@@ -594,7 +594,8 @@ void Channel::SetMode(Player const* player, std::string const& p2n, bool mod, bo
     if (!victim || !IsOn(victim) ||
         // allow make moderator from another team only if both is GMs
         // at this moment this only way to show channel post for GM from another team
-        ((!AccountMgr::IsGMAccount(sec) || !AccountMgr::IsGMAccount(newp->GetSession()->GetSecurity())) && player->GetTeamId() != newp->GetTeamId()))
+        ((!AccountMgr::IsGMAccount(sec) || !AccountMgr::IsGMAccount(newp->GetSession()->GetSecurity())) && player->GetTeamId() != newp->GetTeamId() && 
+		!sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_CHANNEL)))
     {
         WorldPacket data;
         MakePlayerNotFound(&data, p2n);
@@ -659,7 +660,8 @@ void Channel::SetOwner(Player const* player, std::string const& newname)
     Player* newp = ObjectAccessor::FindPlayerByName(newname, false);
     uint64 victim = newp ? newp->GetGUID() : 0;
 
-    if (!victim || !IsOn(victim) || newp->GetTeamId() != player->GetTeamId())
+	if (!victim || !IsOn(victim) || newp->GetTeamId() != player->GetTeamId() &&
+		!sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_CHANNEL))
     {
         WorldPacket data;
         MakePlayerNotFound(&data, newname);
@@ -763,6 +765,9 @@ void Channel::Say(uint64 guid, std::string const& what, uint32 lang)
 {
     if (what.empty())
         return;
+
+	if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_CHANNEL))
+		lang = LANG_UNIVERSAL;
 
     if (!IsOn(guid))
     {

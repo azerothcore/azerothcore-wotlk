@@ -813,8 +813,6 @@ void GameObject::SaveToDB()
 
 void GameObject::SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask)
 { 
-	return;
-
     const GameObjectTemplate* goI = GetGOInfo();
 
     if (!goI)

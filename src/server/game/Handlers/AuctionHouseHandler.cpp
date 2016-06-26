@@ -265,7 +265,11 @@ void WorldSession::HandleAuctionSellItem(WorldPacket & recvData)
 
         AuctionEntry* AH = new AuctionEntry;
         AH->Id = sObjectMgr->GenerateAuctionID();
-        AH->auctioneer = GUID_LOPART(auctioneer);
+
+		if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_AUCTION))
+			AH->auctioneer = 23442;
+		else
+			AH->auctioneer = GUID_LOPART(auctioneer);
 
         // Required stack size of auction matches to current item stack size, just move item to auctionhouse
         if (itemsCount == 1 && item->GetCount() == count[i])

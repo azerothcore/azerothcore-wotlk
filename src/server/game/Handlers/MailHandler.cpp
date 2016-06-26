@@ -189,7 +189,7 @@ void WorldSession::HandleSendMail(WorldPacket & recvData)
         ? receive->GetSession()->GetAccountId()
         : sObjectMgr->GetPlayerAccountIdByGUID(rc);
 
-    if (/*!accountBound*/ GetAccountId() != rc_account && player->GetTeamId() != rc_teamId && AccountMgr::IsPlayerAccount(GetSecurity()))
+	if (/*!accountBound*/ GetAccountId() != rc_account && !sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_MAIL) && player->GetTeamId() != rc_teamId && AccountMgr::IsPlayerAccount(GetSecurity()))
     {
         player->SendMailResult(0, MAIL_SEND, MAIL_ERR_NOT_YOUR_TEAM);
         return;

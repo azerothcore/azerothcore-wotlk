@@ -363,7 +363,7 @@ public:
     static bool HandleReloadAutobroadcastCommand(ChatHandler* handler, const char* /*args*/)
     {
         sLog->outString("Re-Loading Autobroadcasts...");
-        //sWorld->LoadAutobroadcasts();
+        sWorld->LoadAutobroadcasts();
         handler->SendGlobalGMSysMessage("DB table `autobroadcast` reloaded.");
         return true;
     }

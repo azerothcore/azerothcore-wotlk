@@ -90,6 +90,17 @@ enum WorldBoolConfigs
     CONFIG_ALLOW_PLAYER_COMMANDS,
     CONFIG_CLEAN_CHARACTER_DB,
     CONFIG_STATS_SAVE_ONLY_ON_LOGOUT,
+    CONFIG_ALLOW_TWO_SIDE_ACCOUNTS,
+    CONFIG_ALLOW_TWO_SIDE_INTERACTION_CALENDAR,
+    CONFIG_ALLOW_TWO_SIDE_INTERACTION_CHAT,
+    CONFIG_ALLOW_TWO_SIDE_INTERACTION_CHANNEL,
+    CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP,
+    CONFIG_ALLOW_TWO_SIDE_INTERACTION_GUILD,
+    CONFIG_ALLOW_TWO_SIDE_INTERACTION_AUCTION,
+    CONFIG_ALLOW_TWO_SIDE_INTERACTION_MAIL,
+    CONFIG_ALLOW_TWO_SIDE_WHO_LIST,
+    CONFIG_ALLOW_TWO_SIDE_ADD_FRIEND,
+    CONFIG_ALLOW_TWO_SIDE_TRADE,
     CONFIG_ALL_TAXI_PATHS,
     CONFIG_INSTANT_TAXI,
     CONFIG_INSTANCE_IGNORE_LEVEL,
@@ -741,6 +752,8 @@ class World
         void LoadDBVersion();
         char const* GetDBVersion() const { return m_DBVersion.c_str(); }
 
+		void LoadAutobroadcasts();
+		
         void UpdateAreaDependentAuras();
 
         uint32 GetCleaningFlags() const { return m_CleaningFlags; }
@@ -841,7 +854,11 @@ class World
         // used versions
         std::string m_DBVersion;
 
-        std::list<std::string> m_Autobroadcasts;
+        typedef std::map<uint8, std::string> AutobroadcastsMap;
+        AutobroadcastsMap m_Autobroadcasts;
+
+        typedef std::map<uint8, uint8> AutobroadcastsWeightMap;
+        AutobroadcastsWeightMap m_AutobroadcastsWeights;
 
         void ProcessQueryCallbacks();
         ACE_Future_Set<PreparedQueryResult> m_realmCharCallbacks;

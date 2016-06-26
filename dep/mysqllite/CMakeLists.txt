@@ -24,13 +24,13 @@ set(WITH_FAST_MUTEXES OFF)
 
 # Handle useful options - hardcode to ON/OFF
 set(ENABLED_PROFILING OFF)
-set_directory_properties(PROPERTIES COMPILE_DEFINITIONS_DEBUG ENABLED_DEBUG_SYNC)
+set_directory_properties(PROPERTIES COMPILE_DEFINITIONS $<$<CONFIG:Debug>:ENABLED_DEBUG_SYNC)
  
 # Set DBUG_OFF and other optional release-only flags for non-debug project types
 foreach(BUILD_TYPE RELEASE RELWITHDEBINFO MINSIZEREL)
-  set_directory_properties(PROPERTIES COMPILE_DEFINITIONS_${BUILD_TYPE} DBUG_OFF)
+  set_directory_properties(PROPERTIES COMPILE_DEFINITIONS_<CONFIG> DBUG_OFF)
   if(WITH_FAST_MUTEXES)
-    set_directory_properties(PROPERTIES COMPILE_DEFINITIONS_${BUILD_TYPE} "MY_PTHREAD_FASTMUTEX=1")
+    set_directory_properties(PROPERTIES COMPILE_DEFINITIONS_<CONFIG> "MY_PTHREAD_FASTMUTEX=1")
   endif()
 endforeach()
 

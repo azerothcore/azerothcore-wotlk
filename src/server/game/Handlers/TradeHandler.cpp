@@ -618,11 +618,11 @@ void WorldSession::HandleInitiateTradeOpcode(WorldPacket& recvPacket)
         return;
     }
 
-    if (pOther->GetTeamId() !=_player->GetTeamId())
-    {
-        SendTradeStatus(TRADE_STATUS_WRONG_FACTION);
-        return;
-    }
+	if (!sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_TRADE) && pOther->GetTeamId() != _player->GetTeamId())
+	{
+		SendTradeStatus(TRADE_STATUS_WRONG_FACTION);
+		return;
+	}
 
     if (!pOther->IsWithinDistInMap(_player, 10.0f, false))
     {

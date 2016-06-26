@@ -1706,7 +1706,8 @@ void LFGMgr::RemoveProposal(LfgProposalContainer::iterator itProposal, LfgUpdate
 	for (LfgProposalPlayerContainer::iterator it = proposal.players.begin(); it != proposal.players.end(); ++it)
 		if (it->second.accept == LFG_ANSWER_DENY)
 			if (Player* plr = sObjectAccessor->FindPlayer(it->first))
-				if (Aura* aura = plr->AddAura(LFG_SPELL_DUNGEON_COOLDOWN, plr)) 					aura->SetDuration(150*IN_MILLISECONDS);
+				if (Aura* aura = plr->AddAura(LFG_SPELL_DUNGEON_COOLDOWN, plr)) 
+					aura->SetDuration(150*IN_MILLISECONDS);
 
     // Mark players/groups to be removed
     LfgGuidSet toRemove;
@@ -2350,6 +2351,9 @@ void LFGMgr::SetLeader(uint64 gguid, uint64 leader)
 
 void LFGMgr::SetTeam(uint64 guid, TeamId teamId)
 {
+	if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP))
+		teamId = TEAM_ALLIANCE; // @Not Sure About That TeamId is supposed to be uint8 Team = 0(@TrinityCore)
+
     PlayersStore[guid].SetTeam(teamId);
 }
 

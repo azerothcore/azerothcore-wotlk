@@ -36,6 +36,10 @@ enum AccountOpResult
 
 namespace AccountMgr
 {
+	AccountOpResult CreateAccount(std::string username, std::string password);
+	AccountOpResult DeleteAccount(uint32 accountId);
+	AccountOpResult ChangeUsername(uint32 accountId, std::string newUsername, std::string newPassword);
+	AccountOpResult ChangePassword(uint32 accountId, std::string newPassword);
     bool CheckPassword(uint32 accountId, std::string password);
 
     uint32 GetId(std::string const& username);

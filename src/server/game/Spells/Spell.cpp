@@ -6139,7 +6139,7 @@ SpellCastResult Spell::CheckCasterAuras(bool preventionOnly) const
 			if (usableInStun)
 			{
 				bool foundNotStun = false;
-				uint32 mask = 1<<MECHANIC_STUN;
+				uint32 mask = (1 << MECHANIC_STUN) | (1 << MECHANIC_FREEZE) | (1 << MECHANIC_HORROR);
 				// Barkskin should skip sleep effects, sap and fears
 				if (m_spellInfo->Id == 22812)
 					mask |= 1<<MECHANIC_SAPPED | 1<<MECHANIC_HORROR | 1<<MECHANIC_SLEEP;

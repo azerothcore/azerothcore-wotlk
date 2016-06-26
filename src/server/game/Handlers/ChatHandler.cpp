@@ -165,25 +165,38 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
             lang = LANG_UNIVERSAL;
         else
         {
-            switch (type)
-            {
-                case CHAT_MSG_PARTY:
-                case CHAT_MSG_PARTY_LEADER:
-                case CHAT_MSG_RAID:
-                case CHAT_MSG_RAID_LEADER:
-                case CHAT_MSG_RAID_WARNING:
-                    specialMessageLimit = 35;
-                    break;
-                case CHAT_MSG_GUILD:
-                case CHAT_MSG_OFFICER:
-                    specialMessageLimit = 15;
-                    break;
-                case CHAT_MSG_WHISPER:
-                    if (sender->getLevel() >= 80)
-                        specialMessageLimit = 15;
-                    break;
-            }
+			// send in universal language in two side iteration allowed mode
+			if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_CHAT))
+				lang = LANG_UNIVERSAL;
+			else
+			{
+				switch (type)
+				{
+				case CHAT_MSG_PARTY:
+				case CHAT_MSG_PARTY_LEADER:
+				case CHAT_MSG_RAID:
+				case CHAT_MSG_RAID_LEADER:
+				case CHAT_MSG_RAID_WARNING:
+					// allow two side chat at group channel if two side group allowed
+					if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP))
+						lang = LANG_UNIVERSAL;
 
+					specialMessageLimit = 35;
+					break;
+				case CHAT_MSG_GUILD:
+				case CHAT_MSG_OFFICER:
+					// allow two side chat at guild channel if two side guild allowed
+					if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GUILD))
+						lang = LANG_UNIVERSAL;
+
+					specialMessageLimit = 15;
+					break;
+				case CHAT_MSG_WHISPER:
+					if (sender->getLevel() >= 80)
+						specialMessageLimit = 15;
+					break;
+				}
+			}
             // but overwrite it by SPELL_AURA_MOD_LANGUAGE auras (only single case used)
             Unit::AuraEffectList const& ModLangAuras = sender->GetAuraEffectsByType(SPELL_AURA_MOD_LANGUAGE);
             if (!ModLangAuras.empty())
@@ -335,7 +348,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
                 return;
             }
 
-            if (senderIsPlayer && receiverIsPlayer)
+			if (!sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_CHAT) && senderIsPlayer && receiverIsPlayer)
                 if (GetPlayer()->GetTeamId() != receiver->GetTeamId())
                 {
                     SendWrongFactionNotice();
