@@ -1,0 +1,27 @@
+// -*- MPC -*-
+feature(ace_svcconf) {
+  macros -= ACE_LACKS_ACE_SVCCONF
+
+  Source_Files(ACE_COMPONENTS) {
+    DLL.cpp
+    Dynamic_Service_Base.cpp
+    Dynamic_Service_Dependency.cpp
+    Parse_Node.cpp
+    Service_Config.cpp
+    Service_Gestalt.cpp
+    Service_Manager.cpp
+    Service_Object.cpp
+    Service_Repository.cpp
+    Service_Types.cpp
+    Shared_Object.cpp
+    Svc_Conf_Lexer.cpp
+    Svc_Conf_y.cpp
+    Encoding_Converter.cpp
+    Encoding_Converter_Factory.cpp
+    UTF8_Encoding_Converter.cpp
+    UTF16_Encoding_Converter.cpp
+    UTF32_Encoding_Converter.cpp
+    XML_Svc_Conf.cpp
+  }
+}
+

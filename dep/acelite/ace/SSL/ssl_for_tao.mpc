@@ -1,0 +1,43 @@
+//  -*- MPC -*-
+project(SSL_FOR_TAO) : acelib, ace_output, install, ace_openssl {
+  requires    += ssl ace_for_tao
+  sharedname   = ACE_SSL_FOR_TAO
+  dynamicflags += ACE_SSL_BUILD_DLL
+
+  Source_Files {
+    SSL_Context.cpp
+    SSL_SOCK.cpp
+    SSL_SOCK_Acceptor.cpp
+    SSL_SOCK_Connector.cpp
+    SSL_SOCK_Stream.cpp
+  }
+
+  Header_Files {
+    SSL_Context.h
+    SSL_Export.h
+    SSL_SOCK.h
+    SSL_SOCK_Acceptor.h
+    SSL_SOCK_Connector.h
+    SSL_SOCK_Stream.h
+    sslconf.h
+  }
+
+  Inline_Files {
+    SSL_SOCK.inl
+    SSL_SOCK_Acceptor.inl
+    SSL_SOCK_Connector.inl
+    SSL_Context.inl
+    SSL_SOCK_Stream.inl
+  }
+
+  Template_Files {
+  }
+
+  pkgconfig_files {
+    ACE_SSL.pc.in
+  }
+
+  specific {
+    install_dir = ace/SSL
+  }
+}

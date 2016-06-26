@@ -1,0 +1,72 @@
+
+-- Scarlet Peasant (28557)
+DELETE FROM creature_text WHERE entry=28557;
+INSERT INTO creature_text VALUES (28557, 0, 0, 'Don''t kill me! I only took this job for the benefits!', 12, 0, 100, 0, 0, 0, 0, 'Scarlet Peasant');
+INSERT INTO creature_text VALUES (28557, 0, 1, 'I picked the wrong week to quit drinkin''!', 12, 0, 100, 0, 0, 0, 0, 'Scarlet Peasant');
+INSERT INTO creature_text VALUES (28557, 0, 2, 'I''ve got five kids, $gman:lady;! They''ll die without me!', 12, 0, 100, 0, 0, 0, 0, 'Scarlet Peasant');
+INSERT INTO creature_text VALUES (28557, 0, 3, 'I... I got a sick grandma at home... I... I''m all she''s got, $gmister:miss;.', 12, 0, 100, 0, 0, 0, 0, 'Scarlet Peasant');
+INSERT INTO creature_text VALUES (28557, 0, 4, 'Let me live! I''ll do whatever you say!', 12, 0, 100, 0, 0, 0, 0, 'Scarlet Peasant');
+INSERT INTO creature_text VALUES (28557, 0, 5, 'Please, no! Spare me!', 12, 0, 100, 0, 0, 0, 0, 'Scarlet Peasant');
+INSERT INTO creature_text VALUES (28557, 0, 6, 'Ungh... I... I think I pooped...', 12, 0, 100, 0, 0, 0, 0, 'Scarlet Peasant');
+INSERT INTO creature_text VALUES (28557, 0, 7, 'You don''t have to do this! Nobody has to die!', 12, 0, 100, 0, 0, 0, 0, 'Scarlet Peasant');
+UPDATE creature_template SET AIName='SmartAI', ScriptName='' WHERE entry=28557;
+DELETE FROM smart_scripts WHERE entryorguid=28557 AND source_type=0;
+INSERT INTO smart_scripts VALUES (28557, 0, 0, 0, 25, 0, 100, 0, 0, 0, 0, 0, 22, 1, 1, 1, 1, 2, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Peasant - On Reset - Set Event Phase');
+INSERT INTO smart_scripts VALUES (28557, 0, 1, 2, 4, 1, 100, 0, 0, 0, 0, 0, 11, 52384, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Peasant - On Aggro - Cast Cosmetic - Periodic Cower Effect');
+INSERT INTO smart_scripts VALUES (28557, 0, 2, 3, 61, 0, 100, 0, 0, 0, 0, 0, 11, 52385, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Peasant - On Aggro - Cast Cosmetic - Periodic Cower');
+INSERT INTO smart_scripts VALUES (28557, 0, 3, 4, 61, 0, 100, 0, 0, 0, 0, 0, 11, 51604, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Peasant - On Aggro - Cast Self Stun');
+INSERT INTO smart_scripts VALUES (28557, 0, 4, 0, 61, 0, 100, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Peasant - On Aggro - Say Line 0');
+
+-- Citizen of Havenshire (28576)
+DELETE FROM creature_text WHERE entry=28576;
+INSERT INTO creature_text VALUES (28576, 0, 0, 'Come then, death knight!', 12, 0, 100, 0, 0, 0, 0, 'Citizen of Havenshire');
+INSERT INTO creature_text VALUES (28576, 0, 1, 'Die Scourge dog! DIE!', 12, 0, 100, 0, 0, 0, 0, 'Citizen of Havenshire');
+INSERT INTO creature_text VALUES (28576, 0, 2, 'DIE!', 12, 0, 100, 0, 0, 0, 0, 'Citizen of Havenshire');
+INSERT INTO creature_text VALUES (28576, 0, 3, 'I won''t go down that easy!', 12, 0, 100, 0, 0, 0, 0, 'Citizen of Havenshire');
+INSERT INTO creature_text VALUES (28576, 0, 4, 'You''re not taking me without a fight!', 12, 0, 100, 0, 0, 0, 0, 'Citizen of Havenshire');
+INSERT INTO creature_text VALUES (28576, 1, 0, 'Have mercy, $gsir:madam;!', 12, 0, 100, 0, 0, 0, 0, 'Citizen of Havenshire');
+INSERT INTO creature_text VALUES (28576, 1, 1, 'No! Please! I... I have children! I... I...', 12, 0, 100, 0, 0, 0, 0, 'Citizen of Havenshire');
+INSERT INTO creature_text VALUES (28576, 1, 2, 'P... Please don''t...', 12, 0, 100, 0, 0, 0, 0, 'Citizen of Havenshire');
+INSERT INTO creature_text VALUES (28576, 1, 3, 'Spare my life! I will leave this place forever! Please!', 12, 0, 100, 0, 0, 0, 0, 'Citizen of Havenshire');
+INSERT INTO creature_text VALUES (28576, 2, 0, 'I almost... made it...', 12, 0, 100, 0, 0, 0, 0, 'Citizen of Havenshire');
+INSERT INTO creature_text VALUES (28576, 2, 1, 'May the Light take mercy on your soul, death knight.', 12, 0, 100, 0, 0, 0, 0, 'Citizen of Havenshire');
+INSERT INTO creature_text VALUES (28576, 2, 2, 'Why?', 12, 0, 100, 0, 0, 0, 0, 'Citizen of Havenshire');
+INSERT INTO creature_text VALUES (28576, 2, 3, 'You make my children orphans on this day, fiend!', 12, 0, 100, 0, 0, 0, 0, 'Citizen of Havenshire');
+INSERT INTO creature_text VALUES (28576, 2, 4, 'You may take my life, but you won''t take my freedom!', 12, 0, 100, 0, 0, 0, 0, 'Citizen of Havenshire');
+UPDATE creature_template SET AIName='SmartAI', ScriptName='' WHERE entry=28576;
+DELETE FROM smart_scripts WHERE entryorguid=28576 AND source_type=0;
+INSERT INTO smart_scripts VALUES (28576, 0, 0, 0, 25, 0, 100, 0, 0, 0, 0, 0, 22, 1, 2, 2, 2, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Reset - Set Event Phase');
+INSERT INTO smart_scripts VALUES (28576, 0, 1, 2, 4, 1, 100, 0, 0, 0, 0, 0, 11, 52384, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Aggro - Cast Cosmetic - Periodic Cower Effect');
+INSERT INTO smart_scripts VALUES (28576, 0, 2, 3, 61, 0, 100, 0, 0, 0, 0, 0, 11, 52385, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Aggro - Cast Cosmetic - Periodic Cower');
+INSERT INTO smart_scripts VALUES (28576, 0, 3, 4, 61, 0, 100, 0, 0, 0, 0, 0, 11, 51604, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Aggro - Cast Self Stun');
+INSERT INTO smart_scripts VALUES (28576, 0, 4, 0, 61, 0, 100, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Aggro - Say Line 1');
+INSERT INTO smart_scripts VALUES (28576, 0, 5, 0, 4, 2, 50, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Aggro - Say Line 0');
+INSERT INTO smart_scripts VALUES (28576, 0, 6, 0, 2, 2, 50, 1, 0, 30, 0, 0, 11, 52262, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - Between Health 0-30% - Cast Cornered and Enraged!');
+INSERT INTO smart_scripts VALUES (28576, 0, 7, 0, 6, 0, 50, 0, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Death - Say Line 2');
+
+-- Citizen of Havenshire (28577)
+DELETE FROM creature_text WHERE entry=28577;
+INSERT INTO creature_text VALUES (28577, 0, 0, 'Come then, death knight!', 12, 0, 100, 0, 0, 0, 0, 'Citizen of Havenshire');
+INSERT INTO creature_text VALUES (28577, 0, 1, 'Die Scourge dog! DIE!', 12, 0, 100, 0, 0, 0, 0, 'Citizen of Havenshire');
+INSERT INTO creature_text VALUES (28577, 0, 2, 'DIE!', 12, 0, 100, 0, 0, 0, 0, 'Citizen of Havenshire');
+INSERT INTO creature_text VALUES (28577, 0, 3, 'I won''t go down that easy!', 12, 0, 100, 0, 0, 0, 0, 'Citizen of Havenshire');
+INSERT INTO creature_text VALUES (28577, 0, 4, 'You''re not taking me without a fight!', 12, 0, 100, 0, 0, 0, 0, 'Citizen of Havenshire');
+INSERT INTO creature_text VALUES (28577, 1, 0, 'Have mercy, $gsir:madam;!', 12, 0, 100, 0, 0, 0, 0, 'Citizen of Havenshire');
+INSERT INTO creature_text VALUES (28577, 1, 1, 'No! Please! I... I have children! I... I...', 12, 0, 100, 0, 0, 0, 0, 'Citizen of Havenshire');
+INSERT INTO creature_text VALUES (28577, 1, 2, 'P... Please don''t...', 12, 0, 100, 0, 0, 0, 0, 'Citizen of Havenshire');
+INSERT INTO creature_text VALUES (28577, 1, 3, 'Spare my life! I will leave this place forever! Please!', 12, 0, 100, 0, 0, 0, 0, 'Citizen of Havenshire');
+INSERT INTO creature_text VALUES (28577, 2, 0, 'I almost... made it...', 12, 0, 100, 0, 0, 0, 0, 'Citizen of Havenshire');
+INSERT INTO creature_text VALUES (28577, 2, 1, 'May the Light take mercy on your soul, death knight.', 12, 0, 100, 0, 0, 0, 0, 'Citizen of Havenshire');
+INSERT INTO creature_text VALUES (28577, 2, 2, 'Why?', 12, 0, 100, 0, 0, 0, 0, 'Citizen of Havenshire');
+INSERT INTO creature_text VALUES (28577, 2, 3, 'You make my children orphans on this day, fiend!', 12, 0, 100, 0, 0, 0, 0, 'Citizen of Havenshire');
+INSERT INTO creature_text VALUES (28577, 2, 4, 'You may take my life, but you won''t take my freedom!', 12, 0, 100, 0, 0, 0, 0, 'Citizen of Havenshire');
+UPDATE creature_template SET AIName='SmartAI', ScriptName='' WHERE entry=28577;
+DELETE FROM smart_scripts WHERE entryorguid=28577 AND source_type=0;
+INSERT INTO smart_scripts VALUES (28577, 0, 0, 0, 25, 0, 100, 0, 0, 0, 0, 0, 22, 1, 2, 2, 2, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Reset - Set Event Phase');
+INSERT INTO smart_scripts VALUES (28577, 0, 1, 2, 4, 1, 100, 0, 0, 0, 0, 0, 11, 52384, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Aggro - Cast Cosmetic - Periodic Cower Effect');
+INSERT INTO smart_scripts VALUES (28577, 0, 2, 3, 61, 0, 100, 0, 0, 0, 0, 0, 11, 52385, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Aggro - Cast Cosmetic - Periodic Cower');
+INSERT INTO smart_scripts VALUES (28577, 0, 3, 4, 61, 0, 100, 0, 0, 0, 0, 0, 11, 51604, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Aggro - Cast Self Stun');
+INSERT INTO smart_scripts VALUES (28577, 0, 4, 0, 61, 0, 100, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Aggro - Say Line 1');
+INSERT INTO smart_scripts VALUES (28577, 0, 5, 0, 4, 2, 50, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Aggro - Say Line 0');
+INSERT INTO smart_scripts VALUES (28577, 0, 6, 0, 2, 2, 50, 1, 0, 30, 0, 0, 11, 52262, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - Between Health 0-30% - Cast Cornered and Enraged!');
+INSERT INTO smart_scripts VALUES (28577, 0, 7, 0, 6, 0, 50, 0, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Death - Say Line 2');

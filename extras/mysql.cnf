@@ -1,0 +1,90 @@
+[client]
+port		= 3306
+socket		= /var/run/mysqld/mysqld.sock
+
+
+
+[mysqld_safe]
+socket		= /var/run/mysqld/mysqld.sock
+nice		= 0
+
+
+
+[mysqld]
+user		= mysql
+pid-file	= /var/run/mysqld/mysqld.pid
+socket		= /var/run/mysqld/mysqld.sock
+port		= 3306
+basedir		= /mnt/raid0/mysql/basedir
+datadir		= /mnt/raid0/mysql/data
+tmpdir		= /mnt/raid0/mysql/tmp
+lc-messages-dir	= /usr/share/mysql
+skip-external-locking
+bind-address = 0.0.0.0
+max_connections = 500
+max_user_connections = 500
+
+
+sort_buffer_size = 4M
+myisam_sort_buffer_size = 8M
+innodb_sort_buffer_size = 4M
+
+read_buffer_size = 256K
+join_buffer_size = 256K
+read_rnd_buffer_size = 256K
+
+key_buffer_size = 2G
+max_allowed_packet = 128M
+transaction_isolation = READ-COMMITTED
+tmp_table_size = 32M
+
+innodb_flush_method = ALL_O_DIRECT
+innodb_buffer_pool_size = 64G
+innodb_additional_mem_pool_size = 100M
+innodb_log_file_size = 4G 
+innodb_log_buffer_size = 1G 
+innodb_flush_log_at_trx_commit=0 
+innodb_thread_concurrency=24 
+innodb_file_per_table 
+innodb_table_locks=0 
+innodb_log_files_in_group = 2 
+innodb_log_block_size = 4096 
+innodb_purge_threads = 2 
+innodb_doublewrite = 0 
+innodb_io_capacity = 1000 
+innodb_read_io_threads = 24 
+innodb_write_io_threads = 24 
+innodb_read_ahead = 0 
+innodb_concurrency_tickets = 500 
+
+thread_stack = 192K
+thread_cache_size = 16
+myisam-recover = BACKUP
+query_cache_limit = 0
+query_cache_size = 0
+general_log = 0
+slow_query_log = 0
+long_query_time = 60
+log_error = /mnt/raid0/mysql/logs/error.log
+expire_logs_days = 10
+
+
+
+[mysqldump]
+quick
+quote-names
+max_allowed_packet	= 16M
+
+
+
+[mysql]
+#no-auto-rehash	# faster start of mysql but no tab completition
+
+
+
+[isamchk]
+key_buffer		= 16M
+
+
+
+!includedir /etc/mysql/conf.d/

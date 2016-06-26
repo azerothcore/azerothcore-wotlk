@@ -1,0 +1,21 @@
+//  -*- MPC -*-
+project(SSL) : acelib, ace_output, install, ace_openssl {
+  avoids      += ace_for_tao
+  requires    += ssl
+  sharedname   = ACE_SSL
+  dynamicflags += ACE_SSL_BUILD_DLL
+
+  specific {
+    install_dir = ace/SSL
+  }
+
+  pkgconfig_files {
+    ACE_SSL.pc.in
+  }
+
+  specific(gnuace) {
+    pkgconfig_variables += ACE_TLS_CPPFLAGS=$(PLATFORM_SSL_CPPFLAGS)
+    pkgconfig_variables += ACE_TLS_LDFLAGS=$(PLATFORM_SSL_LDFLAGS)
+    pkgconfig_variables += ACE_TLS_LIBS=$(PLATFORM_SSL_LIBS)
+  }
+}

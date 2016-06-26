@@ -1,0 +1,30 @@
+html, body {
+	background: #000000 url(bg_tile.gif);
+	margin: 0px;
+	color: #848484;
+	font-family:Arial, Helvetica, sans-serif;
+	font-size:9pt;
+}
+
+table {
+	background: #1f1f1f;
+	border: 1px solid #363636;
+	margin-bottom:20px;
+}
+
+td {	
+	background-color:black;
+	font-size:9pt;
+}
+
+th {
+	background: #373737 url(grad.gif) repeat-x top left;
+	font-size:9pt;
+	text-align: left;
+	color:#FFFFFF;
+	border-top: 1px solid #363636;
+}
+
+tr.head th {
+	background: #0E72A4 url(cellpic3.gif) repeat-x top left;
+}

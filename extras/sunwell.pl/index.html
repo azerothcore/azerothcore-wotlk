@@ -1,0 +1,523 @@
+<HTML>
+	
+<!-- Mirrored from sunwell.pl/ by HTTrack Website Copier/3.x [XR&CO'2014], Tue, 16 Feb 2016 21:24:26 GMT -->
+<HEAD>
+		<TITLE>SunwellCore</TITLE>
+		<META HTTP-EQUIV="Content-type" CONTENT="text/html; charset=utf-8">
+		<LINK REL="Stylesheet" TYPE="text/css" HREF="style.css">
+	</HEAD>
+	<BODY>
+		&nbsp;
+		<DIV ID="content">
+			&nbsp;
+			<DIV CLASS="page-title">Why <SPAN STYLE="font-size: 28px;">S</SPAN>unwell<SPAN STYLE="font-size: 28px;">C</SPAN>ore</DIV>&nbsp;
+			<P CLASS="sc-paragraph" STYLE="line-height: 18px;">
+				&#8227; <A       HREF="#devstate">Current development state</A><BR>
+				&#8227; <A    HREF="#performance">Server performance</A><BR>
+				&#8227; <A       HREF="#movemaps">MoveMaps</A><BR>
+				&#8227; <A    HREF="#spellsystem">Spell system</A><BR>
+				&#8227; <A  HREF="#spellstacking">Spell stacking</A><BR>
+				&#8227; <A         HREF="#hotdot">HoT and DoT calculation</A><BR>
+				&#8227; <A     HREF="#instanceid">Instance ID system</A><BR>
+				&#8227; <A  HREF="#dungeonfinder">Dungeon Finder</A><BR>
+				&#8227; <A       HREF="#bgqueues">Battleground Queues</A><BR>
+				&#8227; <A     HREF="#transports">Transport System</A><BR>
+				&#8227; <A      HREF="#instances">Instances</A><BR>
+				&#8227; <A         HREF="#quests">Quests</A><BR>
+				&#8227; <A           HREF="#pets">Pets</A><BR>
+				&#8227; <A  HREF="#battlegrounds">Battlegrounds and arenas</A><BR>
+				&#8227; <A     HREF="#dynamicmmr">Dynamic MMR</A><BR>
+				&#8227; <A   HREF="#achievements">Achievements</A><BR>
+				&#8227; <A         HREF="#events">Ingame seasonal events</A><BR>
+				&#8227; <A    HREF="#wintergrasp">Wintergrasp</A><BR>
+				&#8227; <A    HREF="#raidbrowser">Raid Browser</A><BR>
+				&#8227; <A HREF="#arenaspectator">Arena Spectator</A><BR>
+				&#8227; <A        HREF="#summary">Summary</A><BR>
+				&#8227; <A       HREF="#download">Download</A><BR>
+			</P>
+
+
+
+			<P CLASS="sc-subtitle"><A NAME="devstate"></A>Current development state</P>
+			<P CLASS="sc-paragraph">
+				The most rational way to assess the current development state would be to check our BugTracker statistics. Over the years thousands of players have been reporting all spotted bugs. At the moment of writing this, there are over 5600 bug reports fixed and only 25 bug reports open (unresolved). That's over 99% of bugs fixed! The BugTracker hasn't been cleared since May 2011.<BR><BR>
+				Besides fixing the most obvious part, which is the content (quests, instances, spells, etc.), we have managed to rewrite major emulator structures and systems to eliminate more general bugs and problems, and also to optimize it. You'll find more informations below.
+			</P>
+
+
+
+			<P CLASS="sc-subtitle"><A NAME="performance"></A>Server performance</P>
+			<P CLASS="sc-paragraph">
+				Firstly, we will have to explain what "update time diff" is (we usually refer to it as "diff" in short). Update time diff is the time it takes the server to process all current tasks. The longer the diff is, the longer you wait for your actions to be processed (running, casting spells, etc.) and the less dynamic the game is. Diff adds up to your network latency (explicitly shown in the game client) and creates final delay you experience while playing. You can check current and average diff (average in the last ~10 seconds) using ".server info" command ingame.<BR><BR>
+				We have managed to lower diffs to ~20ms (milliseconds) on average @ 2500 players online. Here is a <A TARGET="_blank" HREF="img/diff/diff_2015-11-08.jpg">screenshot</A>. We expect diffs to be ~40ms on average @ 4000 players online. We say "expect", because we haven't yet reached 4k since latest optimizations. However, we can guarantee the core easily supports 4000 players online, because it has already supported in the past. Here is a screenshot of 4000 players online with diffs ~65ms on average: <A TARGET="_blank" HREF="img/diff/diff_2014-01-06.jpg">click</A>.<BR><BR>
+				Such exceptionally low diffs were achieved by countless optimizations over the years. Fortunately, we don't have to multiply our player counters by 2 to build up hype, as some popular servers do.
+			</P>
+
+
+
+			<P CLASS="sc-subtitle"><A NAME="movemaps"></A>MoveMaps</P>
+			<P CLASS="sc-paragraph" STYLE="margin-bottom: 6px;">
+				MoveMaps have been coded and enabled in the whole game world since May 2013 and haven't been changed since then. Nice things to mention:
+			</P>
+			<UL STYLE="margin: 0px 60px 0px 60px; color: #000">
+				<LI>working properly in standard places,</LI>
+				<LI>working in water,</LI>
+				<LI>working on the boundaries of water/land,</LI>
+				<LI>proper charge pathing,</LI>
+				<LI>NPCs take into consideration path existence when selecting a target from threat list,</LI>
+				<LI>NPCs evade after the target is unreachable for a few seconds, not sooner,</LI>
+				<LI>slightly different rules for pets.</LI>
+			</UL>
+			<P CLASS="sc-paragraph" STYLE="margin-top: 0px;">
+				&nbsp;<BR>
+				Current MoveMaps implementation is our own, original work. We are using a publicly available library to do the path calculations, while the usage of the library and incorporating it into core systems is our work. Thanks to that the MoveMaps are very fast, having almost no impact on server's performance.<BR><BR>
+				MoveMaps are not perfect though, and never will be. They depend on pre-generated representation of visual textures, which is not ideal is some places.
+			</P>
+
+
+
+			<P CLASS="sc-subtitle"><A NAME="spellsystem"></A>Spell system</P>
+			<P CLASS="sc-paragraph" STYLE="margin-bottom: 6px;">
+				Generally speaking, we have rewritten spell, talent and dual talent specialization systems (September 2014). To be specific, we have completely rewritten the way spells and talents (both in core and database) are stored, added and removed, and rewritten dual talent specialization and talent resetting. This fixed very serious and unacceptable bugs, such as:
+			</P>
+			<UL STYLE="margin: 0px 60px 0px 60px; color: #000">
+				<LI>talent bonuses applied twice,</LI>
+				<LI>talents working without any points spent,</LI>
+				<LI>doubled glyph effects,</LI>
+				<LI>possessing spells which should have been removed from a character,</LI>
+				<LI>and some more.</LI>
+			</UL>
+			<P CLASS="sc-paragraph" STYLE="margin-top: 0px;">
+				&nbsp;<BR>
+				Players hardly notice any difference, however the changes are significant, prevent many bugs, and positively affect balance in PvP and PvE.<BR><BR>
+
+				Besides that, fully working character spells, talents and glyphs have always been our top priority. It happens that from time to time a new bug is discovered and reported. It is then fixed as soon as possible.
+			</P>
+
+
+
+			<P CLASS="sc-subtitle"><A NAME="spellstacking"></A>Spell stacking</P>
+			<P CLASS="sc-paragraph" STYLE="margin-bottom: 6px;">
+				We wrote our own spell stacking system (November 2012). This greatly influences balance in PvP and makes PvE harder, as it should be. Features:
+			</P>
+			<UL STYLE="margin: 0px 60px 0px 60px; color: #000">
+				<LI>Allows more sophisticated stacking rules, to reproduce all rules from the official servers.</LI>
+				<LI>Fixes stacking of many spells.</LI>
+				<LI>If required, allows to have multiple auras applied that shouldn't stack with each other. In such situations only the strongest effects of all the auras are working.</LI>
+				<LI>Implemented "A more powerful spell is already active".</LI>
+				<LI>Faster and simpler from technical point of view.</LI>
+				<LI>Working fully blizzlike.</LI>
+			</UL>
+			<P CLASS="sc-paragraph" STYLE="margin-top: 0px; margin-bottom: 6px;">
+				&nbsp;<BR>
+				Examples:
+			</P>
+			<UL STYLE="margin: 0px 60px 0px 60px; color: #000">
+				<LI>Divine Spirit (80 spirit) + Fel Intelligence (48 intellect + 64 spirit) = 80 spirit + 48 intellect.</LI>
+				<LI>Battle Shout won't be applied to characters having a stronger Blessing of Might. Characters with a weaker effect or no effect at all will gain the buff properly.</LI>
+				<LI>Blessing of Kings and Blessing of Sanctuary will coexist on the target because of other bonuses, but bonus statistics won't accumulate.</LI>
+				<LI>Faerie Fire and Faerie Fire (Feral) from any number of casters will coexist on the target, because they give additional bonuses to the caster when having a talent, but the -5% armor effect won't accumulate.</LI>
+			</UL>
+			<P CLASS="sc-paragraph" STYLE="margin-top: 0px; margin-bottom: 30px;">
+				&nbsp;
+			</P>
+
+
+
+			<P CLASS="sc-subtitle"><A NAME="hotdot"></A>HoT and DoT calculation</P>
+			<P CLASS="sc-paragraph" STYLE="margin-bottom: 6px;">
+				We reworked HoT and DoT calculation (November 2012) to make it work the same as on the official servers. This influences balance in PvP and PvE. Changes:
+			</P>
+			<UL STYLE="margin: 0px 60px 0px 60px; color: #000">
+				<LI>Caster bonuses are calculated once, when the spell is cast, and are constant for the duration of the effect, not affected by the caster losing/gaining any buffs.</LI>
+				<LI>Target modifiers and bonuses affect the DoT/HoT up to date.</LI>
+				<LI>Percentage caster bonuses to damage/heal and to crit chance remain constant after first calculation, even if the aura is refreshed using some talents.</LI>
+				<LI>When refreshing DoT/HoT using talents, Spell Power bonus is recalculated at the moment of refreshing (and then constant again for the new duration).</LI>
+				<LI>DoTs i HoTs are now independent of caster existence. Thanks to that you may for example apply a DoT using Dancing Rune Weapon a second before the DRW disappears and the DoT will correctly deal damage afterwards.</LI>
+				<LI>Introduces "DoT rolling" mechanic, which is important during raids.</LI>
+				<LI>Fully blizzlike.</LI>
+			</UL>
+			<P CLASS="sc-paragraph" STYLE="margin-top: 0px; margin-bottom: 30px;">
+				&nbsp;
+			</P>
+
+
+
+			<P CLASS="sc-subtitle"><A NAME="instanceid"></A>Instance ID system</P>
+			<P CLASS="sc-paragraph" STYLE="margin-bottom: 6px;">
+				We have completely rewritten instance id system and character binding (December 2014). It eliminated some major bugs and fixed various related problems:
+			</P>
+			<UL STYLE="margin: 0px 60px 0px 60px; color: #000">
+				<LI>fixed disappearing permanent instance binds (which allowed to run the same raid few times a week),</LI>
+				<LI>fixed automatic instance id reset randomly not working,</LI>
+				<LI>corrected bugs in creation, loading, closing and resetting of instance maps,</LI>
+				<LI>corrected bugs in group saving, loading and storing group data,</LI>
+				<LI>fixed a few other problems spotted on the occasion, including a few crashes.</LI>
+			</UL>
+			<P CLASS="sc-paragraph" STYLE="margin-top: 0px;">
+				&nbsp;<BR>
+				We have also implemented Instance Lock Extension function, allowing you to extend selected instance id periods. Instance Lock Extension allows every group to progress raids at their own pace. This was possible thanks to rewriting whole instance id system and eliminating huge amount of bugs in it. We also fixed displaying of global id reset times in the in-game calendar and displaying of your own instance lockout periods taking into account current extensions.
+			</P>
+
+
+
+			<P CLASS="sc-subtitle"><A NAME="dungeonfinder"></A>Dungeon Finder</P>
+			<P CLASS="sc-paragraph" STYLE="margin-bottom: 6px;">
+				We have fixed a lot of problems with the Dungeon Finder. The most significant change is our own system of queueing and joining players/groups together into DF groups. The publicly available one, copied to every emulator, performs poorly with lots of players queued. During peak hours, with thousands of players online, it checked less than 1% of all possible combinations of queued players. Our own system checks them all, properly forms groups and is hundreds of times faster. The changes (May 2013) include:
+			</P>
+			<UL STYLE="margin: 0px 60px 0px 60px; color: #000">
+				<LI>Properly joining players together into DF groups, no matter the number of players queued.</LI>
+				<LI>After a proposal fails, players who accepted it are put back to the beginning of the queue.</LI>
+				<LI>You can replace missing group members while inside the instance (by queueing DF again). New members will be teleported to leader's current location.</LI>
+				<LI>Dungeon rewards working for every dungeon, even the low level ones.</LI>
+				<LI>DF won't put groups into instances with mobs/bosses killed.</LI>
+				<LI>Implemented minimum level of gear requirement (only when accessing instances through DF).</LI>
+				<LI>Vote to kick works properly, with a reason to kick asked.</LI>
+				<LI>There are no bugs caused by being disconnected, entering and leaving the instance, and kicking or refilling players.</LI>
+				<LI>Luck of the Draw, Dungeon Cooldown and Dungeon Deserter buffs are working properly.</LI>
+				<LI>Groups are teleported to proper starting locations.</LI>
+			</UL>
+			<P CLASS="sc-paragraph" STYLE="margin-top: 0px; margin-bottom: 30px;">
+				&nbsp;
+			</P>
+
+
+
+			<P CLASS="sc-subtitle"><A NAME="bgqueues"></A>Battleground Queues</P>
+			<P CLASS="sc-paragraph" STYLE="margin-bottom: 6px;">
+				We have rewritten Battleground Queue system and everything related to it (July 2015). Not only lots of bugs were fixed, but also many improvements were introduced. A list of main changes:
+			</P>
+			<UL STYLE="margin: 0px 60px 0px 60px; color: #000">
+				<LI>Joined random and specific queues. Random queue will now gather groups together with specific queues.</LI>
+				<LI>Battlegrounds are created only after required amount of players is gathered for a particular Battleground. This helps to avoid premature closing of large Battlegrounds, caused by insufficient number of participants. In case of lower number of players queued, large Battlegrounds simply won't be created.</LI>
+				<LI>Already created Battlegrounds with free slots are filled up first using queued players. Only then new ones are created. When filling, Battlegrounds with more free slots (in percentage) are prioritized.</LI>
+				<LI>Fixed conditions for queueing as a group and queueing alone. You can queue for two different Battlegrounds at the same time without any bugs (as a group and alone).</LI>
+				<LI>Rewritten algorithms for assembling teams from queued groups/players. This applies to premade Battlegrounds, standard Battlegrounds, non-rated arenas and non-rated arenas against the same faction.</LI>
+				<LI>Fixed balancing of players in the opposite teams on Battlegrounds. The algorithm was reworked, and now takes into account actually invited characters and characters being teleported at the moment.</LI>
+				<LI>Fixed exceeding maximum number of players on either team.</LI>
+				<LI>Always sending proper queue and bg status to the game client.</LI>
+				<LI>And some more... ;)</LI>
+			</UL>
+			<P CLASS="sc-paragraph" STYLE="margin-top: 0px; margin-bottom: 30px;">
+				&nbsp;
+			</P>
+
+
+
+			<P CLASS="sc-subtitle"><A NAME="transports"></A>Transport System</P>
+			<P CLASS="sc-paragraph">
+				For the typical motion transports (zeppelins, ships, etc.), we have fixed position desynchronization (visual vs actual) affecting a few of them, vmap issues and some bugs with fighting on such transports moving.<BR><BR>
+				But most importantly, we have implemented static transports (July 2015), ie. elevators and trams. This means that players, pets, totems, traps, etc., now move along with elevators. Their position is updated both visually and actually according to the movement of the elevator. This applies to all kinds of transport, in every state, for any parameters, any rotation of the transport, rotation of it's path and rotation of it's animation. Also Line of Sight is properly blocked in the current position of every transport. This will surely be noticeable on Ring of Valor arena.
+			</P>
+
+
+
+			<P CLASS="sc-subtitle"><A NAME="instances"></A>Instances</P>
+			<P CLASS="sc-paragraph" STYLE="margin-bottom: 6px;">
+				Instead of waiting for hundreds of bugs to be reported, we decided to entirely rewrite every instance there is in the game. And by entirely we mean entirely (bosses, trash, scenes, achievements, etc.). Up to this moment, we have managed to rewrite:
+			</P>
+			<UL STYLE="margin: 0px 60px 0px 60px; color: #000">
+				<LI>WotLK dungeons: 16 of 16</LI>
+				<LI>WotLK raids: 9 of 9</LI>
+				<LI>TBC dungeons: 16 of 16</LI>
+				<LI>TBC raids: 6 of 9</LI>
+				<LI>Vanilla dungeons: 17 of 19</LI>
+				<LI>Vanilla raids: 0 of 5</LI>
+			</UL>
+			<P CLASS="sc-paragraph" STYLE="margin-top: 0px; margin-bottom: 6px;">
+				&nbsp;<BR>
+				Every instance in the game is open and available. Exact list of their current status is below.<BR><BR>
+				<B>WotLK dungeons:</B>
+			</P>
+			<UL STYLE="margin: 0px 60px 0px 60px; color: #000">
+				<LI>Halls of Reflection - <SPAN STYLE="color: green">rewritten and available</SPAN></LI>
+				<LI>Pit of Saron - <SPAN STYLE="color: green">rewritten and available</SPAN></LI>
+				<LI>The Forge of Souls - <SPAN STYLE="color: green">rewritten and available</SPAN></LI>
+				<LI>Trial of the Champion - <SPAN STYLE="color: green">rewritten and available</SPAN></LI>
+				<LI>The Culling of Stratholme - <SPAN STYLE="color: green">rewritten and available</SPAN></LI>
+				<LI>Utgarde Pinnacle - <SPAN STYLE="color: green">rewritten and available</SPAN></LI>
+				<LI>Halls of Lightning - <SPAN STYLE="color: green">rewritten and available</SPAN></LI>
+				<LI>The Oculus - <SPAN STYLE="color: green">rewritten and available</SPAN></LI>
+				<LI>Halls of Stone - <SPAN STYLE="color: green">rewritten and available</SPAN></LI>
+				<LI>Gundrak - <SPAN STYLE="color: green">rewritten and available</SPAN></LI>
+				<LI>Violet Hold - <SPAN STYLE="color: green">rewritten and available</SPAN></LI>
+				<LI>Drak'Tharon Keep - <SPAN STYLE="color: green">rewritten and available</SPAN></LI>
+				<LI>Ahn'kahet: The Old Kingdom - <SPAN STYLE="color: green">rewritten and available</SPAN></LI>
+				<LI>Azjol-Nerub - <SPAN STYLE="color: green">rewritten and available</SPAN></LI>
+				<LI>The Nexus - <SPAN STYLE="color: green">rewritten and available</SPAN></LI>
+				<LI>Utgarde Keep - <SPAN STYLE="color: green">rewritten and available</SPAN></LI>
+			</UL>
+			<P CLASS="sc-paragraph" STYLE="margin-top: 0px; margin-bottom: 6px;">
+				&nbsp;<BR>
+				<B>WotLK raids:</B>
+			</P>
+			<UL STYLE="margin: 0px 60px 0px 60px; color: #000">
+				<LI>The Ruby Sanctum - <SPAN STYLE="color: green">rewritten and available</SPAN></LI>
+				<LI>Icecrown Citadel - <SPAN STYLE="color: green">rewritten and available</SPAN></LI>
+				<LI>Onyxia's Lair - <SPAN STYLE="color: green">rewritten and available</SPAN></LI>
+				<LI>Trial of the Crusader - <SPAN STYLE="color: green">rewritten and available</SPAN></LI>
+				<LI>Ulduar - <SPAN STYLE="color: green">rewritten and available</SPAN></LI>
+				<LI>The Eye of Eternity - <SPAN STYLE="color: green">rewritten and available</SPAN></LI>
+				<LI>Vault of Archavon - <SPAN STYLE="color: green">rewritten and available</SPAN></LI>
+				<LI>The Obsidian Sanctum - <SPAN STYLE="color: green">rewritten and available</SPAN></LI>
+				<LI>Naxxramas - <SPAN STYLE="color: green">rewritten and available</SPAN></LI>
+			</UL>
+			<P CLASS="sc-paragraph" STYLE="margin-top: 0px; margin-bottom: 6px;">
+				&nbsp;<BR>
+				<B>TBC dungeons:</B>
+			</P>
+			<UL STYLE="margin: 0px 60px 0px 60px; color: #000">
+				<LI>Magisters' Terrace - <SPAN STYLE="color: green">rewritten and available</SPAN></LI>
+				<LI>The Black Morass - <SPAN STYLE="color: green">rewritten and available</SPAN></LI>
+				<LI>The Arcatraz - <SPAN STYLE="color: green">rewritten and available</SPAN></LI>
+				<LI>The Botanica - <SPAN STYLE="color: green">rewritten and available</SPAN></LI>
+				<LI>The Mechanar - <SPAN STYLE="color: green">rewritten and available</SPAN></LI>
+				<LI>Old Hillsbrad Foothills - <SPAN STYLE="color: green">rewritten and available</SPAN></LI>
+				<LI>Shadow Labyrinth - <SPAN STYLE="color: green">rewritten and available</SPAN></LI>
+				<LI>The Shattered Halls - <SPAN STYLE="color: green">rewritten and available</SPAN></LI>
+				<LI>The Steamvault - <SPAN STYLE="color: green">rewritten and available</SPAN></LI>
+				<LI>Sethekk Halls - <SPAN STYLE="color: green">rewritten and available</SPAN></LI>
+				<LI>Auchenai Crypts - <SPAN STYLE="color: green">rewritten and available</SPAN></LI>
+				<LI>Mana-Tombs - <SPAN STYLE="color: green">rewritten and available</SPAN></LI>
+				<LI>The Underbog - <SPAN STYLE="color: green">rewritten and available</SPAN></LI>
+				<LI>The Slave Pens - <SPAN STYLE="color: green">rewritten and available</SPAN></LI>
+				<LI>The Blood Furnace - <SPAN STYLE="color: green">rewritten and available</SPAN></LI>
+				<LI>Hellfire Ramparts - <SPAN STYLE="color: green">rewritten and available</SPAN></LI>
+			</UL>
+			<P CLASS="sc-paragraph" STYLE="margin-top: 0px; margin-bottom: 6px;">
+				&nbsp;<BR>
+				<B>TBC raids:</B>
+			</P>
+			<UL STYLE="margin: 0px 60px 0px 60px; color: #000">
+				<LI>Sunwell Plateau - <SPAN STYLE="color: green">rewritten and available</SPAN></LI>
+				<LI>Black Temple - <SPAN STYLE="color: green">rewritten and available</SPAN></LI>
+				<LI>The Battle for Mount Hyjal - <SPAN STYLE="color: #BC9000">available, not rewritten yet</SPAN></LI>
+				<LI>Tempest Keep: The Eye - <SPAN STYLE="color: green">rewritten and available</SPAN></LI>
+				<LI>Serpentshrine Cavern - <SPAN STYLE="color: green">rewritten and available</SPAN></LI>
+				<LI>Magtheridon's Lair - <SPAN STYLE="color: green">rewritten and available</SPAN></LI>
+				<LI>Gruul's Lair - <SPAN STYLE="color: green">rewritten and available</SPAN></LI>
+				<LI>Zul'Aman - <SPAN STYLE="color: #BC9000">available, not rewritten yet</SPAN></LI>
+				<LI>Karazhan - <SPAN STYLE="color: #BC9000">available, not rewritten yet</SPAN></LI>
+			</UL>
+			<P CLASS="sc-paragraph" STYLE="margin-top: 0px; margin-bottom: 6px;">
+				&nbsp;<BR>
+				<B>Vanilla dungeons:</B>
+			</P>
+			<UL STYLE="margin: 0px 60px 0px 60px; color: #000">
+				<LI>Scholomance - <SPAN STYLE="color: green">rewritten and available</SPAN></LI>
+				<LI>Stratholme - <SPAN STYLE="color: green">rewritten and available</SPAN></LI>
+				<LI>Dire Maul - <SPAN STYLE="color: green">rewritten and available</SPAN></LI>
+				<LI>Blackrock Spire - <SPAN STYLE="color: #BC9000">available, not rewritten yet</SPAN></LI>
+				<LI>Blackrock Depths - <SPAN STYLE="color: #BC9000">available, not rewritten yet</SPAN></LI>
+				<LI>Temple of Atal'Hakkar - <SPAN STYLE="color: green">rewritten and available</SPAN></LI>
+				<LI>Maraudon - <SPAN STYLE="color: green">rewritten and available</SPAN></LI>
+				<LI>Zul'Farrak - <SPAN STYLE="color: green">rewritten and available</SPAN></LI>
+				<LI>Uldaman - <SPAN STYLE="color: green">rewritten and available</SPAN></LI>
+				<LI>Razorfen Downs - <SPAN STYLE="color: green">rewritten and available</SPAN></LI>
+				<LI>The Scarlet Monastery - <SPAN STYLE="color: green">rewritten and available</SPAN></LI>
+				<LI>Razorfen Kraul - <SPAN STYLE="color: green">rewritten and available</SPAN></LI>
+				<LI>Gnomeregan - <SPAN STYLE="color: green">rewritten and available</SPAN></LI>
+				<LI>The Stockade - <SPAN STYLE="color: green">rewritten and available</SPAN></LI>
+				<LI>Blackfathom Deeps - <SPAN STYLE="color: green">rewritten and available</SPAN></LI>
+				<LI>Shadowfang Keep - <SPAN STYLE="color: green">rewritten and available</SPAN></LI>
+				<LI>The Deadmines - <SPAN STYLE="color: green">rewritten and available</SPAN></LI>
+				<LI>Wailing Caverns - <SPAN STYLE="color: green">rewritten and available</SPAN></LI>
+				<LI>Ragefire Chasm - <SPAN STYLE="color: green">rewritten and available</SPAN></LI>
+			</UL>
+			<P CLASS="sc-paragraph" STYLE="margin-top: 0px; margin-bottom: 6px;">
+				&nbsp;<BR>
+				<B>Vanilla raids:</B>
+			</P>
+			<UL STYLE="margin: 0px 60px 0px 60px; color: #000">
+				<LI>Temple of Ahn'Qiraj - <SPAN STYLE="color: #BC9000">available, not rewritten yet</SPAN></LI>
+				<LI>Ruins of Ahn'Qiraj - <SPAN STYLE="color: #BC9000">available, not rewritten yet</SPAN></LI>
+				<LI>Blackwing Lair - <SPAN STYLE="color: #BC9000">available, not rewritten yet</SPAN></LI>
+				<LI>Molten Core - <SPAN STYLE="color: #BC9000">available, not rewritten yet</SPAN></LI>
+				<LI>Zul'Gurub - <SPAN STYLE="color: #BC9000">available, not rewritten yet</SPAN></LI>
+			</UL>
+			<P CLASS="sc-paragraph" STYLE="margin-top: 0px; margin-bottom: 36px;">
+				&nbsp;<BR>
+				We fixed some reported bugs in the not yet rewritten instances, but we are aware more needs to be done. Further reporting bugs in those instances is pointless, because they will be totally rewritten anyway. This list will then be updated accordingly.
+			</P>
+
+
+
+			<P CLASS="sc-subtitle"><A NAME="quests"></A>Quests</P>
+			<P CLASS="sc-paragraph">
+				The Loremaster achievement has been obtainable since November 2012. We've been fixing quests from the very beginning. We always try to fix them with proper visual effects, texts, waypoints, and so on. In some cases doing just the visual effects for a single quest took hours, and we did it anyway.<BR><BR>
+				To our best knowledge, there's only one quest in the game that is not working, namely: The Battle For The Undercity. It is possible that some quests get stuck under certain circumstances, or are missing some visuals, or worked but got broken by an update. In such cases please report them on our BugTracker. We will fix them as soon as possible.
+			</P>
+
+
+
+			<P CLASS="sc-subtitle"><A NAME="pets"></A>Pets</P>
+			<P CLASS="sc-paragraph" STYLE="margin-bottom: 6px;">
+				Various fixes have been done to pets in order to achieve their correct behavior:
+			</P>
+			<UL STYLE="margin: 0px 60px 0px 60px; color: #000">
+				<LI>If a pet is ordered to cast a spell, but the target is out of range or not in LoS, the pet will run up to the target and then cast the ordered spell (no need to order it again).</LI>
+				<LI>Properly working defensive stance (aggressive and passive too).</LI>
+				<LI>All pets have AoE damage reduction aura.</LI>
+				<LI>Correctly inheriting owner's statistics.</LI>
+				<LI>Pets react to crowd control auras on targets.</LI>
+				<LI>Correct pet size scaling with it's level.</LI>
+				<LI>Fixed controlling pets if one of them is dead (eg. Shaman's Feral Spirit).</LI>
+				<LI>Fixed dismissing dead pets.</LI>
+				<LI>Damage done by and to pets is properly counted in Battleground statistics.</LI>
+				<LI>And many more.</LI>
+			</UL>
+			<P CLASS="sc-paragraph" STYLE="margin-top: 0px; margin-bottom: 30px;">
+				&nbsp;<BR>
+				Moreover, nearly all non-combat pets have their custom animations and behaviors scripted.
+			</P>
+
+
+
+			<P CLASS="sc-subtitle"><A NAME="battlegrounds"></A>Battlegrounds and arenas</P>
+			<P CLASS="sc-paragraph">
+				We have completely rewritten Warsong Gulch, Arathi Basin and Eye of the Storm, and fixed reported bugs in the rest of the Battlegrounds. We consider rewriting the remaining three in the future, just to be sure everything is top-notch.<BR><BR>
+				All Battleground achievements are working. Experience is properly awarded on Battlegrounds for killing, various bg actions and winning/losing. There wasn't much to fix on arenas. We have scripted the Ring of Valor arena - working elevators/pillars, MoveMaps and LoS smoothly matching pillar movement.<BR><BR>
+				Battleground Queues and Arena Matching have been rewritten, which is described in detail in other sections on this page.
+			</P>
+
+
+
+			<P CLASS="sc-subtitle"><A NAME="dynamicmmr"></A>Dynamic MMR</P>
+			<P CLASS="sc-paragraph">
+				MMR (Match Making Rating) is a rating for each player that changes every time you play an arena battle. Your MMR increases when you win, and it decreases when you lose. It is used to pair teams of similar skill. But there's a dillema: lower allowed difference in MMR results in fairer matches, but increases waiting time in the queue. Solution: Dynamic MMR.<BR><BR>
+
+				The allowed MMR difference between two teams grows as you wait in the queue. The most adequate opponents are searched for in larger and larger span of MMR values as you wait. Previous algorithm for matching arena teams had a constant MMR difference set and a lot of defects, so we rewrote it completely.
+			</P>
+
+
+
+			<P CLASS="sc-subtitle"><A NAME="achievements"></A>Achievements</P>
+			<P CLASS="sc-paragraph">
+				Every achievement in the game should be obtainable. To give you an example, just imagine ~140 achievements in Ulduar instance alone and every one of them working properly. We have paid close attention to achievements in every instance we have rewritten. There may be some difficulties with obtaining achievements in the not yet rewritten instances, but they should be doable. Achievements of all the categories are working (General, Quests, Exploration, PvP, Dungeons & Raids, Professions, Reputation, World Events).
+			</P>
+
+
+
+			<P CLASS="sc-subtitle"><A NAME="events"></A>Ingame seasonal events</P>
+			<P CLASS="sc-paragraph" STYLE="margin-bottom: 6px;">
+				We have rewritten every seasonal event in the game. All achievements from the events are working, together with the "What A Long, Strange Trip It's Been" achievement, awarded for completing all seasonal achievements. The list of available and working seasonal events:
+			</P>
+			<UL STYLE="margin: 0px 60px 0px 60px; color: #000">
+				<LI>Lunar Festival</LI>
+				<LI>Love is in the Air</LI>
+				<LI>Noblegarden</LI>
+				<LI>Children's Week</LI>
+				<LI>Midsummer Fire Festival</LI>
+				<LI>Brewfest</LI>
+				<LI>Hallow's End</LI>
+				<LI>Day of the Dead</LI>
+				<LI>Pilgrim's Bounty</LI>
+				<LI>Feast of Winter Veil</LI>
+			</UL>
+			<P CLASS="sc-paragraph" STYLE="margin-top: 0px; margin-bottom: 6px;">
+				&nbsp;<BR>
+				The following are also fixed:
+			</P>
+			<UL STYLE="margin: 0px 60px 0px 60px; color: #000">
+				<LI>Gurubashi Arena event</LI>
+				<LI>Stranglethorn Fishing Extravaganza</LI>
+				<LI>Kalu'ak Fishing Derby</LI>
+				<LI>Elemental Invasions from Vanilla</LI>
+			</UL>
+			<P CLASS="sc-paragraph" STYLE="margin-top: 0px; margin-bottom: 30px;">
+				&nbsp;
+			</P>
+
+
+
+			<P CLASS="sc-subtitle"><A NAME="wintergrasp"></A>Wintergrasp</P>
+			<P CLASS="sc-paragraph" STYLE="margin-bottom: 6px;">
+				Countless fixes have been applied to the Wintergrasp. Here are the most important ones:
+			</P>
+			<UL STYLE="margin: 0px 60px 0px 60px; color: #000">
+				<LI>Increased visibility distance.</LI>
+				<LI>Fixed Wintergrasp ranks. Higher ranks are gained for killing players, turrets and Keep NPCs.</LI>
+				<LI>Fixed applying Tenacity and fixed it's formula.</LI>
+				<LI>Players are always rewarded, regardless being dead or alive.</LI>
+				<LI>All players in range are credited for certain actions.</LI>
+				<LI>To drive vehicles you have to have adequate rank obtained. Additional vehicle seats do not require ranks.</LI>
+				<LI>Players are automatically put into vehicles after they are built.</LI>
+				<LI>Fixed trajectory spells target selection.</LI>
+				<LI>Fixed additional bonuses for damaging/destroying towers.</LI>
+				<LI>Wintergrasp weekly quests are pooled (only 1 weekly available at a time) and available both inside and outside the Fortress.</LI>
+				<LI>Player corpses can be looted.</LI>
+				<LI>Minor and Major Elementals disappear during the fight.</LI>
+				<LI>Major Elementals are only visible to the faction controlling the Wintergrasp.</LI>
+				<LI>Lots of general changes to the vehicles.</LI>
+				<LI>And many more...</LI>
+			</UL>
+			<P CLASS="sc-paragraph" STYLE="margin-top: 0px; margin-bottom: 30px;">
+				&nbsp;
+			</P>
+
+
+
+			<P CLASS="sc-subtitle"><A NAME="raidbrowser"></A>Raid Browser</P>
+			<P CLASS="sc-paragraph" STYLE="margin-bottom: 6px;">
+				We share with you written from scratch Raid Browser and our AddOn for it (February 2015).<BR>
+				Raid Browser can be used to find players interested in doing specific raids from any expansion. It's a kind of announcement table, where you can list yourself alone or as group, adding a brief comment (eg. your requirements, expectations, gs, "I have achievement X").<BR>
+				Important: Raid Browser is not Raid Finder. It won't assemble groups. You still have full control over choosing group members.<BR><BR>
+
+				Raid Browser is available after typing /rb or in Social (O) -> Raid tab -> Raid Browser.<BR><BR>
+
+				Why is it worth using?
+			</P>
+			<UL STYLE="margin: 0px 60px 0px 60px; color: #000">
+				<LI>You get a lot of info about a character before even writing a private message. About every listed player in RB you will get such informations as: level, class, talents, avg itemLevel, role (tank / healer / dps), comment, a list of killed bosses if the player has an ID, spell power, attack power, heal power, melee crit rating, ranged crit rating, spell crit rating, defense skill, dodge rating, block rating, parry rating, haste rating, expertise rating and other.</LI>
+				<LI>No need to read repeated spam on lfg channel.</LI>
+			</UL>
+			<P CLASS="sc-paragraph" STYLE="margin-top: 0px; margin-bottom: 30px;">
+				&nbsp;<BR>
+				Raid Browser is working without the AddOn, but the default interface won't display all of this data.<BR>
+				Link to the AddOn: <A TARGET="_blank" HREF="https://mega.nz/#!DA8AHQ4Y!4YDX5jxztWQPDEvnEp3HqRt7_6DtzU-q3FyvMpjL7bg">download</A>.<BR>
+				Screenshots: <A TARGET="_blank" HREF="img/addons/RB_solo.jpg">solo example</A>, <A TARGET="_blank" HREF="img/addons/RB_group.jpg">group example</A>.<BR><BR>
+				
+				We encourage to use Raid Browser and propagate using it. This way everyone will more easily find a group.
+			</P>
+
+
+
+			<P CLASS="sc-subtitle"><A NAME="arenaspectator"></A>Arena Spectator</P>
+			<P CLASS="sc-paragraph">
+				We share with you our Arena Spectator system and an AddOn for it (December 2013).<BR>
+				Arena Spectator can be used to watch live arena matches with all the details displayed.<BR>
+				Link do the AddOn: <A TARGET="_blank" HREF="https://mega.nz/#!TY90EIxQ!_cs7moweSoRrAIbC4FnFXImE7IEFWiKI8lJRvsVCaxA">download</A>.<BR>
+				To leave the arena before it ends, type: /g .sp leave
+			</P>
+
+
+
+			<P CLASS="sc-subtitle"><A NAME="summary"></A>Summary</P>
+			<P CLASS="sc-paragraph">
+				Sounds too good to be true? Check it out yourself ;) With passion and dedication, we've been doing as much as we could and have always strived to deliver highest quality possible. There are no promises. Everything is already here. If you are looking for the best Wrath of the Lich King experience, you have come to the right place.<BR><BR>
+
+				Reading through the changes is relatively quick, compared to actually making them. Lots of the changes described by a single sentence took many days and sleepless nights. We would like to clearly state this: the server is not perfect. No server will ever be. We are doing our best. No more and no less.
+			</P>
+
+
+
+			<P CLASS="sc-subtitle"><A NAME="download"></A>Download</P>
+			<UL STYLE="margin: 12px 60px 0px 60px; color: #000">
+				<LI><A TARGET="_blank" HREF="https://mega.nz/#!PENFDRAC!AjFd5pgRtNpqxiq41Kbc6WFIVEaWPc1DegvJZLIT5uU">Core</A></LI>
+				<LI><A TARGET="_blank" HREF="https://mega.nz/#!qVdTjLqJ!WMxklbqTVOYhAhCqOVc8tRtN-JH7Ml3nGSiXIsLXDCc">Databases</A></LI>
+				<LI><A TARGET="_blank" HREF="https://mega.nz/#!PIc2QSJK!cHT74BaRzmobGd_pgvV0qt5m9YgTzScH1y7ZrRViEME">Dbc</A>, 
+					<A TARGET="_blank" HREF="https://mega.nz/#!zd81TDaY!ZhaeQbEeZ2ksufA0utu5pEiNrbMiMtAef4ej-3fhi-I">Maps</A>,
+					<A TARGET="_blank" HREF="https://mega.nz/#!6McnED6T!qEllG_Rh9QZJlEfcJR6Sv9i8XbmAbkmkTolqJ3aOydc">MMaps</A>,
+					<A TARGET="_blank" HREF="https://mega.nz/#!XEElWYCJ!KE4ra8DtKYfeorEXsQ4jEoxkLVMRmjtltieCUceKmQs">VMaps</A></LI>
+			</UL>
+			<P CLASS="sc-paragraph">
+				&nbsp;<BR>
+				16th February 2016<BR>
+				- xinef & pussywizard
+			</P>
+			&nbsp;
+		</DIV><DIV ID="content-bottombg"></DIV>
+	</BODY>
+
+<!-- Mirrored from sunwell.pl/ by HTTrack Website Copier/3.x [XR&CO'2014], Tue, 16 Feb 2016 21:24:48 GMT -->
+</HTML>

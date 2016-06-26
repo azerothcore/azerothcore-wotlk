@@ -1,0 +1,77 @@
+* { margin: 0px; padding: 0px; }
+html, body { height: 100%; }
+
+body
+{
+	background: url(img/lay/bg.jpg) center -250px no-repeat;
+	background-attachment: fixed;
+	background-size: 2500px 1400px;
+	background-color: #000000;
+	color: #ffffff;
+	font-family: Arial;
+	font-size: 12px;
+}
+
+a:link, a:visited
+{
+	text-decoration: none;
+	color: #2a557d;
+	font-weight: bold;
+}
+
+a:hover
+ {
+	text-decoration: underline;
+	color: #2a557d;
+	font-weight: bold;
+}
+
+#content
+{
+	margin-left: auto;
+	margin-right: auto;
+	width: 672px;
+	background: url(img/lay/content-top.jpg) center top no-repeat, url(img/lay/content-leftborder.jpg) left top repeat-y, url(img/lay/content-rightborder.jpg) 648px top repeat-y, url(img/lay/content-bg.jpg) left top repeat;
+}
+
+#content-bottombg
+{
+	margin-left: auto;
+	margin-right: auto;
+	width: 678px;
+	height: 113px;
+	background: url(img/lay/content-bottom.png) center top no-repeat;
+}
+
+.page-title
+{
+	height: 67px;
+	font-family: Georgia;
+	text-align: left;
+	padding-left: 60px;
+	font-size: 21px;
+	line-height: 67px;
+	color: #1b4a76;
+	background: url(img/lay/pagetitle_bg.png) 20px top no-repeat;
+	text-transform: uppercase;
+	letter-spacing: 1px;
+}
+.page-title:first-letter { font-size: 28px; }
+
+.sc-subtitle
+{
+	text-align: left;
+	font-size: 16px;
+	font-weight: bold;
+	color: #000;
+	margin: 0px 40px;
+}
+
+.sc-paragraph
+{
+	text-align: left;
+	font-size: 13px;
+	font-weight: normal;
+	color: #000;
+	margin: 8px 40px 40px 40px;
+}

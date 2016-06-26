@@ -1,0 +1,393 @@
+//  -*- MPC -*-
+// The ACE_FOR_TAO subset is designed primarily for use with the
+// TAO CosNotification service.  It is not intended to be used
+// for some of other TAO features and services, such as the TAO
+// Strategies library, the CosNaming service, etc.
+//
+// Avoid adding source files simply to get some ACE/TAO-based code to
+// link.  This ACE_FOR_TAO subset library must remain as small as
+// possible.
+
+project(ACE_FOR_TAO) : acedefaults, install, svcconf, uuid, versioned_namespace, pkgconfig, ace_output {
+  macros      += ACE_LACKS_ACE_TOKEN
+  requires     = ace_for_tao ace_svcconf
+  sharedname   = ACE_FOR_TAO
+  dynamicflags += ACE_BUILD_DLL
+
+  Source_Files(ACE_COMPONENTS) {
+    ACE.cpp
+    Active_Map_Manager.cpp
+    Addr.cpp
+    Argv_Type_Converter.cpp
+    Assert.cpp
+    Atomic_Op.cpp
+    Barrier.cpp             // Required by orbsvcs/tests/Notify/lib
+    Base_Thread_Adapter.cpp
+    Based_Pointer_Repository.cpp
+    Basic_Stats.cpp         // Required by ace/Stats
+    Basic_Types.cpp
+    Capabilities.cpp        // Required by TAO/orbsvcs/examples/ImR/Advanced
+    CDR_Base.cpp
+    CDR_Stream.cpp
+    CDR_Size.cpp
+    Cleanup.cpp
+    Codeset_IBM1047.cpp
+    Codeset_Registry.cpp
+    Codeset_Registry_db.cpp
+    Condition_Attributes.cpp
+    Condition_Recursive_Thread_Mutex.cpp
+    Condition_Thread_Mutex.cpp
+    Copy_Disabled.cpp
+    DLL_Manager.cpp
+    Dirent.cpp // Required by TAO_IDL
+    Dirent_Selector.cpp
+    Dump.cpp
+    Dynamic.cpp
+    Dynamic_Message_Strategy.cpp
+    Event_Base.cpp
+    Event_Handler.cpp
+    Event_Handler_Handle_Timeout_Upcall.cpp
+    FILE.cpp
+    FILE_Addr.cpp
+    Flag_Manip.cpp
+    Framework_Component.cpp
+    Functor.cpp
+    Functor_String.cpp
+    Get_Opt.cpp
+    Handle_Ops.cpp
+    Handle_Set.cpp
+    Hashable.cpp
+    High_Res_Timer.cpp  // Required by orbsvcs/tests/Notify/lib
+    INET_Addr.cpp
+    Init_ACE.cpp
+    IO_SAP.cpp
+    IO_Cntl_Msg.cpp
+    IOStream.cpp
+    IPC_SAP.cpp
+    Lib_Find.cpp
+    Local_Memory_Pool.cpp
+    Lock.cpp
+    Log_Category.cpp
+    Log_Msg.cpp
+    Log_Msg_Backend.cpp
+    Log_Msg_Callback.cpp
+    Log_Msg_IPC.cpp
+    Log_Msg_NT_Event_Log.cpp
+    Log_Msg_UNIX_Syslog.cpp
+    Log_Record.cpp
+    Logging_Strategy.cpp
+    Malloc.cpp
+    Malloc_Allocator.cpp
+    Mem_Map.cpp
+    Message_Block.cpp
+    Message_Queue.cpp
+    Message_Queue_NT.cpp
+    MMAP_Memory_Pool.cpp
+    Monitor_Admin.cpp
+    Monitor_Admin_Manager.cpp
+    Monitor_Base.cpp
+    Monitor_Point_Registry.cpp
+    Monitor_Size.cpp
+    Monitor_Control_Types.cpp
+    Monitor_Control_Action.cpp
+    Monotonic_Time_Policy.cpp
+    Mutex.cpp
+    Notification_Strategy.cpp
+    Notification_Queue.cpp
+    Obchunk.cpp
+    Object_Manager.cpp
+    Object_Manager_Base.cpp
+    Obstack.cpp
+    OS_Errno.cpp
+    OS_Log_Msg_Attributes.cpp
+    OS_main.cpp
+    OS_NS_arpa_inet.cpp
+    OS_NS_ctype.cpp
+    OS_NS_dirent.cpp
+    OS_NS_dlfcn.cpp
+    OS_NS_errno.cpp
+    OS_NS_fcntl.cpp
+    OS_NS_math.cpp
+    OS_NS_netdb.cpp
+    OS_NS_poll.cpp
+    OS_NS_pwd.cpp
+    OS_NS_regex.cpp
+    OS_NS_signal.cpp
+    OS_NS_stdio.cpp
+    OS_NS_stdlib.cpp
+    OS_NS_string.cpp
+    OS_NS_strings.cpp
+    OS_NS_stropts.cpp
+    OS_NS_sys_mman.cpp
+    OS_NS_sys_msg.cpp
+    OS_NS_sys_resource.cpp
+    OS_NS_sys_select.cpp
+    OS_NS_sys_sendfile.cpp
+    OS_NS_sys_shm.cpp
+    OS_NS_sys_socket.cpp
+    OS_NS_sys_stat.cpp
+    OS_NS_sys_time.cpp
+    OS_NS_sys_uio.cpp
+    OS_NS_sys_utsname.cpp
+    OS_NS_sys_wait.cpp
+    OS_NS_Thread.cpp
+    OS_NS_time.cpp
+    OS_NS_unistd.cpp
+    OS_NS_wchar.cpp
+    OS_NS_wctype.cpp
+    OS_QoS.cpp
+    OS_Thread_Adapter.cpp
+    OS_TLI.cpp
+    Parse_Node.cpp
+    Pipe.cpp
+    Process.cpp
+    Process_Manager.cpp
+    Reactor.cpp
+    Reactor_Impl.cpp
+    Reactor_Notification_Strategy.cpp
+    Reactor_Timer_Interface.cpp
+    Read_Buffer.cpp
+    Recursive_Thread_Mutex.cpp
+    Rtems_init.c
+    RW_Mutex.cpp
+    RW_Thread_Mutex.cpp
+    Sched_Params.cpp
+    Select_Reactor_Base.cpp
+    Signal.cpp
+    Sig_Handler.cpp
+    Sig_Adapter.cpp
+    SOCK.cpp
+    SOCK_Acceptor.cpp
+    Sock_Connect.cpp
+    SOCK_Connector.cpp
+    SOCK_Dgram.cpp
+    SOCK_Dgram_Mcast.cpp
+    SOCK_IO.cpp
+    SOCK_Stream.cpp
+    SPIPE.cpp
+    SPIPE_Acceptor.cpp
+    SPIPE_Connector.cpp
+    SPIPE_Addr.cpp
+    SPIPE_Stream.cpp
+    SString.cpp
+    Stack_Trace.cpp      // Required by Log_Msg.cpp
+    Stats.cpp            // Required by orbsvcs/tests/Notify
+    String_Base_Const.cpp
+    Synch_Options.cpp
+    Task.cpp
+    Thread.cpp
+    Thread_Adapter.cpp
+    Thread_Control.cpp
+    Thread_Exit.cpp
+    Thread_Hook.cpp
+    Thread_Manager.cpp
+    Thread_Mutex.cpp
+    Throughput_Stats.cpp
+    Time_Policy.cpp
+    Time_Value.cpp
+    Timeprobe.cpp
+    Token.cpp
+    TP_Reactor.cpp
+    Trace.cpp
+    TSS_Adapter.cpp
+
+    // Dev_Poll_Reactor isn't available on Windows.
+    conditional(!prop:windows) {
+      Dev_Poll_Reactor.cpp
+    }
+
+    // ACE_Token implementation uses semaphores on Windows and VxWorks.
+    conditional(prop:windows) {
+      NT_Service.cpp // Required by ace_for_tao sponsors
+      Semaphore.cpp
+      Process_Mutex.cpp
+      WFMO_Reactor.cpp
+    }
+  }
+
+  Template_Files {
+    Abstract_Timer_Queue.cpp
+    Acceptor.cpp
+    Active_Map_Manager_T.cpp
+    Array_Base.cpp
+    Array_Map.cpp
+    Arg_Shifter.cpp
+    ARGV.cpp
+    Atomic_Op_T.cpp
+    Auto_Event.cpp
+    Auto_Functor.cpp
+    Auto_IncDec_T.cpp
+    Auto_Ptr.cpp
+    Based_Pointer_T.cpp
+    Cache_Map_Manager_T.cpp
+    Cached_Connect_Strategy_T.cpp
+    Caching_Strategies_T.cpp
+    Caching_Utility_T.cpp
+    Cleanup_Strategies_T.cpp
+    Condition_T.cpp
+    Connector.cpp
+    Containers_T.cpp
+    Countdown_Time_T.cpp
+    Dump_T.cpp
+    Dynamic_Service.cpp
+    Env_Value_T.cpp
+    Event.cpp
+    Event_Handler_T.cpp
+    Framework_Component_T.cpp
+    Free_List.cpp
+    Functor_T.cpp
+    Guard_T.cpp
+    Hash_Cache_Map_Manager_T.cpp
+    Hash_Map_Manager_T.cpp
+    Hash_Map_With_Allocator_T.cpp
+    IOStream_T.cpp
+    Intrusive_List.cpp
+    Intrusive_List_Node.cpp
+    Lock_Adapter_T.cpp
+    Malloc_T.cpp
+    Managed_Object.cpp
+    Manual_Event.cpp
+    Map_Manager.cpp
+    Map_T.cpp
+    Message_Block_T.cpp
+    Message_Queue_T.cpp
+    Module.cpp
+    Node.cpp
+    Obstack_T.cpp
+    Pair_T.cpp
+    RB_Tree.cpp
+    Reactor_Token_T.cpp
+    Refcountable_T.cpp
+    Refcounted_Auto_Ptr.cpp
+    Reverse_Lock_T.cpp
+    Select_Reactor_T.cpp
+    Singleton.cpp
+    Strategies_T.cpp
+    Stream.cpp
+    Stream_Modules.cpp
+    String_Base.cpp
+    Svc_Handler.cpp
+    TSS_T.cpp
+    Task_Ex_T.cpp
+    Task_T.cpp
+    Timeprobe_T.cpp
+    Time_Policy_T.cpp
+    Time_Value_T.cpp
+    Timer_Hash_T.cpp
+    Timer_Heap_T.cpp
+    Timer_List_T.cpp
+    Timer_Queue_Adapters.cpp
+    Timer_Queue_Iterator.cpp
+    Timer_Queue_T.cpp
+    Timer_Wheel_T.cpp
+    Tokenizer_T.cpp
+    Typed_SV_Message.cpp
+    Typed_SV_Message_Queue.cpp
+    Unbounded_Queue.cpp
+    Unbounded_Set.cpp
+    Vector_T.cpp
+  }
+
+  Inline_Files {
+    Bound_Ptr.inl
+    Condition_T.inl
+    Guard_T.inl
+    Handle_Gobbler.inl
+    Lock_Adapter_T.inl
+    OS_Memory.inl
+    Refcounted_Auto_Ptr.inl
+    Reverse_Lock_T.inl
+    TSS_T.inl
+    ace_wchar.inl
+    MMAP_Memory_Pool.inl
+    Mem_Map.inl
+    Time_Value_T.inl
+  }
+
+  Header_Files {
+    ACE_export.h
+    Based_Pointer_Repository.h
+    Bound_Ptr.h
+    CORBA_macros.h
+    Condition_T.h
+    Countdown_Time.h
+    Default_Constants.h
+    Event_Base.h
+    Exception_Macros.h
+    Global_Macros.h
+    Guard_T.h
+    Handle_Gobbler.h
+    If_Then_Else.h
+    IO_Cntl_Msg.h
+    Lock_Adapter_T.h
+    Log_Priority.h
+    Malloc_Base.h
+    MMAP_Memory_Pool.h
+    Memory_Pool.h
+    Mem_Map.h
+    Min_Max.h
+    Monotonic_Time_Policy.h
+    Null_Barrier.h
+    Null_Condition.h
+    Null_Mutex.h
+    Null_Semaphore.h
+    Numeric_Limits.h
+    OS_Memory.h
+    OS_NS_macros.h
+    OS_Thread_Adapter.h
+    Object_Manager_Base.h
+    Process.h
+    Process_Manager.h
+    Reactor_Impl.h
+    Reactor_Timer_Interface.h
+    Refcounted_Auto_Ptr.h
+    Reverse_Lock_T.h
+    Select_Reactor.h
+    SStringfwd.h
+    Static_Object_Lock.h
+    String_Base_Const.h
+    Svc_Conf.h
+    Svc_Conf_Tokens.h
+    Synch.h
+    Synch_Traits.h
+    TSS_T.h
+    Time_Policy.h
+    Time_Value_T.h
+    Timer_Queuefwd.h
+    Truncate.h
+    Value_Ptr.h
+    Version.h
+    ace_wchar.h
+    checked_iterator.h
+    config-WinCE.h
+    config-all.h
+    config-borland-common.h
+    config-lite.h
+    config-minimal.h
+    config-win32-borland.h
+    config-win32-common.h
+    config-win32-msvc-7.h
+    config-win32-msvc.h
+    config-win32.h
+    config.h
+    iosfwd.h
+    os_include
+    os_include/arpa
+    os_include/net
+    os_include/netinet
+    os_include/sys
+    post.h
+    pre.h
+    streams.h
+    svc_export.h
+  }
+
+  Documentation_Files {
+    README
+    ../VERSION
+  }
+
+  Pkgconfig_Files {
+     ACE_FOR_TAO.pc.in
+  }
+}

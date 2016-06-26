@@ -1,0 +1,6 @@
+// -*- MPC -*-
+feature(ace_filecache) {
+  Source_Files(ACE_COMPONENTS) {
+    Filecache.cpp
+  }
+}

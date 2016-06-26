@@ -1,0 +1,607 @@
+--- bison_gen\ETCL_y.cpp	2005-07-19 09:56:06.368807400 -0700
++++ ETCL_y.cpp	2005-07-19 09:45:00.160274900 -0700
+@@ -1,5 +1,6 @@
++// $Id$
+ 
+-/*  A Bison parser, made from ETCL.yy
++/*  A Bison parser, made from ETCL/ETCL.yy
+     by GNU Bison version 1.28  */
+ 
+ #define YYBISON 1  /* Identify Bison output.  */
+@@ -48,9 +49,9 @@
+ #define	TAO_ETCL_TYPE_ID	298
+ #define	TAO_ETCL_REPOS_ID	299
+ 
+-#line 1 "ETCL.yy"
++//#line 1 "ETCL/ETCL.yy"
+ 
+-// ETCL.yy,v 1.3 2002/01/14 19:52:28 parsons Exp
++// $Id$
+ // ========================================================================
+ //
+ // = LIBRARY
+@@ -70,6 +71,7 @@
+ #include "ETCL_Interpreter.h"
+ 
+ extern int yylex (void);
++extern void yyflush_current_buffer (void);
+ 
+ static void yyerror (const char *)
+ {
+@@ -77,9 +79,6 @@
+   // Ignore error messages
+ }
+ 
+-#ifndef YYSTYPE
+-#define YYSTYPE int
+-#endif
+ #include <stdio.h>
+ 
+ #ifndef __cplusplus
+@@ -293,8 +292,9 @@
+     -1,    -1,    29,     3,     4,     5,     6,     7,     8,    -1,
+     -1,    -1,    -1,    40,    49,    50,    51,    52,    53,    54
+ };
+-/* -*-C-*-  Note some compilers choke on comments on `#line' lines.  */
+-#line 3 "/usr/local/share/bison.simple"
++/* -*-C-*-  Note some compilers choke on comments on `//#line' lines.  */
++//#line 3 "/pkg/gnu/share/bison.simple"
++/* This file comes from bison-1.28.  */
+ 
+ /* Skeleton output parser for bison,
+    Copyright (C) 1984, 1989, 1990 Free Software Foundation, Inc.
+@@ -311,46 +311,66 @@
+ 
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+-   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.  */
++   Foundation, Inc., 59 Temple Place - Suite 330,
++   Boston, MA 02111-1307, USA.  */
+ 
+ /* As a special exception, when this file is copied by Bison into a
+    Bison output file, you may use that output file without restriction.
+    This special exception was added by the Free Software Foundation
+    in version 1.24 of Bison.  */
+ 
+-#ifndef alloca
++/* This is the parser code that is written into each bison parser
++  when the %semantic_parser declaration is not specified in the grammar.
++  It was written by Richard Stallman by simplifying the hairy parser
++  used when %semantic_parser is specified.  */
++
++#ifndef YYSTACK_USE_ALLOCA
++#ifdef alloca
++#define YYSTACK_USE_ALLOCA
++#else /* alloca not defined */
+ #ifdef __GNUC__
++#define YYSTACK_USE_ALLOCA
+ #define alloca __builtin_alloca
+ #else /* not GNU C.  */
+-#if (!defined (__STDC__) && defined (sparc)) || defined (__sparc__) || defined (__sparc) || defined (__sgi)
++#if (!defined (__STDC__) && defined (sparc)) || defined (__sparc__) || defined (__sparc) || defined (__sgi) || (defined (__sun) && defined (__i386))
++#define YYSTACK_USE_ALLOCA
+ #include <alloca.h>
+ #else /* not sparc */
+-#if defined (MSDOS) && !defined (__TURBOC__)
++/* We think this test detects Watcom and Microsoft C.  */
++/* This used to test MSDOS, but that is a bad idea
++   since that symbol is in the user namespace.  */
++#if (defined (_MSDOS) || defined (_MSDOS_)) && !defined (__TURBOC__)
++#if 0 /* No need for malloc.h, which pollutes the namespace;
++	 instead, just don't use alloca.  */
+ #include <malloc.h>
++#endif
+ #else /* not MSDOS, or __TURBOC__ */
+ #if defined(_AIX)
+-#include <malloc.h>
++/* I don't know what this was needed for, but it pollutes the namespace.
++   So I turned it off.   rms, 2 May 1997.  */
++/* #include <malloc.h>  */
+  #pragma alloca
+-#else /* not MSDOS, __TURBOC__, or _AIX */
+-#ifdef __hpux
+-#ifdef __cplusplus
+-extern "C" {
+-void *alloca (unsigned int);
+-};
+-#else /* not __cplusplus */
+-void *alloca ();
+-#endif /* not __cplusplus */
++#define YYSTACK_USE_ALLOCA
++#else /* not MSDOS, or __TURBOC__, or _AIX */
++#if 0
++#ifdef __hpux /* haible@ilog.fr says this works for HPUX 9.05 and up,
++		 and on HPUX 10.  Eventually we can turn this on.  */
++#define YYSTACK_USE_ALLOCA
++#define alloca __builtin_alloca
+ #endif /* __hpux */
++#endif
+ #endif /* not _AIX */
+ #endif /* not MSDOS, or __TURBOC__ */
+-#endif /* not sparc.  */
+-#endif /* not GNU C.  */
+-#endif /* alloca not defined.  */
++#endif /* not sparc */
++#endif /* not GNU C */
++#endif /* alloca not defined */
++#endif /* YYSTACK_USE_ALLOCA not defined */
+ 
+-/* This is the parser code that is written into each bison parser
+-  when the %semantic_parser declaration is not specified in the grammar.
+-  It was written by Richard Stallman by simplifying the hairy parser
+-  used when %semantic_parser is specified.  */
++#ifdef YYSTACK_USE_ALLOCA
++#define YYSTACK_ALLOC alloca
++#else
++#define YYSTACK_ALLOC malloc
++#endif
+ 
+ /* Note: there must be only one dollar sign in this file.
+    It is replaced by the list of actions, each action
+@@ -360,8 +380,8 @@
+ #define yyclearin	(yychar = YYEMPTY)
+ #define YYEMPTY		-2
+ #define YYEOF		0
+-#define YYACCEPT	return(0)
+-#define YYABORT 	return(1)
++#define YYACCEPT	goto yyacceptlab
++#define YYABORT 	goto yyabortlab
+ #define YYERROR		goto yyerrlab1
+ /* Like YYERROR except do call yyerror.
+    This remains here temporarily to ease the
+@@ -411,6 +431,10 @@
+ int	yychar;			/*  the lookahead symbol		*/
+ YYSTYPE	yylval;			/*  the semantic value of the		*/
+ 				/*  lookahead symbol			*/
++YYSTYPE yyval;		/*  the variable used to return		*/
++				/*  semantic values from the action	*/
++				/*  routines				*/
++
+ 
+ #ifdef YYLSP_NEEDED
+ YYLTYPE yylloc;			/*  location data for the lookahead	*/
+@@ -443,11 +467,11 @@
+ #define YYMAXDEPTH 10000
+ #endif
+ 
+-/* Prevent warning if -Wstrict-prototypes.  */
+-#ifdef __GNUC__
+-int yyparse (void);
+-#endif
+-
++/* Define __yy_memcpy.  Note that the size argument
++   should be passed with type unsigned int, because that is what the non-GCC
++   definitions require.  With GCC, __builtin_memcpy takes an arg
++   of type size_t, but it can handle unsigned int.  */
++
+ #if __GNUC__ > 1		/* GNU C and GNU C++ define this.  */
+ #define __yy_memcpy(TO,FROM,COUNT)	__builtin_memcpy(TO,FROM,COUNT)
+ #else				/* not GNU C or C++ */
+@@ -459,7 +483,7 @@
+ __yy_memcpy (to, from, count)
+      char *to;
+      char *from;
+-     int count;
++     unsigned int count;
+ {
+   ACE_REGISTER char *f = from;
+   ACE_REGISTER char *t = to;
+@@ -474,10 +498,10 @@
+ /* This is the most reliable way to avoid incompatibilities
+    in available built-in functions on various systems.  */
+ static void
+-__yy_memcpy (char *to, char *from, int count)
++__yy_memcpy (char *to, char *from, unsigned int count)
+ {
+-  ACE_REGISTER char *f = from;
+   ACE_REGISTER char *t = to;
++  ACE_REGISTER char *f = from;
+   ACE_REGISTER int i = count;
+ 
+   while (i-- > 0)
+@@ -486,8 +510,8 @@
+ 
+ #endif
+ #endif
+-
+-#line 196 "/usr/local/share/bison.simple"
++
++//#line 217 "/pkg/gnu/share/bison.simple"
+ 
+ /* The user can define YYPARSE_PARAM as the name of an argument to be passed
+    into yyparse.  The argument should have type void *.
+@@ -508,6 +532,15 @@
+ #define YYPARSE_PARAM_DECL
+ #endif /* not YYPARSE_PARAM */
+ 
++/* Prevent warning if -Wstrict-prototypes.  */
++#ifdef __GNUC__
++#ifdef YYPARSE_PARAM
++int yyparse (void *);
++#else
++int yyparse (void);
++#endif
++#endif
++
+ int
+ yyparse(YYPARSE_PARAM_ARG)
+      YYPARSE_PARAM_DECL
+@@ -536,6 +569,7 @@
+ #endif
+ 
+   int yystacksize = YYINITDEPTH;
++  int yyfree_stacks = 0;
+ 
+ #ifdef YYPURE
+   int yychar;
+@@ -546,10 +580,6 @@
+ #endif
+ #endif
+ 
+-  YYSTYPE yyval;		/*  the variable used to return		*/
+-				/*  semantic values from the action	*/
+-				/*  routines				*/
+-
+   int yylen;
+ 
+ #if YYDEBUG != 0
+@@ -620,18 +650,32 @@
+       if (yystacksize >= YYMAXDEPTH)
+ 	{
+ 	  yyerror("parser stack overflow");
++	  if (yyfree_stacks)
++	    {
++	      free (yyss);
++	      free (yyvs);
++#ifdef YYLSP_NEEDED
++	      free (yyls);
++#endif
++	    }
+ 	  return 2;
+ 	}
+       yystacksize *= 2;
+       if (yystacksize > YYMAXDEPTH)
+ 	yystacksize = YYMAXDEPTH;
+-      yyss = (short *) alloca (yystacksize * sizeof (*yyssp));
+-      __yy_memcpy ((char *)yyss, (char *)yyss1, size * sizeof (*yyssp));
+-      yyvs = (YYSTYPE *) alloca (yystacksize * sizeof (*yyvsp));
+-      __yy_memcpy ((char *)yyvs, (char *)yyvs1, size * sizeof (*yyvsp));
++#ifndef YYSTACK_USE_ALLOCA
++      yyfree_stacks = 1;
++#endif
++      yyss = (short *) YYSTACK_ALLOC (yystacksize * sizeof (*yyssp));
++      __yy_memcpy ((char *)yyss, (char *)yyss1,
++		   size * (unsigned int) sizeof (*yyssp));
++      yyvs = (YYSTYPE *) YYSTACK_ALLOC (yystacksize * sizeof (*yyvsp));
++      __yy_memcpy ((char *)yyvs, (char *)yyvs1,
++		   size * (unsigned int) sizeof (*yyvsp));
+ #ifdef YYLSP_NEEDED
+-      yyls = (YYLTYPE *) alloca (yystacksize * sizeof (*yylsp));
+-      __yy_memcpy ((char *)yyls, (char *)yyls1, size * sizeof (*yylsp));
++      yyls = (YYLTYPE *) YYSTACK_ALLOC (yystacksize * sizeof (*yylsp));
++      __yy_memcpy ((char *)yyls, (char *)yyls1,
++		   size * (unsigned int) sizeof (*yylsp));
+ #endif
+ #endif /* no yyoverflow */
+ 
+@@ -792,225 +836,225 @@
+   switch (yyn) {
+ 
+ case 3:
+-#line 97 "ETCL.yy"
++//#line 97 "ETCL/ETCL.yy"
+ { yyval.constraint = new TAO_ETCL_Preference (TAO_ETCL_MIN, yyvsp[0].constraint); ;
+     break;}
+ case 4:
+-#line 99 "ETCL.yy"
++//#line 99 "ETCL/ETCL.yy"
+ { yyval.constraint = new TAO_ETCL_Preference (TAO_ETCL_MAX, yyvsp[0].constraint); ;
+     break;}
+ case 5:
+-#line 101 "ETCL.yy"
++//#line 101 "ETCL/ETCL.yy"
+ { yyval.constraint = new TAO_ETCL_Preference (TAO_ETCL_WITH, yyvsp[0].constraint); ;
+     break;}
+ case 6:
+-#line 103 "ETCL.yy"
++//#line 103 "ETCL/ETCL.yy"
+ { yyval.constraint = new TAO_ETCL_Preference (TAO_ETCL_FIRST); ;
+     break;}
+ case 7:
+-#line 105 "ETCL.yy"
++//#line 105 "ETCL/ETCL.yy"
+ { yyval.constraint = new TAO_ETCL_Preference (TAO_ETCL_RANDOM); ;
+     break;}
+ case 8:
+-#line 109 "ETCL.yy"
++//#line 109 "ETCL/ETCL.yy"
+ { yyval.constraint = new TAO_ETCL_Binary_Expr (TAO_ETCL_OR, yyvsp[-2].constraint, yyvsp[0].constraint); ;
+     break;}
+ case 10:
+-#line 114 "ETCL.yy"
++//#line 114 "ETCL/ETCL.yy"
+ { yyval.constraint = new TAO_ETCL_Binary_Expr (TAO_ETCL_AND, yyvsp[-2].constraint, yyvsp[0].constraint); ;
+     break;}
+ case 12:
+-#line 119 "ETCL.yy"
++//#line 119 "ETCL/ETCL.yy"
+ { yyval.constraint = new TAO_ETCL_Binary_Expr (TAO_ETCL_EQ, yyvsp[-2].constraint, yyvsp[0].constraint); ;
+     break;}
+ case 13:
+-#line 121 "ETCL.yy"
++//#line 121 "ETCL/ETCL.yy"
+ { yyval.constraint = new TAO_ETCL_Binary_Expr (TAO_ETCL_NE, yyvsp[-2].constraint, yyvsp[0].constraint); ;
+     break;}
+ case 14:
+-#line 123 "ETCL.yy"
++//#line 123 "ETCL/ETCL.yy"
+ { yyval.constraint = new TAO_ETCL_Binary_Expr (TAO_ETCL_GT, yyvsp[-2].constraint, yyvsp[0].constraint); ;
+     break;}
+ case 15:
+-#line 125 "ETCL.yy"
++//#line 125 "ETCL/ETCL.yy"
+ { yyval.constraint = new TAO_ETCL_Binary_Expr (TAO_ETCL_GE, yyvsp[-2].constraint, yyvsp[0].constraint); ;
+     break;}
+ case 16:
+-#line 127 "ETCL.yy"
++//#line 127 "ETCL/ETCL.yy"
+ { yyval.constraint = new TAO_ETCL_Binary_Expr (TAO_ETCL_LT, yyvsp[-2].constraint, yyvsp[0].constraint); ;
+     break;}
+ case 17:
+-#line 129 "ETCL.yy"
++//#line 129 "ETCL/ETCL.yy"
+ { yyval.constraint = new TAO_ETCL_Binary_Expr (TAO_ETCL_LE, yyvsp[-2].constraint, yyvsp[0].constraint); ;
+     break;}
+ case 19:
+-#line 134 "ETCL.yy"
++//#line 134 "ETCL/ETCL.yy"
+ { yyval.constraint = new TAO_ETCL_Binary_Expr (TAO_ETCL_IN, yyvsp[-2].constraint, yyvsp[0].constraint); ;
+     break;}
+ case 20:
+-#line 136 "ETCL.yy"
++//#line 136 "ETCL/ETCL.yy"
+ { yyval.constraint = new TAO_ETCL_Binary_Expr (TAO_ETCL_IN, yyvsp[-3].constraint, yyvsp[0].constraint); ;
+     break;}
+ case 22:
+-#line 141 "ETCL.yy"
++//#line 141 "ETCL/ETCL.yy"
+ { yyval.constraint = new TAO_ETCL_Binary_Expr (TAO_ETCL_TWIDDLE, yyvsp[-2].constraint, yyvsp[0].constraint); ;
+     break;}
+ case 24:
+-#line 146 "ETCL.yy"
++//#line 146 "ETCL/ETCL.yy"
+ { yyval.constraint = new TAO_ETCL_Binary_Expr (TAO_ETCL_PLUS, yyvsp[-2].constraint, yyvsp[0].constraint); ;
+     break;}
+ case 25:
+-#line 148 "ETCL.yy"
++//#line 148 "ETCL/ETCL.yy"
+ { yyval.constraint = new TAO_ETCL_Binary_Expr (TAO_ETCL_MINUS, yyvsp[-2].constraint, yyvsp[0].constraint); ;
+     break;}
+ case 27:
+-#line 153 "ETCL.yy"
++//#line 153 "ETCL/ETCL.yy"
+ { yyval.constraint = new TAO_ETCL_Binary_Expr (TAO_ETCL_MULT, yyvsp[-2].constraint, yyvsp[0].constraint); ;
+     break;}
+ case 28:
+-#line 155 "ETCL.yy"
++//#line 155 "ETCL/ETCL.yy"
+ { yyval.constraint = new TAO_ETCL_Binary_Expr (TAO_ETCL_DIV, yyvsp[-2].constraint, yyvsp[0].constraint); ;
+     break;}
+ case 30:
+-#line 160 "ETCL.yy"
++//#line 160 "ETCL/ETCL.yy"
+ { yyval.constraint = new TAO_ETCL_Unary_Expr (TAO_ETCL_NOT, yyvsp[0].constraint); ;
+     break;}
+ case 32:
+-#line 165 "ETCL.yy"
++//#line 165 "ETCL/ETCL.yy"
+ { yyval.constraint = yyvsp[-1].constraint; ;
+     break;}
+ case 33:
+-#line 167 "ETCL.yy"
++//#line 167 "ETCL/ETCL.yy"
+ { yyval.constraint = yyvsp[0].constraint; ;
+     break;}
+ case 34:
+-#line 169 "ETCL.yy"
++//#line 169 "ETCL/ETCL.yy"
+ { yyval.constraint = new TAO_ETCL_Unary_Expr (TAO_ETCL_PLUS, yyvsp[0].constraint); ;
+     break;}
+ case 35:
+-#line 171 "ETCL.yy"
++//#line 171 "ETCL/ETCL.yy"
+ { yyval.constraint = new TAO_ETCL_Unary_Expr (TAO_ETCL_MINUS, yyvsp[0].constraint); ;
+     break;}
+ case 36:
+-#line 173 "ETCL.yy"
++//#line 173 "ETCL/ETCL.yy"
+ { yyval.constraint = yyvsp[0].constraint; ;
+     break;}
+ case 37:
+-#line 175 "ETCL.yy"
++//#line 175 "ETCL/ETCL.yy"
+ { yyval.constraint = new TAO_ETCL_Unary_Expr (TAO_ETCL_PLUS, yyvsp[0].constraint); ;
+     break;}
+ case 38:
+-#line 177 "ETCL.yy"
++//#line 177 "ETCL/ETCL.yy"
+ { yyval.constraint = new TAO_ETCL_Unary_Expr (TAO_ETCL_MINUS, yyvsp[0].constraint); ;
+     break;}
+ case 39:
+-#line 179 "ETCL.yy"
++//#line 179 "ETCL/ETCL.yy"
+ { yyval.constraint = yyvsp[0].constraint; ;
+     break;}
+ case 40:
+-#line 181 "ETCL.yy"
++//#line 181 "ETCL/ETCL.yy"
+ { yyval.constraint = yyvsp[0].constraint; ;
+     break;}
+ case 41:
+-#line 183 "ETCL.yy"
++//#line 183 "ETCL/ETCL.yy"
+ { yyval.constraint = new TAO_ETCL_Exist (yyvsp[0].constraint); ;
+     break;}
+ case 42:
+-#line 185 "ETCL.yy"
++//#line 185 "ETCL/ETCL.yy"
+ { yyval.constraint = new TAO_ETCL_Exist (yyvsp[0].constraint); ;
+     break;}
+ case 43:
+-#line 187 "ETCL.yy"
++//#line 187 "ETCL/ETCL.yy"
+ { yyval.constraint = new TAO_ETCL_Default (yyvsp[0].constraint); ;
+     break;}
+ case 44:
+-#line 189 "ETCL.yy"
++//#line 189 "ETCL/ETCL.yy"
+ { yyval.constraint = new TAO_ETCL_Eval (yyvsp[0].constraint); ;
+     break;}
+ case 45:
+-#line 191 "ETCL.yy"
++//#line 191 "ETCL/ETCL.yy"
+ { yyval.constraint = yyvsp[0].constraint; ;
+     break;}
+ case 46:
+-#line 195 "ETCL.yy"
++//#line 195 "ETCL/ETCL.yy"
+ { yyval.constraint = 0; ;
+     break;}
+ case 47:
+-#line 197 "ETCL.yy"
++//#line 197 "ETCL/ETCL.yy"
+ { yyval.constraint = new TAO_ETCL_Dot (yyvsp[0].constraint); ;
+     break;}
+ case 48:
+-#line 200 "ETCL.yy"
++//#line 200 "ETCL/ETCL.yy"
+ { yyval.constraint = new TAO_ETCL_Component (yyvsp[-1].constraint, yyvsp[0].constraint); ;
+     break;}
+ case 51:
+-#line 207 "ETCL.yy"
++//#line 207 "ETCL/ETCL.yy"
+ { yyval.constraint = 0; ;
+     break;}
+ case 52:
+-#line 209 "ETCL.yy"
++//#line 209 "ETCL/ETCL.yy"
+ { yyval.constraint = new TAO_ETCL_Dot (yyvsp[0].constraint); ;
+     break;}
+ case 55:
+-#line 216 "ETCL.yy"
++//#line 216 "ETCL/ETCL.yy"
+ { yyval.constraint = new TAO_ETCL_Component (yyvsp[-1].constraint, yyvsp[0].constraint); ;
+     break;}
+ case 56:
+-#line 218 "ETCL.yy"
++//#line 218 "ETCL/ETCL.yy"
+ { yyval.constraint = new TAO_ETCL_Special (TAO_ETCL_LENGTH); ;
+     break;}
+ case 57:
+-#line 220 "ETCL.yy"
++//#line 220 "ETCL/ETCL.yy"
+ { yyval.constraint = new TAO_ETCL_Special (TAO_ETCL_DISCRIMINANT); ;
+     break;}
+ case 58:
+-#line 222 "ETCL.yy"
++//#line 222 "ETCL/ETCL.yy"
+ { yyval.constraint = new TAO_ETCL_Special (TAO_ETCL_TYPE_ID); ;
+     break;}
+ case 59:
+-#line 224 "ETCL.yy"
++//#line 224 "ETCL/ETCL.yy"
+ { yyval.constraint = new TAO_ETCL_Special (TAO_ETCL_REPOS_ID); ;
+     break;}
+ case 62:
+-#line 230 "ETCL.yy"
++//#line 230 "ETCL/ETCL.yy"
+ { yyval.constraint = new TAO_ETCL_Component_Array (yyvsp[-2].constraint, yyvsp[0].constraint); ;
+     break;}
+ case 63:
+-#line 234 "ETCL.yy"
++//#line 234 "ETCL/ETCL.yy"
+ { yyval.constraint = new TAO_ETCL_Component_Assoc (yyvsp[-2].constraint, yyvsp[0].constraint); ;
+     break;}
+ case 64:
+-#line 238 "ETCL.yy"
++//#line 238 "ETCL/ETCL.yy"
+ { yyval.constraint = new TAO_ETCL_Component_Pos (yyvsp[-1].constraint, yyvsp[0].constraint); ;
+     break;}
+ case 65:
+-#line 242 "ETCL.yy"
++//#line 242 "ETCL/ETCL.yy"
+ { yyval.constraint = new TAO_ETCL_Union_Pos (yyvsp[-2].constraint, yyvsp[0].constraint); ;
+     break;}
+ case 66:
+-#line 246 "ETCL.yy"
++//#line 246 "ETCL/ETCL.yy"
+ { yyval.constraint = 0; ;
+     break;}
+ case 67:
+-#line 248 "ETCL.yy"
++//#line 248 "ETCL/ETCL.yy"
+ { yyval.constraint = new TAO_ETCL_Union_Value (+1, yyvsp[0].constraint); ;
+     break;}
+ case 68:
+-#line 250 "ETCL.yy"
++//#line 250 "ETCL/ETCL.yy"
+ { yyval.constraint = new TAO_ETCL_Union_Value (+1, yyvsp[0].constraint); ;
+     break;}
+ case 69:
+-#line 252 "ETCL.yy"
++//#line 252 "ETCL/ETCL.yy"
+ { yyval.constraint = new TAO_ETCL_Union_Value (-1, yyvsp[0].constraint); ;
+     break;}
+ case 70:
+-#line 254 "ETCL.yy"
++//#line 254 "ETCL/ETCL.yy"
+ { yyval.constraint = new TAO_ETCL_Union_Value (yyvsp[0].constraint); ;
+     break;}
+ }
+    /* the action file gets copied in in place of this dollarsign */
+-#line 498 "/usr/local/share/bison.simple"
+-
++//#line 543 "/pkg/gnu/share/bison.simple"
++
+   yyvsp -= yylen;
+   yyssp -= yylen;
+ #ifdef YYLSP_NEEDED
+@@ -1204,7 +1248,37 @@
+ 
+   yystate = yyn;
+   goto yynewstate;
++
++ yyacceptlab:
++  /* YYACCEPT comes here.  */
++  if (yyfree_stacks)
++    {
++      free (yyss);
++      free (yyvs);
++#ifdef YYLSP_NEEDED
++      free (yyls);
++#endif
++    }
++  return 0;
++
++ yyabortlab:
++  /* YYABORT comes here.  */
++
++  /* Flush out yy_current_buffer before next parse.  Since there is
++     no error recovery, the buffer could still contain tokens from this
++     parse. */
++  yyflush_current_buffer();
++
++  if (yyfree_stacks)
++    {
++      free (yyss);
++      free (yyvs);
++#ifdef YYLSP_NEEDED
++      free (yyls);
++#endif
++    }
++  return 1;
+ }
+-#line 257 "ETCL.yy"
++//#line 257 "ETCL/ETCL.yy"
+ 
+ 
