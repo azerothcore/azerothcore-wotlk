@@ -60,6 +60,8 @@ struct dtNavMeshCreateParams
 	float cs;								// Cell size (xz) (wu).
 	float ch;								// Cell height (y) (wu).
 	int tileSize;							// Tile size (width & height) (vx).
+    int tileLayer;
+    bool buildBvTree;   
 };
 
 // Build navmesh data from given input data.
