@@ -260,8 +260,7 @@ public:
             return false;
         }
 
-        char* addMulti = strtok(NULL, " ");
-        uint32 vendor_entry = addMulti ? handler->GetSession()->GetCurrentVendor() : vendor ? vendor->GetEntry() : 0;
+        uint32 vendor_entry = vendor ? vendor->GetEntry() : 0;
 
         if (!sObjectMgr->IsVendorItemValid(vendor_entry, itemId, maxcount, incrtime, extendedcost, handler->GetSession()->GetPlayer()))
         {
@@ -484,8 +483,7 @@ public:
         }
         uint32 itemId = atol(pitem);
 
-        char* addMulti = strtok(NULL, " ");
-        if (!sObjectMgr->RemoveVendorItem(addMulti ? handler->GetSession()->GetCurrentVendor() : vendor->GetEntry(), itemId))
+        if (!sObjectMgr->RemoveVendorItem(vendor->GetEntry(), itemId))
         {
             handler->PSendSysMessage(LANG_ITEM_NOT_IN_LIST, itemId);
             handler->SetSentErrorMessage(true);
