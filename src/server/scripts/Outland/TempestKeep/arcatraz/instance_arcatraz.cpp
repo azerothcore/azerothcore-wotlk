@@ -102,10 +102,10 @@ class instance_arcatraz : public InstanceMapScript
                     case DATA_WARDEN_3:
                     case DATA_WARDEN_4:
                     case DATA_WARDEN_5:
-						if (data < FAIL)
-							HandleGameObject(StasisPodGUIDs[type - DATA_WARDEN_1], data == IN_PROGRESS);
-						if (Creature* warden = instance->GetCreature(MellicharGUID))
-							warden->AI()->SetData(type, data);
+                        if (data < FAIL)
+                            HandleGameObject(StasisPodGUIDs[type - DATA_WARDEN_1], data == IN_PROGRESS);
+                        if (Creature* warden = instance->GetCreature(MellicharGUID))
+                            warden->AI()->SetData(type, data);
                         break;
                 }
             }
@@ -141,7 +141,7 @@ class instance_arcatraz : public InstanceMapScript
                     SetData(DATA_WARDEN_3, NOT_STARTED);
                     SetData(DATA_WARDEN_4, NOT_STARTED);
                     SetData(DATA_WARDEN_5, NOT_STARTED);
-					HandleGameObject(WardensShieldGUID, true);
+                    HandleGameObject(WardensShieldGUID, true);
                 }
 
                 return true;

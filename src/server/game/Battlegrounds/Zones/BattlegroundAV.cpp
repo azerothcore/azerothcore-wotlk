@@ -736,7 +736,7 @@ void BattlegroundAV::PopulateNode(BG_AV_Nodes node)
         creatureid=(ownerId == TEAM_ALLIANCE)?AV_NPC_A_TOWERDEFENSE:AV_NPC_H_TOWERDEFENSE;
     else
     {
-		if (m_Team_QuestStatus[ownerId][0] < 500)
+        if (m_Team_QuestStatus[ownerId][0] < 500)
             creatureid = (ownerId == TEAM_ALLIANCE)? AV_NPC_A_GRAVEDEFENSE0 : AV_NPC_H_GRAVEDEFENSE0;
         else if (m_Team_QuestStatus[ownerId][0] < 1000)
             creatureid = (ownerId == TEAM_ALLIANCE)? AV_NPC_A_GRAVEDEFENSE1 : AV_NPC_H_GRAVEDEFENSE1;
@@ -1008,8 +1008,8 @@ void BattlegroundAV::EventPlayerAssaultsPoint(Player* player, uint32 object)
         }
     }
 
-	// xinef: moved here, assure that no call to m_Nodes is used in IF statement bellow as it is modified
-	AssaultNode(node, teamId);
+    // xinef: moved here, assure that no call to m_Nodes is used in IF statement bellow as it is modified
+    AssaultNode(node, teamId);
 
     //if snowfall gots capped it can be handled like all other graveyards
     if (m_Nodes[node].TotalOwnerId != TEAM_NEUTRAL)
@@ -1134,8 +1134,8 @@ void BattlegroundAV::SendMineWorldStates(uint32 mine)
     else if (m_Mine_Owner[mine] == TEAM_HORDE)
         owner = 2;
 
-	for (uint8 i = 0; i < 3; ++i)
-		UpdateWorldState(BG_AV_MineWorldStates[mine][i], 0); // Xinef: Clear data for consistency and buglessness
+    for (uint8 i = 0; i < 3; ++i)
+        UpdateWorldState(BG_AV_MineWorldStates[mine][i], 0); // Xinef: Clear data for consistency and buglessness
 
     UpdateWorldState(BG_AV_MineWorldStates[mine][owner], 1);
 }
@@ -1295,21 +1295,21 @@ bool BattlegroundAV::SetupBattleground()
         }
     }
 
-	// Handpacked snowdrift, only during holiday
-	if (IsHolidayActive(HOLIDAY_FEAST_OF_WINTER_VEIL))
-		for (uint16 i= 0 ; i <= (BG_AV_OBJECT_HANDPACKED_SNOWDRIFT_MAX-BG_AV_OBJECT_HANDPACKED_SNOWDRIFT_MIN); i++)
-		{
-			if (!AddObject(BG_AV_OBJECT_HANDPACKED_SNOWDRIFT_MIN+i, BG_AV_OBJECTID_HARDPACKED_SNOWDRIFT, BG_AV_ObjectPos[AV_OPLACE_HANDPACKED_SNOWDRIFT_MIN+i][0], BG_AV_ObjectPos[AV_OPLACE_HANDPACKED_SNOWDRIFT_MIN+i][1], BG_AV_ObjectPos[AV_OPLACE_HANDPACKED_SNOWDRIFT_MIN+i][2], BG_AV_ObjectPos[AV_OPLACE_HANDPACKED_SNOWDRIFT_MIN+i][3], 0, 0, sin(BG_AV_ObjectPos[AV_OPLACE_HANDPACKED_SNOWDRIFT_MIN+i][3]/2), cos(BG_AV_ObjectPos[AV_OPLACE_HANDPACKED_SNOWDRIFT_MIN+i][3]/2), RESPAWN_ONE_DAY))
-				return false;
-		}
+    // Handpacked snowdrift, only during holiday
+    if (IsHolidayActive(HOLIDAY_FEAST_OF_WINTER_VEIL))
+        for (uint16 i= 0 ; i <= (BG_AV_OBJECT_HANDPACKED_SNOWDRIFT_MAX-BG_AV_OBJECT_HANDPACKED_SNOWDRIFT_MIN); i++)
+        {
+            if (!AddObject(BG_AV_OBJECT_HANDPACKED_SNOWDRIFT_MIN+i, BG_AV_OBJECTID_HARDPACKED_SNOWDRIFT, BG_AV_ObjectPos[AV_OPLACE_HANDPACKED_SNOWDRIFT_MIN+i][0], BG_AV_ObjectPos[AV_OPLACE_HANDPACKED_SNOWDRIFT_MIN+i][1], BG_AV_ObjectPos[AV_OPLACE_HANDPACKED_SNOWDRIFT_MIN+i][2], BG_AV_ObjectPos[AV_OPLACE_HANDPACKED_SNOWDRIFT_MIN+i][3], 0, 0, sin(BG_AV_ObjectPos[AV_OPLACE_HANDPACKED_SNOWDRIFT_MIN+i][3]/2), cos(BG_AV_ObjectPos[AV_OPLACE_HANDPACKED_SNOWDRIFT_MIN+i][3]/2), RESPAWN_ONE_DAY))
+                return false;
+        }
 
-	// Quest banners
-	if (!AddObject(BG_AV_OBJECT_FROSTWOLF_BANNER, BG_AV_OBJECTID_FROSTWOLF_BANNER, BG_AV_ObjectPos[AV_OPLACE_FROSTWOLF_BANNER][0], BG_AV_ObjectPos[AV_OPLACE_FROSTWOLF_BANNER][1], BG_AV_ObjectPos[AV_OPLACE_FROSTWOLF_BANNER][2], BG_AV_ObjectPos[AV_OPLACE_FROSTWOLF_BANNER][3], 0, 0, sin(BG_AV_ObjectPos[AV_OPLACE_FROSTWOLF_BANNER][3]/2), cos(BG_AV_ObjectPos[AV_OPLACE_FROSTWOLF_BANNER][3]/2), RESPAWN_ONE_DAY))
+    // Quest banners
+    if (!AddObject(BG_AV_OBJECT_FROSTWOLF_BANNER, BG_AV_OBJECTID_FROSTWOLF_BANNER, BG_AV_ObjectPos[AV_OPLACE_FROSTWOLF_BANNER][0], BG_AV_ObjectPos[AV_OPLACE_FROSTWOLF_BANNER][1], BG_AV_ObjectPos[AV_OPLACE_FROSTWOLF_BANNER][2], BG_AV_ObjectPos[AV_OPLACE_FROSTWOLF_BANNER][3], 0, 0, sin(BG_AV_ObjectPos[AV_OPLACE_FROSTWOLF_BANNER][3]/2), cos(BG_AV_ObjectPos[AV_OPLACE_FROSTWOLF_BANNER][3]/2), RESPAWN_ONE_DAY))
     {
         sLog->outError("BatteGroundAV: Failed to spawn some object Battleground not created!8");
         return false;
     }
-	if (!AddObject(BG_AV_OBJECT_STORMPIKE_BANNER, BG_AV_OBJECTID_STORMPIKE_BANNER, BG_AV_ObjectPos[AV_OPLACE_STORMPIKE_BANNER][0], BG_AV_ObjectPos[AV_OPLACE_STORMPIKE_BANNER][1], BG_AV_ObjectPos[AV_OPLACE_STORMPIKE_BANNER][2], BG_AV_ObjectPos[AV_OPLACE_STORMPIKE_BANNER][3], 0, 0, sin(BG_AV_ObjectPos[AV_OPLACE_STORMPIKE_BANNER][3]/2), cos(BG_AV_ObjectPos[AV_OPLACE_STORMPIKE_BANNER][3]/2), RESPAWN_ONE_DAY))
+    if (!AddObject(BG_AV_OBJECT_STORMPIKE_BANNER, BG_AV_OBJECTID_STORMPIKE_BANNER, BG_AV_ObjectPos[AV_OPLACE_STORMPIKE_BANNER][0], BG_AV_ObjectPos[AV_OPLACE_STORMPIKE_BANNER][1], BG_AV_ObjectPos[AV_OPLACE_STORMPIKE_BANNER][2], BG_AV_ObjectPos[AV_OPLACE_STORMPIKE_BANNER][3], 0, 0, sin(BG_AV_ObjectPos[AV_OPLACE_STORMPIKE_BANNER][3]/2), cos(BG_AV_ObjectPos[AV_OPLACE_STORMPIKE_BANNER][3]/2), RESPAWN_ONE_DAY))
     {
         sLog->outError("BatteGroundAV: Failed to spawn some object Battleground not created!8");
         return false;
@@ -1354,15 +1354,15 @@ bool BattlegroundAV::SetupBattleground()
         SpawnBGObject(i, RESPAWN_IMMEDIATELY);
 
     SpawnBGObject(BG_AV_OBJECT_AURA_N_SNOWFALL_GRAVE, RESPAWN_IMMEDIATELY);
-	
-	// Handpacked snowdrift, only during holiday
-	if (IsHolidayActive(HOLIDAY_FEAST_OF_WINTER_VEIL))
-		for (i = BG_AV_OBJECT_HANDPACKED_SNOWDRIFT_MIN ; i <= BG_AV_OBJECT_HANDPACKED_SNOWDRIFT_MAX; i++)
-			SpawnBGObject(i, RESPAWN_IMMEDIATELY);
+    
+    // Handpacked snowdrift, only during holiday
+    if (IsHolidayActive(HOLIDAY_FEAST_OF_WINTER_VEIL))
+        for (i = BG_AV_OBJECT_HANDPACKED_SNOWDRIFT_MIN ; i <= BG_AV_OBJECT_HANDPACKED_SNOWDRIFT_MAX; i++)
+            SpawnBGObject(i, RESPAWN_IMMEDIATELY);
 
-	// Quest banners
-	SpawnBGObject(BG_AV_OBJECT_FROSTWOLF_BANNER, RESPAWN_IMMEDIATELY);
-	SpawnBGObject(BG_AV_OBJECT_STORMPIKE_BANNER, RESPAWN_IMMEDIATELY);
+    // Quest banners
+    SpawnBGObject(BG_AV_OBJECT_FROSTWOLF_BANNER, RESPAWN_IMMEDIATELY);
+    SpawnBGObject(BG_AV_OBJECT_STORMPIKE_BANNER, RESPAWN_IMMEDIATELY);
 
     //creatures
     ;//sLog->outDebug(LOG_FILTER_BATTLEGROUND, "BG_AV start poputlating nodes");
@@ -1509,7 +1509,7 @@ void BattlegroundAV::ResetBGSubclass()
 bool BattlegroundAV::IsBothMinesControlledByTeam(TeamId teamId) const
 {
     for (uint8 mine = 0; mine < 2; mine++)
-		if (m_Mine_Owner[mine] != teamId)
+        if (m_Mine_Owner[mine] != teamId)
             return false;
 
     return true;
@@ -1567,8 +1567,8 @@ bool BattlegroundAV::IsAllTowersControlledAndCaptainAlive(TeamId teamId) const
 
 TeamId BattlegroundAV::GetPrematureWinner()
 {
-	if (GetTeamScore(TEAM_ALLIANCE) > GetTeamScore(TEAM_HORDE))
-		return TEAM_ALLIANCE;
+    if (GetTeamScore(TEAM_ALLIANCE) > GetTeamScore(TEAM_HORDE))
+        return TEAM_ALLIANCE;
 
-	return GetTeamScore(TEAM_HORDE) > GetTeamScore(TEAM_ALLIANCE) ? TEAM_HORDE : Battleground::GetPrematureWinner();
+    return GetTeamScore(TEAM_HORDE) > GetTeamScore(TEAM_ALLIANCE) ? TEAM_HORDE : Battleground::GetPrematureWinner();
 }

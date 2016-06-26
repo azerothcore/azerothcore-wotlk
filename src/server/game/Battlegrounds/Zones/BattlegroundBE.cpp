@@ -115,27 +115,27 @@ void BattlegroundBE::HandleAreaTrigger(Player* player, uint32 trigger)
         case 4539:                                          // buff trigger?
             //buff_guid = BgObjects[BG_BE_OBJECT_BUFF_2];
             break;
-		// OUTSIDE OF ARENA, TELEPORT!
-		case 4919:
-			player->NearTeleportTo(6220.90f, 318.94f, 5.1f, 5.3f);
-			break;
-		case 4921:
-			player->NearTeleportTo(6250.27f, 208.50f, 4.77f, 1.9f);
-			break;
-		case 4922:
-			player->NearTeleportTo(6214.4f, 227.12f, 4.28f, 0.8f);
-			break;
-		case 4923:
-			player->NearTeleportTo(6180.98f, 265.28f, 4.27f, 6.06f);
-			break;
-		case 4924:
-			player->NearTeleportTo(6269.0f, 295.06f, 4.46f, 3.98f);
-			break;
-		case 4944: // under arena -20
-		case 5039: // under arena -40
-		case 5040: // under arena -60
-			player->NearTeleportTo(6238.930176f, 262.963470f, 0.889519f, player->GetOrientation());
-			break;
+        // OUTSIDE OF ARENA, TELEPORT!
+        case 4919:
+            player->NearTeleportTo(6220.90f, 318.94f, 5.1f, 5.3f);
+            break;
+        case 4921:
+            player->NearTeleportTo(6250.27f, 208.50f, 4.77f, 1.9f);
+            break;
+        case 4922:
+            player->NearTeleportTo(6214.4f, 227.12f, 4.28f, 0.8f);
+            break;
+        case 4923:
+            player->NearTeleportTo(6180.98f, 265.28f, 4.27f, 6.06f);
+            break;
+        case 4924:
+            player->NearTeleportTo(6269.0f, 295.06f, 4.46f, 3.98f);
+            break;
+        case 4944: // under arena -20
+        case 5039: // under arena -40
+        case 5040: // under arena -60
+            player->NearTeleportTo(6238.930176f, 262.963470f, 0.889519f, player->GetOrientation());
+            break;
     }
 }
 

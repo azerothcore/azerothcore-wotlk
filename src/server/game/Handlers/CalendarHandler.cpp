@@ -141,9 +141,9 @@ void WorldSession::HandleCalendarGetCalendar(WorldPacket& /*recvData*/)
         sentMaps.insert(mapId);
 
         dataBuffer << int32(mapId);
-		time_t period = sInstanceSaveMgr->GetExtendedResetTimeFor(mapId, (Difficulty)PAIR32_HIPART(itr->first)) - itr->second;
-		dataBuffer << int32(period); // pussywizard: reset time period
-		dataBuffer << int32(0); // pussywizard: reset time offset, needed for other than 7-day periods if not aligned with relationTime
+        time_t period = sInstanceSaveMgr->GetExtendedResetTimeFor(mapId, (Difficulty)PAIR32_HIPART(itr->first)) - itr->second;
+        dataBuffer << int32(period); // pussywizard: reset time period
+        dataBuffer << int32(0); // pussywizard: reset time offset, needed for other than 7-day periods if not aligned with relationTime
         ++boundCounter;
     }
 
@@ -445,15 +445,15 @@ void WorldSession::HandleCalendarEventInvite(WorldPacket& recvData)
     else
     {
         // xinef: Get Data From global storage
-		if (uint32 guidLow = sWorld->GetGlobalPlayerGUID(name))
-		{
-			if (GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(guidLow))
-			{
-				inviteeGuid = MAKE_NEW_GUID(guidLow, 0, HIGHGUID_PLAYER);
-				inviteeTeamId = Player::TeamIdForRace(playerData->race);
-				inviteeGuildId = playerData->guildId;
-			}
-		}
+        if (uint32 guidLow = sWorld->GetGlobalPlayerGUID(name))
+        {
+            if (GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(guidLow))
+            {
+                inviteeGuid = MAKE_NEW_GUID(guidLow, 0, HIGHGUID_PLAYER);
+                inviteeTeamId = Player::TeamIdForRace(playerData->race);
+                inviteeGuildId = playerData->guildId;
+            }
+        }
     }
 
     if (!inviteeGuid)
@@ -468,7 +468,7 @@ void WorldSession::HandleCalendarEventInvite(WorldPacket& recvData)
         return;
     }
 
-	// xinef: zomg! sync query
+    // xinef: zomg! sync query
     if (QueryResult result = CharacterDatabase.PQuery("SELECT flags FROM character_social WHERE guid = " UI64FMTD " AND friend = " UI64FMTD, inviteeGuid, playerGuid))
     {
         Field* fields = result->Fetch();
@@ -700,22 +700,22 @@ void WorldSession::HandleSetSavedInstanceExtend(WorldPacket& recvData)
     uint8 toggleExtendOn;
     recvData >> mapId >> difficulty>> toggleExtendOn;
 
-	const MapEntry* entry = sMapStore.LookupEntry(mapId);
-	if (!entry || !entry->IsRaid())
-		return;
-
-	InstancePlayerBind* instanceBind = sInstanceSaveMgr->PlayerGetBoundInstance(GetPlayer()->GetGUIDLow(), mapId, Difficulty(difficulty));
-	if (!instanceBind || !instanceBind->perm || (bool)toggleExtendOn == instanceBind->extended)
+    const MapEntry* entry = sMapStore.LookupEntry(mapId);
+    if (!entry || !entry->IsRaid())
         return;
 
-	instanceBind->extended = (bool)toggleExtendOn;
+    InstancePlayerBind* instanceBind = sInstanceSaveMgr->PlayerGetBoundInstance(GetPlayer()->GetGUIDLow(), mapId, Difficulty(difficulty));
+    if (!instanceBind || !instanceBind->perm || (bool)toggleExtendOn == instanceBind->extended)
+        return;
 
-	// update in db
-	PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_INSTANCE_EXTENDED);
-	stmt->setUInt8(0, toggleExtendOn ? 1 : 0);
-	stmt->setUInt32(1, GetPlayer()->GetGUIDLow());
-	stmt->setUInt32(2, instanceBind->save->GetInstanceId());
-	CharacterDatabase.Execute(stmt);
+    instanceBind->extended = (bool)toggleExtendOn;
+
+    // update in db
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_INSTANCE_EXTENDED);
+    stmt->setUInt8(0, toggleExtendOn ? 1 : 0);
+    stmt->setUInt32(1, GetPlayer()->GetGUIDLow());
+    stmt->setUInt32(2, instanceBind->save->GetInstanceId());
+    CharacterDatabase.Execute(stmt);
 
     SendCalendarRaidLockoutUpdated(instanceBind->save, (bool)toggleExtendOn);
 }

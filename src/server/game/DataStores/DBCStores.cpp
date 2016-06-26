@@ -368,7 +368,7 @@ void LoadDBCStores(const std::string& dataPath)
     LoadDBC(availableDbcLocales, bad_dbc_files, sItemSetStore,                dbcPath, "ItemSet.dbc");
 
     LoadDBC(availableDbcLocales, bad_dbc_files, sLFGDungeonStore,             dbcPath, "LFGDungeons.dbc");
-	LoadDBC(availableDbcLocales, bad_dbc_files, sLightStore,                  dbcPath, "Light.dbc");
+    LoadDBC(availableDbcLocales, bad_dbc_files, sLightStore,                  dbcPath, "Light.dbc");
     LoadDBC(availableDbcLocales, bad_dbc_files, sLiquidTypeStore,             dbcPath, "LiquidType.dbc");
     LoadDBC(availableDbcLocales, bad_dbc_files, sLockStore,                   dbcPath, "Lock.dbc");
 
@@ -420,7 +420,7 @@ void LoadDBCStores(const std::string& dataPath)
 
         SpellEntry const* spellInfo = sSpellStore.LookupEntry(skillLine->spellId);
 
-		if (spellInfo && (spellInfo->Attributes & SPELL_ATTR0_PASSIVE))
+        if (spellInfo && (spellInfo->Attributes & SPELL_ATTR0_PASSIVE))
         {
             for (uint32 i = 1; i < sCreatureFamilyStore.GetNumRows(); ++i)
             {
@@ -822,12 +822,12 @@ MapDifficulty const* GetDownscaledMapDifficultyData(uint32 mapId, Difficulty &di
 
 PvPDifficultyEntry const* GetBattlegroundBracketByLevel(uint32 mapid, uint32 level)
 {
-	if (mapid == sBattlegroundMgr->randomBgDifficultyEntry.mapId)
-	{
-		if (level < sBattlegroundMgr->randomBgDifficultyEntry.minLevel)
-			return NULL;
-		return &sBattlegroundMgr->randomBgDifficultyEntry;
-	}
+    if (mapid == sBattlegroundMgr->randomBgDifficultyEntry.mapId)
+    {
+        if (level < sBattlegroundMgr->randomBgDifficultyEntry.minLevel)
+            return NULL;
+        return &sBattlegroundMgr->randomBgDifficultyEntry;
+    }
 
     PvPDifficultyEntry const* maxEntry = NULL;              // used for level > max listed level case
     for (uint32 i = 0; i < sPvPDifficultyStore.GetNumRows(); ++i)
@@ -853,12 +853,12 @@ PvPDifficultyEntry const* GetBattlegroundBracketByLevel(uint32 mapid, uint32 lev
 
 PvPDifficultyEntry const* GetBattlegroundBracketById(uint32 mapid, BattlegroundBracketId id)
 {
-	if (mapid == sBattlegroundMgr->randomBgDifficultyEntry.mapId)
-	{
-		if (id != sBattlegroundMgr->randomBgDifficultyEntry.bracketId)
-			return NULL;
-		return &sBattlegroundMgr->randomBgDifficultyEntry;
-	}
+    if (mapid == sBattlegroundMgr->randomBgDifficultyEntry.mapId)
+    {
+        if (id != sBattlegroundMgr->randomBgDifficultyEntry.bracketId)
+            return NULL;
+        return &sBattlegroundMgr->randomBgDifficultyEntry;
+    }
 
     for (uint32 i = 0; i < sPvPDifficultyStore.GetNumRows(); ++i)
         if (PvPDifficultyEntry const* entry = sPvPDifficultyStore.LookupEntry(i))

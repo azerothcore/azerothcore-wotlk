@@ -114,7 +114,7 @@ public:
 
 enum Myranda
 {
-	QUEST_FIND_MYRANDA		= 5861,
+    QUEST_FIND_MYRANDA      = 5861,
     QUEST_SUBTERFUGE        = 5862,
     QUEST_IN_DREAMS         = 5944,
     SPELL_SCARLET_ILLUSION  = 17961

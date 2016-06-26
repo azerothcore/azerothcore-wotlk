@@ -27,7 +27,7 @@ enum ScriptTexts
     SAY_FRENZY                      = 11,
     SAY_BERSERK                     = 12,
     SAY_DEATH                       = 13,
-	EMOTE_SCENT_OF_BLOOD			= 14,
+    EMOTE_SCENT_OF_BLOOD            = 14,
 
     // High Overlord Saurfang
     SAY_INTRO_HORDE_1               = 0,
@@ -129,7 +129,7 @@ enum EventTypes
 
     EVENT_BERSERK               = 18,
     EVENT_SUMMON_BLOOD_BEAST    = 19,
-	EVENT_BLOOD_BEAST_SCENT_OF_BLOOD = 100,
+    EVENT_BLOOD_BEAST_SCENT_OF_BLOOD = 100,
     EVENT_BOILING_BLOOD         = 20,
     EVENT_BLOOD_NOVA            = 21,
     EVENT_RUNE_OF_BLOOD         = 22,
@@ -179,9 +179,9 @@ enum Actions
     ACTION_CHARGE                       = -3781302,
     ACTION_START_OUTRO                  = -3781303,
     ACTION_DESPAWN                      = -3781304,
-	ACTION_INTRO_DONE                   = -3781305,
-	ACTION_EVADE                        = -3781306,
-	ACTION_GAIN_SCENT_OF_BLOOD			= -3781307,
+    ACTION_INTRO_DONE                   = -3781305,
+    ACTION_EVADE                        = -3781306,
+    ACTION_GAIN_SCENT_OF_BLOOD          = -3781307,
     ACTION_MARK_OF_THE_FALLEN_CHAMPION  = -72293,
 };
 
@@ -241,10 +241,10 @@ class boss_deathbringer_saurfang : public CreatureScript
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_NOT_SELECTABLE);
                 me->SetReactState(REACT_DEFENSIVE);
                 events.Reset();
-				_introDone = false;
+                _introDone = false;
                 _frenzied = false;
-				_fallenChampionCastCount = 0;
-				_transportCheckTimer = 1000;
+                _fallenChampionCastCount = 0;
+                _transportCheckTimer = 1000;
                 me->SetPower(POWER_ENERGY, 0);
                 DoCast(me, SPELL_ZERO_POWER, true);
                 DoCast(me, SPELL_BLOOD_LINK, true);
@@ -258,11 +258,11 @@ class boss_deathbringer_saurfang : public CreatureScript
 
             void EnterCombat(Unit* who)
             {
-				if (!_introDone)
-				{
-					me->CombatStop();
-					return;
-				}
+                if (!_introDone)
+                {
+                    me->CombatStop();
+                    return;
+                }
 
                 // pussywizard: without this, the aura is not recalculated the first time
                 me->RemoveAurasDueToSpell(SPELL_BLOOD_POWER);
@@ -282,7 +282,7 @@ class boss_deathbringer_saurfang : public CreatureScript
 
                 events.Reset();
                 events.ScheduleEvent(EVENT_SUMMON_BLOOD_BEAST, 30000);
-				events.ScheduleEvent(EVENT_BERSERK, (IsHeroic() ? 360000 : 480000));
+                events.ScheduleEvent(EVENT_BERSERK, (IsHeroic() ? 360000 : 480000));
                 events.ScheduleEvent(EVENT_BOILING_BLOOD, 15500, 0);
                 events.ScheduleEvent(EVENT_BLOOD_NOVA, 17000, 0);
                 events.ScheduleEvent(EVENT_RUNE_OF_BLOOD, 20000, 0);
@@ -303,10 +303,10 @@ class boss_deathbringer_saurfang : public CreatureScript
                     creature->AI()->DoAction(ACTION_START_OUTRO);
             }
 
-			bool CanAIAttack(const Unit* target) const
-			{
-				return _introDone;
-			}
+            bool CanAIAttack(const Unit* target) const
+            {
+                return _introDone;
+            }
 
             void AttackStart(Unit* victim)
             {
@@ -316,7 +316,7 @@ class boss_deathbringer_saurfang : public CreatureScript
                 ScriptedAI::AttackStart(victim);
             }
 
-			void MoveInLineOfSight(Unit* /*who*/) {}
+            void MoveInLineOfSight(Unit* /*who*/) {}
 
             void JustReachedHome()
             {
@@ -384,20 +384,20 @@ class boss_deathbringer_saurfang : public CreatureScript
 
                 events.Update(diff);
 
-				if (_transportCheckTimer <= diff)
-				{
-					_transportCheckTimer = 1000;
-					Map::PlayerList const& pl = me->GetMap()->GetPlayers();
-					for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
-						if (Player* p = itr->GetSource())
-							if (p->GetTransport())
-							{
-								EnterEvadeMode();
-								return;
-							}
-				}
-				else
-					_transportCheckTimer -= diff;
+                if (_transportCheckTimer <= diff)
+                {
+                    _transportCheckTimer = 1000;
+                    Map::PlayerList const& pl = me->GetMap()->GetPlayers();
+                    for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
+                        if (Player* p = itr->GetSource())
+                            if (p->GetTransport())
+                            {
+                                EnterEvadeMode();
+                                return;
+                            }
+                }
+                else
+                    _transportCheckTimer -= diff;
 
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
@@ -414,13 +414,13 @@ class boss_deathbringer_saurfang : public CreatureScript
                                     DoCast(me, SPELL_SUMMON_BLOOD_BEAST_25_MAN+i25);
                             Talk(SAY_BLOOD_BEASTS);
                             events.ScheduleEvent(EVENT_SUMMON_BLOOD_BEAST, 40000);
-							if (IsHeroic())
-								events.ScheduleEvent(EVENT_BLOOD_BEAST_SCENT_OF_BLOOD, 10000);
+                            if (IsHeroic())
+                                events.ScheduleEvent(EVENT_BLOOD_BEAST_SCENT_OF_BLOOD, 10000);
                             break;
-						case EVENT_BLOOD_BEAST_SCENT_OF_BLOOD:
-							Talk(EMOTE_SCENT_OF_BLOOD);
-							summons.DoAction(ACTION_GAIN_SCENT_OF_BLOOD);
-							break;
+                        case EVENT_BLOOD_BEAST_SCENT_OF_BLOOD:
+                            Talk(EMOTE_SCENT_OF_BLOOD);
+                            summons.DoAction(ACTION_GAIN_SCENT_OF_BLOOD);
+                            break;
                         case EVENT_BLOOD_NOVA:
                         {
                             me->CastSpell((Unit*)NULL, SPELL_BLOOD_NOVA_TRIGGER, false);
@@ -447,9 +447,9 @@ class boss_deathbringer_saurfang : public CreatureScript
                 DoMeleeAttackIfReady();
             }
 
-			void DoAction(int32 action)
-			{
-				switch (action)
+            void DoAction(int32 action)
+            {
+                switch (action)
                 {
                     case ACTION_MARK_OF_THE_FALLEN_CHAMPION:
                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 0.0f, true, -SPELL_MARK_OF_THE_FALLEN_CHAMPION))
@@ -461,39 +461,39 @@ class boss_deathbringer_saurfang : public CreatureScript
                                 bloodPower->RecalculateAmountOfEffects();
                         }
                         break;
-					case ACTION_INTRO_DONE:
-						_introDone = true;
-						break;
+                    case ACTION_INTRO_DONE:
+                        _introDone = true;
+                        break;
                     default:
                         break;
                 }
-			}
+            }
 
             uint32 GetData(uint32 type) const
             {
                 if (type == DATA_MADE_A_MESS)
-				{
+                {
                     if (_fallenChampionCastCount < RAID_MODE<uint32>(3, 5, 3, 5))
                         return 1;
-				}
-				else if (type == FALLEN_CHAMPION_CAST_COUNT)
-					return _fallenChampionCastCount;
+                }
+                else if (type == FALLEN_CHAMPION_CAST_COUNT)
+                    return _fallenChampionCastCount;
 
                 return 0;
             }
 
-			void EnterEvadeMode()
-			{
-				BossAI::EnterEvadeMode();
-				if (Creature* creature = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_SAURFANG_EVENT_NPC)))
+            void EnterEvadeMode()
+            {
+                BossAI::EnterEvadeMode();
+                if (Creature* creature = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_SAURFANG_EVENT_NPC)))
                     creature->AI()->DoAction(ACTION_EVADE);
-			}
+            }
 
         private:
             uint32 _fallenChampionCastCount;
             bool _introDone;
             bool _frenzied;   // faster than iterating all auras to find Frenzy
-			uint16 _transportCheckTimer;
+            uint16 _transportCheckTimer;
         };
 
         CreatureAI* GetAI(Creature* creature) const
@@ -518,8 +518,8 @@ class npc_high_overlord_saurfang_icc : public CreatureScript
             void Reset()
             {
                 _events.Reset();
-				me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-				me->SetReactState(REACT_PASSIVE);
+                me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                me->SetReactState(REACT_PASSIVE);
             }
 
             void DoAction(int32 action)
@@ -527,77 +527,77 @@ class npc_high_overlord_saurfang_icc : public CreatureScript
                 switch (action)
                 {
                     case ACTION_START_EVENT:
-						{
-							// Prevent crashes
-							if (_events.GetPhaseMask() & PHASE_INTRO_MASK)
-								return;
+                        {
+                            // Prevent crashes
+                            if (_events.GetPhaseMask() & PHASE_INTRO_MASK)
+                                return;
 
-							Creature* deathbringer = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_DEATHBRINGER_SAURFANG));
-							if (!deathbringer || deathbringer->IsInEvadeMode())
-								return;
+                            Creature* deathbringer = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_DEATHBRINGER_SAURFANG));
+                            if (!deathbringer || deathbringer->IsInEvadeMode())
+                                return;
 
-							if (_guardList.empty())
-							{
-								GetCreatureListWithEntryInGrid(_guardList, me, NPC_SE_KOR_KRON_REAVER, 20.0f);
-								_guardList.sort(Trinity::ObjectDistanceOrderPred(me));
-							}
-							uint32 x = 1;
-							for (std::list<Creature*>::iterator itr = _guardList.begin(); itr != _guardList.end(); ++itr)
-								(*itr)->AI()->SetData(0, x++);
+                            if (_guardList.empty())
+                            {
+                                GetCreatureListWithEntryInGrid(_guardList, me, NPC_SE_KOR_KRON_REAVER, 20.0f);
+                                _guardList.sort(Trinity::ObjectDistanceOrderPred(me));
+                            }
+                            uint32 x = 1;
+                            for (std::list<Creature*>::iterator itr = _guardList.begin(); itr != _guardList.end(); ++itr)
+                                (*itr)->AI()->SetData(0, x++);
 
-							me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-							Talk(SAY_INTRO_HORDE_1);
-							_events.SetPhase(PHASE_INTRO_H);
-							_events.ScheduleEvent(EVENT_INTRO_HORDE_2, 5000, 0, PHASE_INTRO_H);
-							_events.ScheduleEvent(EVENT_INTRO_HORDE_3, 18500, 0, PHASE_INTRO_H);
-							_instance->HandleGameObject(_instance->GetData64(GO_SAURFANG_S_DOOR), true);
-							
-							if (GameObject* teleporter = ObjectAccessor::GetGameObject(*me, _instance->GetData64(GO_SCOURGE_TRANSPORTER_SAURFANG)))
-							{
-								_instance->HandleGameObject(0, false, teleporter);
-								teleporter->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_IN_USE);
-							}
+                            me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                            Talk(SAY_INTRO_HORDE_1);
+                            _events.SetPhase(PHASE_INTRO_H);
+                            _events.ScheduleEvent(EVENT_INTRO_HORDE_2, 5000, 0, PHASE_INTRO_H);
+                            _events.ScheduleEvent(EVENT_INTRO_HORDE_3, 18500, 0, PHASE_INTRO_H);
+                            _instance->HandleGameObject(_instance->GetData64(GO_SAURFANG_S_DOOR), true);
+                            
+                            if (GameObject* teleporter = ObjectAccessor::GetGameObject(*me, _instance->GetData64(GO_SCOURGE_TRANSPORTER_SAURFANG)))
+                            {
+                                _instance->HandleGameObject(0, false, teleporter);
+                                teleporter->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_IN_USE);
+                            }
 
-							deathbringer->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-							deathbringer->SetWalk(false);
-							deathbringer->GetMotionMaster()->MovePoint(POINT_SAURFANG, deathbringerPos.GetPositionX(), deathbringerPos.GetPositionY(), deathbringerPos.GetPositionZ());
-						}
+                            deathbringer->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                            deathbringer->SetWalk(false);
+                            deathbringer->GetMotionMaster()->MovePoint(POINT_SAURFANG, deathbringerPos.GetPositionX(), deathbringerPos.GetPositionY(), deathbringerPos.GetPositionZ());
+                        }
                         break;
                     case ACTION_START_OUTRO:
-						{
-							me->RemoveAurasDueToSpell(SPELL_GRIP_OF_AGONY);
-							me->SetDisableGravity(false);
-							me->MonsterMoveWithSpeed(me->GetPositionX(), me->GetPositionY(), 539.2917f, 10.0f);
-							for (std::list<Creature*>::iterator itr = _guardList.begin(); itr != _guardList.end(); ++itr)
-								(*itr)->AI()->DoAction(ACTION_DESPAWN);
+                        {
+                            me->RemoveAurasDueToSpell(SPELL_GRIP_OF_AGONY);
+                            me->SetDisableGravity(false);
+                            me->MonsterMoveWithSpeed(me->GetPositionX(), me->GetPositionY(), 539.2917f, 10.0f);
+                            for (std::list<Creature*>::iterator itr = _guardList.begin(); itr != _guardList.end(); ++itr)
+                                (*itr)->AI()->DoAction(ACTION_DESPAWN);
 
-							/*Talk(SAY_OUTRO_HORDE_1);
-							_events.ScheduleEvent(EVENT_OUTRO_HORDE_1, 10000);
-							_events.ScheduleEvent(EVENT_OUTRO_HORDE_2, 18000);
-							_events.ScheduleEvent(EVENT_OUTRO_HORDE_3, 24000);*/
-	                        
-						}
-						break;
-					case ACTION_EVADE:
-						{
-							float x, y, z, o;
-							me->GetMotionMaster()->Clear();
-							me->GetHomePosition(x, y, z, o);
-							me->SetPosition(x, y, z, o);
-							me->StopMovingOnCurrentPos();
-							me->SetDisableGravity(false);
-							EnterEvadeMode();
-							for (std::list<Creature*>::iterator itr = _guardList.begin(); itr != _guardList.end(); ++itr)
-							{
-								(*itr)->GetMotionMaster()->Clear();
-								(*itr)->GetHomePosition(x, y, z, o);
-								(*itr)->SetPosition(x, y, z, o);
-								(*itr)->StopMovingOnCurrentPos();
-								(*itr)->SetDisableGravity(false);
-								(*itr)->AI()->EnterEvadeMode();
-							}
-						}
-						break;
+                            /*Talk(SAY_OUTRO_HORDE_1);
+                            _events.ScheduleEvent(EVENT_OUTRO_HORDE_1, 10000);
+                            _events.ScheduleEvent(EVENT_OUTRO_HORDE_2, 18000);
+                            _events.ScheduleEvent(EVENT_OUTRO_HORDE_3, 24000);*/
+                            
+                        }
+                        break;
+                    case ACTION_EVADE:
+                        {
+                            float x, y, z, o;
+                            me->GetMotionMaster()->Clear();
+                            me->GetHomePosition(x, y, z, o);
+                            me->SetPosition(x, y, z, o);
+                            me->StopMovingOnCurrentPos();
+                            me->SetDisableGravity(false);
+                            EnterEvadeMode();
+                            for (std::list<Creature*>::iterator itr = _guardList.begin(); itr != _guardList.end(); ++itr)
+                            {
+                                (*itr)->GetMotionMaster()->Clear();
+                                (*itr)->GetHomePosition(x, y, z, o);
+                                (*itr)->SetPosition(x, y, z, o);
+                                (*itr)->StopMovingOnCurrentPos();
+                                (*itr)->SetDisableGravity(false);
+                                (*itr)->AI()->EnterEvadeMode();
+                            }
+                        }
+                        break;
                     default:
                         break;
                 }
@@ -621,13 +621,13 @@ class npc_high_overlord_saurfang_icc : public CreatureScript
                         case POINT_FIRST_STEP:
                             me->SetWalk(false);
                             Talk(SAY_INTRO_HORDE_3);
-							_events.ScheduleEvent(EVENT_INTRO_HORDE_4, 6500, 0, PHASE_INTRO_H);
+                            _events.ScheduleEvent(EVENT_INTRO_HORDE_4, 6500, 0, PHASE_INTRO_H);
                             _events.ScheduleEvent(EVENT_INTRO_HORDE_5, 15500, 0, PHASE_INTRO_H);
                             _events.ScheduleEvent(EVENT_INTRO_HORDE_6, 29500, 0, PHASE_INTRO_H);
                             _events.ScheduleEvent(EVENT_INTRO_HORDE_7, 43800, 0, PHASE_INTRO_H);
                             _events.ScheduleEvent(EVENT_INTRO_HORDE_8, 47000, 0, PHASE_INTRO_H);
-							_events.ScheduleEvent(EVENT_INTRO_HORDE_9, 46700+1000+500, 0, PHASE_INTRO_H);
-							_events.ScheduleEvent(EVENT_INTRO_FINISH,  46700+1000+9000, 0, PHASE_INTRO_H);
+                            _events.ScheduleEvent(EVENT_INTRO_HORDE_9, 46700+1000+500, 0, PHASE_INTRO_H);
+                            _events.ScheduleEvent(EVENT_INTRO_FINISH,  46700+1000+9000, 0, PHASE_INTRO_H);
                             break;
                         /*case POINT_CORPSE:
                             if (Creature* deathbringer = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_DEATHBRINGER_SAURFANG)))
@@ -655,19 +655,19 @@ class npc_high_overlord_saurfang_icc : public CreatureScript
                 _events.Update(diff);
                 switch (uint32 eventId = _events.ExecuteEvent())
                 {
-					case 0:
-						break;
+                    case 0:
+                        break;
                     case EVENT_INTRO_HORDE_2:
-						if (Creature* deathbringer = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_DEATHBRINGER_SAURFANG)))
-							deathbringer->AI()->Talk(SAY_INTRO_HORDE_2);
+                        if (Creature* deathbringer = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_DEATHBRINGER_SAURFANG)))
+                            deathbringer->AI()->Talk(SAY_INTRO_HORDE_2);
                         break;
                     case EVENT_INTRO_HORDE_3:
                         me->SetWalk(true);
                         me->GetMotionMaster()->MovePoint(POINT_FIRST_STEP, firstStepPos.GetPositionX(), firstStepPos.GetPositionY(), firstStepPos.GetPositionZ());
                         break;
                     case EVENT_INTRO_HORDE_4:
-						if (Creature* deathbringer = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_DEATHBRINGER_SAURFANG)))
-							deathbringer->AI()->Talk(SAY_INTRO_HORDE_4);
+                        if (Creature* deathbringer = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_DEATHBRINGER_SAURFANG)))
+                            deathbringer->AI()->Talk(SAY_INTRO_HORDE_4);
                         break;
                     case EVENT_INTRO_HORDE_5:
                         Talk(SAY_INTRO_HORDE_5);
@@ -685,20 +685,20 @@ class npc_high_overlord_saurfang_icc : public CreatureScript
                         me->GetMotionMaster()->MoveCharge(chargePos[0].GetPositionX(), chargePos[0].GetPositionY(), chargePos[0].GetPositionZ(), 8.5f, POINT_CHARGE);
                         break;
                     case EVENT_INTRO_HORDE_9:
-						if (Creature* deathbringer = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_DEATHBRINGER_SAURFANG)))
-						{
-							deathbringer->AI()->DoCast(me, SPELL_GRIP_OF_AGONY);
-							deathbringer->AI()->Talk(SAY_INTRO_HORDE_9);
-						}
+                        if (Creature* deathbringer = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_DEATHBRINGER_SAURFANG)))
+                        {
+                            deathbringer->AI()->DoCast(me, SPELL_GRIP_OF_AGONY);
+                            deathbringer->AI()->Talk(SAY_INTRO_HORDE_9);
+                        }
                         break;
                     case EVENT_INTRO_FINISH:
-						if (Creature* deathbringer = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_DEATHBRINGER_SAURFANG)))
-						{
-							deathbringer->AI()->DoAction(ACTION_INTRO_DONE);
-							deathbringer->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
-							if (Player* target = deathbringer->SelectNearestPlayer(100.0f))
-								deathbringer->AI()->AttackStart(target);
-						}
+                        if (Creature* deathbringer = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_DEATHBRINGER_SAURFANG)))
+                        {
+                            deathbringer->AI()->DoAction(ACTION_INTRO_DONE);
+                            deathbringer->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                            if (Player* target = deathbringer->SelectNearestPlayer(100.0f))
+                                deathbringer->AI()->AttackStart(target);
+                        }
                         break;
 
                     /*case EVENT_OUTRO_HORDE_1:
@@ -747,14 +747,14 @@ class npc_high_overlord_saurfang_icc : public CreatureScript
 
         bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action)
         {
-			InstanceScript* instance = creature->GetInstanceScript();
+            InstanceScript* instance = creature->GetInstanceScript();
             if (instance && instance->GetBossState(DATA_DEATHBRINGER_SAURFANG) != DONE && instance->GetBossState(DATA_DEATHBRINGER_SAURFANG) != IN_PROGRESS)
-			{
-				player->PlayerTalkClass->ClearMenus();
-				player->CLOSE_GOSSIP_MENU();
-				if (action == -ACTION_START_EVENT)
-					creature->AI()->DoAction(ACTION_START_EVENT);
-			}
+            {
+                player->PlayerTalkClass->ClearMenus();
+                player->CLOSE_GOSSIP_MENU();
+                if (action == -ACTION_START_EVENT)
+                    creature->AI()->DoAction(ACTION_START_EVENT);
+            }
 
             return true;
         }
@@ -780,8 +780,8 @@ class npc_muradin_bronzebeard_icc : public CreatureScript
             void Reset()
             {
                 _events.Reset();
-				me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-				me->SetReactState(REACT_PASSIVE);
+                me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                me->SetReactState(REACT_PASSIVE);
             }
 
             void DoAction(int32 action)
@@ -789,43 +789,43 @@ class npc_muradin_bronzebeard_icc : public CreatureScript
                 switch (action)
                 {
                     case ACTION_START_EVENT:
-						{
-							// Prevent crashes
-							if (_events.GetPhaseMask() & PHASE_INTRO_MASK)
-								return;
+                        {
+                            // Prevent crashes
+                            if (_events.GetPhaseMask() & PHASE_INTRO_MASK)
+                                return;
 
-							Creature* deathbringer = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_DEATHBRINGER_SAURFANG));
-							if (!deathbringer || deathbringer->IsInEvadeMode())
-								return;
+                            Creature* deathbringer = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_DEATHBRINGER_SAURFANG));
+                            if (!deathbringer || deathbringer->IsInEvadeMode())
+                                return;
 
-							if (_guardList.empty())
-							{
-								GetCreatureListWithEntryInGrid(_guardList, me, NPC_SE_SKYBREAKER_MARINE, 20.0f);
-								_guardList.sort(Trinity::ObjectDistanceOrderPred(me));
-							}
-							uint32 x = 1;
-							for (std::list<Creature*>::iterator itr = _guardList.begin(); itr != _guardList.end(); ++itr)
-								(*itr)->AI()->SetData(0, x++);
+                            if (_guardList.empty())
+                            {
+                                GetCreatureListWithEntryInGrid(_guardList, me, NPC_SE_SKYBREAKER_MARINE, 20.0f);
+                                _guardList.sort(Trinity::ObjectDistanceOrderPred(me));
+                            }
+                            uint32 x = 1;
+                            for (std::list<Creature*>::iterator itr = _guardList.begin(); itr != _guardList.end(); ++itr)
+                                (*itr)->AI()->SetData(0, x++);
 
-							me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-							Talk(SAY_INTRO_ALLIANCE_1);
-							_events.SetPhase(PHASE_INTRO_A);
-							_events.ScheduleEvent(EVENT_INTRO_ALLIANCE_2, 2500, 0, PHASE_INTRO_A);
-							_events.ScheduleEvent(EVENT_INTRO_ALLIANCE_3, 20000, 0, PHASE_INTRO_A);
-							_events.ScheduleEvent(EVENT_INTRO_ALLIANCE_4, 2500+17500+9500, 0, PHASE_INTRO_A);
-							_instance->HandleGameObject(_instance->GetData64(GO_SAURFANG_S_DOOR), true);
+                            me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                            Talk(SAY_INTRO_ALLIANCE_1);
+                            _events.SetPhase(PHASE_INTRO_A);
+                            _events.ScheduleEvent(EVENT_INTRO_ALLIANCE_2, 2500, 0, PHASE_INTRO_A);
+                            _events.ScheduleEvent(EVENT_INTRO_ALLIANCE_3, 20000, 0, PHASE_INTRO_A);
+                            _events.ScheduleEvent(EVENT_INTRO_ALLIANCE_4, 2500+17500+9500, 0, PHASE_INTRO_A);
+                            _instance->HandleGameObject(_instance->GetData64(GO_SAURFANG_S_DOOR), true);
 
-							if (GameObject* teleporter = ObjectAccessor::GetGameObject(*me, _instance->GetData64(GO_SCOURGE_TRANSPORTER_SAURFANG)))
-							{
-								_instance->HandleGameObject(0, false, teleporter);
-								teleporter->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_IN_USE);
-							}
+                            if (GameObject* teleporter = ObjectAccessor::GetGameObject(*me, _instance->GetData64(GO_SCOURGE_TRANSPORTER_SAURFANG)))
+                            {
+                                _instance->HandleGameObject(0, false, teleporter);
+                                teleporter->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_IN_USE);
+                            }
 
-							deathbringer->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-							deathbringer->SetWalk(false);
-							deathbringer->GetMotionMaster()->MovePoint(POINT_SAURFANG, deathbringerPos.GetPositionX(), deathbringerPos.GetPositionY(), deathbringerPos.GetPositionZ());
-						}
-						break;
+                            deathbringer->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                            deathbringer->SetWalk(false);
+                            deathbringer->GetMotionMaster()->MovePoint(POINT_SAURFANG, deathbringerPos.GetPositionX(), deathbringerPos.GetPositionY(), deathbringerPos.GetPositionZ());
+                        }
+                        break;
                     case ACTION_START_OUTRO:
                     {
                         me->RemoveAurasDueToSpell(SPELL_GRIP_OF_AGONY);
@@ -837,28 +837,28 @@ class npc_muradin_bronzebeard_icc : public CreatureScript
                         //Talk(SAY_OUTRO_ALLIANCE_1);
                         break;
                     }
-					case ACTION_EVADE:
-						{
-							float x, y, z, o;
-							me->GetMotionMaster()->Clear();
-							me->GetHomePosition(x, y, z, o);
-							me->SetPosition(x, y, z, o);
-							me->StopMovingOnCurrentPos();
-							me->SetDisableGravity(false);
-							EnterEvadeMode();
-							for (std::list<Creature*>::iterator itr = _guardList.begin(); itr != _guardList.end(); ++itr)
-							{
-								(*itr)->GetMotionMaster()->Clear();
-								(*itr)->GetHomePosition(x, y, z, o);
-								(*itr)->SetPosition(x, y, z, o);
-								(*itr)->StopMovingOnCurrentPos();
-								(*itr)->SetDisableGravity(false);
-								(*itr)->AI()->EnterEvadeMode();
-							}
-						}
-						break;
-					default:
-						break;
+                    case ACTION_EVADE:
+                        {
+                            float x, y, z, o;
+                            me->GetMotionMaster()->Clear();
+                            me->GetHomePosition(x, y, z, o);
+                            me->SetPosition(x, y, z, o);
+                            me->StopMovingOnCurrentPos();
+                            me->SetDisableGravity(false);
+                            EnterEvadeMode();
+                            for (std::list<Creature*>::iterator itr = _guardList.begin(); itr != _guardList.end(); ++itr)
+                            {
+                                (*itr)->GetMotionMaster()->Clear();
+                                (*itr)->GetHomePosition(x, y, z, o);
+                                (*itr)->SetPosition(x, y, z, o);
+                                (*itr)->StopMovingOnCurrentPos();
+                                (*itr)->SetDisableGravity(false);
+                                (*itr)->AI()->EnterEvadeMode();
+                            }
+                        }
+                        break;
+                    default:
+                        break;
                 }
             }
 
@@ -878,16 +878,16 @@ class npc_muradin_bronzebeard_icc : public CreatureScript
                     switch (id)
                     {
                         case POINT_FIRST_STEP:
-							me->SetWalk(false);
-							Talk(SAY_INTRO_ALLIANCE_4);
-							_events.ScheduleEvent(EVENT_INTRO_ALLIANCE_5, 5000, 0, PHASE_INTRO_A);
-							_events.ScheduleEvent(EVENT_INTRO_ALLIANCE_6, 6500+500, 0, PHASE_INTRO_A);
-							_events.ScheduleEvent(EVENT_INTRO_ALLIANCE_7, 6500+500+2000, 0, PHASE_INTRO_A);
-							_events.ScheduleEvent(EVENT_INTRO_FINISH, 6500+500+2000+5000, 0, PHASE_INTRO_A);
-							break;
-						default:
-							break;
-					}
+                            me->SetWalk(false);
+                            Talk(SAY_INTRO_ALLIANCE_4);
+                            _events.ScheduleEvent(EVENT_INTRO_ALLIANCE_5, 5000, 0, PHASE_INTRO_A);
+                            _events.ScheduleEvent(EVENT_INTRO_ALLIANCE_6, 6500+500, 0, PHASE_INTRO_A);
+                            _events.ScheduleEvent(EVENT_INTRO_ALLIANCE_7, 6500+500+2000, 0, PHASE_INTRO_A);
+                            _events.ScheduleEvent(EVENT_INTRO_FINISH, 6500+500+2000+5000, 0, PHASE_INTRO_A);
+                            break;
+                        default:
+                            break;
+                    }
                 }
             }
 
@@ -896,15 +896,15 @@ class npc_muradin_bronzebeard_icc : public CreatureScript
                 _events.Update(diff);
                 switch (uint32 eventId = _events.ExecuteEvent())
                 {
-					case 0:
-						break;
+                    case 0:
+                        break;
                     case EVENT_INTRO_ALLIANCE_2:
-						if (Creature* deathbringer = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_DEATHBRINGER_SAURFANG)))
-							deathbringer->AI()->Talk(SAY_INTRO_ALLIANCE_2);
+                        if (Creature* deathbringer = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_DEATHBRINGER_SAURFANG)))
+                            deathbringer->AI()->Talk(SAY_INTRO_ALLIANCE_2);
                         break;
                     case EVENT_INTRO_ALLIANCE_3:
                         if (Creature* deathbringer = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_DEATHBRINGER_SAURFANG)))
-							deathbringer->AI()->Talk(SAY_INTRO_ALLIANCE_3);
+                            deathbringer->AI()->Talk(SAY_INTRO_ALLIANCE_3);
                         break;
                     case EVENT_INTRO_ALLIANCE_4:
                         me->SetWalk(true);
@@ -917,26 +917,26 @@ class npc_muradin_bronzebeard_icc : public CreatureScript
                         me->GetMotionMaster()->MoveCharge(chargePos[0].GetPositionX(), chargePos[0].GetPositionY(), chargePos[0].GetPositionZ(), 8.5f, POINT_CHARGE);
                         break;
                     case EVENT_INTRO_ALLIANCE_6:
-						if (Creature* deathbringer = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_DEATHBRINGER_SAURFANG)))
-						{
-							deathbringer->AI()->Talk(SAY_INTRO_ALLIANCE_7);
-							deathbringer->AI()->DoCast(me, SPELL_GRIP_OF_AGONY);
-						}
+                        if (Creature* deathbringer = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_DEATHBRINGER_SAURFANG)))
+                        {
+                            deathbringer->AI()->Talk(SAY_INTRO_ALLIANCE_7);
+                            deathbringer->AI()->DoCast(me, SPELL_GRIP_OF_AGONY);
+                        }
                         break;
                     case EVENT_INTRO_ALLIANCE_7:
-						if (Creature* deathbringer = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_DEATHBRINGER_SAURFANG)))
-						{
-							deathbringer->AI()->Talk(SAY_INTRO_ALLIANCE_6);
-						}
+                        if (Creature* deathbringer = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_DEATHBRINGER_SAURFANG)))
+                        {
+                            deathbringer->AI()->Talk(SAY_INTRO_ALLIANCE_6);
+                        }
                         break;
                     case EVENT_INTRO_FINISH:
-						if (Creature* deathbringer = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_DEATHBRINGER_SAURFANG)))
-						{
-							deathbringer->AI()->DoAction(ACTION_INTRO_DONE);
-							deathbringer->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
-							if (Player* target = deathbringer->SelectNearestPlayer(100.0f))
-								deathbringer->AI()->AttackStart(target);
-						}
+                        if (Creature* deathbringer = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_DEATHBRINGER_SAURFANG)))
+                        {
+                            deathbringer->AI()->DoAction(ACTION_INTRO_DONE);
+                            deathbringer->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                            if (Player* target = deathbringer->SelectNearestPlayer(100.0f))
+                                deathbringer->AI()->AttackStart(target);
+                        }
                         break;
                 }
             }
@@ -949,7 +949,7 @@ class npc_muradin_bronzebeard_icc : public CreatureScript
 
         bool OnGossipHello(Player* player, Creature* creature)
         {
-			InstanceScript* instance = creature->GetInstanceScript();
+            InstanceScript* instance = creature->GetInstanceScript();
             if (instance && instance->GetBossState(DATA_DEATHBRINGER_SAURFANG) != DONE && instance->GetBossState(DATA_DEATHBRINGER_SAURFANG) != IN_PROGRESS)
             {
                 player->ADD_GOSSIP_ITEM(0, "Let it begin...", 631, -ACTION_START_EVENT + 1);
@@ -961,14 +961,14 @@ class npc_muradin_bronzebeard_icc : public CreatureScript
 
         bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action)
         {
-			InstanceScript* instance = creature->GetInstanceScript();
+            InstanceScript* instance = creature->GetInstanceScript();
             if (instance && instance->GetBossState(DATA_DEATHBRINGER_SAURFANG) != DONE && instance->GetBossState(DATA_DEATHBRINGER_SAURFANG) != IN_PROGRESS)
-			{
-				player->PlayerTalkClass->ClearMenus();
-				player->CLOSE_GOSSIP_MENU();
-				if (action == -ACTION_START_EVENT + 1)
-					creature->AI()->DoAction(ACTION_START_EVENT);
-			}
+            {
+                player->PlayerTalkClass->ClearMenus();
+                player->CLOSE_GOSSIP_MENU();
+                if (action == -ACTION_START_EVENT + 1)
+                    creature->AI()->DoAction(ACTION_START_EVENT);
+            }
 
             return true;
         }
@@ -989,7 +989,7 @@ class npc_saurfang_event : public CreatureScript
             npc_saurfang_eventAI(Creature* creature) : ScriptedAI(creature)
             {
                 _index = 0;
-				me->SetReactState(REACT_PASSIVE);
+                me->SetReactState(REACT_PASSIVE);
             }
 
             void SetData(uint32 type, uint32 data)
@@ -1010,10 +1010,10 @@ class npc_saurfang_event : public CreatureScript
             void DoAction(int32 action)
             {
                 if (action == ACTION_CHARGE && _index)
-				{
-					me->SetWalk(false);
+                {
+                    me->SetWalk(false);
                     me->GetMotionMaster()->MoveCharge(chargePos[_index].GetPositionX(), chargePos[_index].GetPositionY(), chargePos[_index].GetPositionZ(), 13.0f, POINT_CHARGE);
-				}
+                }
                 else if (action == ACTION_DESPAWN)
                     me->DespawnOrUnsummon(1);
             }
@@ -1045,31 +1045,31 @@ class spell_deathbringer_blood_link_aura : public SpellScriptLoader
                         saurfang->AI()->DoAction(ACTION_MARK_OF_THE_FALLEN_CHAMPION);
             }
 
-			bool CheckProc(ProcEventInfo& eventInfo)
+            bool CheckProc(ProcEventInfo& eventInfo)
             {
-				SpellInfo const* procSpell = eventInfo.GetDamageInfo()->GetSpellInfo();
-				return eventInfo.GetActor() && eventInfo.GetActionTarget() && (eventInfo.GetDamageInfo()->GetDamage() || eventInfo.GetHitMask() & PROC_EX_ABSORB) && procSpell && procSpell->SpellIconID != 2731; // Xinef: Mark of the Fallen Champion
+                SpellInfo const* procSpell = eventInfo.GetDamageInfo()->GetSpellInfo();
+                return eventInfo.GetActor() && eventInfo.GetActionTarget() && (eventInfo.GetDamageInfo()->GetDamage() || eventInfo.GetHitMask() & PROC_EX_ABSORB) && procSpell && procSpell->SpellIconID != 2731; // Xinef: Mark of the Fallen Champion
             }
 
             void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
             {
                 PreventDefaultAction();
-				Unit* victim = eventInfo.GetActionTarget();
-				SpellInfo const* procSpell = eventInfo.GetDamageInfo()->GetSpellInfo();
+                Unit* victim = eventInfo.GetActionTarget();
+                SpellInfo const* procSpell = eventInfo.GetDamageInfo()->GetSpellInfo();
 
-				uint32 markCount = 0;
-				if (Creature* saurfang = eventInfo.GetActor()->ToCreature())
-					markCount = saurfang->IsAIEnabled ? saurfang->AI()->GetData(123456 /*FALLEN_CHAMPION_CAST_COUNT*/) : 0;
-				int32 basepoints = int32(1.0f /*+ 0.5f + 0.5f*markCount*/);
-				switch (procSpell->Id) // some spells give more Blood Power
-				{
-					case 72380: case 72438: case 72439: case 72440: // Blood Nova
-						basepoints = int32(2.0f /*+ 0.5f + 0.75f*markCount*/);
-						break;
-				}
+                uint32 markCount = 0;
+                if (Creature* saurfang = eventInfo.GetActor()->ToCreature())
+                    markCount = saurfang->IsAIEnabled ? saurfang->AI()->GetData(123456 /*FALLEN_CHAMPION_CAST_COUNT*/) : 0;
+                int32 basepoints = int32(1.0f /*+ 0.5f + 0.5f*markCount*/);
+                switch (procSpell->Id) // some spells give more Blood Power
+                {
+                    case 72380: case 72438: case 72439: case 72440: // Blood Nova
+                        basepoints = int32(2.0f /*+ 0.5f + 0.75f*markCount*/);
+                        break;
+                }
 
-				victim->CastCustomSpell(SPELL_BLOOD_LINK_DUMMY, SPELLVALUE_BASE_POINT0, basepoints, eventInfo.GetActor(), true);
-				return;
+                victim->CastCustomSpell(SPELL_BLOOD_LINK_DUMMY, SPELLVALUE_BASE_POINT0, basepoints, eventInfo.GetActor(), true);
+                return;
             }
 
             void Register()
@@ -1096,27 +1096,27 @@ class spell_deathbringer_blood_link_blood_beast_aura : public SpellScriptLoader
         {
             PrepareAuraScript(spell_deathbringer_blood_link_blood_beast_aura_AuraScript);
 
-			bool CheckProc(ProcEventInfo& eventInfo)
+            bool CheckProc(ProcEventInfo& eventInfo)
             {
-				SpellInfo const* procSpell = eventInfo.GetDamageInfo()->GetSpellInfo();
-				return eventInfo.GetActor() && eventInfo.GetActionTarget() && (eventInfo.GetDamageInfo()->GetDamage() || eventInfo.GetHitMask() & PROC_EX_ABSORB) && (!procSpell || procSpell->SpellIconID != 2731); // Xinef: Mark of the Fallen Champion
+                SpellInfo const* procSpell = eventInfo.GetDamageInfo()->GetSpellInfo();
+                return eventInfo.GetActor() && eventInfo.GetActionTarget() && (eventInfo.GetDamageInfo()->GetDamage() || eventInfo.GetHitMask() & PROC_EX_ABSORB) && (!procSpell || procSpell->SpellIconID != 2731); // Xinef: Mark of the Fallen Champion
             }
 
             void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
             {
                 PreventDefaultAction();
 
-				uint32 markCount = 0;
-				if (Map* map = eventInfo.GetActor()->FindMap())
-					if (InstanceMap* imap = map->ToInstanceMap())
-						if (InstanceScript* isc = imap->GetInstanceScript())
-							if (uint64 sguid = isc->GetData64(3 /*DATA_DEATHBRINGER_SAURFANG*/))
-								if (Creature* saurfang = ObjectAccessor::GetCreature(*eventInfo.GetActor(), sguid))
-									markCount = saurfang->IsAIEnabled ? saurfang->AI()->GetData(123456 /*FALLEN_CHAMPION_CAST_COUNT*/) : 0;
-				int32 basepoints = int32(3.0f /*+ 0.5f + 0.5f*markCount*/);
+                uint32 markCount = 0;
+                if (Map* map = eventInfo.GetActor()->FindMap())
+                    if (InstanceMap* imap = map->ToInstanceMap())
+                        if (InstanceScript* isc = imap->GetInstanceScript())
+                            if (uint64 sguid = isc->GetData64(3 /*DATA_DEATHBRINGER_SAURFANG*/))
+                                if (Creature* saurfang = ObjectAccessor::GetCreature(*eventInfo.GetActor(), sguid))
+                                    markCount = saurfang->IsAIEnabled ? saurfang->AI()->GetData(123456 /*FALLEN_CHAMPION_CAST_COUNT*/) : 0;
+                int32 basepoints = int32(3.0f /*+ 0.5f + 0.5f*markCount*/);
 
-				eventInfo.GetActor()->CastCustomSpell(SPELL_BLOOD_LINK_DUMMY, SPELLVALUE_BASE_POINT0, basepoints, eventInfo.GetActionTarget(), true);
-				return;
+                eventInfo.GetActor()->CastCustomSpell(SPELL_BLOOD_LINK_DUMMY, SPELLVALUE_BASE_POINT0, basepoints, eventInfo.GetActionTarget(), true);
+                return;
             }
 
             void Register()
@@ -1249,12 +1249,12 @@ class spell_deathbringer_blood_nova_targeting : public SpellScriptLoader
                 if (targetsAtRange < minTargets)
                     targetsAtRange = std::min<uint32>(targets.size(), minTargets);
 
-				if (!targetsAtRange)
-					return;
+                if (!targetsAtRange)
+                    return;
 
-				std::list<WorldObject*>::iterator itrTarget = targets.begin();
-				std::advance(itrTarget, urand(0,targetsAtRange-1));
-				target = *itrTarget;
+                std::list<WorldObject*>::iterator itrTarget = targets.begin();
+                std::advance(itrTarget, urand(0,targetsAtRange-1));
+                target = *itrTarget;
                 targets.clear();
                 targets.push_back(target);
             }
@@ -1304,14 +1304,14 @@ class spell_deathbringer_boiling_blood : public SpellScriptLoader
                 if (targets.empty())
                     return;
 
-				if (GetSpellInfo()->Id == 72385 || GetSpellInfo()->Id == 72442) // 10n, 10h
-				{
-					WorldObject* target = Trinity::Containers::SelectRandomContainerElement(targets);
-					targets.clear();
-					targets.push_back(target);
-				}
-				else
-					Trinity::Containers::RandomResizeList(targets, 3);
+                if (GetSpellInfo()->Id == 72385 || GetSpellInfo()->Id == 72442) // 10n, 10h
+                {
+                    WorldObject* target = Trinity::Containers::SelectRandomContainerElement(targets);
+                    targets.clear();
+                    targets.push_back(target);
+                }
+                else
+                    Trinity::Containers::RandomResizeList(targets, 3);
             }
 
             void Register()
@@ -1345,45 +1345,45 @@ class achievement_ive_gone_and_made_a_mess : public AchievementCriteriaScript
 class npc_icc_blood_beast : public CreatureScript
 {
 public:
-	npc_icc_blood_beast() : CreatureScript("npc_icc_blood_beast") { }
+    npc_icc_blood_beast() : CreatureScript("npc_icc_blood_beast") { }
 
-	struct npc_icc_blood_beastAI : public ScriptedAI
-	{
-		npc_icc_blood_beastAI(Creature* creature) : ScriptedAI(creature)
-		{
-			me->SetControlled(true, UNIT_STATE_ROOT);
-			timer1 = 1500;
-		}
+    struct npc_icc_blood_beastAI : public ScriptedAI
+    {
+        npc_icc_blood_beastAI(Creature* creature) : ScriptedAI(creature)
+        {
+            me->SetControlled(true, UNIT_STATE_ROOT);
+            timer1 = 1500;
+        }
 
-		uint16 timer1;
+        uint16 timer1;
 
-		void DoAction(int32 param)
-		{
-			if (param == ACTION_GAIN_SCENT_OF_BLOOD)
-				me->CastSpell(me, SPELL_SCENT_OF_BLOOD, false);
-		}
+        void DoAction(int32 param)
+        {
+            if (param == ACTION_GAIN_SCENT_OF_BLOOD)
+                me->CastSpell(me, SPELL_SCENT_OF_BLOOD, false);
+        }
 
-		void UpdateAI(uint32 diff)
-		{
-			if (timer1)
-			{
-				if (timer1 <= diff)
-				{
-					me->SetControlled(false, UNIT_STATE_ROOT);
-					timer1 = 0;
-				}
-				else
-					timer1 -= diff;
-			}
+        void UpdateAI(uint32 diff)
+        {
+            if (timer1)
+            {
+                if (timer1 <= diff)
+                {
+                    me->SetControlled(false, UNIT_STATE_ROOT);
+                    timer1 = 0;
+                }
+                else
+                    timer1 -= diff;
+            }
 
-			ScriptedAI::UpdateAI(diff);
-		}
-	};
+            ScriptedAI::UpdateAI(diff);
+        }
+    };
 
-	CreatureAI* GetAI(Creature* creature) const
-	{
-		return new npc_icc_blood_beastAI(creature);
-	}
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_icc_blood_beastAI(creature);
+    }
 };
 
 void AddSC_boss_deathbringer_saurfang()
@@ -1392,12 +1392,12 @@ void AddSC_boss_deathbringer_saurfang()
     new npc_high_overlord_saurfang_icc();
     new npc_muradin_bronzebeard_icc();
     new npc_saurfang_event();
-	new spell_deathbringer_blood_link_aura();
-	new spell_deathbringer_blood_link_blood_beast_aura();
+    new spell_deathbringer_blood_link_aura();
+    new spell_deathbringer_blood_link_blood_beast_aura();
     new spell_deathbringer_blood_link();
     new spell_deathbringer_blood_power();
     new spell_deathbringer_blood_nova_targeting();
     new spell_deathbringer_boiling_blood();
     new achievement_ive_gone_and_made_a_mess();
-	new npc_icc_blood_beast();
+    new npc_icc_blood_beast();
 }

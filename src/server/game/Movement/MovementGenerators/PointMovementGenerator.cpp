@@ -33,7 +33,7 @@ void PointMovementGenerator<T>::DoInitialize(T* unit)
         unit->StopMoving();
 
     unit->AddUnitState(UNIT_STATE_ROAMING|UNIT_STATE_ROAMING_MOVE);
-	i_recalculateSpeed = false;
+    i_recalculateSpeed = false;
     Movement::MoveSplineInit init(unit);
     if (m_precomputedPath.size() > 2) // pussywizard: for charge
         init.MovebyPath(m_precomputedPath);
@@ -48,27 +48,27 @@ void PointMovementGenerator<T>::DoInitialize(T* unit)
         }
         else
         {
-			// Xinef: fix strange client visual bug, moving on z coordinate only switches orientation by 180 degrees (visual only)
-			if (G3D::fuzzyEq(unit->GetPositionX(), i_x) && G3D::fuzzyEq(unit->GetPositionY(), i_y))
-			{
-				i_x += 0.2f*cos(unit->GetOrientation());
-				i_y += 0.2f*sin(unit->GetOrientation());
-			}
+            // Xinef: fix strange client visual bug, moving on z coordinate only switches orientation by 180 degrees (visual only)
+            if (G3D::fuzzyEq(unit->GetPositionX(), i_x) && G3D::fuzzyEq(unit->GetPositionY(), i_y))
+            {
+                i_x += 0.2f*cos(unit->GetOrientation());
+                i_y += 0.2f*sin(unit->GetOrientation());
+            }
 
-			init.MoveTo(i_x, i_y, i_z);
-		}
+            init.MoveTo(i_x, i_y, i_z);
+        }
     }
     else
-	{
-		// Xinef: fix strange client visual bug, moving on z coordinate only switches orientation by 180 degrees (visual only)
-		if (G3D::fuzzyEq(unit->GetPositionX(), i_x) && G3D::fuzzyEq(unit->GetPositionY(), i_y))
-		{
-			i_x += 0.2f*cos(unit->GetOrientation());
-			i_y += 0.2f*sin(unit->GetOrientation());
-		}
+    {
+        // Xinef: fix strange client visual bug, moving on z coordinate only switches orientation by 180 degrees (visual only)
+        if (G3D::fuzzyEq(unit->GetPositionX(), i_x) && G3D::fuzzyEq(unit->GetPositionY(), i_y))
+        {
+            i_x += 0.2f*cos(unit->GetOrientation());
+            i_y += 0.2f*sin(unit->GetOrientation());
+        }
 
         init.MoveTo(i_x, i_y, i_z);
-	}
+    }
     if (speed > 0.0f)
         init.SetVelocity(speed);
     init.Launch();
@@ -175,8 +175,8 @@ void EffectMovementGenerator::Finalize(Unit* unit)
     if (unit->GetTypeId() != TYPEID_UNIT)
         return;
 
-	if (unit->GetTypeId() == TYPEID_UNIT && unit->HasUnitMovementFlag(MOVEMENTFLAG_FALLING) && unit->movespline->isFalling()) // pussywizard
-		unit->RemoveUnitMovementFlag(MOVEMENTFLAG_FALLING);
+    if (unit->GetTypeId() == TYPEID_UNIT && unit->HasUnitMovementFlag(MOVEMENTFLAG_FALLING) && unit->movespline->isFalling()) // pussywizard
+        unit->RemoveUnitMovementFlag(MOVEMENTFLAG_FALLING);
 
     // Need restore previous movement since we have no proper states system
     //if (unit->IsAlive() && !unit->HasUnitState(UNIT_STATE_CONFUSED | UNIT_STATE_FLEEING))

@@ -88,7 +88,7 @@ public:
 
         SpellScriptsBounds bounds = sObjectMgr->GetSpellScriptsBounds(spellId);
         uint32 spellDifficultyId = sSpellMgr->GetSpellDifficultyId(spellId);
-		if (handler->GetSession()->GetSecurity() < SEC_CONSOLE && (bounds.first != bounds.second || spellDifficultyId || spellInfo->HasEffect(SPELL_EFFECT_SKILL_STEP) || spellInfo->HasEffect(SPELL_EFFECT_TRADE_SKILL)))
+        if (handler->GetSession()->GetSecurity() < SEC_CONSOLE && (bounds.first != bounds.second || spellDifficultyId || spellInfo->HasEffect(SPELL_EFFECT_SKILL_STEP) || spellInfo->HasEffect(SPELL_EFFECT_TRADE_SKILL)))
         {
             handler->PSendSysMessage("Spell %u cannot be casted using a command!", spellId);
             handler->SetSentErrorMessage(true);

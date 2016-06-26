@@ -120,8 +120,8 @@ bool GameObjectModel::initialize(const GameObject& go, const GameObjectDisplayIn
     //ID = 0;
     iPos = Vector3(go.GetPositionX(), go.GetPositionY(), go.GetPositionZ());
 
-	// pussywizard: 
-	phasemask = (go.GetGoState() == GO_STATE_READY || go.IsTransport()) ? go.GetPhaseMask() : 0;
+    // pussywizard: 
+    phasemask = (go.GetGoState() == GO_STATE_READY || go.IsTransport()) ? go.GetPhaseMask() : 0;
 
     iScale = go.GetFloatValue(OBJECT_FIELD_SCALE_X);
     iInvScale = 1.f / iScale;

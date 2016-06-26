@@ -57,7 +57,7 @@ enum SMART_EVENT_PHASE
     SMART_EVENT_PHASE_9       = 9,
     SMART_EVENT_PHASE_10      = 10,
     SMART_EVENT_PHASE_11      = 11,
-	SMART_EVENT_PHASE_12      = 12,
+    SMART_EVENT_PHASE_12      = 12,
     SMART_EVENT_PHASE_MAX     = 13,
 
     SMART_EVENT_PHASE_COUNT   = 12
@@ -390,7 +390,7 @@ struct SmartEvent
             uint32 eventId;
         } eventInform;
 
-		struct
+        struct
         {
             uint32 eventId;
         } doAction;
@@ -554,43 +554,43 @@ enum SMART_ACTION
     SMART_ACTION_GAME_EVENT_START                   = 112,    // GameEventId
     SMART_ACTION_START_CLOSEST_WAYPOINT             = 113,    // wp1, wp2, wp3, wp4, wp5, wp6, wp7
     SMART_ACTION_RISE_UP                            = 114,    // distance
-	// RESERVED										= 115,
-	// RESERVED										= 116,
-	// RESERVED										= 117,
-	// RESERVED										= 118,
-	// RESERVED										= 119,
-	// RESERVED										= 120,
-	// RESERVED										= 121,
-	// RESERVED										= 122,
-	// RESERVED										= 123,
-	// RESERVED										= 124,
-	// RESERVED										= 125,
-	// RESERVED										= 126,
-	// RESERVED										= 127,
-	// RESERVED										= 128,
-	// RESERVED										= 129,
-	// 113!
-	SMART_ACTION_MOVE_TO_POS_TARGET					= 130,    // pointId
-	SMART_ACTION_SET_GO_STATE						= 131,    // state
-	SMART_ACTION_EXIT_VEHICLE						= 132,    // none
-	SMART_ACTION_SET_UNIT_MOVEMENT_FLAGS			= 133,    // flags
-	SMART_ACTION_SET_COMBAT_DISTANCE				= 134,    // combatDistance
-	SMART_ACTION_SET_CASTER_COMBAT_DIST				= 135,    // followDistance, resetToMax
-	SMART_ACTION_SET_SIGHT_DIST						= 136,    // sightDistance
-	SMART_ACTION_FLEE								= 137,    // fleeTime
-	SMART_ACTION_ADD_THREAT							= 138,    // +threat, -threat
-	SMART_ACTION_LOAD_EQUIPMENT						= 139,    // id
-	SMART_ACTION_TRIGGER_RANDOM_TIMED_EVENT			= 140,    // id min range, id max range
-	SMART_ACTION_SET_HOVER							= 141,    // 0/1
-	SMART_ACTION_ADD_IMMUNITY						= 142,    // type, id, value
-	SMART_ACTION_REMOVE_IMMUNITY					= 143,    // type, id, value
-	SMART_ACTION_FALL								= 144,    // 
-	SMART_ACTION_SET_EVENT_FLAG_RESET				= 145,    // 0/1
-	SMART_ACTION_REMOVE_ALL_GAMEOBJECTS				= 146,
-	SMART_ACTION_STOP_MOTION						= 147,	  // stopMoving, movementExpired
-	SMART_ACTION_NO_ENVIRONMENT_UPDATE				= 148,
-	SMART_ACTION_ZONE_UNDER_ATTACK					= 149,
-	SMART_ACTION_LOAD_GRID							= 150,
+    // RESERVED                                     = 115,
+    // RESERVED                                     = 116,
+    // RESERVED                                     = 117,
+    // RESERVED                                     = 118,
+    // RESERVED                                     = 119,
+    // RESERVED                                     = 120,
+    // RESERVED                                     = 121,
+    // RESERVED                                     = 122,
+    // RESERVED                                     = 123,
+    // RESERVED                                     = 124,
+    // RESERVED                                     = 125,
+    // RESERVED                                     = 126,
+    // RESERVED                                     = 127,
+    // RESERVED                                     = 128,
+    // RESERVED                                     = 129,
+    // 113!
+    SMART_ACTION_MOVE_TO_POS_TARGET                 = 130,    // pointId
+    SMART_ACTION_SET_GO_STATE                       = 131,    // state
+    SMART_ACTION_EXIT_VEHICLE                       = 132,    // none
+    SMART_ACTION_SET_UNIT_MOVEMENT_FLAGS            = 133,    // flags
+    SMART_ACTION_SET_COMBAT_DISTANCE                = 134,    // combatDistance
+    SMART_ACTION_SET_CASTER_COMBAT_DIST             = 135,    // followDistance, resetToMax
+    SMART_ACTION_SET_SIGHT_DIST                     = 136,    // sightDistance
+    SMART_ACTION_FLEE                               = 137,    // fleeTime
+    SMART_ACTION_ADD_THREAT                         = 138,    // +threat, -threat
+    SMART_ACTION_LOAD_EQUIPMENT                     = 139,    // id
+    SMART_ACTION_TRIGGER_RANDOM_TIMED_EVENT         = 140,    // id min range, id max range
+    SMART_ACTION_SET_HOVER                          = 141,    // 0/1
+    SMART_ACTION_ADD_IMMUNITY                       = 142,    // type, id, value
+    SMART_ACTION_REMOVE_IMMUNITY                    = 143,    // type, id, value
+    SMART_ACTION_FALL                               = 144,    // 
+    SMART_ACTION_SET_EVENT_FLAG_RESET               = 145,    // 0/1
+    SMART_ACTION_REMOVE_ALL_GAMEOBJECTS             = 146,
+    SMART_ACTION_STOP_MOTION                        = 147,    // stopMoving, movementExpired
+    SMART_ACTION_NO_ENVIRONMENT_UPDATE              = 148,
+    SMART_ACTION_ZONE_UNDER_ATTACK                  = 149,
+    SMART_ACTION_LOAD_GRID                          = 150,
 
     SMART_ACTION_END                                = 151,    // ZOMG!, zmienic w sql
 };
@@ -605,7 +605,7 @@ struct SmartAction
         {
             uint32 textGroupID;
             uint32 duration;
-			uint32 useTalkTarget;
+            uint32 useTalkTarget;
         } talk;
 
         struct
@@ -668,10 +668,10 @@ struct SmartAction
             uint32 targetParam3;
         } crossCast;
 
-		struct
-		{
-			uint32 alternative;
-		} activateObject;
+        struct
+        {
+            uint32 alternative;
+        } activateObject;
 
         struct
         {
@@ -679,7 +679,7 @@ struct SmartAction
             uint32 type;
             uint32 duration;
             uint32 attackInvoker;
-			uint32 attackScriptOwner;
+            uint32 attackScriptOwner;
         } summonCreature;
 
         struct
@@ -742,7 +742,7 @@ struct SmartAction
             uint32 entry;
             uint32 credit;
             uint32 creditType;
-			uint32 aliveState;
+            uint32 aliveState;
         } follow;
 
         struct
@@ -781,7 +781,7 @@ struct SmartAction
         {
             uint32 creature;
             uint32 team;
-			uint32 doNotChangeLevel;
+            uint32 doNotChangeLevel;
         } updateTemplate;
 
         struct
@@ -836,7 +836,7 @@ struct SmartAction
         {
             uint32 entry;
             uint32 despawnTime;
-			uint32 targetsummon;
+            uint32 targetsummon;
         } summonGO;
 
         struct
@@ -890,8 +890,8 @@ struct SmartAction
         struct
         {
             uint32 fly;
-			uint32 speed;
-			uint32 disableGravity;
+            uint32 speed;
+            uint32 disableGravity;
         } setFly;
 
         struct
@@ -995,13 +995,13 @@ struct SmartAction
         {
             uint32 speedxy;
             uint32 speedz;
-			uint32 selfJump;
+            uint32 selfJump;
         } jump;
 
-		struct
-		{
-			uint32 flag;
-		} movementFlag;
+        struct
+        {
+            uint32 flag;
+        } movementFlag;
 
         struct
         {
@@ -1017,7 +1017,7 @@ struct SmartAction
         {
             uint32 pointId;
             uint32 transport;
-			uint32 controlled;
+            uint32 controlled;
         } MoveToPos;
 
         struct
@@ -1057,16 +1057,16 @@ struct SmartAction
             uint32 flag;
         } goFlag;
 
-		struct
-		{
-			uint32 state;
-		} goState;
+        struct
+        {
+            uint32 state;
+        } goState;
 
         struct
         {
             uint32 group;
             uint32 attackInvoker;
-			uint32 attackScriptOwner;
+            uint32 attackScriptOwner;
         } creatureGroup;
 
         struct
@@ -1095,61 +1095,61 @@ struct SmartAction
             uint32 wp6;
         } closestWaypointFromList;
 
-		struct
-		{
-			uint32 dist;
-		} combatDistance;
+        struct
+        {
+            uint32 dist;
+        } combatDistance;
 
-		struct
-		{
-			uint32 dist;
-		} sightDistance;
+        struct
+        {
+            uint32 dist;
+        } sightDistance;
 
-		struct
-		{
-			uint32 dist;
-			uint32 reset;
-		} casterDistance;
+        struct
+        {
+            uint32 dist;
+            uint32 reset;
+        } casterDistance;
 
-		struct
-		{
-			uint32 spawnPos;
-		} setHomePos;
+        struct
+        {
+            uint32 spawnPos;
+        } setHomePos;
 
-		struct
-		{
-			uint32 id;
-			uint32 force;
-		} loadEquipment;
+        struct
+        {
+            uint32 id;
+            uint32 force;
+        } loadEquipment;
 
-		struct
-		{
-			uint32 minId;
-			uint32 maxId;
-		} randomTimedEvent;
+        struct
+        {
+            uint32 minId;
+            uint32 maxId;
+        } randomTimedEvent;
 
-		struct
-		{
-			uint32 state;
-		} setHover;
+        struct
+        {
+            uint32 state;
+        } setHover;
 
-		struct
-		{
-			uint32 type;
-			uint32 id;
-			uint32 value;
-		} immunity;
+        struct
+        {
+            uint32 type;
+            uint32 id;
+            uint32 value;
+        } immunity;
 
-		struct
-		{
-			uint32 quickChange;
-		} orientation;
+        struct
+        {
+            uint32 quickChange;
+        } orientation;
 
-		struct
-		{
-			uint32 stopMovement;
-			uint32 movementExpired;
-		} stopMotion;
+        struct
+        {
+            uint32 stopMovement;
+            uint32 movementExpired;
+        } stopMotion;
 
         //! Note for any new future actions
         //! All parameters must have type uint32
@@ -1206,20 +1206,20 @@ enum SMARTAI_TARGETS
     SMART_TARGET_THREAT_LIST                    = 24,   // All units on creature's threat list, maxdist, playerOnly
     SMART_TARGET_CLOSEST_ENEMY                  = 25,   // maxDist, playerOnly
     SMART_TARGET_CLOSEST_FRIENDLY               = 26,   // maxDist, playerOnly
-	// RESERVED									= 27,
-	// RESERVED									= 28,
-	// RESERVED									= 29,
-	// RESERVED									= 30,
-	// RESERVED									= 31,
-	// RESERVED									= 32,
-	// RESERVED									= 33,
-	// RESERVED									= 34,
-	// RESERVED									= 35,
-	// RESERVED									= 36,
-	// RESERVED									= 37,
-	// RESERVED									= 38,
-	// RESERVED									= 39,
-	SMART_TARGET_FARTHEST						= 40,
+    // RESERVED                                 = 27,
+    // RESERVED                                 = 28,
+    // RESERVED                                 = 29,
+    // RESERVED                                 = 30,
+    // RESERVED                                 = 31,
+    // RESERVED                                 = 32,
+    // RESERVED                                 = 33,
+    // RESERVED                                 = 34,
+    // RESERVED                                 = 35,
+    // RESERVED                                 = 36,
+    // RESERVED                                 = 37,
+    // RESERVED                                 = 38,
+    // RESERVED                                 = 39,
+    SMART_TARGET_FARTHEST                       = 40,
 
     SMART_TARGET_END                            = 41
 };
@@ -1232,7 +1232,7 @@ struct SmartTarget
         raw.param1 = p1;
         raw.param2 = p2;
         raw.param3 = p3;
-		raw.param4 = p4;
+        raw.param4 = p4;
         x = 0.0f;
         y = 0.0f;
         z = 0.0f;
@@ -1242,19 +1242,19 @@ struct SmartTarget
     float x, y, z, o;
     union
     {
-		// Xinef: allow random selectors to limit distance
-		struct
+        // Xinef: allow random selectors to limit distance
+        struct
         {
             uint32 maxDist;
-			uint32 playerOnly;
-			uint32 powerType;
+            uint32 playerOnly;
+            uint32 powerType;
         } hostilRandom;
 
-		struct
+        struct
         {
             uint32 maxDist;
-			uint32 playerOnly;
-			uint32 isInLos;
+            uint32 playerOnly;
+            uint32 isInLos;
         } farthest;
 
         struct
@@ -1262,21 +1262,21 @@ struct SmartTarget
             uint32 creature;
             uint32 minDist;
             uint32 maxDist;
-			uint32 livingState;
+            uint32 livingState;
         } unitRange;
 
         struct
         {
             uint32 dbGuid;
             uint32 entry;
-			uint32 getFromHashMap; // Does not work in instances
+            uint32 getFromHashMap; // Does not work in instances
         } unitGUID;
 
         struct
         {
             uint32 creature;
             uint32 dist;
-			uint32 livingState;
+            uint32 livingState;
         } unitDistance;
 
         struct
@@ -1307,7 +1307,7 @@ struct SmartTarget
         {
             uint32 dbGuid;
             uint32 entry;
-			uint32 getFromHashMap; // Does not work in instances
+            uint32 getFromHashMap; // Does not work in instances
         } goGUID;
 
         struct
@@ -1321,10 +1321,10 @@ struct SmartTarget
             uint32 map;
         } position;
 
-		struct
-		{
-			uint32 useCharmerOrOwner;
-		} owner;
+        struct
+        {
+            uint32 useCharmerOrOwner;
+        } owner;
 
         struct
         {
@@ -1350,7 +1350,7 @@ struct SmartTarget
             uint32 param1;
             uint32 param2;
             uint32 param3;
-			uint32 param4;
+            uint32 param4;
         } raw;
     };
 };
@@ -1476,7 +1476,7 @@ const uint32 SmartAIEventMask[SMART_EVENT_END][2] =
     {SMART_EVENT_JUST_CREATED,              SMART_SCRIPT_TYPE_MASK_CREATURE + SMART_SCRIPT_TYPE_MASK_GAMEOBJECT },
     {SMART_EVENT_GOSSIP_HELLO,              SMART_SCRIPT_TYPE_MASK_CREATURE + SMART_SCRIPT_TYPE_MASK_GAMEOBJECT },
     {SMART_EVENT_FOLLOW_COMPLETED,          SMART_SCRIPT_TYPE_MASK_CREATURE },
-	{SMART_EVENT_UNUSED_66,                 0},
+    {SMART_EVENT_UNUSED_66,                 0},
     {SMART_EVENT_IS_BEHIND_TARGET,          SMART_SCRIPT_TYPE_MASK_CREATURE },
     {SMART_EVENT_GAME_EVENT_START,          SMART_SCRIPT_TYPE_MASK_CREATURE + SMART_SCRIPT_TYPE_MASK_GAMEOBJECT },
     {SMART_EVENT_GAME_EVENT_END,            SMART_SCRIPT_TYPE_MASK_CREATURE + SMART_SCRIPT_TYPE_MASK_GAMEOBJECT },

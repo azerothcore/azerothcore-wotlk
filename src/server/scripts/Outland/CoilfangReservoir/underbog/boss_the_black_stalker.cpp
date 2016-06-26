@@ -28,23 +28,23 @@ EndScriptData */
 
 enum eBlackStalker
 {
-	SPELL_LEVITATE					= 31704,
-	SPELL_SUSPENSION				= 31719,
-	SPELL_LEVITATION_PULSE			= 31701,
-	SPELL_MAGNETIC_PULL				= 31705,
-	SPELL_CHAIN_LIGHTNING			= 31717,
-	SPELL_STATIC_CHARGE				= 31715,
-	SPELL_SUMMON_SPORE_STRIDER		= 38755,
+    SPELL_LEVITATE                  = 31704,
+    SPELL_SUSPENSION                = 31719,
+    SPELL_LEVITATION_PULSE          = 31701,
+    SPELL_MAGNETIC_PULL             = 31705,
+    SPELL_CHAIN_LIGHTNING           = 31717,
+    SPELL_STATIC_CHARGE             = 31715,
+    SPELL_SUMMON_SPORE_STRIDER      = 38755,
 
-	EVENT_LEVITATE					= 1,
-	EVENT_SPELL_CHAIN				= 2,
-	EVENT_SPELL_STATIC				= 3,
-	EVENT_SPELL_SPORES				= 4,
-	EVENT_CHECK						= 5,
-	EVENT_LEVITATE_TARGET_1			= 6,
-	EVENT_LEVITATE_TARGET_2			= 7,
+    EVENT_LEVITATE                  = 1,
+    EVENT_SPELL_CHAIN               = 2,
+    EVENT_SPELL_STATIC              = 3,
+    EVENT_SPELL_SPORES              = 4,
+    EVENT_CHECK                     = 5,
+    EVENT_LEVITATE_TARGET_1         = 6,
+    EVENT_LEVITATE_TARGET_2         = 7,
 
-    ENTRY_SPORE_STRIDER				= 22299
+    ENTRY_SPORE_STRIDER             = 22299
 };
 
 class boss_the_black_stalker : public CreatureScript
@@ -63,43 +63,43 @@ public:
         {
         }
 
-		EventMap events;
-		SummonList summons;
-		uint64 lTarget;
+        EventMap events;
+        SummonList summons;
+        uint64 lTarget;
 
         void Reset()
         {
-			events.Reset();
-			summons.DespawnAll();
-			lTarget = 0;
+            events.Reset();
+            summons.DespawnAll();
+            lTarget = 0;
         }
 
-		void EnterCombat(Unit*)
-		{
-			events.ScheduleEvent(EVENT_LEVITATE, 12000);
-			events.ScheduleEvent(EVENT_SPELL_CHAIN, 6000);
-			events.ScheduleEvent(EVENT_SPELL_STATIC, 10000);
-			events.ScheduleEvent(EVENT_CHECK, 5000);
-			if (IsHeroic())
-				events.ScheduleEvent(EVENT_SPELL_SPORES, urand(10000, 15000));
-		}
+        void EnterCombat(Unit*)
+        {
+            events.ScheduleEvent(EVENT_LEVITATE, 12000);
+            events.ScheduleEvent(EVENT_SPELL_CHAIN, 6000);
+            events.ScheduleEvent(EVENT_SPELL_STATIC, 10000);
+            events.ScheduleEvent(EVENT_CHECK, 5000);
+            if (IsHeroic())
+                events.ScheduleEvent(EVENT_SPELL_SPORES, urand(10000, 15000));
+        }
 
 
         void JustSummoned(Creature* summon)
         {
-			summons.Summon(summon);
-			if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1))
-				summon->AI()->AttackStart(target);
-			else if (me->GetVictim())
-				summon->AI()->AttackStart(me->GetVictim());
+            summons.Summon(summon);
+            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1))
+                summon->AI()->AttackStart(target);
+            else if (me->GetVictim())
+                summon->AI()->AttackStart(me->GetVictim());
         }
 
-		void SummonedCreatureDies(Creature* summon, Unit*)
-		{
-			summons.Despawn(summon);
-			for (uint8 i = 0; i < 3; ++i)
-				me->CastSpell(me, SPELL_SUMMON_SPORE_STRIDER, false);
-		}
+        void SummonedCreatureDies(Creature* summon, Unit*)
+        {
+            summons.Despawn(summon);
+            for (uint8 i = 0; i < 3; ++i)
+                me->CastSpell(me, SPELL_SUMMON_SPORE_STRIDER, false);
+        }
 
         void JustDied(Unit*)
         {
@@ -111,71 +111,71 @@ public:
             if (!UpdateVictim())
                 return;
 
-			events.Update(diff);
-			switch (events.GetEvent())
-			{
-				case EVENT_CHECK:
-					float x, y, z, o;
-					me->GetHomePosition(x, y, z, o);
-					if (!me->IsWithinDist3d(x, y, z, 60))
-					{
-						EnterEvadeMode();
-						return;
-					}
-					events.RepeatEvent(5000);
-					break;
-				case EVENT_SPELL_SPORES:
-					me->CastSpell(me, SPELL_SUMMON_SPORE_STRIDER, false);
-					events.RepeatEvent(urand(10000, 15000));
-					break;
-				case EVENT_SPELL_CHAIN:
-					if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
-						me->CastSpell(target, SPELL_CHAIN_LIGHTNING, false);
-					events.DelayEvents(3000);
-					events.RepeatEvent(9000);
-					break;
-				case EVENT_SPELL_STATIC:
-					if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 30, true))
-						me->CastSpell(target, SPELL_STATIC_CHARGE, false);
-					events.RepeatEvent(10000);
-					break;
-				case EVENT_LEVITATE:
-					events.RepeatEvent(15000);
-					if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1))
-					{
-						me->CastSpell(target, SPELL_LEVITATE, false);
-						lTarget = target->GetGUID();
-						events.DelayEvents(5000);
-						events.ScheduleEvent(EVENT_LEVITATE_TARGET_1, 2000);
-					}
-					break;
-				case EVENT_LEVITATE_TARGET_1:
-					if (Unit* target = ObjectAccessor::GetUnit(*me, lTarget))
-					{
-						if (!target->HasAura(SPELL_LEVITATE))
-							lTarget = 0;
-						else
-						{
-							target->CastSpell(target, SPELL_MAGNETIC_PULL, true);
-							events.ScheduleEvent(EVENT_LEVITATE_TARGET_2, 1500);
-						}
-					}
-					events.PopEvent();
-					break;
-				case EVENT_LEVITATE_TARGET_2:
-					if (Unit* target = ObjectAccessor::GetUnit(*me, lTarget))
-					{
-						if (!target->HasAura(SPELL_LEVITATE))
-							lTarget = 0;
-						else
-						{
-							target->AddAura(SPELL_SUSPENSION, target);
-							lTarget = 0;
-						}
-					}
-					events.PopEvent();
-					break;
-			}
+            events.Update(diff);
+            switch (events.GetEvent())
+            {
+                case EVENT_CHECK:
+                    float x, y, z, o;
+                    me->GetHomePosition(x, y, z, o);
+                    if (!me->IsWithinDist3d(x, y, z, 60))
+                    {
+                        EnterEvadeMode();
+                        return;
+                    }
+                    events.RepeatEvent(5000);
+                    break;
+                case EVENT_SPELL_SPORES:
+                    me->CastSpell(me, SPELL_SUMMON_SPORE_STRIDER, false);
+                    events.RepeatEvent(urand(10000, 15000));
+                    break;
+                case EVENT_SPELL_CHAIN:
+                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                        me->CastSpell(target, SPELL_CHAIN_LIGHTNING, false);
+                    events.DelayEvents(3000);
+                    events.RepeatEvent(9000);
+                    break;
+                case EVENT_SPELL_STATIC:
+                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 30, true))
+                        me->CastSpell(target, SPELL_STATIC_CHARGE, false);
+                    events.RepeatEvent(10000);
+                    break;
+                case EVENT_LEVITATE:
+                    events.RepeatEvent(15000);
+                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1))
+                    {
+                        me->CastSpell(target, SPELL_LEVITATE, false);
+                        lTarget = target->GetGUID();
+                        events.DelayEvents(5000);
+                        events.ScheduleEvent(EVENT_LEVITATE_TARGET_1, 2000);
+                    }
+                    break;
+                case EVENT_LEVITATE_TARGET_1:
+                    if (Unit* target = ObjectAccessor::GetUnit(*me, lTarget))
+                    {
+                        if (!target->HasAura(SPELL_LEVITATE))
+                            lTarget = 0;
+                        else
+                        {
+                            target->CastSpell(target, SPELL_MAGNETIC_PULL, true);
+                            events.ScheduleEvent(EVENT_LEVITATE_TARGET_2, 1500);
+                        }
+                    }
+                    events.PopEvent();
+                    break;
+                case EVENT_LEVITATE_TARGET_2:
+                    if (Unit* target = ObjectAccessor::GetUnit(*me, lTarget))
+                    {
+                        if (!target->HasAura(SPELL_LEVITATE))
+                            lTarget = 0;
+                        else
+                        {
+                            target->AddAura(SPELL_SUSPENSION, target);
+                            lTarget = 0;
+                        }
+                    }
+                    events.PopEvent();
+                    break;
+            }
 
             DoMeleeAttackIfReady();
         }
@@ -199,7 +199,7 @@ public:
 
         void Update(AuraEffect* effect)
         {
-			SetDuration(0);
+            SetDuration(0);
         }
 
         void Register()
@@ -218,5 +218,5 @@ public:
 void AddSC_boss_the_black_stalker()
 {
     new boss_the_black_stalker();
-	new spell_gen_allergies();
+    new spell_gen_allergies();
 }

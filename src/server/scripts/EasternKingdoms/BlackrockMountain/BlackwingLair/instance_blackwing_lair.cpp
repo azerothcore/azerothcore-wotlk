@@ -168,9 +168,9 @@ public:
 
         bool SetBossState(uint32 type, EncounterState state)
         {
-			// pussywizard:
-			if (GetBossState(type) == DONE && state != DONE) // prevent undoneing a boss xd
-				return false;
+            // pussywizard:
+            if (GetBossState(type) == DONE && state != DONE) // prevent undoneing a boss xd
+                return false;
 
             if (!InstanceScript::SetBossState(type, state))
                 return false;

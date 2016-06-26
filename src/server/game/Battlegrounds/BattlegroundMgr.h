@@ -58,15 +58,15 @@ struct GroupQueueInfo;
 // pussywizard
 class RandomBattlegroundSystem
 {
-	public:
-		RandomBattlegroundSystem();
-		void Update(uint32 diff);
-		BattlegroundTypeId GetCurrentRandomBg() const { return m_CurrentRandomBg; }
-		void BattlegroundCreated(BattlegroundTypeId bgTypeId);
-	private:
-		BattlegroundTypeId m_CurrentRandomBg;
-		uint32 m_SwitchTimer;
-		std::vector<BattlegroundTypeId> m_BgOrder;
+    public:
+        RandomBattlegroundSystem();
+        void Update(uint32 diff);
+        BattlegroundTypeId GetCurrentRandomBg() const { return m_CurrentRandomBg; }
+        void BattlegroundCreated(BattlegroundTypeId bgTypeId);
+    private:
+        BattlegroundTypeId m_CurrentRandomBg;
+        uint32 m_SwitchTimer;
+        std::vector<BattlegroundTypeId> m_BgOrder;
 };
 
 class BattlegroundMgr
@@ -142,22 +142,22 @@ class BattlegroundMgr
             return BATTLEGROUND_TYPE_NONE;
         }
 
-		const BattlegroundContainer& GetBattlegroundList() { return m_Battlegrounds; } // pussywizard
-		RandomBattlegroundSystem RandomSystem; // pussywizard
+        const BattlegroundContainer& GetBattlegroundList() { return m_Battlegrounds; } // pussywizard
+        RandomBattlegroundSystem RandomSystem; // pussywizard
 
     private:
         bool CreateBattleground(CreateBattlegroundData& data);
         uint32 GetNextClientVisibleInstanceId();
 
         typedef std::map<BattlegroundTypeId, Battleground*> BattlegroundTemplateContainer;
-		BattlegroundTemplateContainer m_BattlegroundTemplates;
+        BattlegroundTemplateContainer m_BattlegroundTemplates;
         BattlegroundContainer m_Battlegrounds;
 
         BattlegroundQueue m_BattlegroundQueues[MAX_BATTLEGROUND_QUEUE_TYPES];
 
         std::vector<uint64> m_ArenaQueueUpdateScheduler;
-		uint32 m_lastClientVisibleInstanceId;
-		uint32 m_NextPeriodicQueueUpdateTime;
+        uint32 m_lastClientVisibleInstanceId;
+        uint32 m_NextPeriodicQueueUpdateTime;
         time_t m_NextAutoDistributionTime;
         bool   m_ArenaTesting;
         bool   m_Testing;

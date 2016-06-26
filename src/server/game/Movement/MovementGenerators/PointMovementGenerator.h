@@ -49,7 +49,7 @@ class PointMovementGenerator : public MovementGeneratorMedium< T, PointMovementG
         uint32 id;
         float i_x, i_y, i_z;
         float speed;
-		bool i_recalculateSpeed;
+        bool i_recalculateSpeed;
         Movement::PointsArray m_precomputedPath;
         bool _generatePath;
         bool _forceDestination;

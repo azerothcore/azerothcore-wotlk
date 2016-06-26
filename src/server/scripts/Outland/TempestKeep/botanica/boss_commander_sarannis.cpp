@@ -29,7 +29,7 @@ enum Events
 {
     EVENT_ARCANE_RESONANCE      = 1,
     EVENT_ARCANE_DEVASTATION    = 2,
-	EVENT_HEALTH_CHECK			= 3
+    EVENT_HEALTH_CHECK          = 3
 };
 
 class boss_commander_sarannis : public CreatureScript
@@ -51,13 +51,13 @@ class boss_commander_sarannis : public CreatureScript
                 Talk(SAY_AGGRO);
                 events.ScheduleEvent(EVENT_ARCANE_RESONANCE, 20000);
                 events.ScheduleEvent(EVENT_ARCANE_DEVASTATION, 10000);
-				events.ScheduleEvent(EVENT_HEALTH_CHECK, 500);
+                events.ScheduleEvent(EVENT_HEALTH_CHECK, 500);
             }
 
             void KilledUnit(Unit* victim)
             {
-				if (victim->GetTypeId() == TYPEID_PLAYER)
-					Talk(SAY_KILL);
+                if (victim->GetTypeId() == TYPEID_PLAYER)
+                    Talk(SAY_KILL);
             }
 
             void JustDied(Unit* /*killer*/)
@@ -78,27 +78,27 @@ class boss_commander_sarannis : public CreatureScript
                 switch (events.ExecuteEvent())
                 {
                     case EVENT_ARCANE_RESONANCE:
-						if (roll_chance_i(50))
-							Talk(SAY_ARCANE_RESONANCE);
+                        if (roll_chance_i(50))
+                            Talk(SAY_ARCANE_RESONANCE);
                         me->CastSpell(me->GetVictim(), SPELL_ARCANE_RESONANCE, false);
                         events.ScheduleEvent(EVENT_ARCANE_RESONANCE, 27000);
                         break;
                     case EVENT_ARCANE_DEVASTATION:
-						if (roll_chance_i(50))
-							Talk(SAY_ARCANE_DEVASTATION);
-						me->CastSpell(me->GetVictim(), SPELL_ARCANE_DEVASTATION, false);
+                        if (roll_chance_i(50))
+                            Talk(SAY_ARCANE_DEVASTATION);
+                        me->CastSpell(me->GetVictim(), SPELL_ARCANE_DEVASTATION, false);
                         events.ScheduleEvent(EVENT_ARCANE_DEVASTATION, 17000);
                         break;
-					case EVENT_HEALTH_CHECK:
-						if (me->HealthBelowPct(50))
-						{
-							Talk(EMOTE_SUMMON);
-							Talk(SAY_SUMMON);
-							me->CastSpell(me, SPELL_SUMMON_REINFORCEMENTS, true);
-							break;
-						}
-						events.ScheduleEvent(EVENT_HEALTH_CHECK, 500);
-						break;
+                    case EVENT_HEALTH_CHECK:
+                        if (me->HealthBelowPct(50))
+                        {
+                            Talk(EMOTE_SUMMON);
+                            Talk(SAY_SUMMON);
+                            me->CastSpell(me, SPELL_SUMMON_REINFORCEMENTS, true);
+                            break;
+                        }
+                        events.ScheduleEvent(EVENT_HEALTH_CHECK, 500);
+                        break;
                 }
 
                 DoMeleeAttackIfReady();
@@ -121,8 +121,8 @@ Position const PosSummonReinforcements[4] =
 
 enum Creatures
 {
-    NPC_SUMMONED_BLOODWARDER_MENDER		= 20083,
-    NPC_SUMMONED_BLOODWARDER_RESERVIST	= 20078
+    NPC_SUMMONED_BLOODWARDER_MENDER     = 20083,
+    NPC_SUMMONED_BLOODWARDER_RESERVIST  = 20078
 };
 
 class spell_commander_sarannis_summon_reinforcements : public SpellScriptLoader

@@ -66,8 +66,8 @@ class EventProcessor
         void AddEvent(BasicEvent* Event, uint64 e_time, bool set_addtime = true);
         uint64 CalculateTime(uint64 t_offset) const;
 
-		// Xinef: calculates next queue tick time
-		uint64 CalculateQueueTime(uint64 delay) const;
+        // Xinef: calculates next queue tick time
+        uint64 CalculateQueueTime(uint64 delay) const;
 
     protected:
         uint64 m_time;

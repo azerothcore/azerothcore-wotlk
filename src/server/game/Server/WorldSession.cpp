@@ -103,12 +103,12 @@ m_sessionDbLocaleIndex(locale),
 m_latency(0), m_clientTimeDelay(0), m_TutorialsChanged(false), recruiterId(recruiter),
 isRecruiter(isARecruiter), m_currentVendorEntry(0), m_currentBankerGUID(0), timeWhoCommandAllowed(0), _lastAuctionListItemsMSTime(0), _lastAuctionListOwnerItemsMSTime(0), _skipQueue(skipQueue)
 {
-	memset(m_Tutorials, 0, sizeof(m_Tutorials));
+    memset(m_Tutorials, 0, sizeof(m_Tutorials));
 
     _warden = NULL;
-	_offlineTime = 0;
-	_kicked = false;
-	_shouldSetOfflineInDB = true;
+    _offlineTime = 0;
+    _kicked = false;
+    _shouldSetOfflineInDB = true;
 
     if (sock)
     {
@@ -147,8 +147,8 @@ WorldSession::~WorldSession()
     while (_recvQueue.next(packet))
         delete packet;
 
-	if (GetShouldSetOfflineInDB())
-		LoginDatabase.PExecute("UPDATE account SET online = online & ~(1<<(%u-1)) WHERE id = %u;", realmID, GetAccountId());     // One-time query
+    if (GetShouldSetOfflineInDB())
+        LoginDatabase.PExecute("UPDATE account SET online = online & ~(1<<(%u-1)) WHERE id = %u;", realmID, GetAccountId());     // One-time query
 }
 
 std::string const & WorldSession::GetPlayerName() const
@@ -226,188 +226,188 @@ void WorldSession::QueuePacket(WorldPacket* new_packet)
 /// Update the WorldSession (triggered by World update)
 bool WorldSession::Update(uint32 diff, PacketFilter& updater)
 {
-	if (updater.ProcessLogout())
-	{
-		UpdateTimeOutTime(diff);
-		if (IsConnectionIdle())
-			m_Socket->CloseSocket();
-	}
+    if (updater.ProcessLogout())
+    {
+        UpdateTimeOutTime(diff);
+        if (IsConnectionIdle())
+            m_Socket->CloseSocket();
+    }
 
-	HandleTeleportTimeout(updater.ProcessLogout());
+    HandleTeleportTimeout(updater.ProcessLogout());
 
-	uint32 _startMSTime = getMSTime();
-	WorldPacket* packet = NULL;
-	WorldPacket* movementPacket = NULL;
-	bool deletePacket = true;
-	WorldPacket* firstDelayedPacket = NULL;
-	uint32 processedPackets = 0;
+    uint32 _startMSTime = getMSTime();
+    WorldPacket* packet = NULL;
+    WorldPacket* movementPacket = NULL;
+    bool deletePacket = true;
+    WorldPacket* firstDelayedPacket = NULL;
+    uint32 processedPackets = 0;
 
-	while (m_Socket && !m_Socket->IsClosed() && !_recvQueue.empty() && _recvQueue.peek(true) != firstDelayedPacket && _recvQueue.next(packet, updater))
-	{
-		if (packet->GetOpcode() < NUM_MSG_TYPES)
-		{
-			OpcodeHandler &opHandle = opcodeTable[packet->GetOpcode()];
-			try
-			{
-				switch (opHandle.status)
-				{
-					case STATUS_LOGGEDIN:
-						if (!_player)
-						{
-							// pussywizard: such packets were sent to do something for a character that has already logged out, skip them
-						}
-						else if (!_player->IsInWorld())
-						{
-							// pussywizard: such packets may do something important and the player is just being teleported, move to the end of the queue
-							// pussywizard: previously such were skipped, so leave it as it is xD proper code below if we wish to change that
+    while (m_Socket && !m_Socket->IsClosed() && !_recvQueue.empty() && _recvQueue.peek(true) != firstDelayedPacket && _recvQueue.next(packet, updater))
+    {
+        if (packet->GetOpcode() < NUM_MSG_TYPES)
+        {
+            OpcodeHandler &opHandle = opcodeTable[packet->GetOpcode()];
+            try
+            {
+                switch (opHandle.status)
+                {
+                    case STATUS_LOGGEDIN:
+                        if (!_player)
+                        {
+                            // pussywizard: such packets were sent to do something for a character that has already logged out, skip them
+                        }
+                        else if (!_player->IsInWorld())
+                        {
+                            // pussywizard: such packets may do something important and the player is just being teleported, move to the end of the queue
+                            // pussywizard: previously such were skipped, so leave it as it is xD proper code below if we wish to change that
 
-							// pussywizard: requeue only important packets not related to maps (PROCESS_THREADUNSAFE)
-							/*if (opHandle.packetProcessing == PROCESS_THREADUNSAFE)
-							{
-								if (!firstDelayedPacket)
-									firstDelayedPacket = packet;
-								deletePacket = false;
-								QueuePacket(packet);
-							}*/
-						}
-						else
-						{
-							if (opHandle.isGrouppedMovementOpcode)
-							{
-								if (movementPacket)
-									delete movementPacket;
-								movementPacket = new WorldPacket(packet->GetOpcode(), 0);
-								movementPacket->append(*((ByteBuffer*)packet));
-							}
-							else
-							{
-								if (movementPacket)
-								{
-									HandleMovementOpcodes(*movementPacket);
-									delete movementPacket;
-									movementPacket = NULL;
-								}
-								(this->*opHandle.handler)(*packet);
-							}
-						}
-						break;
-					case STATUS_TRANSFER:
-						if (_player && !_player->IsInWorld())
-						{
-							if (movementPacket)
-							{
-								delete movementPacket;
-								movementPacket = NULL;
-							}
-							(this->*opHandle.handler)(*packet);
-						}
-						break;
-					case STATUS_AUTHED:
-						if (m_inQueue) // prevent cheating
-							break;
-						(this->*opHandle.handler)(*packet);
-						break;
-					//case STATUS_NEVER:
-					//    break;
-					//case STATUS_UNHANDLED:
-					//    break;
-				}
-			}
-			catch(ByteBufferException &)
-			{
-				sLog->outError("WorldSession::Update ByteBufferException occured while parsing a packet (opcode: %u) from client %s, accountid=%i. Skipped packet.", packet->GetOpcode(), GetRemoteAddress().c_str(), GetAccountId());
-				if (sLog->IsOutDebug())
-				{
-					sLog->outDebug(LOG_FILTER_NETWORKIO, "Dumping error causing packet:");
-					packet->hexlike();
-				}
-			}
-		}
+                            // pussywizard: requeue only important packets not related to maps (PROCESS_THREADUNSAFE)
+                            /*if (opHandle.packetProcessing == PROCESS_THREADUNSAFE)
+                            {
+                                if (!firstDelayedPacket)
+                                    firstDelayedPacket = packet;
+                                deletePacket = false;
+                                QueuePacket(packet);
+                            }*/
+                        }
+                        else
+                        {
+                            if (opHandle.isGrouppedMovementOpcode)
+                            {
+                                if (movementPacket)
+                                    delete movementPacket;
+                                movementPacket = new WorldPacket(packet->GetOpcode(), 0);
+                                movementPacket->append(*((ByteBuffer*)packet));
+                            }
+                            else
+                            {
+                                if (movementPacket)
+                                {
+                                    HandleMovementOpcodes(*movementPacket);
+                                    delete movementPacket;
+                                    movementPacket = NULL;
+                                }
+                                (this->*opHandle.handler)(*packet);
+                            }
+                        }
+                        break;
+                    case STATUS_TRANSFER:
+                        if (_player && !_player->IsInWorld())
+                        {
+                            if (movementPacket)
+                            {
+                                delete movementPacket;
+                                movementPacket = NULL;
+                            }
+                            (this->*opHandle.handler)(*packet);
+                        }
+                        break;
+                    case STATUS_AUTHED:
+                        if (m_inQueue) // prevent cheating
+                            break;
+                        (this->*opHandle.handler)(*packet);
+                        break;
+                    //case STATUS_NEVER:
+                    //    break;
+                    //case STATUS_UNHANDLED:
+                    //    break;
+                }
+            }
+            catch(ByteBufferException &)
+            {
+                sLog->outError("WorldSession::Update ByteBufferException occured while parsing a packet (opcode: %u) from client %s, accountid=%i. Skipped packet.", packet->GetOpcode(), GetRemoteAddress().c_str(), GetAccountId());
+                if (sLog->IsOutDebug())
+                {
+                    sLog->outDebug(LOG_FILTER_NETWORKIO, "Dumping error causing packet:");
+                    packet->hexlike();
+                }
+            }
+        }
 
-		if (deletePacket)
-			delete packet;
-		else
-			deletePacket = true;
+        if (deletePacket)
+            delete packet;
+        else
+            deletePacket = true;
 
-		if (++processedPackets >= 150) // limit (by count) packets processed in one update, prevent DDoS
-			break;
+        if (++processedPackets >= 150) // limit (by count) packets processed in one update, prevent DDoS
+            break;
 
-		if (getMSTimeDiff(_startMSTime, getMSTime()) >= 3) // limit (by time) packets processed in one update, prevent DDoS
-			break;
-	}
+        if (getMSTimeDiff(_startMSTime, getMSTime()) >= 3) // limit (by time) packets processed in one update, prevent DDoS
+            break;
+    }
 
-	if (movementPacket)
-	{
-		if (_player && _player->IsInWorld())
-			HandleMovementOpcodes(*movementPacket);
-		delete movementPacket;
-	}
+    if (movementPacket)
+    {
+        if (_player && _player->IsInWorld())
+            HandleMovementOpcodes(*movementPacket);
+        delete movementPacket;
+    }
 
-	if (m_Socket && !m_Socket->IsClosed())
-		ProcessQueryCallbacks();
+    if (m_Socket && !m_Socket->IsClosed())
+        ProcessQueryCallbacks();
 
-	if (updater.ProcessLogout())
-	{
-		time_t currTime = time(NULL);
-		if (ShouldLogOut(currTime) && !m_playerLoading)
-			LogoutPlayer(true);
+    if (updater.ProcessLogout())
+    {
+        time_t currTime = time(NULL);
+        if (ShouldLogOut(currTime) && !m_playerLoading)
+            LogoutPlayer(true);
 
-		if (m_Socket && !m_Socket->IsClosed() && _warden)
-			_warden->Update();
+        if (m_Socket && !m_Socket->IsClosed() && _warden)
+            _warden->Update();
 
-		if (m_Socket && m_Socket->IsClosed())
-		{
-			m_Socket->RemoveReference();
-			m_Socket = NULL;
-		}
+        if (m_Socket && m_Socket->IsClosed())
+        {
+            m_Socket->RemoveReference();
+            m_Socket = NULL;
+        }
 
-		if (!m_Socket)
-			return false;
-	}
+        if (!m_Socket)
+            return false;
+    }
 
-	return true;
+    return true;
 }
 
 bool WorldSession::HandleSocketClosed()
 {
-	if (m_Socket && m_Socket->IsClosed() && !IsKicked() && GetPlayer() && !PlayerLogout() && GetPlayer()->m_taxi.empty() && GetPlayer()->IsInWorld() && !World::IsStopped())
-	{
-		m_Socket->RemoveReference();
-		m_Socket = NULL;
-		GetPlayer()->TradeCancel(false);
-		return true;
-	}
-	return false;
+    if (m_Socket && m_Socket->IsClosed() && !IsKicked() && GetPlayer() && !PlayerLogout() && GetPlayer()->m_taxi.empty() && GetPlayer()->IsInWorld() && !World::IsStopped())
+    {
+        m_Socket->RemoveReference();
+        m_Socket = NULL;
+        GetPlayer()->TradeCancel(false);
+        return true;
+    }
+    return false;
 }
 
 void WorldSession::HandleTeleportTimeout(bool updateInSessions)
 {
-	// pussywizard: handle teleport ack timeout
-	if (m_Socket && !m_Socket->IsClosed() && GetPlayer() && GetPlayer()->IsBeingTeleported())
-	{
-		time_t currTime = time(NULL);
-		if (updateInSessions) // session update from World::UpdateSessions
-		{
-			if (GetPlayer()->IsBeingTeleportedFar() && GetPlayer()->GetSemaphoreTeleportFar()+sWorld->getIntConfig(CONFIG_TELEPORT_TIMEOUT_FAR) < currTime)
-				while (GetPlayer() && GetPlayer()->IsBeingTeleportedFar())
-					HandleMoveWorldportAckOpcode();
-		}
-		else // session update from Map::Update
-		{
-			if (GetPlayer()->IsBeingTeleportedNear() && GetPlayer()->GetSemaphoreTeleportNear()+sWorld->getIntConfig(CONFIG_TELEPORT_TIMEOUT_NEAR) < currTime)
-				while (GetPlayer() && GetPlayer()->IsInWorld() && GetPlayer()->IsBeingTeleportedNear())
-				{
-					Player* plMover = GetPlayer()->m_mover->ToPlayer();
-					if (!plMover)
-						break;
-					WorldPacket pkt(MSG_MOVE_TELEPORT_ACK, 20);
-					pkt.append(plMover->GetPackGUID());
-					pkt << uint32(0); // flags
-					pkt << uint32(0); // time
-					HandleMoveTeleportAck(pkt);
-				}
-		}
-	}
+    // pussywizard: handle teleport ack timeout
+    if (m_Socket && !m_Socket->IsClosed() && GetPlayer() && GetPlayer()->IsBeingTeleported())
+    {
+        time_t currTime = time(NULL);
+        if (updateInSessions) // session update from World::UpdateSessions
+        {
+            if (GetPlayer()->IsBeingTeleportedFar() && GetPlayer()->GetSemaphoreTeleportFar()+sWorld->getIntConfig(CONFIG_TELEPORT_TIMEOUT_FAR) < currTime)
+                while (GetPlayer() && GetPlayer()->IsBeingTeleportedFar())
+                    HandleMoveWorldportAckOpcode();
+        }
+        else // session update from Map::Update
+        {
+            if (GetPlayer()->IsBeingTeleportedNear() && GetPlayer()->GetSemaphoreTeleportNear()+sWorld->getIntConfig(CONFIG_TELEPORT_TIMEOUT_NEAR) < currTime)
+                while (GetPlayer() && GetPlayer()->IsInWorld() && GetPlayer()->IsBeingTeleportedNear())
+                {
+                    Player* plMover = GetPlayer()->m_mover->ToPlayer();
+                    if (!plMover)
+                        break;
+                    WorldPacket pkt(MSG_MOVE_TELEPORT_ACK, 20);
+                    pkt.append(plMover->GetPackGUID());
+                    pkt << uint32(0); // flags
+                    pkt << uint32(0); // time
+                    HandleMoveTeleportAck(pkt);
+                }
+        }
+    }
 }
 
 /// %Log the player out
@@ -448,16 +448,16 @@ void WorldSession::LogoutPlayer(bool save)
         }
 
         // pussywizard: leave whole bg on logout (character stays ingame when necessary)
-		// pussywizard: GetBattleground() checked inside
-		_player->LeaveBattleground();
+        // pussywizard: GetBattleground() checked inside
+        _player->LeaveBattleground();
 
-		// pussywizard: checked first time
-		if (!_player->IsBeingTeleportedFar() && !_player->m_InstanceValid && !_player->IsGameMaster())
+        // pussywizard: checked first time
+        if (!_player->IsBeingTeleportedFar() && !_player->m_InstanceValid && !_player->IsGameMaster())
             _player->RepopAtGraveyard();
 
         sOutdoorPvPMgr->HandlePlayerLeaveZone(_player, _player->GetZoneId());
 
-		// pussywizard: remove from battleground queues on logout
+        // pussywizard: remove from battleground queues on logout
         for (int i=0; i < PLAYER_MAX_BATTLEGROUND_QUEUES; ++i)
             if (BattlegroundQueueTypeId bgQueueTypeId = _player->GetBattlegroundQueueTypeId(i))
             {
@@ -472,9 +472,9 @@ void WorldSession::LogoutPlayer(bool save)
         ///- Remove pet
         _player->RemovePet(NULL, PET_SAVE_AS_CURRENT);
 
-		// pussywizard: on logout remove auras that are removed at map change (before saving to db)
-		// there are some positive auras from boss encounters that can be kept by logging out and logging in after boss is dead, and may be used on next bosses
-		_player->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_CHANGE_MAP);
+        // pussywizard: on logout remove auras that are removed at map change (before saving to db)
+        // there are some positive auras from boss encounters that can be kept by logging out and logging in after boss is dead, and may be used on next bosses
+        _player->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_CHANGE_MAP);
 
         ///- If the player is in a group (or invited), remove him. If the group if then only 1 person, disband the group.
         _player->UninviteFromGroup();
@@ -484,7 +484,7 @@ void WorldSession::LogoutPlayer(bool save)
         if (_player->GetGroup() && !_player->GetGroup()->isRaidGroup() && !_player->GetGroup()->isLFGGroup() && m_Socket)
             _player->RemoveFromGroup();
 
-		// pussywizard: checked second time after being removed from a group
+        // pussywizard: checked second time after being removed from a group
         if (!_player->IsBeingTeleportedFar() && !_player->m_InstanceValid && !_player->IsGameMaster())
             _player->RepopAtGraveyard();
 
@@ -495,7 +495,7 @@ void WorldSession::LogoutPlayer(bool save)
 
         ///- empty buyback items and save the player in the database
         // some save parts only correctly work in case player present in map/player_lists (pets, etc)
-		SavingSystemMgr::InsertToSavingSkipListIfNeeded(_player->GetNextSave()); // pussywizard
+        SavingSystemMgr::InsertToSavingSkipListIfNeeded(_player->GetNextSave()); // pussywizard
         if (save)
         {
             uint32 eslot;
@@ -565,8 +565,8 @@ void WorldSession::KickPlayer(bool setKicked)
     if (m_Socket)
         m_Socket->CloseSocket();
 
-	if (setKicked)
-		SetKicked(true); // pussywizard: the session won't be left ingame for 60 seconds and to also kick offline session
+    if (setKicked)
+        SetKicked(true); // pussywizard: the session won't be left ingame for 60 seconds and to also kick offline session
 }
 
 void WorldSession::SendNotification(const char *format, ...)
@@ -753,13 +753,13 @@ void WorldSession::SaveTutorialsData(SQLTransaction &trans)
     if (!m_TutorialsChanged)
         return;
 
-	bool hasTutorials = false;
-	for (uint8 i = 0; i < MAX_ACCOUNT_TUTORIAL_VALUES; ++i)
-		if (m_Tutorials[i] != 0)
-		{
-			hasTutorials = true;
-			break;
-		}
+    bool hasTutorials = false;
+    for (uint8 i = 0; i < MAX_ACCOUNT_TUTORIAL_VALUES; ++i)
+        if (m_Tutorials[i] != 0)
+        {
+            hasTutorials = true;
+            break;
+        }
 
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(hasTutorials ? CHAR_UPD_TUTORIALS : CHAR_INS_TUTORIALS);
     for (uint8 i = 0; i < MAX_ACCOUNT_TUTORIAL_VALUES; ++i)
@@ -884,8 +884,8 @@ void WorldSession::ReadMovementInfo(WorldPacket &data, MovementInfo* mi)
     REMOVE_VIOLATING_FLAGS(mi->HasMovementFlag(MOVEMENTFLAG_CAN_FLY | MOVEMENTFLAG_DISABLE_GRAVITY) && mi->HasMovementFlag(MOVEMENTFLAG_FALLING),
         MOVEMENTFLAG_FALLING);
 
-	// Xinef: Spline enabled flag should be never sent by client, its internal movementflag
-	REMOVE_VIOLATING_FLAGS(!GetPlayer()->m_mover->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_SPLINE_ENABLED),
+    // Xinef: Spline enabled flag should be never sent by client, its internal movementflag
+    REMOVE_VIOLATING_FLAGS(!GetPlayer()->m_mover->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_SPLINE_ENABLED),
         MOVEMENTFLAG_SPLINE_ENABLED);
 
     #undef REMOVE_VIOLATING_FLAGS
@@ -1084,20 +1084,20 @@ void WorldSession::InitializeQueryCallbackParameters()
     // Callback parameters that have pointers in them should be properly
     // initialized to NULL here.
     _charCreateCallback.SetParam(NULL);
-	_loadPetFromDBFirstCallback.SetFirstParam(NULL);
-	_loadPetFromDBFirstCallback.SetSecondParam(NULL);
+    _loadPetFromDBFirstCallback.SetFirstParam(NULL);
+    _loadPetFromDBFirstCallback.SetSecondParam(NULL);
 }
 
 void WorldSession::ProcessQueryCallbacks()
 {
-	ProcessQueryCallbackPlayer();
-	ProcessQueryCallbackPet();
-	ProcessQueryCallbackLogin();
+    ProcessQueryCallbackPlayer();
+    ProcessQueryCallbackPet();
+    ProcessQueryCallbackLogin();
 }
 
 void WorldSession::ProcessQueryCallbackPlayer()
 {
-	PreparedQueryResult result;
+    PreparedQueryResult result;
 
     //- HandleCharRenameOpcode
     if (_charRenameCallback.IsReady())
@@ -1108,18 +1108,18 @@ void WorldSession::ProcessQueryCallbackPlayer()
         _charRenameCallback.FreeResult();
     }
 
-	//- HandleOpenItemOpcode
+    //- HandleOpenItemOpcode
     if (_openWrappedItemCallback.IsReady())
     {
         uint8 bagIndex = _openWrappedItemCallback.GetFirstParam();
-		uint8 slot = _openWrappedItemCallback.GetSecondParam();
+        uint8 slot = _openWrappedItemCallback.GetSecondParam();
         uint32 itemLowGUID = _openWrappedItemCallback.GetThirdParam();
         _openWrappedItemCallback.GetResult(result);
         HandleOpenWrappedItemCallback(result, bagIndex, slot, itemLowGUID);
         _openWrappedItemCallback.FreeResult();
     }
 
-	//- Player - ActivateSpec
+    //- Player - ActivateSpec
     if (_loadActionsSwitchSpecCallback.ready())
     {
         _loadActionsSwitchSpecCallback.get(result);
@@ -1130,7 +1130,7 @@ void WorldSession::ProcessQueryCallbackPlayer()
 
 void WorldSession::ProcessQueryCallbackPet()
 {
-	PreparedQueryResult result;
+    PreparedQueryResult result;
 
     //- SendStabledPet
     if (_sendStabledPetCallback.IsReady())
@@ -1139,7 +1139,7 @@ void WorldSession::ProcessQueryCallbackPet()
         _sendStabledPetCallback.GetResult(result);
         SendStablePetCallback(result, param);
         _sendStabledPetCallback.FreeResult();
-		return;
+        return;
     }
 
     //- HandleStablePet
@@ -1148,7 +1148,7 @@ void WorldSession::ProcessQueryCallbackPet()
         _stablePetCallback.get(result);
         HandleStablePetCallback(result);
         _stablePetCallback.cancel();
-		return;
+        return;
     }
 
     //- HandleUnstablePet
@@ -1158,7 +1158,7 @@ void WorldSession::ProcessQueryCallbackPet()
         _unstablePetCallback.GetResult(result);
         HandleUnstablePetCallback(result, param);
         _unstablePetCallback.FreeResult();
-		return;
+        return;
     }
 
     //- HandleStableSwapPet
@@ -1168,65 +1168,65 @@ void WorldSession::ProcessQueryCallbackPet()
         _stableSwapCallback.GetResult(result);
         HandleStableSwapPetCallback(result, param);
         _stableSwapCallback.FreeResult();
-		return;
+        return;
     }
 
-	//- LoadPetFromDB first part
-	if (_loadPetFromDBFirstCallback.IsReady())
+    //- LoadPetFromDB first part
+    if (_loadPetFromDBFirstCallback.IsReady())
     {
-		Player* player = GetPlayer();
-		if (!player)
-		{
-			if (AsynchPetSummon* info = _loadPetFromDBFirstCallback.GetSecondParam())
-				delete info;
-			_loadPetFromDBFirstCallback.Reset();
-			return;
-		}
-		// process only if player is in world (teleport crashes?)
-		// otherwise wait with result till he logs in
-		if (player->IsInWorld())
-		{
-			uint8 asynchLoadType = _loadPetFromDBFirstCallback.GetFirstParam();
-			_loadPetFromDBFirstCallback.GetResult(result);
+        Player* player = GetPlayer();
+        if (!player)
+        {
+            if (AsynchPetSummon* info = _loadPetFromDBFirstCallback.GetSecondParam())
+                delete info;
+            _loadPetFromDBFirstCallback.Reset();
+            return;
+        }
+        // process only if player is in world (teleport crashes?)
+        // otherwise wait with result till he logs in
+        if (player->IsInWorld())
+        {
+            uint8 asynchLoadType = _loadPetFromDBFirstCallback.GetFirstParam();
+            _loadPetFromDBFirstCallback.GetResult(result);
 
-			uint8 loadResult = HandleLoadPetFromDBFirstCallback(result, asynchLoadType);
-			if (loadResult != PET_LOAD_OK)
-				Pet::HandleAsynchLoadFailed(_loadPetFromDBFirstCallback.GetSecondParam(), player, asynchLoadType, loadResult);
+            uint8 loadResult = HandleLoadPetFromDBFirstCallback(result, asynchLoadType);
+            if (loadResult != PET_LOAD_OK)
+                Pet::HandleAsynchLoadFailed(_loadPetFromDBFirstCallback.GetSecondParam(), player, asynchLoadType, loadResult);
 
-			if (AsynchPetSummon* info = _loadPetFromDBFirstCallback.GetSecondParam())
-				delete info;
-			_loadPetFromDBFirstCallback.Reset();
-		}
-		return;
+            if (AsynchPetSummon* info = _loadPetFromDBFirstCallback.GetSecondParam())
+                delete info;
+            _loadPetFromDBFirstCallback.Reset();
+        }
+        return;
     }
 
-	//- LoadPetFromDB second part
-	if (_loadPetFromDBSecondCallback.ready())
+    //- LoadPetFromDB second part
+    if (_loadPetFromDBSecondCallback.ready())
     {
-		Player* player = GetPlayer();
-		if (!player)
-		{
-			_loadPetFromDBSecondCallback.cancel();
-		}
-		else if (!player->IsInWorld())
-		{
-			// wait
-		}
-		else
-		{
-			SQLQueryHolder* param;
-			_loadPetFromDBSecondCallback.get(param);
-			HandleLoadPetFromDBSecondCallback((LoadPetFromDBQueryHolder*)param);
-			delete param;
-		   _loadPetFromDBSecondCallback.cancel();
-		}
-		return;
+        Player* player = GetPlayer();
+        if (!player)
+        {
+            _loadPetFromDBSecondCallback.cancel();
+        }
+        else if (!player->IsInWorld())
+        {
+            // wait
+        }
+        else
+        {
+            SQLQueryHolder* param;
+            _loadPetFromDBSecondCallback.get(param);
+            HandleLoadPetFromDBSecondCallback((LoadPetFromDBQueryHolder*)param);
+            delete param;
+           _loadPetFromDBSecondCallback.cancel();
+        }
+        return;
     }
 }
 
 void WorldSession::ProcessQueryCallbackLogin()
 {
-	PreparedQueryResult result;
+    PreparedQueryResult result;
 
     //! HandleCharEnumOpcode
     if (_charEnumCallback.ready())

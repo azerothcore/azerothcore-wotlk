@@ -55,8 +55,8 @@ class AuraApplication
         uint8 _effectsToApply;                         // Used only at spell hit to determine which effect should be applied
         bool _needClientUpdate:1;
 
-		// xinef: stacking
-		uint8 _disableMask;
+        // xinef: stacking
+        uint8 _disableMask;
 
         explicit AuraApplication(Unit* target, Unit* caster, Aura* base, uint8 effMask);
         void _Remove();
@@ -84,10 +84,10 @@ class AuraApplication
         void BuildUpdatePacket(ByteBuffer& data, bool remove) const;
         void ClientUpdate(bool remove = false);
 
-		// xinef: stacking
-		bool IsActive(uint8 effIdx) { return ((1 << effIdx) & _disableMask) == 0; }
-		void SetDisableMask(uint8 effIdx) { _disableMask |= 1 << effIdx; }
-		void RemoveDisableMask(uint8 effIdx) { _disableMask &= ~(1 << effIdx); }
+        // xinef: stacking
+        bool IsActive(uint8 effIdx) { return ((1 << effIdx) & _disableMask) == 0; }
+        void SetDisableMask(uint8 effIdx) { _disableMask |= 1 << effIdx; }
+        void RemoveDisableMask(uint8 effIdx) { _disableMask &= ~(1 << effIdx); }
 };
 
 class Aura
@@ -140,7 +140,7 @@ class Aura
         void SetDuration(int32 duration, bool withMods = false);
         void RefreshDuration();
         void RefreshTimers(bool periodicReset = false);
-		void RefreshTimersWithMods();
+        void RefreshTimersWithMods();
         bool IsExpired() const { return !GetDuration();}
         bool IsPermanent() const { return GetMaxDuration() == -1; }
 
@@ -195,7 +195,7 @@ class Aura
         bool CanBeAppliedOn(Unit* target);
         bool CheckAreaTarget(Unit* target);
         bool CanStackWith(Aura const* checkAura, bool remove) const;
-		bool IsAuraStronger(Aura const* newAura) const;
+        bool IsAuraStronger(Aura const* newAura) const;
 
         // Proc system
         // this subsystem is not yet in use - the core of it is functional, but still some research has to be done

@@ -40,261 +40,261 @@ EndContentData */
 // Ours
 enum saeed
 {
-	NPC_PROTECTORATE_AVENGER		= 21805,
-	NPC_PROTECTORATE_DEFENDER		= 20984,
-	NPC_DIMENSIUS					= 19554,
+    NPC_PROTECTORATE_AVENGER        = 21805,
+    NPC_PROTECTORATE_DEFENDER       = 20984,
+    NPC_DIMENSIUS                   = 19554,
 
-	EVENT_START_WALK				= 1,
-	EVENT_START_FIGHT1				= 2,
-	EVENT_START_FIGHT2				= 3,
+    EVENT_START_WALK                = 1,
+    EVENT_START_FIGHT1              = 2,
+    EVENT_START_FIGHT2              = 3,
 
-	DATA_START_ENCOUNTER			= 1,
-	DATA_START_FIGHT				= 2,
+    DATA_START_ENCOUNTER            = 1,
+    DATA_START_FIGHT                = 2,
 
-	SAY_SAEED_0						= 0,
-	SAY_SAEED_1						= 1,
-	SAY_SAEED_2						= 2,
-	SAY_SAEED_3						= 3,
-	SAY_DIMENSISIUS_1				= 1,
+    SAY_SAEED_0                     = 0,
+    SAY_SAEED_1                     = 1,
+    SAY_SAEED_2                     = 2,
+    SAY_SAEED_3                     = 3,
+    SAY_DIMENSISIUS_1               = 1,
 
-	QUEST_DIMENSIUS_DEVOURING		= 10439,
+    QUEST_DIMENSIUS_DEVOURING       = 10439,
 
-	SPELL_DIMENSIUS_TRANSFORM		= 35939
+    SPELL_DIMENSIUS_TRANSFORM       = 35939
 };
 
 class npc_captain_saeed : public CreatureScript
 {
-	public:
-		npc_captain_saeed() : CreatureScript("npc_captain_saeed") { }
+    public:
+        npc_captain_saeed() : CreatureScript("npc_captain_saeed") { }
 
-		CreatureAI* GetAI(Creature* creature) const
-		{
-			return new npc_captain_saeedAI(creature);
-		}
+        CreatureAI* GetAI(Creature* creature) const
+        {
+            return new npc_captain_saeedAI(creature);
+        }
 
-		struct npc_captain_saeedAI : public npc_escortAI
-		{
-			npc_captain_saeedAI(Creature* creature) : npc_escortAI(creature), summons(me) {}
+        struct npc_captain_saeedAI : public npc_escortAI
+        {
+            npc_captain_saeedAI(Creature* creature) : npc_escortAI(creature), summons(me) {}
 
-			SummonList summons;
-			EventMap events;
-			bool started, fight;
+            SummonList summons;
+            EventMap events;
+            bool started, fight;
 
-			void Reset()
-			{
-				if (!summons.empty())
-				{
-					for (std::list<uint64>::iterator itr = summons.begin(); itr != summons.end(); ++itr)
-					if (Creature* cr = ObjectAccessor::GetCreature(*me, *itr))
-					{
-						float x, y, z, o;
-						cr->GetRespawnPosition(x, y, z, &o);
-						cr->SetHomePosition(x, y, z, o);
-					}
-				}
-				events.Reset();
-				summons.clear();
-				started = false;
-				fight = false;
-				me->RestoreFaction();
-			}
+            void Reset()
+            {
+                if (!summons.empty())
+                {
+                    for (std::list<uint64>::iterator itr = summons.begin(); itr != summons.end(); ++itr)
+                    if (Creature* cr = ObjectAccessor::GetCreature(*me, *itr))
+                    {
+                        float x, y, z, o;
+                        cr->GetRespawnPosition(x, y, z, &o);
+                        cr->SetHomePosition(x, y, z, o);
+                    }
+                }
+                events.Reset();
+                summons.clear();
+                started = false;
+                fight = false;
+                me->RestoreFaction();
+            }
 
-			void MoveInLineOfSight(Unit* who)
-			{
-				if (Player* player = GetPlayerForEscort())
-					if (me->GetDistance(who) < 10.0f && !me->GetVictim())
-						if (player->IsValidAttackTarget(who))
-						{
-							AttackStart(who);
-							return;
-						}
+            void MoveInLineOfSight(Unit* who)
+            {
+                if (Player* player = GetPlayerForEscort())
+                    if (me->GetDistance(who) < 10.0f && !me->GetVictim())
+                        if (player->IsValidAttackTarget(who))
+                        {
+                            AttackStart(who);
+                            return;
+                        }
 
-				npc_escortAI::MoveInLineOfSight(who);
-			}
+                npc_escortAI::MoveInLineOfSight(who);
+            }
 
-			void SetGUID(uint64 playerGUID, int32 type)
-			{
-				if (type == DATA_START_ENCOUNTER)
-				{
-					Start(true, true, playerGUID);
-					SetEscortPaused(true);
-					started = true;
+            void SetGUID(uint64 playerGUID, int32 type)
+            {
+                if (type == DATA_START_ENCOUNTER)
+                {
+                    Start(true, true, playerGUID);
+                    SetEscortPaused(true);
+                    started = true;
 
-					std::list<Creature*> cl;
-					me->GetCreaturesWithEntryInRange(cl, 20.0f, NPC_PROTECTORATE_AVENGER);
-					for (std::list<Creature*>::iterator itr = cl.begin(); itr != cl.end(); ++itr)
-					{
-						summons.Summon(*itr);
-						(*itr)->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
-						(*itr)->setFaction(250);
-					}
-					cl.clear();
-					me->GetCreaturesWithEntryInRange(cl, 20.0f, NPC_PROTECTORATE_DEFENDER);
-					for (std::list<Creature*>::iterator itr = cl.begin(); itr != cl.end(); ++itr)
-					{
-						summons.Summon(*itr);
-						(*itr)->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
-						(*itr)->setFaction(250);
-					}
+                    std::list<Creature*> cl;
+                    me->GetCreaturesWithEntryInRange(cl, 20.0f, NPC_PROTECTORATE_AVENGER);
+                    for (std::list<Creature*>::iterator itr = cl.begin(); itr != cl.end(); ++itr)
+                    {
+                        summons.Summon(*itr);
+                        (*itr)->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
+                        (*itr)->setFaction(250);
+                    }
+                    cl.clear();
+                    me->GetCreaturesWithEntryInRange(cl, 20.0f, NPC_PROTECTORATE_DEFENDER);
+                    for (std::list<Creature*>::iterator itr = cl.begin(); itr != cl.end(); ++itr)
+                    {
+                        summons.Summon(*itr);
+                        (*itr)->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
+                        (*itr)->setFaction(250);
+                    }
 
-					me->setFaction(250);
-					Talk(SAY_SAEED_0);
-					events.ScheduleEvent(EVENT_START_WALK, 3000);
-				}
-				else if (type == DATA_START_FIGHT)
-				{
-					Talk(SAY_SAEED_2);
-					SetEscortPaused(false);
-					me->SetUInt32Value(UNIT_NPC_FLAGS, 0);
-				}
-			}
+                    me->setFaction(250);
+                    Talk(SAY_SAEED_0);
+                    events.ScheduleEvent(EVENT_START_WALK, 3000);
+                }
+                else if (type == DATA_START_FIGHT)
+                {
+                    Talk(SAY_SAEED_2);
+                    SetEscortPaused(false);
+                    me->SetUInt32Value(UNIT_NPC_FLAGS, 0);
+                }
+            }
 
-			void EnterEvadeMode()
-			{
-				if (fight)
-					SetEscortPaused(false);
+            void EnterEvadeMode()
+            {
+                if (fight)
+                    SetEscortPaused(false);
 
-				SummonsAction(NULL);
-				npc_escortAI::EnterEvadeMode();
-			}
+                SummonsAction(NULL);
+                npc_escortAI::EnterEvadeMode();
+            }
 
-			void SummonsAction(Unit* who)
-			{
-				float i = 0;
-				for (std::list<uint64>::iterator itr = summons.begin(); itr != summons.end(); ++itr, i += 1.0f)
-					if (Creature* cr = ObjectAccessor::GetCreature(*me, *itr))
-					{
-						if (who == NULL)
-						{
-							cr->GetMotionMaster()->Clear(false);
-							cr->GetMotionMaster()->MoveFollow(me, 2.0f, M_PI/2.0f + (i / summons.size() * M_PI));
-						}
-						else
-						{
-							cr->SetHomePosition(cr->GetPositionX(), cr->GetPositionY(), cr->GetPositionZ(), cr->GetOrientation());
-							cr->AI()->AttackStart(who);
-						}
-					}
-			}
+            void SummonsAction(Unit* who)
+            {
+                float i = 0;
+                for (std::list<uint64>::iterator itr = summons.begin(); itr != summons.end(); ++itr, i += 1.0f)
+                    if (Creature* cr = ObjectAccessor::GetCreature(*me, *itr))
+                    {
+                        if (who == NULL)
+                        {
+                            cr->GetMotionMaster()->Clear(false);
+                            cr->GetMotionMaster()->MoveFollow(me, 2.0f, M_PI/2.0f + (i / summons.size() * M_PI));
+                        }
+                        else
+                        {
+                            cr->SetHomePosition(cr->GetPositionX(), cr->GetPositionY(), cr->GetPositionZ(), cr->GetOrientation());
+                            cr->AI()->AttackStart(who);
+                        }
+                    }
+            }
 
-			void WaypointReached(uint32 i)
-			{
-				Player* player = GetPlayerForEscort();
-				if (!player)
-					return;
+            void WaypointReached(uint32 i)
+            {
+                Player* player = GetPlayerForEscort();
+                if (!player)
+                    return;
 
-				switch (i)
-				{
-					case 16:
-						Talk(SAY_SAEED_1);
-						me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-						SetEscortPaused(true);
-						break;
-					case 18:
-						events.ScheduleEvent(EVENT_START_FIGHT1, 0);
-						SetEscortPaused(true);
-						break;
-					case 19:
-						summons.DespawnAll();
-						break;
-				}
-			}
+                switch (i)
+                {
+                    case 16:
+                        Talk(SAY_SAEED_1);
+                        me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                        SetEscortPaused(true);
+                        break;
+                    case 18:
+                        events.ScheduleEvent(EVENT_START_FIGHT1, 0);
+                        SetEscortPaused(true);
+                        break;
+                    case 19:
+                        summons.DespawnAll();
+                        break;
+                }
+            }
 
-			void EnterCombat(Unit* who)
-			{
-				SummonsAction(who);
-			}
+            void EnterCombat(Unit* who)
+            {
+                SummonsAction(who);
+            }
 
-			void JustDied(Unit* /*killer*/)
-			{
-				Player* player = GetPlayerForEscort();
-				if (player)
-					player->FailQuest(QUEST_DIMENSIUS_DEVOURING);
+            void JustDied(Unit* /*killer*/)
+            {
+                Player* player = GetPlayerForEscort();
+                if (player)
+                    player->FailQuest(QUEST_DIMENSIUS_DEVOURING);
 
-				summons.DespawnAll();
-			}
+                summons.DespawnAll();
+            }
 
-			void CorpseRemoved(uint32&)
-			{
-				summons.DespawnAll();
-			}
+            void CorpseRemoved(uint32&)
+            {
+                summons.DespawnAll();
+            }
 
-			uint32 GetData(uint32 data) const
-			{
-				if (data == 1)
-					return (uint32)started;
+            uint32 GetData(uint32 data) const
+            {
+                if (data == 1)
+                    return (uint32)started;
 
-				return 0;
-			}
+                return 0;
+            }
 
-			void UpdateAI(uint32 diff)
-			{
-				npc_escortAI::UpdateAI(diff);
+            void UpdateAI(uint32 diff)
+            {
+                npc_escortAI::UpdateAI(diff);
 
-				events.Update(diff);
-				switch (events.ExecuteEvent())
-				{
-					case EVENT_START_WALK:
-						SummonsAction(NULL);
-						SetEscortPaused(false);
-						break;
-					case EVENT_START_FIGHT1:
-						Talk(SAY_SAEED_3);
-						events.ScheduleEvent(EVENT_START_FIGHT2, 3000);
-						break;
-					case EVENT_START_FIGHT2:
-						if (Creature* dimensius = me->FindNearestCreature(NPC_DIMENSIUS, 50.0f))
-						{
-							dimensius->RemoveAurasDueToSpell(SPELL_DIMENSIUS_TRANSFORM);
-							dimensius->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
-							AttackStart(dimensius);
-							fight = true;
-						}
-						break;
-				}
+                events.Update(diff);
+                switch (events.ExecuteEvent())
+                {
+                    case EVENT_START_WALK:
+                        SummonsAction(NULL);
+                        SetEscortPaused(false);
+                        break;
+                    case EVENT_START_FIGHT1:
+                        Talk(SAY_SAEED_3);
+                        events.ScheduleEvent(EVENT_START_FIGHT2, 3000);
+                        break;
+                    case EVENT_START_FIGHT2:
+                        if (Creature* dimensius = me->FindNearestCreature(NPC_DIMENSIUS, 50.0f))
+                        {
+                            dimensius->RemoveAurasDueToSpell(SPELL_DIMENSIUS_TRANSFORM);
+                            dimensius->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+                            AttackStart(dimensius);
+                            fight = true;
+                        }
+                        break;
+                }
 
-				if (!UpdateVictim())
-					return;
+                if (!UpdateVictim())
+                    return;
 
-				DoMeleeAttackIfReady();
-			}
-		};
+                DoMeleeAttackIfReady();
+            }
+        };
 
 
-		bool OnGossipSelect(Player* player, Creature* creature, uint32 /*uiSender*/, uint32 uiAction)
-		{
-			player->PlayerTalkClass->ClearMenus();
-			if (uiAction == GOSSIP_ACTION_INFO_DEF+1)
-			{
-				creature->AI()->SetGUID(player->GetGUID(), DATA_START_ENCOUNTER);
-				player->KilledMonsterCredit(creature->GetEntry(), 0);
-			}
-			else if (uiAction == GOSSIP_ACTION_INFO_DEF+2)
-			{
-				creature->AI()->SetGUID(player->GetGUID(), DATA_START_FIGHT);
-			}
+        bool OnGossipSelect(Player* player, Creature* creature, uint32 /*uiSender*/, uint32 uiAction)
+        {
+            player->PlayerTalkClass->ClearMenus();
+            if (uiAction == GOSSIP_ACTION_INFO_DEF+1)
+            {
+                creature->AI()->SetGUID(player->GetGUID(), DATA_START_ENCOUNTER);
+                player->KilledMonsterCredit(creature->GetEntry(), 0);
+            }
+            else if (uiAction == GOSSIP_ACTION_INFO_DEF+2)
+            {
+                creature->AI()->SetGUID(player->GetGUID(), DATA_START_FIGHT);
+            }
 
-			player->CLOSE_GOSSIP_MENU();
-			return true;
-		}
+            player->CLOSE_GOSSIP_MENU();
+            return true;
+        }
 
-		bool OnGossipHello(Player* player, Creature* creature)
-		{
-			if (creature->IsQuestGiver())
-				player->PrepareQuestMenu(creature->GetGUID());
+        bool OnGossipHello(Player* player, Creature* creature)
+        {
+            if (creature->IsQuestGiver())
+                player->PrepareQuestMenu(creature->GetGUID());
 
-			if (player->GetQuestStatus(QUEST_DIMENSIUS_DEVOURING) == QUEST_STATUS_INCOMPLETE)
-			{
-				if (!creature->AI()->GetData(1))
-					player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Let's move out.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
-				else
-					player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Let's start the battle.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+2);
-			}
+            if (player->GetQuestStatus(QUEST_DIMENSIUS_DEVOURING) == QUEST_STATUS_INCOMPLETE)
+            {
+                if (!creature->AI()->GetData(1))
+                    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Let's move out.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
+                else
+                    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Let's start the battle.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+2);
+            }
 
-			player->SEND_GOSSIP_MENU(player->GetGossipTextId(creature), creature->GetGUID());
+            player->SEND_GOSSIP_MENU(player->GetGossipTextId(creature), creature->GetGUID());
 
-			return true;
-		}
+            return true;
+        }
 };
 
 
@@ -783,8 +783,8 @@ enum BessyData
     SPAWN_SECOND    = 19881,
     SAY_THADELL_1   = 0,
     SAY_THADELL_2   = 1,
-	SAY_BESSY_0		= 0,
-	SAY_BESSY_1		= 1
+    SAY_BESSY_0     = 0,
+    SAY_BESSY_1     = 1
 };
 
 class npc_bessy : public CreatureScript
@@ -798,7 +798,7 @@ public:
         {
             creature->setFaction(113);
             creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-			creature->AI()->Talk(SAY_BESSY_0);
+            creature->AI()->Talk(SAY_BESSY_0);
             CAST_AI(npc_escortAI, (creature->AI()))->Start(true, false, player->GetGUID());
         }
         return true;
@@ -828,13 +828,13 @@ public:
             switch (waypointId)
             {
                 case 3: //first spawn
-					Talk(SAY_BESSY_1);
+                    Talk(SAY_BESSY_1);
                     me->SummonCreature(SPAWN_FIRST, 2449.67f, 2183.11f, 96.85f, 6.20f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 25000);
                     me->SummonCreature(SPAWN_FIRST, 2449.53f, 2184.43f, 96.36f, 6.27f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 25000);
                     me->SummonCreature(SPAWN_FIRST, 2449.85f, 2186.34f, 97.57f, 6.08f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 25000);
                     break;
                 case 7:
-					Talk(SAY_BESSY_1);
+                    Talk(SAY_BESSY_1);
                     me->SummonCreature(SPAWN_SECOND, 2309.64f, 2186.24f, 92.25f, 6.06f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 25000);
                     me->SummonCreature(SPAWN_SECOND, 2309.25f, 2183.46f, 91.75f, 6.22f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 25000);
                     break;
@@ -858,7 +858,7 @@ public:
         void Reset()
         {
             me->RestoreFaction();
-			me->SetReactState(REACT_PASSIVE);
+            me->SetReactState(REACT_PASSIVE);
         }
     };
 };
@@ -968,10 +968,10 @@ public:
 
 void AddSC_netherstorm()
 {
-	// Ours
-	new npc_captain_saeed();
+    // Ours
+    new npc_captain_saeed();
 
-	// Theirs
+    // Theirs
     new npc_commander_dawnforge();
     new at_commander_dawnforge();
     new npc_professor_dabiri();

@@ -52,8 +52,8 @@ class TempSummon : public Creature
         Unit* GetSummoner() const;
         uint64 GetSummonerGUID() { return m_summonerGUID; }
         TempSummonType const& GetSummonType() { return m_type; }
-		uint32 GetTimer() { return m_timer; }
-		void SetTimer(uint32 t) { m_timer = t; }
+        uint32 GetTimer() { return m_timer; }
+        void SetTimer(uint32 t) { m_timer = t; }
 
         const SummonPropertiesEntry* const m_Properties;
     private:
@@ -69,12 +69,12 @@ class Minion : public TempSummon
         Minion(SummonPropertiesEntry const* properties, uint64 owner, bool isWorldObject);
         void InitStats(uint32 duration);
         void RemoveFromWorld();
-		Unit* GetOwner() const;
+        Unit* GetOwner() const;
         float GetFollowAngle() const { return m_followAngle; }
         void SetFollowAngle(float angle) { m_followAngle = angle; }
         bool IsPetGhoul() const {return GetEntry() == 26125 /*normal ghoul*/ || GetEntry() == 30230 /*Raise Ally ghoul*/;} // Ghoul may be guardian or pet
         bool IsGuardianPet() const;
-		void setDeathState(DeathState s, bool despawn = false);                   // override virtual Unit::setDeathState
+        void setDeathState(DeathState s, bool despawn = false);                   // override virtual Unit::setDeathState
     protected:
         const uint64 m_owner;
         float m_followAngle;
@@ -106,7 +106,7 @@ class Puppet : public Minion
         void Update(uint32 time);
         void RemoveFromWorld();
     protected:
-		Player* GetOwner() const;
+        Player* GetOwner() const;
         const uint64 m_owner;
 };
 

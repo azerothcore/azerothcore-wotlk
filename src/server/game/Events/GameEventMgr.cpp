@@ -1078,11 +1078,11 @@ uint32 GameEventMgr::Update()                               // return the next e
         {
             //sLog->outDebug("GameEvent %u is not active", itr->first);
             if (IsActiveEvent(itr))
-			{
-				// Xinef: do not deactivate internal events on whim
-				if (mGameEvent[itr].state != GAMEEVENT_INTERNAL)
-					deactivate.insert(itr);
-			}
+            {
+                // Xinef: do not deactivate internal events on whim
+                if (mGameEvent[itr].state != GAMEEVENT_INTERNAL)
+                    deactivate.insert(itr);
+            }
             else
             {
                 if (!isSystemInit)
@@ -1133,7 +1133,7 @@ void GameEventMgr::UnApplyEvent(uint16 event_id)
     UpdateEventNPCVendor(event_id, false);
     // update bg holiday
     UpdateBattlegroundSettings();
-	// check for seasonal quest reset.
+    // check for seasonal quest reset.
     sWorld->ResetEventSeasonalQuests(event_id);
 }
 

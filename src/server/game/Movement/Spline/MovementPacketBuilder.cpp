@@ -70,9 +70,9 @@ namespace Movement
         }
 
         // add fake Enter_Cycle flag - needed for client-side cyclic movement (client will erase first spline vertex after first cycle done)
-		// Xinef: this flag breaks cycle for ground movement, client teleports npc between last and first point instead of using smooth movement
-		if (splineflags & MoveSplineFlag::Flying)
-			splineflags.enter_cycle = move_spline.isCyclic();
+        // Xinef: this flag breaks cycle for ground movement, client teleports npc between last and first point instead of using smooth movement
+        if (splineflags & MoveSplineFlag::Flying)
+            splineflags.enter_cycle = move_spline.isCyclic();
         data << uint32(splineflags & uint32(~MoveSplineFlag::Mask_No_Monster_Move));
 
         if (splineflags.animation)
@@ -129,16 +129,16 @@ namespace Movement
     {
         uint32 count = spline.getPointCount() - 3;
         data << uint32(count+1);
-		if (flying)
-		{
-			data << spline.getPoint(1, true); // fake point, client will erase it from the spline after first cycle done
-			data.append<Vector3>(&spline.getPoint(2, true), count);
-		}
-		else
-		{
-			data.append<Vector3>(&spline.getPoint(2, true), count);
-			data << Vector3::zero(); //Xinef: fake point
-		}
+        if (flying)
+        {
+            data << spline.getPoint(1, true); // fake point, client will erase it from the spline after first cycle done
+            data.append<Vector3>(&spline.getPoint(2, true), count);
+        }
+        else
+        {
+            data.append<Vector3>(&spline.getPoint(2, true), count);
+            data << Vector3::zero(); //Xinef: fake point
+        }
     }
 
     void PacketBuilder::WriteMonsterMove(const MoveSpline& move_spline, ByteBuffer& data)
@@ -150,7 +150,7 @@ namespace Movement
         if (splineflags & MoveSplineFlag::Mask_CatmullRom)
         {
             if (splineflags.cyclic)
-				WriteCatmullRomCyclicPath(spline, data, splineflags & MoveSplineFlag::Flying);
+                WriteCatmullRomCyclicPath(spline, data, splineflags & MoveSplineFlag::Flying);
             else
                 WriteCatmullRomPath(spline, data);
         }

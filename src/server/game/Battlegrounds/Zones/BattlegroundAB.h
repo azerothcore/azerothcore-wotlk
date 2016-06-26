@@ -9,20 +9,20 @@ REWRITTEN BY XINEF
 
 enum BG_AB_Events
 {
-	BG_AB_EVENT_UPDATE_BANNER_STABLE		= 1,
-	BG_AB_EVENT_UPDATE_BANNER_FARM			= 2,
-	BG_AB_EVENT_UPDATE_BANNER_BLACKSMITH	= 3,
-	BG_AB_EVENT_UPDATE_BANNER_LUMBERMILL	= 4,
-	BG_AB_EVENT_UPDATE_BANNER_GOLDMINE		= 5,
+    BG_AB_EVENT_UPDATE_BANNER_STABLE        = 1,
+    BG_AB_EVENT_UPDATE_BANNER_FARM          = 2,
+    BG_AB_EVENT_UPDATE_BANNER_BLACKSMITH    = 3,
+    BG_AB_EVENT_UPDATE_BANNER_LUMBERMILL    = 4,
+    BG_AB_EVENT_UPDATE_BANNER_GOLDMINE      = 5,
 
-	BG_AB_EVENT_CAPTURE_STABLE				= 6,
-	BG_AB_EVENT_CAPTURE_FARM				= 7,
-	BG_AB_EVENT_CAPTURE_BLACKSMITH			= 8,
-	BG_AB_EVENT_CAPTURE_LUMBERMILL			= 9,
-	BG_AB_EVENT_CAPTURE_GOLDMINE			= 10,
+    BG_AB_EVENT_CAPTURE_STABLE              = 6,
+    BG_AB_EVENT_CAPTURE_FARM                = 7,
+    BG_AB_EVENT_CAPTURE_BLACKSMITH          = 8,
+    BG_AB_EVENT_CAPTURE_LUMBERMILL          = 9,
+    BG_AB_EVENT_CAPTURE_GOLDMINE            = 10,
 
-	BG_AB_EVENT_ALLIANCE_TICK				= 11,
-	BG_AB_EVENT_HORDE_TICK					= 12
+    BG_AB_EVENT_ALLIANCE_TICK               = 11,
+    BG_AB_EVENT_HORDE_TICK                  = 12
 };
 
 enum BG_AB_WorldStates
@@ -67,11 +67,11 @@ enum BG_AB_WorldStates
 
 enum BG_AB_ObjectIds
 {
-    BG_AB_OBJECTID_NODE_BANNER_0		= 180087,       // Stables banner
-    BG_AB_OBJECTID_NODE_BANNER_1		= 180088,       // Blacksmith banner
-    BG_AB_OBJECTID_NODE_BANNER_2		= 180089,       // Farm banner
-    BG_AB_OBJECTID_NODE_BANNER_3		= 180090,       // Lumber mill banner
-    BG_AB_OBJECTID_NODE_BANNER_4		= 180091,       // Gold mine banner
+    BG_AB_OBJECTID_NODE_BANNER_0        = 180087,       // Stables banner
+    BG_AB_OBJECTID_NODE_BANNER_1        = 180088,       // Blacksmith banner
+    BG_AB_OBJECTID_NODE_BANNER_2        = 180089,       // Farm banner
+    BG_AB_OBJECTID_NODE_BANNER_3        = 180090,       // Lumber mill banner
+    BG_AB_OBJECTID_NODE_BANNER_4        = 180091,       // Gold mine banner
 
     BG_AB_OBJECTID_BANNER_A             = 180058,
     BG_AB_OBJECTID_BANNER_CONT_A        = 180059,
@@ -96,7 +96,7 @@ enum BG_AB_ObjectType
     BG_AB_OBJECT_AURA_ALLY               = 5,
     BG_AB_OBJECT_AURA_HORDE              = 6,
     BG_AB_OBJECT_AURA_CONTESTED          = 7,
-	BG_AB_OBJECTS_PER_NODE				 = 8,
+    BG_AB_OBJECTS_PER_NODE               = 8,
 
     BG_AB_OBJECT_GATE_A                  = 40,
     BG_AB_OBJECT_GATE_H                  = 41,
@@ -135,11 +135,11 @@ enum BG_AB_BattlegroundNodes
 
 enum BG_AB_NodeStatus
 {
-	BG_AB_NODE_STATE_NEUTRAL			= 0,
-	BG_AB_NODE_STATE_ALLY_OCCUPIED		= 1,
-	BG_AB_NODE_STATE_HORDE_OCCUPIED		= 2,
-	BG_AB_NODE_STATE_ALLY_CONTESTED		= 3,
-	BG_AB_NODE_STATE_HORDE_CONTESTED	= 4
+    BG_AB_NODE_STATE_NEUTRAL            = 0,
+    BG_AB_NODE_STATE_ALLY_OCCUPIED      = 1,
+    BG_AB_NODE_STATE_HORDE_OCCUPIED     = 2,
+    BG_AB_NODE_STATE_ALLY_CONTESTED     = 3,
+    BG_AB_NODE_STATE_HORDE_CONTESTED    = 4
 };
 
 enum BG_AB_Sounds
@@ -156,19 +156,19 @@ enum BG_AB_Misc
 {
     BG_AB_OBJECTIVE_ASSAULT_BASE        = 122,
     BG_AB_OBJECTIVE_DEFEND_BASE         = 123,
-	BG_AB_EVENT_START_BATTLE			= 9158, // Achievement: Let's Get This Done
-	BG_AB_QUEST_CREDIT_BASE				= 15001,
+    BG_AB_EVENT_START_BATTLE            = 9158, // Achievement: Let's Get This Done
+    BG_AB_QUEST_CREDIT_BASE             = 15001,
 
-	BG_AB_HONOR_TICK_NORMAL				= 260,
-	BG_AB_HONOR_TICK_WEEKEND			= 160,
-	BG_AB_REP_TICK_NORMAL				= 160,
-	BG_AB_REP_TICK_WEEKEND				= 120,
+    BG_AB_HONOR_TICK_NORMAL             = 260,
+    BG_AB_HONOR_TICK_WEEKEND            = 160,
+    BG_AB_REP_TICK_NORMAL               = 160,
+    BG_AB_REP_TICK_WEEKEND              = 120,
 
     BG_AB_WARNING_NEAR_VICTORY_SCORE    = 1400,
     BG_AB_MAX_TEAM_SCORE                = 1600,
 
     BG_AB_FLAG_CAPTURING_TIME           = 60000,
-	BG_AB_BANNER_UPDATE_TIME			= 2000
+    BG_AB_BANNER_UPDATE_TIME            = 2000
 };
 
 const uint32 BG_AB_TickIntervals[BG_AB_DYNAMIC_NODES_COUNT+1] = {0, 12000, 9000, 6000, 3000, 1000};
@@ -250,26 +250,26 @@ class BattlegroundAB : public Battleground
         void SendNodeUpdate(uint8 node);
         void NodeOccupied(uint8 node);
         void NodeDeoccupied(uint8 node);
-		void ApplyPhaseMask();
+        void ApplyPhaseMask();
 
-		struct CapturePointInfo
-		{
-			CapturePointInfo() : _ownerTeamId(TEAM_NEUTRAL), _iconNone(0), _iconCapture(0), _state(BG_AB_NODE_STATE_NEUTRAL), _captured(false)
-			{
-			}
+        struct CapturePointInfo
+        {
+            CapturePointInfo() : _ownerTeamId(TEAM_NEUTRAL), _iconNone(0), _iconCapture(0), _state(BG_AB_NODE_STATE_NEUTRAL), _captured(false)
+            {
+            }
 
-			uint8 _state;
-			uint32 _iconNone;
-			uint32 _iconCapture;
-			TeamId _ownerTeamId;
-			bool _captured;
-		};
+            uint8 _state;
+            uint32 _iconNone;
+            uint32 _iconCapture;
+            TeamId _ownerTeamId;
+            bool _captured;
+        };
 
-		CapturePointInfo _capturePointInfo[BG_AB_DYNAMIC_NODES_COUNT];
-		EventMap _bgEvents;
+        CapturePointInfo _capturePointInfo[BG_AB_DYNAMIC_NODES_COUNT];
+        EventMap _bgEvents;
         uint32 _honorTics;
         uint32 _reputationTics;
-		uint8 _controlledPoints[BG_TEAMS_COUNT];
+        uint8 _controlledPoints[BG_TEAMS_COUNT];
         bool _teamScores500Disadvantage[BG_TEAMS_COUNT];
 };
 #endif

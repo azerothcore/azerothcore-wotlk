@@ -37,10 +37,10 @@ void InstanceScript::SaveToDB()
     //if (data.empty()) // pussywizard: encounterMask can be updated and theres no reason to not save
     //    return;
 
-	// pussywizard:
-	InstanceSave* save = sInstanceSaveMgr->GetInstanceSave(instance->GetInstanceId());
-	if (save)
-		save->SetInstanceData(data);
+    // pussywizard:
+    InstanceSave* save = sInstanceSaveMgr->GetInstanceSave(instance->GetInstanceId());
+    if (save)
+        save->SetInstanceData(data);
 
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_INSTANCE_SAVE_DATA);
     stmt->setString(0, data);
@@ -118,7 +118,7 @@ void InstanceScript::UpdateDoorState(GameObject* door)
     if (range.first == range.second)
         return;
 
-	// xinef: doors can be assigned to few bosses, if any of them demands doors closed - they should be closed (added & operator for assigment)
+    // xinef: doors can be assigned to few bosses, if any of them demands doors closed - they should be closed (added & operator for assigment)
     bool open = true;
     for (; range.first != range.second && open; ++range.first)
     {
@@ -126,7 +126,7 @@ void InstanceScript::UpdateDoorState(GameObject* door)
         switch (info.type)
         {
             case DOOR_TYPE_ROOM:
-				open &= (info.bossInfo->state != IN_PROGRESS) ? true : false;
+                open &= (info.bossInfo->state != IN_PROGRESS) ? true : false;
                 break;
             case DOOR_TYPE_PASSAGE:
                 open &= (info.bossInfo->state == DONE) ? true : false;
@@ -399,21 +399,21 @@ bool InstanceScript::CheckAchievementCriteriaMeet(uint32 criteria_id, Player con
 
 void InstanceScript::SetCompletedEncountersMask(uint32 newMask, bool save)
 {
-	if (completedEncounters == newMask)
-		return;
-	completedEncounters = newMask;
-	// pussywizard:
-	if (save)
-	{
-		InstanceSave* iSave = sInstanceSaveMgr->GetInstanceSave(instance->GetInstanceId());
-		if (iSave)
-			iSave->SetCompletedEncounterMask(completedEncounters);
+    if (completedEncounters == newMask)
+        return;
+    completedEncounters = newMask;
+    // pussywizard:
+    if (save)
+    {
+        InstanceSave* iSave = sInstanceSaveMgr->GetInstanceSave(instance->GetInstanceId());
+        if (iSave)
+            iSave->SetCompletedEncounterMask(completedEncounters);
 
-		PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_INSTANCE_SAVE_ENCOUNTERMASK);
-		stmt->setUInt32(0, completedEncounters);
-		stmt->setUInt32(1, instance->GetInstanceId());
-		CharacterDatabase.Execute(stmt);
-	}
+        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_INSTANCE_SAVE_ENCOUNTERMASK);
+        stmt->setUInt32(0, completedEncounters);
+        stmt->setUInt32(1, instance->GetInstanceId());
+        CharacterDatabase.Execute(stmt);
+    }
 }
 
 void InstanceScript::SendEncounterUnit(uint32 type, Unit* unit /*= NULL*/, uint8 param1 /*= 0*/, uint8 param2 /*= 0*/)

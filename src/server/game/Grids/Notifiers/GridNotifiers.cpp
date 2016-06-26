@@ -71,11 +71,11 @@ void VisibleNotifier::SendToSelf()
 
     for (Player::ClientGUIDs::const_iterator it = vis_guids.begin();it != vis_guids.end(); ++it)
     {
-		// pussywizard: static transports are removed only in RemovePlayerFromMap and here if can no longer detect (eg. phase changed)
-		if (IS_TRANSPORT_GUID(*it))
-			if (GameObject* staticTrans = i_player.GetMap()->GetGameObject(*it))
-				if (i_player.CanSeeOrDetect(staticTrans, false, true))
-					continue;
+        // pussywizard: static transports are removed only in RemovePlayerFromMap and here if can no longer detect (eg. phase changed)
+        if (IS_TRANSPORT_GUID(*it))
+            if (GameObject* staticTrans = i_player.GetMap()->GetGameObject(*it))
+                if (i_player.CanSeeOrDetect(staticTrans, false, true))
+                    continue;
 
         i_player.m_clientGUIDs.erase(*it);
         i_data.AddOutOfRangeGUID(*it);
@@ -127,11 +127,11 @@ void VisibleChangesNotifier::Visit(CreatureMapType &m)
 void VisibleChangesNotifier::Visit(DynamicObjectMapType &m)
 {
     for (DynamicObjectMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
-		if (IS_PLAYER_GUID(iter->GetSource()->GetCasterGUID()))
-			if (Unit* caster = iter->GetSource()->GetCaster())
-				if (Player* player = caster->ToPlayer())
-					if (player->m_seer == iter->GetSource())
-						player->UpdateVisibilityOf(&i_object);
+        if (IS_PLAYER_GUID(iter->GetSource()->GetCasterGUID()))
+            if (Unit* caster = iter->GetSource()->GetCaster())
+                if (Player* player = caster->ToPlayer())
+                    if (player->m_seer == iter->GetSource())
+                        player->UpdateVisibilityOf(&i_object);
 }
 
 inline void CreatureUnitRelocationWorker(Creature* c, Unit* u)
@@ -140,7 +140,7 @@ inline void CreatureUnitRelocationWorker(Creature* c, Unit* u)
         return;
 
     if (c->HasReactState(REACT_AGGRESSIVE) && !c->HasUnitState(UNIT_STATE_SIGHTLESS))
-		if (c->IsAIEnabled && c->CanSeeOrDetect(u, false, true))
+        if (c->IsAIEnabled && c->CanSeeOrDetect(u, false, true))
             c->AI()->MoveInLineOfSight_Safe(u);
 }
 
@@ -161,11 +161,11 @@ void CreatureRelocationNotifier::Visit(PlayerMapType &m)
     {
         Player* player = iter->GetSource();
 
-		// NOTIFY_VISIBILITY_CHANGED does not guarantee that player will do it himself (because distance is also checked), but screw it, it's not that important
+        // NOTIFY_VISIBILITY_CHANGED does not guarantee that player will do it himself (because distance is also checked), but screw it, it's not that important
         if (!player->m_seer->isNeedNotify(NOTIFY_VISIBILITY_CHANGED))
             player->UpdateVisibilityOf(&i_creature);
 
-		// NOTIFY_AI_RELOCATION does not guarantee that player will do it himself (because distance is also checked), but screw it, it's not that important
+        // NOTIFY_AI_RELOCATION does not guarantee that player will do it himself (because distance is also checked), but screw it, it's not that important
         if (!player->m_seer->isNeedNotify(NOTIFY_AI_RELOCATION) && !i_creature.IsMoveInLineOfSightStrictlyDisabled())
             CreatureUnitRelocationWorker(&i_creature, player);
     }
@@ -173,16 +173,16 @@ void CreatureRelocationNotifier::Visit(PlayerMapType &m)
 
 void AIRelocationNotifier::Visit(CreatureMapType &m)
 {
-	bool self = isCreature && !((Creature*)(&i_unit))->IsMoveInLineOfSightStrictlyDisabled();
+    bool self = isCreature && !((Creature*)(&i_unit))->IsMoveInLineOfSightStrictlyDisabled();
     for (CreatureMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
     {
         Creature* c = iter->GetSource();
 
-		// NOTIFY_VISIBILITY_CHANGED | NOTIFY_AI_RELOCATION does not guarantee that unit will do it itself (because distance is also checked), but screw it, it's not that important
-		if (!c->isNeedNotify(NOTIFY_VISIBILITY_CHANGED | NOTIFY_AI_RELOCATION) && !c->IsMoveInLineOfSightStrictlyDisabled())
-			CreatureUnitRelocationWorker(c, &i_unit);
+        // NOTIFY_VISIBILITY_CHANGED | NOTIFY_AI_RELOCATION does not guarantee that unit will do it itself (because distance is also checked), but screw it, it's not that important
+        if (!c->isNeedNotify(NOTIFY_VISIBILITY_CHANGED | NOTIFY_AI_RELOCATION) && !c->IsMoveInLineOfSightStrictlyDisabled())
+            CreatureUnitRelocationWorker(c, &i_unit);
 
-		if (self)
+        if (self)
             CreatureUnitRelocationWorker((Creature*)&i_unit, c);
     }
 }
@@ -239,9 +239,9 @@ void MessageDistDeliverer::Visit(DynamicObjectMapType &m)
         if (!IS_PLAYER_GUID(target->GetCasterGUID()) || !target->InSamePhase(i_phaseMask))
             continue;
 
-		// Xinef: Check whether the dynobject allows to see through it
-		if (!target->IsViewpoint())
-			continue;
+        // Xinef: Check whether the dynobject allows to see through it
+        if (!target->IsViewpoint())
+            continue;
 
         if (target->GetExactDist2dSq(i_source) > i_distSq)
             continue;

@@ -61,38 +61,38 @@ public:
             KillCount                 = 0;
         }
 
-		void InitializeAI()
-		{
-			// Xinef: check if copy is summoned
-			std::list<Creature*> cList;
-			me->GetCreatureListWithEntryInGrid(cList, me->GetEntry(), 50.0f);
-			if (!cList.empty())
-				for (std::list<Creature*>::const_iterator itr = cList.begin(); itr != cList.end(); ++itr)
-					if ((*itr)->IsAlive() && me->GetGUID() != (*itr)->GetGUID())
-					{
-						me->DespawnOrUnsummon(1);
-						break;
-					}
+        void InitializeAI()
+        {
+            // Xinef: check if copy is summoned
+            std::list<Creature*> cList;
+            me->GetCreatureListWithEntryInGrid(cList, me->GetEntry(), 50.0f);
+            if (!cList.empty())
+                for (std::list<Creature*>::const_iterator itr = cList.begin(); itr != cList.end(); ++itr)
+                    if ((*itr)->IsAlive() && me->GetGUID() != (*itr)->GetGUID())
+                    {
+                        me->DespawnOrUnsummon(1);
+                        break;
+                    }
 
-			_introSpoken = false;
-			ScriptedAI::InitializeAI();
-		}
+            _introSpoken = false;
+            ScriptedAI::InitializeAI();
+        }
 
-		void MoveInLineOfSight(Unit* who)
-		{
-			if (!_introSpoken && who->GetTypeId() == TYPEID_PLAYER)
-			{
-				_introSpoken = true;
-				Talk(YELL_TWILIGHTCORRUPTOR_RESPAWN, who);
-				me->setFaction(FACTION_HOSTILE);
-			}
-			ScriptedAI::MoveInLineOfSight(who);
-		}
+        void MoveInLineOfSight(Unit* who)
+        {
+            if (!_introSpoken && who->GetTypeId() == TYPEID_PLAYER)
+            {
+                _introSpoken = true;
+                Talk(YELL_TWILIGHTCORRUPTOR_RESPAWN, who);
+                me->setFaction(FACTION_HOSTILE);
+            }
+            ScriptedAI::MoveInLineOfSight(who);
+        }
 
         void EnterCombat(Unit* /*who*/)
         {
             Talk(YELL_TWILIGHTCORRUPTOR_AGGRO);
-			_events.Reset();
+            _events.Reset();
             _events.ScheduleEvent(EVENT_SOUL_CORRUPTION, 15000);
             _events.ScheduleEvent(EVENT_CREATURE_OF_NIGHTMARE, 30000);
         }
@@ -128,8 +128,8 @@ public:
                         _events.ScheduleEvent(EVENT_SOUL_CORRUPTION, rand()%4000+15000);
                         break;
                     case EVENT_CREATURE_OF_NIGHTMARE:
-						if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 100, true))
-							DoCast(target, SPELL_CREATURE_OF_NIGHTMARE);
+                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 100, true))
+                            DoCast(target, SPELL_CREATURE_OF_NIGHTMARE);
                         _events.ScheduleEvent(EVENT_CREATURE_OF_NIGHTMARE, 45000);
                         break;
                     default:
@@ -142,7 +142,7 @@ public:
         private:
             EventMap _events;
             uint8 KillCount;
-			bool _introSpoken;
+            bool _introSpoken;
     };
 
     CreatureAI* GetAI(Creature* creature) const
@@ -162,7 +162,7 @@ public:
 
     bool OnTrigger(Player* player, const AreaTriggerEntry* /*at*/)
     {
-		if (player->HasQuestForItem(ITEM_FRAGMENT) && !player->HasItemCount(ITEM_FRAGMENT))
+        if (player->HasQuestForItem(ITEM_FRAGMENT) && !player->HasItemCount(ITEM_FRAGMENT))
             player->SummonCreature(NPC_TWILIGHT_CORRUPTER, -10328.16f, -489.57f, 49.95f, 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 240000);
 
         return false;

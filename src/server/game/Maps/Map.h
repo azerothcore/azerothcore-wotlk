@@ -287,7 +287,7 @@ class Map : public GridRefManager<NGridType>
 
         virtual bool AddPlayerToMap(Player*);
         virtual void RemovePlayerFromMap(Player*, bool);
-		virtual void AfterPlayerUnlinkFromMap();
+        virtual void AfterPlayerUnlinkFromMap();
         template<class T> bool AddToMap(T *, bool checkTransport = false);
         template<class T> void RemoveFromMap(T *, bool);
 
@@ -339,7 +339,7 @@ class Map : public GridRefManager<NGridType>
         // some calls like isInWater should not use vmaps due to processor power
         // can return INVALID_HEIGHT if under z+2 z coord not found height
         float GetHeight(float x, float y, float z, bool checkVMap = true, float maxSearchDist = DEFAULT_HEIGHT_SEARCH) const;
-		Transport* GetTransportForPos(uint32 phase, float x, float y, float z, WorldObject* worldobject = NULL);
+        Transport* GetTransportForPos(uint32 phase, float x, float y, float z, WorldObject* worldobject = NULL);
 
         ZLiquidStatus getLiquidStatus(float x, float y, float z, uint8 ReqLiquidType, LiquidData* data = 0) const;
 
@@ -449,7 +449,7 @@ class Map : public GridRefManager<NGridType>
         void UpdateIteratorBack(Player* player);
 
         TempSummon* SummonCreature(uint32 entry, Position const& pos, SummonPropertiesEntry const* properties = NULL, uint32 duration = 0, Unit* summoner = NULL, uint32 spellId = 0, uint32 vehId = 0);
-		GameObject* SummonGameObject(uint32 entry, float x, float y, float z, float ang, float rotation0, float rotation1, float rotation2, float rotation3, uint32 respawnTime, bool checkTransport = true);
+        GameObject* SummonGameObject(uint32 entry, float x, float y, float z, float ang, float rotation0, float rotation1, float rotation2, float rotation3, uint32 respawnTime, bool checkTransport = true);
         void SummonCreatureGroup(uint8 group, std::list<TempSummon*>* list = NULL);
         Player* GetPlayer(uint64 guid);
         Creature* GetCreature(uint64 guid);
@@ -475,7 +475,7 @@ class Map : public GridRefManager<NGridType>
         void RemoveGameObjectModel(const GameObjectModel& model) { _dynamicTree.remove(model); }
         void InsertGameObjectModel(const GameObjectModel& model) { _dynamicTree.insert(model); }
         bool ContainsGameObjectModel(const GameObjectModel& model) const { return _dynamicTree.contains(model);}
-		DynamicMapTree const& GetDynamicMapTree() const { return _dynamicTree; }
+        DynamicMapTree const& GetDynamicMapTree() const { return _dynamicTree; }
         bool getObjectHitPos(uint32 phasemask, float x1, float y1, float z1, float x2, float y2, float z2, float& rx, float &ry, float& rz, float modifyDist);
 
         /*
@@ -506,7 +506,7 @@ class Map : public GridRefManager<NGridType>
         void RemoveGORespawnTime(uint32 dbGuid);
         void LoadRespawnTimes();
         void DeleteRespawnTimes();
-		time_t GetInstanceResetPeriod() const { return _instanceResetPeriod; }
+        time_t GetInstanceResetPeriod() const { return _instanceResetPeriod; }
 
         static void DeleteRespawnTimesInDB(uint16 mapId, uint32 instanceId);
 
@@ -521,13 +521,13 @@ class Map : public GridRefManager<NGridType>
   
         // Checks encounter state at kill/spellcast, originally in InstanceScript however not every map has instance script :(
         void UpdateEncounterState(EncounterCreditType type, uint32 creditEntry, Unit* source);
-		void LogEncounterFinished(EncounterCreditType type, uint32 creditEntry);
+        void LogEncounterFinished(EncounterCreditType type, uint32 creditEntry);
 
         GridMap* GetGrid(float x, float y);
         void EnsureGridCreated(const GridCoord &);
-		bool AllTransportsEmpty() const; // pussywizard
-		void AllTransportsRemovePassengers(); // pussywizard
-		TransportsContainer const& GetAllTransports() const { return _transports; }
+        bool AllTransportsEmpty() const; // pussywizard
+        void AllTransportsRemovePassengers(); // pussywizard
+        TransportsContainer const& GetAllTransports() const { return _transports; }
 
     private:
         void LoadMapAndVMap(int gx, int gy);
@@ -560,7 +560,7 @@ class Map : public GridRefManager<NGridType>
             return i_grids[x][y];
         }
 
-		bool EnsureGridLoaded(Cell const&);
+        bool EnsureGridLoaded(Cell const&);
         bool isGridObjectDataLoaded(uint32 x, uint32 y) const { return getNGrid(x, y)->isGridObjectDataLoaded(); }
         void setGridObjectDataLoaded(bool pLoaded, uint32 x, uint32 y) { getNGrid(x, y)->setGridObjectDataLoaded(pLoaded); }
 
@@ -658,11 +658,11 @@ class Map : public GridRefManager<NGridType>
 
 enum InstanceResetMethod
 {
-    INSTANCE_RESET_ALL,					// reset all option under portrait, resets only normal 5-mans
-    INSTANCE_RESET_CHANGE_DIFFICULTY,	// on changing difficulty
-    INSTANCE_RESET_GLOBAL,				// global id reset
-    INSTANCE_RESET_GROUP_JOIN,			// on joining group
-    INSTANCE_RESET_GROUP_LEAVE			// on leaving group
+    INSTANCE_RESET_ALL,                 // reset all option under portrait, resets only normal 5-mans
+    INSTANCE_RESET_CHANGE_DIFFICULTY,   // on changing difficulty
+    INSTANCE_RESET_GLOBAL,              // global id reset
+    INSTANCE_RESET_GROUP_JOIN,          // on joining group
+    INSTANCE_RESET_GROUP_LEAVE          // on leaving group
 };
 
 class InstanceMap : public Map
@@ -672,10 +672,10 @@ class InstanceMap : public Map
         ~InstanceMap();
         bool AddPlayerToMap(Player*);
         void RemovePlayerFromMap(Player*, bool);
-		void AfterPlayerUnlinkFromMap();
+        void AfterPlayerUnlinkFromMap();
         void Update(const uint32, const uint32, bool thread = true);
-		void CreateInstanceScript(bool load, std::string data, uint32 completedEncounterMask);
-		bool Reset(uint8 method, std::list<uint32>* globalSkipList = NULL);
+        void CreateInstanceScript(bool load, std::string data, uint32 completedEncounterMask);
+        bool Reset(uint8 method, std::list<uint32>* globalSkipList = NULL);
         uint32 GetScriptId() { return i_script_id; }
         InstanceScript* GetInstanceScript() { return instance_script; }
         void PermBindAllPlayers();

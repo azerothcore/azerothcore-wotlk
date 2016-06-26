@@ -108,12 +108,12 @@ void BattlegroundNA::HandleAreaTrigger(Player* player, uint32 trigger)
         case 4536:                                          // buff trigger?
         case 4537:                                          // buff trigger?
             break;
-		// OUTSIDE OF ARENA, TELEPORT!
-		case 4917:
-		case 5006:
-		case 5008:
-			player->NearTeleportTo(4054.15f, 2923.7f, 13.4f, player->GetOrientation());
-			break;
+        // OUTSIDE OF ARENA, TELEPORT!
+        case 4917:
+        case 5006:
+        case 5008:
+            player->NearTeleportTo(4054.15f, 2923.7f, 13.4f, player->GetOrientation());
+            break;
     }
 }
 

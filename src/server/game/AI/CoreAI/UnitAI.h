@@ -121,7 +121,7 @@ struct PowerUsersSelector : public std::unary_function<Unit*, bool>
     Unit const* _me;
     float const _dist;
     bool const _playerOnly;
-	Powers const _power;
+    Powers const _power;
 
 
     PowerUsersSelector(Unit const* unit, Powers power, float dist, bool playerOnly) : _me(unit), _power(power), _dist(dist), _playerOnly(playerOnly) { }
@@ -131,8 +131,8 @@ struct PowerUsersSelector : public std::unary_function<Unit*, bool>
         if (!_me || !target)
             return false;
 
-		if (target->getPowerType() != _power)
-			return false;
+        if (target->getPowerType() != _power)
+            return false;
 
         if (_playerOnly && target->GetTypeId() != TYPEID_PLAYER)
             return false;
@@ -162,8 +162,8 @@ struct FarthestTargetSelector : public std::unary_function<Unit*, bool>
         if (_dist > 0.0f && !_me->IsWithinCombatRange(target, _dist))
             return false;
 
-		if (_inLos && !_me->IsWithinLOSInMap(target))
-			return false;
+        if (_inLos && !_me->IsWithinLOSInMap(target))
+            return false;
 
         return true;
     }
@@ -172,7 +172,7 @@ private:
     const Unit* _me;
     float _dist;
     bool _playerOnly;
-	bool _inLos;
+    bool _inLos;
 };
 
 class UnitAI

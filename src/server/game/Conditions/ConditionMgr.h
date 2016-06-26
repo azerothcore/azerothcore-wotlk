@@ -74,17 +74,17 @@ enum ConditionTypes
     CONDITION_HP_PCT                = 38,                   // hpPct            ComparisonType 0                  true if unit's hp matches given pct
     CONDITION_REALM_ACHIEVEMENT     = 39,                   // achievement_id   0              0                  true if realm achievement is complete
     CONDITION_IN_WATER              = 40,                   // 0                0              0                  true if unit in water
-	// RESERVED						= 41,
-	// RESERVED						= 42,
-	// RESERVED						= 43,
-	// RESERVED						= 44,
-	// RESERVED						= 45,
-	// RESERVED						= 46,
-	// RESERVED						= 47,
-	// RESERVED						= 48,
-	// RESERVED						= 49,
+    // RESERVED                     = 41,
+    // RESERVED                     = 42,
+    // RESERVED                     = 43,
+    // RESERVED                     = 44,
+    // RESERVED                     = 45,
+    // RESERVED                     = 46,
+    // RESERVED                     = 47,
+    // RESERVED                     = 48,
+    // RESERVED                     = 49,
     CONDITION_QUEST_SATISFY_EXCLUSIVE = 50,                 // quest_id         0              0                  true if satisfied exclusive group
-	CONDITION_HAS_AURA_TYPE			= 51,					// aura_type		0			   0				  true if has aura type
+    CONDITION_HAS_AURA_TYPE         = 51,                   // aura_type        0              0                  true if has aura type
     CONDITION_MAX                   = 52                    // MAX
 };
 

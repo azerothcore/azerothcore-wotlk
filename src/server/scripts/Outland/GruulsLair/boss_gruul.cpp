@@ -33,13 +33,13 @@ enum Spells
 
 enum Events
 {
-    EVENT_GROWTH				= 1,
-    EVENT_CAVE_IN				= 2,
-    EVENT_GROUND_SLAM			= 3,
-    EVENT_HURTFUL_STRIKE		= 4,
-    EVENT_REVERBERATION			= 5,
-	EVENT_SHATTER				= 6,
-	EVENT_RECENTLY_SPOKEN		= 7
+    EVENT_GROWTH                = 1,
+    EVENT_CAVE_IN               = 2,
+    EVENT_GROUND_SLAM           = 3,
+    EVENT_HURTFUL_STRIKE        = 4,
+    EVENT_REVERBERATION         = 5,
+    EVENT_SHATTER               = 6,
+    EVENT_RECENTLY_SPOKEN       = 7
 };
 
 class boss_gruul : public CreatureScript
@@ -54,7 +54,7 @@ class boss_gruul : public CreatureScript
             void Reset()
             {
                 _Reset();
-				_caveInTimer = 29000;
+                _caveInTimer = 29000;
             }
 
             void EnterCombat(Unit* /*who*/)
@@ -62,20 +62,20 @@ class boss_gruul : public CreatureScript
                 _EnterCombat();
                 Talk(SAY_AGGRO);
 
-				events.ScheduleEvent(EVENT_GROWTH, 30000);
-				events.ScheduleEvent(EVENT_CAVE_IN, _caveInTimer);
-				events.ScheduleEvent(EVENT_REVERBERATION, 20000);
-				events.ScheduleEvent(EVENT_HURTFUL_STRIKE, 10000);
-				events.ScheduleEvent(EVENT_GROUND_SLAM, 35000);
+                events.ScheduleEvent(EVENT_GROWTH, 30000);
+                events.ScheduleEvent(EVENT_CAVE_IN, _caveInTimer);
+                events.ScheduleEvent(EVENT_REVERBERATION, 20000);
+                events.ScheduleEvent(EVENT_HURTFUL_STRIKE, 10000);
+                events.ScheduleEvent(EVENT_GROUND_SLAM, 35000);
             }
 
             void KilledUnit(Unit* who)
             {
                 if (events.GetNextEventTime(EVENT_RECENTLY_SPOKEN) == 0)
-				{
-					events.ScheduleEvent(EVENT_RECENTLY_SPOKEN, 5000);
+                {
+                    events.ScheduleEvent(EVENT_RECENTLY_SPOKEN, 5000);
                     Talk(SAY_SLAY);
-				}
+                }
             }
 
             void JustDied(Unit* /*killer*/)
@@ -93,46 +93,46 @@ class boss_gruul : public CreatureScript
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
 
-				switch (events.ExecuteEvent())
-				{
-					case EVENT_GROWTH:
-						Talk(EMOTE_GROW);
-						DoCast(me, SPELL_GROWTH);
-						events.ScheduleEvent(EVENT_GROWTH, 30000);
-						break;
-					case EVENT_CAVE_IN:
-						if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
-							me->CastSpell(target, SPELL_CAVE_IN, false);
-						_caveInTimer -= 1500;
-						events.ScheduleEvent(EVENT_CAVE_IN, _caveInTimer);
-						break;
-					case EVENT_REVERBERATION:
-						me->CastSpell(me, SPELL_REVERBERATION, false);
-						events.ScheduleEvent(EVENT_REVERBERATION, 22000);
-						break;
-					case EVENT_HURTFUL_STRIKE:
-						if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO, 1, 5.0f))
-							me->CastSpell(target, SPELL_HURTFUL_STRIKE, false);
-						events.ScheduleEvent(EVENT_HURTFUL_STRIKE, 15000);
-						break;
-					case EVENT_GROUND_SLAM:
-						Talk(SAY_SLAM);
-						me->CastSpell(me, SPELL_GROUND_SLAM, false);
-						events.DelayEvents(8001);
-						events.ScheduleEvent(EVENT_GROUND_SLAM, 60000);
-						events.ScheduleEvent(EVENT_SHATTER, 8000);
-						break;
-					case EVENT_SHATTER:
-						Talk(SAY_SHATTER);
-						me->CastSpell(me, SPELL_SHATTER, false);
-						break;
-				}
+                switch (events.ExecuteEvent())
+                {
+                    case EVENT_GROWTH:
+                        Talk(EMOTE_GROW);
+                        DoCast(me, SPELL_GROWTH);
+                        events.ScheduleEvent(EVENT_GROWTH, 30000);
+                        break;
+                    case EVENT_CAVE_IN:
+                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                            me->CastSpell(target, SPELL_CAVE_IN, false);
+                        _caveInTimer -= 1500;
+                        events.ScheduleEvent(EVENT_CAVE_IN, _caveInTimer);
+                        break;
+                    case EVENT_REVERBERATION:
+                        me->CastSpell(me, SPELL_REVERBERATION, false);
+                        events.ScheduleEvent(EVENT_REVERBERATION, 22000);
+                        break;
+                    case EVENT_HURTFUL_STRIKE:
+                        if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO, 1, 5.0f))
+                            me->CastSpell(target, SPELL_HURTFUL_STRIKE, false);
+                        events.ScheduleEvent(EVENT_HURTFUL_STRIKE, 15000);
+                        break;
+                    case EVENT_GROUND_SLAM:
+                        Talk(SAY_SLAM);
+                        me->CastSpell(me, SPELL_GROUND_SLAM, false);
+                        events.DelayEvents(8001);
+                        events.ScheduleEvent(EVENT_GROUND_SLAM, 60000);
+                        events.ScheduleEvent(EVENT_SHATTER, 8000);
+                        break;
+                    case EVENT_SHATTER:
+                        Talk(SAY_SHATTER);
+                        me->CastSpell(me, SPELL_SHATTER, false);
+                        break;
+                }
 
                 DoMeleeAttackIfReady();
             }
 
-			private:
-				uint32 _caveInTimer;
+            private:
+                uint32 _caveInTimer;
         };
 
         CreatureAI* GetAI(Creature* creature) const
@@ -153,7 +153,7 @@ class spell_gruul_ground_slam : public SpellScriptLoader
             void HandleScriptEffect(SpellEffIndex /*effIndex*/)
             {
                 if (Unit* target = GetHitUnit())
-					target->KnockbackFrom(GetCaster()->GetPositionX(), GetCaster()->GetPositionY(), 15.0f, 15.0f);
+                    target->KnockbackFrom(GetCaster()->GetPositionX(), GetCaster()->GetPositionY(), 15.0f, 15.0f);
             }
 
             void Register()
@@ -179,8 +179,8 @@ class spell_gruul_ground_slam_trigger : public SpellScriptLoader
 
             void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
             {
-				if (GetUnitOwner()->GetAuraCount(GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell) == 5)
-					GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_STONED, true);
+                if (GetUnitOwner()->GetAuraCount(GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell) == 5)
+                    GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_STONED, true);
             }
 
             void Register()
@@ -207,10 +207,10 @@ class spell_gruul_shatter : public SpellScriptLoader
             void HandleScriptEffect(SpellEffIndex /*effIndex*/)
             {
                 if (Unit* target = GetHitUnit())
-				{
+                {
                     target->RemoveAurasDueToSpell(SPELL_STONED);
                     target->CastSpell((Unit*)NULL, SPELL_SHATTER_EFFECT, true);
-				}
+                }
             }
 
             void Register()
@@ -263,8 +263,8 @@ class spell_gruul_shatter_effect : public SpellScriptLoader
 void AddSC_boss_gruul()
 {
     new boss_gruul();
-	new spell_gruul_ground_slam();
-	new spell_gruul_ground_slam_trigger();
+    new spell_gruul_ground_slam();
+    new spell_gruul_ground_slam_trigger();
     new spell_gruul_shatter();
     new spell_gruul_shatter_effect();
 }

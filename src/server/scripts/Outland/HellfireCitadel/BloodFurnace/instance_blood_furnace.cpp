@@ -16,10 +16,10 @@ class instance_blood_furnace : public InstanceMapScript
         {
             instance_blood_furnace_InstanceMapScript(Map* map) : InstanceScript(map) {}
 
-			uint32 _auiEncounter[MAX_ENCOUNTER];
+            uint32 _auiEncounter[MAX_ENCOUNTER];
             uint64 _bossGUIDs[3];
-			uint64 _doorGUIDs[6];
-			uint64 _prisonGUIDs[4];
+            uint64 _doorGUIDs[6];
+            uint64 _prisonGUIDs[4];
 
             std::set<uint64> _prisonersCell[4];
 
@@ -30,13 +30,13 @@ class instance_blood_furnace : public InstanceMapScript
             void Initialize()
             {
                 memset(&_auiEncounter, 0, sizeof(_auiEncounter));
-				memset(&_bossGUIDs, 0, sizeof(_bossGUIDs));
-				memset(&_doorGUIDs, 0, sizeof(_doorGUIDs));
-				memset(&_prisonGUIDs, 0, sizeof(_prisonGUIDs));
-				memset(&_prisonerCounter, 0, sizeof(_prisonerCounter));
+                memset(&_bossGUIDs, 0, sizeof(_bossGUIDs));
+                memset(&_doorGUIDs, 0, sizeof(_doorGUIDs));
+                memset(&_prisonGUIDs, 0, sizeof(_prisonGUIDs));
+                memset(&_prisonerCounter, 0, sizeof(_prisonerCounter));
 
-				for (uint8 i = 0; i < 4; ++i)
-					_prisonersCell[i].clear();
+                for (uint8 i = 0; i < 4; ++i)
+                    _prisonersCell[i].clear();
 
                 _broggokLeverGUID = 0;
             }
@@ -73,19 +73,19 @@ class instance_blood_furnace : public InstanceMapScript
                  if (go->GetEntry() == 181811)               //The Maker Front door
                      _doorGUIDs[1] = go->GetGUID();
                  if (go->GetEntry() == 181812)                //The Maker Rear door
-				 {
+                 {
                      _doorGUIDs[2] = go->GetGUID();
-					 if (GetData(DATA_THE_MAKER) == DONE)
-						 HandleGameObject(go->GetGUID(), true);
-				 }
+                     if (GetData(DATA_THE_MAKER) == DONE)
+                         HandleGameObject(go->GetGUID(), true);
+                 }
                  if (go->GetEntry() == 181822)               //Broggok Front door
                      _doorGUIDs[3] = go->GetGUID();
                  if (go->GetEntry() == 181819)               //Broggok Rear door
-				 {
+                 {
                      _doorGUIDs[4] = go->GetGUID();
-					 if (GetData(DATA_BROGGOK) == DONE)
-						 HandleGameObject(go->GetGUID(), true);
-				 }
+                     if (GetData(DATA_BROGGOK) == DONE)
+                         HandleGameObject(go->GetGUID(), true);
+                 }
                  if (go->GetEntry() == 181823)               //Kelidan exit door
                      _doorGUIDs[5] = go->GetGUID();
 
@@ -107,9 +107,9 @@ class instance_blood_furnace : public InstanceMapScript
                 switch (data)
                 {
                      case DATA_THE_MAKER:
-					 case DATA_BROGGOK:
+                     case DATA_BROGGOK:
                      case DATA_KELIDAN:
-						 return _bossGUIDs[data];
+                         return _bossGUIDs[data];
 
                      case DATA_DOOR1:
                      case DATA_DOOR2:
@@ -117,13 +117,13 @@ class instance_blood_furnace : public InstanceMapScript
                      case DATA_DOOR4:
                      case DATA_DOOR5:
                      case DATA_DOOR6:
-						 return _doorGUIDs[data-DATA_DOOR1];
+                         return _doorGUIDs[data-DATA_DOOR1];
 
                      case DATA_PRISON_CELL1:
                      case DATA_PRISON_CELL2:
                      case DATA_PRISON_CELL3:
                      case DATA_PRISON_CELL4:
-						 return _prisonGUIDs[data-DATA_PRISON_CELL1];
+                         return _prisonGUIDs[data-DATA_PRISON_CELL1];
                 }
                 return 0;
             }
@@ -133,37 +133,37 @@ class instance_blood_furnace : public InstanceMapScript
                  switch (type)
                  {
                      case DATA_THE_MAKER:
-					 case DATA_BROGGOK:
-					 case DATA_KELIDAN:
+                     case DATA_BROGGOK:
+                     case DATA_KELIDAN:
                          _auiEncounter[type] = data;
-						 if (type == DATA_BROGGOK)
-							 UpdateBroggokEvent(data);
+                         if (type == DATA_BROGGOK)
+                             UpdateBroggokEvent(data);
                          break;
                  }
 
                 if (data == DONE)
-					SaveToDB();
-			}
+                    SaveToDB();
+            }
 
-			std::string GetSaveData()
-			{
-				OUT_SAVE_INST_DATA;
+            std::string GetSaveData()
+            {
+                OUT_SAVE_INST_DATA;
 
-				std::ostringstream saveStream;
+                std::ostringstream saveStream;
                 saveStream << "B F " << _auiEncounter[0] << ' ' << _auiEncounter[1] << ' ' << _auiEncounter[2];
 
-				OUT_SAVE_INST_DATA_COMPLETE;
-				return saveStream.str();
-			}
+                OUT_SAVE_INST_DATA_COMPLETE;
+                return saveStream.str();
+            }
 
             uint32 GetData(uint32 type) const
             {
                 switch (type)
                 {
-					case DATA_THE_MAKER:
-					case DATA_BROGGOK:
-					case DATA_KELIDAN:
-						return _auiEncounter[type];
+                    case DATA_THE_MAKER:
+                    case DATA_BROGGOK:
+                    case DATA_KELIDAN:
+                        return _auiEncounter[type];
                 }
                 return 0;
             }
@@ -176,21 +176,21 @@ class instance_blood_furnace : public InstanceMapScript
                     return;
                 }
 
-				OUT_LOAD_INST_DATA(strIn);
+                OUT_LOAD_INST_DATA(strIn);
 
-				char dataHead1, dataHead2;
+                char dataHead1, dataHead2;
 
-				std::istringstream loadStream(strIn);
-				loadStream >> dataHead1 >> dataHead2;
+                std::istringstream loadStream(strIn);
+                loadStream >> dataHead1 >> dataHead2;
 
-				if (dataHead1 == 'B' && dataHead2 == 'F')
-				{
-					loadStream >> _auiEncounter[0] >> _auiEncounter[1] >> _auiEncounter[2];
+                if (dataHead1 == 'B' && dataHead2 == 'F')
+                {
+                    loadStream >> _auiEncounter[0] >> _auiEncounter[1] >> _auiEncounter[2];
 
-					for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
-						if (_auiEncounter[i] == IN_PROGRESS || _auiEncounter[i] == FAIL)
-							_auiEncounter[i] = NOT_STARTED;
-				}
+                    for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
+                        if (_auiEncounter[i] == IN_PROGRESS || _auiEncounter[i] == FAIL)
+                            _auiEncounter[i] = NOT_STARTED;
+                }
 
                 OUT_LOAD_INST_DATA_COMPLETE;
             }
@@ -215,12 +215,12 @@ class instance_blood_furnace : public InstanceMapScript
 
             void ResetPrisons()
             {
-				for (uint8 i = 0; i < 4; ++i)
-				{
-					_prisonerCounter[i] = _prisonersCell[i].size();
-					ResetPrisoners(_prisonersCell[i]);
-					HandleGameObject(_prisonGUIDs[i], false);
-				}
+                for (uint8 i = 0; i < 4; ++i)
+                {
+                    _prisonerCounter[i] = _prisonersCell[i].size();
+                    ResetPrisoners(_prisonersCell[i]);
+                    HandleGameObject(_prisonGUIDs[i], false);
+                }
             }
 
             void ResetPrisoners(std::set<uint64> prisoners)
@@ -248,13 +248,13 @@ class instance_blood_furnace : public InstanceMapScript
                     {
                         _prisonersCell[0].insert(creature->GetGUID());
                         ++_prisonerCounter[0];
-						ResetPrisoner(creature);
+                        ResetPrisoner(creature);
                     }
                     else if (posY >= 76.0f && posY <= 91.0f)
                     {
                         _prisonersCell[1].insert(creature->GetGUID());
                         ++_prisonerCounter[1];
-						ResetPrisoner(creature);
+                        ResetPrisoner(creature);
                     }
                 }
                 else if (posX >= 490.0f && posX <= 506.0f)
@@ -263,13 +263,13 @@ class instance_blood_furnace : public InstanceMapScript
                     {
                         _prisonersCell[2].insert(creature->GetGUID());
                         ++_prisonerCounter[2];
-						ResetPrisoner(creature);
+                        ResetPrisoner(creature);
                     }
                     else if (posY >= 76.0f && posY <= 91.0f)
                     {
                         _prisonersCell[3].insert(creature->GetGUID());
                         ++_prisonerCounter[3];
-						ResetPrisoner(creature);
+                        ResetPrisoner(creature);
                     }
                 }
             }

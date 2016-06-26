@@ -83,11 +83,11 @@ void WorldSession::HandleGroupInviteOpcode(WorldPacket& recvData)
         return;
     }
 
-	if (GetPlayer()->IsSpectator() || player->IsSpectator())
-	{
+    if (GetPlayer()->IsSpectator() || player->IsSpectator())
+    {
         SendPartyResult(PARTY_OP_INVITE, membername, ERR_INVITE_RESTRICTED);
-		return;
-	}
+        return;
+    }
 
     // restrict invite to GMs
     if (!sWorld->getBoolConfig(CONFIG_ALLOW_GM_GROUP) && !GetPlayer()->IsGameMaster() && player->IsGameMaster())
@@ -97,7 +97,7 @@ void WorldSession::HandleGroupInviteOpcode(WorldPacket& recvData)
     }
 
     // can't group with
-	if (!GetPlayer()->IsGameMaster() && !sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP) && GetPlayer()->GetTeamId() != player->GetTeamId())
+    if (!GetPlayer()->IsGameMaster() && !sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP) && GetPlayer()->GetTeamId() != player->GetTeamId())
     {
         SendPartyResult(PARTY_OP_INVITE, membername, ERR_PLAYER_WRONG_FACTION);
         return;
@@ -219,11 +219,11 @@ void WorldSession::HandleGroupAcceptOpcode(WorldPacket& recvData)
     // Remove player from invitees in any case
     group->RemoveInvite(GetPlayer());
 
-	if (GetPlayer()->IsSpectator())
-	{
+    if (GetPlayer()->IsSpectator())
+    {
         SendPartyResult(PARTY_OP_INVITE, "", ERR_INVITE_RESTRICTED);
-		return;
-	}
+        return;
+    }
 
     if (group->GetLeaderGUID() == GetPlayer()->GetGUID())
     {
@@ -244,7 +244,7 @@ void WorldSession::HandleGroupAcceptOpcode(WorldPacket& recvData)
     if (!group->IsCreated())
     {
         // This can happen if the leader is zoning. To be removed once delayed actions for zoning are implemented
-		if (!leader || leader->IsSpectator())
+        if (!leader || leader->IsSpectator())
         {
             group->RemoveAllInvites();
             return;
@@ -303,8 +303,8 @@ void WorldSession::HandleGroupUninviteGuidOpcode(WorldPacket& recvData)
         return;
     }
 
-	// Xinef: name is properly filled in packets
-	sObjectMgr->GetPlayerNameByGUID(guid, name);
+    // Xinef: name is properly filled in packets
+    sObjectMgr->GetPlayerNameByGUID(guid, name);
 
     PartyResult res = GetPlayer()->CanUninviteFromGroup();
     if (res != ERR_PARTY_RESULT_OK)
@@ -317,12 +317,12 @@ void WorldSession::HandleGroupUninviteGuidOpcode(WorldPacket& recvData)
     if (!grp)
         return;
 
-	// Xinef: do not allow to kick with empty reason, this will resend packet with given reason
-	if (grp->isLFGGroup() && reason.empty())
-	{
+    // Xinef: do not allow to kick with empty reason, this will resend packet with given reason
+    if (grp->isLFGGroup() && reason.empty())
+    {
         SendPartyResult(PARTY_OP_UNINVITE, name, ERR_VOTE_KICK_REASON_NEEDED);
         return;
-	}
+    }
 
     if (grp->IsLeader(guid) && !grp->isLFGGroup())
     {
@@ -447,8 +447,8 @@ void WorldSession::HandleLootMethodOpcode(WorldPacket& recvData)
         return;
 
     /** error handling **/
-	// Xinef: Check if group is LFG
-	if (!group->IsLeader(GetPlayer()->GetGUID()) || group->isLFGGroup())
+    // Xinef: Check if group is LFG
+    if (!group->IsLeader(GetPlayer()->GetGUID()) || group->isLFGGroup())
         return;
 
     if (lootMethod > NEED_BEFORE_GREED)

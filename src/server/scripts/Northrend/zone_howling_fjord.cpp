@@ -39,112 +39,112 @@ EndContentData */
 class npc_attracted_reef_bull : public CreatureScript
 {
 public:
-	npc_attracted_reef_bull() : CreatureScript("npc_attracted_reef_bull") { }
+    npc_attracted_reef_bull() : CreatureScript("npc_attracted_reef_bull") { }
 
-	struct npc_attracted_reef_bullAI : public NullCreatureAI
-	{
-		npc_attracted_reef_bullAI(Creature* creature) : NullCreatureAI(creature)
-		{
-			me->SetDisableGravity(true);
-			if (me->IsSummon())
-				if (Unit* owner = me->ToTempSummon()->GetSummoner())
-					me->GetMotionMaster()->MovePoint(0, *owner);
-		}
+    struct npc_attracted_reef_bullAI : public NullCreatureAI
+    {
+        npc_attracted_reef_bullAI(Creature* creature) : NullCreatureAI(creature)
+        {
+            me->SetDisableGravity(true);
+            if (me->IsSummon())
+                if (Unit* owner = me->ToTempSummon()->GetSummoner())
+                    me->GetMotionMaster()->MovePoint(0, *owner);
+        }
 
-		void MovementInform(uint32 type, uint32 id)
-		{
-			if (Creature* cow = me->FindNearestCreature(24797, 5.0f, true))
-			{
-				me->CastSpell(me, 44460, true);
-				me->DespawnOrUnsummon(10000);
-				cow->CastSpell(cow, 44460, true);
-				cow->DespawnOrUnsummon(10000);
-				if (me->IsSummon())
-					if (Unit* owner = me->ToTempSummon()->GetSummoner())
-						owner->CastSpell(owner, 44463, true);
-			}
-		}
-		
-		void SpellHit(Unit* caster, const SpellInfo* spellInfo)
-		{
-			if (caster && spellInfo->Id == 44454)
-				me->GetMotionMaster()->MovePoint(0, *caster);
-		}
-	};
+        void MovementInform(uint32 type, uint32 id)
+        {
+            if (Creature* cow = me->FindNearestCreature(24797, 5.0f, true))
+            {
+                me->CastSpell(me, 44460, true);
+                me->DespawnOrUnsummon(10000);
+                cow->CastSpell(cow, 44460, true);
+                cow->DespawnOrUnsummon(10000);
+                if (me->IsSummon())
+                    if (Unit* owner = me->ToTempSummon()->GetSummoner())
+                        owner->CastSpell(owner, 44463, true);
+            }
+        }
+        
+        void SpellHit(Unit* caster, const SpellInfo* spellInfo)
+        {
+            if (caster && spellInfo->Id == 44454)
+                me->GetMotionMaster()->MovePoint(0, *caster);
+        }
+    };
 
-	CreatureAI *GetAI(Creature* creature) const
-	{
-		return new npc_attracted_reef_bullAI(creature);
-	}
+    CreatureAI *GetAI(Creature* creature) const
+    {
+        return new npc_attracted_reef_bullAI(creature);
+    }
 };
 
 class npc_your_inner_turmoil : public CreatureScript
 {
 public:
-	npc_your_inner_turmoil() : CreatureScript("npc_your_inner_turmoil") { }
+    npc_your_inner_turmoil() : CreatureScript("npc_your_inner_turmoil") { }
 
-	struct npc_your_inner_turmoilAI : public ScriptedAI
-	{
-		npc_your_inner_turmoilAI(Creature* creature) : ScriptedAI(creature) {}
+    struct npc_your_inner_turmoilAI : public ScriptedAI
+    {
+        npc_your_inner_turmoilAI(Creature* creature) : ScriptedAI(creature) {}
 
-		uint32 timer;
-		short phase;
+        uint32 timer;
+        short phase;
 
-		void Reset()
-		{
-			timer = 0;
-			phase = 0;
-		}
+        void Reset()
+        {
+            timer = 0;
+            phase = 0;
+        }
 
-		void UpdateAI(uint32 diff)
-		{
-			if (timer >= 6000 && phase < 4)
-			{
-				phase++;
-				setphase(phase);
-				timer = 0;
-			}
-			
-			timer += diff;
-			
-			DoMeleeAttackIfReady();
-		}
+        void UpdateAI(uint32 diff)
+        {
+            if (timer >= 6000 && phase < 4)
+            {
+                phase++;
+                setphase(phase);
+                timer = 0;
+            }
+            
+            timer += diff;
+            
+            DoMeleeAttackIfReady();
+        }
 
-		void setphase(short phase)
-		{
-			Unit* summoner = me->ToTempSummon() ? me->ToTempSummon()->GetSummoner() : NULL;
-			if (!summoner || summoner->GetTypeId() != TYPEID_PLAYER)
-				return;
+        void setphase(short phase)
+        {
+            Unit* summoner = me->ToTempSummon() ? me->ToTempSummon()->GetSummoner() : NULL;
+            if (!summoner || summoner->GetTypeId() != TYPEID_PLAYER)
+                return;
 
-			switch (phase)
-			{
-				case 1:
-					me->MonsterWhisper("You think that you can get rid of me through meditation?", summoner->ToPlayer());
-					return;
-				case 2:
-					me->MonsterWhisper("Fool! I will destroy you and finally become that which has been building inside of you all these years!", summoner->ToPlayer());
-					return;
-				case 3:
-					me->MonsterWhisper("You cannot defeat me. I'm an inseparable part of you!", summoner->ToPlayer());
-					return;
-				case 4:
-					me->MonsterWhisper("NOOOOOOOoooooooooo!", summoner->ToPlayer());
-					me->SetLevel(summoner->getLevel());
-					me->setFaction(14);
-					if (me->GetExactDist(summoner) < 50.0f)
-					{
-						me->UpdatePosition(summoner->GetPositionX(), summoner->GetPositionY(), summoner->GetPositionZ(), 0.0f, true);
-						summoner->CastSpell(me, 50218, true); // clone caster
-						AttackStart(summoner);
-					}
-			}
-		}
-	};
+            switch (phase)
+            {
+                case 1:
+                    me->MonsterWhisper("You think that you can get rid of me through meditation?", summoner->ToPlayer());
+                    return;
+                case 2:
+                    me->MonsterWhisper("Fool! I will destroy you and finally become that which has been building inside of you all these years!", summoner->ToPlayer());
+                    return;
+                case 3:
+                    me->MonsterWhisper("You cannot defeat me. I'm an inseparable part of you!", summoner->ToPlayer());
+                    return;
+                case 4:
+                    me->MonsterWhisper("NOOOOOOOoooooooooo!", summoner->ToPlayer());
+                    me->SetLevel(summoner->getLevel());
+                    me->setFaction(14);
+                    if (me->GetExactDist(summoner) < 50.0f)
+                    {
+                        me->UpdatePosition(summoner->GetPositionX(), summoner->GetPositionY(), summoner->GetPositionZ(), 0.0f, true);
+                        summoner->CastSpell(me, 50218, true); // clone caster
+                        AttackStart(summoner);
+                    }
+            }
+        }
+    };
 
-	CreatureAI *GetAI(Creature* creature) const
-	{
-		return new npc_your_inner_turmoilAI(creature);
-	}
+    CreatureAI *GetAI(Creature* creature) const
+    {
+        return new npc_your_inner_turmoilAI(creature);
+    }
 };
 
 
@@ -172,7 +172,7 @@ public:
     {
         if (quest->GetQuestId() == QUEST_TRAIL_OF_FIRE)
         {
-			creature->setFaction(player->GetTeamId() == TEAM_ALLIANCE ? FACTION_ESCORTEE_A : FACTION_ESCORTEE_H);
+            creature->setFaction(player->GetTeamId() == TEAM_ALLIANCE ? FACTION_ESCORTEE_A : FACTION_ESCORTEE_H);
             CAST_AI(npc_escortAI, (creature->AI()))->Start(true, false, player->GetGUID());
         }
         return true;
@@ -386,11 +386,11 @@ public:
 
 void AddSC_howling_fjord()
 {
-	// Ours
-	new npc_attracted_reef_bull();
-	new npc_your_inner_turmoil();
+    // Ours
+    new npc_attracted_reef_bull();
+    new npc_your_inner_turmoil();
 
-	// Theirs
+    // Theirs
     new npc_apothecary_hanes();
     new npc_plaguehound_tracker();
     new npc_razael_and_lyana();

@@ -53,8 +53,8 @@ class AuraEffect
         int32 GetMiscValueB() const { return m_spellInfo->Effects[m_effIndex].MiscValueB; }
         int32 GetMiscValue() const { return m_spellInfo->Effects[m_effIndex].MiscValue; }
         AuraType GetAuraType() const { return (AuraType)m_spellInfo->Effects[m_effIndex].ApplyAuraName; }
-		int32 GetAmount() const { return m_isAuraEnabled ? m_amount : 0; }
-		int32 GetForcedAmount() const { return m_amount; }
+        int32 GetAmount() const { return m_isAuraEnabled ? m_amount : 0; }
+        int32 GetForcedAmount() const { return m_amount; }
         void SetAmount(int32 amount) { m_amount = amount; m_canBeRecalculated = false;}
 
         int32 GetPeriodicTimer() const { return m_periodicTimer; }
@@ -62,7 +62,7 @@ class AuraEffect
 
         int32 CalculateAmount(Unit* caster);
         void CalculatePeriodic(Unit* caster, bool create = false, bool load = false);
-		void CalculatePeriodicData();
+        void CalculatePeriodicData();
         void CalculateSpellMod();
         void ChangeAmount(int32 newAmount, bool mark = true, bool onStackOrReapply = false);
         void RecalculateAmount() { if (!CanBeRecalculated()) return; ChangeAmount(CalculateAmount(GetCaster()), false); }
@@ -95,18 +95,18 @@ class AuraEffect
         // add/remove SPELL_AURA_MOD_SHAPESHIFT (36) linked auras
         void HandleShapeshiftBoosts(Unit* target, bool apply) const;
 
-		// xinef: storing initial crit chance
-		float GetCritChance() const { return m_critChance; }
-		void SetCritChance(float crit) { m_critChance = crit; }
-		uint8 GetCasterLevel() const { return m_casterLevel; }
-		bool CanApplyResilience() const { return m_applyResilience; }
-		float GetPctMods() const { return m_pctMods; }
+        // xinef: storing initial crit chance
+        float GetCritChance() const { return m_critChance; }
+        void SetCritChance(float crit) { m_critChance = crit; }
+        uint8 GetCasterLevel() const { return m_casterLevel; }
+        bool CanApplyResilience() const { return m_applyResilience; }
+        float GetPctMods() const { return m_pctMods; }
 
-		// xinef: stacking
-		uint32 GetAuraGroup() const { return m_auraGroup; }
-		int32 GetOldAmount() const { return m_oldAmount; }
-		void SetOldAmount(int32 amount) { m_oldAmount = amount; }
-		void SetEnabled(bool enabled) { m_isAuraEnabled = enabled; }
+        // xinef: stacking
+        uint32 GetAuraGroup() const { return m_auraGroup; }
+        int32 GetOldAmount() const { return m_oldAmount; }
+        void SetOldAmount(int32 amount) { m_oldAmount = amount; }
+        void SetEnabled(bool enabled) { m_isAuraEnabled = enabled; }
 
     private:
         Aura* const m_base;
@@ -114,18 +114,18 @@ class AuraEffect
         SpellInfo const* const m_spellInfo;
         int32 const m_baseAmount;
 
-		bool m_applyResilience;
-		uint8 m_casterLevel;
+        bool m_applyResilience;
+        uint8 m_casterLevel;
         int32 m_amount;
-		float m_critChance;
-		float m_pctMods;
+        float m_critChance;
+        float m_pctMods;
 
-		// xinef: stacking
-		uint32 m_auraGroup;
-		int32 m_oldAmount;
-		bool m_isAuraEnabled;
-		// xinef: channel information for channel triggering
-		ChannelTargetData* m_channelData;
+        // xinef: stacking
+        uint32 m_auraGroup;
+        int32 m_oldAmount;
+        bool m_isAuraEnabled;
+        // xinef: channel information for channel triggering
+        ChannelTargetData* m_channelData;
 
 
         SpellModifier* m_spellmod;

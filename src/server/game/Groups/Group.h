@@ -122,16 +122,16 @@ enum GroupUpdateFlags
 
 enum lfgGroupFlags
 {
-	GROUP_LFG_FLAG_APPLY_RANDOM_BUFF		= 0x001,
-	GROUP_LFG_FLAG_IS_RANDOM_INSTANCE		= 0x002,
-	GROUP_LFG_FLAG_IS_HEROIC				= 0x004
+    GROUP_LFG_FLAG_APPLY_RANDOM_BUFF        = 0x001,
+    GROUP_LFG_FLAG_IS_RANDOM_INSTANCE       = 0x002,
+    GROUP_LFG_FLAG_IS_HEROIC                = 0x004
 };
 
 enum DifficultyPreventionChangeType
 {
-	DIFFICULTY_PREVENTION_CHANGE_NONE					= 0,
-	DIFFICULTY_PREVENTION_CHANGE_RECENTLY_CHANGED		= 1,
-	DIFFICULTY_PREVENTION_CHANGE_BOSS_KILLED			= 2
+    DIFFICULTY_PREVENTION_CHANGE_NONE                   = 0,
+    DIFFICULTY_PREVENTION_CHANGE_RECENTLY_CHANGED       = 1,
+    DIFFICULTY_PREVENTION_CHANGE_BOSS_KILLED            = 2
 };
 
 #define GROUP_UPDATE_FLAGS_COUNT          20
@@ -302,22 +302,22 @@ class Group
         // FG: evil hacks
         void BroadcastGroupUpdate(void);
 
-		// LFG
-		void AddLfgBuffFlag() { m_lfgGroupFlags |= GROUP_LFG_FLAG_APPLY_RANDOM_BUFF; }
-		void AddLfgRandomInstanceFlag() { m_lfgGroupFlags |= GROUP_LFG_FLAG_IS_RANDOM_INSTANCE; }
-		void AddLfgHeroicFlag() { m_lfgGroupFlags |= GROUP_LFG_FLAG_IS_HEROIC; }
-		bool IsLfgWithBuff() const { return isLFGGroup() && (m_lfgGroupFlags & GROUP_LFG_FLAG_APPLY_RANDOM_BUFF); }
-		bool IsLfgRandomInstance() const { return isLFGGroup() && (m_lfgGroupFlags & GROUP_LFG_FLAG_IS_RANDOM_INSTANCE); }
-		bool IsLfgHeroic() const { return isLFGGroup() && (m_lfgGroupFlags & GROUP_LFG_FLAG_IS_HEROIC); }
+        // LFG
+        void AddLfgBuffFlag() { m_lfgGroupFlags |= GROUP_LFG_FLAG_APPLY_RANDOM_BUFF; }
+        void AddLfgRandomInstanceFlag() { m_lfgGroupFlags |= GROUP_LFG_FLAG_IS_RANDOM_INSTANCE; }
+        void AddLfgHeroicFlag() { m_lfgGroupFlags |= GROUP_LFG_FLAG_IS_HEROIC; }
+        bool IsLfgWithBuff() const { return isLFGGroup() && (m_lfgGroupFlags & GROUP_LFG_FLAG_APPLY_RANDOM_BUFF); }
+        bool IsLfgRandomInstance() const { return isLFGGroup() && (m_lfgGroupFlags & GROUP_LFG_FLAG_IS_RANDOM_INSTANCE); }
+        bool IsLfgHeroic() const { return isLFGGroup() && (m_lfgGroupFlags & GROUP_LFG_FLAG_IS_HEROIC); }
 
-		// Difficulty Change
-		uint32 GetDifficultyChangePreventionTime() const { return _difficultyChangePreventionTime > time(NULL) ? _difficultyChangePreventionTime - time(NULL) : 0; }
-		DifficultyPreventionChangeType GetDifficultyChangePreventionReason() const { return _difficultyChangePreventionType; }
-		void SetDifficultyChangePrevention(DifficultyPreventionChangeType type)
-		{
-			_difficultyChangePreventionTime = time(NULL) + MINUTE;
-			_difficultyChangePreventionType = type;
-		}
+        // Difficulty Change
+        uint32 GetDifficultyChangePreventionTime() const { return _difficultyChangePreventionTime > time(NULL) ? _difficultyChangePreventionTime - time(NULL) : 0; }
+        DifficultyPreventionChangeType GetDifficultyChangePreventionReason() const { return _difficultyChangePreventionType; }
+        void SetDifficultyChangePrevention(DifficultyPreventionChangeType type)
+        {
+            _difficultyChangePreventionTime = time(NULL) + MINUTE;
+            _difficultyChangePreventionType = type;
+        }
 
     protected:
         void _homebindIfInstance(Player* player);
@@ -352,8 +352,8 @@ class Group
         uint32              m_maxEnchantingLevel;
         uint8               m_lfgGroupFlags;
 
-		// Xinef: change difficulty prevention
-		uint32 _difficultyChangePreventionTime;
-		DifficultyPreventionChangeType _difficultyChangePreventionType;
+        // Xinef: change difficulty prevention
+        uint32 _difficultyChangePreventionTime;
+        DifficultyPreventionChangeType _difficultyChangePreventionType;
 };
 #endif

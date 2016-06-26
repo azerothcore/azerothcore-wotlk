@@ -95,7 +95,7 @@ void GuildMgr::LoadGuilds()
     {
         uint32 oldMSTime = getMSTime();
 
-		CharacterDatabase.DirectExecute("DELETE g FROM guild g LEFT JOIN guild_member gm ON g.guildid = gm.guildid WHERE gm.guildid IS NULL");
+        CharacterDatabase.DirectExecute("DELETE g FROM guild g LEFT JOIN guild_member gm ON g.guildid = gm.guildid WHERE gm.guildid IS NULL");
 
                                                      //          0          1       2             3              4              5              6
         QueryResult result = CharacterDatabase.Query("SELECT g.guildid, g.name, g.leaderguid, g.EmblemStyle, g.EmblemColor, g.BorderStyle, g.BorderColor, "

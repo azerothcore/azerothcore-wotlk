@@ -54,10 +54,10 @@ class AreaTrigger_at_voltarus_middle : public AreaTriggerScript
         {
             if (player->IsAlive() && !player->IsInCombat())
                 if (player->HasItemCount(39319)) // Scepter of Domination
-				{
-					player->TeleportTo(571, 6242.67f, -1972.10f, 484.783f, 0.6f);
-					return true;
-				}
+                {
+                    player->TeleportTo(571, 6242.67f, -1972.10f, 484.783f, 0.6f);
+                    return true;
+                }
 
             return false;
         }
@@ -218,8 +218,8 @@ class AreaTrigger_at_last_rites : public AreaTriggerScript
 
         bool OnTrigger(Player* player, AreaTriggerEntry const* trigger)
         {
-			QuestStatus QLR = player->GetQuestStatus(QUEST_LAST_RITES);
-			QuestStatus QBT = player->GetQuestStatus(QUEST_BREAKING_THROUGH);
+            QuestStatus QLR = player->GetQuestStatus(QUEST_LAST_RITES);
+            QuestStatus QBT = player->GetQuestStatus(QUEST_BREAKING_THROUGH);
             if (!(QLR == QUEST_STATUS_INCOMPLETE || QLR  == QUEST_STATUS_COMPLETE ||
                   QBT == QUEST_STATUS_INCOMPLETE || QBT == QUEST_STATUS_COMPLETE))
                 return false;
@@ -237,10 +237,10 @@ class AreaTrigger_at_last_rites : public AreaTriggerScript
                     pPosition = WorldLocation(571, 3802.38f, 3585.95f, 49.5765f, 0.0f);
                     break;
                 case 5340:
-					if (QBT == QUEST_STATUS_INCOMPLETE)
-						pPosition = WorldLocation(571, 3758, 3562, 345.51f, 0.0f);
-					else
-						pPosition = WorldLocation(571, 3687.91f, 3577.28f, 473.342f, 0.0f);
+                    if (QBT == QUEST_STATUS_INCOMPLETE)
+                        pPosition = WorldLocation(571, 3758, 3562, 345.51f, 0.0f);
+                    else
+                        pPosition = WorldLocation(571, 3687.91f, 3577.28f, 473.342f, 0.0f);
                     break;
                 default:
                     return false;
@@ -457,10 +457,10 @@ class AreaTrigger_at_area_52_entrance : public AreaTriggerScript
 
 void AddSC_areatrigger_scripts()
 {
-	// Ours
-	new AreaTrigger_at_voltarus_middle();
+    // Ours
+    new AreaTrigger_at_voltarus_middle();
 
-	// Theirs
+    // Theirs
     new AreaTrigger_at_coilfang_waterfall();
     new AreaTrigger_at_legion_teleporter();
     new AreaTrigger_at_stormwright_shelf();

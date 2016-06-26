@@ -98,8 +98,8 @@ public:
 
         void DamageTaken(Unit* pDoneBy, uint32 &uiDamage, DamageEffectType, SpellSchoolMask)
         {
-			if (!pDoneBy)
-				return;
+            if (!pDoneBy)
+                return;
 
             if (uiDamage >= me->GetHealth() || me->HealthBelowPctDamaged(15, uiDamage))
             {

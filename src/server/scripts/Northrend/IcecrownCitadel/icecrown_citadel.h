@@ -42,14 +42,14 @@ enum SharedSpells
     SPELL_FROSTMOURNE_TELEPORT_VISUAL   = 73078,
 
     // Shadowmourne questline
-	SPELL_UNSATED_CRAVING               = 71168,
+    SPELL_UNSATED_CRAVING               = 71168,
     SPELL_SHADOWS_FATE                  = 71169,
 
-	// Misc
-	SPELL_WEB_BEAM						= 69887,
-	SPELL_WEB_BEAM2						= 69986,
-	SPELL_GIANT_INSECT_SWARM			= 70475,
-	SPELL_LEAP_TO_A_RANDOM_LOCATION		= 70485
+    // Misc
+    SPELL_WEB_BEAM                      = 69887,
+    SPELL_WEB_BEAM2                     = 69986,
+    SPELL_GIANT_INSECT_SWARM            = 70475,
+    SPELL_LEAP_TO_A_RANDOM_LOCATION     = 70485
 };
 
 enum TeleporterSpells
@@ -79,9 +79,9 @@ enum DataTypes
     DATA_VALITHRIA_DREAMWALKER      = 10,
     DATA_SINDRAGOSA                 = 11,
     DATA_THE_LICH_KING              = 12,
-	DATA_SINDRAGOSA_GAUNTLET		= 13,
-	DATA_BLOOD_PRINCE_TRASH			= 14,
-	MAX_ENCOUNTERS					= 15,
+    DATA_SINDRAGOSA_GAUNTLET        = 13,
+    DATA_BLOOD_PRINCE_TRASH         = 14,
+    MAX_ENCOUNTERS                  = 15,
 
     // Additional data
     DATA_SAURFANG_EVENT_NPC         = 13,
@@ -113,15 +113,15 @@ enum DataTypes
     DATA_TERENAS_MENETHIL           = 39,
     DATA_ENEMY_GUNSHIP              = 40,
 
-	// pussywizard:
-	DATA_BUFF_AVAILABLE				= 251,
-	DATA_WEEKLY_QUEST_ID			= 252,
-	// NONE							= 253,
-	DATA_PUTRICIDE_TRAP_STATE       = 254,
-	DATA_HAS_LIMITED_ATTEMPTS       = 255,
-	DATA_LK_HC_AVAILABLE            = 256,
+    // pussywizard:
+    DATA_BUFF_AVAILABLE             = 251,
+    DATA_WEEKLY_QUEST_ID            = 252,
+    // NONE                         = 253,
+    DATA_PUTRICIDE_TRAP_STATE       = 254,
+    DATA_HAS_LIMITED_ATTEMPTS       = 255,
+    DATA_LK_HC_AVAILABLE            = 256,
 
-	DATA_BPC_TRASH_DIED				= 300,
+    DATA_BPC_TRASH_DIED             = 300,
 };
 
 enum CreaturesIds
@@ -147,8 +147,8 @@ enum CreaturesIds
     NPC_GARROSH_HELLSCREAM                      = 39372,
     NPC_KING_VARIAN_WRYNN                       = 39371,
     NPC_DEATHBOUND_WARD                         = 37007,
-	NPC_HIGH_OVERLORD_SAURFANG_DUMMY            = 32315,
-	NPC_MURADIN_BRONZEBEARD_DUMMY               = 38607,
+    NPC_HIGH_OVERLORD_SAURFANG_DUMMY            = 32315,
+    NPC_MURADIN_BRONZEBEARD_DUMMY               = 38607,
     NPC_LADY_JAINA_PROUDMOORE_QUEST             = 38606,
     NPC_MURADIN_BRONZEBEARD_QUEST               = 38607,
     NPC_UTHER_THE_LIGHTBRINGER_QUEST            = 38608,
@@ -183,7 +183,7 @@ enum CreaturesIds
     NPC_VENGEFUL_SHADE                          = 38222,
 
     NPC_DEATHSPEAKER_SERVANT                    = 36805,
-	NPC_RISEN_DEATHSPEAKER_SERVANT              = 36844,
+    NPC_RISEN_DEATHSPEAKER_SERVANT              = 36844,
 
     // Icecrown Gunship Battle
     NPC_MARTYR_STALKER_IGB_SAURFANG             = 38569,
@@ -305,17 +305,17 @@ enum CreaturesIds
     NPC_FROST_BOMB                              = 37186,
     NPC_ICE_TOMB                                = 36980,
 
-	// Sindragosa Gauntlet
-	NPC_SINDRAGOSA_GAUNTLET						= 37503,
-	NPC_NERUBAR_CHAMPION						= 37501,
-	NPC_NERUBAR_WEBWEAVER						= 37502,
-	NPC_NERUBAR_BROODLING						= 37232,
-	NPC_FROSTWARDEN_SORCERESS					= 37229,
-	NPC_FROSTWARDEN_WARRIOR						= 37228,
+    // Sindragosa Gauntlet
+    NPC_SINDRAGOSA_GAUNTLET                     = 37503,
+    NPC_NERUBAR_CHAMPION                        = 37501,
+    NPC_NERUBAR_WEBWEAVER                       = 37502,
+    NPC_NERUBAR_BROODLING                       = 37232,
+    NPC_FROSTWARDEN_SORCERESS                   = 37229,
+    NPC_FROSTWARDEN_WARRIOR                     = 37228,
 
-	// Putricade Trap
-	NPC_PUTRICADES_TRAP							= 38879,
-	NPC_FLASH_EATING_INSECT						= 37782,
+    // Putricade Trap
+    NPC_PUTRICADES_TRAP                         = 38879,
+    NPC_FLASH_EATING_INSECT                     = 37782,
 
     // The Lich King
     NPC_THE_LICH_KING                           = 36597,
@@ -338,7 +338,7 @@ enum CreaturesIds
     NPC_SPIRIT_BOMB                             = 39189,
     NPC_FROSTMOURNE_TRIGGER                     = 38584,
     NPC_TERENAS_MENETHIL_OUTRO                  = 38579,
-	
+    
     // Generic
     NPC_INVISIBLE_STALKER                       = 30298,
     NPC_SPIRE_FROSTWYRM                         = 37230,
@@ -528,7 +528,7 @@ enum WeekliesICC
 
 enum QuestsICC
 {
-	QUEST_A_FEAST_OF_SOULS					= 24547
+    QUEST_A_FEAST_OF_SOULS                  = 24547
 };
 
 enum WorldStatesICC
@@ -542,10 +542,10 @@ enum WorldStatesICC
 
 enum PutricideEventFlags
 {
-	PUTRICIDE_EVENT_FLAG_FESTERGUT_VALVE	= 1,
-	PUTRICIDE_EVENT_FLAG_ROTFACE_VALVE		= 2,
-	PUTRICIDE_EVENT_FLAG_TRAP_INPROGRESS	= 4,
-	PUTRICIDE_EVENT_FLAG_TRAP_FINISHED		= 8,
+    PUTRICIDE_EVENT_FLAG_FESTERGUT_VALVE    = 1,
+    PUTRICIDE_EVENT_FLAG_ROTFACE_VALVE      = 2,
+    PUTRICIDE_EVENT_FLAG_TRAP_INPROGRESS    = 4,
+    PUTRICIDE_EVENT_FLAG_TRAP_FINISHED      = 8,
 };
 
 enum AreaIds

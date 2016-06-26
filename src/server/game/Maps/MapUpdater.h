@@ -17,10 +17,10 @@ class MapUpdater
         virtual ~MapUpdater();
 
         friend class MapUpdateRequest;
-		friend class LFGUpdateRequest;
+        friend class LFGUpdateRequest;
 
         int schedule_update(Map& map, ACE_UINT32 diff, ACE_UINT32 s_diff);
-		int schedule_lfg_update(ACE_UINT32 diff);
+        int schedule_lfg_update(ACE_UINT32 diff);
 
         int wait();
 

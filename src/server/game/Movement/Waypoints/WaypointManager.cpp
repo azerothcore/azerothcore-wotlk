@@ -81,7 +81,7 @@ void WaypointMgr::Load()
         if (wp->move_type >= WAYPOINT_MOVE_TYPE_MAX)
         {
             //TC_LOG_ERROR("sql.sql", "Waypoint %u in waypoint_data has invalid move_type, ignoring", wp->id);
-			delete wp;
+            delete wp;
             continue;
         }
 
@@ -143,7 +143,7 @@ void WaypointMgr::ReloadPath(uint32 id)
         if (wp->move_type >= WAYPOINT_MOVE_TYPE_MAX)
         {
             //TC_LOG_ERROR("sql.sql", "Waypoint %u in waypoint_data has invalid move_type, ignoring", wp->id);
-			delete wp;
+            delete wp;
             continue;
         }
         

@@ -22,8 +22,8 @@
 #include "PetDefines.h"
 #include "TemporarySummon.h"
 
-#define PET_FOCUS_REGEN_INTERVAL	4 * IN_MILLISECONDS
-#define PET_LOSE_HAPPINES_INTERVAL	7500
+#define PET_FOCUS_REGEN_INTERVAL    4 * IN_MILLISECONDS
+#define PET_LOSE_HAPPINES_INTERVAL  7500
 #define HAPPINESS_LEVEL_SIZE        333000
 
 struct PetSpell
@@ -36,15 +36,15 @@ struct PetSpell
 
 class AsynchPetSummon
 {
-	public:
-		AsynchPetSummon(uint32 entry, Position position, PetType petType, uint32 duration, uint32 createdBySpell, uint64 casterGUID) : 
-			m_entry(entry), pos(position), m_petType(petType),
-			m_duration(duration), m_createdBySpell(createdBySpell), m_casterGUID(casterGUID) { }
-	
-		Position pos;
-		uint32 m_entry, m_createdBySpell, m_duration;
-		PetType m_petType;
-		uint64 m_casterGUID;
+    public:
+        AsynchPetSummon(uint32 entry, Position position, PetType petType, uint32 duration, uint32 createdBySpell, uint64 casterGUID) : 
+            m_entry(entry), pos(position), m_petType(petType),
+            m_duration(duration), m_createdBySpell(createdBySpell), m_casterGUID(casterGUID) { }
+    
+        Position pos;
+        uint32 m_entry, m_createdBySpell, m_duration;
+        PetType m_petType;
+        uint64 m_casterGUID;
 };
 
 typedef UNORDERED_MAP<uint32, PetSpell> PetSpellMap;
@@ -74,7 +74,7 @@ class Pet : public Guardian
         bool CreateBaseAtCreature(Creature* creature);
         bool CreateBaseAtCreatureInfo(CreatureTemplate const* cinfo, Unit* owner);
         bool CreateBaseAtTamed(CreatureTemplate const* cinfo, Map* map, uint32 phaseMask);
-		static bool LoadPetFromDB(Player* owner, uint8 asynchLoadType, uint32 petentry = 0, uint32 petnumber = 0, bool current = false, AsynchPetSummon* info = NULL);
+        static bool LoadPetFromDB(Player* owner, uint8 asynchLoadType, uint32 petentry = 0, uint32 petnumber = 0, bool current = false, AsynchPetSummon* info = NULL);
         bool isBeingLoaded() const { return m_loading;}
         void SavePetToDB(PetSaveMode mode, bool logout);
         void Remove(PetSaveMode mode, bool returnreagent = false);
@@ -100,7 +100,7 @@ class Pet : public Guardian
         bool HaveInDiet(ItemTemplate const* item) const;
         uint32 GetCurrentFoodBenefitLevel(uint32 itemlevel) const;
         void SetDuration(int32 dur) { m_duration = dur; }
-		int32 GetDuration() const { return m_duration; }
+        int32 GetDuration() const { return m_duration; }
 
         /*
         bool UpdateStats(Stats stat);
@@ -124,7 +124,7 @@ class Pet : public Guardian
         void _SaveAuras(SQLTransaction& trans, bool logout);
         void _SaveSpells(SQLTransaction& trans);
 
-		void _LoadSpellCooldowns(PreparedQueryResult result);
+        void _LoadSpellCooldowns(PreparedQueryResult result);
         void _LoadAuras(PreparedQueryResult result, uint32 timediff);
         void _LoadSpells(PreparedQueryResult result);
 
@@ -160,11 +160,11 @@ class Pet : public Guardian
         bool    m_removed;                                  // prevent overwrite pet state in DB at next Pet::Update if pet already removed(saved)
 
         Player* GetOwner() const { return m_owner; }
-		void SetLoading(bool load) { m_loading = load; }
-		void HandleAsynchLoadSucceed();
-		static void HandleAsynchLoadFailed(AsynchPetSummon* info, Player* player, uint8 asynchLoadType, uint8 loadResult);
-		uint8 GetAsynchLoadType() const { return asynchLoadType; }
-		void SetAsynchLoadType(uint8 type) { asynchLoadType = type; }
+        void SetLoading(bool load) { m_loading = load; }
+        void HandleAsynchLoadSucceed();
+        static void HandleAsynchLoadFailed(AsynchPetSummon* info, Player* player, uint8 asynchLoadType, uint8 loadResult);
+        uint8 GetAsynchLoadType() const { return asynchLoadType; }
+        void SetAsynchLoadType(uint8 type) { asynchLoadType = type; }
     protected:
         Player* m_owner;
         int32   m_happinessTimer;
@@ -172,10 +172,10 @@ class Pet : public Guardian
         int32   m_duration;                                 // time until unsummon (used mostly for summoned guardians and not used for controlled pets)
         uint64  m_auraRaidUpdateMask;
         bool    m_loading;
-        int32   m_petRegenTimer;							// xinef: used for focus regeneration
+        int32   m_petRegenTimer;                            // xinef: used for focus regeneration
 
         DeclinedName *m_declinedname;
-		uint8 asynchLoadType;
+        uint8 asynchLoadType;
 
     private:
         void SaveToDB(uint32, uint8, uint32)                // override of Creature::SaveToDB     - must not be called

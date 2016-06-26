@@ -20,86 +20,86 @@ enum Creatures
 
 class instance_shadowfang_keep : public InstanceMapScript
 {
-	public:
-		instance_shadowfang_keep() : InstanceMapScript("instance_shadowfang_keep", 33) { }
+    public:
+        instance_shadowfang_keep() : InstanceMapScript("instance_shadowfang_keep", 33) { }
 
-		InstanceScript* GetInstanceScript(InstanceMap* map) const
-		{
-			return new instance_shadowfang_keep_InstanceMapScript(map);
-		}
+        InstanceScript* GetInstanceScript(InstanceMap* map) const
+        {
+            return new instance_shadowfang_keep_InstanceMapScript(map);
+        }
 
-		struct instance_shadowfang_keep_InstanceMapScript : public InstanceScript
-		{
-			instance_shadowfang_keep_InstanceMapScript(Map* map) : InstanceScript(map) { }
+        struct instance_shadowfang_keep_InstanceMapScript : public InstanceScript
+        {
+            instance_shadowfang_keep_InstanceMapScript(Map* map) : InstanceScript(map) { }
 
-			void Initialize()
-			{
-				memset(&_encounters, 0, sizeof(_encounters));
-			}
+            void Initialize()
+            {
+                memset(&_encounters, 0, sizeof(_encounters));
+            }
 
-			void OnGameObjectCreate(GameObject* gameobject)
-			{
-				switch (gameobject->GetEntry())
-				{
-					case GO_COURTYARD_DOOR:
-						if (_encounters[TYPE_COURTYARD] == DONE)
-							HandleGameObject(0, true, gameobject);
-						break;
-					case GO_SORCERER_DOOR:
-						if (_encounters[TYPE_FENRUS_THE_DEVOURER] == DONE)
-							HandleGameObject(0, true, gameobject);
-						break;
-					case GO_ARUGAL_DOOR:
-						if (_encounters[TYPE_WOLF_MASTER_NANDOS] == DONE)
-							HandleGameObject(0, true, gameobject);
-						break;
-				}
-			}
+            void OnGameObjectCreate(GameObject* gameobject)
+            {
+                switch (gameobject->GetEntry())
+                {
+                    case GO_COURTYARD_DOOR:
+                        if (_encounters[TYPE_COURTYARD] == DONE)
+                            HandleGameObject(0, true, gameobject);
+                        break;
+                    case GO_SORCERER_DOOR:
+                        if (_encounters[TYPE_FENRUS_THE_DEVOURER] == DONE)
+                            HandleGameObject(0, true, gameobject);
+                        break;
+                    case GO_ARUGAL_DOOR:
+                        if (_encounters[TYPE_WOLF_MASTER_NANDOS] == DONE)
+                            HandleGameObject(0, true, gameobject);
+                        break;
+                }
+            }
 
-			void SetData(uint32 type, uint32 data)
-			{
-				switch (type)
-				{
-					case TYPE_COURTYARD:
-					case TYPE_FENRUS_THE_DEVOURER:
-					case TYPE_WOLF_MASTER_NANDOS:
-						_encounters[type] = data;
-						break;
-				}
+            void SetData(uint32 type, uint32 data)
+            {
+                switch (type)
+                {
+                    case TYPE_COURTYARD:
+                    case TYPE_FENRUS_THE_DEVOURER:
+                    case TYPE_WOLF_MASTER_NANDOS:
+                        _encounters[type] = data;
+                        break;
+                }
 
-				if (data == DONE)
-					SaveToDB();
-			}
+                if (data == DONE)
+                    SaveToDB();
+            }
 
-			std::string GetSaveData()
-			{
-				std::ostringstream saveStream;
-				saveStream << "S K " << _encounters[0] << ' ' << _encounters[1] << ' ' << _encounters[2];
-				return saveStream.str();
-			}
+            std::string GetSaveData()
+            {
+                std::ostringstream saveStream;
+                saveStream << "S K " << _encounters[0] << ' ' << _encounters[1] << ' ' << _encounters[2];
+                return saveStream.str();
+            }
 
-			void Load(const char* in)
-			{
-				if (!in)
-					return;
+            void Load(const char* in)
+            {
+                if (!in)
+                    return;
 
-				char dataHead1, dataHead2;
-				std::istringstream loadStream(in);
-				loadStream >> dataHead1 >> dataHead2;
-				if (dataHead1 == 'S' && dataHead2 == 'K')
-				{
-					for (uint8 i = 0; i < MAX_ENCOUNTERS; ++i)
-					{
-						loadStream >> _encounters[i];
-						if (_encounters[i] == IN_PROGRESS)
-							_encounters[i] = NOT_STARTED;
-					}
-				}
-			}
+                char dataHead1, dataHead2;
+                std::istringstream loadStream(in);
+                loadStream >> dataHead1 >> dataHead2;
+                if (dataHead1 == 'S' && dataHead2 == 'K')
+                {
+                    for (uint8 i = 0; i < MAX_ENCOUNTERS; ++i)
+                    {
+                        loadStream >> _encounters[i];
+                        if (_encounters[i] == IN_PROGRESS)
+                            _encounters[i] = NOT_STARTED;
+                    }
+                }
+            }
 
-		private:
-			uint32 _encounters[MAX_ENCOUNTERS];
-		};
+        private:
+            uint32 _encounters[MAX_ENCOUNTERS];
+        };
 
 };
 
@@ -144,8 +144,8 @@ class spell_shadowfang_keep_haunting_spirits : public SpellScriptLoader
 
 enum ForsakenSpells
 {
-	SPELL_FORSAKEN_SKILL_SWORD			= 7038,
-	SPELL_FORSAKEN_SKILL_SHADOW			= 7053
+    SPELL_FORSAKEN_SKILL_SWORD          = 7038,
+    SPELL_FORSAKEN_SKILL_SHADOW         = 7053
 };
 
 class spell_shadowfang_keep_forsaken_skills : public SpellScriptLoader
@@ -157,38 +157,38 @@ class spell_shadowfang_keep_forsaken_skills : public SpellScriptLoader
         {
             PrepareAuraScript(spell_shadowfang_keep_forsaken_skills_AuraScript);
 
-			bool Load()
-			{
-				_forsakenSpell = 0;
-				return true;
-			}
+            bool Load()
+            {
+                _forsakenSpell = 0;
+                return true;
+            }
 
             void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-			{
-				_forsakenSpell = urand(SPELL_FORSAKEN_SKILL_SWORD, SPELL_FORSAKEN_SKILL_SHADOW);
-				if (_forsakenSpell == SPELL_FORSAKEN_SKILL_SHADOW - 1)
-					++_forsakenSpell;
-				GetUnitOwner()->CastSpell(GetUnitOwner(), _forsakenSpell, true);
-			}
+            {
+                _forsakenSpell = urand(SPELL_FORSAKEN_SKILL_SWORD, SPELL_FORSAKEN_SKILL_SHADOW);
+                if (_forsakenSpell == SPELL_FORSAKEN_SKILL_SHADOW - 1)
+                    ++_forsakenSpell;
+                GetUnitOwner()->CastSpell(GetUnitOwner(), _forsakenSpell, true);
+            }
 
             void HandleDummyTick(AuraEffect const* aurEff)
             {
-				PreventDefaultAction();
-				GetUnitOwner()->RemoveAurasDueToSpell(_forsakenSpell);
-				_forsakenSpell = urand(SPELL_FORSAKEN_SKILL_SWORD, SPELL_FORSAKEN_SKILL_SHADOW);
-				if (_forsakenSpell == SPELL_FORSAKEN_SKILL_SHADOW - 1)
-					++_forsakenSpell;
-				GetUnitOwner()->CastSpell(GetUnitOwner(), _forsakenSpell, true);
+                PreventDefaultAction();
+                GetUnitOwner()->RemoveAurasDueToSpell(_forsakenSpell);
+                _forsakenSpell = urand(SPELL_FORSAKEN_SKILL_SWORD, SPELL_FORSAKEN_SKILL_SHADOW);
+                if (_forsakenSpell == SPELL_FORSAKEN_SKILL_SHADOW - 1)
+                    ++_forsakenSpell;
+                GetUnitOwner()->CastSpell(GetUnitOwner(), _forsakenSpell, true);
             }
 
-			void Register()
-			{
-				OnEffectApply += AuraEffectApplyFn(spell_shadowfang_keep_forsaken_skills_AuraScript::OnApply, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
+            void Register()
+            {
+                OnEffectApply += AuraEffectApplyFn(spell_shadowfang_keep_forsaken_skills_AuraScript::OnApply, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
                 OnEffectPeriodic += AuraEffectPeriodicFn(spell_shadowfang_keep_forsaken_skills_AuraScript::HandleDummyTick, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
             }
 
-		private:
-			uint32 _forsakenSpell;
+        private:
+            uint32 _forsakenSpell;
         };
 
         AuraScript* GetAuraScript() const
@@ -201,5 +201,5 @@ void AddSC_instance_shadowfang_keep()
 {
     new instance_shadowfang_keep();
     new spell_shadowfang_keep_haunting_spirits();
-	new spell_shadowfang_keep_forsaken_skills();
+    new spell_shadowfang_keep_forsaken_skills();
 }

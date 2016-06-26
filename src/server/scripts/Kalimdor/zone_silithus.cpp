@@ -1258,26 +1258,26 @@ class go_wind_stone : public GameObjectScript
 
         void SummonNPC(GameObject* go, Player* player, uint32 npc, uint32 spellId)
         {
-			SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
-			if (!spellInfo)
-				return;
-			SpellInfo const* spellInfoTrigger = sSpellMgr->GetSpellInfo(spellInfo->Effects[EFFECT_0].TriggerSpell);
-			if (!spellInfoTrigger)
-				return;
-			Spell* spell = new Spell(player, spellInfoTrigger, TRIGGERED_NONE);
-			SpellCastResult result = spell->CheckCast(true);
-			delete spell;
-			if (result != SPELL_CAST_OK)
-			{
-				if (result == SPELL_FAILED_REAGENTS)
-				{
-					std::string accountName;
-					AccountMgr::GetName(player->GetSession()->GetAccountId(), accountName);
-					sWorld->BanAccount(BAN_ACCOUNT, accountName, "0s", "Wind Stone exploit", "Server");
-				}
-				return;
-			}
-			player->CastSpell(player, spellInfoTrigger->Id, false);
+            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+            if (!spellInfo)
+                return;
+            SpellInfo const* spellInfoTrigger = sSpellMgr->GetSpellInfo(spellInfo->Effects[EFFECT_0].TriggerSpell);
+            if (!spellInfoTrigger)
+                return;
+            Spell* spell = new Spell(player, spellInfoTrigger, TRIGGERED_NONE);
+            SpellCastResult result = spell->CheckCast(true);
+            delete spell;
+            if (result != SPELL_CAST_OK)
+            {
+                if (result == SPELL_FAILED_REAGENTS)
+                {
+                    std::string accountName;
+                    AccountMgr::GetName(player->GetSession()->GetAccountId(), accountName);
+                    sWorld->BanAccount(BAN_ACCOUNT, accountName, "0s", "Wind Stone exploit", "Server");
+                }
+                return;
+            }
+            player->CastSpell(player, spellInfoTrigger->Id, false);
             TempSummon* summons = go->SummonCreature(npc, go->GetPositionX(), go->GetPositionY(), go->GetPositionZ(), player->GetOrientation() - M_PI, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 10 * 60 * 1000);
             summons->CastSpell(summons, SPELL_SPAWN_IN, false);
             switch (summons->GetEntry())

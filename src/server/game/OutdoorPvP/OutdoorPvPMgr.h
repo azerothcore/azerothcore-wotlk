@@ -81,8 +81,8 @@ class OutdoorPvPMgr
 
         void HandleDropFlag(Player* player, uint32 spellId);
 
-		// pussywizard: lock required because different functions affect m_players
-		ACE_Thread_Mutex _lock;
+        // pussywizard: lock required because different functions affect m_players
+        ACE_Thread_Mutex _lock;
 
     private:
         typedef std::vector<OutdoorPvP*> OutdoorPvPSet;

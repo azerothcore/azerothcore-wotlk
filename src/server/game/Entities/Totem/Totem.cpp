@@ -56,24 +56,24 @@ void Totem::Update(uint32 time)
 void Totem::InitStats(uint32 duration)
 { 
     // client requires SMSG_TOTEM_CREATED to be sent before adding to world and before removing old totem
-	// Xinef: Set level for Unit totems
-	if (Unit* owner = ObjectAccessor::FindUnit(m_owner))
-	{
-		if (owner->GetTypeId() == TYPEID_PLAYER && m_Properties->Slot >= SUMMON_SLOT_TOTEM && m_Properties->Slot < MAX_TOTEM_SLOT)
-		{
-			WorldPacket data(SMSG_TOTEM_CREATED, 1 + 8 + 4 + 4);
-			data << uint8(m_Properties->Slot - 1);
-			data << uint64(GetGUID());
-			data << uint32(duration);
-			data << uint32(GetUInt32Value(UNIT_CREATED_BY_SPELL));
-			owner->ToPlayer()->SendDirectMessage(&data);
+    // Xinef: Set level for Unit totems
+    if (Unit* owner = ObjectAccessor::FindUnit(m_owner))
+    {
+        if (owner->GetTypeId() == TYPEID_PLAYER && m_Properties->Slot >= SUMMON_SLOT_TOTEM && m_Properties->Slot < MAX_TOTEM_SLOT)
+        {
+            WorldPacket data(SMSG_TOTEM_CREATED, 1 + 8 + 4 + 4);
+            data << uint8(m_Properties->Slot - 1);
+            data << uint64(GetGUID());
+            data << uint32(duration);
+            data << uint32(GetUInt32Value(UNIT_CREATED_BY_SPELL));
+            owner->ToPlayer()->SendDirectMessage(&data);
 
-			// set display id depending on caster's race
-			SetDisplayId(owner->GetModelForTotem(PlayerTotemType(m_Properties->Id)));
-		}
+            // set display id depending on caster's race
+            SetDisplayId(owner->GetModelForTotem(PlayerTotemType(m_Properties->Id)));
+        }
 
-		SetLevel(owner->getLevel());
-	}
+        SetLevel(owner->getLevel());
+    }
 
     Minion::InitStats(duration);
 
@@ -95,14 +95,14 @@ void Totem::InitSummon()
     if(GetSpell(1))
         CastSpell(this, GetSpell(1), true);
 
-	// xinef: this is better than the script, 100% sure to work
+    // xinef: this is better than the script, 100% sure to work
     if(GetEntry() == SENTRY_TOTEM_ENTRY)
-	{
+    {
         SetReactState(REACT_AGGRESSIVE);
-		GetOwner()->CastSpell(this, 6277, true);
-	}
+        GetOwner()->CastSpell(this, 6277, true);
+    }
 
-	this->GetMotionMaster()->MoveFall();
+    this->GetMotionMaster()->MoveFall();
 }
 
 void Totem::UnSummon(uint32 msTime)
@@ -116,7 +116,7 @@ void Totem::UnSummon(uint32 msTime)
     CombatStop();
     RemoveAurasDueToSpell(GetSpell(), GetGUID());
 
-	Unit *m_owner = GetOwner();
+    Unit *m_owner = GetOwner();
     // clear owner's totem slot
     for (uint8 i = SUMMON_SLOT_TOTEM; i < MAX_TOTEM_SLOT; ++i)
     {
@@ -146,7 +146,7 @@ void Totem::UnSummon(uint32 msTime)
             for (GroupReference* itr = group->GetFirstMember(); itr != NULL; itr = itr->next())
             {
                 Player* target = itr->GetSource();
-				if (target && target->IsInMap(owner) && group->SameSubGroup(owner, target))
+                if (target && target->IsInMap(owner) && group->SameSubGroup(owner, target))
                     target->RemoveAurasDueToSpell(GetSpell(), GetGUID());
             }
         }
@@ -157,13 +157,13 @@ void Totem::UnSummon(uint32 msTime)
 
 bool Totem::IsImmunedToSpellEffect(SpellInfo const* spellInfo, uint32 index) const
 { 
-	// xinef: immune to all positive spells, except of stoneclaw totem absorb and sentry totem bind sight
-	// totems positive spells have unit_caster target
-	if (spellInfo->Effects[index].Effect != SPELL_EFFECT_DUMMY && 
-		spellInfo->Effects[index].Effect != SPELL_EFFECT_SCRIPT_EFFECT && 
-		spellInfo->IsPositive() && spellInfo->Effects[index].TargetA.GetTarget() != TARGET_UNIT_CASTER &&
-		spellInfo->Effects[index].TargetA.GetCheckType() != TARGET_CHECK_ENTRY && spellInfo->Id != 55277 && spellInfo->Id != 6277)
-		return true;
+    // xinef: immune to all positive spells, except of stoneclaw totem absorb and sentry totem bind sight
+    // totems positive spells have unit_caster target
+    if (spellInfo->Effects[index].Effect != SPELL_EFFECT_DUMMY && 
+        spellInfo->Effects[index].Effect != SPELL_EFFECT_SCRIPT_EFFECT && 
+        spellInfo->IsPositive() && spellInfo->Effects[index].TargetA.GetTarget() != TARGET_UNIT_CASTER &&
+        spellInfo->Effects[index].TargetA.GetCheckType() != TARGET_CHECK_ENTRY && spellInfo->Id != 55277 && spellInfo->Id != 6277)
+        return true;
 
     switch (spellInfo->Effects[index].ApplyAuraName)
     {

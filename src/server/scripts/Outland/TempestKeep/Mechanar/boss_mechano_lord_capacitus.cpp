@@ -57,13 +57,13 @@ class boss_mechano_lord_capacitus : public CreatureScript
                 events.ScheduleEvent(EVENT_HEADCRACK, 6000);
                 events.ScheduleEvent(EVENT_SUMMON_NETHER_CHARGE, 10000);
                 events.ScheduleEvent(EVENT_BERSERK, 180000);
-				events.ScheduleEvent(IsHeroic() ? EVENT_POSITIVE_SHIFT : EVENT_REFLECTIVE_DAMAGE_SHIELD, 15000);
+                events.ScheduleEvent(IsHeroic() ? EVENT_POSITIVE_SHIFT : EVENT_REFLECTIVE_DAMAGE_SHIELD, 15000);
             }
 
             void KilledUnit(Unit* victim)
             {
-				if (victim->GetTypeId() == TYPEID_PLAYER)
-					Talk(YELL_KILL);
+                if (victim->GetTypeId() == TYPEID_PLAYER)
+                    Talk(YELL_KILL);
             }
 
             void JustDied(Unit* /*victim*/)
@@ -72,11 +72,11 @@ class boss_mechano_lord_capacitus : public CreatureScript
                 Talk(YELL_DEATH);
             }
 
-			void JustSummoned(Creature* summon)
-			{
-				summons.Summon(summon);
-				summon->GetMotionMaster()->MoveRandom(30.0f);
-			}
+            void JustSummoned(Creature* summon)
+            {
+                summons.Summon(summon);
+                summon->GetMotionMaster()->MoveRandom(30.0f);
+            }
 
             void UpdateAI(uint32 diff)
             {
@@ -90,12 +90,12 @@ class boss_mechano_lord_capacitus : public CreatureScript
                 switch (events.ExecuteEvent())
                 {
                     case EVENT_HEADCRACK:
-						me->CastSpell(me->GetVictim(), SPELL_HEADCRACK, false);
+                        me->CastSpell(me->GetVictim(), SPELL_HEADCRACK, false);
                         events.ScheduleEvent(EVENT_HEADCRACK, 20000);
                         break;
                     case EVENT_REFLECTIVE_DAMAGE_SHIELD:
                         Talk(YELL_REFLECTIVE_DAMAGE_SHIELD);
-						me->CastSpell(me, SPELL_REFLECTIVE_DAMAGE_SHIELD, false);
+                        me->CastSpell(me, SPELL_REFLECTIVE_DAMAGE_SHIELD, false);
                         events.ScheduleEvent(EVENT_REFLECTIVE_MAGIE_SHIELD, 20000);
                         break;
                     case EVENT_REFLECTIVE_MAGIE_SHIELD:
@@ -107,14 +107,14 @@ class boss_mechano_lord_capacitus : public CreatureScript
                         Position pos;
                         me->GetRandomNearPosition(pos, 8.0f);
                         me->SummonCreature(NPC_NETHER_CHARGE, pos, TEMPSUMMON_TIMED_DESPAWN, 18000);
-						events.ScheduleEvent(EVENT_SUMMON_NETHER_CHARGE, 5000);
+                        events.ScheduleEvent(EVENT_SUMMON_NETHER_CHARGE, 5000);
                         break;
                     case EVENT_POSITIVE_SHIFT:
-						me->CastSpell(me, SPELL_POLARITY_SHIFT, true);
+                        me->CastSpell(me, SPELL_POLARITY_SHIFT, true);
                         events.ScheduleEvent(EVENT_POSITIVE_SHIFT, 30000);
                         break;
                     case EVENT_BERSERK:
-						me->CastSpell(me, SPELL_BERSERK, true);
+                        me->CastSpell(me, SPELL_BERSERK, true);
                         break;
                 }
 
@@ -159,7 +159,7 @@ class spell_capacitus_polarity_charge : public SpellScriptLoader
 
                 if (count)
                 {
-					uint32 spellId = GetSpellInfo()->Id == SPELL_POSITIVE_CHARGE ? SPELL_POSITIVE_CHARGE_STACK : SPELL_NEGATIVE_CHARGE_STACK;
+                    uint32 spellId = GetSpellInfo()->Id == SPELL_POSITIVE_CHARGE ? SPELL_POSITIVE_CHARGE_STACK : SPELL_NEGATIVE_CHARGE_STACK;
                     GetCaster()->SetAuraStack(spellId, GetCaster(), count);
                 }
             }
@@ -198,8 +198,8 @@ class spell_capacitus_polarity_shift : public SpellScriptLoader
 
             void HandleDummy(SpellEffIndex /*effIndex*/)
             {
-				if (Unit* target = GetHitUnit())
-					target->CastSpell(target, roll_chance_i(50) ? SPELL_POSITIVE_POLARITY : SPELL_NEGATIVE_POLARITY, true, NULL, NULL, GetCaster()->GetGUID());
+                if (Unit* target = GetHitUnit())
+                    target->CastSpell(target, roll_chance_i(50) ? SPELL_POSITIVE_POLARITY : SPELL_NEGATIVE_POLARITY, true, NULL, NULL, GetCaster()->GetGUID());
             }
 
             void Register()

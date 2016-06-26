@@ -30,7 +30,7 @@ class GuardAI : public ScriptedAI
 
         static int Permissible(Creature const* creature);
 
-		void Reset();
+        void Reset();
         void EnterEvadeMode();
         void JustDied(Unit* killer);
 };

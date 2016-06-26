@@ -55,13 +55,13 @@ void LFGPlayerScript::OnLogout(Player* player)
         sLFGMgr->LeaveLfg(player->GetGUID());
         sLFGMgr->LeaveAllLfgQueues(player->GetGUID(), true, player->GetGroup() ? player->GetGroup()->GetGUID() : 0);
 
-		// pussywizard: after all necessary actions handle raid browser
-		// pussywizard: already done above
-		//if (sLFGMgr->GetState(player->GetGUID()) == LFG_STATE_RAIDBROWSER)
-		//	sLFGMgr->LeaveLfg(player->GetGUID());
+        // pussywizard: after all necessary actions handle raid browser
+        // pussywizard: already done above
+        //if (sLFGMgr->GetState(player->GetGUID()) == LFG_STATE_RAIDBROWSER)
+        //  sLFGMgr->LeaveLfg(player->GetGUID());
     }
 
-	sLFGMgr->LfrSearchRemove(player);
+    sLFGMgr->LfrSearchRemove(player);
 }
 
 void LFGPlayerScript::OnLogin(Player* player)
@@ -126,14 +126,14 @@ void LFGPlayerScript::OnMapChanged(Player* player)
             player->CastSpell(player, LFG_SPELL_LUCK_OF_THE_DRAW, true);
     }
     else
-	{
+    {
         player->RemoveAurasDueToSpell(LFG_SPELL_LUCK_OF_THE_DRAW);
 
-		// Xinef: Destroy group if only one player is left
-		if (Group* group = player->GetGroup())
-			if (group->GetMembersCount() <= 1u)
-				group->Disband();
-	}
+        // Xinef: Destroy group if only one player is left
+        if (Group* group = player->GetGroup())
+            if (group->GetMembersCount() <= 1u)
+                group->Disband();
+    }
 }
 
 LFGGroupScript::LFGGroupScript() : GroupScript("LFGGroupScript")
@@ -175,9 +175,9 @@ void LFGGroupScript::OnAddMember(Group* group, uint64 guid)
     sLFGMgr->SetGroup(guid, gguid);
     sLFGMgr->AddPlayerToGroup(gguid, guid);
 
-	// pussywizard: after all necessary actions handle raid browser
-	if (sLFGMgr->GetState(guid) == LFG_STATE_RAIDBROWSER)
-		sLFGMgr->LeaveLfg(guid);
+    // pussywizard: after all necessary actions handle raid browser
+    if (sLFGMgr->GetState(guid) == LFG_STATE_RAIDBROWSER)
+        sLFGMgr->LeaveLfg(guid);
 }
 
 void LFGGroupScript::OnRemoveMember(Group* group, uint64 guid, RemoveMethod method, uint64 kicker, char const* reason)
@@ -205,33 +205,33 @@ void LFGGroupScript::OnRemoveMember(Group* group, uint64 guid, RemoveMethod meth
     sLFGMgr->SetGroup(guid, 0);
     uint8 players = sLFGMgr->RemovePlayerFromGroup(gguid, guid);
 
-	// pussywizard: after all necessary actions handle raid browser
-	// pussywizard: already done above
-	//if (sLFGMgr->GetState(guid) == LFG_STATE_RAIDBROWSER)
-	//	sLFGMgr->LeaveLfg(guid);
+    // pussywizard: after all necessary actions handle raid browser
+    // pussywizard: already done above
+    //if (sLFGMgr->GetState(guid) == LFG_STATE_RAIDBROWSER)
+    //  sLFGMgr->LeaveLfg(guid);
 
-	// Xinef: only LFG groups can go below
-	if (!isLFG)
-		return;
+    // Xinef: only LFG groups can go below
+    if (!isLFG)
+        return;
 
     if (Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(guid))
     {
-		// xinef: fixed dungeon deserter
-		if (method != GROUP_REMOVEMETHOD_KICK_LFG && state != LFG_STATE_FINISHED_DUNGEON && 
-			player->HasAura(LFG_SPELL_DUNGEON_COOLDOWN) && players >= LFG_GROUP_KICK_VOTES_NEEDED)
-		{
-			player->AddAura(LFG_SPELL_DUNGEON_DESERTER, player);
-		}
+        // xinef: fixed dungeon deserter
+        if (method != GROUP_REMOVEMETHOD_KICK_LFG && state != LFG_STATE_FINISHED_DUNGEON && 
+            player->HasAura(LFG_SPELL_DUNGEON_COOLDOWN) && players >= LFG_GROUP_KICK_VOTES_NEEDED)
+        {
+            player->AddAura(LFG_SPELL_DUNGEON_DESERTER, player);
+        }
         //else if (state == LFG_STATE_BOOT)
             // Update internal kick cooldown of kicked
 
         player->GetSession()->SendLfgUpdateParty(LfgUpdateData(LFG_UPDATETYPE_LEADER_UNK1));
         if (player->GetMap()->IsDungeon())            // Teleport player out the dungeon
-		{
+        {
             // Xinef: no longer valid sLFGMgr->TeleportPlayer(player, true);
-			if (!player->IsBeingTeleportedFar() && player->GetMapId() == sLFGMgr->GetDungeonMapId(gguid))
-				player->TeleportToEntryPoint();
-		}
+            if (!player->IsBeingTeleportedFar() && player->GetMapId() == sLFGMgr->GetDungeonMapId(gguid))
+                player->TeleportToEntryPoint();
+        }
     }
 
     if (state != LFG_STATE_FINISHED_DUNGEON) // Need more players to finish the dungeon
@@ -247,9 +247,9 @@ void LFGGroupScript::OnDisband(Group* group)
     uint64 gguid = group->GetGUID();
     ;//sLog->outDebug(LOG_FILTER_LFG, "LFGScripts::OnDisband [" UI64FMTD "]", gguid);
 
-	// pussywizard: after all necessary actions handle raid browser
-	if (sLFGMgr->GetState(group->GetLeaderGUID()) == LFG_STATE_RAIDBROWSER)
-		sLFGMgr->LeaveLfg(group->GetLeaderGUID());
+    // pussywizard: after all necessary actions handle raid browser
+    if (sLFGMgr->GetState(group->GetLeaderGUID()) == LFG_STATE_RAIDBROWSER)
+        sLFGMgr->LeaveLfg(group->GetLeaderGUID());
 
     sLFGMgr->RemoveGroupData(gguid);
 }
@@ -264,9 +264,9 @@ void LFGGroupScript::OnChangeLeader(Group* group, uint64 newLeaderGuid, uint64 o
     ;//sLog->outDebug(LOG_FILTER_LFG, "LFGScripts::OnChangeLeader [" UI64FMTD "]: old [" UI64FMTD "] new [" UI64FMTD "]", gguid, newLeaderGuid, oldLeaderGuid);
     sLFGMgr->SetLeader(gguid, newLeaderGuid);
 
-	// pussywizard: after all necessary actions handle raid browser
-	if (sLFGMgr->GetState(oldLeaderGuid) == LFG_STATE_RAIDBROWSER)
-		sLFGMgr->LeaveLfg(oldLeaderGuid);
+    // pussywizard: after all necessary actions handle raid browser
+    if (sLFGMgr->GetState(oldLeaderGuid) == LFG_STATE_RAIDBROWSER)
+        sLFGMgr->LeaveLfg(oldLeaderGuid);
 }
 
 void LFGGroupScript::OnInviteMember(Group* group, uint64 guid)

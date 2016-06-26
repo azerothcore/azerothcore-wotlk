@@ -173,15 +173,15 @@ public:
 
         void DamageTaken(Unit* done_by, uint32 &damage, DamageEffectType, SpellSchoolMask)
         {
-			// xinef: some corrections
-			if (done_by)
-				if (Player* player = done_by->GetCharmerOrOwnerPlayerOrPlayerItself())
-					if (me->HealthBelowPctDamaged(20, damage))
-					{
-						player->GroupEventHappens(QUEST_10004, me);
-						damage = 0;
-						EnterEvadeMode();
-					}
+            // xinef: some corrections
+            if (done_by)
+                if (Player* player = done_by->GetCharmerOrOwnerPlayerOrPlayerItself())
+                    if (me->HealthBelowPctDamaged(20, damage))
+                    {
+                        player->GroupEventHappens(QUEST_10004, me);
+                        damage = 0;
+                        EnterEvadeMode();
+                    }
         }
 
         void UpdateAI(uint32 diff)
@@ -415,12 +415,12 @@ public:
 
         void IsSummonedBy(Unit* summoner)
         {
-			if (!summoner)
-				return;
+            if (!summoner)
+                return;
 
             Player* player = summoner->ToPlayer();
             if (player && player->GetQuestStatus(10211) == QUEST_STATUS_INCOMPLETE)
-				Start(false, false, summoner->GetGUID());
+                Start(false, false, summoner->GetGUID());
         }
 
         void Reset() { }

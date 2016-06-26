@@ -7,16 +7,16 @@ REWRITTEN BY XINEF
 
 enum DataTypes
 {
-	DATA_IRONAYA_DOORS					= 0,
-	DATA_STONE_KEEPERS					= 1,
-	DATA_ARCHAEDAS						= 2,
-	MAX_ENCOUNTERS						= 3
+    DATA_IRONAYA_DOORS                  = 0,
+    DATA_STONE_KEEPERS                  = 1,
+    DATA_ARCHAEDAS                      = 2,
+    MAX_ENCOUNTERS                      = 3
 };
 
 enum GameObjectIds
 {
     GO_ARCHAEDAS_TEMPLE_DOOR            = 141869,
-    GO_TEMPLE_DOOR						= 124367,
+    GO_TEMPLE_DOOR                      = 124367,
     GO_ANCIENT_VAULT_DOOR               = 124369,
     GO_IRONAYA_SEAL_DOOR                = 124372,
     GO_KEYSTONE                         = 124371,
@@ -24,8 +24,8 @@ enum GameObjectIds
 
 enum NpcIds
 {
-	NPC_STONE_KEEPER					= 4857,
-	NPC_ARCHAEDAS						= 2748
+    NPC_STONE_KEEPER                    = 4857,
+    NPC_ARCHAEDAS                       = 2748
 };
 
 #endif

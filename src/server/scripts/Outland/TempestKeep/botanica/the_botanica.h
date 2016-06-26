@@ -12,7 +12,7 @@ enum DataTypes
     DATA_THORNGRIN_THE_TENDER           = 2,
     DATA_LAJ                            = 3,
     DATA_WARP_SPLINTER                  = 4,
-	MAX_ENCOUNTER						= 5
+    MAX_ENCOUNTER                       = 5
 };
 
 enum CreatureIds
@@ -23,15 +23,15 @@ enum CreatureIds
     NPC_LAJ                             = 17980,
     NPC_WARP_SPLINTER                   = 17977,
 
-	NPC_BLOODFALCON						= 18155
+    NPC_BLOODFALCON                     = 18155
 };
 
 enum SpellIds
 {
-	SPELL_ARCANE_FORM					= 34204,
-	SPELL_FIRE_FORM						= 34203,
-	SPELL_FROST_FORM					= 34202,
-	SPELL_SHADOW_FORM					= 34205
+    SPELL_ARCANE_FORM                   = 34204,
+    SPELL_FIRE_FORM                     = 34203,
+    SPELL_FROST_FORM                    = 34202,
+    SPELL_SHADOW_FORM                   = 34205
 };
 
 #endif

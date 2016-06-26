@@ -75,30 +75,30 @@ Battlefield::~Battlefield()
 // Called when a player enters the zone
 void Battlefield::HandlePlayerEnterZone(Player* player, uint32 /*zone*/)
 {
-	// Xinef: do not invite players on taxi
-	if (!player->IsInFlight())
-	{
-		// If battle is started, 
-		// If not full of players > invite player to join the war
-		// If full of players > announce to player that BF is full and kick him after a few second if he desn't leave
-		if (IsWarTime())
-		{
-			if (m_PlayersInWar[player->GetTeamId()].size() + m_InvitedPlayers[player->GetTeamId()].size() < m_MaxPlayer) // Vacant spaces
-				InvitePlayerToWar(player);
-			else // No more vacant places
-			{
-				// TODO: Send a packet to announce it to player
-				m_PlayersWillBeKick[player->GetTeamId()][player->GetGUID()] = time(NULL) + (player->IsGameMaster() ? 30*MINUTE : 10);
-				InvitePlayerToQueue(player);
-			}
-		}
-		else
-		{
-			// If time left is < 15 minutes invite player to join queue
-			if (m_Timer <= m_StartGroupingTimer)
-				InvitePlayerToQueue(player);
-		}
-	}
+    // Xinef: do not invite players on taxi
+    if (!player->IsInFlight())
+    {
+        // If battle is started, 
+        // If not full of players > invite player to join the war
+        // If full of players > announce to player that BF is full and kick him after a few second if he desn't leave
+        if (IsWarTime())
+        {
+            if (m_PlayersInWar[player->GetTeamId()].size() + m_InvitedPlayers[player->GetTeamId()].size() < m_MaxPlayer) // Vacant spaces
+                InvitePlayerToWar(player);
+            else // No more vacant places
+            {
+                // TODO: Send a packet to announce it to player
+                m_PlayersWillBeKick[player->GetTeamId()][player->GetGUID()] = time(NULL) + (player->IsGameMaster() ? 30*MINUTE : 10);
+                InvitePlayerToQueue(player);
+            }
+        }
+        else
+        {
+            // If time left is < 15 minutes invite player to join queue
+            if (m_Timer <= m_StartGroupingTimer)
+                InvitePlayerToQueue(player);
+        }
+    }
 
     // Add player in the list of player in zone
     m_players[player->GetTeamId()].insert(player->GetGUID());
@@ -116,8 +116,8 @@ void Battlefield::HandlePlayerLeaveZone(Player* player, uint32 /*zone*/)
             m_PlayersInWar[player->GetTeamId()].erase(player->GetGUID());
             player->GetSession()->SendBfLeaveMessage(m_BattleId);
             if (Group* group = player->GetGroup()) // Remove the player from the raid group
-				if (group->isBFGroup())
-					group->RemoveMember(player->GetGUID());
+                if (group->isBFGroup())
+                    group->RemoveMember(player->GetGUID());
 
             OnPlayerLeaveWar(player);
         }
@@ -138,12 +138,12 @@ bool Battlefield::Update(uint32 diff)
 {
     if (m_Timer <= diff)
     {
-		if (!IsEnabled() || (!IsWarTime() && sWorld->GetActiveSessionCount() > 3500)) // if WG is disabled or there is more than 3500 connections, switch automaticly
-		{
-			m_isActive = true;
-			EndBattle(false);
-			return false;
-		}
+        if (!IsEnabled() || (!IsWarTime() && sWorld->GetActiveSessionCount() > 3500)) // if WG is disabled or there is more than 3500 connections, switch automaticly
+        {
+            m_isActive = true;
+            EndBattle(false);
+            return false;
+        }
         // Battlefield ends on time
         if (IsWarTime())
             EndBattle(true);
@@ -153,8 +153,8 @@ bool Battlefield::Update(uint32 diff)
     else
         m_Timer -= diff;
 
-	if (!IsEnabled())
-		return false;
+    if (!IsEnabled())
+        return false;
 
     // Invite players a few minutes before the battle's beginning
     if (!IsWarTime() && !m_StartGrouping && m_Timer <= m_StartGroupingTimer)
@@ -466,7 +466,7 @@ void Battlefield::SendWarningToAllInZone(uint32 entry)
 {
     if (Unit* unit = ObjectAccessor::FindUnit(StalkerGuid))
         if (Creature* stalker = unit->ToCreature())
-			sCreatureTextMgr->SendChat(stalker, (uint8)entry, NULL, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_ZONE);
+            sCreatureTextMgr->SendChat(stalker, (uint8)entry, NULL, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_ZONE);
 }
 
 void Battlefield::SendWarningToPlayer(Player* player, uint32 entry)
@@ -544,11 +544,11 @@ bool Battlefield::AddOrSetPlayerToCorrectBfGroup(Player* player)
     if (!player->IsInWorld())
         return false;
 
-	if (player->GetGroup() && (player->GetGroup()->isBGGroup() || player->GetGroup()->isBFGroup()))
-	{
-		sLog->outMisc("Battlefield::AddOrSetPlayerToCorrectBfGroup - player is already in %s group!", (player->GetGroup()->isBGGroup() ? "BG" : "BF"));
-		return false;
-	}
+    if (player->GetGroup() && (player->GetGroup()->isBGGroup() || player->GetGroup()->isBFGroup()))
+    {
+        sLog->outMisc("Battlefield::AddOrSetPlayerToCorrectBfGroup - player is already in %s group!", (player->GetGroup()->isBGGroup() ? "BG" : "BF"));
+        return false;
+    }
 
     Group* group = GetFreeBfRaid(player->GetTeamId());
     if (!group)
@@ -802,7 +802,7 @@ Creature* Battlefield::SpawnCreature(uint32 entry, float x, float y, float z, fl
         return NULL;
     }
 
-	creature->setFaction(BattlefieldFactions[teamId]);
+    creature->setFaction(BattlefieldFactions[teamId]);
     creature->SetHomePosition(x, y, z, o);
 
     CreatureTemplate const* cinfo = sObjectMgr->GetCreatureTemplate(entry);
@@ -841,7 +841,7 @@ GameObject* Battlefield::SpawnGameObject(uint32 entry, float x, float y, float z
 
     // Add to world
     map->AddToMap(go);
-	go->setActive(true);
+    go->setActive(true);
 
     return go;
 }
@@ -890,7 +890,7 @@ GuidSet::iterator BfCapturePoint::HandlePlayerLeave(Player* player)
 
 void BfCapturePoint::SendChangePhase()
 {
-	GameObject* capturePoint = GetCapturePointGo();
+    GameObject* capturePoint = GetCapturePointGo();
     if (!capturePoint)
         return;
 
@@ -957,7 +957,7 @@ bool BfCapturePoint::DelCapturePoint()
 
 bool BfCapturePoint::Update(uint32 diff)
 {
-	GameObject* capturePoint = GetCapturePointGo();
+    GameObject* capturePoint = GetCapturePointGo();
     if (!capturePoint)
         return false;
 

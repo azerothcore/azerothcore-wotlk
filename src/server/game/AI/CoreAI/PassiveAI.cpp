@@ -64,7 +64,7 @@ void CritterAI::DamageTaken(Unit*, uint32&, DamageEffectType, SpellSchoolMask)
     if (!me->HasUnitState(UNIT_STATE_FLEEING))
         me->SetControlled(true, UNIT_STATE_FLEEING);
 
-	_combatTimer = 1;
+    _combatTimer = 1;
 }
 
 void CritterAI::EnterEvadeMode()
@@ -72,21 +72,21 @@ void CritterAI::EnterEvadeMode()
     if (me->HasUnitState(UNIT_STATE_FLEEING))
         me->SetControlled(false, UNIT_STATE_FLEEING);
     CreatureAI::EnterEvadeMode();
-	_combatTimer = 0;
+    _combatTimer = 0;
 }
 
 void CritterAI::UpdateAI(uint32 diff)
 {
-	if (me->IsInCombat())
-	{
-		_combatTimer += diff;
-		if (_combatTimer >= 5000)
-			EnterEvadeMode();
-	}
+    if (me->IsInCombat())
+    {
+        _combatTimer += diff;
+        if (_combatTimer >= 5000)
+            EnterEvadeMode();
+    }
 }
 
 void TriggerAI::IsSummonedBy(Unit* summoner)
 {
     if (me->m_spells[0])
-		me->CastSpell(me, me->m_spells[0], false, 0, 0, summoner ? summoner->GetGUID() : 0);
+        me->CastSpell(me, me->m_spells[0], false, 0, 0, summoner ? summoner->GetGUID() : 0);
 }

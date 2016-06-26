@@ -450,7 +450,7 @@ bool Item::LoadFromDB(uint32 guid, uint64 owner_guid, Field* fields, uint32 entr
     SetUInt32Value(ITEM_FIELD_DURABILITY, durability);
 
     // update max durability (and durability) if need
-	// xinef: do not overwrite durability for wrapped items!!
+    // xinef: do not overwrite durability for wrapped items!!
     SetUInt32Value(ITEM_FIELD_MAXDURABILITY, proto->MaxDurability);
     if (durability > proto->MaxDurability && !HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAG_WRAPPED))
     {
@@ -758,9 +758,9 @@ bool Item::IsEquipped() const
 
 bool Item::CanBeTraded(bool mail, bool trade) const
 {
-	// Xinef: little protection
-	if (m_lootGenerated)
-		return false;
+    // Xinef: little protection
+    if (m_lootGenerated)
+        return false;
 
     if ((!mail || !IsBoundAccountWide()) && (IsSoulBound() && (!HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAG_BOP_TRADEABLE) || !trade)))
         return false;
@@ -773,7 +773,7 @@ bool Item::CanBeTraded(bool mail, bool trade) const
         if (owner->CanUnequipItem(GetPos(), false) != EQUIP_ERR_OK)
             return false;
 
-		// Xinef: check if item is looted now
+        // Xinef: check if item is looted now
         if (owner->GetLootGUID() == GetGUID())
             return false;
     }

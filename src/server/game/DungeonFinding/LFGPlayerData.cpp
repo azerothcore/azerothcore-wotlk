@@ -31,8 +31,8 @@ LfgPlayerData::~LfgPlayerData()
 
 void LfgPlayerData::SetState(LfgState state)
 {
-	if (m_State == LFG_STATE_RAIDBROWSER && state != LFG_STATE_RAIDBROWSER && !CanOverrideRBState())
-		return;
+    if (m_State == LFG_STATE_RAIDBROWSER && state != LFG_STATE_RAIDBROWSER && !CanOverrideRBState())
+        return;
 
     switch (state)
     {
@@ -52,8 +52,8 @@ void LfgPlayerData::SetState(LfgState state)
 
 void LfgPlayerData::RestoreState()
 {
-	if (m_State == LFG_STATE_RAIDBROWSER && m_OldState != LFG_STATE_RAIDBROWSER && !CanOverrideRBState())
-		return;
+    if (m_State == LFG_STATE_RAIDBROWSER && m_OldState != LFG_STATE_RAIDBROWSER && !CanOverrideRBState())
+        return;
 
     if (m_OldState == LFG_STATE_NONE)
     {
@@ -95,12 +95,12 @@ void LfgPlayerData::SetSelectedDungeons(LfgDungeonSet const& dungeons)
 
 void LfgPlayerData::SetRandomPlayersCount(uint8 count)
 {
-	m_randomPlayers = count;
+    m_randomPlayers = count;
 }
 
 uint8 LfgPlayerData::GetRandomPlayersCount() const
 {
-	return m_randomPlayers;
+    return m_randomPlayers;
 }
 
 LfgState LfgPlayerData::GetState() const

@@ -651,17 +651,17 @@ void Map::ScriptsProcess()
                         sLog->outError("%s creature entry (datalong) is not specified.", step.script->GetDebugInfo().c_str());
                     else
                     {
-						uint32 entry = step.script->TempSummonCreature.CreatureEntry;
+                        uint32 entry = step.script->TempSummonCreature.CreatureEntry;
 
                         float x = step.script->TempSummonCreature.PosX;
                         float y = step.script->TempSummonCreature.PosY;
                         float z = step.script->TempSummonCreature.PosZ;
                         float o = step.script->TempSummonCreature.Orientation;
 
-						if (step.script->TempSummonCreature.CheckIfExists)
-							if (Unit* trigger = pSummoner->SummonTrigger(x, y, z, o, 1))
-								if (trigger->FindNearestCreature(entry, 60.0f))
-									break;
+                        if (step.script->TempSummonCreature.CheckIfExists)
+                            if (Unit* trigger = pSummoner->SummonTrigger(x, y, z, o, 1))
+                                if (trigger->FindNearestCreature(entry, 60.0f))
+                                    break;
 
                         if (!pSummoner->SummonCreature(entry, x, y, z, o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, step.script->TempSummonCreature.DespawnDelay))
                             sLog->outError("%s creature was not spawned (entry: %u).", step.script->GetDebugInfo().c_str(), step.script->TempSummonCreature.CreatureEntry);

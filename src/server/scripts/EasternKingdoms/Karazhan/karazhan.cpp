@@ -439,8 +439,8 @@ public:
         npc_image_of_medivhAI(Creature* creature) : ScriptedAI(creature)
         {
             instance = creature->GetInstanceScript();
-			Step = 1;
-			YellTimer = 5000;
+            Step = 1;
+            YellTimer = 5000;
         }
 
         InstanceScript* instance;
@@ -457,28 +457,28 @@ public:
         void Reset()
         {
             ArcanagosGUID = 0;
-			MTimer = 0;
-			ATimer = 0;
+            MTimer = 0;
+            ATimer = 0;
 
             if (instance && instance->GetData64(DATA_IMAGE_OF_MEDIVH) == 0)
             {
-				Creature* Arcanagos = me->SummonCreature(NPC_ARCANAGOS, ArcanagosPos[0], ArcanagosPos[1], ArcanagosPos[2], 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000);
-				if (!Arcanagos)
-				{
-					me->DespawnOrUnsummon();
-					return;
-				}
+                Creature* Arcanagos = me->SummonCreature(NPC_ARCANAGOS, ArcanagosPos[0], ArcanagosPos[1], ArcanagosPos[2], 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000);
+                if (!Arcanagos)
+                {
+                    me->DespawnOrUnsummon();
+                    return;
+                }
 
-				instance->SetData64(DATA_IMAGE_OF_MEDIVH, me->GetGUID());
-				EventStarted = true;
-				ArcanagosGUID = Arcanagos->GetGUID();
+                instance->SetData64(DATA_IMAGE_OF_MEDIVH, me->GetGUID());
+                EventStarted = true;
+                ArcanagosGUID = Arcanagos->GetGUID();
 
-				Arcanagos->SetFacingToObject(me);
-				me->SetFacingToObject(Arcanagos);
+                Arcanagos->SetFacingToObject(me);
+                me->SetFacingToObject(Arcanagos);
 
-				Arcanagos->SetCanFly(true);
+                Arcanagos->SetCanFly(true);
             }
-			else
+            else
                 me->DespawnOrUnsummon();
         }
 
@@ -509,8 +509,8 @@ public:
                 if (Creature* arca = ObjectAccessor::GetCreature((*me), ArcanagosGUID))
                     arca->MonsterYell(SAY_DIALOG_ARCANAGOS_6, LANG_UNIVERSAL, 0);
 
-				ATimer = 5500;
-				MTimer = 6600;
+                ATimer = 5500;
+                MTimer = 6600;
                 return 10000;
             case 7:
                 return 1000;
@@ -519,10 +519,10 @@ public:
                 return 5500;
             case 9:
                 me->MonsterTextEmote(EMOTE_DIALOG_MEDIVH_7, 0, false);
-				me->CastSpell(me, 30972, true);
+                me->CastSpell(me, 30972, true);
                 return 10000;
             case 10:
-				me->RemoveAurasDueToSpell(30972);
+                me->RemoveAurasDueToSpell(30972);
                 if (Creature* arca = ObjectAccessor::GetCreature((*me), ArcanagosGUID))
                     me->CastSpell(arca, SPELL_CONFLAGRATION_BLAST, false);
                 return 1000;
@@ -531,12 +531,12 @@ public:
                     arca->MonsterYell(SAY_DIALOG_ARCANAGOS_8, LANG_UNIVERSAL, 0);
                 return 5000;
             case 12:
-				if (Creature* arca = ObjectAccessor::GetCreature((*me), ArcanagosGUID))
-				{
-					arca->SetSpeed(MOVE_RUN, 2.0f);
-					arca->GetMotionMaster()->MovePoint(0, -11010.82f, -1761.18f, 156.47f);
-					arca->InterruptNonMeleeSpells(true);
-				}
+                if (Creature* arca = ObjectAccessor::GetCreature((*me), ArcanagosGUID))
+                {
+                    arca->SetSpeed(MOVE_RUN, 2.0f);
+                    arca->GetMotionMaster()->MovePoint(0, -11010.82f, -1761.18f, 156.47f);
+                    arca->InterruptNonMeleeSpells(true);
+                }
                 return 10000;
             case 13:
                 me->MonsterYell(SAY_DIALOG_MEDIVH_9, LANG_UNIVERSAL, 0);
@@ -548,20 +548,20 @@ public:
                     for (InstanceMap::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
                     {
                         if (i->GetSource()->GetQuestStatus(9645) == QUEST_STATUS_INCOMPLETE)
-						{
+                        {
                             i->GetSource()->GroupEventHappens(9645, me);
-							break;
-						}
+                            break;
+                        }
                     }
                 }
 
-				me->DespawnOrUnsummon(100);
-				if (Creature* arca = ObjectAccessor::GetCreature((*me), ArcanagosGUID))
-					arca->DespawnOrUnsummon(100);
+                me->DespawnOrUnsummon(100);
+                if (Creature* arca = ObjectAccessor::GetCreature((*me), ArcanagosGUID))
+                    arca->DespawnOrUnsummon(100);
 
                 return 5000;
             default: 
-				return 2000;
+                return 2000;
             }
 
         }
@@ -577,8 +577,8 @@ public:
 
             if (Step >= 7 && Step <= 8)
             {
-				ATimer += diff;
-				MTimer += diff;
+                ATimer += diff;
+                MTimer += diff;
                 if (ATimer >= 6000)
                 {
                     if (Unit* arca = ObjectAccessor::GetUnit((*me), ArcanagosGUID))
@@ -588,7 +588,7 @@ public:
                 if (MTimer >= 6000)
                 {
                     if (Unit* arca = ObjectAccessor::GetUnit((*me), ArcanagosGUID))
-						me->CastSpell(arca, SPELL_FIRE_BALL, false);
+                        me->CastSpell(arca, SPELL_FIRE_BALL, false);
                     MTimer = 0;
                 }
             }

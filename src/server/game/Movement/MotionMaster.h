@@ -167,7 +167,7 @@ class MotionMaster //: private std::stack<MovementGenerator *>
 
         void MovementExpiredOnSlot(MovementSlot slot, bool reset = true)
         {
-			// xinef: cannot be used during motion update!
+            // xinef: cannot be used during motion update!
             if (!(_cleanFlag & MMCF_UPDATE))
                 DirectExpireSlot(slot, reset);
         }
@@ -207,7 +207,7 @@ class MotionMaster //: private std::stack<MovementGenerator *>
 
         MovementGeneratorType GetCurrentMovementGeneratorType() const;
         MovementGeneratorType GetMotionSlotType(int slot) const;
-		uint32 GetCurrentSplineId() const; // Xinef: Escort system
+        uint32 GetCurrentSplineId() const; // Xinef: Escort system
 
         void propagateSpeedChange();
         void ReinitializeMovement();

@@ -101,9 +101,9 @@ bool WaypointMovementGenerator<Creature>::StartMove(Creature* creature)
     if (!i_path || i_path->empty())
         return false;
 
-	// Xinef: Dont allow dead creatures to move
-	if (!creature->IsAlive())
-		return false;
+    // Xinef: Dont allow dead creatures to move
+    if (!creature->IsAlive())
+        return false;
 
     if (Stopped())
         return true;
@@ -112,7 +112,7 @@ bool WaypointMovementGenerator<Creature>::StartMove(Creature* creature)
 
     if (m_isArrivalDone)
     {
-		// Xinef: not true... update this at every waypoint!
+        // Xinef: not true... update this at every waypoint!
         //if ((i_currentNode == i_path->size() - 1) && !repeating) // If that's our last waypoint
         {
             float x = i_path->at(i_currentNode)->x;
@@ -135,11 +135,11 @@ bool WaypointMovementGenerator<Creature>::StartMove(Creature* creature)
                     transportPath = false;
                 // else if (vehicle) - this should never happen, vehicle offsets are const
             }
-		}
+        }
 
-		// Xinef: moved the upper IF here
-		if ((i_currentNode == i_path->size() - 1) && !repeating) // If that's our last waypoint
-		{
+        // Xinef: moved the upper IF here
+        if ((i_currentNode == i_path->size() - 1) && !repeating) // If that's our last waypoint
+        {
             creature->GetMotionMaster()->Initialize();
             return false;
         }
@@ -147,9 +147,9 @@ bool WaypointMovementGenerator<Creature>::StartMove(Creature* creature)
         i_currentNode = (i_currentNode+1) % i_path->size();
     }
 
-	// xinef: do not initialize motion if we got stunned in movementinform
-	if (creature->HasUnitState(UNIT_STATE_NOT_MOVE))
-		return true;
+    // xinef: do not initialize motion if we got stunned in movementinform
+    if (creature->HasUnitState(UNIT_STATE_NOT_MOVE))
+        return true;
 
     WaypointData const* node = i_path->at(i_currentNode);
 
@@ -214,25 +214,25 @@ bool WaypointMovementGenerator<Creature>::DoUpdate(Creature* creature, uint32 di
     if (!i_path || i_path->empty())
         return false;
 
-	// Xinef: Dont allow dead creatures to move
-	if (!creature->IsAlive())
-		return false;
+    // Xinef: Dont allow dead creatures to move
+    if (!creature->IsAlive())
+        return false;
 
     // prevent movement while casting spells with cast time or channel time
     if (creature->HasUnitState(UNIT_STATE_CASTING))
     {
-		bool stop = true;
-		if (Spell* spell = creature->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
-			if (!(spell->GetSpellInfo()->ChannelInterruptFlags & (AURA_INTERRUPT_FLAG_MOVE | AURA_INTERRUPT_FLAG_TURNING)) && !(spell->GetSpellInfo()->InterruptFlags & SPELL_INTERRUPT_FLAG_MOVEMENT))
-				stop = false;
+        bool stop = true;
+        if (Spell* spell = creature->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
+            if (!(spell->GetSpellInfo()->ChannelInterruptFlags & (AURA_INTERRUPT_FLAG_MOVE | AURA_INTERRUPT_FLAG_TURNING)) && !(spell->GetSpellInfo()->InterruptFlags & SPELL_INTERRUPT_FLAG_MOVEMENT))
+                stop = false;
 
-		if (stop)
-		{
-			Stop(1000);
-			if (!creature->IsStopped())
-				creature->StopMoving();
-			return true;
-		}
+        if (stop)
+        {
+            Stop(1000);
+            if (!creature->IsStopped())
+                creature->StopMoving();
+            return true;
+        }
     }
 
     if (Stopped())
@@ -246,17 +246,17 @@ bool WaypointMovementGenerator<Creature>::DoUpdate(Creature* creature, uint32 di
             Stop(STOP_TIME_FOR_PLAYER);
         else
         {
-			// xinef: code to detect pre-empetively if we should start movement to next waypoint
-			// xinef: do not start pre-empetive movement if current node has delay or we are ending waypoint movement
-			bool finished = creature->movespline->Finalized();
-			if (!finished && !i_path->at(i_currentNode)->delay && ((i_currentNode != i_path->size() - 1) || repeating))
-				finished = (creature->movespline->_Spline().length(creature->movespline->_currentSplineIdx()+1) - creature->movespline->timePassed()) < 200;
+            // xinef: code to detect pre-empetively if we should start movement to next waypoint
+            // xinef: do not start pre-empetive movement if current node has delay or we are ending waypoint movement
+            bool finished = creature->movespline->Finalized();
+            if (!finished && !i_path->at(i_currentNode)->delay && ((i_currentNode != i_path->size() - 1) || repeating))
+                finished = (creature->movespline->_Spline().length(creature->movespline->_currentSplineIdx()+1) - creature->movespline->timePassed()) < 200;
 
-			if (finished)
-			{
-				OnArrived(creature);
-				return StartMove(creature);
-			}
+            if (finished)
+            {
+                OnArrived(creature);
+                return StartMove(creature);
+            }
         }
     }
      return true;
@@ -318,7 +318,7 @@ void FlightPathMovementGenerator::DoFinalize(Player* player)
     // remove flag to prevent send object build movement packets for flight state and crash (movement generator already not at top of stack)
     player->ClearUnitState(UNIT_STATE_IN_FLIGHT);
 
-	// xinef: this should be cleaned by CleanupAfterTaxiFlight(); function!
+    // xinef: this should be cleaned by CleanupAfterTaxiFlight(); function!
     player->Dismount();
     player->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_TAXI_FLIGHT);
 
@@ -329,7 +329,7 @@ void FlightPathMovementGenerator::DoFinalize(Player* player)
         // this prevent cheating with landing  point at lags
         // when client side flight end early in comparison server side
         player->StopMoving();
-		player->SetFallInformation(time(NULL), player->GetPositionZ());
+        player->SetFallInformation(time(NULL), player->GetPositionZ());
     }
 
     player->RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_TAXI_BENCHMARK);
@@ -358,13 +358,13 @@ void FlightPathMovementGenerator::DoReset(Player* player)
 
 bool FlightPathMovementGenerator::DoUpdate(Player* player, uint32 /*diff*/)
 {
-	// xinef: map was switched
-	if (_mapSwitch)
-	{
-		DoInitialize(player);
-		_mapSwitch = false;
-		return true;
-	}
+    // xinef: map was switched
+    if (_mapSwitch)
+    {
+        DoInitialize(player);
+        _mapSwitch = false;
+        return true;
+    }
 
     uint32 pointId = (uint32)player->movespline->currentPathIdx();
     if (pointId > i_currentNode)
@@ -372,30 +372,30 @@ bool FlightPathMovementGenerator::DoUpdate(Player* player, uint32 /*diff*/)
         bool departureEvent = true;
         do
         {
-			if (i_currentNode >= i_path.size())
-			{
-				sLog->outMisc("TAXI NODE WAS GREATER THAN PATH SIZE, GUID: %u, POINTID: %u, NODESIZE: %u, CURRENT: %u", player->GetGUIDLow(), pointId, i_path.size(), i_currentNode);
-				player->CleanupAfterTaxiFlight();
-				return false;
-			}
+            if (i_currentNode >= i_path.size())
+            {
+                sLog->outMisc("TAXI NODE WAS GREATER THAN PATH SIZE, GUID: %u, POINTID: %u, NODESIZE: %u, CURRENT: %u", player->GetGUIDLow(), pointId, i_path.size(), i_currentNode);
+                player->CleanupAfterTaxiFlight();
+                return false;
+            }
 
-			if (i_path[i_currentNode]->mapid != player->GetMapId())
-			{
-				sLog->outMisc("Player on different map, curmap: %u, pointmap: %u, nodesize: %u, currentnode: %u", player->GetMapId(), i_path[i_currentNode]->mapid, i_path.size(), i_currentNode);
-				player->CleanupAfterTaxiFlight();
-				return false;
-			}
+            if (i_path[i_currentNode]->mapid != player->GetMapId())
+            {
+                sLog->outMisc("Player on different map, curmap: %u, pointmap: %u, nodesize: %u, currentnode: %u", player->GetMapId(), i_path[i_currentNode]->mapid, i_path.size(), i_currentNode);
+                player->CleanupAfterTaxiFlight();
+                return false;
+            }
 
             DoEventIfAny(player, i_path[i_currentNode], departureEvent);
 
-			// xinef: erase any previous points
-			uint32 curSize = _pointsForPathSwitch.size();
+            // xinef: erase any previous points
+            uint32 curSize = _pointsForPathSwitch.size();
             while (!_pointsForPathSwitch.empty() && _pointsForPathSwitch.front() <= i_currentNode)
                 _pointsForPathSwitch.pop_front();
 
-			// xinef: switch destination only once
-			if (curSize != _pointsForPathSwitch.size())
-				player->m_taxi.NextTaxiDestination();
+            // xinef: switch destination only once
+            if (curSize != _pointsForPathSwitch.size())
+                player->m_taxi.NextTaxiDestination();
 
             if (pointId == i_currentNode)
                 break;
@@ -405,26 +405,26 @@ bool FlightPathMovementGenerator::DoUpdate(Player* player, uint32 /*diff*/)
             i_currentNode += (uint32)departureEvent;
             departureEvent = !departureEvent;
 
-			// xinef: map should be switched, do not rely on client packets QQ
-			if (i_currentNode + 1 < i_path.size() && i_path[i_currentNode+1]->mapid != player->GetMapId())
-			{
-				++i_currentNode;
-				_mapSwitch = true;
-				player->TeleportTo(i_path[i_currentNode]->mapid, i_path[i_currentNode]->x, i_path[i_currentNode]->y, i_path[i_currentNode]->z, player->GetOrientation(), TELE_TO_NOT_LEAVE_TAXI);
-				return true;
-			}
+            // xinef: map should be switched, do not rely on client packets QQ
+            if (i_currentNode + 1 < i_path.size() && i_path[i_currentNode+1]->mapid != player->GetMapId())
+            {
+                ++i_currentNode;
+                _mapSwitch = true;
+                player->TeleportTo(i_path[i_currentNode]->mapid, i_path[i_currentNode]->x, i_path[i_currentNode]->y, i_path[i_currentNode]->z, player->GetOrientation(), TELE_TO_NOT_LEAVE_TAXI);
+                return true;
+            }
 
-			// xinef: reached the end
-			if (i_currentNode >= i_path.size() - 1)
-			{
-				player->CleanupAfterTaxiFlight();
-				player->SetFallInformation(time(NULL), player->GetPositionZ());
-				if (player->pvpInfo.IsHostile)
-					player->CastSpell(player, 2479, true);
+            // xinef: reached the end
+            if (i_currentNode >= i_path.size() - 1)
+            {
+                player->CleanupAfterTaxiFlight();
+                player->SetFallInformation(time(NULL), player->GetPositionZ());
+                if (player->pvpInfo.IsHostile)
+                    player->CastSpell(player, 2479, true);
 
-				return false;
-			}
-		}
+                return false;
+            }
+        }
         while (true);
     }
 
@@ -463,17 +463,17 @@ void FlightPathMovementGenerator::InitEndGridInfo()
     uint32 nodeCount = i_path.size();        //! Number of nodes in path.
     _endMapId = i_path[nodeCount - 1]->mapid; //! MapId of last node
 
-	// pussywizard:
-	{
-		_preloadTargetNode = nodeCount - 1;
-		for (uint8 i = 3; i > 0; --i)
-			if (nodeCount >= i && _endMapId == i_path[nodeCount - i]->mapid)
-			{
-				_preloadTargetNode = nodeCount - i;
-				break;
-			}
-		//_preloadTargetNode = nodeCount - 3; // pussywizard: this can be on other map
-	}
+    // pussywizard:
+    {
+        _preloadTargetNode = nodeCount - 1;
+        for (uint8 i = 3; i > 0; --i)
+            if (nodeCount >= i && _endMapId == i_path[nodeCount - i]->mapid)
+            {
+                _preloadTargetNode = nodeCount - i;
+                break;
+            }
+        //_preloadTargetNode = nodeCount - 3; // pussywizard: this can be on other map
+    }
 
     _endGridX = i_path[nodeCount - 1]->x;
     _endGridY = i_path[nodeCount - 1]->y;

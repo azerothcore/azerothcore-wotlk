@@ -435,11 +435,11 @@ class boss_janalai : public CreatureScript
                     FireBreathTimer = 8000;
                 } else FireBreathTimer -= diff;
             }
-					
-			bool CheckEvadeIfOutOfCombatArea() const
-			{
-				return me->GetPositionZ() <= 12.0f;
-			}
+                    
+            bool CheckEvadeIfOutOfCombatArea() const
+            {
+                return me->GetPositionZ() <= 12.0f;
+            }
         };
 
         CreatureAI* GetAI(Creature* creature) const

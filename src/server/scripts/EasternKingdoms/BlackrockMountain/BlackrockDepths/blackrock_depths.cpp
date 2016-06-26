@@ -49,17 +49,17 @@ public:
 
 enum eChallenge
 {
-	QUEST_THE_CHALLENGE					= 9015,
-	GO_BANNER_OF_PROVOCATION			= 181058,
-	GO_ARENA_SPOILS						= 181074,
+    QUEST_THE_CHALLENGE                 = 9015,
+    GO_BANNER_OF_PROVOCATION            = 181058,
+    GO_ARENA_SPOILS                     = 181074,
 
-	NPC_GRIMSTONE						= 10096,
-	NPC_THELDREN						= 16059,
+    NPC_GRIMSTONE                       = 10096,
+    NPC_THELDREN                        = 16059,
 };
 
 uint32 theldrenTeam[] =
 {
-	16053, 16055, 16050, 16051, 16049, 16052, 16054, 16058
+    16053, 16055, 16050, 16051, 16049, 16052, 16054, 16058
 };
 
 uint32 RingMob[]=
@@ -130,39 +130,39 @@ public:
         {
             instance = creature->GetInstanceScript();
             MobSpawnId = rand()%6;
-			eventPhase = 0;
-			eventTimer = 1000;
-			theldrenEvent = false;
-			summons.DespawnAll();
+            eventPhase = 0;
+            eventTimer = 1000;
+            theldrenEvent = false;
+            summons.DespawnAll();
         }
 
         InstanceScript* instance;
-		SummonList summons;
+        SummonList summons;
 
         uint8 eventPhase;
         uint32 eventTimer;
         uint8 MobSpawnId;
-		bool theldrenEvent;
+        bool theldrenEvent;
 
         void Reset()
         {
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
         }
 
-		void JustSummoned(Creature* summon)
-		{
-			summons.Summon(summon);
-			if (Unit* target = SelectTargetFromPlayerList(100.0f))
-				summon->AI()->AttackStart(target);
-		}
+        void JustSummoned(Creature* summon)
+        {
+            summons.Summon(summon);
+            if (Unit* target = SelectTargetFromPlayerList(100.0f))
+                summon->AI()->AttackStart(target);
+        }
 
-		void SummonedCreatureDies(Creature* summon, Unit*)
-		{
-			summons.Despawn(summon);
-			// All Summons killed, next phase
-			if (summons.empty())
-				eventTimer = 5000;
-		}
+        void SummonedCreatureDies(Creature* summon, Unit*)
+        {
+            summons.Despawn(summon);
+            // All Summons killed, next phase
+            if (summons.empty())
+                eventTimer = 5000;
+        }
 
         void WaypointReached(uint32 waypointId)
         {
@@ -204,19 +204,19 @@ public:
             instance->HandleGameObject(instance->GetData64(id), open);
         }
 
-		void SummonBoss()
-		{
-			if (me->FindNearestGameObject(GO_BANNER_OF_PROVOCATION, 100.0f))
-			{
-				theldrenEvent = true;
-				me->SummonCreature(NPC_THELDREN, 644.300f, -175.989f, -53.739f, 3.418f, TEMPSUMMON_DEAD_DESPAWN, 0);
-				uint8 rand = urand(0, 4);
-				for (uint8 i = rand; i < rand+4; ++i)
-					me->SummonCreature(theldrenTeam[i], 644.300f, -175.989f, -53.739f, 3.418f, TEMPSUMMON_DEAD_DESPAWN, 0);
-			}
-			else
-				me->SummonCreature(RingBoss[rand()%6], 644.300f, -175.989f, -53.739f, 3.418f, TEMPSUMMON_DEAD_DESPAWN, 0);
-		}
+        void SummonBoss()
+        {
+            if (me->FindNearestGameObject(GO_BANNER_OF_PROVOCATION, 100.0f))
+            {
+                theldrenEvent = true;
+                me->SummonCreature(NPC_THELDREN, 644.300f, -175.989f, -53.739f, 3.418f, TEMPSUMMON_DEAD_DESPAWN, 0);
+                uint8 rand = urand(0, 4);
+                for (uint8 i = rand; i < rand+4; ++i)
+                    me->SummonCreature(theldrenTeam[i], 644.300f, -175.989f, -53.739f, 3.418f, TEMPSUMMON_DEAD_DESPAWN, 0);
+            }
+            else
+                me->SummonCreature(RingBoss[rand()%6], 644.300f, -175.989f, -53.739f, 3.418f, TEMPSUMMON_DEAD_DESPAWN, 0);
+        }
 
         void UpdateEscortAI(uint32 diff)
         {
@@ -229,77 +229,77 @@ public:
                 {
                     switch (eventPhase)
                     {
-						case 0:
-							Talk(SAY_TEXT5);
-							HandleGameObject(DATA_ARENA4, false);
-							Start(false, false);
-							eventTimer = 0;
-							break;
-						case 1:
-							SetEscortPaused(false);
-							eventTimer = 0;
-							break;
-						case 2:
-							eventTimer = 2000;
-							break;
-						case 3:
-							HandleGameObject(DATA_ARENA1, true);
-							eventTimer = 3000;
-							break;
-						case 4:
-							SetEscortPaused(false);
-							me->SetVisible(false);
-							me->SummonCreature(RingMob[MobSpawnId], 608.960f, -235.322f, -53.907f, 1.857f, TEMPSUMMON_DEAD_DESPAWN, 0);
-							eventTimer = 8000;
-							break;
-						case 5:
-							me->SummonCreature(RingMob[MobSpawnId], 608.960f, -235.322f, -53.907f, 1.857f, TEMPSUMMON_DEAD_DESPAWN, 0);
-							me->SummonCreature(RingMob[MobSpawnId], 608.960f, -235.322f, -53.907f, 1.857f, TEMPSUMMON_DEAD_DESPAWN, 0);
-							eventTimer = 8000;
-							break;
-						case 6:
-							me->SummonCreature(RingMob[MobSpawnId], 608.960f, -235.322f, -53.907f, 1.857f, TEMPSUMMON_DEAD_DESPAWN, 0);
-							eventTimer = 0;
-							break;
-						case 7:
-							me->SetVisible(true);
-							HandleGameObject(DATA_ARENA1, false);
-							Talk(SAY_TEXT6);
-							SetEscortPaused(false);
-							eventTimer = 0;
-							break;
-						case 8:
-							HandleGameObject(DATA_ARENA2, true);
-							eventTimer = 5000;
-							break;
-						case 9:
-							me->SetVisible(false);
-							SummonBoss();
-							eventTimer = 0;
-							break;
-						case 10:
-							if (theldrenEvent)
-							{
-								if (GameObject* go = me->SummonGameObject(GO_ARENA_SPOILS, 596.48f, -187.91f, -54.14f, 4.9f, 0.0f, 0.0f, 0.0f, 0.0f, 300))
-									go->SetOwnerGUID(0);
+                        case 0:
+                            Talk(SAY_TEXT5);
+                            HandleGameObject(DATA_ARENA4, false);
+                            Start(false, false);
+                            eventTimer = 0;
+                            break;
+                        case 1:
+                            SetEscortPaused(false);
+                            eventTimer = 0;
+                            break;
+                        case 2:
+                            eventTimer = 2000;
+                            break;
+                        case 3:
+                            HandleGameObject(DATA_ARENA1, true);
+                            eventTimer = 3000;
+                            break;
+                        case 4:
+                            SetEscortPaused(false);
+                            me->SetVisible(false);
+                            me->SummonCreature(RingMob[MobSpawnId], 608.960f, -235.322f, -53.907f, 1.857f, TEMPSUMMON_DEAD_DESPAWN, 0);
+                            eventTimer = 8000;
+                            break;
+                        case 5:
+                            me->SummonCreature(RingMob[MobSpawnId], 608.960f, -235.322f, -53.907f, 1.857f, TEMPSUMMON_DEAD_DESPAWN, 0);
+                            me->SummonCreature(RingMob[MobSpawnId], 608.960f, -235.322f, -53.907f, 1.857f, TEMPSUMMON_DEAD_DESPAWN, 0);
+                            eventTimer = 8000;
+                            break;
+                        case 6:
+                            me->SummonCreature(RingMob[MobSpawnId], 608.960f, -235.322f, -53.907f, 1.857f, TEMPSUMMON_DEAD_DESPAWN, 0);
+                            eventTimer = 0;
+                            break;
+                        case 7:
+                            me->SetVisible(true);
+                            HandleGameObject(DATA_ARENA1, false);
+                            Talk(SAY_TEXT6);
+                            SetEscortPaused(false);
+                            eventTimer = 0;
+                            break;
+                        case 8:
+                            HandleGameObject(DATA_ARENA2, true);
+                            eventTimer = 5000;
+                            break;
+                        case 9:
+                            me->SetVisible(false);
+                            SummonBoss();
+                            eventTimer = 0;
+                            break;
+                        case 10:
+                            if (theldrenEvent)
+                            {
+                                if (GameObject* go = me->SummonGameObject(GO_ARENA_SPOILS, 596.48f, -187.91f, -54.14f, 4.9f, 0.0f, 0.0f, 0.0f, 0.0f, 300))
+                                    go->SetOwnerGUID(0);
 
-								Map::PlayerList const &pl = me->GetMap()->GetPlayers();
-								for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
-									itr->GetSource()->KilledMonsterCredit(16166, 0);
-							}
+                                Map::PlayerList const &pl = me->GetMap()->GetPlayers();
+                                for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
+                                    itr->GetSource()->KilledMonsterCredit(16166, 0);
+                            }
 
-							HandleGameObject(DATA_ARENA2, false);
-							HandleGameObject(DATA_ARENA3, true);
-							HandleGameObject(DATA_ARENA4, true);
-							SetEscortPaused(false);
-							break;
+                            HandleGameObject(DATA_ARENA2, false);
+                            HandleGameObject(DATA_ARENA3, true);
+                            HandleGameObject(DATA_ARENA4, true);
+                            SetEscortPaused(false);
+                            break;
                     }
                     ++eventPhase;
                 }
-				else
-					eventTimer -= diff;
+                else
+                    eventTimer -= diff;
             }
-		}
+        }
     };
 };
 

@@ -67,8 +67,8 @@ Map::~Map()
     if (!m_scriptSchedule.empty())
         sScriptMgr->DecreaseScheduledScriptCount(m_scriptSchedule.size());
 
-	//MMAP::MMapFactory::createOrGetMMapManager()->unloadMap(GetId());
-	MMAP::MMapFactory::createOrGetMMapManager()->unloadMapInstance(GetId(), i_InstanceId);
+    //MMAP::MMapFactory::createOrGetMMapManager()->unloadMap(GetId());
+    MMAP::MMapFactory::createOrGetMMapManager()->unloadMapInstance(GetId(), i_InstanceId);
 }
 
 bool Map::ExistMap(uint32 mapid, int gx, int gy)
@@ -237,15 +237,15 @@ void Map::InitVisibilityDistance()
     //init visibility for continents
     m_VisibleDistance = World::GetMaxVisibleDistanceOnContinents();
 
-	switch (GetId())
-	{
-		case 609: // Scarlet Enclave (DK starting zone)
-			m_VisibleDistance = 125.0f;
-			break;
-		case 25: // Scott Test (box map)
-			m_VisibleDistance = 200.0f;
-			break;
-	}
+    switch (GetId())
+    {
+        case 609: // Scarlet Enclave (DK starting zone)
+            m_VisibleDistance = 125.0f;
+            break;
+        case 25: // Scott Test (box map)
+            m_VisibleDistance = 200.0f;
+            break;
+    }
 }
 
 // Template specialization of utility methods
@@ -393,8 +393,8 @@ void Map::DeleteFromWorld(Player* player)
 
 void Map::EnsureGridCreated(const GridCoord &p)
 { 
-	if (getNGrid(p.x_coord, p.y_coord)) // pussywizard
-		return;
+    if (getNGrid(p.x_coord, p.y_coord)) // pussywizard
+        return;
     TRINITY_GUARD(ACE_Thread_Mutex, GridLock);
     EnsureGridCreated_i(p);
 }
@@ -405,9 +405,9 @@ void Map::EnsureGridCreated_i(const GridCoord &p)
 { 
     if (!getNGrid(p.x_coord, p.y_coord))
     {
-		// pussywizard: moved setNGrid to the end of the function
+        // pussywizard: moved setNGrid to the end of the function
         NGridType* ngt = new NGridType(p.x_coord*MAX_NUMBER_OF_GRIDS + p.y_coord, p.x_coord, p.y_coord);
-		
+        
         // build a linkage between this map and NGridType
         buildNGridLinkage(ngt); // pussywizard: getNGrid(x, y) changed to: ngt
 
@@ -420,8 +420,8 @@ void Map::EnsureGridCreated_i(const GridCoord &p)
             LoadMapAndVMap(gx, gy);
         }
 
-		// pussywizard: moved here
-		setNGrid(ngt, p.x_coord, p.y_coord);
+        // pussywizard: moved here
+        setNGrid(ngt, p.x_coord, p.y_coord);
     }
 }
 
@@ -478,7 +478,7 @@ bool Map::AddPlayerToMap(Player* player)
 
     SendInitTransports(player);
     SendInitSelf(player);
-	SendZoneDynamicInfo(player);
+    SendZoneDynamicInfo(player);
 
     player->m_clientGUIDs.clear();
     player->UpdateObjectVisibility(false);
@@ -538,10 +538,10 @@ bool Map::AddToMap(T* obj, bool checkTransport)
     //obj->SetMap(this);
     obj->AddToWorld();
 
-	if (checkTransport)
-		if (!(obj->GetTypeId() == TYPEID_GAMEOBJECT && obj->ToGameObject()->IsTransport())) // dont add transport to transport ;d
-			if (Transport* transport = GetTransportForPos(obj->GetPhaseMask(), obj->GetPositionX(), obj->GetPositionY(), obj->GetPositionZ(), obj))
-				transport->AddPassenger(obj, true);
+    if (checkTransport)
+        if (!(obj->GetTypeId() == TYPEID_GAMEOBJECT && obj->ToGameObject()->IsTransport())) // dont add transport to transport ;d
+            if (Transport* transport = GetTransportForPos(obj->GetPhaseMask(), obj->GetPositionX(), obj->GetPositionY(), obj->GetPositionZ(), obj))
+                transport->AddPassenger(obj, true);
 
     InitializeObject(obj);
 
@@ -552,11 +552,11 @@ bool Map::AddToMap(T* obj, bool checkTransport)
     //also, trigger needs to cast spell, if not update, cannot see visual
     obj->UpdateObjectVisibility(true);
 
-	// Xinef: little hack for vehicles, accessories have to be added after visibility update so they wont fall off the vehicle, moved from Creature::AIM_Initialize
-	// Initialize vehicle, this is done only for summoned npcs, DB creatures are handled by grid loaders
+    // Xinef: little hack for vehicles, accessories have to be added after visibility update so they wont fall off the vehicle, moved from Creature::AIM_Initialize
+    // Initialize vehicle, this is done only for summoned npcs, DB creatures are handled by grid loaders
     if (obj->GetTypeId() == TYPEID_UNIT)
-		if (Vehicle* vehicle = obj->ToCreature()->GetVehicleKit())
-			vehicle->Reset();
+        if (Vehicle* vehicle = obj->ToCreature()->GetVehicleKit())
+            vehicle->Reset();
     return true;
 }
 
@@ -615,8 +615,8 @@ void Map::VisitNearbyCellsOf(WorldObject* obj, TypeContainerVisitor<Trinity::Obj
     if (!obj->IsPositionValid())
         return;
 
-	if (obj->GetGridActivationRange() <= 0.0f) // pussywizard: gameobjects for example are on active lists, but range is equal to 0 (they just prevent grid unloading)
-		return;
+    if (obj->GetGridActivationRange() <= 0.0f) // pussywizard: gameobjects for example are on active lists, but range is equal to 0 (they just prevent grid unloading)
+        return;
 
     // Update mobs/objects in ALL visible cells around object!
     CellArea area = Cell::CalculateCellArea(obj->GetPositionX(), obj->GetPositionY(), obj->GetGridActivationRange());
@@ -644,8 +644,8 @@ void Map::VisitNearbyCellsOf(WorldObject* obj, TypeContainerVisitor<Trinity::Obj
 
 void Map::Update(const uint32 t_diff, const uint32 s_diff, bool thread)
 {
-	uint32 mapId = GetId(); // pussywizard: for crashlogs
-	sLog->outDebug(LOG_FILTER_POOLSYS, "%u", mapId); // pussywizard: for crashlogs
+    uint32 mapId = GetId(); // pussywizard: for crashlogs
+    sLog->outDebug(LOG_FILTER_POOLSYS, "%u", mapId); // pussywizard: for crashlogs
 
     if (t_diff)
         _dynamicTree.update(t_diff);
@@ -662,22 +662,22 @@ void Map::Update(const uint32 t_diff, const uint32 s_diff, bool thread)
         }
     }
 
-	if (!t_diff)
-	{
-		for (m_mapRefIter = m_mapRefManager.begin(); m_mapRefIter != m_mapRefManager.end(); ++m_mapRefIter)
-		{
-			Player* player = m_mapRefIter->GetSource();
+    if (!t_diff)
+    {
+        for (m_mapRefIter = m_mapRefManager.begin(); m_mapRefIter != m_mapRefManager.end(); ++m_mapRefIter)
+        {
+            Player* player = m_mapRefIter->GetSource();
 
-			if (!player || !player->IsInWorld())
-				continue;
+            if (!player || !player->IsInWorld())
+                continue;
 
-			// update players at tick
-			player->Update(s_diff);
-		}
+            // update players at tick
+            player->Update(s_diff);
+        }
 
-		HandleDelayedVisibility();
-		return;
-	}
+        HandleDelayedVisibility();
+        return;
+    }
 
     /// update active cells around players and active objects
     resetMarkedCells();
@@ -759,22 +759,22 @@ void Map::Update(const uint32 t_diff, const uint32 s_diff, bool thread)
     MoveAllGameObjectsInMoveList();
     MoveAllDynamicObjectsInMoveList();
 
-	HandleDelayedVisibility();
+    HandleDelayedVisibility();
 
     sScriptMgr->OnMapUpdate(this, t_diff);
 
     BuildAndSendUpdateForObjects(); // pussywizard
 
-	sLog->outDebug(LOG_FILTER_POOLSYS, "%u", mapId); // pussywizard: for crashlogs
+    sLog->outDebug(LOG_FILTER_POOLSYS, "%u", mapId); // pussywizard: for crashlogs
 }
 
 void Map::HandleDelayedVisibility()
 { 
-	if (i_objectsForDelayedVisibility.empty())
-		return;
-	for (UNORDERED_SET<Unit*>::iterator itr = i_objectsForDelayedVisibility.begin(); itr != i_objectsForDelayedVisibility.end(); ++itr)
-		(*itr)->ExecuteDelayedUnitRelocationEvent();
-	i_objectsForDelayedVisibility.clear();
+    if (i_objectsForDelayedVisibility.empty())
+        return;
+    for (UNORDERED_SET<Unit*>::iterator itr = i_objectsForDelayedVisibility.begin(); itr != i_objectsForDelayedVisibility.end(); ++itr)
+        (*itr)->ExecuteDelayedUnitRelocationEvent();
+    i_objectsForDelayedVisibility.clear();
 }
 
 struct ResetNotifier
@@ -1020,13 +1020,13 @@ void Map::MoveAllCreaturesInMoveList()
         if (!c->IsInWorld())
             continue;
 
-		Cell const& old_cell = c->GetCurrentCell();
-		Cell new_cell(c->GetPositionX(), c->GetPositionY());
+        Cell const& old_cell = c->GetCurrentCell();
+        Cell new_cell(c->GetPositionX(), c->GetPositionY());
 
-		c->RemoveFromGrid();
-		if (old_cell.DiffGrid(new_cell))
-			EnsureGridLoaded(new_cell);
-		AddToGrid(c, new_cell);
+        c->RemoveFromGrid();
+        if (old_cell.DiffGrid(new_cell))
+            EnsureGridLoaded(new_cell);
+        AddToGrid(c, new_cell);
     }
     _creaturesToMove.clear();
 }
@@ -1049,13 +1049,13 @@ void Map::MoveAllGameObjectsInMoveList()
         if (!go->IsInWorld())
             continue;
 
-		Cell const& old_cell = go->GetCurrentCell();
-		Cell new_cell(go->GetPositionX(), go->GetPositionY());
+        Cell const& old_cell = go->GetCurrentCell();
+        Cell new_cell(go->GetPositionX(), go->GetPositionY());
 
-		go->RemoveFromGrid();
-		if (old_cell.DiffGrid(new_cell))
-			EnsureGridLoaded(new_cell);
-		AddToGrid(go, new_cell);
+        go->RemoveFromGrid();
+        if (old_cell.DiffGrid(new_cell))
+            EnsureGridLoaded(new_cell);
+        AddToGrid(go, new_cell);
     }
     _gameObjectsToMove.clear();
 }
@@ -1078,20 +1078,20 @@ void Map::MoveAllGameObjectsInMoveList()
         if (!dynObj->IsInWorld())
             continue;
 
-		Cell const& old_cell = dynObj->GetCurrentCell();
-		Cell new_cell(dynObj->GetPositionX(), dynObj->GetPositionY());
+        Cell const& old_cell = dynObj->GetCurrentCell();
+        Cell new_cell(dynObj->GetPositionX(), dynObj->GetPositionY());
 
-		dynObj->RemoveFromGrid();
-		if (old_cell.DiffGrid(new_cell))
-			EnsureGridLoaded(new_cell);
-		AddToGrid(dynObj, new_cell);
+        dynObj->RemoveFromGrid();
+        if (old_cell.DiffGrid(new_cell))
+            EnsureGridLoaded(new_cell);
+        AddToGrid(dynObj, new_cell);
     }
     _dynamicObjectsToMove.clear();
 }
 
 bool Map::UnloadGrid(NGridType& ngrid)
 { 
-	// pussywizard: UnloadGrid only done when whole map is unloaded, no need to worry about moving npcs between grids, etc.
+    // pussywizard: UnloadGrid only done when whole map is unloaded, no need to worry about moving npcs between grids, etc.
 
     const uint32 x = ngrid.getX();
     const uint32 y = ngrid.getY();
@@ -1166,9 +1166,9 @@ void Map::UnloadAll()
         UnloadGrid(grid); // deletes the grid and removes it from the GridRefManager
     }
 
-	// pussywizard: crashfix, some npc can be left on transport (not a default passenger)
-	if (!AllTransportsEmpty())
-		AllTransportsRemovePassengers();
+    // pussywizard: crashfix, some npc can be left on transport (not a default passenger)
+    if (!AllTransportsEmpty())
+        AllTransportsRemovePassengers();
 
     for (TransportsContainer::iterator itr = _transports.begin(); itr != _transports.end();)
     {
@@ -1772,27 +1772,27 @@ Transport* Map::GetTransportForPos(uint32 phase, float x, float y, float z, Worl
 {
     G3D::Vector3 v(x, y, z + 2.0f);
     G3D::Ray r(v, G3D::Vector3(0, 0, -1));
-	for (TransportsContainer::const_iterator itr = _transports.begin(); itr != _transports.end(); ++itr)
-		if ((*itr)->IsInWorld() && (*itr)->GetExactDistSq(x, y, z) < 75.0f*75.0f && (*itr)->m_model)
-		{
-			float dist = 30.0f;
-			bool hit = (*itr)->m_model->intersectRay(r, dist, false, phase);
-			if (hit)
-				return *itr;
-		}
+    for (TransportsContainer::const_iterator itr = _transports.begin(); itr != _transports.end(); ++itr)
+        if ((*itr)->IsInWorld() && (*itr)->GetExactDistSq(x, y, z) < 75.0f*75.0f && (*itr)->m_model)
+        {
+            float dist = 30.0f;
+            bool hit = (*itr)->m_model->intersectRay(r, dist, false, phase);
+            if (hit)
+                return *itr;
+        }
 
-	if (worldobject)
-		if (GameObject* staticTrans = worldobject->FindNearestGameObjectOfType(GAMEOBJECT_TYPE_TRANSPORT, 75.0f))
-			if (staticTrans->m_model)
-			{
-				float dist = 10.0f;
-				bool hit = staticTrans->m_model->intersectRay(r, dist, false, phase);
-				if (hit)
-					if (GetHeight(phase, x, y, z, true, 30.0f) < (v.z - dist + 1.0f))
-						return staticTrans->ToTransport();
-			}
+    if (worldobject)
+        if (GameObject* staticTrans = worldobject->FindNearestGameObjectOfType(GAMEOBJECT_TYPE_TRANSPORT, 75.0f))
+            if (staticTrans->m_model)
+            {
+                float dist = 10.0f;
+                bool hit = staticTrans->m_model->intersectRay(r, dist, false, phase);
+                if (hit)
+                    if (GetHeight(phase, x, y, z, true, 30.0f) < (v.z - dist + 1.0f))
+                        return staticTrans->ToTransport();
+            }
 
-	return NULL;
+    return NULL;
 }
 
 float Map::GetHeight(float x, float y, float z, bool checkVMap /*= true*/, float maxSearchDist /*= DEFAULT_HEIGHT_SEARCH*/) const
@@ -2120,16 +2120,16 @@ void Map::SendInitSelf(Player* player)
 
     // attach to player data current transport data
     if (Transport* transport = player->GetTransport())
-		transport->BuildCreateUpdateBlockForPlayer(&data, player);
+        transport->BuildCreateUpdateBlockForPlayer(&data, player);
 
     // build data for self presence in world at own client (one time for map)
     player->BuildCreateUpdateBlockForPlayer(&data, player);
 
     // build other passengers at transport also (they always visible and marked as visible and will not send at visibility update at add to map
     if (Transport* transport = player->GetTransport())
-		for (Transport::PassengerSet::const_iterator itr = transport->GetPassengers().begin(); itr != transport->GetPassengers().end(); ++itr)
-			if (player != (*itr) && player->HaveAtClient(*itr))
-				(*itr)->BuildCreateUpdateBlockForPlayer(&data, player);
+        for (Transport::PassengerSet::const_iterator itr = transport->GetPassengers().begin(); itr != transport->GetPassengers().end(); ++itr)
+            if (player != (*itr) && player->HaveAtClient(*itr))
+                (*itr)->BuildCreateUpdateBlockForPlayer(&data, player);
 
     WorldPacket packet;
     data.BuildPacket(&packet);
@@ -2157,17 +2157,17 @@ void Map::SendRemoveTransports(Player* player)
         if (*itr != player->GetTransport())
             (*itr)->BuildOutOfRangeUpdateBlock(&transData);
 
-	// pussywizard: remove static transports from client
-	for (Player::ClientGUIDs::const_iterator it = player->m_clientGUIDs.begin();it != player->m_clientGUIDs.end(); )
-	{
-		if (IS_TRANSPORT_GUID(*it))
-		{
-			transData.AddOutOfRangeGUID(*it);
-			it = player->m_clientGUIDs.erase(it);
-		}
-		else
-			++it;
-	}
+    // pussywizard: remove static transports from client
+    for (Player::ClientGUIDs::const_iterator it = player->m_clientGUIDs.begin();it != player->m_clientGUIDs.end(); )
+    {
+        if (IS_TRANSPORT_GUID(*it))
+        {
+            transData.AddOutOfRangeGUID(*it);
+            it = player->m_clientGUIDs.erase(it);
+        }
+        else
+            ++it;
+    }
 
     WorldPacket packet;
     transData.BuildPacket(&packet);
@@ -2381,11 +2381,11 @@ InstanceMap::InstanceMap(uint32 id, uint32 InstanceId, uint8 SpawnMode, Map* _pa
     // this make sure it gets unloaded if for some reason no player joins
     m_unloadTimer = std::max(sWorld->getIntConfig(CONFIG_INSTANCE_UNLOAD_DELAY), (uint32)MIN_UNLOAD_DELAY);
 
-	// pussywizard:
-	if (IsRaid())
-		if (time_t resetTime = sInstanceSaveMgr->GetResetTimeFor(id, Difficulty(SpawnMode)))
-			if (time_t extendedResetTime = sInstanceSaveMgr->GetExtendedResetTimeFor(id, Difficulty(SpawnMode)))
-				_instanceResetPeriod = extendedResetTime - resetTime;
+    // pussywizard:
+    if (IsRaid())
+        if (time_t resetTime = sInstanceSaveMgr->GetResetTimeFor(id, Difficulty(SpawnMode)))
+            if (time_t extendedResetTime = sInstanceSaveMgr->GetExtendedResetTimeFor(id, Difficulty(SpawnMode)))
+                _instanceResetPeriod = extendedResetTime - resetTime;
 }
 
 InstanceMap::~InstanceMap()
@@ -2400,31 +2400,31 @@ void InstanceMap::InitVisibilityDistance()
     //init visibility distance for instances
     m_VisibleDistance = World::GetMaxVisibleDistanceInInstances();
 
-	// pussywizard: this CAN NOT exceed MAX_VISIBILITY_DISTANCE
-	switch (GetId())
-	{
-		case 429: // Dire Maul
-			m_VisibleDistance = 175.0f;
-			break;
-		case 649: // Trial of the Crusader
-		case 650: // Trial of the Champion
-		case 595: // Culling of Startholme
-		case 658: // Pit of Saron
-			m_VisibleDistance = 150.0f;
-			break;
-		case 550: // The Eye
-		case 578: // The Nexus: The Oculus
-			m_VisibleDistance = 175.0f;
-			break;
-		case 615: // Obsidian Sanctum
-		case 616: // Eye of Eternity
-		case 603: // Ulduar
-		case 668: // Halls of Reflection
-		case 631: // Icecrown Citadel
-		case 724: // Ruby Sanctum
-			m_VisibleDistance = 200.0f;
-			break;
-	}
+    // pussywizard: this CAN NOT exceed MAX_VISIBILITY_DISTANCE
+    switch (GetId())
+    {
+        case 429: // Dire Maul
+            m_VisibleDistance = 175.0f;
+            break;
+        case 649: // Trial of the Crusader
+        case 650: // Trial of the Champion
+        case 595: // Culling of Startholme
+        case 658: // Pit of Saron
+            m_VisibleDistance = 150.0f;
+            break;
+        case 550: // The Eye
+        case 578: // The Nexus: The Oculus
+            m_VisibleDistance = 175.0f;
+            break;
+        case 615: // Obsidian Sanctum
+        case 616: // Eye of Eternity
+        case 603: // Ulduar
+        case 668: // Halls of Reflection
+        case 631: // Icecrown Citadel
+        case 724: // Ruby Sanctum
+            m_VisibleDistance = 200.0f;
+            break;
+    }
 }
 
 /*
@@ -2445,7 +2445,7 @@ bool InstanceMap::CanEnter(Player* player, bool loginCheck)
 
     // cannot enter if the instance is full (player cap), GMs don't count
     uint32 maxPlayers = GetMaxPlayers();
-	if (GetPlayersCountExceptGMs() >= (loginCheck ? maxPlayers+1 : maxPlayers))
+    if (GetPlayersCountExceptGMs() >= (loginCheck ? maxPlayers+1 : maxPlayers))
     {
         ;//sLog->outDetail("MAP: Instance '%u' of map '%s' cannot have more than '%u' players. Player '%s' rejected", GetInstanceId(), GetMapName(), maxPlayers, player->GetName().c_str());
         player->SendTransferAborted(GetId(), TRANSFER_ABORT_MAX_PLAYERS);
@@ -2460,14 +2460,14 @@ bool InstanceMap::CanEnter(Player* player, bool loginCheck)
         return false;
     }
 
-	// xinef: dont allow LFG Group to enter other instance that is selected
-	if (Group* group = player->GetGroup())
-		if (group->isLFGGroup())
-			if (!sLFGMgr->inLfgDungeonMap(group->GetGUID(), GetId(), GetDifficulty()))
-			{
-				player->SendTransferAborted(GetId(), TRANSFER_ABORT_MAP_NOT_ALLOWED);
-				return false;
-			}
+    // xinef: dont allow LFG Group to enter other instance that is selected
+    if (Group* group = player->GetGroup())
+        if (group->isLFGGroup())
+            if (!sLFGMgr->inLfgDungeonMap(group->GetGUID(), GetId(), GetDifficulty()))
+            {
+                player->SendTransferAborted(GetId(), TRANSFER_ABORT_MAP_NOT_ALLOWED);
+                return false;
+            }
 
     // cannot enter if instance is in use by another party/soloer that have a permanent save in the same instance id
     PlayerList const &playerList = GetPlayers();
@@ -2475,8 +2475,8 @@ bool InstanceMap::CanEnter(Player* player, bool loginCheck)
         for (PlayerList::const_iterator i = playerList.begin(); i != playerList.end(); ++i)
             if (Player* iPlayer = i->GetSource())
             {
-				if (iPlayer == player) // login case, player already added to map
-					continue;
+                if (iPlayer == player) // login case, player already added to map
+                    continue;
                 if (iPlayer->IsGameMaster()) // bypass GMs
                     continue;
                 if (!player->GetGroup()) // player has not group and there is someone inside, deny entry
@@ -2501,8 +2501,8 @@ bool InstanceMap::CanEnter(Player* player, bool loginCheck)
 */
 bool InstanceMap::AddPlayerToMap(Player* player)
 { 
-	if (m_resetAfterUnload) // this instance has been reset, it's not meant to be used anymore
-		return false;
+    if (m_resetAfterUnload) // this instance has been reset, it's not meant to be used anymore
+        return false;
 
     if (IsDungeon())
     {
@@ -2517,42 +2517,42 @@ bool InstanceMap::AddPlayerToMap(Player* player)
         }
 
         // check for existing instance binds
-		InstancePlayerBind* playerBind = sInstanceSaveMgr->PlayerGetBoundInstance(player->GetGUIDLow(), GetId(), Difficulty(GetSpawnMode()));
+        InstancePlayerBind* playerBind = sInstanceSaveMgr->PlayerGetBoundInstance(player->GetGUIDLow(), GetId(), Difficulty(GetSpawnMode()));
         if (playerBind && playerBind->perm)
-		{
-			if (playerBind->save != mapSave)
-			{
-				sLog->outError("InstanceMap::Add: player %s(%d) is permanently bound to instance %d, %d, %d, %d but he is being put into instance %d, %d, %d, %d", player->GetName().c_str(), player->GetGUIDLow(), playerBind->save->GetMapId(), playerBind->save->GetInstanceId(), playerBind->save->GetDifficulty(), playerBind->save->CanReset(), mapSave->GetMapId(), mapSave->GetInstanceId(), mapSave->GetDifficulty(), mapSave->CanReset());
+        {
+            if (playerBind->save != mapSave)
+            {
+                sLog->outError("InstanceMap::Add: player %s(%d) is permanently bound to instance %d, %d, %d, %d but he is being put into instance %d, %d, %d, %d", player->GetName().c_str(), player->GetGUIDLow(), playerBind->save->GetMapId(), playerBind->save->GetInstanceId(), playerBind->save->GetDifficulty(), playerBind->save->CanReset(), mapSave->GetMapId(), mapSave->GetInstanceId(), mapSave->GetDifficulty(), mapSave->CanReset());
                 return false;
-			}
-		}
-		else
-		{
+            }
+        }
+        else
+        {
             playerBind = sInstanceSaveMgr->PlayerBindToInstance(player->GetGUIDLow(), mapSave, false, player);
-			// pussywizard: bind lider also if not yet bound
-			if (Group* g = player->GetGroup())
-				if (g->GetLeaderGUID() != player->GetGUID())
-					if (!sInstanceSaveMgr->PlayerGetBoundInstance(GUID_LOPART(g->GetLeaderGUID()), mapSave->GetMapId(), mapSave->GetDifficulty()))
-					{
-						sInstanceSaveMgr->PlayerCreateBoundInstancesMaps(GUID_LOPART(g->GetLeaderGUID()));
-						sInstanceSaveMgr->PlayerBindToInstance(GUID_LOPART(g->GetLeaderGUID()), mapSave, false, ObjectAccessor::FindPlayerInOrOutOfWorld(g->GetLeaderGUID()));
-					}
-		}
+            // pussywizard: bind lider also if not yet bound
+            if (Group* g = player->GetGroup())
+                if (g->GetLeaderGUID() != player->GetGUID())
+                    if (!sInstanceSaveMgr->PlayerGetBoundInstance(GUID_LOPART(g->GetLeaderGUID()), mapSave->GetMapId(), mapSave->GetDifficulty()))
+                    {
+                        sInstanceSaveMgr->PlayerCreateBoundInstancesMaps(GUID_LOPART(g->GetLeaderGUID()));
+                        sInstanceSaveMgr->PlayerBindToInstance(GUID_LOPART(g->GetLeaderGUID()), mapSave, false, ObjectAccessor::FindPlayerInOrOutOfWorld(g->GetLeaderGUID()));
+                    }
+        }
 
         // increase current instances (hourly limit)
-		// xinef: specific instances are still limited
+        // xinef: specific instances are still limited
         if (!group || !group->isLFGGroup() || !group->IsLfgRandomInstance())
             player->AddInstanceEnterTime(GetInstanceId(), time(NULL));
 
-		if (!playerBind->perm && !mapSave->CanReset() && (!group || !group->isLFGGroup() || !group->IsLfgRandomInstance()))
+        if (!playerBind->perm && !mapSave->CanReset() && (!group || !group->isLFGGroup() || !group->IsLfgRandomInstance()))
         {
             WorldPacket data(SMSG_INSTANCE_LOCK_WARNING_QUERY, 9);
             data << uint32(60000);
             data << uint32(instance_script ? instance_script->GetCompletedEncounterMask() : 0);
             data << uint8(0);
             player->GetSession()->SendPacket(&data);
-			player->SetPendingBind(mapSave->GetInstanceId(), 60000);
-		}
+            player->SetPendingBind(mapSave->GetInstanceId(), 60000);
+        }
     }
 
     // initialize unload state
@@ -2623,28 +2623,28 @@ void InstanceMap::CreateInstanceScript(bool load, std::string data, uint32 compl
 */
 bool InstanceMap::Reset(uint8 method, std::list<uint32>* globalResetSkipList)
 {
-	if (method == INSTANCE_RESET_GLOBAL)
-	{
+    if (method == INSTANCE_RESET_GLOBAL)
+    {
         // pussywizard: teleport out immediately
         for (MapRefManager::iterator itr = m_mapRefManager.begin(); itr != m_mapRefManager.end(); ++itr)
-		{
-			// teleport players that are no longer bound (can be still bound if extended id)
-			if (!globalResetSkipList || std::find(globalResetSkipList->begin(), globalResetSkipList->end(), itr->GetSource()->GetGUIDLow()) == globalResetSkipList->end())
-				itr->GetSource()->RepopAtGraveyard();
-		}
+        {
+            // teleport players that are no longer bound (can be still bound if extended id)
+            if (!globalResetSkipList || std::find(globalResetSkipList->begin(), globalResetSkipList->end(), itr->GetSource()->GetGUIDLow()) == globalResetSkipList->end())
+                itr->GetSource()->RepopAtGraveyard();
+        }
 
-		// reset map only if noone is bound
-		if (!globalResetSkipList || globalResetSkipList->empty())
-		{
-			// pussywizard: setting both m_unloadWhenEmpty and m_unloadTimer intended, in case RepopAtGraveyard failed
-			if (HavePlayers())
-				m_unloadWhenEmpty = true;
-			m_unloadTimer = MIN_UNLOAD_DELAY;
-			m_resetAfterUnload = true;
-		}
+        // reset map only if noone is bound
+        if (!globalResetSkipList || globalResetSkipList->empty())
+        {
+            // pussywizard: setting both m_unloadWhenEmpty and m_unloadTimer intended, in case RepopAtGraveyard failed
+            if (HavePlayers())
+                m_unloadWhenEmpty = true;
+            m_unloadTimer = MIN_UNLOAD_DELAY;
+            m_resetAfterUnload = true;
+        }
 
-		return m_mapRefManager.isEmpty();
-	}
+        return m_mapRefManager.isEmpty();
+    }
 
     if (HavePlayers())
     {
@@ -2675,13 +2675,13 @@ void InstanceMap::PermBindAllPlayers()
         return;
     }
 
-	Player* player;
-	Group* group;
+    Player* player;
+    Group* group;
     // group members outside the instance group don't get bound
     for (MapRefManager::iterator itr = m_mapRefManager.begin(); itr != m_mapRefManager.end(); ++itr)
     {
         player = itr->GetSource();
-		group = player->GetGroup();
+        group = player->GetGroup();
         // players inside an instance cannot be bound to other instances
         // some players may already be permanently bound, in this case nothing happens
         InstancePlayerBind* bind = sInstanceSaveMgr->PlayerGetBoundInstance(player->GetGUIDLow(), save->GetMapId(), save->GetDifficulty());
@@ -2690,12 +2690,12 @@ void InstanceMap::PermBindAllPlayers()
             WorldPacket data(SMSG_INSTANCE_SAVE_CREATED, 4);
             data << uint32(0);
             player->GetSession()->SendPacket(&data);
-			sInstanceSaveMgr->PlayerBindToInstance(player->GetGUIDLow(), save, true, player);
+            sInstanceSaveMgr->PlayerBindToInstance(player->GetGUIDLow(), save, true, player);
         }
 
-		// Xinef: Difficulty change prevention
-		if (group)
-			group->SetDifficultyChangePrevention(DIFFICULTY_PREVENTION_CHANGE_BOSS_KILLED);
+        // Xinef: Difficulty change prevention
+        if (group)
+            group->SetDifficultyChangePrevention(DIFFICULTY_PREVENTION_CHANGE_BOSS_KILLED);
     }
 }
 
@@ -2783,21 +2783,21 @@ bool BattlegroundMap::CanEnter(Player* player, bool loginCheck)
 bool BattlegroundMap::AddPlayerToMap(Player* player)
 { 
     player->m_InstanceValid = true;
-	if (IsBattleArena())
-		player->CastSpell(player, 100102, true);
+    if (IsBattleArena())
+        player->CastSpell(player, 100102, true);
     return Map::AddPlayerToMap(player);
 }
 
 void BattlegroundMap::RemovePlayerFromMap(Player* player, bool remove)
 {
-	if (Battleground* bg = GetBG())
-	{
-		bg->RemovePlayerAtLeave(player);
-		if (IsBattleArena())
-			bg->RemoveSpectator(player);
-	}
-	if (IsBattleArena())
-		player->RemoveAura(100102);
+    if (Battleground* bg = GetBG())
+    {
+        bg->RemovePlayerAtLeave(player);
+        if (IsBattleArena())
+            bg->RemoveSpectator(player);
+    }
+    if (IsBattleArena())
+        player->RemoveAura(100102);
     Map::RemovePlayerFromMap(player, remove);
 }
 
@@ -2869,9 +2869,9 @@ void Map::SaveCreatureRespawnTime(uint32 dbGuid, time_t& respawnTime)
         return;
     }
 
-	time_t now = time(NULL);
-	if (GetInstanceResetPeriod() > 0 && respawnTime-now+5 >= GetInstanceResetPeriod())
-		respawnTime = now+YEAR;
+    time_t now = time(NULL);
+    if (GetInstanceResetPeriod() > 0 && respawnTime-now+5 >= GetInstanceResetPeriod())
+        respawnTime = now+YEAR;
 
     _creatureRespawnTimes[dbGuid] = respawnTime;
 
@@ -2903,9 +2903,9 @@ void Map::SaveGORespawnTime(uint32 dbGuid, time_t& respawnTime)
         return;
     }
 
-	time_t now = time(NULL);
-	if (GetInstanceResetPeriod() > 0 && respawnTime-now+5 >= GetInstanceResetPeriod())
-		respawnTime = now+YEAR;
+    time_t now = time(NULL);
+    if (GetInstanceResetPeriod() > 0 && respawnTime-now+5 >= GetInstanceResetPeriod())
+        respawnTime = now+YEAR;
 
     _goRespawnTimes[dbGuid] = respawnTime;
 
@@ -2984,7 +2984,7 @@ void Map::DeleteRespawnTimesInDB(uint16 mapId, uint32 instanceId)
 
 void Map::UpdateEncounterState(EncounterCreditType type, uint32 creditEntry, Unit* source)
 { 
-	Difficulty difficulty_fixed = (GetId() == 631 || GetId() == 724 ? Difficulty(GetDifficulty()%2) : GetDifficulty());
+    Difficulty difficulty_fixed = (GetId() == 631 || GetId() == 724 ? Difficulty(GetDifficulty()%2) : GetDifficulty());
     DungeonEncounterList const* encounters = sObjectMgr->GetDungeonEncounterList(GetId(), difficulty_fixed);
     if (!encounters)
         return;
@@ -2996,9 +2996,9 @@ void Map::UpdateEncounterState(EncounterCreditType type, uint32 creditEntry, Uni
         DungeonEncounter const* encounter = *itr;
         if (encounter->creditType == type && encounter->creditEntry == creditEntry)
         {
-			if (source)
-				if (InstanceScript* instanceScript = source->GetInstanceScript())
-					instanceScript->SetCompletedEncountersMask((1 << encounter->dbcEntry->encounterIndex)|instanceScript->GetCompletedEncounterMask(), true);
+            if (source)
+                if (InstanceScript* instanceScript = source->GetInstanceScript())
+                    instanceScript->SetCompletedEncountersMask((1 << encounter->dbcEntry->encounterIndex)|instanceScript->GetCompletedEncounterMask(), true);
 
             if (encounter->lastEncounterDungeon)
             {
@@ -3008,19 +3008,19 @@ void Map::UpdateEncounterState(EncounterCreditType type, uint32 creditEntry, Uni
         }
     }
 
-	// pussywizard:
-	LogEncounterFinished(type, creditEntry);
+    // pussywizard:
+    LogEncounterFinished(type, creditEntry);
 
-	if (dungeonId)
+    if (dungeonId)
     {
-		Map::PlayerList const& players = GetPlayers();
+        Map::PlayerList const& players = GetPlayers();
         for (Map::PlayerList::const_iterator i = players.begin(); i != players.end(); ++i)
         {
-			if (Player* player = i->GetSource())
+            if (Player* player = i->GetSource())
                 if (Group* grp = player->GetGroup())
                     if (grp->isLFGGroup())
                     {
-						sLFGMgr->FinishDungeon(grp->GetGUID(), dungeonId, this);
+                        sLFGMgr->FinishDungeon(grp->GetGUID(), dungeonId, this);
                         return;
                     }
         }
@@ -3029,30 +3029,30 @@ void Map::UpdateEncounterState(EncounterCreditType type, uint32 creditEntry, Uni
 
 void Map::LogEncounterFinished(EncounterCreditType type, uint32 creditEntry)
 {
-	if (!IsRaid() || !GetEntry() || GetEntry()->Expansion() < 2) // only for wotlk raids, because logs take up tons of mysql memory
-		return;
-	InstanceMap* map = ToInstanceMap();
-	if (!map)
-		return;
-	std::string playersInfo;
-	char buffer[16384], buffer2[255];
-	Map::PlayerList const& pl = map->GetPlayers();
-	for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
-		if (Player* p = itr->GetSource())
-		{
-			std::string auraStr;
-			const Unit::AuraApplicationMap& a = p->GetAppliedAuras();
-			for (Unit::AuraApplicationMap::const_iterator itr = a.begin(); itr != a.end(); ++itr)
-			{
-				snprintf(buffer2, 255, "%u(%u) ", itr->first, itr->second->GetEffectMask());
-				auraStr += buffer2;
-			}
+    if (!IsRaid() || !GetEntry() || GetEntry()->Expansion() < 2) // only for wotlk raids, because logs take up tons of mysql memory
+        return;
+    InstanceMap* map = ToInstanceMap();
+    if (!map)
+        return;
+    std::string playersInfo;
+    char buffer[16384], buffer2[255];
+    Map::PlayerList const& pl = map->GetPlayers();
+    for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
+        if (Player* p = itr->GetSource())
+        {
+            std::string auraStr;
+            const Unit::AuraApplicationMap& a = p->GetAppliedAuras();
+            for (Unit::AuraApplicationMap::const_iterator itr = a.begin(); itr != a.end(); ++itr)
+            {
+                snprintf(buffer2, 255, "%u(%u) ", itr->first, itr->second->GetEffectMask());
+                auraStr += buffer2;
+            }
 
-			snprintf(buffer, 16384, "%s (guid: %u, acc: %u, ip: %s, guild: %u), xyz: (%.1f, %.1f, %.1f), auras: %s\n", p->GetName().c_str(), p->GetGUIDLow(), p->GetSession()->GetAccountId(), p->GetSession()->GetRemoteAddress().c_str(), p->GetGuildId(), p->GetPositionX(), p->GetPositionY(), p->GetPositionZ(), auraStr.c_str());
-			playersInfo += buffer;
-		}
-	CleanStringForMysqlQuery(playersInfo);
-	CharacterDatabase.PExecute("INSERT INTO log_encounter VALUES(NOW(), %u, %u, %u, %u, '%s')", GetId(), (uint32)GetDifficulty(), type, creditEntry, playersInfo.c_str());
+            snprintf(buffer, 16384, "%s (guid: %u, acc: %u, ip: %s, guild: %u), xyz: (%.1f, %.1f, %.1f), auras: %s\n", p->GetName().c_str(), p->GetGUIDLow(), p->GetSession()->GetAccountId(), p->GetSession()->GetRemoteAddress().c_str(), p->GetGuildId(), p->GetPositionX(), p->GetPositionY(), p->GetPositionZ(), auraStr.c_str());
+            playersInfo += buffer;
+        }
+    CleanStringForMysqlQuery(playersInfo);
+    CharacterDatabase.PExecute("INSERT INTO log_encounter VALUES(NOW(), %u, %u, %u, %u, '%s')", GetId(), (uint32)GetDifficulty(), type, creditEntry, playersInfo.c_str());
 }
 
 bool Map::AllTransportsEmpty() const
@@ -3068,7 +3068,7 @@ void Map::AllTransportsRemovePassengers()
 {
     for (TransportsContainer::const_iterator itr = _transports.begin(); itr != _transports.end(); ++itr)
         while (!(*itr)->GetPassengers().empty())
-			(*itr)->RemovePassenger(*((*itr)->GetPassengers().begin()), true);
+            (*itr)->RemovePassenger(*((*itr)->GetPassengers().begin()), true);
 }
 
 time_t Map::GetLinkedRespawnTime(uint64 guid) const

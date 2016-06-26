@@ -30,7 +30,7 @@ enum PriestSpells
 {
     SPELL_PRIEST_GLYPH_OF_SHADOWFIEND       = 58228,
     SPELL_PRIEST_GLYPH_OF_SHADOWFIEND_MANA  = 58227,
-	SPELL_PRIEST_SHADOWFIEND_DODGE          = 8273,
+    SPELL_PRIEST_SHADOWFIEND_DODGE          = 8273,
     SPELL_PRIEST_LIGHTWELL_CHARGES          = 59907
 };
 
@@ -43,19 +43,19 @@ class npc_pet_pri_lightwell : public CreatureScript
         {
             npc_pet_pri_lightwellAI(Creature* creature) : TotemAI(creature) { }
 
-			void InitializeAI()
-			{
-				if (Unit* owner = me->ToTempSummon()->GetSummoner())
-				{
-					uint32 hp = uint32(owner->GetMaxHealth()*0.3f);
-					me->SetMaxHealth(hp);
-					me->SetHealth(hp);
-					me->SetLevel(owner->getLevel());
-				}
+            void InitializeAI()
+            {
+                if (Unit* owner = me->ToTempSummon()->GetSummoner())
+                {
+                    uint32 hp = uint32(owner->GetMaxHealth()*0.3f);
+                    me->SetMaxHealth(hp);
+                    me->SetHealth(hp);
+                    me->SetLevel(owner->getLevel());
+                }
 
-				me->CastSpell(me, SPELL_PRIEST_LIGHTWELL_CHARGES, false); // Spell for Lightwell Charges
-				TotemAI::InitializeAI();
-			}
+                me->CastSpell(me, SPELL_PRIEST_LIGHTWELL_CHARGES, false); // Spell for Lightwell Charges
+                TotemAI::InitializeAI();
+            }
         };
 
         CreatureAI* GetAI(Creature* creature) const
@@ -73,15 +73,15 @@ class npc_pet_pri_shadowfiend : public CreatureScript
         {
             npc_pet_pri_shadowfiendAI(Creature* creature) : PetAI(creature) { }
 
-			void Reset()
-			{
-				PetAI::Reset();
-				if (!me->HasAura(SPELL_PRIEST_SHADOWFIEND_DODGE))
-					me->AddAura(SPELL_PRIEST_SHADOWFIEND_DODGE, me);
+            void Reset()
+            {
+                PetAI::Reset();
+                if (!me->HasAura(SPELL_PRIEST_SHADOWFIEND_DODGE))
+                    me->AddAura(SPELL_PRIEST_SHADOWFIEND_DODGE, me);
 
-				if (Unit* target = me->SelectNearestTarget(15.0f))
-					AttackStart(target);
-			}
+                if (Unit* target = me->SelectNearestTarget(15.0f))
+                    AttackStart(target);
+            }
 
             void JustDied(Unit* /*killer*/)
             {

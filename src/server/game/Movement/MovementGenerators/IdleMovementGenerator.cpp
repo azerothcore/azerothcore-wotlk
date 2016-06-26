@@ -62,7 +62,7 @@ bool RotateMovementGenerator::Update(Unit* owner, uint32 diff)
         while (angle < 0) angle += static_cast<float>(M_PI * 2);
     }
 
-	owner->SetFacingTo(angle);
+    owner->SetFacingTo(angle);
 
     if (m_duration > diff)
         m_duration -= diff;

@@ -265,8 +265,8 @@ uint32 Quest::CalculateHonorGain(uint8 level) const
             return 0;
         honor = uint32(tc->value * GetRewHonorMultiplier() * 0.1000000014901161);
 
-		// Xinef: exactly this is calculated above, however with higher precision...
-		//honor += Trinity::Honor::hk_honor_at_level(level, GetRewHonorMultiplier());
+        // Xinef: exactly this is calculated above, however with higher precision...
+        //honor += Trinity::Honor::hk_honor_at_level(level, GetRewHonorMultiplier());
         honor += GetRewHonorAddition();
     }
 
@@ -275,105 +275,105 @@ uint32 Quest::CalculateHonorGain(uint8 level) const
 
 void Quest::InitializeQueryData()
 {
-	queryData.Initialize(SMSG_QUEST_QUERY_RESPONSE, 1);
+    queryData.Initialize(SMSG_QUEST_QUERY_RESPONSE, 1);
 
-	queryData << uint32(GetQuestId());                    // quest id
-	queryData << uint32(GetQuestMethod());                // Accepted values: 0, 1 or 2. 0 == IsAutoComplete() (skip objectives/details)
-	queryData << uint32(GetQuestLevel());                 // may be -1, static data, in other cases must be used dynamic level: Player::GetQuestLevel (0 is not known, but assuming this is no longer valid for quest intended for client)
-	queryData << uint32(GetMinLevel());                   // min level
-	queryData << uint32(GetZoneOrSort());                 // zone or sort to display in quest log
+    queryData << uint32(GetQuestId());                    // quest id
+    queryData << uint32(GetQuestMethod());                // Accepted values: 0, 1 or 2. 0 == IsAutoComplete() (skip objectives/details)
+    queryData << uint32(GetQuestLevel());                 // may be -1, static data, in other cases must be used dynamic level: Player::GetQuestLevel (0 is not known, but assuming this is no longer valid for quest intended for client)
+    queryData << uint32(GetMinLevel());                   // min level
+    queryData << uint32(GetZoneOrSort());                 // zone or sort to display in quest log
 
-	queryData << uint32(GetType());                       // quest type
-	queryData << uint32(GetSuggestedPlayers());           // suggested players count
+    queryData << uint32(GetType());                       // quest type
+    queryData << uint32(GetSuggestedPlayers());           // suggested players count
 
-	queryData << uint32(GetRepObjectiveFaction());        // shown in quest log as part of quest objective
-	queryData << uint32(GetRepObjectiveValue());          // shown in quest log as part of quest objective
+    queryData << uint32(GetRepObjectiveFaction());        // shown in quest log as part of quest objective
+    queryData << uint32(GetRepObjectiveValue());          // shown in quest log as part of quest objective
 
-	queryData << uint32(GetRepObjectiveFaction2());       // shown in quest log as part of quest objective OPPOSITE faction
-	queryData << uint32(GetRepObjectiveValue2());         // shown in quest log as part of quest objective OPPOSITE faction
+    queryData << uint32(GetRepObjectiveFaction2());       // shown in quest log as part of quest objective OPPOSITE faction
+    queryData << uint32(GetRepObjectiveValue2());         // shown in quest log as part of quest objective OPPOSITE faction
 
-	queryData << uint32(GetNextQuestInChain());           // client will request this quest from NPC, if not 0
-	queryData << uint32(GetXPId());                       // used for calculating rewarded experience
+    queryData << uint32(GetNextQuestInChain());           // client will request this quest from NPC, if not 0
+    queryData << uint32(GetXPId());                       // used for calculating rewarded experience
 
-	if (HasFlag(QUEST_FLAGS_HIDDEN_REWARDS))
-		queryData << uint32(0);                                  // Hide money rewarded
-	else
-		queryData << uint32(GetRewOrReqMoney());          // reward money (below max lvl)
+    if (HasFlag(QUEST_FLAGS_HIDDEN_REWARDS))
+        queryData << uint32(0);                                  // Hide money rewarded
+    else
+        queryData << uint32(GetRewOrReqMoney());          // reward money (below max lvl)
 
-	queryData << uint32(GetRewMoneyMaxLevel());           // used in XP calculation at client
-	queryData << uint32(GetRewSpell());                   // reward spell, this spell will display (icon) (casted if RewSpellCast == 0)
-	queryData << int32(GetRewSpellCast());                // casted spell
+    queryData << uint32(GetRewMoneyMaxLevel());           // used in XP calculation at client
+    queryData << uint32(GetRewSpell());                   // reward spell, this spell will display (icon) (casted if RewSpellCast == 0)
+    queryData << int32(GetRewSpellCast());                // casted spell
 
-	// rewarded honor points
-	queryData << uint32(GetRewHonorAddition());
-	queryData << float(GetRewHonorMultiplier());
-	queryData << uint32(GetSrcItemId());                  // source item id
-	queryData << uint32(GetFlags() & 0xFFFF);             // quest flags
-	queryData << uint32(GetCharTitleId());                // CharTitleId, new 2.4.0, player gets this title (id from CharTitles)
-	queryData << uint32(GetPlayersSlain());               // players slain
-	queryData << uint32(GetBonusTalents());               // bonus talents
-	queryData << uint32(GetRewArenaPoints());             // bonus arena points
-	queryData << uint32(0);                                      // review rep show mask
+    // rewarded honor points
+    queryData << uint32(GetRewHonorAddition());
+    queryData << float(GetRewHonorMultiplier());
+    queryData << uint32(GetSrcItemId());                  // source item id
+    queryData << uint32(GetFlags() & 0xFFFF);             // quest flags
+    queryData << uint32(GetCharTitleId());                // CharTitleId, new 2.4.0, player gets this title (id from CharTitles)
+    queryData << uint32(GetPlayersSlain());               // players slain
+    queryData << uint32(GetBonusTalents());               // bonus talents
+    queryData << uint32(GetRewArenaPoints());             // bonus arena points
+    queryData << uint32(0);                                      // review rep show mask
 
-	if (HasFlag(QUEST_FLAGS_HIDDEN_REWARDS))
-	{
-		for (uint32 i = 0; i < QUEST_REWARDS_COUNT; ++i)
-			queryData << uint32(0) << uint32(0);
-		for (uint32 i = 0; i < QUEST_REWARD_CHOICES_COUNT; ++i)
-			queryData << uint32(0) << uint32(0);
-	}
-	else
-	{
-		for (uint32 i = 0; i < QUEST_REWARDS_COUNT; ++i)
-		{
-			queryData << uint32(RewardItemId[i]);
-			queryData << uint32(RewardItemIdCount[i]);
-		}
-		for (uint32 i = 0; i < QUEST_REWARD_CHOICES_COUNT; ++i)
-		{
-			queryData << uint32(RewardChoiceItemId[i]);
-			queryData << uint32(RewardChoiceItemCount[i]);
-		}
-	}
+    if (HasFlag(QUEST_FLAGS_HIDDEN_REWARDS))
+    {
+        for (uint32 i = 0; i < QUEST_REWARDS_COUNT; ++i)
+            queryData << uint32(0) << uint32(0);
+        for (uint32 i = 0; i < QUEST_REWARD_CHOICES_COUNT; ++i)
+            queryData << uint32(0) << uint32(0);
+    }
+    else
+    {
+        for (uint32 i = 0; i < QUEST_REWARDS_COUNT; ++i)
+        {
+            queryData << uint32(RewardItemId[i]);
+            queryData << uint32(RewardItemIdCount[i]);
+        }
+        for (uint32 i = 0; i < QUEST_REWARD_CHOICES_COUNT; ++i)
+        {
+            queryData << uint32(RewardChoiceItemId[i]);
+            queryData << uint32(RewardChoiceItemCount[i]);
+        }
+    }
 
-	for (uint32 i = 0; i < QUEST_REPUTATIONS_COUNT; ++i)        // reward factions ids
-		queryData << uint32(RewardFactionId[i]);
+    for (uint32 i = 0; i < QUEST_REPUTATIONS_COUNT; ++i)        // reward factions ids
+        queryData << uint32(RewardFactionId[i]);
 
-	for (uint32 i = 0; i < QUEST_REPUTATIONS_COUNT; ++i)        // columnid+1 QuestFactionReward.dbc?
-		queryData << int32(RewardFactionValueId[i]);
+    for (uint32 i = 0; i < QUEST_REPUTATIONS_COUNT; ++i)        // columnid+1 QuestFactionReward.dbc?
+        queryData << int32(RewardFactionValueId[i]);
 
-	for (int i = 0; i < QUEST_REPUTATIONS_COUNT; ++i)           // unk (0)
-		queryData << int32(RewardFactionValueIdOverride[i]);
+    for (int i = 0; i < QUEST_REPUTATIONS_COUNT; ++i)           // unk (0)
+        queryData << int32(RewardFactionValueIdOverride[i]);
 
-	queryData << GetPointMapId();
-	queryData << GetPointX();
-	queryData << GetPointY();
-	queryData << GetPointOpt();
+    queryData << GetPointMapId();
+    queryData << GetPointX();
+    queryData << GetPointY();
+    queryData << GetPointOpt();
 
-	queryData << GetTitle();
-	queryData << GetObjectives();
-	queryData << GetDetails();
-	queryData << GetEndText();
-	queryData << GetCompletedText();                                  // display in quest objectives window once all objectives are completed
+    queryData << GetTitle();
+    queryData << GetObjectives();
+    queryData << GetDetails();
+    queryData << GetEndText();
+    queryData << GetCompletedText();                                  // display in quest objectives window once all objectives are completed
 
-	for (uint32 i = 0; i < QUEST_OBJECTIVES_COUNT; ++i)
-	{
-		if (RequiredNpcOrGo[i] < 0)
-			queryData << uint32((RequiredNpcOrGo[i] * (-1)) | 0x80000000);    // client expects gameobject template id in form (id|0x80000000)
-		else
-			queryData << uint32(RequiredNpcOrGo[i]);
+    for (uint32 i = 0; i < QUEST_OBJECTIVES_COUNT; ++i)
+    {
+        if (RequiredNpcOrGo[i] < 0)
+            queryData << uint32((RequiredNpcOrGo[i] * (-1)) | 0x80000000);    // client expects gameobject template id in form (id|0x80000000)
+        else
+            queryData << uint32(RequiredNpcOrGo[i]);
 
-		queryData << uint32(RequiredNpcOrGoCount[i]);
-		queryData << uint32(RequiredSourceItemId[i]);
-		queryData << uint32(0);                                  // req source count?
-	}
+        queryData << uint32(RequiredNpcOrGoCount[i]);
+        queryData << uint32(RequiredSourceItemId[i]);
+        queryData << uint32(0);                                  // req source count?
+    }
 
-	for (uint32 i = 0; i < QUEST_ITEM_OBJECTIVES_COUNT; ++i)
-	{
-		queryData << uint32(RequiredItemId[i]);
-		queryData << uint32(RequiredItemCount[i]);
-	}
+    for (uint32 i = 0; i < QUEST_ITEM_OBJECTIVES_COUNT; ++i)
+    {
+        queryData << uint32(RequiredItemId[i]);
+        queryData << uint32(RequiredItemCount[i]);
+    }
 
-	for (uint32 i = 0; i < QUEST_OBJECTIVES_COUNT; ++i)
-		queryData << ObjectiveText[i];
+    for (uint32 i = 0; i < QUEST_OBJECTIVES_COUNT; ++i)
+        queryData << ObjectiveText[i];
 }

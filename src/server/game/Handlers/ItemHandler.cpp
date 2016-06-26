@@ -256,8 +256,8 @@ void WorldSession::HandleAutoEquipItemOpcode(WorldPacket & recvData)
 
         _player->AutoUnequipOffhandIfNeed();
 
-		// Xinef: Call this here after all needed items are equipped
-		_player->RemoveItemDependentAurasAndCasts((Item*)NULL);
+        // Xinef: Call this here after all needed items are equipped
+        _player->RemoveItemDependentAurasAndCasts((Item*)NULL);
     }
 }
 
@@ -306,131 +306,131 @@ void WorldSession::HandleDestroyItemOpcode(WorldPacket & recvData)
 
 void ItemTemplate::InitializeQueryData()
 {
-	queryData.Initialize(SMSG_ITEM_QUERY_SINGLE_RESPONSE, 1);
+    queryData.Initialize(SMSG_ITEM_QUERY_SINGLE_RESPONSE, 1);
 
-	queryData << ItemId;
-	queryData << Class;
-	queryData << SubClass;
-	queryData << SoundOverrideSubclass;
-	queryData << Name1;
-	queryData << uint8(0x00);                                //pProto->Name2; // blizz not send name there, just uint8(0x00); <-- \0 = empty string = empty name...
-	queryData << uint8(0x00);                                //pProto->Name3; // blizz not send name there, just uint8(0x00);
-	queryData << uint8(0x00);                                //pProto->Name4; // blizz not send name there, just uint8(0x00);
-	queryData << DisplayInfoID;
-	queryData << Quality;
-	queryData << Flags;
-	queryData << Flags2;
-	queryData << BuyPrice;
-	queryData << SellPrice;
-	queryData << InventoryType;
-	queryData << AllowableClass;
-	queryData << AllowableRace;
-	queryData << ItemLevel;
-	queryData << RequiredLevel;
-	queryData << RequiredSkill;
-	queryData << RequiredSkillRank;
-	queryData << RequiredSpell;
-	queryData << RequiredHonorRank;
-	queryData << RequiredCityRank;
-	queryData << RequiredReputationFaction;
-	queryData << RequiredReputationRank;
-	queryData << int32(MaxCount);
-	queryData << int32(Stackable);
-	queryData << ContainerSlots;
-	queryData << StatsCount;                         // item stats count
-	for (uint32 i = 0; i < StatsCount; ++i)
-	{
-		queryData << ItemStat[i].ItemStatType;
-		queryData << ItemStat[i].ItemStatValue;
-	}
-	queryData << ScalingStatDistribution;            // scaling stats distribution
-	queryData << ScalingStatValue;                   // some kind of flags used to determine stat values column
-	for (int i = 0; i < MAX_ITEM_PROTO_DAMAGES; ++i)
-	{
-		queryData << Damage[i].DamageMin;
-		queryData << Damage[i].DamageMax;
-		queryData << Damage[i].DamageType;
-	}
+    queryData << ItemId;
+    queryData << Class;
+    queryData << SubClass;
+    queryData << SoundOverrideSubclass;
+    queryData << Name1;
+    queryData << uint8(0x00);                                //pProto->Name2; // blizz not send name there, just uint8(0x00); <-- \0 = empty string = empty name...
+    queryData << uint8(0x00);                                //pProto->Name3; // blizz not send name there, just uint8(0x00);
+    queryData << uint8(0x00);                                //pProto->Name4; // blizz not send name there, just uint8(0x00);
+    queryData << DisplayInfoID;
+    queryData << Quality;
+    queryData << Flags;
+    queryData << Flags2;
+    queryData << BuyPrice;
+    queryData << SellPrice;
+    queryData << InventoryType;
+    queryData << AllowableClass;
+    queryData << AllowableRace;
+    queryData << ItemLevel;
+    queryData << RequiredLevel;
+    queryData << RequiredSkill;
+    queryData << RequiredSkillRank;
+    queryData << RequiredSpell;
+    queryData << RequiredHonorRank;
+    queryData << RequiredCityRank;
+    queryData << RequiredReputationFaction;
+    queryData << RequiredReputationRank;
+    queryData << int32(MaxCount);
+    queryData << int32(Stackable);
+    queryData << ContainerSlots;
+    queryData << StatsCount;                         // item stats count
+    for (uint32 i = 0; i < StatsCount; ++i)
+    {
+        queryData << ItemStat[i].ItemStatType;
+        queryData << ItemStat[i].ItemStatValue;
+    }
+    queryData << ScalingStatDistribution;            // scaling stats distribution
+    queryData << ScalingStatValue;                   // some kind of flags used to determine stat values column
+    for (int i = 0; i < MAX_ITEM_PROTO_DAMAGES; ++i)
+    {
+        queryData << Damage[i].DamageMin;
+        queryData << Damage[i].DamageMax;
+        queryData << Damage[i].DamageType;
+    }
 
-	// resistances (7)
-	queryData << Armor;
-	queryData << HolyRes;
-	queryData << FireRes;
-	queryData << NatureRes;
-	queryData << FrostRes;
-	queryData << ShadowRes;
-	queryData << ArcaneRes;
+    // resistances (7)
+    queryData << Armor;
+    queryData << HolyRes;
+    queryData << FireRes;
+    queryData << NatureRes;
+    queryData << FrostRes;
+    queryData << ShadowRes;
+    queryData << ArcaneRes;
 
-	queryData << Delay;
-	queryData << AmmoType;
-	queryData << RangedModRange;
+    queryData << Delay;
+    queryData << AmmoType;
+    queryData << RangedModRange;
 
-	for (int s = 0; s < MAX_ITEM_PROTO_SPELLS; ++s)
-	{
-		// send DBC data for cooldowns in same way as it used in Spell::SendSpellCooldown
-		// use `item_template` or if not set then only use spell cooldowns
-		SpellInfo const* spell = sSpellMgr->GetSpellInfo(Spells[s].SpellId);
-		if (spell)
-		{
-			bool db_data = Spells[s].SpellCooldown >= 0 || Spells[s].SpellCategoryCooldown >= 0;
+    for (int s = 0; s < MAX_ITEM_PROTO_SPELLS; ++s)
+    {
+        // send DBC data for cooldowns in same way as it used in Spell::SendSpellCooldown
+        // use `item_template` or if not set then only use spell cooldowns
+        SpellInfo const* spell = sSpellMgr->GetSpellInfo(Spells[s].SpellId);
+        if (spell)
+        {
+            bool db_data = Spells[s].SpellCooldown >= 0 || Spells[s].SpellCategoryCooldown >= 0;
 
-			queryData << Spells[s].SpellId;
-			queryData << Spells[s].SpellTrigger;
-			queryData << uint32(-abs(Spells[s].SpellCharges));
+            queryData << Spells[s].SpellId;
+            queryData << Spells[s].SpellTrigger;
+            queryData << uint32(-abs(Spells[s].SpellCharges));
 
-			if (db_data)
-			{
-				queryData << uint32(Spells[s].SpellCooldown);
-				queryData << uint32(Spells[s].SpellCategory);
-				queryData << uint32(Spells[s].SpellCategoryCooldown);
-			}
-			else
-			{
-				queryData << uint32(spell->RecoveryTime);
-				queryData << uint32(spell->GetCategory());
-				queryData << uint32(spell->CategoryRecoveryTime);
-			}
-		}
-		else
-		{
-			queryData << uint32(0);
-			queryData << uint32(0);
-			queryData << uint32(0);
-			queryData << uint32(-1);
-			queryData << uint32(0);
-			queryData << uint32(-1);
-		}
-	}
-	queryData << Bonding;
-	queryData << Description;
-	queryData << PageText;
-	queryData << LanguageID;
-	queryData << PageMaterial;
-	queryData << StartQuest;
-	queryData << LockID;
-	queryData << int32(Material);
-	queryData << Sheath;
-	queryData << RandomProperty;
-	queryData << RandomSuffix;
-	queryData << Block;
-	queryData << ItemSet;
-	queryData << MaxDurability;
-	queryData << Area;
-	queryData << Map;                                // Added in 1.12.x & 2.0.1 client branch
-	queryData << BagFamily;
-	queryData << TotemCategory;
-	for (int s = 0; s < MAX_ITEM_PROTO_SOCKETS; ++s)
-	{
-		queryData << Socket[s].Color;
-		queryData << Socket[s].Content;
-	}
-	queryData << socketBonus;
-	queryData << GemProperties;
-	queryData << RequiredDisenchantSkill;
-	queryData << ArmorDamageModifier;
-	queryData << Duration;                           // added in 2.4.2.8209, duration (seconds)
-	queryData << ItemLimitCategory;                  // WotLK, ItemLimitCategory
-	queryData << HolidayId;                          // Holiday.dbc?
+            if (db_data)
+            {
+                queryData << uint32(Spells[s].SpellCooldown);
+                queryData << uint32(Spells[s].SpellCategory);
+                queryData << uint32(Spells[s].SpellCategoryCooldown);
+            }
+            else
+            {
+                queryData << uint32(spell->RecoveryTime);
+                queryData << uint32(spell->GetCategory());
+                queryData << uint32(spell->CategoryRecoveryTime);
+            }
+        }
+        else
+        {
+            queryData << uint32(0);
+            queryData << uint32(0);
+            queryData << uint32(0);
+            queryData << uint32(-1);
+            queryData << uint32(0);
+            queryData << uint32(-1);
+        }
+    }
+    queryData << Bonding;
+    queryData << Description;
+    queryData << PageText;
+    queryData << LanguageID;
+    queryData << PageMaterial;
+    queryData << StartQuest;
+    queryData << LockID;
+    queryData << int32(Material);
+    queryData << Sheath;
+    queryData << RandomProperty;
+    queryData << RandomSuffix;
+    queryData << Block;
+    queryData << ItemSet;
+    queryData << MaxDurability;
+    queryData << Area;
+    queryData << Map;                                // Added in 1.12.x & 2.0.1 client branch
+    queryData << BagFamily;
+    queryData << TotemCategory;
+    for (int s = 0; s < MAX_ITEM_PROTO_SOCKETS; ++s)
+    {
+        queryData << Socket[s].Color;
+        queryData << Socket[s].Content;
+    }
+    queryData << socketBonus;
+    queryData << GemProperties;
+    queryData << RequiredDisenchantSkill;
+    queryData << ArmorDamageModifier;
+    queryData << Duration;                           // added in 2.4.2.8209, duration (seconds)
+    queryData << ItemLimitCategory;                  // WotLK, ItemLimitCategory
+    queryData << HolidayId;                          // Holiday.dbc?
 }
 
 // Only _static_ data send in this packet !!!
@@ -586,7 +586,7 @@ void WorldSession::HandleSellItemOpcode(WorldPacket & recvData)
                     _player->RemoveItem(pItem->GetBagSlot(), pItem->GetSlot(), true);
                     pItem->RemoveFromUpdateQueueOf(_player);
                     _player->AddItemToBuyBackSlot(pItem);
-					_player->UpdateTitansGrip();
+                    _player->UpdateTitansGrip();
                 }
 
                 uint32 money = pProto->SellPrice * count;
@@ -871,7 +871,7 @@ void WorldSession::HandleAutoStoreBagItemOpcode(WorldPacket & recvData)
 
     _player->RemoveItem(srcbag, srcslot, true);
     _player->StoreItem(dest, pItem, true);
-	_player->UpdateTitansGrip();
+    _player->UpdateTitansGrip();
 }
 
 void WorldSession::HandleBuyBankSlotOpcode(WorldPacket& recvPacket)
@@ -958,7 +958,7 @@ void WorldSession::HandleAutoBankItemOpcode(WorldPacket& recvPacket)
     _player->RemoveItem(srcbag, srcslot, true);
     _player->ItemRemovedQuestCheck(pItem->GetEntry(), pItem->GetCount());
     _player->BankItem(dest, pItem, true);
-	_player->UpdateTitansGrip();
+    _player->UpdateTitansGrip();
 }
 
 void WorldSession::HandleAutoStoreBankItemOpcode(WorldPacket& recvPacket)
@@ -990,8 +990,8 @@ void WorldSession::HandleAutoStoreBankItemOpcode(WorldPacket& recvPacket)
         }
 
         _player->RemoveItem(srcbag, srcslot, true);
-		if (Item const* storedItem = _player->StoreItem(dest, pItem, true))
-			_player->ItemAddedQuestCheck(storedItem->GetEntry(), storedItem->GetCount());
+        if (Item const* storedItem = _player->StoreItem(dest, pItem, true))
+            _player->ItemAddedQuestCheck(storedItem->GetEntry(), storedItem->GetCount());
     }
     else                                                    // moving from inventory to bank
     {
@@ -1005,7 +1005,7 @@ void WorldSession::HandleAutoStoreBankItemOpcode(WorldPacket& recvPacket)
 
         _player->RemoveItem(srcbag, srcslot, true);
         _player->BankItem(dest, pItem, true);
-		_player->UpdateTitansGrip();
+        _player->UpdateTitansGrip();
     }
 }
 
@@ -1107,8 +1107,8 @@ void WorldSession::HandleWrapItemOpcode(WorldPacket& recvData)
         return;
     }
 
-	// xinef: do not allow to wrap removed items, just in case
-	if (item->GetState() == ITEM_REMOVED)
+    // xinef: do not allow to wrap removed items, just in case
+    if (item->GetState() == ITEM_REMOVED)
     {
         _player->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, item, NULL);
         return;
@@ -1182,7 +1182,7 @@ void WorldSession::HandleWrapItemOpcode(WorldPacket& recvData)
     item->SetState(ITEM_CHANGED, _player);
 
     // after save it will be impossible to remove the item from the queue
-	_player->SaveInventoryAndGoldToDB(trans);
+    _player->SaveInventoryAndGoldToDB(trans);
 
     CharacterDatabase.CommitTransaction(trans);
 

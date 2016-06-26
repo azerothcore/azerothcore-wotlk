@@ -445,10 +445,10 @@ public:
         {
             Creature* Spark = ObjectAccessor::GetCreature(*me, SparkGUID);
             if (!Spark)
-			{
-				me->DespawnOrUnsummon(1);
+            {
+                me->DespawnOrUnsummon(1);
                 return 5000;
-			}
+            }
 
             switch (Step)
             {
@@ -489,10 +489,10 @@ public:
                     CompleteQuest();
                     return 9000;
                 case 10:
-					Spark->DespawnOrUnsummon(1);
+                    Spark->DespawnOrUnsummon(1);
                     DespawnNagaFlag(false);
-					me->DespawnOrUnsummon(1);
-					return 5000;
+                    me->DespawnOrUnsummon(1);
+                    return 5000;
                 default: return 99999999;
             }
         }
@@ -683,7 +683,7 @@ class npc_stillpine_capitive : public CreatureScript
                 if (type != POINT_MOTION_TYPE || id != POINT_INIT)
                     return;
 
-				if (Player* player = ObjectAccessor::GetPlayer(*me, _playerGUID))
+                if (Player* player = ObjectAccessor::GetPlayer(*me, _playerGUID))
                     player->KilledMonsterCredit(me->GetEntry(), me->GetGUID());
 
                 _movementComplete = true;

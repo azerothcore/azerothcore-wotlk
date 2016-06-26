@@ -13,19 +13,19 @@ template <class Node>
 class NodeArray
 {
 public:
-	explicit NodeArray() { memset(&_nodes, 0, sizeof(_nodes)); }
-	void AddNode(Node* n)
-	{
-		for (uint8 i=0; i<9; ++i)
-			if (_nodes[i] == 0)
-			{
-				_nodes[i] = n;
-				return;
-			}
-			else if (_nodes[i] == n)
-				return;
-	}
-	Node* _nodes[9];
+    explicit NodeArray() { memset(&_nodes, 0, sizeof(_nodes)); }
+    void AddNode(Node* n)
+    {
+        for (uint8 i=0; i<9; ++i)
+            if (_nodes[i] == 0)
+            {
+                _nodes[i] = n;
+                return;
+            }
+            else if (_nodes[i] == n)
+                return;
+    }
+    Node* _nodes[9];
 };
 
 template<class Node>
@@ -68,47 +68,47 @@ public:
     void insert(const T& value)
     {
         G3D::Vector3 pos[9];
-		pos[0] = value.getBounds().corner(0);
-		pos[1] = value.getBounds().corner(1);
-		pos[2] = value.getBounds().corner(2);
-		pos[3] = value.getBounds().corner(3);
-		pos[4] = (pos[0] + pos[1])/2.0f;
-		pos[5] = (pos[1] + pos[2])/2.0f;
-		pos[6] = (pos[2] + pos[3])/2.0f;
-		pos[7] = (pos[3] + pos[0])/2.0f;
-		pos[8] = (pos[0] + pos[2])/2.0f;
+        pos[0] = value.getBounds().corner(0);
+        pos[1] = value.getBounds().corner(1);
+        pos[2] = value.getBounds().corner(2);
+        pos[3] = value.getBounds().corner(3);
+        pos[4] = (pos[0] + pos[1])/2.0f;
+        pos[5] = (pos[1] + pos[2])/2.0f;
+        pos[6] = (pos[2] + pos[3])/2.0f;
+        pos[7] = (pos[3] + pos[0])/2.0f;
+        pos[8] = (pos[0] + pos[2])/2.0f;
 
-		NodeArray<Node> na;
-		for (uint8 i=0; i<9; ++i)
-		{
-			Cell c = Cell::ComputeCell(pos[i].x, pos[i].y);
-			if (!c.isValid())
-				continue;
-			Node& node = getGridFor(pos[i].x, pos[i].y);
-			na.AddNode(&node);
-		}
+        NodeArray<Node> na;
+        for (uint8 i=0; i<9; ++i)
+        {
+            Cell c = Cell::ComputeCell(pos[i].x, pos[i].y);
+            if (!c.isValid())
+                continue;
+            Node& node = getGridFor(pos[i].x, pos[i].y);
+            na.AddNode(&node);
+        }
 
-		for (uint8 i=0; i<9; ++i)
-		{
-			if (na._nodes[i])
-				na._nodes[i]->insert(value);
-			else
-				break;
-		}
+        for (uint8 i=0; i<9; ++i)
+        {
+            if (na._nodes[i])
+                na._nodes[i]->insert(value);
+            else
+                break;
+        }
 
         memberTable.set(&value, na);
     }
 
     void remove(const T& value)
     {
-		NodeArray<Node>& na = memberTable[&value];
-		for (uint8 i=0; i<9; ++i)
-		{
-			if (na._nodes[i])
-				na._nodes[i]->remove(value);
-			else
-				break;
-		}
+        NodeArray<Node>& na = memberTable[&value];
+        for (uint8 i=0; i<9; ++i)
+        {
+            if (na._nodes[i])
+                na._nodes[i]->remove(value);
+            else
+                break;
+        }
 
         // Remove the member
         memberTable.remove(&value);

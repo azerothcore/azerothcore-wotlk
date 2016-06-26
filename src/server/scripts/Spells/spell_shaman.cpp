@@ -30,10 +30,10 @@
 
 enum ShamanSpells
 {
-	// Ours
-	SPELL_SHAMAN_GLYPH_OF_FERAL_SPIRIT			= 63271,
+    // Ours
+    SPELL_SHAMAN_GLYPH_OF_FERAL_SPIRIT          = 63271,
 
-	// Theirs
+    // Theirs
     SPELL_SHAMAN_ANCESTRAL_AWAKENING_PROC       = 52752,
     SPELL_SHAMAN_BIND_SIGHT                     = 6277,
     SPELL_SHAMAN_CLEANSING_TOTEM_EFFECT         = 52025,
@@ -79,14 +79,14 @@ class spell_sha_totem_of_wrath : public SpellScriptLoader
 
             void HandleAfterCast()
             {
-				if (AuraEffect* aurEff = GetCaster()->GetAuraEffect(63280, EFFECT_0))
+                if (AuraEffect* aurEff = GetCaster()->GetAuraEffect(63280, EFFECT_0))
                     if (Creature* totem = GetCaster()->GetMap()->GetCreature(GetCaster()->m_SummonSlot[1]))   // Fire totem summon slot
                         if (SpellInfo const* totemSpell = sSpellMgr->GetSpellInfo(totem->m_spells[0]))
                         {
                             int32 bp0 = CalculatePct(totemSpell->Effects[EFFECT_0].CalcValue(), aurEff->GetAmount());
                             int32 bp1 = CalculatePct(totemSpell->Effects[EFFECT_1].CalcValue(), aurEff->GetAmount());
                             GetCaster()->CastCustomSpell(GetCaster(), 63283, &bp0, &bp1, NULL, true);
-						}
+                        }
             }
 
             void Register()
@@ -113,8 +113,8 @@ class spell_sha_spirit_walk : public SpellScriptLoader
             SpellCastResult CheckCast()
             {
                if (Unit* owner = GetCaster()->GetOwner())
-				   if (GetCaster()->IsWithinDist(owner, GetSpellInfo()->GetMaxRange(GetSpellInfo()->IsPositive())))
-					   return SPELL_CAST_OK;
+                   if (GetCaster()->IsWithinDist(owner, GetSpellInfo()->GetMaxRange(GetSpellInfo()->IsPositive())))
+                       return SPELL_CAST_OK;
 
                 return SPELL_FAILED_OUT_OF_RANGE;
             }
@@ -142,17 +142,17 @@ class spell_sha_t10_restoration_4p_bonus : public SpellScriptLoader
 
             bool CheckProc(ProcEventInfo& eventInfo)
             {
-				return eventInfo.GetActor() && eventInfo.GetProcTarget();
+                return eventInfo.GetActor() && eventInfo.GetProcTarget();
             }
 
             void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
             {
                 PreventDefaultAction();
 
-		        uint32 triggered_spell_id = 70809;
+                uint32 triggered_spell_id = 70809;
                 SpellInfo const* triggeredSpell = sSpellMgr->GetSpellInfo(triggered_spell_id);
-				int32 amount = CalculatePct(eventInfo.GetDamageInfo()->GetDamage(), aurEff->GetAmount()) / triggeredSpell->GetMaxTicks();
-				eventInfo.GetProcTarget()->CastDelayedSpellWithPeriodicAmount(GetTarget(), triggered_spell_id, SPELL_AURA_PERIODIC_HEAL, amount, EFFECT_0);
+                int32 amount = CalculatePct(eventInfo.GetDamageInfo()->GetDamage(), aurEff->GetAmount()) / triggeredSpell->GetMaxTicks();
+                eventInfo.GetProcTarget()->CastDelayedSpellWithPeriodicAmount(GetTarget(), triggered_spell_id, SPELL_AURA_PERIODIC_HEAL, amount, EFFECT_0);
             }
 
             void Register()
@@ -183,7 +183,7 @@ class spell_sha_totemic_mastery : public SpellScriptLoader
 
                 for (uint8 i = SUMMON_SLOT_TOTEM; i < MAX_TOTEM_SLOT; ++i)
                     if (!GetTarget()->m_SummonSlot[i])
-						return;
+                        return;
 
                 GetTarget()->CastSpell(GetTarget(), 38437, true);
             }
@@ -211,111 +211,111 @@ class spell_sha_feral_spirit_scaling : public SpellScriptLoader
 
             void CalculateResistanceAmount(AuraEffect const* aurEff, int32 & amount, bool & /*canBeRecalculated*/)
             {
-				// xinef: feral spirit inherits 40% of resistance from owner and 35% of armor
-				if (Unit* owner = GetUnitOwner()->GetOwner())
-				{
-					SpellSchoolMask schoolMask = SpellSchoolMask(aurEff->GetSpellInfo()->Effects[aurEff->GetEffIndex()].MiscValue);
-					int32 modifier = schoolMask == SPELL_SCHOOL_MASK_NORMAL ? 35 : 40;
-					amount = CalculatePct(std::max<int32>(0, owner->GetResistance(schoolMask)), modifier);
-				}
+                // xinef: feral spirit inherits 40% of resistance from owner and 35% of armor
+                if (Unit* owner = GetUnitOwner()->GetOwner())
+                {
+                    SpellSchoolMask schoolMask = SpellSchoolMask(aurEff->GetSpellInfo()->Effects[aurEff->GetEffIndex()].MiscValue);
+                    int32 modifier = schoolMask == SPELL_SCHOOL_MASK_NORMAL ? 35 : 40;
+                    amount = CalculatePct(std::max<int32>(0, owner->GetResistance(schoolMask)), modifier);
+                }
             }
 
             void CalculateStatAmount(AuraEffect const* aurEff, int32 & amount, bool & /*canBeRecalculated*/)
             {
-				// xinef: by default feral spirit inherits 30% of stamina
-				if (Unit* owner = GetUnitOwner()->GetOwner())
-				{
-					Stats stat = Stats(aurEff->GetSpellInfo()->Effects[aurEff->GetEffIndex()].MiscValue);
-					amount = CalculatePct(std::max<int32>(0, owner->GetStat(stat)), 30);
-				}
+                // xinef: by default feral spirit inherits 30% of stamina
+                if (Unit* owner = GetUnitOwner()->GetOwner())
+                {
+                    Stats stat = Stats(aurEff->GetSpellInfo()->Effects[aurEff->GetEffIndex()].MiscValue);
+                    amount = CalculatePct(std::max<int32>(0, owner->GetStat(stat)), 30);
+                }
             }
 
-			void CalculateAPAmount(AuraEffect const* aurEff, int32 & amount, bool & /*canBeRecalculated*/)
+            void CalculateAPAmount(AuraEffect const* aurEff, int32 & amount, bool & /*canBeRecalculated*/)
             {
-				// xinef: by default feral spirit inherits 30% of AP
-				if (Unit* owner = GetUnitOwner()->GetOwner())
-				{
-					int32 modifier = 30;
-					if (AuraEffect const* gofsEff = owner->GetAuraEffect(SPELL_SHAMAN_GLYPH_OF_FERAL_SPIRIT, EFFECT_0))
-						modifier += gofsEff->GetAmount();
+                // xinef: by default feral spirit inherits 30% of AP
+                if (Unit* owner = GetUnitOwner()->GetOwner())
+                {
+                    int32 modifier = 30;
+                    if (AuraEffect const* gofsEff = owner->GetAuraEffect(SPELL_SHAMAN_GLYPH_OF_FERAL_SPIRIT, EFFECT_0))
+                        modifier += gofsEff->GetAmount();
 
-					amount = CalculatePct(std::max<int32>(0, owner->GetTotalAttackPowerValue(BASE_ATTACK)), modifier);
-				}
+                    amount = CalculatePct(std::max<int32>(0, owner->GetTotalAttackPowerValue(BASE_ATTACK)), modifier);
+                }
             }
 
-			void CalculateSPAmount(AuraEffect const* aurEff, int32 & amount, bool & /*canBeRecalculated*/)
+            void CalculateSPAmount(AuraEffect const* aurEff, int32 & amount, bool & /*canBeRecalculated*/)
             {
-				// xinef: by default feral spirit inherits 30% of AP as SP
-				if (Unit* owner = GetUnitOwner()->GetOwner())
-				{
-					int32 modifier = 30;
-					if (AuraEffect const* gofsEff = owner->GetAuraEffect(SPELL_SHAMAN_GLYPH_OF_FERAL_SPIRIT, EFFECT_0))
-						modifier += gofsEff->GetAmount();
+                // xinef: by default feral spirit inherits 30% of AP as SP
+                if (Unit* owner = GetUnitOwner()->GetOwner())
+                {
+                    int32 modifier = 30;
+                    if (AuraEffect const* gofsEff = owner->GetAuraEffect(SPELL_SHAMAN_GLYPH_OF_FERAL_SPIRIT, EFFECT_0))
+                        modifier += gofsEff->GetAmount();
 
-					amount = CalculatePct(std::max<int32>(0, owner->GetTotalAttackPowerValue(BASE_ATTACK)), modifier);
+                    amount = CalculatePct(std::max<int32>(0, owner->GetTotalAttackPowerValue(BASE_ATTACK)), modifier);
 
-					// xinef: Update appropriate player field
-					if (owner->GetTypeId() == TYPEID_PLAYER)
-						owner->SetUInt32Value(PLAYER_PET_SPELL_POWER, (uint32)amount);
-				}
+                    // xinef: Update appropriate player field
+                    if (owner->GetTypeId() == TYPEID_PLAYER)
+                        owner->SetUInt32Value(PLAYER_PET_SPELL_POWER, (uint32)amount);
+                }
             }
 
-			void HandleEffectApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
-			{
-				GetUnitOwner()->ApplySpellImmune(0, IMMUNITY_STATE, aurEff->GetAuraType(), true, SPELL_BLOCK_TYPE_POSITIVE);
-				if (aurEff->GetAuraType() == SPELL_AURA_MOD_ATTACK_POWER)
-					GetUnitOwner()->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_ATTACK_POWER_PCT, true, SPELL_BLOCK_TYPE_POSITIVE);
-				else if (aurEff->GetAuraType() == SPELL_AURA_MOD_STAT)
-					GetUnitOwner()->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TOTAL_STAT_PERCENTAGE, true, SPELL_BLOCK_TYPE_POSITIVE);
-			}
+            void HandleEffectApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+            {
+                GetUnitOwner()->ApplySpellImmune(0, IMMUNITY_STATE, aurEff->GetAuraType(), true, SPELL_BLOCK_TYPE_POSITIVE);
+                if (aurEff->GetAuraType() == SPELL_AURA_MOD_ATTACK_POWER)
+                    GetUnitOwner()->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_ATTACK_POWER_PCT, true, SPELL_BLOCK_TYPE_POSITIVE);
+                else if (aurEff->GetAuraType() == SPELL_AURA_MOD_STAT)
+                    GetUnitOwner()->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TOTAL_STAT_PERCENTAGE, true, SPELL_BLOCK_TYPE_POSITIVE);
+            }
 
-			void CalcPeriodic(AuraEffect const* /*aurEff*/, bool& isPeriodic, int32& amplitude)
+            void CalcPeriodic(AuraEffect const* /*aurEff*/, bool& isPeriodic, int32& amplitude)
             {
                 isPeriodic = true;
                 amplitude = 1*IN_MILLISECONDS;
             }
-			
+            
             void HandlePeriodic(AuraEffect const* aurEff)
             {
                 PreventDefaultAction();
-				if (aurEff->GetAuraType() == SPELL_AURA_MOD_STAT && (aurEff->GetMiscValue() == STAT_STAMINA || aurEff->GetMiscValue() == STAT_INTELLECT))
-				{
-					int32 currentAmount = aurEff->GetAmount();
-					int32 newAmount = GetEffect(aurEff->GetEffIndex())->CalculateAmount(GetCaster());
-					if (newAmount != currentAmount)
-					{
-						if (aurEff->GetMiscValue() == STAT_STAMINA)
-						{
-							uint32 actStat = GetUnitOwner()->GetHealth();
-							GetEffect(aurEff->GetEffIndex())->ChangeAmount(newAmount, false);
-							GetUnitOwner()->SetHealth(std::min<uint32>(GetUnitOwner()->GetMaxHealth(), actStat));
-						}
-						else
-						{
-							uint32 actStat = GetUnitOwner()->GetPower(POWER_MANA);
-							GetEffect(aurEff->GetEffIndex())->ChangeAmount(newAmount, false);
-							GetUnitOwner()->SetPower(POWER_MANA, std::min<uint32>(GetUnitOwner()->GetMaxPower(POWER_MANA), actStat));
-						}
-					}
-				}
-				else
-					GetEffect(aurEff->GetEffIndex())->RecalculateAmount();
+                if (aurEff->GetAuraType() == SPELL_AURA_MOD_STAT && (aurEff->GetMiscValue() == STAT_STAMINA || aurEff->GetMiscValue() == STAT_INTELLECT))
+                {
+                    int32 currentAmount = aurEff->GetAmount();
+                    int32 newAmount = GetEffect(aurEff->GetEffIndex())->CalculateAmount(GetCaster());
+                    if (newAmount != currentAmount)
+                    {
+                        if (aurEff->GetMiscValue() == STAT_STAMINA)
+                        {
+                            uint32 actStat = GetUnitOwner()->GetHealth();
+                            GetEffect(aurEff->GetEffIndex())->ChangeAmount(newAmount, false);
+                            GetUnitOwner()->SetHealth(std::min<uint32>(GetUnitOwner()->GetMaxHealth(), actStat));
+                        }
+                        else
+                        {
+                            uint32 actStat = GetUnitOwner()->GetPower(POWER_MANA);
+                            GetEffect(aurEff->GetEffIndex())->ChangeAmount(newAmount, false);
+                            GetUnitOwner()->SetPower(POWER_MANA, std::min<uint32>(GetUnitOwner()->GetMaxPower(POWER_MANA), actStat));
+                        }
+                    }
+                }
+                else
+                    GetEffect(aurEff->GetEffIndex())->RecalculateAmount();
             }
 
             void Register()
             {
-				if (m_scriptSpellId == 35675 || m_scriptSpellId == 35675)
-					DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_sha_feral_spirit_scaling_AuraScript::CalculateResistanceAmount, EFFECT_ALL, SPELL_AURA_MOD_RESISTANCE);
+                if (m_scriptSpellId == 35675 || m_scriptSpellId == 35675)
+                    DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_sha_feral_spirit_scaling_AuraScript::CalculateResistanceAmount, EFFECT_ALL, SPELL_AURA_MOD_RESISTANCE);
 
-				if (m_scriptSpellId == 35674)
-				{
-					DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_sha_feral_spirit_scaling_AuraScript::CalculateStatAmount, EFFECT_ALL, SPELL_AURA_MOD_STAT);
-					DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_sha_feral_spirit_scaling_AuraScript::CalculateAPAmount, EFFECT_ALL, SPELL_AURA_MOD_ATTACK_POWER);
-					DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_sha_feral_spirit_scaling_AuraScript::CalculateSPAmount, EFFECT_ALL, SPELL_AURA_MOD_DAMAGE_DONE);
-				}
+                if (m_scriptSpellId == 35674)
+                {
+                    DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_sha_feral_spirit_scaling_AuraScript::CalculateStatAmount, EFFECT_ALL, SPELL_AURA_MOD_STAT);
+                    DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_sha_feral_spirit_scaling_AuraScript::CalculateAPAmount, EFFECT_ALL, SPELL_AURA_MOD_ATTACK_POWER);
+                    DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_sha_feral_spirit_scaling_AuraScript::CalculateSPAmount, EFFECT_ALL, SPELL_AURA_MOD_DAMAGE_DONE);
+                }
 
-				OnEffectApply += AuraEffectApplyFn(spell_sha_feral_spirit_scaling_AuraScript::HandleEffectApply, EFFECT_ALL, SPELL_AURA_ANY, AURA_EFFECT_HANDLE_REAL);
-				DoEffectCalcPeriodic += AuraEffectCalcPeriodicFn(spell_sha_feral_spirit_scaling_AuraScript::CalcPeriodic, EFFECT_ALL, SPELL_AURA_ANY);
+                OnEffectApply += AuraEffectApplyFn(spell_sha_feral_spirit_scaling_AuraScript::HandleEffectApply, EFFECT_ALL, SPELL_AURA_ANY, AURA_EFFECT_HANDLE_REAL);
+                DoEffectCalcPeriodic += AuraEffectCalcPeriodicFn(spell_sha_feral_spirit_scaling_AuraScript::CalcPeriodic, EFFECT_ALL, SPELL_AURA_ANY);
                 OnEffectPeriodic += AuraEffectPeriodicFn(spell_sha_feral_spirit_scaling_AuraScript::HandlePeriodic, EFFECT_ALL, SPELL_AURA_ANY);
             }
         };
@@ -337,73 +337,73 @@ class spell_sha_fire_elemental_scaling : public SpellScriptLoader
 
             void CalculateResistanceAmount(AuraEffect const* aurEff, int32 & amount, bool & /*canBeRecalculated*/)
             {
-				// xinef: fire elemental inherits 40% of resistance from owner and 35% of armor
-				if (Unit* owner = GetUnitOwner()->GetOwner())
-				{
-					SpellSchoolMask schoolMask = SpellSchoolMask(aurEff->GetSpellInfo()->Effects[aurEff->GetEffIndex()].MiscValue);
-					int32 modifier = schoolMask == SPELL_SCHOOL_MASK_NORMAL ? 35 : 40;
-					amount = CalculatePct(std::max<int32>(0, owner->GetResistance(schoolMask)), modifier);
-				}
+                // xinef: fire elemental inherits 40% of resistance from owner and 35% of armor
+                if (Unit* owner = GetUnitOwner()->GetOwner())
+                {
+                    SpellSchoolMask schoolMask = SpellSchoolMask(aurEff->GetSpellInfo()->Effects[aurEff->GetEffIndex()].MiscValue);
+                    int32 modifier = schoolMask == SPELL_SCHOOL_MASK_NORMAL ? 35 : 40;
+                    amount = CalculatePct(std::max<int32>(0, owner->GetResistance(schoolMask)), modifier);
+                }
             }
 
             void CalculateStatAmount(AuraEffect const* aurEff, int32 & amount, bool & /*canBeRecalculated*/)
             {
-				// xinef: fire elemental inherits 30% of intellect / stamina
-				if (Unit* owner = GetUnitOwner()->GetOwner())
-				{
-					Stats stat = Stats(aurEff->GetSpellInfo()->Effects[aurEff->GetEffIndex()].MiscValue);
-					amount = CalculatePct(std::max<int32>(0, owner->GetStat(stat)), 30);
-				}
+                // xinef: fire elemental inherits 30% of intellect / stamina
+                if (Unit* owner = GetUnitOwner()->GetOwner())
+                {
+                    Stats stat = Stats(aurEff->GetSpellInfo()->Effects[aurEff->GetEffIndex()].MiscValue);
+                    amount = CalculatePct(std::max<int32>(0, owner->GetStat(stat)), 30);
+                }
             }
 
-			void CalculateAPAmount(AuraEffect const* aurEff, int32 & amount, bool & /*canBeRecalculated*/)
+            void CalculateAPAmount(AuraEffect const* aurEff, int32 & amount, bool & /*canBeRecalculated*/)
             {
-				// xinef: fire elemental inherits 300% / 150% of SP as AP
-				if (Unit* owner = GetUnitOwner()->GetOwner())
-				{
-					int32 fire = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_FIRE);
-					amount = CalculatePct(std::max<int32>(0, fire), (GetUnitOwner()->GetEntry() == NPC_FIRE_ELEMENTAL ? 300 : 150));
-				}
+                // xinef: fire elemental inherits 300% / 150% of SP as AP
+                if (Unit* owner = GetUnitOwner()->GetOwner())
+                {
+                    int32 fire = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_FIRE);
+                    amount = CalculatePct(std::max<int32>(0, fire), (GetUnitOwner()->GetEntry() == NPC_FIRE_ELEMENTAL ? 300 : 150));
+                }
             }
 
-			void CalculateSPAmount(AuraEffect const* aurEff, int32 & amount, bool & /*canBeRecalculated*/)
+            void CalculateSPAmount(AuraEffect const* aurEff, int32 & amount, bool & /*canBeRecalculated*/)
             {
-				// xinef: fire elemental inherits 100% of SP
-				if (Unit* owner = GetUnitOwner()->GetOwner())
-				{
-					int32 fire = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_FIRE);
-					amount = CalculatePct(std::max<int32>(0, fire), 100);
+                // xinef: fire elemental inherits 100% of SP
+                if (Unit* owner = GetUnitOwner()->GetOwner())
+                {
+                    int32 fire = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_FIRE);
+                    amount = CalculatePct(std::max<int32>(0, fire), 100);
 
-					// xinef: Update appropriate player field
-					if (owner->GetTypeId() == TYPEID_PLAYER)
-						owner->SetUInt32Value(PLAYER_PET_SPELL_POWER, (uint32)amount);
-				}
+                    // xinef: Update appropriate player field
+                    if (owner->GetTypeId() == TYPEID_PLAYER)
+                        owner->SetUInt32Value(PLAYER_PET_SPELL_POWER, (uint32)amount);
+                }
             }
 
-			void HandleEffectApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
-			{
-				GetUnitOwner()->ApplySpellImmune(0, IMMUNITY_STATE, aurEff->GetAuraType(), true, SPELL_BLOCK_TYPE_POSITIVE);
-				if (aurEff->GetAuraType() == SPELL_AURA_MOD_ATTACK_POWER)
-					GetUnitOwner()->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_ATTACK_POWER_PCT, true, SPELL_BLOCK_TYPE_POSITIVE);
-				else if (aurEff->GetAuraType() == SPELL_AURA_MOD_STAT)
-					GetUnitOwner()->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TOTAL_STAT_PERCENTAGE, true, SPELL_BLOCK_TYPE_POSITIVE);
-			}
+            void HandleEffectApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+            {
+                GetUnitOwner()->ApplySpellImmune(0, IMMUNITY_STATE, aurEff->GetAuraType(), true, SPELL_BLOCK_TYPE_POSITIVE);
+                if (aurEff->GetAuraType() == SPELL_AURA_MOD_ATTACK_POWER)
+                    GetUnitOwner()->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_ATTACK_POWER_PCT, true, SPELL_BLOCK_TYPE_POSITIVE);
+                else if (aurEff->GetAuraType() == SPELL_AURA_MOD_STAT)
+                    GetUnitOwner()->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TOTAL_STAT_PERCENTAGE, true, SPELL_BLOCK_TYPE_POSITIVE);
+            }
 
             void Register()
             {
-				if (m_scriptSpellId != 35665 && m_scriptSpellId != 65225)
-					DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_sha_fire_elemental_scaling_AuraScript::CalculateResistanceAmount, EFFECT_ALL, SPELL_AURA_MOD_RESISTANCE);
+                if (m_scriptSpellId != 35665 && m_scriptSpellId != 65225)
+                    DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_sha_fire_elemental_scaling_AuraScript::CalculateResistanceAmount, EFFECT_ALL, SPELL_AURA_MOD_RESISTANCE);
 
-				if (m_scriptSpellId == 35666 || m_scriptSpellId == 65226)
-					DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_sha_fire_elemental_scaling_AuraScript::CalculateStatAmount, EFFECT_ALL, SPELL_AURA_MOD_STAT);
+                if (m_scriptSpellId == 35666 || m_scriptSpellId == 65226)
+                    DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_sha_fire_elemental_scaling_AuraScript::CalculateStatAmount, EFFECT_ALL, SPELL_AURA_MOD_STAT);
 
-				if (m_scriptSpellId == 35665 || m_scriptSpellId == 65225)
-				{
-					DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_sha_fire_elemental_scaling_AuraScript::CalculateAPAmount, EFFECT_ALL, SPELL_AURA_MOD_ATTACK_POWER);
-					DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_sha_fire_elemental_scaling_AuraScript::CalculateSPAmount, EFFECT_ALL, SPELL_AURA_MOD_DAMAGE_DONE);
-				}
+                if (m_scriptSpellId == 35665 || m_scriptSpellId == 65225)
+                {
+                    DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_sha_fire_elemental_scaling_AuraScript::CalculateAPAmount, EFFECT_ALL, SPELL_AURA_MOD_ATTACK_POWER);
+                    DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_sha_fire_elemental_scaling_AuraScript::CalculateSPAmount, EFFECT_ALL, SPELL_AURA_MOD_DAMAGE_DONE);
+                }
 
-				OnEffectApply += AuraEffectApplyFn(spell_sha_fire_elemental_scaling_AuraScript::HandleEffectApply, EFFECT_ALL, SPELL_AURA_ANY, AURA_EFFECT_HANDLE_REAL);
+                OnEffectApply += AuraEffectApplyFn(spell_sha_fire_elemental_scaling_AuraScript::HandleEffectApply, EFFECT_ALL, SPELL_AURA_ANY, AURA_EFFECT_HANDLE_REAL);
             }
         };
 
@@ -658,9 +658,9 @@ class spell_sha_earth_shield : public SpellScriptLoader
             {
                 if (Unit* caster = GetCaster())
                 {
-					int32 baseAmount = amount;
+                    int32 baseAmount = amount;
                     amount = caster->SpellHealingBonusDone(GetUnitOwner(), GetSpellInfo(), amount, HEAL);
-					// xinef: taken should be calculated at every heal
+                    // xinef: taken should be calculated at every heal
                     //amount = GetUnitOwner()->SpellHealingBonusTaken(caster, GetSpellInfo(), amount, HEAL);
 
                     // Glyph of Earth Shield
@@ -669,17 +669,17 @@ class spell_sha_earth_shield : public SpellScriptLoader
                     if (AuraEffect* glyphe = caster->GetAuraEffect(SPELL_SHAMAN_GLYPH_OF_EARTH_SHIELD, EFFECT_0))
                         AddPct(amount, glyphe->GetAmount());
 
-					// xinef: Improved Shields
-					if (baseAmount = amount - baseAmount)
-						if (AuraEffect* aurEff = caster->GetAuraEffect(SPELL_AURA_ADD_PCT_MODIFIER, SPELLFAMILY_SHAMAN, 19, EFFECT_1))
-						{
-							ApplyPct(baseAmount, aurEff->GetAmount());
-							amount += baseAmount;
-						}
+                    // xinef: Improved Shields
+                    if (baseAmount = amount - baseAmount)
+                        if (AuraEffect* aurEff = caster->GetAuraEffect(SPELL_AURA_ADD_PCT_MODIFIER, SPELLFAMILY_SHAMAN, 19, EFFECT_1))
+                        {
+                            ApplyPct(baseAmount, aurEff->GetAmount());
+                            amount += baseAmount;
+                        }
                 }
             }
 
-			bool CheckProc(ProcEventInfo& eventInfo)
+            bool CheckProc(ProcEventInfo& eventInfo)
             {
                 return !GetTarget()->HasSpellCooldown(SPELL_SHAMAN_EARTH_SHIELD_HEAL);
             }
@@ -1354,15 +1354,15 @@ class spell_sha_thunderstorm : public SpellScriptLoader
 
 void AddSC_shaman_spell_scripts()
 {
-	// ours
-	new spell_sha_totem_of_wrath();
-	new spell_sha_spirit_walk();
-	new spell_sha_t10_restoration_4p_bonus();
-	new spell_sha_totemic_mastery();
-	new spell_sha_feral_spirit_scaling();
-	new spell_sha_fire_elemental_scaling();
+    // ours
+    new spell_sha_totem_of_wrath();
+    new spell_sha_spirit_walk();
+    new spell_sha_t10_restoration_4p_bonus();
+    new spell_sha_totemic_mastery();
+    new spell_sha_feral_spirit_scaling();
+    new spell_sha_fire_elemental_scaling();
 
-	// theirs
+    // theirs
     new spell_sha_ancestral_awakening_proc();
     new spell_sha_astral_shift();
     new spell_sha_bloodlust();

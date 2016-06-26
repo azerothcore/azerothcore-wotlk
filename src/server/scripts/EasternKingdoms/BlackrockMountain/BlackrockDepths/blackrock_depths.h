@@ -60,7 +60,7 @@ enum DataTypes
     DATA_SF_BRAZIER_S       = 26,
     DATA_MOIRA              = 27,
 
-	DATA_OPEN_COFFER_DOORS	= 30,
+    DATA_OPEN_COFFER_DOORS  = 30,
 };
 
 #endif

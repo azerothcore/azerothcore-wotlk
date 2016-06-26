@@ -37,7 +37,7 @@ public:
 
     ChatCommand* GetCommands() const
     {
-		static ChatCommand modifyspeedCommandTable[] =
+        static ChatCommand modifyspeedCommandTable[] =
         {
             { "fly",            SEC_GAMEMASTER,      false, &HandleModifyFlyCommand,           "", NULL },
             { "all",            SEC_GAMEMASTER,      false, &HandleModifyASpeedCommand,        "", NULL },
@@ -69,12 +69,12 @@ public:
             { "standstate",     SEC_GAMEMASTER,     false, &HandleModifyStandStateCommand,    "", NULL },
             { "phase",          SEC_ADMINISTRATOR,  false, &HandleModifyPhaseCommand,         "", NULL },
             { "gender",         SEC_GAMEMASTER,     false, &HandleModifyGenderCommand,        "", NULL },
-			{ "speed",          SEC_GAMEMASTER,      false, NULL,           "", modifyspeedCommandTable },
+            { "speed",          SEC_GAMEMASTER,      false, NULL,           "", modifyspeedCommandTable },
             { NULL,             0,                  false, NULL,                                           "", NULL }
         };
         static ChatCommand commandTable[] =
         {
-			{ "morph",          SEC_GAMEMASTER,     false, &HandleModifyMorphCommand,          "", NULL },
+            { "morph",          SEC_GAMEMASTER,     false, &HandleModifyMorphCommand,          "", NULL },
             { "demorph",        SEC_GAMEMASTER,     false, &HandleDeMorphCommand,              "", NULL },
             { "modify",         SEC_GAMEMASTER,      false, NULL,                 "", modifyCommandTable },
             { NULL,             0,                  false, NULL,                               "", NULL }
@@ -487,8 +487,8 @@ public:
         }
 
         Player* target = handler->getSelectedPlayerOrSelf();
-		if (handler->GetSession()->GetSecurity() < SEC_GAMEMASTER)
-			target = handler->GetSession()->GetPlayer();
+        if (handler->GetSession()->GetSecurity() < SEC_GAMEMASTER)
+            target = handler->GetSession()->GetPlayer();
         if (!target)
         {
             handler->SendSysMessage(LANG_NO_CHAR_SELECTED);
@@ -537,8 +537,8 @@ public:
         }
 
         Player* target = handler->getSelectedPlayerOrSelf();
-		if (handler->GetSession()->GetSecurity() < SEC_GAMEMASTER)
-			target = handler->GetSession()->GetPlayer();
+        if (handler->GetSession()->GetSecurity() < SEC_GAMEMASTER)
+            target = handler->GetSession()->GetPlayer();
         if (!target)
         {
             handler->SendSysMessage(LANG_NO_CHAR_SELECTED);
@@ -584,8 +584,8 @@ public:
         }
 
         Player* target = handler->getSelectedPlayerOrSelf();
-		if (handler->GetSession()->GetSecurity() < SEC_GAMEMASTER)
-			target = handler->GetSession()->GetPlayer();
+        if (handler->GetSession()->GetSecurity() < SEC_GAMEMASTER)
+            target = handler->GetSession()->GetPlayer();
         if (!target)
         {
             handler->SendSysMessage(LANG_NO_CHAR_SELECTED);
@@ -631,8 +631,8 @@ public:
         }
 
         Player* target = handler->getSelectedPlayerOrSelf();
-		if (handler->GetSession()->GetSecurity() < SEC_GAMEMASTER)
-			target = handler->GetSession()->GetPlayer();
+        if (handler->GetSession()->GetSecurity() < SEC_GAMEMASTER)
+            target = handler->GetSession()->GetPlayer();
         if (!target)
         {
             handler->SendSysMessage(LANG_NO_CHAR_SELECTED);
@@ -678,8 +678,8 @@ public:
         }
 
         Player* target = handler->getSelectedPlayerOrSelf();
-		if (handler->GetSession()->GetSecurity() < SEC_GAMEMASTER)
-			target = handler->GetSession()->GetPlayer();
+        if (handler->GetSession()->GetSecurity() < SEC_GAMEMASTER)
+            target = handler->GetSession()->GetPlayer();
         if (!target)
         {
             handler->SendSysMessage(LANG_NO_CHAR_SELECTED);

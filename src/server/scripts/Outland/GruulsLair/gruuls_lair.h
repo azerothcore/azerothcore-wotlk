@@ -9,10 +9,10 @@ enum DataTypes
 {
     DATA_MAULGAR                = 0,
     DATA_GRUUL                  = 1,
-	MAX_ENCOUNTER				= 2,
+    MAX_ENCOUNTER               = 2,
 
-	DATA_ADDS_KILLED			= 10,
-	MAX_ADD_NUMBER				= 4
+    DATA_ADDS_KILLED            = 10,
+    MAX_ADD_NUMBER              = 4
 };
 
 enum CreatureIds

@@ -91,13 +91,13 @@ public:
             { "areatriggers",   SEC_ADMINISTRATOR,  false, &HandleDebugAreaTriggersCommand,    "", NULL },
             { "los",            SEC_GAMEMASTER,      false, &HandleDebugLoSCommand,             "", NULL },
             { "moveflags",      SEC_ADMINISTRATOR,  false, &HandleDebugMoveflagsCommand,       "", NULL },
-			{ "unitstate",      SEC_ADMINISTRATOR,  false, &HandleDebugUnitStateCommand,       "", NULL },
+            { "unitstate",      SEC_ADMINISTRATOR,  false, &HandleDebugUnitStateCommand,       "", NULL },
             { NULL,             SEC_PLAYER,         false, NULL,                               "", NULL }
         };
         static ChatCommand commandTable[] =
         {
             { "debug",          SEC_GAMEMASTER,      true,  NULL,                  "", debugCommandTable },
-			{ "wpgps",          SEC_ADMINISTRATOR,  false, &HandleWPGPSCommand,   "",              NULL },
+            { "wpgps",          SEC_ADMINISTRATOR,  false, &HandleWPGPSCommand,   "",              NULL },
             { NULL,             SEC_PLAYER,         false, NULL,                  "",              NULL }
         };
         return commandTable;
@@ -839,7 +839,7 @@ public:
         while (ref)
         {
             if (Unit* unit = ref->GetSource()->GetOwner())
-				handler->PSendSysMessage("   %u.   %s %s   (guid %u)  - threat %f", ++count, (ref->isOnline() ? "" : "[offline]"), unit->GetName().c_str(), unit->GetGUIDLow(), ref->getThreat());
+                handler->PSendSysMessage("   %u.   %s %s   (guid %u)  - threat %f", ++count, (ref->isOnline() ? "" : "[offline]"), unit->GetName().c_str(), unit->GetGUIDLow(), ref->getThreat());
             else
                 handler->PSendSysMessage("   %u.   No Owner  - threat %f", ++count, ref->getThreat());
             ref = ref->next();
@@ -1344,19 +1344,19 @@ public:
 
         if (!*args)
         {
-			handler->PSendSysMessage("Unit States: %u, React State: %u", target->GetUnitState(), target->ToCreature() ? target->ToCreature()->GetReactState() : 10);
+            handler->PSendSysMessage("Unit States: %u, React State: %u", target->GetUnitState(), target->ToCreature() ? target->ToCreature()->GetReactState() : 10);
         }
         else
         {
             uint32 unitState = atoi((char*)args);
-			target->ClearUnitState(target->GetUnitState());
-			target->AddUnitState(unitState);
+            target->ClearUnitState(target->GetUnitState());
+            target->AddUnitState(unitState);
         }
 
         return true;
     }
 
-	static bool HandleWPGPSCommand(ChatHandler* handler, char const* /*args*/)
+    static bool HandleWPGPSCommand(ChatHandler* handler, char const* /*args*/)
     {
         Player* player = handler->GetSession()->GetPlayer();
 

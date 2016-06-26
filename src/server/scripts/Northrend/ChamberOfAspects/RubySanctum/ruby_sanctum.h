@@ -17,12 +17,12 @@ enum DataTypes
     DATA_BALTHARUS_THE_WARBORN              = 0,
     DATA_GENERAL_ZARITHRIAN                 = 1,
     DATA_SAVIANA_RAGEFIRE                   = 2,
-	DATA_HALION_INTRO1						= 3,
-	DATA_HALION_INTRO2						= 4,
-	DATA_HALION_INTRO_DONE					= 5,
+    DATA_HALION_INTRO1                      = 3,
+    DATA_HALION_INTRO2                      = 4,
+    DATA_HALION_INTRO_DONE                  = 5,
     DATA_HALION                             = 6,
-	
-	MAX_ENCOUNTERS							= 7,
+    
+    MAX_ENCOUNTERS                          = 7,
 
     // Etc
     DATA_ZARITHRIAN_SPAWN_STALKER_1         = 8,
@@ -92,7 +92,7 @@ enum WorldStatesRS
 enum InstanceSpell
 {
     SPELL_BERSERK                       = 26662,
-	SPELL_RALLY							= 75416
+    SPELL_RALLY                         = 75416
 };
 
 #endif // RUBY_SANCTUM_H_

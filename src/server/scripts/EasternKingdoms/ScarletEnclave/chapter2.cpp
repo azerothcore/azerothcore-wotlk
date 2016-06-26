@@ -26,7 +26,7 @@
 // texts signed for creature 28939 but used for 28939, 28940, 28610
 enum win_friends
 {
-	SAY_AGGRO                         = 0,
+    SAY_AGGRO                         = 0,
     SAY_CRUSADER                      = 1,
     SAY_PERSUADED1                    = 2,
     SAY_PERSUADED2                    = 3,
@@ -67,11 +67,11 @@ public:
             me->RestoreFaction();
         }
 
-		void EnterCombat(Unit*)
-		{
-			if (roll_chance_i(33))
-				Talk(SAY_AGGRO);
-		}
+        void EnterCombat(Unit*)
+        {
+            if (roll_chance_i(33))
+                Talk(SAY_AGGRO);
+        }
 
         void SpellHit(Unit* caster, const SpellInfo* spell)
         {
@@ -154,7 +154,7 @@ public:
                 return;
             }
 
-			CombatAI::UpdateAI(diff);
+            CombatAI::UpdateAI(diff);
         }
     };
 
@@ -200,7 +200,7 @@ public:
         if (quest->GetQuestId() == QUEST_BREAKOUT)
         {
             creature->SetStandState(UNIT_STAND_STATE_STAND);
-			creature->setActive(true);
+            creature->setActive(true);
 
             if (npc_escortAI* pEscortAI = CAST_AI(npc_koltira_deathweaver::npc_koltira_deathweaverAI, creature->AI()))
                 pEscortAI->Start(false, false, player->GetGUID());
@@ -223,7 +223,7 @@ public:
         uint32 m_uiWave;
         uint32 m_uiWave_Timer;
         uint64 m_uiValrothGUID;
-		SummonList summons;
+        SummonList summons;
 
         void Reset()
         {
@@ -235,38 +235,38 @@ public:
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                 me->LoadEquipment(0, true);
                 me->RemoveAllAuras();
-				me->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_ALL, true);
-				summons.DespawnAll();
+                me->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_ALL, true);
+                summons.DespawnAll();
             }
         }
 
-		void EnterEvadeMode()
-		{
-			me->DeleteThreatList();
-			me->CombatStop(false);
-			me->SetLootRecipient(NULL);
+        void EnterEvadeMode()
+        {
+            me->DeleteThreatList();
+            me->CombatStop(false);
+            me->SetLootRecipient(NULL);
 
-			if (HasEscortState(STATE_ESCORT_ESCORTING))
-			{
-				AddEscortState(STATE_ESCORT_RETURNING);
-				ReturnToLastPoint();
-				;//sLog->outDebug(LOG_FILTER_TSCR, "TSCR: EscortAI has left combat and is now returning to last point");
-			}
-			else
-			{
-				me->GetMotionMaster()->MoveTargetedHome();
-				me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
-				Reset();
-			}
-		}
+            if (HasEscortState(STATE_ESCORT_ESCORTING))
+            {
+                AddEscortState(STATE_ESCORT_RETURNING);
+                ReturnToLastPoint();
+                ;//sLog->outDebug(LOG_FILTER_TSCR, "TSCR: EscortAI has left combat and is now returning to last point");
+            }
+            else
+            {
+                me->GetMotionMaster()->MoveTargetedHome();
+                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+                Reset();
+            }
+        }
 
-		void AttackStart(Unit* who)
-		{
-			if (HasEscortState(STATE_ESCORT_PAUSED))
-				return;
+        void AttackStart(Unit* who)
+        {
+            if (HasEscortState(STATE_ESCORT_PAUSED))
+                return;
 
-			npc_escortAI::AttackStart(who);
-		}
+            npc_escortAI::AttackStart(who);
+        }
 
         void WaypointReached(uint32 waypointId)
         {
@@ -292,7 +292,7 @@ public:
                     DoCast(me, SPELL_ANTI_MAGIC_ZONE);  // cast again that makes bubble up
                     break;
                 case 4:
-					me->ApplySpellImmune(0, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_ALL, false);
+                    me->ApplySpellImmune(0, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_ALL, false);
                     SetRun(true);
                     break;
                 case 9:
@@ -314,7 +314,7 @@ public:
 
             summoned->AddThreat(me, 0.0f);
             summoned->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
-			summons.Summon(summoned);
+            summons.Summon(summoned);
         }
 
         void SummonAcolyte(uint32 uiAmount)
@@ -1066,15 +1066,15 @@ class spell_q12779_an_end_to_all_things : public SpellScriptLoader
         {
             PrepareSpellScript(spell_q12779_an_end_to_all_things_SpellScript);
 
-			void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+            void HandleScriptEffect(SpellEffIndex /*effIndex*/)
             {
-				if (GetHitUnit())
+                if (GetHitUnit())
                     GetHitUnit()->CastSpell(GetCaster(), GetEffectValue(), true);
-			}
+            }
 
             void Register()
             {
-				OnEffectHitTarget += SpellEffectFn(spell_q12779_an_end_to_all_things_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+                OnEffectHitTarget += SpellEffectFn(spell_q12779_an_end_to_all_things_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
             }
         };
 
@@ -1092,6 +1092,6 @@ void AddSC_the_scarlet_enclave_c2()
     new npc_high_inquisitor_valroth();
     new npc_a_special_surprise();
 
-	// Xinef: Should be in chapter III
-	new spell_q12779_an_end_to_all_things();
+    // Xinef: Should be in chapter III
+    new spell_q12779_an_end_to_all_things();
 }

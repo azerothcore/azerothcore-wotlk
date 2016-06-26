@@ -33,7 +33,7 @@ void HomeMovementGenerator<Creature>::DoFinalize(Creature* owner)
     owner->ClearUnitState(UNIT_STATE_EVADE);
     if (arrived)
     {
-		// Xinef: npc run by default
+        // Xinef: npc run by default
         //owner->SetWalk(true);
         owner->LoadCreaturesAddon(true);
         owner->AI()->JustReachedHome();
@@ -48,15 +48,15 @@ void HomeMovementGenerator<Creature>::DoReset(Creature*)
 
 void HomeMovementGenerator<Creature>::_setTargetLocation(Creature* owner)
 {
-	// Xinef: dont interrupt in any cast!
+    // Xinef: dont interrupt in any cast!
     //if (owner->HasUnitState(UNIT_STATE_ROOT | UNIT_STATE_STUNNED | UNIT_STATE_DISTRACTED))
     //    return;
     Movement::MoveSplineInit init(owner);
     float x, y, z, o;
 
-	// Xinef: if there is motion generator on controlled slot, this one is not updated
-	// Xinef: always get reset pos from idle slot
-	MovementGenerator* gen = owner->GetMotionMaster()->GetMotionSlot(MOTION_SLOT_IDLE);
+    // Xinef: if there is motion generator on controlled slot, this one is not updated
+    // Xinef: always get reset pos from idle slot
+    MovementGenerator* gen = owner->GetMotionMaster()->GetMotionSlot(MOTION_SLOT_IDLE);
     if (owner->GetMotionMaster()->empty() || !gen || !gen->GetResetPosition(x, y, z))
     {
         owner->GetHomePosition(x, y, z, o);
@@ -74,15 +74,15 @@ void HomeMovementGenerator<Creature>::_setTargetLocation(Creature* owner)
 
 bool HomeMovementGenerator<Creature>::DoUpdate(Creature* owner, const uint32 /*time_diff*/)
 {
-	arrived = owner->movespline->Finalized();
-	if (arrived)
-		return false;
+    arrived = owner->movespline->Finalized();
+    if (arrived)
+        return false;
 
-	if (i_recalculateTravel)
-	{
-		_setTargetLocation(owner);
-		i_recalculateTravel = false;
-	}
+    if (i_recalculateTravel)
+    {
+        _setTargetLocation(owner);
+        i_recalculateTravel = false;
+    }
 
-	return true;
+    return true;
 }

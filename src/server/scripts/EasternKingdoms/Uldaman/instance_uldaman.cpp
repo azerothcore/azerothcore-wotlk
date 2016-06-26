@@ -50,13 +50,13 @@ class instance_uldaman : public InstanceMapScript
                            HandleGameObject(0, true, gameobject);
                         break;
                     case GO_ANCIENT_VAULT_DOOR:
-						ancientVaultDoorGUID = gameobject->GetGUID();
+                        ancientVaultDoorGUID = gameobject->GetGUID();
                         if (_encounters[DATA_ARCHAEDAS] == DONE)
                            HandleGameObject(0, true, gameobject);
                         break;
-					case GO_ARCHAEDAS_TEMPLE_DOOR:
-						archaedasTempleDoorGUID = gameobject->GetGUID();
-						break;
+                    case GO_ARCHAEDAS_TEMPLE_DOOR:
+                        archaedasTempleDoorGUID = gameobject->GetGUID();
+                        break;
                 }
             }
 
@@ -64,15 +64,15 @@ class instance_uldaman : public InstanceMapScript
             {
                 switch (type)
                 {
-					case DATA_IRONAYA_DOORS:
+                    case DATA_IRONAYA_DOORS:
                     case DATA_STONE_KEEPERS:
-						_encounters[type] = data;
-						break;
-					case DATA_ARCHAEDAS:
-						_encounters[type] = data;
-						HandleGameObject(ancientVaultDoorGUID, data == DONE, NULL);
-						HandleGameObject(archaedasTempleDoorGUID, data != IN_PROGRESS, NULL);
-						break;
+                        _encounters[type] = data;
+                        break;
+                    case DATA_ARCHAEDAS:
+                        _encounters[type] = data;
+                        HandleGameObject(ancientVaultDoorGUID, data == DONE, NULL);
+                        HandleGameObject(archaedasTempleDoorGUID, data != IN_PROGRESS, NULL);
+                        break;
                 }
 
                 if (data == DONE)
@@ -83,7 +83,7 @@ class instance_uldaman : public InstanceMapScript
             {
                 std::ostringstream saveStream;
                 saveStream << "U D " << _encounters[DATA_IRONAYA_DOORS] << ' ' << _encounters[DATA_STONE_KEEPERS] << ' ' << _encounters[DATA_ARCHAEDAS];
-				return saveStream.str();
+                return saveStream.str();
             }
 
             void Load(const char* in)
@@ -91,19 +91,19 @@ class instance_uldaman : public InstanceMapScript
                 if (!in)
                     return;
 
-				char dataHead1, dataHead2;
-				std::istringstream loadStream(in);
-				loadStream >> dataHead1 >> dataHead2;
+                char dataHead1, dataHead2;
+                std::istringstream loadStream(in);
+                loadStream >> dataHead1 >> dataHead2;
 
-				if (dataHead1 == 'U' && dataHead2 == 'D')
-				{
-					for (uint8 i = 0; i < MAX_ENCOUNTERS; ++i)
-					{
-						loadStream >> _encounters[i];
-						if (_encounters[i] == IN_PROGRESS)
-							_encounters[i] = NOT_STARTED;
-					}
-				}
+                if (dataHead1 == 'U' && dataHead2 == 'D')
+                {
+                    for (uint8 i = 0; i < MAX_ENCOUNTERS; ++i)
+                    {
+                        loadStream >> _encounters[i];
+                        if (_encounters[i] == IN_PROGRESS)
+                            _encounters[i] = NOT_STARTED;
+                    }
+                }
             }
 
             void OnCreatureCreate(Creature* creature)
@@ -111,13 +111,13 @@ class instance_uldaman : public InstanceMapScript
                 switch (creature->GetEntry())
                 {
                     case NPC_STONE_KEEPER:
-						if (_encounters[DATA_STONE_KEEPERS] != DONE && !creature->IsAlive())
-							creature->Respawn();
+                        if (_encounters[DATA_STONE_KEEPERS] != DONE && !creature->IsAlive())
+                            creature->Respawn();
                         break;
-				}
+                }
             }
 
-		private:
+        private:
             uint32 _encounters[MAX_ENCOUNTERS];
             uint64 archaedasTempleDoorGUID;
             uint64 ancientVaultDoorGUID;
@@ -131,29 +131,29 @@ class instance_uldaman : public InstanceMapScript
 
 class spell_uldaman_sub_boss_agro_keepers : public SpellScriptLoader
 {
-	public:
-		spell_uldaman_sub_boss_agro_keepers() : SpellScriptLoader("spell_uldaman_sub_boss_agro_keepers") { }
+    public:
+        spell_uldaman_sub_boss_agro_keepers() : SpellScriptLoader("spell_uldaman_sub_boss_agro_keepers") { }
 
-		class spell_uldaman_sub_boss_agro_keepers_SpellScript : public SpellScript
-		{
-			PrepareSpellScript(spell_uldaman_sub_boss_agro_keepers_SpellScript);
+        class spell_uldaman_sub_boss_agro_keepers_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_uldaman_sub_boss_agro_keepers_SpellScript);
 
-			void HandleSendEvent(SpellEffIndex effIndex)
-			{
-				if (Creature* keeper = GetCaster()->FindNearestCreature(NPC_STONE_KEEPER, 100.0f, true))
-					keeper->AI()->SetData(1, 1);
-			}
+            void HandleSendEvent(SpellEffIndex effIndex)
+            {
+                if (Creature* keeper = GetCaster()->FindNearestCreature(NPC_STONE_KEEPER, 100.0f, true))
+                    keeper->AI()->SetData(1, 1);
+            }
 
-			void Register()
-			{
-				OnEffectLaunch += SpellEffectFn(spell_uldaman_sub_boss_agro_keepers_SpellScript::HandleSendEvent, EFFECT_0, SPELL_EFFECT_SEND_EVENT);
-			}
-		};
+            void Register()
+            {
+                OnEffectLaunch += SpellEffectFn(spell_uldaman_sub_boss_agro_keepers_SpellScript::HandleSendEvent, EFFECT_0, SPELL_EFFECT_SEND_EVENT);
+            }
+        };
 
-		SpellScript* GetSpellScript() const
-		{
-			return new spell_uldaman_sub_boss_agro_keepers_SpellScript();
-		}
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_uldaman_sub_boss_agro_keepers_SpellScript();
+        }
 };
 
 class spell_uldaman_stoned : public SpellScriptLoader
@@ -165,23 +165,23 @@ class spell_uldaman_stoned : public SpellScriptLoader
         {
             PrepareAuraScript(spell_uldaman_stoned_AuraScript);
 
-			bool Load()
-			{
-				return GetUnitOwner()->GetTypeId() == TYPEID_UNIT;
-			}
+            bool Load()
+            {
+                return GetUnitOwner()->GetTypeId() == TYPEID_UNIT;
+            }
 
             void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
                 Creature* target = GetUnitOwner()->ToCreature();
-				target->SetReactState(REACT_PASSIVE);
-				target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
+                target->SetReactState(REACT_PASSIVE);
+                target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
             }
 
             void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
                 Creature* target = GetUnitOwner()->ToCreature();
-				target->SetReactState(REACT_AGGRESSIVE);
-				target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
+                target->SetReactState(REACT_AGGRESSIVE);
+                target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
             }
 
             void Register()
@@ -199,40 +199,40 @@ class spell_uldaman_stoned : public SpellScriptLoader
 
 class spell_uldaman_boss_agro_archaedas : public SpellScriptLoader
 {
-	public:
-		spell_uldaman_boss_agro_archaedas() : SpellScriptLoader("spell_uldaman_boss_agro_archaedas") { }
+    public:
+        spell_uldaman_boss_agro_archaedas() : SpellScriptLoader("spell_uldaman_boss_agro_archaedas") { }
 
-		class spell_uldaman_boss_agro_archaedas_SpellScript : public SpellScript
-		{
-			PrepareSpellScript(spell_uldaman_boss_agro_archaedas_SpellScript);
+        class spell_uldaman_boss_agro_archaedas_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_uldaman_boss_agro_archaedas_SpellScript);
 
-			void HandleSendEvent(SpellEffIndex effIndex)
-			{
-				InstanceScript* instance = GetCaster()->GetInstanceScript();
-				if (!instance || instance->GetData(DATA_ARCHAEDAS) == IN_PROGRESS)
-					return;
+            void HandleSendEvent(SpellEffIndex effIndex)
+            {
+                InstanceScript* instance = GetCaster()->GetInstanceScript();
+                if (!instance || instance->GetData(DATA_ARCHAEDAS) == IN_PROGRESS)
+                    return;
 
-				instance->SetData(DATA_ARCHAEDAS, IN_PROGRESS);
-				if (Creature* archaedas = GetCaster()->FindNearestCreature(NPC_ARCHAEDAS, 100.0f, true))
-					archaedas->AI()->SetData(1, 1);
-			}
+                instance->SetData(DATA_ARCHAEDAS, IN_PROGRESS);
+                if (Creature* archaedas = GetCaster()->FindNearestCreature(NPC_ARCHAEDAS, 100.0f, true))
+                    archaedas->AI()->SetData(1, 1);
+            }
 
-			void Register()
-			{
-				OnEffectLaunch += SpellEffectFn(spell_uldaman_boss_agro_archaedas_SpellScript::HandleSendEvent, EFFECT_0, SPELL_EFFECT_SEND_EVENT);
-			}
-		};
+            void Register()
+            {
+                OnEffectLaunch += SpellEffectFn(spell_uldaman_boss_agro_archaedas_SpellScript::HandleSendEvent, EFFECT_0, SPELL_EFFECT_SEND_EVENT);
+            }
+        };
 
-		SpellScript* GetSpellScript() const
-		{
-			return new spell_uldaman_boss_agro_archaedas_SpellScript();
-		}
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_uldaman_boss_agro_archaedas_SpellScript();
+        }
 };
 
 void AddSC_instance_uldaman()
 {
     new instance_uldaman();
-	new spell_uldaman_sub_boss_agro_keepers();
-	new spell_uldaman_stoned();
-	new spell_uldaman_boss_agro_archaedas();
+    new spell_uldaman_sub_boss_agro_keepers();
+    new spell_uldaman_stoned();
+    new spell_uldaman_boss_agro_archaedas();
 }

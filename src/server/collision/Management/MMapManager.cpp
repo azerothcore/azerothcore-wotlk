@@ -311,7 +311,7 @@ namespace MMAP
 
     dtNavMesh const* MMapManager::GetNavMesh(uint32 mapId)
     {
-		// pussywizard: moved to calling function
+        // pussywizard: moved to calling function
         //TRINITY_READ_GUARD(ACE_RW_Thread_Mutex, MMapManagerLock);
 
         if (loadedMMaps.find(mapId) == loadedMMaps.end())
@@ -322,18 +322,18 @@ namespace MMAP
 
     dtNavMeshQuery const* MMapManager::GetNavMeshQuery(uint32 mapId, uint32 instanceId)
     {
-		// pussywizard: moved to calling function
+        // pussywizard: moved to calling function
         //TRINITY_READ_GUARD(ACE_RW_Thread_Mutex, MMapManagerLock);
 
         if (loadedMMaps.find(mapId) == loadedMMaps.end())
             return NULL;
 
         MMapData* mmap = loadedMMaps[mapId];
-		if (mmap->navMeshQueries.find(instanceId) == mmap->navMeshQueries.end())
-		{
-		// pussywizard: different instances of the same map shouldn't access this simultaneously
-		TRINITY_WRITE_GUARD(ACE_RW_Thread_Mutex, GetMMapLock(mapId));
-		// check again after acquiring mutex
+        if (mmap->navMeshQueries.find(instanceId) == mmap->navMeshQueries.end())
+        {
+        // pussywizard: different instances of the same map shouldn't access this simultaneously
+        TRINITY_WRITE_GUARD(ACE_RW_Thread_Mutex, GetMMapLock(mapId));
+        // check again after acquiring mutex
         if (mmap->navMeshQueries.find(instanceId) == mmap->navMeshQueries.end())
         {
             // allocate mesh query
@@ -349,7 +349,7 @@ namespace MMAP
             ;//sLog->outDetail("MMAP:GetNavMeshQuery: created dtNavMeshQuery for mapId %03u instanceId %u", mapId, instanceId);
             mmap->navMeshQueries.insert(std::pair<uint32, dtNavMeshQuery*>(instanceId, query));
         }
-		}
+        }
 
         return mmap->navMeshQueries[instanceId];
     }

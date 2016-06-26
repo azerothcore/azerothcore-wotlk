@@ -234,7 +234,7 @@ void AuthSocket::OnRead()
             ++challengesInARow;
             if (challengesInARow == MAX_AUTH_LOGON_CHALLENGES_IN_A_ROW)
             {
-				sLog->outString("Got %u AUTH_LOGON_CHALLENGE in a row from '%s', possible ongoing DoS", challengesInARow, socket().getRemoteAddress().c_str());
+                sLog->outString("Got %u AUTH_LOGON_CHALLENGE in a row from '%s', possible ongoing DoS", challengesInARow, socket().getRemoteAddress().c_str());
                 socket().shutdown();
                 return;
             }
@@ -318,29 +318,29 @@ bool AuthSocket::_HandleLogonChallenge()
     if (socket().recv_len() < sizeof(sAuthLogonChallenge_C))
         return false;
 
-	// pussywizard: logon flood protection:
-	{
-		TRINITY_GUARD(ACE_Thread_Mutex, LastLoginAttemptMutex);
-		std::string ipaddr = socket().getRemoteAddress();
-		uint32 currTime = time(NULL);
-		std::map<std::string, uint32>::iterator itr = LastLoginAttemptTimeForIP.find(ipaddr);
-		if (itr != LastLoginAttemptTimeForIP.end() && itr->second >= currTime)
-		{
-			ByteBuffer pkt;
-			pkt << uint8(AUTH_LOGON_CHALLENGE);
-			pkt << uint8(0x00);
-			pkt << uint8(WOW_FAIL_UNKNOWN_ACCOUNT);
-			socket().send((char const*)pkt.contents(), pkt.size());
-			return true;
-		}
-		if (LastLoginAttemptCleanTime+60 < currTime)
-		{
-			LastLoginAttemptTimeForIP.clear();
-			LastLoginAttemptCleanTime = currTime;
-		}
-		else
-			LastLoginAttemptTimeForIP[ipaddr] = currTime;
-	}
+    // pussywizard: logon flood protection:
+    {
+        TRINITY_GUARD(ACE_Thread_Mutex, LastLoginAttemptMutex);
+        std::string ipaddr = socket().getRemoteAddress();
+        uint32 currTime = time(NULL);
+        std::map<std::string, uint32>::iterator itr = LastLoginAttemptTimeForIP.find(ipaddr);
+        if (itr != LastLoginAttemptTimeForIP.end() && itr->second >= currTime)
+        {
+            ByteBuffer pkt;
+            pkt << uint8(AUTH_LOGON_CHALLENGE);
+            pkt << uint8(0x00);
+            pkt << uint8(WOW_FAIL_UNKNOWN_ACCOUNT);
+            socket().send((char const*)pkt.contents(), pkt.size());
+            return true;
+        }
+        if (LastLoginAttemptCleanTime+60 < currTime)
+        {
+            LastLoginAttemptTimeForIP.clear();
+            LastLoginAttemptCleanTime = currTime;
+        }
+        else
+            LastLoginAttemptTimeForIP[ipaddr] = currTime;
+    }
 
     // Read the first 4 bytes (header) to get the length of the remaining of the packet
     std::vector<uint8> buf;

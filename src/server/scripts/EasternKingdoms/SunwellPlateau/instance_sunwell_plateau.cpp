@@ -43,17 +43,17 @@ class instance_sunwell_plateau : public InstanceMapScript
                 AnveenaGUID                 = 0;
                 KalecgosKjGUID              = 0;
 
-				IceBarrierGUID				= 0;
-				memset(&blueFlightOrbGUID, 0, sizeof(blueFlightOrbGUID));
+                IceBarrierGUID              = 0;
+                memset(&blueFlightOrbGUID, 0, sizeof(blueFlightOrbGUID));
             }
 
-			void OnPlayerEnter(Player* player)
-			{
-				instance->LoadGrid(1477.94f, 643.22f);
-				instance->LoadGrid(1641.45f, 988.08f);
-				if (GameObject* gobj = instance->GetGameObject(IceBarrierGUID))
-					gobj->SendUpdateToPlayer(player);
-			}
+            void OnPlayerEnter(Player* player)
+            {
+                instance->LoadGrid(1477.94f, 643.22f);
+                instance->LoadGrid(1641.45f, 988.08f);
+                if (GameObject* gobj = instance->GetGameObject(IceBarrierGUID))
+                    gobj->SendUpdateToPlayer(player);
+            }
 
             Player const* GetPlayerInMap() const
             {
@@ -76,8 +76,8 @@ class instance_sunwell_plateau : public InstanceMapScript
 
             void OnCreatureCreate(Creature* creature)
             {
-				if (creature->GetDBTableGUIDLow() > 0 || !IS_PLAYER_GUID(creature->GetOwnerGUID()))
-					creature->CastSpell(creature, SPELL_SUNWELL_RADIANCE, true);
+                if (creature->GetDBTableGUIDLow() > 0 || !IS_PLAYER_GUID(creature->GetOwnerGUID()))
+                    creature->CastSpell(creature, SPELL_SUNWELL_RADIANCE, true);
 
                 switch (creature->GetEntry())
                 {
@@ -118,29 +118,29 @@ class instance_sunwell_plateau : public InstanceMapScript
                         KalecgosKjGUID = creature->GetGUID();
                         break;
 
-					// Xinef: Felmyst encounter
-					case NPC_DEMONIC_VAPOR_TRAIL:
-					case NPC_UNYIELDING_DEAD:
-						if (Creature* felmyst = instance->GetCreature(FelmystGUID))
-							felmyst->AI()->JustSummoned(creature);
-						break;
+                    // Xinef: Felmyst encounter
+                    case NPC_DEMONIC_VAPOR_TRAIL:
+                    case NPC_UNYIELDING_DEAD:
+                        if (Creature* felmyst = instance->GetCreature(FelmystGUID))
+                            felmyst->AI()->JustSummoned(creature);
+                        break;
 
-					// Xinef: M'uru encounter
-					case NPC_DARKNESS:
-					case NPC_VOID_SENTINEL:
-					case NPC_VOID_SPAWN:
-						if (Creature* muru = instance->GetCreature(MuruGUID))
-							muru->AI()->JustSummoned(creature);
-						break;
+                    // Xinef: M'uru encounter
+                    case NPC_DARKNESS:
+                    case NPC_VOID_SENTINEL:
+                    case NPC_VOID_SPAWN:
+                        if (Creature* muru = instance->GetCreature(MuruGUID))
+                            muru->AI()->JustSummoned(creature);
+                        break;
 
-					// Xinef: Kil'jaeden encounter
-					case NPC_FELFIRE_PORTAL:
-					case NPC_VOLATILE_FELFIRE_FIEND:
-					case NPC_SHIELD_ORB:
-					case NPC_SINISTER_REFLECTION:
-						if (Creature* kiljaedenC = instance->GetCreature(KilJaedenControllerGUID))
-							kiljaedenC->AI()->JustSummoned(creature);
-						break;
+                    // Xinef: Kil'jaeden encounter
+                    case NPC_FELFIRE_PORTAL:
+                    case NPC_VOLATILE_FELFIRE_FIEND:
+                    case NPC_SHIELD_ORB:
+                    case NPC_SINISTER_REFLECTION:
+                        if (Creature* kiljaedenC = instance->GetCreature(KilJaedenControllerGUID))
+                            kiljaedenC->AI()->JustSummoned(creature);
+                        break;
                     default:
                         break;
                 }
@@ -158,22 +158,22 @@ class instance_sunwell_plateau : public InstanceMapScript
                     case GO_MURUS_GATE_2:
                         AddDoor(go, true);
                         break;
-					case GO_ICE_BARRIER:
-						IceBarrierGUID = go->GetGUID();
-						go->setActive(true);
-						break;
-					case GO_ORB_OF_THE_BLUE_DRAGONFLIGHT1:
-						blueFlightOrbGUID[0] = go->GetGUID();
-						break;
-					case GO_ORB_OF_THE_BLUE_DRAGONFLIGHT2:
-						blueFlightOrbGUID[1] = go->GetGUID();
-						break;
-					case GO_ORB_OF_THE_BLUE_DRAGONFLIGHT3:
-						blueFlightOrbGUID[2] = go->GetGUID();
-						break;
-					case GO_ORB_OF_THE_BLUE_DRAGONFLIGHT4:
-						blueFlightOrbGUID[3] = go->GetGUID();
-						break;
+                    case GO_ICE_BARRIER:
+                        IceBarrierGUID = go->GetGUID();
+                        go->setActive(true);
+                        break;
+                    case GO_ORB_OF_THE_BLUE_DRAGONFLIGHT1:
+                        blueFlightOrbGUID[0] = go->GetGUID();
+                        break;
+                    case GO_ORB_OF_THE_BLUE_DRAGONFLIGHT2:
+                        blueFlightOrbGUID[1] = go->GetGUID();
+                        break;
+                    case GO_ORB_OF_THE_BLUE_DRAGONFLIGHT3:
+                        blueFlightOrbGUID[2] = go->GetGUID();
+                        break;
+                    case GO_ORB_OF_THE_BLUE_DRAGONFLIGHT4:
+                        blueFlightOrbGUID[3] = go->GetGUID();
+                        break;
                     default:
                         break;
                 }
@@ -225,12 +225,12 @@ class instance_sunwell_plateau : public InstanceMapScript
                     case NPC_KILJAEDEN:
                         return KilJaedenGUID;
 
-					// Orbs
-					case DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_1:
-					case DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_2:
-					case DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_3:
-					case DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_4:
-						return blueFlightOrbGUID[id-DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_1];
+                    // Orbs
+                    case DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_1:
+                    case DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_2:
+                    case DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_3:
+                    case DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_4:
+                        return blueFlightOrbGUID[id-DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_1];
                 }
                 return 0;
             }
@@ -292,8 +292,8 @@ class instance_sunwell_plateau : public InstanceMapScript
                 uint64 AnveenaGUID;
                 uint64 KalecgosKjGUID;
 
-				uint64 IceBarrierGUID;
-				uint64 blueFlightOrbGUID[4];
+                uint64 IceBarrierGUID;
+                uint64 blueFlightOrbGUID[4];
         };
 
         InstanceScript* GetInstanceScript(InstanceMap* map) const
@@ -304,14 +304,14 @@ class instance_sunwell_plateau : public InstanceMapScript
 
 enum cataclysmBreath
 {
-	SPELL_CORROSIVE_POISON		= 46293,
-	SPELL_FEVERED_FATIGUE		= 46294,
-	SPELL_HEX					= 46295,
-	SPELL_NECROTIC_POISON		= 46296,
-	SPELL_PIERCING_SHADOW		= 46297,
-	SPELL_SHRINK				= 46298,
-	SPELL_WAVERING_WILL			= 46299,
-	SPELL_WITHERED_TOUCH		= 46300
+    SPELL_CORROSIVE_POISON      = 46293,
+    SPELL_FEVERED_FATIGUE       = 46294,
+    SPELL_HEX                   = 46295,
+    SPELL_NECROTIC_POISON       = 46296,
+    SPELL_PIERCING_SHADOW       = 46297,
+    SPELL_SHRINK                = 46298,
+    SPELL_WAVERING_WILL         = 46299,
+    SPELL_WITHERED_TOUCH        = 46300
 };
 
 class spell_cataclysm_breath : public SpellScriptLoader
@@ -325,9 +325,9 @@ class spell_cataclysm_breath : public SpellScriptLoader
 
             void HandleAfterCast()
             {
-				if (Unit* target = GetExplTargetUnit())
-					for (uint8 i = 0; i < 4; ++i)
-						GetCaster()->CastSpell(target, RAND(SPELL_CORROSIVE_POISON, SPELL_FEVERED_FATIGUE, SPELL_HEX, SPELL_NECROTIC_POISON, SPELL_PIERCING_SHADOW, SPELL_SHRINK, SPELL_WAVERING_WILL, SPELL_WITHERED_TOUCH), true);
+                if (Unit* target = GetExplTargetUnit())
+                    for (uint8 i = 0; i < 4; ++i)
+                        GetCaster()->CastSpell(target, RAND(SPELL_CORROSIVE_POISON, SPELL_FEVERED_FATIGUE, SPELL_HEX, SPELL_NECROTIC_POISON, SPELL_PIERCING_SHADOW, SPELL_SHRINK, SPELL_WAVERING_WILL, SPELL_WITHERED_TOUCH), true);
             }
 
             void Register()
@@ -345,5 +345,5 @@ class spell_cataclysm_breath : public SpellScriptLoader
 void AddSC_instance_sunwell_plateau()
 {
     new instance_sunwell_plateau();
-	new spell_cataclysm_breath();
+    new spell_cataclysm_breath();
 }

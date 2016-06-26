@@ -99,5 +99,5 @@ uint64 EventProcessor::CalculateTime(uint64 t_offset) const
 
 uint64 EventProcessor::CalculateQueueTime(uint64 delay) const
 {
-	return CalculateTime(delay - (m_time % delay));
+    return CalculateTime(delay - (m_time % delay));
 }

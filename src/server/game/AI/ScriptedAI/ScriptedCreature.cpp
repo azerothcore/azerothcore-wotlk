@@ -90,7 +90,7 @@ bool SummonList::HasEntry(uint32 entry) const
 
 uint32 SummonList::GetEntryCount(uint32 entry) const
 {
-	uint32 count = 0;
+    uint32 count = 0;
     for (StorageType::const_iterator i = storage_.begin(); i != storage_.end(); ++i)
     {
         Creature* summon = ObjectAccessor::GetCreature(*me, *i);
@@ -106,10 +106,10 @@ void SummonList::Respawn()
     for (StorageType::iterator i = storage_.begin(); i != storage_.end();)
     {
         if (Creature* summon = ObjectAccessor::GetCreature(*me, *i))
-		{
-			summon->Respawn(true);
+        {
+            summon->Respawn(true);
             ++i;
-		}
+        }
         else
             i = storage_.erase(i);
     }
@@ -120,8 +120,8 @@ Creature* SummonList::GetCreatureWithEntry(uint32 entry) const
     for (StorageType::const_iterator i = storage_.begin(); i != storage_.end(); ++i)
     {
         if (Creature* summon = ObjectAccessor::GetCreature(*me, *i))
-			if (summon->GetEntry() == entry)
-				return summon;
+            if (summon->GetEntry() == entry)
+                return summon;
     }
 
     return NULL;
@@ -296,7 +296,7 @@ void ScriptedAI::DoResetThreat()
         return;
     }
 
-	me->getThreatManager().resetAllAggro();
+    me->getThreatManager().resetAllAggro();
 }
 
 float ScriptedAI::DoGetThreat(Unit* unit)
@@ -410,20 +410,20 @@ enum eNPCs
     NPC_BROODLORD   = 12017,
     NPC_JAN_ALAI    = 23578,
     NPC_SARTHARION  = 28860,
-	NPC_FREYA		= 32906,
+    NPC_FREYA       = 32906,
 };
 
 bool ScriptedAI::EnterEvadeIfOutOfCombatArea()
 {
-	if (me->IsInEvadeMode() || !me->IsInCombat())
+    if (me->IsInEvadeMode() || !me->IsInCombat())
         return false;
 
-	if (_evadeCheckCooldown == time(NULL))
-		return false;
-	_evadeCheckCooldown = time(NULL);
+    if (_evadeCheckCooldown == time(NULL))
+        return false;
+    _evadeCheckCooldown = time(NULL);
 
-	if (!CheckEvadeIfOutOfCombatArea())
-		return false;
+    if (!CheckEvadeIfOutOfCombatArea())
+        return false;
 
     EnterEvadeMode();
     return true;
@@ -431,22 +431,22 @@ bool ScriptedAI::EnterEvadeIfOutOfCombatArea()
 
 Player* ScriptedAI::SelectTargetFromPlayerList(float maxdist, uint32 excludeAura, bool mustBeInLOS) const
 {
-	Map::PlayerList const& pList = me->GetMap()->GetPlayers();
-	std::vector<Player*> tList;
-	for(Map::PlayerList::const_iterator itr = pList.begin(); itr != pList.end(); ++itr)
-	{
-		if (me->GetDistance(itr->GetSource()) > maxdist || !itr->GetSource()->IsAlive() || itr->GetSource()->IsGameMaster())
-			continue;
-		if (excludeAura && itr->GetSource()->HasAura(excludeAura))
-			continue;
-		if (mustBeInLOS && !me->IsWithinLOSInMap(itr->GetSource()))
-			continue;
-		tList.push_back(itr->GetSource());
-	}
-	if (!tList.empty())
-		return tList[urand(0,tList.size()-1)];
-	else
-		return NULL;
+    Map::PlayerList const& pList = me->GetMap()->GetPlayers();
+    std::vector<Player*> tList;
+    for(Map::PlayerList::const_iterator itr = pList.begin(); itr != pList.end(); ++itr)
+    {
+        if (me->GetDistance(itr->GetSource()) > maxdist || !itr->GetSource()->IsAlive() || itr->GetSource()->IsGameMaster())
+            continue;
+        if (excludeAura && itr->GetSource()->HasAura(excludeAura))
+            continue;
+        if (mustBeInLOS && !me->IsWithinLOSInMap(itr->GetSource()))
+            continue;
+        tList.push_back(itr->GetSource());
+    }
+    if (!tList.empty())
+        return tList[urand(0,tList.size()-1)];
+    else
+        return NULL;
 }
 
 // BossAI - for instanced bosses

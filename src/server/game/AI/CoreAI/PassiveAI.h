@@ -71,11 +71,11 @@ class CritterAI : public PassiveAI
 
         void DamageTaken(Unit* /*done_by*/, uint32& /*damage*/, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask);
         void EnterEvadeMode();
-		void UpdateAI(uint32);
+        void UpdateAI(uint32);
 
-	// Xinef: Added
-	private:
-		uint32 _combatTimer;
+    // Xinef: Added
+    private:
+        uint32 _combatTimer;
 };
 
 class TriggerAI : public NullCreatureAI

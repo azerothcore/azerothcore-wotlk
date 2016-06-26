@@ -44,9 +44,9 @@ struct GroupQueueInfo                                       // stores informatio
     uint32  OpponentsTeamRating;                            // for rated arena matches
     uint32  OpponentsMatchmakerRating;                      // for rated arena matches
 
-	// pussywizard: for internal use
-	uint8 _bracketId;
-	uint8 _groupType;
+    // pussywizard: for internal use
+    uint8 _bracketId;
+    uint8 _groupType;
 };
 
 enum BattlegroundQueueGroupTypes
@@ -81,8 +81,8 @@ class BattlegroundQueue
         void PlayerInvitedToBGUpdateAverageWaitTime(GroupQueueInfo* ginfo);
         uint32 GetAverageQueueWaitTime(GroupQueueInfo* ginfo) const;
 
-		void SetBgTypeIdAndArenaType(BattlegroundTypeId b, uint8 a) { m_bgTypeId = b; m_arenaType = ArenaType(a); } // pussywizard
-		void AddEvent(BasicEvent* Event, uint64 e_time);
+        void SetBgTypeIdAndArenaType(BattlegroundTypeId b, uint8 a) { m_bgTypeId = b; m_arenaType = ArenaType(a); } // pussywizard
+        void AddEvent(BasicEvent* Event, uint64 e_time);
 
         typedef std::map<uint64, GroupQueueInfo*> QueuedPlayersMap;
         QueuedPlayersMap m_QueuedPlayers;
@@ -104,24 +104,24 @@ class BattlegroundQueue
         // class to select and invite groups to bg
         class SelectionPool
         {
-			public:
-				SelectionPool(): PlayerCount(0) {};
-				void Init();
-				bool AddGroup(GroupQueueInfo* ginfo, uint32 desiredCount);
-				bool KickGroup(const uint32 size);
-				uint32 GetPlayerCount() const {return PlayerCount;}
-			public:
-				GroupsQueueType SelectedGroups;
-			private:
-				uint32 PlayerCount;
+            public:
+                SelectionPool(): PlayerCount(0) {};
+                void Init();
+                bool AddGroup(GroupQueueInfo* ginfo, uint32 desiredCount);
+                bool KickGroup(const uint32 size);
+                uint32 GetPlayerCount() const {return PlayerCount;}
+            public:
+                GroupsQueueType SelectedGroups;
+            private:
+                uint32 PlayerCount;
         };
 
         //one selection pool for horde, other one for alliance
         SelectionPool m_SelectionPools[BG_TEAMS_COUNT];
     private:
 
-		BattlegroundTypeId m_bgTypeId;
-		ArenaType m_arenaType;
+        BattlegroundTypeId m_bgTypeId;
+        ArenaType m_arenaType;
         uint32 m_WaitTimes[BG_TEAMS_COUNT][MAX_BATTLEGROUND_BRACKETS][COUNT_OF_PLAYERS_TO_AVERAGE_WAIT_TIME];
         uint32 m_WaitTimeLastIndex[BG_TEAMS_COUNT][MAX_BATTLEGROUND_BRACKETS];
 

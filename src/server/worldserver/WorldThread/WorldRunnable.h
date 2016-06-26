@@ -32,8 +32,8 @@ class WorldRunnable : public ACE_Based::Runnable
 
 class AuctionListingRunnable : public ACE_Based::Runnable
 {
-	public:
-		void run();
+    public:
+        void run();
 };
 #endif
 /// @}

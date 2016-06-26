@@ -123,7 +123,7 @@ class ChatHandler
         static bool LoadCommandTable() { return load_command_table; }
         static void SetLoadCommandTable(bool val) { load_command_table = val; }
 
-		bool ShowHelpForCommand(ChatCommand* table, const char* cmd);
+        bool ShowHelpForCommand(ChatCommand* table, const char* cmd);
     protected:
         explicit ChatHandler() : m_session(NULL), sentErrorMessage(false) {}      // for CLI subclass
         static bool SetDataForCommandInTable(ChatCommand* table, const char* text, uint32 security, std::string const& help, std::string const& fullcommand);

@@ -12,14 +12,14 @@ REWRITTEN BY XINEF
 DoorData const doorData[] =
 {
     {GO_FIRE_FIELD,     DATA_BALTHARUS_THE_WARBORN, DOOR_TYPE_PASSAGE,  BOUNDARY_E   },
-	{GO_FLAME_WALLS,	DATA_SAVIANA_RAGEFIRE,		DOOR_TYPE_PASSAGE,	BOUNDARY_NONE},
-	{GO_FLAME_WALLS,	DATA_BALTHARUS_THE_WARBORN, DOOR_TYPE_PASSAGE,	BOUNDARY_NONE},
-	{GO_FLAME_WALLS,	DATA_GENERAL_ZARITHRIAN,	DOOR_TYPE_ROOM,		BOUNDARY_NONE},
-	{GO_BURNING_TREE_4,	DATA_HALION_INTRO1,			DOOR_TYPE_PASSAGE,	BOUNDARY_NONE},
-	{GO_BURNING_TREE_3,	DATA_HALION_INTRO1,			DOOR_TYPE_PASSAGE,	BOUNDARY_NONE},
-	{GO_BURNING_TREE_2,	DATA_HALION_INTRO2,			DOOR_TYPE_PASSAGE,	BOUNDARY_NONE},
-	{GO_BURNING_TREE_1,	DATA_HALION_INTRO2,			DOOR_TYPE_PASSAGE,	BOUNDARY_NONE},
-	{GO_TWILIGHT_FLAME_RING, DATA_HALION,			DOOR_TYPE_ROOM,		BOUNDARY_NONE},
+    {GO_FLAME_WALLS,    DATA_SAVIANA_RAGEFIRE,      DOOR_TYPE_PASSAGE,  BOUNDARY_NONE},
+    {GO_FLAME_WALLS,    DATA_BALTHARUS_THE_WARBORN, DOOR_TYPE_PASSAGE,  BOUNDARY_NONE},
+    {GO_FLAME_WALLS,    DATA_GENERAL_ZARITHRIAN,    DOOR_TYPE_ROOM,     BOUNDARY_NONE},
+    {GO_BURNING_TREE_4, DATA_HALION_INTRO1,         DOOR_TYPE_PASSAGE,  BOUNDARY_NONE},
+    {GO_BURNING_TREE_3, DATA_HALION_INTRO1,         DOOR_TYPE_PASSAGE,  BOUNDARY_NONE},
+    {GO_BURNING_TREE_2, DATA_HALION_INTRO2,         DOOR_TYPE_PASSAGE,  BOUNDARY_NONE},
+    {GO_BURNING_TREE_1, DATA_HALION_INTRO2,         DOOR_TYPE_PASSAGE,  BOUNDARY_NONE},
+    {GO_TWILIGHT_FLAME_RING, DATA_HALION,           DOOR_TYPE_ROOM,     BOUNDARY_NONE},
     {0,                 0,                          DOOR_TYPE_ROOM,     BOUNDARY_NONE},
 };
 
@@ -89,18 +89,18 @@ class instance_ruby_sanctum : public InstanceMapScript
                         OrbCarrierGUID = creature->GetGUID();
                         break;
 
-					case NPC_LIVING_INFERNO:
-					case NPC_LIVING_EMBER:
-					case NPC_METEOR_STRIKE_NORTH:
-					case NPC_METEOR_STRIKE_SOUTH:
-					case NPC_METEOR_STRIKE_EAST:
-					case NPC_METEOR_STRIKE_WEST:
-					case NPC_METEOR_STRIKE_FLAME:
-					case NPC_COMBUSTION:
-					case NPC_CONSUMPTION:
-						if (Creature* halion = instance->GetCreature(HalionGUID))
-							halion->AI()->JustSummoned(creature);
-						break;
+                    case NPC_LIVING_INFERNO:
+                    case NPC_LIVING_EMBER:
+                    case NPC_METEOR_STRIKE_NORTH:
+                    case NPC_METEOR_STRIKE_SOUTH:
+                    case NPC_METEOR_STRIKE_EAST:
+                    case NPC_METEOR_STRIKE_WEST:
+                    case NPC_METEOR_STRIKE_FLAME:
+                    case NPC_COMBUSTION:
+                    case NPC_CONSUMPTION:
+                        if (Creature* halion = instance->GetCreature(HalionGUID))
+                            halion->AI()->JustSummoned(creature);
+                        break;
 
                 }
             }
@@ -115,7 +115,7 @@ class instance_ruby_sanctum : public InstanceMapScript
                     case GO_BURNING_TREE_2:
                     case GO_BURNING_TREE_3:
                     case GO_BURNING_TREE_4:
-					case GO_TWILIGHT_FLAME_RING:
+                    case GO_TWILIGHT_FLAME_RING:
                         AddDoor(go, true);
                         break;
                     case GO_FLAME_RING:
@@ -147,8 +147,8 @@ class instance_ruby_sanctum : public InstanceMapScript
                         return BaltharusTheWarbornGUID;
                     case NPC_XERESTRASZA:
                         return XerestraszaGUID;
-					case NPC_GENERAL_ZARITHRIAN:
-						return GeneralZarithrianGUID;
+                    case NPC_GENERAL_ZARITHRIAN:
+                        return GeneralZarithrianGUID;
                     case DATA_ZARITHRIAN_SPAWN_STALKER_1:
                     case DATA_ZARITHRIAN_SPAWN_STALKER_2:
                         return ZarithrianSpawnStalkerGUID[type - DATA_ZARITHRIAN_SPAWN_STALKER_1];
@@ -160,7 +160,7 @@ class instance_ruby_sanctum : public InstanceMapScript
                         return TwilightHalionGUID;
                     case NPC_ORB_CARRIER:
                         return OrbCarrierGUID;
-					
+                    
                     case GO_FLAME_RING:
                         return FlameRingGUID;
                 }
@@ -181,11 +181,11 @@ class instance_ruby_sanctum : public InstanceMapScript
                             if (Creature* zarithrian = instance->GetCreature(GeneralZarithrianGUID))
                                 zarithrian->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_NOT_SELECTABLE);
                         break;
-					case DATA_GENERAL_ZARITHRIAN:
-						if (state == DONE)
-							if (Creature* halionController = instance->GetCreature(HalionControllerGUID))
-								halionController->AI()->DoAction(ACTION_INTRO_HALION);
-						break;
+                    case DATA_GENERAL_ZARITHRIAN:
+                        if (state == DONE)
+                            if (Creature* halionController = instance->GetCreature(HalionControllerGUID))
+                                halionController->AI()->DoAction(ACTION_INTRO_HALION);
+                        break;
                     case DATA_HALION:
                         DoUpdateWorldState(WORLDSTATE_CORPOREALITY_TOGGLE, 0);
                         DoUpdateWorldState(WORLDSTATE_CORPOREALITY_TWILIGHT, 0);
@@ -242,12 +242,12 @@ class instance_ruby_sanctum : public InstanceMapScript
                         SetBossState(i, EncounterState(tmpState));
                     }
 
-					// Xinef: additional check
-					if (GetBossState(DATA_HALION_INTRO_DONE) != DONE)
-					{
-						SetBossState(DATA_HALION_INTRO1, NOT_STARTED);
-						SetBossState(DATA_HALION_INTRO2, NOT_STARTED);
-					}
+                    // Xinef: additional check
+                    if (GetBossState(DATA_HALION_INTRO_DONE) != DONE)
+                    {
+                        SetBossState(DATA_HALION_INTRO1, NOT_STARTED);
+                        SetBossState(DATA_HALION_INTRO2, NOT_STARTED);
+                    }
                 }
                 else
                     OUT_LOAD_INST_DATA_FAIL;
@@ -285,13 +285,13 @@ class spell_ruby_sanctum_rallying_shout : public SpellScriptLoader
 
             void CountAllies()
             {
-				uint32 count = GetSpell()->GetUniqueTargetInfo()->size();
-				if (count == GetCaster()->GetAuraCount(SPELL_RALLY))
-					return;
+                uint32 count = GetSpell()->GetUniqueTargetInfo()->size();
+                if (count == GetCaster()->GetAuraCount(SPELL_RALLY))
+                    return;
 
-				GetCaster()->RemoveAurasDueToSpell(SPELL_RALLY);
-				if (count > 0)
-					GetCaster()->CastCustomSpell(SPELL_RALLY, SPELLVALUE_AURA_STACK, count, GetCaster(), true);
+                GetCaster()->RemoveAurasDueToSpell(SPELL_RALLY);
+                if (count > 0)
+                    GetCaster()->CastCustomSpell(SPELL_RALLY, SPELLVALUE_AURA_STACK, count, GetCaster(), true);
             }
 
             void Register()
@@ -309,5 +309,5 @@ class spell_ruby_sanctum_rallying_shout : public SpellScriptLoader
 void AddSC_instance_ruby_sanctum()
 {
     new instance_ruby_sanctum();
-	new spell_ruby_sanctum_rallying_shout();
+    new spell_ruby_sanctum_rallying_shout();
 }

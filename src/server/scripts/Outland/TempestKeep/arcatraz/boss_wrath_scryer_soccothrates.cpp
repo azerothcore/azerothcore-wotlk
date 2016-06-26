@@ -52,9 +52,9 @@ enum Events
     EVENT_PREFIGHT_9                = 11,
     EVENT_ME_FIRST                  = 12,
     EVENT_DALLIAH_DEATH             = 13,
-	EVENT_CHECK_HEALTH				= 14,
-	EVENT_SPELL_CHARGE				= 15,
-	EVENT_FELFIRE					= 16,
+    EVENT_CHECK_HEALTH              = 14,
+    EVENT_SPELL_CHARGE              = 15,
+    EVENT_FELFIRE                   = 16,
 };
 
 class boss_wrath_scryer_soccothrates : public CreatureScript
@@ -65,24 +65,24 @@ class boss_wrath_scryer_soccothrates : public CreatureScript
         struct boss_wrath_scryer_soccothratesAI : public BossAI
         {
             boss_wrath_scryer_soccothratesAI(Creature* creature) : BossAI(creature, DATA_SOCCOTHRATES)
-			{
-				preFight = instance->GetBossState(DATA_DALLIAH) == DONE;
-			}
+            {
+                preFight = instance->GetBossState(DATA_DALLIAH) == DONE;
+            }
 
             void Reset()
             {
                 _Reset();
-				events2.Reset();
-				me->CastSpell(me, SPELL_FEL_IMMOLATION, true);
-				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
+                events2.Reset();
+                me->CastSpell(me, SPELL_FEL_IMMOLATION, true);
+                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
             }
 
-			void InitializeAI()
-			{
-				BossAI::InitializeAI();
-				if (!preFight)
-					me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
-			}
+            void InitializeAI()
+            {
+                BossAI::InitializeAI();
+                if (!preFight)
+                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
+            }
 
             void JustDied(Unit* /*killer*/)
             {
@@ -97,18 +97,18 @@ class boss_wrath_scryer_soccothrates : public CreatureScript
             void EnterCombat(Unit* /*who*/)
             {
                 _EnterCombat();
-				events2.Reset();
+                events2.Reset();
                 events.ScheduleEvent(EVENT_FELFIRE_SHOCK, urand(12000, 14000));
                 events.ScheduleEvent(EVENT_KNOCK_AWAY, urand(11000, 12000));
                 events.ScheduleEvent(EVENT_ME_FIRST, 6000);
-				events.ScheduleEvent(EVENT_CHECK_HEALTH, 1000);
+                events.ScheduleEvent(EVENT_CHECK_HEALTH, 1000);
                 Talk(SAY_AGGRO);
             }
 
             void KilledUnit(Unit* victim)
             {
-				if (victim->GetTypeId() == TYPEID_PLAYER)
-					Talk(SAY_SLAY);
+                if (victim->GetTypeId() == TYPEID_PLAYER)
+                    Talk(SAY_SLAY);
             }
 
             void MoveInLineOfSight(Unit* who)
@@ -129,9 +129,9 @@ class boss_wrath_scryer_soccothrates : public CreatureScript
 
             void UpdateAI(uint32 diff)
             {
-				events2.Update(diff);
-				switch (events2.ExecuteEvent())
-				{
+                events2.Update(diff);
+                switch (events2.ExecuteEvent())
+                {
                     case EVENT_PREFIGHT_1:
                         if (Creature* dalliah = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_DALLIAH)))
                             dalliah->AI()->Talk(SAY_DALLIAH_CONVO_1);
@@ -172,17 +172,17 @@ class boss_wrath_scryer_soccothrates : public CreatureScript
                         if (Creature* dalliah = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_DALLIAH)))
                         {
                             dalliah->SetFacingToObject(me);
-							dalliah->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
+                            dalliah->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
                             me->SetFacingToObject(dalliah);
-							me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
+                            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
                             dalliah->SetHomePosition(dalliah->GetPositionX(), dalliah->GetPositionY(), dalliah->GetPositionZ(), 1.51737f);
                             me->SetHomePosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 4.725722f);
                         }
                         break;
-					case EVENT_DALLIAH_DEATH:
+                    case EVENT_DALLIAH_DEATH:
                         Talk(SAY_DALLIAH_DEATH);
                         break;
-				}
+                }
 
                 if (!UpdateVictim())
                     return;
@@ -194,42 +194,42 @@ class boss_wrath_scryer_soccothrates : public CreatureScript
                 switch (events.ExecuteEvent())
                 {
                     case EVENT_FELFIRE_SHOCK:
-						me->CastSpell(me->GetVictim(), SPELL_FELFIRE_SHOCK, false);
+                        me->CastSpell(me->GetVictim(), SPELL_FELFIRE_SHOCK, false);
                         events.ScheduleEvent(EVENT_FELFIRE_SHOCK, urand(12000, 14000));
                         break;
                     case EVENT_KNOCK_AWAY:
-						me->CastSpell(me, SPELL_KNOCK_AWAY, false);
+                        me->CastSpell(me, SPELL_KNOCK_AWAY, false);
                         Talk(SAY_KNOCK_AWAY);
                         events.ScheduleEvent(EVENT_KNOCK_AWAY, urand(11000, 12000));
-						events.ScheduleEvent(EVENT_SPELL_CHARGE, 4600);
+                        events.ScheduleEvent(EVENT_SPELL_CHARGE, 4600);
                         break;
-					case EVENT_SPELL_CHARGE:
-						me->CastSpell(me, SPELL_CHARGE, true);
-						me->CastSpell(me, SPELL_FELFIRE, true);
-						events.ScheduleEvent(EVENT_FELFIRE, 300);
-						events.ScheduleEvent(EVENT_FELFIRE, 600);
-						events.ScheduleEvent(EVENT_FELFIRE, 900);
-						events.ScheduleEvent(EVENT_FELFIRE, 1200);
-						events.ScheduleEvent(EVENT_FELFIRE, 1500);
-						events.ScheduleEvent(EVENT_FELFIRE, 1800);
-						break;
-					case EVENT_FELFIRE:
-						me->CastSpell(me, SPELL_FELFIRE, true);
-						break;
+                    case EVENT_SPELL_CHARGE:
+                        me->CastSpell(me, SPELL_CHARGE, true);
+                        me->CastSpell(me, SPELL_FELFIRE, true);
+                        events.ScheduleEvent(EVENT_FELFIRE, 300);
+                        events.ScheduleEvent(EVENT_FELFIRE, 600);
+                        events.ScheduleEvent(EVENT_FELFIRE, 900);
+                        events.ScheduleEvent(EVENT_FELFIRE, 1200);
+                        events.ScheduleEvent(EVENT_FELFIRE, 1500);
+                        events.ScheduleEvent(EVENT_FELFIRE, 1800);
+                        break;
+                    case EVENT_FELFIRE:
+                        me->CastSpell(me, SPELL_FELFIRE, true);
+                        break;
                     case EVENT_ME_FIRST:
                         if (Creature* dalliah = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_DALLIAH)))
                             if (dalliah->IsAlive() && !dalliah->IsInCombat())
                                 dalliah->AI()->Talk(SAY_AGGRO_SOCCOTHRATES_FIRST);
                         break;
-					case EVENT_CHECK_HEALTH:
-						if (HealthBelowPct(25))
-						{
-							if (Creature* dalliah = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_DALLIAH)))
-								dalliah->AI()->Talk(SAY_SOCCOTHRATES_25_PERCENT);
-							break;
-						}
-						events.ScheduleEvent(EVENT_CHECK_HEALTH, 1000);
-						break;
+                    case EVENT_CHECK_HEALTH:
+                        if (HealthBelowPct(25))
+                        {
+                            if (Creature* dalliah = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_DALLIAH)))
+                                dalliah->AI()->Talk(SAY_SOCCOTHRATES_25_PERCENT);
+                            break;
+                        }
+                        events.ScheduleEvent(EVENT_CHECK_HEALTH, 1000);
+                        break;
                 }
 
                 DoMeleeAttackIfReady();
@@ -237,7 +237,7 @@ class boss_wrath_scryer_soccothrates : public CreatureScript
 
         private:
             bool preFight;
-			EventMap events2;
+            EventMap events2;
         };
 
         CreatureAI* GetAI(Creature* creature) const

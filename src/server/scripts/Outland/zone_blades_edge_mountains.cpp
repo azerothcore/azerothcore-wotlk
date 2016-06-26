@@ -44,12 +44,12 @@ EndContentData */
 // Ours
 enum deathsDoorWrapGate
 {
-	SPELL_ARTILLERY_ON_THE_WRAP_GATE			= 39221,
-	SPELL_ANTI_DEMON_FLAME_THROWER				= 39222,
-	NPC_NORTH_GATE								= 22471,
-	NPC_SOUTH_GATE								= 22472,
-	NPC_NORTH_GATE_CREDIT						= 22503,
-	NPC_SOUTH_GATE_CREDIT						= 22504,
+    SPELL_ARTILLERY_ON_THE_WRAP_GATE            = 39221,
+    SPELL_ANTI_DEMON_FLAME_THROWER              = 39222,
+    NPC_NORTH_GATE                              = 22471,
+    NPC_SOUTH_GATE                              = 22472,
+    NPC_NORTH_GATE_CREDIT                       = 22503,
+    NPC_SOUTH_GATE_CREDIT                       = 22504,
 
 };
 
@@ -63,57 +63,57 @@ public:
         return new npc_deahts_door_wrap_gateAI(creature);
     }
 
-	struct npc_deahts_door_wrap_gateAI : public ScriptedAI
-	{
-		npc_deahts_door_wrap_gateAI(Creature *c) : ScriptedAI(c)
-		{
-		}
+    struct npc_deahts_door_wrap_gateAI : public ScriptedAI
+    {
+        npc_deahts_door_wrap_gateAI(Creature *c) : ScriptedAI(c)
+        {
+        }
 
-		uint8 count;
-		uint32 timer;
-		void Reset() { count = 0; timer = 0;}
-		void SpellHit(Unit* caster, SpellInfo const* spellInfo)
-		{
-			if (spellInfo->Id == SPELL_ARTILLERY_ON_THE_WRAP_GATE)
-			{
-				Player* plr = caster->GetCharmerOrOwnerPlayerOrPlayerItself();
-				if (!plr)
-					return;
+        uint8 count;
+        uint32 timer;
+        void Reset() { count = 0; timer = 0;}
+        void SpellHit(Unit* caster, SpellInfo const* spellInfo)
+        {
+            if (spellInfo->Id == SPELL_ARTILLERY_ON_THE_WRAP_GATE)
+            {
+                Player* plr = caster->GetCharmerOrOwnerPlayerOrPlayerItself();
+                if (!plr)
+                    return;
 
-				timer = 1;
-				count++;
+                timer = 1;
+                count++;
 
-				if (count >= 6)
-				{
-					if (me->GetEntry() == NPC_SOUTH_GATE)
-						plr->KilledMonsterCredit(NPC_SOUTH_GATE_CREDIT, 0);
-					else
-						plr->KilledMonsterCredit(NPC_NORTH_GATE_CREDIT, 0);
+                if (count >= 6)
+                {
+                    if (me->GetEntry() == NPC_SOUTH_GATE)
+                        plr->KilledMonsterCredit(NPC_SOUTH_GATE_CREDIT, 0);
+                    else
+                        plr->KilledMonsterCredit(NPC_NORTH_GATE_CREDIT, 0);
 
-					Reset();
-				}
-			}
-		}
+                    Reset();
+                }
+            }
+        }
 
-		void UpdateAI(uint32 diff)
-		{
-			if (timer)
-			{
-				timer += diff;
-				if ((timer >= 0 && timer < 10000) || (timer >= 20000 && timer < 30000))
-				{
-					for (uint8 i = 0; i < 3; ++i)
-						if (Creature* cr = me->SummonCreature((roll_chance_i(50) ? 22474 : 22500), me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000))
-							if (Unit* target = cr->SelectNearbyTarget(NULL, 50.0f))
-								cr->AI()->AttackStart(target);
+        void UpdateAI(uint32 diff)
+        {
+            if (timer)
+            {
+                timer += diff;
+                if ((timer >= 0 && timer < 10000) || (timer >= 20000 && timer < 30000))
+                {
+                    for (uint8 i = 0; i < 3; ++i)
+                        if (Creature* cr = me->SummonCreature((roll_chance_i(50) ? 22474 : 22500), me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000))
+                            if (Unit* target = cr->SelectNearbyTarget(NULL, 50.0f))
+                                cr->AI()->AttackStart(target);
 
-					timer += 10000;
-					if (timer >= 30000)
-						timer = 0;
-				}
-			}
-		}
-	};
+                    timer += 10000;
+                    if (timer >= 30000)
+                        timer = 0;
+                }
+            }
+        }
+    };
 };
 
 class spell_npc22275_crystal_prison : public SpellScriptLoader
@@ -127,14 +127,14 @@ class spell_npc22275_crystal_prison : public SpellScriptLoader
 
             void OnPeriodic(AuraEffect const* aurEff)
             {
-				PreventDefaultAction();
-				SetDuration(0);
-				GetTarget()->CastSpell(GetTarget(), 40898, true);
+                PreventDefaultAction();
+                SetDuration(0);
+                GetTarget()->CastSpell(GetTarget(), 40898, true);
             }
 
             void Register()
             {
-				OnEffectPeriodic += AuraEffectPeriodicFn(spell_npc22275_crystal_prison_AuraScript::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
+                OnEffectPeriodic += AuraEffectPeriodicFn(spell_npc22275_crystal_prison_AuraScript::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
             }
         };
 
@@ -1052,11 +1052,11 @@ class spell_oscillating_field : public SpellScriptLoader
 
 void AddSC_blades_edge_mountains()
 {
-	// Ours
-	new npc_deahts_door_wrap_gate();
-	new spell_npc22275_crystal_prison();
+    // Ours
+    new npc_deahts_door_wrap_gate();
+    new spell_npc22275_crystal_prison();
 
-	// Theirs
+    // Theirs
     new npc_nether_drake();
     new npc_daranelle();
     new npc_simon_bunny();

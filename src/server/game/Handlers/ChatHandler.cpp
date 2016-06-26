@@ -60,47 +60,47 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
 
     //sLog->outDebug("CHAT: packet received. type %u, lang %u", type, lang);
 
-	// pussywizard: chatting on most chat types requires 2 hours played to prevent spam/abuse
-	if (AccountMgr::IsPlayerAccount(GetSecurity()))
-		switch (type)
-		{
-			case CHAT_MSG_ADDON:
-			case CHAT_MSG_PARTY:
-			case CHAT_MSG_RAID:
-			case CHAT_MSG_GUILD:
-			case CHAT_MSG_OFFICER:
-			case CHAT_MSG_AFK:
-			case CHAT_MSG_DND:
-			case CHAT_MSG_RAID_LEADER:
-			case CHAT_MSG_RAID_WARNING:
-			case CHAT_MSG_BATTLEGROUND:
-			case CHAT_MSG_BATTLEGROUND_LEADER:
-			case CHAT_MSG_PARTY_LEADER:
-				break;
-			default:
-				if (sender->GetTotalPlayedTime() < 2*HOUR)
-				{
-					SendNotification("Speaking is allowed after playing for at least 2 hours. You may use party and guild chat.");
-					recvData.rfinish();
-					return;
-				}
-		}
+    // pussywizard: chatting on most chat types requires 2 hours played to prevent spam/abuse
+    if (AccountMgr::IsPlayerAccount(GetSecurity()))
+        switch (type)
+        {
+            case CHAT_MSG_ADDON:
+            case CHAT_MSG_PARTY:
+            case CHAT_MSG_RAID:
+            case CHAT_MSG_GUILD:
+            case CHAT_MSG_OFFICER:
+            case CHAT_MSG_AFK:
+            case CHAT_MSG_DND:
+            case CHAT_MSG_RAID_LEADER:
+            case CHAT_MSG_RAID_WARNING:
+            case CHAT_MSG_BATTLEGROUND:
+            case CHAT_MSG_BATTLEGROUND_LEADER:
+            case CHAT_MSG_PARTY_LEADER:
+                break;
+            default:
+                if (sender->GetTotalPlayedTime() < 2*HOUR)
+                {
+                    SendNotification("Speaking is allowed after playing for at least 2 hours. You may use party and guild chat.");
+                    recvData.rfinish();
+                    return;
+                }
+        }
 
-	// pussywizard:
-	switch (type)
-	{
-		case CHAT_MSG_SAY:
-		case CHAT_MSG_YELL:
-		case CHAT_MSG_EMOTE:
-		case CHAT_MSG_TEXT_EMOTE:
-		case CHAT_MSG_AFK:
-		case CHAT_MSG_DND:
-			if (sender->IsSpectator())
-			{
-				recvData.rfinish();
-				return;
-			}
-	}
+    // pussywizard:
+    switch (type)
+    {
+        case CHAT_MSG_SAY:
+        case CHAT_MSG_YELL:
+        case CHAT_MSG_EMOTE:
+        case CHAT_MSG_TEXT_EMOTE:
+        case CHAT_MSG_AFK:
+        case CHAT_MSG_DND:
+            if (sender->IsSpectator())
+            {
+                recvData.rfinish();
+                return;
+            }
+    }
 
     // prevent talking at unknown language (cheating)
     LanguageDesc const* langDesc = GetLanguageDescByID(lang);
@@ -165,38 +165,38 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
             lang = LANG_UNIVERSAL;
         else
         {
-			// send in universal language in two side iteration allowed mode
-			if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_CHAT))
-				lang = LANG_UNIVERSAL;
-			else
-			{
-				switch (type)
-				{
-				case CHAT_MSG_PARTY:
-				case CHAT_MSG_PARTY_LEADER:
-				case CHAT_MSG_RAID:
-				case CHAT_MSG_RAID_LEADER:
-				case CHAT_MSG_RAID_WARNING:
-					// allow two side chat at group channel if two side group allowed
-					if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP))
-						lang = LANG_UNIVERSAL;
+            // send in universal language in two side iteration allowed mode
+            if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_CHAT))
+                lang = LANG_UNIVERSAL;
+            else
+            {
+                switch (type)
+                {
+                case CHAT_MSG_PARTY:
+                case CHAT_MSG_PARTY_LEADER:
+                case CHAT_MSG_RAID:
+                case CHAT_MSG_RAID_LEADER:
+                case CHAT_MSG_RAID_WARNING:
+                    // allow two side chat at group channel if two side group allowed
+                    if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP))
+                        lang = LANG_UNIVERSAL;
 
-					specialMessageLimit = 35;
-					break;
-				case CHAT_MSG_GUILD:
-				case CHAT_MSG_OFFICER:
-					// allow two side chat at guild channel if two side guild allowed
-					if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GUILD))
-						lang = LANG_UNIVERSAL;
+                    specialMessageLimit = 35;
+                    break;
+                case CHAT_MSG_GUILD:
+                case CHAT_MSG_OFFICER:
+                    // allow two side chat at guild channel if two side guild allowed
+                    if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GUILD))
+                        lang = LANG_UNIVERSAL;
 
-					specialMessageLimit = 15;
-					break;
-				case CHAT_MSG_WHISPER:
-					if (sender->getLevel() >= 80)
-						specialMessageLimit = 15;
-					break;
-				}
-			}
+                    specialMessageLimit = 15;
+                    break;
+                case CHAT_MSG_WHISPER:
+                    if (sender->getLevel() >= 80)
+                        specialMessageLimit = 15;
+                    break;
+                }
+            }
             // but overwrite it by SPELL_AURA_MOD_LANGUAGE auras (only single case used)
             Unit::AuraEffectList const& ModLangAuras = sender->GetAuraEffectsByType(SPELL_AURA_MOD_LANGUAGE);
             if (!ModLangAuras.empty())
@@ -252,9 +252,9 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
     if (lang != LANG_ADDON && sWorld->getBoolConfig(CONFIG_CHAT_FAKE_MESSAGE_PREVENTING))
         stripLineInvisibleChars(msg);
 
-	// pussywizard:
-	if (lang != LANG_ADDON && msg.find("|0") != std::string::npos)
-		return;
+    // pussywizard:
+    if (lang != LANG_ADDON && msg.find("|0") != std::string::npos)
+        return;
 
     if (!ignoreChecks)
     {
@@ -264,12 +264,12 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
         if (ChatHandler(this).ParseCommands(msg.c_str()))
             return;
 
-		if (!_player->CanSpeak())
-		{
-			std::string timeStr = secsToTimeString(m_muteTime - time(NULL));
-			SendNotification(GetTrinityString(LANG_WAIT_BEFORE_SPEAKING), timeStr.c_str());
-			return;
-		}
+        if (!_player->CanSpeak())
+        {
+            std::string timeStr = secsToTimeString(m_muteTime - time(NULL));
+            SendNotification(GetTrinityString(LANG_WAIT_BEFORE_SPEAKING), timeStr.c_str());
+            return;
+        }
 
         if (lang != LANG_ADDON)
         {
@@ -286,20 +286,20 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
         }
     }
 
-	// exploit
-	size_t found1 = msg.find("|Hquest");
-	if (found1 != std::string::npos)
-	{
-		size_t found2 = msg.find(":", found1+8);
-		size_t found3 = msg.find("|", found1+8);
-		if (found3 != std::string::npos)
-		{
-			if (found2 == std::string::npos)
-				return;
-			if (found2 > found3)
-				return;
-		}
-	}
+    // exploit
+    size_t found1 = msg.find("|Hquest");
+    if (found1 != std::string::npos)
+    {
+        size_t found2 = msg.find(":", found1+8);
+        size_t found3 = msg.find("|", found1+8);
+        if (found3 != std::string::npos)
+        {
+            if (found2 == std::string::npos)
+                return;
+            if (found2 > found3)
+                return;
+        }
+    }
 
 
     switch (type)
@@ -348,7 +348,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
                 return;
             }
 
-			if (!sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_CHAT) && senderIsPlayer && receiverIsPlayer)
+            if (!sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_CHAT) && senderIsPlayer && receiverIsPlayer)
                 if (GetPlayer()->GetTeamId() != receiver->GetTeamId())
                 {
                     SendWrongFactionNotice();
@@ -544,8 +544,8 @@ void WorldSession::HandleEmoteOpcode(WorldPacket & recvData)
     if (!GetPlayer()->IsAlive() || GetPlayer()->HasUnitState(UNIT_STATE_DIED))
         return;
 
-	if (GetPlayer()->IsSpectator())
-		return;
+    if (GetPlayer()->IsSpectator())
+        return;
 
     uint32 emote;
     recvData >> emote;
@@ -590,7 +590,7 @@ void WorldSession::HandleTextEmoteOpcode(WorldPacket & recvData)
     if (!GetPlayer()->IsAlive())
         return;
 
-	GetPlayer()->UpdateSpeakTime();
+    GetPlayer()->UpdateSpeakTime();
 
     if (!GetPlayer()->CanSpeak())
     {
@@ -599,8 +599,8 @@ void WorldSession::HandleTextEmoteOpcode(WorldPacket & recvData)
         return;
     }
 
-	if (GetPlayer()->IsSpectator())
-		return;
+    if (GetPlayer()->IsSpectator())
+        return;
 
     uint32 text_emote, emoteNum;
     uint64 guid;

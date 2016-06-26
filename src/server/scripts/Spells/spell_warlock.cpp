@@ -73,42 +73,42 @@ class spell_warl_eye_of_kilrogg : public SpellScriptLoader
         {
             PrepareAuraScript(spell_warl_eye_of_kilrogg_AuraScript);
 
-			void HandleAuraApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+            void HandleAuraApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
-				PreventDefaultAction();
+                PreventDefaultAction();
                 if (Player* player = GetTarget()->ToPlayer())
-				{
+                {
                     player->UnsummonPetTemporaryIfAny();
 
-					// Glyph of Kilrogg
-					if (player->HasAura(58081))
-						if (Unit* charm = player->GetCharm())
-						{
-							charm->SetSpeed(MOVE_RUN, 2.14f, true);
-							if (charm->GetMapId() == 530 || charm->GetMapId() == 571)
-							{
-								charm->SetCanFly(true);
-								charm->SetSpeed(MOVE_FLIGHT, 2.14f, true);
-								charm->SendMovementFlagUpdate();
-							}
-						}
-				}
+                    // Glyph of Kilrogg
+                    if (player->HasAura(58081))
+                        if (Unit* charm = player->GetCharm())
+                        {
+                            charm->SetSpeed(MOVE_RUN, 2.14f, true);
+                            if (charm->GetMapId() == 530 || charm->GetMapId() == 571)
+                            {
+                                charm->SetCanFly(true);
+                                charm->SetSpeed(MOVE_FLIGHT, 2.14f, true);
+                                charm->SendMovementFlagUpdate();
+                            }
+                        }
+                }
             }
 
-			void HandleAuraRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+            void HandleAuraRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
                 if (Player* player = GetTarget()->ToPlayer())
-				{
-					if (Unit* charm = player->GetCharm())
-						charm->ToTempSummon()->UnSummon();
+                {
+                    if (Unit* charm = player->GetCharm())
+                        charm->ToTempSummon()->UnSummon();
 
                     player->ResummonPetTemporaryUnSummonedIfAny();
-				}
+                }
             }
 
             void Register()
             {
-				OnEffectApply += AuraEffectApplyFn(spell_warl_eye_of_kilrogg_AuraScript::HandleAuraApply, EFFECT_1, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+                OnEffectApply += AuraEffectApplyFn(spell_warl_eye_of_kilrogg_AuraScript::HandleAuraApply, EFFECT_1, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
                 AfterEffectRemove += AuraEffectRemoveFn(spell_warl_eye_of_kilrogg_AuraScript::HandleAuraRemove, EFFECT_1, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
             }
         };
@@ -130,8 +130,8 @@ class spell_warl_shadowflame : public SpellScriptLoader
 
             void HandleSchoolDMG(SpellEffIndex /*effIndex*/)
             {
-				if (Unit* target = GetHitUnit())
-					GetCaster()->CastSpell(target, (GetSpellInfo()->Id == 47897 ? 47960 : 61291), true);
+                if (Unit* target = GetHitUnit())
+                    GetCaster()->CastSpell(target, (GetSpellInfo()->Id == 47897 ? 47960 : 61291), true);
             }
 
             void Register()
@@ -155,24 +155,24 @@ class spell_warl_seduction : public SpellScriptLoader
         {
             PrepareAuraScript(spell_warl_seduction_AuraScript);
 
-			void HandleAuraApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+            void HandleAuraApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
                 if (Unit* caster = GetCaster())
-				{
-					if (Unit* owner = caster->GetOwner())
-						if (owner->GetAuraEffectDummy(56250))
-						{
-							Unit* target = GetTarget();
-							target->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE, 0, target->GetAura(32409)); // SW:D shall not be removed.
-							target->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE_PERCENT);
-							target->RemoveAurasByType(SPELL_AURA_PERIODIC_LEECH);
-						}
-				}
+                {
+                    if (Unit* owner = caster->GetOwner())
+                        if (owner->GetAuraEffectDummy(56250))
+                        {
+                            Unit* target = GetTarget();
+                            target->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE, 0, target->GetAura(32409)); // SW:D shall not be removed.
+                            target->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE_PERCENT);
+                            target->RemoveAurasByType(SPELL_AURA_PERIODIC_LEECH);
+                        }
+                }
             }
 
             void Register()
             {
-				OnEffectApply += AuraEffectApplyFn(spell_warl_seduction_AuraScript::HandleAuraApply, EFFECT_0, SPELL_AURA_MOD_STUN, AURA_EFFECT_HANDLE_REAL);
+                OnEffectApply += AuraEffectApplyFn(spell_warl_seduction_AuraScript::HandleAuraApply, EFFECT_0, SPELL_AURA_MOD_STUN, AURA_EFFECT_HANDLE_REAL);
             }
         };
 
@@ -191,10 +191,10 @@ class spell_warl_improved_demonic_tactics : public SpellScriptLoader
         {
             PrepareAuraScript(spell_warl_improved_demonic_tactics_AuraScript);
 
-			bool Load()
-			{
-				return GetUnitOwner()->GetTypeId() == TYPEID_PLAYER;
-			}
+            bool Load()
+            {
+                return GetUnitOwner()->GetTypeId() == TYPEID_PLAYER;
+            }
 
             void CalcPeriodic(AuraEffect const* /*aurEff*/, bool& isPeriodic, int32& amplitude)
             {
@@ -204,10 +204,10 @@ class spell_warl_improved_demonic_tactics : public SpellScriptLoader
 
             void CalculateAmount(AuraEffect const* aurEff, int32& amount, bool& canBeRecalculated)
             {
-				if (aurEff->GetEffIndex() == EFFECT_0)
-					amount = CalculatePct<int32, float>(GetUnitOwner()->ToPlayer()->GetFloatValue(PLAYER_SPELL_CRIT_PERCENTAGE1 + SPELL_SCHOOL_FROST), GetSpellInfo()->Effects[EFFECT_0].CalcValue());
-				else
-					amount = CalculatePct<int32, float>(GetUnitOwner()->ToPlayer()->GetFloatValue(PLAYER_CRIT_PERCENTAGE), GetSpellInfo()->Effects[EFFECT_0].CalcValue());
+                if (aurEff->GetEffIndex() == EFFECT_0)
+                    amount = CalculatePct<int32, float>(GetUnitOwner()->ToPlayer()->GetFloatValue(PLAYER_SPELL_CRIT_PERCENTAGE1 + SPELL_SCHOOL_FROST), GetSpellInfo()->Effects[EFFECT_0].CalcValue());
+                else
+                    amount = CalculatePct<int32, float>(GetUnitOwner()->ToPlayer()->GetFloatValue(PLAYER_CRIT_PERCENTAGE), GetSpellInfo()->Effects[EFFECT_0].CalcValue());
             }
 
             void HandleEffectCalcSpellMod(AuraEffect const* aurEff, SpellModifier*& spellMod)
@@ -215,7 +215,7 @@ class spell_warl_improved_demonic_tactics : public SpellScriptLoader
                 if (!spellMod)
                 {
                     spellMod = new SpellModifier(aurEff->GetBase());
-					spellMod->op = SpellModOp(aurEff->GetMiscValue());
+                    spellMod->op = SpellModOp(aurEff->GetMiscValue());
                     spellMod->type = SPELLMOD_FLAT;
                     spellMod->spellId = GetId();
                     spellMod->mask = flag96(0x0, 0x2000, 0x0); // Pet Passive
@@ -227,7 +227,7 @@ class spell_warl_improved_demonic_tactics : public SpellScriptLoader
             void HandlePeriodic(AuraEffect const* aurEff)
             {
                 PreventDefaultAction();
-				GetAura()->GetEffect(aurEff->GetEffIndex())->RecalculateAmount();
+                GetAura()->GetEffect(aurEff->GetEffIndex())->RecalculateAmount();
             }
 
             void Register()
@@ -256,10 +256,10 @@ class spell_warl_ritual_of_summoning : public SpellScriptLoader
 
             SpellCastResult CheckCast()
             {
-				if (GetCaster()->GetTypeId() == TYPEID_PLAYER)
-					if (GetCaster()->ToPlayer()->InBattleground())
-						return SPELL_FAILED_NOT_IN_BATTLEGROUND;
-				return SPELL_CAST_OK;
+                if (GetCaster()->GetTypeId() == TYPEID_PLAYER)
+                    if (GetCaster()->ToPlayer()->InBattleground())
+                        return SPELL_FAILED_NOT_IN_BATTLEGROUND;
+                return SPELL_CAST_OK;
             }
 
             void Register()
@@ -283,15 +283,15 @@ class spell_warl_demonic_aegis : public SpellScriptLoader
         {
             PrepareAuraScript(spell_warl_demonic_aegis_AuraScript);
 
-			void HandleAuraApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+            void HandleAuraApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
-				// Remove Fel Armor and Demon Armor
-				GetTarget()->RemoveAurasWithFamily(SPELLFAMILY_WARLOCK, 0, 0x20000020, 0, 0);
+                // Remove Fel Armor and Demon Armor
+                GetTarget()->RemoveAurasWithFamily(SPELLFAMILY_WARLOCK, 0, 0x20000020, 0, 0);
             }
 
             void Register()
             {
-				OnEffectRemove += AuraEffectRemoveFn(spell_warl_demonic_aegis_AuraScript::HandleAuraApply, EFFECT_0, SPELL_AURA_ADD_PCT_MODIFIER, AURA_EFFECT_HANDLE_REAL);
+                OnEffectRemove += AuraEffectRemoveFn(spell_warl_demonic_aegis_AuraScript::HandleAuraApply, EFFECT_0, SPELL_AURA_ADD_PCT_MODIFIER, AURA_EFFECT_HANDLE_REAL);
             }
         };
 
@@ -312,26 +312,26 @@ class spell_warl_demonic_knowledge : public SpellScriptLoader
 
             void CalculateAmount(AuraEffect const* aurEff, int32 & amount, bool & /*canBeRecalculated*/)
             {
-				if (Unit* caster = GetCaster())
-					amount = CalculatePct(caster->GetStat(STAT_STAMINA)+caster->GetStat(STAT_INTELLECT), aurEff->GetBaseAmount());
+                if (Unit* caster = GetCaster())
+                    amount = CalculatePct(caster->GetStat(STAT_STAMINA)+caster->GetStat(STAT_INTELLECT), aurEff->GetBaseAmount());
             }
 
-			void CalcPeriodic(AuraEffect const* /*aurEff*/, bool& isPeriodic, int32& amplitude)
+            void CalcPeriodic(AuraEffect const* /*aurEff*/, bool& isPeriodic, int32& amplitude)
             {
                 isPeriodic = true;
                 amplitude = 5*IN_MILLISECONDS;
             }
-			
+            
             void HandlePeriodic(AuraEffect const* aurEff)
             {
                 PreventDefaultAction();
-				GetEffect(aurEff->GetEffIndex())->RecalculateAmount();
+                GetEffect(aurEff->GetEffIndex())->RecalculateAmount();
             }
 
             void Register()
             {
                 DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_warl_demonic_knowledge_AuraScript::CalculateAmount, EFFECT_0, SPELL_AURA_MOD_DAMAGE_DONE);
-				DoEffectCalcPeriodic += AuraEffectCalcPeriodicFn(spell_warl_demonic_knowledge_AuraScript::CalcPeriodic, EFFECT_0, SPELL_AURA_MOD_DAMAGE_DONE);
+                DoEffectCalcPeriodic += AuraEffectCalcPeriodicFn(spell_warl_demonic_knowledge_AuraScript::CalcPeriodic, EFFECT_0, SPELL_AURA_MOD_DAMAGE_DONE);
                 OnEffectPeriodic += AuraEffectPeriodicFn(spell_warl_demonic_knowledge_AuraScript::HandlePeriodic, EFFECT_0, SPELL_AURA_MOD_DAMAGE_DONE);
             }
         };
@@ -353,102 +353,102 @@ class spell_warl_generic_scaling : public SpellScriptLoader
 
             void CalculateResistanceAmount(AuraEffect const* aurEff, int32 & amount, bool & /*canBeRecalculated*/)
             {
-				// xinef: pet inherits 40% of resistance from owner and 35% of armor
-				if (Unit* owner = GetUnitOwner()->GetOwner())
-				{
-					SpellSchoolMask schoolMask = SpellSchoolMask(aurEff->GetSpellInfo()->Effects[aurEff->GetEffIndex()].MiscValue);
-					int32 modifier = schoolMask == SPELL_SCHOOL_MASK_NORMAL ? 35 : 40;
-					amount = CalculatePct(std::max<int32>(0, owner->GetResistance(schoolMask)), modifier);
-				}
+                // xinef: pet inherits 40% of resistance from owner and 35% of armor
+                if (Unit* owner = GetUnitOwner()->GetOwner())
+                {
+                    SpellSchoolMask schoolMask = SpellSchoolMask(aurEff->GetSpellInfo()->Effects[aurEff->GetEffIndex()].MiscValue);
+                    int32 modifier = schoolMask == SPELL_SCHOOL_MASK_NORMAL ? 35 : 40;
+                    amount = CalculatePct(std::max<int32>(0, owner->GetResistance(schoolMask)), modifier);
+                }
             }
 
             void CalculateStatAmount(AuraEffect const* aurEff, int32 & amount, bool & /*canBeRecalculated*/)
             {
-				// xinef: by default warlock pet inherits 75% of stamina and 30% of intellect
-				if (Unit* owner = GetUnitOwner()->GetOwner())
-				{
-					Stats stat = Stats(aurEff->GetSpellInfo()->Effects[aurEff->GetEffIndex()].MiscValue);
-					int32 modifier = stat == STAT_STAMINA ? 75 : 30;
-					amount = CalculatePct(std::max<int32>(0, owner->GetStat(stat)), modifier);
-				}
+                // xinef: by default warlock pet inherits 75% of stamina and 30% of intellect
+                if (Unit* owner = GetUnitOwner()->GetOwner())
+                {
+                    Stats stat = Stats(aurEff->GetSpellInfo()->Effects[aurEff->GetEffIndex()].MiscValue);
+                    int32 modifier = stat == STAT_STAMINA ? 75 : 30;
+                    amount = CalculatePct(std::max<int32>(0, owner->GetStat(stat)), modifier);
+                }
             }
 
-			void CalculateAPAmount(AuraEffect const* aurEff, int32 & amount, bool & /*canBeRecalculated*/)
+            void CalculateAPAmount(AuraEffect const* aurEff, int32 & amount, bool & /*canBeRecalculated*/)
             {
-				// xinef: by default warlock pet inherits 57% of max(SP FIRE, SP SHADOW) as AP
-				if (Unit* owner = GetUnitOwner()->GetOwner())
-				{
-					int32 fire  = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_FIRE);
-					int32 shadow = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_SHADOW);
-					int32 maximum  = (fire > shadow) ? fire : shadow;
-					amount = CalculatePct(std::max<int32>(0, maximum), 57);
-				}
+                // xinef: by default warlock pet inherits 57% of max(SP FIRE, SP SHADOW) as AP
+                if (Unit* owner = GetUnitOwner()->GetOwner())
+                {
+                    int32 fire  = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_FIRE);
+                    int32 shadow = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_SHADOW);
+                    int32 maximum  = (fire > shadow) ? fire : shadow;
+                    amount = CalculatePct(std::max<int32>(0, maximum), 57);
+                }
             }
 
-			void CalculateSPAmount(AuraEffect const* aurEff, int32 & amount, bool & /*canBeRecalculated*/)
+            void CalculateSPAmount(AuraEffect const* aurEff, int32 & amount, bool & /*canBeRecalculated*/)
             {
-				// xinef: by default warlock pet inherits 15% of max(SP FIRE, SP SHADOW) as SP
-				if (Unit* owner = GetUnitOwner()->GetOwner())
-				{
-					int32 fire  = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_FIRE);
-					int32 shadow = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_SHADOW);
-					int32 maximum  = (fire > shadow) ? fire : shadow;
-					amount = CalculatePct(std::max<int32>(0, maximum), 15);
+                // xinef: by default warlock pet inherits 15% of max(SP FIRE, SP SHADOW) as SP
+                if (Unit* owner = GetUnitOwner()->GetOwner())
+                {
+                    int32 fire  = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_FIRE);
+                    int32 shadow = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_SHADOW);
+                    int32 maximum  = (fire > shadow) ? fire : shadow;
+                    amount = CalculatePct(std::max<int32>(0, maximum), 15);
 
-					// xinef: Update appropriate player field
-					if (owner->GetTypeId() == TYPEID_PLAYER)
-						owner->SetUInt32Value(PLAYER_PET_SPELL_POWER, (uint32)amount);
-				}
+                    // xinef: Update appropriate player field
+                    if (owner->GetTypeId() == TYPEID_PLAYER)
+                        owner->SetUInt32Value(PLAYER_PET_SPELL_POWER, (uint32)amount);
+                }
             }
 
-			void CalcPeriodic(AuraEffect const* /*aurEff*/, bool& isPeriodic, int32& amplitude)
+            void CalcPeriodic(AuraEffect const* /*aurEff*/, bool& isPeriodic, int32& amplitude)
             {
                 isPeriodic = true;
                 amplitude = 2*IN_MILLISECONDS;
             }
-			
+            
             void HandlePeriodic(AuraEffect const* aurEff)
             {
                 PreventDefaultAction();
-				if (aurEff->GetAuraType() == SPELL_AURA_MOD_STAT && (aurEff->GetMiscValue() == STAT_STAMINA || aurEff->GetMiscValue() == STAT_INTELLECT))
-				{
-					int32 currentAmount = aurEff->GetAmount();
-					int32 newAmount = GetEffect(aurEff->GetEffIndex())->CalculateAmount(GetCaster());
-					if (newAmount != currentAmount)
-					{
-						if (aurEff->GetMiscValue() == STAT_STAMINA)
-						{
-							uint32 actStat = GetUnitOwner()->GetHealth();
-							GetEffect(aurEff->GetEffIndex())->ChangeAmount(newAmount, false);
-							GetUnitOwner()->SetHealth(std::min<uint32>(GetUnitOwner()->GetMaxHealth(), actStat));
-						}
-						else
-						{
-							uint32 actStat = GetUnitOwner()->GetPower(POWER_MANA);
-							GetEffect(aurEff->GetEffIndex())->ChangeAmount(newAmount, false);
-							GetUnitOwner()->SetPower(POWER_MANA, std::min<uint32>(GetUnitOwner()->GetMaxPower(POWER_MANA), actStat));
-						}
-					}
-				}
-				else
-					GetEffect(aurEff->GetEffIndex())->RecalculateAmount();
+                if (aurEff->GetAuraType() == SPELL_AURA_MOD_STAT && (aurEff->GetMiscValue() == STAT_STAMINA || aurEff->GetMiscValue() == STAT_INTELLECT))
+                {
+                    int32 currentAmount = aurEff->GetAmount();
+                    int32 newAmount = GetEffect(aurEff->GetEffIndex())->CalculateAmount(GetCaster());
+                    if (newAmount != currentAmount)
+                    {
+                        if (aurEff->GetMiscValue() == STAT_STAMINA)
+                        {
+                            uint32 actStat = GetUnitOwner()->GetHealth();
+                            GetEffect(aurEff->GetEffIndex())->ChangeAmount(newAmount, false);
+                            GetUnitOwner()->SetHealth(std::min<uint32>(GetUnitOwner()->GetMaxHealth(), actStat));
+                        }
+                        else
+                        {
+                            uint32 actStat = GetUnitOwner()->GetPower(POWER_MANA);
+                            GetEffect(aurEff->GetEffIndex())->ChangeAmount(newAmount, false);
+                            GetUnitOwner()->SetPower(POWER_MANA, std::min<uint32>(GetUnitOwner()->GetMaxPower(POWER_MANA), actStat));
+                        }
+                    }
+                }
+                else
+                    GetEffect(aurEff->GetEffIndex())->RecalculateAmount();
             }
 
             void Register()
             {
-				if (m_scriptSpellId != 34947)
-					DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_warl_generic_scaling_AuraScript::CalculateResistanceAmount, EFFECT_ALL, SPELL_AURA_MOD_RESISTANCE);
+                if (m_scriptSpellId != 34947)
+                    DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_warl_generic_scaling_AuraScript::CalculateResistanceAmount, EFFECT_ALL, SPELL_AURA_MOD_RESISTANCE);
 
-				if (m_scriptSpellId == 34947 || m_scriptSpellId == 34956)
-					DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_warl_generic_scaling_AuraScript::CalculateStatAmount, EFFECT_ALL, SPELL_AURA_MOD_STAT);
+                if (m_scriptSpellId == 34947 || m_scriptSpellId == 34956)
+                    DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_warl_generic_scaling_AuraScript::CalculateStatAmount, EFFECT_ALL, SPELL_AURA_MOD_STAT);
 
-				if (m_scriptSpellId == 34947)
-				{
-					DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_warl_generic_scaling_AuraScript::CalculateAPAmount, EFFECT_ALL, SPELL_AURA_MOD_ATTACK_POWER);
-					DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_warl_generic_scaling_AuraScript::CalculateSPAmount, EFFECT_ALL, SPELL_AURA_MOD_DAMAGE_DONE);
-				}
+                if (m_scriptSpellId == 34947)
+                {
+                    DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_warl_generic_scaling_AuraScript::CalculateAPAmount, EFFECT_ALL, SPELL_AURA_MOD_ATTACK_POWER);
+                    DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_warl_generic_scaling_AuraScript::CalculateSPAmount, EFFECT_ALL, SPELL_AURA_MOD_DAMAGE_DONE);
+                }
 
-				DoEffectCalcPeriodic += AuraEffectCalcPeriodicFn(spell_warl_generic_scaling_AuraScript::CalcPeriodic, EFFECT_ALL, SPELL_AURA_ANY);
+                DoEffectCalcPeriodic += AuraEffectCalcPeriodicFn(spell_warl_generic_scaling_AuraScript::CalcPeriodic, EFFECT_ALL, SPELL_AURA_ANY);
                 OnEffectPeriodic += AuraEffectPeriodicFn(spell_warl_generic_scaling_AuraScript::HandlePeriodic, EFFECT_ALL, SPELL_AURA_ANY);
             }
         };
@@ -470,78 +470,78 @@ class spell_warl_infernal_scaling : public SpellScriptLoader
 
             void CalculateResistanceAmount(AuraEffect const* aurEff, int32 & amount, bool & /*canBeRecalculated*/)
             {
-				// xinef: pet inherits 40% of resistance from owner and 35% of armor
-				if (Unit* owner = GetUnitOwner()->GetOwner())
-				{
-					SpellSchoolMask schoolMask = SpellSchoolMask(aurEff->GetSpellInfo()->Effects[aurEff->GetEffIndex()].MiscValue);
-					int32 modifier = schoolMask == SPELL_SCHOOL_MASK_NORMAL ? 35 : 40;
-					amount = CalculatePct(std::max<int32>(0, owner->GetResistance(schoolMask)), modifier);
-				}
+                // xinef: pet inherits 40% of resistance from owner and 35% of armor
+                if (Unit* owner = GetUnitOwner()->GetOwner())
+                {
+                    SpellSchoolMask schoolMask = SpellSchoolMask(aurEff->GetSpellInfo()->Effects[aurEff->GetEffIndex()].MiscValue);
+                    int32 modifier = schoolMask == SPELL_SCHOOL_MASK_NORMAL ? 35 : 40;
+                    amount = CalculatePct(std::max<int32>(0, owner->GetResistance(schoolMask)), modifier);
+                }
             }
 
             void CalculateStatAmount(AuraEffect const* aurEff, int32 & amount, bool & /*canBeRecalculated*/)
             {
-				// xinef: by default warlock pet inherits 75% of stamina and 30% of intellect
-				if (Unit* owner = GetUnitOwner()->GetOwner())
-				{
-					Stats stat = Stats(aurEff->GetSpellInfo()->Effects[aurEff->GetEffIndex()].MiscValue);
-					int32 modifier = stat == STAT_STAMINA ? 75 : 30;
-					amount = CalculatePct(std::max<int32>(0, owner->GetStat(stat)), modifier);
-				}
+                // xinef: by default warlock pet inherits 75% of stamina and 30% of intellect
+                if (Unit* owner = GetUnitOwner()->GetOwner())
+                {
+                    Stats stat = Stats(aurEff->GetSpellInfo()->Effects[aurEff->GetEffIndex()].MiscValue);
+                    int32 modifier = stat == STAT_STAMINA ? 75 : 30;
+                    amount = CalculatePct(std::max<int32>(0, owner->GetStat(stat)), modifier);
+                }
             }
 
-			void CalculateAPAmount(AuraEffect const* aurEff, int32 & amount, bool & /*canBeRecalculated*/)
+            void CalculateAPAmount(AuraEffect const* aurEff, int32 & amount, bool & /*canBeRecalculated*/)
             {
-				// xinef: by default warlock pet inherits 57% of max(SP FIRE, SP SHADOW) as AP
-				if (Unit* owner = GetUnitOwner()->GetOwner())
-				{
-					int32 fire  = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_FIRE);
-					int32 shadow = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_SHADOW);
-					int32 maximum  = (fire > shadow) ? fire : shadow;
-					amount = CalculatePct(std::max<int32>(0, maximum), 57);
-				}
+                // xinef: by default warlock pet inherits 57% of max(SP FIRE, SP SHADOW) as AP
+                if (Unit* owner = GetUnitOwner()->GetOwner())
+                {
+                    int32 fire  = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_FIRE);
+                    int32 shadow = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_SHADOW);
+                    int32 maximum  = (fire > shadow) ? fire : shadow;
+                    amount = CalculatePct(std::max<int32>(0, maximum), 57);
+                }
             }
 
-			void CalculateSPAmount(AuraEffect const* aurEff, int32 & amount, bool & /*canBeRecalculated*/)
+            void CalculateSPAmount(AuraEffect const* aurEff, int32 & amount, bool & /*canBeRecalculated*/)
             {
-				// xinef: by default warlock pet inherits 15% of max(SP FIRE, SP SHADOW) as SP
-				if (Unit* owner = GetUnitOwner()->GetOwner())
-				{
-					int32 fire  = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_FIRE);
-					int32 shadow = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_SHADOW);
-					int32 maximum  = (fire > shadow) ? fire : shadow;
-					amount = CalculatePct(std::max<int32>(0, maximum), 15);
+                // xinef: by default warlock pet inherits 15% of max(SP FIRE, SP SHADOW) as SP
+                if (Unit* owner = GetUnitOwner()->GetOwner())
+                {
+                    int32 fire  = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_FIRE);
+                    int32 shadow = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_SHADOW);
+                    int32 maximum  = (fire > shadow) ? fire : shadow;
+                    amount = CalculatePct(std::max<int32>(0, maximum), 15);
 
-					// xinef: Update appropriate player field
-					if (owner->GetTypeId() == TYPEID_PLAYER)
-						owner->SetUInt32Value(PLAYER_PET_SPELL_POWER, (uint32)amount);
-				}
+                    // xinef: Update appropriate player field
+                    if (owner->GetTypeId() == TYPEID_PLAYER)
+                        owner->SetUInt32Value(PLAYER_PET_SPELL_POWER, (uint32)amount);
+                }
             }
 
-			void HandleEffectApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
-			{
-				GetUnitOwner()->ApplySpellImmune(0, IMMUNITY_STATE, aurEff->GetAuraType(), true, SPELL_BLOCK_TYPE_POSITIVE);
-				if (aurEff->GetAuraType() == SPELL_AURA_MOD_ATTACK_POWER)
-					GetUnitOwner()->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_ATTACK_POWER_PCT, true, SPELL_BLOCK_TYPE_POSITIVE);
-				else if (aurEff->GetAuraType() == SPELL_AURA_MOD_STAT)
-					GetUnitOwner()->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TOTAL_STAT_PERCENTAGE, true, SPELL_BLOCK_TYPE_POSITIVE);
-			}
+            void HandleEffectApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+            {
+                GetUnitOwner()->ApplySpellImmune(0, IMMUNITY_STATE, aurEff->GetAuraType(), true, SPELL_BLOCK_TYPE_POSITIVE);
+                if (aurEff->GetAuraType() == SPELL_AURA_MOD_ATTACK_POWER)
+                    GetUnitOwner()->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_ATTACK_POWER_PCT, true, SPELL_BLOCK_TYPE_POSITIVE);
+                else if (aurEff->GetAuraType() == SPELL_AURA_MOD_STAT)
+                    GetUnitOwner()->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TOTAL_STAT_PERCENTAGE, true, SPELL_BLOCK_TYPE_POSITIVE);
+            }
 
             void Register()
             {
-				if (m_scriptSpellId != 36186)
-					DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_warl_infernal_scaling_AuraScript::CalculateResistanceAmount, EFFECT_ALL, SPELL_AURA_MOD_RESISTANCE);
+                if (m_scriptSpellId != 36186)
+                    DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_warl_infernal_scaling_AuraScript::CalculateResistanceAmount, EFFECT_ALL, SPELL_AURA_MOD_RESISTANCE);
 
-				if (m_scriptSpellId == 36186 || m_scriptSpellId == 36188)
-					DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_warl_infernal_scaling_AuraScript::CalculateStatAmount, EFFECT_ALL, SPELL_AURA_MOD_STAT);
+                if (m_scriptSpellId == 36186 || m_scriptSpellId == 36188)
+                    DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_warl_infernal_scaling_AuraScript::CalculateStatAmount, EFFECT_ALL, SPELL_AURA_MOD_STAT);
 
-				if (m_scriptSpellId == 36186)
-				{
-					DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_warl_infernal_scaling_AuraScript::CalculateAPAmount, EFFECT_ALL, SPELL_AURA_MOD_ATTACK_POWER);
-					DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_warl_infernal_scaling_AuraScript::CalculateSPAmount, EFFECT_ALL, SPELL_AURA_MOD_DAMAGE_DONE);
-				}
+                if (m_scriptSpellId == 36186)
+                {
+                    DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_warl_infernal_scaling_AuraScript::CalculateAPAmount, EFFECT_ALL, SPELL_AURA_MOD_ATTACK_POWER);
+                    DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_warl_infernal_scaling_AuraScript::CalculateSPAmount, EFFECT_ALL, SPELL_AURA_MOD_DAMAGE_DONE);
+                }
 
-				OnEffectApply += AuraEffectApplyFn(spell_warl_infernal_scaling_AuraScript::HandleEffectApply, EFFECT_ALL, SPELL_AURA_ANY, AURA_EFFECT_HANDLE_REAL);
+                OnEffectApply += AuraEffectApplyFn(spell_warl_infernal_scaling_AuraScript::HandleEffectApply, EFFECT_ALL, SPELL_AURA_ANY, AURA_EFFECT_HANDLE_REAL);
             }
         };
 
@@ -765,10 +765,10 @@ class spell_warl_everlasting_affliction : public SpellScriptLoader
                 if (Unit* unitTarget = GetHitUnit())
                     // Refresh corruption on target
                     if (AuraEffect* aur = unitTarget->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_WARLOCK, 0x2, 0, 0, GetCaster()->GetGUID()))
-					{
+                    {
                         aur->GetBase()->RefreshTimersWithMods();
-						aur->ChangeAmount(aur->CalculateAmount(aur->GetCaster()), false);
-					}
+                        aur->ChangeAmount(aur->CalculateAmount(aur->GetCaster()), false);
+                    }
             }
 
             void Register()
@@ -1104,7 +1104,7 @@ class spell_warl_fel_synergy : public SpellScriptLoader
 
             bool CheckProc(ProcEventInfo& eventInfo)
             {
-				// Xinef: Added charm check
+                // Xinef: Added charm check
                 return (GetTarget()->GetGuardianPet() || GetTarget()->GetCharm()) && eventInfo.GetDamageInfo()->GetDamage();
             }
 
@@ -1211,8 +1211,8 @@ class spell_warl_unstable_affliction : public SpellScriptLoader
                 if (Unit* caster = GetCaster())
                     if (AuraEffect const* aurEff = GetEffect(EFFECT_0))
                     {
-						int32 damage = aurEff->GetBaseAmount();
-						damage = aurEff->GetSpellInfo()->Effects[EFFECT_0].CalcValue(caster, &damage, NULL) * 9;
+                        int32 damage = aurEff->GetBaseAmount();
+                        damage = aurEff->GetSpellInfo()->Effects[EFFECT_0].CalcValue(caster, &damage, NULL) * 9;
                         // backfire damage and silence
                         caster->CastCustomSpell(dispelInfo->GetDispeller(), SPELL_WARLOCK_UNSTABLE_AFFLICTION_DISPEL, &damage, NULL, NULL, true, NULL, aurEff);
                     }
@@ -1394,18 +1394,18 @@ class spell_warl_glyph_of_shadowflame : public SpellScriptLoader
 
 void AddSC_warlock_spell_scripts()
 {
-	// Ours
-	new spell_warl_eye_of_kilrogg();
-	new spell_warl_shadowflame();
-	new spell_warl_seduction();
-	new spell_warl_improved_demonic_tactics();
-	new spell_warl_ritual_of_summoning();
-	new spell_warl_demonic_aegis();
-	new spell_warl_demonic_knowledge();
-	new spell_warl_generic_scaling();
-	new spell_warl_infernal_scaling();
+    // Ours
+    new spell_warl_eye_of_kilrogg();
+    new spell_warl_shadowflame();
+    new spell_warl_seduction();
+    new spell_warl_improved_demonic_tactics();
+    new spell_warl_ritual_of_summoning();
+    new spell_warl_demonic_aegis();
+    new spell_warl_demonic_knowledge();
+    new spell_warl_generic_scaling();
+    new spell_warl_infernal_scaling();
 
-	// Theirs
+    // Theirs
     new spell_warl_banish();
     new spell_warl_create_healthstone();
     new spell_warl_curse_of_doom();

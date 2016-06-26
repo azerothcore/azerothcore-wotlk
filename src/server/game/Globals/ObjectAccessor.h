@@ -88,11 +88,11 @@ class HashMapHolder
 class DelayedCorpseAction
 {
 public:
-	DelayedCorpseAction(Corpse* corpse, uint8 action, uint32 mapId, uint32 instanceId) : _corpse(corpse), _action(action), _mapId(mapId), _instanceId(instanceId) {}
-	Corpse* _corpse;
-	uint8 _action;
-	uint32 _mapId;
-	uint32 _instanceId;
+    DelayedCorpseAction(Corpse* corpse, uint8 action, uint32 mapId, uint32 instanceId) : _corpse(corpse), _action(action), _mapId(mapId), _instanceId(instanceId) {}
+    Corpse* _corpse;
+    uint8 _action;
+    uint32 _mapId;
+    uint32 _instanceId;
 };
 
 class ObjectAccessor
@@ -199,7 +199,7 @@ class ObjectAccessor
         // ACCESS LIKE THAT IS NOT THREAD SAFE
         static Pet* FindPet(uint64);
         static Player* FindPlayer(uint64);
-		static Player* FindPlayerInOrOutOfWorld(uint64 m_guid); 
+        static Player* FindPlayerInOrOutOfWorld(uint64 m_guid); 
         static Unit* FindUnit(uint64);
         static Player* FindPlayerByName(std::string const& name, bool checkInWorld = true);
         static std::map<std::string, Player*> playerNameToPlayerPointer; // pussywizard: optimization

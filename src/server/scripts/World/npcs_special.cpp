@@ -64,16 +64,16 @@ EndContentData */
 
 enum elderClearwater
 {
-	EVENT_CLEARWATER_ANNOUNCE			= 1,
+    EVENT_CLEARWATER_ANNOUNCE           = 1,
 
-	CLEARWATER_SAY_PRE					= 0,
-	CLEARWATER_SAY_START				= 1,
-	CLEARWATER_SAY_WINNER				= 2,
-	CLEARWATER_SAY_END					= 3,
+    CLEARWATER_SAY_PRE                  = 0,
+    CLEARWATER_SAY_START                = 1,
+    CLEARWATER_SAY_WINNER               = 2,
+    CLEARWATER_SAY_END                  = 3,
 
-	QUEST_FISHING_DERBY					= 24803,
+    QUEST_FISHING_DERBY                 = 24803,
 
-	DATA_DERBY_FINISHED					= 1,
+    DATA_DERBY_FINISHED                 = 1,
 };
 
 class npc_elder_clearwater : public CreatureScript
@@ -81,146 +81,146 @@ class npc_elder_clearwater : public CreatureScript
 public:
     npc_elder_clearwater() : CreatureScript("npc_elder_clearwater") { }
 
-	struct npc_elder_clearwaterAI : public ScriptedAI
-	{
-		npc_elder_clearwaterAI(Creature *c) : ScriptedAI(c) 
-		{
-			events.Reset();
-			events.ScheduleEvent(EVENT_CLEARWATER_ANNOUNCE, 1000, 1, 0);
-			finished = false;
-			preWarning = false;
-			startWarning = false;
-			finishWarning = false;
-		}
+    struct npc_elder_clearwaterAI : public ScriptedAI
+    {
+        npc_elder_clearwaterAI(Creature *c) : ScriptedAI(c) 
+        {
+            events.Reset();
+            events.ScheduleEvent(EVENT_CLEARWATER_ANNOUNCE, 1000, 1, 0);
+            finished = false;
+            preWarning = false;
+            startWarning = false;
+            finishWarning = false;
+        }
 
-		EventMap events;
-		bool finished;
-		bool preWarning;
-		bool startWarning;
-		bool finishWarning;
+        EventMap events;
+        bool finished;
+        bool preWarning;
+        bool startWarning;
+        bool finishWarning;
 
-		uint32 GetData(uint32 type) const
-		{
-			if (type == DATA_DERBY_FINISHED)
-				return (uint32)finished;
+        uint32 GetData(uint32 type) const
+        {
+            if (type == DATA_DERBY_FINISHED)
+                return (uint32)finished;
 
-			return 0;
-		}
+            return 0;
+        }
 
-		void DoAction(int32 param)
-		{
-			if (param == DATA_DERBY_FINISHED)
-				finished = true;
-		}
+        void DoAction(int32 param)
+        {
+            if (param == DATA_DERBY_FINISHED)
+                finished = true;
+        }
 
-		void UpdateAI(uint32 diff)
-		{
-			events.Update(diff);
-			switch (events.GetEvent())
-			{
-				case EVENT_CLEARWATER_ANNOUNCE:
-				{
-					time_t curtime = time(NULL);
-					tm strdate;
-					ACE_OS::localtime_r(&curtime, &strdate);
+        void UpdateAI(uint32 diff)
+        {
+            events.Update(diff);
+            switch (events.GetEvent())
+            {
+                case EVENT_CLEARWATER_ANNOUNCE:
+                {
+                    time_t curtime = time(NULL);
+                    tm strdate;
+                    ACE_OS::localtime_r(&curtime, &strdate);
 
-					if (!preWarning && strdate.tm_hour == 13 && strdate.tm_min == 55)
-					{
-						sCreatureTextMgr->SendChat(me, CLEARWATER_SAY_PRE, 0, CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, TEXT_RANGE_MAP);
-						preWarning = true;
-					}
-					if (!startWarning && strdate.tm_hour == 14 && strdate.tm_min == 0)
-					{
-						sCreatureTextMgr->SendChat(me, CLEARWATER_SAY_START, 0, CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, TEXT_RANGE_MAP);
-						startWarning = true;
-					}
-					if (!finishWarning && strdate.tm_hour == 15 && strdate.tm_min == 0)
-					{
-						sCreatureTextMgr->SendChat(me, CLEARWATER_SAY_END, 0, CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, TEXT_RANGE_MAP);
-						finishWarning = true;
-						// no one won - despawn
-						if (!finished)
-						{
-							me->DespawnOrUnsummon();
-							events.PopEvent();
-							break;
-						}
-					}
+                    if (!preWarning && strdate.tm_hour == 13 && strdate.tm_min == 55)
+                    {
+                        sCreatureTextMgr->SendChat(me, CLEARWATER_SAY_PRE, 0, CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, TEXT_RANGE_MAP);
+                        preWarning = true;
+                    }
+                    if (!startWarning && strdate.tm_hour == 14 && strdate.tm_min == 0)
+                    {
+                        sCreatureTextMgr->SendChat(me, CLEARWATER_SAY_START, 0, CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, TEXT_RANGE_MAP);
+                        startWarning = true;
+                    }
+                    if (!finishWarning && strdate.tm_hour == 15 && strdate.tm_min == 0)
+                    {
+                        sCreatureTextMgr->SendChat(me, CLEARWATER_SAY_END, 0, CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, TEXT_RANGE_MAP);
+                        finishWarning = true;
+                        // no one won - despawn
+                        if (!finished)
+                        {
+                            me->DespawnOrUnsummon();
+                            events.PopEvent();
+                            break;
+                        }
+                    }
 
-					events.RepeatEvent(1000);
-					break;
-				}
-			}
-		}
-	};
+                    events.RepeatEvent(1000);
+                    break;
+                }
+            }
+        }
+    };
 
-	bool OnGossipHello(Player* player, Creature* creature)
-	{
-		QuestRelationBounds pObjectQR;
-		QuestRelationBounds pObjectQIR;
+    bool OnGossipHello(Player* player, Creature* creature)
+    {
+        QuestRelationBounds pObjectQR;
+        QuestRelationBounds pObjectQIR;
 
-		// pets also can have quests
-		if (creature)
-		{
-			pObjectQR  = sObjectMgr->GetCreatureQuestRelationBounds(creature->GetEntry());
-			pObjectQIR = sObjectMgr->GetCreatureQuestInvolvedRelationBounds(creature->GetEntry());
-		}
-		else
-			return true;
+        // pets also can have quests
+        if (creature)
+        {
+            pObjectQR  = sObjectMgr->GetCreatureQuestRelationBounds(creature->GetEntry());
+            pObjectQIR = sObjectMgr->GetCreatureQuestInvolvedRelationBounds(creature->GetEntry());
+        }
+        else
+            return true;
 
-		QuestMenu &qm = player->PlayerTalkClass->GetQuestMenu();
-		qm.ClearMenu();
+        QuestMenu &qm = player->PlayerTalkClass->GetQuestMenu();
+        qm.ClearMenu();
 
-		for (QuestRelations::const_iterator i = pObjectQIR.first; i != pObjectQIR.second; ++i)
-		{
-			uint32 quest_id = i->second;
-			Quest const* quest = sObjectMgr->GetQuestTemplate(quest_id);
-			if (!quest)
-				continue;
+        for (QuestRelations::const_iterator i = pObjectQIR.first; i != pObjectQIR.second; ++i)
+        {
+            uint32 quest_id = i->second;
+            Quest const* quest = sObjectMgr->GetQuestTemplate(quest_id);
+            if (!quest)
+                continue;
 
-			if (!creature->AI()->GetData(DATA_DERBY_FINISHED))
-			{
-				if (quest_id == QUEST_FISHING_DERBY)
-					player->PlayerTalkClass->SendQuestGiverRequestItems(quest, creature->GetGUID(), player->CanRewardQuest(quest, false), true);
-			}
-			else
-			{
-				if (quest_id != QUEST_FISHING_DERBY)
-					player->PlayerTalkClass->SendQuestGiverRequestItems(quest, creature->GetGUID(), player->CanRewardQuest(quest, false), true);
-			}
-		}
+            if (!creature->AI()->GetData(DATA_DERBY_FINISHED))
+            {
+                if (quest_id == QUEST_FISHING_DERBY)
+                    player->PlayerTalkClass->SendQuestGiverRequestItems(quest, creature->GetGUID(), player->CanRewardQuest(quest, false), true);
+            }
+            else
+            {
+                if (quest_id != QUEST_FISHING_DERBY)
+                    player->PlayerTalkClass->SendQuestGiverRequestItems(quest, creature->GetGUID(), player->CanRewardQuest(quest, false), true);
+            }
+        }
 
-		return true;
-	}
+        return true;
+    }
 
-	bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32 opt)
-	{
-		if (!creature->AI()->GetData(DATA_DERBY_FINISHED) && quest->GetQuestId() == QUEST_FISHING_DERBY)
-		{
-			creature->AI()->DoAction(DATA_DERBY_FINISHED);
-			sCreatureTextMgr->SendChat(creature, CLEARWATER_SAY_WINNER, player, CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, TEXT_RANGE_MAP);
-		}
-		return true;
-	}
+    bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32 opt)
+    {
+        if (!creature->AI()->GetData(DATA_DERBY_FINISHED) && quest->GetQuestId() == QUEST_FISHING_DERBY)
+        {
+            creature->AI()->DoAction(DATA_DERBY_FINISHED);
+            sCreatureTextMgr->SendChat(creature, CLEARWATER_SAY_WINNER, player, CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, TEXT_RANGE_MAP);
+        }
+        return true;
+    }
 
 
-	CreatureAI* GetAI(Creature* pCreature) const
-	{
-		return new npc_elder_clearwaterAI (pCreature);
-	}
+    CreatureAI* GetAI(Creature* pCreature) const
+    {
+        return new npc_elder_clearwaterAI (pCreature);
+    }
 };
 
 enum riggleBassbait
 {
-	EVENT_RIGGLE_ANNOUNCE				= 1,
+    EVENT_RIGGLE_ANNOUNCE               = 1,
 
-	RIGGLE_SAY_START					= 0,
-	RIGGLE_SAY_WINNER					= 1,
-	RIGGLE_SAY_END						= 2,
+    RIGGLE_SAY_START                    = 0,
+    RIGGLE_SAY_WINNER                   = 1,
+    RIGGLE_SAY_END                      = 2,
 
-	QUEST_MASTER_ANGLER					= 8193,
+    QUEST_MASTER_ANGLER                 = 8193,
 
-	DATA_ANGLER_FINISHED				= 1,
+    DATA_ANGLER_FINISHED                = 1,
 };
 
 class npc_riggle_bassbait : public CreatureScript
@@ -228,107 +228,107 @@ class npc_riggle_bassbait : public CreatureScript
 public:
     npc_riggle_bassbait() : CreatureScript("npc_riggle_bassbait") { }
 
-	struct npc_riggle_bassbaitAI : public ScriptedAI
-	{
-		npc_riggle_bassbaitAI(Creature *c) : ScriptedAI(c) 
-		{
-			events.Reset();
-			events.ScheduleEvent(EVENT_RIGGLE_ANNOUNCE, 1000, 1, 0);
-			finished = false;
-			startWarning = false;
-			finishWarning = false;
-		}
+    struct npc_riggle_bassbaitAI : public ScriptedAI
+    {
+        npc_riggle_bassbaitAI(Creature *c) : ScriptedAI(c) 
+        {
+            events.Reset();
+            events.ScheduleEvent(EVENT_RIGGLE_ANNOUNCE, 1000, 1, 0);
+            finished = false;
+            startWarning = false;
+            finishWarning = false;
+        }
 
-		EventMap events;
-		bool finished;
-		bool startWarning;
-		bool finishWarning;
+        EventMap events;
+        bool finished;
+        bool startWarning;
+        bool finishWarning;
 
-		uint32 GetData(uint32 type) const
-		{
-			if (type == DATA_ANGLER_FINISHED)
-				return (uint32)finished;
+        uint32 GetData(uint32 type) const
+        {
+            if (type == DATA_ANGLER_FINISHED)
+                return (uint32)finished;
 
-			return 0;
-		}
+            return 0;
+        }
 
-		void DoAction(int32 param)
-		{
-			if (param == DATA_ANGLER_FINISHED)
-				finished = true;
-		}
+        void DoAction(int32 param)
+        {
+            if (param == DATA_ANGLER_FINISHED)
+                finished = true;
+        }
 
-		void UpdateAI(uint32 diff)
-		{
-			events.Update(diff);
-			switch (events.GetEvent())
-			{
-				case EVENT_RIGGLE_ANNOUNCE:
-				{
-					time_t curtime = time(NULL);
-					tm strdate;
-					ACE_OS::localtime_r(&curtime, &strdate);
-					if (!startWarning && strdate.tm_hour == 14 && strdate.tm_min == 0)
-					{
-						sCreatureTextMgr->SendChat(me, RIGGLE_SAY_START, 0, CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, TEXT_RANGE_ZONE);
-						startWarning = true;
-					}
-					if (!finishWarning && strdate.tm_hour == 16 && strdate.tm_min == 0)
-					{
-						sCreatureTextMgr->SendChat(me, RIGGLE_SAY_END, 0, CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, TEXT_RANGE_ZONE);
-						finishWarning = true;
-						// no one won - despawn
-						if (!finished)
-						{
-							me->DespawnOrUnsummon();
-							events.PopEvent();
-							break;
-						}
-					}
+        void UpdateAI(uint32 diff)
+        {
+            events.Update(diff);
+            switch (events.GetEvent())
+            {
+                case EVENT_RIGGLE_ANNOUNCE:
+                {
+                    time_t curtime = time(NULL);
+                    tm strdate;
+                    ACE_OS::localtime_r(&curtime, &strdate);
+                    if (!startWarning && strdate.tm_hour == 14 && strdate.tm_min == 0)
+                    {
+                        sCreatureTextMgr->SendChat(me, RIGGLE_SAY_START, 0, CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, TEXT_RANGE_ZONE);
+                        startWarning = true;
+                    }
+                    if (!finishWarning && strdate.tm_hour == 16 && strdate.tm_min == 0)
+                    {
+                        sCreatureTextMgr->SendChat(me, RIGGLE_SAY_END, 0, CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, TEXT_RANGE_ZONE);
+                        finishWarning = true;
+                        // no one won - despawn
+                        if (!finished)
+                        {
+                            me->DespawnOrUnsummon();
+                            events.PopEvent();
+                            break;
+                        }
+                    }
 
-					events.RepeatEvent(1000);
-					break;
-				}
-			}
-		}
-	};
+                    events.RepeatEvent(1000);
+                    break;
+                }
+            }
+        }
+    };
 
-	bool OnGossipHello(Player* player, Creature* creature)
-	{
-		if (!creature->AI()->GetData(DATA_ANGLER_FINISHED))
+    bool OnGossipHello(Player* player, Creature* creature)
+    {
+        if (!creature->AI()->GetData(DATA_ANGLER_FINISHED))
             player->PrepareQuestMenu(creature->GetGUID());
 
         player->SEND_GOSSIP_MENU(player->GetGossipTextId(creature), creature->GetGUID());
-		return true;
-	}
+        return true;
+    }
 
-	bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32 opt)
-	{
-		if (!creature->AI()->GetData(DATA_ANGLER_FINISHED) && quest->GetQuestId() == QUEST_MASTER_ANGLER)
-		{
-			creature->AI()->DoAction(DATA_ANGLER_FINISHED);
-			sCreatureTextMgr->SendChat(creature, RIGGLE_SAY_WINNER, player, CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, TEXT_RANGE_ZONE);
-		}
-		return true;
-	}
+    bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32 opt)
+    {
+        if (!creature->AI()->GetData(DATA_ANGLER_FINISHED) && quest->GetQuestId() == QUEST_MASTER_ANGLER)
+        {
+            creature->AI()->DoAction(DATA_ANGLER_FINISHED);
+            sCreatureTextMgr->SendChat(creature, RIGGLE_SAY_WINNER, player, CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, TEXT_RANGE_ZONE);
+        }
+        return true;
+    }
 
 
-	CreatureAI* GetAI(Creature* pCreature) const
-	{
-		return new npc_riggle_bassbaitAI (pCreature);
-	}
+    CreatureAI* GetAI(Creature* pCreature) const
+    {
+        return new npc_riggle_bassbaitAI (pCreature);
+    }
 };
 
 enum shortJohnMirthil
 {
-	EVENT_SHORT_JOHN_ACTION				= 1,
-	EVENT_SHORT_JOHN_REMOVE_WARNING		= 2,
-	EVENT_SHORT_JOHN_MOVE_BACK			= 3,
+    EVENT_SHORT_JOHN_ACTION             = 1,
+    EVENT_SHORT_JOHN_REMOVE_WARNING     = 2,
+    EVENT_SHORT_JOHN_MOVE_BACK          = 3,
 
-	SAY_SHORT_JOHN_ANNOUNCE				= 0,
-	SAY_SHORT_JOHN_BATTLE_START			= 1,
+    SAY_SHORT_JOHN_ANNOUNCE             = 0,
+    SAY_SHORT_JOHN_BATTLE_START         = 1,
 
-	SPELL_SUMMON_PIRATE_BOOTY			= 23176
+    SPELL_SUMMON_PIRATE_BOOTY           = 23176
 };
 
 class npc_short_john_mirthil : public CreatureScript
@@ -336,110 +336,110 @@ class npc_short_john_mirthil : public CreatureScript
 public:
     npc_short_john_mirthil() : CreatureScript("npc_short_john_mirthil") { }
 
-	struct npc_short_john_mirthilAI : public NullCreatureAI
-	{
-		npc_short_john_mirthilAI(Creature *c) : NullCreatureAI(c) 
-		{
-			pathPoint = 0;
-			startWarning = false;
-			events.Reset();
-			events.ScheduleEvent(EVENT_SHORT_JOHN_ACTION, 1000);
-		}
+    struct npc_short_john_mirthilAI : public NullCreatureAI
+    {
+        npc_short_john_mirthilAI(Creature *c) : NullCreatureAI(c) 
+        {
+            pathPoint = 0;
+            startWarning = false;
+            events.Reset();
+            events.ScheduleEvent(EVENT_SHORT_JOHN_ACTION, 1000);
+        }
 
-		EventMap events;
-		bool startWarning;
-		uint32 pathPoint;
+        EventMap events;
+        bool startWarning;
+        uint32 pathPoint;
 
-		void StartMovement(bool reverse)
-		{
-			Movement::PointsArray pathPoints;
-			pathPoints.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
-			WaypointPath const* i_path = sWaypointMgr->GetPath(me->GetEntry());
+        void StartMovement(bool reverse)
+        {
+            Movement::PointsArray pathPoints;
+            pathPoints.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
+            WaypointPath const* i_path = sWaypointMgr->GetPath(me->GetEntry());
 
-			if (reverse)
-			{
-				for (uint8 i = 0; i < i_path->size(); ++i)
-				{
-					WaypointData const* node = i_path->at(i_path->size()-1-i);
-					pathPoints.push_back(G3D::Vector3(node->x, node->y, node->z));
-				}
-				float x, y, z, o;
-				me->GetRespawnPosition(x, y, z, &o);
-				pathPoints.push_back(G3D::Vector3(x, y, z));
-			}
-			else
-			{
-				for (uint8 i = 0; i < i_path->size(); ++i)
-				{
-					WaypointData const* node = i_path->at(i);
-					pathPoints.push_back(G3D::Vector3(node->x, node->y, node->z));
-				}
-			}
+            if (reverse)
+            {
+                for (uint8 i = 0; i < i_path->size(); ++i)
+                {
+                    WaypointData const* node = i_path->at(i_path->size()-1-i);
+                    pathPoints.push_back(G3D::Vector3(node->x, node->y, node->z));
+                }
+                float x, y, z, o;
+                me->GetRespawnPosition(x, y, z, &o);
+                pathPoints.push_back(G3D::Vector3(x, y, z));
+            }
+            else
+            {
+                for (uint8 i = 0; i < i_path->size(); ++i)
+                {
+                    WaypointData const* node = i_path->at(i);
+                    pathPoints.push_back(G3D::Vector3(node->x, node->y, node->z));
+                }
+            }
 
-			me->SetWalk(!reverse);
+            me->SetWalk(!reverse);
             me->GetMotionMaster()->MoveSplinePath(&pathPoints);
-		}
+        }
 
-		void MovementInform(uint32 type, uint32 point)
-		{
-			if (type != ESCORT_MOTION_TYPE)
-				return;
+        void MovementInform(uint32 type, uint32 point)
+        {
+            if (type != ESCORT_MOTION_TYPE)
+                return;
 
-			++pathPoint;
-			if (pathPoint == 16)
-				events.ScheduleEvent(EVENT_SHORT_JOHN_MOVE_BACK, 0);
-			else if (pathPoint == 33)
-				CreatureAI::EnterEvadeMode();
-		}
+            ++pathPoint;
+            if (pathPoint == 16)
+                events.ScheduleEvent(EVENT_SHORT_JOHN_MOVE_BACK, 0);
+            else if (pathPoint == 33)
+                CreatureAI::EnterEvadeMode();
+        }
 
-		void UpdateAI(uint32 diff)
-		{
-			events.Update(diff);
-			switch (events.GetEvent())
-			{
-				case EVENT_SHORT_JOHN_ACTION:
-				{
-					time_t curtime = time(NULL);
-					tm strdate;
-					ACE_OS::localtime_r(&curtime, &strdate);
-					if (!startWarning && strdate.tm_hour % 3 == 0 && strdate.tm_min == 0)
-					{
-						sCreatureTextMgr->SendChat(me, SAY_SHORT_JOHN_ANNOUNCE, 0, CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, TEXT_RANGE_ZONE);
-						startWarning = true;
-						events.ScheduleEvent(EVENT_SHORT_JOHN_REMOVE_WARNING, 150000); // 2.5 minutes, to be sure above condition fails
-						me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
+        void UpdateAI(uint32 diff)
+        {
+            events.Update(diff);
+            switch (events.GetEvent())
+            {
+                case EVENT_SHORT_JOHN_ACTION:
+                {
+                    time_t curtime = time(NULL);
+                    tm strdate;
+                    ACE_OS::localtime_r(&curtime, &strdate);
+                    if (!startWarning && strdate.tm_hour % 3 == 0 && strdate.tm_min == 0)
+                    {
+                        sCreatureTextMgr->SendChat(me, SAY_SHORT_JOHN_ANNOUNCE, 0, CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, TEXT_RANGE_ZONE);
+                        startWarning = true;
+                        events.ScheduleEvent(EVENT_SHORT_JOHN_REMOVE_WARNING, 150000); // 2.5 minutes, to be sure above condition fails
+                        me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
 
-						pathPoint = 0;
-						StartMovement(false);
-					}
+                        pathPoint = 0;
+                        StartMovement(false);
+                    }
 
-					events.RepeatEvent(1000);
-					break;
-				}
-				case EVENT_SHORT_JOHN_REMOVE_WARNING:
-					startWarning = false;
-					me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP|UNIT_NPC_FLAG_QUESTGIVER);
-					events.PopEvent();
-					break;
-				case EVENT_SHORT_JOHN_MOVE_BACK:
-					me->CastSpell(me, SPELL_SUMMON_PIRATE_BOOTY, true);
-					sCreatureTextMgr->SendChat(me, SAY_SHORT_JOHN_BATTLE_START, 0, CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, TEXT_RANGE_ZONE);
-					StartMovement(true);
-					events.PopEvent();
-					break;
-			}
-		}
-	};
+                    events.RepeatEvent(1000);
+                    break;
+                }
+                case EVENT_SHORT_JOHN_REMOVE_WARNING:
+                    startWarning = false;
+                    me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP|UNIT_NPC_FLAG_QUESTGIVER);
+                    events.PopEvent();
+                    break;
+                case EVENT_SHORT_JOHN_MOVE_BACK:
+                    me->CastSpell(me, SPELL_SUMMON_PIRATE_BOOTY, true);
+                    sCreatureTextMgr->SendChat(me, SAY_SHORT_JOHN_BATTLE_START, 0, CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, TEXT_RANGE_ZONE);
+                    StartMovement(true);
+                    events.PopEvent();
+                    break;
+            }
+        }
+    };
 
-	CreatureAI* GetAI(Creature* pCreature) const
-	{
-		return new npc_short_john_mirthilAI (pCreature);
-	}
+    CreatureAI* GetAI(Creature* pCreature) const
+    {
+        return new npc_short_john_mirthilAI (pCreature);
+    }
 };
 
 enum eTrainingDummy
 {
-	SPELL_STUN_PERMANENT		= 61204
+    SPELL_STUN_PERMANENT        = 61204
 };
 
 class npc_training_dummy : public CreatureScript
@@ -510,7 +510,7 @@ public:
         npc_target_dummyAI(Creature* creature) : ScriptedAI(creature)
         {
             SetCombatMovement(false);
-			deathTimer = 15000;
+            deathTimer = 15000;
             me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true); //imune to knock aways like blast wave
         }
 
@@ -519,8 +519,8 @@ public:
         void Reset()
         {
             me->SetControlled(true, UNIT_STATE_STUNNED); //disable rotate
-			me->SetLootRecipient(me->GetOwner());
-			me->SelectLevel();
+            me->SetLootRecipient(me->GetOwner());
+            me->SelectLevel();
         }
 
         void EnterEvadeMode()
@@ -538,9 +538,9 @@ public:
 
             if (deathTimer <= diff)
             {
-				me->SetLootRecipient(me->GetOwner());
-				me->LowerPlayerDamageReq(me->GetMaxHealth());
-				Unit::Kill(me, me);
+                me->SetLootRecipient(me->GetOwner());
+                me->LowerPlayerDamageReq(me->GetMaxHealth());
+                Unit::Kill(me, me);
                 deathTimer = 600000;
             }
             else
@@ -1430,7 +1430,7 @@ public:
 
             RunAwayTimer = 5000;
 
-			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
             me->SetStandState(UNIT_STAND_STATE_KNEEL);
             // expect database to have RegenHealth=0
             me->SetHealth(me->CountPctFromMaxHealth(70));
@@ -2656,14 +2656,14 @@ class npc_stable_master : public CreatureScript
 
 void AddSC_npcs_special()
 {
-	// Ours
-	new npc_elder_clearwater();
-	new npc_riggle_bassbait();
-	new npc_short_john_mirthil();
-	new npc_target_dummy();
-	new npc_training_dummy();
+    // Ours
+    new npc_elder_clearwater();
+    new npc_riggle_bassbait();
+    new npc_short_john_mirthil();
+    new npc_target_dummy();
+    new npc_training_dummy();
 
-	// Theirs
+    // Theirs
     new npc_air_force_bots();
     new npc_lunaclaw_spirit();
     new npc_chicken_cluck();

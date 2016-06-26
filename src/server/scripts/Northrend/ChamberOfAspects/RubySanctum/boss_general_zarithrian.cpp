@@ -34,13 +34,13 @@ enum Misc
     EVENT_INTIDMDATING_ROAR         = 2,
     EVENT_SUMMON_ADDS1              = 3,
     EVENT_SUMMON_ADDS2              = 4,
-	EVENT_KILL_TALK					= 5,
+    EVENT_KILL_TALK                 = 5,
 
     // Onyx Flamecaller
     EVENT_BLAST_NOVA                = 6,
     EVENT_LAVA_GOUT                 = 7,
 
-	MAX_PATH_FLAMECALLER_WAYPOINTS	= 12
+    MAX_PATH_FLAMECALLER_WAYPOINTS  = 12
 };
 
 // East
@@ -90,21 +90,21 @@ class boss_general_zarithrian : public CreatureScript
 
             void Reset()
             {
-				BossAI::Reset();
+                BossAI::Reset();
                 if (instance->GetBossState(DATA_SAVIANA_RAGEFIRE) == DONE && instance->GetBossState(DATA_BALTHARUS_THE_WARBORN) == DONE)
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_NOT_SELECTABLE);
             }
 
             void EnterCombat(Unit* who)
             {
-				BossAI::EnterCombat(who);
+                BossAI::EnterCombat(who);
                 Talk(SAY_AGGRO);
 
                 events.ScheduleEvent(EVENT_CLEAVE, 9000);
                 events.ScheduleEvent(EVENT_INTIDMDATING_ROAR, 14000);
                 events.ScheduleEvent(EVENT_SUMMON_ADDS1, 18000);
-				if (Is25ManRaid())
-					events.ScheduleEvent(EVENT_SUMMON_ADDS2, 20000);
+                if (Is25ManRaid())
+                    events.ScheduleEvent(EVENT_SUMMON_ADDS2, 20000);
             }
 
             void JustSummoned(Creature* summon)
@@ -114,17 +114,17 @@ class boss_general_zarithrian : public CreatureScript
 
             void JustDied(Unit* killer)
             {
-				BossAI::JustDied(killer);
+                BossAI::JustDied(killer);
                 Talk(SAY_DEATH);
             }
 
             void KilledUnit(Unit* victim)
             {
                 if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
-				{
+                {
                     Talk(SAY_KILL);
-					events.ScheduleEvent(EVENT_KILL_TALK, 6000);
-				}
+                    events.ScheduleEvent(EVENT_KILL_TALK, 6000);
+                }
             }
 
             void UpdateAI(uint32 diff)
@@ -145,20 +145,20 @@ class boss_general_zarithrian : public CreatureScript
                         if (Creature* stalker2 = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_ZARITHRIAN_SPAWN_STALKER_2)))
                             stalker2->CastSpell(stalker2, SPELL_SUMMON_FLAMECALLER, false);
                         events.ScheduleEvent(EVENT_SUMMON_ADDS1, 40000);
-						break;
+                        break;
                     case EVENT_SUMMON_ADDS2:
                         if (Creature* stalker1 = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_ZARITHRIAN_SPAWN_STALKER_1)))
                             stalker1->CastSpell(stalker1, SPELL_SUMMON_FLAMECALLER, false);
                         if (Creature* stalker2 = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_ZARITHRIAN_SPAWN_STALKER_2)))
                             stalker2->CastSpell(stalker2, SPELL_SUMMON_FLAMECALLER, false);
-						events.ScheduleEvent(EVENT_SUMMON_ADDS2, 40000);
+                        events.ScheduleEvent(EVENT_SUMMON_ADDS2, 40000);
                         break;
                     case EVENT_INTIDMDATING_ROAR:
-						me->CastSpell(me, SPELL_INTIMIDATING_ROAR, false);
+                        me->CastSpell(me, SPELL_INTIMIDATING_ROAR, false);
                         events.ScheduleEvent(EVENT_INTIDMDATING_ROAR, 30000);
-						break;
+                        break;
                     case EVENT_CLEAVE:
-						me->CastSpell(me->GetVictim(), SPELL_CLEAVE_ARMOR, false);
+                        me->CastSpell(me->GetVictim(), SPELL_CLEAVE_ARMOR, false);
                         events.ScheduleEvent(EVENT_CLEAVE, 15000);
                         break;
                 }
@@ -166,11 +166,11 @@ class boss_general_zarithrian : public CreatureScript
                 DoMeleeAttackIfReady();
                 EnterEvadeIfOutOfCombatArea();
             }
-					
-			bool CheckEvadeIfOutOfCombatArea() const
-			{
-				return me->GetPositionX() > 3060.0f;
-			}
+                    
+            bool CheckEvadeIfOutOfCombatArea() const
+            {
+                return me->GetPositionX() > 3060.0f;
+            }
         };
 
         CreatureAI* GetAI(Creature* creature) const
@@ -220,7 +220,7 @@ class npc_onyx_flamecaller : public CreatureScript
             void WaypointReached(uint32 waypointId)
             {
                 if (waypointId == MAX_PATH_FLAMECALLER_WAYPOINTS)
-					me->SetInCombatWithZone();
+                    me->SetInCombatWithZone();
             }
 
             void AddWaypoints()

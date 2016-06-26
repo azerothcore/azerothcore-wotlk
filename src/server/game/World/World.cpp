@@ -106,7 +106,7 @@ World::World()
     m_ShutdownMask = 0;
     m_ShutdownTimer = 0;
     m_gameTime = time(NULL);
-	m_gameMSTime = getMSTime();
+    m_gameMSTime = getMSTime();
     m_startTime = m_gameTime;
     m_maxActiveSessionCount = 0;
     m_maxQueuedSessionCount = 0;
@@ -145,11 +145,11 @@ World::~World()
         m_sessions.erase(m_sessions.begin());
     }
 
-	while (!m_offlineSessions.empty())
-	{
-		delete m_offlineSessions.begin()->second;
-		m_offlineSessions.erase(m_offlineSessions.begin());
-	}
+    while (!m_offlineSessions.empty())
+    {
+        delete m_offlineSessions.begin()->second;
+        m_offlineSessions.erase(m_offlineSessions.begin());
+    }
 
     CliCommandHolder* command = NULL;
     while (cliCmdQueue.next(command))
@@ -228,12 +228,12 @@ WorldSession* World::FindOfflineSession(uint32 id) const
 
 WorldSession* World::FindOfflineSessionForCharacterGUID(uint32 guidLow) const
 {
-	if (m_offlineSessions.empty())
-		return NULL;
-	for (SessionMap::const_iterator itr = m_offlineSessions.begin(); itr != m_offlineSessions.end(); ++itr)
-		if (itr->second->GetGuidLow() == guidLow)
-			return itr->second;
-	return NULL;
+    if (m_offlineSessions.empty())
+        return NULL;
+    for (SessionMap::const_iterator itr = m_offlineSessions.begin(); itr != m_offlineSessions.end(); ++itr)
+        if (itr->second->GetGuidLow() == guidLow)
+            return itr->second;
+    return NULL;
 }
 
 /// Remove a given session
@@ -279,26 +279,26 @@ void World::AddSession_(WorldSession* s)
         if (!RemoveQueuedPlayer(oldSession) && getIntConfig(CONFIG_INTERVAL_DISCONNECT_TOLERANCE))
             m_disconnects[s->GetAccountId()] = time(NULL);
 
-		// pussywizard:
-		if (oldSession->HandleSocketClosed())
-		{
-			// there should be no offline session if current one is logged onto a character
-			SessionMap::iterator iter;
-			if ((iter = m_offlineSessions.find(oldSession->GetAccountId())) != m_offlineSessions.end())
-			{
-				WorldSession* tmp = iter->second;
-				m_offlineSessions.erase(iter);
-				tmp->SetShouldSetOfflineInDB(false);
-				delete tmp;
-			}
-			oldSession->SetOfflineTime(time(NULL));
-			m_offlineSessions[oldSession->GetAccountId()] = oldSession;
-		}
-		else
-		{
-			oldSession->SetShouldSetOfflineInDB(false); // pussywizard: don't set offline in db because new session for that acc is already created
-			delete oldSession;
-		}
+        // pussywizard:
+        if (oldSession->HandleSocketClosed())
+        {
+            // there should be no offline session if current one is logged onto a character
+            SessionMap::iterator iter;
+            if ((iter = m_offlineSessions.find(oldSession->GetAccountId())) != m_offlineSessions.end())
+            {
+                WorldSession* tmp = iter->second;
+                m_offlineSessions.erase(iter);
+                tmp->SetShouldSetOfflineInDB(false);
+                delete tmp;
+            }
+            oldSession->SetOfflineTime(time(NULL));
+            m_offlineSessions[oldSession->GetAccountId()] = oldSession;
+        }
+        else
+        {
+            oldSession->SetShouldSetOfflineInDB(false); // pussywizard: don't set offline in db because new session for that acc is already created
+            delete oldSession;
+        }
     }
 
     m_sessions[s->GetAccountId()] = s;
@@ -427,7 +427,7 @@ void World::LoadConfigSettings(bool reload)
 {
     if (reload)
     {
-		if (!sConfigMgr->Reload())
+        if (!sConfigMgr->Reload())
         {
             sLog->outError("World settings reload fail: can't read settings from %s.", sConfigMgr->GetFilename().c_str());
             return;
@@ -437,8 +437,8 @@ void World::LoadConfigSettings(bool reload)
     }
 
     ///- Read the player limit and the Message of the day from the config file
-	if (!reload)
-		SetPlayerAmountLimit(sConfigMgr->GetIntDefault("PlayerLimit", 100));
+    if (!reload)
+        SetPlayerAmountLimit(sConfigMgr->GetIntDefault("PlayerLimit", 100));
     SetMotd(sConfigMgr->GetStringDefault("Motd", "Welcome to a Sunwell Core Server."));
 
     ///- Read ticket system setting from the config file
@@ -680,8 +680,8 @@ void World::LoadConfigSettings(bool reload)
     m_int_configs[CONFIG_STRICT_CHARTER_NAMES]                = sConfigMgr->GetIntDefault ("StrictCharterNames", 0);
     m_int_configs[CONFIG_STRICT_CHANNEL_NAMES]                = sConfigMgr->GetIntDefault ("StrictChannelNames", 0);
     m_int_configs[CONFIG_STRICT_PET_NAMES]                    = sConfigMgr->GetIntDefault ("StrictPetNames",     0);
-	
-	m_bool_configs[CONFIG_ALLOW_TWO_SIDE_ACCOUNTS]            = sConfigMgr->GetBoolDefault("AllowTwoSide.Accounts", true);
+    
+    m_bool_configs[CONFIG_ALLOW_TWO_SIDE_ACCOUNTS]            = sConfigMgr->GetBoolDefault("AllowTwoSide.Accounts", true);
     m_bool_configs[CONFIG_ALLOW_TWO_SIDE_INTERACTION_CALENDAR]= sConfigMgr->GetBoolDefault("AllowTwoSide.Interaction.Calendar", false);
     m_bool_configs[CONFIG_ALLOW_TWO_SIDE_INTERACTION_CHAT]    = sConfigMgr->GetBoolDefault("AllowTwoSide.Interaction.Chat", false);
     m_bool_configs[CONFIG_ALLOW_TWO_SIDE_INTERACTION_CHANNEL] = sConfigMgr->GetBoolDefault("AllowTwoSide.Interaction.Channel", false);
@@ -863,7 +863,7 @@ void World::LoadConfigSettings(bool reload)
     m_bool_configs[CONFIG_INSTANCE_IGNORE_RAID]  = sConfigMgr->GetBoolDefault("Instance.IgnoreRaid", false);
 
     m_int_configs[CONFIG_INSTANCE_RESET_TIME_HOUR]  = sConfigMgr->GetIntDefault("Instance.ResetTimeHour", 4);
-	m_int_configs[CONFIG_INSTANCE_RESET_TIME_RELATIVE_TIMESTAMP] = sConfigMgr->GetIntDefault("Instance.ResetTimeRelativeTimestamp", 1135814400);
+    m_int_configs[CONFIG_INSTANCE_RESET_TIME_RELATIVE_TIMESTAMP] = sConfigMgr->GetIntDefault("Instance.ResetTimeRelativeTimestamp", 1135814400);
     m_int_configs[CONFIG_INSTANCE_UNLOAD_DELAY] = sConfigMgr->GetIntDefault("Instance.UnloadDelay", 30 * MINUTE * IN_MILLISECONDS);
 
     m_int_configs[CONFIG_MAX_PRIMARY_TRADE_SKILL] = sConfigMgr->GetIntDefault("MaxPrimaryTradeSkill", 2);
@@ -923,12 +923,12 @@ void World::LoadConfigSettings(bool reload)
         m_timers[WUPDATE_CLEANDB].Reset();
     }
 
-	m_int_configs[CONFIG_TELEPORT_TIMEOUT_NEAR] = sConfigMgr->GetIntDefault("TeleportTimeoutNear", 25); // pussywizard
-	m_int_configs[CONFIG_TELEPORT_TIMEOUT_FAR] = sConfigMgr->GetIntDefault("TeleportTimeoutFar", 45); // pussywizard
-	m_int_configs[CONFIG_MAX_ALLOWED_MMR_DROP] = sConfigMgr->GetIntDefault("MaxAllowedMMRDrop", 500); // pussywizard
-	m_bool_configs[CONFIG_ENABLE_LOGIN_AFTER_DC] = sConfigMgr->GetBoolDefault("EnableLoginAfterDC", true); // pussywizard
-	m_bool_configs[CONFIG_DONT_CACHE_RANDOM_MOVEMENT_PATHS] = sConfigMgr->GetBoolDefault("DontCacheRandomMovementPaths", true); // pussywizard
-	SetRealmName(sConfigMgr->GetStringDefault("RealmName", "X"));
+    m_int_configs[CONFIG_TELEPORT_TIMEOUT_NEAR] = sConfigMgr->GetIntDefault("TeleportTimeoutNear", 25); // pussywizard
+    m_int_configs[CONFIG_TELEPORT_TIMEOUT_FAR] = sConfigMgr->GetIntDefault("TeleportTimeoutFar", 45); // pussywizard
+    m_int_configs[CONFIG_MAX_ALLOWED_MMR_DROP] = sConfigMgr->GetIntDefault("MaxAllowedMMRDrop", 500); // pussywizard
+    m_bool_configs[CONFIG_ENABLE_LOGIN_AFTER_DC] = sConfigMgr->GetBoolDefault("EnableLoginAfterDC", true); // pussywizard
+    m_bool_configs[CONFIG_DONT_CACHE_RANDOM_MOVEMENT_PATHS] = sConfigMgr->GetBoolDefault("DontCacheRandomMovementPaths", true); // pussywizard
+    SetRealmName(sConfigMgr->GetStringDefault("RealmName", "X"));
 
     m_int_configs[CONFIG_SKILL_CHANCE_ORANGE] = sConfigMgr->GetIntDefault("SkillChance.Orange", 100);
     m_int_configs[CONFIG_SKILL_CHANCE_YELLOW] = sConfigMgr->GetIntDefault("SkillChance.Yellow", 75);
@@ -1249,8 +1249,8 @@ void World::SetInitialWorldSettings()
     ///- Initialize the random number generator
     srand((unsigned int)time(NULL));
 
-	///- Initialize detour memory management
-	dtAllocSetCustom(dtCustomAlloc, dtCustomFree);
+    ///- Initialize detour memory management
+    dtAllocSetCustom(dtCustomAlloc, dtCustomFree);
 
     ///- Initialize config settings
     LoadConfigSettings();
@@ -1317,10 +1317,10 @@ void World::SetInitialWorldSettings()
     sLog->outString("Loading SpellInfo store...");
     sSpellMgr->LoadSpellInfoStore();
 
-	sLog->outString("Loading Spell Rank Data...");
+    sLog->outString("Loading Spell Rank Data...");
     sSpellMgr->LoadSpellRanks();
 
-	sLog->outString("Loading Spell Specific And Aura State...");
+    sLog->outString("Loading Spell Specific And Aura State...");
     sSpellMgr->LoadSpellSpecificAndAuraState();
 
     sLog->outString("Loading SkillLineAbilityMultiMap Data...");
@@ -1338,8 +1338,8 @@ void World::SetInitialWorldSettings()
     sLog->outString("Loading Instance Template...");
     sObjectMgr->LoadInstanceTemplate();
 
-	// xinef: Global Storage, should be loaded asap
-	sLog->outString("Load Global Player Data...");
+    // xinef: Global Storage, should be loaded asap
+    sLog->outString("Load Global Player Data...");
     sWorld->LoadGlobalPlayerDataStore();
 
     // Must be called before `creature_respawn`/`gameobject_respawn` tables
@@ -1667,18 +1667,18 @@ void World::SetInitialWorldSettings()
     sLog->outString("Loading client addons...");
     AddonMgr::LoadFromDB();
 
-	// pussywizard:
-	sLog->outString("Deleting invalid mail items...\n");
-	CharacterDatabase.Query("DELETE mi FROM mail_items mi LEFT JOIN item_instance ii ON mi.item_guid = ii.guid WHERE ii.guid IS NULL");
-	CharacterDatabase.Query("DELETE mi FROM mail_items mi LEFT JOIN mail m ON mi.mail_id = m.id WHERE m.id IS NULL");
-	CharacterDatabase.Query("UPDATE mail m LEFT JOIN mail_items mi ON m.id = mi.mail_id SET m.has_items=0 WHERE m.has_items<>0 AND mi.mail_id IS NULL");
+    // pussywizard:
+    sLog->outString("Deleting invalid mail items...\n");
+    CharacterDatabase.Query("DELETE mi FROM mail_items mi LEFT JOIN item_instance ii ON mi.item_guid = ii.guid WHERE ii.guid IS NULL");
+    CharacterDatabase.Query("DELETE mi FROM mail_items mi LEFT JOIN mail m ON mi.mail_id = m.id WHERE m.id IS NULL");
+    CharacterDatabase.Query("UPDATE mail m LEFT JOIN mail_items mi ON m.id = mi.mail_id SET m.has_items=0 WHERE m.has_items<>0 AND mi.mail_id IS NULL");
 
     ///- Handle outdated emails (delete/return)
     sLog->outString("Returning old mails...");
     sObjectMgr->ReturnOrDeleteOldMails(false);
-	
-	///- Load AutoBroadCast 
-	sLog->outString("Loading Autobroadcasts...");
+    
+    ///- Load AutoBroadCast 
+    sLog->outString("Loading Autobroadcasts...");
     LoadAutobroadcasts();
 
     ///- Load and initialize scripts
@@ -1711,8 +1711,8 @@ void World::SetInitialWorldSettings()
     sLog->outString("Loading Calendar data...");
     sCalendarMgr->LoadFromDB();
 
-	sLog->outString("Initializing SpellInfo precomputed data..."); // must be called after loading items, professions, spells and pretty much anything
-	sObjectMgr->InitializeSpellInfoPrecomputedData();
+    sLog->outString("Initializing SpellInfo precomputed data..."); // must be called after loading items, professions, spells and pretty much anything
+    sObjectMgr->InitializeSpellInfoPrecomputedData();
 
     ///- Initialize game time and timers
     sLog->outString("Initialize game time and timers");
@@ -1733,10 +1733,10 @@ void World::SetInitialWorldSettings()
 
     m_timers[WUPDATE_PINGDB].SetInterval(getIntConfig(CONFIG_DB_PING_INTERVAL)*MINUTE*IN_MILLISECONDS);    // Mysql ping time in minutes
 
-	// our speed up
-	m_timers[WUPDATE_5_SECS].SetInterval(5*IN_MILLISECONDS);
+    // our speed up
+    m_timers[WUPDATE_5_SECS].SetInterval(5*IN_MILLISECONDS);
 
-	mail_expire_check_timer = time(NULL) + 6*3600;
+    mail_expire_check_timer = time(NULL) + 6*3600;
 
     ///- Initilize static helper structures
     AIRegistry::Initialize();
@@ -1801,30 +1801,30 @@ void World::SetInitialWorldSettings()
     sLog->outString("Calculate Guild cap reset time...");
     InitGuildResetTime();
 
-	sLog->outString("Load Petitions...");
-	sPetitionMgr->LoadPetitions();
+    sLog->outString("Load Petitions...");
+    sPetitionMgr->LoadPetitions();
 
-	sLog->outString("Load Petition Signs...");
-	sPetitionMgr->LoadSignatures();
+    sLog->outString("Load Petition Signs...");
+    sPetitionMgr->LoadSignatures();
 
-	sLog->outString("Load Stored Loot Items...");
-	sLootItemStorage->LoadStorageFromDB();
+    sLog->outString("Load Stored Loot Items...");
+    sLootItemStorage->LoadStorageFromDB();
 
-	sLog->outString("Load Channel Rights...");
-	ChannelMgr::LoadChannelRights();
+    sLog->outString("Load Channel Rights...");
+    ChannelMgr::LoadChannelRights();
 
-	sLog->outString("Load Channels...");
-	ChannelMgr* mgr = ChannelMgr::forTeam(TEAM_ALLIANCE);
-	mgr->LoadChannels();
-	mgr = ChannelMgr::forTeam(TEAM_HORDE);
-	mgr->LoadChannels();
+    sLog->outString("Load Channels...");
+    ChannelMgr* mgr = ChannelMgr::forTeam(TEAM_ALLIANCE);
+    mgr->LoadChannels();
+    mgr = ChannelMgr::forTeam(TEAM_HORDE);
+    mgr->LoadChannels();
 
     uint32 startupDuration = GetMSTimeDiffToNow(startupBegin);
     sLog->outString();
     sLog->outError("WORLD: World initialized in %u minutes %u seconds", (startupDuration / 60000), ((startupDuration % 60000) / 1000));
     sLog->outString();
 
-	// possibly enable db logging; avoid massive startup spam by doing it here.
+    // possibly enable db logging; avoid massive startup spam by doing it here.
     if (sConfigMgr->GetBoolDefault("EnableLogDB", false))
     {
         sLog->outString("Enabling database logging...");
@@ -1895,7 +1895,7 @@ void World::LoadAutobroadcasts()
 /// Update the World !
 void World::Update(uint32 diff)
 {
-	m_updateTime = diff;
+    m_updateTime = diff;
 
     if (m_int_configs[CONFIG_INTERVAL_LOG_UPDATE])
     {
@@ -1907,7 +1907,7 @@ void World::Update(uint32 diff)
         }
     }
 
-	DynamicVisibilityMgr::Update(GetActiveSessionCount());
+    DynamicVisibilityMgr::Update(GetActiveSessionCount());
 
     ///- Update the different timers
     for (int i = 0; i < WUPDATE_COUNT; ++i)
@@ -1918,18 +1918,18 @@ void World::Update(uint32 diff)
             m_timers[i].SetCurrent(0);
     }
 
-	// pussywizard: our speed up and functionality
-	if (m_timers[WUPDATE_5_SECS].Passed())
-	{
-		m_timers[WUPDATE_5_SECS].Reset();
+    // pussywizard: our speed up and functionality
+    if (m_timers[WUPDATE_5_SECS].Passed())
+    {
+        m_timers[WUPDATE_5_SECS].Reset();
 
-		// moved here from HandleCharEnumOpcode
-		PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_EXPIRED_BANS);
-		CharacterDatabase.Execute(stmt);
+        // moved here from HandleCharEnumOpcode
+        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_EXPIRED_BANS);
+        CharacterDatabase.Execute(stmt);
 
-		// copy players hashmapholder to avoid mutex
-		WhoListCacheMgr::Update();
-	}
+        // copy players hashmapholder to avoid mutex
+        WhoListCacheMgr::Update();
+    }
 
     ///- Update the game time and check for shutdown time
     _UpdateGameTime();
@@ -1952,34 +1952,34 @@ void World::Update(uint32 diff)
     if (m_gameTime > m_NextGuildReset)
         ResetGuildCap();
 
-	// pussywizard:
-	// acquire mutex now, this is kind of waiting for listing thread to finish it's work (since it can't process next packet)
-	// so we don't have to do it in every packet that modifies auctions
-	AsyncAuctionListingMgr::SetAuctionListingAllowed(false);
-	{
-		TRINITY_GUARD(ACE_Thread_Mutex, AsyncAuctionListingMgr::GetLock()); 
+    // pussywizard:
+    // acquire mutex now, this is kind of waiting for listing thread to finish it's work (since it can't process next packet)
+    // so we don't have to do it in every packet that modifies auctions
+    AsyncAuctionListingMgr::SetAuctionListingAllowed(false);
+    {
+        TRINITY_GUARD(ACE_Thread_Mutex, AsyncAuctionListingMgr::GetLock()); 
 
-		// pussywizard: handle auctions when the timer has passed
-		if (m_timers[WUPDATE_AUCTIONS].Passed())
-		{
-			m_timers[WUPDATE_AUCTIONS].Reset();
+        // pussywizard: handle auctions when the timer has passed
+        if (m_timers[WUPDATE_AUCTIONS].Passed())
+        {
+            m_timers[WUPDATE_AUCTIONS].Reset();
 
-			// pussywizard: handle expired auctions, auctions expired when realm was offline are also handled here (not during loading when many required things aren't loaded yet)
-			sAuctionMgr->Update();
-		}
+            // pussywizard: handle expired auctions, auctions expired when realm was offline are also handled here (not during loading when many required things aren't loaded yet)
+            sAuctionMgr->Update();
+        }
 
-		AsyncAuctionListingMgr::Update(diff);
+        AsyncAuctionListingMgr::Update(diff);
 
-		if (m_gameTime > mail_expire_check_timer)
-		{
-			sObjectMgr->ReturnOrDeleteOldMails(true);
-			mail_expire_check_timer = m_gameTime + 6*3600;
-		}
+        if (m_gameTime > mail_expire_check_timer)
+        {
+            sObjectMgr->ReturnOrDeleteOldMails(true);
+            mail_expire_check_timer = m_gameTime + 6*3600;
+        }
 
-		UpdateSessions(diff);
-	} 
-	// end of section with mutex
-	AsyncAuctionListingMgr::SetAuctionListingAllowed(true);
+        UpdateSessions(diff);
+    } 
+    // end of section with mutex
+    AsyncAuctionListingMgr::SetAuctionListingAllowed(true);
 
     /// <li> Handle weather updates when the timer has passed
     if (m_timers[WUPDATE_WEATHERS].Passed())
@@ -1988,7 +1988,7 @@ void World::Update(uint32 diff)
         WeatherMgr::Update(uint32(m_timers[WUPDATE_WEATHERS].GetInterval()));
     }
 
-	sLFGMgr->Update(diff, 0); // pussywizard: remove obsolete stuff before finding compatibility during map update
+    sLFGMgr->Update(diff, 0); // pussywizard: remove obsolete stuff before finding compatibility during map update
 
     sMapMgr->Update(diff);
 
@@ -2046,7 +2046,7 @@ void World::Update(uint32 diff)
 
     sScriptMgr->OnWorldUpdate(diff);
 
-	SavingSystemMgr::Update(diff);
+    SavingSystemMgr::Update(diff);
 }
 
 void World::ForceGameEventUpdate()
@@ -2305,12 +2305,12 @@ BanReturn World::BanAccount(BanMode mode, std::string const& nameOrIP, std::stri
 
         if (mode != BAN_IP)
         {
-			// pussywizard: check existing ban to prevent overriding by a shorter one! >_>
-			PreparedStatement* stmtx = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_BANNED);
-			stmtx->setUInt32(0, account);
-			PreparedQueryResult banresultx = LoginDatabase.Query(stmtx);
-			if (banresultx && ((*banresultx)[0].GetUInt32() == (*banresultx)[1].GetUInt32() || ((*banresultx)[1].GetUInt32() > time(NULL)+duration_secs && duration_secs)))
-				return BAN_LONGER_EXISTS;
+            // pussywizard: check existing ban to prevent overriding by a shorter one! >_>
+            PreparedStatement* stmtx = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_BANNED);
+            stmtx->setUInt32(0, account);
+            PreparedQueryResult banresultx = LoginDatabase.Query(stmtx);
+            if (banresultx && ((*banresultx)[0].GetUInt32() == (*banresultx)[1].GetUInt32() || ((*banresultx)[1].GetUInt32() > time(NULL)+duration_secs && duration_secs)))
+                return BAN_LONGER_EXISTS;
 
             // make sure there is only one active ban
             stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_NOT_BANNED);
@@ -2378,9 +2378,9 @@ BanReturn World::BanCharacter(std::string const& name, std::string const& durati
     /// Pick a player to ban if not online
     if (!pBanned)
     {
-		guid = sWorld->GetGlobalPlayerGUID(name);
-		if (!guid)
-			return BAN_NOTFOUND;
+        guid = sWorld->GetGlobalPlayerGUID(name);
+        if (!guid)
+            return BAN_NOTFOUND;
     }
     else
         guid = pBanned->GetGUIDLow();
@@ -2411,7 +2411,7 @@ bool World::RemoveBanCharacter(std::string const& name)
 
     /// Pick a player to ban if not online
     if (!pBanned)
-		guid = sWorld->GetGlobalPlayerGUID(name);
+        guid = sWorld->GetGlobalPlayerGUID(name);
     else
         guid = pBanned->GetGUIDLow();
 
@@ -2431,7 +2431,7 @@ void World::_UpdateGameTime()
     time_t thisTime = time(NULL);
     uint32 elapsed = uint32(thisTime - m_gameTime);
     m_gameTime = thisTime;
-	m_gameMSTime = getMSTime();
+    m_gameMSTime = getMSTime();
 
     ///- if there is a shutdown timer
     if (!IsStopped() && m_ShutdownTimer > 0 && elapsed > 0)
@@ -2556,54 +2556,54 @@ void World::UpdateSessions(uint32 diff)
         WorldSession* pSession = itr->second;
         WorldSessionFilter updater(pSession);
 
-		// pussywizard:
-		if (pSession->HandleSocketClosed())
-		{
+        // pussywizard:
+        if (pSession->HandleSocketClosed())
+        {
             if (!RemoveQueuedPlayer(pSession) && getIntConfig(CONFIG_INTERVAL_DISCONNECT_TOLERANCE))
                 m_disconnects[pSession->GetAccountId()] = time(NULL);
             m_sessions.erase(itr);
-			// there should be no offline session if current one is logged onto a character
-			SessionMap::iterator iter;
-			if ((iter = m_offlineSessions.find(pSession->GetAccountId())) != m_offlineSessions.end())
-			{
-				WorldSession* tmp = iter->second;
-				m_offlineSessions.erase(iter);
-				tmp->SetShouldSetOfflineInDB(false);
-				delete tmp;
-			}
-			pSession->SetOfflineTime(time(NULL));
-			m_offlineSessions[pSession->GetAccountId()] = pSession;
-			continue;
-		}
+            // there should be no offline session if current one is logged onto a character
+            SessionMap::iterator iter;
+            if ((iter = m_offlineSessions.find(pSession->GetAccountId())) != m_offlineSessions.end())
+            {
+                WorldSession* tmp = iter->second;
+                m_offlineSessions.erase(iter);
+                tmp->SetShouldSetOfflineInDB(false);
+                delete tmp;
+            }
+            pSession->SetOfflineTime(time(NULL));
+            m_offlineSessions[pSession->GetAccountId()] = pSession;
+            continue;
+        }
 
         if (!pSession->Update(diff, updater))
         {
             if (!RemoveQueuedPlayer(pSession) && getIntConfig(CONFIG_INTERVAL_DISCONNECT_TOLERANCE))
                 m_disconnects[pSession->GetAccountId()] = time(NULL);
             m_sessions.erase(itr);
-			if (m_offlineSessions.find(pSession->GetAccountId()) != m_offlineSessions.end()) // pussywizard: don't set offline in db because offline session for that acc is present (character is in world)
-				pSession->SetShouldSetOfflineInDB(false);
+            if (m_offlineSessions.find(pSession->GetAccountId()) != m_offlineSessions.end()) // pussywizard: don't set offline in db because offline session for that acc is present (character is in world)
+                pSession->SetShouldSetOfflineInDB(false);
             delete pSession;
         }
     }
 
-	// pussywizard:
-	if (m_offlineSessions.empty())
-		return;
-	uint32 currTime = time(NULL);
-	for (SessionMap::iterator itr = m_offlineSessions.begin(), next; itr != m_offlineSessions.end(); itr = next)
-	{
+    // pussywizard:
+    if (m_offlineSessions.empty())
+        return;
+    uint32 currTime = time(NULL);
+    for (SessionMap::iterator itr = m_offlineSessions.begin(), next; itr != m_offlineSessions.end(); itr = next)
+    {
         next = itr;
         ++next;
-		WorldSession* pSession = itr->second;
-		if (!pSession->GetPlayer() || pSession->GetOfflineTime()+60 < currTime || pSession->IsKicked())
-		{
-			m_offlineSessions.erase(itr);
-			if (m_sessions.find(pSession->GetAccountId()) != m_sessions.end())
-				pSession->SetShouldSetOfflineInDB(false); // pussywizard: don't set offline in db because new session for that acc is already created
-			delete pSession;
-		}
-	}
+        WorldSession* pSession = itr->second;
+        if (!pSession->GetPlayer() || pSession->GetOfflineTime()+60 < currTime || pSession->IsKicked())
+        {
+            m_offlineSessions.erase(itr);
+            if (m_sessions.find(pSession->GetAccountId()) != m_sessions.end())
+                pSession->SetShouldSetOfflineInDB(false); // pussywizard: don't set offline in db because new session for that acc is already created
+            delete pSession;
+        }
+    }
 }
 
 // This handles the issued and queued CLI commands
@@ -2629,8 +2629,8 @@ void World::SendAutoBroadcast()
 {
     if (m_Autobroadcasts.empty())
         return;
-	
-	uint32 weight = 0;
+    
+    uint32 weight = 0;
     AutobroadcastsWeightMap selectionWeights;
 
     std::string msg;
@@ -2721,46 +2721,46 @@ void World::_UpdateRealmCharCount(PreparedQueryResult resultCharCount)
 // int8 dayOfWeek: 0 (sunday) to 6 (saturday)
 time_t World::GetNextTimeWithDayAndHour(int8 dayOfWeek, int8 hour)
 {
-	if (hour < 0 || hour > 23)
-		hour = 0;
-	time_t curr = time(NULL);
-	tm localTm;
-	ACE_OS::localtime_r(&curr, &localTm);
-	localTm.tm_hour = hour;
-	localTm.tm_min  = 0;
-	localTm.tm_sec  = 0;
-	uint32 add;
-	if (dayOfWeek < 0 || dayOfWeek > 6)
-		dayOfWeek = (localTm.tm_wday+1)%7;
-	if (localTm.tm_wday >= dayOfWeek)
-		add = (7 - (localTm.tm_wday - dayOfWeek)) * DAY;
-	else
-		add = (dayOfWeek - localTm.tm_wday) * DAY;
-	return mktime(&localTm) + add;
+    if (hour < 0 || hour > 23)
+        hour = 0;
+    time_t curr = time(NULL);
+    tm localTm;
+    ACE_OS::localtime_r(&curr, &localTm);
+    localTm.tm_hour = hour;
+    localTm.tm_min  = 0;
+    localTm.tm_sec  = 0;
+    uint32 add;
+    if (dayOfWeek < 0 || dayOfWeek > 6)
+        dayOfWeek = (localTm.tm_wday+1)%7;
+    if (localTm.tm_wday >= dayOfWeek)
+        add = (7 - (localTm.tm_wday - dayOfWeek)) * DAY;
+    else
+        add = (dayOfWeek - localTm.tm_wday) * DAY;
+    return mktime(&localTm) + add;
 }
 
 // int8 month: 0 (january) to 11 (december)
 time_t World::GetNextTimeWithMonthAndHour(int8 month, int8 hour)
 {
-	if (hour < 0 || hour > 23)
-		hour = 0;
-	time_t curr = time(NULL);
-	tm localTm;
-	ACE_OS::localtime_r(&curr, &localTm);
-	localTm.tm_mday = 1;
-	localTm.tm_hour = hour;
-	localTm.tm_min  = 0;
-	localTm.tm_sec  = 0;
-	if (month < 0 || month > 11)
-	{
-		month = (localTm.tm_mon+1)%12;
-		if (month == 0)
-			localTm.tm_year += 1;
-	}
-	else if (localTm.tm_mon >= month)
-		localTm.tm_year += 1;
-	localTm.tm_mon = month;
-	return mktime(&localTm);
+    if (hour < 0 || hour > 23)
+        hour = 0;
+    time_t curr = time(NULL);
+    tm localTm;
+    ACE_OS::localtime_r(&curr, &localTm);
+    localTm.tm_mday = 1;
+    localTm.tm_hour = hour;
+    localTm.tm_min  = 0;
+    localTm.tm_sec  = 0;
+    if (month < 0 || month > 11)
+    {
+        month = (localTm.tm_mon+1)%12;
+        if (month == 0)
+            localTm.tm_year += 1;
+    }
+    else if (localTm.tm_mon >= month)
+        localTm.tm_year += 1;
+    localTm.tm_mon = month;
+    return mktime(&localTm);
 }
 
 void World::InitWeeklyQuestResetTime()
@@ -3031,40 +3031,40 @@ void World::LoadGlobalPlayerDataStore()
 
     uint32 count = 0;
 
-	// query to load number of mails by receiver
-	std::map<uint32, uint16> _mailCountMap;
-	QueryResult mailCountResult = CharacterDatabase.Query("SELECT receiver, COUNT(receiver) FROM mail GROUP BY receiver");
-	if (mailCountResult)
-	{
-		do
-		{
-			Field* fields = mailCountResult->Fetch();
-			_mailCountMap[fields[0].GetUInt32()] = uint16(fields[1].GetUInt64());
-		}
-		while (mailCountResult->NextRow());
-	}
+    // query to load number of mails by receiver
+    std::map<uint32, uint16> _mailCountMap;
+    QueryResult mailCountResult = CharacterDatabase.Query("SELECT receiver, COUNT(receiver) FROM mail GROUP BY receiver");
+    if (mailCountResult)
+    {
+        do
+        {
+            Field* fields = mailCountResult->Fetch();
+            _mailCountMap[fields[0].GetUInt32()] = uint16(fields[1].GetUInt64());
+        }
+        while (mailCountResult->NextRow());
+    }
 
     do
     {
         Field* fields = result->Fetch();
-		uint32 guidLow = fields[0].GetUInt32();
+        uint32 guidLow = fields[0].GetUInt32();
 
-		// count mails
-		uint16 mailCount = 0;
-		std::map<uint32, uint16>::const_iterator itr = _mailCountMap.find(guidLow);
-		if (itr != _mailCountMap.end())
-			mailCount = itr->second;
+        // count mails
+        uint16 mailCount = 0;
+        std::map<uint32, uint16>::const_iterator itr = _mailCountMap.find(guidLow);
+        if (itr != _mailCountMap.end())
+            mailCount = itr->second;
 
-		AddGlobalPlayerData(
-			guidLow,               /*guid*/
-			fields[1].GetUInt32(), /*accountId*/
-			fields[2].GetString(), /*name*/
+        AddGlobalPlayerData(
+            guidLow,               /*guid*/
+            fields[1].GetUInt32(), /*accountId*/
+            fields[2].GetString(), /*name*/
             fields[3].GetUInt8(),  /*gender*/
-			fields[4].GetUInt8(),  /*race*/
-			fields[5].GetUInt8(),  /*class*/
-			fields[6].GetUInt8(),  /*level*/
-			mailCount,             /*mail count*/
-			0                      /*guild id*/);
+            fields[4].GetUInt8(),  /*race*/
+            fields[5].GetUInt8(),  /*class*/
+            fields[6].GetUInt8(),  /*level*/
+            mailCount,             /*mail count*/
+            0                      /*guild id*/);
 
         ++count;
     }
@@ -3076,42 +3076,42 @@ void World::LoadGlobalPlayerDataStore()
 
 void World::AddGlobalPlayerData(uint32 guid, uint32 accountId, std::string const& name, uint8 gender, uint8 race, uint8 playerClass, uint8 level, uint16 mailCount, uint32 guildId)
 {
-	GlobalPlayerData data;
+    GlobalPlayerData data;
 
-	data.guidLow = guid;
-	data.accountId = accountId;
-	data.name = name;
-	data.level = level;
+    data.guidLow = guid;
+    data.accountId = accountId;
+    data.name = name;
+    data.level = level;
     data.race = race;
-	data.playerClass = playerClass;
-	data.gender = gender;
-	data.mailCount = mailCount;
-	data.guildId = guildId;
-	data.groupId = 0;
-	data.arenaTeamId[0] = 0;
-	data.arenaTeamId[1] = 0;
-	data.arenaTeamId[2] = 0;
+    data.playerClass = playerClass;
+    data.gender = gender;
+    data.mailCount = mailCount;
+    data.guildId = guildId;
+    data.groupId = 0;
+    data.arenaTeamId[0] = 0;
+    data.arenaTeamId[1] = 0;
+    data.arenaTeamId[2] = 0;
 
-	_globalPlayerDataStore[guid] = data;
-	_globalPlayerNameStore[name] = guid;
+    _globalPlayerDataStore[guid] = data;
+    _globalPlayerNameStore[name] = guid;
 }
 
 void World::UpdateGlobalPlayerData(uint32 guid, uint8 mask, std::string const& name, uint8 level, uint8 gender, uint8 race, uint8 playerClass)
 {
-	GlobalPlayerDataMap::iterator itr = _globalPlayerDataStore.find(guid);
+    GlobalPlayerDataMap::iterator itr = _globalPlayerDataStore.find(guid);
     if (itr == _globalPlayerDataStore.end())
         return;
 
-	if (mask & PLAYER_UPDATE_DATA_LEVEL)
-		itr->second.level = level;
-	if (mask & PLAYER_UPDATE_DATA_RACE)
-		itr->second.race = race;
-	if (mask & PLAYER_UPDATE_DATA_CLASS)
-		itr->second.playerClass = playerClass;
-	if (mask & PLAYER_UPDATE_DATA_GENDER)
-		itr->second.gender = gender;
-	if (mask & PLAYER_UPDATE_DATA_NAME)
-		itr->second.name = name;
+    if (mask & PLAYER_UPDATE_DATA_LEVEL)
+        itr->second.level = level;
+    if (mask & PLAYER_UPDATE_DATA_RACE)
+        itr->second.race = race;
+    if (mask & PLAYER_UPDATE_DATA_CLASS)
+        itr->second.playerClass = playerClass;
+    if (mask & PLAYER_UPDATE_DATA_GENDER)
+        itr->second.gender = gender;
+    if (mask & PLAYER_UPDATE_DATA_NAME)
+        itr->second.name = name;
 
     WorldPacket data(SMSG_INVALIDATE_PLAYER, 8);
     data << MAKE_NEW_GUID(guid, 0, HIGHGUID_PLAYER);
@@ -3120,74 +3120,74 @@ void World::UpdateGlobalPlayerData(uint32 guid, uint8 mask, std::string const& n
 
 void World::UpdateGlobalPlayerMails(uint32 guid, int16 count, bool add)
 {
-	GlobalPlayerDataMap::iterator itr = _globalPlayerDataStore.find(guid);
+    GlobalPlayerDataMap::iterator itr = _globalPlayerDataStore.find(guid);
     if (itr == _globalPlayerDataStore.end())
         return;
 
-	if (!add)
-	{
-		itr->second.mailCount = count;
-		return;
-	}
+    if (!add)
+    {
+        itr->second.mailCount = count;
+        return;
+    }
 
-	int16 icount = (int16)itr->second.mailCount;
-	if (count < 0 && abs(count) > icount)
-		count = -icount;
-	itr->second.mailCount = uint16(icount + count); // addition or subtraction
+    int16 icount = (int16)itr->second.mailCount;
+    if (count < 0 && abs(count) > icount)
+        count = -icount;
+    itr->second.mailCount = uint16(icount + count); // addition or subtraction
 }
 
 void World::UpdateGlobalPlayerGuild(uint32 guid, uint32 guildId)
 {
-	GlobalPlayerDataMap::iterator itr = _globalPlayerDataStore.find(guid);
+    GlobalPlayerDataMap::iterator itr = _globalPlayerDataStore.find(guid);
     if (itr == _globalPlayerDataStore.end())
         return;
 
-	itr->second.guildId = guildId;
+    itr->second.guildId = guildId;
 }
 void World::UpdateGlobalPlayerGroup(uint32 guid, uint32 groupId)
 {
-	GlobalPlayerDataMap::iterator itr = _globalPlayerDataStore.find(guid);
+    GlobalPlayerDataMap::iterator itr = _globalPlayerDataStore.find(guid);
     if (itr == _globalPlayerDataStore.end())
         return;
 
-	itr->second.groupId = groupId;
+    itr->second.groupId = groupId;
 }
 
 void World::UpdateGlobalPlayerArenaTeam(uint32 guid, uint8 slot, uint32 arenaTeamId)
 {
-	GlobalPlayerDataMap::iterator itr = _globalPlayerDataStore.find(guid);
+    GlobalPlayerDataMap::iterator itr = _globalPlayerDataStore.find(guid);
     if (itr == _globalPlayerDataStore.end())
         return;
 
-	itr->second.arenaTeamId[slot] = arenaTeamId;
+    itr->second.arenaTeamId[slot] = arenaTeamId;
 }
 
 void World::UpdateGlobalNameData(uint32 guidLow, std::string const& oldName, std::string const& newName)
 {
-	_globalPlayerNameStore.erase(oldName);
-	_globalPlayerNameStore[newName] = guidLow;
+    _globalPlayerNameStore.erase(oldName);
+    _globalPlayerNameStore[newName] = guidLow;
 }
 
 void World::DeleteGlobalPlayerData(uint32 guid, std::string const& name)
 {
-	if (guid)
-		_globalPlayerDataStore.erase(guid);
-	if (!name.empty())
-		_globalPlayerNameStore.erase(name);
+    if (guid)
+        _globalPlayerDataStore.erase(guid);
+    if (!name.empty())
+        _globalPlayerNameStore.erase(name);
 }
 
 GlobalPlayerData const* World::GetGlobalPlayerData(uint32 guid) const
 {
-	GlobalPlayerDataMap::const_iterator itr = _globalPlayerDataStore.find(guid);
-	if (itr != _globalPlayerDataStore.end())
-		return &itr->second;
-	return NULL;
+    GlobalPlayerDataMap::const_iterator itr = _globalPlayerDataStore.find(guid);
+    if (itr != _globalPlayerDataStore.end())
+        return &itr->second;
+    return NULL;
 }
 
 uint32 World::GetGlobalPlayerGUID(std::string const& name) const
 {
-	GlobalPlayerNameMap::const_iterator itr = _globalPlayerNameStore.find(name);
-	if (itr != _globalPlayerNameStore.end())
-		return itr->second;
-	return 0;
+    GlobalPlayerNameMap::const_iterator itr = _globalPlayerNameStore.find(name);
+    if (itr != _globalPlayerNameStore.end())
+        return itr->second;
+    return 0;
 }

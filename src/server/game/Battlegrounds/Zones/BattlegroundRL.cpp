@@ -63,7 +63,7 @@ void BattlegroundRL::AddPlayer(Player* player)
 {
     Battleground::AddPlayer(player);
     PlayerScores[player->GetGUID()] = new BattlegroundScore(player);
-	Battleground::UpdateArenaWorldState();
+    Battleground::UpdateArenaWorldState();
 }
 
 void BattlegroundRL::RemovePlayer(Player* /*player*/)
@@ -108,38 +108,38 @@ void BattlegroundRL::HandleAreaTrigger(Player* player, uint32 trigger)
         case 4696:                                          // buff trigger?
         case 4697:                                          // buff trigger?
             break;
-		// OUTSIDE OF ARENA, TELEPORT!
-		case 4927:
-		case 4928:
-			player->NearTeleportTo(1230.77f, 1662.42f, 34.56f, 0.0f);
-			break;
-		case 4929:
-		case 4930:
-			player->NearTeleportTo(1341.16f, 1673.52f, 34.43f, 3.5f);
-			break;
-		case 4931:
-			player->NearTeleportTo(1294.74f, 1584.5f, 31.62f, 1.66f);
-			break;
-		case 4932:
-			player->NearTeleportTo(1277.5f, 1751.07f, 31.61f, 4.7f);
-			break;
-		case 4933:
-			player->NearTeleportTo(1269.14f, 1713.85f, 34.46f, 5.23f);
-			break;
-		case 4934:
-			player->NearTeleportTo(1298.14f, 1713.8f, 33.58f, 4.55f);
-			break;
-		case 4935:
-			player->NearTeleportTo(1306.32f, 1620.75f, 34.25f, 1.97f);
-			break;
-		case 4936:
-			player->NearTeleportTo(1277.97f, 1615.51f, 34.56f, 1.15f);
-			break;
-		case 4941: // under arena +10
-		case 5041: // under arena -10
-		case 5042: // under arena -30
-			player->NearTeleportTo(1285.810547f, 1667.896851f, 39.957642f, player->GetOrientation());
-			break;
+        // OUTSIDE OF ARENA, TELEPORT!
+        case 4927:
+        case 4928:
+            player->NearTeleportTo(1230.77f, 1662.42f, 34.56f, 0.0f);
+            break;
+        case 4929:
+        case 4930:
+            player->NearTeleportTo(1341.16f, 1673.52f, 34.43f, 3.5f);
+            break;
+        case 4931:
+            player->NearTeleportTo(1294.74f, 1584.5f, 31.62f, 1.66f);
+            break;
+        case 4932:
+            player->NearTeleportTo(1277.5f, 1751.07f, 31.61f, 4.7f);
+            break;
+        case 4933:
+            player->NearTeleportTo(1269.14f, 1713.85f, 34.46f, 5.23f);
+            break;
+        case 4934:
+            player->NearTeleportTo(1298.14f, 1713.8f, 33.58f, 4.55f);
+            break;
+        case 4935:
+            player->NearTeleportTo(1306.32f, 1620.75f, 34.25f, 1.97f);
+            break;
+        case 4936:
+            player->NearTeleportTo(1277.97f, 1615.51f, 34.56f, 1.15f);
+            break;
+        case 4941: // under arena +10
+        case 5041: // under arena -10
+        case 5042: // under arena -30
+            player->NearTeleportTo(1285.810547f, 1667.896851f, 39.957642f, player->GetOrientation());
+            break;
     }
 }
 

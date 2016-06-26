@@ -22,7 +22,7 @@ public:
 
         uint32 m_auiEncounter[MAX_ENCOUNTER];
 
-		uint64 m_uiHellmawGUID;
+        uint64 m_uiHellmawGUID;
         uint64 m_uiRefectoryDoorGUID;
         uint64 m_uiScreamingHallDoorGUID;
 
@@ -32,7 +32,7 @@ public:
         {
             memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
 
-			m_uiHellmawGUID = 0;
+            m_uiHellmawGUID = 0;
             m_uiRefectoryDoorGUID = 0;
             m_uiScreamingHallDoorGUID = 0;
 
@@ -73,9 +73,9 @@ public:
                     if (creature->IsAlive())
                         ++m_uiFelOverseerCount;
                     break;
-				case NPC_HELLMAW:
-					m_uiHellmawGUID = creature->GetGUID();
-					break;
+                case NPC_HELLMAW:
+                    m_uiHellmawGUID = creature->GetGUID();
+                    break;
             }
         }
 
@@ -83,13 +83,13 @@ public:
         {
             switch (type)
             {
-				case TYPE_OVERSEER:
+                case TYPE_OVERSEER:
                     if (!--m_uiFelOverseerCount)
-					{
+                    {
                         m_auiEncounter[type] = DONE;
-						if (Creature* cr = instance->GetCreature(m_uiHellmawGUID))
-							cr->AI()->DoAction(1);
-					}
+                        if (Creature* cr = instance->GetCreature(m_uiHellmawGUID))
+                            cr->AI()->DoAction(1);
+                    }
                     break;
                 
                 case DATA_BLACKHEARTTHEINCITEREVENT:
@@ -105,7 +105,7 @@ public:
                     break;
 
                 case DATA_MURMUREVENT:
-				case TYPE_HELLMAW:
+                case TYPE_HELLMAW:
                     m_auiEncounter[type] = uiData;
                     break;
             }
@@ -117,7 +117,7 @@ public:
         uint32 GetData(uint32 type) const
         {
             if (type == TYPE_OVERSEER)
-				return m_auiEncounter[0];
+                return m_auiEncounter[0];
             return 0;
         }
 
@@ -140,18 +140,18 @@ public:
 
             OUT_LOAD_INST_DATA(in);
 
-			char dataHead1, dataHead2;
+            char dataHead1, dataHead2;
             std::istringstream loadStream(in);
             loadStream >> dataHead1 >> dataHead2;
             if (dataHead1 == 'S' && dataHead2 == 'L')
-			{
-				for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
-				{
-					loadStream >> m_auiEncounter[i];
-					if (m_auiEncounter[i] == IN_PROGRESS)
-						m_auiEncounter[i] = NOT_STARTED;
-				}
-			}
+            {
+                for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
+                {
+                    loadStream >> m_auiEncounter[i];
+                    if (m_auiEncounter[i] == IN_PROGRESS)
+                        m_auiEncounter[i] = NOT_STARTED;
+                }
+            }
 
             OUT_LOAD_INST_DATA_COMPLETE;
         }

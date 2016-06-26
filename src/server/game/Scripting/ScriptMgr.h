@@ -453,7 +453,7 @@ class GameObjectScript : public ScriptObject, public UpdatableScript<GameObject>
         // Called when the game object is damaged (destructible buildings only).
         virtual void OnDamaged(GameObject* /*go*/, Player* /*player*/) { }
 
-		// Called when the game object loot state is changed.
+        // Called when the game object loot state is changed.
         virtual void OnLootStateChanged(GameObject* /*go*/, uint32 /*state*/, Unit* /*unit*/) { }
 
         // Called when the game object state is changed.

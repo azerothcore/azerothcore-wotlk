@@ -44,12 +44,12 @@ class ChannelMgr
 
         Channel* GetJoinChannel(std::string const& name, uint32 channel_id);
         Channel* GetChannel(std::string const& name, Player* p, bool pkt = true);
-		void LoadChannels();
+        void LoadChannels();
 
         static void LoadChannelRights();
         static const ChannelRights& GetChannelRightsFor(const std::string& name);
         static void SetChannelRightsFor(const std::string& name, const uint32& flags, const uint32& speakDelay, const std::string& joinmessage, const std::string& speakmessage, const std::set<uint32>& moderators);
-		static uint32 _channelIdMax;
+        static uint32 _channelIdMax;
 
     private:
         ChannelMap channels;

@@ -15,9 +15,9 @@ enum eEnums
     SPELL_POISON_BOLT       = 30917,
     SPELL_POISON            = 30914,
 
-	EVENT_SPELL_SLIME		= 1,
-	EVENT_SPELL_POISON		= 2,
-	EVENT_SPELL_BOLT		= 3
+    EVENT_SPELL_SLIME       = 1,
+    EVENT_SPELL_POISON      = 2,
+    EVENT_SPELL_BOLT        = 3
 };
 
 class boss_broggok : public CreatureScript
@@ -36,7 +36,7 @@ class boss_broggok : public CreatureScript
             }
 
             InstanceScript* instance;
-			EventMap events;
+            EventMap events;
             bool canAttack;
 
             void Reset()
@@ -47,8 +47,8 @@ class boss_broggok : public CreatureScript
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NON_ATTACKABLE);
                 canAttack = false;
 
-				if (instance)
-					instance->SetData(DATA_BROGGOK, NOT_STARTED);
+                if (instance)
+                    instance->SetData(DATA_BROGGOK, NOT_STARTED);
             }
 
             void EnterCombat(Unit* /*who*/)
@@ -69,27 +69,27 @@ class boss_broggok : public CreatureScript
                 if (!UpdateVictim() || !canAttack)
                     return;
 
-				events.Update(diff);
-				if (me->HasUnitState(UNIT_STATE_CASTING))
-					return;
+                events.Update(diff);
+                if (me->HasUnitState(UNIT_STATE_CASTING))
+                    return;
 
-				switch (events.GetEvent())
-				{
-					case EVENT_SPELL_SLIME:
-						me->CastSpell(me->GetVictim(), SPELL_SLIME_SPRAY, false);
-						events.RepeatEvent(urand(7000, 12000));
-						break;
-					case EVENT_SPELL_BOLT:
-						if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
-							me->CastSpell(target, SPELL_POISON_BOLT, false);
-						events.RepeatEvent(urand(6000, 11000));
-						break;
-					case EVENT_SPELL_POISON:
-						me->CastSpell(me, SPELL_POISON_CLOUD, false);
-						events.RepeatEvent(20000);
-						break;
-					
-				}
+                switch (events.GetEvent())
+                {
+                    case EVENT_SPELL_SLIME:
+                        me->CastSpell(me->GetVictim(), SPELL_SLIME_SPRAY, false);
+                        events.RepeatEvent(urand(7000, 12000));
+                        break;
+                    case EVENT_SPELL_BOLT:
+                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                            me->CastSpell(target, SPELL_POISON_BOLT, false);
+                        events.RepeatEvent(urand(6000, 11000));
+                        break;
+                    case EVENT_SPELL_POISON:
+                        me->CastSpell(me, SPELL_POISON_CLOUD, false);
+                        events.RepeatEvent(20000);
+                        break;
+                    
+                }
 
                 DoMeleeAttackIfReady();
             }
@@ -112,9 +112,9 @@ class boss_broggok : public CreatureScript
                         me->SetInCombatWithZone();
                         break;
                     case ACTION_ACTIVATE_BROGGOK:
-						events.ScheduleEvent(EVENT_SPELL_SLIME, 10000);
-						events.ScheduleEvent(EVENT_SPELL_POISON, 5000);
-						events.ScheduleEvent(EVENT_SPELL_BOLT, 7000);
+                        events.ScheduleEvent(EVENT_SPELL_SLIME, 10000);
+                        events.ScheduleEvent(EVENT_SPELL_POISON, 5000);
+                        events.ScheduleEvent(EVENT_SPELL_BOLT, 7000);
 
                         me->SetReactState(REACT_AGGRESSIVE);
                         me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NON_ATTACKABLE);
@@ -141,10 +141,10 @@ class go_broggok_lever : public GameObjectScript
             if (InstanceScript* instance = go->GetInstanceScript())
                 if (instance->GetData(DATA_BROGGOK) != DONE && instance->GetData(DATA_BROGGOK) != IN_PROGRESS)
                     if (Creature* broggok = ObjectAccessor::GetCreature(*go, instance->GetData64(DATA_BROGGOK)))
-					{
-						instance->SetData(DATA_BROGGOK, IN_PROGRESS);
+                    {
+                        instance->SetData(DATA_BROGGOK, IN_PROGRESS);
                         broggok->AI()->DoAction(ACTION_PREPARE_BROGGOK);
-					}
+                    }
 
             go->UseDoorOrButton();
             return false;

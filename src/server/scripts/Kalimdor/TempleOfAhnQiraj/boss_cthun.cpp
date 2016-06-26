@@ -319,7 +319,7 @@ public:
                         //Freeze animation
                         DoCast(me, SPELL_FREEZE_ANIM);
                         me->StopMoving();
-						me->SetFacingTo(DarkGlareAngle);
+                        me->SetFacingTo(DarkGlareAngle);
                         me->SetOrientation(DarkGlareAngle);
 
                         //Darkbeam for 35 seconds
@@ -337,15 +337,15 @@ public:
 
                             //Set angle and cast
                             if (ClockWise)
-							{
-								me->SetFacingTo(DarkGlareAngle + DarkGlareTick * M_PI / 35);
+                            {
+                                me->SetFacingTo(DarkGlareAngle + DarkGlareTick * M_PI / 35);
                                 me->SetOrientation(DarkGlareAngle + DarkGlareTick * M_PI / 35);
-							}
+                            }
                             else
-							{
-								me->SetFacingTo(DarkGlareAngle - DarkGlareTick * M_PI / 35);
+                            {
+                                me->SetFacingTo(DarkGlareAngle - DarkGlareTick * M_PI / 35);
                                 me->SetOrientation(DarkGlareAngle - DarkGlareTick * M_PI / 35);
-							}
+                            }
 
                             //Actual dark glare cast, maybe something missing here?
                             DoCast(me, SPELL_DARK_GLARE, false);
@@ -922,7 +922,7 @@ public:
         void JustDied(Unit* /*killer*/)
         {
             if (Unit* p = ObjectAccessor::GetUnit(*me, Portal))
-				Unit::Kill(p, p);
+                Unit::Kill(p, p);
         }
 
         void Reset()
@@ -948,7 +948,7 @@ public:
             //KillSelfTimer
             if (KillSelfTimer <= diff)
             {
-				Unit::Kill(me, me);
+                Unit::Kill(me, me);
                 return;
             } else KillSelfTimer -= diff;
 

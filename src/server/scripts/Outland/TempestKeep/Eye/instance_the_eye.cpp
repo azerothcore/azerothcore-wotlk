@@ -20,79 +20,79 @@ class instance_the_eye : public InstanceMapScript
             uint64 GrandAstromancerCapernianGUID;
             uint64 MasterEngineerTelonicusGUID;
             uint64 AlarGUID;
-			uint64 KaelthasGUID;
-			uint64 BridgeWindowGUID;
-			uint64 KaelStateRightGUID;
-			uint64 KaelStateLeftGUID;
+            uint64 KaelthasGUID;
+            uint64 BridgeWindowGUID;
+            uint64 KaelStateRightGUID;
+            uint64 KaelStateLeftGUID;
 
             void Initialize()
             {
-				SetBossNumber(MAX_ENCOUNTER);
-				AlarGUID = 0;
-				KaelthasGUID = 0;
+                SetBossNumber(MAX_ENCOUNTER);
+                AlarGUID = 0;
+                KaelthasGUID = 0;
                 ThaladredTheDarkenerGUID = 0;
                 LordSanguinarGUID = 0;
                 GrandAstromancerCapernianGUID = 0;
                 MasterEngineerTelonicusGUID = 0;
-				BridgeWindowGUID = 0;
-				KaelStateRightGUID = 0;
-				KaelStateLeftGUID = 0;
+                BridgeWindowGUID = 0;
+                KaelStateRightGUID = 0;
+                KaelStateLeftGUID = 0;
             }
 
             void OnCreatureCreate(Creature* creature)
             {
                 switch (creature->GetEntry())
                 {
-					case NPC_ALAR:
-						AlarGUID = creature->GetGUID();
-						break;
-					case NPC_KAELTHAS:
-						KaelthasGUID = creature->GetGUID();
-						break;
-					case NPC_THALADRED:
-						ThaladredTheDarkenerGUID = creature->GetGUID();
-						break;
-					case NPC_TELONICUS:
-						MasterEngineerTelonicusGUID = creature->GetGUID();
-						break;
-					case NPC_CAPERNIAN:
-						GrandAstromancerCapernianGUID = creature->GetGUID();
-						break;
-					case NPC_LORD_SANGUINAR:
-						LordSanguinarGUID = creature->GetGUID();
-						break;
+                    case NPC_ALAR:
+                        AlarGUID = creature->GetGUID();
+                        break;
+                    case NPC_KAELTHAS:
+                        KaelthasGUID = creature->GetGUID();
+                        break;
+                    case NPC_THALADRED:
+                        ThaladredTheDarkenerGUID = creature->GetGUID();
+                        break;
+                    case NPC_TELONICUS:
+                        MasterEngineerTelonicusGUID = creature->GetGUID();
+                        break;
+                    case NPC_CAPERNIAN:
+                        GrandAstromancerCapernianGUID = creature->GetGUID();
+                        break;
+                    case NPC_LORD_SANGUINAR:
+                        LordSanguinarGUID = creature->GetGUID();
+                        break;
                 }
             }
 
-			void OnGameObjectCreate(GameObject* gobject)
-			{
-				switch (gobject->GetEntry())
-				{
-					case GO_BRIDGE_WINDOW:
-						BridgeWindowGUID = gobject->GetGUID();
-						break;
-					case GO_KAEL_STATUE_RIGHT:
-						KaelStateRightGUID = gobject->GetGUID();
-						break;
-					case GO_KAEL_STATUE_LEFT:
-						KaelStateLeftGUID = gobject->GetGUID();
-						break;
-				}
-			}
+            void OnGameObjectCreate(GameObject* gobject)
+            {
+                switch (gobject->GetEntry())
+                {
+                    case GO_BRIDGE_WINDOW:
+                        BridgeWindowGUID = gobject->GetGUID();
+                        break;
+                    case GO_KAEL_STATUE_RIGHT:
+                        KaelStateRightGUID = gobject->GetGUID();
+                        break;
+                    case GO_KAEL_STATUE_LEFT:
+                        KaelStateLeftGUID = gobject->GetGUID();
+                        break;
+                }
+            }
 
             uint64 GetData64(uint32 identifier) const
             {
                 switch (identifier)
                 {
-					case GO_BRIDGE_WINDOW:		return BridgeWindowGUID;
-					case GO_KAEL_STATUE_RIGHT:	return KaelStateRightGUID;
-					case GO_KAEL_STATUE_LEFT:	return KaelStateLeftGUID;
-					case NPC_ALAR:				return AlarGUID;
-					case NPC_KAELTHAS:			return KaelthasGUID;
-					case DATA_KAEL_ADVISOR1:	return ThaladredTheDarkenerGUID;
-					case DATA_KAEL_ADVISOR2:	return LordSanguinarGUID;
-					case DATA_KAEL_ADVISOR3:	return GrandAstromancerCapernianGUID;
-					case DATA_KAEL_ADVISOR4:	return MasterEngineerTelonicusGUID;
+                    case GO_BRIDGE_WINDOW:      return BridgeWindowGUID;
+                    case GO_KAEL_STATUE_RIGHT:  return KaelStateRightGUID;
+                    case GO_KAEL_STATUE_LEFT:   return KaelStateLeftGUID;
+                    case NPC_ALAR:              return AlarGUID;
+                    case NPC_KAELTHAS:          return KaelthasGUID;
+                    case DATA_KAEL_ADVISOR1:    return ThaladredTheDarkenerGUID;
+                    case DATA_KAEL_ADVISOR2:    return LordSanguinarGUID;
+                    case DATA_KAEL_ADVISOR3:    return GrandAstromancerCapernianGUID;
+                    case DATA_KAEL_ADVISOR4:    return MasterEngineerTelonicusGUID;
                 }
                 return 0;
             }
@@ -139,7 +139,7 @@ class instance_the_eye : public InstanceMapScript
 
                 OUT_LOAD_INST_DATA_COMPLETE;
             }
-		};
+        };
 
         InstanceScript* GetInstanceScript(InstanceMap* map) const
         {
@@ -156,11 +156,11 @@ class spell_the_eye_countercharge : public SpellScriptLoader
         {
             PrepareAuraScript(spell_the_eye_counterchargeScript);
 
-			bool PrepareProc(ProcEventInfo& eventInfo)
+            bool PrepareProc(ProcEventInfo& eventInfo)
             {
-				// xinef: prevent charge drop
-				PreventDefaultAction();
-				return true;
+                // xinef: prevent charge drop
+                PreventDefaultAction();
+                return true;
             }
 
             void Register()
@@ -178,5 +178,5 @@ class spell_the_eye_countercharge : public SpellScriptLoader
 void AddSC_instance_the_eye()
 {
     new instance_the_eye();
-	new spell_the_eye_countercharge();
+    new spell_the_eye_countercharge();
 }

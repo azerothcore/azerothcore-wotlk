@@ -26,10 +26,10 @@ class instance_mechanar : public InstanceMapScript
                 SetBossNumber(MAX_ENCOUNTER);
                 LoadDoorData(doorData);
 
-				_pathaleonGUID = 0;
-				_passageEncounter = 0;
-				_passageTimer = 0;
-				_passageGUIDs.clear();
+                _pathaleonGUID = 0;
+                _passageEncounter = 0;
+                _passageTimer = 0;
+                _passageGUIDs.clear();
             }
 
             void OnGameObjectCreate(GameObject* gameObject)
@@ -60,125 +60,125 @@ class instance_mechanar : public InstanceMapScript
                 }
             }
 
-			void OnCreatureCreate(Creature* creature)
-			{
-				if (creature->GetEntry() == NPC_PATHALEON_THE_CALCULATOR)
-					_pathaleonGUID = creature->GetGUID();
-			}
+            void OnCreatureCreate(Creature* creature)
+            {
+                if (creature->GetEntry() == NPC_PATHALEON_THE_CALCULATOR)
+                    _pathaleonGUID = creature->GetGUID();
+            }
 
-			void OnUnitDeath(Unit* unit)
-			{
-				if (unit->GetTypeId() == TYPEID_UNIT)
-					if (_passageEncounter > ENCOUNTER_PASSAGE_NOT_STARTED && _passageEncounter < ENCOUNTER_PASSAGE_DONE)
-						if (_passageGUIDs.find(unit->GetGUID()) != _passageGUIDs.end())
-							_passageGUIDs.erase(unit->GetGUID());
-			}
+            void OnUnitDeath(Unit* unit)
+            {
+                if (unit->GetTypeId() == TYPEID_UNIT)
+                    if (_passageEncounter > ENCOUNTER_PASSAGE_NOT_STARTED && _passageEncounter < ENCOUNTER_PASSAGE_DONE)
+                        if (_passageGUIDs.find(unit->GetGUID()) != _passageGUIDs.end())
+                            _passageGUIDs.erase(unit->GetGUID());
+            }
 
-			Player* GetPassagePlayer(float x)
-			{
-				Map::PlayerList const& pl = instance->GetPlayers();
-				for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
-					if (Player* player = itr->GetSource())
-						if (player->GetPositionX() < x && player->GetPositionZ() > 24.0f && player->GetPositionY() > -30.0f)
-							return player;
-				return NULL;
-			}
+            Player* GetPassagePlayer(float x)
+            {
+                Map::PlayerList const& pl = instance->GetPlayers();
+                for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
+                    if (Player* player = itr->GetSource())
+                        if (player->GetPositionX() < x && player->GetPositionZ() > 24.0f && player->GetPositionY() > -30.0f)
+                            return player;
+                return NULL;
+            }
 
-			void DoSummonAction(Creature* summon, Player* player)
-			{
-				summon->CastSpell(summon, SPELL_TELEPORT_VISUAL, true);
-				summon->AI()->AttackStart(player);
-				_passageGUIDs.insert(summon->GetGUID());
-			}
+            void DoSummonAction(Creature* summon, Player* player)
+            {
+                summon->CastSpell(summon, SPELL_TELEPORT_VISUAL, true);
+                summon->AI()->AttackStart(player);
+                _passageGUIDs.insert(summon->GetGUID());
+            }
 
-			void Update(uint32 diff)
-			{
-				if (_passageEncounter == ENCOUNTER_PASSAGE_DONE)
-					return;
+            void Update(uint32 diff)
+            {
+                if (_passageEncounter == ENCOUNTER_PASSAGE_DONE)
+                    return;
 
-				_passageTimer += diff;
-				if (_passageTimer >= 1000)
-				{
-					_passageTimer = 0;
-					if (_passageEncounter == ENCOUNTER_PASSAGE_NOT_STARTED)
-					{
-						if (Player* player = GetPassagePlayer(250.0f))
-						{
-							_passageEncounter++;
-							for (uint8 i = 0; i < 4; ++i)
-							{
-								Position pos = {238.0f, -27.0f + 3.0f*i, 26.328f, 0.0f};
-								if (Creature* creature = instance->SummonCreature(i==1 || i==2 ? NPC_SUNSEEKER_ASTROMAGE : NPC_BLOODWARDER_CENTURION, pos))
-									DoSummonAction(creature, player);
-							}
-						}
-					}
-					
-					if (!_passageGUIDs.empty())
-						return;
+                _passageTimer += diff;
+                if (_passageTimer >= 1000)
+                {
+                    _passageTimer = 0;
+                    if (_passageEncounter == ENCOUNTER_PASSAGE_NOT_STARTED)
+                    {
+                        if (Player* player = GetPassagePlayer(250.0f))
+                        {
+                            _passageEncounter++;
+                            for (uint8 i = 0; i < 4; ++i)
+                            {
+                                Position pos = {238.0f, -27.0f + 3.0f*i, 26.328f, 0.0f};
+                                if (Creature* creature = instance->SummonCreature(i==1 || i==2 ? NPC_SUNSEEKER_ASTROMAGE : NPC_BLOODWARDER_CENTURION, pos))
+                                    DoSummonAction(creature, player);
+                            }
+                        }
+                    }
+                    
+                    if (!_passageGUIDs.empty())
+                        return;
 
-					if (_passageEncounter < ENCOUNTER_PASSAGE_PHASE3)
-					{
-						if (Player* player = GetPassagePlayer(250.0f))
-						{
-							if (_passageEncounter == ENCOUNTER_PASSAGE_PHASE1)
-							{
-								Position pos = {214.37f, -23.5f, 24.88f, 0.0f};
-								if (Creature* creature = instance->SummonCreature(NPC_TEMPEST_KEEPER_DESTROYER, pos))
-									DoSummonAction(creature, player);
-							}
-							else if (_passageEncounter == ENCOUNTER_PASSAGE_PHASE2)
-							{
-								for (uint8 i = 0; i < 3; ++i)
-								{
-									Position pos = {199.76f, -26.0f + 2.5f*i, 24.88f, 0.0f};
-									if (Creature* creature = instance->SummonCreature(i==1 ? NPC_SUNSEEKER_ENGINEER : NPC_BLOODWARDER_PHYSICIAN, pos))
-										DoSummonAction(creature, player);
-								}
-							}
-							_passageEncounter++;
-							SaveToDB();
-						}
-					}
-					else
-					{
-						if (Player* player = GetPassagePlayer(148.0f))
-						{
-							if (_passageEncounter == ENCOUNTER_PASSAGE_PHASE3)
-							{
-								for (uint8 i = 0; i < 3; ++i)
-								{
-									Position pos = {135.0f + 2.5f*i, 36.76f, 24.88f};
-									if (Creature* creature = instance->SummonCreature(i==1 ? NPC_SUNSEEKER_ASTROMAGE : NPC_BLOODWARDER_PHYSICIAN, pos))
-										DoSummonAction(creature, player);
-								}
-							}
-							else if (_passageEncounter == ENCOUNTER_PASSAGE_PHASE4)
-							{
-								Position pos = {137.62f, 62.23f, 24.88f, M_PI*1.5f};
-								if (Creature* creature = instance->SummonCreature(NPC_TEMPEST_KEEPER_DESTROYER, pos))
-									DoSummonAction(creature, player);
-							}
-							else if (_passageEncounter == ENCOUNTER_PASSAGE_PHASE5)
-							{
-								for (uint8 i = 0; i < 4; ++i)
-								{
-									Position pos = {133.0f + 3.5f*i, 92.88f, 26.38f, M_PI*1.5f};
-									if (Creature* creature = instance->SummonCreature(i==1||i==2 ? NPC_SUNSEEKER_ASTROMAGE : NPC_SUNSEEKER_ENGINEER, pos))
-										DoSummonAction(creature, player);
-								}
-							}
-							else if (_passageEncounter == ENCOUNTER_PASSAGE_PHASE6)
-							{
-								if (Creature* creature = instance->GetCreature(_pathaleonGUID))
-									creature->AI()->DoAction(1);
-							}
-							_passageEncounter++;
-							SaveToDB();
-						}
-					}
-				}
-			}
+                    if (_passageEncounter < ENCOUNTER_PASSAGE_PHASE3)
+                    {
+                        if (Player* player = GetPassagePlayer(250.0f))
+                        {
+                            if (_passageEncounter == ENCOUNTER_PASSAGE_PHASE1)
+                            {
+                                Position pos = {214.37f, -23.5f, 24.88f, 0.0f};
+                                if (Creature* creature = instance->SummonCreature(NPC_TEMPEST_KEEPER_DESTROYER, pos))
+                                    DoSummonAction(creature, player);
+                            }
+                            else if (_passageEncounter == ENCOUNTER_PASSAGE_PHASE2)
+                            {
+                                for (uint8 i = 0; i < 3; ++i)
+                                {
+                                    Position pos = {199.76f, -26.0f + 2.5f*i, 24.88f, 0.0f};
+                                    if (Creature* creature = instance->SummonCreature(i==1 ? NPC_SUNSEEKER_ENGINEER : NPC_BLOODWARDER_PHYSICIAN, pos))
+                                        DoSummonAction(creature, player);
+                                }
+                            }
+                            _passageEncounter++;
+                            SaveToDB();
+                        }
+                    }
+                    else
+                    {
+                        if (Player* player = GetPassagePlayer(148.0f))
+                        {
+                            if (_passageEncounter == ENCOUNTER_PASSAGE_PHASE3)
+                            {
+                                for (uint8 i = 0; i < 3; ++i)
+                                {
+                                    Position pos = {135.0f + 2.5f*i, 36.76f, 24.88f};
+                                    if (Creature* creature = instance->SummonCreature(i==1 ? NPC_SUNSEEKER_ASTROMAGE : NPC_BLOODWARDER_PHYSICIAN, pos))
+                                        DoSummonAction(creature, player);
+                                }
+                            }
+                            else if (_passageEncounter == ENCOUNTER_PASSAGE_PHASE4)
+                            {
+                                Position pos = {137.62f, 62.23f, 24.88f, M_PI*1.5f};
+                                if (Creature* creature = instance->SummonCreature(NPC_TEMPEST_KEEPER_DESTROYER, pos))
+                                    DoSummonAction(creature, player);
+                            }
+                            else if (_passageEncounter == ENCOUNTER_PASSAGE_PHASE5)
+                            {
+                                for (uint8 i = 0; i < 4; ++i)
+                                {
+                                    Position pos = {133.0f + 3.5f*i, 92.88f, 26.38f, M_PI*1.5f};
+                                    if (Creature* creature = instance->SummonCreature(i==1||i==2 ? NPC_SUNSEEKER_ASTROMAGE : NPC_SUNSEEKER_ENGINEER, pos))
+                                        DoSummonAction(creature, player);
+                                }
+                            }
+                            else if (_passageEncounter == ENCOUNTER_PASSAGE_PHASE6)
+                            {
+                                if (Creature* creature = instance->GetCreature(_pathaleonGUID))
+                                    creature->AI()->DoAction(1);
+                            }
+                            _passageEncounter++;
+                            SaveToDB();
+                        }
+                    }
+                }
+            }
 
             bool SetBossState(uint32 type, EncounterState state)
             {
@@ -193,7 +193,7 @@ class instance_mechanar : public InstanceMapScript
                 OUT_SAVE_INST_DATA;
 
                 std::ostringstream saveStream;
-				// Xinef: no space needed
+                // Xinef: no space needed
                 saveStream << "M E " << GetBossSaveData() << _passageEncounter;
 
                 OUT_SAVE_INST_DATA_COMPLETE;
@@ -226,9 +226,9 @@ class instance_mechanar : public InstanceMapScript
                         SetBossState(i, EncounterState(tmpState));
                     }
 
-					loadStream >> _passageEncounter;
-					if (_passageEncounter == ENCOUNTER_PASSAGE_DONE)
-						_passageEncounter = ENCOUNTER_PASSAGE_PHASE6;
+                    loadStream >> _passageEncounter;
+                    if (_passageEncounter == ENCOUNTER_PASSAGE_DONE)
+                        _passageEncounter = ENCOUNTER_PASSAGE_PHASE6;
                 }
                 else
                     OUT_LOAD_INST_DATA_FAIL;
@@ -236,11 +236,11 @@ class instance_mechanar : public InstanceMapScript
                 OUT_LOAD_INST_DATA_COMPLETE;
             }
 
-		private:
-			uint64 _pathaleonGUID;
-			uint32 _passageTimer;
-			uint32 _passageEncounter;
-			std::set<uint64> _passageGUIDs;
+        private:
+            uint64 _pathaleonGUID;
+            uint32 _passageTimer;
+            uint32 _passageEncounter;
+            std::set<uint64> _passageGUIDs;
         };
 
         InstanceScript* GetInstanceScript(InstanceMap* map) const

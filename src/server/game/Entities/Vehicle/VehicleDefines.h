@@ -52,14 +52,14 @@ enum VehicleSpells
     VEHICLE_SPELL_RIDE_HARDCODED                = 46598,
     VEHICLE_SPELL_PARACHUTE                     = 45472,
 
-	VEHICLE_SPELL_GEIST_CONTROL_END				= 58119,
-	VEHICLE_SPELL_SHADE_CONTROL_END				= 58664
+    VEHICLE_SPELL_GEIST_CONTROL_END             = 58119,
+    VEHICLE_SPELL_SHADE_CONTROL_END             = 58664
 };
 
 enum VehicleNPCs
 {
-	NPC_EIDOLON_WATCHER							= 31110,
-	NPC_LITHE_STALKER							= 30895
+    NPC_EIDOLON_WATCHER                         = 31110,
+    NPC_LITHE_STALKER                           = 30895
 };
 
 struct PassengerInfo

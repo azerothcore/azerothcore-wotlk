@@ -80,7 +80,7 @@ enum WintergraspSpells
     SPELL_WINTERGRASP_WATER                     = 36444,
     SPELL_ESSENCE_OF_WINTERGRASP                = 58045,
     SPELL_WINTERGRASP_RESTRICTED_FLIGHT_AREA    = 58730,
-	SPELL_LEANING_TOWER_ACHIEVEMENT				= 60676,
+    SPELL_LEANING_TOWER_ACHIEVEMENT             = 60676,
 
     // Phasing spells
     SPELL_HORDE_CONTROLS_FACTORY_PHASE_SHIFT    = 56618,// ADDS PHASE 16
@@ -92,7 +92,7 @@ enum WintergraspSpells
 
 enum WintergraspData
 {
-	BATTLEFIELD_WG_DATA_INTACT_TOWER_ATT,
+    BATTLEFIELD_WG_DATA_INTACT_TOWER_ATT,
     BATTLEFIELD_WG_DATA_DAMAGED_TOWER_ATT,
     BATTLEFIELD_WG_DATA_BROKEN_TOWER_ATT,
     BATTLEFIELD_WG_DATA_MAX_VEHICLE_A,
@@ -157,14 +157,14 @@ enum WGGraveyardId
 
 enum eWGGossipText
 {
-	BATTLEFIELD_WG_GOSSIPTEXT_GY_NE              = 20071,
-	BATTLEFIELD_WG_GOSSIPTEXT_GY_NW              = 20072,
-	BATTLEFIELD_WG_GOSSIPTEXT_GY_SE              = 20074,
-	BATTLEFIELD_WG_GOSSIPTEXT_GY_SW              = 20073,
-	BATTLEFIELD_WG_GOSSIPTEXT_GY_KEEP            = 20070,
-	BATTLEFIELD_WG_GOSSIPTEXT_GY_HORDE           = 20075,
-	BATTLEFIELD_WG_GOSSIPTEXT_GY_ALLIANCE        = 20076,
-	BATTLEFIELD_WG_WORLD_START_MESSAGE           = 20078,
+    BATTLEFIELD_WG_GOSSIPTEXT_GY_NE              = 20071,
+    BATTLEFIELD_WG_GOSSIPTEXT_GY_NW              = 20072,
+    BATTLEFIELD_WG_GOSSIPTEXT_GY_SE              = 20074,
+    BATTLEFIELD_WG_GOSSIPTEXT_GY_SW              = 20073,
+    BATTLEFIELD_WG_GOSSIPTEXT_GY_KEEP            = 20070,
+    BATTLEFIELD_WG_GOSSIPTEXT_GY_HORDE           = 20075,
+    BATTLEFIELD_WG_GOSSIPTEXT_GY_ALLIANCE        = 20076,
+    BATTLEFIELD_WG_WORLD_START_MESSAGE           = 20078,
 };
 
 enum WintergraspNpcs
@@ -182,19 +182,19 @@ enum WintergraspNpcs
     BATTLEFIELD_WG_NPC_SIEGESMITH_STRONGHOOF        = 31106,
     BATTLEFIELD_WG_NPC_PRIMALIST_MULFORT            = 31053,
     BATTLEFIELD_WG_NPC_LIEUTENANT_MURP              = 31107,
-	BATTLEFIELD_WG_NPC_HORDE_WARBRINGER             = 15350,
-	BATTLEFIELD_WG_NPC_BRIGADIER_GENERAL			= 15351,
+    BATTLEFIELD_WG_NPC_HORDE_WARBRINGER             = 15350,
+    BATTLEFIELD_WG_NPC_BRIGADIER_GENERAL            = 15351,
 
-	BATTLEFIELD_WG_NPC_AV_PORTAL_HORDE				= 32617,
-	BATTLEFIELD_WG_NPC_AV_PORTAL_ALLY				= 32616,
-	BATTLEFIELD_WG_NPC_AB_PORTAL_HORDE				= 32619,
-	BATTLEFIELD_WG_NPC_AB_PORTAL_ALLY				= 32618,
-	BATTLEFIELD_WG_NPC_EOTS_PORTAL_HORDE			= 32620,
-	BATTLEFIELD_WG_NPC_EOTS_PORTAL_ALLY				= 32621,
-	BATTLEFIELD_WG_NPC_SOTA_PORTAL_HORDE			= 32623,
-	BATTLEFIELD_WG_NPC_SOTA_PORTAL_ALLY				= 32622,
-	BATTLEFIELD_WG_NPC_WG_PORTAL_HORDE				= 32625,
-	BATTLEFIELD_WG_NPC_WG_PORTAL_ALLY				= 32624,
+    BATTLEFIELD_WG_NPC_AV_PORTAL_HORDE              = 32617,
+    BATTLEFIELD_WG_NPC_AV_PORTAL_ALLY               = 32616,
+    BATTLEFIELD_WG_NPC_AB_PORTAL_HORDE              = 32619,
+    BATTLEFIELD_WG_NPC_AB_PORTAL_ALLY               = 32618,
+    BATTLEFIELD_WG_NPC_EOTS_PORTAL_HORDE            = 32620,
+    BATTLEFIELD_WG_NPC_EOTS_PORTAL_ALLY             = 32621,
+    BATTLEFIELD_WG_NPC_SOTA_PORTAL_HORDE            = 32623,
+    BATTLEFIELD_WG_NPC_SOTA_PORTAL_ALLY             = 32622,
+    BATTLEFIELD_WG_NPC_WG_PORTAL_HORDE              = 32625,
+    BATTLEFIELD_WG_NPC_WG_PORTAL_ALLY               = 32624,
 
     BATTLEFIELD_WG_NPC_BOWYER_RANDOLPH              = 31052,
     BATTLEFIELD_WG_NPC_KNIGHT_DAMERON               = 32294,// <WINTERGRASP QUARTERMASTER>
@@ -209,17 +209,17 @@ enum WintergraspNpcs
     NPC_TAUNKA_SPIRIT_GUIDE                         = 31841,    // Horde spirit guide for Wintergrasp
     NPC_DWARVEN_SPIRIT_GUIDE                        = 31842,    // Alliance spirit guide for Wintergrasp
 
-	NPC_WINTERGRASP_SIEGE_ENGINE_TURRET_ALLIANCE	= 28319,
-	NPC_WINTERGRASP_SIEGE_ENGINE_TURRET_HORDE		= 32629,
-    NPC_WINTERGRASP_SIEGE_ENGINE_ALLIANCE			= 28312,
-    NPC_WINTERGRASP_SIEGE_ENGINE_HORDE				= 32627,
+    NPC_WINTERGRASP_SIEGE_ENGINE_TURRET_ALLIANCE    = 28319,
+    NPC_WINTERGRASP_SIEGE_ENGINE_TURRET_HORDE       = 32629,
+    NPC_WINTERGRASP_SIEGE_ENGINE_ALLIANCE           = 28312,
+    NPC_WINTERGRASP_SIEGE_ENGINE_HORDE              = 32627,
     NPC_WINTERGRASP_CATAPULT                        = 27881,
     NPC_WINTERGRASP_DEMOLISHER                      = 28094,
     NPC_WINTERGRASP_TOWER_CANNON                    = 28366,
 
-	NPC_QUEST_SOUTHERN_TOWER_KILL					= 35074,
-	NPC_QUEST_VEHICLE_PROTECTED						= 31284,
-	NPC_QUEST_PVP_KILL_VEHICLE						= 31093,
+    NPC_QUEST_SOUTHERN_TOWER_KILL                   = 35074,
+    NPC_QUEST_VEHICLE_PROTECTED                     = 31284,
+    NPC_QUEST_PVP_KILL_VEHICLE                      = 31093,
 };
 
 struct BfWGCoordGY
@@ -385,7 +385,7 @@ class BattlefieldWG : public Battlefield
         bool SetupBattlefield();
 
         /// Return pointer to relic object
-		GameObject* GetRelic() { return ObjectAccessor::GetObjectInWorld(m_titansRelic, (GameObject*)NULL); }
+        GameObject* GetRelic() { return ObjectAccessor::GetObjectInWorld(m_titansRelic, (GameObject*)NULL); }
 
         /// Define relic object
         //void SetRelic(GameObject* relic) { m_titansRelic = relic; }
@@ -398,8 +398,8 @@ class BattlefieldWG : public Battlefield
 
         /// Vehicle world states update
         void UpdateCounterVehicle(bool init);
-		void UpdateVehicleCountWG();
-		void CapturePointTaken(uint32 areaId);
+        void UpdateVehicleCountWG();
+        void CapturePointTaken(uint32 areaId);
 
         void SendInitWorldStatesTo(Player* player);
         void SendInitWorldStatesToAll();
@@ -409,17 +409,17 @@ class BattlefieldWG : public Battlefield
         void OnUnitDeath(Unit* unit);
         void PromotePlayer(Player* killer);
 
-		uint32 GetHonorBuff(int32 stack) const;
+        uint32 GetHonorBuff(int32 stack) const;
         void UpdateTenacity();
-		void AddUpdateTenacity(Player* player);
-		void RemoveUpdateTenacity(Player* player);
+        void AddUpdateTenacity(Player* player);
+        void RemoveUpdateTenacity(Player* player);
         void ProcessEvent(WorldObject *obj, uint32 eventId);
 
         bool FindAndRemoveVehicleFromList(Unit* vehicle);
 
         // returns the graveyardId in the specified area.
         uint8 GetSpiritGraveyardId(uint32 areaId) const;
-		uint32 GetAreaByGraveyardId(uint8 gId) const;
+        uint32 GetAreaByGraveyardId(uint8 gId) const;
 
         uint32 GetData(uint32 data) const;
     protected:
@@ -435,10 +435,10 @@ class BattlefieldWG : public Battlefield
         GuidSet CanonList;
         GuidSet KeepCreature[2];
         GuidSet OutsideCreature[2];
-		GuidSet m_updateTenacityList;
+        GuidSet m_updateTenacityList;
 
         int32 m_tenacityStack;
-		uint32 m_tenacityUpdateTimer;
+        uint32 m_tenacityUpdateTimer;
         uint32 m_saveTimer;
 
         uint64 m_titansRelic;
@@ -498,31 +498,31 @@ enum WintergraspWorldstates
 // TODO: Handle this with creature_text ?
 enum eWGText
 {
-	BATTLEFIELD_WG_TEXT_START                    = 0,
+    BATTLEFIELD_WG_TEXT_START                    = 0,
     BATTLEFIELD_WG_TEXT_WORKSHOP_NE_ATTACK       = 19, // Ally, horde +2
     BATTLEFIELD_WG_TEXT_WORKSHOP_NW_ATTACK       = 11, // Ally, horde +2
     BATTLEFIELD_WG_TEXT_WORKSHOP_SE_ATTACK       = 15, // Ally, horde +2
     BATTLEFIELD_WG_TEXT_WORKSHOP_SW_ATTACK       = 23, // Ally, horde +2
-	BATTLEFIELD_WG_TEXT_WORKSHOP_NE_TAKEN        = 20, // Ally, horde +2
+    BATTLEFIELD_WG_TEXT_WORKSHOP_NE_TAKEN        = 20, // Ally, horde +2
     BATTLEFIELD_WG_TEXT_WORKSHOP_NW_TAKEN        = 12, // Ally, horde +2
     BATTLEFIELD_WG_TEXT_WORKSHOP_SE_TAKEN        = 16, // Ally, horde +2
     BATTLEFIELD_WG_TEXT_WORKSHOP_SW_TAKEN        = 24, // Ally, horde +2
-	BATTLEFIELD_WG_TEXT_DEFEND_KEEP              = 27, // Ally, horde +2
+    BATTLEFIELD_WG_TEXT_DEFEND_KEEP              = 27, // Ally, horde +2
     BATTLEFIELD_WG_TEXT_WIN_KEEP                 = 28, // Ally, horde +2
     BATTLEFIELD_WG_TEXT_WILL_START               = 31,
     BATTLEFIELD_WG_TEXT_FIRSTRANK                = 32,
     BATTLEFIELD_WG_TEXT_SECONDRANK               = 33,
-	BATTLEFIELD_WG_TEXT_TOWER_S_DAMAGED          = 1,
+    BATTLEFIELD_WG_TEXT_TOWER_S_DAMAGED          = 1,
     BATTLEFIELD_WG_TEXT_TOWER_E_DAMAGED          = 3,
     BATTLEFIELD_WG_TEXT_TOWER_W_DAMAGED          = 5,
-	BATTLEFIELD_WG_TEXT_TOWER_S_DESTROYED        = 2,
+    BATTLEFIELD_WG_TEXT_TOWER_S_DESTROYED        = 2,
     BATTLEFIELD_WG_TEXT_TOWER_E_DESTROYED        = 4,
     BATTLEFIELD_WG_TEXT_TOWER_W_DESTROYED        = 6,
     BATTLEFIELD_WG_TEXT_KEEPTOWER_NE_DAMAGED     = 36,
     BATTLEFIELD_WG_TEXT_KEEPTOWER_NW_DAMAGED     = 34,
     BATTLEFIELD_WG_TEXT_KEEPTOWER_SE_DAMAGED     = 38,
     BATTLEFIELD_WG_TEXT_KEEPTOWER_SW_DAMAGED     = 40,
-	BATTLEFIELD_WG_TEXT_KEEPTOWER_NE_DESTROYED   = 37,
+    BATTLEFIELD_WG_TEXT_KEEPTOWER_NE_DESTROYED   = 37,
     BATTLEFIELD_WG_TEXT_KEEPTOWER_NW_DESTROYED   = 35,
     BATTLEFIELD_WG_TEXT_KEEPTOWER_SE_DESTROYED   = 39,
     BATTLEFIELD_WG_TEXT_KEEPTOWER_SW_DESTROYED   = 41,
@@ -571,7 +571,7 @@ struct WintergraspBuildingSpawnData
     float o;
     uint32 type;
     uint32 damageText;
-	uint32 destroyText;
+    uint32 destroyText;
 };
 
 const WintergraspBuildingSpawnData WGGameObjectBuilding[WG_MAX_OBJ] = {
@@ -637,38 +637,38 @@ const Position WGTurret[WG_MAX_TURRET] = {
     { 5390.95f, 2615.5f,  421.126f, 4.6409f },
     { 5148.8f,  2820.24f, 421.621f, 3.16043f },
     { 5147.98f, 2861.93f, 421.63f,  3.18792f },
-	{ 5352.22f, 3061.46f, 421.102f, 1.52235f }
+    { 5352.22f, 3061.46f, 421.102f, 1.52235f }
 };
 
 static bool IsKeepNpc(uint32 entry)
 {
-	switch (entry)
-	{
-		case BATTLEFIELD_WG_NPC_GUARD_H:
-		case BATTLEFIELD_WG_NPC_GUARD_A:
-		case BATTLEFIELD_WG_NPC_VIERON_BLAZEFEATHER:
-		case BATTLEFIELD_WG_NPC_BOWYER_RANDOLPH:
-		case BATTLEFIELD_WG_NPC_STONE_GUARD_MUKAR:
-		case BATTLEFIELD_WG_NPC_KNIGHT_DAMERON:
-		case BATTLEFIELD_WG_NPC_HOODOO_MASTER_FU_JIN:
-		case BATTLEFIELD_WG_NPC_SORCERESS_KAYLANA:
-		case BATTLEFIELD_WG_NPC_CHAMPION_ROS_SLAI:
-		case BATTLEFIELD_WG_NPC_MARSHAL_MAGRUDER:
-		case BATTLEFIELD_WG_NPC_COMMANDER_DARDOSH:
-		case BATTLEFIELD_WG_NPC_COMMANDER_ZANNETH:
-		case BATTLEFIELD_WG_NPC_TACTICAL_OFFICER_KILRATH:
-		case BATTLEFIELD_WG_NPC_TACTICAL_OFFICER_AHBRAMIS:
-		case BATTLEFIELD_WG_NPC_HORDE_WARBRINGER:
-		case BATTLEFIELD_WG_NPC_BRIGADIER_GENERAL:
-		case BATTLEFIELD_WG_NPC_SIEGESMITH_STRONGHOOF:
-		case BATTLEFIELD_WG_NPC_SIEGE_MASTER_STOUTHANDLE:
-		case BATTLEFIELD_WG_NPC_PRIMALIST_MULFORT:
-		case BATTLEFIELD_WG_NPC_ANCHORITE_TESSA:
-		case BATTLEFIELD_WG_NPC_LIEUTENANT_MURP:
-		case BATTLEFIELD_WG_NPC_SENIOR_DEMOLITIONIST_LEGOSO:
-			return true;
-	}
-	return false;
+    switch (entry)
+    {
+        case BATTLEFIELD_WG_NPC_GUARD_H:
+        case BATTLEFIELD_WG_NPC_GUARD_A:
+        case BATTLEFIELD_WG_NPC_VIERON_BLAZEFEATHER:
+        case BATTLEFIELD_WG_NPC_BOWYER_RANDOLPH:
+        case BATTLEFIELD_WG_NPC_STONE_GUARD_MUKAR:
+        case BATTLEFIELD_WG_NPC_KNIGHT_DAMERON:
+        case BATTLEFIELD_WG_NPC_HOODOO_MASTER_FU_JIN:
+        case BATTLEFIELD_WG_NPC_SORCERESS_KAYLANA:
+        case BATTLEFIELD_WG_NPC_CHAMPION_ROS_SLAI:
+        case BATTLEFIELD_WG_NPC_MARSHAL_MAGRUDER:
+        case BATTLEFIELD_WG_NPC_COMMANDER_DARDOSH:
+        case BATTLEFIELD_WG_NPC_COMMANDER_ZANNETH:
+        case BATTLEFIELD_WG_NPC_TACTICAL_OFFICER_KILRATH:
+        case BATTLEFIELD_WG_NPC_TACTICAL_OFFICER_AHBRAMIS:
+        case BATTLEFIELD_WG_NPC_HORDE_WARBRINGER:
+        case BATTLEFIELD_WG_NPC_BRIGADIER_GENERAL:
+        case BATTLEFIELD_WG_NPC_SIEGESMITH_STRONGHOOF:
+        case BATTLEFIELD_WG_NPC_SIEGE_MASTER_STOUTHANDLE:
+        case BATTLEFIELD_WG_NPC_PRIMALIST_MULFORT:
+        case BATTLEFIELD_WG_NPC_ANCHORITE_TESSA:
+        case BATTLEFIELD_WG_NPC_LIEUTENANT_MURP:
+        case BATTLEFIELD_WG_NPC_SENIOR_DEMOLITIONIST_LEGOSO:
+            return true;
+    }
+    return false;
 }
 
 // Here there is all npc keeper spawn point
@@ -690,13 +690,13 @@ const WintergraspObjectPositionData WGKeepNPC[WG_MAX_KEEP_NPC] =
     { 5388.560059f, 2834.770020f, 418.759003f, 3.071780f, BATTLEFIELD_WG_NPC_GUARD_H, BATTLEFIELD_WG_NPC_GUARD_A },       // Standing Guard
     { 5359.129883f, 2837.989990f, 409.364014f, 4.698930f, BATTLEFIELD_WG_NPC_COMMANDER_DARDOSH, BATTLEFIELD_WG_NPC_COMMANDER_ZANNETH }, // Commander Dardosh
     { 5366.129883f, 2833.399902f, 409.322998f, 3.141590f, BATTLEFIELD_WG_NPC_TACTICAL_OFFICER_KILRATH, BATTLEFIELD_WG_NPC_TACTICAL_OFFICER_AHBRAMIS }, // Tactical Officer Kilrath
-	{ 5467.590000f, 2841.060000f, 418.758000f, 1.396260f, BATTLEFIELD_WG_NPC_HORDE_WARBRINGER, BATTLEFIELD_WG_NPC_BRIGADIER_GENERAL }, // Battlemaster
+    { 5467.590000f, 2841.060000f, 418.758000f, 1.396260f, BATTLEFIELD_WG_NPC_HORDE_WARBRINGER, BATTLEFIELD_WG_NPC_BRIGADIER_GENERAL }, // Battlemaster
 
-	{ 5415.120000f, 2811.420000f, 418.758000f, 2.321290f, BATTLEFIELD_WG_NPC_AV_PORTAL_HORDE, BATTLEFIELD_WG_NPC_AV_PORTAL_ALLY }, // Portal
-	{ 5467.560000f, 2810.080000f, 418.758000f, 0.837758f, BATTLEFIELD_WG_NPC_AB_PORTAL_HORDE, BATTLEFIELD_WG_NPC_AB_PORTAL_ALLY }, // Portal
-	{ 5476.330000f, 2863.210000f, 418.758000f, 0.471239f, BATTLEFIELD_WG_NPC_EOTS_PORTAL_HORDE, BATTLEFIELD_WG_NPC_EOTS_PORTAL_ALLY }, // Portal
-	{ 5468.270000f, 2871.140000f, 418.758000f, 0.000000f, BATTLEFIELD_WG_NPC_SOTA_PORTAL_HORDE, BATTLEFIELD_WG_NPC_SOTA_PORTAL_ALLY }, // Portal
-	{ 5476.100000f, 2818.040000f, 418.758000f, 4.380780f, BATTLEFIELD_WG_NPC_WG_PORTAL_HORDE, BATTLEFIELD_WG_NPC_WG_PORTAL_ALLY }, // Portal
+    { 5415.120000f, 2811.420000f, 418.758000f, 2.321290f, BATTLEFIELD_WG_NPC_AV_PORTAL_HORDE, BATTLEFIELD_WG_NPC_AV_PORTAL_ALLY }, // Portal
+    { 5467.560000f, 2810.080000f, 418.758000f, 0.837758f, BATTLEFIELD_WG_NPC_AB_PORTAL_HORDE, BATTLEFIELD_WG_NPC_AB_PORTAL_ALLY }, // Portal
+    { 5476.330000f, 2863.210000f, 418.758000f, 0.471239f, BATTLEFIELD_WG_NPC_EOTS_PORTAL_HORDE, BATTLEFIELD_WG_NPC_EOTS_PORTAL_ALLY }, // Portal
+    { 5468.270000f, 2871.140000f, 418.758000f, 0.000000f, BATTLEFIELD_WG_NPC_SOTA_PORTAL_HORDE, BATTLEFIELD_WG_NPC_SOTA_PORTAL_ALLY }, // Portal
+    { 5476.100000f, 2818.040000f, 418.758000f, 4.380780f, BATTLEFIELD_WG_NPC_WG_PORTAL_HORDE, BATTLEFIELD_WG_NPC_WG_PORTAL_ALLY }, // Portal
 
     // X          Y            Z           O         horde  alliance
     // North West
@@ -1059,7 +1059,7 @@ struct WGWorkshopData
     uint8 id;
     uint32 worldstate;
     uint8 attackText;
-	uint8 takenText;
+    uint8 takenText;
 };
 
 const WGWorkshopData WorkshopsData[WG_MAX_WORKSHOP] =
@@ -1093,7 +1093,7 @@ struct BfWGGameObjectBuilding
         m_WorldState = 0;
         m_State = 0;
         m_damagedText = 0;
-		m_destroyedText = 0;
+        m_destroyedText = 0;
     }
 
     // the team that controls this point
@@ -1116,7 +1116,7 @@ struct BfWGGameObjectBuilding
 
     // Name id for warning text
     uint8 m_damagedText;
-	uint8 m_destroyedText;
+    uint8 m_destroyedText;
 
     // GameObject associations
     GameObjectSet m_GameObjectList[2];
@@ -1145,13 +1145,13 @@ struct BfWGGameObjectBuilding
                 break;
         }
 
-		GameObject* go = ObjectAccessor::GetObjectInWorld(m_Build, (GameObject*)NULL);
-		if (go)
-		{
-		 // Rebuild gameobject
-			go->SetDestructibleState(GO_DESTRUCTIBLE_REBUILDING, NULL, true);
-			go->SetUInt32Value(GAMEOBJECT_FACTION, WintergraspFaction[m_Team]);
-		}
+        GameObject* go = ObjectAccessor::GetObjectInWorld(m_Build, (GameObject*)NULL);
+        if (go)
+        {
+         // Rebuild gameobject
+            go->SetDestructibleState(GO_DESTRUCTIBLE_REBUILDING, NULL, true);
+            go->SetUInt32Value(GAMEOBJECT_FACTION, WintergraspFaction[m_Team]);
+        }
 
         // Update worldstate
         m_State = BATTLEFIELD_WG_OBJECTSTATE_ALLIANCE_INTACT - (m_Team * 3);
@@ -1171,7 +1171,7 @@ struct BfWGGameObjectBuilding
             m_WG->SendWarningToAllInZone(m_damagedText);
 
         for (GuidSet::const_iterator itr = m_CreatureTopList[m_WG->GetAttackerTeam()].begin(); itr != m_CreatureTopList[m_WG->GetAttackerTeam()].end(); ++itr)
-			if (Unit* unit = ObjectAccessor::FindUnit(*itr))
+            if (Unit* unit = ObjectAccessor::FindUnit(*itr))
                 if (Creature* creature = unit->ToCreature())
                     m_WG->HideNpc(creature);
 
@@ -1199,8 +1199,8 @@ struct BfWGGameObjectBuilding
         {
             // Inform the global wintergrasp script of the destruction of this object
             case BATTLEFIELD_WG_OBJECTTYPE_TOWER:
-				m_WG->UpdatedDestroyedTowerCount(TeamId(m_Team), ObjectAccessor::GetObjectInWorld(m_Build, (GameObject*)NULL));
-				break;
+                m_WG->UpdatedDestroyedTowerCount(TeamId(m_Team), ObjectAccessor::GetObjectInWorld(m_Build, (GameObject*)NULL));
+                break;
             case BATTLEFIELD_WG_OBJECTTYPE_DOOR_LAST:
                 m_WG->SetRelicInteractible(true);
                 if (GameObject* go = m_WG->GetRelic())
@@ -1208,11 +1208,11 @@ struct BfWGGameObjectBuilding
                 else
                     sLog->outError("BattlefieldWG: Relic not found.");
                 break;
-			case BATTLEFIELD_WG_OBJECTTYPE_DOOR:
-			case BATTLEFIELD_WG_OBJECTTYPE_WALL:
-			case BATTLEFIELD_WG_OBJECTTYPE_KEEP_TOWER:
-				m_WG->UpdatedDestroyedTowerCount(TeamId(m_Team), ObjectAccessor::GetObjectInWorld(m_Build, (GameObject*)NULL));
-				break;
+            case BATTLEFIELD_WG_OBJECTTYPE_DOOR:
+            case BATTLEFIELD_WG_OBJECTTYPE_WALL:
+            case BATTLEFIELD_WG_OBJECTTYPE_KEEP_TOWER:
+                m_WG->UpdatedDestroyedTowerCount(TeamId(m_Team), ObjectAccessor::GetObjectInWorld(m_Build, (GameObject*)NULL));
+                break;
         }
 
         m_WG->BrokenWallOrTower(TeamId(m_Team));
@@ -1231,7 +1231,7 @@ struct BfWGGameObjectBuilding
 
         // NameId for Warning text
         m_damagedText = damageText;
-		m_destroyedText = destroyText;
+        m_destroyedText = destroyText;
 
         switch (m_Type)
         {
@@ -1388,17 +1388,17 @@ struct BfWGGameObjectBuilding
 
     void UpdateTurretAttack(bool disable)
     {
-		GameObject* build = ObjectAccessor::GetObjectInWorld(m_Build, (GameObject*)NULL);
-		if (!build)
-			return;
+        GameObject* build = ObjectAccessor::GetObjectInWorld(m_Build, (GameObject*)NULL);
+        if (!build)
+            return;
 
-		uint32 faction = 0;
-		switch (build->GetEntry())
+        uint32 faction = 0;
+        switch (build->GetEntry())
         {
             case GO_WINTERGRASP_FORTRESS_TOWER_1:
             case GO_WINTERGRASP_FORTRESS_TOWER_2:
-			case GO_WINTERGRASP_FORTRESS_TOWER_3:
-			case GO_WINTERGRASP_FORTRESS_TOWER_4:
+            case GO_WINTERGRASP_FORTRESS_TOWER_3:
+            case GO_WINTERGRASP_FORTRESS_TOWER_4:
                 faction = WintergraspFaction[m_WG->GetDefenderTeam()];
                 break;
             case GO_WINTERGRASP_SHADOWSIGHT_TOWER:
@@ -1408,19 +1408,19 @@ struct BfWGGameObjectBuilding
                 break;
         }
 
-		for (GuidSet::const_iterator itr = m_TowerCannonBottomList.begin(); itr != m_TowerCannonBottomList.end(); ++itr)
-		{
+        for (GuidSet::const_iterator itr = m_TowerCannonBottomList.begin(); itr != m_TowerCannonBottomList.end(); ++itr)
+        {
             if (Unit* unit = ObjectAccessor::FindUnit(*itr))
-			{
+            {
                 if (Creature* creature = unit->ToCreature())
-				{
-					creature->setFaction(faction);
+                {
+                    creature->setFaction(faction);
                     if (disable)
                         m_WG->HideNpc(creature);
                     else
                         m_WG->ShowNpc(creature, true);
-				}
-			}
+                }
+            }
         }
 
         for (GuidSet::const_iterator itr = m_TurretTopList.begin(); itr != m_TurretTopList.end(); ++itr)
@@ -1429,7 +1429,7 @@ struct BfWGGameObjectBuilding
             {
                 if (Creature* creature = unit->ToCreature())
                 {
-					creature->setFaction(faction);
+                    creature->setFaction(faction);
                     if (disable)
                         m_WG->HideNpc(creature);
                     else
@@ -1499,10 +1499,10 @@ struct WGWorkshop
         }
 
         if (!init)
-		{
+        {
             bf->UpdateCounterVehicle(false);
-			bf->CapturePointTaken(bf->GetAreaByGraveyardId(workshopId));
-		}
+            bf->CapturePointTaken(bf->GetAreaByGraveyardId(workshopId));
+        }
     }
 
     void UpdateGraveyardAndWorkshop()

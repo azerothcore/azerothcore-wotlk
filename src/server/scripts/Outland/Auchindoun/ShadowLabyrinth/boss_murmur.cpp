@@ -9,27 +9,27 @@ REWRITTEN BY XINEF
 
 enum Murmur
 {
-	EMOTE_SONIC_BOOM            = 0,
+    EMOTE_SONIC_BOOM            = 0,
 
-    SPELL_RESONANCE					= 33657,
-    SPELL_MAGNETIC_PULL				= 33689,
-    SPELL_SONIC_SHOCK				= 38797,
-    SPELL_THUNDERING_STORM			= 39365,
+    SPELL_RESONANCE                 = 33657,
+    SPELL_MAGNETIC_PULL             = 33689,
+    SPELL_SONIC_SHOCK               = 38797,
+    SPELL_THUNDERING_STORM          = 39365,
  
-	SPELL_SONIC_BOOM_CAST_N			= 33923,
-	SPELL_SONIC_BOOM_CAST_H			= 38796,
-	SPELL_SONIC_BOOM_EFFECT_N		= 38795,
-	SPELL_SONIC_BOOM_EFFECT_H		= 33666,
-	SPELL_MURMURS_TOUCH_N			= 33711,
-	SPELL_MURMURS_TOUCH_H			= 38794,
+    SPELL_SONIC_BOOM_CAST_N         = 33923,
+    SPELL_SONIC_BOOM_CAST_H         = 38796,
+    SPELL_SONIC_BOOM_EFFECT_N       = 38795,
+    SPELL_SONIC_BOOM_EFFECT_H       = 33666,
+    SPELL_MURMURS_TOUCH_N           = 33711,
+    SPELL_MURMURS_TOUCH_H           = 38794,
 
-	EVENT_SPELL_SONIC_BOOM			= 1,
-	EVENT_SPELL_SONIC_BOOM_EFFECT	= 2,
-	EVENT_SPELL_MURMURS_TOUCH		= 3,
-	EVENT_SPELL_RESONANCE			= 4,
-	EVENT_SPELL_MAGNETIC			= 5,
-	EVENT_SPELL_THUNDERING			= 6,
-	EVENT_SPELL_SONIC_SHOCK			= 7
+    EVENT_SPELL_SONIC_BOOM          = 1,
+    EVENT_SPELL_SONIC_BOOM_EFFECT   = 2,
+    EVENT_SPELL_MURMURS_TOUCH       = 3,
+    EVENT_SPELL_RESONANCE           = 4,
+    EVENT_SPELL_MAGNETIC            = 5,
+    EVENT_SPELL_THUNDERING          = 6,
+    EVENT_SPELL_SONIC_SHOCK         = 7
 };
 
 class boss_murmur : public CreatureScript
@@ -47,91 +47,91 @@ public:
         boss_murmurAI(Creature* creature) : ScriptedAI(creature)
         {
             SetCombatMovement(false);
-			instance = creature->GetInstanceScript();
+            instance = creature->GetInstanceScript();
         }
 
-		InstanceScript* instance;
-		EventMap events;
+        InstanceScript* instance;
+        EventMap events;
 
         void Reset()
         {
-			events.Reset();
+            events.Reset();
             me->SetHealth(me->CountPctFromMaxHealth(40));
             me->ResetPlayerDamageReq();
 
-			if (instance)
-				instance->SetData(DATA_MURMUREVENT, NOT_STARTED);
+            if (instance)
+                instance->SetData(DATA_MURMUREVENT, NOT_STARTED);
         }
 
         void EnterCombat(Unit* /*who*/)
-		{
-			events.ScheduleEvent(EVENT_SPELL_SONIC_BOOM, 30000);
-			events.ScheduleEvent(EVENT_SPELL_MURMURS_TOUCH, urand(8000, 20000));
-			events.ScheduleEvent(EVENT_SPELL_RESONANCE, 5000);
-			events.ScheduleEvent(EVENT_SPELL_MAGNETIC, urand(15000, 30000));
-			if (IsHeroic())
-			{
-				events.ScheduleEvent(EVENT_SPELL_THUNDERING, 15000);
-				events.ScheduleEvent(EVENT_SPELL_SONIC_SHOCK, 10000);
-			}
+        {
+            events.ScheduleEvent(EVENT_SPELL_SONIC_BOOM, 30000);
+            events.ScheduleEvent(EVENT_SPELL_MURMURS_TOUCH, urand(8000, 20000));
+            events.ScheduleEvent(EVENT_SPELL_RESONANCE, 5000);
+            events.ScheduleEvent(EVENT_SPELL_MAGNETIC, urand(15000, 30000));
+            if (IsHeroic())
+            {
+                events.ScheduleEvent(EVENT_SPELL_THUNDERING, 15000);
+                events.ScheduleEvent(EVENT_SPELL_SONIC_SHOCK, 10000);
+            }
 
-			if (instance)
-				instance->SetData(DATA_MURMUREVENT, IN_PROGRESS);
-		}
+            if (instance)
+                instance->SetData(DATA_MURMUREVENT, IN_PROGRESS);
+        }
 
-		void JustDied(Unit*)
-		{
-			if (instance)
-				instance->SetData(DATA_MURMUREVENT, DONE);
-		}
+        void JustDied(Unit*)
+        {
+            if (instance)
+                instance->SetData(DATA_MURMUREVENT, DONE);
+        }
 
         void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-			events.Update(diff);
-			switch (events.GetEvent())
-			{
-				case EVENT_SPELL_SONIC_BOOM:
-					Talk(EMOTE_SONIC_BOOM);
-					me->CastSpell(me, DUNGEON_MODE(SPELL_SONIC_BOOM_CAST_N, SPELL_SONIC_BOOM_CAST_H), false);
-					events.RepeatEvent(28500);
-					events.DelayEvents(1500);
-					events.ScheduleEvent(EVENT_SPELL_SONIC_BOOM_EFFECT, 0);
-					return;
-				case EVENT_SPELL_SONIC_BOOM_EFFECT:
-					me->CastSpell(me, DUNGEON_MODE(SPELL_SONIC_BOOM_EFFECT_N, SPELL_SONIC_BOOM_EFFECT_H), true);
-					events.PopEvent();
-					break;
-				case EVENT_SPELL_MURMURS_TOUCH:
-					if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 80.0f, true))
-						me->CastSpell(target, DUNGEON_MODE(SPELL_MURMURS_TOUCH_N, SPELL_MURMURS_TOUCH_H), false);
-					events.RepeatEvent(urand(25000, 35000));
-					break;
-				case EVENT_SPELL_RESONANCE:
-					if (!me->IsWithinMeleeRange(me->GetVictim()))
-						me->CastSpell(me, SPELL_RESONANCE, false);
-					events.RepeatEvent(5000);
-					break;
-				case EVENT_SPELL_MAGNETIC:
-					if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 80.0f, true))
-					{
-						me->CastSpell(target, SPELL_MAGNETIC_PULL, false);
-						events.RepeatEvent(urand(15000, 30000));
-						return;
-					}
-					events.RepeatEvent(500);
-					break;
-				case EVENT_SPELL_THUNDERING:
-					me->CastSpell(me, SPELL_THUNDERING_STORM, true);
+            events.Update(diff);
+            switch (events.GetEvent())
+            {
+                case EVENT_SPELL_SONIC_BOOM:
+                    Talk(EMOTE_SONIC_BOOM);
+                    me->CastSpell(me, DUNGEON_MODE(SPELL_SONIC_BOOM_CAST_N, SPELL_SONIC_BOOM_CAST_H), false);
+                    events.RepeatEvent(28500);
+                    events.DelayEvents(1500);
+                    events.ScheduleEvent(EVENT_SPELL_SONIC_BOOM_EFFECT, 0);
+                    return;
+                case EVENT_SPELL_SONIC_BOOM_EFFECT:
+                    me->CastSpell(me, DUNGEON_MODE(SPELL_SONIC_BOOM_EFFECT_N, SPELL_SONIC_BOOM_EFFECT_H), true);
+                    events.PopEvent();
+                    break;
+                case EVENT_SPELL_MURMURS_TOUCH:
+                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 80.0f, true))
+                        me->CastSpell(target, DUNGEON_MODE(SPELL_MURMURS_TOUCH_N, SPELL_MURMURS_TOUCH_H), false);
+                    events.RepeatEvent(urand(25000, 35000));
+                    break;
+                case EVENT_SPELL_RESONANCE:
+                    if (!me->IsWithinMeleeRange(me->GetVictim()))
+                        me->CastSpell(me, SPELL_RESONANCE, false);
+                    events.RepeatEvent(5000);
+                    break;
+                case EVENT_SPELL_MAGNETIC:
+                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 80.0f, true))
+                    {
+                        me->CastSpell(target, SPELL_MAGNETIC_PULL, false);
+                        events.RepeatEvent(urand(15000, 30000));
+                        return;
+                    }
+                    events.RepeatEvent(500);
+                    break;
+                case EVENT_SPELL_THUNDERING:
+                    me->CastSpell(me, SPELL_THUNDERING_STORM, true);
                     events.RepeatEvent(15000);
-					break;
-				case EVENT_SPELL_SONIC_SHOCK:
-					me->CastSpell(me->GetVictim(), SPELL_SONIC_SHOCK, false);
+                    break;
+                case EVENT_SPELL_SONIC_SHOCK:
+                    me->CastSpell(me->GetVictim(), SPELL_SONIC_SHOCK, false);
                     events.RepeatEvent(urand(10000, 20000));
-					break;
-			}
+                    break;
+            }
 
             if (!me->isAttackReady())
                 return;
@@ -193,8 +193,8 @@ class spell_murmur_thundering_storm : public SpellScriptLoader
 
             void SelectTarget(std::list<WorldObject*>& targets)
             {
-				targets.remove_if(Trinity::AllWorldObjectsInExactRange(GetCaster(), 100.0f, true));
-				targets.remove_if(Trinity::AllWorldObjectsInExactRange(GetCaster(), 25.0f, false));
+                targets.remove_if(Trinity::AllWorldObjectsInExactRange(GetCaster(), 100.0f, true));
+                targets.remove_if(Trinity::AllWorldObjectsInExactRange(GetCaster(), 25.0f, false));
             }
 
             void Register()
@@ -212,6 +212,6 @@ class spell_murmur_thundering_storm : public SpellScriptLoader
 void AddSC_boss_murmur()
 {
     new boss_murmur();
-	new spell_murmur_sonic_boom_effect();
-	new spell_murmur_thundering_storm();
+    new spell_murmur_sonic_boom_effect();
+    new spell_murmur_thundering_storm();
 }

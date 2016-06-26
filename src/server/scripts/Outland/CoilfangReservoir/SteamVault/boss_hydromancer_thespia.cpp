@@ -8,18 +8,18 @@ REWRITTEN BY XINEF
 
 enum HydromancerThespia
 {
-    SAY_SUMMON					= 0,
-    SAY_AGGRO					= 1,
-    SAY_SLAY					= 2,
-    SAY_DEAD					= 3,
+    SAY_SUMMON                  = 0,
+    SAY_AGGRO                   = 1,
+    SAY_SLAY                    = 2,
+    SAY_DEAD                    = 3,
 
-    SPELL_LIGHTNING_CLOUD		= 25033,
-    SPELL_LUNG_BURST			= 31481,
-    SPELL_ENVELOPING_WINDS		= 31718,
+    SPELL_LIGHTNING_CLOUD       = 25033,
+    SPELL_LUNG_BURST            = 31481,
+    SPELL_ENVELOPING_WINDS      = 31718,
 
-	EVENT_SPELL_LIGHTNING		= 1,
-	EVENT_SPELL_LUNG			= 2,
-	EVENT_SPELL_ENVELOPING		= 3
+    EVENT_SPELL_LIGHTNING       = 1,
+    EVENT_SPELL_LUNG            = 2,
+    EVENT_SPELL_ENVELOPING      = 3
 };
 
 class boss_hydromancer_thespia : public CreatureScript
@@ -40,7 +40,7 @@ public:
         }
 
         InstanceScript* instance;
-		EventMap events;
+        EventMap events;
 
         void Reset()
         {
@@ -58,16 +58,16 @@ public:
 
         void KilledUnit(Unit* victim)
         {
-			if (victim->GetTypeId() == TYPEID_PLAYER)
-				Talk(SAY_SLAY);
+            if (victim->GetTypeId() == TYPEID_PLAYER)
+                Talk(SAY_SLAY);
         }
 
         void EnterCombat(Unit* /*who*/)
         {
             Talk(SAY_AGGRO);
-			events.ScheduleEvent(EVENT_SPELL_LIGHTNING, 15000);
-			events.ScheduleEvent(EVENT_SPELL_LUNG, 7000);
-			events.ScheduleEvent(EVENT_SPELL_ENVELOPING, 9000);
+            events.ScheduleEvent(EVENT_SPELL_LIGHTNING, 15000);
+            events.ScheduleEvent(EVENT_SPELL_LUNG, 7000);
+            events.ScheduleEvent(EVENT_SPELL_ENVELOPING, 9000);
 
             if (instance)
                 instance->SetData(TYPE_HYDROMANCER_THESPIA, IN_PROGRESS);
@@ -78,27 +78,27 @@ public:
             if (!UpdateVictim())
                 return;
 
-			events.Update(diff);
-			switch (events.GetEvent())
-			{
-				case EVENT_SPELL_LIGHTNING:
-					for (uint8 i = 0; i < DUNGEON_MODE(1, 2); ++i)
-						if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
-							me->CastSpell(target, SPELL_LIGHTNING_CLOUD, false);
-					events.RepeatEvent(urand(15000, 25000));
-					break;
-				case EVENT_SPELL_LUNG:
-					if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+            events.Update(diff);
+            switch (events.GetEvent())
+            {
+                case EVENT_SPELL_LIGHTNING:
+                    for (uint8 i = 0; i < DUNGEON_MODE(1, 2); ++i)
+                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                            me->CastSpell(target, SPELL_LIGHTNING_CLOUD, false);
+                    events.RepeatEvent(urand(15000, 25000));
+                    break;
+                case EVENT_SPELL_LUNG:
+                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
                     DoCast(target, SPELL_LUNG_BURST);
-					events.RepeatEvent(urand(7000, 12000));
-					break;
-				case EVENT_SPELL_ENVELOPING:
-					for (uint8 i = 0; i < DUNGEON_MODE(1, 2); ++i)
-						if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
-							me->CastSpell(target, SPELL_ENVELOPING_WINDS, false);
-					events.RepeatEvent(urand(10000, 15000));
-					break;
-			}
+                    events.RepeatEvent(urand(7000, 12000));
+                    break;
+                case EVENT_SPELL_ENVELOPING:
+                    for (uint8 i = 0; i < DUNGEON_MODE(1, 2); ++i)
+                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                            me->CastSpell(target, SPELL_ENVELOPING_WINDS, false);
+                    events.RepeatEvent(urand(10000, 15000));
+                    break;
+            }
 
             DoMeleeAttackIfReady();
         }

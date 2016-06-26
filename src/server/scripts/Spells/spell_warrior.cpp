@@ -29,12 +29,12 @@
 
 enum WarriorSpells
 {
-	// Ours
-	SPELL_WARRIOR_INTERVENE_TRIGGER					= 59667,
-	SPELL_WARRIOR_SPELL_REFLECTION					= 23920,
-	SPELL_WARRIOR_IMPROVED_SPELL_REFLECTION_TRIGGER	= 59725,
+    // Ours
+    SPELL_WARRIOR_INTERVENE_TRIGGER                 = 59667,
+    SPELL_WARRIOR_SPELL_REFLECTION                  = 23920,
+    SPELL_WARRIOR_IMPROVED_SPELL_REFLECTION_TRIGGER = 59725,
 
-	// Theirs
+    // Theirs
     SPELL_WARRIOR_BLOODTHIRST                       = 23885,
     SPELL_WARRIOR_BLOODTHIRST_DAMAGE                = 23881,
     SPELL_WARRIOR_CHARGE                            = 34846,
@@ -87,9 +87,9 @@ class spell_warr_mocking_blow : public SpellScriptLoader
 
             void HandleOnHit()
             {
-				if (Unit* target = GetHitUnit())
-					if (target->IsImmunedToSpellEffect(GetSpellInfo(), EFFECT_1))
-						SetHitDamage(0);
+                if (Unit* target = GetHitUnit())
+                    if (target->IsImmunedToSpellEffect(GetSpellInfo(), EFFECT_1))
+                        SetHitDamage(0);
             }
 
             void Register()
@@ -140,23 +140,23 @@ class spell_warr_improved_spell_reflection : public SpellScriptLoader
         {
             PrepareAuraScript(spell_warr_improved_spell_reflection_AuraScript);
 
-			bool CheckProc(ProcEventInfo& eventInfo)
+            bool CheckProc(ProcEventInfo& eventInfo)
             {
-				return eventInfo.GetDamageInfo()->GetSpellInfo() && eventInfo.GetDamageInfo()->GetSpellInfo()->Id == SPELL_WARRIOR_SPELL_REFLECTION;
+                return eventInfo.GetDamageInfo()->GetSpellInfo() && eventInfo.GetDamageInfo()->GetSpellInfo()->Id == SPELL_WARRIOR_SPELL_REFLECTION;
             }
 
             void OnProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
             {
                 PreventDefaultAction();
-				CustomSpellValues values;
-				values.AddSpellMod(SPELLVALUE_MAX_TARGETS, aurEff->GetAmount());
-				values.AddSpellMod(SPELLVALUE_RADIUS_MOD, 2000); // Base range = 100, final range = 20 value / 10000.0f = 0.2f
-				eventInfo.GetActor()->CastCustomSpell(SPELL_WARRIOR_IMPROVED_SPELL_REFLECTION_TRIGGER, values, eventInfo.GetActor(), TRIGGERED_FULL_MASK, NULL);
+                CustomSpellValues values;
+                values.AddSpellMod(SPELLVALUE_MAX_TARGETS, aurEff->GetAmount());
+                values.AddSpellMod(SPELLVALUE_RADIUS_MOD, 2000); // Base range = 100, final range = 20 value / 10000.0f = 0.2f
+                eventInfo.GetActor()->CastCustomSpell(SPELL_WARRIOR_IMPROVED_SPELL_REFLECTION_TRIGGER, values, eventInfo.GetActor(), TRIGGERED_FULL_MASK, NULL);
             }
 
             void Register()
             {
-				DoCheckProc += AuraCheckProcFn(spell_warr_improved_spell_reflection_AuraScript::CheckProc);
+                DoCheckProc += AuraCheckProcFn(spell_warr_improved_spell_reflection_AuraScript::CheckProc);
                 OnEffectProc += AuraEffectProcFn(spell_warr_improved_spell_reflection_AuraScript::OnProc, EFFECT_1, SPELL_AURA_DUMMY);
             }
         };
@@ -178,15 +178,15 @@ class spell_warr_improved_spell_reflection_trigger : public SpellScriptLoader
 
             void FilterTargets(std::list<WorldObject*>& unitList)
             {
-				GetCaster()->RemoveAurasDueToSpell(SPELL_WARRIOR_SPELL_REFLECTION);
-				unitList.sort(Trinity::ObjectDistanceOrderPred(GetCaster()));
-				while (unitList.size() > GetSpellValue()->MaxAffectedTargets)
-					unitList.pop_back();
+                GetCaster()->RemoveAurasDueToSpell(SPELL_WARRIOR_SPELL_REFLECTION);
+                unitList.sort(Trinity::ObjectDistanceOrderPred(GetCaster()));
+                while (unitList.size() > GetSpellValue()->MaxAffectedTargets)
+                    unitList.pop_back();
             }
 
             void Register()
             {
-				OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_warr_improved_spell_reflection_trigger_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_CASTER_AREA_PARTY);
+                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_warr_improved_spell_reflection_trigger_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_CASTER_AREA_PARTY);
             }
         };
 
@@ -202,7 +202,7 @@ class spell_warr_improved_spell_reflection_trigger : public SpellScriptLoader
 
             void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes mode)
             {
-				if (!IsExpired())
+                if (!IsExpired())
                 {
                     // aura remove - remove auras from all party members
                     std::list<Unit*> PartyMembers;
@@ -210,11 +210,11 @@ class spell_warr_improved_spell_reflection_trigger : public SpellScriptLoader
                     for (std::list<Unit*>::iterator itr = PartyMembers.begin(); itr != PartyMembers.end(); ++itr)
                     {
                         if ((*itr)->GetGUID() != GetOwner()->GetGUID())
-							if (Aura* aur = (*itr)->GetAura(59725, GetCasterGUID()))
-							{
-								aur->SetDuration(0);
-								aur->Remove();
-							}
+                            if (Aura* aur = (*itr)->GetAura(59725, GetCasterGUID()))
+                            {
+                                aur->SetDuration(0);
+                                aur->Remove();
+                            }
                     }
                 }
             }
@@ -292,11 +292,11 @@ class spell_warr_deep_wounds : public SpellScriptLoader
                 Unit* caster = GetCaster();
                 if (Unit* target = GetHitUnit())
                 {
-					// include target dependant auras
-					damage = target->MeleeDamageBonusTaken(caster, damage, BASE_ATTACK, GetSpellInfo());
+                    // include target dependant auras
+                    damage = target->MeleeDamageBonusTaken(caster, damage, BASE_ATTACK, GetSpellInfo());
                     // apply percent damage mods
                     ApplyPct(damage, 16.0f * GetSpellInfo()->GetRank() / 6.0f);
-					target->CastDelayedSpellWithPeriodicAmount(caster, SPELL_WARRIOR_DEEP_WOUNDS_RANK_PERIODIC, SPELL_AURA_PERIODIC_DAMAGE, damage, EFFECT_0);
+                    target->CastDelayedSpellWithPeriodicAmount(caster, SPELL_WARRIOR_DEEP_WOUNDS_RANK_PERIODIC, SPELL_AURA_PERIODIC_DAMAGE, damage, EFFECT_0);
 
                     //caster->CastCustomSpell(target, SPELL_WARRIOR_DEEP_WOUNDS_RANK_PERIODIC, &damage, NULL, NULL, true);
                 }
@@ -755,7 +755,7 @@ class spell_warr_sweeping_strikes : public SpellScriptLoader
             void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
             {
                 PreventDefaultAction();
-				int32 damage = eventInfo.GetDamageInfo()->GetDamage();
+                int32 damage = eventInfo.GetDamageInfo()->GetDamage();
                 GetTarget()->CastCustomSpell(_procTarget, SPELL_WARRIOR_SWEEPING_STRIKES_EXTRA_ATTACK, &damage, 0, 0, true, NULL, aurEff);
             }
 
@@ -980,13 +980,13 @@ class spell_warr_retaliation : public SpellScriptLoader
 
 void AddSC_warrior_spell_scripts()
 {
-	// Ours
-	new spell_warr_mocking_blow();
-	new spell_warr_intervene();
-	new spell_warr_improved_spell_reflection();
-	new spell_warr_improved_spell_reflection_trigger();
+    // Ours
+    new spell_warr_mocking_blow();
+    new spell_warr_intervene();
+    new spell_warr_improved_spell_reflection();
+    new spell_warr_improved_spell_reflection_trigger();
 
-	// Theirs
+    // Theirs
     new spell_warr_bloodthirst();
     new spell_warr_bloodthirst_heal();
     new spell_warr_charge();
@@ -994,12 +994,12 @@ void AddSC_warrior_spell_scripts()
     new spell_warr_damage_shield();
     new spell_warr_deep_wounds();
     new spell_warr_execute();
-	new spell_warr_glyph_of_sunder_armor();
+    new spell_warr_glyph_of_sunder_armor();
     new spell_warr_intimidating_shout();
     new spell_warr_last_stand();
     new spell_warr_overpower();
     new spell_warr_rend();
-	new spell_warr_retaliation();
+    new spell_warr_retaliation();
     new spell_warr_shattering_throw();
     new spell_warr_slam();
     new spell_warr_sweeping_strikes();

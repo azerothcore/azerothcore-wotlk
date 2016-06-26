@@ -100,18 +100,18 @@ enum PlayerSpellState
 struct PlayerSpell
 {
     PlayerSpellState State : 7; // UPPER CASE TO CAUSE CONSOLE ERRORS (CHECK EVERY USAGE)!
-	bool Active            : 1; // UPPER CASE TO CAUSE CONSOLE ERRORS (CHECK EVERY USAGE)! lower rank of a spell are not useable, but learnt
-	uint8 specMask         : 8;
-	bool IsInSpec(uint8 spec) { return (specMask & (1<<spec)); }
+    bool Active            : 1; // UPPER CASE TO CAUSE CONSOLE ERRORS (CHECK EVERY USAGE)! lower rank of a spell are not useable, but learnt
+    uint8 specMask         : 8;
+    bool IsInSpec(uint8 spec) { return (specMask & (1<<spec)); }
 };
 
 struct PlayerTalent
 {
     PlayerSpellState State : 8; // UPPER CASE TO CAUSE CONSOLE ERRORS (CHECK EVERY USAGE)!
-	uint8 specMask         : 8;
-	uint32 talentID;
-	bool inSpellBook;
-	bool IsInSpec(uint8 spec) { return (specMask & (1<<spec)); }
+    uint8 specMask         : 8;
+    uint32 talentID;
+    bool inSpellBook;
+    bool IsInSpec(uint8 spec) { return (specMask & (1<<spec)); }
 };
 
 #define SPEC_MASK_ALL 255
@@ -139,9 +139,9 @@ struct SpellCooldown
 {
     uint32 end;
     uint32 itemid;
-	uint32 maxduration;
-	bool sendToSpectator:1;
-	bool needSendToClient:1;
+    uint32 maxduration;
+    bool sendToSpectator:1;
+    bool needSendToClient:1;
 };
 
 typedef std::map<uint32, SpellCooldown> SpellCooldowns;
@@ -505,9 +505,9 @@ enum PlayerExtraFlags
     PLAYER_EXTRA_GM_INVISIBLE       = 0x0010,
     PLAYER_EXTRA_GM_CHAT            = 0x0020,               // Show GM badge in chat messages
     PLAYER_EXTRA_HAS_310_FLYER      = 0x0040,               // Marks if player already has 310% speed flying mount
-	PLAYER_EXTRA_SPECTATOR_ON		= 0x0080,				// Marks if player is spectactor
+    PLAYER_EXTRA_SPECTATOR_ON       = 0x0080,               // Marks if player is spectactor
     PLAYER_EXTRA_PVP_DEATH          = 0x0100,               // store PvP death status until corpse creating.
-	PLAYER_EXTRA_SHOW_DK_PET		= 0x0400,				// Marks if player should see ghoul on login screen
+    PLAYER_EXTRA_SHOW_DK_PET        = 0x0400,               // Marks if player should see ghoul on login screen
 };
 
 // 2^n values
@@ -749,9 +749,9 @@ enum TeleportToOptions
     TELE_TO_NOT_LEAVE_COMBAT    = 0x04,
     TELE_TO_NOT_UNSUMMON_PET    = 0x08,
     TELE_TO_SPELL               = 0x10,
-	TELE_TO_NOT_LEAVE_VEHICLE	= 0x20,
-	TELE_TO_WITH_PET			= 0x40,
-	TELE_TO_NOT_LEAVE_TAXI		= 0x80
+    TELE_TO_NOT_LEAVE_VEHICLE   = 0x20,
+    TELE_TO_WITH_PET            = 0x40,
+    TELE_TO_NOT_LEAVE_TAXI      = 0x80
 };
 
 /// Type of environmental damages
@@ -816,8 +816,8 @@ enum PlayerLoginQueryIndex
     PLAYER_LOGIN_QUERY_LOAD_INSTANCE_LOCK_TIMES     = 30,
     PLAYER_LOGIN_QUERY_LOAD_SEASONAL_QUEST_STATUS   = 31,
     PLAYER_LOGIN_QUERY_LOAD_MONTHLY_QUEST_STATUS    = 32,
-	PLAYER_LOGIN_QUERY_LOAD_MAIL                    = 33,
-	PLAYER_LOGIN_QUERY_LOAD_BREW_OF_THE_MONTH       = 34,
+    PLAYER_LOGIN_QUERY_LOAD_MAIL                    = 33,
+    PLAYER_LOGIN_QUERY_LOAD_BREW_OF_THE_MONTH       = 34,
     MAX_PLAYER_LOGIN_QUERY,
 };
 
@@ -829,23 +829,23 @@ enum PlayerDelayedOperations
     DELAYED_BG_MOUNT_RESTORE    = 0x08,                     ///< Flag to restore mount state after teleport from BG
     DELAYED_BG_TAXI_RESTORE     = 0x10,                     ///< Flag to restore taxi state after teleport from BG
     DELAYED_BG_GROUP_RESTORE    = 0x20,                     ///< Flag to restore group state after teleport from BG
-	DELAYED_VEHICLE_TELEPORT    = 0x40,
+    DELAYED_VEHICLE_TELEPORT    = 0x40,
     DELAYED_END
 };
 
 enum PlayerCharmedAISpells
 {
-	SPELL_T_STUN,
-	SPELL_ROOT_OR_FEAR,
-	SPELL_INSTANT_DAMAGE,
-	SPELL_INSTANT_DAMAGE2,
-	SPELL_HIGH_DAMAGE1,
-	SPELL_HIGH_DAMAGE2,
-	SPELL_DOT_DAMAGE,
-	SPELL_T_CHARGE,
-	SPELL_IMMUNITY,
-	SPELL_FAST_RUN,
-	NUM_CAI_SPELLS
+    SPELL_T_STUN,
+    SPELL_ROOT_OR_FEAR,
+    SPELL_INSTANT_DAMAGE,
+    SPELL_INSTANT_DAMAGE2,
+    SPELL_HIGH_DAMAGE1,
+    SPELL_HIGH_DAMAGE2,
+    SPELL_DOT_DAMAGE,
+    SPELL_T_CHARGE,
+    SPELL_IMMUNITY,
+    SPELL_FAST_RUN,
+    NUM_CAI_SPELLS
 };
 
 // Player summoning auto-decline time (in secs)
@@ -905,9 +905,9 @@ enum PlayerRestState
 
 enum AdditionalSaving
 {
-	ADDITIONAL_SAVING_NONE						= 0x00,
-	ADDITIONAL_SAVING_INVENTORY_AND_GOLD		= 0x01,
-	ADDITIONAL_SAVING_QUEST_STATUS				= 0x02,
+    ADDITIONAL_SAVING_NONE                      = 0x00,
+    ADDITIONAL_SAVING_INVENTORY_AND_GOLD        = 0x01,
+    ADDITIONAL_SAVING_QUEST_STATUS              = 0x02,
 };
 
 class PlayerTaxi
@@ -946,7 +946,7 @@ class PlayerTaxi
         void ClearTaxiDestinations() { m_TaxiDestinations.clear(); _taxiSegment = 0; }
         void AddTaxiDestination(uint32 dest) { m_TaxiDestinations.push_back(dest); }
         uint32 GetTaxiSource() const { return m_TaxiDestinations.size() <= _taxiSegment+1 ? 0 : m_TaxiDestinations[_taxiSegment]; }
-		uint32 GetTaxiDestination() const { return m_TaxiDestinations.size() <= _taxiSegment+1 ? 0 : m_TaxiDestinations[_taxiSegment+1]; }
+        uint32 GetTaxiDestination() const { return m_TaxiDestinations.size() <= _taxiSegment+1 ? 0 : m_TaxiDestinations[_taxiSegment+1]; }
         uint32 GetCurrentTaxiPath() const;
         uint32 NextTaxiDestination()
         {
@@ -954,9 +954,9 @@ class PlayerTaxi
             return GetTaxiDestination();
         }
 
-		// xinef:
-		void SetTaxiSegment(uint32 segment) { _taxiSegment = segment; }
-		uint32 GetTaxiSegment() const { return _taxiSegment; }
+        // xinef:
+        void SetTaxiSegment(uint32 segment) { _taxiSegment = segment; }
+        uint32 GetTaxiSegment() const { return _taxiSegment; }
 
         std::vector<uint32> const& GetPath() const { return m_TaxiDestinations; }
         bool empty() const { return m_TaxiDestinations.empty(); }
@@ -965,7 +965,7 @@ class PlayerTaxi
     private:
         TaxiMask m_taximask;
         std::vector<uint32> m_TaxiDestinations;
-		uint32 _taxiSegment;
+        uint32 _taxiSegment;
 };
 
 std::ostringstream& operator<< (std::ostringstream& ss, PlayerTaxi const& taxi);
@@ -975,14 +975,14 @@ class Player;
 // holder for Battleground data (pussywizard: not stored in db)
 struct BGData
 {
-	BGData() : bgInstanceID(0), bgTypeID(BATTLEGROUND_TYPE_NONE), bgTeamId(TEAM_NEUTRAL), bgQueueSlot(PLAYER_MAX_BATTLEGROUND_QUEUES), isInvited(false), bgIsRandom(false), bgAfkReportedCount(0), bgAfkReportedTimer(0) {}
+    BGData() : bgInstanceID(0), bgTypeID(BATTLEGROUND_TYPE_NONE), bgTeamId(TEAM_NEUTRAL), bgQueueSlot(PLAYER_MAX_BATTLEGROUND_QUEUES), isInvited(false), bgIsRandom(false), bgAfkReportedCount(0), bgAfkReportedTimer(0) {}
 
     uint32 bgInstanceID;
     BattlegroundTypeId bgTypeID;
     TeamId bgTeamId;
-	uint32 bgQueueSlot;
-	bool isInvited;
-	bool bgIsRandom;
+    uint32 bgQueueSlot;
+    bool isInvited;
+    bool bgIsRandom;
 
     std::set<uint32>   bgAfkReporter;
     uint8              bgAfkReportedCount;
@@ -993,12 +993,12 @@ struct BGData
 struct EntryPointData
 {
     EntryPointData() : mountSpell(0)
-	{
-		ClearTaxiPath();
-	}
+    {
+        ClearTaxiPath();
+    }
 
     uint32 mountSpell;
-	std::vector<uint32> taxiPath;
+    std::vector<uint32> taxiPath;
     WorldLocation joinPos;
 
     void ClearTaxiPath()     { taxiPath.clear(); }
@@ -1122,12 +1122,12 @@ class Player : public Unit, public GridObject<Player>
             m_summon_x = x;
             m_summon_y = y;
             m_summon_z = z;
-			m_summon_asSpectator = asSpectator;
+            m_summon_asSpectator = asSpectator;
         }
-		bool IsSummonAsSpectator() const { return m_summon_asSpectator && m_summon_expire >= time(NULL); }
-		void SetSummonAsSpectator(bool on) { m_summon_asSpectator = on; }
+        bool IsSummonAsSpectator() const { return m_summon_asSpectator && m_summon_expire >= time(NULL); }
+        void SetSummonAsSpectator(bool on) { m_summon_asSpectator = on; }
         void SummonIfPossible(bool agree);
-		time_t GetSummonExpireTimer() const { return m_summon_expire; }
+        time_t GetSummonExpireTimer() const { return m_summon_expire; }
 
         bool Create(uint32 guidlow, CharacterCreateInfo* createInfo);
 
@@ -1278,7 +1278,7 @@ class Player : public Unit, public GridObject<Player>
         InventoryResult CanBankItem(uint8 bag, uint8 slot, ItemPosCountVec& dest, Item* pItem, bool swap, bool not_loading = true) const;
         InventoryResult CanUseItem(Item* pItem, bool not_loading = true) const;
         bool HasItemTotemCategory(uint32 TotemCategory) const;
-		bool IsTotemCategoryCompatiableWith(const ItemTemplate* pProto, uint32 requiredTotemCategoryId) const;
+        bool IsTotemCategoryCompatiableWith(const ItemTemplate* pProto, uint32 requiredTotemCategoryId) const;
         InventoryResult CanUseItem(ItemTemplate const* pItem) const;
         InventoryResult CanUseAmmo(uint32 item) const;
         InventoryResult CanRollForItemInLFG(ItemTemplate const* item, WorldObject const* lootedObject) const;
@@ -1292,8 +1292,8 @@ class Player : public Unit, public GridObject<Player>
         void AutoStoreLoot(uint8 bag, uint8 slot, uint32 loot_id, LootStore const& store, bool broadcast = false);
         void AutoStoreLoot(uint32 loot_id, LootStore const& store, bool broadcast = false) { AutoStoreLoot(NULL_BAG, NULL_SLOT, loot_id, store, broadcast); }
         void StoreLootItem(uint8 lootSlot, Loot* loot);
-		void UpdateLootAchievements(LootItem *item, Loot* loot);
-		void UpdateTitansGrip();
+        void UpdateLootAchievements(LootItem *item, Loot* loot);
+        void UpdateTitansGrip();
 
         InventoryResult CanTakeMoreSimilarItems(uint32 entry, uint32 count, Item* pItem, uint32* no_space_count = NULL) const;
         InventoryResult CanStoreItem(uint8 bag, uint8 slot, ItemPosCountVec& dest, uint32 entry, uint32 count, Item* pItem = NULL, bool swap = false, uint32* no_space_count = NULL) const;
@@ -1667,7 +1667,7 @@ class Player : public Unit, public GridObject<Player>
 
         void SendProficiency(ItemClass itemClass, uint32 itemSubclassMask);
         void SendInitialSpells();
-		void SendLearnPacket(uint32 spellId, bool learn);
+        void SendLearnPacket(uint32 spellId, bool learn);
         bool addSpell(uint32 spellId, uint8 addSpecMask, bool updateActive, bool temporary = false);
         bool _addSpell(uint32 spellId, uint8 addSpecMask, bool temporary);
         void learnSpell(uint32 spellId);
@@ -1692,10 +1692,10 @@ class Player : public Unit, public GridObject<Player>
         void LearnPetTalent(uint64 petGuid, uint32 talentId, uint32 talentRank);
 
         bool addTalent(uint32 spellId, uint8 addSpecMask, uint8 oldTalentRank);
-		void _removeTalent(PlayerTalentMap::iterator& itr, uint8 specMask);
-		void _removeTalent(uint32 spellId, uint8 specMask);
-		void _removeTalentAurasAndSpells(uint32 spellId);
-		void _addTalentAurasAndSpells(uint32 spellId);
+        void _removeTalent(PlayerTalentMap::iterator& itr, uint8 specMask);
+        void _removeTalent(uint32 spellId, uint8 specMask);
+        void _removeTalentAurasAndSpells(uint32 spellId);
+        void _addTalentAurasAndSpells(uint32 spellId);
         bool HasTalent(uint32 spell_id, uint8 spec) const;
 
         uint32 CalculateTalentsPoints() const;
@@ -1708,9 +1708,9 @@ class Player : public Unit, public GridObject<Player>
         uint8 GetSpecsCount() const { return m_specsCount; }
         void SetSpecsCount(uint8 count) { m_specsCount = count; }
         void ActivateSpec(uint8 spec);
-		void GetTalentTreePoints(uint8 (&specPoints)[3]) const;
-		uint8 GetMostPointsTalentTree() const;
-		bool IsHealerTalentSpec() const;
+        void GetTalentTreePoints(uint8 (&specPoints)[3]) const;
+        uint8 GetMostPointsTalentTree() const;
+        bool IsHealerTalentSpec() const;
 
         void InitGlyphsForLevel();
         void SetGlyphSlot(uint8 slot, uint32 slottype) { SetUInt32Value(PLAYER_FIELD_GLYPH_SLOTS_1 + slot, slottype); }
@@ -1720,8 +1720,8 @@ class Player : public Unit, public GridObject<Player>
             m_Glyphs[m_activeSpec][slot] = glyph;
             SetUInt32Value(PLAYER_FIELD_GLYPHS_1 + slot, glyph);
 
-			if (save)
-				SetNeedToSaveGlyphs(true);
+            if (save)
+                SetNeedToSaveGlyphs(true);
         }
         uint32 GetGlyph(uint8 slot) const { return m_Glyphs[m_activeSpec][slot]; }
 
@@ -1737,7 +1737,7 @@ class Player : public Unit, public GridObject<Player>
 
         void AddSpellMod(SpellModifier* mod, bool apply);
         bool IsAffectedBySpellmod(SpellInfo const* spellInfo, SpellModifier* mod, Spell* spell = NULL);
-		bool HasSpellMod(SpellModifier* mod, Spell* spell);
+        bool HasSpellMod(SpellModifier* mod, Spell* spell);
         template <class T> T ApplySpellMod(uint32 spellId, SpellModOp op, T &basevalue, Spell* spell = NULL, bool temporaryPet = false);
         void RemoveSpellMods(Spell* spell);
         void RestoreSpellMods(Spell* spell, uint32 ownerAuraId = 0, Aura* aura = NULL);
@@ -1817,17 +1817,17 @@ class Player : public Unit, public GridObject<Player>
         void SetPvP(bool state)
         {
             Unit::SetPvP(state);
-			if (!m_Controlled.empty())
-				for (ControlSet::iterator itr = m_Controlled.begin(); itr != m_Controlled.end(); ++itr)
-					(*itr)->SetPvP(state);
+            if (!m_Controlled.empty())
+                for (ControlSet::iterator itr = m_Controlled.begin(); itr != m_Controlled.end(); ++itr)
+                    (*itr)->SetPvP(state);
         }
         void UpdatePvP(bool state, bool _override=false);
         void UpdateZone(uint32 newZone, uint32 newArea);
         void UpdateArea(uint32 newArea);
 
-		uint32 GetZoneId(bool forceRecalc = false) const;
-		uint32 GetAreaId(bool forceRecalc = false) const;
-		void GetZoneAndAreaId(uint32& zoneid, uint32& areaid, bool forceRecalc = false) const;
+        uint32 GetZoneId(bool forceRecalc = false) const;
+        uint32 GetAreaId(bool forceRecalc = false) const;
+        void GetZoneAndAreaId(uint32& zoneid, uint32& areaid, bool forceRecalc = false) const;
 
         void UpdateZoneDependentAuras(uint32 zone_id);    // zones
         void UpdateAreaDependentAuras(uint32 area_id);    // subzones
@@ -1859,11 +1859,11 @@ class Player : public Unit, public GridObject<Player>
         void SendUpdateToOutOfRangeGroupMembers();
 
         void SetInGuild(uint32 GuildId)
-		{
-			SetUInt32Value(PLAYER_GUILDID, GuildId);
-			// xinef: update global storage
-			sWorld->UpdateGlobalPlayerGuild(GetGUIDLow(), GuildId);
-		}
+        {
+            SetUInt32Value(PLAYER_GUILDID, GuildId);
+            // xinef: update global storage
+            sWorld->UpdateGlobalPlayerGuild(GetGUIDLow(), GuildId);
+        }
         void SetRank(uint8 rankId) { SetUInt32Value(PLAYER_GUILDRANK, rankId); }
         uint8 GetRank() const { return uint8(GetUInt32Value(PLAYER_GUILDRANK)); }
         void SetGuildIdInvited(uint32 GuildId) { m_GuildIdInvited = GuildId; }
@@ -1999,7 +1999,7 @@ class Player : public Unit, public GridObject<Player>
         void SendMessageToSet(WorldPacket* data, bool self) { SendMessageToSetInRange(data, GetVisibilityRange(), self, true); } // pussywizard!
         void SendMessageToSetInRange(WorldPacket* data, float dist, bool self, bool includeMargin = false, Player const* skipped_rcvr = NULL); // pussywizard!
         void SendMessageToSetInRange_OwnTeam(WorldPacket* data, float dist, bool self); // pussywizard! param includeMargin not needed here
-		void SendMessageToSet(WorldPacket* data, Player const* skipped_rcvr) { SendMessageToSetInRange(data, GetVisibilityRange(), skipped_rcvr != this, true, skipped_rcvr); } // pussywizard!
+        void SendMessageToSet(WorldPacket* data, Player const* skipped_rcvr) { SendMessageToSetInRange(data, GetVisibilityRange(), skipped_rcvr != this, true, skipped_rcvr); } // pussywizard!
 
         void SendTeleportAckPacket();
 
@@ -2064,8 +2064,8 @@ class Player : public Unit, public GridObject<Player>
         time_t GetSemaphoreTeleportNear() const { return mSemaphoreTeleport_Near; }
         time_t GetSemaphoreTeleportFar() const { return mSemaphoreTeleport_Far; }
         void ProcessDelayedOperations();
-		uint32 GetDelayedOperations() const { return m_DelayedOperations; }
-		void ScheduleDelayedOperation(uint32 operation)
+        uint32 GetDelayedOperations() const { return m_DelayedOperations; }
+        void ScheduleDelayedOperation(uint32 operation)
         {
             if (operation < DELAYED_END)
                 m_DelayedOperations |= operation;
@@ -2200,9 +2200,9 @@ class Player : public Unit, public GridObject<Player>
         bool InArena() const;
         uint32 GetBattlegroundId() const { return m_bgData.bgInstanceID; }
         BattlegroundTypeId GetBattlegroundTypeId() const { return m_bgData.bgTypeID; }
-		uint32 GetCurrentBattlegroundQueueSlot() const { return m_bgData.bgQueueSlot; }
+        uint32 GetCurrentBattlegroundQueueSlot() const { return m_bgData.bgQueueSlot; }
         bool IsInvitedForBattlegroundInstance() const { return m_bgData.isInvited; }
-		bool IsCurrentBattlegroundRandom() const { return m_bgData.bgIsRandom; }
+        bool IsCurrentBattlegroundRandom() const { return m_bgData.bgIsRandom; }
         Battleground* GetBattleground(bool create = false) const;
 
         bool InBattlegroundQueue() const
@@ -2259,7 +2259,7 @@ class Player : public Unit, public GridObject<Player>
                 }
         }
 
-		TeamId GetBgTeamId() const { return m_bgData.bgTeamId != TEAM_NEUTRAL ? m_bgData.bgTeamId : GetTeamId(); }
+        TeamId GetBgTeamId() const { return m_bgData.bgTeamId != TEAM_NEUTRAL ? m_bgData.bgTeamId : GetTeamId(); }
 
         void LeaveBattleground(Battleground* bg = NULL);
         bool CanJoinToBattleground() const;
@@ -2304,7 +2304,7 @@ class Player : public Unit, public GridObject<Player>
         void UpdateFallInformationIfNeed(MovementInfo const& minfo, uint16 opcode);
         SafeUnitPointer m_mover;
         WorldObject* m_seer;
-		std::set<Unit*> m_isInSharedVisionOf;
+        std::set<Unit*> m_isInSharedVisionOf;
         void SetFallInformation(uint32 time, float z)
         {
             m_lastFallTime = time;
@@ -2420,8 +2420,8 @@ class Player : public Unit, public GridObject<Player>
         // last used pet number (for BG's)
         uint32 GetLastPetNumber() const { return m_lastpetnumber; }
         void SetLastPetNumber(uint32 petnumber) { m_lastpetnumber = petnumber; }
-		uint32 GetLastPetSpell() const { return m_oldpetspell; }
-		void SetLastPetSpell(uint32 petspell) { m_oldpetspell = petspell; }
+        uint32 GetLastPetSpell() const { return m_oldpetspell; }
+        void SetLastPetSpell(uint32 petspell) { m_oldpetspell = petspell; }
 
         /*********************************************************/
         /***                   GROUP SYSTEM                    ***/
@@ -2555,44 +2555,44 @@ class Player : public Unit, public GridObject<Player>
         }
 
         // OURS
-		// saving
-		void AdditionalSavingAddMask(uint8 mask) { m_additionalSaveTimer = 2000; m_additionalSaveMask |= mask; }
-		// arena spectator
-		bool IsSpectator() const { return m_ExtraFlags & PLAYER_EXTRA_SPECTATOR_ON; }
-		void SetIsSpectator(bool on);
-		bool NeedSendSpectatorData() const;
-		void SetPendingSpectatorForBG(uint32 bgInstanceId) { m_pendingSpectatorForBG = bgInstanceId; }
-		bool HasPendingSpectatorForBG(uint32 bgInstanceId) const { return m_pendingSpectatorForBG == bgInstanceId; }
-		void SetPendingSpectatorInviteInstanceId(uint32 bgInstanceId) { m_pendingSpectatorInviteInstanceId = bgInstanceId; }
-		uint32 GetPendingSpectatorInviteInstanceId() const { return m_pendingSpectatorInviteInstanceId; }
-		bool HasReceivedSpectatorResetFor(uint32 guid) { return m_receivedSpectatorResetFor.find(guid) != m_receivedSpectatorResetFor.end(); }
-		void ClearReceivedSpectatorResetFor() { m_receivedSpectatorResetFor.clear(); }
-		void AddReceivedSpectatorResetFor(uint32 guid) { m_receivedSpectatorResetFor.insert(guid); }
-		void RemoveReceivedSpectatorResetFor(uint32 guid) { m_receivedSpectatorResetFor.erase(guid); }
-		uint32 m_pendingSpectatorForBG;
-		uint32 m_pendingSpectatorInviteInstanceId;
-		std::set<uint32> m_receivedSpectatorResetFor;
+        // saving
+        void AdditionalSavingAddMask(uint8 mask) { m_additionalSaveTimer = 2000; m_additionalSaveMask |= mask; }
+        // arena spectator
+        bool IsSpectator() const { return m_ExtraFlags & PLAYER_EXTRA_SPECTATOR_ON; }
+        void SetIsSpectator(bool on);
+        bool NeedSendSpectatorData() const;
+        void SetPendingSpectatorForBG(uint32 bgInstanceId) { m_pendingSpectatorForBG = bgInstanceId; }
+        bool HasPendingSpectatorForBG(uint32 bgInstanceId) const { return m_pendingSpectatorForBG == bgInstanceId; }
+        void SetPendingSpectatorInviteInstanceId(uint32 bgInstanceId) { m_pendingSpectatorInviteInstanceId = bgInstanceId; }
+        uint32 GetPendingSpectatorInviteInstanceId() const { return m_pendingSpectatorInviteInstanceId; }
+        bool HasReceivedSpectatorResetFor(uint32 guid) { return m_receivedSpectatorResetFor.find(guid) != m_receivedSpectatorResetFor.end(); }
+        void ClearReceivedSpectatorResetFor() { m_receivedSpectatorResetFor.clear(); }
+        void AddReceivedSpectatorResetFor(uint32 guid) { m_receivedSpectatorResetFor.insert(guid); }
+        void RemoveReceivedSpectatorResetFor(uint32 guid) { m_receivedSpectatorResetFor.erase(guid); }
+        uint32 m_pendingSpectatorForBG;
+        uint32 m_pendingSpectatorInviteInstanceId;
+        std::set<uint32> m_receivedSpectatorResetFor;
 
-		bool CanSeeDKPet() const	{ return m_ExtraFlags & PLAYER_EXTRA_SHOW_DK_PET; }
-		void SetShowDKPet(bool on)	{ if (on) m_ExtraFlags |= PLAYER_EXTRA_SHOW_DK_PET; else m_ExtraFlags &= ~PLAYER_EXTRA_SHOW_DK_PET; };
-		void PrepareCharmAISpells();
-		uint32 m_charmUpdateTimer;
+        bool CanSeeDKPet() const    { return m_ExtraFlags & PLAYER_EXTRA_SHOW_DK_PET; }
+        void SetShowDKPet(bool on)  { if (on) m_ExtraFlags |= PLAYER_EXTRA_SHOW_DK_PET; else m_ExtraFlags &= ~PLAYER_EXTRA_SHOW_DK_PET; };
+        void PrepareCharmAISpells();
+        uint32 m_charmUpdateTimer;
 
-		int8 GetComboPointGain() { return m_comboPointGain; }
-		void SetComboPointGain(int8 combo) { m_comboPointGain = combo; }
+        int8 GetComboPointGain() { return m_comboPointGain; }
+        void SetComboPointGain(int8 combo) { m_comboPointGain = combo; }
 
-		bool NeedToSaveGlyphs() { return m_NeedToSaveGlyphs; }
-		void SetNeedToSaveGlyphs(bool val) { m_NeedToSaveGlyphs = val; }
+        bool NeedToSaveGlyphs() { return m_NeedToSaveGlyphs; }
+        void SetNeedToSaveGlyphs(bool val) { m_NeedToSaveGlyphs = val; }
 
-		uint32 GetMountBlockId() { return m_MountBlockId; }
-		void SetMountBlockId(uint32 mount) { m_MountBlockId = mount; }
+        uint32 GetMountBlockId() { return m_MountBlockId; }
+        void SetMountBlockId(uint32 mount) { m_MountBlockId = mount; }
 
-		float GetRealParry() const { return m_realParry; }
-		float GetRealDodge() const { return m_realDodge; }
-		// mt maps
-		const PlayerTalentMap& GetTalentMap() const { return m_talents; }
-		uint32 GetNextSave() const { return m_nextSave; }
-		SpellModList const& GetSpellModList(uint32 type) const { return m_spellMods[type]; }
+        float GetRealParry() const { return m_realParry; }
+        float GetRealDodge() const { return m_realDodge; }
+        // mt maps
+        const PlayerTalentMap& GetTalentMap() const { return m_talents; }
+        uint32 GetNextSave() const { return m_nextSave; }
+        SpellModList const& GetSpellModList(uint32 type) const { return m_spellMods[type]; }
 
     protected:
         // Gamemaster whisper whitelist
@@ -2600,15 +2600,15 @@ class Player : public Unit, public GridObject<Player>
 
         // Combo Points
         int8 m_comboPointGain;
-		// Performance Varibales
-		bool m_NeedToSaveGlyphs;
-		// Mount block bug
-		uint32 m_MountBlockId;
-		// Real stats
-		float m_realDodge;
-		float m_realParry;
+        // Performance Varibales
+        bool m_NeedToSaveGlyphs;
+        // Mount block bug
+        uint32 m_MountBlockId;
+        // Real stats
+        float m_realDodge;
+        float m_realParry;
 
-		uint32 m_charmAISpells[NUM_CAI_SPELLS];
+        uint32 m_charmAISpells[NUM_CAI_SPELLS];
 
         uint32 m_AreaID;
         uint32 m_regenTimerCount;
@@ -2654,7 +2654,7 @@ class Player : public Unit, public GridObject<Player>
         void _LoadGlyphAuras();
         void _LoadInventory(PreparedQueryResult result, uint32 timeDiff);
         void _LoadMailInit(PreparedQueryResult resultUnread, PreparedQueryResult resultDelivery);
-		void _LoadMailAsynch(PreparedQueryResult result);
+        void _LoadMailAsynch(PreparedQueryResult result);
         void _LoadMail();
         void _LoadMailedItems(Mail* mail);
         void _LoadQuestStatus(PreparedQueryResult result);
@@ -2698,7 +2698,7 @@ class Player : public Unit, public GridObject<Player>
         void _SaveGlyphs(SQLTransaction& trans);
         void _SaveTalents(SQLTransaction& trans);
         void _SaveStats(SQLTransaction& trans);
-		void _SaveCharacter(bool create, SQLTransaction& trans);
+        void _SaveCharacter(bool create, SQLTransaction& trans);
         void _SaveInstanceTimeRestrictions(SQLTransaction& trans);
 
         /*********************************************************/
@@ -2782,7 +2782,7 @@ class Player : public Unit, public GridObject<Player>
         EnchantDurationList m_enchantDuration;
         ItemDurationList m_itemDuration;
         ItemDurationList m_itemSoulboundTradeable;
-		ACE_Thread_Mutex m_soulboundTradableLock;
+        ACE_Thread_Mutex m_soulboundTradableLock;
 
         void ResetTimeSync();
         void SendTimeSync();
@@ -2855,7 +2855,7 @@ class Player : public Unit, public GridObject<Player>
         float  m_summon_x;
         float  m_summon_y;
         float  m_summon_z;
-		bool   m_summon_asSpectator;
+        bool   m_summon_asSpectator;
 
         DeclinedName *m_declinedname;
         Runes *m_runes;
@@ -2962,18 +2962,18 @@ template <class T> T Player::ApplySpellMod(uint32 spellId, SpellModOp op, T &bas
         if (!IsAffectedBySpellmod(spellInfo, mod, spell))
             continue;
 
-		// xinef: temporary pets cannot use charged mods of owner, needed for mirror image QQ they should use their own auras
-		if (temporaryPet && mod->charges != 0)
-			continue;
+        // xinef: temporary pets cannot use charged mods of owner, needed for mirror image QQ they should use their own auras
+        if (temporaryPet && mod->charges != 0)
+            continue;
 
         if (mod->type == SPELLMOD_FLAT)
-		{
-			// xinef: do not allow to consume more than one 100% crit increasing spell
-			if (mod->op == SPELLMOD_CRITICAL_CHANCE && totalflat >= 100)
-				continue;
+        {
+            // xinef: do not allow to consume more than one 100% crit increasing spell
+            if (mod->op == SPELLMOD_CRITICAL_CHANCE && totalflat >= 100)
+                continue;
 
             totalflat += mod->value;
-		}
+        }
         else if (mod->type == SPELLMOD_PCT)
         {
             // skip percent mods for null basevalue (most important for spell mods with charges)
@@ -2983,27 +2983,27 @@ template <class T> T Player::ApplySpellMod(uint32 spellId, SpellModOp op, T &bas
             // special case (skip > 10sec spell casts for instant cast setting)
             if (mod->op == SPELLMOD_CASTING_TIME && basevalue >= T(10000) && mod->value <= -100)
                 continue;
-			// xinef: special exception for surge of light, dont affect crit chance if previous mods were not applied
-			else if (mod->op == SPELLMOD_CRITICAL_CHANCE && spell && !HasSpellMod(mod, spell))
-				continue;
-			// xinef: special case for backdraft gcd reduce with backlast time reduction, dont affect gcd if cast time was not applied
-			else if (mod->op == SPELLMOD_GLOBAL_COOLDOWN && spell && !HasSpellMod(mod, spell))
-				continue;
+            // xinef: special exception for surge of light, dont affect crit chance if previous mods were not applied
+            else if (mod->op == SPELLMOD_CRITICAL_CHANCE && spell && !HasSpellMod(mod, spell))
+                continue;
+            // xinef: special case for backdraft gcd reduce with backlast time reduction, dont affect gcd if cast time was not applied
+            else if (mod->op == SPELLMOD_GLOBAL_COOLDOWN && spell && !HasSpellMod(mod, spell))
+                continue;
 
-			// xinef: those two mods should be multiplicative (Glyph of Renew)
-			if (mod->op == SPELLMOD_DAMAGE || mod->op == SPELLMOD_DOT)
-				totalmul *= CalculatePct(1.0f, 100.0f+mod->value);
-			else
-				totalmul += CalculatePct(1.0f, mod->value);
+            // xinef: those two mods should be multiplicative (Glyph of Renew)
+            if (mod->op == SPELLMOD_DAMAGE || mod->op == SPELLMOD_DOT)
+                totalmul *= CalculatePct(1.0f, 100.0f+mod->value);
+            else
+                totalmul += CalculatePct(1.0f, mod->value);
         }
 
         DropModCharge(mod, spell);
     }
     float diff = 0.0f;
-	if (op == SPELLMOD_CASTING_TIME || op == SPELLMOD_DURATION)
-		diff = ((float)basevalue + totalflat) * (totalmul - 1.0f) + (float)totalflat;
-	else
-		diff = (float)basevalue * (totalmul - 1.0f) + (float)totalflat;
+    if (op == SPELLMOD_CASTING_TIME || op == SPELLMOD_DURATION)
+        diff = ((float)basevalue + totalflat) * (totalmul - 1.0f) + (float)totalflat;
+    else
+        diff = (float)basevalue * (totalmul - 1.0f) + (float)totalflat;
     basevalue = T((float)basevalue + diff);
     return T(diff);
 }

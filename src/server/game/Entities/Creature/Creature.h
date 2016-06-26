@@ -56,7 +56,7 @@ enum CreatureFlagsExtra
     CREATURE_FLAG_EXTRA_ALL_DIMINISH    = 0x00100000,       // Creature is subject to all diminishing returns as player are
     CREATURE_FLAG_EXTRA_KNOCKBACK_IMMUNE= 0x00200000,       // pussywizard: set mostly for dungeon bosses and their summons
     CREATURE_FLAG_EXTRA_AVOID_AOE       = 0x00400000,       // pussywizard: ignored by aoe attacks (for icc blood prince council npc - Dark Nucleus)
-	CREATURE_FLAG_EXTRA_NO_DODGE		= 0x00800000,		// xinef: target cannot dodge
+    CREATURE_FLAG_EXTRA_NO_DODGE        = 0x00800000,       // xinef: target cannot dodge
     CREATURE_FLAG_EXTRA_DUNGEON_BOSS        = 0x10000000,   // creature is a dungeon boss (SET DYNAMICALLY, DO NOT ADD IN DB)
     CREATURE_FLAG_EXTRA_IGNORE_PATHFINDING  = 0x20000000    // creature ignore pathfinding
 };
@@ -67,7 +67,7 @@ enum CreatureFlagsExtra
     CREATURE_FLAG_EXTRA_NO_TAUNT | CREATURE_FLAG_EXTRA_WORLDEVENT | CREATURE_FLAG_EXTRA_NO_CRIT | \
     CREATURE_FLAG_EXTRA_NO_SKILLGAIN | CREATURE_FLAG_EXTRA_TAUNT_DIMINISH | CREATURE_FLAG_EXTRA_ALL_DIMINISH | \
     CREATURE_FLAG_EXTRA_GUARD | CREATURE_FLAG_EXTRA_KNOCKBACK_IMMUNE | CREATURE_FLAG_EXTRA_AVOID_AOE | \
-	CREATURE_FLAG_EXTRA_NO_DODGE | CREATURE_FLAG_EXTRA_IGNORE_PATHFINDING)
+    CREATURE_FLAG_EXTRA_NO_DODGE | CREATURE_FLAG_EXTRA_IGNORE_PATHFINDING)
 
 
 #define MAX_AGGRO_RESET_TIME 10 // in seconds
@@ -280,7 +280,7 @@ struct CreatureData
     uint32 unit_flags;                                      // enum UnitFlags mask values
     uint32 dynamicflags;
     bool dbData;
-	bool overwrittenZ;
+    bool overwrittenZ;
 };
 
 struct CreatureModelInfo
@@ -475,7 +475,7 @@ class Creature : public Unit, public GridObject<Creature>, public MovableMapObje
         bool CanCreatureAttack(Unit const* victim, bool skipDistCheck = false) const;
         bool IsImmunedToSpell(SpellInfo const* spellInfo);
 
-		bool HasMechanicTemplateImmunity(uint32 mask) const;
+        bool HasMechanicTemplateImmunity(uint32 mask) const;
                                                             // redefine Unit::IsImmunedToSpell
         bool IsImmunedToSpellEffect(SpellInfo const* spellInfo, uint32 index) const;
                                                             // redefine Unit::IsImmunedToSpellEffect
@@ -498,7 +498,7 @@ class Creature : public Unit, public GridObject<Creature>, public MovableMapObje
 
         bool IsDungeonBoss() const;
         bool IsImmuneToKnockback() const;
-		bool IsAvoidingAOE() const { return GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_AVOID_AOE; }
+        bool IsAvoidingAOE() const { return GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_AVOID_AOE; }
 
         uint8 getLevelForTarget(WorldObject const* target) const; // overwrite Unit::getLevelForTarget for boss level support
 
@@ -526,11 +526,11 @@ class Creature : public Unit, public GridObject<Creature>, public MovableMapObje
         void SetMeleeDamageSchool(SpellSchools school) { m_meleeDamageSchoolMask = SpellSchoolMask(1 << school); }
 
         void _AddCreatureSpellCooldown(uint32 spell_id, uint32 end_time);
-		virtual void AddSpellCooldown(uint32 spell_id, uint32 /*itemid*/, uint32 end_time, bool needSendToClient = false, bool forceSendToSpectator = false);
+        virtual void AddSpellCooldown(uint32 spell_id, uint32 /*itemid*/, uint32 end_time, bool needSendToClient = false, bool forceSendToSpectator = false);
         virtual bool HasSpellCooldown(uint32 spell_id) const;
-		uint32 GetSpellCooldown(uint32 spell_id) const;
-		void ProhibitSpellSchool(SpellSchoolMask idSchoolMask, uint32 unTimeMs);
-		bool IsSpellProhibited(SpellSchoolMask idSchoolMask) const;
+        uint32 GetSpellCooldown(uint32 spell_id) const;
+        void ProhibitSpellSchool(SpellSchoolMask idSchoolMask, uint32 unTimeMs);
+        bool IsSpellProhibited(SpellSchoolMask idSchoolMask) const;
 
         bool HasSpell(uint32 spellID) const;
 
@@ -578,14 +578,14 @@ class Creature : public Unit, public GridObject<Creature>, public MovableMapObje
         virtual void DeleteFromDB();                        // overriden in Pet
 
         Loot loot;
-		uint64 GetLootRecipientGUID() const { return m_lootRecipient; }
+        uint64 GetLootRecipientGUID() const { return m_lootRecipient; }
         Player* GetLootRecipient() const;
         Group* GetLootRecipientGroup() const;
         bool hasLootRecipient() const { return m_lootRecipient || m_lootRecipientGroup; }
         bool isTappedBy(Player const* player) const;                          // return true if the creature is tapped by the player or a member of his party.
-		bool CanGeneratePickPocketLoot() const { return lootPickPocketRestoreTime == 0 || lootPickPocketRestoreTime < time(NULL); }
-		void SetPickPocketLootTime() { lootPickPocketRestoreTime = time(NULL) + MINUTE + GetCorpseDelay() + GetRespawnTime(); }
-		void ResetPickPocketLootTime() { lootPickPocketRestoreTime = 0; }
+        bool CanGeneratePickPocketLoot() const { return lootPickPocketRestoreTime == 0 || lootPickPocketRestoreTime < time(NULL); }
+        void SetPickPocketLootTime() { lootPickPocketRestoreTime = time(NULL) + MINUTE + GetCorpseDelay() + GetRespawnTime(); }
+        void ResetPickPocketLootTime() { lootPickPocketRestoreTime = 0; }
 
         void SetLootRecipient (Unit* unit, bool withGroup = true);
         void AllLootRemovedFromCorpse();
@@ -602,7 +602,7 @@ class Creature : public Unit, public GridObject<Creature>, public MovableMapObje
 
         uint32 m_spells[CREATURE_MAX_SPELLS];
         CreatureSpellCooldowns m_CreatureSpellCooldowns;
-		uint32 m_ProhibitSchoolTime[7];
+        uint32 m_ProhibitSchoolTime[7];
 
         bool CanStartAttack(Unit const* u) const;
         float GetAggroRange(Unit const* target) const;
@@ -622,10 +622,10 @@ class Creature : public Unit, public GridObject<Creature>, public MovableMapObje
         bool _IsTargetAcceptable(const Unit* target) const;
         bool _CanDetectFeignDeathOf(const Unit* target) const; // pussywizard
 
-		// pussywizard: updated at faction change, disable move in line of sight if actual faction is not hostile to anyone
-		void UpdateMoveInLineOfSightState();
-		bool IsMoveInLineOfSightDisabled() { return m_moveInLineOfSightDisabled; }
-		bool IsMoveInLineOfSightStrictlyDisabled() { return m_moveInLineOfSightStrictlyDisabled; }
+        // pussywizard: updated at faction change, disable move in line of sight if actual faction is not hostile to anyone
+        void UpdateMoveInLineOfSightState();
+        bool IsMoveInLineOfSightDisabled() { return m_moveInLineOfSightDisabled; }
+        bool IsMoveInLineOfSightStrictlyDisabled() { return m_moveInLineOfSightStrictlyDisabled; }
 
         MovementGeneratorType GetDefaultMovementType() const { return m_defaultMovementType; }
         void SetDefaultMovementType(MovementGeneratorType mgt) { m_defaultMovementType = mgt; }
@@ -657,7 +657,7 @@ class Creature : public Unit, public GridObject<Creature>, public MovableMapObje
         bool hasInvolvedQuest(uint32 quest_id)  const;
 
         bool isRegeneratingHealth() { return m_regenHealth; }
-		void SetRegeneratingHealth(bool c) { m_regenHealth = c; }
+        void SetRegeneratingHealth(bool c) { m_regenHealth = c; }
         virtual uint8 GetPetAutoSpellSize() const { return MAX_SPELL_CHARM; }
         virtual uint32 GetPetAutoSpellOnPos(uint8 pos) const
         {
@@ -739,7 +739,7 @@ class Creature : public Unit, public GridObject<Creature>, public MovableMapObje
         uint32 m_respawnDelay;                              // (secs) delay between corpse disappearance and respawning
         uint32 m_corpseDelay;                               // (secs) delay between death and corpse disappearance
         float m_respawnradius;
-		uint16 m_transportCheckTimer;
+        uint16 m_transportCheckTimer;
         uint32 lootPickPocketRestoreTime;
 
         ReactStates m_reactState;                           // for AI, not charmInfo
@@ -757,12 +757,12 @@ class Creature : public Unit, public GridObject<Creature>, public MovableMapObje
 
         SpellSchoolMask m_meleeDamageSchoolMask;
         uint32 m_originalEntry;
-		
-		bool m_moveInLineOfSightDisabled;
-		bool m_moveInLineOfSightStrictlyDisabled;
+        
+        bool m_moveInLineOfSightDisabled;
+        bool m_moveInLineOfSightStrictlyDisabled;
 
         Position m_homePosition;
-		Position m_transportHomePosition;
+        Position m_transportHomePosition;
 
         bool DisableReputationGain;
 
@@ -775,7 +775,7 @@ class Creature : public Unit, public GridObject<Creature>, public MovableMapObje
         bool CanAlwaysSee(WorldObject const* obj) const;
 
     private:
-		void ForcedDespawn(uint32 timeMSToDespawn = 0);
+        void ForcedDespawn(uint32 timeMSToDespawn = 0);
 
         //WaypointMovementGenerator vars
         uint32 m_waypointID;

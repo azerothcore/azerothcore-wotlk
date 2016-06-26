@@ -45,19 +45,19 @@ void BuildPartyLockDungeonBlock(WorldPacket& data, const lfg::LfgLockPartyMap& l
 
 void WorldSession::HandleLfgJoinOpcode(WorldPacket& recvData)
 {
-	if (!sLFGMgr->isOptionEnabled(lfg::LFG_OPTION_ENABLE_DUNGEON_FINDER | lfg::LFG_OPTION_ENABLE_RAID_BROWSER))
-	{
-		recvData.rfinish();
-		return;
-	}
+    if (!sLFGMgr->isOptionEnabled(lfg::LFG_OPTION_ENABLE_DUNGEON_FINDER | lfg::LFG_OPTION_ENABLE_RAID_BROWSER))
+    {
+        recvData.rfinish();
+        return;
+    }
 
-	// pussywizard:
-	if (Group* g = GetPlayer()->GetGroup())
-		if (g->isLFGGroup() ? g->GetMembersCount() == MAXGROUPSIZE : g->GetLeaderGUID() != GetPlayer()->GetGUID())
-		{
-			recvData.rfinish();
-			return;
-		}
+    // pussywizard:
+    if (Group* g = GetPlayer()->GetGroup())
+        if (g->isLFGGroup() ? g->GetMembersCount() == MAXGROUPSIZE : g->GetLeaderGUID() != GetPlayer()->GetGUID())
+        {
+            recvData.rfinish();
+            return;
+        }
 
     uint8 numDungeons;
     uint32 roles;
@@ -88,7 +88,7 @@ void WorldSession::HandleLfgJoinOpcode(WorldPacket& recvData)
     recvData >> comment;
     ;//sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_LFG_JOIN [" UI64FMTD "] roles: %u, Dungeons: %u, Comment: %s", GetPlayer()->GetGUID(), roles, uint8(newDungeons.size()), comment.c_str());
 
-	sLFGMgr->JoinLfg(GetPlayer(), uint8(roles), newDungeons, comment);
+    sLFGMgr->JoinLfg(GetPlayer(), uint8(roles), newDungeons, comment);
 }
 
 void WorldSession::HandleLfgLeaveOpcode(WorldPacket&  /*recvData*/)
@@ -273,16 +273,16 @@ void WorldSession::HandleLfrSearchJoinOpcode(WorldPacket& recvData)
 {
     uint32 dungeonId;
     recvData >> dungeonId;
-	dungeonId = (dungeonId & 0x00FFFFFF); // remove the type from the dungeon entry
-	sLFGMgr->LfrSearchAdd(GetPlayer(), dungeonId);
-	sLFGMgr->SendRaidBrowserCachedList(GetPlayer(), dungeonId);
+    dungeonId = (dungeonId & 0x00FFFFFF); // remove the type from the dungeon entry
+    sLFGMgr->LfrSearchAdd(GetPlayer(), dungeonId);
+    sLFGMgr->SendRaidBrowserCachedList(GetPlayer(), dungeonId);
 }
 
 void WorldSession::HandleLfrSearchLeaveOpcode(WorldPacket& recvData)
 {
     uint32 dungeonId;
     recvData >> dungeonId;
-	sLFGMgr->LfrSearchRemove(GetPlayer());
+    sLFGMgr->LfrSearchRemove(GetPlayer());
 }
 
 void WorldSession::HandleLfgGetStatus(WorldPacket& /*recvData*/)
@@ -428,7 +428,7 @@ void WorldSession::SendLfgRoleCheckUpdate(lfg::LfgRoleCheck const& roleCheck)
         Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(guid);
         data << uint8(player ? player->getLevel() : 0);    // Level
 
-		for (lfg::LfgRolesMap::const_iterator it = roleCheck.roles.begin(); it != roleCheck.roles.end(); ++it)
+        for (lfg::LfgRolesMap::const_iterator it = roleCheck.roles.begin(); it != roleCheck.roles.end(); ++it)
         {
             if (it->first == roleCheck.leader)
                 continue;
@@ -516,11 +516,11 @@ void WorldSession::SendLfgPlayerReward(lfg::LfgPlayerRewardData const& rewardDat
 void WorldSession::SendLfgBootProposalUpdate(lfg::LfgPlayerBoot const& boot)
 {
     uint64 guid = GetPlayer()->GetGUID();
-	lfg::LfgAnswer playerVote = boot.votes.find(guid)->second;
+    lfg::LfgAnswer playerVote = boot.votes.find(guid)->second;
     uint8 votesNum = 0;
     uint8 agreeNum = 0;
     uint32 secsleft = boot.cancelTime - time(NULL);
-	for (lfg::LfgAnswerContainer::const_iterator it = boot.votes.begin(); it != boot.votes.end(); ++it)
+    for (lfg::LfgAnswerContainer::const_iterator it = boot.votes.begin(); it != boot.votes.end(); ++it)
     {
         if (it->second != lfg::LFG_ANSWER_PENDING)
         {

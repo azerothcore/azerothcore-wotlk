@@ -18,143 +18,143 @@ enum Yells
 
 enum Spells
 {
-	SPELL_SUMMON_INVADER_A				= 49456,
-	SPELL_SUMMON_INVADER_B				= 49457,
-	SPELL_SUMMON_INVADER_C				= 49458,
+    SPELL_SUMMON_INVADER_A              = 49456,
+    SPELL_SUMMON_INVADER_B              = 49457,
+    SPELL_SUMMON_INVADER_C              = 49458,
 
-	SPELL_INFECTED_WOUND				= 49637,
-	SPELL_CRUSH							= 49639,
-	SPELL_CONSUME						= 49380,
-	SPELL_CORPSE_EXPLODE				= 49555,
+    SPELL_INFECTED_WOUND                = 49637,
+    SPELL_CRUSH                         = 49639,
+    SPELL_CONSUME                       = 49380,
+    SPELL_CORPSE_EXPLODE                = 49555,
 
-	SPELL_CORPSE_EXPLODE_DAMAGE			= 49618,
-	SPELL_CONSUME_AURA					= 49381,
+    SPELL_CORPSE_EXPLODE_DAMAGE         = 49618,
+    SPELL_CONSUME_AURA                  = 49381,
 };
 
 enum Events
 {
-	EVENT_SPELL_INFECTED_WOUND			= 1,
-	EVENT_SPELL_CRUSH					= 2,
-	EVENT_SPELL_CONSUME					= 3,
-	EVENT_SPELL_CORPSE_EXPLODE			= 4,
-	EVENT_SPAWN_INVADERS				= 5,
-	EVENT_KILL_TALK						= 6
+    EVENT_SPELL_INFECTED_WOUND          = 1,
+    EVENT_SPELL_CRUSH                   = 2,
+    EVENT_SPELL_CONSUME                 = 3,
+    EVENT_SPELL_CORPSE_EXPLODE          = 4,
+    EVENT_SPAWN_INVADERS                = 5,
+    EVENT_KILL_TALK                     = 6
 };
 
 class boss_trollgore : public CreatureScript
 {
-	public:
-		boss_trollgore() : CreatureScript("boss_trollgore") { }
+    public:
+        boss_trollgore() : CreatureScript("boss_trollgore") { }
 
-		struct boss_trollgoreAI : public BossAI
-		{
-			boss_trollgoreAI(Creature* creature) : BossAI(creature, DATA_TROLLGORE)
-			{
-			}
+        struct boss_trollgoreAI : public BossAI
+        {
+            boss_trollgoreAI(Creature* creature) : BossAI(creature, DATA_TROLLGORE)
+            {
+            }
 
-			void Reset()
-			{
-				BossAI::Reset();
-				events2.Reset();
-				events2.ScheduleEvent(EVENT_SPAWN_INVADERS, 30000);
-			}
+            void Reset()
+            {
+                BossAI::Reset();
+                events2.Reset();
+                events2.ScheduleEvent(EVENT_SPAWN_INVADERS, 30000);
+            }
 
-			void EnterCombat(Unit* who)
-			{
-				events.ScheduleEvent(EVENT_SPELL_INFECTED_WOUND, urand(6000,10000));
-				events.ScheduleEvent(EVENT_SPELL_CRUSH, urand(3000,5000));
-				events.ScheduleEvent(EVENT_SPELL_CONSUME, 15000);
-				events.ScheduleEvent(EVENT_SPELL_CORPSE_EXPLODE, 35000);
-				events.ScheduleEvent(EVENT_SPAWN_INVADERS, 20000, 30000);
-				
-				me->setActive(true);
-				instance->SetBossState(DATA_TROLLGORE, IN_PROGRESS);
-				if (who->GetTypeId() == TYPEID_PLAYER)
-				{
-					Talk(SAY_AGGRO);
-					me->SetInCombatWithZone();
-				}
-			}
+            void EnterCombat(Unit* who)
+            {
+                events.ScheduleEvent(EVENT_SPELL_INFECTED_WOUND, urand(6000,10000));
+                events.ScheduleEvent(EVENT_SPELL_CRUSH, urand(3000,5000));
+                events.ScheduleEvent(EVENT_SPELL_CONSUME, 15000);
+                events.ScheduleEvent(EVENT_SPELL_CORPSE_EXPLODE, 35000);
+                events.ScheduleEvent(EVENT_SPAWN_INVADERS, 20000, 30000);
+                
+                me->setActive(true);
+                instance->SetBossState(DATA_TROLLGORE, IN_PROGRESS);
+                if (who->GetTypeId() == TYPEID_PLAYER)
+                {
+                    Talk(SAY_AGGRO);
+                    me->SetInCombatWithZone();
+                }
+            }
 
-			void JustDied(Unit* killer)
-			{
-				Talk(SAY_DEATH);
-				BossAI::JustDied(killer);
-			}
+            void JustDied(Unit* killer)
+            {
+                Talk(SAY_DEATH);
+                BossAI::JustDied(killer);
+            }
 
-			void KilledUnit(Unit* victim)
-			{
-				if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
-				{
-					Talk(SAY_KILL);
-					events.ScheduleEvent(EVENT_KILL_TALK, 6000);
-				}
-			}
+            void KilledUnit(Unit* victim)
+            {
+                if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
+                {
+                    Talk(SAY_KILL);
+                    events.ScheduleEvent(EVENT_KILL_TALK, 6000);
+                }
+            }
 
-			void JustSummoned(Creature* summon)
-			{
-				summons.Summon(summon);
-			}
+            void JustSummoned(Creature* summon)
+            {
+                summons.Summon(summon);
+            }
 
-			void UpdateAI(uint32 diff)
-			{
-				events2.Update(diff);
-				switch (events2.ExecuteEvent())
-				{
-					case EVENT_SPAWN_INVADERS:
-						me->CastSpell(me, SPELL_SUMMON_INVADER_A, true);
-						me->CastSpell(me, SPELL_SUMMON_INVADER_B, true);
-						me->CastSpell(me, SPELL_SUMMON_INVADER_C, true);
-						events2.ScheduleEvent(EVENT_SPAWN_INVADERS, 30000);
-						break;
-				}
+            void UpdateAI(uint32 diff)
+            {
+                events2.Update(diff);
+                switch (events2.ExecuteEvent())
+                {
+                    case EVENT_SPAWN_INVADERS:
+                        me->CastSpell(me, SPELL_SUMMON_INVADER_A, true);
+                        me->CastSpell(me, SPELL_SUMMON_INVADER_B, true);
+                        me->CastSpell(me, SPELL_SUMMON_INVADER_C, true);
+                        events2.ScheduleEvent(EVENT_SPAWN_INVADERS, 30000);
+                        break;
+                }
 
-				if (!UpdateVictim())
-					return;
+                if (!UpdateVictim())
+                    return;
 
-				events.Update(diff);
-				if (me->HasUnitState(UNIT_STATE_CASTING))
-					return;
+                events.Update(diff);
+                if (me->HasUnitState(UNIT_STATE_CASTING))
+                    return;
 
-				switch(events.ExecuteEvent())
-				{
-					case EVENT_SPELL_INFECTED_WOUND:
-						me->CastSpell(me->GetVictim(), SPELL_INFECTED_WOUND, false);
-						events.ScheduleEvent(EVENT_SPELL_INFECTED_WOUND, urand(25000,35000));
-						break;
-					case EVENT_SPELL_CRUSH:
-						me->CastSpell(me->GetVictim(), SPELL_CRUSH, false);
-						events.ScheduleEvent(EVENT_SPELL_CRUSH, urand(10000,15000));
-						break;
-					case EVENT_SPELL_CONSUME:
-						Talk(SAY_CONSUME);
-						me->CastSpell(me, SPELL_CONSUME, false);
-						events.ScheduleEvent(EVENT_SPELL_CONSUME, 15000);
-						break;
-					case EVENT_SPELL_CORPSE_EXPLODE:
-						Talk(SAY_EXPLODE);
-						me->CastSpell(me, SPELL_CORPSE_EXPLODE, false);
-						events.ScheduleEvent(EVENT_SPELL_CORPSE_EXPLODE, urand(15000,19000));
-						break;
-				}
+                switch(events.ExecuteEvent())
+                {
+                    case EVENT_SPELL_INFECTED_WOUND:
+                        me->CastSpell(me->GetVictim(), SPELL_INFECTED_WOUND, false);
+                        events.ScheduleEvent(EVENT_SPELL_INFECTED_WOUND, urand(25000,35000));
+                        break;
+                    case EVENT_SPELL_CRUSH:
+                        me->CastSpell(me->GetVictim(), SPELL_CRUSH, false);
+                        events.ScheduleEvent(EVENT_SPELL_CRUSH, urand(10000,15000));
+                        break;
+                    case EVENT_SPELL_CONSUME:
+                        Talk(SAY_CONSUME);
+                        me->CastSpell(me, SPELL_CONSUME, false);
+                        events.ScheduleEvent(EVENT_SPELL_CONSUME, 15000);
+                        break;
+                    case EVENT_SPELL_CORPSE_EXPLODE:
+                        Talk(SAY_EXPLODE);
+                        me->CastSpell(me, SPELL_CORPSE_EXPLODE, false);
+                        events.ScheduleEvent(EVENT_SPELL_CORPSE_EXPLODE, urand(15000,19000));
+                        break;
+                }
 
-				DoMeleeAttackIfReady();
+                DoMeleeAttackIfReady();
                 EnterEvadeIfOutOfCombatArea();
             }
-					
-			bool CheckEvadeIfOutOfCombatArea() const
-			{
-				return me->GetHomePosition().GetExactDist2d(me) > 60.0f;
-			}
+                    
+            bool CheckEvadeIfOutOfCombatArea() const
+            {
+                return me->GetHomePosition().GetExactDist2d(me) > 60.0f;
+            }
 
-		private:
-			EventMap events2;
-		};
+        private:
+            EventMap events2;
+        };
 
-		CreatureAI *GetAI(Creature *creature) const
-		{
-			return GetInstanceAI<boss_trollgoreAI>(creature);
-		}
+        CreatureAI *GetAI(Creature *creature) const
+        {
+            return GetInstanceAI<boss_trollgoreAI>(creature);
+        }
 };
 
 class spell_trollgore_consume : public SpellScriptLoader
@@ -264,9 +264,9 @@ class achievement_consumption_junction : public AchievementCriteriaScript
 
 void AddSC_boss_trollgore()
 {
-	new boss_trollgore();
-	new spell_trollgore_consume();
-	new spell_trollgore_corpse_explode();
-	new spell_trollgore_invader_taunt();
-	new achievement_consumption_junction();
+    new boss_trollgore();
+    new spell_trollgore_consume();
+    new spell_trollgore_corpse_explode();
+    new spell_trollgore_invader_taunt();
+    new achievement_consumption_junction();
 }

@@ -201,8 +201,8 @@ public:
                     return;
                 }
 
-				MovePhase = id+1;
-				return;
+                MovePhase = id+1;
+                return;
             }
 
             if (Flying)
@@ -216,10 +216,10 @@ public:
                 }
 
                 if (id < 8)
-					MovePhase = id+1;
-				else
+                    MovePhase = id+1;
+                else
                 {
-					Phase = 1;
+                    Phase = 1;
                     Flying = false;
                     Movement = true;
                     return;
@@ -255,25 +255,25 @@ public:
         void UpdateAI(uint32 diff)
         {
             if (Intro)
-			{
-				if (MovePhase)
-				{
-					if (MovePhase >= 7)
-					{
-						me->SetDisableGravity(false);
-						me->HandleEmoteCommand(EMOTE_ONESHOT_LAND);
-						me->GetMotionMaster()->MovePoint(8, IntroWay[7][0], IntroWay[7][1], IntroWay[7][2]);
-					}
-					else
-					{
-						me->GetMotionMaster()->MovePoint(MovePhase, IntroWay[MovePhase][0], IntroWay[MovePhase][1], IntroWay[MovePhase][2]);
-					}
-					MovePhase = 0;
-				}
-				return;
-			}
+            {
+                if (MovePhase)
+                {
+                    if (MovePhase >= 7)
+                    {
+                        me->SetDisableGravity(false);
+                        me->HandleEmoteCommand(EMOTE_ONESHOT_LAND);
+                        me->GetMotionMaster()->MovePoint(8, IntroWay[7][0], IntroWay[7][1], IntroWay[7][2]);
+                    }
+                    else
+                    {
+                        me->GetMotionMaster()->MovePoint(MovePhase, IntroWay[MovePhase][0], IntroWay[MovePhase][1], IntroWay[MovePhase][2]);
+                    }
+                    MovePhase = 0;
+                }
+                return;
+            }
 
-			if (Flying && MovePhase)
+            if (Flying && MovePhase)
             {
                 if (MovePhase >= 7)
                 {
@@ -284,7 +284,7 @@ public:
                 else
                     me->GetMotionMaster()->MovePoint(MovePhase, IntroWay[MovePhase][0], IntroWay[MovePhase][1], IntroWay[MovePhase][2]);
                     
-				MovePhase = 0;
+                MovePhase = 0;
             }
 
             if (!UpdateVictim())
@@ -417,18 +417,18 @@ public:
 
     bool OnGossipHello(Player* pPlayer, GameObject *pGo)
     {
-		if (InstanceScript* pInstance = pGo->GetInstanceScript())
-		{
-			if (pInstance->GetData(TYPE_NIGHTBANE) != DONE && !pGo->FindNearestCreature(17225, 40.0f))
-				if (Creature *cr = ObjectAccessor::GetCreature(*pPlayer, pInstance->GetData64(DATA_NIGHTBANE)))
-					cr->GetMotionMaster()->MovePoint(0, IntroWay[0][0], IntroWay[0][1], IntroWay[0][2]);
-		}        
-		return false;
+        if (InstanceScript* pInstance = pGo->GetInstanceScript())
+        {
+            if (pInstance->GetData(TYPE_NIGHTBANE) != DONE && !pGo->FindNearestCreature(17225, 40.0f))
+                if (Creature *cr = ObjectAccessor::GetCreature(*pPlayer, pInstance->GetData64(DATA_NIGHTBANE)))
+                    cr->GetMotionMaster()->MovePoint(0, IntroWay[0][0], IntroWay[0][1], IntroWay[0][2]);
+        }        
+        return false;
     }
 };
 
 void AddSC_boss_nightbane()
 {
     new boss_nightbane();
-	new go_blackened_urn();
+    new go_blackened_urn();
 }

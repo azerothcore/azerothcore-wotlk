@@ -35,7 +35,7 @@ enum HighGuid
     HIGHGUID_CORPSE         = 0xF101,                      // blizz F100
     HIGHGUID_MO_TRANSPORT   = 0x1FC0,                      // blizz 1FC0 (for GAMEOBJECT_TYPE_MO_TRANSPORT)
     HIGHGUID_GROUP          = 0x1F50,
-	HIGHGUID_INSTANCE       = 0x1F42,                      // blizz 1F42/1F44/1F44/1F47
+    HIGHGUID_INSTANCE       = 0x1F42,                      // blizz 1F42/1F44/1F44/1F47
 };
 
 // used for creating values for respawn for example

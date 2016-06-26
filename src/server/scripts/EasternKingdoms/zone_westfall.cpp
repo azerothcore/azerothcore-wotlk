@@ -85,23 +85,23 @@ public:
     {
         npc_daphne_stilwellAI(Creature* creature) : npc_escortAI(creature), summons(me) { }
 
-		SummonList summons;
-		uint8 textCounter;
+        SummonList summons;
+        uint8 textCounter;
 
         void Reset()
         {
-			summons.DespawnAll();
-			textCounter = SAY_DS_DOWN_1;
+            summons.DespawnAll();
+            textCounter = SAY_DS_DOWN_1;
         }
 
         void WaypointReached(uint32 waypointId)
         {
             Player* player = GetPlayerForEscort();
             if (!player)
-			{
-				me->DespawnOrUnsummon(1);
+            {
+                me->DespawnOrUnsummon(1);
                 return;
-			}
+            }
 
             switch (waypointId)
             {
@@ -128,7 +128,7 @@ public:
                     me->SummonCreature(NPC_DEFIAS_RAIDER, -11440.96f, 1599.69f, 66.35f, 4.09f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 60000);
                     me->SummonCreature(NPC_DEFIAS_RAIDER, -11433.44f, 1594.24f, 66.99f, 4.05f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 60000);
                     me->SummonCreature(NPC_DEFIAS_RAIDER, -11428.29f, 1598.37f, 70.90f, 3.9f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 60000);
-					me->SummonCreature(NPC_DEFIAS_RAIDER, -11438.14f, 1607.6f, 70.94f, 4.38f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 60000);
+                    me->SummonCreature(NPC_DEFIAS_RAIDER, -11438.14f, 1607.6f, 70.94f, 4.38f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 60000);
                     break;
                 case 10:
                     SetRun(false);
@@ -142,10 +142,10 @@ public:
                     me->HandleEmoteCommand(EMOTE_STATE_USE_STANDING_NO_SHEATHE);
                     break;
                 case 17:
-					SetEscortPaused(true);
+                    SetEscortPaused(true);
                     player->GroupEventHappens(QUEST_TOME_VALOR, me);
-					me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
-					me->DespawnOrUnsummon(60000);
+                    me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+                    me->DespawnOrUnsummon(60000);
                     break;
             }
         }
@@ -161,20 +161,20 @@ public:
 
         void JustSummoned(Creature* creature)
         {
-			creature->SetHomePosition(me->GetHomePosition());
-			creature->GetMotionMaster()->MoveChase(me);
-			creature->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
-			creature->AI()->AttackStart(me);
-			creature->AddThreat(me, 0.0f);
-			summons.Summon(creature);
+            creature->SetHomePosition(me->GetHomePosition());
+            creature->GetMotionMaster()->MoveChase(me);
+            creature->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
+            creature->AI()->AttackStart(me);
+            creature->AddThreat(me, 0.0f);
+            summons.Summon(creature);
         }
 
-		void SummonedCreatureDies(Creature* creature, Unit*)
-		{
-			summons.Despawn(creature);
-			if (summons.empty())
-				Talk(textCounter++, GetPlayerForEscort());
-		}
+        void SummonedCreatureDies(Creature* creature, Unit*)
+        {
+            summons.Despawn(creature);
+            if (summons.empty())
+                Talk(textCounter++, GetPlayerForEscort());
+        }
 
         void Update(const uint32 diff)
         {
@@ -183,17 +183,17 @@ public:
             if (!UpdateVictim())
                 return;
 
-			if (me->isAttackReady(BASE_ATTACK))
-			{
+            if (me->isAttackReady(BASE_ATTACK))
+            {
                 if (!me->IsWithinDist(me->GetVictim(), ATTACK_DISTANCE))
                     DoCastVictim(SPELL_SHOOT, true);
-				else
-				{
-					me->SetSheath(SHEATH_STATE_MELEE);
-					me->AttackerStateUpdate(me->GetVictim());
-				}
+                else
+                {
+                    me->SetSheath(SHEATH_STATE_MELEE);
+                    me->AttackerStateUpdate(me->GetVictim());
+                }
 
-				me->resetAttackTimer();
+                me->resetAttackTimer();
             }
         }
     };

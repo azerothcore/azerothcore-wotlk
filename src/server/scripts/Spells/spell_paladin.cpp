@@ -99,32 +99,32 @@ class spell_pal_seal_of_command : public SpellScriptLoader
         {
             PrepareAuraScript(spell_pal_seal_of_command_AuraScript);
 
-			bool CheckProc(ProcEventInfo& eventInfo)
+            bool CheckProc(ProcEventInfo& eventInfo)
             {
-				if (const SpellInfo* procSpell = eventInfo.GetDamageInfo()->GetSpellInfo())
-					if (procSpell->SpellIconID == 3025) // Righteous Vengeance, should not proc SoC
-						return false;
+                if (const SpellInfo* procSpell = eventInfo.GetDamageInfo()->GetSpellInfo())
+                    if (procSpell->SpellIconID == 3025) // Righteous Vengeance, should not proc SoC
+                        return false;
                 return true;
             }
 
             void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
             {
                 PreventDefaultAction();
-				int32 targets = 3;
-				if (const SpellInfo* procSpell = eventInfo.GetDamageInfo()->GetSpellInfo())
-					if (procSpell->IsAffectingArea())
-						targets = 1;
+                int32 targets = 3;
+                if (const SpellInfo* procSpell = eventInfo.GetDamageInfo()->GetSpellInfo())
+                    if (procSpell->IsAffectingArea())
+                        targets = 1;
 
-				eventInfo.GetActor()->CastCustomSpell(aurEff->GetSpellInfo()->Effects[EFFECT_0].TriggerSpell, SPELLVALUE_MAX_TARGETS, targets, eventInfo.GetActionTarget(), false, NULL, aurEff);
+                eventInfo.GetActor()->CastCustomSpell(aurEff->GetSpellInfo()->Effects[EFFECT_0].TriggerSpell, SPELLVALUE_MAX_TARGETS, targets, eventInfo.GetActionTarget(), false, NULL, aurEff);
             }
 
             void Register()
             {
-				if (m_scriptSpellId == 20375)
-				{
-					DoCheckProc += AuraCheckProcFn(spell_pal_seal_of_command_AuraScript::CheckProc);
-					OnEffectProc += AuraEffectProcFn(spell_pal_seal_of_command_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
-				}
+                if (m_scriptSpellId == 20375)
+                {
+                    DoCheckProc += AuraCheckProcFn(spell_pal_seal_of_command_AuraScript::CheckProc);
+                    OnEffectProc += AuraEffectProcFn(spell_pal_seal_of_command_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+                }
             }
         };
 
@@ -133,28 +133,28 @@ class spell_pal_seal_of_command : public SpellScriptLoader
             return new spell_pal_seal_of_command_AuraScript();
         }
 
-		class spell_pal_seal_of_command_SpellScript : public SpellScript
-		{
-			PrepareSpellScript(spell_pal_seal_of_command_SpellScript);
+        class spell_pal_seal_of_command_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_pal_seal_of_command_SpellScript);
 
-			void FilterTargets(std::list<WorldObject*>& targets)
-			{
-				if (const SpellValue* spellValue = GetSpellValue())
-					if (spellValue->MaxAffectedTargets == 1)
-						targets.clear();
-			}
+            void FilterTargets(std::list<WorldObject*>& targets)
+            {
+                if (const SpellValue* spellValue = GetSpellValue())
+                    if (spellValue->MaxAffectedTargets == 1)
+                        targets.clear();
+            }
 
-			void Register()
-			{
-				if (m_scriptSpellId == 20424)
-					OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_pal_seal_of_command_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_TARGET_ENEMY);
-			}
-		};
+            void Register()
+            {
+                if (m_scriptSpellId == 20424)
+                    OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_pal_seal_of_command_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_TARGET_ENEMY);
+            }
+        };
 
-		SpellScript* GetSpellScript() const
-		{
-			return new spell_pal_seal_of_command_SpellScript();
-		}
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_pal_seal_of_command_SpellScript();
+        }
 };
 
 class spell_pal_divine_intervention : public SpellScriptLoader
@@ -168,8 +168,8 @@ class spell_pal_divine_intervention : public SpellScriptLoader
 
             void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
-				if (!GetTarget()->IsInCombat() && GetTarget()->GetTypeId() == TYPEID_PLAYER)
-					GetTarget()->RemoveAurasDueToSpell(GetTarget()->ToPlayer()->GetTeamId() == TEAM_ALLIANCE ? 57723 : 57724);
+                if (!GetTarget()->IsInCombat() && GetTarget()->GetTypeId() == TYPEID_PLAYER)
+                    GetTarget()->RemoveAurasDueToSpell(GetTarget()->ToPlayer()->GetTeamId() == TEAM_ALLIANCE ? 57723 : 57724);
             }
 
             void Register()
@@ -195,8 +195,8 @@ class spell_pal_seal_of_light : public SpellScriptLoader
 
             bool CheckProc(ProcEventInfo& eventInfo)
             {
-				// xinef: skip divine storm self hit (dummy) and righteous vengeance (0x20000000=
-				return eventInfo.GetActor() != eventInfo.GetProcTarget() && (!eventInfo.GetDamageInfo()->GetSpellInfo() || !eventInfo.GetDamageInfo()->GetSpellInfo()->SpellFamilyFlags.HasFlag(0x20000000));
+                // xinef: skip divine storm self hit (dummy) and righteous vengeance (0x20000000=
+                return eventInfo.GetActor() != eventInfo.GetProcTarget() && (!eventInfo.GetDamageInfo()->GetSpellInfo() || !eventInfo.GetDamageInfo()->GetSpellInfo()->SpellFamilyFlags.HasFlag(0x20000000));
             }
 
             void Register()
@@ -224,13 +224,13 @@ class spell_pal_sacred_shield_base : public SpellScriptLoader
             {
                 if (Unit* caster = GetCaster())
                 {
-					const SpellInfo* spellInfo = sSpellMgr->GetSpellInfo(GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell);
-					amount = spellInfo->Effects[EFFECT_0].CalcValue();
+                    const SpellInfo* spellInfo = sSpellMgr->GetSpellInfo(GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell);
+                    amount = spellInfo->Effects[EFFECT_0].CalcValue();
 
                     // +75.00% from sp bonus
                     amount += CalculatePct(caster->SpellBaseDamageBonusDone(spellInfo->GetSchoolMask()), 75.0f);
 
-					// Xinef: removed divine guardian because it will affect triggered spell with increased amount
+                    // Xinef: removed divine guardian because it will affect triggered spell with increased amount
                     // Arena - Dampening
                     if (AuraEffect const* dampening = caster->GetAuraEffect(SPELL_GENERIC_ARENA_DAMPENING, EFFECT_0))
                         AddPct(amount, dampening->GetAmount());
@@ -242,53 +242,53 @@ class spell_pal_sacred_shield_base : public SpellScriptLoader
 
             bool CheckProc(ProcEventInfo& eventInfo)
             {
-				return !(eventInfo.GetHitMask() & PROC_EX_INTERNAL_HOT) && eventInfo.GetDamageInfo()->GetDamage() > 0;
+                return !(eventInfo.GetHitMask() & PROC_EX_INTERNAL_HOT) && eventInfo.GetDamageInfo()->GetDamage() > 0;
             }
 
             void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
             {
                 PreventDefaultAction();
 
-				if (eventInfo.GetTypeMask() & PROC_FLAG_TAKEN_SPELL_MAGIC_DMG_CLASS_POS)
+                if (eventInfo.GetTypeMask() & PROC_FLAG_TAKEN_SPELL_MAGIC_DMG_CLASS_POS)
                 {
-					Unit* caster = eventInfo.GetActor();
-					const SpellInfo* procSpell = eventInfo.GetDamageInfo()->GetSpellInfo();
-					if (caster && procSpell->SpellFamilyName == SPELLFAMILY_PALADIN &&
-						procSpell->SpellFamilyFlags.HasFlag(0x40000000) && caster->GetAuraEffect(SPELL_AURA_PROC_TRIGGER_SPELL, SPELLFAMILY_PALADIN, 3021, 0)) // need infusion of light
+                    Unit* caster = eventInfo.GetActor();
+                    const SpellInfo* procSpell = eventInfo.GetDamageInfo()->GetSpellInfo();
+                    if (caster && procSpell->SpellFamilyName == SPELLFAMILY_PALADIN &&
+                        procSpell->SpellFamilyFlags.HasFlag(0x40000000) && caster->GetAuraEffect(SPELL_AURA_PROC_TRIGGER_SPELL, SPELLFAMILY_PALADIN, 3021, 0)) // need infusion of light
                     {
-						int32 basepoints = int32(float(eventInfo.GetDamageInfo()->GetDamage())/12.0f);
-						// Item - Paladin T9 Holy 4P Bonus (Flash of Light)
-						if (AuraEffect const* aurEffect = caster->GetAuraEffect(67191, EFFECT_0))
-							AddPct(basepoints, aurEffect->GetAmount());
+                        int32 basepoints = int32(float(eventInfo.GetDamageInfo()->GetDamage())/12.0f);
+                        // Item - Paladin T9 Holy 4P Bonus (Flash of Light)
+                        if (AuraEffect const* aurEffect = caster->GetAuraEffect(67191, EFFECT_0))
+                            AddPct(basepoints, aurEffect->GetAmount());
 
-						caster->CastCustomSpell(eventInfo.GetActionTarget(), 66922, &basepoints, NULL, NULL, true, 0, aurEff, caster->GetGUID());
+                        caster->CastCustomSpell(eventInfo.GetActionTarget(), 66922, &basepoints, NULL, NULL, true, 0, aurEff, caster->GetGUID());
                         return;
                     }
 
                     return;
                 }
                 
-				uint32 triggered_spell_id = GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell;
-				if (eventInfo.GetActionTarget()->HasSpellCooldown(triggered_spell_id))
-					return;
+                uint32 triggered_spell_id = GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell;
+                if (eventInfo.GetActionTarget()->HasSpellCooldown(triggered_spell_id))
+                    return;
 
-				uint32 cooldown = eventInfo.GetProcCooldown();
-				int32 basepoints = aurEff->GetAmount();
+                uint32 cooldown = eventInfo.GetProcCooldown();
+                int32 basepoints = aurEff->GetAmount();
 
                 // Item - Paladin T8 Holy 4P Bonus
                 if (Unit* caster = aurEff->GetCaster())
                     if (AuraEffect const* aurEffect = caster->GetAuraEffect(64895, 0))
                         cooldown = aurEffect->GetAmount()*IN_MILLISECONDS;
 
-				eventInfo.GetActionTarget()->AddSpellCooldown(triggered_spell_id, 0, cooldown);
-				eventInfo.GetActionTarget()->CastCustomSpell(eventInfo.GetActionTarget(), triggered_spell_id, &basepoints, NULL, NULL, true, NULL, aurEff, eventInfo.GetActionTarget()->GetGUID());
+                eventInfo.GetActionTarget()->AddSpellCooldown(triggered_spell_id, 0, cooldown);
+                eventInfo.GetActionTarget()->CastCustomSpell(eventInfo.GetActionTarget(), triggered_spell_id, &basepoints, NULL, NULL, true, NULL, aurEff, eventInfo.GetActionTarget()->GetGUID());
             }
 
             void Register()
             {
                 DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_pal_sacred_shield_base_AuraScript::CalculateAmount, EFFECT_0, SPELL_AURA_DUMMY);
                 DoCheckProc += AuraCheckProcFn(spell_pal_sacred_shield_base_AuraScript::CheckProc);
-				OnEffectProc += AuraEffectProcFn(spell_pal_sacred_shield_base_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+                OnEffectProc += AuraEffectProcFn(spell_pal_sacred_shield_base_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
             }
         };
 
@@ -346,17 +346,17 @@ class spell_pal_ardent_defender : public SpellScriptLoader
                     // Max heal when defense skill denies critical hits from raid bosses
                     // Formula: max defense at level + 140 (raiting from gear)
                     uint32 reqDefForMaxHeal  = victim->getLevel() * 5 + 140;
-					float pctFromDefense = (defenseSkillValue - victim->getLevel()*5.0f) / 140.0f;
-					if (pctFromDefense < 0.0f)
-						pctFromDefense = 0.0f;
-					else if (pctFromDefense > 1.0f)
-						pctFromDefense = 1.0f;
+                    float pctFromDefense = (defenseSkillValue - victim->getLevel()*5.0f) / 140.0f;
+                    if (pctFromDefense < 0.0f)
+                        pctFromDefense = 0.0f;
+                    else if (pctFromDefense > 1.0f)
+                        pctFromDefense = 1.0f;
 
                     int32 healAmount = int32(victim->CountPctFromMaxHealth(uint32(healPct * pctFromDefense)));
-					if (healAmount)
-						victim->CastCustomSpell(victim, PAL_SPELL_ARDENT_DEFENDER_HEAL, &healAmount, NULL, NULL, true, NULL, aurEff);
+                    if (healAmount)
+                        victim->CastCustomSpell(victim, PAL_SPELL_ARDENT_DEFENDER_HEAL, &healAmount, NULL, NULL, true, NULL, aurEff);
 
-					victim->ToPlayer()->AddSpellCooldown(PAL_SPELL_ARDENT_DEFENDER_HEAL, 0, 120000);
+                    victim->ToPlayer()->AddSpellCooldown(PAL_SPELL_ARDENT_DEFENDER_HEAL, 0, 120000);
                 }
                 else if (remainingHealth < int32(allowedHealth))
                 {
@@ -507,11 +507,11 @@ class spell_pal_blessing_of_sanctuary : public SpellScriptLoader
             {
                 Unit* target = GetTarget();
                 if (Unit* caster = GetCaster())
-				{
+                {
                     // xinef: hack
-					int32 value = 9;
+                    int32 value = 9;
                     caster->CastCustomSpell(target, SPELL_PALADIN_BLESSING_OF_SANCTUARY_BUFF, &value, &value, 0, true);
-				}
+                }
             }
 
             void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
@@ -629,8 +629,8 @@ class spell_pal_divine_storm : public SpellScriptLoader
             void TriggerHeal()
             {
                 Unit* caster = GetCaster();
-				if (GetHitUnit() != caster)
-					caster->CastCustomSpell(SPELL_PALADIN_DIVINE_STORM_DUMMY, SPELLVALUE_BASE_POINT0, (GetHitDamage() * healPct) / 100, caster, true);
+                if (GetHitUnit() != caster)
+                    caster->CastCustomSpell(SPELL_PALADIN_DIVINE_STORM_DUMMY, SPELLVALUE_BASE_POINT0, (GetHitDamage() * healPct) / 100, caster, true);
             }
 
             void Register()
@@ -664,7 +664,7 @@ class spell_pal_divine_storm_dummy : public SpellScriptLoader
 
             void CountTargets(std::list<WorldObject*>& targetList)
             {
-				Trinity::Containers::RandomResizeList(targetList, GetSpellValue()->MaxAffectedTargets);
+                Trinity::Containers::RandomResizeList(targetList, GetSpellValue()->MaxAffectedTargets);
                 _targetCount = targetList.size();
             }
 
@@ -877,29 +877,29 @@ class spell_pal_hand_of_sacrifice : public SpellScriptLoader
             return new spell_pal_hand_of_sacrifice_AuraScript();
         }
 
-		class spell_pal_hand_of_sacrifice_SpellScript : public SpellScript
-		{
-			PrepareSpellScript(spell_pal_hand_of_sacrifice_SpellScript);
+        class spell_pal_hand_of_sacrifice_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_pal_hand_of_sacrifice_SpellScript);
 
-			SpellCastResult CheckTarget()
-			{
-				Unit* target = GetExplTargetUnit();
-				if (!target || target->HasAura(SPELL_PALADIN_DIVINE_SACRIFICE))
-					return SPELL_FAILED_TARGET_AURASTATE;
+            SpellCastResult CheckTarget()
+            {
+                Unit* target = GetExplTargetUnit();
+                if (!target || target->HasAura(SPELL_PALADIN_DIVINE_SACRIFICE))
+                    return SPELL_FAILED_TARGET_AURASTATE;
 
-				return SPELL_CAST_OK;
-			}
+                return SPELL_CAST_OK;
+            }
 
-			void Register()
-			{
-				OnCheckCast += SpellCheckCastFn(spell_pal_hand_of_sacrifice_SpellScript::CheckTarget);
-			}
-		};
+            void Register()
+            {
+                OnCheckCast += SpellCheckCastFn(spell_pal_hand_of_sacrifice_SpellScript::CheckTarget);
+            }
+        };
 
-		SpellScript* GetSpellScript() const
-		{
-			return new spell_pal_hand_of_sacrifice_SpellScript();
-		};
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_pal_hand_of_sacrifice_SpellScript();
+        };
 };
 
 // 1038 - Hand of Salvation
@@ -1157,11 +1157,11 @@ class spell_pal_lay_on_hands : public SpellScriptLoader
                 return true;
             }
 
-			bool Load()
-			{
-				_manaAmount = 0;
-				return true;
-			}
+            bool Load()
+            {
+                _manaAmount = 0;
+                return true;
+            }
 
             SpellCastResult CheckCast()
             {
@@ -1171,10 +1171,10 @@ class spell_pal_lay_on_hands : public SpellScriptLoader
                         if (target->HasAura(SPELL_PALADIN_FORBEARANCE) || target->HasAura(SPELL_PALADIN_AVENGING_WRATH_MARKER) || target->HasAura(SPELL_PALADIN_IMMUNE_SHIELD_MARKER))
                             return SPELL_FAILED_TARGET_AURASTATE;
 
-				// Xinef: Glyph of Divinity
-				if (Unit* target = GetExplTargetUnit())
-					if (target->getPowerType() == POWER_MANA)
-						_manaAmount = target->GetPower(POWER_MANA);
+                // Xinef: Glyph of Divinity
+                if (Unit* target = GetExplTargetUnit())
+                    if (target->getPowerType() == POWER_MANA)
+                        _manaAmount = target->GetPower(POWER_MANA);
 
                 return SPELL_CAST_OK;
             }
@@ -1182,20 +1182,20 @@ class spell_pal_lay_on_hands : public SpellScriptLoader
             void HandleScript()
             {
                 Unit* caster = GetCaster();
-				Unit* target = GetHitUnit();
+                Unit* target = GetHitUnit();
                 if (caster == target)
                 {
                     caster->CastSpell(caster, SPELL_PALADIN_FORBEARANCE, true);
                     caster->CastSpell(caster, SPELL_PALADIN_AVENGING_WRATH_MARKER, true);
                     caster->CastSpell(caster, SPELL_PALADIN_IMMUNE_SHIELD_MARKER, true);
                 }
-				// Xinef: Glyph of Divinity
-				else if (target && caster->HasAura(54939) && GetSpellInfo()->Id != 633 && _manaAmount > 0) // excluding first rank
-				{
-					_manaAmount = target->GetPower(POWER_MANA) - _manaAmount;
-					if (_manaAmount > 0)
-						caster->CastCustomSpell(54986 /*Energize*/, SPELLVALUE_BASE_POINT1, _manaAmount, caster, true);
-				}
+                // Xinef: Glyph of Divinity
+                else if (target && caster->HasAura(54939) && GetSpellInfo()->Id != 633 && _manaAmount > 0) // excluding first rank
+                {
+                    _manaAmount = target->GetPower(POWER_MANA) - _manaAmount;
+                    if (_manaAmount > 0)
+                        caster->CastCustomSpell(54986 /*Energize*/, SPELLVALUE_BASE_POINT1, _manaAmount, caster, true);
+                }
             }
 
             void Register()
@@ -1204,7 +1204,7 @@ class spell_pal_lay_on_hands : public SpellScriptLoader
                 AfterHit += SpellHitFn(spell_pal_lay_on_hands_SpellScript::HandleScript);
             }
 
-			int32 _manaAmount;
+            int32 _manaAmount;
         };
 
         SpellScript* GetSpellScript() const
@@ -1296,11 +1296,11 @@ class spell_pal_seal_of_righteousness : public SpellScriptLoader
 
             bool CheckProc(ProcEventInfo& eventInfo)
             {
-				Unit* target = eventInfo.GetProcTarget();
-				if (!target)
-					return false;
+                Unit* target = eventInfo.GetProcTarget();
+                if (!target)
+                    return false;
 
-				return target->IsAlive() && !eventInfo.GetTriggerAuraSpell() && (eventInfo.GetDamageInfo()->GetDamage() || (eventInfo.GetHitMask() & PROC_EX_ABSORB));
+                return target->IsAlive() && !eventInfo.GetTriggerAuraSpell() && (eventInfo.GetDamageInfo()->GetDamage() || (eventInfo.GetHitMask() & PROC_EX_ABSORB));
             }
 
             void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
@@ -1311,11 +1311,11 @@ class spell_pal_seal_of_righteousness : public SpellScriptLoader
                 int32 holy = GetTarget()->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_HOLY);
                 holy += eventInfo.GetProcTarget()->SpellBaseDamageBonusTaken(SPELL_SCHOOL_MASK_HOLY);
 
-				// Xinef: Libram of Divine Purpose
-				if (AuraEffect* aurEff = GetTarget()->GetDummyAuraEffect(SPELLFAMILY_PALADIN, 2025, EFFECT_0))
-					holy += aurEff->GetAmount();
+                // Xinef: Libram of Divine Purpose
+                if (AuraEffect* aurEff = GetTarget()->GetDummyAuraEffect(SPELLFAMILY_PALADIN, 2025, EFFECT_0))
+                    holy += aurEff->GetAmount();
 
-				int32 bp = std::max<int32>(0, int32((ap * 0.022f + 0.044f * holy) * GetTarget()->GetAttackTime(BASE_ATTACK) / 1000));
+                int32 bp = std::max<int32>(0, int32((ap * 0.022f + 0.044f * holy) * GetTarget()->GetAttackTime(BASE_ATTACK) / 1000));
                 GetTarget()->CastCustomSpell(SPELL_PALADIN_SEAL_OF_RIGHTEOUSNESS, SPELLVALUE_BASE_POINT0, bp, eventInfo.GetProcTarget(), true, NULL, aurEff);
             }
 
@@ -1334,13 +1334,13 @@ class spell_pal_seal_of_righteousness : public SpellScriptLoader
 
 void AddSC_paladin_spell_scripts()
 {
-	// Ours
-	new spell_pal_seal_of_command();
-	new spell_pal_divine_intervention();
-	new spell_pal_seal_of_light();
-	new spell_pal_sacred_shield_base();
+    // Ours
+    new spell_pal_seal_of_command();
+    new spell_pal_divine_intervention();
+    new spell_pal_seal_of_light();
+    new spell_pal_sacred_shield_base();
 
-	// Theirs
+    // Theirs
     new spell_pal_ardent_defender();
     new spell_pal_avenging_wrath();
     new spell_pal_blessing_of_faith();

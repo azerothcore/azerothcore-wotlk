@@ -8,11 +8,11 @@ REWRITTEN BY XINEF
 
 enum Spells
 {
-    SPELL_POISON_NOVA							= 55081,
-    SPELL_POWERFULL_BITE						= 48287,
-    SPELL_VENOM_BOLT							= 54970,
+    SPELL_POISON_NOVA                           = 55081,
+    SPELL_POWERFULL_BITE                        = 48287,
+    SPELL_VENOM_BOLT                            = 54970,
 
-	SPELL_SNAKE_WRAP							= 55126
+    SPELL_SNAKE_WRAP                            = 55126
 };
 
 enum Yells
@@ -23,26 +23,26 @@ enum Yells
     SAY_SUMMON_SNAKES                           = 3,
     SAY_SUMMON_CONSTRICTORS                     = 4,
     EMOTE_NOVA                                  = 5,
-	EMOTE_ALTAR									= 6
+    EMOTE_ALTAR                                 = 6
 };
 
 enum Misc
 {
-    NPC_SLADRAN_VIPER							= 29680,
-    NPC_SLADRAN_CONSTRICTORS					= 29713,
+    NPC_SLADRAN_VIPER                           = 29680,
+    NPC_SLADRAN_CONSTRICTORS                    = 29713,
 
-	MAX_VIPER									= 2,
-	MAX_CONSTRICTOR								= 3,
-	MAX_SUMMONS									= 5,
+    MAX_VIPER                                   = 2,
+    MAX_CONSTRICTOR                             = 3,
+    MAX_SUMMONS                                 = 5,
 
-	EVENT_POISON_NOVA							= 1,
-	EVENT_POWERFULL_BITE						= 2,
-	EVENT_VENOM_BOLT							= 3,
-	EVENT_CHECK_HEALTH1							= 4,
-	EVENT_CHECK_HEALTH2							= 5,
-	EVENT_SUMMON1								= 6,
-	EVENT_SUMMON2								= 7,
-	EVENT_KILL_TALK								= 8
+    EVENT_POISON_NOVA                           = 1,
+    EVENT_POWERFULL_BITE                        = 2,
+    EVENT_VENOM_BOLT                            = 3,
+    EVENT_CHECK_HEALTH1                         = 4,
+    EVENT_CHECK_HEALTH2                         = 5,
+    EVENT_SUMMON1                               = 6,
+    EVENT_SUMMON2                               = 7,
+    EVENT_KILL_TALK                             = 8
 };
 
 const Position SpawnLoc[]=
@@ -56,133 +56,133 @@ const Position SpawnLoc[]=
 
 class boss_slad_ran : public CreatureScript
 {
-	public:
-		boss_slad_ran() : CreatureScript("boss_slad_ran") { }
+    public:
+        boss_slad_ran() : CreatureScript("boss_slad_ran") { }
 
-		CreatureAI* GetAI(Creature* creature) const
-		{
-			return new boss_slad_ranAI(creature);
-		}
+        CreatureAI* GetAI(Creature* creature) const
+        {
+            return new boss_slad_ranAI(creature);
+        }
 
-		struct boss_slad_ranAI : public BossAI
-		{
-			boss_slad_ranAI(Creature* creature) : BossAI(creature, DATA_SLAD_RAN)
-			{
-			}
+        struct boss_slad_ranAI : public BossAI
+        {
+            boss_slad_ranAI(Creature* creature) : BossAI(creature, DATA_SLAD_RAN)
+            {
+            }
 
-			void Reset()
-			{
-				BossAI::Reset();
-				_achievement = true;
-			}
+            void Reset()
+            {
+                BossAI::Reset();
+                _achievement = true;
+            }
 
-			uint32 GetData(uint32 data) const
-			{
-				if (data == me->GetEntry())
-					return uint32(_achievement);
-				return 0;
-			}
+            uint32 GetData(uint32 data) const
+            {
+                if (data == me->GetEntry())
+                    return uint32(_achievement);
+                return 0;
+            }
 
-			void SetData(uint32 data, uint32)
-			{
-				if (data == me->GetEntry())
-					_achievement = false;
-			}
+            void SetData(uint32 data, uint32)
+            {
+                if (data == me->GetEntry())
+                    _achievement = false;
+            }
 
-			void EnterCombat(Unit* who)
-			{
-				Talk(SAY_AGGRO);
-				BossAI::EnterCombat(who);
+            void EnterCombat(Unit* who)
+            {
+                Talk(SAY_AGGRO);
+                BossAI::EnterCombat(who);
 
-				events.ScheduleEvent(EVENT_POISON_NOVA, 10000);
-				events.ScheduleEvent(EVENT_POWERFULL_BITE, 3000);
-				events.ScheduleEvent(EVENT_VENOM_BOLT, 15000);
-				events.ScheduleEvent(EVENT_CHECK_HEALTH1, 1000);
-				events.ScheduleEvent(EVENT_CHECK_HEALTH2, 1000);
-			}
+                events.ScheduleEvent(EVENT_POISON_NOVA, 10000);
+                events.ScheduleEvent(EVENT_POWERFULL_BITE, 3000);
+                events.ScheduleEvent(EVENT_VENOM_BOLT, 15000);
+                events.ScheduleEvent(EVENT_CHECK_HEALTH1, 1000);
+                events.ScheduleEvent(EVENT_CHECK_HEALTH2, 1000);
+            }
 
-			void JustDied(Unit* killer)
-			{
-				Talk(SAY_DEATH);
-				Talk(EMOTE_ALTAR);
-				BossAI::JustDied(killer);
-			}
+            void JustDied(Unit* killer)
+            {
+                Talk(SAY_DEATH);
+                Talk(EMOTE_ALTAR);
+                BossAI::JustDied(killer);
+            }
 
-			void KilledUnit(Unit*)
-			{
-				if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
-				{
-					Talk(SAY_SLAY);
-					events.ScheduleEvent(EVENT_KILL_TALK, 6000);
-				}
-			}
+            void KilledUnit(Unit*)
+            {
+                if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
+                {
+                    Talk(SAY_SLAY);
+                    events.ScheduleEvent(EVENT_KILL_TALK, 6000);
+                }
+            }
 
-			void JustSummoned(Creature* summon)
-			{
-				summon->SetInCombatWithZone();
-				summons.Summon(summon);
-			}
+            void JustSummoned(Creature* summon)
+            {
+                summon->SetInCombatWithZone();
+                summons.Summon(summon);
+            }
 
-			void UpdateAI(uint32 diff)
-			{
-				if (!UpdateVictim())
-					return;
+            void UpdateAI(uint32 diff)
+            {
+                if (!UpdateVictim())
+                    return;
 
-				events.Update(diff);
-				if (me->HasUnitState(UNIT_STATE_CASTING))
-					return;
+                events.Update(diff);
+                if (me->HasUnitState(UNIT_STATE_CASTING))
+                    return;
 
-				switch (events.ExecuteEvent())
-				{
-					case EVENT_CHECK_HEALTH1:
-						if (me->HealthBelowPct(70))
-						{
-							Talk(SAY_SUMMON_SNAKES);
-							events.ScheduleEvent(EVENT_SUMMON1, 1000);
-							break;
-						}
-						events.ScheduleEvent(EVENT_CHECK_HEALTH1, 1000);
-						break;
-					case EVENT_CHECK_HEALTH2:
-						if (me->HealthBelowPct(50))
-						{
-							Talk(SAY_SUMMON_CONSTRICTORS);
-							events.ScheduleEvent(EVENT_SUMMON2, 1000);
-							break;
-						}
-						events.ScheduleEvent(EVENT_CHECK_HEALTH2, 1000);
-						break;
-					case EVENT_POISON_NOVA:
-						Talk(EMOTE_NOVA);
-						me->CastSpell(me, SPELL_POISON_NOVA, false);
-						events.ScheduleEvent(EVENT_POISON_NOVA, 15000);
-						break;
-					case EVENT_POWERFULL_BITE:
-						me->CastSpell(me->GetVictim(), SPELL_POWERFULL_BITE, false);
-						events.ScheduleEvent(EVENT_POWERFULL_BITE, 10000);
-						break;
-					case EVENT_VENOM_BOLT:
-						me->CastSpell(me->GetVictim(), SPELL_VENOM_BOLT, false);
-						events.ScheduleEvent(EVENT_VENOM_BOLT, 10000);
-						break;
-					case EVENT_SUMMON1:
-						for (uint8 i = MAX_CONSTRICTOR; i < MAX_SUMMONS; ++i)
-							me->SummonCreature(NPC_SLADRAN_VIPER, SpawnLoc[i], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20*IN_MILLISECONDS);
-						events.ScheduleEvent(EVENT_SUMMON1, 8000);
-						break;
-					case EVENT_SUMMON2:
-						for (uint8 i = 0; i < MAX_CONSTRICTOR; ++i)
-							me->SummonCreature(NPC_SLADRAN_CONSTRICTORS, SpawnLoc[i], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20*IN_MILLISECONDS);
-						events.ScheduleEvent(EVENT_SUMMON2, urand(3000, 5000));
-						break;
-				}
+                switch (events.ExecuteEvent())
+                {
+                    case EVENT_CHECK_HEALTH1:
+                        if (me->HealthBelowPct(70))
+                        {
+                            Talk(SAY_SUMMON_SNAKES);
+                            events.ScheduleEvent(EVENT_SUMMON1, 1000);
+                            break;
+                        }
+                        events.ScheduleEvent(EVENT_CHECK_HEALTH1, 1000);
+                        break;
+                    case EVENT_CHECK_HEALTH2:
+                        if (me->HealthBelowPct(50))
+                        {
+                            Talk(SAY_SUMMON_CONSTRICTORS);
+                            events.ScheduleEvent(EVENT_SUMMON2, 1000);
+                            break;
+                        }
+                        events.ScheduleEvent(EVENT_CHECK_HEALTH2, 1000);
+                        break;
+                    case EVENT_POISON_NOVA:
+                        Talk(EMOTE_NOVA);
+                        me->CastSpell(me, SPELL_POISON_NOVA, false);
+                        events.ScheduleEvent(EVENT_POISON_NOVA, 15000);
+                        break;
+                    case EVENT_POWERFULL_BITE:
+                        me->CastSpell(me->GetVictim(), SPELL_POWERFULL_BITE, false);
+                        events.ScheduleEvent(EVENT_POWERFULL_BITE, 10000);
+                        break;
+                    case EVENT_VENOM_BOLT:
+                        me->CastSpell(me->GetVictim(), SPELL_VENOM_BOLT, false);
+                        events.ScheduleEvent(EVENT_VENOM_BOLT, 10000);
+                        break;
+                    case EVENT_SUMMON1:
+                        for (uint8 i = MAX_CONSTRICTOR; i < MAX_SUMMONS; ++i)
+                            me->SummonCreature(NPC_SLADRAN_VIPER, SpawnLoc[i], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20*IN_MILLISECONDS);
+                        events.ScheduleEvent(EVENT_SUMMON1, 8000);
+                        break;
+                    case EVENT_SUMMON2:
+                        for (uint8 i = 0; i < MAX_CONSTRICTOR; ++i)
+                            me->SummonCreature(NPC_SLADRAN_CONSTRICTORS, SpawnLoc[i], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20*IN_MILLISECONDS);
+                        events.ScheduleEvent(EVENT_SUMMON2, urand(3000, 5000));
+                        break;
+                }
 
-				DoMeleeAttackIfReady();
-			}
+                DoMeleeAttackIfReady();
+            }
 
-		private:
-			bool _achievement;
-		};
+        private:
+            bool _achievement;
+        };
 };
 
 class spell_sladran_grip_of_sladran : public SpellScriptLoader
@@ -197,11 +197,11 @@ class spell_sladran_grip_of_sladran : public SpellScriptLoader
             void HandlePeriodic(AuraEffect const* aurEff)
             {
                 PreventDefaultAction();
-				if (GetStackAmount() >= 5)
-				{
-					SetDuration(0);
-					GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_SNAKE_WRAP, true);
-				}
+                if (GetStackAmount() >= 5)
+                {
+                    SetDuration(0);
+                    GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_SNAKE_WRAP, true);
+                }
             }
 
             void Register()
@@ -236,5 +236,5 @@ void AddSC_boss_slad_ran()
 {
     new boss_slad_ran();
     new spell_sladran_grip_of_sladran();
-	new achievement_snakes_whyd_it_have_to_be_snakes();
+    new achievement_snakes_whyd_it_have_to_be_snakes();
 }

@@ -174,66 +174,66 @@ void AuraApplication::_HandleEffect(uint8 effIndex, bool apply)
         aurEff->CleanupTriggeredSpells(GetTarget());
     }
 
-	// Stacking!
-	if (uint32 groupId = aurEff->GetAuraGroup())
-	{
-		SpellGroupStackFlags sFlag = sSpellMgr->GetGroupStackFlags(groupId);
-		if (!aurEff->IsPeriodic() && (sFlag & SPELL_GROUP_STACK_FLAG_EFFECT_EXCLUSIVE))
-		{
-			AuraApplication* strongestApp = apply ? this : NULL;
-			AuraEffect* strongestEff = apply ? aurEff : NULL;
-			int32 amount = apply ? abs(aurEff->GetAmount()) : 0;
-			Unit* target = GetTarget();
-			Unit::AuraEffectList const& auraList = target->GetAuraEffectsByType(aurEff->GetAuraType());
-			for (Unit::AuraEffectList::const_iterator iter = auraList.begin(); iter != auraList.end(); ++iter)
-			{
-				if ((*iter)->GetAuraGroup() != groupId || (*iter) == strongestEff || (*iter)->GetBase()->IsRemoved())
-					continue;
+    // Stacking!
+    if (uint32 groupId = aurEff->GetAuraGroup())
+    {
+        SpellGroupStackFlags sFlag = sSpellMgr->GetGroupStackFlags(groupId);
+        if (!aurEff->IsPeriodic() && (sFlag & SPELL_GROUP_STACK_FLAG_EFFECT_EXCLUSIVE))
+        {
+            AuraApplication* strongestApp = apply ? this : NULL;
+            AuraEffect* strongestEff = apply ? aurEff : NULL;
+            int32 amount = apply ? abs(aurEff->GetAmount()) : 0;
+            Unit* target = GetTarget();
+            Unit::AuraEffectList const& auraList = target->GetAuraEffectsByType(aurEff->GetAuraType());
+            for (Unit::AuraEffectList::const_iterator iter = auraList.begin(); iter != auraList.end(); ++iter)
+            {
+                if ((*iter)->GetAuraGroup() != groupId || (*iter) == strongestEff || (*iter)->GetBase()->IsRemoved())
+                    continue;
 
-				// xinef: skip different misc values
-				if (aurEff->GetAuraType() != SPELL_AURA_230 /*SPELL_AURA_MOD_INCREASE_HEALTH_2*/ && aurEff->GetAuraType() != SPELL_AURA_MOD_CASTING_SPEED_NOT_STACK &&
-					aurEff->GetMiscValue() != (*iter)->GetMiscValue())
-					continue;
+                // xinef: skip different misc values
+                if (aurEff->GetAuraType() != SPELL_AURA_230 /*SPELL_AURA_MOD_INCREASE_HEALTH_2*/ && aurEff->GetAuraType() != SPELL_AURA_MOD_CASTING_SPEED_NOT_STACK &&
+                    aurEff->GetMiscValue() != (*iter)->GetMiscValue())
+                    continue;
 
-				// xinef: should not happen
-				AuraApplication* aurApp = (*iter)->GetBase()->GetApplicationOfTarget(target->GetGUID());
-				if (!aurApp)
-					continue;
+                // xinef: should not happen
+                AuraApplication* aurApp = (*iter)->GetBase()->GetApplicationOfTarget(target->GetGUID());
+                if (!aurApp)
+                    continue;
 
-				if (amount < abs((*iter)->GetForcedAmount()))
-				{
-					// xinef: if we have strongest aura and it is active, turn it off
-					// xinef: otherwise just save new aura;
-					if (strongestApp && strongestEff && strongestApp->IsActive(strongestEff->GetEffIndex()))
-					{
-						strongestEff->HandleEffect(strongestApp, AURA_EFFECT_HANDLE_CHANGE_AMOUNT, false);
-						if (!strongestEff->GetSpellInfo()->HasAreaAuraEffect())
-							strongestEff->SetEnabled(false);
-						strongestApp->SetDisableMask(strongestEff->GetEffIndex());
-					}
-					strongestApp = aurApp;
-					strongestEff = (*iter);
-					amount = abs((*iter)->GetAmount());
-				}
-				// xinef: itered aura is weaker, deactivate if active
-				else if (aurApp->IsActive((*iter)->GetEffIndex()))
-				{
-					(*iter)->HandleEffect(aurApp, AURA_EFFECT_HANDLE_CHANGE_AMOUNT, false);
-					if (!(*iter)->GetSpellInfo()->HasAreaAuraEffect())
-						(*iter)->SetEnabled(false);
-					aurApp->SetDisableMask((*iter)->GetEffIndex());
-				}
-			}
+                if (amount < abs((*iter)->GetForcedAmount()))
+                {
+                    // xinef: if we have strongest aura and it is active, turn it off
+                    // xinef: otherwise just save new aura;
+                    if (strongestApp && strongestEff && strongestApp->IsActive(strongestEff->GetEffIndex()))
+                    {
+                        strongestEff->HandleEffect(strongestApp, AURA_EFFECT_HANDLE_CHANGE_AMOUNT, false);
+                        if (!strongestEff->GetSpellInfo()->HasAreaAuraEffect())
+                            strongestEff->SetEnabled(false);
+                        strongestApp->SetDisableMask(strongestEff->GetEffIndex());
+                    }
+                    strongestApp = aurApp;
+                    strongestEff = (*iter);
+                    amount = abs((*iter)->GetAmount());
+                }
+                // xinef: itered aura is weaker, deactivate if active
+                else if (aurApp->IsActive((*iter)->GetEffIndex()))
+                {
+                    (*iter)->HandleEffect(aurApp, AURA_EFFECT_HANDLE_CHANGE_AMOUNT, false);
+                    if (!(*iter)->GetSpellInfo()->HasAreaAuraEffect())
+                        (*iter)->SetEnabled(false);
+                    aurApp->SetDisableMask((*iter)->GetEffIndex());
+                }
+            }
 
-			// xinef: if we have new strongest aura, and it is not active
-			if (strongestApp && strongestEff && !strongestApp->IsActive(strongestEff->GetEffIndex()))
-			{
-				strongestApp->RemoveDisableMask(strongestEff->GetEffIndex());
-				strongestEff->SetEnabled(true);
-				strongestEff->HandleEffect(strongestApp, AURA_EFFECT_HANDLE_CHANGE_AMOUNT, true);
-			}
-		}
-	}
+            // xinef: if we have new strongest aura, and it is not active
+            if (strongestApp && strongestEff && !strongestApp->IsActive(strongestEff->GetEffIndex()))
+            {
+                strongestApp->RemoveDisableMask(strongestEff->GetEffIndex());
+                strongestEff->SetEnabled(true);
+                strongestEff->HandleEffect(strongestApp, AURA_EFFECT_HANDLE_CHANGE_AMOUNT, true);
+            }
+        }
+    }
     SetNeedClientUpdate();
 }
 
@@ -278,11 +278,11 @@ void AuraApplication::ClientUpdate(bool remove)
     data.append(GetTarget()->GetPackGUID());
     BuildUpdatePacket(data, remove);
 
-	if (GetSlot() < MAX_AURAS)
-		if (const Player* plr = GetTarget()->ToPlayer())
-			if (Aura* aura = GetBase())
-				if (plr->NeedSendSpectatorData() && ArenaSpectator::ShouldSendAura(aura, GetEffectMask(), GetTarget()->GetGUID(), remove))
-						ArenaSpectator::SendCommand_Aura(plr->FindMap(), plr->GetGUID(), "AUR", aura->GetCasterGUID(), aura->GetSpellInfo()->Id, aura->GetSpellInfo()->IsPositive(), aura->GetSpellInfo()->Dispel, aura->GetDuration(), aura->GetMaxDuration(), (aura->GetCharges() > 1 ? aura->GetCharges() : aura->GetStackAmount()), remove);
+    if (GetSlot() < MAX_AURAS)
+        if (const Player* plr = GetTarget()->ToPlayer())
+            if (Aura* aura = GetBase())
+                if (plr->NeedSendSpectatorData() && ArenaSpectator::ShouldSendAura(aura, GetEffectMask(), GetTarget()->GetGUID(), remove))
+                        ArenaSpectator::SendCommand_Aura(plr->FindMap(), plr->GetGUID(), "AUR", aura->GetCasterGUID(), aura->GetSpellInfo()->Id, aura->GetSpellInfo()->IsPositive(), aura->GetSpellInfo()->Dispel, aura->GetDuration(), aura->GetMaxDuration(), (aura->GetCharges() > 1 ? aura->GetCharges() : aura->GetStackAmount()), remove);
 
     _target->SendMessageToSet(&data, true);
 }
@@ -561,13 +561,13 @@ void Aura::UpdateTargetMap(Unit* caster, bool apply)
             targetsToRemove.push_back(appIter->second->GetTarget());
         else
         {
-			// xinef: check immunities here, so aura wont get removed on every tick and then reapplied
-			if (IsArea())
-				for (uint8 effIndex = 0; effIndex < MAX_SPELL_EFFECTS; ++effIndex)
-				{
-					if ((existing->second & (1 << effIndex)) && existing->first->IsImmunedToSpellEffect(GetSpellInfo(), effIndex))
-						existing->second &= ~(1 << effIndex);
-				}
+            // xinef: check immunities here, so aura wont get removed on every tick and then reapplied
+            if (IsArea())
+                for (uint8 effIndex = 0; effIndex < MAX_SPELL_EFFECTS; ++effIndex)
+                {
+                    if ((existing->second & (1 << effIndex)) && existing->first->IsImmunedToSpellEffect(GetSpellInfo(), effIndex))
+                        existing->second &= ~(1 << effIndex);
+                }
 
             // needs readding - remove now, will be applied in next update cycle
             // (dbcs do not have auras which apply on same type of targets but have different radius, so this is not really needed)
@@ -623,18 +623,18 @@ void Aura::UpdateTargetMap(Unit* caster, bool apply)
                 if (itr->first->IsInFlight())
                     addUnit = false;
 
-				switch( GetId() )
-				{
-					case 62821: // Ulduar, Hodir, Toasty Fire
-					case 62807: // Ulduar, Hodir, Starlight
-					case 51103: // Oculus, Mage-Lord Urom, Frostbomb
-					case 69146: case 70823: case 70824: case 70825: // Icecrown Citadel, Lord Marrowgar, Coldflame
-						{
-							if( itr->first->HasAura(GetId()) )
-								addUnit = false;
-						}
-						break;
-				}
+                switch( GetId() )
+                {
+                    case 62821: // Ulduar, Hodir, Toasty Fire
+                    case 62807: // Ulduar, Hodir, Starlight
+                    case 51103: // Oculus, Mage-Lord Urom, Frostbomb
+                    case 69146: case 70823: case 70824: case 70825: // Icecrown Citadel, Lord Marrowgar, Coldflame
+                        {
+                            if( itr->first->HasAura(GetId()) )
+                                addUnit = false;
+                        }
+                        break;
+                }
             }
             // unit auras can not stack with each other
             else // (GetType() == UNIT_AURA_TYPE)
@@ -719,9 +719,9 @@ void Aura::_ApplyEffectForTargets(uint8 effIndex)
 void Aura::UpdateOwner(uint32 diff, WorldObject* owner)
 {
     if (owner != m_owner)
-	{
-		ASSERT(false);
-	}
+    {
+        ASSERT(false);
+    }
 
     Unit* caster = GetCaster();
     // Apply spellmods for channeled auras
@@ -853,22 +853,22 @@ void Aura::RefreshTimers(bool periodicReset /*= false*/)
     Unit* caster = GetCaster();
     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
         if (HasEffect(i))
-		{
+        {
             GetEffect(i)->CalculatePeriodic(caster, periodicReset, false);
-			GetEffect(i)->CalculatePeriodicData();
-		}
+            GetEffect(i)->CalculatePeriodicData();
+        }
 }
 
 // xinef: dot's rolling function
 void Aura::RefreshTimersWithMods()
 {
-	Unit* caster = GetCaster();
+    Unit* caster = GetCaster();
     m_maxDuration = CalcMaxDuration();
-	if (caster && caster->HasAuraTypeWithAffectMask(SPELL_AURA_PERIODIC_HASTE, m_spellInfo) || m_spellInfo->HasAttribute(SPELL_ATTR5_HASTE_AFFECT_DURATION))
+    if (caster && caster->HasAuraTypeWithAffectMask(SPELL_AURA_PERIODIC_HASTE, m_spellInfo) || m_spellInfo->HasAttribute(SPELL_ATTR5_HASTE_AFFECT_DURATION))
         m_maxDuration = int32(m_maxDuration * caster->GetFloatValue(UNIT_MOD_CAST_SPEED));
     
-	// xinef: we should take ModSpellDuration into account, but none of the spells using this function is affected by contents of ModSpellDuration
-	RefreshDuration();
+    // xinef: we should take ModSpellDuration into account, but none of the spells using this function is affected by contents of ModSpellDuration
+    RefreshDuration();
     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
         if (HasEffect(i))
             GetEffect(i)->CalculatePeriodic(caster, false, false);
@@ -978,7 +978,7 @@ bool Aura::ModStackAmount(int32 num, AuraRemoveMode removeMode, bool periodicRes
                         mod->charges = GetCharges();
     }
 
-	SetStackAmount(stackAmount);
+    SetStackAmount(stackAmount);
 
     SetNeedClientUpdateForTargets();
     return false;
@@ -1013,21 +1013,21 @@ bool Aura::IsDeathPersistent() const
 
 bool Aura::CanBeSaved() const
 {
-	if (IsPassive() || (GetSpellInfo()->HasAttribute(SPELL_ATTR0_HIDDEN_CLIENTSIDE) && GetSpellInfo()->Stances))
+    if (IsPassive() || (GetSpellInfo()->HasAttribute(SPELL_ATTR0_HIDDEN_CLIENTSIDE) && GetSpellInfo()->Stances))
         return false;
 
-	// Xinef: do not save channel auras
-	if (GetSpellInfo()->IsChanneled())
-		return false;
+    // Xinef: do not save channel auras
+    if (GetSpellInfo()->IsChanneled())
+        return false;
 
-	// Xinef: Check if aura is single target, not only spell info
+    // Xinef: Check if aura is single target, not only spell info
     if (GetCasterGUID() != GetOwner()->GetGUID())
-		if (GetSpellInfo()->IsSingleTarget() || IsSingleTarget())
+        if (GetSpellInfo()->IsSingleTarget() || IsSingleTarget())
             return false;
 
-	// Xinef: Dont save control vehicle auras - caster may not exist
-	if (HasEffectType(SPELL_AURA_CONTROL_VEHICLE))
-		return false;
+    // Xinef: Dont save control vehicle auras - caster may not exist
+    if (HasEffectType(SPELL_AURA_CONTROL_VEHICLE))
+        return false;
 
     // Can't be saved - aura handler relies on calculated amount and changes it
     if (HasEffectType(SPELL_AURA_CONVERT_RUNE))
@@ -1037,21 +1037,21 @@ bool Aura::CanBeSaved() const
     if (HasEffectType(SPELL_AURA_OPEN_STABLE))
         return false;
 
-	// xinef: do not save bind sight auras!
-	if (HasEffectType(SPELL_AURA_BIND_SIGHT))
-		return false;
+    // xinef: do not save bind sight auras!
+    if (HasEffectType(SPELL_AURA_BIND_SIGHT))
+        return false;
 
-	// xinef: no charming auras (taking direct control)
-	if (HasEffectType(SPELL_AURA_MOD_POSSESS) || HasEffectType(SPELL_AURA_MOD_POSSESS_PET))
-		return false;
+    // xinef: no charming auras (taking direct control)
+    if (HasEffectType(SPELL_AURA_MOD_POSSESS) || HasEffectType(SPELL_AURA_MOD_POSSESS_PET))
+        return false;
 
-	// xinef: no charming auras can be saved
-	if (HasEffectType(SPELL_AURA_MOD_CHARM) || HasEffectType(SPELL_AURA_AOE_CHARM))
-		return false;
+    // xinef: no charming auras can be saved
+    if (HasEffectType(SPELL_AURA_MOD_CHARM) || HasEffectType(SPELL_AURA_AOE_CHARM))
+        return false;
 
-	// Xinef: Raise Ally control aura
-	if (GetId() == 46619)
-		return false;
+    // Xinef: Raise Ally control aura
+    if (GetId() == 46619)
+        return false;
 
     // don't save auras removed by proc system
     if (IsUsingCharges() && !GetCharges())
@@ -1097,13 +1097,13 @@ void Aura::UnregisterSingleTarget()
     // TODO: find a better way to do this.
     if (!caster)
         caster = ObjectAccessor::GetObjectInOrOutOfWorld(GetCasterGUID(), (Unit*)NULL);
-	if (!caster)
-	{
-		sLog->outMisc("Aura::UnregisterSingleTarget (A1) - %u, %u, %u, %s", GetId(), GetOwner()->GetTypeId(), GetOwner()->GetEntry(), GetOwner()->GetName().c_str());
-		//ASSERT(caster);
-	}
-	else
-		caster->GetSingleCastAuras().remove(this);
+    if (!caster)
+    {
+        sLog->outMisc("Aura::UnregisterSingleTarget (A1) - %u, %u, %u, %s", GetId(), GetOwner()->GetTypeId(), GetOwner()->GetEntry(), GetOwner()->GetName().c_str());
+        //ASSERT(caster);
+    }
+    else
+        caster->GetSingleCastAuras().remove(this);
 
     SetIsSingleTarget(false);
 }
@@ -1360,23 +1360,23 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         break;
                 }
                 break;
-			case SPELLFAMILY_DRUID:
-				if (!caster)
+            case SPELLFAMILY_DRUID:
+                if (!caster)
                     break;
-				// Rejuvenation
+                // Rejuvenation
                 if (GetSpellInfo()->SpellFamilyFlags[0] & 0x10 && GetEffect(0))
                 {
                     // Druid T8 Restoration 4P Bonus
                     if (AuraEffect const * aurEff = caster->GetAuraEffectDummy(64760))
                     {
-						uint32 damage = GetEffect(0)->GetAmount();
+                        uint32 damage = GetEffect(0)->GetAmount();
                         damage = target->SpellHealingBonusTaken(caster, GetSpellInfo(), damage, DOT);
 
                         int32 basepoints0 = damage;
                         caster->CastCustomSpell(target, 64801, &basepoints0, NULL, NULL, true, NULL, GetEffect(0));
                     }
                 }
-				break;
+                break;
             case SPELLFAMILY_PRIEST:
                 if (!caster)
                     break;
@@ -1391,7 +1391,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         int32 basepoints0 = aurEff->GetAmount() * GetEffect(0)->GetTotalTicks() * int32(damage) / 100;
                         int32 heal = int32(CalculatePct(basepoints0, 15));
 
-						caster->CastCustomSpell(target, 63675, &basepoints0, NULL, NULL, true, NULL, GetEffect(0));
+                        caster->CastCustomSpell(target, 63675, &basepoints0, NULL, NULL, true, NULL, GetEffect(0));
                         caster->CastCustomSpell(caster, 75999, &heal, NULL, NULL, true, NULL, GetEffect(0));
                     }
                 }
@@ -1456,41 +1456,41 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         caster->CastSpell(target, spellId, true, 0, GetEffect(0));
                     }
                 }
-				// Unholy blight
-				if (GetId() == 50536)
-				{
-					if (caster->IsFriendlyTo(target))
-						SetDuration(0);
-				}
+                // Unholy blight
+                if (GetId() == 50536)
+                {
+                    if (caster->IsFriendlyTo(target))
+                        SetDuration(0);
+                }
                 break;
-			case SPELLFAMILY_POTION:
-				// Alchemy: Mixology
-				if (caster && caster->HasAura(53042) && caster->GetTypeId() == TYPEID_PLAYER && !caster->ToPlayer()->GetSession()->PlayerLoading())
-				{
-					if (sSpellMgr->GetSpellGroup(GetId()) == 1) /*Elixirs*/
-					{
-						if (caster->HasSpell(GetSpellInfo()->Effects[EFFECT_0].TriggerSpell))
-						{
-							for (int i = 0; i < MAX_SPELL_EFFECTS; ++i)
-								if (GetEffect(i))
-									GetEffect(i)->SetAmount(CalculatePct(GetEffect(i)->GetAmount(), 100+sSpellMgr->GetSpellMixologyBonus(GetId())));
+            case SPELLFAMILY_POTION:
+                // Alchemy: Mixology
+                if (caster && caster->HasAura(53042) && caster->GetTypeId() == TYPEID_PLAYER && !caster->ToPlayer()->GetSession()->PlayerLoading())
+                {
+                    if (sSpellMgr->GetSpellGroup(GetId()) == 1) /*Elixirs*/
+                    {
+                        if (caster->HasSpell(GetSpellInfo()->Effects[EFFECT_0].TriggerSpell))
+                        {
+                            for (int i = 0; i < MAX_SPELL_EFFECTS; ++i)
+                                if (GetEffect(i))
+                                    GetEffect(i)->SetAmount(CalculatePct(GetEffect(i)->GetAmount(), 100+sSpellMgr->GetSpellMixologyBonus(GetId())));
 
-							SetMaxDuration(caster->CalcSpellDuration(GetSpellInfo())*2);
-							SetDuration(GetMaxDuration());
-						}
-					}
-				}
-				break;
-		}
+                            SetMaxDuration(caster->CalcSpellDuration(GetSpellInfo())*2);
+                            SetDuration(GetMaxDuration());
+                        }
+                    }
+                }
+                break;
+        }
 
     }
     // mods at aura remove
     else
     {
         switch (GetSpellInfo()->SpellFamilyName)
-		{
+        {
             case SPELLFAMILY_GENERIC:
-				if (!caster)
+                if (!caster)
                     break;
                 switch(GetId())
                 {
@@ -1507,7 +1507,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                             if (remainingDamage > 0)
                                 caster->CastCustomSpell(caster, 72373, NULL, &remainingDamage, NULL, true);
                         }
-						break;
+                        break;
                 }
                 break;
             case SPELLFAMILY_MAGE:
@@ -1540,11 +1540,11 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                 if (removeMode == AURA_REMOVE_BY_ENEMY_SPELL && GetSpellInfo()->SpellFamilyFlags[1] & 0x1)
                 {
                     // Shattered Barrier
-					if (AuraEffect* absorb = GetEffect(EFFECT_0))
-						if (absorb->GetAmount() <= 0) // removed by damage, not dispel
-							if (AuraEffect* dummy = caster->GetDummyAuraEffect(SPELLFAMILY_MAGE, 2945, 0))
-								if (roll_chance_i(dummy->GetSpellInfo()->ProcChance))
-									caster->CastSpell(target, 55080, true, NULL, GetEffect(0));
+                    if (AuraEffect* absorb = GetEffect(EFFECT_0))
+                        if (absorb->GetAmount() <= 0) // removed by damage, not dispel
+                            if (AuraEffect* dummy = caster->GetDummyAuraEffect(SPELLFAMILY_MAGE, 2945, 0))
+                                if (roll_chance_i(dummy->GetSpellInfo()->ProcChance))
+                                    caster->CastSpell(target, 55080, true, NULL, GetEffect(0));
                 }
                 break;
             case SPELLFAMILY_WARRIOR:
@@ -1667,22 +1667,22 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         break;
                 }
                 break;
-			case SPELLFAMILY_ROGUE:
-				{
-					// Overkill, Master of Subtlety
-					if (caster && GetSpellInfo()->SpellIconID == 250)
-					{
-						if (caster->GetDummyAuraEffect(SPELLFAMILY_ROGUE, 2114, 0))
-							caster->CastSpell(caster, 31666, true);
+            case SPELLFAMILY_ROGUE:
+                {
+                    // Overkill, Master of Subtlety
+                    if (caster && GetSpellInfo()->SpellIconID == 250)
+                    {
+                        if (caster->GetDummyAuraEffect(SPELLFAMILY_ROGUE, 2114, 0))
+                            caster->CastSpell(caster, 31666, true);
 
-						if (caster->GetAuraEffectDummy(58426))
-							caster->CastSpell(caster, 58428, true);
-					}
-					// Remove Vanish on stealth remove
-					if (GetId() == 1784)
-						target->RemoveAurasWithFamily(SPELLFAMILY_ROGUE, 0x800, 0, 0, 0);
-					break;
-				}
+                        if (caster->GetAuraEffectDummy(58426))
+                            caster->CastSpell(caster, 58428, true);
+                    }
+                    // Remove Vanish on stealth remove
+                    if (GetId() == 1784)
+                        target->RemoveAurasWithFamily(SPELLFAMILY_ROGUE, 0x800, 0, 0, 0);
+                    break;
+                }
 
             case SPELLFAMILY_DEATHKNIGHT:
                 // Blood of the North
@@ -1701,13 +1701,13 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                     target->ToPlayer()->RemoveRunesByAuraEffect(GetEffect(0));
                 }
                 break;
-			case SPELLFAMILY_PALADIN:
+            case SPELLFAMILY_PALADIN:
                 // Remove the immunity shield marker on Forbearance removal if AW marker is not present
                 if (GetId() == 25771 && target->HasAura(61988) && !target->HasAura(61987))
                     target->RemoveAura(61988);
-				break;
-		}
-	}
+                break;
+        }
+    }
 
     // mods at aura apply or remove
     switch (GetSpellInfo()->SpellFamilyName)
@@ -1751,7 +1751,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                     else
                         target->RemoveAurasDueToSpell(64364, GetCasterGUID());
                     break;
-				case 31842:
+                case 31842:
                     if (caster && caster->HasAura(70755))
                     {
                         if (apply)
@@ -1762,39 +1762,39 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                     break;
             }
 
-			// Sanctified Retribution, Improved Devotion Aura, Swift Retribution, Improved Concentration Aura
-			if (caster == target && GetSpellInfo()->GetSpellSpecific() == SPELL_SPECIFIC_AURA)
+            // Sanctified Retribution, Improved Devotion Aura, Swift Retribution, Improved Concentration Aura
+            if (caster == target && GetSpellInfo()->GetSpellSpecific() == SPELL_SPECIFIC_AURA)
             {
-				if (apply)
-				{
-					target->CastSpell(target, 63510, true);
-					target->CastSpell(target, 63514, true);
-					target->CastSpell(target, 63531, true);
-				}
-				else
-				{
-					target->RemoveAura(63510);
-					target->RemoveAura(63514);
-					target->RemoveAura(63531);
-				}
-			}
+                if (apply)
+                {
+                    target->CastSpell(target, 63510, true);
+                    target->CastSpell(target, 63514, true);
+                    target->CastSpell(target, 63531, true);
+                }
+                else
+                {
+                    target->RemoveAura(63510);
+                    target->RemoveAura(63514);
+                    target->RemoveAura(63531);
+                }
+            }
 
             break;
-		case SPELLFAMILY_DRUID:
-			if (!caster)
-				break;
-			// Reduce base armor of bear form and dire bear form
-			if (GetId() == 5229)
-			{
-				if (target->HasAura(70726)) // Item - Druid T10 Feral 4P Bonus
-				{
-					if (apply)
-						target->CastSpell(target, 70725, true);
-				}
-				else if (AuraEffect *aurEff = caster->GetAuraEffect(SPELL_AURA_MOD_BASE_RESISTANCE_PCT, SPELLFAMILY_DRUID, 107, 0))
-					aurEff->RecalculateAmount();
-			}
-			break;
+        case SPELLFAMILY_DRUID:
+            if (!caster)
+                break;
+            // Reduce base armor of bear form and dire bear form
+            if (GetId() == 5229)
+            {
+                if (target->HasAura(70726)) // Item - Druid T10 Feral 4P Bonus
+                {
+                    if (apply)
+                        target->CastSpell(target, 70725, true);
+                }
+                else if (AuraEffect *aurEff = caster->GetAuraEffect(SPELL_AURA_MOD_BASE_RESISTANCE_PCT, SPELLFAMILY_DRUID, 107, 0))
+                    aurEff->RecalculateAmount();
+            }
+            break;
     }
 }
 
@@ -1822,31 +1822,31 @@ bool Aura::CheckAreaTarget(Unit* target)
 
 bool Aura::IsAuraStronger(Aura const* newAura) const
 {
-	for (uint8 i = EFFECT_0; i < MAX_SPELL_EFFECTS; ++i)
-	{
-		AuraEffect* thisEffect = GetEffect(i);
-		if (!thisEffect)
-			continue;
+    for (uint8 i = EFFECT_0; i < MAX_SPELL_EFFECTS; ++i)
+    {
+        AuraEffect* thisEffect = GetEffect(i);
+        if (!thisEffect)
+            continue;
 
-		AuraEffect* newEffect = NULL;
-		for (uint8 j = EFFECT_0; j < MAX_SPELL_EFFECTS; ++j)
-		{
-			newEffect = newAura->GetEffect(j);
-			if (!newEffect || thisEffect->GetAuraType() != newEffect->GetAuraType() || thisEffect->GetMiscValue() != newEffect->GetMiscValue())
-				continue;
+        AuraEffect* newEffect = NULL;
+        for (uint8 j = EFFECT_0; j < MAX_SPELL_EFFECTS; ++j)
+        {
+            newEffect = newAura->GetEffect(j);
+            if (!newEffect || thisEffect->GetAuraType() != newEffect->GetAuraType() || thisEffect->GetMiscValue() != newEffect->GetMiscValue())
+                continue;
 
-			// xinef: assume that all spells are either positive or negative, otherwise they should not be in one group
-			int32 curValue = abs(thisEffect->GetAmount());
-			if (curValue < abs(newEffect->GetAmount()))
-				return true;
+            // xinef: assume that all spells are either positive or negative, otherwise they should not be in one group
+            int32 curValue = abs(thisEffect->GetAmount());
+            if (curValue < abs(newEffect->GetAmount()))
+                return true;
 
-			if (curValue == abs(newEffect->GetAmount()))
-				if(!IsPassive() && !IsPermanent() && GetDuration() < newAura->GetDuration())
-					return true;
-		}
-	}
+            if (curValue == abs(newEffect->GetAmount()))
+                if(!IsPassive() && !IsPermanent() && GetDuration() < newAura->GetDuration())
+                    return true;
+        }
+    }
 
-	return false;
+    return false;
 }
 
 bool Aura::CanStackWith(Aura const* existingAura, bool remove) const
@@ -1858,15 +1858,15 @@ bool Aura::CanStackWith(Aura const* existingAura, bool remove) const
     SpellInfo const* existingSpellInfo = existingAura->GetSpellInfo();
     bool sameCaster = GetCasterGUID() == existingAura->GetCasterGUID();
 
-	// Dynobj auras always stack
-	// xinef: dont allow different ranks (or the same rank) of same spell to stack (many flamestrikes for example)
+    // Dynobj auras always stack
+    // xinef: dont allow different ranks (or the same rank) of same spell to stack (many flamestrikes for example)
     if (existingAura->GetType() == DYNOBJ_AURA_TYPE)
-	{
-		// xinef: desecration lag fix - bound this condition to periodics
-		if (sameCaster && GetSpellInfo()->Id == existingSpellInfo->Id && GetSpellInfo()->HasAura(SPELL_AURA_PERIODIC_DAMAGE))
-			return false;
+    {
+        // xinef: desecration lag fix - bound this condition to periodics
+        if (sameCaster && GetSpellInfo()->Id == existingSpellInfo->Id && GetSpellInfo()->HasAura(SPELL_AURA_PERIODIC_DAMAGE))
+            return false;
         return true;
-	}
+    }
 
     // passive auras don't stack with another rank of the spell cast by same caster
     if (IsPassive() && sameCaster && m_spellInfo->IsDifferentRankOf(existingSpellInfo))
@@ -1887,42 +1887,42 @@ bool Aura::CanStackWith(Aura const* existingAura, bool remove) const
         return false;
 
     // check spell group stack rules
-	// xinef: this assures us that both spells are in same group!
-	SpellGroupStackFlags stackFlags = sSpellMgr->CheckSpellGroupStackRules(m_spellInfo, existingSpellInfo, remove, IsArea());
+    // xinef: this assures us that both spells are in same group!
+    SpellGroupStackFlags stackFlags = sSpellMgr->CheckSpellGroupStackRules(m_spellInfo, existingSpellInfo, remove, IsArea());
     if (stackFlags)
     {
-		// xinef: same caster rule is bounded by spellfamily
-		if (sameCaster && m_spellInfo->SpellFamilyName == existingSpellInfo->SpellFamilyName && 
-			(stackFlags & SPELL_GROUP_STACK_FLAG_NOT_SAME_CASTER))
-			return false;
+        // xinef: same caster rule is bounded by spellfamily
+        if (sameCaster && m_spellInfo->SpellFamilyName == existingSpellInfo->SpellFamilyName && 
+            (stackFlags & SPELL_GROUP_STACK_FLAG_NOT_SAME_CASTER))
+            return false;
 
-		// xinef: normal exclusive stacking, remove if auras are equal by effects
+        // xinef: normal exclusive stacking, remove if auras are equal by effects
         if (stackFlags & SPELL_GROUP_STACK_FLAG_EXCLUSIVE)
-		{
-			if (GetSpellInfo()->IsAuraEffectEqual(existingSpellInfo) || GetSpellInfo()->IsRankOf(existingSpellInfo))
-			{
-				if (remove)
-					return IsAuraStronger(existingAura);
-				else
-					return existingAura->IsAuraStronger(this);
-			}
-		}
+        {
+            if (GetSpellInfo()->IsAuraEffectEqual(existingSpellInfo) || GetSpellInfo()->IsRankOf(existingSpellInfo))
+            {
+                if (remove)
+                    return IsAuraStronger(existingAura);
+                else
+                    return existingAura->IsAuraStronger(this);
+            }
+        }
 
-		// xinef: check priority before effect mask
-		SpellGroupSpecialFlags thisAuraFlag = sSpellMgr->GetSpellGroupSpecialFlags(GetId());
-		SpellGroupSpecialFlags existingAuraFlag = sSpellMgr->GetSpellGroupSpecialFlags(existingSpellInfo->Id);
-		if (thisAuraFlag >= SPELL_GROUP_SPECIAL_FLAG_PRIORITY1 && existingAuraFlag >= SPELL_GROUP_SPECIAL_FLAG_PRIORITY1)
-			if (thisAuraFlag < existingAuraFlag)
-				return false;
+        // xinef: check priority before effect mask
+        SpellGroupSpecialFlags thisAuraFlag = sSpellMgr->GetSpellGroupSpecialFlags(GetId());
+        SpellGroupSpecialFlags existingAuraFlag = sSpellMgr->GetSpellGroupSpecialFlags(existingSpellInfo->Id);
+        if (thisAuraFlag >= SPELL_GROUP_SPECIAL_FLAG_PRIORITY1 && existingAuraFlag >= SPELL_GROUP_SPECIAL_FLAG_PRIORITY1)
+            if (thisAuraFlag < existingAuraFlag)
+                return false;
 
-		// xinef: forced strongest aura in group by flag
-		if (stackFlags & SPELL_GROUP_STACK_FLAG_FORCED_STRONGEST)
-			return !remove;
-		if (stackFlags & SPELL_GROUP_STACK_FLAG_FORCED_WEAKEST)
-			return remove;
+        // xinef: forced strongest aura in group by flag
+        if (stackFlags & SPELL_GROUP_STACK_FLAG_FORCED_STRONGEST)
+            return !remove;
+        if (stackFlags & SPELL_GROUP_STACK_FLAG_FORCED_WEAKEST)
+            return remove;
 
-		// xinef: forced return, handle all cases using available flags!
-		return !(stackFlags & SPELL_GROUP_STACK_FLAG_NEVER_STACK);
+        // xinef: forced return, handle all cases using available flags!
+        return !(stackFlags & SPELL_GROUP_STACK_FLAG_NEVER_STACK);
     }
 
     if (m_spellInfo->SpellFamilyName != existingSpellInfo->SpellFamilyName)
@@ -1986,11 +1986,11 @@ bool Aura::CanStackWith(Aura const* existingAura, bool remove) const
         if (!veh)           // We should probably just let it stack. Vehicle system will prevent undefined behaviour later
             return true;
 
-		// xinef: allow direct auras to stack if there is no passenger in this slot
-		if (AuraEffect* aurEff = GetEffect(VehicleAura1-1))
-			if (aurEff->GetAmount() > 0)
-				if (!veh->GetPassenger(aurEff->GetAmount()-1))
-					return true;
+        // xinef: allow direct auras to stack if there is no passenger in this slot
+        if (AuraEffect* aurEff = GetEffect(VehicleAura1-1))
+            if (aurEff->GetAmount() > 0)
+                if (!veh->GetPassenger(aurEff->GetAmount()-1))
+                    return true;
 
         if (!veh->GetAvailableSeatCount())
             return false;   // No empty seat available
@@ -2683,14 +2683,14 @@ void DynObjAura::FillTargetMap(std::map<Unit*, uint8> & targets, Unit* /*caster*
             Trinity::UnitListSearcher<Trinity::AnyFriendlyUnitInObjectRangeCheck> searcher(GetDynobjOwner(), targetList, u_check);
             GetDynobjOwner()->VisitNearbyObject(radius, searcher);
         }
-		// pussywizard: TARGET_DEST_DYNOBJ_NONE is supposed to search for both friendly and unfriendly targets, so for any unit
-		// what about EffectImplicitTargetA?
-		else if (GetSpellInfo()->Effects[effIndex].TargetB.GetTarget() == TARGET_DEST_DYNOBJ_NONE)
-		{
-			Trinity::AnyAttackableUnitExceptForOriginalCasterInObjectRangeCheck u_check(GetDynobjOwner(), dynObjOwnerCaster, radius);
+        // pussywizard: TARGET_DEST_DYNOBJ_NONE is supposed to search for both friendly and unfriendly targets, so for any unit
+        // what about EffectImplicitTargetA?
+        else if (GetSpellInfo()->Effects[effIndex].TargetB.GetTarget() == TARGET_DEST_DYNOBJ_NONE)
+        {
+            Trinity::AnyAttackableUnitExceptForOriginalCasterInObjectRangeCheck u_check(GetDynobjOwner(), dynObjOwnerCaster, radius);
             Trinity::UnitListSearcher<Trinity::AnyAttackableUnitExceptForOriginalCasterInObjectRangeCheck> searcher(GetDynobjOwner(), targetList, u_check);
             GetDynobjOwner()->VisitNearbyObject(radius, searcher);
-		}
+        }
         else
         {
             Trinity::AnyAoETargetUnitInObjectRangeCheck u_check(GetDynobjOwner(), dynObjOwnerCaster, radius);
@@ -2700,12 +2700,12 @@ void DynObjAura::FillTargetMap(std::map<Unit*, uint8> & targets, Unit* /*caster*
 
         for (UnitList::iterator itr = targetList.begin(); itr!= targetList.end();++itr)
         {
-			// xinef: check z level and los dependence
-			Unit* target = *itr;
-			float zLevel = GetDynobjOwner()->GetPositionZ();
-			if (target->GetPositionZ()+3.0f < zLevel || target->GetPositionZ()-5.0f > zLevel)
-				if (!target->IsWithinLOSInMap(GetDynobjOwner()))
-					continue;
+            // xinef: check z level and los dependence
+            Unit* target = *itr;
+            float zLevel = GetDynobjOwner()->GetPositionZ();
+            if (target->GetPositionZ()+3.0f < zLevel || target->GetPositionZ()-5.0f > zLevel)
+                if (!target->IsWithinLOSInMap(GetDynobjOwner()))
+                    continue;
 
             std::map<Unit*, uint8>::iterator existing = targets.find(*itr);
             if (existing != targets.end())

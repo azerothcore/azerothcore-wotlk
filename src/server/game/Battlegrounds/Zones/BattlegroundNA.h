@@ -28,8 +28,8 @@ enum BattlegroundNAObjectTypes
     BG_NA_OBJECT_DOOR_4         = 3,
     BG_NA_OBJECT_BUFF_1         = 4,
     BG_NA_OBJECT_BUFF_2         = 5,
-	BG_NA_OBJECT_READY_MARKER_1 = 6,
-	BG_NA_OBJECT_READY_MARKER_2 = 7,
+    BG_NA_OBJECT_READY_MARKER_1 = 6,
+    BG_NA_OBJECT_READY_MARKER_2 = 7,
     BG_NA_OBJECT_MAX            = 8
 };
 

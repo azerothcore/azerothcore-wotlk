@@ -28,7 +28,7 @@ void EscortMovementGenerator<T>::DoInitialize(T* unit)
 
     init.Launch();
 
-	_splineId = unit->movespline->GetId();
+    _splineId = unit->movespline->GetId();
 }
 
 template<class T>
@@ -70,8 +70,8 @@ bool EscortMovementGenerator<T>::DoUpdate(T* unit, uint32 diff)
         }
 
         init.Launch();
-		// Xinef: Override spline Id on recalculate launch
-		_splineId = unit->movespline->GetId();
+        // Xinef: Override spline Id on recalculate launch
+        _splineId = unit->movespline->GetId();
     }
 
     return !arrived;

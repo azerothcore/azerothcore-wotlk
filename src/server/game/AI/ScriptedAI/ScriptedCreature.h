@@ -79,10 +79,10 @@ public:
         return storage_.size();
     }
 
-	void clear()
-	{
-		storage_.clear();
-	}
+    void clear()
+    {
+        storage_.clear();
+    }
 
     void Summon(Creature const* summon) { storage_.push_back(summon->GetGUID()); }
     void Despawn(Creature const* summon) { storage_.remove(summon->GetGUID()); }
@@ -100,7 +100,7 @@ public:
         if (max)
             RemoveNotExisting(); // pussywizard: when max is set, non existing can be chosen and nothing will happen
 
-		StorageType listCopy = storage_;
+        StorageType listCopy = storage_;
         for (StorageType::const_iterator i = listCopy.begin(); i != listCopy.end(); ++i)
         {
             if (Creature* summon = ObjectAccessor::GetCreature(*me, *i))
@@ -135,8 +135,8 @@ public:
     void RemoveNotExisting();
     bool HasEntry(uint32 entry) const;
     uint32 GetEntryCount(uint32 entry) const;
-	void Respawn();
-	Creature* GetCreatureWithEntry(uint32 entry) const;
+    void Respawn();
+    Creature* GetCreatureWithEntry(uint32 entry) const;
 
 private:
     Creature* me;
@@ -159,7 +159,7 @@ class PlayerOrPetCheck
         bool operator() (WorldObject* unit) const
         {
             if (unit->GetTypeId() != TYPEID_PLAYER)
-				if (!IS_PLAYER_GUID(unit->ToUnit()->GetOwnerGUID()))
+                if (!IS_PLAYER_GUID(unit->ToUnit()->GetOwnerGUID()))
                     return true;
 
             return false;
@@ -291,7 +291,7 @@ struct ScriptedAI : public CreatureAI
     bool IsCombatMovementAllowed() const { return _isCombatMovementAllowed; }
 
     bool EnterEvadeIfOutOfCombatArea();
-	virtual bool CheckEvadeIfOutOfCombatArea() const { return false; }
+    virtual bool CheckEvadeIfOutOfCombatArea() const { return false; }
 
     // return true for heroic mode. i.e.
     //   - for dungeon in mode 10-heroic,
@@ -358,7 +358,7 @@ struct ScriptedAI : public CreatureAI
         return heroic25;
     }
 
-	Player* SelectTargetFromPlayerList(float maxdist, uint32 excludeAura = 0, bool mustBeInLOS = false) const;
+    Player* SelectTargetFromPlayerList(float maxdist, uint32 excludeAura = 0, bool mustBeInLOS = false) const;
 
     private:
         Difficulty _difficulty;

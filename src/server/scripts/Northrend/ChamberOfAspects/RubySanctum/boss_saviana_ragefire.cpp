@@ -8,19 +8,19 @@ REWRITTEN BY XINEF
 
 enum Texts
 {
-	SAY_AGGRO					= 0,
-	SAY_CONFLAGRATION			= 1,
-	EMOTE_ENRAGED				= 2,
-	SAY_KILL					= 3
+    SAY_AGGRO                   = 0,
+    SAY_CONFLAGRATION           = 1,
+    EMOTE_ENRAGED               = 2,
+    SAY_KILL                    = 3
 };
 
 enum Spells
 {
-	SPELL_CONFLAGRATION			= 74452,
-	SPELL_FLAME_BEACON			= 74453,
-	SPELL_CONFLAGRATION_MISSLE	= 74454,
-	SPELL_ENRAGE				= 78722,
-	SPELL_FLAME_BREATH			= 74403,
+    SPELL_CONFLAGRATION         = 74452,
+    SPELL_FLAME_BEACON          = 74453,
+    SPELL_CONFLAGRATION_MISSLE  = 74454,
+    SPELL_ENRAGE                = 78722,
+    SPELL_FLAME_BREATH          = 74403,
 };
 
 enum Events
@@ -31,8 +31,8 @@ enum Events
     EVENT_CONFLAGRATION         = 4,
     EVENT_LAND_GROUND           = 5,
     EVENT_AIR_MOVEMENT          = 6,
-	EVENT_LAND_BACK				= 7,
-	EVENT_KILL_TALK				= 8
+    EVENT_LAND_BACK             = 7,
+    EVENT_KILL_TALK             = 8
 };
 
 enum Misc
@@ -57,13 +57,13 @@ class boss_saviana_ragefire : public CreatureScript
 
             void Reset()
             {
-				BossAI::Reset();
+                BossAI::Reset();
                 me->SetReactState(REACT_AGGRESSIVE);
             }
 
             void EnterCombat(Unit* who)
             {
-				BossAI::EnterCombat(who);
+                BossAI::EnterCombat(who);
                 Talk(SAY_AGGRO);
 
                 events.ScheduleEvent(EVENT_ENRAGE, 15000);
@@ -73,7 +73,7 @@ class boss_saviana_ragefire : public CreatureScript
 
             void JustDied(Unit* killer)
             {
-				BossAI::JustDied(killer);
+                BossAI::JustDied(killer);
                 me->PlayDirectSound(SOUND_ID_DEATH);
             }
 
@@ -85,13 +85,13 @@ class boss_saviana_ragefire : public CreatureScript
                 switch (point)
                 {
                     case POINT_FLIGHT:
-						me->SetFacingTo(4.69f);
+                        me->SetFacingTo(4.69f);
                         events.ScheduleEvent(EVENT_CONFLAGRATION, 1000);
-						events.ScheduleEvent(EVENT_LAND_BACK, 7000);		
+                        events.ScheduleEvent(EVENT_LAND_BACK, 7000);        
                         Talk(SAY_CONFLAGRATION);
                         break;
                     case POINT_LAND:
-						me->SetDisableGravity(false);
+                        me->SetDisableGravity(false);
                         events.ScheduleEvent(EVENT_LAND_GROUND, 500);
                         break;
                 }
@@ -99,18 +99,18 @@ class boss_saviana_ragefire : public CreatureScript
 
             void JustReachedHome()
             {
-				BossAI::JustReachedHome();
+                BossAI::JustReachedHome();
                 me->SetDisableGravity(false);
-				me->SetHover(false);
+                me->SetHover(false);
             }
 
             void KilledUnit(Unit* victim)
             {
                 if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
-				{
+                {
                     Talk(SAY_KILL);
-					events.ScheduleEvent(EVENT_KILL_TALK, 6000);
-				}
+                    events.ScheduleEvent(EVENT_KILL_TALK, 6000);
+                }
             }
 
             void UpdateAI(uint32 diff)
@@ -128,15 +128,15 @@ class boss_saviana_ragefire : public CreatureScript
                     {
                         me->SetReactState(REACT_PASSIVE);
                         me->AttackStop();
-						me->SetDisableGravity(true);
-						me->GetMotionMaster()->MovePoint(POINT_TAKEOFF, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()+6.0f, false);
+                        me->SetDisableGravity(true);
+                        me->GetMotionMaster()->MovePoint(POINT_TAKEOFF, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()+6.0f, false);
                         events.ScheduleEvent(EVENT_FLIGHT, 50000);
                         events.DelayEvents(15000);
                         events.ScheduleEvent(EVENT_AIR_MOVEMENT, 2000);
                         break;
                     }
                     case EVENT_CONFLAGRATION:
-						me->CastCustomSpell(SPELL_CONFLAGRATION, SPELLVALUE_MAX_TARGETS, RAID_MODE(3, 6, 3, 6), me, true);
+                        me->CastCustomSpell(SPELL_CONFLAGRATION, SPELLVALUE_MAX_TARGETS, RAID_MODE(3, 6, 3, 6), me, true);
                         break;
                     case EVENT_ENRAGE:
                         me->CastSpell(me, SPELL_ENRAGE, false);
@@ -150,13 +150,13 @@ class boss_saviana_ragefire : public CreatureScript
                     case EVENT_AIR_MOVEMENT:
                         me->GetMotionMaster()->MovePoint(POINT_FLIGHT, 3155.51f, 683.844f, 95.0f, false);
                         break;
-					case EVENT_LAND_BACK:
-						me->GetMotionMaster()->MovePoint(POINT_LAND, 3151.07f, 636.443f, 80.0f, false);
-						break;
+                    case EVENT_LAND_BACK:
+                        me->GetMotionMaster()->MovePoint(POINT_LAND, 3151.07f, 636.443f, 80.0f, false);
+                        break;
                     case EVENT_LAND_GROUND:
                         me->SetReactState(REACT_AGGRESSIVE);
-						if (me->GetVictim())
-							me->GetMotionMaster()->MoveChase(me->GetVictim());
+                        if (me->GetVictim())
+                            me->GetMotionMaster()->MoveChase(me->GetVictim());
                         break;
                 }
 

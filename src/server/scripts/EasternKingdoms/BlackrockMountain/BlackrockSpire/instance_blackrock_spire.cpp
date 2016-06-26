@@ -73,7 +73,7 @@ public:
             go_blackrockaltar         = 0;
             go_portcullis_active      = 0;
             go_portcullis_tobossrooms = 0;
-			go_urok_pile			  = 0;
+            go_urok_pile              = 0;
             memset(go_roomrunes, 0, sizeof(go_roomrunes));
             memset(go_emberseerrunes, 0, sizeof(go_emberseerrunes));
         }
@@ -238,9 +238,9 @@ public:
                     if (GetBossState(DATA_GYTH) == DONE)
                         HandleGameObject(0, true, go);
                     break;
-				case GO_UROK_PILE:
-					go_urok_pile = go->GetGUID();
-					break;
+                case GO_UROK_PILE:
+                    go_urok_pile = go->GetGUID();
+                    break;
                 default:
                     break;
             }
@@ -290,8 +290,8 @@ public:
                 case EVENT_UROK_DOOMHOWL:
                     if (GetBossState(DATA_UROK_DOOMHOWL) == NOT_STARTED)
                     {
-						if (GameObject* pile = instance->GetGameObject(go_urok_pile))
-							pile->SetLootState(GO_JUST_DEACTIVATED);
+                        if (GameObject* pile = instance->GetGameObject(go_urok_pile))
+                            pile->SetLootState(GO_JUST_DEACTIVATED);
                     }
                     break;
                 default:
@@ -577,7 +577,7 @@ public:
             uint64 runecreaturelist[7][5];
             uint64 go_portcullis_active;
             uint64 go_portcullis_tobossrooms;
-			uint64 go_urok_pile;
+            uint64 go_urok_pile;
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const

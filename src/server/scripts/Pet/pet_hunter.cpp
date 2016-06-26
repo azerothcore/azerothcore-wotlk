@@ -28,8 +28,8 @@ enum HunterSpells
     SPELL_HUNTER_CRIPPLING_POISON       = 30981, // Viper
     SPELL_HUNTER_DEADLY_POISON_PASSIVE  = 34657, // Venomous Snake
     SPELL_HUNTER_MIND_NUMBING_POISON    = 25810, // Viper
-	SPELL_HUNTER_GLYPH_OF_SNAKE_TRAP	= 56849,
-	SPELL_HUNTER_PET_SCALING			= 62915
+    SPELL_HUNTER_GLYPH_OF_SNAKE_TRAP    = 56849,
+    SPELL_HUNTER_PET_SCALING            = 62915
 };
 
 enum HunterCreatures
@@ -46,50 +46,50 @@ class npc_pet_hunter_snake_trap : public CreatureScript
         {
             npc_pet_hunter_snake_trapAI(Creature* creature) : ScriptedAI(creature) { _init = false; }
 
-			void Reset()
-			{
-				_spellTimer = urand(1500, 3000);
+            void Reset()
+            {
+                _spellTimer = urand(1500, 3000);
 
-				// Start attacking attacker of owner on first ai update after spawn - move in line of sight may choose better target
-				if (!me->GetVictim())
-					if (Unit *tgt = me->SelectNearestTarget(10.0f))
-					{
-						me->AddThreat(tgt, 100000.0f);
-						AttackStart(tgt);
-					}
+                // Start attacking attacker of owner on first ai update after spawn - move in line of sight may choose better target
+                if (!me->GetVictim())
+                    if (Unit *tgt = me->SelectNearestTarget(10.0f))
+                    {
+                        me->AddThreat(tgt, 100000.0f);
+                        AttackStart(tgt);
+                    }
             }
 
-			void EnterEvadeMode()
-			{
-				// _EnterEvadeMode();
-				me->DeleteThreatList();
-				me->CombatStop(true);
-				me->LoadCreaturesAddon(true);
-				me->SetLootRecipient(NULL);
-				me->ResetPlayerDamageReq();
-				me->SetLastDamagedTime(0); 
-				
-				me->AddUnitState(UNIT_STATE_EVADE);
-				me->GetMotionMaster()->MoveTargetedHome();
+            void EnterEvadeMode()
+            {
+                // _EnterEvadeMode();
+                me->DeleteThreatList();
+                me->CombatStop(true);
+                me->LoadCreaturesAddon(true);
+                me->SetLootRecipient(NULL);
+                me->ResetPlayerDamageReq();
+                me->SetLastDamagedTime(0); 
+                
+                me->AddUnitState(UNIT_STATE_EVADE);
+                me->GetMotionMaster()->MoveTargetedHome();
 
-				Reset();
-			}
+                Reset();
+            }
 
-			//Redefined for random target selection:
-			void MoveInLineOfSight(Unit* who)
-			{
-				if (!me->GetVictim() && who->isTargetableForAttack() && (me->IsHostileTo(who)) && who->isInAccessiblePlaceFor(me))
-				{
-					if (me->GetDistanceZ(who) > CREATURE_Z_ATTACK_RANGE)
-						return;
+            //Redefined for random target selection:
+            void MoveInLineOfSight(Unit* who)
+            {
+                if (!me->GetVictim() && who->isTargetableForAttack() && (me->IsHostileTo(who)) && who->isInAccessiblePlaceFor(me))
+                {
+                    if (me->GetDistanceZ(who) > CREATURE_Z_ATTACK_RANGE)
+                        return;
 
-					if (me->IsWithinDistInMap(who, 10.0f))
-					{
-						me->AddThreat(who, 100000.0f);
-						AttackStart(who);
-					}
-				}
-			}
+                    if (me->IsWithinDistInMap(who, 10.0f))
+                    {
+                        me->AddThreat(who, 100000.0f);
+                        AttackStart(who);
+                    }
+                }
+            }
 
             void UpdateAI(uint32 diff)
             {
@@ -102,35 +102,35 @@ class npc_pet_hunter_snake_trap : public CreatureScript
                     return;
                 }
 
-				if (!_init)
-				{
-					_init = true;
+                if (!_init)
+                {
+                    _init = true;
 
-					CreatureTemplate const* Info = me->GetCreatureTemplate();
-					uint32 health = uint32(107 * (me->getLevel() - 40) * 0.025f);
-					me->SetCreateHealth(health);
+                    CreatureTemplate const* Info = me->GetCreatureTemplate();
+                    uint32 health = uint32(107 * (me->getLevel() - 40) * 0.025f);
+                    me->SetCreateHealth(health);
 
-					for (uint8 stat = 0; stat < MAX_STATS; ++stat)
-					{
-						me->SetStat(Stats(stat), 0);
-						me->SetCreateStat(Stats(stat), 0);
-					}
+                    for (uint8 stat = 0; stat < MAX_STATS; ++stat)
+                    {
+                        me->SetStat(Stats(stat), 0);
+                        me->SetCreateStat(Stats(stat), 0);
+                    }
 
-					me->SetModifierValue(UNIT_MOD_HEALTH, BASE_VALUE, (float)health);
-					me->SetMaxHealth(health);
-					//Add delta to make them not all hit the same time
-					uint32 delta = urand(0, 700);
-					me->SetAttackTime(BASE_ATTACK, Info->baseattacktime + delta);
-					me->SetStatFloatValue(UNIT_FIELD_RANGED_ATTACK_POWER , float(Info->attackpower));
-					me->CastSpell(me, SPELL_HUNTER_DEADLY_POISON_PASSIVE, true);
+                    me->SetModifierValue(UNIT_MOD_HEALTH, BASE_VALUE, (float)health);
+                    me->SetMaxHealth(health);
+                    //Add delta to make them not all hit the same time
+                    uint32 delta = urand(0, 700);
+                    me->SetAttackTime(BASE_ATTACK, Info->baseattacktime + delta);
+                    me->SetStatFloatValue(UNIT_FIELD_RANGED_ATTACK_POWER , float(Info->attackpower));
+                    me->CastSpell(me, SPELL_HUNTER_DEADLY_POISON_PASSIVE, true);
 
-					// Glyph of Snake Trap
-					if (Unit* owner = me->GetOwner())
-						if (owner->GetAuraEffectDummy(SPELL_HUNTER_GLYPH_OF_SNAKE_TRAP))
-							me->CastSpell(me, SPELL_HUNTER_PET_SCALING, true);
-				}
+                    // Glyph of Snake Trap
+                    if (Unit* owner = me->GetOwner())
+                        if (owner->GetAuraEffectDummy(SPELL_HUNTER_GLYPH_OF_SNAKE_TRAP))
+                            me->CastSpell(me, SPELL_HUNTER_PET_SCALING, true);
+                }
 
-				_spellTimer += diff;
+                _spellTimer += diff;
                 if (_spellTimer >= 3000)
                 {
                     if (urand(0, 2) == 0) // 33% chance to cast

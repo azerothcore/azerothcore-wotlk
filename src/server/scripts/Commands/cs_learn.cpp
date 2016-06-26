@@ -229,18 +229,18 @@ public:
 
             // xinef: search highest talent rank
             uint32 spellId = 0;
-			uint8 rankId = MAX_TALENT_RANK;
+            uint8 rankId = MAX_TALENT_RANK;
             for (int8 rank = MAX_TALENT_RANK - 1; rank >= 0; --rank)
             {
                 if (talentInfo->RankID[rank] != 0)
                 {
-					rankId = rank;
+                    rankId = rank;
                     spellId = talentInfo->RankID[rank];
                     break;
                 }
             }
 
-			// xinef: some errors?
+            // xinef: some errors?
             if (!spellId || rankId == MAX_TALENT_RANK)
                 continue;
 
@@ -248,7 +248,7 @@ public:
             if (!spellInfo || !SpellMgr::IsSpellValid(spellInfo))
                 continue;
 
-			player->LearnTalent(talentInfo->TalentID, rankId);
+            player->LearnTalent(talentInfo->TalentID, rankId);
         }
 
         handler->SendSysMessage(LANG_COMMAND_LEARN_CLASS_TALENTS);

@@ -62,9 +62,9 @@ struct LootGroupInvalidSelector : public std::unary_function<LootStoreItem*, boo
         if (!(item->lootmode & _lootMode))
             return true;
 
-		ItemTemplate const* _proto = sObjectMgr->GetItemTemplate(item->itemid);
-		if (!_proto)
-			return true;
+        ItemTemplate const* _proto = sObjectMgr->GetItemTemplate(item->itemid);
+        if (!_proto)
+            return true;
 
         uint8 foundDuplicates = 0;
         for (std::vector<LootItem>::const_iterator itr = _loot.items.begin(); itr != _loot.items.end(); ++itr)
@@ -167,11 +167,11 @@ uint32 LootStore::LoadLootTable()
             continue;                                   // error already printed to log/console.
         }
 
-		if (lootmode == 0)
-		{
-			sLog->outError("Table '%s' entry %d item %d: lootmode is equal to 0, item will never drop - setting mode 1", GetName(), entry, item);
-			lootmode = 1;
-		}
+        if (lootmode == 0)
+        {
+            sLog->outError("Table '%s' entry %d item %d: lootmode is equal to 0, item will never drop - setting mode 1", GetName(), entry, item);
+            lootmode = 1;
+        }
 
         LootStoreItem* storeitem = new LootStoreItem(item, chanceOrQuestChance, lootmode, group, mincountOrRef, maxcount);
 
@@ -384,7 +384,7 @@ LootItem::LootItem(LootStoreItem const& li)
     is_blocked = 0;
     is_underthreshold = 0;
     is_counted = 0;
-	rollWinnerGUID = 0;
+    rollWinnerGUID = 0;
 }
 
 // Basic checks for player/item compatibility - if false no chance to see the item in the loot
@@ -907,13 +907,13 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
                                 continue;
                         }
                     }
-					else if (l.items[i].rollWinnerGUID)
-					{
-						if (l.items[i].rollWinnerGUID == lv.viewer->GetGUID())
-							slot_type = LOOT_SLOT_TYPE_OWNER;
-						else
-							continue;
-					}
+                    else if (l.items[i].rollWinnerGUID)
+                    {
+                        if (l.items[i].rollWinnerGUID == lv.viewer->GetGUID())
+                            slot_type = LOOT_SLOT_TYPE_OWNER;
+                        else
+                            continue;
+                    }
                     else if (l.roundRobinPlayer == 0 || lv.viewer->GetGUID() == l.roundRobinPlayer || !l.items[i].is_underthreshold)
                     {
                         // no round robin owner or he has released the loot
@@ -1028,7 +1028,7 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
             {
                 b << uint8(fi->index);
                 b << item;
-				// Xinef: Here are FFA items, so dont use owner permision
+                // Xinef: Here are FFA items, so dont use owner permision
                 b << uint8(LOOT_SLOT_TYPE_ALLOW_LOOT /*slotType*/);
                 ++itemsShown;
             }

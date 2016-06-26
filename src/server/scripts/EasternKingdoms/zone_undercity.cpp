@@ -149,9 +149,9 @@ public:
         {
             if (summoned->GetEntry() == NPC_HIGHBORNE_BUNNY)
             {
-				summoned->SetDisableGravity(true);
-				float speed = summoned->GetDistance(summoned->GetPositionX(), summoned->GetPositionY(), me->GetPositionZ()+15.0f) / (1000.0f * 0.001f);
-				summoned->MonsterMoveWithSpeed(summoned->GetPositionX(), summoned->GetPositionY(), me->GetPositionZ()+15.0f, speed);
+                summoned->SetDisableGravity(true);
+                float speed = summoned->GetDistance(summoned->GetPositionX(), summoned->GetPositionY(), me->GetPositionZ()+15.0f) / (1000.0f * 0.001f);
+                summoned->MonsterMoveWithSpeed(summoned->GetPositionX(), summoned->GetPositionY(), me->GetPositionZ()+15.0f, speed);
                 summoned->CastSpell(summoned, SPELL_RIBBON_OF_SOULS, false);
             }
         }

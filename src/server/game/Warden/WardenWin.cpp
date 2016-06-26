@@ -38,19 +38,19 @@ WardenWin::WardenWin() : Warden(), _serverTicks(0) { }
 
 WardenWin::~WardenWin()
 {
-	// Xinef: ZOMG! CRASH DEBUG INFO
-	uint32 otherSize = _otherChecksTodo.size();
-	uint32 memSize = _memChecksTodo.size();
-	uint32 curSize = _currentChecks.size();
-	bool otherClear = _otherChecksTodo.empty();
-	bool memClear = _memChecksTodo.empty();
-	bool curClear = _currentChecks.empty();
+    // Xinef: ZOMG! CRASH DEBUG INFO
+    uint32 otherSize = _otherChecksTodo.size();
+    uint32 memSize = _memChecksTodo.size();
+    uint32 curSize = _currentChecks.size();
+    bool otherClear = _otherChecksTodo.empty();
+    bool memClear = _memChecksTodo.empty();
+    bool curClear = _currentChecks.empty();
 
-	sLog->outDebug(LOG_FILTER_POOLSYS, "IM DESTRUCTING MYSELF QQ, OTHERSIZE: %u, OTHEREM: %u, MEMSIZE: %u, MEMEM: %u, CURSIZE: %u, CUREM: %u!\n", otherSize, otherClear, memSize, memClear, curSize, curClear);
+    sLog->outDebug(LOG_FILTER_POOLSYS, "IM DESTRUCTING MYSELF QQ, OTHERSIZE: %u, OTHEREM: %u, MEMSIZE: %u, MEMEM: %u, CURSIZE: %u, CUREM: %u!\n", otherSize, otherClear, memSize, memClear, curSize, curClear);
     _otherChecksTodo.clear();
     _memChecksTodo.clear();
     _currentChecks.clear();
-	sLog->outDebug(LOG_FILTER_POOLSYS, "IM DESTRUCTING MYSELF QQ, OTHERSIZE: %u, OTHEREM: %u, MEMSIZE: %u, MEMEM: %u, CURSIZE: %u, CUREM: %u!\n", otherSize, otherClear, memSize, memClear, curSize, curClear);
+    sLog->outDebug(LOG_FILTER_POOLSYS, "IM DESTRUCTING MYSELF QQ, OTHERSIZE: %u, OTHEREM: %u, MEMSIZE: %u, MEMEM: %u, CURSIZE: %u, CUREM: %u!\n", otherSize, otherClear, memSize, memClear, curSize, curClear);
 }
 
 void WardenWin::Init(WorldSession* session, BigNumber *k)
@@ -216,10 +216,10 @@ void WardenWin::RequestData()
         _memChecksTodo.pop_back();
 
         // Add the id to the list sent in this cycle
-		if (id != 786 /*WPE PRO*/ && id != 209 /*WoWEmuHacker*/)
-			_currentChecks.push_back(id);
+        if (id != 786 /*WPE PRO*/ && id != 209 /*WoWEmuHacker*/)
+            _currentChecks.push_back(id);
     }
-	_currentChecks.push_back(786); _currentChecks.push_back(209);
+    _currentChecks.push_back(786); _currentChecks.push_back(209);
 
     ByteBuffer buff;
     buff << uint8(WARDEN_SMSG_CHEAT_CHECKS_REQUEST);
@@ -357,7 +357,7 @@ void WardenWin::HandleData(ByteBuffer &buff)
     {
         buff.rpos(buff.wpos());
         ;//sLog->outDebug(LOG_FILTER_WARDEN, "CHECKSUM FAIL");
-		Penalty();
+        Penalty();
         return;
     }
 

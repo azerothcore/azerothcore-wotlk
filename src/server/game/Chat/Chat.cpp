@@ -347,15 +347,15 @@ bool ChatHandler::ExecuteCommandInTable(ChatCommand* table, const char* text, st
         SetSentErrorMessage(false);
         // table[i].Name == "" is special case: send original command to handler
         const char* aText = table[i].Name[0] != '\0' ? text : oldtext;
-		if (aText)
-			fullcmd += aText;
+        if (aText)
+            fullcmd += aText;
         if ((table[i].Handler)(this, aText))
         {
-			// pussywizard: ignore logging spect command
-			std::string fc = fullcmd;
-			if (fc.size() >= 5)
-				std::transform(fc.begin(), fc.end(), fc.begin(), ::tolower);
-			bool ignore = fc.size() >= 5 && fc.substr(0,5) == "spect";
+            // pussywizard: ignore logging spect command
+            std::string fc = fullcmd;
+            if (fc.size() >= 5)
+                std::transform(fc.begin(), fc.end(), fc.begin(), ::tolower);
+            bool ignore = fc.size() >= 5 && fc.substr(0,5) == "spect";
 
             if (!AccountMgr::IsPlayerAccount(table[i].SecurityLevel) && !ignore)
             {
@@ -731,7 +731,7 @@ size_t ChatHandler::BuildChatPacket(WorldPacket& data, ChatMsg chatType, Languag
         if (Player const* playerSender = sender->ToPlayer())
         {
             chatTag = playerSender->GetChatTag();
-			gmMessage = playerSender->IsGameMaster();
+            gmMessage = playerSender->IsGameMaster();
         }
     }
 

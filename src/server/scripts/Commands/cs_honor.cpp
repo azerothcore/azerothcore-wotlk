@@ -90,7 +90,7 @@ public:
         }
 
         // check online security
-		if (target->GetTypeId() == TYPEID_PLAYER && handler->HasLowerSecurity(target->ToPlayer(), 0))
+        if (target->GetTypeId() == TYPEID_PLAYER && handler->HasLowerSecurity(target->ToPlayer(), 0))
             return false;
 
         handler->GetSession()->GetPlayer()->RewardHonor(target, 1);

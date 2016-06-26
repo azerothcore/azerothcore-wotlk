@@ -7,15 +7,15 @@ REWRITTEN BY XINEF
 
 enum DataTypes
 {
-    TYPE_RHAHK_ZOR				= 0,
-	TYPE_CANNON					= 1,
-	MAX_ENCOUNTERS				= 2
+    TYPE_RHAHK_ZOR              = 0,
+    TYPE_CANNON                 = 1,
+    MAX_ENCOUNTERS              = 2
 };
 
 enum GameObjects
 {
-	GO_FACTORY_DOOR				= 13965,
-	GO_IRON_CLAD_DOOR			= 16397
+    GO_FACTORY_DOOR             = 13965,
+    GO_IRON_CLAD_DOOR           = 16397
 };
 
 #endif

@@ -147,17 +147,17 @@ enum BG_AV_ObjectIds
     BG_AV_OBJECTID_GATE_H               = 180424,
 
     //mine supplies
-    BG_AV_OBJECTID_MINE_N				= 178785,
-    BG_AV_OBJECTID_MINE_S				= 178784,
+    BG_AV_OBJECTID_MINE_N               = 178785,
+    BG_AV_OBJECTID_MINE_S               = 178784,
 
-    BG_AV_OBJECTID_FIRE					= 179065,
-    BG_AV_OBJECTID_SMOKE				= 179066,
+    BG_AV_OBJECTID_FIRE                 = 179065,
+    BG_AV_OBJECTID_SMOKE                = 179066,
 
-	// Winter Veil Hardpacked Snowdrift
-	BG_AV_OBJECTID_HARDPACKED_SNOWDRIFT	= 180654,
+    // Winter Veil Hardpacked Snowdrift
+    BG_AV_OBJECTID_HARDPACKED_SNOWDRIFT = 180654,
 
-	BG_AV_OBJECTID_FROSTWOLF_BANNER		= 179025,
-	BG_AV_OBJECTID_STORMPIKE_BANNER		= 179024,
+    BG_AV_OBJECTID_FROSTWOLF_BANNER     = 179025,
+    BG_AV_OBJECTID_STORMPIKE_BANNER     = 179024,
 };
 
 enum BG_AV_Nodes
@@ -310,10 +310,10 @@ enum BG_AV_ObjectTypes
     BG_AV_OBJECT_MINE_SUPPLY_N_MAX           = 224,
     BG_AV_OBJECT_MINE_SUPPLY_S_MIN           = 225,
     BG_AV_OBJECT_MINE_SUPPLY_S_MAX           = 236,
-	BG_AV_OBJECT_HANDPACKED_SNOWDRIFT_MIN    = 237,
-	BG_AV_OBJECT_HANDPACKED_SNOWDRIFT_MAX    = 246,
-	BG_AV_OBJECT_FROSTWOLF_BANNER			 = 247,
-	BG_AV_OBJECT_STORMPIKE_BANNER			 = 248,
+    BG_AV_OBJECT_HANDPACKED_SNOWDRIFT_MIN    = 237,
+    BG_AV_OBJECT_HANDPACKED_SNOWDRIFT_MAX    = 246,
+    BG_AV_OBJECT_FROSTWOLF_BANNER            = 247,
+    BG_AV_OBJECT_STORMPIKE_BANNER            = 248,
 
     BG_AV_OBJECT_MAX                         = 249
 };
@@ -362,10 +362,10 @@ enum BG_AV_OBJECTS
     AV_OPLACE_MINE_SUPPLY_N_MAX           = 136,
     AV_OPLACE_MINE_SUPPLY_S_MIN           = 137,
     AV_OPLACE_MINE_SUPPLY_S_MAX           = 148,
-	AV_OPLACE_HANDPACKED_SNOWDRIFT_MIN    = 149,
-	AV_OPLACE_HANDPACKED_SNOWDRIFT_MAX    = 158,
-	AV_OPLACE_FROSTWOLF_BANNER			  = 159,
-	AV_OPLACE_STORMPIKE_BANNER			  = 160,
+    AV_OPLACE_HANDPACKED_SNOWDRIFT_MIN    = 149,
+    AV_OPLACE_HANDPACKED_SNOWDRIFT_MAX    = 158,
+    AV_OPLACE_FROSTWOLF_BANNER            = 159,
+    AV_OPLACE_STORMPIKE_BANNER            = 160,
 
     AV_OPLACE_MAX                         = 161
 };
@@ -540,19 +540,19 @@ const float BG_AV_ObjectPos[AV_OPLACE_MAX][4] =
     {-820.644f, -136.043f, 63.1977f, 2.40855f},
     {-947.642f, -208.807f, 77.0101f, 1.36136f},
     {-951.394f, -193.695f, 67.634f, 0.802851f},
-	// hardpacked snowdrift
-	{712.1f, -446.49f, 65.74f, 2.13f},
-	{696.4f, -276.4f, 28.55f, 3.2f},
-	{74.0f, -313.27f, 31.16f, 0.17f},
-	{-75.4f, -224.4f, 10.24f, 2.99f},
-	{-160.9f, -72.1f, 33.36f, 5.5f},
-	{-255.8f, -217.55f, 7.66f, 2.8f},
-	{-361.49f, -115.5f, 26.42f, 0.6f},
-	{-389.5f, -325.0f, 17.98f, 3.89f},
-	{-919.57f, -362.48f, 52.13f, 3.8f},
-	{-1259.1f, -500.8f, 50.81f, 1.2f},
-	{-1552.55f, -359.738f, 66.948f, 2.8875f},
-	{40.0913f, 0.0153897f, -4.0962f, 0.96131f}
+    // hardpacked snowdrift
+    {712.1f, -446.49f, 65.74f, 2.13f},
+    {696.4f, -276.4f, 28.55f, 3.2f},
+    {74.0f, -313.27f, 31.16f, 0.17f},
+    {-75.4f, -224.4f, 10.24f, 2.99f},
+    {-160.9f, -72.1f, 33.36f, 5.5f},
+    {-255.8f, -217.55f, 7.66f, 2.8f},
+    {-361.49f, -115.5f, 26.42f, 0.6f},
+    {-389.5f, -325.0f, 17.98f, 3.89f},
+    {-919.57f, -362.48f, 52.13f, 3.8f},
+    {-1259.1f, -500.8f, 50.81f, 1.2f},
+    {-1552.55f, -359.738f, 66.948f, 2.8875f},
+    {40.0913f, 0.0153897f, -4.0962f, 0.96131f}
 };
 
 const float BG_AV_DoorPositons[2][4] =
@@ -1593,7 +1593,7 @@ class BattlegroundAV : public Battleground
         void HandleKillUnit(Creature* unit, Player* killer);
         void HandleQuestComplete(uint32 questid, Player* player);
         bool PlayerCanDoMineQuest(int32 GOId, TeamId teamId);
-		TeamId GetMineOwner(uint8 mine) { return m_Mine_Owner[mine]; }
+        TeamId GetMineOwner(uint8 mine) { return m_Mine_Owner[mine]; }
 
         void EndBattleground(TeamId winnerTeamId);
 

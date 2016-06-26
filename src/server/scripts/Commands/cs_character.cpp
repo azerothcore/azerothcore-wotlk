@@ -102,8 +102,8 @@ public:
             stmt->setUInt32(1, GUID_LOPART(playerGuid));
             CharacterDatabase.Execute(stmt);
 
-			// xinef: update global storage
-			sWorld->UpdateGlobalPlayerData(GUID_LOPART(playerGuid), PLAYER_UPDATE_DATA_LEVEL, "", newLevel);
+            // xinef: update global storage
+            sWorld->UpdateGlobalPlayerData(GUID_LOPART(playerGuid), PLAYER_UPDATE_DATA_LEVEL, "", newLevel);
         }
     }
 
@@ -117,7 +117,7 @@ public:
             return false;
 
         LocaleConstant loc = handler->GetSessionDbcLocale();
-		char const* targetName = target->GetName().c_str();
+        char const* targetName = target->GetName().c_str();
         char const* knownStr = handler->GetTrinityString(LANG_KNOWN);
 
         // Search in CharTitles.dbc
@@ -512,35 +512,35 @@ public:
         char* fileStr = strtok((char*)args, " ");
         char* playerStr = strtok(NULL, " ");
 
-		if (!fileStr && !playerStr)
-		{
-			QueryResult result = CharacterDatabase.PQuery("SELECT guid FROM characters");
-			if (!result)
-				return true;
-			do{
-				uint64 _guid = result->Fetch()[0].GetUInt64();
-				char buff[20];
-				sprintf(buff,"%u.dump", _guid);
-				switch(PlayerDumpWriter().WriteDump(buff, uint32(_guid)))
-				{
-					case DUMP_SUCCESS:
-						handler->PSendSysMessage(LANG_COMMAND_EXPORT_SUCCESS);
-						break;
-					case DUMP_FILE_OPEN_ERROR:
-						handler->PSendSysMessage(LANG_FILE_OPEN_FAIL, buff);
-						handler->SetSentErrorMessage(true);
-						return false;
-					case DUMP_CHARACTER_DELETED:
-						handler->PSendSysMessage(LANG_COMMAND_EXPORT_DELETED_CHAR);
-						handler->SetSentErrorMessage(true);
-						return false;
-					default:
-						handler->PSendSysMessage(LANG_COMMAND_EXPORT_FAILED);
-						handler->SetSentErrorMessage(true);
-						return false;
-				}
-			}while(result->NextRow());
-		}
+        if (!fileStr && !playerStr)
+        {
+            QueryResult result = CharacterDatabase.PQuery("SELECT guid FROM characters");
+            if (!result)
+                return true;
+            do{
+                uint64 _guid = result->Fetch()[0].GetUInt64();
+                char buff[20];
+                sprintf(buff,"%u.dump", _guid);
+                switch(PlayerDumpWriter().WriteDump(buff, uint32(_guid)))
+                {
+                    case DUMP_SUCCESS:
+                        handler->PSendSysMessage(LANG_COMMAND_EXPORT_SUCCESS);
+                        break;
+                    case DUMP_FILE_OPEN_ERROR:
+                        handler->PSendSysMessage(LANG_FILE_OPEN_FAIL, buff);
+                        handler->SetSentErrorMessage(true);
+                        return false;
+                    case DUMP_CHARACTER_DELETED:
+                        handler->PSendSysMessage(LANG_COMMAND_EXPORT_DELETED_CHAR);
+                        handler->SetSentErrorMessage(true);
+                        return false;
+                    default:
+                        handler->PSendSysMessage(LANG_COMMAND_EXPORT_FAILED);
+                        handler->SetSentErrorMessage(true);
+                        return false;
+                }
+            }while(result->NextRow());
+        }
 
         if (!fileStr || !playerStr)
             return false;

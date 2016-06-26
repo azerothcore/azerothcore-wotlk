@@ -62,7 +62,7 @@ void TransportMgr::LoadTransportTemplates()
         GameObjectTemplate const* goInfo = sObjectMgr->GetGameObjectTemplate(entry);
         if (goInfo == NULL)
         {
-			sLog->outError("Transport %u has no associated GameObjectTemplate from `gameobject_template` , skipped.", entry);
+            sLog->outError("Transport %u has no associated GameObjectTemplate from `gameobject_template` , skipped.", entry);
             continue;
         }
 
@@ -403,8 +403,8 @@ MotionTransport* TransportMgr::CreateTransport(uint32 entry, uint32 guid /*= 0*/
     if (map && map->IsDungeon())
         trans->m_zoneScript = map->ToInstanceMap()->GetInstanceScript();
 
-	// xinef: transports are active so passengers can be relocated (grids must be loaded)
-	trans->setActive(true);
+    // xinef: transports are active so passengers can be relocated (grids must be loaded)
+    trans->setActive(true);
     trans->GetMap()->AddToMap<MotionTransport>(trans);
     return trans;
 }
@@ -435,8 +435,8 @@ void TransportMgr::SpawnContinentTransports()
 
     sLog->outString(">> Spawned %u continent motion transports in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 
-	// pussywizard: preload grids for continent static transports
-	oldMSTime = getMSTime();
+    // pussywizard: preload grids for continent static transports
+    oldMSTime = getMSTime();
     result = WorldDatabase.Query("SELECT map, position_x, position_y FROM gameobject g JOIN gameobject_template t ON g.id = t.entry WHERE t.type = 11");
     count = 0;
     if (result)
@@ -449,12 +449,12 @@ void TransportMgr::SpawnContinentTransports()
             float y = fields[2].GetFloat();
 
             MapEntry const* mapEntry = sMapStore.LookupEntry(mapId);
-			if (mapEntry && !mapEntry->Instanceable())
-				if (Map* map = sMapMgr->CreateBaseMap(mapId))
-				{
-					map->LoadGrid(x, y);
-					++count;
-				}
+            if (mapEntry && !mapEntry->Instanceable())
+                if (Map* map = sMapMgr->CreateBaseMap(mapId))
+                {
+                    map->LoadGrid(x, y);
+                    ++count;
+                }
 
         } while (result->NextRow());
     }
@@ -478,53 +478,53 @@ void TransportMgr::CreateInstanceTransports(Map* map)
 bool TransportAnimation::GetAnimNode(uint32 time, TransportAnimationEntry const* &curr, TransportAnimationEntry const* &next, float &percPos) const
 {
     if (Path.empty())
-		return false;
+        return false;
 
     for (TransportPathContainer::const_reverse_iterator itr = Path.rbegin(); itr != Path.rend(); ++itr)
         if (time >= itr->first)
-		{
+        {
             curr = itr->second;
-			ASSERT(itr != Path.rbegin());
-			--itr;
-			next = itr->second;
-			percPos = float(time - curr->TimeSeg) / float(next->TimeSeg - curr->TimeSeg);
-			return true;
-		}
+            ASSERT(itr != Path.rbegin());
+            --itr;
+            next = itr->second;
+            percPos = float(time - curr->TimeSeg) / float(next->TimeSeg - curr->TimeSeg);
+            return true;
+        }
 
-	return false;
+    return false;
 }
 
 void TransportAnimation::GetAnimRotation(uint32 time, G3D::Quat &curr, G3D::Quat &next, float &percRot) const
 {
     if (Rotations.empty())
-	{
-		curr = G3D::Quat(0.0f, 0.0f, 0.0f, 1.0f);
-		next = G3D::Quat(0.0f, 0.0f, 0.0f, 1.0f);
-		percRot = 0.0f;
+    {
+        curr = G3D::Quat(0.0f, 0.0f, 0.0f, 1.0f);
+        next = G3D::Quat(0.0f, 0.0f, 0.0f, 1.0f);
+        percRot = 0.0f;
         return;
-	}
+    }
 
     for (TransportPathRotationContainer::const_reverse_iterator itr = Rotations.rbegin(); itr != Rotations.rend(); ++itr)
         if (time >= itr->first)
         {
-			uint32 currSeg = itr->second->TimeSeg, nextSeg;
-			curr = G3D::Quat(itr->second->X, itr->second->Y, itr->second->Z, itr->second->W);
-			if (itr != Rotations.rbegin())
-			{
-				--itr;
-				next = G3D::Quat(itr->second->X, itr->second->Y, itr->second->Z, itr->second->W);
-				nextSeg = itr->second->TimeSeg;
-			}
-			else
-			{
-				next = G3D::Quat(Rotations.begin()->second->X, Rotations.begin()->second->Y, Rotations.begin()->second->Z, Rotations.begin()->second->W);
-				nextSeg = this->TotalTime;
-			}
-			percRot = float(time - currSeg) / float(nextSeg - currSeg);
+            uint32 currSeg = itr->second->TimeSeg, nextSeg;
+            curr = G3D::Quat(itr->second->X, itr->second->Y, itr->second->Z, itr->second->W);
+            if (itr != Rotations.rbegin())
+            {
+                --itr;
+                next = G3D::Quat(itr->second->X, itr->second->Y, itr->second->Z, itr->second->W);
+                nextSeg = itr->second->TimeSeg;
+            }
+            else
+            {
+                next = G3D::Quat(Rotations.begin()->second->X, Rotations.begin()->second->Y, Rotations.begin()->second->Z, Rotations.begin()->second->W);
+                nextSeg = this->TotalTime;
+            }
+            percRot = float(time - currSeg) / float(nextSeg - currSeg);
             return;
         }
 
-	curr = G3D::Quat(0.0f, 0.0f, 0.0f, 1.0f);
-	next = G3D::Quat(0.0f, 0.0f, 0.0f, 1.0f);
-	percRot = 0.0f;
+    curr = G3D::Quat(0.0f, 0.0f, 0.0f, 1.0f);
+    next = G3D::Quat(0.0f, 0.0f, 0.0f, 1.0f);
+    percRot = 0.0f;
 }

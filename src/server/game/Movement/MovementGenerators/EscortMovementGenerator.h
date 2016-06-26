@@ -26,13 +26,13 @@ class EscortMovementGenerator : public MovementGeneratorMedium< T, EscortMovemen
 
         MovementGeneratorType GetMovementGeneratorType() { return ESCORT_MOTION_TYPE; }
 
-		uint32 GetSplineId() const { return _splineId; }
+        uint32 GetSplineId() const { return _splineId; }
 
     private:
         bool i_recalculateSpeed;
         Movement::PointsArray m_precomputedPath;
 
-		uint32 _splineId;
+        uint32 _splineId;
 };
 
 #endif

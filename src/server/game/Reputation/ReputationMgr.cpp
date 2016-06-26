@@ -345,9 +345,9 @@ bool ReputationMgr::SetReputation(FactionEntry const* factionEntry, int32 standi
     FactionStateList::iterator faction = _factions.find(factionEntry->reputationListID);
     if (faction != _factions.end())
     {
-		// Xinef: if we update spillover only, do not update main reputation (rank exceeds creature reward rate)
-		if (!spillOverOnly)
-			res = SetOneFactionReputation(factionEntry, standing, incremental);
+        // Xinef: if we update spillover only, do not update main reputation (rank exceeds creature reward rate)
+        if (!spillOverOnly)
+            res = SetOneFactionReputation(factionEntry, standing, incremental);
         // only this faction gets reported to client, even if it has no own visible standing
         SendState(&faction->second);
     }
@@ -541,10 +541,10 @@ void ReputationMgr::LoadFromDB(PreparedQueryResult result)
                     SetInactive(faction, true);              // have internal checks for visibility requirement
 
                 if (dbFactionFlags & FACTION_FLAG_AT_WAR)  // DB at war
-				{
-					// Xinef: dont set at war for friendly hidden reputations
-					SetAtWar(faction, bool(!(dbFactionFlags & FACTION_FLAG_HIDDEN) || GetRank(factionEntry) < REP_NEUTRAL)); // have internal checks for FACTION_FLAG_PEACE_FORCED
-				}
+                {
+                    // Xinef: dont set at war for friendly hidden reputations
+                    SetAtWar(faction, bool(!(dbFactionFlags & FACTION_FLAG_HIDDEN) || GetRank(factionEntry) < REP_NEUTRAL)); // have internal checks for FACTION_FLAG_PEACE_FORCED
+                }
                 else                                        // DB not at war
                 {
                     // allow remove if visible (and then not FACTION_FLAG_INVISIBLE_FORCED or FACTION_FLAG_HIDDEN)

@@ -1263,8 +1263,8 @@ public:
         uint32 count = 0;
         uint32 maxResults = sWorld->getIntConfig(CONFIG_MAX_RESULTS_LOOKUP_COMMANDS);
 
-		const char* name_races[RACE_DRAENEI] = {"Human", "Orc", "Dwarf", "Night Elf", "Undead", "Tauren", "Gnome", "Troll", "", "Blood Elf", "Draenei"};
-		const char* name_classes[CLASS_DRUID] = {"Warrior", "Paladin", "Hunter", "Rogue", "Priest", "Death Knight", "Shaman", "Mage", "Warlock", "", "Druid"};
+        const char* name_races[RACE_DRAENEI] = {"Human", "Orc", "Dwarf", "Night Elf", "Undead", "Tauren", "Gnome", "Troll", "", "Blood Elf", "Draenei"};
+        const char* name_classes[CLASS_DRUID] = {"Warrior", "Paladin", "Hunter", "Rogue", "Priest", "Death Knight", "Shaman", "Mage", "Warlock", "", "Druid"};
 
         do
         {
@@ -1291,20 +1291,20 @@ public:
                     Field* characterFields  = result2->Fetch();
                     uint32 guid             = characterFields[0].GetUInt32();
                     std::string name        = characterFields[1].GetString();
-					uint8 plevel = 0, prace = 0, pclass = 0;
-					bool online = (ObjectAccessor::FindPlayerInOrOutOfWorld(MAKE_NEW_GUID(guid, 0, HIGHGUID_PLAYER)) != NULL);
+                    uint8 plevel = 0, prace = 0, pclass = 0;
+                    bool online = (ObjectAccessor::FindPlayerInOrOutOfWorld(MAKE_NEW_GUID(guid, 0, HIGHGUID_PLAYER)) != NULL);
 
-					if (const GlobalPlayerData* gpd = sWorld->GetGlobalPlayerData(guid))
-					{
-						plevel = gpd->level;
-						prace = gpd->race;
-						pclass = gpd->playerClass;
-					}
+                    if (const GlobalPlayerData* gpd = sWorld->GetGlobalPlayerData(guid))
+                    {
+                        plevel = gpd->level;
+                        prace = gpd->race;
+                        pclass = gpd->playerClass;
+                    }
 
-					if (plevel > 0 && prace > 0 && prace <= RACE_DRAENEI && pclass > 0 && pclass <= CLASS_DRUID)
-						handler->PSendSysMessage("  %s (GUID %u) - %s - %s - %u%s", name.c_str(), guid, name_races[prace-1], name_classes[pclass-1], plevel, (online ? " - online" : ""));
-					else
-						handler->PSendSysMessage(LANG_LOOKUP_PLAYER_CHARACTER, name.c_str(), guid);
+                    if (plevel > 0 && prace > 0 && prace <= RACE_DRAENEI && pclass > 0 && pclass <= CLASS_DRUID)
+                        handler->PSendSysMessage("  %s (GUID %u) - %s - %s - %u%s", name.c_str(), guid, name_races[prace-1], name_classes[pclass-1], plevel, (online ? " - online" : ""));
+                    else
+                        handler->PSendSysMessage(LANG_LOOKUP_PLAYER_CHARACTER, name.c_str(), guid);
                     ++counter;
                 }
                 while (result2->NextRow() && (limit == -1 || counter < limit));

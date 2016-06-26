@@ -110,7 +110,7 @@ class BfCapturePoint
 
         bool SetCapturePointData(GameObject* capturePoint);
         GameObject* GetCapturePointGo() { return ObjectAccessor::GetObjectInWorld(m_capturePoint, (GameObject*)NULL); }
-		GameObject* GetCapturePointGo(WorldObject* obj) { return ObjectAccessor::GetGameObject(*obj, m_capturePoint); }
+        GameObject* GetCapturePointGo(WorldObject* obj) { return ObjectAccessor::GetGameObject(*obj, m_capturePoint); }
 
         TeamId GetTeamId() { return m_team; }
     protected:
@@ -183,7 +183,7 @@ class BfGraveyard
             if (!m_SpiritGuide[0] && !m_SpiritGuide[1])
                 return false;
 
-			// performance
+            // performance
             /*if (!ObjectAccessor::FindUnit(m_SpiritGuide[0]) &&
                 !ObjectAccessor::FindUnit(m_SpiritGuide[1]))
                 return false;*/
@@ -335,7 +335,7 @@ class Battlefield : public ZoneScript
         //virtual void DoCompleteOrIncrementAchievement(uint32 /*achievement*/, Player* /*player*/, uint8 /*incrementNumber = 1*/) {};
 
         /// Send all worldstate data to all player in zone.
-        virtual void SendInitWorldStatesToAll() = 0;	
+        virtual void SendInitWorldStatesToAll() = 0;    
         virtual void FillInitialWorldStates(WorldPacket& /*data*/) = 0;
 
         /// Return if we can use mount in battlefield

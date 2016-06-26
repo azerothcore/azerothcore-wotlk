@@ -29,8 +29,8 @@ class instance_scholomance : public InstanceMapScript
                 GateRavenianGUID        = 0;
                 GateBarovGUID           = 0;
                 GateIlluciaGUID         = 0;
-				_kirtonosState = 0;
-				_miniBosses = 0;
+                _kirtonosState = 0;
+                _miniBosses = 0;
             }
 
             void OnGameObjectCreate(GameObject* go)
@@ -84,32 +84,32 @@ class instance_scholomance : public InstanceMapScript
                 return 0;
             }
 
-			void SetData(uint32 type, uint32 data)
-			{
-				switch (type)
-				{
-					case DATA_KIRTONOS_THE_HERALD:
-						_kirtonosState = data;
-						break;
-					case DATA_MINI_BOSSES:
-						++_miniBosses;
-						break;
-				}
+            void SetData(uint32 type, uint32 data)
+            {
+                switch (type)
+                {
+                    case DATA_KIRTONOS_THE_HERALD:
+                        _kirtonosState = data;
+                        break;
+                    case DATA_MINI_BOSSES:
+                        ++_miniBosses;
+                        break;
+                }
 
-				SaveToDB();
-			}
+                SaveToDB();
+            }
 
-			uint32 GetData(uint32 type) const
-			{
-				switch (type)
-				{
-					case DATA_KIRTONOS_THE_HERALD:
-						return _kirtonosState;
-					case DATA_MINI_BOSSES:
-						return _miniBosses;
-				}
-				return 0;
-			}
+            uint32 GetData(uint32 type) const
+            {
+                switch (type)
+                {
+                    case DATA_KIRTONOS_THE_HERALD:
+                        return _kirtonosState;
+                    case DATA_MINI_BOSSES:
+                        return _miniBosses;
+                }
+                return 0;
+            }
 
             std::string GetSaveData()
             {
@@ -130,10 +130,10 @@ class instance_scholomance : public InstanceMapScript
                 if (dataHead1 == 'S' && dataHead2 == 'O')
                 {
                     loadStream >> _kirtonosState;
-					loadStream >> _miniBosses;
+                    loadStream >> _miniBosses;
 
-					if (_kirtonosState == IN_PROGRESS)
-						_kirtonosState = NOT_STARTED;
+                    if (_kirtonosState == IN_PROGRESS)
+                        _kirtonosState = NOT_STARTED;
                 }
             }
 
@@ -146,8 +146,8 @@ class instance_scholomance : public InstanceMapScript
             uint64 GateBarovGUID;
             uint64 GateIlluciaGUID;
 
-			uint32 _kirtonosState;
-			uint32 _miniBosses;
+            uint32 _kirtonosState;
+            uint32 _miniBosses;
         };
 };
 
@@ -163,15 +163,15 @@ class spell_scholomance_fixate : public SpellScriptLoader
             void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
                 Unit* target = GetTarget();
-				if (Unit* caster = GetCaster())
-					caster->TauntApply(target);
+                if (Unit* caster = GetCaster())
+                    caster->TauntApply(target);
             }
 
             void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
                 Unit* target = GetTarget();
-				if (Unit* caster = GetCaster())
-					caster->TauntFadeOut(target);
+                if (Unit* caster = GetCaster())
+                    caster->TauntFadeOut(target);
             }
 
             void Register()
@@ -221,28 +221,28 @@ class spell_kormok_summon_bone_minions : SpellScriptLoader
     public:
        spell_kormok_summon_bone_minions() : SpellScriptLoader("spell_kormok_summon_bone_minions") { }
 
-		class spell_kormok_summon_bone_minionsSpellScript : public SpellScript
-		{
-			PrepareSpellScript(spell_kormok_summon_bone_minionsSpellScript);
+        class spell_kormok_summon_bone_minionsSpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_kormok_summon_bone_minionsSpellScript);
 
-			void HandleScript(SpellEffIndex effIndex)
-			{
-				PreventHitDefaultEffect(effIndex);
+            void HandleScript(SpellEffIndex effIndex)
+            {
+                PreventHitDefaultEffect(effIndex);
 
-				for (uint32 i = 0; i < 4; ++i)
-					GetCaster()->CastSpell(GetCaster(), SPELL_SUMMON_BONE_MINION1+i, true);
-			}
+                for (uint32 i = 0; i < 4; ++i)
+                    GetCaster()->CastSpell(GetCaster(), SPELL_SUMMON_BONE_MINION1+i, true);
+            }
 
-			void Register()
-			{
-				OnEffectHitTarget += SpellEffectFn(spell_kormok_summon_bone_minionsSpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-			}
-		};
+            void Register()
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_kormok_summon_bone_minionsSpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+            }
+        };
 
-		SpellScript* GetSpellScript() const
-		{
-			return new spell_kormok_summon_bone_minionsSpellScript();
-		}
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_kormok_summon_bone_minionsSpellScript();
+        }
 };
 
 enum Rooms
@@ -253,7 +253,7 @@ enum Rooms
     ROOM_THE_SHADOW_VAULT       = 3,
     ROOM_BAROV_FAMILY_VAULT     = 4,
     ROOM_VAULT_OF_THE_RAVENIAN  = 5,
-	ROOM_MAX					= 6
+    ROOM_MAX                    = 6
 };
 
 class spell_scholomance_shadow_portal : public SpellScriptLoader
@@ -265,15 +265,15 @@ class spell_scholomance_shadow_portal : public SpellScriptLoader
         {
             PrepareSpellScript(spell_scholomance_shadow_portal_SpellScript);
 
-			bool Load()
-			{
-				return GetCaster()->GetTypeId() == TYPEID_UNIT;
-			}
+            bool Load()
+            {
+                return GetCaster()->GetTypeId() == TYPEID_UNIT;
+            }
 
             void HandleDummy(SpellEffIndex /*effIndex*/)
             {
                 Creature* caster = GetCaster()->ToCreature();
-				uint8 attempts = 0;
+                uint8 attempts = 0;
                 uint8 room = urand(ROOM_HALL_OF_SECRETS, ROOM_VAULT_OF_THE_RAVENIAN);
                 uint32 spellId = 0;
 
@@ -284,51 +284,51 @@ class spell_scholomance_shadow_portal : public SpellScriptLoader
                         case ROOM_HALL_OF_SECRETS:
                             if (InstanceScript* instance = caster->GetInstanceScript())
                                 if (GameObject* gate = ObjectAccessor::GetGameObject(*caster, instance->GetData64(GO_GATE_RAVENIAN)))
-									if (gate->GetGoState() == GO_STATE_ACTIVE)
-										spellId = SPELL_SHADOW_PORTAL_HALLOFSECRETS;
+                                    if (gate->GetGoState() == GO_STATE_ACTIVE)
+                                        spellId = SPELL_SHADOW_PORTAL_HALLOFSECRETS;
                             break;
                         case ROOM_HALL_OF_THE_DAMNED:
                             if (InstanceScript* instance = caster->GetInstanceScript())
                                 if (GameObject* gate = ObjectAccessor::GetGameObject(*caster, instance->GetData64(GO_GATE_THEOLEN)))
-									if (gate->GetGoState() == GO_STATE_ACTIVE)
-										spellId = SPELL_SHADOW_PORTAL_HALLOFTHEDAMNED;
+                                    if (gate->GetGoState() == GO_STATE_ACTIVE)
+                                        spellId = SPELL_SHADOW_PORTAL_HALLOFTHEDAMNED;
                             break;
                         case ROOM_THE_COVEN:
                             if (InstanceScript* instance = caster->GetInstanceScript())
                                 if (GameObject* gate = ObjectAccessor::GetGameObject(*caster, instance->GetData64(GO_GATE_MALICIA)))
-									if (gate->GetGoState() == GO_STATE_ACTIVE)
-										spellId = SPELL_SHADOW_PORTAL_THECOVEN;
+                                    if (gate->GetGoState() == GO_STATE_ACTIVE)
+                                        spellId = SPELL_SHADOW_PORTAL_THECOVEN;
                             break;
                         case ROOM_THE_SHADOW_VAULT:
                             if (InstanceScript* instance = caster->GetInstanceScript())
                                 if (GameObject* gate = ObjectAccessor::GetGameObject(*caster, instance->GetData64(GO_GATE_ILLUCIA)))
-									if (gate->GetGoState() == GO_STATE_ACTIVE)
-										spellId = SPELL_SHADOW_PORTAL_THESHADOWVAULT;
+                                    if (gate->GetGoState() == GO_STATE_ACTIVE)
+                                        spellId = SPELL_SHADOW_PORTAL_THESHADOWVAULT;
                             break;
                         case ROOM_BAROV_FAMILY_VAULT:
                             if (InstanceScript* instance = caster->GetInstanceScript())
                                 if (GameObject* gate = ObjectAccessor::GetGameObject(*caster, instance->GetData64(GO_GATE_BAROV)))
-									if (gate->GetGoState() == GO_STATE_ACTIVE)
-										spellId = SPELL_SHADOW_PORTAL_BAROVFAMILYVAULT;
+                                    if (gate->GetGoState() == GO_STATE_ACTIVE)
+                                        spellId = SPELL_SHADOW_PORTAL_BAROVFAMILYVAULT;
                             break;
                         case ROOM_VAULT_OF_THE_RAVENIAN:
                             if (InstanceScript* instance = caster->GetInstanceScript())
                                 if (GameObject* gate = ObjectAccessor::GetGameObject(*caster, instance->GetData64(GO_GATE_POLKELT)))
-									if (gate->GetGoState() == GO_STATE_ACTIVE)
-										spellId = SPELL_SHADOW_PORTAL_VAULTOFTHERAVENIAN;
+                                    if (gate->GetGoState() == GO_STATE_ACTIVE)
+                                        spellId = SPELL_SHADOW_PORTAL_VAULTOFTHERAVENIAN;
                             break;
                     }
 
                     if (spellId)
-					{
+                    {
                         caster->CastSpell(GetHitUnit(), spellId, true);
-						break;
-					}
-					else
-					{
-						room = (++room)%ROOM_MAX;
-						++attempts;
-					}
+                        break;
+                    }
+                    else
+                    {
+                        room = (++room)%ROOM_MAX;
+                        ++attempts;
+                    }
                 }
             }
 
@@ -381,14 +381,14 @@ class spell_scholomance_shadow_portal_rooms : public SpellScriptLoader
         {
             PrepareSpellScript(spell_scholomance_shadow_portal_rooms_SpellScript);
 
-			bool Load()
-			{
-				return GetCaster()->GetTypeId() == TYPEID_UNIT;
-			}
+            bool Load()
+            {
+                return GetCaster()->GetTypeId() == TYPEID_UNIT;
+            }
 
             void HandleSendEvent(SpellEffIndex effIndex)
             {
-				PreventHitEffect(effIndex);
+                PreventHitEffect(effIndex);
                 Creature* caster = GetCaster()->ToCreature();
 
                 uint8 summonPos = 0;
@@ -435,10 +435,10 @@ class spell_scholomance_shadow_portal_rooms : public SpellScriptLoader
 
                     if (InstanceScript* instance = GetCaster()->GetInstanceScript())
                         if (GameObject* gate = ObjectAccessor::GetGameObject(*caster, instance->GetData64(gateId)))
-						{
+                        {
                             gate->SetGoState(GO_STATE_READY);
-							gate->AI()->SetData(1, 1);
-						}
+                            gate->AI()->SetData(1, 1);
+                        }
                 }
             }
 
@@ -457,9 +457,9 @@ class spell_scholomance_shadow_portal_rooms : public SpellScriptLoader
 void AddSC_instance_scholomance()
 {
     new instance_scholomance();
-	new spell_scholomance_fixate();
-	new spell_kormok_summon_bone_mages();
-	new spell_kormok_summon_bone_minions();
-	new spell_scholomance_shadow_portal();
-	new spell_scholomance_shadow_portal_rooms();
+    new spell_scholomance_fixate();
+    new spell_kormok_summon_bone_mages();
+    new spell_kormok_summon_bone_minions();
+    new spell_scholomance_shadow_portal();
+    new spell_scholomance_shadow_portal_rooms();
 }

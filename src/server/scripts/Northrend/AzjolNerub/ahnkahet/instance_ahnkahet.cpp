@@ -27,8 +27,8 @@ public:
         uint32 m_auiEncounter[MAX_ENCOUNTER];
         uint32 spheres;
 
-		bool nadoxAchievement;
-		bool jedogaAchievement;
+        bool nadoxAchievement;
+        bool jedogaAchievement;
 
         void Initialize()
         {
@@ -40,12 +40,12 @@ public:
             Herald_Volazj = 0;
             Amanitar = 0;
 
-			Prince_TaldaramPlatform = 0;
-			Prince_TaldaramGate = 0;
+            Prince_TaldaramPlatform = 0;
+            Prince_TaldaramGate = 0;
             spheres = NOT_STARTED;
 
-			nadoxAchievement = false;
-			jedogaAchievement = false;
+            nadoxAchievement = false;
+            jedogaAchievement = false;
         }
 
         bool IsEncounterInProgress() const
@@ -61,20 +61,20 @@ public:
             switch(pCreature->GetEntry())
             {
                 case NPC_ELDER_NADOX:
-					Elder_Nadox = pCreature->GetGUID();
-					break;
+                    Elder_Nadox = pCreature->GetGUID();
+                    break;
                 case NPC_PRINCE_TALDARAM:
-					Prince_Taldaram = pCreature->GetGUID();
-					break;
+                    Prince_Taldaram = pCreature->GetGUID();
+                    break;
                 case NPC_JEDOGA_SHADOWSEEKER:
-					Jedoga_Shadowseeker = pCreature->GetGUID();
-					break;
+                    Jedoga_Shadowseeker = pCreature->GetGUID();
+                    break;
                 case NPC_HERALD_JOLAZJ:
-					Herald_Volazj = pCreature->GetGUID();
-					break;
+                    Herald_Volazj = pCreature->GetGUID();
+                    break;
                 case NPC_AMANITAR:
-					Amanitar = pCreature->GetGUID();
-					break;
+                    Amanitar = pCreature->GetGUID();
+                    break;
             }
         }
 
@@ -83,11 +83,11 @@ public:
             switch(pGo->GetEntry())
             {
                 case 193564:     
-					Prince_TaldaramPlatform = pGo->GetGUID();
+                    Prince_TaldaramPlatform = pGo->GetGUID();
                     if (m_auiEncounter[1] == DONE) 
-						HandleGameObject(0,true,pGo); 
-					
-					break;
+                        HandleGameObject(0,true,pGo); 
+                    
+                    break;
                 case 193093:
                     if (spheres == DONE)
                     {
@@ -95,9 +95,9 @@ public:
                         pGo->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
                     }
                     else 
-						pGo->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                        pGo->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
                     
-					break;
+                    break;
                 case 193094:
                     if (spheres == DONE)
                     {
@@ -105,15 +105,15 @@ public:
                         pGo->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
                     }
                     else 
-						pGo->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                        pGo->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
                     
-					break;
+                    break;
                 case 192236:    
-					Prince_TaldaramGate = pGo->GetGUID(); // Web gate past Prince Taldaram
+                    Prince_TaldaramGate = pGo->GetGUID(); // Web gate past Prince Taldaram
                     if (m_auiEncounter[1] == DONE)
-						HandleGameObject(0,true,pGo);
-					
-					break;
+                        HandleGameObject(0,true,pGo);
+                    
+                    break;
             }
         }
 
@@ -132,43 +132,43 @@ public:
             return 0;
         }
 
-		bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const* source, Unit const* target = NULL, uint32 miscvalue1 = 0)
-		{
-			switch(criteria_id)
-			{
-				case 7317: // Respect Your Elders (2038)
-					return nadoxAchievement;
-				case 7359: // Volunteer Work (2056)
-					return jedogaAchievement;
-			}
-			return false;
-		}
+        bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const* source, Unit const* target = NULL, uint32 miscvalue1 = 0)
+        {
+            switch(criteria_id)
+            {
+                case 7317: // Respect Your Elders (2038)
+                    return nadoxAchievement;
+                case 7359: // Volunteer Work (2056)
+                    return jedogaAchievement;
+            }
+            return false;
+        }
 
         void SetData(uint32 type, uint32 data)
         {
             switch(type)
             {
-				case DATA_HERALD_VOLAZJ_EVENT:
+                case DATA_HERALD_VOLAZJ_EVENT:
                 case DATA_AMANITAR_EVENT:
                 case DATA_ELDER_NADOX_EVENT: 
-				case DATA_JEDOGA_SHADOWSEEKER_EVENT:
-					m_auiEncounter[type] = data;
-					break;
+                case DATA_JEDOGA_SHADOWSEEKER_EVENT:
+                    m_auiEncounter[type] = data;
+                    break;
                 case DATA_PRINCE_TALDARAM_EVENT:
                     if (data == DONE)
                         HandleGameObject(Prince_TaldaramGate, true);
                     
-					m_auiEncounter[type] = data;
+                    m_auiEncounter[type] = data;
                     break;
                 case DATA_SPHERE_EVENT:
-					spheres = data;
-					break;
-				case DATA_NADOX_ACHIEVEMENT:
-					nadoxAchievement = (bool)data;
-					return;
-				case DATA_JEDOGA_ACHIEVEMENT:
-					jedogaAchievement = (bool)data;
-					return;
+                    spheres = data;
+                    break;
+                case DATA_NADOX_ACHIEVEMENT:
+                    nadoxAchievement = (bool)data;
+                    return;
+                case DATA_JEDOGA_ACHIEVEMENT:
+                    jedogaAchievement = (bool)data;
+                    return;
             }
 
             if (data == DONE)
@@ -181,13 +181,13 @@ public:
             {
                 case DATA_ELDER_NADOX_EVENT:
                 case DATA_PRINCE_TALDARAM_EVENT:
-				case DATA_JEDOGA_SHADOWSEEKER_EVENT:
+                case DATA_JEDOGA_SHADOWSEEKER_EVENT:
                 case DATA_HERALD_VOLAZJ:
                 case DATA_AMANITAR_EVENT:
-					return m_auiEncounter[type];
+                    return m_auiEncounter[type];
 
                 case DATA_SPHERE_EVENT:                 
-					return spheres;
+                    return spheres;
             }
 
             return 0;

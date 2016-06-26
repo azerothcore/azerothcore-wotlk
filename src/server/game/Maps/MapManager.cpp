@@ -168,14 +168,14 @@ bool MapManager::CanPlayerEnter(uint32 mapid, Player* player, bool loginCheck)
         }
     }
 
-	// xinef: dont allow LFG Group to enter other instance that is selected
-	if (group)
-		if (group->isLFGGroup())
-			if (!sLFGMgr->inLfgDungeonMap(group->GetGUID(), mapid, targetDifficulty))
-			{
-				player->SendTransferAborted(mapid, TRANSFER_ABORT_MAP_NOT_ALLOWED);
-				return false;
-			}
+    // xinef: dont allow LFG Group to enter other instance that is selected
+    if (group)
+        if (group->isLFGGroup())
+            if (!sLFGMgr->inLfgDungeonMap(group->GetGUID(), mapid, targetDifficulty))
+            {
+                player->SendTransferAborted(mapid, TRANSFER_ABORT_MAP_NOT_ALLOWED);
+                return false;
+            }
 
     if (!player->IsAlive())
     {
@@ -208,9 +208,9 @@ bool MapManager::CanPlayerEnter(uint32 mapid, Player* player, bool loginCheck)
     }
 
     // if map exists - check for being full, etc.
-	if (!loginCheck) // for login this is done by the calling function
+    if (!loginCheck) // for login this is done by the calling function
     {
-		uint32 destInstId = sInstanceSaveMgr->PlayerGetDestinationInstanceId(player, mapid, targetDifficulty);
+        uint32 destInstId = sInstanceSaveMgr->PlayerGetDestinationInstanceId(player, mapid, targetDifficulty);
         if (destInstId)
             if (Map* boundMap = sMapMgr->FindMap(mapid, destInstId))
                 if (!boundMap->CanEnter(player, loginCheck))
@@ -221,7 +221,7 @@ bool MapManager::CanPlayerEnter(uint32 mapid, Player* player, bool loginCheck)
     if (entry->IsDungeon() && (!group || !group->isLFGGroup() || !group->IsLfgRandomInstance()))
     {
         uint32 instaceIdToCheck = 0;
-		if (InstanceSave* save = sInstanceSaveMgr->PlayerGetInstanceSave(player->GetGUIDLow(), mapid, player->GetDifficulty(entry->IsRaid())))
+        if (InstanceSave* save = sInstanceSaveMgr->PlayerGetInstanceSave(player->GetGUIDLow(), mapid, player->GetDifficulty(entry->IsRaid())))
             instaceIdToCheck = save->GetInstanceId();
 
         // instaceIdToCheck can be 0 if save not found - means no bind so the instance is new
@@ -241,19 +241,19 @@ void MapManager::Update(uint32 diff)
     for (uint8 i=0; i<4; ++i)
         i_timer[i].Update(diff);
 
-	// pussywizard: lfg compatibles update, schedule before maps so it is processed from the very beginning
-	//if (mapUpdateStep == 0)
-	{
-		if (m_updater.activated())
-			m_updater.schedule_lfg_update(diff);
-		else
-		{
-			uint32 startTime = getMSTime();
-			sLFGMgr->Update(diff, 1);
-			uint32 totalTime = getMSTimeDiff(startTime, getMSTime());
-			lfgDiffTracker.Update(10000+totalTime); // +10k to mark it was NOT multithreaded
-		}
-	}
+    // pussywizard: lfg compatibles update, schedule before maps so it is processed from the very beginning
+    //if (mapUpdateStep == 0)
+    {
+        if (m_updater.activated())
+            m_updater.schedule_lfg_update(diff);
+        else
+        {
+            uint32 startTime = getMSTime();
+            sLFGMgr->Update(diff, 1);
+            uint32 totalTime = getMSTimeDiff(startTime, getMSTime());
+            lfgDiffTracker.Update(10000+totalTime); // +10k to mark it was NOT multithreaded
+        }
+    }
 
     MapMapType::iterator iter = i_maps.begin();
     for (; iter != i_maps.end(); ++iter)
@@ -340,11 +340,11 @@ void MapManager::GetNumInstances(uint32& dungeons, uint32& battlegrounds, uint32
             continue;
         MapInstanced::InstancedMaps &maps = ((MapInstanced*)map)->GetInstancedMaps();
         for (MapInstanced::InstancedMaps::iterator mitr = maps.begin(); mitr != maps.end(); ++mitr)
-		{
+        {
             if (mitr->second->IsDungeon()) dungeons++;
-			else if (mitr->second->IsBattleground()) battlegrounds++;
-			else if (mitr->second->IsBattleArena()) arenas++;
-		}
+            else if (mitr->second->IsBattleground()) battlegrounds++;
+            else if (mitr->second->IsBattleArena()) arenas++;
+        }
     }
 }
 
@@ -357,20 +357,20 @@ void MapManager::GetNumPlayersInInstances(uint32& dungeons, uint32& battleground
             continue;
         MapInstanced::InstancedMaps &maps = ((MapInstanced*)map)->GetInstancedMaps();
         for (MapInstanced::InstancedMaps::iterator mitr = maps.begin(); mitr != maps.end(); ++mitr)
-		{
+        {
             if (mitr->second->IsDungeon()) dungeons += ((InstanceMap*)mitr->second)->GetPlayers().getSize();
-			else if (mitr->second->IsBattleground()) battlegrounds += ((InstanceMap*)mitr->second)->GetPlayers().getSize();
-			else if (mitr->second->IsBattleArena())
-			{
-				uint32 spect = 0;
-				if (BattlegroundMap* bgmap = mitr->second->ToBattlegroundMap())
-					if (Battleground* bg = bgmap->GetBG())
-						spect = bg->GetSpectators().size();
+            else if (mitr->second->IsBattleground()) battlegrounds += ((InstanceMap*)mitr->second)->GetPlayers().getSize();
+            else if (mitr->second->IsBattleArena())
+            {
+                uint32 spect = 0;
+                if (BattlegroundMap* bgmap = mitr->second->ToBattlegroundMap())
+                    if (Battleground* bg = bgmap->GetBG())
+                        spect = bg->GetSpectators().size();
 
-				arenas += ((InstanceMap*)mitr->second)->GetPlayers().getSize() - spect;
-				spectators += spect;
-			}
-		}
+                arenas += ((InstanceMap*)mitr->second)->GetPlayers().getSize() - spect;
+                spectators += spect;
+            }
+        }
     }
 }
 
@@ -391,10 +391,10 @@ void MapManager::RegisterInstanceId(uint32 instanceId)
     // Allocation was done in InitInstanceIds()
     _instanceIds[instanceId] = true;
 
-	// Instances are pulled in ascending order from db and _nextInstanceId is initialized with 1,
+    // Instances are pulled in ascending order from db and _nextInstanceId is initialized with 1,
     // so if the instance id is used, increment
-	if (_nextInstanceId == instanceId)
-		++_nextInstanceId;
+    if (_nextInstanceId == instanceId)
+        ++_nextInstanceId;
 }
 
 uint32 MapManager::GenerateInstanceId()
@@ -402,7 +402,7 @@ uint32 MapManager::GenerateInstanceId()
     uint32 newInstanceId = _nextInstanceId;
 
     // find the lowest available id starting from the current _nextInstanceId
-	while (_nextInstanceId < 0xFFFFFFFF && ++_nextInstanceId < _instanceIds.size() && _instanceIds[_nextInstanceId]);
+    while (_nextInstanceId < 0xFFFFFFFF && ++_nextInstanceId < _instanceIds.size() && _instanceIds[_nextInstanceId]);
 
     if (_nextInstanceId == 0xFFFFFFFF)
     {

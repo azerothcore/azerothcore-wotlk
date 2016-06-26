@@ -145,12 +145,12 @@ bool normalizePlayerName(std::string& name)
     for (size_t i = 1; i < wstr_len; ++i)
         wstr_buf[i] = wcharToLower(wstr_buf[i]);
 
-	// if there's "gm" at the end, uppercase it!
-	if (wstr_len>=2 && wstr_buf[wstr_len-2]==L'g' && wstr_buf[wstr_len-1]==L'm')
-	{
-		wstr_buf[wstr_len-2]=L'G';
-		wstr_buf[wstr_len-1]=L'M';
-	}
+    // if there's "gm" at the end, uppercase it!
+    if (wstr_len>=2 && wstr_buf[wstr_len-2]==L'g' && wstr_buf[wstr_len-1]==L'm')
+    {
+        wstr_buf[wstr_len-2]=L'G';
+        wstr_buf[wstr_len-1]=L'M';
+    }
 
     if (!WStrToUtf8(wstr_buf, wstr_len, name))
         return false;
@@ -518,20 +518,20 @@ void ObjectMgr::LoadCreatureTemplates()
     }
     while (result->NextRow());
 
-	// pussywizard:
-	{
-		uint32 max = 0;
-		for (CreatureTemplateContainer::const_iterator itr = _creatureTemplateStore.begin(); itr != _creatureTemplateStore.end(); ++itr)
-			if (itr->first > max)
-				max = itr->first;
-		if (max)
-		{
-			_creatureTemplateStoreFast.clear();
-			_creatureTemplateStoreFast.resize(max+1, NULL);
-			for (CreatureTemplateContainer::iterator itr = _creatureTemplateStore.begin(); itr != _creatureTemplateStore.end(); ++itr)
-				_creatureTemplateStoreFast[itr->first] = &(itr->second);
-		}
-	}
+    // pussywizard:
+    {
+        uint32 max = 0;
+        for (CreatureTemplateContainer::const_iterator itr = _creatureTemplateStore.begin(); itr != _creatureTemplateStore.end(); ++itr)
+            if (itr->first > max)
+                max = itr->first;
+        if (max)
+        {
+            _creatureTemplateStoreFast.clear();
+            _creatureTemplateStoreFast.resize(max+1, NULL);
+            for (CreatureTemplateContainer::iterator itr = _creatureTemplateStore.begin(); itr != _creatureTemplateStore.end(); ++itr)
+                _creatureTemplateStoreFast[itr->first] = &(itr->second);
+        }
+    }
 
     // Checking needs to be done after loading because of the difficulty self referencing
     for (CreatureTemplateContainer::iterator itr = _creatureTemplateStore.begin(); itr != _creatureTemplateStore.end(); ++itr)
@@ -730,11 +730,11 @@ void ObjectMgr::CheckCreatureTemplate(CreatureTemplate const* cInfo)
                 cInfo->Entry, cInfo->VehicleId, diff + 1, cInfo->DifficultyEntry[diff], difficultyInfo->VehicleId);
         }
 
-		// Xinef: check dmg school
-		if (cInfo->dmgschool != difficultyInfo->dmgschool)
-		{
-			sLog->outErrorDb("Creature (Entry: %u) has different `dmgschool` in difficulty %u mode (Entry: %u)", cInfo->Entry, diff + 1, cInfo->DifficultyEntry[diff]);
-		}
+        // Xinef: check dmg school
+        if (cInfo->dmgschool != difficultyInfo->dmgschool)
+        {
+            sLog->outErrorDb("Creature (Entry: %u) has different `dmgschool` in difficulty %u mode (Entry: %u)", cInfo->Entry, diff + 1, cInfo->DifficultyEntry[diff]);
+        }
 
         if (!difficultyInfo->AIName.empty())
         {
@@ -1000,7 +1000,7 @@ void ObjectMgr::LoadCreatureAddons()
         Tokenizer tokens(fields[6].GetString(), ' ');
         uint8 i = 0;
         creatureAddon.auras.resize(tokens.size());
-		for (Tokenizer::const_iterator itr = tokens.begin(); itr != tokens.end(); ++itr)
+        for (Tokenizer::const_iterator itr = tokens.begin(); itr != tokens.end(); ++itr)
         {
             SpellInfo const* AdditionalSpellInfo = sSpellMgr->GetSpellInfo(uint32(atol(*itr)));
             if (!AdditionalSpellInfo)
@@ -1044,7 +1044,7 @@ void ObjectMgr::LoadGameObjectAddons()
     if (!result)
     {
         sLog->outString(">> Loaded 0 gameobject addon definitions. DB table `gameobject_addon` is empty.");
-		sLog->outString();
+        sLog->outString();
         return;
     }
 
@@ -1075,7 +1075,7 @@ void ObjectMgr::LoadGameObjectAddons()
 
         if (gameObjectAddon.invisibilityType && !gameObjectAddon.InvisibilityValue)
         {
-			sLog->outErrorDb("GameObject (GUID: %u) has InvisibilityType set but has no InvisibilityValue in `gameobject_addon`, set to 1", guid);
+            sLog->outErrorDb("GameObject (GUID: %u) has InvisibilityType set but has no InvisibilityValue in `gameobject_addon`, set to 1", guid);
             gameObjectAddon.InvisibilityValue = 1;
         }
 
@@ -1084,7 +1084,7 @@ void ObjectMgr::LoadGameObjectAddons()
     while (result->NextRow());
 
     sLog->outString(">> Loaded %u gameobject addons in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-	sLog->outString();
+    sLog->outString();
 }
 
 GameObjectAddon const* ObjectMgr::GetGameObjectAddon(uint32 lowguid)
@@ -1170,7 +1170,7 @@ void ObjectMgr::LoadEquipmentTemplates()
         uint8 id = fields[1].GetUInt8();
         if (!id)
         {
-			sLog->outError("Creature equipment template with id 0 found for creature %u, skipped.", entry);
+            sLog->outError("Creature equipment template with id 0 found for creature %u, skipped.", entry);
             continue;
         }
 
@@ -2152,48 +2152,48 @@ void ObjectMgr::RemoveGameobjectFromGrid(uint32 guid, GameObjectData const* data
 
 uint64 ObjectMgr::GetPlayerGUIDByName(std::string const& name) const
 {
-	// Get data from global storage
-	if (uint32 guidLow = sWorld->GetGlobalPlayerGUID(name))
-		return MAKE_NEW_GUID(guidLow, 0, HIGHGUID_PLAYER);
-	return 0;
+    // Get data from global storage
+    if (uint32 guidLow = sWorld->GetGlobalPlayerGUID(name))
+        return MAKE_NEW_GUID(guidLow, 0, HIGHGUID_PLAYER);
+    return 0;
 }
 
 bool ObjectMgr::GetPlayerNameByGUID(uint64 guid, std::string &name) const
 {
-	// Get data from global storage
-	if (GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(GUID_LOPART(guid)))
-	{
-		name = playerData->name;
-		return true;
-	}
+    // Get data from global storage
+    if (GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(GUID_LOPART(guid)))
+    {
+        name = playerData->name;
+        return true;
+    }
 
     return false;
 }
 
 TeamId ObjectMgr::GetPlayerTeamIdByGUID(uint64 guid) const
 {
-	// xinef: Get data from global storage
-	if (GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(GUID_LOPART(guid)))
-		return Player::TeamIdForRace(playerData->race);
+    // xinef: Get data from global storage
+    if (GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(GUID_LOPART(guid)))
+        return Player::TeamIdForRace(playerData->race);
 
     return TEAM_NEUTRAL;
 }
 
 uint32 ObjectMgr::GetPlayerAccountIdByGUID(uint64 guid) const
 {
-	// xinef: Get data from global storage
-	if (GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(GUID_LOPART(guid)))
-		return playerData->accountId;
+    // xinef: Get data from global storage
+    if (GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(GUID_LOPART(guid)))
+        return playerData->accountId;
 
     return 0;
 }
 
 uint32 ObjectMgr::GetPlayerAccountIdByPlayerName(const std::string& name) const
 {
-	// Get data from global storage
-	if (uint32 guidLow = sWorld->GetGlobalPlayerGUID(name))
-		if (GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(guidLow))
-			return playerData->accountId;
+    // Get data from global storage
+    if (uint32 guidLow = sWorld->GetGlobalPlayerGUID(name))
+        if (GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(guidLow))
+            return playerData->accountId;
 
     return 0;
 }
@@ -2797,48 +2797,48 @@ void ObjectMgr::LoadItemTemplates()
             itemTemplate.HolidayId = 0;
         }
 
-		if (itemTemplate.FlagsCu & ITEM_FLAGS_CU_DURATION_REAL_TIME && !itemTemplate.Duration)
+        if (itemTemplate.FlagsCu & ITEM_FLAGS_CU_DURATION_REAL_TIME && !itemTemplate.Duration)
         {
             sLog->outErrorDb("Item (Entry %u) has flag ITEM_FLAGS_CU_DURATION_REAL_TIME but it does not have duration limit", entry);
             itemTemplate.FlagsCu &= ~ITEM_FLAGS_CU_DURATION_REAL_TIME;
         }
 
-		// Fill categories map
-		for (uint8 i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
-			if (itemTemplate.Spells[i].SpellId && itemTemplate.Spells[i].SpellCategory && itemTemplate.Spells[i].SpellCategoryCooldown)
-			{
-				SpellCategoryStore::const_iterator ct = sSpellsByCategoryStore.find(itemTemplate.Spells[i].SpellCategory);
-				if (ct != sSpellsByCategoryStore.end())
-				{
-					const SpellCategorySet& ct_set = ct->second;
-					if (ct_set.find(itemTemplate.Spells[i].SpellId) == ct_set.end())
-						sSpellsByCategoryStore[itemTemplate.Spells[i].SpellCategory].insert(itemTemplate.Spells[i].SpellId);
-				}
-				else
-					sSpellsByCategoryStore[itemTemplate.Spells[i].SpellCategory].insert(itemTemplate.Spells[i].SpellId);
-			}
+        // Fill categories map
+        for (uint8 i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
+            if (itemTemplate.Spells[i].SpellId && itemTemplate.Spells[i].SpellCategory && itemTemplate.Spells[i].SpellCategoryCooldown)
+            {
+                SpellCategoryStore::const_iterator ct = sSpellsByCategoryStore.find(itemTemplate.Spells[i].SpellCategory);
+                if (ct != sSpellsByCategoryStore.end())
+                {
+                    const SpellCategorySet& ct_set = ct->second;
+                    if (ct_set.find(itemTemplate.Spells[i].SpellId) == ct_set.end())
+                        sSpellsByCategoryStore[itemTemplate.Spells[i].SpellCategory].insert(itemTemplate.Spells[i].SpellId);
+                }
+                else
+                    sSpellsByCategoryStore[itemTemplate.Spells[i].SpellCategory].insert(itemTemplate.Spells[i].SpellId);
+            }
 
         ++count;
     }
     while (result->NextRow());
 
-	// pussywizard:
-	{
-		uint32 max = 0;
-		for (ItemTemplateContainer::const_iterator itr = _itemTemplateStore.begin(); itr != _itemTemplateStore.end(); ++itr)
-			if (itr->first > max)
-				max = itr->first;
-		if (max)
-		{
-			_itemTemplateStoreFast.clear();
-			_itemTemplateStoreFast.resize(max+1, NULL);
-			for (ItemTemplateContainer::iterator itr = _itemTemplateStore.begin(); itr != _itemTemplateStore.end(); ++itr)
-				_itemTemplateStoreFast[itr->first] = &(itr->second);
-		}
-	}
+    // pussywizard:
+    {
+        uint32 max = 0;
+        for (ItemTemplateContainer::const_iterator itr = _itemTemplateStore.begin(); itr != _itemTemplateStore.end(); ++itr)
+            if (itr->first > max)
+                max = itr->first;
+        if (max)
+        {
+            _itemTemplateStoreFast.clear();
+            _itemTemplateStoreFast.resize(max+1, NULL);
+            for (ItemTemplateContainer::iterator itr = _itemTemplateStore.begin(); itr != _itemTemplateStore.end(); ++itr)
+                _itemTemplateStoreFast[itr->first] = &(itr->second);
+        }
+    }
 
-	for (ItemTemplateContainer::iterator itr = _itemTemplateStore.begin(); itr != _itemTemplateStore.end(); ++itr)
-		itr->second.InitializeQueryData();
+    for (ItemTemplateContainer::iterator itr = _itemTemplateStore.begin(); itr != _itemTemplateStore.end(); ++itr)
+        itr->second.InitializeQueryData();
 
     // Check if item templates for DBC referenced character start outfit are present
     std::set<uint32> notFoundOutfit;
@@ -3912,23 +3912,23 @@ void ObjectMgr::LoadQuests()
         _questTemplates[newQuest->GetQuestId()] = newQuest;
     } while (result->NextRow());
 
-	// pussywizard:
-	{
-		uint32 max = 0;
-		for (QuestMap::const_iterator itr = _questTemplates.begin(); itr != _questTemplates.end(); ++itr)
-			if (itr->first > max)
-				max = itr->first;
-		if (max)
-		{
-			_questTemplatesFast.clear();
-			_questTemplatesFast.resize(max+1, NULL);
-			for (QuestMap::iterator itr = _questTemplates.begin(); itr != _questTemplates.end(); ++itr)
-				_questTemplatesFast[itr->first] = itr->second;
-		}
-	}
+    // pussywizard:
+    {
+        uint32 max = 0;
+        for (QuestMap::const_iterator itr = _questTemplates.begin(); itr != _questTemplates.end(); ++itr)
+            if (itr->first > max)
+                max = itr->first;
+        if (max)
+        {
+            _questTemplatesFast.clear();
+            _questTemplatesFast.resize(max+1, NULL);
+            for (QuestMap::iterator itr = _questTemplates.begin(); itr != _questTemplates.end(); ++itr)
+                _questTemplatesFast[itr->first] = itr->second;
+        }
+    }
 
-	for (QuestMap::iterator itr = _questTemplates.begin(); itr != _questTemplates.end(); ++itr)
-		itr->second->InitializeQueryData();
+    for (QuestMap::iterator itr = _questTemplates.begin(); itr != _questTemplates.end(); ++itr)
+        itr->second->InitializeQueryData();
 
     std::map<uint32, uint32> usedMailTemplates;
 
@@ -4501,7 +4501,7 @@ void ObjectMgr::LoadQuests()
                 sLog->outErrorDb("Spell (id: %u) have SPELL_EFFECT_QUEST_COMPLETE for quest %u, but quest not have specialflag QUEST_SPECIAL_FLAGS_EXPLORATION_OR_EVENT. Quest flags must be fixed, quest modified to enable objective.", spellInfo->Id, quest_id);
 
                 // this will prevent quest completing without objective
-				// xinef: remove this, leave error but do not break the quest
+                // xinef: remove this, leave error but do not break the quest
                 // const_cast<Quest*>(quest)->SetSpecialFlag(QUEST_SPECIAL_FLAGS_EXPLORATION_OR_EVENT);
             }
         }
@@ -4762,7 +4762,7 @@ void ObjectMgr::LoadScripts(ScriptsType type)
                     continue;
                 }
 
-				uint32 entry = tmp.TempSummonCreature.CreatureEntry;
+                uint32 entry = tmp.TempSummonCreature.CreatureEntry;
                 if (!GetCreatureTemplate(entry))
                 {
                     sLog->outErrorDb("Table `%s` has invalid creature (Entry: %u) in SCRIPT_COMMAND_TEMP_SUMMON_CREATURE for script id %u",
@@ -5099,14 +5099,14 @@ void ObjectMgr::ValidateSpellScripts()
 
 void ObjectMgr::InitializeSpellInfoPrecomputedData()
 {
-	uint32 limit = sSpellStore.GetNumRows();
-	for(uint32 i=0; i<=limit; ++i)
-		if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(i))
-		{
-			const_cast<SpellInfo*>(spellInfo)->SetStackableWithRanks(spellInfo->ComputeIsStackableWithRanks());
-			const_cast<SpellInfo*>(spellInfo)->SetCritCapable(spellInfo->ComputeIsCritCapable());
-			const_cast<SpellInfo*>(spellInfo)->SetSpellValid(SpellMgr::ComputeIsSpellValid(spellInfo, false));
-		}
+    uint32 limit = sSpellStore.GetNumRows();
+    for(uint32 i=0; i<=limit; ++i)
+        if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(i))
+        {
+            const_cast<SpellInfo*>(spellInfo)->SetStackableWithRanks(spellInfo->ComputeIsStackableWithRanks());
+            const_cast<SpellInfo*>(spellInfo)->SetCritCapable(spellInfo->ComputeIsCritCapable());
+            const_cast<SpellInfo*>(spellInfo)->SetSpellValid(SpellMgr::ComputeIsSpellValid(spellInfo, false));
+        }
 }
 
 void ObjectMgr::LoadPageTexts()
@@ -5500,9 +5500,9 @@ void ObjectMgr::ReturnOrDeleteOldMails(bool serverUp)
                     CharacterDatabase.Execute(stmt);
                 }
 
-				stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_MAIL_ITEM_BY_ID);
-				stmt->setUInt32(0, m->messageID);
-				CharacterDatabase.Execute(stmt);
+                stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_MAIL_ITEM_BY_ID);
+                stmt->setUInt32(0, m->messageID);
+                CharacterDatabase.Execute(stmt);
             }
             else
             {
@@ -5529,9 +5529,9 @@ void ObjectMgr::ReturnOrDeleteOldMails(bool serverUp)
                     CharacterDatabase.Execute(stmt);
                 }
 
-				// xinef: update global data
-				sWorld->UpdateGlobalPlayerMails(m->sender, 1);
-				sWorld->UpdateGlobalPlayerMails(m->receiver, -1);
+                // xinef: update global data
+                sWorld->UpdateGlobalPlayerMails(m->sender, 1);
+                sWorld->UpdateGlobalPlayerMails(m->receiver, -1);
 
                 delete m;
                 ++returnedCount;
@@ -5539,8 +5539,8 @@ void ObjectMgr::ReturnOrDeleteOldMails(bool serverUp)
             }
         }
 
-		// xinef: update global data
-		sWorld->UpdateGlobalPlayerMails(m->receiver, -1);
+        // xinef: update global data
+        sWorld->UpdateGlobalPlayerMails(m->receiver, -1);
 
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_MAIL_BY_ID);
         stmt->setUInt32(0, m->messageID);
@@ -5817,7 +5817,7 @@ void ObjectMgr::LoadGraveyardZones()
         uint32 safeLocId = fields[0].GetUInt32();
         uint32 zoneId = fields[1].GetUInt32();
         uint32 team   = fields[2].GetUInt16();
-		TeamId teamId = team == 0 ? TEAM_NEUTRAL : (team == ALLIANCE ? TEAM_ALLIANCE : TEAM_HORDE);
+        TeamId teamId = team == 0 ? TEAM_NEUTRAL : (team == ALLIANCE ? TEAM_ALLIANCE : TEAM_HORDE);
 
         WorldSafeLocsEntry const* entry = sWorldSafeLocsStore.LookupEntry(safeLocId);
         if (!entry)
@@ -5861,7 +5861,7 @@ WorldSafeLocsEntry const* ObjectMgr::GetDefaultGraveyard(TeamId teamId)
         ALLIANCE_GRAVEYARD = 4, // Westfall
     };
 
-	return sWorldSafeLocsStore.LookupEntry(teamId == TEAM_HORDE ? HORDE_GRAVEYARD : ALLIANCE_GRAVEYARD);
+    return sWorldSafeLocsStore.LookupEntry(teamId == TEAM_HORDE ? HORDE_GRAVEYARD : ALLIANCE_GRAVEYARD);
 }
 
 WorldSafeLocsEntry const* ObjectMgr::GetClosestGraveyard(float x, float y, float z, uint32 MapId, TeamId teamId)
@@ -6007,7 +6007,7 @@ bool ObjectMgr::AddGraveyardLink(uint32 id, uint32 zoneId, TeamId teamId, bool p
     // add link to loaded data
     GraveyardData data;
     data.safeLocId = id;
-	data.teamId = teamId;
+    data.teamId = teamId;
 
     GraveyardStore.insert(GraveyardContainer::value_type(zoneId, data));
 
@@ -6018,7 +6018,7 @@ bool ObjectMgr::AddGraveyardLink(uint32 id, uint32 zoneId, TeamId teamId, bool p
 
         stmt->setUInt32(0, id);
         stmt->setUInt32(1, zoneId);
-		// Xinef: DB Data compatibility...
+        // Xinef: DB Data compatibility...
         stmt->setUInt16(2, uint16(teamId == TEAM_NEUTRAL ? 0 : (teamId == TEAM_ALLIANCE ? ALLIANCE : HORDE)));
 
         WorldDatabase.Execute(stmt);
@@ -6070,8 +6070,8 @@ void ObjectMgr::RemoveGraveyardLink(uint32 id, uint32 zoneId, TeamId teamId, boo
 
         stmt->setUInt32(0, id);
         stmt->setUInt32(1, zoneId);
-		// Xinef: DB Data compatibility...
-		stmt->setUInt16(2, uint16(teamId == TEAM_NEUTRAL ? 0 : (teamId == TEAM_ALLIANCE ? ALLIANCE : HORDE)));
+        // Xinef: DB Data compatibility...
+        stmt->setUInt16(2, uint16(teamId == TEAM_NEUTRAL ? 0 : (teamId == TEAM_ALLIANCE ? ALLIANCE : HORDE)));
 
         WorldDatabase.Execute(stmt);
     }
@@ -6277,9 +6277,9 @@ AreaTrigger const* ObjectMgr::GetMapEntranceTrigger(uint32 Map) const
 {
     for (AreaTriggerContainer::const_iterator itr = _areaTriggerStore.begin(); itr != _areaTriggerStore.end(); ++itr)
     {
-		if (itr->second.target_mapId == Map) // Id is used to determine correct Scarlet Monastery instance
+        if (itr->second.target_mapId == Map) // Id is used to determine correct Scarlet Monastery instance
         {
-			// xinef: no need to check, already done at loading
+            // xinef: no need to check, already done at loading
             //AreaTriggerEntry const* atEntry = sAreaTriggerStore.LookupEntry(itr->first);
             //if (atEntry)
                 return &itr->second;
@@ -7264,7 +7264,7 @@ void ObjectMgr::LoadQuestPOI()
             _questPOIStore[questId].push_back(POI);
         }
         else
-			sLog->outError("Table quest_poi references unknown quest points for quest %u POI id %u", questId, id);
+            sLog->outError("Table quest_poi references unknown quest points for quest %u POI id %u", questId, id);
 
         ++count;
     } while (result->NextRow());
@@ -7519,9 +7519,9 @@ void ObjectMgr::LoadReservedPlayersNames()
 
 bool ObjectMgr::IsReservedName(const std::string& name) const
 {
-	// pussywizard
-	if (name.size() >= 2 && (name[name.size()-2] == 'G' || name[name.size()-2] == 'g') && (name[name.size()-1] == 'M' || name[name.size()-1] == 'm'))
-		return true;
+    // pussywizard
+    if (name.size() >= 2 && (name[name.size()-2] == 'G' || name[name.size()-2] == 'g') && (name[name.size()-1] == 'M' || name[name.size()-1] == 'm'))
+        return true;
 
     std::wstring wstr;
     if (!Utf8toWStr (name, wstr))
@@ -7953,7 +7953,7 @@ SkillRangeType GetSkillRangeType(SkillLineEntry const* pSkill, bool racial)
     switch (pSkill->categoryId)
     {
         case SKILL_CATEGORY_LANGUAGES:
-			return SKILL_RANGE_LANGUAGE;
+            return SKILL_RANGE_LANGUAGE;
         case SKILL_CATEGORY_WEAPON:
             if (pSkill->id != SKILL_FIST_WEAPONS)
                 return SKILL_RANGE_LEVEL;
@@ -8804,19 +8804,19 @@ void ObjectMgr::LoadCreatureClassLevelStats()
                 stats.BaseHealth[i] = 1;
             }
 
-			// xinef: if no data is available, get them from lower expansions
-			if (stats.BaseHealth[i] <= 1)
-			{
-				for (uint8 j = i; j > 0;)
-				{
-					--j;
-					if (stats.BaseHealth[j] > 1)
-					{
-						stats.BaseHealth[i] = stats.BaseHealth[j];
-						break;
-					}
-				}
-			}
+            // xinef: if no data is available, get them from lower expansions
+            if (stats.BaseHealth[i] <= 1)
+            {
+                for (uint8 j = i; j > 0;)
+                {
+                    --j;
+                    if (stats.BaseHealth[j] > 1)
+                    {
+                        stats.BaseHealth[i] = stats.BaseHealth[j];
+                        break;
+                    }
+                }
+            }
 
             stats.BaseDamage[i] = fields[9 + i].GetFloat();
             if (stats.BaseDamage[i] < 0.0f)
@@ -9084,8 +9084,8 @@ GameObjectTemplate const* ObjectMgr::GetGameObjectTemplate(uint32 entry)
 
 bool ObjectMgr::IsGameObjectStaticTransport(uint32 entry)
 {
-	GameObjectTemplate const* goinfo = GetGameObjectTemplate(entry);
-	return goinfo && goinfo->type == GAMEOBJECT_TYPE_TRANSPORT;
+    GameObjectTemplate const* goinfo = GetGameObjectTemplate(entry);
+    return goinfo && goinfo->type == GAMEOBJECT_TYPE_TRANSPORT;
 }
 
 CreatureTemplate const* ObjectMgr::GetCreatureTemplate(uint32 entry)

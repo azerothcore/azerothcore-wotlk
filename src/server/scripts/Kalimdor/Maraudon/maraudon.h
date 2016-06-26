@@ -7,13 +7,13 @@ REWRITTEN BY XINEF
 
 enum DataTypes
 {
-    TYPE_NOXXION				= 0,
-    MAX_ENCOUNTERS				= 1,
+    TYPE_NOXXION                = 0,
+    MAX_ENCOUNTERS              = 1,
 };
 
 enum GoIds
 {
-    GO_CORRUPTION_SPEWER		= 178570
+    GO_CORRUPTION_SPEWER        = 178570
 };
 
 #endif

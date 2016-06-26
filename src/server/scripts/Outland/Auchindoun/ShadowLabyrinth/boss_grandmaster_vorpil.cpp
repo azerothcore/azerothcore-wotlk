@@ -9,32 +9,32 @@ REWRITTEN BY XINEF
 
 enum GrandmasterVorpil
 {
-    SAY_INTRO					= 0,
-    SAY_AGGRO					= 1,
-    SAY_HELP					= 2,
-    SAY_SLAY					= 3,
-    SAY_DEATH					= 4,
+    SAY_INTRO                   = 0,
+    SAY_AGGRO                   = 1,
+    SAY_HELP                    = 2,
+    SAY_SLAY                    = 3,
+    SAY_DEATH                   = 4,
 
-    SPELL_RAIN_OF_FIRE_N		= 33617,
-    SPELL_RAIN_OF_FIRE_H		= 39363,
+    SPELL_RAIN_OF_FIRE_N        = 33617,
+    SPELL_RAIN_OF_FIRE_H        = 39363,
 
-    SPELL_DRAW_SHADOWS			= 33563,
-    SPELL_SHADOWBOLT_VOLLEY		= 33841,
-    SPELL_BANISH				= 38791,
+    SPELL_DRAW_SHADOWS          = 33563,
+    SPELL_SHADOWBOLT_VOLLEY     = 33841,
+    SPELL_BANISH                = 38791,
 
-    NPC_VOID_TRAVELER			= 19226,
-    SPELL_SACRIFICE				= 33587,
-    SPELL_SHADOW_NOVA			= 33846,
-    SPELL_EMPOWERING_SHADOWS_N	= 33783,
-    SPELL_EMPOWERING_SHADOWS_H	= 39364,
+    NPC_VOID_TRAVELER           = 19226,
+    SPELL_SACRIFICE             = 33587,
+    SPELL_SHADOW_NOVA           = 33846,
+    SPELL_EMPOWERING_SHADOWS_N  = 33783,
+    SPELL_EMPOWERING_SHADOWS_H  = 39364,
 
-    NPC_VOID_PORTAL				= 19224,
-    SPELL_VOID_PORTAL_VISUAL	= 33569,
+    NPC_VOID_PORTAL             = 19224,
+    SPELL_VOID_PORTAL_VISUAL    = 33569,
 
-	EVENT_SPELL_SHADOWBOLT		= 1,
-	EVENT_SPELL_DRAWSHADOWS		= 2,
-	EVENT_SUMMON_TRAVELER		= 3,
-	EVENT_SPELL_BANISH			= 4
+    EVENT_SPELL_SHADOWBOLT      = 1,
+    EVENT_SPELL_DRAWSHADOWS     = 2,
+    EVENT_SUMMON_TRAVELER       = 3,
+    EVENT_SPELL_BANISH          = 4
 };
 
 float VorpilPosition[3] = {-252.8820f, -264.3030f, 17.1f};
@@ -67,16 +67,16 @@ public:
         }
 
         InstanceScript* instance;
-		EventMap events;
-		SummonList summons;
+        EventMap events;
+        SummonList summons;
 
         bool sayIntro, sayHelp;
 
         void Reset()
         {
             sayHelp = false;
-			events.Reset();
-			summons.DespawnAll();
+            events.Reset();
+            summons.DespawnAll();
 
             if (instance)
                 instance->SetData(DATA_GRANDMASTERVORPILEVENT, NOT_STARTED);
@@ -84,8 +84,8 @@ public:
 
         void summonPortals()
         {
-			for (uint8 i = 0; i < 5; ++i)
-				me->SummonCreature(NPC_VOID_PORTAL, VoidPortalCoords[i][0], VoidPortalCoords[i][1], VoidPortalCoords[i][2], 0, TEMPSUMMON_CORPSE_DESPAWN, 3000000);
+            for (uint8 i = 0; i < 5; ++i)
+                me->SummonCreature(NPC_VOID_PORTAL, VoidPortalCoords[i][0], VoidPortalCoords[i][1], VoidPortalCoords[i][2], 0, TEMPSUMMON_CORPSE_DESPAWN, 3000000);
         }
 
         void spawnVoidTraveler()
@@ -101,17 +101,17 @@ public:
 
         void JustSummoned(Creature* summon)
         {
-			summons.Summon(summon);
+            summons.Summon(summon);
             if (summon->GetEntry() == NPC_VOID_TRAVELER)
                 summon->AI()->SetGUID(me->GetGUID());
-			else if (summon->GetEntry() == NPC_VOID_PORTAL)
-				summon->CastSpell(summon, SPELL_VOID_PORTAL_VISUAL, false);
+            else if (summon->GetEntry() == NPC_VOID_PORTAL)
+                summon->CastSpell(summon, SPELL_VOID_PORTAL_VISUAL, false);
         }
 
         void KilledUnit(Unit* victim)
         {
-			if (victim->GetTypeId() == TYPEID_PLAYER)
-				Talk(SAY_SLAY);
+            if (victim->GetTypeId() == TYPEID_PLAYER)
+                Talk(SAY_SLAY);
         }
 
         void JustDied(Unit* /*killer*/)
@@ -128,11 +128,11 @@ public:
             Talk(SAY_AGGRO);
             summonPortals();
 
-			events.ScheduleEvent(EVENT_SPELL_SHADOWBOLT, urand(7000, 14000));
-			events.ScheduleEvent(EVENT_SPELL_DRAWSHADOWS, 45000);
-			events.ScheduleEvent(EVENT_SUMMON_TRAVELER, 5000);
-			if (IsHeroic())
-				events.ScheduleEvent(EVENT_SPELL_BANISH, 17000);
+            events.ScheduleEvent(EVENT_SPELL_SHADOWBOLT, urand(7000, 14000));
+            events.ScheduleEvent(EVENT_SPELL_DRAWSHADOWS, 45000);
+            events.ScheduleEvent(EVENT_SUMMON_TRAVELER, 5000);
+            if (IsHeroic())
+                events.ScheduleEvent(EVENT_SPELL_BANISH, 17000);
 
             if (instance)
                 instance->SetData(DATA_GRANDMASTERVORPILEVENT, IN_PROGRESS);
@@ -154,40 +154,40 @@ public:
             if (!UpdateVictim())
                 return;
 
-			events.Update(diff);
-			switch (events.GetEvent())
-			{
-				case EVENT_SPELL_SHADOWBOLT:
-					me->CastSpell(me, SPELL_SHADOWBOLT_VOLLEY, false);
-					events.RepeatEvent(urand(15000, 30000));
-					break;
-				case EVENT_SPELL_BANISH:
-					if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 30, false))
-						me->CastSpell(target, SPELL_BANISH, false);
-					events.RepeatEvent(16000);
-					break;
-				case EVENT_SUMMON_TRAVELER:
-					spawnVoidTraveler();
-					events.RepeatEvent(HealthBelowPct(20) ? 5000: 10000);
-					break;
-				case EVENT_SPELL_DRAWSHADOWS:
-				{
-					Map* map = me->GetMap();
-					Map::PlayerList const &PlayerList = map->GetPlayers();
-					for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-						if (Player* player = i->GetSource())
-							if (player->IsAlive() && !player->HasAura(SPELL_BANISH))
-								player->TeleportTo(me->GetMapId(), VorpilPosition[0], VorpilPosition[1], VorpilPosition[2], 0, TELE_TO_NOT_LEAVE_COMBAT);
+            events.Update(diff);
+            switch (events.GetEvent())
+            {
+                case EVENT_SPELL_SHADOWBOLT:
+                    me->CastSpell(me, SPELL_SHADOWBOLT_VOLLEY, false);
+                    events.RepeatEvent(urand(15000, 30000));
+                    break;
+                case EVENT_SPELL_BANISH:
+                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 30, false))
+                        me->CastSpell(target, SPELL_BANISH, false);
+                    events.RepeatEvent(16000);
+                    break;
+                case EVENT_SUMMON_TRAVELER:
+                    spawnVoidTraveler();
+                    events.RepeatEvent(HealthBelowPct(20) ? 5000: 10000);
+                    break;
+                case EVENT_SPELL_DRAWSHADOWS:
+                {
+                    Map* map = me->GetMap();
+                    Map::PlayerList const &PlayerList = map->GetPlayers();
+                    for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+                        if (Player* player = i->GetSource())
+                            if (player->IsAlive() && !player->HasAura(SPELL_BANISH))
+                                player->TeleportTo(me->GetMapId(), VorpilPosition[0], VorpilPosition[1], VorpilPosition[2], 0, TELE_TO_NOT_LEAVE_COMBAT);
 
-					me->NearTeleportTo(VorpilPosition[0], VorpilPosition[1], VorpilPosition[2], 0.0f);
-					me->CastSpell(me, SPELL_DRAW_SHADOWS, true);
-					me->CastSpell(me, SPELL_RAIN_OF_FIRE_N);
+                    me->NearTeleportTo(VorpilPosition[0], VorpilPosition[1], VorpilPosition[2], 0.0f);
+                    me->CastSpell(me, SPELL_DRAW_SHADOWS, true);
+                    me->CastSpell(me, SPELL_RAIN_OF_FIRE_N);
 
-					events.RepeatEvent(24000);
-					events.DelayEvents(6000);
-					break;
-				}
-			}
+                    events.RepeatEvent(24000);
+                    events.DelayEvents(6000);
+                    break;
+                }
+            }
 
             DoMeleeAttackIfReady();
         }
@@ -208,8 +208,8 @@ public:
     {
         npc_voidtravelerAI(Creature* creature) : ScriptedAI(creature)
         {
-			VorpilGUID = 0;
-			moveTimer = 1000;
+            VorpilGUID = 0;
+            moveTimer = 1000;
             sacrificed = false;
         }
 
@@ -217,41 +217,41 @@ public:
         uint32 moveTimer;
         bool sacrificed;
 
-		void SetGUID(uint64 guid, int32)
-		{
-			VorpilGUID = guid;
-		}
+        void SetGUID(uint64 guid, int32)
+        {
+            VorpilGUID = guid;
+        }
 
         void UpdateAI(uint32 diff)
         {
-			moveTimer += diff;
+            moveTimer += diff;
             if (moveTimer >= 1000)
             {
-				moveTimer = 0;
+                moveTimer = 0;
                 Creature* Vorpil = ObjectAccessor::GetCreature(*me, VorpilGUID);
                 if (!Vorpil)
                 {
                     me->DespawnOrUnsummon();
                     return;
                 }
-				me->GetMotionMaster()->MoveFollow(Vorpil, 0.0f, 0.0f);
+                me->GetMotionMaster()->MoveFollow(Vorpil, 0.0f, 0.0f);
 
                 if (sacrificed)
                 {
                     me->AddAura(DUNGEON_MODE(SPELL_EMPOWERING_SHADOWS_N, SPELL_EMPOWERING_SHADOWS_H), Vorpil);
                     Vorpil->ModifyHealth(int32(Vorpil->CountPctFromMaxHealth(4)));
-					me->CastSpell(me, SPELL_SHADOW_NOVA, true);
+                    me->CastSpell(me, SPELL_SHADOW_NOVA, true);
                     Unit::Kill(me, me);
                     return;
                 }
 
                 if (me->IsWithinDist(Vorpil, 3.0f))
                 {
-					me->CastSpell(me, SPELL_SACRIFICE, false);
+                    me->CastSpell(me, SPELL_SACRIFICE, false);
                     sacrificed = true;
                     moveTimer = 500;
                 }
-			}
+            }
         }
     };
 };

@@ -29,17 +29,17 @@ struct CreatureData;
 class Transport : public GameObject, public TransportBase
 {
 public:
-	Transport() : GameObject() {}
-	void CalculatePassengerPosition(float& x, float& y, float& z, float* o = NULL) const { TransportBase::CalculatePassengerPosition(x, y, z, o, GetPositionX(), GetPositionY(), GetPositionZ(), GetOrientation()); }
+    Transport() : GameObject() {}
+    void CalculatePassengerPosition(float& x, float& y, float& z, float* o = NULL) const { TransportBase::CalculatePassengerPosition(x, y, z, o, GetPositionX(), GetPositionY(), GetPositionZ(), GetOrientation()); }
     void CalculatePassengerOffset(float& x, float& y, float& z, float* o = NULL) const { TransportBase::CalculatePassengerOffset(x, y, z, o, GetPositionX(), GetPositionY(), GetPositionZ(), GetOrientation()); }
 
-	typedef std::set<WorldObject*> PassengerSet;
+    typedef std::set<WorldObject*> PassengerSet;
     virtual void AddPassenger(WorldObject* passenger, bool withAll = false) = 0;
     virtual void RemovePassenger(WorldObject* passenger, bool withAll = false) = 0;
     PassengerSet const& GetPassengers() const { return _passengers; }
 
     uint32 GetPathProgress() const { return GetGOValue()->Transport.PathProgress; }
-	void SetPathProgress(uint32 val) { m_goValue.Transport.PathProgress = val; }
+    void SetPathProgress(uint32 val) { m_goValue.Transport.PathProgress = val; }
 
 protected:
     PassengerSet _passengers;
@@ -53,14 +53,14 @@ public:
     ~MotionTransport();
 
     bool CreateMoTrans(uint32 guidlow, uint32 entry, uint32 mapid, float x, float y, float z, float ang, uint32 animprogress);
-	void CleanupsBeforeDelete(bool finalCleanup = true);
+    void CleanupsBeforeDelete(bool finalCleanup = true);
     void BuildUpdate(UpdateDataMapType& data_map, UpdatePlayerSet&);
 
     void Update(uint32 diff);
-	void DelayedUpdate(uint32 diff);
+    void DelayedUpdate(uint32 diff);
     void UpdatePosition(float x, float y, float z, float o);
 
-	void AddPassenger(WorldObject* passenger, bool withAll = false);
+    void AddPassenger(WorldObject* passenger, bool withAll = false);
     void RemovePassenger(WorldObject* passenger, bool withAll = false);
     Creature* CreateNPCPassenger(uint32 guid, CreatureData const* data);
     GameObject* CreateGOPassenger(uint32 guid, GameObjectData const* data);
@@ -69,8 +69,8 @@ public:
     PassengerSet const& GetStaticPassengers() const { return _staticPassengers; }
     void UnloadStaticPassengers();
     void UnloadNonStaticPassengers();
-	void SetPassengersLoaded(bool loaded) { _passengersLoaded = loaded; }
-	bool PassengersLoaded() const { return _passengersLoaded; }
+    void SetPassengersLoaded(bool loaded) { _passengersLoaded = loaded; }
+    bool PassengersLoaded() const { return _passengersLoaded; }
 
     KeyFrameVec const& GetKeyFrames() const { return _transportInfo->keyFrames; }
     void EnableMovement(bool enabled);
@@ -104,22 +104,22 @@ private:
 
     PassengerSet _staticPassengers;
     mutable ACE_Thread_Mutex Lock;
-	bool _passengersLoaded;
-	bool _delayedTeleport;
+    bool _passengersLoaded;
+    bool _delayedTeleport;
 };
 
 class StaticTransport : public Transport
 {
 public:
-	StaticTransport();
-	~StaticTransport();
+    StaticTransport();
+    ~StaticTransport();
 
     virtual bool Create(uint32 guidlow, uint32 name_id, Map* map, uint32 phaseMask, float x, float y, float z, float ang, G3D::Quat const& rotation, uint32 animprogress, GOState go_state, uint32 artKit = 0);
-	void CleanupsBeforeDelete(bool finalCleanup = true);
+    void CleanupsBeforeDelete(bool finalCleanup = true);
     void BuildUpdate(UpdateDataMapType& data_map, UpdatePlayerSet&);
 
     void Update(uint32 diff);
-	void RelocateToProgress(uint32 progress);
+    void RelocateToProgress(uint32 progress);
     void UpdatePosition(float x, float y, float z, float o);
     void UpdatePassengerPositions();
 
@@ -130,7 +130,7 @@ public:
     void SetPauseTime(uint32 val) { SetUInt32Value(GAMEOBJECT_LEVEL, val); }
     uint32 GetPeriod() const { return m_goValue.Transport.AnimationInfo ? m_goValue.Transport.AnimationInfo->TotalTime : GetPauseTime()+2; }
 private:
-	bool _needDoInitialRelocation;
+    bool _needDoInitialRelocation;
 };
 
 #endif

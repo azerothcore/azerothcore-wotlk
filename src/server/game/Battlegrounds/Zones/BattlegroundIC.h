@@ -36,7 +36,7 @@ enum creaturesIC
     NPC_KOR_KRON_GUARD                      = 34918, // horde guard
     NPC_SEVEN_TH_LEGION_INFANTRY            = 34919, // alliance guard
     NPC_KEEP_CANNON                         = 34944,
-	NPC_BROKEN_KEEP_CANNON                  = 35819,
+    NPC_BROKEN_KEEP_CANNON                  = 35819,
     NPC_DEMOLISHER                          = 34775,
     NPC_SIEGE_ENGINE_H                      = 35069,
     NPC_SIEGE_ENGINE_A                      = 34776,
@@ -194,7 +194,7 @@ enum Times
 {
     WORKSHOP_UPDATE_TIME     = 10000, // 10 seconds
     DOCKS_UPDATE_TIME        = 10000, // 10 seconds
-	VEHICLE_RESPAWN_TIME     = 180,   // 3 minutes, not sure
+    VEHICLE_RESPAWN_TIME     = 180,   // 3 minutes, not sure
     IC_RESOURCE_TIME         = 45000, // not sure, need more research
     CLOSE_DOORS_TIME         = 20000,
     BANNER_STATE_CHANGE_TIME = 60000,
@@ -203,11 +203,11 @@ enum Times
 
 enum Actions
 {
-    ACTION_GUNSHIP_READY				= 1,
-	ACTION_TELEPORT_PLAYER_TO_TRANSPORT = 2,
+    ACTION_GUNSHIP_READY                = 1,
+    ACTION_TELEPORT_PLAYER_TO_TRANSPORT = 2,
 
-	AREA_TRIGGER_HORDE_KEEP				= 5535,
-	AREA_TRIGGER_ALLIANCE_KEEP			= 5536
+    AREA_TRIGGER_HORDE_KEEP             = 5535,
+    AREA_TRIGGER_ALLIANCE_KEEP          = 5536
 };
 
 struct ICNpc
@@ -710,19 +710,19 @@ const Position workshopBombs[2] =
 
 enum Spells
 {
-    SPELL_OIL_REFINERY					= 68719,
-    SPELL_QUARRY						= 68720,
+    SPELL_OIL_REFINERY                  = 68719,
+    SPELL_QUARRY                        = 68720,
 
-    SPELL_DESTROYED_VEHICLE_ACHIEVEMENT	= 68357,
-	SPELL_BACK_DOOR_JOB					= 68502,
+    SPELL_DESTROYED_VEHICLE_ACHIEVEMENT = 68357,
+    SPELL_BACK_DOOR_JOB                 = 68502,
 
-    SPELL_DRIVING_CREDIT_DEMOLISHER		= 68365,
-    SPELL_DRIVING_CREDIT_GLAIVE			= 68363,
-    SPELL_DRIVING_CREDIT_SIEGE			= 68364,
-    SPELL_DRIVING_CREDIT_CATAPULT		= 68362,
+    SPELL_DRIVING_CREDIT_DEMOLISHER     = 68365,
+    SPELL_DRIVING_CREDIT_GLAIVE         = 68363,
+    SPELL_DRIVING_CREDIT_SIEGE          = 68364,
+    SPELL_DRIVING_CREDIT_CATAPULT       = 68362,
 
-	SPELL_REPAIR_TURRET_CHANNEL			= 68077,
-	SPELL_REPAIR_TURRET_DUMMY			= 68078,
+    SPELL_REPAIR_TURRET_CHANNEL         = 68077,
+    SPELL_REPAIR_TURRET_DUMMY           = 68078,
 
     SPELL_SIMPLE_TELEPORT               = 12980,
     SPELL_TELEPORT_VISUAL_ONLY          = 51347,
@@ -932,8 +932,8 @@ class BattlegroundIC : public Battleground
         uint32 GetNodeState(uint8 nodeType) const { return (uint8)nodePoint[nodeType].nodeState; }
 
         bool AllNodesConrolledByTeam(TeamId teamId) const;  // overwrited
-		bool IsResourceGlutAllowed(TeamId teamId) const;
-		void DoAction(uint32 action, uint64 guid);
+        bool IsResourceGlutAllowed(TeamId teamId) const;
+        void DoAction(uint32 action, uint64 guid);
     private:
         uint32 closeFortressDoorsTimer;
         bool doorsClosed;
@@ -944,8 +944,8 @@ class BattlegroundIC : public Battleground
         BG_IC_GateState GateStatus[6];
         ICNodePoint nodePoint[7];
 
-		typedef std::map<uint32, uint32> RespawnMap;
-		RespawnMap respawnMap;
+        typedef std::map<uint32, uint32> RespawnMap;
+        RespawnMap respawnMap;
 
         MotionTransport* gunshipAlliance;
         MotionTransport* gunshipHorde;
@@ -998,7 +998,7 @@ class BattlegroundIC : public Battleground
         void UpdateNodeWorldState(ICNodePoint* nodePoint);
         void HandleCapturedNodes(ICNodePoint* nodePoint, bool recapture);
         void HandleContestedNodes(ICNodePoint* nodePoint);
-		void TurnBosses(bool on);
+        void TurnBosses(bool on);
 };
 
 #endif

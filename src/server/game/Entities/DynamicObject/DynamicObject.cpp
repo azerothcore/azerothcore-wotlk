@@ -88,8 +88,8 @@ void DynamicObject::RemoveFromWorld()
             return;
 
         UnbindFromCaster();
-		if (Transport* transport = GetTransport())
-			transport->RemovePassenger(this, true);
+        if (Transport* transport = GetTransport())
+            transport->RemovePassenger(this, true);
         WorldObject::RemoveFromWorld();
         sObjectAccessor->RemoveObject(this);
     }

@@ -27,7 +27,7 @@
 ArenaTeamMgr::ArenaTeamMgr()
 {
     NextArenaTeamId = 1;
-	LastArenaLogId = 0;
+    LastArenaLogId = 0;
 }
 
 ArenaTeamMgr::~ArenaTeamMgr()

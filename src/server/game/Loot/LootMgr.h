@@ -155,7 +155,7 @@ struct LootItem
     int32   randomPropertyId;
     ConditionList conditions;                               // additional loot condition
     AllowedLooterSet allowedGUIDs;
-	uint64  rollWinnerGUID;									// Stores the guid of person who won loot, if his bags are full only he can see the item in loot list!
+    uint64  rollWinnerGUID;                                 // Stores the guid of person who won loot, if his bags are full only he can see the item in loot list!
     uint8   count             : 8;
     bool    is_looted         : 1;
     bool    is_blocked        : 1;
@@ -169,7 +169,7 @@ struct LootItem
     // Should be called for non-reference LootStoreItem entries only (mincountOrRef > 0)
     explicit LootItem(LootStoreItem const& li);
 
-	LootItem() {}
+    LootItem() {}
 
     // Basic checks for player/item compatibility - if false no chance to see the item in the loot
     bool AllowedForPlayer(Player const* player) const;

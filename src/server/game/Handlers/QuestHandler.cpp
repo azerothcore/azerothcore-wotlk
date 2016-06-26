@@ -89,8 +89,8 @@ void WorldSession::HandleQuestgiverHelloOpcode(WorldPacket & recvData)
     if (GetPlayer()->HasUnitState(UNIT_STATE_DIED))
         GetPlayer()->RemoveAurasByType(SPELL_AURA_FEIGN_DEATH);
     // Stop the npc if moving
-	//if (!creature->GetTransport()) // pussywizard: reverted with new spline (old: without this check, npc would stay in place and the transport would continue moving, so the npc falls off. NPCs on transports don't have waypoints, so stopmoving is not needed)
-		creature->StopMoving();
+    //if (!creature->GetTransport()) // pussywizard: reverted with new spline (old: without this check, npc would stay in place and the transport would continue moving, so the npc falls off. NPCs on transports don't have waypoints, so stopmoving is not needed)
+        creature->StopMoving();
 
     if (sScriptMgr->OnGossipHello(_player, creature))
         return;
@@ -127,12 +127,12 @@ void WorldSession::HandleQuestgiverAcceptQuestOpcode(WorldPacket & recvData)
 
     if (Quest const* quest = sObjectMgr->GetQuestTemplate(questId))
     {
-		// pussywizard: exploit fix, can't share quests that give items to be sold
-		if (object->GetTypeId() == TYPEID_PLAYER)
-			if (uint32 itemId = quest->GetSrcItemId())
-				if (const ItemTemplate* srcItem = sObjectMgr->GetItemTemplate(itemId))
-					if (srcItem->SellPrice > 0)
-						return;
+        // pussywizard: exploit fix, can't share quests that give items to be sold
+        if (object->GetTypeId() == TYPEID_PLAYER)
+            if (uint32 itemId = quest->GetSrcItemId())
+                if (const ItemTemplate* srcItem = sObjectMgr->GetItemTemplate(itemId))
+                    if (srcItem->SellPrice > 0)
+                        return;
 
         // prevent cheating
         if (!GetPlayer()->CanTakeQuest(quest, true))
@@ -276,7 +276,7 @@ void WorldSession::HandleQuestgiverChooseRewardOpcode(WorldPacket & recvData)
             switch (object->GetTypeId())
             {
                 case TYPEID_UNIT:
-				{
+                {
                     Creature* questgiver = object->ToCreature();
                     if (!sScriptMgr->OnQuestReward(_player, questgiver, quest, reward))
                     {
@@ -284,17 +284,17 @@ void WorldSession::HandleQuestgiverChooseRewardOpcode(WorldPacket & recvData)
                         if (Quest const* nextQuest = _player->GetNextQuest(guid, quest))
                         {
                             if (_player->CanAddQuest(nextQuest, false) && _player->CanTakeQuest(nextQuest, false))
-							{
-								if (nextQuest->IsAutoAccept())
-									_player->AddQuestAndCheckCompletion(nextQuest, object);
-								_player->PlayerTalkClass->SendQuestGiverQuestDetails(nextQuest, guid, true);
-							}
+                            {
+                                if (nextQuest->IsAutoAccept())
+                                    _player->AddQuestAndCheckCompletion(nextQuest, object);
+                                _player->PlayerTalkClass->SendQuestGiverQuestDetails(nextQuest, guid, true);
+                            }
                         }
 
                         questgiver->AI()->sQuestReward(_player, quest, reward);
                     }
                     break;
-				}
+                }
                 case TYPEID_GAMEOBJECT:
                 {
                     GameObject* questGiver = object->ToGameObject();
@@ -304,17 +304,17 @@ void WorldSession::HandleQuestgiverChooseRewardOpcode(WorldPacket & recvData)
                         if (Quest const* nextQuest = _player->GetNextQuest(guid, quest))
                         {
                             if (_player->CanAddQuest(nextQuest, false) && _player->CanTakeQuest(quest, false))
-							{
-								if (nextQuest->IsAutoAccept())
-									_player->AddQuestAndCheckCompletion(nextQuest, object);
-								_player->PlayerTalkClass->SendQuestGiverQuestDetails(nextQuest, guid, true);
-							}
+                            {
+                                if (nextQuest->IsAutoAccept())
+                                    _player->AddQuestAndCheckCompletion(nextQuest, object);
+                                _player->PlayerTalkClass->SendQuestGiverQuestDetails(nextQuest, guid, true);
+                            }
                         }
 
                         questGiver->AI()->QuestReward(_player, quest, reward);
                     }
                     break;
-				}
+                }
                 default:
                     break;
             }
@@ -431,11 +431,11 @@ void WorldSession::HandleQuestConfirmAccept(WorldPacket& recvData)
         if (!_player->CanTakeQuest(quest, true) || _player->HasPendingBind())
             return;
 
-		// pussywizard: exploit fix, can't share quests that give items to be sold
-		if (uint32 itemId = quest->GetSrcItemId())
-			if (const ItemTemplate* srcItem = sObjectMgr->GetItemTemplate(itemId))
-				if (srcItem->SellPrice > 0)
-					return;
+        // pussywizard: exploit fix, can't share quests that give items to be sold
+        if (uint32 itemId = quest->GetSrcItemId())
+            if (const ItemTemplate* srcItem = sObjectMgr->GetItemTemplate(itemId))
+                if (srcItem->SellPrice > 0)
+                    return;
 
         if (_player->CanAddQuest(quest, true))
             _player->AddQuestAndCheckCompletion(quest, NULL); // NULL, this prevent DB script from duplicate running
@@ -550,7 +550,7 @@ void WorldSession::HandlePushQuestToParty(WorldPacket& recvPacket)
                 _player->SendPushToPartyResponse(player, QUEST_PARTY_MSG_SHARING_QUEST);
 
                 if (quest->IsAutoAccept() && player->CanAddQuest(quest, true) && player->CanTakeQuest(quest, true))
-					player->AddQuestAndCheckCompletion(quest, _player);
+                    player->AddQuestAndCheckCompletion(quest, _player);
 
                 if ((quest->IsAutoComplete() && quest->IsRepeatable() && !quest->IsDailyOrWeekly()) || quest->HasFlag(QUEST_FLAGS_AUTOCOMPLETE))
                     player->PlayerTalkClass->SendQuestGiverRequestItems(quest, _player->GetGUID(), player->CanCompleteRepeatableQuest(quest), true);

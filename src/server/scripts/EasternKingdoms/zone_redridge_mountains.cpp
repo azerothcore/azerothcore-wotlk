@@ -53,7 +53,7 @@ public:
             phase = 0;
             mockingBlowTimer = 5000;
             shieldBashTimer  = 8000;
-			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
         }
 
         void sQuestAccept(Player* player, Quest const* quest)
@@ -62,8 +62,8 @@ public:
             {
                 Talk(SAY_CORPORAL_1, player);
                 npc_escortAI::Start(true, false, player->GetGUID(), quest);
-				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
-				me->setFaction(250);
+                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+                me->setFaction(250);
             }
         }
 

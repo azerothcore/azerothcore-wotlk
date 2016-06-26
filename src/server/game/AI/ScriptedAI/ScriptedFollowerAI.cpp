@@ -35,7 +35,7 @@ void FollowerAI::AttackStart(Unit* who)
 
     if (me->Attack(who, true))
     {
-		// This is done in Unit::Attack function which wont bug npcs by not adding threat upon combat start...
+        // This is done in Unit::Attack function which wont bug npcs by not adding threat upon combat start...
         //me->AddThreat(who, 0.0f);
         //me->SetInCombatWith(who);
         //who->SetInCombatWith(me);
@@ -80,14 +80,14 @@ bool FollowerAI::AssistPlayerInCombat(Unit* who)
 
 void FollowerAI::MoveInLineOfSight(Unit* who)
 {
-	if (me->GetVictim())
-		return;
+    if (me->GetVictim())
+        return;
 
     if (!me->HasUnitState(UNIT_STATE_STUNNED) && who->isTargetableForAttack(true, me) && who->isInAccessiblePlaceFor(me))
         if (HasFollowState(STATE_FOLLOW_INPROGRESS) && AssistPlayerInCombat(who))
             return;
 
-	if (me->CanStartAttack(who))
+    if (me->CanStartAttack(who))
         AttackStart(who);
 }
 

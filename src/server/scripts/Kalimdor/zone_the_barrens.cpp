@@ -347,15 +347,15 @@ public:
 
         void EnterCombat(Unit* /*who*/) { }
 
-		void EnterEvadeMode()
-		{
-			CleanUp();
-			ScriptedAI::EnterEvadeMode();
-		}
+        void EnterEvadeMode()
+        {
+            CleanUp();
+            ScriptedAI::EnterEvadeMode();
+        }
 
-		void CleanUp()
-		{
-			for (uint8 i = 0; i < 6; ++i) // unsummon challengers
+        void CleanUp()
+        {
+            for (uint8 i = 0; i < 6; ++i) // unsummon challengers
                 if (AffrayChallenger[i])
                     if (Creature* creature = ObjectAccessor::GetCreature((*me), AffrayChallenger[i]))
                         creature->DespawnOrUnsummon(1);
@@ -363,7 +363,7 @@ public:
             if (BigWill) // unsummon bigWill
                 if (Creature* creature = ObjectAccessor::GetCreature((*me), BigWill))
                     creature->DespawnOrUnsummon(1);
-		}
+        }
 
         void MoveInLineOfSight(Unit* who)
         {
@@ -380,19 +380,19 @@ public:
         void UpdateAI(uint32 diff)
         {
             if (EventInProgress)
-			{
+            {
                 Player* pWarrior = ObjectAccessor::GetPlayer(*me, PlayerGUID);
                 if (!pWarrior || me->GetDistance2d(pWarrior) >= 200.0f)
-				{
-					EnterEvadeMode();
+                {
+                    EnterEvadeMode();
                     return;
-				}
+                }
 
                 if (!pWarrior->IsAlive() && pWarrior->GetQuestStatus(1719) == QUEST_STATUS_INCOMPLETE)
-				{
+                {
                     Talk(SAY_TWIGGY_FLATHEAD_DOWN);
                     pWarrior->FailQuest(1719);
-					EnterEvadeMode();
+                    EnterEvadeMode();
                     return;
                 }
 
@@ -402,7 +402,7 @@ public:
                     pWarrior->GetPosition(x, y, z);
 
                     if (x >= -1684 && x <= -1674 && y >= -4334 && y <= -4324)
-					{
+                    {
                         pWarrior->AreaExploredOrEventHappens(1719);
                         Talk(SAY_TWIGGY_FLATHEAD_BEGIN, pWarrior);
 
@@ -455,11 +455,11 @@ public:
                                 creature->setFaction(14);
                                 creature->AI()->AttackStart(pWarrior);
                             }
-							++Wave;
+                            ++Wave;
                             WaveTimer = 20000;
                         }
                         else if (Wave >= 6 && !EventBigWill)
-						{
+                        {
                             if (Creature* creature = me->SummonCreature(NPC_BIG_WILL, -1722, -4341, 6.12f, 6.26f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 480000))
                             {
                                 BigWill = creature->GetGUID();
@@ -476,7 +476,7 @@ public:
                             {
                                 Talk(SAY_TWIGGY_FLATHEAD_OVER);
                                 EnterEvadeMode();
-								return;
+                                return;
                             }
                             else if (creature) // Makes BIG WILL attackable.
                             {
@@ -486,11 +486,11 @@ public:
                                 creature->setFaction(14);
                                 creature->AI()->AttackStart(pWarrior);
                             }
-							WaveTimer = 2000;
+                            WaveTimer = 2000;
                         }
                     }
-					else
-						WaveTimer -= diff;
+                    else
+                        WaveTimer -= diff;
                 }
             }
         }

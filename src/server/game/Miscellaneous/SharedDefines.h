@@ -521,7 +521,7 @@ enum SpellAttr6
     SPELL_ATTR6_UNK26                            = 0x04000000, // 26 related to player castable positive buff
     SPELL_ATTR6_LIMIT_PCT_HEALING_MODS           = 0x08000000, // 27 xinef: complicated and guessed
     SPELL_ATTR6_UNK28                            = 0x10000000, // 28 Death Grip
-    SPELL_ATTR6_LIMIT_PCT_DAMAGE_MODS			 = 0x20000000, // 29 xinef: complicated and guessed
+    SPELL_ATTR6_LIMIT_PCT_DAMAGE_MODS            = 0x20000000, // 29 xinef: complicated and guessed
     SPELL_ATTR6_UNK30                            = 0x40000000, // 30
     SPELL_ATTR6_IGNORE_CATEGORY_COOLDOWN_MODS    = 0x80000000  // 31 Spells with this attribute skip applying modifiers to category cooldowns
 };
@@ -1283,7 +1283,7 @@ enum SpellImmunity
     IMMUNITY_DISPEL                = 4,                     // enum DispelType
     IMMUNITY_MECHANIC              = 5,                     // enum Mechanics
     IMMUNITY_ID                    = 6,
-	IMMUNITY_ALLOW_ID              = 7                      // xinef: special type of immunity, npc is immune to everything except for those spells id
+    IMMUNITY_ALLOW_ID              = 7                      // xinef: special type of immunity, npc is immune to everything except for those spells id
 };
 
 #define MAX_SPELL_IMMUNITY           8
@@ -3297,7 +3297,7 @@ enum BanReturn
     BAN_SUCCESS,
     BAN_SYNTAX_ERROR,
     BAN_NOTFOUND,
-	BAN_LONGER_EXISTS
+    BAN_LONGER_EXISTS
 };
 
 // indexes of BattlemasterList.dbc

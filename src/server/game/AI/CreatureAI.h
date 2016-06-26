@@ -165,11 +165,11 @@ class CreatureAI : public UnitAI
         /// == Fields =======================================
         virtual void PassengerBoarded(Unit* /*passenger*/, int8 /*seatId*/, bool /*apply*/) {}
 
-		virtual void OnSpellClick(Unit* /*clicker*/, bool& /*result*/) { }
+        virtual void OnSpellClick(Unit* /*clicker*/, bool& /*result*/) { }
 
         virtual bool CanSeeAlways(WorldObject const* /*obj*/) { return false; }
 
-		virtual bool CanBeSeen(Player const* /*seer*/) { return true; }
+        virtual bool CanBeSeen(Player const* /*seer*/) { return true; }
 
     protected:
         virtual void MoveInLineOfSight(Unit* /*who*/);

@@ -75,12 +75,12 @@ void WorldSession::HandleMoveWorldportAckOpcode()
 
     // reset instance validity, except if going to an instance inside an instance
     if (GetPlayer()->m_InstanceValid == false && !mInstance)
-	{
+    {
         GetPlayer()->m_InstanceValid = true;
-		// pussywizard: m_InstanceValid can be false only by leaving a group in an instance => so remove temp binds that could not be removed because player was still on the map!
-		if (!sInstanceSaveMgr->PlayerIsPermBoundToInstance(GetPlayer()->GetGUIDLow(), oldMap->GetId(), oldMap->GetDifficulty()))
-			sInstanceSaveMgr->PlayerUnbindInstance(GetPlayer()->GetGUIDLow(), oldMap->GetId(), oldMap->GetDifficulty(), true);
-	}
+        // pussywizard: m_InstanceValid can be false only by leaving a group in an instance => so remove temp binds that could not be removed because player was still on the map!
+        if (!sInstanceSaveMgr->PlayerIsPermBoundToInstance(GetPlayer()->GetGUIDLow(), oldMap->GetId(), oldMap->GetDifficulty()))
+            sInstanceSaveMgr->PlayerUnbindInstance(GetPlayer()->GetGUIDLow(), oldMap->GetId(), oldMap->GetDifficulty(), true);
+    }
 
     // relocate the player to the teleport destination
     Map* newMap = sMapMgr->CreateMap(loc.GetMapId(), GetPlayer());
@@ -108,34 +108,34 @@ void WorldSession::HandleMoveWorldportAckOpcode()
         return;
     }
 
-	oldMap->AfterPlayerUnlinkFromMap();
+    oldMap->AfterPlayerUnlinkFromMap();
 
-	// pussywizard: transport teleport couldn't teleport us to the same map (some other teleport pending, reqs not met, etc.), but we still have transport set until player moves! clear it if map differs (crashfix)
-	if (Transport* t = _player->GetTransport())
-		if (!t->IsInMap(_player))
-		{
-			t->RemovePassenger(_player);
-			_player->m_transport = NULL;
-			_player->m_movementInfo.transport.Reset();
-			_player->m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
-		}
+    // pussywizard: transport teleport couldn't teleport us to the same map (some other teleport pending, reqs not met, etc.), but we still have transport set until player moves! clear it if map differs (crashfix)
+    if (Transport* t = _player->GetTransport())
+        if (!t->IsInMap(_player))
+        {
+            t->RemovePassenger(_player);
+            _player->m_transport = NULL;
+            _player->m_movementInfo.transport.Reset();
+            _player->m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
+        }
 
-	if (!_player->getHostileRefManager().isEmpty())
-		_player->getHostileRefManager().deleteReferences(); // pussywizard: multithreading crashfix
+    if (!_player->getHostileRefManager().isEmpty())
+        _player->getHostileRefManager().deleteReferences(); // pussywizard: multithreading crashfix
 
-	CellCoord pair(Trinity::ComputeCellCoord(GetPlayer()->GetPositionX(), GetPlayer()->GetPositionY()));
-	Cell cell(pair);
-	if (!GridCoord(cell.GridX(), cell.GridY()).IsCoordValid())
-	{
+    CellCoord pair(Trinity::ComputeCellCoord(GetPlayer()->GetPositionX(), GetPlayer()->GetPositionY()));
+    Cell cell(pair);
+    if (!GridCoord(cell.GridX(), cell.GridY()).IsCoordValid())
+    {
         KickPlayer();
         return;
     }
-	newMap->LoadGrid(GetPlayer()->GetPositionX(), GetPlayer()->GetPositionY());
+    newMap->LoadGrid(GetPlayer()->GetPositionX(), GetPlayer()->GetPositionY());
 
-	// pussywizard: player supposed to enter bg map
+    // pussywizard: player supposed to enter bg map
     if (_player->InBattleground())
     {
-		// but landed on another map, cleanup data
+        // but landed on another map, cleanup data
         if (!mEntry->IsBattlegroundOrArena())
             _player->SetBattlegroundId(0, BATTLEGROUND_TYPE_NONE, PLAYER_MAX_BATTLEGROUND_QUEUES, false, false, TEAM_NEUTRAL);
         // everything ok
@@ -146,39 +146,39 @@ void WorldSession::HandleMoveWorldportAckOpcode()
         }
     }
 
-	// pussywizard: arena spectator stuff
-	{
-		if (newMap->IsBattleArena() && ((BattlegroundMap*)newMap)->GetBG() && _player->HasPendingSpectatorForBG(((BattlegroundMap*)newMap)->GetInstanceId()))
-		{
-			_player->ClearReceivedSpectatorResetFor();
-			_player->SetIsSpectator(true);
-			ArenaSpectator::SendCommand(_player, "%sENABLE", SPECTATOR_ADDON_PREFIX);
-			((BattlegroundMap*)newMap)->GetBG()->AddSpectator(_player);
-			ArenaSpectator::HandleResetCommand(_player);
-		}
-		else
-			_player->SetIsSpectator(false);
+    // pussywizard: arena spectator stuff
+    {
+        if (newMap->IsBattleArena() && ((BattlegroundMap*)newMap)->GetBG() && _player->HasPendingSpectatorForBG(((BattlegroundMap*)newMap)->GetInstanceId()))
+        {
+            _player->ClearReceivedSpectatorResetFor();
+            _player->SetIsSpectator(true);
+            ArenaSpectator::SendCommand(_player, "%sENABLE", SPECTATOR_ADDON_PREFIX);
+            ((BattlegroundMap*)newMap)->GetBG()->AddSpectator(_player);
+            ArenaSpectator::HandleResetCommand(_player);
+        }
+        else
+            _player->SetIsSpectator(false);
 
-		GetPlayer()->SetPendingSpectatorForBG(0);
-		timeWhoCommandAllowed = time(NULL) + sWorld->GetNextWhoListUpdateDelaySecs() + 1; // after exiting arena Subscribe will scan for a player and cached data says he is still in arena, so disallow until next update
+        GetPlayer()->SetPendingSpectatorForBG(0);
+        timeWhoCommandAllowed = time(NULL) + sWorld->GetNextWhoListUpdateDelaySecs() + 1; // after exiting arena Subscribe will scan for a player and cached data says he is still in arena, so disallow until next update
 
-		if (uint32 inviteInstanceId = _player->GetPendingSpectatorInviteInstanceId())
-		{
-			if (Battleground* tbg = sBattlegroundMgr->GetBattleground(inviteInstanceId))
-				tbg->RemoveToBeTeleported(_player->GetGUID());
-			_player->SetPendingSpectatorInviteInstanceId(0);
-		}
-	}
+        if (uint32 inviteInstanceId = _player->GetPendingSpectatorInviteInstanceId())
+        {
+            if (Battleground* tbg = sBattlegroundMgr->GetBattleground(inviteInstanceId))
+                tbg->RemoveToBeTeleported(_player->GetGUID());
+            _player->SetPendingSpectatorInviteInstanceId(0);
+        }
+    }
 
-	// xinef: do this again, player can be teleported inside bg->AddPlayer(_player)!!!!
-	CellCoord pair2(Trinity::ComputeCellCoord(GetPlayer()->GetPositionX(), GetPlayer()->GetPositionY()));
-	Cell cell2(pair2);
-	if (!GridCoord(cell2.GridX(), cell2.GridY()).IsCoordValid())
-	{
+    // xinef: do this again, player can be teleported inside bg->AddPlayer(_player)!!!!
+    CellCoord pair2(Trinity::ComputeCellCoord(GetPlayer()->GetPositionX(), GetPlayer()->GetPositionY()));
+    Cell cell2(pair2);
+    if (!GridCoord(cell2.GridX(), cell2.GridY()).IsCoordValid())
+    {
         KickPlayer();
         return;
     }
-	newMap->LoadGrid(GetPlayer()->GetPositionX(), GetPlayer()->GetPositionY());
+    newMap->LoadGrid(GetPlayer()->GetPositionX(), GetPlayer()->GetPositionY());
 
     GetPlayer()->SendInitialPacketsAfterAddToMap();
 
@@ -256,35 +256,35 @@ void WorldSession::HandleMoveTeleportAck(WorldPacket& recvData)
     uint32 old_zone = plMover->GetZoneId();
 
     WorldLocation const& dest = plMover->GetTeleportDest();
-	Position oldPos(*plMover);
+    Position oldPos(*plMover);
 
     plMover->UpdatePosition(dest, true);
 
-	// xinef: teleport pets if they are not unsummoned
-	if (Pet* pet = plMover->GetPet())
-	{
-		if (!pet->IsWithinDist3d(plMover, plMover->GetMap()->GetVisibilityRange()-5.0f))
-			pet->NearTeleportTo(plMover->GetPositionX(), plMover->GetPositionY(), plMover->GetPositionZ(), pet->GetOrientation());
-	}
+    // xinef: teleport pets if they are not unsummoned
+    if (Pet* pet = plMover->GetPet())
+    {
+        if (!pet->IsWithinDist3d(plMover, plMover->GetMap()->GetVisibilityRange()-5.0f))
+            pet->NearTeleportTo(plMover->GetPositionX(), plMover->GetPositionY(), plMover->GetPositionZ(), pet->GetOrientation());
+    }
 
-	if (oldPos.GetExactDist2d(plMover) > 100.0f)
-	{
-		uint32 newzone, newarea;
-		plMover->GetZoneAndAreaId(newzone, newarea, true);
-		plMover->UpdateZone(newzone, newarea);
+    if (oldPos.GetExactDist2d(plMover) > 100.0f)
+    {
+        uint32 newzone, newarea;
+        plMover->GetZoneAndAreaId(newzone, newarea, true);
+        plMover->UpdateZone(newzone, newarea);
 
-		// new zone
-		if (old_zone != newzone)
-		{
-			// honorless target
-			if (plMover->pvpInfo.IsHostile)
-				plMover->CastSpell(plMover, 2479, true);
+        // new zone
+        if (old_zone != newzone)
+        {
+            // honorless target
+            if (plMover->pvpInfo.IsHostile)
+                plMover->CastSpell(plMover, 2479, true);
 
-			// in friendly area
-			else if (plMover->IsPvP() && !plMover->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_IN_PVP))
-				plMover->UpdatePvP(false, false);
-		}
-	}
+            // in friendly area
+            else if (plMover->IsPvP() && !plMover->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_IN_PVP))
+                plMover->UpdatePvP(false, false);
+        }
+    }
 
     // resummon pet
     GetPlayer()->ResummonPetTemporaryUnSummonedIfAny();
@@ -292,11 +292,11 @@ void WorldSession::HandleMoveTeleportAck(WorldPacket& recvData)
     //lets process all delayed operations on successful teleport
     GetPlayer()->ProcessDelayedOperations();
 
-	plMover->GetMotionMaster()->ReinitializeMovement();
+    plMover->GetMotionMaster()->ReinitializeMovement();
 
-	// pussywizard: client forgets about losing control, resend it
-	if (plMover->HasUnitState(UNIT_STATE_FLEEING|UNIT_STATE_CONFUSED) || plMover->IsCharmed()) // only in such cases SetClientControl(self, false) is sent
-		plMover->SetClientControl(plMover, false, true);
+    // pussywizard: client forgets about losing control, resend it
+    if (plMover->HasUnitState(UNIT_STATE_FLEEING|UNIT_STATE_CONFUSED) || plMover->IsCharmed()) // only in such cases SetClientControl(self, false) is sent
+        plMover->SetClientControl(plMover, false, true);
 }
 
 void WorldSession::HandleMovementOpcodes(WorldPacket & recvData)
@@ -339,9 +339,9 @@ void WorldSession::HandleMovementOpcodes(WorldPacket & recvData)
 
     if (movementInfo.flags & MOVEMENTFLAG_ONTRANSPORT)
     {
-		// T_POS ON VEHICLES!
-		if (mover->GetVehicle())
-			movementInfo.transport.pos = mover->m_movementInfo.transport.pos;
+        // T_POS ON VEHICLES!
+        if (mover->GetVehicle())
+            movementInfo.transport.pos = mover->m_movementInfo.transport.pos;
 
         // transports size limited
         // (also received at zeppelin leave by some reason with t_* as absolute in continent coordinates, can be safely skipped)
@@ -404,9 +404,9 @@ void WorldSession::HandleMovementOpcodes(WorldPacket & recvData)
         // now client not include swimming flag in case jumping under water
         plrMover->SetInWater(!plrMover->IsInWater() || plrMover->GetBaseMap()->IsUnderWater(movementInfo.pos.GetPositionX(), movementInfo.pos.GetPositionY(), movementInfo.pos.GetPositionZ()));
     }
-	// Dont allow to turn on walking if charming other player
-	if (mover->GetGUID() != _player->GetGUID())
-		movementInfo.flags &= ~MOVEMENTFLAG_WALKING;
+    // Dont allow to turn on walking if charming other player
+    if (mover->GetGUID() != _player->GetGUID())
+        movementInfo.flags &= ~MOVEMENTFLAG_WALKING;
 
     uint32 mstime = World::GetGameTimeMS();
     /*----------------------*/
@@ -415,19 +415,19 @@ void WorldSession::HandleMovementOpcodes(WorldPacket & recvData)
 
     // Xinef: do not allow to move with UNIT_FLAG_DISABLE_MOVE
     if (mover->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE))
-	{
-		// Xinef: skip moving packets
-		if (movementInfo.HasMovementFlag(MOVEMENTFLAG_MASK_MOVING))
-			return;
-		movementInfo.pos.Relocate(mover->GetPositionX(), mover->GetPositionY(), mover->GetPositionZ());
+    {
+        // Xinef: skip moving packets
+        if (movementInfo.HasMovementFlag(MOVEMENTFLAG_MASK_MOVING))
+            return;
+        movementInfo.pos.Relocate(mover->GetPositionX(), mover->GetPositionY(), mover->GetPositionZ());
 
-		if (mover->GetTypeId() == TYPEID_UNIT)
-		{
-			movementInfo.transport.guid = mover->m_movementInfo.transport.guid;
-			movementInfo.transport.pos.Relocate(mover->m_movementInfo.transport.pos.GetPositionX(), mover->m_movementInfo.transport.pos.GetPositionY(), mover->m_movementInfo.transport.pos.GetPositionZ());
-			movementInfo.transport.seat = mover->m_movementInfo.transport.seat;
-		}
-	}
+        if (mover->GetTypeId() == TYPEID_UNIT)
+        {
+            movementInfo.transport.guid = mover->m_movementInfo.transport.guid;
+            movementInfo.transport.pos.Relocate(mover->m_movementInfo.transport.pos.GetPositionX(), mover->m_movementInfo.transport.pos.GetPositionY(), mover->m_movementInfo.transport.pos.GetPositionZ());
+            movementInfo.transport.seat = mover->m_movementInfo.transport.seat;
+        }
+    }
 
     /* process position-change */
     WorldPacket data(opcode, recvData.size());
@@ -444,28 +444,28 @@ void WorldSession::HandleMovementOpcodes(WorldPacket & recvData)
     if (mover->GetVehicle())
     {
         mover->SetOrientation(movementInfo.pos.GetOrientation());
-		mover->UpdatePosition(movementInfo.pos);
+        mover->UpdatePosition(movementInfo.pos);
         return;
     }
 
-	// pussywizard: previously always mover->UpdatePosition(movementInfo.pos);
-	if (movementInfo.flags & MOVEMENTFLAG_ONTRANSPORT && mover->GetTransport())
-	{
-		float x, y, z, o;
-		movementInfo.transport.pos.GetPosition(x, y, z, o);
-		mover->GetTransport()->CalculatePassengerPosition(x, y, z, &o);
-		mover->UpdatePosition(x, y, z, o);
-	}
-	else
-		mover->UpdatePosition(movementInfo.pos);
+    // pussywizard: previously always mover->UpdatePosition(movementInfo.pos);
+    if (movementInfo.flags & MOVEMENTFLAG_ONTRANSPORT && mover->GetTransport())
+    {
+        float x, y, z, o;
+        movementInfo.transport.pos.GetPosition(x, y, z, o);
+        mover->GetTransport()->CalculatePassengerPosition(x, y, z, &o);
+        mover->UpdatePosition(x, y, z, o);
+    }
+    else
+        mover->UpdatePosition(movementInfo.pos);
 
-	// fall damage generation (ignore in flight case that can be triggered also at lags in moment teleportation to another map).
-	// Xinef: moved it here, previously StopMoving function called when player died relocated him to last saved coordinates (which were in air)
+    // fall damage generation (ignore in flight case that can be triggered also at lags in moment teleportation to another map).
+    // Xinef: moved it here, previously StopMoving function called when player died relocated him to last saved coordinates (which were in air)
     if (opcode == MSG_MOVE_FALL_LAND && plrMover && !plrMover->IsInFlight() && (!plrMover->GetTransport() || plrMover->GetTransport()->IsStaticTransport()))
         plrMover->HandleFall(movementInfo);
-	// Xinef: interrupt parachutes upon falling or landing in water
-	if (opcode == MSG_MOVE_FALL_LAND || opcode == MSG_MOVE_START_SWIM)
-		mover->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_LANDING); // Parachutes
+    // Xinef: interrupt parachutes upon falling or landing in water
+    if (opcode == MSG_MOVE_FALL_LAND || opcode == MSG_MOVE_START_SWIM)
+        mover->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_LANDING); // Parachutes
 
 
     if (plrMover)                                            // nothing is charmed, or player charmed
@@ -502,12 +502,12 @@ void WorldSession::HandleForceSpeedChangeAck(WorldPacket &recvData)
 
     recvData.readPackGUID(guid);
 
-	// pussywizard: special check, only player mover allowed here
-	if (guid != _player->m_mover->GetGUID() || guid != _player->GetGUID())
-	{
-		recvData.rfinish(); // prevent warnings spam
-		return;
-	}
+    // pussywizard: special check, only player mover allowed here
+    if (guid != _player->m_mover->GetGUID() || guid != _player->GetGUID())
+    {
+        recvData.rfinish(); // prevent warnings spam
+        return;
+    }
 
     // continue parse packet
 
@@ -590,12 +590,12 @@ void WorldSession::HandleMoveNotActiveMover(WorldPacket &recvData)
     uint64 old_mover_guid;
     recvData.readPackGUID(old_mover_guid);
 
-	// pussywizard: typical check for incomming movement packets
-	if (!_player->m_mover || !_player->m_mover->IsInWorld() || _player->m_mover->IsDuringRemoveFromWorld() || old_mover_guid != _player->m_mover->GetGUID())
-	{
-		recvData.rfinish(); // prevent warnings spam
-		return;
-	}
+    // pussywizard: typical check for incomming movement packets
+    if (!_player->m_mover || !_player->m_mover->IsInWorld() || _player->m_mover->IsDuringRemoveFromWorld() || old_mover_guid != _player->m_mover->GetGUID())
+    {
+        recvData.rfinish(); // prevent warnings spam
+        return;
+    }
 
     MovementInfo mi;
     mi.guid = old_mover_guid;
@@ -619,12 +619,12 @@ void WorldSession::HandleMoveKnockBackAck(WorldPacket & recvData)
     uint64 guid;
     recvData.readPackGUID(guid);
 
-	// pussywizard: typical check for incomming movement packets
-	if (!_player->m_mover || !_player->m_mover->IsInWorld() || _player->m_mover->IsDuringRemoveFromWorld() || guid != _player->m_mover->GetGUID())
-	{
-		recvData.rfinish(); // prevent warnings spam
-		return;
-	}
+    // pussywizard: typical check for incomming movement packets
+    if (!_player->m_mover || !_player->m_mover->IsInWorld() || _player->m_mover->IsDuringRemoveFromWorld() || guid != _player->m_mover->GetGUID())
+    {
+        recvData.rfinish(); // prevent warnings spam
+        return;
+    }
 
     recvData.read_skip<uint32>();                          // unk
 
@@ -657,7 +657,7 @@ void WorldSession::HandleMoveHoverAck(WorldPacket& recvData)
     recvData.read_skip<uint32>();                          // unk
 
     MovementInfo movementInfo;
-	movementInfo.guid = guid;
+    movementInfo.guid = guid;
     ReadMovementInfo(recvData, &movementInfo);
 
     recvData.read_skip<uint32>();                          // unk2
@@ -673,7 +673,7 @@ void WorldSession::HandleMoveWaterWalkAck(WorldPacket& recvData)
     recvData.read_skip<uint32>();                          // unk
 
     MovementInfo movementInfo;
-	movementInfo.guid = guid;
+    movementInfo.guid = guid;
     ReadMovementInfo(recvData, &movementInfo);
 
     recvData.read_skip<uint32>();                          // unk2
@@ -689,16 +689,16 @@ void WorldSession::HandleSummonResponseOpcode(WorldPacket& recvData)
     recvData >> summoner_guid;
     recvData >> agree;
 
-	if (agree && _player->IsSummonAsSpectator())
-	{
-		ChatHandler chc(this);
-		if (Player* summoner = ObjectAccessor::FindPlayer(summoner_guid))
-			ArenaSpectator::HandleSpectatorSpectateCommand(&chc, summoner->GetName().c_str());
-		else
-			chc.PSendSysMessage("Requested player not found.");
+    if (agree && _player->IsSummonAsSpectator())
+    {
+        ChatHandler chc(this);
+        if (Player* summoner = ObjectAccessor::FindPlayer(summoner_guid))
+            ArenaSpectator::HandleSpectatorSpectateCommand(&chc, summoner->GetName().c_str());
+        else
+            chc.PSendSysMessage("Requested player not found.");
 
         agree = false;
-	}
-	_player->SetSummonAsSpectator(false);
+    }
+    _player->SetSummonAsSpectator(false);
     _player->SummonIfPossible(agree);
 }

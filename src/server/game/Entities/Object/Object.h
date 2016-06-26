@@ -90,7 +90,7 @@ enum TempSummonType
     TEMPSUMMON_CORPSE_TIMED_DESPAWN        = 6,             // despawns after a specified time after death
     TEMPSUMMON_DEAD_DESPAWN                = 7,             // despawns when the creature disappears
     TEMPSUMMON_MANUAL_DESPAWN              = 8,             // despawns when UnSummon() is called
-	TEMPSUMMON_DESPAWNED				   = 9,				// xinef: DONT USE, INTERNAL USE ONLY
+    TEMPSUMMON_DESPAWNED                   = 9,             // xinef: DONT USE, INTERNAL USE ONLY
 };
 
 enum PhaseMasks
@@ -145,7 +145,7 @@ class Object
         uint32 GetEntry() const { return GetUInt32Value(OBJECT_FIELD_ENTRY); }
         void SetEntry(uint32 entry) { SetUInt32Value(OBJECT_FIELD_ENTRY, entry); }
 
-		virtual void SetObjectScale(float scale) { SetFloatValue(OBJECT_FIELD_SCALE_X, scale); }
+        virtual void SetObjectScale(float scale) { SetFloatValue(OBJECT_FIELD_SCALE_X, scale); }
 
         TypeID GetTypeId() const { return m_objectTypeId; }
         bool isType(uint16 mask) const { return (mask & m_objectType); }
@@ -579,14 +579,14 @@ class WorldLocation : public Position
 
         void WorldRelocate(const WorldLocation &loc)
         {
-			m_mapId = loc.GetMapId();
-			Relocate(loc);
-		}
+            m_mapId = loc.GetMapId();
+            Relocate(loc);
+        }
 
         uint32 GetMapId() const
-		{
-			return m_mapId;
-		}
+        {
+            return m_mapId;
+        }
 
         WorldLocation GetWorldLocation() const
         {
@@ -642,7 +642,7 @@ class MovableMapObject
 {
         friend class Map; //map for moving creatures
         friend class ObjectGridLoader; //grid loader for loading creatures
-		template<class T> friend class RandomMovementGenerator;
+        template<class T> friend class RandomMovementGenerator;
 
     protected:
         MovableMapObject() : _moveState(MAP_OBJECT_CELL_MOVE_NONE) {}
@@ -728,9 +728,9 @@ class WorldObject : public Object, public WorldLocation
         bool InSamePhase(WorldObject const* obj) const { return InSamePhase(obj->GetPhaseMask()); }
         bool InSamePhase(uint32 phasemask) const { return (GetPhaseMask() & phasemask); }
 
-		virtual uint32 GetZoneId(bool forceRecalc = false) const;
-		virtual uint32 GetAreaId(bool forceRecalc = false) const;
-		virtual void GetZoneAndAreaId(uint32& zoneid, uint32& areaid, bool forceRecalc = false) const;
+        virtual uint32 GetZoneId(bool forceRecalc = false) const;
+        virtual uint32 GetAreaId(bool forceRecalc = false) const;
+        virtual void GetZoneAndAreaId(uint32& zoneid, uint32& areaid, bool forceRecalc = false) const;
 
         InstanceScript* GetInstanceScript();
 
@@ -808,9 +808,9 @@ class WorldObject : public Object, public WorldLocation
 
         virtual void CleanupsBeforeDelete(bool finalCleanup = true);  // used in destructor or explicitly before mass creature delete to remove cross-references to already deleted units
 
-		virtual void SendMessageToSet(WorldPacket* data, bool self) { if (IsInWorld()) SendMessageToSetInRange(data, GetVisibilityRange(), self, true); } // pussywizard!
+        virtual void SendMessageToSet(WorldPacket* data, bool self) { if (IsInWorld()) SendMessageToSetInRange(data, GetVisibilityRange(), self, true); } // pussywizard!
         virtual void SendMessageToSetInRange(WorldPacket* data, float dist, bool /*self*/, bool includeMargin = false, Player const* skipped_rcvr = NULL); // pussywizard!
-		virtual void SendMessageToSet(WorldPacket* data, Player const* skipped_rcvr) { if (IsInWorld()) SendMessageToSetInRange(data, GetVisibilityRange(), false, true, skipped_rcvr); } // pussywizard!
+        virtual void SendMessageToSet(WorldPacket* data, Player const* skipped_rcvr) { if (IsInWorld()) SendMessageToSetInRange(data, GetVisibilityRange(), false, true, skipped_rcvr); } // pussywizard!
 
         virtual uint8 getLevelForTarget(WorldObject const* /*target*/) const { return 1; }
 
@@ -887,11 +887,11 @@ class WorldObject : public Object, public WorldLocation
         void DestroyForNearbyPlayers();
         virtual void UpdateObjectVisibility(bool forced = true, bool fromUpdate = false);
         void BuildUpdate(UpdateDataMapType& data_map, UpdatePlayerSet& player_set);
-		void GetCreaturesWithEntryInRange(std::list<Creature*> &creatureList, float radius, uint32 entry);
+        void GetCreaturesWithEntryInRange(std::list<Creature*> &creatureList, float radius, uint32 entry);
 
         //relocation and visibility system functions
         void AddToNotify(uint16 f);
-		void RemoveFromNotify(uint16 f) { m_notifyflags &= ~f; }
+        void RemoveFromNotify(uint16 f) { m_notifyflags &= ~f; }
         bool isNeedNotify(uint16 f) const { return m_notifyflags & f;}
         uint16 GetNotifyFlags() const { return m_notifyflags; }
         bool NotifyExecuted(uint16 f) const { return m_executed_notifies & f;}
@@ -908,10 +908,10 @@ class WorldObject : public Object, public WorldLocation
         template<class NOTIFIER> void VisitNearbyGridObject(float const& radius, NOTIFIER& notifier) const { if (IsInWorld()) GetMap()->VisitGrid(GetPositionX(), GetPositionY(), radius, notifier); }
         template<class NOTIFIER> void VisitNearbyWorldObject(float const& radius, NOTIFIER& notifier) const { if (IsInWorld()) GetMap()->VisitWorld(GetPositionX(), GetPositionY(), radius, notifier); }
 
-		bool IsInWintergrasp() const
-		{
-			return GetMapId() == 571 && GetPositionX() > 3733.33331f && GetPositionX() < 5866.66663f && GetPositionY() > 1599.99999f && GetPositionY() < 4799.99997f;
-		}
+        bool IsInWintergrasp() const
+        {
+            return GetMapId() == 571 && GetPositionX() > 3733.33331f && GetPositionX() < 5866.66663f && GetPositionY() > 1599.99999f && GetPositionY() < 4799.99997f;
+        }
 
 #ifdef MAP_BASED_RAND_GEN
         int32 irand(int32 min, int32 max) const     { return int32 (GetMap()->mtRand.randInt(max - min)) + min; }

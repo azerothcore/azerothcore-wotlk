@@ -56,14 +56,14 @@ class spell_q10935_the_exorcism_of_colonel_jules : public SpellScriptLoader
                     return;
 
                 if (GetCaster()->IsHostileTo(target))
-					GetCaster()->CastSpell(target, 39323 /*SPELL_HOLY_FIRE*/, true);
-				else
-					GetCaster()->CastSpell(target, 39322 /*SPELL_HEAL_BARADA*/, true);
+                    GetCaster()->CastSpell(target, 39323 /*SPELL_HOLY_FIRE*/, true);
+                else
+                    GetCaster()->CastSpell(target, 39322 /*SPELL_HEAL_BARADA*/, true);
             }
 
             void Register()
             {
-				OnEffectHitTarget += SpellEffectFn(spell_q10935_the_exorcism_of_colonel_jules_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+                OnEffectHitTarget += SpellEffectFn(spell_q10935_the_exorcism_of_colonel_jules_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
             }
         };
 
@@ -191,8 +191,8 @@ public:
         void Reset()
         {
             ryga = NULL;
-			me->CastSpell(me, SPELL_ANCESTRAL_WOLF_BUFF, false);
-			me->SetReactState(REACT_PASSIVE);
+            me->CastSpell(me, SPELL_ANCESTRAL_WOLF_BUFF, false);
+            me->SetReactState(REACT_PASSIVE);
         }
 
         void MoveInLineOfSight(Unit* who)
@@ -207,7 +207,7 @@ public:
 
         void WaypointReached(uint32 waypointId)
         {
-			me->CastSpell(me, SPELL_ANCESTRAL_WOLF_BUFF, false);
+            me->CastSpell(me, SPELL_ANCESTRAL_WOLF_BUFF, false);
             switch (waypointId)
             {
                 case 0:
@@ -398,10 +398,10 @@ public:
 
 void AddSC_hellfire_peninsula()
 {
-	// Ours
-	new spell_q10935_the_exorcism_of_colonel_jules();
+    // Ours
+    new spell_q10935_the_exorcism_of_colonel_jules();
 
-	// Theirs
+    // Theirs
     new npc_aeranas();
     new npc_ancestral_wolf();
     new npc_wounded_blood_elf();

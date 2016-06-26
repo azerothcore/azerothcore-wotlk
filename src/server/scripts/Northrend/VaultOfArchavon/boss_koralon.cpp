@@ -11,19 +11,19 @@ REWRITTEN FROM SCRATCH BY XINEF, IT OWNS NOW!
 enum Events
 {
     // Koralon
-    EVENT_BURNING_BREATH			= 1,
-    EVENT_FLAME_CINDER				= 2,
-    EVENT_METEOR_FISTS				= 3,
+    EVENT_BURNING_BREATH            = 1,
+    EVENT_FLAME_CINDER              = 2,
+    EVENT_METEOR_FISTS              = 3,
 };
 
 enum Spells
 {
     SPELL_BURNING_FURY                          = 68168,
-    SPELL_BURNING_BREATH						= 66665, // handled by spell_difficulty
+    SPELL_BURNING_BREATH                        = 66665, // handled by spell_difficulty
     
     SPELL_FLAMING_CINDER                        = 66681,
-	SPELL_FLAMING_CINDER_DUMMY					= 66690,
-	SPELL_FLAMING_CINDER_MISSILE				= 66682, // trigger of missile handled by spell_difficulty
+    SPELL_FLAMING_CINDER_DUMMY                  = 66690,
+    SPELL_FLAMING_CINDER_MISSILE                = 66682, // trigger of missile handled by spell_difficulty
 
     SPELL_METEOR_FISTS                          = 66725, // handled by spell_difficulty
     SPELL_METEOR_FISTS_DAMAGE                   = 66765,
@@ -39,38 +39,38 @@ class boss_koralon : public CreatureScript
         {
             boss_koralonAI(Creature* creature) : ScriptedAI(creature)
             {
-				pInstance = me->GetInstanceScript();
+                pInstance = me->GetInstanceScript();
             }
 
-			InstanceScript* pInstance;
-			EventMap events;
-			uint32 rotateTimer;
+            InstanceScript* pInstance;
+            EventMap events;
+            uint32 rotateTimer;
 
-			void Reset()
-			{
-				rotateTimer = 0;
-				events.Reset();
-				if (pInstance)
-				{
-					if (pInstance->GetData(DATA_STONED))
-					{
-						if (Aura* aur = me->AddAura(SPELL_STONED_AURA, me))
-						{
-							aur->SetMaxDuration(60 * MINUTE* IN_MILLISECONDS);
-							aur->SetDuration(60 * MINUTE* IN_MILLISECONDS);
-						}
-					}
-					pInstance->SetData(EVENT_KORALON, NOT_STARTED);
-				}
-			}
+            void Reset()
+            {
+                rotateTimer = 0;
+                events.Reset();
+                if (pInstance)
+                {
+                    if (pInstance->GetData(DATA_STONED))
+                    {
+                        if (Aura* aur = me->AddAura(SPELL_STONED_AURA, me))
+                        {
+                            aur->SetMaxDuration(60 * MINUTE* IN_MILLISECONDS);
+                            aur->SetDuration(60 * MINUTE* IN_MILLISECONDS);
+                        }
+                    }
+                    pInstance->SetData(EVENT_KORALON, NOT_STARTED);
+                }
+            }
 
-			void AttackStart(Unit* who)
-			{
-				if (me->HasAura(SPELL_STONED_AURA))
-					return;
+            void AttackStart(Unit* who)
+            {
+                if (me->HasAura(SPELL_STONED_AURA))
+                    return;
 
-				ScriptedAI::AttackStart(who);
-			}
+                ScriptedAI::AttackStart(who);
+            }
 
             void EnterCombat(Unit* /*who*/)
             {
@@ -81,38 +81,38 @@ class boss_koralon : public CreatureScript
                 events.ScheduleEvent(EVENT_FLAME_CINDER, 20000);
 
                 if (pInstance)
-					pInstance->SetData(EVENT_KORALON, IN_PROGRESS);
+                    pInstance->SetData(EVENT_KORALON, IN_PROGRESS);
             }
 
-			void JustDied(Unit* )
-			{
-				if (pInstance)
-					pInstance->SetData(EVENT_KORALON, DONE);
-			}
+            void JustDied(Unit* )
+            {
+                if (pInstance)
+                    pInstance->SetData(EVENT_KORALON, DONE);
+            }
 
             void UpdateAI(uint32 diff)
             {
-				if (rotateTimer)
-				{
-					rotateTimer += diff;
-					if (rotateTimer >= 3000)
-					{
-						if (!me->HasUnitMovementFlag(MOVEMENTFLAG_LEFT))
-						{
-							me->SetUnitMovementFlags(MOVEMENTFLAG_LEFT);
-							me->SendMovementFlagUpdate();
-							rotateTimer = 1;
-							return;
-						}
-						else
-						{
-							me->RemoveUnitMovementFlag(MOVEMENTFLAG_LEFT);
-							me->SendMovementFlagUpdate();
-							rotateTimer = 0;
-							return;
-						}
-					}
-				}
+                if (rotateTimer)
+                {
+                    rotateTimer += diff;
+                    if (rotateTimer >= 3000)
+                    {
+                        if (!me->HasUnitMovementFlag(MOVEMENTFLAG_LEFT))
+                        {
+                            me->SetUnitMovementFlags(MOVEMENTFLAG_LEFT);
+                            me->SendMovementFlagUpdate();
+                            rotateTimer = 1;
+                            return;
+                        }
+                        else
+                        {
+                            me->RemoveUnitMovementFlag(MOVEMENTFLAG_LEFT);
+                            me->SendMovementFlagUpdate();
+                            rotateTimer = 0;
+                            return;
+                        }
+                    }
+                }
 
                 if (!UpdateVictim())
                     return;
@@ -124,7 +124,7 @@ class boss_koralon : public CreatureScript
                 switch (events.GetEvent())
                 {
                     case EVENT_BURNING_BREATH:
-						rotateTimer = 1500;
+                        rotateTimer = 1500;
                         me->CastSpell(me, SPELL_BURNING_BREATH, false);
                         events.RepeatEvent(45000);
                         break;
@@ -161,8 +161,8 @@ class spell_voa_flaming_cinder : public SpellScriptLoader
 
             void HandleDummy(SpellEffIndex /*effIndex*/)
             {
-				if (Unit* target = GetHitUnit())
-					GetCaster()->CastSpell(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), SPELL_FLAMING_CINDER_MISSILE, true);
+                if (Unit* target = GetHitUnit())
+                    GetCaster()->CastSpell(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), SPELL_FLAMING_CINDER_MISSILE, true);
             }
 
             void Register()
@@ -248,7 +248,7 @@ class spell_flame_warder_meteor_fists : public SpellScriptLoader
 void AddSC_boss_koralon()
 {
     new boss_koralon();
-	new spell_voa_flaming_cinder();
-	new spell_koralon_meteor_fists();
-	new spell_flame_warder_meteor_fists();
+    new spell_voa_flaming_cinder();
+    new spell_koralon_meteor_fists();
+    new spell_flame_warder_meteor_fists();
 }

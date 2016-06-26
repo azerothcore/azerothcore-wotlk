@@ -54,8 +54,8 @@ void MotionMaster::Initialize()
 // set new default movement generator
 void MotionMaster::InitDefault()
 {
-	// Xinef: Do not allow to initialize any motion generator for dead creatures
-	if (_owner->GetTypeId() == TYPEID_UNIT && _owner->IsAlive())
+    // Xinef: Do not allow to initialize any motion generator for dead creatures
+    if (_owner->GetTypeId() == TYPEID_UNIT && _owner->IsAlive())
     {
         MovementGenerator* movement = FactorySelector::selectMovementGenerator(_owner->ToCreature());
         Mutate(movement == NULL ? &si_idleMovement : movement, MOTION_SLOT_IDLE);
@@ -253,17 +253,17 @@ void MotionMaster::MoveTargetedHome()
     }
     else if (_owner->GetTypeId() == TYPEID_UNIT && _owner->ToCreature()->GetCharmerOrOwnerGUID())
     {
-		_owner->ClearUnitState(UNIT_STATE_EVADE);
-		// Xinef: do not allow to move with UNIT_FLAG_DISABLE_MOVE
-	    if (_owner->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE))
-		    return;
+        _owner->ClearUnitState(UNIT_STATE_EVADE);
+        // Xinef: do not allow to move with UNIT_FLAG_DISABLE_MOVE
+        if (_owner->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE))
+            return;
 
         ;//sLog->outStaticDebug("Pet or controlled creature (Entry: %u GUID: %u) targeting home", _owner->GetEntry(), _owner->GetGUIDLow());
         Unit* target = _owner->ToCreature()->GetCharmerOrOwner();
         if (target)
         {
             ;//sLog->outStaticDebug("Following %s (GUID: %u)", target->GetTypeId() == TYPEID_PLAYER ? "player" : "creature", target->GetTypeId() == TYPEID_PLAYER ? target->GetGUIDLow() : ((Creature*)target)->GetDBTableGUIDLow());
-			Mutate(new FollowMovementGenerator<Creature>(target, PET_FOLLOW_DIST, _owner->GetFollowAngle()), MOTION_SLOT_ACTIVE);
+            Mutate(new FollowMovementGenerator<Creature>(target, PET_FOLLOW_DIST, _owner->GetFollowAngle()), MOTION_SLOT_ACTIVE);
         }
     }
     else
@@ -401,8 +401,8 @@ void MotionMaster::MoveLand(uint32 id, Position const& pos, float speed)
 
 void MotionMaster::MoveLand(uint32 id, float x, float y, float z, float speed)
 {
-	Position pos = {x, y, z, 0.0f};
-	MoveLand(id, pos, speed);
+    Position pos = {x, y, z, 0.0f};
+    MoveLand(id, pos, speed);
 }
 
 void MotionMaster::MoveTakeoff(uint32 id, Position const& pos, float speed)
@@ -426,8 +426,8 @@ void MotionMaster::MoveTakeoff(uint32 id, Position const& pos, float speed)
 
 void MotionMaster::MoveTakeoff(uint32 id, float x, float y, float z, float speed)
 {
-	Position pos = {x, y, z, 0.0f};
-	MoveTakeoff(id, pos, speed);
+    Position pos = {x, y, z, 0.0f};
+    MoveTakeoff(id, pos, speed);
 }
 
 void MotionMaster::MoveKnockbackFrom(float srcX, float srcY, float speedXY, float speedZ)
@@ -490,8 +490,8 @@ void MotionMaster::MoveJump(float x, float y, float z, float speedXY, float spee
     init.MoveTo(x, y, z);
     init.SetParabolic(max_height, 0);
     init.SetVelocity(speedXY);
-	if (target)
-		init.SetFacing(target);
+    if (target)
+        init.SetFacing(target);
     init.Launch();
     Mutate(new EffectMovementGenerator(id), MOTION_SLOT_CONTROLLED);
 }
@@ -519,16 +519,16 @@ void MotionMaster::MoveFall(uint32 id /*=0*/, bool addFlagForNPC)
     {
         _owner->AddUnitMovementFlag(MOVEMENTFLAG_FALLING);
         _owner->m_movementInfo.SetFallTime(0);
-		_owner->ToPlayer()->SetFallInformation(time(NULL), _owner->GetPositionZ());
+        _owner->ToPlayer()->SetFallInformation(time(NULL), _owner->GetPositionZ());
     }
-	else if (_owner->GetTypeId() == TYPEID_UNIT && addFlagForNPC) // pussywizard
-	{
-		_owner->RemoveUnitMovementFlag(MOVEMENTFLAG_MASK_MOVING);
-		_owner->RemoveUnitMovementFlag(MOVEMENTFLAG_FLYING|MOVEMENTFLAG_CAN_FLY);
-		_owner->AddUnitMovementFlag(MOVEMENTFLAG_FALLING);
-		_owner->m_movementInfo.SetFallTime(0);
-		_owner->SendMovementFlagUpdate();
-	}
+    else if (_owner->GetTypeId() == TYPEID_UNIT && addFlagForNPC) // pussywizard
+    {
+        _owner->RemoveUnitMovementFlag(MOVEMENTFLAG_MASK_MOVING);
+        _owner->RemoveUnitMovementFlag(MOVEMENTFLAG_FLYING|MOVEMENTFLAG_CAN_FLY);
+        _owner->AddUnitMovementFlag(MOVEMENTFLAG_FALLING);
+        _owner->m_movementInfo.SetFallTime(0);
+        _owner->SendMovementFlagUpdate();
+    }
 
     Movement::MoveSplineInit init(_owner);
     init.MoveTo(_owner->GetPositionX(), _owner->GetPositionY(), tz);
@@ -574,7 +574,7 @@ void MotionMaster::MoveSeekAssistance(float x, float y, float z)
         ;//sLog->outStaticDebug("Creature (Entry: %u GUID: %u) seek assistance (X: %f Y: %f Z: %f)",
         //    _owner->GetEntry(), _owner->GetGUIDLow(), x, y, z);
         _owner->AttackStop();
-		_owner->CastStop(0, false);
+        _owner->CastStop(0, false);
         _owner->ToCreature()->SetReactState(REACT_PASSIVE);
         Mutate(new AssistanceMovementGenerator(x, y, z), MOTION_SLOT_ACTIVE);
     }

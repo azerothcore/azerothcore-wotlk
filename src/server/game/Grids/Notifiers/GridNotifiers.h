@@ -102,7 +102,7 @@ namespace Trinity
         Player const* skipped_receiver;
         MessageDistDeliverer(WorldObject* src, WorldPacket* msg, float dist, bool own_team_only = false, Player const* skipped = NULL)
             : i_source(src), i_message(msg), i_phaseMask(src->GetPhaseMask()), i_distSq(dist * dist)
-			, teamId((own_team_only && src->GetTypeId() == TYPEID_PLAYER) ? src->ToPlayer()->GetTeamId() : TEAM_NEUTRAL)
+            , teamId((own_team_only && src->GetTypeId() == TYPEID_PLAYER) ? src->ToPlayer()->GetTeamId() : TEAM_NEUTRAL)
             , skipped_receiver(skipped)
         {
         }
@@ -124,7 +124,7 @@ namespace Trinity
         }
     };
 
-	struct MessageDistDelivererToHostile
+    struct MessageDistDelivererToHostile
     {
         Unit* i_source;
         WorldPacket* i_message;
@@ -625,8 +625,8 @@ namespace Trinity
                 if (go->GetGOInfo()->type != GAMEOBJECT_TYPE_SPELL_FOCUS)
                     return false;
 
-				if (!go->isSpawned()) // xinef: dont allow to count deactivated objects
-					return false;
+                if (!go->isSpawned()) // xinef: dont allow to count deactivated objects
+                    return false;
 
                 if (go->GetGOInfo()->spellFocus.focusId != i_focusId)
                     return false;
@@ -785,12 +785,12 @@ namespace Trinity
     {
         public:
             FriendlyMissingBuffInRange(Unit const* obj, float range, uint32 spellid) : i_obj(obj), i_range(range)
-			{
-				i_spell = spellid;
-				if( SpellInfo const* spell = sSpellMgr->GetSpellInfo(spellid) )
-					if( SpellInfo const* newSpell = sSpellMgr->GetSpellForDifficultyFromSpell(spell, const_cast<Unit*>(obj)) )
-						i_spell = newSpell->Id;
-			}
+            {
+                i_spell = spellid;
+                if( SpellInfo const* spell = sSpellMgr->GetSpellInfo(spellid) )
+                    if( SpellInfo const* newSpell = sSpellMgr->GetSpellForDifficultyFromSpell(spell, const_cast<Unit*>(obj)) )
+                        i_spell = newSpell->Id;
+            }
             bool operator()(Unit* u)
             {
                 if (u->IsAlive() && u->IsInCombat() && !i_obj->IsHostileTo(u) && i_obj->IsWithinDistInMap(u, i_range) &&
@@ -813,7 +813,7 @@ namespace Trinity
             bool operator()(Unit* u)
             {
                 if (u->IsAlive() && i_obj->IsWithinDistInMap(u, i_range) && !i_funit->IsFriendlyTo(u) && 
-					(i_funit->GetTypeId() != TYPEID_UNIT || !i_funit->ToCreature()->IsAvoidingAOE())) // pussywizard
+                    (i_funit->GetTypeId() != TYPEID_UNIT || !i_funit->ToCreature()->IsAvoidingAOE())) // pussywizard
                     return true;
                 else
                     return false;
@@ -833,10 +833,10 @@ namespace Trinity
                 if (!u->IsAlive())
                     return false;
 
-				if (u->GetCreatureType() == CREATURE_TYPE_NON_COMBAT_PET)
-					return false;
+                if (u->GetCreatureType() == CREATURE_TYPE_NON_COMBAT_PET)
+                    return false;
 
-				if (u->GetTypeId() == TYPEID_UNIT && (u->ToCreature()->IsTotem() || u->ToCreature()->IsTrigger() || u->ToCreature()->IsAvoidingAOE())) // pussywizard: added IsAvoidingAOE()
+                if (u->GetTypeId() == TYPEID_UNIT && (u->ToCreature()->IsTotem() || u->ToCreature()->IsTrigger() || u->ToCreature()->IsAvoidingAOE())) // pussywizard: added IsAvoidingAOE()
                     return false;
 
                 if (!u->isTargetableForAttack(false, i_funit))
@@ -863,7 +863,7 @@ namespace Trinity
                     && !i_funit->IsFriendlyTo(u)
                     && i_funit->IsValidAttackTarget(u)
                     && !u->IsCritter()
-					&& !u->IsTotem() //xinef: dont attack totems
+                    && !u->IsTotem() //xinef: dont attack totems
                     /*&& i_funit->CanSeeOrDetect(u)*/; // pussywizard: already checked in IsValidAttackTarget(u)
             }
         private:
@@ -1018,7 +1018,7 @@ namespace Trinity
             float i_range;
     };
 
-	class AnyAttackableUnitExceptForOriginalCasterInObjectRangeCheck
+    class AnyAttackableUnitExceptForOriginalCasterInObjectRangeCheck
     {
         public:
             AnyAttackableUnitExceptForOriginalCasterInObjectRangeCheck(WorldObject const* obj, Unit const* funit, float range)
@@ -1031,9 +1031,9 @@ namespace Trinity
             }
             bool operator()(Unit* u)
             {
-				if (!u->IsAlive() || u->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE) || (u->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC) && !u->IsInCombat()))
+                if (!u->IsAlive() || u->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE) || (u->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC) && !u->IsInCombat()))
                     return false;
-				if (u->GetGUID() == i_funit->GetGUID())
+                if (u->GetGUID() == i_funit->GetGUID())
                     return false;
 
                 if (i_obj->IsWithinDistInMap(u, i_range))
@@ -1240,8 +1240,8 @@ namespace Trinity
                 if (_reqAlive && !u->IsAlive())
                     return false;
 
-				if (_disallowGM && (u->IsGameMaster() || u->IsSpectator()))
-					return false;
+                if (_disallowGM && (u->IsGameMaster() || u->IsSpectator()))
+                    return false;
 
                 if (!_obj->IsWithinDistInMap(u, _range))
                     return false;
@@ -1262,7 +1262,7 @@ namespace Trinity
             WorldObject const* _obj;
             float _range;
             bool _reqAlive;
-			bool _disallowGM;
+            bool _disallowGM;
     };
 
     class NearestPlayerInObjectRangeCheck
@@ -1411,7 +1411,7 @@ namespace Trinity
 
         private:
             uint64 _GUID;
-			bool _equals;
+            bool _equals;
     };
 
     class UnitAuraCheck
@@ -1434,61 +1434,61 @@ namespace Trinity
             uint64 _casterGUID;
     };
 
-	class AllWorldObjectsInExactRange
+    class AllWorldObjectsInExactRange
     {
-		public:
-			AllWorldObjectsInExactRange(const WorldObject* object, float range, bool equals) : _object(object), _range(range), _equals(equals) { }
-			bool operator() (WorldObject const* object)
-			{
-				return (_object->GetExactDist2d(object) > _range) == _equals;
-			}
+        public:
+            AllWorldObjectsInExactRange(const WorldObject* object, float range, bool equals) : _object(object), _range(range), _equals(equals) { }
+            bool operator() (WorldObject const* object)
+            {
+                return (_object->GetExactDist2d(object) > _range) == _equals;
+            }
 
-		private:
-			const WorldObject* _object;
-			float _range;
-			bool _equals;
+        private:
+            const WorldObject* _object;
+            float _range;
+            bool _equals;
     };
 
-	class RandomCheck
-	{
-		public:
-			explicit RandomCheck(uint8 chance) : _chance(chance) { }
-			bool operator()(WorldObject const* object) const
-			{
-				return roll_chance_i(_chance);
-			}
+    class RandomCheck
+    {
+        public:
+            explicit RandomCheck(uint8 chance) : _chance(chance) { }
+            bool operator()(WorldObject const* object) const
+            {
+                return roll_chance_i(_chance);
+            }
 
-		private:
-			uint8 const _chance;
-	};
-	
-	class PowerCheck
-	{
-		public:
-			explicit PowerCheck(Powers const power, bool equals) : _power(power), _equals(equals) { }
-			bool operator()(WorldObject const* object) const
-			{
-				return object->ToUnit() && (object->ToUnit()->getPowerType() == _power) == _equals;
-			}
+        private:
+            uint8 const _chance;
+    };
+    
+    class PowerCheck
+    {
+        public:
+            explicit PowerCheck(Powers const power, bool equals) : _power(power), _equals(equals) { }
+            bool operator()(WorldObject const* object) const
+            {
+                return object->ToUnit() && (object->ToUnit()->getPowerType() == _power) == _equals;
+            }
 
-		private:
-			Powers const _power;
-			bool const _equals;
-	};
+        private:
+            Powers const _power;
+            bool const _equals;
+    };
 
-	class RaidCheck
-	{
-		public:
-			explicit RaidCheck(Unit const* compare, bool equals) : _compare(compare), _equals(equals) { }
-			bool operator()(WorldObject const* object) const
-			{
-				return object->ToUnit() && object->ToUnit()->IsInRaidWith(_compare) == _equals;
-			}
+    class RaidCheck
+    {
+        public:
+            explicit RaidCheck(Unit const* compare, bool equals) : _compare(compare), _equals(equals) { }
+            bool operator()(WorldObject const* object) const
+            {
+                return object->ToUnit() && object->ToUnit()->IsInRaidWith(_compare) == _equals;
+            }
 
-		private:
-			Unit const* _compare;
-			bool const _equals;
-	};
+        private:
+            Unit const* _compare;
+            bool const _equals;
+    };
 
     // Player checks and do
 

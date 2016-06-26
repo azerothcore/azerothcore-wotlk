@@ -164,7 +164,7 @@ void MailDraft::SendReturnToSender(uint32 sender_acc, uint32 sender_guid, uint32
         }
     }
 
-	// xinef: WowWiki: "Return mail arrives immediately."
+    // xinef: WowWiki: "Return mail arrives immediately."
 
     // will delete item or place to receiver mail list
     SendMailTo(trans, MailReceiver(receiver, receiver_guid), MailSender(MAIL_NORMAL, sender_guid), MAIL_CHECK_MASK_RETURNED, 0);
@@ -193,12 +193,12 @@ void MailDraft::SendMailTo(SQLTransaction& trans, MailReceiver const& receiver, 
         expire_delay = DAY;
      // default case: expire time if COD 3 days, if no COD 30 days (or 90 days if sender is a game master)
     else
-	{
+    {
         if (m_COD)
             expire_delay = 3 * DAY;
         else
             expire_delay = pSender && pSender->GetSession()->GetSecurity() ? 90 * DAY : 30 * DAY;
-	}
+    }
 
     time_t expire_time = deliver_time + expire_delay;
 
@@ -231,8 +231,8 @@ void MailDraft::SendMailTo(SQLTransaction& trans, MailReceiver const& receiver, 
         trans->Append(stmt);
     }
 
-	// xinef: update global data
-	sWorld->UpdateGlobalPlayerMails(receiver.GetPlayerGUIDLow(), 1);
+    // xinef: update global data
+    sWorld->UpdateGlobalPlayerMails(receiver.GetPlayerGUIDLow(), 1);
 
     // For online receiver update in game mail status and data
     if (pReceiver)

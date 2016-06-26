@@ -539,10 +539,10 @@ struct GameObjectTemplate
         }
     }
 
-	bool IsGameObjectForQuests() const
-	{
-		return IsForQuests;
-	}
+    bool IsGameObjectForQuests() const
+    {
+        return IsForQuests;
+    }
 };
 
 // Benchmarked: Faster than std::map (insert/find)
@@ -782,8 +782,8 @@ class GameObject : public WorldObject, public GridObject<GameObject>, public Mov
         bool HasLootRecipient() const { return m_lootRecipient || m_lootRecipientGroup; }
         uint32 m_groupLootTimer;                            // (msecs)timer used for group loot
         uint32 lootingGroupLowGUID;                         // used to find group which is looting
-		void SetLootGenerationTime() { m_lootGenerationTime = time(NULL); }
-		uint32 GetLootGenerationTime() const { return m_lootGenerationTime; }
+        void SetLootGenerationTime() { m_lootGenerationTime = time(NULL); }
+        uint32 GetLootGenerationTime() const { return m_lootGenerationTime; }
 
         bool hasQuest(uint32 quest_id) const;
         bool hasInvolvedQuest(uint32 quest_id) const;
@@ -815,7 +815,7 @@ class GameObject : public WorldObject, public GridObject<GameObject>, public Mov
         void SendMessageToSetInRange(WorldPacket* data, float dist, bool /*self*/, bool includeMargin = false, Player const* skipped_rcvr = NULL); // pussywizard!
 
         void ModifyHealth(int32 change, Unit* attackerOrHealer = NULL, uint32 spellId = 0);
-		void SetDestructibleBuildingModifyState(bool allow) { m_allowModifyDestructibleBuilding = allow; }
+        void SetDestructibleBuildingModifyState(bool allow) { m_allowModifyDestructibleBuilding = allow; }
         // sets GameObject type 33 destruction flags and optionally default health for that state
         void SetDestructibleState(GameObjectDestructibleState state, Player* eventInvoker = NULL, bool setHealth = false);
         GameObjectDestructibleState GetDestructibleState() const
@@ -842,8 +842,8 @@ class GameObject : public WorldObject, public GridObject<GameObject>, public Mov
         void SetPosition(float x, float y, float z, float o);
         void SetPosition(const Position &pos) { SetPosition(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation()); }
 
-		bool IsStaticTransport() const { return GetGOInfo()->type == GAMEOBJECT_TYPE_TRANSPORT; }
-		bool IsMotionTransport() const { return GetGOInfo()->type == GAMEOBJECT_TYPE_MO_TRANSPORT; }
+        bool IsStaticTransport() const { return GetGOInfo()->type == GAMEOBJECT_TYPE_TRANSPORT; }
+        bool IsMotionTransport() const { return GetGOInfo()->type == GAMEOBJECT_TYPE_MO_TRANSPORT; }
 
         Transport* ToTransport() { if (GetGOInfo()->type == GAMEOBJECT_TYPE_MO_TRANSPORT || GetGOInfo()->type == GAMEOBJECT_TYPE_TRANSPORT) return reinterpret_cast<Transport*>(this); else return NULL; }
         Transport const* ToTransport() const { if (GetGOInfo()->type == GAMEOBJECT_TYPE_MO_TRANSPORT || GetGOInfo()->type == GAMEOBJECT_TYPE_TRANSPORT) return reinterpret_cast<Transport const*>(this); else return NULL; }
@@ -886,7 +886,7 @@ class GameObject : public WorldObject, public GridObject<GameObject>, public Mov
         GameObjectTemplate const* m_goInfo;
         GameObjectData const* m_goData;
         GameObjectValue m_goValue;
-		bool m_allowModifyDestructibleBuilding;
+        bool m_allowModifyDestructibleBuilding;
 
         int64 m_packedRotation;
         G3D::Quat m_worldRotation;
@@ -895,10 +895,10 @@ class GameObject : public WorldObject, public GridObject<GameObject>, public Mov
         uint64 m_lootRecipient;
         uint32 m_lootRecipientGroup;
         uint16 m_LootMode;                                  // bitmask, default LOOT_MODE_DEFAULT, determines what loot will be lootable
-		uint32 m_lootGenerationTime;
+        uint32 m_lootGenerationTime;
     private:
-		void CheckRitualList();
-		void ClearRitualList();
+        void CheckRitualList();
+        void ClearRitualList();
         void RemoveFromOwner();
         void SwitchDoorOrButton(bool activate, bool alternative = false);
         void UpdatePackedRotation();
@@ -907,7 +907,7 @@ class GameObject : public WorldObject, public GridObject<GameObject>, public Mov
         bool _IsWithinDist(WorldObject const* obj, float dist2compare, bool /*is3D*/) const
         {
             //! Following check does check 3d distance
-			dist2compare += obj->GetObjectSize();
+            dist2compare += obj->GetObjectSize();
             return IsInRange(obj->GetPositionX(), obj->GetPositionY(), obj->GetPositionZ(), dist2compare);
         }
         GameObjectAI* m_AI;

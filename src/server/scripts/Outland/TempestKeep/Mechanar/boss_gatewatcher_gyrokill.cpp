@@ -54,8 +54,8 @@ class boss_gatewatcher_gyrokill : public CreatureScript
 
             void KilledUnit(Unit* victim)
             {
-				if (victim->GetTypeId() == TYPEID_PLAYER)
-					Talk(SAY_SLAY);
+                if (victim->GetTypeId() == TYPEID_PLAYER)
+                    Talk(SAY_SLAY);
             }
 
             void UpdateAI(uint32 diff)
@@ -74,8 +74,8 @@ class boss_gatewatcher_gyrokill : public CreatureScript
                         events.ScheduleEvent(EVENT_STREAM_OF_MACHINE_FLUID, urand(12000, 14000));
                         break;
                     case EVENT_SAW_BLADE:
-						if (Unit* target= SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f))
-							me->CastSpell(target, SPELL_SAW_BLADE, false);
+                        if (Unit* target= SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f))
+                            me->CastSpell(target, SPELL_SAW_BLADE, false);
                         Talk(SAY_SAW_BLADE);
                         events.ScheduleEvent(EVENT_SAW_BLADE, 25000);
                         break;

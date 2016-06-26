@@ -74,7 +74,7 @@ void WorldRunnable::run()
         #endif
     }
 
-	sLog->SetLogDB(false);
+    sLog->SetLogDB(false);
 
     sScriptMgr->OnShutdown();
 
@@ -95,42 +95,42 @@ void WorldRunnable::run()
 void AuctionListingRunnable::run()
 {
     sLog->outString("Starting up Auction House Listing thread...");
-	while (!World::IsStopped())
-	{
-		if (AsyncAuctionListingMgr::IsAuctionListingAllowed())
-		{
-			uint32 diff = AsyncAuctionListingMgr::GetDiff();
-			AsyncAuctionListingMgr::ResetDiff();
+    while (!World::IsStopped())
+    {
+        if (AsyncAuctionListingMgr::IsAuctionListingAllowed())
+        {
+            uint32 diff = AsyncAuctionListingMgr::GetDiff();
+            AsyncAuctionListingMgr::ResetDiff();
 
-			if (AsyncAuctionListingMgr::GetTempList().size() || AsyncAuctionListingMgr::GetList().size())
-			{
-				TRINITY_GUARD(ACE_Thread_Mutex, AsyncAuctionListingMgr::GetLock());
+            if (AsyncAuctionListingMgr::GetTempList().size() || AsyncAuctionListingMgr::GetList().size())
+            {
+                TRINITY_GUARD(ACE_Thread_Mutex, AsyncAuctionListingMgr::GetLock());
 
-				{
-					TRINITY_GUARD(ACE_Thread_Mutex, AsyncAuctionListingMgr::GetTempLock());
-					for (std::list<AuctionListItemsDelayEvent>::iterator itr = AsyncAuctionListingMgr::GetTempList().begin(); itr != AsyncAuctionListingMgr::GetTempList().end(); ++itr)
-						AsyncAuctionListingMgr::GetList().push_back( (*itr) );
-					AsyncAuctionListingMgr::GetTempList().clear();
-				}
+                {
+                    TRINITY_GUARD(ACE_Thread_Mutex, AsyncAuctionListingMgr::GetTempLock());
+                    for (std::list<AuctionListItemsDelayEvent>::iterator itr = AsyncAuctionListingMgr::GetTempList().begin(); itr != AsyncAuctionListingMgr::GetTempList().end(); ++itr)
+                        AsyncAuctionListingMgr::GetList().push_back( (*itr) );
+                    AsyncAuctionListingMgr::GetTempList().clear();
+                }
 
-				for (std::list<AuctionListItemsDelayEvent>::iterator itr = AsyncAuctionListingMgr::GetList().begin(); itr != AsyncAuctionListingMgr::GetList().end(); ++itr)
-				{
-					if ((*itr)._msTimer <= diff)
-						(*itr)._msTimer = 0;
-					else
-						(*itr)._msTimer -= diff;
-				}
+                for (std::list<AuctionListItemsDelayEvent>::iterator itr = AsyncAuctionListingMgr::GetList().begin(); itr != AsyncAuctionListingMgr::GetList().end(); ++itr)
+                {
+                    if ((*itr)._msTimer <= diff)
+                        (*itr)._msTimer = 0;
+                    else
+                        (*itr)._msTimer -= diff;
+                }
 
-				for (std::list<AuctionListItemsDelayEvent>::iterator itr = AsyncAuctionListingMgr::GetList().begin(); itr != AsyncAuctionListingMgr::GetList().end(); ++itr)
-					if ((*itr)._msTimer == 0)
-					{
-						if ((*itr).Execute())
-							AsyncAuctionListingMgr::GetList().erase(itr);
-						break;
-					}
-			}
-		}
-		ACE_Based::Thread::Sleep(1);
-	}
+                for (std::list<AuctionListItemsDelayEvent>::iterator itr = AsyncAuctionListingMgr::GetList().begin(); itr != AsyncAuctionListingMgr::GetList().end(); ++itr)
+                    if ((*itr)._msTimer == 0)
+                    {
+                        if ((*itr).Execute())
+                            AsyncAuctionListingMgr::GetList().erase(itr);
+                        break;
+                    }
+            }
+        }
+        ACE_Based::Thread::Sleep(1);
+    }
     sLog->outString("Auction House Listing thread exiting without problems.");
 }

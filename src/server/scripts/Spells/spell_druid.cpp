@@ -29,20 +29,20 @@
 
 enum DruidSpells
 {
-	// Ours
-	SPELL_DRUID_GLYPH_OF_WILD_GROWTH        = 62970,
-	SPELL_DRUID_NURTURING_INSTINCT_R1		= 47179,
-	SPELL_DRUID_NURTURING_INSTINCT_R2		= 47180,
-	SPELL_DRUID_FERAL_SWIFTNESS_R1			= 17002,
-	SPELL_DRUID_FERAL_SWIFTNESS_R2			= 24866,
-	SPELL_DRUID_FERAL_SWIFTNESS_PASSIVE_1	= 24867,
-	SPELL_DRUID_FERAL_SWIFTNESS_PASSIVE_2	= 24864,
-	SPELL_DRUID_BARKSKIN					= 22812,
-	SPELL_DRUID_GLYPH_OF_BARKSKIN			= 63057,
-	SPELL_DRUID_GLYPH_OF_BARKSKIN_TRIGGER	= 63058,
+    // Ours
+    SPELL_DRUID_GLYPH_OF_WILD_GROWTH        = 62970,
+    SPELL_DRUID_NURTURING_INSTINCT_R1       = 47179,
+    SPELL_DRUID_NURTURING_INSTINCT_R2       = 47180,
+    SPELL_DRUID_FERAL_SWIFTNESS_R1          = 17002,
+    SPELL_DRUID_FERAL_SWIFTNESS_R2          = 24866,
+    SPELL_DRUID_FERAL_SWIFTNESS_PASSIVE_1   = 24867,
+    SPELL_DRUID_FERAL_SWIFTNESS_PASSIVE_2   = 24864,
+    SPELL_DRUID_BARKSKIN                    = 22812,
+    SPELL_DRUID_GLYPH_OF_BARKSKIN           = 63057,
+    SPELL_DRUID_GLYPH_OF_BARKSKIN_TRIGGER   = 63058,
 
 
-	// Theirs
+    // Theirs
     SPELL_DRUID_ENRAGE_MOD_DAMAGE           = 51185,
     SPELL_DRUID_GLYPH_OF_TYPHOON            = 62135,
     SPELL_DRUID_IDOL_OF_FERAL_SHADOWS       = 34241,
@@ -72,18 +72,18 @@ class spell_dru_t10_balance_4p_bonus : public SpellScriptLoader
 
             bool CheckProc(ProcEventInfo& eventInfo)
             {
-				return eventInfo.GetActor() && eventInfo.GetProcTarget();
+                return eventInfo.GetActor() && eventInfo.GetProcTarget();
             }
 
             void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
             {
                 PreventDefaultAction();
 
-		        uint32 triggered_spell_id = 71023;
+                uint32 triggered_spell_id = 71023;
                 SpellInfo const* triggeredSpell = sSpellMgr->GetSpellInfo(triggered_spell_id);
 
-				int32 amount = CalculatePct(eventInfo.GetDamageInfo()->GetDamage(), aurEff->GetAmount()) / triggeredSpell->GetMaxTicks();
-				eventInfo.GetProcTarget()->CastDelayedSpellWithPeriodicAmount(GetTarget(), triggered_spell_id, SPELL_AURA_PERIODIC_DAMAGE, amount, EFFECT_0);
+                int32 amount = CalculatePct(eventInfo.GetDamageInfo()->GetDamage(), aurEff->GetAmount()) / triggeredSpell->GetMaxTicks();
+                eventInfo.GetProcTarget()->CastDelayedSpellWithPeriodicAmount(GetTarget(), triggered_spell_id, SPELL_AURA_PERIODIC_DAMAGE, amount, EFFECT_0);
 
                 //GetTarget()->CastCustomSpell(triggered_spell_id, SPELLVALUE_BASE_POINT0, amount, eventInfo.GetProcTarget(), true, NULL, aurEff);
             }
@@ -112,14 +112,14 @@ class spell_dru_nurturing_instinct : public SpellScriptLoader
 
             void AfterApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
             {
-				if (Player* player = GetTarget()->ToPlayer())
-					player->addSpell(GetSpellInfo()->GetRank() == 1 ? SPELL_DRUID_NURTURING_INSTINCT_R1 : SPELL_DRUID_NURTURING_INSTINCT_R2, SPEC_MASK_ALL, false, true);
+                if (Player* player = GetTarget()->ToPlayer())
+                    player->addSpell(GetSpellInfo()->GetRank() == 1 ? SPELL_DRUID_NURTURING_INSTINCT_R1 : SPELL_DRUID_NURTURING_INSTINCT_R2, SPEC_MASK_ALL, false, true);
             }
 
             void AfterRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
-				if (Player* player = GetTarget()->ToPlayer())
-					player->removeSpell(GetSpellInfo()->GetRank() == 1 ? SPELL_DRUID_NURTURING_INSTINCT_R1 : SPELL_DRUID_NURTURING_INSTINCT_R2, SPEC_MASK_ALL, true);
+                if (Player* player = GetTarget()->ToPlayer())
+                    player->removeSpell(GetSpellInfo()->GetRank() == 1 ? SPELL_DRUID_NURTURING_INSTINCT_R1 : SPELL_DRUID_NURTURING_INSTINCT_R2, SPEC_MASK_ALL, true);
             }
 
             void Register()
@@ -146,9 +146,9 @@ class spell_dru_feral_swiftness : public SpellScriptLoader
 
             void AfterApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
             {
-				if (Player* player = GetTarget()->ToPlayer())
-					if (uint8 rank = player->HasTalent(SPELL_DRUID_FERAL_SWIFTNESS_R1, player->GetActiveSpec()) ? 1 : (player->HasTalent(SPELL_DRUID_FERAL_SWIFTNESS_R2, player->GetActiveSpec()) ? 2 : 0))
-						player->CastSpell(player, rank == 1 ? SPELL_DRUID_FERAL_SWIFTNESS_PASSIVE_1 : SPELL_DRUID_FERAL_SWIFTNESS_PASSIVE_2, true, NULL, aurEff, GetCasterGUID());
+                if (Player* player = GetTarget()->ToPlayer())
+                    if (uint8 rank = player->HasTalent(SPELL_DRUID_FERAL_SWIFTNESS_R1, player->GetActiveSpec()) ? 1 : (player->HasTalent(SPELL_DRUID_FERAL_SWIFTNESS_R2, player->GetActiveSpec()) ? 2 : 0))
+                        player->CastSpell(player, rank == 1 ? SPELL_DRUID_FERAL_SWIFTNESS_PASSIVE_1 : SPELL_DRUID_FERAL_SWIFTNESS_PASSIVE_2, true, NULL, aurEff, GetCasterGUID());
             }
 
             void AfterRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
@@ -181,16 +181,16 @@ class spell_dru_omen_of_clarity : public SpellScriptLoader
 
             bool CheckProc(ProcEventInfo& eventInfo)
             {
-				const SpellInfo* spellInfo = eventInfo.GetDamageInfo()->GetSpellInfo();
-				if (!spellInfo)
-					return true;
+                const SpellInfo* spellInfo = eventInfo.GetDamageInfo()->GetSpellInfo();
+                if (!spellInfo)
+                    return true;
 
-				// xinef: no mana cost
-				if (spellInfo->ManaCost == 0 && spellInfo->ManaCostPercentage == 0)
-					return false;
+                // xinef: no mana cost
+                if (spellInfo->ManaCost == 0 && spellInfo->ManaCostPercentage == 0)
+                    return false;
 
-				// xinef: SPELL_ATTR0_CU_NO_INITIAL_THREAT and SPELL_ATTR0_CU_DIRECT_DAMAGE contains spells capable of healing and damaging + some others, but this is taken care of above
-				return spellInfo->HasAttribute(SpellCustomAttributes(SPELL_ATTR0_CU_DIRECT_DAMAGE|SPELL_ATTR0_CU_NO_INITIAL_THREAT));
+                // xinef: SPELL_ATTR0_CU_NO_INITIAL_THREAT and SPELL_ATTR0_CU_DIRECT_DAMAGE contains spells capable of healing and damaging + some others, but this is taken care of above
+                return spellInfo->HasAttribute(SpellCustomAttributes(SPELL_ATTR0_CU_DIRECT_DAMAGE|SPELL_ATTR0_CU_NO_INITIAL_THREAT));
             }
 
             void Register()
@@ -216,31 +216,31 @@ class spell_dru_brambles_treant : public SpellScriptLoader
 
             bool CheckProc(ProcEventInfo& eventInfo)
             {
-				if (Player* player = GetUnitOwner()->GetSpellModOwner())
-				{
-					int32 amount = 0;
-					if (player->HasAura(SPELL_DRUID_BARKSKIN, player->GetGUID()))
-						player->ApplySpellMod(SPELL_DRUID_BARKSKIN, SPELLMOD_CHANCE_OF_SUCCESS, amount);
+                if (Player* player = GetUnitOwner()->GetSpellModOwner())
+                {
+                    int32 amount = 0;
+                    if (player->HasAura(SPELL_DRUID_BARKSKIN, player->GetGUID()))
+                        player->ApplySpellMod(SPELL_DRUID_BARKSKIN, SPELLMOD_CHANCE_OF_SUCCESS, amount);
 
-					return roll_chance_i(amount);
-				}
+                    return roll_chance_i(amount);
+                }
 
-				return false;
+                return false;
             }
 
-			void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
-			{
-				// xinef: chance of success stores proper amount of damage increase
-				// xinef: little hack because GetSpellModOwner will return NULL pointer at this point (early summoning stage)
-				if (GetUnitOwner()->IsSummon())
-					if (Unit* owner = GetUnitOwner()->ToTempSummon()->GetSummoner())
-						if (Player* player = owner->GetSpellModOwner())
-							player->ApplySpellMod(SPELL_DRUID_BARKSKIN, SPELLMOD_CHANCE_OF_SUCCESS, amount);
-			}
+            void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
+            {
+                // xinef: chance of success stores proper amount of damage increase
+                // xinef: little hack because GetSpellModOwner will return NULL pointer at this point (early summoning stage)
+                if (GetUnitOwner()->IsSummon())
+                    if (Unit* owner = GetUnitOwner()->ToTempSummon()->GetSummoner())
+                        if (Player* player = owner->GetSpellModOwner())
+                            player->ApplySpellMod(SPELL_DRUID_BARKSKIN, SPELLMOD_CHANCE_OF_SUCCESS, amount);
+            }
 
             void Register()
             {
-				DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_dru_brambles_treant_AuraScript::CalculateAmount, EFFECT_0, SPELL_AURA_MOD_DAMAGE_PERCENT_DONE);
+                DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_dru_brambles_treant_AuraScript::CalculateAmount, EFFECT_0, SPELL_AURA_MOD_DAMAGE_PERCENT_DONE);
                 DoCheckProc += AuraCheckProcFn(spell_dru_brambles_treant_AuraScript::CheckProc);
             }
         };
@@ -262,13 +262,13 @@ class spell_dru_barkskin : public SpellScriptLoader
 
             void AfterApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
             {
-				if (GetUnitOwner()->HasAura(SPELL_DRUID_GLYPH_OF_BARKSKIN, GetUnitOwner()->GetGUID()))
-					GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_DRUID_GLYPH_OF_BARKSKIN_TRIGGER, true);
+                if (GetUnitOwner()->HasAura(SPELL_DRUID_GLYPH_OF_BARKSKIN, GetUnitOwner()->GetGUID()))
+                    GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_DRUID_GLYPH_OF_BARKSKIN_TRIGGER, true);
             }
 
             void AfterRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
-				GetUnitOwner()->RemoveAurasDueToSpell(SPELL_DRUID_GLYPH_OF_BARKSKIN_TRIGGER, GetUnitOwner()->GetGUID());
+                GetUnitOwner()->RemoveAurasDueToSpell(SPELL_DRUID_GLYPH_OF_BARKSKIN_TRIGGER, GetUnitOwner()->GetGUID());
             }
 
             void Register()
@@ -295,77 +295,77 @@ class spell_dru_treant_scaling : public SpellScriptLoader
 
             void CalculateResistanceAmount(AuraEffect const* aurEff, int32 & amount, bool & /*canBeRecalculated*/)
             {
-				// xinef: treant inherits 40% of resistance from owner and 35% of armor (guessed)
-				if (Unit* owner = GetUnitOwner()->GetOwner())
-				{
-					SpellSchoolMask schoolMask = SpellSchoolMask(aurEff->GetSpellInfo()->Effects[aurEff->GetEffIndex()].MiscValue);
-					int32 modifier = schoolMask == SPELL_SCHOOL_MASK_NORMAL ? 35 : 40;
-					amount = CalculatePct(std::max<int32>(0, owner->GetResistance(schoolMask)), modifier);
-				}
+                // xinef: treant inherits 40% of resistance from owner and 35% of armor (guessed)
+                if (Unit* owner = GetUnitOwner()->GetOwner())
+                {
+                    SpellSchoolMask schoolMask = SpellSchoolMask(aurEff->GetSpellInfo()->Effects[aurEff->GetEffIndex()].MiscValue);
+                    int32 modifier = schoolMask == SPELL_SCHOOL_MASK_NORMAL ? 35 : 40;
+                    amount = CalculatePct(std::max<int32>(0, owner->GetResistance(schoolMask)), modifier);
+                }
             }
 
             void CalculateStatAmount(AuraEffect const* aurEff, int32 & amount, bool & /*canBeRecalculated*/)
             {
-				// xinef: treant inherits 30% of intellect / stamina (guessed)
-				if (Unit* owner = GetUnitOwner()->GetOwner())
-				{
-					Stats stat = Stats(aurEff->GetSpellInfo()->Effects[aurEff->GetEffIndex()].MiscValue);
-					amount = CalculatePct(std::max<int32>(0, owner->GetStat(stat)), 30);
-				}
+                // xinef: treant inherits 30% of intellect / stamina (guessed)
+                if (Unit* owner = GetUnitOwner()->GetOwner())
+                {
+                    Stats stat = Stats(aurEff->GetSpellInfo()->Effects[aurEff->GetEffIndex()].MiscValue);
+                    amount = CalculatePct(std::max<int32>(0, owner->GetStat(stat)), 30);
+                }
             }
 
-			void CalculateAPAmount(AuraEffect const* aurEff, int32 & amount, bool & /*canBeRecalculated*/)
+            void CalculateAPAmount(AuraEffect const* aurEff, int32 & amount, bool & /*canBeRecalculated*/)
             {
-				// xinef: treant inherits 105% of SP as AP - 15% of damage increase per hit
-				if (Unit* owner = GetUnitOwner()->GetOwner())
-				{
-					int32 nature = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_NATURE);
-					amount = CalculatePct(std::max<int32>(0, nature), 105);
+                // xinef: treant inherits 105% of SP as AP - 15% of damage increase per hit
+                if (Unit* owner = GetUnitOwner()->GetOwner())
+                {
+                    int32 nature = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_NATURE);
+                    amount = CalculatePct(std::max<int32>(0, nature), 105);
 
-					// xinef: brambles talent
-					if (AuraEffect const* bramblesEff = owner->GetAuraEffect(SPELL_AURA_ADD_FLAT_MODIFIER, SPELLFAMILY_DRUID, 53, 2))
-						AddPct(amount, bramblesEff->GetAmount());
-				}
+                    // xinef: brambles talent
+                    if (AuraEffect const* bramblesEff = owner->GetAuraEffect(SPELL_AURA_ADD_FLAT_MODIFIER, SPELLFAMILY_DRUID, 53, 2))
+                        AddPct(amount, bramblesEff->GetAmount());
+                }
             }
 
-			void CalculateSPAmount(AuraEffect const* aurEff, int32 & amount, bool & /*canBeRecalculated*/)
+            void CalculateSPAmount(AuraEffect const* aurEff, int32 & amount, bool & /*canBeRecalculated*/)
             {
-				// xinef: treant inherits 15% of SP
-				if (Unit* owner = GetUnitOwner()->GetOwner())
-				{
-					int32 nature = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_NATURE);
-					amount = CalculatePct(std::max<int32>(0, nature), 15);
+                // xinef: treant inherits 15% of SP
+                if (Unit* owner = GetUnitOwner()->GetOwner())
+                {
+                    int32 nature = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_NATURE);
+                    amount = CalculatePct(std::max<int32>(0, nature), 15);
 
-					// xinef: Update appropriate player field
-					if (owner->GetTypeId() == TYPEID_PLAYER)
-						owner->SetUInt32Value(PLAYER_PET_SPELL_POWER, (uint32)amount);
-				}
+                    // xinef: Update appropriate player field
+                    if (owner->GetTypeId() == TYPEID_PLAYER)
+                        owner->SetUInt32Value(PLAYER_PET_SPELL_POWER, (uint32)amount);
+                }
             }
 
-			void HandleEffectApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
-			{
-				GetUnitOwner()->ApplySpellImmune(0, IMMUNITY_STATE, aurEff->GetAuraType(), true, SPELL_BLOCK_TYPE_POSITIVE);
-				if (aurEff->GetAuraType() == SPELL_AURA_MOD_ATTACK_POWER)
-					GetUnitOwner()->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_ATTACK_POWER_PCT, true, SPELL_BLOCK_TYPE_POSITIVE);
-				else if (aurEff->GetAuraType() == SPELL_AURA_MOD_STAT)
-					GetUnitOwner()->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TOTAL_STAT_PERCENTAGE, true, SPELL_BLOCK_TYPE_POSITIVE);
-			}
+            void HandleEffectApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+            {
+                GetUnitOwner()->ApplySpellImmune(0, IMMUNITY_STATE, aurEff->GetAuraType(), true, SPELL_BLOCK_TYPE_POSITIVE);
+                if (aurEff->GetAuraType() == SPELL_AURA_MOD_ATTACK_POWER)
+                    GetUnitOwner()->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_ATTACK_POWER_PCT, true, SPELL_BLOCK_TYPE_POSITIVE);
+                else if (aurEff->GetAuraType() == SPELL_AURA_MOD_STAT)
+                    GetUnitOwner()->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TOTAL_STAT_PERCENTAGE, true, SPELL_BLOCK_TYPE_POSITIVE);
+            }
 
             void Register()
             {
-				if (m_scriptSpellId != 35669)
-					DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_dru_treant_scaling_AuraScript::CalculateResistanceAmount, EFFECT_ALL, SPELL_AURA_MOD_RESISTANCE);
+                if (m_scriptSpellId != 35669)
+                    DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_dru_treant_scaling_AuraScript::CalculateResistanceAmount, EFFECT_ALL, SPELL_AURA_MOD_RESISTANCE);
 
-				if (m_scriptSpellId == 35669 || m_scriptSpellId == 35670)
-					DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_dru_treant_scaling_AuraScript::CalculateStatAmount, EFFECT_ALL, SPELL_AURA_MOD_STAT);
+                if (m_scriptSpellId == 35669 || m_scriptSpellId == 35670)
+                    DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_dru_treant_scaling_AuraScript::CalculateStatAmount, EFFECT_ALL, SPELL_AURA_MOD_STAT);
 
-				if (m_scriptSpellId == 35669)
-				{
-					DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_dru_treant_scaling_AuraScript::CalculateAPAmount, EFFECT_ALL, SPELL_AURA_MOD_ATTACK_POWER);
-					DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_dru_treant_scaling_AuraScript::CalculateSPAmount, EFFECT_ALL, SPELL_AURA_MOD_DAMAGE_DONE);
-				}
+                if (m_scriptSpellId == 35669)
+                {
+                    DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_dru_treant_scaling_AuraScript::CalculateAPAmount, EFFECT_ALL, SPELL_AURA_MOD_ATTACK_POWER);
+                    DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_dru_treant_scaling_AuraScript::CalculateSPAmount, EFFECT_ALL, SPELL_AURA_MOD_DAMAGE_DONE);
+                }
 
-				OnEffectApply += AuraEffectApplyFn(spell_dru_treant_scaling_AuraScript::HandleEffectApply, EFFECT_ALL, SPELL_AURA_ANY, AURA_EFFECT_HANDLE_REAL);
+                OnEffectApply += AuraEffectApplyFn(spell_dru_treant_scaling_AuraScript::HandleEffectApply, EFFECT_ALL, SPELL_AURA_ANY, AURA_EFFECT_HANDLE_REAL);
             }
         };
 
@@ -614,20 +614,20 @@ class spell_dru_lifebloom : public SpellScriptLoader
                 if (GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_EXPIRE)
                     return;
 
-				// final heal
+                // final heal
                 int32 stack = GetStackAmount();
                 int32 healAmount = aurEff->GetAmount();
-				const SpellInfo* finalHeal = sSpellMgr->GetSpellInfo(SPELL_DRUID_LIFEBLOOM_FINAL_HEAL);
+                const SpellInfo* finalHeal = sSpellMgr->GetSpellInfo(SPELL_DRUID_LIFEBLOOM_FINAL_HEAL);
 
-				if (Unit* caster = GetCaster())
-				{
-					healAmount = caster->SpellHealingBonusDone(GetTarget(), finalHeal, healAmount, HEAL, 0.0f, stack);
-					healAmount = GetTarget()->SpellHealingBonusTaken(caster, finalHeal, healAmount, HEAL, stack);
-					// restore mana
-					int32 returnmana = (GetSpellInfo()->ManaCostPercentage * caster->GetCreateMana() / 100) * stack / 2;
-					caster->CastCustomSpell(caster, SPELL_DRUID_LIFEBLOOM_ENERGIZE, &returnmana, NULL, NULL, true, NULL, aurEff, GetCasterGUID());
-				}
-				GetTarget()->CastCustomSpell(GetTarget(), SPELL_DRUID_LIFEBLOOM_FINAL_HEAL, &healAmount, NULL, NULL, true, NULL, aurEff, GetCasterGUID());
+                if (Unit* caster = GetCaster())
+                {
+                    healAmount = caster->SpellHealingBonusDone(GetTarget(), finalHeal, healAmount, HEAL, 0.0f, stack);
+                    healAmount = GetTarget()->SpellHealingBonusTaken(caster, finalHeal, healAmount, HEAL, stack);
+                    // restore mana
+                    int32 returnmana = (GetSpellInfo()->ManaCostPercentage * caster->GetCreateMana() / 100) * stack / 2;
+                    caster->CastCustomSpell(caster, SPELL_DRUID_LIFEBLOOM_ENERGIZE, &returnmana, NULL, NULL, true, NULL, aurEff, GetCasterGUID());
+                }
+                GetTarget()->CastCustomSpell(GetTarget(), SPELL_DRUID_LIFEBLOOM_FINAL_HEAL, &healAmount, NULL, NULL, true, NULL, aurEff, GetCasterGUID());
             }
 
             void HandleDispel(DispelInfo* dispelInfo)
@@ -636,19 +636,19 @@ class spell_dru_lifebloom : public SpellScriptLoader
                 {
                     if (AuraEffect const* aurEff = GetEffect(EFFECT_1))
                     {
-						Unit* caster = GetCaster();
-						int32 healAmount = GetSpellInfo()->Effects[EFFECT_1].CalcValue(caster ? caster : target, 0, target) * dispelInfo->GetRemovedCharges();
-						const SpellInfo* finalHeal = sSpellMgr->GetSpellInfo(SPELL_DRUID_LIFEBLOOM_FINAL_HEAL);
-						if (caster)
-						{
-							// healing with bonus
+                        Unit* caster = GetCaster();
+                        int32 healAmount = GetSpellInfo()->Effects[EFFECT_1].CalcValue(caster ? caster : target, 0, target) * dispelInfo->GetRemovedCharges();
+                        const SpellInfo* finalHeal = sSpellMgr->GetSpellInfo(SPELL_DRUID_LIFEBLOOM_FINAL_HEAL);
+                        if (caster)
+                        {
+                            // healing with bonus
                             healAmount = caster->SpellHealingBonusDone(target, finalHeal, healAmount, HEAL, 0.0f, dispelInfo->GetRemovedCharges());
-							healAmount = target->SpellHealingBonusTaken(caster, finalHeal, healAmount, HEAL, dispelInfo->GetRemovedCharges());
-							
-							// mana amount
-							int32 mana = CalculatePct(caster->GetCreateMana(), GetSpellInfo()->ManaCostPercentage) * dispelInfo->GetRemovedCharges() / 2;
-							caster->CastCustomSpell(caster, SPELL_DRUID_LIFEBLOOM_ENERGIZE, &mana, NULL, NULL, true, NULL, NULL, GetCasterGUID());
-						}
+                            healAmount = target->SpellHealingBonusTaken(caster, finalHeal, healAmount, HEAL, dispelInfo->GetRemovedCharges());
+                            
+                            // mana amount
+                            int32 mana = CalculatePct(caster->GetCreateMana(), GetSpellInfo()->ManaCostPercentage) * dispelInfo->GetRemovedCharges() / 2;
+                            caster->CastCustomSpell(caster, SPELL_DRUID_LIFEBLOOM_ENERGIZE, &mana, NULL, NULL, true, NULL, NULL, GetCasterGUID());
+                        }
                         target->CastCustomSpell(target, SPELL_DRUID_LIFEBLOOM_FINAL_HEAL, &healAmount, NULL, NULL, true, NULL, NULL, GetCasterGUID());
                     }
                 }
@@ -1305,7 +1305,7 @@ class spell_dru_t10_restoration_4p_bonus : public SpellScriptLoader
                         return;
                     }
 
-					tempTargets.sort(Trinity::HealthPctOrderPred());
+                    tempTargets.sort(Trinity::HealthPctOrderPred());
                     targets.clear();
                     targets.push_back(tempTargets.front());
                 }
@@ -1342,7 +1342,7 @@ class spell_dru_wild_growth : public SpellScriptLoader
 
             void FilterTargets(std::list<WorldObject*>& targets)
             {
-				targets.remove_if(Trinity::RaidCheck(GetCaster(), false));
+                targets.remove_if(Trinity::RaidCheck(GetCaster(), false));
 
                 uint32 const maxTargets = GetCaster()->HasAura(SPELL_DRUID_GLYPH_OF_WILD_GROWTH) ? 6 : 5;
 
@@ -1378,16 +1378,16 @@ class spell_dru_wild_growth : public SpellScriptLoader
 
 void AddSC_druid_spell_scripts()
 {
-	// Ours
-	new spell_dru_t10_balance_4p_bonus();
-	new spell_dru_nurturing_instinct();
-	new spell_dru_feral_swiftness();
-	new spell_dru_omen_of_clarity();
-	new spell_dru_brambles_treant();
-	new spell_dru_barkskin();
-	new spell_dru_treant_scaling();
+    // Ours
+    new spell_dru_t10_balance_4p_bonus();
+    new spell_dru_nurturing_instinct();
+    new spell_dru_feral_swiftness();
+    new spell_dru_omen_of_clarity();
+    new spell_dru_brambles_treant();
+    new spell_dru_barkskin();
+    new spell_dru_treant_scaling();
 
-	// Theirs
+    // Theirs
     new spell_dru_dash();
     new spell_dru_enrage();
     new spell_dru_glyph_of_starfire();

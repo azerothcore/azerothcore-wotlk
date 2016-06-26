@@ -228,7 +228,7 @@ class WorldSession
         Player* GetPlayer() const { return _player; }
         std::string const& GetPlayerName() const;
         std::string GetPlayerInfo() const;
-		
+        
         uint32 GetCurrentVendor() const { return m_currentVendorEntry; }
         void SetCurrentVendor(uint32 vendorEntry) { m_currentVendorEntry = vendorEntry; }
 
@@ -359,10 +359,10 @@ class WorldSession
         void SetLatency(uint32 latency) { m_latency = latency; }
         void ResetClientTimeDelay() { m_clientTimeDelay = 0; }
 
-		ACE_Atomic_Op<ACE_Thread_Mutex, time_t> m_timeOutTime;
+        ACE_Atomic_Op<ACE_Thread_Mutex, time_t> m_timeOutTime;
         void UpdateTimeOutTime(uint32 diff)
         {
-			if (time_t(diff) > m_timeOutTime.value())
+            if (time_t(diff) > m_timeOutTime.value())
                 m_timeOutTime = 0;
             else
                 m_timeOutTime -= diff;
@@ -394,8 +394,8 @@ class WorldSession
         void HandlePlayerLoginOpcode(WorldPacket& recvPacket);
         void HandleCharEnum(PreparedQueryResult result);
         void HandlePlayerLoginFromDB(LoginQueryHolder * holder);
-		void HandlePlayerLoginToCharInWorld(Player* pCurrChar);
-		void HandlePlayerLoginToCharOutOfWorld(Player* pCurrChar);
+        void HandlePlayerLoginToCharInWorld(Player* pCurrChar);
+        void HandlePlayerLoginToCharOutOfWorld(Player* pCurrChar);
         void HandleCharFactionOrRaceChange(WorldPacket& recvData);
 
         // played time
@@ -588,11 +588,11 @@ class WorldSession
         void HandleStableRevivePet(WorldPacket& recvPacket);
         void HandleStableSwapPet(WorldPacket& recvPacket);
         void HandleStableSwapPetCallback(PreparedQueryResult result, uint32 petId);
-		void HandleOpenWrappedItemCallback(PreparedQueryResult result, uint8 bagIndex, uint8 slot, uint32 itemLowGUID);
-		void HandleLoadActionsSwitchSpec(PreparedQueryResult result);
-		void HandleCharacterAuraFrozen(PreparedQueryResult result);
-		uint8 HandleLoadPetFromDBFirstCallback(PreparedQueryResult result, uint8 asynchLoadType);
-		void HandleLoadPetFromDBSecondCallback(LoadPetFromDBQueryHolder * holder);
+        void HandleOpenWrappedItemCallback(PreparedQueryResult result, uint8 bagIndex, uint8 slot, uint32 itemLowGUID);
+        void HandleLoadActionsSwitchSpec(PreparedQueryResult result);
+        void HandleCharacterAuraFrozen(PreparedQueryResult result);
+        uint8 HandleLoadPetFromDBFirstCallback(PreparedQueryResult result, uint8 asynchLoadType);
+        void HandleLoadPetFromDBSecondCallback(LoadPetFromDBQueryHolder * holder);
 
         void HandleDuelAcceptedOpcode(WorldPacket& recvPacket);
         void HandleDuelCancelledOpcode(WorldPacket& recvPacket);
@@ -777,7 +777,7 @@ class WorldSession
         void HandleResetInstancesOpcode(WorldPacket& recvData);
         void HandleHearthAndResurrect(WorldPacket& recvData);
         void HandleInstanceLockResponse(WorldPacket& recvPacket);
-		void HandleUpdateMissileTrajectory(WorldPacket& recvPacket);
+        void HandleUpdateMissileTrajectory(WorldPacket& recvPacket);
 
         // Battlefield
         void SendBfInvitePlayerToWar(uint32 battleId, uint32 zoneId, uint32 time);
@@ -907,30 +907,30 @@ class WorldSession
         void HandleEnterPlayerVehicle(WorldPacket& data);
         void HandleUpdateProjectilePosition(WorldPacket& recvPacket);
 
-		// _loadPetFromDBFirstCallback helpers
-		//QueryCallback<PreparedQueryResult, uint64> GetLoadPetFromDBFirstCallback() { return _loadPetFromDBFirstCallback; }
+        // _loadPetFromDBFirstCallback helpers
+        //QueryCallback<PreparedQueryResult, uint64> GetLoadPetFromDBFirstCallback() { return _loadPetFromDBFirstCallback; }
 
-		uint32 _lastAuctionListItemsMSTime;
-		uint32 _lastAuctionListOwnerItemsMSTime;
+        uint32 _lastAuctionListItemsMSTime;
+        uint32 _lastAuctionListOwnerItemsMSTime;
 
-		void HandleTeleportTimeout(bool updateInSessions);
-		bool HandleSocketClosed();
-		void SetOfflineTime(uint32 time) { _offlineTime = time; }
-		uint32 GetOfflineTime() const { return _offlineTime; }
-		bool IsKicked() const { return _kicked; }
-		void SetKicked(bool val) { _kicked = val; }
-		void SetShouldSetOfflineInDB(bool val) { _shouldSetOfflineInDB = val; }
-		bool GetShouldSetOfflineInDB() const { return _shouldSetOfflineInDB; }
+        void HandleTeleportTimeout(bool updateInSessions);
+        bool HandleSocketClosed();
+        void SetOfflineTime(uint32 time) { _offlineTime = time; }
+        uint32 GetOfflineTime() const { return _offlineTime; }
+        bool IsKicked() const { return _kicked; }
+        void SetKicked(bool val) { _kicked = val; }
+        void SetShouldSetOfflineInDB(bool val) { _shouldSetOfflineInDB = val; }
+        bool GetShouldSetOfflineInDB() const { return _shouldSetOfflineInDB; }
 
-	/***
-	CALLBACKS
-	***/
+    /***
+    CALLBACKS
+    ***/
     private:
         void InitializeQueryCallbackParameters();
         void ProcessQueryCallbacks();
-		void ProcessQueryCallbackPlayer();
-		void ProcessQueryCallbackPet();
-		void ProcessQueryCallbackLogin();
+        void ProcessQueryCallbackPlayer();
+        void ProcessQueryCallbackPet();
+        void ProcessQueryCallbackLogin();
 
         PreparedQueryResultFuture _charEnumCallback;
         PreparedQueryResultFuture _stablePetCallback;
@@ -942,18 +942,18 @@ class WorldSession
 
         QueryResultHolderFuture _charLoginCallback;
 
-		QueryResultHolderFuture _loadPetFromDBSecondCallback;
-		QueryCallback_3<PreparedQueryResult, uint8, uint8, uint32> _openWrappedItemCallback;
+        QueryResultHolderFuture _loadPetFromDBSecondCallback;
+        QueryCallback_3<PreparedQueryResult, uint8, uint8, uint32> _openWrappedItemCallback;
 
-	public:
-		// xinef: those must be public, requires calls out of worldsession :(
-		QueryCallback_2<PreparedQueryResult, uint32, AsynchPetSummon*> _loadPetFromDBFirstCallback;
-		PreparedQueryResultFuture _loadActionsSwitchSpecCallback;
-		PreparedQueryResultFuture _CharacterAuraFrozenCallback;
+    public:
+        // xinef: those must be public, requires calls out of worldsession :(
+        QueryCallback_2<PreparedQueryResult, uint32, AsynchPetSummon*> _loadPetFromDBFirstCallback;
+        PreparedQueryResultFuture _loadActionsSwitchSpecCallback;
+        PreparedQueryResultFuture _CharacterAuraFrozenCallback;
 
-	/***
-	END OF CALLBACKS
-	***/
+    /***
+    END OF CALLBACKS
+    ***/
     private:
         // private trade methods
         void moveItems(Item* myItems[], Item* hisItems[]);
@@ -1001,12 +1001,12 @@ class WorldSession
         uint32 recruiterId;
         bool isRecruiter;
         ACE_Based::LockedQueue<WorldPacket*, ACE_Thread_Mutex> _recvQueue;
-		uint32 m_currentVendorEntry;
+        uint32 m_currentVendorEntry;
         uint64 m_currentBankerGUID;
         time_t timeWhoCommandAllowed;
-		uint32 _offlineTime;
-		bool _kicked;
-		bool _shouldSetOfflineInDB;
+        uint32 _offlineTime;
+        bool _kicked;
+        bool _shouldSetOfflineInDB;
 };
 #endif
 /// @}

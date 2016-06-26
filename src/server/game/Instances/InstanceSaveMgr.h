@@ -39,8 +39,8 @@ class InstanceSaveManager;
 struct InstancePlayerBind
 {
     InstanceSave* save;
-	bool perm : 1;
-	bool extended : 1;
+    bool perm : 1;
+    bool extended : 1;
     InstancePlayerBind() : save(NULL), perm(false), extended(false) {}
 };
 
@@ -48,7 +48,7 @@ typedef UNORDERED_MAP< uint32 /*mapId*/, InstancePlayerBind > BoundInstancesMap;
 
 struct BoundInstancesMapWrapper
 {
-	BoundInstancesMap m[MAX_DIFFICULTY];
+    BoundInstancesMap m[MAX_DIFFICULTY];
 };
 
 typedef UNORDERED_MAP< uint32 /*guidLow*/, BoundInstancesMapWrapper* > PlayerBindStorage;
@@ -66,17 +66,17 @@ class InstanceSave
 
         /* Saved when the instance is generated for the first time */
         void InsertToDB();
-		// pussywizard: deleting is done internally when there are no binds left
+        // pussywizard: deleting is done internally when there are no binds left
 
-		std::string GetInstanceData() const { return m_instanceData; }
-		void SetInstanceData(std::string str) { m_instanceData = str; }
-		uint32 GetCompletedEncounterMask() const { return m_completedEncounterMask; }
-		void SetCompletedEncounterMask(uint32 mask) { m_completedEncounterMask = mask; }
+        std::string GetInstanceData() const { return m_instanceData; }
+        void SetInstanceData(std::string str) { m_instanceData = str; }
+        uint32 GetCompletedEncounterMask() const { return m_completedEncounterMask; }
+        void SetCompletedEncounterMask(uint32 mask) { m_completedEncounterMask = mask; }
 
         // pussywizard: for normal instances this corresponds to 0, for raid/heroic instances this caches the global reset time for the map
         time_t GetResetTime() const { return m_resetTime; }
         time_t GetExtendedResetTime() const { return m_extendedResetTime; }
-		time_t GetResetTimeForDB();
+        time_t GetResetTimeForDB();
         void SetResetTime(time_t resetTime) { m_resetTime = resetTime; }
         void SetExtendedResetTime(time_t extendedResetTime) { m_extendedResetTime = extendedResetTime; }
 
@@ -86,7 +86,7 @@ class InstanceSave
         InstanceTemplate const* GetTemplate();
         MapEntry const* GetMapEntry();
 
-		void AddPlayer(uint32 guidLow);
+        void AddPlayer(uint32 guidLow);
         bool RemovePlayer(uint32 guidLow, InstanceSaveManager* ism);
 
         typedef std::list<uint32> PlayerListType;
@@ -94,13 +94,13 @@ class InstanceSave
 
         PlayerListType m_playerList;
         time_t m_resetTime;
-		time_t m_extendedResetTime;
+        time_t m_extendedResetTime;
         uint32 m_instanceid;
         uint32 m_mapid;
         Difficulty m_difficulty;
         bool m_canReset;
-		std::string m_instanceData;
-		uint32 m_completedEncounterMask;
+        std::string m_instanceData;
+        uint32 m_completedEncounterMask;
 
         ACE_Thread_Mutex _lock;
 };
@@ -133,8 +133,8 @@ class InstanceSaveManager
 
         void LoadInstances();
         void LoadResetTimes();
-		void LoadInstanceSaves();
-		void LoadCharacterBinds();
+        void LoadInstanceSaves();
+        void LoadCharacterBinds();
 
         time_t GetResetTimeFor(uint32 mapid, Difficulty d) const
         {
@@ -173,22 +173,22 @@ class InstanceSaveManager
 
         InstanceSave* GetInstanceSave(uint32 InstanceId);
 
-		InstancePlayerBind* PlayerBindToInstance(uint32 guidLow, InstanceSave* save, bool permanent, Player* player = NULL);
-		void PlayerUnbindInstance(uint32 guidLow, uint32 mapid, Difficulty difficulty, bool deleteFromDB, Player* player = NULL);
-		void PlayerUnbindInstanceNotExtended(uint32 guidLow, uint32 mapid, Difficulty difficulty, Player* player = NULL);
-		InstancePlayerBind* PlayerGetBoundInstance(uint32 guidLow, uint32 mapid, Difficulty difficulty);
-		bool PlayerIsPermBoundToInstance(uint32 guidLow, uint32 mapid, Difficulty difficulty);
-		BoundInstancesMap const& PlayerGetBoundInstances(uint32 guidLow, Difficulty difficulty);
-		void PlayerCreateBoundInstancesMaps(uint32 guidLow);
+        InstancePlayerBind* PlayerBindToInstance(uint32 guidLow, InstanceSave* save, bool permanent, Player* player = NULL);
+        void PlayerUnbindInstance(uint32 guidLow, uint32 mapid, Difficulty difficulty, bool deleteFromDB, Player* player = NULL);
+        void PlayerUnbindInstanceNotExtended(uint32 guidLow, uint32 mapid, Difficulty difficulty, Player* player = NULL);
+        InstancePlayerBind* PlayerGetBoundInstance(uint32 guidLow, uint32 mapid, Difficulty difficulty);
+        bool PlayerIsPermBoundToInstance(uint32 guidLow, uint32 mapid, Difficulty difficulty);
+        BoundInstancesMap const& PlayerGetBoundInstances(uint32 guidLow, Difficulty difficulty);
+        void PlayerCreateBoundInstancesMaps(uint32 guidLow);
         InstanceSave* PlayerGetInstanceSave(uint32 guidLow, uint32 mapid, Difficulty difficulty);
-		uint32 PlayerGetDestinationInstanceId(Player* player, uint32 mapid, Difficulty difficulty);
-		void CopyBinds(uint32 from, uint32 to, Player* toPlr = NULL);
-		void UnbindAllFor(InstanceSave* save);
+        uint32 PlayerGetDestinationInstanceId(Player* player, uint32 mapid, Difficulty difficulty);
+        void CopyBinds(uint32 from, uint32 to, Player* toPlr = NULL);
+        void UnbindAllFor(InstanceSave* save);
 
     protected:
         static uint16 ResetTimeDelay[];
-		static PlayerBindStorage playerBindStorage;
-		static BoundInstancesMap emptyBoundInstancesMap;
+        static PlayerBindStorage playerBindStorage;
+        static BoundInstancesMap emptyBoundInstancesMap;
 
     private:
         void _ResetOrWarnAll(uint32 mapid, Difficulty difficulty, bool warn, time_t resetTime);

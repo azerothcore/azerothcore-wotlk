@@ -207,8 +207,8 @@ void HostileRefManager::UpdateVisibility(bool checkThreat)
     while (ref)
     {
         HostileReference* nextRef = ref->next();
-		if ((!checkThreat || ref->GetSource()->getThreatList().size() <= 1) && 
-			!ref->GetSource()->GetOwner()->CanSeeOrDetect(GetOwner()))
+        if ((!checkThreat || ref->GetSource()->getThreatList().size() <= 1) && 
+            !ref->GetSource()->GetOwner()->CanSeeOrDetect(GetOwner()))
         {
             nextRef = ref->next();
             ref->removeReference();

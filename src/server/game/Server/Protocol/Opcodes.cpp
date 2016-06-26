@@ -1336,5 +1336,5 @@ OpcodeHandler opcodeTable[NUM_MSG_TYPES] =
     /*0x51B*/ { "CMSG_COMMENTATOR_SKIRMISH_QUEUE_COMMAND",      STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_NULL                     , false },
     /*0x51C*/ { "SMSG_COMMENTATOR_SKIRMISH_QUEUE_RESULT1",      STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               , false },
     /*0x51D*/ { "SMSG_COMMENTATOR_SKIRMISH_QUEUE_RESULT2",      STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               , false },
-	/*0x51E*/ { "SMSG_COMPRESSED_UNKNOWN_1310",                 STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               , false },
+    /*0x51E*/ { "SMSG_COMPRESSED_UNKNOWN_1310",                 STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               , false },
 };

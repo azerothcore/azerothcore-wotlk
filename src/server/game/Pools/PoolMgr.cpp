@@ -964,30 +964,30 @@ void PoolMgr::SaveQuestsToDB(bool daily, bool weekly, bool other)
     {
         if (itr->isEmpty())
             continue;
-		if (Quest const* quest = sObjectMgr->GetQuestTemplate(itr->GetFirstEqualChancedObjectId()))
-		{
-			if (!daily && quest->IsDaily())
-				continue;
-			if (!weekly && quest->IsWeekly())
-				continue;
-			if (!other && !quest->IsDaily() && !quest->IsWeekly())
-				continue;
-		}
+        if (Quest const* quest = sObjectMgr->GetQuestTemplate(itr->GetFirstEqualChancedObjectId()))
+        {
+            if (!daily && quest->IsDaily())
+                continue;
+            if (!weekly && quest->IsWeekly())
+                continue;
+            if (!other && !quest->IsDaily() && !quest->IsWeekly())
+                continue;
+        }
         PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_QUEST_POOL_SAVE);
         stmt->setUInt32(0, itr->GetPoolId());
         trans->Append(stmt);
         deletedPools.insert(itr->GetPoolId());
     }
 
-	for (SearchMap::iterator itr = mQuestSearchMap.begin(); itr != mQuestSearchMap.end(); ++itr)
-		if (deletedPools.find(itr->second) != deletedPools.end())
-			if (IsSpawnedObject<Quest>(itr->first))
-			{
-				PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_QUEST_POOL_SAVE);
-				stmt->setUInt32(0, itr->second);
-				stmt->setUInt32(1, itr->first);
-				trans->Append(stmt);
-			}
+    for (SearchMap::iterator itr = mQuestSearchMap.begin(); itr != mQuestSearchMap.end(); ++itr)
+        if (deletedPools.find(itr->second) != deletedPools.end())
+            if (IsSpawnedObject<Quest>(itr->first))
+            {
+                PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_QUEST_POOL_SAVE);
+                stmt->setUInt32(0, itr->second);
+                stmt->setUInt32(1, itr->first);
+                trans->Append(stmt);
+            }
 
     CharacterDatabase.CommitTransaction(trans);
 }

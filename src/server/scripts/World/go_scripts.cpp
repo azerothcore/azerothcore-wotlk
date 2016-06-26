@@ -61,8 +61,8 @@ public:
 
     bool OnGossipHello(Player* player, GameObject* /*pGO*/)
     {
-		if (roll_chance_i(5))
-			player->CastSpell(player, 61734, true); // SPELL NOBLEGARDEN BUNNY
+        if (roll_chance_i(5))
+            player->CastSpell(player, 61734, true); // SPELL NOBLEGARDEN BUNNY
         return false;
     }
 };
@@ -74,8 +74,8 @@ public:
 
     bool OnGossipHello(Player* player, GameObject* /*pGO*/)
     {
-		if (player->GetQuestStatus(12007) == QUEST_STATUS_INCOMPLETE)
-			player->CastSpell(player, 47293, true);
+        if (player->GetQuestStatus(12007) == QUEST_STATUS_INCOMPLETE)
+            player->CastSpell(player, 47293, true);
         return true;
     }
 };
@@ -87,15 +87,15 @@ public:
 
     bool OnGossipHello(Player* pPlayer, GameObject *pGo)
     {
-		if (!pGo->FindNearestCreature(28105, 30.0f)) // Tartek
-		{
-			if (Creature *cr = pGo->SummonCreature(28105, 6708.7f, 5115.45f, -18.3f, 0.7f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000))
-			{
-				cr->MonsterYell("My treasure! You no steal from Tartek, dumb big-tongue traitor thing. Tartek and nasty dragon going to kill you! You so dumb.", LANG_UNIVERSAL, 0);
-				cr->AI()->AttackStart(pPlayer);
-			}
-		}        
-		return false;
+        if (!pGo->FindNearestCreature(28105, 30.0f)) // Tartek
+        {
+            if (Creature *cr = pGo->SummonCreature(28105, 6708.7f, 5115.45f, -18.3f, 0.7f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000))
+            {
+                cr->MonsterYell("My treasure! You no steal from Tartek, dumb big-tongue traitor thing. Tartek and nasty dragon going to kill you! You so dumb.", LANG_UNIVERSAL, 0);
+                cr->AI()->AttackStart(pPlayer);
+            }
+        }        
+        return false;
     }
 };
 
@@ -108,24 +108,24 @@ class go_witherbark_totem_bundle : public GameObjectScript
         {
             go_witherbark_totem_bundleAI(GameObject* gameObject) : GameObjectAI(gameObject)
             {
-				_timer = 1;
-			}
+                _timer = 1;
+            }
 
-			void UpdateAI(uint32 diff)
-			{
-				if (_timer)
-				{
-					_timer += diff;
-					if (_timer > 5000)
-					{
-						go->CastSpell(NULL, 9056);
-						go->DestroyForNearbyPlayers();
-						_timer = 0;
-					}
-				}
-			}
+            void UpdateAI(uint32 diff)
+            {
+                if (_timer)
+                {
+                    _timer += diff;
+                    if (_timer > 5000)
+                    {
+                        go->CastSpell(NULL, 9056);
+                        go->DestroyForNearbyPlayers();
+                        _timer = 0;
+                    }
+                }
+            }
 
-			uint32 _timer;
+            uint32 _timer;
         };
 
         GameObjectAI* GetAI(GameObject* go) const
@@ -141,10 +141,10 @@ public:
 
     bool OnGossipHello(Player* player, GameObject *go)
     {
-		if (Battleground* bg = player->GetBattleground())
-			bg->ReadyMarkerClicked(player);
-		
-		return false;
+        if (Battleground* bg = player->GetBattleground())
+            bg->ReadyMarkerClicked(player);
+        
+        return false;
     }
 };
 
@@ -244,7 +244,7 @@ public:
 
     bool OnGossipHello(Player* /*player*/, GameObject* go)
     {
-		 // xinef: prevent spawning hundreds of them
+         // xinef: prevent spawning hundreds of them
         if (go->GetGoType() == GAMEOBJECT_TYPE_GOOBER && !go->FindNearestCreature(NPC_GOGGEROC, 20.0f))
             go->SummonCreature(NPC_GOGGEROC, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 300000);
 
@@ -272,50 +272,50 @@ public:
     {
         go_tadpole_cageAI(GameObject* gameObject) : GameObjectAI(gameObject)
         {
-			requireSummon = 2;
-		}
+            requireSummon = 2;
+        }
 
-		uint8 requireSummon;
+        uint8 requireSummon;
 
-		void SummonTadpoles()
-		{
-			requireSummon = 0;
-			int8 count = urand(1, 3);
-			for (int8 i = 0; i < count; ++i)
-				go->SummonCreature(NPC_WINTERFIN_TADPOLE, go->GetPositionX()+cos(2*M_PI*i/3.0f)*0.60f, go->GetPositionY()+sin(2*M_PI*i/3.0f)*0.60f, go->GetPositionZ()+0.5f, go->GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30000);
-		}
+        void SummonTadpoles()
+        {
+            requireSummon = 0;
+            int8 count = urand(1, 3);
+            for (int8 i = 0; i < count; ++i)
+                go->SummonCreature(NPC_WINTERFIN_TADPOLE, go->GetPositionX()+cos(2*M_PI*i/3.0f)*0.60f, go->GetPositionY()+sin(2*M_PI*i/3.0f)*0.60f, go->GetPositionZ()+0.5f, go->GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30000);
+        }
 
-		void OnStateChanged(uint32 state, Unit* unit)
-		{
-			if (requireSummon == 1 && state == GO_READY)
-				requireSummon = 2;
-		}
+        void OnStateChanged(uint32 state, Unit* unit)
+        {
+            if (requireSummon == 1 && state == GO_READY)
+                requireSummon = 2;
+        }
 
-		void UpdateAI(uint32 diff)
-		{
-			if (go->isSpawned() && requireSummon == 2)
-				SummonTadpoles();
-		}
+        void UpdateAI(uint32 diff)
+        {
+            if (go->isSpawned() && requireSummon == 2)
+                SummonTadpoles();
+        }
 
-		bool GossipHello(Player* player, bool reportUse)
-		{
-			if (requireSummon)
-				return false;
+        bool GossipHello(Player* player, bool reportUse)
+        {
+            if (requireSummon)
+                return false;
 
-			requireSummon = 1;
-			if (player->GetQuestStatus(QUEST_OH_NOES_THE_TADPOLES) == QUEST_STATUS_INCOMPLETE)
-			{
-				std::list<Creature*> cList;
-				GetCreatureListWithEntryInGrid(cList, go, NPC_WINTERFIN_TADPOLE, 5.0f);
-				for (std::list<Creature*>::const_iterator itr = cList.begin(); itr != cList.end(); ++itr)
-				{
-					player->KilledMonsterCredit(NPC_WINTERFIN_TADPOLE, 0);
-					(*itr)->DespawnOrUnsummon(urand(45000, 60000));
-					(*itr)->GetMotionMaster()->MoveFollow(player, 1.0f, frand(0.0f, 2*M_PI), MOTION_SLOT_CONTROLLED);
-				}
-			}
-			return false;
-		}
+            requireSummon = 1;
+            if (player->GetQuestStatus(QUEST_OH_NOES_THE_TADPOLES) == QUEST_STATUS_INCOMPLETE)
+            {
+                std::list<Creature*> cList;
+                GetCreatureListWithEntryInGrid(cList, go, NPC_WINTERFIN_TADPOLE, 5.0f);
+                for (std::list<Creature*>::const_iterator itr = cList.begin(); itr != cList.end(); ++itr)
+                {
+                    player->KilledMonsterCredit(NPC_WINTERFIN_TADPOLE, 0);
+                    (*itr)->DespawnOrUnsummon(urand(45000, 60000));
+                    (*itr)->GetMotionMaster()->MoveFollow(player, 1.0f, frand(0.0f, 2*M_PI), MOTION_SLOT_CONTROLLED);
+                }
+            }
+            return false;
+        }
     };
 
     GameObjectAI* GetAI(GameObject* go) const
@@ -739,7 +739,7 @@ public:
 
     bool OnGossipHello(Player* player, GameObject* go)
     {
-		// xinef: prevent spawning hundreds of them
+        // xinef: prevent spawning hundreds of them
         if (player->GetQuestStatus(QUEST_PRISON_BREAK) == QUEST_STATUS_INCOMPLETE && !go->FindNearestCreature(25318, 20.0f))
         {
             go->SummonCreature(25318, 3485.089844f, 6115.7422188f, 70.966812f, 0, TEMPSUMMON_TIMED_DESPAWN, 60000);
@@ -845,27 +845,27 @@ enum InconspicuousLandmark
 
 class go_inconspicuous_landmark : public GameObjectScript
 {
-	public:
-		go_inconspicuous_landmark() : GameObjectScript("go_inconspicuous_landmark")
-		{
-			_lastUsedTime = time(NULL);
-		}
+    public:
+        go_inconspicuous_landmark() : GameObjectScript("go_inconspicuous_landmark")
+        {
+            _lastUsedTime = time(NULL);
+        }
 
-		bool OnGossipHello(Player* player, GameObject* /*go*/)
-		{
-			if (player->HasItemCount(ITEM_CUERGOS_KEY))
-				return true;
+        bool OnGossipHello(Player* player, GameObject* /*go*/)
+        {
+            if (player->HasItemCount(ITEM_CUERGOS_KEY))
+                return true;
 
-			if (_lastUsedTime > time(NULL))
-				return true;
+            if (_lastUsedTime > time(NULL))
+                return true;
 
-			_lastUsedTime = time(NULL) + MINUTE;
-			player->CastSpell(player, SPELL_SUMMON_PIRATES_TREASURE_AND_TRIGGER_MOB, true);
-			return true;
-		}
+            _lastUsedTime = time(NULL) + MINUTE;
+            player->CastSpell(player, SPELL_SUMMON_PIRATES_TREASURE_AND_TRIGGER_MOB, true);
+            return true;
+        }
 
-	private:
-		uint32 _lastUsedTime;
+    private:
+        uint32 _lastUsedTime;
 };
 
 /*######
@@ -939,8 +939,8 @@ class go_soulwell : public GameObjectScript
             /// on the well. We have to find how to segregate REPORT_USE and USE.
             bool GossipHello(Player* player, bool reportUse)
             {
-				if (reportUse)
-					return false;
+                if (reportUse)
+                    return false;
 
                 Unit* owner = go->GetOwner();
                 if (_stoneSpell == 0 || _stoneId == 0)
@@ -948,14 +948,14 @@ class go_soulwell : public GameObjectScript
                     if (SpellInfo const* spell = sSpellMgr->GetSpellInfo(_stoneSpell))
                         Spell::SendCastResult(player, spell, 0, SPELL_FAILED_ERROR);
                     return true;
-				}
+                }
 
                 if (!owner || owner->GetTypeId() != TYPEID_PLAYER || !player->IsInSameRaidWith(owner->ToPlayer()))
-				{
+                {
                     if (SpellInfo const* spell = sSpellMgr->GetSpellInfo(_stoneSpell))
                         Spell::SendCastResult(player, spell, 0, SPELL_FAILED_TARGET_NOT_IN_RAID);
                     return true;
-				}
+                }
 
                 // Don't try to add a stone if we already have one.
                 if (player->HasItemCount(_stoneId))
@@ -1120,9 +1120,9 @@ public:
     {
         player->SendLoot(go->GetGUID(), LOOT_CORPSE);
 
-		// xinef: prevent spawning hundreds of them
-		if (go->FindNearestCreature(NPC_HIVE_AMBUSHER, 20.0f))
-			return true;
+        // xinef: prevent spawning hundreds of them
+        if (go->FindNearestCreature(NPC_HIVE_AMBUSHER, 20.0f))
+            return true;
 
         go->SummonCreature(NPC_HIVE_AMBUSHER, go->GetPositionX()+1, go->GetPositionY(), go->GetPositionZ(), go->GetAngle(player), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 60000);
         go->SummonCreature(NPC_HIVE_AMBUSHER, go->GetPositionX(), go->GetPositionY()+1, go->GetPositionZ(), go->GetAngle(player), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 60000);
@@ -1180,18 +1180,18 @@ class go_veil_skith_cage : public GameObjectScript
 
 void AddSC_go_scripts()
 {
-	// Ours
-	new go_noblegarden_colored_egg();
-	new go_seer_of_zebhalak();
-	new go_mistwhisper_treasure();
-	new go_witherbark_totem_bundle();
-	new go_arena_ready_marker();
-	new go_ethereum_prison();
+    // Ours
+    new go_noblegarden_colored_egg();
+    new go_seer_of_zebhalak();
+    new go_mistwhisper_treasure();
+    new go_witherbark_totem_bundle();
+    new go_arena_ready_marker();
+    new go_ethereum_prison();
     new go_ethereum_stasis();
     new go_resonite_cask();
     new go_tadpole_cage();
 
-	// Theirs
+    // Theirs
     new go_cat_figurine();
     new go_gilded_brazier();
     new go_shrine_of_the_birds();

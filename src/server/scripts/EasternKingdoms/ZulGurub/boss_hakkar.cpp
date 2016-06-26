@@ -130,7 +130,7 @@ class boss_hakkar : public CreatureScript
                             // events.ScheduleEvent(EVENT_CAUSE_INSANITY, urand(35000, 45000));
                             break;
                         case EVENT_WILL_OF_HAKKAR:
-							// Xinef: Skip Tank
+                            // Xinef: Skip Tank
                             DoCast(SelectTarget(SELECT_TARGET_RANDOM, 1, 100, true), SPELL_WILL_OF_HAKKAR);
                             events.ScheduleEvent(EVENT_WILL_OF_HAKKAR, urand(25000, 35000));
                             break;

@@ -156,10 +156,10 @@ void HostileReference::addThreat(float modThreat)
 
 void HostileReference::addThreatPercent(int32 percent)
 {
-	// Xinef: Do not allow to modify threat by percent if threat is negative (forced to big value < 0 by spells adding temporary threat)
-	// Xinef: When the temporary effect ends, temporary threat is added back which results in huge additional amount of threat
-	if (iThreat <= 0)
-		return;
+    // Xinef: Do not allow to modify threat by percent if threat is negative (forced to big value < 0 by spells adding temporary threat)
+    // Xinef: When the temporary effect ends, temporary threat is added back which results in huge additional amount of threat
+    if (iThreat <= 0)
+        return;
 
     float tmpThreat = iThreat;
     AddPct(tmpThreat, percent);
@@ -302,95 +302,95 @@ void ThreatContainer::update()
 
 HostileReference* ThreatContainer::selectNextVictim(Creature* attacker, HostileReference* currentVictim) const
 {
-	// pussywizard: pretty much remade this whole function
+    // pussywizard: pretty much remade this whole function
 
-	HostileReference* currentRef = NULL;
-	bool found = false;
-	bool noPriorityTargetFound = false;
-	uint32 currTime = sWorld->GetGameTime();
+    HostileReference* currentRef = NULL;
+    bool found = false;
+    bool noPriorityTargetFound = false;
+    uint32 currTime = sWorld->GetGameTime();
 
-	// pussywizard: currentVictim is needed to compare if threat was exceeded by 10%/30% for melee/range targets (only then switching current target)
-	if (currentVictim)
-	{
-		Unit* cvUnit = currentVictim->getTarget();
-		if (!attacker->_CanDetectFeignDeathOf(cvUnit) || !attacker->CanCreatureAttack(cvUnit) || attacker->isTargetNotAcceptableByMMaps(cvUnit->GetGUID(), currTime, cvUnit)) // pussywizard: if currentVictim is not valid => don't compare the threat with it, just take the highest threat valid target
-			currentVictim = NULL;
-		else if (cvUnit->IsImmunedToDamageOrSchool(attacker->GetMeleeDamageSchoolMask()) || cvUnit->HasNegativeAuraWithInterruptFlag(AURA_INTERRUPT_FLAG_TAKE_DAMAGE)) // pussywizard: no 10%/30% if currentVictim is immune to damage or has auras breakable by damage
-			currentVictim = NULL;
-	}
+    // pussywizard: currentVictim is needed to compare if threat was exceeded by 10%/30% for melee/range targets (only then switching current target)
+    if (currentVictim)
+    {
+        Unit* cvUnit = currentVictim->getTarget();
+        if (!attacker->_CanDetectFeignDeathOf(cvUnit) || !attacker->CanCreatureAttack(cvUnit) || attacker->isTargetNotAcceptableByMMaps(cvUnit->GetGUID(), currTime, cvUnit)) // pussywizard: if currentVictim is not valid => don't compare the threat with it, just take the highest threat valid target
+            currentVictim = NULL;
+        else if (cvUnit->IsImmunedToDamageOrSchool(attacker->GetMeleeDamageSchoolMask()) || cvUnit->HasNegativeAuraWithInterruptFlag(AURA_INTERRUPT_FLAG_TAKE_DAMAGE)) // pussywizard: no 10%/30% if currentVictim is immune to damage or has auras breakable by damage
+            currentVictim = NULL;
+    }
 
-	ThreatContainer::StorageType::const_iterator lastRef = iThreatList.end();
-	--lastRef;
+    ThreatContainer::StorageType::const_iterator lastRef = iThreatList.end();
+    --lastRef;
 
-	// pussywizard: iterate from highest to lowest threat
-	for (ThreatContainer::StorageType::const_iterator iter = iThreatList.begin(); iter != iThreatList.end() && !found;)
-	{
-		currentRef = (*iter);
+    // pussywizard: iterate from highest to lowest threat
+    for (ThreatContainer::StorageType::const_iterator iter = iThreatList.begin(); iter != iThreatList.end() && !found;)
+    {
+        currentRef = (*iter);
 
-		Unit* target = currentRef->getTarget();
-		ASSERT(target); // if the ref has status online the target must be there !
+        Unit* target = currentRef->getTarget();
+        ASSERT(target); // if the ref has status online the target must be there !
 
-		// pussywizard: don't go to threat comparison if this ref is immune to damage or has aura breakable on damage (second choice target)
-		// pussywizard: if this is the last entry on the threat list, then all targets are second choice, set bool to true and loop threat list again, ignoring this section
-		if (!noPriorityTargetFound && (target->IsImmunedToDamageOrSchool(attacker->GetMeleeDamageSchoolMask()) || target->HasNegativeAuraWithInterruptFlag(AURA_INTERRUPT_FLAG_TAKE_DAMAGE) || target->HasAuraTypeWithCaster(SPELL_AURA_IGNORED, attacker->GetGUID())))
-		{
-			if (iter != lastRef)
-			{
-				++iter;
-				continue;
-			}
-			else
-			{
-				noPriorityTargetFound = true;
-				iter = iThreatList.begin();
-				continue;
-			}
-		}
+        // pussywizard: don't go to threat comparison if this ref is immune to damage or has aura breakable on damage (second choice target)
+        // pussywizard: if this is the last entry on the threat list, then all targets are second choice, set bool to true and loop threat list again, ignoring this section
+        if (!noPriorityTargetFound && (target->IsImmunedToDamageOrSchool(attacker->GetMeleeDamageSchoolMask()) || target->HasNegativeAuraWithInterruptFlag(AURA_INTERRUPT_FLAG_TAKE_DAMAGE) || target->HasAuraTypeWithCaster(SPELL_AURA_IGNORED, attacker->GetGUID())))
+        {
+            if (iter != lastRef)
+            {
+                ++iter;
+                continue;
+            }
+            else
+            {
+                noPriorityTargetFound = true;
+                iter = iThreatList.begin();
+                continue;
+            }
+        }
 
-		// pussywizard: skip not valid targets
-		if (attacker->_CanDetectFeignDeathOf(target) && attacker->CanCreatureAttack(target) && !attacker->isTargetNotAcceptableByMMaps(target->GetGUID(), currTime, target))
-		{
-			if (currentVictim) // pussywizard: if not NULL then target must have 10%/30% more threat
-			{
-				if (currentVictim == currentRef) // pussywizard: nothing found previously was good and enough, currentRef passed all necessary tests, so end now
-				{
-					found = true;
-					break;
-				}
+        // pussywizard: skip not valid targets
+        if (attacker->_CanDetectFeignDeathOf(target) && attacker->CanCreatureAttack(target) && !attacker->isTargetNotAcceptableByMMaps(target->GetGUID(), currTime, target))
+        {
+            if (currentVictim) // pussywizard: if not NULL then target must have 10%/30% more threat
+            {
+                if (currentVictim == currentRef) // pussywizard: nothing found previously was good and enough, currentRef passed all necessary tests, so end now
+                {
+                    found = true;
+                    break;
+                }
 
-				// pussywizard: implement 110% threat rule for targets in melee range and 130% rule for targets in ranged distances
-				if (currentRef->getThreat() > 1.3f * currentVictim->getThreat()) // pussywizard: enough in all cases, end
-				{
-					found = true;
-					break;
-				}
-				else if (currentRef->getThreat() > 1.1f * currentVictim->getThreat()) // pussywizard: enought only if target in melee range
-				{
-					if (attacker->IsWithinMeleeRange(target))
-					{
-						found = true;
-						break;
-					}
-				}
-				else // pussywizard: nothing found previously was good and enough, this and next entries on the list have less than 110% threat, and currentVictim is present and valid as checked before the loop (otherwise it's NULL), so end now
-				{
-					currentRef = currentVictim;
-					found = true;
-					break;
-				}
-			}
-			else // pussywizard: no currentVictim, first passing all checks is chosen (highest threat, list is sorted)
-			{
-				found = true;
-				break;
-			}
-		}
-		++iter;
-	}
-	if (!found)
-		currentRef = NULL;
+                // pussywizard: implement 110% threat rule for targets in melee range and 130% rule for targets in ranged distances
+                if (currentRef->getThreat() > 1.3f * currentVictim->getThreat()) // pussywizard: enough in all cases, end
+                {
+                    found = true;
+                    break;
+                }
+                else if (currentRef->getThreat() > 1.1f * currentVictim->getThreat()) // pussywizard: enought only if target in melee range
+                {
+                    if (attacker->IsWithinMeleeRange(target))
+                    {
+                        found = true;
+                        break;
+                    }
+                }
+                else // pussywizard: nothing found previously was good and enough, this and next entries on the list have less than 110% threat, and currentVictim is present and valid as checked before the loop (otherwise it's NULL), so end now
+                {
+                    currentRef = currentVictim;
+                    found = true;
+                    break;
+                }
+            }
+            else // pussywizard: no currentVictim, first passing all checks is chosen (highest threat, list is sorted)
+            {
+                found = true;
+                break;
+            }
+        }
+        ++iter;
+    }
+    if (!found)
+        currentRef = NULL;
 
-	return currentRef;
+    return currentRef;
 }
 
 //============================================================
@@ -432,8 +432,8 @@ void ThreatManager::doAddThreat(Unit* victim, float threat)
         {
             float redirectThreat = CalculatePct(threat, redirectThreadPct);
             threat -= redirectThreat;
-			if (ThreatCalcHelper::isValidProcess(redirectTarget, GetOwner()))
-				_addThreat(redirectTarget, redirectThreat);
+            if (ThreatCalcHelper::isValidProcess(redirectTarget, GetOwner()))
+                _addThreat(redirectTarget, redirectThreat);
         }
     }
 

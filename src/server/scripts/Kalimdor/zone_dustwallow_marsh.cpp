@@ -187,9 +187,9 @@ public:
             {
                 Damage = 0;
 
-				if (pDoneBy)
-					if (Player* player = pDoneBy->GetCharmerOrOwnerPlayerOrPlayerItself())
-						player->GroupEventHappens(QUEST_MISSING_DIPLO_PT16, me);
+                if (pDoneBy)
+                    if (Player* player = pDoneBy->GetCharmerOrOwnerPlayerOrPlayerItself())
+                        player->GroupEventHappens(QUEST_MISSING_DIPLO_PT16, me);
 
                 Talk(EMOTE_SURRENDER);
                 EnterEvadeMode();
@@ -352,7 +352,7 @@ class spell_ooze_zap_channel_end : public SpellScriptLoader
                 PreventHitDefaultEffect(effIndex);
                 if (Player* player = GetCaster()->ToPlayer())
                     player->CastSpell(player, SPELL_OOZE_CHANNEL_CREDIT, true);
-				Unit::Kill(GetHitUnit(), GetHitUnit());
+                Unit::Kill(GetHitUnit(), GetHitUnit());
             }
 
             void Register()

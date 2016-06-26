@@ -46,26 +46,26 @@ BattlegroundRV::~BattlegroundRV() { }
 
 void BattlegroundRV::TeleportUnitToNewZ(Unit* unit, float newZ, bool casting)
 {
-	if (!unit->IsAlive())
-		return;
+    if (!unit->IsAlive())
+        return;
     unit->NearTeleportTo(unit->GetPositionX(), unit->GetPositionY(), newZ, unit->GetOrientation(), casting);
     unit->m_positionZ = newZ;
 }
 
 void BattlegroundRV::CheckPositionForUnit(Unit* unit)
 {
-	// get height at current pos, if something is wrong (below or high above) - teleport
-	if (!unit->IsFalling() && unit->IsAlive())
-	{
-		float groundZ_vmap = unit->GetMap()->GetHeight(unit->GetPositionX(), unit->GetPositionY(), 37.0f, true, 50.0f);
-		float groundZ_dyntree = unit->GetMap()->GetDynamicMapTree().getHeight(unit->GetPositionX(), unit->GetPositionY(), 37.0f, 50.0f, unit->GetPhaseMask());
-		if (groundZ_vmap > 28.0f && groundZ_vmap < 29.0f || groundZ_dyntree > 28.0f && groundZ_dyntree < 37.0f)
-		{
-			float groundZ = std::max<float>(groundZ_vmap, groundZ_dyntree);
-			if (unit->GetPositionZ() < groundZ - 0.2f || unit->GetPositionZ() > groundZ + 3.5f)
-				TeleportUnitToNewZ(unit, groundZ+1.0f, true);
-		}
-	}
+    // get height at current pos, if something is wrong (below or high above) - teleport
+    if (!unit->IsFalling() && unit->IsAlive())
+    {
+        float groundZ_vmap = unit->GetMap()->GetHeight(unit->GetPositionX(), unit->GetPositionY(), 37.0f, true, 50.0f);
+        float groundZ_dyntree = unit->GetMap()->GetDynamicMapTree().getHeight(unit->GetPositionX(), unit->GetPositionY(), 37.0f, 50.0f, unit->GetPhaseMask());
+        if (groundZ_vmap > 28.0f && groundZ_vmap < 29.0f || groundZ_dyntree > 28.0f && groundZ_dyntree < 37.0f)
+        {
+            float groundZ = std::max<float>(groundZ_vmap, groundZ_dyntree);
+            if (unit->GetPositionZ() < groundZ - 0.2f || unit->GetPositionZ() > groundZ + 3.5f)
+                TeleportUnitToNewZ(unit, groundZ+1.0f, true);
+        }
+    }
 }
 
 void BattlegroundRV::PostUpdateImpl(uint32 diff)
@@ -87,11 +87,11 @@ void BattlegroundRV::PostUpdateImpl(uint32 diff)
                     if (Player* player = itr->second)
                     {
                         // Demonic Circle Summon
-						if (GameObject* gObj = player->GetGameObject(48018))
-						{
-							gObj->Relocate(gObj->GetPositionX(), gObj->GetPositionY(), 28.28f);
-							gObj->UpdateObjectVisibility(true);
-						}
+                        if (GameObject* gObj = player->GetGameObject(48018))
+                        {
+                            gObj->Relocate(gObj->GetPositionX(), gObj->GetPositionY(), 28.28f);
+                            gObj->UpdateObjectVisibility(true);
+                        }
 
                         if (player->GetPositionZ() < 27.0f)
                             TeleportUnitToNewZ(player, 28.28f, true);
@@ -103,18 +103,18 @@ void BattlegroundRV::PostUpdateImpl(uint32 diff)
                                         TeleportUnitToNewZ(totem, 28.28f, true);
 
                         for (Unit::ControlSet::const_iterator itr = player->m_Controlled.begin(); itr != player->m_Controlled.end(); ++itr)
-						{
+                        {
                             if ((*itr)->GetPositionZ() < 28.0f)
                                 TeleportUnitToNewZ((*itr), 28.28f, true);
 
-							// Xinef: override stay position
-							if (CharmInfo* charmInfo = (*itr)->GetCharmInfo())
-								if (charmInfo->IsAtStay())
-								{
-									(*itr)->StopMovingOnCurrentPos();
-									charmInfo->SaveStayPosition(false);
-								}
-						}
+                            // Xinef: override stay position
+                            if (CharmInfo* charmInfo = (*itr)->GetCharmInfo())
+                                if (charmInfo->IsAtStay())
+                                {
+                                    (*itr)->StopMovingOnCurrentPos();
+                                    charmInfo->SaveStayPosition(false);
+                                }
+                        }
                     }
 
                 // fix ground on elevators (so aoe spells can be casted there)
@@ -141,8 +141,8 @@ void BattlegroundRV::PostUpdateImpl(uint32 diff)
     else
         setTimer(getTimer() - diff);
 
-	if (getState() == BG_RV_STATE_OPEN_FENCES)
-		return;
+    if (getState() == BG_RV_STATE_OPEN_FENCES)
+        return;
 
     if (CheckPlayersTimer <= diff)
     {
@@ -150,7 +150,7 @@ void BattlegroundRV::PostUpdateImpl(uint32 diff)
         for (BattlegroundPlayerMap::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
             CheckPositionForUnit(itr->second);
 
-		// maybe for pets and m_Controlled also, but not really necessary
+        // maybe for pets and m_Controlled also, but not really necessary
     }
     else
         CheckPlayersTimer -= diff;
@@ -179,12 +179,12 @@ void BattlegroundRV::StartingEventOpenDoors()
 
 void BattlegroundRV::AddPlayer(Player* player)
 {
-	if (GetStatus() == STATUS_WAIT_JOIN && player->GetBgTeamId() == TEAM_HORDE)
+    if (GetStatus() == STATUS_WAIT_JOIN && player->GetBgTeamId() == TEAM_HORDE)
         player->SetPhaseMask(2, true);
 
     Battleground::AddPlayer(player);
     PlayerScores[player->GetGUID()] = new BattlegroundScore(player);
-	BattlegroundRV::UpdateArenaWorldState();
+    BattlegroundRV::UpdateArenaWorldState();
 }
 
 void BattlegroundRV::RemovePlayer(Player* player)
@@ -195,7 +195,7 @@ void BattlegroundRV::RemovePlayer(Player* player)
     if (GetStatus() == STATUS_WAIT_JOIN)
         player->SetPhaseMask(1, true);
 
-	BattlegroundRV::UpdateArenaWorldState();
+    BattlegroundRV::UpdateArenaWorldState();
     CheckArenaWinConditions();
 }
 
@@ -208,7 +208,7 @@ void BattlegroundRV::HandleKillPlayer(Player* player, Player* killer)
         return;
 
     Battleground::HandleKillPlayer(player, killer);
-	BattlegroundRV::UpdateArenaWorldState();
+    BattlegroundRV::UpdateArenaWorldState();
 
     CheckArenaWinConditions();
 }
@@ -246,7 +246,7 @@ void BattlegroundRV::HandleAreaTrigger(Player* player, uint32 trigger)
 void BattlegroundRV::FillInitialWorldStates(WorldPacket &data)
 {
     data << uint32(BG_RV_WORLD_STATE) << uint32(1);
-	BattlegroundRV::UpdateArenaWorldState();
+    BattlegroundRV::UpdateArenaWorldState();
 }
 
 void BattlegroundRV::UpdateArenaWorldState()
@@ -304,27 +304,27 @@ bool BattlegroundRV::SetupBattleground()
 
 void BattlegroundRV::UpdatePillars()
 {
-	GameObject* test = GetBgMap()->GetGameObject(BgObjects[BG_RV_OBJECT_PILAR_1]);
-	if (!test)
-		return;
+    GameObject* test = GetBgMap()->GetGameObject(BgObjects[BG_RV_OBJECT_PILAR_1]);
+    if (!test)
+        return;
 
-	if (test->GetGoState() == GO_STATE_READY)
+    if (test->GetGoState() == GO_STATE_READY)
     {
         for (uint8 i = BG_RV_OBJECT_PILAR_1; i <= BG_RV_OBJECT_GEAR_2; ++i)
-			if (GameObject* go = GetBgMap()->GetGameObject(BgObjects[i]))
-				go->SetGoState(GO_STATE_ACTIVE);
+            if (GameObject* go = GetBgMap()->GetGameObject(BgObjects[i]))
+                go->SetGoState(GO_STATE_ACTIVE);
         for (uint8 i = BG_RV_OBJECT_PILAR_2; i <= BG_RV_OBJECT_PULLEY_2; ++i)
-			if (GameObject* go = GetBgMap()->GetGameObject(BgObjects[i]))
-				go->SetGoState(GO_STATE_READY);
+            if (GameObject* go = GetBgMap()->GetGameObject(BgObjects[i]))
+                go->SetGoState(GO_STATE_READY);
     }
     else
     {
         for (uint8 i = BG_RV_OBJECT_PILAR_1; i <= BG_RV_OBJECT_GEAR_2; ++i)
-			if (GameObject* go = GetBgMap()->GetGameObject(BgObjects[i]))
-				go->SetGoState(GO_STATE_READY);
+            if (GameObject* go = GetBgMap()->GetGameObject(BgObjects[i]))
+                go->SetGoState(GO_STATE_READY);
         for (uint8 i = BG_RV_OBJECT_PILAR_2; i <= BG_RV_OBJECT_PULLEY_2; ++i)
-			if (GameObject* go = GetBgMap()->GetGameObject(BgObjects[i]))
-				go->SetGoState(GO_STATE_ACTIVE);
+            if (GameObject* go = GetBgMap()->GetGameObject(BgObjects[i]))
+                go->SetGoState(GO_STATE_ACTIVE);
     }
 }
 

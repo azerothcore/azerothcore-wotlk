@@ -1504,7 +1504,7 @@ void Guild::HandleInviteMember(WorldSession* session, std::string const& name)
     if (pInvitee->GetSocial()->HasIgnore(player->GetGUIDLow()))
         return;
 
-	if (!sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GUILD) && pInvitee->GetTeamId() != player->GetTeamId())
+    if (!sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GUILD) && pInvitee->GetTeamId() != player->GetTeamId())
     {
         SendCommandResult(session, GUILD_COMMAND_INVITE, ERR_GUILD_NOT_ALLIED, name);
         return;
@@ -1546,8 +1546,8 @@ void Guild::HandleInviteMember(WorldSession* session, std::string const& name)
 void Guild::HandleAcceptMember(WorldSession* session)
 {
     Player* player = session->GetPlayer();
-	if (!sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GUILD) && 
-		player->GetTeamId() != sObjectMgr->GetPlayerTeamIdByGUID(GetLeaderGUID()))
+    if (!sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GUILD) && 
+        player->GetTeamId() != sObjectMgr->GetPlayerTeamIdByGUID(GetLeaderGUID()))
         return;
 
     AddMember(player->GetGUID());
@@ -1730,8 +1730,8 @@ void Guild::HandleMemberDepositMoney(WorldSession* session, uint32 amount)
     std::string aux = ByteArrayToHexStr(reinterpret_cast<uint8*>(&m_bankMoney), 8, true);
     _BroadcastEvent(GE_BANK_MONEY_SET, 0, aux.c_str());
 
-	if (amount > 10*GOLD)
-		CharacterDatabase.PExecute("INSERT INTO log_money VALUES(%u, %u, \"%s\", \"%s\", %u, \"%s\", %u, \"<GB DEPOSIT> %s (guild id: %u, members: %u, new amount: "UI64FMTD", leader guid low: %u, char level: %u)\", NOW())", session->GetAccountId(), player->GetGUIDLow(), player->GetName().c_str(), session->GetRemoteAddress().c_str(), 0, "", amount, GetName().c_str(), GetId(), GetMemberCount(), GetTotalBankMoney(), (uint32)(GetLeaderGUID()&0xFFFFFFFF), player->getLevel());
+    if (amount > 10*GOLD)
+        CharacterDatabase.PExecute("INSERT INTO log_money VALUES(%u, %u, \"%s\", \"%s\", %u, \"%s\", %u, \"<GB DEPOSIT> %s (guild id: %u, members: %u, new amount: "UI64FMTD", leader guid low: %u, char level: %u)\", NOW())", session->GetAccountId(), player->GetGUIDLow(), player->GetName().c_str(), session->GetRemoteAddress().c_str(), 0, "", amount, GetName().c_str(), GetId(), GetMemberCount(), GetTotalBankMoney(), (uint32)(GetLeaderGUID()&0xFFFFFFFF), player->getLevel());
 }
 
 bool Guild::HandleMemberWithdrawMoney(WorldSession* session, uint32 amount, bool repair)
@@ -1773,8 +1773,8 @@ bool Guild::HandleMemberWithdrawMoney(WorldSession* session, uint32 amount, bool
     _LogBankEvent(trans, repair ? GUILD_BANK_LOG_REPAIR_MONEY : GUILD_BANK_LOG_WITHDRAW_MONEY, uint8(0), player->GetGUIDLow(), amount);
     CharacterDatabase.CommitTransaction(trans);
 
-	if (amount > 10*GOLD)
-		CharacterDatabase.PExecute("INSERT INTO log_money VALUES(%u, %u, \"%s\", \"%s\", %u, \"%s\", %u, \"<GB WITHDRAW> %s (guild id: %u, members: %u, new amount: "UI64FMTD", leader guid low: %u, char level: %u)\", NOW())", session->GetAccountId(), player->GetGUIDLow(), player->GetName().c_str(), session->GetRemoteAddress().c_str(), 0, "", amount, GetName().c_str(), GetId(), GetMemberCount(), GetTotalBankMoney(), (uint32)(GetLeaderGUID()&0xFFFFFFFF), player->getLevel());
+    if (amount > 10*GOLD)
+        CharacterDatabase.PExecute("INSERT INTO log_money VALUES(%u, %u, \"%s\", \"%s\", %u, \"%s\", %u, \"<GB WITHDRAW> %s (guild id: %u, members: %u, new amount: "UI64FMTD", leader guid low: %u, char level: %u)\", NOW())", session->GetAccountId(), player->GetGUIDLow(), player->GetName().c_str(), session->GetRemoteAddress().c_str(), 0, "", amount, GetName().c_str(), GetId(), GetMemberCount(), GetTotalBankMoney(), (uint32)(GetLeaderGUID()&0xFFFFFFFF), player->getLevel());
 
     std::string aux = ByteArrayToHexStr(reinterpret_cast<uint8*>(&m_bankMoney), 8, true);
     _BroadcastEvent(GE_BANK_MONEY_SET, 0, aux.c_str());
@@ -1960,7 +1960,7 @@ bool Guild::LoadMemberFromDB(Field* fields)
         return false;
     }
     m_members[lowguid] = member;
-	sWorld->UpdateGlobalPlayerGuild(lowguid, GetId());
+    sWorld->UpdateGlobalPlayerGuild(lowguid, GetId());
     return true;
 }
 
@@ -2224,7 +2224,7 @@ bool Guild::AddMember(uint64 guid, uint8 rankId)
         member->ResetFlags();
 
         bool ok = false;
-		// xinef: zomg! sync query
+        // xinef: zomg! sync query
         // Player must exist
         PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_DATA_FOR_GUILD);
         stmt->setUInt32(0, lowguid);
@@ -2247,7 +2247,7 @@ bool Guild::AddMember(uint64 guid, uint8 rankId)
             return false;
         }
         m_members[lowguid] = member;
-		sWorld->UpdateGlobalPlayerGuild(lowguid, m_id);
+        sWorld->UpdateGlobalPlayerGuild(lowguid, m_id);
     }
 
     SQLTransaction trans(NULL);
@@ -2316,8 +2316,8 @@ void Guild::DeleteMember(uint64 guid, bool isDisbanding, bool isKicked, bool can
         player->SetInGuild(0);
         player->SetRank(0);
     }
-	else
-		sWorld->UpdateGlobalPlayerGuild(lowguid, 0);
+    else
+        sWorld->UpdateGlobalPlayerGuild(lowguid, 0);
 
     _DeleteMemberFromDB(lowguid);
     if (!isDisbanding)

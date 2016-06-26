@@ -16,13 +16,13 @@ enum Says
     SAY_CAST_HELLFIRE           = 5,
     SAY_DEATH                   = 6,
     EMOTE_ENRAGE                = 7,
-	SAY_INTRO					= 8
+    SAY_INTRO                   = 8
 };
 
 enum Spells
 {
     SPELL_SACRIFICE             = 34661,
-    SPELL_HELLFIRE				= 34659,
+    SPELL_HELLFIRE              = 34659,
     SPELL_ENRAGE                = 34670
 };
 
@@ -31,8 +31,8 @@ enum Events
     EVENT_SACRIFICE             = 1,
     EVENT_HELLFIRE              = 2,
     EVENT_ENRAGE                = 3,
-	EVENT_HEALTH_CHECK_50		= 4,
-	EVENT_HEALTH_CHECK_20		= 5
+    EVENT_HEALTH_CHECK_50       = 4,
+    EVENT_HEALTH_CHECK_20       = 5
 };
 
 class boss_thorngrin_the_tender : public CreatureScript
@@ -42,25 +42,25 @@ class boss_thorngrin_the_tender : public CreatureScript
         struct boss_thorngrin_the_tenderAI : public BossAI
         {
             boss_thorngrin_the_tenderAI(Creature* creature) : BossAI(creature, DATA_THORNGRIN_THE_TENDER)
-			{
-				me->m_SightDistance = 100.0f;
-				_intro = false;
-			}
+            {
+                me->m_SightDistance = 100.0f;
+                _intro = false;
+            }
 
             void Reset()
             {
                 _Reset();
             }
 
-			void MoveInLineOfSight(Unit* who)
-			{
-				if (!_intro && who->GetTypeId() == TYPEID_PLAYER)
-				{
-					_intro = true;
-					Talk(SAY_INTRO);
-				}
-				BossAI::MoveInLineOfSight(who);
-			}
+            void MoveInLineOfSight(Unit* who)
+            {
+                if (!_intro && who->GetTypeId() == TYPEID_PLAYER)
+                {
+                    _intro = true;
+                    Talk(SAY_INTRO);
+                }
+                BossAI::MoveInLineOfSight(who);
+            }
 
 
             void EnterCombat(Unit* /*who*/)
@@ -70,14 +70,14 @@ class boss_thorngrin_the_tender : public CreatureScript
                 events.ScheduleEvent(EVENT_SACRIFICE, 6000);
                 events.ScheduleEvent(EVENT_HELLFIRE, 18000);
                 events.ScheduleEvent(EVENT_ENRAGE, 15000);
-				events.ScheduleEvent(EVENT_HEALTH_CHECK_50, 500);
-				events.ScheduleEvent(EVENT_HEALTH_CHECK_20, 500);
+                events.ScheduleEvent(EVENT_HEALTH_CHECK_50, 500);
+                events.ScheduleEvent(EVENT_HEALTH_CHECK_20, 500);
             }
 
             void KilledUnit(Unit* victim)
             {
-				if (victim->GetTypeId() == TYPEID_PLAYER)
-					Talk(SAY_KILL);
+                if (victim->GetTypeId() == TYPEID_PLAYER)
+                    Talk(SAY_KILL);
             }
 
             void JustDied(Unit* /*killer*/)
@@ -101,44 +101,44 @@ class boss_thorngrin_the_tender : public CreatureScript
                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 0.0f, true))
                         {
                             Talk(SAY_CAST_SACRIFICE);
-							me->CastSpell(target, SPELL_SACRIFICE, false);
+                            me->CastSpell(target, SPELL_SACRIFICE, false);
                         }
                         events.ScheduleEvent(EVENT_SACRIFICE, 30000);
                         break;
                     case EVENT_HELLFIRE:
-						if (roll_chance_i(50))
-							Talk(SAY_CAST_HELLFIRE);
-						me->CastSpell(me, SPELL_HELLFIRE, false);
+                        if (roll_chance_i(50))
+                            Talk(SAY_CAST_HELLFIRE);
+                        me->CastSpell(me, SPELL_HELLFIRE, false);
                         events.ScheduleEvent(EVENT_HELLFIRE, 22000);
                         break;
                     case EVENT_ENRAGE:
                         Talk(EMOTE_ENRAGE);
-						me->CastSpell(me, SPELL_ENRAGE, false);
+                        me->CastSpell(me, SPELL_ENRAGE, false);
                         events.ScheduleEvent(EVENT_ENRAGE, 30000);
                         break;
-					case EVENT_HEALTH_CHECK_50:
-						if (me->HealthBelowPct(50))
-						{
-							Talk(SAY_50_PERCENT_HP);
-							break;
-						}
-						events.ScheduleEvent(EVENT_HEALTH_CHECK_50, 500);
-						break;
-					case EVENT_HEALTH_CHECK_20:
-						if (me->HealthBelowPct(20))
-						{
-							Talk(SAY_20_PERCENT_HP);
-							break;
-						}
-						events.ScheduleEvent(EVENT_HEALTH_CHECK_20, 500);
-						break;
+                    case EVENT_HEALTH_CHECK_50:
+                        if (me->HealthBelowPct(50))
+                        {
+                            Talk(SAY_50_PERCENT_HP);
+                            break;
+                        }
+                        events.ScheduleEvent(EVENT_HEALTH_CHECK_50, 500);
+                        break;
+                    case EVENT_HEALTH_CHECK_20:
+                        if (me->HealthBelowPct(20))
+                        {
+                            Talk(SAY_20_PERCENT_HP);
+                            break;
+                        }
+                        events.ScheduleEvent(EVENT_HEALTH_CHECK_20, 500);
+                        break;
                 }
 
                 DoMeleeAttackIfReady();
             }
 
         private:
-			bool _intro;
+            bool _intro;
         };
 
         CreatureAI* GetAI(Creature* creature) const

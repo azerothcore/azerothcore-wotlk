@@ -38,7 +38,7 @@ enum Creatures
     NPC_MAGMUS              = 9938,
     NPC_MOIRA               = 8929,
 
-	NPC_WATCHMAN_DOOMGRIP	= 9476,
+    NPC_WATCHMAN_DOOMGRIP   = 9476,
 };
 
 enum GameObjects
@@ -116,7 +116,7 @@ public:
         uint64 TombEventStarterGUID;
         uint32 TombTimer;
         uint32 TombEventCounter;
-		uint32 OpenedCoofers;
+        uint32 OpenedCoofers;
 
         void Initialize()
         {
@@ -154,7 +154,7 @@ public:
             TombEventStarterGUID = 0;
             TombTimer = TIMER_TOMBOFTHESEVEN;
             TombEventCounter = 0;
-			OpenedCoofers = 0;
+            OpenedCoofers = 0;
 
             for (uint8 i = 0; i < 7; ++i)
                 TombBossGUIDs[i] = 0;
@@ -262,15 +262,15 @@ public:
             case DATA_GHOSTKILL:
                 GhostKillCount += data;
                 break;
-			case DATA_OPEN_COFFER_DOORS:
-				OpenedCoofers += 1;
-				if (OpenedCoofers == 12)
-				{
-					Position pos = {812.15f, -348.91f, -50.579f, 0.7f};
-					if (TempSummon* summon = instance->SummonCreature(NPC_WATCHMAN_DOOMGRIP, pos))
-						summon->SetTempSummonType(TEMPSUMMON_MANUAL_DESPAWN);
-				}
-				break;
+            case DATA_OPEN_COFFER_DOORS:
+                OpenedCoofers += 1;
+                if (OpenedCoofers == 12)
+                {
+                    Position pos = {812.15f, -348.91f, -50.579f, 0.7f};
+                    if (TempSummon* summon = instance->SummonCreature(NPC_WATCHMAN_DOOMGRIP, pos))
+                        summon->SetTempSummonType(TEMPSUMMON_MANUAL_DESPAWN);
+                }
+                break;
             }
 
             if (data == DONE || GhostKillCount >= 7)

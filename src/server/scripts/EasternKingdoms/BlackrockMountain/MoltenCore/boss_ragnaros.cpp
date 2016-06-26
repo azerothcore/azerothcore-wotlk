@@ -115,11 +115,11 @@ class boss_ragnaros : public CreatureScript
                     Talk(SAY_KILL);
             }
 
-			void AttackStart(Unit* target)
-			{
-				if (target && me->Attack(target, true))
-					DoStartNoMovement(target);
-			}
+            void AttackStart(Unit* target)
+            {
+                if (target && me->Attack(target, true))
+                    DoStartNoMovement(target);
+            }
 
             void UpdateAI(uint32 diff)
             {
@@ -154,7 +154,7 @@ class boss_ragnaros : public CreatureScript
                         case EVENT_INTRO_4:
                             Talk(SAY_ARRIVAL5_RAG);
                             if (Creature* executus = ObjectAccessor::GetCreature(*me, instance->GetData64(BOSS_MAJORDOMO_EXECUTUS)))
-								Unit::Kill(me, executus);
+                                Unit::Kill(me, executus);
                             break;
                         case EVENT_INTRO_5:
                             me->SetReactState(REACT_AGGRESSIVE);

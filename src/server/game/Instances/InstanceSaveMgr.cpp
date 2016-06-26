@@ -42,14 +42,14 @@ BoundInstancesMap InstanceSaveManager::emptyBoundInstancesMap;
 InstanceSaveManager::~InstanceSaveManager()
 {
     lock_instLists = true;
-	// pussywizard: crashes on calling function in destructor (PlayerUnbindInstance), completely not needed anyway
+    // pussywizard: crashes on calling function in destructor (PlayerUnbindInstance), completely not needed anyway
     /*for (InstanceSaveHashMap::iterator itr = m_instanceSaveById.begin(); itr != m_instanceSaveById.end(); ++itr)
     {
         InstanceSave* save = itr->second;
 
-		InstanceSave::PlayerListType &pList = save->m_playerList;
-		while (!pList.empty())
-			PlayerUnbindInstance(*(pList.begin()), save->GetMapId(), save->GetDifficulty(), false);
+        InstanceSave::PlayerListType &pList = save->m_playerList;
+        while (!pList.empty())
+            PlayerUnbindInstance(*(pList.begin()), save->GetMapId(), save->GetDifficulty(), false);
 
         delete save;
     }*/
@@ -82,19 +82,19 @@ InstanceSave* InstanceSaveManager::AddInstanceSave(uint32 mapId, uint32 instance
     }
 
     time_t resetTime, extendedResetTime;
-	if (entry->map_type == MAP_RAID || difficulty > DUNGEON_DIFFICULTY_NORMAL)
-	{
+    if (entry->map_type == MAP_RAID || difficulty > DUNGEON_DIFFICULTY_NORMAL)
+    {
         resetTime = GetResetTimeFor(mapId, difficulty);
-		extendedResetTime = GetExtendedResetTimeFor(mapId, difficulty);
-	}
+        extendedResetTime = GetExtendedResetTimeFor(mapId, difficulty);
+    }
     else
-	{
+    {
         resetTime = time(NULL) + 3*DAY; // normals expire after 3 days even if someone is still bound to them, cleared on startup
-		extendedResetTime = 0;
-	}
+        extendedResetTime = 0;
+    }
     InstanceSave* save = new InstanceSave(mapId, instanceId, difficulty, resetTime, extendedResetTime);
-	if (!startup)
-		save->InsertToDB();
+    if (!startup)
+        save->InsertToDB();
 
     m_instanceSaveById[instanceId] = save;
     return save;
@@ -108,33 +108,33 @@ InstanceSave* InstanceSaveManager::GetInstanceSave(uint32 InstanceId)
 
 bool InstanceSaveManager::DeleteInstanceSaveIfNeeded(uint32 InstanceId, bool skipMapCheck)
 {
-	return DeleteInstanceSaveIfNeeded(GetInstanceSave(InstanceId), skipMapCheck);
+    return DeleteInstanceSaveIfNeeded(GetInstanceSave(InstanceId), skipMapCheck);
 }
 
 bool InstanceSaveManager::DeleteInstanceSaveIfNeeded(InstanceSave* save, bool skipMapCheck)
 {
-	// pussywizard: save is removed only when there are no more players bound AND the map doesn't exist
-	// pussywizard: this function is called when unbinding a player and when unloading a map
-	if (!lock_instLists && save && save->m_playerList.empty() && (skipMapCheck || !sMapMgr->FindMap(save->GetMapId(), save->GetInstanceId())))
-	{
-		// delete save from storage:
-		InstanceSaveHashMap::iterator itr = m_instanceSaveById.find(save->GetInstanceId());
-		ASSERT(itr != m_instanceSaveById.end() && itr->second == save);
-		m_instanceSaveById.erase(itr);
+    // pussywizard: save is removed only when there are no more players bound AND the map doesn't exist
+    // pussywizard: this function is called when unbinding a player and when unloading a map
+    if (!lock_instLists && save && save->m_playerList.empty() && (skipMapCheck || !sMapMgr->FindMap(save->GetMapId(), save->GetInstanceId())))
+    {
+        // delete save from storage:
+        InstanceSaveHashMap::iterator itr = m_instanceSaveById.find(save->GetInstanceId());
+        ASSERT(itr != m_instanceSaveById.end() && itr->second == save);
+        m_instanceSaveById.erase(itr);
 
-		// delete save from db:
-		// character_instance is deleted when unbinding a certain player
-		PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_INSTANCE_BY_INSTANCE);
-		stmt->setUInt32(0, save->GetInstanceId());
-		CharacterDatabase.Execute(stmt);
+        // delete save from db:
+        // character_instance is deleted when unbinding a certain player
+        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_INSTANCE_BY_INSTANCE);
+        stmt->setUInt32(0, save->GetInstanceId());
+        CharacterDatabase.Execute(stmt);
 
-		// clear respawn times (if map is loaded do it just to be sure, if already unloaded it won't do it by itself)
-		Map::DeleteRespawnTimesInDB(save->GetMapId(), save->GetInstanceId());
+        // clear respawn times (if map is loaded do it just to be sure, if already unloaded it won't do it by itself)
+        Map::DeleteRespawnTimesInDB(save->GetMapId(), save->GetInstanceId());
 
-		delete save;
-		return true;
-	}
-	return false;
+        delete save;
+        return true;
+    }
+    return false;
 }
 
 InstanceSave::InstanceSave(uint16 MapId, uint32 InstanceId, Difficulty difficulty, time_t resetTime, time_t extendedResetTime)
@@ -161,9 +161,9 @@ void InstanceSave::InsertToDB()
             data = instanceScript->GetSaveData();
             completedEncounters = instanceScript->GetCompletedEncounterMask();
 
-			// pussywizard:
-			SetInstanceData(data);
-			SetCompletedEncounterMask(completedEncounters);
+            // pussywizard:
+            SetInstanceData(data);
+            SetCompletedEncounterMask(completedEncounters);
         }
     }
 
@@ -200,17 +200,17 @@ MapEntry const* InstanceSave::GetMapEntry()
 
 void InstanceSave::AddPlayer(uint32 guidLow)
 {
-	TRINITY_GUARD(ACE_Thread_Mutex, _lock);
-	m_playerList.push_back(guidLow);
+    TRINITY_GUARD(ACE_Thread_Mutex, _lock);
+    m_playerList.push_back(guidLow);
 }
 
 bool InstanceSave::RemovePlayer(uint32 guidLow, InstanceSaveManager* ism)
 {
-	TRINITY_GUARD(ACE_Thread_Mutex, _lock);
-	m_playerList.remove(guidLow);
+    TRINITY_GUARD(ACE_Thread_Mutex, _lock);
+    m_playerList.remove(guidLow);
 
-	// ism passed as an argument to avoid calling via singleton (might result in a deadlock)
-	return ism->DeleteInstanceSaveIfNeeded(this->GetInstanceId(), false);
+    // ism passed as an argument to avoid calling via singleton (might result in a deadlock)
+    return ism->DeleteInstanceSaveIfNeeded(this->GetInstanceId(), false);
 }
 
 void InstanceSaveManager::LoadInstances()
@@ -220,8 +220,8 @@ void InstanceSaveManager::LoadInstances()
     // Delete character_instance for non-existent character
     CharacterDatabase.DirectExecute("DELETE ci.* FROM character_instance AS ci LEFT JOIN characters AS c ON ci.guid = c.guid WHERE c.guid IS NULL");
 
-	// Delete expired normal instances (normals expire after 3 days even if someone is still bound to them, cleared on startup)
-	CharacterDatabase.DirectExecute("DELETE FROM instance WHERE resettime > 0 AND resettime < UNIX_TIMESTAMP()");
+    // Delete expired normal instances (normals expire after 3 days even if someone is still bound to them, cleared on startup)
+    CharacterDatabase.DirectExecute("DELETE FROM instance WHERE resettime > 0 AND resettime < UNIX_TIMESTAMP()");
 
     // Delete instance with no binds
     CharacterDatabase.DirectExecute("DELETE i.* FROM instance AS i LEFT JOIN character_instance AS ci ON i.id = ci.instance WHERE ci.guid IS NULL");
@@ -241,9 +241,9 @@ void InstanceSaveManager::LoadInstances()
     // Load reset times and clean expired instances
     LoadResetTimes();
 
-	// pussywizard
-	LoadInstanceSaves();
-	LoadCharacterBinds();
+    // pussywizard
+    LoadInstanceSaves();
+    LoadCharacterBinds();
 
     sLog->outString(">> Loaded instances and binds in %u ms", GetMSTimeDiffToNow(oldMSTime));
     sLog->outString();
@@ -299,10 +299,10 @@ void InstanceSaveManager::LoadResetTimes()
         {
             // initialize the reset time
             t = today + period + diff;
-			SetResetTimeFor(mapid, difficulty, t);
+            SetResetTimeFor(mapid, difficulty, t);
             CharacterDatabase.DirectPExecute("INSERT INTO instance_reset VALUES ('%u', '%u', '%u')", mapid, difficulty, (uint32)t);
         }
-		SetExtendedResetTimeFor(mapid, difficulty, t + period);
+        SetExtendedResetTimeFor(mapid, difficulty, t + period);
 
         // schedule the global reset/warning
         uint8 type;
@@ -316,7 +316,7 @@ void InstanceSaveManager::LoadResetTimes()
 
 void InstanceSaveManager::LoadInstanceSaves()
 {
-	QueryResult result = CharacterDatabase.Query("SELECT id, map, resettime, difficulty, completedEncounters, data FROM instance ORDER BY id ASC");
+    QueryResult result = CharacterDatabase.Query("SELECT id, map, resettime, difficulty, completedEncounters, data FROM instance ORDER BY id ASC");
     if (result)
     {
         do
@@ -324,23 +324,23 @@ void InstanceSaveManager::LoadInstanceSaves()
             Field* fields = result->Fetch();
 
             uint32 instanceId = fields[0].GetUInt32();
-			uint32 mapId = fields[1].GetUInt16();
-			time_t resettime = time_t(fields[2].GetUInt32());
-			uint8 difficulty = fields[3].GetUInt8();
-			uint32 completedEncounters = fields[4].GetUInt32();
-			std::string instanceData = fields[5].GetString();
+            uint32 mapId = fields[1].GetUInt16();
+            time_t resettime = time_t(fields[2].GetUInt32());
+            uint8 difficulty = fields[3].GetUInt8();
+            uint32 completedEncounters = fields[4].GetUInt32();
+            std::string instanceData = fields[5].GetString();
 
             // Mark instance id as being used
             sMapMgr->RegisterInstanceId(instanceId);
 
-			InstanceSave* save = AddInstanceSave(mapId, instanceId, Difficulty(difficulty), true);
-			if (save)
-			{
-				save->SetCompletedEncounterMask(completedEncounters);
-				save->SetInstanceData(instanceData);
-				if (resettime > 0)
-					save->SetResetTime(resettime);
-			}
+            InstanceSave* save = AddInstanceSave(mapId, instanceId, Difficulty(difficulty), true);
+            if (save)
+            {
+                save->SetCompletedEncounterMask(completedEncounters);
+                save->SetInstanceData(instanceData);
+                if (resettime > 0)
+                    save->SetResetTime(resettime);
+            }
         }
         while (result->NextRow());
     }
@@ -348,9 +348,9 @@ void InstanceSaveManager::LoadInstanceSaves()
 
 void InstanceSaveManager::LoadCharacterBinds()
 {
-	lock_instLists = true;
+    lock_instLists = true;
 
-	QueryResult result = CharacterDatabase.Query("SELECT guid, instance, permanent, extended FROM character_instance");
+    QueryResult result = CharacterDatabase.Query("SELECT guid, instance, permanent, extended FROM character_instance");
     if (result)
     {
         do
@@ -362,41 +362,41 @@ void InstanceSaveManager::LoadCharacterBinds()
             bool perm = fields[2].GetBool();
             bool extended = fields[3].GetBool();
 
-			if (InstanceSave* save = GetInstanceSave(instanceId))
-			{
-				PlayerCreateBoundInstancesMaps(guid);
-				InstancePlayerBind& bind = playerBindStorage[guid]->m[save->GetDifficulty()][save->GetMapId()];
-				if (bind.save) // pussywizard: another bind for the same map and difficulty! may happen because of mysql thread races
-				{
-					if (bind.perm) // already loaded perm -> delete currently checked one from db
-					{
-						PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_INSTANCE_BY_INSTANCE_GUID);
-						stmt->setUInt32(0, guid);
-						stmt->setUInt32(1, instanceId);
-						CharacterDatabase.Execute(stmt);
-						continue;
-					}
-					else // override temp bind by newest one
-					{
-						PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_INSTANCE_BY_INSTANCE_GUID);
-						stmt->setUInt32(0, guid);
-						stmt->setUInt32(1, bind.save->GetInstanceId());
-						CharacterDatabase.Execute(stmt);
-						bind.save->RemovePlayer(guid, this);
-					}
-				}
-				bind.save = save;
-				bind.perm = perm;
-				bind.extended = extended;
-				save->AddPlayer(guid);
-				if (perm)
-					save->SetCanReset(false);
-			}
+            if (InstanceSave* save = GetInstanceSave(instanceId))
+            {
+                PlayerCreateBoundInstancesMaps(guid);
+                InstancePlayerBind& bind = playerBindStorage[guid]->m[save->GetDifficulty()][save->GetMapId()];
+                if (bind.save) // pussywizard: another bind for the same map and difficulty! may happen because of mysql thread races
+                {
+                    if (bind.perm) // already loaded perm -> delete currently checked one from db
+                    {
+                        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_INSTANCE_BY_INSTANCE_GUID);
+                        stmt->setUInt32(0, guid);
+                        stmt->setUInt32(1, instanceId);
+                        CharacterDatabase.Execute(stmt);
+                        continue;
+                    }
+                    else // override temp bind by newest one
+                    {
+                        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_INSTANCE_BY_INSTANCE_GUID);
+                        stmt->setUInt32(0, guid);
+                        stmt->setUInt32(1, bind.save->GetInstanceId());
+                        CharacterDatabase.Execute(stmt);
+                        bind.save->RemovePlayer(guid, this);
+                    }
+                }
+                bind.save = save;
+                bind.perm = perm;
+                bind.extended = extended;
+                save->AddPlayer(guid);
+                if (perm)
+                    save->SetCanReset(false);
+            }
         }
         while (result->NextRow());
     }
 
-	lock_instLists = false;
+    lock_instLists = false;
 }
 
 void InstanceSaveManager::ScheduleReset(time_t time, InstResetEvent event)
@@ -408,7 +408,7 @@ void InstanceSaveManager::Update()
 {
     time_t now = time(NULL);
     time_t t;
-	bool resetOccurred = false;
+    bool resetOccurred = false;
 
     while (!m_resetTimeQueue.empty())
     {
@@ -417,7 +417,7 @@ void InstanceSaveManager::Update()
             break;
 
         InstResetEvent &event = m_resetTimeQueue.begin()->second;
-		if (event.type)
+        if (event.type)
         {
             // global reset/warning for a certain map
             time_t resetTime = GetResetTimeFor(event.mapid, event.difficulty);
@@ -429,24 +429,24 @@ void InstanceSaveManager::Update()
                 ++event.type;
                 ScheduleReset(resetTime - ResetTimeDelay[event.type-1], event);
             }
-			else
-				resetOccurred = true;
+            else
+                resetOccurred = true;
         }
         m_resetTimeQueue.erase(m_resetTimeQueue.begin());
     }
 
-	// pussywizard: send updated calendar and raid info
-	if (resetOccurred)
-	{
-		sLog->outString("Instance ID reset occurred, sending updated calendar and raid info to all players!");
-		WorldPacket dummy;
-		for (SessionMap::const_iterator itr = sWorld->GetAllSessions().begin(); itr != sWorld->GetAllSessions().end(); ++itr)
-			if (Player* plr = itr->second->GetPlayer())
-			{
-				itr->second->HandleCalendarGetCalendar(dummy);
-				plr->SendRaidInfo();
-			}
-	}
+    // pussywizard: send updated calendar and raid info
+    if (resetOccurred)
+    {
+        sLog->outString("Instance ID reset occurred, sending updated calendar and raid info to all players!");
+        WorldPacket dummy;
+        for (SessionMap::const_iterator itr = sWorld->GetAllSessions().begin(); itr != sWorld->GetAllSessions().end(); ++itr)
+            if (Player* plr = itr->second->GetPlayer())
+            {
+                itr->second->HandleCalendarGetCalendar(dummy);
+                plr->SendRaidInfo();
+            }
+    }
 }
 
 void InstanceSaveManager::_ResetSave(InstanceSaveHashMap::iterator &itr)
@@ -454,46 +454,46 @@ void InstanceSaveManager::_ResetSave(InstanceSaveHashMap::iterator &itr)
     lock_instLists = true;
 
     InstanceSave::PlayerListType &pList = itr->second->m_playerList;
-	for (InstanceSave::PlayerListType::iterator iter = pList.begin(), iter2; iter != pList.end(); )
-	{
-		iter2 = iter++;
-		PlayerUnbindInstanceNotExtended(*iter2, itr->second->GetMapId(), itr->second->GetDifficulty(), ObjectAccessor::GetObjectInOrOutOfWorld(MAKE_NEW_GUID(*iter2, 0, HIGHGUID_PLAYER), (Player*)NULL));
-	}
+    for (InstanceSave::PlayerListType::iterator iter = pList.begin(), iter2; iter != pList.end(); )
+    {
+        iter2 = iter++;
+        PlayerUnbindInstanceNotExtended(*iter2, itr->second->GetMapId(), itr->second->GetDifficulty(), ObjectAccessor::GetObjectInOrOutOfWorld(MAKE_NEW_GUID(*iter2, 0, HIGHGUID_PLAYER), (Player*)NULL));
+    }
 
-	// delete stuff if no players left (noone extended id)
-	if (pList.empty())
-	{
-		// delete character_instance per id, delete instance per id
-		PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_INSTANCE_BY_INSTANCE);
-		stmt->setUInt32(0, itr->second->GetInstanceId());
-		CharacterDatabase.Execute(stmt);
-		stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_INSTANCE_BY_INSTANCE);
-		stmt->setUInt32(0, itr->second->GetInstanceId());
-		CharacterDatabase.Execute(stmt);
+    // delete stuff if no players left (noone extended id)
+    if (pList.empty())
+    {
+        // delete character_instance per id, delete instance per id
+        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_INSTANCE_BY_INSTANCE);
+        stmt->setUInt32(0, itr->second->GetInstanceId());
+        CharacterDatabase.Execute(stmt);
+        stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_INSTANCE_BY_INSTANCE);
+        stmt->setUInt32(0, itr->second->GetInstanceId());
+        CharacterDatabase.Execute(stmt);
 
-		// clear respawn times if the map is already unloaded and won't do it by itself
-		if (!sMapMgr->FindMap(itr->second->GetMapId(), itr->second->GetInstanceId()))
-			Map::DeleteRespawnTimesInDB(itr->second->GetMapId(), itr->second->GetInstanceId());
+        // clear respawn times if the map is already unloaded and won't do it by itself
+        if (!sMapMgr->FindMap(itr->second->GetMapId(), itr->second->GetInstanceId()))
+            Map::DeleteRespawnTimesInDB(itr->second->GetMapId(), itr->second->GetInstanceId());
 
-		delete itr->second;
-		m_instanceSaveById.erase(itr);
-	}
-	else
-	{
-		// delete character_instance per id where extended = 0, transtaction with set extended = 0, transaction is used to avoid mysql thread races
-		SQLTransaction trans = CharacterDatabase.BeginTransaction();
-		PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_INSTANCE_BY_INSTANCE_NOT_EXTENDED);
-		stmt->setUInt32(0, itr->second->GetInstanceId());
-		trans->Append(stmt);
-		stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_INSTANCE_SET_NOT_EXTENDED);
-		stmt->setUInt32(0, itr->second->GetInstanceId());
-		trans->Append(stmt);
-		CharacterDatabase.CommitTransaction(trans);
+        delete itr->second;
+        m_instanceSaveById.erase(itr);
+    }
+    else
+    {
+        // delete character_instance per id where extended = 0, transtaction with set extended = 0, transaction is used to avoid mysql thread races
+        SQLTransaction trans = CharacterDatabase.BeginTransaction();
+        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_INSTANCE_BY_INSTANCE_NOT_EXTENDED);
+        stmt->setUInt32(0, itr->second->GetInstanceId());
+        trans->Append(stmt);
+        stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_INSTANCE_SET_NOT_EXTENDED);
+        stmt->setUInt32(0, itr->second->GetInstanceId());
+        trans->Append(stmt);
+        CharacterDatabase.CommitTransaction(trans);
 
-		// update reset time and extended reset time for instance save
-		itr->second->SetResetTime(GetResetTimeFor(itr->second->GetMapId(), itr->second->GetDifficulty()));
-		itr->second->SetExtendedResetTime(GetExtendedResetTimeFor(itr->second->GetMapId(), itr->second->GetDifficulty()));
-	}
+        // update reset time and extended reset time for instance save
+        itr->second->SetResetTime(GetResetTimeFor(itr->second->GetMapId(), itr->second->GetDifficulty()));
+        itr->second->SetExtendedResetTime(GetExtendedResetTimeFor(itr->second->GetMapId(), itr->second->GetDifficulty()));
+    }
 
     lock_instLists = false;
 }
@@ -554,7 +554,7 @@ void InstanceSaveManager::_ResetOrWarnAll(uint32 mapid, Difficulty difficulty, b
     for (mitr = instMaps.begin(); mitr != instMaps.end(); ++mitr)
     {
         Map* map2 = mitr->second;
-		if (!map2->IsDungeon() || map2->GetDifficulty() != difficulty)
+        if (!map2->IsDungeon() || map2->GetDifficulty() != difficulty)
             continue;
 
         if (warn)
@@ -567,23 +567,23 @@ void InstanceSaveManager::_ResetOrWarnAll(uint32 mapid, Difficulty difficulty, b
             map2->ToInstanceMap()->SendResetWarnings(timeLeft);
         }
         else
-		{
-			InstanceSave* save = GetInstanceSave(map2->GetInstanceId());
-			map2->ToInstanceMap()->Reset(INSTANCE_RESET_GLOBAL, (save ? &(save->m_playerList) : NULL));
-		}
+        {
+            InstanceSave* save = GetInstanceSave(map2->GetInstanceId());
+            map2->ToInstanceMap()->Reset(INSTANCE_RESET_GLOBAL, (save ? &(save->m_playerList) : NULL));
+        }
     }
 }
 
 InstancePlayerBind* InstanceSaveManager::PlayerBindToInstance(uint32 guidLow, InstanceSave* save, bool permanent, Player* player /*= NULL*/)
 {
-	InstancePlayerBind& bind = playerBindStorage[guidLow]->m[save->GetDifficulty()][save->GetMapId()];
-	ASSERT(!bind.perm || permanent); // ensure there's no changing permanent to temporary, this can be done only by unbinding
+    InstancePlayerBind& bind = playerBindStorage[guidLow]->m[save->GetDifficulty()][save->GetMapId()];
+    ASSERT(!bind.perm || permanent); // ensure there's no changing permanent to temporary, this can be done only by unbinding
 
-	if (bind.save)
-	{
-		if (save != bind.save || permanent != bind.perm)
-		{
-			bind.extended = false;
+    if (bind.save)
+    {
+        if (save != bind.save || permanent != bind.perm)
+        {
+            bind.extended = false;
 
             PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_INSTANCE);
             stmt->setUInt32(0, save->GetInstanceId());
@@ -591,34 +591,34 @@ InstancePlayerBind* InstanceSaveManager::PlayerBindToInstance(uint32 guidLow, In
             stmt->setUInt32(2, guidLow);
             stmt->setUInt32(3, bind.save->GetInstanceId());
             CharacterDatabase.Execute(stmt);
-		}
-	}
-	else
-	{
-		// pussywizard: protect against mysql thread races!
-		// pussywizard: CHANGED MY MIND! DON'T SLOW DOWN THIS QUERY! HANDLE ONLY DURING LOADING FROM DB!
-		// example: enter instance -> bind -> update old id to new id -> exit -> delete new id
-		// if delete by new id is executed before update, then we end up with shit in db
-		/*SQLTransaction trans = CharacterDatabase.BeginTransaction();
-		// ensure any shit for that map+difficulty is deleted!
-		PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_INSTANCE_BY_GUID_MAP_DIFF); // DELETE ci FROM character_instance ci JOIN instance i ON ci.instance = i.id WHERE ci.guid = ? AND i.map = ? AND i.difficulty = ?
-		stmt->setUInt32(0, guidLow);
+        }
+    }
+    else
+    {
+        // pussywizard: protect against mysql thread races!
+        // pussywizard: CHANGED MY MIND! DON'T SLOW DOWN THIS QUERY! HANDLE ONLY DURING LOADING FROM DB!
+        // example: enter instance -> bind -> update old id to new id -> exit -> delete new id
+        // if delete by new id is executed before update, then we end up with shit in db
+        /*SQLTransaction trans = CharacterDatabase.BeginTransaction();
+        // ensure any shit for that map+difficulty is deleted!
+        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_INSTANCE_BY_GUID_MAP_DIFF); // DELETE ci FROM character_instance ci JOIN instance i ON ci.instance = i.id WHERE ci.guid = ? AND i.map = ? AND i.difficulty = ?
+        stmt->setUInt32(0, guidLow);
         stmt->setUInt16(1, uint16(save->GetMapId()));
         stmt->setUInt8(2, uint8(save->GetDifficulty()));
-		trans->Append(stmt);
+        trans->Append(stmt);
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHAR_INSTANCE);
         stmt->setUInt32(0, guidLow);
         stmt->setUInt32(1, save->GetInstanceId());
         stmt->setBool(2, permanent);
         trans->Append(stmt);
-		CharacterDatabase.CommitTransaction(trans);*/
+        CharacterDatabase.CommitTransaction(trans);*/
 
         PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHAR_INSTANCE);
         stmt->setUInt32(0, guidLow);
         stmt->setUInt32(1, save->GetInstanceId());
         stmt->setBool(2, permanent);
         CharacterDatabase.Execute(stmt);
-	}
+    }
 
     if (bind.save != save)
     {
@@ -628,80 +628,80 @@ InstancePlayerBind* InstanceSaveManager::PlayerBindToInstance(uint32 guidLow, In
     }
 
     if (permanent)
-	{
+    {
         save->SetCanReset(false);
-		if (!bind.perm && player) // temporary changing to permanent
-			player->GetSession()->SendCalendarRaidLockout(save, true);
-	}
+        if (!bind.perm && player) // temporary changing to permanent
+            player->GetSession()->SendCalendarRaidLockout(save, true);
+    }
 
     bind.save = save;
     bind.perm = permanent;
 
-	if (player)
-		sScriptMgr->OnPlayerBindToInstance(player, save->GetDifficulty(), save->GetMapId(), permanent);
+    if (player)
+        sScriptMgr->OnPlayerBindToInstance(player, save->GetDifficulty(), save->GetMapId(), permanent);
 
-	return &bind;
+    return &bind;
 }
 
 void InstanceSaveManager::PlayerUnbindInstance(uint32 guidLow, uint32 mapid, Difficulty difficulty, bool deleteFromDB, Player* player /*= NULL*/)
 {
-	BoundInstancesMapWrapper* w = playerBindStorage[guidLow];
-	BoundInstancesMap::iterator itr = w->m[difficulty].find(mapid);
-	if (itr != w->m[difficulty].end())
-	{
-		if (deleteFromDB)
-		{
+    BoundInstancesMapWrapper* w = playerBindStorage[guidLow];
+    BoundInstancesMap::iterator itr = w->m[difficulty].find(mapid);
+    if (itr != w->m[difficulty].end())
+    {
+        if (deleteFromDB)
+        {
             PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_INSTANCE_BY_INSTANCE_GUID);
             stmt->setUInt32(0, guidLow);
             stmt->setUInt32(1, itr->second.save->GetInstanceId());
             CharacterDatabase.Execute(stmt);
-		}
+        }
 
         if (itr->second.perm && player)
             player->GetSession()->SendCalendarRaidLockout(itr->second.save, false);
 
-		InstanceSave* tmp = itr->second.save;
-		w->m[difficulty].erase(itr);
+        InstanceSave* tmp = itr->second.save;
+        w->m[difficulty].erase(itr);
         tmp->RemovePlayer(guidLow, this);
-	}
+    }
 }
 
 void InstanceSaveManager::PlayerUnbindInstanceNotExtended(uint32 guidLow, uint32 mapid, Difficulty difficulty, Player* player /*= NULL*/)
 {
-	BoundInstancesMapWrapper* w = playerBindStorage[guidLow];
-	BoundInstancesMap::iterator itr = w->m[difficulty].find(mapid);
-	if (itr != w->m[difficulty].end())
-	{
-		if (itr->second.extended)
-			itr->second.extended = false;
-		else
-		{
-			if (itr->second.perm && player)
-				player->GetSession()->SendCalendarRaidLockout(itr->second.save, false);
+    BoundInstancesMapWrapper* w = playerBindStorage[guidLow];
+    BoundInstancesMap::iterator itr = w->m[difficulty].find(mapid);
+    if (itr != w->m[difficulty].end())
+    {
+        if (itr->second.extended)
+            itr->second.extended = false;
+        else
+        {
+            if (itr->second.perm && player)
+                player->GetSession()->SendCalendarRaidLockout(itr->second.save, false);
 
-			InstanceSave* tmp = itr->second.save;
-			w->m[difficulty].erase(itr);
-			tmp->RemovePlayer(guidLow, this);
-		}
-	}
+            InstanceSave* tmp = itr->second.save;
+            w->m[difficulty].erase(itr);
+            tmp->RemovePlayer(guidLow, this);
+        }
+    }
 }
 
 InstancePlayerBind* InstanceSaveManager::PlayerGetBoundInstance(uint32 guidLow, uint32 mapid, Difficulty difficulty)
 {
-	Difficulty difficulty_fixed = (mapid == 631 || mapid == 724 ? Difficulty(difficulty%2) : difficulty);
+    Difficulty difficulty_fixed = (mapid == 631 || mapid == 724 ? Difficulty(difficulty%2) : difficulty);
     MapDifficulty const* mapDiff = GetDownscaledMapDifficultyData(mapid, difficulty_fixed);
     if (!mapDiff)
         return NULL;
 
-	BoundInstancesMapWrapper* w = NULL;
-	PlayerBindStorage::const_iterator itr = playerBindStorage.find(guidLow);
-	if (itr != playerBindStorage.end())
-		w = itr->second;
-	else
-		return NULL;
+    BoundInstancesMapWrapper* w = NULL;
+    PlayerBindStorage::const_iterator itr = playerBindStorage.find(guidLow);
+    if (itr != playerBindStorage.end())
+        w = itr->second;
+    else
+        return NULL;
 
-	BoundInstancesMap::iterator itr2 = w->m[difficulty_fixed].find(mapid);
-	if (itr2 != w->m[difficulty_fixed].end())
+    BoundInstancesMap::iterator itr2 = w->m[difficulty_fixed].find(mapid);
+    if (itr2 != w->m[difficulty_fixed].end())
         return &itr2->second;
     else
         return NULL;
@@ -709,66 +709,66 @@ InstancePlayerBind* InstanceSaveManager::PlayerGetBoundInstance(uint32 guidLow, 
 
 bool InstanceSaveManager::PlayerIsPermBoundToInstance(uint32 guidLow, uint32 mapid, Difficulty difficulty)
 { 
-	if (InstancePlayerBind* bind = PlayerGetBoundInstance(guidLow, mapid, difficulty))
-		if (bind->perm)
-			return true;
-	return false;
+    if (InstancePlayerBind* bind = PlayerGetBoundInstance(guidLow, mapid, difficulty))
+        if (bind->perm)
+            return true;
+    return false;
 }
 
 BoundInstancesMap const& InstanceSaveManager::PlayerGetBoundInstances(uint32 guidLow, Difficulty difficulty)
 {
-	PlayerBindStorage::iterator itr = playerBindStorage.find(guidLow);
-	if (itr != playerBindStorage.end())
-		return itr->second->m[difficulty];
-	return emptyBoundInstancesMap;
+    PlayerBindStorage::iterator itr = playerBindStorage.find(guidLow);
+    if (itr != playerBindStorage.end())
+        return itr->second->m[difficulty];
+    return emptyBoundInstancesMap;
 }
 
 void InstanceSaveManager::PlayerCreateBoundInstancesMaps(uint32 guidLow)
 {
-	if (playerBindStorage.find(guidLow) == playerBindStorage.end())
-		playerBindStorage[guidLow] = new BoundInstancesMapWrapper;
+    if (playerBindStorage.find(guidLow) == playerBindStorage.end())
+        playerBindStorage[guidLow] = new BoundInstancesMapWrapper;
 }
 
 InstanceSave* InstanceSaveManager::PlayerGetInstanceSave(uint32 guidLow, uint32 mapid, Difficulty difficulty)
 {
-	InstancePlayerBind* pBind = PlayerGetBoundInstance(guidLow, mapid, difficulty);
+    InstancePlayerBind* pBind = PlayerGetBoundInstance(guidLow, mapid, difficulty);
     return (pBind ? pBind->save : NULL);
 }
 
 uint32 InstanceSaveManager::PlayerGetDestinationInstanceId(Player* player, uint32 mapid, Difficulty difficulty)
 {
-	// returning 0 means a new instance will be created
-	// non-zero implicates that InstanceSave exists
+    // returning 0 means a new instance will be created
+    // non-zero implicates that InstanceSave exists
 
-	InstancePlayerBind* ipb = PlayerGetBoundInstance(player->GetGUIDLow(), mapid, difficulty);
-	if (ipb && ipb->perm) // 1. self perm
-		return ipb->save->GetInstanceId();
-	if (Group* g = player->GetGroup())
-	{
-		if (InstancePlayerBind* ilb = PlayerGetBoundInstance(GUID_LOPART(g->GetLeaderGUID()), mapid, difficulty)) // 2. leader temp/perm
-			return ilb->save->GetInstanceId();
-		return 0; // 3. in group, no leader bind
-	}
-	return ipb ? ipb->save->GetInstanceId() : 0; // 4. self temp
+    InstancePlayerBind* ipb = PlayerGetBoundInstance(player->GetGUIDLow(), mapid, difficulty);
+    if (ipb && ipb->perm) // 1. self perm
+        return ipb->save->GetInstanceId();
+    if (Group* g = player->GetGroup())
+    {
+        if (InstancePlayerBind* ilb = PlayerGetBoundInstance(GUID_LOPART(g->GetLeaderGUID()), mapid, difficulty)) // 2. leader temp/perm
+            return ilb->save->GetInstanceId();
+        return 0; // 3. in group, no leader bind
+    }
+    return ipb ? ipb->save->GetInstanceId() : 0; // 4. self temp
 }
 
 void InstanceSaveManager::CopyBinds(uint32 from, uint32 to, Player* toPlr)
 {
-	if (from == to)
-		return;
+    if (from == to)
+        return;
 
-	for (uint8 d = 0; d < MAX_DIFFICULTY; ++d)
-	{
-		BoundInstancesMap const& bi = PlayerGetBoundInstances(from, Difficulty(d));
-		for (BoundInstancesMap::const_iterator itr = bi.begin(); itr != bi.end(); ++itr)
-			if (!PlayerGetBoundInstance(to, itr->first, Difficulty(d)))
-				PlayerBindToInstance(to, itr->second.save, false, toPlr);
-	}
+    for (uint8 d = 0; d < MAX_DIFFICULTY; ++d)
+    {
+        BoundInstancesMap const& bi = PlayerGetBoundInstances(from, Difficulty(d));
+        for (BoundInstancesMap::const_iterator itr = bi.begin(); itr != bi.end(); ++itr)
+            if (!PlayerGetBoundInstance(to, itr->first, Difficulty(d)))
+                PlayerBindToInstance(to, itr->second.save, false, toPlr);
+    }
 }
 
 void InstanceSaveManager::UnbindAllFor(InstanceSave* save)
 {
     InstanceSave::PlayerListType &pList = save->m_playerList;
     while (!pList.empty())
-		PlayerUnbindInstance(*(pList.begin()), save->GetMapId(), save->GetDifficulty(), true, ObjectAccessor::GetObjectInOrOutOfWorld(MAKE_NEW_GUID(*(pList.begin()), 0, HIGHGUID_PLAYER), (Player*)NULL));
+        PlayerUnbindInstance(*(pList.begin()), save->GetMapId(), save->GetDifficulty(), true, ObjectAccessor::GetObjectInOrOutOfWorld(MAKE_NEW_GUID(*(pList.begin()), 0, HIGHGUID_PLAYER), (Player*)NULL));
 }

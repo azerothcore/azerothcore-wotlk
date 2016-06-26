@@ -36,7 +36,7 @@ GossipMenu::~GossipMenu()
 
 void GossipMenu::AddMenuItem(int32 menuItemId, uint8 icon, std::string const& message, uint32 sender, uint32 action, std::string const& boxMessage, uint32 boxMoney, bool coded /*= false*/)
 {
-	//TRINITY_WRITE_GUARD(ACE_RW_Thread_Mutex, GetLock());
+    //TRINITY_WRITE_GUARD(ACE_RW_Thread_Mutex, GetLock());
     ASSERT(_menuItems.size() <= GOSSIP_MAX_MENU_ITEMS);
 
     // Find a free new id - script case
@@ -68,7 +68,7 @@ void GossipMenu::AddMenuItem(int32 menuItemId, uint8 icon, std::string const& me
 
 void GossipMenu::AddGossipMenuItemData(uint32 menuItemId, uint32 gossipActionMenuId, uint32 gossipActionPoi)
 {
-	//TRINITY_WRITE_GUARD(ACE_RW_Thread_Mutex, GetLock());
+    //TRINITY_WRITE_GUARD(ACE_RW_Thread_Mutex, GetLock());
     GossipMenuItemData& itemData = _menuItemData[menuItemId];
 
     itemData.GossipActionMenuId  = gossipActionMenuId;
@@ -77,7 +77,7 @@ void GossipMenu::AddGossipMenuItemData(uint32 menuItemId, uint32 gossipActionMen
 
 uint32 GossipMenu::GetMenuItemSender(uint32 menuItemId) const
 {
-	//TRINITY_READ_GUARD(ACE_RW_Thread_Mutex, GetLock());
+    //TRINITY_READ_GUARD(ACE_RW_Thread_Mutex, GetLock());
     GossipMenuItemContainer::const_iterator itr = _menuItems.find(menuItemId);
     if (itr == _menuItems.end())
         return 0;
@@ -87,7 +87,7 @@ uint32 GossipMenu::GetMenuItemSender(uint32 menuItemId) const
 
 uint32 GossipMenu::GetMenuItemAction(uint32 menuItemId) const
 {
-	//TRINITY_READ_GUARD(ACE_RW_Thread_Mutex, GetLock());
+    //TRINITY_READ_GUARD(ACE_RW_Thread_Mutex, GetLock());
     GossipMenuItemContainer::const_iterator itr = _menuItems.find(menuItemId);
     if (itr == _menuItems.end())
         return 0;
@@ -97,7 +97,7 @@ uint32 GossipMenu::GetMenuItemAction(uint32 menuItemId) const
 
 bool GossipMenu::IsMenuItemCoded(uint32 menuItemId) const
 {
-	//TRINITY_READ_GUARD(ACE_RW_Thread_Mutex, GetLock());
+    //TRINITY_READ_GUARD(ACE_RW_Thread_Mutex, GetLock());
     GossipMenuItemContainer::const_iterator itr = _menuItems.find(menuItemId);
     if (itr == _menuItems.end())
         return false;
@@ -107,7 +107,7 @@ bool GossipMenu::IsMenuItemCoded(uint32 menuItemId) const
 
 void GossipMenu::ClearMenu()
 {
-	//TRINITY_WRITE_GUARD(ACE_RW_Thread_Mutex, GetLock());
+    //TRINITY_WRITE_GUARD(ACE_RW_Thread_Mutex, GetLock());
     _menuItems.clear();
     _menuItemData.clear();
 }
@@ -129,8 +129,8 @@ void PlayerMenu::ClearMenus()
 
 void PlayerMenu::SendGossipMenu(uint32 titleTextId, uint64 objectGUID) const
 {
-	//ACE_Read_Guard<ACE_RW_Thread_Mutex> lock1(_gossipMenu.GetLock());
-	//ACE_Read_Guard<ACE_RW_Thread_Mutex> lock2(_questMenu.GetLock());
+    //ACE_Read_Guard<ACE_RW_Thread_Mutex> lock1(_gossipMenu.GetLock());
+    //ACE_Read_Guard<ACE_RW_Thread_Mutex> lock2(_questMenu.GetLock());
 
     WorldPacket data(SMSG_GOSSIP_MESSAGE, 24 + _gossipMenu.GetMenuItemCount()*100 + _questMenu.GetMenuItemCount()*75);         // guess size
     data << uint64(objectGUID);
@@ -213,7 +213,7 @@ void QuestMenu::AddMenuItem(uint32 QuestId, uint8 Icon)
     if (!sObjectMgr->GetQuestTemplate(QuestId))
         return;
 
-	//TRINITY_WRITE_GUARD(ACE_RW_Thread_Mutex, GetLock());
+    //TRINITY_WRITE_GUARD(ACE_RW_Thread_Mutex, GetLock());
 
     ASSERT(_questMenuItems.size() <= GOSSIP_MAX_MENU_ITEMS);
 
@@ -227,7 +227,7 @@ void QuestMenu::AddMenuItem(uint32 QuestId, uint8 Icon)
 
 bool QuestMenu::HasItem(uint32 questId) const
 {
-	//TRINITY_READ_GUARD(ACE_RW_Thread_Mutex, GetLock());
+    //TRINITY_READ_GUARD(ACE_RW_Thread_Mutex, GetLock());
     for (QuestMenuItemList::const_iterator i = _questMenuItems.begin(); i != _questMenuItems.end(); ++i)
         if (i->QuestId == questId)
             return true;
@@ -237,7 +237,7 @@ bool QuestMenu::HasItem(uint32 questId) const
 
 void QuestMenu::ClearMenu()
 {
-	//TRINITY_WRITE_GUARD(ACE_RW_Thread_Mutex, GetLock());
+    //TRINITY_WRITE_GUARD(ACE_RW_Thread_Mutex, GetLock());
     _questMenuItems.clear();
 }
 
@@ -467,22 +467,22 @@ void PlayerMenu::SendQuestGiverRequestItems(Quest const* quest, uint64 npcGUID, 
         return;
     }
 
-	// Xinef: recheck completion on reward display
-	Player* _player = _session->GetPlayer();
-	QuestStatusMap::iterator qsitr = _player->getQuestStatusMap().find(quest->GetQuestId());
-	if (qsitr != _player->getQuestStatusMap().end() && qsitr->second.Status == QUEST_STATUS_INCOMPLETE)
-	{
-		for (uint8 i=0; i<6; ++i)
-			if (quest->RequiredItemId[i] && qsitr->second.ItemCount[i] < quest->RequiredItemCount[i])
-				if (_player->GetItemCount(quest->RequiredItemId[i], false) >= quest->RequiredItemCount[i])
-					qsitr->second.ItemCount[i] = quest->RequiredItemCount[i];
+    // Xinef: recheck completion on reward display
+    Player* _player = _session->GetPlayer();
+    QuestStatusMap::iterator qsitr = _player->getQuestStatusMap().find(quest->GetQuestId());
+    if (qsitr != _player->getQuestStatusMap().end() && qsitr->second.Status == QUEST_STATUS_INCOMPLETE)
+    {
+        for (uint8 i=0; i<6; ++i)
+            if (quest->RequiredItemId[i] && qsitr->second.ItemCount[i] < quest->RequiredItemCount[i])
+                if (_player->GetItemCount(quest->RequiredItemId[i], false) >= quest->RequiredItemCount[i])
+                    qsitr->second.ItemCount[i] = quest->RequiredItemCount[i];
 
-		if (_player->CanCompleteQuest(quest->GetQuestId()))
-		{
-			_player->CompleteQuest(quest->GetQuestId());
-			canComplete = true;
-		}
-	}
+        if (_player->CanCompleteQuest(quest->GetQuestId()))
+        {
+            _player->CompleteQuest(quest->GetQuestId());
+            canComplete = true;
+        }
+    }
 
     WorldPacket data(SMSG_QUESTGIVER_REQUEST_ITEMS, 300);   // guess size
     data << uint64(npcGUID);

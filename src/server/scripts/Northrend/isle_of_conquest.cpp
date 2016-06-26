@@ -26,7 +26,7 @@
 
 enum eIoCTurrent
 {
-	EVENT_RESTORE_FLAG			= 1
+    EVENT_RESTORE_FLAG          = 1
 };
 
 class npc_isle_of_conquest_turret : public CreatureScript
@@ -36,48 +36,48 @@ class npc_isle_of_conquest_turret : public CreatureScript
 
         struct npc_isle_of_conquest_turretAI : public VehicleAI
         {
-            npc_isle_of_conquest_turretAI(Creature* creature) : VehicleAI(creature), faction(0)	{ }
+            npc_isle_of_conquest_turretAI(Creature* creature) : VehicleAI(creature), faction(0) { }
 
-			uint32 faction;
-			EventMap events;
+            uint32 faction;
+            EventMap events;
 
             void JustDied(Unit* )
-			{
-				if (me->GetEntry() == NPC_KEEP_CANNON)
-				{
-					faction = me->getFaction();
-					me->Respawn();
-					me->UpdateEntry(NPC_BROKEN_KEEP_CANNON, NULL, false);
-					me->RemoveVehicleKit();
-					me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
-				}
-			}
+            {
+                if (me->GetEntry() == NPC_KEEP_CANNON)
+                {
+                    faction = me->getFaction();
+                    me->Respawn();
+                    me->UpdateEntry(NPC_BROKEN_KEEP_CANNON, NULL, false);
+                    me->RemoveVehicleKit();
+                    me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
+                }
+            }
 
-			void SpellHit(Unit* /*caster*/, SpellInfo const* spellInfo)
-			{
-				if (spellInfo->Id == SPELL_REPAIR_TURRET_DUMMY && me->GetEntry() == NPC_BROKEN_KEEP_CANNON)
-				{
-					me->UpdateEntry(NPC_KEEP_CANNON, NULL, false);
-					if (faction)
-						me->setFaction(faction);
-					me->CreateVehicleKit(510, NPC_KEEP_CANNON);
-					me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
-					events.ScheduleEvent(EVENT_RESTORE_FLAG, 4000);
-				}
-			}
+            void SpellHit(Unit* /*caster*/, SpellInfo const* spellInfo)
+            {
+                if (spellInfo->Id == SPELL_REPAIR_TURRET_DUMMY && me->GetEntry() == NPC_BROKEN_KEEP_CANNON)
+                {
+                    me->UpdateEntry(NPC_KEEP_CANNON, NULL, false);
+                    if (faction)
+                        me->setFaction(faction);
+                    me->CreateVehicleKit(510, NPC_KEEP_CANNON);
+                    me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
+                    events.ScheduleEvent(EVENT_RESTORE_FLAG, 4000);
+                }
+            }
 
-			void UpdateAI(uint32 diff)
-			{
-				events.Update(diff);
-				switch (events.ExecuteEvent())
-				{
-					case EVENT_RESTORE_FLAG:
-						me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
-						break;
-				}
+            void UpdateAI(uint32 diff)
+            {
+                events.Update(diff);
+                switch (events.ExecuteEvent())
+                {
+                    case EVENT_RESTORE_FLAG:
+                        me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
+                        break;
+                }
 
-				VehicleAI::UpdateAI(diff);
-			}
+                VehicleAI::UpdateAI(diff);
+            }
         };
 
         CreatureAI* GetAI(Creature* creature) const
@@ -125,11 +125,11 @@ class npc_four_car_garage : public CreatureScript
                 }
             }
 
-			void JustDied(Unit* killer)
-			{
-				if (Player* player = killer->GetCharmerOrOwnerPlayerOrPlayerItself())
-					player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_GET_KILLING_BLOWS, 1, 0, me);
-			}
+            void JustDied(Unit* killer)
+            {
+                if (Player* player = killer->GetCharmerOrOwnerPlayerOrPlayerItself())
+                    player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_GET_KILLING_BLOWS, 1, 0, me);
+            }
         };
 
         CreatureAI* GetAI(Creature* creature) const
@@ -202,18 +202,18 @@ class npc_ioc_gunship_captain : public CreatureScript
 
 enum BossIoCEvents
 {
-	EVENT_CHECK_RAGE				= 1,
-	EVENT_BRUTAL_STRIKE				= 2,
-	EVENT_CRUSHING_LEAP				= 3,
-	EVENT_DAGGER_THROW				= 4,
+    EVENT_CHECK_RAGE                = 1,
+    EVENT_BRUTAL_STRIKE             = 2,
+    EVENT_CRUSHING_LEAP             = 3,
+    EVENT_DAGGER_THROW              = 4,
 };
 
 enum BossIoCSpells
 {
-	SPELL_IOCBOSS_BRUTAL_STRIKE		= 58460,
-	SPELL_IOCBOSS_CRUSHING_LEAP		= 68506,
-	SPELL_IOCBOSS_DAGGER_THROW		= 67280,
-	SPELL_IOCBOSS_RAGE				= 66776,
+    SPELL_IOCBOSS_BRUTAL_STRIKE     = 58460,
+    SPELL_IOCBOSS_CRUSHING_LEAP     = 68506,
+    SPELL_IOCBOSS_DAGGER_THROW      = 67280,
+    SPELL_IOCBOSS_RAGE              = 66776,
 };
 
 class boss_isle_of_conquest : public CreatureScript
@@ -225,75 +225,75 @@ class boss_isle_of_conquest : public CreatureScript
         {
             boss_isle_of_conquestAI(Creature* creature) : ScriptedAI(creature) { }
 
-			EventMap events;
-			bool rage;
-			void Reset() 
-			{ 
-				events.Reset();
-				rage = false;
-			}
+            EventMap events;
+            bool rage;
+            void Reset() 
+            { 
+                events.Reset();
+                rage = false;
+            }
 
-			void CheckRageBuff()
-			{
-				if (!rage)
-				{
-					if (me->GetDistance(me->GetHomePosition()) > 40.0f)
-					{
-						rage = true;
-						me->CastSpell(me, SPELL_IOCBOSS_RAGE, true);
-					}
-				}
-				else
-				{
-					if (me->GetDistance(me->GetHomePosition()) < 40.0f && abs(me->GetPositionZ() - me->GetHomePosition().GetPositionZ()) < 5.0f)
-					{
-						rage = false;
-						me->RemoveAurasDueToSpell(SPELL_IOCBOSS_RAGE);
-					}
-				}
-			}
+            void CheckRageBuff()
+            {
+                if (!rage)
+                {
+                    if (me->GetDistance(me->GetHomePosition()) > 40.0f)
+                    {
+                        rage = true;
+                        me->CastSpell(me, SPELL_IOCBOSS_RAGE, true);
+                    }
+                }
+                else
+                {
+                    if (me->GetDistance(me->GetHomePosition()) < 40.0f && abs(me->GetPositionZ() - me->GetHomePosition().GetPositionZ()) < 5.0f)
+                    {
+                        rage = false;
+                        me->RemoveAurasDueToSpell(SPELL_IOCBOSS_RAGE);
+                    }
+                }
+            }
 
-			void EnterCombat(Unit* who)
-			{
-				events.ScheduleEvent(EVENT_CHECK_RAGE, 2000);
-				events.ScheduleEvent(EVENT_BRUTAL_STRIKE, 6000);
-				events.ScheduleEvent(EVENT_CRUSHING_LEAP, 22000);
-				events.ScheduleEvent(EVENT_DAGGER_THROW, 10000);
-			}
+            void EnterCombat(Unit* who)
+            {
+                events.ScheduleEvent(EVENT_CHECK_RAGE, 2000);
+                events.ScheduleEvent(EVENT_BRUTAL_STRIKE, 6000);
+                events.ScheduleEvent(EVENT_CRUSHING_LEAP, 22000);
+                events.ScheduleEvent(EVENT_DAGGER_THROW, 10000);
+            }
 
-			void UpdateAI(uint32 diff)
-			{
-				if (!UpdateVictim())
-					return;
+            void UpdateAI(uint32 diff)
+            {
+                if (!UpdateVictim())
+                    return;
 
-				events.Update(diff);
-				if (me->HasUnitState(UNIT_STATE_CASTING))
-					return;
+                events.Update(diff);
+                if (me->HasUnitState(UNIT_STATE_CASTING))
+                    return;
 
-				switch (events.GetEvent())
-				{
-					case EVENT_CHECK_RAGE:
-						CheckRageBuff();
-						events.RepeatEvent(2000);
-						break;
-					case EVENT_BRUTAL_STRIKE:
-						me->CastSpell(me->GetVictim(), SPELL_IOCBOSS_BRUTAL_STRIKE, false);
-						events.RepeatEvent(6000);
-						break;
-					case EVENT_CRUSHING_LEAP:
-						me->CastSpell(me, SPELL_IOCBOSS_CRUSHING_LEAP, false);
-						events.RepeatEvent(22000);
-						break;
-					case EVENT_DAGGER_THROW:
-						if (Unit* tgt = SelectTarget(SELECT_TARGET_RANDOM))
-							me->CastSpell(tgt, SPELL_IOCBOSS_DAGGER_THROW, false);
-						
-						events.RepeatEvent(10000);
-						break;
-				}
+                switch (events.GetEvent())
+                {
+                    case EVENT_CHECK_RAGE:
+                        CheckRageBuff();
+                        events.RepeatEvent(2000);
+                        break;
+                    case EVENT_BRUTAL_STRIKE:
+                        me->CastSpell(me->GetVictim(), SPELL_IOCBOSS_BRUTAL_STRIKE, false);
+                        events.RepeatEvent(6000);
+                        break;
+                    case EVENT_CRUSHING_LEAP:
+                        me->CastSpell(me, SPELL_IOCBOSS_CRUSHING_LEAP, false);
+                        events.RepeatEvent(22000);
+                        break;
+                    case EVENT_DAGGER_THROW:
+                        if (Unit* tgt = SelectTarget(SELECT_TARGET_RANDOM))
+                            me->CastSpell(tgt, SPELL_IOCBOSS_DAGGER_THROW, false);
+                        
+                        events.RepeatEvent(10000);
+                        break;
+                }
 
-				DoMeleeAttackIfReady();
-			}
+                DoMeleeAttackIfReady();
+            }
         };
 
         CreatureAI* GetAI(Creature* creature) const
@@ -331,11 +331,11 @@ class spell_ioc_repair_turret : public SpellScriptLoader
 
 enum blastCriteria
 {
-	SPELL_SEAFORIUM_BLAST			= 66676,
-	SPELL_HUGE_SEAFORIUM_BLAST		= 66672,
+    SPELL_SEAFORIUM_BLAST           = 66676,
+    SPELL_HUGE_SEAFORIUM_BLAST      = 66672,
 
-	SPELL_BOMB_INABLE_CREDIT		= 68366,
-	SPELL_BOMB_INATION_CREDIT		= 68367,
+    SPELL_BOMB_INABLE_CREDIT        = 68366,
+    SPELL_BOMB_INATION_CREDIT       = 68367,
 };
 
 class spell_ioc_bomb_blast_criteria : public SpellScriptLoader
@@ -347,16 +347,16 @@ class spell_ioc_bomb_blast_criteria : public SpellScriptLoader
         {
             PrepareSpellScript(spell_ioc_bomb_blast_criteria_SpellScript);
 
-			void HandleGameObjectDamage(SpellEffIndex effIndex)
+            void HandleGameObjectDamage(SpellEffIndex effIndex)
             {
-				Unit* owner = GetCaster()->GetOwner();
-				if (!owner)
-					return;
+                Unit* owner = GetCaster()->GetOwner();
+                if (!owner)
+                    return;
 
-				if (GetSpellInfo()->Id == SPELL_SEAFORIUM_BLAST)
-					owner->CastSpell(owner, SPELL_BOMB_INABLE_CREDIT, true);
-				else if (GetSpellInfo()->Id == SPELL_HUGE_SEAFORIUM_BLAST)
-					owner->CastSpell(owner, SPELL_BOMB_INATION_CREDIT, true);
+                if (GetSpellInfo()->Id == SPELL_SEAFORIUM_BLAST)
+                    owner->CastSpell(owner, SPELL_BOMB_INABLE_CREDIT, true);
+                else if (GetSpellInfo()->Id == SPELL_HUGE_SEAFORIUM_BLAST)
+                    owner->CastSpell(owner, SPELL_BOMB_INATION_CREDIT, true);
             }
 
             void Register()
@@ -387,7 +387,7 @@ class spell_ioc_gunship_portal : public SpellScriptLoader
 
             void HandleScript(SpellEffIndex effIndex)
             {
-				PreventHitDefaultEffect(effIndex);
+                PreventHitDefaultEffect(effIndex);
                 /*Player* caster = GetCaster()->ToPlayer();
                 /*
                  * HACK: GetWorldLocation() returns real position and not transportposition.
@@ -397,16 +397,16 @@ class spell_ioc_gunship_portal : public SpellScriptLoader
                  * Transport Position X: 0 Y: 0 Z: 0 O: 0
                  * Position: X: 7.305609 Y: -0.095246 Z: 34.51022 O: 0
                  
-				caster->TeleportTo(GetHitCreature()->GetWorldLocation(), TELE_TO_NOT_LEAVE_TRANSPORT);*/
+                caster->TeleportTo(GetHitCreature()->GetWorldLocation(), TELE_TO_NOT_LEAVE_TRANSPORT);*/
             }
 
             void HandleScript2(SpellEffIndex effIndex)
             {
-				PreventHitDefaultEffect(effIndex);
+                PreventHitDefaultEffect(effIndex);
                 Player* caster = GetCaster()->ToPlayer();
-				if (!caster->IsBeingTeleported())
-					if (Battleground* bg = caster->GetBattleground())
-						bg->DoAction(2 /**/, caster->GetGUID());
+                if (!caster->IsBeingTeleported())
+                    if (Battleground* bg = caster->GetBattleground())
+                        bg->DoAction(2 /**/, caster->GetGUID());
             }
 
             void Register()
@@ -472,13 +472,13 @@ class spell_ioc_launch : public SpellScriptLoader
                 if (Player* player = GetHitPlayer())
                 {
                     player->ExitVehicle();
-					player->DisableSpline();
-					player->GetMap()->PlayerRelocation(player, GetCaster()->GetPositionX(), GetCaster()->GetPositionY(), GetCaster()->GetPositionZ(), GetCaster()->GetOrientation());
+                    player->DisableSpline();
+                    player->GetMap()->PlayerRelocation(player, GetCaster()->GetPositionX(), GetCaster()->GetPositionY(), GetCaster()->GetPositionZ(), GetCaster()->GetOrientation());
 
                     float dist = position->GetExactDist2d(player->GetPositionX(), player->GetPositionY());
-					float elevation = GetSpell()->m_targets.GetElevation();
-					float speedZ = std::max(10.0f, float(50.0f * sin(elevation)));
-					float speedXY = dist * 10.0f / speedZ;
+                    float elevation = GetSpell()->m_targets.GetElevation();
+                    float speedZ = std::max(10.0f, float(50.0f * sin(elevation)));
+                    float speedXY = dist * 10.0f / speedZ;
 
                     player->GetMotionMaster()->MoveJump(position->GetPositionX(), position->GetPositionY(), position->GetPositionZ(), speedXY, speedZ);
                 }
@@ -499,13 +499,13 @@ class spell_ioc_launch : public SpellScriptLoader
 
 void AddSC_isle_of_conquest()
 {
-	new npc_isle_of_conquest_turret();
+    new npc_isle_of_conquest_turret();
     new npc_four_car_garage();
-	new npc_ioc_gunship_captain();
-	new boss_isle_of_conquest();
-	new spell_ioc_repair_turret();
-	new spell_ioc_bomb_blast_criteria();
-	new spell_ioc_gunship_portal();
-	new spell_ioc_parachute_ic();
-	new spell_ioc_launch();
+    new npc_ioc_gunship_captain();
+    new boss_isle_of_conquest();
+    new spell_ioc_repair_turret();
+    new spell_ioc_bomb_blast_criteria();
+    new spell_ioc_gunship_portal();
+    new spell_ioc_parachute_ic();
+    new spell_ioc_launch();
 }

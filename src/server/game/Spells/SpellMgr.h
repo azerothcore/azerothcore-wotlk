@@ -213,8 +213,8 @@ enum ProcFlagsExLegacy
     PROC_EX_EX_TRIGGER_ALWAYS   = 0x0010000,                 // If set trigger always no matter of hit result
     PROC_EX_EX_ONE_TIME_TRIGGER = 0x0020000,                 // If set trigger always but only one time (not implemented yet)
     PROC_EX_ONLY_ACTIVE_SPELL   = 0x0040000,                 // Spell has to do damage/heal to proc
-	PROC_EX_NO_OVERHEAL			= 0x0080000,				 // Proc if heal did some work
-	PROC_EX_NO_AURA_REFRESH		= 0x0100000,				 // Proc if aura was not refreshed
+    PROC_EX_NO_OVERHEAL         = 0x0080000,                 // Proc if heal did some work
+    PROC_EX_NO_AURA_REFRESH     = 0x0100000,                 // Proc if aura was not refreshed
 
     // Flags for internal use - do not use these in db!
     PROC_EX_INTERNAL_CANT_PROC  = 0x0800000,
@@ -326,41 +326,41 @@ typedef UNORDERED_MAP<uint32, SpellBonusEntry>     SpellBonusMap;
 
 enum SpellGroupSpecialFlags
 {
-    SPELL_GROUP_SPECIAL_FLAG_NONE				= 0x000,
-    SPELL_GROUP_SPECIAL_FLAG_ELIXIR_BATTLE		= 0x001,
-    SPELL_GROUP_SPECIAL_FLAG_ELIXIR_GUARDIAN	= 0x002,
-    SPELL_GROUP_SPECIAL_FLAG_ELIXIR_UNSTABLE	= 0x004,
-    SPELL_GROUP_SPECIAL_FLAG_ELIXIR_SHATTRATH	= 0x008,
-	SPELL_GROUP_SPECIAL_FLAG_STACK_EXCLUSIVE_MAX= 0x00F,
-	SPELL_GROUP_SPECIAL_FLAG_FORCED_STRONGEST	= 0x010, // xinef: specially helpful flag if some spells have different auras, but only one should be present
-	SPELL_GROUP_SPECIAL_FLAG_SKIP_STRONGER_CHECK= 0x020,
-	SPELL_GROUP_SPECIAL_FLAG_BASE_AMOUNT_CHECK	= 0x040,
-	SPELL_GROUP_SPECIAL_FLAG_PRIORITY1			= 0x100,
-	SPELL_GROUP_SPECIAL_FLAG_PRIORITY2			= 0x200,
-	SPELL_GROUP_SPECIAL_FLAG_PRIORITY3			= 0x400,
-	SPELL_GROUP_SPECIAL_FLAG_PRIORITY4			= 0x800,
-	SPELL_GROUP_SPECIAL_FLAG_MAX				= 0x1000,
+    SPELL_GROUP_SPECIAL_FLAG_NONE               = 0x000,
+    SPELL_GROUP_SPECIAL_FLAG_ELIXIR_BATTLE      = 0x001,
+    SPELL_GROUP_SPECIAL_FLAG_ELIXIR_GUARDIAN    = 0x002,
+    SPELL_GROUP_SPECIAL_FLAG_ELIXIR_UNSTABLE    = 0x004,
+    SPELL_GROUP_SPECIAL_FLAG_ELIXIR_SHATTRATH   = 0x008,
+    SPELL_GROUP_SPECIAL_FLAG_STACK_EXCLUSIVE_MAX= 0x00F,
+    SPELL_GROUP_SPECIAL_FLAG_FORCED_STRONGEST   = 0x010, // xinef: specially helpful flag if some spells have different auras, but only one should be present
+    SPELL_GROUP_SPECIAL_FLAG_SKIP_STRONGER_CHECK= 0x020,
+    SPELL_GROUP_SPECIAL_FLAG_BASE_AMOUNT_CHECK  = 0x040,
+    SPELL_GROUP_SPECIAL_FLAG_PRIORITY1          = 0x100,
+    SPELL_GROUP_SPECIAL_FLAG_PRIORITY2          = 0x200,
+    SPELL_GROUP_SPECIAL_FLAG_PRIORITY3          = 0x400,
+    SPELL_GROUP_SPECIAL_FLAG_PRIORITY4          = 0x800,
+    SPELL_GROUP_SPECIAL_FLAG_MAX                = 0x1000,
 };
 
 enum SpellGroupStackFlags
 {
-    SPELL_GROUP_STACK_FLAG_NONE					= 0x00,
-    SPELL_GROUP_STACK_FLAG_EXCLUSIVE			= 0x01,
-    SPELL_GROUP_STACK_FLAG_NOT_SAME_CASTER		= 0x02,
-	SPELL_GROUP_STACK_FLAG_FLAGGED				= 0x04, // xinef: just a marker
-	SPELL_GROUP_STACK_FLAG_NEVER_STACK			= 0x08,
-	SPELL_GROUP_STACK_FLAG_EFFECT_EXCLUSIVE		= 0x10,
-	SPELL_GROUP_STACK_FLAG_MAX					= 0x20,
+    SPELL_GROUP_STACK_FLAG_NONE                 = 0x00,
+    SPELL_GROUP_STACK_FLAG_EXCLUSIVE            = 0x01,
+    SPELL_GROUP_STACK_FLAG_NOT_SAME_CASTER      = 0x02,
+    SPELL_GROUP_STACK_FLAG_FLAGGED              = 0x04, // xinef: just a marker
+    SPELL_GROUP_STACK_FLAG_NEVER_STACK          = 0x08,
+    SPELL_GROUP_STACK_FLAG_EFFECT_EXCLUSIVE     = 0x10,
+    SPELL_GROUP_STACK_FLAG_MAX                  = 0x20,
 
-	// Internal use
-	SPELL_GROUP_STACK_FLAG_FORCED_STRONGEST		= 0x100,
-	SPELL_GROUP_STACK_FLAG_FORCED_WEAKEST		= 0x200,
+    // Internal use
+    SPELL_GROUP_STACK_FLAG_FORCED_STRONGEST     = 0x100,
+    SPELL_GROUP_STACK_FLAG_FORCED_WEAKEST       = 0x200,
 };
 
 struct SpellStackInfo
 {
-	uint32 groupId;
-	SpellGroupSpecialFlags specialFlags;
+    uint32 groupId;
+    SpellGroupSpecialFlags specialFlags;
 };
 //             spell_id, group_id
 typedef std::map<uint32, SpellStackInfo> SpellGroupMap;
@@ -619,7 +619,7 @@ class SpellMgr
         // Spell correctness for client using
         static bool ComputeIsSpellValid(SpellInfo const* spellInfo, bool msg = true);
         static bool IsSpellValid(SpellInfo const* spellInfo);
-		static bool CheckSpellValid(SpellInfo const* spellInfo, uint32 spellId, bool isTalent);
+        static bool CheckSpellValid(SpellInfo const* spellInfo, uint32 spellId, bool isTalent);
 
         // Spell difficulty
         uint32 GetSpellDifficultyId(uint32 spellId) const;
@@ -650,10 +650,10 @@ class SpellMgr
 
         // Spell Groups
         uint32 GetSpellGroup(uint32 spellid) const;
-		SpellGroupSpecialFlags GetSpellGroupSpecialFlags(uint32 spell_id) const;
-		SpellGroupStackFlags GetGroupStackFlags(uint32 groupid) const;
+        SpellGroupSpecialFlags GetSpellGroupSpecialFlags(uint32 spell_id) const;
+        SpellGroupStackFlags GetGroupStackFlags(uint32 groupid) const;
         SpellGroupStackFlags CheckSpellGroupStackRules(SpellInfo const* spellInfo1, SpellInfo const* spellInfo2, bool remove, bool areaAura) const;
-		void GetSetOfSpellsInSpellGroupWithFlag(uint32 group_id, SpellGroupSpecialFlags flag, std::set<uint32>& availableElixirs) const;
+        void GetSetOfSpellsInSpellGroupWithFlag(uint32 group_id, SpellGroupSpecialFlags flag, std::set<uint32>& availableElixirs) const;
 
         // Spell proc event table
         SpellProcEventEntry const* GetSpellProcEvent(uint32 spellId) const;
@@ -669,8 +669,8 @@ class SpellMgr
         // Spell threat table
         SpellThreatEntry const* GetSpellThreatEntry(uint32 spellID) const;
 
-		// Spell mixology table
-		float GetSpellMixologyBonus(uint32 spellId) const;
+        // Spell mixology table
+        float GetSpellMixologyBonus(uint32 spellId) const;
 
         SkillLineAbilityMapBounds GetSkillLineAbilityMapBounds(uint32 spell_id) const;
 
@@ -695,8 +695,8 @@ class SpellMgr
         SpellInfo const* GetSpellInfo(uint32 spellId) const { return spellId < GetSpellInfoStoreSize() ?  mSpellInfoMap[spellId] : NULL; }
         uint32 GetSpellInfoStoreSize() const { return mSpellInfoMap.size(); }
 
-		// Talent Additional Set
-		bool IsAdditionalTalentSpell(uint32 spellId) const;
+        // Talent Additional Set
+        bool IsAdditionalTalentSpell(uint32 spellId) const;
 
     // Modifiers
     public:
@@ -714,7 +714,7 @@ class SpellMgr
         void LoadSpellProcs();
         void LoadSpellBonusess();
         void LoadSpellThreats();
-		void LoadSpellMixology();
+        void LoadSpellMixology();
         void LoadSkillLineAbilityMap();
         void LoadSpellPetAuras();
         void LoadEnchantCustomAttr();
@@ -728,7 +728,7 @@ class SpellMgr
         void UnloadSpellInfoImplicitTargetConditionLists();
         void LoadSpellCustomAttr();
         void LoadDbcDataCorrections();
-		void LoadSpellSpecificAndAuraState();
+        void LoadSpellSpecificAndAuraState();
 
     private:
         SpellDifficultySearcherMap mSpellDifficultySearcherMap;
@@ -743,7 +743,7 @@ class SpellMgr
         SpellProcMap               mSpellProcMap;
         SpellBonusMap              mSpellBonusMap;
         SpellThreatMap             mSpellThreatMap;
-		SpellMixologyMap           mSpellMixologyMap;
+        SpellMixologyMap           mSpellMixologyMap;
         SpellPetAuraMap            mSpellPetAuraMap;
         SpellLinkedMap             mSpellLinkedMap;
         SpellEnchantProcEventMap   mSpellEnchantProcEventMap;
@@ -757,7 +757,7 @@ class SpellMgr
         PetLevelupSpellMap         mPetLevelupSpellMap;
         PetDefaultSpellsMap        mPetDefaultSpellsMap;           // only spells not listed in related mPetLevelupSpellMap entry
         SpellInfoMap               mSpellInfoMap;
-		TalentAdditionalSet        mTalentSpellAdditionalSet;
+        TalentAdditionalSet        mTalentSpellAdditionalSet;
 };
 
 #define sSpellMgr ACE_Singleton<SpellMgr, ACE_Null_Mutex>::instance()

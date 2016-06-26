@@ -87,18 +87,18 @@ class npc_forest_frog : public CreatureScript
                 }
 
                 if (!instance->GetData(TYPE_RAND_VENDOR_1) && roll_chance_i(10))
-				{
+                {
                     cEntry = 24408;      //Gunter
-					instance->SetData(TYPE_RAND_VENDOR_1, DONE);
-				}
+                    instance->SetData(TYPE_RAND_VENDOR_1, DONE);
+                }
                 else if (!instance->GetData(TYPE_RAND_VENDOR_2) && roll_chance_i(10))
-				{
+                {
                     cEntry = 24409;      //Kyren
-					instance->SetData(TYPE_RAND_VENDOR_2, DONE);
-				}
+                    instance->SetData(TYPE_RAND_VENDOR_2, DONE);
+                }
 
                 me->UpdateEntry(cEntry);
-				me->DespawnOrUnsummon(2*MINUTE*IN_MILLISECONDS);
+                me->DespawnOrUnsummon(2*MINUTE*IN_MILLISECONDS);
             }
 
             void SpellHit(Unit* caster, const SpellInfo* spell)
@@ -106,9 +106,9 @@ class npc_forest_frog : public CreatureScript
                 if (spell->Id == SPELL_REMOVE_AMANI_CURSE && caster->GetTypeId() == TYPEID_PLAYER && me->GetEntry() == NPC_FOREST_FROG)
                 {
                     if (roll_chance_i(2))
-						DoCast(caster, SPELL_PUSH_MOJO, true);
+                        DoCast(caster, SPELL_PUSH_MOJO, true);
                     else
-						DoSpawnRandom();
+                        DoSpawnRandom();
                 }
             }
         };

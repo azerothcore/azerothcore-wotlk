@@ -105,7 +105,7 @@ class boss_majordomo : public CreatureScript
 
                     if (!me->FindNearestCreature(NPC_FLAMEWAKER_HEALER, 100.0f) && !me->FindNearestCreature(NPC_FLAMEWAKER_ELITE, 100.0f))
                     {
-						me->GetMap()->UpdateEncounterState(ENCOUNTER_CREDIT_KILL_CREATURE, me->GetEntry(), me);
+                        me->GetMap()->UpdateEncounterState(ENCOUNTER_CREDIT_KILL_CREATURE, me->GetEntry(), me);
                         me->setFaction(35);
                         EnterEvadeMode();
                         Talk(SAY_DEFEAT);

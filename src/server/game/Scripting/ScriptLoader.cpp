@@ -376,7 +376,7 @@ void AddSC_instance_oculus();
 void AddSC_oculus();
 void AddSC_boss_sartharion();            //Obsidian Sanctum
 void AddSC_instance_obsidian_sanctum();
-void AddSC_boss_malygos();				 //Eye of Eternity
+void AddSC_boss_malygos();               //Eye of Eternity
 void AddSC_instance_eye_of_eternity();
 void AddSC_boss_bjarngrim();             //Ulduar Halls of Lightning
 void AddSC_boss_loken();
@@ -595,7 +595,7 @@ void AddScripts()
     AddCommandScripts();
 #ifdef SCRIPTS
     AddWorldScripts();
-	AddEventScripts();
+    AddEventScripts();
     AddEasternKingdomsScripts();
     AddKalimdorScripts();
     AddOutlandScripts();
@@ -609,36 +609,36 @@ void AddScripts()
 
 void CheckIfScriptsInDatabaseExist()
 {
-	ObjectMgr::ScriptNameContainer& sn = sObjectMgr->GetScriptNames();
-	for (ObjectMgr::ScriptNameContainer::iterator itr = sn.begin(); itr != sn.end(); ++itr)
-		if (uint32 sid = sObjectMgr->GetScriptId((*itr).c_str()))
-		{
-			if (!ScriptRegistry<SpellScriptLoader>::GetScriptById(sid) &&
-				!ScriptRegistry<ServerScript>::GetScriptById(sid) &&
-				!ScriptRegistry<WorldScript>::GetScriptById(sid) &&
-				!ScriptRegistry<FormulaScript>::GetScriptById(sid) &&
-				!ScriptRegistry<WorldMapScript>::GetScriptById(sid) &&
-				!ScriptRegistry<InstanceMapScript>::GetScriptById(sid) &&
-				!ScriptRegistry<BattlegroundMapScript>::GetScriptById(sid) &&
-				!ScriptRegistry<ItemScript>::GetScriptById(sid) &&
-				!ScriptRegistry<CreatureScript>::GetScriptById(sid) &&
-				!ScriptRegistry<GameObjectScript>::GetScriptById(sid) &&
-				!ScriptRegistry<AreaTriggerScript>::GetScriptById(sid) &&
-				!ScriptRegistry<BattlegroundScript>::GetScriptById(sid) &&
-				!ScriptRegistry<OutdoorPvPScript>::GetScriptById(sid) &&
-				!ScriptRegistry<CommandScript>::GetScriptById(sid) &&
-				!ScriptRegistry<WeatherScript>::GetScriptById(sid) &&
-				!ScriptRegistry<AuctionHouseScript>::GetScriptById(sid) &&
-				!ScriptRegistry<ConditionScript>::GetScriptById(sid) &&
-				!ScriptRegistry<VehicleScript>::GetScriptById(sid) &&
-				!ScriptRegistry<DynamicObjectScript>::GetScriptById(sid) &&
-				!ScriptRegistry<TransportScript>::GetScriptById(sid) &&
-				!ScriptRegistry<AchievementCriteriaScript>::GetScriptById(sid) &&
-				!ScriptRegistry<PlayerScript>::GetScriptById(sid) &&
-				!ScriptRegistry<GuildScript>::GetScriptById(sid) &&
-				!ScriptRegistry<GroupScript>::GetScriptById(sid))
-				sLog->outErrorDb("Script named '%s' is assigned in database, but has no code!", (*itr).c_str());
-		}
+    ObjectMgr::ScriptNameContainer& sn = sObjectMgr->GetScriptNames();
+    for (ObjectMgr::ScriptNameContainer::iterator itr = sn.begin(); itr != sn.end(); ++itr)
+        if (uint32 sid = sObjectMgr->GetScriptId((*itr).c_str()))
+        {
+            if (!ScriptRegistry<SpellScriptLoader>::GetScriptById(sid) &&
+                !ScriptRegistry<ServerScript>::GetScriptById(sid) &&
+                !ScriptRegistry<WorldScript>::GetScriptById(sid) &&
+                !ScriptRegistry<FormulaScript>::GetScriptById(sid) &&
+                !ScriptRegistry<WorldMapScript>::GetScriptById(sid) &&
+                !ScriptRegistry<InstanceMapScript>::GetScriptById(sid) &&
+                !ScriptRegistry<BattlegroundMapScript>::GetScriptById(sid) &&
+                !ScriptRegistry<ItemScript>::GetScriptById(sid) &&
+                !ScriptRegistry<CreatureScript>::GetScriptById(sid) &&
+                !ScriptRegistry<GameObjectScript>::GetScriptById(sid) &&
+                !ScriptRegistry<AreaTriggerScript>::GetScriptById(sid) &&
+                !ScriptRegistry<BattlegroundScript>::GetScriptById(sid) &&
+                !ScriptRegistry<OutdoorPvPScript>::GetScriptById(sid) &&
+                !ScriptRegistry<CommandScript>::GetScriptById(sid) &&
+                !ScriptRegistry<WeatherScript>::GetScriptById(sid) &&
+                !ScriptRegistry<AuctionHouseScript>::GetScriptById(sid) &&
+                !ScriptRegistry<ConditionScript>::GetScriptById(sid) &&
+                !ScriptRegistry<VehicleScript>::GetScriptById(sid) &&
+                !ScriptRegistry<DynamicObjectScript>::GetScriptById(sid) &&
+                !ScriptRegistry<TransportScript>::GetScriptById(sid) &&
+                !ScriptRegistry<AchievementCriteriaScript>::GetScriptById(sid) &&
+                !ScriptRegistry<PlayerScript>::GetScriptById(sid) &&
+                !ScriptRegistry<GuildScript>::GetScriptById(sid) &&
+                !ScriptRegistry<GroupScript>::GetScriptById(sid))
+                sLog->outErrorDb("Script named '%s' is assigned in database, but has no code!", (*itr).c_str());
+        }
 }
 
 void AddSpellScripts()
@@ -660,36 +660,36 @@ void AddSpellScripts()
 
 void AddCommandScripts()
 {
-	AddSC_server_commandscript();
+    AddSC_server_commandscript();
 
     AddSC_account_commandscript();
     AddSC_achievement_commandscript();
-	AddSC_ban_commandscript();
-	AddSC_bf_commandscript();
-	AddSC_cast_commandscript();
-	AddSC_character_commandscript();
+    AddSC_ban_commandscript();
+    AddSC_bf_commandscript();
+    AddSC_cast_commandscript();
+    AddSC_character_commandscript();
     AddSC_debug_commandscript();
     AddSC_event_commandscript();
     AddSC_gm_commandscript();
     AddSC_go_commandscript();
     AddSC_gobject_commandscript();
-	AddSC_guild_commandscript();
+    AddSC_guild_commandscript();
     AddSC_honor_commandscript();
-	AddSC_instance_commandscript();
+    AddSC_instance_commandscript();
     AddSC_learn_commandscript();
     AddSC_lfg_commandscript();
-	AddSC_list_commandscript();
+    AddSC_list_commandscript();
     AddSC_lookup_commandscript();
-	AddSC_message_commandscript();
+    AddSC_message_commandscript();
     AddSC_misc_commandscript();
     AddSC_modify_commandscript();
     AddSC_npc_commandscript();
     AddSC_quest_commandscript();
     AddSC_reload_commandscript();
-	AddSC_reset_commandscript();
-	AddSC_spectator_commandscript();
+    AddSC_reset_commandscript();
+    AddSC_spectator_commandscript();
     AddSC_tele_commandscript();
-	AddSC_ticket_commandscript();
+    AddSC_ticket_commandscript();
     AddSC_titles_commandscript();
     AddSC_wp_commandscript();
 }
@@ -714,13 +714,13 @@ void AddWorldScripts()
 void AddEventScripts()
 {
 #ifdef SCRIPTS
-	AddSC_event_brewfest_scripts();
-	AddSC_event_hallows_end_scripts();
-	AddSC_event_pilgrims_end_scripts();
-	AddSC_event_winter_veil_scripts();
-	AddSC_event_love_in_the_air();
-	AddSC_event_midsummer_scripts();
-	AddSC_event_childrens_week();
+    AddSC_event_brewfest_scripts();
+    AddSC_event_hallows_end_scripts();
+    AddSC_event_pilgrims_end_scripts();
+    AddSC_event_winter_veil_scripts();
+    AddSC_event_love_in_the_air();
+    AddSC_event_midsummer_scripts();
+    AddSC_event_childrens_week();
 #endif
 }
 
@@ -756,8 +756,8 @@ void AddEasternKingdomsScripts()
     AddSC_boss_pyroguard_emberseer();
     AddSC_boss_gyth();
     AddSC_boss_rend_blackhand();
-	AddSC_boss_urok_doomhowl();
-	AddSC_boss_gizrul_the_slavener();
+    AddSC_boss_urok_doomhowl();
+    AddSC_boss_gizrul_the_slavener();
     AddSC_instance_blackrock_spire();
     AddSC_boss_razorgore();                 //Blackwing lair
     AddSC_boss_vaelastrasz();
@@ -767,12 +767,12 @@ void AddEasternKingdomsScripts()
     AddSC_boss_flamegor();
     AddSC_boss_chromaggus();
     AddSC_boss_nefarian();
-	AddSC_instance_blackwing_lair();
+    AddSC_instance_blackwing_lair();
     AddSC_boss_mr_smite();
     AddSC_instance_deadmines();             //Deadmines
     AddSC_instance_gnomeregan();            //Gnomeregan
     AddSC_instance_karazhan();              //Karazhan
-	AddSC_boss_servant_quarters();
+    AddSC_boss_servant_quarters();
     AddSC_boss_attumen();
     AddSC_boss_curator();
     AddSC_boss_maiden_of_virtue();
@@ -897,10 +897,10 @@ void AddKalimdorScripts()
     AddSC_culling_of_stratholme();
     AddSC_instance_culling_of_stratholme();
     AddSC_instance_dire_maul();             //Dire Maul
-	AddSC_instance_maraudon();              //Maraudon
+    AddSC_instance_maraudon();              //Maraudon
     AddSC_boss_onyxia();                    //Onyxia's Lair
     AddSC_instance_onyxias_lair();
-	AddSC_instance_ragefire_chasm();        //Ragefire Chasm
+    AddSC_instance_ragefire_chasm();        //Ragefire Chasm
     AddSC_razorfen_downs();
     AddSC_instance_razorfen_downs();        //Razorfen Downs
     AddSC_instance_razorfen_kraul();        //Razorfen Kraul
@@ -919,7 +919,7 @@ void AddKalimdorScripts()
     AddSC_boss_sartura();
     AddSC_boss_skeram();
     AddSC_boss_twinemperors();
-	AddSC_boss_ouro();
+    AddSC_boss_ouro();
     AddSC_npc_anubisath_sentinel();
     AddSC_instance_temple_of_ahnqiraj();
     AddSC_instance_wailing_caverns();       //Wailing caverns
@@ -957,7 +957,7 @@ void AddOutlandScripts()
     AddSC_boss_exarch_maladaar();           //Auchindoun Auchenai Crypts
     AddSC_boss_shirrak_the_dead_watcher();
     AddSC_boss_nexusprince_shaffar();       //Auchindoun Mana Tombs
-    AddSC_boss_talon_king_ikiss();			//Auchindoun Sekketh Halls
+    AddSC_boss_talon_king_ikiss();          //Auchindoun Sekketh Halls
     AddSC_instance_sethekk_halls();
     AddSC_instance_shadow_labyrinth();      //Auchindoun Shadow Labyrinth
     AddSC_boss_ambassador_hellmaw();
@@ -986,7 +986,7 @@ void AddOutlandScripts()
     AddSC_boss_warlord_kalithresh();
     AddSC_instance_steam_vault();
     AddSC_boss_the_black_stalker();         //CR Underbog
-	AddSC_boss_ahune();
+    AddSC_boss_ahune();
     AddSC_boss_gruul();                     //Gruul's Lair
     AddSC_boss_high_king_maulgar();
     AddSC_instance_gruuls_lair();
@@ -1006,9 +1006,9 @@ void AddOutlandScripts()
     AddSC_instance_ramparts();
     AddSC_arcatraz();                       //TK Arcatraz
     AddSC_boss_harbinger_skyriss();
-	AddSC_boss_wrath_scryer_soccothrates();
-	AddSC_boss_zereketh_the_unbound();
-	AddSC_boss_dalliah_the_doomsayer();
+    AddSC_boss_wrath_scryer_soccothrates();
+    AddSC_boss_zereketh_the_unbound();
+    AddSC_boss_dalliah_the_doomsayer();
     AddSC_instance_arcatraz();
     AddSC_boss_high_botanist_freywinn();    //TK Botanica
     AddSC_boss_laj();
@@ -1092,18 +1092,18 @@ void AddNorthrendScripts()
     AddSC_boss_anomalus();
     AddSC_boss_ormorok();
     AddSC_boss_keristrasza();
-	AddSC_boss_commander_stoutbeard();
+    AddSC_boss_commander_stoutbeard();
     AddSC_instance_nexus();
     AddSC_boss_drakos();                //The Nexus The Oculus
-	AddSC_boss_varos();
+    AddSC_boss_varos();
     AddSC_boss_urom();
-	AddSC_boss_eregos();
+    AddSC_boss_eregos();
     AddSC_instance_oculus();
     AddSC_oculus();
     AddSC_boss_sartharion();            //Obsidian Sanctum
     AddSC_instance_obsidian_sanctum();
-	AddSC_boss_malygos();				 //Eye of Eternity
-	AddSC_instance_eye_of_eternity();
+    AddSC_boss_malygos();                //Eye of Eternity
+    AddSC_instance_eye_of_eternity();
     AddSC_boss_bjarngrim();             //Ulduar Halls of Lightning
     AddSC_boss_loken();
     AddSC_boss_ionar();
@@ -1112,7 +1112,7 @@ void AddNorthrendScripts()
     AddSC_boss_maiden_of_grief();       //Ulduar Halls of Stone
     AddSC_boss_krystallus();
     AddSC_boss_sjonnir();
-	AddSC_brann_bronzebeard();
+    AddSC_brann_bronzebeard();
     AddSC_instance_halls_of_stone();
     AddSC_boss_auriaya();               //Ulduar Ulduar
     AddSC_boss_flame_leviathan();
@@ -1121,12 +1121,12 @@ void AddNorthrendScripts()
     AddSC_boss_xt002();
     AddSC_boss_assembly_of_iron();
     AddSC_boss_mimiron();
-	AddSC_boss_hodir();
-	AddSC_boss_vezax();
+    AddSC_boss_hodir();
+    AddSC_boss_vezax();
     AddSC_boss_kologarn();
-	AddSC_boss_freya();
-	AddSC_boss_thorim();
-	AddSC_boss_yoggsaron();
+    AddSC_boss_freya();
+    AddSC_boss_thorim();
+    AddSC_boss_yoggsaron();
     AddSC_ulduar();
     AddSC_boss_algalon_the_observer();
     AddSC_instance_ulduar();
@@ -1204,7 +1204,7 @@ void AddNorthrendScripts()
     AddSC_zuldrak();
     AddSC_crystalsong_forest();
     AddSC_isle_of_conquest();
-	AddSC_wintergrasp();
+    AddSC_wintergrasp();
 #endif
 }
 
@@ -1229,7 +1229,7 @@ void AddOutdoorPvPScripts()
     AddSC_outdoorpvp_si();
     AddSC_outdoorpvp_tf();
     AddSC_outdoorpvp_zm();
-	AddSC_outdoorpvp_gh();
+    AddSC_outdoorpvp_gh();
 #endif
 }
 

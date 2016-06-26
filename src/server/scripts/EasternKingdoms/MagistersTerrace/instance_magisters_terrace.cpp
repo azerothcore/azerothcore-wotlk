@@ -30,7 +30,7 @@ public:
         void Initialize()
         {
             memset(&Encounter, 0, sizeof(Encounter));
-			
+            
             VexallusDoorGUID = 0;
             SelinDoorGUID = 0;
             SelinEncounterDoorGUID = 0;
@@ -39,7 +39,7 @@ public:
             EscapeOrbGUID = 0;
 
             DelrissaGUID = 0;
-			KaelGUID = 0;
+            KaelGUID = 0;
         }
 
         bool IsEncounterInProgress() const
@@ -84,9 +84,9 @@ public:
                     break;
                 case DATA_KAELTHAS_EVENT:
                     HandleGameObject(KaelDoorGUID, data != IN_PROGRESS);
-					if (data == DONE)
-						if (GameObject* escapeOrb = instance->GetGameObject(EscapeOrbGUID))
-							escapeOrb->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                    if (data == DONE)
+                        if (GameObject* escapeOrb = instance->GetGameObject(EscapeOrbGUID))
+                            escapeOrb->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
                     Encounter[identifier] = data;
                     break;
             }
@@ -101,14 +101,14 @@ public:
                 case NPC_DELRISSA:
                     DelrissaGUID = creature->GetGUID();
                     break;
-				case NPC_KAEL_THAS:
-					KaelGUID = creature->GetGUID();
-					break;
-				case NPC_PHOENIX:
-				case NPC_PHOENIX_EGG:
-					if (Creature* kael = instance->GetCreature(KaelGUID))
-						kael->AI()->JustSummoned(creature);
-					break;
+                case NPC_KAEL_THAS:
+                    KaelGUID = creature->GetGUID();
+                    break;
+                case NPC_PHOENIX:
+                case NPC_PHOENIX_EGG:
+                    if (Creature* kael = instance->GetCreature(KaelGUID))
+                        kael->AI()->JustSummoned(creature);
+                    break;
             }
         }
 
@@ -116,9 +116,9 @@ public:
         {
             switch (go->GetEntry())
             {
-				case GO_SELIN_DOOR:
-					if (GetData(DATA_SELIN_EVENT) == DONE)
-						HandleGameObject(0, true, go);
+                case GO_SELIN_DOOR:
+                    if (GetData(DATA_SELIN_EVENT) == DONE)
+                        HandleGameObject(0, true, go);
                     SelinDoorGUID = go->GetGUID();
                     break;
                 case GO_SELIN_ENCOUNTER_DOOR:
@@ -126,22 +126,22 @@ public:
                     break;
 
                 case GO_VEXALLUS_DOOR:
-					if (GetData(DATA_VEXALLUS_EVENT) == DONE)
+                    if (GetData(DATA_VEXALLUS_EVENT) == DONE)
                         HandleGameObject(0, true, go);
                     VexallusDoorGUID = go->GetGUID();
                     break;
                 
                 case GO_DELRISSA_DOOR:
-					if (GetData(DATA_DELRISSA_EVENT) == DONE)
-						HandleGameObject(0, true, go);
+                    if (GetData(DATA_DELRISSA_EVENT) == DONE)
+                        HandleGameObject(0, true, go);
                     DelrissaDoorGUID = go->GetGUID();
                     break;
                 case GO_KAEL_DOOR:
                     KaelDoorGUID = go->GetGUID();
                     break;
                 case GO_ESCAPE_ORB:
-					if (GetData(DATA_KAELTHAS_EVENT) == DONE)
-						go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                    if (GetData(DATA_KAELTHAS_EVENT) == DONE)
+                        go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
                     EscapeOrbGUID = go->GetGUID();
                     break;
             }

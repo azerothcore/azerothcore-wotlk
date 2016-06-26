@@ -133,220 +133,220 @@ public:
         return commandTable;
     }
 
-	static bool HandleSkirmishCommand(ChatHandler* handler, char const* args)
-	{
-		Tokenizer tokens(args, ' ');
+    static bool HandleSkirmishCommand(ChatHandler* handler, char const* args)
+    {
+        Tokenizer tokens(args, ' ');
 
-		if (!*args || !tokens.size())
-		{
-			handler->PSendSysMessage("Usage: .skirmish [arena] [XvX] [Nick1] [Nick2] ... [NickN]");
-			handler->PSendSysMessage("[arena] can be \"all\" or comma-separated list of possible arenas (NA,BE,RL,DS,RV).");
-			handler->PSendSysMessage("[XvX] can be 1v1, 2v2, 3v3, 5v5. After [XvX] specify enough nicknames for that mode.");
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
-
-		Tokenizer::const_iterator i = tokens.begin();
-
-		std::set<BattlegroundTypeId> allowedArenas;
-		std::string arenasStr = *(i++);
-		std::string tmpStr;
-		Tokenizer arenaTokens(arenasStr, ',');
-		for (Tokenizer::const_iterator itr = arenaTokens.begin(); itr != arenaTokens.end(); ++itr)
-		{
-			tmpStr = std::string(*itr);
-			if (tmpStr == "all")
-			{
-				if (arenaTokens.size() > 1)
-				{
-					handler->PSendSysMessage("Invalid [arena] specified.");
-					handler->SetSentErrorMessage(true);
-					return false;
-				}
-				allowedArenas.insert(BATTLEGROUND_NA);
-				allowedArenas.insert(BATTLEGROUND_BE);
-				allowedArenas.insert(BATTLEGROUND_RL);
-				allowedArenas.insert(BATTLEGROUND_DS);
-				allowedArenas.insert(BATTLEGROUND_RV);
-			}
-			else if (tmpStr == "NA")
-				allowedArenas.insert(BATTLEGROUND_NA);
-			else if (tmpStr == "BE")
-				allowedArenas.insert(BATTLEGROUND_BE);
-			else if (tmpStr == "RL")
-				allowedArenas.insert(BATTLEGROUND_RL);
-			else if (tmpStr == "DS")
-				allowedArenas.insert(BATTLEGROUND_DS);
-			else if (tmpStr == "RV")
-				allowedArenas.insert(BATTLEGROUND_RV);
-			else
-			{
-				handler->PSendSysMessage("Invalid [arena] specified.");
-				handler->SetSentErrorMessage(true);
-				return false;
-			}
-		}
-		ASSERT(!allowedArenas.empty());
-		BattlegroundTypeId randomizedArenaBgTypeId = Trinity::Containers::SelectRandomContainerElement(allowedArenas);
-
-		uint8 count = 0;
-		if (i != tokens.end())
-		{
-			std::string mode = *(i++);
-			if (mode == "1v1") count = 2;
-			else if (mode == "2v2") count = 4;
-			else if (mode == "3v3") count = 6;
-			else if (mode == "5v5") count = 10;
-		}
-
-		if (!count)
-		{
-			handler->PSendSysMessage("Invalid bracket. Can be 1v1, 2v2, 3v3, 5v5");
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
-
-		if (tokens.size() != count+2)
-		{
-			handler->PSendSysMessage("Invalid number of nicknames for this bracket.");
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
-
-		uint8 hcnt = count / 2;
-		uint8 error = 0;
-		std::string last_name;
-		Player* plr = NULL;
-		Player* players[10] = {NULL};
-		uint8 cnt = 0;
-        for (; i != tokens.end(); ++i)
+        if (!*args || !tokens.size())
         {
-			last_name = std::string(*i);
-			plr = ObjectAccessor::FindPlayerByName(last_name, false);
-			if (!plr) { error = 1; break; }
-			if (!plr->IsInWorld() || !plr->FindMap() || plr->IsBeingTeleported()) { error = 2; break; }
-			if (plr->GetMap()->GetEntry()->Instanceable()) { error = 3; break; }
-			if (plr->isUsingLfg()) { error = 4; break; }
-			if (plr->InBattlegroundQueue()) { error = 5; break; }
-			if (plr->IsInFlight()) { error = 10; break; }
-			if (!plr->IsAlive()) { error = 11; break; }
-			const Group* g = plr->GetGroup();
-			if (hcnt > 1)
-			{
-				if (!g) { error = 6; break; }
-				if (g->isRaidGroup() || g->isBGGroup() || g->isBFGroup() || g->isLFGGroup()) { error = 7; break; }
-				if (g->GetMembersCount() != hcnt) { error = 8; break; }
-
-				uint8 sti = (cnt < hcnt ? 0 : hcnt);
-				if (sti != cnt)
-					if (players[sti]->GetGroup() != plr->GetGroup()) { error = 9; last_name += " and " + players[sti]->GetName(); break; }
-			}
-			else // 1v1
-			{
-				if (g) { error = 12; break; }
-			}
-			players[cnt++] = plr;
+            handler->PSendSysMessage("Usage: .skirmish [arena] [XvX] [Nick1] [Nick2] ... [NickN]");
+            handler->PSendSysMessage("[arena] can be \"all\" or comma-separated list of possible arenas (NA,BE,RL,DS,RV).");
+            handler->PSendSysMessage("[XvX] can be 1v1, 2v2, 3v3, 5v5. After [XvX] specify enough nicknames for that mode.");
+            handler->SetSentErrorMessage(true);
+            return false;
         }
 
-		for (uint8 i=0; i<cnt && !error; ++i)
-			for (uint8 j=i+1; j<cnt; ++j)
-				if (players[i]->GetGUID() == players[j]->GetGUID())
-				{
-					last_name = players[i]->GetName();
-					error = 13;
-					break;
-				}
+        Tokenizer::const_iterator i = tokens.begin();
 
-		switch (error)
-		{
-			case 1:
-				handler->PSendSysMessage("Player %s not found.", last_name.c_str());
-				break;
-			case 2:
-				handler->PSendSysMessage("Player %s is being teleported.", last_name.c_str());
-				break;
-			case 3:
-				handler->PSendSysMessage("Player %s is in instance/battleground/arena.", last_name.c_str());
-				break;
-			case 4:
-				handler->PSendSysMessage("Player %s is in LFG system.", last_name.c_str());
-				break;
-			case 5:
-				handler->PSendSysMessage("Player %s is queued for battleground/arena.", last_name.c_str());
-				break;
-			case 6:
-				handler->PSendSysMessage("Player %s is not in group.", last_name.c_str());
-				break;
-			case 7:
-				handler->PSendSysMessage("Player %s is not in normal group.", last_name.c_str());
-				break;
-			case 8:
-				handler->PSendSysMessage("Group of player %s has invalid member count.", last_name.c_str());
-				break;
-			case 9:
-				handler->PSendSysMessage("Players %s are not in the same group.", last_name.c_str());
-				break;
-			case 10:
-				handler->PSendSysMessage("Player %s is in flight.", last_name.c_str());
-				break;
-			case 11:
-				handler->PSendSysMessage("Player %s is dead.", last_name.c_str());
-				break;
-			case 12:
-				handler->PSendSysMessage("Player %s is in a group.", last_name.c_str());
-				break;
-			case 13:
-				handler->PSendSysMessage("Player %s occurs more than once.", last_name.c_str());
-				break;
-		}
+        std::set<BattlegroundTypeId> allowedArenas;
+        std::string arenasStr = *(i++);
+        std::string tmpStr;
+        Tokenizer arenaTokens(arenasStr, ',');
+        for (Tokenizer::const_iterator itr = arenaTokens.begin(); itr != arenaTokens.end(); ++itr)
+        {
+            tmpStr = std::string(*itr);
+            if (tmpStr == "all")
+            {
+                if (arenaTokens.size() > 1)
+                {
+                    handler->PSendSysMessage("Invalid [arena] specified.");
+                    handler->SetSentErrorMessage(true);
+                    return false;
+                }
+                allowedArenas.insert(BATTLEGROUND_NA);
+                allowedArenas.insert(BATTLEGROUND_BE);
+                allowedArenas.insert(BATTLEGROUND_RL);
+                allowedArenas.insert(BATTLEGROUND_DS);
+                allowedArenas.insert(BATTLEGROUND_RV);
+            }
+            else if (tmpStr == "NA")
+                allowedArenas.insert(BATTLEGROUND_NA);
+            else if (tmpStr == "BE")
+                allowedArenas.insert(BATTLEGROUND_BE);
+            else if (tmpStr == "RL")
+                allowedArenas.insert(BATTLEGROUND_RL);
+            else if (tmpStr == "DS")
+                allowedArenas.insert(BATTLEGROUND_DS);
+            else if (tmpStr == "RV")
+                allowedArenas.insert(BATTLEGROUND_RV);
+            else
+            {
+                handler->PSendSysMessage("Invalid [arena] specified.");
+                handler->SetSentErrorMessage(true);
+                return false;
+            }
+        }
+        ASSERT(!allowedArenas.empty());
+        BattlegroundTypeId randomizedArenaBgTypeId = Trinity::Containers::SelectRandomContainerElement(allowedArenas);
 
-		if (error)
-		{
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
+        uint8 count = 0;
+        if (i != tokens.end())
+        {
+            std::string mode = *(i++);
+            if (mode == "1v1") count = 2;
+            else if (mode == "2v2") count = 4;
+            else if (mode == "3v3") count = 6;
+            else if (mode == "5v5") count = 10;
+        }
 
-		Battleground* bgt = sBattlegroundMgr->GetBattlegroundTemplate(BATTLEGROUND_AA);
-		if (!bgt)
-		{
-			handler->PSendSysMessage("Couldn't create arena map!");
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
+        if (!count)
+        {
+            handler->PSendSysMessage("Invalid bracket. Can be 1v1, 2v2, 3v3, 5v5");
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
 
-		Battleground* bg = sBattlegroundMgr->CreateNewBattleground(randomizedArenaBgTypeId, 80, 80, ArenaType(hcnt >= 2 ? hcnt : 2), false);
-		if (!bg)
-		{
-			handler->PSendSysMessage("Couldn't create arena map!");
-			handler->SetSentErrorMessage(true);
-			return false;
-		}
+        if (tokens.size() != count+2)
+        {
+            handler->PSendSysMessage("Invalid number of nicknames for this bracket.");
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
 
-		bg->StartBattleground();
+        uint8 hcnt = count / 2;
+        uint8 error = 0;
+        std::string last_name;
+        Player* plr = NULL;
+        Player* players[10] = {NULL};
+        uint8 cnt = 0;
+        for (; i != tokens.end(); ++i)
+        {
+            last_name = std::string(*i);
+            plr = ObjectAccessor::FindPlayerByName(last_name, false);
+            if (!plr) { error = 1; break; }
+            if (!plr->IsInWorld() || !plr->FindMap() || plr->IsBeingTeleported()) { error = 2; break; }
+            if (plr->GetMap()->GetEntry()->Instanceable()) { error = 3; break; }
+            if (plr->isUsingLfg()) { error = 4; break; }
+            if (plr->InBattlegroundQueue()) { error = 5; break; }
+            if (plr->IsInFlight()) { error = 10; break; }
+            if (!plr->IsAlive()) { error = 11; break; }
+            const Group* g = plr->GetGroup();
+            if (hcnt > 1)
+            {
+                if (!g) { error = 6; break; }
+                if (g->isRaidGroup() || g->isBGGroup() || g->isBFGroup() || g->isLFGGroup()) { error = 7; break; }
+                if (g->GetMembersCount() != hcnt) { error = 8; break; }
 
-		BattlegroundTypeId bgTypeId = bg->GetBgTypeID();
+                uint8 sti = (cnt < hcnt ? 0 : hcnt);
+                if (sti != cnt)
+                    if (players[sti]->GetGroup() != plr->GetGroup()) { error = 9; last_name += " and " + players[sti]->GetName(); break; }
+            }
+            else // 1v1
+            {
+                if (g) { error = 12; break; }
+            }
+            players[cnt++] = plr;
+        }
 
-		TeamId teamId1 = Player::TeamIdForRace(players[0]->getRace());
-		TeamId teamId2 = (teamId1 == TEAM_ALLIANCE ? TEAM_HORDE : TEAM_ALLIANCE);
-		for (uint8 i=0; i<cnt; ++i)
-		{
-			Player* player = players[i];
+        for (uint8 i=0; i<cnt && !error; ++i)
+            for (uint8 j=i+1; j<cnt; ++j)
+                if (players[i]->GetGUID() == players[j]->GetGUID())
+                {
+                    last_name = players[i]->GetName();
+                    error = 13;
+                    break;
+                }
 
-			TeamId teamId = (i < hcnt ? teamId1 : teamId2);
-			player->SetEntryPoint();
+        switch (error)
+        {
+            case 1:
+                handler->PSendSysMessage("Player %s not found.", last_name.c_str());
+                break;
+            case 2:
+                handler->PSendSysMessage("Player %s is being teleported.", last_name.c_str());
+                break;
+            case 3:
+                handler->PSendSysMessage("Player %s is in instance/battleground/arena.", last_name.c_str());
+                break;
+            case 4:
+                handler->PSendSysMessage("Player %s is in LFG system.", last_name.c_str());
+                break;
+            case 5:
+                handler->PSendSysMessage("Player %s is queued for battleground/arena.", last_name.c_str());
+                break;
+            case 6:
+                handler->PSendSysMessage("Player %s is not in group.", last_name.c_str());
+                break;
+            case 7:
+                handler->PSendSysMessage("Player %s is not in normal group.", last_name.c_str());
+                break;
+            case 8:
+                handler->PSendSysMessage("Group of player %s has invalid member count.", last_name.c_str());
+                break;
+            case 9:
+                handler->PSendSysMessage("Players %s are not in the same group.", last_name.c_str());
+                break;
+            case 10:
+                handler->PSendSysMessage("Player %s is in flight.", last_name.c_str());
+                break;
+            case 11:
+                handler->PSendSysMessage("Player %s is dead.", last_name.c_str());
+                break;
+            case 12:
+                handler->PSendSysMessage("Player %s is in a group.", last_name.c_str());
+                break;
+            case 13:
+                handler->PSendSysMessage("Player %s occurs more than once.", last_name.c_str());
+                break;
+        }
 
-			uint32 queueSlot = 0;
-			WorldPacket data;
-			sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, bg, queueSlot, STATUS_IN_PROGRESS, 0, bg->GetStartTime(), bg->GetArenaType(), teamId);
-			player->GetSession()->SendPacket(&data);
+        if (error)
+        {
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
 
-			player->SetBattlegroundId(bg->GetInstanceID(), bgTypeId, queueSlot, true, false, teamId);
-			sBattlegroundMgr->SendToBattleground(player, bg->GetInstanceID(), bgTypeId);
-		}
+        Battleground* bgt = sBattlegroundMgr->GetBattlegroundTemplate(BATTLEGROUND_AA);
+        if (!bgt)
+        {
+            handler->PSendSysMessage("Couldn't create arena map!");
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
 
-		handler->PSendSysMessage("Success! Players are now being teleported to the arena.");
-		return true;
-	}
+        Battleground* bg = sBattlegroundMgr->CreateNewBattleground(randomizedArenaBgTypeId, 80, 80, ArenaType(hcnt >= 2 ? hcnt : 2), false);
+        if (!bg)
+        {
+            handler->PSendSysMessage("Couldn't create arena map!");
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        bg->StartBattleground();
+
+        BattlegroundTypeId bgTypeId = bg->GetBgTypeID();
+
+        TeamId teamId1 = Player::TeamIdForRace(players[0]->getRace());
+        TeamId teamId2 = (teamId1 == TEAM_ALLIANCE ? TEAM_HORDE : TEAM_ALLIANCE);
+        for (uint8 i=0; i<cnt; ++i)
+        {
+            Player* player = players[i];
+
+            TeamId teamId = (i < hcnt ? teamId1 : teamId2);
+            player->SetEntryPoint();
+
+            uint32 queueSlot = 0;
+            WorldPacket data;
+            sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, bg, queueSlot, STATUS_IN_PROGRESS, 0, bg->GetStartTime(), bg->GetArenaType(), teamId);
+            player->GetSession()->SendPacket(&data);
+
+            player->SetBattlegroundId(bg->GetInstanceID(), bgTypeId, queueSlot, true, false, teamId);
+            sBattlegroundMgr->SendToBattleground(player, bg->GetInstanceID(), bgTypeId);
+        }
+
+        handler->PSendSysMessage("Success! Players are now being teleported to the arena.");
+        return true;
+    }
 
     static bool HandleDevCommand(ChatHandler* handler, char const* args)
     {
@@ -363,9 +363,9 @@ public:
 
         if (argstr == "on")
         {
-			handler->GetSession()->GetPlayer()->SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_DEVELOPER);
-			handler->GetSession()->SendNotification(LANG_DEV_ON);
-			return true;
+            handler->GetSession()->GetPlayer()->SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_DEVELOPER);
+            handler->GetSession()->SendNotification(LANG_DEV_ON);
+            return true;
         }
 
         if (argstr == "off")
@@ -380,7 +380,7 @@ public:
         return false;
     }
 
-	static bool HandleGPSCommand(ChatHandler* handler, char const* args)
+    static bool HandleGPSCommand(ChatHandler* handler, char const* args)
     {
         WorldObject* object = NULL;
         if (*args)
@@ -460,8 +460,8 @@ public:
 
         if (status)
             handler->PSendSysMessage(LANG_LIQUID_STATUS, liquidStatus.level, liquidStatus.depth_level, liquidStatus.entry, liquidStatus.type_flags, status);
-		if (Transport* t = object->GetTransport())
-			handler->PSendSysMessage("Transport offset: %.2f, %.2f, %.2f, %.2f", object->m_movementInfo.transport.pos.GetPositionX(), object->m_movementInfo.transport.pos.GetPositionY(), object->m_movementInfo.transport.pos.GetPositionZ(), object->m_movementInfo.transport.pos.GetOrientation());
+        if (Transport* t = object->GetTransport())
+            handler->PSendSysMessage("Transport offset: %.2f, %.2f, %.2f, %.2f", object->m_movementInfo.transport.pos.GetPositionX(), object->m_movementInfo.transport.pos.GetPositionY(), object->m_movementInfo.transport.pos.GetPositionZ(), object->m_movementInfo.transport.pos.GetOrientation());
 
         return true;
     }
@@ -607,7 +607,7 @@ public:
                 InstancePlayerBind* bind = sInstanceSaveMgr->PlayerGetBoundInstance(_player->GetGUIDLow(), target->GetMapId(), target->GetDifficulty(map->IsRaid()));
                 if (!bind)
                     if (InstanceSave* save = sInstanceSaveMgr->GetInstanceSave(target->GetInstanceId()))
-						sInstanceSaveMgr->PlayerBindToInstance(_player->GetGUIDLow(), save, !save->CanReset(), _player);
+                        sInstanceSaveMgr->PlayerBindToInstance(_player->GetGUIDLow(), save, !save->CanReset(), _player);
 
                 if (map->IsRaid())
                     _player->SetRaidDifficulty(target->GetRaidDifficulty());
@@ -703,9 +703,9 @@ public:
             }
             else if (map->IsDungeon())
             {
-				// pussywizard: prevent unbinding normal player's perm bind by just summoning him >_>
-				if (!target->GetSession()->GetSecurity())
-				{
+                // pussywizard: prevent unbinding normal player's perm bind by just summoning him >_>
+                if (!target->GetSession()->GetSecurity())
+                {
                     handler->PSendSysMessage("Only GMs can be summoned to an instance!");
                     handler->SetSentErrorMessage(true);
                     return false;
@@ -888,11 +888,11 @@ public:
         if (target->IsAlive())
         {
             if (sWorld->getBoolConfig(CONFIG_DIE_COMMAND_MODE))
-			{
-				if (target->GetTypeId() == TYPEID_UNIT && handler->GetSession()->GetSecurity() == SEC_CONSOLE) // pussywizard
-					target->ToCreature()->LowerPlayerDamageReq(target->GetMaxHealth());
+            {
+                if (target->GetTypeId() == TYPEID_UNIT && handler->GetSession()->GetSecurity() == SEC_CONSOLE) // pussywizard
+                    target->ToCreature()->LowerPlayerDamageReq(target->GetMaxHealth());
                 Unit::Kill(handler->GetSession()->GetPlayer(), target);
-			}
+            }
             else
                 Unit::DealDamage(handler->GetSession()->GetPlayer(), target, target->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false, true);
         }
@@ -1341,11 +1341,11 @@ public:
 
             std::string team_name = handler->GetTrinityString(LANG_COMMAND_GRAVEYARD_NOTEAM);
 
-			if (data->teamId == TEAM_NEUTRAL)
+            if (data->teamId == TEAM_NEUTRAL)
                 team_name = handler->GetTrinityString(LANG_COMMAND_GRAVEYARD_ANY);
-			else if (data->teamId == TEAM_HORDE)
+            else if (data->teamId == TEAM_HORDE)
                 team_name = handler->GetTrinityString(LANG_COMMAND_GRAVEYARD_HORDE);
-			else if (data->teamId == TEAM_ALLIANCE)
+            else if (data->teamId == TEAM_ALLIANCE)
                 team_name = handler->GetTrinityString(LANG_COMMAND_GRAVEYARD_ALLIANCE);
 
             handler->PSendSysMessage(LANG_COMMAND_GRAVEYARDNEAREST, graveyardId, team_name.c_str(), zone_id);
@@ -1543,11 +1543,11 @@ public:
             return true;
         }
 
-		if (handler->GetSession()->GetSecurity() < SEC_ADMINISTRATOR)
-		{
-			handler->PSendSysMessage("You may only remove items. Adding items is available for higher GMLevel.");
-			return false;
-		}
+        if (handler->GetSession()->GetSecurity() < SEC_ADMINISTRATOR)
+        {
+            handler->PSendSysMessage("You may only remove items. Adding items is available for higher GMLevel.");
+            return false;
+        }
 
         // Adding items
         uint32 noSpaceForCount = 0;
@@ -1801,21 +1801,21 @@ public:
         uint32 areaId;
         uint32 phase            = 0;
 
-		// pussywizard: guild info
-		std::string guildName   = "";
-		bool guildIsLeader      = false;
-		uint64 guildMoney       = 0;
-		uint32 guildMemberCount = 0;
-		if (const GlobalPlayerData* gpd = sWorld->GetGlobalPlayerData(targetGuid))
-			if (gpd->guildId)
-				if (Guild* targetGuild = sGuildMgr->GetGuildById(gpd->guildId))
-				{
-					guildName = targetGuild->GetName();
-					guildMoney = targetGuild->GetTotalBankMoney();
-					guildMemberCount = targetGuild->GetMemberCount();
-					if (targetGuild->GetLeaderGUID() == targetGuid)
-						guildIsLeader = true;
-				}
+        // pussywizard: guild info
+        std::string guildName   = "";
+        bool guildIsLeader      = false;
+        uint64 guildMoney       = 0;
+        uint32 guildMemberCount = 0;
+        if (const GlobalPlayerData* gpd = sWorld->GetGlobalPlayerData(targetGuid))
+            if (gpd->guildId)
+                if (Guild* targetGuild = sGuildMgr->GetGuildById(gpd->guildId))
+                {
+                    guildName = targetGuild->GetName();
+                    guildMoney = targetGuild->GetTotalBankMoney();
+                    guildMemberCount = targetGuild->GetMemberCount();
+                    if (targetGuild->GetLeaderGUID() == targetGuid)
+                        guildIsLeader = true;
+                }
 
         // get additional information from Player object
         if (target)
@@ -2038,13 +2038,13 @@ public:
         else
            handler->PSendSysMessage(LANG_PINFO_MAP_OFFLINE, map->name[locale], areaName.c_str());
 
-		if (!guildName.empty())
-		{
-			uint32 gold = guildMoney /GOLD;
-			uint32 silv = (guildMoney % GOLD) / SILVER;
-			uint32 copp = (guildMoney % GOLD) % SILVER;
-			handler->PSendSysMessage("Guild: %s, members: %u, gb money: %ug %us %uc, is guild leader: %s", guildName.c_str(), guildMemberCount, gold, silv, copp, guildIsLeader ? "yes" : "no");
-		}
+        if (!guildName.empty())
+        {
+            uint32 gold = guildMoney /GOLD;
+            uint32 silv = (guildMoney % GOLD) / SILVER;
+            uint32 copp = (guildMoney % GOLD) % SILVER;
+            handler->PSendSysMessage("Guild: %s, members: %u, gb money: %ug %us %uc, is guild leader: %s", guildName.c_str(), guildMemberCount, gold, silv, copp, guildIsLeader ? "yes" : "no");
+        }
 
         return true;
     }
@@ -2362,8 +2362,8 @@ public:
 
         uint32 damage = damage_int;
 
-		if (target->GetTypeId() == TYPEID_UNIT && handler->GetSession()->GetSecurity() == SEC_CONSOLE) // pussywizard
-			target->ToCreature()->LowerPlayerDamageReq(target->GetMaxHealth());
+        if (target->GetTypeId() == TYPEID_UNIT && handler->GetSession()->GetSecurity() == SEC_CONSOLE) // pussywizard
+            target->ToCreature()->LowerPlayerDamageReq(target->GetMaxHealth());
         Unit::DealDamage(handler->GetSession()->GetPlayer(), target, damage, NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false, true);
         if (target != handler->GetSession()->GetPlayer())
             handler->GetSession()->GetPlayer()->SendAttackStateUpdate (HITINFO_AFFECTS_VICTIM, target, 1, SPELL_SCHOOL_MASK_NORMAL, damage, 0, 0, VICTIMSTATE_HIT, 0);
@@ -2670,8 +2670,8 @@ public:
         if (!handler->extractPlayerTarget((char*)args, &player))
             return false;
 
-		if (!player)
-			return false;
+        if (!player)
+            return false;
 
         char* msgStr = strtok(NULL, "");
         if (!msgStr)
@@ -2908,18 +2908,18 @@ public:
         {
             handler->PSendSysMessage(LANG_COMMAND_UNFREEZE, name.c_str());
             player->RemoveAurasDueToSpell(9454);
-			return true;
+            return true;
         }
         else if (targetName)
         {
-			if (uint64 playerGUID = sWorld->GetGlobalPlayerGUID(name))
-			{
-				PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_AURA_FROZEN);
-				stmt->setUInt32(0, GUID_LOPART(playerGUID));
-				CharacterDatabase.Execute(stmt);
-				handler->PSendSysMessage(LANG_COMMAND_UNFREEZE, name.c_str());
-				return true;
-			}
+            if (uint64 playerGUID = sWorld->GetGlobalPlayerGUID(name))
+            {
+                PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_AURA_FROZEN);
+                stmt->setUInt32(0, GUID_LOPART(playerGUID));
+                CharacterDatabase.Execute(stmt);
+                handler->PSendSysMessage(LANG_COMMAND_UNFREEZE, name.c_str());
+                return true;
+            }
         }
  
         handler->SendSysMessage(LANG_COMMAND_FREEZE_WRONG);
@@ -3046,9 +3046,9 @@ public:
         if (playerTarget)
             groupTarget = playerTarget->GetGroup();
 
-		if (!groupTarget && guidTarget)
-			if (uint32 groupId = Player::GetGroupIdFromStorage(GUID_LOPART(guidTarget)))
-				groupTarget = sGroupMgr->GetGroupByGUID(groupId);
+        if (!groupTarget && guidTarget)
+            if (uint32 groupId = Player::GetGroupIdFromStorage(GUID_LOPART(guidTarget)))
+                groupTarget = sGroupMgr->GetGroupByGUID(groupId);
 
         if (groupTarget)
         {

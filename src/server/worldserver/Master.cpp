@@ -91,7 +91,7 @@ private:
     uint32 _delayTime;
 
 public:
-	FreezeDetectorRunnable(uint32 freezeDelay) : _loops(0), _lastChange(0), _delayTime(freezeDelay) {}
+    FreezeDetectorRunnable(uint32 freezeDelay) : _loops(0), _lastChange(0), _delayTime(freezeDelay) {}
 
     void run()
     {
@@ -185,9 +185,9 @@ int Master::Run()
 
     ACE_Based::Thread rarThread(new RARunnable);
 
-	// pussywizard:
-	ACE_Based::Thread auctionLising_thread(new AuctionListingRunnable);
-	auctionLising_thread.setPriority(ACE_Based::High);
+    // pussywizard:
+    ACE_Based::Thread auctionLising_thread(new AuctionListingRunnable);
+    auctionLising_thread.setPriority(ACE_Based::High);
 
 #if defined(_WIN32) || defined(__linux__)
     
@@ -304,11 +304,11 @@ int Master::Run()
         delete soapThread;
     }
 
-	if (freezeThread)
-	{
-		freezeThread->wait();
-		delete freezeThread;
-	}
+    if (freezeThread)
+    {
+        freezeThread->wait();
+        delete freezeThread;
+    }
 
     // set server offline
     LoginDatabase.DirectPExecute("UPDATE realmlist SET flag = flag | %u WHERE id = '%d'", REALM_FLAG_OFFLINE, realmID);

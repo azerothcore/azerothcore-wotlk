@@ -39,7 +39,7 @@ enum SmartEscortState
 enum SmartEscortVars
 {
     SMART_ESCORT_MAX_PLAYER_DIST        = 60,
-    SMART_MAX_AID_DIST					= SMART_ESCORT_MAX_PLAYER_DIST / 2,
+    SMART_MAX_AID_DIST                  = SMART_ESCORT_MAX_PLAYER_DIST / 2,
 };
 
 class SmartAI : public CreatureAI
@@ -59,11 +59,11 @@ class SmartAI : public CreatureAI
         void GenerateWayPointArray(Movement::PointsArray* points);
         bool HasEscortState(uint32 uiEscortState) { return (mEscortState & uiEscortState); }
         void AddEscortState(uint32 uiEscortState) { mEscortState |= uiEscortState; }
-		virtual bool IsEscorted() { return (mEscortState & SMART_ESCORT_ESCORTING); }
+        virtual bool IsEscorted() { return (mEscortState & SMART_ESCORT_ESCORTING); }
         void RemoveEscortState(uint32 uiEscortState) { mEscortState &= ~uiEscortState; }
         void SetAutoAttack(bool on) { mCanAutoAttack = on; }
         void SetCombatMove(bool on);
-		bool CanCombatMove() { return mCanCombatMove; }
+        bool CanCombatMove() { return mCanCombatMove; }
         void SetFollow(Unit* target, float dist = 0.0f, float angle = 0.0f, uint32 credit = 0, uint32 end = 0, uint32 creditType = 0, bool aliveState = true);
         void StopFollow(bool complete);
 
@@ -196,16 +196,16 @@ class SmartAI : public CreatureAI
 
         void OnSpellClick(Unit* clicker, bool& result);
 
-		// Xinef
-		void SetWPPauseTimer(uint32 time) { mWPPauseTimer = time; }
-		void SetForcedCombatMove(float dist);
+        // Xinef
+        void SetWPPauseTimer(uint32 time) { mWPPauseTimer = time; }
+        void SetForcedCombatMove(float dist);
 
     private:
         uint32 mFollowCreditType;
         uint32 mFollowArrivedTimer;
         uint32 mFollowCredit;
         uint32 mFollowArrivedEntry;
-		bool   mFollowArrivedAlive;
+        bool   mFollowArrivedAlive;
         uint64 mFollowGuid;
         float mFollowDist;
         float mFollowAngle;
@@ -217,7 +217,7 @@ class SmartAI : public CreatureAI
         uint32 mEscortState;
         uint32 mCurrentWPID;
         bool mWPReached;
-		bool mOOCReached;
+        bool mOOCReached;
         uint32 mWPPauseTimer;
         WayPoint* mLastWP;
         uint32 mEscortNPCFlags;
@@ -237,7 +237,7 @@ class SmartAI : public CreatureAI
         uint32 mEscortInvokerCheckTimer;
         bool mJustReset;
 
-		// Xinef: Vehicle conditions
+        // Xinef: Vehicle conditions
         void CheckConditions(const uint32 diff);
         ConditionList conditions;
         uint32 m_ConditionsTimer;
@@ -266,7 +266,7 @@ class SmartGameObjectAI : public GameObjectAI
         void OnGameEvent(bool start, uint16 eventId);
         void OnStateChanged(uint32 state, Unit* unit);
         void EventInform(uint32 eventId);
-		void SpellHit(Unit* unit, const SpellInfo* spellInfo);
+        void SpellHit(Unit* unit, const SpellInfo* spellInfo);
 
     protected:
         SmartScript mScript;

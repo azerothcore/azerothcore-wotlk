@@ -59,7 +59,7 @@ class DynamicObject : public WorldObject, public GridObject<DynamicObject>, publ
         uint32 GetSpellId() const {  return GetUInt32Value(DYNAMICOBJECT_SPELLID); }
         uint64 GetCasterGUID() const { return GetUInt64Value(DYNAMICOBJECT_CASTER); }
         float GetRadius() const { return GetFloatValue(DYNAMICOBJECT_RADIUS); }
-		bool IsViewpoint() const { return _isViewpoint; }
+        bool IsViewpoint() const { return _isViewpoint; }
 
     protected:
         Aura* _aura;

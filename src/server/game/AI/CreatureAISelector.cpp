@@ -33,8 +33,8 @@ namespace FactorySelector
         const CreatureAICreator* ai_factory = NULL;
         CreatureAIRegistry& ai_registry(*CreatureAIRepository::instance());
 
-		// xinef: if we have controlable guardian, define petai for players as they can steer him, otherwise db / normal ai
-		// xinef: dont remember why i changed this qq commented out as may break some quests
+        // xinef: if we have controlable guardian, define petai for players as they can steer him, otherwise db / normal ai
+        // xinef: dont remember why i changed this qq commented out as may break some quests
         if (creature->IsPet()/* || (creature->HasUnitTypeMask(UNIT_MASK_CONTROLABLE_GUARDIAN) && ((Guardian*)creature)->GetOwner()->GetTypeId() == TYPEID_PLAYER)*/)
             ai_factory = ai_registry.GetRegistryItem("PetAI");
 
@@ -95,7 +95,7 @@ namespace FactorySelector
         }
 
         // select NullCreatureAI if not another cases
-		// xinef: unused
+        // xinef: unused
         // ainame = (ai_factory == NULL) ? "NullCreatureAI" : ai_factory->key();
 
         ;//sLog->outDebug(LOG_FILTER_TSCR, "Creature %u used AI is %s.", creature->GetGUIDLow(), ainame.c_str());
@@ -143,7 +143,7 @@ namespace FactorySelector
 
         //future goAI types go here
 
-		// xinef: unused
+        // xinef: unused
         //std::string ainame = (ai_factory == NULL || go->GetScriptId()) ? "NullGameObjectAI" : ai_factory->key();
 
         ;//sLog->outDebug(LOG_FILTER_TSCR, "GameObject %u used AI is %s.", go->GetGUIDLow(), ainame.c_str());

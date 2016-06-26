@@ -151,7 +151,7 @@ void WorldSession::HandleLootMoneyOpcode(WorldPacket & /*recvData*/)
         case HIGHGUID_VEHICLE:
         {
             Creature* creature = player->GetMap()->GetCreature(guid);
-			bool lootAllowed = creature && creature->IsAlive() == (player->getClass() == CLASS_ROGUE && creature->loot.loot_type == LOOT_PICKPOCKETING);
+            bool lootAllowed = creature && creature->IsAlive() == (player->getClass() == CLASS_ROGUE && creature->loot.loot_type == LOOT_PICKPOCKETING);
             if (lootAllowed && creature->IsWithinDistInMap(player, INTERACTION_DISTANCE))
             {
                 loot = &creature->loot;
@@ -291,18 +291,18 @@ void WorldSession::DoLootRelease(uint64 lguid)
                     go->SetLootState(GO_READY);
             }
             else
-			{
+            {
                 go->SetLootState(GO_JUST_DEACTIVATED);                
-				
-				// Xinef: moved event execution to loot release (after everything is looted)
-				// Xinef: 99% sure that this worked like this on blizz
-				// Xinef: prevents exploits with just opening GO and spawning bilions of npcs, which can crash core if you know what you're doin ;)
-				if (go->GetGoType() == GAMEOBJECT_TYPE_CHEST && go->GetGOInfo()->chest.eventId)
+                
+                // Xinef: moved event execution to loot release (after everything is looted)
+                // Xinef: 99% sure that this worked like this on blizz
+                // Xinef: prevents exploits with just opening GO and spawning bilions of npcs, which can crash core if you know what you're doin ;)
+                if (go->GetGoType() == GAMEOBJECT_TYPE_CHEST && go->GetGOInfo()->chest.eventId)
                 {
                     ;//sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "Chest ScriptStart id %u for GO %u", gameObjTarget->GetGOInfo()->chest.eventId, gameObjTarget->GetDBTableGUIDLow());
                     player->GetMap()->ScriptsStart(sEventScripts, go->GetGOInfo()->chest.eventId, player, go);
                 }
-			}
+            }
 
             loot->clear();
         }
@@ -324,7 +324,7 @@ void WorldSession::DoLootRelease(uint64 lguid)
 
         loot = &corpse->loot;
 
-		// Xinef: Buggs client? (Opening loot after closing)
+        // Xinef: Buggs client? (Opening loot after closing)
         //if (loot->isLooted())
         {
             loot->clear();
@@ -337,7 +337,7 @@ void WorldSession::DoLootRelease(uint64 lguid)
         if (!pItem)
             return;
 
-		loot = &pItem->loot;
+        loot = &pItem->loot;
         ItemTemplate const* proto = pItem->GetTemplate();
 
         // destroy only 5 items from stack in case prospecting and milling
@@ -355,16 +355,16 @@ void WorldSession::DoLootRelease(uint64 lguid)
             player->DestroyItemCount(pItem, count, true);
         }
         else if (pItem->loot.isLooted() || !(proto->Flags & ITEM_PROTO_FLAG_OPENABLE))
-		{
+        {
             player->DestroyItem(pItem->GetBagSlot(), pItem->GetSlot(), true);
-			return;
-		}
+            return;
+        }
     }
     else
     {
         Creature* creature = GetPlayer()->GetMap()->GetCreature(lguid);
 
-		bool lootAllowed = creature && creature->IsAlive() == (player->getClass() == CLASS_ROGUE && creature->loot.loot_type == LOOT_PICKPOCKETING);
+        bool lootAllowed = creature && creature->IsAlive() == (player->getClass() == CLASS_ROGUE && creature->loot.loot_type == LOOT_PICKPOCKETING);
         if (!lootAllowed || !creature->IsWithinDistInMap(_player, INTERACTION_DISTANCE))
             return;
 
@@ -415,18 +415,18 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recvData)
 
     Player* target = ObjectAccessor::GetPlayer(*_player, MAKE_NEW_GUID(target_playerguid, 0, HIGHGUID_PLAYER));
     if (!target)
-	{
+    {
         _player->SendLootError(lootguid, LOOT_ERROR_PLAYER_NOT_FOUND);
         return;
-	}
+    }
 
     ;//sLog->outDebug(LOG_FILTER_NETWORKIO, "WorldSession::HandleLootMasterGiveOpcode (CMSG_LOOT_MASTER_GIVE, 0x02A3) Target = [%s].", target->GetName().c_str());
 
     if (_player->GetLootGUID() != lootguid)
-	{
+    {
         _player->SendLootError(lootguid, LOOT_ERROR_DIDNT_KILL);
         return;
-	}
+    }
 
     if (!_player->IsInRaidWith(target))
     {

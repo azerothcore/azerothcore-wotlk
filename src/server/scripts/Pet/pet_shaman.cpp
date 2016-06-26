@@ -57,22 +57,22 @@ class npc_pet_shaman_earth_elemental : public CreatureScript
                 _events.ScheduleEvent(EVENT_SHAMAN_ANGEREDEARTH, 0);
             }
 
-			void InitializeAI()
-			{
+            void InitializeAI()
+            {
                 me->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_NATURE, true);
-			}
+            }
 
             void UpdateAI(uint32 diff)
             {
-				if (_initAttack)
-				{
-					if (!me->IsInCombat())
-						if (Player* owner = me->GetCharmerOrOwnerPlayerOrPlayerItself())
-							if (Unit* target = owner->GetSelectedUnit())
-								if (me->_CanDetectFeignDeathOf(target) && me->CanCreatureAttack(target))
-									AttackStart(target);
-					_initAttack = false;
-				}
+                if (_initAttack)
+                {
+                    if (!me->IsInCombat())
+                        if (Player* owner = me->GetCharmerOrOwnerPlayerOrPlayerItself())
+                            if (Unit* target = owner->GetSelectedUnit())
+                                if (me->_CanDetectFeignDeathOf(target) && me->CanCreatureAttack(target))
+                                    AttackStart(target);
+                    _initAttack = false;
+                }
 
                 if (!UpdateVictim())
                     return;
@@ -90,7 +90,7 @@ class npc_pet_shaman_earth_elemental : public CreatureScript
 
         private:
             EventMap _events;
-			bool _initAttack;
+            bool _initAttack;
         };
 
         CreatureAI* GetAI(Creature* creature) const
@@ -108,33 +108,33 @@ class npc_pet_shaman_fire_elemental : public CreatureScript
         {
             npc_pet_shaman_fire_elementalAI(Creature* creature) : ScriptedAI(creature), _initAttack(true) { }
 
-			void InitializeAI()
-			{
+            void InitializeAI()
+            {
                 me->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_FIRE, true);
-			}
+            }
 
-			void EnterCombat(Unit*)
-			{
+            void EnterCombat(Unit*)
+            {
                 _events.Reset();
                 _events.ScheduleEvent(EVENT_SHAMAN_FIRENOVA, urand(5000, 20000));
                 _events.ScheduleEvent(EVENT_SHAMAN_FIREBLAST, urand(5000, 20000));
                 //_events.ScheduleEvent(EVENT_SHAMAN_FIRESHIELD, 0);
 
-				me->RemoveAurasDueToSpell(SPELL_SHAMAN_FIRESHIELD);
-				me->CastSpell(me, SPELL_SHAMAN_FIRESHIELD, true);
-			}
+                me->RemoveAurasDueToSpell(SPELL_SHAMAN_FIRESHIELD);
+                me->CastSpell(me, SPELL_SHAMAN_FIRESHIELD, true);
+            }
 
             void UpdateAI(uint32 diff)
             {
-				if (_initAttack)
-				{
-					if (!me->IsInCombat())
-						if (Player* owner = me->GetCharmerOrOwnerPlayerOrPlayerItself())
-							if (Unit* target = owner->GetSelectedUnit())
-								if (me->_CanDetectFeignDeathOf(target) && me->CanCreatureAttack(target))
-									AttackStart(target);
-					_initAttack = false;
-				}
+                if (_initAttack)
+                {
+                    if (!me->IsInCombat())
+                        if (Player* owner = me->GetCharmerOrOwnerPlayerOrPlayerItself())
+                            if (Unit* target = owner->GetSelectedUnit())
+                                if (me->_CanDetectFeignDeathOf(target) && me->CanCreatureAttack(target))
+                                    AttackStart(target);
+                    _initAttack = false;
+                }
 
                 if (!UpdateVictim())
                     return;
@@ -145,11 +145,11 @@ class npc_pet_shaman_fire_elemental : public CreatureScript
                     switch (eventId)
                     {
                         case EVENT_SHAMAN_FIRENOVA:
-							me->CastSpell(me, SPELL_SHAMAN_FIRENOVA, false);
+                            me->CastSpell(me, SPELL_SHAMAN_FIRENOVA, false);
                             _events.ScheduleEvent(EVENT_SHAMAN_FIRENOVA, urand(8000, 15000));
                             break;
                         case EVENT_SHAMAN_FIREBLAST:
-							me->CastSpell(me->GetVictim(), SPELL_SHAMAN_FIREBLAST, false);
+                            me->CastSpell(me->GetVictim(), SPELL_SHAMAN_FIREBLAST, false);
                             _events.ScheduleEvent(EVENT_SHAMAN_FIREBLAST, urand(4000, 8000));
                             break;
                         default:
@@ -162,7 +162,7 @@ class npc_pet_shaman_fire_elemental : public CreatureScript
 
         private:
             EventMap _events;
-			bool _initAttack;
+            bool _initAttack;
         };
 
         CreatureAI* GetAI(Creature* creature) const

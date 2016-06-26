@@ -24,53 +24,53 @@ public:
         {
             pInstance = c->GetInstanceScript();
 
-			float x = me->GetHomePosition().GetPositionX();
-			float y = me->GetHomePosition().GetPositionY();
-			if (x>344.0f && x<357.0f && y<-35.0f && y>-44.0f)
-			{
-				dataId = DATA_FORGE_1;
-				prevDataId = 0;
-			}
-			else if (x>380.0f && x<389.0f && y<-12.0f && y>-21.0f)
-			{
-				dataId = DATA_FORGE_2;
-				prevDataId = DATA_FORGE_1;
-			}
-			else
-			{
-				dataId = DATA_FORGE_3;
-				prevDataId = DATA_FORGE_2;
-			}
+            float x = me->GetHomePosition().GetPositionX();
+            float y = me->GetHomePosition().GetPositionY();
+            if (x>344.0f && x<357.0f && y<-35.0f && y>-44.0f)
+            {
+                dataId = DATA_FORGE_1;
+                prevDataId = 0;
+            }
+            else if (x>380.0f && x<389.0f && y<-12.0f && y>-21.0f)
+            {
+                dataId = DATA_FORGE_2;
+                prevDataId = DATA_FORGE_1;
+            }
+            else
+            {
+                dataId = DATA_FORGE_3;
+                prevDataId = DATA_FORGE_2;
+            }
         }
 
         InstanceScript* pInstance;
         uint32 dataId;
-		uint32 prevDataId;
+        uint32 prevDataId;
 
         void Reset()
         {
             if (pInstance)
-				pInstance->SetData(dataId, NOT_STARTED);
+                pInstance->SetData(dataId, NOT_STARTED);
         }
 
         void JustDied(Unit* /*killer*/)
         {
             if (pInstance)
-				pInstance->SetData(dataId, DONE);
-			me->SaveRespawnTime();
+                pInstance->SetData(dataId, DONE);
+            me->SaveRespawnTime();
         }
 
         void EnterCombat(Unit* /*who*/)
         {
             if (pInstance)
-			{
-				if (prevDataId && !pInstance->GetData(prevDataId))
-				{
-					EnterEvadeMode();
-					return;
-				}
+            {
+                if (prevDataId && !pInstance->GetData(prevDataId))
+                {
+                    EnterEvadeMode();
+                    return;
+                }
                 pInstance->SetData(dataId, IN_PROGRESS);
-			}
+            }
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
         }
     };
@@ -120,17 +120,17 @@ public:
         {
             if (type == WAYPOINT_MOTION_TYPE && id == POINT_LAST)
             {
-				me->SetHomePosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.25f);
-				if (Vehicle* v = me->GetVehicleKit())
-					if (Unit* p = v->GetPassenger(0))
-						if (Creature* rider = p->ToCreature())
-							rider->SetHomePosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.25f);
+                me->SetHomePosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.25f);
+                if (Vehicle* v = me->GetVehicleKit())
+                    if (Unit* p = v->GetPassenger(0))
+                        if (Creature* rider = p->ToCreature())
+                            rider->SetHomePosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.25f);
 
-				me->SetDisableGravity(false);
-				me->SetHover(false);
-				me->SetCanFly(false);
-				me->SetFacingTo(0.25f);
-				me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                me->SetDisableGravity(false);
+                me->SetHover(false);
+                me->SetCanFly(false);
+                me->SetFacingTo(0.25f);
+                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
             }
         }
 
@@ -139,9 +139,9 @@ public:
             if (type == TYPE_PROTODRAKE_AT && data == DATA_PROTODRAKE_MOVE && !_setData && me->IsAlive() && me->GetDistance(protodrakeCheckPos) < 10.0f)
             {
                 _setData = true;
-				me->SetDisableGravity(true);
-				me->SetHover(true);
-				me->SetCanFly(true);
+                me->SetDisableGravity(true);
+                me->SetHover(true);
+                me->SetCanFly(true);
                 me->GetMotionMaster()->MovePath(PATH_PROTODRAKE, false);
             }
         }
@@ -236,5 +236,5 @@ void AddSC_utgarde_keep()
     new npc_dragonflayer_forge_master();
     new npc_enslaved_proto_drake();
 
-	new spell_ticking_time_bomb();
+    new spell_ticking_time_bomb();
 }

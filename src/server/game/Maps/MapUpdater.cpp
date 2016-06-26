@@ -72,10 +72,10 @@ class LFGUpdateRequest : public ACE_Method_Request
 
         virtual int call()
         {
-			uint32 startTime = getMSTime();
+            uint32 startTime = getMSTime();
             sLFGMgr->Update(m_diff, 1);
-			uint32 totalTime = getMSTimeDiff(startTime, getMSTime());
-			lfgDiffTracker.Update(totalTime);
+            uint32 totalTime = getMSTimeDiff(startTime, getMSTime());
+            lfgDiffTracker.Update(totalTime);
             m_updater.update_finished();
             return 0;
         }
@@ -159,8 +159,8 @@ void MapUpdater::update_finished()
     if (pending_requests == 0)
     {
         ACE_ERROR((LM_ERROR, ACE_TEXT("(%t)\n"), ACE_TEXT("MapUpdater::update_finished BUG, report to devs")));
-		sLog->outMisc("WOOT! pending_requests == 0 before decrement!");
-		m_condition.broadcast();
+        sLog->outMisc("WOOT! pending_requests == 0 before decrement!");
+        m_condition.broadcast();
         return;
     }
 

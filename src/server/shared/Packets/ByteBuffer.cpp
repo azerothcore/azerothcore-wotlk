@@ -49,8 +49,8 @@ ByteBufferSourceException::ByteBufferSourceException(size_t pos, size_t size,
 
 void ByteBuffer::hexlike(bool outString) const
 {
-	if (!outString)
-		return;
+    if (!outString)
+        return;
 
     uint32 j = 1, k = 1;
 

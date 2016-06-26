@@ -9,24 +9,24 @@ REWRITTEN BY XINEF
 
 enum BG_WS_Events
 {
-	BG_WS_EVENT_UPDATE_GAME_TIME	= 1,
-	BG_WS_EVENT_NO_TIME_LEFT		= 2,
-	BG_WS_EVENT_RESPAWN_BOTH_FLAGS	= 3,
-	BG_WS_EVENT_ALLIANCE_DROP_FLAG	= 4,
-	BG_WS_EVENT_HORDE_DROP_FLAG		= 5,
-	BG_WS_EVENT_BOTH_FLAGS_KEPT10	= 6,
-	BG_WS_EVENT_BOTH_FLAGS_KEPT15	= 7
+    BG_WS_EVENT_UPDATE_GAME_TIME    = 1,
+    BG_WS_EVENT_NO_TIME_LEFT        = 2,
+    BG_WS_EVENT_RESPAWN_BOTH_FLAGS  = 3,
+    BG_WS_EVENT_ALLIANCE_DROP_FLAG  = 4,
+    BG_WS_EVENT_HORDE_DROP_FLAG     = 5,
+    BG_WS_EVENT_BOTH_FLAGS_KEPT10   = 6,
+    BG_WS_EVENT_BOTH_FLAGS_KEPT15   = 7
 };
 
 enum BG_WS_TimerOrScore
 {
-	BG_WS_MAX_TEAM_SCORE			= 3,
+    BG_WS_MAX_TEAM_SCORE            = 3,
 
-	BG_WS_TOTAL_GAME_TIME			= 27*MINUTE*IN_MILLISECONDS,
-	BG_WS_FLAG_RESPAWN_TIME			= 23*IN_MILLISECONDS,
-	BG_WS_FLAG_DROP_TIME			= 10*IN_MILLISECONDS,
-	BG_WS_SPELL_FORCE_TIME			= 10*MINUTE*IN_MILLISECONDS,
-	BG_WS_SPELL_BRUTAL_TIME			= 15*MINUTE*IN_MILLISECONDS
+    BG_WS_TOTAL_GAME_TIME           = 27*MINUTE*IN_MILLISECONDS,
+    BG_WS_FLAG_RESPAWN_TIME         = 23*IN_MILLISECONDS,
+    BG_WS_FLAG_DROP_TIME            = 10*IN_MILLISECONDS,
+    BG_WS_SPELL_FORCE_TIME          = 10*MINUTE*IN_MILLISECONDS,
+    BG_WS_SPELL_BRUTAL_TIME         = 15*MINUTE*IN_MILLISECONDS
 };
 
 enum BG_WS_Sound
@@ -133,7 +133,7 @@ enum BG_WS_Objectives
     WS_OBJECTIVE_CAPTURE_FLAG   = 42,
     WS_OBJECTIVE_RETURN_FLAG    = 44,
 
-	WS_EVENT_START_BATTLE		= 8563
+    WS_EVENT_START_BATTLE       = 8563
 };
 
 struct BattlegroundWGScore : public BattlegroundScore
@@ -185,12 +185,12 @@ class BattlegroundWS : public Battleground
         void AddPoints(TeamId teamId, uint32 points) { m_TeamScores[teamId] += points; }
         
         TeamId GetPrematureWinner();
-		uint32 GetMatchTime() const { return 1 + (BG_WS_TOTAL_GAME_TIME - GetStartTime()) / (MINUTE*IN_MILLISECONDS); }
-		uint32 GetAssaultSpellId() const;
-		void RemoveAssaultAuras();
+        uint32 GetMatchTime() const { return 1 + (BG_WS_TOTAL_GAME_TIME - GetStartTime()) / (MINUTE*IN_MILLISECONDS); }
+        uint32 GetAssaultSpellId() const;
+        void RemoveAssaultAuras();
 
     private:
-		EventMap _bgEvents;
+        EventMap _bgEvents;
 
         uint64 _flagKeepers[2];
         uint64 _droppedFlagGUID[2];

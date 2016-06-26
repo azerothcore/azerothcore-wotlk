@@ -32,7 +32,7 @@ enum RogueSpells
 {
     SPELL_ROGUE_BLADE_FLURRY_EXTRA_ATTACK       = 22482,
     SPELL_ROGUE_CHEAT_DEATH_COOLDOWN            = 31231,
-	SPELL_ROGUE_CHEATING_DEATH					= 45182,
+    SPELL_ROGUE_CHEATING_DEATH                  = 45182,
     SPELL_ROGUE_GLYPH_OF_PREPARATION            = 56819,
     SPELL_ROGUE_KILLING_SPREE                   = 51690,
     SPELL_ROGUE_KILLING_SPREE_TELEPORT          = 57840,
@@ -62,12 +62,12 @@ public:
 
         void Update(AuraEffect* auraEffect)
         {
-			Unit::AuraApplicationMap const& auras = GetUnitOwner()->GetAppliedAuras();
-			for (Unit::AuraApplicationMap::const_iterator itr = auras.begin(); itr != auras.end(); ++itr)
-				if (itr->second->GetBase()->GetCasterGUID() == this->GetCasterGUID() && itr->second->GetBase()->GetSpellInfo()->Dispel == DISPEL_POISON)
-					return;
+            Unit::AuraApplicationMap const& auras = GetUnitOwner()->GetAppliedAuras();
+            for (Unit::AuraApplicationMap::const_iterator itr = auras.begin(); itr != auras.end(); ++itr)
+                if (itr->second->GetBase()->GetCasterGUID() == this->GetCasterGUID() && itr->second->GetBase()->GetSpellInfo()->Dispel == DISPEL_POISON)
+                    return;
 
-			SetDuration(0);
+            SetDuration(0);
         }
 
         void Register()
@@ -94,7 +94,7 @@ class spell_rog_combat_potency : public SpellScriptLoader
 
             bool CheckProc(ProcEventInfo& eventInfo)
             {
-				return eventInfo.GetTypeMask() & PROC_FLAG_DONE_MELEE_AUTO_ATTACK;
+                return eventInfo.GetTypeMask() & PROC_FLAG_DONE_MELEE_AUTO_ATTACK;
             }
 
             void Register()
@@ -137,27 +137,27 @@ class spell_rog_blade_flurry : public SpellScriptLoader
             bool CheckProc(ProcEventInfo& eventInfo)
             {
                 Unit* _procTarget = eventInfo.GetActor()->SelectNearbyTarget(eventInfo.GetProcTarget());
-				if (_procTarget)
-					_procTargetGUID = _procTarget->GetGUID();
+                if (_procTarget)
+                    _procTargetGUID = _procTarget->GetGUID();
                 return _procTarget;
             }
 
             void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
             {
                 PreventDefaultAction();
-				// Xinef: no _procTarget but checkproc passed??
-				// Unit::CalculateAOEDamageReduction (this=0x0, damage=4118, schoolMask=1, caster=0x7ffdad089000)
-				Unit* procTarget = ObjectAccessor::GetUnit(*GetTarget(), _procTargetGUID);
+                // Xinef: no _procTarget but checkproc passed??
+                // Unit::CalculateAOEDamageReduction (this=0x0, damage=4118, schoolMask=1, caster=0x7ffdad089000)
+                Unit* procTarget = ObjectAccessor::GetUnit(*GetTarget(), _procTargetGUID);
                 if (procTarget && eventInfo.GetDamageInfo())
                 {
                     int32 damage = eventInfo.GetDamageInfo()->GetDamage();
-					// Xinef: Include AOE Damage Reduction auras
-					damage = procTarget->CalculateAOEDamageReduction(damage, SPELL_SCHOOL_MASK_NORMAL, GetTarget());
+                    // Xinef: Include AOE Damage Reduction auras
+                    damage = procTarget->CalculateAOEDamageReduction(damage, SPELL_SCHOOL_MASK_NORMAL, GetTarget());
 
-					CustomSpellValues values;
-					values.AddSpellMod(SPELLVALUE_BASE_POINT0, damage);
-					values.AddSpellMod(SPELLVALUE_FORCED_CRIT_RESULT, int32(eventInfo.GetHitMask() & PROC_EX_CRITICAL_HIT));
-					GetTarget()->CastCustomSpell(SPELL_ROGUE_BLADE_FLURRY_EXTRA_ATTACK, values, procTarget, TRIGGERED_FULL_MASK, NULL, aurEff);
+                    CustomSpellValues values;
+                    values.AddSpellMod(SPELLVALUE_BASE_POINT0, damage);
+                    values.AddSpellMod(SPELLVALUE_FORCED_CRIT_RESULT, int32(eventInfo.GetHitMask() & PROC_EX_CRITICAL_HIT));
+                    GetTarget()->CastCustomSpell(SPELL_ROGUE_BLADE_FLURRY_EXTRA_ATTACK, values, procTarget, TRIGGERED_FULL_MASK, NULL, aurEff);
                 }
             }
 
@@ -214,9 +214,9 @@ class spell_rog_cheat_death : public SpellScriptLoader
                 if (dmgInfo.GetDamage() < target->GetHealth() || target->HasSpellCooldown(SPELL_ROGUE_CHEAT_DEATH_COOLDOWN) || !roll_chance_i(absorbChance))
                     return;
 
-				target->CastSpell(target, SPELL_ROGUE_CHEAT_DEATH_COOLDOWN, true);
-				target->CastSpell(target, SPELL_ROGUE_CHEATING_DEATH, true);
-				target->AddSpellCooldown(SPELL_ROGUE_CHEAT_DEATH_COOLDOWN, 0, MINUTE*IN_MILLISECONDS);
+                target->CastSpell(target, SPELL_ROGUE_CHEAT_DEATH_COOLDOWN, true);
+                target->CastSpell(target, SPELL_ROGUE_CHEATING_DEATH, true);
+                target->AddSpellCooldown(SPELL_ROGUE_CHEAT_DEATH_COOLDOWN, 0, MINUTE*IN_MILLISECONDS);
 
                 uint32 health10 = target->CountPctFromMaxHealth(10);
 
@@ -232,7 +232,7 @@ class spell_rog_cheat_death : public SpellScriptLoader
             {
                 DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_rog_cheat_death_AuraScript::CalculateAmount, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB);
                 OnEffectAbsorb += AuraEffectAbsorbFn(spell_rog_cheat_death_AuraScript::Absorb, EFFECT_0);
-			}
+            }
         };
 
         AuraScript* GetAuraScript() const
@@ -346,24 +346,24 @@ class spell_rog_killing_spree : public SpellScriptLoader
         {
             PrepareSpellScript(spell_rog_killing_spree_SpellScript);
 
-			SpellCastResult CheckCast()
+            SpellCastResult CheckCast()
             {
-				// Kologarn area, Killing Spree should not work
-				if (GetCaster()->GetMapId() == 603 /*Ulduar*/ && GetCaster()->GetDistance2d(1766.936f, -24.748f) < 50.0f)
-					return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
-				return SPELL_CAST_OK;
-			}
+                // Kologarn area, Killing Spree should not work
+                if (GetCaster()->GetMapId() == 603 /*Ulduar*/ && GetCaster()->GetDistance2d(1766.936f, -24.748f) < 50.0f)
+                    return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
+                return SPELL_CAST_OK;
+            }
 
             void FilterTargets(std::list<WorldObject*>& targets)
             {
                 if (targets.empty() || GetCaster()->GetVehicleBase() || GetCaster()->HasUnitState(UNIT_STATE_ROOT))
                     FinishCast(SPELL_FAILED_OUT_OF_RANGE);
-				else
-				{
-					// Added attribute not breaking stealth, removes auras here
-					GetCaster()->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_CAST);
-					GetCaster()->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_SPELL_ATTACK);
-				}
+                else
+                {
+                    // Added attribute not breaking stealth, removes auras here
+                    GetCaster()->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_CAST);
+                    GetCaster()->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_SPELL_ATTACK);
+                }
             }
 
             void HandleDummy(SpellEffIndex /*effIndex*/)
@@ -413,12 +413,12 @@ class spell_rog_killing_spree : public SpellScriptLoader
                     uint64 guid = Trinity::Containers::SelectRandomContainerElement(_targets);
                     if (Unit* target = ObjectAccessor::GetUnit(*GetTarget(), guid))
                     {
-						// xinef: target may be no longer valid
-						if (!GetTarget()->IsValidAttackTarget(target))
-						{
-							_targets.remove(guid);
-							continue;
-						}
+                        // xinef: target may be no longer valid
+                        if (!GetTarget()->IsValidAttackTarget(target))
+                        {
+                            _targets.remove(guid);
+                            continue;
+                        }
 
                         GetTarget()->CastSpell(target, SPELL_ROGUE_KILLING_SPREE_TELEPORT, true);
 
@@ -530,41 +530,41 @@ class spell_rog_preparation : public SpellScriptLoader
 
             void HandleDummy(SpellEffIndex /*effIndex*/)
             {
-				Player* caster = GetCaster()->ToPlayer();
-				//immediately finishes the cooldown on certain Rogue abilities
+                Player* caster = GetCaster()->ToPlayer();
+                //immediately finishes the cooldown on certain Rogue abilities
 
-				bool hasGlyph = caster->HasAura(SPELL_ROGUE_GLYPH_OF_PREPARATION);
-				PlayerSpellMap const& spellMap = caster->GetSpellMap();
-				for (PlayerSpellMap::const_iterator itr = spellMap.begin(); itr != spellMap.end(); ++itr)
-				{
-					SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(itr->first);
-					if (spellInfo->SpellFamilyName == SPELLFAMILY_ROGUE)
-					{
-						if (spellInfo->SpellFamilyFlags[1] & SPELLFAMILYFLAG1_ROGUE_COLDB_SHADOWSTEP ||      // Cold Blood, Shadowstep
-							spellInfo->SpellFamilyFlags[0] & SPELLFAMILYFLAG_ROGUE_VAN_EVAS_SPRINT)           // Vanish, Evasion, Sprint
-						{
-							SpellCooldowns::iterator citr = caster->GetSpellCooldownMap().find(spellInfo->Id);
-							if (citr != caster->GetSpellCooldownMap().end() && citr->second.needSendToClient)
-								caster->RemoveSpellCooldown(spellInfo->Id, true);
-							else
-								caster->RemoveSpellCooldown(spellInfo->Id, false);
-						}
-						else if (hasGlyph)
-						{
-							if (spellInfo->SpellFamilyFlags[1] & SPELLFAMILYFLAG1_ROGUE_DISMANTLE ||         // Dismantle
-								spellInfo->SpellFamilyFlags[0] & SPELLFAMILYFLAG_ROGUE_KICK ||               // Kick
-								(spellInfo->SpellFamilyFlags[0] & SPELLFAMILYFLAG_ROGUE_BLADE_FLURRY &&     // Blade Flurry
-								spellInfo->SpellFamilyFlags[1] & SPELLFAMILYFLAG1_ROGUE_BLADE_FLURRY))
-							{
-								SpellCooldowns::iterator citr = caster->GetSpellCooldownMap().find(spellInfo->Id);
-								if (citr != caster->GetSpellCooldownMap().end() && citr->second.needSendToClient)
-									caster->RemoveSpellCooldown(spellInfo->Id, true);
-								else
-									caster->RemoveSpellCooldown(spellInfo->Id, false);
-							}
-						}
-					}
-				}
+                bool hasGlyph = caster->HasAura(SPELL_ROGUE_GLYPH_OF_PREPARATION);
+                PlayerSpellMap const& spellMap = caster->GetSpellMap();
+                for (PlayerSpellMap::const_iterator itr = spellMap.begin(); itr != spellMap.end(); ++itr)
+                {
+                    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(itr->first);
+                    if (spellInfo->SpellFamilyName == SPELLFAMILY_ROGUE)
+                    {
+                        if (spellInfo->SpellFamilyFlags[1] & SPELLFAMILYFLAG1_ROGUE_COLDB_SHADOWSTEP ||      // Cold Blood, Shadowstep
+                            spellInfo->SpellFamilyFlags[0] & SPELLFAMILYFLAG_ROGUE_VAN_EVAS_SPRINT)           // Vanish, Evasion, Sprint
+                        {
+                            SpellCooldowns::iterator citr = caster->GetSpellCooldownMap().find(spellInfo->Id);
+                            if (citr != caster->GetSpellCooldownMap().end() && citr->second.needSendToClient)
+                                caster->RemoveSpellCooldown(spellInfo->Id, true);
+                            else
+                                caster->RemoveSpellCooldown(spellInfo->Id, false);
+                        }
+                        else if (hasGlyph)
+                        {
+                            if (spellInfo->SpellFamilyFlags[1] & SPELLFAMILYFLAG1_ROGUE_DISMANTLE ||         // Dismantle
+                                spellInfo->SpellFamilyFlags[0] & SPELLFAMILYFLAG_ROGUE_KICK ||               // Kick
+                                (spellInfo->SpellFamilyFlags[0] & SPELLFAMILYFLAG_ROGUE_BLADE_FLURRY &&     // Blade Flurry
+                                spellInfo->SpellFamilyFlags[1] & SPELLFAMILYFLAG1_ROGUE_BLADE_FLURRY))
+                            {
+                                SpellCooldowns::iterator citr = caster->GetSpellCooldownMap().find(spellInfo->Id);
+                                if (citr != caster->GetSpellCooldownMap().end() && citr->second.needSendToClient)
+                                    caster->RemoveSpellCooldown(spellInfo->Id, true);
+                                else
+                                    caster->RemoveSpellCooldown(spellInfo->Id, false);
+                            }
+                        }
+                    }
+                }
             }
 
             void Register()
@@ -600,8 +600,8 @@ class spell_rog_prey_on_the_weak : public SpellScriptLoader
             {
                 Unit* target = GetTarget();
                 Unit* victim = target->GetVictim();
-				if (!victim && target->GetTypeId() == TYPEID_PLAYER)
-					victim = target->ToPlayer()->GetSelectedUnit();
+                if (!victim && target->GetTypeId() == TYPEID_PLAYER)
+                    victim = target->ToPlayer()->GetSelectedUnit();
 
                 if (victim && (target->GetHealthPct() > victim->GetHealthPct()))
                 {
@@ -813,11 +813,11 @@ class spell_rog_tricks_of_the_trade_proc : public SpellScriptLoader
 
 void AddSC_rogue_spell_scripts()
 {
-	// Ours
-	new spell_rog_savage_combat();
-	new spell_rog_combat_potency();
+    // Ours
+    new spell_rog_savage_combat();
+    new spell_rog_combat_potency();
 
-	// Theirs
+    // Theirs
     new spell_rog_blade_flurry();
     new spell_rog_cheat_death();
     new spell_rog_deadly_poison();

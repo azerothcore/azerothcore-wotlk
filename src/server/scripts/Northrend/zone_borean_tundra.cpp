@@ -46,8 +46,8 @@ EndContentData */
 // Ours
 enum eDrakeHunt
 {
-	SPELL_DRAKE_HATCHLING_SUBDUED		= 46691,
-	SPELL_SUBDUED						= 46675
+    SPELL_DRAKE_HATCHLING_SUBDUED       = 46691,
+    SPELL_SUBDUED                       = 46675
 };
 
 class spell_q11919_q11940_drake_hunt : public SpellScriptLoader
@@ -59,32 +59,32 @@ public:
     {
         PrepareAuraScript(spell_q11919_q11940_drake_hunt_AuraScript)
 
-		bool Load()
-		{
-			return GetOwner()->GetTypeId() == TYPEID_UNIT;
-		}
-
-		void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        bool Load()
         {
-			if (GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_EXPIRE || !GetCaster())
-				return;
+            return GetOwner()->GetTypeId() == TYPEID_UNIT;
+        }
 
-			Creature* owner = GetOwner()->ToCreature();
-			owner->RemoveAllAurasExceptType(SPELL_AURA_DUMMY);
-			owner->CombatStop(true);
-			owner->DeleteThreatList();
-			owner->GetMotionMaster()->Clear(false);
-			owner->GetMotionMaster()->MoveFollow(GetCaster(), 4.0f, M_PI, MOTION_SLOT_ACTIVE);
-			owner->CastSpell(owner, SPELL_SUBDUED, true);
-			GetCaster()->CastSpell(GetCaster(), SPELL_DRAKE_HATCHLING_SUBDUED, true);
-			owner->setFaction(35);
-			owner->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
-			owner->DespawnOrUnsummon(3*MINUTE*IN_MILLISECONDS);
+        void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            if (GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_EXPIRE || !GetCaster())
+                return;
+
+            Creature* owner = GetOwner()->ToCreature();
+            owner->RemoveAllAurasExceptType(SPELL_AURA_DUMMY);
+            owner->CombatStop(true);
+            owner->DeleteThreatList();
+            owner->GetMotionMaster()->Clear(false);
+            owner->GetMotionMaster()->MoveFollow(GetCaster(), 4.0f, M_PI, MOTION_SLOT_ACTIVE);
+            owner->CastSpell(owner, SPELL_SUBDUED, true);
+            GetCaster()->CastSpell(GetCaster(), SPELL_DRAKE_HATCHLING_SUBDUED, true);
+            owner->setFaction(35);
+            owner->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
+            owner->DespawnOrUnsummon(3*MINUTE*IN_MILLISECONDS);
         }
 
         void Register()
         {
-			AfterEffectRemove += AuraEffectRemoveFn(spell_q11919_q11940_drake_hunt_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+            AfterEffectRemove += AuraEffectRemoveFn(spell_q11919_q11940_drake_hunt_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
         }
     };
 
@@ -140,7 +140,7 @@ public:
             if (player && player->GetQuestStatus(QUEST_PLUG_THE_SINKHOLES) == QUEST_STATUS_INCOMPLETE)
             {
                 phase = 1;
-				phaseTimer = 0;
+                phaseTimer = 0;
                 casterGuid = caster->GetGUID();
             }
         }
@@ -188,7 +188,7 @@ public:
                         DoCast(me, SPELL_EXPLODE_CART, true);
                         if (Unit* worm = me->FindNearestCreature(NPC_SCOURGED_BURROWER, 3.0f))
                         {
-							Unit::Kill(me, worm);
+                            Unit::Kill(me, worm);
                             worm->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
                         }
                         phaseTimer = 2000;
@@ -202,7 +202,7 @@ public:
                         phase = 8;
                         break;
                     default:
-						CreatureAI::EnterEvadeMode();
+                        CreatureAI::EnterEvadeMode();
                         break;
                 }
             } else phaseTimer -= diff;
@@ -536,7 +536,7 @@ public:
             if (npc_escortAI* pEscortAI = CAST_AI(npc_lurgglbr::npc_lurgglbrAI, creature->AI()))
                 pEscortAI->Start(true, false, player->GetGUID());
 
-			creature->setFaction(player->GetTeamId() == TEAM_ALLIANCE ? FACTION_ESCORTEE_A : FACTION_ESCORTEE_H);
+            creature->setFaction(player->GetTeamId() == TEAM_ALLIANCE ? FACTION_ESCORTEE_A : FACTION_ESCORTEE_H);
             return true;
         }
         return false;
@@ -549,7 +549,7 @@ public:
 
 enum BerylSorcerer
 {
-	NPC_BERYL_SORCERER					= 25316,
+    NPC_BERYL_SORCERER                  = 25316,
     NPC_CAPTURED_BERLY_SORCERER         = 25474,
     NPC_LIBRARIAN_DONATHAN              = 25262,
 
@@ -571,7 +571,7 @@ public:
 
         void Reset()
         {
-			me->UpdateEntry(NPC_BERYL_SORCERER);
+            me->UpdateEntry(NPC_BERYL_SORCERER);
             me->SetReactState(REACT_AGGRESSIVE);
             bEnslaved = false;
         }
@@ -591,7 +591,7 @@ public:
                 StartFollow(pCaster->ToPlayer(), 0, NULL);
                 me->UpdateEntry(NPC_CAPTURED_BERLY_SORCERER, NULL, false);
                 DoCast(me, SPELL_COSMETIC_ENSLAVE_CHAINS_SELF, true);
-				me->DespawnOrUnsummon(45000);
+                me->DespawnOrUnsummon(45000);
 
                 if (Player* player = pCaster->ToPlayer())
                     player->KilledMonsterCredit(NPC_CAPTURED_BERLY_SORCERER, 0);
@@ -663,9 +663,9 @@ public:
 
             rebuff = 0;
 
-			// xinef: correct visuals
-			me->UpdatePosition(me->GetPositionX(), me->GetPositionY(), 150.517f, me->GetOrientation(), true);
-			me->SetStandState(UNIT_STAND_STATE_SIT_MEDIUM_CHAIR);
+            // xinef: correct visuals
+            me->UpdatePosition(me->GetPositionX(), me->GetPositionY(), 150.517f, me->GetOrientation(), true);
+            me->SetStandState(UNIT_STAND_STATE_SIT_MEDIUM_CHAIR);
         }
 
         void UpdateAI(uint32 diff)
@@ -765,7 +765,7 @@ public:
     {
         if (quest->GetQuestId() == QUEST_ESCAPING_THE_MIST)
         {
-			creature->setFaction(player->GetTeamId() == TEAM_ALLIANCE ? FACTION_ESCORTEE_A : FACTION_ESCORTEE_H);
+            creature->setFaction(player->GetTeamId() == TEAM_ALLIANCE ? FACTION_ESCORTEE_A : FACTION_ESCORTEE_H);
             creature->SetStandState(UNIT_STAND_STATE_STAND);
             creature->AI()->Talk(SAY_1, player);
             CAST_AI(npc_escortAI, (creature->AI()))->Start(true, false, player->GetGUID());
@@ -982,9 +982,9 @@ public:
     struct npc_warmage_coldarraAI : public ScriptedAI
     {
         npc_warmage_coldarraAI(Creature* creature) : ScriptedAI(creature)
-		{
-			SetCombatMovement(false);
-		}
+        {
+            SetCombatMovement(false);
+        }
 
         uint32 m_uiTimer;                 //Timer until recast
 
@@ -1277,10 +1277,10 @@ public:
 
 void AddSC_borean_tundra()
 {
-	// Ours
-	new spell_q11919_q11940_drake_hunt();
+    // Ours
+    new spell_q11919_q11940_drake_hunt();
 
-	// Theirs
+    // Theirs
     new npc_sinkhole_kill_credit();
     new npc_khunok_the_behemoth();
     new npc_corastrasza();

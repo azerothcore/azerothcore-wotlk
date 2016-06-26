@@ -113,7 +113,7 @@ public:
         data << uint32(0);                                      // unknown
         target->SendMessageToSet(&data, true);
         handler->PSendSysMessage(LANG_COMMAND_FLYMODE_STATUS, handler->GetNameLink(target).c_str(), args);
-		handler->SetSentErrorMessage(true);
+        handler->SetSentErrorMessage(true);
         return false;
     }
 
@@ -200,7 +200,7 @@ public:
         if (!*args)
         {
             handler->PSendSysMessage(LANG_YOU_ARE, _player->isGMVisible() ? handler->GetTrinityString(LANG_VISIBLE) : handler->GetTrinityString(LANG_INVISIBLE));
-			handler->SetSentErrorMessage(true);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -215,7 +215,7 @@ public:
             _player->SetGMVisible(true);
             //_player->UpdateObjectVisibility();
             handler->GetSession()->SendNotification(LANG_INVISIBLE_VISIBLE);
-			handler->SetSentErrorMessage(true);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -225,7 +225,7 @@ public:
             _player->SetGMVisible(false);
             //_player->UpdateObjectVisibility();
             handler->GetSession()->SendNotification(LANG_INVISIBLE_INVISIBLE);
-			handler->SetSentErrorMessage(true);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -242,7 +242,7 @@ public:
         if (!*args)
         {
             handler->GetSession()->SendNotification(_player->IsGameMaster() ? LANG_GM_ON : LANG_GM_OFF);
-			handler->SetSentErrorMessage(true);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -253,7 +253,7 @@ public:
             _player->SetGameMaster(true);
             handler->GetSession()->SendNotification(LANG_GM_ON);
             _player->UpdateTriggerVisibility();
-			handler->SetSentErrorMessage(true);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 
@@ -262,7 +262,7 @@ public:
             _player->SetGameMaster(false);
             handler->GetSession()->SendNotification(LANG_GM_OFF);
             _player->UpdateTriggerVisibility();
-			handler->SetSentErrorMessage(true);
+            handler->SetSentErrorMessage(true);
             return false;
         }
 

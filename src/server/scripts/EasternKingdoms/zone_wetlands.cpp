@@ -86,7 +86,7 @@ public:
         {
             if (HasEscortState(STATE_ESCORT_ESCORTING) && !IsFriendSummoned && GetPlayerForEscort())
             {
-				me->CastSpell(me, SPELL_CALL_FRIENDS, true);
+                me->CastSpell(me, SPELL_CALL_FRIENDS, true);
                 IsFriendSummoned = true;
             }
         }

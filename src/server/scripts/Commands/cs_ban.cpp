@@ -284,7 +284,7 @@ public:
 
         if (!target)
         {
-			targetGuid = sWorld->GetGlobalPlayerGUID(name);
+            targetGuid = sWorld->GetGlobalPlayerGUID(name);
             if (!targetGuid)
             {
                 handler->PSendSysMessage(LANG_BANINFO_NOCHARACTER);

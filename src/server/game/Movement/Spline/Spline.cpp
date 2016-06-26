@@ -286,7 +286,7 @@ void SplineBase::clear()
     index_lo = 0;
     index_hi = 0;
     points.clear();
-	pointsVisual.clear();
+    pointsVisual.clear();
 }
 
 std::string SplineBase::ToString() const

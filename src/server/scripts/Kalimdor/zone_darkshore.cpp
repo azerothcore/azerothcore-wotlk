@@ -40,15 +40,15 @@ EndContentData */
 // Ours
 enum murkdeep
 {
-	NPC_GREYMIST_HUNTER					= 2206,
-	NPC_GREYMIST_WARRIOR				= 2205,
-	NPC_GREYMIST_COASTRUNNER			= 2202,
+    NPC_GREYMIST_HUNTER                 = 2206,
+    NPC_GREYMIST_WARRIOR                = 2205,
+    NPC_GREYMIST_COASTRUNNER            = 2202,
 
-	SPELL_SUNDER_ARMOR					= 11971,
-	SPELL_NET							= 6533,
+    SPELL_SUNDER_ARMOR                  = 11971,
+    SPELL_NET                           = 6533,
 
-	EVENT_SPELL_SUNDER_ARMOR			= 2,
-	EVENT_SPELL_NET						= 3,
+    EVENT_SPELL_SUNDER_ARMOR            = 2,
+    EVENT_SPELL_NET                     = 3,
 };
 
 class npc_murkdeep : public CreatureScript
@@ -58,107 +58,107 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const
     {
-		return new npc_murkdeepAI(creature);
+        return new npc_murkdeepAI(creature);
     }
 
     struct npc_murkdeepAI : public ScriptedAI
     {
         npc_murkdeepAI(Creature* c) : ScriptedAI(c) {}
 
-		uint8 phase;
-		uint32 spawnTimer;
-		EventMap events;
+        uint8 phase;
+        uint32 spawnTimer;
+        EventMap events;
 
-		void Reset()
-		{
-			spawnTimer = 0;
-			phase = 0;
-			me->SetVisible(false);
-			me->SetReactState(REACT_PASSIVE);
-		}
+        void Reset()
+        {
+            spawnTimer = 0;
+            phase = 0;
+            me->SetVisible(false);
+            me->SetReactState(REACT_PASSIVE);
+        }
 
-		void EnterCombat(Unit*)
-		{
-			events.Reset();
-			events.ScheduleEvent(EVENT_SPELL_SUNDER_ARMOR, 5000);
-			events.ScheduleEvent(EVENT_SPELL_NET, 10000);
-		}
+        void EnterCombat(Unit*)
+        {
+            events.Reset();
+            events.ScheduleEvent(EVENT_SPELL_SUNDER_ARMOR, 5000);
+            events.ScheduleEvent(EVENT_SPELL_NET, 10000);
+        }
 
-		void UpdateAI(uint32 diff)
-		{
-			spawnTimer += diff;
-			if (spawnTimer >= 5000)
-			{
-				spawnTimer = 0;
-				switch (phase)
-				{
-				case 0:
-					if (!me->FindNearestCreature(NPC_GREYMIST_WARRIOR, 80.0f, true) && !me->FindNearestCreature(NPC_GREYMIST_HUNTER, 80.0f, true))
-					{
-						Player *player = me->SelectNearestPlayer(100.0f);
-						if (!player)
-							return;
+        void UpdateAI(uint32 diff)
+        {
+            spawnTimer += diff;
+            if (spawnTimer >= 5000)
+            {
+                spawnTimer = 0;
+                switch (phase)
+                {
+                case 0:
+                    if (!me->FindNearestCreature(NPC_GREYMIST_WARRIOR, 80.0f, true) && !me->FindNearestCreature(NPC_GREYMIST_HUNTER, 80.0f, true))
+                    {
+                        Player *player = me->SelectNearestPlayer(100.0f);
+                        if (!player)
+                            return;
 
-						phase++;
-						for (int i = 0; i < 3; ++i)
-							if (Creature* cr = me->SummonCreature(NPC_GREYMIST_COASTRUNNER, me->GetPositionX()+irand(-5, 5), me->GetPositionY()+irand(-5, 5), me->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000))
-								cr->AI()->AttackStart(player);
-					}
-					return;
-				case 1:
-					if (!me->FindNearestCreature(NPC_GREYMIST_COASTRUNNER, 80.0f))
-					{
-						Player *player = me->SelectNearestPlayer(100.0f);
-						if (!player)
-							return;
+                        phase++;
+                        for (int i = 0; i < 3; ++i)
+                            if (Creature* cr = me->SummonCreature(NPC_GREYMIST_COASTRUNNER, me->GetPositionX()+irand(-5, 5), me->GetPositionY()+irand(-5, 5), me->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000))
+                                cr->AI()->AttackStart(player);
+                    }
+                    return;
+                case 1:
+                    if (!me->FindNearestCreature(NPC_GREYMIST_COASTRUNNER, 80.0f))
+                    {
+                        Player *player = me->SelectNearestPlayer(100.0f);
+                        if (!player)
+                            return;
 
-						phase++;
-						for (int i = 0; i < 2; ++i)
-							if (Creature* cr = me->SummonCreature(NPC_GREYMIST_WARRIOR, me->GetPositionX()+irand(-5, 5), me->GetPositionY()+irand(-5, 5), me->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000))
-								cr->AI()->AttackStart(player);
-					}
-					return;
-				case 2:
-					if (!me->FindNearestCreature(NPC_GREYMIST_WARRIOR, 80.0f))
-					{
-						Player *player = me->SelectNearestPlayer(100.0f);
-						if (!player)
-							return;
+                        phase++;
+                        for (int i = 0; i < 2; ++i)
+                            if (Creature* cr = me->SummonCreature(NPC_GREYMIST_WARRIOR, me->GetPositionX()+irand(-5, 5), me->GetPositionY()+irand(-5, 5), me->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000))
+                                cr->AI()->AttackStart(player);
+                    }
+                    return;
+                case 2:
+                    if (!me->FindNearestCreature(NPC_GREYMIST_WARRIOR, 80.0f))
+                    {
+                        Player *player = me->SelectNearestPlayer(100.0f);
+                        if (!player)
+                            return;
 
-						phase++;
-						if (Creature* cr = me->SummonCreature(NPC_GREYMIST_HUNTER, me->GetPositionX()+irand(-5, 5), me->GetPositionY()+irand(-5, 5), me->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000))
-							cr->AI()->AttackStart(player);
+                        phase++;
+                        if (Creature* cr = me->SummonCreature(NPC_GREYMIST_HUNTER, me->GetPositionX()+irand(-5, 5), me->GetPositionY()+irand(-5, 5), me->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000))
+                            cr->AI()->AttackStart(player);
 
-						me->SetReactState(REACT_AGGRESSIVE);
-						me->SetVisible(true);
-						AttackStart(player);
-					}
-					return;
-				}
-			}
+                        me->SetReactState(REACT_AGGRESSIVE);
+                        me->SetVisible(true);
+                        AttackStart(player);
+                    }
+                    return;
+                }
+            }
 
-			if (!me->IsVisible())
-				return;
+            if (!me->IsVisible())
+                return;
 
-			if (!UpdateVictim())
-				return;
+            if (!UpdateVictim())
+                return;
 
-			events.Update(diff);
-			switch (events.ExecuteEvent())
-			{
-				case EVENT_SPELL_SUNDER_ARMOR:
-					me->CastSpell(me->GetVictim(), SPELL_SUNDER_ARMOR, false);
-					events.ScheduleEvent(EVENT_SPELL_SUNDER_ARMOR, 15000);
-					break;
-				case EVENT_SPELL_NET:
-					me->CastSpell(me->GetVictim(), SPELL_NET, false);
-					events.ScheduleEvent(EVENT_SPELL_NET, 25000);
-					break;
-			}
+            events.Update(diff);
+            switch (events.ExecuteEvent())
+            {
+                case EVENT_SPELL_SUNDER_ARMOR:
+                    me->CastSpell(me->GetVictim(), SPELL_SUNDER_ARMOR, false);
+                    events.ScheduleEvent(EVENT_SPELL_SUNDER_ARMOR, 15000);
+                    break;
+                case EVENT_SPELL_NET:
+                    me->CastSpell(me->GetVictim(), SPELL_NET, false);
+                    events.ScheduleEvent(EVENT_SPELL_NET, 25000);
+                    break;
+            }
 
-			DoMeleeAttackIfReady();
-		}
-	};
+            DoMeleeAttackIfReady();
+        }
+    };
 };
 
 
@@ -513,10 +513,10 @@ public:
 
 void AddSC_darkshore()
 {
-	// Ours
-	new npc_murkdeep();
+    // Ours
+    new npc_murkdeep();
 
-	// Theirs
+    // Theirs
     new npc_kerlonian();
     new npc_prospector_remtravel();
     new npc_threshwackonator();

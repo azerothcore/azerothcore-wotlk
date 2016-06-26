@@ -964,7 +964,7 @@ void Log::outMisc(const char * str, ...)
     if (!str)
         return;
 
-	if (m_enableLogDB)
+    if (m_enableLogDB)
     {
         va_list ap2;
         va_start(ap2, str);

@@ -379,14 +379,14 @@ bool AchievementCriteriaData::Meets(uint32 criteria_id, Player const* source, Un
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_MAP_PLAYER_COUNT:
             return source->GetMap()->GetPlayersCountExceptGMs() <= map_players.maxcount;
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_T_TEAM:
-		{
+        {
             if (!target || target->GetTypeId() != TYPEID_PLAYER)
                 return false;
 
-			// DB data compatibility...
-			uint32 teamOld = target->ToPlayer()->GetTeamId() == TEAM_ALLIANCE ? ALLIANCE : HORDE;
+            // DB data compatibility...
+            uint32 teamOld = target->ToPlayer()->GetTeamId() == TEAM_ALLIANCE ? ALLIANCE : HORDE;
             return teamOld == team.team;
-		}
+        }
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_S_DRUNK:
             return Player::GetDrunkenstateByValue(source->GetDrunkValue()) >= DrunkenState(drunk.state);
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_HOLIDAY:
@@ -500,8 +500,8 @@ void AchievementMgr::Reset()
 void AchievementMgr::ResetAchievementCriteria(AchievementCriteriaCondition condition, uint32 value, bool evenIfCriteriaComplete)
 {
     AchievementCriteriaEntryList const* achievementCriteriaList = sAchievementMgr->GetAchievementCriteriaByCondition(condition, value);
-	if (!achievementCriteriaList)
-		return;
+    if (!achievementCriteriaList)
+        return;
 
     for (AchievementCriteriaEntryList::const_iterator i = achievementCriteriaList->begin(); i != achievementCriteriaList->end(); ++i)
     {
@@ -569,7 +569,7 @@ void AchievementMgr::SaveToDB(SQLTransaction& trans)
             stmt->setUInt16(1, iter->first);
             trans->Append(stmt);
 
-			// pussywizard: insert only for (counter != 0) is very important! this is how criteria of completed achievements gets deleted from db (by setting counter to 0); if conflicted during merge - contact me
+            // pussywizard: insert only for (counter != 0) is very important! this is how criteria of completed achievements gets deleted from db (by setting counter to 0); if conflicted during merge - contact me
             if (iter->second.counter)
             {
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHAR_ACHIEVEMENT_PROGRESS);
@@ -753,62 +753,62 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
     if (m_player->IsGameMaster())
         return;
 
-	AchievementCriteriaEntryList const* achievementCriteriaList = NULL;
+    AchievementCriteriaEntryList const* achievementCriteriaList = NULL;
 
-	switch (type)
-	{
-		case ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE:
-		case ACHIEVEMENT_CRITERIA_TYPE_WIN_BG:
-		case ACHIEVEMENT_CRITERIA_TYPE_REACH_SKILL_LEVEL:
-		case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_ACHIEVEMENT:
-		case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUESTS_IN_ZONE:
-		case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_BATTLEGROUND:
-		case ACHIEVEMENT_CRITERIA_TYPE_KILLED_BY_CREATURE:
-		case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST:
-		case ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET:
-		case ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL:
-		case ACHIEVEMENT_CRITERIA_TYPE_BG_OBJECTIVE_CAPTURE:
-		case ACHIEVEMENT_CRITERIA_TYPE_HONORABLE_KILL_AT_AREA:
-		case ACHIEVEMENT_CRITERIA_TYPE_LEARN_SPELL:
-		case ACHIEVEMENT_CRITERIA_TYPE_OWN_ITEM:
-		case ACHIEVEMENT_CRITERIA_TYPE_LEARN_SKILL_LEVEL:
-		case ACHIEVEMENT_CRITERIA_TYPE_USE_ITEM:
-		case ACHIEVEMENT_CRITERIA_TYPE_LOOT_ITEM:
-		case ACHIEVEMENT_CRITERIA_TYPE_EXPLORE_AREA:
-		case ACHIEVEMENT_CRITERIA_TYPE_GAIN_REPUTATION:
-		case ACHIEVEMENT_CRITERIA_TYPE_HK_CLASS:
-		case ACHIEVEMENT_CRITERIA_TYPE_HK_RACE:
-		case ACHIEVEMENT_CRITERIA_TYPE_DO_EMOTE:
-		case ACHIEVEMENT_CRITERIA_TYPE_EQUIP_ITEM:
-		case ACHIEVEMENT_CRITERIA_TYPE_USE_GAMEOBJECT:
-		case ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET2:
-		case ACHIEVEMENT_CRITERIA_TYPE_FISH_IN_GAMEOBJECT:
-		case ACHIEVEMENT_CRITERIA_TYPE_LEARN_SKILLLINE_SPELLS:
-		case ACHIEVEMENT_CRITERIA_TYPE_LOOT_TYPE:
-		case ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL2:
-		case ACHIEVEMENT_CRITERIA_TYPE_LEARN_SKILL_LINE:
-			if (miscValue1)
-			{
-				achievementCriteriaList = sAchievementMgr->GetSpecialAchievementCriteriaByType(type, miscValue1);
-				break;
-			}
-			achievementCriteriaList = sAchievementMgr->GetAchievementCriteriaByType(type);
-			break;
-		case ACHIEVEMENT_CRITERIA_TYPE_EQUIP_EPIC_ITEM:
-			if (miscValue2)
-			{
-				achievementCriteriaList = sAchievementMgr->GetSpecialAchievementCriteriaByType(type, miscValue2);
-				break;
-			}
-			achievementCriteriaList = sAchievementMgr->GetAchievementCriteriaByType(type);
-			break;
-		default:
-			achievementCriteriaList = sAchievementMgr->GetAchievementCriteriaByType(type);
-			break;
-	}
+    switch (type)
+    {
+        case ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE:
+        case ACHIEVEMENT_CRITERIA_TYPE_WIN_BG:
+        case ACHIEVEMENT_CRITERIA_TYPE_REACH_SKILL_LEVEL:
+        case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_ACHIEVEMENT:
+        case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUESTS_IN_ZONE:
+        case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_BATTLEGROUND:
+        case ACHIEVEMENT_CRITERIA_TYPE_KILLED_BY_CREATURE:
+        case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST:
+        case ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET:
+        case ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL:
+        case ACHIEVEMENT_CRITERIA_TYPE_BG_OBJECTIVE_CAPTURE:
+        case ACHIEVEMENT_CRITERIA_TYPE_HONORABLE_KILL_AT_AREA:
+        case ACHIEVEMENT_CRITERIA_TYPE_LEARN_SPELL:
+        case ACHIEVEMENT_CRITERIA_TYPE_OWN_ITEM:
+        case ACHIEVEMENT_CRITERIA_TYPE_LEARN_SKILL_LEVEL:
+        case ACHIEVEMENT_CRITERIA_TYPE_USE_ITEM:
+        case ACHIEVEMENT_CRITERIA_TYPE_LOOT_ITEM:
+        case ACHIEVEMENT_CRITERIA_TYPE_EXPLORE_AREA:
+        case ACHIEVEMENT_CRITERIA_TYPE_GAIN_REPUTATION:
+        case ACHIEVEMENT_CRITERIA_TYPE_HK_CLASS:
+        case ACHIEVEMENT_CRITERIA_TYPE_HK_RACE:
+        case ACHIEVEMENT_CRITERIA_TYPE_DO_EMOTE:
+        case ACHIEVEMENT_CRITERIA_TYPE_EQUIP_ITEM:
+        case ACHIEVEMENT_CRITERIA_TYPE_USE_GAMEOBJECT:
+        case ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET2:
+        case ACHIEVEMENT_CRITERIA_TYPE_FISH_IN_GAMEOBJECT:
+        case ACHIEVEMENT_CRITERIA_TYPE_LEARN_SKILLLINE_SPELLS:
+        case ACHIEVEMENT_CRITERIA_TYPE_LOOT_TYPE:
+        case ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL2:
+        case ACHIEVEMENT_CRITERIA_TYPE_LEARN_SKILL_LINE:
+            if (miscValue1)
+            {
+                achievementCriteriaList = sAchievementMgr->GetSpecialAchievementCriteriaByType(type, miscValue1);
+                break;
+            }
+            achievementCriteriaList = sAchievementMgr->GetAchievementCriteriaByType(type);
+            break;
+        case ACHIEVEMENT_CRITERIA_TYPE_EQUIP_EPIC_ITEM:
+            if (miscValue2)
+            {
+                achievementCriteriaList = sAchievementMgr->GetSpecialAchievementCriteriaByType(type, miscValue2);
+                break;
+            }
+            achievementCriteriaList = sAchievementMgr->GetAchievementCriteriaByType(type);
+            break;
+        default:
+            achievementCriteriaList = sAchievementMgr->GetAchievementCriteriaByType(type);
+            break;
+    }
 
-	if (!achievementCriteriaList)
-		return;
+    if (!achievementCriteriaList)
+        return;
 
     for (AchievementCriteriaEntryList::const_iterator i = achievementCriteriaList->begin(); i != achievementCriteriaList->end(); ++i)
     {
@@ -848,7 +848,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
             case ACHIEVEMENT_CRITERIA_TYPE_GOLD_EARNED_BY_AUCTIONS:/* FIXME: for online player only currently */
             case ACHIEVEMENT_CRITERIA_TYPE_TOTAL_DAMAGE_RECEIVED:
             case ACHIEVEMENT_CRITERIA_TYPE_TOTAL_HEALING_RECEIVED:
-			case ACHIEVEMENT_CRITERIA_TYPE_USE_LFD_TO_GROUP_WITH_PLAYERS:
+            case ACHIEVEMENT_CRITERIA_TYPE_USE_LFD_TO_GROUP_WITH_PLAYERS:
                 // AchievementMgr::UpdateAchievementCriteria might also be called on login - skip in this case
                 if (!miscValue1)
                     continue;
@@ -1256,9 +1256,9 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                     continue;
 
                 // Children's Week achievements have extra requirements
-				//if (achievement->categoryId == CATEGORY_CHILDRENS_WEEK || achievement->ID == 1291) // Lonely?
+                //if (achievement->categoryId == CATEGORY_CHILDRENS_WEEK || achievement->ID == 1291) // Lonely?
                 {
-					// Xinef: skip progress only if data exists and is not meet
+                    // Xinef: skip progress only if data exists and is not meet
                     AchievementCriteriaDataSet const* data = sAchievementMgr->GetCriteriaDataSet(achievementCriteria);
                     if (data && !data->Meets(GetPlayer(), NULL))
                         continue;
@@ -1448,11 +1448,11 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                     for (SkillLineAbilityMap::const_iterator skillIter = bounds.first; skillIter != bounds.second; ++skillIter)
                     {
                         if (skillIter->second->skillId == achievementCriteria->learn_skillline_spell.skillLine)
-						{
-							// xinef: do not add couter twice if by any chance skill is listed twice in dbc (eg. skill 777 and spell 22717)
+                        {
+                            // xinef: do not add couter twice if by any chance skill is listed twice in dbc (eg. skill 777 and spell 22717)
                             ++spellCount;
-							break;
-						}
+                            break;
+                        }
                     }
                 }
 
@@ -1508,14 +1508,14 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                 {
                     SkillLineAbilityMapBounds bounds = sSpellMgr->GetSkillLineAbilityMapBounds(spellIter->first);
                     for (SkillLineAbilityMap::const_iterator skillIter = bounds.first; skillIter != bounds.second; ++skillIter)
-					{
+                    {
                         if (skillIter->second->skillId == achievementCriteria->learn_skill_line.skillLine)
-						{
-							// xinef: do not add couter twice if by any chance skill is listed twice in dbc (eg. skill 777 and spell 22717)
+                        {
+                            // xinef: do not add couter twice if by any chance skill is listed twice in dbc (eg. skill 777 and spell 22717)
                             ++spellCount;
-							break;
-						}
-					}
+                            break;
+                        }
+                    }
                 }
 
                 SetCriteriaProgress(achievementCriteria, spellCount);
@@ -1719,24 +1719,24 @@ bool AchievementMgr::IsCompletedCriteria(AchievementCriteriaEntry const* achieve
             return false;
     }
 
-	// pussywizard: progress will be deleted after getting the achievement (optimization)
-	// finished achievement should indicate criteria completed, since not finding progress would start some timed achievements and probably other things
-	if (HasAchieved(achievement->ID))
-	{
-		bool completed = true;
+    // pussywizard: progress will be deleted after getting the achievement (optimization)
+    // finished achievement should indicate criteria completed, since not finding progress would start some timed achievements and probably other things
+    if (HasAchieved(achievement->ID))
+    {
+        bool completed = true;
 
-		// completed only after all referenced achievements are also completed
-		if (AchievementEntryList const* achRefList = sAchievementMgr->GetAchievementByReferencedId(achievement->ID))
+        // completed only after all referenced achievements are also completed
+        if (AchievementEntryList const* achRefList = sAchievementMgr->GetAchievementByReferencedId(achievement->ID))
             for (AchievementEntryList::const_iterator itr = achRefList->begin(); itr != achRefList->end(); ++itr)
                 if (!IsCompletedAchievement(*itr))
-				{
-					completed = false;
-					break;
-				}
+                {
+                    completed = false;
+                    break;
+                }
 
-		if (completed)
-			return true;
-	}
+        if (completed)
+            return true;
+    }
 
     CriteriaProgress const* progress = GetCriteriaProgress(achievementCriteria);
     if (!progress)
@@ -2000,7 +2000,7 @@ void AchievementMgr::SetCriteriaProgress(AchievementCriteriaEntry const* entry, 
         switch (ptype)
         {
             case PROGRESS_SET:
-			case PROGRESS_RESET:
+            case PROGRESS_RESET:
                 newValue = changeValue;
                 break;
             case PROGRESS_ACCUMULATE:
@@ -2138,28 +2138,28 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
     ca.date = time(NULL);
     ca.changed = true;
 
-	// pussywizard: set all progress counters to 0, so progress will be deleted from db during save
-	{
-		bool allRefsCompleted = true;
-		uint32 achiCheckId = achievement->refAchievement ? achievement->refAchievement : achievement->ID;
+    // pussywizard: set all progress counters to 0, so progress will be deleted from db during save
+    {
+        bool allRefsCompleted = true;
+        uint32 achiCheckId = achievement->refAchievement ? achievement->refAchievement : achievement->ID;
 
-		if (AchievementEntryList const* achRefList = sAchievementMgr->GetAchievementByReferencedId(achiCheckId))
-			for (AchievementEntryList::const_iterator itr = achRefList->begin(); itr != achRefList->end(); ++itr)
-				if (!IsCompletedAchievement(*itr))
-				{
-					allRefsCompleted = false;
-					break;
-				}
+        if (AchievementEntryList const* achRefList = sAchievementMgr->GetAchievementByReferencedId(achiCheckId))
+            for (AchievementEntryList::const_iterator itr = achRefList->begin(); itr != achRefList->end(); ++itr)
+                if (!IsCompletedAchievement(*itr))
+                {
+                    allRefsCompleted = false;
+                    break;
+                }
 
-		if (allRefsCompleted)
-			if (AchievementCriteriaEntryList const* cList = sAchievementMgr->GetAchievementCriteriaByAchievement(achiCheckId))
-				for (AchievementCriteriaEntryList::const_iterator itr = cList->begin(); itr != cList->end(); ++itr)
-					if (CriteriaProgress* progress = GetCriteriaProgress(*itr))
-					{
-						progress->changed = true;
-						progress->counter = 0;
-					}
-	}
+        if (allRefsCompleted)
+            if (AchievementCriteriaEntryList const* cList = sAchievementMgr->GetAchievementCriteriaByAchievement(achiCheckId))
+                for (AchievementCriteriaEntryList::const_iterator itr = cList->begin(); itr != cList->end(); ++itr)
+                    if (CriteriaProgress* progress = GetCriteriaProgress(*itr))
+                    {
+                        progress->changed = true;
+                        progress->counter = 0;
+                    }
+    }
 
     // don't insert for ACHIEVEMENT_FLAG_REALM_FIRST_KILL since otherwise only the first group member would reach that achievement
     // TODO: where do set this instead?
@@ -2188,10 +2188,10 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
     // mail
     if (reward->sender)
     {        
-		MailDraft draft(reward->mailTemplate);
+        MailDraft draft(reward->mailTemplate);
 
         if (!reward->mailTemplate)
-			draft = MailDraft(reward->subject, reward->text);
+            draft = MailDraft(reward->subject, reward->text);
 
         SQLTransaction trans = CharacterDatabase.BeginTransaction();
 
@@ -2230,33 +2230,33 @@ void AchievementMgr::SendRespondInspectAchievements(Player* player) const
  */
 void AchievementMgr::BuildAllDataPacket(WorldPacket* data, bool inspect) const
 {
-	if (!m_completedAchievements.empty())
-	{
-		AchievementEntry const* achievement = NULL;
-		for (CompletedAchievementMap::const_iterator iter = m_completedAchievements.begin(); iter != m_completedAchievements.end(); ++iter)
-		{
-			// Skip hidden achievements
-			achievement = sAchievementStore.LookupEntry(iter->first);
-			if (!achievement || achievement->flags & ACHIEVEMENT_FLAG_HIDDEN)
-				continue;
+    if (!m_completedAchievements.empty())
+    {
+        AchievementEntry const* achievement = NULL;
+        for (CompletedAchievementMap::const_iterator iter = m_completedAchievements.begin(); iter != m_completedAchievements.end(); ++iter)
+        {
+            // Skip hidden achievements
+            achievement = sAchievementStore.LookupEntry(iter->first);
+            if (!achievement || achievement->flags & ACHIEVEMENT_FLAG_HIDDEN)
+                continue;
 
-			*data << uint32(iter->first);
-			data->AppendPackedTime(iter->second.date);
-		}
-	}
-	*data << int32(-1);
+            *data << uint32(iter->first);
+            data->AppendPackedTime(iter->second.date);
+        }
+    }
+    *data << int32(-1);
 
-	if (!inspect && !m_criteriaProgress.empty())
-		for (CriteriaProgressMap::const_iterator iter = m_criteriaProgress.begin(); iter != m_criteriaProgress.end(); ++iter)
-		{
-			*data << uint32(iter->first);
-			data->appendPackGUID(iter->second.counter);
-			data->append(GetPlayer()->GetPackGUID());
-			*data << uint32(0);
-			data->AppendPackedTime(iter->second.date);
-			*data << uint32(0);
-			*data << uint32(0);
-		}
+    if (!inspect && !m_criteriaProgress.empty())
+        for (CriteriaProgressMap::const_iterator iter = m_criteriaProgress.begin(); iter != m_criteriaProgress.end(); ++iter)
+        {
+            *data << uint32(iter->first);
+            data->appendPackGUID(iter->second.counter);
+            data->append(GetPlayer()->GetPackGUID());
+            *data << uint32(0);
+            data->AppendPackedTime(iter->second.date);
+            *data << uint32(0);
+            *data << uint32(0);
+        }
 
     *data << int32(-1);
 }
@@ -2329,122 +2329,122 @@ void AchievementGlobalMgr::LoadAchievementCriteriaList()
         m_AchievementCriteriaListByAchievement[criteria->referredAchievement].push_back(criteria);
 
         if (criteria->additionalRequirements[0].additionalRequirement_type != ACHIEVEMENT_CRITERIA_CONDITION_NONE)
-			m_AchievementCriteriasByCondition[criteria->additionalRequirements[0].additionalRequirement_type][criteria->additionalRequirements[0].additionalRequirement_value].push_back(criteria);
-		if (criteria->additionalRequirements[1].additionalRequirement_type != ACHIEVEMENT_CRITERIA_CONDITION_NONE &&
-			criteria->additionalRequirements[1].additionalRequirement_type != criteria->additionalRequirements[0].additionalRequirement_type)
-			m_AchievementCriteriasByCondition[criteria->additionalRequirements[1].additionalRequirement_type][criteria->additionalRequirements[1].additionalRequirement_value].push_back(criteria);
+            m_AchievementCriteriasByCondition[criteria->additionalRequirements[0].additionalRequirement_type][criteria->additionalRequirements[0].additionalRequirement_value].push_back(criteria);
+        if (criteria->additionalRequirements[1].additionalRequirement_type != ACHIEVEMENT_CRITERIA_CONDITION_NONE &&
+            criteria->additionalRequirements[1].additionalRequirement_type != criteria->additionalRequirements[0].additionalRequirement_type)
+            m_AchievementCriteriasByCondition[criteria->additionalRequirements[1].additionalRequirement_type][criteria->additionalRequirements[1].additionalRequirement_value].push_back(criteria);
 
-		switch (criteria->requiredType)
-		{
-			case ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE:
-				m_SpecialList[criteria->requiredType][criteria->kill_creature.creatureID].push_back(criteria);
-				break;
-			case ACHIEVEMENT_CRITERIA_TYPE_WIN_BG:
-				m_SpecialList[criteria->requiredType][criteria->win_bg.bgMapID].push_back(criteria);
-				break;
-			case ACHIEVEMENT_CRITERIA_TYPE_REACH_SKILL_LEVEL:
-				m_SpecialList[criteria->requiredType][criteria->reach_skill_level.skillID].push_back(criteria);
-				break;
-			case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_ACHIEVEMENT:
-				m_SpecialList[criteria->requiredType][criteria->complete_achievement.linkedAchievement].push_back(criteria);
-				break;
-			case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUESTS_IN_ZONE:
-				m_SpecialList[criteria->requiredType][criteria->complete_quests_in_zone.zoneID].push_back(criteria);
-				break;
-			case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_BATTLEGROUND:
-				m_SpecialList[criteria->requiredType][criteria->complete_battleground.mapID].push_back(criteria);
-				break;
-			case ACHIEVEMENT_CRITERIA_TYPE_KILLED_BY_CREATURE:
-				m_SpecialList[criteria->requiredType][criteria->killed_by_creature.creatureEntry].push_back(criteria);
-				break;
-			case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST:
-				m_SpecialList[criteria->requiredType][criteria->complete_quest.questID].push_back(criteria);
-				break;
-			case ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET:
-				m_SpecialList[criteria->requiredType][criteria->be_spell_target.spellID].push_back(criteria);
-				break;
-			case ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL:
-				m_SpecialList[criteria->requiredType][criteria->cast_spell.spellID].push_back(criteria);
-				break;
-			case ACHIEVEMENT_CRITERIA_TYPE_BG_OBJECTIVE_CAPTURE:
-				m_SpecialList[criteria->requiredType][criteria->bg_objective.objectiveId].push_back(criteria);
-				break;
-			case ACHIEVEMENT_CRITERIA_TYPE_HONORABLE_KILL_AT_AREA:
-				m_SpecialList[criteria->requiredType][criteria->honorable_kill_at_area.areaID].push_back(criteria);
-				break;
-			case ACHIEVEMENT_CRITERIA_TYPE_LEARN_SPELL:
-				m_SpecialList[criteria->requiredType][criteria->learn_spell.spellID].push_back(criteria);
-				break;
-			case ACHIEVEMENT_CRITERIA_TYPE_OWN_ITEM:
-				m_SpecialList[criteria->requiredType][criteria->own_item.itemID].push_back(criteria);
-				break;
-			case ACHIEVEMENT_CRITERIA_TYPE_LEARN_SKILL_LEVEL:
-				m_SpecialList[criteria->requiredType][criteria->learn_skill_level.skillID].push_back(criteria);
-				break;
-			case ACHIEVEMENT_CRITERIA_TYPE_USE_ITEM:
-				m_SpecialList[criteria->requiredType][criteria->use_item.itemID].push_back(criteria);
-				break;
-			case ACHIEVEMENT_CRITERIA_TYPE_LOOT_ITEM:
-				m_SpecialList[criteria->requiredType][criteria->own_item.itemID].push_back(criteria);
-				break;
-			case ACHIEVEMENT_CRITERIA_TYPE_EXPLORE_AREA:
-				{
-					WorldMapOverlayEntry const* worldOverlayEntry = sWorldMapOverlayStore.LookupEntry(criteria->explore_area.areaReference);
-					if (!worldOverlayEntry)
-						break;
+        switch (criteria->requiredType)
+        {
+            case ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE:
+                m_SpecialList[criteria->requiredType][criteria->kill_creature.creatureID].push_back(criteria);
+                break;
+            case ACHIEVEMENT_CRITERIA_TYPE_WIN_BG:
+                m_SpecialList[criteria->requiredType][criteria->win_bg.bgMapID].push_back(criteria);
+                break;
+            case ACHIEVEMENT_CRITERIA_TYPE_REACH_SKILL_LEVEL:
+                m_SpecialList[criteria->requiredType][criteria->reach_skill_level.skillID].push_back(criteria);
+                break;
+            case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_ACHIEVEMENT:
+                m_SpecialList[criteria->requiredType][criteria->complete_achievement.linkedAchievement].push_back(criteria);
+                break;
+            case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUESTS_IN_ZONE:
+                m_SpecialList[criteria->requiredType][criteria->complete_quests_in_zone.zoneID].push_back(criteria);
+                break;
+            case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_BATTLEGROUND:
+                m_SpecialList[criteria->requiredType][criteria->complete_battleground.mapID].push_back(criteria);
+                break;
+            case ACHIEVEMENT_CRITERIA_TYPE_KILLED_BY_CREATURE:
+                m_SpecialList[criteria->requiredType][criteria->killed_by_creature.creatureEntry].push_back(criteria);
+                break;
+            case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST:
+                m_SpecialList[criteria->requiredType][criteria->complete_quest.questID].push_back(criteria);
+                break;
+            case ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET:
+                m_SpecialList[criteria->requiredType][criteria->be_spell_target.spellID].push_back(criteria);
+                break;
+            case ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL:
+                m_SpecialList[criteria->requiredType][criteria->cast_spell.spellID].push_back(criteria);
+                break;
+            case ACHIEVEMENT_CRITERIA_TYPE_BG_OBJECTIVE_CAPTURE:
+                m_SpecialList[criteria->requiredType][criteria->bg_objective.objectiveId].push_back(criteria);
+                break;
+            case ACHIEVEMENT_CRITERIA_TYPE_HONORABLE_KILL_AT_AREA:
+                m_SpecialList[criteria->requiredType][criteria->honorable_kill_at_area.areaID].push_back(criteria);
+                break;
+            case ACHIEVEMENT_CRITERIA_TYPE_LEARN_SPELL:
+                m_SpecialList[criteria->requiredType][criteria->learn_spell.spellID].push_back(criteria);
+                break;
+            case ACHIEVEMENT_CRITERIA_TYPE_OWN_ITEM:
+                m_SpecialList[criteria->requiredType][criteria->own_item.itemID].push_back(criteria);
+                break;
+            case ACHIEVEMENT_CRITERIA_TYPE_LEARN_SKILL_LEVEL:
+                m_SpecialList[criteria->requiredType][criteria->learn_skill_level.skillID].push_back(criteria);
+                break;
+            case ACHIEVEMENT_CRITERIA_TYPE_USE_ITEM:
+                m_SpecialList[criteria->requiredType][criteria->use_item.itemID].push_back(criteria);
+                break;
+            case ACHIEVEMENT_CRITERIA_TYPE_LOOT_ITEM:
+                m_SpecialList[criteria->requiredType][criteria->own_item.itemID].push_back(criteria);
+                break;
+            case ACHIEVEMENT_CRITERIA_TYPE_EXPLORE_AREA:
+                {
+                    WorldMapOverlayEntry const* worldOverlayEntry = sWorldMapOverlayStore.LookupEntry(criteria->explore_area.areaReference);
+                    if (!worldOverlayEntry)
+                        break;
 
-					for (uint8 j = 0; j < MAX_WORLD_MAP_OVERLAY_AREA_IDX; ++j)
-						if (worldOverlayEntry->areatableID[j])
-						{
-							bool valid = true;
-							for (uint8 i=0; i<j; ++i)
-								if (worldOverlayEntry->areatableID[j] == worldOverlayEntry->areatableID[i])
-									valid = false;
-							if (valid)
-								m_SpecialList[criteria->requiredType][worldOverlayEntry->areatableID[j]].push_back(criteria);
-						}
-				}
-				break;
-			case ACHIEVEMENT_CRITERIA_TYPE_GAIN_REPUTATION:
-				m_SpecialList[criteria->requiredType][criteria->gain_reputation.factionID].push_back(criteria);
-				break;
-			case ACHIEVEMENT_CRITERIA_TYPE_EQUIP_EPIC_ITEM:
-				m_SpecialList[criteria->requiredType][criteria->equip_epic_item.itemSlot].push_back(criteria);
-				break;
-			case ACHIEVEMENT_CRITERIA_TYPE_HK_CLASS:
-				m_SpecialList[criteria->requiredType][criteria->hk_class.classID].push_back(criteria);
-				break;
-			case ACHIEVEMENT_CRITERIA_TYPE_HK_RACE:
-				m_SpecialList[criteria->requiredType][criteria->hk_race.raceID].push_back(criteria);
-				break;
-			case ACHIEVEMENT_CRITERIA_TYPE_DO_EMOTE:
-				m_SpecialList[criteria->requiredType][criteria->do_emote.emoteID].push_back(criteria);
-				break;
-			case ACHIEVEMENT_CRITERIA_TYPE_EQUIP_ITEM:
-				m_SpecialList[criteria->requiredType][criteria->equip_item.itemID].push_back(criteria);
-				break;
-			case ACHIEVEMENT_CRITERIA_TYPE_USE_GAMEOBJECT:
-				m_SpecialList[criteria->requiredType][criteria->use_gameobject.goEntry].push_back(criteria);
-				break;
-			case ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET2:
-				m_SpecialList[criteria->requiredType][criteria->be_spell_target.spellID].push_back(criteria);
-				break;
-			case ACHIEVEMENT_CRITERIA_TYPE_FISH_IN_GAMEOBJECT:
-				m_SpecialList[criteria->requiredType][criteria->fish_in_gameobject.goEntry].push_back(criteria);
-				break;
-			case ACHIEVEMENT_CRITERIA_TYPE_LEARN_SKILLLINE_SPELLS:
-				m_SpecialList[criteria->requiredType][criteria->learn_skillline_spell.skillLine].push_back(criteria);
-				break;
-			case ACHIEVEMENT_CRITERIA_TYPE_LOOT_TYPE:
-				m_SpecialList[criteria->requiredType][criteria->loot_type.lootType].push_back(criteria);
-				break;
-			case ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL2:
-				m_SpecialList[criteria->requiredType][criteria->cast_spell.spellID].push_back(criteria);
-				break;
-			case ACHIEVEMENT_CRITERIA_TYPE_LEARN_SKILL_LINE:
-				m_SpecialList[criteria->requiredType][criteria->learn_skill_line.skillLine].push_back(criteria);
-				break;
-		}
+                    for (uint8 j = 0; j < MAX_WORLD_MAP_OVERLAY_AREA_IDX; ++j)
+                        if (worldOverlayEntry->areatableID[j])
+                        {
+                            bool valid = true;
+                            for (uint8 i=0; i<j; ++i)
+                                if (worldOverlayEntry->areatableID[j] == worldOverlayEntry->areatableID[i])
+                                    valid = false;
+                            if (valid)
+                                m_SpecialList[criteria->requiredType][worldOverlayEntry->areatableID[j]].push_back(criteria);
+                        }
+                }
+                break;
+            case ACHIEVEMENT_CRITERIA_TYPE_GAIN_REPUTATION:
+                m_SpecialList[criteria->requiredType][criteria->gain_reputation.factionID].push_back(criteria);
+                break;
+            case ACHIEVEMENT_CRITERIA_TYPE_EQUIP_EPIC_ITEM:
+                m_SpecialList[criteria->requiredType][criteria->equip_epic_item.itemSlot].push_back(criteria);
+                break;
+            case ACHIEVEMENT_CRITERIA_TYPE_HK_CLASS:
+                m_SpecialList[criteria->requiredType][criteria->hk_class.classID].push_back(criteria);
+                break;
+            case ACHIEVEMENT_CRITERIA_TYPE_HK_RACE:
+                m_SpecialList[criteria->requiredType][criteria->hk_race.raceID].push_back(criteria);
+                break;
+            case ACHIEVEMENT_CRITERIA_TYPE_DO_EMOTE:
+                m_SpecialList[criteria->requiredType][criteria->do_emote.emoteID].push_back(criteria);
+                break;
+            case ACHIEVEMENT_CRITERIA_TYPE_EQUIP_ITEM:
+                m_SpecialList[criteria->requiredType][criteria->equip_item.itemID].push_back(criteria);
+                break;
+            case ACHIEVEMENT_CRITERIA_TYPE_USE_GAMEOBJECT:
+                m_SpecialList[criteria->requiredType][criteria->use_gameobject.goEntry].push_back(criteria);
+                break;
+            case ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET2:
+                m_SpecialList[criteria->requiredType][criteria->be_spell_target.spellID].push_back(criteria);
+                break;
+            case ACHIEVEMENT_CRITERIA_TYPE_FISH_IN_GAMEOBJECT:
+                m_SpecialList[criteria->requiredType][criteria->fish_in_gameobject.goEntry].push_back(criteria);
+                break;
+            case ACHIEVEMENT_CRITERIA_TYPE_LEARN_SKILLLINE_SPELLS:
+                m_SpecialList[criteria->requiredType][criteria->learn_skillline_spell.skillLine].push_back(criteria);
+                break;
+            case ACHIEVEMENT_CRITERIA_TYPE_LOOT_TYPE:
+                m_SpecialList[criteria->requiredType][criteria->loot_type.lootType].push_back(criteria);
+                break;
+            case ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL2:
+                m_SpecialList[criteria->requiredType][criteria->cast_spell.spellID].push_back(criteria);
+                break;
+            case ACHIEVEMENT_CRITERIA_TYPE_LEARN_SKILL_LINE:
+                m_SpecialList[criteria->requiredType][criteria->learn_skill_line.skillLine].push_back(criteria);
+                break;
+        }
 
         if (criteria->timeLimit)
             m_AchievementCriteriasByTimedType[criteria->timedType].push_back(criteria);

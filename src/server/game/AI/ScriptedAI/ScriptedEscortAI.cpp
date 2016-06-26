@@ -87,8 +87,8 @@ bool npc_escortAI::AssistPlayerInCombat(Unit* who)
 
 void npc_escortAI::MoveInLineOfSight(Unit* who)
 {
-	if (me->GetVictim())
-		return;
+    if (me->GetVictim())
+        return;
 
     if (!me->HasUnitState(UNIT_STATE_STUNNED) && who->isTargetableForAttack(true, me) && who->isInAccessiblePlaceFor(me))
         if (HasEscortState(STATE_ESCORT_ESCORTING) && AssistPlayerInCombat(who))
@@ -122,7 +122,7 @@ void npc_escortAI::JustDied(Unit* /*killer*/)
 
 void npc_escortAI::JustRespawned()
 {
-	RemoveEscortState(STATE_ESCORT_ESCORTING|STATE_ESCORT_RETURNING|STATE_ESCORT_PAUSED);
+    RemoveEscortState(STATE_ESCORT_ESCORTING|STATE_ESCORT_RETURNING|STATE_ESCORT_PAUSED);
 
     if (!IsCombatMovementAllowed())
         SetCombatMovement(true);
@@ -139,7 +139,7 @@ void npc_escortAI::JustRespawned()
 void npc_escortAI::ReturnToLastPoint()
 {
     float x, y, z, o;
-	me->SetWalk(false);
+    me->SetWalk(false);
     me->GetHomePosition(x, y, z, o);
     me->GetMotionMaster()->MovePoint(POINT_LAST_POINT, x, y, z);
 }
@@ -213,8 +213,8 @@ void npc_escortAI::UpdateAI(uint32 diff)
                         me->DespawnOrUnsummon();
                 }
 
-				// xinef: remove escort state, escort was finished (lack of this line resulted in skipping UpdateEscortAI calls after finished escort)
-				RemoveEscortState(STATE_ESCORT_ESCORTING);
+                // xinef: remove escort state, escort was finished (lack of this line resulted in skipping UpdateEscortAI calls after finished escort)
+                RemoveEscortState(STATE_ESCORT_ESCORTING);
                 return;
             }
 
@@ -239,7 +239,7 @@ void npc_escortAI::UpdateAI(uint32 diff)
     //Check if player or any member of his group is within range
     if (HasEscortState(STATE_ESCORT_ESCORTING) && m_uiPlayerGUID && !me->GetVictim() && !HasEscortState(STATE_ESCORT_RETURNING))
     {
-		m_uiPlayerCheckTimer += diff;
+        m_uiPlayerCheckTimer += diff;
         if (m_uiPlayerCheckTimer > 1000)
         {
             if (DespawnAtFar && !IsPlayerOrGroupInRange())
@@ -303,7 +303,7 @@ void npc_escortAI::MovementInform(uint32 moveType, uint32 pointId)
         {
             //Call WP function
             me->SetPosition(CurrentWP->x, CurrentWP->y, CurrentWP->z, me->GetOrientation());
-			me->SetHomePosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation());
+            me->SetHomePosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation());
             WaypointReached(CurrentWP->id);
 
             m_uiWPWaitTimer = CurrentWP->WaitTimeMs + 1;
@@ -495,9 +495,9 @@ bool npc_escortAI::SetNextWaypoint(uint32 pointId, bool setPosition)
 
     size_t const size = WaypointList.size();
     Escort_Waypoint waypoint(0, 0, 0, 0, 0);
-	for (CurrentWP = WaypointList.begin(); CurrentWP != WaypointList.end(); ++CurrentWP)
+    for (CurrentWP = WaypointList.begin(); CurrentWP != WaypointList.end(); ++CurrentWP)
     {
-		if (CurrentWP->id == pointId)
+        if (CurrentWP->id == pointId)
         {
             if (setPosition)
                 me->UpdatePosition(CurrentWP->x, CurrentWP->y, CurrentWP->z, me->GetOrientation());
@@ -540,7 +540,7 @@ void npc_escortAI::GenerateWaypointArray(Movement::PointsArray* points)
     {
         // xinef: first point in vector is unit real position
         points->clear();
-		points->push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
+        points->push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
         for (std::list<Escort_Waypoint>::const_iterator itr = CurrentWP; itr != WaypointList.end(); ++itr)
             points->push_back(G3D::Vector3(itr->x, itr->y, itr->z));
     }

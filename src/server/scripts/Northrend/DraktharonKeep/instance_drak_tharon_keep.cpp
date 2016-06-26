@@ -8,117 +8,117 @@ REWRITTEN BY XINEF
 
 DoorData const doorData[] =
 {
-    { GO_NOVOS_CRYSTAL_1,	DATA_NOVOS_CRYSTALS,	DOOR_TYPE_ROOM,		BOUNDARY_NONE },
-    { GO_NOVOS_CRYSTAL_2,	DATA_NOVOS_CRYSTALS,	DOOR_TYPE_ROOM,		BOUNDARY_NONE },
-    { GO_NOVOS_CRYSTAL_3,	DATA_NOVOS_CRYSTALS,	DOOR_TYPE_ROOM,		BOUNDARY_NONE },
-    { GO_NOVOS_CRYSTAL_4,	DATA_NOVOS_CRYSTALS,	DOOR_TYPE_ROOM,		BOUNDARY_NONE },
-    { 0,					0,						DOOR_TYPE_ROOM,     BOUNDARY_NONE }
+    { GO_NOVOS_CRYSTAL_1,   DATA_NOVOS_CRYSTALS,    DOOR_TYPE_ROOM,     BOUNDARY_NONE },
+    { GO_NOVOS_CRYSTAL_2,   DATA_NOVOS_CRYSTALS,    DOOR_TYPE_ROOM,     BOUNDARY_NONE },
+    { GO_NOVOS_CRYSTAL_3,   DATA_NOVOS_CRYSTALS,    DOOR_TYPE_ROOM,     BOUNDARY_NONE },
+    { GO_NOVOS_CRYSTAL_4,   DATA_NOVOS_CRYSTALS,    DOOR_TYPE_ROOM,     BOUNDARY_NONE },
+    { 0,                    0,                      DOOR_TYPE_ROOM,     BOUNDARY_NONE }
 };
 
 class instance_drak_tharon_keep : public InstanceMapScript
 {
-	public:
-		instance_drak_tharon_keep() : InstanceMapScript("instance_drak_tharon_keep", 600) { }
+    public:
+        instance_drak_tharon_keep() : InstanceMapScript("instance_drak_tharon_keep", 600) { }
 
-		struct instance_drak_tharon_keep_InstanceScript : public InstanceScript
-		{
-			instance_drak_tharon_keep_InstanceScript(Map* map) : InstanceScript(map)
-			{
-				SetBossNumber(MAX_ENCOUNTERS);
-				LoadDoorData(doorData);
-			}
-			
-			void OnGameObjectCreate(GameObject* go)
-			{
-				switch (go->GetEntry())
-				{
-					case GO_NOVOS_CRYSTAL_1:
-					case GO_NOVOS_CRYSTAL_2:
-					case GO_NOVOS_CRYSTAL_3:
-					case GO_NOVOS_CRYSTAL_4:
+        struct instance_drak_tharon_keep_InstanceScript : public InstanceScript
+        {
+            instance_drak_tharon_keep_InstanceScript(Map* map) : InstanceScript(map)
+            {
+                SetBossNumber(MAX_ENCOUNTERS);
+                LoadDoorData(doorData);
+            }
+            
+            void OnGameObjectCreate(GameObject* go)
+            {
+                switch (go->GetEntry())
+                {
+                    case GO_NOVOS_CRYSTAL_1:
+                    case GO_NOVOS_CRYSTAL_2:
+                    case GO_NOVOS_CRYSTAL_3:
+                    case GO_NOVOS_CRYSTAL_4:
                         AddDoor(go, true);
-						break;
-				}
-			}
-			
-			void OnGameObjectRemove(GameObject* go)
-			{
-				switch (go->GetEntry())
-				{
-					case GO_NOVOS_CRYSTAL_1:
-					case GO_NOVOS_CRYSTAL_2:
-					case GO_NOVOS_CRYSTAL_3:
-					case GO_NOVOS_CRYSTAL_4:
+                        break;
+                }
+            }
+            
+            void OnGameObjectRemove(GameObject* go)
+            {
+                switch (go->GetEntry())
+                {
+                    case GO_NOVOS_CRYSTAL_1:
+                    case GO_NOVOS_CRYSTAL_2:
+                    case GO_NOVOS_CRYSTAL_3:
+                    case GO_NOVOS_CRYSTAL_4:
                         AddDoor(go, false);
-						break;
-				}
-			}
+                        break;
+                }
+            }
 
-			std::string GetSaveData()
-			{
-				std::ostringstream saveStream;
-				saveStream << "D K " << GetBossSaveData();
-				return saveStream.str();
-			}
+            std::string GetSaveData()
+            {
+                std::ostringstream saveStream;
+                saveStream << "D K " << GetBossSaveData();
+                return saveStream.str();
+            }
 
-			void Load(const char* in)
-			{
-				if( !in )
-					return;
+            void Load(const char* in)
+            {
+                if( !in )
+                    return;
 
-				char dataHead1, dataHead2;
-				std::istringstream loadStream(in);
-				loadStream >> dataHead1 >> dataHead2;
-				if (dataHead1 == 'D' && dataHead2 == 'K')
-				{
-					for (uint8 i = 0; i < MAX_ENCOUNTERS; ++i)
-					{
-						uint32 tmpState;
-						loadStream >> tmpState;
-						if (tmpState == IN_PROGRESS || tmpState > SPECIAL)
-							tmpState = NOT_STARTED;
-						SetBossState(i, EncounterState(tmpState));
-					}
-				}
-			}
-		};
+                char dataHead1, dataHead2;
+                std::istringstream loadStream(in);
+                loadStream >> dataHead1 >> dataHead2;
+                if (dataHead1 == 'D' && dataHead2 == 'K')
+                {
+                    for (uint8 i = 0; i < MAX_ENCOUNTERS; ++i)
+                    {
+                        uint32 tmpState;
+                        loadStream >> tmpState;
+                        if (tmpState == IN_PROGRESS || tmpState > SPECIAL)
+                            tmpState = NOT_STARTED;
+                        SetBossState(i, EncounterState(tmpState));
+                    }
+                }
+            }
+        };
 
-		InstanceScript* GetInstanceScript(InstanceMap *map) const
-		{
-			return new instance_drak_tharon_keep_InstanceScript(map);
-		}
+        InstanceScript* GetInstanceScript(InstanceMap *map) const
+        {
+            return new instance_drak_tharon_keep_InstanceScript(map);
+        }
 };
 
 class spell_dtk_raise_dead : public SpellScriptLoader
 {
-	public:
-		spell_dtk_raise_dead() : SpellScriptLoader("spell_dtk_raise_dead") { }
+    public:
+        spell_dtk_raise_dead() : SpellScriptLoader("spell_dtk_raise_dead") { }
 
-		class spell_dtk_raise_dead_AuraScript : public AuraScript
-		{
-			PrepareAuraScript(spell_dtk_raise_dead_AuraScript)
+        class spell_dtk_raise_dead_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_dtk_raise_dead_AuraScript)
 
-			bool Load()
-			{
-				return GetUnitOwner()->GetTypeId() == TYPEID_UNIT;
-			}
+            bool Load()
+            {
+                return GetUnitOwner()->GetTypeId() == TYPEID_UNIT;
+            }
 
-			void HandleEffectRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
-			{
-				GetUnitOwner()->ToCreature()->DespawnOrUnsummon(1);
-				GetUnitOwner()->SummonCreature(NPC_RISEN_DRAKKARI_WARRIOR, *GetUnitOwner());
-			}
+            void HandleEffectRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+            {
+                GetUnitOwner()->ToCreature()->DespawnOrUnsummon(1);
+                GetUnitOwner()->SummonCreature(NPC_RISEN_DRAKKARI_WARRIOR, *GetUnitOwner());
+            }
 
-			void Register()
-			{
-				AfterEffectRemove += AuraEffectRemoveFn(spell_dtk_raise_dead_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-			}
-		};
+            void Register()
+            {
+                AfterEffectRemove += AuraEffectRemoveFn(spell_dtk_raise_dead_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+            }
+        };
 
-		AuraScript* GetAuraScript() const
-		{
-			return new spell_dtk_raise_dead_AuraScript();
-		}
+        AuraScript* GetAuraScript() const
+        {
+            return new spell_dtk_raise_dead_AuraScript();
+        }
 };
 
 class spell_dtk_summon_random_drakkari : public SpellScriptLoader
@@ -149,7 +149,7 @@ class spell_dtk_summon_random_drakkari : public SpellScriptLoader
 
 void AddSC_instance_drak_tharon_keep()
 {
-	new instance_drak_tharon_keep();
-	new spell_dtk_raise_dead();
-	new spell_dtk_summon_random_drakkari();
+    new instance_drak_tharon_keep();
+    new spell_dtk_raise_dead();
+    new spell_dtk_summon_random_drakkari();
 }

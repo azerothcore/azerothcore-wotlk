@@ -310,13 +310,13 @@ void WorldSession::HandleGossipHelloOpcode(WorldPacket & recvData)
         return;
     }
 
-	// xinef: check if we have ANY npc flags
-	if (unit->GetUInt32Value(UNIT_NPC_FLAGS) == UNIT_NPC_FLAG_NONE)
-		return;
+    // xinef: check if we have ANY npc flags
+    if (unit->GetUInt32Value(UNIT_NPC_FLAGS) == UNIT_NPC_FLAG_NONE)
+        return;
 
-	// xinef: do not allow to open gossip when npc is in combat
-	if (unit->GetUInt32Value(UNIT_NPC_FLAGS) == UNIT_NPC_FLAG_GOSSIP && unit->IsInCombat()) // should work on all flags?
-		return;
+    // xinef: do not allow to open gossip when npc is in combat
+    if (unit->GetUInt32Value(UNIT_NPC_FLAGS) == UNIT_NPC_FLAG_GOSSIP && unit->IsInCombat()) // should work on all flags?
+        return;
 
     // set faction visible if needed
     if (FactionTemplateEntry const* factionTemplateEntry = sFactionTemplateStore.LookupEntry(unit->getFaction()))
@@ -327,7 +327,7 @@ void WorldSession::HandleGossipHelloOpcode(WorldPacket & recvData)
     //if (GetPlayer()->HasUnitState(UNIT_STATE_DIED))
     //    GetPlayer()->RemoveAurasByType(SPELL_AURA_FEIGN_DEATH);
 
-	// xinef: and if he has pure gossip or is banker and moves or is tabard designer?
+    // xinef: and if he has pure gossip or is banker and moves or is tabard designer?
     //if (unit->IsArmorer() || unit->IsCivilian() || unit->IsQuestGiver() || unit->IsServiceProvider() || unit->IsGuard())
     {
         //if (!unit->GetTransport()) // pussywizard: reverted with new spline (old: without this check, npc would stay in place and the transport would continue moving, so the npc falls off. NPCs on transports don't have waypoints, so stopmoving is not needed)
@@ -727,7 +727,7 @@ void WorldSession::HandleUnstablePetCallback(PreparedQueryResult result, uint32 
     if (pet)
         _player->RemovePet(pet, PET_SAVE_AS_DELETED);
 
-	if (!Pet::LoadPetFromDB(_player, PET_LOAD_HANDLE_UNSTABLE_CALLBACK, petEntry, petId))
+    if (!Pet::LoadPetFromDB(_player, PET_LOAD_HANDLE_UNSTABLE_CALLBACK, petEntry, petId))
     {
         SendStableResult(STABLE_ERR_STABLE);
         return;
@@ -854,7 +854,7 @@ void WorldSession::HandleStableSwapPetCallback(PreparedQueryResult result, uint3
     _player->RemovePet(pet, pet->IsAlive() ? PetSaveMode(slot) : PET_SAVE_AS_DELETED);
 
     // summon unstabled pet
-	if (!Pet::LoadPetFromDB(_player, PET_LOAD_HANDLE_UNSTABLE_CALLBACK, petEntry, petId))
+    if (!Pet::LoadPetFromDB(_player, PET_LOAD_HANDLE_UNSTABLE_CALLBACK, petEntry, petId))
     {
         SendStableResult(STABLE_ERR_STABLE);
     }

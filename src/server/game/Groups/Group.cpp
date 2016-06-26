@@ -167,9 +167,9 @@ bool Group::LoadGroupFromDB(Field* fields)
 
     // group leader not exist
     if (!sObjectMgr->GetPlayerNameByGUID(fields[0].GetUInt32(), m_leaderName))
-	{
-		uint32 groupLowGuid = fields[16].GetUInt32();
-		SQLTransaction trans = CharacterDatabase.BeginTransaction();
+    {
+        uint32 groupLowGuid = fields[16].GetUInt32();
+        SQLTransaction trans = CharacterDatabase.BeginTransaction();
         PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_GROUP);
         stmt->setUInt32(0, groupLowGuid);
         trans->Append(stmt);
@@ -181,7 +181,7 @@ bool Group::LoadGroupFromDB(Field* fields)
         stmt->setUInt32(0, groupLowGuid);
         CharacterDatabase.Execute(stmt);
         return false;
-	}
+    }
 
     m_lootMethod = LootMethod(fields[1].GetUInt8());
     m_looterGuid = MAKE_NEW_GUID(fields[2].GetUInt32(), 0, HIGHGUID_PLAYER);
@@ -211,7 +211,7 @@ bool Group::LoadGroupFromDB(Field* fields)
     if (m_groupType & GROUPTYPE_LFG)
         sLFGMgr->_LoadFromDB(fields, GetGUID());
 
-	return true;
+    return true;
 }
 
 void Group::LoadMemberFromDB(uint32 guidLow, uint8 memberFlags, uint8 subgroup, uint8 roles)
@@ -224,7 +224,7 @@ void Group::LoadMemberFromDB(uint32 guidLow, uint8 memberFlags, uint8 subgroup, 
     {
         PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_GROUP_MEMBER);
         stmt->setUInt32(0, guidLow);
-		stmt->setUInt32(1, GetLowGUID());
+        stmt->setUInt32(1, GetLowGUID());
         CharacterDatabase.Execute(stmt);
         return;
     }
@@ -234,8 +234,8 @@ void Group::LoadMemberFromDB(uint32 guidLow, uint8 memberFlags, uint8 subgroup, 
     member.roles = roles;
 
     m_memberSlots.push_back(member);
-	if (!isBGGroup() && !isBFGroup())
-		sWorld->UpdateGlobalPlayerGroup(guidLow, GetLowGUID());
+    if (!isBGGroup() && !isBFGroup())
+        sWorld->UpdateGlobalPlayerGroup(guidLow, GetLowGUID());
 
     SubGroupCounterIncrease(subgroup);
 
@@ -282,9 +282,9 @@ void Group::ConvertToRaid()
         if (Player* player = ObjectAccessor::FindPlayer(citr->guid))
             player->UpdateForQuestWorldObjects();
 
-	// pussywizard: client automatically clears df "eye" near minimap, so remove from raid browser
-	if (sLFGMgr->GetState(GetLeaderGUID()) == lfg::LFG_STATE_RAIDBROWSER)
-		sLFGMgr->LeaveLfg(GetLeaderGUID());
+    // pussywizard: client automatically clears df "eye" near minimap, so remove from raid browser
+    if (sLFGMgr->GetState(GetLeaderGUID()) == lfg::LFG_STATE_RAIDBROWSER)
+        sLFGMgr->LeaveLfg(GetLeaderGUID());
 }
 
 bool Group::AddInvite(Player* player)
@@ -322,8 +322,8 @@ void Group::RemoveInvite(Player* player)
 {
     if (player)
     {
-		if (!m_invitees.empty())
-			m_invitees.erase(player);
+        if (!m_invitees.empty())
+            m_invitees.erase(player);
         player->SetGroupInvite(NULL);
     }
 }
@@ -385,7 +385,7 @@ bool Group::AddMember(Player* player)
     member.roles     = 0;
     m_memberSlots.push_back(member);
     if (!isBGGroup() && !isBFGroup())
-		sWorld->UpdateGlobalPlayerGroup(player->GetGUIDLow(), GetLowGUID());
+        sWorld->UpdateGlobalPlayerGroup(player->GetGUIDLow(), GetLowGUID());
 
     SubGroupCounterIncrease(subGroup);
 
@@ -403,7 +403,7 @@ bool Group::AddMember(Player* player)
             player->SetGroup(this, subGroup);
 
         // if the same group invites the player back, cancel the homebind timer
-		_cancelHomebindIfInstance(player);
+        _cancelHomebindIfInstance(player);
     }
 
     if (!isRaidGroup())                                      // reset targetIcons for non-raid-groups
@@ -430,7 +430,7 @@ bool Group::AddMember(Player* player)
     {
         if (!IsLeader(player->GetGUID()) && !isBGGroup() && !isBFGroup())
         {
-			Player::ResetInstances(player->GetGUIDLow(), INSTANCE_RESET_GROUP_JOIN, false);
+            Player::ResetInstances(player->GetGUIDLow(), INSTANCE_RESET_GROUP_JOIN, false);
 
             if (player->GetDungeonDifficulty() != GetDungeonDifficulty())
             {
@@ -443,10 +443,10 @@ bool Group::AddMember(Player* player)
                 player->SendRaidDifficulty(true);
             }
         }
-		else if (IsLeader(player->GetGUID()) && isLFGGroup()) // pussywizard
-		{
-			Player::ResetInstances(player->GetGUIDLow(), INSTANCE_RESET_GROUP_JOIN, false);
-		}
+        else if (IsLeader(player->GetGUID()) && isLFGGroup()) // pussywizard
+        {
+            Player::ResetInstances(player->GetGUIDLow(), INSTANCE_RESET_GROUP_JOIN, false);
+        }
 
         player->SetGroupUpdateFlag(GROUP_UPDATE_FULL);
         UpdatePlayerOutOfRange(player);
@@ -513,10 +513,10 @@ bool Group::RemoveMember(uint64 guid, const RemoveMethod &method /*= GROUP_REMOV
 
     // LFG group vote kick handled in scripts
     if (isLFGGroup() && method == GROUP_REMOVEMETHOD_KICK)
-	{
+    {
         sLFGMgr->InitBoot(GetGUID(), kicker, guid, std::string(reason ? reason : ""));
         return m_memberSlots.size() > 0;
-	}
+    }
 
     // remove member and change leader (if need) only if strong more 2 members _before_ member remove (BG/BF allow 1 member group)
     if (GetMembersCount() > ((isBGGroup() || isLFGGroup() || isBFGroup()) ? 1u : 2u))
@@ -559,7 +559,7 @@ bool Group::RemoveMember(uint64 guid, const RemoveMethod &method /*= GROUP_REMOV
         {
             PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_GROUP_MEMBER);
             stmt->setUInt32(0, GUID_LOPART(guid));
-			stmt->setUInt32(1, GetLowGUID());
+            stmt->setUInt32(1, GetLowGUID());
             CharacterDatabase.Execute(stmt);
         }
 
@@ -573,10 +573,10 @@ bool Group::RemoveMember(uint64 guid, const RemoveMethod &method /*= GROUP_REMOV
             Roll* roll = *it;
             Roll::PlayerVote::iterator itr2 = roll->playerVote.find(guid);
             if (itr2 == roll->playerVote.end())
-			{
-				++it;
+            {
+                ++it;
                 continue;
-			}
+            }
 
             if (itr2->second == GREED || itr2->second == DISENCHANT)
                 --roll->totalGreed;
@@ -590,12 +590,12 @@ bool Group::RemoveMember(uint64 guid, const RemoveMethod &method /*= GROUP_REMOV
 
             roll->playerVote.erase(itr2);
 
-			// Xinef: itr can be erased inside
-			// Xinef: player is removed from all vote lists so it will not pass above playerVote == playerVote.end statement during second iteration
+            // Xinef: itr can be erased inside
+            // Xinef: player is removed from all vote lists so it will not pass above playerVote == playerVote.end statement during second iteration
             if (CountRollVote(guid, roll->itemGUID, MAX_ROLL_TYPE))
-				it = RollId.begin();
-			else
-				++it;
+                it = RollId.begin();
+            else
+                ++it;
         }
 
         // Update subgroups
@@ -604,46 +604,46 @@ bool Group::RemoveMember(uint64 guid, const RemoveMethod &method /*= GROUP_REMOV
         {
             SubGroupCounterDecrease(slot->group);
             m_memberSlots.erase(slot);
-			if (!isBGGroup() && !isBFGroup())
-				sWorld->UpdateGlobalPlayerGroup(GUID_LOPART(guid), 0);
+            if (!isBGGroup() && !isBFGroup())
+                sWorld->UpdateGlobalPlayerGroup(GUID_LOPART(guid), 0);
         }
 
         // Pick new leader if necessary
-		bool validLeader = true;
+        bool validLeader = true;
         if (m_leaderGuid == guid)
         {
-			validLeader = false;
+            validLeader = false;
             for (member_witerator itr = m_memberSlots.begin(); itr != m_memberSlots.end(); ++itr)
             {
                 if (ObjectAccessor::FindPlayerInOrOutOfWorld(itr->guid))
                 {
                     ChangeLeader(itr->guid);
-					validLeader = true;
+                    validLeader = true;
                     break;
                 }
             }
         }
 
-		_homebindIfInstance(player);
-		if (!isBGGroup() && !isBFGroup())
-			Player::ResetInstances(guid, INSTANCE_RESET_GROUP_LEAVE, false);
+        _homebindIfInstance(player);
+        if (!isBGGroup() && !isBFGroup())
+            Player::ResetInstances(guid, INSTANCE_RESET_GROUP_LEAVE, false);
 
-		sScriptMgr->OnGroupRemoveMember(this, guid, method, kicker, reason);
+        sScriptMgr->OnGroupRemoveMember(this, guid, method, kicker, reason);
 
         SendUpdate();
 
-		if (!validLeader)
-		{
-			// pussywizard: temp do nothing, something causes crashes in MakeNewGroup
-			//Disband();
-			//return false;
-		}
+        if (!validLeader)
+        {
+            // pussywizard: temp do nothing, something causes crashes in MakeNewGroup
+            //Disband();
+            //return false;
+        }
 
         if (isLFGGroup() && GetMembersCount() == 1)
         {
             Player* leader = ObjectAccessor::FindPlayerInOrOutOfWorld(GetLeaderGUID());
             uint32 mapId = sLFGMgr->GetDungeonMapId(GetGUID());
-			lfg::LfgState state = sLFGMgr->GetState(GetGUID());
+            lfg::LfgState state = sLFGMgr->GetState(GetGUID());
             if (!mapId || !leader || (leader->IsAlive() && leader->GetMapId() != mapId) || state == lfg::LFG_STATE_NONE)
             {
                 Disband();
@@ -652,17 +652,17 @@ bool Group::RemoveMember(uint64 guid, const RemoveMethod &method /*= GROUP_REMOV
         }
 
         if (m_memberMgr.getSize() < ((isLFGGroup() || isBGGroup() || isBFGroup()) ? 1u : 2u))
-		{
+        {
             Disband();
-			return false;
-		}
+            return false;
+        }
 
         return true;
     }
     // If group size before player removal <= 2 then disband it
     else
     {
-		sScriptMgr->OnGroupRemoveMember(this, guid, method, kicker, reason);
+        sScriptMgr->OnGroupRemoveMember(this, guid, method, kicker, reason);
         Disband();
         return false;
     }
@@ -693,7 +693,7 @@ void Group::ChangeLeader(uint64 newLeaderGuid)
         trans->Append(stmt);
         CharacterDatabase.CommitTransaction(trans);
 
-		sInstanceSaveMgr->CopyBinds(m_leaderGuid, newLeaderGuid, newLeader);
+        sInstanceSaveMgr->CopyBinds(m_leaderGuid, newLeaderGuid, newLeader);
     }
 
     if (Player* oldLeader = ObjectAccessor::FindPlayerInOrOutOfWorld(m_leaderGuid))
@@ -716,14 +716,14 @@ void Group::Disband(bool hideDestroy /* = false */)
     Player* player;
     for (member_citerator citr = m_memberSlots.begin(); citr != m_memberSlots.end(); ++citr)
     {
-	    if (!isBGGroup() && !isBFGroup())
-			sWorld->UpdateGlobalPlayerGroup(GUID_LOPART(citr->guid), 0);
+        if (!isBGGroup() && !isBFGroup())
+            sWorld->UpdateGlobalPlayerGroup(GUID_LOPART(citr->guid), 0);
 
         player = ObjectAccessor::FindPlayerInOrOutOfWorld(citr->guid);
 
         _homebindIfInstance(player);
-		if (!isBGGroup() && !isBFGroup())
-			Player::ResetInstances(citr->guid, INSTANCE_RESET_GROUP_LEAVE, false);
+        if (!isBGGroup() && !isBFGroup())
+            Player::ResetInstances(citr->guid, INSTANCE_RESET_GROUP_LEAVE, false);
 
         if (!player)
             continue;
@@ -1282,8 +1282,8 @@ bool Group::CountRollVote(uint64 playerGUID, uint64 Guid, uint8 Choice)
 
     Roll::PlayerVote::iterator itr = roll->playerVote.find(playerGUID);
     // this condition means that player joins to the party after roll begins
-	// Xinef: if choice == MAX_ROLL_TYPE, player was removed from the map in removefromgroup
-	// Xinef: itr can be invalid as it is not used below
+    // Xinef: if choice == MAX_ROLL_TYPE, player was removed from the map in removefromgroup
+    // Xinef: itr can be invalid as it is not used below
     if (Choice < MAX_ROLL_TYPE && itr == roll->playerVote.end())
         return false;
 
@@ -1316,11 +1316,11 @@ bool Group::CountRollVote(uint64 playerGUID, uint64 Guid, uint8 Choice)
     }
 
     if (roll->totalPass + roll->totalNeed + roll->totalGreed >= roll->totalPlayersRolling)
-	{
+    {
         CountTheRoll(rollI, NULL);
-		return true;
-	}
-	return false;
+        return true;
+    }
+    return false;
 }
 
 //called when roll timer expires
@@ -1361,12 +1361,12 @@ void Group::CountTheRoll(Rolls::iterator rollI, Map* allowedMap)
                 if (itr->second != NEED)
                     continue;
 
-				player = ObjectAccessor::FindPlayer(itr->first);
-				if (!player || allowedMap != NULL && player->FindMap() != allowedMap)
-				{
-					--roll->totalNeed;
-					continue;
-				}
+                player = ObjectAccessor::FindPlayer(itr->first);
+                if (!player || allowedMap != NULL && player->FindMap() != allowedMap)
+                {
+                    --roll->totalNeed;
+                    continue;
+                }
 
                 uint8 randomN = urand(1, 100);
                 SendLootRoll(0, itr->first, randomN, ROLL_NEED, *roll);
@@ -1377,37 +1377,37 @@ void Group::CountTheRoll(Rolls::iterator rollI, Map* allowedMap)
                 }
             }
 
-			if (maxguid) // pussywizard: added condition
-			{
-				SendLootRollWon(0, maxguid, maxresul, ROLL_NEED, *roll);
-				player = ObjectAccessor::FindPlayer(maxguid);
+            if (maxguid) // pussywizard: added condition
+            {
+                SendLootRollWon(0, maxguid, maxresul, ROLL_NEED, *roll);
+                player = ObjectAccessor::FindPlayer(maxguid);
 
-				if (player)
-				{
-					player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_ROLL_NEED_ON_LOOT, roll->itemid, maxresul);
+                if (player)
+                {
+                    player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_ROLL_NEED_ON_LOOT, roll->itemid, maxresul);
 
-					ItemPosCountVec dest;
-					LootItem* item = &(roll->itemSlot >= roll->getLoot()->items.size() ? roll->getLoot()->quest_items[roll->itemSlot - roll->getLoot()->items.size()] : roll->getLoot()->items[roll->itemSlot]);
-					InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, roll->itemid, item->count);
-					if (msg == EQUIP_ERR_OK)
-					{
-						item->is_looted = true;
-						roll->getLoot()->NotifyItemRemoved(roll->itemSlot);
-						roll->getLoot()->unlootedCount--;
-						AllowedLooterSet looters = item->GetAllowedLooters();
-						player->StoreNewItem(dest, roll->itemid, true, item->randomPropertyId, looters);
-						player->UpdateLootAchievements(item, roll->getLoot());
-					}
-					else
-					{
-						item->is_blocked = false;
-						item->rollWinnerGUID = player->GetGUID();
-						player->SendEquipError(msg, NULL, NULL, roll->itemid);
-					}
-				}
-			}
-			else
-				roll->totalNeed = 0;
+                    ItemPosCountVec dest;
+                    LootItem* item = &(roll->itemSlot >= roll->getLoot()->items.size() ? roll->getLoot()->quest_items[roll->itemSlot - roll->getLoot()->items.size()] : roll->getLoot()->items[roll->itemSlot]);
+                    InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, roll->itemid, item->count);
+                    if (msg == EQUIP_ERR_OK)
+                    {
+                        item->is_looted = true;
+                        roll->getLoot()->NotifyItemRemoved(roll->itemSlot);
+                        roll->getLoot()->unlootedCount--;
+                        AllowedLooterSet looters = item->GetAllowedLooters();
+                        player->StoreNewItem(dest, roll->itemid, true, item->randomPropertyId, looters);
+                        player->UpdateLootAchievements(item, roll->getLoot());
+                    }
+                    else
+                    {
+                        item->is_blocked = false;
+                        item->rollWinnerGUID = player->GetGUID();
+                        player->SendEquipError(msg, NULL, NULL, roll->itemid);
+                    }
+                }
+            }
+            else
+                roll->totalNeed = 0;
         }
     }
     if (roll->totalNeed == 0 && roll->totalGreed > 0) // pussywizard: if (roll->totalNeed == 0 && ...), not else if, because numbers can be modified above if player is on a different map
@@ -1425,12 +1425,12 @@ void Group::CountTheRoll(Rolls::iterator rollI, Map* allowedMap)
                 if (itr->second != GREED && itr->second != DISENCHANT)
                     continue;
 
-				player = ObjectAccessor::FindPlayer(itr->first);
-				if (!player || allowedMap != NULL && player->FindMap() != allowedMap)
-				{
-					--roll->totalGreed;
-					continue;
-				}
+                player = ObjectAccessor::FindPlayer(itr->first);
+                if (!player || allowedMap != NULL && player->FindMap() != allowedMap)
+                {
+                    --roll->totalGreed;
+                    continue;
+                }
 
                 uint8 randomN = urand(1, 100);
                 SendLootRoll(0, itr->first, randomN, itr->second, *roll);
@@ -1442,50 +1442,50 @@ void Group::CountTheRoll(Rolls::iterator rollI, Map* allowedMap)
                 }
             }
 
-			if (maxguid) // pussywizard: added condition
-			{
-				SendLootRollWon(0, maxguid, maxresul, rollvote, *roll);
-				player = ObjectAccessor::FindPlayer(maxguid);
+            if (maxguid) // pussywizard: added condition
+            {
+                SendLootRollWon(0, maxguid, maxresul, rollvote, *roll);
+                player = ObjectAccessor::FindPlayer(maxguid);
 
-				if (player)
-				{
-					player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_ROLL_GREED_ON_LOOT, roll->itemid, maxresul);
+                if (player)
+                {
+                    player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_ROLL_GREED_ON_LOOT, roll->itemid, maxresul);
 
-					LootItem* item = &(roll->itemSlot >= roll->getLoot()->items.size() ? roll->getLoot()->quest_items[roll->itemSlot - roll->getLoot()->items.size()] : roll->getLoot()->items[roll->itemSlot]);
+                    LootItem* item = &(roll->itemSlot >= roll->getLoot()->items.size() ? roll->getLoot()->quest_items[roll->itemSlot - roll->getLoot()->items.size()] : roll->getLoot()->items[roll->itemSlot]);
 
-					if (rollvote == GREED)
-					{
-						ItemPosCountVec dest;
-						InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, roll->itemid, item->count);
-						if (msg == EQUIP_ERR_OK)
-						{
-							item->is_looted = true;
-							roll->getLoot()->NotifyItemRemoved(roll->itemSlot);
-							roll->getLoot()->unlootedCount--;
-							AllowedLooterSet looters = item->GetAllowedLooters();
-							player->StoreNewItem(dest, roll->itemid, true, item->randomPropertyId, looters);
-							player->UpdateLootAchievements(item, roll->getLoot());
-						}
-						else
-						{
-							item->is_blocked = false;
-							item->rollWinnerGUID = player->GetGUID();
-							player->SendEquipError(msg, NULL, NULL, roll->itemid);
-						}
-					}
-					else if (rollvote == DISENCHANT)
-					{
-						item->is_looted = true;
-						roll->getLoot()->NotifyItemRemoved(roll->itemSlot);
-						roll->getLoot()->unlootedCount--;
-						ItemTemplate const* pProto = sObjectMgr->GetItemTemplate(roll->itemid);
-						player->AutoStoreLoot(pProto->DisenchantID, LootTemplates_Disenchant, true);
-						player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL, 13262); // Disenchant
-					}
-				}
-			}
-			else
-				roll->totalGreed = 0;
+                    if (rollvote == GREED)
+                    {
+                        ItemPosCountVec dest;
+                        InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, roll->itemid, item->count);
+                        if (msg == EQUIP_ERR_OK)
+                        {
+                            item->is_looted = true;
+                            roll->getLoot()->NotifyItemRemoved(roll->itemSlot);
+                            roll->getLoot()->unlootedCount--;
+                            AllowedLooterSet looters = item->GetAllowedLooters();
+                            player->StoreNewItem(dest, roll->itemid, true, item->randomPropertyId, looters);
+                            player->UpdateLootAchievements(item, roll->getLoot());
+                        }
+                        else
+                        {
+                            item->is_blocked = false;
+                            item->rollWinnerGUID = player->GetGUID();
+                            player->SendEquipError(msg, NULL, NULL, roll->itemid);
+                        }
+                    }
+                    else if (rollvote == DISENCHANT)
+                    {
+                        item->is_looted = true;
+                        roll->getLoot()->NotifyItemRemoved(roll->itemSlot);
+                        roll->getLoot()->unlootedCount--;
+                        ItemTemplate const* pProto = sObjectMgr->GetItemTemplate(roll->itemid);
+                        player->AutoStoreLoot(pProto->DisenchantID, LootTemplates_Disenchant, true);
+                        player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL, 13262); // Disenchant
+                    }
+                }
+            }
+            else
+                roll->totalGreed = 0;
         }
     }
     if (roll->totalNeed == 0 && roll->totalGreed == 0) // pussywizard: if, not else, because numbers can be modified above if player is on a different map
@@ -1574,7 +1574,7 @@ void Group::SendUpdateToPlayer(uint64 playerGUID, MemberSlot* slot)
     data << uint8(slot->roles);
     if (isLFGGroup())
     {
-		data << uint8(sLFGMgr->GetState(m_guid) == lfg::LFG_STATE_FINISHED_DUNGEON ? 2 : 0); // FIXME - Dungeon save status? 2 = done
+        data << uint8(sLFGMgr->GetState(m_guid) == lfg::LFG_STATE_FINISHED_DUNGEON ? 2 : 0); // FIXME - Dungeon save status? 2 = done
         data << uint32(sLFGMgr->GetDungeon(m_guid));
     }
 
@@ -1819,7 +1819,7 @@ GroupJoinBattlegroundResult Group::CanJoinBattlegroundQueue(Battleground const* 
     if (!bgEntry)
         return ERR_GROUP_JOIN_BATTLEGROUND_FAIL;
 
-	// too many players in the group
+    // too many players in the group
     if (GetMembersCount() > bgEntry->maxGroupSize)
         return ERR_BATTLEGROUND_NONE;
 
@@ -1866,13 +1866,13 @@ GroupJoinBattlegroundResult Group::CanJoinBattlegroundQueue(Battleground const* 
         if (member->isUsingLfg())
             return ERR_LFG_CANT_USE_BATTLEGROUND;
 
-		// pussywizard: prevent joining when any member is in bg/arena
-		if (member->InBattleground())
-			return ERR_BATTLEGROUND_JOIN_FAILED;
+        // pussywizard: prevent joining when any member is in bg/arena
+        if (member->InBattleground())
+            return ERR_BATTLEGROUND_JOIN_FAILED;
 
-		// pussywizard: check for free slot, this is actually ensured before calling this function, but just in case
-		if (!member->HasFreeBattlegroundQueueId())
-			return ERR_BATTLEGROUND_TOO_MANY_QUEUES;
+        // pussywizard: check for free slot, this is actually ensured before calling this function, but just in case
+        if (!member->HasFreeBattlegroundQueueId())
+            return ERR_BATTLEGROUND_TOO_MANY_QUEUES;
     }
 
     // for arenas: check party size is proper
@@ -1936,62 +1936,62 @@ void Group::SetRaidDifficulty(Difficulty difficulty)
 
 void Group::ResetInstances(uint8 method, bool isRaid, Player* leader)
 {
-	if (isBGGroup() || isBFGroup() || isLFGGroup())
+    if (isBGGroup() || isBFGroup() || isLFGGroup())
         return;
 
-	switch (method)
-	{
-		case INSTANCE_RESET_ALL:
-			{
-				if (leader->GetDifficulty(false) != DUNGEON_DIFFICULTY_NORMAL)
-					break;
-				std::vector<InstanceSave*> toUnbind;
-				BoundInstancesMap const& m_boundInstances = sInstanceSaveMgr->PlayerGetBoundInstances(leader->GetGUIDLow(), Difficulty(DUNGEON_DIFFICULTY_NORMAL));
-				for (BoundInstancesMap::const_iterator itr = m_boundInstances.begin(); itr != m_boundInstances.end(); ++itr)
-				{
-					InstanceSave* instanceSave = itr->second.save;
-					const MapEntry* entry = sMapStore.LookupEntry(itr->first);
-					if (!entry || entry->IsRaid() || !instanceSave->CanReset())
-						continue;
+    switch (method)
+    {
+        case INSTANCE_RESET_ALL:
+            {
+                if (leader->GetDifficulty(false) != DUNGEON_DIFFICULTY_NORMAL)
+                    break;
+                std::vector<InstanceSave*> toUnbind;
+                BoundInstancesMap const& m_boundInstances = sInstanceSaveMgr->PlayerGetBoundInstances(leader->GetGUIDLow(), Difficulty(DUNGEON_DIFFICULTY_NORMAL));
+                for (BoundInstancesMap::const_iterator itr = m_boundInstances.begin(); itr != m_boundInstances.end(); ++itr)
+                {
+                    InstanceSave* instanceSave = itr->second.save;
+                    const MapEntry* entry = sMapStore.LookupEntry(itr->first);
+                    if (!entry || entry->IsRaid() || !instanceSave->CanReset())
+                        continue;
 
-					Map* map = sMapMgr->FindMap(instanceSave->GetMapId(), instanceSave->GetInstanceId());
-					if (!map || map->ToInstanceMap()->Reset(method))
-					{
-						leader->SendResetInstanceSuccess(instanceSave->GetMapId());
-						toUnbind.push_back(instanceSave);
-					}
-					else
-						leader->SendResetInstanceFailed(0, instanceSave->GetMapId());
-				}
-				for (std::vector<InstanceSave*>::const_iterator itr = toUnbind.begin(); itr != toUnbind.end(); ++itr)
-					sInstanceSaveMgr->UnbindAllFor(*itr);
-			}
-			break;
-		case INSTANCE_RESET_CHANGE_DIFFICULTY:
-			{
-				std::vector<InstanceSave*> toUnbind;
-				BoundInstancesMap const& m_boundInstances = sInstanceSaveMgr->PlayerGetBoundInstances(leader->GetGUIDLow(), leader->GetDifficulty(isRaid));
-				for (BoundInstancesMap::const_iterator itr = m_boundInstances.begin(); itr != m_boundInstances.end(); ++itr)
-				{
-					InstanceSave* instanceSave = itr->second.save;
-					const MapEntry* entry = sMapStore.LookupEntry(itr->first);
-					if (!entry || entry->IsRaid() != isRaid || !instanceSave->CanReset())
-						continue;
+                    Map* map = sMapMgr->FindMap(instanceSave->GetMapId(), instanceSave->GetInstanceId());
+                    if (!map || map->ToInstanceMap()->Reset(method))
+                    {
+                        leader->SendResetInstanceSuccess(instanceSave->GetMapId());
+                        toUnbind.push_back(instanceSave);
+                    }
+                    else
+                        leader->SendResetInstanceFailed(0, instanceSave->GetMapId());
+                }
+                for (std::vector<InstanceSave*>::const_iterator itr = toUnbind.begin(); itr != toUnbind.end(); ++itr)
+                    sInstanceSaveMgr->UnbindAllFor(*itr);
+            }
+            break;
+        case INSTANCE_RESET_CHANGE_DIFFICULTY:
+            {
+                std::vector<InstanceSave*> toUnbind;
+                BoundInstancesMap const& m_boundInstances = sInstanceSaveMgr->PlayerGetBoundInstances(leader->GetGUIDLow(), leader->GetDifficulty(isRaid));
+                for (BoundInstancesMap::const_iterator itr = m_boundInstances.begin(); itr != m_boundInstances.end(); ++itr)
+                {
+                    InstanceSave* instanceSave = itr->second.save;
+                    const MapEntry* entry = sMapStore.LookupEntry(itr->first);
+                    if (!entry || entry->IsRaid() != isRaid || !instanceSave->CanReset())
+                        continue;
 
-					Map* map = sMapMgr->FindMap(instanceSave->GetMapId(), instanceSave->GetInstanceId());
-					if (!map || map->ToInstanceMap()->Reset(method))
-					{
-						leader->SendResetInstanceSuccess(instanceSave->GetMapId());
-						toUnbind.push_back(instanceSave);
-					}
-					else
-						leader->SendResetInstanceFailed(0, instanceSave->GetMapId());
-				}
-				for (std::vector<InstanceSave*>::const_iterator itr = toUnbind.begin(); itr != toUnbind.end(); ++itr)
-					sInstanceSaveMgr->UnbindAllFor(*itr);
-			}
-			break;
-	}
+                    Map* map = sMapMgr->FindMap(instanceSave->GetMapId(), instanceSave->GetInstanceId());
+                    if (!map || map->ToInstanceMap()->Reset(method))
+                    {
+                        leader->SendResetInstanceSuccess(instanceSave->GetMapId());
+                        toUnbind.push_back(instanceSave);
+                    }
+                    else
+                        leader->SendResetInstanceFailed(0, instanceSave->GetMapId());
+                }
+                for (std::vector<InstanceSave*>::const_iterator itr = toUnbind.begin(); itr != toUnbind.end(); ++itr)
+                    sInstanceSaveMgr->UnbindAllFor(*itr);
+            }
+            break;
+    }
 }
 
 void Group::_homebindIfInstance(Player* player)
@@ -2002,10 +2002,10 @@ void Group::_homebindIfInstance(Player* player)
 
 void Group::_cancelHomebindIfInstance(Player* player)
 {
-	// if player is reinvited to group and in the instance - cancel homebind timer
-	if (!player->FindMap() || !player->FindMap()->IsDungeon())
-		return;
-	InstancePlayerBind* bind = sInstanceSaveMgr->PlayerGetBoundInstance(player->GetGUIDLow(), player->FindMap()->GetId(), player->GetDifficulty(player->FindMap()->IsRaid()));
+    // if player is reinvited to group and in the instance - cancel homebind timer
+    if (!player->FindMap() || !player->FindMap()->IsDungeon())
+        return;
+    InstancePlayerBind* bind = sInstanceSaveMgr->PlayerGetBoundInstance(player->GetGUIDLow(), player->FindMap()->GetId(), player->GetDifficulty(player->FindMap()->IsRaid()));
     if (bind && bind->save->GetInstanceId() == player->GetInstanceId())
         player->m_InstanceValid = true;
 }

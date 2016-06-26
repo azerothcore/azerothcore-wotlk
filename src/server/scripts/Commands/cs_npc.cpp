@@ -175,24 +175,24 @@ public:
         Map* map = chr->GetMap();
 
         if (Transport* tt = chr->GetTransport())
-			if (MotionTransport* trans = tt->ToMotionTransport())
-			{
-				uint32 guid = sObjectMgr->GenerateLowGuid(HIGHGUID_UNIT);
-				CreatureData& data = sObjectMgr->NewOrExistCreatureData(guid);
-				data.id = id;
-				data.phaseMask = chr->GetPhaseMaskForSpawn();
-				data.posX = chr->GetTransOffsetX();
-				data.posY = chr->GetTransOffsetY();
-				data.posZ = chr->GetTransOffsetZ();
-				data.orientation = chr->GetTransOffsetO();
+            if (MotionTransport* trans = tt->ToMotionTransport())
+            {
+                uint32 guid = sObjectMgr->GenerateLowGuid(HIGHGUID_UNIT);
+                CreatureData& data = sObjectMgr->NewOrExistCreatureData(guid);
+                data.id = id;
+                data.phaseMask = chr->GetPhaseMaskForSpawn();
+                data.posX = chr->GetTransOffsetX();
+                data.posY = chr->GetTransOffsetY();
+                data.posZ = chr->GetTransOffsetZ();
+                data.orientation = chr->GetTransOffsetO();
 
-				Creature* creature = trans->CreateNPCPassenger(guid, &data);
+                Creature* creature = trans->CreateNPCPassenger(guid, &data);
 
-				creature->SaveToDB(trans->GetGOInfo()->moTransport.mapID, 1 << map->GetSpawnMode(), chr->GetPhaseMaskForSpawn());
+                creature->SaveToDB(trans->GetGOInfo()->moTransport.mapID, 1 << map->GetSpawnMode(), chr->GetPhaseMaskForSpawn());
 
-				sObjectMgr->AddCreatureToGrid(guid, &data);
-				return true;
-			}
+                sObjectMgr->AddCreatureToGrid(guid, &data);
+                return true;
+            }
 
         Creature* creature = new Creature();
         if (!creature->Create(sObjectMgr->GenerateLowGuid(HIGHGUID_UNIT), map, chr->GetPhaseMaskForSpawn(), id, 0, x, y, z, o))
@@ -260,7 +260,7 @@ public:
             return false;
         }
 
-		char* addMulti = strtok(NULL, " ");
+        char* addMulti = strtok(NULL, " ");
         uint32 vendor_entry = addMulti ? handler->GetSession()->GetCurrentVendor() : vendor ? vendor->GetEntry() : 0;
 
         if (!sObjectMgr->IsVendorItemValid(vendor_entry, itemId, maxcount, incrtime, extendedcost, handler->GetSession()->GetPlayer()))
@@ -484,7 +484,7 @@ public:
         }
         uint32 itemId = atol(pitem);
 
-		char* addMulti = strtok(NULL, " ");
+        char* addMulti = strtok(NULL, " ");
         if (!sObjectMgr->RemoveVendorItem(addMulti ? handler->GetSession()->GetCurrentVendor() : vendor->GetEntry(), itemId))
         {
             handler->PSendSysMessage(LANG_ITEM_NOT_IN_LIST, itemId);
@@ -574,7 +574,7 @@ public:
         return true;
     }
 
-	//set data of creature for testing scripting
+    //set data of creature for testing scripting
     static bool HandleNpcSetDataCommand(ChatHandler* handler, const char* args)
     {
         if (!*args)
@@ -603,7 +603,7 @@ public:
 
         creature->AI()->SetData(data_1, data_2);
         std::string AIorScript = creature->GetAIName() != "" ? "AI type: " + creature->GetAIName() : (creature->GetScriptName() != "" ? "Script Name: " + creature->GetScriptName() : "No AI or Script Name Set");
-		handler->PSendSysMessage(LANG_NPC_SETDATA, creature->GetGUID(), creature->GetEntry(), creature->GetName().c_str(), data_1, data_2, AIorScript.c_str());
+        handler->PSendSysMessage(LANG_NPC_SETDATA, creature->GetGUID(), creature->GetEntry(), creature->GetName().c_str(), data_1, data_2, AIorScript.c_str());
         return true;
     }
 

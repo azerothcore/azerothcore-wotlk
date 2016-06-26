@@ -41,9 +41,9 @@ LocaleConstant GetLocaleByName(const std::string& name)
 
 void CleanStringForMysqlQuery(std::string& str)
 {
-	std::string::size_type n = 0;
-	while ((n=str.find('\\')) != str.npos) str.erase(n,1);
-	while ((n=str.find('"')) != str.npos) str.erase(n,1);
-	while ((n=str.find('\'')) != str.npos) str.erase(n,1);
+    std::string::size_type n = 0;
+    while ((n=str.find('\\')) != str.npos) str.erase(n,1);
+    while ((n=str.find('"')) != str.npos) str.erase(n,1);
+    while ((n=str.find('\'')) != str.npos) str.erase(n,1);
 }
 

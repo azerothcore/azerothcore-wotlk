@@ -196,9 +196,9 @@ void CreatureGroup::MemberAttackStart(Creature* member, Unit* target)
 
 void CreatureGroup::FormationReset(bool dismiss)
 {
-	if (m_members.size() && m_members.begin()->second->groupAI == 5)
-		return;
-	
+    if (m_members.size() && m_members.begin()->second->groupAI == 5)
+        return;
+    
     for (CreatureGroupMemberType::iterator itr = m_members.begin(); itr != m_members.end(); ++itr)
     {
         if (itr->first != m_leader && itr->first->IsAlive())
@@ -220,11 +220,11 @@ void CreatureGroup::LeaderMoveTo(float x, float y, float z, bool run)
     if (!m_leader)
         return;
 
-	uint8 groupAI = sFormationMgr->CreatureGroupMap[m_leader->GetDBTableGUIDLow()]->groupAI;
-	if (groupAI == 5)
-		return;
+    uint8 groupAI = sFormationMgr->CreatureGroupMap[m_leader->GetDBTableGUIDLow()]->groupAI;
+    if (groupAI == 5)
+        return;
 
-	float pathDist = m_leader->GetExactDist(x, y, z);
+    float pathDist = m_leader->GetExactDist(x, y, z);
     float pathAngle = m_leader->GetAngle(x, y);
 
     for (CreatureGroupMemberType::iterator itr = m_members.begin(); itr != m_members.end(); ++itr)
@@ -233,18 +233,18 @@ void CreatureGroup::LeaderMoveTo(float x, float y, float z, bool run)
         if (member == m_leader || !member->IsAlive() || member->GetVictim())
             continue;
 
-		// Xinef: If member is stunned / rooted etc don't allow to move him
-		if (member->HasUnitState(UNIT_STATE_NOT_MOVE))
-			continue;
+        // Xinef: If member is stunned / rooted etc don't allow to move him
+        if (member->HasUnitState(UNIT_STATE_NOT_MOVE))
+            continue;
 
-		// Xinef: this should be automatized, if turn angle is greater than PI/2 (90°) we should swap formation angle
+        // Xinef: this should be automatized, if turn angle is greater than PI/2 (90°) we should swap formation angle
         if (M_PI - fabs(fabs(m_leader->GetOrientation() - pathAngle) - M_PI) > M_PI*0.50f)
         {
-			// pussywizard: in both cases should be 2*M_PI - follow_angle
-			// pussywizard: also, GetCurrentWaypointID() returns 0..n-1, while point_1 must be > 0, so +1
-			// pussywizard: db table waypoint_data shouldn't have point id 0 and shouldn't have any gaps for this to work!
+            // pussywizard: in both cases should be 2*M_PI - follow_angle
+            // pussywizard: also, GetCurrentWaypointID() returns 0..n-1, while point_1 must be > 0, so +1
+            // pussywizard: db table waypoint_data shouldn't have point id 0 and shouldn't have any gaps for this to work!
             // if (m_leader->GetCurrentWaypointID()+1 == itr->second->point_1 || m_leader->GetCurrentWaypointID()+1 == itr->second->point_2)
-			itr->second->follow_angle = Position::NormalizeOrientation(itr->second->follow_angle + M_PI); //(2 * M_PI) - itr->second->follow_angle;
+            itr->second->follow_angle = Position::NormalizeOrientation(itr->second->follow_angle + M_PI); //(2 * M_PI) - itr->second->follow_angle;
         }
 
         float followAngle = itr->second->follow_angle;
@@ -260,16 +260,16 @@ void CreatureGroup::LeaderMoveTo(float x, float y, float z, bool run)
         member->UpdateGroundPositionZ(dx, dy, dz);
 
         member->SetUnitMovementFlags(m_leader->GetUnitMovementFlags());
-		// pussywizard: setting the same movementflags is not enough, spline decides whether leader walks/runs, so spline param is now passed as "run" parameter to this function
+        // pussywizard: setting the same movementflags is not enough, spline decides whether leader walks/runs, so spline param is now passed as "run" parameter to this function
         if (run && member->IsWalking())
             member->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
         else if (!run && !member->IsWalking())
             member->AddUnitMovementFlag(MOVEMENTFLAG_WALKING);
 
-		// xinef: if we move members to position without taking care of sizes, we should compare distance without sizes
-		// xinef: change members speed basing on distance - if too far speed up, if too close slow down
-		UnitMoveType mtype = Movement::SelectSpeedType(member->GetUnitMovementFlags());
-		member->SetSpeedRate(mtype, m_leader->GetSpeedRate(mtype) * member->GetExactDist(dx, dy, dz) / pathDist);
+        // xinef: if we move members to position without taking care of sizes, we should compare distance without sizes
+        // xinef: change members speed basing on distance - if too far speed up, if too close slow down
+        UnitMoveType mtype = Movement::SelectSpeedType(member->GetUnitMovementFlags());
+        member->SetSpeedRate(mtype, m_leader->GetSpeedRate(mtype) * member->GetExactDist(dx, dy, dz) / pathDist);
 
         member->GetMotionMaster()->MovePoint(0, dx, dy, dz);
         member->SetHomePosition(dx, dy, dz, pathAngle);

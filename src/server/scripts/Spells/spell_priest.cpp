@@ -46,8 +46,8 @@ enum PriestSpells
     SPELL_PRIEST_T9_HEALING_2P                      = 67201,
     SPELL_PRIEST_VAMPIRIC_TOUCH_DISPEL              = 64085,
 
-    SPELL_GENERIC_ARENA_DAMPENING					= 74410,
-    SPELL_GENERIC_BATTLEGROUND_DAMPENING			= 74411
+    SPELL_GENERIC_ARENA_DAMPENING                   = 74410,
+    SPELL_GENERIC_BATTLEGROUND_DAMPENING            = 74411
 };
 
 enum PriestSpellIcons
@@ -69,73 +69,73 @@ class spell_pri_shadowfiend_scaling : public SpellScriptLoader
 
             void CalculateResistanceAmount(AuraEffect const* aurEff, int32 & amount, bool & /*canBeRecalculated*/)
             {
-				// xinef: shadowfiend inherits 40% of resistance from owner and 35% of armor (guessed)
-				if (Unit* owner = GetUnitOwner()->GetOwner())
-				{
-					SpellSchoolMask schoolMask = SpellSchoolMask(aurEff->GetSpellInfo()->Effects[aurEff->GetEffIndex()].MiscValue);
-					int32 modifier = schoolMask == SPELL_SCHOOL_MASK_NORMAL ? 35 : 40;
-					amount = CalculatePct(std::max<int32>(0, owner->GetResistance(schoolMask)), modifier);
-				}
+                // xinef: shadowfiend inherits 40% of resistance from owner and 35% of armor (guessed)
+                if (Unit* owner = GetUnitOwner()->GetOwner())
+                {
+                    SpellSchoolMask schoolMask = SpellSchoolMask(aurEff->GetSpellInfo()->Effects[aurEff->GetEffIndex()].MiscValue);
+                    int32 modifier = schoolMask == SPELL_SCHOOL_MASK_NORMAL ? 35 : 40;
+                    amount = CalculatePct(std::max<int32>(0, owner->GetResistance(schoolMask)), modifier);
+                }
             }
 
             void CalculateStatAmount(AuraEffect const* aurEff, int32 & amount, bool & /*canBeRecalculated*/)
             {
-				// xinef: shadowfiend inherits 30% of intellect / stamina (guessed)
-				if (Unit* owner = GetUnitOwner()->GetOwner())
-				{
-					Stats stat = Stats(aurEff->GetSpellInfo()->Effects[aurEff->GetEffIndex()].MiscValue);
-					amount = CalculatePct(std::max<int32>(0, owner->GetStat(stat)), 30);
-				}
+                // xinef: shadowfiend inherits 30% of intellect / stamina (guessed)
+                if (Unit* owner = GetUnitOwner()->GetOwner())
+                {
+                    Stats stat = Stats(aurEff->GetSpellInfo()->Effects[aurEff->GetEffIndex()].MiscValue);
+                    amount = CalculatePct(std::max<int32>(0, owner->GetStat(stat)), 30);
+                }
             }
 
-			void CalculateAPAmount(AuraEffect const* aurEff, int32 & amount, bool & /*canBeRecalculated*/)
+            void CalculateAPAmount(AuraEffect const* aurEff, int32 & amount, bool & /*canBeRecalculated*/)
             {
-				// xinef: shadowfiend inherits 333% of SP as AP - 35.7% of damage increase per hit
-				if (Unit* owner = GetUnitOwner()->GetOwner())
-				{
-					int32 shadow = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_SHADOW);
-					amount = CalculatePct(std::max<int32>(0, shadow), 300); // xinef: deacrased to 300, including 15% from self buff
-				}
+                // xinef: shadowfiend inherits 333% of SP as AP - 35.7% of damage increase per hit
+                if (Unit* owner = GetUnitOwner()->GetOwner())
+                {
+                    int32 shadow = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_SHADOW);
+                    amount = CalculatePct(std::max<int32>(0, shadow), 300); // xinef: deacrased to 300, including 15% from self buff
+                }
             }
 
-			void CalculateSPAmount(AuraEffect const* aurEff, int32 & amount, bool & /*canBeRecalculated*/)
+            void CalculateSPAmount(AuraEffect const* aurEff, int32 & amount, bool & /*canBeRecalculated*/)
             {
-				// xinef: shadowfiend inherits 30% of SP
-				if (Unit* owner = GetUnitOwner()->GetOwner())
-				{
-					int32 shadow = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_SHADOW);
-					amount = CalculatePct(std::max<int32>(0, shadow), 30);
+                // xinef: shadowfiend inherits 30% of SP
+                if (Unit* owner = GetUnitOwner()->GetOwner())
+                {
+                    int32 shadow = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_SHADOW);
+                    amount = CalculatePct(std::max<int32>(0, shadow), 30);
 
-					// xinef: Update appropriate player field
-					if (owner->GetTypeId() == TYPEID_PLAYER)
-						owner->SetUInt32Value(PLAYER_PET_SPELL_POWER, (uint32)amount);
-				}
+                    // xinef: Update appropriate player field
+                    if (owner->GetTypeId() == TYPEID_PLAYER)
+                        owner->SetUInt32Value(PLAYER_PET_SPELL_POWER, (uint32)amount);
+                }
             }
 
-			void HandleEffectApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
-			{
-				GetUnitOwner()->ApplySpellImmune(0, IMMUNITY_STATE, aurEff->GetAuraType(), true, SPELL_BLOCK_TYPE_POSITIVE);
-				if (aurEff->GetAuraType() == SPELL_AURA_MOD_ATTACK_POWER)
-					GetUnitOwner()->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_ATTACK_POWER_PCT, true, SPELL_BLOCK_TYPE_POSITIVE);
-				else if (aurEff->GetAuraType() == SPELL_AURA_MOD_STAT)
-					GetUnitOwner()->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TOTAL_STAT_PERCENTAGE, true, SPELL_BLOCK_TYPE_POSITIVE);
-			}
+            void HandleEffectApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+            {
+                GetUnitOwner()->ApplySpellImmune(0, IMMUNITY_STATE, aurEff->GetAuraType(), true, SPELL_BLOCK_TYPE_POSITIVE);
+                if (aurEff->GetAuraType() == SPELL_AURA_MOD_ATTACK_POWER)
+                    GetUnitOwner()->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_ATTACK_POWER_PCT, true, SPELL_BLOCK_TYPE_POSITIVE);
+                else if (aurEff->GetAuraType() == SPELL_AURA_MOD_STAT)
+                    GetUnitOwner()->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TOTAL_STAT_PERCENTAGE, true, SPELL_BLOCK_TYPE_POSITIVE);
+            }
 
             void Register()
             {
-				if (m_scriptSpellId != 35661)
-					DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_pri_shadowfiend_scaling_AuraScript::CalculateResistanceAmount, EFFECT_ALL, SPELL_AURA_MOD_RESISTANCE);
+                if (m_scriptSpellId != 35661)
+                    DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_pri_shadowfiend_scaling_AuraScript::CalculateResistanceAmount, EFFECT_ALL, SPELL_AURA_MOD_RESISTANCE);
 
-				if (m_scriptSpellId == 35661 || m_scriptSpellId == 35662)
-					DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_pri_shadowfiend_scaling_AuraScript::CalculateStatAmount, EFFECT_ALL, SPELL_AURA_MOD_STAT);
+                if (m_scriptSpellId == 35661 || m_scriptSpellId == 35662)
+                    DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_pri_shadowfiend_scaling_AuraScript::CalculateStatAmount, EFFECT_ALL, SPELL_AURA_MOD_STAT);
 
-				if (m_scriptSpellId == 35661)
-				{
-					DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_pri_shadowfiend_scaling_AuraScript::CalculateAPAmount, EFFECT_ALL, SPELL_AURA_MOD_ATTACK_POWER);
-					DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_pri_shadowfiend_scaling_AuraScript::CalculateSPAmount, EFFECT_ALL, SPELL_AURA_MOD_DAMAGE_DONE);
-				}
+                if (m_scriptSpellId == 35661)
+                {
+                    DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_pri_shadowfiend_scaling_AuraScript::CalculateAPAmount, EFFECT_ALL, SPELL_AURA_MOD_ATTACK_POWER);
+                    DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_pri_shadowfiend_scaling_AuraScript::CalculateSPAmount, EFFECT_ALL, SPELL_AURA_MOD_DAMAGE_DONE);
+                }
 
-				OnEffectApply += AuraEffectApplyFn(spell_pri_shadowfiend_scaling_AuraScript::HandleEffectApply, EFFECT_ALL, SPELL_AURA_ANY, AURA_EFFECT_HANDLE_REAL);
+                OnEffectApply += AuraEffectApplyFn(spell_pri_shadowfiend_scaling_AuraScript::HandleEffectApply, EFFECT_ALL, SPELL_AURA_ANY, AURA_EFFECT_HANDLE_REAL);
             }
         };
 
@@ -166,7 +166,7 @@ class spell_pri_circle_of_healing : public SpellScriptLoader
 
             void FilterTargets(std::list<WorldObject*>& targets)
             {
-				targets.remove_if(Trinity::RaidCheck(GetCaster(), false));
+                targets.remove_if(Trinity::RaidCheck(GetCaster(), false));
 
                 uint32 const maxTargets = GetCaster()->HasAura(SPELL_PRIEST_GLYPH_OF_CIRCLE_OF_HEALING) ? 6 : 5; // Glyph of Circle of Healing
 
@@ -251,7 +251,7 @@ class spell_pri_divine_hymn : public SpellScriptLoader
 
             void FilterTargets(std::list<WorldObject*>& targets)
             {
-				targets.remove_if(Trinity::RaidCheck(GetCaster(), false));
+                targets.remove_if(Trinity::RaidCheck(GetCaster(), false));
 
                 uint32 const maxTargets = 3;
 
@@ -381,8 +381,8 @@ class spell_pri_hymn_of_hope : public SpellScriptLoader
 
             void FilterTargets(std::list<WorldObject*>& targets)
             {
-				targets.remove_if(Trinity::PowerCheck(POWER_MANA, false));
-				targets.remove_if(Trinity::RaidCheck(GetCaster(), false));
+                targets.remove_if(Trinity::PowerCheck(POWER_MANA, false));
+                targets.remove_if(Trinity::RaidCheck(GetCaster(), false));
 
                 uint32 const maxTargets = 3;
 
@@ -593,10 +593,10 @@ class spell_pri_pain_and_suffering_proc : public SpellScriptLoader
                 // Refresh Shadow Word: Pain on target
                 if (Unit* unitTarget = GetHitUnit())
                     if (AuraEffect* aur = unitTarget->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_PRIEST, 0x8000, 0, 0, GetCaster()->GetGUID()))
-					{
-						aur->GetBase()->RefreshTimersWithMods();
+                    {
+                        aur->GetBase()->RefreshTimersWithMods();
                         aur->ChangeAmount(aur->CalculateAmount(aur->GetCaster()), false);
-					}
+                    }
             }
 
             void Register()
@@ -700,9 +700,9 @@ class spell_pri_power_word_shield : public SpellScriptLoader
     public:
         spell_pri_power_word_shield() : SpellScriptLoader("spell_pri_power_word_shield") { }
 
-		static int32 CalculateSpellAmount(Unit* caster, int32 amount, const SpellInfo* spellInfo, const AuraEffect* aurEff)
-		{
-	        // +80.68% from sp bonus
+        static int32 CalculateSpellAmount(Unit* caster, int32 amount, const SpellInfo* spellInfo, const AuraEffect* aurEff)
+        {
+            // +80.68% from sp bonus
             float bonus = 0.8068f;
 
             // Borrowed Time
@@ -719,22 +719,22 @@ class spell_pri_power_word_shield : public SpellScriptLoader
             amount += int32(bonus);
 
             // Twin Disciplines
-			if (AuraEffect const* twinDisciplines = caster->GetAuraEffect(SPELL_AURA_ADD_PCT_MODIFIER, SPELLFAMILY_PRIEST, 0x400000, 0, 0, caster->GetGUID()))
+            if (AuraEffect const* twinDisciplines = caster->GetAuraEffect(SPELL_AURA_ADD_PCT_MODIFIER, SPELLFAMILY_PRIEST, 0x400000, 0, 0, caster->GetGUID()))
                 AddPct(amount, twinDisciplines->GetAmount());
 
-			// Focused Power, xinef: apply positive modifier only
-			if (int32 healModifier = caster->GetMaxPositiveAuraModifier(SPELL_AURA_MOD_HEALING_DONE_PERCENT))
-				AddPct(amount, healModifier);
+            // Focused Power, xinef: apply positive modifier only
+            if (int32 healModifier = caster->GetMaxPositiveAuraModifier(SPELL_AURA_MOD_HEALING_DONE_PERCENT))
+                AddPct(amount, healModifier);
 
-	        // Arena - Dampening
+            // Arena - Dampening
             if (AuraEffect const* dampening = caster->GetAuraEffect(SPELL_GENERIC_ARENA_DAMPENING, EFFECT_0))
                 AddPct(amount, dampening->GetAmount());
             // Battleground - Dampening
             else if (AuraEffect const* dampening = caster->GetAuraEffect(SPELL_GENERIC_BATTLEGROUND_DAMPENING, EFFECT_0))
                 AddPct(amount, dampening->GetAmount());
 
-			return amount;
-		}
+            return amount;
+        }
 
         class spell_pri_power_word_shield_AuraScript : public AuraScript
         {
@@ -753,7 +753,7 @@ class spell_pri_power_word_shield : public SpellScriptLoader
             {
                 canBeRecalculated = false;
                 if (Unit* caster = GetCaster())
-					amount = CalculateSpellAmount(caster, amount, GetSpellInfo(), aurEff);
+                    amount = CalculateSpellAmount(caster, amount, GetSpellInfo(), aurEff);
             }
 
             void ReflectDamage(AuraEffect* aurEff, DamageInfo& dmgInfo, uint32& absorbAmount)
@@ -766,9 +766,9 @@ class spell_pri_power_word_shield : public SpellScriptLoader
                     if (AuraEffect* talentAurEff = owner->GetAuraEffectOfRankedSpell(SPELL_PRIEST_REFLECTIVE_SHIELD_R1, EFFECT_0))
                     {
                         int32 bp = CalculatePct(absorbAmount, talentAurEff->GetAmount());
-						// xinef: prevents infinite loop!
-						if (!dmgInfo.GetSpellInfo() || dmgInfo.GetSpellInfo()->Id != SPELL_PRIEST_REFLECTIVE_SHIELD_TRIGGERED)
-							target->CastCustomSpell(dmgInfo.GetAttacker(), SPELL_PRIEST_REFLECTIVE_SHIELD_TRIGGERED, &bp, NULL, NULL, true, NULL, aurEff);
+                        // xinef: prevents infinite loop!
+                        if (!dmgInfo.GetSpellInfo() || dmgInfo.GetSpellInfo()->Id != SPELL_PRIEST_REFLECTIVE_SHIELD_TRIGGERED)
+                            target->CastCustomSpell(dmgInfo.GetAttacker(), SPELL_PRIEST_REFLECTIVE_SHIELD_TRIGGERED, &bp, NULL, NULL, true, NULL, aurEff);
                     }
             }
 
@@ -792,17 +792,17 @@ class spell_pri_power_word_shield : public SpellScriptLoader
             {
                 Unit* caster = GetCaster();
                 Unit* target = GetExplTargetUnit();
-				if (!target)
-					return SPELL_FAILED_BAD_TARGETS;
+                if (!target)
+                    return SPELL_FAILED_BAD_TARGETS;
 
-				if (AuraEffect* aurEff = target->GetAuraEffect(SPELL_AURA_SCHOOL_ABSORB, (SpellFamilyNames)GetSpellInfo()->SpellFamilyName, GetSpellInfo()->SpellIconID, EFFECT_0))
-				{
-					int32 newAmount = GetSpellInfo()->Effects[EFFECT_0].CalcValue(caster, NULL, NULL);
-					newAmount = CalculateSpellAmount(caster, newAmount, GetSpellInfo(), aurEff);
+                if (AuraEffect* aurEff = target->GetAuraEffect(SPELL_AURA_SCHOOL_ABSORB, (SpellFamilyNames)GetSpellInfo()->SpellFamilyName, GetSpellInfo()->SpellIconID, EFFECT_0))
+                {
+                    int32 newAmount = GetSpellInfo()->Effects[EFFECT_0].CalcValue(caster, NULL, NULL);
+                    newAmount = CalculateSpellAmount(caster, newAmount, GetSpellInfo(), aurEff);
 
-					if (aurEff->GetAmount() > newAmount)
-						return SPELL_FAILED_AURA_BOUNCED;
-				}
+                    if (aurEff->GetAmount() > newAmount)
+                        return SPELL_FAILED_AURA_BOUNCED;
+                }
 
                 return SPELL_CAST_OK;
             }
@@ -953,8 +953,8 @@ class spell_pri_vampiric_touch : public SpellScriptLoader
                     if (Unit* target = GetUnitOwner())
                         if (AuraEffect const* aurEff = GetEffect(EFFECT_1))
                         {
-							int32 damage = aurEff->GetBaseAmount();
-							damage = aurEff->GetSpellInfo()->Effects[EFFECT_1].CalcValue(caster, &damage, NULL) * 8;
+                            int32 damage = aurEff->GetBaseAmount();
+                            damage = aurEff->GetSpellInfo()->Effects[EFFECT_1].CalcValue(caster, &damage, NULL) * 8;
                             // backfire damage
                             caster->CastCustomSpell(target, SPELL_PRIEST_VAMPIRIC_TOUCH_DISPEL, &damage, NULL, NULL, true, NULL, aurEff);
                         }
@@ -962,7 +962,7 @@ class spell_pri_vampiric_touch : public SpellScriptLoader
 
             bool CheckProc(ProcEventInfo& eventInfo)
             {
-				return eventInfo.GetActionTarget() && eventInfo.GetActionTarget()->IsAlive() && GetOwner()->GetGUID() == eventInfo.GetActionTarget()->GetGUID();
+                return eventInfo.GetActionTarget() && eventInfo.GetActionTarget()->IsAlive() && GetOwner()->GetGUID() == eventInfo.GetActionTarget()->GetGUID();
             }
 
             void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
@@ -974,7 +974,7 @@ class spell_pri_vampiric_touch : public SpellScriptLoader
             void Register()
             {
                 AfterDispel += AuraDispelFn(spell_pri_vampiric_touch_AuraScript::HandleDispel);
-				DoCheckProc += AuraCheckProcFn(spell_pri_vampiric_touch_AuraScript::CheckProc);
+                DoCheckProc += AuraCheckProcFn(spell_pri_vampiric_touch_AuraScript::CheckProc);
                 OnEffectProc += AuraEffectProcFn(spell_pri_vampiric_touch_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
             }
         };
@@ -987,10 +987,10 @@ class spell_pri_vampiric_touch : public SpellScriptLoader
 
 void AddSC_priest_spell_scripts()
 {
-	// Ours
-	new spell_pri_shadowfiend_scaling();
+    // Ours
+    new spell_pri_shadowfiend_scaling();
 
-	// Theirs
+    // Theirs
     new spell_pri_circle_of_healing();
     new spell_pri_divine_aegis();
     new spell_pri_divine_hymn();

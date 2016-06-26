@@ -37,9 +37,9 @@ class instance_ramparts : public InstanceMapScript
                 if (!InstanceScript::SetBossState(type, state))
                     return false;
 
-				if (type == DATA_VAZRUDEN && state == DONE)
+                if (type == DATA_VAZRUDEN && state == DONE)
                     if (GameObject* chest = instance->GetGameObject(felIronChestGUID))
-						chest->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                        chest->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
                 return true;
             }
 

@@ -15,7 +15,7 @@ class instance_the_botanica : public InstanceMapScript
         {
             instance_the_botanica_InstanceMapScript(Map* map) : InstanceScript(map)
             {
-				SetBossNumber(MAX_ENCOUNTER);
+                SetBossNumber(MAX_ENCOUNTER);
             }
 
             bool SetBossState(uint32 type, EncounterState state)
@@ -85,42 +85,42 @@ public:
     {
         PrepareAuraScript(spell_botanica_call_of_the_falcon_AuraScript)
 
-		bool Load()
-		{
-			_falconSet.clear();
-			return true;
-		}
-        
-		void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        bool Load()
         {
-			std::list<Creature*> creatureList;
-			GetUnitOwner()->GetCreaturesWithEntryInRange(creatureList, 80.0f, NPC_BLOODFALCON);
-			for (std::list<Creature*>::const_iterator itr = creatureList.begin(); itr != creatureList.end(); ++itr)
-			{
-				(*itr)->TauntApply(GetUnitOwner());
-				(*itr)->AddThreat(GetUnitOwner(), 10000000.0f);
-				_falconSet.insert((*itr)->GetGUID());
-			}
+            _falconSet.clear();
+            return true;
+        }
+        
+        void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            std::list<Creature*> creatureList;
+            GetUnitOwner()->GetCreaturesWithEntryInRange(creatureList, 80.0f, NPC_BLOODFALCON);
+            for (std::list<Creature*>::const_iterator itr = creatureList.begin(); itr != creatureList.end(); ++itr)
+            {
+                (*itr)->TauntApply(GetUnitOwner());
+                (*itr)->AddThreat(GetUnitOwner(), 10000000.0f);
+                _falconSet.insert((*itr)->GetGUID());
+            }
         }
 
-		void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
-			for (std::set<uint64>::const_iterator itr = _falconSet.begin(); itr != _falconSet.end(); ++itr)
-				if (Creature* falcon = ObjectAccessor::GetCreature(*GetUnitOwner(), *itr))
-				{
-					falcon->TauntFadeOut(GetUnitOwner());
-					falcon->AddThreat(GetUnitOwner(), -10000000.0f);
-				}
+            for (std::set<uint64>::const_iterator itr = _falconSet.begin(); itr != _falconSet.end(); ++itr)
+                if (Creature* falcon = ObjectAccessor::GetCreature(*GetUnitOwner(), *itr))
+                {
+                    falcon->TauntFadeOut(GetUnitOwner());
+                    falcon->AddThreat(GetUnitOwner(), -10000000.0f);
+                }
         }
 
         void Register()
         {
             OnEffectApply += AuraEffectApplyFn(spell_botanica_call_of_the_falcon_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-			OnEffectRemove += AuraEffectRemoveFn(spell_botanica_call_of_the_falcon_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+            OnEffectRemove += AuraEffectRemoveFn(spell_botanica_call_of_the_falcon_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
         }
 
-		private:
-			std::set<uint64> _falconSet;
+        private:
+            std::set<uint64> _falconSet;
     };
 
     AuraScript* GetAuraScript() const
@@ -138,52 +138,52 @@ class spell_botanica_shift_form : public SpellScriptLoader
         {
             PrepareAuraScript(spell_botanica_shift_form_AuraScript);
 
-			bool Load()
-			{
-				_lastSchool = 0;
-				_lastForm = 0;
-				_swapTime = 0;
-				return true;
-			}
-
-			bool CheckProc(ProcEventInfo& eventInfo)
+            bool Load()
             {
-				if (SpellInfo const* spellInfo = eventInfo.GetDamageInfo()->GetSpellInfo())
-				{
-					if ((spellInfo->GetSchoolMask() & _lastSchool) && _swapTime > time(NULL))
-						return false;
+                _lastSchool = 0;
+                _lastForm = 0;
+                _swapTime = 0;
+                return true;
+            }
 
-					uint32 form = 0;
-					switch (GetFirstSchoolInMask(spellInfo->GetSchoolMask()))
-					{
-						case SPELL_SCHOOL_FIRE:		form = SPELL_FIRE_FORM;		break;
-						case SPELL_SCHOOL_FROST:	form = SPELL_FROST_FORM;	break;
-						case SPELL_SCHOOL_ARCANE:	form = SPELL_ARCANE_FORM;	break;
-						case SPELL_SCHOOL_SHADOW:	form = SPELL_SHADOW_FORM;	break;
-					}
+            bool CheckProc(ProcEventInfo& eventInfo)
+            {
+                if (SpellInfo const* spellInfo = eventInfo.GetDamageInfo()->GetSpellInfo())
+                {
+                    if ((spellInfo->GetSchoolMask() & _lastSchool) && _swapTime > time(NULL))
+                        return false;
 
-					if (form)
-					{
-						_swapTime = time(NULL) + 6;
-						_lastSchool = spellInfo->GetSchoolMask();
-						GetUnitOwner()->RemoveAurasDueToSpell(_lastForm);
-						_lastForm = form;
-						GetUnitOwner()->CastSpell(GetUnitOwner(), _lastForm, true);
-					}
-				}
+                    uint32 form = 0;
+                    switch (GetFirstSchoolInMask(spellInfo->GetSchoolMask()))
+                    {
+                        case SPELL_SCHOOL_FIRE:     form = SPELL_FIRE_FORM;     break;
+                        case SPELL_SCHOOL_FROST:    form = SPELL_FROST_FORM;    break;
+                        case SPELL_SCHOOL_ARCANE:   form = SPELL_ARCANE_FORM;   break;
+                        case SPELL_SCHOOL_SHADOW:   form = SPELL_SHADOW_FORM;   break;
+                    }
 
-				return false;
+                    if (form)
+                    {
+                        _swapTime = time(NULL) + 6;
+                        _lastSchool = spellInfo->GetSchoolMask();
+                        GetUnitOwner()->RemoveAurasDueToSpell(_lastForm);
+                        _lastForm = form;
+                        GetUnitOwner()->CastSpell(GetUnitOwner(), _lastForm, true);
+                    }
+                }
+
+                return false;
             }
 
             void Register()
             {
-				DoCheckProc += AuraCheckProcFn(spell_botanica_shift_form_AuraScript::CheckProc);
+                DoCheckProc += AuraCheckProcFn(spell_botanica_shift_form_AuraScript::CheckProc);
             }
 
-			private:
-				uint32 _lastSchool;
-				uint32 _lastForm;
-				uint32 _swapTime;
+            private:
+                uint32 _lastSchool;
+                uint32 _lastForm;
+                uint32 _swapTime;
         };
 
         AuraScript* GetAuraScript() const
@@ -195,6 +195,6 @@ class spell_botanica_shift_form : public SpellScriptLoader
 void AddSC_instance_the_botanica()
 {
     new instance_the_botanica();
-	new spell_botanica_call_of_the_falcon();
-	new spell_botanica_shift_form();
+    new spell_botanica_call_of_the_falcon();
+    new spell_botanica_shift_form();
 }

@@ -145,33 +145,33 @@ Map* MapInstanced::CreateInstanceForPlayer(const uint32 mapId, Player* player)
 
         if (destInstId)
         {
-			InstanceSave* pSave = sInstanceSaveMgr->GetInstanceSave(destInstId);
-			ASSERT(pSave); // pussywizard: must exist
+            InstanceSave* pSave = sInstanceSaveMgr->GetInstanceSave(destInstId);
+            ASSERT(pSave); // pussywizard: must exist
 
             map = FindInstanceMap(destInstId);
             if (!map)
                 map = CreateInstance(destInstId, pSave, realdiff);
-			else if ((mapId == 631 || mapId == 724) && !map->HavePlayers() && map->GetDifficulty() != realdiff)
-			{
-				if (player->isBeingLoaded()) // pussywizard: crashfix (assert(passengers.empty) fail in ~transport), could be added to a transport during loading from db
-					return NULL;
+            else if ((mapId == 631 || mapId == 724) && !map->HavePlayers() && map->GetDifficulty() != realdiff)
+            {
+                if (player->isBeingLoaded()) // pussywizard: crashfix (assert(passengers.empty) fail in ~transport), could be added to a transport during loading from db
+                    return NULL;
 
-				if (!map->AllTransportsEmpty())
-					map->AllTransportsRemovePassengers(); // pussywizard: gameobjects / summons (assert(passengers.empty) fail in ~transport)
+                if (!map->AllTransportsEmpty())
+                    map->AllTransportsRemovePassengers(); // pussywizard: gameobjects / summons (assert(passengers.empty) fail in ~transport)
 
-				for (InstancedMaps::iterator i = m_InstancedMaps.begin(); i != m_InstancedMaps.end(); ++i)
-					if (i->first == destInstId)
-					{
-						DestroyInstance(i);
-						map = CreateInstance(destInstId, pSave, realdiff);
-						break;
-					}
-			}
+                for (InstancedMaps::iterator i = m_InstancedMaps.begin(); i != m_InstancedMaps.end(); ++i)
+                    if (i->first == destInstId)
+                    {
+                        DestroyInstance(i);
+                        map = CreateInstance(destInstId, pSave, realdiff);
+                        break;
+                    }
+            }
         }
         else
         {
             uint32 newInstanceId = sMapMgr->GenerateInstanceId();
-			ASSERT(!FindInstanceMap(newInstanceId)); // pussywizard: instance with new id can't exist
+            ASSERT(!FindInstanceMap(newInstanceId)); // pussywizard: instance with new id can't exist
             Difficulty diff = player->GetGroup() ? player->GetGroup()->GetDifficulty(IsRaid()) : player->GetDifficulty(IsRaid());
             map = CreateInstance(newInstanceId, NULL, diff);
         }
@@ -209,13 +209,13 @@ InstanceMap* MapInstanced::CreateInstance(uint32 InstanceId, InstanceSave* save,
 
     map->LoadRespawnTimes();
 
-	if (save)
-		map->CreateInstanceScript(true, save->GetInstanceData(), save->GetCompletedEncounterMask());
-	else
-		map->CreateInstanceScript(false, "", 0);
+    if (save)
+        map->CreateInstanceScript(true, save->GetInstanceData(), save->GetCompletedEncounterMask());
+    else
+        map->CreateInstanceScript(false, "", 0);
 
-	if (!save) // this is for sure a dungeon (assert above), no need to check here
-		sInstanceSaveMgr->AddInstanceSave(GetId(), InstanceId, difficulty);
+    if (!save) // this is for sure a dungeon (assert above), no need to check here
+        sInstanceSaveMgr->AddInstanceSave(GetId(), InstanceId, difficulty);
 
     m_InstancedMaps[InstanceId] = map;
     return map;

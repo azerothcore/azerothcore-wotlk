@@ -108,20 +108,20 @@ class LFGQueue
         void UpdateBestCompatibleInQueue(LfgQueueDataContainer::iterator itrQueue, Lfg5Guids const& key);
 
         LfgCompatibility FindNewGroups(const uint64& newGuid);
-		LfgCompatibility CheckCompatibility(Lfg5Guids const& checkWith, const uint64& newGuid, uint64& foundMask, uint32& foundCount, const std::set<Lfg5Guids>& currentCompatibles);
+        LfgCompatibility CheckCompatibility(Lfg5Guids const& checkWith, const uint64& newGuid, uint64& foundMask, uint32& foundCount, const std::set<Lfg5Guids>& currentCompatibles);
 
         // Queue
         uint32 m_QueueStatusTimer;                         ///< used to check interval of sending queue status
         LfgQueueDataContainer QueueDataStore;              ///< Queued groups
         LfgCompatibleContainer CompatibleList;             ///< Compatible dungeons
-		LfgCompatibleContainer CompatibleTempList;         ///< new compatibles are added to this container while main one is being iterated
+        LfgCompatibleContainer CompatibleTempList;         ///< new compatibles are added to this container while main one is being iterated
 
         LfgWaitTimesContainer waitTimesAvgStore;           ///< Average wait time to find a group queuing as multiple roles
         LfgWaitTimesContainer waitTimesTankStore;          ///< Average wait time to find a group queuing as tank
         LfgWaitTimesContainer waitTimesHealerStore;        ///< Average wait time to find a group queuing as healer
         LfgWaitTimesContainer waitTimesDpsStore;           ///< Average wait time to find a group queuing as dps
         LfgGuidList newToQueueStore;                       ///< New groups to add to queue
-		LfgGuidList restoredAfterProposal;
+        LfgGuidList restoredAfterProposal;
 };
 
 } // namespace lfg

@@ -72,7 +72,7 @@ void ConfusedMovementGenerator<T>::DoInitialize(T* unit)
                 i_waypoints[idx][2] = idx > 0 ? i_waypoints[idx-1][2] : z;
                 continue;
             }
-			
+            
         }
         else
         {
@@ -91,10 +91,10 @@ void ConfusedMovementGenerator<T>::DoInitialize(T* unit)
         i_waypoints[idx][2] = new_z;
     }
 
-	// Xinef: Call movement immediately to broadcast movement packet
-	// Xinef: Initial timer is set to 1 so update with 1
-	i_nextMove = urand(1, MAX_CONF_WAYPOINTS);
-	DoUpdate(unit, 1);
+    // Xinef: Call movement immediately to broadcast movement packet
+    // Xinef: Initial timer is set to 1 so update with 1
+    i_nextMove = urand(1, MAX_CONF_WAYPOINTS);
+    DoUpdate(unit, 1);
 
     unit->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_CONFUSED);
     unit->AddUnitState(UNIT_STATE_CONFUSED | UNIT_STATE_CONFUSED_MOVE);
@@ -117,7 +117,7 @@ void ConfusedMovementGenerator<Player>::_InitSpecific(Player* , bool &is_water_o
 template<class T>
 void ConfusedMovementGenerator<T>::DoReset(T* unit)
 {
-	DoInitialize(unit);
+    DoInitialize(unit);
 }
 
 template<class T>

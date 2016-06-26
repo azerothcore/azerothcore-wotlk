@@ -79,9 +79,9 @@ DiminishingGroup GetDiminishingReturnsGroupForSpell(SpellInfo const* spellproto,
             // Gnaw
             else if (spellproto->Id == 47481)
                 return DIMINISHING_CONTROLLED_STUN;
-			// Screams of the Past
-			else if (spellproto->Id == 7074)
-				return DIMINISHING_NONE;
+            // Screams of the Past
+            else if (spellproto->Id == 7074)
+                return DIMINISHING_NONE;
             break;
         }
         // Event spells
@@ -112,7 +112,7 @@ DiminishingGroup GetDiminishingReturnsGroupForSpell(SpellInfo const* spellproto,
             if (spellproto->SpellFamilyFlags[0] & 0x2)
                 return DIMINISHING_LIMITONLY;
             // Improved Hamstring
-			else if (spellproto->Id == 23694)
+            else if (spellproto->Id == 23694)
                 return DIMINISHING_ROOT;
             // Charge Stun (own diminishing)
             else if (spellproto->SpellFamilyFlags[0] & 0x01000000)
@@ -235,8 +235,8 @@ DiminishingGroup GetDiminishingReturnsGroupForSpell(SpellInfo const* spellproto,
         return DIMINISHING_BANISH;
     if (mechanic & (1 << MECHANIC_ROOT))
         return triggered ? DIMINISHING_ROOT : DIMINISHING_CONTROLLED_ROOT;
-	if (mechanic & (1 << MECHANIC_HORROR))
-		return DIMINISHING_HORROR;
+    if (mechanic & (1 << MECHANIC_HORROR))
+        return DIMINISHING_HORROR;
 
     return DIMINISHING_NONE;
 }
@@ -314,7 +314,7 @@ int32 GetDiminishingReturnsLimitDuration(DiminishingGroup group, SpellInfo const
             // Curse of Elements - limit to 120 seconds in PvP
             else if (spellproto->SpellFamilyFlags[1] & 0x200)
                return 120 * IN_MILLISECONDS;
-			// Curse of Exhaustion
+            // Curse of Exhaustion
             else if (spellproto->SpellFamilyFlags[0] & 0x400000)
                 return 12 * IN_MILLISECONDS;
             break;
@@ -434,9 +434,9 @@ bool SpellMgr::ComputeIsSpellValid(SpellInfo const *spellInfo, bool msg)
 
 bool SpellMgr::IsSpellValid(SpellInfo const *spellInfo)
 {
-	if (!spellInfo)
-		return false;
-	return spellInfo->IsSpellValid();
+    if (!spellInfo)
+        return false;
+    return spellInfo->IsSpellValid();
 }
 
 void DeleteSpellFromAllPlayers(uint32 spellId)
@@ -455,7 +455,7 @@ bool SpellMgr::CheckSpellValid(SpellInfo const* spellInfo, uint32 spellId, bool 
     if (!spellInfo)
     {
         DeleteSpellFromAllPlayers(spellId);
-		sLog->outError("Player::%s: Non-existed in SpellStore spell #%u request.", (isTalent ? "AddTalent" : "addSpell"), spellId);
+        sLog->outError("Player::%s: Non-existed in SpellStore spell #%u request.", (isTalent ? "AddTalent" : "addSpell"), spellId);
         return false;
     }
 
@@ -466,7 +466,7 @@ bool SpellMgr::CheckSpellValid(SpellInfo const* spellInfo, uint32 spellId, bool 
         return false;
     }
 
-	return true;
+    return true;
 }
 
 uint32 SpellMgr::GetSpellDifficultyId(uint32 spellId) const
@@ -622,7 +622,7 @@ bool SpellMgr::IsSpellRequiringSpell(uint32 spellid, uint32 req_spellid) const
 
 bool SpellMgr::IsAdditionalTalentSpell(uint32 spellId) const
 {
-	return mTalentSpellAdditionalSet.find(spellId) != mTalentSpellAdditionalSet.end();
+    return mTalentSpellAdditionalSet.find(spellId) != mTalentSpellAdditionalSet.end();
 }
 
 SpellLearnSkillNode const* SpellMgr::GetSpellLearnSkill(uint32 spell_id) const
@@ -644,70 +644,70 @@ SpellTargetPosition const* SpellMgr::GetSpellTargetPosition(uint32 spell_id, Spe
 
 SpellGroupStackFlags SpellMgr::GetGroupStackFlags(uint32 groupid) const
 {
-	SpellGroupStackMap::const_iterator itr = mSpellGroupStackMap.find(groupid);
-	if (itr != mSpellGroupStackMap.end())
-		return itr->second;
+    SpellGroupStackMap::const_iterator itr = mSpellGroupStackMap.find(groupid);
+    if (itr != mSpellGroupStackMap.end())
+        return itr->second;
 
-	return SPELL_GROUP_STACK_FLAG_NONE;
+    return SPELL_GROUP_STACK_FLAG_NONE;
 }
 
 uint32 SpellMgr::GetSpellGroup(uint32 spell_id) const
 {
-	uint32 first_rank = GetFirstSpellInChain(spell_id);
-	SpellGroupMap::const_iterator itr = mSpellGroupMap.find(first_rank);
-	if (itr != mSpellGroupMap.end())
-		return itr->second.groupId;
+    uint32 first_rank = GetFirstSpellInChain(spell_id);
+    SpellGroupMap::const_iterator itr = mSpellGroupMap.find(first_rank);
+    if (itr != mSpellGroupMap.end())
+        return itr->second.groupId;
 
-	return 0;
+    return 0;
 }
 
 SpellGroupSpecialFlags SpellMgr::GetSpellGroupSpecialFlags(uint32 spell_id) const
 {
-	uint32 first_rank = GetFirstSpellInChain(spell_id);
-	SpellGroupMap::const_iterator itr = mSpellGroupMap.find(first_rank);
-	if (itr != mSpellGroupMap.end())
-		return itr->second.specialFlags;
+    uint32 first_rank = GetFirstSpellInChain(spell_id);
+    SpellGroupMap::const_iterator itr = mSpellGroupMap.find(first_rank);
+    if (itr != mSpellGroupMap.end())
+        return itr->second.specialFlags;
 
-	return SPELL_GROUP_SPECIAL_FLAG_NONE;
+    return SPELL_GROUP_SPECIAL_FLAG_NONE;
 }
 
 SpellGroupStackFlags SpellMgr::CheckSpellGroupStackRules(SpellInfo const* spellInfo1, SpellInfo const* spellInfo2, bool remove, bool areaAura) const
 {
     uint32 spellid_1 = spellInfo1->GetFirstRankSpell()->Id;
     uint32 spellid_2 = spellInfo2->GetFirstRankSpell()->Id;
-	// xinef: dunno why i added this
+    // xinef: dunno why i added this
     if (spellid_1 == spellid_2 && remove && !areaAura)
         return SPELL_GROUP_STACK_FLAG_NONE;
 
-	uint32 groupId = GetSpellGroup(spellid_1);
-	if (groupId > 0 && groupId == GetSpellGroup(spellid_2))
-	{
-		SpellGroupSpecialFlags flag1 = GetSpellGroupSpecialFlags(spellid_1);
-		SpellGroupSpecialFlags flag2 = GetSpellGroupSpecialFlags(spellid_2);
-		SpellGroupStackFlags additionFlag = SPELL_GROUP_STACK_FLAG_NONE;
-		// xinef: first flags are used for elixir stacking rules
-		if (flag1 & SPELL_GROUP_SPECIAL_FLAG_STACK_EXCLUSIVE_MAX && flag2 & SPELL_GROUP_SPECIAL_FLAG_STACK_EXCLUSIVE_MAX)
-		{
-			if (flag1 & flag2)
-				return SPELL_GROUP_STACK_FLAG_NEVER_STACK;
-		}
-		// xinef: check only flag1 (new spell)
-		else if (flag1 & SPELL_GROUP_SPECIAL_FLAG_FORCED_STRONGEST)
-			additionFlag = SPELL_GROUP_STACK_FLAG_FORCED_STRONGEST;
-		else if (flag2 & SPELL_GROUP_SPECIAL_FLAG_FORCED_STRONGEST)
-			additionFlag = SPELL_GROUP_STACK_FLAG_FORCED_WEAKEST;
+    uint32 groupId = GetSpellGroup(spellid_1);
+    if (groupId > 0 && groupId == GetSpellGroup(spellid_2))
+    {
+        SpellGroupSpecialFlags flag1 = GetSpellGroupSpecialFlags(spellid_1);
+        SpellGroupSpecialFlags flag2 = GetSpellGroupSpecialFlags(spellid_2);
+        SpellGroupStackFlags additionFlag = SPELL_GROUP_STACK_FLAG_NONE;
+        // xinef: first flags are used for elixir stacking rules
+        if (flag1 & SPELL_GROUP_SPECIAL_FLAG_STACK_EXCLUSIVE_MAX && flag2 & SPELL_GROUP_SPECIAL_FLAG_STACK_EXCLUSIVE_MAX)
+        {
+            if (flag1 & flag2)
+                return SPELL_GROUP_STACK_FLAG_NEVER_STACK;
+        }
+        // xinef: check only flag1 (new spell)
+        else if (flag1 & SPELL_GROUP_SPECIAL_FLAG_FORCED_STRONGEST)
+            additionFlag = SPELL_GROUP_STACK_FLAG_FORCED_STRONGEST;
+        else if (flag2 & SPELL_GROUP_SPECIAL_FLAG_FORCED_STRONGEST)
+            additionFlag = SPELL_GROUP_STACK_FLAG_FORCED_WEAKEST;
 
-		return SpellGroupStackFlags(GetGroupStackFlags(groupId) | additionFlag);
-	}
+        return SpellGroupStackFlags(GetGroupStackFlags(groupId) | additionFlag);
+    }
 
-	return SPELL_GROUP_STACK_FLAG_NONE;
+    return SPELL_GROUP_STACK_FLAG_NONE;
 }
 
 void SpellMgr::GetSetOfSpellsInSpellGroupWithFlag(uint32 group_id, SpellGroupSpecialFlags flag, std::set<uint32>& availableElixirs) const
 {
-	for (SpellGroupMap::const_iterator itr = mSpellGroupMap.begin(); itr != mSpellGroupMap.end(); ++itr)
-		if (itr->second.groupId == group_id && itr->second.specialFlags == flag)
-			availableElixirs.insert(itr->first); // insert spell id
+    for (SpellGroupMap::const_iterator itr = mSpellGroupMap.begin(); itr != mSpellGroupMap.end(); ++itr)
+        if (itr->second.groupId == group_id && itr->second.specialFlags == flag)
+            availableElixirs.insert(itr->first); // insert spell id
 }
 
 SpellProcEventEntry const* SpellMgr::GetSpellProcEvent(uint32 spellId) const
@@ -952,11 +952,11 @@ SpellThreatEntry const* SpellMgr::GetSpellThreatEntry(uint32 spellID) const
 
 float SpellMgr::GetSpellMixologyBonus(uint32 spellId) const
 {
-	SpellMixologyMap::const_iterator itr = mSpellMixologyMap.find(spellId);
-	if (itr == mSpellMixologyMap.end())
-		return 30.0f;
+    SpellMixologyMap::const_iterator itr = mSpellMixologyMap.find(spellId);
+    if (itr == mSpellMixologyMap.end())
+        return 30.0f;
 
-	return itr->second;
+    return itr->second;
 }
 
 SkillLineAbilityMapBounds SpellMgr::GetSkillLineAbilityMapBounds(uint32 spell_id) const
@@ -1073,12 +1073,12 @@ bool SpellArea::IsFitToRequirements(Player const* player, uint32 newZone, uint32
                 return false;
             if (!player->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) && !player->HasAuraType(SPELL_AURA_FLY))
                 return false;
-			// Xinef: Underbelly elixir
-			if (player->GetPositionZ() < 637.0f && player->HasAuraType(SPELL_AURA_TRANSFORM))
-				return false;
+            // Xinef: Underbelly elixir
+            if (player->GetPositionZ() < 637.0f && player->HasAuraType(SPELL_AURA_TRANSFORM))
+                return false;
             break;
         }
-		case 58730: // No fly Zone - Wintergrasp
+        case 58730: // No fly Zone - Wintergrasp
         {
             if (!player)
                 return false;
@@ -1088,16 +1088,16 @@ bool SpellArea::IsFitToRequirements(Player const* player, uint32 newZone, uint32
                 return false;
             break;
         }
-		// xinef: northrend flying mounts
-		// xinef: NE wisp and spectral gryphon
-		case 55164:
-		case 55173:
-		{
-			Battlefield* Bf = sBattlefieldMgr->GetBattlefieldToZoneId(player->GetZoneId());
-			return !Bf || Bf->CanFlyIn();
-		}
-		case 57940: // Essence of Wintergrasp OUTSIDE
-		case 58045: // Essence of Wintergrasp INSIDE
+        // xinef: northrend flying mounts
+        // xinef: NE wisp and spectral gryphon
+        case 55164:
+        case 55173:
+        {
+            Battlefield* Bf = sBattlefieldMgr->GetBattlefieldToZoneId(player->GetZoneId());
+            return !Bf || Bf->CanFlyIn();
+        }
+        case 57940: // Essence of Wintergrasp OUTSIDE
+        case 58045: // Essence of Wintergrasp INSIDE
         {
             if (!player)
                 return false;
@@ -1122,16 +1122,16 @@ bool SpellArea::IsFitToRequirements(Player const* player, uint32 newZone, uint32
             if (!player)
                 return false;
 
-			Battleground* bg = player->GetBattleground();
-			if (!bg || bg->GetBgTypeID() != BATTLEGROUND_IC)
-				return false;
+            Battleground* bg = player->GetBattleground();
+            if (!bg || bg->GetBgTypeID() != BATTLEGROUND_IC)
+                return false;
 
             uint8 nodeType = spellId == 68719 ? NODE_TYPE_REFINERY : NODE_TYPE_QUARRY;
             uint8 nodeState = player->GetTeamId() == TEAM_ALLIANCE ? NODE_STATE_CONTROLLED_A : NODE_STATE_CONTROLLED_H;
 
             return bg->ToBattlegroundIC()->GetNodeState(nodeType) == nodeState;
         }
-		case 56618: // Horde Controls Factory Phase Shift
+        case 56618: // Horde Controls Factory Phase Shift
         case 56617: // Alliance Controls Factory Phase Shift
         {
             if (!player)
@@ -1149,27 +1149,27 @@ bool SpellArea::IsFitToRequirements(Player const* player, uint32 newZone, uint32
                 return spellId == 56618;
             else if (team == TEAM_ALLIANCE)
                 return spellId == 56617;
-			break;
+            break;
         }
-		// Hellscream's Warsong
-		case 73816:
-		case 73818:
-		case 73819:
-		case 73820:
-		case 73821:
-		case 73822:
-		// Strength of Wrynn
-		case 73762:
-		case 73824:
-		case 73825:
-		case 73826:
-		case 73827:
-		case 73828:
-			if (player)
-				if (InstanceScript* s = const_cast<Player*>(player)->GetInstanceScript())
-					return s->GetData(251 /*DATA_BUFF_AVAILABLE*/) != 0;
-			return false;
-			break;
+        // Hellscream's Warsong
+        case 73816:
+        case 73818:
+        case 73819:
+        case 73820:
+        case 73821:
+        case 73822:
+        // Strength of Wrynn
+        case 73762:
+        case 73824:
+        case 73825:
+        case 73826:
+        case 73827:
+        case 73828:
+            if (player)
+                if (InstanceScript* s = const_cast<Player*>(player)->GetInstanceScript())
+                    return s->GetData(251 /*DATA_BUFF_AVAILABLE*/) != 0;
+            return false;
+            break;
     }
 
     return true;
@@ -1412,9 +1412,9 @@ void SpellMgr::LoadSpellRequired()
         mSpellsReqSpell.insert (std::pair<uint32, uint32>(spellReq, spellId));
         ++count;
 
-		// xinef: fill additionalTalentInfo data, currently Blessing of Sanctuary only
-		if (GetTalentSpellCost(spellReq) > 0)
-			mTalentSpellAdditionalSet.insert(spellId);
+        // xinef: fill additionalTalentInfo data, currently Blessing of Sanctuary only
+        if (GetTalentSpellCost(spellReq) > 0)
+            mTalentSpellAdditionalSet.insert(spellId);
 
     } while (result->NextRow());
 
@@ -1587,8 +1587,8 @@ void SpellMgr::LoadSpellGroups()
 
         uint32 group_id = fields[0].GetUInt32();
         int32 spell_id = fields[1].GetUInt32();
-		SpellGroupSpecialFlags specialFlag = (SpellGroupSpecialFlags)fields[2].GetUInt32();
-		SpellInfo const* spellInfo = GetSpellInfo(spell_id);
+        SpellGroupSpecialFlags specialFlag = (SpellGroupSpecialFlags)fields[2].GetUInt32();
+        SpellInfo const* spellInfo = GetSpellInfo(spell_id);
 
         if (!spellInfo)
         {
@@ -1601,24 +1601,24 @@ void SpellMgr::LoadSpellGroups()
             continue;
         }
 
-		if (mSpellGroupMap.find(spell_id) != mSpellGroupMap.end())
-		{
+        if (mSpellGroupMap.find(spell_id) != mSpellGroupMap.end())
+        {
             sLog->outErrorDb("Spell %u listed in `spell_group` has more than one group", spell_id);
             continue;
         }
 
-		if (specialFlag >= SPELL_GROUP_SPECIAL_FLAG_MAX)
-		{
+        if (specialFlag >= SPELL_GROUP_SPECIAL_FLAG_MAX)
+        {
             sLog->outErrorDb("Spell %u listed in `spell_group` has invalid special flag!", spell_id);
             continue;
         }
 
-		SpellStackInfo ssi;
-		ssi.groupId = group_id;
-		ssi.specialFlags = specialFlag;
-		mSpellGroupMap[spell_id] = ssi;
+        SpellStackInfo ssi;
+        ssi.groupId = group_id;
+        ssi.specialFlags = specialFlag;
+        mSpellGroupMap[spell_id] = ssi;
 
-		++count;
+        ++count;
     } while (result->NextRow());
 
 
@@ -1654,13 +1654,13 @@ void SpellMgr::LoadSpellGroupStackRules()
             continue;
         }
 
-		bool present = false;
-		for (SpellGroupMap::const_iterator itr = mSpellGroupMap.begin(); itr != mSpellGroupMap.end(); ++itr)
-			if (itr->second.groupId == group_id)
-			{
-				present = true;
-				break;
-			}
+        bool present = false;
+        for (SpellGroupMap::const_iterator itr = mSpellGroupMap.begin(); itr != mSpellGroupMap.end(); ++itr)
+            if (itr->second.groupId == group_id)
+            {
+                present = true;
+                break;
+            }
 
 
         if (!present)
@@ -1710,7 +1710,7 @@ void SpellMgr::LoadSpellProcEvents()
         SpellInfo const* spellInfo = GetSpellInfo(spellId);
         if (!spellInfo)
         {
-			sLog->outErrorDb("Spell %u listed in `spell_proc_event` does not exist", spellId);
+            sLog->outErrorDb("Spell %u listed in `spell_proc_event` does not exist", spellId);
             continue;
         }
 
@@ -2125,7 +2125,7 @@ void SpellMgr::LoadEnchantCustomAttr()
             continue;
 
         // TODO: find a better check
-		// Xinef: commented second part, fixes warlock enchants like firestone, spellstone
+        // Xinef: commented second part, fixes warlock enchants like firestone, spellstone
         if (!spellInfo->HasAttribute(SPELL_ATTR2_PRESERVE_ENCHANT_IN_ARENA)/* || !spellInfo->HasAttribute(SPELL_ATTR0_NOT_SHAPESHIFT)*/)
             continue;
 
@@ -2666,8 +2666,8 @@ void SpellMgr::LoadSpellSpecificAndAuraState()
         spellInfo = mSpellInfoMap[i];
         if (!spellInfo)
             continue;
-		spellInfo->_spellSpecific = spellInfo->LoadSpellSpecific();
-		spellInfo->_auraState = spellInfo->LoadAuraState();
+        spellInfo->_spellSpecific = spellInfo->LoadSpellSpecific();
+        spellInfo->_auraState = spellInfo->LoadAuraState();
     }
 
     sLog->outString(">> Loaded spell specific and aura state in %u ms", GetMSTimeDiffToNow(oldMSTime));
@@ -2678,7 +2678,7 @@ void SpellMgr::LoadSpellCustomAttr()
 {
     uint32 oldMSTime = getMSTime();
 
-	// xinef: create talent spells set
+    // xinef: create talent spells set
     for (uint32 i = 0; i < sTalentStore.GetNumRows(); ++i)
     {
         TalentEntry const* talentInfo = sTalentStore.LookupEntry(i);
@@ -2687,12 +2687,12 @@ void SpellMgr::LoadSpellCustomAttr()
 
         for (uint8 j = 0; j < MAX_TALENT_RANK; j++)
             if (uint32 spellId = talentInfo->RankID[j])
-				if (const SpellInfo* spellInfo = GetSpellInfo(spellId))
-					for (uint8 k = 0; k < MAX_SPELL_EFFECTS; ++k)
-						if (spellInfo->Effects[k].Effect == SPELL_EFFECT_LEARN_SPELL)
-							if (const SpellInfo* learnSpell = GetSpellInfo(spellInfo->Effects[k].TriggerSpell))
-								if (learnSpell->IsRanked() && !learnSpell->HasAttribute(SpellAttr0(SPELL_ATTR0_PASSIVE|SPELL_ATTR0_HIDDEN_CLIENTSIDE)))
-									mTalentSpellAdditionalSet.insert(learnSpell->Id);
+                if (const SpellInfo* spellInfo = GetSpellInfo(spellId))
+                    for (uint8 k = 0; k < MAX_SPELL_EFFECTS; ++k)
+                        if (spellInfo->Effects[k].Effect == SPELL_EFFECT_LEARN_SPELL)
+                            if (const SpellInfo* learnSpell = GetSpellInfo(spellInfo->Effects[k].TriggerSpell))
+                                if (learnSpell->IsRanked() && !learnSpell->HasAttribute(SpellAttr0(SPELL_ATTR0_PASSIVE|SPELL_ATTR0_HIDDEN_CLIENTSIDE)))
+                                    mTalentSpellAdditionalSet.insert(learnSpell->Id);
     }
 
     SpellInfo* spellInfo = NULL;
@@ -2791,60 +2791,60 @@ void SpellMgr::LoadSpellCustomAttr()
             }
         }
 
-		// Xinef: spells ignoring hit result should not be binary
-		if (!spellInfo->HasAttribute(SPELL_ATTR3_IGNORE_HIT_RESULT))
-		{
-			for (uint8 j = 0; j < MAX_SPELL_EFFECTS; ++j)
-			{
-				if (spellInfo->Effects[j].Effect)
-				{
-					switch(spellInfo->Effects[j].Effect)
-					{
-						case SPELL_EFFECT_SCHOOL_DAMAGE:
-						case SPELL_EFFECT_WEAPON_DAMAGE:
-						case SPELL_EFFECT_WEAPON_DAMAGE_NOSCHOOL:
-						case SPELL_EFFECT_NORMALIZED_WEAPON_DMG:
-						case SPELL_EFFECT_WEAPON_PERCENT_DAMAGE:
-						case SPELL_EFFECT_TRIGGER_SPELL:
-						case SPELL_EFFECT_TRIGGER_SPELL_WITH_VALUE:
-							continue;
-						case SPELL_EFFECT_PERSISTENT_AREA_AURA:
-						case SPELL_EFFECT_APPLY_AURA:
-						case SPELL_EFFECT_APPLY_AREA_AURA_PARTY:
-						case SPELL_EFFECT_APPLY_AREA_AURA_RAID:
-						case SPELL_EFFECT_APPLY_AREA_AURA_FRIEND:
-						case SPELL_EFFECT_APPLY_AREA_AURA_ENEMY:
-						case SPELL_EFFECT_APPLY_AREA_AURA_PET:
-						case SPELL_EFFECT_APPLY_AREA_AURA_OWNER:
-							if (spellInfo->Effects[j].ApplyAuraName == SPELL_AURA_PERIODIC_DAMAGE ||
-								spellInfo->Effects[j].ApplyAuraName == SPELL_AURA_PERIODIC_DAMAGE_PERCENT ||
-								spellInfo->Effects[j].ApplyAuraName == SPELL_AURA_DUMMY ||
-								spellInfo->Effects[j].ApplyAuraName == SPELL_AURA_PERIODIC_LEECH ||
-								spellInfo->Effects[j].ApplyAuraName == SPELL_AURA_PERIODIC_HEALTH_FUNNEL ||
-								spellInfo->Effects[j].ApplyAuraName == SPELL_AURA_PERIODIC_DUMMY)
-								continue;
-						default:
-							if (spellInfo->Effects[j].CalcValue() || ((spellInfo->Effects[j].Effect == SPELL_EFFECT_INTERRUPT_CAST || spellInfo->HasAttribute(SPELL_ATTR0_CU_AURA_CC)) && !spellInfo->HasAttribute(SPELL_ATTR0_UNAFFECTED_BY_INVULNERABILITY)))
-								if (spellInfo->Id != 69649 && spellInfo->Id != 71056 && spellInfo->Id != 71057 && spellInfo->Id != 71058 && spellInfo->Id != 73061 && spellInfo->Id != 73062 && spellInfo->Id != 73063 && spellInfo->Id != 73064) // Sindragosa Frost Breath
-								if (spellInfo->SpellFamilyName != SPELLFAMILY_MAGE || !(spellInfo->SpellFamilyFlags[0] & 0x20)) // frostbolt
-								if (spellInfo->Id != 55095) // frost fever
-								if (spellInfo->SpellFamilyName != SPELLFAMILY_WARLOCK || !(spellInfo->SpellFamilyFlags[1] & 0x40000)) // Haunt
-								{
-									spellInfo->AttributesCu |= SPELL_ATTR0_CU_BINARY_SPELL;
-									break;
-								}
-							continue;
-					}
-				}
-			}
-		}
+        // Xinef: spells ignoring hit result should not be binary
+        if (!spellInfo->HasAttribute(SPELL_ATTR3_IGNORE_HIT_RESULT))
+        {
+            for (uint8 j = 0; j < MAX_SPELL_EFFECTS; ++j)
+            {
+                if (spellInfo->Effects[j].Effect)
+                {
+                    switch(spellInfo->Effects[j].Effect)
+                    {
+                        case SPELL_EFFECT_SCHOOL_DAMAGE:
+                        case SPELL_EFFECT_WEAPON_DAMAGE:
+                        case SPELL_EFFECT_WEAPON_DAMAGE_NOSCHOOL:
+                        case SPELL_EFFECT_NORMALIZED_WEAPON_DMG:
+                        case SPELL_EFFECT_WEAPON_PERCENT_DAMAGE:
+                        case SPELL_EFFECT_TRIGGER_SPELL:
+                        case SPELL_EFFECT_TRIGGER_SPELL_WITH_VALUE:
+                            continue;
+                        case SPELL_EFFECT_PERSISTENT_AREA_AURA:
+                        case SPELL_EFFECT_APPLY_AURA:
+                        case SPELL_EFFECT_APPLY_AREA_AURA_PARTY:
+                        case SPELL_EFFECT_APPLY_AREA_AURA_RAID:
+                        case SPELL_EFFECT_APPLY_AREA_AURA_FRIEND:
+                        case SPELL_EFFECT_APPLY_AREA_AURA_ENEMY:
+                        case SPELL_EFFECT_APPLY_AREA_AURA_PET:
+                        case SPELL_EFFECT_APPLY_AREA_AURA_OWNER:
+                            if (spellInfo->Effects[j].ApplyAuraName == SPELL_AURA_PERIODIC_DAMAGE ||
+                                spellInfo->Effects[j].ApplyAuraName == SPELL_AURA_PERIODIC_DAMAGE_PERCENT ||
+                                spellInfo->Effects[j].ApplyAuraName == SPELL_AURA_DUMMY ||
+                                spellInfo->Effects[j].ApplyAuraName == SPELL_AURA_PERIODIC_LEECH ||
+                                spellInfo->Effects[j].ApplyAuraName == SPELL_AURA_PERIODIC_HEALTH_FUNNEL ||
+                                spellInfo->Effects[j].ApplyAuraName == SPELL_AURA_PERIODIC_DUMMY)
+                                continue;
+                        default:
+                            if (spellInfo->Effects[j].CalcValue() || ((spellInfo->Effects[j].Effect == SPELL_EFFECT_INTERRUPT_CAST || spellInfo->HasAttribute(SPELL_ATTR0_CU_AURA_CC)) && !spellInfo->HasAttribute(SPELL_ATTR0_UNAFFECTED_BY_INVULNERABILITY)))
+                                if (spellInfo->Id != 69649 && spellInfo->Id != 71056 && spellInfo->Id != 71057 && spellInfo->Id != 71058 && spellInfo->Id != 73061 && spellInfo->Id != 73062 && spellInfo->Id != 73063 && spellInfo->Id != 73064) // Sindragosa Frost Breath
+                                if (spellInfo->SpellFamilyName != SPELLFAMILY_MAGE || !(spellInfo->SpellFamilyFlags[0] & 0x20)) // frostbolt
+                                if (spellInfo->Id != 55095) // frost fever
+                                if (spellInfo->SpellFamilyName != SPELLFAMILY_WARLOCK || !(spellInfo->SpellFamilyFlags[1] & 0x40000)) // Haunt
+                                {
+                                    spellInfo->AttributesCu |= SPELL_ATTR0_CU_BINARY_SPELL;
+                                    break;
+                                }
+                            continue;
+                    }
+                }
+            }
+        }
 
-		// pussywizard:
-		if ((spellInfo->SchoolMask & SPELL_SCHOOL_MASK_NORMAL) && (spellInfo->SchoolMask & SPELL_SCHOOL_MASK_MAGIC))
-		{
-			spellInfo->SchoolMask &= ~SPELL_SCHOOL_MASK_NORMAL;
-			spellInfo->AttributesCu |= SPELL_ATTR0_CU_SCHOOLMASK_NORMAL_WITH_MAGIC;
-		}
+        // pussywizard:
+        if ((spellInfo->SchoolMask & SPELL_SCHOOL_MASK_NORMAL) && (spellInfo->SchoolMask & SPELL_SCHOOL_MASK_MAGIC))
+        {
+            spellInfo->SchoolMask &= ~SPELL_SCHOOL_MASK_NORMAL;
+            spellInfo->AttributesCu |= SPELL_ATTR0_CU_SCHOOLMASK_NORMAL_WITH_MAGIC;
+        }
 
         if (!spellInfo->_IsPositiveEffect(EFFECT_0, false))
             spellInfo->AttributesCu |= SPELL_ATTR0_CU_NEGATIVE_EFF0;
@@ -2860,10 +2860,10 @@ void SpellMgr::LoadSpellCustomAttr()
 
         switch (spellInfo->Id)
         {
-			// Xinef: additional spells which should be binary
-			case 45145: // Snake Trap Effect
-				spellInfo->AttributesCu |= SPELL_ATTR0_CU_BINARY_SPELL;
-				break;
+            // Xinef: additional spells which should be binary
+            case 45145: // Snake Trap Effect
+                spellInfo->AttributesCu |= SPELL_ATTR0_CU_BINARY_SPELL;
+                break;
             case 1776: // Gouge
             case 1777:
             case 8629:
@@ -2939,7 +2939,7 @@ void SpellMgr::LoadSpellCustomAttr()
             case 23959: // Test Stab R50
             case 24825: // Test Backstab
             case 58563: // Assassinate Restless Lookout
-			case 63124: // quest There's Something About the Squire (13654)
+            case 63124: // quest There's Something About the Squire (13654)
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_REQ_CASTER_BEHIND_TARGET;
                 break;
             case 26029: // Dark Glare
@@ -2951,14 +2951,14 @@ void SpellMgr::LoadSpellCustomAttr()
             case 73789: // Pain and Suffering
             case 73790: // Pain and Suffering
             case 63293: // Mimiron - spinning damage
-			case 68873: // Wailing Souls
-			case 70324: // Wailing Souls
-			case 64619: // Ulduar, Mimiron, Emergency Fire Bot, Water Spray
+            case 68873: // Wailing Souls
+            case 70324: // Wailing Souls
+            case 64619: // Ulduar, Mimiron, Emergency Fire Bot, Water Spray
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_CONE_LINE;
                 break;
-			case 58690: // Cyanigosa, Tail Sweep
-			case 59283: // Cyanigosa, Tail Sweep
-				spellInfo->AttributesCu |= SPELL_ATTR0_CU_CONE_BACK;
+            case 58690: // Cyanigosa, Tail Sweep
+            case 59283: // Cyanigosa, Tail Sweep
+                spellInfo->AttributesCu |= SPELL_ATTR0_CU_CONE_BACK;
                 break;
             case 24340: // Meteor
             case 26558: // Meteor
@@ -2983,10 +2983,10 @@ void SpellMgr::LoadSpellCustomAttr()
             case 72624: // Ooze Eruption
             case 72625: // Ooze Eruption
             // ONLY SPELLS WITH SPELLFAMILY_GENERIC and EFFECT_SCHOOL_DAMAGE, OR WEAPON_DMG_X
-			case 66809: // Meteor Fists
-			case 67331: // Meteor Fists
-			case 66765: // Meteor Fists
-			case 67333: // Meteor Fists
+            case 66809: // Meteor Fists
+            case 67331: // Meteor Fists
+            case 66765: // Meteor Fists
+            case 67333: // Meteor Fists
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_SHARE_DAMAGE;
                 break;
             case 18500: // Wing Buffet
@@ -3000,16 +3000,16 @@ void SpellMgr::LoadSpellCustomAttr()
             case 65239: // Machine Gun
             case 69293: // Wing Buffet
             case 74439: // Machine Gun
-			// Trial of the Crusader, Jaraxxus, Shivan Slash
-			case 66378:
-			case 67097:
-			case 67098:
-			case 67099:
-			// Trial of the Crusader, Anub'arak, Impale
-			case 65919:
-			case 67858:
-			case 67859:
-			case 67860:
+            // Trial of the Crusader, Jaraxxus, Shivan Slash
+            case 66378:
+            case 67097:
+            case 67098:
+            case 67099:
+            // Trial of the Crusader, Anub'arak, Impale
+            case 65919:
+            case 67858:
+            case 67859:
+            case 67860:
             case 63278: // Mark of the Faceless (General Vezax)
             case 64125: // Ulduar, Yogg-Saron, Squeeze
             case 64126: // Ulduar, Yogg-Saron, Squeeze
@@ -3034,12 +3034,12 @@ void SpellMgr::LoadSpellCustomAttr()
             case 72444: // Mark of the Fallen Champion (Deathbringer Saurfang)
             case 72445: // Mark of the Fallen Champion (Deathbringer Saurfang)
             case 72446: // Mark of the Fallen Champion (Deathbringer Saurfang)
-			case 72409: // Rune of Blood (Deathbringer Saurfang)
-			case 72447: // Rune of Blood (Deathbringer Saurfang)
-			case 72448: // Rune of Blood (Deathbringer Saurfang)
-			case 72449: // Rune of Blood (Deathbringer Saurfang)
-			case 49882: // Leviroth Self-Impale
-			case 62775: // Ulduar: XT-002 Tympanic Tamparum
+            case 72409: // Rune of Blood (Deathbringer Saurfang)
+            case 72447: // Rune of Blood (Deathbringer Saurfang)
+            case 72448: // Rune of Blood (Deathbringer Saurfang)
+            case 72449: // Rune of Blood (Deathbringer Saurfang)
+            case 49882: // Leviroth Self-Impale
+            case 62775: // Ulduar: XT-002 Tympanic Tamparum
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_IGNORE_ARMOR;
                 break;
             case 64422: // Sonic Screech (Auriaya)
@@ -3047,92 +3047,92 @@ void SpellMgr::LoadSpellCustomAttr()
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_IGNORE_ARMOR;
                 break;
             case 72293: // Mark of the Fallen Champion (Deathbringer Saurfang)
-			case 72347: // Lock Players and Tap Chest (Gunship Battle)
+            case 72347: // Lock Players and Tap Chest (Gunship Battle)
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_NEGATIVE_EFF0;
                 break;
             default:
                 break;
-			case 63675: // Improved Devouring Plague
-			case 17962: // Conflagrate
-			case 32593: // Earth Shield aura
-			case 32594: // Earth Shield aura
-			case 49283: // Earth Shield aura
-			case 49284: // Earth Shield aura
-			case 50526: // Wandering Plague
-			case 53353: // Chimera Shot - Serpent trigger
-			case 52752: // Ancestral Awakening Heal
-				spellInfo->AttributesCu |= SPELL_ATTR0_CU_NO_POSITIVE_TAKEN_BONUS;
-				break;
-			case 65280: // Ulduar, Hodir, Singed
-			case 65775: // Anub'arak, Swarm Scarab, Acid-Drenched Mandibles
-			case 67861:
-			case 67862:
-			case 67863:
-			case 67721: // Anub'arak, Nerubian Burrower, Expose Weakness
-			case 64638: // Ulduar, Winter Jormungar, Acidic Bite
-			case 71157: // Icecrown Citadel, Plagued Zombie, Infected Wound
-			case 72963: // Icecrown Citadel, Valithria Dreamwalker, Flesh Rot (Rot Worm)
-			case 72964:
-			case 72965:
-			case 72966:
-			case 72465: // Icecrown Citadel, Sindragosa, Respite for a Tormented Soul (weekly quest)
-			case 45271: // Sunwell, Eredar Twins encounter, Dark Strike
-			case 45347: // Sunwell, Eredar Twins encounter, Dark Touched
-			case 45348: // Sunwell, Eredar Twins encounter, Flame Touched
-			case 35859: // The Eye, Nether Vapor
-			case 40520: // Black Temple, Shade Soul Channel
-			case 40327: // Black Temple, Atrophy
-			case 38449: // Serpentshrine Cavern, Blessing of the Tides
-			case 38044: // Serpentshrine Cavern, Surge
-			case 74507: // Ruby Sanctum, Siphoned Might
-			case 49381: // Drak'tharon Keep, Consume
-			case 59805: // Drak'tharon Keep, Consume
-			case 55093: // Gundrak, Grip of Slad'ran
-			case 30659: // Hellfire Ramparts, Fel Infusion
-			case 54314: // Azjol'Nerub Drain Power
-			case 59354: // Azjol'Nerub Drain Power
-			case 34655: // Snake Trap, Deadly Poison
-			case 11971: // Sunder Armor
-			case 58567: // Player Sunder Armor
-				spellInfo->AttributesCu |= SPELL_ATTR0_CU_SINGLE_AURA_STACK;
-				break;
-			case 43138: // North Fleet Reservist Kill Credit
-				spellInfo->AttributesCu |= SPELL_ATTR0_CU_ALLOW_INFLIGHT_TARGET;
-				break;
+            case 63675: // Improved Devouring Plague
+            case 17962: // Conflagrate
+            case 32593: // Earth Shield aura
+            case 32594: // Earth Shield aura
+            case 49283: // Earth Shield aura
+            case 49284: // Earth Shield aura
+            case 50526: // Wandering Plague
+            case 53353: // Chimera Shot - Serpent trigger
+            case 52752: // Ancestral Awakening Heal
+                spellInfo->AttributesCu |= SPELL_ATTR0_CU_NO_POSITIVE_TAKEN_BONUS;
+                break;
+            case 65280: // Ulduar, Hodir, Singed
+            case 65775: // Anub'arak, Swarm Scarab, Acid-Drenched Mandibles
+            case 67861:
+            case 67862:
+            case 67863:
+            case 67721: // Anub'arak, Nerubian Burrower, Expose Weakness
+            case 64638: // Ulduar, Winter Jormungar, Acidic Bite
+            case 71157: // Icecrown Citadel, Plagued Zombie, Infected Wound
+            case 72963: // Icecrown Citadel, Valithria Dreamwalker, Flesh Rot (Rot Worm)
+            case 72964:
+            case 72965:
+            case 72966:
+            case 72465: // Icecrown Citadel, Sindragosa, Respite for a Tormented Soul (weekly quest)
+            case 45271: // Sunwell, Eredar Twins encounter, Dark Strike
+            case 45347: // Sunwell, Eredar Twins encounter, Dark Touched
+            case 45348: // Sunwell, Eredar Twins encounter, Flame Touched
+            case 35859: // The Eye, Nether Vapor
+            case 40520: // Black Temple, Shade Soul Channel
+            case 40327: // Black Temple, Atrophy
+            case 38449: // Serpentshrine Cavern, Blessing of the Tides
+            case 38044: // Serpentshrine Cavern, Surge
+            case 74507: // Ruby Sanctum, Siphoned Might
+            case 49381: // Drak'tharon Keep, Consume
+            case 59805: // Drak'tharon Keep, Consume
+            case 55093: // Gundrak, Grip of Slad'ran
+            case 30659: // Hellfire Ramparts, Fel Infusion
+            case 54314: // Azjol'Nerub Drain Power
+            case 59354: // Azjol'Nerub Drain Power
+            case 34655: // Snake Trap, Deadly Poison
+            case 11971: // Sunder Armor
+            case 58567: // Player Sunder Armor
+                spellInfo->AttributesCu |= SPELL_ATTR0_CU_SINGLE_AURA_STACK;
+                break;
+            case 43138: // North Fleet Reservist Kill Credit
+                spellInfo->AttributesCu |= SPELL_ATTR0_CU_ALLOW_INFLIGHT_TARGET;
+                break;
 
-			// Xinef: NOT CUSTOM, cant add in DBC CORRECTION because i need to swap effects, too much work to do there
-			// Envenom
-			case 32645:
-			case 32684:
-			case 57992:
-			case 57993:
-			{
-				SpellEffectInfo info = spellInfo->Effects[EFFECT_0];
-				spellInfo->Effects[EFFECT_0] = spellInfo->Effects[EFFECT_2];
-				spellInfo->Effects[EFFECT_2] = info;
-				break;
-			}
+            // Xinef: NOT CUSTOM, cant add in DBC CORRECTION because i need to swap effects, too much work to do there
+            // Envenom
+            case 32645:
+            case 32684:
+            case 57992:
+            case 57993:
+            {
+                SpellEffectInfo info = spellInfo->Effects[EFFECT_0];
+                spellInfo->Effects[EFFECT_0] = spellInfo->Effects[EFFECT_2];
+                spellInfo->Effects[EFFECT_2] = info;
+                break;
+            }
 
-			// Xinef: Cooldown overwrites
-			// Jotunheim Rapid-Fire Harpoon: Energy Reserve
-			case 56585:
-				spellInfo->RecoveryTime = 30000;
-				spellInfo->_requireCooldownInfo = true;
-				break;
-			// Jotunheim Rapid-Fire Harpoon: Rapid-Fire Harpoon
-			case 56570:
-				spellInfo->RecoveryTime = 200;
-				break;
-			// Burst of Speed
-			case 57493:
-				spellInfo->RecoveryTime = 60000;
-				spellInfo->_requireCooldownInfo = true;
-				break;
-			// Strafe Jotunheim Building
-			case 7769:
-				spellInfo->RecoveryTime = 1500;
-				spellInfo->_requireCooldownInfo = true;
-				break;
+            // Xinef: Cooldown overwrites
+            // Jotunheim Rapid-Fire Harpoon: Energy Reserve
+            case 56585:
+                spellInfo->RecoveryTime = 30000;
+                spellInfo->_requireCooldownInfo = true;
+                break;
+            // Jotunheim Rapid-Fire Harpoon: Rapid-Fire Harpoon
+            case 56570:
+                spellInfo->RecoveryTime = 200;
+                break;
+            // Burst of Speed
+            case 57493:
+                spellInfo->RecoveryTime = 60000;
+                spellInfo->_requireCooldownInfo = true;
+                break;
+            // Strafe Jotunheim Building
+            case 7769:
+                spellInfo->RecoveryTime = 1500;
+                spellInfo->_requireCooldownInfo = true;
+                break;
         }
 
         switch (spellInfo->SpellFamilyName)
@@ -3147,49 +3147,49 @@ void SpellMgr::LoadSpellCustomAttr()
                 if (spellInfo->SpellFamilyFlags[0] & 0x8)
                     spellInfo->AttributesCu |= SPELL_ATTR0_CU_AURA_CC;
                 break;
-			case SPELLFAMILY_GENERIC:
-				// Stoneclaw Totem effect
-				if(spellInfo->Id == 5729)
-					spellInfo->AttributesCu |= SPELL_ATTR0_CU_AURA_CC;
-				break;
+            case SPELLFAMILY_GENERIC:
+                // Stoneclaw Totem effect
+                if(spellInfo->Id == 5729)
+                    spellInfo->AttributesCu |= SPELL_ATTR0_CU_AURA_CC;
+                break;
             default:
                 break;
         }
     }
 
-	// Xinef: addition for binary spells, ommit spells triggering other spells
-	for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
+    // Xinef: addition for binary spells, ommit spells triggering other spells
+    for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
     {
         spellInfo = mSpellInfoMap[i];
         if (!spellInfo)
             continue;
 
-		if (!(spellInfo->AttributesCu & SPELL_ATTR0_CU_BINARY_SPELL))
-			continue;
+        if (!(spellInfo->AttributesCu & SPELL_ATTR0_CU_BINARY_SPELL))
+            continue;
 
-		bool allNonBinary = true;
-		bool overrideAttr = false;
-		for (uint8 j = 0; j < MAX_SPELL_EFFECTS; ++j)
+        bool allNonBinary = true;
+        bool overrideAttr = false;
+        for (uint8 j = 0; j < MAX_SPELL_EFFECTS; ++j)
         {
-			if (spellInfo->Effects[j].ApplyAuraName && spellInfo->Effects[j].TriggerSpell)
-			{
-				switch(spellInfo->Effects[j].ApplyAuraName)
-				{
-					case SPELL_AURA_PERIODIC_TRIGGER_SPELL:
-					case SPELL_AURA_PERIODIC_TRIGGER_SPELL_WITH_VALUE:
-						if (SpellInfo const* triggerSpell = sSpellMgr->GetSpellInfo(spellInfo->Effects[j].TriggerSpell))
-						{
-							overrideAttr = true;
-							if (triggerSpell->AttributesCu & SPELL_ATTR0_CU_BINARY_SPELL)
-								allNonBinary = false;
-						}
-				}
-			}
-		}
+            if (spellInfo->Effects[j].ApplyAuraName && spellInfo->Effects[j].TriggerSpell)
+            {
+                switch(spellInfo->Effects[j].ApplyAuraName)
+                {
+                    case SPELL_AURA_PERIODIC_TRIGGER_SPELL:
+                    case SPELL_AURA_PERIODIC_TRIGGER_SPELL_WITH_VALUE:
+                        if (SpellInfo const* triggerSpell = sSpellMgr->GetSpellInfo(spellInfo->Effects[j].TriggerSpell))
+                        {
+                            overrideAttr = true;
+                            if (triggerSpell->AttributesCu & SPELL_ATTR0_CU_BINARY_SPELL)
+                                allNonBinary = false;
+                        }
+                }
+            }
+        }
 
-		if (overrideAttr && allNonBinary)
-			spellInfo->AttributesCu &= ~SPELL_ATTR0_CU_BINARY_SPELL;
-	}
+        if (overrideAttr && allNonBinary)
+            spellInfo->AttributesCu &= ~SPELL_ATTR0_CU_BINARY_SPELL;
+    }
 
     CreatureAI::FillAISpellInfo();
 
@@ -3222,16 +3222,16 @@ void SpellMgr::LoadDbcDataCorrections()
                     break;
             }
 
-			// Xinef: i hope this will fix the problem with not working resurrection
-			if (spellInfo->Effect[j] == SPELL_EFFECT_SELF_RESURRECT)
-				spellInfo->EffectImplicitTargetA[j] = TARGET_UNIT_CASTER;
+            // Xinef: i hope this will fix the problem with not working resurrection
+            if (spellInfo->Effect[j] == SPELL_EFFECT_SELF_RESURRECT)
+                spellInfo->EffectImplicitTargetA[j] = TARGET_UNIT_CASTER;
         }
 
-		// Xinef: Fix range for trajectories and triggered spells
-		for (uint8 j = 0; j < 3; ++j)
-			if (spellInfo->rangeIndex == 1 && (spellInfo->EffectImplicitTargetA[j] == TARGET_DEST_TRAJ || spellInfo->EffectImplicitTargetB[j] == TARGET_DEST_TRAJ))
-				if (SpellEntry* spellInfo2 = (SpellEntry*)sSpellStore.LookupEntry(spellInfo->EffectTriggerSpell[j]))
-					spellInfo2->rangeIndex = 187; // 300yd
+        // Xinef: Fix range for trajectories and triggered spells
+        for (uint8 j = 0; j < 3; ++j)
+            if (spellInfo->rangeIndex == 1 && (spellInfo->EffectImplicitTargetA[j] == TARGET_DEST_TRAJ || spellInfo->EffectImplicitTargetB[j] == TARGET_DEST_TRAJ))
+                if (SpellEntry* spellInfo2 = (SpellEntry*)sSpellStore.LookupEntry(spellInfo->EffectTriggerSpell[j]))
+                    spellInfo2->rangeIndex = 187; // 300yd
 
         if (spellInfo->activeIconID == 2158)  // flight
             spellInfo->Attributes |= SPELL_ATTR0_PASSIVE;
@@ -3239,11 +3239,11 @@ void SpellMgr::LoadDbcDataCorrections()
         switch (spellInfo->Id)
         {
             case 63026: // Force Cast (HACK: Target shouldn't be changed)
-			case 63137: // Force Cast (HACK: Target shouldn't be changed; summon position should be untied from spell destination)
-            	spellInfo->EffectImplicitTargetA[EFFECT_0] = TARGET_DEST_DB;
+            case 63137: // Force Cast (HACK: Target shouldn't be changed; summon position should be untied from spell destination)
+                spellInfo->EffectImplicitTargetA[EFFECT_0] = TARGET_DEST_DB;
                 break;
-			case 53096: // Quetz'lun's Judgment            
-			case 70743: // AoD Special
+            case 53096: // Quetz'lun's Judgment            
+            case 70743: // AoD Special
             case 70614: // AoD Special - Vegard
                 spellInfo->MaxAffectedTargets = 1;
                 break;
@@ -3303,7 +3303,7 @@ void SpellMgr::LoadDbcDataCorrections()
         case 36327: // Shoot Arcane Explosion Arrow
             spellInfo->MaxAffectedTargets = 1;
             break;
-		case 36384: // Skartax Purple Beam
+        case 36384: // Skartax Purple Beam
             spellInfo->MaxAffectedTargets = 2;
             break;
         case 37790: // Spread Shot
@@ -3343,9 +3343,9 @@ void SpellMgr::LoadDbcDataCorrections()
         case 18820: // Insight
             spellInfo->procCharges = 1;
             break;
-		case 53390: // Tidal Wave
-			spellInfo->procCharges = 2;
-			break;
+        case 53390: // Tidal Wave
+            spellInfo->procCharges = 2;
+            break;
         case 37408: // Oscillation Field
             spellInfo->AttributesEx3 |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;
             break;
@@ -3355,7 +3355,7 @@ void SpellMgr::LoadDbcDataCorrections()
         case 51852: // The Eye of Acherus (no spawn in phase 2 in db)
             spellInfo->EffectMiscValue[0] |= 1;
             break;
-		case 51912: // Crafty's Ultra-Advanced Proto-Typical Shortening Blaster
+        case 51912: // Crafty's Ultra-Advanced Proto-Typical Shortening Blaster
             spellInfo->EffectAmplitude[0] = 3000;
             break;
         case 29809: // Desecration Arm - 36 instead of 37 - typo? :/
@@ -3372,7 +3372,7 @@ void SpellMgr::LoadDbcDataCorrections()
         case 48422:
             spellInfo->Stances = 1 << (FORM_TREE - 1);
             break;
-		case 51466: // Elemental Oath (Rank 1)
+        case 51466: // Elemental Oath (Rank 1)
         case 51470: // Elemental Oath (Rank 2)
             spellInfo->Effect[EFFECT_1] = SPELL_EFFECT_APPLY_AURA;
             spellInfo->EffectApplyAuraName[EFFECT_1] = SPELL_AURA_ADD_FLAT_MODIFIER;
@@ -3395,7 +3395,7 @@ void SpellMgr::LoadDbcDataCorrections()
         case 51726:
             spellInfo->SpellFamilyFlags[2] = 0x10;
             spellInfo->EffectApplyAuraName[1] = SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN;
-			spellInfo->AttributesEx3 |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;
+            spellInfo->AttributesEx3 |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;
             break;
         case 41013: // Parasitic Shadowfiend Passive
             spellInfo->EffectApplyAuraName[0] = SPELL_AURA_DUMMY; // proc debuff, and summon infinite fiends
@@ -3420,7 +3420,7 @@ void SpellMgr::LoadDbcDataCorrections()
             spellInfo->EffectBasePoints[EFFECT_1] = -6; // -5%
             break;
         case 63675: // Improved Devouring Plague
-			spellInfo->EffectBonusMultiplier[0] = 0;
+            spellInfo->EffectBonusMultiplier[0] = 0;
             spellInfo->AttributesEx3 |= SPELL_ATTR3_NO_DONE_BONUS;
             break;
         case 8145: // Tremor Totem (instant pulse)
@@ -3468,18 +3468,18 @@ void SpellMgr::LoadDbcDataCorrections()
         case 45602: // Ride Carpet
             spellInfo->EffectBasePoints[EFFECT_0] = 0; // force seat 0, vehicle doesn't have the required seat flags for "no seat specified (-1)"
             break;
-		case 64745: // Item - Death Knight T8 Tank 4P Bonus
+        case 64745: // Item - Death Knight T8 Tank 4P Bonus
         case 64936: // Item - Warrior T8 Protection 4P Bonus
-			spellInfo->EffectBasePoints[EFFECT_0] = 100; // 100% chance of procc'ing, not -10% (chance calculated in PrepareTriggersExecutedOnHit)
+            spellInfo->EffectBasePoints[EFFECT_0] = 100; // 100% chance of procc'ing, not -10% (chance calculated in PrepareTriggersExecutedOnHit)
             break;
         case 61719: // Easter Lay Noblegarden Egg Aura - Interrupt flags copied from aura which this aura is linked with
             spellInfo->AuraInterruptFlags = AURA_INTERRUPT_FLAG_HITBYSPELL | AURA_INTERRUPT_FLAG_TAKE_DAMAGE;
             break;
-		case 51640: // spell for item The Flag of Ownership (38578)
-			spellInfo->AttributesEx3 |= SPELL_ATTR3_ONLY_TARGET_PLAYERS;
-			spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_DEAD;
-			spellInfo->MaxAffectedTargets = 1;
-			break;
+        case 51640: // spell for item The Flag of Ownership (38578)
+            spellInfo->AttributesEx3 |= SPELL_ATTR3_ONLY_TARGET_PLAYERS;
+            spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_DEAD;
+            spellInfo->MaxAffectedTargets = 1;
+            break;
         case 34471: // The Beast Within
             spellInfo->AttributesEx5 |= SPELL_ATTR5_USABLE_WHILE_CONFUSED | SPELL_ATTR5_USABLE_WHILE_FEARED | SPELL_ATTR5_USABLE_WHILE_STUNNED;
             break;
@@ -3495,29 +3495,29 @@ void SpellMgr::LoadDbcDataCorrections()
             break;
         case 24314: // Threatening Gaze
             spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_CAST | AURA_INTERRUPT_FLAG_MOVE | AURA_INTERRUPT_FLAG_JUMP;
-			break;
+            break;
 
 
-		/////////////////////////////////////////////
-		/////////////////CLASS SPELLS////////////////
-		/////////////////////////////////////////////
+        /////////////////////////////////////////////
+        /////////////////CLASS SPELLS////////////////
+        /////////////////////////////////////////////
 
-		/////////////////////////////////
-		///// PALADIN
-		/////////////////////////////////
-		// Heart of the Crusader
-		case 20335:
-		case 20336:
-		case 20337:
-			if (spellInfo->Id == 20335)
-				spellInfo->EffectTriggerSpell[0] = 21183;
-			else if (spellInfo->Id == 20336)
-				spellInfo->EffectTriggerSpell[0] = 54498;
-			else
-				spellInfo->EffectTriggerSpell[0] = 54499;
+        /////////////////////////////////
+        ///// PALADIN
+        /////////////////////////////////
+        // Heart of the Crusader
+        case 20335:
+        case 20336:
+        case 20337:
+            if (spellInfo->Id == 20335)
+                spellInfo->EffectTriggerSpell[0] = 21183;
+            else if (spellInfo->Id == 20336)
+                spellInfo->EffectTriggerSpell[0] = 54498;
+            else
+                spellInfo->EffectTriggerSpell[0] = 54499;
             spellInfo->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
             break;
-		// Bleh, need to change FamilyFlags :/ (have the same as original aura - bad!)
+        // Bleh, need to change FamilyFlags :/ (have the same as original aura - bad!)
         case 63510:
             spellInfo->SpellFamilyFlags[0] = 0;
             spellInfo->SpellFamilyFlags[2] = 0x4000000;
@@ -3529,7 +3529,7 @@ void SpellMgr::LoadDbcDataCorrections()
         case 63531:
             spellInfo->SpellFamilyFlags[0] = 0;
             spellInfo->SpellFamilyFlags[2] = 0x8000000;
-			break;
+            break;
         // And affecting spells
         case 20138:
         case 20139:
@@ -3552,234 +3552,234 @@ void SpellMgr::LoadDbcDataCorrections()
             spellInfo->EffectSpellClassMask[0][2] = 0x8000000;
             break;
         case 31869:// Sanctified Retribution
-			spellInfo->EffectSpellClassMask[0][0] = 0;
+            spellInfo->EffectSpellClassMask[0][0] = 0;
             spellInfo->EffectSpellClassMask[0][2] = 0x8000000;
             break;
-		// Judgements Facing
-		case 20271:
-		case 53407:
-		case 53408:
-			spellInfo->FacingCasterFlags |= SPELL_FACING_FLAG_INFRONT;
-			break;
-		// Seal of Light trigger
-		case 20167:
-			spellInfo->spellLevel = 0;
-			spellInfo->baseLevel = 0;
-			spellInfo->DmgClass = SPELL_DAMAGE_CLASS_MAGIC;
-			break;
-		// Light's Beacon, Beacon of Light
-		case 53651:
-			spellInfo->AttributesEx3 |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;
-			break;
-		// Hand of Reckoning
-		case 62124:
-			spellInfo->AttributesEx |= SPELL_ATTR1_CANT_BE_REDIRECTED;
-			break;
-		// Redemption
-		case 7328:
-		case 10322:
-		case 10324:
-		case 20772:
-		case 20773:
-		case 48949:
-		case 48950:
-			spellInfo->SpellFamilyName = SPELLFAMILY_PALADIN;
-			break;
-		// hack for seal of light and few spells, judgement consists of few single casts and each of them can proc
-		// some spell, base one has disabled proc flag but those dont have this flag
-		case 20184:
-		case 20185:
-		case 20186:
-		case 68055:
-			spellInfo->AttributesEx3 |= SPELL_ATTR3_CANT_TRIGGER_PROC;
-			break;
-		// Blessing of sanctuary stats
-		case 67480:
-			spellInfo->EffectMiscValue[0] = -1;
-			spellInfo->SpellFamilyName = SPELLFAMILY_UNK1; // allows stacking
-			spellInfo->EffectApplyAuraName[1] = SPELL_AURA_DUMMY; // just a marker
-			break;
-		// Seal of Command trigger
-		case 20424:
-			spellInfo->AttributesEx3 &= ~SPELL_ATTR3_CANT_TRIGGER_PROC;
-			break;
-		// Glyph of Holy Light, Damage Class should be magic
-		case 54968:
-		// Beacon of Light heal, Damage Class should be magic
-		case 53652:
-		case 53654:
-			spellInfo->AttributesEx3 |= SPELL_ATTR3_NO_DONE_BONUS;
-			spellInfo->DmgClass = SPELL_DAMAGE_CLASS_MAGIC;
-			break;
+        // Judgements Facing
+        case 20271:
+        case 53407:
+        case 53408:
+            spellInfo->FacingCasterFlags |= SPELL_FACING_FLAG_INFRONT;
+            break;
+        // Seal of Light trigger
+        case 20167:
+            spellInfo->spellLevel = 0;
+            spellInfo->baseLevel = 0;
+            spellInfo->DmgClass = SPELL_DAMAGE_CLASS_MAGIC;
+            break;
+        // Light's Beacon, Beacon of Light
+        case 53651:
+            spellInfo->AttributesEx3 |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;
+            break;
+        // Hand of Reckoning
+        case 62124:
+            spellInfo->AttributesEx |= SPELL_ATTR1_CANT_BE_REDIRECTED;
+            break;
+        // Redemption
+        case 7328:
+        case 10322:
+        case 10324:
+        case 20772:
+        case 20773:
+        case 48949:
+        case 48950:
+            spellInfo->SpellFamilyName = SPELLFAMILY_PALADIN;
+            break;
+        // hack for seal of light and few spells, judgement consists of few single casts and each of them can proc
+        // some spell, base one has disabled proc flag but those dont have this flag
+        case 20184:
+        case 20185:
+        case 20186:
+        case 68055:
+            spellInfo->AttributesEx3 |= SPELL_ATTR3_CANT_TRIGGER_PROC;
+            break;
+        // Blessing of sanctuary stats
+        case 67480:
+            spellInfo->EffectMiscValue[0] = -1;
+            spellInfo->SpellFamilyName = SPELLFAMILY_UNK1; // allows stacking
+            spellInfo->EffectApplyAuraName[1] = SPELL_AURA_DUMMY; // just a marker
+            break;
+        // Seal of Command trigger
+        case 20424:
+            spellInfo->AttributesEx3 &= ~SPELL_ATTR3_CANT_TRIGGER_PROC;
+            break;
+        // Glyph of Holy Light, Damage Class should be magic
+        case 54968:
+        // Beacon of Light heal, Damage Class should be magic
+        case 53652:
+        case 53654:
+            spellInfo->AttributesEx3 |= SPELL_ATTR3_NO_DONE_BONUS;
+            spellInfo->DmgClass = SPELL_DAMAGE_CLASS_MAGIC;
+            break;
 
 
-		/////////////////////////////////
-		///// HUNTER
-		/////////////////////////////////
-		// Furious Howl
-		case 64491:
-		case 64492:
-		case 64493:
-		case 64494:
-		case 64495:
-			spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_CASTER;
-			spellInfo->EffectImplicitTargetB[0] = TARGET_UNIT_MASTER;
-			spellInfo->EffectImplicitTargetA[1] = TARGET_UNIT_CASTER;
-			spellInfo->EffectImplicitTargetB[1] = TARGET_UNIT_MASTER;
-			break;
-		// Call of the Wild
-		case 53434:
-			spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_MASTER;
-			spellInfo->EffectImplicitTargetA[1] = TARGET_UNIT_MASTER;
-			spellInfo->EffectImplicitTargetB[0] = TARGET_UNIT_CASTER;
-			spellInfo->EffectImplicitTargetB[1] = TARGET_UNIT_CASTER;
-			break;
-		// Wild Hunt
-		case 62758:
-		case 62762:
-			spellInfo->Effect[0] = SPELL_EFFECT_APPLY_AURA;
-			spellInfo->EffectApplyAuraName[0] = SPELL_AURA_DUMMY;
-			spellInfo->Effect[1] = SPELL_EFFECT_APPLY_AURA;
-			spellInfo->EffectApplyAuraName[1] = SPELL_AURA_DUMMY;
-			break;
-		// Intervene
+        /////////////////////////////////
+        ///// HUNTER
+        /////////////////////////////////
+        // Furious Howl
+        case 64491:
+        case 64492:
+        case 64493:
+        case 64494:
+        case 64495:
+            spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_CASTER;
+            spellInfo->EffectImplicitTargetB[0] = TARGET_UNIT_MASTER;
+            spellInfo->EffectImplicitTargetA[1] = TARGET_UNIT_CASTER;
+            spellInfo->EffectImplicitTargetB[1] = TARGET_UNIT_MASTER;
+            break;
+        // Call of the Wild
+        case 53434:
+            spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_MASTER;
+            spellInfo->EffectImplicitTargetA[1] = TARGET_UNIT_MASTER;
+            spellInfo->EffectImplicitTargetB[0] = TARGET_UNIT_CASTER;
+            spellInfo->EffectImplicitTargetB[1] = TARGET_UNIT_CASTER;
+            break;
+        // Wild Hunt
+        case 62758:
+        case 62762:
+            spellInfo->Effect[0] = SPELL_EFFECT_APPLY_AURA;
+            spellInfo->EffectApplyAuraName[0] = SPELL_AURA_DUMMY;
+            spellInfo->Effect[1] = SPELL_EFFECT_APPLY_AURA;
+            spellInfo->EffectApplyAuraName[1] = SPELL_AURA_DUMMY;
+            break;
+        // Intervene
         case 3411:
             spellInfo->Attributes |= SPELL_ATTR0_STOP_ATTACK_TARGET;
-			spellInfo->AttributesEx3 |= SPELL_ATTR3_NO_INITIAL_AGGRO;
+            spellInfo->AttributesEx3 |= SPELL_ATTR3_NO_INITIAL_AGGRO;
             break;
-		// Roar of Sacrifice
-		case 53480:
-			spellInfo->Effect[1] = SPELL_EFFECT_APPLY_AURA;
-			spellInfo->EffectApplyAuraName[1] = SPELL_AURA_SPLIT_DAMAGE_PCT;
-			spellInfo->EffectImplicitTargetA[1] = TARGET_UNIT_TARGET_ALLY;
-			spellInfo->EffectDieSides[1] = 1;
-			spellInfo->EffectBasePoints[1] = 19;
-			spellInfo->EffectMiscValue[1] = 127; // all schools
-			break;
-		// Silencing Shot
-		case 34490:
-		case 41084:
-		case 42671:
-			spellInfo->speed = 0.0f;
-			break;
-		// Monstrous Bite
-		case 54680:
-		case 55495:
-		case 55496:
-		case 55497:
-		case 55498:
-		case 55499:
-			spellInfo->EffectImplicitTargetA[1] = TARGET_UNIT_CASTER;
-			break;
-		// Hunter's Mark
-		case 1130:
-		case 14323:
-		case 14324:
-		case 14325:
-		case 53338:
-			spellInfo->DmgClass = SPELL_DAMAGE_CLASS_MAGIC;
-			spellInfo->AttributesEx3 |= SPELL_ATTR3_IGNORE_HIT_RESULT;
-			break;
-		// Cobra Strikes
-		case 53257: 
-			spellInfo->procCharges = 2;
-			spellInfo->StackAmount = 0;
-			break;
-		// Kill Command
-		case 34027:
-			spellInfo->procCharges = 0;
-			break;
-		// Kindred Spirits, damage aura
-		case 57458:
-			spellInfo->AttributesEx4 |= SPELL_ATTR4_UNK21;
-			break;
-		// Chimera Shot - Serpent trigger
-		case 53353:
+        // Roar of Sacrifice
+        case 53480:
+            spellInfo->Effect[1] = SPELL_EFFECT_APPLY_AURA;
+            spellInfo->EffectApplyAuraName[1] = SPELL_AURA_SPLIT_DAMAGE_PCT;
+            spellInfo->EffectImplicitTargetA[1] = TARGET_UNIT_TARGET_ALLY;
+            spellInfo->EffectDieSides[1] = 1;
+            spellInfo->EffectBasePoints[1] = 19;
+            spellInfo->EffectMiscValue[1] = 127; // all schools
+            break;
+        // Silencing Shot
+        case 34490:
+        case 41084:
+        case 42671:
+            spellInfo->speed = 0.0f;
+            break;
+        // Monstrous Bite
+        case 54680:
+        case 55495:
+        case 55496:
+        case 55497:
+        case 55498:
+        case 55499:
+            spellInfo->EffectImplicitTargetA[1] = TARGET_UNIT_CASTER;
+            break;
+        // Hunter's Mark
+        case 1130:
+        case 14323:
+        case 14324:
+        case 14325:
+        case 53338:
+            spellInfo->DmgClass = SPELL_DAMAGE_CLASS_MAGIC;
+            spellInfo->AttributesEx3 |= SPELL_ATTR3_IGNORE_HIT_RESULT;
+            break;
+        // Cobra Strikes
+        case 53257: 
+            spellInfo->procCharges = 2;
+            spellInfo->StackAmount = 0;
+            break;
+        // Kill Command
+        case 34027:
+            spellInfo->procCharges = 0;
+            break;
+        // Kindred Spirits, damage aura
+        case 57458:
+            spellInfo->AttributesEx4 |= SPELL_ATTR4_UNK21;
+            break;
+        // Chimera Shot - Serpent trigger
+        case 53353:
             spellInfo->AttributesEx3 |= SPELL_ATTR3_NO_DONE_BONUS;
-			break;
-		// Entrapment trigger
-		case 19185:
-		case 64803:
-		case 64804:
-			spellInfo->EffectImplicitTargetA[EFFECT_0] = TARGET_DEST_TARGET_ENEMY;
-			spellInfo->EffectImplicitTargetB[EFFECT_0] = TARGET_UNIT_DEST_AREA_ENEMY;
-			spellInfo->AttributesEx5 |= SPELL_ATTR5_SKIP_CHECKCAST_LOS_CHECK;
-			break;
-		 // Improved Stings (Rank 2)
-		case 19465:
-			spellInfo->EffectImplicitTargetA[EFFECT_2] = TARGET_UNIT_CASTER;
             break;
-		// Explosive Shot (trigger)
-		case 53352:
-			spellInfo->AttributesEx3 |= SPELL_ATTR3_IGNORE_HIT_RESULT;
-			break;
-		// Heart of the Phoenix (triggered)
-		case 54114:
-			spellInfo->AttributesEx &= ~SPELL_ATTR1_DISMISS_PET;
-			spellInfo->RecoveryTime = 8*60*IN_MILLISECONDS; // prev 600000
-			break;
+        // Entrapment trigger
+        case 19185:
+        case 64803:
+        case 64804:
+            spellInfo->EffectImplicitTargetA[EFFECT_0] = TARGET_DEST_TARGET_ENEMY;
+            spellInfo->EffectImplicitTargetB[EFFECT_0] = TARGET_UNIT_DEST_AREA_ENEMY;
+            spellInfo->AttributesEx5 |= SPELL_ATTR5_SKIP_CHECKCAST_LOS_CHECK;
+            break;
+         // Improved Stings (Rank 2)
+        case 19465:
+            spellInfo->EffectImplicitTargetA[EFFECT_2] = TARGET_UNIT_CASTER;
+            break;
+        // Explosive Shot (trigger)
+        case 53352:
+            spellInfo->AttributesEx3 |= SPELL_ATTR3_IGNORE_HIT_RESULT;
+            break;
+        // Heart of the Phoenix (triggered)
+        case 54114:
+            spellInfo->AttributesEx &= ~SPELL_ATTR1_DISMISS_PET;
+            spellInfo->RecoveryTime = 8*60*IN_MILLISECONDS; // prev 600000
+            break;
 
 
 
-		/////////////////////////////////
-		///// ROGUE
-		/////////////////////////////////
-		// Master of Subtlety
-		case 31221:
-		case 31222:
-		case 31223:
-			spellInfo->SpellFamilyName = SPELLFAMILY_ROGUE;
-			break;
-		// Master of Subtlety triggers
-		case 31666:
-		// Overkill
-		case 58428:
-			spellInfo->Effect[0] = SPELL_EFFECT_SCRIPT_EFFECT;
-			break;
-		// Honor Among Thieves
+        /////////////////////////////////
+        ///// ROGUE
+        /////////////////////////////////
+        // Master of Subtlety
+        case 31221:
+        case 31222:
+        case 31223:
+            spellInfo->SpellFamilyName = SPELLFAMILY_ROGUE;
+            break;
+        // Master of Subtlety triggers
+        case 31666:
+        // Overkill
+        case 58428:
+            spellInfo->Effect[0] = SPELL_EFFECT_SCRIPT_EFFECT;
+            break;
+        // Honor Among Thieves
         case 51698:
         case 51700:
         case 51701:
             spellInfo->EffectTriggerSpell[0] = 51699;
             break;
-		// Slice and Dice
-		case 5171:
-		case 6774:
-		// Distract
-		case 1725:
-			spellInfo->AttributesEx3 |= SPELL_ATTR3_NO_INITIAL_AGGRO;
-			break;
-		// Envenom
-		case 32645:
-		case 32684:
-		case 57992:
-		case 57993:
-			spellInfo->Dispel = DISPEL_NONE;
-			break;
-		// Killing Spree (teleport)
-		case 57840:
-			spellInfo->rangeIndex = 6; // 100 yards
-			break;
-		// Killing Spree
-		case 51690:
-			spellInfo->AttributesEx |= SPELL_ATTR1_NOT_BREAK_STEALTH;
-			break;
+        // Slice and Dice
+        case 5171:
+        case 6774:
+        // Distract
+        case 1725:
+            spellInfo->AttributesEx3 |= SPELL_ATTR3_NO_INITIAL_AGGRO;
+            break;
+        // Envenom
+        case 32645:
+        case 32684:
+        case 57992:
+        case 57993:
+            spellInfo->Dispel = DISPEL_NONE;
+            break;
+        // Killing Spree (teleport)
+        case 57840:
+            spellInfo->rangeIndex = 6; // 100 yards
+            break;
+        // Killing Spree
+        case 51690:
+            spellInfo->AttributesEx |= SPELL_ATTR1_NOT_BREAK_STEALTH;
+            break;
 
 
-		/////////////////////////////////
-		///// DEATH KNIGHT
-		/////////////////////////////////
-		// Blood Tap visual cd reset
-		case 47804:
-			spellInfo->Effect[2] = 0;
-			spellInfo->Effect[1] = 0;
-			spellInfo->runeCostID = 442;
-			break;
-		// Chains of Ice
-		case 45524:
-			spellInfo->Effect[EFFECT_2] = 0;
-			break;
-		// Impurity
+        /////////////////////////////////
+        ///// DEATH KNIGHT
+        /////////////////////////////////
+        // Blood Tap visual cd reset
+        case 47804:
+            spellInfo->Effect[2] = 0;
+            spellInfo->Effect[1] = 0;
+            spellInfo->runeCostID = 442;
+            break;
+        // Chains of Ice
+        case 45524:
+            spellInfo->Effect[EFFECT_2] = 0;
+            break;
+        // Impurity
         case 49220:
         case 49633:
         case 49635:
@@ -3788,1620 +3788,1620 @@ void SpellMgr::LoadDbcDataCorrections()
             spellInfo->Effect[0] = SPELL_EFFECT_APPLY_AURA;
             spellInfo->EffectApplyAuraName[0] = SPELL_AURA_DUMMY;
             spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_CASTER;
-			spellInfo->SpellFamilyName = SPELLFAMILY_DEATHKNIGHT;
+            spellInfo->SpellFamilyName = SPELLFAMILY_DEATHKNIGHT;
             break;
-		// Deadly Aggression (Deadly Gladiator's Death Knight Relic, item: 42620)
-		case 60549:
-			spellInfo->Effect[1] = 0;
-			break;
-		// Magic Suppression
-		case 49224:
-		case 49610:
-		case 49611:
-			spellInfo->procCharges = 0;
-			break;
-		// Wandering Plague
-		case 50526:
-			spellInfo->AttributesEx3 |= SPELL_ATTR3_NO_DONE_BONUS;
-			spellInfo->AttributesEx3 |=  SPELL_ATTR3_NO_INITIAL_AGGRO;
-			break;
-		// Dancing Rune Weapon
-		case 49028:
-			spellInfo->Effect[2] = 0;
-			spellInfo->procFlags |= PROC_FLAG_DONE_MELEE_AUTO_ATTACK;
-			break;
-		// Death and Decay
-		case 52212:
-			spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
-			spellInfo->AttributesEx6 |= SPELL_ATTR6_CAN_TARGET_INVISIBLE;
-			break;
-		// T9 blood plague crit bonus
-		case 67118:
-			spellInfo->Effect[1] = 0;
-			break;
-		// Pestilence
-		case 50842:
-			spellInfo->EffectImplicitTargetA[2] = TARGET_DEST_TARGET_ENEMY;
-			break;
-		// Horn of Winter, stacking issues
-		case 57330:
-		case 57623:
-			spellInfo->EffectImplicitTargetA[1] = 0;
-			break;
-		// Scourge Strike trigger
-		case 70890:
-			spellInfo->AttributesEx3 |= SPELL_ATTR3_CANT_TRIGGER_PROC;
-			break;
-		// Blood-caked Blade - Blood-caked Strike trigger
-		case 50463:
-			spellInfo->AttributesEx3 |= SPELL_ATTR3_CANT_TRIGGER_PROC;
-			break;
-		// Blood Gorged - ARP affect Death Strike and Rune Strike
-		case 61274:
-		case 61275:
-		case 61276:
-		case 61277:
-		case 61278:
-			spellInfo->EffectSpellClassMask[EFFECT_0] = flag96(0x1400011, 0x20000000, 0x0);
-			break;
-		// Death Grip, remove main grip mechanic, leave only effect one
-		// Death Grip, should fix taunt on bosses and not break the pull protection at the same time (no aura provides immunity to grip mechanic)
-		case 49576:
-		case 49560:
-			spellInfo->Mechanic = 0;
-			break;
-		// Death Grip Jump Dest
-		case 57604:
-			spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
-			break;
-		// Death Pact
-		case 48743:
+        // Deadly Aggression (Deadly Gladiator's Death Knight Relic, item: 42620)
+        case 60549:
+            spellInfo->Effect[1] = 0;
+            break;
+        // Magic Suppression
+        case 49224:
+        case 49610:
+        case 49611:
+            spellInfo->procCharges = 0;
+            break;
+        // Wandering Plague
+        case 50526:
+            spellInfo->AttributesEx3 |= SPELL_ATTR3_NO_DONE_BONUS;
+            spellInfo->AttributesEx3 |=  SPELL_ATTR3_NO_INITIAL_AGGRO;
+            break;
+        // Dancing Rune Weapon
+        case 49028:
+            spellInfo->Effect[2] = 0;
+            spellInfo->procFlags |= PROC_FLAG_DONE_MELEE_AUTO_ATTACK;
+            break;
+        // Death and Decay
+        case 52212:
+            spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
+            spellInfo->AttributesEx6 |= SPELL_ATTR6_CAN_TARGET_INVISIBLE;
+            break;
+        // T9 blood plague crit bonus
+        case 67118:
+            spellInfo->Effect[1] = 0;
+            break;
+        // Pestilence
+        case 50842:
+            spellInfo->EffectImplicitTargetA[2] = TARGET_DEST_TARGET_ENEMY;
+            break;
+        // Horn of Winter, stacking issues
+        case 57330:
+        case 57623:
+            spellInfo->EffectImplicitTargetA[1] = 0;
+            break;
+        // Scourge Strike trigger
+        case 70890:
+            spellInfo->AttributesEx3 |= SPELL_ATTR3_CANT_TRIGGER_PROC;
+            break;
+        // Blood-caked Blade - Blood-caked Strike trigger
+        case 50463:
+            spellInfo->AttributesEx3 |= SPELL_ATTR3_CANT_TRIGGER_PROC;
+            break;
+        // Blood Gorged - ARP affect Death Strike and Rune Strike
+        case 61274:
+        case 61275:
+        case 61276:
+        case 61277:
+        case 61278:
+            spellInfo->EffectSpellClassMask[EFFECT_0] = flag96(0x1400011, 0x20000000, 0x0);
+            break;
+        // Death Grip, remove main grip mechanic, leave only effect one
+        // Death Grip, should fix taunt on bosses and not break the pull protection at the same time (no aura provides immunity to grip mechanic)
+        case 49576:
+        case 49560:
+            spellInfo->Mechanic = 0;
+            break;
+        // Death Grip Jump Dest
+        case 57604:
+            spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
+            break;
+        // Death Pact
+        case 48743:
             spellInfo->AttributesEx &= ~SPELL_ATTR1_CANT_TARGET_SELF;
             break;
-		// Raise Ally (trigger)
-		case 46619:
-			spellInfo->Attributes &= ~SPELL_ATTR0_CANT_CANCEL;
-			break;
-		// Frost Strike
-		case 49143:
-		case 51416:
-		case 51417:
-		case 51418:
-		case 51419:
-		case 55268:
-			spellInfo->AttributesEx3 |= SPELL_ATTR3_BLOCKABLE_SPELL;
-			break;
+        // Raise Ally (trigger)
+        case 46619:
+            spellInfo->Attributes &= ~SPELL_ATTR0_CANT_CANCEL;
+            break;
+        // Frost Strike
+        case 49143:
+        case 51416:
+        case 51417:
+        case 51418:
+        case 51419:
+        case 55268:
+            spellInfo->AttributesEx3 |= SPELL_ATTR3_BLOCKABLE_SPELL;
+            break;
 
 
 
-		/////////////////////////////////
-		///// SHAMAN
-		/////////////////////////////////
-		// Lightning overload
+        /////////////////////////////////
+        ///// SHAMAN
+        /////////////////////////////////
+        // Lightning overload
         case 45297:
-		case 45284:
+        case 45284:
             spellInfo->CategoryRecoveryTime = 0;
             spellInfo->RecoveryTime = 0;
-			spellInfo->AttributesEx6 |= SPELL_ATTR6_LIMIT_PCT_DAMAGE_MODS;
+            spellInfo->AttributesEx6 |= SPELL_ATTR6_LIMIT_PCT_DAMAGE_MODS;
             break;
-		// Improved Earth Shield
-		case 51560:
-		case 51561:
-			spellInfo->EffectMiscValue[1] = SPELLMOD_DAMAGE;
-			break;
-		// Tidal Force
-		case 55166:
-		case 55198:
-			spellInfo->DurationIndex = 18;
-			spellInfo->procCharges = 0;
-			break;
-		// Healing Stream Totem
-		case 52042:
-			spellInfo->spellLevel = 0;
-			spellInfo->baseLevel = 0;
-			spellInfo->DmgClass = SPELL_DAMAGE_CLASS_MAGIC;
-			break;
-		// Earth Shield
-		case 379:
-			spellInfo->spellLevel = 0;
-			spellInfo->baseLevel = 0;
-			spellInfo->DmgClass = SPELL_DAMAGE_CLASS_MAGIC;
-			spellInfo->AttributesEx3 |= SPELL_ATTR3_NO_DONE_BONUS;
-			break;
-		// Stormstrike
-		case 17364:
-			spellInfo->AttributesEx3 |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;
-			break;
-		// Strength of Earth totem effect
-		case 8076:
-		case 8162:
-		case 8163:
-		case 10441:
-		case 25362:
-		case 25527:
-		case 57621:
-		case 58646:
-			spellInfo->EffectRadiusIndex[1] = spellInfo->EffectRadiusIndex[0];
-			spellInfo->EffectRadiusIndex[2] = spellInfo->EffectRadiusIndex[0];
-			break;
-		// Flametongue Totem effect
-		case 52109:
-		case 52110:
-		case 52111:
-		case 52112:
-		case 52113:
-		case 58651:
-		case 58654:
-		case 58655:
-			spellInfo->EffectImplicitTargetB[2] = spellInfo->EffectImplicitTargetB[1] = spellInfo->EffectImplicitTargetB[0] = 0;
-			spellInfo->EffectImplicitTargetA[2] = spellInfo->EffectImplicitTargetA[1] = spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_CASTER;
-			break;
-		// Sentry Totem
-		case 6495:
-			spellInfo->EffectRadiusIndex[0] = 0;
-			break;
-		// Bind Sight (PT)
-		case 6277:
-			spellInfo->AttributesEx &= ~SPELL_ATTR1_CHANNELED_1;
-			spellInfo->Attributes |= SPELL_ATTR0_PASSIVE;
-			spellInfo->AttributesEx7 |= SPELL_ATTR7_REACTIVATE_AT_RESURRECT; // because it is passive, needs this to be properly removed at death in RemoveAllAurasOnDeath()
-			break;
-		// Ancestral Awakening Heal
-		case 52752:
-			spellInfo->AttributesEx3 |= SPELL_ATTR3_NO_DONE_BONUS;
-			break;
+        // Improved Earth Shield
+        case 51560:
+        case 51561:
+            spellInfo->EffectMiscValue[1] = SPELLMOD_DAMAGE;
+            break;
+        // Tidal Force
+        case 55166:
+        case 55198:
+            spellInfo->DurationIndex = 18;
+            spellInfo->procCharges = 0;
+            break;
+        // Healing Stream Totem
+        case 52042:
+            spellInfo->spellLevel = 0;
+            spellInfo->baseLevel = 0;
+            spellInfo->DmgClass = SPELL_DAMAGE_CLASS_MAGIC;
+            break;
+        // Earth Shield
+        case 379:
+            spellInfo->spellLevel = 0;
+            spellInfo->baseLevel = 0;
+            spellInfo->DmgClass = SPELL_DAMAGE_CLASS_MAGIC;
+            spellInfo->AttributesEx3 |= SPELL_ATTR3_NO_DONE_BONUS;
+            break;
+        // Stormstrike
+        case 17364:
+            spellInfo->AttributesEx3 |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;
+            break;
+        // Strength of Earth totem effect
+        case 8076:
+        case 8162:
+        case 8163:
+        case 10441:
+        case 25362:
+        case 25527:
+        case 57621:
+        case 58646:
+            spellInfo->EffectRadiusIndex[1] = spellInfo->EffectRadiusIndex[0];
+            spellInfo->EffectRadiusIndex[2] = spellInfo->EffectRadiusIndex[0];
+            break;
+        // Flametongue Totem effect
+        case 52109:
+        case 52110:
+        case 52111:
+        case 52112:
+        case 52113:
+        case 58651:
+        case 58654:
+        case 58655:
+            spellInfo->EffectImplicitTargetB[2] = spellInfo->EffectImplicitTargetB[1] = spellInfo->EffectImplicitTargetB[0] = 0;
+            spellInfo->EffectImplicitTargetA[2] = spellInfo->EffectImplicitTargetA[1] = spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_CASTER;
+            break;
+        // Sentry Totem
+        case 6495:
+            spellInfo->EffectRadiusIndex[0] = 0;
+            break;
+        // Bind Sight (PT)
+        case 6277:
+            spellInfo->AttributesEx &= ~SPELL_ATTR1_CHANNELED_1;
+            spellInfo->Attributes |= SPELL_ATTR0_PASSIVE;
+            spellInfo->AttributesEx7 |= SPELL_ATTR7_REACTIVATE_AT_RESURRECT; // because it is passive, needs this to be properly removed at death in RemoveAllAurasOnDeath()
+            break;
+        // Ancestral Awakening Heal
+        case 52752:
+            spellInfo->AttributesEx3 |= SPELL_ATTR3_NO_DONE_BONUS;
+            break;
         case 32182: // Heroism
             spellInfo->excludeTargetAuraSpell = 57723; // Exhaustion
-			spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
+            spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
             break;
         case 2825:  // Bloodlust
             spellInfo->excludeTargetAuraSpell = 57724; // Sated
-			spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
+            spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
             break;
 
-		/////////////////////////////////
-		///// WARLOCK
-		/////////////////////////////////
-		// Improved Succubus
+        /////////////////////////////////
+        ///// WARLOCK
+        /////////////////////////////////
+        // Improved Succubus
         case 18754:
         case 18755:
         case 18756:
             spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_CASTER;
             break;
-		// Unstable Affliction
-		case 31117:
-			spellInfo->PreventionType = SPELL_PREVENTION_TYPE_NONE;
-			break;
-		// Shadowflame - trigger
-		case 47960: // r1
-		case 61291: // r2
-			spellInfo->AttributesEx |= SPELL_ATTR1_CANT_BE_REDIRECTED;
-			break;
-		// Curse of Doom - summoned doomguard duration fix
-		case 18662:
-			spellInfo->DurationIndex = 6;
-			break;
-		// Glyph of Voidwalker
-		case 56247:
-			spellInfo->EffectApplyAuraName[EFFECT_0] = SPELL_AURA_ADD_FLAT_MODIFIER;
-			spellInfo->EffectMiscValue[EFFECT_0] = SPELLMOD_EFFECT1;
-			spellInfo->EffectSpellClassMask[EFFECT_0] = flag96(0x8000000, 0, 0);
-			break;
-		// Everlasting Affliction
-		case 47201:
+        // Unstable Affliction
+        case 31117:
+            spellInfo->PreventionType = SPELL_PREVENTION_TYPE_NONE;
+            break;
+        // Shadowflame - trigger
+        case 47960: // r1
+        case 61291: // r2
+            spellInfo->AttributesEx |= SPELL_ATTR1_CANT_BE_REDIRECTED;
+            break;
+        // Curse of Doom - summoned doomguard duration fix
+        case 18662:
+            spellInfo->DurationIndex = 6;
+            break;
+        // Glyph of Voidwalker
+        case 56247:
+            spellInfo->EffectApplyAuraName[EFFECT_0] = SPELL_AURA_ADD_FLAT_MODIFIER;
+            spellInfo->EffectMiscValue[EFFECT_0] = SPELLMOD_EFFECT1;
+            spellInfo->EffectSpellClassMask[EFFECT_0] = flag96(0x8000000, 0, 0);
+            break;
+        // Everlasting Affliction
+        case 47201:
         case 47202:
         case 47203:
         case 47204:
         case 47205:
             spellInfo->EffectSpellClassMask[1][0] |= 2; // add corruption to affected spells
             break;
-		// Death's Embrace
+        // Death's Embrace
         case 47198:
         case 47199:
         case 47200:
-			spellInfo->EffectSpellClassMask[1][0] |= 0x4000; // include Drain Soul
-			break;
-		// Improved Demonic Tactics
-		case 54347:
-		case 54348:
-		case 54349:
-			spellInfo->Effect[EFFECT_1] = spellInfo->Effect[EFFECT_0];
-			spellInfo->EffectApplyAuraName[EFFECT_1] = spellInfo->EffectApplyAuraName[EFFECT_0];
-			spellInfo->EffectImplicitTargetA[EFFECT_1] = spellInfo->EffectImplicitTargetA[EFFECT_0];
-			spellInfo->EffectMiscValue[EFFECT_0] = SPELLMOD_EFFECT1;
-			spellInfo->EffectMiscValue[EFFECT_1] = SPELLMOD_EFFECT2;
-			break;
-		// Rain of Fire (Doomguard)
-		case 42227:
-			spellInfo->speed = 0.0f;
-			break;
-		// Ritual Enslavement
-		case 22987:
-			spellInfo->EffectApplyAuraName[EFFECT_0] = SPELL_AURA_MOD_CHARM;
-			break;
+            spellInfo->EffectSpellClassMask[1][0] |= 0x4000; // include Drain Soul
+            break;
+        // Improved Demonic Tactics
+        case 54347:
+        case 54348:
+        case 54349:
+            spellInfo->Effect[EFFECT_1] = spellInfo->Effect[EFFECT_0];
+            spellInfo->EffectApplyAuraName[EFFECT_1] = spellInfo->EffectApplyAuraName[EFFECT_0];
+            spellInfo->EffectImplicitTargetA[EFFECT_1] = spellInfo->EffectImplicitTargetA[EFFECT_0];
+            spellInfo->EffectMiscValue[EFFECT_0] = SPELLMOD_EFFECT1;
+            spellInfo->EffectMiscValue[EFFECT_1] = SPELLMOD_EFFECT2;
+            break;
+        // Rain of Fire (Doomguard)
+        case 42227:
+            spellInfo->speed = 0.0f;
+            break;
+        // Ritual Enslavement
+        case 22987:
+            spellInfo->EffectApplyAuraName[EFFECT_0] = SPELL_AURA_MOD_CHARM;
+            break;
 
 
-		/////////////////////////////////
-		///// MAGE
-		/////////////////////////////////
-		// Combustion, make this passive
-		case 11129:
-			spellInfo->Dispel = DISPEL_NONE;
-			break;
-		// Magic Absorption (nigga stole my code)
+        /////////////////////////////////
+        ///// MAGE
+        /////////////////////////////////
+        // Combustion, make this passive
+        case 11129:
+            spellInfo->Dispel = DISPEL_NONE;
+            break;
+        // Magic Absorption (nigga stole my code)
         case 29441:
         case 29444:
             spellInfo->spellLevel = 0;
             break;
-		// Living Bomb
-		case 44461:
-		case 55361:
-		case 55362:
-			spellInfo->AttributesEx3 |=  SPELL_ATTR3_NO_INITIAL_AGGRO;
-			spellInfo->AttributesEx4 |= SPELL_ATTR4_DAMAGE_DOESNT_BREAK_AURAS;
-			break;
-		// Evocation
-		case 12051:
-			spellInfo->InterruptFlags |= SPELL_INTERRUPT_FLAG_INTERRUPT;
-			break;
-		// MI Fireblast, WE Frostbolt, MI Frostbolt
-		case 59637:
-		case 31707:
-		case 72898:
-			spellInfo->DmgClass = SPELL_DAMAGE_CLASS_MAGIC;
-			break;
-		// Blazing Speed
+        // Living Bomb
+        case 44461:
+        case 55361:
+        case 55362:
+            spellInfo->AttributesEx3 |=  SPELL_ATTR3_NO_INITIAL_AGGRO;
+            spellInfo->AttributesEx4 |= SPELL_ATTR4_DAMAGE_DOESNT_BREAK_AURAS;
+            break;
+        // Evocation
+        case 12051:
+            spellInfo->InterruptFlags |= SPELL_INTERRUPT_FLAG_INTERRUPT;
+            break;
+        // MI Fireblast, WE Frostbolt, MI Frostbolt
+        case 59637:
+        case 31707:
+        case 72898:
+            spellInfo->DmgClass = SPELL_DAMAGE_CLASS_MAGIC;
+            break;
+        // Blazing Speed
         case 31641:
         case 31642:
             spellInfo->EffectTriggerSpell[0] = 31643;
             break;
-		// Summon Water Elemental (permanent), treat it as pet
-		case 70908:
-			spellInfo->Effect[0] = SPELL_EFFECT_SUMMON_PET;
-			break;
-		// Burnout, trigger
-		case 44450:
-			spellInfo->Effect[0] = SPELL_EFFECT_POWER_BURN;
-			break;
-		// Mirror Image - Summon Spells
-		case 58831:
-		case 58833:
-		case 58834:
-		case 65047:
-			spellInfo->EffectImplicitTargetA[EFFECT_0] = TARGET_DEST_CASTER;
-			spellInfo->EffectRadiusIndex[EFFECT_0] = 0;
-			break;
-		// Initialize Images (Mirror Image)
-		case 58836:
-			spellInfo->EffectImplicitTargetA[EFFECT_1] = TARGET_UNIT_CASTER;
-			break;
-		// Arcane Blast, can't be dispelled
-		case 36032:
-			spellInfo->Attributes |= SPELL_ATTR0_UNAFFECTED_BY_INVULNERABILITY;
-			break;
-		// Chilled (frost armor, ice armor proc)
-		case 6136:
-		case 7321:
-			spellInfo->PreventionType = SPELL_PREVENTION_TYPE_NONE;
-			break;
-		// Mirror Image Frostbolt
-		case 59638:
-			spellInfo->DmgClass = SPELL_DAMAGE_CLASS_MAGIC;
-			spellInfo->SpellFamilyName = SPELLFAMILY_MAGE;
-			spellInfo->SpellFamilyFlags = flag96(0x20, 0x0, 0x0);
-			break;
-		// Fingers of Frost
+        // Summon Water Elemental (permanent), treat it as pet
+        case 70908:
+            spellInfo->Effect[0] = SPELL_EFFECT_SUMMON_PET;
+            break;
+        // Burnout, trigger
+        case 44450:
+            spellInfo->Effect[0] = SPELL_EFFECT_POWER_BURN;
+            break;
+        // Mirror Image - Summon Spells
+        case 58831:
+        case 58833:
+        case 58834:
+        case 65047:
+            spellInfo->EffectImplicitTargetA[EFFECT_0] = TARGET_DEST_CASTER;
+            spellInfo->EffectRadiusIndex[EFFECT_0] = 0;
+            break;
+        // Initialize Images (Mirror Image)
+        case 58836:
+            spellInfo->EffectImplicitTargetA[EFFECT_1] = TARGET_UNIT_CASTER;
+            break;
+        // Arcane Blast, can't be dispelled
+        case 36032:
+            spellInfo->Attributes |= SPELL_ATTR0_UNAFFECTED_BY_INVULNERABILITY;
+            break;
+        // Chilled (frost armor, ice armor proc)
+        case 6136:
+        case 7321:
+            spellInfo->PreventionType = SPELL_PREVENTION_TYPE_NONE;
+            break;
+        // Mirror Image Frostbolt
+        case 59638:
+            spellInfo->DmgClass = SPELL_DAMAGE_CLASS_MAGIC;
+            spellInfo->SpellFamilyName = SPELLFAMILY_MAGE;
+            spellInfo->SpellFamilyFlags = flag96(0x20, 0x0, 0x0);
+            break;
+        // Fingers of Frost
         case 44544:
-			spellInfo->Dispel = DISPEL_NONE;
-			spellInfo->AttributesEx4 |= SPELL_ATTR4_NOT_STEALABLE;
+            spellInfo->Dispel = DISPEL_NONE;
+            spellInfo->AttributesEx4 |= SPELL_ATTR4_NOT_STEALABLE;
             spellInfo->EffectSpellClassMask[0] = flag96(685904631, 1151040, 32); // xinef: removed molten armor
             break;
-		// Fingers of Frost visual buff
+        // Fingers of Frost visual buff
         case 74396:
             spellInfo->procCharges = 2;
             spellInfo->StackAmount = 0;
             break;
 
 
-		/////////////////////////////////
-		///// WARRIOR
-		/////////////////////////////////
-		// Glyph of blocking
-		case 58375:
-			spellInfo->EffectTriggerSpell[0] = 58374;
-			break;
-		// Sweeping Strikes stance change
-		case 12328:
-			spellInfo->Attributes |= SPELL_ATTR0_NOT_SHAPESHIFT;
-			break;
-		// Damage Shield
-		case 59653:
-			spellInfo->DmgClass = SPELL_DAMAGE_CLASS_MAGIC;
-			spellInfo->spellLevel = 0;
-			break;
-		// Strange shared cooldown
-		case 20230: // Retaliation
-		case 871: // Shield Wall
-		case 1719: // Recklessness
-			spellInfo->AttributesEx6 |= SPELL_ATTR6_IGNORE_CATEGORY_COOLDOWN_MODS;
-			break;
-		// Vigilance, fixes bug with empowered renew, single target aura
-		case 50720:
-			spellInfo->SpellFamilyName = SPELLFAMILY_WARRIOR;
-			break;
-		// Sunder Armor - trigger, remove spellfamilyflags because of glyph of sunder armor
-		case 58567:
-			spellInfo->SpellFamilyFlags = flag96(0x0, 0x0, 0x0);
-			break;
-		// Sunder Armor - Old Ranks
-		case 7405:
-		case 8380:
-		case 11596:
-		case 11597:
-		case 25225:
-		case 47467:
-			spellInfo->EffectTriggerSpell[EFFECT_0] = 11971;
-			spellInfo->Effect[EFFECT_0] = SPELL_EFFECT_TRIGGER_SPELL_WITH_VALUE;
-			break;
-		// Improved Spell Reflection
-		case 59725:
-			spellInfo->EffectImplicitTargetA[EFFECT_0] = TARGET_UNIT_CASTER_AREA_PARTY;
-			break;
+        /////////////////////////////////
+        ///// WARRIOR
+        /////////////////////////////////
+        // Glyph of blocking
+        case 58375:
+            spellInfo->EffectTriggerSpell[0] = 58374;
+            break;
+        // Sweeping Strikes stance change
+        case 12328:
+            spellInfo->Attributes |= SPELL_ATTR0_NOT_SHAPESHIFT;
+            break;
+        // Damage Shield
+        case 59653:
+            spellInfo->DmgClass = SPELL_DAMAGE_CLASS_MAGIC;
+            spellInfo->spellLevel = 0;
+            break;
+        // Strange shared cooldown
+        case 20230: // Retaliation
+        case 871: // Shield Wall
+        case 1719: // Recklessness
+            spellInfo->AttributesEx6 |= SPELL_ATTR6_IGNORE_CATEGORY_COOLDOWN_MODS;
+            break;
+        // Vigilance, fixes bug with empowered renew, single target aura
+        case 50720:
+            spellInfo->SpellFamilyName = SPELLFAMILY_WARRIOR;
+            break;
+        // Sunder Armor - trigger, remove spellfamilyflags because of glyph of sunder armor
+        case 58567:
+            spellInfo->SpellFamilyFlags = flag96(0x0, 0x0, 0x0);
+            break;
+        // Sunder Armor - Old Ranks
+        case 7405:
+        case 8380:
+        case 11596:
+        case 11597:
+        case 25225:
+        case 47467:
+            spellInfo->EffectTriggerSpell[EFFECT_0] = 11971;
+            spellInfo->Effect[EFFECT_0] = SPELL_EFFECT_TRIGGER_SPELL_WITH_VALUE;
+            break;
+        // Improved Spell Reflection
+        case 59725:
+            spellInfo->EffectImplicitTargetA[EFFECT_0] = TARGET_UNIT_CASTER_AREA_PARTY;
+            break;
 
 
 
-		/////////////////////////////////
-		///// PRIEST
-		/////////////////////////////////
-		// Shadow Weaving
-		case 15257:
-		case 15331:
-		case 15332:
-			spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_CASTER;
-			spellInfo->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-			break;
-		// Hymn of Hope - rewrite part of aura system or swap effects...
-		case 64904:
-			spellInfo->EffectApplyAuraName[1] = SPELL_AURA_MOD_INCREASE_ENERGY_PERCENT;
-			spellInfo->Effect[2] = spellInfo->Effect[0];
-			spellInfo->Effect[0] = 0;
-			spellInfo->EffectDieSides[2] = spellInfo->EffectDieSides[0];
-			spellInfo->EffectImplicitTargetA[2] = spellInfo->EffectImplicitTargetB[0];
-			spellInfo->EffectRadiusIndex[2] = spellInfo->EffectRadiusIndex[0];
-			spellInfo->EffectBasePoints[2] = spellInfo->EffectBasePoints[0];
-			break;
-		// Divine Hymn
-		case 64844:
-			spellInfo->DmgClass = SPELL_DAMAGE_CLASS_MAGIC;
-			spellInfo->spellLevel = 0;
-			break;
-		// Spiritual Healing affects prayer of mending
-		case 14898:		case 15349:		case 15354:		case 15355:		case 15356:
-		// Divine Providence affects prayer of mending
-		case 47562:		case 47564:		case 47565:		case 47566:		case 47567:
-		// Twin Disciplines affects prayer of mending
-		case 47586:		case 47587:		case 47588:		case 52802:		case 52803:
-			spellInfo->EffectSpellClassMask[0][1] |= 0x20; // prayer of mending
-			break;
-		// Power Infusion, hack to fix stacking with arcane power
-		case 10060:
-			spellInfo->Effect[EFFECT_2] = SPELL_EFFECT_APPLY_AURA;
-			spellInfo->EffectApplyAuraName[EFFECT_2] = SPELL_AURA_ADD_PCT_MODIFIER;
-			spellInfo->EffectImplicitTargetA[EFFECT_2] = TARGET_UNIT_TARGET_ALLY;
-			break;
+        /////////////////////////////////
+        ///// PRIEST
+        /////////////////////////////////
+        // Shadow Weaving
+        case 15257:
+        case 15331:
+        case 15332:
+            spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_CASTER;
+            spellInfo->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            break;
+        // Hymn of Hope - rewrite part of aura system or swap effects...
+        case 64904:
+            spellInfo->EffectApplyAuraName[1] = SPELL_AURA_MOD_INCREASE_ENERGY_PERCENT;
+            spellInfo->Effect[2] = spellInfo->Effect[0];
+            spellInfo->Effect[0] = 0;
+            spellInfo->EffectDieSides[2] = spellInfo->EffectDieSides[0];
+            spellInfo->EffectImplicitTargetA[2] = spellInfo->EffectImplicitTargetB[0];
+            spellInfo->EffectRadiusIndex[2] = spellInfo->EffectRadiusIndex[0];
+            spellInfo->EffectBasePoints[2] = spellInfo->EffectBasePoints[0];
+            break;
+        // Divine Hymn
+        case 64844:
+            spellInfo->DmgClass = SPELL_DAMAGE_CLASS_MAGIC;
+            spellInfo->spellLevel = 0;
+            break;
+        // Spiritual Healing affects prayer of mending
+        case 14898:     case 15349:     case 15354:     case 15355:     case 15356:
+        // Divine Providence affects prayer of mending
+        case 47562:     case 47564:     case 47565:     case 47566:     case 47567:
+        // Twin Disciplines affects prayer of mending
+        case 47586:     case 47587:     case 47588:     case 52802:     case 52803:
+            spellInfo->EffectSpellClassMask[0][1] |= 0x20; // prayer of mending
+            break;
+        // Power Infusion, hack to fix stacking with arcane power
+        case 10060:
+            spellInfo->Effect[EFFECT_2] = SPELL_EFFECT_APPLY_AURA;
+            spellInfo->EffectApplyAuraName[EFFECT_2] = SPELL_AURA_ADD_PCT_MODIFIER;
+            spellInfo->EffectImplicitTargetA[EFFECT_2] = TARGET_UNIT_TARGET_ALLY;
+            break;
 
 
 
-		/////////////////////////////////
-		///// DRUID
-		/////////////////////////////////
-		// Lifebloom final bloom
-		case 33778:
-			spellInfo->DmgClass = SPELL_DAMAGE_CLASS_MAGIC;
-			spellInfo->spellLevel = 0;
-			spellInfo->SpellFamilyFlags = flag96(0, 0x10, 0);
-			break;
-		// Clearcasting
-		case 16870:
-			spellInfo->DurationIndex = 31; // 8 secs
-			break;
-		// Owlkin Frenzy
-		case 48391:
-			spellInfo->Attributes |= SPELL_ATTR0_NOT_SHAPESHIFT;
-			break;
-		// Item T10 Restoration 4P Bonus
-		case 70691:
-			spellInfo->AttributesEx3 |= SPELL_ATTR3_NO_DONE_BONUS;
-			break;
-		// Faerie Fire, Faerie Fire (Feral)
-		case 770:
-		case 16857:
-			spellInfo->AttributesEx &= ~SPELL_ATTR1_UNAFFECTED_BY_SCHOOL_IMMUNE;
-			break;
-		// Feral Charge - Cat
-		case 49376:
-		case 61138:
-		case 61132:
-		case 50259:
-			spellInfo->AttributesEx3 |= SPELL_ATTR3_NO_INITIAL_AGGRO;
-			break;
-		// Glyph of Barkskin
-		case 63058:
-			spellInfo->EffectApplyAuraName[EFFECT_0] = SPELL_AURA_MOD_ATTACKER_MELEE_CRIT_CHANCE;
-			break;
+        /////////////////////////////////
+        ///// DRUID
+        /////////////////////////////////
+        // Lifebloom final bloom
+        case 33778:
+            spellInfo->DmgClass = SPELL_DAMAGE_CLASS_MAGIC;
+            spellInfo->spellLevel = 0;
+            spellInfo->SpellFamilyFlags = flag96(0, 0x10, 0);
+            break;
+        // Clearcasting
+        case 16870:
+            spellInfo->DurationIndex = 31; // 8 secs
+            break;
+        // Owlkin Frenzy
+        case 48391:
+            spellInfo->Attributes |= SPELL_ATTR0_NOT_SHAPESHIFT;
+            break;
+        // Item T10 Restoration 4P Bonus
+        case 70691:
+            spellInfo->AttributesEx3 |= SPELL_ATTR3_NO_DONE_BONUS;
+            break;
+        // Faerie Fire, Faerie Fire (Feral)
+        case 770:
+        case 16857:
+            spellInfo->AttributesEx &= ~SPELL_ATTR1_UNAFFECTED_BY_SCHOOL_IMMUNE;
+            break;
+        // Feral Charge - Cat
+        case 49376:
+        case 61138:
+        case 61132:
+        case 50259:
+            spellInfo->AttributesEx3 |= SPELL_ATTR3_NO_INITIAL_AGGRO;
+            break;
+        // Glyph of Barkskin
+        case 63058:
+            spellInfo->EffectApplyAuraName[EFFECT_0] = SPELL_AURA_MOD_ATTACKER_MELEE_CRIT_CHANCE;
+            break;
 
 
-		/////////////////////////////////
-		///// MISC
-		/////////////////////////////////
-		// Resurrection Sickness
-		case 15007:
-			spellInfo->SpellFamilyName = SPELLFAMILY_GENERIC;
-			break;
-		// Luck of the Draw
-		case 72221:
-			spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_CHANGE_MAP;
-			break;
-		case 3286:  // Bind
-			spellInfo->Targets = 0; // neutral innkeepers not friendly?
+        /////////////////////////////////
+        ///// MISC
+        /////////////////////////////////
+        // Resurrection Sickness
+        case 15007:
+            spellInfo->SpellFamilyName = SPELLFAMILY_GENERIC;
+            break;
+        // Luck of the Draw
+        case 72221:
+            spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_CHANGE_MAP;
+            break;
+        case 3286:  // Bind
+            spellInfo->Targets = 0; // neutral innkeepers not friendly?
             spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_TARGET_ANY;
             spellInfo->EffectImplicitTargetA[1] = TARGET_UNIT_TARGET_ANY;
             break;
         // remove creaturetargettype
-		case 2641:
-		case 23356:
+        case 2641:
+        case 23356:
             spellInfo->TargetCreatureType = 0;
             break;
-		case 34074: // Aspect of the Viper
-			spellInfo->Effect[2] = SPELL_EFFECT_APPLY_AURA;
-			spellInfo->EffectImplicitTargetA[2] = 1;
-			spellInfo->EffectApplyAuraName[2] = SPELL_AURA_DUMMY;
-			break;
+        case 34074: // Aspect of the Viper
+            spellInfo->Effect[2] = SPELL_EFFECT_APPLY_AURA;
+            spellInfo->EffectImplicitTargetA[2] = 1;
+            spellInfo->EffectApplyAuraName[2] = SPELL_AURA_DUMMY;
+            break;
         // Strength of Wrynn
         case 60509:
             spellInfo->EffectBasePoints[2] = 1500;
             spellInfo->EffectBasePoints[1] = 150;
             spellInfo->EffectApplyAuraName[1] = SPELL_AURA_PERIODIC_HEAL;
             break;
-		// Playback Speech
-		case 74209:
-			spellInfo->DurationIndex = 1;
-			break;
-		// Winterfin First Responder
-		case 48739:
-			spellInfo->EffectBasePoints[0] = 1;
-			spellInfo->EffectRealPointsPerLevel[0] = 0;
-			spellInfo->EffectDieSides[0] = 0;
-			spellInfo->EffectDamageMultiplier[0] = 0;
-			spellInfo->EffectBonusMultiplier[0] = 0;
-			break;
-		// Army of the Dead (trigger npc aura)
-		case 49099:
-			spellInfo->EffectAmplitude[0] = 15000;
-			break;
-		// Isle of Conquest - Teleport in, missing range
-		case 66551:
-			spellInfo->rangeIndex = 13; // 50000yd
-			break;
-		// A'dal's Song of Battle
-		case 39953:
+        // Playback Speech
+        case 74209:
+            spellInfo->DurationIndex = 1;
+            break;
+        // Winterfin First Responder
+        case 48739:
+            spellInfo->EffectBasePoints[0] = 1;
+            spellInfo->EffectRealPointsPerLevel[0] = 0;
+            spellInfo->EffectDieSides[0] = 0;
+            spellInfo->EffectDamageMultiplier[0] = 0;
+            spellInfo->EffectBonusMultiplier[0] = 0;
+            break;
+        // Army of the Dead (trigger npc aura)
+        case 49099:
+            spellInfo->EffectAmplitude[0] = 15000;
+            break;
+        // Isle of Conquest - Teleport in, missing range
+        case 66551:
+            spellInfo->rangeIndex = 13; // 50000yd
+            break;
+        // A'dal's Song of Battle
+        case 39953:
             spellInfo->EffectImplicitTargetA[EFFECT_0] = TARGET_SRC_CASTER;
             spellInfo->EffectImplicitTargetA[EFFECT_1] = TARGET_SRC_CASTER;
             spellInfo->EffectImplicitTargetA[EFFECT_2] = TARGET_SRC_CASTER;
             spellInfo->EffectImplicitTargetB[EFFECT_0] = TARGET_UNIT_SRC_AREA_ALLY;
             spellInfo->EffectImplicitTargetB[EFFECT_1] = TARGET_UNIT_SRC_AREA_ALLY;
             spellInfo->EffectImplicitTargetB[EFFECT_2] = TARGET_UNIT_SRC_AREA_ALLY;
-			spellInfo->DurationIndex = 367; // 2 Hours
-			break;
-		// Wintergrasp spells
-		case 51422: // Cannon (Tower Cannon)
-			spellInfo->EffectRadiusIndex[EFFECT_0] = 13; // 10yd
-			break;
-		case 57610: // Cannon (Siege Turret)
-			spellInfo->EffectRadiusIndex[EFFECT_0] = 13; // 10yd
-			break;
-		case 50999: // Boulder (Demolisher)
-			spellInfo->EffectRadiusIndex[EFFECT_0] = 13; // 10yd
-			break;
-		case 50990: // Flame Breath (Catapult)
-			spellInfo->EffectRadiusIndex[EFFECT_0] = 19; // 18yd
-			break;
+            spellInfo->DurationIndex = 367; // 2 Hours
+            break;
+        // Wintergrasp spells
+        case 51422: // Cannon (Tower Cannon)
+            spellInfo->EffectRadiusIndex[EFFECT_0] = 13; // 10yd
+            break;
+        case 57610: // Cannon (Siege Turret)
+            spellInfo->EffectRadiusIndex[EFFECT_0] = 13; // 10yd
+            break;
+        case 50999: // Boulder (Demolisher)
+            spellInfo->EffectRadiusIndex[EFFECT_0] = 13; // 10yd
+            break;
+        case 50990: // Flame Breath (Catapult)
+            spellInfo->EffectRadiusIndex[EFFECT_0] = 19; // 18yd
+            break;
 
-		/////////////////////////////////
-		///// Generic NPC Spells
-		/////////////////////////////////
+        /////////////////////////////////
+        ///// Generic NPC Spells
+        /////////////////////////////////
 
-		// Throw Proximity Bomb
-		case 34095:
-			spellInfo->EffectImplicitTargetA[EFFECT_0] = TARGET_DEST_TARGET_ENEMY;
-			spellInfo->EffectImplicitTargetB[EFFECT_0] = 0;
-			break;
-		// DEATH KNIGHT SCARLET FIRE ARROW
-		case 53348:
-		// BALISTA
-		case 53117:
-			spellInfo->RecoveryTime = 5000;
-			spellInfo->CategoryRecoveryTime = 5000;
-			break;
-		// Teleport To Molten Core
-		case 25139:
-			spellInfo->AttributesEx3 |= SPELL_ATTR3_DEATH_PERSISTENT;
-			break;
+        // Throw Proximity Bomb
+        case 34095:
+            spellInfo->EffectImplicitTargetA[EFFECT_0] = TARGET_DEST_TARGET_ENEMY;
+            spellInfo->EffectImplicitTargetB[EFFECT_0] = 0;
+            break;
+        // DEATH KNIGHT SCARLET FIRE ARROW
+        case 53348:
+        // BALISTA
+        case 53117:
+            spellInfo->RecoveryTime = 5000;
+            spellInfo->CategoryRecoveryTime = 5000;
+            break;
+        // Teleport To Molten Core
+        case 25139:
+            spellInfo->AttributesEx3 |= SPELL_ATTR3_DEATH_PERSISTENT;
+            break;
 
 
         // ///////////////////////////////////////////
-		// ////////////////BOSS SPELLS////////////////
-		// ///////////////////////////////////////////
-		//////////////////////////////////////////
-		////////// Vanilla Instances
-		//////////////////////////////////////////
+        // ////////////////BOSS SPELLS////////////////
+        // ///////////////////////////////////////////
+        //////////////////////////////////////////
+        ////////// Vanilla Instances
+        //////////////////////////////////////////
 
-		// Shadowfang Keep
-		// Landen Stilwell Transform
-		case 31310:
-			spellInfo->Attributes |= SPELL_ATTR0_PASSIVE;
-			break;
+        // Shadowfang Keep
+        // Landen Stilwell Transform
+        case 31310:
+            spellInfo->Attributes |= SPELL_ATTR0_PASSIVE;
+            break;
 
-		// Blackfathom Deeps
-		// Shadowstalker Stealth
-		case 5916:
-			spellInfo->EffectRealPointsPerLevel[EFFECT_0] = 5.0f;
-			break;
+        // Blackfathom Deeps
+        // Shadowstalker Stealth
+        case 5916:
+            spellInfo->EffectRealPointsPerLevel[EFFECT_0] = 5.0f;
+            break;
 
-		// Maraudon
-		// Sneak
-		case 22766:
-			spellInfo->EffectRealPointsPerLevel[EFFECT_0] = 5.0f;
-			break;
+        // Maraudon
+        // Sneak
+        case 22766:
+            spellInfo->EffectRealPointsPerLevel[EFFECT_0] = 5.0f;
+            break;
 
 
-		//////////////////////////////////////////
-		////////// TBC Instances
-		//////////////////////////////////////////
+        //////////////////////////////////////////
+        ////////// TBC Instances
+        //////////////////////////////////////////
 
-		// Shadow Labirynth
-		// Murmur's Touch
-		case 38794:
-		case 33711:
+        // Shadow Labirynth
+        // Murmur's Touch
+        case 38794:
+        case 33711:
             spellInfo->MaxAffectedTargets = 1;
             spellInfo->EffectTriggerSpell[0] = 33760;
             break;
 
-		// The Arcatraz
-		// Negaton Field
-		case 36729: // Normal
-		case 38834: // Heroic
-			spellInfo->AttributesEx3 |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;
-			break;
-		// Curse of the Doomsayer NORMAL
-		case 36173:
-			spellInfo->EffectTriggerSpell[0] = 36174; // Currently triggers heroic version...
-			break;
+        // The Arcatraz
+        // Negaton Field
+        case 36729: // Normal
+        case 38834: // Heroic
+            spellInfo->AttributesEx3 |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;
+            break;
+        // Curse of the Doomsayer NORMAL
+        case 36173:
+            spellInfo->EffectTriggerSpell[0] = 36174; // Currently triggers heroic version...
+            break;
 
-		// The Botanica
-		// Crystal Channel
-		case 34156:
-			spellInfo->rangeIndex = 35; // 35yd;
-			spellInfo->ChannelInterruptFlags |= AURA_INTERRUPT_FLAG_MOVE;
-			break;
+        // The Botanica
+        // Crystal Channel
+        case 34156:
+            spellInfo->rangeIndex = 35; // 35yd;
+            spellInfo->ChannelInterruptFlags |= AURA_INTERRUPT_FLAG_MOVE;
+            break;
 
-		// Magtheridon's Lair
-		// Debris
-		case 36449:
-			spellInfo->Attributes |= SPELL_ATTR0_NEGATIVE_1;
-			break;
-		// Soul Channel
-		case 30531:
-			spellInfo->AttributesEx3 |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;
-			break;
-		// Debris Visual
-		case 30632:
-			spellInfo->EffectImplicitTargetB[0] = TARGET_DEST_DYNOBJ_ALLY;
-			break;
+        // Magtheridon's Lair
+        // Debris
+        case 36449:
+            spellInfo->Attributes |= SPELL_ATTR0_NEGATIVE_1;
+            break;
+        // Soul Channel
+        case 30531:
+            spellInfo->AttributesEx3 |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;
+            break;
+        // Debris Visual
+        case 30632:
+            spellInfo->EffectImplicitTargetB[0] = TARGET_DEST_DYNOBJ_ALLY;
+            break;
 
-		// Sunwell Plateu
-		// Activate Sunblade Protecto
-		case 46475:
-		case 46476:
-			spellInfo->rangeIndex = 14; // 60yd
-			break;
-		// Break Ice
-		case 46638:
-			spellInfo->AttributesEx3 &= ~SPELL_ATTR3_ONLY_TARGET_PLAYERS; // Obvious fail, it targets gameobject...
-			break;
-		// Sinister Reflection Clone
-		case 45785:
-			spellInfo->speed = 0.0f;
-			break;
-		// Armageddon
-		case 45909:
-			spellInfo->speed = 8.0f;
-			break;
+        // Sunwell Plateu
+        // Activate Sunblade Protecto
+        case 46475:
+        case 46476:
+            spellInfo->rangeIndex = 14; // 60yd
+            break;
+        // Break Ice
+        case 46638:
+            spellInfo->AttributesEx3 &= ~SPELL_ATTR3_ONLY_TARGET_PLAYERS; // Obvious fail, it targets gameobject...
+            break;
+        // Sinister Reflection Clone
+        case 45785:
+            spellInfo->speed = 0.0f;
+            break;
+        // Armageddon
+        case 45909:
+            spellInfo->speed = 8.0f;
+            break;
 
-		// Black Temple
-		// Spell Absorption
-		case 41034:
-			spellInfo->Effect[EFFECT_2] = SPELL_EFFECT_APPLY_AURA;
-			spellInfo->EffectApplyAuraName[EFFECT_2] = SPELL_AURA_SCHOOL_ABSORB;
-			spellInfo->EffectImplicitTargetA[EFFECT_2] = TARGET_UNIT_CASTER;
-			spellInfo->EffectMiscValue[EFFECT_2] = SPELL_SCHOOL_MASK_MAGIC;
-			break;
-		// Shared Bonds
-		case 41363:
-			spellInfo->AttributesEx &= ~SPELL_ATTR1_CHANNELED_1;
-			break;
-		// Deadly Poison
-		case 41485:
-		// Envenom
-		case 41487:
-			spellInfo->AttributesEx6 |= SPELL_ATTR6_CAN_TARGET_INVISIBLE;
-			break;
-		// Parasitic Shadowfiend
-		case 41914:
-			spellInfo->Attributes |= SPELL_ATTR0_NEGATIVE_1;
-			spellInfo->AttributesEx3 |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;
-			break;
-		// Teleport Maiev
-		case 41221:
-			spellInfo->rangeIndex = 13; // 0-50000yd
-			break;
+        // Black Temple
+        // Spell Absorption
+        case 41034:
+            spellInfo->Effect[EFFECT_2] = SPELL_EFFECT_APPLY_AURA;
+            spellInfo->EffectApplyAuraName[EFFECT_2] = SPELL_AURA_SCHOOL_ABSORB;
+            spellInfo->EffectImplicitTargetA[EFFECT_2] = TARGET_UNIT_CASTER;
+            spellInfo->EffectMiscValue[EFFECT_2] = SPELL_SCHOOL_MASK_MAGIC;
+            break;
+        // Shared Bonds
+        case 41363:
+            spellInfo->AttributesEx &= ~SPELL_ATTR1_CHANNELED_1;
+            break;
+        // Deadly Poison
+        case 41485:
+        // Envenom
+        case 41487:
+            spellInfo->AttributesEx6 |= SPELL_ATTR6_CAN_TARGET_INVISIBLE;
+            break;
+        // Parasitic Shadowfiend
+        case 41914:
+            spellInfo->Attributes |= SPELL_ATTR0_NEGATIVE_1;
+            spellInfo->AttributesEx3 |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;
+            break;
+        // Teleport Maiev
+        case 41221:
+            spellInfo->rangeIndex = 13; // 0-50000yd
+            break;
 
-		// Serpentshrine Cavern
-		// Watery Grave Explosion
-		case 37852:
-			spellInfo->AttributesEx5 |= SPELL_ATTR5_USABLE_WHILE_STUNNED;
-			break;
+        // Serpentshrine Cavern
+        // Watery Grave Explosion
+        case 37852:
+            spellInfo->AttributesEx5 |= SPELL_ATTR5_USABLE_WHILE_STUNNED;
+            break;
 
-		// Magisters' Terrace
-		// Energy Feedback
-		case 44335:
-			spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_CHANGE_MAP;
-			break;
+        // Magisters' Terrace
+        // Energy Feedback
+        case 44335:
+            spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_CHANGE_MAP;
+            break;
 
 
 
-		//////////////////////////////////////////
-		////////// Vault of Archavon (VOA)
-		//////////////////////////////////////////
-		// Flame Breath, catapult spell
-		case 50989:
-			spellInfo->Attributes &= ~SPELL_ATTR0_LEVEL_DAMAGE_CALCULATION;
-			break;
-		// Koralon, Flaming Cinder missing radius index
-		case 66690:
-			spellInfo->EffectRadiusIndex[0] = 12; //100yd
-			spellInfo->MaxAffectedTargets = 1;
-			break;
+        //////////////////////////////////////////
+        ////////// Vault of Archavon (VOA)
+        //////////////////////////////////////////
+        // Flame Breath, catapult spell
+        case 50989:
+            spellInfo->Attributes &= ~SPELL_ATTR0_LEVEL_DAMAGE_CALCULATION;
+            break;
+        // Koralon, Flaming Cinder missing radius index
+        case 66690:
+            spellInfo->EffectRadiusIndex[0] = 12; //100yd
+            spellInfo->MaxAffectedTargets = 1;
+            break;
 
-		//////////////////////////////////////////
-		////////// Naxxramas
-		//////////////////////////////////////////
-		// Acid Volley
-		case 54714:
-		case 29325:
-			spellInfo->MaxAffectedTargets = 1;
-			break;
-		// Summon Plagued Warrior
-		case 29237:
-			spellInfo->Effect[0] = SPELL_EFFECT_DUMMY;
-			spellInfo->Effect[1] = spellInfo->Effect[2] = 0;
-			break;
-		// Icebolt
-		case 28526:
-			spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_TARGET_ANY;
-			break;
-		// Infected Wound
-		case 29306:
-			spellInfo->AttributesEx3 |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;
-			break;
-		// Hopeless
-		case 29125:
-			spellInfo->EffectImplicitTargetB[0] = TARGET_UNIT_SRC_AREA_ENTRY;
-			break;
+        //////////////////////////////////////////
+        ////////// Naxxramas
+        //////////////////////////////////////////
+        // Acid Volley
+        case 54714:
+        case 29325:
+            spellInfo->MaxAffectedTargets = 1;
+            break;
+        // Summon Plagued Warrior
+        case 29237:
+            spellInfo->Effect[0] = SPELL_EFFECT_DUMMY;
+            spellInfo->Effect[1] = spellInfo->Effect[2] = 0;
+            break;
+        // Icebolt
+        case 28526:
+            spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_TARGET_ANY;
+            break;
+        // Infected Wound
+        case 29306:
+            spellInfo->AttributesEx3 |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;
+            break;
+        // Hopeless
+        case 29125:
+            spellInfo->EffectImplicitTargetB[0] = TARGET_UNIT_SRC_AREA_ENTRY;
+            break;
 
-		//////////////////////////////////////////
-		////////// Gundrak
-		//////////////////////////////////////////
-		// Moorabi - Transformation 
-		case 55098:
-			spellInfo->InterruptFlags |= SPELL_INTERRUPT_FLAG_INTERRUPT;
-			break;
+        //////////////////////////////////////////
+        ////////// Gundrak
+        //////////////////////////////////////////
+        // Moorabi - Transformation 
+        case 55098:
+            spellInfo->InterruptFlags |= SPELL_INTERRUPT_FLAG_INTERRUPT;
+            break;
 
-		//////////////////////////////////////////
-		////////// The Nexus: Nexus
-		//////////////////////////////////////////
-		// Charged Chaotic rift aura, trigger
-		case 47737:
-			spellInfo->rangeIndex = 37; // 50yd
-			break;
+        //////////////////////////////////////////
+        ////////// The Nexus: Nexus
+        //////////////////////////////////////////
+        // Charged Chaotic rift aura, trigger
+        case 47737:
+            spellInfo->rangeIndex = 37; // 50yd
+            break;
 
-		//////////////////////////////////////////
-		////////// AHN'KAHET: THE OLD KINGDOM
-		////////////////////////////////////////// 
-		// Vanish
-		case 55964:
-			spellInfo->Effect[1] = 0;
-			spellInfo->Effect[2] = 0;
-			break;
+        //////////////////////////////////////////
+        ////////// AHN'KAHET: THE OLD KINGDOM
+        ////////////////////////////////////////// 
+        // Vanish
+        case 55964:
+            spellInfo->Effect[1] = 0;
+            spellInfo->Effect[2] = 0;
+            break;
 
-		//////////////////////////////////////////
-		////////// DRAK'THARON KEEP
-		////////////////////////////////////////// 
-		// Trollgore - Summon Drakkari Invader
-		case 49456:
-		case 49457:
-		case 49458:
-			spellInfo->EffectImplicitTargetA[0] = TARGET_DEST_DB;
-			break;
+        //////////////////////////////////////////
+        ////////// DRAK'THARON KEEP
+        ////////////////////////////////////////// 
+        // Trollgore - Summon Drakkari Invader
+        case 49456:
+        case 49457:
+        case 49458:
+            spellInfo->EffectImplicitTargetA[0] = TARGET_DEST_DB;
+            break;
 
-		//////////////////////////////////////////
-		////////// UTGARDE PINNACLE
-		////////////////////////////////////////// 
-		// Paralyse
-		case 48278:
-		// Awaken subboss
-		case 47669:
-			spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_TARGET_ANY;
-			spellInfo->EffectImplicitTargetB[0] = 0;
-			break;
-		// Flame Breath
-		case 47592:
-			spellInfo->EffectAmplitude[0] = 200;
-			break;
+        //////////////////////////////////////////
+        ////////// UTGARDE PINNACLE
+        ////////////////////////////////////////// 
+        // Paralyse
+        case 48278:
+        // Awaken subboss
+        case 47669:
+            spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_TARGET_ANY;
+            spellInfo->EffectImplicitTargetB[0] = 0;
+            break;
+        // Flame Breath
+        case 47592:
+            spellInfo->EffectAmplitude[0] = 200;
+            break;
 
-		//////////////////////////////////////////
-		////////// UTGARDE KEEP
-		////////////////////////////////////////// 
-		// Skarvald, Charge
-		case 43651:
-			spellInfo->rangeIndex = 13; // 0-50000yd
-			break;
-		// Ingvar the Plunderer, Woe Strike
-		case 42730:
-			spellInfo->EffectTriggerSpell[1] = 42739;
-			break;
-		case 59735:
-			spellInfo->EffectTriggerSpell[1] = 59736;
-			break;
-		// Ingvar the Plunderer, Ingvar transform
-		case 42796:
-			spellInfo->AttributesEx3 |= SPELL_ATTR3_DEATH_PERSISTENT;
-			break;
+        //////////////////////////////////////////
+        ////////// UTGARDE KEEP
+        ////////////////////////////////////////// 
+        // Skarvald, Charge
+        case 43651:
+            spellInfo->rangeIndex = 13; // 0-50000yd
+            break;
+        // Ingvar the Plunderer, Woe Strike
+        case 42730:
+            spellInfo->EffectTriggerSpell[1] = 42739;
+            break;
+        case 59735:
+            spellInfo->EffectTriggerSpell[1] = 59736;
+            break;
+        // Ingvar the Plunderer, Ingvar transform
+        case 42796:
+            spellInfo->AttributesEx3 |= SPELL_ATTR3_DEATH_PERSISTENT;
+            break;
 
-		//////////////////////////////////////////
-		////////// VIOLET HOLD
-		//////////////////////////////////////////
-		// Control Crystal Activation
-		case 57804:
-			spellInfo->EffectImplicitTargetA[0] = 1;
-			spellInfo->EffectImplicitTargetB[0] = 0;
-			break;
-		// Destroy Door Seal
-		case 58040:
-			spellInfo->ChannelInterruptFlags &= ~(AURA_INTERRUPT_FLAG_HITBYSPELL | AURA_INTERRUPT_FLAG_TAKE_DAMAGE);
-			break;
-		// Ichoron, Water Blast
-		case 54237:
-		case 59520:
-			spellInfo->AttributesEx3 |= SPELL_ATTR3_IGNORE_HIT_RESULT;
-			break;
+        //////////////////////////////////////////
+        ////////// VIOLET HOLD
+        //////////////////////////////////////////
+        // Control Crystal Activation
+        case 57804:
+            spellInfo->EffectImplicitTargetA[0] = 1;
+            spellInfo->EffectImplicitTargetB[0] = 0;
+            break;
+        // Destroy Door Seal
+        case 58040:
+            spellInfo->ChannelInterruptFlags &= ~(AURA_INTERRUPT_FLAG_HITBYSPELL | AURA_INTERRUPT_FLAG_TAKE_DAMAGE);
+            break;
+        // Ichoron, Water Blast
+        case 54237:
+        case 59520:
+            spellInfo->AttributesEx3 |= SPELL_ATTR3_IGNORE_HIT_RESULT;
+            break;
 
-		//////////////////////////////////////////
-		////////// AZJOL'NERUB
-		////////////////////////////////////////// 
+        //////////////////////////////////////////
+        ////////// AZJOL'NERUB
+        ////////////////////////////////////////// 
 
-		// Krik'thir - Mind Flay
-		case 52586:
-		case 59367:
-			spellInfo->ChannelInterruptFlags |= AURA_INTERRUPT_FLAG_MOVE;
-			break;
+        // Krik'thir - Mind Flay
+        case 52586:
+        case 59367:
+            spellInfo->ChannelInterruptFlags |= AURA_INTERRUPT_FLAG_MOVE;
+            break;
 
-		//////////////////////////////////////////
-		////////// HALLS OF STONE
-		//////////////////////////////////////////
-		// Glare of the Tribunal
+        //////////////////////////////////////////
+        ////////// HALLS OF STONE
+        //////////////////////////////////////////
+        // Glare of the Tribunal
         case 50988:
         case 59870:
             spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_TARGET_ANY;
-			spellInfo->EffectImplicitTargetB[0] = 0;
+            spellInfo->EffectImplicitTargetB[0] = 0;
             break;
-		// Static Charge
-		case 50835:
-		case 59847:
-			spellInfo->EffectImplicitTargetB[0] = TARGET_UNIT_SRC_AREA_ALLY;
-			break;
+        // Static Charge
+        case 50835:
+        case 59847:
+            spellInfo->EffectImplicitTargetB[0] = TARGET_UNIT_SRC_AREA_ALLY;
+            break;
 
-		//////////////////////////////////////////
-		////////// OBSIDIAN SANCTUM
-		//////////////////////////////////////////
-		// Lava Strike damage
-		case 57697: 
-			spellInfo->EffectImplicitTargetA[0] = TARGET_DEST_DEST;
-			break;
-		// Lava Strike trigger
-		case 57578:
-			spellInfo->MaxAffectedTargets = 1;
-			break;
-		// Gift of Twilight Shadow/Fire
-		case 57835:
-		case 58766:
-			spellInfo->AttributesEx &= ~SPELL_ATTR1_CHANNELED_1;
-			break;
-		// Pyrobuffet
-		case 57557:
-			spellInfo->excludeTargetAuraSpell = 56911;
-			break;
+        //////////////////////////////////////////
+        ////////// OBSIDIAN SANCTUM
+        //////////////////////////////////////////
+        // Lava Strike damage
+        case 57697: 
+            spellInfo->EffectImplicitTargetA[0] = TARGET_DEST_DEST;
+            break;
+        // Lava Strike trigger
+        case 57578:
+            spellInfo->MaxAffectedTargets = 1;
+            break;
+        // Gift of Twilight Shadow/Fire
+        case 57835:
+        case 58766:
+            spellInfo->AttributesEx &= ~SPELL_ATTR1_CHANNELED_1;
+            break;
+        // Pyrobuffet
+        case 57557:
+            spellInfo->excludeTargetAuraSpell = 56911;
+            break;
 
-		//////////////////////////////////////////
-		////////// EYE OF ETERNITY
-		//////////////////////////////////////////
-		// Arcane Barrage
-		case 56397:
-			spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_TARGET_ENEMY;
-			spellInfo->EffectImplicitTargetB[0] = 0;
-			spellInfo->EffectImplicitTargetA[1] = TARGET_UNIT_TARGET_ENEMY;
-			spellInfo->EffectImplicitTargetB[1] = 0;
-			spellInfo->EffectImplicitTargetA[2] = TARGET_UNIT_TARGET_ENEMY;
-			spellInfo->EffectImplicitTargetB[2] = 0;
-			break;
-		// Power Spark (ground +50% dmg aura)
-		case 55849:
-		// Arcane Overload (-50% dmg taken) - this is to prevent apply -> unapply -> apply ... dunno whether it's correct
-		case 56438:
-			spellInfo->AttributesEx3 |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;
-			break;
-		// Vortex (Control Vehicle)
-		case 56263:
-			spellInfo->AttributesEx3 |= SPELL_ATTR3_IGNORE_HIT_RESULT;
-			break;
-		// Haste (Nexus Lord, increase run speed of the disk)
-		case 57060:
-			spellInfo->EffectImplicitTargetA[2] = TARGET_UNIT_VEHICLE;
-			break;
-		// Arcane Overload
-		case 56430:
-			spellInfo->Effect[0] = SPELL_EFFECT_TRIGGER_MISSILE;
-			spellInfo->EffectTriggerSpell[0] = 56429;
-			// no break intended
-		case 56429:
-			spellInfo->EffectImplicitTargetA[0] = TARGET_DEST_DEST;
-			spellInfo->EffectImplicitTargetB[0] = 0;
-			spellInfo->EffectImplicitTargetA[1] = 0;
-			spellInfo->EffectImplicitTargetB[1] = 0;
-			spellInfo->EffectImplicitTargetA[2] = 0;
-			spellInfo->EffectImplicitTargetB[2] = 0;
-			break;
-		// Destroy Platform Event
-		case 59099:
-			spellInfo->EffectImplicitTargetA[1] = 22;
-			spellInfo->EffectImplicitTargetB[1] = 15;
-			spellInfo->EffectImplicitTargetA[2] = 22;
-			spellInfo->EffectImplicitTargetB[2] = 15;
-			break;
-		// Surge of Power (Phase 3)
-		case 57407: // N
-		case 60936: // H
-			spellInfo->MaxAffectedTargets = (i == 60936 ? 3 : 1);
-			spellInfo->InterruptFlags = 0;
-			spellInfo->EffectRadiusIndex[0] = 28;
-			spellInfo->AttributesEx4 |= SPELL_ATTR4_CAN_CAST_WHILE_CASTING;
-			spellInfo->EffectImplicitTargetA[0] = TARGET_SRC_CASTER;
-			spellInfo->EffectImplicitTargetB[0] = TARGET_UNIT_SRC_AREA_ENEMY;
-			spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
-			break;
-		// Wyrmrest Drake - Life Burst
-		case 57143:
-			spellInfo->Effect[0] = 0;
-			spellInfo->EffectImplicitTargetA[0] = 0;
-			spellInfo->EffectImplicitTargetB[0] = 0;
-			spellInfo->EffectImplicitTargetA[1] = TARGET_SRC_CASTER;
-			spellInfo->EffectImplicitTargetB[1] = TARGET_UNIT_SRC_AREA_ALLY;
-			spellInfo->EffectPointsPerComboPoint[1] = 2500;
-			spellInfo->EffectBasePoints[1] = 2499;
-			spellInfo->rangeIndex = 1;
-			spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
-			break;
-		//Alexstrasza - Gift
-		case 61028:
-			spellInfo->EffectImplicitTargetA[0] = TARGET_DEST_DEST;
-			break;
-		// Vortex (freeze anim)
-		case 55883:
-			spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_CHANGE_MAP;
-			break;
+        //////////////////////////////////////////
+        ////////// EYE OF ETERNITY
+        //////////////////////////////////////////
+        // Arcane Barrage
+        case 56397:
+            spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_TARGET_ENEMY;
+            spellInfo->EffectImplicitTargetB[0] = 0;
+            spellInfo->EffectImplicitTargetA[1] = TARGET_UNIT_TARGET_ENEMY;
+            spellInfo->EffectImplicitTargetB[1] = 0;
+            spellInfo->EffectImplicitTargetA[2] = TARGET_UNIT_TARGET_ENEMY;
+            spellInfo->EffectImplicitTargetB[2] = 0;
+            break;
+        // Power Spark (ground +50% dmg aura)
+        case 55849:
+        // Arcane Overload (-50% dmg taken) - this is to prevent apply -> unapply -> apply ... dunno whether it's correct
+        case 56438:
+            spellInfo->AttributesEx3 |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;
+            break;
+        // Vortex (Control Vehicle)
+        case 56263:
+            spellInfo->AttributesEx3 |= SPELL_ATTR3_IGNORE_HIT_RESULT;
+            break;
+        // Haste (Nexus Lord, increase run speed of the disk)
+        case 57060:
+            spellInfo->EffectImplicitTargetA[2] = TARGET_UNIT_VEHICLE;
+            break;
+        // Arcane Overload
+        case 56430:
+            spellInfo->Effect[0] = SPELL_EFFECT_TRIGGER_MISSILE;
+            spellInfo->EffectTriggerSpell[0] = 56429;
+            // no break intended
+        case 56429:
+            spellInfo->EffectImplicitTargetA[0] = TARGET_DEST_DEST;
+            spellInfo->EffectImplicitTargetB[0] = 0;
+            spellInfo->EffectImplicitTargetA[1] = 0;
+            spellInfo->EffectImplicitTargetB[1] = 0;
+            spellInfo->EffectImplicitTargetA[2] = 0;
+            spellInfo->EffectImplicitTargetB[2] = 0;
+            break;
+        // Destroy Platform Event
+        case 59099:
+            spellInfo->EffectImplicitTargetA[1] = 22;
+            spellInfo->EffectImplicitTargetB[1] = 15;
+            spellInfo->EffectImplicitTargetA[2] = 22;
+            spellInfo->EffectImplicitTargetB[2] = 15;
+            break;
+        // Surge of Power (Phase 3)
+        case 57407: // N
+        case 60936: // H
+            spellInfo->MaxAffectedTargets = (i == 60936 ? 3 : 1);
+            spellInfo->InterruptFlags = 0;
+            spellInfo->EffectRadiusIndex[0] = 28;
+            spellInfo->AttributesEx4 |= SPELL_ATTR4_CAN_CAST_WHILE_CASTING;
+            spellInfo->EffectImplicitTargetA[0] = TARGET_SRC_CASTER;
+            spellInfo->EffectImplicitTargetB[0] = TARGET_UNIT_SRC_AREA_ENEMY;
+            spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
+            break;
+        // Wyrmrest Drake - Life Burst
+        case 57143:
+            spellInfo->Effect[0] = 0;
+            spellInfo->EffectImplicitTargetA[0] = 0;
+            spellInfo->EffectImplicitTargetB[0] = 0;
+            spellInfo->EffectImplicitTargetA[1] = TARGET_SRC_CASTER;
+            spellInfo->EffectImplicitTargetB[1] = TARGET_UNIT_SRC_AREA_ALLY;
+            spellInfo->EffectPointsPerComboPoint[1] = 2500;
+            spellInfo->EffectBasePoints[1] = 2499;
+            spellInfo->rangeIndex = 1;
+            spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
+            break;
+        //Alexstrasza - Gift
+        case 61028:
+            spellInfo->EffectImplicitTargetA[0] = TARGET_DEST_DEST;
+            break;
+        // Vortex (freeze anim)
+        case 55883:
+            spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_CHANGE_MAP;
+            break;
 
-		//////////////////////////////////////////
-		////////// ULDUAR
-		//////////////////////////////////////////
-		// Flame Leviathan
-		// Hurl Pyrite
-		case 62490:
-			spellInfo->Effect[EFFECT_1] = 0;
-			break;
-
-		// Ulduar, Mimiron, Magnetic Core (summon)
-		case 64444:
-			spellInfo->EffectImplicitTargetA[0] = TARGET_DEST_CASTER;
-			break;
-		// Ulduar, Mimiron, bomb bot explosion
-		case 63801:
-			spellInfo->EffectMiscValue[1] = 17286;
-			break;
-		// Ulduar, Mimiron, Summon Flames Initial
-		case 64563:
-			spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
-			spellInfo->AttributesEx3 |= SPELL_ATTR3_IGNORE_HIT_RESULT;
-			spellInfo->EffectImplicitTargetA[0] = TARGET_DEST_DEST;
-			spellInfo->EffectImplicitTargetB[0] = 0;
-			break;
-		// Ulduar, Mimiron, Flames (damage)
-		case 64566:
-			spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
-			spellInfo->AttributesEx4 &= ~SPELL_ATTR4_IGNORE_RESISTANCES;
-			break;
-
-		// Ulduar, Hodir, Starlight
-		case 62807:
-			spellInfo->EffectRadiusIndex[0] = 16; // 1yd
-			break;
-
-		// Ulduar, General Vezax, Mark of the Faceless
-		case 63278:
-			spellInfo->Effect[0] = 0;
-			break;
-
-		// XT-002 DECONSTRUCTOR
-		case 62834: // Boom (XT-002)
+        //////////////////////////////////////////
+        ////////// ULDUAR
+        //////////////////////////////////////////
+        // Flame Leviathan
+        // Hurl Pyrite
+        case 62490:
             spellInfo->Effect[EFFECT_1] = 0;
             break;
 
-		// ASSEMBLY OF IRON
-		// Supercharge
-		case 61920:
-			spellInfo->AttributesEx3 |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;
-			break;
-		// Lightning Whirl
-		case 61916:
-			spellInfo->MaxAffectedTargets = 3;
-			break;
-		case 63482:
-			spellInfo->MaxAffectedTargets = 8;
-			break;
+        // Ulduar, Mimiron, Magnetic Core (summon)
+        case 64444:
+            spellInfo->EffectImplicitTargetA[0] = TARGET_DEST_CASTER;
+            break;
+        // Ulduar, Mimiron, bomb bot explosion
+        case 63801:
+            spellInfo->EffectMiscValue[1] = 17286;
+            break;
+        // Ulduar, Mimiron, Summon Flames Initial
+        case 64563:
+            spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
+            spellInfo->AttributesEx3 |= SPELL_ATTR3_IGNORE_HIT_RESULT;
+            spellInfo->EffectImplicitTargetA[0] = TARGET_DEST_DEST;
+            spellInfo->EffectImplicitTargetB[0] = 0;
+            break;
+        // Ulduar, Mimiron, Flames (damage)
+        case 64566:
+            spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
+            spellInfo->AttributesEx4 &= ~SPELL_ATTR4_IGNORE_RESISTANCES;
+            break;
 
-		// KOLOGARN
-		// Stone Grip, remove absorb aura
-		case 62056:
-		case 63985:
-			spellInfo->Effect[1] = 0;
-			break;
+        // Ulduar, Hodir, Starlight
+        case 62807:
+            spellInfo->EffectRadiusIndex[0] = 16; // 1yd
+            break;
 
-		// AURIAYA
-		// Sentinel Blast
-		case 64389:
-		case 64678:
-			spellInfo->Dispel = DISPEL_MAGIC;
-			break;
+        // Ulduar, General Vezax, Mark of the Faceless
+        case 63278:
+            spellInfo->Effect[0] = 0;
+            break;
 
-		// FREYA
-		// Potent Pheromones
-		case 62619:
-			spellInfo->AttributesEx |= SPELL_ATTR1_DISPEL_AURAS_ON_IMMUNITY;
-			break;
-		// Healthy spore summon periodic
-		case 62566:
-			spellInfo->EffectAmplitude[0] = 2000;
-			spellInfo->EffectApplyAuraName[0] = SPELL_AURA_PERIODIC_TRIGGER_SPELL;
-			break;
-		// Brightleaf Essence trigger
-		case 62968:
-			spellInfo->Effect[1] = 0; // duplicate
-			break;
-		// Potent Pheromones
-		case 64321:
-			spellInfo->AttributesEx3 |= SPELL_ATTR3_ONLY_TARGET_PLAYERS;
-			spellInfo->AttributesEx |= SPELL_ATTR1_DISPEL_AURAS_ON_IMMUNITY;
-			break;
+        // XT-002 DECONSTRUCTOR
+        case 62834: // Boom (XT-002)
+            spellInfo->Effect[EFFECT_1] = 0;
+            break;
 
-		// THORIM
-		// charge obr stuff
-		case 62186:
-			spellInfo->EffectAmplitude[0] = 5000; // Duration 5 secs, amplitude 8 secs...
-			break;
-		// Charge Orb P2
-		case 62976:
-			spellInfo->rangeIndex = 6;
-			spellInfo->DurationIndex = 28;
-			break;
-		// Sif's Blizzard
-		case 62576:
-		case 62602:
-			spellInfo->EffectRadiusIndex[0] = 14; // 8yd
-			spellInfo->EffectRadiusIndex[1] = 14; // 8yd
-			break;
+        // ASSEMBLY OF IRON
+        // Supercharge
+        case 61920:
+            spellInfo->AttributesEx3 |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;
+            break;
+        // Lightning Whirl
+        case 61916:
+            spellInfo->MaxAffectedTargets = 3;
+            break;
+        case 63482:
+            spellInfo->MaxAffectedTargets = 8;
+            break;
 
-		// YOGG-SARON
-		// Protective Gaze
-		case 64175:
-			spellInfo->RecoveryTime = 25000;
-			break;
-		// Shadow Beacon
-		case 64465:
-			spellInfo->EffectTriggerSpell[0] = 64467; // why do they need two script effects :/ (this one has visual effect)
-			break;
-		// Sanity
-		case 63050:
-			spellInfo->AttributesEx6 |= SPELL_ATTR6_CAN_TARGET_INVISIBLE;
-			break;
-		// Shadow Nova
-		case 62714:
-		case 65209:
-			spellInfo->AttributesEx3 |= SPELL_ATTR3_IGNORE_HIT_RESULT;
-			break;
+        // KOLOGARN
+        // Stone Grip, remove absorb aura
+        case 62056:
+        case 63985:
+            spellInfo->Effect[1] = 0;
+            break;
 
-		// ALGALON
-		 // Cosmic Smash (Algalon the Observer)
+        // AURIAYA
+        // Sentinel Blast
+        case 64389:
+        case 64678:
+            spellInfo->Dispel = DISPEL_MAGIC;
+            break;
+
+        // FREYA
+        // Potent Pheromones
+        case 62619:
+            spellInfo->AttributesEx |= SPELL_ATTR1_DISPEL_AURAS_ON_IMMUNITY;
+            break;
+        // Healthy spore summon periodic
+        case 62566:
+            spellInfo->EffectAmplitude[0] = 2000;
+            spellInfo->EffectApplyAuraName[0] = SPELL_AURA_PERIODIC_TRIGGER_SPELL;
+            break;
+        // Brightleaf Essence trigger
+        case 62968:
+            spellInfo->Effect[1] = 0; // duplicate
+            break;
+        // Potent Pheromones
+        case 64321:
+            spellInfo->AttributesEx3 |= SPELL_ATTR3_ONLY_TARGET_PLAYERS;
+            spellInfo->AttributesEx |= SPELL_ATTR1_DISPEL_AURAS_ON_IMMUNITY;
+            break;
+
+        // THORIM
+        // charge obr stuff
+        case 62186:
+            spellInfo->EffectAmplitude[0] = 5000; // Duration 5 secs, amplitude 8 secs...
+            break;
+        // Charge Orb P2
+        case 62976:
+            spellInfo->rangeIndex = 6;
+            spellInfo->DurationIndex = 28;
+            break;
+        // Sif's Blizzard
+        case 62576:
+        case 62602:
+            spellInfo->EffectRadiusIndex[0] = 14; // 8yd
+            spellInfo->EffectRadiusIndex[1] = 14; // 8yd
+            break;
+
+        // YOGG-SARON
+        // Protective Gaze
+        case 64175:
+            spellInfo->RecoveryTime = 25000;
+            break;
+        // Shadow Beacon
+        case 64465:
+            spellInfo->EffectTriggerSpell[0] = 64467; // why do they need two script effects :/ (this one has visual effect)
+            break;
+        // Sanity
+        case 63050:
+            spellInfo->AttributesEx6 |= SPELL_ATTR6_CAN_TARGET_INVISIBLE;
+            break;
+        // Shadow Nova
+        case 62714:
+        case 65209:
+            spellInfo->AttributesEx3 |= SPELL_ATTR3_IGNORE_HIT_RESULT;
+            break;
+
+        // ALGALON
+         // Cosmic Smash (Algalon the Observer)
         case 62293:
             spellInfo->EffectImplicitTargetB[0] = TARGET_DEST_CASTER;
             break;
-		// Cosmic Smash (Algalon the Observer)
+        // Cosmic Smash (Algalon the Observer)
         case 62311:
         case 64596: 
-			spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
-			spellInfo->EffectRadiusIndex[0] = 12; // 100yd
+            spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
+            spellInfo->EffectRadiusIndex[0] = 12; // 100yd
             spellInfo->rangeIndex = 13;  // 50000yd
             break;
-		// Constellation Phase Effect
-		case 65509:
-			spellInfo->MaxAffectedTargets = 1;
-			break;
-		// Black Hole
-		case 62168:
-		case 65250:
-		case 62169:
-			spellInfo->Attributes |= SPELL_ATTR0_NEGATIVE_1;
-			break;
+        // Constellation Phase Effect
+        case 65509:
+            spellInfo->MaxAffectedTargets = 1;
+            break;
+        // Black Hole
+        case 62168:
+        case 65250:
+        case 62169:
+            spellInfo->Attributes |= SPELL_ATTR0_NEGATIVE_1;
+            break;
 
-		// TRASH
-		// Ground Slam
-		case 62625:
-			spellInfo->InterruptFlags |= SPELL_INTERRUPT_FLAG_INTERRUPT;
-			break;
+        // TRASH
+        // Ground Slam
+        case 62625:
+            spellInfo->InterruptFlags |= SPELL_INTERRUPT_FLAG_INTERRUPT;
+            break;
 
-		//////////////////////////////////////////
-		////////// ONYXIA'S LAIR
-		//////////////////////////////////////////
-		// Onyxia's Lair, Onyxia, Flame Breath (TriggerSpell = 0 and spamming errors in console)
-		case 18435:
-			spellInfo->Effect[1] = 0;
-			break;
-		// Onyxia's Lair, Onyxia, Create Onyxia Spawner
-		case 17647:
-			spellInfo->DurationIndex = 37;
-			break;
-		// Onyxia's Lair, Onyxia, Summon Onyxia Whelp
-		case 17646:
-		// Onyxia's Lair, Onyxia, Summon Lair Guard
-		case 68968:
-			spellInfo->Targets |= TARGET_FLAG_DEST_LOCATION;
-			spellInfo->EffectImplicitTargetA[0] = TARGET_DEST_DEST;
-			spellInfo->rangeIndex = 13;
-			spellInfo->DurationIndex = 5;
-			break;
-		// Onyxia's Lair, Onyxia, Eruption:
-		case 17731:
-		case 69294:
-			spellInfo->Effect[1] = SPELL_EFFECT_DUMMY;
-			spellInfo->CastingTimeIndex = 3;
-			spellInfo->EffectRadiusIndex[1] = 19; // 18yd instead of 13yd to make sure all cracks erupt
-			break;
-		// Onyxia's Lair, Onyxia, Breath:
-		// TODO: fix it by IconId / SpellVisual
-		case 18576: case 18578: case 18579: case 18580:
-		case 18581: case 18582: case 18583: case 18609: case 18611: case 18612: case 18613: case 18614:
-		case 18615: case 18616: case 18584: case 18585: case 18586: case 18587: case 18588: case 18589:
-		case 18590: case 18591: case 18592: case 18593: case 18594: case 18595: case 18564: case 18565:
-		case 18566: case 18567: case 18568: case 18569: case 18570: case 18571: case 18572: case 18573:
-		case 18574: case 18575: case 18596: case 18597: case 18598: case 18599: case 18600: case 18601:
-		case 18602: case 18603: case 18604: case 18605: case 18606: case 18607: case 18617: case 18619:
-		case 18620: case 18621: case 18622: case 18623: case 18624: case 18625: case 18626: case 18627:
-		case 18628: case 18618: case 18351: case 18352: case 18353: case 18354: case 18355: case 18356:
-		case 18357: case 18358: case 18359: case 18360: case 18361: case 17086: case 17087: case 17088:
-		case 17089: case 17090: case 17091: case 17092: case 17093: case 17094: case 17095: case 17097:
-		case 22267: case 22268: case 21132: case 21133: case 21135: case 21136: case 21137: case 21138:
-		case 21139:
-			spellInfo->DurationIndex = 328; // 250ms
-			spellInfo->EffectImplicitTargetA[1] = 1;
-			if( spellInfo->Effect[1] )
-			{
-				spellInfo->Effect[1] = SPELL_EFFECT_APPLY_AURA;
-				spellInfo->EffectApplyAuraName[1] = SPELL_AURA_PERIODIC_TRIGGER_SPELL;
-				spellInfo->EffectAmplitude[1] = ((spellInfo->CastingTimeIndex == 170) ? 50 : 215);
-			}
-			break;
+        //////////////////////////////////////////
+        ////////// ONYXIA'S LAIR
+        //////////////////////////////////////////
+        // Onyxia's Lair, Onyxia, Flame Breath (TriggerSpell = 0 and spamming errors in console)
+        case 18435:
+            spellInfo->Effect[1] = 0;
+            break;
+        // Onyxia's Lair, Onyxia, Create Onyxia Spawner
+        case 17647:
+            spellInfo->DurationIndex = 37;
+            break;
+        // Onyxia's Lair, Onyxia, Summon Onyxia Whelp
+        case 17646:
+        // Onyxia's Lair, Onyxia, Summon Lair Guard
+        case 68968:
+            spellInfo->Targets |= TARGET_FLAG_DEST_LOCATION;
+            spellInfo->EffectImplicitTargetA[0] = TARGET_DEST_DEST;
+            spellInfo->rangeIndex = 13;
+            spellInfo->DurationIndex = 5;
+            break;
+        // Onyxia's Lair, Onyxia, Eruption:
+        case 17731:
+        case 69294:
+            spellInfo->Effect[1] = SPELL_EFFECT_DUMMY;
+            spellInfo->CastingTimeIndex = 3;
+            spellInfo->EffectRadiusIndex[1] = 19; // 18yd instead of 13yd to make sure all cracks erupt
+            break;
+        // Onyxia's Lair, Onyxia, Breath:
+        // TODO: fix it by IconId / SpellVisual
+        case 18576: case 18578: case 18579: case 18580:
+        case 18581: case 18582: case 18583: case 18609: case 18611: case 18612: case 18613: case 18614:
+        case 18615: case 18616: case 18584: case 18585: case 18586: case 18587: case 18588: case 18589:
+        case 18590: case 18591: case 18592: case 18593: case 18594: case 18595: case 18564: case 18565:
+        case 18566: case 18567: case 18568: case 18569: case 18570: case 18571: case 18572: case 18573:
+        case 18574: case 18575: case 18596: case 18597: case 18598: case 18599: case 18600: case 18601:
+        case 18602: case 18603: case 18604: case 18605: case 18606: case 18607: case 18617: case 18619:
+        case 18620: case 18621: case 18622: case 18623: case 18624: case 18625: case 18626: case 18627:
+        case 18628: case 18618: case 18351: case 18352: case 18353: case 18354: case 18355: case 18356:
+        case 18357: case 18358: case 18359: case 18360: case 18361: case 17086: case 17087: case 17088:
+        case 17089: case 17090: case 17091: case 17092: case 17093: case 17094: case 17095: case 17097:
+        case 22267: case 22268: case 21132: case 21133: case 21135: case 21136: case 21137: case 21138:
+        case 21139:
+            spellInfo->DurationIndex = 328; // 250ms
+            spellInfo->EffectImplicitTargetA[1] = 1;
+            if( spellInfo->Effect[1] )
+            {
+                spellInfo->Effect[1] = SPELL_EFFECT_APPLY_AURA;
+                spellInfo->EffectApplyAuraName[1] = SPELL_AURA_PERIODIC_TRIGGER_SPELL;
+                spellInfo->EffectAmplitude[1] = ((spellInfo->CastingTimeIndex == 170) ? 50 : 215);
+            }
+            break;
 
-		//////////////////////////////////////////
-		////////// THE NEXUS: OCULUS
-		//////////////////////////////////////////
-		// Oculus, Teleport to Coldarra DND
-		case 48760:
-		// Oculus, Teleport to Boss 1 DND
-		case 49305:
-			spellInfo->EffectImplicitTargetA[0] = 25;
-			spellInfo->EffectImplicitTargetB[0] = 17;
-			break;
-		// Oculus, Drake spell Stop Time
-		case 49838:
-			spellInfo->AttributesEx3 |= SPELL_ATTR3_NO_INITIAL_AGGRO;
-			spellInfo->excludeTargetAuraSpell = 51162; // exclude planar shift
-			spellInfo->EffectRadiusIndex[EFFECT_0] = EFFECT_RADIUS_150_YARDS;
-			break;
-		// Oculus, Varos Cloudstrider, Energize Cores
-		case 61407:
-		case 62136:
-		case 56251:
-		case 54069:
-			spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_CONE_ENTRY;
-			spellInfo->EffectImplicitTargetB[0] = 0;
-			break;
+        //////////////////////////////////////////
+        ////////// THE NEXUS: OCULUS
+        //////////////////////////////////////////
+        // Oculus, Teleport to Coldarra DND
+        case 48760:
+        // Oculus, Teleport to Boss 1 DND
+        case 49305:
+            spellInfo->EffectImplicitTargetA[0] = 25;
+            spellInfo->EffectImplicitTargetB[0] = 17;
+            break;
+        // Oculus, Drake spell Stop Time
+        case 49838:
+            spellInfo->AttributesEx3 |= SPELL_ATTR3_NO_INITIAL_AGGRO;
+            spellInfo->excludeTargetAuraSpell = 51162; // exclude planar shift
+            spellInfo->EffectRadiusIndex[EFFECT_0] = EFFECT_RADIUS_150_YARDS;
+            break;
+        // Oculus, Varos Cloudstrider, Energize Cores
+        case 61407:
+        case 62136:
+        case 56251:
+        case 54069:
+            spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_CONE_ENTRY;
+            spellInfo->EffectImplicitTargetB[0] = 0;
+            break;
 
-		//////////////////////////////////////////
-		////////// HALLS OF LIGHTNING
-		//////////////////////////////////////////
-		// Halls of Lightning, Arc Weld
-		case 59086:
-			spellInfo->EffectImplicitTargetA[0] = 1;
-			break;
-		// Halls of Lightning, Arcing Burn
-		case 52671:
-		case 59834:
-			spellInfo->AttributesEx3 |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;
-			break;
+        //////////////////////////////////////////
+        ////////// HALLS OF LIGHTNING
+        //////////////////////////////////////////
+        // Halls of Lightning, Arc Weld
+        case 59086:
+            spellInfo->EffectImplicitTargetA[0] = 1;
+            break;
+        // Halls of Lightning, Arcing Burn
+        case 52671:
+        case 59834:
+            spellInfo->AttributesEx3 |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;
+            break;
 
-		//////////////////////////////////////////
-		////////// TRIAL OF THE CHAMPION
-		//////////////////////////////////////////
-		// Trial of the Champion, Death's Respite
-		case 68306:
-			spellInfo->EffectImplicitTargetA[0] = 25;
-			spellInfo->EffectImplicitTargetA[1] = 25;
-			break;
-		// Trial of the Champion, Eadric Achievement (The Faceroller)
-		case 68197:
-			spellInfo->EffectImplicitTargetB[0] = TARGET_UNIT_SRC_AREA_ALLY;
-			spellInfo->Attributes |= SPELL_ATTR0_CASTABLE_WHILE_DEAD;
-			break;
-		// Trial of the Champion, Earth Shield
-		case 67530:
-			spellInfo->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL; // will trigger 67537
-			break;
-		// Trial of the Champion, Hammer of the Righteous
-		case 66867:
-			spellInfo->Effect[0] = SPELL_EFFECT_DUMMY;
-			break;
-		// Trial of the Champion, Summon Risen Jaeren/Arelas
-		case 67705:
-		case 67715:
-			spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_DEAD;
-			break;
-		// Trial of the Champion, Ghoul Explode
-		case 67751:
-			spellInfo->EffectImplicitTargetA[0] = TARGET_SRC_CASTER;
-			spellInfo->EffectImplicitTargetB[0] = TARGET_UNIT_SRC_AREA_ENTRY;
-			spellInfo->EffectRadiusIndex[0] = 12;
-			spellInfo->EffectImplicitTargetA[1] = TARGET_SRC_CASTER;
-			spellInfo->EffectImplicitTargetB[1] = TARGET_UNIT_SRC_AREA_ENTRY;
-			spellInfo->EffectRadiusIndex[1] = 12;
-			spellInfo->EffectImplicitTargetA[2] = TARGET_SRC_CASTER;
-			spellInfo->EffectImplicitTargetB[2] = TARGET_UNIT_SRC_AREA_ENTRY;
-			spellInfo->EffectRadiusIndex[3] = 12;
-			break;
-		// Trial of the Champion, Desecration
-		case 67778:
-		case 67877:
-			spellInfo->EffectTriggerSpell[0] = 68766;
-			break;
+        //////////////////////////////////////////
+        ////////// TRIAL OF THE CHAMPION
+        //////////////////////////////////////////
+        // Trial of the Champion, Death's Respite
+        case 68306:
+            spellInfo->EffectImplicitTargetA[0] = 25;
+            spellInfo->EffectImplicitTargetA[1] = 25;
+            break;
+        // Trial of the Champion, Eadric Achievement (The Faceroller)
+        case 68197:
+            spellInfo->EffectImplicitTargetB[0] = TARGET_UNIT_SRC_AREA_ALLY;
+            spellInfo->Attributes |= SPELL_ATTR0_CASTABLE_WHILE_DEAD;
+            break;
+        // Trial of the Champion, Earth Shield
+        case 67530:
+            spellInfo->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL; // will trigger 67537
+            break;
+        // Trial of the Champion, Hammer of the Righteous
+        case 66867:
+            spellInfo->Effect[0] = SPELL_EFFECT_DUMMY;
+            break;
+        // Trial of the Champion, Summon Risen Jaeren/Arelas
+        case 67705:
+        case 67715:
+            spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_DEAD;
+            break;
+        // Trial of the Champion, Ghoul Explode
+        case 67751:
+            spellInfo->EffectImplicitTargetA[0] = TARGET_SRC_CASTER;
+            spellInfo->EffectImplicitTargetB[0] = TARGET_UNIT_SRC_AREA_ENTRY;
+            spellInfo->EffectRadiusIndex[0] = 12;
+            spellInfo->EffectImplicitTargetA[1] = TARGET_SRC_CASTER;
+            spellInfo->EffectImplicitTargetB[1] = TARGET_UNIT_SRC_AREA_ENTRY;
+            spellInfo->EffectRadiusIndex[1] = 12;
+            spellInfo->EffectImplicitTargetA[2] = TARGET_SRC_CASTER;
+            spellInfo->EffectImplicitTargetB[2] = TARGET_UNIT_SRC_AREA_ENTRY;
+            spellInfo->EffectRadiusIndex[3] = 12;
+            break;
+        // Trial of the Champion, Desecration
+        case 67778:
+        case 67877:
+            spellInfo->EffectTriggerSpell[0] = 68766;
+            break;
 
-		//////////////////////////////////////////
-		////////// TRIAL OF THE CRUSADER
-		//////////////////////////////////////////
-		// Trial of the Crusader, Jaraxxus Intro spell
-		case 67888:
-			spellInfo->Attributes |= SPELL_ATTR0_STOP_ATTACK_TARGET;
-			spellInfo->AttributesEx |= SPELL_ATTR1_NO_THREAT;
-			spellInfo->AttributesEx3 |= SPELL_ATTR3_NO_INITIAL_AGGRO;
-			break;
-		// Trial of the Crusader, Lich King Intro spell
-		case 68193:
-			spellInfo->EffectImplicitTargetB[0] = TARGET_UNIT_SRC_AREA_ENEMY;
-			break;
-		// Trial of the Crusader, Gormok, player vehicle spell, CUSTOM! (default jump to hand, not used)
-		case 66342:
-			spellInfo->Effect[0] = SPELL_EFFECT_APPLY_AURA;
-			spellInfo->EffectApplyAuraName[0] = SPELL_AURA_SET_VEHICLE_ID;
-			spellInfo->EffectMiscValue[0] = 496;
-			spellInfo->DurationIndex = 21;
-			spellInfo->rangeIndex = 13;
-			spellInfo->EffectImplicitTargetA[0] = 25;
-			spellInfo->EffectImplicitTargetB[0] = 0;
-			spellInfo->AuraInterruptFlags = AURA_INTERRUPT_FLAG_CHANGE_MAP;
-			break;
-		// Trial of the Crusader, Gormok, Fire Bomb
-		case 66313:
-			spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_TARGET_ANY;
-			spellInfo->EffectImplicitTargetB[0] = TARGET_DEST_TARGET_ANY;
-			spellInfo->EffectImplicitTargetA[1] = TARGET_UNIT_TARGET_ANY;
-			spellInfo->EffectImplicitTargetB[1] = TARGET_DEST_TARGET_ANY;
-			spellInfo->Effect[1] = 0;
-			// no break intended
-		case 66317:
-			spellInfo->Attributes |= SPELL_ATTR0_STOP_ATTACK_TARGET;
-			spellInfo->AttributesEx |= SPELL_ATTR1_NO_THREAT;
-			spellInfo->AttributesEx3 |= SPELL_ATTR3_NO_INITIAL_AGGRO;
-			break;
-		case 66318:
-			spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_TARGET_ANY;
-			spellInfo->EffectImplicitTargetB[0] = 0;
-			spellInfo->speed = 14.0f;
-			spellInfo->Attributes |= SPELL_ATTR0_STOP_ATTACK_TARGET;
-			spellInfo->AttributesEx |= SPELL_ATTR1_NO_THREAT;
-			spellInfo->AttributesEx3 |= SPELL_ATTR3_NO_INITIAL_AGGRO;
-			break;
-		case 66320:
-		case 67472:
-		case 67473:
-		case 67475:
-			spellInfo->EffectRadiusIndex[0] = 7;
-			spellInfo->EffectRadiusIndex[1] = 7;
-			break;
-		// Trial of the Crusader, Acidmaw & Dreadscale, Emerge
-		case 66947:
-			spellInfo->AttributesEx5 |= SPELL_ATTR5_USABLE_WHILE_STUNNED;
-			break;
-		// Trial of the Crusader, Jaraxxus, Curse of the Nether
-		case 66211:
-			spellInfo->excludeTargetAuraSpell = 66209; // exclude Touch of Jaraxxus
-			break;
-		// Trial of the Crusader, Jaraxxus, Summon Volcano
-		case 66258:
-		case 67901:
-			spellInfo->DurationIndex = 85; // summon for 18 seconds, 15 not enough
-			break;
-		// Trial of the Crusader, Jaraxxus, Spinning Pain Spike
-		case 66281:
-			spellInfo->EffectRadiusIndex[0] = 26;
-			break;
-		case 66287:
-			spellInfo->Effect[1] = SPELL_EFFECT_APPLY_AURA;
-			spellInfo->EffectApplyAuraName[1] = SPELL_AURA_MOD_TAUNT;
-			spellInfo->EffectImplicitTargetA[1] = TARGET_UNIT_NEARBY_ENTRY;
-			spellInfo->Effect[2] = SPELL_EFFECT_APPLY_AURA;
-			spellInfo->EffectApplyAuraName[2] = SPELL_AURA_MOD_STUN;
-			spellInfo->EffectImplicitTargetA[2] = TARGET_UNIT_CASTER;
-			spellInfo->DurationIndex = 35; // 4 secs
-			break;
-		// Trial of the Crusader, Jaraxxus, Fel Fireball
-		case 66532:
-		case 66963:
-		case 66964:
-		case 66965:
-			spellInfo->InterruptFlags |= SPELL_INTERRUPT_FLAG_INTERRUPT;
-			break;
-		// tempfix, make Nether Power not stealable
-		case 66228:
-		case 67106:
-		case 67107:
-		case 67108:
-			spellInfo->AttributesEx4 |= SPELL_ATTR4_NOT_STEALABLE;
-			break;
-		// Trial of the Crusader, Faction Champions, Druid - Tranquality
-		case 66086:
-		case 67974:
-		case 67975:
-		case 67976:
-			spellInfo->Effect[0] = SPELL_EFFECT_APPLY_AREA_AURA_FRIEND;
-			break;
-		// Trial of the Crusader, Faction Champions, Shaman - Earth Shield
-		case 66063:
-			spellInfo->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
-			spellInfo->EffectTriggerSpell[0] = 66064;
-			break;
-		// Trial of the Crusader, Faction Champions, Priest - Mana Burn
-		case 66100:
-			spellInfo->EffectBasePoints[0] = 5;
-			spellInfo->EffectDieSides[0] = 0;
-			break;
-		case 68026:
-			spellInfo->EffectBasePoints[0] = 8;
-			spellInfo->EffectDieSides[0] = 0;
-			break;
-		case 68027:
-			spellInfo->EffectBasePoints[0] = 6;
-			spellInfo->EffectDieSides[0] = 0;
-			break;
-		case 68028:
-			spellInfo->EffectBasePoints[0] = 10;
-			spellInfo->EffectDieSides[0] = 0;
-			break;
+        //////////////////////////////////////////
+        ////////// TRIAL OF THE CRUSADER
+        //////////////////////////////////////////
+        // Trial of the Crusader, Jaraxxus Intro spell
+        case 67888:
+            spellInfo->Attributes |= SPELL_ATTR0_STOP_ATTACK_TARGET;
+            spellInfo->AttributesEx |= SPELL_ATTR1_NO_THREAT;
+            spellInfo->AttributesEx3 |= SPELL_ATTR3_NO_INITIAL_AGGRO;
+            break;
+        // Trial of the Crusader, Lich King Intro spell
+        case 68193:
+            spellInfo->EffectImplicitTargetB[0] = TARGET_UNIT_SRC_AREA_ENEMY;
+            break;
+        // Trial of the Crusader, Gormok, player vehicle spell, CUSTOM! (default jump to hand, not used)
+        case 66342:
+            spellInfo->Effect[0] = SPELL_EFFECT_APPLY_AURA;
+            spellInfo->EffectApplyAuraName[0] = SPELL_AURA_SET_VEHICLE_ID;
+            spellInfo->EffectMiscValue[0] = 496;
+            spellInfo->DurationIndex = 21;
+            spellInfo->rangeIndex = 13;
+            spellInfo->EffectImplicitTargetA[0] = 25;
+            spellInfo->EffectImplicitTargetB[0] = 0;
+            spellInfo->AuraInterruptFlags = AURA_INTERRUPT_FLAG_CHANGE_MAP;
+            break;
+        // Trial of the Crusader, Gormok, Fire Bomb
+        case 66313:
+            spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_TARGET_ANY;
+            spellInfo->EffectImplicitTargetB[0] = TARGET_DEST_TARGET_ANY;
+            spellInfo->EffectImplicitTargetA[1] = TARGET_UNIT_TARGET_ANY;
+            spellInfo->EffectImplicitTargetB[1] = TARGET_DEST_TARGET_ANY;
+            spellInfo->Effect[1] = 0;
+            // no break intended
+        case 66317:
+            spellInfo->Attributes |= SPELL_ATTR0_STOP_ATTACK_TARGET;
+            spellInfo->AttributesEx |= SPELL_ATTR1_NO_THREAT;
+            spellInfo->AttributesEx3 |= SPELL_ATTR3_NO_INITIAL_AGGRO;
+            break;
+        case 66318:
+            spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_TARGET_ANY;
+            spellInfo->EffectImplicitTargetB[0] = 0;
+            spellInfo->speed = 14.0f;
+            spellInfo->Attributes |= SPELL_ATTR0_STOP_ATTACK_TARGET;
+            spellInfo->AttributesEx |= SPELL_ATTR1_NO_THREAT;
+            spellInfo->AttributesEx3 |= SPELL_ATTR3_NO_INITIAL_AGGRO;
+            break;
+        case 66320:
+        case 67472:
+        case 67473:
+        case 67475:
+            spellInfo->EffectRadiusIndex[0] = 7;
+            spellInfo->EffectRadiusIndex[1] = 7;
+            break;
+        // Trial of the Crusader, Acidmaw & Dreadscale, Emerge
+        case 66947:
+            spellInfo->AttributesEx5 |= SPELL_ATTR5_USABLE_WHILE_STUNNED;
+            break;
+        // Trial of the Crusader, Jaraxxus, Curse of the Nether
+        case 66211:
+            spellInfo->excludeTargetAuraSpell = 66209; // exclude Touch of Jaraxxus
+            break;
+        // Trial of the Crusader, Jaraxxus, Summon Volcano
+        case 66258:
+        case 67901:
+            spellInfo->DurationIndex = 85; // summon for 18 seconds, 15 not enough
+            break;
+        // Trial of the Crusader, Jaraxxus, Spinning Pain Spike
+        case 66281:
+            spellInfo->EffectRadiusIndex[0] = 26;
+            break;
+        case 66287:
+            spellInfo->Effect[1] = SPELL_EFFECT_APPLY_AURA;
+            spellInfo->EffectApplyAuraName[1] = SPELL_AURA_MOD_TAUNT;
+            spellInfo->EffectImplicitTargetA[1] = TARGET_UNIT_NEARBY_ENTRY;
+            spellInfo->Effect[2] = SPELL_EFFECT_APPLY_AURA;
+            spellInfo->EffectApplyAuraName[2] = SPELL_AURA_MOD_STUN;
+            spellInfo->EffectImplicitTargetA[2] = TARGET_UNIT_CASTER;
+            spellInfo->DurationIndex = 35; // 4 secs
+            break;
+        // Trial of the Crusader, Jaraxxus, Fel Fireball
+        case 66532:
+        case 66963:
+        case 66964:
+        case 66965:
+            spellInfo->InterruptFlags |= SPELL_INTERRUPT_FLAG_INTERRUPT;
+            break;
+        // tempfix, make Nether Power not stealable
+        case 66228:
+        case 67106:
+        case 67107:
+        case 67108:
+            spellInfo->AttributesEx4 |= SPELL_ATTR4_NOT_STEALABLE;
+            break;
+        // Trial of the Crusader, Faction Champions, Druid - Tranquality
+        case 66086:
+        case 67974:
+        case 67975:
+        case 67976:
+            spellInfo->Effect[0] = SPELL_EFFECT_APPLY_AREA_AURA_FRIEND;
+            break;
+        // Trial of the Crusader, Faction Champions, Shaman - Earth Shield
+        case 66063:
+            spellInfo->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL;
+            spellInfo->EffectTriggerSpell[0] = 66064;
+            break;
+        // Trial of the Crusader, Faction Champions, Priest - Mana Burn
+        case 66100:
+            spellInfo->EffectBasePoints[0] = 5;
+            spellInfo->EffectDieSides[0] = 0;
+            break;
+        case 68026:
+            spellInfo->EffectBasePoints[0] = 8;
+            spellInfo->EffectDieSides[0] = 0;
+            break;
+        case 68027:
+            spellInfo->EffectBasePoints[0] = 6;
+            spellInfo->EffectDieSides[0] = 0;
+            break;
+        case 68028:
+            spellInfo->EffectBasePoints[0] = 10;
+            spellInfo->EffectDieSides[0] = 0;
+            break;
 
-		// Trial of the Crusader, Twin Valkyr, Touch of Light/Darkness, Light/Dark Surge
-		case 65950: // light 0
-			//spellInfo->EffectApplyAuraName[0] = SPELL_AURA_PERIODIC_DUMMY;
-			spellInfo->EffectImplicitTargetA[0] = 6;
-			spellInfo->EffectImplicitTargetB[0] = 0;
-			spellInfo->Effect[1] = 0; spellInfo->Effect[2] = 0;
-		case 65767: // light surge 0
-			spellInfo->excludeTargetAuraSpell = 65686;
-			break;
-		case 67296: // light 1
-			//spellInfo->EffectApplyAuraName[0] = SPELL_AURA_PERIODIC_DUMMY;
-			spellInfo->EffectImplicitTargetA[0] = 6;
-			spellInfo->EffectImplicitTargetB[0] = 0;
-			spellInfo->Effect[1] = 0; spellInfo->Effect[2] = 0;
-		case 67274: // light surge 1
-			spellInfo->excludeTargetAuraSpell = 67222;
-			break;
-		case 67297: // light 2
-			//spellInfo->EffectApplyAuraName[0] = SPELL_AURA_PERIODIC_DUMMY;
-			spellInfo->EffectImplicitTargetA[0] = 6;
-			spellInfo->EffectImplicitTargetB[0] = 0;
-			spellInfo->Effect[1] = 0; spellInfo->Effect[2] = 0;
-		case 67275: // light surge 2
-			spellInfo->excludeTargetAuraSpell = 67223;
-			break;
-		case 67298: // light 3
-			//spellInfo->EffectApplyAuraName[0] = SPELL_AURA_PERIODIC_DUMMY;
-			spellInfo->EffectImplicitTargetA[0] = 6;
-			spellInfo->EffectImplicitTargetB[0] = 0;
-			spellInfo->Effect[1] = 0; spellInfo->Effect[2] = 0;
-		case 67276: // light surge 3
-			spellInfo->excludeTargetAuraSpell = 67224;
-			break;
-		case 66001: // dark 0
-			//spellInfo->EffectApplyAuraName[0] = SPELL_AURA_PERIODIC_DUMMY;
-			spellInfo->EffectImplicitTargetA[0] = 6;
-			spellInfo->EffectImplicitTargetB[0] = 0;
-			spellInfo->Effect[1] = 0; spellInfo->Effect[2] = 0;
-		case 65769: // dark surge 0
-			spellInfo->excludeTargetAuraSpell = 65684;
-			break;
-		case 67281: // dark 1
-			//spellInfo->EffectApplyAuraName[0] = SPELL_AURA_PERIODIC_DUMMY;
-			spellInfo->EffectImplicitTargetA[0] = 6;
-			spellInfo->EffectImplicitTargetB[0] = 0;
-			spellInfo->Effect[1] = 0; spellInfo->Effect[2] = 0;
-		case 67265: // dark surge 1
-			spellInfo->excludeTargetAuraSpell = 67176;
-			break;
-		case 67282: // dark 2
-			//spellInfo->EffectApplyAuraName[0] = SPELL_AURA_PERIODIC_DUMMY;
-			spellInfo->EffectImplicitTargetA[0] = 6;
-			spellInfo->EffectImplicitTargetB[0] = 0;
-			spellInfo->Effect[1] = 0; spellInfo->Effect[2] = 0;
-		case 67266: // dark surge 2
-			spellInfo->excludeTargetAuraSpell = 67177;
-			break;
-		case 67283: // dark 3
-			//spellInfo->EffectApplyAuraName[0] = SPELL_AURA_PERIODIC_DUMMY;
-			spellInfo->EffectImplicitTargetA[0] = 6;
-			spellInfo->EffectImplicitTargetB[0] = 0;
-			spellInfo->Effect[1] = 0; spellInfo->Effect[2] = 0;
-		case 67267: // dark surge 3
-			spellInfo->excludeTargetAuraSpell = 67178;
-			break;
+        // Trial of the Crusader, Twin Valkyr, Touch of Light/Darkness, Light/Dark Surge
+        case 65950: // light 0
+            //spellInfo->EffectApplyAuraName[0] = SPELL_AURA_PERIODIC_DUMMY;
+            spellInfo->EffectImplicitTargetA[0] = 6;
+            spellInfo->EffectImplicitTargetB[0] = 0;
+            spellInfo->Effect[1] = 0; spellInfo->Effect[2] = 0;
+        case 65767: // light surge 0
+            spellInfo->excludeTargetAuraSpell = 65686;
+            break;
+        case 67296: // light 1
+            //spellInfo->EffectApplyAuraName[0] = SPELL_AURA_PERIODIC_DUMMY;
+            spellInfo->EffectImplicitTargetA[0] = 6;
+            spellInfo->EffectImplicitTargetB[0] = 0;
+            spellInfo->Effect[1] = 0; spellInfo->Effect[2] = 0;
+        case 67274: // light surge 1
+            spellInfo->excludeTargetAuraSpell = 67222;
+            break;
+        case 67297: // light 2
+            //spellInfo->EffectApplyAuraName[0] = SPELL_AURA_PERIODIC_DUMMY;
+            spellInfo->EffectImplicitTargetA[0] = 6;
+            spellInfo->EffectImplicitTargetB[0] = 0;
+            spellInfo->Effect[1] = 0; spellInfo->Effect[2] = 0;
+        case 67275: // light surge 2
+            spellInfo->excludeTargetAuraSpell = 67223;
+            break;
+        case 67298: // light 3
+            //spellInfo->EffectApplyAuraName[0] = SPELL_AURA_PERIODIC_DUMMY;
+            spellInfo->EffectImplicitTargetA[0] = 6;
+            spellInfo->EffectImplicitTargetB[0] = 0;
+            spellInfo->Effect[1] = 0; spellInfo->Effect[2] = 0;
+        case 67276: // light surge 3
+            spellInfo->excludeTargetAuraSpell = 67224;
+            break;
+        case 66001: // dark 0
+            //spellInfo->EffectApplyAuraName[0] = SPELL_AURA_PERIODIC_DUMMY;
+            spellInfo->EffectImplicitTargetA[0] = 6;
+            spellInfo->EffectImplicitTargetB[0] = 0;
+            spellInfo->Effect[1] = 0; spellInfo->Effect[2] = 0;
+        case 65769: // dark surge 0
+            spellInfo->excludeTargetAuraSpell = 65684;
+            break;
+        case 67281: // dark 1
+            //spellInfo->EffectApplyAuraName[0] = SPELL_AURA_PERIODIC_DUMMY;
+            spellInfo->EffectImplicitTargetA[0] = 6;
+            spellInfo->EffectImplicitTargetB[0] = 0;
+            spellInfo->Effect[1] = 0; spellInfo->Effect[2] = 0;
+        case 67265: // dark surge 1
+            spellInfo->excludeTargetAuraSpell = 67176;
+            break;
+        case 67282: // dark 2
+            //spellInfo->EffectApplyAuraName[0] = SPELL_AURA_PERIODIC_DUMMY;
+            spellInfo->EffectImplicitTargetA[0] = 6;
+            spellInfo->EffectImplicitTargetB[0] = 0;
+            spellInfo->Effect[1] = 0; spellInfo->Effect[2] = 0;
+        case 67266: // dark surge 2
+            spellInfo->excludeTargetAuraSpell = 67177;
+            break;
+        case 67283: // dark 3
+            //spellInfo->EffectApplyAuraName[0] = SPELL_AURA_PERIODIC_DUMMY;
+            spellInfo->EffectImplicitTargetA[0] = 6;
+            spellInfo->EffectImplicitTargetB[0] = 0;
+            spellInfo->Effect[1] = 0; spellInfo->Effect[2] = 0;
+        case 67267: // dark surge 3
+            spellInfo->excludeTargetAuraSpell = 67178;
+            break;
 
-		// Trial of the Crusader, Twin Valkyr, Twin's Pact
-		case 65875: case 67303: case 67304: case 67305: case 65876: case 67306: case 67307: case 67308:
-			spellInfo->Effect[1] = 0; spellInfo->Effect[2] = 0;
-			break;
-		// Trial of the Crusader, Anub'arak, Emerge
-		case 65982:
-			spellInfo->AttributesEx5 |= SPELL_ATTR5_USABLE_WHILE_STUNNED;
-			break;
-		// Trial of the Crusader, Anub'arak, Penetrating Cold
-		case 66013:
-		case 67700:
-		case 68509:
-		case 68510:
-			spellInfo->EffectRadiusIndex[0] = 12; // 100yd
-			break;
-		// Trial of the Crusader, Anub'arak, Shadow Strike
-		case 66134:
-			spellInfo->InterruptFlags |= SPELL_INTERRUPT_FLAG_INTERRUPT;
-			spellInfo->Effect[0] = 0;
-			break;
-		// Trial of the Crusader, Anub'arak, Pursuing Spikes
-		case 65920:
-		case 65922:
-		case 65923:
-			spellInfo->EffectApplyAuraName[0] = SPELL_AURA_PERIODIC_DUMMY;
-			//spellInfo->EffectTriggerSpell[0] = 0;
-			break;
-		// Trial of the Crusader, Anub'arak, Summon Scarab
-		case 66339:
-			spellInfo->DurationIndex = 35;
-			spellInfo->EffectImplicitTargetA[0] = 25;
-			spellInfo->EffectImplicitTargetB[0] = 0;
-			break;
-		// Trial of the Crusader, Anub'arak, Achievements: The Traitor King
-		case 68186: // Anub'arak Scarab Achievement 10
-		case 68515: // Anub'arak Scarab Achievement 25
-			spellInfo->EffectImplicitTargetA[0] = TARGET_SRC_CASTER;
-			spellInfo->EffectImplicitTargetB[0] = TARGET_UNIT_SRC_AREA_ENEMY;
-			spellInfo->Attributes |= SPELL_ATTR0_CASTABLE_WHILE_DEAD;
-			break;
-		// Trial of the Crusader, Anub'arak, Spider Frenzy
-		case 66129:
-			spellInfo->AttributesEx3 |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;
-			break;
+        // Trial of the Crusader, Twin Valkyr, Twin's Pact
+        case 65875: case 67303: case 67304: case 67305: case 65876: case 67306: case 67307: case 67308:
+            spellInfo->Effect[1] = 0; spellInfo->Effect[2] = 0;
+            break;
+        // Trial of the Crusader, Anub'arak, Emerge
+        case 65982:
+            spellInfo->AttributesEx5 |= SPELL_ATTR5_USABLE_WHILE_STUNNED;
+            break;
+        // Trial of the Crusader, Anub'arak, Penetrating Cold
+        case 66013:
+        case 67700:
+        case 68509:
+        case 68510:
+            spellInfo->EffectRadiusIndex[0] = 12; // 100yd
+            break;
+        // Trial of the Crusader, Anub'arak, Shadow Strike
+        case 66134:
+            spellInfo->InterruptFlags |= SPELL_INTERRUPT_FLAG_INTERRUPT;
+            spellInfo->Effect[0] = 0;
+            break;
+        // Trial of the Crusader, Anub'arak, Pursuing Spikes
+        case 65920:
+        case 65922:
+        case 65923:
+            spellInfo->EffectApplyAuraName[0] = SPELL_AURA_PERIODIC_DUMMY;
+            //spellInfo->EffectTriggerSpell[0] = 0;
+            break;
+        // Trial of the Crusader, Anub'arak, Summon Scarab
+        case 66339:
+            spellInfo->DurationIndex = 35;
+            spellInfo->EffectImplicitTargetA[0] = 25;
+            spellInfo->EffectImplicitTargetB[0] = 0;
+            break;
+        // Trial of the Crusader, Anub'arak, Achievements: The Traitor King
+        case 68186: // Anub'arak Scarab Achievement 10
+        case 68515: // Anub'arak Scarab Achievement 25
+            spellInfo->EffectImplicitTargetA[0] = TARGET_SRC_CASTER;
+            spellInfo->EffectImplicitTargetB[0] = TARGET_UNIT_SRC_AREA_ENEMY;
+            spellInfo->Attributes |= SPELL_ATTR0_CASTABLE_WHILE_DEAD;
+            break;
+        // Trial of the Crusader, Anub'arak, Spider Frenzy
+        case 66129:
+            spellInfo->AttributesEx3 |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;
+            break;
 
-		//////////////////////////////////////////
-		////////// THE FORGE OF SOULS
-		//////////////////////////////////////////
-		// Soul Sickness (69131)
-		case 69131:
-			spellInfo->EffectApplyAuraName[0] = SPELL_AURA_PERIODIC_TRIGGER_SPELL;
-			spellInfo->EffectAmplitude[0] = 8000;
-			spellInfo->EffectTriggerSpell[0] = 69133;
-			break;
-		// Phantom Blast (68982,70322)
-		case 68982:
-		case 70322:
-			spellInfo->InterruptFlags |= SPELL_INTERRUPT_FLAG_INTERRUPT;
-			break;
+        //////////////////////////////////////////
+        ////////// THE FORGE OF SOULS
+        //////////////////////////////////////////
+        // Soul Sickness (69131)
+        case 69131:
+            spellInfo->EffectApplyAuraName[0] = SPELL_AURA_PERIODIC_TRIGGER_SPELL;
+            spellInfo->EffectAmplitude[0] = 8000;
+            spellInfo->EffectTriggerSpell[0] = 69133;
+            break;
+        // Phantom Blast (68982,70322)
+        case 68982:
+        case 70322:
+            spellInfo->InterruptFlags |= SPELL_INTERRUPT_FLAG_INTERRUPT;
+            break;
 
-		//////////////////////////////////////////
-		////////// PIT OF SARON
-		//////////////////////////////////////////
-		// Empowered Blizzard
-		case 70131:
-			spellInfo->EffectImplicitTargetA[0] = TARGET_DEST_DEST;
-			break;
-		// Ice Lance Volley
-		case 70464:
-			spellInfo->EffectImplicitTargetA[0] = TARGET_SRC_CASTER;
-			spellInfo->EffectImplicitTargetB[0] = TARGET_UNIT_SRC_AREA_ENTRY;
-			spellInfo->EffectRadiusIndex[0] = 25;
-			break;
-		// Multi-Shot
-		case 70513:
-		// Shriek of the Highborne
-		case 59514:
-			spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_CONE_ENTRY;
-			spellInfo->EffectImplicitTargetB[0] = 0;
-			break;
-		// Icicle
-		case 69428:
-		case 69426:
-			spellInfo->InterruptFlags = 0;
-			spellInfo->AuraInterruptFlags = 0;
-			spellInfo->ChannelInterruptFlags = 0;
-			break;
-		// Jaina's Call
-		case 70525:
-		// Call of Sylvanas
-		case 70639:
-			spellInfo->Effect[0] = 0;
-			spellInfo->Effect[1] = 0;
-			spellInfo->EffectImplicitTargetA[2] = TARGET_SRC_CASTER;
-			spellInfo->EffectImplicitTargetB[2] = TARGET_UNIT_SRC_AREA_ENTRY;
-			spellInfo->EffectRadiusIndex[2] = 30; // 500yd
-			break;
-		// Frost Nova
-		case 68198:
-			spellInfo->rangeIndex = 13;
-			spellInfo->Targets |= TARGET_FLAG_DEST_LOCATION;
-			break;
-		// Blight
-		case 69604:
-		case 70286:
-			spellInfo->MaxAffectedTargets = 1;
-			spellInfo->AttributesEx3 |= (SPELL_ATTR3_IGNORE_HIT_RESULT | SPELL_ATTR3_ONLY_TARGET_PLAYERS);
-			break;
-		// Chilling Wave
-		case 68778:
-		case 70333:
-			spellInfo->EffectImplicitTargetA[0] = TARGET_DEST_TARGET_ENEMY;
-			spellInfo->EffectImplicitTargetB[0] = 0;
-			break;
-		// Permafrost
-		case 68786:
-		case 70336:
-			spellInfo->AttributesEx3 |= (SPELL_ATTR3_IGNORE_HIT_RESULT | SPELL_ATTR3_ONLY_TARGET_PLAYERS);
-			spellInfo->Effect[2] = SPELL_EFFECT_DUMMY;
-			break;
-		// Pursuit:
-		case 68987:
-			spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_TARGET_ANY;
-			spellInfo->EffectImplicitTargetB[0] = 0;
-			spellInfo->EffectImplicitTargetA[1] = TARGET_UNIT_TARGET_ANY;
-			spellInfo->EffectImplicitTargetB[1] = 0;
-			spellInfo->EffectImplicitTargetA[2] = TARGET_UNIT_CASTER;
-			spellInfo->EffectImplicitTargetB[2] = 0;
-			spellInfo->rangeIndex = 6; // 100yd
-			spellInfo->AttributesEx3 |= SPELL_ATTR3_IGNORE_HIT_RESULT;
-			break;
-		case 69029:
-		case 70850:
-			spellInfo->Effect[2] = 0;
-			break;
-		// Explosive Barrage:
-		case 69263:
-			spellInfo->EffectApplyAuraName[0] = SPELL_AURA_MOD_STUN;
-			break;
-		// Overlord's Brand:
-		case 69172:
-			spellInfo->procFlags = DONE_HIT_PROC_FLAG_MASK & ~PROC_FLAG_DONE_PERIODIC;
-			spellInfo->procChance = 100;
-			break;
-		// Icy Blast:
-		case 69232:
-			spellInfo->EffectTriggerSpell[1] = 69238;
-			spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
-			break;
-		case 69233:
-		case 69646:
-			spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
-			break;
-		case 69238:
-		case 69628:
-			spellInfo->EffectImplicitTargetA[0] = TARGET_DEST_DEST;
-			spellInfo->EffectImplicitTargetB[0] = TARGET_DEST_DYNOBJ_NONE;
-			spellInfo->EffectImplicitTargetA[1] = TARGET_DEST_DEST;
-			spellInfo->EffectImplicitTargetB[1] = TARGET_DEST_DYNOBJ_NONE;
-			spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
-			break;
-		// Hoarfrost:
-		case 69246:
-		case 69245:
-		case 69645:
-			spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
-			break;
-		// Devour Humanoid:
-		case 69503:
-			spellInfo->ChannelInterruptFlags |= 0;
-			spellInfo->AuraInterruptFlags = AURA_INTERRUPT_FLAG_MOVE | AURA_INTERRUPT_FLAG_TURNING;
-			break;
+        //////////////////////////////////////////
+        ////////// PIT OF SARON
+        //////////////////////////////////////////
+        // Empowered Blizzard
+        case 70131:
+            spellInfo->EffectImplicitTargetA[0] = TARGET_DEST_DEST;
+            break;
+        // Ice Lance Volley
+        case 70464:
+            spellInfo->EffectImplicitTargetA[0] = TARGET_SRC_CASTER;
+            spellInfo->EffectImplicitTargetB[0] = TARGET_UNIT_SRC_AREA_ENTRY;
+            spellInfo->EffectRadiusIndex[0] = 25;
+            break;
+        // Multi-Shot
+        case 70513:
+        // Shriek of the Highborne
+        case 59514:
+            spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_CONE_ENTRY;
+            spellInfo->EffectImplicitTargetB[0] = 0;
+            break;
+        // Icicle
+        case 69428:
+        case 69426:
+            spellInfo->InterruptFlags = 0;
+            spellInfo->AuraInterruptFlags = 0;
+            spellInfo->ChannelInterruptFlags = 0;
+            break;
+        // Jaina's Call
+        case 70525:
+        // Call of Sylvanas
+        case 70639:
+            spellInfo->Effect[0] = 0;
+            spellInfo->Effect[1] = 0;
+            spellInfo->EffectImplicitTargetA[2] = TARGET_SRC_CASTER;
+            spellInfo->EffectImplicitTargetB[2] = TARGET_UNIT_SRC_AREA_ENTRY;
+            spellInfo->EffectRadiusIndex[2] = 30; // 500yd
+            break;
+        // Frost Nova
+        case 68198:
+            spellInfo->rangeIndex = 13;
+            spellInfo->Targets |= TARGET_FLAG_DEST_LOCATION;
+            break;
+        // Blight
+        case 69604:
+        case 70286:
+            spellInfo->MaxAffectedTargets = 1;
+            spellInfo->AttributesEx3 |= (SPELL_ATTR3_IGNORE_HIT_RESULT | SPELL_ATTR3_ONLY_TARGET_PLAYERS);
+            break;
+        // Chilling Wave
+        case 68778:
+        case 70333:
+            spellInfo->EffectImplicitTargetA[0] = TARGET_DEST_TARGET_ENEMY;
+            spellInfo->EffectImplicitTargetB[0] = 0;
+            break;
+        // Permafrost
+        case 68786:
+        case 70336:
+            spellInfo->AttributesEx3 |= (SPELL_ATTR3_IGNORE_HIT_RESULT | SPELL_ATTR3_ONLY_TARGET_PLAYERS);
+            spellInfo->Effect[2] = SPELL_EFFECT_DUMMY;
+            break;
+        // Pursuit:
+        case 68987:
+            spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_TARGET_ANY;
+            spellInfo->EffectImplicitTargetB[0] = 0;
+            spellInfo->EffectImplicitTargetA[1] = TARGET_UNIT_TARGET_ANY;
+            spellInfo->EffectImplicitTargetB[1] = 0;
+            spellInfo->EffectImplicitTargetA[2] = TARGET_UNIT_CASTER;
+            spellInfo->EffectImplicitTargetB[2] = 0;
+            spellInfo->rangeIndex = 6; // 100yd
+            spellInfo->AttributesEx3 |= SPELL_ATTR3_IGNORE_HIT_RESULT;
+            break;
+        case 69029:
+        case 70850:
+            spellInfo->Effect[2] = 0;
+            break;
+        // Explosive Barrage:
+        case 69263:
+            spellInfo->EffectApplyAuraName[0] = SPELL_AURA_MOD_STUN;
+            break;
+        // Overlord's Brand:
+        case 69172:
+            spellInfo->procFlags = DONE_HIT_PROC_FLAG_MASK & ~PROC_FLAG_DONE_PERIODIC;
+            spellInfo->procChance = 100;
+            break;
+        // Icy Blast:
+        case 69232:
+            spellInfo->EffectTriggerSpell[1] = 69238;
+            spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
+            break;
+        case 69233:
+        case 69646:
+            spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
+            break;
+        case 69238:
+        case 69628:
+            spellInfo->EffectImplicitTargetA[0] = TARGET_DEST_DEST;
+            spellInfo->EffectImplicitTargetB[0] = TARGET_DEST_DYNOBJ_NONE;
+            spellInfo->EffectImplicitTargetA[1] = TARGET_DEST_DEST;
+            spellInfo->EffectImplicitTargetB[1] = TARGET_DEST_DYNOBJ_NONE;
+            spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
+            break;
+        // Hoarfrost:
+        case 69246:
+        case 69245:
+        case 69645:
+            spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
+            break;
+        // Devour Humanoid:
+        case 69503:
+            spellInfo->ChannelInterruptFlags |= 0;
+            spellInfo->AuraInterruptFlags = AURA_INTERRUPT_FLAG_MOVE | AURA_INTERRUPT_FLAG_TURNING;
+            break;
 
-		//////////////////////////////////////////
-		////////// HALLS OF REFLECTION
-		//////////////////////////////////////////
-		// Falric: Defiling Horror
-		case 72435:
-		case 72452:
-			spellInfo->EffectRadiusIndex[0] = EFFECT_RADIUS_200_YARDS;
-			spellInfo->EffectRadiusIndex[1] = EFFECT_RADIUS_200_YARDS;
-			break;
-		// Frostsworn General - Throw Shield
-		case 69222:
-		case 73076:
-			spellInfo->EffectImplicitTargetA[2] = TARGET_UNIT_TARGET_ENEMY;
-			break;
-		// Halls of Reflection Clone
-		case 69828:
-			spellInfo->Effect[1] = 0;
-			spellInfo->Effect[2] = 0;
-			break;
-		// Summon Ice Wall
-		case 69768:
-			spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_TARGET_ANY;
-			break;
-		case 69767:
-			spellInfo->EffectImplicitTargetA[0] = TARGET_DEST_TARGET_ANY;
-			spellInfo->EffectImplicitTargetA[2] = TARGET_UNIT_TARGET_ANY;
-			break;
-		// Essence of the Captured
-		case 73035:
-		case 70719:
-			spellInfo->rangeIndex = 13;
-			break;
-		// Achievement Check
-		case 72830:
-			spellInfo->EffectRadiusIndex[0] = EFFECT_RADIUS_200_YARDS;
-			break;
+        //////////////////////////////////////////
+        ////////// HALLS OF REFLECTION
+        //////////////////////////////////////////
+        // Falric: Defiling Horror
+        case 72435:
+        case 72452:
+            spellInfo->EffectRadiusIndex[0] = EFFECT_RADIUS_200_YARDS;
+            spellInfo->EffectRadiusIndex[1] = EFFECT_RADIUS_200_YARDS;
+            break;
+        // Frostsworn General - Throw Shield
+        case 69222:
+        case 73076:
+            spellInfo->EffectImplicitTargetA[2] = TARGET_UNIT_TARGET_ENEMY;
+            break;
+        // Halls of Reflection Clone
+        case 69828:
+            spellInfo->Effect[1] = 0;
+            spellInfo->Effect[2] = 0;
+            break;
+        // Summon Ice Wall
+        case 69768:
+            spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_TARGET_ANY;
+            break;
+        case 69767:
+            spellInfo->EffectImplicitTargetA[0] = TARGET_DEST_TARGET_ANY;
+            spellInfo->EffectImplicitTargetA[2] = TARGET_UNIT_TARGET_ANY;
+            break;
+        // Essence of the Captured
+        case 73035:
+        case 70719:
+            spellInfo->rangeIndex = 13;
+            break;
+        // Achievement Check
+        case 72830:
+            spellInfo->EffectRadiusIndex[0] = EFFECT_RADIUS_200_YARDS;
+            break;
 
-		//////////////////////////////////////////
-		////////// ICECROWN CITADEL
-		//////////////////////////////////////////
+        //////////////////////////////////////////
+        ////////// ICECROWN CITADEL
+        //////////////////////////////////////////
         case 70781: // Light's Hammer Teleport
         case 70856: // Oratory of the Damned Teleport
         case 70857: // Rampart of Skulls Teleport
@@ -5409,60 +5409,60 @@ void SpellMgr::LoadDbcDataCorrections()
         case 70859: // Upper Spire Teleport
         case 70860: // Frozen Throne Teleport
         case 70861: // Sindragosa's Lair Teleport
-			spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_TARGET_ANY;
-			spellInfo->EffectImplicitTargetB[0] = 0;
+            spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_TARGET_ANY;
+            spellInfo->EffectImplicitTargetB[0] = 0;
             spellInfo->EffectImplicitTargetA[1] = TARGET_DEST_DB; // this target is for SPELL_EFFECT_TELEPORT_UNITS
-			spellInfo->EffectImplicitTargetB[1] = 0;
-			spellInfo->EffectImplicitTargetA[2] = TARGET_UNIT_TARGET_ANY;
-			spellInfo->EffectImplicitTargetB[2] = 0;
+            spellInfo->EffectImplicitTargetB[1] = 0;
+            spellInfo->EffectImplicitTargetA[2] = TARGET_UNIT_TARGET_ANY;
+            spellInfo->EffectImplicitTargetB[2] = 0;
             break;
-		case 70960: // Bone Flurry
-		case 71258: // Adrenaline Rush (Ymirjar Battle-Maiden)
-			spellInfo->AttributesEx &= ~SPELL_ATTR1_CHANNELED_2;
-			break;
+        case 70960: // Bone Flurry
+        case 71258: // Adrenaline Rush (Ymirjar Battle-Maiden)
+            spellInfo->AttributesEx &= ~SPELL_ATTR1_CHANNELED_2;
+            break;
         case 69055: // Saber Lash (Lord Marrowgar)
         case 70814: // Saber Lash (Lord Marrowgar)
             spellInfo->EffectRadiusIndex[0] = 8;    // 5yd
             break;
-		case 69065: // Impaled (Lord Marrowgar)
-			spellInfo->Effect[0] = 0; // remove stun so Dispersion can be used
-			break;
-		case 72701: // Cold Flame (Lord Marrowgar)
-		case 72702: // Cold Flame (Lord Marrowgar)
-		case 72703: // Cold Flame (Lord Marrowgar)
-		case 72704: // Cold Flame (Lord Marrowgar)
-			spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_CASTER;
-			spellInfo->EffectImplicitTargetA[1] = TARGET_DEST_DEST;
-			spellInfo->EffectImplicitTargetB[1] = 0;
-			spellInfo->DurationIndex = 9; // 30 secs instead of 12, need him for longer, but will stop his actions after 12 secs
-			break;
-		case 69138: // Coldflame (Lord Marrowgar)
-			spellInfo->Effect[0] = 0;
-			spellInfo->EffectImplicitTargetA[1] = TARGET_DEST_DEST;
-			spellInfo->DurationIndex = 9; // 30 secs instead of 12, need him for longer, but will stop his actions after 12 secs
-			break;
-		case 69146: case 70823: case 70824: case 70825: // Coldflame (Lord Marrowgar)
-			spellInfo->EffectRadiusIndex[0] = 15; // 3yd instead of 5yd
-			spellInfo->AttributesEx4 &= ~SPELL_ATTR4_IGNORE_RESISTANCES;
-			break;
-		case 70897: // Dark Martyrdom (Lady Deathwhisper)
-			spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_DEAD;
-			break;
+        case 69065: // Impaled (Lord Marrowgar)
+            spellInfo->Effect[0] = 0; // remove stun so Dispersion can be used
+            break;
+        case 72701: // Cold Flame (Lord Marrowgar)
+        case 72702: // Cold Flame (Lord Marrowgar)
+        case 72703: // Cold Flame (Lord Marrowgar)
+        case 72704: // Cold Flame (Lord Marrowgar)
+            spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_CASTER;
+            spellInfo->EffectImplicitTargetA[1] = TARGET_DEST_DEST;
+            spellInfo->EffectImplicitTargetB[1] = 0;
+            spellInfo->DurationIndex = 9; // 30 secs instead of 12, need him for longer, but will stop his actions after 12 secs
+            break;
+        case 69138: // Coldflame (Lord Marrowgar)
+            spellInfo->Effect[0] = 0;
+            spellInfo->EffectImplicitTargetA[1] = TARGET_DEST_DEST;
+            spellInfo->DurationIndex = 9; // 30 secs instead of 12, need him for longer, but will stop his actions after 12 secs
+            break;
+        case 69146: case 70823: case 70824: case 70825: // Coldflame (Lord Marrowgar)
+            spellInfo->EffectRadiusIndex[0] = 15; // 3yd instead of 5yd
+            spellInfo->AttributesEx4 &= ~SPELL_ATTR4_IGNORE_RESISTANCES;
+            break;
+        case 70897: // Dark Martyrdom (Lady Deathwhisper)
+            spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_DEAD;
+            break;
         case 69075: // Bone Storm (Lord Marrowgar)
         case 70834: // Bone Storm (Lord Marrowgar)
         case 70835: // Bone Storm (Lord Marrowgar)
         case 70836: // Bone Storm (Lord Marrowgar)
         case 72378: // Blood Nova (Deathbringer Saurfang)
         case 73058: // Blood Nova (Deathbringer Saurfang)
-		case 72769: // Scent of Blood (Deathbringer Saurfang)
-		case 72385: // Boiling Blood (Deathbringer Saurfang)
-		case 72441: // Boiling Blood (Deathbringer Saurfang)
-		case 72442: // Boiling Blood (Deathbringer Saurfang)
-		case 72443: // Boiling Blood (Deathbringer Saurfang)
+        case 72769: // Scent of Blood (Deathbringer Saurfang)
+        case 72385: // Boiling Blood (Deathbringer Saurfang)
+        case 72441: // Boiling Blood (Deathbringer Saurfang)
+        case 72442: // Boiling Blood (Deathbringer Saurfang)
+        case 72443: // Boiling Blood (Deathbringer Saurfang)
         case 71160: // Plague Stench (Stinky)
         case 71161: // Plague Stench (Stinky)
         case 71123: // Decimate (Stinky & Precious)
-		case 71464: // Divine Surge (Sister Svalna)
+        case 71464: // Divine Surge (Sister Svalna)
             spellInfo->EffectRadiusIndex[0] = 12;   // 100yd
             break;
         case 71169: // Shadow's Fate
@@ -5475,70 +5475,70 @@ void SpellMgr::LoadDbcDataCorrections()
         case 73844: // Award Reputation - Boss Kill
         case 73845: // Award Reputation - Boss Kill
         case 73846: // Award Reputation - Boss Kill
-			spellInfo->EffectRadiusIndex[EFFECT_0] = EFFECT_RADIUS_50000_YARDS;
+            spellInfo->EffectRadiusIndex[EFFECT_0] = EFFECT_RADIUS_50000_YARDS;
             break;
-		case 72864: // Death Plague (Rotting Frost Giant)
-			spellInfo->excludeTargetAuraSpell = 0;
-			break;
-		case 69705: // Gunship Battle, spell Below Zero
-			spellInfo->AttributesEx3 |= SPELL_ATTR3_IGNORE_HIT_RESULT;
-			break;
+        case 72864: // Death Plague (Rotting Frost Giant)
+            spellInfo->excludeTargetAuraSpell = 0;
+            break;
+        case 69705: // Gunship Battle, spell Below Zero
+            spellInfo->AttributesEx3 |= SPELL_ATTR3_IGNORE_HIT_RESULT;
+            break;
         case 72723: // Resistant Skin (Deathbringer Saurfang adds)
             // this spell initially granted Shadow damage immunity, however it was removed but the data was left in client
             spellInfo->Effect[2] = 0;
             break;
-		case 72255: // Mark of the Fallen Champion (Deathbringer Saurfang) // Patch 3.3.2 (2010-01-02): Deathbringer Saurfang will no longer gain blood power from Mark of the Fallen Champion.
-		case 72444: // Mark of the Fallen Champion (Deathbringer Saurfang) // Xinef: prevented in script, effect needed for Prayer of Mending
-		case 72445: // Mark of the Fallen Champion (Deathbringer Saurfang)
-		case 72446: // Mark of the Fallen Champion (Deathbringer Saurfang)
-			spellInfo->AttributesEx3 &= ~SPELL_ATTR3_CANT_TRIGGER_PROC;
-			break;
+        case 72255: // Mark of the Fallen Champion (Deathbringer Saurfang) // Patch 3.3.2 (2010-01-02): Deathbringer Saurfang will no longer gain blood power from Mark of the Fallen Champion.
+        case 72444: // Mark of the Fallen Champion (Deathbringer Saurfang) // Xinef: prevented in script, effect needed for Prayer of Mending
+        case 72445: // Mark of the Fallen Champion (Deathbringer Saurfang)
+        case 72446: // Mark of the Fallen Champion (Deathbringer Saurfang)
+            spellInfo->AttributesEx3 &= ~SPELL_ATTR3_CANT_TRIGGER_PROC;
+            break;
         case 70460: // Coldflame Jets (Traps after Saurfang)
             spellInfo->DurationIndex = 1;   // 10 seconds
-			break;
-		case 70461: // Coldflame Jets (Traps after Saurfang)
-		case 71289: // Dominate Mind (Lady Deathwhisper)
-			spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
             break;
-		case 71906: // Severed Essence (Val'kyr Herald)
-		case 71942: // Severed Essence (Val'kyr Herald)
-			spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_TARGET_ENEMY;
-			spellInfo->EffectImplicitTargetB[0] = 0;
-			spellInfo->Effect[1] = 0;
-			break;
+        case 70461: // Coldflame Jets (Traps after Saurfang)
+        case 71289: // Dominate Mind (Lady Deathwhisper)
+            spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
+            break;
+        case 71906: // Severed Essence (Val'kyr Herald)
+        case 71942: // Severed Essence (Val'kyr Herald)
+            spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_TARGET_ENEMY;
+            spellInfo->EffectImplicitTargetB[0] = 0;
+            spellInfo->Effect[1] = 0;
+            break;
         case 71159: // Awaken Plagued Zombies (Precious)
-		case 71302: // Awaken Ymirjar Fallen (Ymirjar Deathbringer)
+        case 71302: // Awaken Ymirjar Fallen (Ymirjar Deathbringer)
             spellInfo->DurationIndex = 21;
             break;
-		case 70981: // Blood Prince Council, Invocation of Blood
-		case 70982: // Blood Prince Council, Invocation of Blood
-		case 70952: // Blood Prince Council, Invocation of Blood
-			spellInfo->Effect[0] = 0; // clear share health aura
-			break;
-		case 71274: // Ymirjar Frostbinder, Frozen Orb
-			spellInfo->EffectImplicitTargetA[0] = 6;
-			break;
-		case 69783: // Ooze Flood (Rotface)
-		case 69797:
-		case 69799:
-		case 69802:
-			spellInfo->AttributesEx |= SPELL_ATTR1_CANT_TARGET_SELF;
-			break;
-		case 70530: // Volatile Ooze Beam Protection
-			spellInfo->Effect[0] = SPELL_EFFECT_APPLY_AURA; // blizzard typo, 65 instead of 6, aura itself is defined (dummy)
-			break;
-		case 70672: case 72455: case 72832: case 72833: // Professor Putricide, Gaseous Bloat (Orange Ooze Channel) -- copied attributes from Green Ooze Channel
-			spellInfo->Attributes |= SPELL_ATTR0_UNAFFECTED_BY_INVULNERABILITY;
-			spellInfo->AttributesEx3 |= SPELL_ATTR3_IGNORE_HIT_RESULT;
-			break;
+        case 70981: // Blood Prince Council, Invocation of Blood
+        case 70982: // Blood Prince Council, Invocation of Blood
+        case 70952: // Blood Prince Council, Invocation of Blood
+            spellInfo->Effect[0] = 0; // clear share health aura
+            break;
+        case 71274: // Ymirjar Frostbinder, Frozen Orb
+            spellInfo->EffectImplicitTargetA[0] = 6;
+            break;
+        case 69783: // Ooze Flood (Rotface)
+        case 69797:
+        case 69799:
+        case 69802:
+            spellInfo->AttributesEx |= SPELL_ATTR1_CANT_TARGET_SELF;
+            break;
+        case 70530: // Volatile Ooze Beam Protection
+            spellInfo->Effect[0] = SPELL_EFFECT_APPLY_AURA; // blizzard typo, 65 instead of 6, aura itself is defined (dummy)
+            break;
+        case 70672: case 72455: case 72832: case 72833: // Professor Putricide, Gaseous Bloat (Orange Ooze Channel) -- copied attributes from Green Ooze Channel
+            spellInfo->Attributes |= SPELL_ATTR0_UNAFFECTED_BY_INVULNERABILITY;
+            spellInfo->AttributesEx3 |= SPELL_ATTR3_IGNORE_HIT_RESULT;
+            break;
         case 71412: // Green Ooze Summon (Professor Putricide)
         case 71415: // Orange Ooze Summon (Professor Putricide)
             spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_TARGET_ANY;
             break;
-		case 71621: case 72850: case 72851: case 72852: // Create Concoction (Professor Putricide)
-		case 71893: case 73120: case 73121: case 73122: // Guzzle Potions (Professor Putricide)
-			spellInfo->CastingTimeIndex = 15; // 4 sec
-			break;
+        case 71621: case 72850: case 72851: case 72852: // Create Concoction (Professor Putricide)
+        case 71893: case 73120: case 73121: case 73122: // Guzzle Potions (Professor Putricide)
+            spellInfo->CastingTimeIndex = 15; // 4 sec
+            break;
         case 72454: // Mutated Plague (Professor Putricide)
         case 72464: // Mutated Plague (Professor Putricide)
         case 72506: // Mutated Plague (Professor Putricide)
@@ -5552,12 +5552,12 @@ void SpellMgr::LoadDbcDataCorrections()
         case 72856: // Unbound Plague (Professor Putricide) (needs target selection script)
             spellInfo->EffectImplicitTargetB[0] = TARGET_UNIT_TARGET_ENEMY;
             break;
-		case 70402: // Mutated Transformation (Professor Putricide)
-		case 72511: // Mutated Transformation (Professor Putricide)
-		case 72512: // Mutated Transformation (Professor Putricide)
-		case 72513: // Mutated Transformation (Professor Putricide)
-			spellInfo->AttributesEx2 |= SPELL_ATTR2_CANT_CRIT;
-			break;
+        case 70402: // Mutated Transformation (Professor Putricide)
+        case 72511: // Mutated Transformation (Professor Putricide)
+        case 72512: // Mutated Transformation (Professor Putricide)
+        case 72513: // Mutated Transformation (Professor Putricide)
+            spellInfo->AttributesEx2 |= SPELL_ATTR2_CANT_CRIT;
+            break;
         case 71708: // Empowered Flare (Blood Prince Council)
         case 72785: // Empowered Flare (Blood Prince Council)
         case 72786: // Empowered Flare (Blood Prince Council)
@@ -5573,11 +5573,11 @@ void SpellMgr::LoadDbcDataCorrections()
         case 72890: // Swarming Shadows
             spellInfo->AreaGroupId = 0; // originally, these require area 4522, which is... outside of Icecrown Citadel
             break;
-		case 71301: // Summon Dream Portal (Valithria Dreamwalker)
-		case 71977: // Summon Nightmare Portal (Valithria Dreamwalker)
-			spellInfo->EffectImplicitTargetA[0] = TARGET_DEST_DEST;
-			spellInfo->EffectImplicitTargetB[0] = 0;
-			break;
+        case 71301: // Summon Dream Portal (Valithria Dreamwalker)
+        case 71977: // Summon Nightmare Portal (Valithria Dreamwalker)
+            spellInfo->EffectImplicitTargetA[0] = TARGET_DEST_DEST;
+            spellInfo->EffectImplicitTargetB[0] = 0;
+            break;
         case 70715: // Column of Frost (visual marker)
             spellInfo->DurationIndex = 32; // 6 seconds (missing)
             break;
@@ -5598,54 +5598,54 @@ void SpellMgr::LoadDbcDataCorrections()
         case 70598: // Sindragosa's Fury
             spellInfo->EffectImplicitTargetA[0] = TARGET_DEST_DEST;
             break;
-		case 71077: // Tail Smash (Sindragosa)
-			spellInfo->EffectImplicitTargetA[0] = TARGET_DEST_CASTER_BACK;
-			spellInfo->EffectImplicitTargetB[0] = TARGET_UNIT_DEST_AREA_ENEMY;
-			spellInfo->EffectImplicitTargetA[1] = TARGET_DEST_CASTER_BACK;
-			spellInfo->EffectImplicitTargetB[1] = TARGET_UNIT_DEST_AREA_ENEMY;
-			break;
+        case 71077: // Tail Smash (Sindragosa)
+            spellInfo->EffectImplicitTargetA[0] = TARGET_DEST_CASTER_BACK;
+            spellInfo->EffectImplicitTargetB[0] = TARGET_UNIT_DEST_AREA_ENEMY;
+            spellInfo->EffectImplicitTargetA[1] = TARGET_DEST_CASTER_BACK;
+            spellInfo->EffectImplicitTargetB[1] = TARGET_UNIT_DEST_AREA_ENEMY;
+            break;
         case 69846: // Frost Bomb
             spellInfo->speed = 0.0f;    // This spell's summon happens instantly
             break;
-		case 70127: // Mystic Buffet (Sindragosa) - remove obsolete spell effect with no targets
-		case 72528:
-		case 72529:
-		case 72530:
-			spellInfo->Effect[1] = 0;
-			break;
-		case 70084: // Sindragosa, Frost Aura
-		case 71050:
-		case 71051:
-		case 71052:
-			spellInfo->Attributes &= ~SPELL_ATTR0_UNAFFECTED_BY_INVULNERABILITY;
-			break;
+        case 70127: // Mystic Buffet (Sindragosa) - remove obsolete spell effect with no targets
+        case 72528:
+        case 72529:
+        case 72530:
+            spellInfo->Effect[1] = 0;
+            break;
+        case 70084: // Sindragosa, Frost Aura
+        case 71050:
+        case 71051:
+        case 71052:
+            spellInfo->Attributes &= ~SPELL_ATTR0_UNAFFECTED_BY_INVULNERABILITY;
+            break;
 
         case 71614: // Ice Lock
             spellInfo->Mechanic = MECHANIC_STUN;
             break;
-		case 70541: // Lich King, Infest
-		case 73779:
-		case 73780:
-		case 73781:
-			spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
-			break;
-		case 70337: // Lich King, Necrotic Plague
-		case 73912:
-		case 73913:
-		case 73914:
-		case 70338:
-		case 73785:
-		case 73786:
-		case 73787:
-			spellInfo->AttributesEx3 |= SPELL_ATTR3_IGNORE_HIT_RESULT;
-			break;
-		case 69099: // Ice Pulse 10n
-		case 73776: // Ice Pulse 25n
-		case 73777: // Ice Pulse 10h
-		case 73778: // Ice Pulse 25h
-			spellInfo->AttributesEx2 |= SPELL_ATTR2_CANT_CRIT;
-			spellInfo->AttributesEx4 &= ~SPELL_ATTR4_IGNORE_RESISTANCES;
-			break;
+        case 70541: // Lich King, Infest
+        case 73779:
+        case 73780:
+        case 73781:
+            spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
+            break;
+        case 70337: // Lich King, Necrotic Plague
+        case 73912:
+        case 73913:
+        case 73914:
+        case 70338:
+        case 73785:
+        case 73786:
+        case 73787:
+            spellInfo->AttributesEx3 |= SPELL_ATTR3_IGNORE_HIT_RESULT;
+            break;
+        case 69099: // Ice Pulse 10n
+        case 73776: // Ice Pulse 25n
+        case 73777: // Ice Pulse 10h
+        case 73778: // Ice Pulse 25h
+            spellInfo->AttributesEx2 |= SPELL_ATTR2_CANT_CRIT;
+            spellInfo->AttributesEx4 &= ~SPELL_ATTR4_IGNORE_RESISTANCES;
+            break;
         case 72350: // Fury of Frostmourne
             spellInfo->EffectRadiusIndex[0] = EFFECT_RADIUS_50000_YARDS;   // 50000yd
             spellInfo->EffectRadiusIndex[1] = EFFECT_RADIUS_50000_YARDS;   // 50000yd
@@ -5688,8 +5688,8 @@ void SpellMgr::LoadDbcDataCorrections()
         case 72762: // Defile
             spellInfo->DurationIndex = 559; // 53 seconds
             spellInfo->excludeCasterAuraSpell = 0;
-			spellInfo->Attributes |= SPELL_ATTR0_UNAFFECTED_BY_INVULNERABILITY;
-			spellInfo->AttributesEx6 |= (SPELL_ATTR6_CAN_TARGET_INVISIBLE | SPELL_ATTR6_CAN_TARGET_UNTARGETABLE);
+            spellInfo->Attributes |= SPELL_ATTR0_UNAFFECTED_BY_INVULNERABILITY;
+            spellInfo->AttributesEx6 |= (SPELL_ATTR6_CAN_TARGET_INVISIBLE | SPELL_ATTR6_CAN_TARGET_UNTARGETABLE);
             break;
         case 72743: // Defile
             spellInfo->DurationIndex = 22; // 45 seconds
@@ -5742,285 +5742,285 @@ void SpellMgr::LoadDbcDataCorrections()
         case 73582: // Trigger Vile Spirit (Inside, Heroic)
             spellInfo->EffectRadiusIndex[0] = EFFECT_RADIUS_50000_YARDS;   // 50000yd
             break;
-		// Scale Aura (used during Dominate Mind from Lady Deathwhisper)
-		case 73261:
-			spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_CHANGE_MAP;
-			break;
-		// Leap to a Random Location
-		case 70485:
-			spellInfo->rangeIndex = 6; // 100yd
-			spellInfo->EffectRadiusIndex[0] = EFFECT_RADIUS_10_YARDS;
-			spellInfo->EffectMiscValue[0] = 100;
-			break;
-		// Empowered Blood
-		case 70227:
-		case 70232:
-			spellInfo->AreaGroupId = 2452; // Whole icc instead of Crimson Halls only, remove when area calculation is fixed
-			break;
-
-		//////////////////////////////////////////
-		////////// RUBY SANCTUN
-		//////////////////////////////////////////
-		// Repelling Wave
-		case 74509:
-			spellInfo->EffectRadiusIndex[EFFECT_0] = EFFECT_RADIUS_20_YARDS;
-			spellInfo->EffectRadiusIndex[EFFECT_1] = EFFECT_RADIUS_20_YARDS;
-			break;
-		// Rallying Shout
-		case 75414:
-			spellInfo->EffectRadiusIndex[EFFECT_0] = EFFECT_RADIUS_20_YARDS;
-			break;
-		// Barrier Channel
-		case 76221:
-			spellInfo->ChannelInterruptFlags &= ~(AURA_INTERRUPT_FLAG_TURNING|AURA_INTERRUPT_FLAG_MOVE);
-			spellInfo->EffectImplicitTargetA[EFFECT_0] = TARGET_UNIT_NEARBY_ENTRY;
-			break;
-		// Intimidating Roar
-		case 74384:
-			spellInfo->EffectRadiusIndex[EFFECT_0] = EFFECT_RADIUS_100_YARDS;
-			spellInfo->EffectRadiusIndex[EFFECT_1] = EFFECT_RADIUS_100_YARDS;
-			break;
-		// Fiery Combustion
-		case 74562:
-		// Soul Consumption
-		case 74792:
-			spellInfo->AttributesEx |= SPELL_ATTR1_CANT_BE_REDIRECTED;
-			break;
-		// Combustion
-		case 75883:
-		case 75884:
-			spellInfo->EffectRadiusIndex[EFFECT_0] = EFFECT_RADIUS_6_YARDS;
-			spellInfo->EffectRadiusIndex[EFFECT_1] = EFFECT_RADIUS_6_YARDS;
-			break;
-		// Consumption
-		case 75875:
-		case 75876:
-			spellInfo->EffectRadiusIndex[EFFECT_0] = EFFECT_RADIUS_6_YARDS;
-			spellInfo->EffectRadiusIndex[EFFECT_1] = EFFECT_RADIUS_6_YARDS;
-			spellInfo->EffectMechanic[EFFECT_0] = 0;
-			spellInfo->EffectMechanic[EFFECT_1] = MECHANIC_SNARE;
-			break;
-		// Soul Consumption
-        case 74799:
-			spellInfo->EffectRadiusIndex[EFFECT_1] = EFFECT_RADIUS_12_YARDS;
+        // Scale Aura (used during Dominate Mind from Lady Deathwhisper)
+        case 73261:
+            spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_CHANGE_MAP;
             break;
-		// Twilight Cutter
+        // Leap to a Random Location
+        case 70485:
+            spellInfo->rangeIndex = 6; // 100yd
+            spellInfo->EffectRadiusIndex[0] = EFFECT_RADIUS_10_YARDS;
+            spellInfo->EffectMiscValue[0] = 100;
+            break;
+        // Empowered Blood
+        case 70227:
+        case 70232:
+            spellInfo->AreaGroupId = 2452; // Whole icc instead of Crimson Halls only, remove when area calculation is fixed
+            break;
+
+        //////////////////////////////////////////
+        ////////// RUBY SANCTUN
+        //////////////////////////////////////////
+        // Repelling Wave
+        case 74509:
+            spellInfo->EffectRadiusIndex[EFFECT_0] = EFFECT_RADIUS_20_YARDS;
+            spellInfo->EffectRadiusIndex[EFFECT_1] = EFFECT_RADIUS_20_YARDS;
+            break;
+        // Rallying Shout
+        case 75414:
+            spellInfo->EffectRadiusIndex[EFFECT_0] = EFFECT_RADIUS_20_YARDS;
+            break;
+        // Barrier Channel
+        case 76221:
+            spellInfo->ChannelInterruptFlags &= ~(AURA_INTERRUPT_FLAG_TURNING|AURA_INTERRUPT_FLAG_MOVE);
+            spellInfo->EffectImplicitTargetA[EFFECT_0] = TARGET_UNIT_NEARBY_ENTRY;
+            break;
+        // Intimidating Roar
+        case 74384:
+            spellInfo->EffectRadiusIndex[EFFECT_0] = EFFECT_RADIUS_100_YARDS;
+            spellInfo->EffectRadiusIndex[EFFECT_1] = EFFECT_RADIUS_100_YARDS;
+            break;
+        // Fiery Combustion
+        case 74562:
+        // Soul Consumption
+        case 74792:
+            spellInfo->AttributesEx |= SPELL_ATTR1_CANT_BE_REDIRECTED;
+            break;
+        // Combustion
+        case 75883:
+        case 75884:
+            spellInfo->EffectRadiusIndex[EFFECT_0] = EFFECT_RADIUS_6_YARDS;
+            spellInfo->EffectRadiusIndex[EFFECT_1] = EFFECT_RADIUS_6_YARDS;
+            break;
+        // Consumption
+        case 75875:
+        case 75876:
+            spellInfo->EffectRadiusIndex[EFFECT_0] = EFFECT_RADIUS_6_YARDS;
+            spellInfo->EffectRadiusIndex[EFFECT_1] = EFFECT_RADIUS_6_YARDS;
+            spellInfo->EffectMechanic[EFFECT_0] = 0;
+            spellInfo->EffectMechanic[EFFECT_1] = MECHANIC_SNARE;
+            break;
+        // Soul Consumption
+        case 74799:
+            spellInfo->EffectRadiusIndex[EFFECT_1] = EFFECT_RADIUS_12_YARDS;
+            break;
+        // Twilight Cutter
         case 74769:
         case 77844:
         case 77845:
         case 77846:
-			spellInfo->EffectRadiusIndex[EFFECT_0] = EFFECT_RADIUS_100_YARDS;
+            spellInfo->EffectRadiusIndex[EFFECT_0] = EFFECT_RADIUS_100_YARDS;
             break;
-		// Twilight Mending
+        // Twilight Mending
         case 75509:
             spellInfo->AttributesEx6 |= SPELL_ATTR6_CAN_TARGET_INVISIBLE;
             spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
-			spellInfo->EffectRadiusIndex[EFFECT_0] = EFFECT_RADIUS_100_YARDS;
-			spellInfo->EffectRadiusIndex[EFFECT_1] = EFFECT_RADIUS_100_YARDS;
+            spellInfo->EffectRadiusIndex[EFFECT_0] = EFFECT_RADIUS_100_YARDS;
+            spellInfo->EffectRadiusIndex[EFFECT_1] = EFFECT_RADIUS_100_YARDS;
             break;
-		// Meteor Strike
-		case 74637:
-			spellInfo->speed = 0;
-			break;
+        // Meteor Strike
+        case 74637:
+            spellInfo->speed = 0;
+            break;
 
 
-		// ///////////////////////////////////////////
-		// ////////////////QUESTS/////////////////////
-		// ///////////////////////////////////////////
-		// Going Bearback (12851)
-		case 54897:
-			spellInfo->Effect[1] = SPELL_EFFECT_DUMMY;
-			spellInfo->EffectRadiusIndex[1] = spellInfo->EffectRadiusIndex[0];
-			spellInfo->EffectImplicitTargetA[1] = TARGET_UNIT_DEST_AREA_ENTRY;
-			break;
-		// Still At It (12644)
-		case 51931:
-		case 51932:
-		case 51933:
-			spellInfo->EffectImplicitTargetA[0] = 38;
-			spellInfo->EffectImplicitTargetB[0] = 0;
-			break;
-		// Rallying the Troops (12070)
-		case 47394:
-			spellInfo->excludeTargetAuraSpell = 47394;
-			break;
-		// A Tangled Skein (12555)
-		case 51165:
-		case 51173:
-			spellInfo->AttributesEx3 |= SPELL_ATTR3_NO_INITIAL_AGGRO;
-			break;
-		// A Cloudlet of Classy Cologne (24635)
-		case 69563:
-		// A Perfect Puff of Perfume (24629)
-		case 69445:
-		// Bonbon Blitz (24636)
-		case 69489:
-			spellInfo->EffectImplicitTargetA[1] = TARGET_UNIT_CASTER;
-			break;
-		// Control (9595)
-		case 30790:
-			spellInfo->EffectMiscValue[1] = 0;
-			break;
-		// Reclusive Runemaster (12150)
-		case 48028:
-			spellInfo->EffectImplicitTargetA[0] = TARGET_SRC_CASTER;
-			spellInfo->EffectImplicitTargetB[0] = TARGET_UNIT_SRC_AREA_ENEMY;
-			break;
-		// Mastery of
-		case 65147:
-			spellInfo->Category = 1244;
-			spellInfo->CategoryRecoveryTime = 1500;
-			break;
-		// Weakness to Lightning (11896)
-		case 46432:
-			spellInfo->AttributesEx3 &= ~SPELL_ATTR3_DEATH_PERSISTENT;
-			break;
-		// Wrangle Some Aether Rays! (11065)
-		case 40856:
-			spellInfo->DurationIndex = 27; // 3000ms
-			break;
-		// The Black Knight's Orders (13663)
-		case 63163:
-			spellInfo->EffectBasePoints[0] = 52390;
-			break;
-		// The Warp Rifts (10278)
-		case 34888:
-			spellInfo->DurationIndex = 5; // 300 secs
-			break;
-		// The Smallest Creatures (10720)
-		case 38544:
-			spellInfo->EffectMiscValueB[0] = 427;
-			spellInfo->EffectImplicitTargetA[0] = 1;
-			spellInfo->Effect[1] = 0;
-			break;
-		// Ridding the red rocket
-		case 49177:
-			spellInfo->EffectBasePoints[0] = 1; // corrects seat id (points - 1 = seatId)
-			break;
-		// The Iron Colossus (13007)
-		case 56513:
-		case 56524:
-			spellInfo->RecoveryTime = (spellInfo->Id == 56524 ? 6000 : 2000);
-			break;
-		// Kaw the Mammoth Destroyer (11879)
-		case 46260:
-			spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
-			break;
-		// That's Abominable (13264)(13276)(13288)(13289)
-		case 59565:
-			spellInfo->EffectMiscValueB[0] = 1721; // controlable guardian
-			break;
-		// Investigate the Blue Recluse (1920)
-		// Investigate the Alchemist Shop (1960)
-		case 9095:
-			spellInfo->EffectApplyAuraName[0] = SPELL_AURA_DUMMY;
-			spellInfo->EffectRadiusIndex[0] = 13;
-			break;
-		// Dragonmaw Race: All parts
-		case 40890: // Oldie's Rotten Pumpkin
-			spellInfo->Targets |= TARGET_FLAG_DEST_LOCATION;
-			spellInfo->EffectTriggerSpell[0] = 40905;
-			spellInfo->Effect[0] = SPELL_EFFECT_TRIGGER_MISSILE;
-			spellInfo->EffectImplicitTargetA[0] = TARGET_DEST_DEST;
-			break;
-		case 40909: // Trope's Slime Cannon
-			spellInfo->Targets |= TARGET_FLAG_DEST_LOCATION;
-			spellInfo->EffectTriggerSpell[0] = 40905;
-			spellInfo->Effect[0] = SPELL_EFFECT_TRIGGER_MISSILE;
-			spellInfo->EffectImplicitTargetA[0] = TARGET_DEST_DEST;
-			break;
-		case 40894: // Corlok's Skull Barrage
-			spellInfo->Targets |= TARGET_FLAG_DEST_LOCATION;
-			spellInfo->EffectTriggerSpell[0] = 40900;
-			spellInfo->Effect[0] = SPELL_EFFECT_TRIGGER_MISSILE;
-			spellInfo->EffectImplicitTargetA[0] = TARGET_DEST_DEST;
-			break;
-		case 40928: // Ichman's Blazing Fireball
-			spellInfo->Targets |= TARGET_FLAG_DEST_LOCATION;
-			spellInfo->EffectTriggerSpell[0] = 40929;
-			spellInfo->Effect[0] = SPELL_EFFECT_TRIGGER_MISSILE;
-			spellInfo->EffectImplicitTargetA[0] = TARGET_DEST_DEST;
-			break;
-		case 40930: // Mulverick's Great Balls of Lightning
-			spellInfo->Targets |= TARGET_FLAG_DEST_LOCATION;
-			spellInfo->EffectTriggerSpell[0] = 40931;
-			spellInfo->Effect[0] = SPELL_EFFECT_TRIGGER_MISSILE;
-			spellInfo->EffectImplicitTargetA[0] = TARGET_DEST_DEST;
-			break;
-		case 40945: // Sky Shatter
-			spellInfo->Targets |= TARGET_FLAG_DEST_LOCATION;
-			spellInfo->EffectTriggerSpell[0] = 41064;
-			spellInfo->Effect[0] = SPELL_EFFECT_TRIGGER_MISSILE;
-			spellInfo->EffectImplicitTargetA[0] = TARGET_DEST_DEST;
-			break;
-		// Gauging the Resonant Frequency (10594)
-		case 37390:
-			spellInfo->EffectMiscValueB[0] = 181;
-			break;
-		// Where in the World is Hemet Nesingwary? (12521)
-		case 50860:
-			spellInfo->EffectBasePoints[0] = 50860;
-			break;
-		case 50861:
-			spellInfo->EffectBasePoints[0] = 0;
-			break;
-		// Krolmir, Hammer of Storms (13010)
-		case 56606:
-		case 56541:
-			spellInfo->EffectBasePoints[0] = 1;
-			break;
-		// Blightbeasts be Damned! (12072)
-		case 47424:
-			spellInfo->AuraInterruptFlags &= ~AURA_INTERRUPT_FLAG_NOT_ABOVEWATER;
-			break;
-		// Leading the Charge (13380), All Infra-Green bomber quests
-		case 59059:
-			spellInfo->AttributesEx4 &= ~SPELL_ATTR4_CAN_CAST_WHILE_CASTING;
-			break;
-		// Dark Horizon (12664), Reunited (12663)
-		case 52190:
-			spellInfo->EffectBasePoints[EFFECT_0] = 52391-1;
-			break;
-		// The Sum is Greater than the Parts (13043) - Chained Grip
-		case 60540:
-			spellInfo->EffectMiscValue[EFFECT_0] = 300;
-			break;
-		// Not a Bug (13342)
-		case 60531:
-			spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_DEAD;
-			break;
-		// Frankly,  It Makes No Sense... (10672)
-		case 37851:
-			spellInfo->AttributesEx3 |= SPELL_ATTR3_NO_INITIAL_AGGRO;
-			break;
-		// Honor Challenge (12939)
-		case 21855:
-			spellInfo->AttributesEx3 |= SPELL_ATTR3_NO_INITIAL_AGGRO;
-			break;
+        // ///////////////////////////////////////////
+        // ////////////////QUESTS/////////////////////
+        // ///////////////////////////////////////////
+        // Going Bearback (12851)
+        case 54897:
+            spellInfo->Effect[1] = SPELL_EFFECT_DUMMY;
+            spellInfo->EffectRadiusIndex[1] = spellInfo->EffectRadiusIndex[0];
+            spellInfo->EffectImplicitTargetA[1] = TARGET_UNIT_DEST_AREA_ENTRY;
+            break;
+        // Still At It (12644)
+        case 51931:
+        case 51932:
+        case 51933:
+            spellInfo->EffectImplicitTargetA[0] = 38;
+            spellInfo->EffectImplicitTargetB[0] = 0;
+            break;
+        // Rallying the Troops (12070)
+        case 47394:
+            spellInfo->excludeTargetAuraSpell = 47394;
+            break;
+        // A Tangled Skein (12555)
+        case 51165:
+        case 51173:
+            spellInfo->AttributesEx3 |= SPELL_ATTR3_NO_INITIAL_AGGRO;
+            break;
+        // A Cloudlet of Classy Cologne (24635)
+        case 69563:
+        // A Perfect Puff of Perfume (24629)
+        case 69445:
+        // Bonbon Blitz (24636)
+        case 69489:
+            spellInfo->EffectImplicitTargetA[1] = TARGET_UNIT_CASTER;
+            break;
+        // Control (9595)
+        case 30790:
+            spellInfo->EffectMiscValue[1] = 0;
+            break;
+        // Reclusive Runemaster (12150)
+        case 48028:
+            spellInfo->EffectImplicitTargetA[0] = TARGET_SRC_CASTER;
+            spellInfo->EffectImplicitTargetB[0] = TARGET_UNIT_SRC_AREA_ENEMY;
+            break;
+        // Mastery of
+        case 65147:
+            spellInfo->Category = 1244;
+            spellInfo->CategoryRecoveryTime = 1500;
+            break;
+        // Weakness to Lightning (11896)
+        case 46432:
+            spellInfo->AttributesEx3 &= ~SPELL_ATTR3_DEATH_PERSISTENT;
+            break;
+        // Wrangle Some Aether Rays! (11065)
+        case 40856:
+            spellInfo->DurationIndex = 27; // 3000ms
+            break;
+        // The Black Knight's Orders (13663)
+        case 63163:
+            spellInfo->EffectBasePoints[0] = 52390;
+            break;
+        // The Warp Rifts (10278)
+        case 34888:
+            spellInfo->DurationIndex = 5; // 300 secs
+            break;
+        // The Smallest Creatures (10720)
+        case 38544:
+            spellInfo->EffectMiscValueB[0] = 427;
+            spellInfo->EffectImplicitTargetA[0] = 1;
+            spellInfo->Effect[1] = 0;
+            break;
+        // Ridding the red rocket
+        case 49177:
+            spellInfo->EffectBasePoints[0] = 1; // corrects seat id (points - 1 = seatId)
+            break;
+        // The Iron Colossus (13007)
+        case 56513:
+        case 56524:
+            spellInfo->RecoveryTime = (spellInfo->Id == 56524 ? 6000 : 2000);
+            break;
+        // Kaw the Mammoth Destroyer (11879)
+        case 46260:
+            spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
+            break;
+        // That's Abominable (13264)(13276)(13288)(13289)
+        case 59565:
+            spellInfo->EffectMiscValueB[0] = 1721; // controlable guardian
+            break;
+        // Investigate the Blue Recluse (1920)
+        // Investigate the Alchemist Shop (1960)
+        case 9095:
+            spellInfo->EffectApplyAuraName[0] = SPELL_AURA_DUMMY;
+            spellInfo->EffectRadiusIndex[0] = 13;
+            break;
+        // Dragonmaw Race: All parts
+        case 40890: // Oldie's Rotten Pumpkin
+            spellInfo->Targets |= TARGET_FLAG_DEST_LOCATION;
+            spellInfo->EffectTriggerSpell[0] = 40905;
+            spellInfo->Effect[0] = SPELL_EFFECT_TRIGGER_MISSILE;
+            spellInfo->EffectImplicitTargetA[0] = TARGET_DEST_DEST;
+            break;
+        case 40909: // Trope's Slime Cannon
+            spellInfo->Targets |= TARGET_FLAG_DEST_LOCATION;
+            spellInfo->EffectTriggerSpell[0] = 40905;
+            spellInfo->Effect[0] = SPELL_EFFECT_TRIGGER_MISSILE;
+            spellInfo->EffectImplicitTargetA[0] = TARGET_DEST_DEST;
+            break;
+        case 40894: // Corlok's Skull Barrage
+            spellInfo->Targets |= TARGET_FLAG_DEST_LOCATION;
+            spellInfo->EffectTriggerSpell[0] = 40900;
+            spellInfo->Effect[0] = SPELL_EFFECT_TRIGGER_MISSILE;
+            spellInfo->EffectImplicitTargetA[0] = TARGET_DEST_DEST;
+            break;
+        case 40928: // Ichman's Blazing Fireball
+            spellInfo->Targets |= TARGET_FLAG_DEST_LOCATION;
+            spellInfo->EffectTriggerSpell[0] = 40929;
+            spellInfo->Effect[0] = SPELL_EFFECT_TRIGGER_MISSILE;
+            spellInfo->EffectImplicitTargetA[0] = TARGET_DEST_DEST;
+            break;
+        case 40930: // Mulverick's Great Balls of Lightning
+            spellInfo->Targets |= TARGET_FLAG_DEST_LOCATION;
+            spellInfo->EffectTriggerSpell[0] = 40931;
+            spellInfo->Effect[0] = SPELL_EFFECT_TRIGGER_MISSILE;
+            spellInfo->EffectImplicitTargetA[0] = TARGET_DEST_DEST;
+            break;
+        case 40945: // Sky Shatter
+            spellInfo->Targets |= TARGET_FLAG_DEST_LOCATION;
+            spellInfo->EffectTriggerSpell[0] = 41064;
+            spellInfo->Effect[0] = SPELL_EFFECT_TRIGGER_MISSILE;
+            spellInfo->EffectImplicitTargetA[0] = TARGET_DEST_DEST;
+            break;
+        // Gauging the Resonant Frequency (10594)
+        case 37390:
+            spellInfo->EffectMiscValueB[0] = 181;
+            break;
+        // Where in the World is Hemet Nesingwary? (12521)
+        case 50860:
+            spellInfo->EffectBasePoints[0] = 50860;
+            break;
+        case 50861:
+            spellInfo->EffectBasePoints[0] = 0;
+            break;
+        // Krolmir, Hammer of Storms (13010)
+        case 56606:
+        case 56541:
+            spellInfo->EffectBasePoints[0] = 1;
+            break;
+        // Blightbeasts be Damned! (12072)
+        case 47424:
+            spellInfo->AuraInterruptFlags &= ~AURA_INTERRUPT_FLAG_NOT_ABOVEWATER;
+            break;
+        // Leading the Charge (13380), All Infra-Green bomber quests
+        case 59059:
+            spellInfo->AttributesEx4 &= ~SPELL_ATTR4_CAN_CAST_WHILE_CASTING;
+            break;
+        // Dark Horizon (12664), Reunited (12663)
+        case 52190:
+            spellInfo->EffectBasePoints[EFFECT_0] = 52391-1;
+            break;
+        // The Sum is Greater than the Parts (13043) - Chained Grip
+        case 60540:
+            spellInfo->EffectMiscValue[EFFECT_0] = 300;
+            break;
+        // Not a Bug (13342)
+        case 60531:
+            spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_DEAD;
+            break;
+        // Frankly,  It Makes No Sense... (10672)
+        case 37851:
+            spellInfo->AttributesEx3 |= SPELL_ATTR3_NO_INITIAL_AGGRO;
+            break;
+        // Honor Challenge (12939)
+        case 21855:
+            spellInfo->AttributesEx3 |= SPELL_ATTR3_NO_INITIAL_AGGRO;
+            break;
 
 
 
         // ///////////////////////////////////////////
-		// ////////////////ITEMS//////////////////////
-		// ///////////////////////////////////////////
+        // ////////////////ITEMS//////////////////////
+        // ///////////////////////////////////////////
         // enchant Lightweave Embroidery
         case 55637:
             spellInfo->EffectMiscValue[1] = 126;
             break;
-		// Magic Broom
-		case 47977:
-			spellInfo->Effect[0] = 0;
-			spellInfo->Effect[1] = 0;
-			break;
-		// Titanium Seal of Dalaran, Toss your luck
-		case 60476:
-			spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_CASTER;
-			break;
-		// Mind Amplification Dish, change charm aura
-		case 26740:
-			spellInfo->EffectApplyAuraName[0] = SPELL_AURA_MOD_CHARM;
-			break;
-		// Persistent Shield (fixes idiocity)
+        // Magic Broom
+        case 47977:
+            spellInfo->Effect[0] = 0;
+            spellInfo->Effect[1] = 0;
+            break;
+        // Titanium Seal of Dalaran, Toss your luck
+        case 60476:
+            spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_CASTER;
+            break;
+        // Mind Amplification Dish, change charm aura
+        case 26740:
+            spellInfo->EffectApplyAuraName[0] = SPELL_AURA_MOD_CHARM;
+            break;
+        // Persistent Shield (fixes idiocity)
         case 26467:
             spellInfo->EffectApplyAuraName[0] = SPELL_AURA_PROC_TRIGGER_SPELL_WITH_VALUE;
             spellInfo->EffectTriggerSpell[0] = 26470;
@@ -6029,186 +6029,186 @@ void SpellMgr::LoadDbcDataCorrections()
         case 31255:
             spellInfo->EffectTriggerSpell[0] = 22588;
             break;
-		// Black Magic enchant
-		case 59630:
-			spellInfo->Attributes |= SPELL_ATTR0_PASSIVE;
-			break;
-		// Precious's Ribbon
-		case 72968:
-			spellInfo->AttributesEx3 |= SPELL_ATTR3_DEATH_PERSISTENT;
-			break;
-		// Item - Bauble of True Blood 10m
-		// Item - Bauble of True Blood 25m
+        // Black Magic enchant
+        case 59630:
+            spellInfo->Attributes |= SPELL_ATTR0_PASSIVE;
+            break;
+        // Precious's Ribbon
+        case 72968:
+            spellInfo->AttributesEx3 |= SPELL_ATTR3_DEATH_PERSISTENT;
+            break;
+        // Item - Bauble of True Blood 10m
+        // Item - Bauble of True Blood 25m
         case 71646:
-		case 71607:
-		// Item - Althor's Abacus trigger 10m
-		// Item - Althor's Abacus trigger 25m
-		case 71610:
-		case 71641:
-			spellInfo->DmgClass = SPELL_DAMAGE_CLASS_MAGIC;
-			spellInfo->spellLevel = 0;
-			break;
-		// Drain Life - Bryntroll Normal / Heroic
+        case 71607:
+        // Item - Althor's Abacus trigger 10m
+        // Item - Althor's Abacus trigger 25m
+        case 71610:
+        case 71641:
+            spellInfo->DmgClass = SPELL_DAMAGE_CLASS_MAGIC;
+            spellInfo->spellLevel = 0;
+            break;
+        // Drain Life - Bryntroll Normal / Heroic
         case 71838:
         case 71839:
             spellInfo->AttributesEx2 |= SPELL_ATTR2_CANT_CRIT;
-			spellInfo->AttributesEx4 |= SPELL_ATTR4_IGNORE_RESISTANCES;
+            spellInfo->AttributesEx4 |= SPELL_ATTR4_IGNORE_RESISTANCES;
             break;
-		// Alchemist's Stone
-		case 17619:
-			spellInfo->AttributesEx3 |= SPELL_ATTR3_DEATH_PERSISTENT;
-			break;
-		// Gnomish Death Ray
-		case 13278:
-		case 13280:
-			spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_TARGET_ENEMY;
-			break;
-		// Stormchops
-		case 43730:
-			spellInfo->EffectImplicitTargetA[1] = 1;
-			spellInfo->EffectImplicitTargetB[1] = 0;
-			break;
-		// Savory Deviate Delight (transformations), allow to mount while transformed
-		case 8219:
-		case 8220:
-		case 8221:
-		case 8222:
-			spellInfo->Attributes &= ~SPELL_ATTR0_UNAFFECTED_BY_INVULNERABILITY;
-			break;
-		// Clamlette Magnifique
-		case 72623: // drink triggered spell
-			spellInfo->EffectBasePoints[EFFECT_0] = spellInfo->EffectBasePoints[EFFECT_1];
-			break;
-		// Compact Harvest Reaper
-		case 4078:
-			spellInfo->DurationIndex = 6; // 10 minutes
-			break;
-		// Dragon Kite, Tuskarr Kite - Kite String
-		case 45192:
-			spellInfo->rangeIndex = 6; // 100yd
-			break;
-		// Frigid Frostling, Infrigidate
-		case 74960:
-			spellInfo->EffectRadiusIndex[EFFECT_0] = 9; // 20yd
-			break;
+        // Alchemist's Stone
+        case 17619:
+            spellInfo->AttributesEx3 |= SPELL_ATTR3_DEATH_PERSISTENT;
+            break;
+        // Gnomish Death Ray
+        case 13278:
+        case 13280:
+            spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_TARGET_ENEMY;
+            break;
+        // Stormchops
+        case 43730:
+            spellInfo->EffectImplicitTargetA[1] = 1;
+            spellInfo->EffectImplicitTargetB[1] = 0;
+            break;
+        // Savory Deviate Delight (transformations), allow to mount while transformed
+        case 8219:
+        case 8220:
+        case 8221:
+        case 8222:
+            spellInfo->Attributes &= ~SPELL_ATTR0_UNAFFECTED_BY_INVULNERABILITY;
+            break;
+        // Clamlette Magnifique
+        case 72623: // drink triggered spell
+            spellInfo->EffectBasePoints[EFFECT_0] = spellInfo->EffectBasePoints[EFFECT_1];
+            break;
+        // Compact Harvest Reaper
+        case 4078:
+            spellInfo->DurationIndex = 6; // 10 minutes
+            break;
+        // Dragon Kite, Tuskarr Kite - Kite String
+        case 45192:
+            spellInfo->rangeIndex = 6; // 100yd
+            break;
+        // Frigid Frostling, Infrigidate
+        case 74960:
+            spellInfo->EffectRadiusIndex[EFFECT_0] = 9; // 20yd
+            break;
 
 
-		// ///////////////////////////////////////////
-		// ////////////////EVENTS/////////////////////
-		// ///////////////////////////////////////////
+        // ///////////////////////////////////////////
+        // ////////////////EVENTS/////////////////////
+        // ///////////////////////////////////////////
 
-		//////////////////////////////////////////
-		////////// BREWFEST
-		//////////////////////////////////////////
-		// Apple Trap
-		case 43450:
-			spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_SRC_AREA_ENEMY;
-			spellInfo->EffectImplicitTargetB[0] = TARGET_UNIT_CASTER;
-			spellInfo->Effect[0] = SPELL_EFFECT_DUMMY;
-			break;
-		// Dark Iron Attack - spawn mole machine
-		case 43563:
-			spellInfo->Effect[2] = 0; // summon GO's manually
-			break;
-		// Throw Mug visual
-		case 42300:
-			spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_TARGET_ANY;
-			break;
-		// Dark Iron knockback Aura
-		case 42299:
-			spellInfo->EffectApplyAuraName[1] = SPELL_AURA_DUMMY;
-			spellInfo->EffectMiscValue[0] = 100;
-			spellInfo->EffectBasePoints[0] = 79;
-			break;
-		// Chug and Chuck!
-		case 42436:
-			spellInfo->EffectImplicitTargetA[0] = TARGET_SRC_CASTER;
-			spellInfo->EffectImplicitTargetB[0] = TARGET_UNIT_SRC_AREA_ENTRY;
-			spellInfo->MaxAffectedTargets = 0;
-			spellInfo->excludeCasterAuraSpell = 42299;
-			break;
-		// Catch the Wild Wolpertinger!
-		case 41621:
-			spellInfo->Effect[0] = SPELL_EFFECT_DUMMY;
-			break;
-		// Brewfest quests
-		case 47134:
-		case 51798:
-			spellInfo->Effect[0] = 0;
-			break;
-		// The Heart of The Storms (12998)
-		case 43528:
-			spellInfo->DurationIndex = 18;
-			spellInfo->EffectImplicitTargetA[0] = 25;
-			break;
+        //////////////////////////////////////////
+        ////////// BREWFEST
+        //////////////////////////////////////////
+        // Apple Trap
+        case 43450:
+            spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_SRC_AREA_ENEMY;
+            spellInfo->EffectImplicitTargetB[0] = TARGET_UNIT_CASTER;
+            spellInfo->Effect[0] = SPELL_EFFECT_DUMMY;
+            break;
+        // Dark Iron Attack - spawn mole machine
+        case 43563:
+            spellInfo->Effect[2] = 0; // summon GO's manually
+            break;
+        // Throw Mug visual
+        case 42300:
+            spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_TARGET_ANY;
+            break;
+        // Dark Iron knockback Aura
+        case 42299:
+            spellInfo->EffectApplyAuraName[1] = SPELL_AURA_DUMMY;
+            spellInfo->EffectMiscValue[0] = 100;
+            spellInfo->EffectBasePoints[0] = 79;
+            break;
+        // Chug and Chuck!
+        case 42436:
+            spellInfo->EffectImplicitTargetA[0] = TARGET_SRC_CASTER;
+            spellInfo->EffectImplicitTargetB[0] = TARGET_UNIT_SRC_AREA_ENTRY;
+            spellInfo->MaxAffectedTargets = 0;
+            spellInfo->excludeCasterAuraSpell = 42299;
+            break;
+        // Catch the Wild Wolpertinger!
+        case 41621:
+            spellInfo->Effect[0] = SPELL_EFFECT_DUMMY;
+            break;
+        // Brewfest quests
+        case 47134:
+        case 51798:
+            spellInfo->Effect[0] = 0;
+            break;
+        // The Heart of The Storms (12998)
+        case 43528:
+            spellInfo->DurationIndex = 18;
+            spellInfo->EffectImplicitTargetA[0] = 25;
+            break;
 
-		//////////////////////////////////////////
-		////////// Hallow's End
-		//////////////////////////////////////////
-		// Water splash
-		case 42348:
-			spellInfo->Effect[0] = 0;
-			break;
-		// Summon Lantersn
-		case 44255:
-		case 44231:
-			spellInfo->EffectImplicitTargetA[0] = TARGET_DEST_DEST;
-			spellInfo->EffectImplicitTargetB[0] = 0;
-			break;
-		// Throw Head Back
-		case 42401:
-			spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_NEARBY_ENTRY;
-			break;
+        //////////////////////////////////////////
+        ////////// Hallow's End
+        //////////////////////////////////////////
+        // Water splash
+        case 42348:
+            spellInfo->Effect[0] = 0;
+            break;
+        // Summon Lantersn
+        case 44255:
+        case 44231:
+            spellInfo->EffectImplicitTargetA[0] = TARGET_DEST_DEST;
+            spellInfo->EffectImplicitTargetB[0] = 0;
+            break;
+        // Throw Head Back
+        case 42401:
+            spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_NEARBY_ENTRY;
+            break;
 
-		//////////////////////////////////////////
-		////////// Pilgrim's Bounty
-		//////////////////////////////////////////
-		// Various food
-		case 65418:
-			spellInfo->EffectTriggerSpell[2] = 65410;
-			break;
-		case 65422:
-			spellInfo->EffectTriggerSpell[2] = 65414;
-			break;
-		case 65419:
-			spellInfo->EffectTriggerSpell[2] = 65416;
-			break;
-		case 65420:
-			spellInfo->EffectTriggerSpell[2] = 65412;
-			break;
-		case 65421:
-			spellInfo->EffectTriggerSpell[2] = 65415;
-			break;
+        //////////////////////////////////////////
+        ////////// Pilgrim's Bounty
+        //////////////////////////////////////////
+        // Various food
+        case 65418:
+            spellInfo->EffectTriggerSpell[2] = 65410;
+            break;
+        case 65422:
+            spellInfo->EffectTriggerSpell[2] = 65414;
+            break;
+        case 65419:
+            spellInfo->EffectTriggerSpell[2] = 65416;
+            break;
+        case 65420:
+            spellInfo->EffectTriggerSpell[2] = 65412;
+            break;
+        case 65421:
+            spellInfo->EffectTriggerSpell[2] = 65415;
+            break;
 
-		//////////////////////////////////////////
-		////////// Midsummer
-		//////////////////////////////////////////
-		// Stamp Out Bonfire
-		case 45437:
-			spellInfo->Effect[1] = SPELL_EFFECT_DUMMY;
-			spellInfo->EffectImplicitTargetA[1] = TARGET_UNIT_NEARBY_ENTRY;
-			spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
-			break;
-		// Light Bonfire (DND)
-		case 29831:
-			spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
-			break;
-		//////////////////////////////////////////
-		////////// Misc Events
-		//////////////////////////////////////////
-		// Infernal
-		case 33240:
-			spellInfo->EffectImplicitTargetA[EFFECT_0] = TARGET_DEST_TARGET_ANY;
-			spellInfo->EffectImplicitTargetA[EFFECT_1] = TARGET_UNIT_TARGET_ANY;
-			spellInfo->EffectImplicitTargetA[EFFECT_2] = TARGET_UNIT_TARGET_ANY;
-			break;
+        //////////////////////////////////////////
+        ////////// Midsummer
+        //////////////////////////////////////////
+        // Stamp Out Bonfire
+        case 45437:
+            spellInfo->Effect[1] = SPELL_EFFECT_DUMMY;
+            spellInfo->EffectImplicitTargetA[1] = TARGET_UNIT_NEARBY_ENTRY;
+            spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
+            break;
+        // Light Bonfire (DND)
+        case 29831:
+            spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
+            break;
+        //////////////////////////////////////////
+        ////////// Misc Events
+        //////////////////////////////////////////
+        // Infernal
+        case 33240:
+            spellInfo->EffectImplicitTargetA[EFFECT_0] = TARGET_DEST_TARGET_ANY;
+            spellInfo->EffectImplicitTargetA[EFFECT_1] = TARGET_UNIT_TARGET_ANY;
+            spellInfo->EffectImplicitTargetA[EFFECT_2] = TARGET_UNIT_TARGET_ANY;
+            break;
         }
 
         switch (spellInfo->SpellFamilyName)
         {
             case SPELLFAMILY_PALADIN:
                 // Seals of the Pure should affect Seal of Righteousness
-				if (spellInfo->SpellIconID == 25 && (spellInfo->Attributes & SPELL_ATTR0_PASSIVE))
+                if (spellInfo->SpellIconID == 25 && (spellInfo->Attributes & SPELL_ATTR0_PASSIVE))
                     spellInfo->EffectSpellClassMask[0][1] |= 0x20000000;
                 break;
             case SPELLFAMILY_DEATHKNIGHT:
@@ -6219,98 +6219,98 @@ void SpellMgr::LoadDbcDataCorrections()
         }
     }
 
-	// Xinef: The Veiled Sea area in outlands (Draenei zone), client blocks casting flying mounts
-	for (uint32 i = 0; i < sAreaStore.GetNumRows(); ++i)
-		if (AreaTableEntry* areaEntry = const_cast<AreaTableEntry*>(sAreaStore.LookupEntry(i)))
-		{
-			if (areaEntry->ID == 3479)
-				areaEntry->flags |= AREA_FLAG_NO_FLY_ZONE;
-			// Xinef: Dun Morogh, Kharanos tavern, missing resting flag
-			else if (areaEntry->ID == 2102)
-				areaEntry->flags |= AREA_FLAG_REST_ZONE_ALLIANCE;
-		}
+    // Xinef: The Veiled Sea area in outlands (Draenei zone), client blocks casting flying mounts
+    for (uint32 i = 0; i < sAreaStore.GetNumRows(); ++i)
+        if (AreaTableEntry* areaEntry = const_cast<AreaTableEntry*>(sAreaStore.LookupEntry(i)))
+        {
+            if (areaEntry->ID == 3479)
+                areaEntry->flags |= AREA_FLAG_NO_FLY_ZONE;
+            // Xinef: Dun Morogh, Kharanos tavern, missing resting flag
+            else if (areaEntry->ID == 2102)
+                areaEntry->flags |= AREA_FLAG_REST_ZONE_ALLIANCE;
+        }
 
 
-	// Xinef: fix for something?
+    // Xinef: fix for something?
     SummonPropertiesEntry* properties = const_cast<SummonPropertiesEntry*>(sSummonPropertiesStore.LookupEntry(121));
     properties->Type = SUMMON_TYPE_TOTEM;
     properties = const_cast<SummonPropertiesEntry*>(sSummonPropertiesStore.LookupEntry(647)); // 52893
     properties->Type = SUMMON_TYPE_TOTEM;
 
 
-	// Correct Pet Size
-	CreatureDisplayInfoEntry* displayEntry = const_cast<CreatureDisplayInfoEntry*>(sCreatureDisplayInfoStore.LookupEntry(17028)); // Kurken
-	displayEntry->scale = 2.5f;
+    // Correct Pet Size
+    CreatureDisplayInfoEntry* displayEntry = const_cast<CreatureDisplayInfoEntry*>(sCreatureDisplayInfoStore.LookupEntry(17028)); // Kurken
+    displayEntry->scale = 2.5f;
 
 
-	// Oracles and Frenzyheart faction
-	FactionEntry* factionEntry = const_cast<FactionEntry*>(sFactionStore.LookupEntry(1104));
-	factionEntry->ReputationFlags[0] = 0;
-	factionEntry = const_cast<FactionEntry*>(sFactionStore.LookupEntry(1105));
-	factionEntry->ReputationFlags[0] = 0;
+    // Oracles and Frenzyheart faction
+    FactionEntry* factionEntry = const_cast<FactionEntry*>(sFactionStore.LookupEntry(1104));
+    factionEntry->ReputationFlags[0] = 0;
+    factionEntry = const_cast<FactionEntry*>(sFactionStore.LookupEntry(1105));
+    factionEntry->ReputationFlags[0] = 0;
 
 
-	// Various factions, added 14, 16 to hostile mask
-	FactionTemplateEntry* factionTemplateEntry = const_cast<FactionTemplateEntry*>(sFactionTemplateStore.LookupEntry(1978)); // Warsong Offensive
-	factionTemplateEntry->hostileMask |= 8;
-	factionTemplateEntry = const_cast<FactionTemplateEntry*>(sFactionTemplateStore.LookupEntry(1921)); // The Taunka
-	factionTemplateEntry->hostileMask |= 8;
+    // Various factions, added 14, 16 to hostile mask
+    FactionTemplateEntry* factionTemplateEntry = const_cast<FactionTemplateEntry*>(sFactionTemplateStore.LookupEntry(1978)); // Warsong Offensive
+    factionTemplateEntry->hostileMask |= 8;
+    factionTemplateEntry = const_cast<FactionTemplateEntry*>(sFactionTemplateStore.LookupEntry(1921)); // The Taunka
+    factionTemplateEntry->hostileMask |= 8;
 
 
-	// Remove vehicles attr, making accessories selectable
-	VehicleSeatEntry* vse = const_cast<VehicleSeatEntry*>(sVehicleSeatStore.LookupEntry(4689)); // Siege Engine, Accessory
-	vse->m_flags &= ~VEHICLE_SEAT_FLAG_PASSENGER_NOT_SELECTABLE;
-	vse = const_cast<VehicleSeatEntry*>(sVehicleSeatStore.LookupEntry(4692)); // Siege Engine, Accessory
-	vse->m_flags &= ~VEHICLE_SEAT_FLAG_PASSENGER_NOT_SELECTABLE;
-	vse = const_cast<VehicleSeatEntry*>(sVehicleSeatStore.LookupEntry(4693)); // Siege Engine, Accessory
-	vse->m_flags &= ~VEHICLE_SEAT_FLAG_PASSENGER_NOT_SELECTABLE;
-	vse = const_cast<VehicleSeatEntry*>(sVehicleSeatStore.LookupEntry(3011)); // Salvaged Demolisher, Ulduar - not allow to change seats
-	vse->m_flags &= ~VEHICLE_SEAT_FLAG_CAN_SWITCH;
-	vse = const_cast<VehicleSeatEntry*>(sVehicleSeatStore.LookupEntry(3077)); // Salvaged Demolisher Seat, Ulduar - not allow to change seats
-	vse->m_flags &= ~VEHICLE_SEAT_FLAG_CAN_SWITCH;
+    // Remove vehicles attr, making accessories selectable
+    VehicleSeatEntry* vse = const_cast<VehicleSeatEntry*>(sVehicleSeatStore.LookupEntry(4689)); // Siege Engine, Accessory
+    vse->m_flags &= ~VEHICLE_SEAT_FLAG_PASSENGER_NOT_SELECTABLE;
+    vse = const_cast<VehicleSeatEntry*>(sVehicleSeatStore.LookupEntry(4692)); // Siege Engine, Accessory
+    vse->m_flags &= ~VEHICLE_SEAT_FLAG_PASSENGER_NOT_SELECTABLE;
+    vse = const_cast<VehicleSeatEntry*>(sVehicleSeatStore.LookupEntry(4693)); // Siege Engine, Accessory
+    vse->m_flags &= ~VEHICLE_SEAT_FLAG_PASSENGER_NOT_SELECTABLE;
+    vse = const_cast<VehicleSeatEntry*>(sVehicleSeatStore.LookupEntry(3011)); // Salvaged Demolisher, Ulduar - not allow to change seats
+    vse->m_flags &= ~VEHICLE_SEAT_FLAG_CAN_SWITCH;
+    vse = const_cast<VehicleSeatEntry*>(sVehicleSeatStore.LookupEntry(3077)); // Salvaged Demolisher Seat, Ulduar - not allow to change seats
+    vse->m_flags &= ~VEHICLE_SEAT_FLAG_CAN_SWITCH;
 
 
-	// pussywizard: fix z offset for some vehicles:
-	vse = const_cast<VehicleSeatEntry*>(sVehicleSeatStore.LookupEntry(6206)); // Marrowgar - Bone Spike
-	vse->m_attachmentOffsetZ = 4.0f;
-	vse = const_cast<VehicleSeatEntry*>(sVehicleSeatStore.LookupEntry(3806)); // Mimiron - seat on VX-001 for ACU during last phase
-	vse->m_attachmentOffsetZ = 15.0f;
-	vse = const_cast<VehicleSeatEntry*>(sVehicleSeatStore.LookupEntry(3566)); // Mimiron - Working seat
-	vse->m_attachmentOffsetX = -3.5f;
-	vse->m_attachmentOffsetY = 0.0f;
-	vse = const_cast<VehicleSeatEntry*>(sVehicleSeatStore.LookupEntry(3567)); // Mimiron - Working seat
-	vse->m_attachmentOffsetX = 2.3f;
-	vse->m_attachmentOffsetY = -2.3f;
+    // pussywizard: fix z offset for some vehicles:
+    vse = const_cast<VehicleSeatEntry*>(sVehicleSeatStore.LookupEntry(6206)); // Marrowgar - Bone Spike
+    vse->m_attachmentOffsetZ = 4.0f;
+    vse = const_cast<VehicleSeatEntry*>(sVehicleSeatStore.LookupEntry(3806)); // Mimiron - seat on VX-001 for ACU during last phase
+    vse->m_attachmentOffsetZ = 15.0f;
+    vse = const_cast<VehicleSeatEntry*>(sVehicleSeatStore.LookupEntry(3566)); // Mimiron - Working seat
+    vse->m_attachmentOffsetX = -3.5f;
+    vse->m_attachmentOffsetY = 0.0f;
+    vse = const_cast<VehicleSeatEntry*>(sVehicleSeatStore.LookupEntry(3567)); // Mimiron - Working seat
+    vse->m_attachmentOffsetX = 2.3f;
+    vse->m_attachmentOffsetY = -2.3f;
 
-	// Pilgrim's Bounty offsets
-	vse = const_cast<VehicleSeatEntry*>(sVehicleSeatStore.LookupEntry(2841));
-	vse->m_attachmentOffsetX += 1.65f;
-	vse->m_attachmentOffsetY += 0.75f;
-	vse = const_cast<VehicleSeatEntry*>(sVehicleSeatStore.LookupEntry(2842));
-	vse->m_attachmentOffsetX += 1.6f;
-	vse->m_attachmentOffsetY += -1.0f;
-	vse = const_cast<VehicleSeatEntry*>(sVehicleSeatStore.LookupEntry(2843));
-	vse->m_attachmentOffsetX += -1.2f;
-	vse->m_attachmentOffsetY += 0.2f;
-	vse = const_cast<VehicleSeatEntry*>(sVehicleSeatStore.LookupEntry(2844));
-	vse->m_attachmentOffsetX += -0.1f;
-	vse->m_attachmentOffsetY += -1.6f;
-	vse = const_cast<VehicleSeatEntry*>(sVehicleSeatStore.LookupEntry(2845));
-	vse->m_attachmentOffsetX += 0.0f;
-	vse->m_attachmentOffsetY += 1.6f;
+    // Pilgrim's Bounty offsets
+    vse = const_cast<VehicleSeatEntry*>(sVehicleSeatStore.LookupEntry(2841));
+    vse->m_attachmentOffsetX += 1.65f;
+    vse->m_attachmentOffsetY += 0.75f;
+    vse = const_cast<VehicleSeatEntry*>(sVehicleSeatStore.LookupEntry(2842));
+    vse->m_attachmentOffsetX += 1.6f;
+    vse->m_attachmentOffsetY += -1.0f;
+    vse = const_cast<VehicleSeatEntry*>(sVehicleSeatStore.LookupEntry(2843));
+    vse->m_attachmentOffsetX += -1.2f;
+    vse->m_attachmentOffsetY += 0.2f;
+    vse = const_cast<VehicleSeatEntry*>(sVehicleSeatStore.LookupEntry(2844));
+    vse->m_attachmentOffsetX += -0.1f;
+    vse->m_attachmentOffsetY += -1.6f;
+    vse = const_cast<VehicleSeatEntry*>(sVehicleSeatStore.LookupEntry(2845));
+    vse->m_attachmentOffsetX += 0.0f;
+    vse->m_attachmentOffsetY += 1.6f;
 
 
 
-	// Once Bitten, Twice Shy (10 player) - Icecrown Citadel
+    // Once Bitten, Twice Shy (10 player) - Icecrown Citadel
     AchievementEntry* achievement = const_cast<AchievementEntry*>(sAchievementStore.LookupEntry(4539));
     achievement->mapID = 631;    // Correct map requirement (currently has Ulduar)
 
 
-	// Ring of Valor starting Locations
-	WorldSafeLocsEntry const* entry = sWorldSafeLocsStore.LookupEntry(1364);
-	const_cast<WorldSafeLocsEntry*>(entry)->z += 6.0f;
-	entry = sWorldSafeLocsStore.LookupEntry(1365);
-	const_cast<WorldSafeLocsEntry*>(entry)->z += 6.0f;
+    // Ring of Valor starting Locations
+    WorldSafeLocsEntry const* entry = sWorldSafeLocsStore.LookupEntry(1364);
+    const_cast<WorldSafeLocsEntry*>(entry)->z += 6.0f;
+    entry = sWorldSafeLocsStore.LookupEntry(1365);
+    const_cast<WorldSafeLocsEntry*>(entry)->z += 6.0f;
 
     sLog->outString(">> Loading spell dbc data corrections  in %u ms", GetMSTimeDiffToNow(oldMSTime));
     sLog->outString();

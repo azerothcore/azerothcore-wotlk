@@ -117,20 +117,20 @@ public:
         uint32 updateTime = sWorld->GetUpdateTime();
         uint32 avgUpdateTime = avgDiffTracker.getAverage();
 
-		handler->PSendSysMessage("%s Realm, revision: %s.", realmName.c_str(), _REVISION);
-		handler->PSendSysMessage("This server runs on SunwellCore.");
-		if (!queuedSessionCount)
-			handler->PSendSysMessage("Connected players: %u. Characters in world: %u.", activeSessionCount, playerCount);
-		else
-			handler->PSendSysMessage("Connected players: %u. Characters in world: %u. Queue: %u.", activeSessionCount, playerCount, queuedSessionCount);
-		//handler->PSendSysMessage("Connection peak: %u.", connPeak);
+        handler->PSendSysMessage("%s Realm, revision: %s.", realmName.c_str(), _REVISION);
+        handler->PSendSysMessage("This server runs on SunwellCore.");
+        if (!queuedSessionCount)
+            handler->PSendSysMessage("Connected players: %u. Characters in world: %u.", activeSessionCount, playerCount);
+        else
+            handler->PSendSysMessage("Connected players: %u. Characters in world: %u. Queue: %u.", activeSessionCount, playerCount, queuedSessionCount);
+        //handler->PSendSysMessage("Connection peak: %u.", connPeak);
         handler->PSendSysMessage(LANG_UPTIME, uptime.c_str());
-	    handler->PSendSysMessage("Update time diff: %ums, average: %ums.", updateTime, avgUpdateTime);
+        handler->PSendSysMessage("Update time diff: %ums, average: %ums.", updateTime, avgUpdateTime);
 
-		if (handler->GetSession())
-			if (Player* p = handler->GetSession()->GetPlayer())
-				if (p->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_DEVELOPER))
-					handler->PSendSysMessage("DEV wavg: %ums, nsmax: %ums, nsavg: %ums. LFG avg: %ums, max: %ums.", avgDiffTracker.getTimeWeightedAverage(), devDiffTracker.getMax(), devDiffTracker.getAverage(), lfgDiffTracker.getAverage(), lfgDiffTracker.getMax());
+        if (handler->GetSession())
+            if (Player* p = handler->GetSession()->GetPlayer())
+                if (p->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_DEVELOPER))
+                    handler->PSendSysMessage("DEV wavg: %ums, nsmax: %ums, nsavg: %ums. LFG avg: %ums, max: %ums.", avgDiffTracker.getTimeWeightedAverage(), devDiffTracker.getMax(), devDiffTracker.getAverage(), lfgDiffTracker.getAverage(), lfgDiffTracker.getMax());
 
         //! Can't use sWorld->ShutdownMsg here in case of console command
         if (sWorld->IsShuttingDown())

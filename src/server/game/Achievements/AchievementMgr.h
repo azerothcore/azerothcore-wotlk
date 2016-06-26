@@ -279,7 +279,7 @@ class AchievementMgr
         void StartTimedAchievement(AchievementCriteriaTimedTypes type, uint32 entry, uint32 timeLost = 0);
         void RemoveTimedAchievement(AchievementCriteriaTimedTypes type, uint32 entry);   // used for quest and scripted timed achievements
 
-		void RemoveCriteriaProgress(AchievementCriteriaEntry const* entry);
+        void RemoveCriteriaProgress(AchievementCriteriaEntry const* entry);
     private:
         enum ProgressType { PROGRESS_SET, PROGRESS_ACCUMULATE, PROGRESS_HIGHEST, PROGRESS_RESET };
         void SendAchievementEarned(AchievementEntry const* achievement) const;
@@ -393,9 +393,9 @@ class AchievementGlobalMgr
         AchievementRewards m_achievementRewards;
         AchievementRewardLocales m_achievementRewardLocales;
 
-		// pussywizard:
-		std::map<uint32, AchievementCriteriaEntryList> m_SpecialList[ACHIEVEMENT_CRITERIA_TYPE_TOTAL];
-		std::map<uint32, AchievementCriteriaEntryList> m_AchievementCriteriasByCondition[ACHIEVEMENT_CRITERIA_CONDITION_TOTAL];
+        // pussywizard:
+        std::map<uint32, AchievementCriteriaEntryList> m_SpecialList[ACHIEVEMENT_CRITERIA_TYPE_TOTAL];
+        std::map<uint32, AchievementCriteriaEntryList> m_AchievementCriteriasByCondition[ACHIEVEMENT_CRITERIA_CONDITION_TOTAL];
 };
 
 #define sAchievementMgr ACE_Singleton<AchievementGlobalMgr, ACE_Null_Mutex>::instance()

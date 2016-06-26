@@ -31,15 +31,15 @@
 // Ours
 enum eyeOfAcherus
 {
-	EVENT_REMOVE_CONTROL            = 1,
-	EVENT_SPEAK_1                   = 2,
-	EVENT_LAUNCH                    = 3,
-	EVENT_REGAIN_CONTROL            = 4,
+    EVENT_REMOVE_CONTROL            = 1,
+    EVENT_SPEAK_1                   = 2,
+    EVENT_LAUNCH                    = 3,
+    EVENT_REGAIN_CONTROL            = 4,
 
-	EYE_TEXT_LAUNCH                 = 0,
-	EYE_TEXT_CONTROL                = 1,
+    EYE_TEXT_LAUNCH                 = 0,
+    EYE_TEXT_CONTROL                = 1,
 
-	SPELL_EYE_OF_ACHERUS_VISUAL     = 51892,
+    SPELL_EYE_OF_ACHERUS_VISUAL     = 51892,
 };
 
 class npc_eye_of_acherus : public CreatureScript
@@ -56,68 +56,68 @@ public:
     {
         npc_eye_of_acherusAI(Creature* creature) : NullCreatureAI(creature) { }
 
-		EventMap events;
+        EventMap events;
 
-		void InitializeAI()
-		{
-			events.Reset();
-			events.ScheduleEvent(EVENT_REMOVE_CONTROL, 500);
-			events.ScheduleEvent(EVENT_SPEAK_1, 4000);
-			events.ScheduleEvent(EVENT_LAUNCH, 7000);
+        void InitializeAI()
+        {
+            events.Reset();
+            events.ScheduleEvent(EVENT_REMOVE_CONTROL, 500);
+            events.ScheduleEvent(EVENT_SPEAK_1, 4000);
+            events.ScheduleEvent(EVENT_LAUNCH, 7000);
 
-			me->CastSpell(me, SPELL_EYE_OF_ACHERUS_VISUAL, true);
-		}
+            me->CastSpell(me, SPELL_EYE_OF_ACHERUS_VISUAL, true);
+        }
 
-		void MovementInform(uint32 type, uint32 point)
-		{
-			if (type == ESCORT_MOTION_TYPE && me->movespline->Finalized())
-				events.ScheduleEvent(EVENT_REGAIN_CONTROL, 1000);
-		}
+        void MovementInform(uint32 type, uint32 point)
+        {
+            if (type == ESCORT_MOTION_TYPE && me->movespline->Finalized())
+                events.ScheduleEvent(EVENT_REGAIN_CONTROL, 1000);
+        }
 
-		void SetControl(Player* player, bool on)
-		{
-			WorldPacket data(SMSG_CLIENT_CONTROL_UPDATE, me->GetPackGUID().size()+1);
-			data.append(me->GetPackGUID());
-			data << uint8(on ? 1 : 0);
-			player->GetSession()->SendPacket(&data);
-		}
+        void SetControl(Player* player, bool on)
+        {
+            WorldPacket data(SMSG_CLIENT_CONTROL_UPDATE, me->GetPackGUID().size()+1);
+            data.append(me->GetPackGUID());
+            data << uint8(on ? 1 : 0);
+            player->GetSession()->SendPacket(&data);
+        }
 
-		void JustSummoned(Creature* creature)
-		{
-			if (Unit* target = creature->SelectNearbyTarget())
-				creature->AI()->AttackStart(target);
-		}
+        void JustSummoned(Creature* creature)
+        {
+            if (Unit* target = creature->SelectNearbyTarget())
+                creature->AI()->AttackStart(target);
+        }
 
-		void UpdateAI(uint32 diff)
-		{
-			events.Update(diff);
-			switch (events.ExecuteEvent())
-			{
-				case EVENT_REMOVE_CONTROL:
-					if (Player* player = me->GetCharmerOrOwnerPlayerOrPlayerItself())
-						SetControl(player, false);
-					break;
-				case EVENT_SPEAK_1:
-					Talk(EYE_TEXT_LAUNCH, me->GetCharmerOrOwnerPlayerOrPlayerItself());
-					break;
-				case EVENT_LAUNCH:
-				{
-					Movement::PointsArray path;
-					path.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
-					path.push_back(G3D::Vector3(me->GetPositionX()-40.0f, me->GetPositionY(), me->GetPositionZ()+10.0f));
-					path.push_back(G3D::Vector3(1768.0f, -5876.0f, 153.0f));
-					me->GetMotionMaster()->MoveSplinePath(&path);
-					break;
-				}
-				case EVENT_REGAIN_CONTROL:
-					if (Player* player = me->GetCharmerOrOwnerPlayerOrPlayerItself())
-					{
-						SetControl(player, true);
-						Talk(EYE_TEXT_CONTROL, player);
-					}
-					break;
-			}
-		}
+        void UpdateAI(uint32 diff)
+        {
+            events.Update(diff);
+            switch (events.ExecuteEvent())
+            {
+                case EVENT_REMOVE_CONTROL:
+                    if (Player* player = me->GetCharmerOrOwnerPlayerOrPlayerItself())
+                        SetControl(player, false);
+                    break;
+                case EVENT_SPEAK_1:
+                    Talk(EYE_TEXT_LAUNCH, me->GetCharmerOrOwnerPlayerOrPlayerItself());
+                    break;
+                case EVENT_LAUNCH:
+                {
+                    Movement::PointsArray path;
+                    path.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
+                    path.push_back(G3D::Vector3(me->GetPositionX()-40.0f, me->GetPositionY(), me->GetPositionZ()+10.0f));
+                    path.push_back(G3D::Vector3(1768.0f, -5876.0f, 153.0f));
+                    me->GetMotionMaster()->MoveSplinePath(&path);
+                    break;
+                }
+                case EVENT_REGAIN_CONTROL:
+                    if (Player* player = me->GetCharmerOrOwnerPlayerOrPlayerItself())
+                    {
+                        SetControl(player, true);
+                        Talk(EYE_TEXT_CONTROL, player);
+                    }
+                    break;
+            }
+        }
     };
 };
 
@@ -132,9 +132,9 @@ class spell_q12641_death_comes_from_on_high_summon_ghouls : public SpellScriptLo
 
             void HandleScriptEffect(SpellEffIndex effIndex)
             {
-				PreventHitEffect(effIndex);
-				if (Unit* target = GetHitUnit())
-					GetCaster()->CastSpell(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 54522, true);
+                PreventHitEffect(effIndex);
+                if (Unit* target = GetHitUnit())
+                    GetCaster()->CastSpell(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 54522, true);
             }
 
             void Register()
@@ -163,10 +163,10 @@ enum deathsChallenge
     QUEST_DEATH_CHALLENGE       = 12733,
     FACTION_HOSTILE             = 2068,
 
-	DATA_IN_PROGRESS			= 0,
+    DATA_IN_PROGRESS            = 0,
 
-	EVENT_SPEAK					= 1, // 1 - 6
-	EVENT_DUEL_LOST             = 7, // 7 - 8
+    EVENT_SPEAK                 = 1, // 1 - 6
+    EVENT_DUEL_LOST             = 7, // 7 - 8
 };
 
 class npc_death_knight_initiate : public CreatureScript
@@ -184,8 +184,8 @@ public:
             if (player->IsInCombat() || creature->IsInCombat())
                 return true;
 
-			if (creature->AI()->GetData(DATA_IN_PROGRESS))
-				return true;
+            if (creature->AI()->GetData(DATA_IN_PROGRESS))
+                return true;
 
             creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
             creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNK_15);
@@ -206,8 +206,8 @@ public:
             if (player->IsInCombat() || creature->IsInCombat())
                 return true;
 
-			if (!creature->AI()->GetData(player->GetGUIDLow()))
-				player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ACCEPT_DUEL, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
+            if (!creature->AI()->GetData(player->GetGUIDLow()))
+                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ACCEPT_DUEL, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
 
             player->SEND_GOSSIP_MENU(player->GetGossipTextId(creature), creature->GetGUID());
         }
@@ -223,23 +223,23 @@ public:
     {
         npc_death_knight_initiateAI(Creature* creature) : CombatAI(creature) { }
 
-		bool _duelInProgress;
-		uint64 _duelGUID;
-		EventMap events;
-		std::set<uint32> playerGUIDs;
+        bool _duelInProgress;
+        uint64 _duelGUID;
+        EventMap events;
+        std::set<uint32> playerGUIDs;
 
-		uint32 GetData(uint32 data) const
-		{
-			if (data == DATA_IN_PROGRESS)
-				return _duelInProgress;
+        uint32 GetData(uint32 data) const
+        {
+            if (data == DATA_IN_PROGRESS)
+                return _duelInProgress;
 
-			return playerGUIDs.find(data) != playerGUIDs.end();
-		}
+            return playerGUIDs.find(data) != playerGUIDs.end();
+        }
 
         void Reset()
         {
-			_duelInProgress = false;
-			_duelGUID = 0;
+            _duelInProgress = false;
+            _duelGUID = 0;
             me->RestoreFaction();
             CombatAI::Reset();
 
@@ -250,37 +250,37 @@ public:
         {
             if (!_duelInProgress && pSpell->Id == SPELL_DUEL)
             {
-				playerGUIDs.insert(caster->GetGUIDLow());
+                playerGUIDs.insert(caster->GetGUIDLow());
                 _duelGUID = caster->GetGUID();
                 _duelInProgress = true;
 
-				events.ScheduleEvent(EVENT_SPEAK, 3000);
-				events.ScheduleEvent(EVENT_SPEAK+1, 7000);
-				events.ScheduleEvent(EVENT_SPEAK+2, 8000);
-				events.ScheduleEvent(EVENT_SPEAK+3, 9000);
-				events.ScheduleEvent(EVENT_SPEAK+4, 10000);
-				events.ScheduleEvent(EVENT_SPEAK+5, 11000);
+                events.ScheduleEvent(EVENT_SPEAK, 3000);
+                events.ScheduleEvent(EVENT_SPEAK+1, 7000);
+                events.ScheduleEvent(EVENT_SPEAK+2, 8000);
+                events.ScheduleEvent(EVENT_SPEAK+3, 9000);
+                events.ScheduleEvent(EVENT_SPEAK+4, 10000);
+                events.ScheduleEvent(EVENT_SPEAK+5, 11000);
             }
         }
 
        void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType, SpellSchoolMask)
         {
-			if (attacker && _duelInProgress && attacker->IsControlledByPlayer())
+            if (attacker && _duelInProgress && attacker->IsControlledByPlayer())
             {
-				if (attacker->GetCharmerOrOwnerOrOwnGUID() != _duelGUID)
-					damage = 0;
-				else if (damage >= me->GetHealth())
-				{
-					damage = 0;
-					events.ScheduleEvent(EVENT_DUEL_LOST, 2000);
-					events.ScheduleEvent(EVENT_DUEL_LOST+1, 6000);
-					_duelGUID = 0;
-					_duelInProgress = 0;
+                if (attacker->GetCharmerOrOwnerOrOwnGUID() != _duelGUID)
+                    damage = 0;
+                else if (damage >= me->GetHealth())
+                {
+                    damage = 0;
+                    events.ScheduleEvent(EVENT_DUEL_LOST, 2000);
+                    events.ScheduleEvent(EVENT_DUEL_LOST+1, 6000);
+                    _duelGUID = 0;
+                    _duelInProgress = 0;
 
                     attacker->RemoveGameObject(SPELL_DUEL_FLAG, true);
                     attacker->AttackStop();
-					me->CombatStop(false);
-					me->RemoveAllAuras();
+                    me->CombatStop(false);
+                    me->RemoveAllAuras();
                     me->CastSpell(attacker, SPELL_DUEL_VICTORY, true);
                     me->RestoreFaction();
                 }
@@ -289,43 +289,43 @@ public:
 
         void UpdateAI(uint32 diff)
         {
-			events.Update(diff);
-			switch (events.ExecuteEvent())
-			{
-				case EVENT_SPEAK:
-					Talk(SAY_DUEL, ObjectAccessor::GetPlayer(*me, _duelGUID));
-					break;
-				case EVENT_SPEAK+1:
-					Talk(SAY_DUEL+1, ObjectAccessor::GetPlayer(*me, _duelGUID));
-					break;
-				case EVENT_SPEAK+2:
-					Talk(SAY_DUEL+2, ObjectAccessor::GetPlayer(*me, _duelGUID));
-					break;
-				case EVENT_SPEAK+3:
-					Talk(SAY_DUEL+3, ObjectAccessor::GetPlayer(*me, _duelGUID));
-					break;
-				case EVENT_SPEAK+4:
-					Talk(SAY_DUEL+4, ObjectAccessor::GetPlayer(*me, _duelGUID));
-					break;
-				case EVENT_SPEAK+5:
-					me->setFaction(FACTION_HOSTILE);
+            events.Update(diff);
+            switch (events.ExecuteEvent())
+            {
+                case EVENT_SPEAK:
+                    Talk(SAY_DUEL, ObjectAccessor::GetPlayer(*me, _duelGUID));
+                    break;
+                case EVENT_SPEAK+1:
+                    Talk(SAY_DUEL+1, ObjectAccessor::GetPlayer(*me, _duelGUID));
+                    break;
+                case EVENT_SPEAK+2:
+                    Talk(SAY_DUEL+2, ObjectAccessor::GetPlayer(*me, _duelGUID));
+                    break;
+                case EVENT_SPEAK+3:
+                    Talk(SAY_DUEL+3, ObjectAccessor::GetPlayer(*me, _duelGUID));
+                    break;
+                case EVENT_SPEAK+4:
+                    Talk(SAY_DUEL+4, ObjectAccessor::GetPlayer(*me, _duelGUID));
+                    break;
+                case EVENT_SPEAK+5:
+                    me->setFaction(FACTION_HOSTILE);
                     if (Player* player = ObjectAccessor::GetPlayer(*me, _duelGUID))
                         AttackStart(player);
-					return;
-				case EVENT_DUEL_LOST:
-					me->CastSpell(me, 7267, true);
-					break;
-				case EVENT_DUEL_LOST+1:
-					EnterEvadeMode();
-					return;
-			}
+                    return;
+                case EVENT_DUEL_LOST:
+                    me->CastSpell(me, 7267, true);
+                    break;
+                case EVENT_DUEL_LOST+1:
+                    EnterEvadeMode();
+                    return;
+            }
 
-			if (!events.Empty() || !UpdateVictim())
-				return;
+            if (!events.Empty() || !UpdateVictim())
+                return;
 
             if (_duelInProgress)
             {
-				if (me->GetVictim()->GetGUID() == _duelGUID && me->GetVictim()->HealthBelowPct(10))
+                if (me->GetVictim()->GetGUID() == _duelGUID && me->GetVictim()->HealthBelowPct(10))
                 {
                     me->GetVictim()->CastSpell(me->GetVictim(), 7267, true); // beg
                     me->GetVictim()->RemoveGameObject(SPELL_DUEL_FLAG, true);
@@ -341,19 +341,19 @@ public:
 
 enum GiftOfTheHarvester
 {
-    NPC_GHOUL					= 28845,
-    MAX_GHOULS					= 5,
+    NPC_GHOUL                   = 28845,
+    MAX_GHOULS                  = 5,
 
-	SPELL_GHOUL_EMERGE			= 50142,
-	SPELL_SUMMON_SCARLET_GHOST	= 52505,
-	SPELL_GHOUL_SUBMERGE        = 26234,
+    SPELL_GHOUL_EMERGE          = 50142,
+    SPELL_SUMMON_SCARLET_GHOST  = 52505,
+    SPELL_GHOUL_SUBMERGE        = 26234,
 
-	EVENT_GHOUL_RESTORE_STATE	= 1,
-	EVENT_GHOUL_CHECK_COMBAT	= 2,
-	EVENT_GHOUL_EMOTE			= 3,
-	EVENT_GHOUL_MOVE_TO_PIT     = 4,
+    EVENT_GHOUL_RESTORE_STATE   = 1,
+    EVENT_GHOUL_CHECK_COMBAT    = 2,
+    EVENT_GHOUL_EMOTE           = 3,
+    EVENT_GHOUL_MOVE_TO_PIT     = 4,
 
-	SAY_GOTHIK_PIT              = 0
+    SAY_GOTHIK_PIT              = 0
 };
 
 class spell_item_gift_of_the_harvester : public SpellScriptLoader
@@ -399,15 +399,15 @@ class spell_q12698_the_gift_that_keeps_on_giving : public SpellScriptLoader
         {
             PrepareSpellScript(spell_q12698_the_gift_that_keeps_on_giving_SpellScript);
 
-			void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+            void HandleScriptEffect(SpellEffIndex /*effIndex*/)
             {
-				if (GetOriginalCaster() && GetHitUnit())
+                if (GetOriginalCaster() && GetHitUnit())
                     GetOriginalCaster()->CastSpell(GetHitUnit(), urand(0, 1) ? GetEffectValue() : SPELL_SUMMON_SCARLET_GHOST, true);
-			}
+            }
 
             void Register()
             {
-				OnEffectHitTarget += SpellEffectFn(spell_q12698_the_gift_that_keeps_on_giving_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+                OnEffectHitTarget += SpellEffectFn(spell_q12698_the_gift_that_keeps_on_giving_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
             }
         };
 
@@ -433,79 +433,79 @@ public:
         {
         }
 
-		EventMap events;
-		uint64 gothikGUID;
+        EventMap events;
+        uint64 gothikGUID;
 
-		void InitializeAI()
-		{
-			gothikGUID = 0;
-			me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
-			ScriptedAI::InitializeAI();
-			me->SetReactState(REACT_PASSIVE);
+        void InitializeAI()
+        {
+            gothikGUID = 0;
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+            ScriptedAI::InitializeAI();
+            me->SetReactState(REACT_PASSIVE);
 
-			events.ScheduleEvent(EVENT_GHOUL_EMOTE, 1);
-			events.ScheduleEvent(EVENT_GHOUL_RESTORE_STATE, 3500);
-		}
+            events.ScheduleEvent(EVENT_GHOUL_EMOTE, 1);
+            events.ScheduleEvent(EVENT_GHOUL_RESTORE_STATE, 3500);
+        }
 
-		void OwnerAttackedBy(Unit* attacker)
-		{
-			if (!me->IsInCombat() && me->GetReactState() == REACT_DEFENSIVE)
-				AttackStart(attacker);
-		}
+        void OwnerAttackedBy(Unit* attacker)
+        {
+            if (!me->IsInCombat() && me->GetReactState() == REACT_DEFENSIVE)
+                AttackStart(attacker);
+        }
 
-		void SetGUID(uint64 guid, int32)
-		{
-			gothikGUID = guid;
-			events.ScheduleEvent(EVENT_GHOUL_MOVE_TO_PIT, 3000);
-			me->GetMotionMaster()->Clear(false);
-		}
+        void SetGUID(uint64 guid, int32)
+        {
+            gothikGUID = guid;
+            events.ScheduleEvent(EVENT_GHOUL_MOVE_TO_PIT, 3000);
+            me->GetMotionMaster()->Clear(false);
+        }
 
-		void MovementInform(uint32 type, uint32 point)
-		{
-			if (type == POINT_MOTION_TYPE && point == 1)
-			{
-				me->DespawnOrUnsummon(1500);
-				me->CastSpell(me, SPELL_GHOUL_SUBMERGE, true);
-			}
-		}
+        void MovementInform(uint32 type, uint32 point)
+        {
+            if (type == POINT_MOTION_TYPE && point == 1)
+            {
+                me->DespawnOrUnsummon(1500);
+                me->CastSpell(me, SPELL_GHOUL_SUBMERGE, true);
+            }
+        }
 
         void UpdateAI(uint32 diff)
         {
-			events.Update(diff);
-			switch (events.GetEvent())
-			{
-				case EVENT_GHOUL_MOVE_TO_PIT:
-					me->GetMotionMaster()->MovePoint(1, 2364.77f, -5776.14f, 151.36f);
-					if (Creature* gothik = ObjectAccessor::GetCreature(*me, gothikGUID))
-						gothik->AI()->DoAction(SAY_GOTHIK_PIT);
-					events.PopEvent();
-					break;
-				case EVENT_GHOUL_EMOTE:
-					me->CastSpell(me, SPELL_GHOUL_EMERGE, true);
-					events.PopEvent();
-					break;
-				case EVENT_GHOUL_RESTORE_STATE:
-					me->SetReactState(REACT_DEFENSIVE);
-					me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
-					if (Player* owner = me->GetCharmerOrOwnerPlayerOrPlayerItself())
-						me->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST, frand(0.0f, 2*M_PI));
-					events.PopEvent();
-					events.ScheduleEvent(EVENT_GHOUL_CHECK_COMBAT, 1000);
-					return;
-				case EVENT_GHOUL_CHECK_COMBAT:
-					if (!me->IsInCombat())
-						if (Player* owner = me->GetCharmerOrOwnerPlayerOrPlayerItself())
-							if (owner->GetVictim())
-								AttackStart(owner->GetVictim());
+            events.Update(diff);
+            switch (events.GetEvent())
+            {
+                case EVENT_GHOUL_MOVE_TO_PIT:
+                    me->GetMotionMaster()->MovePoint(1, 2364.77f, -5776.14f, 151.36f);
+                    if (Creature* gothik = ObjectAccessor::GetCreature(*me, gothikGUID))
+                        gothik->AI()->DoAction(SAY_GOTHIK_PIT);
+                    events.PopEvent();
+                    break;
+                case EVENT_GHOUL_EMOTE:
+                    me->CastSpell(me, SPELL_GHOUL_EMERGE, true);
+                    events.PopEvent();
+                    break;
+                case EVENT_GHOUL_RESTORE_STATE:
+                    me->SetReactState(REACT_DEFENSIVE);
+                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+                    if (Player* owner = me->GetCharmerOrOwnerPlayerOrPlayerItself())
+                        me->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST, frand(0.0f, 2*M_PI));
+                    events.PopEvent();
+                    events.ScheduleEvent(EVENT_GHOUL_CHECK_COMBAT, 1000);
+                    return;
+                case EVENT_GHOUL_CHECK_COMBAT:
+                    if (!me->IsInCombat())
+                        if (Player* owner = me->GetCharmerOrOwnerPlayerOrPlayerItself())
+                            if (owner->GetVictim())
+                                AttackStart(owner->GetVictim());
 
-					events.RepeatEvent(1000);
-					return;
-			}
-			
-			if (!UpdateVictim())
-				return;
+                    events.RepeatEvent(1000);
+                    return;
+            }
+            
+            if (!UpdateVictim())
+                return;
 
-			DoMeleeAttackIfReady();
+            DoMeleeAttackIfReady();
         }
     };
 };
@@ -524,22 +524,22 @@ public:
     {
         npc_dkc1_gothikAI(Creature* creature) : ScriptedAI(creature) { spoken = 0; }
 
-		int32 spoken;
+        int32 spoken;
 
-		void DoAction(int32 action)
-		{
-			if (action == SAY_GOTHIK_PIT && spoken <= 0)
-			{
-				spoken = 5000;
-				Talk(SAY_GOTHIK_PIT);
-			}
-		}
+        void DoAction(int32 action)
+        {
+            if (action == SAY_GOTHIK_PIT && spoken <= 0)
+            {
+                spoken = 5000;
+                Talk(SAY_GOTHIK_PIT);
+            }
+        }
 
         void MoveInLineOfSight(Unit* who)
         {
             ScriptedAI::MoveInLineOfSight(who);
 
-			if (!who->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC) && who->GetEntry() == NPC_GHOUL && me->IsWithinDistInMap(who, 10.0f))
+            if (!who->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC) && who->GetEntry() == NPC_GHOUL && me->IsWithinDistInMap(who, 10.0f))
                 if (Unit* owner = who->GetOwner())
                     if (Player* player = owner->ToPlayer())
                     {
@@ -547,18 +547,18 @@ public:
                         if (player->GetQuestStatus(12698) == QUEST_STATUS_INCOMPLETE)
                             creature->CastSpell(owner, 52517, true);
 
-						creature->AI()->SetGUID(me->GetGUID());
-						creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
+                        creature->AI()->SetGUID(me->GetGUID());
+                        creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
                     }
         }
 
-		void UpdateAI(uint32 diff)
-		{
-			if (spoken > 0)
-				spoken -= diff;
+        void UpdateAI(uint32 diff)
+        {
+            if (spoken > 0)
+                spoken -= diff;
 
-			ScriptedAI::UpdateAI(diff);
-		}
+            ScriptedAI::UpdateAI(diff);
+        }
     };
 };
 
@@ -574,34 +574,34 @@ public:
 
     struct npc_scarlet_cannonAI : public VehicleAI
     {
-		npc_scarlet_cannonAI(Creature* creature) : VehicleAI(creature) { summonAttackers = 0; }
+        npc_scarlet_cannonAI(Creature* creature) : VehicleAI(creature) { summonAttackers = 0; }
 
-		uint32 summonAttackers;
-		void PassengerBoarded(Unit* /*passenger*/, int8 /*seatId*/, bool apply)
-		{
-			summonAttackers = apply ? 8000 : 0;
-		}
+        uint32 summonAttackers;
+        void PassengerBoarded(Unit* /*passenger*/, int8 /*seatId*/, bool apply)
+        {
+            summonAttackers = apply ? 8000 : 0;
+        }
 
-		void UpdateAI(uint32 diff)
-		{
-			VehicleAI::UpdateAI(diff);
+        void UpdateAI(uint32 diff)
+        {
+            VehicleAI::UpdateAI(diff);
 
-			if (summonAttackers)
-			{
-				summonAttackers += diff;
-				if (summonAttackers >= 15000)
-				{
-					for (uint8 i = 0; i < 15; ++i)
-						if (Creature* summon = me->SummonCreature(28834 /*NPC_SCARLET_FLEET_DEFENDER*/, 2192.56f+irand(-10, 10), -6147.90f+irand(-10, 10), 5.2f, 4.7f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 45000))
-						{
-							summon->SetHomePosition(me->GetHomePosition());
-							summon->AI()->AttackStart(me);
-						}
+            if (summonAttackers)
+            {
+                summonAttackers += diff;
+                if (summonAttackers >= 15000)
+                {
+                    for (uint8 i = 0; i < 15; ++i)
+                        if (Creature* summon = me->SummonCreature(28834 /*NPC_SCARLET_FLEET_DEFENDER*/, 2192.56f+irand(-10, 10), -6147.90f+irand(-10, 10), 5.2f, 4.7f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 45000))
+                        {
+                            summon->SetHomePosition(me->GetHomePosition());
+                            summon->AI()->AttackStart(me);
+                        }
 
-					summonAttackers = 1;
-				}
-			}
-		}
+                    summonAttackers = 1;
+                }
+            }
+        }
     };
 };
 
@@ -924,7 +924,7 @@ public:
         npc_scarlet_miner_cartAI(Creature* creature) : PassiveAI(creature), minerGUID(0)
         {
             me->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
-			me->setFaction(35);
+            me->setFaction(35);
             me->SetDisplayId(me->GetCreatureTemplate()->Modelid1); // Modelid2 is a horse.
         }
 
@@ -946,14 +946,14 @@ public:
                 me->SetSpeed(MOVE_RUN, 1.25f);
 
                 me->GetMotionMaster()->MoveFollow(miner, 1.0f, 0);
-				me->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
+                me->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
                 me->setFaction(35);
             }
         }
 
         void PassengerBoarded(Unit* who, int8 /*seatId*/, bool apply)
         {
-			who->SetVisible(!apply);
+            who->SetVisible(!apply);
             if (!apply)
                 if (Creature* miner = ObjectAccessor::GetCreature(*me, minerGUID))
                     miner->DisappearAndDie();
@@ -1129,8 +1129,8 @@ public:
                         car->AI()->SetGUID(miner->GetGUID());
                         CAST_AI(npc_scarlet_miner::npc_scarlet_minerAI, miner->AI())->InitCartQuest(player);
                     }
-				}
-			}
+                }
+            }
         }
         return true;
     }
@@ -1139,17 +1139,17 @@ public:
 
 void AddSC_the_scarlet_enclave_c1()
 {
-	// Ours
-	new npc_eye_of_acherus();
-	new spell_q12641_death_comes_from_on_high_summon_ghouls();
-	new npc_death_knight_initiate();
+    // Ours
+    new npc_eye_of_acherus();
+    new spell_q12641_death_comes_from_on_high_summon_ghouls();
+    new npc_death_knight_initiate();
     new spell_item_gift_of_the_harvester();
-	new spell_q12698_the_gift_that_keeps_on_giving();
+    new spell_q12698_the_gift_that_keeps_on_giving();
     new npc_scarlet_ghoul();
-	new npc_dkc1_gothik();
-	new npc_scarlet_cannon();
+    new npc_dkc1_gothik();
+    new npc_scarlet_cannon();
 
-	// Theirs
+    // Theirs
     new npc_unworthy_initiate();
     new npc_unworthy_initiate_anchor();
     new go_acherus_soul_prison();

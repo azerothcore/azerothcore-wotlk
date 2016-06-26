@@ -39,13 +39,13 @@ void WorldSession::HandleDismissControlledVehicle(WorldPacket &recvData)
 
     recvData.readPackGUID(guid);
 
-	// pussywizard: typical check for incomming movement packets
-	if (!_player->m_mover || !_player->m_mover->IsInWorld() || _player->m_mover->IsDuringRemoveFromWorld() || guid != _player->m_mover->GetGUID())
-	{
-		recvData.rfinish(); // prevent warnings spam
-		_player->ExitVehicle();
-		return;
-	}
+    // pussywizard: typical check for incomming movement packets
+    if (!_player->m_mover || !_player->m_mover->IsInWorld() || _player->m_mover->IsDuringRemoveFromWorld() || guid != _player->m_mover->GetGUID())
+    {
+        recvData.rfinish(); // prevent warnings spam
+        _player->ExitVehicle();
+        return;
+    }
 
     MovementInfo mi;
     mi.guid = guid;
@@ -89,12 +89,12 @@ void WorldSession::HandleChangeSeatsOnControlledVehicle(WorldPacket &recvData)
             uint64 guid;        // current vehicle guid
             recvData.readPackGUID(guid);
 
-			// pussywizard:
-			if (vehicle_base->GetGUID() != guid)
-			{
-				recvData.rfinish(); // prevent warnings spam
-				return;
-			}
+            // pussywizard:
+            if (vehicle_base->GetGUID() != guid)
+            {
+                recvData.rfinish(); // prevent warnings spam
+                return;
+            }
 
             MovementInfo movementInfo;
             movementInfo.guid = guid;
@@ -152,9 +152,9 @@ void WorldSession::HandleEnterPlayerVehicle(WorldPacket &data)
             return;
         if (!player->IsWithinDistInMap(_player, INTERACTION_DISTANCE))
             return;
-		// Xinef:
-		if (!_player->FindMap() || _player->FindMap()->IsBattleArena())
-			return;
+        // Xinef:
+        if (!_player->FindMap() || _player->FindMap()->IsBattleArena())
+            return;
 
         _player->EnterVehicle(player);
     }

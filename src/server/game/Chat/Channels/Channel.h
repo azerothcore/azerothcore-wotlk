@@ -30,7 +30,7 @@
 
 class Player;
 
-#define CHANNEL_BAN_DURATION			DAY*60
+#define CHANNEL_BAN_DURATION            DAY*60
 
 enum ChatNotify
 {
@@ -123,26 +123,26 @@ enum ChannelMemberFlags
 class ChannelRights
 {
 public:
-	ChannelRights() : flags(0), speakDelay(0) {}
-	ChannelRights(const uint32& f, const uint32& d, const std::string& jm, const std::string& sm, const std::set<uint32>& ml) : flags(f), speakDelay(d), joinMessage(jm), speakMessage(sm), moderators(ml) {}
-	uint32 flags;
-	uint32 speakDelay;
-	std::string joinMessage;
-	std::string speakMessage;
-	std::set<uint32> moderators;
+    ChannelRights() : flags(0), speakDelay(0) {}
+    ChannelRights(const uint32& f, const uint32& d, const std::string& jm, const std::string& sm, const std::set<uint32>& ml) : flags(f), speakDelay(d), joinMessage(jm), speakMessage(sm), moderators(ml) {}
+    uint32 flags;
+    uint32 speakDelay;
+    std::string joinMessage;
+    std::string speakMessage;
+    std::set<uint32> moderators;
 };
 
 enum eChannelRights
 {
-	CHANNEL_RIGHT_FORCE_NO_ANNOUNCEMENTS	= 0x001,
-	CHANNEL_RIGHT_FORCE_ANNOUNCEMENTS		= 0x002,
-	CHANNEL_RIGHT_NO_OWNERSHIP				= 0x004,
-	CHANNEL_RIGHT_CANT_SPEAK				= 0x008,
-	CHANNEL_RIGHT_CANT_BAN					= 0x010,
-	CHANNEL_RIGHT_CANT_KICK					= 0x020,
-	CHANNEL_RIGHT_CANT_MUTE					= 0x040,
-	CHANNEL_RIGHT_CANT_CHANGE_PASSWORD		= 0x080,
-	CHANNEL_RIGHT_DONT_PRESERVE				= 0x100,
+    CHANNEL_RIGHT_FORCE_NO_ANNOUNCEMENTS    = 0x001,
+    CHANNEL_RIGHT_FORCE_ANNOUNCEMENTS       = 0x002,
+    CHANNEL_RIGHT_NO_OWNERSHIP              = 0x004,
+    CHANNEL_RIGHT_CANT_SPEAK                = 0x008,
+    CHANNEL_RIGHT_CANT_BAN                  = 0x010,
+    CHANNEL_RIGHT_CANT_KICK                 = 0x020,
+    CHANNEL_RIGHT_CANT_MUTE                 = 0x040,
+    CHANNEL_RIGHT_CANT_CHANGE_PASSWORD      = 0x080,
+    CHANNEL_RIGHT_DONT_PRESERVE             = 0x100,
 };
 
 class Channel
@@ -204,7 +204,7 @@ class Channel
         void KickOrBan(Player const* player, std::string const& badname, bool ban);
         void Kick(Player const* player, std::string const& badname) { KickOrBan(player, badname, false); }
         void Ban(Player const* player, std::string const& badname) { KickOrBan(player, badname, true); }
-		void AddBan(uint32 guid, uint32 time) { bannedStore[guid] = time; }
+        void AddBan(uint32 guid, uint32 time) { bannedStore[guid] = time; }
         void UnBan(Player const* player, std::string const& badname);
         void UnBan(uint64 guid);
         void Password(Player const* player, std::string const& pass);
@@ -219,7 +219,7 @@ class Channel
         void List(Player const* player);
         void Announce(Player const* player);
         void Say(uint64 guid, std::string const& what, uint32 lang);
-		void EveryoneSayToSelf(const char *what);
+        void EveryoneSayToSelf(const char *what);
         void Invite(Player const* player, std::string const& newp);
         void Voice(uint64 guid1, uint64 guid2);
         void DeVoice(uint64 guid1, uint64 guid2);
@@ -228,9 +228,9 @@ class Channel
         void FlagsNotify(Player* p);
         static void CleanOldChannelsInDB();
 
-		// pussywizard:
-		void AddWatching(Player* p);
-		void RemoveWatching(Player* p);
+        // pussywizard:
+        void AddWatching(Player* p);
+        void RemoveWatching(Player* p);
 
     private:
         // initial packet data (notify type and channel name)
@@ -281,8 +281,8 @@ class Channel
 
         void UpdateChannelInDB() const;
         void UpdateChannelUseageInDB() const;
-		void AddChannelBanToDB(uint32 guid, uint32 time) const;
-		void RemoveChannelBanFromDB(uint32 guid) const;
+        void AddChannelBanToDB(uint32 guid, uint32 time) const;
+        void RemoveChannelBanFromDB(uint32 guid) const;
 
         uint8 GetPlayerFlags(uint64 guid) const
         {
@@ -329,7 +329,7 @@ class Channel
         bool _IsSaved;
         uint8 _flags;
         uint32 _channelId;
-		uint32 _channelDBId;
+        uint32 _channelDBId;
         TeamId _teamId;
         uint64 _ownerGUID;
         std::string _name;

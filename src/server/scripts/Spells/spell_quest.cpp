@@ -33,8 +33,8 @@
 // Ours
 class spell_q11065_wrangle_some_aether_rays : public SpellScriptLoader
 {
-	public:
-		spell_q11065_wrangle_some_aether_rays() : SpellScriptLoader("spell_q11065_wrangle_some_aether_rays") { }
+    public:
+        spell_q11065_wrangle_some_aether_rays() : SpellScriptLoader("spell_q11065_wrangle_some_aether_rays") { }
 
         class spell_q11065_wrangle_some_aether_rays_SpellScript : public SpellScript
         {
@@ -42,10 +42,10 @@ class spell_q11065_wrangle_some_aether_rays : public SpellScriptLoader
 
             SpellCastResult CheckCast()
             {
-				// if thane is present and not in combat - allow cast
-				if (Unit* target = GetExplTargetUnit())
-					if (target->GetHealthPct() < 40.0f)
-						return SPELL_CAST_OK;
+                // if thane is present and not in combat - allow cast
+                if (Unit* target = GetExplTargetUnit())
+                    if (target->GetHealthPct() < 40.0f)
+                        return SPELL_CAST_OK;
 
                 return SPELL_FAILED_CASTER_AURASTATE;
             }
@@ -61,212 +61,212 @@ class spell_q11065_wrangle_some_aether_rays : public SpellScriptLoader
             return new spell_q11065_wrangle_some_aether_rays_SpellScript();
         }
 
-		class spell_q11065_wrangle_some_aether_rays_AuraScript : public AuraScript
-		{
-			PrepareAuraScript(spell_q11065_wrangle_some_aether_rays_AuraScript)
-			void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-			{
-				Unit* ar = GetTarget();
-				if (ar && ar->ToCreature())
-				{
-					if (GetCaster() && GetCaster()->ToPlayer())
-					{
-						Player* player = GetCaster()->ToPlayer();
+        class spell_q11065_wrangle_some_aether_rays_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_q11065_wrangle_some_aether_rays_AuraScript)
+            void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+            {
+                Unit* ar = GetTarget();
+                if (ar && ar->ToCreature())
+                {
+                    if (GetCaster() && GetCaster()->ToPlayer())
+                    {
+                        Player* player = GetCaster()->ToPlayer();
 
-						player->KilledMonsterCredit(23343, 0);
-						if (Creature *cr = GetCaster()->SummonCreature(23343, ar->GetPositionX(), ar->GetPositionY(), ar->GetPositionZ(), ar->GetOrientation(), TEMPSUMMON_TIMED_DESPAWN, 180000))
-						{
-							cr->CastSpell(player, 40926, true);
-							cr->GetMotionMaster()->MoveFollow(player, 5.0f, 2*M_PI*rand_norm());
-							ar->ToCreature()->DespawnOrUnsummon(500);
-						}
-					}
-				}
-			}
+                        player->KilledMonsterCredit(23343, 0);
+                        if (Creature *cr = GetCaster()->SummonCreature(23343, ar->GetPositionX(), ar->GetPositionY(), ar->GetPositionZ(), ar->GetOrientation(), TEMPSUMMON_TIMED_DESPAWN, 180000))
+                        {
+                            cr->CastSpell(player, 40926, true);
+                            cr->GetMotionMaster()->MoveFollow(player, 5.0f, 2*M_PI*rand_norm());
+                            ar->ToCreature()->DespawnOrUnsummon(500);
+                        }
+                    }
+                }
+            }
 
-			void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-			{
-				SetDuration(5000);
-			}
+            void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+            {
+                SetDuration(5000);
+            }
 
-			void Register()
-			{
-				OnEffectApply += AuraEffectApplyFn(spell_q11065_wrangle_some_aether_rays_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-				OnEffectRemove += AuraEffectRemoveFn(spell_q11065_wrangle_some_aether_rays_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-			}
+            void Register()
+            {
+                OnEffectApply += AuraEffectApplyFn(spell_q11065_wrangle_some_aether_rays_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+                OnEffectRemove += AuraEffectRemoveFn(spell_q11065_wrangle_some_aether_rays_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+            }
 
-		};
+        };
 
-		AuraScript* GetAuraScript() const
-		{
-			return new spell_q11065_wrangle_some_aether_rays_AuraScript();
-		}
+        AuraScript* GetAuraScript() const
+        {
+            return new spell_q11065_wrangle_some_aether_rays_AuraScript();
+        }
 };
 
 enum eDrakuru
 {
-	QUEST_SUBJECT_TO_INTERPRETATION			= 11991,
-	QUEST_MY_HEART_IS_IN_YOUR_HANDS			= 12802,
+    QUEST_SUBJECT_TO_INTERPRETATION         = 11991,
+    QUEST_MY_HEART_IS_IN_YOUR_HANDS         = 12802,
 
-	NPC_DRAKURU								= 28016,
+    NPC_DRAKURU                             = 28016,
 };
 
 class spell_image_of_drakuru_reagent_check : public SpellScriptLoader
 {
-	public:
-		spell_image_of_drakuru_reagent_check() : SpellScriptLoader("spell_image_of_drakuru_reagent_check") { }
+    public:
+        spell_image_of_drakuru_reagent_check() : SpellScriptLoader("spell_image_of_drakuru_reagent_check") { }
 
-		class spell_image_of_drakuru_reagent_check_SpellScript : public SpellScript
-		{
-			PrepareSpellScript(spell_image_of_drakuru_reagent_check_SpellScript);
+        class spell_image_of_drakuru_reagent_check_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_image_of_drakuru_reagent_check_SpellScript);
 
-			void HandleDummyEffect(SpellEffIndex /*effIndex*/)
-			{
-				Unit* caster = GetCaster();
-				if (!caster || !caster->ToPlayer())
-					return;
-				Player* player = caster->ToPlayer();
+            void HandleDummyEffect(SpellEffIndex /*effIndex*/)
+            {
+                Unit* caster = GetCaster();
+                if (!caster || !caster->ToPlayer())
+                    return;
+                Player* player = caster->ToPlayer();
 
-				float dist = player->GetDistance(3385, -1807, 114);
-				if (dist < 40.0f)
-				{
-					caster->ToPlayer()->GroupEventHappens(QUEST_SUBJECT_TO_INTERPRETATION, caster);
-					caster->CastSpell(caster, 47118, false);
-					return;
-				}
+                float dist = player->GetDistance(3385, -1807, 114);
+                if (dist < 40.0f)
+                {
+                    caster->ToPlayer()->GroupEventHappens(QUEST_SUBJECT_TO_INTERPRETATION, caster);
+                    caster->CastSpell(caster, 47118, false);
+                    return;
+                }
 
-				dist = player->GetDistance(4244, -2025, 238);
-				if (dist < 40.0f)
-				{
-					caster->CastSpell(caster, 47150, false);
-					return;
-				}
+                dist = player->GetDistance(4244, -2025, 238);
+                if (dist < 40.0f)
+                {
+                    caster->CastSpell(caster, 47150, false);
+                    return;
+                }
 
-				dist = player->GetDistance(4524, -3472, 228);
-				if (dist < 40.0f)
-				{
-					caster->ToPlayer()->GroupEventHappens(QUEST_MY_HEART_IS_IN_YOUR_HANDS, caster);
-					caster->CastSpell(caster, 47317, false);
-					return;
-				}
+                dist = player->GetDistance(4524, -3472, 228);
+                if (dist < 40.0f)
+                {
+                    caster->ToPlayer()->GroupEventHappens(QUEST_MY_HEART_IS_IN_YOUR_HANDS, caster);
+                    caster->CastSpell(caster, 47317, false);
+                    return;
+                }
 
-				dist = player->GetDistance(4599, -4877, 48);
-				if (dist < 40.0f)
-				{
-					caster->CastSpell(caster, 47406, false);
-					return;
-				}
+                dist = player->GetDistance(4599, -4877, 48);
+                if (dist < 40.0f)
+                {
+                    caster->CastSpell(caster, 47406, false);
+                    return;
+                }
 
-				dist = player->GetDistance(-236, -614, 116);
-				if (dist < 40.0f)
-				{
-					caster->CastSpell(caster, 50440, false);
-					return;
-				}
-			}
+                dist = player->GetDistance(-236, -614, 116);
+                if (dist < 40.0f)
+                {
+                    caster->CastSpell(caster, 50440, false);
+                    return;
+                }
+            }
 
-			void Register()
-			{
-				OnEffectHitTarget += SpellEffectFn(spell_image_of_drakuru_reagent_check_SpellScript::HandleDummyEffect, EFFECT_0, SPELL_EFFECT_DUMMY);
-			}
-		};
+            void Register()
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_image_of_drakuru_reagent_check_SpellScript::HandleDummyEffect, EFFECT_0, SPELL_EFFECT_DUMMY);
+            }
+        };
 
-		SpellScript* GetSpellScript() const
-		{
-			return new spell_image_of_drakuru_reagent_check_SpellScript();
-		};
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_image_of_drakuru_reagent_check_SpellScript();
+        };
 };
 
 class spell_q12014_steady_as_a_rock : public SpellScriptLoader
 {
-	public:
-		spell_q12014_steady_as_a_rock() : SpellScriptLoader("spell_q12014_steady_as_a_rock") { }
+    public:
+        spell_q12014_steady_as_a_rock() : SpellScriptLoader("spell_q12014_steady_as_a_rock") { }
 
-		class spell_q12014_steady_as_a_rock_SpellScript : public SpellScript
-		{
-			PrepareSpellScript(spell_q12014_steady_as_a_rock_SpellScript);
+        class spell_q12014_steady_as_a_rock_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_q12014_steady_as_a_rock_SpellScript);
 
-			void HandleFinish()
-			{
-				Unit* caster = GetCaster();
-				if (!caster || !caster->ToPlayer()) // caster cant be null, but meh :p
-					return;
+            void HandleFinish()
+            {
+                Unit* caster = GetCaster();
+                if (!caster || !caster->ToPlayer()) // caster cant be null, but meh :p
+                    return;
 
-				if (caster->ToPlayer()->GetQuestStatus(12014 /*QUEST_STEADY_AS_A_ROCK*/) == QUEST_STATUS_INCOMPLETE)
-				{
-					float x = caster->GetPositionX() + 3.0f*cos(caster->GetOrientation());
-					float y = caster->GetPositionY() + 3.0f*sin(caster->GetOrientation());
-					float o = caster->GetOrientation() < M_PI ? caster->GetOrientation()+M_PI : caster->GetOrientation()-M_PI;
-					caster->SummonGameObject(188367, x, y, caster->GetPositionZ(), o, 0.0f, 0.0f, 0.0f, 0.0f, 60000);
-				}
-			}
+                if (caster->ToPlayer()->GetQuestStatus(12014 /*QUEST_STEADY_AS_A_ROCK*/) == QUEST_STATUS_INCOMPLETE)
+                {
+                    float x = caster->GetPositionX() + 3.0f*cos(caster->GetOrientation());
+                    float y = caster->GetPositionY() + 3.0f*sin(caster->GetOrientation());
+                    float o = caster->GetOrientation() < M_PI ? caster->GetOrientation()+M_PI : caster->GetOrientation()-M_PI;
+                    caster->SummonGameObject(188367, x, y, caster->GetPositionZ(), o, 0.0f, 0.0f, 0.0f, 0.0f, 60000);
+                }
+            }
 
-			void Register()
-			{
-				AfterCast += SpellCastFn(spell_q12014_steady_as_a_rock_SpellScript::HandleFinish);
-			}
-		};
+            void Register()
+            {
+                AfterCast += SpellCastFn(spell_q12014_steady_as_a_rock_SpellScript::HandleFinish);
+            }
+        };
 
-		SpellScript* GetSpellScript() const
-		{
-			return new spell_q12014_steady_as_a_rock_SpellScript();
-		};
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_q12014_steady_as_a_rock_SpellScript();
+        };
 };
 
 class spell_q11026_a11051_banish_the_demons : public SpellScriptLoader
 {
-	public:
-		spell_q11026_a11051_banish_the_demons() : SpellScriptLoader("spell_q11026_a11051_banish_the_demons") { }
+    public:
+        spell_q11026_a11051_banish_the_demons() : SpellScriptLoader("spell_q11026_a11051_banish_the_demons") { }
 
-		class spell_q11026_a11051_banish_the_demons_AuraScript : public AuraScript
-		{
-			PrepareAuraScript(spell_q11026_a11051_banish_the_demons_AuraScript)
+        class spell_q11026_a11051_banish_the_demons_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_q11026_a11051_banish_the_demons_AuraScript)
 
-			void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-			{
-				Unit* ar = GetTarget();
-				if (ar && !ar->IsAlive())
-					ar->CastSpell(ar, 40828, true); // Banish kill credit
-			}
+            void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+            {
+                Unit* ar = GetTarget();
+                if (ar && !ar->IsAlive())
+                    ar->CastSpell(ar, 40828, true); // Banish kill credit
+            }
 
-			void Register()
-			{
-				// aura spell only
-				if (m_scriptSpellId == 40825)
-					OnEffectRemove += AuraEffectRemoveFn(spell_q11026_a11051_banish_the_demons_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-			}
+            void Register()
+            {
+                // aura spell only
+                if (m_scriptSpellId == 40825)
+                    OnEffectRemove += AuraEffectRemoveFn(spell_q11026_a11051_banish_the_demons_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+            }
 
-		};
+        };
 
-		AuraScript* GetAuraScript() const
-		{
-			return new spell_q11026_a11051_banish_the_demons_AuraScript();
-		}
+        AuraScript* GetAuraScript() const
+        {
+            return new spell_q11026_a11051_banish_the_demons_AuraScript();
+        }
 
-		class spell_q11026_a11051_banish_the_demons_SpellScript : public SpellScript
-		{
-			PrepareSpellScript(spell_q11026_a11051_banish_the_demons_SpellScript);
+        class spell_q11026_a11051_banish_the_demons_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_q11026_a11051_banish_the_demons_SpellScript);
 
-			void HandleScriptEffect(SpellEffIndex /*effIndex*/)
-			{
-				if (Unit* target = GetHitUnit())
-					if (Unit* owner = target->ToTempSummon()->GetSummoner())
-						if (owner->GetTypeId() == TYPEID_PLAYER)
-							owner->ToPlayer()->KilledMonsterCredit(23327, 0); // Some trigger, just count
-			}
+            void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+            {
+                if (Unit* target = GetHitUnit())
+                    if (Unit* owner = target->ToTempSummon()->GetSummoner())
+                        if (owner->GetTypeId() == TYPEID_PLAYER)
+                            owner->ToPlayer()->KilledMonsterCredit(23327, 0); // Some trigger, just count
+            }
 
-			void Register()
-			{
-				// script effect only
-				if (m_scriptSpellId == 40828)
-					OnEffectHitTarget += SpellEffectFn(spell_q11026_a11051_banish_the_demons_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-			}
-		};
+            void Register()
+            {
+                // script effect only
+                if (m_scriptSpellId == 40828)
+                    OnEffectHitTarget += SpellEffectFn(spell_q11026_a11051_banish_the_demons_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+            }
+        };
 
-		SpellScript* GetSpellScript() const
-		{
-			return new spell_q11026_a11051_banish_the_demons_SpellScript();
-		};
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_q11026_a11051_banish_the_demons_SpellScript();
+        };
 };
 
 class spell_q10525_vision_guide : public SpellScriptLoader
@@ -280,24 +280,24 @@ public:
 
         void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
-			SetDuration(75*IN_MILLISECONDS);
+            SetDuration(75*IN_MILLISECONDS);
         }
 
-		void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
-			if (Player* target = GetTarget()->ToPlayer())
-			{
-				target->AreaExploredOrEventHappens(10525); // Vision Guide quest
-				target->GetMotionMaster()->MovementExpired();
-				target->CleanupAfterTaxiFlight();
-				target->NearTeleportTo(2283.267f, 5987.395f, 142.4f, 3.80f);
-			}
+            if (Player* target = GetTarget()->ToPlayer())
+            {
+                target->AreaExploredOrEventHappens(10525); // Vision Guide quest
+                target->GetMotionMaster()->MovementExpired();
+                target->CleanupAfterTaxiFlight();
+                target->NearTeleportTo(2283.267f, 5987.395f, 142.4f, 3.80f);
+            }
         }
 
         void Register()
         {
-			OnEffectApply += AuraEffectApplyFn(spell_q10525_vision_guide_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_TRANSFORM, AURA_EFFECT_HANDLE_REAL);
-			AfterEffectRemove += AuraEffectRemoveFn(spell_q10525_vision_guide_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_TRANSFORM, AURA_EFFECT_HANDLE_REAL);
+            OnEffectApply += AuraEffectApplyFn(spell_q10525_vision_guide_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_TRANSFORM, AURA_EFFECT_HANDLE_REAL);
+            AfterEffectRemove += AuraEffectRemoveFn(spell_q10525_vision_guide_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_TRANSFORM, AURA_EFFECT_HANDLE_REAL);
         }
 
     };
@@ -317,16 +317,16 @@ public:
     {
         PrepareAuraScript(spell_q11322_q11317_the_cleansing_AuraScript)
         
-		void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
-			Unit* ar = GetCaster();
-			if (ar && ar->ToPlayer())
-			{
-				if (ar->ToPlayer()->GetQuestStatus(11317) == QUEST_STATUS_INCOMPLETE || ar->ToPlayer()->GetQuestStatus(11322) == QUEST_STATUS_INCOMPLETE)
-					ar->SummonCreature(27959, 3032.0f, -5095.0f, 723.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 60000);
-				
-				ar->SetStandState(UNIT_STAND_STATE_SIT);
-			}
+            Unit* ar = GetCaster();
+            if (ar && ar->ToPlayer())
+            {
+                if (ar->ToPlayer()->GetQuestStatus(11317) == QUEST_STATUS_INCOMPLETE || ar->ToPlayer()->GetQuestStatus(11322) == QUEST_STATUS_INCOMPLETE)
+                    ar->SummonCreature(27959, 3032.0f, -5095.0f, 723.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 60000);
+                
+                ar->SetStandState(UNIT_STAND_STATE_SIT);
+            }
         }
 
         void Register()
@@ -346,27 +346,27 @@ class spell_q10714_on_spirits_wings : public SpellScriptLoader
 public:
     spell_q10714_on_spirits_wings() : SpellScriptLoader("spell_q10714_on_spirits_wings") { }
 
-	class spell_q10714_on_spirits_wings_SpellScript : public SpellScript
+    class spell_q10714_on_spirits_wings_SpellScript : public SpellScript
     {
         PrepareSpellScript(spell_q10714_on_spirits_wings_SpellScript);
 
-		uint8 count;
-		bool Load()
-		{
-			count = 0;
-			return true;
-		}
+        uint8 count;
+        bool Load()
+        {
+            count = 0;
+            return true;
+        }
 
         void HandleDummy(SpellEffIndex /*effIndex*/)
         {
-			if (Creature* target = GetHitCreature())
-				if (target->GetDBTableGUIDLow() == 77757 || target->GetDBTableGUIDLow() == 78693)
-				{
-					count++;
-					if (count == 2)
-						if (GetCaster() && GetCaster()->ToPlayer())
-							GetCaster()->ToPlayer()->KilledMonsterCredit(22383, 0);
-				}
+            if (Creature* target = GetHitCreature())
+                if (target->GetDBTableGUIDLow() == 77757 || target->GetDBTableGUIDLow() == 78693)
+                {
+                    count++;
+                    if (count == 2)
+                        if (GetCaster() && GetCaster()->ToPlayer())
+                            GetCaster()->ToPlayer()->KilledMonsterCredit(22383, 0);
+                }
         }
 
         void Register()
@@ -375,7 +375,7 @@ public:
         }
     };
 
-	SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const
     {
         return new spell_q10714_on_spirits_wings_SpellScript();
     };
@@ -386,24 +386,24 @@ class spell_q10720_the_smallest_creature : public SpellScriptLoader
 public:
     spell_q10720_the_smallest_creature() : SpellScriptLoader("spell_q10720_the_smallest_creature") { }
 
-	class spell_q10720_the_smallest_creature_SpellScript : public SpellScript
+    class spell_q10720_the_smallest_creature_SpellScript : public SpellScript
     {
         PrepareSpellScript(spell_q10720_the_smallest_creature_SpellScript);
 
         void HandleScriptEffect(SpellEffIndex /*effIndex*/)
         {
-			if (GetCaster() && GetHitUnit())
-				if (Player* player = GetCaster()->GetCharmerOrOwnerPlayerOrPlayerItself())
-					player->KilledMonsterCredit(GetHitUnit()->GetEntry(), 0);
+            if (GetCaster() && GetHitUnit())
+                if (Player* player = GetCaster()->GetCharmerOrOwnerPlayerOrPlayerItself())
+                    player->KilledMonsterCredit(GetHitUnit()->GetEntry(), 0);
         }
 
         void Register()
         {
-			OnEffectHitTarget += SpellEffectFn(spell_q10720_the_smallest_creature_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+            OnEffectHitTarget += SpellEffectFn(spell_q10720_the_smallest_creature_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
         }
     };
 
-	SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const
     {
         return new spell_q10720_the_smallest_creature_SpellScript();
     };
@@ -418,31 +418,31 @@ class spell_q13086_last_line_of_defence : public SpellScriptLoader
         {
             PrepareSpellScript(spell_q13086_last_line_of_defence_SpellScript);
 
-			bool Load() { _triggerSpellId = 0; return true; }
+            bool Load() { _triggerSpellId = 0; return true; }
 
             void HandleDummy(SpellEffIndex effIndex)
             {
-				if (effIndex == EFFECT_0)
-					_triggerSpellId = GetSpellInfo()->Effects[effIndex].CalcValue();
+                if (effIndex == EFFECT_0)
+                    _triggerSpellId = GetSpellInfo()->Effects[effIndex].CalcValue();
 
-				PreventHitEffect(effIndex);
+                PreventHitEffect(effIndex);
             }
 
-			void HandleAfterCast()
-			{
-				if (WorldLocation const* loc = GetExplTargetDest())
-					GetCaster()->CastSpell(loc->GetPositionX(), loc->GetPositionY(), loc->GetPositionZ(), _triggerSpellId, true);
-			}
+            void HandleAfterCast()
+            {
+                if (WorldLocation const* loc = GetExplTargetDest())
+                    GetCaster()->CastSpell(loc->GetPositionX(), loc->GetPositionY(), loc->GetPositionZ(), _triggerSpellId, true);
+            }
 
             void Register()
             {
                 OnEffectLaunch += SpellEffectFn(spell_q13086_last_line_of_defence_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-				OnEffectLaunch += SpellEffectFn(spell_q13086_last_line_of_defence_SpellScript::HandleDummy, EFFECT_1, SPELL_EFFECT_DUMMY);
-				AfterCast += SpellCastFn(spell_q13086_last_line_of_defence_SpellScript::HandleAfterCast);
+                OnEffectLaunch += SpellEffectFn(spell_q13086_last_line_of_defence_SpellScript::HandleDummy, EFFECT_1, SPELL_EFFECT_DUMMY);
+                AfterCast += SpellCastFn(spell_q13086_last_line_of_defence_SpellScript::HandleAfterCast);
             }
 
-			private:
-				uint32 _triggerSpellId;
+            private:
+                uint32 _triggerSpellId;
         };
 
         SpellScript* GetSpellScript() const
@@ -453,7 +453,7 @@ class spell_q13086_last_line_of_defence : public SpellScriptLoader
 
 enum eShadowVaultDecree
 {
-	NPC_THANE_UFRANG				= 29919,
+    NPC_THANE_UFRANG                = 29919,
 };
 
 class spell_q12943_shadow_vault_decree : public SpellScriptLoader
@@ -467,26 +467,26 @@ class spell_q12943_shadow_vault_decree : public SpellScriptLoader
 
             SpellCastResult CheckRequirement()
             {
-				// if thane is present and not in combat - allow cast
+                // if thane is present and not in combat - allow cast
                 Unit* caster = GetCaster();
-				if (Creature* thane = caster->FindNearestCreature(NPC_THANE_UFRANG, 30.0f))
-					if (!thane->IsInCombat())
-						return SPELL_CAST_OK;
+                if (Creature* thane = caster->FindNearestCreature(NPC_THANE_UFRANG, 30.0f))
+                    if (!thane->IsInCombat())
+                        return SPELL_CAST_OK;
 
                 return SPELL_FAILED_CASTER_AURASTATE;
             }
 
-			void HandleScriptEffect(SpellEffIndex /*effIndex*/)
-			{
-				Unit* caster = GetCaster();
-				if (Creature* thane = caster->FindNearestCreature(NPC_THANE_UFRANG, 30.0f))
-					thane->AI()->AttackStart(caster);
-			}
+            void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+            {
+                Unit* caster = GetCaster();
+                if (Creature* thane = caster->FindNearestCreature(NPC_THANE_UFRANG, 30.0f))
+                    thane->AI()->AttackStart(caster);
+            }
 
             void Register()
             {
                 OnCheckCast += SpellCheckCastFn(spell_q12943_shadow_vault_decree_SpellScript::CheckRequirement);
-				OnEffectHitTarget += SpellEffectFn(spell_q12943_shadow_vault_decree_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+                OnEffectHitTarget += SpellEffectFn(spell_q12943_shadow_vault_decree_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
             }
         };
 
@@ -505,57 +505,57 @@ public:
     {
         PrepareAuraScript(spell_q10769_dissension_amongst_the_ranks_AuraScript)
         
-		void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
-			Unit* ar = GetTarget();
-			if (ar)
-			{
-				if (ar->getGender() == GENDER_MALE)
-					ar->CastSpell(ar, 38225, true);
-				else
-					ar->CastSpell(ar, 38227, true);
-			}
+            Unit* ar = GetTarget();
+            if (ar)
+            {
+                if (ar->getGender() == GENDER_MALE)
+                    ar->CastSpell(ar, 38225, true);
+                else
+                    ar->CastSpell(ar, 38227, true);
+            }
         }
 
-		void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
-			Unit* ar = GetTarget();
-			if (ar)
-			{
-				if (ar->getGender() == GENDER_MALE)
-					ar->RemoveAurasDueToSpell(38225);
-				else
-					ar->RemoveAurasDueToSpell(38227);
-			}
+            Unit* ar = GetTarget();
+            if (ar)
+            {
+                if (ar->getGender() == GENDER_MALE)
+                    ar->RemoveAurasDueToSpell(38225);
+                else
+                    ar->RemoveAurasDueToSpell(38227);
+            }
         }
 
         void Register()
         {
-			if (m_scriptSpellId == 38224)
-			{
-				OnEffectApply += AuraEffectApplyFn(spell_q10769_dissension_amongst_the_ranks_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-				OnEffectRemove += AuraEffectRemoveFn(spell_q10769_dissension_amongst_the_ranks_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-			}
+            if (m_scriptSpellId == 38224)
+            {
+                OnEffectApply += AuraEffectApplyFn(spell_q10769_dissension_amongst_the_ranks_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+                OnEffectRemove += AuraEffectRemoveFn(spell_q10769_dissension_amongst_the_ranks_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+            }
         }
 
     };
 
-	class spell_q10769_dissension_amongst_the_ranks_SpellScript : public SpellScript
+    class spell_q10769_dissension_amongst_the_ranks_SpellScript : public SpellScript
     {
         PrepareSpellScript(spell_q10769_dissension_amongst_the_ranks_SpellScript);
 
         void HandleScriptEffect(SpellEffIndex /*effIndex*/)
         {
-			if (Unit* target = GetHitUnit())
-				if (Player* player = target->GetCharmerOrOwnerPlayerOrPlayerItself())
-					if (player->HasAura(38224))
-						player->KilledMonsterCredit(22051, 0);
+            if (Unit* target = GetHitUnit())
+                if (Player* player = target->GetCharmerOrOwnerPlayerOrPlayerItself())
+                    if (player->HasAura(38224))
+                        player->KilledMonsterCredit(22051, 0);
         }
 
         void Register()
         {
-			if (m_scriptSpellId == 38223)
-				OnEffectHitTarget += SpellEffectFn(spell_q10769_dissension_amongst_the_ranks_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+            if (m_scriptSpellId == 38223)
+                OnEffectHitTarget += SpellEffectFn(spell_q10769_dissension_amongst_the_ranks_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
         }
     };
 
@@ -564,7 +564,7 @@ public:
         return new spell_q10769_dissension_amongst_the_ranks_AuraScript();
     }
 
-	SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const
     {
         return new spell_q10769_dissension_amongst_the_ranks_SpellScript();
     };
@@ -572,8 +572,8 @@ public:
 
 enum q11520Roots
 {
-	GO_RAZORTHORN_DIRT_MOUNT			= 187073,
-	SPELL_SUMMON_RAZORTHORN_ROOT		= 44941,
+    GO_RAZORTHORN_DIRT_MOUNT            = 187073,
+    SPELL_SUMMON_RAZORTHORN_ROOT        = 44941,
 };
 
 class spell_q11520_discovering_your_roots : public SpellScriptLoader
@@ -581,27 +581,27 @@ class spell_q11520_discovering_your_roots : public SpellScriptLoader
 public:
     spell_q11520_discovering_your_roots() : SpellScriptLoader("spell_q11520_discovering_your_roots") { }
 
-	class spell_q11520_discovering_your_roots_SpellScript : public SpellScript
+    class spell_q11520_discovering_your_roots_SpellScript : public SpellScript
     {
         PrepareSpellScript(spell_q11520_discovering_your_roots_SpellScript);
 
         void HandleDummy(SpellEffIndex /*effIndex*/)
         {
-			if (GameObject* go = GetCaster()->FindNearestGameObject(GO_RAZORTHORN_DIRT_MOUNT, 20.0f))
-			{
-				GetCaster()->GetMotionMaster()->MovePoint(0, *go);
-				go->SetLootState(GO_JUST_DEACTIVATED);
-				GetCaster()->CastSpell(GetCaster(), SPELL_SUMMON_RAZORTHORN_ROOT, true);
-			}
-		}
+            if (GameObject* go = GetCaster()->FindNearestGameObject(GO_RAZORTHORN_DIRT_MOUNT, 20.0f))
+            {
+                GetCaster()->GetMotionMaster()->MovePoint(0, *go);
+                go->SetLootState(GO_JUST_DEACTIVATED);
+                GetCaster()->CastSpell(GetCaster(), SPELL_SUMMON_RAZORTHORN_ROOT, true);
+            }
+        }
 
         void Register()
         {
-			OnEffectHitTarget += SpellEffectFn(spell_q11520_discovering_your_roots_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+            OnEffectHitTarget += SpellEffectFn(spell_q11520_discovering_your_roots_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
         }
     };
 
-	SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const
     {
         return new spell_q11520_discovering_your_roots_SpellScript();
     };
@@ -615,46 +615,46 @@ class spell_quest_dragonmaw_race_generic : public SpellScriptLoader
         class spell_quest_dragonmaw_race_generic_SpellScript : public SpellScript
         {
             PrepareSpellScript(spell_quest_dragonmaw_race_generic_SpellScript);
-			
-			bool Load()
-			{
-				_x = _y = _z = 0.0f;
-				return true;
-			}
+            
+            bool Load()
+            {
+                _x = _y = _z = 0.0f;
+                return true;
+            }
 
             SpellCastResult RelocateDest()
             {
-				Unit* caster = GetCaster();
-				float o = Position::NormalizeOrientation(caster->GetOrientation()+frand(0.0f, 2*M_PI));
-				float dist = frand(5.0f, 30.0f);
-				_x = caster->GetPositionX()+dist*cos(o);
-				_y = caster->GetPositionY()+dist*sin(o);
-				_z = caster->GetPositionZ()+frand(-10.0f, 15.0f);
-				GetSpell()->m_targets.SetDst(_x, _y, _z, 0.0f, caster->GetMapId());
-				return SPELL_CAST_OK;
+                Unit* caster = GetCaster();
+                float o = Position::NormalizeOrientation(caster->GetOrientation()+frand(0.0f, 2*M_PI));
+                float dist = frand(5.0f, 30.0f);
+                _x = caster->GetPositionX()+dist*cos(o);
+                _y = caster->GetPositionY()+dist*sin(o);
+                _z = caster->GetPositionZ()+frand(-10.0f, 15.0f);
+                GetSpell()->m_targets.SetDst(_x, _y, _z, 0.0f, caster->GetMapId());
+                return SPELL_CAST_OK;
             }
 
-			void ChangeDest(SpellEffIndex effIndex)
-			{
-				PreventHitDefaultEffect(effIndex);
-				Unit* caster = GetCaster();
-				if (Creature* trigger = caster->SummonCreature(23356, _x, _y, _z, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 1500))
-				{
-					trigger->CastSpell(trigger, GetSpellInfo()->Effects[effIndex].TriggerSpell, true);
-					if (GetSpellInfo()->Effects[effIndex].TriggerSpell == 41064)
-						trigger->CastSpell(trigger, 41284, true);
-				}
+            void ChangeDest(SpellEffIndex effIndex)
+            {
+                PreventHitDefaultEffect(effIndex);
+                Unit* caster = GetCaster();
+                if (Creature* trigger = caster->SummonCreature(23356, _x, _y, _z, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 1500))
+                {
+                    trigger->CastSpell(trigger, GetSpellInfo()->Effects[effIndex].TriggerSpell, true);
+                    if (GetSpellInfo()->Effects[effIndex].TriggerSpell == 41064)
+                        trigger->CastSpell(trigger, 41284, true);
+                }
 
-			}
+            }
 
             void Register()
             {
                 OnCheckCast += SpellCheckCastFn(spell_quest_dragonmaw_race_generic_SpellScript::RelocateDest);
-				OnEffectHit += SpellEffectFn(spell_quest_dragonmaw_race_generic_SpellScript::ChangeDest, EFFECT_0, SPELL_EFFECT_TRIGGER_MISSILE);
+                OnEffectHit += SpellEffectFn(spell_quest_dragonmaw_race_generic_SpellScript::ChangeDest, EFFECT_0, SPELL_EFFECT_TRIGGER_MISSILE);
             }
 
-		private:
-			float _x, _y, _z;
+        private:
+            float _x, _y, _z;
         };
 
         SpellScript* GetSpellScript() const
@@ -668,23 +668,23 @@ class spell_q11670_it_was_the_orcs_honest : public SpellScriptLoader
 public:
     spell_q11670_it_was_the_orcs_honest() : SpellScriptLoader("spell_q11670_it_was_the_orcs_honest") { }
 
-	class spell_q11670_it_was_the_orcs_honest_SpellScript : public SpellScript
+    class spell_q11670_it_was_the_orcs_honest_SpellScript : public SpellScript
     {
         PrepareSpellScript(spell_q11670_it_was_the_orcs_honest_SpellScript);
 
         void HandleScriptEffect()
         {
-			if (GetSpellInfo()->Id != 45759)
-				return;
+            if (GetSpellInfo()->Id != 45759)
+                return;
 
-			if (Unit* caster = GetCaster())
-				caster->CastSpell(caster, caster->getGender() == GENDER_MALE ? 45760 : 45762, true);
+            if (Unit* caster = GetCaster())
+                caster->CastSpell(caster, caster->getGender() == GENDER_MALE ? 45760 : 45762, true);
         }
 
-		SpellCastResult CheckTarget()
+        SpellCastResult CheckTarget()
         {
-			if (GetSpellInfo()->Id != 45742)
-				return SPELL_CAST_OK;
+            if (GetSpellInfo()->Id != 45742)
+                return SPELL_CAST_OK;
 
             if (!GetCaster() || !GetCaster()->HasAura((GetCaster()->getGender() == GENDER_MALE ? 45760 : 45762)))
             {
@@ -697,12 +697,12 @@ public:
 
         void Register()
         {
-			OnCheckCast += SpellCheckCastFn(spell_q11670_it_was_the_orcs_honest_SpellScript::CheckTarget);
+            OnCheckCast += SpellCheckCastFn(spell_q11670_it_was_the_orcs_honest_SpellScript::CheckTarget);
             AfterHit += SpellHitFn(spell_q11670_it_was_the_orcs_honest_SpellScript::HandleScriptEffect);
         }
     };
 
-	SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const
     {
         return new spell_q11670_it_was_the_orcs_honest_SpellScript();
     };
@@ -710,37 +710,37 @@ public:
 
 enum eTestFlight
 {
-	SPELL_CANNON_CHARGING_SELF		= 36860,
-	SPELL_TELEPORT_VISUAL			= 35517,
-	SPELL_CANNON_CHARGING_PORT		= 36801,
-	SPELL_CANNON_CHARGING_STATE2	= 36790,
-	SPELL_CANNON_CHARGING_STATE3	= 36792,
-	SPELL_CANNON_CHARGING_STATE4	= 36800,
-	SPELL_CANNON_CHANNEL			= 36795,
-	SPELL_ZEPHYRIUM_CHARGED			= 37108,
+    SPELL_CANNON_CHARGING_SELF      = 36860,
+    SPELL_TELEPORT_VISUAL           = 35517,
+    SPELL_CANNON_CHARGING_PORT      = 36801,
+    SPELL_CANNON_CHARGING_STATE2    = 36790,
+    SPELL_CANNON_CHARGING_STATE3    = 36792,
+    SPELL_CANNON_CHARGING_STATE4    = 36800,
+    SPELL_CANNON_CHANNEL            = 36795,
+    SPELL_ZEPHYRIUM_CHARGED         = 37108,
 
-	SPELL_SOARING_10557				= 37910,
-	SPELL_SOARING_10710				= 37962,
-	SPELL_SOARING_10711				= 36812,
-	SPELL_SOARING_10712				= 37968,
-	SPELL_SOARING_10716				= 37940,
+    SPELL_SOARING_10557             = 37910,
+    SPELL_SOARING_10710             = 37962,
+    SPELL_SOARING_10711             = 36812,
+    SPELL_SOARING_10712             = 37968,
+    SPELL_SOARING_10716             = 37940,
 
-	NPC_CANNON						= 21393,
-	NPC_CANNON_TARGET				= 21394,
-	NPC_GNOME_SHOOTER				= 21413,
+    NPC_CANNON                      = 21393,
+    NPC_CANNON_TARGET               = 21394,
+    NPC_GNOME_SHOOTER               = 21413,
 
-	QUEST_TF_ZEPHYRIUM_CAPACITORIUM	= 10557,
-	QUEST_TF_SINGING_RIDGE			= 10710,
-	QUEST_TF_RAZAANS_LANDING		= 10711,
-	QUEST_TF_RUUAN_WEALD			= 10712,
+    QUEST_TF_ZEPHYRIUM_CAPACITORIUM = 10557,
+    QUEST_TF_SINGING_RIDGE          = 10710,
+    QUEST_TF_RAZAANS_LANDING        = 10711,
+    QUEST_TF_RUUAN_WEALD            = 10712,
 };
 
 static Position ShooterPos[] =
 {
-	{1920.91f, 5579.68f, 269.23f, 1.93f},
-	{1921.01f, 5585.01f, 269.23f, 4.42f},
-	{1917.48f, 5583.55f, 269.23f, 5.71f},
-	{1917.16f, 5581.52f, 269.23f, 0.11f},
+    {1920.91f, 5579.68f, 269.23f, 1.93f},
+    {1921.01f, 5585.01f, 269.23f, 4.42f},
+    {1917.48f, 5583.55f, 269.23f, 5.71f},
+    {1917.16f, 5581.52f, 269.23f, 0.11f},
 };
 
 class spell_quest_test_flight_charging : public SpellScriptLoader
@@ -752,72 +752,72 @@ public:
     {
         PrepareAuraScript(spell_quest_test_flight_charging_AuraScript)
 
-		void OnApplySelf(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-		{
-			GetTarget()->CastSpell(GetTarget(), SPELL_TELEPORT_VISUAL, true);
-			GetTarget()->CastSpell(GetTarget(), SPELL_CANNON_CHARGING_PORT, true);
-		}
-
-		void PerformKick()
-		{
-			if (Player* player = GetTarget()->ToPlayer())
-			{
-				Creature* shooter = player->FindNearestCreature(NPC_GNOME_SHOOTER, 20.0f);
-				if (!shooter)
-					return;
-
-				uint8 task = 0;
-				uint32 spellId = 0;
-				for (; task < 4; ++task)
-					if (shooter->GetDistance(ShooterPos[task]) < 1.0f)
-						break;
-
-				switch (task)
-				{
-					case 0: spellId = SPELL_SOARING_10557; break;
-					case 1: spellId = SPELL_SOARING_10710; break;
-					case 2: spellId = SPELL_SOARING_10711; break;
-					case 3: spellId = SPELL_SOARING_10712; break;
-				}
-
-				player->RemoveAurasDueToSpell(SPELL_CANNON_CHARGING_PORT);
-				shooter->CastSpell(player, spellId, true);
-			}
-		}
-
-		void HandleEffectPeriodicSelf(AuraEffect const * aurEff)
+        void OnApplySelf(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
-			if (aurEff->GetTickNumber() == 1)
-			{
-				GetTarget()->SummonCreature(NPC_CANNON_TARGET, 1919.99f, 5581.97f, 272.30f, 5.27f, TEMPSUMMON_TIMED_DESPAWN, 12000);
-				if (Creature* cannon = GetTarget()->FindNearestCreature(NPC_CANNON, 40.0f))
-					cannon->CastSpell(cannon, SPELL_CANNON_CHANNEL, false);
-			}
-			if (aurEff->GetTickNumber() == 6)
-				PerformKick();
+            GetTarget()->CastSpell(GetTarget(), SPELL_TELEPORT_VISUAL, true);
+            GetTarget()->CastSpell(GetTarget(), SPELL_CANNON_CHARGING_PORT, true);
         }
 
-		void HandleEffectPeriodicPlatform(AuraEffect const * aurEff)
+        void PerformKick()
         {
-			if (aurEff->GetTickNumber() == 1)
-				GetTarget()->CastSpell(GetTarget(), SPELL_CANNON_CHARGING_STATE2, true);
-			else if (aurEff->GetTickNumber() == 2)
-				GetTarget()->CastSpell(GetTarget(), SPELL_CANNON_CHARGING_STATE3, true);
-			else if (aurEff->GetTickNumber() == 3)
-				GetTarget()->CastSpell(GetTarget(), SPELL_CANNON_CHARGING_STATE4, true);
-			else if (aurEff->GetTickNumber() == 5)
-				GetTarget()->CastSpell(GetTarget(), SPELL_TELEPORT_VISUAL, true);
+            if (Player* player = GetTarget()->ToPlayer())
+            {
+                Creature* shooter = player->FindNearestCreature(NPC_GNOME_SHOOTER, 20.0f);
+                if (!shooter)
+                    return;
+
+                uint8 task = 0;
+                uint32 spellId = 0;
+                for (; task < 4; ++task)
+                    if (shooter->GetDistance(ShooterPos[task]) < 1.0f)
+                        break;
+
+                switch (task)
+                {
+                    case 0: spellId = SPELL_SOARING_10557; break;
+                    case 1: spellId = SPELL_SOARING_10710; break;
+                    case 2: spellId = SPELL_SOARING_10711; break;
+                    case 3: spellId = SPELL_SOARING_10712; break;
+                }
+
+                player->RemoveAurasDueToSpell(SPELL_CANNON_CHARGING_PORT);
+                shooter->CastSpell(player, spellId, true);
+            }
+        }
+
+        void HandleEffectPeriodicSelf(AuraEffect const * aurEff)
+        {
+            if (aurEff->GetTickNumber() == 1)
+            {
+                GetTarget()->SummonCreature(NPC_CANNON_TARGET, 1919.99f, 5581.97f, 272.30f, 5.27f, TEMPSUMMON_TIMED_DESPAWN, 12000);
+                if (Creature* cannon = GetTarget()->FindNearestCreature(NPC_CANNON, 40.0f))
+                    cannon->CastSpell(cannon, SPELL_CANNON_CHANNEL, false);
+            }
+            if (aurEff->GetTickNumber() == 6)
+                PerformKick();
+        }
+
+        void HandleEffectPeriodicPlatform(AuraEffect const * aurEff)
+        {
+            if (aurEff->GetTickNumber() == 1)
+                GetTarget()->CastSpell(GetTarget(), SPELL_CANNON_CHARGING_STATE2, true);
+            else if (aurEff->GetTickNumber() == 2)
+                GetTarget()->CastSpell(GetTarget(), SPELL_CANNON_CHARGING_STATE3, true);
+            else if (aurEff->GetTickNumber() == 3)
+                GetTarget()->CastSpell(GetTarget(), SPELL_CANNON_CHARGING_STATE4, true);
+            else if (aurEff->GetTickNumber() == 5)
+                GetTarget()->CastSpell(GetTarget(), SPELL_TELEPORT_VISUAL, true);
         }
 
         void Register()
         {
-			if (m_scriptSpellId == SPELL_CANNON_CHARGING_SELF)
-			{
-				OnEffectApply += AuraEffectApplyFn(spell_quest_test_flight_charging_AuraScript::OnApplySelf, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
-				OnEffectPeriodic += AuraEffectPeriodicFn(spell_quest_test_flight_charging_AuraScript::HandleEffectPeriodicSelf, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-			}
-			else
-				OnEffectPeriodic += AuraEffectPeriodicFn(spell_quest_test_flight_charging_AuraScript::HandleEffectPeriodicPlatform, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+            if (m_scriptSpellId == SPELL_CANNON_CHARGING_SELF)
+            {
+                OnEffectApply += AuraEffectApplyFn(spell_quest_test_flight_charging_AuraScript::OnApplySelf, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
+                OnEffectPeriodic += AuraEffectPeriodicFn(spell_quest_test_flight_charging_AuraScript::HandleEffectPeriodicSelf, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+            }
+            else
+                OnEffectPeriodic += AuraEffectPeriodicFn(spell_quest_test_flight_charging_AuraScript::HandleEffectPeriodicPlatform, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
         }
     };
 
@@ -829,7 +829,7 @@ public:
 
 enum qFallFromGrace
 {
-    SPELL_SCARLET_RAVEN_PRIEST_IMAGE_MALE	= 48763,
+    SPELL_SCARLET_RAVEN_PRIEST_IMAGE_MALE   = 48763,
     SPELL_SCARLET_RAVEN_PRIEST_IMAGE_FEMALE = 48761
 };
 
@@ -882,17 +882,17 @@ public:
         PrepareSpellScript(spell_q13369_fate_up_against_your_will_SpellScript)
 
         void HandleScript(SpellEffIndex effIndex)
-		{
-			PreventHitDefaultEffect(effIndex);
-			GetCaster()->CastSpell(GetCaster(), GetEffectValue(), true);   
+        {
+            PreventHitDefaultEffect(effIndex);
+            GetCaster()->CastSpell(GetCaster(), GetEffectValue(), true);   
         }
 
-	    SpellCastResult CheckRequirement()
+        SpellCastResult CheckRequirement()
         {
-			// Fate, Up Against Your Will (13369)
+            // Fate, Up Against Your Will (13369)
             if (Unit* caster = GetCaster())
-				if (caster->GetTypeId() == TYPEID_PLAYER && caster->ToPlayer()->GetQuestStatus(13369) >= QUEST_STATUS_COMPLETE)
-					return SPELL_CAST_OK;
+                if (caster->GetTypeId() == TYPEID_PLAYER && caster->ToPlayer()->GetQuestStatus(13369) >= QUEST_STATUS_COMPLETE)
+                    return SPELL_CAST_OK;
             return SPELL_FAILED_DONT_REPORT;
         }
 
@@ -919,12 +919,12 @@ public:
         PrepareSpellScript(spell_q11198_take_down_tethyr_SpellScript)
 
         void HandleScript(SpellEffIndex effIndex)
-		{
-			PreventHitDefaultEffect(effIndex);
-			if (Unit* unit = GetHitUnit())
-				if (unit->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC))
-					return;
-			GetCaster()->CastCustomSpell(42576 /*SPELL_CANNON_BLAST*/, SPELLVALUE_BASE_POINT0, GetEffectValue(), GetCaster(), true);   
+        {
+            PreventHitDefaultEffect(effIndex);
+            if (Unit* unit = GetHitUnit())
+                if (unit->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC))
+                    return;
+            GetCaster()->CastCustomSpell(42576 /*SPELL_CANNON_BLAST*/, SPELLVALUE_BASE_POINT0, GetEffectValue(), GetCaster(), true);   
         }
 
         void Register()
@@ -949,9 +949,9 @@ public:
         PrepareSpellScript(spell_q11653_youre_not_so_big_now_SpellScript)
 
         void HandleScript(SpellEffIndex effIndex)
-		{
-			PreventHitDefaultEffect(effIndex);
-			Unit* target = GetHitUnit();
+        {
+            PreventHitDefaultEffect(effIndex);
+            Unit* target = GetHitUnit();
             if (!target || target->GetTypeId() != TYPEID_UNIT)
                 return;
 
@@ -973,10 +973,10 @@ public:
                 45673                             // Polymorph
             };
 
-			if (roll_chance_i(30))
-				GetCaster()->CastSpell(GetCaster(), spellPlayer[urand(0, 4)], true);
-			else
-				target->CastSpell(target, spellTarget[urand(0, 4)], true);
+            if (roll_chance_i(30))
+                GetCaster()->CastSpell(GetCaster(), spellPlayer[urand(0, 4)], true);
+            else
+                target->CastSpell(target, spellTarget[urand(0, 4)], true);
         }
 
         void Register()
@@ -1000,15 +1000,15 @@ class spell_q10985_light_of_the_naaru : public SpellScriptLoader
         {
             PrepareAuraScript(spell_q10985_light_of_the_naaru_AuraScript);
 
-			bool CheckProc(ProcEventInfo& eventInfo)
+            bool CheckProc(ProcEventInfo& eventInfo)
             {
-				Unit* target = eventInfo.GetActionTarget();
-				return target && target->getFaction() == 1843; // Xinef: Illidari demons faction
+                Unit* target = eventInfo.GetActionTarget();
+                return target && target->getFaction() == 1843; // Xinef: Illidari demons faction
             }
 
             void Register()
             {
-				DoCheckProc += AuraCheckProcFn(spell_q10985_light_of_the_naaru_AuraScript::CheckProc);
+                DoCheckProc += AuraCheckProcFn(spell_q10985_light_of_the_naaru_AuraScript::CheckProc);
             }
         };
 
@@ -3028,29 +3028,29 @@ class spell_q12919_gymers_throw : public SpellScriptLoader
 
 void AddSC_quest_spell_scripts()
 {
-	// Ours
-	new spell_q11065_wrangle_some_aether_rays();
-	new spell_image_of_drakuru_reagent_check();
-	new spell_q12014_steady_as_a_rock();
-	new spell_q11026_a11051_banish_the_demons();
-	new spell_q10525_vision_guide();
-	new spell_q11322_q11317_the_cleansing();
-	new spell_q10714_on_spirits_wings();
-	new spell_q10720_the_smallest_creature();
-	new spell_q13086_last_line_of_defence();
-	new spell_q12943_shadow_vault_decree();
-	new spell_q10769_dissension_amongst_the_ranks();
-	new spell_q11520_discovering_your_roots();
-	new spell_quest_dragonmaw_race_generic();
-	new spell_q11670_it_was_the_orcs_honest();
-	new spell_quest_test_flight_charging();
-	new spell_q12274_a_fall_from_grace_costume();
-	new spell_q13369_fate_up_against_your_will();
-	new spell_q11198_take_down_tethyr();
-	new spell_q11653_youre_not_so_big_now();
-	new spell_q10985_light_of_the_naaru();
+    // Ours
+    new spell_q11065_wrangle_some_aether_rays();
+    new spell_image_of_drakuru_reagent_check();
+    new spell_q12014_steady_as_a_rock();
+    new spell_q11026_a11051_banish_the_demons();
+    new spell_q10525_vision_guide();
+    new spell_q11322_q11317_the_cleansing();
+    new spell_q10714_on_spirits_wings();
+    new spell_q10720_the_smallest_creature();
+    new spell_q13086_last_line_of_defence();
+    new spell_q12943_shadow_vault_decree();
+    new spell_q10769_dissension_amongst_the_ranks();
+    new spell_q11520_discovering_your_roots();
+    new spell_quest_dragonmaw_race_generic();
+    new spell_q11670_it_was_the_orcs_honest();
+    new spell_quest_test_flight_charging();
+    new spell_q12274_a_fall_from_grace_costume();
+    new spell_q13369_fate_up_against_your_will();
+    new spell_q11198_take_down_tethyr();
+    new spell_q11653_youre_not_so_big_now();
+    new spell_q10985_light_of_the_naaru();
 
-	// Theirs
+    // Theirs
     new spell_q55_sacred_cleansing();
     new spell_q2203_thaumaturgy_channel();
     new spell_q5206_test_fetid_skull();

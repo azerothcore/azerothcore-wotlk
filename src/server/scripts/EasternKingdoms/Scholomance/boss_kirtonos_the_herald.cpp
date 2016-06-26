@@ -44,8 +44,8 @@ enum Misc
     WEAPON_KIRTONOS_STAFF             = 11365,
     POINT_KIRTONOS_LAND               = 13,
     KIRTONOS_PATH                     = 105061,
-	
-	EMOTE_SUMMONED                    = 0
+    
+    EMOTE_SUMMONED                    = 0
 };
 
 Position const PosMove[2] =
@@ -61,20 +61,20 @@ class boss_kirtonos_the_herald : public CreatureScript
         struct boss_kirtonos_the_heraldAI : public ScriptedAI
         {
             boss_kirtonos_the_heraldAI(Creature* creature) : ScriptedAI(creature)
-			{
-				instance = me->GetInstanceScript();
-			}
+            {
+                instance = me->GetInstanceScript();
+            }
 
-			EventMap events;
-			EventMap events2;
-			InstanceScript* instance;
+            EventMap events;
+            EventMap events2;
+            InstanceScript* instance;
 
             void EnterCombat(Unit* /*who*/)
             {
-				events.Reset();
-				events.ScheduleEvent(EVENT_SHADOW_BOLT_VOLLEY, 2000);
-				events.ScheduleEvent(EVENT_CURSE_OF_TONGUES, 6000);
-				events.ScheduleEvent(EVENT_DOMINATE_MIND, 20000);
+                events.Reset();
+                events.ScheduleEvent(EVENT_SHADOW_BOLT_VOLLEY, 2000);
+                events.ScheduleEvent(EVENT_CURSE_OF_TONGUES, 6000);
+                events.ScheduleEvent(EVENT_DOMINATE_MIND, 20000);
                 events.ScheduleEvent(EVENT_KIRTONOS_TRANSFORM, 5000);
             }
 
@@ -83,7 +83,7 @@ class boss_kirtonos_the_herald : public CreatureScript
                 if (GameObject* gate = me->GetMap()->GetGameObject(instance->GetData64(GO_GATE_KIRTONOS)))
                     gate->SetGoState(GO_STATE_ACTIVE);
 
-				instance->SetData(DATA_KIRTONOS_THE_HERALD, DONE);
+                instance->SetData(DATA_KIRTONOS_THE_HERALD, DONE);
             }
 
             void EnterEvadeMode()
@@ -91,13 +91,13 @@ class boss_kirtonos_the_herald : public CreatureScript
                 if (GameObject* gate = me->GetMap()->GetGameObject(instance->GetData64(GO_GATE_KIRTONOS)))
                     gate->SetGoState(GO_STATE_ACTIVE);
 
-				instance->SetData(DATA_KIRTONOS_THE_HERALD, NOT_STARTED);
+                instance->SetData(DATA_KIRTONOS_THE_HERALD, NOT_STARTED);
                 me->DespawnOrUnsummon(1);
             }
 
             void IsSummonedBy(Unit* /*summoner*/)
             {
-				events2.Reset();
+                events2.Reset();
                 events2.ScheduleEvent(INTRO_1, 500);
                 me->SetDisableGravity(true);
                 me->SetReactState(REACT_PASSIVE);
@@ -108,13 +108,13 @@ class boss_kirtonos_the_herald : public CreatureScript
             void MovementInform(uint32 type, uint32 id)
             {
                 if (type == WAYPOINT_MOTION_TYPE && id == POINT_KIRTONOS_LAND)
-				{
+                {
                     events2.ScheduleEvent(INTRO_2, 1500);
                     events2.ScheduleEvent(INTRO_3, 2500);
                     events2.ScheduleEvent(INTRO_4, 5500);
                     events2.ScheduleEvent(INTRO_5, 6500);
                     events2.ScheduleEvent(INTRO_6, 11500);
-				}
+                }
             }
 
             void UpdateAI(uint32 diff)
@@ -153,18 +153,18 @@ class boss_kirtonos_the_herald : public CreatureScript
                 if (!UpdateVictim())
                     return;
 
-				events.Update(diff);
+                events.Update(diff);
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
 
                 switch (events.ExecuteEvent())
                 {
                     case EVENT_SWOOP:
-						me->CastSpell(me->GetVictim(), SPELL_SWOOP, false);
+                        me->CastSpell(me->GetVictim(), SPELL_SWOOP, false);
                         events.ScheduleEvent(EVENT_SWOOP, 15000);
                         break;
                     case EVENT_WING_FLAP:
-						me->CastSpell(me, SPELL_WING_FLAP, false);
+                        me->CastSpell(me, SPELL_WING_FLAP, false);
                         events.ScheduleEvent(EVENT_WING_FLAP, 13000);
                         break;
                     case EVENT_PIERCE_ARMOR:
@@ -180,28 +180,28 @@ class boss_kirtonos_the_herald : public CreatureScript
                         events.ScheduleEvent(EVENT_SHADOW_BOLT_VOLLEY, 10000);
                         break;
                     case EVENT_CURSE_OF_TONGUES:
-						me->CastSpell(me, SPELL_CURSE_OF_TONGUES, false);
+                        me->CastSpell(me, SPELL_CURSE_OF_TONGUES, false);
                         events.ScheduleEvent(EVENT_CURSE_OF_TONGUES, 20000);
                         break;
                     case EVENT_DOMINATE_MIND:
-						if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 20.0f, true))
-							me->CastSpell(target, SPELL_DOMINATE_MIND, false);
+                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 20.0f, true))
+                            me->CastSpell(target, SPELL_DOMINATE_MIND, false);
                         events.ScheduleEvent(EVENT_DOMINATE_MIND, urand(44000, 48000));
                         break;
                     case EVENT_KIRTONOS_TRANSFORM:
-						if (me->HealthBelowPct(50))
-						{
-							events.Reset();
-							events.ScheduleEvent(EVENT_SWOOP, 4000);
-							events.ScheduleEvent(EVENT_WING_FLAP, 7000);
-							events.ScheduleEvent(EVENT_PIERCE_ARMOR, 11000);
-							events.ScheduleEvent(EVENT_DISARM, 15000);
+                        if (me->HealthBelowPct(50))
+                        {
+                            events.Reset();
+                            events.ScheduleEvent(EVENT_SWOOP, 4000);
+                            events.ScheduleEvent(EVENT_WING_FLAP, 7000);
+                            events.ScheduleEvent(EVENT_PIERCE_ARMOR, 11000);
+                            events.ScheduleEvent(EVENT_DISARM, 15000);
                             me->RemoveAura(SPELL_KIRTONOS_TRANSFORM);
                             me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 0, uint32(0));
-							break;
+                            break;
                         }
-						
-						events.ScheduleEvent(EVENT_KIRTONOS_TRANSFORM, 2000);
+                        
+                        events.ScheduleEvent(EVENT_KIRTONOS_TRANSFORM, 2000);
                         break;
                 }
 

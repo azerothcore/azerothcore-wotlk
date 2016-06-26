@@ -8,25 +8,25 @@ REWRITTEN BY XINEF
 
 enum Enums
 {
-    SAY_ENTER					= 0,
-    SAY_AGGRO					= 1,
-    SAY_BANISH					= 2,
-    SAY_SLAY					= 3,
-    SAY_DEATH					= 4,
+    SAY_ENTER                   = 0,
+    SAY_AGGRO                   = 1,
+    SAY_BANISH                  = 2,
+    SAY_SLAY                    = 3,
+    SAY_DEATH                   = 4,
 
-    SPELL_HASTEN				= 31458,
-    SPELL_MORTAL_WOUND			= 31464,
-    SPELL_WING_BUFFET			= 31475,
-    SPELL_REFLECT				= 38592,
-	SPELL_BANISH_DRAGON_HELPER	= 31550
+    SPELL_HASTEN                = 31458,
+    SPELL_MORTAL_WOUND          = 31464,
+    SPELL_WING_BUFFET           = 31475,
+    SPELL_REFLECT               = 38592,
+    SPELL_BANISH_DRAGON_HELPER  = 31550
 };
 
 enum Events
 {
-    EVENT_HASTEN				= 1,
-    EVENT_MORTAL_WOUND			= 2,
-    EVENT_WING_BUFFET			= 3,
-    EVENT_SPELL_REFLECTION		= 4
+    EVENT_HASTEN                = 1,
+    EVENT_MORTAL_WOUND          = 2,
+    EVENT_WING_BUFFET           = 3,
+    EVENT_SPELL_REFLECTION      = 4
 };
 
 class boss_temporus : public CreatureScript
@@ -38,24 +38,24 @@ public:
     {
         boss_temporusAI(Creature* creature) : ScriptedAI(creature) { }
 
-		EventMap events;
+        EventMap events;
 
-		void OwnTalk(uint32 id)
-		{
-			if (me->GetEntry() == NPC_TEMPORUS)
-				Talk(id);
-		}
+        void OwnTalk(uint32 id)
+        {
+            if (me->GetEntry() == NPC_TEMPORUS)
+                Talk(id);
+        }
 
         void Reset()
-		{
-			events.Reset();
-		}
+        {
+            events.Reset();
+        }
 
-		void InitializeAI()
-		{
-			OwnTalk(SAY_ENTER);
-			ScriptedAI::InitializeAI();
-		}
+        void InitializeAI()
+        {
+            OwnTalk(SAY_ENTER);
+            ScriptedAI::InitializeAI();
+        }
 
         void EnterCombat(Unit* /*who*/)
         {
@@ -70,15 +70,15 @@ public:
 
         void KilledUnit(Unit* victim)
         {
-			if (victim->GetTypeId() == TYPEID_PLAYER)
-				OwnTalk(SAY_SLAY);
+            if (victim->GetTypeId() == TYPEID_PLAYER)
+                OwnTalk(SAY_SLAY);
         }
 
         void JustDied(Unit* /*killer*/)
         {
             OwnTalk(SAY_DEATH);
             if (InstanceScript* instance = me->GetInstanceScript())
-				instance->SetData(TYPE_TEMPORUS, DONE);
+                instance->SetData(TYPE_TEMPORUS, DONE);
         }
 
         void MoveInLineOfSight(Unit* who)
@@ -88,8 +88,8 @@ public:
                 if (me->IsWithinDistInMap(who, 20.0f))
                 {
                     OwnTalk(SAY_BANISH);
-					me->CastSpell(me, SPELL_BANISH_DRAGON_HELPER, true);
-					return;
+                    me->CastSpell(me, SPELL_BANISH_DRAGON_HELPER, true);
+                    return;
                 }
             }
 
@@ -108,11 +108,11 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_HASTEN:
-					me->CastSpell(me, SPELL_HASTEN, false);
+                    me->CastSpell(me, SPELL_HASTEN, false);
                     events.ScheduleEvent(EVENT_HASTEN, 20000);
                     break;
                 case EVENT_MORTAL_WOUND:
-					me->CastSpell(me->GetVictim(), SPELL_MORTAL_WOUND, false);
+                    me->CastSpell(me->GetVictim(), SPELL_MORTAL_WOUND, false);
                     events.ScheduleEvent(EVENT_MORTAL_WOUND, 10000);
                     break;
                 case EVENT_WING_BUFFET:
@@ -120,7 +120,7 @@ public:
                     events.ScheduleEvent(EVENT_WING_BUFFET, 20000);
                     break;
                 case EVENT_SPELL_REFLECTION:
-					me->CastSpell(me, SPELL_REFLECT, false);
+                    me->CastSpell(me, SPELL_REFLECT, false);
                     events.ScheduleEvent(EVENT_SPELL_REFLECTION, 30000);
                     break;
             }

@@ -8,11 +8,11 @@ REWRITTEN BY XINEF
 enum DataTypes
 {
     // Encounter States/Boss GUIDs
-    DATA_ZEREKETH								= 0,
-    DATA_DALLIAH								= 1,
-    DATA_SOCCOTHRATES							= 2,
-    DATA_WARDEN_MELLICHAR						= 3,
-	MAX_ENCOUTER								= 4,
+    DATA_ZEREKETH                               = 0,
+    DATA_DALLIAH                                = 1,
+    DATA_SOCCOTHRATES                           = 2,
+    DATA_WARDEN_MELLICHAR                       = 3,
+    MAX_ENCOUTER                                = 4,
 
     // Additional Data
     DATA_WARDEN_1                               = 5, // used by SmartAI
@@ -28,7 +28,7 @@ enum CreatureIds
     NPC_DALLIAH                                 = 20885,
     NPC_SOCCOTHRATES                            = 20886,
     NPC_MELLICHAR                               = 20904,
-	NPC_HARBINGER_SKYRISS						= 20912,
+    NPC_HARBINGER_SKYRISS                       = 20912,
     NPC_ALPHA_POD_TARGET                        = 21436
 };
 
@@ -46,8 +46,8 @@ enum GameObjectIds
 
 enum SpellIds
 {
-	SPELL_TELEPORT_VISUAL					= 35517,
-	SPELL_SOUL_STEAL						= 36782
+    SPELL_TELEPORT_VISUAL                   = 35517,
+    SPELL_SOUL_STEAL                        = 36782
 };
 
 #endif // ARCATRAZ_H

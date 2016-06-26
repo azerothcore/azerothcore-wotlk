@@ -829,7 +829,7 @@ class ObjectMgr
         void LoadQuests();
         void LoadQuestStartersAndEnders()
         {
-			sLog->outString("Loading GO Start Quest Data...");
+            sLog->outString("Loading GO Start Quest Data...");
             LoadGameobjectQuestStarters();
             sLog->outString("Loading GO End Quest Data...");
             LoadGameobjectQuestEnders();
@@ -889,7 +889,7 @@ class ObjectMgr
 
         void LoadSpellScriptNames();
         void ValidateSpellScripts();
-		void InitializeSpellInfoPrecomputedData();
+        void InitializeSpellInfoPrecomputedData();
 
         bool LoadTrinityStrings(char const* table, int32 min_value, int32 max_value);
         bool LoadTrinityStrings() { return LoadTrinityStrings("trinity_string", MIN_TRINITY_STRING_ID, MAX_TRINITY_STRING_ID); }
@@ -1003,22 +1003,22 @@ class ObjectMgr
 
         CellObjectGuids const& GetCellObjectGuids(uint16 mapid, uint8 spawnMode, uint32 cell_id)
         {
-			MapObjectGuids::const_iterator itr1 = _mapObjectGuidsStore.find(MAKE_PAIR32(mapid, spawnMode));
-			if (itr1 != _mapObjectGuidsStore.end())
-			{
-				CellObjectGuidsMap::const_iterator itr2 = itr1->second.find(cell_id);
-				if (itr2 != itr1->second.end())
-					return itr2->second;
-			}
+            MapObjectGuids::const_iterator itr1 = _mapObjectGuidsStore.find(MAKE_PAIR32(mapid, spawnMode));
+            if (itr1 != _mapObjectGuidsStore.end())
+            {
+                CellObjectGuidsMap::const_iterator itr2 = itr1->second.find(cell_id);
+                if (itr2 != itr1->second.end())
+                    return itr2->second;
+            }
             return _emptyCellObjectGuids;
         }
 
         CellObjectGuidsMap const& GetMapObjectGuids(uint16 mapid, uint8 spawnMode)
         {
-			MapObjectGuids::const_iterator itr1 = _mapObjectGuidsStore.find(MAKE_PAIR32(mapid, spawnMode));
-			if (itr1 != _mapObjectGuidsStore.end())
-				return itr1->second;
-			return _emptyCellObjectGuidsMap;
+            MapObjectGuids::const_iterator itr1 = _mapObjectGuidsStore.find(MAKE_PAIR32(mapid, spawnMode));
+            if (itr1 != _mapObjectGuidsStore.end())
+                return itr1->second;
+            return _emptyCellObjectGuidsMap;
         }
 
         /**
@@ -1094,7 +1094,7 @@ class ObjectMgr
         static uint8 CheckPlayerName(std::string const& name, bool create = false);
         static PetNameInvalidReason CheckPetName(std::string const& name);
         static bool IsValidCharterName(std::string const& name);
-		static bool IsValidChannelName(std::string const& name);
+        static bool IsValidChannelName(std::string const& name);
 
         static bool CheckDeclinedNames(std::wstring w_ownname, DeclinedName const& names);
 
@@ -1285,8 +1285,8 @@ class ObjectMgr
         ItemSetNameContainer _itemSetNameStore;
 
         MapObjectGuids _mapObjectGuidsStore;
-		CellObjectGuidsMap _emptyCellObjectGuidsMap;
-		CellObjectGuids _emptyCellObjectGuids;
+        CellObjectGuidsMap _emptyCellObjectGuidsMap;
+        CellObjectGuids _emptyCellObjectGuids;
         CreatureDataContainer _creatureDataStore;
         CreatureTemplateContainer _creatureTemplateStore;
         std::vector<CreatureTemplate*> _creatureTemplateStoreFast; // pussywizard

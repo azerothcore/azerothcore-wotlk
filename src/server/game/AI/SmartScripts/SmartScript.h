@@ -152,11 +152,11 @@ class SmartScript
             {
                 if (reset == 0)
                     itr->second += value;
-				else
-					itr->second = value;
+                else
+                    itr->second = value;
             }
-			else
-				mCounterList.insert(std::make_pair(id, value));
+            else
+                mCounterList.insert(std::make_pair(id, value));
 
             ProcessEventsFor(SMART_EVENT_COUNTER_SET, NULL, id);
         }
@@ -232,42 +232,42 @@ class SmartScript
         typedef UNORDERED_MAP<uint32, uint32> CounterMap;
         CounterMap mCounterList;
 
-		// Xinef: Fix Combat Movement
-		void SetActualCombatDist(uint32 dist) { mActualCombatDist = dist; }
-		void RestoreMaxCombatDist() { mActualCombatDist = mMaxCombatDist; }
-		uint32 GetActualCombatDist() const { return mActualCombatDist; }
-		uint32 GetMaxCombatDist() const { return mMaxCombatDist; }
+        // Xinef: Fix Combat Movement
+        void SetActualCombatDist(uint32 dist) { mActualCombatDist = dist; }
+        void RestoreMaxCombatDist() { mActualCombatDist = mMaxCombatDist; }
+        uint32 GetActualCombatDist() const { return mActualCombatDist; }
+        uint32 GetMaxCombatDist() const { return mMaxCombatDist; }
 
-		// Xinef: SmartCasterAI, replace above
-		void SetCasterActualDist(float dist) { smartCasterActualDist = dist; }
-		void RestoreCasterMaxDist() { smartCasterActualDist = smartCasterMaxDist; }
-		Powers GetCasterPowerType() const { return smartCasterPowerType; }
-		float GetCasterActualDist() const { return smartCasterActualDist; }
-		float GetCasterMaxDist() const { return smartCasterMaxDist; }
+        // Xinef: SmartCasterAI, replace above
+        void SetCasterActualDist(float dist) { smartCasterActualDist = dist; }
+        void RestoreCasterMaxDist() { smartCasterActualDist = smartCasterMaxDist; }
+        Powers GetCasterPowerType() const { return smartCasterPowerType; }
+        float GetCasterActualDist() const { return smartCasterActualDist; }
+        float GetCasterMaxDist() const { return smartCasterMaxDist; }
 
-		bool AllowPhaseReset() const { return _allowPhaseReset; }
-		void SetPhaseReset(bool allow) { _allowPhaseReset = allow; }
+        bool AllowPhaseReset() const { return _allowPhaseReset; }
+        void SetPhaseReset(bool allow) { _allowPhaseReset = allow; }
 
     private:
         void IncPhase(uint32 p)
-		{
-			// Xinef: protect phase from overflowing
-			mEventPhase = std::min<uint32>(SMART_EVENT_PHASE_12, mEventPhase + p);
-		}
+        {
+            // Xinef: protect phase from overflowing
+            mEventPhase = std::min<uint32>(SMART_EVENT_PHASE_12, mEventPhase + p);
+        }
 
         void DecPhase(uint32 p) 
-		{
-			if (p >= mEventPhase)
-				mEventPhase = 0;
-			else
-				mEventPhase -= p;
-		}
+        {
+            if (p >= mEventPhase)
+                mEventPhase = 0;
+            else
+                mEventPhase -= p;
+        }
         bool IsInPhase(uint32 p) const 
-		{ 
-			if (mEventPhase == 0)
-				return false;
-			return (1 << (mEventPhase - 1)) & p;
-		}
+        { 
+            if (mEventPhase == 0)
+                return false;
+            return (1 << (mEventPhase - 1)) & p;
+        }
         void SetPhase(uint32 p = 0) { mEventPhase = p; }
 
         SmartAIEventList mEvents;
@@ -292,17 +292,17 @@ class SmartScript
         uint32 mTalkerEntry;
         bool mUseTextTimer;
 
-		// Xinef: Fix Combat Movement
-		uint32 mActualCombatDist;
-		uint32 mMaxCombatDist;
+        // Xinef: Fix Combat Movement
+        uint32 mActualCombatDist;
+        uint32 mMaxCombatDist;
 
-		// Xinef: SmartCasterAI, replace above in future
-		uint32 smartCasterActualDist;
-		uint32 smartCasterMaxDist;
-		Powers smartCasterPowerType;
+        // Xinef: SmartCasterAI, replace above in future
+        uint32 smartCasterActualDist;
+        uint32 smartCasterMaxDist;
+        Powers smartCasterPowerType;
 
-		// Xinef: misc
-		bool _allowPhaseReset;
+        // Xinef: misc
+        bool _allowPhaseReset;
 
         SMARTAI_TEMPLATE mTemplate;
         void InstallEvents();

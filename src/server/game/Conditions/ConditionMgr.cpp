@@ -91,11 +91,11 @@ bool Condition::Meets(ConditionSourceInfo& sourceInfo)
         case CONDITION_TEAM:
         {
             if (Player* player = object->ToPlayer())
-			{
-				// Xinef: DB Data compatibility...
-				uint32 teamOld = player->GetTeamId() == TEAM_ALLIANCE ? ALLIANCE : HORDE;
+            {
+                // Xinef: DB Data compatibility...
+                uint32 teamOld = player->GetTeamId() == TEAM_ALLIANCE ? ALLIANCE : HORDE;
                 condMeets = teamOld == ConditionValue1;
-			}
+            }
             break;
         }
         case CONDITION_CLASS:
@@ -155,16 +155,16 @@ bool Condition::Meets(ConditionSourceInfo& sourceInfo)
             }
             break;
         }
-		case CONDITION_QUEST_SATISFY_EXCLUSIVE:
-		{
+        case CONDITION_QUEST_SATISFY_EXCLUSIVE:
+        {
             if (Player* player = object->ToPlayer())
             {
-				// Xinef: cannot be null, checked at loading
-				const Quest* quest = sObjectMgr->GetQuestTemplate(ConditionValue1);
-				condMeets = !player->IsQuestRewarded(ConditionValue1) && player->SatisfyQuestExclusiveGroup(quest, false);
+                // Xinef: cannot be null, checked at loading
+                const Quest* quest = sObjectMgr->GetQuestTemplate(ConditionValue1);
+                condMeets = !player->IsQuestRewarded(ConditionValue1) && player->SatisfyQuestExclusiveGroup(quest, false);
             }
             break;
-		}
+        }
         case CONDITION_ACTIVE_EVENT:
             condMeets = sGameEventMgr->IsActiveEvent(ConditionValue1);
             break;
@@ -227,9 +227,9 @@ bool Condition::Meets(ConditionSourceInfo& sourceInfo)
         }
         case CONDITION_OBJECT_ENTRY_GUID:
         {
-			if (ConditionValue3 == 1 && object->ToUnit()) // pussywizard: if == 1, ignore not attackable/selectable targets
-				if (object->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE))
-					break;
+            if (ConditionValue3 == 1 && object->ToUnit()) // pussywizard: if == 1, ignore not attackable/selectable targets
+                if (object->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE))
+                    break;
 
             if (uint32(object->GetTypeId()) == ConditionValue1)
             {
@@ -372,7 +372,7 @@ bool Condition::Meets(ConditionSourceInfo& sourceInfo)
         case CONDITION_HAS_AURA_TYPE:
         {
             if (Unit* unit = object->ToUnit())
-				condMeets = unit->HasAuraType(AuraType(ConditionValue1));
+                condMeets = unit->HasAuraType(AuraType(ConditionValue1));
             break;
         }
         default:
@@ -492,7 +492,7 @@ uint32 Condition::GetSearcherTypeMaskForCondition()
                 default:
                     break;
             }
-			break;
+            break;
         case CONDITION_TYPE_MASK:
             if (ConditionValue1 & TYPEMASK_UNIT)
                 mask |= GRID_MAP_TYPE_MASK_CREATURE | GRID_MAP_TYPE_MASK_PLAYER;
@@ -535,7 +535,7 @@ uint32 Condition::GetSearcherTypeMaskForCondition()
             break;
         case CONDITION_GENDER:
             mask |= GRID_MAP_TYPE_MASK_PLAYER;
-			break;
+            break;
         case CONDITION_UNIT_STATE:
             mask |= GRID_MAP_TYPE_MASK_CREATURE | GRID_MAP_TYPE_MASK_PLAYER;
             break;
@@ -563,8 +563,8 @@ uint32 Condition::GetMaxAvailableConditionTargets()
     // returns number of targets which are available for given source type
     switch(SourceType)
     {
-		case CONDITION_SOURCE_TYPE_SMART_EVENT:
-			return 3;
+        case CONDITION_SOURCE_TYPE_SMART_EVENT:
+            return 3;
         case CONDITION_SOURCE_TYPE_SPELL:
         case CONDITION_SOURCE_TYPE_SPELL_IMPLICIT_TARGET:
         case CONDITION_SOURCE_TYPE_CREATURE_TEMPLATE_VEHICLE:
@@ -1468,7 +1468,7 @@ bool ConditionMgr::isSourceTypeValid(Condition* cond)
                     case TARGET_SELECT_CATEGORY_NEARBY:
                     case TARGET_SELECT_CATEGORY_CONE:
                     case TARGET_SELECT_CATEGORY_AREA:
-					case TARGET_SELECT_CATEGORY_TRAJ:
+                    case TARGET_SELECT_CATEGORY_TRAJ:
                         continue;
                     default:
                         break;
@@ -1479,15 +1479,15 @@ bool ConditionMgr::isSourceTypeValid(Condition* cond)
                     case TARGET_SELECT_CATEGORY_NEARBY:
                     case TARGET_SELECT_CATEGORY_CONE:
                     case TARGET_SELECT_CATEGORY_AREA:
-					case TARGET_SELECT_CATEGORY_TRAJ:
+                    case TARGET_SELECT_CATEGORY_TRAJ:
                         continue;
                     default:
                         break;
                 }
 
-				// Xinef: chain targets are treated as area targets! Apply conditions!
-				if (spellInfo->Effects[i].ChainTarget > 1)
-					continue;
+                // Xinef: chain targets are treated as area targets! Apply conditions!
+                if (spellInfo->Effects[i].ChainTarget > 1)
+                    continue;
 
                 sLog->outErrorDb("SourceEntry %u SourceGroup %u in `condition` table - spell %u does not have implicit targets of types: _AREA_, _CONE_, _NEARBY_ for effect %u, SourceGroup needs correction, ignoring.", cond->SourceEntry, origGroup, cond->SourceEntry, uint32(i));
                 cond->SourceGroup &= ~(1<<i);
@@ -1720,7 +1720,7 @@ bool ConditionMgr::isConditionTypeValid(Condition* cond)
         case CONDITION_QUESTTAKEN:
         case CONDITION_QUEST_NONE:
         case CONDITION_QUEST_COMPLETE:
-		case CONDITION_QUEST_SATISFY_EXCLUSIVE:
+        case CONDITION_QUEST_SATISFY_EXCLUSIVE:
         {
             if (!sObjectMgr->GetQuestTemplate(cond->ConditionValue1))
             {
@@ -1944,7 +1944,7 @@ bool ConditionMgr::isConditionTypeValid(Condition* cond)
                     return false;
             }
             break;
-		}
+        }
         case CONDITION_TYPE_MASK:
         {
             if (!cond->ConditionValue1 || (cond->ConditionValue1 & ~(TYPEMASK_UNIT | TYPEMASK_PLAYER | TYPEMASK_GAMEOBJECT | TYPEMASK_CORPSE)))
@@ -2124,9 +2124,9 @@ bool ConditionMgr::isConditionTypeValid(Condition* cond)
             break;
         }
         case CONDITION_IN_WATER:
-		{
+        {
             break;
-		}
+        }
         case CONDITION_HAS_AURA_TYPE:
         {
             if (cond->ConditionValue1 == SPELL_AURA_NONE || cond->ConditionValue1 >= TOTAL_AURAS)

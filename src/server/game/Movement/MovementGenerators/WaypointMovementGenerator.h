@@ -113,7 +113,7 @@ class FlightPathMovementGenerator : public MovementGeneratorMedium< Player, Flig
             _endGridY = 0.0f;
             _endMapId = 0;
             _preloadTargetNode = 0;
-			_mapSwitch = false;
+            _mapSwitch = false;
         }
         void LoadPath(Player* player);
         void DoInitialize(Player*);
@@ -137,7 +137,7 @@ class FlightPathMovementGenerator : public MovementGeneratorMedium< Player, Flig
         float _endGridY;                //! Y coord of last node location
         uint32 _endMapId;               //! map Id of last node location
         uint32 _preloadTargetNode;      //! node index where preloading starts
-		bool _mapSwitch;
+        bool _mapSwitch;
 
         std::deque<uint32> _pointsForPathSwitch;    //! node indexes and costs where TaxiPath changes
 };

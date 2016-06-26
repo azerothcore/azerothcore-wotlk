@@ -47,7 +47,7 @@ namespace Movement
             Result_Arrived      = 0x02,
             Result_NextCycle    = 0x04,
             Result_NextSegment  = 0x08,
-			Result_JustArrived	= 0x10,
+            Result_JustArrived  = 0x10,
         };
         friend class PacketBuilder;
     protected:
@@ -81,8 +81,8 @@ namespace Movement
         int32 segment_time_elapsed() const { return next_timestamp() - time_passed; }
 
     public:
-        int32 timeElapsed() const { return Duration() - time_passed; }	// xinef: moved to public for waypoint movegen
-        int32 timePassed() const { return time_passed; }				// xinef: moved to public for waypoint movegen
+        int32 timeElapsed() const { return Duration() - time_passed; }  // xinef: moved to public for waypoint movegen
+        int32 timePassed() const { return time_passed; }                // xinef: moved to public for waypoint movegen
         int32 Duration() const { return spline.length(); }
         MySpline const& _Spline() const { return spline; }
         int32 _currentSplineIdx() const { return point_Idx; }

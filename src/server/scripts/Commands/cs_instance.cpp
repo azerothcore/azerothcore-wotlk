@@ -76,14 +76,14 @@ public:
         uint32 counter = 0;
         for (uint8 i = 0; i < MAX_DIFFICULTY; ++i)
         {
-			BoundInstancesMap const& m_boundInstances = sInstanceSaveMgr->PlayerGetBoundInstances(player->GetGUIDLow(), Difficulty(i));
+            BoundInstancesMap const& m_boundInstances = sInstanceSaveMgr->PlayerGetBoundInstances(player->GetGUIDLow(), Difficulty(i));
             for (BoundInstancesMap::const_iterator itr = m_boundInstances.begin(); itr != m_boundInstances.end(); ++itr)
             {
                 InstanceSave* save = itr->second.save;
-				uint32 resetTime = itr->second.extended ? save->GetExtendedResetTime() : save->GetResetTime();
-				uint32 ttr = (resetTime >= time(NULL) ? resetTime - time(NULL) : 0);
+                uint32 resetTime = itr->second.extended ? save->GetExtendedResetTime() : save->GetResetTime();
+                uint32 ttr = (resetTime >= time(NULL) ? resetTime - time(NULL) : 0);
                 std::string timeleft = GetTimeString(ttr);
-				handler->PSendSysMessage("map: %d, inst: %d, perm: %s, diff: %d, canReset: %s, TTR: %s%s", itr->first, save->GetInstanceId(), itr->second.perm ? "yes" : "no",  save->GetDifficulty(), save->CanReset() ? "yes" : "no", timeleft.c_str(), (itr->second.extended ? " (extended)" : ""));
+                handler->PSendSysMessage("map: %d, inst: %d, perm: %s, diff: %d, canReset: %s, TTR: %s%s", itr->first, save->GetInstanceId(), itr->second.perm ? "yes" : "no",  save->GetDifficulty(), save->CanReset() ? "yes" : "no", timeleft.c_str(), (itr->second.extended ? " (extended)" : ""));
                 counter++;
             }
         }
@@ -124,12 +124,12 @@ public:
                 InstanceSave* save = itr->second.save;
                 if (itr->first != player->GetMapId() && (!MapId || MapId == itr->first) && (diff == -1 || diff == save->GetDifficulty()))
                 {
-					uint32 resetTime = itr->second.extended ? save->GetExtendedResetTime() : save->GetResetTime();
-					uint32 ttr = (resetTime >= time(NULL) ? resetTime - time(NULL) : 0);
+                    uint32 resetTime = itr->second.extended ? save->GetExtendedResetTime() : save->GetResetTime();
+                    uint32 ttr = (resetTime >= time(NULL) ? resetTime - time(NULL) : 0);
                     std::string timeleft = GetTimeString(ttr);
                     handler->PSendSysMessage("unbinding map: %d, inst: %d, perm: %s, diff: %d, canReset: %s, TTR: %s%s", itr->first, save->GetInstanceId(), itr->second.perm ? "yes" : "no", save->GetDifficulty(), save->CanReset() ? "yes" : "no", timeleft.c_str(), (itr->second.extended ? " (extended)" : ""));
-					sInstanceSaveMgr->PlayerUnbindInstance(player->GetGUIDLow(), itr->first, Difficulty(i), true, player);
-					itr = m_boundInstances.begin();
+                    sInstanceSaveMgr->PlayerUnbindInstance(player->GetGUIDLow(), itr->first, Difficulty(i), true, player);
+                    itr = m_boundInstances.begin();
                     counter++;
                 }
                 else
@@ -143,14 +143,14 @@ public:
 
     static bool HandleInstanceStatsCommand(ChatHandler* handler, char const* /*args*/)
     {
-		uint32 dungeon = 0, battleground = 0, arena = 0, spectators = 0;
-		sMapMgr->GetNumInstances(dungeon, battleground, arena);
+        uint32 dungeon = 0, battleground = 0, arena = 0, spectators = 0;
+        sMapMgr->GetNumInstances(dungeon, battleground, arena);
         handler->PSendSysMessage("instances loaded: dungeons (%d), battlegrounds (%d), arenas (%d)", dungeon, battleground, arena);
-		dungeon = 0; battleground = 0; arena = 0; spectators = 0;
-		sMapMgr->GetNumPlayersInInstances(dungeon, battleground, arena, spectators);
+        dungeon = 0; battleground = 0; arena = 0; spectators = 0;
+        sMapMgr->GetNumPlayersInInstances(dungeon, battleground, arena, spectators);
         handler->PSendSysMessage("players in instances: dungeons (%d), battlegrounds (%d), arenas (%d + %d spect)", dungeon, battleground, arena, spectators);
 
-		handler->SetSentErrorMessage(true);
+        handler->SetSentErrorMessage(true);
         return false;
     }
 

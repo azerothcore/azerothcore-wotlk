@@ -449,8 +449,8 @@ public:
                 GUID_LOPART(aura->GetCasterGUID()));
         }
 
-		if (!args || std::string(args) != "all")
-			return true;
+        if (!args || std::string(args) != "all")
+            return true;
 
         for (uint16 i = 0; i < TOTAL_AURAS; ++i)
         {

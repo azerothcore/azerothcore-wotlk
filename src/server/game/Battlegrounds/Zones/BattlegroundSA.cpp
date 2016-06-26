@@ -64,7 +64,7 @@ BattlegroundSA::~BattlegroundSA()
 
 void BattlegroundSA::Init()
 {
-	Battleground::Init();
+    Battleground::Init();
 
     TotalTime = 0;
     Attackers = ((urand(0, 1)) ? TEAM_ALLIANCE : TEAM_HORDE);
@@ -74,7 +74,7 @@ void BattlegroundSA::Init()
     _notEvenAScratch[TEAM_ALLIANCE] = true;
     _notEvenAScratch[TEAM_HORDE] = true;
     Status = BG_SA_WARMUP;
-	_relicClicked = false;
+    _relicClicked = false;
 }
 
 bool BattlegroundSA::SetupBattleground()
@@ -159,11 +159,11 @@ bool BattlegroundSA::ResetObjs()
     {
         SpawnBGObject(i, RESPAWN_IMMEDIATELY);
         if (GameObject* go = GetBGObject(i))
-		{
-			go->setActive(true);
-			go->SetUInt32Value(GAMEOBJECT_FACTION, defF);
-			go->SetDestructibleBuildingModifyState(false);
-		}
+        {
+            go->setActive(true);
+            go->SetUInt32Value(GAMEOBJECT_FACTION, defF);
+            go->SetDestructibleBuildingModifyState(false);
+        }
     }
 
     GetBGObject(BG_SA_TITAN_RELIC)->SetUInt32Value(GAMEOBJECT_FACTION, atF);
@@ -316,7 +316,7 @@ void BattlegroundSA::PostUpdateImpl(uint32 diff)
                 SendMessageToAll(LANG_BG_SA_ROUND_TWO_ONE_MINUTE, CHAT_MSG_BG_SYSTEM_NEUTRAL);
             }
         }
-		else
+        else
         {
             UpdateWaitTimer -= diff;
             return;
@@ -354,7 +354,7 @@ void BattlegroundSA::PostUpdateImpl(uint32 diff)
             DemolisherStartState(false);
             Status = BG_SA_ROUND_TWO;
             StartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, (Attackers == TEAM_ALLIANCE)?23748:21702);
-			
+            
             // status was set to STATUS_WAIT_JOIN manually for Preparation, set it back now
             SetStatus(STATUS_IN_PROGRESS);
             for (BattlegroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
@@ -377,27 +377,27 @@ void BattlegroundSA::PostUpdateImpl(uint32 diff)
         {
             if (TotalTime >= BG_SA_ROUNDLENGTH || _relicClicked)
             {
-				if (_relicClicked)
-				{
-					RoundScores[0].winner = Attackers;
-					RoundScores[0].time = TotalTime;
-					//Achievement Storm the Beach (1310)
-					for (BattlegroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
-						if (itr->second->GetTeamId() == Attackers)
-							itr->second->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET, 65246);
-				}
-				else
-				{
-					// cast this before Attackers variable is switched
-					// cast this spell only upon timer end, no other ability for defenders to win :)
-					for (BattlegroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
-						itr->second->CastSpell(itr->second, SPELL_SA_END_OF_ROUND, true);
+                if (_relicClicked)
+                {
+                    RoundScores[0].winner = Attackers;
+                    RoundScores[0].time = TotalTime;
+                    //Achievement Storm the Beach (1310)
+                    for (BattlegroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
+                        if (itr->second->GetTeamId() == Attackers)
+                            itr->second->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET, 65246);
+                }
+                else
+                {
+                    // cast this before Attackers variable is switched
+                    // cast this spell only upon timer end, no other ability for defenders to win :)
+                    for (BattlegroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
+                        itr->second->CastSpell(itr->second, SPELL_SA_END_OF_ROUND, true);
 
-					RoundScores[0].winner = Attackers;
-					RoundScores[0].time = BG_SA_ROUNDLENGTH;
-				}
+                    RoundScores[0].winner = Attackers;
+                    RoundScores[0].time = BG_SA_ROUNDLENGTH;
+                }
 
-				_relicClicked = false;
+                _relicClicked = false;
                 Attackers = (Attackers == TEAM_ALLIANCE) ? TEAM_HORDE : TEAM_ALLIANCE;
                 Status = BG_SA_SECOND_WARMUP;
                 TotalTime = 0;
@@ -416,9 +416,9 @@ void BattlegroundSA::PostUpdateImpl(uint32 diff)
         {
             if (TotalTime >= EndRoundTimer)
             {
-				// cast this spell only upon timer end, no other ability for defenders to win :)
-				for (BattlegroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
-					itr->second->CastSpell(itr->second, SPELL_SA_END_OF_ROUND, true);
+                // cast this spell only upon timer end, no other ability for defenders to win :)
+                for (BattlegroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
+                    itr->second->CastSpell(itr->second, SPELL_SA_END_OF_ROUND, true);
 
                 RoundScores[1].time = BG_SA_ROUNDLENGTH;
                 RoundScores[1].winner = GetOtherTeamId(Attackers);
@@ -496,7 +496,7 @@ void BattlegroundSA::AddPlayer(Player* player)
 
     SendTransportInit(player);
     PlayerScores[player->GetGUID()] = sc;
-	TeleportToEntrancePosition(player);
+    TeleportToEntrancePosition(player);
 }
 
 void BattlegroundSA::RemovePlayer(Player* /*player*/)
@@ -540,49 +540,49 @@ void BattlegroundSA::TeleportPlayers()
                 player->SpawnCorpseBones();
             }
 
-			if (Status == BG_SA_SECOND_WARMUP)
-			{
-				player->CastSpell(player, SPELL_PREPARATION, true);
-				player->GetMotionMaster()->MovementExpired();
-			}
+            if (Status == BG_SA_SECOND_WARMUP)
+            {
+                player->CastSpell(player, SPELL_PREPARATION, true);
+                player->GetMotionMaster()->MovementExpired();
+            }
 
             player->ResetAllPowers();
             player->CombatStopWithPets(true);
 
-			TeleportToEntrancePosition(player);
+            TeleportToEntrancePosition(player);
 
-			// xinef: one more time, just to be sure
-			if (Status == BG_SA_SECOND_WARMUP)
-				player->GetMotionMaster()->Clear(false);
+            // xinef: one more time, just to be sure
+            if (Status == BG_SA_SECOND_WARMUP)
+                player->GetMotionMaster()->Clear(false);
         }
     }
 }
 
 void BattlegroundSA::TeleportToEntrancePosition(Player* player)
 {
-	if (player->GetTeamId() != Attackers)
-	{
-		player->TeleportTo(607, 1209.7f, -65.16f, 70.1f, 0.0f, 0);
-	}
-	else
-	{
-		if (!ShipsStarted)
-		{
-			player->CastSpell(player, 12438, true);//Without this player falls before boat loads...
-			if (urand(0, 1))
-				player->TeleportTo(607, 2682.936f, -830.368f, 15.0f, 2.895f, 0);
-			else
-				player->TeleportTo(607, 2577.003f, 980.261f, 15.0f, 0.807f, 0);
-		}
-		else
-			player->TeleportTo(607, 1600.381f, -106.263f, 8.8745f, 3.78f, 0);
-	}
+    if (player->GetTeamId() != Attackers)
+    {
+        player->TeleportTo(607, 1209.7f, -65.16f, 70.1f, 0.0f, 0);
+    }
+    else
+    {
+        if (!ShipsStarted)
+        {
+            player->CastSpell(player, 12438, true);//Without this player falls before boat loads...
+            if (urand(0, 1))
+                player->TeleportTo(607, 2682.936f, -830.368f, 15.0f, 2.895f, 0);
+            else
+                player->TeleportTo(607, 2577.003f, 980.261f, 15.0f, 0.807f, 0);
+        }
+        else
+            player->TeleportTo(607, 1600.381f, -106.263f, 8.8745f, 3.78f, 0);
+    }
 }
 
 void BattlegroundSA::DefendersPortalTeleport(GameObject* portal, Player* plr)
 {
     if (plr->GetTeamId() == Attackers) 
-		return;
+        return;
 
     uint32 portal_num = 0;
     //get it via X
@@ -629,29 +629,29 @@ void BattlegroundSA::EventPlayerDamagedGO(Player* /*player*/, GameObject* go, ui
         else
             SendWarningToAll(LANG_BG_SA_WAS_DESTROYED, go->GetGOInfo()->name.c_str());
 
-		uint32 i = GetGateIDFromEntry(go->GetEntry());
-		switch (i)
-		{
-			case BG_SA_BLUE_GATE:
-			case BG_SA_GREEN_GATE:
-			{
-				GameObject* go = NULL;
-				if (go = GetBGObject(BG_SA_RED_GATE))
-					go->SetDestructibleBuildingModifyState(true);
-				if (go = GetBGObject(BG_SA_PURPLE_GATE))
-					go->SetDestructibleBuildingModifyState(true);
-				break;
-			}
-			case BG_SA_RED_GATE:
-			case BG_SA_PURPLE_GATE:
-				if (GameObject*  go = GetBGObject(BG_SA_YELLOW_GATE))
-					go->SetDestructibleBuildingModifyState(true);
-				break;
-			case BG_SA_YELLOW_GATE:
-				if (GameObject*  go = GetBGObject(BG_SA_ANCIENT_GATE))
-					go->SetDestructibleBuildingModifyState(true);
-				break;
-		}
+        uint32 i = GetGateIDFromEntry(go->GetEntry());
+        switch (i)
+        {
+            case BG_SA_BLUE_GATE:
+            case BG_SA_GREEN_GATE:
+            {
+                GameObject* go = NULL;
+                if (go = GetBGObject(BG_SA_RED_GATE))
+                    go->SetDestructibleBuildingModifyState(true);
+                if (go = GetBGObject(BG_SA_PURPLE_GATE))
+                    go->SetDestructibleBuildingModifyState(true);
+                break;
+            }
+            case BG_SA_RED_GATE:
+            case BG_SA_PURPLE_GATE:
+                if (GameObject*  go = GetBGObject(BG_SA_YELLOW_GATE))
+                    go->SetDestructibleBuildingModifyState(true);
+                break;
+            case BG_SA_YELLOW_GATE:
+                if (GameObject*  go = GetBGObject(BG_SA_ANCIENT_GATE))
+                    go->SetDestructibleBuildingModifyState(true);
+                break;
+        }
     }
 
     if (eventType == go->GetGOInfo()->building.damageEvent)
@@ -704,7 +704,7 @@ void BattlegroundSA::DemolisherStartState(bool start)
                 dem->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
         }
 
-	for (uint8 i = BG_SA_GUN_1; i <= BG_SA_GUN_10;i++)
+    for (uint8 i = BG_SA_GUN_1; i <= BG_SA_GUN_10;i++)
         if (Creature* gun = GetBGCreature(i))
         {
             if (start)
@@ -713,13 +713,13 @@ void BattlegroundSA::DemolisherStartState(bool start)
                 gun->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
         }
 
-	// xinef: enable first gates damaging at start
-	if (!start)
-	{    
+    // xinef: enable first gates damaging at start
+    if (!start)
+    {    
         if (GameObject* go = GetBGObject(BG_SA_GREEN_GATE))
-			go->SetDestructibleBuildingModifyState(true);
-		if (GameObject* go = GetBGObject(BG_SA_BLUE_GATE))
-			go->SetDestructibleBuildingModifyState(true);
+            go->SetDestructibleBuildingModifyState(true);
+        if (GameObject* go = GetBGObject(BG_SA_BLUE_GATE))
+            go->SetDestructibleBuildingModifyState(true);
     }
 }
 
@@ -758,17 +758,17 @@ void BattlegroundSA::DestroyGate(Player* player, GameObject* go)
                     break;
             }
 
-			UpdateObjectInteractionFlags();
+            UpdateObjectInteractionFlags();
 
             if (i < 5)
                 DelObject(i+9);
 
-			if (player)
-			{
-				UpdatePlayerScore(player, SCORE_DESTROYED_WALL, 1);
-				if (rewardHonor)
-					UpdatePlayerScore(player, SCORE_BONUS_HONOR, GetBonusHonorFromKill(1));
-			}
+            if (player)
+            {
+                UpdatePlayerScore(player, SCORE_DESTROYED_WALL, 1);
+                if (rewardHonor)
+                    UpdatePlayerScore(player, SCORE_BONUS_HONOR, GetBonusHonorFromKill(1));
+            }
         }
     }
 }
@@ -788,24 +788,24 @@ WorldSafeLocsEntry const* BattlegroundSA::GetClosestGraveyard(Player* player)
             continue;
 
         WorldSafeLocsEntry const* ret = sWorldSafeLocsStore.LookupEntry(BG_SA_GYEntries[i]);
-		
-		// if on beach
-		if (i == BG_SA_BEACH_GY)
-		{
-			if (x > 1400)
-				return ret;
-			continue;
-		}
+        
+        // if on beach
+        if (i == BG_SA_BEACH_GY)
+        {
+            if (x > 1400)
+                return ret;
+            continue;
+        }
 
-		float dist = sqrt(pow(ret->x - x, 2) * pow(ret->y - y, 2));
+        float dist = sqrt(pow(ret->x - x, 2) * pow(ret->y - y, 2));
         if (dist < mindist)
-		{
+        {
             mindist = dist;
-			closest = ret;
-		}
+            closest = ret;
+        }
     }
-	if (!closest && GraveyardStatus[BG_SA_BEACH_GY] == player->GetTeamId())
-		return sWorldSafeLocsStore.LookupEntry(BG_SA_GYEntries[BG_SA_BEACH_GY]);
+    if (!closest && GraveyardStatus[BG_SA_BEACH_GY] == player->GetTeamId())
+        return sWorldSafeLocsStore.LookupEntry(BG_SA_GYEntries[BG_SA_BEACH_GY]);
 
 
     return closest;
@@ -891,7 +891,7 @@ void BattlegroundSA::CaptureGraveyard(BG_SA_Graveyards i, Player *Source)
     if (GraveyardStatus[i] == Attackers || Source->GetTeamId() != Attackers)
         return;
 
-	GraveyardStatus[i] = Source->GetTeamId();
+    GraveyardStatus[i] = Source->GetTeamId();
     // Those who are waiting to resurrect at this node are taken to the closest own node's graveyard
     std::vector<uint64> ghost_list = m_ReviveQueue[BgCreatures[BG_SA_MAXNPC + i]];
     if (!ghost_list.empty())
@@ -909,8 +909,8 @@ void BattlegroundSA::CaptureGraveyard(BG_SA_Graveyards i, Player *Source)
             if (ClosestGrave)
                 player->TeleportTo(GetMapId(), ClosestGrave->x, ClosestGrave->y, ClosestGrave->z, player->GetOrientation());
         }
-		// xinef: clear resurrect queue for this creature
-		m_ReviveQueue[BgCreatures[BG_SA_MAXNPC + i]].clear();
+        // xinef: clear resurrect queue for this creature
+        m_ReviveQueue[BgCreatures[BG_SA_MAXNPC + i]].clear();
     }
 
     DelCreature(BG_SA_MAXNPC + i);
@@ -1017,7 +1017,7 @@ void BattlegroundSA::EventPlayerUsedGO(Player* Source, GameObject* object)
 
             if (Status == BG_SA_ROUND_ONE)
             {
-				_relicClicked = true;
+                _relicClicked = true;
             }
             else if (Status == BG_SA_ROUND_TWO)
             {
@@ -1123,14 +1123,14 @@ void BattlegroundSA::SendTransportsRemove(Player* player)
 
 bool BattlegroundSA::AllowDefenseOfTheAncients(Player* source)
 {
-	if (source->GetTeamId() == Attackers)
-		return false;
+    if (source->GetTeamId() == Attackers)
+        return false;
 
-	for (uint8 i = 0; i <= 5; i++)
-	{
+    for (uint8 i = 0; i <= 5; i++)
+    {
         if (GateStatus[i] == BG_SA_GATE_DESTROYED)
-			return false;
-	}
+            return false;
+    }
 
-	return true;
+    return true;
 }

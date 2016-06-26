@@ -7,23 +7,23 @@ REWRITTEN FROM SCRATCH BY PUSSYWIZARD, IT OWNS NOW!
 
 enum eInstanceData
 {
-	DATA_ONYXIA					= 0,
-	MAX_ENCOUNTER				= 1,
-	DATA_WHELP_SUMMONED,
-	DATA_DEEP_BREATH_FAILED,
+    DATA_ONYXIA                 = 0,
+    MAX_ENCOUNTER               = 1,
+    DATA_WHELP_SUMMONED,
+    DATA_DEEP_BREATH_FAILED,
 };
 
 enum eCreatures
 {
-	NPC_ONYXIA					= 10184,
-	NPC_ONYXIAN_WHELP			= 11262,
-	NPC_ONYXIAN_LAIR_GUARD		= 36561,
+    NPC_ONYXIA                  = 10184,
+    NPC_ONYXIAN_WHELP           = 11262,
+    NPC_ONYXIAN_LAIR_GUARD      = 36561,
 };
 
 enum eGameObjects
 {
-	GO_WHELP_SPAWNER			= 176510,
-	GO_WHELP_EGG				= 176511
+    GO_WHELP_SPAWNER            = 176510,
+    GO_WHELP_EGG                = 176511
 };
 
 enum eAchievementData

@@ -7,10 +7,10 @@ REWRITTEN BY XINEF
 
 enum ZulFarrakData
 {
-	TYPE_PYRAMID_EVENT			= 0,
-	TYPE_GAHZRILLA				= 1,
+    TYPE_PYRAMID_EVENT          = 0,
+    TYPE_GAHZRILLA              = 1,
 
-    GO_END_DOOR					= 146084
+    GO_END_DOOR                 = 146084
 };
 
 #endif

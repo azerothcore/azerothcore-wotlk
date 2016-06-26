@@ -39,7 +39,7 @@ class LfgPlayerData
         void SetLockedDungeons(LfgLockMap const& lock);
         void SetTeam(TeamId teamId);
         void SetGroup(uint64 group);
-		void SetRandomPlayersCount(uint8 count);
+        void SetRandomPlayersCount(uint8 count);
 
         // Queue
         void SetRoles(uint8 roles);
@@ -52,9 +52,9 @@ class LfgPlayerData
         LfgLockMap const& GetLockedDungeons() const;
         TeamId GetTeam() const;
         uint64 GetGroup() const;
-		uint8 GetRandomPlayersCount() const;
-		void SetCanOverrideRBState(bool val) { m_canOverrideRBState = val; }
-		bool CanOverrideRBState() const { return m_canOverrideRBState; }
+        uint8 GetRandomPlayersCount() const;
+        void SetCanOverrideRBState(bool val) { m_canOverrideRBState = val; }
+        bool CanOverrideRBState() const { return m_canOverrideRBState; }
 
         // Queue
         uint8 GetRoles() const;
@@ -65,12 +65,12 @@ class LfgPlayerData
         // General
         LfgState m_State;                                  ///< State if group in LFG
         LfgState m_OldState;                               ///< Old State - Used to restore state after failed Rolecheck/Proposal
-		bool m_canOverrideRBState;                         ///< pussywizard
+        bool m_canOverrideRBState;                         ///< pussywizard
         // Player
         LfgLockMap m_LockedDungeons;                       ///< Dungeons player can't do and reason
         TeamId m_TeamId;                                   ///< Player team - determines the queue to join
         uint64 m_Group;                                    ///< Original group of player when joined LFG
-		uint8 m_randomPlayers;                             ///< Xinef: Amount of random players you raid with
+        uint8 m_randomPlayers;                             ///< Xinef: Amount of random players you raid with
 
         // Queue
         uint8 m_Roles;                                     ///< Roles the player selected when joined LFG

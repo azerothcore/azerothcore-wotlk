@@ -535,15 +535,15 @@ struct AreaTableEntry
         return (flags & AREA_FLAG_SANCTUARY);
     }
 
-	// Xinef: mark some zones / areas as inns
-	bool IsInn(TeamId teamId) const
-	{
-		if (teamId == TEAM_ALLIANCE)
-			return flags & AREA_FLAG_REST_ZONE_ALLIANCE;
-		else if (teamId == TEAM_HORDE)
-			return flags & AREA_FLAG_REST_ZONE_HORDE;
-		return false;
-	}
+    // Xinef: mark some zones / areas as inns
+    bool IsInn(TeamId teamId) const
+    {
+        if (teamId == TEAM_ALLIANCE)
+            return flags & AREA_FLAG_REST_ZONE_ALLIANCE;
+        else if (teamId == TEAM_HORDE)
+            return flags & AREA_FLAG_REST_ZONE_HORDE;
+        return false;
+    }
 };
 
 #define MAX_GROUP_AREA_IDS 6
@@ -926,9 +926,9 @@ struct FactionTemplateEntry
     // helpers
     bool IsFriendlyTo(FactionTemplateEntry const& entry) const
     {
-		// Xinef: Always friendly to self faction
-		if (faction == entry.faction)
-			return true;
+        // Xinef: Always friendly to self faction
+        if (faction == entry.faction)
+            return true;
 
         if (entry.faction)
         {

@@ -174,19 +174,19 @@ public:
 
             if (me->GetMapId() == 469)
             {
-				// pussywizard:
-				bool reset = true;
-				if (instance)
-					if (Creature* nefarian = instance->instance->GetCreature(instance->GetData64(DATA_NEFARIAN)))
-						reset = false;
-				if (reset)
+                // pussywizard:
+                bool reset = true;
+                if (instance)
+                    if (Creature* nefarian = instance->instance->GetCreature(instance->GetData64(DATA_NEFARIAN)))
+                        reset = false;
+                if (reset)
                     _Reset();
 
-				// pussywizard:
-				if (!instance || instance->GetBossState(BOSS_NEFARIAN) == DONE || instance->GetBossState(BOSS_NEFARIAN) == IN_PROGRESS)
-					me->SetVisible(false);
-				else
-					me->SetVisible(true);
+                // pussywizard:
+                if (!instance || instance->GetBossState(BOSS_NEFARIAN) == DONE || instance->GetBossState(BOSS_NEFARIAN) == IN_PROGRESS)
+                    me->SetVisible(false);
+                else
+                    me->SetVisible(true);
 
                 me->SetPhaseMask(1, true);
                 me->SetUInt32Value(UNIT_NPC_FLAGS, 1);
@@ -196,7 +196,7 @@ public:
             }
         }
 
-		bool CanAIAttack(const Unit* target) const { return me->IsVisible(); }
+        bool CanAIAttack(const Unit* target) const { return me->IsVisible(); }
 
         void JustReachedHome()
         {
@@ -351,12 +351,12 @@ public:
                                 {
                                     if (Creature* nefarian = me->SummonCreature(NPC_NEFARIAN, NefarianLoc[0]))
                                     {
-										nefarian->AddUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
-										nefarian->SetCanFly(true);
-										nefarian->SetHover(false);
-										nefarian->setActive(true);
-										nefarian->SetHomePosition(NefarianLoc[1]);
-										nefarian->GetMotionMaster()->MoveCharge(NefarianLoc[1].GetPositionX(), NefarianLoc[1].GetPositionY(), NefarianLoc[1].GetPositionZ(), 15.0f);
+                                        nefarian->AddUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
+                                        nefarian->SetCanFly(true);
+                                        nefarian->SetHover(false);
+                                        nefarian->setActive(true);
+                                        nefarian->SetHomePosition(NefarianLoc[1]);
+                                        nefarian->GetMotionMaster()->MoveCharge(NefarianLoc[1].GetPositionX(), NefarianLoc[1].GetPositionY(), NefarianLoc[1].GetPositionZ(), 15.0f);
 
                                         nefarian->AI()->DoCastAOE(SPELL_SHADOWFLAME_INITIAL);
                                     }
@@ -364,7 +364,7 @@ public:
                                     events.CancelEvent(EVENT_FEAR);
                                     events.CancelEvent(EVENT_SHADOW_BOLT);
                                     me->SetVisible(false);
-									EnterEvadeMode();
+                                    EnterEvadeMode();
                                     return;
                                 }
                             }
@@ -379,10 +379,10 @@ public:
         {
             if (sender == GOSSIP_ID && action == GOSSIP_OPTION_ID)
             {
-				// pussywizard:
-				InstanceScript* instance = player->GetInstanceScript();
-				if (!instance || instance->GetBossState(BOSS_NEFARIAN) == DONE)
-					return;
+                // pussywizard:
+                InstanceScript* instance = player->GetInstanceScript();
+                if (!instance || instance->GetBossState(BOSS_NEFARIAN) == DONE)
+                    return;
 
                 player->CLOSE_GOSSIP_MENU();
                 Talk(SAY_GAMESBEGIN_1);
@@ -451,9 +451,9 @@ public:
             if (type != POINT_MOTION_TYPE)
                 return;
 
-			me->SetCanFly(false);
-			me->SetDisableGravity(false);
-			me->SetWalk(false);
+            me->SetCanFly(false);
+            me->SetDisableGravity(false);
+            me->SetWalk(false);
             me->SetInCombatWithZone();
             if (me->GetVictim())
                 AttackStart(me->GetVictim());

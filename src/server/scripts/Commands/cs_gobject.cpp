@@ -600,17 +600,17 @@ public:
         uint32 displayId = 0;
         std::string name;
         uint32 lootId = 0;
-		GameObject* gameObject = NULL;
+        GameObject* gameObject = NULL;
 
         if (!*args)
         {
             if (WorldObject* object = handler->getSelectedObject())
-			{
+            {
                 entry = object->GetEntry();
-				if (object->GetTypeId() == TYPEID_GAMEOBJECT)
-					gameObject = object->ToGameObject();
-			}
-		}
+                if (object->GetTypeId() == TYPEID_GAMEOBJECT)
+                    gameObject = object->ToGameObject();
+            }
+        }
         else
             entry = atoi((char*)args);
 
@@ -631,15 +631,15 @@ public:
         handler->PSendSysMessage(LANG_GOINFO_TYPE, type);
         handler->PSendSysMessage(LANG_GOINFO_LOOTID, lootId);
         handler->PSendSysMessage(LANG_GOINFO_DISPLAYID, displayId);
-		if (gameObject)
-		{
-			handler->PSendSysMessage("LootMode: %u", gameObject->GetLootMode());
-			handler->PSendSysMessage("LootState: %u", gameObject->getLootState());
-			handler->PSendSysMessage("GOState: %u", gameObject->GetGoState());
-			handler->PSendSysMessage("PhaseMask: %u", gameObject->GetPhaseMask());
-			handler->PSendSysMessage("IsLootEmpty: %u", gameObject->loot.empty());
-			handler->PSendSysMessage("IsLootLooted: %u", gameObject->loot.isLooted());
-		}
+        if (gameObject)
+        {
+            handler->PSendSysMessage("LootMode: %u", gameObject->GetLootMode());
+            handler->PSendSysMessage("LootState: %u", gameObject->getLootState());
+            handler->PSendSysMessage("GOState: %u", gameObject->GetGoState());
+            handler->PSendSysMessage("PhaseMask: %u", gameObject->GetPhaseMask());
+            handler->PSendSysMessage("IsLootEmpty: %u", gameObject->loot.empty());
+            handler->PSendSysMessage("IsLootLooted: %u", gameObject->loot.isLooted());
+        }
 
         handler->PSendSysMessage(LANG_GOINFO_NAME, name.c_str());
 
@@ -659,20 +659,20 @@ public:
 
         GameObject* object = NULL;
 
-		if (guidLow > 0)
-		{
-			if (GameObjectData const* gameObjectData = sObjectMgr->GetGOData(guidLow))
-				object = handler->GetObjectGlobalyWithGuidOrNearWithDbGuid(guidLow, gameObjectData->id);
-		}
-		else
-			object = handler->GetSession()->GetPlayer()->FindNearestGameObject(-guidLow, 30.0f);
+        if (guidLow > 0)
+        {
+            if (GameObjectData const* gameObjectData = sObjectMgr->GetGOData(guidLow))
+                object = handler->GetObjectGlobalyWithGuidOrNearWithDbGuid(guidLow, gameObjectData->id);
+        }
+        else
+            object = handler->GetSession()->GetPlayer()->FindNearestGameObject(-guidLow, 30.0f);
 
         if (!object)
         {
-			
-			handler->PSendSysMessage(LANG_COMMAND_OBJNOTFOUND, abs(guidLow));
-			handler->SetSentErrorMessage(true);
-			return false;
+            
+            handler->PSendSysMessage(LANG_COMMAND_OBJNOTFOUND, abs(guidLow));
+            handler->SetSentErrorMessage(true);
+            return false;
         }
 
         char* type = strtok(NULL, " ");
@@ -704,10 +704,10 @@ public:
             data << (uint32)(objectState);
             object->SendMessageToSet(&data, true);
         }
-		else if (objectType == 5)
-			object->SetUInt32Value(GAMEOBJECT_FLAGS, (uint32)(objectState));
-		else if (objectType == 6)
-			object->SetGoArtKit((uint32)(objectState));
+        else if (objectType == 5)
+            object->SetUInt32Value(GAMEOBJECT_FLAGS, (uint32)(objectState));
+        else if (objectType == 6)
+            object->SetGoArtKit((uint32)(objectState));
 
         handler->PSendSysMessage("Set gobject type %d state %d", objectType, objectState);
         return true;

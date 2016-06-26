@@ -487,18 +487,18 @@ class BattlegroundSA : public Battleground
         /// Update score board
         void UpdatePlayerScore(Player* player, uint32 type, uint32 value, bool doAddHonor = true);
 
-		// Teleporters
-		void DefendersPortalTeleport(GameObject* portal, Player* plr);
+        // Teleporters
+        void DefendersPortalTeleport(GameObject* portal, Player* plr);
 
-		// Achievements
-		bool AllowDefenseOfTheAncients(Player* source);
+        // Achievements
+        bool AllowDefenseOfTheAncients(Player* source);
 
         // Achievement: Not Even a Scratch
         bool notEvenAScratch(TeamId teamId) const { return _notEvenAScratch[teamId]; }
 
     private:
 
-		/// Return gate id, relative to bg data, according to gameobject id
+        /// Return gate id, relative to bg data, according to gameobject id
         uint32 GetGateIDFromEntry(uint32 id)
         {
             uint32 i = 0;
@@ -597,8 +597,8 @@ class BattlegroundSA : public Battleground
         bool InitSecondRound;
         std::map<uint32/*id*/, uint32/*timer*/> DemoliserRespawnList;
 
-		// xinef:
-		bool _relicClicked;
+        // xinef:
+        bool _relicClicked;
 
         // Achievement: Not Even a Scratch
         bool _notEvenAScratch[BG_TEAMS_COUNT];

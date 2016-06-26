@@ -45,11 +45,11 @@ EndContentData */
 // Ours
 enum fumping
 {
-	SPELL_SUMMON_SAND_GNOME1			= 39240,
-	SPELL_SUMMON_SAND_GNOME3			= 39247,
-	SPELL_SUMMON_MATURE_BONE_SIFTER1	= 39241,
-	SPELL_SUMMON_MATURE_BONE_SIFTER3	= 39245,
-	SPELL_SUMMON_HAISHULUD				= 39248,
+    SPELL_SUMMON_SAND_GNOME1            = 39240,
+    SPELL_SUMMON_SAND_GNOME3            = 39247,
+    SPELL_SUMMON_MATURE_BONE_SIFTER1    = 39241,
+    SPELL_SUMMON_MATURE_BONE_SIFTER3    = 39245,
+    SPELL_SUMMON_HAISHULUD              = 39248,
 };
 
 class spell_q10930_big_bone_worm : public SpellScriptLoader
@@ -84,10 +84,10 @@ class spell_q10930_big_bone_worm : public SpellScriptLoader
 
             void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {               
-				if (GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_EXPIRE)
+                if (GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_EXPIRE)
                     return;
 
-				GetUnitOwner()->CastSpell(GetUnitOwner(), RAND(SPELL_SUMMON_HAISHULUD, SPELL_SUMMON_MATURE_BONE_SIFTER1, SPELL_SUMMON_MATURE_BONE_SIFTER3), true);
+                GetUnitOwner()->CastSpell(GetUnitOwner(), RAND(SPELL_SUMMON_HAISHULUD, SPELL_SUMMON_MATURE_BONE_SIFTER1, SPELL_SUMMON_MATURE_BONE_SIFTER3), true);
             }
 
             void Register()
@@ -154,91 +154,91 @@ class spell_q10929_fumping : SpellScriptLoader
 
 class npc_greatfather_aldrimus : public CreatureScript
 {
-	public:
-		npc_greatfather_aldrimus() : CreatureScript("npc_greatfather_aldrimus") { }
+    public:
+        npc_greatfather_aldrimus() : CreatureScript("npc_greatfather_aldrimus") { }
 
-		CreatureAI* GetAI(Creature* creature) const
-		{
-			return new npc_greatfather_aldrimusAI(creature);
-		}
+        CreatureAI* GetAI(Creature* creature) const
+        {
+            return new npc_greatfather_aldrimusAI(creature);
+        }
 
-		struct npc_greatfather_aldrimusAI : public ScriptedAI
-		{
-			npc_greatfather_aldrimusAI(Creature* c) : ScriptedAI(c) {}
+        struct npc_greatfather_aldrimusAI : public ScriptedAI
+        {
+            npc_greatfather_aldrimusAI(Creature* c) : ScriptedAI(c) {}
 
-			bool CanBeSeen(Player const* player)
-			{
-				return player->GetQuestStatus(10253) == QUEST_STATUS_REWARDED;
-			}
-		};
+            bool CanBeSeen(Player const* player)
+            {
+                return player->GetQuestStatus(10253) == QUEST_STATUS_REWARDED;
+            }
+        };
 };
 
 enum q10036Torgos
 {
-	NPC_TORGOS					= 18707
+    NPC_TORGOS                  = 18707
 };
 
 class spell_q10036_torgos : public SpellScriptLoader
 {
-	public:
-		spell_q10036_torgos() : SpellScriptLoader("spell_q10036_torgos") { }
+    public:
+        spell_q10036_torgos() : SpellScriptLoader("spell_q10036_torgos") { }
 
-		class spell_q10036_torgos_SpellScript : public SpellScript
-		{
-			PrepareSpellScript(spell_q10036_torgos_SpellScript);
+        class spell_q10036_torgos_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_q10036_torgos_SpellScript);
 
-			void HandleSendEvent(SpellEffIndex effIndex)
-			{
-				if (Creature* torgos = GetCaster()->FindNearestCreature(NPC_TORGOS, 100.0f, true))
-					torgos->GetAI()->AttackStart(GetCaster());
-			}
+            void HandleSendEvent(SpellEffIndex effIndex)
+            {
+                if (Creature* torgos = GetCaster()->FindNearestCreature(NPC_TORGOS, 100.0f, true))
+                    torgos->GetAI()->AttackStart(GetCaster());
+            }
 
-			void Register()
-			{
-				OnEffectLaunch += SpellEffectFn(spell_q10036_torgos_SpellScript::HandleSendEvent, EFFECT_0, SPELL_EFFECT_SEND_EVENT);
-			}
-		};
+            void Register()
+            {
+                OnEffectLaunch += SpellEffectFn(spell_q10036_torgos_SpellScript::HandleSendEvent, EFFECT_0, SPELL_EFFECT_SEND_EVENT);
+            }
+        };
 
-		SpellScript* GetSpellScript() const
-		{
-			return new spell_q10036_torgos_SpellScript();
-		}
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_q10036_torgos_SpellScript();
+        }
 };
 
 enum eQ10923EvilDrawsNear
 {
-	SPELL_DUSTIN_UNDEAD_DRAGON_VISUAL1		= 39256,
-	SPELL_DUSTIN_UNDEAD_DRAGON_VISUAL2		= 39257,
-	SPELL_DUSTIN_UNDEAD_DRAGON_VISUAL_AURA	= 39259,
+    SPELL_DUSTIN_UNDEAD_DRAGON_VISUAL1      = 39256,
+    SPELL_DUSTIN_UNDEAD_DRAGON_VISUAL2      = 39257,
+    SPELL_DUSTIN_UNDEAD_DRAGON_VISUAL_AURA  = 39259,
 
-	NPC_AUCHENAI_DEATH_SPIRIT				= 21967
+    NPC_AUCHENAI_DEATH_SPIRIT               = 21967
 };
 
 class spell_q10923_evil_draws_near_summon : public SpellScriptLoader
 {
-	public:
-		spell_q10923_evil_draws_near_summon() : SpellScriptLoader("spell_q10923_evil_draws_near_summon") { }
+    public:
+        spell_q10923_evil_draws_near_summon() : SpellScriptLoader("spell_q10923_evil_draws_near_summon") { }
 
-		class spell_q10923_evil_draws_near_summon_SpellScript : public SpellScript
-		{
-			PrepareSpellScript(spell_q10923_evil_draws_near_summon_SpellScript);
+        class spell_q10923_evil_draws_near_summon_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_q10923_evil_draws_near_summon_SpellScript);
 
-			void HandleSendEvent(SpellEffIndex effIndex)
-			{
-				if (Creature* auchenai = GetCaster()->FindNearestCreature(NPC_AUCHENAI_DEATH_SPIRIT, 10.0f, true))
-					auchenai->CastSpell(auchenai, SPELL_DUSTIN_UNDEAD_DRAGON_VISUAL_AURA, true);
-			}
+            void HandleSendEvent(SpellEffIndex effIndex)
+            {
+                if (Creature* auchenai = GetCaster()->FindNearestCreature(NPC_AUCHENAI_DEATH_SPIRIT, 10.0f, true))
+                    auchenai->CastSpell(auchenai, SPELL_DUSTIN_UNDEAD_DRAGON_VISUAL_AURA, true);
+            }
 
-			void Register()
-			{
-				OnEffectLaunch += SpellEffectFn(spell_q10923_evil_draws_near_summon_SpellScript::HandleSendEvent, EFFECT_0, SPELL_EFFECT_SEND_EVENT);
-			}
-		};
+            void Register()
+            {
+                OnEffectLaunch += SpellEffectFn(spell_q10923_evil_draws_near_summon_SpellScript::HandleSendEvent, EFFECT_0, SPELL_EFFECT_SEND_EVENT);
+            }
+        };
 
-		SpellScript* GetSpellScript() const
-		{
-			return new spell_q10923_evil_draws_near_summon_SpellScript();
-		}
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_q10923_evil_draws_near_summon_SpellScript();
+        }
 };
 
 class spell_q10923_evil_draws_near_periodic : public SpellScriptLoader
@@ -253,7 +253,7 @@ class spell_q10923_evil_draws_near_periodic : public SpellScriptLoader
             void HandlePeriodic(AuraEffect const* aurEff)
             {
                 PreventDefaultAction();
-				GetUnitOwner()->CastSpell(GetUnitOwner(), RAND(SPELL_DUSTIN_UNDEAD_DRAGON_VISUAL1, SPELL_DUSTIN_UNDEAD_DRAGON_VISUAL2), true);
+                GetUnitOwner()->CastSpell(GetUnitOwner(), RAND(SPELL_DUSTIN_UNDEAD_DRAGON_VISUAL1, SPELL_DUSTIN_UNDEAD_DRAGON_VISUAL2), true);
             }
 
             void Register()
@@ -309,7 +309,7 @@ class spell_q10898_skywing : public SpellScriptLoader
             {
                 // Adjust effect summon position
                 Position const offset = { frand(-7.0f, 7.0f), frand(-7.0f, 7.0f), 11.0f, 0.0f };
-				dest.Relocate(*GetCaster());
+                dest.Relocate(*GetCaster());
                 dest.RelocateOffset(offset);
             }
 
@@ -385,9 +385,9 @@ public:
         void DamageTaken(Unit* done_by, uint32 &damage, DamageEffectType, SpellSchoolMask)
         {
             if (!done_by)
-				return;
+                return;
 
-			Player* player = done_by->ToPlayer();
+            Player* player = done_by->ToPlayer();
             if (player && me->HealthBelowPctDamaged(30, damage))
             {
                 if (Group* group = player->GetGroup())
@@ -633,13 +633,13 @@ enum IslaStarmaneData
     GO_CAGE         = 182794,
     SPELL_CAT       = 32447,
 
-	EVENT_SPELL_WRATH				= 1,
-	EVENT_SPELL_MOONFIRE			= 2,
-	EVENT_SPELL_ENTANGLING_ROOTS	= 3,
+    EVENT_SPELL_WRATH               = 1,
+    EVENT_SPELL_MOONFIRE            = 2,
+    EVENT_SPELL_ENTANGLING_ROOTS    = 3,
 
-	SPELL_WRATH						= 9739,
-	SPELL_MOONFIRE					= 15798,
-	SPELL_ENTANGLING_ROOTS			= 33844
+    SPELL_WRATH                     = 9739,
+    SPELL_MOONFIRE                  = 15798,
+    SPELL_ENTANGLING_ROOTS          = 33844
 };
 
 class npc_isla_starmane : public CreatureScript
@@ -706,43 +706,43 @@ public:
             }
         }
 
-		void EnterCombat(Unit*)
-		{
-			events.Reset();
-			events.ScheduleEvent(EVENT_SPELL_WRATH, 0);
-			events.ScheduleEvent(EVENT_SPELL_MOONFIRE, 4000);
-			events.ScheduleEvent(EVENT_SPELL_ENTANGLING_ROOTS, 10000);
-		}
+        void EnterCombat(Unit*)
+        {
+            events.Reset();
+            events.ScheduleEvent(EVENT_SPELL_WRATH, 0);
+            events.ScheduleEvent(EVENT_SPELL_MOONFIRE, 4000);
+            events.ScheduleEvent(EVENT_SPELL_ENTANGLING_ROOTS, 10000);
+        }
 
-		void UpdateEscortAI(uint32 diff)
-		{
-			if (!UpdateVictim())
-				return;
+        void UpdateEscortAI(uint32 diff)
+        {
+            if (!UpdateVictim())
+                return;
 
-			events.Update(diff);
-			if (me->HasUnitState(UNIT_STATE_CASTING))
-				return;
+            events.Update(diff);
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+                return;
 
-			switch (events.ExecuteEvent())
-			{
-				case EVENT_SPELL_WRATH:
-					me->CastSpell(me->GetVictim(), SPELL_WRATH, false);
-					events.ScheduleEvent(EVENT_SPELL_WRATH, 3000);
-					break;
-				case EVENT_SPELL_MOONFIRE:
-					me->CastSpell(me->GetVictim(), SPELL_MOONFIRE, false);
-					events.ScheduleEvent(EVENT_SPELL_MOONFIRE, 12000);
-					break;
-				case EVENT_SPELL_ENTANGLING_ROOTS:
-					me->CastSpell(me->GetVictim(), SPELL_ENTANGLING_ROOTS, false);
-					events.ScheduleEvent(EVENT_SPELL_ENTANGLING_ROOTS, 20000);
-					break;
-			}
+            switch (events.ExecuteEvent())
+            {
+                case EVENT_SPELL_WRATH:
+                    me->CastSpell(me->GetVictim(), SPELL_WRATH, false);
+                    events.ScheduleEvent(EVENT_SPELL_WRATH, 3000);
+                    break;
+                case EVENT_SPELL_MOONFIRE:
+                    me->CastSpell(me->GetVictim(), SPELL_MOONFIRE, false);
+                    events.ScheduleEvent(EVENT_SPELL_MOONFIRE, 12000);
+                    break;
+                case EVENT_SPELL_ENTANGLING_ROOTS:
+                    me->CastSpell(me->GetVictim(), SPELL_ENTANGLING_ROOTS, false);
+                    events.ScheduleEvent(EVENT_SPELL_ENTANGLING_ROOTS, 20000);
+                    break;
+            }
 
-			DoMeleeAttackIfReady();
-		}
+            DoMeleeAttackIfReady();
+        }
 
-		EventMap events;
+        EventMap events;
     };
 
     bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
@@ -857,17 +857,17 @@ public:
 
 void AddSC_terokkar_forest()
 {
-	// Ours
-	new spell_q10930_big_bone_worm();
-	new spell_q10929_fumping();
-	new npc_greatfather_aldrimus();
-	new spell_q10036_torgos();
-	new spell_q10923_evil_draws_near_summon();
-	new spell_q10923_evil_draws_near_periodic();
-	new spell_q10923_evil_draws_near_visual();
-	new spell_q10898_skywing();
+    // Ours
+    new spell_q10930_big_bone_worm();
+    new spell_q10929_fumping();
+    new npc_greatfather_aldrimus();
+    new spell_q10036_torgos();
+    new spell_q10923_evil_draws_near_summon();
+    new spell_q10923_evil_draws_near_periodic();
+    new spell_q10923_evil_draws_near_visual();
+    new spell_q10898_skywing();
 
-	// Theirs
+    // Theirs
     new npc_unkor_the_ruthless();
     new npc_infested_root_walker();
     new npc_rotting_forest_rager();

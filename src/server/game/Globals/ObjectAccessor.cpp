@@ -175,7 +175,7 @@ Player* ObjectAccessor::FindPlayer(uint64 guid)
 
 Player* ObjectAccessor::FindPlayerInOrOutOfWorld(uint64 guid)
 {
-	return GetObjectInOrOutOfWorld(guid, (Player*)NULL); 
+    return GetObjectInOrOutOfWorld(guid, (Player*)NULL); 
 }
 
 Unit* ObjectAccessor::FindUnit(uint64 guid)
@@ -235,21 +235,21 @@ void ObjectAccessor::RemoveCorpse(Corpse* corpse, bool final)
 {
     ASSERT(corpse && corpse->GetType() != CORPSE_BONES);
 
-	if (!final)
-	{
-		TRINITY_WRITE_GUARD(ACE_RW_Thread_Mutex, i_corpseLock);
-		Player2CorpsesMapType::iterator iter = i_player2corpse.find(corpse->GetOwnerGUID());
-		if (iter == i_player2corpse.end())
-			return;
-		i_player2corpse.erase(iter);
-		AddDelayedCorpseAction(corpse, 0);
-		return;
-	}
+    if (!final)
+    {
+        TRINITY_WRITE_GUARD(ACE_RW_Thread_Mutex, i_corpseLock);
+        Player2CorpsesMapType::iterator iter = i_player2corpse.find(corpse->GetOwnerGUID());
+        if (iter == i_player2corpse.end())
+            return;
+        i_player2corpse.erase(iter);
+        AddDelayedCorpseAction(corpse, 0);
+        return;
+    }
 
     //TODO: more works need to be done for corpse and other world object
     if (Map* map = corpse->FindMap())
     {
-		// xinef: ok, should be called in both cases
+        // xinef: ok, should be called in both cases
         corpse->DestroyForNearbyPlayers();
         if (corpse->IsInGrid())
             map->RemoveFromMap(corpse, false);
@@ -329,7 +329,7 @@ Corpse* ObjectAccessor::ConvertCorpseForPlayer(uint64 player_guid, bool insignia
 
     // Map can be NULL
     Map* map = corpse->FindMap();
-	bool inWorld = corpse->IsInWorld();
+    bool inWorld = corpse->IsInWorld();
 
     // remove corpse from player_guid -> corpse map and from current map
     RemoveCorpse(corpse);
@@ -404,67 +404,67 @@ void ObjectAccessor::RemoveOldCorpses()
         ConvertCorpseForPlayer(itr->first);
     }
 
-	// pussywizard: for deleting bones
-	std::list<uint64>::iterator next2;
-	TRINITY_WRITE_GUARD(ACE_RW_Thread_Mutex, i_corpseLock);
-	for (std::list<uint64>::iterator itr = i_playerBones.begin(); itr != i_playerBones.end(); itr = next2)
-	{
-		next2 = itr;
-		++next2;
+    // pussywizard: for deleting bones
+    std::list<uint64>::iterator next2;
+    TRINITY_WRITE_GUARD(ACE_RW_Thread_Mutex, i_corpseLock);
+    for (std::list<uint64>::iterator itr = i_playerBones.begin(); itr != i_playerBones.end(); itr = next2)
+    {
+        next2 = itr;
+        ++next2;
 
-		Corpse* c = GetObjectInWorld((*itr), (Corpse*)NULL);
-		if (c)
-		{
-			if (!c->IsExpired(now))
-				continue;
+        Corpse* c = GetObjectInWorld((*itr), (Corpse*)NULL);
+        if (c)
+        {
+            if (!c->IsExpired(now))
+                continue;
 
-			if (Map* map = c->FindMap())
-			{
-				if (c->IsInGrid())
-					map->RemoveFromMap(c, false);
-				else
-				{
-					c->DestroyForNearbyPlayers();
-					c->RemoveFromWorld();
-					c->ResetMap();
-				}
-			}
-			else
-				c->RemoveFromWorld();
-		}
+            if (Map* map = c->FindMap())
+            {
+                if (c->IsInGrid())
+                    map->RemoveFromMap(c, false);
+                else
+                {
+                    c->DestroyForNearbyPlayers();
+                    c->RemoveFromWorld();
+                    c->ResetMap();
+                }
+            }
+            else
+                c->RemoveFromWorld();
+        }
 
-		i_playerBones.erase(itr);
-	}
+        i_playerBones.erase(itr);
+    }
 }
 
 void ObjectAccessor::AddDelayedCorpseAction(Corpse* corpse, uint8 action, uint32 mapId, uint32 instanceId)
 {
-	TRINITY_GUARD(ACE_Thread_Mutex, DelayedCorpseLock);
-	i_delayedCorpseActions.push_back(DelayedCorpseAction(corpse, action, mapId, instanceId));
+    TRINITY_GUARD(ACE_Thread_Mutex, DelayedCorpseLock);
+    i_delayedCorpseActions.push_back(DelayedCorpseAction(corpse, action, mapId, instanceId));
 }
 
 void ObjectAccessor::ProcessDelayedCorpseActions()
 {
-	TRINITY_GUARD(ACE_Thread_Mutex, DelayedCorpseLock);
-	for (std::list<DelayedCorpseAction>::iterator itr = i_delayedCorpseActions.begin(); itr != i_delayedCorpseActions.end(); ++itr)
-	{
-		DelayedCorpseAction a = (*itr);
-		switch (a._action)
-		{
-			case 0: // remove corpse
-				RemoveCorpse(a._corpse, true);
-				break;
-			case 1: // add bones
-				if (Map* map = sMapMgr->FindMap(a._mapId, a._instanceId))
-					if (!map->IsRemovalGrid(a._corpse->GetPositionX(), a._corpse->GetPositionY()))
-					{
-						a._corpse->SetMap(map);
-						map->AddToMap(a._corpse);
-					}
-				break;
-		}
-	}
-	i_delayedCorpseActions.clear();
+    TRINITY_GUARD(ACE_Thread_Mutex, DelayedCorpseLock);
+    for (std::list<DelayedCorpseAction>::iterator itr = i_delayedCorpseActions.begin(); itr != i_delayedCorpseActions.end(); ++itr)
+    {
+        DelayedCorpseAction a = (*itr);
+        switch (a._action)
+        {
+            case 0: // remove corpse
+                RemoveCorpse(a._corpse, true);
+                break;
+            case 1: // add bones
+                if (Map* map = sMapMgr->FindMap(a._mapId, a._instanceId))
+                    if (!map->IsRemovalGrid(a._corpse->GetPositionX(), a._corpse->GetPositionY()))
+                    {
+                        a._corpse->SetMap(map);
+                        map->AddToMap(a._corpse);
+                    }
+                break;
+        }
+    }
+    i_delayedCorpseActions.clear();
 }
 
 void ObjectAccessor::Update(uint32 /*diff*/)

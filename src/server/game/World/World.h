@@ -78,7 +78,7 @@ enum WorldTimers
     WUPDATE_AUTOBROADCAST,
     WUPDATE_MAILBOXQUEUE,
     WUPDATE_PINGDB,
-	WUPDATE_5_SECS,
+    WUPDATE_5_SECS,
     WUPDATE_COUNT
 };
 
@@ -151,7 +151,7 @@ enum WorldBoolConfigs
     CONFIG_FREE_DUAL_SPEC, // pussywizard
     CONFIG_ENABLE_MMAPS, // pussywizard
     CONFIG_ENABLE_LOGIN_AFTER_DC, // pussywizard
-	CONFIG_DONT_CACHE_RANDOM_MOVEMENT_PATHS, // pussywizard
+    CONFIG_DONT_CACHE_RANDOM_MOVEMENT_PATHS, // pussywizard
     CONFIG_QUEST_IGNORE_AUTO_ACCEPT,
     CONFIG_QUEST_IGNORE_AUTO_COMPLETE,
     CONFIG_WARDEN_ENABLED,
@@ -211,7 +211,7 @@ enum WorldIntConfigs
     CONFIG_MAX_RECRUIT_A_FRIEND_BONUS_PLAYER_LEVEL,
     CONFIG_MAX_RECRUIT_A_FRIEND_BONUS_PLAYER_LEVEL_DIFFERENCE,
     CONFIG_INSTANCE_RESET_TIME_HOUR,
-	CONFIG_INSTANCE_RESET_TIME_RELATIVE_TIMESTAMP,
+    CONFIG_INSTANCE_RESET_TIME_RELATIVE_TIMESTAMP,
     CONFIG_INSTANCE_UNLOAD_DELAY,
     CONFIG_MAX_PRIMARY_TRADE_SKILL,
     CONFIG_MIN_PETITION_SIGNS,
@@ -283,9 +283,9 @@ enum WorldIntConfigs
     CONFIG_PLAYER_ALLOW_COMMANDS,
     CONFIG_NUMTHREADS,
     CONFIG_LOGDB_CLEARINTERVAL,
-	CONFIG_TELEPORT_TIMEOUT_NEAR, // pussywizard
-	CONFIG_TELEPORT_TIMEOUT_FAR, // pussywizard
-	CONFIG_MAX_ALLOWED_MMR_DROP, // pussywizard
+    CONFIG_TELEPORT_TIMEOUT_NEAR, // pussywizard
+    CONFIG_TELEPORT_TIMEOUT_FAR, // pussywizard
+    CONFIG_MAX_ALLOWED_MMR_DROP, // pussywizard
     CONFIG_CLIENTCACHE_VERSION,
     CONFIG_GUILD_EVENT_LOG_COUNT,
     CONFIG_GUILD_BANK_EVENT_LOG_COUNT,
@@ -494,26 +494,26 @@ typedef UNORDERED_MAP<uint32, WorldSession*> SessionMap;
 // xinef: global storage
 struct GlobalPlayerData
 {
-	uint32 guidLow;
-	uint32 accountId;
-	std::string name;
-	uint8 race;
-	uint8 playerClass;
-	uint8 gender;
-	uint8 level;
-	uint16 mailCount;
-	uint32 guildId;
-	uint32 groupId;
-	uint32 arenaTeamId[3];
+    uint32 guidLow;
+    uint32 accountId;
+    std::string name;
+    uint8 race;
+    uint8 playerClass;
+    uint8 gender;
+    uint8 level;
+    uint16 mailCount;
+    uint32 guildId;
+    uint32 groupId;
+    uint32 arenaTeamId[3];
 };
 
 enum GlobalPlayerUpdateMask
 {
-	PLAYER_UPDATE_DATA_LEVEL			= 0x01,
-	PLAYER_UPDATE_DATA_RACE				= 0x02,
-	PLAYER_UPDATE_DATA_CLASS			= 0x04,
-	PLAYER_UPDATE_DATA_GENDER			= 0x08,
-	PLAYER_UPDATE_DATA_NAME				= 0x10,
+    PLAYER_UPDATE_DATA_LEVEL            = 0x01,
+    PLAYER_UPDATE_DATA_RACE             = 0x02,
+    PLAYER_UPDATE_DATA_CLASS            = 0x04,
+    PLAYER_UPDATE_DATA_GENDER           = 0x08,
+    PLAYER_UPDATE_DATA_NAME             = 0x10,
 };
 
 typedef UNORDERED_MAP<uint32, GlobalPlayerData> GlobalPlayerDataMap;
@@ -609,8 +609,8 @@ class World
         time_t const& GetStartTime() const { return m_startTime; }
         /// What time is it?
         time_t const& GetGameTime() const { return m_gameTime; }
-		/// What time is it? in ms
-		static uint32 GetGameTimeMS() { return m_gameMSTime; }
+        /// What time is it? in ms
+        static uint32 GetGameTimeMS() { return m_gameMSTime; }
         /// Uptime (in secs)
         uint32 GetUptime() const { return uint32(m_gameTime - m_startTime); }
         /// Update time
@@ -718,27 +718,27 @@ class World
         static float GetMaxVisibleDistanceInInstances()     { return m_MaxVisibleDistanceInInstances;  }
         static float GetMaxVisibleDistanceInBGArenas()      { return m_MaxVisibleDistanceInBGArenas;   }
 
-		// our: needed for arena spectator subscriptions
-		uint32 GetNextWhoListUpdateDelaySecs()
-		{
-			if (m_timers[WUPDATE_5_SECS].Passed())
-				return 1;
-			uint32 t = m_timers[WUPDATE_5_SECS].GetInterval() - m_timers[WUPDATE_5_SECS].GetCurrent();
-			t = std::min(t, (uint32)m_timers[WUPDATE_5_SECS].GetInterval());
-			return uint32(ceil(t/1000.0f));
-		}
+        // our: needed for arena spectator subscriptions
+        uint32 GetNextWhoListUpdateDelaySecs()
+        {
+            if (m_timers[WUPDATE_5_SECS].Passed())
+                return 1;
+            uint32 t = m_timers[WUPDATE_5_SECS].GetInterval() - m_timers[WUPDATE_5_SECS].GetCurrent();
+            t = std::min(t, (uint32)m_timers[WUPDATE_5_SECS].GetInterval());
+            return uint32(ceil(t/1000.0f));
+        }
 
-		// xinef: Global Player Data Storage system
-		void LoadGlobalPlayerDataStore();
-		uint32 GetGlobalPlayerGUID(std::string const& name) const;
-		GlobalPlayerData const* GetGlobalPlayerData(uint32 guid) const;
+        // xinef: Global Player Data Storage system
+        void LoadGlobalPlayerDataStore();
+        uint32 GetGlobalPlayerGUID(std::string const& name) const;
+        GlobalPlayerData const* GetGlobalPlayerData(uint32 guid) const;
         void AddGlobalPlayerData(uint32 guid, uint32 accountId, std::string const& name, uint8 gender, uint8 race, uint8 playerClass, uint8 level, uint16 mailCount, uint32 guildId);
         void UpdateGlobalPlayerData(uint32 guid, uint8 mask, std::string const& name, uint8 level = 0, uint8 gender = 0, uint8 race = 0, uint8 playerClass = 0);
-		void UpdateGlobalPlayerMails(uint32 guid, int16 count, bool add = true);
-		void UpdateGlobalPlayerGuild(uint32 guid, uint32 guildId);
-		void UpdateGlobalPlayerGroup(uint32 guid, uint32 groupId);
-		void UpdateGlobalPlayerArenaTeam(uint32 guid, uint8 slot, uint32 arenaTeamId);
-		void UpdateGlobalNameData(uint32 guidLow, std::string const& oldName, std::string const& newName);
+        void UpdateGlobalPlayerMails(uint32 guid, int16 count, bool add = true);
+        void UpdateGlobalPlayerGuild(uint32 guid, uint32 guildId);
+        void UpdateGlobalPlayerGroup(uint32 guid, uint32 groupId);
+        void UpdateGlobalPlayerArenaTeam(uint32 guid, uint8 slot, uint32 arenaTeamId);
+        void UpdateGlobalNameData(uint32 guidLow, std::string const& oldName, std::string const& newName);
         void DeleteGlobalPlayerData(uint32 guid, std::string const& name);
 
         void ProcessCliCommands();
@@ -752,19 +752,19 @@ class World
         void LoadDBVersion();
         char const* GetDBVersion() const { return m_DBVersion.c_str(); }
 
-		void LoadAutobroadcasts();
-		
+        void LoadAutobroadcasts();
+        
         void UpdateAreaDependentAuras();
 
         uint32 GetCleaningFlags() const { return m_CleaningFlags; }
         void   SetCleaningFlags(uint32 flags) { m_CleaningFlags = flags; }
         void   ResetEventSeasonalQuests(uint16 event_id);
 
-		time_t GetNextTimeWithDayAndHour(int8 dayOfWeek, int8 hour); // pussywizard
-		time_t GetNextTimeWithMonthAndHour(int8 month, int8 hour); // pussywizard
+        time_t GetNextTimeWithDayAndHour(int8 dayOfWeek, int8 hour); // pussywizard
+        time_t GetNextTimeWithMonthAndHour(int8 month, int8 hour); // pussywizard
 
-		std::string const& GetRealmName() const { return _realmName; } // pussywizard
-		void SetRealmName(std::string name) { _realmName = name; } // pussywizard
+        std::string const& GetRealmName() const { return _realmName; } // pussywizard
+        void SetRealmName(std::string name) { _realmName = name; } // pussywizard
 
     protected:
         void _UpdateGameTime();
@@ -796,7 +796,7 @@ class World
         IntervalTimer m_timers[WUPDATE_COUNT];
         time_t mail_expire_check_timer;
         uint32 m_updateTime, m_updateTimeSum;
-		static uint32 m_gameMSTime;
+        static uint32 m_gameMSTime;
 
         SessionMap m_sessions;
         SessionMap m_offlineSessions;
@@ -828,11 +828,11 @@ class World
         static float m_MaxVisibleDistanceInInstances;
         static float m_MaxVisibleDistanceInBGArenas;
 
-		// our speed ups
-		GlobalPlayerDataMap _globalPlayerDataStore; // xinef
-		GlobalPlayerNameMap _globalPlayerNameStore; // xinef
+        // our speed ups
+        GlobalPlayerDataMap _globalPlayerDataStore; // xinef
+        GlobalPlayerNameMap _globalPlayerNameStore; // xinef
 
-		std::string _realmName;
+        std::string _realmName;
 
         // CLI command holder to be thread safe
         ACE_Based::LockedQueue<CliCommandHolder*, ACE_Thread_Mutex> cliCmdQueue;

@@ -30,11 +30,11 @@
 
 enum MageSpells
 {
-	// Ours
+    // Ours
     SPELL_MAGE_BURNOUT_TRIGGER                   = 44450,
-	SPELL_MAGE_IMPROVED_BLIZZARD_CHILLED		 = 12486,
+    SPELL_MAGE_IMPROVED_BLIZZARD_CHILLED         = 12486,
 
-	// Theirs
+    // Theirs
     SPELL_MAGE_COLD_SNAP                         = 11958,
     SPELL_MAGE_FOCUS_MAGIC_PROC                  = 54648,
     SPELL_MAGE_FROST_WARDING_R1                  = 11189,
@@ -65,28 +65,28 @@ class spell_mage_arcane_blast : public SpellScriptLoader
         {
             PrepareSpellScript(spell_mage_arcane_blast_SpellScript);
 
-			bool Load() { _triggerSpellId = 0; return true; }
+            bool Load() { _triggerSpellId = 0; return true; }
 
             void HandleTriggerSpell(SpellEffIndex effIndex)
             {
-				_triggerSpellId = GetSpellInfo()->Effects[effIndex].TriggerSpell;
-				PreventHitDefaultEffect(effIndex);
+                _triggerSpellId = GetSpellInfo()->Effects[effIndex].TriggerSpell;
+                PreventHitDefaultEffect(effIndex);
             }
 
-			void HandleAfterCast()
-			{
-				GetCaster()->CastSpell(GetCaster(), _triggerSpellId, TRIGGERED_FULL_MASK);
-			}
+            void HandleAfterCast()
+            {
+                GetCaster()->CastSpell(GetCaster(), _triggerSpellId, TRIGGERED_FULL_MASK);
+            }
 
             void Register()
             {
                 OnEffectLaunch += SpellEffectFn(spell_mage_arcane_blast_SpellScript::HandleTriggerSpell, EFFECT_1, SPELL_EFFECT_TRIGGER_SPELL);
-				OnEffectLaunchTarget += SpellEffectFn(spell_mage_arcane_blast_SpellScript::HandleTriggerSpell, EFFECT_1, SPELL_EFFECT_TRIGGER_SPELL);
-				AfterCast += SpellCastFn(spell_mage_arcane_blast_SpellScript::HandleAfterCast);
+                OnEffectLaunchTarget += SpellEffectFn(spell_mage_arcane_blast_SpellScript::HandleTriggerSpell, EFFECT_1, SPELL_EFFECT_TRIGGER_SPELL);
+                AfterCast += SpellCastFn(spell_mage_arcane_blast_SpellScript::HandleAfterCast);
             }
 
-			private:
-				uint32 _triggerSpellId;
+            private:
+                uint32 _triggerSpellId;
         };
 
         SpellScript* GetSpellScript() const
@@ -106,11 +106,11 @@ class spell_mage_deep_freeze : public SpellScriptLoader
 
             void HandleOnHit()
             {
-				if (Unit* caster = GetCaster())
-					if (Unit* target = (caster->ToPlayer() ? caster->ToPlayer()->GetSelectedUnit() : NULL))
-						if (Creature* cTarget = target->ToCreature())
-							if (cTarget->HasMechanicTemplateImmunity(1 << (MECHANIC_STUN - 1)))
-								caster->CastSpell(cTarget, 71757, true);
+                if (Unit* caster = GetCaster())
+                    if (Unit* target = (caster->ToPlayer() ? caster->ToPlayer()->GetSelectedUnit() : NULL))
+                        if (Creature* cTarget = target->ToCreature())
+                            if (cTarget->HasMechanicTemplateImmunity(1 << (MECHANIC_STUN - 1)))
+                                caster->CastSpell(cTarget, 71757, true);
             }
 
             void Register()
@@ -136,33 +136,33 @@ class spell_mage_burning_determination : public SpellScriptLoader
 
             bool CheckProc(ProcEventInfo& eventInfo)
             {
-				if (!eventInfo.GetDamageInfo()->GetSpellInfo() || !eventInfo.GetActionTarget())
-					return false;
+                if (!eventInfo.GetDamageInfo()->GetSpellInfo() || !eventInfo.GetActionTarget())
+                    return false;
 
-				// Need Interrupt or Silenced mechanic
-				if (!(eventInfo.GetDamageInfo()->GetSpellInfo()->GetAllEffectsMechanicMask() & ((1<<MECHANIC_INTERRUPT)|(1<<MECHANIC_SILENCE))))
-					return false;
+                // Need Interrupt or Silenced mechanic
+                if (!(eventInfo.GetDamageInfo()->GetSpellInfo()->GetAllEffectsMechanicMask() & ((1<<MECHANIC_INTERRUPT)|(1<<MECHANIC_SILENCE))))
+                    return false;
 
-				// Xinef: immuned effect should just eat charge
-				if (eventInfo.GetHitMask() & PROC_EX_IMMUNE)
-				{
-					eventInfo.GetActionTarget()->RemoveAurasDueToSpell(54748);
-					return false;
-				}
-				if (Aura* aura = eventInfo.GetActionTarget()->GetAura(54748))
-				{
-					if (aura->GetDuration() < aura->GetMaxDuration())
-						eventInfo.GetActionTarget()->RemoveAurasDueToSpell(54748);
-					return false;
-				}
+                // Xinef: immuned effect should just eat charge
+                if (eventInfo.GetHitMask() & PROC_EX_IMMUNE)
+                {
+                    eventInfo.GetActionTarget()->RemoveAurasDueToSpell(54748);
+                    return false;
+                }
+                if (Aura* aura = eventInfo.GetActionTarget()->GetAura(54748))
+                {
+                    if (aura->GetDuration() < aura->GetMaxDuration())
+                        eventInfo.GetActionTarget()->RemoveAurasDueToSpell(54748);
+                    return false;
+                }
 
-				return true;
+                return true;
             }
 
             void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
             {
                 PreventDefaultAction();
-				GetUnitOwner()->CastSpell(GetUnitOwner(), 54748, true);
+                GetUnitOwner()->CastSpell(GetUnitOwner(), 54748, true);
             }
 
             void Register()
@@ -189,15 +189,15 @@ class spell_mage_molten_armor : public SpellScriptLoader
 
             bool CheckProc(ProcEventInfo& eventInfo)
             {
-				const SpellInfo* spellInfo = eventInfo.GetDamageInfo()->GetSpellInfo();
-				if (!spellInfo || (eventInfo.GetTypeMask() & PROC_FLAG_TAKEN_MELEE_AUTO_ATTACK))
-					return true;
+                const SpellInfo* spellInfo = eventInfo.GetDamageInfo()->GetSpellInfo();
+                if (!spellInfo || (eventInfo.GetTypeMask() & PROC_FLAG_TAKEN_MELEE_AUTO_ATTACK))
+                    return true;
 
-				// Xinef: Molten Shields talent
-				if (AuraEffect* aurEff = eventInfo.GetActionTarget()->GetAuraEffect(SPELL_AURA_ADD_FLAT_MODIFIER, SPELLFAMILY_MAGE, 16, EFFECT_0))
-					return roll_chance_i(aurEff->GetSpellInfo()->GetRank()*50);
+                // Xinef: Molten Shields talent
+                if (AuraEffect* aurEff = eventInfo.GetActionTarget()->GetAuraEffect(SPELL_AURA_ADD_FLAT_MODIFIER, SPELLFAMILY_MAGE, 16, EFFECT_0))
+                    return roll_chance_i(aurEff->GetSpellInfo()->GetRank()*50);
 
-				return false;
+                return false;
             }
 
             void Register()
@@ -221,20 +221,20 @@ public:
     {
         PrepareAuraScript(spell_mage_mirror_image_AuraScript)
         
-		void HandleEffectApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+        void HandleEffectApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
         {
-			GetTarget()->CastSpell((Unit*)NULL, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true);
+            GetTarget()->CastSpell((Unit*)NULL, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true);
         }
 
-		void CalcPeriodic(AuraEffect const* /*effect*/, bool& isPeriodic, int32& amplitude)
+        void CalcPeriodic(AuraEffect const* /*effect*/, bool& isPeriodic, int32& amplitude)
         {
             isPeriodic = false;
         }
 
         void Register()
         {
-			OnEffectApply += AuraEffectApplyFn(spell_mage_mirror_image_AuraScript::HandleEffectApply, EFFECT_2, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
-			DoEffectCalcPeriodic += AuraEffectCalcPeriodicFn(spell_mage_mirror_image_AuraScript::CalcPeriodic, EFFECT_2, SPELL_AURA_PERIODIC_DUMMY);
+            OnEffectApply += AuraEffectApplyFn(spell_mage_mirror_image_AuraScript::HandleEffectApply, EFFECT_2, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
+            DoEffectCalcPeriodic += AuraEffectCalcPeriodicFn(spell_mage_mirror_image_AuraScript::CalcPeriodic, EFFECT_2, SPELL_AURA_PERIODIC_DUMMY);
         }
     };
 
@@ -299,12 +299,12 @@ class spell_mage_burnout_trigger : public SpellScriptLoader
 
             void HandleDummy(SpellEffIndex effIndex)
             {
-				PreventHitDefaultEffect(effIndex);
-				if (Unit* target = GetHitUnit())
-				{
-					int32 newDamage = -(target->ModifyPower(POWER_MANA, -GetEffectValue()));
-					GetSpell()->ExecuteLogEffectTakeTargetPower(effIndex, target, POWER_MANA, newDamage, 0.0f);
-				}
+                PreventHitDefaultEffect(effIndex);
+                if (Unit* target = GetHitUnit())
+                {
+                    int32 newDamage = -(target->ModifyPower(POWER_MANA, -GetEffectValue()));
+                    GetSpell()->ExecuteLogEffectTakeTargetPower(effIndex, target, POWER_MANA, newDamage, 0.0f);
+                }
             }
 
             void Register()
@@ -330,108 +330,108 @@ class spell_mage_pet_scaling : public SpellScriptLoader
 
             void CalculateResistanceAmount(AuraEffect const* aurEff, int32 & amount, bool & /*canBeRecalculated*/)
             {
-				// xinef: mage pet inherits 40% of resistance from owner and 35% of armor (guessed)
-				if (Unit* owner = GetUnitOwner()->GetOwner())
-				{
-					SpellSchoolMask schoolMask = SpellSchoolMask(aurEff->GetSpellInfo()->Effects[aurEff->GetEffIndex()].MiscValue);
-					int32 modifier = schoolMask == SPELL_SCHOOL_MASK_NORMAL ? 35 : 40;
-					amount = CalculatePct(std::max<int32>(0, owner->GetResistance(schoolMask)), modifier);
-				}
+                // xinef: mage pet inherits 40% of resistance from owner and 35% of armor (guessed)
+                if (Unit* owner = GetUnitOwner()->GetOwner())
+                {
+                    SpellSchoolMask schoolMask = SpellSchoolMask(aurEff->GetSpellInfo()->Effects[aurEff->GetEffIndex()].MiscValue);
+                    int32 modifier = schoolMask == SPELL_SCHOOL_MASK_NORMAL ? 35 : 40;
+                    amount = CalculatePct(std::max<int32>(0, owner->GetResistance(schoolMask)), modifier);
+                }
             }
 
             void CalculateStatAmount(AuraEffect const* aurEff, int32 & amount, bool & /*canBeRecalculated*/)
             {
-				// xinef: mage pet inherits 30% of intellect / stamina
-				if (Unit* owner = GetUnitOwner()->GetOwner())
-				{
-					Stats stat = Stats(aurEff->GetSpellInfo()->Effects[aurEff->GetEffIndex()].MiscValue);
-					amount = CalculatePct(std::max<int32>(0, owner->GetStat(stat)), 30);
-				}
+                // xinef: mage pet inherits 30% of intellect / stamina
+                if (Unit* owner = GetUnitOwner()->GetOwner())
+                {
+                    Stats stat = Stats(aurEff->GetSpellInfo()->Effects[aurEff->GetEffIndex()].MiscValue);
+                    amount = CalculatePct(std::max<int32>(0, owner->GetStat(stat)), 30);
+                }
             }
 
-			void CalculateAPAmount(AuraEffect const* aurEff, int32 & amount, bool & /*canBeRecalculated*/)
+            void CalculateAPAmount(AuraEffect const* aurEff, int32 & amount, bool & /*canBeRecalculated*/)
             {
-				// xinef: mage pet inherits 0% AP
+                // xinef: mage pet inherits 0% AP
             }
 
-			void CalculateSPAmount(AuraEffect const* aurEff, int32 & amount, bool & /*canBeRecalculated*/)
+            void CalculateSPAmount(AuraEffect const* aurEff, int32 & amount, bool & /*canBeRecalculated*/)
             {
-				// xinef: mage pet inherits 33% of SP
-				if (Unit* owner = GetUnitOwner()->GetOwner())
-				{
-					int32 frost = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_FROST);
-					amount = CalculatePct(std::max<int32>(0, frost), 33);
+                // xinef: mage pet inherits 33% of SP
+                if (Unit* owner = GetUnitOwner()->GetOwner())
+                {
+                    int32 frost = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_FROST);
+                    amount = CalculatePct(std::max<int32>(0, frost), 33);
 
-					// xinef: Update appropriate player field
-					if (owner->GetTypeId() == TYPEID_PLAYER)
-						owner->SetUInt32Value(PLAYER_PET_SPELL_POWER, (uint32)amount);
-				}
+                    // xinef: Update appropriate player field
+                    if (owner->GetTypeId() == TYPEID_PLAYER)
+                        owner->SetUInt32Value(PLAYER_PET_SPELL_POWER, (uint32)amount);
+                }
             }
 
-			void HandleEffectApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
-			{
-				if (GetUnitOwner()->IsPet())
-					return;
-
-				GetUnitOwner()->ApplySpellImmune(0, IMMUNITY_STATE, aurEff->GetAuraType(), true, SPELL_BLOCK_TYPE_POSITIVE);
-				if (aurEff->GetAuraType() == SPELL_AURA_MOD_ATTACK_POWER)
-					GetUnitOwner()->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_ATTACK_POWER_PCT, true, SPELL_BLOCK_TYPE_POSITIVE);
-				else if (aurEff->GetAuraType() == SPELL_AURA_MOD_STAT)
-					GetUnitOwner()->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TOTAL_STAT_PERCENTAGE, true, SPELL_BLOCK_TYPE_POSITIVE);
-			}
-
-			void CalcPeriodic(AuraEffect const* /*aurEff*/, bool& isPeriodic, int32& amplitude)
+            void HandleEffectApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
             {
-				if (!GetUnitOwner()->IsPet())
-					return;
+                if (GetUnitOwner()->IsPet())
+                    return;
+
+                GetUnitOwner()->ApplySpellImmune(0, IMMUNITY_STATE, aurEff->GetAuraType(), true, SPELL_BLOCK_TYPE_POSITIVE);
+                if (aurEff->GetAuraType() == SPELL_AURA_MOD_ATTACK_POWER)
+                    GetUnitOwner()->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_ATTACK_POWER_PCT, true, SPELL_BLOCK_TYPE_POSITIVE);
+                else if (aurEff->GetAuraType() == SPELL_AURA_MOD_STAT)
+                    GetUnitOwner()->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TOTAL_STAT_PERCENTAGE, true, SPELL_BLOCK_TYPE_POSITIVE);
+            }
+
+            void CalcPeriodic(AuraEffect const* /*aurEff*/, bool& isPeriodic, int32& amplitude)
+            {
+                if (!GetUnitOwner()->IsPet())
+                    return;
 
                 isPeriodic = true;
                 amplitude = 2*IN_MILLISECONDS;
             }
-			
+            
             void HandlePeriodic(AuraEffect const* aurEff)
             {
                 PreventDefaultAction();
-				if (aurEff->GetAuraType() == SPELL_AURA_MOD_STAT && (aurEff->GetMiscValue() == STAT_STAMINA || aurEff->GetMiscValue() == STAT_INTELLECT))
-				{
-					int32 currentAmount = aurEff->GetAmount();
-					int32 newAmount = GetEffect(aurEff->GetEffIndex())->CalculateAmount(GetCaster());
-					if (newAmount != currentAmount)
-					{
-						if (aurEff->GetMiscValue() == STAT_STAMINA)
-						{
-							uint32 actStat = GetUnitOwner()->GetHealth();
-							GetEffect(aurEff->GetEffIndex())->ChangeAmount(newAmount, false);
-							GetUnitOwner()->SetHealth(std::min<uint32>(GetUnitOwner()->GetMaxHealth(), actStat));
-						}
-						else
-						{
-							uint32 actStat = GetUnitOwner()->GetPower(POWER_MANA);
-							GetEffect(aurEff->GetEffIndex())->ChangeAmount(newAmount, false);
-							GetUnitOwner()->SetPower(POWER_MANA, std::min<uint32>(GetUnitOwner()->GetMaxPower(POWER_MANA), actStat));
-						}
-					}
-				}
-				else
-					GetEffect(aurEff->GetEffIndex())->RecalculateAmount();
+                if (aurEff->GetAuraType() == SPELL_AURA_MOD_STAT && (aurEff->GetMiscValue() == STAT_STAMINA || aurEff->GetMiscValue() == STAT_INTELLECT))
+                {
+                    int32 currentAmount = aurEff->GetAmount();
+                    int32 newAmount = GetEffect(aurEff->GetEffIndex())->CalculateAmount(GetCaster());
+                    if (newAmount != currentAmount)
+                    {
+                        if (aurEff->GetMiscValue() == STAT_STAMINA)
+                        {
+                            uint32 actStat = GetUnitOwner()->GetHealth();
+                            GetEffect(aurEff->GetEffIndex())->ChangeAmount(newAmount, false);
+                            GetUnitOwner()->SetHealth(std::min<uint32>(GetUnitOwner()->GetMaxHealth(), actStat));
+                        }
+                        else
+                        {
+                            uint32 actStat = GetUnitOwner()->GetPower(POWER_MANA);
+                            GetEffect(aurEff->GetEffIndex())->ChangeAmount(newAmount, false);
+                            GetUnitOwner()->SetPower(POWER_MANA, std::min<uint32>(GetUnitOwner()->GetMaxPower(POWER_MANA), actStat));
+                        }
+                    }
+                }
+                else
+                    GetEffect(aurEff->GetEffIndex())->RecalculateAmount();
             }
 
             void Register()
             {
-				if (m_scriptSpellId != 35657)
-					DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_mage_pet_scaling_AuraScript::CalculateResistanceAmount, EFFECT_ALL, SPELL_AURA_MOD_RESISTANCE);
+                if (m_scriptSpellId != 35657)
+                    DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_mage_pet_scaling_AuraScript::CalculateResistanceAmount, EFFECT_ALL, SPELL_AURA_MOD_RESISTANCE);
 
-				if (m_scriptSpellId == 35657 || m_scriptSpellId == 35658)
-					DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_mage_pet_scaling_AuraScript::CalculateStatAmount, EFFECT_ALL, SPELL_AURA_MOD_STAT);
+                if (m_scriptSpellId == 35657 || m_scriptSpellId == 35658)
+                    DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_mage_pet_scaling_AuraScript::CalculateStatAmount, EFFECT_ALL, SPELL_AURA_MOD_STAT);
 
-				if (m_scriptSpellId == 35657)
-				{
-					DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_mage_pet_scaling_AuraScript::CalculateAPAmount, EFFECT_ALL, SPELL_AURA_MOD_ATTACK_POWER);
-					DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_mage_pet_scaling_AuraScript::CalculateSPAmount, EFFECT_ALL, SPELL_AURA_MOD_DAMAGE_DONE);
-				}
+                if (m_scriptSpellId == 35657)
+                {
+                    DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_mage_pet_scaling_AuraScript::CalculateAPAmount, EFFECT_ALL, SPELL_AURA_MOD_ATTACK_POWER);
+                    DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_mage_pet_scaling_AuraScript::CalculateSPAmount, EFFECT_ALL, SPELL_AURA_MOD_DAMAGE_DONE);
+                }
 
-				OnEffectApply += AuraEffectApplyFn(spell_mage_pet_scaling_AuraScript::HandleEffectApply, EFFECT_ALL, SPELL_AURA_ANY, AURA_EFFECT_HANDLE_REAL);
-				DoEffectCalcPeriodic += AuraEffectCalcPeriodicFn(spell_mage_pet_scaling_AuraScript::CalcPeriodic, EFFECT_ALL, SPELL_AURA_ANY);
+                OnEffectApply += AuraEffectApplyFn(spell_mage_pet_scaling_AuraScript::HandleEffectApply, EFFECT_ALL, SPELL_AURA_ANY, AURA_EFFECT_HANDLE_REAL);
+                DoEffectCalcPeriodic += AuraEffectCalcPeriodicFn(spell_mage_pet_scaling_AuraScript::CalcPeriodic, EFFECT_ALL, SPELL_AURA_ANY);
                 OnEffectPeriodic += AuraEffectPeriodicFn(spell_mage_pet_scaling_AuraScript::HandlePeriodic, EFFECT_ALL, SPELL_AURA_ANY);
             }
         };
@@ -453,15 +453,15 @@ class spell_mage_brain_freeze : public SpellScriptLoader
 
             bool CheckProc(ProcEventInfo& eventInfo)
             {
-				const SpellInfo* spellInfo = eventInfo.GetDamageInfo()->GetSpellInfo();
-				if (!spellInfo)
-					return false;
+                const SpellInfo* spellInfo = eventInfo.GetDamageInfo()->GetSpellInfo();
+                if (!spellInfo)
+                    return false;
 
-				// xinef: Improved Blizzard, generic chilled check
-				if (spellInfo->SpellFamilyFlags[0] & 0x100000)
-					return spellInfo->Id == SPELL_MAGE_IMPROVED_BLIZZARD_CHILLED;
+                // xinef: Improved Blizzard, generic chilled check
+                if (spellInfo->SpellFamilyFlags[0] & 0x100000)
+                    return spellInfo->Id == SPELL_MAGE_IMPROVED_BLIZZARD_CHILLED;
 
-				return true;
+                return true;
             }
 
             void Register()
@@ -498,14 +498,14 @@ class spell_mage_incanters_absorbtion_base_AuraScript : public AuraScript
             if (AuraEffect* talentAurEff = target->GetAuraEffectOfRankedSpell(SPELL_MAGE_INCANTERS_ABSORBTION_R1, EFFECT_0))
             {
                 int32 bp = CalculatePct(absorbAmount, talentAurEff->GetAmount());
-				if (AuraEffect* currentAura = target->GetAuraEffect(SPELL_AURA_MOD_DAMAGE_DONE, SPELLFAMILY_MAGE, 2941, EFFECT_0))
-				{
-					bp += int32(currentAura->GetAmount() * (currentAura->GetBase()->GetDuration() / (float)currentAura->GetBase()->GetMaxDuration()));
-					currentAura->ChangeAmount(bp);
-					currentAura->GetBase()->RefreshDuration();
-				}
-				else
-					target->CastCustomSpell(target, SPELL_MAGE_INCANTERS_ABSORBTION_TRIGGERED, &bp, NULL, NULL, true, NULL, aurEff);
+                if (AuraEffect* currentAura = target->GetAuraEffect(SPELL_AURA_MOD_DAMAGE_DONE, SPELLFAMILY_MAGE, 2941, EFFECT_0))
+                {
+                    bp += int32(currentAura->GetAmount() * (currentAura->GetBase()->GetDuration() / (float)currentAura->GetBase()->GetMaxDuration()));
+                    currentAura->ChangeAmount(bp);
+                    currentAura->GetBase()->RefreshDuration();
+                }
+                else
+                    target->CastCustomSpell(target, SPELL_MAGE_INCANTERS_ABSORBTION_TRIGGERED, &bp, NULL, NULL, true, NULL, aurEff);
             }
         }
 };
@@ -562,22 +562,22 @@ class spell_mage_cold_snap : public SpellScriptLoader
 
             void HandleDummy(SpellEffIndex /*effIndex*/)
             {
-				Player* caster = GetCaster()->ToPlayer();
-				// immediately finishes the cooldown on Frost spells
+                Player* caster = GetCaster()->ToPlayer();
+                // immediately finishes the cooldown on Frost spells
 
-				PlayerSpellMap const& spellMap = caster->GetSpellMap();
-				for (PlayerSpellMap::const_iterator itr = spellMap.begin(); itr != spellMap.end(); ++itr)
-				{
-					SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(itr->first);
-					if (spellInfo->SpellFamilyName == SPELLFAMILY_MAGE && (spellInfo->GetSchoolMask() & SPELL_SCHOOL_MASK_FROST) && spellInfo->Id != SPELL_MAGE_COLD_SNAP && spellInfo->GetRecoveryTime() > 0)
-					{
-						SpellCooldowns::iterator citr = caster->GetSpellCooldownMap().find(spellInfo->Id);
-						if (citr != caster->GetSpellCooldownMap().end() && citr->second.needSendToClient)
-							caster->RemoveSpellCooldown(spellInfo->Id, true);
-						else
-							caster->RemoveSpellCooldown(spellInfo->Id, false);
-					}
-				}
+                PlayerSpellMap const& spellMap = caster->GetSpellMap();
+                for (PlayerSpellMap::const_iterator itr = spellMap.begin(); itr != spellMap.end(); ++itr)
+                {
+                    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(itr->first);
+                    if (spellInfo->SpellFamilyName == SPELLFAMILY_MAGE && (spellInfo->GetSchoolMask() & SPELL_SCHOOL_MASK_FROST) && spellInfo->Id != SPELL_MAGE_COLD_SNAP && spellInfo->GetRecoveryTime() > 0)
+                    {
+                        SpellCooldowns::iterator citr = caster->GetSpellCooldownMap().find(spellInfo->Id);
+                        if (citr != caster->GetSpellCooldownMap().end() && citr->second.needSendToClient)
+                            caster->RemoveSpellCooldown(spellInfo->Id, true);
+                        else
+                            caster->RemoveSpellCooldown(spellInfo->Id, false);
+                    }
+                }
             }
 
             void Register()
@@ -640,9 +640,9 @@ class spell_mage_fire_frost_ward : public SpellScriptLoader
                         target->CastCustomSpell(target, SPELL_MAGE_FROST_WARDING_TRIGGERED, &bp, NULL, NULL, true, NULL, aurEff);
                         absorbAmount = 0;
 
-						// Xinef: trigger Incanters Absorbtion
-						uint32 damage = dmgInfo.GetDamage();
-						Trigger(aurEff, dmgInfo, damage);
+                        // Xinef: trigger Incanters Absorbtion
+                        uint32 damage = dmgInfo.GetDamage();
+                        Trigger(aurEff, dmgInfo, damage);
 
                         // Xinef: hack for chaos bolt
                         if (!dmgInfo.GetSpellInfo() || dmgInfo.GetSpellInfo()->SpellIconID != 3178)
@@ -724,8 +724,8 @@ class spell_mage_ice_barrier : public SpellScriptLoader
     public:
         spell_mage_ice_barrier() : SpellScriptLoader("spell_mage_ice_barrier") { }
 
-		static int32 CalculateSpellAmount(Unit* caster, int32 amount, const SpellInfo* spellInfo, const AuraEffect* aurEff)
-		{
+        static int32 CalculateSpellAmount(Unit* caster, int32 amount, const SpellInfo* spellInfo, const AuraEffect* aurEff)
+        {
             // +80.68% from sp bonus
             float bonus = 0.8068f;
 
@@ -738,8 +738,8 @@ class spell_mage_ice_barrier : public SpellScriptLoader
             bonus *= caster->CalculateLevelPenalty(spellInfo);
 
             amount += int32(bonus);
-			return amount;
-		}
+            return amount;
+        }
 
         class spell_mage_ice_barrier_AuraScript : public spell_mage_incanters_absorbtion_base_AuraScript
         {
@@ -749,7 +749,7 @@ class spell_mage_ice_barrier : public SpellScriptLoader
             {
                 canBeRecalculated = false;
                 if (Unit* caster = GetCaster())
-					amount = CalculateSpellAmount(caster, amount, GetSpellInfo(), aurEff);
+                    amount = CalculateSpellAmount(caster, amount, GetSpellInfo(), aurEff);
             }
 
             void Register()
@@ -772,14 +772,14 @@ class spell_mage_ice_barrier : public SpellScriptLoader
             {
                 Unit* caster = GetCaster();
 
-				if (AuraEffect* aurEff = caster->GetAuraEffect(SPELL_AURA_SCHOOL_ABSORB, (SpellFamilyNames)GetSpellInfo()->SpellFamilyName, GetSpellInfo()->SpellIconID, EFFECT_0))
-				{
-					int32 newAmount = GetSpellInfo()->Effects[EFFECT_0].CalcValue(caster, NULL, NULL);
-					newAmount = CalculateSpellAmount(caster, newAmount, GetSpellInfo(), aurEff);
+                if (AuraEffect* aurEff = caster->GetAuraEffect(SPELL_AURA_SCHOOL_ABSORB, (SpellFamilyNames)GetSpellInfo()->SpellFamilyName, GetSpellInfo()->SpellIconID, EFFECT_0))
+                {
+                    int32 newAmount = GetSpellInfo()->Effects[EFFECT_0].CalcValue(caster, NULL, NULL);
+                    newAmount = CalculateSpellAmount(caster, newAmount, GetSpellInfo(), aurEff);
 
-					if (aurEff->GetAmount() > newAmount)
-						return SPELL_FAILED_AURA_BOUNCED;
-				}
+                    if (aurEff->GetAmount() > newAmount)
+                        return SPELL_FAILED_AURA_BOUNCED;
+                }
 
                 return SPELL_CAST_OK;
             }
@@ -815,15 +815,15 @@ class spell_mage_ignite : public SpellScriptLoader
 
             bool CheckProc(ProcEventInfo& eventInfo)
             {
-				if (!eventInfo.GetActor() || !eventInfo.GetProcTarget())
-					return false;
+                if (!eventInfo.GetActor() || !eventInfo.GetProcTarget())
+                    return false;
 
-				// Molten Armor
-				if (SpellInfo const* spellInfo = eventInfo.GetDamageInfo()->GetSpellInfo())
-					if (spellInfo->SpellFamilyFlags[1] & 0x8)
-						return false;
+                // Molten Armor
+                if (SpellInfo const* spellInfo = eventInfo.GetDamageInfo()->GetSpellInfo())
+                    if (spellInfo->SpellFamilyFlags[1] & 0x8)
+                        return false;
 
-				return true;
+                return true;
             }
 
             void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
@@ -835,7 +835,7 @@ class spell_mage_ignite : public SpellScriptLoader
 
                 int32 amount = int32(CalculatePct(eventInfo.GetDamageInfo()->GetDamage(), pct) / igniteDot->GetMaxTicks());
 
-				// Xinef: implement ignite bug
+                // Xinef: implement ignite bug
                 eventInfo.GetProcTarget()->CastDelayedSpellWithPeriodicAmount(eventInfo.GetActor(), SPELL_MAGE_IGNITE, SPELL_AURA_PERIODIC_DAMAGE, amount);
                 //GetTarget()->CastCustomSpell(SPELL_MAGE_IGNITE, SPELLVALUE_BASE_POINT0, amount, eventInfo.GetProcTarget(), true, NULL, aurEff);
             }
@@ -1054,11 +1054,11 @@ class spell_mage_summon_water_elemental : public SpellScriptLoader
 
             void HandleDummy(SpellEffIndex /*effIndex*/)
             {
-				Unit* caster = GetCaster();
+                Unit* caster = GetCaster();
 
-				if (Creature *pet = ObjectAccessor::GetCreature(*caster, caster->GetPetGUID()))
-					if (!pet->IsAlive())
-						pet->ToTempSummon()->UnSummon();
+                if (Creature *pet = ObjectAccessor::GetCreature(*caster, caster->GetPetGUID()))
+                    if (!pet->IsAlive())
+                        pet->ToTempSummon()->UnSummon();
 
                 // Glyph of Eternal Water
                 if (caster->HasAura(SPELL_MAGE_GLYPH_OF_ETERNAL_WATER))
@@ -1067,15 +1067,15 @@ class spell_mage_summon_water_elemental : public SpellScriptLoader
                     caster->CastSpell(caster, SPELL_MAGE_SUMMON_WATER_ELEMENTAL_TEMPORARY, true);
 
 
-				if (Creature *pet = ObjectAccessor::GetCreature(*caster, caster->GetPetGUID()))
-					if (pet->GetCharmInfo() && caster->ToPlayer())
-					{
-						pet->m_CreatureSpellCooldowns.clear();
-						const SpellInfo* spellEntry = sSpellMgr->GetSpellInfo(31707);
-						pet->GetCharmInfo()->ToggleCreatureAutocast(spellEntry, true);
-						pet->GetCharmInfo()->SetSpellAutocast(spellEntry, true);
-						caster->ToPlayer()->CharmSpellInitialize();
-					}
+                if (Creature *pet = ObjectAccessor::GetCreature(*caster, caster->GetPetGUID()))
+                    if (pet->GetCharmInfo() && caster->ToPlayer())
+                    {
+                        pet->m_CreatureSpellCooldowns.clear();
+                        const SpellInfo* spellEntry = sSpellMgr->GetSpellInfo(31707);
+                        pet->GetCharmInfo()->ToggleCreatureAutocast(spellEntry, true);
+                        pet->GetCharmInfo()->SetSpellAutocast(spellEntry, true);
+                        caster->ToPlayer()->CharmSpellInitialize();
+                    }
             }
 
             void Register()
@@ -1092,18 +1092,18 @@ class spell_mage_summon_water_elemental : public SpellScriptLoader
 
 void AddSC_mage_spell_scripts()
 {
-	// Ours
-	new spell_mage_arcane_blast();
-	new spell_mage_deep_freeze();
-	new spell_mage_burning_determination();
-	new spell_mage_molten_armor();
-	new spell_mage_mirror_image();
+    // Ours
+    new spell_mage_arcane_blast();
+    new spell_mage_deep_freeze();
+    new spell_mage_burning_determination();
+    new spell_mage_molten_armor();
+    new spell_mage_mirror_image();
     new spell_mage_burnout();
     new spell_mage_burnout_trigger();
-	new spell_mage_pet_scaling();
-	new spell_mage_brain_freeze();
+    new spell_mage_pet_scaling();
+    new spell_mage_brain_freeze();
 
-	// Theirs
+    // Theirs
     new spell_mage_blast_wave();
     new spell_mage_cold_snap();
     new spell_mage_fire_frost_ward();

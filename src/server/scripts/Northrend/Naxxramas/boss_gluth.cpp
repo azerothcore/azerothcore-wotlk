@@ -10,29 +10,29 @@ REWRITTEN FROM SCRATCH BY XINEF, IT OWNS NOW!
 
 enum Spells
 {
-	SPELL_MORTAL_WOUND					= 25646,
-	SPELL_ENRAGE_10						= 28371,
-	SPELL_ENRAGE_25						= 54427,
-	SPELL_DECIMATE_10					= 28374,
-	SPELL_DECIMATE_25					= 54426,
-	SPELL_BERSERK						= 26662,
-	SPELL_INFECTED_WOUND				= 29306,
-	SPELL_CHOW_SEARCHER					= 28404,
+    SPELL_MORTAL_WOUND                  = 25646,
+    SPELL_ENRAGE_10                     = 28371,
+    SPELL_ENRAGE_25                     = 54427,
+    SPELL_DECIMATE_10                   = 28374,
+    SPELL_DECIMATE_25                   = 54426,
+    SPELL_BERSERK                       = 26662,
+    SPELL_INFECTED_WOUND                = 29306,
+    SPELL_CHOW_SEARCHER                 = 28404,
 };
 
 enum Events
 {
-	EVENT_SPELL_MORTAL_WOUND			= 1,
-	EVENT_SPELL_ENRAGE					= 2,
-	EVENT_SPELL_DECIMATE				= 3,
-	EVENT_SPELL_BERSERK					= 4,
-	EVENT_SUMMON_ZOMBIE					= 5,
-	EVENT_CAN_EAT_ZOMBIE				= 6,
+    EVENT_SPELL_MORTAL_WOUND            = 1,
+    EVENT_SPELL_ENRAGE                  = 2,
+    EVENT_SPELL_DECIMATE                = 3,
+    EVENT_SPELL_BERSERK                 = 4,
+    EVENT_SUMMON_ZOMBIE                 = 5,
+    EVENT_CAN_EAT_ZOMBIE                = 6,
 };
 
 enum Misc
 {
-	NPC_ZOMBIE_CHOW						= 16360,
+    NPC_ZOMBIE_CHOW                     = 16360,
 };
 
 const Position zombiePos[3] =
@@ -52,157 +52,157 @@ public:
         return new boss_gluthAI (pCreature);
     }
 
-	struct boss_gluthAI : public ScriptedAI
-	{
-		boss_gluthAI(Creature *c) : ScriptedAI(c), summons(me)
-		{
-			pInstance = me->GetInstanceScript();
-		}
+    struct boss_gluthAI : public ScriptedAI
+    {
+        boss_gluthAI(Creature *c) : ScriptedAI(c), summons(me)
+        {
+            pInstance = me->GetInstanceScript();
+        }
 
-		EventMap events;
-		SummonList summons;
-		InstanceScript* pInstance;
-		uint64 gazeTarget;
-		
-		void Reset()
-		{
-			me->ApplySpellImmune(29306, IMMUNITY_ID, 29306, true);
-			events.Reset();
-			summons.DespawnAll();
-			gazeTarget = 0;
-			me->SetReactState(REACT_AGGRESSIVE);
+        EventMap events;
+        SummonList summons;
+        InstanceScript* pInstance;
+        uint64 gazeTarget;
+        
+        void Reset()
+        {
+            me->ApplySpellImmune(29306, IMMUNITY_ID, 29306, true);
+            events.Reset();
+            summons.DespawnAll();
+            gazeTarget = 0;
+            me->SetReactState(REACT_AGGRESSIVE);
 
-			if (pInstance)
-				pInstance->SetData(EVENT_GLUTH, NOT_STARTED);
-		}
+            if (pInstance)
+                pInstance->SetData(EVENT_GLUTH, NOT_STARTED);
+        }
 
-		void MoveInLineOfSight(Unit *who)
-		{
-			if ((!me->GetVictim() || me->GetVictim()->GetEntry() != NPC_ZOMBIE_CHOW) && who->GetEntry() == NPC_ZOMBIE_CHOW && me->IsWithinDistInMap(who, 15))
-			{
-				SetGazeOn(who);
-				me->MonsterTextEmote("%s spots a nearby zombie to devour!", 0, false);
-			}
-			else
-				ScriptedAI::MoveInLineOfSight(who);
-		}
+        void MoveInLineOfSight(Unit *who)
+        {
+            if ((!me->GetVictim() || me->GetVictim()->GetEntry() != NPC_ZOMBIE_CHOW) && who->GetEntry() == NPC_ZOMBIE_CHOW && me->IsWithinDistInMap(who, 15))
+            {
+                SetGazeOn(who);
+                me->MonsterTextEmote("%s spots a nearby zombie to devour!", 0, false);
+            }
+            else
+                ScriptedAI::MoveInLineOfSight(who);
+        }
 
-		void EnterCombat(Unit *who)
-		{
-			me->SetInCombatWithZone();
-			events.ScheduleEvent(EVENT_SPELL_MORTAL_WOUND, 10000);
-			events.ScheduleEvent(EVENT_SPELL_ENRAGE, 30000);
-			events.ScheduleEvent(EVENT_SPELL_DECIMATE, 105000);
-			events.ScheduleEvent(EVENT_SPELL_BERSERK, 8*60000);
-			events.ScheduleEvent(EVENT_SUMMON_ZOMBIE, 10000);
-			events.ScheduleEvent(EVENT_CAN_EAT_ZOMBIE, 1000);
+        void EnterCombat(Unit *who)
+        {
+            me->SetInCombatWithZone();
+            events.ScheduleEvent(EVENT_SPELL_MORTAL_WOUND, 10000);
+            events.ScheduleEvent(EVENT_SPELL_ENRAGE, 30000);
+            events.ScheduleEvent(EVENT_SPELL_DECIMATE, 105000);
+            events.ScheduleEvent(EVENT_SPELL_BERSERK, 8*60000);
+            events.ScheduleEvent(EVENT_SUMMON_ZOMBIE, 10000);
+            events.ScheduleEvent(EVENT_CAN_EAT_ZOMBIE, 1000);
 
-			if (pInstance)
-				pInstance->SetData(EVENT_GLUTH, IN_PROGRESS);
-		}
+            if (pInstance)
+                pInstance->SetData(EVENT_GLUTH, IN_PROGRESS);
+        }
 
-		void JustSummoned(Creature *summon)
-		{
-			if (summon->GetEntry() == NPC_ZOMBIE_CHOW)
-				summon->AI()->AttackStart(me);
+        void JustSummoned(Creature *summon)
+        {
+            if (summon->GetEntry() == NPC_ZOMBIE_CHOW)
+                summon->AI()->AttackStart(me);
 
-			summons.Summon(summon);
-		}
+            summons.Summon(summon);
+        }
 
-		void SummonedCreatureDies(Creature* cr, Unit*) { summons.Despawn(cr); }
+        void SummonedCreatureDies(Creature* cr, Unit*) { summons.Despawn(cr); }
 
-		void KilledUnit(Unit* who)
-		{
-			if (me->IsAlive() && who->GetEntry() == NPC_ZOMBIE_CHOW)
-				me->ModifyHealth(int32(me->GetMaxHealth()*0.05f));
+        void KilledUnit(Unit* who)
+        {
+            if (me->IsAlive() && who->GetEntry() == NPC_ZOMBIE_CHOW)
+                me->ModifyHealth(int32(me->GetMaxHealth()*0.05f));
 
-			if (who->GetTypeId() == TYPEID_PLAYER && pInstance)
-				pInstance->SetData(DATA_IMMORTAL_FAIL, 0);
-		}
+            if (who->GetTypeId() == TYPEID_PLAYER && pInstance)
+                pInstance->SetData(DATA_IMMORTAL_FAIL, 0);
+        }
 
-		void JustDied(Unit*)
-		{
-			summons.DespawnAll();
-			if (pInstance)
-				pInstance->SetData(EVENT_GLUTH, DONE);
-		}
+        void JustDied(Unit*)
+        {
+            summons.DespawnAll();
+            if (pInstance)
+                pInstance->SetData(EVENT_GLUTH, DONE);
+        }
 
-		bool SelectPlayerInRoom()
-		{
-			if (me->IsInCombat())
-				return false;
+        bool SelectPlayerInRoom()
+        {
+            if (me->IsInCombat())
+                return false;
 
-			Map::PlayerList const& pList = me->GetMap()->GetPlayers();
-			for(Map::PlayerList::const_iterator itr = pList.begin(); itr != pList.end(); ++itr)
-			{
-				Player* player = itr->GetSource();
-				if (!player || !player->IsAlive())
-					continue;
-				if (player->GetPositionZ() > 300.0f || me->GetExactDist(player) > 50.0f)
-					continue;
+            Map::PlayerList const& pList = me->GetMap()->GetPlayers();
+            for(Map::PlayerList::const_iterator itr = pList.begin(); itr != pList.end(); ++itr)
+            {
+                Player* player = itr->GetSource();
+                if (!player || !player->IsAlive())
+                    continue;
+                if (player->GetPositionZ() > 300.0f || me->GetExactDist(player) > 50.0f)
+                    continue;
 
-				AttackStart(player);
-				return true;
-			}
+                AttackStart(player);
+                return true;
+            }
 
-			return false;
-		}
+            return false;
+        }
 
-		void UpdateAI(uint32 diff)
-		{
-			if (!UpdateVictimWithGaze() && !SelectPlayerInRoom())
-				return;
+        void UpdateAI(uint32 diff)
+        {
+            if (!UpdateVictimWithGaze() && !SelectPlayerInRoom())
+                return;
 
-			events.Update(diff);
-			if (me->HasUnitState(UNIT_STATE_CASTING))
-				return;
+            events.Update(diff);
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+                return;
 
-			switch (events.GetEvent())
-			{
-				case EVENT_SPELL_BERSERK:
-					me->CastSpell(me, SPELL_BERSERK, true);
-					events.PopEvent();
-					break;
-				case EVENT_SPELL_ENRAGE:
-					me->MonsterTextEmote("Gluth becomes enraged!", 0, true);
-					me->CastSpell(me, RAID_MODE(SPELL_ENRAGE_10, SPELL_ENRAGE_25), true);
-					events.RepeatEvent(30000);
-					break;
-				case EVENT_SPELL_MORTAL_WOUND:
-					me->CastSpell(me->GetVictim(), SPELL_MORTAL_WOUND, false);
-					events.RepeatEvent(10000);
-					break;
-				case EVENT_SPELL_DECIMATE:
-					me->MonsterTextEmote("Gluth decimates all nearby flesh!", 0, true);
-					me->CastSpell(me, RAID_MODE(SPELL_DECIMATE_10, SPELL_DECIMATE_25), false);
-					events.RepeatEvent(105000);
-					break;
-				case EVENT_SUMMON_ZOMBIE:
-					{
-					uint8 rand = urand(0,2);
-					for (int32 i = 0; i < RAID_MODE(1,2); ++i)
-					{
-						me->SummonCreature(NPC_ZOMBIE_CHOW, zombiePos[urand(0,2)]);
-						(rand == 2 ? rand = 0 : rand++);
-					}
+            switch (events.GetEvent())
+            {
+                case EVENT_SPELL_BERSERK:
+                    me->CastSpell(me, SPELL_BERSERK, true);
+                    events.PopEvent();
+                    break;
+                case EVENT_SPELL_ENRAGE:
+                    me->MonsterTextEmote("Gluth becomes enraged!", 0, true);
+                    me->CastSpell(me, RAID_MODE(SPELL_ENRAGE_10, SPELL_ENRAGE_25), true);
+                    events.RepeatEvent(30000);
+                    break;
+                case EVENT_SPELL_MORTAL_WOUND:
+                    me->CastSpell(me->GetVictim(), SPELL_MORTAL_WOUND, false);
+                    events.RepeatEvent(10000);
+                    break;
+                case EVENT_SPELL_DECIMATE:
+                    me->MonsterTextEmote("Gluth decimates all nearby flesh!", 0, true);
+                    me->CastSpell(me, RAID_MODE(SPELL_DECIMATE_10, SPELL_DECIMATE_25), false);
+                    events.RepeatEvent(105000);
+                    break;
+                case EVENT_SUMMON_ZOMBIE:
+                    {
+                    uint8 rand = urand(0,2);
+                    for (int32 i = 0; i < RAID_MODE(1,2); ++i)
+                    {
+                        me->SummonCreature(NPC_ZOMBIE_CHOW, zombiePos[urand(0,2)]);
+                        (rand == 2 ? rand = 0 : rand++);
+                    }
 
-					events.RepeatEvent(10000);
-					break;
-					}
-				case EVENT_CAN_EAT_ZOMBIE:
-					events.RepeatEvent(1000);
-					if (me->GetVictim()->GetEntry() == NPC_ZOMBIE_CHOW && me->IsWithinMeleeRange(me->GetVictim()))
-					{
-						me->CastCustomSpell(SPELL_CHOW_SEARCHER, SPELLVALUE_RADIUS_MOD, 20000, me, true);
-						me->MonsterTextEmote("%s devour all nearby zombies!", 0, false);
-						return; // leave it to skip DoMeleeAttackIfReady
-					}
-					break;
-			}
+                    events.RepeatEvent(10000);
+                    break;
+                    }
+                case EVENT_CAN_EAT_ZOMBIE:
+                    events.RepeatEvent(1000);
+                    if (me->GetVictim()->GetEntry() == NPC_ZOMBIE_CHOW && me->IsWithinMeleeRange(me->GetVictim()))
+                    {
+                        me->CastCustomSpell(SPELL_CHOW_SEARCHER, SPELLVALUE_RADIUS_MOD, 20000, me, true);
+                        me->MonsterTextEmote("%s devour all nearby zombies!", 0, false);
+                        return; // leave it to skip DoMeleeAttackIfReady
+                    }
+                    break;
+            }
 
-			DoMeleeAttackIfReady();
-		}
-	};
+            DoMeleeAttackIfReady();
+        }
+    };
 };
 
 class spell_gluth_decimate : public SpellScriptLoader
@@ -218,18 +218,18 @@ class spell_gluth_decimate : public SpellScriptLoader
             {
                 if (Unit* unitTarget = GetHitUnit())
                 {
-					int32 damage = int32(unitTarget->GetHealth()) - int32(unitTarget->CountPctFromMaxHealth(5));
-					if (damage <= 0)
-						return;
+                    int32 damage = int32(unitTarget->GetHealth()) - int32(unitTarget->CountPctFromMaxHealth(5));
+                    if (damage <= 0)
+                        return;
 
-					if (Creature* cTarget = unitTarget->ToCreature())
-					{
-						cTarget->SetWalk(true);
-						cTarget->GetMotionMaster()->MoveFollow(GetCaster(), 0.0f, 0.0f, MOTION_SLOT_CONTROLLED);
-						cTarget->SetReactState(REACT_PASSIVE);
-						Unit::DealDamage(GetCaster(), cTarget, damage);
-						return;
-					}
+                    if (Creature* cTarget = unitTarget->ToCreature())
+                    {
+                        cTarget->SetWalk(true);
+                        cTarget->GetMotionMaster()->MoveFollow(GetCaster(), 0.0f, 0.0f, MOTION_SLOT_CONTROLLED);
+                        cTarget->SetReactState(REACT_PASSIVE);
+                        Unit::DealDamage(GetCaster(), cTarget, damage);
+                        return;
+                    }
 
                     GetCaster()->CastCustomSpell(28375, SPELLVALUE_BASE_POINT0, damage, unitTarget);
                 }
@@ -237,7 +237,7 @@ class spell_gluth_decimate : public SpellScriptLoader
 
             void Register()
             {
-				OnEffectHitTarget += SpellEffectFn(spell_gluth_decimate_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+                OnEffectHitTarget += SpellEffectFn(spell_gluth_decimate_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
             }
         };
 
@@ -250,6 +250,6 @@ class spell_gluth_decimate : public SpellScriptLoader
 void AddSC_boss_gluth()
 {
     new boss_gluth();
-	new spell_gluth_decimate();
+    new spell_gluth_decimate();
 }
 

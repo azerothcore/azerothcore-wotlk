@@ -29,9 +29,9 @@
 // Ours
 enum qRedRocket
 {
-	SPELL_TORPEDO_EXPLODE						= 49290,
-	SPELL_ALLIANCE_TORPEDO_KILL_CREDIT			= 49510,
-	SPELL_HORDE_TORPEDO_KILL_CREDIT				= 49340,
+    SPELL_TORPEDO_EXPLODE                       = 49290,
+    SPELL_ALLIANCE_TORPEDO_KILL_CREDIT          = 49510,
+    SPELL_HORDE_TORPEDO_KILL_CREDIT             = 49340,
 
 };
 
@@ -40,7 +40,7 @@ class npc_riding_the_red_rocket : public CreatureScript
 public:
     npc_riding_the_red_rocket() : CreatureScript("npc_riding_the_red_rocket") { }
 
-	struct npc_riding_the_red_rocketAI : public VehicleAI
+    struct npc_riding_the_red_rocketAI : public VehicleAI
     {
         npc_riding_the_red_rocketAI(Creature* creature) : VehicleAI(creature) {}
 
@@ -50,30 +50,30 @@ public:
 
         void UpdateAI(uint32 diff)
         {
-			if (me->GetDistance(2763, -1596, 0) < 20.0f) // Horde ship
-			{
-				me->CastSpell(me, SPELL_ALLIANCE_TORPEDO_KILL_CREDIT, true);
-				if (Unit* owner = me->GetCharmerOrOwner())
-				{
-					Position pos(me->GetHomePosition());
-					owner->ExitVehicle();
-					me->NearTeleportTo(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation(), false);
-					owner->CastSpell(owner, SPELL_TORPEDO_EXPLODE, true);
-					owner->KnockbackFrom(owner->GetPositionX(), owner->GetPositionY(), 5.0f, 50.0f);
-				}
-			}
-			else if (me->GetDistance(2545, -2242, 0) < 20.0f) // Alliance ship
-			{
-				me->CastSpell(me, SPELL_HORDE_TORPEDO_KILL_CREDIT, true);
-				if (Unit* owner = me->GetCharmerOrOwner())
-				{
-					Position pos(me->GetHomePosition());
-					owner->ExitVehicle();
-					me->NearTeleportTo(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation(), false);
-					owner->CastSpell(owner, SPELL_TORPEDO_EXPLODE, true);
-					owner->KnockbackFrom(owner->GetPositionX(), owner->GetPositionY(), 5.0f, 50.0f);
-				}
-			}
+            if (me->GetDistance(2763, -1596, 0) < 20.0f) // Horde ship
+            {
+                me->CastSpell(me, SPELL_ALLIANCE_TORPEDO_KILL_CREDIT, true);
+                if (Unit* owner = me->GetCharmerOrOwner())
+                {
+                    Position pos(me->GetHomePosition());
+                    owner->ExitVehicle();
+                    me->NearTeleportTo(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation(), false);
+                    owner->CastSpell(owner, SPELL_TORPEDO_EXPLODE, true);
+                    owner->KnockbackFrom(owner->GetPositionX(), owner->GetPositionY(), 5.0f, 50.0f);
+                }
+            }
+            else if (me->GetDistance(2545, -2242, 0) < 20.0f) // Alliance ship
+            {
+                me->CastSpell(me, SPELL_HORDE_TORPEDO_KILL_CREDIT, true);
+                if (Unit* owner = me->GetCharmerOrOwner())
+                {
+                    Position pos(me->GetHomePosition());
+                    owner->ExitVehicle();
+                    me->NearTeleportTo(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation(), false);
+                    owner->CastSpell(owner, SPELL_TORPEDO_EXPLODE, true);
+                    owner->KnockbackFrom(owner->GetPositionX(), owner->GetPositionY(), 5.0f, 50.0f);
+                }
+            }
         }
     };
 
@@ -889,10 +889,10 @@ class spell_infected_worgen_bite : public SpellScriptLoader
 
 void AddSC_grizzly_hills()
 {
-	// Ours
-	new npc_riding_the_red_rocket();
+    // Ours
+    new npc_riding_the_red_rocket();
 
-	// Theirs
+    // Theirs
     new npc_emily();
     new npc_mrfloppy();
     new npc_outhouse_bunny();

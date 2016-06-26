@@ -34,11 +34,11 @@ bool OutdoorPvPGH::SetupOutdoorPvP()
 {
     RegisterZone(GH_ZONE);
     if (m_obj = new OPvPCapturePointGH(this))
-	{
-		AddCapturePoint(m_obj);
-		return true;
-	}
-	return false;
+    {
+        AddCapturePoint(m_obj);
+        return true;
+    }
+    return false;
 }
 
 void OutdoorPvPGH::SendRemoveWorldStates(Player* player)
@@ -95,15 +95,15 @@ void OPvPCapturePointGH::ChangeState()
     switch (m_State)
     {
         case OBJECTIVESTATE_ALLIANCE:
-			sGameEventMgr->StopEvent(GH_ALLIANCE_DEFENSE_EVENT);
-			sGameEventMgr->StopEvent(GH_HORDE_DEFENSE_EVENT);
-			sGameEventMgr->StartEvent(GH_ALLIANCE_DEFENSE_EVENT);
+            sGameEventMgr->StopEvent(GH_ALLIANCE_DEFENSE_EVENT);
+            sGameEventMgr->StopEvent(GH_HORDE_DEFENSE_EVENT);
+            sGameEventMgr->StartEvent(GH_ALLIANCE_DEFENSE_EVENT);
             artkit = 2;
             break;
         case OBJECTIVESTATE_HORDE:
-			sGameEventMgr->StopEvent(GH_ALLIANCE_DEFENSE_EVENT);
-			sGameEventMgr->StopEvent(GH_HORDE_DEFENSE_EVENT);
-			sGameEventMgr->StartEvent(GH_HORDE_DEFENSE_EVENT);
+            sGameEventMgr->StopEvent(GH_ALLIANCE_DEFENSE_EVENT);
+            sGameEventMgr->StopEvent(GH_HORDE_DEFENSE_EVENT);
+            sGameEventMgr->StartEvent(GH_HORDE_DEFENSE_EVENT);
             artkit = 1;
             break;
     }

@@ -128,8 +128,8 @@ bool OPvPCapturePoint::SetCapturePointData(uint32 entry, uint32 map, float x, fl
 
     uint32 lowguid = sObjectMgr->AddGOData(entry, map, x, y, z, o, 0, rotation0, rotation1, rotation2, rotation3);
     if (!lowguid)
-		return false;
-	m_capturePointGUID = MAKE_NEW_GUID(lowguid, entry, HIGHGUID_GAMEOBJECT);
+        return false;
+    m_capturePointGUID = MAKE_NEW_GUID(lowguid, entry, HIGHGUID_GAMEOBJECT);
 
     // get the needed values from goinfo
     m_maxValue = (float)goinfo->capturePoint.maxTime;

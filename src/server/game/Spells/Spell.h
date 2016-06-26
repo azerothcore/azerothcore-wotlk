@@ -166,12 +166,12 @@ class SpellCastTargets
         void Update(Unit* caster);
         void OutDebug() const;
 
-		// Xinef: Channel data
-		void SetObjectTargetChannel(uint64 targetGUID);
-		void SetDstChannel(SpellDestination const& spellDest);
-		WorldObject* GetObjectTargetChannel(Unit* caster) const;
-		bool HasDstChannel() const;
-		SpellDestination const* GetDstChannel() const;
+        // Xinef: Channel data
+        void SetObjectTargetChannel(uint64 targetGUID);
+        void SetDstChannel(SpellDestination const& spellDest);
+        WorldObject* GetObjectTargetChannel(Unit* caster) const;
+        bool HasDstChannel() const;
+        SpellDestination const* GetDstChannel() const;
 
     private:
         uint32 m_targetMask;
@@ -191,9 +191,9 @@ class SpellCastTargets
         float m_elevation, m_speed;
         std::string m_strTarget;
 
-		// Xinef: Save channel data
-		SpellDestination m_dstChannel;
-		uint64 m_objectTargetGUIDChannel;
+        // Xinef: Save channel data
+        SpellDestination m_dstChannel;
+        uint64 m_objectTargetGUIDChannel;
 };
 
 struct SpellValue
@@ -203,7 +203,7 @@ struct SpellValue
     uint32    MaxAffectedTargets;
     float     RadiusMod;
     uint8     AuraStackAmount;
-	bool	  ForcedCritResult;
+    bool      ForcedCritResult;
 };
 
 enum SpellState
@@ -227,14 +227,14 @@ enum SpellEffectHandleMode
 // Xinef: special structure containing data for channel target spells
 struct ChannelTargetData
 {
-	ChannelTargetData(uint64 cguid, const SpellDestination* dst) : channelGUID(cguid)
-	{
-		if (dst)
-			spellDst = *dst;
-	}
+    ChannelTargetData(uint64 cguid, const SpellDestination* dst) : channelGUID(cguid)
+    {
+        if (dst)
+            spellDst = *dst;
+    }
 
-	uint64 channelGUID;
-	SpellDestination spellDst;
+    uint64 channelGUID;
+    SpellDestination spellDst;
 };
 
 class Spell
@@ -404,7 +404,7 @@ class Spell
         void cancel(bool bySelf = false);
         void update(uint32 difftime);
         void cast(bool skipCheck = false);
-		void _cast(bool skipCheck);
+        void _cast(bool skipCheck);
         void finish(bool ok = true);
         void TakePower();
         void TakeAmmo();
@@ -424,7 +424,7 @@ class Spell
         void _handle_finish_phase();
 
         SpellCastResult CheckItems();
-		SpellCastResult CheckSpellFocus();
+        SpellCastResult CheckSpellFocus();
         SpellCastResult CheckRange(bool strict);
         SpellCastResult CheckPower();
         SpellCastResult CheckRuneCost(uint32 runeCostID);
@@ -502,7 +502,7 @@ class Spell
         uint64 GetDelayStart() const { return m_delayStart; }
         void SetDelayStart(uint64 m_time) { m_delayStart = m_time; }
         uint64 GetDelayMoment() const { return m_delayMoment; }
-		uint64 GetDelayTrajectory() const { return m_delayTrajectory; }
+        uint64 GetDelayTrajectory() const { return m_delayTrajectory; }
 
         bool IsNeedSendToClient(bool go) const;
 
@@ -518,12 +518,12 @@ class Spell
         void CleanupTargetList();
 
         void SetSpellValue(SpellValueMod mod, int32 value);
-		SpellValue const* const GetSpellValue() { return m_spellValue; }
+        SpellValue const* const GetSpellValue() { return m_spellValue; }
 
-		// xinef: moved to public
+        // xinef: moved to public
         void LoadScripts();
 
-		// Targets store structures and data
+        // Targets store structures and data
         struct TargetInfo
         {
             uint64 targetGUID;
@@ -537,7 +537,7 @@ class Spell
             bool   scaleAura:1;
             int32  damage;
         };
-		std::list<TargetInfo>* GetUniqueTargetInfo() { return &m_UniqueTargetInfo; }
+        std::list<TargetInfo>* GetUniqueTargetInfo() { return &m_UniqueTargetInfo; }
     protected:
         bool HasGlobalCooldown() const;
         void TriggerGlobalCooldown();
@@ -578,7 +578,7 @@ class Spell
         // Delayed spells system
         uint64 m_delayStart;                                // time of spell delay start, filled by event handler, zero = just started
         uint64 m_delayMoment;                               // moment of next delay call, used internally
-		uint64 m_delayTrajectory;							// Xinef: Trajectory delay
+        uint64 m_delayTrajectory;                           // Xinef: Trajectory delay
         bool m_immediateHandled;                            // were immediate actions handled? (used by delayed spells only)
 
         // These vars are used in both delayed spell system and modified immediate spell system
@@ -664,7 +664,7 @@ class Spell
         void CheckEffectExecuteData();
 
         // Scripting system
-		bool _scriptsLoaded;
+        bool _scriptsLoaded;
         //void LoadScripts();
         void CallScriptBeforeCastHandlers();
         void CallScriptOnCastHandlers();
@@ -714,8 +714,8 @@ class Spell
         bool m_skipCheck;
         uint8 m_auraScaleMask;
 
-		// xinef:
-		bool _spellTargetsSelected;
+        // xinef:
+        bool _spellTargetsSelected;
 
         ByteBuffer * m_effectExecuteData[MAX_SPELL_EFFECTS];
 
@@ -774,7 +774,7 @@ namespace Trinity
     struct WorldObjectSpellTrajTargetCheck : public WorldObjectSpellAreaTargetCheck
     {
         WorldObjectSpellTrajTargetCheck(float range, Position const* position, Unit* caster,
-			SpellInfo const* spellInfo, SpellTargetCheckTypes selectionType, ConditionList* condList);
+            SpellInfo const* spellInfo, SpellTargetCheckTypes selectionType, ConditionList* condList);
         bool operator()(WorldObject* target);
     };
 }
@@ -796,14 +796,14 @@ class SpellEvent : public BasicEvent
 
 class ReflectEvent : public BasicEvent
 {
-	public:
-		ReflectEvent(uint64 casterGUID, uint64 targetGUID, const SpellInfo* spellInfo) : _casterGUID(casterGUID), _targetGUID(targetGUID), _spellInfo(spellInfo) { }
-		virtual bool Execute(uint64 e_time, uint32 p_time);
+    public:
+        ReflectEvent(uint64 casterGUID, uint64 targetGUID, const SpellInfo* spellInfo) : _casterGUID(casterGUID), _targetGUID(targetGUID), _spellInfo(spellInfo) { }
+        virtual bool Execute(uint64 e_time, uint32 p_time);
 
-	protected:
-		uint64 _casterGUID;
-		uint64 _targetGUID;
-		const SpellInfo* _spellInfo;
+    protected:
+        uint64 _casterGUID;
+        uint64 _targetGUID;
+        const SpellInfo* _spellInfo;
 };
 
 #endif

@@ -75,7 +75,7 @@ enum BattlegroundMarks
     SPELL_AV_MARK_WINNER            = 24955,
     SPELL_SA_MARK_WINNER            = 61160,
     SPELL_SA_MARK_LOSER             = 61159,
-	SPELL_WG_MARK_WINNER			= 56902,
+    SPELL_WG_MARK_WINNER            = 56902,
     ITEM_AV_MARK_OF_HONOR           = 20560,
     ITEM_WS_MARK_OF_HONOR           = 20558,
     ITEM_AB_MARK_OF_HONOR           = 20559,
@@ -171,7 +171,7 @@ enum BattlegroundStatus
 
 enum BattlegroundTeams
 {
-	BG_TEAMS_COUNT		= 2
+    BG_TEAMS_COUNT      = 2
 };
 
 struct BattlegroundObjectInfo
@@ -256,30 +256,30 @@ struct BattlegroundScore
     uint32 BonusHonor;
     uint32 DamageDone;
     uint32 HealingDone;
-	Player* player;
+    Player* player;
 };
 
 class ArenaLogEntryData
 {
-	public:
-		ArenaLogEntryData() : Guid(0), ArenaTeamId(0), DamageDone(0), HealingDone(0), KillingBlows(0) {}
-		void Fill(const char* name, uint32 guid, uint32 acc, uint32 arenaTeamId, std::string ip)
-		{
-			Name = std::string(name);
-			Guid = guid;
-			Acc = acc;
-			ArenaTeamId = arenaTeamId;
-			IP = ip;
-		}
+    public:
+        ArenaLogEntryData() : Guid(0), ArenaTeamId(0), DamageDone(0), HealingDone(0), KillingBlows(0) {}
+        void Fill(const char* name, uint32 guid, uint32 acc, uint32 arenaTeamId, std::string ip)
+        {
+            Name = std::string(name);
+            Guid = guid;
+            Acc = acc;
+            ArenaTeamId = arenaTeamId;
+            IP = ip;
+        }
 
-		std::string Name;
-		uint32 Guid;
-		uint32 Acc;
-		uint32 ArenaTeamId;
-		std::string IP;
-		uint32 DamageDone;
-		uint32 HealingDone;
-		uint32 KillingBlows;
+        std::string Name;
+        uint32 Guid;
+        uint32 Acc;
+        uint32 ArenaTeamId;
+        std::string IP;
+        uint32 DamageDone;
+        uint32 HealingDone;
+        uint32 KillingBlows;
 };
 
 enum BGHonorMode
@@ -368,23 +368,23 @@ class Battleground
         void SetMaxPlayersPerTeam(uint32 MaxPlayers) { m_MaxPlayersPerTeam = MaxPlayers; }
         void SetMinPlayersPerTeam(uint32 MinPlayers) { m_MinPlayersPerTeam = MinPlayers; }
 
-		void DecreaseInvitedCount(TeamId teamId)    { ASSERT(m_BgInvitedPlayers[teamId] > 0); --m_BgInvitedPlayers[teamId]; }
-		void IncreaseInvitedCount(TeamId teamId)    { ++m_BgInvitedPlayers[teamId]; }
-		uint32 GetInvitedCount(TeamId teamId) const { return m_BgInvitedPlayers[teamId]; }
+        void DecreaseInvitedCount(TeamId teamId)    { ASSERT(m_BgInvitedPlayers[teamId] > 0); --m_BgInvitedPlayers[teamId]; }
+        void IncreaseInvitedCount(TeamId teamId)    { ++m_BgInvitedPlayers[teamId]; }
+        uint32 GetInvitedCount(TeamId teamId) const { return m_BgInvitedPlayers[teamId]; }
 
         bool HasFreeSlots() const;
         uint32 GetFreeSlotsForTeam(TeamId teamId) const;
-		uint32 GetMaxFreeSlots() const;
+        uint32 GetMaxFreeSlots() const;
  
         typedef std::set<Player*> SpectatorList;
-		typedef std::map<uint64, uint64> ToBeTeleportedMap;
+        typedef std::map<uint64, uint64> ToBeTeleportedMap;
         void AddSpectator(Player* p) { m_Spectators.insert(p); }
         void RemoveSpectator(Player* p) { m_Spectators.erase(p); }
         bool HaveSpectators() { return !m_Spectators.empty(); }
-		const SpectatorList& GetSpectators() const { return m_Spectators; }
-		void AddToBeTeleported(uint64 spectator, uint64 participant) { m_ToBeTeleported[spectator] = participant; }
-		void RemoveToBeTeleported(uint64 spectator) { ToBeTeleportedMap::iterator itr = m_ToBeTeleported.find(spectator); if (itr != m_ToBeTeleported.end()) m_ToBeTeleported.erase(itr); }
-		void SpectatorsSendPacket(WorldPacket& data);
+        const SpectatorList& GetSpectators() const { return m_Spectators; }
+        void AddToBeTeleported(uint64 spectator, uint64 participant) { m_ToBeTeleported[spectator] = participant; }
+        void RemoveToBeTeleported(uint64 spectator) { ToBeTeleportedMap::iterator itr = m_ToBeTeleported.find(spectator); if (itr != m_ToBeTeleported.end()) m_ToBeTeleported.erase(itr); }
+        void SpectatorsSendPacket(WorldPacket& data);
 
         bool isArena() const        { return m_IsArena; }
         bool isBattleground() const { return !m_IsArena; }
@@ -394,8 +394,8 @@ class Battleground
         BattlegroundPlayerMap const& GetPlayers() const { return m_Players; }
         uint32 GetPlayersSize() const { return m_Players.size(); }
 
-		void ReadyMarkerClicked(Player* p); // pussywizard
-		std::set<uint32> readyMarkerClickedSet; // pussywizard
+        void ReadyMarkerClicked(Player* p); // pussywizard
+        std::set<uint32> readyMarkerClickedSet; // pussywizard
 
         typedef std::map<uint64, BattlegroundScore*> BattlegroundScoreMap;
         typedef std::map<uint64, ArenaLogEntryData> ArenaLogEntryDataMap;// pussywizard
@@ -624,8 +624,8 @@ class Battleground
         BGHonorMode m_HonorMode;
         int32 m_TeamScores[BG_TEAMS_COUNT];
 
-		// pussywizard:
-		uint32 m_UpdateTimer;
+        // pussywizard:
+        uint32 m_UpdateTimer;
     private:
         // Battleground
         BattlegroundTypeId m_RealTypeID;
@@ -684,13 +684,13 @@ class Battleground
         // Invited counters are useful for player invitation to BG - do not allow, if BG is started to one faction to have 2 more players than another faction
         // Invited counters will be changed only when removing already invited player from queue, removing player from battleground and inviting player to BG
         // Invited players counters
-		uint32 m_BgInvitedPlayers[BG_TEAMS_COUNT];
+        uint32 m_BgInvitedPlayers[BG_TEAMS_COUNT];
 
         // Raid Group
         Group* m_BgRaids[BG_TEAMS_COUNT];                   // 0 - alliance, 1 - horde
 
-		SpectatorList m_Spectators;
-		ToBeTeleportedMap m_ToBeTeleported;
+        SpectatorList m_Spectators;
+        ToBeTeleportedMap m_ToBeTeleported;
 
         // Players count by team
         uint32 m_PlayersCount[BG_TEAMS_COUNT];

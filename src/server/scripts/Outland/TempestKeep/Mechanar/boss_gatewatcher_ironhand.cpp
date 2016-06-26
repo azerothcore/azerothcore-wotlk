@@ -49,7 +49,7 @@ class boss_gatewatcher_iron_hand : public CreatureScript
 
             void KilledUnit(Unit* victim)
             {
-				if (victim->GetTypeId() == TYPEID_PLAYER)
+                if (victim->GetTypeId() == TYPEID_PLAYER)
                     Talk(SAY_SLAY);
             }
 
@@ -71,17 +71,17 @@ class boss_gatewatcher_iron_hand : public CreatureScript
                 switch (events.ExecuteEvent())
                 {
                     case EVENT_STREAM_OF_MACHINE_FLUID:
-						me->CastSpell(me->GetVictim(), SPELL_STREAM_OF_MACHINE_FLUID, false);
+                        me->CastSpell(me->GetVictim(), SPELL_STREAM_OF_MACHINE_FLUID, false);
                         events.ScheduleEvent(EVENT_STREAM_OF_MACHINE_FLUID, 20000);
                         break;
                     case EVENT_JACKHAMMER:
                         Talk(EMOTE_HAMMER);
                         Talk(SAY_HAMMER);
-						me->CastSpell(me, SPELL_JACKHAMMER, false);
+                        me->CastSpell(me, SPELL_JACKHAMMER, false);
                         events.ScheduleEvent(EVENT_JACKHAMMER, 40000);
                         break;
                     case EVENT_SHADOW_POWER:
-						me->CastSpell(me, SPELL_SHADOW_POWER, false);
+                        me->CastSpell(me, SPELL_SHADOW_POWER, false);
                         events.ScheduleEvent(EVENT_SHADOW_POWER, 25000);
                         break;
                     default:

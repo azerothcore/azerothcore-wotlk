@@ -201,24 +201,24 @@ void BattlegroundDS::HandleAreaTrigger(Player* player, uint32 trigger)
             if (getPipeKnockBackCount() >= BG_DS_PIPE_KNOCKBACK_TOTAL_COUNT)
                 setPipeKnockBackCount(0);
             break;
-		// OUTSIDE OF ARENA, TELEPORT!
-		case 5328:
-			player->NearTeleportTo(1290.44f, 744.96f, 3.16f, 1.6f);
-			break;
-		case 5329:
-			player->NearTeleportTo(1292.6f, 837.07f, 3.161f, 4.7f);
-			break;
-		case 5330:
-			player->NearTeleportTo(1250.68f, 790.86f, 3.16f, 0.0f);
-			break;
-		case 5331:
-			player->NearTeleportTo(1332.50f, 790.9f, 3.16f, 3.14f);
-			break;
-		case 5326: // -10
-		case 5343: // -40
-		case 5344: // -60
-			player->NearTeleportTo(1330.0f, 800.0f, 3.16f, player->GetOrientation());
-			break;
+        // OUTSIDE OF ARENA, TELEPORT!
+        case 5328:
+            player->NearTeleportTo(1290.44f, 744.96f, 3.16f, 1.6f);
+            break;
+        case 5329:
+            player->NearTeleportTo(1292.6f, 837.07f, 3.161f, 4.7f);
+            break;
+        case 5330:
+            player->NearTeleportTo(1250.68f, 790.86f, 3.16f, 0.0f);
+            break;
+        case 5331:
+            player->NearTeleportTo(1332.50f, 790.9f, 3.16f, 3.14f);
+            break;
+        case 5326: // -10
+        case 5343: // -40
+        case 5344: // -60
+            player->NearTeleportTo(1330.0f, 800.0f, 3.16f, player->GetOrientation());
+            break;
     }
 }
 

@@ -36,7 +36,7 @@ class instance_gruuls_lair : public InstanceMapScript
                 LoadMinionData(minionData);
 
                 _maulgarGUID = 0;
-				_addsKilled = 0;
+                _addsKilled = 0;
             }
 
             void OnCreatureCreate(Creature* creature)
@@ -91,27 +91,27 @@ class instance_gruuls_lair : public InstanceMapScript
                 }
             }
 
-			bool SetBossState(uint32 id, EncounterState state)
-			{
-				if (!InstanceScript::SetBossState(id, state))
-					return false;
+            bool SetBossState(uint32 id, EncounterState state)
+            {
+                if (!InstanceScript::SetBossState(id, state))
+                    return false;
 
-				if (id == DATA_MAULGAR && state == NOT_STARTED)
-					_addsKilled = 0;
-				return true;
-			}
+                if (id == DATA_MAULGAR && state == NOT_STARTED)
+                    _addsKilled = 0;
+                return true;
+            }
 
-			void SetData(uint32 type, uint32 id)
-			{
-				if (type == DATA_ADDS_KILLED)
-					if (Creature* maulgar = instance->GetCreature(_maulgarGUID))
-						maulgar->AI()->DoAction(++_addsKilled);
-			}
+            void SetData(uint32 type, uint32 id)
+            {
+                if (type == DATA_ADDS_KILLED)
+                    if (Creature* maulgar = instance->GetCreature(_maulgarGUID))
+                        maulgar->AI()->DoAction(++_addsKilled);
+            }
 
             uint32 GetData(uint32 type) const
             {
                 if (type == DATA_ADDS_KILLED)
-					return _addsKilled;
+                    return _addsKilled;
                 return 0;
             }
 
@@ -159,7 +159,7 @@ class instance_gruuls_lair : public InstanceMapScript
             }
 
         protected:
-			uint32 _addsKilled;
+            uint32 _addsKilled;
             uint64 _maulgarGUID;
         };
 

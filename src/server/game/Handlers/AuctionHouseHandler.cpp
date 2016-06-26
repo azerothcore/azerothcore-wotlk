@@ -121,9 +121,9 @@ void WorldSession::HandleAuctionSellItem(WorldPacket & recvData)
     recvData >> itemsCount;
 
     uint64 itemGUIDs[MAX_AUCTION_ITEMS]; // 160 slot = 4x 36 slot bag + backpack 16 slot
-	memset(itemGUIDs, 0, sizeof(itemGUIDs));
+    memset(itemGUIDs, 0, sizeof(itemGUIDs));
     uint32 count[MAX_AUCTION_ITEMS];
-	memset(count, 0, sizeof(count));
+    memset(count, 0, sizeof(count));
 
     if (itemsCount > MAX_AUCTION_ITEMS)
     {
@@ -190,7 +190,7 @@ void WorldSession::HandleAuctionSellItem(WorldPacket & recvData)
     Item* items[MAX_AUCTION_ITEMS];
 
     uint32 finalCount = 0;
-	uint32 itemEntry = 0;
+    uint32 itemEntry = 0;
 
     for (uint32 i = 0; i < itemsCount; ++i)
     {
@@ -266,10 +266,10 @@ void WorldSession::HandleAuctionSellItem(WorldPacket & recvData)
         AuctionEntry* AH = new AuctionEntry;
         AH->Id = sObjectMgr->GenerateAuctionID();
 
-		if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_AUCTION))
-			AH->auctioneer = 23442;
-		else
-			AH->auctioneer = GUID_LOPART(auctioneer);
+        if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_AUCTION))
+            AH->auctioneer = 23442;
+        else
+            AH->auctioneer = GUID_LOPART(auctioneer);
 
         // Required stack size of auction matches to current item stack size, just move item to auctionhouse
         if (itemsCount == 1 && item->GetCount() == count[i])
@@ -635,17 +635,17 @@ void WorldSession::HandleAuctionListBidderItems(WorldPacket & recvData)
 //this void sends player info about his auctions
 void WorldSession::HandleAuctionListOwnerItems(WorldPacket & recvData)
 {
-	// pussywizard:
-	const uint32 delay = 4500;
-	const uint32 now = World::GetGameTimeMS();
-	if (_lastAuctionListOwnerItemsMSTime > now) // list is pending
-		return;
-	uint32 diff = getMSTimeDiff(_lastAuctionListOwnerItemsMSTime, now);
-	if (diff > delay)
-		diff = delay;
+    // pussywizard:
+    const uint32 delay = 4500;
+    const uint32 now = World::GetGameTimeMS();
+    if (_lastAuctionListOwnerItemsMSTime > now) // list is pending
+        return;
+    uint32 diff = getMSTimeDiff(_lastAuctionListOwnerItemsMSTime, now);
+    if (diff > delay)
+        diff = delay;
 
-	_lastAuctionListOwnerItemsMSTime = now + delay; // set longest possible here, actual exectuing will change this to getMSTime of that moment
-	_player->m_Events.AddEvent(new AuctionListOwnerItemsDelayEvent(recvData, _player->GetGUID(), true), _player->m_Events.CalculateTime(delay-diff));
+    _lastAuctionListOwnerItemsMSTime = now + delay; // set longest possible here, actual exectuing will change this to getMSTime of that moment
+    _player->m_Events.AddEvent(new AuctionListOwnerItemsDelayEvent(recvData, _player->GetGUID(), true), _player->m_Events.CalculateTime(delay-diff));
 }
 
 void WorldSession::HandleAuctionListOwnerItemsEvent(WorldPacket & recvData)
@@ -717,19 +717,19 @@ void WorldSession::HandleAuctionListItems(WorldPacket & recvData)
         recvData.read_skip<uint8>();
     }
 
-	// remove fake death
-	if (_player->HasUnitState(UNIT_STATE_DIED))
-		_player->RemoveAurasByType(SPELL_AURA_FEIGN_DEATH);
+    // remove fake death
+    if (_player->HasUnitState(UNIT_STATE_DIED))
+        _player->RemoveAurasByType(SPELL_AURA_FEIGN_DEATH);
 
-	// pussywizard:
-	const uint32 delay = 2000;
-	const uint32 now = World::GetGameTimeMS();
-	uint32 diff = getMSTimeDiff(_lastAuctionListItemsMSTime, now);
-	if (diff > delay)
-		diff = delay;
-	_lastAuctionListItemsMSTime = now + delay - diff;
-	TRINITY_GUARD(ACE_Thread_Mutex, AsyncAuctionListingMgr::GetTempLock());
-	AsyncAuctionListingMgr::GetTempList().push_back( AuctionListItemsDelayEvent(delay-diff, _player->GetGUID(), guid, searchedname, listfrom, levelmin, levelmax, usable, auctionSlotID, auctionMainCategory, auctionSubCategory, quality, getAll) );
+    // pussywizard:
+    const uint32 delay = 2000;
+    const uint32 now = World::GetGameTimeMS();
+    uint32 diff = getMSTimeDiff(_lastAuctionListItemsMSTime, now);
+    if (diff > delay)
+        diff = delay;
+    _lastAuctionListItemsMSTime = now + delay - diff;
+    TRINITY_GUARD(ACE_Thread_Mutex, AsyncAuctionListingMgr::GetTempLock());
+    AsyncAuctionListingMgr::GetTempList().push_back( AuctionListItemsDelayEvent(delay-diff, _player->GetGUID(), guid, searchedname, listfrom, levelmin, levelmax, usable, auctionSlotID, auctionMainCategory, auctionSubCategory, quality, getAll) );
 }
 
 void WorldSession::HandleAuctionListPendingSales(WorldPacket & recvData)

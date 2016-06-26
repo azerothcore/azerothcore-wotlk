@@ -418,7 +418,7 @@ public:
     bool OnQuestAccept(Player* player, Creature* creature, const Quest* quest)
     {
         if (quest->GetQuestId() == QUEST_TOTEM_KARDASH_A)
-			creature->AI()->SetGUID(player->GetGUID(), quest->GetQuestId());
+            creature->AI()->SetGUID(player->GetGUID(), quest->GetQuestId());
 
         return true;
     }
@@ -436,8 +436,8 @@ public:
         uint32 HealTimer;
         uint32 FrostShockTimer;
 
-		void SetGUID(uint64 guid, int32 questId)
-		{
+        void SetGUID(uint64 guid, int32 questId)
+        {
             me->SetStandState(UNIT_STAND_STATE_STAND);
             Start(true, false, guid);
             Talk(SAY_KUR_START);
@@ -445,7 +445,7 @@ public:
             me->SummonCreature(NPC_KUR_MURK_RAIDER, kurenaiAmbushA[0]+2.5f, kurenaiAmbushA[1]-2.5f, kurenaiAmbushA[2], 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 50000);
             me->SummonCreature(NPC_KUR_MURK_BRUTE, kurenaiAmbushA[0]-2.5f, kurenaiAmbushA[1]+2.5f, kurenaiAmbushA[2], 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 50000);
             me->SummonCreature(NPC_KUR_MURK_SCAVENGER, kurenaiAmbushA[0], kurenaiAmbushA[1], kurenaiAmbushA[2], 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 50000);
-		}
+        }
 
         void Reset()
         {

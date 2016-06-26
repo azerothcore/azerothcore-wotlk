@@ -10,16 +10,16 @@ REWRITTEN BY XINEF
 
 enum BG_EY_Events
 {
-	BG_EY_EVENT_ADD_POINTS			= 1,
-	BG_EY_EVENT_FLAG_ON_GROUND		= 2,
-	BG_EY_EVENT_RESPAWN_FLAG		= 3,
-	BG_EY_EVENT_CHECK_CPOINTS		= 4
+    BG_EY_EVENT_ADD_POINTS          = 1,
+    BG_EY_EVENT_FLAG_ON_GROUND      = 2,
+    BG_EY_EVENT_RESPAWN_FLAG        = 3,
+    BG_EY_EVENT_CHECK_CPOINTS       = 4
 };
 
 enum BG_EY_Timers
 {
     BG_EY_FLAG_RESPAWN_TIME         = 20*IN_MILLISECONDS,
-	BG_EY_FLAG_ON_GROUND_TIME		= 10*IN_MILLISECONDS,
+    BG_EY_FLAG_ON_GROUND_TIME       = 10*IN_MILLISECONDS,
     BG_EY_FPOINTS_CHECK_TIME        = 2*IN_MILLISECONDS,
     BG_EY_FPOINTS_TICK_TIME         = 1*IN_MILLISECONDS
 };
@@ -98,14 +98,14 @@ enum BG_EY_ObjectEntry
 
 enum BG_EY_AreaTriggers
 {
-	AT_BLOOD_ELF_POINT					= 4476,
-	AT_FEL_REAVER_POINT					= 4514,
-	AT_MAGE_TOWER_POINT					= 4516,
-	AT_DRAENEI_RUINS_POINT				= 4518,
-	AT_BLOOD_ELF_BUFF					= 4568,
-	AT_FEL_REAVER_BUFF					= 4569,
-	AT_MAGE_TOWER_BUFF					= 4570,
-	AT_DRAENEI_RUINS_BUFF				= 4571
+    AT_BLOOD_ELF_POINT                  = 4476,
+    AT_FEL_REAVER_POINT                 = 4514,
+    AT_MAGE_TOWER_POINT                 = 4516,
+    AT_DRAENEI_RUINS_POINT              = 4518,
+    AT_BLOOD_ELF_BUFF                   = 4568,
+    AT_FEL_REAVER_BUFF                  = 4569,
+    AT_MAGE_TOWER_BUFF                  = 4570,
+    AT_DRAENEI_RUINS_BUFF               = 4571
 };
 
 enum BG_EY_Graveyards
@@ -120,11 +120,11 @@ enum BG_EY_Graveyards
 
 enum BG_EY_Points
 {
-    POINT_FEL_REAVER		= 0,
-    POINT_BLOOD_ELF			= 1,
-    POINT_DRAENEI_RUINS		= 2,
-    POINT_MAGE_TOWER		= 3,
-    EY_POINTS_MAX			= 4
+    POINT_FEL_REAVER        = 0,
+    POINT_BLOOD_ELF         = 1,
+    POINT_DRAENEI_RUINS     = 2,
+    POINT_MAGE_TOWER        = 3,
+    EY_POINTS_MAX           = 4
 };
 
 enum BG_EY_CreatureTypes
@@ -214,11 +214,11 @@ enum BG_EY_Score
     BG_EY_WARNING_NEAR_VICTORY_SCORE    = 1400,
     BG_EY_MAX_TEAM_SCORE                = 1600,
 
-	BG_EY_HONOR_TICK_WEEKEND			= 160,
-	BG_EY_HONOR_TICK_NORMAL				= 260,
+    BG_EY_HONOR_TICK_WEEKEND            = 160,
+    BG_EY_HONOR_TICK_NORMAL             = 260,
 
-	BG_EY_EVENT_START_BATTLE			= 13180, // Achievement: Flurry
-	BG_EY_OBJECTIVE_CAPTURE_FLAG		= 183
+    BG_EY_EVENT_START_BATTLE            = 13180, // Achievement: Flurry
+    BG_EY_OBJECTIVE_CAPTURE_FLAG        = 183
 };
 
 enum BG_EY_FlagState
@@ -366,26 +366,26 @@ class BattlegroundEY : public Battleground
         /* Scorekeeping */
         void AddPoints(TeamId teamId, uint32 points);
 
-		struct CapturePointInfo
-		{
-			CapturePointInfo() : _ownerTeamId(TEAM_NEUTRAL), _barStatus(BG_EY_PROGRESS_BAR_STATE_MIDDLE), _areaTrigger(0)
-			{
-				_playersCount[TEAM_ALLIANCE] = 0;
-				_playersCount[TEAM_HORDE] = 0;
-			}
+        struct CapturePointInfo
+        {
+            CapturePointInfo() : _ownerTeamId(TEAM_NEUTRAL), _barStatus(BG_EY_PROGRESS_BAR_STATE_MIDDLE), _areaTrigger(0)
+            {
+                _playersCount[TEAM_ALLIANCE] = 0;
+                _playersCount[TEAM_HORDE] = 0;
+            }
 
-			TeamId _ownerTeamId;
-			uint32 _areaTrigger;
-			int8 _barStatus;
-			int8 _playersCount[BG_TEAMS_COUNT];
+            TeamId _ownerTeamId;
+            uint32 _areaTrigger;
+            int8 _barStatus;
+            int8 _playersCount[BG_TEAMS_COUNT];
 
-			bool IsUnderControl(TeamId teamId) const { return _ownerTeamId == teamId; }
-			bool IsUnderControl() const { return _ownerTeamId != TEAM_NEUTRAL; }
-			bool IsUncontrolled() const { return _ownerTeamId == TEAM_NEUTRAL; }
-		};
+            bool IsUnderControl(TeamId teamId) const { return _ownerTeamId == teamId; }
+            bool IsUnderControl() const { return _ownerTeamId != TEAM_NEUTRAL; }
+            bool IsUncontrolled() const { return _ownerTeamId == TEAM_NEUTRAL; }
+        };
 
-		CapturePointInfo _capturePointInfo[EY_POINTS_MAX];
-		EventMap _bgEvents;
+        CapturePointInfo _capturePointInfo[EY_POINTS_MAX];
+        EventMap _bgEvents;
         uint32 _honorTics;
         uint8 _ownedPointsCount[BG_TEAMS_COUNT];
         uint64 _flagKeeperGUID;

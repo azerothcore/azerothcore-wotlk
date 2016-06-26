@@ -39,31 +39,31 @@ EndContentData */
 // Ours
 enum eStaveQuest
 {
-    QUEST_STAVE_OF_THE_ANCIENTS				= 7636,
+    QUEST_STAVE_OF_THE_ANCIENTS             = 7636,
 
-	NPC_SIMONE_NORMAL						= 14527,
-	NPC_FRANKLIN_NORMAL						= 14529,
-	NPC_ARTORIUS_NORMAL						= 14531,
-	NPC_NELSON_NORMAL						= 14536,
-	NPC_PRECIOUS							= 14528,
+    NPC_SIMONE_NORMAL                       = 14527,
+    NPC_FRANKLIN_NORMAL                     = 14529,
+    NPC_ARTORIUS_NORMAL                     = 14531,
+    NPC_NELSON_NORMAL                       = 14536,
+    NPC_PRECIOUS                            = 14528,
 
-	NPC_SIMONE_EVIL							= 14533,
-	NPC_FRANKLIN_EVIL						= 14534,
-	NPC_ARTORIUS_EVIL						= 14535,
-	NPC_NELSON_EVIL							= 14530,
-	NPC_PRECIOUS_EVIL						= 14538,
+    NPC_SIMONE_EVIL                         = 14533,
+    NPC_FRANKLIN_EVIL                       = 14534,
+    NPC_ARTORIUS_EVIL                       = 14535,
+    NPC_NELSON_EVIL                         = 14530,
+    NPC_PRECIOUS_EVIL                       = 14538,
 
-	EVENT_CHECK_PLAYER						= 1,
-	EVENT_SPELL_CHAIN_LIGHTNING				= 23206,
-	EVENT_SPELL_TEMPTRESS_KISS				= 23205,
-	EVENT_SPELL_DEMONIC_ENRAGE				= 23257,
-	EVENT_SPELL_ENTROPIC_STING				= 23260,
-	EVENT_SPELL_DEMONIC_DOOM				= 23298,
-	EVENT_SPELL_STINGING_TRAUMA				= 23299,
-	EVENT_SPELL_DREADFUL_FRIGHT				= 23275,
+    EVENT_CHECK_PLAYER                      = 1,
+    EVENT_SPELL_CHAIN_LIGHTNING             = 23206,
+    EVENT_SPELL_TEMPTRESS_KISS              = 23205,
+    EVENT_SPELL_DEMONIC_ENRAGE              = 23257,
+    EVENT_SPELL_ENTROPIC_STING              = 23260,
+    EVENT_SPELL_DEMONIC_DOOM                = 23298,
+    EVENT_SPELL_STINGING_TRAUMA             = 23299,
+    EVENT_SPELL_DREADFUL_FRIGHT             = 23275,
 
-	SPELL_FOOLS_PLIGHT						= 23504,
-	SPELL_SOUL_FLAME						= 23272,
+    SPELL_FOOLS_PLIGHT                      = 23504,
+    SPELL_SOUL_FLAME                        = 23272,
 };
 
 class npc_stave_of_the_ancients : public CreatureScript
@@ -79,135 +79,135 @@ public:
     struct npc_stave_of_the_ancientsAI : public ScriptedAI
     {
         npc_stave_of_the_ancientsAI(Creature* creature) : ScriptedAI(creature)
-		{
-			changeEntry = me->GetEntry();
-			switch (me->GetEntry())
-			{
-				case NPC_SIMONE_NORMAL: changeEntry = NPC_SIMONE_EVIL; break;
-				case NPC_FRANKLIN_NORMAL: changeEntry = NPC_FRANKLIN_EVIL; break;
-				case NPC_ARTORIUS_NORMAL: changeEntry = NPC_ARTORIUS_EVIL; break;
-				case NPC_NELSON_NORMAL: changeEntry = NPC_NELSON_EVIL; break;
-				case NPC_PRECIOUS: changeEntry = NPC_PRECIOUS_EVIL; break;
-			}
-		}
+        {
+            changeEntry = me->GetEntry();
+            switch (me->GetEntry())
+            {
+                case NPC_SIMONE_NORMAL: changeEntry = NPC_SIMONE_EVIL; break;
+                case NPC_FRANKLIN_NORMAL: changeEntry = NPC_FRANKLIN_EVIL; break;
+                case NPC_ARTORIUS_NORMAL: changeEntry = NPC_ARTORIUS_EVIL; break;
+                case NPC_NELSON_NORMAL: changeEntry = NPC_NELSON_EVIL; break;
+                case NPC_PRECIOUS: changeEntry = NPC_PRECIOUS_EVIL; break;
+            }
+        }
 
-		uint64 playerGUID;
-		EventMap events;
-		uint32 changeEntry;
-		bool damaged;
+        uint64 playerGUID;
+        EventMap events;
+        uint32 changeEntry;
+        bool damaged;
 
-		void Reset()
-		{
-			if (me->GetOriginalEntry() != me->GetEntry())
-				me->UpdateEntry(me->GetOriginalEntry());
+        void Reset()
+        {
+            if (me->GetOriginalEntry() != me->GetEntry())
+                me->UpdateEntry(me->GetOriginalEntry());
 
-			events.Reset();
-			playerGUID = 0;
-			damaged = false;
-		}
+            events.Reset();
+            playerGUID = 0;
+            damaged = false;
+        }
 
-		void DamageTaken(Unit* who, uint32&, DamageEffectType, SpellSchoolMask)
-		{
-			if (!damaged)
-			{
-				if (who && who->GetGUID() != playerGUID && (who->GetTypeId() == TYPEID_PLAYER || IS_PLAYER_GUID(who->GetOwnerGUID())))
-				{
-					damaged = true;
-					me->CastSpell(who, SPELL_FOOLS_PLIGHT, true);
-				}
-			}
-			else
-				damaged = false;
-		}
+        void DamageTaken(Unit* who, uint32&, DamageEffectType, SpellSchoolMask)
+        {
+            if (!damaged)
+            {
+                if (who && who->GetGUID() != playerGUID && (who->GetTypeId() == TYPEID_PLAYER || IS_PLAYER_GUID(who->GetOwnerGUID())))
+                {
+                    damaged = true;
+                    me->CastSpell(who, SPELL_FOOLS_PLIGHT, true);
+                }
+            }
+            else
+                damaged = false;
+        }
 
-		void EnterCombat(Unit*)
-		{
-			switch (changeEntry)
-			{
-				case NPC_SIMONE_EVIL:
-					events.ScheduleEvent(EVENT_SPELL_CHAIN_LIGHTNING, 3000);
-					events.ScheduleEvent(EVENT_SPELL_TEMPTRESS_KISS, 1000);
-					break;
-				case NPC_FRANKLIN_EVIL:
-					events.ScheduleEvent(EVENT_SPELL_DEMONIC_ENRAGE, 3000);
-					events.ScheduleEvent(EVENT_SPELL_ENTROPIC_STING, 5000);
-					break;
-				case NPC_ARTORIUS_EVIL:
-					events.ScheduleEvent(EVENT_SPELL_DEMONIC_DOOM, 3000);
-					events.ScheduleEvent(EVENT_SPELL_STINGING_TRAUMA, 5000);
-					break;
-				case NPC_NELSON_EVIL:
-					me->CastSpell(me, SPELL_SOUL_FLAME, true);
-					events.ScheduleEvent(EVENT_SPELL_DREADFUL_FRIGHT, 5000);
-					break;
-			}
-		}
+        void EnterCombat(Unit*)
+        {
+            switch (changeEntry)
+            {
+                case NPC_SIMONE_EVIL:
+                    events.ScheduleEvent(EVENT_SPELL_CHAIN_LIGHTNING, 3000);
+                    events.ScheduleEvent(EVENT_SPELL_TEMPTRESS_KISS, 1000);
+                    break;
+                case NPC_FRANKLIN_EVIL:
+                    events.ScheduleEvent(EVENT_SPELL_DEMONIC_ENRAGE, 3000);
+                    events.ScheduleEvent(EVENT_SPELL_ENTROPIC_STING, 5000);
+                    break;
+                case NPC_ARTORIUS_EVIL:
+                    events.ScheduleEvent(EVENT_SPELL_DEMONIC_DOOM, 3000);
+                    events.ScheduleEvent(EVENT_SPELL_STINGING_TRAUMA, 5000);
+                    break;
+                case NPC_NELSON_EVIL:
+                    me->CastSpell(me, SPELL_SOUL_FLAME, true);
+                    events.ScheduleEvent(EVENT_SPELL_DREADFUL_FRIGHT, 5000);
+                    break;
+            }
+        }
 
-		void MoveInLineOfSight(Unit* who)
-		{
-			if (me->GetEntry() != changeEntry && who->GetTypeId() == TYPEID_PLAYER && who->ToPlayer()->GetQuestStatus(QUEST_STAVE_OF_THE_ANCIENTS) == QUEST_STATUS_INCOMPLETE)
-			{
-				playerGUID = who->GetGUID();
-				me->UpdateEntry(changeEntry);
-				events.ScheduleEvent(EVENT_CHECK_PLAYER, 5000);
-				return;
-			}
-			ScriptedAI::MoveInLineOfSight(who);
-		}
+        void MoveInLineOfSight(Unit* who)
+        {
+            if (me->GetEntry() != changeEntry && who->GetTypeId() == TYPEID_PLAYER && who->ToPlayer()->GetQuestStatus(QUEST_STAVE_OF_THE_ANCIENTS) == QUEST_STATUS_INCOMPLETE)
+            {
+                playerGUID = who->GetGUID();
+                me->UpdateEntry(changeEntry);
+                events.ScheduleEvent(EVENT_CHECK_PLAYER, 5000);
+                return;
+            }
+            ScriptedAI::MoveInLineOfSight(who);
+        }
 
-		void UpdateAI(uint32 diff)
-		{
-			events.Update(diff);
-			uint32 eventId = events.GetEvent();
-			if (eventId == EVENT_CHECK_PLAYER)
-			{
-				Player* player = ObjectAccessor::GetPlayer(*me, playerGUID);
-				if (!player || !player->IsWithinDist2d(me, 60.0f))
-					EnterEvadeMode();
-				else
-					events.RepeatEvent(5000);
-				return;
-			}
+        void UpdateAI(uint32 diff)
+        {
+            events.Update(diff);
+            uint32 eventId = events.GetEvent();
+            if (eventId == EVENT_CHECK_PLAYER)
+            {
+                Player* player = ObjectAccessor::GetPlayer(*me, playerGUID);
+                if (!player || !player->IsWithinDist2d(me, 60.0f))
+                    EnterEvadeMode();
+                else
+                    events.RepeatEvent(5000);
+                return;
+            }
 
-			if (!UpdateVictim())
-				return;
+            if (!UpdateVictim())
+                return;
 
-			if (me->HasUnitState(UNIT_STATE_CASTING))
-				return;
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+                return;
 
-			switch (eventId)
-			{
-				case EVENT_SPELL_CHAIN_LIGHTNING:
-					me->CastSpell(me->GetVictim(), eventId, false);
-					events.RepeatEvent(7000);
-					break;
-				case EVENT_SPELL_TEMPTRESS_KISS:
-					me->CastSpell(me->GetVictim(), eventId, false);
-					events.RepeatEvent(45000);
-					break;
-				case EVENT_SPELL_DEMONIC_ENRAGE:
-					me->CastSpell(me, eventId, false);
-					events.RepeatEvent(20000);
-					break;
-				case EVENT_SPELL_ENTROPIC_STING:
-					me->CastSpell(me->GetVictim(), eventId, false);
-					events.RepeatEvent(20000);
-					break;
-				case EVENT_SPELL_DEMONIC_DOOM:
-					me->CastSpell(me->GetVictim(), eventId, false);
-					events.RepeatEvent(50000);
-					break;
-				case EVENT_SPELL_STINGING_TRAUMA:
-					me->CastSpell(me->GetVictim(), eventId, false);
-					events.RepeatEvent(20000);
-					break;
-				case EVENT_SPELL_DREADFUL_FRIGHT:
-					me->CastSpell(me->GetVictim(), eventId, false);
-					events.RepeatEvent(15000);
-					break;
-			}
+            switch (eventId)
+            {
+                case EVENT_SPELL_CHAIN_LIGHTNING:
+                    me->CastSpell(me->GetVictim(), eventId, false);
+                    events.RepeatEvent(7000);
+                    break;
+                case EVENT_SPELL_TEMPTRESS_KISS:
+                    me->CastSpell(me->GetVictim(), eventId, false);
+                    events.RepeatEvent(45000);
+                    break;
+                case EVENT_SPELL_DEMONIC_ENRAGE:
+                    me->CastSpell(me, eventId, false);
+                    events.RepeatEvent(20000);
+                    break;
+                case EVENT_SPELL_ENTROPIC_STING:
+                    me->CastSpell(me->GetVictim(), eventId, false);
+                    events.RepeatEvent(20000);
+                    break;
+                case EVENT_SPELL_DEMONIC_DOOM:
+                    me->CastSpell(me->GetVictim(), eventId, false);
+                    events.RepeatEvent(50000);
+                    break;
+                case EVENT_SPELL_STINGING_TRAUMA:
+                    me->CastSpell(me->GetVictim(), eventId, false);
+                    events.RepeatEvent(20000);
+                    break;
+                case EVENT_SPELL_DREADFUL_FRIGHT:
+                    me->CastSpell(me->GetVictim(), eventId, false);
+                    events.RepeatEvent(15000);
+                    break;
+            }
 
-			DoMeleeAttackIfReady();
+            DoMeleeAttackIfReady();
         }
     };
 };
@@ -795,10 +795,10 @@ public:
 
 void AddSC_winterspring()
 {
-	// Ours
-	new npc_stave_of_the_ancients();
+    // Ours
+    new npc_stave_of_the_ancients();
 
-	// Theirs
+    // Theirs
     new npc_rivern_frostwind();
     new npc_ranshalla();
     new go_elune_fire();
