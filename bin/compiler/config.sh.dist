@@ -1,5 +1,9 @@
 #!/bin/bash
 
+COMPILER_C="/usr/bin/gcc"
+COMPILER_CC="/usr/bin/gcc"
+COMPILER_CXX="/usr/bin/g++"
+
 # how many thread must be used for compilation ( leave zero to use all available )
 MTHREADS=0
 # enable/disable warnings during compilation
