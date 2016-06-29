@@ -20,6 +20,8 @@
 #include "Map.h"
 #include "Creature.h"
 #include "Log.h"
+#include "CellImpl.h"
+#include "Cell.h"
 
 #include "DetourCommon.h"
 #include "DetourNavMeshQuery.h"
