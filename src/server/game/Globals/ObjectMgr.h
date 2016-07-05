@@ -687,6 +687,18 @@ class ObjectMgr
         ItemTemplate const* GetItemTemplate(uint32 entry);
         ItemTemplateContainer const* GetItemTemplateStore() const { return &_itemTemplateStore; }
 
+        ItemLocale const* GetItemLocale(uint32 entry) const
+        {
+            ItemLocaleContainer::const_iterator itr = _itemLocaleStore.find(entry);
+            if (itr == _itemLocaleStore.end()) return NULL;
+            return &itr->second;
+        }
+        ItemSetNameLocale const* GetItemSetNameLocale(uint32 entry) const
+        {
+            ItemSetNameLocaleContainer::const_iterator itr = _itemSetNameLocaleStore.find(entry);
+            if (itr == _itemSetNameLocaleStore.end())return NULL;
+            return &itr->second;
+        }
         ItemSetNameEntry const* GetItemSetNameEntry(uint32 itemId)
         {
             ItemSetNameContainer::iterator itr = _itemSetNameStore.find(itemId);
@@ -1164,6 +1176,11 @@ class ObjectMgr
         GraveyardContainer GraveyardStore;
 
         static void AddLocaleString(std::string const& s, LocaleConstant locale, StringVector& data);
+        static inline void GetLocaleString(const StringVector& data, int loc_idx, std::string& value)
+        {
+            if (data.size() > size_t(loc_idx) && !data[loc_idx].empty())
+                value = data[loc_idx];
+        }
 
         CharacterConversionMap FactionChangeAchievements;
         CharacterConversionMap FactionChangeItems;
