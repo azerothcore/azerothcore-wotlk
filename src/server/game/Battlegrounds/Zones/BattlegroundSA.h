@@ -27,6 +27,9 @@ struct BattlegroundSAScore : public BattlegroundScore
     ~BattlegroundSAScore() { }
     uint8 demolishers_destroyed;
     uint8 gates_destroyed;
+
+    uint32 GetAttr1() const final override { return demolishers_destroyed; }
+    uint32 GetAttr2() const final override { return gates_destroyed; }
 };
 
 #define BG_SA_FLAG_AMOUNT           3

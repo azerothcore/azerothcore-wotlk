@@ -310,6 +310,8 @@ struct BattlegroundEYScore : public BattlegroundScore
     BattlegroundEYScore(Player* player) : BattlegroundScore(player), FlagCaptures(0) { }
     ~BattlegroundEYScore() { }
     uint32 FlagCaptures;
+
+    uint32 GetAttr1() const final override { return FlagCaptures; }
 };
 
 class BattlegroundEY : public Battleground

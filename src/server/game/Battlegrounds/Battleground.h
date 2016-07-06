@@ -257,6 +257,19 @@ struct BattlegroundScore
     uint32 DamageDone;
     uint32 HealingDone;
     Player* player;
+
+    uint32 GetKillingBlows() const { return KillingBlows; }
+    uint32 GetDeaths() const { return Deaths; }
+    uint32 GetHonorableKills() const { return HonorableKills; }
+    uint32 GetBonusHonor() const { return BonusHonor; }
+    uint32 GetDamageDone() const { return DamageDone; }
+    uint32 GetHealingDone() const { return HealingDone; }
+
+    virtual uint32 GetAttr1() const { return 0; }
+    virtual uint32 GetAttr2() const { return 0; }
+    virtual uint32 GetAttr3() const { return 0; }
+    virtual uint32 GetAttr4() const { return 0; }
+    virtual uint32 GetAttr5() const { return 0; }
 };
 
 class ArenaLogEntryData
@@ -558,6 +571,9 @@ class Battleground
         uint32 GetTeamScore(TeamId teamId) const;
         
         virtual TeamId GetPrematureWinner();
+
+        // because BattleGrounds with different types and same level range has different m_BracketId
+        uint8 GetUniqueBracketId() const;
 
         BattlegroundAV* ToBattlegroundAV() { if (GetBgTypeID() == BATTLEGROUND_AV) return reinterpret_cast<BattlegroundAV*>(this); else return NULL; }
         BattlegroundAV const* ToBattlegroundAV() const { if (GetBgTypeID() == BATTLEGROUND_AV) return reinterpret_cast<const BattlegroundAV*>(this); else return NULL; }
