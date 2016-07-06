@@ -80,7 +80,7 @@ void Transmogrification::LoadPlayerSets(Player* player)
                 player->presetMap[PresetID].slotMap[slot] = entry;
             }
             else
-                sLog->outError("custom.transmog", "Item entry (FakeEntry: %u, playerGUID: %u, slot: %u, presetId: %u) does not exist, ignoring.", entry, player->GetGUIDLow(), uint32(slot), uint32(PresetID));
+                sLog->outError("Item entry (FakeEntry: %u, playerGUID: %u, slot: %u, presetId: %u) does not exist, ignoring.", entry, player->GetGUIDLow(), uint32(slot), uint32(PresetID));
         }
 
         if (player->presetMap[PresetID].slotMap.empty())
