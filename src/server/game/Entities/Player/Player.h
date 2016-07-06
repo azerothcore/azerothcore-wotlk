@@ -157,7 +157,7 @@ enum TrainerSpellState
 };
 
 // Transmogrification
-typedef std::unordered_map<uint64, uint32> TransmogMapType;
+typedef UNORDERED_MAP<uint64, uint32> TransmogMapType;
 #ifdef PRESETS
 typedef std::map<uint8, uint32> PresetslotMapType;
 struct PresetData
