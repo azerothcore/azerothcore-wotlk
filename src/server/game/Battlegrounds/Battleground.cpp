@@ -731,7 +731,7 @@ void Battleground::EndBattleground(TeamId winnerTeamId)
     else
         SetWinner(TEAM_NEUTRAL);
 
-    PreparedStatement* stmt = nullptr;
+    PreparedStatement* stmt = NULL;
     uint64 battlegroundId = 1;
     if (isBattleground() && sWorld->getBoolConfig(CONFIG_BATTLEGROUND_STORE_STATISTICS_ENABLE))
     {
