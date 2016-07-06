@@ -78,12 +78,14 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
             case CHAT_MSG_PARTY_LEADER:
                 break;
             default:
-                if (sender->GetTotalPlayedTime() < 2*HOUR)
+                /*[AZTH] we should enable it using a conf
+		if (sender->GetTotalPlayedTime() < 2*HOUR)
                 {
                     SendNotification("Speaking is allowed after playing for at least 2 hours. You may use party and guild chat.");
                     recvData.rfinish();
                     return;
-                }
+                }*/
+	    break;
         }
 
     // pussywizard:
