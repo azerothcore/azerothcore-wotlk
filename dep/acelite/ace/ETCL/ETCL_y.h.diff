@@ -1,0 +1,25 @@
+--- ETCL_y.h	Mon Nov 12 16:07:25 2001
++++ ETCL_y.h.safe	Thu Oct 11 20:53:13 2001
+@@ -1,7 +1,4 @@
+ // $Id$
+-#ifndef YYSTYPE
+-#define YYSTYPE int
+-#endif
+ #define	TAO_ETCL_GT	257
+ #define	TAO_ETCL_GE	258
+ #define	TAO_ETCL_LT	259
+@@ -33,7 +30,7 @@
+ #define	TAO_ETCL_SIGNED	285
+ #define	TAO_ETCL_DOUBLE	286
+ #define	TAO_ETCL_CONSTRAINT	287
+-#define	TAO_ETCL_SEQUENCE	288
++#define	TAO_ETCL_COMPONENT	288
+ #define	TAO_ETCL_WITH	289
+ #define	TAO_ETCL_MAX	290
+ #define	TAO_ETCL_MIN	291
+@@ -46,5 +43,3 @@
+ #define	TAO_ETCL_TYPE_ID	298
+ #define	TAO_ETCL_REPOS_ID	299
+ 
+-
+-extern YYSTYPE yylval;

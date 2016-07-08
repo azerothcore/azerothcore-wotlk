@@ -1,8 +1,17 @@
 #!/bin/bash
-CURRENT_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-source "$CURRENT_PATH/includes/common.sh"
+. "defines.sh"
 
-source "$CURRENT_PATH/includes/includes.sh"
 
-build
+[ $MTHREADS == 0 ] && MTHREADS=`grep -c ^processor /proc/cpuinfo` && MTHREADS=$(($MTHREADS + 2))
+
+echo "Using $MTHREADS threads"
+
+CWD=$(pwd)
+
+cd $BUILDPATH
+
+time make -j $MTHREADS
+make -j $MTHREADS install
+
+cd $CWD

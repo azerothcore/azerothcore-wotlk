@@ -1,9 +1,8 @@
 #!/bin/bash
 
-
-# set preferred compilers
-CCOMPILERC="/usr/bin/clang-3.6"
-CCOMPILERCXX="/usr/bin/clang++-3.6"
+COMPILER_C="/usr/bin/gcc"
+COMPILER_CC="/usr/bin/gcc"
+COMPILER_CXX="/usr/bin/g++"
 
 # how many thread must be used for compilation ( leave zero to use all available )
 MTHREADS=0
@@ -24,12 +23,12 @@ CSCRIPTPCH=1
 CCOREPCH=1
 
 # AZTH
-# compile azth custom plugins
-CAZTH_CUSTOM_PLG=1
-# compile azth plugins 
+# compile azth plugins for custom features
 CAZTH_PLG=1
+# compile azth plugins for trinitycore features
+CAZTH_TC_PLG=1
 # enable unit test on TC load
-CAZTH_UNIT_TEST=0
+CAZTH_UNIT_TEST=1
 
 # absolute root path of your azerothshard repository
 SRCPATH=

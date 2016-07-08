@@ -1,8 +1,16 @@
 #!/bin/bash
-CURRENT_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-source "$CURRENT_PATH/includes/common.sh"
+. "defines.sh"
 
-source "$CURRENT_PATH/includes/includes.sh"
+echo "Cleaning build files"
 
-clean
+CWD=$(pwd)
+
+cd $BUILDPATH
+
+make -f Makefile clean
+make clean
+find -iname '*cmake*' -not -name CMakeLists.txt -exec rm -rf {} \+
+
+cd $CWD
+

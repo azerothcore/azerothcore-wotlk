@@ -1,8 +1,8 @@
-# Copyright (C)
+# Copyright (C) 
 #
 # This file is free software; as a special exception the author gives
 # unlimited permission to copy and/or distribute it, with or without
-# modifications, as long as this notice is preserved.
+# modifications, as long as this notice is preserved. 
 #
 # This program is distributed in the hope that it will be useful, but
 # WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
@@ -26,7 +26,7 @@ set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH 1)
 
 # set macro-directory
-set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/src/cmake/macros")
+set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/macros")
 
 # build in Release-mode by default if not explicitly set
 if( NOT CMAKE_BUILD_TYPE )
@@ -37,7 +37,7 @@ include(CheckCXXSourceRuns)
 include(CheckIncludeFiles)
 
 # set default buildoptions and print them
-include(src/cmake/options.cmake)
+include(cmake/options.cmake)
 
 # turn off PCH totally if enabled (hidden setting, mainly for devs)
 if( NOPCH )
@@ -71,13 +71,13 @@ endif()
 #endif()
 
 # Find revision ID and hash of the sourcetree
-include(src/cmake/genrev.cmake)
+include(cmake/genrev.cmake)
 
 # print out the results before continuing
-include(src/cmake/showoptions.cmake)
+include(cmake/showoptions.cmake)
 
 # add dependencies
-add_subdirectory(modules/dep)
+add_subdirectory(dep)
 
 # add core sources
 add_subdirectory(src)

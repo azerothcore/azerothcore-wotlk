@@ -1,4 +1,4 @@
-# Copyright (C)
+# Copyright (C) 
 #
 # This file is free software; as a special exception the author gives
 # unlimited permission to copy and/or distribute it, with or without
@@ -43,11 +43,11 @@ endif()
 
 include_directories(
   ${CMAKE_BINARY_DIR}
-  ${CMAKE_SOURCE_DIR}/modules/dep/g3dlite/include
-  ${CMAKE_SOURCE_DIR}/modules/dep/recastnavigation/Detour
-  ${CMAKE_SOURCE_DIR}/modules/dep/gsoap
-  ${CMAKE_SOURCE_DIR}/modules/dep/sockets/include
-  ${CMAKE_SOURCE_DIR}/modules/dep/SFMT
+  ${CMAKE_SOURCE_DIR}/dep/g3dlite/include
+  ${CMAKE_SOURCE_DIR}/dep/recastnavigation/Detour
+  ${CMAKE_SOURCE_DIR}/dep/gsoap
+  ${CMAKE_SOURCE_DIR}/dep/sockets/include
+  ${CMAKE_SOURCE_DIR}/dep/SFMT
   ${CMAKE_SOURCE_DIR}/src/server/collision
   ${CMAKE_SOURCE_DIR}/src/server/collision/Management
   ${CMAKE_SOURCE_DIR}/src/server/collision/Models

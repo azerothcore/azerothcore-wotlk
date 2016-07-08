@@ -1,4 +1,4 @@
-# Copyright (C)
+# Copyright (C) 
 #
 # This file is free software; as a special exception the author gives
 # unlimited permission to copy and/or distribute it, with or without
@@ -15,12 +15,12 @@ set(mmap_gen_Includes
   ${ACE_INCLUDE_DIR}
   ${MYSQL_INCLUDE_DIR}
   ${OPENSSL_INCLUDE_DIR}
-  ${CMAKE_SOURCE_DIR}/modules/dep/libmpq
-  ${CMAKE_SOURCE_DIR}/modules/dep/zlib
-  ${CMAKE_SOURCE_DIR}/modules/dep/bzip2
-  ${CMAKE_SOURCE_DIR}/modules/dep/g3dlite/include
-  ${CMAKE_SOURCE_DIR}/modules/dep/recastnavigation/Recast
-  ${CMAKE_SOURCE_DIR}/modules/dep/recastnavigation/Detour
+  ${CMAKE_SOURCE_DIR}/dep/libmpq
+  ${CMAKE_SOURCE_DIR}/dep/zlib
+  ${CMAKE_SOURCE_DIR}/dep/bzip2
+  ${CMAKE_SOURCE_DIR}/dep/g3dlite/include
+  ${CMAKE_SOURCE_DIR}/dep/recastnavigation/Recast
+  ${CMAKE_SOURCE_DIR}/dep/recastnavigation/Detour
   ${CMAKE_SOURCE_DIR}/src/server/collision
   ${CMAKE_SOURCE_DIR}/src/server/collision/Management
   ${CMAKE_SOURCE_DIR}/src/server/collision/Maps

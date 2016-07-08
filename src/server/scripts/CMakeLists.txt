@@ -1,4 +1,4 @@
-# Copyright (C)
+# Copyright (C) 
 #
 # This file is free software; as a special exception the author gives
 # unlimited permission to copy and/or distribute it, with or without
@@ -44,11 +44,11 @@ message("")
 
 include_directories(
   ${CMAKE_BINARY_DIR}
-  ${CMAKE_SOURCE_DIR}/modules/dep/recastnavigation/Detour
-  ${CMAKE_SOURCE_DIR}/modules/dep/recastnavigation/Recast
-  ${CMAKE_SOURCE_DIR}/modules/dep/g3dlite/include
-  ${CMAKE_SOURCE_DIR}/modules/dep/SFMT
-  ${CMAKE_SOURCE_DIR}/modules/dep/zlib
+  ${CMAKE_SOURCE_DIR}/dep/recastnavigation/Detour
+  ${CMAKE_SOURCE_DIR}/dep/recastnavigation/Recast
+  ${CMAKE_SOURCE_DIR}/dep/g3dlite/include
+  ${CMAKE_SOURCE_DIR}/dep/SFMT
+  ${CMAKE_SOURCE_DIR}/dep/zlib
   ${CMAKE_SOURCE_DIR}/src/server/shared
   ${CMAKE_SOURCE_DIR}/src/server/shared/Configuration
   ${CMAKE_SOURCE_DIR}/src/server/shared/Cryptography
