@@ -8,8 +8,21 @@
 # WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-# Need to pass old ${CMAKE_BINARY_DIR} as param because its different at build stage
-add_custom_target(revision.h ALL
-  COMMAND ${CMAKE_COMMAND} -DBUILDDIR=${CMAKE_BINARY_DIR} -P ${CMAKE_SOURCE_DIR}/src/cmake/genrev.cmake
-  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+set(Detour_STAT_SRCS
+    DetourAlloc.cpp
+    DetourCommon.cpp
+    DetourNavMesh.cpp
+    DetourNavMeshBuilder.cpp
+    DetourNavMeshQuery.cpp
+    DetourNode.cpp
 )
+
+if(WIN32)
+  include_directories(
+    ${CMAKE_SOURCE_DIR}/modules/dep/zlib
+  )
+endif()
+
+add_library(Detour STATIC ${Detour_STAT_SRCS})
+
+target_link_libraries(Detour ${ZLIB_LIBRARIES})

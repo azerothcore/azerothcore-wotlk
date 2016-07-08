@@ -1,5 +1,5 @@
-# Copyright (C) 
-# Copyright (C) 
+# Copyright (C)
+# Copyright (C)
 #
 # This file is free software; as a special exception the author gives
 # unlimited permission to copy and/or distribute it, with or without
@@ -13,7 +13,7 @@ file(GLOB_RECURSE sources *.cpp *.h)
 
 set(include_Dirs
     ${CMAKE_SOURCE_DIR}/src/server/shared
-    ${CMAKE_SOURCE_DIR}/dep/libmpq
+    ${CMAKE_SOURCE_DIR}/modules/dep/libmpq
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/loadlib
 )
@@ -21,7 +21,7 @@ set(include_Dirs
 if( WIN32 )
   set(include_Dirs
     ${include_Dirs}
-    ${CMAKE_SOURCE_DIR}/dep/libmpq/win
+    ${CMAKE_SOURCE_DIR}/modules/dep/libmpq/win
   )
 endif()
 
