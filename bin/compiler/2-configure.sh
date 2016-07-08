@@ -1,19 +1,8 @@
 #!/bin/bash
+CURRENT_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-. "defines.sh"
+source "$CURRENT_PATH/includes/common.sh"
 
-CWD=$(pwd)
+source "$CURRENT_PATH/includes/includes.sh"
 
-cd $BUILDPATH
-
-echo "Build path: $BUILDPATH"
-echo "DEBUG info: $CDEBUG"
-echo "Compilation type: $CCTYPE"
-# -DCMAKE_BUILD_TYPE=$CCTYPE disable optimization "slow and huge amount of ram"
-# -DWITH_COREDEBUG=$CDEBUG compiled with debug information
-
-cmake $SRCPATH -DCMAKE_INSTALL_PREFIX=$BINPATH -DCONF_DIR=$CONFDIR -DSERVERS=$CSERVERS -DSCRIPTS=$CSCRIPTS  \
--DCMAKE_C_COMPILER=$COMPILER_C -DCMAKE_CC_COMPILER=$COMPILER_CC -DCMAKE_CXX_COMPILER=$COMPILER_CXX \
--DTOOLS=$CTOOLS -DUSE_SCRIPTPCH=$CSCRIPTPCH -DUSE_COREPCH=$CCOREPCH -DWITH_COREDEBUG=$CDEBUG  -DCMAKE_BUILD_TYPE=$CCTYPE -DWITH_WARNINGS=$CWARNINGS 
-
-cd $CWD
+configure

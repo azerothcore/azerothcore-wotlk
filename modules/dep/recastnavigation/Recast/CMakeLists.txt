@@ -8,8 +8,24 @@
 # WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-# Need to pass old ${CMAKE_BINARY_DIR} as param because its different at build stage
-add_custom_target(revision.h ALL
-  COMMAND ${CMAKE_COMMAND} -DBUILDDIR=${CMAKE_BINARY_DIR} -P ${CMAKE_SOURCE_DIR}/src/cmake/genrev.cmake
-  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+set(Recast_STAT_SRCS
+    Recast.cpp
+    RecastAlloc.cpp
+    RecastArea.cpp
+    RecastContour.cpp
+    RecastFilter.cpp
+    RecastMesh.cpp
+    RecastMeshDetail.cpp
+    RecastRasterization.cpp
+    RecastRegion.cpp
 )
+
+if(WIN32)
+  include_directories(
+    ${CMAKE_SOURCE_DIR}/modules/dep/zlib
+  )
+endif()
+
+add_library(Recast STATIC ${Recast_STAT_SRCS})
+
+target_link_libraries(Recast ${ZLIB_LIBRARIES})
