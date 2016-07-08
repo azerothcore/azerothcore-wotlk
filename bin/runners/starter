@@ -1,0 +1,22 @@
+#!/bin/bash
+
+GDB_FILE="$2"
+CONFIG="$3"
+SYSLOG="$4"
+SYSERR="$5"
+GBD_ENABLED="$6"
+
+if [ $GBD_ENABLED -eq 1 ]; then
+    echo "run -c $3" > "$GDB_FILE"
+    echo "bt" >> "$GDB_FILE"
+    echo "bt full" >> "$GDB_FILE"
+    echo "info threads" >> "$GDB_FILE"
+    echo "thread apply all bt full" >> "$GDB_FILE"
+
+    [ ! -f "$SYSLOG" ] && touch "$SYSLOG"
+    [ ! -f "$SYSERR" ] && touch "$SYSERR"
+
+    gdb -x $GDB_FILE --batch $1 >> "$SYSLOG" 2>> "$SYSERR"
+elif [ $GBD_ENABLED -eq 0 ]; then
+    "./$1" -c "$CONFIG"
+fi
