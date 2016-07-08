@@ -16,3 +16,29 @@ CMakeLists.txt.user
 *.BACKUP.*
 *.BASE.*
 *.LOCAL.*
+
+#
+# IDE & other softwares
+#
+/.settings/
+/.externalToolBuilders/*
+# exclude in all levels
+nbproject/
+.sync.ffs_db
+
+#
+# Eclipse
+#
+*.pydevproject
+.metadata
+.gradle
+tmp/
+*.tmp
+*.swp
+*~.nib
+local.properties
+.settings/
+.loadpath
+.project
+.cproject
+
