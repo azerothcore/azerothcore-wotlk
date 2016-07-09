@@ -11,7 +11,7 @@ class Item;
 class Player;
 class WorldSession;
 struct ItemTemplate;
-
+ 
 enum TransmogTrinityStrings // Language.h might have same entries, appears when executing SQL, change if needed
 {
     LANG_ERR_TRANSMOG_OK = 11100, // change this
@@ -116,8 +116,8 @@ public:
     void SetFakeEntry(Player* player, Item* item, uint32 entry);
 
     TransmogTrinityStrings Transmogrify(Player* player, uint64 itemGUID, uint8 slot, bool no_cost = false);
-    bool CanTransmogrifyItemWithItem(Player* player, ItemTemplate const* destination, ItemTemplate const* source, Item* srcItem) const;
-    bool SuitableForTransmogrification(Player* player, ItemTemplate const* proto, Item* item) const;
+    bool CanTransmogrifyItemWithItem(Player* player, ItemTemplate const* destination, ItemTemplate const* source) const;
+    bool SuitableForTransmogrification(Player* player, ItemTemplate const* proto) const;
     // bool CanBeTransmogrified(Item const* item);
     // bool CanTransmogrify(Item const* item);
     uint32 GetSpecialPrice(ItemTemplate const* proto) const;
