@@ -76,8 +76,9 @@ MACRO(AZTH_ADD_INC_PATH val)
         ${AZTH_INC_PATHS}
         ${val}
     )
+
     #update cache
-    AZTH_SET_CACHE("AZTH_INC_PATHS" ${AZTH_INC_PATHS})
+    AZTH_SET_CACHE("AZTH_INC_PATHS" "${AZTH_INC_PATHS}")
     include_directories(${val})
 ENDMACRO()
 
