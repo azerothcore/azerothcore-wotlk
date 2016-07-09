@@ -33,6 +33,17 @@ MACRO(AZTH_SET_GLOBAL name val)
   AZTH_GET_GLOBAL(${name})
 ENDMACRO()
 
+MACRO(AZTH_ADD_GLOBAL name val)
+  AZTH_GET_GLOBAL(${name})
+
+  set_property ( GLOBAL PROPERTY ${name}
+      ${val}
+      ${${name}}
+  )
+  # after set , create the variable for current scope
+  AZTH_GET_GLOBAL(${name})
+ENDMACRO()
+
 #
 # AZTH_GET_GLOBAL
 #
@@ -99,7 +110,12 @@ MACRO(AZTH_ADD_CORE_TG val)
     AZTH_SET_GLOBAL("AZTH_CORE_TGS" "${AZTH_CORE_TGS}")
 ENDMACRO()
 
+MACRO(ADD_HOOK hook_name value)
+  AZTH_ADD_GLOBAL(${hook_name} "${value}")
+ENDMACRO()
+
 MACRO(RUN_HOOK hook_name)
+  AZTH_GET_GLOBAL(${hook_name})
   message("Running cmake hook: ${hook_name}")
   if (${hook_name})
       set(HOOK_ARRAY ${${hook_name}})
