@@ -1,4 +1,4 @@
-AZTH_LOAD_SRC("libs")
+#AZTH_LOAD_SRC("libs")
 AZTH_LOAD_SRC("game")
 AZTH_LOAD_SRC("plugins")
 
