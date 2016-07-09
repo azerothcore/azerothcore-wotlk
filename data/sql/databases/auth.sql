@@ -1,6 +1,6 @@
 -- MySQL dump 10.13  Distrib 5.6.10, for Win64 (x86_64)
 --
--- Host: localhost    Database: clean_logon
+-- Host: localhost    Database: clean_auth
 -- ------------------------------------------------------
 -- Server version	5.6.10
 
