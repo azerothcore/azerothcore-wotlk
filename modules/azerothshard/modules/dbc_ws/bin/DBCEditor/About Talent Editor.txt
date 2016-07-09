@@ -1,0 +1,39 @@
+DBC Tool v2.7b by TRX.
+
+
+Q.How to use talents editor?
+A. Run my tool, go to Tools/Talent Editor
+
+New widow will appear... up u can change classes and down u can change talent tabs...
+
+Talents are in x,y order like in game so u dont have to worry where u will put ur talents... just use the spot in program and in that spot talent will appear in game...
+
+For each talent u can specify :
+
+--Talent ID (its NOT a spell! just talent id...) i would recommend if u are gonna make new talents, to use nubmers from 1700 and up... but dont ever use numbers like 99999 just start from 1700 and do up one by one...
+
+--Req. Talent...This is where u specify wich talent is needed for this talent to learn...
+
+--Req. N...This is where u specify how much talent points in req. talent is needed for this one to be learned... use from 1 to 5....
+
+-Button S...New window appears where u set talent spells (Rank1, Rank2,....)
+
+-Button OK will apply changes
+
+ATTENTION : Allways edit only one talent at one time, then apply changes, and then u can edit other....
+
+
+Also, if u want to make new tab, go to empty tab, and first thing u do is specify its NAME...
+
+IF you made NEW talent tab, you also need to make background for it... U got 4 .png files with my program, if u want u can edit them with photoshop...and convert them with BLPConverer to .blp
+
+important is to RENAME them...how? well if your tab's name is "TRX", and its class warlock then filenames would be :
+
+WarlockTRX-BottomLeft.blp
+WarlockTRX-BottomRight.blp
+WarlockTRX-TopLeft.blp
+WarlockTRX-TopRight.blp
+
+when u did that, copy them to : ur "World of Warcraft\Data\Interface\TalentFrame\"(case sensitive!)
+
+and thats all... :D

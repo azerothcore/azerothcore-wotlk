@@ -1,0 +1,402 @@
+long,long,long,long,long,flags,long,long,long,long,long,long,long,long,flags,long,long,long,long,float,float,long,long,str,None,None,None,None,None,None,None,None,None,None,None,None,None,None,None,flags,str,None,None,None,None,None,None,None,None,None,None,None,None,None,None,None,flags
+1,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"PLAYER, Human",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+2,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"PLAYER, Orc",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+3,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"PLAYER, Dwarf",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+4,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"PLAYER, Night Elf",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+5,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"PLAYER, Undead",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FE
+6,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"PLAYER, Tauren ",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+7,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Creature",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+8,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"PLAYER, Gnome",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+9,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"PLAYER, Troll",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+14,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Monster",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+15,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Defias Brotherhood",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+16,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Gnoll - Riverpaw",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+17,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Gnoll - Redridge",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+18,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Gnoll - Shadowhide",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+19,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Murloc",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+20,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Undead, Scourge",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+21,1,1791,0,0,0x0,0,0,0,0,500,0,0,0,0x40,0,0,0,169,1,0,5,7,5,"Booty Bay",,,,,,,,,,,,,,,,0xFF01FE,"This booming coastal city is run by Baron Revilgaz of the Blackwater Raiders.  Mortal enemies of the Bloodsail Buccaneers and part of the Steamwheedle Cartel.",,,,,,,,,,,,,,,,0xFF01FE
+22,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Beast - Spider",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+23,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Beast - Boar",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+24,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Worgen",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+25,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Kobold",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+26,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Troll, Bloodscalp",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+27,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Troll, Skullsplitter",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+28,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Prey",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+29,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Beast - Wolf",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+30,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Defias Brotherhood Traitor",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+31,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Friendly",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+32,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Trogg",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+33,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Troll, Frostmane",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+34,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Orc, Blackrock",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+35,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Villian",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+36,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Victim",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+37,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Beast - Bear",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+38,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Ogre",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+39,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Kurzen's Mercenaries",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+40,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Escortee",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+41,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Venture Company",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+42,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Beast - Raptor",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+43,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Basilisk",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+44,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Dragonflight, Green",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+45,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Lost Ones",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+46,29,1791,0,0,0x0,0,0,0,0,0,0,0,0,0x4,0,0,0,0,1,1,5,5," Blacksmithing - Armorsmithing",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+47,20,1097,690,4,0x0,0,0,0,0,3100,-42000,4000,0,0x111,6,17,0,469,1,0,25,7,5,"Ironforge",,,,,,,,,,,,,,,,0xFF01FE,"This Alliance capital is the pride of the Dun Morogh dwarves.  Home to King Magni.",,,,,,,,,,,,,,,,0xFF01FE
+48,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Dark Iron Dwarves",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+49,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Human, Night Watch",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+50,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Dragonflight, Red",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+51,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Gnoll - Mosshide",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+52,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Orc, Dragonmaw",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+53,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Gnome - Leper",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+54,18,1037,690,64,0x0,0,0,0,0,3100,-42000,4000,0,0x111,6,17,0,469,1,0,25,7,5,"Gnomeregan Exiles",,,,,,,,,,,,,,,,0xFF01FE,"The former denizens of Gnomeregan, now living in exile in Ironforge and in league with the Alliance.",,,,,,,,,,,,,,,,0xFF01FE
+55,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Leopard",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+56,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Scarlet Crusade",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+57,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Gnoll - Rothide",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+58,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Beast - Gorilla",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+59,4,1791,0,0,0x0,0,0,0,0,0,0,0,0,0x10,0,0,0,1118,0,0,5,5,"Thorium Brotherhood",,,,,,,,,,,,,,,,0xFF01FE,"The dwarves of the Thorium Brotherhood epitomize excellence in craftsmanship and are bent on unlocking the secrets of Blackrock Mountain.",,,,,,,,,,,,,,,,0xFF01FE
+60,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Naga",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+61,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Dalaran",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+62,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Forlorn Spirit",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+63,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Darkhowl",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+64,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Grell",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+65,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Furbolg",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+66,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Horde Generic",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+67,12,690,1101,0,0x0,0,0,0,0,3500,-42000,0,0,0x19,14,0,0,1118,0,0,5,5,"Horde",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+68,17,162,1101,16,0x200,0,0,0,0,500,-42000,4000,3100,0x111,6,17,17,67,1,0,25,7,5,"Undercity",,,,,,,,,,,,,,,,0xFF01FE,"Led by Sylvanas Windrunner, the Forsaken have joined a tenuous alliance with the Horde and established this capital in the vast depths under the Ruins of Lordaeron.",,,,,,,,,,,,,,,,0xFF01FE
+69,21,1093,690,8,0x0,0,0,0,0,3100,-42000,4000,0,0x111,6,17,0,469,1,0,25,7,5,"Darnassus",,,,,,,,,,,,,,,,0xFF01FE,"This Alliance capital is populated by Night Elves and is located in the Island of Teldrassil.  Ruled by the Priestess of the Moon, Tyrande Whisperwind.",,,,,,,,,,,,,,,,0xFF01FE
+70,6,1791,0,0,0x0,0,0,0,0,-10000,0,0,0,0x2,0,0,0,0,1,1,5,5,"Syndicate",,,,,,,,,,,,,,,,0xFF01FE,"A primarily human criminal organization that operates mostly out of the Alterac Mountains and Hillsbrad Foothills.",,,,,,,,,,,,,,,,0xFF01FE
+71,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Hillsbrad Militia",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+72,19,1100,690,1,0x0,0,0,0,0,3100,-42000,4000,0,0x111,6,17,0,469,1,0,25,7,5,"Stormwind",,,,,,,,,,,,,,,,0xFF01FE,"One of the last bastions of human power, this Alliance capital is ruled by the prodigal king, Varian Wrynn.",,,,,,,,,,,,,,,,0xFF01FE
+73,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Demon",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+74,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Elemental",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+75,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Spirit",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+76,14,160,1101,2,0x210,0,0,0,0,3100,-42000,4000,500,0x111,6,17,17,67,1,0,25,7,5,"Orgrimmar",,,,,,,,,,,,,,,,0xFF01FE,"Founded by Thrall, this Horde capital city is home to many of the proud orc clans of Durotar.",,,,,,,,,,,,,,,,0xFF01FE
+77,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Treasure",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+78,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Gnoll - Mudsnout",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+79,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"HIllsbrad, Southshore Mayor",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+80,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Dragonflight, Black",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+81,16,130,1101,528,0x20,0,0,0,0,3100,-42000,500,4000,0x111,6,17,17,67,1,0,25,7,5,"Thunder Bluff",,,,,,,,,,,,,,,,0xFF01FE,"Cairne Bloodhoof leads his people, the proud Tauren, from this mighty Horde capital.",,,,,,,,,,,,,,,,0xFF01FE
+82,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Troll, Witherbark",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+83,23,1791,0,0,0x0,0,0,0,0,2999,0,0,0,0x4,0,0,0,0,1,1,5,5," Leatherworking - Elemental",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+84,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Quilboar, Razormane",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+85,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Quilboar, Bristleback",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+86,22,1791,0,0,0x0,0,0,0,0,2999,0,0,0,0x4,0,0,0,0,1,1,5,5," Leatherworking - Dragonscale",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+87,0,1791,0,0,0x0,0,0,0,0,-6500,0,0,0,0x2,0,0,0,1118,0,0,5,5,"Bloodsail Buccaneers",,,,,,,,,,,,,,,,0xFF01FE,"These bloodthirsty corsairs are the bane of many a merchant in the high seas.  Sworn enemies of Booty Bay.",,,,,,,,,,,,,,,,0xFF01FE
+88,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Blackfathom",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+89,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Makrura",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+90,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Centaur, Kolkar",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+91,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Centaur, Galak",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+92,2,1791,0,0,0x0,0,0,0,0,2000,0,0,0,0x2,0,0,0,1118,0,0,5,5,"Gelkis Clan Centaur",,,,,,,,,,,,,,,,0xFF01FE,"These centaur have made their home in the southern region of Desolace.  Mortal enemies of the Magram Centaur.",,,,,,,,,,,,,,,,0xFF01FE
+93,3,1791,0,0,0x0,0,0,0,0,2000,0,0,0,0x2,0,0,0,1118,0,0,5,5,"Magram Clan Centaur",,,,,,,,,,,,,,,,0xFF01FE,"These centaur have made their home in the eastern region of Desolace.  Mortal enemies of the Gelkis Centaur.",,,,,,,,,,,,,,,,0xFF01FE
+94,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Maraudine",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+108,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Theramore",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+109,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Quilboar, Razorfen",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+110,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Quilboar, Razormane 2",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+111,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Quilboar, Deathshead",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+128,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Enemy",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+148,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Ambient",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+168,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Nethergarde Caravan",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+169,10,1791,0,0,0x0,0,0,0,0,500,0,0,0,0xC,0,0,0,1118,0,0,5,5,"Steamwheedle Cartel",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+189,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Alliance Generic",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+209,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Nethergarde",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+229,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Wailing Caverns",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+249,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Silithid",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+269,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Silvermoon Remnant",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+270,51,1791,0,0,0x0,0,0,0,0,0,0,0,0,0x10,0,0,0,1118,0,0,5,5,"Zandalar Tribe",,,,,,,,,,,,,,,,0xFF01FE,"These trolls have come to Yojamba Isle in an effort to recruit help against the resurrected Blood God and his Atal'ai Priests in Zul'Gurub.",,,,,,,,,,,,,,,,0xFF01FE
+289,30,1791,0,0,0x0,0,0,0,0,0,0,0,0,0x4,0,0,0,0,1,1,5,5," Blacksmithing - Weaponsmithing",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+309,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Scorpid",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+310,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Beast - Bat",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+311,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Titan",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+329,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Taskmaster Fizzule",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+349,5,1791,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,1118,0,0,5,5,"Ravenholdt",,,,,,,,,,,,,,,,0xFF01FE,"This guild of thieves and assassins welcomes only those of extraordinary prowess into its fold.  Sworn rivals of the Syndicate.",,,,,,,,,,,,,,,,0xFF01FE
+369,7,1791,0,0,0x0,0,0,0,0,500,0,0,0,0x40,0,0,0,169,1,0,5,7,5,"Gadgetzan",,,,,,,,,,,,,,,,0xFF01FE,"Capital of the Steamwheedle Cartel and home to goblinhood's finest engineers, alchemists and merchants.",,,,,,,,,,,,,,,,0xFF01FE
+389,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Gnomeregan Bug",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+409,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Harpy",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+429,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Burning Blade",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+449,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Shadowsilk Poacher",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+450,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Searing Spider",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+469,11,1101,690,0,0x0,0,0,0,0,3300,-42000,0,0,0x19,14,0,0,1118,0,0,5,5,"Alliance",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+470,9,1791,0,0,0x0,0,0,0,0,500,0,0,0,0x40,0,0,0,169,1,0,5,7,5,"Ratchet",,,,,,,,,,,,,,,,0xFF01FE,"Part of the Steamwheedle Cartel, this goblin city provides a neutral haven for those that wish to trade goods and services in the Barrens.",,,,,,,,,,,,,,,,0xFF01FE
+471,8,1097,690,4,0x0,0,0,0,0,150,-42000,500,0,0x14,22,4,0,0,1,1,5,5,"Wildhammer Clan",,,,,,,,,,,,,,,,0xFF01FE,"Though not a part of the Alliance, the dwarves of Aerie Peak have opened their doors to it and hold the Horde as enemies.",,,,,,,,,,,,,,,,0xFF01FE
+489,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Goblin, Dark Iron Bar Patron",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+509,53,1101,690,0,0x0,0,0,0,0,0,-42000,0,0,0x10,2,0,0,891,0,0,5,5,"The League of Arathor",,,,,,,,,,,,,,,,0xFF01FE,"The League of Arathor seeks to reclaim the lost land of Arathi Basin for their benefactors in Stormwind.",,,,,,,,,,,,,,,,0xFF01FE
+510,52,690,1101,0,0x0,0,0,0,0,0,-42000,0,0,0x10,2,0,0,892,0,0,5,5,"The Defilers",,,,,,,,,,,,,,,,0xFF01FE,"The Defilers seek to claim Arathi Basin's valuable resources for the Horde.",,,,,,,,,,,,,,,,0xFF01FE
+511,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Giant",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+529,13,1791,0,0,0x0,0,0,0,0,200,0,0,0,0x0,0,0,0,1118,0,0,5,5,"Argent Dawn",,,,,,,,,,,,,,,,0xFF01FE,"An organization focused on protecting Azeroth from the threat of the Scourge.  Strongholds of the Argent Dawn can be found in the Eastern and Western Plaguelands.",,,,,,,,,,,,,,,,0xFF01FE
+530,15,34,1101,528,0x80,0,0,0,0,3100,-42000,500,4000,0x111,6,17,17,67,1,0,25,7,5,"Darkspear Trolls",,,,,,,,,,,,,,,,0xFF01FE,"This tribe of exiled trolls has joined forces with Thrall and the Horde.  They now call Durotar their home, which they share with their orc allies.",,,,,,,,,,,,,,,,0xFF01FE
+531,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Dragonflight, Bronze",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+532,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Dragonflight, Blue",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+549,24,1791,0,0,0x0,0,0,0,0,2999,0,0,0,0x4,0,0,0,0,1,1,5,5," Leatherworking - Tribal",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+550,26,1791,0,0,0x0,0,0,0,0,2999,0,0,0,0x4,0,0,0,0,1,1,5,5," Engineering - Goblin",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+551,25,1791,0,0,0x0,0,0,0,0,2999,0,0,0,0x4,0,0,0,0,1,1,5,5," Engineering - Gnome",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+569,33,1791,0,0,0x0,0,0,0,0,0,0,0,0,0x4,0,0,0,0,1,1,5,5," Blacksmithing - Hammersmithing",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+570,31,1791,0,0,0x0,0,0,0,0,0,0,0,0,0x4,0,0,0,0,1,1,5,5," Blacksmithing - Axesmithing",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+571,32,1791,0,0,0x0,0,0,0,0,0,0,0,0,0x4,0,0,0,0,1,1,5,5," Blacksmithing - Swordsmithing",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+572,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Troll, Vilebranch",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+573,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Southsea Freebooters",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+574,34,1791,0,0,0x0,0,0,0,0,0,0,0,0,0x4,0,0,0,0,1,1,5,5,"Caer Darrow",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+575,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Furbolg, Uncorrupted",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+576,35,1791,0,0,0x0,0,0,0,0,-3500,0,0,0,0x2,0,0,0,1118,0,0,5,5,"Timbermaw Hold",,,,,,,,,,,,,,,,0xFF01FE,"As the last uncorrupted furbolg tribe, the Timbermaw seek to preserve their spiritual ways and end the suffering of their brethren.",,,,,,,,,,,,,,,,0xFF01FE
+577,28,1791,0,0,0x0,0,0,0,0,500,0,0,0,0x40,0,0,0,169,1,0,5,7,5,"Everlook",,,,,,,,,,,,,,,,0xFF01FE,"This trading post is run by the goblins of the Steamwheedle Cartel and it sits in the crossroads of Winterspring's main trade routes.",,,,,,,,,,,,,,,,0xFF01FE
+589,27,690,1101,0,0x0,0,0,0,0,-42000,0,0,0,0x6,0,0,0,0,1,1,5,5,"Wintersaber Trainers",,,,,,,,,,,,,,,,0xFF01FE,"This small group of reclusive night elves raises and trains wintersabers in the Winterspring area.",,,,,,,,,,,,,,,,0xFF01FE
+609,36,1791,40,0,0x0,511,1024,0,0,0,2000,0,0,0x0,0,0,0,1118,0,0,5,5,"Cenarion Circle",,,,,,,,,,,,,,,,0xFF01FE,"The druids of Cenarion Circle are guardians of nature and make their home in tranquil Moonglade.",,,,,,,,,,,,,,,,0xFF01FE
+629,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Shatterspear Trolls",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+630,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Ravasaur Trainers",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+649,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Majordomo Executus",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+669,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Beast - Carrion Bird",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+670,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Beast - Cat",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+671,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Beast - Crab",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+672,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Beast - Crocilisk",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+673,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Beast - Hyena",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+674,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Beast - Owl",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+675,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Beast - Scorpid",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+676,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Beast - Tallstrider",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+677,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Beast - Turtle",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+678,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Beast - Wind Serpent",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+679,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Training Dummy",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+689,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Dragonflight, Black - Bait",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+709,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Battleground Neutral",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+729,41,690,1101,0,0x0,0,0,0,0,0,-42000,0,0,0x10,2,0,0,892,0,0,5,5,"Frostwolf Clan",,,,,,,,,,,,,,,,0xFF01FE,"The Frostwolf Clan seeks to drive out the dwarves of the Stormpike Expedition from Alterac Valley.",,,,,,,,,,,,,,,,0xFF01FE
+730,40,1101,690,0,0x0,0,0,0,0,0,-42000,0,0,0x10,2,0,0,891,0,0,5,5,"Stormpike Guard",,,,,,,,,,,,,,,,0xFF01FE,"The Stormpike Dwarves have set up residence in Alterac Valley, where they're locked in battle with the Frostwolf Orcs.",,,,,,,,,,,,,,,,0xFF01FE
+749,42,1791,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,1118,1,1,5,5,"Hydraxian Waterlords",,,,,,,,,,,,,,,,0xFF01FE,"These elementals have made their home on the islands east of Azshara.  Sworn enemies of the armies of Ragnaros.",,,,,,,,,,,,,,,,0xFF01FE
+750,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Sulfuron Firelords",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+769,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Gizlock's Dummy",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+770,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Gizlock's Charm",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+771,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Gizlock",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+789,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Moro'gai",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+790,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Spirit Guide - Alliance",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+809,44,1791,0,0,0x0,0,0,0,0,0,0,0,0,0x10,0,0,0,1118,0,0,5,5,"Shen'dralar",,,,,,,,,,,,,,,,0xFF01FE,"A remnant of the once powerful elves living in Dire Maul, yet still wise and knowledgeable about great secrets. ",,,,,,,,,,,,,,,,0xFF01FE
+829,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Ogre (Captain Kromcrush)",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+849,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Spirit Guide - Horde",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+869,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Jaedenar",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+889,46,690,1101,0,0x0,0,0,0,0,0,-42000,0,0,0x10,6,0,0,892,0,0,7,7,"Warsong Outriders",,,,,,,,,,,,,,,,0xFF01FE,"Fierce orcs of the Warsong Clan, locked in battle against the Silverwing Sentinels in Warsong Gulch.",,,,,,,,,,,,,,,,0xFF01FE
+890,45,1101,690,0,0x0,0,0,0,0,0,-42000,0,0,0x10,6,0,0,891,0,0,7,7,"Silverwing Sentinels",,,,,,,,,,,,,,,,0xFF01FE,"Staunch defenders of Ashenvale, locked in battle against the Warsong Outriders in Warsong Gulch.",,,,,,,,,,,,,,,,0xFF01FE
+891,47,1101,178,0,0x0,0,0,0,0,0,-42000,0,0,0x18,14,0,0,1118,0,0,5,5,"Alliance Forces",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+892,48,690,77,0,0x0,0,0,0,0,0,-42000,0,0,0x18,14,0,0,1118,0,0,5,5,"Horde Forces",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+893,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Revantusk Trolls",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+909,50,1791,0,0,0x0,0,0,0,0,0,0,0,0,0x10,0,0,0,1118,0,0,5,5,"Darkmoon Faire",,,,,,,,,,,,,,,,0xFF01FE,"A traveling fair that showcases the weird and the extraordinary.  Often spotted in Elwynn Forest, Mulgore, and Terokkar Forest.",,,,,,,,,,,,,,,,0xFF01FE
+910,54,1791,0,0,0x0,0,0,0,0,-42000,0,0,0,0x0,0,0,0,1118,0,0,5,5,"Brood of Nozdormu",,,,,,,,,,,,,,,,0xFF01FE,"The descendants of the Bronze Dragonflight are the guardians of time and care little for the mortal races.",,,,,,,,,,,,,,,,0xFF01FE
+911,55,162,1101,512,0x10,0,0,0,0,400,-42000,4000,3100,0x111,6,17,17,67,1,0,25,7,5,"Silvermoon City",,,,,,,,,,,,,,,,0xFF01FE,"The capital of Quel'Thalas, home of the blood elves.  Though nearly destroyed by Arthas' attack on the Sunwell, Silvermoon is once again a thriving city.",,,,,,,,,,,,,,,,0xFF01FE
+912,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Might of Kalimdor",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+914,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"PLAYER, Blood Elf",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+915,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Armies of C'Thun",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+916,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Silithid Attackers",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+917,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"The Ironforge Brigade",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+918,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"RC Enemies",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+919,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"RC Objects",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+920,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Red",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+921,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Blue",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+922,56,690,1101,0,0x0,0,0,0,0,0,-42000,0,0,0x10,6,0,0,1118,0,0,5,5,"Tranquillien",,,,,,,,,,,,,,,,0xFF01FE,"Once a high elf town, Tranquillien became abandoned after the Scourge invaded Quel'Thalas.  It has now been reclaimed by the Forsaken and the blood elves who seek to rid the Ghostlands of the Scourge.",,,,,,,,,,,,,,,,0xFF01FE
+923,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Farstriders",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+924,1000,0,0,0,0x0,0,0,0,0,0,-42000,0,0,0x10,6,0,0,0,1,1,5,5,"AzerothShard",,,,,,,,,,,,,,,,0xFF01FE,"AzerothShard Reputation",,,,,,,,,,,,,,,,0xFF01FC
+925,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Sunstriders",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+926,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Magister's Guild",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+927,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"PLAYER, Draenei",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+928,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Scourge Invaders",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+929,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,469,0,0,3,3,"Bloodmaul Clan",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+930,49,77,946,1024,0x0,0,0,0,0,3000,-42000,4000,0,0x111,6,17,0,469,1,0,25,7,5,"Exodar",,,,,,,,,,,,,,,,0xFF01FE,"The naaru vessel that brought the draenei to Azeroth.  Though stranded in the Azuremyst Isles, it acts as a home city for this noble race.",,,,,,,,,,,,,,,,0xFF01FE
+931,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Test Faction (not a real faction)",,,,,,,,,,,,,,,,0xFF01FE,"This faction only exists to test the editing of faction names and descriptions...",,,,,,,,,,,,,,,,0xFF01FE
+932,58,255,1024,512,0x0,0,0,0,0,0,3500,-3500,0,0x50,80,80,0,936,-1,10000002384186,1,7,7,"The Aldor",,,,,,,,,,,,,,,,0xFF01FE,"An ancient order of draenei priests once run by Velen, the Aldor are currently led by High Priestess Ishanah.  They are servants of the naaru in Shattrath City known as the Sha'tar.  Rivals of the Scryers.",,,,,,,,,,,,,,,,0xFF01FE
+933,60,2047,0,0,0x0,0,0,0,0,0,0,0,0,0x10,0,0,0,980,0,0,7,7,"The Consortium",,,,,,,,,,,,,,,,0xFF01FE,"Led by Nexus-Prince Haramad, the Consortium is a loosely affiliated cartel of ethereal smugglers, traders and thieves that has come to Outland to benefit from its riches.",,,,,,,,,,,,,,,,0xFF01FE
+934,62,255,1024,512,0x0,0,0,0,0,0,-3500,3500,0,0x50,80,80,0,936,-1,10000002384186,1,7,7,"The Scryers",,,,,,,,,,,,,,,,0xFF01FE,"Voren'thal the Seer leads the dissident blood elves who've rejected Kael'thas' path to power.  They've joined forces with the naaru of Shattrath City, much to the dismay of the Aldor.",,,,,,,,,,,,,,,,0xFF01FE
+935,39,1791,0,0,0x0,0,0,0,0,0,0,0,0,0x10,0,0,0,936,0,5,0,4,3,"The Sha'tar",,,,,,,,,,,,,,,,0xFF01FE,"The Sha'tar are a group of powerful naaru who rule over a rebuilt Shattrath City.  With the help of the Aldor and the Scryers, they lead the battle against Illidan and the Burning Legion.",,,,,,,,,,,,,,,,0xFF01FE
+936,59,2047,0,0,0x0,0,0,0,0,0,0,0,0,0x1C,0,0,0,980,0,0,7,7,"Shattrath City",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+937,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Troll, Forest",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+938,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"The Omenai",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+939,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"DEPRECATED",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+940,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"The Sons of Lothar",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+941,61,690,1101,0,0x0,0,0,0,0,-500,-42000,0,0,0x10,6,0,0,980,0,0,5,5,"The Mag'har",,,,,,,,,,,,,,,,0xFF01FE,"This reclusive group of brown-skinned orcs has escaped any form of demonic corruption.  They have retained their traditional way of life in the face of great changes in Outland.",,,,,,,,,,,,,,,,0xFF01FE
+942,64,2047,0,0,0x0,0,0,0,0,0,0,0,0,0x10,0,0,0,980,0,0,5,5,"Cenarion Expedition",,,,,,,,,,,,,,,,0xFF01FE,"An exploratory force sent to Outland by the Cenarion Circle to study surviving life forms.  The Cenarion Expedition has quickly gained in size and autonomy since the opening of the Dark Portal.",,,,,,,,,,,,,,,,0xFF01FE
+943,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Fel Orc",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+944,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Fel Orc Ghost",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+945,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Sons of Lothar Ghosts",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+946,38,1101,690,0,0x0,0,0,0,0,0,-42000,0,0,0x10,0,0,0,980,0,0,5,5,"Honor Hold",,,,,,,,,,,,,,,,0xFF01FE,"Vestiges of the Sons of Lothar, veterans of the Alliance that first came into Draenor, have steadfastly held on to this Hellfire outpost.  They are now joined by the armies from Stormwind and Ironforge.",,,,,,,,,,,,,,,,0xFF01FE
+947,37,690,1101,0,0x0,0,0,0,0,0,-42000,0,0,0x10,0,0,0,980,0,0,5,5,"Thrallmar",,,,,,,,,,,,,,,,0xFF01FE,"The expedition sent through the Dark Portal by Thrall has built a stronghold in Hellfire Peninsula.  Thrallmar serves as a base of operations for much of the Horde's activities in Outland.",,,,,,,,,,,,,,,,0xFF01FE
+948,86,32767,0,0,0x0,0,0,0,0,0,0,0,0,0x8,0,0,0,949,1,1,5,5,"Test Faction 2",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+949,85,32767,0,0,0x0,0,0,0,0,0,0,0,0,0x18,0,0,0,0,1,1,5,5,"Test Faction 1",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+950,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"ToWoW - Flag",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+951,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"ToWoW - Flag Trigger Alliance (DND)",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+952,87,32767,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,948,1,1,5,5,"Test Faction 3",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+953,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Test Faction 4",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+954,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"ToWoW - Flag Trigger Horde (DND)",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+955,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Broken",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+956,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Ethereum",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+957,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Earth Elemental",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+958,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Fighting Robots",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+959,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Actor Good",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+960,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Actor Evil",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+961,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Stillpine Furbolg",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+962,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Crazed Owlkin",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+963,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Chess Alliance",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+964,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Chess Horde",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+965,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Monster Spar",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+966,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Monster Spar Buddy",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+967,63,4095,0,0,0x0,0,0,0,0,0,0,0,0,0x10,0,0,0,980,0,0,5,5,"The Violet Eye",,,,,,,,,,,,,,,,0xFF01FE,"A secret sect of the Kirin Tor founded to spy on Medivh and his activities.",,,,,,,,,,,,,,,,0xFF01FE
+968,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Sunhawks",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+969,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Hand of Argus",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+970,65,2047,0,0,0x0,0,0,0,0,-2500,0,0,0,0x0,0,0,0,980,0,0,5,5,"Sporeggar",,,,,,,,,,,,,,,,0xFF01FE,"The sporelings are a mostly peaceful race of mushroom-men native to Outland. Their home is located in the southern bogs of Zangarmarsh. ",,,,,,,,,,,,,,,,0xFF01FE
+971,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Fungal Giant",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+972,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Spore Bat",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+973,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Monster, Predator",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+974,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Monster, Prey",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+975,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Void Anomaly",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+976,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Hyjal Defenders",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+977,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Hyjal Invaders",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+978,66,1101,690,0,0x0,0,0,0,0,-1200,-42000,0,0,0x10,0,0,0,980,0,0,5,5,"Kurenai",,,,,,,,,,,,,,,,0xFF01FE,"Draenei for redeemed.  These Broken have escaped the grasp of their various slavers in Outland and have made their home in Nagrand.  It is there that they seek to rediscover their destiny.""",,,,,,,,,,,,,,,,0xFF01FE
+979,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Earthen Ring",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+980,43,0,0,0,0x0,0,0,0,0,0,0,0,0,0x18,0,0,0,0,0,0,5,5,"The Burning Crusade",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+981,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Arakkoa",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+982,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Zangarmarsh Banner (Alliance)",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+983,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Zangarmarsh Banner (Horde)",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+984,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Zangarmarsh Banner (Neutral)",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+985,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Caverns of Time - Thrall",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+986,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Caverns of Time - Durnholde",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+987,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Caverns of Time - Southshore Guards",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+988,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Shadow Council Covert",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+989,67,1791,0,0,0x0,0,0,0,0,0,0,0,0,0x10,0,0,0,980,0,0,5,5,"Keepers of Time",,,,,,,,,,,,,,,,0xFF01FE,"The Keepers of Time are bronze dragons hand-picked by Nozdormu to watch over the Caverns of Time.",,,,,,,,,,,,,,,,0xFF01FE
+990,57,1791,0,0,0x0,0,0,0,0,0,0,0,0,0x10,0,0,0,980,0,0,5,5,"The Scale of the Sands",,,,,,,,,,,,,,,,0xFF01FE,"A secretive subgroup of the Bronze Dragonflight, led by Soridormi, prime mate of Nozdormu.",,,,,,,,,,,,,,,,0xFF01FE
+991,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Dark Portal Defender, Alliance",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+992,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Dark Portal Defender, Horde",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+993,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Dark Portal Attacker, Legion",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+994,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Inciter Trigger",,,,,,,,,,,,,,,,0xFF01FE,"Used for the Blackheart the Inciter event.",,,,,,,,,,,,,,,,0xFF01FE
+995,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Inciter Trigger 2",,,,,,,,,,,,,,,,0xFF01FE,"Used for the Blackheart the Inciter event.",,,,,,,,,,,,,,,,0xFF01FE
+996,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Inciter Trigger 3",,,,,,,,,,,,,,,,0xFF01FE,"Used for the Blackheart the Inciter event.",,,,,,,,,,,,,,,,0xFF01FE
+997,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Inciter Trigger 4",,,,,,,,,,,,,,,,0xFF01FE,"Used for the Blackheart the Inciter event.",,,,,,,,,,,,,,,,0xFF01FE
+998,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Inciter Trigger 5",,,,,,,,,,,,,,,,0xFF01FE,"Used for the Blackheart the Inciter event.",,,,,,,,,,,,,,,,0xFF01FE
+999,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Mana Creature",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1000,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Khadgar's Servant",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1001,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Bladespire Clan",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1002,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Ethereum Sparbuddy",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1003,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Protectorate",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1004,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Arcane Annihilator (DNR)",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1005,68,32767,0,0,0x0,1503,0,0,0,3000,0,0,0,0x4,0,0,0,0,1,1,5,5,"Friendly, Hidden",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1006,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Kirin'Var - Dathric",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1007,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Kirin'Var - Belmara",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1008,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Kirin'Var - Luminrath",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1009,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Kirin'Var - Cohlien",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1010,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Servant of Illidan",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1011,69,32767,0,0,0x0,1535,0,0,0,0,0,0,0,0x10,0,0,0,936,0,0,3,3,"Lower City",,,,,,,,,,,,,,,,0xFF01FE,"The refugees of Shattrath come from diverse backgrounds and races.  Word of helpful deeds spreads quickly among the Denizens of Lower City.",,,,,,,,,,,,,,,,0xFF01FE
+1012,70,1791,0,0,0x0,0,0,0,0,0,0,0,0,0x10,0,0,0,980,0,0,3,3,"Ashtongue Deathsworn",,,,,,,,,,,,,,,,0xFF01FE,"The elite of the Broken tribe known as the Ashtongue, officially aligned with Illidan. The Deathsworn are Akama's most trusted lieutenants and are privy to their leader's mysterious motivations.",,,,,,,,,,,,,,,,0xFF01FE
+1013,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Spirits of Shadowmoon 1",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1014,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Spirits of Shadowmoon 2",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1015,71,1791,0,0,0x0,1535,0,0,0,-42000,0,0,0,0x2,0,0,0,980,0,0,5,5,"Netherwing",,,,,,,,,,,,,,,,0xFF01FE,"This unusual brood of dragons was spawned from the eggs of Deathwing's black dragonflight, and infused with raw nether-energies.  Now, they seek to find their identity beyond the shadows of their father's destructive heritage.",,,,,,,,,,,,,,,,0xFF01FE
+1016,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Wyrmcult",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1017,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Treant",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1018,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Leotheras Demon I",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1019,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Leotheras Demon II",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1020,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Leotheras Demon III",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1021,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Leotheras Demon IV",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1022,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Leotheras Demon V",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1023,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Azaloth",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1024,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Rock Flayer",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1025,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Flayer Hunter",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1026,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Shadowmoon Shade",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1027,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Legion Communicator",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1028,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Ravenswood Ancients",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1029,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Chess, Friendly to All Chess",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1030,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Black Temple Gates - Illidari",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1031,72,1791,0,0,0x0,1535,0,0,0,0,0,0,0,0x10,0,0,0,936,0,0,5,5,"Sha'tari Skyguard",,,,,,,,,,,,,,,,0xFF01FE,"An airborne military force created by Shattrath City to deal with the threats that loom in the highest reaches of Outland.",,,,,,,,,,,,,,,,0xFF01FE
+1032,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Area 52",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1033,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Maiev",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1034,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Skettis Shadowy Arakkoa",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1035,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Skettis Arakkoa",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1036,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Dragonmaw Enemy",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1037,88,1101,690,0,0x0,0,0,0,0,0,0,0,0,0x88,6,0,0,1097,0,0,5,5,"Alliance Vanguard",,,,,,,,,,,,,,,,0xFF01FE,"The combined forces of the Alliance in Northrend, lead by the Valiance Expedition, but also including civilian groups such as the Explorer's League.",,,,,,,,,,,,,,,,0xFF01FE
+1038,73,1791,0,0,0x0,0,0,0,0,0,0,0,0,0x10,0,0,0,980,0,0,5,5,"Ogri'la",,,,,,,,,,,,,,,,0xFF01FE,"The enlightened denizens of Ogri'la have made their dwelling in the western Blade's Edge Mountains, where proximity to apexis crystals has caused them to transcend their brutish ogre nature.",,,,,,,,,,,,,,,,0xFF01FE
+1039,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Ravager",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1040,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"REUSE",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1041,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Frenzy",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1042,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Skyguard Enemy",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1043,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Skunk, Petunia",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1044,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Theramore Deserter",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1045,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Vrykul",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1046,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Northsea Pirates",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1047,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Tuskarr",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1048,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"UNUSED",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1049,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Troll, Amani",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1050,74,1101,690,0,0x0,0,0,0,0,0,-42000,0,0,0x10,6,0,0,1037,0,5,0,5,7,7,"Valiance Expedition",,,,,,,,,,,,,,,,0xFF01FE,"The main armies of the Alliance in Northrend, moving against the Scourge and unified under King Varian Wrynn's command.",,,,,,,,,,,,,,,,0xFF01FE
+1051,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"UNUSED",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1052,75,690,1101,0,0x0,0,0,0,0,0,-42000,0,0,0x98,0,0,0,1097,0,0,5,5,"Horde Expedition",,,,,,,,,,,,,,,,0xFF01FE,"The combined forces of the Horde in Northrend, spearheaded by the Warsong Offensive.",,,,,,,,,,,,,,,,0xFF01FE
+1053,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Westguard",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1054,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Spotted Gryphon",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1055,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Tamed Plaguehound",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1056,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Vrykul (Ancient Spirit 1)",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1057,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Vrykul (Ancient Siprit 2)",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1058,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Vrykul (Ancient Siprit 3)",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1059,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"CTF - Flag - Alliance",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1060,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Test",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1061,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"vrykul",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1062,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Vrykul Gladiator",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1063,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Valgarde Combatant",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1064,76,690,1101,0,0x0,0,0,0,0,0,-42000,0,0,0x10,6,0,0,1052,0,5,0,5,7,7,"The Taunka",,,,,,,,,,,,,,,,0xFF01FE,"These hardy people are cousins of the Tauren and have become valuable scouts for the armies of the Horde as they march northward.",,,,,,,,,,,,,,,,0xFF01FE
+1065,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Monster, Zone Force Reaction 1",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1066,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Monster, Zone Force Reaction 2",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1067,77,690,1101,0,0x0,0,0,0,0,0,-42000,0,0,0x10,0,0,0,1052,0,5,0,5,7,7,"The Hand of Vengeance",,,,,,,,,,,,,,,,0xFF01FE,"The Forsaken tasked by Sylvanas Windrunner with enacting Undercity's vengeance against Arthas by delivering the latest strain of their deadly Plague.",,,,,,,,,,,,,,,,0xFF01FE
+1068,78,1101,690,0,0x0,0,0,0,0,0,-42000,0,0,0x10,6,0,0,1037,0,5,0,5,7,7,"Explorers' League",,,,,,,,,,,,,,,,0xFF01FE,"This organization seeks to find the origin of the dwarven race by collecting Titan artifacts.  Their most recent research has led them to various archeological sites in Northrend.",,,,,,,,,,,,,,,,0xFF01FE
+1069,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Ram Racing Powerup DND",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1070,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Ram Racing Trap DND",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1071,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Craig's Squirrels",,,,,,,,,,,,,,,,0xFF01FE,"A test faction.",,,,,,,,,,,,,,,,0xFF01FE
+1072,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"REUSE",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1073,79,1791,0,0,0x0,0,0,0,0,0,0,0,0,0x10,0,0,0,1097,0,0,5,5,"The Kalu'ak",,,,,,,,,,,,,,,,0xFF01FE,"The tuskarr are a tough but peaceful people who derive their livelihood from fishing and whaling.  Their settlements have recently come under fierce attack and welcome any allies who would come to their aid.",,,,,,,,,,,,,,,,0xFF01FE
+1074,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Holiday - Water Barrel",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1075,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Holiday - Generic",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1076,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Iron Dwarves",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1077,80,32767,0,0,0x0,0,0,0,0,0,0,0,0,0x10,0,0,0,936,0,0,5,5,"Shattered Sun Offensive",,,,,,,,,,,,,,,,0xFF01FE,"Shattrath City's final push against Prince Kael'thas' operations in the Sunwell.",,,,,,,,,,,,,,,,0xFF01FE
+1078,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Fighting Vanity Pet",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1079,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Murloc, Winterfin",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1080,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Friendly, Force Reaction",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1081,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Object, Force Reaction",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1082,82,1101,690,0,0x0,0,0,0,0,0,-42000,0,0,0x4,2,0,0,0,1,1,5,5,"REUSE",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1083,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"REUSE",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1084,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Vrykul, Sea",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1085,81,1101,690,0,0x0,0,0,0,0,-42000,0,0,0,0x6,16,0,0,1052,0,5,0,5,7,7,"Warsong Offensive",,,,,,,,,,,,,,,,0xFF01FE,"Garrosh Hellscream commands the Horde's main expeditionary forces as they make their way into Northrend to face Arthas and the armies of the Scourge.",,,,,,,,,,,,,,,,0xFF01FE
+1086,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Poacher",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1087,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Holiday Monster",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1088,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Furbolg, Redfang",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1089,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Furbolg, Frostpaw",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1090,84,1229,690,1101,0x2B2,1407,1407,128,128,0,0,3000,3000,0x10,16,16,16,1097,0,0,5,5,"Kirin Tor",,,,,,,,,,,,,,,,0xFF01FE,"The mages and archmages running the city of Dalaran.  Faced with the rising threats of the Blue Dragonflight and the Scourge, they've transported their city to the heart of Northrend.",,,,,,,,,,,,,,,,0xFF01FE
+1091,83,1791,0,0,0x0,0,0,0,0,0,0,0,0,0x10,0,0,0,1097,0,0,5,5,"The Wyrmrest Accord",,,,,,,,,,,,,,,,0xFF01FE,"With the Blue Dragonflight's violent upheaval against all mortal users of magic, the remaining dragonflights have banded under the leadership of the Red Dragonflight to combat their wayward kin.",,,,,,,,,,,,,,,,0xFF01FE
+1092,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Azjol-Nerub",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1093,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"REUSE",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1094,90,1101,690,0,0x0,0,0,0,0,0,-42000,0,0,0x10,6,0,0,1037,0,5,0,5,7,7,"The Silver Covenant",,,,,,,,,,,,,,,,0xFF01FE,"A militant core of high elves that rejects the admission of blood elves into the Kirin Tor.  They've united under the banner of Vereesa Windrunner and joined the Alliance forces in Northrend.",,,,,,,,,,,,,,,,0xFF01FE
+1095,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Grizzly Hills Trapper",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1096,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"REUSE",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1097,89,0,0,0,0x0,0,0,0,0,0,0,0,0,0xC,0,0,0,0,0,0,5,5,"Wrath of the Lich King",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1098,91,0,0,0,0x0,32,1503,0,0,3200,0,0,0,0x10,16,0,0,1097,1,1,5,5,"Knights of the Ebon Blade",,,,,,,,,,,,,,,,0xFF01FE,"Freed from the grasp of the Lich King, his former Death Knights have regrouped against him under the banner of Highlord Darion Mograine.",,,,,,,,,,,,,,,,0xFF01FE
+1099,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Wrathgate Scourge",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1100,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Wrathgate Alliance",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1101,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Wrathgate Horde",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1102,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"CTF - Flag - Horde",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1103,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"CTF - Flag - Neutral",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1104,92,1791,0,0,0x0,0,0,0,0,0,0,0,0,0x10,0,0,0,1117,-2,20000004768372,1,7,7,"Frenzyheart Tribe",,,,,,,,,,,,,,,,0xFF01FE,"Driven from their lands by the Scourge, this fierce tribe of wolvar stumbled upon Sholazar Basin, where they intend to make their new home.  Their aggressive nature has put them at odds with the various gorloc tribes known collectively as the Oracles.",,,,,,,,,,,,,,,,0xFF01FE
+1105,93,1791,0,0,0x0,0,0,0,0,0,0,0,0,0x10,0,0,0,1117,-2,20000004768372,1,7,7,"The Oracles",,,,,,,,,,,,,,,,0xFF01FE,"The gorlocs of Sholazar Basin are a race of reptilian creatures who see themselves as guardians of the titan technology that remains in the zone (though they understand little of it).  They find themselves in an escalating territorial war with the wolvar.",,,,,,,,,,,,,,,,0xFF01FE
+1106,94,32767,0,0,0x0,0,0,0,0,0,0,0,0,0x10,0,0,0,1097,0,0,5,5,"Argent Crusade",,,,,,,,,,,,,,,,0xFF01FE,"Led by Tirion Fordring, the Argent Crusade combines the reformed Order of the Silver Hand with the Argent Dawn in one final push against the forces of the Lich King.",,,,,,,,,,,,,,,,0xFF01FE
+1107,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Troll, Drakkari",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1108,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"CoT Arthas",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1109,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"CoT Stratholme Citizen",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1110,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"CoT Scourge",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1111,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Freya",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1112,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Mount - Taxi - Alliance",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1113,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Mount - Taxi - Horde",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1114,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Mount - Taxi - Neutral",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1115,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Elemental, Water",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1116,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Elemental, Air",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1117,95,1791,0,0,0x0,0,0,0,0,0,0,0,0,0xC,0,0,0,1097,0,0,5,5,"Sholazar Basin",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1118,96,1791,0,0,0x0,0,0,0,0,0,0,0,0,0xC,0,0,0,0,0,0,5,5,"Classic",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1119,97,1791,0,0,0x0,0,0,0,0,-42000,0,0,0,0x0,0,0,0,1097,0,0,5,5,"The Sons of Hodir",,,,,,,,,,,,,,,,0xFF01FE,"The frost giants of the Storm Peaks are a war-like race that makes their home in Dun Nifelem.",,,,,,,,,,,,,,,,0xFF01FE
+1120,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Iron Giants",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1121,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Frost Vrykul",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1122,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Earthen",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1123,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Monster Referee",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1124,98,690,1101,0,0x0,0,0,0,0,0,-42000,0,0,0x10,6,0,0,1052,0,5,0,5,7,7,"The Sunreavers",,,,,,,,,,,,,,,,0xFF01FE,"Traditionally barred from Dalaran, the Horde has been accepted into the city through the efforts of Archmage Aethas Sunreaver.  His followers have taken up his name and watch over the ward known as Sunreaver's Sanctuary.",,,,,,,,,,,,,,,,0xFF01FE
+1125,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Hyldsmeet",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1126,99,1101,690,0,0x0,0,0,0,0,0,-42000,0,0,0x10,0,0,0,1037,0,5,0,5,7,7,"The Frostborn",,,,,,,,,,,,,,,,0xFF01FE,"This mysterious race of frost dwarves makes their home in the Storm Peaks.  They've recently befriended members of the Explorers' League and welcome Alliance members within their settlements.",,,,,,,,,,,,,,,,0xFF01FE
+1127,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"Orgrimmar (Alex Test)",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1136,100,2097151,0,0,0x0,0,0,0,0,0,0,0,0,0x4,0,0,0,0,0,0,0,0,"Tranquillien Conversion",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1137,101,32767,0,0,0x0,1535,0,0,0,0,0,0,0,0x4,0,0,0,0,0,0,0,0,"Wintersaber Conversion",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1145,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,0,0,0,0,"Hates Everything",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1154,102,2097151,0,0,0x0,0,0,0,0,0,0,0,0,0x4,0,0,0,0,0,0,0,0,"Silver Covenant Conversion",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1155,103,2097151,0,0,0x0,0,0,0,0,0,0,0,0,0x4,0,0,0,0,0,0,0,0,"Sunreavers Conversion",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1156,104,2097151,0,0,0x0,0,0,0,0,0,0,0,0,0x10,0,0,0,1097,0,0,0,0,"The Ashen Verdict",,,,,,,,,,,,,,,,0xFF01FE,"Under a pact by Tirion Fordring and Darion Mograine, the Argent Crusade and the Knights of the Ebon Blade have set aside their differences during the attack on Icecrown Citadel until the Lich King is slain.",,,,,,,,,,,,,,,,0xFF01FE
+1159,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"CTF - Flag - Alliance 2",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC
+1160,-1,0,0,0,0x0,0,0,0,0,0,0,0,0,0x0,0,0,0,0,1,1,5,5,"CTF - Flag - Horde 2",,,,,,,,,,,,,,,,0xFF01FE,"",,,,,,,,,,,,,,,,0xFF01FC

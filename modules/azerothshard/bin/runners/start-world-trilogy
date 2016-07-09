@@ -1,0 +1,7 @@
+#!/bin/bash
+
+source "./run-engine"
+
+source ./conf/world-trilogy
+
+starter $SERVERBIN $GDB "$CONFIG" "$SYSLOG" "$SYSERR" $GDB_ENABLED

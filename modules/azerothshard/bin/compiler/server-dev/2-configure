@@ -1,0 +1,7 @@
+#!/bin/bash
+
+source "../includes/conf-dev"
+
+source "../includes/include.sh"
+
+configure

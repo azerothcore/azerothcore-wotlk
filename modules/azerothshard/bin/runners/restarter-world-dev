@@ -1,0 +1,8 @@
+#!/bin/bash
+
+source ./run-engine
+
+source ./conf/world-dev
+
+restarter
+

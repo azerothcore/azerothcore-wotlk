@@ -1,0 +1,2 @@
+;IdColumnIndex=0
+924:1=1000,11=-42000,14=16,15=6,23="AzerothShard",40="AzerothShard Reputation"

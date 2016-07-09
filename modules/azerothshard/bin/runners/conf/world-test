@@ -1,0 +1,14 @@
+######################
+export GDB_ENABLED=0
+
+export BINPATH="../server-test/debug/bin/"
+
+export GDB="world.gdb"
+export CONFIG="../../../etc/world-test.conf"
+export SERVERBIN="worldserver"
+export SERVERPID="world.pid"
+export LOGS_PATH="../../logs";
+
+export SCREEN_NAME="worldserver-test"
+
+######################

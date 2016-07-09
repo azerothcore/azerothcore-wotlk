@@ -1,0 +1,7 @@
+#!/bin/bash
+
+source "../includes/conf-trilogy"
+
+source "../includes/include.sh"
+
+clean

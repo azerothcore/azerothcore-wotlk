@@ -1,0 +1,9 @@
+OPT=""
+
+# you can change column data type using following declarations 
+# ( if auto generated field type is uncorrect for example )
+# it is used just as example for now and doesn't change the type
+# NB: columns starts from 1
+
+OPT=$OPT" -k 1 long"
+OPT=$OPT" -k 3 long"

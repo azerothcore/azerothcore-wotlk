@@ -1,0 +1,28 @@
+#!/bin/bash
+
+# set preferred compilers
+CCOMPILERC="/usr/bin/clang-3.6"
+CCOMPILERCXX="/usr/bin/clang++-3.6"
+
+# how many thread must be used for compilation ( leave zero to use all available )
+MTHREADS=0
+# enable/disable warnings during compilation
+CWARNINGS=ON
+# enable/disable some debug informations ( it's not a debug compilation )
+CDEBUG=OFF
+# compile scripts
+CSCRIPTS=static
+# compile server
+CSERVERS=ON
+# compile tools
+CTOOLS=OFF
+# use precompiled headers ( fatest compilation but not optimized if you change headers often )
+CSCRIPTPCH=ON
+CCOREPCH=ON
+
+# compile azth custom plugins
+CAZTH_CUSTOM_PLG=ON
+# compile azth plugins
+CAZTH_PLG=ON
+# enable unit test on TC load
+CAZTH_UNIT_TEST=OFF

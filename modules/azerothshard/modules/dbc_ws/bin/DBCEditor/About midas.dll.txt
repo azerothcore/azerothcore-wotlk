@@ -1,0 +1,7 @@
+If midas makes any problems do this :
+
+copy midas.dll to Windows\System32... then
+
+open ms-dos(Start/Run and type "cmd") and go to that dir(windows\system32) and type : "regsvr32 midas.dll"
+
+That should do the job^^

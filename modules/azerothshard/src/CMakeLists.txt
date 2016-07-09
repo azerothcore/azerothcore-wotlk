@@ -1,0 +1,35 @@
+AZTH_SET_PATH("CMAKE_AZTH_DIR" "${CMAKE_CURRENT_LIST_DIR}/../")
+AZTH_SET_PATH("CMAKE_AZTH_SRC_DIR" "${CMAKE_CURRENT_LIST_DIR}")
+
+MACRO(AZTH_LOAD_SRC dir)
+    AZTH_SUBDIRLIST(sub_DIRS  "${CMAKE_AZTH_SRC_DIR}/server/${dir}" TRUE TRUE)
+    FOREACH(subdir ${sub_DIRS})
+        get_filename_component(azth_dir_name ${subdir} DIRECTORY)
+
+        if (NOT (${azth_dir_name} STREQUAL "tests") OR AZTH_WITH_UNIT_TEST)
+            file(GLOB sources "${subdir}/*.cpp" "${subdir}/*.h")
+
+            set(azth_STAT_SRCS
+                ${azth_STAT_SRCS}
+                ${sources}
+            )
+
+            set(azth_DIRS
+                ${subdir}
+                ${azth_DIRS}
+            )
+        endif()
+    ENDFOREACH()
+ENDMACRO()
+
+AZTH_LOAD_SRC("libs")
+AZTH_LOAD_SRC("game")
+AZTH_LOAD_SRC("plugins")
+
+AZTH_ADD_INC_PATH("${azth_DIRS}")
+
+AZTH_LOAD_INC_PATHS()
+
+AZTH_SET_CACHE("CMAKE_AZTH_SRCS" "${azth_STAT_SRCS}")
+
+ADD_HOOK(AFTER_SRC_LOAD "${CMAKE_AZTH_SRC_DIR}/cmake/after_src_load.cmake")

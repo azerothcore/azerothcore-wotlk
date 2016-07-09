@@ -1,0 +1,14 @@
+######################
+export GDB_ENABLED=0
+
+export BINPATH="../server-trilogy/release/bin/"
+
+export GDB="world.gdb"
+export CONFIG="../../../etc/world-trilogy.conf"
+export SERVERBIN="worldserver"
+export SERVERPID="world.pid"
+export LOGS_PATH="../../logs";
+
+export SCREEN_NAME="worldserver-trilogy"
+
+######################

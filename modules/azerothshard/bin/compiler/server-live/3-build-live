@@ -1,0 +1,7 @@
+#!/bin/bash
+
+source "../includes/conf-live"
+
+source "../includes/include.sh"
+
+build

@@ -1,0 +1,5 @@
+long,long,str,str,None,None,None,None,None,None,None,None,None,None,None,None,None,None,None,flags,
+1,0,"Player","",,,,,,,,,,,,,,,,0xFF01FC,
+2,1,"Alliance","Alliance",,,,,,,,,,,,,,,,0xFF01FE,
+3,2,"Horde","Horde",,,,,,,,,,,,,,,,0xFF01FE,
+4,3,"Monster","",,,,,,,,,,,,,,,,0xFF01FC,

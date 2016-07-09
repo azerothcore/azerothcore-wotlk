@@ -1,0 +1,14 @@
+######################
+export GDB_ENABLED=0
+
+export BINPATH="../server-live/debug/bin/"
+
+export GDB="auth.gdb"
+export CONFIG="../../../etc/auth.conf"
+export SERVERBIN="authserver"
+export SERVERPID="auth.pid"
+export LOGS_PATH="../../logs";
+
+export SCREEN_NAME="authserver"
+
+######################

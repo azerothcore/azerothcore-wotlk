@@ -1,0 +1,17 @@
+#!/bin/bash
+CURRENT_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+# including default conf for custom
+source "$CURRENT_PATH/conf"
+
+# how many thread must be used for compilation ( leave zero to use all available )
+MTHREADS=0
+# specify compilation type
+CCTYPE=Debug
+
+# absolute root path of your azerothshard repository
+SRCPATH=/home/hw2/usr/workspace/projects/AzerothShard/server-dev/
+# absolute path where binary files must be stored
+BINPATH=/home/hw2/modules/azerothshard-server/server-dev/
+# absolute path where config. files must be stored
+CONFDIR=/home/hw2/modules/azerothshard-server/etc/
