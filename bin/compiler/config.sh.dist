@@ -32,3 +32,6 @@ SRCPATH=
 BINPATH=
 # absolute path where config. files must be stored
 CONFDIR=
+
+
+
