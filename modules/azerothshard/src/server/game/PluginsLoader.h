@@ -1,4 +1,3 @@
-#include "AzthCustomPlgLoader.h"
 #include "AzthPlgLoader.h"
 
 /*

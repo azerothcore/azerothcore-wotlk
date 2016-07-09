@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 
- * Copyright (C) 
+ * Copyright (C)
+ * Copyright (C)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -32,6 +32,9 @@
 #include "CreatureAI.h"
 #include "Player.h"
 #include "WorldPacket.h"
+
+// [AZTH]
+#include "PluginsLoader.h"
 
 // This is the global static registry of scripts.
 /*template<class TScript>
@@ -178,6 +181,9 @@ void ScriptMgr::Initialize()
     sLog->outString("Loading C++ scripts");
 
     FillSpellSummary();
+
+    AddAzthScripts(); // [AZTH] Loading AzerothShard Scripts
+
     AddScripts();
     CheckIfScriptsInDatabaseExist();
 
