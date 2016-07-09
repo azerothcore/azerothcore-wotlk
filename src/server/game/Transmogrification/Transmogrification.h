@@ -31,18 +31,18 @@ enum TransmogTrinityStrings // Language.h might have same entries, appears when 
 class Transmogrification
 {
 public:
-    typedef std::unordered_map<uint64, uint64> transmogData;
-    typedef std::unordered_map<uint64, transmogData> transmogMap;
+    typedef UNORDERED_MAP<uint64, uint64> transmogData;
+    typedef UNORDERED_MAP<uint64, transmogData> transmogMap;
     transmogMap entryMap; // entryMap[pGUID][iGUID] = entry
     transmogData dataMap; // dataMap[iGUID] = pGUID
 
 #ifdef PRESETS
     typedef std::map<uint8, uint32> slotMap;
     typedef std::map<uint8, slotMap> presetData;
-    typedef std::unordered_map<uint64, presetData> presetDataMap;
+    typedef UNORDERED_MAP<uint64, presetData> presetDataMap;
     presetDataMap presetById; // presetById[pGUID][presetID][slot] = entry
     typedef std::map<uint8, std::string> presetIdMap;
-    typedef std::unordered_map<uint64, presetIdMap> presetNameMap;
+    typedef UNORDERED_MAP<uint64, presetIdMap> presetNameMap;
     presetNameMap presetByName; // presetByName[pGUID][presetID] = presetName
 
     void PresetTransmog(Player* player, Item* itemTransmogrified, uint32 fakeEntry, uint8 slot);
