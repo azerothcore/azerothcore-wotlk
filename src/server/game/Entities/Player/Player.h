@@ -31,7 +31,6 @@
 #include "Unit.h"
 #include "Battleground.h"
 #include "WorldSession.h"
-#include "../../Transmogrification/Transmogrification.h"
 
 #include <string>
 #include <vector>
@@ -156,17 +155,6 @@ enum TrainerSpellState
     TRAINER_SPELL_GREEN_DISABLED = 10                       // custom value, not send to client: formally green but learn not allowed
 };
 
-// Transmogrification
-typedef UNORDERED_MAP<uint64, uint32> TransmogMapType;
-#ifdef PRESETS
-typedef std::map<uint8, uint32> PresetslotMapType;
-struct PresetData
-{
-    std::string name;
-    PresetslotMapType slotMap;
-};
-typedef std::map<uint8, PresetData> PresetMapType;
-#endif
 
 enum ActionButtonUpdateState
 {
@@ -2606,12 +2594,6 @@ class Player : public Unit, public GridObject<Player>
         const PlayerTalentMap& GetTalentMap() const { return m_talents; }
         uint32 GetNextSave() const { return m_nextSave; }
         SpellModList const& GetSpellModList(uint32 type) const { return m_spellMods[type]; }
-
-        //Transmogrification
-        TransmogMapType transmogMap; // transmogMap[iGUID] = entry
-        #ifdef PRESETS
-            PresetMapType presetMap; // presetMap[presetId] = presetData
-        #endif
 
     protected:
         // Gamemaster whisper whitelist
