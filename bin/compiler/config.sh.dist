@@ -23,14 +23,6 @@ CTOOLS=0
 CSCRIPTPCH=1
 CCOREPCH=1
 
-# AZTH
-# compile azth custom plugins
-CAZTH_CUSTOM_PLG=1
-# compile azth plugins 
-CAZTH_PLG=1
-# enable unit test on TC load
-CAZTH_UNIT_TEST=0
-
 # absolute root path of your azerothshard repository
 SRCPATH=
 # absolute path where binary files must be stored
