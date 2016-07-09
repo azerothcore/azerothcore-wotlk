@@ -8,6 +8,8 @@
 # WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
+RUN_HOOK(BEFORE_GAME_LIBRARY)
+
 file(GLOB_RECURSE sources_Accounts Accounts/*.cpp Accounts/*.h)
 file(GLOB_RECURSE sources_Achievements Achievements/*.cpp Achievements/*.h)
 file(GLOB_RECURSE sources_Addons Addons/*.cpp Addons/*.h)
@@ -223,3 +225,5 @@ add_dependencies(game revision.h)
 if (USE_COREPCH)
   add_cxx_pch(game ${game_STAT_PCH_HDR} ${game_STAT_PCH_SRC})
 endif ()
+
+RUN_HOOK(AFTER_GAME_LIBRARY)
