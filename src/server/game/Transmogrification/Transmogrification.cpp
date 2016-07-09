@@ -24,7 +24,7 @@
 #ifdef PRESETS
 void Transmogrification::PresetTransmog(Player* player, Item* itemTransmogrified, uint32 fakeEntry, uint8 slot)
 {
-    sLog->outDebug(LOG_FILTER_TRANSMOG,"Transmogrification::PresetTransmog");
+    sLog->outError("Transmogrification::PresetTransmog");
 
     if (!EnableSets)
         return;
@@ -32,8 +32,8 @@ void Transmogrification::PresetTransmog(Player* player, Item* itemTransmogrified
         return;
     if (slot >= EQUIPMENT_SLOT_END)
         return;
-    if (!CanTransmogrifyItemWithItem(player, itemTransmogrified->GetTemplate(), sObjectMgr->GetItemTemplate(fakeEntry),NULL))
-        return
+    if (!CanTransmogrifyItemWithItem(player, itemTransmogrified->GetTemplate(), sObjectMgr->GetItemTemplate(fakeEntry)))
+        return;
 
     SetFakeEntry(player, itemTransmogrified, fakeEntry);
 
@@ -46,7 +46,7 @@ void Transmogrification::PresetTransmog(Player* player, Item* itemTransmogrified
 
 void Transmogrification::LoadPlayerSets(Player* player)
 {
-    sLog->outDebug(LOG_FILTER_TRANSMOG,"Transmogrification::LoadPlayerSets");
+    sLog->outError("Transmogrification::LoadPlayerSets");
 
     player->presetMap.clear();
 
@@ -97,7 +97,7 @@ void Transmogrification::LoadPlayerSets(Player* player)
 
 const char* Transmogrification::GetSlotName(uint8 slot, WorldSession* /*session*/) const
 {
-    sLog->outDebug(LOG_FILTER_TRANSMOG,"Transmogrification::GetSlotName");
+    sLog->outError("Transmogrification::GetSlotName");
 
     switch (slot)
     {
@@ -115,13 +115,13 @@ const char* Transmogrification::GetSlotName(uint8 slot, WorldSession* /*session*
         case EQUIPMENT_SLOT_OFFHAND: return  "Off hand";// session->GetTrinityString(LANG_SLOT_NAME_OFFHAND);
         case EQUIPMENT_SLOT_RANGED: return  "Ranged";// session->GetTrinityString(LANG_SLOT_NAME_RANGED);
         case EQUIPMENT_SLOT_TABARD: return  "Tabard";// session->GetTrinityString(LANG_SLOT_NAME_TABARD);
-        default: return NULL;
+    default: return NULL;
     }
 }
 
 std::string Transmogrification::GetItemIcon(uint32 entry, uint32 width, uint32 height, int x, int y) const
 {
-    sLog->outDebug(LOG_FILTER_TRANSMOG, "Transmogrification::GetItemIcon");
+    sLog->outError("Transmogrification::GetItemIcon");
 
     std::ostringstream ss;
     ss << "|TInterface";
@@ -141,7 +141,7 @@ std::string Transmogrification::GetItemIcon(uint32 entry, uint32 width, uint32 h
 
 std::string Transmogrification::GetSlotIcon(uint8 slot, uint32 width, uint32 height, int x, int y) const
 {
-    sLog->outDebug(LOG_FILTER_TRANSMOG, "Transmogrification::GetSlotIcon");
+    sLog->outError("Transmogrification::GetSlotIcon");
 
     std::ostringstream ss;
     ss << "|TInterface/PaperDoll/";
@@ -169,7 +169,7 @@ std::string Transmogrification::GetSlotIcon(uint8 slot, uint32 width, uint32 hei
 
 std::string Transmogrification::GetItemLink(Item* item, WorldSession* session) const
 {
-    sLog->outDebug(LOG_FILTER_TRANSMOG, "Transmogrification::GetItemLink");
+    sLog->outError("Transmogrification::GetItemLink");
 
     int loc_idx = session->GetSessionDbLocaleIndex();
     const ItemTemplate* temp = item->GetTemplate();
@@ -219,7 +219,7 @@ std::string Transmogrification::GetItemLink(Item* item, WorldSession* session) c
 
 std::string Transmogrification::GetItemLink(uint32 entry, WorldSession* session) const
 {
-    sLog->outDebug(LOG_FILTER_TRANSMOG, "Transmogrification::GetItemLink");
+    sLog->outError("Transmogrification::GetItemLink");
 
     const ItemTemplate* temp = sObjectMgr->GetItemTemplate(entry);
     int loc_idx = session->GetSessionDbLocaleIndex();
@@ -236,7 +236,7 @@ std::string Transmogrification::GetItemLink(uint32 entry, WorldSession* session)
 
 uint32 Transmogrification::GetFakeEntry(const Item* item)
 {
-    sLog->outDebug(LOG_FILTER_TRANSMOG, "Transmogrification::GetFakeEntry");
+    sLog->outError("Transmogrification::GetFakeEntry");
 
     Player* owner = item->GetOwner();
 
@@ -253,7 +253,7 @@ uint32 Transmogrification::GetFakeEntry(const Item* item)
 
 void Transmogrification::UpdateItem(Player* player, Item* item) const
 {
-    sLog->outDebug(LOG_FILTER_TRANSMOG, "Transmogrification::UpdateItem");
+    sLog->outError("Transmogrification::UpdateItem");
 
     if (item->IsEquipped())
     {
@@ -265,7 +265,7 @@ void Transmogrification::UpdateItem(Player* player, Item* item) const
 
 void Transmogrification::DeleteFakeEntry(Player* player, Item* item)
 {
-    sLog->outDebug(LOG_FILTER_TRANSMOG, "Transmogrification::DeleteFakeEntry");
+    sLog->outError("Transmogrification::DeleteFakeEntry");
 
     if (player->transmogMap.erase(item->GetGUID()) != 0)
         UpdateItem(player, item);
@@ -273,7 +273,7 @@ void Transmogrification::DeleteFakeEntry(Player* player, Item* item)
 
 void Transmogrification::SetFakeEntry(Player* player, Item* item, uint32 entry)
 {
-    sLog->outDebug(LOG_FILTER_TRANSMOG, "Transmogrification::SetFakeEntry");
+    sLog->outError("Transmogrification::SetFakeEntry");
 
     player->transmogMap[item->GetGUID()] = entry;
     UpdateItem(player, item);
@@ -281,12 +281,12 @@ void Transmogrification::SetFakeEntry(Player* player, Item* item, uint32 entry)
 
 TransmogTrinityStrings Transmogrification::Transmogrify(Player* player, uint64 itemGUID, uint8 slot, bool no_cost)
 {
-    sLog->outDebug(LOG_FILTER_TRANSMOG, "Transmogrification::Transmogrify");
+    sLog->outError("Transmogrification::Transmogrify");
 
     // slot of the transmogrified item
     if (slot >= EQUIPMENT_SLOT_END)
     {
-        sLog->outDebug(LOG_FILTER_TRANSMOG, "Transmogrification::Transmogrify - %s (%u) tried to transmogrify an %u with a wrong slot (%u) when transmogrifying items.", player->GetName().c_str(), player->GetGUIDLow(), itemGUID, slot);
+        sLog->outError("Transmogrification::Transmogrify - %s (%u) tried to transmogrify an %u with a wrong slot (%u) when transmogrifying items.", player->GetName().c_str(), player->GetGUIDLow(), (uint32)itemGUID, slot);
         return LANG_ERR_TRANSMOG_INVALID_SLOT;
     }
 
@@ -297,7 +297,7 @@ TransmogTrinityStrings Transmogrification::Transmogrify(Player* player, uint64 i
         itemTransmogrifier = player->GetItemByGuid(itemGUID);
         if (!itemTransmogrifier)
         {
-            sLog->outDebug(LOG_FILTER_TRANSMOG, "Transmogrification::Transmogrify - %s (%u) tried to transmogrify with an invalid %u.", player->GetName().c_str(), player->GetGUIDLow(), (uint32)itemGUID);
+            sLog->outError("Transmogrification::Transmogrify - %s (%u) tried to transmogrify with an invalid %u.", player->GetName().c_str(), player->GetGUIDLow(), (uint32)itemGUID);
             return LANG_ERR_TRANSMOG_MISSING_SRC_ITEM;
         }
     }
@@ -306,7 +306,7 @@ TransmogTrinityStrings Transmogrification::Transmogrify(Player* player, uint64 i
     Item* itemTransmogrified = player->GetItemByPos(INVENTORY_SLOT_BAG_0, slot);
     if (!itemTransmogrified)
     {
-        sLog->outDebug(LOG_FILTER_TRANSMOG, "Transmogrification::Transmogrify - %s (%u) tried to transmogrify an invalid item in a valid slot (slot: %u).", player->GetName().c_str(), player->GetGUIDLow(), slot);
+        sLog->outError("Transmogrification::Transmogrify - %s (%u) tried to transmogrify an invalid item in a valid slot (slot: %u).", player->GetName().c_str(), player->GetGUIDLow(), slot);
         return LANG_ERR_TRANSMOG_MISSING_DEST_ITEM;
     }
 
@@ -316,9 +316,9 @@ TransmogTrinityStrings Transmogrification::Transmogrify(Player* player, uint64 i
     }
     else
     {
-        if (!CanTransmogrifyItemWithItem(player, itemTransmogrified->GetTemplate(), itemTransmogrifier->GetTemplate(),itemTransmogrifier))
+        if (!CanTransmogrifyItemWithItem(player, itemTransmogrified->GetTemplate(), itemTransmogrifier->GetTemplate()))
         {
-            sLog->outDebug(LOG_FILTER_TRANSMOG, "Transmogrification::Transmogrify - %s (%u) failed CanTransmogrifyItemWithItem (%u with %u).", player->GetName().c_str(), player->GetGUIDLow(), itemTransmogrified->GetEntry(), itemTransmogrifier->GetEntry());
+            sLog->outError("Transmogrification::Transmogrify - %s (%u) failed CanTransmogrifyItemWithItem (%u with %u).", player->GetName().c_str(), player->GetGUIDLow(), itemTransmogrified->GetEntry(), itemTransmogrifier->GetEntry());
             return LANG_ERR_TRANSMOG_INVALID_ITEMS;
         }
 
@@ -340,7 +340,7 @@ TransmogTrinityStrings Transmogrification::Transmogrify(Player* player, uint64 i
             if (cost) // 0 cost if reverting look
             {
                 if (cost < 0)
-                    sLog->outDebug(LOG_FILTER_TRANSMOG, "Transmogrification::Transmogrify - %s (%u) transmogrification invalid cost (non negative, amount %i). Transmogrified %u with %u", player->GetName().c_str(), player->GetGUIDLow(), -cost, itemTransmogrified->GetEntry(), itemTransmogrifier->GetEntry());
+                    sLog->outError("Transmogrification::Transmogrify - %s (%u) transmogrification invalid cost (non negative, amount %i). Transmogrified %u with %u", player->GetName().c_str(), player->GetGUIDLow(), -cost, itemTransmogrified->GetEntry(), itemTransmogrifier->GetEntry());
                 else
                 {
                     if (!player->HasEnoughMoney(cost))
@@ -369,9 +369,9 @@ TransmogTrinityStrings Transmogrification::Transmogrify(Player* player, uint64 i
     return LANG_ERR_TRANSMOG_OK;
 }
 
-bool Transmogrification::CanTransmogrifyItemWithItem(Player* player, ItemTemplate const* target, ItemTemplate const* source, Item* srcItem) const
+bool Transmogrification::CanTransmogrifyItemWithItem(Player* player, ItemTemplate const* target, ItemTemplate const* source) const
 {
-    sLog->outDebug(LOG_FILTER_TRANSMOG, "Transmogrification::CanTransmogrifyItemWithItem");
+    sLog->outError("Transmogrification::CanTransmogrifyItemWithItem");
 
     if (!target || !source)
         return false;
@@ -403,7 +403,7 @@ bool Transmogrification::CanTransmogrifyItemWithItem(Player* player, ItemTemplat
         target->InventoryType == INVTYPE_QUIVER)
         return false;
 
-    if (!SuitableForTransmogrification(player, target, srcItem) || !SuitableForTransmogrification(player, source, srcItem)) // if (!transmogrified->CanTransmogrify() || !transmogrifier->CanBeTransmogrified())
+    if (!SuitableForTransmogrification(player, target) || !SuitableForTransmogrification(player, source)) // if (!transmogrified->CanTransmogrify() || !transmogrifier->CanBeTransmogrified())
         return false;
 
     if (IsRangedWeapon(source->Class, source->SubClass) != IsRangedWeapon(target->Class, target->SubClass))
@@ -420,23 +420,25 @@ bool Transmogrification::CanTransmogrifyItemWithItem(Player* player, ItemTemplat
     if (source->InventoryType != target->InventoryType)
     {
         if (source->Class == ITEM_CLASS_WEAPON && !(IsRangedWeapon(target->Class, target->SubClass) ||
-            ((target->InventoryType == INVTYPE_WEAPON || target->InventoryType == INVTYPE_2HWEAPON ||
-              target->InventoryType == INVTYPE_WEAPONMAINHAND || target->InventoryType == INVTYPE_WEAPONOFFHAND)
-              && (source->InventoryType == INVTYPE_WEAPON || source->InventoryType == INVTYPE_2HWEAPON || source->InventoryType == INVTYPE_WEAPONMAINHAND || source->InventoryType == INVTYPE_WEAPONOFFHAND)
-            )))
+            (
+                // [AZTH] Yehonal: fixed weapon check
+            (target->InventoryType == INVTYPE_WEAPON || target->InventoryType == INVTYPE_2HWEAPON || target->InventoryType == INVTYPE_WEAPONMAINHAND || target->InventoryType == INVTYPE_WEAPONOFFHAND)
+                && (source->InventoryType == INVTYPE_WEAPON || source->InventoryType == INVTYPE_2HWEAPON || source->InventoryType == INVTYPE_WEAPONMAINHAND || source->InventoryType == INVTYPE_WEAPONOFFHAND)
+                )
+            ))
             return false;
         if (source->Class == ITEM_CLASS_ARMOR &&
             !((source->InventoryType == INVTYPE_CHEST || source->InventoryType == INVTYPE_ROBE) &&
-                (target->InventoryType == INVTYPE_CHEST || target->InventoryType == INVTYPE_ROBE)))
+            (target->InventoryType == INVTYPE_CHEST || target->InventoryType == INVTYPE_ROBE)))
             return false;
     }
 
     return true;
 }
 
-bool Transmogrification::SuitableForTransmogrification(Player* player, ItemTemplate const* proto, Item* item) const
+bool Transmogrification::SuitableForTransmogrification(Player* player, ItemTemplate const* proto) const
 {
-    sLog->outDebug(LOG_FILTER_TRANSMOG, "Transmogrification::SuitableForTransmogrification");
+    sLog->outError("Transmogrification::SuitableForTransmogrification");
 
     // ItemTemplate const* proto = item->GetTemplate();
     if (!player || !proto)
@@ -450,8 +452,11 @@ bool Transmogrification::SuitableForTransmogrification(Player* player, ItemTempl
     if (IsAllowed(proto->ItemId))
         return true;
 
-    if (/*TODO: conf here*/ proto->SubClass > 0 && item && player->GetSkillValue(item->GetSkill()) == 0)
+    if (/*TODO: conf here*/ proto->SubClass > 0 && player->GetSkillValue(proto->GetSkill()) == 0)
+    {
+        sLog->outError("error error error");
         return false;
+    }
 
     if (IsNotAllowed(proto->ItemId))
         return false;
@@ -494,7 +499,9 @@ bool Transmogrification::SuitableForTransmogrification(Player* player, ItemTempl
 
     if (!IgnoreReqStats)
     {
-        if (!proto->RandomProperty && !proto->RandomSuffix)
+        if (!proto->RandomProperty && !proto->RandomSuffix
+            /*[AZTH] Yehonal: we should transmorg also items without stats*/
+            && proto->StatsCount > 0 /*[/AZTH]*/)
         {
             bool found = false;
             for (uint8 i = 0; i < proto->StatsCount; ++i)
@@ -513,73 +520,9 @@ bool Transmogrification::SuitableForTransmogrification(Player* player, ItemTempl
     return true;
 }
 
-/*
-bool Transmogrification::CanTransmogrify(Item const* item)
-{
-ItemTemplate const* proto = item->GetTemplate();
-
-if (!proto)
-return false;
-
-if (proto->Flags2 & ITEM_FLAGS_EXTRA_CANNOT_TRANSMOG)
-return false;
-
-if (proto->Quality == ITEM_QUALITY_LEGENDARY)
-return false;
-
-if (proto->Class != ITEM_CLASS_ARMOR &&
-proto->Class != ITEM_CLASS_WEAPON)
-return false;
-
-if (proto->Class == ITEM_CLASS_WEAPON && proto->SubClass == ITEM_SUBCLASS_WEAPON_FISHING_POLE)
-return false;
-
-if (proto->Flags2 & ITEM_FLAGS_EXTRA_CAN_TRANSMOG)
-return true;
-
-if (item->GetItemRandomPropertyId() == 0)
-return false;
-
-for (uint8 i = 0; i < MAX_ITEM_PROTO_STATS; ++i)
-if (proto->ItemStat[i].ItemStatValue != 0)
-return true;
-
-return false;
-}
-bool Transmogrification::CanBeTransmogrified(Item const* item)
-{
-ItemTemplate const* proto = item->GetTemplate();
-
-if (!proto)
-return false;
-
-if (proto->Quality == ITEM_QUALITY_LEGENDARY)
-return false;
-
-if (proto->Class != ITEM_CLASS_ARMOR &&
-proto->Class != ITEM_CLASS_WEAPON)
-return false;
-
-if (proto->Class == ITEM_CLASS_WEAPON && proto->SubClass == ITEM_SUBCLASS_WEAPON_FISHING_POLE)
-return false;
-
-if (proto->Flags2 & ITEM_FLAGS_EXTRA_CANNOT_BE_TRANSMOG)
-return false;
-
-if (item->GetItemRandomPropertyId() == 0)
-return false;
-
-for (uint8 i = 0; i < MAX_ITEM_PROTO_STATS; ++i)
-if (proto->ItemStat[i].ItemStatValue != 0)
-return true;
-
-return false;
-}
-*/
-
 uint32 Transmogrification::GetSpecialPrice(ItemTemplate const* proto) const
 {
-    sLog->outDebug(LOG_FILTER_TRANSMOG, "Transmogrification::GetSpecialPrice");
+    sLog->outError("Transmogrification::GetSpecialPrice");
 
     uint32 cost = proto->SellPrice < 10000 ? 10000 : proto->SellPrice;
     return cost;
@@ -587,7 +530,7 @@ uint32 Transmogrification::GetSpecialPrice(ItemTemplate const* proto) const
 
 bool Transmogrification::IsRangedWeapon(uint32 Class, uint32 SubClass) const
 {
-    sLog->outDebug(LOG_FILTER_TRANSMOG, "Transmogrification::IsRangedWeapon");
+    sLog->outError("Transmogrification::IsRangedWeapon");
 
     return Class == ITEM_CLASS_WEAPON && (
         SubClass == ITEM_SUBCLASS_WEAPON_BOW ||
@@ -597,21 +540,21 @@ bool Transmogrification::IsRangedWeapon(uint32 Class, uint32 SubClass) const
 
 bool Transmogrification::IsAllowed(uint32 entry) const
 {
-    sLog->outDebug(LOG_FILTER_TRANSMOG, "Transmogrification::IsAllowed");
+    sLog->outError("Transmogrification::IsAllowed");
 
     return Allowed.find(entry) != Allowed.end();
 }
 
 bool Transmogrification::IsNotAllowed(uint32 entry) const
 {
-    sLog->outDebug(LOG_FILTER_TRANSMOG, "Transmogrification::IsNotAllowed");
+    sLog->outError("Transmogrification::IsNotAllowed");
 
     return NotAllowed.find(entry) != NotAllowed.end();
 }
 
 bool Transmogrification::IsAllowedQuality(uint32 quality) const
 {
-    sLog->outDebug(LOG_FILTER_TRANSMOG, "Transmogrification::IsAllowedQuality");
+    sLog->outError("Transmogrification::IsAllowedQuality");
 
     switch (quality)
     {
@@ -629,7 +572,7 @@ bool Transmogrification::IsAllowedQuality(uint32 quality) const
 
 void Transmogrification::LoadConfig(bool reload)
 {
-    sLog->outDebug(LOG_FILTER_TRANSMOG, "Transmogrification::LoadConfig");
+    sLog->outError("Transmogrification::LoadConfig");
 
 #ifdef PRESETS
     EnableSetInfo = sConfigMgr->GetBoolDefault("Transmogrification.EnableSetInfo", true);
@@ -711,7 +654,7 @@ void Transmogrification::LoadConfig(bool reload)
 
     if (!sObjectMgr->GetItemTemplate(TokenEntry))
     {
-        sLog->outDebug(LOG_FILTER_TRANSMOG, "Transmogrification.TokenEntry (%u) does not exist. Using default (%u).", TokenEntry, 49426);
+        sLog->outError("Transmogrification.TokenEntry (%u) does not exist. Using default (%u).", TokenEntry, 49426);
         TokenEntry = 49426;
     }
 }

@@ -226,7 +226,7 @@ namespace
                             const ItemTemplate* temp = sObjectMgr->GetItemTemplate(entry);
                             if (!temp)
                                 continue;
-                            if (!sTransmogrification->SuitableForTransmogrification(player, temp, NULL)) // no need to check?
+                            if (!sTransmogrification->SuitableForTransmogrification(player, temp)) // no need to check?
                                 continue;
                             cost += sTransmogrification->GetSpecialPrice(temp);
                             canSave = true;
@@ -305,7 +305,7 @@ namespace
                     const ItemTemplate* temp = sObjectMgr->GetItemTemplate(entry);
                     if (!temp)
                         continue;
-                    if (!sTransmogrification->SuitableForTransmogrification(player, temp, NULL))
+                    if (!sTransmogrification->SuitableForTransmogrification(player, temp))
                         continue;
                     cost += sTransmogrification->GetSpecialPrice(temp);
                     items[slot] = entry;
@@ -376,7 +376,7 @@ namespace
                     Item* newItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, i);
                     if (!newItem)
                         continue;
-                    if (!sTransmogrification->CanTransmogrifyItemWithItem(player, oldItem->GetTemplate(), newItem->GetTemplate(), newItem))
+                    if (!sTransmogrification->CanTransmogrifyItemWithItem(player, oldItem->GetTemplate(), newItem->GetTemplate()))
                         continue;
                     if (sTransmogrification->GetFakeEntry(oldItem) == newItem->GetEntry())
                         continue;
@@ -396,7 +396,7 @@ namespace
                         Item* newItem = player->GetItemByPos(i, j);
                         if (!newItem)
                             continue;
-                        if (!sTransmogrification->CanTransmogrifyItemWithItem(player, oldItem->GetTemplate(), newItem->GetTemplate(), newItem))
+                        if (!sTransmogrification->CanTransmogrifyItemWithItem(player, oldItem->GetTemplate(), newItem->GetTemplate()))
                             continue;
                         if (sTransmogrification->GetFakeEntry(oldItem) == newItem->GetEntry())
                             continue;
