@@ -2927,6 +2927,7 @@ void World::LoadDBVersion()
     if (result)
     {
         Field* fields = result->Fetch();
+
         m_DBVersion              = fields[0].GetString();
 
         // will be overwrite by config values if different and non-0
