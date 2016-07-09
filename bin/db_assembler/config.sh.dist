@@ -1,0 +1,49 @@
+#!/bin/bash
+
+# 0 if you want create an sql for each kind of following categories
+# 1 to create a single big file to import ( suggested for new installations )
+ALL_IN_ONE=0
+
+DATABASES=(
+	"AUTH"
+	"CHARACTERS"
+	"WORLD"
+)
+
+OUTPUT_FOLDER="output/"
+
+# FULL DB
+DB_CHARACTERS_PATHS=(
+    $SRCPATH"/data/sql/databases/characters.sql"
+)
+
+DB_AUTH_PATHS=(
+    $SRCPATH"/data/sql/databases/auth.sql"
+)
+
+DB_WORLD_PATHS=(
+    $SRCPATH"/data/sql/databases/world.sql"
+)
+
+# UPDATES
+DB_CHARACTERS_UPDATE_PATHS=(
+    $SRCPATH"/data/sql/updates/characters/"
+)
+
+DB_AUTH_UPDATE_PATHS=(
+    $SRCPATH"/data/sql/updates/auth/"
+)
+
+DB_WORLD_UPDATE_PATHS=(
+    $SRCPATH"/data/sql/updates/world/"
+)
+
+# CUSTOM
+DB_CHARACTERS_CUSTOM_PATHS=(
+)
+
+DB_AUTH_CUSTOM_PATHS=(
+)
+
+DB_WORLD_CUSTOM_PATHS=(
+)
