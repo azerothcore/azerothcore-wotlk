@@ -81,6 +81,9 @@ ERR_ARENA_TEAM_LEVEL_TOO_LOW_I
 
 enum ArenaTeamTypes
 {
+//[AZTH]
+    ARENA_TEAM_1v1      = 1, // Custom 1v1 Arena Rated
+//[/AZTH]
     ARENA_TEAM_2v2      = 2,
     ARENA_TEAM_3v3      = 3,
     ARENA_TEAM_5v5      = 5

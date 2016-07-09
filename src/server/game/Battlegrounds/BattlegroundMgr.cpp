@@ -116,7 +116,9 @@ void BattlegroundMgr::Update(uint32 diff)
     if (m_NextPeriodicQueueUpdateTime < diff)
     {
         // for rated arenas
-        for (uint32 qtype = BATTLEGROUND_QUEUE_2v2; qtype <= BATTLEGROUND_QUEUE_5v5; ++qtype)
+//[AZTH]
+        for (uint32 qtype = BATTLEGROUND_QUEUE_2v2; qtype <= BATTLEGROUND_QUEUE_1v1; ++qtype)
+//[/AZTH]
             for (uint32 bracket = BG_BRACKET_ID_FIRST; bracket < MAX_BATTLEGROUND_BRACKETS; ++bracket)
                 m_BattlegroundQueues[qtype].BattlegroundQueueUpdate(BattlegroundBracketId(bracket), 0x03, true, 0); // pussywizard: 0 for rated means looking for opponents for every team
 
@@ -494,6 +496,11 @@ Battleground* BattlegroundMgr::CreateNewBattleground(BattlegroundTypeId bgTypeId
         uint32 maxPlayersPerTeam = 0;
         switch (arenaType)
         {
+//[AZTH]
+            case ARENA_TYPE_1v1:
+                maxPlayersPerTeam = 1;
+                break;
+//[/AZTH]
             case ARENA_TYPE_2v2:
                 maxPlayersPerTeam = 2;
                 break;
@@ -817,6 +824,10 @@ BattlegroundQueueTypeId BattlegroundMgr::BGQueueTypeId(BattlegroundTypeId bgType
         case BATTLEGROUND_RV:
             switch (arenaType)
             {
+//[AZTH]
+                case ARENA_TYPE_1v1:
+                    return BATTLEGROUND_QUEUE_1v1;
+//[/AZTH]
                 case ARENA_TYPE_2v2:
                     return BATTLEGROUND_QUEUE_2v2;
                 case ARENA_TYPE_3v3:
@@ -849,6 +860,9 @@ BattlegroundTypeId BattlegroundMgr::BGTemplateId(BattlegroundQueueTypeId bgQueue
             return BATTLEGROUND_IC;
         case BATTLEGROUND_QUEUE_RB:
             return BATTLEGROUND_RB;
+//[AZTH]
+        case BATTLEGROUND_QUEUE_1v1:
+//[/AZTH]
         case BATTLEGROUND_QUEUE_2v2:
         case BATTLEGROUND_QUEUE_3v3:
         case BATTLEGROUND_QUEUE_5v5:
@@ -862,6 +876,10 @@ uint8 BattlegroundMgr::BGArenaType(BattlegroundQueueTypeId bgQueueTypeId)
 {
     switch (bgQueueTypeId)
     {
+//[AZTH]
+        case BATTLEGROUND_QUEUE_1v1:
+            return ARENA_TYPE_1v1;
+//[/AZTH]
         case BATTLEGROUND_QUEUE_2v2:
             return ARENA_TYPE_2v2;
         case BATTLEGROUND_QUEUE_3v3:

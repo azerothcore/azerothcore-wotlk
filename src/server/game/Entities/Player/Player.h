@@ -18,7 +18,10 @@
 
 #ifndef _PLAYER_H
 #define _PLAYER_H
-
+ //[AZTH]
+#include "ArenaTeam.h"
+#include "AzthPlayer.h"
+ //[/AZTH]
 #include "DBCStores.h"
 #include "GroupReference.h"
 #include "MapReference.h"
@@ -1091,11 +1094,15 @@ private:
 class Player : public Unit, public GridObject<Player>
 {
     friend class WorldSession;
+    friend class AzthPlayer; // [AZTH] make AzthPlayer friendly to Player, allowing private access
     friend void Item::AddToUpdateQueueOf(Player* player);
     friend void Item::RemoveFromUpdateQueueOf(Player* player);
     public:
         explicit Player(WorldSession* session);
         ~Player();
+
+        // [AZTH] Custom variables
+        AzthPlayer *azthPlayer;
 
         void CleanupsBeforeDelete(bool finalCleanup = true);
 
@@ -1882,13 +1889,27 @@ class Player : public Unit, public GridObject<Player>
             SetArenaTeamInfoField(slot, ARENA_TEAM_ID, ArenaTeamId);
             SetArenaTeamInfoField(slot, ARENA_TEAM_TYPE, type);
         }
+
         void SetArenaTeamInfoField(uint8 slot, ArenaTeamInfoType type, uint32 value)
         {
+// [AZTH] avoid higher slots to be set in datafield
+            if (slot >= ArenaTeam::GetSlotByType(ARENA_TEAM_1v1)) {
+                azthPlayer->setArena1v1Info(type, value);
+                return;
+            }
+// [/AZTH]
             SetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (slot * ARENA_TEAM_END) + type, value);
+        }
+
+        uint32 GetArenaPersonalRating(uint8 slot) const {
+            // [AZTH]
+            if (slot == ArenaTeam::GetSlotByType(ARENA_TEAM_1v1))
+                return azthPlayer->getArena1v1Info(ARENA_TEAM_PERSONAL_RATING);
+            // [/AZTH]
+            return GetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (slot * ARENA_TEAM_END) + ARENA_TEAM_PERSONAL_RATING); 
         }
         static void LeaveAllArenaTeams(uint64 guid);
         uint32 GetArenaTeamId(uint8 slot) const { return GetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (slot * ARENA_TEAM_END) + ARENA_TEAM_ID); }
-        uint32 GetArenaPersonalRating(uint8 slot) const { return GetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (slot * ARENA_TEAM_END) + ARENA_TEAM_PERSONAL_RATING); }
         void SetArenaTeamIdInvited(uint32 ArenaTeamId) { m_ArenaTeamIdInvited = ArenaTeamId; }
         uint32 GetArenaTeamIdInvited() { return m_ArenaTeamIdInvited; }
 

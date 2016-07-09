@@ -6,11 +6,11 @@
 #include "Player.h"
 
 /* [TODO] fix and re-enable */
-// class AzthPlayer {
-// public:
-//     explicit AzthPlayer(Player *origin);
-//     ~AzthPlayer();
-//
+ class AzthPlayer {
+ public:
+     explicit AzthPlayer(Player *origin);
+     ~AzthPlayer();
+
 //     void SetPlayerQuestRate(float rate);
 //
 //     /**
@@ -30,15 +30,15 @@
 //     bool setFactionForRace(uint8 race);
 //     uint32 getOriginalTeam();
 //
-//     uint32 getArena1v1Info(uint8 type);
-//     void setArena1v1Info(uint8 type, uint32 value);
+     uint32 getArena1v1Info(uint8 type);
+     void setArena1v1Info(uint8 type, uint32 value);
 //
-// private:
-//     Player *player;
-//     uint32 arena1v1Info[7]; // ARENA_TEAM_END
+ private:
+     Player *player;
+     uint32 arena1v1Info[7]; // ARENA_TEAM_END
 //
-//     float playerQuestRate, maxQuestRate;
-// };
+     float playerQuestRate, maxQuestRate;
+ };
 
 #endif /* AZTHPLAYER_H */
 

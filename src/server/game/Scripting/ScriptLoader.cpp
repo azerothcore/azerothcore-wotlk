@@ -1246,6 +1246,10 @@ void AddBattlegroundScripts()
 #ifdef SCRIPTS
 /* This is where custom scripts' loading functions should be declared. */
 
+//[AZTH]
+
+//[/AZTH]
+
 #endif
 
 void AddCustomScripts()
