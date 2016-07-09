@@ -110,6 +110,7 @@ add_library(azth_mod STATIC
 
 target_link_libraries(azth_mod
   game
+  ${ACE_LIBRARY}
 )
 
 message(STATUS "AZTH-MODULE PREPARATION COMPLETE")

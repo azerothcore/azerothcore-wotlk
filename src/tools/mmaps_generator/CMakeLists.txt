@@ -111,7 +111,7 @@ set(mmap_gen_Includes
 if( WIN32 )
   set(mmap_gen_Includes
     ${mmap_gen_Includes}
-    ${CMAKE_SOURCE_DIR}/dep/libmpq/win
+    ${CMAKE_SOURCE_DIR}/modules/dep/libmpq/win
     )
 endif()
 
