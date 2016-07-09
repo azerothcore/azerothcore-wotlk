@@ -36,6 +36,9 @@ endif()
 include(CheckCXXSourceRuns)
 include(CheckIncludeFiles)
 
+# some utils for cmake
+include(src/cmake/utils.cmake)
+
 # set default buildoptions and print them
 include(src/cmake/options.cmake)
 
@@ -76,8 +79,16 @@ include(src/cmake/genrev.cmake)
 # print out the results before continuing
 include(src/cmake/showoptions.cmake)
 
-# add dependencies
-add_subdirectory(modules/dep)
+# add modules and dependencies
+AZTH_SUBDIRLIST(sub_DIRS  "${CMAKE_SOURCE_DIR}/modules" FALSE FALSE)
+FOREACH(subdir ${sub_DIRS})
+    message("Loading module: ${subdir}")
+    add_subdirectory("${subdir}")
+ENDFOREACH()
+
+RUN_HOOK("BEFORE_SRC_LOAD")
 
 # add core sources
 add_subdirectory(src)
+
+RUN_HOOK("AFTER_SRC_LOAD")
