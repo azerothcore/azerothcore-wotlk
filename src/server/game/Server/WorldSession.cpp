@@ -1267,3 +1267,70 @@ void WorldSession::InitWarden(BigNumber* k, std::string const& os)
         // _warden->Init(this, k);
     }
 }
+
+void WorldSession::SendExternalMails()
+{
+    sLog->outError("EXTERNAL MAIL> Sending mails in queue...");
+
+    PreparedStatement* stmt = ExtraDatabase.GetPreparedStatement(EXTRA_GET_EXTERNAL_MAIL);
+    PreparedQueryResult result = ExtraDatabase.Query(stmt);
+    if (!result)
+    {
+        sLog->outError("EXTERNAL MAIL> No mails in queue...");
+        return;
+    }
+
+    SQLTransaction trans = CharacterDatabase.BeginTransaction();
+    SQLTransaction trans2 = ExtraDatabase.BeginTransaction();
+
+    MailDraft* mail = NULL;
+
+    do
+    {
+        Field *fields = result->Fetch();
+        uint32 id = fields[0].GetUInt32();
+        uint32 receiver_guid = fields[1].GetUInt32();
+        std::string subject = fields[2].GetString();
+        std::string body = fields[3].GetString();
+        uint32 money = fields[4].GetUInt32();
+        uint32 itemId = fields[5].GetUInt32();
+        uint32 itemCount = fields[6].GetUInt32();
+
+        Player *receiver = ObjectAccessor::FindPlayer(receiver_guid);
+
+        mail = new MailDraft(subject, body);
+
+        if (money)
+        {
+            mail->AddMoney(money);
+        }
+
+        if (itemId)
+        {
+            ItemTemplate const* pProto = sObjectMgr->GetItemTemplate(itemId);
+            if (pProto)
+            {
+                Item* mailItem = Item::CreateItem(itemId, itemCount);
+                if (mailItem)
+                {
+                    mailItem->SaveToDB(trans);
+                    mail->AddItem(mailItem);
+                }
+            }
+            else
+                sLog->outError("non-existing item");
+        }
+
+        mail->SendMailTo(trans, receiver ? receiver : MailReceiver(receiver_guid), MailSender(MAIL_NORMAL, 0, MAIL_STATIONERY_GM), MAIL_CHECK_MASK_RETURNED);
+        delete mail;
+
+        stmt = ExtraDatabase.GetPreparedStatement(EXTRA_DEL_EXTERNAL_MAIL);
+        stmt->setUInt32(0, id);
+        trans2->Append(stmt);
+
+    } while (result->NextRow());
+
+    CharacterDatabase.CommitTransaction(trans);
+    ExtraDatabase.CommitTransaction(trans2);
+    sLog->outError("EXTERNAL MAIL> ALL MAILS SENT!");
+}
