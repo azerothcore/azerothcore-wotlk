@@ -144,7 +144,6 @@ include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/AI/CoreAI
   ${CMAKE_CURRENT_SOURCE_DIR}/AI/ScriptedAI
   ${CMAKE_CURRENT_SOURCE_DIR}/AI/SmartScripts
-  ${CMAKE_CURRENT_SOURCE_DIR}/Anticheat
   ${CMAKE_CURRENT_SOURCE_DIR}/AuctionHouse
   ${CMAKE_CURRENT_SOURCE_DIR}/Battlefield
   ${CMAKE_CURRENT_SOURCE_DIR}/Battlefield/Zones
@@ -204,7 +203,6 @@ include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/Texts
   ${CMAKE_CURRENT_SOURCE_DIR}/Tools
   ${CMAKE_CURRENT_SOURCE_DIR}/Tickets
-  ${CMAKE_CURRENT_SOURCE_DIR}/Transmogrification
   ${CMAKE_CURRENT_SOURCE_DIR}/Warden
   ${CMAKE_CURRENT_SOURCE_DIR}/Warden/Modules
   ${CMAKE_CURRENT_SOURCE_DIR}/Weather

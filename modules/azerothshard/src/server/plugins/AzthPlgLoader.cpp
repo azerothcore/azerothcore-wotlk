@@ -13,6 +13,8 @@
 // void AddSC_CS_Transmogrification();
 // void AddSC_npc_1v1arena();
 void AddSC_npc_lottery();
+void AddSC_anticheat_commandscript();
+
 
 void AddAzthScripts()
 {
@@ -26,6 +28,7 @@ void AddAzthScripts()
 //     AddSC_CS_Transmogrification();
 //     AddSC_npc_1v1arena();
 	AddSC_npc_lottery();
+    AddSC_anticheat_commandscript();
 }
 
 

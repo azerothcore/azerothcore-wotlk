@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 
+ * Copyright (C)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -17,7 +17,7 @@
 
 #include "ScriptLoader.h"
 #include "ScriptMgr.h"
-#include "AnticheatMgr.h"
+#include "AnticheatMgr.h" //[AZTH]
 
 //examples
 void AddSC_example_creature();
@@ -75,7 +75,6 @@ void AddSC_tele_commandscript();
 void AddSC_ticket_commandscript();
 void AddSC_titles_commandscript();
 void AddSC_wp_commandscript();
-void AddSC_anticheat_commandscript();
 
 #ifdef SCRIPTS
 //world
@@ -240,7 +239,7 @@ void AddSC_western_plaguelands();
 void AddSC_westfall();
 void AddSC_wetlands();
 
-//kalimdor     
+//kalimdor
 void AddSC_instance_blackfathom_deeps();     //Blackfathom Depths
 void AddSC_hyjal();                          //CoT Battle for Mt. Hyjal
 void AddSC_boss_archimonde();
@@ -696,7 +695,6 @@ void AddCommandScripts()
     AddSC_ticket_commandscript();
     AddSC_titles_commandscript();
     AddSC_wp_commandscript();
-    AddSC_anticheat_commandscript();
 }
 
 void AddWorldScripts()
