@@ -17,7 +17,6 @@
 
 #include "ScriptLoader.h"
 #include "ScriptMgr.h"
-#include "AnticheatMgr.h" //[AZTH]
 
 //examples
 void AddSC_example_creature();
@@ -89,7 +88,6 @@ void AddSC_npc_innkeeper();
 void AddSC_npcs_special();
 void AddSC_npc_taxi();
 void AddSC_achievement_scripts();
-void AddSC_npc_transmogrifier();
 
 //events
 void AddSC_event_brewfest_scripts();
@@ -595,7 +593,6 @@ void AddScripts()
     AddSpellScripts();
     AddSC_SmartSCripts();
     AddCommandScripts();
-    sAnticheatMgr->StartScripts(); //[AZTH] Anticheat
 #ifdef SCRIPTS
     AddWorldScripts();
     AddEventScripts();
@@ -711,7 +708,6 @@ void AddWorldScripts()
     AddSC_npcs_special();
     AddSC_npc_taxi();
     AddSC_achievement_scripts();
-    AddSC_npc_transmogrifier();
 #endif
 }
 

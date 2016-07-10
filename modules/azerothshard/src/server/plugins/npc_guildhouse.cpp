@@ -1286,5 +1286,5 @@ void AddSC_guildhouse_npcs()
 	new guild_guard();
 	new npc_buffnpc();
 	new npc_portal();
-	//new npc_teleport();
+	new npc_teleport();
 }
