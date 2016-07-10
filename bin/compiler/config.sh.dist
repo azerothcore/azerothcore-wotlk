@@ -3,6 +3,7 @@
 
 # set preferred compilers
 #CCOMPILERC="/usr/bin/clang-3.6"
+#CCOMPILERCC="/usr/bin/clang-3.6"
 #CCOMPILERCXX="/usr/bin/clang++-3.6"
 CCOMPILERC="/usr/bin/gcc"
 CCOMPILERCC="/usr/bin/gcc"
