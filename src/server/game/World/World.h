@@ -802,9 +802,13 @@ class World
         time_t m_gameTime;
         IntervalTimer m_timers[WUPDATE_COUNT];
         time_t mail_expire_check_timer;
-        IntervalTimer extmail_timer;
         uint32 m_updateTime, m_updateTimeSum;
         static uint32 m_gameMSTime;
+
+        //[AZTH] Customs
+        IntervalTimer extmail_timer; 
+        uint32 m_guildhousetimer;
+        // [/AZTH]
 
         SessionMap m_sessions;
         SessionMap m_offlineSessions;

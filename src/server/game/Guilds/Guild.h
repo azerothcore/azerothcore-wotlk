@@ -764,6 +764,11 @@ public:
 
     void ResetTimes();
 
+    //[AZTH] Guildhouses
+    bool ModifyBankMoney(SQLTransaction& trans, const uint64& amount, bool add) { return _ModifyBankMoney(trans, amount, add); }
+    uint32 GetMemberSize() const { return m_members.size(); }
+    //[/AZTH]
+
 protected:
     uint32 m_id;
     std::string m_name;

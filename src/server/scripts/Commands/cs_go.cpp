@@ -29,6 +29,7 @@ EndScriptData */
 #include "Chat.h"
 #include "Language.h"
 #include "Player.h"
+#include "GuildHouse.h" //[AZTH]
 
 class go_commandscript : public CommandScript
 {
@@ -48,8 +49,9 @@ public:
             { "zonexy",         SEC_GAMEMASTER,      false, &HandleGoZoneXYCommand,            "", NULL },
             { "xyz",            SEC_GAMEMASTER,      false, &HandleGoXYZCommand,               "", NULL },
             { "ticket",         SEC_GAMEMASTER,      false, &HandleGoTicketCommand,            "", NULL },
+            { "guildhouse",     SEC_GAMEMASTER,      false, &HandleGuildhouseCommand,          "", NULL }, //[AZTH]
             { "",               SEC_GAMEMASTER,      false, &HandleGoXYZCommand,               "", NULL },
-            { NULL,             0,                  false, NULL,                              "", NULL }
+            { NULL,             0,                   false, NULL,                               "", NULL }
         };
 
         static ChatCommand commandTable[] =
@@ -567,6 +569,67 @@ public:
         ticket->TeleportTo(player);
         return true;
     }
+
+    // [AZTH] Guildhouse GO command
+    static bool HandleGuildhouseCommand(ChatHandler* handler, char const* args)
+    {
+        if (!*args)
+            return false;
+
+        Player* player = handler->GetSession()->GetPlayer();
+
+        char* goGH = strtok((char*)args, " ");
+
+
+        if (!goGH)
+            return false;
+
+        uint32 guildhouse = (uint32)atof(goGH);
+
+        if (guildhouse > 0)
+        {
+            float x;
+            float y;
+            float z;
+            float o;
+            uint32 map;
+
+            // here i have to retrieve coordinates for the GH.
+
+            if (GHobj.GetGuildHouseLocation(guildhouse, x, y, z, o, map))
+            {
+                // stop flight if need
+                if (player->IsInFlight())
+                {
+                    player->GetMotionMaster()->MovementExpired();
+                    player->CleanupAfterTaxiFlight();
+                }
+                // save only in non-flight case
+                else
+                    player->SaveRecallPosition();
+
+                if (!MapManager::IsValidMapCoord(map, x, y, z))
+                {
+                    handler->PSendSysMessage(LANG_INVALID_TARGET_COORD, x, y, map);
+                    handler->SetSentErrorMessage(true);
+                    return false;
+                }
+
+                //teleport player to the specified location
+                player->TeleportTo(map, x, y, z, o);
+                return true;
+
+            }
+            else
+                return false;
+
+        }
+        else
+            return false;
+
+        return true;
+    }
+    //[/AZTH]
 };
 
 void AddSC_go_commandscript()

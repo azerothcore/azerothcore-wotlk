@@ -87,7 +87,8 @@
 #include "WhoListCache.h"
 #include "AsyncAuctionListing.h"
 #include "SavingSystem.h"
-#include "AnticheatMgr.h"
+#include "AnticheatMgr.h" //[AZTH]
+#include "GuildHouse.h" //[AZTH]
 
 ACE_Atomic_Op<ACE_Thread_Mutex, bool> World::m_stopEvent = false;
 uint8 World::m_ExitCode = SHUTDOWN_EXIT_CODE;
@@ -1722,6 +1723,8 @@ void World::SetInitialWorldSettings()
     sLog->outString("Loading Calendar data...");
     sCalendarMgr->LoadFromDB();
 
+    LoadGuildHouseSystem();     // [AZTH] Load Guildhouses
+
     sLog->outString("Initializing SpellInfo precomputed data..."); // must be called after loading items, professions, spells and pretty much anything
     sObjectMgr->InitializeSpellInfoPrecomputedData();
 
@@ -1965,7 +1968,7 @@ void World::Update(uint32 diff)
     if (m_gameTime > m_NextGuildReset)
         ResetGuildCap();
 
-    /// CUSTOM: MAIL EXTERNAL
+    /// [AZTH] Customs
     if (m_bool_configs[CONFIG_EXTERNAL_MAIL])
     {
         extmail_timer.Update(diff);
@@ -1975,6 +1978,15 @@ void World::Update(uint32 diff)
             extmail_timer.Reset();
         }
     }
+
+    if (m_guildhousetimer <= m_updateTime)
+    {
+        GHobj.ControlGuildHouse();
+        m_guildhousetimer = 600000;
+    }
+    else m_guildhousetimer -= m_updateTime;
+
+    /// [/AZTH]
 
     // pussywizard:
     // acquire mutex now, this is kind of waiting for listing thread to finish it's work (since it can't process next packet)
