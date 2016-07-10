@@ -9,7 +9,7 @@
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 # Set projectname (must be done AFTER setting configurationtypes)
-project(SunwellCore)
+project(AzerothCore)
 
 # CMake policies (can not be handled elsewhere)
 cmake_minimum_required(VERSION 2.8)
@@ -82,6 +82,7 @@ include(src/cmake/showoptions.cmake)
 # add modules and dependencies
 AZTH_SUBDIRLIST(sub_DIRS  "${CMAKE_SOURCE_DIR}/modules" FALSE FALSE)
 FOREACH(subdir ${sub_DIRS})
+    STRING(REGEX REPLACE "^${CMAKE_SOURCE_DIR}/" "" subdir ${subdir})
     message("Loading module: ${subdir}")
     add_subdirectory("${subdir}")
 ENDFOREACH()
