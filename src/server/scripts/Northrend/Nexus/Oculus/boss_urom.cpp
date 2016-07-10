@@ -124,7 +124,7 @@ public:
             me->ApplySpellImmune(0, IMMUNITY_ID, 49838, true);
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* /*who*/)
         {
             if( lock )
                 return;
@@ -198,7 +198,7 @@ public:
             me->ResetPlayerDamageReq();
         }
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit* /*killer*/)
         {
             Talk(SAY_DEATH);
 
@@ -206,24 +206,46 @@ public:
                 pInstance->SetData(DATA_UROM, DONE);
         }
 
-        void KilledUnit(Unit *victim)
+        void KilledUnit(Unit* /*victim*/)
         {
             Talk(SAY_PLAYER_KILL);
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spell)
+        void SpellHit(Unit* /*caster*/, const SpellInfo* spell)
         {
             switch( spell->Id )
             {
                 case SPELL_SUMMON_MENAGERIE_1:
+                {
+                    for( uint8 i=0; i<4; ++i )
+						me->SummonCreature(summons[0][i], cords[0][0] + ((i%2) ? 4.0f : -4.0f), cords[0][1] + (i<2 ? 4.0f : -4.0f), cords[0][2], 0.0f, TEMPSUMMON_TIMED_DESPAWN, 300000);
+                        uint8 phase = GetPhaseByCurrentPosition();
+						me->SetHomePosition(cords[phase+1][0], cords[phase+1][1], cords[phase+1][2], cords[phase+1][3]);
+						me->DestroyForNearbyPlayers();
+                        LeaveCombat();
+						me->CastSpell(me, SPELL_EVOCATION, true);
+						releaseLockTimer = 1;
+                }
+                break;
                 case SPELL_SUMMON_MENAGERIE_2:
+                {
+                    for( uint8 i=0; i<4; ++i )
+						me->SummonCreature(summons[1][i], cords[1][0] + ((i%2) ? 4.0f : -4.0f), cords[1][1] + (i<2 ? 4.0f : -4.0f), cords[1][2], 0.0f, TEMPSUMMON_TIMED_DESPAWN, 300000);
+                        uint8 phase = GetPhaseByCurrentPosition();
+						me->SetHomePosition(cords[phase+1][0], cords[phase+1][1], cords[phase+1][2], cords[phase+1][3]);
+						me->DestroyForNearbyPlayers();
+                        LeaveCombat();
+						me->CastSpell(me, SPELL_EVOCATION, true);
+						releaseLockTimer = 1;
+                }
+                break;                
                 case SPELL_SUMMON_MENAGERIE_3:
                     {
-                        me->DestroyForNearbyPlayers();
-                        uint8 phase = GetPhaseByCurrentPosition();
                         for( uint8 i=0; i<4; ++i )
-                            me->SummonCreature(summons[phase][i], cords[phase][0] + ((i%2) ? 4.0f : -4.0f), cords[phase][1] + (i<2 ? 4.0f : -4.0f), cords[phase][2], 0.0f, TEMPSUMMON_TIMED_DESPAWN, 300000);
++						me->SummonCreature(summons[2][i], cords[2][0] + ((i%2) ? 4.0f : -4.0f), cords[2][1] + (i<2 ? 4.0f : -4.0f), cords[2][2], 0.0f, TEMPSUMMON_TIMED_DESPAWN, 300000);
+                        uint8 phase = GetPhaseByCurrentPosition();
                         me->SetHomePosition(cords[phase+1][0], cords[phase+1][1], cords[phase+1][2], cords[phase+1][3]);
+                        me->DestroyForNearbyPlayers();
                         LeaveCombat();
                         me->CastSpell(me, SPELL_EVOCATION, true);
                         releaseLockTimer = 1;
@@ -249,7 +271,7 @@ public:
             }
         }
 
-        void MoveInLineOfSight(Unit* who) {}
+        void MoveInLineOfSight(Unit* /*who*/) {}
 
         void UpdateAI(uint32 diff)
         {
