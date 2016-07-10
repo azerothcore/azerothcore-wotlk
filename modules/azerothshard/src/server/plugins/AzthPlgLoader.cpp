@@ -14,6 +14,7 @@
 // void AddSC_npc_1v1arena();
 void AddSC_npc_lottery();
 void AddSC_anticheat_commandscript();
+void AddSC_guildhouse_npcs();
 
 
 void AddAzthScripts()
@@ -29,6 +30,7 @@ void AddAzthScripts()
 //     AddSC_npc_1v1arena();
 	AddSC_npc_lottery();
     AddSC_anticheat_commandscript();
+    AddSC_guildhouse_npcs();
 }
 
 
