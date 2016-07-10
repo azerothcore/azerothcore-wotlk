@@ -180,7 +180,8 @@ class instance_gundrak : public InstanceMapScript
                     case DATA_ECK_THE_FEROCIOUS_INIT:
                     {
                         Position pos = {1624.70f, 891.43f, 95.08f, 1.2f};
-                        instance->SummonCreature(NPC_ECK_THE_FEROCIOUS, pos);
+                        if (instance->IsHeroic())
+                            instance->SummonCreature(NPC_ECK_THE_FEROCIOUS, pos);
                         break;
                     }
                 }
