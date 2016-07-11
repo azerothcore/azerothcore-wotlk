@@ -7181,6 +7181,7 @@ bool Player::RewardHonor(Unit* uVictim, uint32 groupsize, int32 honor, bool awar
 
     uint64 victim_guid = 0;
     uint32 victim_rank = 0;
+    uint32 rank_diff = 0; //[AZTH]
 
     // need call before fields update to have chance move yesterday data to appropriate fields before today data change.
     UpdateHonorFields();
@@ -7213,6 +7214,8 @@ bool Player::RewardHonor(Unit* uVictim, uint32 groupsize, int32 honor, bool awar
             if (v_level <= k_grey)
                 return false;
 
+            //[AZTH] PVP Rank Patch
+
             // PLAYER_CHOSEN_TITLE VALUES DESCRIPTION
             //  [0]      Just name
             //  [1..14]  Alliance honor titles and player name
@@ -7220,21 +7223,58 @@ bool Player::RewardHonor(Unit* uVictim, uint32 groupsize, int32 honor, bool awar
             //  [29..38] Other title and player name
             //  [39+]    Nothing
             uint32 victim_title = victim->GetUInt32Value(PLAYER_CHOSEN_TITLE);
-                                                        // Get Killer titles, CharTitlesEntry::bit_index
+
+            // Get Killer titles, CharTitlesEntry::bit_index
+            // PLAYER__FIELD_KNOWN_TITLES describe which titles player can use,
+            // so we must find biggest pvp title , even for killer to find extra honor value
+            uint32 vtitle = victim->GetUInt32Value(PLAYER__FIELD_KNOWN_TITLES);
+            //uint32 victim_title = 0;
+            uint32 ktitle = GetUInt32Value(PLAYER__FIELD_KNOWN_TITLES);
+            uint32 killer_title = 0;
+            if (PLAYER_TITLE_MASK_ALL_PVP & ktitle)
+            {
+                for (int i = ((GetTeamId() == TEAM_ALLIANCE) ? 1 : HKRANKMAX); i != ((GetTeamId() == TEAM_ALLIANCE) ? HKRANKMAX : (2 * HKRANKMAX - 1)); i++)
+                {
+                    if (ktitle & (1 << i))
+                        killer_title = i;
+                }
+            }
+            if (PLAYER_TITLE_MASK_ALL_PVP & vtitle)
+            {
+                for (int i = ((victim->GetTeamId() == TEAM_ALLIANCE) ? 1 : HKRANKMAX); i != ((victim->GetTeamId() == TEAM_ALLIANCE) ? HKRANKMAX : (2 * HKRANKMAX - 1)); i++)
+                {
+                    if (vtitle & (1 << i))
+                        victim_title = i;
+                }
+            }
+
+            // Get Killer titles, CharTitlesEntry::bit_index
             // Ranks:
             //  title[1..14]  -> rank[5..18]
             //  title[15..28] -> rank[5..18]
             //  title[other]  -> 0
             if (victim_title == 0)
                 victim_guid = 0;                        // Don't show HK: <rank> message, only log.
-            else if (victim_title < 15)
+            else if (victim_title < HKRANKMAX)
                 victim_rank = victim_title + 4;
-            else if (victim_title < 29)
-                victim_rank = victim_title - 14 + 4;
+            else if (victim_title < (2 * HKRANKMAX - 1))
+                victim_rank = victim_title - (HKRANKMAX - 1) + 4;
             else
                 victim_guid = 0;                        // Don't show HK: <rank> message, only log.
 
+                                                        // now find rank difference
+            if (killer_title == 0 && victim_rank>4)
+                rank_diff = victim_rank - 4;
+            else if (killer_title < HKRANKMAX)
+                rank_diff = (victim_rank>(killer_title + 4)) ? (victim_rank - (killer_title + 4)) : 0;
+            else if (killer_title < (2 * HKRANKMAX - 1))
+                rank_diff = (victim_rank>(killer_title - (HKRANKMAX - 1) + 4)) ? (victim_rank - (killer_title - (HKRANKMAX - 1) + 4)) : 0;
+
+
             honor_f = ceil(Trinity::Honor::hk_honor_at_level_f(k_level) * (v_level - k_grey) / (k_level - k_grey));
+            honor *= 1 + sWorld->getRate(RATE_PVP_RANK_EXTRA_HONOR)*(((float)rank_diff) / 10.0f);
+
+            //[/AZTH] End of PVP Ranks Patch
 
             // count the number of playerkills in one day
             ApplyModUInt32Value(PLAYER_FIELD_KILLS, 1, true);
@@ -7244,6 +7284,7 @@ bool Player::RewardHonor(Unit* uVictim, uint32 groupsize, int32 honor, bool awar
             UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HK_CLASS, victim->getClass());
             UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HK_RACE, victim->getRace());
             UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HONORABLE_KILL_AT_AREA, GetAreaId());
+            UpdateKnownTitles();
             UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HONORABLE_KILL, 1, 0, victim);
             UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_SPECIAL_PVP_KILL, 1, 0, victim);
         }
@@ -22175,6 +22216,16 @@ void Player::LeaveBattleground(Battleground* bg)
     if (!bg)
         return;
 
+    // Deserter tracker - leave BG
+    if (bg->isBattleground() && sWorld->getBoolConfig(CONFIG_BATTLEGROUND_TRACK_DESERTERS) 
+        && (bg->GetStatus() == STATUS_IN_PROGRESS || bg->GetStatus() == STATUS_WAIT_JOIN))
+    {
+        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_DESERTER_TRACK);
+        stmt->setUInt32(0, GetGUIDLow());
+        stmt->setUInt8(1, BG_DESERTION_TYPE_LEAVE_BG);
+        CharacterDatabase.Execute(stmt);
+    }
+
     // xinef: reset corpse reclaim time
     m_deathExpireTime = time(NULL);
 
@@ -26975,4 +27026,28 @@ void Player::SummonPet(uint32 entry, float x, float y, float z, float ang, PetTy
 
     AsynchPetSummon* asynchPetInfo = new AsynchPetSummon(entry, pos, petType, duration, createdBySpell, casterGUID);
     Pet::LoadPetFromDB(this, asynchLoadType, entry, 0, false, asynchPetInfo);
+}
+
+void Player::UpdateKnownTitles()
+{
+    uint32 new_title = 0;
+    uint32 honor_kills = GetUInt32Value(PLAYER_FIELD_LIFETIME_HONORABLE_KILLS);
+    uint32 old_title = GetUInt32Value(PLAYER_CHOSEN_TITLE);
+    RemoveFlag64(PLAYER__FIELD_KNOWN_TITLES, PLAYER_TITLE_MASK_ALL_PVP);
+    // if (honor_kills < 0)
+    //    return;
+    bool max_rank = ((honor_kills >= sWorld->pvp_ranks[HKRANKMAX - 1]) ? true : false);
+    for (int i = HKRANK01; i != HKRANKMAX; ++i)
+    {
+        if (honor_kills < sWorld->pvp_ranks[i] || (max_rank))
+        {
+            new_title = ((max_rank) ? (HKRANKMAX - 1) : (i - 1));
+            if (new_title > 0)
+                new_title += ((GetTeamId() == TEAM_ALLIANCE) ? 0 : (HKRANKMAX - 1));
+            break;
+        }
+    }
+    SetFlag64(PLAYER__FIELD_KNOWN_TITLES, uint64(1) << new_title);
+    if (old_title > 0 && old_title < (2 * HKRANKMAX - 1) && new_title > old_title)
+        SetUInt32Value(PLAYER_CHOSEN_TITLE, new_title);
 }
