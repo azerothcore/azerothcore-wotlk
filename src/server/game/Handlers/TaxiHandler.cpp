@@ -213,6 +213,13 @@ void WorldSession::HandleMoveSplineDoneOpcode(WorldPacket& recvData)
     movementInfo.guid = guid;
     ReadMovementInfo(recvData, &movementInfo);
 
+    // Fix quest "As the crow flies" - Remove morph and complete quest
+    if(GetPlayer()->GetQuestStatus(9718) == QUEST_STATUS_INCOMPLETE)
+    {
+        GetPlayer()->CompleteQuest(9718);
+        GetPlayer()->RemoveAurasDueToSpell(38776);
+    }
+    
     recvData.read_skip<uint32>();                          // spline id
 }
 
