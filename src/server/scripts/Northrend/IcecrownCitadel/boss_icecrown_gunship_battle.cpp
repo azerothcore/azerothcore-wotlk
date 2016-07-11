@@ -1759,6 +1759,11 @@ class npc_gunship_mage : public CreatureScript
                     switch (Index)
                     {
                         case SLOT_FREEZE_MAGE:
+                            if (Player* player = me->SelectNearestPlayer(50.0f))
+                            {
+                                me->SetInCombatWithZone();
+                                me->AddThreat(player, 1.0f);
+                            }
                             me->CastSpell((Unit*)NULL, SPELL_BELOW_ZERO, false);
                             break;
                         case SLOT_MAGE_1:
