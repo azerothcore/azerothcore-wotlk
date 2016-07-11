@@ -327,6 +327,28 @@ enum WorldIntConfigs
     INT_CONFIG_VALUE_COUNT
 };
 
+//[AZTH] PVP Rank Patch
+enum HonorKillPvPRank
+{
+    HKRANK00,
+    HKRANK01,
+    HKRANK02,
+    HKRANK03,
+    HKRANK04,
+    HKRANK05,
+    HKRANK06,
+    HKRANK07,
+    HKRANK08,
+    HKRANK09,
+    HKRANK10,
+    HKRANK11,
+    HKRANK12,
+    HKRANK13,
+    HKRANK14,
+    HKRANKMAX
+};
+//[/AZTH]
+
 /// Server rates
 enum Rates
 {
@@ -381,6 +403,7 @@ enum Rates
     RATE_AUCTION_DEPOSIT,
     RATE_AUCTION_CUT,
     RATE_HONOR,
+    RATE_PVP_RANK_EXTRA_HONOR, //[AZTH]
     RATE_TALENT,
     RATE_CORPSE_DECAY_LOOTED,
     RATE_INSTANCE_RESET_TIME,
@@ -648,6 +671,8 @@ class World
         bool SendZoneMessage(uint32 zone, WorldPacket* packet, WorldSession* self = 0, TeamId teamId = TEAM_NEUTRAL);
         void SendZoneText(uint32 zone, const char *text, WorldSession* self = 0, TeamId teamId = TEAM_NEUTRAL);
         void SendServerMessage(ServerMessageType type, const char *text = "", Player* player = NULL);
+
+        uint32 pvp_ranks[HKRANKMAX]; //[AZTH] PVP Rank Patch
 
         /// Are we in the middle of a shutdown?
         bool IsShuttingDown() const { return m_ShutdownTimer > 0; }
