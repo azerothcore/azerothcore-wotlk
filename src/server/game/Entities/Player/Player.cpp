@@ -7413,6 +7413,22 @@ uint32 Player::GetArenaTeamIdFromStorage(uint32 guid, uint8 slot)
     return 0;
 }
 
+//[AZTH]
+uint32 Player::GetArenaTeamIdFromDB(uint64 guid, uint8 type)
+{
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_ARENA_TEAM_ID_BY_PLAYER_GUID);
+    stmt->setUInt32(0, GUID_LOPART(guid));
+    stmt->setUInt8(1, type);
+    PreparedQueryResult result = CharacterDatabase.Query(stmt);
+
+    if (!result)
+        return 0;
+
+    uint32 id = (*result)[0].GetUInt32();
+    return id;
+}
+// [/AZTH]
+
 uint32 Player::GetZoneIdFromDB(uint64 guid)
 {
     uint32 guidLow = GUID_LOPART(guid);

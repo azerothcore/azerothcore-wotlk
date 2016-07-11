@@ -116,6 +116,7 @@
          int i = 1;
          std::stringstream teamName;
          teamName << player->GetName();
+
          do {
              if (sArenaTeamMgr->GetArenaTeamByName(teamName.str()) != NULL) // teamname exist, so choose another name
              {

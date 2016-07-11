@@ -1931,8 +1931,15 @@ class Player : public Unit, public GridObject<Player>
             // [/AZTH]
             return GetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (slot * ARENA_TEAM_END) + ARENA_TEAM_PERSONAL_RATING); 
         }
+        static uint32 GetArenaTeamIdFromDB(uint64 guid, uint8 slot);
         static void LeaveAllArenaTeams(uint64 guid);
-        uint32 GetArenaTeamId(uint8 slot) const { return GetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (slot * ARENA_TEAM_END) + ARENA_TEAM_ID); }
+        uint32 GetArenaTeamId(uint8 slot) const {
+            // [AZTH] use static method of ArenaTeam to retrieve the slot
+            if (slot == ArenaTeam::GetSlotByType(ARENA_TEAM_1v1))
+                return GetArenaTeamIdFromDB(this->GetGUID(), ARENA_TEAM_1v1);
+            // [/AZTH]
+            return GetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (slot * ARENA_TEAM_END) + ARENA_TEAM_ID);
+        }
         void SetArenaTeamIdInvited(uint32 ArenaTeamId) { m_ArenaTeamIdInvited = ArenaTeamId; }
         uint32 GetArenaTeamIdInvited() { return m_ArenaTeamIdInvited; }
 
