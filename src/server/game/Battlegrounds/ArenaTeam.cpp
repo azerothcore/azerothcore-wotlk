@@ -25,6 +25,7 @@
 #include "Player.h"
 #include "WorldSession.h"
 #include "Opcodes.h"
+#include <Config.h>
 
 ArenaTeam::ArenaTeam()
     : TeamId(0), Type(0), TeamName(), CaptainGuid(0), BackgroundColor(0), EmblemStyle(0), EmblemColor(0),
@@ -552,6 +553,9 @@ uint8 ArenaTeam::GetSlotByType(uint32 type)
         case ARENA_TEAM_2v2: return 0;
         case ARENA_TEAM_3v3: return 1;
         case ARENA_TEAM_5v5: return 2;
+//[AZTH]
+        case ARENA_TEAM_1v1: return 3;
+//[/AZTH]
         default:
             break;
     }
@@ -590,6 +594,12 @@ uint32 ArenaTeam::GetPoints(uint32 memberRating)
         points *= 0.76f;
     else if (Type == ARENA_TEAM_3v3)
         points *= 0.88f;
+//[AZTH]
+    else if (Type == ARENA_TEAM_1v1) // Custom 1v1 Arena Rated
+        points *= sConfigMgr->GetFloatDefault("Azth.Rate.Arena1v1", 0.20f); 
+//[/AZTH]
+    
+    points *= sWorld->getRate(RATE_ARENA_POINTS);
 
     return (uint32) points;
 }
