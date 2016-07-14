@@ -406,8 +406,25 @@ void BattlegroundQueue::FillPlayersToBG(const int32 aliFree, const int32 hordeFr
     int32 aliDiff   = aliFree   - int32(m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount());
     int32 hordeDiff = hordeFree - int32(m_SelectionPools[TEAM_HORDE].GetPlayerCount());
 
-    // if free space differs too much, ballance
-    while (abs(aliDiff - hordeDiff) > 1 && (m_SelectionPools[TEAM_HORDE].GetPlayerCount() > 0 || m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() > 0))
+    // Mik1893: Battleground Balance system 2.0
+    int32 invType = sWorld->getIntConfig(CONFIG_BATTLEGROUND_INVITATION_TYPE);
+    int32 invDiff = 0;
+
+    // check balance configuration and set the max difference between teams
+    switch (invType)
+    {
+        case BG_QUEUE_INVITATION_TYPE_NO_BALANCE:
+            return;
+        case BG_QUEUE_INVITATION_TYPE_BALANCED:
+            invDiff = 1;
+        case BG_QUEUE_INVITATION_TYPE_EVEN:
+            invDiff = 0;
+        default:
+            return;
+    }
+
+    // balance the teams based on the difference allowed
+    while (abs(aliDiff - hordeDiff) > invDiff && (m_SelectionPools[TEAM_HORDE].GetPlayerCount() > 0 || m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() > 0))
     {
         // if results in more alliance players than horde:
         if (aliDiff < hordeDiff)
@@ -469,8 +486,25 @@ void BattlegroundQueue::FillPlayersToBGWithSpecific(const int32 aliFree, const i
     int32 aliDiff   = aliFree   - int32(m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount());
     int32 hordeDiff = hordeFree - int32(m_SelectionPools[TEAM_HORDE].GetPlayerCount());
 
+    // Mik1893: Battleground Balance system 2.0
+    int32 invType = sWorld->getIntConfig(CONFIG_BATTLEGROUND_INVITATION_TYPE);
+    int32 invDiff = 0;
+
+    // check balance configuration and set the max difference between teams
+    switch (invType)
+    {
+    case BG_QUEUE_INVITATION_TYPE_NO_BALANCE:
+        return;
+    case BG_QUEUE_INVITATION_TYPE_BALANCED:
+        invDiff = 1;
+    case BG_QUEUE_INVITATION_TYPE_EVEN:
+        invDiff = 0;
+    default:
+        return;
+    }
+
     // if free space differs too much, ballance
-    while (abs(aliDiff - hordeDiff) > 1 && (m_SelectionPools[TEAM_HORDE].GetPlayerCount() > 0 || m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() > 0))
+    while (abs(aliDiff - hordeDiff) > invDiff && (m_SelectionPools[TEAM_HORDE].GetPlayerCount() > 0 || m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() > 0))
     {
         // if results in more alliance players than horde:
         if (aliDiff < hordeDiff)
@@ -592,7 +626,21 @@ bool BattlegroundQueue::CheckNormalMatch(Battleground* bgTemplate, BattlegroundB
         if (sBattlegroundMgr->isTesting() && bgTemplate->isBattleground() && (m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() || m_SelectionPools[TEAM_HORDE].GetPlayerCount()))
             return true;
 
-        return m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() >= minPlayers && m_SelectionPools[TEAM_HORDE].GetPlayerCount() >= minPlayers;
+        // Mik1893: Battleground Balance System 2.0
+        switch (sWorld->getIntConfig(CONFIG_BATTLEGROUND_INVITATION_TYPE))
+        {
+            case BG_QUEUE_INVITATION_TYPE_NO_BALANCE: // in this case, as soon as both teams have > mincount, start
+                return m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() >= minPlayers && m_SelectionPools[TEAM_HORDE].GetPlayerCount() >= minPlayers;
+            
+            case BG_QUEUE_INVITATION_TYPE_BALANCED: // check difference between selection pools - if = 1 or less start.
+                return abs( int(m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount()) - int(m_SelectionPools[TEAM_HORDE].GetPlayerCount())) <= 1 && m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() >= minPlayers && m_SelectionPools[TEAM_HORDE].GetPlayerCount() >= minPlayers;
+            
+            case BG_QUEUE_INVITATION_TYPE_EVEN: // if both counts are same then it's an even match
+                return (m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() == m_SelectionPools[TEAM_HORDE].GetPlayerCount()) && m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() >= minPlayers && m_SelectionPools[TEAM_HORDE].GetPlayerCount() >= minPlayers;
+            
+            default: // same as unbalanced (in case wrong setting is entered...)
+                return m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() >= minPlayers && m_SelectionPools[TEAM_HORDE].GetPlayerCount() >= minPlayers;
+        }
     }
 }
 

@@ -2467,8 +2467,9 @@ Battleground.QueueAnnouncer.PlayerOnly = 0
 #                          Don't bother with balance)
 #                     1 - (Experimental, Don't allow to invite much more players
 #                          of one faction)
+#                     2 - (Experimental, start when teams are even)
 
-Battleground.InvitationType = 0
+Battleground.InvitationType = 1
 
 #
 #    Battleground.PrematureFinishTimer

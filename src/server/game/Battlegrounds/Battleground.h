@@ -325,6 +325,14 @@ This class is used to:
 3. some certain cases, same for all battlegrounds
 4. It has properties same for all battlegrounds
 */
+
+enum BattlegroundQueueInvitationType
+{
+    BG_QUEUE_INVITATION_TYPE_NO_BALANCE = 0, // no balance: N+M vs N players
+    BG_QUEUE_INVITATION_TYPE_BALANCED   = 1, // teams balanced: N+1 vs N players
+    BG_QUEUE_INVITATION_TYPE_EVEN       = 2  // teams even: N vs N players
+};
+
 class Battleground
 {
     public:
