@@ -158,7 +158,7 @@ namespace Trinity
             return baseGain;
         }
 
-        inline uint32 Gain(Player* player, Unit* u)
+        inline uint32 Gain(Player* player, Unit* u, bool isBattleGround = false)
         {
             uint32 gain;
 
@@ -180,7 +180,7 @@ namespace Trinity
                         gain *= 2;
                 }
 
-                gain = uint32(gain * sWorld->getRate(RATE_XP_KILL));
+                gain = uint32(gain * isBattleGround ? sWorld->getRate(RATE_XP_BG_KILL) : sWorld->getRate(RATE_XP_KILL));
             }
 
             //sScriptMgr->OnGainCalculation(gain, player, u); // pussywizard: optimization

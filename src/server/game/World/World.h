@@ -373,7 +373,7 @@ enum Rates
     RATE_DROP_ITEM_REFERENCED_AMOUNT,
     RATE_DROP_MONEY,
     RATE_XP_KILL,
-    // Manca RATE_XP_BG_KILL -> enum = 20
+    RATE_XP_BG_KILL,
     RATE_XP_QUEST,
     RATE_XP_EXPLORE,
     RATE_REPAIRCOST,
@@ -801,6 +801,8 @@ class World
 
         std::string const& GetRealmName() const { return _realmName; } // pussywizard
         void SetRealmName(std::string name) { _realmName = name; } // pussywizard
+
+        void SendGameMail(Player* receiver, std::string subject, std::string body, uint32 money, uint32 itemId = 0, uint32 itemCount = 0); //[AZTH] in-game mailer
 
     protected:
         void _UpdateGameTime();

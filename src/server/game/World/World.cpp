@@ -495,6 +495,7 @@ void World::LoadConfigSettings(bool reload)
     rate_values[RATE_DROP_ITEM_REFERENCED_AMOUNT] = sConfigMgr->GetFloatDefault("Rate.Drop.Item.ReferencedAmount", 1.0f);
     rate_values[RATE_DROP_MONEY]  = sConfigMgr->GetFloatDefault("Rate.Drop.Money", 1.0f);
     rate_values[RATE_XP_KILL]     = sConfigMgr->GetFloatDefault("Rate.XP.Kill", 1.0f);
+    rate_values[RATE_XP_BG_KILL] = sConfigMgr->GetFloatDefault("Rate.XP.BattlegroundKill", 1.0f);
     rate_values[RATE_XP_QUEST]    = sConfigMgr->GetFloatDefault("Rate.XP.Quest", 1.0f);
     rate_values[RATE_XP_EXPLORE]  = sConfigMgr->GetFloatDefault("Rate.XP.Explore", 1.0f);
     rate_values[RATE_REPAIRCOST]  = sConfigMgr->GetFloatDefault("Rate.RepairCost", 1.0f);
@@ -3245,4 +3246,39 @@ uint32 World::GetGlobalPlayerGUID(std::string const& name) const
     if (itr != _globalPlayerNameStore.end())
         return itr->second;
     return 0;
+}
+
+void World::SendGameMail(Player* receiver, std::string subject, std::string body, uint32 money, uint32 itemId /* =0 */, uint32 itemCount /* =0 */)
+{
+    uint32 receiver_guid = receiver->GetGUIDLow();
+    sLog->outError("Sending 10 golds boost mail to player %u", receiver_guid);
+
+    SQLTransaction trans = CharacterDatabase.BeginTransaction();
+    MailDraft* mail = NULL;
+
+    mail = new MailDraft(subject, body);
+
+    if (money)
+    {
+        mail->AddMoney(money);
+    }
+
+    if (itemId)
+    {
+        ItemTemplate const* pProto = sObjectMgr->GetItemTemplate(itemId);
+        if (pProto)
+        {
+            Item* mailItem = Item::CreateItem(itemId, itemCount);
+            if (mailItem)
+            {
+                mailItem->SaveToDB(trans);
+                mail->AddItem(mailItem);
+            }
+        }
+    }
+
+    mail->SendMailTo(trans, receiver ? receiver : MailReceiver(receiver_guid), MailSender(MAIL_NORMAL, 0, MAIL_STATIONERY_GM), MAIL_CHECK_MASK_RETURNED);
+    delete mail;
+
+    CharacterDatabase.CommitTransaction(trans);
 }
