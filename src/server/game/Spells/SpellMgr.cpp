@@ -3238,6 +3238,9 @@ void SpellMgr::LoadDbcDataCorrections()
 
         switch (spellInfo->Id)
         {
+            case 38776: // Evergrove Druid Transform Crow
+                spellInfo->DurationIndex = 4; // 120 seconds
+                break;
             case 63026: // Force Cast (HACK: Target shouldn't be changed)
             case 63137: // Force Cast (HACK: Target shouldn't be changed; summon position should be untied from spell destination)
                 spellInfo->EffectImplicitTargetA[EFFECT_0] = TARGET_DEST_DB;
