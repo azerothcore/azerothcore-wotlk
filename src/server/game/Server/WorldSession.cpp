@@ -1276,6 +1276,7 @@ void WorldSession::InitWarden(BigNumber* k, std::string const& os)
     }
 }
 
+// [AZTH] Send External Mails
 void WorldSession::SendExternalMails()
 {
     sLog->outError("EXTERNAL MAIL> Sending mails in queue...");
@@ -1342,3 +1343,5 @@ void WorldSession::SendExternalMails()
     ExtraDatabase.CommitTransaction(trans2);
     sLog->outError("EXTERNAL MAIL> ALL MAILS SENT!");
 }
+// [/AZTH]
+
