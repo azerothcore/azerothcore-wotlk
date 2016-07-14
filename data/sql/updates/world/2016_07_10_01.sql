@@ -1,4 +1,4 @@
-ALTER TABLE world_db_version CHANGE COLUMN 2016_07_09_01 2016_07_10_01 bit;
+ALTER TABLE world_db_version CHANGE COLUMN 2016_07_10_00 2016_07_10_01 bit;
 
 /* Spawn missing Midsummer bonfire */
 SET @STARTGUID := 268968;
