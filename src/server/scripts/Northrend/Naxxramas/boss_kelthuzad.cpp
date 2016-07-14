@@ -175,6 +175,8 @@ public:
                     go->SetPhaseMask(1, true);
                     go->SetGoState(GO_STATE_READY);
                 }
+                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_KELTHUZAD_GATE)))
+                    go->SetGoState(GO_STATE_ACTIVE);
             }
         }
 
@@ -234,6 +236,8 @@ public:
                     go->SetGoState(GO_STATE_ACTIVE);
                 }
             }
+            if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_KELTHUZAD_GATE)))
+                go->SetGoState(GO_STATE_READY);
         }
 
         void JustSummoned(Creature* cr) { summons.Summon(cr); }
