@@ -3025,6 +3025,37 @@ class spell_q12919_gymers_throw : public SpellScriptLoader
         }
 };
 
+#define QUEST_CROW_TRANSFORM 9718
+
+// spell 38776 
+class spell_q9718_crow_transform : public SpellScriptLoader
+{
+public:
+    spell_q9718_crow_transform() : SpellScriptLoader("spell_q9718_crow_transform") { }
+
+    class spell_q9718_crow_transform_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_q9718_crow_transform_AuraScript)
+
+        void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            if(GetOwner())
+                if(Player* player = GetOwner()->ToPlayer())
+                    player->CompleteQuest(QUEST_CROW_TRANSFORM);
+        }
+
+        void Register()
+        {
+            OnEffectRemove += AuraEffectRemoveFn(spell_q9718_crow_transform_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_TRANSFORM, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_q9718_crow_transform_AuraScript();
+    }
+};
+
 
 void AddSC_quest_spell_scripts()
 {
@@ -3049,6 +3080,7 @@ void AddSC_quest_spell_scripts()
     new spell_q11198_take_down_tethyr();
     new spell_q11653_youre_not_so_big_now();
     new spell_q10985_light_of_the_naaru();
+    new spell_q9718_crow_transform();
 
     // Theirs
     new spell_q55_sacred_cleansing();
