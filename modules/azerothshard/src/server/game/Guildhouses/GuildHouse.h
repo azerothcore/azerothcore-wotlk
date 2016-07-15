@@ -109,9 +109,8 @@ class GuildHouseObject
     uint32 GetGuildByGuardID(uint32 guid);
 	uint32 GetGuildByGuardID(Creature* guardia); 
     void ControlGuildHouse();
+    void LoadGuildHouseSystem();
 };
-
-void LoadGuildHouseSystem();
 
 extern GuildHouseObject GHobj;
 #endif

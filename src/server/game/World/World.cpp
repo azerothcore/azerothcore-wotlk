@@ -1741,7 +1741,7 @@ void World::SetInitialWorldSettings()
     sLog->outString("Loading Calendar data...");
     sCalendarMgr->LoadFromDB();
 
-    LoadGuildHouseSystem();     // [AZTH] Load Guildhouses
+    GHobj.LoadGuildHouseSystem();     // [AZTH] Load Guildhouses
 
     sLog->outString("Initializing SpellInfo precomputed data..."); // must be called after loading items, professions, spells and pretty much anything
     sObjectMgr->InitializeSpellInfoPrecomputedData();
