@@ -7,7 +7,7 @@
 
 /* This is where custom AzerothShard function scripts declarations should be added. */
 // void AddSC_azth_commandscript();
-// void AddSC_CrossFactionGroups();
+void AddSC_CrossFactionGroups();
 void AddSC_azth_player_plg();
 // void AddSC_Custom_Rates();
 // void AddSC_PWS_Transmogrification();
@@ -24,7 +24,7 @@ void AddAzthScripts()
     sLog->outString("Loading AzerothShard Plugins...");
     /* This is where custom AzerothShard scripts should be added. */
 //     AddSC_azth_commandscript();
-//     AddSC_CrossFactionGroups();
+    AddSC_CrossFactionGroups();
     AddSC_azth_player_plg();
 //     AddSC_Custom_Rates();
     AddSC_npc_1v1arena();
