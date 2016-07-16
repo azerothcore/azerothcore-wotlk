@@ -46,9 +46,9 @@ void CrossFaction::LoadConfig(bool reload)
         areaDisable.clear();
     }
 
-    QueryResult mapResult = ExtraDatabase.PQuery("SELECT id FROM extra.crossfaction_disable where type = 1");
-    QueryResult zoneResult = ExtraDatabase.PQuery("SELECT id FROM extra.crossfaction_disable where type = 2");
-    QueryResult areaResult = ExtraDatabase.PQuery("SELECT id FROM extra.crossfaction_disable where type = 3");
+    QueryResult mapResult = ExtraDatabase.PQuery("SELECT id FROM crossfaction_disable where type = 1");
+    QueryResult zoneResult = ExtraDatabase.PQuery("SELECT id FROM crossfaction_disable where type = 2");
+    QueryResult areaResult = ExtraDatabase.PQuery("SELECT id FROM crossfaction_disable where type = 3");
 
     // load in the vector the different types of disable
     if (mapResult)
