@@ -10,8 +10,6 @@
 
 set(scripts_STAT_SRCS
   ${scripts_STAT_SRCS}
-  Hearthstone/azth_custom_hearthstone_mode.cpp
-  Hearthstone/azth_custom_new_vendor.cpp
 )
 
 message("  -> Prepared: Custom")

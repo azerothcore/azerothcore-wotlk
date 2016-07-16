@@ -1241,17 +1241,11 @@ void AddBattlegroundScripts()
 
 #ifdef SCRIPTS
 /* This is where custom scripts' loading functions should be declared. */
-
-//[AZTH]
-void AddSC_hearthstone();
-//[/AZTH]
-
 #endif
 
 void AddCustomScripts()
 {
 #ifdef SCRIPTS
     /* This is where custom scripts should be added. */
-	AddSC_hearthstone();
 #endif
 }
