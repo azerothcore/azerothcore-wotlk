@@ -43,7 +43,7 @@ UPDATE creature_template SET resistance2 = 21000 WHERE entry = 100006;
 
 UPDATE creature_template SET  `npcflag` = 129, `unit_flags` = 514, `type_flags` = 0, `flags_extra` = 0, scriptname = "npc_azth_vendor" WHERE entry IN (100002, 100003, 100004, 100005, 100006);
 
-SELECT entry, resistance2 FROM creature_template WHERE entry >= 100002;
+-- SELECT entry, resistance2 FROM creature_template WHERE entry >= 100002;
 
 DELETE FROM npc_text WHERE ID IN (100000, 100001, 100002, 100003);
 INSERT INTO npc_text (ID, text0_0, text0_1, lang0, Prob0, em0_0) VALUES 
@@ -57,10 +57,14 @@ UPDATE `item_template` SET `Flags` = 64, `ScriptName` = 'item_azth_hearthstone_l
 -- DEBUG ONLY
 DELETE FROM npc_vendor WHERE entry IN (100002, 100003, 100004, 100005, 100006, 100007);
 INSERT INTO npc_vendor (entry, item, extendedcost) VALUES 
-(100002, 1388, 0),
-(100003, 1159, 0),
-(100004, 2132, 100010),
-(100004, 5393, 100001),
-(100005, 5581, 0),
-(100006, 20839, 0),
-(100007, 5393, 0);
+(100002, 32558, 100010),
+(100003, 32558, 100009),
+(100004, 32558, 100008),
+(100004, 32558, 100007),
+(100005, 32558, 100006),
+(100006, 32558, 100005),
+(100003, 49426, 100005),
+(100003, 47241, 100004),
+(100003, 45624, 100003),
+(100003, 40753, 100002),
+(100003, 49752, 100001);

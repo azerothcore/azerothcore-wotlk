@@ -74,7 +74,7 @@ void AzthSendListInventory(uint64 vendorGuid, WorldSession * session, uint32 ext
 				}
 
 				// reputation discount
-				uint32 ExtendedToGold = item->ExtendedCost > extendedCostStartValue ? (item->ExtendedCost - extendedCostStartValue) : 0;
+				uint32 ExtendedToGold = item->ExtendedCost > extendedCostStartValue ? (item->ExtendedCost - extendedCostStartValue)*10000 : 0;
 				int32 price = item->IsGoldRequired(itemTemplate) ? uint32(floor(itemTemplate->BuyPrice * discountMod)) : ExtendedToGold;
 
 				data << uint32(slot + 1);       // client expects counting to start at 1
