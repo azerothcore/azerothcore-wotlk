@@ -5,7 +5,7 @@
 #include "Chat.h"
 #include "Language.h"
 
-/* [TODO] fix and re-enable
+// [TODO] fix and re-enable
 class CustomRates {
 private:
     static float GetRateFromDB(const Player *player, CharacterDatabaseStatements statement);
@@ -20,6 +20,5 @@ public:
 
     static void SaveXpRateToDB(const Player *player, float rate);
 };
-*/
 
 #endif

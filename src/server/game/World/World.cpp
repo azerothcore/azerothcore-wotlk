@@ -1226,6 +1226,14 @@ void World::LoadConfigSettings(bool reload)
     m_int_configs[CONFIG_ANTICHEAT_MAX_REPORTS_FOR_DAILY_REPORT] = sConfigMgr->GetIntDefault("Anticheat.MaxReportsForDailyReport", 70);
     //[AZTH]
 
+    // [AZTH]
+    m_int_configs[CONFIG_PLAYER_INDIVIDUAL_XP_RATE_SECURITY] = sConfigMgr->GetIntDefault("Player.customXP.security", 0);
+    m_float_configs[CONFIG_PLAYER_MAXIMUM_INDIVIDUAL_XP_RATE] = sConfigMgr->GetFloatDefault("Player.customXP.maxValue", 1);
+    m_bool_configs[CONFIG_PLAYER_INDIVIDUAL_XP_RATE_SHOW_ON_LOGIN] = sConfigMgr->GetBoolDefault("Player.customXP.showOnLogin", false);
+    m_int_configs[CONFIG_EXTERNAL_MAIL] = sConfigMgr->GetIntDefault("ExternalMail", 0);
+    m_int_configs[CONFIG_EXTERNAL_MAIL_INTERVAL] = sConfigMgr->GetIntDefault("ExternalMailInterval", 1);
+    // [/AZTH]
+
     // DBC_ItemAttributes
     m_bool_configs[CONFIG_DBC_ENFORCE_ITEM_ATTRIBUTES] = sConfigMgr->GetBoolDefault("DBC.EnforceItemAttributes", true);
 

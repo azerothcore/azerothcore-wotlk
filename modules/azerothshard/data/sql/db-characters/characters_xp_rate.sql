@@ -1,4 +1,3 @@
-DROP TABLE IF EXISTS `character_xp_rate`;
 CREATE TABLE `character_xp_rate` (
   `guid` int(10) UNSIGNED NOT NULL,
   `xp_rate` float UNSIGNED NOT NULL DEFAULT '1',

@@ -2,8 +2,9 @@
 #include "Chat.h"
 #include "Language.h"
 #include "server/game/CustomRates.h"
+#include "Player.h"
 
-/* [TODO] fix and re-enable
+ // [TODO] fix and re-enable
 float CustomRates::GetRateFromDB(const Player *player, CharacterDatabaseStatements statement) {
     PreparedStatement *stmt = CharacterDatabase.GetPreparedStatement(statement);
     stmt->setUInt32(0, player->GetGUID());
@@ -48,4 +49,3 @@ void CustomRates::SaveXpRateToDB(const Player *player, float rate) {
 
     SaveRateToDB(player, rate, update, CHAR_UPD_INDIVIDUAL_XP_RATE, CHAR_INS_INDIVIDUAL_XP_RATE);
 }
-*/
