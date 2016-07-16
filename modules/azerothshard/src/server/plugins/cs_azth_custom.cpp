@@ -15,21 +15,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
- #include "Chat.h"
- #include "ScriptMgr.h"
- #include "AccountMgr.h"
- #include "ArenaTeamMgr.h"
- #include "CellImpl.h"
- #include "GridNotifiers.h"
- #include "Group.h"
- #include "Language.h"
- #include "Opcodes.h"
- #include "Player.h"
- #include "Pet.h"
- #include "ReputationMgr.h"
- #include "server/game/CustomRates.h"
- #include "server/game/AzthSharedDefines.h"
-
+#include "Chat.h"
+#include "ScriptMgr.h"
+#include "AccountMgr.h"
+#include "ArenaTeamMgr.h"
+#include "CellImpl.h"
+#include "GridNotifiers.h"
+#include "Group.h"
+#include "Language.h"
+#include "Opcodes.h"
+#include "Player.h"
+#include "Pet.h"
+#include "ReputationMgr.h"
+#include "server/game/CustomRates.h"
+#include "server/game/AzthSharedDefines.h"
+ 
  class azth_commandscript : public CommandScript {
  public:
 
@@ -225,28 +225,13 @@
              return false;
          }
 
-         enum SkillSpells {
-             ONE_HAND_AXES = 196,
-             TWO_HAND_AXES = 197,
-             ONE_HAND_MACES = 198,
-             TWO_HAND_MACES = 199,
-             POLEARMS = 200,
-             ONE_HAND_SWORDS = 201,
-             TWO_HAND_SWORDS = 202,
-             STAVES = 227,
-             BOWS = 264,
-             GUNS = 266,
-             DAGGERS = 1180,
-             WANDS = 5009,
-             CROSSBOWS = 5011,
-             FIST_WEAPONS = 15590
-         };
          static const SkillSpells spells[] = {ONE_HAND_AXES, TWO_HAND_AXES, ONE_HAND_MACES,
              TWO_HAND_MACES, POLEARMS, ONE_HAND_SWORDS, TWO_HAND_SWORDS, STAVES, BOWS,
              GUNS, DAGGERS, WANDS, CROSSBOWS, FIST_WEAPONS};
 
          std::list<SkillSpells> learnList;
-         for (SkillSpells spell : spells) {
+         for (int s=0; s<sizeof(spells); s++) {
+             SkillSpells spell = spells[s];
              switch (target->getClass()) {
                  case CLASS_WARRIOR:
                      if (spell != WANDS)
@@ -294,9 +279,9 @@
              }
          }
 
-         for (SkillSpells spell : learnList) {
-             if (!target->HasSpell(spell))
-                 target->learnSpell(spell);
+         for (std::list<SkillSpells>::const_iterator spell = learnList.begin(), end = learnList.end(); spell != end; ++spell) {
+             if (!target->HasSpell(*spell))
+                 target->learnSpell(*spell);
          }
 
          target->UpdateSkillsToMaxSkillsForLevel();

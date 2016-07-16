@@ -22,7 +22,7 @@ public:
         uint8 level;
     };
 
-    typedef std::unordered_map<uint16 /*achiId*/, CompletedAchievementData /*data*/> CompletedAchievementMap;
+    typedef UNORDERED_MAP<uint16 /*achiId*/, CompletedAchievementData /*data*/> CompletedAchievementMap;
     CompletedAchievementMap m_completed_achievement_map;
     uint32 instanceID;
 
