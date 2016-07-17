@@ -47,10 +47,10 @@ UPDATE creature_template SET  `npcflag` = 129, `unit_flags` = 514, `type_flags` 
 
 DELETE FROM npc_text WHERE ID IN (100000, 100001, 100002, 100003);
 INSERT INTO npc_text (ID, text0_0, text0_1, lang0, Prob0, em0_0) VALUES 
-(100000, "È bello che tu voglia aiutarmi $N, la storia dev'essere scrupolosamente registrata... nulla deve andar perso!", 0, 1,100, 0),
-(100001, "Hai già delle missioni da completare, ritorna quando sarai riuscito a portarle a termine o quando avrai rinunciato...\nNonostante il fallimento potrei avere ancora bisogno di te, $R", 0, 1,100, 0),
-(100002, "Grazie del tuo aiuto, $C, per oggi mi hai aiutato a sufficienza!\nRitorna domani.", 0, 1,100, 0),
-(100003, "Hai già molto lavoro da fare, $N. Non vorrei che ti affaticassi troppo... torna da me quando avrai concluso un po' del tuo lavoro.", 0, 1,100, 0);
+(100000, "È bello che tu voglia aiutarmi $N, la storia dev'essere scrupolosamente registrata... nulla deve andar perso!", 0, 0,100, 0),
+(100001, "Hai già delle missioni da completare, ritorna quando sarai riuscito a portarle a termine o quando avrai rinunciato...\nNonostante il fallimento potrei avere ancora bisogno di te, $R", 0, 0,100, 0),
+(100002, "Grazie del tuo aiuto, $C, per oggi mi hai aiutato a sufficienza!\nRitorna domani.", 0, 0,100, 0),
+(100003, "Hai già molto lavoro da fare, $N. Non vorrei che ti affaticassi troppo... torna da me quando avrai concluso un po' del tuo lavoro.", 0, 0,100, 0);
 
 UPDATE `item_template` SET `Flags` = 64, `ScriptName` = 'item_azth_hearthstone_loot_sack', stackable = 1, `spellid_1` = 36177, maxcount = 5 WHERE (entry = 32558);
 

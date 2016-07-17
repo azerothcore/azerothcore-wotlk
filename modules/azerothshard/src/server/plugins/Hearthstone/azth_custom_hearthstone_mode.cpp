@@ -169,7 +169,7 @@ public:
 	bool OnGossipHello(Player* player, Creature* creature) override
 	{
 		uint32 rep = player->GetReputation(AZTH_REPUTATION_ID);
-		if ((rep >= creature->GetResistance(SPELL_SCHOOL_FIRE)) || player->IsGameMaster()) // resistance 2
+		if ((rep >= creature->GetResistance(SPELL_SCHOOL_FIRE) && (player->GetReputationRank(AZTH_REPUTATION_ID) >= 3)) || player->IsGameMaster()) // resistance 2
 			AzthSendListInventory(creature->GetGUID(), player->GetSession(), 100000);
 		return true;
 	}
@@ -300,6 +300,8 @@ class item_azth_hearthstone_loot_sack : public ItemScript
 			
 			draft->SendMailTo(trans, MailReceiver(player), MailSender(player), MAIL_CHECK_MASK_RETURNED, deliverDelay);
 			CharacterDatabase.CommitTransaction(trans);
+
+			
 			player->DestroyItem(item->GetBagSlot(), item->GetSlot(), true);
 			return true;
 		}
