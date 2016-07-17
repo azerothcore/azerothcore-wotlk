@@ -25,12 +25,15 @@ void CrossFaction::UpdatePlayerTeam(Group* group, uint64 guid, bool reset /* = f
             sLog->outError("Crossfaction disabled for player %s", player->GetName().c_str());
         }
 
-        // if not reset, set the player's race to the group leader race
+        // check conditions and set new faction
         if (!reset)
             if(!disable)
                 if (group)
                     if (Player* groupLeader = ObjectAccessor::FindPlayer(group->GetLeaderGUID()))
+                    {
                         player->setFactionForRace(groupLeader->getRace());
+                        return;
+                    }
 
         // ANY OTHER CASE: just reset it back
         player->setFactionForRace(player->getRace());
