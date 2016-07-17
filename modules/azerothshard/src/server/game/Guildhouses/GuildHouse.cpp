@@ -295,15 +295,15 @@ void GuildHouseObject::LoadGuildHouse()
         {
 			if (!CheckGuildID(guildID))
 			{
+                sLog->outError("Guild %u does not exist - guildhouse not loaded", guildID);
 				continue;
-                sLog->outError("Loading GH for guild %u failed - CHECK FAILED", guildID);
 			}
                 
 
             QueryResult result2 = CharacterDatabase.PQuery("SELECT `GuildHouse_Add` FROM `gh_guildadd` WHERE `guildId` = %u", guildID);
             if (result2)
             {
-                sLog->outError("Cannot find gh_guildadd information for guild %u - CHECK FAILED", guildID);
+                sLog->outError("Loaded guildadd information for guild %u", guildID);
                 Field *fields2 = result2->Fetch();
                 add = fields2[0].GetUInt32();
             }
@@ -314,11 +314,13 @@ void GuildHouseObject::LoadGuildHouse()
             RemoveGuildHouseAdd(id);
             AddGuildHouseAdd(id, add, guildID);
         }
-		else{
+		else
+        {
             sLog->outError("Loading GH for guild %u failed - NOT VALID", guildID);
 			RemoveGuildHouseAdd(id);
 		}
-    } while (result->NextRow());
+    } 
+    while (result->NextRow());
 
 
     sLog->outError("Loaded  %u Guildhouses", GH_map.size());
@@ -330,14 +332,14 @@ void GuildHouseObject::LoadGuildHouseAdd()
     mGuildGuardID.clear();
 
 
-    sLog->outError("Loading GuildHouse system...");
+    sLog->outError("Loading GuildHouse npcs - objects...");
 
     QueryResult result = WorldDatabase.Query("SELECT `guid`,`type`,`id`,`add_type` FROM guildhouses_add ORDER BY Id ASC");
 
     if (!result)
     {
 
-        sLog->outError("Loaded 0 guildhouse adds");
+        sLog->outError("Loaded 0 guildhouse npcs - objects");
         return;
     }
 
@@ -370,7 +372,8 @@ void GuildHouseObject::LoadGuildHouseAdd()
             }
             GH_AddHouse[find].AddGO.push_back(guid);
         }
-    } while (result->NextRow());
+    } 
+    while (result->NextRow());
 
     sLog->outError("Loaded  %u Guildhouse objects", GH_AddHouse.size());
 }
@@ -384,7 +387,8 @@ uint32 GuildHouseObject::GetGuildByGuardID(uint32 guid)
 }
 
 uint32 GuildHouseObject::GetGuildByGuardID(Creature* guardia)
-{//override della funzione presunta causa del bug delle guardie
+{
+    //override della funzione presunta causa del bug delle guardie
 	uint32 guid = guardia->GetDBTableGUIDLow();
 	GuildGuardID::const_iterator i = mGuildGuardID.begin();
     for (; i != mGuildGuardID.end(); ++i)

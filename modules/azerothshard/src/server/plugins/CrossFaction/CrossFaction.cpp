@@ -25,12 +25,15 @@ void CrossFaction::UpdatePlayerTeam(Group* group, uint64 guid, bool reset /* = f
             sLog->outError("Crossfaction disabled for player %s", player->GetName().c_str());
         }
 
-        // if not reset, set the player's race to the group leader race
+        // check conditions and set new faction
         if (!reset)
             if(!disable)
                 if (group)
                     if (Player* groupLeader = ObjectAccessor::FindPlayer(group->GetLeaderGUID()))
+                    {
                         player->setFactionForRace(groupLeader->getRace());
+                        return;
+                    }
 
         // ANY OTHER CASE: just reset it back
         player->setFactionForRace(player->getRace());
@@ -39,6 +42,7 @@ void CrossFaction::UpdatePlayerTeam(Group* group, uint64 guid, bool reset /* = f
 
 void CrossFaction::LoadConfig(bool reload)
 {
+    sLog->outError("Loading Crossfaction disable rules...");
     if (reload)
     {
         mapDisable.clear();
@@ -51,26 +55,41 @@ void CrossFaction::LoadConfig(bool reload)
     QueryResult areaResult = ExtraDatabase.PQuery("SELECT id FROM crossfaction_disable where type = 3");
 
     // load in the vector the different types of disable
+    uint32 mapcount = 0;
+    uint32 zonecount = 0;
+    uint32 areacount = 0;
+
     if (mapResult)
     {
         do
+        {
             mapDisable.push_back((*mapResult)[0].GetUInt32());
+            mapcount++;
+        }
         while (mapResult->NextRow());
     }
-
+    
     if (zoneResult)
     {
         do
+        {
             zoneDisable.push_back((*zoneResult)[0].GetUInt32());
+            zonecount++;
+        } 
         while (zoneResult->NextRow());
     }
 
     if (areaResult)
     {
         do
+        {
             areaDisable.push_back((*areaResult)[0].GetUInt32());
+            areacount++;
+        }   
         while (areaResult->NextRow());
     }
+
+    sLog->outError("%u maps, %u zones, %u areas have been disabled for crossfaction ", mapcount,zonecount,areacount);
 }
 
 // ALL THE SCRIPT FUNCTIONS AFTER THIS POINT: GROUPSCRIPT, PLAYERSCRIPT, WORLDSCRIPT
