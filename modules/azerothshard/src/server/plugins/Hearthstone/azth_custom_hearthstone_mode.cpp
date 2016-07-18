@@ -160,7 +160,7 @@ public:
 	}
 };
 
-int AZTH_REPUTATION_ID				= 1082;
+int AZTH_REPUTATION_ID				= 948;
 #define GOSSIP_ITEM_SHOW_ACCESS     "Vorrei vedere la tua merce, per favore."
 
 class npc_azth_vendor : public CreatureScript

@@ -1,5 +1,5 @@
 -- update quests with rep
-UPDATE `quest_template` SET `Flags` = 4226, `RewardFactionID1` = 68, `RewardFactionValueId1` = 0, RewardFactionValueIdOverride1 = 10 WHERE ID BETWEEN 100000 AND 100080;
+UPDATE `quest_template` SET `Flags` = 4226, `RewardFactionID1` = 948, `RewardFactionValueId1` = 0, RewardFactionValueIdOverride1 = 10 WHERE ID BETWEEN 100000 AND 100080;
 
 -- mark of azeroth
 
@@ -111,6 +111,6 @@ INSERT INTO npc_text (ID, text0_0, text0_1, lang0, Prob0, em0_0) VALUES
 (100010, "Il Maestro è una persona molto stimata e famosa... aiutalo, e sarà generoso con te, $n!", 0, 0,100, 0);
 
 -- UPDATE quest_template SET method = 0, TYPE = 0, flags = 4098, rewardfactionid1 = 69, rewardfactionvalueid1 = 6, RewardFactionValueIdOverride1 = 0, unknown0 = 1 WHERE id = 100000;
-UPDATE quest_template SET method = 0, TYPE = 0, flags = 4098, rewardfactionid1 = 1082, rewardfactionvalueid1 = 1, RewardFactionValueIdOverride1 = 0, unknown0 = 1 WHERE ID BETWEEN 100000 AND 100080;
+UPDATE quest_template SET method = 0, TYPE = 0, flags = 4098, rewardfactionid1 = 948, rewardfactionvalueid1 = 1, RewardFactionValueIdOverride1 = 0, unknown0 = 1 WHERE ID BETWEEN 100000 AND 100080;
 
 DELETE FROM item_template WHERE entry >= 100017 AND subclass IN (0, 5, 7,8,9,10); 
