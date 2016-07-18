@@ -1,5 +1,5 @@
 -- update quests with rep
-UPDATE `quest_template` SET `Flags` = 4290, `RewardFactionID1` = 1082, `RewardFactionValueId1` = 1 WHERE ID BETWEEN 100000 AND 100080;
+UPDATE `quest_template` SET `Flags` = 4290, `RewardFactionID1` = 1082, `RewardFactionValueId1` = 0, RewardFactionValueIdOverride1 = 10 WHERE ID BETWEEN 100000 AND 100080;
 
 -- mark of azeroth
 

@@ -1,3 +1,8 @@
+DELETE FROM npc_text WHERE ID IN (32001, 32002);
+INSERT INTO npc_text (ID, text0_0, text0_1, lang0, Prob0, em0_0) VALUES 
+(32001, "Qui si paga in Marks of Azeroth!", 0, 0, 100, 0),
+(32002, "Ti serve più reputazione!", 0, 0, 100, 0);
+
 -- Quartermaster Ozorg (Dk start set vendor)
 -- FRIENDLY
 DELETE FROM `creature_template` WHERE (entry = 100100);
@@ -5,7 +10,7 @@ INSERT INTO `creature_template` (`entry`, `difficulty_entry_1`, `difficulty_entr
 (100100, 0, 0, 0, 0, 0, 16214, 0, 0, 0, 'Quartermaster Ozorg', 'Acherus Quartermaster', '', 0, 72, 72, 1, 35, 128, 1, 1.14286, 1, 0, 0, 2000, 2000, 1, 33555202, 2048, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 1, 1, 4, 1, 1, 0, 0, 1, 0, 128, '', 12340);
 
 -- requires friendly with azerothshard (3000 rep)
-UPDATE creature_template SET resistance2 = 3000, `npcflag` = 129, `unit_flags` = 514, `type_flags` = 0, `flags_extra` = 0, scriptname = "npc_azth_vendor" WHERE entry = 100100; 
+UPDATE creature_template SET resistance2 = 3000, `npcflag` = 129, `unit_flags` = 768, `type_flags` = 134217728, `flags_extra` = 2, scriptname = "npc_azth_vendor"  WHERE entry = 100100; 
 
 DELETE FROM npc_vendor WHERE entry = 100100;
 INSERT INTO npc_vendor (entry, item, extendedcost) VALUES 
@@ -40,5 +45,11 @@ INSERT INTO npc_vendor (entry, item, extendedcost) VALUES
 (100100, 34658, 100003), -- ring
 (100100, 34659, 100008), -- back
 (100100, 34661, 100030), -- weapon
-(100100, 38147, 100003),
-(100100, 136942, 1002000); -- ring
+(100100, 38147, 100003); -- ring 
+
+-- gossip id inside resistance1 to send the vendor with the gossip
+UPDATE creature_template SET resistance1 = 32000, gossip_menu_id = 32001 WHERE entry = 100100;
+
+DELETE FROM npc_text WHERE ID = 32000;
+INSERT INTO npc_text (ID, text0_0, text0_1, lang0, Prob0, em0_0) VALUES 
+(32000, "Se tu vuoi comprare, tu dare me Marks of Azeroth!", 0, 0, 100, 0);

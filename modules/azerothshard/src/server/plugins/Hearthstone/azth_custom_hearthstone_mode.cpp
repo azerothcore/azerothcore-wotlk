@@ -6,6 +6,7 @@
 #include "WorldSession.h"
 #include "azth_custom_new_vendor.cpp"
 #include "WorldPacket.h"
+#include "Chat.h"
 
 
 #define GOSSIP_ITEM_GIVE_PVE_QUEST      "Vorrei ricevere la mia missione PVE giornaliera."
@@ -159,18 +160,40 @@ public:
 	}
 };
 
-int AZTH_REPUTATION_ID		= 1082;
+int AZTH_REPUTATION_ID				= 1082;
+#define GOSSIP_ITEM_SHOW_ACCESS     "Vorrei vedere la tua merce, per favore."
 
 class npc_azth_vendor : public CreatureScript
 {
 public:
 	npc_azth_vendor() : CreatureScript("npc_azth_vendor") { }
 
-	bool OnGossipHello(Player* player, Creature* creature) override
+	bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action)
 	{
-		uint32 rep = player->GetReputation(AZTH_REPUTATION_ID);
-		if ((rep >= creature->GetResistance(SPELL_SCHOOL_FIRE) && (player->GetReputationRank(AZTH_REPUTATION_ID) >= 3)) || player->IsGameMaster()) // resistance 2
+		player->PlayerTalkClass->ClearMenus();
+
+		if (action == GOSSIP_ACTION_TRADE)
 			AzthSendListInventory(creature->GetGUID(), player->GetSession(), 100000);
+
+		return true;
+	}
+
+	bool OnGossipHello(Player* player, Creature* creature)
+	{
+		uint16 gossip;
+		gossip = 32001;
+		if (creature->GetResistance(SPELL_SCHOOL_HOLY) != 0)
+			gossip = creature->GetResistance(SPELL_SCHOOL_HOLY);
+
+		uint32 rep = player->GetReputation(AZTH_REPUTATION_ID);
+		if (creature->IsVendor() && rep >= creature->GetResistance(SPELL_SCHOOL_FIRE) && (player->GetReputationRank(AZTH_REPUTATION_ID) >= 3))
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_VENDOR, GOSSIP_ITEM_SHOW_ACCESS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
+
+		if (player->GetReputation(AZTH_REPUTATION_ID) < creature->GetResistance(SPELL_SCHOOL_FIRE))
+			player->SEND_GOSSIP_MENU(32002, creature->GetGUID());
+		else
+			player->SEND_GOSSIP_MENU(gossip, creature->GetGUID());
+
 		return true;
 	}
 };
@@ -198,7 +221,7 @@ void getItems()
 	} while (result->NextRow());
 }
 
-float CHANCES[8] = { 10.f, 30.f, 20.f, 15.f, 5.f, 0.01f, 0.01f, 10.f };
+float CHANCES[8] = { 10.f, 30.f, 20.f, 15.f, 5.f, 0.1f, 0.1f, 1.f };
 int QUALITY_TO_FILL_PERCENTAGE = 1;
 int ONLY_COMMON = 2;
 int NOT_COMMON = 1;
@@ -301,10 +324,30 @@ class item_azth_hearthstone_loot_sack : public ItemScript
 			draft->SendMailTo(trans, MailReceiver(player), MailSender(player), MAIL_CHECK_MASK_RETURNED, deliverDelay);
 			CharacterDatabase.CommitTransaction(trans);
 
-			
+			// devi controllare se le quest danno rep pure
+			// player->TextEmote("controlla la tua mail!");
+
+
+			ChatHandler(player->GetSession()).SendSysMessage("Controlla la tua mail!");
+
 			player->DestroyItem(item->GetBagSlot(), item->GetSlot(), true);
 			return true;
 		}
+};
+
+class npc_azth_quest_taker : public CreatureScript
+{
+public:
+	npc_azth_quest_taker() : CreatureScript("npc_azth_quest_taker") { }
+
+	bool OnQuestComplete(Player* player, Creature* creature, Quest const* quest)
+	{
+		uint32 low = PVE_LOWER_RANGE;
+		uint32 up = PVE_UPPER_RANGE;
+		if (quest->GetQuestId() >= low && quest->GetQuestId() < up)
+			player->RewardReputation(player, 5.f);
+		return true;
+	}
 };
 
 void AddSC_hearthstone()
@@ -312,4 +355,5 @@ void AddSC_hearthstone()
 	new npc_han_al();
 	new npc_azth_vendor();
 	new item_azth_hearthstone_loot_sack();
+	new npc_azth_quest_taker();
 }

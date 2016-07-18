@@ -41,7 +41,7 @@ UPDATE creature_template SET resistance2 = 6000 WHERE entry = 100004;
 UPDATE creature_template SET resistance2 = 12000 WHERE entry = 100005;
 UPDATE creature_template SET resistance2 = 21000 WHERE entry = 100006;
 
-UPDATE creature_template SET  `npcflag` = 129, `unit_flags` = 514, `type_flags` = 0, `flags_extra` = 0, scriptname = "npc_azth_vendor" WHERE entry IN (100002, 100003, 100004, 100005, 100006);
+UPDATE creature_template SET  `npcflag` = 129, `unit_flags` = 768, `type_flags` = 134217728, `flags_extra` = 2, scriptname = "npc_azth_vendor", resistance1 = 32001, gossip_menu_id = 32001 WHERE entry IN (100002, 100003, 100004, 100005, 100006);
 
 -- SELECT entry, resistance2 FROM creature_template WHERE entry >= 100002;
 
