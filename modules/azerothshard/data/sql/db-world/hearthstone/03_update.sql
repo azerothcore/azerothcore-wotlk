@@ -1,11 +1,11 @@
 -- update quests with rep
-UPDATE `quest_template` SET `Flags` = 4290, `RewardFactionID1` = 1082, `RewardFactionValueId1` = 0, RewardFactionValueIdOverride1 = 10 WHERE ID BETWEEN 100000 AND 100080;
+UPDATE `quest_template` SET `Flags` = 4226, `RewardFactionID1` = 68, `RewardFactionValueId1` = 0, RewardFactionValueIdOverride1 = 10 WHERE ID BETWEEN 100000 AND 100080;
 
 -- mark of azeroth
 
 UPDATE item_template SET NAME = "Mark of Azeroth", stackable = 2147483647, description = "Il bottino di ogni avventuriero!", maxcount = 0, spellid_1 = 0, spellcharges_1 = 0, flags = 0 WHERE entry = 37711;
 
-
+SELECT * FROM quest_template WHERE title = "A Donation of Runecloth" OR title = "Uccidi Illidan";
 -- quest rewards
 UPDATE `quest_template` SET RewardItemId1 = 37711, RewardItemCount1 = 2 WHERE ID BETWEEN 100000 AND 100080;
 
@@ -109,3 +109,8 @@ INSERT INTO gossip_menu (entry, text_id) VALUES (60000, 100010);
 DELETE FROM npc_text WHERE ID = 100010;
 INSERT INTO npc_text (ID, text0_0, text0_1, lang0, Prob0, em0_0) VALUES 
 (100010, "Il Maestro è una persona molto stimata e famosa... aiutalo, e sarà generoso con te, $n!", 0, 0,100, 0);
+
+-- UPDATE quest_template SET method = 0, TYPE = 0, flags = 4098, rewardfactionid1 = 69, rewardfactionvalueid1 = 6, RewardFactionValueIdOverride1 = 0, unknown0 = 1 WHERE id = 100000;
+UPDATE quest_template SET method = 0, TYPE = 0, flags = 4098, rewardfactionid1 = 1082, rewardfactionvalueid1 = 1, RewardFactionValueIdOverride1 = 0, unknown0 = 1 WHERE ID BETWEEN 100000 AND 100080;
+
+DELETE FROM item_template WHERE entry >= 100017 AND subclass IN (0, 5, 7,8,9,10); 
