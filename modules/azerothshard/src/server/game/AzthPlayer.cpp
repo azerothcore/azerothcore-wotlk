@@ -50,7 +50,7 @@ bool AzthPlayer::setFactionForRace(uint8 race) {
         if (Battleground * bg = player->GetBattleground()) {
             player->m_team = player->GetBgTeamId();
 
-            player->setFaction(player->m_team == ALLIANCE ? 1 : 2);
+            player->setFaction(player->m_team == TEAM_ALLIANCE ? 1 : 2);
 
             return true;
         }
