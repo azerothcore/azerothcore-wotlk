@@ -34,6 +34,8 @@
 #include "Group.h"
 #include "InstanceScript.h"
 #include "ScriptMgr.h"
+// [AZTH]
+#include "AzthInstanceMgr.h"
 
 uint16 InstanceSaveManager::ResetTimeDelay[] = {3600, 900, 300, 60, 0};
 PlayerBindStorage InstanceSaveManager::playerBindStorage;
@@ -140,6 +142,9 @@ bool InstanceSaveManager::DeleteInstanceSaveIfNeeded(InstanceSave* save, bool sk
 InstanceSave::InstanceSave(uint16 MapId, uint32 InstanceId, Difficulty difficulty, time_t resetTime, time_t extendedResetTime)
 : m_resetTime(resetTime), m_extendedResetTime(extendedResetTime), m_instanceid(InstanceId), m_mapid(MapId), m_difficulty(MapId == 631 || MapId == 724 ? Difficulty(difficulty%2) : difficulty), m_canReset(true), m_instanceData(""), m_completedEncounterMask(0)
 {
+    // [AZTH]
+    azthInstMgr = new AzthInstanceMgr(this);
+    // [/AZTH]
 }
 
 InstanceSave::~InstanceSave()
@@ -175,6 +180,9 @@ void InstanceSave::InsertToDB()
     stmt->setUInt32(4, completedEncounters);
     stmt->setString(5, data);
     CharacterDatabase.Execute(stmt);
+
+    // [AZTH]
+    azthInstMgr->saveToDb();
 }
 
 time_t InstanceSave::GetResetTimeForDB()

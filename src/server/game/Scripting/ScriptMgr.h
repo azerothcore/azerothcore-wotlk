@@ -709,6 +709,15 @@ class PlayerScript : public ScriptObject
 
         // Called when a player changes to a new map (after moving to new map)
         virtual void OnMapChanged(Player* /*player*/) { }
+
+        //[AZTH]
+        // Called when a player is removed from battleground
+        virtual void OnPlayerRemoveFromBattleground(Player* /*player*/, Battleground* /*bg*/) { }
+
+        virtual void OnAchiComplete(Player* /*player*/, AchievementEntry const* /*achievement*/) { }
+
+        virtual void OnAchiSave(Player* /*player*/, uint16 /*achId*/) { }
+        //[/AZTH]
 };
 
 class GuildScript : public ScriptObject
@@ -976,6 +985,11 @@ class ScriptMgr
         void OnPlayerDelete(uint64 guid);
         void OnPlayerBindToInstance(Player* player, Difficulty difficulty, uint32 mapid, bool permanent);
         void OnPlayerUpdateZone(Player* player, uint32 newZone, uint32 newArea);
+        // [AZTH] all custom PlayerScript functions
+        void OnPlayerRemoveFromBattleground(Player* player, Battleground* bg);
+        void OnAchievementComplete(Player *player, AchievementEntry const* achievement);
+        void OnAchievementSave(Player *player, uint16 achId);
+        // [/AZTH]
 
     public: /* GuildScript */
 

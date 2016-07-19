@@ -1,6 +1,6 @@
 #ifndef AZTHINSTANCEMGR_H
 #define AZTHINSTANCEMGR_H
-/* [TODO] fix and re-enable
+
 #include "InstanceSaveMgr.h"
 
 class AzthInstanceMgr {
@@ -13,5 +13,4 @@ class AzthInstanceMgr {
         InstanceSave* is;
         uint8 levelMax;
 };
-*/
 #endif
