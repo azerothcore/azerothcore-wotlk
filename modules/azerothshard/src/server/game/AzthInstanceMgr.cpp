@@ -1,5 +1,4 @@
 #include "AzthInstanceMgr.h"
-#include "InstanceSaveMgr.h"
 
  AzthInstanceMgr::AzthInstanceMgr(InstanceSave* is) {
      this->levelMax = 0;
