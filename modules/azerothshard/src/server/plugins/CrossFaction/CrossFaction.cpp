@@ -14,28 +14,6 @@ void CrossFaction::UpdatePlayerTeam(Group* group, uint64 guid, bool reset /* = f
     Player* player = ObjectAccessor::FindPlayer(guid);
     if (player)
     {
-        bool disable = true;
-
-        // Check disables
-        if (isMapEnabled(player->GetMapId()) && isZoneEnabled(player->GetZoneId()) && isAreaEnabled(player->GetAreaId()))
-            disable = false;
-        else
-        {
-            player->Whisper("This specific area has crossfaction disabled", LANG_UNIVERSAL, player->GetGUID());
-            sLog->outError("Crossfaction disabled for player %s", player->GetName().c_str());
-        }
-
-        // check conditions and set new faction
-        if (!reset)
-            if(!disable)
-                if (group)
-                    if (Player* groupLeader = ObjectAccessor::FindPlayer(group->GetLeaderGUID()))
-                    {
-                        player->setFactionForRace(groupLeader->getRace());
-                        return;
-                    }
-
-        // ANY OTHER CASE: just reset it back
         player->setFactionForRace(player->getRace());
     }
 }

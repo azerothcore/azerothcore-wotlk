@@ -32,6 +32,21 @@ uint32 AzthPlayer::getOriginalTeam() {
 }
 
 bool AzthPlayer::setFactionForRace(uint8 race) {
+
+    bool disable = true;
+
+    CrossFaction *cf = sCrossFaction;
+
+    // Check disables
+    if (cf->isMapEnabled(player->GetMapId()) && cf->isZoneEnabled(player->GetZoneId()) && cf->isAreaEnabled(player->GetAreaId()))
+        disable = false;
+    else
+    {
+        player->Whisper("Quest'area ha il crossfaction disabilitato", LANG_UNIVERSAL, player->GetGUID());
+        sLog->outError("Crossfaction disabled for player %s", player->GetName().c_str());
+        return false;
+    }
+
     if (player->InBattleground()) {
         if (Battleground * bg = player->GetBattleground()) {
             player->m_team = player->GetBgTeamId();
