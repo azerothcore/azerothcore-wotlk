@@ -264,7 +264,7 @@ class item_azth_hearthstone_loot_sack : public ItemScript
 				
 				while (i <= EVERYTHING)
 				{
-					srand(seed);
+					//srand(seed);
 					int quality = 0;
 					quality = getQuality();
 					uint32 id = 0;
@@ -281,7 +281,7 @@ class item_azth_hearthstone_loot_sack : public ItemScript
 				i = 1;
 				while (i <= ONLY_COMMON)
 				{
-					srand(seed);
+					//srand(seed + 3);
 					int quality = 1;
 					if (rand_chance() > 80)
 					{
@@ -302,7 +302,7 @@ class item_azth_hearthstone_loot_sack : public ItemScript
 				i = 1;
 				while (i <= NOT_COMMON)
 				{
-					srand(seed);
+					//srand(seed + 4);
 					int quality = 0;
 					quality = getQuality();
 					while (quality < 2)
@@ -335,25 +335,9 @@ class item_azth_hearthstone_loot_sack : public ItemScript
 		}
 };
 
-class npc_azth_quest_taker : public CreatureScript
-{
-public:
-	npc_azth_quest_taker() : CreatureScript("npc_azth_quest_taker") { }
-
-	bool OnQuestComplete(Player* player, Creature* creature, Quest const* quest)
-	{
-		uint32 low = PVE_LOWER_RANGE;
-		uint32 up = PVE_UPPER_RANGE;
-		if (quest->GetQuestId() >= low && quest->GetQuestId() < up)
-			player->RewardReputation(player, 5.f);
-		return true;
-	}
-};
-
 void AddSC_hearthstone()
 {
 	new npc_han_al();
 	new npc_azth_vendor();
 	new item_azth_hearthstone_loot_sack();
-	new npc_azth_quest_taker();
 }
