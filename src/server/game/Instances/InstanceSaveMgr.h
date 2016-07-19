@@ -39,6 +39,7 @@ struct MapEntry;
 class Player;
 class Group;
 class InstanceSaveManager;
+class InstanceSave;
 
 struct InstancePlayerBind
 {
