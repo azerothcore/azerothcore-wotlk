@@ -305,7 +305,7 @@ class item_azth_hearthstone_loot_sack : public ItemScript
 					//srand(seed + 4);
 					int quality = 0;
 					quality = getQuality();
-					while (quality < 2)
+					while (quality < 3)
 					{
 						quality = getQuality();
 					}
