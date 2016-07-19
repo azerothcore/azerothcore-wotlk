@@ -354,7 +354,7 @@ public:
 
             if (!me->IsInCombat())
             {
-                Unit* ownerTarget = nullptr;
+                Unit* ownerTarget = NULL;
                 if (Player* owner = me->GetCharmerOrOwner()->ToPlayer())
                     ownerTarget = owner->GetSelectedUnit();
 
@@ -440,9 +440,9 @@ public:
             Trinity::UnitListSearcher<Trinity::AnyUnfriendlyUnitInObjectRangeCheck> searcher(me, targets, u_check);
             me->VisitNearbyObject(40.0f, searcher);
 
-            Unit* highestThreatUnit = nullptr;
+            Unit* highestThreatUnit = NULL;
             float highestThreat = 0.0f;
-            Unit* nearestPlayer = nullptr;
+            Unit* nearestPlayer = NULL;
             for (std::list<Unit*>::const_iterator iter = targets.begin(); iter != targets.end(); ++iter)
             {
                 // Consider only units without CC
