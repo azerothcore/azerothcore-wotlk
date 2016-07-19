@@ -221,7 +221,7 @@ void getItems()
 	} while (result->NextRow());
 }
 
-float CHANCES[8] = { 10.f, 30.f, 20.f, 15.f, 5.f, 0.1f, 0.1f, 1.f };
+float CHANCES[8] = { 10.f, 30.f, 20.f, 15.f, 5.f, 1.f, 0.5f, 1.f };
 int QUALITY_TO_FILL_PERCENTAGE = 1;
 int ONLY_COMMON = 2;
 int NOT_COMMON = 1;
@@ -305,7 +305,7 @@ class item_azth_hearthstone_loot_sack : public ItemScript
 					//srand(seed + 4);
 					int quality = 0;
 					quality = getQuality();
-					while (quality < 2)
+					while (quality < 3)
 					{
 						quality = getQuality();
 					}
