@@ -4,9 +4,12 @@
 #include "Config.h"
 #include "Define.h"
 #include "Player.h"
+#include "CrossFaction.h"
+
+class CrossFaction;
 
 /* [TODO] fix and re-enable */
- class AzthPlayer {
+class AzthPlayer {
  public:
      explicit AzthPlayer(Player *origin);
      ~AzthPlayer();

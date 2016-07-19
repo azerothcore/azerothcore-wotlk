@@ -19,6 +19,11 @@ class CrossFaction
         void LoadConfig(bool reload);
         void UpdatePlayerTeam(Group* group, uint64 guid, bool reset = false);
 
+        // Check functions
+        bool isMapEnabled(uint32 mapid) { return std::find(mapDisable.begin(), mapDisable.end(), mapid) == mapDisable.end(); };
+        bool isZoneEnabled(uint32 mapid) { return std::find(zoneDisable.begin(), zoneDisable.end(), mapid) == zoneDisable.end(); };
+        bool isAreaEnabled(uint32 mapid) { return std::find(areaDisable.begin(), areaDisable.end(), mapid) == areaDisable.end(); };
+
     private:
         typedef std::vector<uint32> CrossFactionDisableList;
 
@@ -26,12 +31,6 @@ class CrossFaction
         CrossFactionDisableList mapDisable;
         CrossFactionDisableList zoneDisable;
         CrossFactionDisableList areaDisable;
-
-        // Check functions
-        bool isMapEnabled(uint32 mapid) { return std::find(mapDisable.begin(), mapDisable.end(), mapid) == mapDisable.end(); };
-        bool isZoneEnabled(uint32 mapid) { return std::find(zoneDisable.begin(), zoneDisable.end(), mapid) == zoneDisable.end(); };
-        bool isAreaEnabled(uint32 mapid) { return std::find(areaDisable.begin(), areaDisable.end(), mapid) == areaDisable.end(); };
-
 };
 
 #define sCrossFaction ACE_Singleton<CrossFaction, ACE_Null_Mutex>::instance()
