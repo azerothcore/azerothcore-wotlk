@@ -6934,6 +6934,12 @@ TeamId Player::TeamIdForRace(uint8 race)
 void Player::setFactionForRace(uint8 race)
 { 
     m_team = TeamIdForRace(race);
+
+    // [AZTH] Kepler: Inject AzthPlayer's team function to get team from group leader in CrossFactionGroups
+    if (azthPlayer->setFactionForRace(race))
+        return;
+    // [/AZTH]
+
     ChrRacesEntry const* rEntry = sChrRacesStore.LookupEntry(race);
     setFaction(rEntry ? rEntry->FactionID : 0);
 }
@@ -12222,10 +12228,10 @@ InventoryResult Player::CanUseItem(ItemTemplate const* proto) const
 
     if (proto)
     {
-        if ((proto->Flags2 & ITEM_FLAGS_EXTRA_HORDE_ONLY) && GetTeamId() != TEAM_HORDE)
+        if ((proto->Flags2 & ITEM_FLAGS_EXTRA_HORDE_ONLY) && /*[AZTH]*/ azthPlayer->getOriginalTeam() != HORDE)
             return EQUIP_ERR_YOU_CAN_NEVER_USE_THAT_ITEM;
 
-        if ((proto->Flags2 & ITEM_FLAGS_EXTRA_ALLIANCE_ONLY) && GetTeamId() != TEAM_ALLIANCE)
+        if ((proto->Flags2 & ITEM_FLAGS_EXTRA_ALLIANCE_ONLY) && /*[AZTH]*/ azthPlayer->getOriginalTeam() != ALLIANCE)
             return EQUIP_ERR_YOU_CAN_NEVER_USE_THAT_ITEM;
 
         if ((proto->AllowableClass & getClassMask()) == 0 || (proto->AllowableRace & getRaceMask()) == 0)
