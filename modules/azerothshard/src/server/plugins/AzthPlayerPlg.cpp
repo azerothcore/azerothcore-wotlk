@@ -34,8 +34,7 @@ public:
         }
     }
 
-    /*
-    void OnLogin(Player* player, bool firstLogin) override {
+    void OnLogin(Player* player) override {
         // do it again for crossfaction system
         player->setFactionForRace(player->getRace());
     }
@@ -49,8 +48,7 @@ public:
         uint16 levelPlayer = player->getLevel();
 
         if (map->IsDungeon()) {
-            InstanceSave* is=player->GetInstanceSave(map->GetId(),map->IsRaid());
-
+            InstanceSave* is = sInstanceSaveMgr->PlayerGetInstanceSave(GUID_LOPART(player->GetGUID()), map->GetId(), player->GetDifficulty((map->IsRaid())));
             if (is->azthInstMgr->levelMax == 0) {
                 instanceID = map->GetInstanceId();
 
@@ -63,7 +61,7 @@ public:
 
             if (levelPlayer > is->azthInstMgr->levelMax) {
                 is->azthInstMgr->levelMax = levelPlayer;
-                is->SaveToDB();
+                is->InsertToDB();
             }
         }
     }
@@ -75,7 +73,7 @@ public:
 
         Map* map = player->FindMap();
         if (map->IsDungeon()) {
-            InstanceSave* is=player->GetInstanceSave(map->GetId(),map->IsRaid());
+            InstanceSave* is = sInstanceSaveMgr->PlayerGetInstanceSave(GUID_LOPART(player->GetGUID()), map->GetId(), player->GetDifficulty((map->IsRaid())));
             if (is->azthInstMgr->levelMax!=0) {
                 levelPlayer = is->azthInstMgr->levelMax;
             }
@@ -93,7 +91,6 @@ public:
         CharacterDatabase.PExecute("UPDATE character_achievement SET levelPg = %u WHERE achievement = %u", it.level, achId);
         m_completed_achievement_map.erase(achId);
     }
-    */
 };
 
 void AddSC_azth_player_plg() {

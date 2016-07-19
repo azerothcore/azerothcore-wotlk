@@ -30,6 +30,10 @@
 #include "DBCEnums.h"
 #include "ObjectDefines.h"
 
+//[AZTH]
+#include "AzthInstanceMgr.h"
+class AzthInstanceMgr;
+
 struct InstanceTemplate;
 struct MapEntry;
 class Player;
@@ -90,6 +94,10 @@ class InstanceSave
         bool RemovePlayer(uint32 guidLow, InstanceSaveManager* ism);
 
         typedef std::list<uint32> PlayerListType;
+
+        // [AZTH]
+        AzthInstanceMgr* azthInstMgr;
+        // [/AZTH]
     private:
 
         PlayerListType m_playerList;
