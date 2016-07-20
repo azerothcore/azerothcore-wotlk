@@ -48,7 +48,7 @@ public:
         uint16 levelPlayer = player->getLevel();
 
         if (map->IsDungeon()) {
-            InstanceSave* is = sInstanceSaveMgr->PlayerGetInstanceSave(GUID_LOPART(player->GetGUID()), map->GetId(), player->GetDifficulty((map->IsRaid())));
+            InstanceSave* is = sInstanceSaveMgr->PlayerGetInstanceSave(GUID_LOPART(player->GetGUID()), map->GetId(), player->GetDifficulty(map->IsRaid()));
             if (is->azthInstMgr->levelMax == 0) {
                 instanceID = map->GetInstanceId();
 
