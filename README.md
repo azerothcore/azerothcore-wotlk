@@ -41,7 +41,7 @@ This is the new source of AzerothCore Team that we are updating slowly. Sincerel
 
 AzerothCore it is a team of developers that creates MMORPG games mainly based on C ++. To acquire or have access to our projects, you'll have to pay them. Our sources are inspired on TrinityCore, Mangos and ScriptDev2. We do over time changes to optimize, improve and clean the base of the codes while, at the same time we improve the game mechanics and the game functionality.
 
-This is a paid Source, however, the development of it depends from everyone. I'm hopping that the community that has access to this project has enough encouragement and will help us, even if it is by reporting bugs in our forum at our VIP Area.
+It is completely open source; community involvement is highly encouraged.
 
 For more information about the project, visit our website at project [AzerothCore](http://www.azerothcore.org/)
 
