@@ -1,6 +1,12 @@
+## ![logo](http://image.prntscr.com/image/a3c637052c5f430a9b587e0998444d72.jpg)
 # AzerothCore
 
-[![Gitter](https://badges.gitter.im/azerothcore/azerothcore.svg)](https://gitter.im/azerothcore/azerothcore?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
+## Status
+
+AzerothCore | Chat
+:------------: | :------------:
+[![6.x Build Status](https://travis-ci.org/Bodeguero/AzerothCore_3.3.5.svg?branch=master)](https://travis-ci.org/Bodeguero/AzerothCore_3.3.5) | [![Gitter](https://badges.gitter.im/azerothcore/azerothcore.svg)](https://gitter.im/azerothcore/azerothcore?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 
 ##Project General Information 
