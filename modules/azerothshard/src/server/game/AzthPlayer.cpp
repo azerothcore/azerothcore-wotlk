@@ -51,6 +51,8 @@ bool AzthPlayer::setFactionForRace(uint8 race) {
             player->m_team = player->GetBgTeamId();
 
             player->setFaction(player->m_team == TEAM_ALLIANCE ? 1 : 2);
+            
+            //sLog->outError("Team %d , faction %d, bgteam %d", player->m_team,player->getFaction(), player->m_bgData.bgTeamId);
 
             return true;
         }
