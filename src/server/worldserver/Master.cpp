@@ -128,6 +128,23 @@ int Master::Run()
 
     sLog->outString("%s (worldserver-daemon)", _FULLVERSION);
     sLog->outString("<Ctrl-C> to stop.\n");
+	sLog->outString(" ");
+	sLog->outString("   █████╗ ███████╗███████╗██████╗  ██████╗ ████████╗██╗  ██╗");           
+	sLog->outString("  ██╔══██╗╚══███╔╝██╔════╝██╔══██╗██╔═══██╗╚══██╔══╝██║  ██║");           
+	sLog->outString("  ███████║  ███╔╝ █████╗  ██████╔╝██║   ██║   ██║   ███████║");           
+	sLog->outString("  ██╔══██║ ███╔╝  ██╔══╝  ██╔══██╗██║   ██║   ██║   ██╔══██║");           
+	sLog->outString("  ██║  ██║███████╗███████╗██║  ██║╚██████╔╝   ██║   ██║  ██║");           
+	sLog->outString("  ╚═╝  ╚═╝╚══════╝╚══════╝╚═╝  ╚═╝ ╚═════╝    ╚═╝   ╚═╝  ╚═╝");           
+	sLog->outString("   ");                                                        
+    sLog->outString("                                ██████╗ ██████╗ ██████╗ ███████╗");
+    sLog->outString("                                ██╔════╝██╔═══██╗██╔══██╗██╔════╝");
+    sLog->outString("                                ██║     ██║   ██║██████╔╝█████╗");  
+    sLog->outString("                                ██║     ██║   ██║██╔══██╗██╔══╝");  
+    sLog->outString("                                ╚██████╗╚██████╔╝██║  ██║███████╗");
+    sLog->outString("                                 ╚═════╝ ╚═════╝ ╚═╝  ╚═╝╚══════╝");
+	sLog->outString("   ");                                                        
+	sLog->outString("  	  AzerothCore 3.3.5a - New Source - Scripts"); 
+    sLog->outString("		 http://www.azerothcore.org/ ");
 
     /// worldserver PID file creation
     std::string pidFile = sConfigMgr->GetStringDefault("PidFile", "");
