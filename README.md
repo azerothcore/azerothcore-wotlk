@@ -1,4 +1,3 @@
-## ![logo](http://image.prntscr.com/image/a3c637052c5f430a9b587e0998444d72.jpg)
 # AzerothCore
 
 
@@ -32,7 +31,6 @@ This is the new source of AzerothCore Team that we are updating slowly. Sincerel
 
 [AzerothCore_3.3.5a_Vmaps](https://mega.nz/#!vks1GALL!KE4ra8DtKYfeorEXsQ4jEoxkLVMRmjtltieCUceKmQs)
 
-=====================
 
 ## ![logo](http://image.prntscr.com/image/a3c637052c5f430a9b587e0998444d72.jpg)
 
@@ -44,6 +42,21 @@ AzerothCore it is a team of developers that creates MMORPG games mainly based on
 It is completely open source; community involvement is highly encouraged.
 
 For more information about the project, visit our website at project [AzerothCore](http://www.azerothcore.org/)
+
+
+## Why AzerothCore?
+
+Our main goal is to create a playable game server, offering a fully working game experience. In short, we focus on the **user experience (UX)**.
+
+Like MaNGOS and TrinityCore did in past, we like to write clean code and doing software development right, but **our main goal is to have fully working features**. In other terms, we always prefer proper solutions to problems, but we may accept "*hackfixes*" (when they do not affect the game stability) if a proper solution is not available yet.
+
+We also believe in [software modularity](https://en.wikipedia.org/wiki/Modular_programming), because the more the software is modular, and the more it will be easy to be maintained, understood, developed, etc...
+
+
+## Work in progress...
+
+The project is still undert a work in progress phase, so all guidelines may not be available yet, but feel free to starting contributing. We will love to review and accept your PRs.
+
 
 ## Requirements
 
@@ -77,6 +90,7 @@ Read file [COPYING](COPYING)
 Read file [THANKS](https://github.com/AzerothCore/azerothcore-wotlk/graphs/contributors)
 
 
+## Links
 [Forums](http://azerothcore.altervista.org/forum/)
-=======
-## [WEBSITE](https://azerothcore.github.io/)
+
+[WebSite](https://azerothcore.github.io/)
