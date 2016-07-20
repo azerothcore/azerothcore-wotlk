@@ -1,6 +1,6 @@
-################################################
-# Trinity Core World Server configuration file #
-################################################
+##############################################
+# AzerothCore Auth Server configuration file #
+##############################################
 [worldserver]
 
 ###################################################################################################
@@ -58,10 +58,10 @@ RealmID = 1
 #    DataDir
 #        Description: Data directory setting.
 #        Important:   DataDir needs to be quoted, as the string might contain space characters.
-#        Example:     "@prefix@/share/sunwellcore"
+#        Example:     "@prefix@/share/azerothcore"
 #        Default:     "."
 
-DataDir = "."
+DataDir = "data"
 
 #
 #    LogsDir
@@ -70,7 +70,7 @@ DataDir = "."
 #                     Logs directory must exists, or log file creation will be disabled.
 #        Default:     "" - (Log files will be stored in the current path)
 
-LogsDir = ""
+LogsDir = "logs"
 
 #
 #    LoginDatabaseInfo
@@ -83,13 +83,13 @@ LogsDir = ""
 #                                                                 section my.ini)
 #                     ".;/path/to/unix_socket;username;password;database" - (use Unix sockets on
 #                                                                           Unix/Linux)
-#        Default:     "127.0.0.1;3306;trinity;trinity;auth"       - (LoginDatabaseInfo)
-#                     "127.0.0.1;3306;trinity;trinity;world"      - (WorldDatabaseInfo)
-#                     "127.0.0.1;3306;trinity;trinity;characters" - (CharacterDatabaseInfo)
+#        Default:     "127.0.0.1;3306;azeroth;azeroth;auth"       - (LoginDatabaseInfo)
+#                     "127.0.0.1;3306;azeroth;azeroth;world"      - (WorldDatabaseInfo)
+#                     "127.0.0.1;3306;azeroth;azeroth;characters" - (CharacterDatabaseInfo)
 
-LoginDatabaseInfo     = "127.0.0.1;3306;trinity;trinity;auth"
-WorldDatabaseInfo     = "127.0.0.1;3306;trinity;trinity;world"
-CharacterDatabaseInfo = "127.0.0.1;3306;trinity;trinity;characters"
+LoginDatabaseInfo     = "127.0.0.1;3306;azeroth;azeroth;auth"
+WorldDatabaseInfo     = "127.0.0.1;3306;azeroth;azeroth;world"
+CharacterDatabaseInfo = "127.0.0.1;3306;azeroth;azeroth;characters"
 
 #
 #    LoginDatabase.WorkerThreads
@@ -1379,10 +1379,10 @@ BeepAtStart = 1
 #    Motd
 #        Description: Message of the Day, displayed at login.
 #                     Use '@' for a newline and be sure to escape special characters.
-#        Example:     "Welcome to John\'s Server@This server runs on Trinity Core."
-#        Default:     "Welcome to a Trinity Core server."
+#        Example:     "Welcome to John\'s Server@This server runs on AzerothCore."
+#        Default:     "Welcome to a AzerothCore Server."
 
-Motd = "Welcome to a Trinity Core server."
+Motd = "Welcome to a AzerothCore Server."
 
 #
 #    Server.LoginInfo
@@ -1436,7 +1436,7 @@ AccountInstancesPerHour = 5
 
 #
 #   BirthdayTime
-#        Description: Set to date of project's birth in UNIX time. By default the date when SunwellCore was started (Thu Oct 2, 2008)
+#        Description: Set to date of project's birth in UNIX time. By default the date when AzerothCore was started (Thu Oct 2, 2008)
 #        Default:     1222964635
 #
 #
