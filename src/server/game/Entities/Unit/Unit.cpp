@@ -7567,6 +7567,35 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
         }
         case SPELLFAMILY_DEATHKNIGHT:
         {
+            if (dummySpell->Id == 49028)
+            {
+                // 1 dummy aura for dismiss rune blade
+                if (effIndex != 1)
+                    return false;
+
+                Unit* pPet = NULL;
+                for (Unit::ControlSet::iterator itr = m_Controlled.begin(); itr != m_Controlled.end(); ++itr) // Find Rune Weapon
+                    if ((*itr)->GetEntry() == 27893)
+                    {
+                        pPet = *itr;
+                        break;
+                    }
+
+                if (pPet && pPet->GetVictim() && damage && !procSpell)
+                {
+                    CalcDamageInfo damageInfo;
+                    CalculateMeleeDamage(pPet->GetVictim(), 0, &damageInfo, BASE_ATTACK);
+                    damageInfo.attacker = pPet;
+                    damageInfo.damage = damageInfo.damage / 2;
+                    // Send log damage message to client
+                    pPet->DealDamageMods(pPet->GetVictim(), damageInfo.damage, &damageInfo.absorb);
+                    pPet->SendAttackStateUpdate(&damageInfo);
+                    pPet->ProcDamageAndSpell(damageInfo.target, damageInfo.procAttacker, damageInfo.procVictim, damageInfo.procEx, damageInfo.damage, damageInfo.attackType);
+                    pPet->DealMeleeDamage(&damageInfo, true);
+                }
+                else
+                    return false;
+            }
             // Improved Blood Presence
             if (dummySpell->SpellIconID == 2636)
             {
