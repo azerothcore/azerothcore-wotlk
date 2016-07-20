@@ -242,7 +242,7 @@ public:
                 case SPELL_SUMMON_MENAGERIE_3:
                     {
                         for( uint8 i=0; i<4; ++i )
-+						me->SummonCreature(summons[2][i], cords[2][0] + ((i%2) ? 4.0f : -4.0f), cords[2][1] + (i<2 ? 4.0f : -4.0f), cords[2][2], 0.0f, TEMPSUMMON_TIMED_DESPAWN, 300000);
+						me->SummonCreature(summons[2][i], cords[2][0] + ((i%2) ? 4.0f : -4.0f), cords[2][1] + (i<2 ? 4.0f : -4.0f), cords[2][2], 0.0f, TEMPSUMMON_TIMED_DESPAWN, 300000);
                         uint8 phase = GetPhaseByCurrentPosition();
                         me->SetHomePosition(cords[phase+1][0], cords[phase+1][1], cords[phase+1][2], cords[phase+1][3]);
                         me->DestroyForNearbyPlayers();

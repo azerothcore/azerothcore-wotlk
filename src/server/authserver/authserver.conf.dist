@@ -1,6 +1,6 @@
-###############################################
-# Trinity Core Auth Server configuration file #
-###############################################
+##############################################
+# AzerothCore Auth Server configuration file #
+##############################################
 [authserver]
 
 ###################################################################################################
@@ -36,7 +36,7 @@
 #                     Logs directory must exists, or log file creation will be disabled.
 #        Default:     "" - (Log files will be stored in the current path)
 
-LogsDir = ""
+LogsDir = "logs"
 
 #
 #    MaxPingTime
@@ -244,9 +244,9 @@ WrongPass.BanType = 0
 #                                                                 section my.ini)
 #                     ".;/path/to/unix_socket;username;password;database" - (use Unix sockets on
 #                                                                           Unix/Linux)
-#        Default:     "127.0.0.1;3306;trinity;trinity;auth"
+#        Default:     "127.0.0.1;3306;azeroth;azeroth;auth"
 
-LoginDatabaseInfo = "127.0.0.1;3306;trinity;trinity;auth"
+LoginDatabaseInfo = "127.0.0.1;3306;azeroth;azeroth;auth"
 
 #
 #    LoginDatabase.WorkerThreads
