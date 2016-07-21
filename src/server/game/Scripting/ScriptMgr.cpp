@@ -1183,6 +1183,11 @@ void ScriptMgr::OnPlayerUpdateZone(Player* player, uint32 newZone, uint32 newAre
     FOREACH_SCRIPT(PlayerScript)->OnUpdateZone(player, newZone, newArea);
 }
 
+void ScriptMgr::OnPlayerUpdateFaction(Player* player)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnUpdateFaction(player);
+}
+
 // [AZTH]  all custom PlayerScript functions
 void ScriptMgr::OnPlayerRemoveFromBattleground(Player* player, Battleground* bg)
 {

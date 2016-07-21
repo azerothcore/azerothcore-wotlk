@@ -1,5 +1,5 @@
 // Copyright (c) 2016 AzerothCore
-// Author: mik1893
+// Author: mik1893 - kepler - yehonal
 //
 // This software is provided 'as-is', without any express or implied
 // warranty.  In no event will the authors be held liable for any damages
@@ -7,15 +7,59 @@
 
 #include "CrossFaction.h"
 
-
 // Crossfaction class functionalities
 void CrossFaction::UpdatePlayerTeam(Group* group, uint64 guid, bool reset /* = false */)
 {
     Player* player = ObjectAccessor::FindPlayer(guid);
+
     if (player)
     {
-        player->setFactionForRace(player->getRace());
-    }
+        bool disable = true;
+
+        // Per prima cosa, controllo i disable
+        if (isMapEnabled(player->GetMapId()) && isZoneEnabled(player->GetZoneId()) && isAreaEnabled(player->GetAreaId()))
+            disable = false;
+        else
+        {
+            // messaggio al player in caso di crossfaction disabilitato in una specifica area, cosi lo sa prima di lamentarsi e scassarmi la minchia
+            player->Whisper("Quest'area ha il crossfaction disabilitato", LANG_UNIVERSAL, player->GetGUID());
+            sLog->outDebug(LOG_FILTER_CROSSFACTION, "Crossfaction: disabled for player %s", player->GetName().c_str());
+        }
+
+        // se non e' un reset forzato oppure na zona disabilitata, eseguo la routine di cambio
+        if (!reset && !disable)
+        {
+            // Se sono in battleground applico la fazione relativa al battleground
+            if (player->InBattleground())
+            {
+                if (Battleground * bg = player->GetBattleground())
+                {
+                    player->setTeamId(player->GetBgTeamId());
+                    player->setFaction(player->GetTeamId() == TEAM_ALLIANCE ? 1 : 2);
+                    sLog->outDebug(LOG_FILTER_CROSSFACTION, "Crossfaction: Battleground team id set for player %s", player->GetName().c_str());
+                    return;
+                }
+            }
+
+            // Se sono in un nomrale gruppo, applico la fazione relativa al leader
+            uint64 leaderGuid = group ? group->GetLeaderGUID() : player->GetGUID();
+            if (leaderGuid != player->GetGUID())
+                if (Player* leader = ObjectAccessor::FindPlayer(leaderGuid))
+                {
+                    player->setTeamId(leader->GetTeamId());
+                    player->setFaction(leader->getFaction());
+                    return;
+                }
+        }
+
+        // TUTTI GLI ALTRI CASI: RESET DELLA FAZIONE ALL ORIGINALE
+        // Se reset forzato oppure zona disabilitata, va messa la fazione originale del player, qualunque cosa succeda.
+        // LA RAZZA NON VIENE MAI MODIFICATA UNA VOLTA LOGGATI - SI PUO USARE PER TORNARE AL PUNTO DI PARTENZA
+
+        player->setTeamId(player->GetTeamId(true));
+        ChrRacesEntry const* rEntry = sChrRacesStore.LookupEntry(player->getRace());
+        player->setFaction(rEntry ? rEntry->FactionID : 0);
+        sLog->outDebug(LOG_FILTER_CROSSFACTION, "Crossfaction: reset done for player %s", player->GetName().c_str());
 }
 
 void CrossFaction::LoadConfig(bool reload)
@@ -124,6 +168,11 @@ public:
     }
 
     void OnLogin(Player* player) override
+    {
+        sCrossFaction->UpdatePlayerTeam(player->GetGroup(), player->GetGUID());
+    }
+
+    void OnUpdateFaction(Player *player) override
     {
         sCrossFaction->UpdatePlayerTeam(player->GetGroup(), player->GetGUID());
     }

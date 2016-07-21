@@ -437,7 +437,7 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket &recvData)
                 //[AZTH]
                 TeamId teamId = ginfo.teamId;
                 if (bgTypeId == BATTLEGROUND_RB) {
-                    teamId = _player->azthPlayer->getOriginalTeam() == TEAM_ALLIANCE ? TEAM_HORDE : TEAM_ALLIANCE;
+                    teamId = _player->GetTeamId(true) == TEAM_ALLIANCE ? TEAM_HORDE : TEAM_ALLIANCE;
                 }
                 //[/AZTH]
                 // remove player from all bg queues
