@@ -60,6 +60,7 @@ void CrossFaction::UpdatePlayerTeam(Group* group, uint64 guid, bool reset /* = f
         ChrRacesEntry const* rEntry = sChrRacesStore.LookupEntry(player->getRace());
         player->setFaction(rEntry ? rEntry->FactionID : 0);
         sLog->outDebug(LOG_FILTER_CROSSFACTION, "Crossfaction: reset done for player %s", player->GetName().c_str());
+    }
 }
 
 void CrossFaction::LoadConfig(bool reload)
