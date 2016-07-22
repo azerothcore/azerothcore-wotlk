@@ -25,3 +25,5 @@ void AzthPlayer::setArena1v1Info(uint8 type, uint32 value) {
 float AzthPlayer::GetPlayerQuestRate() {
     return playerQuestRate;
 }
+
+AzthPlayer::~AzthPlayer() {}

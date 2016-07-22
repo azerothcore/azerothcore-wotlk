@@ -95,6 +95,8 @@ Group::~Group()
 
     // Sub group counters clean up
     delete[] m_subGroupsCounts;
+    //[AZTH]
+    delete azthGroupMgr;
 }
 
 bool Group::Create(Player* leader)

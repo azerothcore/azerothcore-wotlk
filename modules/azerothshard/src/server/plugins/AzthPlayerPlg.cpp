@@ -8,6 +8,7 @@
 #include "Player.h"
 #include "Map.h"
 #include "WorldSession.h"
+#include "AchievementMgr.h"
 
 class AzthPlayerPlg : public PlayerScript{
 public:
@@ -16,7 +17,8 @@ public:
 
     uint16 levelPlayer;
     uint16 tmpLevelPg;
-
+    uint8 groupLevel;
+    
     struct CompletedAchievementData
     {
         uint8 level;
@@ -26,6 +28,12 @@ public:
     CompletedAchievementMap m_completed_achievement_map;
     uint32 instanceID;
 
+   // Fixa sta pircheria
+    void GetPartyLevel(Group* group, Player* player, AchievementMgr* achievement ) {
+        achievement->GetCompletedAchievement();
+
+    }
+    
     void OnLevelChanged(Player* player, uint8 oldLevel) override
     {
         if (oldLevel == 9)
@@ -79,6 +87,17 @@ public:
 
         CompletedAchievementData& it = m_completed_achievement_map[achievement->ID];
         it.level = levelPlayer;
+
+      // Da spostare nella SaveToDb
+        /* PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_PVESTATS);
+        // playerGuid, achievement, type, level, levelParty, date
+        stmt->setUInt32(0, player->GetGUID());
+        stmt->setUInt32(1, achievement->ID);
+        stmt->setUInt32(2, 0);
+        stmt->setUInt32(3, levelPlayer);
+        stmt->setUInt32(4, );
+        stmt->setUInt32(5, );
+        CharacterDatabase.Execute(stmt);*/
     }
 
     void OnAchiSave(Player *player, uint16 achId) override {
@@ -90,22 +109,9 @@ public:
     }
 };
 
-class AzthGroupPlg : public GroupScript {
-public:
 
-    AzthGroupPlg() : GroupScript("AzthGroupPlg") { }
-
-    void OnAddMember(Group* group, uint64 guid) override {
-        Player* player = ObjectAccessor::FindPlayer(guid);
-        if (group->azthGroupMgr->levelMaxGroup < player->getLevel()) {
-            group->azthGroupMgr->levelMaxGroup = player->getLevel();
-            group->azthGroupMgr->saveToDb();
-        }
-    }
-};
 
 void AddSC_azth_player_plg() {
     new AzthPlayerPlg();
-    new AzthGroupPlg();
 }
 
