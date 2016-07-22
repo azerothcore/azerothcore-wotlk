@@ -1,0 +1,1 @@
+ALTER TABLE `groups` ADD COLUMN `MaxlevelGroup` INT(10) UNSIGNED DEFAULT 0 NOT NULL AFTER `masterLooterGuid`; 

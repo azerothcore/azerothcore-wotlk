@@ -9,7 +9,7 @@
 #include "Map.h"
 #include "WorldSession.h"
 
-class AzthPlayerPlg : public PlayerScript {
+class AzthPlayerPlg : public PlayerScript{
 public:
 
     AzthPlayerPlg() : PlayerScript("AzthPlayerPlg") { }
@@ -41,11 +41,10 @@ public:
 
     void OnUpdateZone(Player* player, uint32 newZone, uint32 newArea) override {
         player->setFactionForRace(player->getRace());
-
-        return; // disable following
-
+        
         Map* map = player->FindMap();
         uint16 levelPlayer = player->getLevel();
+
 
         if (map->IsDungeon()) {
             InstanceSave* is = sInstanceSaveMgr->PlayerGetInstanceSave(GUID_LOPART(player->GetGUID()), map->GetId(), player->GetDifficulty(map->IsRaid()));
@@ -67,7 +66,6 @@ public:
     }
 
     void OnAchiComplete(Player *player, AchievementEntry const* achievement) override {
-        return;  // disable following
 
         uint16 levelPlayer = player->getLevel();
 
@@ -84,7 +82,6 @@ public:
     }
 
     void OnAchiSave(Player *player, uint16 achId) override {
-        return;  // disable following
 
         CompletedAchievementData& it = m_completed_achievement_map[achId];
 
@@ -93,7 +90,22 @@ public:
     }
 };
 
+class AzthGroupPlg : public GroupScript {
+public:
+
+    AzthGroupPlg() : GroupScript("AzthGroupPlg") { }
+
+    void OnAddMember(Group* group, uint64 guid) override {
+        Player* player = ObjectAccessor::FindPlayer(guid);
+        if (group->azthGroupMgr->levelMaxGroup < player->getLevel()) {
+            group->azthGroupMgr->levelMaxGroup = player->getLevel();
+            group->azthGroupMgr->saveToDb();
+        }
+    }
+};
+
 void AddSC_azth_player_plg() {
     new AzthPlayerPlg();
+    new AzthGroupPlg();
 }
 
