@@ -1834,25 +1834,43 @@ void World::SetInitialWorldSettings()
 
 void World::DetectDBCLang()
 {
+    uint8 m_lang_confid = sConfigMgr->GetIntDefault("DBC.Locale", 255);
+
+    if (m_lang_confid != 255 && m_lang_confid >= TOTAL_LOCALES)
+    {
+        sLog->outError("Incorrect DBC.Locale! Must be >= 0 and < %d (set to 0)", TOTAL_LOCALES);
+        m_lang_confid = LOCALE_enUS;
+    }
+
     ChrRacesEntry const* race = sChrRacesStore.LookupEntry(1);
+
     std::string availableLocalsStr;
 
-    uint8 locale = TOTAL_LOCALES;
-    for (uint8 i = locale-1; i < TOTAL_LOCALES; --i)  // -1 will be 255 due to uint8
+    uint8 default_locale = TOTAL_LOCALES;
+    for (uint8 i = default_locale-1; i < TOTAL_LOCALES; --i)  // -1 will be 255 due to uint8
     {
         if (race->name[i][0] != '\0')                     // check by race names
         {
-            locale = i;
+            default_locale = i;
+            m_availableDbcLocaleMask |= (1 << i);
             availableLocalsStr += localeNames[i];
             availableLocalsStr += " ";
         }
     }
 
-    if (locale != GetDefaultDbcLocale())
+    if (default_locale != m_lang_confid && m_lang_confid < TOTAL_LOCALES &&
+        (m_availableDbcLocaleMask & (1 << m_lang_confid)))
+    {
+        default_locale = m_lang_confid;
+    }
+
+    if (default_locale >= TOTAL_LOCALES)
     {
         sLog->outError("Unable to determine your DBC Locale! (corrupt DBC?)");
         exit(1);
     }
+
+    m_defaultDbcLocale = LocaleConstant(default_locale);
 
     sLog->outString("Using %s DBC Locale as default. All available DBC locales: %s", localeNames[GetDefaultDbcLocale()], availableLocalsStr.empty() ? "<none>" : availableLocalsStr.c_str());
     sLog->outString();
