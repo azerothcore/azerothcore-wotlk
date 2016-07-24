@@ -1115,22 +1115,24 @@ void RandomBattlegroundSystem::Update(uint32 diff)
             // order it like: big, small, big, small, small, small (stored backwards, actually)
 
             std::vector<BattlegroundTypeId> big, small;
-            big.push_back(BATTLEGROUND_AV);
-            big.push_back(BATTLEGROUND_IC);
+            //big.push_back(BATTLEGROUND_AV);
+            //big.push_back(BATTLEGROUND_IC);
             small.push_back(BATTLEGROUND_WS);
             small.push_back(BATTLEGROUND_EY);
             small.push_back(BATTLEGROUND_AB);
             small.push_back(BATTLEGROUND_SA);
 
-            std::random_shuffle(big.begin(), big.end());
+            //std::random_shuffle(big.begin(), big.end());
             std::random_shuffle(small.begin(), small.end());
 
             m_BgOrder.push_back(small.back()); small.pop_back();
             m_BgOrder.push_back(small.back()); small.pop_back();
             m_BgOrder.push_back(small.back()); small.pop_back();
-            m_BgOrder.push_back(big.back()); big.pop_back();
+            //[AZTH] TODO: implement weight system ( there is the field in db but it's not used )
+            // disabled big BGs
+            //m_BgOrder.push_back(big.back()); big.pop_back();
             m_BgOrder.push_back(small.back()); small.pop_back();
-            m_BgOrder.push_back(big.back()); big.pop_back();
+            //m_BgOrder.push_back(big.back()); big.pop_back(); [AZTH]
         }
 
         m_CurrentRandomBg = m_BgOrder.back();

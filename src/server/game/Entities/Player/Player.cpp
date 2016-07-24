@@ -505,7 +505,7 @@ inline void KillRewarder::_InitXP(Player* player)
     // * otherwise, not in PvP;
     // * not if killer is on vehicle.
     if (_isBattleGround || (!_isPvP && !_killer->GetVehicle()))
-        _xp = Trinity::XP::Gain(player, _victim);
+        _xp = Trinity::XP::Gain(player, _victim, _isBattleGround);
 
     if (_xp && !_isBattleGround && _victim) // pussywizard: npcs with relatively low hp give lower exp
         if (_victim->GetTypeId() == TYPEID_UNIT)
@@ -6935,10 +6935,10 @@ void Player::setFactionForRace(uint8 race)
 { 
     m_team = TeamIdForRace(race);
 
-    // [AZTH] Kepler: Inject AzthPlayer's team function to get team from group leader in CrossFactionGroups
-    if (azthPlayer->setFactionForRace(race))
+    sScriptMgr->OnPlayerUpdateFaction(this);
+
+    if (GetTeamId(true) != GetTeamId())
         return;
-    // [/AZTH]
 
     ChrRacesEntry const* rEntry = sChrRacesStore.LookupEntry(race);
     setFaction(rEntry ? rEntry->FactionID : 0);
@@ -7278,7 +7278,7 @@ bool Player::RewardHonor(Unit* uVictim, uint32 groupsize, int32 honor, bool awar
 
 
             honor_f = ceil(Trinity::Honor::hk_honor_at_level_f(k_level) * (v_level - k_grey) / (k_level - k_grey));
-            honor *= 1 + sWorld->getRate(RATE_PVP_RANK_EXTRA_HONOR)*(((float)rank_diff) / 10.0f);
+            honor_f *= 1 + sWorld->getRate(RATE_PVP_RANK_EXTRA_HONOR)*(((float)rank_diff) / 10.0f);
 
             //[/AZTH] End of PVP Ranks Patch
 
@@ -12228,10 +12228,10 @@ InventoryResult Player::CanUseItem(ItemTemplate const* proto) const
 
     if (proto)
     {
-        if ((proto->Flags2 & ITEM_FLAGS_EXTRA_HORDE_ONLY) && /*[AZTH]*/ azthPlayer->getOriginalTeam() != HORDE)
+        if ((proto->Flags2 & ITEM_FLAGS_EXTRA_HORDE_ONLY) && GetTeamId(true) != TEAM_HORDE)
             return EQUIP_ERR_YOU_CAN_NEVER_USE_THAT_ITEM;
 
-        if ((proto->Flags2 & ITEM_FLAGS_EXTRA_ALLIANCE_ONLY) && /*[AZTH]*/ azthPlayer->getOriginalTeam() != ALLIANCE)
+        if ((proto->Flags2 & ITEM_FLAGS_EXTRA_ALLIANCE_ONLY) && GetTeamId(true) != TEAM_ALLIANCE)
             return EQUIP_ERR_YOU_CAN_NEVER_USE_THAT_ITEM;
 
         if ((proto->AllowableClass & getClassMask()) == 0 || (proto->AllowableRace & getRaceMask()) == 0)

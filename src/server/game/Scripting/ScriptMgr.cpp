@@ -1183,6 +1183,28 @@ void ScriptMgr::OnPlayerUpdateZone(Player* player, uint32 newZone, uint32 newAre
     FOREACH_SCRIPT(PlayerScript)->OnUpdateZone(player, newZone, newArea);
 }
 
+void ScriptMgr::OnPlayerUpdateFaction(Player* player)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnUpdateFaction(player);
+}
+
+// [AZTH]  all custom PlayerScript functions
+void ScriptMgr::OnPlayerRemoveFromBattleground(Player* player, Battleground* bg)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnPlayerRemoveFromBattleground(player, bg);
+}
+
+void ScriptMgr::OnAchievementComplete(Player* player, AchievementEntry const* achievement)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnAchiComplete(player, achievement);
+}
+
+void ScriptMgr::OnAchievementSave(Player* player, uint16 achId)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnAchiSave(player, achId);
+}
+//[/AZTH]
+
 // Guild
 void ScriptMgr::OnGuildAddMember(Guild* guild, Player* player, uint8& plRank)
 {

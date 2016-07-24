@@ -23,16 +23,6 @@ class AzthPlayer {
       */
      float GetPlayerQuestRate();
 
-     /**
-
-             Get Player team considering CrossFactionGroups: If player is in a group returns group leader's team
-
-                     @param Unit race (Unused, kept for compatibility)
-                     @returns Group leader team  if player is in a group, -1 for default
-      */
-     bool setFactionForRace(uint8 race);
-     uint32 getOriginalTeam();
-
      uint32 getArena1v1Info(uint8 type);
      void setArena1v1Info(uint8 type, uint32 value);
 
