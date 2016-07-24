@@ -58,7 +58,7 @@ RealmID = 1
 #    DataDir
 #        Description: Data directory setting.
 #        Important:   DataDir needs to be quoted, as the string might contain space characters.
-#        Example:     "@prefix@/share/sunwellcore"
+#        Example:     "/home/youruser/azeroth-server/data"
 #        Default:     "."
 
 DataDir = "."
@@ -1436,7 +1436,7 @@ AccountInstancesPerHour = 5
 
 #
 #   BirthdayTime
-#        Description: Set to date of project's birth in UNIX time. By default the date when SunwellCore was started (Thu Oct 2, 2008)
+#        Description: Set to date of project's birth in UNIX time. By default Thu Oct 2, 2008
 #        Default:     1222964635
 #
 #

@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SUNWELLCORE_CREATURE_H
-#define SUNWELLCORE_CREATURE_H
+#ifndef AZEROTHCORE_CREATURE_H
+#define AZEROTHCORE_CREATURE_H
 
 #include "Common.h"
 #include "Unit.h"

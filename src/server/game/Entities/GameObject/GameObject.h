@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SUNWELLCORE_GAMEOBJECT_H
-#define SUNWELLCORE_GAMEOBJECT_H
+#ifndef AZEROTHCORE_GAMEOBJECT_H
+#define AZEROTHCORE_GAMEOBJECT_H
 
 #include "Common.h"
 #include "SharedDefines.h"
