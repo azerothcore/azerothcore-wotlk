@@ -110,12 +110,28 @@ extern int main(int argc, char** argv)
         printf("Verify that the file exists and has \'[authserver]\' written in the top of the file!\n");
         return 1;
     }
-
-    sLog->outString("%s (authserver)", _FULLVERSION);
-    sLog->outString("<Ctrl-C> to stop.\n");
-    sLog->outString("Using configuration file %s.", configFile);
-
-    sLog->outDetail("%s (Library: %s)", OPENSSL_VERSION_TEXT, SSLeay_version(SSLEAY_VERSION));
+sLog->outString("%s (authserver)", _FULLVERSION);
+sLog->outString("<Ctrl-C> to stop.\n");
+sLog->outString(" ");
+sLog->outString("   █████╗ ███████╗███████╗██████╗  ██████╗ ████████╗██╗  ██╗");           
+sLog->outString("  ██╔══██╗╚══███╔╝██╔════╝██╔══██╗██╔═══██╗╚══██╔══╝██║  ██║");           
+sLog->outString("  ███████║  ███╔╝ █████╗  ██████╔╝██║   ██║   ██║   ███████║");           
+sLog->outString("  ██╔══██║ ███╔╝  ██╔══╝  ██╔══██╗██║   ██║   ██║   ██╔══██║");           
+sLog->outString("  ██║  ██║███████╗███████╗██║  ██║╚██████╔╝   ██║   ██║  ██║");           
+sLog->outString("  ╚═╝  ╚═╝╚══════╝╚══════╝╚═╝  ╚═╝ ╚═════╝    ╚═╝   ╚═╝  ╚═╝");           
+sLog->outString("   ");                                                        
+sLog->outString("                                ██████╗ ██████╗ ██████╗ ███████╗");
+sLog->outString("                                ██╔════╝██╔═══██╗██╔══██╗██╔════╝");
+sLog->outString("                                ██║     ██║   ██║██████╔╝█████╗");  
+sLog->outString("                                ██║     ██║   ██║██╔══██╗██╔══╝");  
+sLog->outString("                                ╚██████╗╚██████╔╝██║  ██║███████╗");
+sLog->outString("                                 ╚═════╝ ╚═════╝ ╚═╝  ╚═╝╚══════╝");
+sLog->outString("   ");                                                        
+sLog->outString("  	  AzerothCore 3.3.5a - New Source - Scripts"); 
+sLog->outString("		 http://www.azerothcore.org/ ");
+sLog->outString("   ");     
+sLog->outString("Using configuration file %s.", configFile);
+sLog->outDetail("%s (Library: %s)", OPENSSL_VERSION_TEXT, SSLeay_version(SSLEAY_VERSION));
 
 #if defined (ACE_HAS_EVENT_POLL) || defined (ACE_HAS_DEV_POLL)
     ACE_Reactor::instance(new ACE_Reactor(new ACE_Dev_Poll_Reactor(ACE::max_handles(), 1), 1), true);
