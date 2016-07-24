@@ -27,6 +27,8 @@ CMakeLists.txt.user
 # exclude in all levels
 nbproject/
 .sync.ffs_db
+.browse.VC*
+.vscode
 
 #
 # Eclipse
