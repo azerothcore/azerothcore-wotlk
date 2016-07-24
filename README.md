@@ -18,7 +18,16 @@ We also believe in [software modularity](https://en.wikipedia.org/wiki/Modular_p
 
 ## Work in progress...
 
-The project is still undert a work in progress phase, so all guidelines may not be available yet, but feel free to starting contributing. We will love to review and accept your PRs.
+The project is still under a work in progress phase, so all guidelines may not be available yet and PRs may be not merged immediately, but feel free to starting contributing. We will love to review and accept your PRs.
+
+## Authors & Contributors
+
+This project is brought to you thanks to:
+
+- The [AzerothCore developers and contributors](https://github.com/AzerothCore/azerothcore-wotlk/graphs/contributors)
+- The SunwellCore developers **xinef** and **pussywizard**
+- All the [TrinityCore developers and contributors](https://github.com/TrinityCore/TrinityCore/blob/3.3.5/THANKS)
+- All the [MaNGOS, ScriptDev2 and UDB developers and contributors](https://github.com/cmangos/mangos-wotlk/blob/master/AUTHORS.md)
 
 ## Links
 
