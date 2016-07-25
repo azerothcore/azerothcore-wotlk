@@ -341,6 +341,5 @@ void AddSC_hearthstone()
 	new npc_han_al();
 	new npc_azth_vendor();
 	new item_azth_hearthstone_loot_sack();
-	new item_azth_hearthstone_morph_creator();
-	new item_azth_hearthstone_morph();
+
 }
