@@ -1,22 +1,4 @@
 #
-# AzerothShard RBAC Structure
-#
-# Current original Roles are:
-# 198 Moderator Commands
-# 197 GameMaster Commands
-# 196 Administrator Commands
-#
-# 195: Player 0
-# 194: Moderator 1
-# 193: GameMaster 2
-# 192: Administrator 3
-#
-# AzerothShard custom roles: 100000+
-#
-
-# IMPORTANT RULE:  do NOT insert duplicate linked permissions for multiple non-custom roles
-
-#
 # EDIT DEFAULT PERMISSIONS
 #
 
@@ -92,7 +74,7 @@ UPDATE command SET `security` = 0 WHERE `name` IN
 "server motd"
 );
 
-# [100000] TIER 0: Interface shared by all GMs
+# TIER 0: Interface shared by all GMs
 
 #
 # COMMANDS
@@ -170,6 +152,8 @@ UPDATE command SET `security` = 1 WHERE `name` IN
 "reload rbac",
 "gps",
 "guild rank"
+"title"
+"unmute"
 );
 
 #
@@ -233,7 +217,6 @@ UPDATE command SET `security` = 2 WHERE `name` IN
 "ban",
 "morph",
 "demorph",
-"unmute"
 );
 
 # [100005] Entertainer

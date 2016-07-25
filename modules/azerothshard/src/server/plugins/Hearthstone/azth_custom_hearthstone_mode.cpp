@@ -7,6 +7,7 @@
 #include "azth_custom_new_vendor.cpp"
 #include "WorldPacket.h"
 #include "Chat.h"
+#include "Spell.h"
 
 
 #define GOSSIP_ITEM_GIVE_PVE_QUEST      "Vorrei ricevere la mia missione PVE giornaliera."
@@ -340,4 +341,6 @@ void AddSC_hearthstone()
 	new npc_han_al();
 	new npc_azth_vendor();
 	new item_azth_hearthstone_loot_sack();
+	new item_azth_hearthstone_morph_creator();
+	new item_azth_hearthstone_morph();
 }
