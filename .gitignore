@@ -1,7 +1,19 @@
+#
+# AzerothCore
+#
 
 */compiler/config.sh
 
+conf/*
+!conf/*.dist
+modules/*
+!modules/dep/
 build*/
+
+#
+#Generic
+#
+
 .directory
 .mailmap
 *.orig
