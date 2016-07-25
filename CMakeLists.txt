@@ -28,11 +28,6 @@ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH 1)
 # set macro-directory
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/src/cmake/macros")
 
-# build in Release-mode by default if not explicitly set
-if( NOT CMAKE_BUILD_TYPE )
-  set(CMAKE_BUILD_TYPE "Release")
-endif()
-
 include(CheckCXXSourceRuns)
 include(CheckIncludeFiles)
 
@@ -40,7 +35,17 @@ include(CheckIncludeFiles)
 include(src/cmake/utils.cmake)
 
 # set default buildoptions and print them
-include(src/cmake/options.cmake)
+include(conf/config.cmake.dist)
+
+# load custom configurations for cmake if exists
+if(EXISTS "conf/config.cmake")
+  include(conf/config.cmake)
+endif()
+
+# build in Release-mode by default if not explicitly set
+if( NOT CMAKE_BUILD_TYPE )
+  set(CMAKE_BUILD_TYPE "Release")
+endif()
 
 # turn off PCH totally if enabled (hidden setting, mainly for devs)
 if( NOPCH )

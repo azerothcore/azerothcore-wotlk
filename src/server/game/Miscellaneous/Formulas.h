@@ -160,27 +160,33 @@ namespace Trinity
 
         inline uint32 Gain(Player* player, Unit* u, bool isBattleGround = false)
         {
-            uint32 gain;
+            Creature* creature = u->ToCreature();
+            uint32 gain = 0;
 
-            if (u->GetTypeId() == TYPEID_UNIT &&
-                (((Creature*)u)->IsTotem() || ((Creature*)u)->IsPet() ||
-                (((Creature*)u)->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_NO_XP_AT_KILL) ||
-                u->IsCritter()))
-                gain = 0;
-            else
+            if (!creature || (!creature->IsTotem() && !creature->IsPet() && !creature->IsCritter() &&
+                !(creature->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_NO_XP_AT_KILL)))
             {
+                float xpMod = 1.0f;
+
                 gain = BaseGain(player->getLevel(), u->getLevel(), GetContentLevelsForMapAndZone(u->GetMapId(), u->GetZoneId()));
 
-                if (gain != 0 && u->GetTypeId() == TYPEID_UNIT && ((Creature*)u)->isElite())
+                if (gain && creature)
                 {
-                    // Elites in instances have a 2.75x XP bonus instead of the regular 2x world bonus.
-                    if (u->GetMap()->IsDungeon())
-                       gain = uint32(gain * 2.75);
-                    else
-                        gain *= 2;
+                    if (creature->isElite())
+                    {
+                        // Elites in instances have a 2.75x XP bonus instead of the regular 2x world bonus.
+                        if (u->GetMap() && u->GetMap()->IsDungeon())
+                            xpMod *= 2.75f;
+                        else
+                            xpMod *= 2.0f;
+                    }
+
+                    // This requires TrinityCore creature_template.ExperienceModifier feature
+                    // xpMod *= creature->GetCreatureTemplate()->ModExperience;
                 }
 
-                gain = uint32(gain * isBattleGround ? sWorld->getRate(RATE_XP_BG_KILL) : sWorld->getRate(RATE_XP_KILL));
+                xpMod *= isBattleGround ? sWorld->getRate(RATE_XP_BG_KILL) : sWorld->getRate(RATE_XP_KILL);
+                gain = uint32(gain * xpMod);
             }
 
             //sScriptMgr->OnGainCalculation(gain, player, u); // pussywizard: optimization
