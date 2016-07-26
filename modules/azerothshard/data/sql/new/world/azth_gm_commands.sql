@@ -1,57 +1,26 @@
 #
 # EDIT DEFAULT PERMISSIONS
 #
+# lvl 0: Player
+# lvl 1: GM T1
+# lvl 2: Entertainer/Story Teller
+# lvl 3: GM T2
+# lvl 4: Administrator
+#
 
-# Move to GM level 3 some dangerous commands
-UPDATE command SET `security` = 3 WHERE NAME IN 
+# Move to GM level 4 ( admin ) some dangerous commands
+UPDATE command SET `security` = 4 WHERE NAME IN 
 (
-"wp unload",
-"wp modify",
-"wp load",
-"wp event",
-"wp add",
-"npc move",
-"npc set spawntime",
-"npc set spawndist",
-"npc set phase",
-"npc set movetype",
-"npc set model",
-"npc set link",
-"npc set level",
-"npc set flag",
-"npc set factionid",
-"npc set",
-"npc add follow stop",
-"npc add follow",
-"npc add delete item",
-"npc add delete",
-"npc add temp",
-"npc add move",
-"npc add item",
-"npc add formation",
-"npc add",
-"gobject turn",
-"gobject set state",
-"gobject set phase",
-"gobject set",
-"gobject move",
-"gobject delete",
-"gobject add temp",
-"gobject add",
-"event stop",
-"event start",
-"unmute",
-"mute",
-"npc say",
-"npc texemote",
-"npc whisper",
-"npc yell"
+"reset all",
+"ticket reset",
+"reset honor"
 );
+
 #
 ### LIVE SERVER ROLES ###
 #
 
-# [100012] Azeroth player
+# lvl 0: Azeroth player
 UPDATE command SET `security` = 0 WHERE `name` IN
 (
 "debug hostil",
@@ -69,18 +38,15 @@ UPDATE command SET `security` = 0 WHERE `name` IN
 "lookup taxinode",
 "lookup title",
 "lookup map",
-"server",
 "qc",
 "server motd"
 );
 
-# TIER 0: Interface shared by all GMs
-
 #
-# COMMANDS
-#
+# TIER 1 ( lvl 1 ): GM T1 Supporter
 UPDATE command SET `security` = 1 WHERE `name` IN
 (
+"modify money", -- dangerous!
 "gm fly",
 "lookup tele",
 "npcinfo",
@@ -149,19 +115,20 @@ UPDATE command SET `security` = 1 WHERE `name` IN
 "listfreeze",
 "cooldown",
 "npc add temp",
-"reload rbac",
+"reload command",
 "gps",
-"guild rank"
-"title"
-"unmute"
-);
+"guild rank",
+"title",
+"unmute",
+"mute",
+"ticket assign",
+"morph",
+"demorph",
 
-#
-# WORLD CHANGE COMMANDS
-#
+--
+-- WORLD CHANGE COMMANDS
+--
 
-UPDATE command SET `security` = 3 WHERE `name` IN
-(
 "wp unload",
 "wp modify",
 "wp load",
@@ -178,8 +145,11 @@ UPDATE command SET `security` = 3 WHERE `name` IN
 "npc set flag",
 "npc set factionid",
 "npc set",
+"npc add follow stop",
+"npc add follow",
 "npc add delete item",
 "npc add delete",
+"npc add temp",
 "npc add move",
 "npc add item",
 "npc add formation",
@@ -190,21 +160,28 @@ UPDATE command SET `security` = 3 WHERE `name` IN
 "gobject set",
 "gobject move",
 "gobject delete",
+"gobject add temp",
 "gobject add"
 );
 
-
-# [100001] TIER 1: Supporter
-UPDATE command SET `security` = 1 WHERE `name` IN
-(
-"mute",
-"ticket assign"
-);
-
-# [100002] TIER 2: Protector - Moderator
+# lvl 2: Entertainer
 UPDATE command SET `security` = 2 WHERE `name` IN
 (
-"modify money", -- dangerous!
+"wchange",
+"npc say",
+"npc playemote",
+"npc textemote",
+"npc whisper",
+"npc yell",
+"pet create",
+"event stop",
+"event start"
+);
+
+
+# TIER 2 ( lvl 3 ): Protector - Moderator
+UPDATE command SET `security` = 3 WHERE `name` IN
+(
 "unban playeraccount",
 "unban ip",
 "unban character",
@@ -214,23 +191,5 @@ UPDATE command SET `security` = 2 WHERE `name` IN
 "ban ip",
 "ban character",
 "ban account",
-"ban",
-"morph",
-"demorph",
+"ban"
 );
-
-# [100005] Entertainer
-UPDATE command SET `security` = 1 WHERE `name` IN
-(
-"morph",
-"demorph",
-"wchange",
-"npc say",
-"npc playemote",
-"npc textemote",
-"npc whisper",
-"npc yell",
-"pet create"
-);
-
-
