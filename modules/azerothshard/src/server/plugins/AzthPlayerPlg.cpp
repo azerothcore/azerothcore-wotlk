@@ -9,6 +9,7 @@
 #include "Map.h"
 #include "WorldSession.h"
 #include "AchievementMgr.h"
+#include "AzthGroupMgr.h"
 
 class AzthPlayerPlg : public PlayerScript{
 public:
@@ -22,6 +23,7 @@ public:
     struct CompletedAchievementData
     {
         uint8 level;
+        uint8 levelParty;
     };
 
     typedef UNORDERED_MAP<uint16 /*achiId*/, CompletedAchievementData /*data*/> CompletedAchievementMap;
@@ -30,7 +32,7 @@ public:
 
    // Fixa sta pircheria
     void GetPartyLevel(Group* group, Player* player, AchievementMgr* achievement ) {
-        achievement->GetCompletedAchievement();
+        
 
     }
     
@@ -75,6 +77,8 @@ public:
 
     void OnAchiComplete(Player *player, AchievementEntry const* achievement) override {
 
+        Group* group = NULL;
+        uint64 leaderGUID = 0;
         uint16 levelPlayer = player->getLevel();
 
         Map* map = player->FindMap();
@@ -87,6 +91,9 @@ public:
 
         CompletedAchievementData& it = m_completed_achievement_map[achievement->ID];
         it.level = levelPlayer;
+        if(player->GetGroup()->isRaidGroup())
+            it.levelParty = group->azthGroupMgr->levelMaxGroup;
+        
 
       // Da spostare nella SaveToDb
         /* PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_PVESTATS);

@@ -73,6 +73,10 @@ _difficultyChangePreventionType(DIFFICULTY_PREVENTION_CHANGE_NONE)
 {
     for (uint8 i = 0; i < TARGETICONCOUNT; ++i)
         m_targetIcons[i] = 0;
+
+    // [AZTH]
+    azthGroupMgr = new AzthGroupMgr(this);
+    // [/AZTH]
 }
 
 Group::~Group()
@@ -108,10 +112,6 @@ bool Group::Create(Player* leader)
     m_leaderGuid = leaderGuid;
     m_leaderName = leader->GetName();
     leader->SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_GROUP_LEADER);
-
-    // [AZTH]
-    azthGroupMgr = new AzthGroupMgr(this);
-    // [/AZTH]
 
     if (isBGGroup() || isBFGroup())
         m_groupType = GROUPTYPE_BGRAID;
@@ -158,6 +158,7 @@ bool Group::Create(Player* leader)
         stmt->setUInt32(index++, GUID_LOPART(m_masterLooterGuid));
         //[/AZTH]
         stmt->setUInt32(index++, uint8(leader->getLevel()));
+        azthGroupMgr->levelMaxGroup = 0;
         // [/AZTH]
 
         CharacterDatabase.Execute(stmt);

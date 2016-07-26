@@ -2,8 +2,8 @@
 #include "DatabaseEnv.h"
 
 AzthGroupMgr::AzthGroupMgr(Group* group) {
-    this->levelMaxGroup = 0;
     this->group = group;
+    this->levelMaxGroup;
 }
 
 void AzthGroupMgr::saveToDb() {
