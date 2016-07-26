@@ -58,7 +58,11 @@ void CrossFaction::UpdatePlayerTeam(Group* group, uint64 guid, bool reset /* = f
                     {
                         uint8 raceid = itr->second;
                         ChrRacesEntry const* rEntry = sChrRacesStore.LookupEntry(raceid);
-                        player->setFaction(rEntry ? rEntry->FactionID : 0);
+                        if (rEntry) {
+                            player->setFaction(rEntry->FactionID);
+                            player->setTeamId(Player::TeamIdForRace(raceid));
+                            return;
+                        }
                     }
                 }
             }
