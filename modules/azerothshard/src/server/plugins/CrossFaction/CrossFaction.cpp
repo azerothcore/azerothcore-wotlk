@@ -133,8 +133,9 @@ void CrossFaction::LoadConfig(bool reload)
 
     if (groupResult)
     {
-        while (groupResult->NextRow());
+        while (groupResult->NextRow()) {
             LeaderRaceMap[(*groupResult)[0].GetUInt64()] = (*groupResult)[0].GetUInt8();
+        }
     }
 }
 
