@@ -58,7 +58,8 @@ void CrossFaction::UpdatePlayerTeam(Group* group, uint64 guid, bool reset /* = f
                     {
                         uint8 raceid = itr->second;
                         ChrRacesEntry const* rEntry = sChrRacesStore.LookupEntry(raceid);
-                        if (rEntry) {
+                        if (rEntry) 
+                        {
                             player->setFaction(rEntry->FactionID);
                             player->setTeamId(Player::TeamIdForRace(raceid));
                             return;
@@ -81,7 +82,7 @@ void CrossFaction::UpdatePlayerTeam(Group* group, uint64 guid, bool reset /* = f
 
 void CrossFaction::LoadConfig(bool reload)
 {
-    sLog->outError("Loading Crossfaction disable rules...");
+    sLog->outError("CROSSFACTION: Loading disable rules...");
     if (reload)
     {
         mapDisable.clear();
@@ -128,19 +129,26 @@ void CrossFaction::LoadConfig(bool reload)
         while (areaResult->NextRow());
     }
 
-    sLog->outError("%u maps, %u zones, %u areas have been disabled for crossfaction ", mapcount,zonecount,areacount);
+    sLog->outError("CROSSFACTION: %u maps, %u zones, %u areas have been disabled for crossfaction ", mapcount,zonecount,areacount);
 
-    sLog->outError("Loading offline group leaders...");
+    sLog->outError("CROSSFACTION: loading offline group leaders...");
 
     LeaderRaceMap.clear();
     QueryResult groupResult = CharacterDatabase.PQuery("SELECT c.guid, c.race from characters c, groups g where g.leaderguid = c.guid");
 
+    uint32 leaderCount = 0;
+
     if (groupResult)
     {
-        while (groupResult->NextRow()) {
+        while (groupResult->NextRow())
+        {
             LeaderRaceMap[(*groupResult)[0].GetUInt64()] = (*groupResult)[0].GetUInt8();
+            leaderCount++;
         }
     }
+
+    sLog->outError("CROSSFACTION: loaded %u  group leaders",leaderCount);
+
 }
 
 // This function is used to retrieve 
