@@ -19,6 +19,7 @@ void AddSC_guildhouse_npcs();
 void AddSC_npc_transmogrifier();
 void AddSC_npc_transmogrifier();
 void AddSC_hearthstone();
+void AddSC_azth_group_plg();
 
 
 void AddAzthScripts()
@@ -36,6 +37,7 @@ void AddAzthScripts()
     AddSC_npc_transmogrifier();
     //sAnticheatMgr->StartScripts(); //[AZTH] Anticheat
     AddSC_hearthstone();
+    AddSC_azth_group_plg();
 }
 
 

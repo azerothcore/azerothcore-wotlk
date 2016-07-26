@@ -8,7 +8,6 @@
 
 class CrossFaction;
 
-/* [TODO] fix and re-enable */
 class AzthPlayer {
  public:
      explicit AzthPlayer(Player *origin);

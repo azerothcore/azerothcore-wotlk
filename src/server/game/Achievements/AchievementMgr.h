@@ -248,6 +248,9 @@ struct CompletedAchievementData
 {
     time_t date;
     bool changed;
+    //[AZTH]
+    uint16 levelPlayer;
+    uint8 groupLevel;
 };
 
 typedef UNORDERED_MAP<uint32, CriteriaProgress> CriteriaProgressMap;
@@ -278,6 +281,7 @@ class AchievementMgr
         void UpdateTimedAchievements(uint32 timeDiff);
         void StartTimedAchievement(AchievementCriteriaTimedTypes type, uint32 entry, uint32 timeLost = 0);
         void RemoveTimedAchievement(AchievementCriteriaTimedTypes type, uint32 entry);   // used for quest and scripted timed achievements
+
 
         void RemoveCriteriaProgress(AchievementCriteriaEntry const* entry);
     private:

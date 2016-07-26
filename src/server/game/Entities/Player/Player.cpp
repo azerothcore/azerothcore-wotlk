@@ -968,6 +968,8 @@ Player::~Player()
     delete m_runes;
     delete m_achievementMgr;
     delete m_reputationMgr;
+    // [AZTH]
+    delete azthPlayer;
 
     sWorld->DecreasePlayerCount();
 

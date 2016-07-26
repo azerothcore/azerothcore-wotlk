@@ -41,6 +41,8 @@
 #include "SharedDefines.h"
 #include "MapManager.h"
 #include "UpdateFieldFlags.h"
+// [AZTH]
+#include "AzthGroupMgr.h"
 
 Roll::Roll(uint64 _guid, LootItem const& li) : itemGUID(_guid), itemid(li.itemid),
 itemRandomPropId(li.randomPropertyId), itemRandomSuffix(li.randomSuffix), itemCount(li.count),
@@ -71,6 +73,10 @@ _difficultyChangePreventionType(DIFFICULTY_PREVENTION_CHANGE_NONE)
 {
     for (uint8 i = 0; i < TARGETICONCOUNT; ++i)
         m_targetIcons[i] = 0;
+
+    // [AZTH]
+    azthGroupMgr = new AzthGroupMgr(this);
+    // [/AZTH]
 }
 
 Group::~Group()
@@ -93,6 +99,8 @@ Group::~Group()
 
     // Sub group counters clean up
     delete[] m_subGroupsCounts;
+    //[AZTH]
+    delete azthGroupMgr;
 }
 
 bool Group::Create(Player* leader)
@@ -148,6 +156,10 @@ bool Group::Create(Player* leader)
         stmt->setUInt32(index++, uint8(m_dungeonDifficulty));
         stmt->setUInt32(index++, uint8(m_raidDifficulty));
         stmt->setUInt32(index++, GUID_LOPART(m_masterLooterGuid));
+        //[/AZTH]
+        stmt->setUInt32(index++, uint8(leader->getLevel()));
+        azthGroupMgr->levelMaxGroup = 0;
+        // [/AZTH]
 
         CharacterDatabase.Execute(stmt);
 

@@ -25,6 +25,11 @@
 #include "QueryResult.h"
 #include "SharedDefines.h"
 
+ //[AZTH]
+#include "AzthGroupMgr.h"
+class AzthGroupMgr;
+// [/AZTH]
+
 class Battlefield;
 class Battleground;
 class Creature;
@@ -328,6 +333,10 @@ class Group
             _difficultyChangePreventionTime = time(NULL) + MINUTE;
             _difficultyChangePreventionType = type;
         }
+
+        // [AZTH]
+        AzthGroupMgr* azthGroupMgr;
+        // [/AZTH]
 
     protected:
         void _homebindIfInstance(Player* player);
