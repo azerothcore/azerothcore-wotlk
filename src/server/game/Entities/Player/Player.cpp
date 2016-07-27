@@ -7180,12 +7180,13 @@ bool Player::RewardHonor(Unit* uVictim, uint32 groupsize, int32 honor, bool awar
     if (HasAura(SPELL_AURA_PLAYER_INACTIVE))
         return false;
 
-    // check if player has same IP
+    /* check if player has same IP
     if (uVictim && uVictim->GetTypeId() == TYPEID_PLAYER)
     {
         if (GetSession()->GetRemoteAddress() == uVictim->ToPlayer()->GetSession()->GetRemoteAddress())
             return false;
     }
+    */
 
     uint64 victim_guid = 0;
     uint32 victim_rank = 0;
