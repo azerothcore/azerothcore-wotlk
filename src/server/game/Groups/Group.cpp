@@ -158,7 +158,6 @@ bool Group::Create(Player* leader)
         stmt->setUInt32(index++, GUID_LOPART(m_masterLooterGuid));
         //[/AZTH]
         stmt->setUInt32(index++, uint8(leader->getLevel()));
-        azthGroupMgr->levelMaxGroup = 0;
         // [/AZTH]
 
         CharacterDatabase.Execute(stmt);

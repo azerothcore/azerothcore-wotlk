@@ -11,6 +11,11 @@
 #include "AchievementMgr.h"
 #include "AzthGroupMgr.h"
 
+enum achievementStatsType {
+    ACHIEVEMENT_TYPE,
+    CRITERIA_TYPE
+};
+
 class AzthPlayerPlg : public PlayerScript{
 public:
 
@@ -20,21 +25,19 @@ public:
     uint16 tmpLevelPg;
     uint8 groupLevel;
     
-    struct CompletedAchievementData
+    struct AzthAchiData
     {
         uint8 level;
         uint8 levelParty;
     };
 
-    typedef UNORDERED_MAP<uint16 /*achiId*/, CompletedAchievementData /*data*/> CompletedAchievementMap;
+    typedef UNORDERED_MAP<uint16 /*achiId*/, AzthAchiData /*data*/> CompletedAchievementMap;
     CompletedAchievementMap m_completed_achievement_map;
+
+    typedef UNORDERED_MAP<uint16 /*critId*/, AzthAchiData /*data*/> CompletedCriteriaMap;
+    CompletedCriteriaMap m_completed_criteria_map;
+
     uint32 instanceID;
-
-   // Fixa sta pircheria
-    void GetPartyLevel(Group* group, Player* player, AchievementMgr* achievement ) {
-        
-
-    }
     
     void OnLevelChanged(Player* player, uint8 oldLevel) override
     {
@@ -75,44 +78,72 @@ public:
         }
     }
 
+    // Following 2 functions store levels in a temporary map
     void OnAchiComplete(Player *player, AchievementEntry const* achievement) override {
+        AzthAchiData& it = m_completed_achievement_map[achievement->ID];
+        it.level = player->getLevel();
+        it.levelParty = getGroupLevel(player);
+    }
 
-        Group* group = NULL;
-        uint64 leaderGUID = 0;
-        uint16 levelPlayer = player->getLevel();
+    void OnCriteriaProgress(Player *player, AchievementCriteriaEntry const* criteria) override {
+        AzthAchiData& it = m_completed_criteria_map[criteria->ID];
+        it.level = player->getLevel();
+        it.levelParty = getGroupLevel(player);
+    }
 
+    // Following 2 functions save our temporary maps inside the db
+    void OnAchiSave(SQLTransaction& trans, Player *player, uint16 achId, CompletedAchievementData achiData) override {
+
+        AzthAchiData& it = m_completed_achievement_map[achId];
+        uint32 index = 0;
+        
+        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_PVESTATS);
+        stmt->setUInt32(index++, player->GetGUID());
+        stmt->setUInt32(index++, achId);
+        stmt->setUInt32(index++, ACHIEVEMENT_TYPE);
+        stmt->setUInt32(index++, it.level);
+        stmt->setUInt32(index++, it.levelParty);
+        stmt->setUInt32(index++, achiData.date);
+        trans->Append(stmt);
+
+        m_completed_achievement_map.erase(achId);
+    }
+
+    void OnCriteriaSave(SQLTransaction& trans, Player* player, uint16 critId, CriteriaProgress criteriaData) override {
+
+        AzthAchiData& it = m_completed_criteria_map[critId];
+        uint32 index = 0;
+
+        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_PVESTATS);
+        stmt->setUInt32(index++, player->GetGUID());
+        stmt->setUInt32(index++, critId);
+        stmt->setUInt32(index++, CRITERIA_TYPE);
+        stmt->setUInt32(index++, it.level);
+        stmt->setUInt32(index++, it.levelParty);
+        stmt->setUInt32(index++, criteriaData.date);
+        trans->Append(stmt);
+
+        m_completed_criteria_map.erase(critId);
+    }
+
+private:
+    uint8 getGroupLevel(Player *player) {
+        uint8 groupLevel = 0;
+
+        Group *group = player->GetGroup();
         Map* map = player->FindMap();
-        if (map->IsDungeon()) {
-            InstanceSave* is = sInstanceSaveMgr->PlayerGetInstanceSave(GUID_LOPART(player->GetGUID()), map->GetId(), player->GetDifficulty((map->IsRaid())));
-            if (is->azthInstMgr->levelMax!=0) {
-                levelPlayer = is->azthInstMgr->levelMax;
+        if (group) {
+            if (map->IsDungeon()) {
+                // caso party instance
+                InstanceSave* is = sInstanceSaveMgr->PlayerGetInstanceSave(GUID_LOPART(player->GetGUID()), map->GetId(), player->GetDifficulty((map->IsRaid())));
+                groupLevel = is->azthInstMgr->levelMax;
+            } else {
+                // caso party esterno
+                groupLevel = group->azthGroupMgr->levelMaxGroup;
             }
         }
 
-        CompletedAchievementData& it = m_completed_achievement_map[achievement->ID];
-        it.level = levelPlayer;
-        if(player->GetGroup()->isRaidGroup())
-            it.levelParty = group->azthGroupMgr->levelMaxGroup;
-        
-
-      // Da spostare nella SaveToDb
-        /* PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_PVESTATS);
-        // playerGuid, achievement, type, level, levelParty, date
-        stmt->setUInt32(0, player->GetGUID());
-        stmt->setUInt32(1, achievement->ID);
-        stmt->setUInt32(2, 0);
-        stmt->setUInt32(3, levelPlayer);
-        stmt->setUInt32(4, );
-        stmt->setUInt32(5, );
-        CharacterDatabase.Execute(stmt);*/
-    }
-
-    void OnAchiSave(Player *player, uint16 achId) override {
-
-        CompletedAchievementData& it = m_completed_achievement_map[achId];
-
-        CharacterDatabase.PExecute("UPDATE character_achievement SET levelPg = %u WHERE achievement = %u", it.level, achId);
-        m_completed_achievement_map.erase(achId);
+        return groupLevel;
     }
 };
 
