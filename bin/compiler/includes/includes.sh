@@ -4,6 +4,10 @@ source "$CURRENT_PATH/../../bash_shared/includes.sh"
 
 AZTH_PATH_COMPILER="$AZTH_PATH_BIN/compiler"
 
+if [ -f "$AZTH_PATH_COMPILER/config.sh"  ]; then
+    source "$AZTH_PATH_COMPILER/config.sh" # should overwrite previous
+fi
+
 function azth_on_after_build() {
     # move the run engine
     cp -rvf "$AZTH_PATH_BIN/runners/"* "$INSTALL_PATH/bin/"
