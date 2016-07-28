@@ -125,6 +125,16 @@ enum BattlegroundSpells
     SPELL_THE_LAST_STANDING         = 26549,                // Arena achievement related
 };
 
+enum BattlegroundReputations
+{
+    BG_REP_AV_HORDE         = 729,
+    BG_REP_AV_ALLIANCE      = 730,
+    BG_REP_AB_HORDE         = 510,
+    BG_REP_AB_ALLIANCE      = 509,
+    BG_REP_WS_HORDE         = 889,
+    BG_REP_WS_ALLIANCE      = 890,
+};
+
 enum BattlegroundTimeIntervals
 {
     CHECK_PLAYER_POSITION_INVERVAL  = 9000,                 // ms
@@ -486,6 +496,7 @@ class Battleground
         void RemoveAuraOnTeam(uint32 spellId, TeamId teamId);
         void RewardHonorToTeam(uint32 honor, TeamId teamId);
         void RewardReputationToTeam(uint32 factionId, uint32 reputation, TeamId teamId);
+        uint32 GetRealRepFactionForPlayer(uint32 factionId, Player* player);
 
         void UpdateWorldState(uint32 Field, uint32 Value);
         void UpdateWorldStateForPlayer(uint32 Field, uint32 Value, Player* player);
