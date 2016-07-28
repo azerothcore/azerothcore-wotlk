@@ -665,16 +665,47 @@ void Battleground::RewardHonorToTeam(uint32 honor, TeamId teamId)
 
 void Battleground::RewardReputationToTeam(uint32 factionId, uint32 reputation, TeamId teamId)
 {
-    if (FactionEntry const* factionEntry = sFactionStore.LookupEntry(factionId))
         for (BattlegroundPlayerMap::const_iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
             if (itr->second->GetBgTeamId() == teamId)
             {
+                uint32 realFactionId = GetRealRepFactionForPlayer(factionId, itr->second);
+
                 uint32 repGain = reputation;
                 AddPct(repGain, itr->second->GetTotalAuraModifier(SPELL_AURA_MOD_REPUTATION_GAIN));
-                AddPct(repGain, itr->second->GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_FACTION_REPUTATION_GAIN, factionId));
-                itr->second->GetReputationMgr().ModifyReputation(factionEntry, repGain);
+                AddPct(repGain, itr->second->GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_FACTION_REPUTATION_GAIN, realFactionId));
+                if (FactionEntry const* factionEntry = sFactionStore.LookupEntry(realFactionId))
+                    itr->second->GetReputationMgr().ModifyReputation(factionEntry, repGain);
             }
 }
+
+uint32 Battleground::GetRealRepFactionForPlayer(uint32 factionId, Player* player)
+{
+    if (player)
+    {
+        // if the bg team is not the original team, reverse reputation
+        if (player->GetBgTeamId() != player->GetTeamId(true))
+        {
+            switch (factionId)
+            {
+                case BG_REP_AB_ALLIANCE:
+                    return BG_REP_AB_HORDE;
+                case BG_REP_AB_HORDE:
+                    return BG_REP_AB_ALLIANCE;
+                case BG_REP_AV_ALLIANCE:
+                    return BG_REP_AV_HORDE;
+                case BG_REP_AV_HORDE:
+                    return BG_REP_AV_ALLIANCE;
+                case BG_REP_WS_ALLIANCE:
+                    return BG_REP_WS_HORDE;
+                case BG_REP_WS_HORDE:
+                    return BG_REP_WS_ALLIANCE;
+            }
+        }
+    }
+
+    return factionId;
+}
+
 
 void Battleground::UpdateWorldState(uint32 Field, uint32 Value)
 {
