@@ -42,6 +42,8 @@ if(EXISTS "conf/config.cmake")
   include(conf/config.cmake)
 endif()
 
+RUN_HOOK("AFTER_LOAD_CONF")
+
 # build in Release-mode by default if not explicitly set
 if( NOT CMAKE_BUILD_TYPE )
   set(CMAKE_BUILD_TYPE "Release")
@@ -85,8 +87,10 @@ include(src/cmake/showoptions.cmake)
 AZTH_SUBDIRLIST(sub_DIRS  "${CMAKE_SOURCE_DIR}/modules" FALSE FALSE)
 FOREACH(subdir ${sub_DIRS})
     STRING(REGEX REPLACE "^${CMAKE_SOURCE_DIR}/" "" subdir ${subdir})
-    message("Loading module: ${subdir}")
-    add_subdirectory("${subdir}")
+    if(EXISTS "${subdir}/CMakeLists.txt")
+        message("Loading module: ${subdir}")
+        add_subdirectory("${subdir}")
+    endif()
 ENDFOREACH()
 
 RUN_HOOK("BEFORE_SRC_LOAD")
