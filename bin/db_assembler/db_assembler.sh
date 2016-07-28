@@ -26,8 +26,8 @@ function assemble() {
 	database=$1
 	start_sql=$2
 
-	var_full="DB_"$database"_PATHS"
-	full=${!var_full}
+	var_base="DB_"$database"_PATHS"
+	base=${!var_full}
 
 	var_updates="DB_"$database"_UPDATE_PATHS"
 	updates=${!var_updates}
@@ -47,16 +47,27 @@ function assemble() {
 	echo "" > $OUTPUT_FOLDER$database$suffix_base".sql"
 
 
-	if [ ! ${#full[@]} -eq 0 ]; then
-		echo "Generating $OUTPUT_FOLDER$database$suffix_based ..."
+	if [ ! ${#base[@]} -eq 0 ]; then
+		echo "Generating $OUTPUT_FOLDER$database$suffix_base ..."
 
-		for entry in "${full[@]}"
+		for d in "${base[@]}"
 	 	do
-			if [ ! -z $entry ]; then
-				if [ -e $entry ]; then 
-	  				cat "$entry" >> $OUTPUT_FOLDER$database$suffix_base".sql"
-				fi
-			fi
+			for entry in "$d"/*.sql "$d"/**/*.sql
+			do
+			  if [ ! -z $d ]; then
+				  file=$(basename $entry)
+				  if [[ "$file" > "$start_sql" ]]
+				  then
+					if [ -e $entry ]; then 
+						if [[ "$gtversion" < "$file" ]]; then
+							gtversion=$file
+						fi
+
+				  		cat "$entry" >> $OUTPUT_FOLDER$database$suffix_base".sql"
+					fi
+				  fi
+			  fi
+			done
 		done
 	fi
 
