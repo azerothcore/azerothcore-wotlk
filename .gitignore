@@ -2,8 +2,6 @@
 # AzerothCore
 #
 
-*/compiler/config.sh
-
 conf/*
 !conf/*.dist
 modules/*

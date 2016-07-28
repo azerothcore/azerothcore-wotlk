@@ -56,7 +56,7 @@ export GDB_ENABLED=0
 export GDB=""
 
 # directory where binary are stored
-exoirt BINPATH=""
+export BINPATH=""
 
  ### Put here the pid you configured on your worldserver.conf file ###
 export SERVERPID=""
