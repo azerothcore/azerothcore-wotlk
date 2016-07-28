@@ -32,7 +32,7 @@ CWARNINGS=1
 # enable/disable some debug informations ( it's not a debug compilation )
 CDEBUG=0
 # specify compilation type
-CCTYPE=Release
+CTYPE=Release
 # compile scripts
 CSCRIPTS=1
 # compile server

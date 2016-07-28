@@ -86,10 +86,10 @@ include(src/cmake/showoptions.cmake)
 # add modules and dependencies
 AZTH_SUBDIRLIST(sub_DIRS  "${CMAKE_SOURCE_DIR}/modules" FALSE FALSE)
 FOREACH(subdir ${sub_DIRS})
-    STRING(REGEX REPLACE "^${CMAKE_SOURCE_DIR}/" "" subdir ${subdir})
+    STRING(REGEX REPLACE "^${CMAKE_SOURCE_DIR}/" "" subdir_rel ${subdir})
     if(EXISTS "${subdir}/CMakeLists.txt")
-        message("Loading module: ${subdir}")
-        add_subdirectory("${subdir}")
+        message("Loading module: ${subdir_rel}")
+        add_subdirectory("${subdir_rel}")
     endif()
 ENDFOREACH()
 
