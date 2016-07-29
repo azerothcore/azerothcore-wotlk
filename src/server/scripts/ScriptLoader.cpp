@@ -40,7 +40,7 @@ void AddSC_warrior_spell_scripts();
 void AddSC_quest_spell_scripts();
 void AddSC_item_spell_scripts();
 
-void AddSC_SmartSCripts();
+void AddSC_SmartScripts();
 
 //Commands
 void AddSC_account_commandscript();
@@ -587,59 +587,6 @@ void AddSC_outdoorpvp_gh();
 
 
 #endif
-
-void AddScripts()
-{
-    AddSpellScripts();
-    AddSC_SmartSCripts();
-    AddCommandScripts();
-#ifdef SCRIPTS
-    AddWorldScripts();
-    AddEventScripts();
-    AddEasternKingdomsScripts();
-    AddKalimdorScripts();
-    AddOutlandScripts();
-    AddNorthrendScripts();
-    AddPetScripts();
-    AddBattlegroundScripts();
-    AddOutdoorPvPScripts();
-    AddCustomScripts();
-#endif
-}
-
-void CheckIfScriptsInDatabaseExist()
-{
-    ObjectMgr::ScriptNameContainer& sn = sObjectMgr->GetScriptNames();
-    for (ObjectMgr::ScriptNameContainer::iterator itr = sn.begin(); itr != sn.end(); ++itr)
-        if (uint32 sid = sObjectMgr->GetScriptId((*itr).c_str()))
-        {
-            if (!ScriptRegistry<SpellScriptLoader>::GetScriptById(sid) &&
-                !ScriptRegistry<ServerScript>::GetScriptById(sid) &&
-                !ScriptRegistry<WorldScript>::GetScriptById(sid) &&
-                !ScriptRegistry<FormulaScript>::GetScriptById(sid) &&
-                !ScriptRegistry<WorldMapScript>::GetScriptById(sid) &&
-                !ScriptRegistry<InstanceMapScript>::GetScriptById(sid) &&
-                !ScriptRegistry<BattlegroundMapScript>::GetScriptById(sid) &&
-                !ScriptRegistry<ItemScript>::GetScriptById(sid) &&
-                !ScriptRegistry<CreatureScript>::GetScriptById(sid) &&
-                !ScriptRegistry<GameObjectScript>::GetScriptById(sid) &&
-                !ScriptRegistry<AreaTriggerScript>::GetScriptById(sid) &&
-                !ScriptRegistry<BattlegroundScript>::GetScriptById(sid) &&
-                !ScriptRegistry<OutdoorPvPScript>::GetScriptById(sid) &&
-                !ScriptRegistry<CommandScript>::GetScriptById(sid) &&
-                !ScriptRegistry<WeatherScript>::GetScriptById(sid) &&
-                !ScriptRegistry<AuctionHouseScript>::GetScriptById(sid) &&
-                !ScriptRegistry<ConditionScript>::GetScriptById(sid) &&
-                !ScriptRegistry<VehicleScript>::GetScriptById(sid) &&
-                !ScriptRegistry<DynamicObjectScript>::GetScriptById(sid) &&
-                !ScriptRegistry<TransportScript>::GetScriptById(sid) &&
-                !ScriptRegistry<AchievementCriteriaScript>::GetScriptById(sid) &&
-                !ScriptRegistry<PlayerScript>::GetScriptById(sid) &&
-                !ScriptRegistry<GuildScript>::GetScriptById(sid) &&
-                !ScriptRegistry<GroupScript>::GetScriptById(sid))
-                sLog->outErrorDb("Script named '%s' is assigned in database, but has no code!", (*itr).c_str());
-        }
-}
 
 void AddSpellScripts()
 {
@@ -1233,19 +1180,3 @@ void AddOutdoorPvPScripts()
 #endif
 }
 
-void AddBattlegroundScripts()
-{
-#ifdef SCRIPTS
-#endif
-}
-
-#ifdef SCRIPTS
-/* This is where custom scripts' loading functions should be declared. */
-#endif
-
-void AddCustomScripts()
-{
-#ifdef SCRIPTS
-    /* This is where custom scripts should be added. */
-#endif
-}

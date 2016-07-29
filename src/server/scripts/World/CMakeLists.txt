@@ -23,4 +23,6 @@ set(scripts_STAT_SRCS
   World/npcs_special.cpp
 )
 
+AZTH_ADD_SCRIPTS("World" "ScriptLoader.h")
+
 message("  -> Prepared: World")

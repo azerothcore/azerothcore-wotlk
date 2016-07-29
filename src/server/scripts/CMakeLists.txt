@@ -22,13 +22,19 @@ include(Commands/CMakeLists.txt)
 
 set(scripts_STAT_SRCS
   ${scripts_STAT_SRCS}
+  ScriptLoader.cpp
+  ScriptLoader.h
+  ${BUILDDIR}/GenLoader.cpp
   ../game/AI/ScriptedAI/ScriptedEscortAI.cpp
   ../game/AI/ScriptedAI/ScriptedCreature.cpp
   ../game/AI/ScriptedAI/ScriptedFollowerAI.cpp
 )
 
+AZTH_ADD_SCRIPTS("Spell" "ScriptLoader.h")
+AZTH_ADD_SCRIPTS("SC_Smart" "ScriptLoader.h")
+AZTH_ADD_SCRIPTS("Command" "ScriptLoader.h")
+
 if(SCRIPTS)
-  include(Custom/CMakeLists.txt)
   include(World/CMakeLists.txt)
   include(OutdoorPvP/CMakeLists.txt)
   include(EasternKingdoms/CMakeLists.txt)
@@ -38,6 +44,18 @@ if(SCRIPTS)
   include(Events/CMakeLists.txt)
   include(Pet/CMakeLists.txt)
 endif()
+
+
+AZTH_GET_GLOBAL("AZTH_ADD_SCRIPTS_LIST")
+AZTH_GET_GLOBAL("AZTH_ADD_SCRIPTS_INCLUDE")
+
+set("AZTH_SCRIPTS_INCLUDES" "")
+
+FOREACH (include ${AZTH_ADD_SCRIPTS_INCLUDE})
+    set("AZTH_SCRIPTS_INCLUDES" "#include \"${include}\"\n${AZTH_SCRIPTS_INCLUDES}")
+ENDFOREACH()
+
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/GenLoader.cpp.cmake ${BUILDDIR}/GenLoader.cpp)
 
 message(STATUS "SCRIPT PREPARATION COMPLETE")
 message("")
@@ -142,6 +160,7 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/src/server/game/World
   ${CMAKE_SOURCE_DIR}/src/server/game/ArenaSpectator
   ${CMAKE_SOURCE_DIR}/src/server/game/Misc
+  ${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}/PrecompiledHeaders
   ${ACE_INCLUDE_DIR}
   ${MYSQL_INCLUDE_DIR}
