@@ -439,14 +439,14 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket &recvData)
                 uint32 allyCount = bg->GetPlayersCountByTeam(TEAM_ALLIANCE);
                 uint32 hordeCount = bg->GetPlayersCountByTeam(TEAM_HORDE);
 
-                if (allyCount && hordeCount && allyCount == hordeCount)
+                if (allyCount == hordeCount)
                 {
                     if (roll_chance_i(50))
                         teamId = _player->GetTeamId(true) == TEAM_ALLIANCE ? TEAM_HORDE : TEAM_ALLIANCE;
                 }
                 else if (allyCount < hordeCount)
                     teamId = TEAM_ALLIANCE;
-                else if (hordeCount < allyCount)
+                else
                     teamId = TEAM_HORDE;
                 // [/AZTH]
 
