@@ -5,6 +5,8 @@ CREATE TABLE IF NOT EXISTS azth_achievement_stats (
      type INT(8) UNSIGNED NOT NULL DEFAULT 0, 
      level INT(10) UNSIGNED NOT NULL DEFAULT 0,
      levelParty INT(10) UNSIGNED DEFAULT 0,
-     date DATETIME NOT NULL DEFAULT NOW(), 
+     date INT(10) NOT NULL DEFAULT 0, 
      PRIMARY KEY (id) 
  ) ENGINE=MYISAM CHARSET=utf8 COLLATE=utf8_general_ci;
+ 
+ 
