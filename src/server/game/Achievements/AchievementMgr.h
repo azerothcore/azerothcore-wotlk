@@ -248,9 +248,6 @@ struct CompletedAchievementData
 {
     time_t date;
     bool changed;
-    //[AZTH]
-    uint16 levelPlayer;
-    uint8 groupLevel;
 };
 
 typedef UNORDERED_MAP<uint32, CriteriaProgress> CriteriaProgressMap;

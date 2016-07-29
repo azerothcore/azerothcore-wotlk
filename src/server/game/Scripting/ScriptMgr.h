@@ -30,6 +30,10 @@
 #include "World.h"
 #include "Weather.h"
 
+//[AZTH]
+#include "AchievementMgr.h"
+//[/AZTH]
+
 class AuctionHouseObject;
 class AuraScript;
 class Battleground;
@@ -719,7 +723,11 @@ class PlayerScript : public ScriptObject
 
         virtual void OnAchiComplete(Player* /*player*/, AchievementEntry const* /*achievement*/) { }
 
-        virtual void OnAchiSave(Player* /*player*/, uint16 /*achId*/) { }
+        virtual void OnCriteriaProgress(Player* /*player*/, AchievementCriteriaEntry const* /*criteria*/) { }
+
+        virtual void OnAchiSave(SQLTransaction& /*trans*/, Player* /*player*/, uint16 /*achId*/, CompletedAchievementData /*achiData*/) { }
+
+        virtual void OnCriteriaSave(SQLTransaction& /*trans*/, Player* /*player*/, uint16 /*achId*/, CriteriaProgress /*criteriaData*/) { }
         //[/AZTH]
 };
 
@@ -992,7 +1000,9 @@ class ScriptMgr
         // [AZTH] all custom PlayerScript functions
         void OnPlayerRemoveFromBattleground(Player* player, Battleground* bg);
         void OnAchievementComplete(Player *player, AchievementEntry const* achievement);
-        void OnAchievementSave(Player *player, uint16 achId);
+        void OnCriteriaProgress(Player *player, AchievementCriteriaEntry const* criteria);
+        void OnAchievementSave(SQLTransaction& trans, Player* player, uint16 achiId, CompletedAchievementData achiData);
+        void OnCriteriaSave(SQLTransaction& trans, Player* player, uint16 critId, CriteriaProgress criteriaData);
         // [/AZTH]
 
     public: /* GuildScript */

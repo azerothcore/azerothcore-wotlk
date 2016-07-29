@@ -1199,9 +1199,19 @@ void ScriptMgr::OnAchievementComplete(Player* player, AchievementEntry const* ac
     FOREACH_SCRIPT(PlayerScript)->OnAchiComplete(player, achievement);
 }
 
-void ScriptMgr::OnAchievementSave(Player* player, uint16 achId)
+void ScriptMgr::OnCriteriaProgress(Player* player, AchievementCriteriaEntry const* criteria)
 {
-    FOREACH_SCRIPT(PlayerScript)->OnAchiSave(player, achId);
+    FOREACH_SCRIPT(PlayerScript)->OnCriteriaProgress(player, criteria);
+}
+
+void ScriptMgr::OnAchievementSave(SQLTransaction& trans, Player* player, uint16 achiId, CompletedAchievementData achiData)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnAchiSave(trans, player, achiId, achiData);
+}
+
+void ScriptMgr::OnCriteriaSave(SQLTransaction& trans, Player* player, uint16 critId, CriteriaProgress criteriaData)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnCriteriaSave(trans, player, critId, criteriaData);
 }
 //[/AZTH]
 
