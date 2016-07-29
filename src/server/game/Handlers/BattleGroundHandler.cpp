@@ -433,13 +433,23 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket &recvData)
                     _player->SpawnCorpseBones();
                 }
 
-
-                //[AZTH]
                 TeamId teamId = ginfo.teamId;
-                if (bgTypeId == BATTLEGROUND_RB) {
-                    teamId = _player->GetTeamId(true) == TEAM_ALLIANCE ? TEAM_HORDE : TEAM_ALLIANCE;
+               
+                // [AZTH] Random Battleground Randomizer - by Yehonal & Mik1893
+                uint32 allyCount = bg->GetPlayersCountByTeam(TEAM_ALLIANCE);
+                uint32 hordeCount = bg->GetPlayersCountByTeam(TEAM_HORDE);
+
+                if (allyCount == hordeCount)
+                {
+                    if (roll_chance_i(50))
+                        teamId = _player->GetTeamId(true) == TEAM_ALLIANCE ? TEAM_HORDE : TEAM_ALLIANCE;
                 }
-                //[/AZTH]
+                else if (allyCount < hordeCount)
+                    teamId = TEAM_ALLIANCE;
+                else
+                    teamId = TEAM_HORDE;
+                // [/AZTH]
+
                 // remove player from all bg queues
                 for (uint32 qslot = 0; qslot < PLAYER_MAX_BATTLEGROUND_QUEUES; ++qslot)
                     if (BattlegroundQueueTypeId q = _player->GetBattlegroundQueueTypeId(qslot))
