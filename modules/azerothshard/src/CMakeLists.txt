@@ -27,3 +27,5 @@ ADD_HOOK(BEFORE_SRC_LOAD "${CMAKE_AZTH_SRC_DIR}/cmake/before_src_load.cmake")
 ADD_HOOK(AFTER_GAME_LIBRARY "${CMAKE_AZTH_SRC_DIR}/cmake/after_game_library.cmake")
 
 ADD_HOOK(AFTER_SRC_LOAD "${CMAKE_AZTH_SRC_DIR}/cmake/after_src_load.cmake")
+
+AZTH_ADD_SCRIPTS("Azth" "AzthPlgLoader.h")

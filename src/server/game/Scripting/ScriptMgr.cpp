@@ -33,9 +33,6 @@
 #include "Player.h"
 #include "WorldPacket.h"
 
-// [AZTH]
-#include "PluginsLoader.h"
-
 // This is the global static registry of scripts.
 /*template<class TScript>
 class ScriptRegistry
@@ -181,8 +178,6 @@ void ScriptMgr::Initialize()
     sLog->outString("Loading C++ scripts");
 
     FillSpellSummary();
-
-    AddAzthScripts(); // [AZTH] Loading AzerothShard Scripts
 
     AddScripts();
     CheckIfScriptsInDatabaseExist();
