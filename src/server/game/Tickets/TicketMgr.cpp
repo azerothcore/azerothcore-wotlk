@@ -371,7 +371,7 @@ void TicketMgr::ResolveAndCloseTicket(uint32 ticketId, int64 source)
 {
     if (GmTicket* ticket = GetTicket(ticketId))
     {
-        SQLTransaction trans = SQLTransaction(nullptr);
+        SQLTransaction trans = SQLTransaction(NULL);
         ticket->SetClosedBy(source);
         ticket->SetResolvedBy(source);
         if (source)
