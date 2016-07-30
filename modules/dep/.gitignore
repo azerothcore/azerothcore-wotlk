@@ -1,19 +1,6 @@
-#
-# AzerothCore
-#
+!.gitignore
 
-conf/*
-!conf/*.dist
-modules/*
-
-#
-# Allow modules to control git ignoring
-#
-!modules/*
-modules/*/*
-!modules/*/.gitignore
-
-build*/
+!*
 
 #
 #Generic
@@ -60,4 +47,3 @@ local.properties
 .loadpath
 .project
 .cproject
-
