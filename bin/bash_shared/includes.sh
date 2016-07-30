@@ -11,3 +11,14 @@ source "$AZTH_PATH_CONF/config.sh.dist" # "hack" to avoid missing conf variables
 if [ -f "$AZTH_PATH_CONF/config.sh"  ]; then
     source "$AZTH_PATH_CONF/config.sh" # should overwrite previous
 fi
+
+#
+# Load modules
+#
+
+for entry in "$AZTH_PATH_MODULES/"*/include.sh
+do
+    if [ -e $entry ]; then 
+        source $entry
+    fi
+done
