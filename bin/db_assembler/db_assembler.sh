@@ -4,21 +4,32 @@ SRCPATH=$(readlink -f "../../")
 
 source $SRCPATH"/bin/bash_shared/includes.sh"
 
+if [ -f "./config.sh"  ]; then
+    source "./config.sh" # should overwrite previous
+fi
+
+version_marker="$OUTPUT_FOLDER/ZZZ_latest_version_"
+
+version="0000_00_00_00"
+for entry in "$version_marker"*
+do
+    if [ -f "$entry" ]; then
+        version=${entry#$version_marker}
+    fi
+
+    break
+done
+
 #
 # You can pass latest version as first argument of this script
 #
 if [ -z "$1" ]; then
-	read -p "Enter latest sql version ( leave blank to use : 0000_00_00_00 )" $version
-	version=${version:-0000_00_00_00}
+	read -p "Enter latest sql version ( leave blank to use : $version )" $rev
+	version=${rev:-$version}
 else
 	version=$1
 fi
 
-source "./config.sh.dist" # "hack" to avoid missing conf variables
-
-if [ -f "./config.sh"  ]; then
-    source "./config.sh" # should overwrite previous
-fi
 
 echo "===== STARTING PROCESS ====="
 
@@ -127,8 +138,12 @@ do
 	assemble "$db" $version".sql"
 done
 
-rm $OUTPUT_FOLDER"ZZZ_latest_version_"*
-echo $gtversion > $OUTPUT_FOLDER"ZZZ_latest_version_"${gtversion%.*}
+if [ ! -z $gtversion ]; then
+    if [ -f $version_marker* ]; then
+        rm $version_marker*
+    fi
+    echo $gtversion > $OUTPUT_FOLDER"ZZZ_latest_version_"${gtversion%.*}
+fi
 
 echo "===== DONE ====="
 
