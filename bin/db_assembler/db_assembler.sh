@@ -2,6 +2,8 @@
 
 SRCPATH=$(readlink -f "../../")
 
+source $SRCPATH"/bin/bash_shared/includes.sh"
+
 #
 # You can pass latest version as first argument of this script
 #
@@ -27,7 +29,7 @@ function assemble() {
 	start_sql=$2
 
 	var_base="DB_"$database"_PATHS"
-	base=${!var_full}
+	base=${!var_base}
 
 	var_updates="DB_"$database"_UPDATE_PATHS"
 	updates=${!var_updates}
@@ -52,22 +54,14 @@ function assemble() {
 
 		for d in "${base[@]}"
 	 	do
-			for entry in "$d"/*.sql "$d"/**/*.sql
-			do
-			  if [ ! -z $d ]; then
-				  file=$(basename $entry)
-				  if [[ "$file" > "$start_sql" ]]
-				  then
+			if [ ! -z $d ]; then
+				for entry in "$d"/*.sql "$d"/**/*.sql
+				do
 					if [ -e $entry ]; then 
-						if [[ "$gtversion" < "$file" ]]; then
-							gtversion=$file
-						fi
-
-				  		cat "$entry" >> $OUTPUT_FOLDER$database$suffix_base".sql"
+			  			cat "$entry" >> $OUTPUT_FOLDER$database$suffix_base".sql"
 					fi
-				  fi
-			  fi
-			done
+				done
+			fi
 		done
 	fi
 
