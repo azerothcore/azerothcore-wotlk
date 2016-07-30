@@ -57,7 +57,7 @@ class DatabaseWorkerPool
             _connections.resize(IDX_SIZE);
 
             WPFatal(mysql_thread_safe(), "Used MySQL library isn't thread-safe.");
-            WPFatal(mysql_get_client_version() >= MIN_MYSQL_CLIENT_VERSION, "SunwellCore does not support MySQL versions below 5.1");
+            WPFatal(mysql_get_client_version() >= MIN_MYSQL_CLIENT_VERSION, "AzerothCore does not support MySQL versions below 5.1");
         }
 
         ~DatabaseWorkerPool()
@@ -79,7 +79,7 @@ class DatabaseWorkerPool
                 T* t = new T(_queue, _connectionInfo);
                 res &= t->Open();
                 if (res) // only check mysql version if connection is valid
-                    WPFatal(mysql_get_server_version(t->GetHandle()) >= MIN_MYSQL_SERVER_VERSION, "SunwellCore does not support MySQL versions below 5.1");
+                    WPFatal(mysql_get_server_version(t->GetHandle()) >= MIN_MYSQL_SERVER_VERSION, "AzerothCore does not support MySQL versions below 5.1");
                 _connections[IDX_ASYNC][i] = t;
                 ++_connectionCount[IDX_ASYNC];
             }
