@@ -431,7 +431,7 @@ void World::LoadConfigSettings(bool reload)
     {
         if (!sConfigMgr->Reload())
         {
-            sLog->outError("World settings reload fail: can't read settings from %s.", sConfigMgr->GetFilename().c_str());
+            sLog->outError("World settings reload fail: can't read settings.");
             return;
         }
 
