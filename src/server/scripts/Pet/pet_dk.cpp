@@ -35,17 +35,7 @@ enum DeathKnightSpells
     SPELL_DK_DISMISS_GARGOYLE       = 50515,
     SPELL_DK_SANCTUARY              = 54661,
     SPELL_DK_NIGHT_OF_THE_DEAD      = 62137,
-    SPELL_DK_PET_SCALING            = 61017,
-    // Dancing Rune Weapon
-    SPELL_DK_DANCING_RUNE_WEAPON        = 49028,
-    SPELL_COPY_WEAPON                   = 63416,
-    SPELL_DK_RUNE_WEAPON_MARK           = 50474,
-    SPELL_DK_DANCING_RUNE_WEAPON_VISUAL = 53160,
-    SPELL_FAKE_AGGRO_RADIUS_8_YARD      = 49812,
-    SPELL_DK_RUNE_WEAPON_SCALING_01     = 51905,
-    SPELL_DK_RUNE_WEAPON_SCALING        = 51906,
-    SPELL_AGGRO_8_YD_PBAE               = 49813,
-    SPELL_DISMISS_RUNEBLADE             = 50707, // Right now despawn is done by its duration
+    SPELL_DK_PET_SCALING            = 61017
 };
 
 class npc_pet_dk_ebon_gargoyle : public CreatureScript
@@ -328,270 +318,35 @@ class npc_pet_dk_army_of_the_dead : public CreatureScript
         }
 };
 
-enum DancingRuneWeapon
+class npc_pet_dk_dancing_rune_weapon : public CreatureScript
 {
-    DATA_INITIAL_TARGET_GUID = 1,
+    public:
+        npc_pet_dk_dancing_rune_weapon() : CreatureScript("npc_pet_dk_dancing_rune_weapon") { }
 
-    EVENT_SPELL_CAST_1 = 1,
-    EVENT_SPELL_CAST_2 = 2
+        struct npc_pet_dk_dancing_rune_weaponAI : public NullCreatureAI
+        {
+            npc_pet_dk_dancing_rune_weaponAI(Creature* creature) : NullCreatureAI(creature) { }
+
+            void InitializeAI()
+            {
+                // Xinef: Hit / Expertise scaling
+                me->AddAura(61017, me);
+                if (Unit* owner = me->GetOwner())
+                    me->GetMotionMaster()->MoveFollow(owner, 0.01f, me->GetFollowAngle(), MOTION_SLOT_CONTROLLED);
+                NullCreatureAI::InitializeAI();
+            }
+        };
+
+        CreatureAI* GetAI(Creature* creature) const
+        {
+            return new npc_pet_dk_dancing_rune_weaponAI (creature);
+        }
 };
-
-
-class npc_pet_dk_rune_weapon : public CreatureScript
-{
-public:
-    npc_pet_dk_rune_weapon() : CreatureScript("npc_pet_dk_rune_weapon") { }
-
-    struct npc_pet_dk_rune_weaponAI : ScriptedAI
-    {
-        npc_pet_dk_rune_weaponAI(Creature* creature) : ScriptedAI(creature)
-        {
-            // Prevent early victim engage
-            creature->SetReactState(REACT_PASSIVE);
-            _engageTimer = 0;
-        }
-
-        void IsSummonedBy(Unit* summoner) override
-        {
-            DoCast(summoner, SPELL_COPY_WEAPON, true);
-            DoCast(summoner, SPELL_DK_RUNE_WEAPON_MARK, true);
-            DoCast(me, SPELL_DK_DANCING_RUNE_WEAPON_VISUAL, true);
-            DoCast(me, SPELL_FAKE_AGGRO_RADIUS_8_YARD, true);
-            DoCast(me, SPELL_DK_RUNE_WEAPON_SCALING_01, true);
-            DoCast(me, SPELL_DK_RUNE_WEAPON_SCALING, true);
-            DoCast(me, SPELL_DK_PET_SCALING_04, true);
-            DoCast(me, SPELL_DK_PET_SCALING_03, true);
-
-            _events.ScheduleEvent(EVENT_SPELL_CAST_2, 6 * IN_MILLISECONDS);
-            _engageTimer = 1 * IN_MILLISECONDS;
-
-            me->SetRedirectThreat(summoner->GetGUID(), 100);
-        }
-
-        void MoveInLineOfSight(Unit* /*who*/) override { }
-        void AttackStart(Unit* /*who*/) override { }
-
-        void SetGUID(uint64 guid, int32 type) override
-        {
-            switch (type)
-            {
-            case DATA_INITIAL_TARGET_GUID:
-                _targetGUID = guid;
-                me->SetReactState(REACT_AGGRESSIVE);
-                if (Unit* target = ObjectAccessor::GetUnit(*me, _targetGUID))
-                    Attack(target);
-                break;
-            default:
-                break;
-            }
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (me->HasReactState(REACT_PASSIVE))
-            {
-                if (_engageTimer <= diff)
-                    me->SetReactState(REACT_AGGRESSIVE);
-                else
-                {
-                    _engageTimer -= diff;
-                    return;
-                }
-            }
-
-            if (me->IsInCombat() && (!me->GetVictim() || !me->IsValidAttackTarget(me->GetVictim())))
-                EnterEvadeMode();
-
-            if (!me->IsInCombat())
-            {
-                Unit* ownerTarget = NULL;
-                if (Player* owner = me->GetCharmerOrOwner()->ToPlayer())
-                    ownerTarget = owner->GetSelectedUnit();
-
-                // recognize which victim will be choosen
-                if (ownerTarget && ownerTarget->GetTypeId() == TYPEID_PLAYER)
-                {
-                    if (!ownerTarget->HasBreakableByDamageCrowdControlAura(ownerTarget))
-                        Attack(ownerTarget);
-                }
-                else if (ownerTarget && (ownerTarget->GetTypeId() != TYPEID_PLAYER) && IsInThreatList(ownerTarget))
-                {
-                    if (!ownerTarget->HasBreakableByDamageCrowdControlAura(ownerTarget))
-                        Attack(ownerTarget);
-                }
-                else
-                    Init();
-            }
-
-            /*
-            Investigate further if these casts are done by
-            any owned aura, eitherway SMSG_SPELL_GO
-            is sent every X seconds.
-            */
-            _events.Update(diff);
-
-            while (uint32 _eventId = _events.ExecuteEvent())
-            {
-                switch (_eventId)
-                {
-                case EVENT_SPELL_CAST_1:
-                    // Cast every second
-                    if (Unit* victim = me->GetVictim())
-                        DoCast(victim, SPELL_AGGRO_8_YD_PBAE, true);
-                    _events.ScheduleEvent(EVENT_SPELL_CAST_1, 1 * IN_MILLISECONDS);
-                    break;
-                case EVENT_SPELL_CAST_2:
-                    // Cast every 6 seconds
-                    DoCast(me, SPELL_DK_DANCING_RUNE_WEAPON_VISUAL, true);
-                    _events.ScheduleEvent(EVENT_SPELL_CAST_2, 6 * IN_MILLISECONDS);
-                    break;
-                default:
-                    break;
-                }
-            }
-
-            if (me->IsInCombat() && me->GetVictim() && me->IsValidAttackTarget(me->GetVictim()))
-                DoMeleeAttackIfReady();
-        }
-
-        void Attack(Unit* who)
-        {
-            if (me->Attack(who, true))
-            {
-                me->GetMotionMaster()->MoveChase(who);
-                DoCast(who, SPELL_AGGRO_8_YD_PBAE, true);
-                _events.RescheduleEvent(EVENT_SPELL_CAST_1, 1 * IN_MILLISECONDS);
-            }
-        }
-
-        void EnterEvadeMode() override
-        {
-            if (!me->IsAlive())
-                return;
-
-            Unit* owner = me->GetCharmerOrOwner();
-
-            _events.CancelEvent(EVENT_SPELL_CAST_1);
-            me->CombatStop(true);
-            if (owner && !me->HasUnitState(UNIT_STATE_FOLLOW))
-            {
-                me->GetMotionMaster()->Clear(false);
-                me->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST, me->GetFollowAngle(), MOTION_SLOT_ACTIVE);
-            }
-            Init();
-        }
-
-        void Init()
-        {
-            Unit* owner = me->GetCharmerOrOwner();
-
-            std::list<Unit*> targets;
-            Trinity::AnyUnfriendlyUnitInObjectRangeCheck u_check(me, me, 30.0f);
-            Trinity::UnitListSearcher<Trinity::AnyUnfriendlyUnitInObjectRangeCheck> searcher(me, targets, u_check);
-            me->VisitNearbyObject(40.0f, searcher);
-
-            Unit* highestThreatUnit = NULL;
-            float highestThreat = 0.0f;
-            Unit* nearestPlayer = NULL;
-            for (std::list<Unit*>::const_iterator iter = targets.begin(); iter != targets.end(); ++iter)
-            {
-                // Consider only units without CC
-                if (!(*iter)->HasBreakableByDamageCrowdControlAura((*iter)))
-                {
-                    // Take first found unit
-                    if (!highestThreatUnit && (*iter)->GetTypeId() != TYPEID_PLAYER)
-                    {
-                        highestThreatUnit = (*iter);
-                        continue;
-                    }
-                    if (!nearestPlayer && ((*iter)->GetTypeId() == TYPEID_PLAYER))
-                    {
-                        nearestPlayer = (*iter);
-                        continue;
-                    }
-                    // else compare best fit unit with current unit
-                    ThreatContainer::StorageType triggers = (*iter)->getThreatManager().getThreatList();
-                    for (ThreatContainer::StorageType::const_iterator trig_citr = triggers.begin(); trig_citr != triggers.end(); ++trig_citr)
-                    {
-                        // Try to find threat referenced to owner
-                        if ((*trig_citr)->getTarget() == owner)
-                        {
-                            // Check if best fit hostile unit hs lower threat than this current unit
-                            if (highestThreat < (*trig_citr)->getThreat())
-                            {
-                                // If so, update best fit unit
-                                highestThreat = (*trig_citr)->getThreat();
-                                highestThreatUnit = (*iter);
-                                break;
-                            }
-                        }
-                    }
-                    // In case no unit with threat was found so far, always check for nearest unit (only for players)
-                    if ((*iter)->GetTypeId() == TYPEID_PLAYER)
-                    {
-                        // If this player is closer than the previous one, update it
-
-                        float d1 = me->GetDistance((*iter)->GetPositionX(), (*iter)->GetPositionY(), (*iter)->GetPositionZ());
-                        float d2 = me->GetDistance(nearestPlayer->GetPositionX(), nearestPlayer->GetPositionY(), nearestPlayer->GetPositionZ());
-                        if (d1 < d2)
-                            nearestPlayer = (*iter);
-                    }
-                }
-            }
-            // Prioritize units with threat referenced to owner
-            if (highestThreat > 0.0f && highestThreatUnit)
-                Attack(highestThreatUnit);
-            // If there is no such target, try to attack nearest hostile unit if such exists
-            else if (nearestPlayer)
-                Attack(nearestPlayer);
-        }
-
-        bool IsInThreatList(Unit* target)
-        {
-            Unit* owner = me->GetCharmerOrOwner();
-
-            std::list<Unit*> targets;
-            Trinity::AnyUnfriendlyUnitInObjectRangeCheck u_check(me, me, 30.0f);
-            Trinity::UnitListSearcher<Trinity::AnyUnfriendlyUnitInObjectRangeCheck> searcher(me, targets, u_check);
-            me->VisitNearbyObject(40.0f, searcher);
-
-            for (std::list<Unit*>::const_iterator iter = targets.begin(); iter != targets.end(); ++iter)
-            {
-                if ((*iter) == target)
-                {
-                    // Consider only units without CC
-                    if (!(*iter)->HasBreakableByDamageCrowdControlAura((*iter)))
-                    {
-                        ThreatContainer::StorageType triggers = (*iter)->getThreatManager().getThreatList();
-                        for (ThreatContainer::StorageType::const_iterator trig_citr = triggers.begin(); trig_citr != triggers.end(); ++trig_citr)
-                        {
-                            // Try to find threat referenced to owner
-                            if ((*trig_citr)->getTarget() == owner)
-                                return true;
-                        }
-                    }
-                }
-            }
-            return false;
-        }
-
-    private:
-        uint64 _targetGUID;
-        EventMap _events;
-        uint32 _engageTimer;
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_pet_dk_rune_weaponAI(creature);
-    }
-};
-
 
 void AddSC_deathknight_pet_scripts()
 {
     new npc_pet_dk_ebon_gargoyle();
     new npc_pet_dk_ghoul();
     new npc_pet_dk_army_of_the_dead();
-    new npc_pet_dk_rune_weapon();
+    new npc_pet_dk_dancing_rune_weapon();
 }
