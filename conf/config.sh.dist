@@ -95,15 +95,15 @@ OUTPUT_FOLDER="output/"
 
 # FULL DB
 DB_CHARACTERS_PATHS=(
-    $SRCPATH"/data/sql/databases/"
+    $SRCPATH"/data/sql/base/characters"
 )
 
 DB_AUTH_PATHS=(
-    $SRCPATH"/data/sql/databases/"
+    $SRCPATH"/data/sql/base/auth/"
 )
 
 DB_WORLD_PATHS=(
-    $SRCPATH"/data/sql/databases/"
+    $SRCPATH"/data/sql/base/world/"
 )
 
 # UPDATES
