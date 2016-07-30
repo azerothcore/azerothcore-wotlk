@@ -680,7 +680,7 @@ INSERT IGNORE INTO `gameobject` (`guid`,`id`,`map`,`spawnMask`,`phaseMask`,`posi
 INSERT IGNORE INTO `gameobject` (`guid`,`id`,`map`,`spawnMask`,`phaseMask`,`position_x`,`position_y`,`position_z`,`orientation`,`rotation0`,`rotation1`,`rotation2`,`rotation3`,`spawntimesecs`,`animprogress`,`state`) VALUES (6023343,175667,0,1,1,-13053.9,-2232.38,13.5986,0.481124,0,0,0.238248,0.971204,300,0,1);
 
 -- update ship spawn   to be fixed - this gunship is unused in game    
-UPDATE `azth_sw_world`.`gameobject_template` SET `type`='14', `flags`='4', `data0`='0', `data4`='0' WHERE `entry`='193183';
+UPDATE `gameobject_template` SET `type`='14', `flags`='4', `data0`='0', `data4`='0' WHERE `entry`='193183';
 
 
 -- GH 18
