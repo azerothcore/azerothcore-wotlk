@@ -122,16 +122,6 @@ class npc_guild_master : public CreatureScript
         }
         return false;
     };
-	/*
-    bool isPlayerMarried(Player *player)
-    {        
-        QueryResult result = WorldDatabase.PQuery("SELECT `guid` FROM `married` WHERE `guid` = %u", player->GetGUIDLow());
-
-        if (result)
-            return true;
-
-        return false;
-    };*/
 
     bool isPlayerHasGuildhouse(Player *player, Creature *_creature, bool whisper = false)
     {
@@ -514,11 +504,6 @@ class npc_guild_master : public CreatureScript
 
         switch (action)
         {
-            /*case ACTION_MARRIED:
-                //teleport player to GH
-                player->CLOSE_GOSSIP_MENU();
-                player->TeleportTo(0, -8323.68f, -349.26f, 145.8f,  0.57f);
-                break;*/
             case ACTION_TELE:
                 //teleport player to GH
                 player->CLOSE_GOSSIP_MENU();

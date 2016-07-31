@@ -89,6 +89,7 @@
 #include "SavingSystem.h"
 #include "AnticheatMgr.h" //[AZTH]
 #include "GuildHouse.h" //[AZTH]
+#include "Teleport.h" //[AZTH]
 
 ACE_Atomic_Op<ACE_Thread_Mutex, bool> World::m_stopEvent = false;
 uint8 World::m_ExitCode = SHUTDOWN_EXIT_CODE;
@@ -1752,6 +1753,7 @@ void World::SetInitialWorldSettings()
     sCalendarMgr->LoadFromDB();
 
     GHobj.LoadGuildHouseSystem();     // [AZTH] Load Guildhouses
+    LoadNpcTele();                    // Teleport
 
     sLog->outString("Initializing SpellInfo precomputed data..."); // must be called after loading items, professions, spells and pretty much anything
     sObjectMgr->InitializeSpellInfoPrecomputedData();
