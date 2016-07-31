@@ -438,6 +438,8 @@ void World::LoadConfigSettings(bool reload)
         sLog->ReloadConfig(); // Reload log levels and filters
     }
 
+    sScriptMgr->OnBeforeConfigLoad(reload);
+
     ///- Read the player limit and the Message of the day from the config file
     if (!reload)
         SetPlayerAmountLimit(sConfigMgr->GetIntDefault("PlayerLimit", 100));
@@ -1274,8 +1276,7 @@ void World::LoadConfigSettings(bool reload)
     m_int_configs[CONFIG_BIRTHDAY_TIME] = sConfigMgr->GetIntDefault("BirthdayTime", 1222964635);
 
     // call ScriptMgr if we're reloading the configuration
-    if (reload)
-        sScriptMgr->OnConfigLoad(reload);
+    sScriptMgr->OnAfterConfigLoad(reload);
 }
 
 extern void LoadGameObjectModelList();
@@ -1291,6 +1292,9 @@ void World::SetInitialWorldSettings()
 
     ///- Initialize detour memory management
     dtAllocSetCustom(dtCustomAlloc, dtCustomFree);
+    
+    sLog->outString("Initializing Scripts...");
+    sScriptMgr->Initialize();
 
     ///- Initialize config settings
     LoadConfigSettings();
@@ -1738,9 +1742,8 @@ void World::SetInitialWorldSettings()
     sLog->outString("Loading Creature Text Locales...");
     sCreatureTextMgr->LoadCreatureTextLocales();
 
-    sLog->outString("Initializing Scripts...");
-    sScriptMgr->Initialize();
-    sScriptMgr->OnConfigLoad(false);                                // must be done after the ScriptMgr has been properly initialized
+    sLog->outString("Loading Scripts...");
+    sScriptMgr->LoadDatabase();
 
     sLog->outString("Validating spell scripts...");
     sObjectMgr->ValidateSpellScripts();
