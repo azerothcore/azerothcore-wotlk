@@ -42,6 +42,8 @@ CTOOLS=0
 # use precompiled headers ( fatest compilation but not optimized if you change headers often )
 CSCRIPTPCH=1
 CCOREPCH=1
+# you can add your custom definitions here ( -D )
+CCUSTOMOPTIONS=""
 
 ##############################################
 #
