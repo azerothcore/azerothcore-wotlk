@@ -50,11 +50,7 @@ class npc_pet_dk_ebon_gargoyle : public CreatureScript
                 _despawnTimer = 36000; // 30 secs + 4 fly out + 2 initial attack timer
                 _despawning = false;
                 _initialSelection = true;
-                _ghoulSelection = true;
-
                 _targetGUID = 0;
-                _markedTargetGUID = 0;
-                _ghoulTargetGUID = 0;
             }
 
             void MovementInform(uint32 type, uint32 point)
@@ -89,33 +85,70 @@ class npc_pet_dk_ebon_gargoyle : public CreatureScript
                 _initialCastTimer = 0;
             }
 
+            uint64 GetGhoulTargetGUID()
+            {
+                uint64 ghoulTargetGUID = 0;
+
+                std::list<Unit*> targets;
+                Trinity::AnyFriendlyUnitInObjectRangeCheck ghoul_check(me, me, 50);
+                Trinity::UnitListSearcher<Trinity::AnyFriendlyUnitInObjectRangeCheck> searcher(me, targets, ghoul_check);
+                me->VisitNearbyObject(50, searcher);
+                for (std::list<Unit*>::const_iterator iter = targets.begin(); iter != targets.end(); ++iter)
+                {
+                    if ((*iter)->GetEntry() == 26125) // ghoul entry
+                        if ((*iter)->GetOwnerGUID() == me->GetOwnerGUID()) // same owner
+                        {
+                            ghoulTargetGUID = (*iter)->GetTarget();
+                            break;
+                        }
+                }
+
+                return ghoulTargetGUID;
+            }
+
             void MySelectNextTarget()
             {
                 Unit* owner = me->GetOwner();
-                if (owner && owner->GetTypeId() == TYPEID_PLAYER && (!me->GetVictim() || me->GetVictim()->IsImmunedToSpell(sSpellMgr->GetSpellInfo(51963)) || !me->IsValidAttackTarget(me->GetVictim()) || !owner->CanSeeOrDetect(me->GetVictim())))
+                if (owner && owner->GetTypeId() == TYPEID_PLAYER)
                 {
-                    Unit* selection = owner->ToPlayer()->GetSelectedUnit();
-                    if (selection && selection != me->GetVictim() && me->IsValidAttackTarget(selection))
+                    Unit* ghoulTarget = ObjectAccessor::GetUnit(*me, GetGhoulTargetGUID());
+                    Unit* dkTarget = owner->ToPlayer()->GetSelectedUnit();
+
+                    if (ghoulTarget && ghoulTarget != me->GetVictim() && me->IsValidAttackTarget(ghoulTarget))
                     {
+                        sLog->outError("Attacking Ghoul Target %u", ghoulTarget->GetGUIDLow());
                         me->GetMotionMaster()->Clear(false);
-                        SetGazeOn(selection);
+                        SwitchTargetAndAttack(ghoulTarget);
+                        return;
                     }
-                    else if (!me->GetVictim() || !owner->CanSeeOrDetect(me->GetVictim()))
+                    
+                    if (dkTarget && dkTarget != me->GetVictim() && me->IsValidAttackTarget(dkTarget))
+                    {
+                        sLog->outError("Attacking DK Target %u", dkTarget->GetGUIDLow());
+                        me->GetMotionMaster()->Clear(false);
+                        SwitchTargetAndAttack(dkTarget);
+                        return;
+                    }
+                    
+                    if (!me->GetVictim() || !owner->CanSeeOrDetect(me->GetVictim()))
                     {
                         me->CombatStop(true);
                         me->GetMotionMaster()->Clear(false);
                         me->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST, 0.0f);
                         RemoveTargetAura();
+                        return;
                     }
                 }
             }
 
-            void AttackStart(Unit* who)
+            void SwitchTargetAndAttack(Unit* who) 
             {
                 RemoveTargetAura();
                 _targetGUID = who->GetGUID();
+
                 me->AddAura(SPELL_DK_SUMMON_GARGOYLE_1, who);
                 ScriptedAI::AttackStart(who);
+                me->SetReactState(REACT_PASSIVE);
             }
 
             void RemoveTargetAura()
@@ -172,72 +205,25 @@ class npc_pet_dk_ebon_gargoyle : public CreatureScript
                     for (std::list<Unit*>::const_iterator iter = targets.begin(); iter != targets.end(); ++iter)
                         if ((*iter)->GetAura(SPELL_DK_SUMMON_GARGOYLE_1, me->GetOwnerGUID()))
                         {
-                            (*iter)->RemoveAura(SPELL_DK_SUMMON_GARGOYLE_1, me->GetOwnerGUID());
-                            SetGazeOn(*iter);
-                            _targetGUID = (*iter)->GetGUID();
-                            _markedTargetGUID = _targetGUID;
+                            SwitchTargetAndAttack((*iter));
                             break;
                         }
-                }
-
-                if (_ghoulSelection) //find pet ghoul target
-                {
-                    std::list<Unit*> targets;
-                    Trinity::AnyFriendlyUnitInObjectRangeCheck ghoul_check(me, me, 50);
-                    Trinity::UnitListSearcher<Trinity::AnyFriendlyUnitInObjectRangeCheck> searcher(me, targets, ghoul_check);
-                    me->VisitNearbyObject(50, searcher);
-                    for (std::list<Unit*>::const_iterator iter = targets.begin(); iter != targets.end(); ++iter)
-                    {
-                        if ((*iter)->GetEntry() == 26125) // ghoul entry
-                        {
-                            if ((*iter)->GetOwnerGUID() == me->GetOwnerGUID()) // same owner
-                            {
-                                _ghoulTargetGUID = (*iter)->GetTarget();
-                                break;
-                            }
-                        }
-                    }
-                }
-
-
-                
-                if (Unit* ghoulTarget = ObjectAccessor::GetUnit(*me, _ghoulTargetGUID))
-                {
-                    if(ghoulTarget->IsAlive()) 
-                    {
-                        AttackStart(ghoulTarget);
-                    }
-                }
-                else
-                {
-                    _ghoulSelection = false; // check for ghoul at next update.
-
-                    if (Unit* markedTarget = ObjectAccessor::GetUnit(*me, _markedTargetGUID))
-                    {
-                        if (markedTarget->IsAlive()) 
-                        {
-                            AttackStart(markedTarget);  
-                        }
-                    }
                 }
 
                 if (_despawnTimer > 4000)
                 {
                     _despawnTimer -= diff;
-                    if (!UpdateVictimWithGaze())
-                    {
-                        MySelectNextTarget();
-                        return;
-                    }
 
                     _initialCastTimer += diff;
                     _selectionTimer += diff;
+
                     if (_selectionTimer >= 1000)
                     {
                         MySelectNextTarget();
                         _selectionTimer = 0;
                     }
-                    if (_initialCastTimer >= 2000 && !me->HasUnitState(UNIT_STATE_CASTING | UNIT_STATE_LOST_CONTROL) && me->GetMotionMaster()->GetMotionSlotType(MOTION_SLOT_CONTROLLED) == NULL_MOTION_TYPE)
+
+                    if (_initialCastTimer >= 2000 && !me->HasUnitState(UNIT_STATE_CASTING|UNIT_STATE_LOST_CONTROL) && me->GetMotionMaster()->GetMotionSlotType(MOTION_SLOT_CONTROLLED) == NULL_MOTION_TYPE)
                         me->CastSpell(me->GetVictim(), 51963, false);
                 }
                 else
@@ -254,14 +240,11 @@ class npc_pet_dk_ebon_gargoyle : public CreatureScript
 
         private:
             uint64 _targetGUID;
-            uint64 _ghoulTargetGUID;
-            uint64 _markedTargetGUID;
             uint32 _despawnTimer;
             uint32 _selectionTimer;
             uint32 _initialCastTimer;
             bool _despawning;
             bool _initialSelection;
-            bool _ghoulSelection;
         };
 
         CreatureAI* GetAI(Creature* creature) const
