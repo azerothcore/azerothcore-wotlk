@@ -18,7 +18,7 @@ UPDATE `battleground_template` SET `MinPlayersPerTeam` = 2  WHERE `ID` = 3;  -- 
 UPDATE `battleground_template` SET `MinPlayersPerTeam` = 2  WHERE `ID` = 7;  -- Eye of The Storm
 UPDATE `battleground_template` SET `MinPlayersPerTeam` = 5  WHERE `ID` = 9;  -- Strand of the Ancients
 UPDATE `battleground_template` SET `MinPlayersPerTeam` = 10 WHERE `ID` = 1;  -- Alterac Valley
-UPDATE `battleground_template` SET `MinPlayersPerTeam` = 3  WHERE `ID` = 32; -- RBG
+UPDATE `battleground_template` SET `MinPlayersPerTeam` = 4  WHERE `ID` = 32; -- RBG
 
 -- MaxPlayersPerTeam
 UPDATE `battleground_template` SET `MaxPlayersPerTeam`=15 WHERE  `ID`=32;
