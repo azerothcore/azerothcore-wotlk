@@ -422,9 +422,10 @@ class WS_Transmogrification : public WorldScript
 public:
     WS_Transmogrification() : WorldScript("WS_Transmogrification") { }
 
-    void OnConfigLoad(bool reload)
+    void OnAfterConfigLoad(bool reload)
     {
-        sT->LoadConfig(reload);
+        if (reload)
+            sT->LoadConfig(reload);
     }
 
     void OnStartup()

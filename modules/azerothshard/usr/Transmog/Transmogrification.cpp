@@ -852,9 +852,10 @@ namespace
     public:
         WS_Transmogrification() : WorldScript("WS_Transmogrification") { }
 
-        void OnConfigLoad(bool reload) override
+        void OnAfterConfigLoad(bool reload) override
         {
-            sTransmogrification->LoadConfig(reload);
+            if (reload)
+                sTransmogrification->LoadConfig(reload);
         }
 
         void OnStartup() override

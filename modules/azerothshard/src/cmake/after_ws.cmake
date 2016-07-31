@@ -1,0 +1,5 @@
+if( UNIX )
+  install(FILES "${CMAKE_AZTH_DIR}/conf/azth_mod.conf.dist" DESTINATION ${CONF_DIR})
+elseif( WIN32 )
+  install(FILES "${CMAKE_AZTH_DIR}/conf/azth_mod.conf.dist" DESTINATION "${CMAKE_INSTALL_PREFIX}")
+endif()

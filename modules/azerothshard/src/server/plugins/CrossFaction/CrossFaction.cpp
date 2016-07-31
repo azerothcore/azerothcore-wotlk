@@ -249,14 +249,9 @@ class CrossFactionWorld : public WorldScript
 public:
     CrossFactionWorld() : WorldScript("CrossFactionWorld") { }
 
-    void OnConfigLoad(bool reload) override
+    void OnAfterConfigLoad(bool reload) override
     {
         sCrossFaction->LoadConfig(reload);
-    }
-
-    void OnStartup() override
-    {
-        sCrossFaction->LoadConfig(false);
     }
 };
 
