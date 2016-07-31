@@ -120,6 +120,10 @@ class Pet : public Guardian
         void LearnPetPassives();
         void CastPetAuras(bool current);
 
+        void CastWhenWillAvailable(uint32 spellid, Unit* spellTarget, Unit* oldTarget, bool spellIsPositive = false);
+        void ClearCastWhenWillAvailable();
+        void RemoveSpellCooldown(uint32 spell_id, bool update /* = false */);
+
         void _SaveSpellCooldowns(SQLTransaction& trans, bool logout);
         void _SaveAuras(SQLTransaction& trans, bool logout);
         void _SaveSpells(SQLTransaction& trans);
@@ -175,6 +179,12 @@ class Pet : public Guardian
         int32   m_petRegenTimer;                            // xinef: used for focus regeneration
 
         DeclinedName *m_declinedname;
+
+        Unit*   m_tempspellTarget;
+        Unit*   m_tempoldTarget;
+        bool    m_tempspellIsPositive;
+        uint32  m_tempspell;
+
         uint8 asynchLoadType;
 
     private:

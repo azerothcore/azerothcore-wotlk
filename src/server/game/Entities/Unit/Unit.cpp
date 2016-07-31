@@ -18623,6 +18623,18 @@ void CharmInfo::GetStayPosition(float &x, float &y, float &z)
     z = _stayZ;
 }
 
+void CharmInfo::RemoveStayPosition()
+{
+    _stayX = 0.0f;
+    _stayY = 0.0f;
+    _stayZ = 0.0f;
+}
+
+bool CharmInfo::HasStayPosition()
+{
+    return _stayX && _stayY && _stayZ;
+}
+
 void CharmInfo::SetIsAtStay(bool val)
 {
     _isAtStay = val;

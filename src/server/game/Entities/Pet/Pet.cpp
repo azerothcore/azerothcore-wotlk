@@ -40,7 +40,7 @@
 Pet::Pet(Player* owner, PetType type) : Guardian(NULL, owner ? owner->GetGUID() : 0, true),
 m_usedTalentCount(0), m_removed(false), m_owner(owner),
 m_happinessTimer(PET_LOSE_HAPPINES_INTERVAL), m_petRegenTimer(PET_FOCUS_REGEN_INTERVAL), m_petType(type), m_duration(0),
-m_auraRaidUpdateMask(0), m_loading(false), m_declinedname(NULL), asynchLoadType(PET_LOAD_DEFAULT)
+m_auraRaidUpdateMask(0), m_loading(false), m_declinedname(NULL), m_tempspell(0), m_tempspellTarget(NULL), m_tempoldTarget(NULL), m_tempspellIsPositive(false), asynchLoadType(PET_LOAD_DEFAULT)
 {
     m_unitTypeMask |= UNIT_MASK_PET;
     if (type == HUNTER_PET)
@@ -381,6 +381,115 @@ void Pet::Update(uint32 diff)
                 {
                     m_petRegenTimer += PET_FOCUS_REGEN_INTERVAL;
                     Regenerate(POWER_FOCUS);
+                }
+            }
+
+            if (m_tempspell != 0)
+            {
+                Unit* tempspellTarget = m_tempspellTarget;
+                Unit* tempoldTarget = m_tempoldTarget;
+                bool tempspellIsPositive = m_tempspellIsPositive;
+                uint32 tempspell = m_tempspell;
+                Unit* charmer = GetCharmerOrOwner();
+                if (!charmer)
+                    return;
+
+                if (!GetCharmInfo())
+                    return;
+
+                if (tempspellTarget && tempspellTarget->IsAlive())
+                {
+                    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(tempspell);
+                    if (!spellInfo)
+                        return;
+                    float max_range = GetSpellMaxRangeForTarget(tempspellTarget, spellInfo);
+
+                    if (IsWithinLOSInMap(tempspellTarget) && GetDistance(tempspellTarget) < max_range)
+                    {
+                        if (tempspellTarget && !GetCharmInfo()->GetGlobalCooldownMgr().HasGlobalCooldown(spellInfo) && !HasSpellCooldown(tempspell))
+                        {
+                            StopMoving();
+                            GetMotionMaster()->Clear(false);
+                            GetMotionMaster()->MoveIdle();
+
+                            GetCharmInfo()->SetIsCommandAttack(false);
+                            GetCharmInfo()->SetIsAtStay(true);
+                            GetCharmInfo()->SetIsCommandFollow(false);
+                            GetCharmInfo()->SetIsFollowing(false);
+                            GetCharmInfo()->SetIsReturning(false);
+                            GetCharmInfo()->SaveStayPosition(true);
+
+                            CastSpell(tempspellTarget, tempspell, true);
+                            m_tempspell = 0;
+                            m_tempspellTarget = NULL;
+
+                            if (tempspellIsPositive)
+                            {
+                                if (tempoldTarget && tempoldTarget->IsAlive())
+                                {
+                                    GetCharmInfo()->SetIsCommandAttack(true);
+                                    GetCharmInfo()->SetIsAtStay(false);
+                                    GetCharmInfo()->SetIsFollowing(false);
+                                    GetCharmInfo()->SetIsCommandFollow(false);
+                                    GetCharmInfo()->SetIsReturning(false);
+
+                                    if (ToCreature() && ToCreature()->IsAIEnabled)
+                                        ToCreature()->AI()->AttackStart(tempoldTarget);
+                                }
+                                else
+                                {
+                                    GetCharmInfo()->SetCommandState(COMMAND_FOLLOW);
+                                    GetCharmInfo()->SetIsCommandAttack(false);
+                                    GetCharmInfo()->SetIsAtStay(false);
+                                    GetCharmInfo()->SetIsReturning(true);
+                                    GetCharmInfo()->SetIsCommandFollow(true);
+                                    GetCharmInfo()->SetIsFollowing(false);
+                                    GetMotionMaster()->MoveFollow(charmer, PET_FOLLOW_DIST, GetFollowAngle());
+                                }
+
+                                m_tempoldTarget = NULL;
+                                m_tempspellIsPositive = false;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    m_tempspell = 0;
+                    m_tempspellTarget = NULL;
+                    m_tempoldTarget = NULL;
+                    m_tempspellIsPositive = false;
+
+                    Unit* victim = charmer->GetVictim();
+                    if (victim && victim->IsAlive())
+                    {
+                        StopMoving();
+                        GetMotionMaster()->Clear(false);
+                        GetMotionMaster()->MoveIdle();
+
+                        GetCharmInfo()->SetIsCommandAttack(true);
+                        GetCharmInfo()->SetIsAtStay(false);
+                        GetCharmInfo()->SetIsFollowing(false);
+                        GetCharmInfo()->SetIsCommandFollow(false);
+                        GetCharmInfo()->SetIsReturning(false);
+
+                        if (ToCreature() && ToCreature()->IsAIEnabled)
+                            ToCreature()->AI()->AttackStart(victim);
+                    }
+                    else
+                    {
+                        StopMoving();
+                        GetMotionMaster()->Clear(false);
+                        GetMotionMaster()->MoveIdle();
+
+                        GetCharmInfo()->SetCommandState(COMMAND_FOLLOW);
+                        GetCharmInfo()->SetIsCommandAttack(false);
+                        GetCharmInfo()->SetIsAtStay(false);
+                        GetCharmInfo()->SetIsReturning(true);
+                        GetCharmInfo()->SetIsCommandFollow(true);
+                        GetCharmInfo()->SetIsFollowing(false);
+                        GetMotionMaster()->MoveFollow(charmer, PET_FOLLOW_DIST, GetFollowAngle());
+                    }
                 }
             }
 
@@ -2102,4 +2211,45 @@ void Pet::SetDisplayId(uint32 modelId)
         if (Player* player = owner->ToPlayer())
             if (player->GetGroup())
                 player->SetGroupUpdateFlag(GROUP_UPDATE_FLAG_PET_MODEL_ID);
+}
+
+void Pet::CastWhenWillAvailable(uint32 spellid, Unit* spellTarget, Unit* oldTarget, bool spellIsPositive)
+{
+    if (!spellid)
+        return;
+
+    if (!spellTarget)
+        return;
+
+    m_tempspellTarget = spellTarget;
+    m_tempspell = spellid;
+    m_tempspellIsPositive = spellIsPositive;
+
+    if (oldTarget)
+        m_tempoldTarget = oldTarget;
+}
+
+void Pet::ClearCastWhenWillAvailable()
+{
+    m_tempspellIsPositive = false;
+    m_tempspell = 0;
+    m_tempspellTarget = NULL;
+    m_tempoldTarget = NULL;
+}
+
+void Pet::RemoveSpellCooldown(uint32 spell_id, bool update /* = false */)
+{
+    m_CreatureSpellCooldowns.erase(spell_id);
+
+    if (update)
+    {
+        
+        if (Player* playerOwner = GetCharmerOrOwnerPlayerOrPlayerItself())
+        {
+            WorldPacket data(SMSG_CLEAR_COOLDOWN, 4 + 8);
+            data << uint32(spell_id);
+            data << uint64(GetGUID());
+            playerOwner->SendDirectMessage(&data);
+        }
+    }
 }
