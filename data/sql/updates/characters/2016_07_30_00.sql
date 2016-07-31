@@ -1,4 +1,4 @@
-DROP TABLE IF EXISTS `gm_ticket`;
+ALTER TABLE characters_db_version CHANGE COLUMN 2016_07_10_00 2016_07_30_00 bit;
 
 CREATE TABLE IF NOT EXISTS `gm_ticket` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
