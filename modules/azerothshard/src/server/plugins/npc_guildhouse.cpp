@@ -122,16 +122,6 @@ class npc_guild_master : public CreatureScript
         }
         return false;
     };
-	/*
-    bool isPlayerMarried(Player *player)
-    {        
-        QueryResult result = WorldDatabase.PQuery("SELECT `guid` FROM `married` WHERE `guid` = %u", player->GetGUIDLow());
-
-        if (result)
-            return true;
-
-        return false;
-    };*/
 
     bool isPlayerHasGuildhouse(Player *player, Creature *_creature, bool whisper = false)
     {
@@ -202,7 +192,7 @@ class npc_guild_master : public CreatureScript
             guildsize = 20000;
 
         result = WorldDatabase.PQuery("SELECT `id`, `comment`, `price` FROM `guildhouses` WHERE `guildId` = 0 AND (`faction` = 3 OR `faction` = %u) AND `id` > %u AND `minguildsize` <= %u ORDER BY `id` ASC LIMIT %u",
-            (player->GetTeamId() == TEAM_HORDE)?1:0, showFromId, guildsize, GOSSIP_COUNT_MAX);
+            (player->GetTeamId(true) == TEAM_HORDE)?1:0, showFromId, guildsize, GOSSIP_COUNT_MAX);
 
         if (result)
         {
@@ -514,11 +504,6 @@ class npc_guild_master : public CreatureScript
 
         switch (action)
         {
-            /*case ACTION_MARRIED:
-                //teleport player to GH
-                player->CLOSE_GOSSIP_MENU();
-                player->TeleportTo(0, -8323.68f, -349.26f, 145.8f,  0.57f);
-                break;*/
             case ACTION_TELE:
                 //teleport player to GH
                 player->CLOSE_GOSSIP_MENU();
@@ -816,7 +801,7 @@ class npc_buffnpc : public CreatureScript
         //player->SetTaxiCheater(true);
 
         // Main Menu for Alliance
-        if ( player->GetTeamId() == ALLIANCE )
+        if ( player->GetTeamId(true) == TEAM_ALLIANCE )
         {
             player->ADD_GOSSIP_ITEM( 5, "Remove Res Sickness"                           , GOSSIP_SENDER_MAIN, 1180);
             //player->ADD_GOSSIP_ITEM( 5, "Give me gold"                                , GOSSIP_SENDER_MAIN, 1185);
@@ -988,7 +973,7 @@ class npc_portal : public CreatureScript
         player->ADD_GOSSIP_ITEM( 5, "Teleport Wintergrasp"          , GOSSIP_SENDER_MAIN, 1100);
 
         // Main Menu for Alliance
-        if ( player->GetTeamId() == TEAM_ALLIANCE )
+        if ( player->GetTeamId(true) == TEAM_ALLIANCE )
         {
             player->ADD_GOSSIP_ITEM( 5, "Teleport Stormwind"            , GOSSIP_SENDER_MAIN, 1015);
             player->ADD_GOSSIP_ITEM( 5, "Teleport Ironforge"            , GOSSIP_SENDER_MAIN, 1020);                     

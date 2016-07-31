@@ -5047,6 +5047,11 @@ uint32 Unit::GetDiseasesByCaster(uint64 casterGUID, uint8 mode)
         SPELL_AURA_NONE
     };
 
+    uint64 drwGUID = 0;
+
+    if (Player* playerCaster = ObjectAccessor::GetPlayer(*this, casterGUID))
+        drwGUID = playerCaster->getRuneWeaponGUID();
+
     uint32 diseases = 0;
     for (uint8 index = 0; diseaseAuraTypes[index] != SPELL_AURA_NONE; ++index)
     {
@@ -5054,7 +5059,7 @@ uint32 Unit::GetDiseasesByCaster(uint64 casterGUID, uint8 mode)
         {
             // Get auras with disease dispel type by caster
             if ((*i)->GetSpellInfo()->Dispel == DISPEL_DISEASE
-                && (*i)->GetCasterGUID() == casterGUID)
+                && ((*i)->GetCasterGUID() == casterGUID || (*i)->GetCasterGUID() == drwGUID)) // if its caster or his dancing rune weapon
             {
                 ++diseases;
 
@@ -18645,6 +18650,18 @@ void CharmInfo::GetStayPosition(float &x, float &y, float &z)
     x = _stayX;
     y = _stayY;
     z = _stayZ;
+}
+
+void CharmInfo::RemoveStayPosition()
+{
+    _stayX = 0.0f;
+    _stayY = 0.0f;
+    _stayZ = 0.0f;
+}
+
+bool CharmInfo::HasStayPosition()
+{
+    return _stayX && _stayY && _stayZ;
 }
 
 void CharmInfo::SetIsAtStay(bool val)

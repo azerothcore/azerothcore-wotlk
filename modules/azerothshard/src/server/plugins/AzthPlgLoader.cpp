@@ -13,7 +13,6 @@ void AddSC_Custom_Rates();
 // void AddSC_PWS_Transmogrification();
 // void AddSC_CS_Transmogrification();
 void AddSC_npc_1v1arena();
-void AddSC_npc_lottery();
 //void AddSC_anticheat_commandscript();
 void AddSC_guildhouse_npcs();
 void AddSC_npc_transmogrifier();
@@ -32,7 +31,6 @@ void AddAzthScripts()
     AddSC_azth_player_plg();
     AddSC_Custom_Rates();
     AddSC_npc_1v1arena();
-	AddSC_npc_lottery();
     //AddSC_anticheat_commandscript();
     AddSC_guildhouse_npcs();
     AddSC_npc_transmogrifier();
