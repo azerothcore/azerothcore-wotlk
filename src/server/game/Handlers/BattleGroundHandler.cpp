@@ -436,7 +436,7 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket &recvData)
                 TeamId teamId = ginfo.teamId;
                
                 // [AZTH] Random Battleground Randomizer - by Yehonal & Mik1893
-                if (bg->isBattleground() && sWorld->getBoolConfig(CONFIG_BATTLEGROUND_RANDOM_CROSSFACTION))
+                if (bg->isBattleground() && sWorld->getBoolConfig(CONFIG_BATTLEGROUND_RANDOM_CROSSFACTION) && bg->GetBgTypeID() == BATTLEGROUND_RB)
                 {
                     uint32 allyCount = bg->GetPlayersCountByTeam(TEAM_ALLIANCE);
                     uint32 hordeCount = bg->GetPlayersCountByTeam(TEAM_HORDE);
