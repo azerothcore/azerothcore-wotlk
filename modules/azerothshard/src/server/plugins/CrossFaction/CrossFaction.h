@@ -4,6 +4,7 @@
 #include "ScriptMgr.h"
 #include "Language.h"
 #include "Player.h"
+#include "Vehicle.h"
 #include "ObjectAccessor.h"
 #include "Group.h"
 #include "Map.h"

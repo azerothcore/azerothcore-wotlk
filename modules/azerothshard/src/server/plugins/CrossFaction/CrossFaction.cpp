@@ -209,6 +209,25 @@ public:
     }
 };
 
+class CrossFactionVehicle : public VehicleScript
+{
+public:
+
+    CrossFactionVehicle() : VehicleScript("CrossFactionVehicle") { }
+
+    void OnAddPassenger(Vehicle* veh, Unit* passenger, int8 /*seatId*/) override
+    {
+        if (!passenger)
+            return;
+
+        if (!veh || !veh->GetBase())
+            return;
+
+        passenger->MonsterSay("Overriding vehicle faction",LANG_UNIVERSAL,NULL);
+        veh->GetBase()->setFaction(passenger->getFaction());
+    }
+};
+
 class CrossFactionPlayer : public PlayerScript
 {
 public:
@@ -260,6 +279,7 @@ void AddSC_CrossFactionGroups()
     new CrossFactionGroup();
     new CrossFactionPlayer();
     new CrossFactionWorld();
+    new CrossFactionVehicle();
 }
 
 

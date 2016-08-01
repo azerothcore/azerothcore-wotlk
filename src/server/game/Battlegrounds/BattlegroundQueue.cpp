@@ -493,14 +493,14 @@ void BattlegroundQueue::FillPlayersToBGWithSpecific(const int32 aliFree, const i
     // check balance configuration and set the max difference between teams
     switch (invType)
     {
-    case BG_QUEUE_INVITATION_TYPE_NO_BALANCE:
-        return;
-    case BG_QUEUE_INVITATION_TYPE_BALANCED:
-        invDiff = 1;
-    case BG_QUEUE_INVITATION_TYPE_EVEN:
-        invDiff = 0;
-    default:
-        return;
+        case BG_QUEUE_INVITATION_TYPE_NO_BALANCE:
+            return;
+        case BG_QUEUE_INVITATION_TYPE_BALANCED:
+            invDiff = 1;
+        case BG_QUEUE_INVITATION_TYPE_EVEN:
+            invDiff = 0;
+        default:
+            return;
     }
 
     // if free space differs too much, ballance
