@@ -263,10 +263,6 @@ void BattlegroundMgr::BuildPvpLogDataPacket(WorldPacket* data, Battleground* bg)
         else
         {
             *data << uint8(itr2->second->player->GetBgTeamId() == TEAM_ALLIANCE ? 1 : 0); // green or yellow
-            if(itr2->second->player->GetBgTeamId() == TEAM_ALLIANCE)
-                itr2->second->player->MonsterSay("conto come ally", LANG_UNIVERSAL, NULL);
-            if (itr2->second->player->GetBgTeamId() == TEAM_HORDE)
-                itr2->second->player->MonsterSay("conto come horde", LANG_UNIVERSAL, NULL);
         }
         *data << uint32(itr2->second->DamageDone);              // damage done
         *data << uint32(itr2->second->HealingDone);             // healing done
