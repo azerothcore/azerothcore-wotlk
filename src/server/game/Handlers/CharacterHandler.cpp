@@ -782,12 +782,6 @@ void WorldSession::HandlePlayerLoginOpcode(WorldPacket & recvData)
             return;
         }
 
-        // [AZTH] hack for instant80 ( we're forcing all change faction and race )
-        if (p->HasAtLoginFlag(AT_LOGIN_CHANGE_FACTION) || p->HasAtLoginFlag(AT_LOGIN_CHANGE_RACE)) {
-            sess->KickPlayer();
-        }
-        // [/AZTH]
-
         if (p->GetGUID() != playerGuid)
             sess->KickPlayer(); // no return, go to normal loading
         else
@@ -884,6 +878,15 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder* holder)
         m_playerLoading = false;
         return;
     }
+
+    // [AZTH] hack for instant80 ( we're forcing all change faction and race )
+    if (pCurrChar->HasAtLoginFlag(AT_LOGIN_CHANGE_FACTION) || pCurrChar->HasAtLoginFlag(AT_LOGIN_CHANGE_RACE)) {
+        // following instruction allow core to destroy the Player instance
+        LogoutRequest(0);
+        KickPlayer();                                       // disconnect client, player no set to session and it will not deleted or saved at kick
+        return;
+    }
+    // [/AZTH]
 
     pCurrChar->GetMotionMaster()->Initialize();
     pCurrChar->SendDungeonDifficulty(false);
