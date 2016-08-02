@@ -782,6 +782,12 @@ void WorldSession::HandlePlayerLoginOpcode(WorldPacket & recvData)
             return;
         }
 
+        // [AZTH] hack for instant80 ( we're forcing all change faction and race )
+        if (p->HasAtLoginFlag(AT_LOGIN_CHANGE_FACTION) || p->HasAtLoginFlag(AT_LOGIN_CHANGE_RACE)) {
+            sess->KickPlayer();
+        }
+        // [/AZTH]
+
         if (p->GetGUID() != playerGuid)
             sess->KickPlayer(); // no return, go to normal loading
         else
