@@ -388,11 +388,14 @@ void BattlegroundQueue::FillPlayersToBG(const int32 aliFree, const int32 hordeFr
     m_SelectionPools[TEAM_ALLIANCE].Init();
     m_SelectionPools[TEAM_HORDE].Init();
 
-    // quick check if nothing we can do:
+    // [AZTH] quick check if nothing we can do:
     if (!sBattlegroundMgr->isTesting())
-        if (aliFree > hordeFree && m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_ALLIANCE].empty() ||
-            hordeFree > aliFree && m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_HORDE].empty())
-            return;
+        if(m_bgTypeId != BATTLEGROUND_RB)
+        {
+            if (aliFree > hordeFree && m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_ALLIANCE].empty() ||
+                hordeFree > aliFree && m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_HORDE].empty())
+                return;
+        }
 
     // ally: at first fill as much as possible
     GroupsQueueType::const_iterator Ali_itr = m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_ALLIANCE].begin();
@@ -406,7 +409,7 @@ void BattlegroundQueue::FillPlayersToBG(const int32 aliFree, const int32 hordeFr
     int32 aliDiff   = aliFree   - int32(m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount());
     int32 hordeDiff = hordeFree - int32(m_SelectionPools[TEAM_HORDE].GetPlayerCount());
 
-    // Mik1893: Battleground Balance system 2.0
+    // [AZTH] Mik1893: Battleground Balance system 2.0
     int32 invType = sWorld->getIntConfig(CONFIG_BATTLEGROUND_INVITATION_TYPE);
     int32 invDiff = 0;
 
@@ -415,14 +418,14 @@ void BattlegroundQueue::FillPlayersToBG(const int32 aliFree, const int32 hordeFr
         // check balance configuration and set the max difference between teams
         switch (invType)
         {
-        case BG_QUEUE_INVITATION_TYPE_NO_BALANCE:
-            return;
-        case BG_QUEUE_INVITATION_TYPE_BALANCED:
-            invDiff = 1;
-        case BG_QUEUE_INVITATION_TYPE_EVEN:
-            invDiff = 0;
-        default:
-            return;
+            case BG_QUEUE_INVITATION_TYPE_NO_BALANCE:
+                return;
+            case BG_QUEUE_INVITATION_TYPE_BALANCED:
+                invDiff = 1;
+            case BG_QUEUE_INVITATION_TYPE_EVEN:
+                invDiff = 0;
+            default:
+                return;
         }
 
         // balance the teams based on the difference allowed
@@ -458,9 +461,11 @@ void BattlegroundQueue::FillPlayersToBG(const int32 aliFree, const int32 hordeFr
     }
     else // unified queues, basically
     {
+        sLog->outError("check min count for players - unified queue... - FILL PLAYERS TO BG ");
         for (; Ali_itr != m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_ALLIANCE].end() && m_SelectionPools[TEAM_ALLIANCE].AddGroup((*Ali_itr), 100); ++Ali_itr);
         for (; Horde_itr != m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_HORDE].end() && m_SelectionPools[TEAM_HORDE].AddGroup((*Horde_itr), 100); ++Horde_itr);
     }
+    // [/AZTH]
 }
 
 void BattlegroundQueue::FillPlayersToBGWithSpecific(const int32 aliFree, const int32 hordeFree, BattlegroundBracketId thisBracketId, BattlegroundQueue* specificQueue, BattlegroundBracketId specificBracketId)
@@ -469,11 +474,14 @@ void BattlegroundQueue::FillPlayersToBGWithSpecific(const int32 aliFree, const i
     m_SelectionPools[TEAM_ALLIANCE].Init();
     m_SelectionPools[TEAM_HORDE].Init();
 
-    // quick check if nothing we can do:
+    // [AZTH] quick check if nothing we can do:
     if (!sBattlegroundMgr->isTesting())
-        if (m_QueuedGroups[thisBracketId][BG_QUEUE_NORMAL_ALLIANCE].empty() && specificQueue->m_QueuedGroups[specificBracketId][BG_QUEUE_NORMAL_ALLIANCE].empty() ||
-            m_QueuedGroups[thisBracketId][BG_QUEUE_NORMAL_HORDE].empty() && specificQueue->m_QueuedGroups[specificBracketId][BG_QUEUE_NORMAL_HORDE].empty())
-            return;
+        if (m_bgTypeId != BATTLEGROUND_RB)
+        {
+            if (m_QueuedGroups[thisBracketId][BG_QUEUE_NORMAL_ALLIANCE].empty() && specificQueue->m_QueuedGroups[specificBracketId][BG_QUEUE_NORMAL_ALLIANCE].empty() ||
+                m_QueuedGroups[thisBracketId][BG_QUEUE_NORMAL_HORDE].empty() && specificQueue->m_QueuedGroups[specificBracketId][BG_QUEUE_NORMAL_HORDE].empty())
+                return;
+        }
 
     // copy groups from both queues to new joined container
     GroupsQueueType m_QueuedBoth[BG_TEAMS_COUNT];
@@ -546,6 +554,7 @@ void BattlegroundQueue::FillPlayersToBGWithSpecific(const int32 aliFree, const i
     }
     else // unified queues, basically - let everyone in and we handle it later
     {
+        sLog->outError("check min count for players - unified queue... - FILL PLAYERS TO BG WITH SPECIFIC ");
         for (; Ali_itr != m_QueuedBoth[TEAM_ALLIANCE].end() && m_SelectionPools[TEAM_ALLIANCE].AddGroup((*Ali_itr), 100); ++Ali_itr);
         for (; Horde_itr != m_QueuedBoth[TEAM_HORDE].end() && m_SelectionPools[TEAM_HORDE].AddGroup((*Horde_itr), 100);++Horde_itr);
     }
@@ -631,6 +640,9 @@ bool BattlegroundQueue::CheckNormalMatch(Battleground* bgTemplate, BattlegroundB
         if (sBattlegroundMgr->isTesting() && bgTemplate->isBattleground() && (m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() || m_SelectionPools[TEAM_HORDE].GetPlayerCount()))
             return true;
 
+        sLog->outError("check min count for players - unified queue...");
+
+        //[AZTH] - Check for sum of queues >= 2* minplayerperteam
         return (m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() + m_SelectionPools[TEAM_HORDE].GetPlayerCount()) >= 2 * (std::min<uint32>(specificTemplate->GetMinPlayersPerTeam(), 15));
     }
     // if this is not random bg queue - use players only from this queue
@@ -720,11 +732,14 @@ typedef std::set<Battleground*, BgEmptinessComp> BattlegroundNeedSet;
 
 void BattlegroundQueue::BattlegroundQueueUpdate(BattlegroundBracketId bracket_id, uint8 actionMask, bool isRated, uint32 arenaRatedTeamId)
 {
-    // if no players in queue - do nothing
-    if (m_QueuedGroups[bracket_id][BG_QUEUE_PREMADE_ALLIANCE].empty() &&
+    bool validRandomQueue = !(m_bgTypeId == BATTLEGROUND_RB && (!m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_ALLIANCE].empty() || !m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_HORDE].empty()));
+    // [AZTH] on random bg you want to check sum of both queues - if no players in queue - do nothing 
+    if (
+        m_QueuedGroups[bracket_id][BG_QUEUE_PREMADE_ALLIANCE].empty() &&
         m_QueuedGroups[bracket_id][BG_QUEUE_PREMADE_HORDE].empty() &&
         m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_ALLIANCE].empty() &&
-        m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_HORDE].empty())
+        m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_HORDE].empty() &&
+        !validRandomQueue)
         return;
 
     Battleground* bg_template = sBattlegroundMgr->GetBattlegroundTemplate(m_bgTypeId);
