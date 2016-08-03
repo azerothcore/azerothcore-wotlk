@@ -80,7 +80,7 @@ void CrossFaction::UpdatePlayerTeam(Group* group, uint64 guid, bool reset /* = f
         sLog->outError("CrossFaction: tried to update faction of player %u but he's not online... ", GUID_LOPART(guid));
 }
 
-void CrossFaction::UpdateGroupLeaderMap(uint64 leaderGuid, bool remove = false)
+void CrossFaction::UpdateGroupLeaderMap(uint64 leaderGuid, bool remove)
 {
     if (remove)
         LeaderRaceMap.erase(leaderGuid);
@@ -94,9 +94,11 @@ void CrossFaction::UpdateAllGroups()
         if (Player* leader = ObjectAccessor::ObjectAccessor::FindPlayer(itr->first))
             if(Group* group = leader->GetGroup())
             {
+                sLog->outError("Updating faction for group of leader %s", leader->GetName().c_str());
+
                 std::list<Group::MemberSlot> memberSlots = group->GetMemberSlots();
-                    for (std::list<Group::MemberSlot>::iterator membersIterator = memberSlots.begin(); membersIterator != memberSlots.end(); membersIterator++)
-                        sCrossFaction->UpdatePlayerTeam(group, (*membersIterator).guid);
+                for (std::list<Group::MemberSlot>::iterator membersIterator = memberSlots.begin(); membersIterator != memberSlots.end(); membersIterator++)
+                    sCrossFaction->UpdatePlayerTeam(group, (*membersIterator).guid);     
             }
 }
 
