@@ -1,12 +1,12 @@
 CREATE TABLE IF NOT EXISTS azth_achievement_stats (
-     id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT, 
-     playerGuid INT(10) UNSIGNED NOT NULL DEFAULT 0,
-     achievement INT(10) UNSIGNED NOT NULL DEFAULT 0, 
-     type INT(8) UNSIGNED NOT NULL DEFAULT 0, 
-     level INT(10) UNSIGNED NOT NULL DEFAULT 0,
-     levelParty INT(10) UNSIGNED DEFAULT 0,
-     date INT(10) NOT NULL DEFAULT 0, 
-     PRIMARY KEY (id) 
- ) ENGINE=MYISAM CHARSET=utf8 COLLATE=utf8_general_ci;
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `playerGuid` int(10) unsigned NOT NULL DEFAULT '0',
+  `achievement` int(10) unsigned NOT NULL DEFAULT '0',
+  `type` int(8) unsigned NOT NULL DEFAULT '0' COMMENT '0 -> achievement, 1 -> criteria',
+  `level` int(10) unsigned NOT NULL DEFAULT '0',
+  `levelParty` int(10) unsigned DEFAULT '0',
+  `date` int(10) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
  
  
