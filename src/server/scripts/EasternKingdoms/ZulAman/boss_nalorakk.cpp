@@ -143,7 +143,9 @@ class boss_nalorakk : public CreatureScript
                     waitTimer = 0;
                     me->SetSpeed(MOVE_RUN, 2);
                     me->SetWalk(false);
-                }else
+                    ResetMobs();
+                }
+                else
                 {
                     (*me).GetMotionMaster()->MovePoint(0, NalorakkWay[7][0], NalorakkWay[7][1], NalorakkWay[7][2]);
                 }
@@ -158,6 +160,33 @@ class boss_nalorakk : public CreatureScript
 
                 inBearForm = false;
                 // me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 1, 5122);  /// @todo find the correct equipment id
+            }
+
+            void ResetMobs()
+            {
+                std::list<Creature*> templist;
+                float x, y, z;
+                me->GetPosition(x, y, z);
+
+                {
+                    CellCoord pair(Trinity::ComputeCellCoord(x, y));
+                    Cell cell(pair);
+                    cell.SetNoCreate();
+
+                    Trinity::AllFriendlyCreaturesInGrid check(me);
+                    Trinity::CreatureListSearcher<Trinity::AllFriendlyCreaturesInGrid> searcher(me, templist, check);
+
+                    TypeContainerVisitor<Trinity::CreatureListSearcher<Trinity::AllFriendlyCreaturesInGrid>, GridTypeMapContainer> cSearcher(searcher);
+
+                    cell.Visit(pair, cSearcher, *(me->GetMap()), *me, me->GetGridActivationRange());
+                }
+
+                if (templist.empty())
+                    return;
+
+                for (std::list<Creature*>::const_iterator i = templist.begin(); i != templist.end(); ++i)
+                    if ((*i) && me->IsWithinDistInMap((*i), 25))
+                        (*i)->AI()->Reset();
             }
 
             void SendAttacker(Unit* target)
@@ -283,6 +312,7 @@ class boss_nalorakk : public CreatureScript
 
             void JustDied(Unit* /*killer*/)
             {
+                ResetMobs();
                 instance->SetData(DATA_NALORAKKEVENT, DONE);
 
                 me->MonsterYell(YELL_DEATH, LANG_UNIVERSAL, NULL);
