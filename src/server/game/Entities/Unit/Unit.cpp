@@ -2749,7 +2749,7 @@ SpellMissInfo Unit::MagicSpellHitResult(Unit* victim, SpellInfo const* spell)
 
     int32 tmp = 10000 - HitChance;
 
-    int32 rand = irand(0, 10000);
+    int32 rand = irand(1, 10000); // Needs to be  1 to 10000 to avoid the 1/10000 chance to miss on 100% hit rating
 
     if (rand < tmp)
         return SPELL_MISS_MISS;
