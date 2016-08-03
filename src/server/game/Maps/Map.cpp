@@ -2682,10 +2682,12 @@ void InstanceMap::PermBindAllPlayers()
     {
         player = itr->GetSource();
         group = player->GetGroup();
+
         // players inside an instance cannot be bound to other instances
         // some players may already be permanently bound, in this case nothing happens
         InstancePlayerBind* bind = sInstanceSaveMgr->PlayerGetBoundInstance(player->GetGUIDLow(), save->GetMapId(), save->GetDifficulty());
-        if ((!group || !group->isLFGGroup() || !group->IsLfgRandomInstance()) && (!bind || !bind->perm))
+
+        if (!bind || !bind->perm)
         {
             WorldPacket data(SMSG_INSTANCE_SAVE_CREATED, 4);
             data << uint32(0);
