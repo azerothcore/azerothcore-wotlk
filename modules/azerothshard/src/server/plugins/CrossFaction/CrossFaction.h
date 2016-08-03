@@ -17,7 +17,8 @@ class CrossFaction
     public:
         void LoadConfig(bool reload);
         void UpdatePlayerTeam(Group* group, uint64 guid, bool reset = false);
-        void UpdateGroupLeaderMap(uint64 leaderGuid) { LeaderRaceMap[leaderGuid] = GetPlayerRace(leaderGuid); };
+        void UpdateGroupLeaderMap(uint64 leaderGuid, bool remove = false);
+        void UpdateAllGroups();
 
     private:
         // Group leader guid-race caching

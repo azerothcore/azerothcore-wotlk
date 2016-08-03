@@ -80,6 +80,26 @@ void CrossFaction::UpdatePlayerTeam(Group* group, uint64 guid, bool reset /* = f
         sLog->outError("CrossFaction: tried to update faction of player %u but he's not online... ", GUID_LOPART(guid));
 }
 
+void CrossFaction::UpdateGroupLeaderMap(uint64 leaderGuid, bool remove = false)
+{
+    if (remove)
+        LeaderRaceMap.erase(leaderGuid);
+    else
+        LeaderRaceMap[leaderGuid] = GetPlayerRace(leaderGuid);
+}
+
+void CrossFaction::UpdateAllGroups()
+{
+    for (UNORDERED_MAP<uint64, uint8>::iterator itr = LeaderRaceMap.begin(); itr != LeaderRaceMap.end(); itr++)
+        if (Player* leader = ObjectAccessor::ObjectAccessor::FindPlayer(itr->first))
+            if(Group* group = leader->GetGroup())
+            {
+                std::list<Group::MemberSlot> memberSlots = group->GetMemberSlots();
+                    for (std::list<Group::MemberSlot>::iterator membersIterator = memberSlots.begin(); membersIterator != memberSlots.end(); membersIterator++)
+                        sCrossFaction->UpdatePlayerTeam(group, (*membersIterator).guid);
+            }
+}
+
 void CrossFaction::LoadConfig(bool reload)
 {
     sLog->outError("CROSSFACTION: Loading disable rules...");
@@ -181,12 +201,18 @@ public:
 
     void OnAddMember(Group* group, uint64 guid) override
     {
+        if(group)
+            sCrossFaction->UpdateGroupLeaderMap(group->GetLeaderGUID());
+
         sCrossFaction->UpdatePlayerTeam(group, guid);
     }
 
     // This script is called when a member is removed, but after a new leader has been already picked up - so it's valid to update in here.
     void OnRemoveMember(Group* group, uint64 guid, RemoveMethod /*method*/, uint64 /*kicker*/, const char* /*reason*/) override
     {
+        if (group)
+            sCrossFaction->UpdateGroupLeaderMap(group->GetLeaderGUID());
+
         sCrossFaction->UpdatePlayerTeam(group, guid, true);
     }
 
@@ -203,6 +229,9 @@ public:
     // On disband, reset all the players to their default race
     void OnDisband(Group* group) override
     {
+        if (group)
+            sCrossFaction->UpdateGroupLeaderMap(group->GetLeaderGUID(),true);
+
         std::list<Group::MemberSlot> memberSlots = group->GetMemberSlots();
         for (std::list<Group::MemberSlot>::iterator membersIterator = memberSlots.begin(); membersIterator != memberSlots.end(); membersIterator++)
             sCrossFaction->UpdatePlayerTeam(group, (*membersIterator).guid, true);
@@ -223,7 +252,6 @@ public:
         if (!veh || !veh->GetBase())
             return;
 
-        passenger->MonsterSay("Overriding vehicle faction",LANG_UNIVERSAL,NULL);
         veh->GetBase()->setFaction(passenger->getFaction());
     }
 };
@@ -266,12 +294,27 @@ public:
 class CrossFactionWorld : public WorldScript
 {
 public:
-    CrossFactionWorld() : WorldScript("CrossFactionWorld") { }
+    CrossFactionWorld() : WorldScript("CrossFactionWorld") { m_crossfactionUpdateInterval = 10000; m_crossfactionDiff = 0; }
 
     void OnAfterConfigLoad(bool reload) override
     {
         sCrossFaction->LoadConfig(reload);
     }
+
+    void OnUpdate(uint32 diff) override
+    {
+        m_crossfactionDiff += diff;
+        if (m_crossfactionDiff > m_crossfactionUpdateInterval)
+        {
+            sCrossFaction->UpdateAllGroups();
+            m_crossfactionDiff = 0;
+        }
+    }
+
+private:
+    uint32 m_crossfactionUpdateInterval;
+    uint32 m_crossfactionDiff;
+
 };
 
 void AddSC_CrossFactionGroups()
