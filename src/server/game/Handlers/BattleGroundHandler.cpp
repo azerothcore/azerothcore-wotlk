@@ -450,6 +450,9 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket &recvData)
                         teamId = TEAM_ALLIANCE;
                     else
                         teamId = TEAM_HORDE;
+
+                    _player->setTeamId(teamId);
+                    _player->setFaction(teamId == TEAM_ALLIANCE ? 1 : 2);
                 }
                 // [/AZTH]
 
