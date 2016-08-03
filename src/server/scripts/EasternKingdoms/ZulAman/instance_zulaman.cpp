@@ -235,69 +235,75 @@ class instance_zulaman : public InstanceMapScript
             {
                 switch (type)
                 {
-                case DATA_GONGEVENT:
-                    m_auiEncounter[DATA_GONGEVENT] = data;
-                    if (data == IN_PROGRESS)
+                    case DATA_GONGEVENT:
+                        m_auiEncounter[DATA_GONGEVENT] = data;
+                        if (data == IN_PROGRESS)
+                            SaveToDB();
+                        else if (data == DONE)
+                            QuestMinute = 21;
+                        break;
+                    case DATA_NALORAKKEVENT:
+                        m_auiEncounter[DATA_NALORAKKEVENT] = data;
+                        if (data == DONE)
+                        {
+                            if (QuestMinute)
+                            {
+                                QuestMinute += 15;
+                                DoUpdateWorldState(WORLDSTATE_TIME_TO_SACRIFICE, QuestMinute);
+                            }
+                            SummonHostage(0);
+                            SaveToDB();
+                        }
+                        break;
+                    case DATA_AKILZONEVENT:
+                        m_auiEncounter[DATA_AKILZONEVENT] = data;
+                        HandleGameObject(AkilzonDoorGUID, data != IN_PROGRESS);
+                        if (data == DONE)
+                        {
+                            if (QuestMinute)
+                            {
+                                QuestMinute += 10;
+                                DoUpdateWorldState(WORLDSTATE_TIME_TO_SACRIFICE, QuestMinute);
+                            }
+                            SummonHostage(1);
+                            SaveToDB();
+                        }
+                        break;
+                    case DATA_JANALAIEVENT:
+                        m_auiEncounter[DATA_JANALAIEVENT] = data;
+                        if (data == DONE)
+                            SummonHostage(2);
                         SaveToDB();
-                    else if (data == DONE)
-                        QuestMinute = 21;
-                    break;
-                case DATA_NALORAKKEVENT:
-                    m_auiEncounter[DATA_NALORAKKEVENT] = data;
-                    if (data == DONE)
-                    {
-                        if (QuestMinute)
-                        {
-                            QuestMinute += 15;
-                            DoUpdateWorldState(WORLDSTATE_TIME_TO_SACRIFICE, QuestMinute);
-                        }
-                        SummonHostage(0);
-                    }
-                    break;
-                case DATA_AKILZONEVENT:
-                    m_auiEncounter[DATA_AKILZONEVENT] = data;
-                    HandleGameObject(AkilzonDoorGUID, data != IN_PROGRESS);
-                    if (data == DONE)
-                    {
-                        if (QuestMinute)
-                        {
-                            QuestMinute += 10;
-                            DoUpdateWorldState(WORLDSTATE_TIME_TO_SACRIFICE, QuestMinute);
-                        }
-                        SummonHostage(1);
-                    }
-                    break;
-                case DATA_JANALAIEVENT:
-                    m_auiEncounter[DATA_JANALAIEVENT] = data;
-                    if (data == DONE)
-                        SummonHostage(2);
-                    break;
-                case DATA_HALAZZIEVENT:
-                    m_auiEncounter[DATA_HALAZZIEVENT] = data;
-                    HandleGameObject(HalazziDoorGUID, data != IN_PROGRESS);
-                    if (data == DONE) SummonHostage(3);
-                    break;
-                case DATA_HEXLORDEVENT:
-                    m_auiEncounter[DATA_HEXLORDEVENT] = data;
-                    if (data == IN_PROGRESS)
-                        HandleGameObject(HexLordGateGUID, false);
-                    else if (data == NOT_STARTED)
-                        CheckInstanceStatus();
-                    break;
-                case DATA_ZULJINEVENT:
-                    m_auiEncounter[DATA_ZULJINEVENT] = data;
-                    HandleGameObject(ZulJinDoorGUID, data != IN_PROGRESS);
-                    break;
-                case DATA_CHESTLOOTED:
-                    ++ChestLooted;
-                    SaveToDB();
-                    break;
-                case TYPE_RAND_VENDOR_1:
-                    RandVendor[0] = data;
-                    break;
-                case TYPE_RAND_VENDOR_2:
-                    RandVendor[1] = data;
-                    break;
+                        break;
+                    case DATA_HALAZZIEVENT:
+                        m_auiEncounter[DATA_HALAZZIEVENT] = data;
+                        HandleGameObject(HalazziDoorGUID, data != IN_PROGRESS);
+                        if (data == DONE) SummonHostage(3);
+                        SaveToDB();
+                        break;
+                    case DATA_HEXLORDEVENT:
+                        m_auiEncounter[DATA_HEXLORDEVENT] = data;
+                        if (data == IN_PROGRESS)
+                            HandleGameObject(HexLordGateGUID, false);
+                        else if (data == NOT_STARTED)
+                            CheckInstanceStatus();
+                        SaveToDB();
+                        break;
+                    case DATA_ZULJINEVENT:
+                        m_auiEncounter[DATA_ZULJINEVENT] = data;
+                        HandleGameObject(ZulJinDoorGUID, data != IN_PROGRESS);
+                        SaveToDB();
+                        break;
+                    case DATA_CHESTLOOTED:
+                        ++ChestLooted;
+                        SaveToDB();
+                        break;
+                    case TYPE_RAND_VENDOR_1:
+                        RandVendor[0] = data;
+                        break;
+                    case TYPE_RAND_VENDOR_2:
+                        RandVendor[1] = data;
+                        break;
                 }
 
                 if (data == DONE)
@@ -317,17 +323,17 @@ class instance_zulaman : public InstanceMapScript
             {
                 switch (type)
                 {
-                case DATA_GONGEVENT:     return m_auiEncounter[DATA_GONGEVENT];
-                case DATA_NALORAKKEVENT: return m_auiEncounter[DATA_NALORAKKEVENT];
-                case DATA_AKILZONEVENT:  return m_auiEncounter[DATA_AKILZONEVENT];
-                case DATA_JANALAIEVENT:  return m_auiEncounter[DATA_JANALAIEVENT];
-                case DATA_HALAZZIEVENT:  return m_auiEncounter[DATA_HALAZZIEVENT];
-                case DATA_HEXLORDEVENT:  return m_auiEncounter[DATA_HEXLORDEVENT];
-                case DATA_ZULJINEVENT:   return m_auiEncounter[DATA_ZULJINEVENT];
-                case DATA_CHESTLOOTED:   return ChestLooted;
-                case TYPE_RAND_VENDOR_1: return RandVendor[0];
-                case TYPE_RAND_VENDOR_2: return RandVendor[1];
-                default:                 return 0;
+                    case DATA_GONGEVENT:     return m_auiEncounter[DATA_GONGEVENT];
+                    case DATA_NALORAKKEVENT: return m_auiEncounter[DATA_NALORAKKEVENT];
+                    case DATA_AKILZONEVENT:  return m_auiEncounter[DATA_AKILZONEVENT];
+                    case DATA_JANALAIEVENT:  return m_auiEncounter[DATA_JANALAIEVENT];
+                    case DATA_HALAZZIEVENT:  return m_auiEncounter[DATA_HALAZZIEVENT];
+                    case DATA_HEXLORDEVENT:  return m_auiEncounter[DATA_HEXLORDEVENT];
+                    case DATA_ZULJINEVENT:   return m_auiEncounter[DATA_ZULJINEVENT];
+                    case DATA_CHESTLOOTED:   return ChestLooted;
+                    case TYPE_RAND_VENDOR_1: return RandVendor[0];
+                    case TYPE_RAND_VENDOR_2: return RandVendor[1];
+                    default:                 return 0;
                 }
             }
 
