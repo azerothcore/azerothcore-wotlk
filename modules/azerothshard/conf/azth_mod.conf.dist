@@ -89,6 +89,10 @@ PlayerDump.DisallowPaths = 0
 
 PlayerDump.DisallowOverwrite = 0
 
+BattleGround.PremadeGroupWaitForMatch = 60000
+
+ChatFlood.MessageDelay = 0
+
 
 ###################################################################################################
 # PLAYER INTERACTION
