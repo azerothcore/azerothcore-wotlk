@@ -396,13 +396,11 @@ namespace VMAP
         uint32 name_length, displayId;
         uint8 isWmo;
         char buff[500];
-        while (!feof(model_list))
+        while (true)
         {
             if (fread(&displayId, sizeof(uint32), 1, model_list) != 1)
                 if (feof(model_list))   // EOF flag is only set after failed reading attempt
-                {
                     break;
-                }
 
             if (fread(&isWmo, sizeof(uint8), 1, model_list) != 1
                     || fread(&name_length, sizeof(uint32), 1, model_list) != 1
@@ -416,10 +414,8 @@ namespace VMAP
             std::string model_name(buff, name_length);
 
             WorldModel_Raw raw_model;
-            if ( !raw_model.Read((iSrcDir + "/" + model_name).c_str()) )
-            {
+            if (!raw_model.Read((iSrcDir + "/" + model_name).c_str()))
                 continue;
-            }
 
             spawnedModelFiles.insert(model_name);
             AABox bounds;
@@ -466,6 +462,7 @@ namespace VMAP
         fclose(model_list);
         fclose(model_list_copy);
     }
+
     // temporary use defines to simplify read/check code (close file and return at fail)
 #define READ_OR_RETURN(V, S) if (fread((V), (S), 1, rf) != 1) { \
                                         fclose(rf); printf("readfail, op = %i\n", readOperation); return(false); }
