@@ -461,7 +461,7 @@ void BattlegroundQueue::FillPlayersToBG(const int32 aliFree, const int32 hordeFr
     }
     else // unified queues, basically
     {
-        sLog->outError("check min count for players - unified queue... - FILL PLAYERS TO BG ");
+        sLog->outDebug(LOG_FILTER_BATTLEGROUND,"check min count for players - unified queue... - FILL PLAYERS TO BG ");
         for (; Ali_itr != m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_ALLIANCE].end() && m_SelectionPools[TEAM_ALLIANCE].AddGroup((*Ali_itr), 100); ++Ali_itr);
         for (; Horde_itr != m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_HORDE].end() && m_SelectionPools[TEAM_HORDE].AddGroup((*Horde_itr), 100); ++Horde_itr);
     }
@@ -554,7 +554,7 @@ void BattlegroundQueue::FillPlayersToBGWithSpecific(const int32 aliFree, const i
     }
     else // unified queues, basically - let everyone in and we handle it later
     {
-        sLog->outError("check min count for players - unified queue... - FILL PLAYERS TO BG WITH SPECIFIC ");
+        sLog->outDebug(LOG_FILTER_BATTLEGROUND, "check min count for players - unified queue... - FILL PLAYERS TO BG WITH SPECIFIC ");
         for (; Ali_itr != m_QueuedBoth[TEAM_ALLIANCE].end() && m_SelectionPools[TEAM_ALLIANCE].AddGroup((*Ali_itr), 100); ++Ali_itr);
         for (; Horde_itr != m_QueuedBoth[TEAM_HORDE].end() && m_SelectionPools[TEAM_HORDE].AddGroup((*Horde_itr), 100);++Horde_itr);
     }
@@ -640,7 +640,7 @@ bool BattlegroundQueue::CheckNormalMatch(Battleground* bgTemplate, BattlegroundB
         if (sBattlegroundMgr->isTesting() && bgTemplate->isBattleground() && (m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() || m_SelectionPools[TEAM_HORDE].GetPlayerCount()))
             return true;
 
-        sLog->outError("check min count for players - unified queue...");
+        sLog->outDebug(LOG_FILTER_BATTLEGROUND, "check min count for players - unified queue...");
 
         //[AZTH] - Check for sum of queues >= 2* minplayerperteam
         return (m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() + m_SelectionPools[TEAM_HORDE].GetPlayerCount()) >= 2 * (std::min<uint32>(specificTemplate->GetMinPlayersPerTeam(), 15));
