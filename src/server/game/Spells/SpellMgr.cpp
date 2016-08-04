@@ -3133,6 +3133,9 @@ void SpellMgr::LoadSpellCustomAttr()
                 spellInfo->RecoveryTime = 1500;
                 spellInfo->_requireCooldownInfo = true;
                 break;
+            case 44535: // Spirit Heal, abilities also have no cost
+                spellInfo->Effects[EFFECT_0].MiscValue = 127;
+                break;
         }
 
         switch (spellInfo->SpellFamilyName)
