@@ -73,6 +73,8 @@ Arena.ArenaStartRating = 1000
 
 Arena.ArenaStartPersonalRating = 1000
 
+Arena.Points.Rate = 1
+
 
 CharDelete.Method = 1
 
