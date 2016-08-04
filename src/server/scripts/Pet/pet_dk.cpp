@@ -116,7 +116,6 @@ class npc_pet_dk_ebon_gargoyle : public CreatureScript
 
                     if (ghoulTarget && ghoulTarget != me->GetVictim() && me->IsValidAttackTarget(ghoulTarget))
                     {
-                        sLog->outError("Attacking Ghoul Target %u", ghoulTarget->GetGUIDLow());
                         me->GetMotionMaster()->Clear(false);
                         SwitchTargetAndAttack(ghoulTarget);
                         return;
@@ -124,7 +123,6 @@ class npc_pet_dk_ebon_gargoyle : public CreatureScript
                     
                     if (dkTarget && dkTarget != me->GetVictim() && me->IsValidAttackTarget(dkTarget))
                     {
-                        sLog->outError("Attacking DK Target %u", dkTarget->GetGUIDLow());
                         me->GetMotionMaster()->Clear(false);
                         SwitchTargetAndAttack(dkTarget);
                         return;
@@ -222,9 +220,11 @@ class npc_pet_dk_ebon_gargoyle : public CreatureScript
                         MySelectNextTarget();
                         _selectionTimer = 0;
                     }
-
-                    if (_initialCastTimer >= 2000 && !me->HasUnitState(UNIT_STATE_CASTING|UNIT_STATE_LOST_CONTROL) && me->GetMotionMaster()->GetMotionSlotType(MOTION_SLOT_CONTROLLED) == NULL_MOTION_TYPE)
-                        me->CastSpell(me->GetVictim(), 51963, false);
+                    // check start timer and if not casting
+                    if(_initialCastTimer >= 2000 && !me->HasUnitState(UNIT_STATE_CASTING))
+                        if (!(me->HasAuraType(SPELL_AURA_MOD_FEAR) || me->HasAuraType(SPELL_AURA_MOD_ROOT) || me->HasAuraType(SPELL_AURA_MOD_CONFUSE) || me->HasAuraType(SPELL_AURA_MOD_STUN)))
+                            if (_initialCastTimer >= 2000 && !me->HasUnitState(UNIT_STATE_LOST_CONTROL) && me->GetMotionMaster()->GetMotionSlotType(MOTION_SLOT_CONTROLLED) == NULL_MOTION_TYPE)
+                                me->CastSpell(me->GetVictim(), 51963, false);
                 }
                 else
                 {
