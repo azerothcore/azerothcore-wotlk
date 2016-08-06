@@ -7,6 +7,7 @@
 #include "CrossFaction.h"
 
 class CrossFaction;
+class Player;
 
 class AzthPlayer {
  public:
@@ -24,6 +25,26 @@ class AzthPlayer {
 
      uint32 getArena1v1Info(uint8 type);
      void setArena1v1Info(uint8 type, uint32 value);
+    
+    uint16 levelPlayer;
+    uint16 tmpLevelPg;
+    uint8 groupLevel;
+
+    struct AzthAchiData
+    {
+        uint8 level;
+        uint8 levelParty;
+    };
+
+    typedef UNORDERED_MAP<uint16 /*achiId*/, AzthAchiData /*data*/> CompletedAchievementMap;
+    CompletedAchievementMap m_completed_achievement_map;
+
+    typedef UNORDERED_MAP<uint16 /*critId*/, AzthAchiData /*data*/> CompletedCriteriaMap;
+    CompletedCriteriaMap m_completed_criteria_map;
+
+    uint32 instanceID;
+    
+    uint8 getGroupLevel();
 
  private:
      Player *player;
