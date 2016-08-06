@@ -468,7 +468,7 @@ Azth.Rate.Arena1v1 = 0.2;
 #		Default: 0 (Don't show message)
 
 Player.customXP.security = 0
-Player.customXP.maxValue = 1.5
+Player.customXP.maxValue = 6
 Player.customXP.showOnLogin = 1
 
 ###################################################################################################
