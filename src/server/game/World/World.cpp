@@ -602,6 +602,14 @@ void World::LoadConfigSettings(bool reload)
         sLog->outError("DurabilityLossChance.Block (%f) must be >=0. Using 0.0 instead.", rate_values[RATE_DURABILITY_LOSS_BLOCK]);
         rate_values[RATE_DURABILITY_LOSS_BLOCK] = 0.0f;
     }
+    //[AZTH] Arena Points Rate
+    rate_values[RATE_ARENA_POINTS] = sConfigMgr->GetFloatDefault("Arena.Points.Rate", 1.0f);
+    if (rate_values[RATE_ARENA_POINTS] < 1.0f)
+    {
+        sLog->outError("Arena.Points.Rate (%f) must be >=1. Using 1.0 instead.", rate_values[RATE_DURABILITY_LOSS_BLOCK]);
+        rate_values[RATE_ARENA_POINTS] = 1.0f;
+    }
+    //[/AZTH]
     ///- Read other configuration items from the config file
 
     m_bool_configs[CONFIG_DURABILITY_LOSS_IN_PVP] = sConfigMgr->GetBoolDefault("DurabilityLoss.InPvP", false);

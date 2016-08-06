@@ -7,6 +7,8 @@
 # lvl 3: GM T2
 # lvl 4: Administrator
 #
+# NOTE: use "[^a-z,\,] as regexp to search rows without comma 
+#
 
 # Move to GM level 4 ( admin ) some dangerous commands
 UPDATE command SET `security` = 4 WHERE NAME IN 
@@ -40,7 +42,8 @@ UPDATE command SET `security` = 0 WHERE `name` IN
 "lookup map",
 "lookup skill",
 "qc",
-"server motd"
+"server motd",
+""
 );
 
 #
@@ -126,6 +129,7 @@ UPDATE command SET `security` = 1 WHERE `name` IN
 "titles remove",
 "titles add",
 "titles current",
+"recall",
 "tele add",
 "tele group",
 "tele name",
@@ -136,11 +140,6 @@ UPDATE command SET `security` = 1 WHERE `name` IN
 "send mail",
 "send items",
 "announce",
-"ban",
-"ban account",
-"ban character",
-"ban ip",
-"ban playeraccount",
 "bank",
 "freeze",
 "unfreeze",
@@ -156,7 +155,7 @@ UPDATE command SET `security` = 1 WHERE `name` IN
 "go taxinode",
 "go ticket",
 "go trigger",
-"go zonexy"
+"go zonexy",
 "gobject activate",
 "gobject near",
 "gobject target",
@@ -209,6 +208,7 @@ UPDATE command SET `security` = 1 WHERE `name` IN
 "ticket unassign",
 "ticket viewid",
 "ticket viewname",
+"ticket complete",
 "ticket",
 "morph",
 "demorph",
@@ -249,8 +249,9 @@ UPDATE command SET `security` = 1 WHERE `name` IN
 "gobject move",
 "gobject delete",
 "gobject add temp",
-"gobject add"
-"server info"
+"gobject add",
+"server info",
+""
 );
 
 # lvl 2: Entertainer
@@ -265,7 +266,8 @@ UPDATE command SET `security` = 2 WHERE `name` IN
 "pet create",
 "event stop",
 "event start",
-"playall"
+"playall",
+""
 );
 
 
@@ -277,9 +279,10 @@ UPDATE command SET `security` = 3 WHERE `name` IN
 "unban character",
 "unban account",
 "unban",
-"ban playeraccount",
-"ban ip",
-"ban character",
+"ban",
 "ban account",
-"ban"
+"ban character",
+"ban ip",
+"ban playeraccount",
+""
 );
