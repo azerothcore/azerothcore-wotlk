@@ -1,6 +1,11 @@
 #!/bin/bash
 
-SRCPATH=$(readlink -f "../../")
+unamestr=`uname`
+if [[ "$unamestr" == 'Darwin' ]]; then
+   SRCPATH=$(greadlink -f "../../")
+else
+   SRCPATH=$(readlink -f "../../")
+fi
 
 #
 # You can pass latest version as first argument of this script
