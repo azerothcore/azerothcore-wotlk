@@ -422,6 +422,15 @@ class ItemScript : public ScriptObject
 
         // Called when the item expires (is destroyed).
         virtual bool OnExpire(Player* /*player*/, ItemTemplate const* /*proto*/) { return false; }
+
+
+		// <AZTH
+		// Called when a player selects an option in an item gossip window
+		virtual void OnGossipSelect(Player* /*player*/, Item* /*item*/, uint32 /*sender*/, uint32 /*action*/) { }
+
+		// Called when a player selects an option in an item gossip window
+		virtual void OnGossipSelectCode(Player* /*player*/, Item* /*item*/, uint32 /*sender*/, uint32 /*action*/, const char* /*code*/) { }
+		// >AZTH
 };
 
 class CreatureScript : public ScriptObject, public UpdatableScript<Creature>
@@ -767,6 +776,15 @@ class PlayerScript : public ScriptObject
         virtual void OnAchiSave(SQLTransaction& /*trans*/, Player* /*player*/, uint16 /*achId*/, CompletedAchievementData /*achiData*/) { }
 
         virtual void OnCriteriaSave(SQLTransaction& /*trans*/, Player* /*player*/, uint16 /*achId*/, CriteriaProgress /*criteriaData*/) { }
+
+
+		// Called when a player selects an option in a player gossip window
+		virtual void OnGossipSelect(Player* /*player*/, uint32 /*menu_id*/, uint32 /*sender*/, uint32 /*action*/) { }
+
+		// Called when a player selects an option in a player gossip window
+		virtual void OnGossipSelectCode(Player* /*player*/, uint32 /*menu_id*/, uint32 /*sender*/, uint32 /*action*/, const char* /*code*/) { }
+
+
         //[/AZTH]
 };
 
@@ -924,6 +942,12 @@ class ScriptMgr
         bool OnItemUse(Player* player, Item* item, SpellCastTargets const& targets);
         bool OnItemExpire(Player* player, ItemTemplate const* proto);
 
+		// <AZTH
+		void OnGossipSelect(Player* player, Item* item, uint32 sender, uint32 action);
+		void OnGossipSelectCode(Player* player, Item* item, uint32 sender, uint32 action, const char* code);
+		// >AZTH
+
+
     public: /* CreatureScript */
 
         bool OnGossipHello(Player* player, Creature* creature);
@@ -1044,6 +1068,8 @@ class ScriptMgr
         void OnCriteriaProgress(Player *player, AchievementCriteriaEntry const* criteria);
         void OnAchievementSave(SQLTransaction& trans, Player* player, uint16 achiId, CompletedAchievementData achiData);
         void OnCriteriaSave(SQLTransaction& trans, Player* player, uint16 critId, CriteriaProgress criteriaData);
+		void OnGossipSelect(Player* player, uint32 menu_id, uint32 sender, uint32 action);
+		void OnGossipSelectCode(Player* player, uint32 menu_id, uint32 sender, uint32 action, const char* code);
         // [/AZTH]
 
     public: /* GuildScript */
