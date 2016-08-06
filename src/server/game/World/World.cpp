@@ -432,11 +432,14 @@ void World::LoadConfigSettings(bool reload)
             sLog->outError("World settings reload fail: can't read settings.");
             return;
         }
-
-        sLog->ReloadConfig(); // Reload log levels and filters
     }
 
     sScriptMgr->OnBeforeConfigLoad(reload);
+
+    // Reload log levels and filters
+    // doing it again to allow sScriptMgr
+    // to change log confs at start
+    sLog->ReloadConfig();
 
     ///- Read the player limit and the Message of the day from the config file
     if (!reload)
