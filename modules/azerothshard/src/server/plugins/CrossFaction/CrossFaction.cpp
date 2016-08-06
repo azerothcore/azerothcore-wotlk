@@ -91,7 +91,7 @@ void CrossFaction::UpdateGroupLeaderMap(uint64 leaderGuid, bool remove)
 void CrossFaction::UpdateAllGroups()
 {
     for (UNORDERED_MAP<uint64, uint8>::iterator itr = LeaderRaceMap.begin(); itr != LeaderRaceMap.end(); itr++)
-        if (Player* leader = ObjectAccessor::ObjectAccessor::FindPlayer(itr->first))
+        if (Player* leader = ObjectAccessor::FindPlayer(itr->first))
             if(Group* group = leader->GetGroup())
             {
                 sLog->outError("Updating faction for group of leader %s", leader->GetName().c_str());
