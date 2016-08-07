@@ -125,12 +125,21 @@ extern int main(int argc, char** argv)
         ++c;
     }
 
-    if (!sConfigMgr->LoadInitial(cfg_file))
+    std::string cfg_def_file=_TRINITY_CORE_CONFIG;
+    cfg_def_file += ".dist";
+
+    if (!sConfigMgr->LoadInitial(cfg_def_file.c_str())) {
+        printf("Invalid or missing default configuration file : %s\n", cfg_def_file.c_str());
+        return 1;
+    }
+
+    if (!sConfigMgr->LoadMore(cfg_file))
     {
         printf("Invalid or missing configuration file : %s\n", cfg_file);
         printf("Verify that the file exists and has \'[worldserver]' written in the top of the file!\n");
         return 1;
     }
+
     sLog->outString("Using configuration file %s.", cfg_file);
 
     sLog->outString("Using SSL version: %s (library: %s)", OPENSSL_VERSION_TEXT, SSLeay_version(SSLEAY_VERSION));

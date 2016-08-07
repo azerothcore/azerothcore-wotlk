@@ -429,12 +429,17 @@ void World::LoadConfigSettings(bool reload)
     {
         if (!sConfigMgr->Reload())
         {
-            sLog->outError("World settings reload fail: can't read settings from %s.", sConfigMgr->GetFilename().c_str());
+            sLog->outError("World settings reload fail: can't read settings.");
             return;
         }
-
-        sLog->ReloadConfig(); // Reload log levels and filters
     }
+
+    sScriptMgr->OnBeforeConfigLoad(reload);
+
+    // Reload log levels and filters
+    // doing it again to allow sScriptMgr
+    // to change log confs at start
+    sLog->ReloadConfig();
 
     ///- Read the player limit and the Message of the day from the config file
     if (!reload)
@@ -443,6 +448,7 @@ void World::LoadConfigSettings(bool reload)
 
     ///- Read ticket system setting from the config file
     m_bool_configs[CONFIG_ALLOW_TICKETS] = sConfigMgr->GetBoolDefault("AllowTickets", true);
+    m_bool_configs[CONFIG_DELETE_CHARACTER_TICKET_TRACE] = sConfigMgr->GetBoolDefault("DeletedCharacterTicketTrace", false);
 
     ///- Get string for new logins (newly created characters)
     SetNewCharString(sConfigMgr->GetStringDefault("PlayerStart.String", ""));
@@ -1043,6 +1049,7 @@ void World::LoadConfigSettings(bool reload)
     m_float_configs[CONFIG_LISTEN_RANGE_YELL]      = sConfigMgr->GetFloatDefault("ListenRange.Yell", 300.0f);
 
     m_bool_configs[CONFIG_BATTLEGROUND_CAST_DESERTER]                = sConfigMgr->GetBoolDefault("Battleground.CastDeserter", true);
+    m_bool_configs[CONFIG_BATTLEGROUND_RANDOM_CROSSFACTION]          = sConfigMgr->GetBoolDefault("Battleground.RandomCrossFaction.Enable", true); // [AZTH] RBG Crossfaction
     m_bool_configs[CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_ENABLE]       = sConfigMgr->GetBoolDefault("Battleground.QueueAnnouncer.Enable", false);
     m_int_configs[CONFIG_BATTLEGROUND_PREMATURE_FINISH_TIMER]        = sConfigMgr->GetIntDefault ("Battleground.PrematureFinishTimer", 5 * MINUTE * IN_MILLISECONDS);
     m_int_configs[CONFIG_BATTLEGROUND_PREMADE_GROUP_WAIT_FOR_MATCH]  = sConfigMgr->GetIntDefault ("Battleground.PremadeGroupWaitForMatch", 30 * MINUTE * IN_MILLISECONDS);
@@ -1234,8 +1241,7 @@ void World::LoadConfigSettings(bool reload)
     m_int_configs[CONFIG_BIRTHDAY_TIME] = sConfigMgr->GetIntDefault("BirthdayTime", 1222964635);
 
     // call ScriptMgr if we're reloading the configuration
-    if (reload)
-        sScriptMgr->OnConfigLoad(reload);
+    sScriptMgr->OnAfterConfigLoad(reload);
 }
 
 extern void LoadGameObjectModelList();
@@ -1251,6 +1257,9 @@ void World::SetInitialWorldSettings()
 
     ///- Initialize detour memory management
     dtAllocSetCustom(dtCustomAlloc, dtCustomFree);
+    
+    sLog->outString("Initializing Scripts...");
+    sScriptMgr->Initialize();
 
     ///- Initialize config settings
     LoadConfigSettings();
@@ -1698,9 +1707,8 @@ void World::SetInitialWorldSettings()
     sLog->outString("Loading Creature Text Locales...");
     sCreatureTextMgr->LoadCreatureTextLocales();
 
-    sLog->outString("Initializing Scripts...");
-    sScriptMgr->Initialize();
-    sScriptMgr->OnConfigLoad(false);                                // must be done after the ScriptMgr has been properly initialized
+    sLog->outString("Loading Scripts...");
+    sScriptMgr->LoadDatabase();
 
     sLog->outString("Validating spell scripts...");
     sObjectMgr->ValidateSpellScripts();

@@ -49,10 +49,9 @@ bool ConfigMgr::LoadInitial(char const* file)
 
     GuardType guard(_configLock);
 
-    _filename = file;
     _config.reset(new ACE_Configuration_Heap());
     if (_config->open() == 0)
-        if (LoadData(_filename.c_str()))
+        if (LoadData(file))
             return true;
 
     _config.reset();
@@ -71,11 +70,25 @@ bool ConfigMgr::LoadMore(char const* file)
 
 bool ConfigMgr::Reload()
 {
-    return LoadInitial(_filename.c_str());
+    for(std::vector<std::string>::iterator it = _confFiles.begin(); it != _confFiles.end(); ++it) {
+        if (it==_confFiles.begin()) {
+            if (!LoadInitial((*it).c_str()))
+                return false;
+        } else {
+            if (!LoadMore((*it).c_str()))
+                return false;
+        }
+    }
+
+    return true;
 }
 
 bool ConfigMgr::LoadData(char const* file)
 {
+    if(std::find(_confFiles.begin(), _confFiles.end(), file) == _confFiles.end()) {
+        _confFiles.push_back(file);
+    }
+
     ACE_Ini_ImpExp config_importer(*_config.get());
     if (config_importer.import_config(file) == 0)
         return true;
@@ -110,12 +123,6 @@ float ConfigMgr::GetFloatDefault(const char* name, float def)
 {
     ACE_TString val;
     return GetValueHelper(name, val) ? (float)atof(val.c_str()) : def;
-}
-
-std::string const& ConfigMgr::GetFilename()
-{
-    GuardType guard(_configLock);
-    return _filename;
 }
 
 std::list<std::string> ConfigMgr::GetKeysByString(std::string const& name)

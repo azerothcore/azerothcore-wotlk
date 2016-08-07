@@ -159,6 +159,8 @@ class ScriptObject
         // Do not override this in scripts; it should be overridden by the various script type classes. It indicates
         // whether or not this script type must be assigned in the database.
         virtual bool IsDatabaseBound() const { return false; }
+        virtual bool isAfterLoadScript() const { return IsDatabaseBound(); }
+        virtual void checkValidity() { }
 
         const std::string& GetName() const { return _name; }
 
@@ -242,7 +244,10 @@ class WorldScript : public ScriptObject
         virtual void OnOpenStateChange(bool /*open*/) { }
 
         // Called after the world configuration is (re)loaded.
-        virtual void OnConfigLoad(bool /*reload*/) { }
+        virtual void OnAfterConfigLoad(bool /*reload*/) { }
+        
+        // Called before the world configuration is (re)loaded.
+        virtual void OnBeforeConfigLoad(bool /*reload*/) { }
 
         // Called before the message of the day is changed.
         virtual void OnMotdChange(std::string& /*newMotd*/) { }
@@ -296,17 +301,22 @@ class FormulaScript : public ScriptObject
 template<class TMap> class MapScript : public UpdatableScript<TMap>
 {
     MapEntry const* _mapEntry;
+    uint32 _mapId;
 
     protected:
 
         MapScript(uint32 mapId)
-            : _mapEntry(sMapStore.LookupEntry(mapId))
+            : _mapId(mapId)
         {
-            if (!_mapEntry)
-                sLog->outError("Invalid MapScript for %u; no such map ID.", mapId);
         }
 
     public:
+        void checkMap() {
+            _mapEntry = sMapStore.LookupEntry(_mapId);
+            
+            if (!_mapEntry)
+                sLog->outError("Invalid MapScript for %u; no such map ID.", _mapId);
+        }
 
         // Gets the MapEntry structure associated with this script. Can return NULL.
         MapEntry const* GetEntry() { return _mapEntry; }
@@ -338,6 +348,17 @@ class WorldMapScript : public ScriptObject, public MapScript<Map>
     protected:
 
         WorldMapScript(const char* name, uint32 mapId);
+
+    public:
+
+        bool isAfterLoadScript() const { return true; }
+
+        void checkValidity() {
+            checkMap();
+
+            if (GetEntry() && !GetEntry()->IsWorldMap())
+                sLog->outError("WorldMapScript for map %u is invalid.", GetEntry()->MapID);
+        }
 };
 
 class InstanceMapScript : public ScriptObject, public MapScript<InstanceMap>
@@ -350,6 +371,13 @@ class InstanceMapScript : public ScriptObject, public MapScript<InstanceMap>
 
         bool IsDatabaseBound() const { return true; }
 
+        void checkValidity() {
+            checkMap();
+
+            if (GetEntry() && !GetEntry()->IsDungeon())
+                sLog->outError("InstanceMapScript for map %u is invalid.", GetEntry()->MapID);
+        }
+
         // Gets an InstanceScript object for this instance.
         virtual InstanceScript* GetInstanceScript(InstanceMap* /*map*/) const { return NULL; }
 };
@@ -359,6 +387,17 @@ class BattlegroundMapScript : public ScriptObject, public MapScript<Battleground
     protected:
 
         BattlegroundMapScript(const char* name, uint32 mapId);
+
+    public:
+
+        bool isAfterLoadScript() const { return true; }
+
+        void checkValidity() {
+            checkMap();
+
+            if (GetEntry() && !GetEntry()->IsBattleground())
+                sLog->outError("BattlegroundMapScript for map %u is invalid.", GetEntry()->MapID);
+        }
 };
 
 class ItemScript : public ScriptObject
@@ -799,6 +838,7 @@ class ScriptMgr
         void Initialize();
         void LoadDatabase();
         void FillSpellSummary();
+        void CheckIfScriptsInDatabaseExist();
 
         const char* ScriptsVersion() const { return "Integrated Trinity Scripts"; }
 
@@ -825,7 +865,8 @@ class ScriptMgr
     public: /* WorldScript */
 
         void OnOpenStateChange(bool open);
-        void OnConfigLoad(bool reload);
+        void OnBeforeConfigLoad(bool reload);
+        void OnAfterConfigLoad(bool reload);
         void OnMotdChange(std::string& newMotd);
         void OnShutdownInitiate(ShutdownExitCode code, ShutdownMask mask);
         void OnShutdownCancel();
@@ -1023,75 +1064,92 @@ class ScriptRegistry
         typedef std::map<uint32, TScript*> ScriptMap;
         typedef typename ScriptMap::iterator ScriptMapIterator;
 
+        typedef std::vector<TScript*> ScriptVector;
+        typedef typename ScriptVector::iterator ScriptVectorIterator;
+
         // The actual list of scripts. This will be accessed concurrently, so it must not be modified
         // after server startup.
         static ScriptMap ScriptPointerList;
+        // After database load scripts
+        static ScriptVector ALScripts;
 
         static void AddScript(TScript* const script)
         {
             ASSERT(script);
 
-            // See if the script is using the same memory as another script. If this happens, it means that
-            // someone forgot to allocate new memory for a script.
-            for (ScriptMapIterator it = ScriptPointerList.begin(); it != ScriptPointerList.end(); ++it)
+            if (!_checkMemory(script))
+                return;
+
+            if (script->isAfterLoadScript())
             {
-                if (it->second == script)
-                {
-                    sLog->outError("Script '%s' has same memory pointer as '%s'.",
-                        script->GetName().c_str(), it->second->GetName().c_str());
-
-                    return;
-                }
-            }
-
-            if (script->IsDatabaseBound())
-            {
-                // Get an ID for the script. An ID only exists if it's a script that is assigned in the database
-                // through a script name (or similar).
-                uint32 id = sObjectMgr->GetScriptId(script->GetName().c_str());
-                if (id)
-                {
-                    // Try to find an existing script.
-                    bool existing = false;
-                    for (ScriptMapIterator it = ScriptPointerList.begin(); it != ScriptPointerList.end(); ++it)
-                    {
-                        // If the script names match...
-                        if (it->second->GetName() == script->GetName())
-                        {
-                            // ... It exists.
-                            existing = true;
-                            break;
-                        }
-                    }
-
-                    // If the script isn't assigned -> assign it!
-                    if (!existing)
-                    {
-                        ScriptPointerList[id] = script;
-                        sScriptMgr->IncrementScriptCount();
-                    }
-                    else
-                    {
-                        // If the script is already assigned -> delete it!
-                        sLog->outError("Script '%s' already assigned with the same script name, so the script can't work.",
-                            script->GetName().c_str());
-
-                        ASSERT(false); // Error that should be fixed ASAP.
-                    }
-                }
-                else
-                {
-                    // The script uses a script name from database, but isn't assigned to anything.
-                    if (script->GetName().find("Smart") == std::string::npos)
-                        sLog->outErrorDb("Script named '%s' does not have a script name assigned in database.",
-                            script->GetName().c_str());
-                }
+                ALScripts.push_back(script);
             }
             else
             {
+                script->checkValidity();
+
                 // We're dealing with a code-only script; just add it.
                 ScriptPointerList[_scriptIdCounter++] = script;
                 sScriptMgr->IncrementScriptCount();
+            }
+        }
+
+        static void AddALScripts() {
+            for(ScriptVectorIterator it = ALScripts.begin(); it != ALScripts.end(); ++it) {
+                TScript* const script = *it;
+                
+                script->checkValidity();
+
+                if (script->IsDatabaseBound()) {
+
+                    if (!_checkMemory(script))
+                        return;
+
+                    // Get an ID for the script. An ID only exists if it's a script that is assigned in the database
+                    // through a script name (or similar).
+                    uint32 id = sObjectMgr->GetScriptId(script->GetName().c_str());
+                    if (id)
+                    {
+                        // Try to find an existing script.
+                        bool existing = false;
+                        for (ScriptMapIterator it = ScriptPointerList.begin(); it != ScriptPointerList.end(); ++it)
+                        {
+                            // If the script names match...
+                            if (it->second->GetName() == script->GetName())
+                            {
+                                // ... It exists.
+                                existing = true;
+                                break;
+                            }
+                        }
+
+                        // If the script isn't assigned -> assign it!
+                        if (!existing)
+                        {
+                            ScriptPointerList[id] = script;
+                            sScriptMgr->IncrementScriptCount();
+                        }
+                        else
+                        {
+                            // If the script is already assigned -> delete it!
+                            sLog->outError("Script '%s' already assigned with the same script name, so the script can't work.",
+                                script->GetName().c_str());
+
+                            ASSERT(false); // Error that should be fixed ASAP.
+                        }
+                    }
+                    else
+                    {
+                        // The script uses a script name from database, but isn't assigned to anything.
+                        if (script->GetName().find("Smart") == std::string::npos)
+                            sLog->outErrorDb("Script named '%s' does not have a script name assigned in database.",
+                                script->GetName().c_str());
+                    }
+                } else {
+                    // We're dealing with a code-only script; just add it.
+                    ScriptPointerList[_scriptIdCounter++] = script;
+                    sScriptMgr->IncrementScriptCount();
+                }
             }
         }
 
@@ -1106,6 +1164,24 @@ class ScriptRegistry
         }
 
     private:
+        // See if the script is using the same memory as another script. If this happens, it means that
+        // someone forgot to allocate new memory for a script.
+        static bool _checkMemory(TScript* const script) {
+            // See if the script is using the same memory as another script. If this happens, it means that
+            // someone forgot to allocate new memory for a script.
+            for (ScriptMapIterator it = ScriptPointerList.begin(); it != ScriptPointerList.end(); ++it)
+            {
+                if (it->second == script)
+                {
+                    sLog->outError("Script '%s' has same memory pointer as '%s'.",
+                        script->GetName().c_str(), it->second->GetName().c_str());
+
+                    return false;
+                }
+            }
+
+            return true;
+        }
 
         // Counter used for code-only scripts.
         static uint32 _scriptIdCounter;

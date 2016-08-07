@@ -108,3 +108,5 @@ endif()
 if (USE_COREPCH)
   add_cxx_pch(authserver ${authserver_PCH_HDR} ${authserver_PCH_SRC})
 endif()
+
+RUN_HOOK("AFTER_AUTHSERVER_CMAKE")

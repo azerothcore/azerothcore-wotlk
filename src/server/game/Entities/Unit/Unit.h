@@ -1224,6 +1224,8 @@ struct CharmInfo
         bool IsReturning();
         void SaveStayPosition(bool atCurrentPos);
         void GetStayPosition(float &x, float &y, float &z);
+        void RemoveStayPosition();
+        bool HasStayPosition();
 
         void SetForcedSpell(uint32 id) { _forcedSpellId = id; }
         int32 GetForcedSpell() { return _forcedSpellId; }

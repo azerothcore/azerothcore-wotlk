@@ -163,6 +163,7 @@ class ScriptRegistry
 ScriptMgr::ScriptMgr()
     : _scriptCount(0), _scheduledScripts(0)
 {
+
 }
 
 ScriptMgr::~ScriptMgr()
@@ -171,18 +172,8 @@ ScriptMgr::~ScriptMgr()
 
 void ScriptMgr::Initialize()
 {
-    uint32 oldMSTime = getMSTime();
-
-    LoadDatabase();
-
-    sLog->outString("Loading C++ scripts");
-
-    FillSpellSummary();
     AddScripts();
-    CheckIfScriptsInDatabaseExist();
-
-    sLog->outString(">> Loaded %u C++ scripts in %u ms", GetScriptCount(), GetMSTimeDiffToNow(oldMSTime));
-    sLog->outString();
+    sLog->outString("Loading C++ scripts");
 }
 
 void ScriptMgr::Unload()
@@ -223,7 +214,32 @@ void ScriptMgr::Unload()
 
 void ScriptMgr::LoadDatabase()
 {
+    uint32 oldMSTime = getMSTime();
+
     sScriptSystemMgr->LoadScriptWaypoints();
+
+    // Add all scripts that must be loaded after db/maps
+    ScriptRegistry<WorldMapScript>::AddALScripts();
+    ScriptRegistry<BattlegroundMapScript>::AddALScripts();
+    ScriptRegistry<InstanceMapScript>::AddALScripts();
+    ScriptRegistry<SpellScriptLoader>::AddALScripts();
+    ScriptRegistry<ItemScript>::AddALScripts();
+    ScriptRegistry<CreatureScript>::AddALScripts();
+    ScriptRegistry<GameObjectScript>::AddALScripts();
+    ScriptRegistry<AreaTriggerScript>::AddALScripts();
+    ScriptRegistry<BattlegroundScript>::AddALScripts();
+    ScriptRegistry<OutdoorPvPScript>::AddALScripts();
+    ScriptRegistry<WeatherScript>::AddALScripts();
+    ScriptRegistry<ConditionScript>::AddALScripts();
+    ScriptRegistry<TransportScript>::AddALScripts();
+    ScriptRegistry<AchievementCriteriaScript>::AddALScripts();
+
+    FillSpellSummary();
+
+    CheckIfScriptsInDatabaseExist();
+
+    sLog->outString(">> Loaded %u C++ scripts in %u ms", GetScriptCount(), GetMSTimeDiffToNow(oldMSTime));
+    sLog->outString();
 }
 
 struct TSpellSummary
@@ -231,6 +247,40 @@ struct TSpellSummary
     uint8 Targets;                                          // set of enum SelectTarget
     uint8 Effects;                                          // set of enum SelectEffect
 } *SpellSummary;
+
+void ScriptMgr::CheckIfScriptsInDatabaseExist()
+{
+    ObjectMgr::ScriptNameContainer& sn = sObjectMgr->GetScriptNames();
+    for (ObjectMgr::ScriptNameContainer::iterator itr = sn.begin(); itr != sn.end(); ++itr)
+        if (uint32 sid = sObjectMgr->GetScriptId((*itr).c_str()))
+        {
+            if (!ScriptRegistry<SpellScriptLoader>::GetScriptById(sid) &&
+                !ScriptRegistry<ServerScript>::GetScriptById(sid) &&
+                !ScriptRegistry<WorldScript>::GetScriptById(sid) &&
+                !ScriptRegistry<FormulaScript>::GetScriptById(sid) &&
+                !ScriptRegistry<WorldMapScript>::GetScriptById(sid) &&
+                !ScriptRegistry<InstanceMapScript>::GetScriptById(sid) &&
+                !ScriptRegistry<BattlegroundMapScript>::GetScriptById(sid) &&
+                !ScriptRegistry<ItemScript>::GetScriptById(sid) &&
+                !ScriptRegistry<CreatureScript>::GetScriptById(sid) &&
+                !ScriptRegistry<GameObjectScript>::GetScriptById(sid) &&
+                !ScriptRegistry<AreaTriggerScript>::GetScriptById(sid) &&
+                !ScriptRegistry<BattlegroundScript>::GetScriptById(sid) &&
+                !ScriptRegistry<OutdoorPvPScript>::GetScriptById(sid) &&
+                !ScriptRegistry<CommandScript>::GetScriptById(sid) &&
+                !ScriptRegistry<WeatherScript>::GetScriptById(sid) &&
+                !ScriptRegistry<AuctionHouseScript>::GetScriptById(sid) &&
+                !ScriptRegistry<ConditionScript>::GetScriptById(sid) &&
+                !ScriptRegistry<VehicleScript>::GetScriptById(sid) &&
+                !ScriptRegistry<DynamicObjectScript>::GetScriptById(sid) &&
+                !ScriptRegistry<TransportScript>::GetScriptById(sid) &&
+                !ScriptRegistry<AchievementCriteriaScript>::GetScriptById(sid) &&
+                !ScriptRegistry<PlayerScript>::GetScriptById(sid) &&
+                !ScriptRegistry<GuildScript>::GetScriptById(sid) &&
+                !ScriptRegistry<GroupScript>::GetScriptById(sid))
+                sLog->outErrorDb("Script named '%s' is assigned in database, but has no code!", (*itr).c_str());
+        }
+}
 
 void ScriptMgr::FillSpellSummary()
 {
@@ -403,9 +453,14 @@ void ScriptMgr::OnOpenStateChange(bool open)
     FOREACH_SCRIPT(WorldScript)->OnOpenStateChange(open);
 }
 
-void ScriptMgr::OnConfigLoad(bool reload)
+void ScriptMgr::OnBeforeConfigLoad(bool reload)
 {
-    FOREACH_SCRIPT(WorldScript)->OnConfigLoad(reload);
+    FOREACH_SCRIPT(WorldScript)->OnBeforeConfigLoad(reload);
+}
+
+void ScriptMgr::OnAfterConfigLoad(bool reload)
+{
+    FOREACH_SCRIPT(WorldScript)->OnAfterConfigLoad(reload);
 }
 
 void ScriptMgr::OnMotdChange(std::string& newMotd)
@@ -1292,27 +1347,18 @@ FormulaScript::FormulaScript(const char* name)
 WorldMapScript::WorldMapScript(const char* name, uint32 mapId)
     : ScriptObject(name), MapScript<Map>(mapId)
 {
-    if (GetEntry() && !GetEntry()->IsWorldMap())
-        sLog->outError("WorldMapScript for map %u is invalid.", mapId);
-
     ScriptRegistry<WorldMapScript>::AddScript(this);
 }
 
 InstanceMapScript::InstanceMapScript(const char* name, uint32 mapId)
     : ScriptObject(name), MapScript<InstanceMap>(mapId)
 {
-    if (GetEntry() && !GetEntry()->IsDungeon())
-        sLog->outError("InstanceMapScript for map %u is invalid.", mapId);
-
     ScriptRegistry<InstanceMapScript>::AddScript(this);
 }
 
 BattlegroundMapScript::BattlegroundMapScript(const char* name, uint32 mapId)
     : ScriptObject(name), MapScript<BattlegroundMap>(mapId)
 {
-    if (GetEntry() && !GetEntry()->IsBattleground())
-        sLog->outError("BattlegroundMapScript for map %u is invalid.", mapId);
-
     ScriptRegistry<BattlegroundMapScript>::AddScript(this);
 }
 
@@ -1420,6 +1466,7 @@ GroupScript::GroupScript(const char* name)
 
 // Instantiate static members of ScriptRegistry.
 template<class TScript> std::map<uint32, TScript*> ScriptRegistry<TScript>::ScriptPointerList;
+template<class TScript> std::vector<TScript*> ScriptRegistry<TScript>::ALScripts;
 template<class TScript> uint32 ScriptRegistry<TScript>::_scriptIdCounter = 0;
 
 // Specialize for each script type class like so:
