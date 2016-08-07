@@ -78,6 +78,13 @@ enum LagReportType
     LAG_REPORT_TYPE_SPELL = 6
 };
 
+enum TicketType
+{
+    TICKET_TYPE_OPEN = 0,
+    TICKET_TYPE_CLOSED = 1,
+    TICKET_TYPE_CHARACTER_DELETED = 2,
+};
+
 class GmTicket
 {
 public:
@@ -85,7 +92,7 @@ public:
     GmTicket(Player* player);
     ~GmTicket();
 
-    bool IsClosed() const { return _closedBy; }
+    bool IsClosed() const { return  _type != TICKET_TYPE_OPEN; }
     bool IsCompleted() const { return _completed; }
     bool IsFromPlayer(uint64 guid) const { return guid == _playerGuid; }
     bool IsAssigned() const { return _assignedTo != 0; }
@@ -119,7 +126,8 @@ public:
         else if (_escalatedStatus == TICKET_UNASSIGNED)
             _escalatedStatus = TICKET_ASSIGNED;
     }
-    void SetClosedBy(int64 value) { _closedBy = value; }
+    void SetClosedBy(int64 value) { _closedBy = value; _type = TICKET_TYPE_CLOSED; }
+    void SetResolvedBy(int64 value) { _resolvedBy = value; }
     void SetCompleted() { _completed = true; }
     void SetMessage(std::string const& message)
     {
@@ -151,6 +159,7 @@ public:
 private:
     uint32 _id;
     uint64 _playerGuid;
+    TicketType _type; // 0 = Open, 1 = Closed, 2 = Character deleted
     std::string _playerName;
     float _posX;
     float _posY;
@@ -159,7 +168,8 @@ private:
     std::string _message;
     uint64 _createTime;
     uint64 _lastModifiedTime;
-    int64 _closedBy; // 0 = Open, -1 = Console, playerGuid = player abandoned ticket, other = GM who closed it.
+    int64 _closedBy; // 0 = Open or Closed by Console (if type = 1), playerGuid = GM who closed it or player abandoned ticket or read the GM response message.
+    int64 _resolvedBy; // 0 = Open, -1 = Resolved by Console, GM who resolved it by closing or completing the ticket.
     uint64 _assignedTo;
     std::string _comment;
     bool _completed;
@@ -213,6 +223,7 @@ public:
 
     void AddTicket(GmTicket* ticket);
     void CloseTicket(uint32 ticketId, int64 source = -1);
+    void ResolveAndCloseTicket(uint32 ticketId, int64 source); // used when GM resolves a ticket by simply closing it
     void RemoveTicket(uint32 ticketId);
 
     bool GetStatus() const { return _status; }
