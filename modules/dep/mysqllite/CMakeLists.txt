@@ -10,11 +10,11 @@
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 # Include the platform-specific file.
-include(${CMAKE_CURRENT_SOURCE_DIR}/src/cmake/os/Windows.cmake)
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/os/Windows.cmake)
 
 # Add macros
-include(${CMAKE_CURRENT_SOURCE_DIR}/src/cmake/character_sets.cmake)
-include(${CMAKE_CURRENT_SOURCE_DIR}/src/cmake/mysql_version.cmake)
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/character_sets.cmake)
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/mysql_version.cmake)
 
 # Advanced options (mostly useless, but usually still in config.h, so they need to be set...)
 set(CYBOZU OFF)

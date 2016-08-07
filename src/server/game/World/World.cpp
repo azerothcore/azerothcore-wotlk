@@ -535,6 +535,7 @@ void World::LoadConfigSettings(bool reload)
     rate_values[RATE_AUCTION_DEPOSIT] = sConfigMgr->GetFloatDefault("Rate.Auction.Deposit", 1.0f);
     rate_values[RATE_AUCTION_CUT] = sConfigMgr->GetFloatDefault("Rate.Auction.Cut", 1.0f);
     rate_values[RATE_HONOR] = sConfigMgr->GetFloatDefault("Rate.Honor", 1.0f);
+    rate_values[RATE_ARENA_POINTS] = sConfigMgr->GetFloatDefault("Rate.ArenaPoints", 1.0f);
     rate_values[RATE_INSTANCE_RESET_TIME] = sConfigMgr->GetFloatDefault("Rate.InstanceResetTime", 1.0f);
     rate_values[RATE_TALENT] = sConfigMgr->GetFloatDefault("Rate.Talent", 1.0f);
     if (rate_values[RATE_TALENT] < 0.0f)
@@ -1063,6 +1064,10 @@ void World::LoadConfigSettings(bool reload)
     m_int_configs[CONFIG_ARENA_START_PERSONAL_RATING]                = sConfigMgr->GetIntDefault ("Arena.ArenaStartPersonalRating", 1000);
     m_int_configs[CONFIG_ARENA_START_MATCHMAKER_RATING]              = sConfigMgr->GetIntDefault ("Arena.ArenaStartMatchmakerRating", 1500);
     m_bool_configs[CONFIG_ARENA_SEASON_IN_PROGRESS]                  = sConfigMgr->GetBoolDefault("Arena.ArenaSeason.InProgress", true);
+    m_float_configs[CONFIG_ARENA_WIN_RATING_MODIFIER_1]              = sConfigMgr->GetFloatDefault("Arena.ArenaWinRatingModifier1", 48.0f);
+    m_float_configs[CONFIG_ARENA_WIN_RATING_MODIFIER_2]              = sConfigMgr->GetFloatDefault("Arena.ArenaWinRatingModifier2", 24.0f);
+    m_float_configs[CONFIG_ARENA_LOSE_RATING_MODIFIER]               = sConfigMgr->GetFloatDefault("Arena.ArenaLoseRatingModifier", 24.0f);
+    m_float_configs[CONFIG_ARENA_MATCHMAKER_RATING_MODIFIER]         = sConfigMgr->GetFloatDefault("Arena.ArenaMatchmakerRatingModifier", 24.0f);
 
     m_bool_configs[CONFIG_OFFHAND_CHECK_AT_SPELL_UNLEARN]            = sConfigMgr->GetBoolDefault("OffhandCheckAtSpellUnlearn", true);
 
@@ -1842,25 +1847,43 @@ void World::SetInitialWorldSettings()
 
 void World::DetectDBCLang()
 {
+    uint8 m_lang_confid = sConfigMgr->GetIntDefault("DBC.Locale", 255);
+
+    if (m_lang_confid != 255 && m_lang_confid >= TOTAL_LOCALES)
+    {
+        sLog->outError("Incorrect DBC.Locale! Must be >= 0 and < %d (set to 0)", TOTAL_LOCALES);
+        m_lang_confid = LOCALE_enUS;
+    }
+
     ChrRacesEntry const* race = sChrRacesStore.LookupEntry(1);
+
     std::string availableLocalsStr;
 
-    uint8 locale = TOTAL_LOCALES;
-    for (uint8 i = locale-1; i < TOTAL_LOCALES; --i)  // -1 will be 255 due to uint8
+    uint8 default_locale = TOTAL_LOCALES;
+    for (uint8 i = default_locale-1; i < TOTAL_LOCALES; --i)  // -1 will be 255 due to uint8
     {
         if (race->name[i][0] != '\0')                     // check by race names
         {
-            locale = i;
+            default_locale = i;
+            m_availableDbcLocaleMask |= (1 << i);
             availableLocalsStr += localeNames[i];
             availableLocalsStr += " ";
         }
     }
 
-    if (locale != GetDefaultDbcLocale())
+    if (default_locale != m_lang_confid && m_lang_confid < TOTAL_LOCALES &&
+        (m_availableDbcLocaleMask & (1 << m_lang_confid)))
+    {
+        default_locale = m_lang_confid;
+    }
+
+    if (default_locale >= TOTAL_LOCALES)
     {
         sLog->outError("Unable to determine your DBC Locale! (corrupt DBC?)");
         exit(1);
     }
+
+    m_defaultDbcLocale = LocaleConstant(default_locale);
 
     sLog->outString("Using %s DBC Locale as default. All available DBC locales: %s", localeNames[GetDefaultDbcLocale()], availableLocalsStr.empty() ? "<none>" : availableLocalsStr.c_str());
     sLog->outString();

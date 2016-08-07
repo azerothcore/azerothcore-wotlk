@@ -172,6 +172,10 @@ enum WorldFloatConfigs
     CONFIG_CREATURE_FAMILY_FLEE_ASSISTANCE_RADIUS,
     CONFIG_CREATURE_FAMILY_ASSISTANCE_RADIUS,
     CONFIG_CHANCE_OF_GM_SURVEY,
+    CONFIG_ARENA_WIN_RATING_MODIFIER_1,
+    CONFIG_ARENA_WIN_RATING_MODIFIER_2,
+    CONFIG_ARENA_LOSE_RATING_MODIFIER,
+    CONFIG_ARENA_MATCHMAKER_RATING_MODIFIER,
     FLOAT_CONFIG_VALUE_COUNT
 };
 
@@ -375,6 +379,7 @@ enum Rates
     RATE_AUCTION_DEPOSIT,
     RATE_AUCTION_CUT,
     RATE_HONOR,
+    RATE_ARENA_POINTS,
     RATE_TALENT,
     RATE_CORPSE_DECAY_LOOTED,
     RATE_INSTANCE_RESET_TIME,
@@ -750,6 +755,8 @@ class World
 
         void UpdateRealmCharCount(uint32 accid);
 
+        LocaleConstant GetAvailableDbcLocale(LocaleConstant locale) const { if (m_availableDbcLocaleMask & (1 << locale)) return locale; else return m_defaultDbcLocale; }
+
         // used World DB version
         void LoadDBVersion();
         char const* GetDBVersion() const { return m_DBVersion.c_str(); }
@@ -820,6 +827,7 @@ class World
         uint32 m_playerLimit;
         AccountTypes m_allowedSecurityLevel;
         LocaleConstant m_defaultDbcLocale;                     // from config for one from loaded DBC locales
+        uint32 m_availableDbcLocaleMask;                       // by loaded DBC
         void DetectDBCLang();
         bool m_allowMovement;
         std::string m_motd;
