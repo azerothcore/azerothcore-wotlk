@@ -94,8 +94,17 @@ class npc_pet_dk_ebon_gargoyle : public CreatureScript
                 Unit* owner = me->GetOwner();
                 if (owner && owner->GetTypeId() == TYPEID_PLAYER && (!me->GetVictim() || me->GetVictim()->IsImmunedToSpell(sSpellMgr->GetSpellInfo(51963)) || !me->IsValidAttackTarget(me->GetVictim()) || !owner->CanSeeOrDetect(me->GetVictim())))
                 {
-                    Unit* selection = owner->ToPlayer()->GetSelectedUnit();
-                    if (selection && selection != me->GetVictim() && me->IsValidAttackTarget(selection))
+                    Unit* ghoulTarget = ObjectAccessor::GetUnit(*me, GetGhoulTargetGUID());
+                    Unit* dkTarget = owner->ToPlayer()->GetSelectedUnit();
+
+                    if (ghoulTarget && ghoulTarget != me->GetVictim() && me->IsValidAttackTarget(ghoulTarget))
+                    {
+                        me->GetMotionMaster()->Clear(false);
+                        SwitchTargetAndAttack(ghoulTarget);
+                        return;
+                    }
+                    
+                    if (dkTarget && dkTarget != me->GetVictim() && me->IsValidAttackTarget(dkTarget))
                     {
                         me->GetMotionMaster()->Clear(false);
                         SetGazeOn(selection);
@@ -237,8 +246,11 @@ class npc_pet_dk_ebon_gargoyle : public CreatureScript
                         MySelectNextTarget();
                         _selectionTimer = 0;
                     }
-                    if (_initialCastTimer >= 2000 && !me->HasUnitState(UNIT_STATE_CASTING | UNIT_STATE_LOST_CONTROL) && me->GetMotionMaster()->GetMotionSlotType(MOTION_SLOT_CONTROLLED) == NULL_MOTION_TYPE)
-                        me->CastSpell(me->GetVictim(), 51963, false);
+                    // check start timer and if not casting
+                    if(_initialCastTimer >= 2000 && !me->HasUnitState(UNIT_STATE_CASTING))
+                        if (!(me->HasAuraType(SPELL_AURA_MOD_FEAR) || me->HasAuraType(SPELL_AURA_MOD_ROOT) || me->HasAuraType(SPELL_AURA_MOD_CONFUSE) || me->HasAuraType(SPELL_AURA_MOD_STUN)))
+                            if (_initialCastTimer >= 2000 && !me->HasUnitState(UNIT_STATE_LOST_CONTROL) && me->GetMotionMaster()->GetMotionSlotType(MOTION_SLOT_CONTROLLED) == NULL_MOTION_TYPE)
+                                me->CastSpell(me->GetVictim(), 51963, false);
                 }
                 else
                 {
