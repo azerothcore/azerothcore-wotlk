@@ -1114,7 +1114,7 @@ bool Player::Create(uint32 guidlow, CharacterCreateInfo* createInfo)
         GetReputationMgr().SetReputation(sFactionStore.LookupEntry(1077), 42999);
 
         // Factions depending on team, like cities and some more stuff
-        switch (GetTeamId())
+        switch (GetTeamId(true))
         {
         case TEAM_ALLIANCE:
             GetReputationMgr().SetReputation(sFactionStore.LookupEntry(72), 42999);
@@ -7045,7 +7045,7 @@ void Player::RewardReputation(Unit* victim, float rate)
                     ChampioningFaction = GetChampioningFaction();
     }
 
-    TeamId teamId = GetTeamId();
+    TeamId teamId = GetTeamId(true); // Always check player original reputation when rewarding
 
     if (Rep->RepFaction1 && (!Rep->TeamDependent || teamId == TEAM_ALLIANCE))
     {
@@ -7217,7 +7217,7 @@ bool Player::RewardHonor(Unit* uVictim, uint32 groupsize, int32 honor, bool awar
             //  [29..38] Other title and player name
             //  [39+]    Nothing
             uint32 victim_title = victim->GetUInt32Value(PLAYER_CHOSEN_TITLE);
-                                                        // Get Killer titles, CharTitlesEntry::bit_index
+            // Get Killer titles, CharTitlesEntry::bit_index
             // Ranks:
             //  title[1..14]  -> rank[5..18]
             //  title[15..28] -> rank[5..18]
@@ -7472,12 +7472,12 @@ void Player::UpdateArea(uint32 newArea)
     AreaTableEntry const* zone = GetAreaEntryByAreaID(area->zone);
     uint32 areaFlags = area->flags;
     bool isSanctuary = area->IsSanctuary();
-    bool isInn = area->IsInn(GetTeamId());
+    bool isInn = area->IsInn(GetTeamId(true));
     if (zone)
     {
         areaFlags |= zone->flags;
         isSanctuary |= zone->IsSanctuary();
-        isInn |= zone->IsInn(GetTeamId());
+        isInn |= zone->IsInn(GetTeamId(true));
     }
 
     // previously this was in UpdateZone (but after UpdateArea) so nothing will break
@@ -7577,10 +7577,10 @@ void Player::UpdateZone(uint32 newZone, uint32 newArea)
     switch (zone->team)
     {
         case AREATEAM_ALLY:
-            pvpInfo.IsInHostileArea = GetTeamId() != TEAM_ALLIANCE && (sWorld->IsPvPRealm() || zone->flags & AREA_FLAG_CAPITAL);
+            pvpInfo.IsInHostileArea = GetTeamId(true) != TEAM_ALLIANCE && (sWorld->IsPvPRealm() || zone->flags & AREA_FLAG_CAPITAL);
             break;
         case AREATEAM_HORDE:
-            pvpInfo.IsInHostileArea = GetTeamId() != TEAM_HORDE && (sWorld->IsPvPRealm() || zone->flags & AREA_FLAG_CAPITAL);
+            pvpInfo.IsInHostileArea = GetTeamId(true) != TEAM_HORDE && (sWorld->IsPvPRealm() || zone->flags & AREA_FLAG_CAPITAL);
             break;
         case AREATEAM_NONE:
             // overwrite for battlegrounds, maybe batter some zone flags but current known not 100% fit to this
@@ -17569,7 +17569,7 @@ bool Player::LoadFromDB(uint32 guid, SQLQueryHolder *holder)
     else if (!taxi_nodes.empty())
     {
         instanceId = 0;
-        if (!m_taxi.LoadTaxiDestinationsFromString(taxi_nodes, GetTeamId()))
+        if (!m_taxi.LoadTaxiDestinationsFromString(taxi_nodes, GetTeamId(true)))
         {
             // xinef: could no load valid data for taxi, relocate to homebind and clear
             m_taxi.ClearTaxiDestinations();
@@ -19031,9 +19031,9 @@ bool Player::Satisfy(AccessRequirement const* ar, uint32 target_map, bool report
         }
 
         uint32 missingQuest = 0;
-        if (GetTeamId() == TEAM_ALLIANCE && ar->quest_A && !GetQuestRewardStatus(ar->quest_A))
+        if (GetTeamId(true) == TEAM_ALLIANCE && ar->quest_A && !GetQuestRewardStatus(ar->quest_A))
             missingQuest = ar->quest_A;
-        else if (GetTeamId() == TEAM_HORDE && ar->quest_H && !GetQuestRewardStatus(ar->quest_H))
+        else if (GetTeamId(true) == TEAM_HORDE && ar->quest_H && !GetQuestRewardStatus(ar->quest_H))
             missingQuest = ar->quest_H;
 
         uint32 missingAchievement = 0;
@@ -21197,7 +21197,7 @@ bool Player::ActivateTaxiPathTo(std::vector<uint32> const& nodes, Creature* npc 
     // only one mount ID for both sides. Probably not good to use 315 in case DBC nodes
     // change but I couldn't find a suitable alternative. OK to use class because only DK
     // can use this taxi.
-    uint32 mount_display_id = sObjectMgr->GetTaxiMountDisplayId(sourcenode, GetTeamId(), npc == NULL || (sourcenode == 315 && getClass() == CLASS_DEATH_KNIGHT));
+    uint32 mount_display_id = sObjectMgr->GetTaxiMountDisplayId(sourcenode, GetTeamId(true), npc == NULL || (sourcenode == 315 && getClass() == CLASS_DEATH_KNIGHT));
 
     // in spell case allow 0 model
     if ((mount_display_id == 0 && spellid == 0) || sourcepath == 0)
@@ -21274,7 +21274,7 @@ void Player::ContinueTaxiFlight()
 
     ;//sLog->outDebug(LOG_FILTER_UNITS, "WORLD: Restart character %u taxi flight", GetGUIDLow());
 
-    uint32 mountDisplayId = sObjectMgr->GetTaxiMountDisplayId(sourceNode, GetTeamId(), true);
+    uint32 mountDisplayId = sObjectMgr->GetTaxiMountDisplayId(sourceNode, GetTeamId(true), true);
     if (!mountDisplayId)
         return;
 
@@ -21515,7 +21515,7 @@ bool Player::BuyItemFromVendorSlot(uint64 vendorguid, uint32 vendorslot, uint32 
         return false;
     }
 
-    if (!IsGameMaster() && ((pProto->Flags2 & ITEM_FLAGS_EXTRA_HORDE_ONLY && GetTeamId() == TEAM_ALLIANCE) || (pProto->Flags2 == ITEM_FLAGS_EXTRA_ALLIANCE_ONLY && GetTeamId() == TEAM_HORDE)))
+    if (!IsGameMaster() && ((pProto->Flags2 & ITEM_FLAGS_EXTRA_HORDE_ONLY && GetTeamId(true) == TEAM_ALLIANCE) || (pProto->Flags2 == ITEM_FLAGS_EXTRA_ALLIANCE_ONLY && GetTeamId(true) == TEAM_HORDE)))
         return false;
 
     Creature* creature = GetNPCIfCanInteractWith(vendorguid, UNIT_NPC_FLAG_VENDOR);
