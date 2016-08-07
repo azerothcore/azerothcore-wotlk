@@ -2074,7 +2074,7 @@ class Player : public Unit, public GridObject<Player>
         void CheckAreaExploreAndOutdoor(void);
 
         static TeamId TeamIdForRace(uint8 race);
-        TeamId GetTeamId() const { return m_team; }
+        TeamId GetTeamId(bool original = false) const { return original ? TeamIdForRace(getRace()) : m_team; };
         void setFactionForRace(uint8 race);
 
         void InitDisplayIds();
