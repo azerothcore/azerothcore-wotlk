@@ -44,6 +44,7 @@ CMakeLists.txt.user
 # exclude in all levels
 nbproject/
 .sync.ffs_db
+*.kate-swp
 
 #
 # Eclipse
