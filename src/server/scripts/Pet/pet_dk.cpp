@@ -332,7 +332,12 @@ class npc_pet_dk_dancing_rune_weapon : public CreatureScript
                 // Xinef: Hit / Expertise scaling
                 me->AddAura(61017, me);
                 if (Unit* owner = me->GetOwner())
+                {
                     me->GetMotionMaster()->MoveFollow(owner, 0.01f, me->GetFollowAngle(), MOTION_SLOT_CONTROLLED);
+                    if (Player* player = owner->ToPlayer())
+                        player->setRuneWeaponGUID(me->GetGUID());
+                }
+                   
                 NullCreatureAI::InitializeAI();
             }
         };

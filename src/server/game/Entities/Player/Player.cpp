@@ -679,6 +679,7 @@ Player::Player(WorldSession* session): Unit(true), m_mover(this)
 #pragma warning(default:4355)
 #endif
 
+    m_drwGUID = 0;
     m_speakTime = 0;
     m_speakCount = 0;
 
