@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SUNWELLCORE_PET_H
-#define SUNWELLCORE_PET_H
+#ifndef AZEROTHCORE_PET_H
+#define AZEROTHCORE_PET_H
 
 #include "PetDefines.h"
 #include "TemporarySummon.h"

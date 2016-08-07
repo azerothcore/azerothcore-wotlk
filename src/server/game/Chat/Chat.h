@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SUNWELLCORE_CHAT_H
-#define SUNWELLCORE_CHAT_H
+#ifndef AZEROTHCORE_CHAT_H
+#define AZEROTHCORE_CHAT_H
 
 #include "SharedDefines.h"
 #include "WorldSession.h"

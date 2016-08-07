@@ -45,6 +45,8 @@ CMakeLists.txt.user
 nbproject/
 .sync.ffs_db
 *.kate-swp
+.browse.VC*
+.vscode
 
 #
 # Eclipse
