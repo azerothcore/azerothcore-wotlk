@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SUNWELLCORE_LOG_H
-#define SUNWELLCORE_LOG_H
+#ifndef AZEROTHCORE_LOG_H
+#define AZEROTHCORE_LOG_H
 
 #include "Common.h"
 #include <ace/Singleton.h>

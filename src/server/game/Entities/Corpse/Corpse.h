@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SUNWELLCORE_CORPSE_H
-#define SUNWELLCORE_CORPSE_H
+#ifndef AZEROTHCORE_CORPSE_H
+#define AZEROTHCORE_CORPSE_H
 
 #include "Object.h"
 #include "DatabaseEnv.h"

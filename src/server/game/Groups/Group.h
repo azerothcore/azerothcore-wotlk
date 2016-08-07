@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SUNWELLCORE_GROUP_H
-#define SUNWELLCORE_GROUP_H
+#ifndef AZEROTHCORE_GROUP_H
+#define AZEROTHCORE_GROUP_H
 
 #include "DBCEnums.h"
 #include "GroupRefManager.h"

@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SUNWELLCORE_QUEST_H
-#define SUNWELLCORE_QUEST_H
+#ifndef AZEROTHCORE_QUEST_H
+#define AZEROTHCORE_QUEST_H
 
 #include "Define.h"
 #include "DatabaseEnv.h"
