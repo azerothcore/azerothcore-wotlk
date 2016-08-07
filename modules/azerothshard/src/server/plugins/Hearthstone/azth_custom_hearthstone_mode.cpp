@@ -11,7 +11,7 @@
 #include "Define.h"
 #include "GossipDef.h"
 #include "Item.h"
-#include <string>
+
 
 #define GOSSIP_ITEM_GIVE_PVE_QUEST      "Vorrei ricevere la mia missione PVE giornaliera."
 #define GOSSIP_ITEM_GIVE_PVP_QUEST      "Vorrei ricevere la mia missione PVP giornaliera."
@@ -30,15 +30,15 @@ int MAX_PVE_QUEST_NUMBER = 3;
 
 int PVE_RANGE = PVE_UPPER_RANGE - PVE_LOWER_RANGE;
 /*
-int WHISPER_CHANCE = 50; 
+int WHISPER_CHANCE = 50;
 
-std::vector<std::string> whispersList = 
+std::vector<std::string> whispersList =
 {
-	"Uccidere --NAME--, non sarà facile... buona fortuna!",
-	"Povero --NAME--... la sua fine è segnata!",
-	"--NAME--? Sarà un gioco da ragazzi ucciderlo.",
-	"Buona fortuna!",
-	"--NAME-- deve morire!"
+"Uccidere --NAME--, non sarà facile... buona fortuna!",
+"Povero --NAME--... la sua fine è segnata!",
+"--NAME--? Sarà un gioco da ragazzi ucciderlo.",
+"Buona fortuna!",
+"--NAME-- deve morire!"
 };*/
 
 class npc_han_al : public CreatureScript
@@ -48,24 +48,24 @@ public:
 	/*
 	void whisperPlayer(std::string creatureName, Player * player, Creature * creature)
 	{
-		double random = rand_chance();
-		if (random <= WHISPER_CHANCE)
-		{
-			int index = rand() % whispersList.size() - 1;
-			std::string whisperText = whispersList[index];
-			replaceAll(whisperText, "--NAME--", creatureName);
-			creature->Whisper(whisperText, LANG_UNIVERSAL, player, false);
-		}
+	double random = rand_chance();
+	if (random <= WHISPER_CHANCE)
+	{
+	int index = rand() % whispersList.size() - 1;
+	std::string whisperText = whispersList[index];
+	replaceAll(whisperText, "--NAME--", creatureName);
+	creature->Whisper(whisperText, LANG_UNIVERSAL, player, false);
+	}
 	}
 
 	void replaceAll(std::string& str, const std::string& from, const std::string& to) {
-		if (from.empty())
-			return;
-		size_t start_pos = 0;
-		while ((start_pos = str.find(from, start_pos)) != std::string::npos) {
-			str.replace(start_pos, from.length(), to);
-			start_pos += to.length();
-		}
+	if (from.empty())
+	return;
+	size_t start_pos = 0;
+	while ((start_pos = str.find(from, start_pos)) != std::string::npos) {
+	str.replace(start_pos, from.length(), to);
+	start_pos += to.length();
+	}
 	}
 	*/
 	bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
@@ -121,7 +121,7 @@ public:
 		int PveMaxCheck = 0;
 		int i = PVE_LOWER_RANGE;
 		while (i <= PVE_UPPER_RANGE && PveMaxCheck <= MAX_PVE_QUEST_NUMBER)
-		{ 
+		{
 			if (player->GetQuestStatus(i) != QUEST_STATUS_NONE)
 			{
 				PveMaxCheck = PveMaxCheck + 1;
@@ -164,7 +164,7 @@ public:
 	}
 };
 
-int AZTH_REPUTATION_ID				= 948;
+int AZTH_REPUTATION_ID = 948;
 #define GOSSIP_ITEM_SHOW_ACCESS     "Vorrei vedere la tua merce, per favore."
 
 class npc_azth_vendor : public CreatureScript
@@ -235,7 +235,7 @@ int TIME_TO_RECEIVE_MAIL = 0;
 int getQuality()
 {
 	double c = rand_chance();
-	float chance = (float) c;
+	float chance = (float)c;
 	float i = CHANCES[0];
 	int quality = 0;
 
@@ -252,91 +252,268 @@ int getQuality()
 
 class item_azth_hearthstone_loot_sack : public ItemScript
 {
-	public:
-		item_azth_hearthstone_loot_sack() : ItemScript("item_azth_hearthstone_loot_sack") {}
-		
-		bool OnUse(Player* player, Item* item, SpellCastTargets const& /*target*/)
+public:
+	item_azth_hearthstone_loot_sack() : ItemScript("item_azth_hearthstone_loot_sack") {}
+
+	bool OnUse(Player* player, Item* item, SpellCastTargets const& /*target*/)
+	{
+		getItems();
+		SQLTransaction trans = CharacterDatabase.BeginTransaction();
+		int16 deliverDelay = TIME_TO_RECEIVE_MAIL;
+		MailDraft* draft = new MailDraft("Sacca Hearthstone", "");
+		int i = 1;
+		time_t t = time(NULL);
+		tm *lt = localtime(&t);
+		int seed = lt->tm_mday + lt->tm_mon + 1 + lt->tm_year + 1900 + lt->tm_sec + player->GetGUID() + player->GetItemCount(item->GetEntry(), true, 0);
+
+		while (i <= EVERYTHING)
 		{
-			getItems();
-				SQLTransaction trans = CharacterDatabase.BeginTransaction();
-				int16 deliverDelay = TIME_TO_RECEIVE_MAIL;
-				MailDraft* draft = new MailDraft("Sacca Hearthstone", "");
-				int i = 1;
-				time_t t = time(NULL);
-				tm *lt = localtime(&t);
-				int seed = lt->tm_mday + lt->tm_mon + 1 + lt->tm_year + 1900 + lt->tm_sec + player->GetGUID() + player->GetItemCount(item->GetEntry(), true, 0);
-				
-				while (i <= EVERYTHING)
-				{
-					//srand(seed);
-					int quality = 0;
-					quality = getQuality();
-					uint32 id = 0;
-					id = rand() % items[quality].size();
-					if (Item* item = Item::CreateItem(items[quality][id], 1, 0))
-					{
-						item->SaveToDB(trans);       
-						draft->AddItem(item);
-					}
+			//srand(seed);
+			int quality = 0;
+			quality = getQuality();
+			uint32 id = 0;
+			id = rand() % items[quality].size();
+			if (Item* item = Item::CreateItem(items[quality][id], 1, 0))
+			{
+				item->SaveToDB(trans);
+				draft->AddItem(item);
+			}
 
-					i = i + 1;
-					seed = seed + i;
-				}
-				i = 1;
-				while (i <= ONLY_COMMON)
-				{
-					//srand(seed + 3);
-					int quality = 1;
-					if (rand_chance() > 80)
-					{
-						quality = 0;
-					}
-					uint32 id;
-					id = rand() % items[quality].size();
-
-					if (Item* item = Item::CreateItem(items[quality][id], 1, 0))
-					{
-						item->SaveToDB(trans);
-						draft->AddItem(item);
-					}
-
-					i = i + 1;
-					seed = seed + i;
-				}
-				i = 1;
-				while (i <= NOT_COMMON)
-				{
-					//srand(seed + 4);
-					int quality = 0;
-					quality = getQuality();
-					while (quality < 3)
-					{
-						quality = getQuality();
-					}
-					uint32 id;
-					id = rand() % items[quality].size();
-					if (Item* item = Item::CreateItem(items[quality][id], 1, 0))
-					{
-						item->SaveToDB(trans);
-						draft->AddItem(item);
-					}
-
-					i = i + 1;
-					seed = seed + i;
-				}
-			
-			draft->SendMailTo(trans, MailReceiver(player), MailSender(player), MAIL_CHECK_MASK_RETURNED, deliverDelay);
-			CharacterDatabase.CommitTransaction(trans);
-
-			// devi controllare se le quest danno rep pure
-			// player->TextEmote("controlla la tua mail!");
-
-
-			ChatHandler(player->GetSession()).SendSysMessage("Controlla la tua mail!");
-
-			player->DestroyItem(item->GetBagSlot(), item->GetSlot(), true);
-			return true;
+			i = i + 1;
+			seed = seed + i;
 		}
+		i = 1;
+		while (i <= ONLY_COMMON)
+		{
+			//srand(seed + 3);
+			int quality = 1;
+			if (rand_chance() > 80)
+			{
+				quality = 0;
+			}
+			uint32 id;
+			id = rand() % items[quality].size();
+
+			if (Item* item = Item::CreateItem(items[quality][id], 1, 0))
+			{
+				item->SaveToDB(trans);
+				draft->AddItem(item);
+			}
+
+			i = i + 1;
+			seed = seed + i;
+		}
+		i = 1;
+		while (i <= NOT_COMMON)
+		{
+			//srand(seed + 4);
+			int quality = 0;
+			quality = getQuality();
+			while (quality < 3)
+			{
+				quality = getQuality();
+			}
+			uint32 id;
+			id = rand() % items[quality].size();
+			if (Item* item = Item::CreateItem(items[quality][id], 1, 0))
+			{
+				item->SaveToDB(trans);
+				draft->AddItem(item);
+			}
+
+			i = i + 1;
+			seed = seed + i;
+		}
+
+		draft->SendMailTo(trans, MailReceiver(player), MailSender(player), MAIL_CHECK_MASK_RETURNED, deliverDelay);
+		CharacterDatabase.CommitTransaction(trans);
+
+		// devi controllare se le quest danno rep pure
+		// player->TextEmote("controlla la tua mail!");
+
+
+		ChatHandler(player->GetSession()).SendSysMessage("Controlla la tua mail!");
+
+		player->DestroyItem(item->GetBagSlot(), item->GetSlot(), true);
+		return true;
+	}
+};
+
+class azth_main_morph : public ItemScript
+{
+public:
+	azth_main_morph() : ItemScript("azth_main_morph") { }
+
+	bool OnUse(Player* player, Item* item, SpellCastTargets const& /*targets*/) override // Any hook here
+	{
+		player->PlayerTalkClass->ClearMenus();
+
+		std::string part1 = "SELECT entry, name FROM azth_character_morph WHERE guid = ";
+		std::string part2 = " LIMIT 0, 200000; ";
+		char guid[10];
+		snprintf(guid, 10, "%d", player->GetGUID());
+		std::string temp = part1 + guid + part2;
+		const char *query = temp.c_str();
+
+		QueryResult result = CharacterDatabase.Query(query);
+
+		if (result.null())
+			return false;
+
+		do
+		{
+			Field* fields = result->Fetch();
+			uint32 entry = fields[0].GetUInt32();
+			std::string name = fields[1].GetString();
+
+			if (name == "" || name.empty())
+			{
+				std::string part1 = "SELECT default_name FROM azth_morph_template WHERE entry = ";
+				std::string part2 = " LIMIT 0, 200000; ";
+				char strEntry[10];
+				snprintf(strEntry, 10, "%d", entry);
+				std::string temp = part1 + strEntry + part2;
+				const char *query = temp.c_str();
+
+				QueryResult result = WorldDatabase.Query(query);
+				Field* fields = result->Fetch();
+				name = fields[0].GetString();
+			}
+
+			player->ADD_GOSSIP_ITEM(0, name, GOSSIP_SENDER_MAIN, entry);
+
+		} while (result->NextRow());
+
+
+		player->ADD_GOSSIP_ITEM(0, "Demorph", GOSSIP_SENDER_MAIN, 1);
+
+		player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, item->GetGUID());
+		return false; // Cast the spell on use normally
+	}
+
+	void OnGossipSelect(Player* player, Item* /*item*/, uint32 /*sender*/, uint32 action) override
+	{
+		player->PlayerTalkClass->ClearMenus();
+		uint32 entry;
+		if (action == 1)
+			entry = player->GetDisplayId();
+		else
+			entry = action;
+		std::string part1 = "SELECT flags, scale, aura FROM azth_morph_template WHERE entry = ";
+		std::string part2 = " LIMIT 0, 1; ";
+		char strEntry[10];
+		snprintf(strEntry, 10, "%d", entry);
+		std::string temp = part1 + strEntry + part2;
+		const char *query = temp.c_str();
+
+		QueryResult result = WorldDatabase.Query(query);
+
+		if (result.null())
+		{
+			player->CLOSE_GOSSIP_MENU();
+			return;
+		}
+
+		Field* fields = result->Fetch();
+
+		uint32 flags = fields[0].GetUInt32();
+		float scale = fields[1].GetFloat();
+		uint32 aura = 0;
+
+		if (fields[2].GetInt32() != -1)
+			aura = fields[2].GetUInt32();
+
+		switch (action)
+		{
+		case 1:
+			player->DeMorph();
+			player->SetObjectScale(1);
+			if (aura > 0)
+				player->RemoveAura(aura, AURA_REMOVE_BY_DEFAULT);
+			break;
+
+		default:
+			player->SetDisplayId(action);
+			player->SetObjectScale(scale);
+
+			if (aura > 0)
+				player->AddAura(aura, player);
+
+			//if (flags > 0)
+			// do something
+
+			break;
+		}
+		player->CLOSE_GOSSIP_MENU();
+	}
+};
+
+class azth_get_morph : public ItemScript
+{
+public:
+	azth_get_morph() : ItemScript("azth_get_morph") { }
+
+	bool OnUse(Player* player, Item* item, SpellCastTargets const& /*targets*/) override // Any hook here
+	{
+		player->PlayerTalkClass->ClearMenus();
+
+		player->ADD_GOSSIP_ITEM(0, "Aggiungi senza soprannome.", GOSSIP_SENDER_MAIN, 1);
+		player->ADD_GOSSIP_ITEM_EXTENDED(GOSSIP_ICON_CHAT, "Aggiungi con soprannome.", GOSSIP_SENDER_MAIN, 2, "Scrivi un soprannome per questa skin.", 0, true);
+
+		player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, item->GetGUID());
+
+		return false;
+	}
+
+	void OnGossipSelect(Player* player, Item* item, uint32 /*sender*/, uint32 action) override
+	{
+		player->PlayerTalkClass->ClearMenus();
+
+		if (action != 1)
+			return;
+
+		std::string part1 = "REPLACE INTO azth_character_morph (guid, entry) VALUES (";
+		std::string part2 = ");";
+		std::string part3 = ",";
+		char guid[10];
+		snprintf(guid, 10, "%d", player->GetGUID());
+		char displayid[10];
+		snprintf(displayid, 10, "%d", item->GetMaxStackCount());
+		std::string temp = part1 + guid + part3 + displayid + part2;
+		const char *query = temp.c_str();
+
+		QueryResult result = CharacterDatabase.Query(query);
+
+		player->CLOSE_GOSSIP_MENU();
+	}
+
+	void OnGossipSelectCode(Player* player, Item* item, uint32 /*sender*/, uint32 action, const char* code) override
+	{
+		player->PlayerTalkClass->ClearMenus();
+
+		if (code == "" || *code == 0)
+		{
+			ChatHandler(player->GetSession()).SendSysMessage("Verrà salvata la skin senza soprannome!");
+		}
+
+		if (action != 2)
+			return;
+
+		std::string part1 = "REPLACE INTO azth_character_morph (guid, entry, name) VALUES (";
+		std::string part2 = ");";
+		std::string part3 = ",";
+		std::string apici = "\"";
+		char guid[10];
+		snprintf(guid, 10, "%d", player->GetGUID());
+		char displayid[10];
+		snprintf(displayid, 10, "%d", item->GetMaxStackCount());
+		std::string temp = part1 + guid + part3 + displayid + part3 + apici + code + apici + part2;
+		const char *query = temp.c_str();
+
+		QueryResult result = CharacterDatabase.Query(query);
+
+		player->CLOSE_GOSSIP_MENU();
+	}
 };
 
 void AddSC_hearthstone()
@@ -344,4 +521,6 @@ void AddSC_hearthstone()
 	new npc_han_al();
 	new npc_azth_vendor();
 	new item_azth_hearthstone_loot_sack();
+	new azth_main_morph();
+	new azth_get_morph();
 }
