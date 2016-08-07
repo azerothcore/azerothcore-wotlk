@@ -6,6 +6,7 @@
 // arising from the use of this software.
 
 #include "CrossFaction.h"
+#include "ArenaTeamMgr.h"
 
 // Crossfaction class functionalities
 void CrossFaction::UpdatePlayerTeam(Group* group, uint64 guid, bool reset /* = false */)
@@ -292,7 +293,10 @@ public:
 class CrossFactionWorld : public WorldScript
 {
 public:
-    CrossFactionWorld() : WorldScript("CrossFactionWorld") { m_crossfactionUpdateInterval = 10000; m_crossfactionDiff = 0; }
+    CrossFactionWorld() : WorldScript("CrossFactionWorld")
+    {
+        m_crossfactionUpdateInterval = 10000; m_arenaUpdateInterval = 180000; m_crossfactionDiff = 0; m_arenaPointsDiff = 0;
+    }
 
     void OnAfterConfigLoad(bool reload) override
     {
@@ -302,16 +306,26 @@ public:
     void OnUpdate(uint32 diff) override
     {
         m_crossfactionDiff += diff;
+        m_arenaPointsDiff += diff;
+
         if (m_crossfactionDiff > m_crossfactionUpdateInterval)
         {
             sCrossFaction->UpdateAllGroups();
             m_crossfactionDiff = 0;
+        }
+
+        if (m_arenaPointsDiff > m_arenaUpdateInterval)
+        {
+            sArenaTeamMgr->DistributeArenaPoints();
+            m_arenaPointsDiff = 0;
         }
     }
 
 private:
     uint32 m_crossfactionUpdateInterval;
     uint32 m_crossfactionDiff;
+    uint32 m_arenaPointsDiff;
+    uint32 m_arenaUpdateInterval;
 
 };
 
