@@ -37,8 +37,8 @@ MACRO(AZTH_ADD_GLOBAL name val)
   AZTH_GET_GLOBAL(${name})
 
   set_property ( GLOBAL PROPERTY ${name}
-      ${val}
       ${${name}}
+      ${val}
   )
   # after set , create the variable for current scope
   AZTH_GET_GLOBAL(${name})
@@ -66,6 +66,21 @@ MACRO(AZTH_SET_PATH name val)
   AZTH_SET_CACHE(${name} ${val})
 
   AZTH_ADD_INC_PATH(${val})
+ENDMACRO()
+
+#
+# AZTH_ADD_SCRIPTS
+#
+MACRO(AZTH_ADD_SCRIPTS script_def include)
+    AZTH_ADD_GLOBAL("AZTH_ADD_SCRIPTS_LIST" "Add${script_def}Scripts()\;")
+    
+
+    if (NOT ${include} STREQUAL "")
+        AZTH_GET_GLOBAL("AZTH_ADD_SCRIPTS_INCLUDE")
+        if (NOT ";${AZTH_ADD_SCRIPTS_INCLUDE};" MATCHES ";${include};")
+            AZTH_ADD_GLOBAL("AZTH_ADD_SCRIPTS_INCLUDE" "${include}\;")
+        endif()
+    endif()
 ENDMACRO()
 
 #

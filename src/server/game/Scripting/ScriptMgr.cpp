@@ -232,6 +232,40 @@ struct TSpellSummary
     uint8 Effects;                                          // set of enum SelectEffect
 } *SpellSummary;
 
+void ScriptMgr::CheckIfScriptsInDatabaseExist()
+{
+    ObjectMgr::ScriptNameContainer& sn = sObjectMgr->GetScriptNames();
+    for (ObjectMgr::ScriptNameContainer::iterator itr = sn.begin(); itr != sn.end(); ++itr)
+        if (uint32 sid = sObjectMgr->GetScriptId((*itr).c_str()))
+        {
+            if (!ScriptRegistry<SpellScriptLoader>::GetScriptById(sid) &&
+                !ScriptRegistry<ServerScript>::GetScriptById(sid) &&
+                !ScriptRegistry<WorldScript>::GetScriptById(sid) &&
+                !ScriptRegistry<FormulaScript>::GetScriptById(sid) &&
+                !ScriptRegistry<WorldMapScript>::GetScriptById(sid) &&
+                !ScriptRegistry<InstanceMapScript>::GetScriptById(sid) &&
+                !ScriptRegistry<BattlegroundMapScript>::GetScriptById(sid) &&
+                !ScriptRegistry<ItemScript>::GetScriptById(sid) &&
+                !ScriptRegistry<CreatureScript>::GetScriptById(sid) &&
+                !ScriptRegistry<GameObjectScript>::GetScriptById(sid) &&
+                !ScriptRegistry<AreaTriggerScript>::GetScriptById(sid) &&
+                !ScriptRegistry<BattlegroundScript>::GetScriptById(sid) &&
+                !ScriptRegistry<OutdoorPvPScript>::GetScriptById(sid) &&
+                !ScriptRegistry<CommandScript>::GetScriptById(sid) &&
+                !ScriptRegistry<WeatherScript>::GetScriptById(sid) &&
+                !ScriptRegistry<AuctionHouseScript>::GetScriptById(sid) &&
+                !ScriptRegistry<ConditionScript>::GetScriptById(sid) &&
+                !ScriptRegistry<VehicleScript>::GetScriptById(sid) &&
+                !ScriptRegistry<DynamicObjectScript>::GetScriptById(sid) &&
+                !ScriptRegistry<TransportScript>::GetScriptById(sid) &&
+                !ScriptRegistry<AchievementCriteriaScript>::GetScriptById(sid) &&
+                !ScriptRegistry<PlayerScript>::GetScriptById(sid) &&
+                !ScriptRegistry<GuildScript>::GetScriptById(sid) &&
+                !ScriptRegistry<GroupScript>::GetScriptById(sid))
+                sLog->outErrorDb("Script named '%s' is assigned in database, but has no code!", (*itr).c_str());
+        }
+}
+
 void ScriptMgr::FillSpellSummary()
 {
     SpellSummary = new TSpellSummary[sSpellMgr->GetSpellInfoStoreSize()];
