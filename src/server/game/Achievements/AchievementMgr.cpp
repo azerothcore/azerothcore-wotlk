@@ -554,6 +554,8 @@ void AchievementMgr::SaveToDB(SQLTransaction& trans)
             trans->Append(stmt);
 
             iter->second.changed = false;
+
+            sScriptMgr->OnAchievementSave(trans, GetPlayer(), iter->first, iter->second);
         }
     }
 
@@ -581,6 +583,8 @@ void AchievementMgr::SaveToDB(SQLTransaction& trans)
             }
 
             iter->second.changed = false;
+
+            sScriptMgr->OnCriteriaSave(trans, GetPlayer(), iter->first, iter->second);
         }
     }
 }
@@ -2041,6 +2045,8 @@ void AchievementMgr::SetCriteriaProgress(AchievementCriteriaEntry const* entry, 
     }
 
     SendCriteriaUpdate(entry, progress, timeElapsed, timedCompleted);
+
+    sScriptMgr->OnCriteriaProgress(GetPlayer(), entry);
 }
 
 void AchievementMgr::RemoveCriteriaProgress(const AchievementCriteriaEntry* entry)
@@ -2137,6 +2143,8 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
     CompletedAchievementData& ca = m_completedAchievements[achievement->ID];
     ca.date = time(NULL);
     ca.changed = true;
+
+    sScriptMgr->OnAchievementComplete(GetPlayer(), achievement);
 
     // pussywizard: set all progress counters to 0, so progress will be deleted from db during save
     {

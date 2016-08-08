@@ -681,8 +681,6 @@ void Group::ChangeLeader(uint64 newLeaderGuid)
     if (!newLeader)
         return;
 
-    sScriptMgr->OnGroupChangeLeader(this, newLeaderGuid, m_leaderGuid);
-
     if (!isBGGroup() && !isBFGroup())
     {
         SQLTransaction trans = CharacterDatabase.BeginTransaction();
@@ -707,6 +705,8 @@ void Group::ChangeLeader(uint64 newLeaderGuid)
     WorldPacket data(SMSG_GROUP_SET_LEADER, m_leaderName.size()+1);
     data << slot->name;
     BroadcastPacket(&data, true);
+
+    sScriptMgr->OnGroupChangeLeader(this, newLeaderGuid, m_leaderGuid); // This hook should be executed at the end - Not used anywhere in the original core
 }
 
 void Group::Disband(bool hideDestroy /* = false */)
