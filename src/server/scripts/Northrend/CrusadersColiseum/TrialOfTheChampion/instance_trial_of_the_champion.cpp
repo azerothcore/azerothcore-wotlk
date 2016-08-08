@@ -7,9 +7,12 @@ REWRITTEN FROM SCRATCH BY PUSSYWIZARD, IT OWNS NOW!
 #include "trial_of_the_champion.h"
 #include "Vehicle.h"
 #include "Player.h"
+#include "Group.h"
 
 const Position SpawnPosition = {746.67f, 684.08f, 412.5f, 4.65f};
 #define CLEANUP_CHECK_INTERVAL  5000
+
+class Group;
 
 class instance_trial_of_the_champion : public InstanceMapScript
 {
