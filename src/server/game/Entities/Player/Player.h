@@ -1885,6 +1885,7 @@ class Player : public Unit, public GridObject<Player>
         {
             SetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (slot * ARENA_TEAM_END) + type, value);
         }
+        static uint32 GetArenaTeamIdFromDB(uint64 guid, uint8 slot);
         static void LeaveAllArenaTeams(uint64 guid);
         uint32 GetArenaTeamId(uint8 slot) const { return GetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (slot * ARENA_TEAM_END) + ARENA_TEAM_ID); }
         uint32 GetArenaPersonalRating(uint8 slot) const { return GetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (slot * ARENA_TEAM_END) + ARENA_TEAM_PERSONAL_RATING); }
@@ -2076,6 +2077,7 @@ class Player : public Unit, public GridObject<Player>
         static TeamId TeamIdForRace(uint8 race);
         TeamId GetTeamId(bool original = false) const { return original ? TeamIdForRace(getRace()) : m_team; };
         void setFactionForRace(uint8 race);
+        void setTeamId(TeamId teamid) { m_team = teamid; };
 
         void InitDisplayIds();
 
