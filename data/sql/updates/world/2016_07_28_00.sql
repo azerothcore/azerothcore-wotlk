@@ -1,3 +1,5 @@
+ALTER TABLE world_db_version CHANGE COLUMN 2016_07_14_00 2016_07_28_00 bit;
+
 -- loot for mindless servant 26536 in utgarde pinnacle
 DELETE FROM `creature_loot_template` WHERE (Entry = 26536);
 INSERT INTO `creature_loot_template` (`Entry`, `Item`, `ChanceOrQuestChance`, `LootMode`, `GroupId`, `mincountOrRef`, `maxcount`) VALUES
