@@ -2225,6 +2225,13 @@ Rate.Auction.Cut     = 1
 Rate.Honor = 1
 
 #
+#    Rate.ArenaPoints
+#        Description: Arena points gain rate.
+#        Default:     1
+
+Rate.ArenaPoints = 1
+
+#
 #    Rate.Mining.Amount
 #        Description: Rate for minimum/maximum times a deposit can be used.
 #        Default:     1

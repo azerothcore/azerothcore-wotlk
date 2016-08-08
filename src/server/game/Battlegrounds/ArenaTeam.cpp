@@ -25,6 +25,7 @@
 #include "Player.h"
 #include "WorldSession.h"
 #include "Opcodes.h"
+#include <Config.h>
 
 ArenaTeam::ArenaTeam()
     : TeamId(0), Type(0), TeamName(), CaptainGuid(0), BackgroundColor(0), EmblemStyle(0), EmblemColor(0),
@@ -590,6 +591,8 @@ uint32 ArenaTeam::GetPoints(uint32 memberRating)
         points *= 0.76f;
     else if (Type == ARENA_TEAM_3v3)
         points *= 0.88f;
+    
+    points *= sWorld->getRate(RATE_ARENA_POINTS);
 
     return (uint32) points;
 }
