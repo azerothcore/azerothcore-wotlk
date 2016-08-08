@@ -2464,14 +2464,6 @@ AutoBroadcast.Timer = 60000
 Battleground.CastDeserter = 1
 
 #
-#    Battleground.RandomCrossFaction.Enable
-#        Description: Enable random battleground crossfaction randomizing system
-#        Default:     0 - (Disabled)
-#                     1 - (Enabled)
-
-Battleground.RandomCrossFaction.Enable = 1
-
-#
 #    Battleground.QueueAnnouncer.Enable
 #        Description: Announce battleground queue status to chat.
 #        Default:     0 - (Disabled)
@@ -2487,15 +2479,6 @@ Battleground.QueueAnnouncer.Enable = 0
 
 Battleground.QueueAnnouncer.PlayerOnly = 0
 
-#
-#    Battleground.InvitationType
-#        Description: Set Battleground invitation type.
-#        Default:     0 - (Normal, Invite as much players to battlegrounds as queued,
-#                          Don't bother with balance)
-#                     1 - (Experimental, Don't allow to invite much more players
-#                          of one faction)
-
-Battleground.InvitationType = 0
 
 #
 #    Battleground.PrematureFinishTimer
