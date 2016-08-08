@@ -9080,6 +9080,12 @@ GameObjectTemplate const* ObjectMgr::GetGameObjectTemplate(uint32 entry)
     return NULL;
 }
 
+Player* ObjectMgr::GetPlayerByLowGUID(uint32 lowguid) const
+{
+    uint64 guid = MAKE_NEW_GUID(lowguid, 0, HIGHGUID_PLAYER);
+    return ObjectAccessor::FindPlayer(guid);
+}
+
 bool ObjectMgr::IsGameObjectStaticTransport(uint32 entry)
 {
     GameObjectTemplate const* goinfo = GetGameObjectTemplate(entry);
