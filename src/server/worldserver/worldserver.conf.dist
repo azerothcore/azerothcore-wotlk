@@ -83,13 +83,13 @@ LogsDir = ""
 #                                                                 section my.ini)
 #                     ".;/path/to/unix_socket;username;password;database" - (use Unix sockets on
 #                                                                           Unix/Linux)
-#        Default:     "127.0.0.1;3306;trinity;trinity;auth"       - (LoginDatabaseInfo)
-#                     "127.0.0.1;3306;trinity;trinity;world"      - (WorldDatabaseInfo)
-#                     "127.0.0.1;3306;trinity;trinity;characters" - (CharacterDatabaseInfo)
+#        Default:     "127.0.0.1;3306;root;root;auth"       - (LoginDatabaseInfo)
+#                     "127.0.0.1;3306;root;root;world"      - (WorldDatabaseInfo)
+#                     "127.0.0.1;3306;root;root;characters" - (CharacterDatabaseInfo)
 
-LoginDatabaseInfo     = "127.0.0.1;3306;trinity;trinity;auth"
-WorldDatabaseInfo     = "127.0.0.1;3306;trinity;trinity;world"
-CharacterDatabaseInfo = "127.0.0.1;3306;trinity;trinity;characters"
+LoginDatabaseInfo     = "127.0.0.1;3306;root;root;auth"
+WorldDatabaseInfo     = "127.0.0.1;3306;root;root;world"
+CharacterDatabaseInfo = "127.0.0.1;3306;root;root;characters"
 
 #
 #    LoginDatabase.WorkerThreads
