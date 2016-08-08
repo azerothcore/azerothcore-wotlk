@@ -513,7 +513,7 @@ Player* Item::GetOwner()const
 // Legacy / Shortcut
 uint32 Item::GetSkill()
 {
-    return proto->GetSkill();
+    return GetTemplate()->GetSkill();
 }
 
 uint32 Item::GetSpell()
