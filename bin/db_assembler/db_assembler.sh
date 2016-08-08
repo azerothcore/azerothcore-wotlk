@@ -1,6 +1,11 @@
 #!/bin/bash
 
-SRCPATH=$(readlink -f "../../")
+unamestr=`uname`
+if [[ "$unamestr" == 'Darwin' ]]; then
+   SRCPATH=$(greadlink -f "../../")
+else
+   SRCPATH=$(readlink -f "../../")
+fi
 
 source $SRCPATH"/bin/bash_shared/includes.sh"
 
