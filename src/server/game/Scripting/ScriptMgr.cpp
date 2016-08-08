@@ -705,30 +705,30 @@ bool ScriptMgr::OnItemExpire(Player* player, ItemTemplate const* proto)
 
 void ScriptMgr::OnGossipSelect(Player* player, Item* item, uint32 sender, uint32 action)
 {
-	ASSERT(player);
-	ASSERT(item);
+    ASSERT(player);
+    ASSERT(item);
 
-	GET_SCRIPT(ItemScript, item->GetScriptId(), tmpscript);
-	tmpscript->OnGossipSelect(player, item, sender, action);
+    GET_SCRIPT(ItemScript, item->GetScriptId(), tmpscript);
+    tmpscript->OnGossipSelect(player, item, sender, action);
 }
 
 void ScriptMgr::OnGossipSelectCode(Player* player, Item* item, uint32 sender, uint32 action, const char* code)
 {
-	ASSERT(player);
-	ASSERT(item);
+    ASSERT(player);
+    ASSERT(item);
 
-	GET_SCRIPT(ItemScript, item->GetScriptId(), tmpscript);
-	tmpscript->OnGossipSelectCode(player, item, sender, action, code);
+    GET_SCRIPT(ItemScript, item->GetScriptId(), tmpscript);
+    tmpscript->OnGossipSelectCode(player, item, sender, action, code);
 }
 
 void ScriptMgr::OnGossipSelect(Player* player, uint32 menu_id, uint32 sender, uint32 action)
 {
-	FOREACH_SCRIPT(PlayerScript)->OnGossipSelect(player, menu_id, sender, action);
+    FOREACH_SCRIPT(PlayerScript)->OnGossipSelect(player, menu_id, sender, action);
 }
 
 void ScriptMgr::OnGossipSelectCode(Player* player, uint32 menu_id, uint32 sender, uint32 action, const char* code)
 {
-	FOREACH_SCRIPT(PlayerScript)->OnGossipSelectCode(player, menu_id, sender, action, code);
+    FOREACH_SCRIPT(PlayerScript)->OnGossipSelectCode(player, menu_id, sender, action, code);
 }
 
 bool ScriptMgr::OnGossipHello(Player* player, Creature* creature)
@@ -1265,7 +1265,6 @@ void ScriptMgr::OnPlayerUpdateFaction(Player* player)
     FOREACH_SCRIPT(PlayerScript)->OnUpdateFaction(player);
 }
 
-// [AZTH]  all custom PlayerScript functions
 void ScriptMgr::OnPlayerRemoveFromBattleground(Player* player, Battleground* bg)
 {
     FOREACH_SCRIPT(PlayerScript)->OnPlayerRemoveFromBattleground(player, bg);
@@ -1290,7 +1289,6 @@ void ScriptMgr::OnCriteriaSave(SQLTransaction& trans, Player* player, uint16 cri
 {
     FOREACH_SCRIPT(PlayerScript)->OnCriteriaSave(trans, player, critId, criteriaData);
 }
-//[/AZTH]
 
 // Guild
 void ScriptMgr::OnGuildAddMember(Guild* guild, Player* player, uint8& plRank)
@@ -1523,6 +1521,14 @@ GroupScript::GroupScript(const char* name)
 {
     ScriptRegistry<GroupScript>::AddScript(this);
 }
+
+// [AZTH]  all custom Script functions HERE
+// you must place here ONLY hooks that are CALLED in AzerothShard ( RARE )
+// module. If an hook can be shared with public repo, must be done! ( OFTEN )
+
+
+// [/AZTH]
+
 
 // Instantiate static members of ScriptRegistry.
 template<class TScript> std::map<uint32, TScript*> ScriptRegistry<TScript>::ScriptPointerList;

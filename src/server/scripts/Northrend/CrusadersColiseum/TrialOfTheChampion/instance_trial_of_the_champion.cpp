@@ -89,7 +89,7 @@ public:
         void OnCreatureCreate(Creature* creature)
         {
             if (TeamIdInInstance == TEAM_NEUTRAL)
-            { 
+            {
                 Map::PlayerList const &players = instance->GetPlayers();
                 if (!players.isEmpty())
                     if (Player* pPlayer = players.begin()->GetSource())

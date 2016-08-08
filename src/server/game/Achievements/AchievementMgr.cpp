@@ -546,7 +546,7 @@ void AchievementMgr::SaveToDB(SQLTransaction& trans)
             stmt->setUInt16(0, iter->first);
             stmt->setUInt32(1, GetPlayer()->GetGUID());
             trans->Append(stmt);
-            
+
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHAR_ACHIEVEMENT);
             stmt->setUInt32(0, GetPlayer()->GetGUID());
             stmt->setUInt16(1, iter->first);
@@ -555,11 +555,8 @@ void AchievementMgr::SaveToDB(SQLTransaction& trans)
 
             iter->second.changed = false;
 
-            // [AZTH]
             sScriptMgr->OnAchievementSave(trans, GetPlayer(), iter->first, iter->second);
         }
-        
-        
     }
 
     if (!m_criteriaProgress.empty())
@@ -587,7 +584,6 @@ void AchievementMgr::SaveToDB(SQLTransaction& trans)
 
             iter->second.changed = false;
 
-            //[AZTH]
             sScriptMgr->OnCriteriaSave(trans, GetPlayer(), iter->first, iter->second);
         }
     }

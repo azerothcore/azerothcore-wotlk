@@ -684,7 +684,6 @@ Player::Player(WorldSession* session): Unit(true), m_mover(this)
     azthPlayer = new AzthPlayer(this);
 
     m_drwGUID = 0;
-    
     m_speakTime = 0;
     m_speakCount = 0;
 
@@ -7310,7 +7309,7 @@ bool Player::RewardHonor(Unit* uVictim, uint32 groupsize, int32 honor, bool awar
             UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HK_CLASS, victim->getClass());
             UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HK_RACE, victim->getRace());
             UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HONORABLE_KILL_AT_AREA, GetAreaId());
-            UpdateKnownTitles();
+            UpdateKnownTitles(); // [AZTH]
             UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HONORABLE_KILL, 1, 0, victim);
             UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_SPECIAL_PVP_KILL, 1, 0, victim);
         }
@@ -7439,7 +7438,6 @@ uint32 Player::GetArenaTeamIdFromStorage(uint32 guid, uint8 slot)
     return 0;
 }
 
-//[AZTH]
 uint32 Player::GetArenaTeamIdFromDB(uint64 guid, uint8 type)
 {
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_ARENA_TEAM_ID_BY_PLAYER_GUID);
@@ -7453,7 +7451,6 @@ uint32 Player::GetArenaTeamIdFromDB(uint64 guid, uint8 type)
     uint32 id = (*result)[0].GetUInt32();
     return id;
 }
-// [/AZTH]
 
 uint32 Player::GetZoneIdFromDB(uint64 guid)
 {
@@ -7769,6 +7766,7 @@ void Player::DuelComplete(DuelCompleteType type)
 
     sScriptMgr->OnPlayerDuelEnd(duel->opponent, this, type);
 
+    //[AZTH]    
     if (type != DUEL_INTERRUPTED)
     {
         RemoveArenaSpellCooldowns();
@@ -7779,6 +7777,7 @@ void Player::DuelComplete(DuelCompleteType type)
     SetPower(POWER_MANA, GetMaxPower(POWER_MANA));
     duel->opponent->SetHealth(duel->opponent->GetMaxHealth());
     duel->opponent->SetPower(POWER_MANA, duel->opponent->GetMaxPower(POWER_MANA));
+    //[/AZTH]
 
     switch (type)
     {
@@ -12755,7 +12754,7 @@ void Player::SetVisibleItemSlot(uint8 slot, Item* pItem)
 { 
     if (pItem)
     {
-        // custom
+        // [AZTH] transm
         if (uint32 entry = sTransmogrification->GetFakeEntry(pItem->GetGUID()))
             SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + (slot * 2), entry);
         else
@@ -12882,7 +12881,7 @@ void Player::MoveItemFromInventory(uint8 bag, uint8 slot, bool update)
 { 
     if (Item* it = GetItemByPos(bag, slot))
     {
-        sTransmogrification->DeleteFakeFromDB(it->GetGUIDLow()); // custom
+        sTransmogrification->DeleteFakeFromDB(it->GetGUIDLow()); // [AZTH] custom
         ItemRemovedQuestCheck(it->GetEntry(), it->GetCount());
         RemoveItem(bag, slot, update);
         UpdateTitansGrip();
@@ -15625,7 +15624,7 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
 
     // Not give XP in case already completed once repeatable quest
     // [AZTH]
-    uint32 XP = rewarded && !quest->IsDFQuest() ? 0 : uint32(quest->XPValue(this) * azthPlayer->GetPlayerQuestRate());
+    uint32 XP = rewarded ? 0 : uint32(quest->XPValue(this) * azthPlayer->GetPlayerQuestRate());
 
     // handle SPELL_AURA_MOD_XP_QUEST_PCT auras
     Unit::AuraEffectList const& ModXPPctAuras = GetAuraEffectsByType(SPELL_AURA_MOD_XP_QUEST_PCT);

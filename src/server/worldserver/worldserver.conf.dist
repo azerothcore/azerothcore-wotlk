@@ -90,6 +90,7 @@ LogsDir = ""
 LoginDatabaseInfo     = "127.0.0.1;3306;trinity;trinity;auth"
 WorldDatabaseInfo     = "127.0.0.1;3306;trinity;trinity;world"
 CharacterDatabaseInfo = "127.0.0.1;3306;trinity;trinity;characters"
+# [AZTH]
 ExtraDatabaseInfo     = "127.0.0.1;3306;trinity;trinity;extra"
 
 #
@@ -106,6 +107,7 @@ ExtraDatabaseInfo     = "127.0.0.1;3306;trinity;trinity;extra"
 LoginDatabase.WorkerThreads     = 1
 WorldDatabase.WorkerThreads     = 1
 CharacterDatabase.WorkerThreads = 1
+# [AZTH]
 ExtraDatabase.WorkerThreads     = 1
 
 #
@@ -120,6 +122,7 @@ ExtraDatabase.WorkerThreads     = 1
 LoginDatabase.SynchThreads     = 1
 WorldDatabase.SynchThreads     = 1
 CharacterDatabase.SynchThreads = 2
+# [AZTH]
 ExtraDatabase.SynchThreads     = 1
 
 #
@@ -407,7 +410,7 @@ PidFile = ""
 #                     2 - (Detail)
 #                     3 - (Full/Debug)
 
-LogLevel = 3
+LogLevel = 1
 
 #
 #    LogFile
@@ -424,7 +427,7 @@ LogFile = "Server.log"
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 
-LogTimestamp = 1
+LogTimestamp = 0
 
 #
 #    LogFileLevel
@@ -434,7 +437,7 @@ LogTimestamp = 1
 #                     2 - (Detail)
 #                     3 - (Full/Debug)
 
-LogFileLevel = 3
+LogFileLevel = 0
 
 #
 #    Debug Log Mask
@@ -470,15 +473,13 @@ LogFileLevel = 3
 #             2097152 - Anything related to guilds
 #             4194304 - Anything related to transports
 #             8388608 - Anything related to Warden anti cheat
-#			 16777216 - Anything related to Battlefields
-#			 33554432 - Anything related to Transmog
 #
 #                       Simply add the values together to create a bitmask.
 #                       For more info see enum DebugLogFilters in Log.h
 #
 #             Default: 0 (nothing)
 
-DebugLogMask = 33554432
+DebugLogMask = 0
 
 #
 #    PacketLogFile
@@ -1387,7 +1388,7 @@ BeepAtStart = 1
 #        Example:     "Welcome to John\'s Server@This server runs on Trinity Core."
 #        Default:     "Welcome to a Trinity Core server."
 
-Motd = "welcome to AzerothCore SW1.0"
+Motd = "Welcome to a Trinity Core server."
 
 #
 #    Server.LoginInfo
@@ -1552,7 +1553,7 @@ AllowTwoSide.Accounts = 1
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 
-AllowTwoSide.Interaction.Calendar = 1
+AllowTwoSide.Interaction.Calendar = 0
 
 #
 #    AllowTwoSide.Interaction.Chat
@@ -1560,7 +1561,7 @@ AllowTwoSide.Interaction.Calendar = 1
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 
-AllowTwoSide.Interaction.Chat = 1
+AllowTwoSide.Interaction.Chat = 0
 
 #
 #    AllowTwoSide.Interaction.Channel
@@ -1568,7 +1569,7 @@ AllowTwoSide.Interaction.Chat = 1
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 
-AllowTwoSide.Interaction.Channel = 1
+AllowTwoSide.Interaction.Channel = 0
 
 #
 #    AllowTwoSide.Interaction.Group
@@ -1576,7 +1577,7 @@ AllowTwoSide.Interaction.Channel = 1
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 
-AllowTwoSide.Interaction.Group = 1
+AllowTwoSide.Interaction.Group = 0
 
 #
 #    AllowTwoSide.Interaction.Guild
@@ -1584,7 +1585,7 @@ AllowTwoSide.Interaction.Group = 1
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 
-AllowTwoSide.Interaction.Guild = 1
+AllowTwoSide.Interaction.Guild = 0
 
 #
 #    AllowTwoSide.Interaction.Auction
@@ -1592,7 +1593,7 @@ AllowTwoSide.Interaction.Guild = 1
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 
-AllowTwoSide.Interaction.Auction = 1
+AllowTwoSide.Interaction.Auction = 0
 
 #
 #    AllowTwoSide.Interaction.Mail
@@ -1600,7 +1601,7 @@ AllowTwoSide.Interaction.Auction = 1
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 
-AllowTwoSide.Interaction.Mail = 1
+AllowTwoSide.Interaction.Mail = 0
 
 #
 #    AllowTwoSide.WhoList
@@ -1608,7 +1609,7 @@ AllowTwoSide.Interaction.Mail = 1
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 
-AllowTwoSide.WhoList = 1
+AllowTwoSide.WhoList = 0
 
 #
 #    AllowTwoSide.AddFriend
@@ -1616,7 +1617,7 @@ AllowTwoSide.WhoList = 1
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 
-AllowTwoSide.AddFriend = 1
+AllowTwoSide.AddFriend = 0
 
 #
 #    AllowTwoSide.Trade
@@ -1624,7 +1625,7 @@ AllowTwoSide.AddFriend = 1
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 
-AllowTwoSide.Trade = 1
+AllowTwoSide.Trade = 0
 
 #
 #    TalentsInspecting
@@ -2238,6 +2239,13 @@ Rate.Auction.Cut     = 1
 Rate.Honor = 1
 
 #
+#    Rate.ArenaPoints
+#        Description: Arena points gain rate.
+#        Default:     1
+
+Rate.ArenaPoints = 1
+
+#
 #    Rate.Mining.Amount
 #        Description: Rate for minimum/maximum times a deposit can be used.
 #        Default:     1
@@ -2461,7 +2469,7 @@ AutoBroadcast.Timer = 60000
 
 Battleground.CastDeserter = 1
 
-#
+#    [AZTH]
 #    Battleground.RandomCrossFaction.Enable
 #        Description: Enable random battleground crossfaction randomizing system
 #        Default:     0 - (Disabled)
@@ -2475,7 +2483,7 @@ Battleground.RandomCrossFaction.Enable = 1
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 
-Battleground.QueueAnnouncer.Enable = 1
+Battleground.QueueAnnouncer.Enable = 0
 
 #
 #    Battleground.QueueAnnouncer.PlayerOnly
@@ -2485,16 +2493,17 @@ Battleground.QueueAnnouncer.Enable = 1
 
 Battleground.QueueAnnouncer.PlayerOnly = 0
 
-#
+#    [AZTH] 
 #    Battleground.InvitationType
 #        Description: Set Battleground invitation type.
 #        Default:     0 - (Normal, Invite as much players to battlegrounds as queued,
 #                          Don't bother with balance)
 #                     1 - (Experimental, Don't allow to invite much more players
 #                          of one faction)
+#                     [AZTH]
 #                     2 - (Experimental, start when teams are even)
 
-Battleground.InvitationType = 1
+Battleground.InvitationType = 0
 
 #
 #    Battleground.PrematureFinishTimer
@@ -2644,7 +2653,7 @@ Arena.AutoDistributeInterval = 7
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 
-Arena.QueueAnnouncer.Enable = 1
+Arena.QueueAnnouncer.Enable = 0
 
 #
 #    Arena.ArenaSeason.ID
@@ -2988,5 +2997,4 @@ PlayerDump.DisallowPaths = 1
 PlayerDump.DisallowOverwrite = 1
 
 #
-###################################################################################################
 ###################################################################################################

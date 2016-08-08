@@ -167,16 +167,6 @@ class Roll : public LootValidatorRef
         uint8 rollVoteMask;
 };
 
-// [AZTH]
-struct InstanceGroupBind {
-    InstanceSave* save;
-    bool perm;
-    /* permanent InstanceGroupBinds exist if the leader has a permanent
-    PlayerInstanceBind for the same instance. */
-    InstanceGroupBind() : save(NULL), perm(false) { }
-};
-// [/AZTH]
-
 /** request member stats checken **/
 /** todo: uninvite people that not accepted invite **/
 class Group

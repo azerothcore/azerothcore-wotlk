@@ -1115,6 +1115,7 @@ void RandomBattlegroundSystem::Update(uint32 diff)
             // order it like: big, small, big, small, small, small (stored backwards, actually)
 
             std::vector<BattlegroundTypeId> big, small;
+            //[AZTH]            
             //big.push_back(BATTLEGROUND_AV);
             //big.push_back(BATTLEGROUND_IC);
             small.push_back(BATTLEGROUND_WS);
@@ -1122,6 +1123,7 @@ void RandomBattlegroundSystem::Update(uint32 diff)
             small.push_back(BATTLEGROUND_AB);
             small.push_back(BATTLEGROUND_SA);
 
+            //[AZTH]
             //std::random_shuffle(big.begin(), big.end());
             std::random_shuffle(small.begin(), small.end());
 

@@ -7572,6 +7572,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
         }
         case SPELLFAMILY_DEATHKNIGHT:
         {
+            // Dancing Rune Weapon
             if (dummySpell->Id == 49028)
             {
                 // 1 dummy aura for dismiss rune blade
