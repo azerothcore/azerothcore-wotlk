@@ -1885,6 +1885,7 @@ class Player : public Unit, public GridObject<Player>
         {
             SetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (slot * ARENA_TEAM_END) + type, value);
         }
+        static uint32 GetArenaTeamIdFromDB(uint64 guid, uint8 slot);
         static void LeaveAllArenaTeams(uint64 guid);
         uint32 GetArenaTeamId(uint8 slot) const { return GetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (slot * ARENA_TEAM_END) + ARENA_TEAM_ID); }
         uint32 GetArenaPersonalRating(uint8 slot) const { return GetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (slot * ARENA_TEAM_END) + ARENA_TEAM_PERSONAL_RATING); }
@@ -2074,8 +2075,9 @@ class Player : public Unit, public GridObject<Player>
         void CheckAreaExploreAndOutdoor(void);
 
         static TeamId TeamIdForRace(uint8 race);
-        TeamId GetTeamId() const { return m_team; }
+        TeamId GetTeamId(bool original = false) const { return original ? TeamIdForRace(getRace()) : m_team; };
         void setFactionForRace(uint8 race);
+        void setTeamId(TeamId teamid) { m_team = teamid; };
 
         void InitDisplayIds();
 
@@ -2572,6 +2574,11 @@ class Player : public Unit, public GridObject<Player>
         uint32 m_pendingSpectatorForBG;
         uint32 m_pendingSpectatorInviteInstanceId;
         std::set<uint32> m_receivedSpectatorResetFor;
+
+        // Dancing Rune weapon
+        void setRuneWeaponGUID(uint64 guid) { m_drwGUID = guid; };
+        uint64 getRuneWeaponGUID() { return m_drwGUID; };
+        uint64 m_drwGUID;
 
         bool CanSeeDKPet() const    { return m_ExtraFlags & PLAYER_EXTRA_SHOW_DK_PET; }
         void SetShowDKPet(bool on)  { if (on) m_ExtraFlags |= PLAYER_EXTRA_SHOW_DK_PET; else m_ExtraFlags &= ~PLAYER_EXTRA_SHOW_DK_PET; };

@@ -104,7 +104,15 @@ extern int main(int argc, char** argv)
         ++count;
     }
 
-    if (!sConfigMgr->LoadInitial(configFile))
+    std::string cfg_def_file=_TRINITY_REALM_CONFIG;
+    cfg_def_file += ".dist";
+
+    if (!sConfigMgr->LoadInitial(cfg_def_file.c_str())) {
+        printf("Invalid or missing default configuration file : %s\n", cfg_def_file.c_str());
+        return 1;
+    }
+
+    if (!sConfigMgr->LoadMore(configFile))
     {
         printf("Invalid or missing configuration file : %s\n", configFile);
         printf("Verify that the file exists and has \'[authserver]\' written in the top of the file!\n");
@@ -113,6 +121,22 @@ extern int main(int argc, char** argv)
 
     sLog->outString("%s (authserver)", _FULLVERSION);
     sLog->outString("<Ctrl-C> to stop.\n");
+
+    sLog->outString("   █████╗ ███████╗███████╗██████╗  ██████╗ ████████╗██╗  ██╗");           
+    sLog->outString("  ██╔══██╗╚══███╔╝██╔════╝██╔══██╗██╔═══██╗╚══██╔══╝██║  ██║");           
+    sLog->outString("  ███████║  ███╔╝ █████╗  ██████╔╝██║   ██║   ██║   ███████║");           
+    sLog->outString("  ██╔══██║ ███╔╝  ██╔══╝  ██╔══██╗██║   ██║   ██║   ██╔══██║");           
+    sLog->outString("  ██║  ██║███████╗███████╗██║  ██║╚██████╔╝   ██║   ██║  ██║");           
+    sLog->outString("  ╚═╝  ╚═╝╚══════╝╚══════╝╚═╝  ╚═╝ ╚═════╝    ╚═╝   ╚═╝  ╚═╝");                                                                
+    sLog->outString("                                ██████╗ ██████╗ ██████╗ ███████╗");
+    sLog->outString("                                ██╔════╝██╔═══██╗██╔══██╗██╔════╝");
+    sLog->outString("                                ██║     ██║   ██║██████╔╝█████╗");  
+    sLog->outString("                                ██║     ██║   ██║██╔══██╗██╔══╝");  
+    sLog->outString("                                ╚██████╗╚██████╔╝██║  ██║███████╗");
+    sLog->outString("                                 ╚═════╝ ╚═════╝ ╚═╝  ╚═╝╚══════╝\n");
+
+    sLog->outString("  	  AzerothCore 3.3.5a  -  www.azerothcore.org\n");
+
     sLog->outString("Using configuration file %s.", configFile);
 
     sLog->outDetail("%s (Library: %s)", OPENSSL_VERSION_TEXT, SSLeay_version(SSLEAY_VERSION));

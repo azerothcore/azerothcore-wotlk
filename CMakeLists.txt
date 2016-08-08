@@ -28,11 +28,6 @@ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH 1)
 # set macro-directory
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/src/cmake/macros")
 
-# build in Release-mode by default if not explicitly set
-if( NOT CMAKE_BUILD_TYPE )
-  set(CMAKE_BUILD_TYPE "Release")
-endif()
-
 include(CheckCXXSourceRuns)
 include(CheckIncludeFiles)
 
@@ -40,7 +35,19 @@ include(CheckIncludeFiles)
 include(src/cmake/utils.cmake)
 
 # set default buildoptions and print them
-include(src/cmake/options.cmake)
+include(conf/config.cmake.dist)
+
+# load custom configurations for cmake if exists
+if(EXISTS "conf/config.cmake")
+  include(conf/config.cmake)
+endif()
+
+RUN_HOOK("AFTER_LOAD_CONF")
+
+# build in Release-mode by default if not explicitly set
+if( NOT CMAKE_BUILD_TYPE )
+  set(CMAKE_BUILD_TYPE "Release")
+endif()
 
 # turn off PCH totally if enabled (hidden setting, mainly for devs)
 if( NOPCH )
@@ -79,9 +86,11 @@ include(src/cmake/showoptions.cmake)
 # add modules and dependencies
 AZTH_SUBDIRLIST(sub_DIRS  "${CMAKE_SOURCE_DIR}/modules" FALSE FALSE)
 FOREACH(subdir ${sub_DIRS})
-    STRING(REGEX REPLACE "^${CMAKE_SOURCE_DIR}/" "" subdir ${subdir})
-    message("Loading module: ${subdir}")
-    add_subdirectory("${subdir}")
+    STRING(REGEX REPLACE "^${CMAKE_SOURCE_DIR}/" "" subdir_rel ${subdir})
+    if(EXISTS "${subdir}/CMakeLists.txt")
+        message("Loading module: ${subdir_rel}")
+        add_subdirectory("${subdir_rel}")
+    endif()
 ENDFOREACH()
 
 RUN_HOOK("BEFORE_SRC_LOAD")

@@ -58,7 +58,7 @@ RealmID = 1
 #    DataDir
 #        Description: Data directory setting.
 #        Important:   DataDir needs to be quoted, as the string might contain space characters.
-#        Example:     "@prefix@/share/sunwellcore"
+#        Example:     "/home/youruser/azeroth-server/data"
 #        Default:     "."
 
 DataDir = "."
@@ -83,13 +83,13 @@ LogsDir = ""
 #                                                                 section my.ini)
 #                     ".;/path/to/unix_socket;username;password;database" - (use Unix sockets on
 #                                                                           Unix/Linux)
-#        Default:     "127.0.0.1;3306;trinity;trinity;auth"       - (LoginDatabaseInfo)
-#                     "127.0.0.1;3306;trinity;trinity;world"      - (WorldDatabaseInfo)
-#                     "127.0.0.1;3306;trinity;trinity;characters" - (CharacterDatabaseInfo)
+#        Default:     "127.0.0.1;3306;root;root;auth"       - (LoginDatabaseInfo)
+#                     "127.0.0.1;3306;root;root;world"      - (WorldDatabaseInfo)
+#                     "127.0.0.1;3306;root;root;characters" - (CharacterDatabaseInfo)
 
-LoginDatabaseInfo     = "127.0.0.1;3306;trinity;trinity;auth"
-WorldDatabaseInfo     = "127.0.0.1;3306;trinity;trinity;world"
-CharacterDatabaseInfo = "127.0.0.1;3306;trinity;trinity;characters"
+LoginDatabaseInfo     = "127.0.0.1;3306;root;root;auth"
+WorldDatabaseInfo     = "127.0.0.1;3306;root;root;world"
+CharacterDatabaseInfo = "127.0.0.1;3306;root;root;characters"
 
 #
 #    LoginDatabase.WorkerThreads
@@ -1407,6 +1407,15 @@ Command.LookupMaxResults = 0
 
 AllowTickets = 1
 
+#    DeletedCharacterTicketTrace
+#        Description: Keep trace of tickets opened by deleted characters
+#                     gm_ticket.playerGuid will be 0, old GUID and character name
+#                     will be included in gm_ticket.comment
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+
+DeletedCharacterTicketTrace = 0
+
 #
 #     DungeonFinder.OptionsMask
 #        Description: Dungeon and raid finder system.
@@ -1436,7 +1445,7 @@ AccountInstancesPerHour = 5
 
 #
 #   BirthdayTime
-#        Description: Set to date of project's birth in UNIX time. By default the date when SunwellCore was started (Thu Oct 2, 2008)
+#        Description: Set to date of project's birth in UNIX time. By default Thu Oct 2, 2008
 #        Default:     1222964635
 #
 #
@@ -2158,8 +2167,8 @@ Rate.Drop.Item.ReferencedAmount = 1
 #    Rate.XP.Kill
 #    Rate.XP.Quest
 #    Rate.XP.Explore
-#        Description: Experience rates.
-#        Default:     1 - (Rate.XP.Kill, affects only kills outside of Battlegrounds)
+#        Description: Experience rates (outside battleground)
+#        Default:     1 - (Rate.XP.Kill)
 #                     1 - (Rate.XP.Quest)
 #                     1 - (Rate.XP.Explore)
 
@@ -2222,6 +2231,13 @@ Rate.Auction.Cut     = 1
 #        Default:     1
 
 Rate.Honor = 1
+
+#
+#    Rate.ArenaPoints
+#        Description: Arena points gain rate.
+#        Default:     1
+
+Rate.ArenaPoints = 1
 
 #
 #    Rate.Mining.Amount
@@ -2463,15 +2479,6 @@ Battleground.QueueAnnouncer.Enable = 0
 
 Battleground.QueueAnnouncer.PlayerOnly = 0
 
-#
-#    Battleground.InvitationType
-#        Description: Set Battleground invitation type.
-#        Default:     0 - (Normal, Invite as much players to battlegrounds as queued,
-#                          Don't bother with balance)
-#                     1 - (Experimental, Don't allow to invite much more players
-#                          of one faction)
-
-Battleground.InvitationType = 0
 
 #
 #    Battleground.PrematureFinishTimer
@@ -2507,6 +2514,20 @@ Battleground.GiveXPForKills = 0
 #        Default:     6 - (06:00 AM)
 
 Battleground.Random.ResetHour = 6
+
+#    Battleground.StoreStatistics.Enable
+#        Description: Store Battleground scores in the database.
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+
+Battleground.StoreStatistics.Enable = 1
+
+#    Battleground.TrackDeserters.Enable
+#        Description: Track deserters of Battlegrounds.
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+
+Battleground.TrackDeserters.Enable = 1
 
 #
 ###################################################################################################

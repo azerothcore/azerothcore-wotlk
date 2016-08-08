@@ -7,11 +7,10 @@ SYSERR="$5"
 GBD_ENABLED="$6"
 
 if [ $GBD_ENABLED -eq 1 ]; then
-    echo "run -c $3" > "$GDB_FILE"
+    echo "set logging on" > "$GDB_FILE"
+    echo "set debug timestamp" >> "$GDB_FILE"
+    echo "run -c $3" >> "$GDB_FILE"
     echo "bt" >> "$GDB_FILE"
-    echo "bt full" >> "$GDB_FILE"
-    echo "info threads" >> "$GDB_FILE"
-    echo "thread apply all bt full" >> "$GDB_FILE"
 
     [ ! -f "$SYSLOG" ] && touch "$SYSLOG"
     [ ! -f "$SYSERR" ] && touch "$SYSERR"

@@ -492,16 +492,18 @@ void PetAI::HandleReturnMovement()
     {
         if (!me->GetCharmInfo()->IsAtStay() && !me->GetCharmInfo()->IsReturning())
         {
-            // Return to previous position where stay was clicked
-            if (me->GetMotionMaster()->GetMotionSlotType(MOTION_SLOT_CONTROLLED) == NULL_MOTION_TYPE)
+            if (me->GetCharmInfo()->HasStayPosition())
             {
-                float x, y, z;
-
-                me->GetCharmInfo()->GetStayPosition(x, y, z);
-                ClearCharmInfoFlags();
-                me->GetCharmInfo()->SetIsReturning(true);
-                me->GetMotionMaster()->Clear();
-                me->GetMotionMaster()->MovePoint(me->GetGUIDLow(), x, y, z);
+                // Return to previous position where stay was clicked
+                if (me->GetMotionMaster()->GetMotionSlotType(MOTION_SLOT_CONTROLLED) == NULL_MOTION_TYPE)
+                {
+                    float x, y, z;
+                    me->GetCharmInfo()->GetStayPosition(x, y, z);
+                    ClearCharmInfoFlags();
+                    me->GetCharmInfo()->SetIsReturning(true);
+                    me->GetMotionMaster()->Clear();
+                    me->GetMotionMaster()->MovePoint(me->GetUInt32Value(OBJECT_FIELD_GUID), x, y, z);
+                }
             }
         }
     }

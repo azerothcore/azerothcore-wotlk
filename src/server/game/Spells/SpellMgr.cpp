@@ -3133,6 +3133,9 @@ void SpellMgr::LoadSpellCustomAttr()
                 spellInfo->RecoveryTime = 1500;
                 spellInfo->_requireCooldownInfo = true;
                 break;
+            case 44535: // Spirit Heal, abilities also have no cost
+                spellInfo->Effects[EFFECT_0].MiscValue = 127;
+                break;
         }
 
         switch (spellInfo->SpellFamilyName)
@@ -3558,12 +3561,12 @@ void SpellMgr::LoadDbcDataCorrections()
             spellInfo->EffectSpellClassMask[0][0] = 0;
             spellInfo->EffectSpellClassMask[0][2] = 0x8000000;
             break;
-        // Judgements Facing
+        /* Judgements Facing   -- SCEICCO: not sure this is offylike
         case 20271:
         case 53407:
         case 53408:
             spellInfo->FacingCasterFlags |= SPELL_FACING_FLAG_INFRONT;
-            break;
+            break;*/ 
         // Seal of Light trigger
         case 20167:
             spellInfo->spellLevel = 0;

@@ -117,7 +117,7 @@ enum ScriptCommands
     SCRIPT_COMMAND_CALLSCRIPT_TO_UNIT    = 21,               // source = WorldObject (if present used as a search center), datalong = script id, datalong2 = unit lowguid, dataint = script table to use (see ScriptsType)
     SCRIPT_COMMAND_KILL                  = 22,               // source/target = Creature, dataint = remove corpse attribute
 
-    // SunwellCore only
+    // AzerothCore only
     SCRIPT_COMMAND_ORIENTATION           = 30,               // source = Unit, target (datalong > 0) = Unit, datalong = > 0 turn source to face target, o = orientation
     SCRIPT_COMMAND_EQUIP                 = 31,               // soucre = Creature, datalong = equipment id
     SCRIPT_COMMAND_MODEL                 = 32,               // source = Creature, datalong = model id
@@ -666,6 +666,8 @@ class ObjectMgr
 
         typedef std::map<uint32, uint32> CharacterConversionMap;
 
+        Player* GetPlayerByLowGUID(uint32 lowguid) const;
+
         GameObjectTemplate const* GetGameObjectTemplate(uint32 entry);
         bool IsGameObjectStaticTransport(uint32 entry);
         GameObjectTemplateContainer const* GetGameObjectTemplates() const { return &_gameObjectTemplateStore; }
@@ -687,6 +689,18 @@ class ObjectMgr
         ItemTemplate const* GetItemTemplate(uint32 entry);
         ItemTemplateContainer const* GetItemTemplateStore() const { return &_itemTemplateStore; }
 
+        ItemLocale const* GetItemLocale(uint32 entry) const
+        {
+            ItemLocaleContainer::const_iterator itr = _itemLocaleStore.find(entry);
+            if (itr == _itemLocaleStore.end()) return NULL;
+            return &itr->second;
+        }
+        ItemSetNameLocale const* GetItemSetNameLocale(uint32 entry) const
+        {
+            ItemSetNameLocaleContainer::const_iterator itr = _itemSetNameLocaleStore.find(entry);
+            if (itr == _itemSetNameLocaleStore.end())return NULL;
+            return &itr->second;
+        }
         ItemSetNameEntry const* GetItemSetNameEntry(uint32 itemId)
         {
             ItemSetNameContainer::iterator itr = _itemSetNameStore.find(itemId);
@@ -1164,6 +1178,11 @@ class ObjectMgr
         GraveyardContainer GraveyardStore;
 
         static void AddLocaleString(std::string const& s, LocaleConstant locale, StringVector& data);
+        static inline void GetLocaleString(const StringVector& data, int loc_idx, std::string& value)
+        {
+            if (data.size() > size_t(loc_idx) && !data[loc_idx].empty())
+                value = data[loc_idx];
+        }
 
         CharacterConversionMap FactionChangeAchievements;
         CharacterConversionMap FactionChangeItems;

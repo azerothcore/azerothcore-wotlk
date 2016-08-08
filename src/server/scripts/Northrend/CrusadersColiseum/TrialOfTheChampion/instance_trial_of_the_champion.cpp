@@ -7,9 +7,12 @@ REWRITTEN FROM SCRATCH BY PUSSYWIZARD, IT OWNS NOW!
 #include "trial_of_the_champion.h"
 #include "Vehicle.h"
 #include "Player.h"
+#include "Group.h"
 
 const Position SpawnPosition = {746.67f, 684.08f, 412.5f, 4.65f};
 #define CLEANUP_CHECK_INTERVAL  5000
+
+class Group;
 
 class instance_trial_of_the_champion : public InstanceMapScript
 {
@@ -91,9 +94,11 @@ public:
             if (TeamIdInInstance == TEAM_NEUTRAL)
             {
                 Map::PlayerList const &players = instance->GetPlayers();
-                if( !players.isEmpty() )
-                    if( Player* pPlayer = players.begin()->GetSource() )
-                        TeamIdInInstance = pPlayer->GetTeamId();
+                if (!players.isEmpty())
+                    if (Player* pPlayer = players.begin()->GetSource())
+                        if (Group * group = pPlayer->GetGroup())
+                            if(Player* groupLeader = ObjectAccessor::GetPlayer(*pPlayer,group->GetLeaderGUID()))
+                                TeamIdInInstance = groupLeader->GetTeamId();
             }
 
             switch( creature->GetEntry() )

@@ -9,4 +9,6 @@ set(scripts_STAT_SRCS
   Events/midsummer.cpp
 )
 
+AZTH_ADD_SCRIPTS("Event" "ScriptLoader.h")
+
 message("  -> Prepared: Events")

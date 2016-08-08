@@ -212,8 +212,8 @@ public:
         if (newlevel < 1)
             return false;                                       // invalid level
 
-        if (newlevel > STRONG_MAX_LEVEL)                         // hardcoded maximum level
-            newlevel = STRONG_MAX_LEVEL;
+        if (newlevel > DEFAULT_MAX_LEVEL)                         // hardcoded maximum level
+            newlevel = DEFAULT_MAX_LEVEL;
 
         HandleCharacterLevel(target, targetGuid, oldlevel, newlevel, handler);
         if (!handler->GetSession() || handler->GetSession()->GetPlayer() != target)      // including player == NULL

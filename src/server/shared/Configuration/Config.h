@@ -21,6 +21,7 @@
 
 #include <string>
 #include <list>
+#include <vector>
 #include <ace/Singleton.h>
 #include <ace/Configuration_Import_Export.h>
 #include <ace/Thread_Mutex.h>
@@ -55,7 +56,6 @@ public:
     int GetIntDefault(const char* name, int def);
     float GetFloatDefault(const char* name, float def);
 
-    std::string const& GetFilename();
     std::list<std::string> GetKeysByString(std::string const& name);
 
 private:
@@ -65,7 +65,7 @@ private:
     typedef ACE_Thread_Mutex LockType;
     typedef ACE_Guard<LockType> GuardType;
 
-    std::string _filename;
+    std::vector<std::string> _confFiles;
     Config _config;
     LockType _configLock;
 

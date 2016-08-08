@@ -118,7 +118,7 @@ public:
         uint32 avgUpdateTime = avgDiffTracker.getAverage();
 
         handler->PSendSysMessage("%s Realm, revision: %s.", realmName.c_str(), _REVISION);
-        handler->PSendSysMessage("This server runs on SunwellCore.");
+        handler->PSendSysMessage("This server runs on AzerothCore.");
         if (!queuedSessionCount)
             handler->PSendSysMessage("Connected players: %u. Characters in world: %u.", activeSessionCount, playerCount);
         else

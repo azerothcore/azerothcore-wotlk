@@ -1930,38 +1930,21 @@ void Spell::SearchChainTargets(std::list<WorldObject*>& targets, uint32 chainTar
 
     // max dist which spell can reach
     float searchRadius = jumpRadius;
-    if (isBouncingFar && !isChainHeal)
+    if (isBouncingFar)
         searchRadius *= chainTargets;
 
-    // Xinef: the distance should be increased by caster size, it is neglected in latter calculations
     std::list<WorldObject*> tempTargets;
-    SearchAreaTargets(tempTargets, searchRadius, (m_spellInfo->DmgClass == SPELL_DAMAGE_CLASS_MELEE ? m_caster : target), m_caster, objectType, selectType, condList);
+    SearchAreaTargets(tempTargets, searchRadius, target, m_caster, objectType, selectType, condList);
     tempTargets.remove(target);
-
-    // xinef: if we have select category nearby and checktype entry, select random of what we have, not by distance
-    if (selectCategory == TARGET_SELECT_CATEGORY_NEARBY && selectType == TARGET_CHECK_ENTRY)
-    {
-        Trinity::Containers::RandomResizeList(tempTargets, chainTargets);
-        targets = tempTargets;
-        return;
-    }
 
     // remove targets which are always invalid for chain spells
     // for some spells allow only chain targets in front of caster (swipe for example)
     if (!isBouncingFar)
     {
-        float allowedArc = 0.0f;
-        if (m_spellInfo->DmgClass == SPELL_DAMAGE_CLASS_MELEE)
-            allowedArc = (M_PI*7.0f) / 18.0f; // 70 degrees
-        else if (m_spellInfo->DmgClass == SPELL_DAMAGE_CLASS_RANGED)
-            allowedArc = M_PI*0.5f; // 90 degrees
-
         for (std::list<WorldObject*>::iterator itr = tempTargets.begin(); itr != tempTargets.end();)
         {
             std::list<WorldObject*>::iterator checkItr = itr++;
             if (!m_caster->HasInArc(static_cast<float>(M_PI), *checkItr))
-                tempTargets.erase(checkItr);
-            else if (allowedArc > 0.0f && !m_caster->HasInArc(allowedArc, *checkItr, (*checkItr)->GetObjectSize()))
                 tempTargets.erase(checkItr);
         }
     }
@@ -1976,14 +1959,10 @@ void Spell::SearchChainTargets(std::list<WorldObject*>& targets, uint32 chainTar
             uint32 maxHPDeficit = 0;
             for (std::list<WorldObject*>::iterator itr = tempTargets.begin(); itr != tempTargets.end(); ++itr)
             {
-                if (Unit* itrTarget = (*itr)->ToUnit())
+                if (Unit* unit = (*itr)->ToUnit())
                 {
-                    uint32 deficit = itrTarget->GetMaxHealth() - itrTarget->GetHealth();
-                    // xinef: chain should not heal targets with max health
-                    if (deficit == 0)
-                        continue;
-
-                    if ((deficit > maxHPDeficit || foundItr == tempTargets.end()) && target->IsWithinDist(itrTarget, jumpRadius) && target->IsWithinLOSInMap(itrTarget))
+                    uint32 deficit = unit->GetMaxHealth() - unit->GetHealth();
+                    if ((deficit > maxHPDeficit || foundItr == tempTargets.end()) && target->IsWithinDist(unit, jumpRadius) && target->IsWithinLOSInMap(unit))
                     {
                         foundItr = itr;
                         maxHPDeficit = deficit;

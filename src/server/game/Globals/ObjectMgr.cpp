@@ -106,7 +106,7 @@ std::string GetScriptCommandName(ScriptCommands command)
         case SCRIPT_COMMAND_LOAD_PATH: res = "SCRIPT_COMMAND_LOAD_PATH"; break;
         case SCRIPT_COMMAND_CALLSCRIPT_TO_UNIT: res = "SCRIPT_COMMAND_CALLSCRIPT_TO_UNIT"; break;
         case SCRIPT_COMMAND_KILL: res = "SCRIPT_COMMAND_KILL"; break;
-        // SunwellCore only
+        // AzerothCore only
         case SCRIPT_COMMAND_ORIENTATION: res = "SCRIPT_COMMAND_ORIENTATION"; break;
         case SCRIPT_COMMAND_EQUIP: res = "SCRIPT_COMMAND_EQUIP"; break;
         case SCRIPT_COMMAND_MODEL: res = "SCRIPT_COMMAND_MODEL"; break;
@@ -9078,6 +9078,12 @@ GameObjectTemplate const* ObjectMgr::GetGameObjectTemplate(uint32 entry)
         return &(itr->second);
 
     return NULL;
+}
+
+Player* ObjectMgr::GetPlayerByLowGUID(uint32 lowguid) const
+{
+    uint64 guid = MAKE_NEW_GUID(lowguid, 0, HIGHGUID_PLAYER);
+    return ObjectAccessor::FindPlayer(guid);
 }
 
 bool ObjectMgr::IsGameObjectStaticTransport(uint32 entry)

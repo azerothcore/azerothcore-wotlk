@@ -2006,7 +2006,7 @@ void WorldSession::HandleCharFactionOrRaceChange(WorldPacket& recvData)
     if (recvData.GetOpcode() == CMSG_CHAR_FACTION_CHANGE)
     {
         // if player is in a guild
-        if (playerData->guildId)
+        if (playerData->guildId && !sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GUILD))
         {
             WorldPacket data(SMSG_CHAR_FACTION_CHANGE, 1);
             data << (uint8)CHAR_CREATE_CHARACTER_IN_GUILD;

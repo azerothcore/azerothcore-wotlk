@@ -11,6 +11,6 @@ BUILDPATH=$BINPATH
 
 INSTALL_PATH=$(readlink -f "$BINPATH/../")
 
-[ $CCTYPE == "Debug" ] && BUILDPATH="$BUILDPATH/debug/build/" ||  BUILDPATH="$BUILDPATH/release/build/"
+[ $CTYPE == "Debug" ] && BUILDPATH="$BUILDPATH/debug/build/" ||  BUILDPATH="$BUILDPATH/release/build/"
 
-[ $CCTYPE == "Debug" ] && BINPATH="$BINPATH/debug" || BINPATH="$BINPATH/release"
+[ $CTYPE == "Debug" ] && BINPATH="$BINPATH/debug" || BINPATH="$BINPATH/release"

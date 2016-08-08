@@ -1,7 +1,24 @@
+#
+# AzerothCore
+#
 
-*/compiler/config.sh
+conf/*
+!conf/*.dist
+modules/*
+
+#
+# Allow modules to control git ignoring
+#
+!modules/*
+modules/*/*
+!modules/*/.gitignore
 
 build*/
+
+#
+#Generic
+#
+
 .directory
 .mailmap
 *.orig
@@ -27,6 +44,9 @@ CMakeLists.txt.user
 # exclude in all levels
 nbproject/
 .sync.ffs_db
+*.kate-swp
+.browse.VC*
+.vscode
 
 #
 # Eclipse
