@@ -142,6 +142,9 @@ struct BattlegroundWGScore : public BattlegroundScore
     ~BattlegroundWGScore() { }
     uint32 FlagCaptures;
     uint32 FlagReturns;
+
+    uint32 GetAttr1() const final override { return FlagCaptures; }
+    uint32 GetAttr2() const final override { return FlagReturns; }
 };
 
 class BattlegroundWS : public Battleground

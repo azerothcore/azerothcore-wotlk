@@ -45,6 +45,15 @@ class BattlegroundIC;
 struct PvPDifficultyEntry;
 struct WorldSafeLocsEntry;
 
+enum BattlegroundDesertionType
+{
+    BG_DESERTION_TYPE_LEAVE_BG          = 0, // player leaves the BG
+    BG_DESERTION_TYPE_OFFLINE           = 1, // player is kicked from BG because offline
+    BG_DESERTION_TYPE_LEAVE_QUEUE       = 2, // player is invited to join and refuses to do it
+    BG_DESERTION_TYPE_NO_ENTER_BUTTON   = 3, // player is invited to join and do nothing (time expires)
+    BG_DESERTION_TYPE_INVITE_LOGOUT     = 4, // player is invited to join and logs out
+};
+
 enum BattlegroundSounds
 {
     SOUND_HORDE_WINS                = 8454,
@@ -267,6 +276,19 @@ struct BattlegroundScore
     uint32 DamageDone;
     uint32 HealingDone;
     Player* player;
+
+    uint32 GetKillingBlows() const { return KillingBlows; }
+    uint32 GetDeaths() const { return Deaths; }
+    uint32 GetHonorableKills() const { return HonorableKills; }
+    uint32 GetBonusHonor() const { return BonusHonor; }
+    uint32 GetDamageDone() const { return DamageDone; }
+    uint32 GetHealingDone() const { return HealingDone; }
+
+    virtual uint32 GetAttr1() const { return 0; }
+    virtual uint32 GetAttr2() const { return 0; }
+    virtual uint32 GetAttr3() const { return 0; }
+    virtual uint32 GetAttr4() const { return 0; }
+    virtual uint32 GetAttr5() const { return 0; }
 };
 
 class ArenaLogEntryData
@@ -310,6 +332,14 @@ This class is used to:
 3. some certain cases, same for all battlegrounds
 4. It has properties same for all battlegrounds
 */
+
+enum BattlegroundQueueInvitationType
+{
+    BG_QUEUE_INVITATION_TYPE_NO_BALANCE = 0, // no balance: N+M vs N players
+    BG_QUEUE_INVITATION_TYPE_BALANCED   = 1, // teams balanced: N+1 vs N players
+    BG_QUEUE_INVITATION_TYPE_EVEN       = 2  // teams even: N vs N players
+};
+
 class Battleground
 {
     public:
@@ -569,6 +599,9 @@ class Battleground
         uint32 GetTeamScore(TeamId teamId) const;
         
         virtual TeamId GetPrematureWinner();
+
+        // because BattleGrounds with different types and same level range has different m_BracketId
+        uint8 GetUniqueBracketId() const;
 
         BattlegroundAV* ToBattlegroundAV() { if (GetBgTypeID() == BATTLEGROUND_AV) return reinterpret_cast<BattlegroundAV*>(this); else return NULL; }
         BattlegroundAV const* ToBattlegroundAV() const { if (GetBgTypeID() == BATTLEGROUND_AV) return reinterpret_cast<const BattlegroundAV*>(this); else return NULL; }

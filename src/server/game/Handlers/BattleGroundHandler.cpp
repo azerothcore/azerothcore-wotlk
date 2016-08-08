@@ -455,6 +455,15 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket &recvData)
             {
                 bgQueue.RemovePlayer(_player->GetGUID(), false, queueSlot);
                 _player->RemoveBattlegroundQueueId(bgQueueTypeId);
+                // track if player refuses to join the BG after being invited
+                if (bg->isBattleground() && sWorld->getBoolConfig(CONFIG_BATTLEGROUND_TRACK_DESERTERS) &&
+                    (bg->GetStatus() == STATUS_IN_PROGRESS || bg->GetStatus() == STATUS_WAIT_JOIN))
+                {
+                    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_DESERTER_TRACK);
+                    stmt->setUInt32(0, _player->GetGUIDLow());
+                    stmt->setUInt8(1, BG_DESERTION_TYPE_LEAVE_QUEUE);
+                    CharacterDatabase.Execute(stmt);
+                }
             }
             break;
         default:
