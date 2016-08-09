@@ -223,12 +223,28 @@ public:
         if (!*args)
             return false;
 
-        uint32 ticketId = atoi(args);
+        char* ticketIdStr = strtok((char*)args, " ");
+        uint32 ticketId = atoi(ticketIdStr);
+
         GmTicket* ticket = sTicketMgr->GetTicket(ticketId);
         if (!ticket || ticket->IsClosed() || ticket->IsCompleted())
         {
             handler->SendSysMessage(LANG_COMMAND_TICKETNOTEXIST);
             return true;
+        }
+
+        char* response = strtok(NULL, "\n");
+        if (response)
+        {
+            // Cannot add response to ticket, assigned to someone else
+            //! Console excluded
+            Player* player = handler->GetSession() ? handler->GetSession()->GetPlayer() : nullptr;
+            if (player && ticket->IsAssignedNotTo(player->GetGUID()))
+            {
+                handler->PSendSysMessage(LANG_COMMAND_TICKETALREADYASSIGNED, ticket->GetId());
+                return true;
+            }
+            ticket->AppendResponse(response);
         }
 
         if (Player* player = ticket->GetPlayer())
