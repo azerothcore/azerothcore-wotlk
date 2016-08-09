@@ -117,8 +117,7 @@ public:
         uint32 updateTime = sWorld->GetUpdateTime();
         uint32 avgUpdateTime = avgDiffTracker.getAverage();
 
-        handler->PSendSysMessage("%s Realm, revision: %s.", realmName.c_str(), _REVISION);
-        handler->PSendSysMessage("This server runs on AzerothCore.");
+        handler->PSendSysMessage("%s", _FULLVERSION);
         if (!queuedSessionCount)
             handler->PSendSysMessage("Connected players: %u. Characters in world: %u.", activeSessionCount, playerCount);
         else
