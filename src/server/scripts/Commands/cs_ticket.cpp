@@ -238,7 +238,7 @@ public:
         {
             // Cannot add response to ticket, assigned to someone else
             //! Console excluded
-            Player* player = handler->GetSession() ? handler->GetSession()->GetPlayer() : nullptr;
+            Player* player = handler->GetSession() ? handler->GetSession()->GetPlayer() : NULL;
             if (player && ticket->IsAssignedNotTo(player->GetGUID()))
             {
                 handler->PSendSysMessage(LANG_COMMAND_TICKETALREADYASSIGNED, ticket->GetId());
