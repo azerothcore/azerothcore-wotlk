@@ -858,6 +858,7 @@ void World::LoadConfigSettings(bool reload)
 
     m_bool_configs[CONFIG_INSTANCE_IGNORE_LEVEL] = sConfigMgr->GetBoolDefault("Instance.IgnoreLevel", false);
     m_bool_configs[CONFIG_INSTANCE_IGNORE_RAID]  = sConfigMgr->GetBoolDefault("Instance.IgnoreRaid", false);
+    m_bool_configs[CONFIG_INSTANCE_SHARED_ID] = sConfigMgr->GetBoolDefault("Instance.SharedNormalHeroicId", false);
 
     m_int_configs[CONFIG_INSTANCE_RESET_TIME_HOUR]  = sConfigMgr->GetIntDefault("Instance.ResetTimeHour", 4);
     m_int_configs[CONFIG_INSTANCE_RESET_TIME_RELATIVE_TIMESTAMP] = sConfigMgr->GetIntDefault("Instance.ResetTimeRelativeTimestamp", 1135814400);

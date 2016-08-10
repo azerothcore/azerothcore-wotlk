@@ -1508,7 +1508,7 @@ void WorldSession::HandleSetRaidDifficultyOpcode(WorldPacket & recv_data)
                     return;
                 }
 
-                if ((groupGuy->GetMap()->GetId() == 631 || groupGuy->GetMap()->GetId() == 724) && mode%2 == _player->GetRaidDifficulty()%2 && group->isRaidGroup())
+                if (IsSharedDifficultyMap(groupGuy->GetMap()->GetId()) && mode%2 == _player->GetRaidDifficulty()%2 && group->isRaidGroup())
                 {
                     if (!currMap)
                         currMap = groupGuy->GetMap();
@@ -1592,7 +1592,7 @@ void WorldSession::HandleSetRaidDifficultyOpcode(WorldPacket & recv_data)
                 if (!groupGuy)
                     continue;
 
-                if (groupGuy->GetMap()->GetId() == 631 || groupGuy->GetMap()->GetId() == 724)
+                if (IsSharedDifficultyMap(groupGuy->GetMap()->GetId()))
                 {
                     anyoneInside = true;
 
