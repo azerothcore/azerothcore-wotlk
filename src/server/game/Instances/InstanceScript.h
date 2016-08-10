@@ -197,6 +197,7 @@ class InstanceScript : public ZoneScript
 
         virtual bool SetBossState(uint32 id, EncounterState state);
         EncounterState GetBossState(uint32 id) const { return id < bosses.size() ? bosses[id].state : TO_BE_DECIDED; }
+        static std::string GetBossStateName(uint8 state);
         BossBoundaryMap const* GetBossBoundary(uint32 id) const { return id < bosses.size() ? &bosses[id].boundary : NULL; }
         BossInfo const* GetBossInfo(uint32 id) const { return &bosses[id]; } 
 
@@ -215,6 +216,8 @@ class InstanceScript : public ZoneScript
         void SendEncounterUnit(uint32 type, Unit* unit = NULL, uint8 param1 = 0, uint8 param2 = 0);
 
         virtual void FillInitialWorldStates(WorldPacket& /*data*/) {}
+
+        uint32 GetEncounterCount() const { return bosses.size(); }
 
     protected:
         void SetBossNumber(uint32 number) { bosses.resize(number); }
