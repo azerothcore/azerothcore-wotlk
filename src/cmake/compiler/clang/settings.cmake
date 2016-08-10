@@ -13,3 +13,5 @@ if(WITH_COREDEBUG)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g3")
   message(STATUS "Clang: Debug-flags set (-g3)")
 endif()
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wno-narrowing -Wno-deprecated-register")
