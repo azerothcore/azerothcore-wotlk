@@ -20,6 +20,7 @@
 #define AZEROTHCORE_LOG_H
 
 #include "Common.h"
+#include <ace/Task.h>
 #include <ace/Singleton.h>
 
 class WorldPacket;
