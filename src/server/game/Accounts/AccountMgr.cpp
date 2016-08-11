@@ -42,6 +42,7 @@ namespace AccountMgr
 
         stmt->setString(0, username);
         stmt->setString(1, CalculateShaPassHash(username, password));
+        stmt->setInt8(2, uint8(sWorld->getIntConfig(CONFIG_EXPANSION)));
 
         LoginDatabase.Execute(stmt);
 
