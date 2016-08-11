@@ -14,3 +14,5 @@ if(WIN32)
 elseif(UNIX)
   include("${CMAKE_SOURCE_DIR}/src/cmake/platform/unix/settings.cmake")
 endif()
+
+include("${CMAKE_SOURCE_DIR}/src/cmake/platform/after_platform.cmake")
