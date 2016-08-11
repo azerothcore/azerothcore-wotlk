@@ -20,7 +20,7 @@ endif()
 
 # configure uninstaller
 configure_file(
-  "${CMAKE_SOURCE_DIR}/src/cmake/platform/cmake_uninstall.in.cmake"
+  "${CMAKE_SOURCE_DIR}/modules/acore/cmake/platform/cmake_uninstall.in.cmake"
   "${CMAKE_BINARY_DIR}/cmake_uninstall.cmake"
   @ONLY
 )
@@ -34,11 +34,11 @@ message(STATUS "UNIX: Created uninstall target")
 
 message(STATUS "UNIX: Detected compiler: ${CMAKE_C_COMPILER}")
 if(CMAKE_C_COMPILER MATCHES "gcc" OR CMAKE_C_COMPILER_ID STREQUAL "GNU")
-  include(${CMAKE_SOURCE_DIR}/src/cmake/compiler/gcc/settings.cmake)
+  include(${CMAKE_SOURCE_DIR}/modules/acore/cmake/compiler/gcc/settings.cmake)
 elseif(CMAKE_C_COMPILER MATCHES "icc")
-  include(${CMAKE_SOURCE_DIR}/src/cmake/compiler/icc/settings.cmake)
+  include(${CMAKE_SOURCE_DIR}/modules/acore/cmake/compiler/icc/settings.cmake)
 elseif(CMAKE_C_COMPILER MATCHES "clang")
-  include(${CMAKE_SOURCE_DIR}/src/cmake/compiler/clang/settings.cmake)
+  include(${CMAKE_SOURCE_DIR}/modules/acore/cmake/compiler/clang/settings.cmake)
 else()
 add_definitions(-D_BUILD_DIRECTIVE='"${CMAKE_BUILD_TYPE}"')
 endif()
