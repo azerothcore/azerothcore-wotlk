@@ -4,11 +4,11 @@
 
 
 # absolute root path of your azerothshard repository
-SRCPATH="$AZTH_PATH_ROOT"
+SRCPATH="$AC_PATH_ROOT"
 # absolute path where binary files must be stored
-BINPATH="$AZTH_PATH_ROOT/build/"
+BINPATH="$AC_PATH_ROOT/build/"
 # absolute path where config. files must be stored
-CONFDIR="$AZTH_PATH_ROOT/build/etc/"
+CONFDIR="$AC_PATH_ROOT/build/etc/"
 
 ##############################################
 #
