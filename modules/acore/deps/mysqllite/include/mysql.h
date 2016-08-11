@@ -20,7 +20,7 @@
   The ABI should never be changed in a released product of MySQL,
   thus you need to take great care when changing the file. In case
   the file is changed so the ABI is broken, you must also update
-  the SHARED_LIB_MAJOR_VERSION in src/cmake/mysql_version.cmake
+  the SHARED_LIB_MAJOR_VERSION in cmake/mysql_version.cmake
 */
 
 #ifndef _mysql_h

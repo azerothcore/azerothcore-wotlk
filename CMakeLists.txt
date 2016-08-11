@@ -26,7 +26,7 @@ set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH 1)
 
 # set macro-directory
-set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/src/cmake/macros")
+set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/modules/acore/cmake/macros")
 
 include(CheckCXXSourceRuns)
 include(CheckIncludeFiles)
@@ -80,10 +80,10 @@ if(NOT WITHOUT_GIT)
 endif()
 
 # Find revision ID and hash of the sourcetree
-include(src/cmake/genrev.cmake)
+include(modules/acore/cmake/genrev.cmake)
 
 # print out the results before continuing
-include(src/cmake/showoptions.cmake)
+include(modules/acore/cmake/showoptions.cmake)
 
 # add modules and dependencies
 CU_SUBDIRLIST(sub_DIRS  "${CMAKE_SOURCE_DIR}/modules" FALSE FALSE)
