@@ -46,30 +46,30 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/modules/acore/framework/Packets
   ${CMAKE_SOURCE_DIR}/modules/acore/framework/Utilities
   ${CMAKE_SOURCE_DIR}/modules/acore/framework/DataStores
-  ${CMAKE_SOURCE_DIR}/src/server/game/Addons
-  ${CMAKE_SOURCE_DIR}/src/server/game/Conditions
-  ${CMAKE_SOURCE_DIR}/src/server/game/Entities/Item
-  ${CMAKE_SOURCE_DIR}/src/server/game/Entities/GameObject
-  ${CMAKE_SOURCE_DIR}/src/server/game/Entities/Creature
-  ${CMAKE_SOURCE_DIR}/src/server/game/Entities/Object
-  ${CMAKE_SOURCE_DIR}/src/server/game/Entities/Object/Updates
-  ${CMAKE_SOURCE_DIR}/src/server/game/Entities/Unit
-  ${CMAKE_SOURCE_DIR}/src/server/game/Combat
-  ${CMAKE_SOURCE_DIR}/src/server/game/Loot
-  ${CMAKE_SOURCE_DIR}/src/server/game/Miscellaneous
-  ${CMAKE_SOURCE_DIR}/src/server/game/Grids
-  ${CMAKE_SOURCE_DIR}/src/server/game/Grids/Cells
-  ${CMAKE_SOURCE_DIR}/src/server/game/Grids/Notifiers
-  ${CMAKE_SOURCE_DIR}/src/server/game/Maps
-  ${CMAKE_SOURCE_DIR}/src/server/game/DataStores
-  ${CMAKE_SOURCE_DIR}/src/server/game/Movement/Waypoints
-  ${CMAKE_SOURCE_DIR}/src/server/game/Movement/Spline
-  ${CMAKE_SOURCE_DIR}/src/server/game/Movement
-  ${CMAKE_SOURCE_DIR}/src/server/game/Server
-  ${CMAKE_SOURCE_DIR}/src/server/game/Server/Protocol
-  ${CMAKE_SOURCE_DIR}/src/server/game/World
-  ${CMAKE_SOURCE_DIR}/src/server/game/Spells
-  ${CMAKE_SOURCE_DIR}/src/server/game/Spells/Auras
+  ${CMAKE_SOURCE_DIR}/src/game/Addons
+  ${CMAKE_SOURCE_DIR}/src/game/Conditions
+  ${CMAKE_SOURCE_DIR}/src/game/Entities/Item
+  ${CMAKE_SOURCE_DIR}/src/game/Entities/GameObject
+  ${CMAKE_SOURCE_DIR}/src/game/Entities/Creature
+  ${CMAKE_SOURCE_DIR}/src/game/Entities/Object
+  ${CMAKE_SOURCE_DIR}/src/game/Entities/Object/Updates
+  ${CMAKE_SOURCE_DIR}/src/game/Entities/Unit
+  ${CMAKE_SOURCE_DIR}/src/game/Combat
+  ${CMAKE_SOURCE_DIR}/src/game/Loot
+  ${CMAKE_SOURCE_DIR}/src/game/Miscellaneous
+  ${CMAKE_SOURCE_DIR}/src/game/Grids
+  ${CMAKE_SOURCE_DIR}/src/game/Grids/Cells
+  ${CMAKE_SOURCE_DIR}/src/game/Grids/Notifiers
+  ${CMAKE_SOURCE_DIR}/src/game/Maps
+  ${CMAKE_SOURCE_DIR}/src/game/DataStores
+  ${CMAKE_SOURCE_DIR}/src/game/Movement/Waypoints
+  ${CMAKE_SOURCE_DIR}/src/game/Movement/Spline
+  ${CMAKE_SOURCE_DIR}/src/game/Movement
+  ${CMAKE_SOURCE_DIR}/src/game/Server
+  ${CMAKE_SOURCE_DIR}/src/game/Server/Protocol
+  ${CMAKE_SOURCE_DIR}/src/game/World
+  ${CMAKE_SOURCE_DIR}/src/game/Spells
+  ${CMAKE_SOURCE_DIR}/src/game/Spells/Auras
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}/Management
   ${CMAKE_CURRENT_SOURCE_DIR}/Maps
