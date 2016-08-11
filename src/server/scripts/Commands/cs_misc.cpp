@@ -1543,7 +1543,7 @@ public:
             return true;
         }
 
-        /* [AZTH] Sunwell hack
+        /* [AC] Sunwell hack
 	if (handler->GetSession()->GetSecurity() < SEC_ADMINISTRATOR)
         {
             handler->PSendSysMessage("You may only remove items. Adding items is available for higher GMLevel.");
