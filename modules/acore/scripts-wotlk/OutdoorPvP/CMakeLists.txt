@@ -10,22 +10,22 @@
 
 set(scripts_STAT_SRCS
   ${scripts_STAT_SRCS}
-  OutdoorPvP/OutdoorPvPTF.cpp
-  OutdoorPvP/OutdoorPvPSI.cpp
-  OutdoorPvP/OutdoorPvPSI.h
-  OutdoorPvP/OutdoorPvPZM.cpp
-  OutdoorPvP/OutdoorPvPNA.cpp
-  OutdoorPvP/OutdoorPvPHP.cpp
-  OutdoorPvP/OutdoorPvPTF.h
-  OutdoorPvP/OutdoorPvPEP.h
-  OutdoorPvP/OutdoorPvPEP.cpp
-  OutdoorPvP/OutdoorPvPHP.h
-  OutdoorPvP/OutdoorPvPZM.h
-  OutdoorPvP/OutdoorPvPNA.h
-  OutdoorPvP/OutdoorPvPGH.cpp
-  OutdoorPvP/OutdoorPvPGH.h
+  ${CMAKE_AC_MODULE_DIR}/OutdoorPvP/OutdoorPvPTF.cpp
+  ${CMAKE_AC_MODULE_DIR}/OutdoorPvP/OutdoorPvPSI.cpp
+  ${CMAKE_AC_MODULE_DIR}/OutdoorPvP/OutdoorPvPSI.h
+  ${CMAKE_AC_MODULE_DIR}/OutdoorPvP/OutdoorPvPZM.cpp
+  ${CMAKE_AC_MODULE_DIR}/OutdoorPvP/OutdoorPvPNA.cpp
+  ${CMAKE_AC_MODULE_DIR}/OutdoorPvP/OutdoorPvPHP.cpp
+  ${CMAKE_AC_MODULE_DIR}/OutdoorPvP/OutdoorPvPTF.h
+  ${CMAKE_AC_MODULE_DIR}/OutdoorPvP/OutdoorPvPEP.h
+  ${CMAKE_AC_MODULE_DIR}/OutdoorPvP/OutdoorPvPEP.cpp
+  ${CMAKE_AC_MODULE_DIR}/OutdoorPvP/OutdoorPvPHP.h
+  ${CMAKE_AC_MODULE_DIR}/OutdoorPvP/OutdoorPvPZM.h
+  ${CMAKE_AC_MODULE_DIR}/OutdoorPvP/OutdoorPvPNA.h
+  ${CMAKE_AC_MODULE_DIR}/OutdoorPvP/OutdoorPvPGH.cpp
+  ${CMAKE_AC_MODULE_DIR}/OutdoorPvP/OutdoorPvPGH.h
 )
 
-AC_ADD_SCRIPT_LOADER("OutdoorPvP" "ScriptLoader.h")
+AC_ADD_SCRIPT_LOADER("OutdoorPvP" "ScriptWotlkLoader.h")
 
 message("  -> Prepared: Outdoor PVP Zones")

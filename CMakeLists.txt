@@ -32,7 +32,7 @@ include(CheckCXXSourceRuns)
 include(CheckIncludeFiles)
 
 # some utils for cmake
-include(src/cmake/utils.cmake)
+include(modules/uwd/cmake-utils/utils.cmake)
 
 include(ScriptsMacro)
 

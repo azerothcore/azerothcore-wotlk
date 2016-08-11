@@ -32,20 +32,20 @@ set(collision_STAT_SRCS
 
 include_directories(
   ${CMAKE_BINARY_DIR}
-  ${CMAKE_SOURCE_DIR}/modules/dep/g3dlite/include
-  ${CMAKE_SOURCE_DIR}/modules/dep/recastnavigation/Detour
-  ${CMAKE_SOURCE_DIR}/src/server/shared
-  ${CMAKE_SOURCE_DIR}/src/server/shared/Configuration
-  ${CMAKE_SOURCE_DIR}/src/server/shared/Debugging
-  ${CMAKE_SOURCE_DIR}/src/server/shared/Database
-  ${CMAKE_SOURCE_DIR}/src/server/shared/Debugging
-  ${CMAKE_SOURCE_DIR}/src/server/shared/Dynamic
-  ${CMAKE_SOURCE_DIR}/src/server/shared/Dynamic/LinkedReference
-  ${CMAKE_SOURCE_DIR}/src/server/shared/Logging
-  ${CMAKE_SOURCE_DIR}/src/server/shared/Threading
-  ${CMAKE_SOURCE_DIR}/src/server/shared/Packets
-  ${CMAKE_SOURCE_DIR}/src/server/shared/Utilities
-  ${CMAKE_SOURCE_DIR}/src/server/shared/DataStores
+  ${CMAKE_SOURCE_DIR}/modules/acore/deps/g3dlite/include
+  ${CMAKE_SOURCE_DIR}/modules/acore/deps/recastnavigation/Detour
+  ${CMAKE_SOURCE_DIR}/modules/acore/framework
+  ${CMAKE_SOURCE_DIR}/modules/acore/framework/Configuration
+  ${CMAKE_SOURCE_DIR}/modules/acore/framework/Debugging
+  ${CMAKE_SOURCE_DIR}/modules/acore/framework/Database
+  ${CMAKE_SOURCE_DIR}/modules/acore/framework/Debugging
+  ${CMAKE_SOURCE_DIR}/modules/acore/framework/Dynamic
+  ${CMAKE_SOURCE_DIR}/modules/acore/framework/Dynamic/LinkedReference
+  ${CMAKE_SOURCE_DIR}/modules/acore/framework/Logging
+  ${CMAKE_SOURCE_DIR}/modules/acore/framework/Threading
+  ${CMAKE_SOURCE_DIR}/modules/acore/framework/Packets
+  ${CMAKE_SOURCE_DIR}/modules/acore/framework/Utilities
+  ${CMAKE_SOURCE_DIR}/modules/acore/framework/DataStores
   ${CMAKE_SOURCE_DIR}/src/server/game/Addons
   ${CMAKE_SOURCE_DIR}/src/server/game/Conditions
   ${CMAKE_SOURCE_DIR}/src/server/game/Entities/Item

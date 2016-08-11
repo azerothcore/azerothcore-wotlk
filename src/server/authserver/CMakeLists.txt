@@ -43,15 +43,15 @@ endif()
 
 include_directories(
   ${CMAKE_BINARY_DIR}
-  ${CMAKE_SOURCE_DIR}/src/server/shared
-  ${CMAKE_SOURCE_DIR}/src/server/shared/Database
-  ${CMAKE_SOURCE_DIR}/src/server/shared/Debugging
-  ${CMAKE_SOURCE_DIR}/src/server/shared/Packets
-  ${CMAKE_SOURCE_DIR}/src/server/shared/Cryptography
-  ${CMAKE_SOURCE_DIR}/src/server/shared/Cryptography/Authentication
-  ${CMAKE_SOURCE_DIR}/src/server/shared/Logging
-  ${CMAKE_SOURCE_DIR}/src/server/shared/Threading
-  ${CMAKE_SOURCE_DIR}/src/server/shared/Utilities
+  ${CMAKE_SOURCE_DIR}/modules/acore/framework
+  ${CMAKE_SOURCE_DIR}/modules/acore/framework/Database
+  ${CMAKE_SOURCE_DIR}/modules/acore/framework/Debugging
+  ${CMAKE_SOURCE_DIR}/modules/acore/framework/Packets
+  ${CMAKE_SOURCE_DIR}/modules/acore/framework/Cryptography
+  ${CMAKE_SOURCE_DIR}/modules/acore/framework/Cryptography/Authentication
+  ${CMAKE_SOURCE_DIR}/modules/acore/framework/Logging
+  ${CMAKE_SOURCE_DIR}/modules/acore/framework/Threading
+  ${CMAKE_SOURCE_DIR}/modules/acore/framework/Utilities
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}/Authentication
   ${CMAKE_CURRENT_SOURCE_DIR}/Realms
