@@ -196,6 +196,6 @@ set(scripts_STAT_SRCS
   ${CMAKE_AC_MODULE_DIR}/Northrend/DraktharonKeep/boss_dred.cpp
 )
 
-AC_ADD_SCRIPT_LOADER("Northrend" "ScriptWotlkLoader.h")
+AC_ADD_SCRIPT_LOADER("Northrend" "${CMAKE_AC_MODULE_DIR}/ScriptWotlkLoader.h")
 
 message("  -> Prepared: Northrend")

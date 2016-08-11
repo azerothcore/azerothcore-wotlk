@@ -164,6 +164,6 @@ set(scripts_STAT_SRCS
   ${CMAKE_AC_MODULE_DIR}/EasternKingdoms/TheStockade/instance_the_stockade.cpp
 )
 
-AC_ADD_SCRIPT_LOADER("EasternKingdoms" "ScriptWotlkLoader.h")
+AC_ADD_SCRIPT_LOADER("EasternKingdoms" "${CMAKE_AC_MODULE_DIR}/ScriptWotlkLoader.h")
 
 message("  -> Prepared: Eastern Kingdoms")

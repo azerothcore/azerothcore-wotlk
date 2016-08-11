@@ -109,6 +109,6 @@ set(scripts_STAT_SRCS
   ${CMAKE_AC_MODULE_DIR}/Outland/zone_zangarmarsh.cpp
 )
 
-AC_ADD_SCRIPT_LOADER("Outland" "ScriptWotlkLoader.h")
+AC_ADD_SCRIPT_LOADER("Outland" "${CMAKE_AC_MODULE_DIR}/ScriptWotlkLoader.h")
 
 message("  -> Prepared: Outland")
