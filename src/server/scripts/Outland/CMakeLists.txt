@@ -109,6 +109,6 @@ set(scripts_STAT_SRCS
   Outland/zone_zangarmarsh.cpp
 )
 
-AZTH_ADD_SCRIPTS("Outland" "ScriptLoader.h")
+AZTH_ADD_SCRIPT_LOADER("Outland" "ScriptLoader.h")
 
 message("  -> Prepared: Outland")

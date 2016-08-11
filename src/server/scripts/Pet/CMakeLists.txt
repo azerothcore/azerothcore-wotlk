@@ -18,6 +18,6 @@ set(scripts_STAT_SRCS
   Pet/pet_shaman.cpp
 )
 
-AZTH_ADD_SCRIPTS("Pet" "ScriptLoader.h")
+AZTH_ADD_SCRIPT_LOADER("Pet" "ScriptLoader.h")
 
 message("  -> Prepared: Pet")
