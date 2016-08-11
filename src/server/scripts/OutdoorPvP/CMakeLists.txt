@@ -26,6 +26,6 @@ set(scripts_STAT_SRCS
   OutdoorPvP/OutdoorPvPGH.h
 )
 
-AZTH_ADD_SCRIPTS("OutdoorPvP" "ScriptLoader.h")
+AZTH_ADD_SCRIPT_LOADER("OutdoorPvP" "ScriptLoader.h")
 
 message("  -> Prepared: Outdoor PVP Zones")

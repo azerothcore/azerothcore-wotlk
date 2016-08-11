@@ -105,6 +105,6 @@ set(scripts_STAT_SRCS
   Kalimdor/DireMaul/dire_maul.h
 )
 
-AZTH_ADD_SCRIPTS("Kalimdor" "ScriptLoader.h")
+AZTH_ADD_SCRIPT_LOADER("Kalimdor" "ScriptLoader.h")
 
 message("  -> Prepared: Kalimdor")

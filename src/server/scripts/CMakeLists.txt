@@ -30,9 +30,9 @@ set(scripts_STAT_SRCS
   ../game/AI/ScriptedAI/ScriptedFollowerAI.cpp
 )
 
-AZTH_ADD_SCRIPTS("Spell" "ScriptLoader.h")
-AZTH_ADD_SCRIPTS("SC_Smart" "ScriptLoader.h")
-AZTH_ADD_SCRIPTS("Command" "ScriptLoader.h")
+AZTH_ADD_SCRIPT_LOADER("Spell" "ScriptLoader.h")
+AZTH_ADD_SCRIPT_LOADER("SC_Smart" "ScriptLoader.h")
+AZTH_ADD_SCRIPT_LOADER("Command" "ScriptLoader.h")
 
 if(SCRIPTS)
   include(World/CMakeLists.txt)
@@ -48,6 +48,12 @@ endif()
 
 AZTH_GET_GLOBAL("AZTH_ADD_SCRIPTS_LIST")
 AZTH_GET_GLOBAL("AZTH_ADD_SCRIPTS_INCLUDE")
+AZTH_GET_GLOBAL("AZTH_SCRIPTS_SOURCES")
+
+set(scripts_STAT_SRCS
+  ${scripts_STAT_SRCS}
+  ${AZTH_SCRIPTS_SOURCES}
+)
 
 set("AZTH_SCRIPTS_INCLUDES" "")
 

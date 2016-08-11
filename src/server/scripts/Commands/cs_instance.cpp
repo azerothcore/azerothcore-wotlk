@@ -29,6 +29,7 @@ EndScriptData */
 #include "InstanceScript.h"
 #include "MapManager.h"
 #include "Player.h"
+#include "Language.h"
 
 class instance_commandscript : public CommandScript
 {
@@ -43,6 +44,8 @@ public:
             { "unbind",         SEC_ADMINISTRATOR,  false,  &HandleInstanceUnbindCommand,       "", NULL },
             { "stats",          SEC_ADMINISTRATOR,  true,   &HandleInstanceStatsCommand,        "", NULL },
             { "savedata",       SEC_ADMINISTRATOR,  false,  &HandleInstanceSaveDataCommand,     "", NULL },
+            { "setbossstate",   SEC_GAMEMASTER,     true,   &HandleInstanceSetBossStateCommand, "", NULL },
+            { "getbossstate",   SEC_GAMEMASTER,     true,   &HandleInstanceGetBossStateCommand, "", NULL },
             { NULL,             0,                  false,  NULL,                               "", NULL }
         };
 
@@ -174,6 +177,140 @@ public:
 
         map->ToInstanceMap()->GetInstanceScript()->SaveToDB();
 
+        return true;
+    }
+
+    static bool HandleInstanceSetBossStateCommand(ChatHandler* handler, char const* args)
+    {
+        if (!*args)
+            return false;
+
+        char* param1 = strtok((char*)args, " ");
+        char* param2 = strtok(NULL, " ");
+        char* param3 = strtok(NULL, " ");
+        uint32 encounterId = 0;
+        int32 state = 0;
+        Player* player = NULL;
+        std::string playerName;
+
+        // Character name must be provided when using this from console.
+        if (!param2 || (!param3 && !handler->GetSession()))
+        {
+            handler->PSendSysMessage(LANG_CMD_SYNTAX);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (!param3)
+            player = handler->GetSession()->GetPlayer();
+        else
+        {
+            playerName = param3;
+            if (normalizePlayerName(playerName))
+                player = ObjectAccessor::FindPlayerByName(playerName);
+        }
+
+        if (!player)
+        {
+            handler->PSendSysMessage(LANG_PLAYER_NOT_FOUND);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        InstanceMap* map = player->GetMap()->ToInstanceMap();
+        if (!map)
+        {
+            handler->PSendSysMessage(LANG_NOT_DUNGEON);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (!map->GetInstanceScript())
+        {
+            handler->PSendSysMessage(LANG_NO_INSTANCE_DATA);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        encounterId = atoi(param1);
+        state = atoi(param2);
+
+        // Reject improper values.
+        if (state > TO_BE_DECIDED || encounterId > map->GetInstanceScript()->GetEncounterCount())
+        {
+            handler->PSendSysMessage(LANG_BAD_VALUE);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        map->GetInstanceScript()->SetBossState(encounterId, EncounterState(state));
+        std::string stateName = InstanceScript::GetBossStateName(state);
+        handler->PSendSysMessage(LANG_COMMAND_INST_SET_BOSS_STATE, encounterId, state, stateName.c_str());
+        return true;
+    }
+
+    static bool HandleInstanceGetBossStateCommand(ChatHandler* handler, char const* args)
+    {
+        if (!*args)
+            return false;
+
+        char* param1 = strtok((char*)args, " ");
+        char* param2 = strtok(NULL, " ");
+        uint32 encounterId = 0;
+        Player* player = NULL;
+        std::string playerName;
+
+        // Character name must be provided when using this from console.
+        if (!param1 || (!param2 && !handler->GetSession()))
+        {
+            handler->PSendSysMessage(LANG_CMD_SYNTAX);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (!param2)
+            player = handler->GetSession()->GetPlayer();
+        else
+        {
+            playerName = param2;
+            if (normalizePlayerName(playerName))
+                player = ObjectAccessor::FindPlayerByName(playerName);
+        }
+
+        if (!player)
+        {
+            handler->PSendSysMessage(LANG_PLAYER_NOT_FOUND);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        InstanceMap* map = player->GetMap()->ToInstanceMap();
+        if (!map)
+        {
+            handler->PSendSysMessage(LANG_NOT_DUNGEON);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (!map->GetInstanceScript())
+        {
+            handler->PSendSysMessage(LANG_NO_INSTANCE_DATA);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        encounterId = atoi(param1);
+
+        if (encounterId > map->GetInstanceScript()->GetEncounterCount())
+        {
+            handler->PSendSysMessage(LANG_BAD_VALUE);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        uint32 state = map->GetInstanceScript()->GetBossState(encounterId);
+        std::string stateName = InstanceScript::GetBossStateName(state);
+        handler->PSendSysMessage(LANG_COMMAND_INST_GET_BOSS_STATE, encounterId, state, stateName.c_str());
         return true;
     }
 };

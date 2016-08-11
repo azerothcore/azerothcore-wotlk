@@ -196,6 +196,6 @@ set(scripts_STAT_SRCS
   Northrend/DraktharonKeep/boss_dred.cpp
 )
 
-AZTH_ADD_SCRIPTS("Northrend" "ScriptLoader.h")
+AZTH_ADD_SCRIPT_LOADER("Northrend" "ScriptLoader.h")
 
 message("  -> Prepared: Northrend")

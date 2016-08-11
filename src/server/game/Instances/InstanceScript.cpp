@@ -446,3 +446,25 @@ void InstanceScript::SendEncounterUnit(uint32 type, Unit* unit /*= NULL*/, uint8
 
     instance->SendToPlayers(&data);
 }
+
+std::string InstanceScript::GetBossStateName(uint8 state)
+{
+    // See enum EncounterState in InstanceScript.h
+    switch (state)
+    {
+        case NOT_STARTED:
+            return "NOT_STARTED";
+        case IN_PROGRESS:
+            return "IN_PROGRESS";
+        case FAIL:
+            return "FAIL";
+        case DONE:
+            return "DONE";
+        case SPECIAL:
+            return "SPECIAL";
+        case TO_BE_DECIDED:
+            return "TO_BE_DECIDED";
+        default:
+            return "INVALID";
+    }
+}

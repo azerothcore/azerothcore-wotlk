@@ -69,10 +69,17 @@ MACRO(AZTH_SET_PATH name val)
 ENDMACRO()
 
 #
-# AZTH_ADD_SCRIPTS
+# AZTH_ADD_SCRIPT
 #
-MACRO(AZTH_ADD_SCRIPTS script_def include)
-    AZTH_ADD_GLOBAL("AZTH_ADD_SCRIPTS_LIST" "Add${script_def}Scripts()\;")
+MACRO(AZTH_ADD_SCRIPT path)
+    AZTH_ADD_GLOBAL("AZTH_SCRIPTS_SOURCES" "${path}")
+ENDMACRO()
+
+#
+# AZTH_ADD_SCRIPT_LOADER
+#
+MACRO(AZTH_ADD_SCRIPT_LOADER script_dec include)
+    AZTH_ADD_GLOBAL("AZTH_ADD_SCRIPTS_LIST" "Add${script_dec}Scripts()\;")
     
 
     if (NOT ${include} STREQUAL "")
