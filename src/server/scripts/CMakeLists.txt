@@ -34,18 +34,6 @@ AC_ADD_SCRIPT_LOADER("Spell" "ScriptLoader.h")
 AC_ADD_SCRIPT_LOADER("SC_Smart" "ScriptLoader.h")
 AC_ADD_SCRIPT_LOADER("Command" "ScriptLoader.h")
 
-if(SCRIPTS)
-  include(World/CMakeLists.txt)
-  include(OutdoorPvP/CMakeLists.txt)
-  include(EasternKingdoms/CMakeLists.txt)
-  include(Kalimdor/CMakeLists.txt)
-  include(Outland/CMakeLists.txt)
-  include(Northrend/CMakeLists.txt)
-  include(Events/CMakeLists.txt)
-  include(Pet/CMakeLists.txt)
-endif()
-
-
 CU_GET_GLOBAL("AC_ADD_SCRIPTS_LIST")
 CU_GET_GLOBAL("AC_ADD_SCRIPTS_INCLUDE")
 CU_GET_GLOBAL("AC_SCRIPTS_SOURCES")
@@ -68,28 +56,28 @@ message("")
 
 include_directories(
   ${CMAKE_BINARY_DIR}
-  ${CMAKE_SOURCE_DIR}/modules/dep/recastnavigation/Detour
-  ${CMAKE_SOURCE_DIR}/modules/dep/recastnavigation/Recast
-  ${CMAKE_SOURCE_DIR}/modules/dep/g3dlite/include
-  ${CMAKE_SOURCE_DIR}/modules/dep/SFMT
-  ${CMAKE_SOURCE_DIR}/modules/dep/zlib
-  ${CMAKE_SOURCE_DIR}/src/server/shared
-  ${CMAKE_SOURCE_DIR}/src/server/shared/Configuration
-  ${CMAKE_SOURCE_DIR}/src/server/shared/Cryptography
-  ${CMAKE_SOURCE_DIR}/src/server/shared/Database
-  ${CMAKE_SOURCE_DIR}/src/server/shared/DataStores
-  ${CMAKE_SOURCE_DIR}/src/server/shared/Debugging
-  ${CMAKE_SOURCE_DIR}/src/server/shared/Dynamic/LinkedReference
-  ${CMAKE_SOURCE_DIR}/src/server/shared/Dynamic
-  ${CMAKE_SOURCE_DIR}/src/server/shared/Logging
-  ${CMAKE_SOURCE_DIR}/src/server/shared/Packets
-  ${CMAKE_SOURCE_DIR}/src/server/shared/Threading
-  ${CMAKE_SOURCE_DIR}/src/server/shared/Utilities
-  ${CMAKE_SOURCE_DIR}/src/server/collision
-  ${CMAKE_SOURCE_DIR}/src/server/collision/Management
-  ${CMAKE_SOURCE_DIR}/src/server/collision/Models
-  ${CMAKE_SOURCE_DIR}/src/server/shared
-  ${CMAKE_SOURCE_DIR}/src/server/shared/Database
+  ${CMAKE_SOURCE_DIR}/modules/acore/deps/recastnavigation/Detour
+  ${CMAKE_SOURCE_DIR}/modules/acore/deps/recastnavigation/Recast
+  ${CMAKE_SOURCE_DIR}/modules/acore/deps/g3dlite/include
+  ${CMAKE_SOURCE_DIR}/modules/acore/deps/SFMT
+  ${CMAKE_SOURCE_DIR}/modules/acore/deps/zlib
+  ${CMAKE_SOURCE_DIR}/modules/acore/framework
+  ${CMAKE_SOURCE_DIR}/modules/acore/framework/Configuration
+  ${CMAKE_SOURCE_DIR}/modules/acore/framework/Cryptography
+  ${CMAKE_SOURCE_DIR}/modules/acore/framework/Database
+  ${CMAKE_SOURCE_DIR}/modules/acore/framework/DataStores
+  ${CMAKE_SOURCE_DIR}/modules/acore/framework/Debugging
+  ${CMAKE_SOURCE_DIR}/modules/acore/framework/Dynamic/LinkedReference
+  ${CMAKE_SOURCE_DIR}/modules/acore/framework/Dynamic
+  ${CMAKE_SOURCE_DIR}/modules/acore/framework/Logging
+  ${CMAKE_SOURCE_DIR}/modules/acore/framework/Packets
+  ${CMAKE_SOURCE_DIR}/modules/acore/framework/Threading
+  ${CMAKE_SOURCE_DIR}/modules/acore/framework/Utilities
+  ${CMAKE_SOURCE_DIR}/modules/acore/world-engine/collision
+  ${CMAKE_SOURCE_DIR}/modules/acore/world-engine/collision/Management
+  ${CMAKE_SOURCE_DIR}/modules/acore/world-engine/collision/Models
+  ${CMAKE_SOURCE_DIR}/modules/acore/framework
+  ${CMAKE_SOURCE_DIR}/modules/acore/framework/Database
   ${CMAKE_SOURCE_DIR}/src/server/game/Accounts
   ${CMAKE_SOURCE_DIR}/src/server/game/Achievements
   ${CMAKE_SOURCE_DIR}/src/server/game/Addons
@@ -106,7 +94,7 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/src/server/game/Chat
   ${CMAKE_SOURCE_DIR}/src/server/game/Chat/Channels
   ${CMAKE_SOURCE_DIR}/src/server/game/Conditions
-  ${CMAKE_SOURCE_DIR}/src/server/shared/Configuration
+  ${CMAKE_SOURCE_DIR}/modules/acore/framework/Configuration
   ${CMAKE_SOURCE_DIR}/src/server/game/Combat
   ${CMAKE_SOURCE_DIR}/src/server/game/DataStores
   ${CMAKE_SOURCE_DIR}/src/server/game/DungeonFinding

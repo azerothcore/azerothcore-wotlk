@@ -15,13 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SC_SCRIPTLOADER_H
-#define SC_SCRIPTLOADER_H
+#ifndef SC_SCRIPT_WOTLK_LOADER_H
+#define SC_SCRIPT_WOTLK_LOADER_H
 
-void AddScripts();
-void AddSpellScripts();
-void AddCommandScripts();
-void AddSC_SmartScripts();
 void AddWorldScripts();
 void AddEventScripts();
 void AddEasternKingdomsScripts();

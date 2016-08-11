@@ -10,14 +10,14 @@
 
 set(scripts_STAT_SRCS
   ${scripts_STAT_SRCS}
-  Pet/pet_dk.cpp
-  Pet/pet_generic.cpp
-  Pet/pet_hunter.cpp
-  Pet/pet_mage.cpp
-  Pet/pet_priest.cpp
-  Pet/pet_shaman.cpp
+  ${CMAKE_AC_MODULE_DIR}/Pet/pet_dk.cpp
+  ${CMAKE_AC_MODULE_DIR}/Pet/pet_generic.cpp
+  ${CMAKE_AC_MODULE_DIR}/Pet/pet_hunter.cpp
+  ${CMAKE_AC_MODULE_DIR}/Pet/pet_mage.cpp
+  ${CMAKE_AC_MODULE_DIR}/Pet/pet_priest.cpp
+  ${CMAKE_AC_MODULE_DIR}/Pet/pet_shaman.cpp
 )
 
-AC_ADD_SCRIPT_LOADER("Pet" "ScriptLoader.h")
+AC_ADD_SCRIPT_LOADER("Pet" "ScriptWotlkLoader.h")
 
 message("  -> Prepared: Pet")

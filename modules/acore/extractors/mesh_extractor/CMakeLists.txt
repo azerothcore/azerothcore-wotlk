@@ -13,11 +13,11 @@ file(GLOB_RECURSE meshExtract_Sources *.cpp *.h)
 
 set(include_Base
   ${CMAKE_BINARY_DIR}
-  ${CMAKE_SOURCE_DIR}/src/server/shared
-  ${CMAKE_SOURCE_DIR}/modules/dep/recastnavigation/Recast
-  ${CMAKE_SOURCE_DIR}/modules/dep/recastnavigation/Detour
-  ${CMAKE_SOURCE_DIR}/modules/dep/libmpq
-  ${CMAKE_SOURCE_DIR}/modules/dep/g3dlite/include
+  ${CMAKE_SOURCE_DIR}/modules/acore/framework
+  ${CMAKE_SOURCE_DIR}/modules/acore/deps/recastnavigation/Recast
+  ${CMAKE_SOURCE_DIR}/modules/acore/deps/recastnavigation/Detour
+  ${CMAKE_SOURCE_DIR}/modules/acore/deps/libmpq
+  ${CMAKE_SOURCE_DIR}/modules/acore/deps/g3dlite/include
   ${ACE_INCLUDE_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}
 )
@@ -25,7 +25,7 @@ set(include_Base
 if( WIN32 )
   set(include_Base
     ${include_Base}
-    ${CMAKE_SOURCE_DIR}/modules/dep/libmpq/win
+    ${CMAKE_SOURCE_DIR}/modules/acore/deps/libmpq/win
     )
 endif()
 

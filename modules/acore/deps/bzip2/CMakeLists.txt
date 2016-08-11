@@ -15,7 +15,7 @@ set(bzip2_STAT_SRCS
 )
 
 include_directories(
-  ${CMAKE_SOURCE_DIR}/modules/dep/zlib
+  ${CMAKE_SOURCE_DIR}/modules/acore/deps/zlib
   ${CMAKE_CURRENT_SOURCE_DIR}
 )
 

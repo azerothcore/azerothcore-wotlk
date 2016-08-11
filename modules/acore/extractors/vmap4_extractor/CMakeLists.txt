@@ -12,13 +12,13 @@
 file(GLOB_RECURSE sources *.cpp *.h)
 
 set(include_Dirs
-    ${CMAKE_SOURCE_DIR}/modules/dep/libmpq
+    ${CMAKE_SOURCE_DIR}/modules/acore/deps/libmpq
 )
 
 if( WIN32 )
   set(include_Dirs
     ${include_Dirs}
-    ${CMAKE_SOURCE_DIR}/modules/dep/libmpq/win
+    ${CMAKE_SOURCE_DIR}/modules/acore/deps/libmpq/win
   )
 endif()
 

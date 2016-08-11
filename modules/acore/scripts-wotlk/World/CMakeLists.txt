@@ -10,17 +10,17 @@
 
 set(scripts_STAT_SRCS
   ${scripts_STAT_SRCS}
-  World/achievement_scripts.cpp
-  World/areatrigger_scripts.cpp
-  World/boss_emerald_dragons.cpp
-  World/go_scripts.cpp
-  World/guards.cpp
-  World/item_scripts.cpp
-  World/mob_generic_creature.cpp
-  World/npc_innkeeper.cpp
-  World/npc_professions.cpp
-  World/npc_taxi.cpp
-  World/npcs_special.cpp
+  ${CMAKE_AC_MODULE_DIR}/World/achievement_scripts.cpp
+  ${CMAKE_AC_MODULE_DIR}/World/areatrigger_scripts.cpp
+  ${CMAKE_AC_MODULE_DIR}/World/boss_emerald_dragons.cpp
+  ${CMAKE_AC_MODULE_DIR}/World/go_scripts.cpp
+  ${CMAKE_AC_MODULE_DIR}/World/guards.cpp
+  ${CMAKE_AC_MODULE_DIR}/World/item_scripts.cpp
+  ${CMAKE_AC_MODULE_DIR}/World/mob_generic_creature.cpp
+  ${CMAKE_AC_MODULE_DIR}/World/npc_innkeeper.cpp
+  ${CMAKE_AC_MODULE_DIR}/World/npc_professions.cpp
+  ${CMAKE_AC_MODULE_DIR}/World/npc_taxi.cpp
+  ${CMAKE_AC_MODULE_DIR}/World/npcs_special.cpp
 )
 
 AC_ADD_SCRIPT_LOADER("World" "ScriptLoader.h")

@@ -56,10 +56,10 @@ set(shared_STAT_SRCS
 
 include_directories(
   ${CMAKE_BINARY_DIR}
-  ${CMAKE_SOURCE_DIR}/modules/dep/recastnavigation/Detour
-  ${CMAKE_SOURCE_DIR}/modules/dep/SFMT
-  ${CMAKE_SOURCE_DIR}/modules/dep/sockets/include
-  ${CMAKE_SOURCE_DIR}/modules/dep/utf8cpp
+  ${CMAKE_SOURCE_DIR}/modules/acore/deps/recastnavigation/Detour
+  ${CMAKE_SOURCE_DIR}/modules/acore/deps/SFMT
+  ${CMAKE_SOURCE_DIR}/modules/acore/deps/sockets/include
+  ${CMAKE_SOURCE_DIR}/modules/acore/deps/utf8cpp
   ${CMAKE_SOURCE_DIR}/src/server
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}/Configuration
