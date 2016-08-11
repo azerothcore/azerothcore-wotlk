@@ -209,4 +209,4 @@ if( USE_COREPCH )
   add_cxx_pch(worldserver ${worldserver_PCH_HDR} ${worldserver_PCH_SRC})
 endif()
 
-RUN_HOOK("AFTER_WORLDSERVER_CMAKE")
+CU_RUN_HOOK("AFTER_WORLDSERVER_CMAKE")

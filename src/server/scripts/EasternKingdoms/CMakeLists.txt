@@ -164,6 +164,6 @@ set(scripts_STAT_SRCS
   EasternKingdoms/TheStockade/instance_the_stockade.cpp
 )
 
-AZTH_ADD_SCRIPT_LOADER("EasternKingdoms" "ScriptLoader.h")
+AC_ADD_SCRIPT_LOADER("EasternKingdoms" "ScriptLoader.h")
 
 message("  -> Prepared: Eastern Kingdoms")

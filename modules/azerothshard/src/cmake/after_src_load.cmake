@@ -102,7 +102,7 @@ include_directories(
   ${OPENSSL_INCLUDE_DIR}
 )
 
-AZTH_LOAD_INC_PATHS()
+CU_LOAD_INC_PATHS()
 
 add_library(azth_mod STATIC
   ${CMAKE_AZTH_SRCS}

@@ -34,6 +34,8 @@ include(CheckIncludeFiles)
 # some utils for cmake
 include(src/cmake/utils.cmake)
 
+include(ScriptsMacro)
+
 # set default buildoptions and print them
 include(conf/config.cmake.dist)
 
@@ -42,7 +44,7 @@ if(EXISTS "conf/config.cmake")
   include(conf/config.cmake)
 endif()
 
-RUN_HOOK("AFTER_LOAD_CONF")
+CU_RUN_HOOK("AFTER_LOAD_CONF")
 
 # build in Release-mode by default if not explicitly set
 if( NOT CMAKE_BUILD_TYPE )
@@ -84,7 +86,7 @@ include(src/cmake/genrev.cmake)
 include(src/cmake/showoptions.cmake)
 
 # add modules and dependencies
-AZTH_SUBDIRLIST(sub_DIRS  "${CMAKE_SOURCE_DIR}/modules" FALSE FALSE)
+CU_SUBDIRLIST(sub_DIRS  "${CMAKE_SOURCE_DIR}/modules" FALSE FALSE)
 FOREACH(subdir ${sub_DIRS})
     STRING(REGEX REPLACE "^${CMAKE_SOURCE_DIR}/" "" subdir_rel ${subdir})
     if(EXISTS "${subdir}/CMakeLists.txt")
@@ -93,9 +95,9 @@ FOREACH(subdir ${sub_DIRS})
     endif()
 ENDFOREACH()
 
-RUN_HOOK("BEFORE_SRC_LOAD")
+CU_RUN_HOOK("BEFORE_SRC_LOAD")
 
 # add core sources
 add_subdirectory(src)
 
-RUN_HOOK("AFTER_SRC_LOAD")
+CU_RUN_HOOK("AFTER_SRC_LOAD")
