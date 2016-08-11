@@ -1,6 +1,7 @@
 CU_RUN_HOOK("BEFORE_ACORE_LOAD")
 
 add_subdirectory(deps)
+add_subdirectory(genrev)
 
 if( SERVERS )
   add_subdirectory(framework)
