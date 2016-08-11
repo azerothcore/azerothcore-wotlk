@@ -1,23 +1,6 @@
-#
-# AzerothCore
-#
+!.gitignore
 
-conf/*
-!conf/*.dist
-modules/*
-
-#
-# Allow modules to control git ignoring
-#
-!modules/*
-modules/*/*
-!modules/*/.gitignore
-!modules/uwd/*
-!modules/uwd/cmake-utils/*
-modules/uwd/joiner
-!modules/acore/*
-
-build*/
+!*
 
 #
 #Generic
@@ -49,8 +32,6 @@ CMakeLists.txt.user
 nbproject/
 .sync.ffs_db
 *.kate-swp
-.browse.VC*
-.vscode
 
 #
 # Eclipse
@@ -67,4 +48,3 @@ local.properties
 .loadpath
 .project
 .cproject
-
