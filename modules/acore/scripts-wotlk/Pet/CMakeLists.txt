@@ -18,6 +18,6 @@ set(scripts_STAT_SRCS
   ${CMAKE_AC_MODULE_DIR}/Pet/pet_shaman.cpp
 )
 
-AC_ADD_SCRIPT_LOADER("Pet" "ScriptWotlkLoader.h")
+AC_ADD_SCRIPT_LOADER("Pet" "${CMAKE_AC_MODULE_DIR}/ScriptWotlkLoader.h")
 
 message("  -> Prepared: Pet")

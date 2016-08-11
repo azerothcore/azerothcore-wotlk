@@ -105,6 +105,6 @@ set(scripts_STAT_SRCS
   ${CMAKE_AC_MODULE_DIR}/Kalimdor/DireMaul/dire_maul.h
 )
 
-AC_ADD_SCRIPT_LOADER("Kalimdor" "ScriptWotlkLoader.h")
+AC_ADD_SCRIPT_LOADER("Kalimdor" "${CMAKE_AC_MODULE_DIR}/ScriptWotlkLoader.h")
 
 message("  -> Prepared: Kalimdor")

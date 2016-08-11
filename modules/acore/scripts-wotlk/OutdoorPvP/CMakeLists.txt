@@ -26,6 +26,6 @@ set(scripts_STAT_SRCS
   ${CMAKE_AC_MODULE_DIR}/OutdoorPvP/OutdoorPvPGH.h
 )
 
-AC_ADD_SCRIPT_LOADER("OutdoorPvP" "ScriptWotlkLoader.h")
+AC_ADD_SCRIPT_LOADER("OutdoorPvP" "${CMAKE_AC_MODULE_DIR}/ScriptWotlkLoader.h")
 
 message("  -> Prepared: Outdoor PVP Zones")

@@ -9,6 +9,6 @@ set(scripts_STAT_SRCS
   ${CMAKE_AC_MODULE_DIR}/Events/midsummer.cpp
 )
 
-AC_ADD_SCRIPT_LOADER("Event" "ScriptWotlkLoader.h")
+AC_ADD_SCRIPT_LOADER("Event" "${CMAKE_AC_MODULE_DIR}/ScriptWotlkLoader.h")
 
 message("  -> Prepared: Events")
