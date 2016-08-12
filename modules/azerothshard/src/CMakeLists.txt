@@ -1,5 +1,5 @@
 MACRO(AZTH_LOAD_SRC dir)
-    AZTH_SUBDIRLIST(sub_DIRS  "${CMAKE_AZTH_SRC_DIR}/server/${dir}" TRUE TRUE)
+    CU_SUBDIRLIST(sub_DIRS  "${CMAKE_AZTH_SRC_DIR}/server/${dir}" TRUE TRUE)
     FOREACH(subdir ${sub_DIRS})
         get_filename_component(azth_dir_name ${subdir} DIRECTORY)
 
@@ -19,10 +19,10 @@ MACRO(AZTH_LOAD_SRC dir)
     ENDFOREACH()
 ENDMACRO()
 
-ADD_HOOK(BEFORE_SRC_LOAD "${CMAKE_AZTH_SRC_DIR}/cmake/before_src_load.cmake")
+CU_ADD_HOOK(BEFORE_SRC_LOAD "${CMAKE_AZTH_SRC_DIR}/cmake/before_src_load.cmake")
 
-ADD_HOOK(AFTER_GAME_LIBRARY "${CMAKE_AZTH_SRC_DIR}/cmake/after_game_library.cmake")
+CU_ADD_HOOK(AFTER_GAME_LIBRARY "${CMAKE_AZTH_SRC_DIR}/cmake/after_game_library.cmake")
 
-ADD_HOOK(AFTER_SRC_LOAD "${CMAKE_AZTH_SRC_DIR}/cmake/after_src_load.cmake")
+CU_ADD_HOOK(AFTER_SRC_LOAD "${CMAKE_AZTH_SRC_DIR}/cmake/after_src_load.cmake")
 
-AZTH_ADD_SCRIPTS("Azth" "AzthPlgLoader.h")
+AC_ADD_SCRIPT_LOADER("Azth" "AzthPlgLoader.h")

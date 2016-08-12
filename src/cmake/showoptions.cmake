@@ -11,8 +11,11 @@ message("")
 message("* Install core to        : ${CMAKE_INSTALL_PREFIX}")
 if( UNIX )
   message("* Install libraries to   : ${LIBSDIR}")
-  message("* Install configs to     : ${CONF_DIR}")
 endif()
+
+message("* Install configs to     : ${CONF_DIR}")
+add_definitions(-D_CONF_DIR="\\"${CONF_DIR}\\"")
+
 message("")
 
 # Show infomation about the options selected during configuration
