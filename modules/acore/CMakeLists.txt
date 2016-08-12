@@ -1,12 +1,10 @@
 CU_RUN_HOOK("BEFORE_ACORE_LOAD")
 
 add_subdirectory(deps)
-add_subdirectory(genrev)
 
 if( SERVERS )
   add_subdirectory(framework)
   add_subdirectory(world-engine/collision)
-  add_subdirectory(scripts-wotlk)
 else()
   if( TOOLS )
     add_subdirectory(extractors)

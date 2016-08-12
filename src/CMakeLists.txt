@@ -16,6 +16,8 @@ if(CMAKE_COMPILER_IS_GNUCXX AND NOT MINGW)
   add_definitions(-fno-delete-null-pointer-checks)
 endif()
 
+add_subdirectory(genrev)
+
 if( SERVERS )
   set(sources_windows_Debugging
     ${CMAKE_SOURCE_DIR}/modules/acore/framework/Debugging/WheatyExceptionReport.cpp

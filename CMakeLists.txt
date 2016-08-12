@@ -34,7 +34,7 @@ include(CheckIncludeFiles)
 # some utils for cmake
 include(modules/uwd/cmake-utils/utils.cmake)
 
-include(ScriptsMacro)
+include(src/cmake/ac_macros.cmake)
 
 # set default buildoptions and print them
 include(conf/config.cmake.dist)
@@ -80,10 +80,10 @@ if(NOT WITHOUT_GIT)
 endif()
 
 # Find revision ID and hash of the sourcetree
-include(modules/acore/cmake/genrev.cmake)
+include(src/cmake/genrev.cmake)
 
 # print out the results before continuing
-include(modules/acore/cmake/showoptions.cmake)
+include(src/cmake/showoptions.cmake)
 
 # add modules and dependencies
 CU_SUBDIRLIST(sub_DIRS  "${CMAKE_SOURCE_DIR}/modules" FALSE FALSE)
