@@ -2986,7 +2986,7 @@ void Map::DeleteRespawnTimesInDB(uint16 mapId, uint32 instanceId)
 
 void Map::UpdateEncounterState(EncounterCreditType type, uint32 creditEntry, Unit* source)
 { 
-    Difficulty difficulty_fixed = (GetId() == 631 || GetId() == 724 ? Difficulty(GetDifficulty()%2) : GetDifficulty());
+    Difficulty difficulty_fixed = (IsSharedDifficultyMap(GetId()) ? Difficulty(GetDifficulty()%2) : GetDifficulty());
     DungeonEncounterList const* encounters = sObjectMgr->GetDungeonEncounterList(GetId(), difficulty_fixed);
     if (!encounters)
         return;

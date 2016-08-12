@@ -868,6 +868,11 @@ PvPDifficultyEntry const* GetBattlegroundBracketById(uint32 mapid, BattlegroundB
     return NULL;
 }
 
+bool IsSharedDifficultyMap(uint32 mapid)
+{ 
+    return sWorld->getBoolConfig(CONFIG_INSTANCE_SHARED_ID) && (mapid == 631 || mapid == 724); 
+}
+
 uint32 GetLiquidFlags(uint32 liquidType)
 {
     if (LiquidTypeEntry const* liq = sLiquidTypeStore.LookupEntry(liquidType))

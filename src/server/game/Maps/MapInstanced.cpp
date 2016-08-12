@@ -151,7 +151,7 @@ Map* MapInstanced::CreateInstanceForPlayer(const uint32 mapId, Player* player)
             map = FindInstanceMap(destInstId);
             if (!map)
                 map = CreateInstance(destInstId, pSave, realdiff);
-            else if ((mapId == 631 || mapId == 724) && !map->HavePlayers() && map->GetDifficulty() != realdiff)
+            else if (IsSharedDifficultyMap(mapId) && !map->HavePlayers() && map->GetDifficulty() != realdiff)
             {
                 if (player->isBeingLoaded()) // pussywizard: crashfix (assert(passengers.empty) fail in ~transport), could be added to a transport during loading from db
                     return NULL;
