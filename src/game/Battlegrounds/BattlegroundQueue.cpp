@@ -502,7 +502,7 @@ void BattlegroundQueue::FillPlayersToBGWithSpecific(const int32 aliFree, const i
     int32 aliDiff   = aliFree   - int32(m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount());
     int32 hordeDiff = hordeFree - int32(m_SelectionPools[TEAM_HORDE].GetPlayerCount());
 
-    // Mik1893: Battleground Balance system 2.0
+    // [AZTH] Mik1893: Battleground Balance system 2.0
     int32 invType = sWorld->getIntConfig(CONFIG_BATTLEGROUND_INVITATION_TYPE);
     int32 invDiff = 0;
 

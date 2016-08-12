@@ -14,7 +14,7 @@ file(GLOB_RECURSE sources_Accounts Accounts/*.cpp Accounts/*.h)
 file(GLOB_RECURSE sources_Achievements Achievements/*.cpp Achievements/*.h)
 file(GLOB_RECURSE sources_Addons Addons/*.cpp Addons/*.h)
 file(GLOB_RECURSE sources_AI AI/*.cpp AI/*.h)
-file(GLOB_RECURSE sources_Anticheat Anticheat/*.cpp Anticheat/*.h)
+file(GLOB_RECURSE sources_Anticheat Anticheat/*.cpp Anticheat/*.h) # [AZTH]
 file(GLOB_RECURSE sources_AuctionHouse AuctionHouse/*.cpp AuctionHouse/*.h)
 file(GLOB_RECURSE sources_Battlefield Battlefield/*.cpp Battlefield/*.h)
 file(GLOB_RECURSE sources_Battlegrounds Battlegrounds/*.cpp Battlegrounds/*.h)
@@ -49,7 +49,7 @@ file(GLOB_RECURSE sources_Spells Spells/*.cpp Spells/*.h)
 file(GLOB_RECURSE sources_Texts Texts/*.cpp Texts/*.h)
 file(GLOB_RECURSE sources_Tools Tools/*.cpp Tools/*.h)
 file(GLOB_RECURSE sources_Tickets Tickets/*.cpp Tickets/*.h)
-file(GLOB_RECURSE sources_Transmogrification Transmogrification/*.cpp Transmogrification/*.h)
+file(GLOB_RECURSE sources_Transmogrification Transmogrification/*.cpp Transmogrification/*.h) # [AZTH] Transm
 file(GLOB_RECURSE sources_Warden Warden/*.cpp Warden/*.h)
 file(GLOB_RECURSE sources_Weather Weather/*.cpp Weather/*.h)
 file(GLOB_RECURSE sources_World World/*.cpp World/*.h)
@@ -69,7 +69,7 @@ set(game_STAT_SRCS
   ${sources_Achievements}
   ${sources_Addons}
   ${sources_AI}
-  ${sources_Anticheat}
+  ${sources_Anticheat} # [AZTH]
   ${sources_AuctionHouse}
   ${sources_Battlefield}
   ${sources_Battlegrounds}
@@ -104,7 +104,7 @@ set(game_STAT_SRCS
   ${sources_Texts}
   ${sources_Tools}
   ${sources_Tickets}
-  ${sources_Transmogrification}
+  ${sources_Transmogrification} # [AZTH] Transm
   ${sources_Warden}
   ${sources_Weather}
   ${sources_World}

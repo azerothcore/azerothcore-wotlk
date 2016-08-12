@@ -51,7 +51,7 @@ public:
             { "ticket",         SEC_GAMEMASTER,      false, &HandleGoTicketCommand,            "", NULL },
             { "guildhouse",     SEC_GAMEMASTER,      false, &HandleGuildhouseCommand,          "", NULL }, //[AZTH]
             { "",               SEC_GAMEMASTER,      false, &HandleGoXYZCommand,               "", NULL },
-            { NULL,             0,                   false, NULL,                               "", NULL }
+            { NULL,             0,                  false, NULL,                              "", NULL }
         };
 
         static ChatCommand commandTable[] =

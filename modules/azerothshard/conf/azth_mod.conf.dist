@@ -53,8 +53,6 @@ Battleground.QueueAnnouncer.Enable = 1
 
 Battleground.QueueAnnouncer.PlayerOnly = 1
 
-Battleground.InvitationType = 2
-
 Battleground.GiveXPForKills = 1
 
 Battleground.StoreStatistics.Enable = 1
@@ -126,6 +124,27 @@ ChatFlood.MessageDelay = 0
 #             8388608 - Anything related to Warden anti cheat
 #            16777216 - Anything related to Battlefields
 #            33554432 - Anything related to Transmog
+
+
+#    [AZTH]
+#    Battleground.RandomCrossFaction.Enable
+#        Description: Enable random battleground crossfaction randomizing system
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+
+Battleground.RandomCrossFaction.Enable = 1
+
+#    [AZTH] 
+#    Battleground.InvitationType
+#        Description: Set Battleground invitation type.
+#        Default:     0 - (Normal, Invite as much players to battlegrounds as queued,
+#                          Don't bother with balance)
+#                     1 - (Experimental, Don't allow to invite much more players
+#                          of one faction)
+#                     [AZTH]
+#                     2 - (Experimental, start when teams are even)
+
+Battleground.InvitationType = 2
 
 
 ###################################################################################################

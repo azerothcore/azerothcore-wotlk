@@ -52,6 +52,7 @@ int m_ServiceStatus = -1;
 WorldDatabaseWorkerPool WorldDatabase;                      ///< Accessor to the world database
 CharacterDatabaseWorkerPool CharacterDatabase;              ///< Accessor to the character database
 LoginDatabaseWorkerPool LoginDatabase;                      ///< Accessor to the realm/login database
+//[AZTH]
 ExtraDatabaseWorkerPool ExtraDatabase;                      ///< Accessor to the realm/login database
 
 uint32 realmID;                                             ///< Id of the realm

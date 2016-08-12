@@ -35,7 +35,7 @@
 #include "ArenaSpectator.h"
 #include "Chat.h"
 #include "BattlegroundMgr.h"
-#include "AnticheatMgr.h"
+#include "AnticheatMgr.h" //[AZTH]
 
 #define MOVEMENT_PACKET_TIME_DELAY 0
 

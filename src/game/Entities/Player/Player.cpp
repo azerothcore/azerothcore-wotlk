@@ -84,7 +84,7 @@
 #include "GameObjectAI.h"
 #include "PoolMgr.h"
 #include "SavingSystem.h"
-#include "Transmogrification.h"
+#include "Transmogrification.h" //[AZTH] Transm
 #include "TicketMgr.h"
 
 #define ZONE_UPDATE_INTERVAL (2*IN_MILLISECONDS)
@@ -12754,7 +12754,7 @@ void Player::SetVisibleItemSlot(uint8 slot, Item* pItem)
 { 
     if (pItem)
     {
-        // [AZTH] transm
+        //[AZTH] Transm
         if (uint32 entry = sTransmogrification->GetFakeEntry(pItem->GetGUID()))
             SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + (slot * 2), entry);
         else
@@ -12881,7 +12881,7 @@ void Player::MoveItemFromInventory(uint8 bag, uint8 slot, bool update)
 { 
     if (Item* it = GetItemByPos(bag, slot))
     {
-        sTransmogrification->DeleteFakeFromDB(it->GetGUIDLow()); // [AZTH] custom
+        sTransmogrification->DeleteFakeFromDB(it->GetGUIDLow()); //[AZTH] Transm
         ItemRemovedQuestCheck(it->GetEntry(), it->GetCount());
         RemoveItem(bag, slot, update);
         UpdateTitansGrip();
@@ -27070,6 +27070,7 @@ void Player::SummonPet(uint32 entry, float x, float y, float z, float ang, PetTy
     Pet::LoadPetFromDB(this, asynchLoadType, entry, 0, false, asynchPetInfo);
 }
 
+//[AZTH]
 void Player::UpdateKnownTitles()
 {
     uint32 new_title = 0;
@@ -27093,3 +27094,5 @@ void Player::UpdateKnownTitles()
     if (old_title > 0 && old_title < (2 * HKRANKMAX - 1) && new_title > old_title)
         SetUInt32Value(PLAYER_CHOSEN_TITLE, new_title);
 }
+
+//[/AZTH]

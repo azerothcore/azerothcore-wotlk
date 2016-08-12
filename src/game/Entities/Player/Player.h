@@ -1911,7 +1911,6 @@ class Player : public Unit, public GridObject<Player>
             SetArenaTeamInfoField(slot, ARENA_TEAM_ID, ArenaTeamId);
             SetArenaTeamInfoField(slot, ARENA_TEAM_TYPE, type);
         }
-
         void SetArenaTeamInfoField(uint8 slot, ArenaTeamInfoType type, uint32 value)
         {
 // [AZTH] avoid higher slots to be set in datafield

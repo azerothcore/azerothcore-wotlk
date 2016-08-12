@@ -104,7 +104,7 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/src/game/AI/CoreAI
   ${CMAKE_SOURCE_DIR}/src/game/AI/ScriptedAI
   ${CMAKE_SOURCE_DIR}/src/game/AI/SmartScripts
-  ${CMAKE_SOURCE_DIR}/src/game/Anticheat
+  ${CMAKE_SOURCE_DIR}/src/game/Anticheat # [AZTH]
   ${CMAKE_SOURCE_DIR}/src/game/AuctionHouse
   ${CMAKE_SOURCE_DIR}/src/game/Battlefield
   ${CMAKE_SOURCE_DIR}/src/game/Battlefield/Zones
@@ -165,7 +165,7 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/src/game/Spells/Auras
   ${CMAKE_SOURCE_DIR}/src/game/Texts
   ${CMAKE_SOURCE_DIR}/src/game/Tickets
-  ${CMAKE_SOURCE_DIR}/src/game/Transmogrification
+  ${CMAKE_SOURCE_DIR}/src/game/Transmogrification #[AZTH] Transm
   ${CMAKE_SOURCE_DIR}/src/game/Tools
   ${CMAKE_SOURCE_DIR}/src/game/Warden
   ${CMAKE_SOURCE_DIR}/src/game/Warden/Modules

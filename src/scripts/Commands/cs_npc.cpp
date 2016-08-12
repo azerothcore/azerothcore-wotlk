@@ -32,7 +32,7 @@ EndScriptData */
 #include "CreatureAI.h"
 #include "Player.h"
 #include "Pet.h"
-#include "GuildHouse.h"
+#include "GuildHouse.h" //[AZTH]
 
 struct NpcFlagText
 {
