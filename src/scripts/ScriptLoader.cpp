@@ -18,13 +18,6 @@
 #include "ScriptLoader.h"
 #include "ScriptMgr.h"
 
-//examples
-void AddSC_example_creature();
-void AddSC_example_escort();
-void AddSC_example_gossip_codebox();
-void AddSC_example_misc();
-void AddSC_example_commandscript();
-
 // spells
 void AddSC_deathknight_spell_scripts();
 void AddSC_druid_spell_scripts();

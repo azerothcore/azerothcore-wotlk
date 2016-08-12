@@ -10,6 +10,8 @@
 
 # Enable precompiled headers when using the GCC compiler.
 
+CU_SET_PATH("AC_SCRIPTS_DIR" "${CMAKE_CURRENT_LIST_DIR}")
+
 if (USE_SCRIPTPCH)
   set(scripts_STAT_PCH_HDR PrecompiledHeaders/ScriptPCH.h)
   set(scripts_STAT_PCH_SRC PrecompiledHeaders/ScriptPCH.cpp)
@@ -33,6 +35,23 @@ set(scripts_STAT_SRCS
 AC_ADD_SCRIPT_LOADER("Spell" "ScriptLoader.h")
 AC_ADD_SCRIPT_LOADER("SC_Smart" "ScriptLoader.h")
 AC_ADD_SCRIPT_LOADER("Command" "ScriptLoader.h")
+
+CU_SET_PATH("CMAKE_AC_MODULE_DIR" "${CMAKE_CURRENT_LIST_DIR}")
+
+if(SCRIPTS)
+  include(World/CMakeLists.txt)
+  include(OutdoorPvP/CMakeLists.txt)
+  include(EasternKingdoms/CMakeLists.txt)
+  include(Kalimdor/CMakeLists.txt)
+  include(Outland/CMakeLists.txt)
+  include(Northrend/CMakeLists.txt)
+  include(Events/CMakeLists.txt)
+  include(Pet/CMakeLists.txt)
+endif()
+
+if(EXISTS "Custom/CMakeLists.txt")
+include(Custom/CMakeLists.txt)
+endif()
 
 CU_GET_GLOBAL("AC_ADD_SCRIPTS_LIST")
 CU_GET_GLOBAL("AC_ADD_SCRIPTS_INCLUDE")
