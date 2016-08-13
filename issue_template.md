@@ -10,7 +10,7 @@
 2. 
 3. 
 
-**Branch(es)**: 1.x / 2.x (Select the branch(es) affected by this issue) 
+**Branch(es)**: 0.x / 1.x / master (Specify the branch(es) affected by this issue) 
 
 **AC hash/commit**:  
 
