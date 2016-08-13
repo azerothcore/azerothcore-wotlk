@@ -1,0 +1,109 @@
+#!/bin/bash
+#
+# * Copyright (C) 2007 - 2015 Hyperweb2 All rights reserved.
+# * GNU General Public License version 3; see www.hyperweb2.com/terms/
+
+echo "starting import process.."
+# check config from same folder and include only if exists
+CONF_FILE=$MT_DIR"/mysql-config"
+if [ -f "$CONF_FILE" ]; then
+    source "$CONF_FILE"
+fi;
+
+#overwrite configs if file exists and variables are defined
+if [ ! -z "$4" ]; then
+    if [ -e "$4" ]; then
+        source "$4"
+    else # if 4th parameter is not a file, then try to eval
+        eval "$4"
+    fi;
+fi;
+
+source $MT_DIR"/shared-def"
+
+if [ ! -z "$1" ]; then 
+ MYSQL_DB=$1;
+fi
+
+# Table prefix ( to implement )
+PFX=
+
+# par 1 : db_name
+function checkdb {
+    # Check if database exists
+    err=`echo "quit" | $(eval "$MYSQL$OPTS '$1'") 2>&1`
+    if [ $? != 0 ]; then
+        if echo "$err" | grep -q "Access denied"; then
+            echo -e "\nDATABASE $1 EXISTS BUT USER $MYSQL_USER DOES NOT HAVE ACCESS TO IT, ABORTING"
+            exit
+        fi
+        echo -n "[creating $1]"
+        if ! echo "CREATE DATABASE $1;" | $(eval "$MYSQL$OPTS" )  2>/dev/null  ; then
+            echo -e "\nDATABASE $1 DOES NOT EXIST AND I FAILED TO CREATE IT, ABORTING"
+            exit
+        fi
+    fi
+}
+
+#par1: is_text_file ;  par2: file
+function import
+{
+    echo "Importing $2 into $MYSQL_DB (text: $1) ..."
+	
+	SQL="SET FOREIGN_KEY_CHECKS = 0;"
+	#eval "$MYSQL$OPTS -e \"SET FOREIGN_KEY_CHECKS = 0\" '$MYSQL_DB'" #disable foreign check
+	
+	FILE=$2	
+	if (($1 != 0)); then
+		#eval "$MYSQLIMPORT$OPTS $IMPORTOPTS_TEXT '$MYSQL_DB' $2"
+		TABLE=${FILE##*/}
+		TABLE=${TABLE%.txt}
+		SQL+="LOAD DATA LOCAL INFILE '$2' INTO TABLE $MYSQL_DB.$TABLE;"
+	else
+		#eval "$MYSQL$OPTS '$MYSQL_DB'" < "$2" 
+		SQL+="SOURCE $2;"
+	fi
+	#eval "$MYSQL$OPTS -e \"SET FOREIGN_KEY_CHECKS = 1\" '$MYSQL_DB'" #enable foreign check
+	SQL+="SET FOREIGN_KEY_CHECKS = 1";
+	
+	eval "$MYSQL$OPTS -e \"$SQL\" '$MYSQL_DB'"
+	
+	echo " done"
+}
+
+if [ ! -z "$1" ]; then 
+	DB=$1; 
+fi
+
+checkdb $MYSQL_DB
+
+if [ ! -z "$2" ]; then 
+	tables=$(echo $2 | tr "," "\n")
+fi
+if [ ! -z "$3" ]; then 
+	FULL=$3; 
+fi
+
+if (($FULL != 0)); then
+	echo "importing full world file"
+	$(eval "$MYSQL$OPTS '$MYSQL_DB'") < $FPATH
+else
+	if [ ! -z "$2" ]; then
+		import "0" "$TPATH/$2.sql" # TODO we should check if it's a set of tables before
+		if (($TEXTDUMPS != 0)); then
+			for x in $TPATH/*.txt; do
+				import "1" "$x"
+			done
+		fi
+	else
+		for x in $TPATH/*.sql; do
+			import "0" "$x"
+		done
+
+		if (($TEXTDUMPS != 0)); then
+			for x in $TPATH/*.txt; do
+				import "1" "$x"
+			done
+		fi
+	fi
+fi
