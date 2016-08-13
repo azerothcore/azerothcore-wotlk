@@ -4,7 +4,10 @@ AC_PATH_SHARED="$AC_PATH_BIN/bash_shared"
 
 source "$AC_PATH_SHARED/defines.sh"
 
-source "$AC_PATH_SHARED/functions.sh"
+source "$AC_PATH_MODULES/hw-core/bash-lib-event/src/hooks.sh"
+
+alias registerHooks="hwc_event_register_hooks"
+alias runHooks="hwc_event_run_hooks"
 
 source "$AC_PATH_CONF/config.sh.dist" # "hack" to avoid missing conf variables
 
