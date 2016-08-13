@@ -496,10 +496,11 @@ enum RealmZone
 
 enum WorldStates
 {
+    WS_ARENA_DISTRIBUTION_TIME  = 20001,                     // Next arena distribution time
     WS_WEEKLY_QUEST_RESET_TIME  = 20002,                     // Next weekly reset time
     WS_BG_DAILY_RESET_TIME      = 20003,                     // Next daily BG reset time
     WS_CLEANING_FLAGS           = 20004,                     // Cleaning Flags
-    WS_DAILY_QUEST_RESET_TIME   = 20005,                     // pussywizard
+    WS_DAILY_QUEST_RESET_TIME   = 20005,                     // Next daily reset time
     WS_GUILD_DAILY_RESET_TIME   = 20006,                     // Next guild cap reset time
     WS_MONTHLY_QUEST_RESET_TIME = 20007,                     // Next monthly reset time
 };

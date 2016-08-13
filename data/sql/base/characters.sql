@@ -533,22 +533,22 @@ DROP TABLE IF EXISTS `character_aura`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `character_aura` (
   `guid` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Global Unique Identifier',
-  `caster_guid` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT 'Full Global Unique Identifier',
-  `item_guid` bigint(20) unsigned NOT NULL DEFAULT '0',
+  `casterGuid` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT 'Full Global Unique Identifier',
+  `itemGuid` bigint(20) unsigned NOT NULL DEFAULT '0',
   `spell` mediumint(8) unsigned NOT NULL DEFAULT '0',
-  `effect_mask` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `recalculate_mask` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `stackcount` tinyint(3) unsigned NOT NULL DEFAULT '1',
+  `effectMask` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `recalculateMask` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `stackCount` tinyint(3) unsigned NOT NULL DEFAULT '1',
   `amount0` int(11) NOT NULL DEFAULT '0',
   `amount1` int(11) NOT NULL DEFAULT '0',
   `amount2` int(11) NOT NULL DEFAULT '0',
   `base_amount0` int(11) NOT NULL DEFAULT '0',
   `base_amount1` int(11) NOT NULL DEFAULT '0',
   `base_amount2` int(11) NOT NULL DEFAULT '0',
-  `maxduration` int(11) NOT NULL DEFAULT '0',
-  `remaintime` int(11) NOT NULL DEFAULT '0',
-  `remaincharges` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  PRIMARY KEY (`guid`,`caster_guid`,`item_guid`,`spell`,`effect_mask`)
+  `maxDuration` int(11) NOT NULL DEFAULT '0',
+  `remainTime` int(11) NOT NULL DEFAULT '0',
+  `remainCharges` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`guid`,`casterGuid`,`itemGuid`,`spell`,`effectMask`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Player System';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -772,14 +772,14 @@ DROP TABLE IF EXISTS `character_glyphs`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `character_glyphs` (
   `guid` int(10) unsigned NOT NULL,
-  `spec` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `talentGroup` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `glyph1` smallint(5) unsigned DEFAULT '0',
   `glyph2` smallint(5) unsigned DEFAULT '0',
   `glyph3` smallint(5) unsigned DEFAULT '0',
   `glyph4` smallint(5) unsigned DEFAULT '0',
   `glyph5` smallint(5) unsigned DEFAULT '0',
   `glyph6` smallint(5) unsigned DEFAULT '0',
-  PRIMARY KEY (`guid`,`spec`)
+  PRIMARY KEY (`guid`,`talentGroup`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1368,8 +1368,8 @@ CREATE TABLE `characters` (
   `power6` int(10) unsigned NOT NULL DEFAULT '0',
   `power7` int(10) unsigned NOT NULL DEFAULT '0',
   `latency` mediumint(8) unsigned NOT NULL DEFAULT '0',
-  `speccount` tinyint(3) unsigned NOT NULL DEFAULT '1',
-  `activespec` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `talentGroupsCount` tinyint(3) unsigned NOT NULL DEFAULT '1',
+  `activeTalentGroup` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `exploredZones` longtext,
   `equipmentCache` longtext,
   `ammoId` int(10) unsigned NOT NULL DEFAULT '0',
@@ -1403,7 +1403,7 @@ DROP TABLE IF EXISTS `characters_db_version`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `characters_db_version` (
-  `2016_07_10_00` bit(1) DEFAULT NULL
+  `2016_08_12_00` bit(1) DEFAULT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Last applied sql update to DB';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1519,7 +1519,6 @@ CREATE TABLE `creature_respawn` (
 
 LOCK TABLES `creature_respawn` WRITE;
 /*!40000 ALTER TABLE `creature_respawn` DISABLE KEYS */;
-INSERT INTO `creature_respawn` VALUES (40270,1470675514,571,0);
 /*!40000 ALTER TABLE `creature_respawn` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1598,42 +1597,42 @@ LOCK TABLES `gameobject_respawn` WRITE;
 UNLOCK TABLES;
 
 --
--- Table structure for table `gm_subsurveys`
+-- Table structure for table `gm_subsurvey`
 --
 
-DROP TABLE IF EXISTS `gm_subsurveys`;
+DROP TABLE IF EXISTS `gm_subsurvey`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `gm_subsurveys` (
+CREATE TABLE `gm_subsurvey` (
   `surveyId` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `subsurveyId` int(10) unsigned NOT NULL DEFAULT '0',
-  `rank` int(10) unsigned NOT NULL DEFAULT '0',
-  `comment` text NOT NULL,
-  PRIMARY KEY (`surveyId`,`subsurveyId`)
+  `questionId` int(10) unsigned NOT NULL DEFAULT '0',
+  `answer` int(10) unsigned NOT NULL DEFAULT '0',
+  `answerComment` text NOT NULL,
+  PRIMARY KEY (`surveyId`,`questionId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Player System';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `gm_subsurveys`
+-- Dumping data for table `gm_subsurvey`
 --
 
-LOCK TABLES `gm_subsurveys` WRITE;
-/*!40000 ALTER TABLE `gm_subsurveys` DISABLE KEYS */;
-/*!40000 ALTER TABLE `gm_subsurveys` ENABLE KEYS */;
+LOCK TABLES `gm_subsurvey` WRITE;
+/*!40000 ALTER TABLE `gm_subsurvey` DISABLE KEYS */;
+/*!40000 ALTER TABLE `gm_subsurvey` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table `gm_surveys`
+-- Table structure for table `gm_survey`
 --
 
-DROP TABLE IF EXISTS `gm_surveys`;
+DROP TABLE IF EXISTS `gm_survey`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `gm_surveys` (
+CREATE TABLE `gm_survey` (
   `surveyId` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `guid` int(10) unsigned NOT NULL DEFAULT '0',
   `mainSurvey` int(10) unsigned NOT NULL DEFAULT '0',
-  `overallComment` longtext NOT NULL,
+  `comment` longtext NOT NULL,
   `createTime` int(10) unsigned NOT NULL DEFAULT '0',
   `maxMMR` smallint(5) NOT NULL,
   PRIMARY KEY (`surveyId`)
@@ -1641,12 +1640,12 @@ CREATE TABLE `gm_surveys` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `gm_surveys`
+-- Dumping data for table `gm_survey`
 --
 
-LOCK TABLES `gm_surveys` WRITE;
-/*!40000 ALTER TABLE `gm_surveys` DISABLE KEYS */;
-/*!40000 ALTER TABLE `gm_surveys` ENABLE KEYS */;
+LOCK TABLES `gm_survey` WRITE;
+/*!40000 ALTER TABLE `gm_survey` DISABLE KEYS */;
+/*!40000 ALTER TABLE `gm_survey` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -1739,7 +1738,7 @@ CREATE TABLE `groups` (
   `icon8` int(10) unsigned NOT NULL,
   `groupType` tinyint(3) unsigned NOT NULL,
   `difficulty` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `raiddifficulty` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `raidDifficulty` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `masterLooterGuid` int(10) unsigned NOT NULL,
   PRIMARY KEY (`guid`),
   KEY `leaderGuid` (`leaderGuid`)
@@ -2069,7 +2068,7 @@ CREATE TABLE `instance_reset` (
 
 LOCK TABLES `instance_reset` WRITE;
 /*!40000 ALTER TABLE `instance_reset` DISABLE KEYS */;
-INSERT INTO `instance_reset` VALUES (249,0,1471060800),(249,1,1471060800),(269,1,1470715200),(309,0,1470715200),(409,0,1471060800),(469,0,1471060800),(509,0,1470715200),(531,0,1471060800),(532,0,1471060800),(533,0,1471060800),(533,1,1471060800),(534,0,1471060800),(540,1,1470715200),(542,1,1470715200),(543,1,1470715200),(544,0,1471060800),(545,1,1470715200),(546,1,1470715200),(547,1,1470715200),(548,0,1471060800),(550,0,1471060800),(552,1,1470715200),(553,1,1470715200),(554,1,1470715200),(555,1,1470715200),(556,1,1470715200),(557,1,1470715200),(558,1,1470715200),(560,1,1470715200),(564,0,1471060800),(565,0,1471060800),(568,0,1470715200),(574,1,1470715200),(575,1,1470715200),(576,1,1470715200),(578,1,1470715200),(580,0,1471060800),(585,1,1470715200),(595,1,1470715200),(598,1,1470715200),(599,1,1470715200),(600,1,1470715200),(601,1,1470715200),(602,1,1470715200),(603,0,1471060800),(603,1,1471060800),(604,1,1470715200),(608,1,1470715200),(615,0,1471060800),(615,1,1471060800),(616,0,1471060800),(616,1,1471060800),(619,1,1470715200),(624,0,1471060800),(624,1,1471060800),(631,0,1471060800),(631,1,1471060800),(631,2,1471060800),(631,3,1471060800),(632,1,1470715200),(649,0,1471060800),(649,1,1471060800),(649,2,1471060800),(649,3,1471060800),(650,1,1470715200),(658,1,1470715200),(668,1,1470715200),(724,0,1471060800),(724,1,1471060800),(724,2,1471060800),(724,3,1471060800);
+INSERT INTO `instance_reset` VALUES (249,0,1471060800),(249,1,1471060800),(269,1,1471060800),(309,0,1471233600),(409,0,1471060800),(469,0,1471060800),(509,0,1471233600),(531,0,1471060800),(532,0,1471060800),(533,0,1471060800),(533,1,1471060800),(534,0,1471060800),(540,1,1471060800),(542,1,1471060800),(543,1,1471060800),(544,0,1471060800),(545,1,1471060800),(546,1,1471060800),(547,1,1471060800),(548,0,1471060800),(550,0,1471060800),(552,1,1471060800),(553,1,1471060800),(554,1,1471060800),(555,1,1471060800),(556,1,1471060800),(557,1,1471060800),(558,1,1471060800),(560,1,1471060800),(564,0,1471060800),(565,0,1471060800),(568,0,1471233600),(574,1,1471060800),(575,1,1471060800),(576,1,1471060800),(578,1,1471060800),(580,0,1471060800),(585,1,1471060800),(595,1,1471060800),(598,1,1471060800),(599,1,1471060800),(600,1,1471060800),(601,1,1471060800),(602,1,1471060800),(603,0,1471060800),(603,1,1471060800),(604,1,1471060800),(608,1,1471060800),(615,0,1471060800),(615,1,1471060800),(616,0,1471060800),(616,1,1471060800),(619,1,1471060800),(624,0,1471060800),(624,1,1471060800),(631,0,1471060800),(631,1,1471060800),(631,2,1471060800),(631,3,1471060800),(632,1,1471060800),(649,0,1471060800),(649,1,1471060800),(649,2,1471060800),(649,3,1471060800),(650,1,1471060800),(658,1,1471060800),(668,1,1471060800),(724,0,1471060800),(724,1,1471060800),(724,2,1471060800),(724,3,1471060800);
 /*!40000 ALTER TABLE `instance_reset` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -2427,21 +2426,21 @@ DROP TABLE IF EXISTS `pet_aura`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `pet_aura` (
   `guid` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Global Unique Identifier',
-  `caster_guid` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT 'Full Global Unique Identifier',
+  `casterGuid` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT 'Full Global Unique Identifier',
   `spell` mediumint(8) unsigned NOT NULL DEFAULT '0',
-  `effect_mask` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `recalculate_mask` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `stackcount` tinyint(3) unsigned NOT NULL DEFAULT '1',
+  `effectMask` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `recalculateMask` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `stackCount` tinyint(3) unsigned NOT NULL DEFAULT '1',
   `amount0` mediumint(8) NOT NULL,
   `amount1` mediumint(8) NOT NULL,
   `amount2` mediumint(8) NOT NULL,
   `base_amount0` mediumint(8) NOT NULL,
   `base_amount1` mediumint(8) NOT NULL,
   `base_amount2` mediumint(8) NOT NULL,
-  `maxduration` int(11) NOT NULL DEFAULT '0',
-  `remaintime` int(11) NOT NULL DEFAULT '0',
-  `remaincharges` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  PRIMARY KEY (`guid`,`spell`,`effect_mask`)
+  `maxDuration` int(11) NOT NULL DEFAULT '0',
+  `remainTime` int(11) NOT NULL DEFAULT '0',
+  `remainCharges` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`guid`,`spell`,`effectMask`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Pet System';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -2576,7 +2575,7 @@ CREATE TABLE `pool_quest_save` (
 
 LOCK TABLES `pool_quest_save` WRITE;
 /*!40000 ALTER TABLE `pool_quest_save` DISABLE KEYS */;
-INSERT INTO `pool_quest_save` VALUES (348,24635),(349,14102),(350,13889),(351,13914),(352,11379),(353,11666),(354,13425),(356,11370),(357,11500),(358,14074),(359,14112),(360,14144),(361,14141),(362,12760),(363,14108),(380,12737),(381,12734),(382,12761),(384,13191),(385,13153),(386,12563),(5662,13673),(5663,13764),(5664,13770),(5665,13774),(5666,13780),(5667,13783),(5668,13669),(5669,13616),(5670,13743),(5671,13748),(5672,13757),(5673,13753),(5674,13103),(5675,13116),(5676,13836),(5677,12962),(5678,24586);
+INSERT INTO `pool_quest_save` VALUES (348,24629),(349,14104),(350,13905),(351,13916),(352,11377),(353,11669),(354,13423),(356,11363),(357,11385),(358,14080),(359,14076),(360,14136),(361,14092),(362,12759),(363,14107),(380,12736),(381,12741),(382,12762),(384,13192),(385,13154),(386,12587),(5662,13675),(5663,13762),(5664,13769),(5665,13773),(5666,13778),(5667,13784),(5668,13670),(5669,13603),(5670,13741),(5671,13746),(5672,13759),(5673,13752),(5674,13107),(5675,13114),(5676,13832),(5677,12961),(5678,24581);
 /*!40000 ALTER TABLE `pool_quest_save` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -2733,7 +2732,7 @@ CREATE TABLE `worldstates` (
 
 LOCK TABLES `worldstates` WRITE;
 /*!40000 ALTER TABLE `worldstates` DISABLE KEYS */;
-INSERT INTO `worldstates` VALUES (3781,9000000,NULL),(3801,0,NULL),(3802,1,NULL),(20001,1454691600,NULL),(20002,1470888000,NULL),(20003,1470715200,NULL),(20005,1470715200,NULL),(20006,1470715200,NULL),(20007,1472702400,NULL);
+INSERT INTO `worldstates` VALUES (3781,9000000,NULL),(3801,0,NULL),(3802,1,NULL),(20001,1454691600,NULL),(20002,1471492800,NULL),(20003,1471060800,NULL),(20005,1471060800,NULL),(20006,1471060800,NULL),(20007,1472702400,NULL);
 /*!40000 ALTER TABLE `worldstates` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -2746,4 +2745,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2016-08-08 19:00:21
+-- Dump completed on 2016-08-12 11:33:43
