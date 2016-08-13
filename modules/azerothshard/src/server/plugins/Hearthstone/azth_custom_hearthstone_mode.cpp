@@ -12,7 +12,18 @@
 #include "GossipDef.h"
 #include "Item.h"
 
+// struct and vector to store the data from hearthstone_achievement_data
+struct HearthstoneAchievement
+{
+    uint32 data0;
+    uint32 data1;
+    uint32 creature;
+    uint32 type;
+};
 
+std::vector<HearthstoneAchievement> hsAchievementTable;
+// end
+ 
 #define GOSSIP_ITEM_GIVE_PVE_QUEST      "Vorrei ricevere la mia missione PVE giornaliera."
 #define GOSSIP_ITEM_GIVE_PVP_QUEST      "Vorrei ricevere la mia missione PVP giornaliera."
 #define GOSSIP_ITEM_GIVE_EXTRA_QUEST    "Vorrei una missione extra!"
@@ -637,39 +648,57 @@ void sendQuestCredit(Player *player, AchievementCriteriaEntry const* criteria)
     if (!isInArray(criteria->requiredType))
         return;
 
-    std::string part1 = "SELECT data0, data1, creature FROM hearthstone_criteria_credits WHERE type = ";
-    std::string part2 = " LIMIT 0, 5000; ";
-    char type[10];
-    snprintf(type, 10, "%d", criteria->requiredType);
-    std::string temp = part1 + type + part2;
-    const char *query = temp.c_str();
+    uint32 achievementType = criteria->requiredType;
 
-    QueryResult result = ExtraDatabase.Query(query);
-
-    if (result.null())
-        entry = 0;
-    else
+    // iterate through the loaded achievemements available
+    for (std::vector<HearthstoneAchievement>::iterator itr = hsAchievementTable.begin(); itr != hsAchievementTable.end(); itr++)
     {
-        do
-        {
-            Field* fields = result->Fetch();
-            uint32 data0 = fields[0].GetUInt32();
-            uint32 data1 = fields[1].GetUInt32();
-            uint32 creature = fields[2].GetUInt32();
-
-            if ((data0 == returnData0(criteria)) || (data1 == returnData1(criteria)))
+        if((*itr).type == achievementType) // match the type
+            if (((*itr).data0 == returnData0(criteria)) || ((*itr).data1 == returnData1(criteria))) // match criteria
             {
-                entry = creature;
+                entry = (*itr).creature; // set credit
                 break;
             }
-
-        } while (result->NextRow());
     }
 
-
     if (entry)
-        player->azthPlayer->ForceKilledMonsterCredit(entry, NULL);
+        player->azthPlayer->ForceKilledMonsterCredit(entry, NULL); // send credit
 }
+
+class azth_hearthstone_world : public WorldScript
+{
+public:
+    azth_hearthstone_world() : WorldScript("azth_hearthstone_world") { }
+
+    void OnAfterConfigLoad(bool reload) override
+    {
+        // initialize count and array
+        uint32 count = 0;
+        hsAchievementTable.clear();
+
+        // run query
+        QueryResult hsAchiResult = ExtraDatabase.PQuery("SELECT data0, data1, creature, type FROM hearthstone_criteria_credits");
+
+        // store result in vector of hs achievement struct
+        if (hsAchiResult)
+        {
+            do
+            {
+                HearthstoneAchievement ha = {};
+                ha.data0 = (*hsAchiResult)[0].GetUInt32();
+                ha.data1 = (*hsAchiResult)[1].GetUInt32();
+                ha.creature = (*hsAchiResult)[2].GetUInt32();
+                ha.type = (*hsAchiResult)[3].GetUInt32();
+
+                hsAchievementTable.push_back(ha); // push the newly created element in the list
+                count++;
+            } while (hsAchiResult->NextRow());
+        }
+
+        // show log of loaded achievements at startup
+        sLog->outError("Hearthstone Mode: loaded %u achievement definitions", count);
+    }
+};
 
 void AddSC_hearthstone()
 {
@@ -678,4 +707,5 @@ void AddSC_hearthstone()
 	new item_azth_hearthstone_loot_sack();
 	new azth_main_morph();
 	new azth_get_morph();
+    new azth_hearthstone_world();
 }
