@@ -1,0 +1,62 @@
+#!/bin/bash
+#
+# * Copyright (C) 2007 - 2015 Hyperweb2 All rights reserved.
+# * GNU General Public License version 3; see www.hyperweb2.com/terms/
+#
+# This file contains login/password information for accessing the MySQL database
+# and is used by all the mysql_* scripts.
+#
+
+#
+#	MYSQL
+#
+
+# change these lines with your mysql config
+MYSQL_DB=test
+MYSQL_USER=usr
+MYSQL_PASS=pwd
+MYSQL_HOST=localhost
+#MYSQL_SOCK=/var/lib/mysql/mysql.sock
+
+#
+#	File Options
+#
+
+# path of directory where extract separated tables ( without end slash )
+TPATH=./tables
+
+# (boolean) clean directory before dump, in this way non-existant db tables will be deleted
+CLEANFOLDER=1
+
+# path of file to extract database full dump
+FPATH=./full/full.sql
+
+# (boolean) switch to enable(1)/disable(0) the dump/import of full db file
+# ( you can do it manually using command parameters )
+FULL=0
+
+# (boolean) set 1 to enable --tab option for mysqldump and import data from it
+# it's very fast import/export process but doesn't utilize the insert query
+# NOTE: full db continue to be dumped with normal sql format
+# NOTE2: if you have problem with permissions ( mysql errorcode:13) mostly in linux
+# you should enable CHMODE config and disable/edit
+# some protections such as AppArmor in Ubuntu or SELinux in Fedora..
+
+TEXTDUMPS=1
+
+# (boolean) allow to change "TPATH" folder permissions to enable mysql server writing
+
+CHMODE=0
+
+
+#
+# TOOLS OPTIONS
+#
+
+#number of threads you want to use in TEXT import mode ( you can safely set it to your number of processor increasing process speed )
+THREADS=1
+
+IMPORTOPTS_TEXT="--use-threads=$THREADS --local --compress --delete --lock-tables"
+
+DUMPOPTS="--skip-comments --skip-set-charset --extended-insert --order-by-primary --single-transaction --quick"
+
