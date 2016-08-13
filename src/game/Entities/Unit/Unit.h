@@ -1457,8 +1457,8 @@ class Unit : public WorldObject
         uint8 getLevel() const { return uint8(GetUInt32Value(UNIT_FIELD_LEVEL)); }
         uint8 getLevelForTarget(WorldObject const* /*target*/) const { return getLevel(); }
         void SetLevel(uint8 lvl, bool showLevelChange = true);
-        uint8 getRace() const { return GetByteValue(UNIT_FIELD_BYTES_0, 0); }
-        uint32 getRaceMask() const { return 1 << (getRace()-1); }
+        uint8 getRace(bool original = false) const;
+        uint32 getRaceMask() const { return 1 << (getRace(true)-1); }
         uint8 getClass() const { return GetByteValue(UNIT_FIELD_BYTES_0, 1); }
         uint32 getClassMask() const { return 1 << (getClass()-1); }
         uint8 getGender() const { return GetByteValue(UNIT_FIELD_BYTES_0, 2); }
@@ -2439,6 +2439,8 @@ class Unit : public WorldObject
         void _DeleteRemovedAuras();
 
         void _UpdateAutoRepeatSpell();
+
+        uint8 m_realRace;
 
         bool m_AutoRepeatFirstCast;
 

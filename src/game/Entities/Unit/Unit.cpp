@@ -146,12 +146,12 @@ _hitMask(hitMask), _spell(spell), _damageInfo(damageInfo), _healInfo(healInfo), 
 #ifdef _MSC_VER
 #pragma warning(disable:4355)
 #endif
-Unit::Unit(bool isWorldObject): WorldObject(isWorldObject),
+Unit::Unit(bool isWorldObject) : WorldObject(isWorldObject),
 m_movedByPlayer(NULL), m_lastSanctuaryTime(0), IsAIEnabled(false), NeedChangeAI(false),
 m_ControlledByPlayer(false), m_CreatedByPlayer(false), movespline(new Movement::MoveSpline()), i_AI(NULL),
 i_disabledAI(NULL), m_procDeep(0), m_removedAurasCount(0), i_motionMaster(new MotionMaster(this)), m_regenTimer(0),
 m_ThreatManager(this), m_vehicle(NULL), m_vehicleKit(NULL), m_unitTypeMask(UNIT_MASK_NONE),
-m_HostileRefManager(this), m_AutoRepeatFirstCast(false)
+m_HostileRefManager(this), m_AutoRepeatFirstCast(false), m_realRace(0)
 {
 #ifdef _MSC_VER
 #pragma warning(default:4355)
@@ -19260,4 +19260,12 @@ void Unit::BuildCooldownPacket(WorldPacket& data, uint8 flags, PacketCooldowns c
         data << uint32(itr->first);
         data << uint32(itr->second);
     }
+}
+
+uint8 Unit::getRace(bool original) const
+{
+    if (GetTypeId() == TYPEID_PLAYER && original)
+        return m_realRace;
+    
+    return GetByteValue(UNIT_FIELD_BYTES_0, 0);
 }

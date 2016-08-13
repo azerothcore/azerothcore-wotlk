@@ -1015,6 +1015,8 @@ bool Player::Create(uint32 guidlow, CharacterCreateInfo* createInfo)
 
     SetObjectScale(1.0f);
 
+    m_realRace = createInfo->Race; // set real race flag
+
     setFactionForRace(createInfo->Race);
 
     if (!IsValidGender(createInfo->Gender))
@@ -1276,7 +1278,7 @@ bool Player::StoreNewItemInBestSlots(uint32 titem_id, uint32 titem_amount)
     }
 
     // item can't be added
-    sLog->outError("STORAGE: Can't equip or store initial item %u for race %u class %u, error msg = %u", titem_id, getRace(), getClass(), msg);
+    sLog->outError("STORAGE: Can't equip or store initial item %u for race %u class %u, error msg = %u", titem_id, getRace(true), getClass(), msg);
     return false;
 }
 
@@ -3022,7 +3024,7 @@ void Player::SetGameMaster(bool on)
         SetPhaseMask(newPhase, false);
 
         m_ExtraFlags &= ~ PLAYER_EXTRA_GM_ON;
-        setFactionForRace(getRace());
+        setFactionForRace(getRace(true));
         RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_GM);
         RemoveFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_ALLOW_CHEAT_SPELLS);
 
@@ -3207,7 +3209,7 @@ void Player::GiveLevel(uint8 level)
         guild->UpdateMemberData(this, GUILD_MEMBER_DATA_LEVEL, level);
 
     PlayerLevelInfo info;
-    sObjectMgr->GetPlayerLevelInfo(getRace(), getClass(), level, &info);
+    sObjectMgr->GetPlayerLevelInfo(getRace(true), getClass(), level, &info);
 
     PlayerClassLevelInfo classInfo;
     sObjectMgr->GetPlayerClassLevelInfo(getClass(), level, &classInfo);
@@ -3321,7 +3323,7 @@ void Player::InitStatsForLevel(bool reapplyMods)
     sObjectMgr->GetPlayerClassLevelInfo(getClass(), getLevel(), &classInfo);
 
     PlayerLevelInfo info;
-    sObjectMgr->GetPlayerLevelInfo(getRace(), getClass(), getLevel(), &info);
+    sObjectMgr->GetPlayerLevelInfo(getRace(true), getClass(), getLevel(), &info);
 
     SetUInt32Value(PLAYER_FIELD_MAX_LEVEL, sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL));
     SetUInt32Value(PLAYER_NEXT_LEVEL_XP, sObjectMgr->GetXPForLevel(getLevel()));
@@ -5097,7 +5099,7 @@ void Player::BuildPlayerRepop()
     data.append(GetPackGUID());
     GetSession()->SendPacket(&data);
 
-    if (getRace() == RACE_NIGHTELF)
+    if (getRace(true) == RACE_NIGHTELF)
         CastSpell(this, 20584, true);
     CastSpell(this, 8326, true);
 
@@ -17384,6 +17386,8 @@ bool Player::LoadFromDB(uint32 guid, SQLQueryHolder *holder)
     bytes0 |= Gender << 16;                                 // gender
     SetUInt32Value(UNIT_FIELD_BYTES_0, bytes0);
 
+    m_realRace = fields[3].GetUInt8(); // set real race
+
     SetUInt32Value(UNIT_FIELD_LEVEL, fields[6].GetUInt8());
     SetUInt32Value(PLAYER_XP, fields[7].GetUInt32());
 
@@ -17432,7 +17436,7 @@ bool Player::LoadFromDB(uint32 guid, SQLQueryHolder *holder)
 
     //Need to call it to initialize m_team (m_team can be calculated from race)
     //Other way is to saves m_team into characters table.
-    setFactionForRace(getRace());
+    setFactionForRace(getRace(true));
 
     // pussywizard: create empty instance bind containers if necessary
     sInstanceSaveMgr->PlayerCreateBoundInstancesMaps(guid);
@@ -17655,7 +17659,7 @@ bool Player::LoadFromDB(uint32 guid, SQLQueryHolder *holder)
         map = sMapMgr->CreateMap(mapId, this);
         if (!map)
         {
-            PlayerInfo const* info = sObjectMgr->GetPlayerInfo(getRace(), getClass());
+            PlayerInfo const* info = sObjectMgr->GetPlayerInfo(getRace(true), getClass());
             mapId = info->mapId;
             Relocate(info->positionX, info->positionY, info->positionZ, 0.0f);
             sLog->outError("Player (guidlow %d) have invalid coordinates (X: %f Y: %f Z: %f O: %f). Teleport to default race/class locations.", guid, GetPositionX(), GetPositionY(), GetPositionZ(), GetOrientation());
@@ -19130,7 +19134,7 @@ bool Player::CheckInstanceCount(uint32 instanceId) const
 
 bool Player::_LoadHomeBind(PreparedQueryResult result)
 { 
-    PlayerInfo const* info = sObjectMgr->GetPlayerInfo(getRace(), getClass());
+    PlayerInfo const* info = sObjectMgr->GetPlayerInfo(getRace(true), getClass());
     if (!info)
     {
         sLog->outError("Player (Name %s) has incorrect race/class pair. Can't be loaded.", GetName().c_str());
@@ -21428,7 +21432,7 @@ void Player::InitDataForForm(bool reapplyMods)
 
 void Player::InitDisplayIds()
 { 
-    PlayerInfo const* info = sObjectMgr->GetPlayerInfo(getRace(), getClass());
+    PlayerInfo const* info = sObjectMgr->GetPlayerInfo(getRace(true), getClass());
     if (!info)
     {
         sLog->outError("Player %u has incorrect race/class pair. Can't init display ids.", GetGUIDLow());
@@ -22246,7 +22250,7 @@ void Player::ReportedAfkBy(Player* reporter)
 
 WorldLocation Player::GetStartPosition() const
 { 
-    PlayerInfo const* info = sObjectMgr->GetPlayerInfo(getRace(), getClass());
+    PlayerInfo const* info = sObjectMgr->GetPlayerInfo(getRace(true), getClass());
     uint32 mapId = info->mapId;
     if (getClass() == CLASS_DEATH_KNIGHT && HasSpell(50977))
         return WorldLocation(0, 2352.0f, -5709.0f, 154.5f, 0.0f);
@@ -22872,7 +22876,7 @@ void Player::resetSpells()
 void Player::learnDefaultSpells()
 { 
     // xinef: learn default race/class spells
-    PlayerInfo const* info = sObjectMgr->GetPlayerInfo(getRace(), getClass());
+    PlayerInfo const* info = sObjectMgr->GetPlayerInfo(getRace(true), getClass());
     for (PlayerCreateInfoSpells::const_iterator itr = info->spell.begin(); itr != info->spell.end(); ++itr)
         _addSpell(*itr, SPEC_MASK_ALL, true);
 }
@@ -25770,7 +25774,7 @@ void Player::_SaveCharacter(bool create, SQLTransaction& trans)
         stmt->setUInt32(index++, GetGUIDLow());
         stmt->setUInt32(index++, GetSession()->GetAccountId());
         stmt->setString(index++, GetName());
-        stmt->setUInt8(index++, getRace());
+        stmt->setUInt8(index++, getRace(true));
         stmt->setUInt8(index++, getClass());
         stmt->setUInt8(index++, getGender());
         stmt->setUInt8(index++, getLevel());
@@ -25875,7 +25879,7 @@ void Player::_SaveCharacter(bool create, SQLTransaction& trans)
         // Update query
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHARACTER);
         stmt->setString(index++, GetName());
-        stmt->setUInt8(index++, getRace());
+        stmt->setUInt8(index++, getRace(true));
         stmt->setUInt8(index++, getClass());
         stmt->setUInt8(index++, getGender());
         stmt->setUInt8(index++, getLevel());
