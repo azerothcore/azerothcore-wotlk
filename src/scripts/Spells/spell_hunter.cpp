@@ -755,6 +755,9 @@ class spell_hun_readiness : public SpellScriptLoader
                         else
                             caster->RemoveSpellCooldown(spellInfo->Id, false);
                     }
+
+                    // force removal of the disarm cooldown
+                    caster->RemoveSpellCooldown(SPELL_HUNTER_CHIMERA_SHOT_SCORPID, false);
                 }
             }
 
