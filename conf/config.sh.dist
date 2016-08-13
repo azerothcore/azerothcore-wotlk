@@ -100,13 +100,34 @@ DB_CHARACTERS_PATHS=(
     $SRCPATH"/data/sql/base/characters"
 )
 
+DB_CHARACTERS_NAME="characters"
+
+DB_CHARACTERS_CONF="MYSQL_USER='root'; \
+                    MYSQL_PASS='root'; \
+                    MYSQL_HOST='localhost';\
+                    "
+
 DB_AUTH_PATHS=(
     $SRCPATH"/data/sql/base/auth/"
 )
 
+DB_AUTH_NAME="auth"
+
+DB_AUTH_CONF="MYSQL_USER='root'; \
+                    MYSQL_PASS='root'; \
+                    MYSQL_HOST='localhost';\
+                    "
+
 DB_WORLD_PATHS=(
     $SRCPATH"/data/sql/base/world/"
 )
+
+DB_WORLD_NAME="world"
+
+DB_WORLD_CONF="MYSQL_USER='root'; \
+                    MYSQL_PASS='root'; \
+                    MYSQL_HOST='localhost';\
+                    "
 
 # UPDATES
 DB_CHARACTERS_UPDATE_PATHS=(
