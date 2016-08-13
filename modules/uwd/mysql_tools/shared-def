@@ -1,0 +1,34 @@
+#!/bin/bash
+#
+# * Copyright (C) 2007 - 2015 Hyperweb2 All rights reserved.
+# * GNU General Public License version 3; see www.hyperweb2.com/terms/
+
+MYSQL="mysql"
+MYSQLIMPORT="mysqlimport"
+MYSQLDUMP="mysqldump"
+DUMPPARSER=$MT_DIR"/bin/dump-parser"
+
+#empty for bash commands
+WIN_BIN=0
+command -v mysql >/dev/null 2>&1 || { WIN_BIN=1; }
+command -v mysqlimport >/dev/null 2>&1 || { WIN_BIN=1; }
+command -v mysqldump >/dev/null 2>&1 || { WIN_BIN=1; }
+
+WIN_BIN=1
+if [ `uname -s` == "Linux" ]; then
+   WIN_BIN=0
+else
+   WIN_BIN=1 
+fi;
+
+if (($WIN_BIN != 0)); then
+	MYSQL=$MT_DIR"/bin/$MYSQL"
+	MYSQLIMPORT=$MT_DIR"/bin/$MYSQLIMPORT"
+	MYSQLDUMP=$MT_DIR"/bin/$MYSQLDUMP"
+fi;
+
+OPTS=
+[ ! -z "$MYSQL_USER" ] && OPTS+=" -u $MYSQL_USER"
+[ ! -z "$MYSQL_PASS" ] && OPTS+=" -p$MYSQL_PASS"
+[ ! -z "$MYSQL_HOST" ] && OPTS+=" -h $MYSQL_HOST"
+[ ! -z "$MYSQL_SOCK" ] && OPTS+=" -S $MYSQL_SOCK"

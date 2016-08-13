@@ -1,0 +1,23 @@
+#!/bin/bash
+#
+# * Copyright (C) 2007 - 2015 Hyperweb2 All rights reserved.
+# * GNU General Public License version 3; see www.hyperweb2.com/terms/
+
+MT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+function main {
+	if [ ! -z "$1" ]; then 
+		if [ "$1" == "dump" ]; then 
+			source $MT_DIR"/mysql-dump" "$3" "$2" "$4" "$5"
+			return
+		elif [ "$1" == "import" ]; then
+			source $MT_DIR"/mysql-import" "$3" "$2" "$4" "$5"
+			return
+		fi
+	else
+		echo "!!no command specified!!"
+	fi
+}
+
+# OPT - Tables - database - full file - config path
+main "$1" "$2" "$3" "$4" "$5"

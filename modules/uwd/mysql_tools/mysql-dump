@@ -1,0 +1,119 @@
+#!/bin/bash
+#
+# * Copyright (C) 2007 - 2015 Hyperweb2 All rights reserved.
+# * GNU General Public License version 3; see www.hyperweb2.com/terms/
+
+echo "starting dump process.."
+# check config from same folder and include only if exists
+CONF_FILE=$MT_DIR"/mysql-config"
+if [ -f "$CONF_FILE" ]; then
+    source "$CONF_FILE"
+fi;
+
+#overwrite configs if file exists and variables are defined
+if [ ! -z "$4" ]; then
+    if [ -e "$4" ]; then
+        source "$4"
+    else # if 4th parameter is not a file, then try to eval
+        eval "$4"
+    fi;
+fi;
+
+source $MT_DIR"/shared-def"
+
+if [ ! -z "$1" ]; then 
+ MYSQL_DB=$1;
+fi
+
+#change group instead mod
+#group=`ls -l tables | awk '{print $4}'`
+#if [ $group != "mysql" ]; then
+#    if (($CHMODE != 0)); then
+#       sudo chgrp -v mysql $TPATH
+#    fi
+#fi
+
+#change permissions for other users
+if [ ! -z $TPATH ]; then
+	if [ ! -d "$TPATH" ]; then
+		#create the path recursively
+		echo "creating dir: $TPATH.."
+		mkdir -p "$TPATH"
+	fi
+	
+	if (($CHMODE != 0)); then
+		echo "changing permissions.."
+		sudo chmod -v o=rwx $TPATH
+	fi
+
+	#clean old tables
+	if (($CLEANFOLDER != 0)); then
+		rm -rvf $TPATH/*
+	fi
+	
+	if [ ! -z "$2" ]; then 
+	#if tables are specified in parameters then..
+		arr=$(echo $2 | tr "," "\n")
+
+		for T in $arr
+		do
+			echo "exporting "$T;
+			if (($TEXTDUMPS != 1)); then
+				FILE="$TPATH/$T.sql"
+				if [ -f $FILE ]; then
+					rm -f $FILE
+				fi
+
+                                if (($PARSEDUMP != 0)); then
+                                    echo "Parsing enabled";
+                                    eval "$MYSQLDUMP$OPTS $DUMPOPTS '$MYSQL_DB' '$T' | $DUMPPARSER > $FILE"
+                                else
+                                    eval "$MYSQLDUMP$OPTS $DUMPOPTS '$MYSQL_DB' '$T' -r $FILE"
+                                fi
+			else
+				echo $(eval "$MYSQLDUMP$OPTS $DUMPOPTS --tab=$TPATH/ '$MYSQL_DB' '$T'")
+			fi
+		done
+		
+	else 
+	#else get all tables from selected db
+			CMD="$MYSQL$OPTS -N -B -e 'show tables from \`$MYSQL_DB\`'"
+			echo "command: "$CMD
+			for T in $(eval $CMD)
+			do 
+				if (($TEXTDUMPS != 1)); then
+					echo "exporting "$T;
+					FILE="$TPATH/$T.sql"
+					if [ -f $FILE ]; then
+						rm -f $FILE
+					fi
+
+                                        if (($PARSEDUMP != 0)); then
+                                            echo "Parsing enabled on file "$FILE;
+                                            eval "$MYSQLDUMP$OPTS $DUMPOPTS '$MYSQL_DB' '$T' | $DUMPPARSER > $FILE"
+                                        else
+                                            eval "$MYSQLDUMP$OPTS $DUMPOPTS '$MYSQL_DB' '$T' -r $FILE"
+                                        fi
+				else
+					echo "exporting "$MYSQL_DB" tables: "$T;
+					echo $(eval "$MYSQLDUMP$OPTS $DUMPOPTS --tab=$TPATH/ '$MYSQL_DB' '$T'")
+				fi
+			done;
+
+	fi
+fi
+
+if [ ! -z "$3" ]; then FULL=$3; fi
+# export full file if option is enabled
+if (($FULL != 0)); then   
+	echo 'exporting FULL '$MYSQL_DB' in single file';
+	rm -f $FPATH
+
+        if (($PARSEDUMP != 0)); then
+            echo "Parsing enabled";
+            eval "$MYSQLDUMP$OPTS $DUMPOPTS '$MYSQL_DB' | $DUMPPARSER > $FPATH"
+        else
+            eval "$MYSQLDUMP$OPTS $DUMPOPTS '$MYSQL_DB' -r $FPATH"
+        fi
+fi
+
