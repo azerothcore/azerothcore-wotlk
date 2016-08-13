@@ -168,6 +168,7 @@ public:
             WorldPacket data(SMSG_GMTICKET_DELETETICKET, 4);
             data << uint32(GMTICKET_RESPONSE_TICKET_DELETED);
             submitter->GetSession()->SendPacket(&data);
+			ChatHandler(submitter->GetSession()).SendSysMessage(LANG_TICKET_CLOSED);
         }
         return true;
     }
@@ -233,25 +234,29 @@ public:
             return true;
         }
 
+		// Check if handler is not assignee in which case return
+		Player* player = handler->GetSession() ? handler->GetSession()->GetPlayer() : NULL;
+
+		if (player && ticket->IsAssignedNotTo(player->GetGUID()))
+		{
+			handler->PSendSysMessage(LANG_COMMAND_TICKETALREADYASSIGNED, ticket->GetId());
+			return true;
+		}
+
         char* response = strtok(NULL, "\n");
         if (response)
-        {
-            // Cannot add response to ticket, assigned to someone else
-            //! Console excluded
-            Player* player = handler->GetSession() ? handler->GetSession()->GetPlayer() : NULL;
-            if (player && ticket->IsAssignedNotTo(player->GetGUID()))
-            {
-                handler->PSendSysMessage(LANG_COMMAND_TICKETALREADYASSIGNED, ticket->GetId());
-                return true;
-            }
             ticket->AppendResponse(response);
-        }
 
-        if (Player* player = ticket->GetPlayer())
-            ticket->SendResponse(player->GetSession());
-
+		if (Player* player = ticket->GetPlayer())
+		{
+			ticket->SendResponse(player->GetSession());
+			ChatHandler(player->GetSession()).SendSysMessage(LANG_TICKET_COMPLETED);
+		}
         Player* gm = handler->GetSession() ? handler->GetSession()->GetPlayer() : NULL;
 
+		std::string msg = ticket->FormatMessageString(*handler, NULL, NULL, NULL, NULL);
+		msg += handler->PGetParseString(LANG_COMMAND_TICKETCOMPLETED, gm ? gm->GetName().c_str() : "Console");
+		handler->SendGlobalGMSysMessage(msg.c_str());
 
         SQLTransaction trans = SQLTransaction(NULL);
         ticket->SetCompleted();
