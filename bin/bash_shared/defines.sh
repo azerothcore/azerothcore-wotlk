@@ -1,7 +1,6 @@
-AZTH_PATH_ROOT=$(readlink -f "$AZTH_PATH_BIN/../")
+AC_PATH_ROOT=$(readlink -f "$AC_PATH_BIN/../")
 
-AZTH_PATH_CONF="$AZTH_PATH_ROOT/conf"
+AC_PATH_CONF="$AC_PATH_ROOT/conf"
 
-AZTH_PATH_MODULES="$AZTH_PATH_ROOT/modules"
+AC_PATH_MODULES="$AC_PATH_ROOT/modules"
 
-AZTH_PATH_CUSTOM=$(readlink -f "$AZTH_PATH_ROOT/../azth_custom")

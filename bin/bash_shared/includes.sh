@@ -1,22 +1,22 @@
-AZTH_PATH_BIN="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../" && pwd )"
+AC_PATH_BIN="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../" && pwd )"
 
-AZTH_PATH_SHARED="$AZTH_PATH_BIN/bash_shared"
+AC_PATH_SHARED="$AC_PATH_BIN/bash_shared"
 
-source "$AZTH_PATH_SHARED/defines.sh"
+source "$AC_PATH_SHARED/defines.sh"
 
-source "$AZTH_PATH_SHARED/functions.sh"
+source "$AC_PATH_SHARED/functions.sh"
 
-source "$AZTH_PATH_CONF/config.sh.dist" # "hack" to avoid missing conf variables
+source "$AC_PATH_CONF/config.sh.dist" # "hack" to avoid missing conf variables
 
-if [ -f "$AZTH_PATH_CONF/config.sh"  ]; then
-    source "$AZTH_PATH_CONF/config.sh" # should overwrite previous
+if [ -f "$AC_PATH_CONF/config.sh"  ]; then
+    source "$AC_PATH_CONF/config.sh" # should overwrite previous
 fi
 
 #
 # Load modules
 #
 
-for entry in "$AZTH_PATH_MODULES/"*/include.sh
+for entry in "$AC_PATH_MODULES/"*/include.sh
 do
     if [ -e $entry ]; then 
         source $entry

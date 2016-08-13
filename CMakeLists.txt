@@ -26,13 +26,15 @@ set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH 1)
 
 # set macro-directory
-set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/src/cmake/macros")
+set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/modules/acore/cmake/macros")
 
 include(CheckCXXSourceRuns)
 include(CheckIncludeFiles)
 
 # some utils for cmake
-include(src/cmake/utils.cmake)
+include(modules/uwd/cmake-utils/utils.cmake)
+
+include(src/cmake/ac_macros.cmake)
 
 # set default buildoptions and print them
 include(conf/config.cmake.dist)
@@ -42,7 +44,7 @@ if(EXISTS "conf/config.cmake")
   include(conf/config.cmake)
 endif()
 
-RUN_HOOK("AFTER_LOAD_CONF")
+CU_RUN_HOOK("AFTER_LOAD_CONF")
 
 # build in Release-mode by default if not explicitly set
 if( NOT CMAKE_BUILD_TYPE )
@@ -59,7 +61,7 @@ include(CheckPlatform)
 
 # basic packagesearching and setup (further support will be needed, this is a preliminary release!)
 set(OPENSSL_EXPECTED_VERSION 1.0.0)
-set(ACE_EXPECTED_VERSION 5.8.3)
+set(ACE_EXPECTED_VERSION 6.0.3)
 
 find_package(PCHSupport)
 find_package(ACE REQUIRED)
@@ -73,9 +75,9 @@ if( UNIX )
   find_package(BZip2)
 endif()
 
-#if(NOT WITHOUT_GIT)
-#  find_package(Git)
-#endif()
+if(NOT WITHOUT_GIT)
+  find_package(Git)
+endif()
 
 # Find revision ID and hash of the sourcetree
 include(src/cmake/genrev.cmake)
@@ -84,7 +86,7 @@ include(src/cmake/genrev.cmake)
 include(src/cmake/showoptions.cmake)
 
 # add modules and dependencies
-AZTH_SUBDIRLIST(sub_DIRS  "${CMAKE_SOURCE_DIR}/modules" FALSE FALSE)
+CU_SUBDIRLIST(sub_DIRS  "${CMAKE_SOURCE_DIR}/modules" FALSE FALSE)
 FOREACH(subdir ${sub_DIRS})
     STRING(REGEX REPLACE "^${CMAKE_SOURCE_DIR}/" "" subdir_rel ${subdir})
     if(EXISTS "${subdir}/CMakeLists.txt")
@@ -93,9 +95,9 @@ FOREACH(subdir ${sub_DIRS})
     endif()
 ENDFOREACH()
 
-RUN_HOOK("BEFORE_SRC_LOAD")
+CU_RUN_HOOK("BEFORE_SRC_LOAD")
 
 # add core sources
 add_subdirectory(src)
 
-RUN_HOOK("AFTER_SRC_LOAD")
+CU_RUN_HOOK("AFTER_SRC_LOAD")
