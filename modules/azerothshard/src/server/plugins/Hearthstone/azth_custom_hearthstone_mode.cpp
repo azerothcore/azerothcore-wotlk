@@ -516,6 +516,161 @@ public:
 	}
 };
 
+int returnData0(AchievementCriteriaEntry const* criteria)
+{
+    int value = -1;
+    switch (criteria->requiredType)
+    {
+    case 0:
+        value = criteria->kill_creature.creatureID;
+    case 1:
+        value = criteria->win_bg.bgMapID;
+    case 8:
+        value = criteria->complete_achievement.linkedAchievement;
+        break;
+    case 30:
+        value = criteria->bg_objective.objectiveId;
+    case 31:
+        value = criteria->honorable_kill_at_area.areaID;
+        break;
+    case 32: // win arena - no use of column 4
+        break;
+    case 33:
+        value = criteria->play_arena.mapID;
+        break;
+    case 37: // win rated arena unsed column 4
+        break;
+    case 38:
+        value = criteria->highest_team_rating.teamtype;
+        break;
+    case 39:
+        // MISSING !!
+        break;
+    case 52:
+        value = criteria->hk_class.classID;
+        break;
+    case 53:
+        value = criteria->hk_race.raceID;
+        break;
+    case 56: // unused
+        break;
+    case 76: // unused
+        break;
+    case 113: //unused
+        break;
+
+    default:
+        value = -1;
+
+    }
+    return value;
+}
+
+int returnData1(AchievementCriteriaEntry const* criteria)
+{
+    int value = -1;
+    switch (criteria->requiredType)
+    {
+    case 0:
+        value = criteria->kill_creature.creatureCount;
+    case 1:
+        value = criteria->win_bg.winCount;
+    case 8: // no column 5
+        break;
+    case 30:
+        value = criteria->bg_objective.completeCount;
+    case 31:
+        value = criteria->honorable_kill_at_area.killCount;
+        break;
+    case 32: // win arena - no use of column 4
+        break;
+    case 33: // unused
+        break;
+    case 37: // win rated arena unsed column 4
+        value = criteria->win_rated_arena.count;
+        break;
+    case 38: //unused
+        break;
+    case 39:
+        // MISSING !!
+        break;
+    case 52:
+        value = criteria->hk_class.count;
+        break;
+    case 53:
+        value = criteria->hk_race.count;
+        break;
+    case 56: 
+        value = criteria->get_killing_blow.killCount;
+        break;
+    case 76: 
+        value = criteria->win_duel.duelCount;
+        break;
+    case 113: 
+        // MISSING !!
+        break;
+
+    default:
+        value = -1;
+
+    }
+    return value;
+}
+
+int SUPPORTED_CRITERIA[] = { 0,1,8,30,31,32,33,37,38,39,52,53,56,76,113 };
+int SUPPORTED_CRITERIA_NUMBER = 15;
+
+bool isInArray(int val){
+    int i;
+    for (i = 0; i < SUPPORTED_CRITERIA_NUMBER; i++) {
+        if (SUPPORTED_CRITERIA[i] == val)
+            return true;
+    }
+    return false;
+}
+
+
+void sendQuestCredit(Player *player, AchievementCriteriaEntry const* criteria)
+{
+    uint32 entry = 0;
+
+    if (!isInArray(criteria->requiredType))
+        return;
+
+    std::string part1 = "SELECT data0, data1, creature FROM hearthstone_criteria_credits WHERE type = ";
+    std::string part2 = " LIMIT 0, 5000; ";
+    char type[10];
+    snprintf(type, 10, "%d", criteria->requiredType);
+    std::string temp = part1 + type + part2;
+    const char *query = temp.c_str();
+
+    QueryResult result = ExtraDatabase.Query(query);
+
+    if (result.null())
+        entry = 0;
+    else
+    {
+        do
+        {
+            Field* fields = result->Fetch();
+            uint32 data0 = fields[0].GetUInt32();
+            uint32 data1 = fields[1].GetUInt32();
+            uint32 creature = fields[2].GetUInt32();
+
+            if ((data0 == returnData0(criteria)) || (data1 == returnData1(criteria)))
+            {
+                entry = creature;
+                break;
+            }
+
+        } while (result->NextRow());
+    }
+
+
+    if (entry)
+        player->azthPlayer->ForceKilledMonsterCredit(entry, NULL);
+}
+
 void AddSC_hearthstone()
 {
 	new npc_han_al();

@@ -11,6 +11,7 @@
 #include "AchievementMgr.h"
 #include "AzthGroupMgr.h"
 #include "AzthPlayer.h"
+#include "azth_custom_hearthstone_mode.cpp"
 
 enum achievementStatsType {
     ACHIEVEMENT_TYPE,
@@ -72,6 +73,9 @@ public:
         AzthPlayer::AzthAchiData& it = player->azthPlayer->m_completed_criteria_map[criteria->ID];
         it.level = player->getLevel();
         it.levelParty = player->azthPlayer->getGroupLevel();
+        
+        // hearthstone mode
+        sendQuestCredit(player, criteria);
     }
 
     // Following 2 functions save our temporary maps inside the db
