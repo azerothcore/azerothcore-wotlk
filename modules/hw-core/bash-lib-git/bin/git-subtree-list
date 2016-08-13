@@ -1,0 +1,7 @@
+#!/bin/bash
+
+CUR_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+source $CUR_DIR"/../src/subtree.sh"
+
+hwc_git_subtree_list

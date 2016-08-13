@@ -15,6 +15,7 @@ modules/*/*
 !modules/uwd/*
 !modules/uwd/cmake-utils/*
 modules/uwd/joiner
+!modules/hw-core/*
 !modules/acore/*
 
 build*/
