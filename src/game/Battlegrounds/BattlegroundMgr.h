@@ -29,8 +29,6 @@
 typedef std::map<uint32, Battleground*> BattlegroundContainer;
 typedef UNORDERED_MAP<uint32, BattlegroundTypeId> BattleMastersMap;
 
-#define WS_ARENA_DISTRIBUTION_TIME 20001 // Custom worldstate
-
 struct CreateBattlegroundData
 {
     BattlegroundTypeId bgTypeId;

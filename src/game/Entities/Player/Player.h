@@ -2116,6 +2116,12 @@ class Player : public Unit, public GridObject<Player>
         void SetHonorPoints(uint32 value);
         void SetArenaPoints(uint32 value);
 
+        // duel health and mana reset methods
+        void SaveHealthBeforeDuel()     { healthBeforeDuel = GetHealth(); }
+        void SaveManaBeforeDuel()       { manaBeforeDuel = GetPower(POWER_MANA); }
+        void RestoreHealthAfterDuel()   { SetHealth(healthBeforeDuel); }
+        void RestoreManaAfterDuel()     { SetPower(POWER_MANA, manaBeforeDuel); }
+
         //End of PvP System
 
         inline SpellCooldowns GetSpellCooldowns() const { return m_spellCooldowns; }
@@ -2940,6 +2946,10 @@ class Player : public Unit, public GridObject<Player>
         InstanceTimeMap _instanceResetTimes;
         uint32 _pendingBindId;
         uint32 _pendingBindTimer;
+
+        // duel health and mana reset attributes
+        uint32 healthBeforeDuel;
+        uint32 manaBeforeDuel;
 };
 
 void AddItemsSetItem(Player*player, Item* item);
