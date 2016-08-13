@@ -13,7 +13,6 @@ if [ -f "./config.sh"  ]; then
     source "./config.sh" # should overwrite previous
 fi
 
-unamestr=`uname`
 if [[ "$unamestr" == 'Darwin' ]]; then
     MD5_CMD="md5"
 else
