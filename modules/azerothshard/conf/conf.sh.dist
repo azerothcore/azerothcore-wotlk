@@ -28,6 +28,11 @@ DB_EXTRA_CUSTOM_PATHS+=(
 	$AZTHSD_PATH_ROOT"/data/sql/db-extra/"
 )
 
+DB_EXTRA_CONF="MYSQL_USER='root'; \
+                    MYSQL_PASS='root'; \
+                    MYSQL_HOST='localhost';\
+                    "
+
 #
 # UPDATES
 #
