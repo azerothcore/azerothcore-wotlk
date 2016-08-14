@@ -9,21 +9,44 @@
 #include "Group.h"
 #include "Map.h"
 #include "Log.h"
+#include "Opcodes.h"
 #include <vector>
 #include <algorithm>
+
+enum FakeMorphs
+{
+    FAKE_F_TAUREN   = 20584,
+    FAKE_M_TAUREN   = 20585,
+    FAKE_M_NELF     = 20318,
+    FAKE_F_DRAENEI  = 20323,
+};
 
 class CrossFaction
 {
     public:
+        // Race Update
+        void SetFakeRaceAndMorph(Player* player);
+        uint8 GetFakeRace(uint64 playerGuid);
+        uint32 GetFakeMorph(uint64 playerGuid);
+        void SetMorph(Player* player, bool value);
+
+        // Team Update
         void LoadConfig(bool reload);
         void UpdatePlayerTeam(Group* group, uint64 guid, bool reset = false);
         void UpdateGroupLeaderMap(uint64 leaderGuid, bool remove = false);
         void UpdateAllGroups();
 
+        // Battleground race player invalidation - retrieval
+        void DoForgetPlayersInBG(Battleground* pBattleGround, Player* player);
+
     private:
         // Group leader guid-race caching
         UNORDERED_MAP<uint64, uint8> LeaderRaceMap; 
-        uint8 GetPlayerRace(uint64 playerGuid);
+        uint8 GetLeaderRace(uint64 playerGuid);
+
+        // Fake race caching
+        UNORDERED_MAP<uint64, uint8> m_FakeRace;
+        UNORDERED_MAP<uint64, uint32> m_FakeMorph;
 
         // Disables system
         typedef std::vector<uint32> CrossFactionDisableList;

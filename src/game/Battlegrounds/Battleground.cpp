@@ -1065,6 +1065,8 @@ void Battleground::BlockMovement(Player* player)
 
 void Battleground::RemovePlayerAtLeave(Player* player)
 {
+    sScriptMgr->OnPlayerRemoveFromBattleground(player, this);
+
     TeamId teamId = player->GetBgTeamId();
 
     // check if the player was a participant of the match, or only entered through gm command
@@ -1250,9 +1252,10 @@ void Battleground::AddPlayer(Player* player)
     // setup BG group membership
     PlayerAddedToBGCheckIfBGIsRunning(player);
     AddOrSetPlayerToCorrectBgGroup(player, teamId);
-
+    
+    sScriptMgr->OnPlayerAddToBattleground(player, this);
     // Log
-    ;//sLog->outDetail("BATTLEGROUND: Player %s joined the battle.", player->GetName().c_str());
+    //sLog->outDetail("BATTLEGROUND: Player %s joined the battle.", player->GetName().c_str());
 }
 
 // this method adds player to his team's bg group, or sets his correct group if player is already in bg group
