@@ -415,6 +415,14 @@ class Battleground
         void IncreaseInvitedCount(TeamId teamId)    { ++m_BgInvitedPlayers[teamId]; }
         uint32 GetInvitedCount(TeamId teamId) const { return m_BgInvitedPlayers[teamId]; }
 
+        //[AZTH] CrossFaction Battleground
+        void SetPlayerJoinPremade(uint64 guid, bool premade) { m_hasPlayerJoinedPremade[guid] = premade; }
+        bool HasPlayerJoinPremade(uint64 guid);
+        void DecreasePremadeCount(TeamId teamId) { if(m_premadeAssigned[teamId] > 0) --m_premadeAssigned[teamId]; }
+        void IncreasePremadeCount(TeamId teamId) { ++m_premadeAssigned[teamId]; }
+        uint32 GetPremadeCount(TeamId teamId) { return m_premadeAssigned[teamId]; }
+        //[/AZTH]
+
         bool HasFreeSlots() const;
         uint32 GetFreeSlotsForTeam(TeamId teamId) const;
         uint32 GetMaxFreeSlots() const;
@@ -732,6 +740,11 @@ class Battleground
         // Invited counters will be changed only when removing already invited player from queue, removing player from battleground and inviting player to BG
         // Invited players counters
         uint32 m_BgInvitedPlayers[BG_TEAMS_COUNT];
+
+        // [AZTH] Crossfaction Battleground
+        UNORDERED_MAP<uint64, bool> m_hasPlayerJoinedPremade;
+        uint32 m_premadeAssigned[BG_TEAMS_COUNT];
+        // [AZTH]
 
         // Raid Group
         Group* m_BgRaids[BG_TEAMS_COUNT];                   // 0 - alliance, 1 - horde

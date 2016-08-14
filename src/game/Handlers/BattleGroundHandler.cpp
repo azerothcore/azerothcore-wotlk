@@ -436,24 +436,25 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket &recvData)
                 TeamId teamId = ginfo.teamId;
 
                 // [AZTH] Random Battleground Randomizer - by Yehonal & Mik1893
-                if (bgQueueTypeId == BATTLEGROUND_QUEUE_RB && bg->isBattleground() && sWorld->getBoolConfig(CONFIG_BATTLEGROUND_RANDOM_CROSSFACTION))
-                {
-                    uint32 allyCount = bg->GetPlayersCountByTeam(TEAM_ALLIANCE);
-                    uint32 hordeCount = bg->GetPlayersCountByTeam(TEAM_HORDE);
-
-                    if (allyCount == hordeCount)
+                if(!bg->HasPlayerJoinPremade(_player->GetGUID())) // Premade players have already defined team and cf settings
+                    if (bgQueueTypeId == BATTLEGROUND_QUEUE_RB && bg->isBattleground() && sWorld->getBoolConfig(CONFIG_BATTLEGROUND_RANDOM_CROSSFACTION))
                     {
-                        if (roll_chance_i(50))
-                            teamId = _player->GetTeamId(true) == TEAM_ALLIANCE ? TEAM_HORDE : TEAM_ALLIANCE;
-                    }
-                    else if (allyCount < hordeCount)
-                        teamId = TEAM_ALLIANCE;
-                    else
-                        teamId = TEAM_HORDE;
+                        uint32 allyCount = bg->GetPlayersCountByTeam(TEAM_ALLIANCE) + bg->GetPremadeCount(TEAM_ALLIANCE);
+                        uint32 hordeCount = bg->GetPlayersCountByTeam(TEAM_HORDE) + bg->GetPremadeCount(TEAM_HORDE);
 
-                    _player->setTeamId(teamId);
-                    _player->setFaction(teamId == TEAM_ALLIANCE ? 1 : 2);
-                }
+                        if (allyCount == hordeCount)
+                        {
+                            if (roll_chance_i(50))
+                                teamId = _player->GetTeamId(true) == TEAM_ALLIANCE ? TEAM_HORDE : TEAM_ALLIANCE;
+                        }
+                        else if (allyCount < hordeCount)
+                            teamId = TEAM_ALLIANCE;
+                        else
+                            teamId = TEAM_HORDE;
+                    }
+
+                _player->setTeamId(teamId);
+                _player->setFaction(teamId == TEAM_ALLIANCE ? 1 : 2);
                 // [/AZTH]
 
                 // remove player from all bg queues
