@@ -12,13 +12,15 @@ It is written in C++ and based on MaNGOS, TrinityCore and SunwellCore.
 
 Our main goal is to create a playable game server, offering a fully working game experience. In short, we focus on the **user experience (UX)**.
 
-Like MaNGOS and TrinityCore did in past, we like to write clean code and doing software development right, but **our main goal is to have fully working features**. In other terms, we always prefer proper solutions to problems, but we may accept "*hackfixes*" (when they do not affect the game stability) if a proper solution is not available yet.
+We also believe in [software modularity](https://en.wikipedia.org/wiki/Modular_programming), because the more the software is modular, and the more it will be easy to be maintained, understood, developed, etc... So we organized the structure of AzerothCore as modular as possible, giving the possibility to [create new modules](https://github.com/azerothcore/azerothcore-wotlk/wiki/Create-a-Module) to add custom features (instead of patching the core).
 
-We also believe in [software modularity](https://en.wikipedia.org/wiki/Modular_programming), because the more the software is modular, and the more it will be easy to be maintained, understood, developed, etc...
+## Learning project
 
-## Work in progress...
+AzerothCore is a learning project.
+If you want to learn how to use C++, SQL, git, etc... you came to the right place! We will gladly to help you: **programming is our passion**.
 
-The project is still under a work in progress phase, so all guidelines may not be available yet and PRs may be not merged immediately, but feel free to starting contributing. We will love to review and accept your PRs.
+If you want to contribute, in [our wiki](https://github.com/azerothcore/azerothcore-wotlk/wiki) you fill find a lot of resources that will guide you. Also you can poke us in [our gitter chat channel](https://gitter.im/azerothcore/azerothcore).
+
 
 ## Authors & Contributors
 

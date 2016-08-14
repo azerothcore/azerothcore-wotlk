@@ -21,8 +21,6 @@ CREATE TABLE `character_homebind`
 
 LOCK TABLES `character_homebind` WRITE;
 /*!40000 ALTER TABLE `character_homebind` DISABLE KEYS */;
-INSERT INTO `character_homebind` VALUES 
-(1,530,3526,-3961.64,-13931.2,100.615);
 /*!40000 ALTER TABLE `character_homebind` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;

@@ -19,8 +19,6 @@ CREATE TABLE `character_achievement_progress`
 
 LOCK TABLES `character_achievement_progress` WRITE;
 /*!40000 ALTER TABLE `character_achievement_progress` DISABLE KEYS */;
-INSERT INTO `character_achievement_progress` VALUES 
-(1,4224,2000000,1468248924);
 /*!40000 ALTER TABLE `character_achievement_progress` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;

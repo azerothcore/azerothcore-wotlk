@@ -20,12 +20,6 @@ CREATE TABLE `mail_items`
 
 LOCK TABLES `mail_items` WRITE;
 /*!40000 ALTER TABLE `mail_items` DISABLE KEYS */;
-INSERT INTO `mail_items` VALUES 
-(1,11,1),
-(2,12,1),
-(3,13,1),
-(4,14,1),
-(5,15,1);
 /*!40000 ALTER TABLE `mail_items` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;

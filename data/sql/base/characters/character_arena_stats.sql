@@ -19,8 +19,6 @@ CREATE TABLE `character_arena_stats`
 
 LOCK TABLES `character_arena_stats` WRITE;
 /*!40000 ALTER TABLE `character_arena_stats` DISABLE KEYS */;
-INSERT INTO `character_arena_stats` VALUES 
-(1,3,1500,1500);
 /*!40000 ALTER TABLE `character_arena_stats` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;

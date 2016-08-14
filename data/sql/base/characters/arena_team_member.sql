@@ -23,8 +23,6 @@ CREATE TABLE `arena_team_member`
 
 LOCK TABLES `arena_team_member` WRITE;
 /*!40000 ALTER TABLE `arena_team_member` DISABLE KEYS */;
-INSERT INTO `arena_team_member` VALUES 
-(1,1,0,0,0,0,0,0);
 /*!40000 ALTER TABLE `arena_team_member` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;

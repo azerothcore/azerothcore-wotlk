@@ -21,12 +21,6 @@ CREATE TABLE `character_inventory`
 
 LOCK TABLES `character_inventory` WRITE;
 /*!40000 ALTER TABLE `character_inventory` DISABLE KEYS */;
-INSERT INTO `character_inventory` VALUES 
-(1,0,3,2),
-(1,0,6,4),
-(1,0,7,6),
-(1,0,15,8),
-(1,0,23,10);
 /*!40000 ALTER TABLE `character_inventory` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
