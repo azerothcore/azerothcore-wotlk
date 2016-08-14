@@ -6331,8 +6331,8 @@ void Player::UpdateCombatSkills(Unit* victim, WeaponAttackType attType, bool def
     uint8 plevel = getLevel();                              // if defense than victim == attacker
     uint8 greylevel = Trinity::XP::GetGrayLevel(plevel);
     uint8 moblevel = victim->getLevelForTarget(this);
-    if (moblevel < greylevel)
-        return;
+    /*if (moblevel < greylevel)
+        return;*/ // Patch 3.0.8 (2009-01-20): You can no longer skill up weapons on mobs that are immune to damage.
 
     if (moblevel > plevel + 5)
         moblevel = plevel + 5;
