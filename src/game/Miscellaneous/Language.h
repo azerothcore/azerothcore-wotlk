@@ -1045,7 +1045,11 @@ enum TrinityStrings
     LANG_BG_AV_H_CAPTAIN_DEAD           = 1331,
     LANG_BG_AV_A_CAPTAIN_DEAD           = 1332,
     LANG_BG_AV_START_TWO_MINUTES        = 1333,
-    // FREE IDS                           1334-1999
+
+    //Player Ticket Strings
+    LANG_TICKET_CLOSED                  = 1334,
+    LANG_TICKET_COMPLETED               = 1335,
+    // FREE IDS                           1336-1999
 
     // Ticket Strings 2000-2030
     LANG_COMMAND_TICKETNEW              = 2000,
