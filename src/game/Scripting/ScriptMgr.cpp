@@ -1263,9 +1263,14 @@ void ScriptMgr::OnPlayerUpdateFaction(Player* player)
     FOREACH_SCRIPT(PlayerScript)->OnUpdateFaction(player);
 }
 
+void ScriptMgr::OnPlayerAddToBattleground(Player* player, Battleground *bg)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnAddToBattleground(player, bg);
+}
+
 void ScriptMgr::OnPlayerRemoveFromBattleground(Player* player, Battleground* bg)
 {
-    FOREACH_SCRIPT(PlayerScript)->OnPlayerRemoveFromBattleground(player, bg);
+    FOREACH_SCRIPT(PlayerScript)->OnRemoveFromBattleground(player, bg);
 }
 
 void ScriptMgr::OnAchievementComplete(Player* player, AchievementEntry const* achievement)

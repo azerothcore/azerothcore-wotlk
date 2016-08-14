@@ -748,8 +748,11 @@ class PlayerScript : public ScriptObject
         // Called when team/faction is set on player
         virtual void OnUpdateFaction(Player* /*player*/) { }
 
+        // Called when a player is added to battleground
+        virtual void OnAddToBattleground(Player* /*player*/, Battleground* /*bg*/) { }
+
         // Called when a player is removed from battleground
-        virtual void OnPlayerRemoveFromBattleground(Player* /*player*/, Battleground* /*bg*/) { }
+        virtual void OnRemoveFromBattleground(Player* /*player*/, Battleground* /*bg*/) { }
 
         // Called when a player complete an achievement
         virtual void OnAchiComplete(Player* /*player*/, AchievementEntry const* /*achievement*/) { }
@@ -1048,6 +1051,7 @@ class ScriptMgr
         void OnCriteriaSave(SQLTransaction& trans, Player* player, uint16 critId, CriteriaProgress criteriaData);
         void OnGossipSelect(Player* player, uint32 menu_id, uint32 sender, uint32 action);
         void OnGossipSelectCode(Player* player, uint32 menu_id, uint32 sender, uint32 action, const char* code);
+        void OnPlayerAddToBattleground(Player* player, Battleground* bg);
 
     public: /* GuildScript */
 
