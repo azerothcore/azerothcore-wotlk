@@ -9,7 +9,7 @@ DROP TABLE IF EXISTS `characters_db_version`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `characters_db_version` 
 (
-  `2016_07_10_00` bit(1) DEFAULT NULL
+  `2016_08_12_00` bit(1) DEFAULT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Last applied sql update to DB';
 /*!40101 SET character_set_client = @saved_cs_client */;
 

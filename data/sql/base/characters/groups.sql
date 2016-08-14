@@ -24,7 +24,7 @@ CREATE TABLE `groups`
   `icon8` int(10) unsigned NOT NULL,
   `groupType` tinyint(3) unsigned NOT NULL,
   `difficulty` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `raiddifficulty` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `raidDifficulty` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `masterLooterGuid` int(10) unsigned NOT NULL,
   `MaxlevelGroup` int(10) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`guid`),
