@@ -1,0 +1,70 @@
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+DROP TABLE IF EXISTS `prospecting_loot_template`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `prospecting_loot_template` 
+(
+  `entry` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `item` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `ChanceOrQuestChance` float NOT NULL DEFAULT '100',
+  `lootmode` smallint(5) unsigned NOT NULL DEFAULT '1',
+  `groupid` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `mincountOrRef` mediumint(8) NOT NULL DEFAULT '1',
+  `maxcount` tinyint(3) unsigned NOT NULL DEFAULT '1',
+  PRIMARY KEY (`entry`,`item`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Loot System';
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+LOCK TABLES `prospecting_loot_template` WRITE;
+/*!40000 ALTER TABLE `prospecting_loot_template` DISABLE KEYS */;
+INSERT INTO `prospecting_loot_template` VALUES 
+(2770,774,0,1,1,1,1),
+(2770,818,0,1,1,1,1),
+(2770,1210,10,1,0,1,1),
+(2771,1,10,1,0,-13000,1),
+(2771,1206,0,1,1,1,2),
+(2771,1210,0,1,1,1,2),
+(2771,1705,0,1,1,1,2),
+(2772,1529,30,1,1,1,2),
+(2772,1705,30,1,1,1,2),
+(2772,3864,30,1,1,1,2),
+(2772,7909,5,1,1,1,1),
+(2772,7910,5,1,1,1,1),
+(3858,3864,30,1,1,1,2),
+(3858,7909,30,1,1,1,2),
+(3858,7910,30,1,1,1,2),
+(3858,12361,2.5,1,1,1,1),
+(3858,12364,2.5,1,1,1,1),
+(3858,12799,2.5,1,1,1,1),
+(3858,12800,2.5,1,1,1,1),
+(10620,1,10,1,1,-13001,1),
+(10620,7910,30,1,1,1,2),
+(10620,12361,15,1,1,1,2),
+(10620,12364,15,1,1,1,2),
+(10620,12799,15,1,1,1,2),
+(10620,12800,15,1,1,1,2),
+(23424,1,100,1,1,-1000,1),
+(23425,1,100,1,1,-13001,1),
+(23425,2,10,1,1,-13002,1),
+(23425,24243,100,1,0,1,1),
+(36909,1,100,1,1,-1001,1),
+(36910,1,20,1,0,-13005,1),
+(36910,2,100,1,1,-1002,1),
+(36910,3,75,1,1,-1003,1),
+(36910,46849,75,1,0,1,1),
+(36912,1,85,1,0,-1003,1),
+(36912,2,100,1,1,-1004,1);
+/*!40000 ALTER TABLE `prospecting_loot_template` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
