@@ -252,17 +252,17 @@ public:
             ticket->SendResponse(player->GetSession());
             ChatHandler(player->GetSession()).SendSysMessage(LANG_TICKET_COMPLETED);
         }
-        Player* gm = handler->GetSession() ? handler->GetSession()->GetPlayer() : NULL;
 
-        std::string msg = ticket->FormatMessageString(*handler, NULL, NULL, NULL, NULL);
-        msg += handler->PGetParseString(LANG_COMMAND_TICKETCOMPLETED, gm ? gm->GetName().c_str() : "Console");
-        handler->SendGlobalGMSysMessage(msg.c_str());
+        Player* gm = handler->GetSession() ? handler->GetSession()->GetPlayer() : NULL;
 
         SQLTransaction trans = SQLTransaction(NULL);
         ticket->SetCompleted();
         ticket->SetResolvedBy(gm ? gm->GetGUID() : -1);
         ticket->SaveToDB(trans);
 
+        std::string msg = ticket->FormatMessageString(*handler, NULL, NULL, NULL, NULL);
+        msg += handler->PGetParseString(LANG_COMMAND_TICKETCOMPLETED, gm ? gm->GetName().c_str() : "Console");
+        handler->SendGlobalGMSysMessage(msg.c_str());
         sTicketMgr->UpdateLastChange();
         return true;
     }
