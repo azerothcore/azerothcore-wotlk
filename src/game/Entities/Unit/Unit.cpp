@@ -163,7 +163,7 @@ m_movedByPlayer(NULL), m_lastSanctuaryTime(0), IsAIEnabled(false), NeedChangeAI(
 m_ControlledByPlayer(false), m_CreatedByPlayer(false), movespline(new Movement::MoveSpline()), i_AI(NULL),
 i_disabledAI(NULL), m_procDeep(0), m_removedAurasCount(0), i_motionMaster(new MotionMaster(this)), m_regenTimer(0),
 m_ThreatManager(this), m_vehicle(NULL), m_vehicleKit(NULL), m_unitTypeMask(UNIT_MASK_NONE),
-m_HostileRefManager(this), m_AutoRepeatFirstCast(false), m_realRace(0)
+m_HostileRefManager(this), m_AutoRepeatFirstCast(false), m_realRace(0), m_race(0)
 {
 #ifdef _MSC_VER
 #pragma warning(default:4355)
@@ -17895,6 +17895,21 @@ uint32 Unit::GetModelForTotem(PlayerTotemType totemType)
             }
             break;
         }
+        default: // One standard for other races.
+        {
+            switch (totemType)
+                {
+                    case SUMMON_TYPE_TOTEM_FIRE:    // fire
+                        return 4589;
+                    case SUMMON_TYPE_TOTEM_EARTH:   // earth
+                        return 4588;
+                    case SUMMON_TYPE_TOTEM_WATER:   // water
+                        return 4587;
+                    case SUMMON_TYPE_TOTEM_AIR:     // air
+                        return 4590;
+                }
+                break;
+        }
     }
     return 0;
 }
@@ -19302,8 +19317,19 @@ void Unit::BuildCooldownPacket(WorldPacket& data, uint8 flags, PacketCooldowns c
 
 uint8 Unit::getRace(bool original) const
 {
-    if (GetTypeId() == TYPEID_PLAYER && original)
-        return m_realRace;
-    
+    if (GetTypeId() == TYPEID_PLAYER)
+    {
+        if (original)
+            return m_realRace;
+        else
+            return m_race;
+    }
+
     return GetByteValue(UNIT_FIELD_BYTES_0, 0);
+}
+
+void Unit::setRace(uint8 race)
+{
+    if (GetTypeId() == TYPEID_PLAYER)
+        m_race = race;
 }

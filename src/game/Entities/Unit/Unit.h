@@ -1470,6 +1470,7 @@ class Unit : public WorldObject
         uint8 getLevelForTarget(WorldObject const* /*target*/) const { return getLevel(); }
         void SetLevel(uint8 lvl, bool showLevelChange = true);
         uint8 getRace(bool original = false) const;
+        void setRace(uint8 race);
         uint32 getRaceMask() const { return 1 << (getRace(true)-1); }
         uint8 getClass() const { return GetByteValue(UNIT_FIELD_BYTES_0, 1); }
         uint32 getClassMask() const { return 1 << (getClass()-1); }
@@ -2447,6 +2448,7 @@ class Unit : public WorldObject
         void _UpdateAutoRepeatSpell();
 
         uint8 m_realRace;
+        uint8 m_race;
 
         bool m_AutoRepeatFirstCast;
 
