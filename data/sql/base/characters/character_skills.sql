@@ -19,23 +19,6 @@ CREATE TABLE `character_skills`
 
 LOCK TABLES `character_skills` WRITE;
 /*!40000 ALTER TABLE `character_skills` DISABLE KEYS */;
-INSERT INTO `character_skills` VALUES 
-(1,26,1,1),
-(1,43,1,400),
-(1,44,1,400),
-(1,54,1,400),
-(1,55,1,400),
-(1,95,1,400),
-(1,98,300,300),
-(1,160,1,400),
-(1,162,1,400),
-(1,172,1,400),
-(1,413,1,1),
-(1,414,1,1),
-(1,415,1,1),
-(1,433,1,1),
-(1,759,300,300),
-(1,760,1,1);
 /*!40000 ALTER TABLE `character_skills` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;

@@ -20,8 +20,6 @@ CREATE TABLE `creature_respawn`
 
 LOCK TABLES `creature_respawn` WRITE;
 /*!40000 ALTER TABLE `creature_respawn` DISABLE KEYS */;
-INSERT INTO `creature_respawn` VALUES 
-(40270,1470940402,571,0);
 /*!40000 ALTER TABLE `creature_respawn` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;

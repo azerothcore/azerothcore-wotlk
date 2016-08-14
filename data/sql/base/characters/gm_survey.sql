@@ -4,22 +4,24 @@
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
-DROP TABLE IF EXISTS `custom_transmogrification_sets`;
+DROP TABLE IF EXISTS `gm_survey`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `custom_transmogrification_sets` 
+CREATE TABLE `gm_survey` 
 (
-  `Owner` int(10) unsigned NOT NULL COMMENT 'Player guidlow',
-  `PresetID` tinyint(3) unsigned NOT NULL COMMENT 'Preset identifier',
-  `SetName` text COMMENT 'SetName',
-  `SetData` text COMMENT 'Slot1 Entry1 Slot2 Entry2',
-  PRIMARY KEY (`Owner`,`PresetID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='6_1';
+  `surveyId` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `guid` int(10) unsigned NOT NULL DEFAULT '0',
+  `mainSurvey` int(10) unsigned NOT NULL DEFAULT '0',
+  `comment` longtext NOT NULL,
+  `createTime` int(10) unsigned NOT NULL DEFAULT '0',
+  `maxMMR` smallint(5) NOT NULL,
+  PRIMARY KEY (`surveyId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Player System';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
-LOCK TABLES `custom_transmogrification_sets` WRITE;
-/*!40000 ALTER TABLE `custom_transmogrification_sets` DISABLE KEYS */;
-/*!40000 ALTER TABLE `custom_transmogrification_sets` ENABLE KEYS */;
+LOCK TABLES `gm_survey` WRITE;
+/*!40000 ALTER TABLE `gm_survey` DISABLE KEYS */;
+/*!40000 ALTER TABLE `gm_survey` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 

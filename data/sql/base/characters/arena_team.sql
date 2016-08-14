@@ -30,8 +30,6 @@ CREATE TABLE `arena_team`
 
 LOCK TABLES `arena_team` WRITE;
 /*!40000 ALTER TABLE `arena_team` DISABLE KEYS */;
-INSERT INTO `arena_team` VALUES 
-(1,'Giemme',1,1,0,0,0,0,0,0,0,0,0,0,0);
 /*!40000 ALTER TABLE `arena_team` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
