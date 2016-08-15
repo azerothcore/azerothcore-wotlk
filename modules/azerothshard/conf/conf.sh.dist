@@ -45,4 +45,6 @@ DB_WORLD_UPDATE_PATHS+=(
 	$AZTHSD_PATH_ROOT"/data/sql/updates/world/"
 )
 
+# specify compilation type
+CTYPE=Debug
 
