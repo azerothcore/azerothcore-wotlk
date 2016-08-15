@@ -12,13 +12,13 @@
 #define __WORLDRUNNABLE_H
 
 /// Heartbeat thread for the World
-class WorldRunnable : public ACE_Based::Runnable
+class WorldRunnable : public ACORE::Runnable
 {
     public:
         void run();
 };
 
-class AuctionListingRunnable : public ACE_Based::Runnable
+class AuctionListingRunnable : public ACORE::Runnable
 {
     public:
         void run();

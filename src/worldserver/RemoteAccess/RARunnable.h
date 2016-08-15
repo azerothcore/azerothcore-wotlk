@@ -16,7 +16,7 @@
 
 #include <ace/Reactor.h>
 
-class RARunnable : public ACE_Based::Runnable
+class RARunnable : public ACORE::Runnable
 {
 public:
     RARunnable();

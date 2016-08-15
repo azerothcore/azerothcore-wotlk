@@ -9,7 +9,7 @@
 
 #include "Common.h"
 #include <ace/Singleton.h>
-#include <ace/Atomic_Op.h>
+#include <atomic>
 
 #include "ObjectMgr.h"
 #include "DBCStores.h"
@@ -1083,7 +1083,7 @@ class ScriptMgr
         uint32 _scriptCount;
 
         //atomic op counter for active scripts amount
-        ACE_Atomic_Op<ACE_Thread_Mutex, long> _scheduledScripts;
+        std::atomic_long _scheduledScripts;
 };
 
 template<class TScript>

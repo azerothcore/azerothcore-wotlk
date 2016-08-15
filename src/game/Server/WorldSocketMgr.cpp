@@ -18,7 +18,7 @@
 #include <ace/TP_Reactor.h>
 #include <ace/Dev_Poll_Reactor.h>
 #include <ace/Guard_T.h>
-#include <ace/Atomic_Op.h>
+#include <atomic>
 #include <ace/os_include/arpa/os_inet.h>
 #include <ace/os_include/netinet/os_tcp.h>
 #include <ace/os_include/sys/os_types.h>
@@ -92,7 +92,7 @@ class ReactorRunnable : protected ACE_Task_Base
 
         long Connections()
         {
-            return static_cast<long> (m_Connections.value());
+            return static_cast<long> (m_Connections);
         }
 
         int AddSocket (WorldSocket* sock)
@@ -186,7 +186,7 @@ class ReactorRunnable : protected ACE_Task_Base
         }
 
     private:
-        typedef ACE_Atomic_Op<ACE_SYNCH_MUTEX, long> AtomicInt;
+        typedef std::atomic_long AtomicInt;
         typedef std::set<WorldSocket*> SocketSet;
 
         ACE_Reactor* m_Reactor;

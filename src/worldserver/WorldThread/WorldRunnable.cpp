@@ -51,7 +51,7 @@ void WorldRunnable::run()
         avgDiffTracker.Update(executionTimeDiff > WORLD_SLEEP_CONST ? executionTimeDiff : WORLD_SLEEP_CONST);
 
         if (executionTimeDiff < WORLD_SLEEP_CONST)
-            ACE_Based::Thread::Sleep(WORLD_SLEEP_CONST-executionTimeDiff);
+            ACORE::Thread::Sleep(WORLD_SLEEP_CONST-executionTimeDiff);
 
         #ifdef _WIN32
             if (m_ServiceStatus == 0)
@@ -118,7 +118,7 @@ void AuctionListingRunnable::run()
                     }
             }
         }
-        ACE_Based::Thread::Sleep(1);
+        ACORE::Thread::Sleep(1);
     }
     sLog->outString("Auction House Listing thread exiting without problems.");
 }
