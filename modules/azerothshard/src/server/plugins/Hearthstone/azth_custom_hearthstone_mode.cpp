@@ -1,9 +1,11 @@
-#include "azth_custom_hearthstone_mode.h"
+// Copyright (c) 2016 AzerothCore
+// Author: Gargarensis
+// Refactored by: mik1893 
+// This software is provided 'as-is', without any express or implied
+// warranty.  In no event will the authors be held liable for any damages
+// arising from the use of this software.
 
-#define GOSSIP_ITEM_GIVE_PVE_QUEST      "Vorrei ricevere la mia missione PVE giornaliera."
-#define GOSSIP_ITEM_GIVE_PVP_QUEST      "Vorrei ricevere la mia missione PVP giornaliera."
-#define GOSSIP_ITEM_GIVE_EXTRA_QUEST    "Vorrei una missione extra!"
-#define GOSSIP_ITEM_CHANGE_QUEST		"Vorrei cambiare la mia missione." // unused
+#include "azth_custom_hearthstone_mode.h"
 
 void HearthstoneMode::AzthSendListInventory(uint64 vendorGuid, WorldSession * session, uint32 extendedCostStartValue)
 {
@@ -156,46 +158,46 @@ int HearthstoneMode::returnData0(AchievementCriteriaEntry const* criteria)
     int value = -1;
     switch (criteria->requiredType)
     {
-    case 0:
-        value = criteria->kill_creature.creatureID;
-    case 1:
-        value = criteria->win_bg.bgMapID;
-    case 8:
-        value = criteria->complete_achievement.linkedAchievement;
-        break;
-    case 30:
-        value = criteria->bg_objective.objectiveId;
-    case 31:
-        value = criteria->honorable_kill_at_area.areaID;
-        break;
-    case 32: // win arena - no use of column 4
-        break;
-    case 33:
-        value = criteria->play_arena.mapID;
-        break;
-    case 37: // win rated arena unsed column 4
-        break;
-    case 38:
-        value = criteria->highest_team_rating.teamtype;
-        break;
-    case 39:
-        // MISSING !!
-        break;
-    case 52:
-        value = criteria->hk_class.classID;
-        break;
-    case 53:
-        value = criteria->hk_race.raceID;
-        break;
-    case 56: // unused
-        break;
-    case 76: // unused
-        break;
-    case 113: //unused
-        break;
+        case 0:
+            value = criteria->kill_creature.creatureID;
+        case 1:
+            value = criteria->win_bg.bgMapID;
+        case 8:
+            value = criteria->complete_achievement.linkedAchievement;
+            break;
+        case 30:
+            value = criteria->bg_objective.objectiveId;
+        case 31:
+            value = criteria->honorable_kill_at_area.areaID;
+            break;
+        case 32: // win arena - no use of column 4
+            break;
+        case 33:
+            value = criteria->play_arena.mapID;
+            break;
+        case 37: // win rated arena unsed column 4
+            break;
+        case 38:
+            value = criteria->highest_team_rating.teamtype;
+            break;
+        case 39:
+            // MISSING !!
+            break;
+        case 52:
+            value = criteria->hk_class.classID;
+            break;
+        case 53:
+            value = criteria->hk_race.raceID;
+            break;
+        case 56: // unused
+            break;
+        case 76: // unused
+            break;
+        case 113: //unused
+            break;
 
-    default:
-        value = -1;
+        default:
+            value = -1;
 
     }
     return value;
@@ -206,47 +208,47 @@ int HearthstoneMode::returnData1(AchievementCriteriaEntry const* criteria)
     int value = -1;
     switch (criteria->requiredType)
     {
-    case 0:
-        value = criteria->kill_creature.creatureCount;
-    case 1:
-        value = criteria->win_bg.winCount;
-    case 8: // no column 5
-        break;
-    case 30:
-        value = criteria->bg_objective.completeCount;
-    case 31:
-        value = criteria->honorable_kill_at_area.killCount;
-        break;
-    case 32: // win arena - no use of column 4
-        break;
-    case 33: // unused
-        break;
-    case 37: // win rated arena unsed column 4
-        value = criteria->win_rated_arena.count;
-        break;
-    case 38: //unused
-        break;
-    case 39:
-        // MISSING !!
-        break;
-    case 52:
-        value = criteria->hk_class.count;
-        break;
-    case 53:
-        value = criteria->hk_race.count;
-        break;
-    case 56:
-        value = criteria->get_killing_blow.killCount;
-        break;
-    case 76:
-        value = criteria->win_duel.duelCount;
-        break;
-    case 113:
-        // MISSING !!
-        break;
+        case 0:
+            value = criteria->kill_creature.creatureCount;
+        case 1:
+            value = criteria->win_bg.winCount;
+        case 8: // no column 5
+            break;
+        case 30:
+            value = criteria->bg_objective.completeCount;
+        case 31:
+            value = criteria->honorable_kill_at_area.killCount;
+            break;
+        case 32: // win arena - no use of column 4
+            break;
+        case 33: // unused
+            break;
+        case 37: // win rated arena unsed column 4
+            value = criteria->win_rated_arena.count;
+            break;
+        case 38: //unused
+            break;
+        case 39:
+            // MISSING !!
+            break;
+        case 52:
+            value = criteria->hk_class.count;
+            break;
+        case 53:
+            value = criteria->hk_race.count;
+            break;
+        case 56:
+            value = criteria->get_killing_blow.killCount;
+            break;
+        case 76:
+            value = criteria->win_duel.duelCount;
+            break;
+        case 113:
+            // MISSING !!
+            break;
 
-    default:
-        value = -1;
+        default:
+            value = -1;
 
     }
     return value;
@@ -262,6 +264,13 @@ std::vector<std::string> whispersList =
 "Buona fortuna!",
 "--NAME-- deve morire!"
 };*/
+
+/// ---------------- START OF SCRIPTS ------------------------- ///
+
+#define GOSSIP_ITEM_GIVE_PVE_QUEST      "Vorrei ricevere la mia missione PVE giornaliera."
+#define GOSSIP_ITEM_GIVE_PVP_QUEST      "Vorrei ricevere la mia missione PVP giornaliera."
+#define GOSSIP_ITEM_GIVE_EXTRA_QUEST    "Vorrei una missione extra!"
+#define GOSSIP_ITEM_CHANGE_QUEST		"Vorrei cambiare la mia missione." // unused
 
 class npc_han_al : public CreatureScript
 {
