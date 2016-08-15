@@ -28,20 +28,20 @@ CCOMPILERCXX="/usr/bin/g++"
 # how many thread must be used for compilation ( leave zero to use all available )
 MTHREADS=0
 # enable/disable warnings during compilation
-CWARNINGS=1
+CWARNINGS=OFF
 # enable/disable some debug informations ( it's not a debug compilation )
-CDEBUG=0
+CDEBUG=OFF
 # specify compilation type
 CTYPE=Release
 # compile scripts
-CSCRIPTS=1
+CSCRIPTS=ON
 # compile server
-CSERVERS=1
+CSERVERS=ON
 # compile tools
-CTOOLS=0
+CTOOLS=OFF
 # use precompiled headers ( fatest compilation but not optimized if you change headers often )
-CSCRIPTPCH=1
-CCOREPCH=1
+CSCRIPTPCH=ON
+CCOREPCH=ON
 # you can add your custom definitions here ( -D )
 CCUSTOMOPTIONS=""
 
