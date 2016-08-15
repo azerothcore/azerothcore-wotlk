@@ -2436,8 +2436,9 @@ void ObjectMgr::LoadItemTemplates()
             }
 
         }
-        else
-            sLog->outErrorDb("Item (Entry: %u) does not exist in item.dbc! (not correct id?).", entry);
+        //[AZTH] disabled error mainly for Hearthstone Mode and custom items 
+        //else
+        //    sLog->outErrorDb("Item (Entry: %u) does not exist in item.dbc! (not correct id?).", entry);
 
         if (itemTemplate.Class >= MAX_ITEM_CLASS)
         {
