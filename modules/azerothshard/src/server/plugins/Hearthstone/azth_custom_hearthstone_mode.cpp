@@ -1,45 +1,256 @@
+#include "azth_custom_hearthstone_mode.h"
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
-#include "Player.h"
-#include "WorldSession.h"
-#include "azth_custom_new_vendor.cpp"
-#include "WorldPacket.h"
-#include "Chat.h"
-#include "Spell.h"
-#include "Define.h"
-#include "GossipDef.h"
-#include "Item.h"
-
-// struct and vector to store the data from hearthstone_achievement_data
-struct HearthstoneAchievement
-{
-    uint32 data0;
-    uint32 data1;
-    uint32 creature;
-    uint32 type;
-};
-
-std::vector<HearthstoneAchievement> hsAchievementTable;
-// end
- 
 #define GOSSIP_ITEM_GIVE_PVE_QUEST      "Vorrei ricevere la mia missione PVE giornaliera."
 #define GOSSIP_ITEM_GIVE_PVP_QUEST      "Vorrei ricevere la mia missione PVP giornaliera."
 #define GOSSIP_ITEM_GIVE_EXTRA_QUEST    "Vorrei una missione extra!"
 #define GOSSIP_ITEM_CHANGE_QUEST		"Vorrei cambiare la mia missione." // unused
 
-int BITMASK_PVE = 1;
-int BITMASK_PVP = 2;
-int BITMASK_EXTRA = 4;
+void HearthstoneMode::AzthSendListInventory(uint64 vendorGuid, WorldSession * session, uint32 extendedCostStartValue)
+{
+    ;//sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Sent SMSG_LIST_INVENTORY");
 
+    Creature* vendor = session->GetPlayer()->GetNPCIfCanInteractWith(vendorGuid, UNIT_NPC_FLAG_VENDOR);
+    if (!vendor)
+    {
+        ;//sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: SendListInventory - Unit (GUID: %u) not found or you can not interact with him.", uint32(GUID_LOPART(vendorGuid)));
+        session->GetPlayer()->SendSellError(SELL_ERR_CANT_FIND_VENDOR, NULL, 0, 0);
+        return;
+    }
 
-int PVE_LOWER_RANGE = 100000;
-int PVE_UPPER_RANGE = 100080;
-int PVE_QUEST_NUMBER = 1;
-int MAX_PVE_QUEST_NUMBER = 3;
+    // remove fake death
+    if (session->GetPlayer()->HasUnitState(UNIT_STATE_DIED))
+        session->GetPlayer()->RemoveAurasByType(SPELL_AURA_FEIGN_DEATH);
 
-int PVE_RANGE = PVE_UPPER_RANGE - PVE_LOWER_RANGE;
+    // Stop the npc if moving
+    if (vendor->HasUnitState(UNIT_STATE_MOVING))
+        vendor->StopMoving();
+
+    VendorItemData const* items = vendor->GetVendorItems();
+    if (!items)
+    {
+        WorldPacket data(SMSG_LIST_INVENTORY, 8 + 1 + 1);
+        data << uint64(vendorGuid);
+        data << uint8(0);                                   // count == 0, next will be error code
+        data << uint8(0);                                   // "Vendor has no inventory"
+        session->SendPacket(&data);
+        return;
+    }
+
+    uint8 itemCount = items->GetItemCount();
+    uint8 count = 0;
+
+    WorldPacket data(SMSG_LIST_INVENTORY, 8 + 1 + itemCount * 8 * 4);
+    data << uint64(vendorGuid);
+
+    size_t countPos = data.wpos();
+    data << uint8(count);
+
+    float discountMod = session->GetPlayer()->GetReputationPriceDiscount(vendor);
+
+    for (uint8 slot = 0; slot < itemCount; ++slot)
+    {
+        if (VendorItem const* item = items->GetItem(slot))
+        {
+            if (ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(item->item))
+            {
+                if (!(itemTemplate->AllowableClass & session->GetPlayer()->getClassMask()) && itemTemplate->Bonding == BIND_WHEN_PICKED_UP && !session->GetPlayer()->IsGameMaster())
+                    continue;
+                // Only display items in vendor lists for the team the
+                // player is on. If GM on, display all items.
+                if (!session->GetPlayer()->IsGameMaster() && ((itemTemplate->Flags2 & ITEM_FLAGS_EXTRA_HORDE_ONLY && session->GetPlayer()->GetTeamId() == TEAM_ALLIANCE) || (itemTemplate->Flags2 == ITEM_FLAGS_EXTRA_ALLIANCE_ONLY && session->GetPlayer()->GetTeamId() == TEAM_HORDE)))
+                    continue;
+
+                // Items sold out are not displayed in list
+                uint32 leftInStock = !item->maxcount ? 0xFFFFFFFF : vendor->GetVendorItemCurrentCount(item);
+                if (!session->GetPlayer()->IsGameMaster() && !leftInStock)
+                    continue;
+
+                ConditionList conditions = sConditionMgr->GetConditionsForNpcVendorEvent(vendor->GetEntry(), item->item);
+                if (!sConditionMgr->IsObjectMeetToConditions(session->GetPlayer(), vendor, conditions))
+                {
+                    sLog->outError("SendListInventory: conditions not met for creature entry %u item %u", vendor->GetEntry(), item->item);
+                    continue;
+                }
+
+                // reputation discount
+                uint32 ExtendedToGold = item->ExtendedCost > extendedCostStartValue ? (item->ExtendedCost - extendedCostStartValue) * 10000 : 0;
+                int32 price = item->IsGoldRequired(itemTemplate) ? uint32(floor(itemTemplate->BuyPrice * discountMod)) : ExtendedToGold;
+
+                data << uint32(slot + 1);       // client expects counting to start at 1
+                data << uint32(item->item);
+                data << uint32(itemTemplate->DisplayInfoID);
+                data << int32(leftInStock);
+                data << uint32(price);
+                data << uint32(itemTemplate->MaxDurability);
+                data << uint32(itemTemplate->BuyCount);
+                data << uint32(item->ExtendedCost);
+
+                if (++count >= MAX_VENDOR_ITEMS)
+                    break;
+            }
+        }
+    }
+
+    if (count == 0)
+    {
+        data << uint8(0);
+        session->SendPacket(&data);
+        return;
+    }
+
+    data.put<uint8>(countPos, count);
+    session->SendPacket(&data);
+}
+
+bool HearthstoneMode::isInArray(int val) 
+{
+    int SUPPORTED_CRITERIA[SUPPORTED_CRITERIA_NUMBER] = { 0,1,8,30,31,32,33,37,38,39,52,53,56,76,113 };
+    int i;
+    for (i = 0; i < SUPPORTED_CRITERIA_NUMBER; i++) {
+        if (SUPPORTED_CRITERIA[i] == val)
+            return true;
+    }
+    return false;
+}
+
+void HearthstoneMode::getItems()
+{
+    items[0].clear();
+    items[1].clear();
+    items[2].clear();
+    items[3].clear();
+    items[4].clear();
+    items[5].clear();
+    items[6].clear();
+    items[7].clear();
+    QueryResult result = WorldDatabase.Query("SELECT entry, quality FROM item_template WHERE entry >= 100017 LIMIT 0, 200000");
+    do
+    {
+        Field* fields = result->Fetch();
+        uint32 entry = fields[0].GetUInt32();
+        uint32 quality = fields[1].GetUInt32();
+
+        items[quality].push_back(entry);
+    } while (result->NextRow());
+}
+
+int HearthstoneMode::getQuality()
+{
+    double c = rand_chance();
+    float chance = (float)c;
+    float i = CHANCES[0];
+    int quality = 0;
+
+    while (i < c)
+    {
+        quality = quality + 1;
+        i = i + CHANCES[quality];
+    }
+    if (quality > 7)
+        quality = QUALITY_TO_FILL_PERCENTAGE;
+    return quality;
+}
+
+int HearthstoneMode::returnData0(AchievementCriteriaEntry const* criteria)
+{
+    int value = -1;
+    switch (criteria->requiredType)
+    {
+    case 0:
+        value = criteria->kill_creature.creatureID;
+    case 1:
+        value = criteria->win_bg.bgMapID;
+    case 8:
+        value = criteria->complete_achievement.linkedAchievement;
+        break;
+    case 30:
+        value = criteria->bg_objective.objectiveId;
+    case 31:
+        value = criteria->honorable_kill_at_area.areaID;
+        break;
+    case 32: // win arena - no use of column 4
+        break;
+    case 33:
+        value = criteria->play_arena.mapID;
+        break;
+    case 37: // win rated arena unsed column 4
+        break;
+    case 38:
+        value = criteria->highest_team_rating.teamtype;
+        break;
+    case 39:
+        // MISSING !!
+        break;
+    case 52:
+        value = criteria->hk_class.classID;
+        break;
+    case 53:
+        value = criteria->hk_race.raceID;
+        break;
+    case 56: // unused
+        break;
+    case 76: // unused
+        break;
+    case 113: //unused
+        break;
+
+    default:
+        value = -1;
+
+    }
+    return value;
+}
+
+int HearthstoneMode::returnData1(AchievementCriteriaEntry const* criteria)
+{
+    int value = -1;
+    switch (criteria->requiredType)
+    {
+    case 0:
+        value = criteria->kill_creature.creatureCount;
+    case 1:
+        value = criteria->win_bg.winCount;
+    case 8: // no column 5
+        break;
+    case 30:
+        value = criteria->bg_objective.completeCount;
+    case 31:
+        value = criteria->honorable_kill_at_area.killCount;
+        break;
+    case 32: // win arena - no use of column 4
+        break;
+    case 33: // unused
+        break;
+    case 37: // win rated arena unsed column 4
+        value = criteria->win_rated_arena.count;
+        break;
+    case 38: //unused
+        break;
+    case 39:
+        // MISSING !!
+        break;
+    case 52:
+        value = criteria->hk_class.count;
+        break;
+    case 53:
+        value = criteria->hk_race.count;
+        break;
+    case 56:
+        value = criteria->get_killing_blow.killCount;
+        break;
+    case 76:
+        value = criteria->win_duel.duelCount;
+        break;
+    case 113:
+        // MISSING !!
+        break;
+
+    default:
+        value = -1;
+
+    }
+    return value;
+}
 /*
 int WHISPER_CHANCE = 50;
 
@@ -174,8 +385,7 @@ public:
 		return true;
 	}
 };
-
-int AZTH_REPUTATION_ID = 948;
+ 
 #define GOSSIP_ITEM_SHOW_ACCESS     "Vorrei vedere la tua merce, per favore."
 
 class npc_azth_vendor : public CreatureScript
@@ -188,7 +398,7 @@ public:
 		player->PlayerTalkClass->ClearMenus();
 
 		if (action == GOSSIP_ACTION_TRADE)
-			AzthSendListInventory(creature->GetGUID(), player->GetSession(), 100000);
+			sHearthstoneMode->AzthSendListInventory(creature->GetGUID(), player->GetSession(), 100000);
 
 		return true;
 	}
@@ -213,54 +423,6 @@ public:
 	}
 };
 
-std::vector<int> items[8]; // <---- THIS
-
-void getItems()
-{
-	items[0].clear();
-	items[1].clear();
-	items[2].clear();
-	items[3].clear();
-	items[4].clear();
-	items[5].clear();
-	items[6].clear();
-	items[7].clear();
-	QueryResult result = WorldDatabase.Query("SELECT entry, quality FROM item_template WHERE entry >= 100017 LIMIT 0, 200000");
-	do
-	{
-		Field* fields = result->Fetch();
-		uint32 entry = fields[0].GetUInt32();
-		uint32 quality = fields[1].GetUInt32();
-
-		items[quality].push_back(entry);
-	} while (result->NextRow());
-}
-
-float CHANCES[8] = { 10.f, 30.f, 20.f, 15.f, 5.f, 1.f, 0.5f, 1.f };
-int QUALITY_TO_FILL_PERCENTAGE = 1;
-int ONLY_COMMON = 2;
-int NOT_COMMON = 1;
-int EVERYTHING = 2;
-int TIME_TO_RECEIVE_MAIL = 0;
-
-int getQuality()
-{
-	double c = rand_chance();
-	float chance = (float)c;
-	float i = CHANCES[0];
-	int quality = 0;
-
-	while (i < c)
-	{
-		quality = quality + 1;
-		i = i + CHANCES[quality];
-	}
-	if (quality > 7)
-		quality = QUALITY_TO_FILL_PERCENTAGE;
-	return quality;
-}
-
-
 class item_azth_hearthstone_loot_sack : public ItemScript
 {
 public:
@@ -268,7 +430,7 @@ public:
 
 	bool OnUse(Player* player, Item* item, SpellCastTargets const& /*target*/)
 	{
-		getItems();
+		sHearthstoneMode->getItems();
 		SQLTransaction trans = CharacterDatabase.BeginTransaction();
 		int16 deliverDelay = TIME_TO_RECEIVE_MAIL;
 		MailDraft* draft = new MailDraft("Sacca Hearthstone", "");
@@ -281,10 +443,10 @@ public:
 		{
 			//srand(seed);
 			int quality = 0;
-			quality = getQuality();
+			quality = sHearthstoneMode->getQuality();
 			uint32 id = 0;
-			id = rand() % items[quality].size();
-			if (Item* item = Item::CreateItem(items[quality][id], 1, 0))
+			id = rand() % sHearthstoneMode->items[quality].size();
+			if (Item* item = Item::CreateItem(sHearthstoneMode->items[quality][id], 1, 0))
 			{
 				item->SaveToDB(trans);
 				draft->AddItem(item);
@@ -303,9 +465,9 @@ public:
 				quality = 0;
 			}
 			uint32 id;
-			id = rand() % items[quality].size();
+			id = rand() % sHearthstoneMode->items[quality].size();
 
-			if (Item* item = Item::CreateItem(items[quality][id], 1, 0))
+			if (Item* item = Item::CreateItem(sHearthstoneMode->items[quality][id], 1, 0))
 			{
 				item->SaveToDB(trans);
 				draft->AddItem(item);
@@ -319,14 +481,14 @@ public:
 		{
 			//srand(seed + 4);
 			int quality = 0;
-			quality = getQuality();
+			quality = sHearthstoneMode->getQuality();
 			while (quality < 3)
 			{
-				quality = getQuality();
+				quality = sHearthstoneMode->getQuality();
 			}
 			uint32 id;
-			id = rand() % items[quality].size();
-			if (Item* item = Item::CreateItem(items[quality][id], 1, 0))
+			id = rand() % sHearthstoneMode->items[quality].size();
+			if (Item* item = Item::CreateItem(sHearthstoneMode->items[quality][id], 1, 0))
 			{
 				item->SaveToDB(trans);
 				draft->AddItem(item);
@@ -362,7 +524,7 @@ public:
 		std::string part1 = "SELECT entry, name FROM azth_character_morph WHERE guid = ";
 		std::string part2 = " LIMIT 0, 200000; ";
 		char guid[10];
-		snprintf(guid, 10, "%d", player->GetGUID());
+		snprintf(guid, 10, "%I64d", player->GetGUID());
 		std::string temp = part1 + guid + part2;
 		const char *query = temp.c_str();
 
@@ -487,7 +649,7 @@ public:
 		std::string part2 = ");";
 		std::string part3 = ",";
 		char guid[10];
-		snprintf(guid, 10, "%d", player->GetGUID());
+		snprintf(guid, 10, "%I64d", player->GetGUID());
 		char displayid[10];
 		snprintf(displayid, 10, "%d", item->GetMaxStackCount());
 		std::string temp = part1 + guid + part3 + displayid + part2;
@@ -515,7 +677,7 @@ public:
 		std::string part3 = ",";
 		std::string apici = "\"";
 		char guid[10];
-		snprintf(guid, 10, "%d", player->GetGUID());
+		snprintf(guid, 10, "%I64d", player->GetGUID());
 		char displayid[10];
 		snprintf(displayid, 10, "%d", item->GetMaxStackCount());
 		std::string temp = part1 + guid + part3 + displayid + part3 + apici + code + apici + part2;
@@ -527,121 +689,7 @@ public:
 	}
 };
 
-int returnData0(AchievementCriteriaEntry const* criteria)
-{
-    int value = -1;
-    switch (criteria->requiredType)
-    {
-    case 0:
-        value = criteria->kill_creature.creatureID;
-    case 1:
-        value = criteria->win_bg.bgMapID;
-    case 8:
-        value = criteria->complete_achievement.linkedAchievement;
-        break;
-    case 30:
-        value = criteria->bg_objective.objectiveId;
-    case 31:
-        value = criteria->honorable_kill_at_area.areaID;
-        break;
-    case 32: // win arena - no use of column 4
-        break;
-    case 33:
-        value = criteria->play_arena.mapID;
-        break;
-    case 37: // win rated arena unsed column 4
-        break;
-    case 38:
-        value = criteria->highest_team_rating.teamtype;
-        break;
-    case 39:
-        // MISSING !!
-        break;
-    case 52:
-        value = criteria->hk_class.classID;
-        break;
-    case 53:
-        value = criteria->hk_race.raceID;
-        break;
-    case 56: // unused
-        break;
-    case 76: // unused
-        break;
-    case 113: //unused
-        break;
-
-    default:
-        value = -1;
-
-    }
-    return value;
-}
-
-int returnData1(AchievementCriteriaEntry const* criteria)
-{
-    int value = -1;
-    switch (criteria->requiredType)
-    {
-    case 0:
-        value = criteria->kill_creature.creatureCount;
-    case 1:
-        value = criteria->win_bg.winCount;
-    case 8: // no column 5
-        break;
-    case 30:
-        value = criteria->bg_objective.completeCount;
-    case 31:
-        value = criteria->honorable_kill_at_area.killCount;
-        break;
-    case 32: // win arena - no use of column 4
-        break;
-    case 33: // unused
-        break;
-    case 37: // win rated arena unsed column 4
-        value = criteria->win_rated_arena.count;
-        break;
-    case 38: //unused
-        break;
-    case 39:
-        // MISSING !!
-        break;
-    case 52:
-        value = criteria->hk_class.count;
-        break;
-    case 53:
-        value = criteria->hk_race.count;
-        break;
-    case 56: 
-        value = criteria->get_killing_blow.killCount;
-        break;
-    case 76: 
-        value = criteria->win_duel.duelCount;
-        break;
-    case 113: 
-        // MISSING !!
-        break;
-
-    default:
-        value = -1;
-
-    }
-    return value;
-}
-
-int SUPPORTED_CRITERIA[] = { 0,1,8,30,31,32,33,37,38,39,52,53,56,76,113 };
-int SUPPORTED_CRITERIA_NUMBER = 15;
-
-bool isInArray(int val){
-    int i;
-    for (i = 0; i < SUPPORTED_CRITERIA_NUMBER; i++) {
-        if (SUPPORTED_CRITERIA[i] == val)
-            return true;
-    }
-    return false;
-}
-
-
-void sendQuestCredit(Player *player, AchievementCriteriaEntry const* criteria)
+void HearthstoneMode::sendQuestCredit(Player *player, AchievementCriteriaEntry const* criteria)
 {
     uint32 entry = 0;
 
@@ -674,7 +722,7 @@ public:
     {
         // initialize count and array
         uint32 count = 0;
-        hsAchievementTable.clear();
+        sHearthstoneMode->hsAchievementTable.clear();
 
         // run query
         QueryResult hsAchiResult = ExtraDatabase.PQuery("SELECT data0, data1, creature, type FROM hearthstone_criteria_credits");
@@ -690,7 +738,7 @@ public:
                 ha.creature = (*hsAchiResult)[2].GetUInt32();
                 ha.type = (*hsAchiResult)[3].GetUInt32();
 
-                hsAchievementTable.push_back(ha); // push the newly created element in the list
+                sHearthstoneMode->hsAchievementTable.push_back(ha); // push the newly created element in the list
                 count++;
             } while (hsAchiResult->NextRow());
         }
