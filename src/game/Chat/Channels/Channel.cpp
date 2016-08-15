@@ -25,9 +25,9 @@
 #include "AccountMgr.h"
 #include "Player.h"
 
-Channel::Channel(std::string const& name, uint32 channelId, uint32 channelDBId, TeamId teamId, bool announce):
+Channel::Channel(std::string const& name, uint32 channelId, uint32 channelDBId, TeamId teamId, bool announce, bool ownership):
     _announce(announce),
-    _ownership(true),
+    _ownership(ownership),
     _IsSaved(false),
     _flags(0),
     _channelId(channelId),

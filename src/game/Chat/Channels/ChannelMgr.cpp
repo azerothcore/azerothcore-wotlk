@@ -48,7 +48,8 @@ void ChannelMgr::LoadChannels()
     uint32 oldMSTime = getMSTime();
     uint32 count = 0;
 
-    QueryResult result = CharacterDatabase.PQuery("SELECT channelId, name, team, announce, password FROM channels WHERE team = %u ORDER BY channelId ASC", _teamId);
+    //                                                    0          1     2     3         4          5
+    QueryResult result = CharacterDatabase.PQuery("SELECT channelId, name, team, announce, ownership, password FROM channels WHERE team = %u ORDER BY channelId ASC", _teamId);
     if (!result)
     {
         sLog->outString(">> Loaded 0 channels for %s", _teamId == TEAM_ALLIANCE ? "Alliance" : "Horde");
@@ -64,11 +65,11 @@ void ChannelMgr::LoadChannels()
 
         uint32 channelDBId = fields[0].GetUInt32();
         std::string channelName = fields[1].GetString();
-        std::string password = fields[4].GetString();
+        std::string password = fields[5].GetString();
         std::wstring channelWName;
         Utf8toWStr(channelName, channelWName);
 
-        Channel* newChannel = new Channel(channelName, 0, channelDBId, TeamId(fields[2].GetUInt32()), fields[3].GetUInt8());
+        Channel* newChannel = new Channel(channelName, 0, channelDBId, TeamId(fields[2].GetUInt32()), fields[3].GetUInt8(), fields[4].GetUInt8());
         newChannel->SetPassword(password);
         channels[channelWName] = newChannel;
 
