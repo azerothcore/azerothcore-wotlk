@@ -12,7 +12,18 @@
 #include "GossipDef.h"
 #include "Item.h"
 
+// struct and vector to store the data from hearthstone_achievement_data
+struct HearthstoneAchievement
+{
+    uint32 data0;
+    uint32 data1;
+    uint32 creature;
+    uint32 type;
+};
 
+std::vector<HearthstoneAchievement> hsAchievementTable;
+// end
+ 
 #define GOSSIP_ITEM_GIVE_PVE_QUEST      "Vorrei ricevere la mia missione PVE giornaliera."
 #define GOSSIP_ITEM_GIVE_PVP_QUEST      "Vorrei ricevere la mia missione PVP giornaliera."
 #define GOSSIP_ITEM_GIVE_EXTRA_QUEST    "Vorrei una missione extra!"
@@ -516,6 +527,179 @@ public:
 	}
 };
 
+int returnData0(AchievementCriteriaEntry const* criteria)
+{
+    int value = -1;
+    switch (criteria->requiredType)
+    {
+    case 0:
+        value = criteria->kill_creature.creatureID;
+    case 1:
+        value = criteria->win_bg.bgMapID;
+    case 8:
+        value = criteria->complete_achievement.linkedAchievement;
+        break;
+    case 30:
+        value = criteria->bg_objective.objectiveId;
+    case 31:
+        value = criteria->honorable_kill_at_area.areaID;
+        break;
+    case 32: // win arena - no use of column 4
+        break;
+    case 33:
+        value = criteria->play_arena.mapID;
+        break;
+    case 37: // win rated arena unsed column 4
+        break;
+    case 38:
+        value = criteria->highest_team_rating.teamtype;
+        break;
+    case 39:
+        // MISSING !!
+        break;
+    case 52:
+        value = criteria->hk_class.classID;
+        break;
+    case 53:
+        value = criteria->hk_race.raceID;
+        break;
+    case 56: // unused
+        break;
+    case 76: // unused
+        break;
+    case 113: //unused
+        break;
+
+    default:
+        value = -1;
+
+    }
+    return value;
+}
+
+int returnData1(AchievementCriteriaEntry const* criteria)
+{
+    int value = -1;
+    switch (criteria->requiredType)
+    {
+    case 0:
+        value = criteria->kill_creature.creatureCount;
+    case 1:
+        value = criteria->win_bg.winCount;
+    case 8: // no column 5
+        break;
+    case 30:
+        value = criteria->bg_objective.completeCount;
+    case 31:
+        value = criteria->honorable_kill_at_area.killCount;
+        break;
+    case 32: // win arena - no use of column 4
+        break;
+    case 33: // unused
+        break;
+    case 37: // win rated arena unsed column 4
+        value = criteria->win_rated_arena.count;
+        break;
+    case 38: //unused
+        break;
+    case 39:
+        // MISSING !!
+        break;
+    case 52:
+        value = criteria->hk_class.count;
+        break;
+    case 53:
+        value = criteria->hk_race.count;
+        break;
+    case 56: 
+        value = criteria->get_killing_blow.killCount;
+        break;
+    case 76: 
+        value = criteria->win_duel.duelCount;
+        break;
+    case 113: 
+        // MISSING !!
+        break;
+
+    default:
+        value = -1;
+
+    }
+    return value;
+}
+
+int SUPPORTED_CRITERIA[] = { 0,1,8,30,31,32,33,37,38,39,52,53,56,76,113 };
+int SUPPORTED_CRITERIA_NUMBER = 15;
+
+bool isInArray(int val){
+    int i;
+    for (i = 0; i < SUPPORTED_CRITERIA_NUMBER; i++) {
+        if (SUPPORTED_CRITERIA[i] == val)
+            return true;
+    }
+    return false;
+}
+
+
+void sendQuestCredit(Player *player, AchievementCriteriaEntry const* criteria)
+{
+    uint32 entry = 0;
+
+    if (!isInArray(criteria->requiredType))
+        return;
+
+    uint32 achievementType = criteria->requiredType;
+
+    // iterate through the loaded achievemements available
+    for (std::vector<HearthstoneAchievement>::iterator itr = hsAchievementTable.begin(); itr != hsAchievementTable.end(); itr++)
+    {
+        if((*itr).type == achievementType) // match the type
+            if (((*itr).data0 == returnData0(criteria)) || ((*itr).data1 == returnData1(criteria))) // match criteria
+            {
+                entry = (*itr).creature; // set credit
+                break;
+            }
+    }
+
+    if (entry)
+        player->azthPlayer->ForceKilledMonsterCredit(entry, NULL); // send credit
+}
+
+class azth_hearthstone_world : public WorldScript
+{
+public:
+    azth_hearthstone_world() : WorldScript("azth_hearthstone_world") { }
+
+    void OnAfterConfigLoad(bool reload) override
+    {
+        // initialize count and array
+        uint32 count = 0;
+        hsAchievementTable.clear();
+
+        // run query
+        QueryResult hsAchiResult = ExtraDatabase.PQuery("SELECT data0, data1, creature, type FROM hearthstone_criteria_credits");
+
+        // store result in vector of hs achievement struct
+        if (hsAchiResult)
+        {
+            do
+            {
+                HearthstoneAchievement ha = {};
+                ha.data0 = (*hsAchiResult)[0].GetUInt32();
+                ha.data1 = (*hsAchiResult)[1].GetUInt32();
+                ha.creature = (*hsAchiResult)[2].GetUInt32();
+                ha.type = (*hsAchiResult)[3].GetUInt32();
+
+                hsAchievementTable.push_back(ha); // push the newly created element in the list
+                count++;
+            } while (hsAchiResult->NextRow());
+        }
+
+        // show log of loaded achievements at startup
+        sLog->outError("Hearthstone Mode: loaded %u achievement definitions", count);
+    }
+};
+
 void AddSC_hearthstone()
 {
 	new npc_han_al();
@@ -523,4 +707,5 @@ void AddSC_hearthstone()
 	new item_azth_hearthstone_loot_sack();
 	new azth_main_morph();
 	new azth_get_morph();
+    new azth_hearthstone_world();
 }

@@ -7,7 +7,110 @@
 
 #include "CrossFaction.h"
 
-// Crossfaction class functionalities
+void CrossFaction::DoForgetPlayersInBG(Battleground* pBattleGround, Player* player)
+{
+    for (Battleground::BattlegroundPlayerMap::const_iterator itr = pBattleGround->GetPlayers().begin(); itr != pBattleGround->GetPlayers().end(); ++itr)
+    {
+        // Here we invalidate players in the bg to the added player
+        WorldPacket data1(SMSG_INVALIDATE_PLAYER, 8);
+        data1 << itr->first;
+        player->GetSession()->SendPacket(&data1);
+            
+        if (Player* pPlayer = ObjectAccessor::FindPlayer(itr->first))
+        {
+            player->GetSession()->SendNameQueryOpcode(pPlayer->GetGUID()); // Send namequery answer instantly if player is available
+                                // Here we invalidate the player added to players in the bg
+            WorldPacket data2(SMSG_INVALIDATE_PLAYER, 8);
+            data2 << player->GetGUID();
+            pPlayer->GetSession()->SendPacket(&data2);
+            pPlayer->GetSession()->SendNameQueryOpcode(player->GetGUID());
+        }
+    }
+}
+
+/// Crossfaction - race update functionalities
+/// pre-save a fake race and morph for a player in case his faction is switched in BG.
+void CrossFaction::SetFakeRaceAndMorph(Player* player)
+{
+    if (player->getClass() == CLASS_DRUID)
+    {
+        if (player->GetTeamId(true) == TEAM_ALLIANCE)
+        {
+            m_FakeMorph[player->GetGUID()] = player->getGender() == GENDER_MALE ? FAKE_M_TAUREN : FAKE_F_TAUREN;
+            m_FakeRace[player->GetGUID()] = RACE_TAUREN;
+        }
+        else if (player->getGender() == GENDER_MALE) // HORDE PLAYER, ONLY HAVE MALE NELF ID
+        {
+            m_FakeMorph[player->GetGUID()] = FAKE_M_NELF;
+            m_FakeRace[player->GetGUID()] = RACE_NIGHTELF;
+        }
+        else
+            m_FakeRace[player->GetGUID()] = player->GetTeamId(true) == TEAM_ALLIANCE ? RACE_BLOODELF : RACE_HUMAN;
+    }
+    else if (player->getClass() == CLASS_SHAMAN && player->GetTeamId(true) == TEAM_HORDE && player->getGender() == GENDER_FEMALE)
+    {
+        m_FakeMorph[player->GetGUID()] = FAKE_F_DRAENEI; // Female Draenei
+        m_FakeRace[player->GetGUID()] = RACE_DRAENEI;
+    }
+    else
+    {
+        m_FakeRace[player->GetGUID()] = player->GetTeamId(true) == TEAM_ALLIANCE ? RACE_BLOODELF : RACE_HUMAN;
+
+        if (player->GetTeamId(true) == TEAM_HORDE)
+        {
+            if (player->getGender() == GENDER_MALE)
+                m_FakeMorph[player->GetGUID()] = 19723;
+            else
+                m_FakeMorph[player->GetGUID()] = 19724;
+        }
+        else
+        {
+            if (player->getGender() == GENDER_MALE)
+                m_FakeMorph[player->GetGUID()] = 20578;
+            else
+                m_FakeMorph[player->GetGUID()] = 20579;
+        }
+    }
+}
+
+uint8 CrossFaction::GetFakeRace(uint64 playerGuid)
+{
+    UNORDERED_MAP<uint64, uint8>::iterator itr = m_FakeRace.find(playerGuid);
+    if (itr != m_FakeRace.end())
+        return itr->second;
+    else
+        return 0;
+}
+
+uint32 CrossFaction::GetFakeMorph(uint64 playerGuid)
+{
+    UNORDERED_MAP<uint64, uint32>::iterator itr = m_FakeMorph.find(playerGuid);
+    if (itr != m_FakeMorph.end())
+        return itr->second;
+    else
+        return 0;
+}
+
+void CrossFaction::SetMorph(Player* player, bool value)
+{
+    if (player)
+    {
+        if (value)
+        {
+            player->setRace(GetFakeRace(player->GetGUID()));
+            player->SetDisplayId(GetFakeMorph(player->GetGUID()));
+        }
+        else
+        {
+            player->setRace(player->getRace(true));
+            player->SetDisplayId(player->GetNativeDisplayId());
+            player->InitDisplayIds();
+        }
+    }
+}
+
+/// Crossfaction team update functionalities
+/// Update player team and update the map of the leaders
 void CrossFaction::UpdatePlayerTeam(Group* group, uint64 guid, bool reset /* = false */)
 {
     Player* player = ObjectAccessor::FindPlayer(guid);
@@ -30,12 +133,19 @@ void CrossFaction::UpdatePlayerTeam(Group* group, uint64 guid, bool reset /* = f
             {
                 if (Battleground * bg = player->GetBattleground())
                 {
-                    player->setTeamId(player->GetBgTeamId());
-                    player->setFaction(player->GetTeamId() == TEAM_ALLIANCE ? 1 : 2);
-                    sLog->outDebug(LOG_FILTER_CROSSFACTION, "Crossfaction: Battleground team id set for player %s", player->GetName().c_str());
-                    return;
+                    if (player->GetTeamId(true) != player->GetBgTeamId())
+                    {
+                        SetMorph(player, true); // setup the new display ID for the player, and the new race
+                        player->setTeamId(player->GetBgTeamId());
+                        player->setFaction(player->GetTeamId() == TEAM_ALLIANCE ? 1 : 2);
+                        DoForgetPlayersInBG(bg, player); // force to resend race information for this player
+                        sLog->outDebug(LOG_FILTER_CROSSFACTION, "Crossfaction: Battleground team id set for player %s", player->GetName().c_str());
+                    }
                 }
+                return;
             }
+
+            SetMorph(player, false); // reset morph if not in bg
 
             // standard group
             uint64 leaderGuid = group ? group->GetLeaderGUID() : player->GetGUID();
@@ -66,10 +176,10 @@ void CrossFaction::UpdatePlayerTeam(Group* group, uint64 guid, bool reset /* = f
         }
 
         // all the other cases: reset to the original faction
-
         player->setTeamId(player->GetTeamId(true));
-        ChrRacesEntry const* rEntry = sChrRacesStore.LookupEntry(player->getRace());
+        ChrRacesEntry const* rEntry = sChrRacesStore.LookupEntry(player->getRace(true));
         player->setFaction(rEntry ? rEntry->FactionID : 0);
+        SetMorph(player, false);
         sLog->outDebug(LOG_FILTER_CROSSFACTION, "Crossfaction: reset done for player %s", player->GetName().c_str());
     }
     else
@@ -81,7 +191,7 @@ void CrossFaction::UpdateGroupLeaderMap(uint64 leaderGuid, bool remove)
     if (remove)
         LeaderRaceMap.erase(leaderGuid);
     else
-        LeaderRaceMap[leaderGuid] = GetPlayerRace(leaderGuid);
+        LeaderRaceMap[leaderGuid] = GetLeaderRace(leaderGuid);
 }
 
 void CrossFaction::UpdateAllGroups()
@@ -170,10 +280,10 @@ void CrossFaction::LoadConfig(bool reload)
 }
 
 // This function is used to retrieve 
-uint8 CrossFaction::GetPlayerRace(uint64 playerGuid)
+uint8 CrossFaction::GetLeaderRace(uint64 playerGuid)
 {
     if (Player* player = ObjectAccessor::FindPlayer(playerGuid))
-        return player->getRace();
+        return player->getRace(true);
     else
     {
         // Query informations from the DB
@@ -277,9 +387,23 @@ public:
         sCrossFaction->UpdatePlayerTeam(player->GetGroup(), player->GetGUID());
     }
 
-    void OnUpdateFaction(Player *player) override
+    void OnUpdateFaction(Player* player) override
     {
+        sCrossFaction->SetFakeRaceAndMorph(player); // set fake race information
         sCrossFaction->UpdatePlayerTeam(player->GetGroup(), player->GetGUID());
+    }
+
+    void OnAddToBattleground(Player* player, Battleground* bg) override
+    {
+        sCrossFaction->SetFakeRaceAndMorph(player); // set (re-set) fake race information
+        sCrossFaction->UpdatePlayerTeam(player->GetGroup(), player->GetGUID()); // this will morph player if he's in BG with switched faction
+    }
+
+    void OnRemoveFromBattleground(Player* player, Battleground* bg) override
+    {
+        sCrossFaction->UpdatePlayerTeam(player->GetGroup(), player->GetGUID(), true);
+        sCrossFaction->SetMorph(player,false); // force reset any morph, then forget players in BG.
+        sCrossFaction->DoForgetPlayersInBG(bg, player);
     }
 
     void OnLogout(Player* player) override

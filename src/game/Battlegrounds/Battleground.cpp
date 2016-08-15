@@ -178,6 +178,12 @@ Battleground::Battleground()
     m_BgInvitedPlayers[TEAM_ALLIANCE]= 0;
     m_BgInvitedPlayers[TEAM_HORDE]   = 0;
 
+    // [AZTH] crossfaction system
+    m_premadeAssigned[TEAM_ALLIANCE] = 0; 
+    m_premadeAssigned[TEAM_HORDE]    = 0;
+    m_hasPlayerJoinedPremade.clear();
+    // [/AZTH]
+
     m_TeamScores[TEAM_ALLIANCE]      = 0;
     m_TeamScores[TEAM_HORDE]         = 0;
 
@@ -1065,6 +1071,8 @@ void Battleground::BlockMovement(Player* player)
 
 void Battleground::RemovePlayerAtLeave(Player* player)
 {
+    sScriptMgr->OnPlayerRemoveFromBattleground(player, this);
+
     TeamId teamId = player->GetBgTeamId();
 
     // check if the player was a participant of the match, or only entered through gm command
@@ -1199,6 +1207,11 @@ void Battleground::AddPlayer(Player* player)
 
     UpdatePlayersCountByTeam(teamId, false);                  // +1 player
 
+    //[AZTH] the player has joined premade - he went into the player count of BG, need to remove it from the pre-count
+    if (HasPlayerJoinPremade(guid))
+        DecreasePremadeCount(teamId);
+    //[/AZTH]
+
     WorldPacket data;
     sBattlegroundMgr->BuildPlayerJoinedBattlegroundPacket(&data, player);
     SendPacketToTeam(teamId, &data, player, false);
@@ -1250,9 +1263,10 @@ void Battleground::AddPlayer(Player* player)
     // setup BG group membership
     PlayerAddedToBGCheckIfBGIsRunning(player);
     AddOrSetPlayerToCorrectBgGroup(player, teamId);
-
+    
+    sScriptMgr->OnPlayerAddToBattleground(player, this);
     // Log
-    ;//sLog->outDetail("BATTLEGROUND: Player %s joined the battle.", player->GetName().c_str());
+    //sLog->outDetail("BATTLEGROUND: Player %s joined the battle.", player->GetName().c_str());
 }
 
 // this method adds player to his team's bg group, or sets his correct group if player is already in bg group
@@ -1994,4 +2008,13 @@ void Battleground::RewardXPAtKill(Player* killer, Player* victim)
 uint8 Battleground::GetUniqueBracketId() const
 {
     return GetMinLevel() / 10;
+}
+
+bool Battleground::HasPlayerJoinPremade(uint64 guid)
+{
+    for (UNORDERED_MAP<uint64, bool>::iterator itr = m_hasPlayerJoinedPremade.begin(); itr != m_hasPlayerJoinedPremade.end(); itr++)
+        if (itr->first == guid)
+            return itr->second;
+
+    return false;
 }

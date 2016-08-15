@@ -314,7 +314,15 @@ void BattlegroundQueue::RemovePlayer(uint64 guid, bool sentToBg, uint32 playerQu
     // sending player to bg will increase it again
     if (groupInfo->IsInvitedToBGInstanceGUID)
         if (Battleground* bg = sBattlegroundMgr->GetBattleground(groupInfo->IsInvitedToBGInstanceGUID))
+        {
             bg->DecreaseInvitedCount(groupInfo->teamId);
+
+            //[AZTH] Crossfaction BG - need to decrease premade count if the person is in a premade
+            if (bg->HasPlayerJoinPremade(guid))
+                bg->DecreasePremadeCount(groupInfo->teamId);
+            //[/AZTH]
+        }
+
 
     // remove player queue info
     m_QueuedPlayers.erase(itr);

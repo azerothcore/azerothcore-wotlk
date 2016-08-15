@@ -44,23 +44,15 @@ void WorldSession::SendNameQueryOpcode(uint64 guid)
         return;
     }
 
+    Player* player = ObjectAccessor::FindPlayer(guid); //[AZTH] CrossFaction battleground
+
     data << uint8(0);                               // name known
     data << playerData->name;                       // played name
     data << uint8(0);                               // realm name - only set for cross realm interaction (such as Battlegrounds)
-    data << uint8(playerData->race);
+    data << uint8(player ? player->getRace() : playerData->race); //[AZTH]
     data << uint8(playerData->gender);
     data << uint8(playerData->playerClass);
-
-    // pussywizard: optimization
-    /*Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(guid);
-    if (DeclinedName const* names = (player ? player->GetDeclinedNames() : NULL))
-    {
-        data << uint8(1);                           // Name is declined
-        for (uint8 i = 0; i < MAX_DECLINED_NAME_CASES; ++i)
-            data << names->name[i];
-    }
-    else*/
-        data << uint8(0);                           // Name is not declined
+    data << uint8(0);                           // Name is not declined
 
     SendPacket(&data);
 }

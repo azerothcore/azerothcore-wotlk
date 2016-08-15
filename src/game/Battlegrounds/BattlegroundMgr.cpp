@@ -1049,6 +1049,8 @@ void BattlegroundMgr::InviteGroupToBG(GroupQueueInfo* ginfo, Battleground* bg, T
 {
     ASSERT(!ginfo->IsInvitedToBGInstanceGUID);
 
+    bool increaseCountPremade = false; //[AZTH] needed later
+
     // set side if needed
     if (teamId != TEAM_NEUTRAL)
         ginfo->teamId = teamId;
@@ -1065,6 +1067,39 @@ void BattlegroundMgr::InviteGroupToBG(GroupQueueInfo* ginfo, Battleground* bg, T
 
     ginfo->RemoveInviteTime = World::GetGameTimeMS() + INVITE_ACCEPT_WAIT_TIME;
 
+    //[AZTH] Preassign people to factions based on invite count as we ignore it completely during queuing
+    if (!bg->isArena() && sWorld->getBoolConfig(CONFIG_BATTLEGROUND_RANDOM_CROSSFACTION) && bgQueueTypeId == BATTLEGROUND_QUEUE_RB)
+    {
+        
+        // if it's a premade group, set the player as  joined premade.
+        // also decide now where the premade group will go. The rest of the player will be switched later
+
+        if (ginfo->Players.size() > 1)
+            increaseCountPremade = true;
+
+        if (increaseCountPremade)
+        {
+            uint32 allyPremadeCount = bg->GetPremadeCount(TEAM_ALLIANCE);
+            uint32 hordePremadeCount = bg->GetPremadeCount(TEAM_HORDE);
+
+            TeamId nextTeam = ginfo->teamId;
+
+            if (hordePremadeCount < allyPremadeCount) // if there is already a premade in ally go horde
+                nextTeam = TEAM_HORDE;
+            else if (hordePremadeCount > allyPremadeCount) // else if premade horde go ally
+                nextTeam = TEAM_ALLIANCE;
+            else 
+            {
+                if(roll_chance_i(50)) // else randomize where the group goes (50-50)
+                    nextTeam = ginfo->teamId == TEAM_ALLIANCE ? TEAM_HORDE : TEAM_ALLIANCE;
+            }
+
+            ginfo->teamId = nextTeam;
+            sLog->outError("A new team of size %u joined premade random battleground", uint32(ginfo->Players.size()));
+        }
+    }
+    // [/AZTH]
+
     // loop through the players
     for (std::set<uint64>::iterator itr = ginfo->Players.begin(); itr != ginfo->Players.end(); ++itr)
     {
@@ -1076,6 +1111,14 @@ void BattlegroundMgr::InviteGroupToBG(GroupQueueInfo* ginfo, Battleground* bg, T
 
         // update average wait time
         bgQueue.PlayerInvitedToBGUpdateAverageWaitTime(ginfo);
+
+        // [AZTH] Set player has joined premade if more than 1 player
+        if (increaseCountPremade)
+        {
+            bg->SetPlayerJoinPremade(*itr, true);
+            bg->IncreasePremadeCount(ginfo->teamId);
+        }
+        // [/AZTH]
 
         // increase invited counter for each invited player
         bg->IncreaseInvitedCount(ginfo->teamId);
