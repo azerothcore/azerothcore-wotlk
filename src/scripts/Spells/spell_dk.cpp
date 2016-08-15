@@ -1319,7 +1319,7 @@ public:
     {
         if (Unit* target = obj->ToUnit())
         {
-            if ((target->isDead() || (_allowGhoul && (target->GetEntry() == NPC_DK_GHOUL && target->GetOwnerGUID() == _casterGUID))
+            if ((target->isDead() || (_allowGhoul && target->GetEntry() == NPC_DK_GHOUL && target->GetOwnerGUID() == _casterGUID))
                 && !(target->GetCreatureTypeMask() & CREATURE_TYPEMASK_MECHANICAL_OR_ELEMENTAL)
                 && target->GetDisplayId() == target->GetNativeDisplayId())
                 return false;
@@ -1330,6 +1330,7 @@ public:
 
 private:
     uint64 _casterGUID;
+    bool _allowGhoul;
 };
 
 // 49158 - Corpse Explosion (51325, 51326, 51327, 51328)
