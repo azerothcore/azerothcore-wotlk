@@ -726,7 +726,7 @@ public:
                     break;
                 case EVENT_SPELL_FANATIC_SHADOW_CLEAVE:
                     me->CastSpell(me->GetVictim(), SPELL_SHADOW_CLEAVE, false);
-                    events.RepeatEvent((9500, 11000));
+                    events.RepeatEvent(urand(9500, 11000));
                     break;
                 case EVENT_SPELL_FANATIC_VAMPIRIC_MIGHT:
                     me->CastSpell(me, SPELL_VAMPIRIC_MIGHT, false);
@@ -825,7 +825,7 @@ public:
                         me->CastSpell(me->GetVictim(), SPELL_DEATHCHILL_BLAST, false);
                     else
                         me->CastSpell(me->GetVictim(), SPELL_DEATHCHILL_BOLT, false);
-                    events.RepeatEvent((9000, 13000));
+                    events.RepeatEvent(urand(9000, 13000));
                     break;
                 case EVENT_SPELL_ADHERENT_CURSE_OF_TORPOR:
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1))
@@ -1043,7 +1043,7 @@ public:
                     break;
                 case EVENT_DARNAVAN_INTIMIDATING_SHOUT:
                     me->CastSpell((Unit*)NULL, SPELL_INTIMIDATING_SHOUT, false);
-                    events.RepeatEvent((90000, 120000));
+                    events.RepeatEvent(urand(90000, 120000));
                     break;
                 case EVENT_DARNAVAN_MORTAL_STRIKE:
                     me->CastSpell(me->GetVictim(), SPELL_MORTAL_STRIKE, false);

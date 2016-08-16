@@ -119,7 +119,9 @@ public:
             me->CastSpell(me, SPELL_EVOCATION, true);
             events.Reset();
             lock = false;
-            x,y,z = 0.0f;
+            x = 0.0f;
+            y = 0.0f;
+            z = 0.0f;
             releaseLockTimer = 0;
             me->ApplySpellImmune(0, IMMUNITY_ID, 49838, true);
         }
