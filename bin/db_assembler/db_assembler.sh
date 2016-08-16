@@ -21,7 +21,7 @@ fi
 
 reg_file="$OUTPUT_FOLDER/.zzz_db_assembler_registry.sh"
 
-declare -A registry
+registry=()
 
 if [ -f "$reg_file" ]; then
     source "$reg_file"

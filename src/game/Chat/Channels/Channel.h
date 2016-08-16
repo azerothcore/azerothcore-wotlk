@@ -187,7 +187,7 @@ class Channel
     };
 
     public:
-        Channel(std::string const& name, uint32 channel_id, uint32 channelDBId, TeamId teamId = TEAM_NEUTRAL, bool announce = true);
+        Channel(std::string const& name, uint32 channel_id, uint32 channelDBId, TeamId teamId = TEAM_NEUTRAL, bool announce = true, bool ownership = true);
         std::string const& GetName() const { return _name; }
         uint32 GetChannelId() const { return _channelId; }
         bool IsConstant() const { return _channelId != 0; }

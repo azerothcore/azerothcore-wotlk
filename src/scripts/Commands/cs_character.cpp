@@ -520,7 +520,7 @@ public:
             do{
                 uint64 _guid = result->Fetch()[0].GetUInt64();
                 char buff[20];
-                sprintf(buff,"%u.dump", _guid);
+                sprintf(buff,"%I64u", _guid);
                 switch(PlayerDumpWriter().WriteDump(buff, uint32(_guid)))
                 {
                     case DUMP_SUCCESS:

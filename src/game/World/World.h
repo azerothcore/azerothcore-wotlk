@@ -792,6 +792,8 @@ class World
 
         void UpdateRealmCharCount(uint32 accid);
 
+        LocaleConstant GetAvailableDbcLocale(LocaleConstant locale) const { if (m_availableDbcLocaleMask & (1 << locale)) return locale; else return m_defaultDbcLocale; }
+
         // used World DB version
         void LoadDBVersion();
         char const* GetDBVersion() const { return m_DBVersion.c_str(); }
@@ -869,6 +871,7 @@ class World
         uint32 m_playerLimit;
         AccountTypes m_allowedSecurityLevel;
         LocaleConstant m_defaultDbcLocale;                     // from config for one from loaded DBC locales
+        uint32 m_availableDbcLocaleMask;                       // by loaded DBC
         void DetectDBCLang();
         bool m_allowMovement;
         std::string m_motd;
