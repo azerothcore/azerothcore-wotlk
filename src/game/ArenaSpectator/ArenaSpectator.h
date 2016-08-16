@@ -205,8 +205,12 @@ namespace ArenaSpectator
             if (effMask & (1<<i))
             {
                 AuraType at = aura->GetEffect(i)->GetAuraType();
-                if (aura->GetEffect(i)->GetAmount() && (aura->GetSpellInfo()->IsPositive() || targetGUID != aura->GetCasterGUID()) || 
-                    at == SPELL_AURA_MECHANIC_IMMUNITY || at == SPELL_AURA_EFFECT_IMMUNITY || at == SPELL_AURA_STATE_IMMUNITY || at == SPELL_AURA_SCHOOL_IMMUNITY || at == SPELL_AURA_DISPEL_IMMUNITY)
+                if ((aura->GetEffect(i)->GetAmount() && (aura->GetSpellInfo()->IsPositive() || targetGUID != aura->GetCasterGUID())) || 
+                    at == SPELL_AURA_MECHANIC_IMMUNITY ||
+                    at == SPELL_AURA_EFFECT_IMMUNITY ||
+                    at == SPELL_AURA_STATE_IMMUNITY ||
+                    at == SPELL_AURA_SCHOOL_IMMUNITY ||
+                    at == SPELL_AURA_DISPEL_IMMUNITY)
                     return true;
             }
         }
