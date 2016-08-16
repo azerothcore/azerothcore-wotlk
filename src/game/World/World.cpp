@@ -536,6 +536,7 @@ void World::LoadConfigSettings(bool reload)
     rate_values[RATE_AUCTION_DEPOSIT] = sConfigMgr->GetFloatDefault("Rate.Auction.Deposit", 1.0f);
     rate_values[RATE_AUCTION_CUT] = sConfigMgr->GetFloatDefault("Rate.Auction.Cut", 1.0f);
     rate_values[RATE_HONOR] = sConfigMgr->GetFloatDefault("Rate.Honor", 1.0f);
+    rate_values[RATE_ARENA_POINTS] = sConfigMgr->GetFloatDefault("Rate.ArenaPoints", 1.0f);
     rate_values[RATE_INSTANCE_RESET_TIME] = sConfigMgr->GetFloatDefault("Rate.InstanceResetTime", 1.0f);
     rate_values[RATE_TALENT] = sConfigMgr->GetFloatDefault("Rate.Talent", 1.0f);
     if (rate_values[RATE_TALENT] < 0.0f)
@@ -602,12 +603,7 @@ void World::LoadConfigSettings(bool reload)
         sLog->outError("DurabilityLossChance.Block (%f) must be >=0. Using 0.0 instead.", rate_values[RATE_DURABILITY_LOSS_BLOCK]);
         rate_values[RATE_DURABILITY_LOSS_BLOCK] = 0.0f;
     }
-    rate_values[RATE_ARENA_POINTS] = sConfigMgr->GetFloatDefault("Arena.Points.Rate", 1.0f);
-    if (rate_values[RATE_ARENA_POINTS] < 1.0f)
-    {
-        sLog->outError("Rate.ArenaPoints (%f) must be >=1. Using 1.0 instead.", rate_values[RATE_ARENA_POINTS]);
-        rate_values[RATE_ARENA_POINTS] = 1.0f;
-    }
+
     ///- Read other configuration items from the config file
 
     m_bool_configs[CONFIG_DURABILITY_LOSS_IN_PVP] = sConfigMgr->GetBoolDefault("DurabilityLoss.InPvP", false);
@@ -1071,10 +1067,10 @@ void World::LoadConfigSettings(bool reload)
     m_int_configs[CONFIG_ARENA_START_PERSONAL_RATING]                = sConfigMgr->GetIntDefault ("Arena.ArenaStartPersonalRating", 1000);
     m_int_configs[CONFIG_ARENA_START_MATCHMAKER_RATING]              = sConfigMgr->GetIntDefault ("Arena.ArenaStartMatchmakerRating", 1500);
     m_bool_configs[CONFIG_ARENA_SEASON_IN_PROGRESS]                  = sConfigMgr->GetBoolDefault("Arena.ArenaSeason.InProgress", true);
-    m_float_configs[CONFIG_ARENA_WIN_RATING_MODIFIER_1] = sConfigMgr->GetFloatDefault("Arena.ArenaWinRatingModifier1", 48.0f);
-    m_float_configs[CONFIG_ARENA_WIN_RATING_MODIFIER_2] = sConfigMgr->GetFloatDefault("Arena.ArenaWinRatingModifier2", 24.0f);
-    m_float_configs[CONFIG_ARENA_LOSE_RATING_MODIFIER] = sConfigMgr->GetFloatDefault("Arena.ArenaLoseRatingModifier", 24.0f);
-    m_float_configs[CONFIG_ARENA_MATCHMAKER_RATING_MODIFIER] = sConfigMgr->GetFloatDefault("Arena.ArenaMatchmakerRatingModifier", 24.0f);
+    m_float_configs[CONFIG_ARENA_WIN_RATING_MODIFIER_1]              = sConfigMgr->GetFloatDefault("Arena.ArenaWinRatingModifier1", 48.0f);
+    m_float_configs[CONFIG_ARENA_WIN_RATING_MODIFIER_2]              = sConfigMgr->GetFloatDefault("Arena.ArenaWinRatingModifier2", 24.0f);
+    m_float_configs[CONFIG_ARENA_LOSE_RATING_MODIFIER]               = sConfigMgr->GetFloatDefault("Arena.ArenaLoseRatingModifier", 24.0f);
+    m_float_configs[CONFIG_ARENA_MATCHMAKER_RATING_MODIFIER]         = sConfigMgr->GetFloatDefault("Arena.ArenaMatchmakerRatingModifier", 24.0f);
 
     m_bool_configs[CONFIG_OFFHAND_CHECK_AT_SPELL_UNLEARN]            = sConfigMgr->GetBoolDefault("OffhandCheckAtSpellUnlearn", true);
 
