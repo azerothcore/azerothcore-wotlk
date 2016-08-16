@@ -19,6 +19,10 @@ enum FakeMorphs
     FAKE_M_TAUREN   = 20585,
     FAKE_M_NELF     = 20318,
     FAKE_F_DRAENEI  = 20323,
+    FAKE_M_HUMAN    = 19723,
+    FAKE_F_HUMAN    = 19724,
+    FAKE_M_BELF     = 20578,
+    FAKE_F_BELF     = 20579
 };
 
 class CrossFaction
@@ -29,6 +33,8 @@ class CrossFaction
         uint8 GetFakeRace(uint64 playerGuid);
         uint32 GetFakeMorph(uint64 playerGuid);
         void SetMorph(Player* player, bool value);
+        void SetResetCache(uint64 guid, bool value) { m_resetCache[guid] = value; };
+        void ResetCacheWorker();
 
         // Team Update
         void LoadConfig(bool reload);
@@ -47,6 +53,7 @@ class CrossFaction
         // Fake race caching
         UNORDERED_MAP<uint64, uint8> m_FakeRace;
         UNORDERED_MAP<uint64, uint32> m_FakeMorph;
+        UNORDERED_MAP<uint64, bool> m_resetCache;
 
         // Disables system
         typedef std::vector<uint32> CrossFactionDisableList;
