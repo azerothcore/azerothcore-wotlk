@@ -38,20 +38,23 @@ void CrossFaction::SetFakeRaceAndMorph(Player* player)
         {
             m_FakeMorph[player->GetGUID()] = player->getGender() == GENDER_MALE ? FAKE_M_TAUREN : FAKE_F_TAUREN;
             m_FakeRace[player->GetGUID()] = RACE_TAUREN;
-            player->MonsterSay("Sono stato settato tauren", LANG_UNIVERSAL, NULL);
+            if(player->GetMap() && player->IsInWorld() && !player->isBeingLoaded() && !player->IsBeingTeleported())
+                player->MonsterSay("Sono stato settato tauren", LANG_UNIVERSAL, NULL);
         }
         else // HORDE
         {
             m_FakeMorph[player->GetGUID()] = FAKE_M_NELF;
             m_FakeRace[player->GetGUID()] = RACE_NIGHTELF;
-            player->MonsterSay("Sono stato settato nightelf", LANG_UNIVERSAL, NULL);
+            if (player->GetMap() && player->IsInWorld() && !player->isBeingLoaded() && !player->IsBeingTeleported())
+                player->MonsterSay("Sono stato settato nightelf", LANG_UNIVERSAL, NULL);
         }         
     }
     else
     {
         if (player->GetTeamId(true) == TEAM_HORDE) // HORDE standard
         {
-            player->MonsterSay("Sono stato settato umano", LANG_UNIVERSAL, NULL);
+            if (player->GetMap() && player->IsInWorld() && !player->isBeingLoaded() && !player->IsBeingTeleported())
+                player->MonsterSay("Sono stato settato umano", LANG_UNIVERSAL, NULL);
 
             if (player->getGender() == GENDER_MALE)
             {
@@ -68,7 +71,8 @@ void CrossFaction::SetFakeRaceAndMorph(Player* player)
         }
         else // ally standard
         {
-            player->MonsterSay("Sono stato settato bloodelf", LANG_UNIVERSAL, NULL);
+            if (player->GetMap() && player->IsInWorld() && !player->isBeingLoaded() && !player->IsBeingTeleported())
+                player->MonsterSay("Sono stato settato bloodelf", LANG_UNIVERSAL, NULL);
 
             if (player->getGender() == GENDER_MALE)
             {
@@ -159,7 +163,9 @@ void CrossFaction::UpdatePlayerTeam(Group* group, uint64 guid, bool reset /* = f
                 {
                     if (player->GetTeamId(true) != player->GetBgTeamId())
                     {
-                        player->MonsterSay("Ho switchato fazione!!", LANG_UNIVERSAL, NULL);
+                        if (player->GetMap() && player->IsInWorld() && !player->isBeingLoaded() && !player->IsBeingTeleported())
+                            player->MonsterSay("Ho switchato fazione!!", LANG_UNIVERSAL, NULL);
+
                         SetMorph(player, true); // setup the new display ID for the player, and the new race
                         player->setTeamId(player->GetBgTeamId());
                         player->setFaction(player->GetTeamId() == TEAM_ALLIANCE ? 1 : 2);
@@ -171,7 +177,9 @@ void CrossFaction::UpdatePlayerTeam(Group* group, uint64 guid, bool reset /* = f
             }
 
             SetMorph(player, false); // reset morph if not in bg
-            player->MonsterSay("Reset morph razza effettuato", LANG_UNIVERSAL, NULL);
+
+            if (player->GetMap() && player->IsInWorld() && !player->isBeingLoaded() && !player->IsBeingTeleported())
+                player->MonsterSay("Reset morph razza effettuato", LANG_UNIVERSAL, NULL);
 
             // standard group
             uint64 leaderGuid = group ? group->GetLeaderGUID() : player->GetGUID();
@@ -206,7 +214,10 @@ void CrossFaction::UpdatePlayerTeam(Group* group, uint64 guid, bool reset /* = f
         ChrRacesEntry const* rEntry = sChrRacesStore.LookupEntry(player->getRace(true));
         player->setFaction(rEntry ? rEntry->FactionID : 0);
         SetMorph(player, false); // reset morph if not in bg
-        player->MonsterSay("Reset morph razza effettuato", LANG_UNIVERSAL, NULL);
+
+        if (player->GetMap() && player->IsInWorld() && !player->isBeingLoaded() && !player->IsBeingTeleported())
+            player->MonsterSay("Reset morph razza effettuato", LANG_UNIVERSAL, NULL);
+
         sLog->outDebug(LOG_FILTER_CROSSFACTION, "Crossfaction: reset done for player %s", player->GetName().c_str());
     }
     else
@@ -429,7 +440,9 @@ public:
     {
         if (player && bg)
         {
-            player->MonsterSay("Adding to battleground...", LANG_UNIVERSAL, NULL);
+            if (player->GetMap() && player->IsInWorld() && !player->isBeingLoaded() && !player->IsBeingTeleported())
+                player->MonsterSay("Adding to battleground...", LANG_UNIVERSAL, NULL);
+
             sCrossFaction->SetFakeRaceAndMorph(player); // set (re-set) fake race information
             sCrossFaction->SetResetCache(player->GetGUID(), true);
             sCrossFaction->UpdatePlayerTeam(player->GetGroup(), player->GetGUID()); // this will morph player if he's in BG with switched faction
@@ -441,7 +454,9 @@ public:
     {
         if (player && bg)
         {
-            player->MonsterSay("Exiting battleground, performing reset...", LANG_UNIVERSAL, NULL);
+            if (player->GetMap() && player->IsInWorld() && !player->isBeingLoaded() && !player->IsBeingTeleported())
+                player->MonsterSay("Exiting battleground, performing reset...", LANG_UNIVERSAL, NULL);
+
             sCrossFaction->UpdatePlayerTeam(player->GetGroup(), player->GetGUID(), true);
             sCrossFaction->SetMorph(player, false); // force reset any morph, then forget players in BG.
             sCrossFaction->DoForgetPlayersInBG(bg, player);
