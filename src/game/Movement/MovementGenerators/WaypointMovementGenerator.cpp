@@ -374,14 +374,14 @@ bool FlightPathMovementGenerator::DoUpdate(Player* player, uint32 /*diff*/)
         {
             if (i_currentNode >= i_path.size())
             {
-                sLog->outMisc("TAXI NODE WAS GREATER THAN PATH SIZE, GUID: %u, POINTID: %u, NODESIZE: %u, CURRENT: %u", player->GetGUIDLow(), pointId, i_path.size(), i_currentNode);
+                sLog->outMisc("TAXI NODE WAS GREATER THAN PATH SIZE, GUID: %u, POINTID: %u, NODESIZE: %lu, CURRENT: %u", player->GetGUIDLow(), pointId, i_path.size(), i_currentNode);
                 player->CleanupAfterTaxiFlight();
                 return false;
             }
 
             if (i_path[i_currentNode]->mapid != player->GetMapId())
             {
-                sLog->outMisc("Player on different map, curmap: %u, pointmap: %u, nodesize: %u, currentnode: %u", player->GetMapId(), i_path[i_currentNode]->mapid, i_path.size(), i_currentNode);
+                sLog->outMisc("Player on different map, curmap: %u, pointmap: %u, nodesize: %lu, currentnode: %u", player->GetMapId(), i_path[i_currentNode]->mapid, i_path.size(), i_currentNode);
                 player->CleanupAfterTaxiFlight();
                 return false;
             }
