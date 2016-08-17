@@ -137,13 +137,11 @@
 
 #endif
 
+using namespace std;
+
 inline float finiteAlways(float f) { return isfinite(f) ? f : 0.0f; }
 
-#if COMPILER == COMPILER_MICROSOFT
-inline bool myisfinite(float f) { return _finite(f) && !_isnan(f); }
-#else
-inline bool myisfinite(float f) { return isfinite(f) && !std::isnan(f); }
-#endif
+inline bool myisfinite(float f) { return isfinite(f) && !isnan(f); }
 
 #define atol(a) strtoul( a, NULL, 10)
 
