@@ -110,10 +110,11 @@ void CrossFaction::SetMorph(Player* player, bool value)
 {
     if (player)
     {
-        SetFakeRaceAndMorph(player);
-
         if (value)
         {
+            if (GetFakeRace(player->GetGUID()) == 0 || GetFakeMorph(player->GetGUID()) == 0)
+                SetFakeRaceAndMorph(player);
+
             player->setRace(GetFakeRace(player->GetGUID()));
             player->SetDisplayId(GetFakeMorph(player->GetGUID()));
             player->SetNativeDisplayId(GetFakeMorph(player->GetGUID()));
@@ -418,6 +419,9 @@ public:
     // Called when a player changes to a new map (after moving to new map)
     void OnMapChanged(Player* player) override
     {
+        if(player && player->GetBattleground())
+            sCrossFaction->DoForgetPlayersInBG(player->GetBattleground(), player);
+
         sCrossFaction->UpdatePlayerTeam(player->GetGroup(), player->GetGUID());
     }
 
