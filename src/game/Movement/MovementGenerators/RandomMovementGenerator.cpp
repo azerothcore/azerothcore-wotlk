@@ -137,7 +137,8 @@ void RandomMovementGenerator<Creature>::_setRandomLocation(Creature* creature)
                     zDiff = fabs((*itr).z - (*itrNext).z);
 
                     // Xinef: tree climbing, cut as much as we can
-                    if (zDiff > 2.0f || G3D::fuzzyNe(zDiff, 0.0f) && distDiff / zDiff < 2.15f) // ~25°
+                    if (zDiff > 2.0f ||
+                        (G3D::fuzzyNe(zDiff, 0.0f) && distDiff / zDiff < 2.15f)) // ~25Ëš
                     {
                         _validPointsVector[_currentPoint].erase(randomIter);
                         _preComputedPaths.erase(pathIdx);

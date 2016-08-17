@@ -84,6 +84,7 @@
 #include <map>
 #include <queue>
 #include <sstream>
+#include <fstream>
 #include <algorithm>
 #include <vector>
 
@@ -122,7 +123,9 @@
 #define snprintf _snprintf
 #define atoll _atoi64
 #define vsnprintf _vsnprintf
-#define finite(X) _finite(X)
+#ifndef isfinite
+#define isfinite(X) _finite(X)
+#endif
 #define llabs _abs64
 
 #else
@@ -134,13 +137,11 @@
 
 #endif
 
-inline float finiteAlways(float f) { return finite(f) ? f : 0.0f; }
+using namespace std;
 
-#if COMPILER == COMPILER_MICROSOFT
-inline bool myisfinite(float f) { return _finite(f) && !_isnan(f); }
-#else
-inline bool myisfinite(float f) { return finite(f) && !std::isnan(f); }
-#endif
+inline float finiteAlways(float f) { return isfinite(f) ? f : 0.0f; }
+
+inline bool myisfinite(float f) { return isfinite(f) && !isnan(f); }
 
 #define atol(a) strtoul( a, NULL, 10)
 

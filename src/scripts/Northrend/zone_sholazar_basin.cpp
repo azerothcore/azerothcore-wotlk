@@ -327,7 +327,7 @@ public:
             running = false;
             success = false;
             playerGUID = 0;
-            thunderbrewGUID;
+            thunderbrewGUID = 0;
             tensecstimer = 0;
             timer = 0;
             stepcount = 0;
