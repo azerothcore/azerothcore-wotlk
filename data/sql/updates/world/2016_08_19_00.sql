@@ -33,3 +33,11 @@ INSERT INTO `skinning_loot_template` VALUES
 (18343,23437,1,1,2,1,1),(18343,23438,1,1,2,1,1),
 (18343,23439,1,1,2,1,1),(18343,23440,1,1,2,1,1),
 (18343,23441,1,1,2,1,1);
+
+/*
+2016-08-16 00:44:36 ERROR: SourceGroup 15550 in condition table, does not exist in creature_loot_template, ignoring.
+
+Adjust the correct SourceGroup
+*/
+UPDATE conditions SET SourceGroup = 16152 WHERE SourceGroup = 15550 AND SourceEntry = 23809;
+
