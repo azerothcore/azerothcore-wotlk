@@ -17,6 +17,7 @@ and then useless.
 Removed, items inside are lootable from no one mobs.
 */
 DELETE FROM creature_loot_template WHERE entry = 1;
+DELETE FROM conditions WHERE SourceTypeOrReferenceId = 1 AND SourceGroup = 1;
 
 /*
 2016-08-16 00:44:35 ERROR: Table 'skinning_loot_template' entry 80102 isn't creature skinning id and not referenced from loot, 
