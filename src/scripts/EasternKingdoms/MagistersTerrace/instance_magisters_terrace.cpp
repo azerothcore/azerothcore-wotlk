@@ -3,6 +3,7 @@ REWRITTEN BY XINEF
 */
 
 #include "ScriptMgr.h"
+#include "ScriptPCH.h"
 #include "InstanceScript.h"
 #include "magisters_terrace.h"
 

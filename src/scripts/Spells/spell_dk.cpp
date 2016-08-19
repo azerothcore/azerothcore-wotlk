@@ -18,6 +18,7 @@
 #include "SpellInfo.h"
 #include "Totem.h"
 #include "PetDefines.h"
+#include "UnitAI.h"
 
 enum DeathKnightSpells
 {

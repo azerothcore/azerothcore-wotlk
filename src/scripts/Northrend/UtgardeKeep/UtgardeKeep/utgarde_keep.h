@@ -5,6 +5,8 @@
 #ifndef DEF_UTGARDE_KEEP_H
 #define DEF_UTGARDE_KEEP_H
 
+#include "ScriptPCH.h"
+
 enum eData
 {
     DATA_KELESETH,

@@ -5,6 +5,8 @@ REWRITTEN BY XINEF
 #ifndef DEF_SHADOW_LABYRINTH_H
 #define DEF_SHADOW_LABYRINTH_H
 
+#include "ScriptPCH.h"
+
 enum slData
 {
     TYPE_OVERSEER                   = 0,

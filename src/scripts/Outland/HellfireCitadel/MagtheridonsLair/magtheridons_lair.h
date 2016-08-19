@@ -5,6 +5,8 @@ REWRITTEN BY XINEF
 #ifndef DEF_MAGTHERIDONS_LAIR_H
 #define DEF_MAGTHERIDONS_LAIR_H
 
+#include "ScriptPCH.h"
+
 enum DataTypes
 {
     TYPE_MAGTHERIDON                = 0,

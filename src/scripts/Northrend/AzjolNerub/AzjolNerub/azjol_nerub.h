@@ -5,6 +5,8 @@ REWRITTEN BY XINEF
 #ifndef DEF_AZJOL_NERUB_H
 #define DEF_AZJOL_NERUB_H
 
+#include "ScriptPCH.h"
+
 enum ANData
 {
     DATA_KRIKTHIR_THE_GATEWATCHER_EVENT = 0,

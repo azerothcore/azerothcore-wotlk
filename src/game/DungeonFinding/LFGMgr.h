@@ -15,6 +15,7 @@
 #include "LFGQueue.h"
 #include "LFGGroupData.h"
 #include "LFGPlayerData.h"
+#include "Map.h"
 
 class Group;
 class Player;

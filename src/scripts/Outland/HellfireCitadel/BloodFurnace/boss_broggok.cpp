@@ -3,6 +3,7 @@ REWRITTEN BY XINEF
 */
 
 #include "ScriptMgr.h"
+#include "ScriptPCH.h"
 #include "ScriptedCreature.h"
 #include "blood_furnace.h"
 

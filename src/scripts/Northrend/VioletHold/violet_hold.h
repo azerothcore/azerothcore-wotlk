@@ -5,6 +5,8 @@
 #ifndef DEF_VIOLET_HOLD_H
 #define DEF_VIOLET_HOLD_H
 
+#include "ScriptPCH.h"
+
 #define MAX_ENCOUNTER 3
 
 enum Creatures

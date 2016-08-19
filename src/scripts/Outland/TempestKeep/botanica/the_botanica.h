@@ -5,6 +5,8 @@ REWRITTEN BY XINEF
 #ifndef DEF_THE_BOTANICA_H
 #define DEF_THE_BOTANICA_H
 
+#include "ScriptPCH.h"
+
 enum DataTypes
 {
     DATA_COMMANDER_SARANNIS             = 0,

@@ -7,6 +7,8 @@
 #ifndef DEF_BRD_H
 #define DEF_BRD_H
 
+#include "ScriptPCH.h"
+
 enum FactionIds
 {
     FACTION_NEUTRAL            = 734,

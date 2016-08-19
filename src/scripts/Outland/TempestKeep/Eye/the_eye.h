@@ -5,6 +5,8 @@ REWRITTEN BY XINEF
 #ifndef DEF_THE_EYE_H
 #define DEF_THE_EYE_H
 
+#include "ScriptPCH.h"
+
 enum EyeData
 {
     DATA_ALAR               = 0,

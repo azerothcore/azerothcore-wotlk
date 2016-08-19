@@ -5,6 +5,8 @@ REWRITTEN BY XINEF
 #ifndef DEF_STRATHOLME_H
 #define DEF_STRATHOLME_H
 
+#include "ScriptPCH.h"
+
 enum DataTypes
 {
     TYPE_BARON_RUN                      = 0,

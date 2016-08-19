@@ -8,6 +8,8 @@
 #ifndef DEF_BLACKWING_LAIR_H
 #define DEF_BLACKWING_LAIR_H
 
+#include "ScriptPCH.h"
+
 uint32 const EncounterCount     = 8;
 
 #define BRLScriptName "instance_blackwing_lair"

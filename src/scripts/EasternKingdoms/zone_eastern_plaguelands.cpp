@@ -19,6 +19,7 @@ npc_tirion_fordring
 EndContentData */
 
 #include "ScriptMgr.h"
+#include "ScriptPCH.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "Player.h"

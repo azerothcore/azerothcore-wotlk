@@ -16,6 +16,7 @@ EndScriptData */
 #include "AccountMgr.h"
 #include "Chat.h"
 #include "Language.h"
+#include "Player.h"
 
 class account_commandscript : public CommandScript
 {

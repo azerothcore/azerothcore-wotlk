@@ -16,6 +16,7 @@
 #include "SpellScript.h"
 #include "SpellAuraEffects.h"
 #include "Containers.h"
+#include "GridNotifiers.h"
 
 enum DruidSpells
 {

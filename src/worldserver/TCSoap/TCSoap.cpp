@@ -8,6 +8,8 @@
 #include "TCSoap.h"
 #include "soapH.h"
 #include "soapStub.h"
+#include "Log.h"
+#include "World.h"
 
 void TCSoapRunnable::run()
 {

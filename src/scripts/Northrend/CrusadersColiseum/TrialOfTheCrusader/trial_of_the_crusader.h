@@ -5,6 +5,8 @@
 #ifndef DEF_CRUSADER_H
 #define DEF_CRUSADER_H
 
+#include "ScriptPCH.h"
+
 enum DataTypes
 {
     TYPE_NONE = 0,

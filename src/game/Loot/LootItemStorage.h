@@ -5,8 +5,13 @@ Xinef
 #ifndef TRINITY_LOOTITEMSTORAGE_H
 #define TRINITY_LOOTITEMSTORAGE_H
 
+#include "Common.h"
 #include <map>
 #include <list>
+
+#include "ace/Singleton.h"
+#include "LootMgr.h"
+#include "Item.h"
 
 struct StoredLootItem
 {

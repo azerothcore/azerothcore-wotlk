@@ -5,6 +5,8 @@ REWRITTEN BY XINEF
 #ifndef DEF_SETHEKK_HALLS_H
 #define DEF_SETHEKK_HALLS_H
 
+#include "ScriptPCH.h"
+
 enum eTypes
 {
     DATA_IKISSDOOREVENT = 1,

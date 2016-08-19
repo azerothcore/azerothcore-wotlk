@@ -3,6 +3,8 @@
 #include "Creature.h"
 #include "AuctionHouseMgr.h"
 #include "ObjectAccessor.h"
+#include "Opcodes.h"
+#include "SpellAuraEffects.h"
 
 uint32 AsyncAuctionListingMgr::auctionListingDiff = 0;
 bool AsyncAuctionListingMgr::auctionListingAllowed = false;

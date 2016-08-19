@@ -5,6 +5,8 @@ REWRITTEN BY XINEF
 #ifndef DEF_RAMPARTS_H
 #define DEF_RAMPARTS_H
 
+#include "ScriptPCH.h"
+
 enum DataTypes
 {
     DATA_WATCHKEEPER_GARGOLMAR  = 0,

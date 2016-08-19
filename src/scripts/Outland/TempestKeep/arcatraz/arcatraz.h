@@ -5,6 +5,8 @@ REWRITTEN BY XINEF
 #ifndef ARCATRAZ_H
 #define ARCATRAZ_H
 
+#include "ScriptPCH.h"
+
 enum DataTypes
 {
     // Encounter States/Boss GUIDs

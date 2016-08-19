@@ -16,6 +16,7 @@
 #include "SpellScript.h"
 #include "SpellAuraEffects.h"
 #include "Group.h"
+#include "UnitAI.h"
 
 enum PaladinSpells
 {

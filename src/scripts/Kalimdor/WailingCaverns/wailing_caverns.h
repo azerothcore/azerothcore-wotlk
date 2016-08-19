@@ -5,6 +5,8 @@ REWRITTEN BY XINEF
 #ifndef DEF_WAILING_CAVERNS_H
 #define DEF_WAILING_CAVERNS_H
 
+#include "ScriptPCH.h"
+
 enum DataTypes
 {
     TYPE_LORD_COBRAHN           = 0,

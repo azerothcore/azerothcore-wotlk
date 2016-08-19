@@ -5,6 +5,8 @@ REWRITTEN BY XINEF
 #ifndef SUNWELL_PLATEAU_H
 #define SUNWELL_PLATEAU_H
 
+#include "ScriptPCH.h"
+
 enum DataTypes
 {
     DATA_KALECGOS                           = 0,

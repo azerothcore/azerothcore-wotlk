@@ -5,6 +5,8 @@ REWRITTEN BY XINEF
 #ifndef DEF_MECHANAR_H
 #define DEF_MECHANAR_H
 
+#include "ScriptPCH.h"
+
 enum DataTypes
 {
     DATA_GATEWATCHER_GYROKILL           = 0,

@@ -7,6 +7,7 @@ REWRITTEN BY XINEF
 #include "Player.h"
 #include "scholomance.h"
 #include "GameObjectAI.h"
+#include "SpellScript.h"
 
 class instance_scholomance : public InstanceMapScript
 {

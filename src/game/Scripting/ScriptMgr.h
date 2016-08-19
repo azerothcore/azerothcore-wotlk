@@ -18,6 +18,7 @@
 #include "World.h"
 #include "Weather.h"
 #include "AchievementMgr.h"
+#include "DynamicObject.h"
 
 class AuctionHouseObject;
 class AuraScript;

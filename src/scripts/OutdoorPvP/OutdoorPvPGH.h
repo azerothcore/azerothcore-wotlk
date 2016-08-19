@@ -8,6 +8,7 @@
 #ifndef OUTDOOR_PVP_GH_
 #define OUTDOOR_PVP_GH_
 
+#include "ScriptPCH.h"
 #include "OutdoorPvP.h"
 
 enum OutdoorPvPGHenum

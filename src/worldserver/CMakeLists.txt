@@ -114,6 +114,7 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/src/game/Maps
   ${CMAKE_SOURCE_DIR}/src/game/Miscellaneous
   ${CMAKE_SOURCE_DIR}/src/game/Movement
+  ${CMAKE_SOURCE_DIR}/src/game/Movement/Spline
   ${CMAKE_SOURCE_DIR}/src/game/Movement/MovementGenerators
   ${CMAKE_SOURCE_DIR}/src/game/Movement/Waypoints
   ${CMAKE_SOURCE_DIR}/src/game/OutdoorPvP
@@ -133,6 +134,7 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/src/game/Weather
   ${CMAKE_SOURCE_DIR}/src/game/World
   ${CMAKE_SOURCE_DIR}/src/game/Misc
+  ${CMAKE_SOURCE_DIR}/src/scripts/PrecompiledHeaders
   ${CMAKE_SOURCE_DIR}/src/authserver/Server
   ${CMAKE_SOURCE_DIR}/src/authserver/Realms
   ${CMAKE_CURRENT_SOURCE_DIR}

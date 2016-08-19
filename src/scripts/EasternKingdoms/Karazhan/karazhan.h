@@ -5,6 +5,8 @@ REWRITTEN BY XINEF
 #ifndef DEF_KARAZHAN_H
 #define DEF_KARAZHAN_H
 
+#include "ScriptPCH.h"
+
 enum DataTypes
 {
     TYPE_SERVANT_QUARTERS           = 0,

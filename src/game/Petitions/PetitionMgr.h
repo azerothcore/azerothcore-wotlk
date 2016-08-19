@@ -5,6 +5,9 @@ Xinef
 #ifndef _PETITIONMGR_H
 #define _PETITIONMGR_H
 
+#include "Common.h"
+#include <ace/Singleton.h>
+
 typedef std::map<uint32, uint32> SignatureMap;
 
 struct Petition

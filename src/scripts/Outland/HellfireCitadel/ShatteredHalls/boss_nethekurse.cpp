@@ -3,6 +3,7 @@ REWRITTEN BY XINEF
 */
 
 #include "ScriptMgr.h"
+#include "ScriptPCH.h"
 #include "ScriptedCreature.h"
 #include "shattered_halls.h"
 

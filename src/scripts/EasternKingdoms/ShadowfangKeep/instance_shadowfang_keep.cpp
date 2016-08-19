@@ -2,8 +2,8 @@
 REWRITTEN BY XINEF
 */
 
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptPCH.h"
 #include "InstanceScript.h"
 #include "shadowfang_keep.h"
 #include "TemporarySummon.h"

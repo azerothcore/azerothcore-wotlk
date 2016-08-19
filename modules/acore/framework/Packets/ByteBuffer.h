@@ -7,7 +7,7 @@
 #ifndef _BYTEBUFFER_H
 #define _BYTEBUFFER_H
 
-#include "Define.h"
+#include "Common.h"
 #include "Errors.h"
 #include "ByteConverter.h"
 
