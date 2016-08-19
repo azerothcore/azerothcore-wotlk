@@ -1,11 +1,12 @@
 /*
-REWRITTEN FROM SCRATCH BY XINEF, IT OWNS NOW!
+ * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-AGPL
 */
 
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "culling_of_stratholme.h"
 #include "SpellInfo.h"
+
 enum Spells
 {
     SPELL_CURSE_OF_EXERTION                     = 52772,
@@ -53,8 +54,8 @@ public:
 
         EventMap events;
         uint8 warps;
-        void Reset() 
-        { 
+        void Reset()
+        {
             events.Reset();
             warps = 0;
         }
@@ -86,7 +87,7 @@ public:
                 warps++;
                 me->CastSpell(target, DUNGEON_MODE(SPELL_TIME_STEP_N, SPELL_TIME_STEP_H), true);
             }
-        }               
+        }
 
         void UpdateAI(uint32 diff)
         {
