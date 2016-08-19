@@ -1,12 +1,3 @@
-/*
-Reference some issues: one problem #96
-Fixing worldserver.exe errors
-
-Server: Local (Repo AzerothCore)
-Last commit hash tested: 3761e9d8433f4d031b3477b787134a1d868a8971
-O.S.: Windows 10
-Compiler: MS Visual Studio 2013
-*/
 
 ALTER TABLE world_db_version CHANGE COLUMN 2016_08_14_02 2016_08_19_00 BIT;
 
