@@ -23,6 +23,7 @@ npc_nexus_drake_hatchling
 EndContentData */
 
 #include "ScriptMgr.h"
+#include "ScriptPCH.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "ScriptedEscortAI.h"

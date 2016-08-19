@@ -5,6 +5,8 @@
 #ifndef DEF_EYE_OF_ETERNITY_H
 #define DEF_EYE_OF_ETERNITY_H
 
+#include "ScriptPCH.h"
+
 enum Objects
 {
     GO_NEXUS_PLATFORM           = 193070,

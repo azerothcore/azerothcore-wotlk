@@ -14,6 +14,7 @@ SDCategory: CrystalsongForest
 Script Data End */
 
 #include "ScriptMgr.h"
+#include "ScriptPCH.h"
 #include "ScriptedCreature.h"
 #include "Player.h"
 #include "SmartScriptMgr.h"

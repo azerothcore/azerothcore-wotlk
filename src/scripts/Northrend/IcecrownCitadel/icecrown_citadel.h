@@ -5,6 +5,7 @@
 #ifndef ICECROWN_CITADEL_H_
 #define ICECROWN_CITADEL_H_
 
+#include "ScriptPCH.h"
 #include "SpellScript.h"
 #include "Map.h"
 #include "Creature.h"

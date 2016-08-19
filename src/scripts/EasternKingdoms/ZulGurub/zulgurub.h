@@ -8,6 +8,8 @@
 #ifndef DEF_ZULGURUB_H
 #define DEF_ZULGURUB_H
 
+#include "ScriptPCH.h"
+
 uint32 const EncounterCount = 13;
 
 #define ZGScriptName "instance_zulgurub"

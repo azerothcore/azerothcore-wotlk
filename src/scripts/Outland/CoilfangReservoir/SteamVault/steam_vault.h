@@ -5,6 +5,8 @@ REWRITTEN BY XINEF
 #ifndef DEF_STEAM_VAULT_H
 #define DEF_STEAM_VAULT_H
 
+#include "ScriptPCH.h"
+
 enum steamVault
 {
     TYPE_HYDROMANCER_THESPIA            = 0,

@@ -17,6 +17,7 @@ quest_a_pawn_on_the_eternal_pawn
 EndContentData */
 
 #include "ScriptMgr.h"
+#include "ScriptPCH.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "Group.h"

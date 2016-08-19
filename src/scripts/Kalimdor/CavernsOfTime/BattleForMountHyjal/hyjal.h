@@ -7,6 +7,8 @@
 #ifndef DEF_HYJAL_H
 #define DEF_HYJAL_H
 
+#include "ScriptPCH.h"
+
 #define ERROR_INST_DATA     "TSCR: Instance data not set properly for Mount Hyjal. Encounters will be buggy."
 
 uint32 const EncounterCount     = 5;

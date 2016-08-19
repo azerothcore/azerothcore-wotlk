@@ -11,6 +11,7 @@
 #include "Spell.h"
 #include "SpellAuraEffects.h"
 #include "PassiveAI.h"
+#include "GridNotifiers.h"
 
 //
 //  Emerald Dragon NPCs and IDs (kept here for reference)

@@ -5,6 +5,8 @@ REWRITTEN BY XINEF
 #ifndef DEF_SHATTERED_H
 #define DEF_SHATTERED_H
 
+#include "ScriptPCH.h"
+
 enum DataTypes
 {
     DATA_NETHEKURSE                 = 0,

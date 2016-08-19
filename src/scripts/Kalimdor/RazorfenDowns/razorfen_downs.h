@@ -5,6 +5,8 @@ REWRITTEN BY XINEF
 #ifndef DEF_RAZORFEN_DOWNS_H
 #define DEF_RAZORFEN_DOWNS_H
 
+#include "ScriptPCH.h"
+
 enum CreatureIds
 {
     NPC_IDOL_ROOM_SPAWNER                  = 8611,

@@ -10,6 +10,7 @@
 #include "AutoPtr.h"
 #include <ace/Thread_Mutex.h>
 
+#include "Errors.h"
 #include "Field.h"
 
 #ifdef _WIN32

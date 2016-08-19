@@ -7,6 +7,8 @@
 #ifndef DEF_MOLTEN_CORE_H
 #define DEF_MOLTEN_CORE_H
 
+#include "ScriptPCH.h"
+
 enum Encounters
 {
     BOSS_LUCIFRON                   = 0,

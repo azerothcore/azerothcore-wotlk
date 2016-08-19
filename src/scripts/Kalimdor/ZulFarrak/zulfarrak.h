@@ -5,6 +5,8 @@ REWRITTEN BY XINEF
 #ifndef DEF_ZULFARRACK_H
 #define DEF_ZULFARRACK_H
 
+#include "ScriptPCH.h"
+
 enum ZulFarrakData
 {
     TYPE_PYRAMID_EVENT          = 0,

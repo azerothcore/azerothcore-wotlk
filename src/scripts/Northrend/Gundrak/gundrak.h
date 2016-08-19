@@ -5,6 +5,8 @@ REWRITTEN BY XINEF
 #ifndef DEF_GUNDRAK_H
 #define DEF_GUNDRAK_H
 
+#include "ScriptPCH.h"
+
 enum Data
 {
     DATA_SLAD_RAN                       = 0,

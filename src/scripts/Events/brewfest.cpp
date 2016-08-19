@@ -1,6 +1,7 @@
 // Scripted by Xinef
 
 #include "ScriptMgr.h"
+#include "ScriptPCH.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "SpellAuras.h"

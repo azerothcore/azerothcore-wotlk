@@ -18,6 +18,7 @@ class Player;
 class Item;
 class Spell;
 class SpellInfo;
+class AuraEffect;
 struct SpellChainNode;
 struct SpellTargetPosition;
 struct SpellDurationEntry;

@@ -9,6 +9,9 @@
 #define _LFG_H
 
 #include "Common.h"
+#include "ObjectDefines.h"
+#include "SharedDefines.h"
+#include "WorldPacket.h"
 
 namespace lfg
 {

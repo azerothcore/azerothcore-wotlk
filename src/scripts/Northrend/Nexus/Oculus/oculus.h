@@ -5,6 +5,8 @@
 #ifndef DEF_OCULUS_H
 #define DEF_OCULUS_H
 
+#include "ScriptPCH.h"
+
 enum Data
 {
     DATA_DRAKOS,            // Drakos the Interrogator

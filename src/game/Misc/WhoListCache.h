@@ -2,6 +2,7 @@
 #define __WHOLISTCACHE_H
 
 #include "Common.h"
+#include "SharedDefines.h"
 
 struct WhoListPlayerInfo
 {

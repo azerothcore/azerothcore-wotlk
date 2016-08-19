@@ -5,6 +5,8 @@ REWRITTEN BY XINEF
 #ifndef GRUULS_LAIR_H_
 #define GRUULS_LAIR_H_
 
+#include "ScriptPCH.h"
+
 enum DataTypes
 {
     DATA_MAULGAR                = 0,

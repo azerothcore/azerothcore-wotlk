@@ -5,6 +5,8 @@ REWRITTEN BY XINEF
 #ifndef DEF_SHADOWFANG_H
 #define DEF_SHADOWFANG_H
 
+#include "ScriptPCH.h"
+
 enum DataTypes
 {
     TYPE_COURTYARD              = 0,

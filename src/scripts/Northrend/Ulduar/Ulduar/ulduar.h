@@ -5,6 +5,8 @@
 #ifndef DEF_ULDUAR_H
 #define DEF_ULDUAR_H
 
+#include "ScriptPCH.h"
+
 enum UlduarEncounters
 {
     MAX_ENCOUNTER                           = 15,

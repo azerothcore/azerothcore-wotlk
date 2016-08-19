@@ -5,6 +5,8 @@ REWRITTEN BY XINEF
 #ifndef DEF_THEBLACKMORASS_H
 #define DEF_THEBLACKMORASS_H
 
+#include "ScriptPCH.h"
+
 enum DataTypes
 {
     TYPE_CHRONO_LORD_DEJA               = 0,

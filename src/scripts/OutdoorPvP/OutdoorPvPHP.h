@@ -8,6 +8,7 @@
 #ifndef OUTDOOR_PVP_HP_
 #define OUTDOOR_PVP_HP_
 
+#include "ScriptPCH.h"
 #include "OutdoorPvP.h"
 
 #define OutdoorPvPHPBuffZonesNum 6
