@@ -25,8 +25,10 @@ set(CMAKE_BUILD_WITH_INSTALL_RPATH 0)
 set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH 1)
 
+set(AC_PATH_ROOT "${CMAKE_SOURCE_DIR}")
+
 # set macro-directory
-set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/modules/acore/cmake/macros")
+set(CMAKE_MODULE_PATH "${AC_PATH_ROOT}/modules/acore/cmake/macros")
 
 include(CheckCXXSourceRuns)
 include(CheckIncludeFiles)

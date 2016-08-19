@@ -13,7 +13,6 @@ modules/*
 modules/*/*
 !modules/*/.gitignore
 !modules/uwd/*
-!modules/uwd/cmake-utils/*
 modules/uwd/joiner
 !modules/hw-core/*
 !modules/acore/*
