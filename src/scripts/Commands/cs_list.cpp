@@ -25,20 +25,20 @@ class list_commandscript : public CommandScript
 public:
     list_commandscript() : CommandScript("list_commandscript") { }
 
-    ChatCommand* GetCommands() const
+    std::vector<ChatCommand> GetCommands() const override
     {
-        static ChatCommand listCommandTable[] =
+        static std::vector<ChatCommand> listCommandTable =
         {
-            { "creature",       SEC_ADMINISTRATOR,  true,  &HandleListCreatureCommand,          "", NULL },
-            { "item",           SEC_ADMINISTRATOR,  true,  &HandleListItemCommand,              "", NULL },
-            { "object",         SEC_ADMINISTRATOR,  true,  &HandleListObjectCommand,            "", NULL },
-            { "auras",          SEC_ADMINISTRATOR,  false, &HandleListAurasCommand,             "", NULL },
-            { NULL,             0,                  false, NULL,                                "", NULL }
+            { "creature",       SEC_ADMINISTRATOR,  true,  &HandleListCreatureCommand,          "" },
+            { "item",           SEC_ADMINISTRATOR,  true,  &HandleListItemCommand,              "" },
+            { "object",         SEC_ADMINISTRATOR,  true,  &HandleListObjectCommand,            "" },
+            { "auras",          SEC_ADMINISTRATOR,  false, &HandleListAurasCommand,             "" },
+            { NULL,             0,                  false, NULL,                                "" }
         };
-        static ChatCommand commandTable[] =
+        static std::vector<ChatCommand> commandTable =
         {
             { "list",          SEC_ADMINISTRATOR,   true, NULL,                                 "", listCommandTable },
-            { NULL,            0,                   false, NULL,                                "", NULL }
+            { NULL,            0,                   false, NULL,                                "" }
         };
         return commandTable;
     }

@@ -23,22 +23,22 @@ class cast_commandscript : public CommandScript
 public:
     cast_commandscript() : CommandScript("cast_commandscript") { }
 
-    ChatCommand* GetCommands() const
+    std::vector<ChatCommand> GetCommands() const override
     {
-        static ChatCommand castCommandTable[] =
+        static std::vector<ChatCommand> castCommandTable =
         {   
-            { "back",           SEC_ADMINISTRATOR,  false, &HandleCastBackCommand,              "", NULL },
-            { "dist",           SEC_ADMINISTRATOR,  false, &HandleCastDistCommand,              "", NULL },
-            { "self",           SEC_ADMINISTRATOR,  false, &HandleCastSelfCommand,              "", NULL },
-            { "target",         SEC_ADMINISTRATOR,  false, &HandleCastTargetCommad,             "", NULL },
-            { "dest",           SEC_ADMINISTRATOR,  false, &HandleCastDestCommand,              "", NULL },
-            { "",               SEC_ADMINISTRATOR,  false, &HandleCastCommand,                  "", NULL },
-            { NULL,             0,                  false, NULL,                                "", NULL }
+            { "back",           SEC_ADMINISTRATOR,  false, &HandleCastBackCommand,              "" },
+            { "dist",           SEC_ADMINISTRATOR,  false, &HandleCastDistCommand,              "" },
+            { "self",           SEC_ADMINISTRATOR,  false, &HandleCastSelfCommand,              "" },
+            { "target",         SEC_ADMINISTRATOR,  false, &HandleCastTargetCommad,             "" },
+            { "dest",           SEC_ADMINISTRATOR,  false, &HandleCastDestCommand,              "" },
+            { "",               SEC_ADMINISTRATOR,  false, &HandleCastCommand,                  "" },
+            { NULL,             0,                  false, NULL,                                "" }
         };
-        static ChatCommand commandTable[] =
+        static std::vector<ChatCommand> commandTable =
         {
             { "cast",           SEC_ADMINISTRATOR,  false, NULL,                                "", castCommandTable },
-            { NULL,             0,                  false, NULL,                                "", NULL }
+            { NULL,             0,                  false, NULL,                                "" }
         };
         return commandTable;
     }

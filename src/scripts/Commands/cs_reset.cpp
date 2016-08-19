@@ -25,23 +25,23 @@ class reset_commandscript : public CommandScript
 public:
     reset_commandscript() : CommandScript("reset_commandscript") { }
 
-    ChatCommand* GetCommands() const
+    std::vector<ChatCommand> GetCommands() const override
     {
-        static ChatCommand resetCommandTable[] =
+        static std::vector<ChatCommand> resetCommandTable =
         {
-            { "achievements",   SEC_ADMINISTRATOR,  true,  &HandleResetAchievementsCommand,     "", NULL },
-            { "honor",          SEC_ADMINISTRATOR,  true,  &HandleResetHonorCommand,            "", NULL },
-            { "level",          SEC_ADMINISTRATOR,  true,  &HandleResetLevelCommand,            "", NULL },
-            { "spells",         SEC_ADMINISTRATOR,  true,  &HandleResetSpellsCommand,           "", NULL },
-            { "stats",          SEC_ADMINISTRATOR,  true,  &HandleResetStatsCommand,            "", NULL },
-            { "talents",        SEC_ADMINISTRATOR,  true,  &HandleResetTalentsCommand,          "", NULL },
-            { "all",            SEC_ADMINISTRATOR,  true,  &HandleResetAllCommand,              "", NULL },
-            { NULL,             0,                  false, NULL,                                "", NULL }
+            { "achievements",   SEC_ADMINISTRATOR,  true,  &HandleResetAchievementsCommand,     "" },
+            { "honor",          SEC_ADMINISTRATOR,  true,  &HandleResetHonorCommand,            "" },
+            { "level",          SEC_ADMINISTRATOR,  true,  &HandleResetLevelCommand,            "" },
+            { "spells",         SEC_ADMINISTRATOR,  true,  &HandleResetSpellsCommand,           "" },
+            { "stats",          SEC_ADMINISTRATOR,  true,  &HandleResetStatsCommand,            "" },
+            { "talents",        SEC_ADMINISTRATOR,  true,  &HandleResetTalentsCommand,          "" },
+            { "all",            SEC_ADMINISTRATOR,  true,  &HandleResetAllCommand,              "" },
+            { NULL,             0,                  false, NULL,                                "" }
         };
-        static ChatCommand commandTable[] =
+        static std::vector<ChatCommand> commandTable =
         {
             { "reset",          SEC_ADMINISTRATOR,  true, NULL,                                 "", resetCommandTable },
-            { NULL,             0,                  false, NULL,                                "", NULL }
+            { NULL,             0,                  false, NULL,                                "" }
         };
         return commandTable;
     }

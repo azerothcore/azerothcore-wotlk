@@ -30,65 +30,65 @@ class debug_commandscript : public CommandScript
 public:
     debug_commandscript() : CommandScript("debug_commandscript") { }
 
-    ChatCommand* GetCommands() const
+    std::vector<ChatCommand> GetCommands() const override
     {
-        static ChatCommand debugPlayCommandTable[] =
+        static std::vector<ChatCommand> debugPlayCommandTable =
         {
-            { "cinematic",      SEC_GAMEMASTER,      false, &HandleDebugPlayCinematicCommand,   "", NULL },
-            { "movie",          SEC_GAMEMASTER,      false, &HandleDebugPlayMovieCommand,       "", NULL },
-            { "sound",          SEC_GAMEMASTER,      false, &HandleDebugPlaySoundCommand,       "", NULL },
-            { NULL,             SEC_PLAYER,     false, NULL,                               "", NULL }
+            { "cinematic",      SEC_GAMEMASTER,      false, &HandleDebugPlayCinematicCommand,   "" },
+            { "movie",          SEC_GAMEMASTER,      false, &HandleDebugPlayMovieCommand,       "" },
+            { "sound",          SEC_GAMEMASTER,      false, &HandleDebugPlaySoundCommand,       "" },
+            { NULL,             SEC_PLAYER,     false, NULL,                               "" }
         };
-        static ChatCommand debugSendCommandTable[] =
+        static std::vector<ChatCommand> debugSendCommandTable =
         {
-            { "buyerror",       SEC_ADMINISTRATOR,  false, &HandleDebugSendBuyErrorCommand,       "", NULL },
-            { "channelnotify",  SEC_ADMINISTRATOR,  false, &HandleDebugSendChannelNotifyCommand,  "", NULL },
-            { "chatmmessage",   SEC_ADMINISTRATOR,  false, &HandleDebugSendChatMsgCommand,        "", NULL },
-            { "equiperror",     SEC_ADMINISTRATOR,  false, &HandleDebugSendEquipErrorCommand,     "", NULL },
-            { "largepacket",    SEC_ADMINISTRATOR,  false, &HandleDebugSendLargePacketCommand,    "", NULL },
-            { "opcode",         SEC_ADMINISTRATOR,  false, &HandleDebugSendOpcodeCommand,         "", NULL },
-            { "qpartymsg",      SEC_ADMINISTRATOR,  false, &HandleDebugSendQuestPartyMsgCommand,  "", NULL },
-            { "qinvalidmsg",    SEC_ADMINISTRATOR,  false, &HandleDebugSendQuestInvalidMsgCommand, "", NULL },
-            { "sellerror",      SEC_ADMINISTRATOR,  false, &HandleDebugSendSellErrorCommand,      "", NULL },
-            { "setphaseshift",  SEC_ADMINISTRATOR,  false, &HandleDebugSendSetPhaseShiftCommand,  "", NULL },
-            { "spellfail",      SEC_ADMINISTRATOR,  false, &HandleDebugSendSpellFailCommand,      "", NULL },
-            { NULL,             SEC_PLAYER,         false, NULL,                                  "", NULL }
+            { "buyerror",       SEC_ADMINISTRATOR,  false, &HandleDebugSendBuyErrorCommand,       "" },
+            { "channelnotify",  SEC_ADMINISTRATOR,  false, &HandleDebugSendChannelNotifyCommand,  "" },
+            { "chatmmessage",   SEC_ADMINISTRATOR,  false, &HandleDebugSendChatMsgCommand,        "" },
+            { "equiperror",     SEC_ADMINISTRATOR,  false, &HandleDebugSendEquipErrorCommand,     "" },
+            { "largepacket",    SEC_ADMINISTRATOR,  false, &HandleDebugSendLargePacketCommand,    "" },
+            { "opcode",         SEC_ADMINISTRATOR,  false, &HandleDebugSendOpcodeCommand,         "" },
+            { "qpartymsg",      SEC_ADMINISTRATOR,  false, &HandleDebugSendQuestPartyMsgCommand,  "" },
+            { "qinvalidmsg",    SEC_ADMINISTRATOR,  false, &HandleDebugSendQuestInvalidMsgCommand, "" },
+            { "sellerror",      SEC_ADMINISTRATOR,  false, &HandleDebugSendSellErrorCommand,      "" },
+            { "setphaseshift",  SEC_ADMINISTRATOR,  false, &HandleDebugSendSetPhaseShiftCommand,  "" },
+            { "spellfail",      SEC_ADMINISTRATOR,  false, &HandleDebugSendSpellFailCommand,      "" },
+            { NULL,             SEC_PLAYER,         false, NULL,                                  "" }
         };
-        static ChatCommand debugCommandTable[] =
+        static std::vector<ChatCommand> debugCommandTable =
         {
-            { "setbit",         SEC_ADMINISTRATOR,  false, &HandleDebugSet32BitCommand,        "", NULL },
-            { "threat",         SEC_ADMINISTRATOR,  false, &HandleDebugThreatListCommand,      "", NULL },
-            { "hostil",         SEC_ADMINISTRATOR,  false, &HandleDebugHostileRefListCommand,  "", NULL },
-            { "anim",           SEC_GAMEMASTER,     false, &HandleDebugAnimCommand,            "", NULL },
-            { "arena",          SEC_ADMINISTRATOR,  false, &HandleDebugArenaCommand,           "", NULL },
-            { "bg",             SEC_ADMINISTRATOR,  false, &HandleDebugBattlegroundCommand,    "", NULL },
-            { "getitemstate",   SEC_ADMINISTRATOR,  false, &HandleDebugGetItemStateCommand,    "", NULL },
-            { "lootrecipient",  SEC_GAMEMASTER,     false, &HandleDebugGetLootRecipientCommand, "", NULL },
-            { "getvalue",       SEC_ADMINISTRATOR,  false, &HandleDebugGetValueCommand,        "", NULL },
-            { "getitemvalue",   SEC_ADMINISTRATOR,  false, &HandleDebugGetItemValueCommand,    "", NULL },
-            { "Mod32Value",     SEC_ADMINISTRATOR,  false, &HandleDebugMod32ValueCommand,      "", NULL },
+            { "setbit",         SEC_ADMINISTRATOR,  false, &HandleDebugSet32BitCommand,        "" },
+            { "threat",         SEC_ADMINISTRATOR,  false, &HandleDebugThreatListCommand,      "" },
+            { "hostil",         SEC_ADMINISTRATOR,  false, &HandleDebugHostileRefListCommand,  "" },
+            { "anim",           SEC_GAMEMASTER,     false, &HandleDebugAnimCommand,            "" },
+            { "arena",          SEC_ADMINISTRATOR,  false, &HandleDebugArenaCommand,           "" },
+            { "bg",             SEC_ADMINISTRATOR,  false, &HandleDebugBattlegroundCommand,    "" },
+            { "getitemstate",   SEC_ADMINISTRATOR,  false, &HandleDebugGetItemStateCommand,    "" },
+            { "lootrecipient",  SEC_GAMEMASTER,     false, &HandleDebugGetLootRecipientCommand, "" },
+            { "getvalue",       SEC_ADMINISTRATOR,  false, &HandleDebugGetValueCommand,        "" },
+            { "getitemvalue",   SEC_ADMINISTRATOR,  false, &HandleDebugGetItemValueCommand,    "" },
+            { "Mod32Value",     SEC_ADMINISTRATOR,  false, &HandleDebugMod32ValueCommand,      "" },
             { "play",           SEC_GAMEMASTER,      false, NULL,              "", debugPlayCommandTable },
             { "send",           SEC_ADMINISTRATOR,  false, NULL,              "", debugSendCommandTable },
-            { "setaurastate",   SEC_ADMINISTRATOR,  false, &HandleDebugSetAuraStateCommand,    "", NULL },
-            { "setitemvalue",   SEC_ADMINISTRATOR,  false, &HandleDebugSetItemValueCommand,    "", NULL },
-            { "setvalue",       SEC_ADMINISTRATOR,  false, &HandleDebugSetValueCommand,        "", NULL },
-            { "spawnvehicle",   SEC_ADMINISTRATOR,  false, &HandleDebugSpawnVehicleCommand,    "", NULL },
-            { "setvid",         SEC_ADMINISTRATOR,  false, &HandleDebugSetVehicleIdCommand,    "", NULL },
-            { "entervehicle",   SEC_ADMINISTRATOR,  false, &HandleDebugEnterVehicleCommand,    "", NULL },
-            { "uws",            SEC_ADMINISTRATOR,  false, &HandleDebugUpdateWorldStateCommand, "", NULL },
-            { "update",         SEC_ADMINISTRATOR,  false, &HandleDebugUpdateCommand,          "", NULL },
-            { "itemexpire",     SEC_ADMINISTRATOR,  false, &HandleDebugItemExpireCommand,      "", NULL },
-            { "areatriggers",   SEC_ADMINISTRATOR,  false, &HandleDebugAreaTriggersCommand,    "", NULL },
-            { "los",            SEC_GAMEMASTER,      false, &HandleDebugLoSCommand,             "", NULL },
-            { "moveflags",      SEC_ADMINISTRATOR,  false, &HandleDebugMoveflagsCommand,       "", NULL },
-            { "unitstate",      SEC_ADMINISTRATOR,  false, &HandleDebugUnitStateCommand,       "", NULL },
-            { NULL,             SEC_PLAYER,         false, NULL,                               "", NULL }
+            { "setaurastate",   SEC_ADMINISTRATOR,  false, &HandleDebugSetAuraStateCommand,    "" },
+            { "setitemvalue",   SEC_ADMINISTRATOR,  false, &HandleDebugSetItemValueCommand,    "" },
+            { "setvalue",       SEC_ADMINISTRATOR,  false, &HandleDebugSetValueCommand,        "" },
+            { "spawnvehicle",   SEC_ADMINISTRATOR,  false, &HandleDebugSpawnVehicleCommand,    "" },
+            { "setvid",         SEC_ADMINISTRATOR,  false, &HandleDebugSetVehicleIdCommand,    "" },
+            { "entervehicle",   SEC_ADMINISTRATOR,  false, &HandleDebugEnterVehicleCommand,    "" },
+            { "uws",            SEC_ADMINISTRATOR,  false, &HandleDebugUpdateWorldStateCommand, "" },
+            { "update",         SEC_ADMINISTRATOR,  false, &HandleDebugUpdateCommand,          "" },
+            { "itemexpire",     SEC_ADMINISTRATOR,  false, &HandleDebugItemExpireCommand,      "" },
+            { "areatriggers",   SEC_ADMINISTRATOR,  false, &HandleDebugAreaTriggersCommand,    "" },
+            { "los",            SEC_GAMEMASTER,      false, &HandleDebugLoSCommand,             "" },
+            { "moveflags",      SEC_ADMINISTRATOR,  false, &HandleDebugMoveflagsCommand,       "" },
+            { "unitstate",      SEC_ADMINISTRATOR,  false, &HandleDebugUnitStateCommand,       "" },
+            { NULL,             SEC_PLAYER,         false, NULL,                               "" }
         };
-        static ChatCommand commandTable[] =
+        static std::vector<ChatCommand> commandTable =
         {
-            { "debug",          SEC_GAMEMASTER,      true,  NULL,                  "", debugCommandTable },
-            { "wpgps",          SEC_ADMINISTRATOR,  false, &HandleWPGPSCommand,   "",              NULL },
-            { NULL,             SEC_PLAYER,         false, NULL,                  "",              NULL }
+            { "debug",          SEC_GAMEMASTER,      true,  NULL,                 "", debugCommandTable },
+            { "wpgps",          SEC_ADMINISTRATOR,  false, &HandleWPGPSCommand,   "", },
+            { NULL,             SEC_PLAYER,         false, NULL,                  "", }
         };
         return commandTable;
     }

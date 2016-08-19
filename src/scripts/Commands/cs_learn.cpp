@@ -26,40 +26,40 @@ class learn_commandscript : public CommandScript
 public:
     learn_commandscript() : CommandScript("learn_commandscript") { }
 
-    ChatCommand* GetCommands() const
+    std::vector<ChatCommand> GetCommands() const override
     {
-        static ChatCommand learnAllMyCommandTable[] =
+        static std::vector<ChatCommand> learnAllMyCommandTable =
         {
-            { "class",          SEC_ADMINISTRATOR,  false, &HandleLearnAllMyClassCommand,       "", NULL },
-            { "pettalents",     SEC_ADMINISTRATOR,  false, &HandleLearnAllMyPetTalentsCommand,  "", NULL },
-            { "spells",         SEC_ADMINISTRATOR,  false, &HandleLearnAllMySpellsCommand,      "", NULL },
-            { "talents",        SEC_ADMINISTRATOR,  false, &HandleLearnAllMyTalentsCommand,     "", NULL },
-            { NULL,             0,                  false, NULL,                                "", NULL }
+            { "class",          SEC_ADMINISTRATOR,  false, &HandleLearnAllMyClassCommand,       "" },
+            { "pettalents",     SEC_ADMINISTRATOR,  false, &HandleLearnAllMyPetTalentsCommand,  "" },
+            { "spells",         SEC_ADMINISTRATOR,  false, &HandleLearnAllMySpellsCommand,      "" },
+            { "talents",        SEC_ADMINISTRATOR,  false, &HandleLearnAllMyTalentsCommand,     "" },
+            { NULL,             0,                  false, NULL,                                "" }
         };
 
-        static ChatCommand learnAllCommandTable[] =
+        static std::vector<ChatCommand> learnAllCommandTable =
         {
             { "my",             SEC_ADMINISTRATOR,  false, NULL,                                "",  learnAllMyCommandTable },
-            { "gm",             SEC_GAMEMASTER,     false, &HandleLearnAllGMCommand,            "", NULL },
-            { "crafts",         SEC_GAMEMASTER,     false, &HandleLearnAllCraftsCommand,        "", NULL },
-            { "default",        SEC_GAMEMASTER,      false, &HandleLearnAllDefaultCommand,       "", NULL },
-            { "lang",           SEC_GAMEMASTER,      false, &HandleLearnAllLangCommand,          "", NULL },
-            { "recipes",        SEC_GAMEMASTER,     false, &HandleLearnAllRecipesCommand,       "", NULL },
-            { NULL,             0,                  false, NULL,                                "", NULL }
+            { "gm",             SEC_GAMEMASTER,     false, &HandleLearnAllGMCommand,            "" },
+            { "crafts",         SEC_GAMEMASTER,     false, &HandleLearnAllCraftsCommand,        "" },
+            { "default",        SEC_GAMEMASTER,      false, &HandleLearnAllDefaultCommand,       "" },
+            { "lang",           SEC_GAMEMASTER,      false, &HandleLearnAllLangCommand,          "" },
+            { "recipes",        SEC_GAMEMASTER,     false, &HandleLearnAllRecipesCommand,       "" },
+            { NULL,             0,                  false, NULL,                                "" }
         };
 
-        static ChatCommand learnCommandTable[] =
+        static std::vector<ChatCommand> learnCommandTable =
         {
             { "all",            SEC_ADMINISTRATOR,  false, NULL,                                "",  learnAllCommandTable },
-            { "",               SEC_ADMINISTRATOR,  false, &HandleLearnCommand,                 "", NULL },
-            { NULL,             0,                  false, NULL,                                "", NULL }
+            { "",               SEC_ADMINISTRATOR,  false, &HandleLearnCommand,                 "" },
+            { NULL,             0,                  false, NULL,                                "" }
         };
 
-        static ChatCommand commandTable[] =
+        static std::vector<ChatCommand> commandTable =
         {
             { "learn",          SEC_GAMEMASTER,      false, NULL,                                "", learnCommandTable },
-            { "unlearn",        SEC_ADMINISTRATOR,  false, &HandleUnLearnCommand,               "", NULL },
-            { NULL,             0,                  false, NULL,                                "", NULL }
+            { "unlearn",        SEC_ADMINISTRATOR,  false, &HandleUnLearnCommand,               "" },
+            { NULL,             0,                  false, NULL,                                "" }
         };
         return commandTable;
     }

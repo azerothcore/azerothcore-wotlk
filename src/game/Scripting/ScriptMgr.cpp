@@ -20,6 +20,7 @@
 #include "CreatureAI.h"
 #include "Player.h"
 #include "WorldPacket.h"
+#include "Chat.h"
 
 // This is the global static registry of scripts.
 /*template<class TScript>
@@ -951,12 +952,15 @@ OutdoorPvP* ScriptMgr::CreateOutdoorPvP(OutdoorPvPData const* data)
     return tmpscript->GetOutdoorPvP();
 }
 
-std::vector<ChatCommand*> ScriptMgr::GetChatCommands()
+std::vector<ChatCommand> ScriptMgr::GetChatCommands()
 {
-    std::vector<ChatCommand*> table;
+    std::vector<ChatCommand> table;
 
     FOR_SCRIPTS_RET(CommandScript, itr, end, table)
-        table.push_back(itr->second->GetCommands());
+    {
+        std::vector<ChatCommand> cmds = itr->second->GetCommands();
+        table.insert(table.end(), cmds.begin(), cmds.end());
+    }
 
     return table;
 }

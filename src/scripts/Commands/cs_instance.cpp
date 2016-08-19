@@ -26,23 +26,23 @@ class instance_commandscript : public CommandScript
 public:
     instance_commandscript() : CommandScript("instance_commandscript") { }
 
-    ChatCommand* GetCommands() const
+    std::vector<ChatCommand> GetCommands() const override
     {
-        static ChatCommand instanceCommandTable[] =
+        static std::vector<ChatCommand> instanceCommandTable =
         {
-            { "listbinds",      SEC_ADMINISTRATOR,  false,  &HandleInstanceListBindsCommand,    "", NULL },
-            { "unbind",         SEC_ADMINISTRATOR,  false,  &HandleInstanceUnbindCommand,       "", NULL },
-            { "stats",          SEC_ADMINISTRATOR,  true,   &HandleInstanceStatsCommand,        "", NULL },
-            { "savedata",       SEC_ADMINISTRATOR,  false,  &HandleInstanceSaveDataCommand,     "", NULL },
-            { "setbossstate",   SEC_GAMEMASTER,     true,   &HandleInstanceSetBossStateCommand, "", NULL },
-            { "getbossstate",   SEC_GAMEMASTER,     true,   &HandleInstanceGetBossStateCommand, "", NULL },
-            { NULL,             0,                  false,  NULL,                               "", NULL }
+            { "listbinds",      SEC_ADMINISTRATOR,  false,  &HandleInstanceListBindsCommand,    "" },
+            { "unbind",         SEC_ADMINISTRATOR,  false,  &HandleInstanceUnbindCommand,       "" },
+            { "stats",          SEC_ADMINISTRATOR,  true,   &HandleInstanceStatsCommand,        "" },
+            { "savedata",       SEC_ADMINISTRATOR,  false,  &HandleInstanceSaveDataCommand,     "" },
+            { "setbossstate",   SEC_GAMEMASTER,     true,   &HandleInstanceSetBossStateCommand, "" },
+            { "getbossstate",   SEC_GAMEMASTER,     true,   &HandleInstanceGetBossStateCommand, "" },
+            { NULL,             0,                  false,  NULL,                               "" }
         };
 
-        static ChatCommand commandTable[] =
+        static std::vector<ChatCommand> commandTable =
         {
             { "instance",       SEC_ADMINISTRATOR,  true,   NULL,                               "", instanceCommandTable },
-            { NULL,             0,                  false,  NULL,                               "", NULL }
+            { NULL,             0,                  false,  NULL,                               "" }
         };
 
         return commandTable;

@@ -25,45 +25,45 @@ class ban_commandscript : public CommandScript
 public:
     ban_commandscript() : CommandScript("ban_commandscript") { }
 
-    ChatCommand* GetCommands() const
+    std::vector<ChatCommand> GetCommands() const override
     {
-        static ChatCommand unbanCommandTable[] =
+        static std::vector<ChatCommand> unbanCommandTable =
         {
-            { "account",        SEC_ADMINISTRATOR,  true,  &HandleUnBanAccountCommand,          "", NULL },
-            { "character",      SEC_ADMINISTRATOR,  true,  &HandleUnBanCharacterCommand,        "", NULL },
-            { "playeraccount",  SEC_ADMINISTRATOR,  true,  &HandleUnBanAccountByCharCommand,    "", NULL },
-            { "ip",             SEC_ADMINISTRATOR,  true,  &HandleUnBanIPCommand,               "", NULL },
-            { NULL,             0,                  false, NULL,                                "", NULL }
+            { "account",        SEC_ADMINISTRATOR,  true,  &HandleUnBanAccountCommand,          "" },
+            { "character",      SEC_ADMINISTRATOR,  true,  &HandleUnBanCharacterCommand,        "" },
+            { "playeraccount",  SEC_ADMINISTRATOR,  true,  &HandleUnBanAccountByCharCommand,    "" },
+            { "ip",             SEC_ADMINISTRATOR,  true,  &HandleUnBanIPCommand,               "" },
+            { NULL,             0,                  false, NULL,                                "" }
         };
-        static ChatCommand banlistCommandTable[] =
+        static std::vector<ChatCommand> banlistCommandTable =
         {
-            { "account",        SEC_ADMINISTRATOR,  true,  &HandleBanListAccountCommand,        "", NULL },
-            { "character",      SEC_ADMINISTRATOR,  true,  &HandleBanListCharacterCommand,      "", NULL },
-            { "ip",             SEC_ADMINISTRATOR,  true,  &HandleBanListIPCommand,             "", NULL },
-            { NULL,             0,                  false, NULL,                                "", NULL }
+            { "account",        SEC_ADMINISTRATOR,  true,  &HandleBanListAccountCommand,        "" },
+            { "character",      SEC_ADMINISTRATOR,  true,  &HandleBanListCharacterCommand,      "" },
+            { "ip",             SEC_ADMINISTRATOR,  true,  &HandleBanListIPCommand,             "" },
+            { NULL,             0,                  false, NULL,                                "" }
         };
-        static ChatCommand baninfoCommandTable[] =
+        static std::vector<ChatCommand> baninfoCommandTable =
         {
-            { "account",        SEC_ADMINISTRATOR,  true,  &HandleBanInfoAccountCommand,        "", NULL },
-            { "character",      SEC_ADMINISTRATOR,  true,  &HandleBanInfoCharacterCommand,      "", NULL },
-            { "ip",             SEC_ADMINISTRATOR,  true,  &HandleBanInfoIPCommand,             "", NULL },
-            { NULL,             0,                  false, NULL,                                "", NULL }
+            { "account",        SEC_ADMINISTRATOR,  true,  &HandleBanInfoAccountCommand,        "" },
+            { "character",      SEC_ADMINISTRATOR,  true,  &HandleBanInfoCharacterCommand,      "" },
+            { "ip",             SEC_ADMINISTRATOR,  true,  &HandleBanInfoIPCommand,             "" },
+            { NULL,             0,                  false, NULL,                                "" }
         };
-        static ChatCommand banCommandTable[] =
+        static std::vector<ChatCommand> banCommandTable =
         {
-            { "account",        SEC_ADMINISTRATOR,  true,  &HandleBanAccountCommand,            "", NULL },
-            { "character",      SEC_ADMINISTRATOR,  true,  &HandleBanCharacterCommand,          "", NULL },
-            { "playeraccount",  SEC_ADMINISTRATOR,  true,  &HandleBanAccountByCharCommand,      "", NULL },
-            { "ip",             SEC_ADMINISTRATOR,  true,  &HandleBanIPCommand,                 "", NULL },
-            { NULL,             0,                  false, NULL,                                "", NULL }
+            { "account",        SEC_ADMINISTRATOR,  true,  &HandleBanAccountCommand,            "" },
+            { "character",      SEC_ADMINISTRATOR,  true,  &HandleBanCharacterCommand,          "" },
+            { "playeraccount",  SEC_ADMINISTRATOR,  true,  &HandleBanAccountByCharCommand,      "" },
+            { "ip",             SEC_ADMINISTRATOR,  true,  &HandleBanIPCommand,                 "" },
+            { NULL,             0,                  false, NULL,                                "" }
         };
-        static ChatCommand commandTable[] =
+        static std::vector<ChatCommand> commandTable =
         {
             { "ban",            SEC_ADMINISTRATOR,  true,  NULL,                                "", banCommandTable },
             { "baninfo",        SEC_ADMINISTRATOR,  true,  NULL,                                "", baninfoCommandTable },
             { "banlist",        SEC_ADMINISTRATOR,  true,  NULL,                                "", banlistCommandTable },
             { "unban",          SEC_ADMINISTRATOR,  true,  NULL,                                "", unbanCommandTable },
-            { NULL,             0,                  false, NULL,                                "", NULL }
+            { NULL,             0,                  false, NULL,                                "" }
         };
         return commandTable;
     }

@@ -26,53 +26,16 @@
 
 bool ChatHandler::load_command_table = true;
 
-// get number of commands in table
-static size_t getCommandTableSize(const ChatCommand* commands)
+std::vector<ChatCommand> const& ChatHandler::getCommandTable()
 {
-    if (!commands)
-        return 0;
-    size_t count = 0;
-    while (commands[count].Name != NULL)
-        count++;
-    return count;
-}
-
-// append source command table to target, return number of appended commands
-static size_t appendCommandTable(ChatCommand* target, const ChatCommand* source)
-{
-    const size_t count = getCommandTableSize(source);
-    if (count)
-        memcpy(target, source, count * sizeof(ChatCommand));
-    return count;
-}
-
-ChatCommand* ChatHandler::getCommandTable()
-{
-    // cache for commands, needed because some commands are loaded dynamically through ScriptMgr
-    // cache is never freed and will show as a memory leak in diagnostic tools
-    // can't use vector as vector storage is implementation-dependent, eg, there can be alignment gaps between elements
-    static ChatCommand* commandTableCache = NULL;
+    static std::vector<ChatCommand> commandTableCache;
 
     if (LoadCommandTable())
     {
         SetLoadCommandTable(false);
 
-        {
-            // count total number of top-level commands
-            size_t total = 0;
-            std::vector<ChatCommand*> const& dynamic = sScriptMgr->GetChatCommands();
-            for (std::vector<ChatCommand*>::const_iterator it = dynamic.begin(); it != dynamic.end(); ++it)
-                total += getCommandTableSize(*it);
-            total += 1; // ending zero
-
-            // cache top-level commands
-            size_t added = 0;
-            commandTableCache = (ChatCommand*)malloc(sizeof(ChatCommand) * total);
-            memset(commandTableCache, 0, sizeof(ChatCommand) * total);
-            ACE_ASSERT(commandTableCache);
-            for (std::vector<ChatCommand*>::const_iterator it = dynamic.begin(); it != dynamic.end(); ++it)
-                added += appendCommandTable(commandTableCache + added, *it);
-        }
+        std::vector<ChatCommand> cmds = sScriptMgr->GetChatCommands();
+        commandTableCache.swap(cmds);
 
         PreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_COMMANDS);
         PreparedQueryResult result = WorldDatabase.Query(stmt);
@@ -268,7 +231,7 @@ void ChatHandler::PSendSysMessage(const char *format, ...)
     SendSysMessage(str);
 }
 
-bool ChatHandler::ExecuteCommandInTable(ChatCommand* table, const char* text, std::string& fullcmd)
+bool ChatHandler::ExecuteCommandInTable(std::vector<ChatCommand> const& table, const char* text, std::string const& fullcmd)
 {
     char const* oldtext = text;
     std::string cmd = "";
@@ -281,7 +244,7 @@ bool ChatHandler::ExecuteCommandInTable(ChatCommand* table, const char* text, st
 
     while (*text == ' ') ++text;
 
-    for (uint32 i = 0; table[i].Name != NULL; ++i)
+    for (uint32 i = 0; i < table.size(); ++i)
     {
         if (!hasStringAbbr(table[i].Name, cmd.c_str()))
             continue;
@@ -289,7 +252,7 @@ bool ChatHandler::ExecuteCommandInTable(ChatCommand* table, const char* text, st
         bool match = false;
         if (strlen(table[i].Name) > cmd.length())
         {
-            for (uint32 j = 0; table[j].Name != NULL; ++j)
+            for (uint32 j = 0; j < table.size(); ++j)
             {
                 if (!hasStringAbbr(table[j].Name, cmd.c_str()))
                     continue;
@@ -306,14 +269,8 @@ bool ChatHandler::ExecuteCommandInTable(ChatCommand* table, const char* text, st
         if (match)
             continue;
 
-        if (table[i].Name[0] != '\0' && table[i].Name)
-        {
-            fullcmd += table[i].Name;
-            fullcmd += " ";
-        }
-
         // select subcommand from child commands list
-        if (table[i].ChildCommands != NULL)
+        if (!table[i].ChildCommands.empty())
         {
             if (!ExecuteCommandInTable(table[i].ChildCommands, text, fullcmd))
             {
@@ -334,28 +291,34 @@ bool ChatHandler::ExecuteCommandInTable(ChatCommand* table, const char* text, st
 
         SetSentErrorMessage(false);
         // table[i].Name == "" is special case: send original command to handler
-        const char* aText = table[i].Name[0] != '\0' ? text : oldtext;
-        if (aText)
-            fullcmd += aText;
-        if ((table[i].Handler)(this, aText))
+        if ((table[i].Handler)(this, table[i].Name[0] != '\0' ? text : oldtext))
         {
-            // pussywizard: ignore logging spect command
-            std::string fc = fullcmd;
-            if (fc.size() >= 5)
-                std::transform(fc.begin(), fc.end(), fc.begin(), ::tolower);
-            bool ignore = fc.size() >= 5 && fc.substr(0,5) == "spect";
+            if (!m_session) // ignore console
+                return true;
 
-            if (!AccountMgr::IsPlayerAccount(table[i].SecurityLevel) && !ignore)
+            Player* player = m_session->GetPlayer();
+            if (!AccountMgr::IsPlayerAccount(m_session->GetSecurity()))
             {
-                // chat case
-                if (m_session)
+                uint64 guid = player->GetTarget();
+                uint32 areaId = player->GetAreaId();
+                std::string areaName = "Unknown";
+                std::string zoneName = "Unknown";
+                if (AreaTableEntry const* area = GetAreaEntryByAreaID(areaId))
                 {
-                    Player* p = m_session->GetPlayer();
-                    uint64 sel_guid = p->GetTarget();
-                    sLog->outCommand(m_session->GetAccountId(), "Command: .%s [Player: %s (Account: %u) X: %f Y: %f Z: %f Map: %u Selected %s: %s (GUID: %u)]",
-                        fullcmd.c_str(), p->GetName().c_str(), m_session->GetAccountId(), p->GetPositionX(), p->GetPositionY(), p->GetPositionZ(), p->GetMapId(),
-                        GetLogNameForGuid(sel_guid), (p->GetSelectedUnit()) ? p->GetSelectedUnit()->GetName().c_str() : "", GUID_LOPART(sel_guid));
+                    int locale = GetSessionDbcLocale();
+                    areaName = area->area_name[locale];
+                    if (AreaTableEntry const* zone = GetAreaEntryByAreaID(area->zone))
+                        zoneName = zone->area_name[locale];
                 }
+
+                sLog->outCommand(m_session->GetAccountId(), "Command: %s [Player: %s (%ul) (Account: %u) X: %f Y: %f Z: %f Map: %u (%s) Area: %u (%s) Zone: %s Selected: %s (%ul)]",
+                    fullcmd.c_str(), player->GetName().c_str(), player->GetGUID(),
+                    m_session->GetAccountId(), player->GetPositionX(), player->GetPositionY(),
+                    player->GetPositionZ(), player->GetMapId(),
+                    player->GetMap() ? player->GetMap()->GetMapName() : "Unknown",
+                    areaId, areaName.c_str(), zoneName.c_str(),
+                    (player->GetSelectedUnit()) ? player->GetSelectedUnit()->GetName().c_str() : "",
+                    guid);
             }
         }
         // some commands have custom error messages. Don't send the default one in these cases.
@@ -373,7 +336,7 @@ bool ChatHandler::ExecuteCommandInTable(ChatCommand* table, const char* text, st
     return false;
 }
 
-bool ChatHandler::SetDataForCommandInTable(ChatCommand* table, char const* text, uint32 security, std::string const& help, std::string const& fullcommand)
+bool ChatHandler::SetDataForCommandInTable(std::vector<ChatCommand>& table, char const* text, uint32 security, std::string const& help, std::string const& fullcommand)
 {
     std::string cmd = "";
 
@@ -385,14 +348,14 @@ bool ChatHandler::SetDataForCommandInTable(ChatCommand* table, char const* text,
 
     while (*text == ' ') ++text;
 
-    for (uint32 i = 0; table[i].Name != NULL; i++)
+    for (uint32 i = 0; i < table.size(); i++)
     {
         // for data fill use full explicit command names
         if (table[i].Name != cmd)
             continue;
 
         // select subcommand from child commands list (including "")
-        if (table[i].ChildCommands != NULL)
+        if (!table[i].ChildCommands.empty())
         {
             if (SetDataForCommandInTable(table[i].ChildCommands, text, security, help, fullcommand))
                 return true;
@@ -419,7 +382,7 @@ bool ChatHandler::SetDataForCommandInTable(ChatCommand* table, char const* text,
     // in case "" command let process by caller
     if (!cmd.empty())
     {
-        if (table == getCommandTable())
+        if (&table == &getCommandTable())
             sLog->outError("Table `command` have not existed command '%s', skip.", cmd.c_str());
         else
             sLog->outError("Table `command` have not existed subcommand '%s' in command '%s', skip.", cmd.c_str(), fullcommand.c_str());
@@ -528,10 +491,10 @@ Valid examples:
     return LinkExtractor(message).IsValidMessage();
 }
 
-bool ChatHandler::ShowHelpForSubCommands(ChatCommand* table, char const* cmd, char const* subcmd)
+bool ChatHandler::ShowHelpForSubCommands(std::vector<ChatCommand> const& table, char const* cmd, char const* subcmd)
 {
     std::string list;
-    for (uint32 i = 0; table[i].Name != NULL; ++i)
+    for (uint32 i = 0; i < table.size(); ++i)
     {
         // must be available (ignore handler existence for show command with possible available subcommands)
         if (!isAvailable(table[i]))
@@ -548,14 +511,14 @@ bool ChatHandler::ShowHelpForSubCommands(ChatCommand* table, char const* cmd, ch
 
         list += table[i].Name;
 
-        if (table[i].ChildCommands)
+        if (!table[i].ChildCommands.empty())
             list += " ...";
     }
 
     if (list.empty())
         return false;
 
-    if (table == getCommandTable())
+    if (&table == &getCommandTable())
     {
         SendSysMessage(LANG_AVIABLE_CMD);
         PSendSysMessage("%s", list.c_str());
@@ -566,11 +529,11 @@ bool ChatHandler::ShowHelpForSubCommands(ChatCommand* table, char const* cmd, ch
     return true;
 }
 
-bool ChatHandler::ShowHelpForCommand(ChatCommand* table, const char* cmd)
+bool ChatHandler::ShowHelpForCommand(std::vector<ChatCommand> const& table, const char* cmd)
 {
     if (*cmd)
     {
-        for (uint32 i = 0; table[i].Name != NULL; ++i)
+        for (uint32 i = 0; i < table.size(); ++i)
         {
             // must be available (ignore handler existence for show command with possible available subcommands)
             if (!isAvailable(table[i]))
@@ -582,7 +545,7 @@ bool ChatHandler::ShowHelpForCommand(ChatCommand* table, const char* cmd)
             // have subcommand
             char const* subcmd = (*cmd) ? strtok(NULL, " ") : "";
 
-            if (table[i].ChildCommands && subcmd && *subcmd)
+            if (!table[i].ChildCommands.empty() && subcmd && *subcmd)
             {
                 if (ShowHelpForCommand(table[i].ChildCommands, subcmd))
                     return true;
@@ -591,7 +554,7 @@ bool ChatHandler::ShowHelpForCommand(ChatCommand* table, const char* cmd)
             if (!table[i].Help.empty())
                 SendSysMessage(table[i].Help.c_str());
 
-            if (table[i].ChildCommands)
+            if (!table[i].ChildCommands.empty())
                 if (ShowHelpForSubCommands(table[i].ChildCommands, table[i].Name, subcmd ? subcmd : ""))
                     return true;
 
@@ -600,7 +563,7 @@ bool ChatHandler::ShowHelpForCommand(ChatCommand* table, const char* cmd)
     }
     else
     {
-        for (uint32 i = 0; table[i].Name != NULL; ++i)
+        for (uint32 i = 0; i < table.size(); ++i)
         {
             // must be available (ignore handler existence for show command with possible available subcommands)
             if (!isAvailable(table[i]))
@@ -612,7 +575,7 @@ bool ChatHandler::ShowHelpForCommand(ChatCommand* table, const char* cmd)
             if (!table[i].Help.empty())
                 SendSysMessage(table[i].Help.c_str());
 
-            if (table[i].ChildCommands)
+            if (!table[i].ChildCommands.empty())
                 if (ShowHelpForSubCommands(table[i].ChildCommands, "", ""))
                     return true;
 
