@@ -19,10 +19,8 @@ CONFDIR="$AC_PATH_ROOT/build/etc/"
 
 # set preferred compilers
 #CCOMPILERC="/usr/bin/clang-3.6"
-#CCOMPILERCC="/usr/bin/clang-3.6"
 #CCOMPILERCXX="/usr/bin/clang++-3.6"
 CCOMPILERC="/usr/bin/gcc"
-CCOMPILERCC="/usr/bin/gcc"
 CCOMPILERCXX="/usr/bin/g++"
 
 # how many thread must be used for compilation ( leave zero to use all available )
