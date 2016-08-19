@@ -28,37 +28,37 @@ class gobject_commandscript : public CommandScript
 public:
     gobject_commandscript() : CommandScript("gobject_commandscript") { }
 
-    ChatCommand* GetCommands() const
+    std::vector<ChatCommand> GetCommands() const override
     {
-        static ChatCommand gobjectAddCommandTable[] =
+        static std::vector<ChatCommand> gobjectAddCommandTable =
         {
-            { "temp",           SEC_GAMEMASTER,     false, &HandleGameObjectAddTempCommand,   "", NULL },
-            { "",               SEC_GAMEMASTER,     false, &HandleGameObjectAddCommand,       "", NULL },
-            { NULL,             0,                  false, NULL,                              "", NULL }
+            { "temp",           SEC_GAMEMASTER,     false, &HandleGameObjectAddTempCommand,   "" },
+            { "",               SEC_GAMEMASTER,     false, &HandleGameObjectAddCommand,       "" },
+            { NULL,             0,                  false, NULL,                              "" }
         };
-        static ChatCommand gobjectSetCommandTable[] =
+        static std::vector<ChatCommand> gobjectSetCommandTable =
         {
-            { "phase",          SEC_GAMEMASTER,     false, &HandleGameObjectSetPhaseCommand,  "", NULL },
-            { "state",          SEC_GAMEMASTER,     false, &HandleGameObjectSetStateCommand,  "", NULL },
-            { NULL,             0,                  false, NULL,                              "", NULL }
+            { "phase",          SEC_GAMEMASTER,     false, &HandleGameObjectSetPhaseCommand,  "" },
+            { "state",          SEC_GAMEMASTER,     false, &HandleGameObjectSetStateCommand,  "" },
+            { NULL,             0,                  false, NULL,                              "" }
         };
-        static ChatCommand gobjectCommandTable[] =
+        static std::vector<ChatCommand> gobjectCommandTable =
         {
-            { "activate",       SEC_GAMEMASTER,     false, &HandleGameObjectActivateCommand,  "", NULL },
-            { "delete",         SEC_GAMEMASTER,     false, &HandleGameObjectDeleteCommand,    "", NULL },
-            { "info",           SEC_GAMEMASTER,     false, &HandleGameObjectInfoCommand,      "", NULL },
-            { "move",           SEC_GAMEMASTER,     false, &HandleGameObjectMoveCommand,      "", NULL },
-            { "near",           SEC_GAMEMASTER,     false, &HandleGameObjectNearCommand,      "", NULL },
-            { "target",         SEC_GAMEMASTER,     false, &HandleGameObjectTargetCommand,    "", NULL },
-            { "turn",           SEC_GAMEMASTER,     false, &HandleGameObjectTurnCommand,      "", NULL },
+            { "activate",       SEC_GAMEMASTER,     false, &HandleGameObjectActivateCommand,  "" },
+            { "delete",         SEC_GAMEMASTER,     false, &HandleGameObjectDeleteCommand,    "" },
+            { "info",           SEC_GAMEMASTER,     false, &HandleGameObjectInfoCommand,      "" },
+            { "move",           SEC_GAMEMASTER,     false, &HandleGameObjectMoveCommand,      "" },
+            { "near",           SEC_GAMEMASTER,     false, &HandleGameObjectNearCommand,      "" },
+            { "target",         SEC_GAMEMASTER,     false, &HandleGameObjectTargetCommand,    "" },
+            { "turn",           SEC_GAMEMASTER,     false, &HandleGameObjectTurnCommand,      "" },
             { "add",            SEC_GAMEMASTER,     false, NULL,            "", gobjectAddCommandTable },
             { "set",            SEC_GAMEMASTER,     false, NULL,            "", gobjectSetCommandTable },
-            { NULL,             0,                  false, NULL,                              "", NULL }
+            { NULL,             0,                  false, NULL,                              "" }
         };
-        static ChatCommand commandTable[] =
+        static std::vector<ChatCommand> commandTable =
         {
             { "gobject",        SEC_GAMEMASTER,     false, NULL,                "", gobjectCommandTable },
-            { NULL,             0,                  false, NULL,                               "", NULL }
+            { NULL,             0,                  false, NULL,                               "" }
         };
         return commandTable;
     }

@@ -24,27 +24,27 @@ class go_commandscript : public CommandScript
 public:
     go_commandscript() : CommandScript("go_commandscript") { }
 
-    ChatCommand* GetCommands() const
+    std::vector<ChatCommand> GetCommands() const override
     {
-        static ChatCommand goCommandTable[] =
+        static std::vector<ChatCommand> goCommandTable =
         {
-            { "creature",       SEC_GAMEMASTER,      false, &HandleGoCreatureCommand,          "", NULL },
-            { "graveyard",      SEC_GAMEMASTER,      false, &HandleGoGraveyardCommand,         "", NULL },
-            { "grid",           SEC_GAMEMASTER,      false, &HandleGoGridCommand,              "", NULL },
-            { "object",         SEC_GAMEMASTER,      false, &HandleGoObjectCommand,            "", NULL },
-            { "taxinode",       SEC_GAMEMASTER,      false, &HandleGoTaxinodeCommand,          "", NULL },
-            { "trigger",        SEC_GAMEMASTER,      false, &HandleGoTriggerCommand,           "", NULL },
-            { "zonexy",         SEC_GAMEMASTER,      false, &HandleGoZoneXYCommand,            "", NULL },
-            { "xyz",            SEC_GAMEMASTER,      false, &HandleGoXYZCommand,               "", NULL },
-            { "ticket",         SEC_GAMEMASTER,      false, &HandleGoTicketCommand,            "", NULL },
-            { "",               SEC_GAMEMASTER,      false, &HandleGoXYZCommand,               "", NULL },
-            { NULL,             0,                  false, NULL,                              "", NULL }
+            { "creature",       SEC_GAMEMASTER,      false, &HandleGoCreatureCommand,          "" },
+            { "graveyard",      SEC_GAMEMASTER,      false, &HandleGoGraveyardCommand,         "" },
+            { "grid",           SEC_GAMEMASTER,      false, &HandleGoGridCommand,              "" },
+            { "object",         SEC_GAMEMASTER,      false, &HandleGoObjectCommand,            "" },
+            { "taxinode",       SEC_GAMEMASTER,      false, &HandleGoTaxinodeCommand,          "" },
+            { "trigger",        SEC_GAMEMASTER,      false, &HandleGoTriggerCommand,           "" },
+            { "zonexy",         SEC_GAMEMASTER,      false, &HandleGoZoneXYCommand,            "" },
+            { "xyz",            SEC_GAMEMASTER,      false, &HandleGoXYZCommand,               "" },
+            { "ticket",         SEC_GAMEMASTER,      false, &HandleGoTicketCommand,            "" },
+            { "",               SEC_GAMEMASTER,      false, &HandleGoXYZCommand,               "" },
+            { NULL,             0,                  false, NULL,                              "" }
         };
 
-        static ChatCommand commandTable[] =
+        static std::vector<ChatCommand> commandTable =
         {
             { "go",             SEC_GAMEMASTER,      false, NULL,                     "", goCommandTable },
-            { NULL,             0,                  false, NULL,                               "", NULL }
+            { NULL,             0,                  false, NULL,                               "" }
         };
         return commandTable;
     }

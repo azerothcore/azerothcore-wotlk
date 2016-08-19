@@ -22,26 +22,26 @@ class honor_commandscript : public CommandScript
 public:
     honor_commandscript() : CommandScript("honor_commandscript") { }
 
-    ChatCommand* GetCommands() const
+    std::vector<ChatCommand> GetCommands() const override
     {
-        static ChatCommand honorAddCommandTable[] =
+        static std::vector<ChatCommand> honorAddCommandTable =
         {
-            { "kill",           SEC_GAMEMASTER,     false, &HandleHonorAddKillCommand,         "", NULL },
-            { "",               SEC_GAMEMASTER,     false, &HandleHonorAddCommand,             "", NULL },
-            { NULL,             0,                  false, NULL,                               "", NULL }
+            { "kill",           SEC_GAMEMASTER,     false, &HandleHonorAddKillCommand,         "" },
+            { "",               SEC_GAMEMASTER,     false, &HandleHonorAddCommand,             "" },
+            { NULL,             0,                  false, NULL,                               "" }
         };
 
-        static ChatCommand honorCommandTable[] =
+        static std::vector<ChatCommand> honorCommandTable =
         {
             { "add",            SEC_GAMEMASTER,     false, NULL,               "", honorAddCommandTable },
-            { "update",         SEC_GAMEMASTER,     false, &HandleHonorUpdateCommand,          "", NULL },
-            { NULL,             0,                  false, NULL,                               "", NULL }
+            { "update",         SEC_GAMEMASTER,     false, &HandleHonorUpdateCommand,          "" },
+            { NULL,             0,                  false, NULL,                               "" }
         };
 
-        static ChatCommand commandTable[] =
+        static std::vector<ChatCommand> commandTable =
         {
             { "honor",          SEC_GAMEMASTER,     false, NULL,                  "", honorCommandTable },
-            { NULL,             0,                  false, NULL,                               "", NULL }
+            { NULL,             0,                  false, NULL,                               "" }
         };
         return commandTable;
     }

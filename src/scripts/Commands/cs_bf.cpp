@@ -20,21 +20,21 @@ class bf_commandscript : public CommandScript
 public:
     bf_commandscript() : CommandScript("bf_commandscript") { }
 
-    ChatCommand* GetCommands() const
+    std::vector<ChatCommand> GetCommands() const override
     {
-        static ChatCommand battlefieldcommandTable[] =
+        static std::vector<ChatCommand> battlefieldcommandTable =
         {
-            { "start",          SEC_ADMINISTRATOR,  false, &HandleBattlefieldStart,            "", NULL },
-            { "stop",           SEC_ADMINISTRATOR,  false, &HandleBattlefieldEnd,              "", NULL },
-            { "switch",         SEC_ADMINISTRATOR,  false, &HandleBattlefieldSwitch,           "", NULL },
-            { "timer",          SEC_ADMINISTRATOR,  false, &HandleBattlefieldTimer,            "", NULL },
-            { "enable",         SEC_ADMINISTRATOR,  false, &HandleBattlefieldEnable,           "", NULL },
-            { NULL,             0,                  false, NULL,                               "", NULL }
+            { "start",          SEC_ADMINISTRATOR,  false, &HandleBattlefieldStart,            "" },
+            { "stop",           SEC_ADMINISTRATOR,  false, &HandleBattlefieldEnd,              "" },
+            { "switch",         SEC_ADMINISTRATOR,  false, &HandleBattlefieldSwitch,           "" },
+            { "timer",          SEC_ADMINISTRATOR,  false, &HandleBattlefieldTimer,            "" },
+            { "enable",         SEC_ADMINISTRATOR,  false, &HandleBattlefieldEnable,           "" },
+            { NULL,             0,                  false, NULL,                               "" }
         };
-        static ChatCommand commandTable[] =
+        static std::vector<ChatCommand> commandTable =
         {
             { "bf",             SEC_ADMINISTRATOR,  false, NULL,            "", battlefieldcommandTable },
-            { NULL,             0,                  false, NULL,                               "", NULL }
+            { NULL,             0,                  false, NULL,                               "" }
         };
         return commandTable;
     }
