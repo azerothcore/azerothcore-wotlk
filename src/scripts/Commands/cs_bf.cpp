@@ -28,13 +28,11 @@ public:
             { "stop",           SEC_ADMINISTRATOR,  false, &HandleBattlefieldEnd,              "" },
             { "switch",         SEC_ADMINISTRATOR,  false, &HandleBattlefieldSwitch,           "" },
             { "timer",          SEC_ADMINISTRATOR,  false, &HandleBattlefieldTimer,            "" },
-            { "enable",         SEC_ADMINISTRATOR,  false, &HandleBattlefieldEnable,           "" },
-            { NULL,             0,                  false, NULL,                               "" }
+            { "enable",         SEC_ADMINISTRATOR,  false, &HandleBattlefieldEnable,           "" }
         };
         static std::vector<ChatCommand> commandTable =
         {
-            { "bf",             SEC_ADMINISTRATOR,  false, NULL,            "", battlefieldcommandTable },
-            { NULL,             0,                  false, NULL,                               "" }
+            { "bf",             SEC_ADMINISTRATOR,  false, nullptr,            "", battlefieldcommandTable }
         };
         return commandTable;
     }
@@ -141,7 +139,7 @@ public:
         char* battleid_str = strtok((char*)args, " ");
         if (!battleid_str)
             return false;
-        char* time_str = strtok(NULL, " ");
+        char* time_str = strtok(nullptr, " ");
         if (!time_str)
             return false;
 

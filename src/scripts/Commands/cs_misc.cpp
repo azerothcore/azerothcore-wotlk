@@ -41,23 +41,20 @@ public:
             { "disband",        SEC_ADMINISTRATOR,          false,  &HandleGroupDisbandCommand,         "" },
             { "remove",         SEC_ADMINISTRATOR,          false,  &HandleGroupRemoveCommand,          "" },
             { "join",           SEC_ADMINISTRATOR,          false,  &HandleGroupJoinCommand,            "" },
-            { "list",           SEC_ADMINISTRATOR,          false,  &HandleGroupListCommand,            "" },
-            { NULL,             0,                          false,  NULL,                               "" }
+            { "list",           SEC_ADMINISTRATOR,          false,  &HandleGroupListCommand,            "" }
         };
         static std::vector<ChatCommand> petCommandTable =
         {
             { "create",             SEC_GAMEMASTER,         false, &HandleCreatePetCommand,             "" },
             { "learn",              SEC_GAMEMASTER,         false, &HandlePetLearnCommand,              "" },
-            { "unlearn",            SEC_GAMEMASTER,         false, &HandlePetUnlearnCommand,            "" },
-            { NULL,                 0,                      false, NULL,                                "" }
+            { "unlearn",            SEC_GAMEMASTER,         false, &HandlePetUnlearnCommand,            "" }
         };
         static std::vector<ChatCommand> sendCommandTable =
         {
             { "items",              SEC_ADMINISTRATOR,      true,  &HandleSendItemsCommand,             "" },
             { "mail",               SEC_GAMEMASTER,         true,  &HandleSendMailCommand,              "" },
             { "message",            SEC_ADMINISTRATOR,      true,  &HandleSendMessageCommand,           "" },
-            { "money",              SEC_ADMINISTRATOR,      true,  &HandleSendMoneyCommand,             "" },
-            { NULL,                 0,                      false, NULL,                                "" }
+            { "money",              SEC_ADMINISTRATOR,      true,  &HandleSendMoneyCommand,             "" }
         };
         static std::vector<ChatCommand> commandTable =
         {
@@ -96,8 +93,8 @@ public:
             { "setskill",           SEC_ADMINISTRATOR,      false, &HandleSetSkillCommand,              "" },
             { "pinfo",              SEC_GAMEMASTER,         true,  &HandlePInfoCommand,                 "" },
             { "respawn",            SEC_ADMINISTRATOR,      false, &HandleRespawnCommand,               "" },
-            { "send",               SEC_GAMEMASTER,         true,  NULL,                                "", sendCommandTable },
-            { "pet",                SEC_GAMEMASTER,         false, NULL,                                "", petCommandTable },
+            { "send",               SEC_GAMEMASTER,         true,  nullptr,                                "", sendCommandTable },
+            { "pet",                SEC_GAMEMASTER,         false, nullptr,                                "", petCommandTable },
             { "mute",               SEC_GAMEMASTER,         true,  &HandleMuteCommand,                  "" },
             { "unmute",             SEC_GAMEMASTER,         true,  &HandleUnmuteCommand,                "" },
             { "movegens",           SEC_ADMINISTRATOR,      false, &HandleMovegensCommand,              "" },
@@ -109,15 +106,14 @@ public:
             { "waterwalk",          SEC_GAMEMASTER,         false, &HandleWaterwalkCommand,             "" },
             { "freeze",             SEC_GAMEMASTER,         false, &HandleFreezeCommand,                "" },
             { "unfreeze",           SEC_GAMEMASTER,         false, &HandleUnFreezeCommand,              "" },
-            { "group",              SEC_ADMINISTRATOR,      false, NULL,                                "", groupCommandTable },
+            { "group",              SEC_ADMINISTRATOR,      false, nullptr,                                "", groupCommandTable },
             { "possess",            SEC_ADMINISTRATOR,      false, HandlePossessCommand,                "" },
             { "unpossess",          SEC_ADMINISTRATOR,      false, HandleUnPossessCommand,              "" },
             { "bindsight",          SEC_ADMINISTRATOR,      false, HandleBindSightCommand,              "" },
             { "unbindsight",        SEC_ADMINISTRATOR,      false, HandleUnbindSightCommand,            "" },
             { "playall",            SEC_GAMEMASTER,         false, HandlePlayAllCommand,                "" },
             { "skirmish",           SEC_ADMINISTRATOR,      false, HandleSkirmishCommand,               "" },
-            { "mailbox",            SEC_ADMINISTRATOR,      false, &HandleMailBoxCommand,               "" },
-            { NULL,                 0,                      false, NULL,                                "" }
+            { "mailbox",            SEC_ADMINISTRATOR,      false, &HandleMailBoxCommand,               "" }
         };
         return commandTable;
     }
@@ -205,8 +201,8 @@ public:
         uint8 hcnt = count / 2;
         uint8 error = 0;
         std::string last_name;
-        Player* plr = NULL;
-        Player* players[10] = {NULL};
+        Player* plr = nullptr;
+        Player* players[10] = {nullptr};
         uint8 cnt = 0;
         for (; i != tokens.end(); ++i)
         {
@@ -371,7 +367,7 @@ public:
 
     static bool HandleGPSCommand(ChatHandler* handler, char const* args)
     {
-        WorldObject* object = NULL;
+        WorldObject* object = nullptr;
         if (*args)
         {
             uint64 guid = handler->extractGuidFromLink((char*)args);
@@ -622,7 +618,7 @@ public:
         else
         {
             // check offline security
-            if (handler->HasLowerSecurity(NULL, targetGuid))
+            if (handler->HasLowerSecurity(nullptr, targetGuid))
                 return false;
 
             std::string nameLink = handler->playerLink(targetName);
@@ -740,7 +736,7 @@ public:
         else
         {
             // check offline security
-            if (handler->HasLowerSecurity(NULL, targetGuid))
+            if (handler->HasLowerSecurity(nullptr, targetGuid))
                 return false;
 
             std::string nameLink = handler->playerLink(targetName);
@@ -795,7 +791,7 @@ public:
             return false;
         }
 
-        for (GroupReference* itr = group->GetFirstMember(); itr != NULL; itr = itr->next())
+        for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
         {
             Player* player = itr->GetSource();
 
@@ -883,7 +879,7 @@ public:
                 Unit::Kill(handler->GetSession()->GetPlayer(), target);
             }
             else
-                Unit::DealDamage(handler->GetSession()->GetPlayer(), target, target->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false, true);
+                Unit::DealDamage(handler->GetSession()->GetPlayer(), target, target->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false, true);
         }
 
         return true;
@@ -974,7 +970,7 @@ public:
         if (!param1)
             return false;
 
-        char const* param2 = strtok(NULL, " ");
+        char const* param2 = strtok(nullptr, " ");
         if (!param2)
             return false;
 
@@ -1037,7 +1033,7 @@ public:
 
     static bool HandleGetDistanceCommand(ChatHandler* handler, char const* args)
     {
-        WorldObject* obj = NULL;
+        WorldObject* obj = nullptr;
 
         if (*args)
         {
@@ -1113,9 +1109,9 @@ public:
     // kick player
     static bool HandleKickPlayerCommand(ChatHandler* handler, char const* args)
     {
-        Player* target = NULL;
+        Player* target = nullptr;
         std::string playerName;
-        if (!handler->extractPlayerTarget((char*)args, &target, NULL, &playerName))
+        if (!handler->extractPlayerTarget((char*)args, &target, nullptr, &playerName))
             return false;
 
         if (handler->GetSession() && target == handler->GetSession()->GetPlayer())
@@ -1158,10 +1154,10 @@ public:
             return false;
 
         std::string location_str = "inn";
-        if (char const* loc = strtok(NULL, " "))
+        if (char const* loc = strtok(nullptr, " "))
             location_str = loc;
 
-        Player* player = NULL;
+        Player* player = nullptr;
         if (!handler->extractPlayerTarget(player_str, &player))
             return false;
 
@@ -1256,7 +1252,7 @@ public:
 
         TeamId teamId;
 
-        char* px2 = strtok(NULL, " ");
+        char* px2 = strtok(nullptr, " ");
 
         if (!px2)
             teamId = TEAM_NEUTRAL;
@@ -1499,12 +1495,12 @@ public:
             itemId = uint32(atol(id));
         }
 
-        char const* ccount = strtok(NULL, " ");
+        char const* ccount = strtok(nullptr, " ");
 
         int32 count = 1;
 
         if (ccount)
-            count = strtol(ccount, NULL, 10);
+            count = strtol(ccount, nullptr, 10);
 
         if (count == 0)
             count = 1;
@@ -1626,7 +1622,7 @@ public:
                 }
                 else
                 {
-                    player->SendEquipError(msg, NULL, NULL, itr->second.ItemId);
+                    player->SendEquipError(msg, nullptr, nullptr, itr->second.ItemId);
                     handler->PSendSysMessage(LANG_ITEM_CANNOT_CREATE, itr->second.ItemId, 1);
                 }
             }
@@ -1663,7 +1659,7 @@ public:
 
         // *Change the weather of a cell
         char const* px = strtok((char*)args, " ");
-        char const* py = strtok(NULL, " ");
+        char const* py = strtok(nullptr, " ");
 
         if (!px || !py)
             return false;
@@ -1713,11 +1709,11 @@ public:
         if (!skillStr)
             return false;
 
-        char const* levelStr = strtok(NULL, " ");
+        char const* levelStr = strtok(nullptr, " ");
         if (!levelStr)
             return false;
 
-        char const* maxPureSkill = strtok(NULL, " ");
+        char const* maxPureSkill = strtok(nullptr, " ");
 
         int32 skill = atoi(skillStr);
         if (skill <= 0)
@@ -1831,7 +1827,7 @@ public:
         else
         {
             // check offline security
-            if (handler->HasLowerSecurity(NULL, targetGuid))
+            if (handler->HasLowerSecurity(nullptr, targetGuid))
                 return false;
 
             PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_PINFO);
@@ -1921,11 +1917,11 @@ public:
             banreason     = fields[3].GetString();
         }
 
-        if (muteTime > 0 && muteTime > time(NULL))
-            handler->PSendSysMessage(LANG_PINFO_MUTE, secsToTimeString(muteTime - time(NULL), true).c_str(), muteBy.c_str(), muteReason.c_str());
+        if (muteTime > 0 && muteTime > time(nullptr))
+            handler->PSendSysMessage(LANG_PINFO_MUTE, secsToTimeString(muteTime - time(nullptr), true).c_str(), muteBy.c_str(), muteReason.c_str());
 
         if (banTime >= 0)
-            handler->PSendSysMessage(LANG_PINFO_BAN, banTime > 0 ? secsToTimeString(banTime - time(NULL), true).c_str() : "permanently", bannedby.c_str(), banreason.c_str());
+            handler->PSendSysMessage(LANG_PINFO_BAN, banTime > 0 ? secsToTimeString(banTime - time(nullptr), true).c_str() : "permanently", bannedby.c_str(), banreason.c_str());
 
         std::string raceStr, ClassStr;
         switch (race)
@@ -2081,9 +2077,9 @@ public:
         if (!delayStr)
             return false;
 
-        char const* muteReason = strtok(NULL, "\r");
+        char const* muteReason = strtok(nullptr, "\r");
         std::string muteReasonStr = "No reason";
-        if (muteReason != NULL)
+        if (muteReason != nullptr)
             muteReasonStr = muteReason;
 
         Player* target;
@@ -2115,7 +2111,7 @@ public:
         if (target)
         {
             // Target is online, mute will be in effect right away.
-            int64 muteTime = time(NULL) + notSpeakTime * MINUTE;
+            int64 muteTime = time(nullptr) + notSpeakTime * MINUTE;
             target->GetSession()->m_muteTime = muteTime;
             stmt->setInt64(0, muteTime);
             ChatHandler(target->GetSession()).PSendSysMessage(LANG_YOUR_CHAT_DISABLED, notSpeakTime, muteBy.c_str(), muteReasonStr.c_str());
@@ -2237,7 +2233,7 @@ public:
                     break;
                 case CHASE_MOTION_TYPE:
                 {
-                    Unit* target = NULL;
+                    Unit* target = nullptr;
                     if (unit->GetTypeId() == TYPEID_PLAYER)
                         target = static_cast<ChaseMovementGenerator<Player> const*>(movementGenerator)->GetTarget();
                     else
@@ -2253,7 +2249,7 @@ public:
                 }
                 case FOLLOW_MOTION_TYPE:
                 {
-                    Unit* target = NULL;
+                    Unit* target = nullptr;
                     if (unit->GetTypeId() == TYPEID_PLAYER)
                         target = static_cast<FollowMovementGenerator<Player> const*>(movementGenerator)->GetTarget();
                     else
@@ -2355,7 +2351,7 @@ public:
 
         if (target->GetTypeId() == TYPEID_UNIT && handler->GetSession()->GetSecurity() == SEC_CONSOLE) // pussywizard
             target->ToCreature()->LowerPlayerDamageReq(target->GetMaxHealth());
-        Unit::DealDamage(handler->GetSession()->GetPlayer(), target, damage, NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false, true);
+        Unit::DealDamage(handler->GetSession()->GetPlayer(), target, damage, nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false, true);
         if (target != handler->GetSession()->GetPlayer())
             handler->GetSession()->GetPlayer()->SendAttackStateUpdate (HITINFO_AFFECTS_VICTIM, target, 1, SPELL_SCHOOL_MASK_NORMAL, damage, 0, 0, VICTIMSTATE_HIT, 0);
         return true;
@@ -2363,7 +2359,7 @@ public:
 
     static bool HandleCombatStopCommand(ChatHandler* handler, char const* args)
     {
-        Player* target = NULL;
+        Player* target = nullptr;
 
         if (args && strlen(args) > 0)
         {
@@ -2460,7 +2456,7 @@ public:
         if (!handler->extractPlayerTarget((char*)args, &target, &targetGuid, &targetName))
             return false;
 
-        char* tail1 = strtok(NULL, "");
+        char* tail1 = strtok(nullptr, "");
         if (!tail1)
             return false;
 
@@ -2468,7 +2464,7 @@ public:
         if (!msgSubject)
             return false;
 
-        char* tail2 = strtok(NULL, "");
+        char* tail2 = strtok(nullptr, "");
         if (!tail2)
             return false;
 
@@ -2504,7 +2500,7 @@ public:
         if (!handler->extractPlayerTarget((char*)args, &receiver, &receiverGuid, &receiverName))
             return false;
 
-        char* tail1 = strtok(NULL, "");
+        char* tail1 = strtok(nullptr, "");
         if (!tail1)
             return false;
 
@@ -2512,7 +2508,7 @@ public:
         if (!msgSubject)
             return false;
 
-        char* tail2 = strtok(NULL, "");
+        char* tail2 = strtok(nullptr, "");
         if (!tail2)
             return false;
 
@@ -2530,17 +2526,17 @@ public:
         ItemPairs items;
 
         // get all tail string
-        char* tail = strtok(NULL, "");
+        char* tail = strtok(nullptr, "");
 
         // get from tail next item str
         while (char* itemStr = strtok(tail, " "))
         {
             // and get new tail
-            tail = strtok(NULL, "");
+            tail = strtok(nullptr, "");
 
             // parse item str
             char const* itemIdStr = strtok(itemStr, ":");
-            char const* itemCountStr = strtok(NULL, " ");
+            char const* itemCountStr = strtok(nullptr, " ");
 
             uint32 itemId = atoi(itemIdStr);
             if (!itemId)
@@ -2613,7 +2609,7 @@ public:
         if (!handler->extractPlayerTarget((char*)args, &receiver, &receiverGuid, &receiverName))
             return false;
 
-        char* tail1 = strtok(NULL, "");
+        char* tail1 = strtok(nullptr, "");
         if (!tail1)
             return false;
 
@@ -2621,7 +2617,7 @@ public:
         if (!msgSubject)
             return false;
 
-        char* tail2 = strtok(NULL, "");
+        char* tail2 = strtok(nullptr, "");
         if (!tail2)
             return false;
 
@@ -2629,7 +2625,7 @@ public:
         if (!msgText)
             return false;
 
-        char* moneyStr = strtok(NULL, "");
+        char* moneyStr = strtok(nullptr, "");
         int32 money = moneyStr ? atoi(moneyStr) : 0;
         if (money <= 0)
             return false;
@@ -2657,14 +2653,14 @@ public:
     static bool HandleSendMessageCommand(ChatHandler* handler, char const* args)
     {
         /// - Find the player
-        Player* player = NULL;
+        Player* player = nullptr;
         if (!handler->extractPlayerTarget((char*)args, &player))
             return false;
 
         if (!player)
             return false;
 
-        char* msgStr = strtok(NULL, "");
+        char* msgStr = strtok(nullptr, "");
         if (!msgStr)
             return false;
 
@@ -2919,8 +2915,8 @@ public:
 
     static bool HandleGroupLeaderCommand(ChatHandler* handler, char const* args)
     {
-        Player* player = NULL;
-        Group* group = NULL;
+        Player* player = nullptr;
+        Group* group = nullptr;
         uint64 guid = 0;
         char* nameStr = strtok((char*)args, " ");
 
@@ -2936,8 +2932,8 @@ public:
 
     static bool HandleGroupDisbandCommand(ChatHandler* handler, char const* args)
     {
-        Player* player = NULL;
-        Group* group = NULL;
+        Player* player = nullptr;
+        Group* group = nullptr;
         uint64 guid = 0;
         char* nameStr = strtok((char*)args, " ");
 
@@ -2950,8 +2946,8 @@ public:
 
     static bool HandleGroupRemoveCommand(ChatHandler* handler, char const* args)
     {
-        Player* player = NULL;
-        Group* group = NULL;
+        Player* player = nullptr;
+        Group* group = nullptr;
         uint64 guid = 0;
         char* nameStr = strtok((char*)args, " ");
 
@@ -2967,19 +2963,19 @@ public:
         if (!*args)
             return false;
 
-        Player* playerSource = NULL;
-        Group* groupSource = NULL;
+        Player* playerSource = nullptr;
+        Group* groupSource = nullptr;
         uint64 guidSource = 0;
         uint64 guidTarget = 0;
         char* nameplgrStr = strtok((char*)args, " ");
-        char* nameplStr = strtok(NULL, " ");
+        char* nameplStr = strtok(nullptr, " ");
 
         if (handler->GetPlayerGroupAndGUIDByName(nameplgrStr, playerSource, groupSource, guidSource, true))
         {
             if (groupSource)
             {
-                Group* groupTarget = NULL;
-                Player* playerTarget = NULL;
+                Group* groupTarget = nullptr;
+                Player* playerTarget = nullptr;
                 if (handler->GetPlayerGroupAndGUIDByName(nameplStr, playerTarget, groupTarget, guidTarget, true))
                 {
                     if (!groupTarget && playerTarget->GetGroup() != groupSource)
@@ -3033,7 +3029,7 @@ public:
         else if (!handler->extractPlayerTarget((char*)args, &playerTarget, &guidTarget, &nameTarget))
             return false;
 
-        Group* groupTarget = NULL;
+        Group* groupTarget = nullptr;
         if (playerTarget)
             groupTarget = playerTarget->GetGroup();
 

@@ -31,13 +31,11 @@ public:
             { "creature",       SEC_ADMINISTRATOR,  true,  &HandleListCreatureCommand,          "" },
             { "item",           SEC_ADMINISTRATOR,  true,  &HandleListItemCommand,              "" },
             { "object",         SEC_ADMINISTRATOR,  true,  &HandleListObjectCommand,            "" },
-            { "auras",          SEC_ADMINISTRATOR,  false, &HandleListAurasCommand,             "" },
-            { NULL,             0,                  false, NULL,                                "" }
+            { "auras",          SEC_ADMINISTRATOR,  false, &HandleListAurasCommand,             "" }
         };
         static std::vector<ChatCommand> commandTable =
         {
-            { "list",          SEC_ADMINISTRATOR,   true, NULL,                                 "", listCommandTable },
-            { NULL,            0,                   false, NULL,                                "" }
+            { "list",          SEC_ADMINISTRATOR,   true, nullptr,                                 "", listCommandTable }
         };
         return commandTable;
     }
@@ -68,7 +66,7 @@ public:
             return false;
         }
 
-        char* countStr = strtok(NULL, " ");
+        char* countStr = strtok(nullptr, " ");
         uint32 count = countStr ? atol(countStr) : 10;
 
         if (count == 0)
@@ -140,7 +138,7 @@ public:
             return false;
         }
 
-        char* countStr = strtok(NULL, " ");
+        char* countStr = strtok(nullptr, " ");
         uint32 count = countStr ? atol(countStr) : 10;
 
         if (count == 0)
@@ -215,7 +213,7 @@ public:
             result = CharacterDatabase.Query(stmt);
         }
         else
-            result = PreparedQueryResult(NULL);
+            result = PreparedQueryResult(nullptr);
 
         if (result)
         {
@@ -262,7 +260,7 @@ public:
             result = CharacterDatabase.Query(stmt);
         }
         else
-            result = PreparedQueryResult(NULL);
+            result = PreparedQueryResult(nullptr);
 
         if (result)
         {
@@ -357,7 +355,7 @@ public:
             return false;
         }
 
-        char* countStr = strtok(NULL, " ");
+        char* countStr = strtok(nullptr, " ");
         uint32 count = countStr ? atol(countStr) : 10;
 
         if (count == 0)

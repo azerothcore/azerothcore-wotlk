@@ -48,8 +48,7 @@ public:
             { "quest",      SEC_ADMINISTRATOR,  true,  &HandleReloadAllQuestCommand,      "" },
             { "scripts",    SEC_ADMINISTRATOR,  true,  &HandleReloadAllScriptsCommand,    "" },
             { "spell",      SEC_ADMINISTRATOR,  true,  &HandleReloadAllSpellCommand,      "" },
-            { "",           SEC_ADMINISTRATOR,  true,  &HandleReloadAllCommand,           "" },
-            { NULL,         0,                  false, NULL,                              "" }
+            { "",           SEC_ADMINISTRATOR,  true,  &HandleReloadAllCommand,           "" }
         };
         static std::vector<ChatCommand> reloadCommandTable =
         {
@@ -57,7 +56,7 @@ public:
             { "access_requirement",           SEC_ADMINISTRATOR, true,  &HandleReloadAccessRequirementCommand,          "" },
             { "achievement_criteria_data",    SEC_ADMINISTRATOR, true,  &HandleReloadAchievementCriteriaDataCommand,    "" },
             { "achievement_reward",           SEC_ADMINISTRATOR, true,  &HandleReloadAchievementRewardCommand,          "" },
-            { "all",                          SEC_ADMINISTRATOR, true,  NULL,                    "", reloadAllCommandTable },
+            { "all",                          SEC_ADMINISTRATOR, true,  nullptr,                    "", reloadAllCommandTable },
             { "areatrigger_involvedrelation", SEC_ADMINISTRATOR, true,  &HandleReloadQuestAreaTriggersCommand,          "" },
             { "areatrigger_tavern",           SEC_ADMINISTRATOR, true,  &HandleReloadAreaTriggerTavernCommand,          "" },
             { "areatrigger_teleport",         SEC_ADMINISTRATOR, true,  &HandleReloadAreaTriggerTeleportCommand,        "" },
@@ -139,13 +138,11 @@ public:
             { "waypoint_scripts",             SEC_ADMINISTRATOR, true,  &HandleReloadWpScriptsCommand,                  "" },
             { "waypoint_data",                SEC_ADMINISTRATOR, true,  &HandleReloadWpCommand,                         "" },
             { "vehicle_accessory",            SEC_ADMINISTRATOR, true,  &HandleReloadVehicleAccessoryCommand,           "" },
-            { "vehicle_template_accessory",   SEC_ADMINISTRATOR, true,  &HandleReloadVehicleTemplateAccessoryCommand,   "" },
-            { NULL,                           0,                 false, NULL,                                           "" }
+            { "vehicle_template_accessory",   SEC_ADMINISTRATOR, true,  &HandleReloadVehicleTemplateAccessoryCommand,   "" }
         };
         static std::vector<ChatCommand> commandTable =
         {
-            { "reload",         SEC_ADMINISTRATOR,  true,  NULL,                 "", reloadCommandTable },
-            { NULL,             0,                  false, NULL,                               "" }
+            { "reload",         SEC_ADMINISTRATOR,  true,  nullptr,                 "", reloadCommandTable }
         };
         return commandTable;
     }

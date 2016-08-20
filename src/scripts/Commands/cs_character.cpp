@@ -29,8 +29,7 @@ public:
         static std::vector<ChatCommand> pdumpCommandTable =
         {
             { "load",           SEC_ADMINISTRATOR,  true,  &HandlePDumpLoadCommand,                 "" },
-            { "write",          SEC_ADMINISTRATOR,  true,  &HandlePDumpWriteCommand,                "" },
-            { NULL,             0,                  false, NULL,                                    "" }
+            { "write",          SEC_ADMINISTRATOR,  true,  &HandlePDumpWriteCommand,                "" }
         };
 
         static std::vector<ChatCommand> characterCommandTable =
@@ -41,16 +40,14 @@ public:
             { "level",          SEC_ADMINISTRATOR,  true,  &HandleCharacterLevelCommand,           "" },
             { "rename",         SEC_GAMEMASTER,     true,  &HandleCharacterRenameCommand,          "" },
             { "reputation",     SEC_GAMEMASTER,     true,  &HandleCharacterReputationCommand,      "" },
-            { "titles",         SEC_GAMEMASTER,     true,  &HandleCharacterTitlesCommand,          "" },
-            { NULL,             0,                  false, NULL,                                   "" }
+            { "titles",         SEC_GAMEMASTER,     true,  &HandleCharacterTitlesCommand,          "" }
         };
 
         static std::vector<ChatCommand> commandTable =
         {
-            { "character",      SEC_GAMEMASTER,     true,  NULL,                                   "", characterCommandTable },
+            { "character",      SEC_GAMEMASTER,     true,  nullptr,                                   "", characterCommandTable },
             { "levelup",        SEC_ADMINISTRATOR,  false, &HandleLevelUpCommand,                  "" },
-            { "pdump",          SEC_ADMINISTRATOR,  true,  NULL,                                   "", pdumpCommandTable },
-            { NULL,             0,                  false, NULL,                                   "" }
+            { "pdump",          SEC_ADMINISTRATOR,  true,  nullptr,                                   "", pdumpCommandTable }
         };
         return commandTable;
     }
@@ -159,7 +156,7 @@ public:
         else
         {
             // check offline security
-            if (handler->HasLowerSecurity(NULL, targetGuid))
+            if (handler->HasLowerSecurity(nullptr, targetGuid))
                 return false;
 
             std::string oldNameLink = handler->playerLink(targetName);
@@ -186,7 +183,7 @@ public:
         if (isalpha(levelStr[0]))
         {
             nameStr = levelStr;
-            levelStr = NULL;                                    // current level will used
+            levelStr = nullptr;                                    // current level will used
         }
 
         Player* target;
@@ -205,7 +202,7 @@ public:
             newlevel = DEFAULT_MAX_LEVEL;
 
         HandleCharacterLevel(target, targetGuid, oldlevel, newlevel, handler);
-        if (!handler->GetSession() || handler->GetSession()->GetPlayer() != target)      // including player == NULL
+        if (!handler->GetSession() || handler->GetSession()->GetPlayer() != target)      // including player == nullptr
         {
             std::string nameLink = handler->playerLink(targetName);
             handler->PSendSysMessage(LANG_YOU_CHANGE_LVL, nameLink.c_str(), newlevel);
@@ -352,7 +349,7 @@ public:
         if (levelStr && isalpha(levelStr[0]))
         {
             nameStr = levelStr;
-            levelStr = NULL;                                    // current level will used
+            levelStr = nullptr;                                    // current level will used
         }
 
         Player* target;
@@ -373,7 +370,7 @@ public:
 
         HandleCharacterLevel(target, targetGuid, oldlevel, newlevel, handler);
 
-        if (!handler->GetSession() || handler->GetSession()->GetPlayer() != target)      // including chr == NULL
+        if (!handler->GetSession() || handler->GetSession()->GetPlayer() != target)      // including chr == nullptr
         {
             std::string nameLink = handler->playerLink(targetName);
             handler->PSendSysMessage(LANG_YOU_CHANGE_LVL, nameLink.c_str(), newlevel);
@@ -391,7 +388,7 @@ public:
         if (!fileStr)
             return false;
 
-        char* accountStr = strtok(NULL, " ");
+        char* accountStr = strtok(nullptr, " ");
         if (!accountStr)
             return false;
 
@@ -422,8 +419,8 @@ public:
             return false;
         }
 
-        char* guidStr = NULL;
-        char* nameStr = strtok(NULL, " ");
+        char* guidStr = nullptr;
+        char* nameStr = strtok(nullptr, " ");
 
         std::string name;
         if (nameStr)
@@ -444,7 +441,7 @@ public:
                 return false;
             }
 
-            guidStr = strtok(NULL, " ");
+            guidStr = strtok(nullptr, " ");
         }
 
         uint32 guid = 0;
@@ -499,7 +496,7 @@ public:
             return false;
 
         char* fileStr = strtok((char*)args, " ");
-        char* playerStr = strtok(NULL, " ");
+        char* playerStr = strtok(nullptr, " ");
 
         if (!fileStr && !playerStr)
         {

@@ -35,8 +35,7 @@ public:
         {
             { "cinematic",      SEC_GAMEMASTER,      false, &HandleDebugPlayCinematicCommand,   "" },
             { "movie",          SEC_GAMEMASTER,      false, &HandleDebugPlayMovieCommand,       "" },
-            { "sound",          SEC_GAMEMASTER,      false, &HandleDebugPlaySoundCommand,       "" },
-            { NULL,             SEC_PLAYER,     false, NULL,                               "" }
+            { "sound",          SEC_GAMEMASTER,      false, &HandleDebugPlaySoundCommand,       "" }
         };
         static std::vector<ChatCommand> debugSendCommandTable =
         {
@@ -50,8 +49,7 @@ public:
             { "qinvalidmsg",    SEC_ADMINISTRATOR,  false, &HandleDebugSendQuestInvalidMsgCommand, "" },
             { "sellerror",      SEC_ADMINISTRATOR,  false, &HandleDebugSendSellErrorCommand,      "" },
             { "setphaseshift",  SEC_ADMINISTRATOR,  false, &HandleDebugSendSetPhaseShiftCommand,  "" },
-            { "spellfail",      SEC_ADMINISTRATOR,  false, &HandleDebugSendSpellFailCommand,      "" },
-            { NULL,             SEC_PLAYER,         false, NULL,                                  "" }
+            { "spellfail",      SEC_ADMINISTRATOR,  false, &HandleDebugSendSpellFailCommand,      "" }
         };
         static std::vector<ChatCommand> debugCommandTable =
         {
@@ -66,8 +64,8 @@ public:
             { "getvalue",       SEC_ADMINISTRATOR,  false, &HandleDebugGetValueCommand,        "" },
             { "getitemvalue",   SEC_ADMINISTRATOR,  false, &HandleDebugGetItemValueCommand,    "" },
             { "Mod32Value",     SEC_ADMINISTRATOR,  false, &HandleDebugMod32ValueCommand,      "" },
-            { "play",           SEC_GAMEMASTER,      false, NULL,              "", debugPlayCommandTable },
-            { "send",           SEC_ADMINISTRATOR,  false, NULL,              "", debugSendCommandTable },
+            { "play",           SEC_GAMEMASTER,      false, nullptr,              "", debugPlayCommandTable },
+            { "send",           SEC_ADMINISTRATOR,  false, nullptr,              "", debugSendCommandTable },
             { "setaurastate",   SEC_ADMINISTRATOR,  false, &HandleDebugSetAuraStateCommand,    "" },
             { "setitemvalue",   SEC_ADMINISTRATOR,  false, &HandleDebugSetItemValueCommand,    "" },
             { "setvalue",       SEC_ADMINISTRATOR,  false, &HandleDebugSetValueCommand,        "" },
@@ -80,14 +78,13 @@ public:
             { "areatriggers",   SEC_ADMINISTRATOR,  false, &HandleDebugAreaTriggersCommand,    "" },
             { "los",            SEC_GAMEMASTER,      false, &HandleDebugLoSCommand,             "" },
             { "moveflags",      SEC_ADMINISTRATOR,  false, &HandleDebugMoveflagsCommand,       "" },
-            { "unitstate",      SEC_ADMINISTRATOR,  false, &HandleDebugUnitStateCommand,       "" },
-            { NULL,             SEC_PLAYER,         false, NULL,                               "" }
+            { "unitstate",      SEC_ADMINISTRATOR,  false, &HandleDebugUnitStateCommand,       "" }
         };
         static std::vector<ChatCommand> commandTable =
         {
-            { "debug",          SEC_GAMEMASTER,      true,  NULL,                 "", debugCommandTable },
+            { "debug",          SEC_GAMEMASTER,      true,  nullptr,                 "", debugCommandTable },
             { "wpgps",          SEC_ADMINISTRATOR,  false, &HandleWPGPSCommand,   "", },
-            { NULL,             SEC_PLAYER,         false, NULL,                  "", }
+            { nullptr,             SEC_PLAYER,         false, nullptr,                  "", }
         };
         return commandTable;
     }
@@ -191,10 +188,10 @@ public:
         if (failNum == 0 && *result != '0')
             return false;
 
-        char* fail1 = strtok(NULL, " ");
+        char* fail1 = strtok(nullptr, " ");
         uint8 failArg1 = fail1 ? (uint8)atoi(fail1) : 0;
 
-        char* fail2 = strtok(NULL, " ");
+        char* fail2 = strtok(nullptr, " ");
         uint8 failArg2 = fail2 ? (uint8)atoi(fail2) : 0;
 
         WorldPacket data(SMSG_CAST_FAILED, 5);
@@ -217,7 +214,7 @@ public:
             return false;
 
         InventoryResult msg = InventoryResult(atoi(args));
-        handler->GetSession()->GetPlayer()->SendEquipError(msg, NULL, NULL);
+        handler->GetSession()->GetPlayer()->SendEquipError(msg, nullptr, nullptr);
         return true;
     }
 
@@ -244,7 +241,7 @@ public:
     static bool HandleDebugSendOpcodeCommand(ChatHandler* handler, char const* /*args*/)
     {
         Unit* unit = handler->getSelectedUnit();
-        Player* player = NULL;
+        Player* player = nullptr;
         if (!unit || (unit->GetTypeId() != TYPEID_PLAYER))
             player = handler->GetSession()->GetPlayer();
         else
@@ -415,7 +412,7 @@ public:
     static bool HandleDebugUpdateWorldStateCommand(ChatHandler* handler, char const* args)
     {
         char* w = strtok((char*)args, " ");
-        char* s = strtok(NULL, " ");
+        char* s = strtok(nullptr, " ");
 
         if (!w || !s)
             return false;
@@ -631,9 +628,9 @@ public:
                         continue;
                     }
 
-                    if (updateQueue[qp] == NULL)
+                    if (updateQueue[qp] == nullptr)
                     {
-                        handler->PSendSysMessage("The item with slot %d and guid %d has its queuepos (%d) pointing to NULL in the queue!", item->GetSlot(), item->GetGUIDLow(), qp);
+                        handler->PSendSysMessage("The item with slot %d and guid %d has its queuepos (%d) pointing to nullptr in the queue!", item->GetSlot(), item->GetGUIDLow(), qp);
                         error = true;
                         continue;
                     }
@@ -699,9 +696,9 @@ public:
                                 continue;
                             }
 
-                            if (updateQueue[qp] == NULL)
+                            if (updateQueue[qp] == nullptr)
                             {
-                                handler->PSendSysMessage("The item in bag %d at slot %d having guid %d has a queuepos (%d) that points to NULL in the queue!", bag->GetSlot(), item2->GetSlot(), item2->GetGUIDLow(), qp);
+                                handler->PSendSysMessage("The item in bag %d at slot %d having guid %d has a queuepos (%d) that points to nullptr in the queue!", bag->GetSlot(), item2->GetSlot(), item2->GetGUIDLow(), qp);
                                 error = true;
                                 continue;
                             }
@@ -748,7 +745,7 @@ public:
 
                 Item* test = player->GetItemByPos(item->GetBagSlot(), item->GetSlot());
 
-                if (test == NULL)
+                if (test == nullptr)
                 {
                     handler->PSendSysMessage("queue(" SIZEFMTD "): The bag(%d) and slot(%d) values for the item with guid %d are incorrect, the player doesn't have any item at that position!", i, item->GetBagSlot(), item->GetSlot(), item->GetGUIDLow());
                     error = true;
@@ -869,7 +866,7 @@ public:
         if (!i)
             return false;
 
-        char* j = strtok(NULL, " ");
+        char* j = strtok(nullptr, " ");
 
         uint32 entry = (uint32)atoi(i);
         int8 seatId = j ? (int8)atoi(j) : -1;
@@ -878,7 +875,7 @@ public:
             handler->GetSession()->GetPlayer()->EnterVehicle(target, seatId);
         else
         {
-            Creature* passenger = NULL;
+            Creature* passenger = nullptr;
             Trinity::AllCreaturesOfEntryInRange check(handler->GetSession()->GetPlayer(), entry, 20.0f);
             Trinity::CreatureSearcher<Trinity::AllCreaturesOfEntryInRange> searcher(handler->GetSession()->GetPlayer(), passenger, check);
             handler->GetSession()->GetPlayer()->VisitNearbyObject(30.0f, searcher);
@@ -897,7 +894,7 @@ public:
             return false;
 
         char* e = strtok((char*)args, " ");
-        char* i = strtok(NULL, " ");
+        char* i = strtok(nullptr, " ");
 
         if (!e)
             return false;
@@ -963,7 +960,7 @@ public:
             return false;
 
         char* e = strtok((char*)args, " ");
-        char* f = strtok(NULL, " ");
+        char* f = strtok(nullptr, " ");
 
         if (!e || !f)
             return false;
@@ -992,8 +989,8 @@ public:
             return false;
 
         char* e = strtok((char*)args, " ");
-        char* f = strtok(NULL, " ");
-        char* g = strtok(NULL, " ");
+        char* f = strtok(nullptr, " ");
+        char* g = strtok(nullptr, " ");
 
         if (!e || !f || !g)
             return false;
@@ -1091,8 +1088,8 @@ public:
             return false;
 
         char* x = strtok((char*)args, " ");
-        char* y = strtok(NULL, " ");
-        char* z = strtok(NULL, " ");
+        char* y = strtok(nullptr, " ");
+        char* z = strtok(nullptr, " ");
 
         if (!x || !y)
             return false;
@@ -1140,7 +1137,7 @@ public:
             return false;
 
         char* x = strtok((char*)args, " ");
-        char* z = strtok(NULL, " ");
+        char* z = strtok(nullptr, " ");
 
         if (!x)
             return false;
@@ -1186,7 +1183,7 @@ public:
             return false;
 
         char* x = strtok((char*)args, " ");
-        char* y = strtok(NULL, " ");
+        char* y = strtok(nullptr, " ");
 
         if (!x || !y)
             return false;
@@ -1241,7 +1238,7 @@ public:
         else if (updateIndex >= UNIT_END)
             return true;
 
-        char* val = strtok(NULL, " ");
+        char* val = strtok(nullptr, " ");
         if (!val)
         {
             value = unit->GetUInt32Value(updateIndex);
@@ -1273,7 +1270,7 @@ public:
         }
 
         char* x = strtok((char*)args, " ");
-        char* y = strtok(NULL, " ");
+        char* y = strtok(nullptr, " ");
 
         if (!x || !y)
             return false;
@@ -1307,7 +1304,7 @@ public:
             if (!mask1)
                 return false;
 
-            char* mask2 = strtok(NULL, " \n");
+            char* mask2 = strtok(nullptr, " \n");
 
             uint32 moveFlags = (uint32)atoi(mask1);
             target->SetUnitMovementFlags(moveFlags);

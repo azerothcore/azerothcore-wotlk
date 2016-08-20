@@ -34,13 +34,11 @@ public:
             //{ "ingame",         SEC_PLAYER,         true,  &HandleGMListIngameCommand,        "" },
             { "list",           SEC_ADMINISTRATOR,  true,  &HandleGMListFullCommand,          "" },
             { "visible",        SEC_GAMEMASTER,      false, &HandleGMVisibleCommand,           "" },
-            { "",               SEC_GAMEMASTER,      false, &HandleGMCommand,                  "" },
-            { NULL,             0,                  false, NULL,                              "" }
+            { "",               SEC_GAMEMASTER,      false, &HandleGMCommand,                  "" }
         };
         static std::vector<ChatCommand> commandTable =
         {
-            { "gm",             SEC_GAMEMASTER,      false, NULL,                     "", gmCommandTable },
-            { NULL,             0,                  false, NULL,                               "" }
+            { "gm",             SEC_GAMEMASTER,      false, nullptr,                     "", gmCommandTable }
         };
         return commandTable;
     }

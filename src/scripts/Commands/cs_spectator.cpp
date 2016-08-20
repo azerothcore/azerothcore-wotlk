@@ -25,13 +25,11 @@ public:
             { "spectate",       SEC_CONSOLE,        false, &ArenaSpectator::HandleSpectatorSpectateCommand, "" },
             { "watch",          SEC_CONSOLE,        false, &ArenaSpectator::HandleSpectatorWatchCommand, "" },
             { "leave",          SEC_CONSOLE,        false, &HandleSpectatorLeaveCommand,      "" },
-            { "",               SEC_CONSOLE,        false, &HandleSpectatorCommand,           "" },
-            { NULL,             0,                  false, NULL,                              "" }
+            { "",               SEC_CONSOLE,        false, &HandleSpectatorCommand,           "" }
         };
         static std::vector<ChatCommand> commandTable =
         {
-            { "spect",          SEC_CONSOLE,        false, NULL,                              "", spectatorCommandTable },
-            { NULL,             0,                  false, NULL,                              "" }
+            { "spect",          SEC_CONSOLE,        false, nullptr,                              "", spectatorCommandTable }
         };
         return commandTable;
     }

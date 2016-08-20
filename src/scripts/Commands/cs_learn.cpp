@@ -32,33 +32,29 @@ public:
             { "class",          SEC_ADMINISTRATOR,  false, &HandleLearnAllMyClassCommand,       "" },
             { "pettalents",     SEC_ADMINISTRATOR,  false, &HandleLearnAllMyPetTalentsCommand,  "" },
             { "spells",         SEC_ADMINISTRATOR,  false, &HandleLearnAllMySpellsCommand,      "" },
-            { "talents",        SEC_ADMINISTRATOR,  false, &HandleLearnAllMyTalentsCommand,     "" },
-            { NULL,             0,                  false, NULL,                                "" }
+            { "talents",        SEC_ADMINISTRATOR,  false, &HandleLearnAllMyTalentsCommand,     "" }
         };
 
         static std::vector<ChatCommand> learnAllCommandTable =
         {
-            { "my",             SEC_ADMINISTRATOR,  false, NULL,                                "",  learnAllMyCommandTable },
+            { "my",             SEC_ADMINISTRATOR,  false, nullptr,                                "",  learnAllMyCommandTable },
             { "gm",             SEC_GAMEMASTER,     false, &HandleLearnAllGMCommand,            "" },
             { "crafts",         SEC_GAMEMASTER,     false, &HandleLearnAllCraftsCommand,        "" },
             { "default",        SEC_GAMEMASTER,      false, &HandleLearnAllDefaultCommand,       "" },
             { "lang",           SEC_GAMEMASTER,      false, &HandleLearnAllLangCommand,          "" },
-            { "recipes",        SEC_GAMEMASTER,     false, &HandleLearnAllRecipesCommand,       "" },
-            { NULL,             0,                  false, NULL,                                "" }
+            { "recipes",        SEC_GAMEMASTER,     false, &HandleLearnAllRecipesCommand,       "" }
         };
 
         static std::vector<ChatCommand> learnCommandTable =
         {
-            { "all",            SEC_ADMINISTRATOR,  false, NULL,                                "",  learnAllCommandTable },
-            { "",               SEC_ADMINISTRATOR,  false, &HandleLearnCommand,                 "" },
-            { NULL,             0,                  false, NULL,                                "" }
+            { "all",            SEC_ADMINISTRATOR,  false, nullptr,                                "",  learnAllCommandTable },
+            { "",               SEC_ADMINISTRATOR,  false, &HandleLearnCommand,                 "" }
         };
 
         static std::vector<ChatCommand> commandTable =
         {
-            { "learn",          SEC_GAMEMASTER,      false, NULL,                                "", learnCommandTable },
-            { "unlearn",        SEC_ADMINISTRATOR,  false, &HandleUnLearnCommand,               "" },
-            { NULL,             0,                  false, NULL,                                "" }
+            { "learn",          SEC_GAMEMASTER,      false, nullptr,                                "", learnCommandTable },
+            { "unlearn",        SEC_ADMINISTRATOR,  false, &HandleUnLearnCommand,               "" }
         };
         return commandTable;
     }
@@ -103,7 +99,7 @@ public:
             return false;
         }
 
-        char const* all = strtok(NULL, " ");
+        char const* all = strtok(nullptr, " ");
         bool allRanks = all ? (strncmp(all, "all", strlen(all)) == 0) : false;
 
         if (!allRanks && targetPlayer->HasSpell(spell))
@@ -389,7 +385,7 @@ public:
 
         std::string name;
 
-        SkillLineEntry const* targetSkillInfo = NULL;
+        SkillLineEntry const* targetSkillInfo = nullptr;
         for (uint32 i = 1; i < sSkillLineStore.GetNumRows(); ++i)
         {
             SkillLineEntry const* skillInfo = sSkillLineStore.LookupEntry(i);
@@ -485,7 +481,7 @@ public:
         if (!spellId)
             return false;
 
-        char const* allStr = strtok(NULL, " ");
+        char const* allStr = strtok(nullptr, " ");
         bool allRanks = allStr ? (strncmp(allStr, "all", strlen(allStr)) == 0) : false;
 
         Player* target = handler->getSelectedPlayer();

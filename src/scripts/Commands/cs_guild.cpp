@@ -31,13 +31,11 @@ public:
             { "delete",         SEC_GAMEMASTER,     true,  &HandleGuildDeleteCommand,           "" },
             { "invite",         SEC_GAMEMASTER,     true,  &HandleGuildInviteCommand,           "" },
             { "uninvite",       SEC_GAMEMASTER,     true,  &HandleGuildUninviteCommand,         "" },
-            { "rank",           SEC_GAMEMASTER,     true,  &HandleGuildRankCommand,             "" },
-            { NULL,             0,                  false, NULL,                                "" }
+            { "rank",           SEC_GAMEMASTER,     true,  &HandleGuildRankCommand,             "" }
         };
         static std::vector<ChatCommand> commandTable =
         {
-            { "guild",          SEC_ADMINISTRATOR,  true, NULL,                                 "", guildCommandTable },
-            { NULL,             0,                  false, NULL,                                "" }
+            { "guild",          SEC_ADMINISTRATOR,  true, nullptr,                                 "", guildCommandTable }
         };
         return commandTable;
     }
@@ -57,10 +55,10 @@ public:
 
         // if not guild name only (in "") then player name
         Player* target;
-        if (!handler->extractPlayerTarget(*args != '"' ? (char*)args : NULL, &target))
+        if (!handler->extractPlayerTarget(*args != '"' ? (char*)args : nullptr, &target))
             return false;
 
-        char* tailStr = *args != '"' ? strtok(NULL, "") : (char*)args;
+        char* tailStr = *args != '"' ? strtok(nullptr, "") : (char*)args;
         if (!tailStr)
             return false;
 
@@ -118,10 +116,10 @@ public:
 
         // if not guild name only (in "") then player name
         uint64 targetGuid;
-        if (!handler->extractPlayerTarget(*args != '"' ? (char*)args : NULL, NULL, &targetGuid))
+        if (!handler->extractPlayerTarget(*args != '"' ? (char*)args : nullptr, nullptr, &targetGuid))
             return false;
 
-        char* tailStr = *args != '"' ? strtok(NULL, "") : (char*)args;
+        char* tailStr = *args != '"' ? strtok(nullptr, "") : (char*)args;
         if (!tailStr)
             return false;
 

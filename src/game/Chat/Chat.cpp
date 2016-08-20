@@ -348,10 +348,10 @@ bool ChatHandler::SetDataForCommandInTable(std::vector<ChatCommand>& table, char
 
     while (*text == ' ') ++text;
 
-    for (uint32 i = 0; table[i].Name != nullptr; i++)
+    for (uint32 i = 0; i < table.size(); i++)
     {
         // for data fill use full explicit command names
-        if (table[i].Name != cmd)
+        if (table[i].Name == nullptr || table[i].Name != cmd)
             continue;
 
         // select subcommand from child commands list (including "")
@@ -372,7 +372,7 @@ bool ChatHandler::SetDataForCommandInTable(std::vector<ChatCommand>& table, char
         }
 
         //if (table[i].SecurityLevel != security)
-            ;//sLog->outDetail("Table `command` overwrite for command '%s' default security (%u) by %u", fullcommand.c_str(), table[i].SecurityLevel, security);
+        //    sLog->outDetail("Table `command` overwrite for command '%s' default security (%u) by %u", fullcommand.c_str(), table[i].SecurityLevel, security);
 
         table[i].SecurityLevel = security;
         table[i].Help          = help;
@@ -383,9 +383,9 @@ bool ChatHandler::SetDataForCommandInTable(std::vector<ChatCommand>& table, char
     if (!cmd.empty())
     {
         if (&table == &getCommandTable())
-            sLog->outError("Table `command` have not existed command '%s', skip.", cmd.c_str());
+            sLog->outError("Table `command` have non-existing command '%s', skip.", cmd.c_str());
         else
-            sLog->outError("Table `command` have not existed subcommand '%s' in command '%s', skip.", cmd.c_str(), fullcommand.c_str());
+            sLog->outError("Table `command` have non-existing subcommand '%s' in command '%s', skip.", cmd.c_str(), fullcommand.c_str());
     }
 
     return false;
