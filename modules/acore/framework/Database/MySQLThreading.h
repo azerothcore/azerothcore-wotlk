@@ -23,8 +23,6 @@ class MySQL
         static void Thread_Init()
         {
             mysql_thread_init();
-            sLog->outSQLDriver("Core thread with ID [" UI64FMTD "] initializing MySQL thread.",
-                    ACORE::Thread::currentId());
         }
 
         /*! Shuts down MySQL thread and frees resources, should only be called
@@ -34,8 +32,6 @@ class MySQL
         static void Thread_End()
         {
             mysql_thread_end();
-            sLog->outSQLDriver("Core thread with ID [" UI64FMTD "] shutting down MySQL thread.",
-                ACORE::Thread::currentId());
         }
 
         static void Library_Init()
