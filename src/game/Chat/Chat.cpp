@@ -247,7 +247,7 @@ bool ChatHandler::ExecuteCommandInTable(std::vector<ChatCommand> const& table, c
     for (uint32 i = 0; i < table.size(); ++i)
     {
         // for data fill use full explicit command names
-        if (table[i].Name == nullptr || table[i].Name != cmd)
+        if (table[i].Name == nullptr)
             continue;
 
         if (!hasStringAbbr(table[i].Name, cmd.c_str()))
@@ -261,15 +261,14 @@ bool ChatHandler::ExecuteCommandInTable(std::vector<ChatCommand> const& table, c
                 if (!hasStringAbbr(table[j].Name, cmd.c_str()))
                     continue;
 
-                if (strcmp(table[j].Name, cmd.c_str()) != 0)
-                    continue;
-                else
+                if (strcmp(table[j].Name, cmd.c_str()) == 0)
                 {
                     match = true;
                     break;
                 }
             }
         }
+
         if (match)
             continue;
 
@@ -278,7 +277,7 @@ bool ChatHandler::ExecuteCommandInTable(std::vector<ChatCommand> const& table, c
         {
             if (!ExecuteCommandInTable(table[i].ChildCommands, text, fullcmd))
             {
-                if (text && text[0] != '\0')
+                if (text[0] != '\0')
                     SendSysMessage(LANG_NO_SUBCMD);
                 else
                     SendSysMessage(LANG_CMD_SYNTAX);
