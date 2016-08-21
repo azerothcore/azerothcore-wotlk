@@ -1,19 +1,7 @@
 /*
- * Copyright (C) 
- * Copyright (C) 
- *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation; either version 2 of the License, or (at your
- * option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
- * more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program. If not, see <http://www.gnu.org/licenses/>.
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
+ * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
 /** \file WorldSocketMgr.cpp
@@ -30,7 +18,7 @@
 #include <ace/TP_Reactor.h>
 #include <ace/Dev_Poll_Reactor.h>
 #include <ace/Guard_T.h>
-#include <ace/Atomic_Op.h>
+#include <atomic>
 #include <ace/os_include/arpa/os_inet.h>
 #include <ace/os_include/netinet/os_tcp.h>
 #include <ace/os_include/sys/os_types.h>
@@ -104,7 +92,7 @@ class ReactorRunnable : protected ACE_Task_Base
 
         long Connections()
         {
-            return static_cast<long> (m_Connections.value());
+            return static_cast<long> (m_Connections);
         }
 
         int AddSocket (WorldSocket* sock)
@@ -198,7 +186,7 @@ class ReactorRunnable : protected ACE_Task_Base
         }
 
     private:
-        typedef ACE_Atomic_Op<ACE_SYNCH_MUTEX, long> AtomicInt;
+        typedef std::atomic_long AtomicInt;
         typedef std::set<WorldSocket*> SocketSet;
 
         ACE_Reactor* m_Reactor;

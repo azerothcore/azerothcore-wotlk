@@ -1,18 +1,7 @@
 /*
- * Copyright (C) 
- *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation; either version 2 of the License, or (at your
- * option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
- * more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program. If not, see <http://www.gnu.org/licenses/>.
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
+ * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
 /* ScriptData
@@ -33,26 +22,23 @@ class honor_commandscript : public CommandScript
 public:
     honor_commandscript() : CommandScript("honor_commandscript") { }
 
-    ChatCommand* GetCommands() const
+    std::vector<ChatCommand> GetCommands() const override
     {
-        static ChatCommand honorAddCommandTable[] =
+        static std::vector<ChatCommand> honorAddCommandTable =
         {
-            { "kill",           SEC_GAMEMASTER,     false, &HandleHonorAddKillCommand,         "", NULL },
-            { "",               SEC_GAMEMASTER,     false, &HandleHonorAddCommand,             "", NULL },
-            { NULL,             0,                  false, NULL,                               "", NULL }
+            { "kill",           SEC_GAMEMASTER,     false, &HandleHonorAddKillCommand,         "" },
+            { "",               SEC_GAMEMASTER,     false, &HandleHonorAddCommand,             "" }
         };
 
-        static ChatCommand honorCommandTable[] =
+        static std::vector<ChatCommand> honorCommandTable =
         {
-            { "add",            SEC_GAMEMASTER,     false, NULL,               "", honorAddCommandTable },
-            { "update",         SEC_GAMEMASTER,     false, &HandleHonorUpdateCommand,          "", NULL },
-            { NULL,             0,                  false, NULL,                               "", NULL }
+            { "add",            SEC_GAMEMASTER,     false, nullptr,               "", honorAddCommandTable },
+            { "update",         SEC_GAMEMASTER,     false, &HandleHonorUpdateCommand,          "" }
         };
 
-        static ChatCommand commandTable[] =
+        static std::vector<ChatCommand> commandTable =
         {
-            { "honor",          SEC_GAMEMASTER,     false, NULL,                  "", honorCommandTable },
-            { NULL,             0,                  false, NULL,                               "", NULL }
+            { "honor",          SEC_GAMEMASTER,     false, nullptr,                  "", honorCommandTable }
         };
         return commandTable;
     }
@@ -75,7 +61,7 @@ public:
             return false;
 
         uint32 amount = (uint32)atoi(args);
-        target->RewardHonor(NULL, 1, amount);
+        target->RewardHonor(nullptr, 1, amount);
         return true;
     }
 

@@ -5,6 +5,8 @@ REWRITTEN BY XINEF
 #ifndef DEF_DEADMINES_H
 #define DEF_DEADMINES_H
 
+#include "ScriptPCH.h"
+
 enum DataTypes
 {
     TYPE_RHAHK_ZOR              = 0,

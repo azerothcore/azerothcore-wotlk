@@ -5,6 +5,8 @@ REWRITTEN BY XINEF
 #ifndef DEF_MAGISTERS_TERRACE_H
 #define DEF_MAGISTERS_TERRACE_H
 
+#include "ScriptPCH.h"
+
 enum MTData
 {
     DATA_SELIN_EVENT            = 0,

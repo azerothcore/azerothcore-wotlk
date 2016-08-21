@@ -5,6 +5,8 @@ REWRITTEN BY XINEF
 #ifndef DEF_DRAK_THARON_H
 #define DEF_DRAK_THARON_H
 
+#include "ScriptPCH.h"
+
 enum Data
 {
     DATA_TROLLGORE              = 0,

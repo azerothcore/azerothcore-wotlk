@@ -5,6 +5,8 @@ REWRITTEN BY XINEF
 #ifndef DEF_SERPENT_SHRINE_H
 #define DEF_SERPENT_SHRINE_H
 
+#include "ScriptPCH.h"
+
 enum DataTypes
 {
     DATA_HYDROSS_THE_UNSTABLE               = 0,

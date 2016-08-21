@@ -5,6 +5,8 @@ REWRITTEN BY XINEF
 #ifndef DEF_SUNKEN_TEMPLE_H
 #define DEF_SUNKEN_TEMPLE_H
 
+#include "ScriptPCH.h"
+
 enum DataTypes
 {
     DATA_STATUES                = 10,

@@ -5,6 +5,8 @@ REWRITTEN BY XINEF
 #ifndef DEF_NEXUS_H
 #define DEF_NEXUS_H
 
+#include "ScriptPCH.h"
+
 enum eTypes
 {
     DATA_MAGUS_TELESTRA_EVENT       = 0,

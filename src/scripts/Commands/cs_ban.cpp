@@ -1,18 +1,7 @@
 /*
- * Copyright (C) 
- *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation; either version 2 of the License, or (at your
- * option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
- * more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program. If not, see <http://www.gnu.org/licenses/>.
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
+ * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
 /* ScriptData
@@ -35,45 +24,40 @@ class ban_commandscript : public CommandScript
 public:
     ban_commandscript() : CommandScript("ban_commandscript") { }
 
-    ChatCommand* GetCommands() const
+    std::vector<ChatCommand> GetCommands() const override
     {
-        static ChatCommand unbanCommandTable[] =
+        static std::vector<ChatCommand> unbanCommandTable =
         {
-            { "account",        SEC_ADMINISTRATOR,  true,  &HandleUnBanAccountCommand,          "", NULL },
-            { "character",      SEC_ADMINISTRATOR,  true,  &HandleUnBanCharacterCommand,        "", NULL },
-            { "playeraccount",  SEC_ADMINISTRATOR,  true,  &HandleUnBanAccountByCharCommand,    "", NULL },
-            { "ip",             SEC_ADMINISTRATOR,  true,  &HandleUnBanIPCommand,               "", NULL },
-            { NULL,             0,                  false, NULL,                                "", NULL }
+            { "account",        SEC_ADMINISTRATOR,  true,  &HandleUnBanAccountCommand,          "" },
+            { "character",      SEC_ADMINISTRATOR,  true,  &HandleUnBanCharacterCommand,        "" },
+            { "playeraccount",  SEC_ADMINISTRATOR,  true,  &HandleUnBanAccountByCharCommand,    "" },
+            { "ip",             SEC_ADMINISTRATOR,  true,  &HandleUnBanIPCommand,               "" }
         };
-        static ChatCommand banlistCommandTable[] =
+        static std::vector<ChatCommand> banlistCommandTable =
         {
-            { "account",        SEC_ADMINISTRATOR,  true,  &HandleBanListAccountCommand,        "", NULL },
-            { "character",      SEC_ADMINISTRATOR,  true,  &HandleBanListCharacterCommand,      "", NULL },
-            { "ip",             SEC_ADMINISTRATOR,  true,  &HandleBanListIPCommand,             "", NULL },
-            { NULL,             0,                  false, NULL,                                "", NULL }
+            { "account",        SEC_ADMINISTRATOR,  true,  &HandleBanListAccountCommand,        "" },
+            { "character",      SEC_ADMINISTRATOR,  true,  &HandleBanListCharacterCommand,      "" },
+            { "ip",             SEC_ADMINISTRATOR,  true,  &HandleBanListIPCommand,             "" }
         };
-        static ChatCommand baninfoCommandTable[] =
+        static std::vector<ChatCommand> baninfoCommandTable =
         {
-            { "account",        SEC_ADMINISTRATOR,  true,  &HandleBanInfoAccountCommand,        "", NULL },
-            { "character",      SEC_ADMINISTRATOR,  true,  &HandleBanInfoCharacterCommand,      "", NULL },
-            { "ip",             SEC_ADMINISTRATOR,  true,  &HandleBanInfoIPCommand,             "", NULL },
-            { NULL,             0,                  false, NULL,                                "", NULL }
+            { "account",        SEC_ADMINISTRATOR,  true,  &HandleBanInfoAccountCommand,        "" },
+            { "character",      SEC_ADMINISTRATOR,  true,  &HandleBanInfoCharacterCommand,      "" },
+            { "ip",             SEC_ADMINISTRATOR,  true,  &HandleBanInfoIPCommand,             "" }
         };
-        static ChatCommand banCommandTable[] =
+        static std::vector<ChatCommand> banCommandTable =
         {
-            { "account",        SEC_ADMINISTRATOR,  true,  &HandleBanAccountCommand,            "", NULL },
-            { "character",      SEC_ADMINISTRATOR,  true,  &HandleBanCharacterCommand,          "", NULL },
-            { "playeraccount",  SEC_ADMINISTRATOR,  true,  &HandleBanAccountByCharCommand,      "", NULL },
-            { "ip",             SEC_ADMINISTRATOR,  true,  &HandleBanIPCommand,                 "", NULL },
-            { NULL,             0,                  false, NULL,                                "", NULL }
+            { "account",        SEC_ADMINISTRATOR,  true,  &HandleBanAccountCommand,            "" },
+            { "character",      SEC_ADMINISTRATOR,  true,  &HandleBanCharacterCommand,          "" },
+            { "playeraccount",  SEC_ADMINISTRATOR,  true,  &HandleBanAccountByCharCommand,      "" },
+            { "ip",             SEC_ADMINISTRATOR,  true,  &HandleBanIPCommand,                 "" }
         };
-        static ChatCommand commandTable[] =
+        static std::vector<ChatCommand> commandTable =
         {
-            { "ban",            SEC_ADMINISTRATOR,  true,  NULL,                                "", banCommandTable },
-            { "baninfo",        SEC_ADMINISTRATOR,  true,  NULL,                                "", baninfoCommandTable },
-            { "banlist",        SEC_ADMINISTRATOR,  true,  NULL,                                "", banlistCommandTable },
-            { "unban",          SEC_ADMINISTRATOR,  true,  NULL,                                "", unbanCommandTable },
-            { NULL,             0,                  false, NULL,                                "", NULL }
+            { "ban",            SEC_ADMINISTRATOR,  true,  nullptr,                                "", banCommandTable },
+            { "baninfo",        SEC_ADMINISTRATOR,  true,  nullptr,                                "", baninfoCommandTable },
+            { "banlist",        SEC_ADMINISTRATOR,  true,  nullptr,                                "", banlistCommandTable },
+            { "unban",          SEC_ADMINISTRATOR,  true,  nullptr,                                "", unbanCommandTable }
         };
         return commandTable;
     }
@@ -94,11 +78,11 @@ public:
 
         std::string name = nameStr;
 
-        char* durationStr = strtok(NULL, " ");
+        char* durationStr = strtok(nullptr, " ");
         if (!durationStr || !atoi(durationStr))
             return false;
 
-        char* reasonStr = strtok(NULL, "");
+        char* reasonStr = strtok(nullptr, "");
         if (!reasonStr)
             return false;
 
@@ -153,11 +137,11 @@ public:
 
         std::string nameOrIP = cnameOrIP;
 
-        char* durationStr = strtok(NULL, " ");
+        char* durationStr = strtok(nullptr, " ");
         if (!durationStr || !atoi(durationStr))
             return false;
 
-        char* reasonStr = strtok(NULL, "");
+        char* reasonStr = strtok(nullptr, "");
         if (!reasonStr)
             return false;
 
@@ -261,7 +245,7 @@ public:
 
             time_t unbanDate = time_t(fields[3].GetUInt32());
             bool active = false;
-            if (fields[2].GetBool() && (fields[1].GetUInt64() == uint64(0) || unbanDate >= time(NULL)))
+            if (fields[2].GetBool() && (fields[1].GetUInt64() == uint64(0) || unbanDate >= time(nullptr)))
                 active = true;
             bool permanent = (fields[1].GetUInt64() == uint64(0));
             std::string banTime = permanent ? handler->GetTrinityString(LANG_BANINFO_INFINITE) : secsToTimeString(fields[1].GetUInt64(), true);
@@ -309,7 +293,7 @@ public:
             Field* fields = result->Fetch();
             time_t unbanDate = time_t(fields[3].GetUInt32());
             bool active = false;
-            if (fields[2].GetUInt8() && (!fields[1].GetUInt32() || unbanDate >= time(NULL)))
+            if (fields[2].GetUInt8() && (!fields[1].GetUInt32() || unbanDate >= time(nullptr)))
                 active = true;
             bool permanent = (fields[1].GetUInt32() == uint32(0));
             std::string banTime = permanent ? handler->GetTrinityString(LANG_BANINFO_INFINITE) : secsToTimeString(fields[1].GetUInt64(), true);

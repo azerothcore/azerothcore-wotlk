@@ -1,18 +1,7 @@
 /*
- * Copyright (C) 
- *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation; either version 2 of the License, or (at your
- * option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
- * more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program. If not, see <http://www.gnu.org/licenses/>.
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
+ * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
 /* ScriptData
@@ -40,65 +29,62 @@ class debug_commandscript : public CommandScript
 public:
     debug_commandscript() : CommandScript("debug_commandscript") { }
 
-    ChatCommand* GetCommands() const
+    std::vector<ChatCommand> GetCommands() const override
     {
-        static ChatCommand debugPlayCommandTable[] =
+        static std::vector<ChatCommand> debugPlayCommandTable =
         {
-            { "cinematic",      SEC_GAMEMASTER,      false, &HandleDebugPlayCinematicCommand,   "", NULL },
-            { "movie",          SEC_GAMEMASTER,      false, &HandleDebugPlayMovieCommand,       "", NULL },
-            { "sound",          SEC_GAMEMASTER,      false, &HandleDebugPlaySoundCommand,       "", NULL },
-            { NULL,             SEC_PLAYER,     false, NULL,                               "", NULL }
+            { "cinematic",      SEC_GAMEMASTER,      false, &HandleDebugPlayCinematicCommand,   "" },
+            { "movie",          SEC_GAMEMASTER,      false, &HandleDebugPlayMovieCommand,       "" },
+            { "sound",          SEC_GAMEMASTER,      false, &HandleDebugPlaySoundCommand,       "" }
         };
-        static ChatCommand debugSendCommandTable[] =
+        static std::vector<ChatCommand> debugSendCommandTable =
         {
-            { "buyerror",       SEC_ADMINISTRATOR,  false, &HandleDebugSendBuyErrorCommand,       "", NULL },
-            { "channelnotify",  SEC_ADMINISTRATOR,  false, &HandleDebugSendChannelNotifyCommand,  "", NULL },
-            { "chatmmessage",   SEC_ADMINISTRATOR,  false, &HandleDebugSendChatMsgCommand,        "", NULL },
-            { "equiperror",     SEC_ADMINISTRATOR,  false, &HandleDebugSendEquipErrorCommand,     "", NULL },
-            { "largepacket",    SEC_ADMINISTRATOR,  false, &HandleDebugSendLargePacketCommand,    "", NULL },
-            { "opcode",         SEC_ADMINISTRATOR,  false, &HandleDebugSendOpcodeCommand,         "", NULL },
-            { "qpartymsg",      SEC_ADMINISTRATOR,  false, &HandleDebugSendQuestPartyMsgCommand,  "", NULL },
-            { "qinvalidmsg",    SEC_ADMINISTRATOR,  false, &HandleDebugSendQuestInvalidMsgCommand, "", NULL },
-            { "sellerror",      SEC_ADMINISTRATOR,  false, &HandleDebugSendSellErrorCommand,      "", NULL },
-            { "setphaseshift",  SEC_ADMINISTRATOR,  false, &HandleDebugSendSetPhaseShiftCommand,  "", NULL },
-            { "spellfail",      SEC_ADMINISTRATOR,  false, &HandleDebugSendSpellFailCommand,      "", NULL },
-            { NULL,             SEC_PLAYER,         false, NULL,                                  "", NULL }
+            { "buyerror",       SEC_ADMINISTRATOR,  false, &HandleDebugSendBuyErrorCommand,       "" },
+            { "channelnotify",  SEC_ADMINISTRATOR,  false, &HandleDebugSendChannelNotifyCommand,  "" },
+            { "chatmmessage",   SEC_ADMINISTRATOR,  false, &HandleDebugSendChatMsgCommand,        "" },
+            { "equiperror",     SEC_ADMINISTRATOR,  false, &HandleDebugSendEquipErrorCommand,     "" },
+            { "largepacket",    SEC_ADMINISTRATOR,  false, &HandleDebugSendLargePacketCommand,    "" },
+            { "opcode",         SEC_ADMINISTRATOR,  false, &HandleDebugSendOpcodeCommand,         "" },
+            { "qpartymsg",      SEC_ADMINISTRATOR,  false, &HandleDebugSendQuestPartyMsgCommand,  "" },
+            { "qinvalidmsg",    SEC_ADMINISTRATOR,  false, &HandleDebugSendQuestInvalidMsgCommand, "" },
+            { "sellerror",      SEC_ADMINISTRATOR,  false, &HandleDebugSendSellErrorCommand,      "" },
+            { "setphaseshift",  SEC_ADMINISTRATOR,  false, &HandleDebugSendSetPhaseShiftCommand,  "" },
+            { "spellfail",      SEC_ADMINISTRATOR,  false, &HandleDebugSendSpellFailCommand,      "" }
         };
-        static ChatCommand debugCommandTable[] =
+        static std::vector<ChatCommand> debugCommandTable =
         {
-            { "setbit",         SEC_ADMINISTRATOR,  false, &HandleDebugSet32BitCommand,        "", NULL },
-            { "threat",         SEC_ADMINISTRATOR,  false, &HandleDebugThreatListCommand,      "", NULL },
-            { "hostil",         SEC_ADMINISTRATOR,  false, &HandleDebugHostileRefListCommand,  "", NULL },
-            { "anim",           SEC_GAMEMASTER,     false, &HandleDebugAnimCommand,            "", NULL },
-            { "arena",          SEC_ADMINISTRATOR,  false, &HandleDebugArenaCommand,           "", NULL },
-            { "bg",             SEC_ADMINISTRATOR,  false, &HandleDebugBattlegroundCommand,    "", NULL },
-            { "getitemstate",   SEC_ADMINISTRATOR,  false, &HandleDebugGetItemStateCommand,    "", NULL },
-            { "lootrecipient",  SEC_GAMEMASTER,     false, &HandleDebugGetLootRecipientCommand, "", NULL },
-            { "getvalue",       SEC_ADMINISTRATOR,  false, &HandleDebugGetValueCommand,        "", NULL },
-            { "getitemvalue",   SEC_ADMINISTRATOR,  false, &HandleDebugGetItemValueCommand,    "", NULL },
-            { "Mod32Value",     SEC_ADMINISTRATOR,  false, &HandleDebugMod32ValueCommand,      "", NULL },
-            { "play",           SEC_GAMEMASTER,      false, NULL,              "", debugPlayCommandTable },
-            { "send",           SEC_ADMINISTRATOR,  false, NULL,              "", debugSendCommandTable },
-            { "setaurastate",   SEC_ADMINISTRATOR,  false, &HandleDebugSetAuraStateCommand,    "", NULL },
-            { "setitemvalue",   SEC_ADMINISTRATOR,  false, &HandleDebugSetItemValueCommand,    "", NULL },
-            { "setvalue",       SEC_ADMINISTRATOR,  false, &HandleDebugSetValueCommand,        "", NULL },
-            { "spawnvehicle",   SEC_ADMINISTRATOR,  false, &HandleDebugSpawnVehicleCommand,    "", NULL },
-            { "setvid",         SEC_ADMINISTRATOR,  false, &HandleDebugSetVehicleIdCommand,    "", NULL },
-            { "entervehicle",   SEC_ADMINISTRATOR,  false, &HandleDebugEnterVehicleCommand,    "", NULL },
-            { "uws",            SEC_ADMINISTRATOR,  false, &HandleDebugUpdateWorldStateCommand, "", NULL },
-            { "update",         SEC_ADMINISTRATOR,  false, &HandleDebugUpdateCommand,          "", NULL },
-            { "itemexpire",     SEC_ADMINISTRATOR,  false, &HandleDebugItemExpireCommand,      "", NULL },
-            { "areatriggers",   SEC_ADMINISTRATOR,  false, &HandleDebugAreaTriggersCommand,    "", NULL },
-            { "los",            SEC_GAMEMASTER,      false, &HandleDebugLoSCommand,             "", NULL },
-            { "moveflags",      SEC_ADMINISTRATOR,  false, &HandleDebugMoveflagsCommand,       "", NULL },
-            { "unitstate",      SEC_ADMINISTRATOR,  false, &HandleDebugUnitStateCommand,       "", NULL },
-            { NULL,             SEC_PLAYER,         false, NULL,                               "", NULL }
+            { "setbit",         SEC_ADMINISTRATOR,  false, &HandleDebugSet32BitCommand,        "" },
+            { "threat",         SEC_ADMINISTRATOR,  false, &HandleDebugThreatListCommand,      "" },
+            { "hostil",         SEC_ADMINISTRATOR,  false, &HandleDebugHostileRefListCommand,  "" },
+            { "anim",           SEC_GAMEMASTER,     false, &HandleDebugAnimCommand,            "" },
+            { "arena",          SEC_ADMINISTRATOR,  false, &HandleDebugArenaCommand,           "" },
+            { "bg",             SEC_ADMINISTRATOR,  false, &HandleDebugBattlegroundCommand,    "" },
+            { "getitemstate",   SEC_ADMINISTRATOR,  false, &HandleDebugGetItemStateCommand,    "" },
+            { "lootrecipient",  SEC_GAMEMASTER,     false, &HandleDebugGetLootRecipientCommand, "" },
+            { "getvalue",       SEC_ADMINISTRATOR,  false, &HandleDebugGetValueCommand,        "" },
+            { "getitemvalue",   SEC_ADMINISTRATOR,  false, &HandleDebugGetItemValueCommand,    "" },
+            { "Mod32Value",     SEC_ADMINISTRATOR,  false, &HandleDebugMod32ValueCommand,      "" },
+            { "play",           SEC_GAMEMASTER,      false, nullptr,              "", debugPlayCommandTable },
+            { "send",           SEC_ADMINISTRATOR,  false, nullptr,              "", debugSendCommandTable },
+            { "setaurastate",   SEC_ADMINISTRATOR,  false, &HandleDebugSetAuraStateCommand,    "" },
+            { "setitemvalue",   SEC_ADMINISTRATOR,  false, &HandleDebugSetItemValueCommand,    "" },
+            { "setvalue",       SEC_ADMINISTRATOR,  false, &HandleDebugSetValueCommand,        "" },
+            { "spawnvehicle",   SEC_ADMINISTRATOR,  false, &HandleDebugSpawnVehicleCommand,    "" },
+            { "setvid",         SEC_ADMINISTRATOR,  false, &HandleDebugSetVehicleIdCommand,    "" },
+            { "entervehicle",   SEC_ADMINISTRATOR,  false, &HandleDebugEnterVehicleCommand,    "" },
+            { "uws",            SEC_ADMINISTRATOR,  false, &HandleDebugUpdateWorldStateCommand, "" },
+            { "update",         SEC_ADMINISTRATOR,  false, &HandleDebugUpdateCommand,          "" },
+            { "itemexpire",     SEC_ADMINISTRATOR,  false, &HandleDebugItemExpireCommand,      "" },
+            { "areatriggers",   SEC_ADMINISTRATOR,  false, &HandleDebugAreaTriggersCommand,    "" },
+            { "los",            SEC_GAMEMASTER,      false, &HandleDebugLoSCommand,             "" },
+            { "moveflags",      SEC_ADMINISTRATOR,  false, &HandleDebugMoveflagsCommand,       "" },
+            { "unitstate",      SEC_ADMINISTRATOR,  false, &HandleDebugUnitStateCommand,       "" }
         };
-        static ChatCommand commandTable[] =
+        static std::vector<ChatCommand> commandTable =
         {
-            { "debug",          SEC_GAMEMASTER,      true,  NULL,                  "", debugCommandTable },
-            { "wpgps",          SEC_ADMINISTRATOR,  false, &HandleWPGPSCommand,   "",              NULL },
-            { NULL,             SEC_PLAYER,         false, NULL,                  "",              NULL }
+            { "debug",          SEC_GAMEMASTER,      true,  nullptr,                 "", debugCommandTable },
+            { "wpgps",          SEC_ADMINISTRATOR,  false, &HandleWPGPSCommand,   "", },
+            { nullptr,             SEC_PLAYER,         false, nullptr,                  "", }
         };
         return commandTable;
     }
@@ -202,10 +188,10 @@ public:
         if (failNum == 0 && *result != '0')
             return false;
 
-        char* fail1 = strtok(NULL, " ");
+        char* fail1 = strtok(nullptr, " ");
         uint8 failArg1 = fail1 ? (uint8)atoi(fail1) : 0;
 
-        char* fail2 = strtok(NULL, " ");
+        char* fail2 = strtok(nullptr, " ");
         uint8 failArg2 = fail2 ? (uint8)atoi(fail2) : 0;
 
         WorldPacket data(SMSG_CAST_FAILED, 5);
@@ -228,7 +214,7 @@ public:
             return false;
 
         InventoryResult msg = InventoryResult(atoi(args));
-        handler->GetSession()->GetPlayer()->SendEquipError(msg, NULL, NULL);
+        handler->GetSession()->GetPlayer()->SendEquipError(msg, nullptr, nullptr);
         return true;
     }
 
@@ -255,7 +241,7 @@ public:
     static bool HandleDebugSendOpcodeCommand(ChatHandler* handler, char const* /*args*/)
     {
         Unit* unit = handler->getSelectedUnit();
-        Player* player = NULL;
+        Player* player = nullptr;
         if (!unit || (unit->GetTypeId() != TYPEID_PLAYER))
             player = handler->GetSession()->GetPlayer();
         else
@@ -426,7 +412,7 @@ public:
     static bool HandleDebugUpdateWorldStateCommand(ChatHandler* handler, char const* args)
     {
         char* w = strtok((char*)args, " ");
-        char* s = strtok(NULL, " ");
+        char* s = strtok(nullptr, " ");
 
         if (!w || !s)
             return false;
@@ -642,9 +628,9 @@ public:
                         continue;
                     }
 
-                    if (updateQueue[qp] == NULL)
+                    if (updateQueue[qp] == nullptr)
                     {
-                        handler->PSendSysMessage("The item with slot %d and guid %d has its queuepos (%d) pointing to NULL in the queue!", item->GetSlot(), item->GetGUIDLow(), qp);
+                        handler->PSendSysMessage("The item with slot %d and guid %d has its queuepos (%d) pointing to nullptr in the queue!", item->GetSlot(), item->GetGUIDLow(), qp);
                         error = true;
                         continue;
                     }
@@ -710,9 +696,9 @@ public:
                                 continue;
                             }
 
-                            if (updateQueue[qp] == NULL)
+                            if (updateQueue[qp] == nullptr)
                             {
-                                handler->PSendSysMessage("The item in bag %d at slot %d having guid %d has a queuepos (%d) that points to NULL in the queue!", bag->GetSlot(), item2->GetSlot(), item2->GetGUIDLow(), qp);
+                                handler->PSendSysMessage("The item in bag %d at slot %d having guid %d has a queuepos (%d) that points to nullptr in the queue!", bag->GetSlot(), item2->GetSlot(), item2->GetGUIDLow(), qp);
                                 error = true;
                                 continue;
                             }
@@ -759,7 +745,7 @@ public:
 
                 Item* test = player->GetItemByPos(item->GetBagSlot(), item->GetSlot());
 
-                if (test == NULL)
+                if (test == nullptr)
                 {
                     handler->PSendSysMessage("queue(" SIZEFMTD "): The bag(%d) and slot(%d) values for the item with guid %d are incorrect, the player doesn't have any item at that position!", i, item->GetBagSlot(), item->GetSlot(), item->GetGUIDLow());
                     error = true;
@@ -880,7 +866,7 @@ public:
         if (!i)
             return false;
 
-        char* j = strtok(NULL, " ");
+        char* j = strtok(nullptr, " ");
 
         uint32 entry = (uint32)atoi(i);
         int8 seatId = j ? (int8)atoi(j) : -1;
@@ -889,7 +875,7 @@ public:
             handler->GetSession()->GetPlayer()->EnterVehicle(target, seatId);
         else
         {
-            Creature* passenger = NULL;
+            Creature* passenger = nullptr;
             Trinity::AllCreaturesOfEntryInRange check(handler->GetSession()->GetPlayer(), entry, 20.0f);
             Trinity::CreatureSearcher<Trinity::AllCreaturesOfEntryInRange> searcher(handler->GetSession()->GetPlayer(), passenger, check);
             handler->GetSession()->GetPlayer()->VisitNearbyObject(30.0f, searcher);
@@ -908,7 +894,7 @@ public:
             return false;
 
         char* e = strtok((char*)args, " ");
-        char* i = strtok(NULL, " ");
+        char* i = strtok(nullptr, " ");
 
         if (!e)
             return false;
@@ -974,7 +960,7 @@ public:
             return false;
 
         char* e = strtok((char*)args, " ");
-        char* f = strtok(NULL, " ");
+        char* f = strtok(nullptr, " ");
 
         if (!e || !f)
             return false;
@@ -1003,8 +989,8 @@ public:
             return false;
 
         char* e = strtok((char*)args, " ");
-        char* f = strtok(NULL, " ");
-        char* g = strtok(NULL, " ");
+        char* f = strtok(nullptr, " ");
+        char* g = strtok(nullptr, " ");
 
         if (!e || !f || !g)
             return false;
@@ -1102,8 +1088,8 @@ public:
             return false;
 
         char* x = strtok((char*)args, " ");
-        char* y = strtok(NULL, " ");
-        char* z = strtok(NULL, " ");
+        char* y = strtok(nullptr, " ");
+        char* z = strtok(nullptr, " ");
 
         if (!x || !y)
             return false;
@@ -1151,7 +1137,7 @@ public:
             return false;
 
         char* x = strtok((char*)args, " ");
-        char* z = strtok(NULL, " ");
+        char* z = strtok(nullptr, " ");
 
         if (!x)
             return false;
@@ -1197,7 +1183,7 @@ public:
             return false;
 
         char* x = strtok((char*)args, " ");
-        char* y = strtok(NULL, " ");
+        char* y = strtok(nullptr, " ");
 
         if (!x || !y)
             return false;
@@ -1252,7 +1238,7 @@ public:
         else if (updateIndex >= UNIT_END)
             return true;
 
-        char* val = strtok(NULL, " ");
+        char* val = strtok(nullptr, " ");
         if (!val)
         {
             value = unit->GetUInt32Value(updateIndex);
@@ -1284,7 +1270,7 @@ public:
         }
 
         char* x = strtok((char*)args, " ");
-        char* y = strtok(NULL, " ");
+        char* y = strtok(nullptr, " ");
 
         if (!x || !y)
             return false;
@@ -1318,7 +1304,7 @@ public:
             if (!mask1)
                 return false;
 
-            char* mask2 = strtok(NULL, " \n");
+            char* mask2 = strtok(nullptr, " \n");
 
             uint32 moveFlags = (uint32)atoi(mask1);
             target->SetUnitMovementFlags(moveFlags);

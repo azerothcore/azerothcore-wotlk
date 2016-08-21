@@ -1,19 +1,7 @@
 /*
- * Copyright (C) 
- * Copyright (C) 
- *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation; either version 2 of the License, or (at your
- * option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
- * more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program. If not, see <http://www.gnu.org/licenses/>.
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
+ * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
 #ifndef SC_SCRIPTMGR_H
@@ -21,7 +9,7 @@
 
 #include "Common.h"
 #include <ace/Singleton.h>
-#include <ace/Atomic_Op.h>
+#include <atomic>
 
 #include "ObjectMgr.h"
 #include "DBCStores.h"
@@ -30,6 +18,7 @@
 #include "World.h"
 #include "Weather.h"
 #include "AchievementMgr.h"
+#include "DynamicObject.h"
 
 class AuctionHouseObject;
 class AuraScript;
@@ -560,7 +549,7 @@ class CommandScript : public ScriptObject
     public:
 
         // Should return a pointer to a valid command table (ChatCommand array) to be used by ChatHandler.
-        virtual ChatCommand* GetCommands() const = 0;
+        virtual std::vector<ChatCommand> GetCommands() const = 0;
 };
 
 class WeatherScript : public ScriptObject, public UpdatableScript<Weather>
@@ -980,7 +969,7 @@ class ScriptMgr
 
     public: /* CommandScript */
 
-        std::vector<ChatCommand*> GetChatCommands();
+        std::vector<ChatCommand> GetChatCommands();
 
     public: /* WeatherScript */
 
@@ -1095,7 +1084,7 @@ class ScriptMgr
         uint32 _scriptCount;
 
         //atomic op counter for active scripts amount
-        ACE_Atomic_Op<ACE_Thread_Mutex, long> _scheduledScripts;
+        std::atomic_long _scheduledScripts;
 };
 
 template<class TScript>

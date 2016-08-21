@@ -3,6 +3,11 @@ Xinef
  */
 
 #include "PetitionMgr.h"
+#include "Timer.h"
+#include "QueryResult.h"
+#include "Log.h"
+#include "DatabaseEnv.h"
+
 
 PetitionMgr::PetitionMgr()
 {

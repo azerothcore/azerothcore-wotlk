@@ -5,6 +5,8 @@ REWRITTEN BY XINEF
 #ifndef DEF_BLOOD_FURNACE_H
 #define DEF_BLOOD_FURNACE_H
 
+#include "ScriptPCH.h"
+
 enum bloodFurnace
 {
     DATA_THE_MAKER                      = 0,

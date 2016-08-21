@@ -1,18 +1,7 @@
 /*
- * Copyright (C) 
- *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation; either version 2 of the License, or (at your
- * option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
- * more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program. If not, see <http://www.gnu.org/licenses/>.
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
+ * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
 /* ScriptData
@@ -31,21 +20,19 @@ class bf_commandscript : public CommandScript
 public:
     bf_commandscript() : CommandScript("bf_commandscript") { }
 
-    ChatCommand* GetCommands() const
+    std::vector<ChatCommand> GetCommands() const override
     {
-        static ChatCommand battlefieldcommandTable[] =
+        static std::vector<ChatCommand> battlefieldcommandTable =
         {
-            { "start",          SEC_ADMINISTRATOR,  false, &HandleBattlefieldStart,            "", NULL },
-            { "stop",           SEC_ADMINISTRATOR,  false, &HandleBattlefieldEnd,              "", NULL },
-            { "switch",         SEC_ADMINISTRATOR,  false, &HandleBattlefieldSwitch,           "", NULL },
-            { "timer",          SEC_ADMINISTRATOR,  false, &HandleBattlefieldTimer,            "", NULL },
-            { "enable",         SEC_ADMINISTRATOR,  false, &HandleBattlefieldEnable,           "", NULL },
-            { NULL,             0,                  false, NULL,                               "", NULL }
+            { "start",          SEC_ADMINISTRATOR,  false, &HandleBattlefieldStart,            "" },
+            { "stop",           SEC_ADMINISTRATOR,  false, &HandleBattlefieldEnd,              "" },
+            { "switch",         SEC_ADMINISTRATOR,  false, &HandleBattlefieldSwitch,           "" },
+            { "timer",          SEC_ADMINISTRATOR,  false, &HandleBattlefieldTimer,            "" },
+            { "enable",         SEC_ADMINISTRATOR,  false, &HandleBattlefieldEnable,           "" }
         };
-        static ChatCommand commandTable[] =
+        static std::vector<ChatCommand> commandTable =
         {
-            { "bf",             SEC_ADMINISTRATOR,  false, NULL,            "", battlefieldcommandTable },
-            { NULL,             0,                  false, NULL,                               "", NULL }
+            { "bf",             SEC_ADMINISTRATOR,  false, nullptr,            "", battlefieldcommandTable }
         };
         return commandTable;
     }
@@ -152,7 +139,7 @@ public:
         char* battleid_str = strtok((char*)args, " ");
         if (!battleid_str)
             return false;
-        char* time_str = strtok(NULL, " ");
+        char* time_str = strtok(nullptr, " ");
         if (!time_str)
             return false;
 

@@ -30,7 +30,7 @@
 #include <linux/types.h>
 #endif
 #endif
-    typedef unsigned long uint64;
+    typedef uint64_t uint64;
 #endif
 
 // Note: If you want to use 64-bit refs, change the types of both dtPolyRef & dtTileRef.

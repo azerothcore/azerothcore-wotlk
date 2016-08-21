@@ -1,18 +1,7 @@
 /*
- * Copyright (C) 
- *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation; either version 2 of the License, or (at your
- * option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
- * more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program. If not, see <http://www.gnu.org/licenses/>.
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
+ * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
 /* ScriptData
@@ -35,33 +24,30 @@ class character_commandscript : public CommandScript
 public:
     character_commandscript() : CommandScript("character_commandscript") { }
 
-    ChatCommand* GetCommands() const
+    std::vector<ChatCommand> GetCommands() const override
     {
-        static ChatCommand pdumpCommandTable[] =
+        static std::vector<ChatCommand> pdumpCommandTable =
         {
-            { "load",           SEC_ADMINISTRATOR,  true,  &HandlePDumpLoadCommand,                 "", NULL },
-            { "write",          SEC_ADMINISTRATOR,  true,  &HandlePDumpWriteCommand,                "", NULL },
-            { NULL,             0,                  false, NULL,                                    "", NULL }
+            { "load",           SEC_ADMINISTRATOR,  true,  &HandlePDumpLoadCommand,                 "" },
+            { "write",          SEC_ADMINISTRATOR,  true,  &HandlePDumpWriteCommand,                "" }
         };
 
-        static ChatCommand characterCommandTable[] =
+        static std::vector<ChatCommand> characterCommandTable =
         {
-            { "customize",      SEC_GAMEMASTER,     true,  &HandleCharacterCustomizeCommand,       "", NULL },
-            { "changefaction",  SEC_GAMEMASTER,     true,  &HandleCharacterChangeFactionCommand,   "", NULL },
-            { "changerace",     SEC_GAMEMASTER,     true,  &HandleCharacterChangeRaceCommand,      "", NULL },
-            { "level",          SEC_ADMINISTRATOR,  true,  &HandleCharacterLevelCommand,           "", NULL },
-            { "rename",         SEC_GAMEMASTER,     true,  &HandleCharacterRenameCommand,          "", NULL },
-            { "reputation",     SEC_GAMEMASTER,     true,  &HandleCharacterReputationCommand,      "", NULL },
-            { "titles",         SEC_GAMEMASTER,     true,  &HandleCharacterTitlesCommand,          "", NULL },
-            { NULL,             0,                  false, NULL,                                   "", NULL }
+            { "customize",      SEC_GAMEMASTER,     true,  &HandleCharacterCustomizeCommand,       "" },
+            { "changefaction",  SEC_GAMEMASTER,     true,  &HandleCharacterChangeFactionCommand,   "" },
+            { "changerace",     SEC_GAMEMASTER,     true,  &HandleCharacterChangeRaceCommand,      "" },
+            { "level",          SEC_ADMINISTRATOR,  true,  &HandleCharacterLevelCommand,           "" },
+            { "rename",         SEC_GAMEMASTER,     true,  &HandleCharacterRenameCommand,          "" },
+            { "reputation",     SEC_GAMEMASTER,     true,  &HandleCharacterReputationCommand,      "" },
+            { "titles",         SEC_GAMEMASTER,     true,  &HandleCharacterTitlesCommand,          "" }
         };
 
-        static ChatCommand commandTable[] =
+        static std::vector<ChatCommand> commandTable =
         {
-            { "character",      SEC_GAMEMASTER,     true,  NULL,                                   "", characterCommandTable },
-            { "levelup",        SEC_ADMINISTRATOR,  false, &HandleLevelUpCommand,                  "", NULL },
-            { "pdump",          SEC_ADMINISTRATOR,  true,  NULL,                                   "", pdumpCommandTable },
-            { NULL,             0,                  false, NULL,                                   "", NULL }
+            { "character",      SEC_GAMEMASTER,     true,  nullptr,                                   "", characterCommandTable },
+            { "levelup",        SEC_ADMINISTRATOR,  false, &HandleLevelUpCommand,                  "" },
+            { "pdump",          SEC_ADMINISTRATOR,  true,  nullptr,                                   "", pdumpCommandTable }
         };
         return commandTable;
     }
@@ -170,7 +156,7 @@ public:
         else
         {
             // check offline security
-            if (handler->HasLowerSecurity(NULL, targetGuid))
+            if (handler->HasLowerSecurity(nullptr, targetGuid))
                 return false;
 
             std::string oldNameLink = handler->playerLink(targetName);
@@ -197,7 +183,7 @@ public:
         if (isalpha(levelStr[0]))
         {
             nameStr = levelStr;
-            levelStr = NULL;                                    // current level will used
+            levelStr = nullptr;                                    // current level will used
         }
 
         Player* target;
@@ -216,7 +202,7 @@ public:
             newlevel = DEFAULT_MAX_LEVEL;
 
         HandleCharacterLevel(target, targetGuid, oldlevel, newlevel, handler);
-        if (!handler->GetSession() || handler->GetSession()->GetPlayer() != target)      // including player == NULL
+        if (!handler->GetSession() || handler->GetSession()->GetPlayer() != target)      // including player == nullptr
         {
             std::string nameLink = handler->playerLink(targetName);
             handler->PSendSysMessage(LANG_YOU_CHANGE_LVL, nameLink.c_str(), newlevel);
@@ -363,7 +349,7 @@ public:
         if (levelStr && isalpha(levelStr[0]))
         {
             nameStr = levelStr;
-            levelStr = NULL;                                    // current level will used
+            levelStr = nullptr;                                    // current level will used
         }
 
         Player* target;
@@ -384,7 +370,7 @@ public:
 
         HandleCharacterLevel(target, targetGuid, oldlevel, newlevel, handler);
 
-        if (!handler->GetSession() || handler->GetSession()->GetPlayer() != target)      // including chr == NULL
+        if (!handler->GetSession() || handler->GetSession()->GetPlayer() != target)      // including chr == nullptr
         {
             std::string nameLink = handler->playerLink(targetName);
             handler->PSendSysMessage(LANG_YOU_CHANGE_LVL, nameLink.c_str(), newlevel);
@@ -402,7 +388,7 @@ public:
         if (!fileStr)
             return false;
 
-        char* accountStr = strtok(NULL, " ");
+        char* accountStr = strtok(nullptr, " ");
         if (!accountStr)
             return false;
 
@@ -433,8 +419,8 @@ public:
             return false;
         }
 
-        char* guidStr = NULL;
-        char* nameStr = strtok(NULL, " ");
+        char* guidStr = nullptr;
+        char* nameStr = strtok(nullptr, " ");
 
         std::string name;
         if (nameStr)
@@ -455,7 +441,7 @@ public:
                 return false;
             }
 
-            guidStr = strtok(NULL, " ");
+            guidStr = strtok(nullptr, " ");
         }
 
         uint32 guid = 0;
@@ -510,7 +496,7 @@ public:
             return false;
 
         char* fileStr = strtok((char*)args, " ");
-        char* playerStr = strtok(NULL, " ");
+        char* playerStr = strtok(nullptr, " ");
 
         if (!fileStr && !playerStr)
         {

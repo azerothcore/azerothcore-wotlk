@@ -1,18 +1,7 @@
 /*
- * Copyright (C) 
- *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation; either version 2 of the License, or (at your
- * option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
- * more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program. If not, see <http://www.gnu.org/licenses/>.
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
+ * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
 #include "ScriptMgr.h"
@@ -41,31 +30,31 @@ class lfg_commandscript : public CommandScript
 public:
     lfg_commandscript() : CommandScript("lfg_commandscript") { }
 
-    ChatCommand* GetCommands() const
+    std::vector<ChatCommand> GetCommands() const override
     {
-        static ChatCommand lfgCommandTable[] =
+        static std::vector<ChatCommand> lfgCommandTable =
         {
-            {  "player",     SEC_GAMEMASTER, false, &HandleLfgPlayerInfoCommand, "", NULL },
-            {   "group",     SEC_GAMEMASTER, false,  &HandleLfgGroupInfoCommand, "", NULL },
-            {   "queue",     SEC_GAMEMASTER, false,  &HandleLfgQueueInfoCommand, "", NULL },
-            {   "clean",  SEC_ADMINISTRATOR, false,      &HandleLfgCleanCommand, "", NULL },
-            { "options",  SEC_ADMINISTRATOR, false,    &HandleLfgOptionsCommand, "", NULL },
-            {      NULL,         SEC_PLAYER, false,                        NULL, "", NULL }
+            {  "player",     SEC_GAMEMASTER, false, &HandleLfgPlayerInfoCommand, "" },
+            {   "group",     SEC_GAMEMASTER, false,  &HandleLfgGroupInfoCommand, "" },
+            {   "queue",     SEC_GAMEMASTER, false,  &HandleLfgQueueInfoCommand, "" },
+            {   "clean",  SEC_ADMINISTRATOR, false,      &HandleLfgCleanCommand, "" },
+            { "options",  SEC_ADMINISTRATOR, false,    &HandleLfgOptionsCommand, "" },
+            {      nullptr,         SEC_PLAYER, false,                        nullptr, "" }
         };
 
-        static ChatCommand commandTable[] =
+        static std::vector<ChatCommand> commandTable =
         {
-            {       "lfg",   SEC_GAMEMASTER, false,                        NULL, "", lfgCommandTable },
-            {  NULL,             SEC_PLAYER, false,                        NULL, "", NULL }
+            {       "lfg",   SEC_GAMEMASTER, false,                        nullptr, "", lfgCommandTable },
+            {  nullptr,             SEC_PLAYER, false,                        nullptr, "" }
         };
         return commandTable;
     }
 
     static bool HandleLfgPlayerInfoCommand(ChatHandler* handler, char const* args)
     {
-        Player* target = NULL;
+        Player* target = nullptr;
         std::string playerName;
-        if (!handler->extractPlayerTarget((char*)args, &target, NULL, &playerName))
+        if (!handler->extractPlayerTarget((char*)args, &target, nullptr, &playerName))
             return false;
 
         GetPlayerInfo(handler, target);
@@ -74,9 +63,9 @@ public:
 
     static bool HandleLfgGroupInfoCommand(ChatHandler* handler, char const* args)
     {
-        Player* target = NULL;
+        Player* target = nullptr;
         std::string playerName;
-        if (!handler->extractPlayerTarget((char*)args, &target, NULL, &playerName))
+        if (!handler->extractPlayerTarget((char*)args, &target, nullptr, &playerName))
             return false;
 
         Group* grp = target->GetGroup();
@@ -91,7 +80,7 @@ public:
         handler->PSendSysMessage(LANG_LFG_GROUP_INFO, grp->isLFGGroup(),
             state.c_str(), sLFGMgr->GetDungeon(guid));
 
-        for (GroupReference* itr = grp->GetFirstMember(); itr != NULL; itr = itr->next())
+        for (GroupReference* itr = grp->GetFirstMember(); itr != nullptr; itr = itr->next())
             GetPlayerInfo(handler, itr->GetSource());
         */
         return true;

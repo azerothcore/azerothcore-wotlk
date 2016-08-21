@@ -5,6 +5,7 @@ REWRITTEN BY XINEF
 #ifndef BLACK_TEMPLE_H_
 #define BLACK_TEMPLE_H_
 
+#include "ScriptPCH.h"
 
 enum DataTypes
 {

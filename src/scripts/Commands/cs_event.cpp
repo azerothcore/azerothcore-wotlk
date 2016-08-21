@@ -1,18 +1,7 @@
 /*
- * Copyright (C) 
- *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation; either version 2 of the License, or (at your
- * option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
- * more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program. If not, see <http://www.gnu.org/licenses/>.
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
+ * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
 /* ScriptData
@@ -33,20 +22,18 @@ class event_commandscript : public CommandScript
 public:
     event_commandscript() : CommandScript("event_commandscript") { }
 
-    ChatCommand* GetCommands() const
+    std::vector<ChatCommand> GetCommands() const override
     {
-        static ChatCommand eventCommandTable[] =
+        static std::vector<ChatCommand> eventCommandTable =
         {
-            { "activelist",     SEC_GAMEMASTER,     true,  &HandleEventActiveListCommand,     "", NULL },
-            { "start",          SEC_GAMEMASTER,     true,  &HandleEventStartCommand,          "", NULL },
-            { "stop",           SEC_GAMEMASTER,     true,  &HandleEventStopCommand,           "", NULL },
-            { "",               SEC_GAMEMASTER,     true,  &HandleEventInfoCommand,           "", NULL },
-            { NULL,             0,                  false, NULL,                              "", NULL }
+            { "activelist",     SEC_GAMEMASTER,     true,  &HandleEventActiveListCommand,     "" },
+            { "start",          SEC_GAMEMASTER,     true,  &HandleEventStartCommand,          "" },
+            { "stop",           SEC_GAMEMASTER,     true,  &HandleEventStopCommand,           "" },
+            { "",               SEC_GAMEMASTER,     true,  &HandleEventInfoCommand,           "" }
         };
-        static ChatCommand commandTable[] =
+        static std::vector<ChatCommand> commandTable =
         {
-            { "event",          SEC_GAMEMASTER,     false, NULL,                  "", eventCommandTable },
-            { NULL,             0,                  false, NULL,                               "", NULL }
+            { "event",          SEC_GAMEMASTER,     false, nullptr,                  "", eventCommandTable }
         };
         return commandTable;
     }
@@ -117,8 +104,8 @@ public:
         std::string endTimeStr = TimeToTimestampStr(eventData.end);
 
         uint32 delay = sGameEventMgr->NextCheck(eventId);
-        time_t nextTime = time(NULL) + delay;
-        std::string nextStr = nextTime >= eventData.start && nextTime < eventData.end ? TimeToTimestampStr(time(NULL) + delay) : "-";
+        time_t nextTime = time(nullptr) + delay;
+        std::string nextStr = nextTime >= eventData.start && nextTime < eventData.end ? TimeToTimestampStr(time(nullptr) + delay) : "-";
 
         std::string occurenceStr = secsToTimeString(eventData.occurence * MINUTE, true);
         std::string lengthStr = secsToTimeString(eventData.length * MINUTE, true);

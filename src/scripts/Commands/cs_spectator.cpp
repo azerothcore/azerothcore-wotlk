@@ -16,22 +16,20 @@ class spectator_commandscript : public CommandScript
 public:
     spectator_commandscript() : CommandScript("spectator_commandscript") { }
 
-    ChatCommand* GetCommands() const
+    std::vector<ChatCommand> GetCommands() const override
     {
-        static ChatCommand spectatorCommandTable[] =
+        static std::vector<ChatCommand> spectatorCommandTable =
         {
-            { "version",        SEC_CONSOLE,        false, &HandleSpectatorVersionCommand,    "", NULL },
-            { "reset",          SEC_CONSOLE,        false, &HandleSpectatorResetCommand,      "", NULL },
-            { "spectate",       SEC_CONSOLE,        false, &ArenaSpectator::HandleSpectatorSpectateCommand, "", NULL },
-            { "watch",          SEC_CONSOLE,        false, &ArenaSpectator::HandleSpectatorWatchCommand, "", NULL },
-            { "leave",          SEC_CONSOLE,        false, &HandleSpectatorLeaveCommand,      "", NULL },
-            { "",               SEC_CONSOLE,        false, &HandleSpectatorCommand,           "", NULL },
-            { NULL,             0,                  false, NULL,                              "", NULL }
+            { "version",        SEC_CONSOLE,        false, &HandleSpectatorVersionCommand,    "" },
+            { "reset",          SEC_CONSOLE,        false, &HandleSpectatorResetCommand,      "" },
+            { "spectate",       SEC_CONSOLE,        false, &ArenaSpectator::HandleSpectatorSpectateCommand, "" },
+            { "watch",          SEC_CONSOLE,        false, &ArenaSpectator::HandleSpectatorWatchCommand, "" },
+            { "leave",          SEC_CONSOLE,        false, &HandleSpectatorLeaveCommand,      "" },
+            { "",               SEC_CONSOLE,        false, &HandleSpectatorCommand,           "" }
         };
-        static ChatCommand commandTable[] =
+        static std::vector<ChatCommand> commandTable =
         {
-            { "spect",          SEC_CONSOLE,        false, NULL,                              "", spectatorCommandTable },
-            { NULL,             0,                  false, NULL,                              "", NULL }
+            { "spect",          SEC_CONSOLE,        false, nullptr,                              "", spectatorCommandTable }
         };
         return commandTable;
     }

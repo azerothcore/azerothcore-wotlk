@@ -1,19 +1,7 @@
 /*
- * Copyright (C) 
- * Copyright (C) 
- *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation; either version 2 of the License, or (at your
- * option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
- * more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program. If not, see <http://www.gnu.org/licenses/>.
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
+ * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
 /** \file
@@ -83,7 +71,7 @@ class WorldServerSignalHandler : public Trinity::SignalHandler
         }
 };
 
-class FreezeDetectorRunnable : public ACE_Based::Runnable
+class FreezeDetectorRunnable : public ACORE::Runnable
 {
 private:
     uint32 _loops;
@@ -113,7 +101,7 @@ public:
                 ASSERT(false);
             }
 
-            ACE_Based::Thread::Sleep(1000);
+            ACORE::Thread::Sleep(1000);
         }
         sLog->outString("Anti-freeze thread exiting without problems.");
     }
@@ -183,10 +171,10 @@ int Master::Run()
     //handle.register_handler(SIGSEGV, &signalSEGV);
 
     ///- Launch WorldRunnable thread
-    ACE_Based::Thread worldThread(new WorldRunnable);
-    worldThread.setPriority(ACE_Based::Highest);
+    ACORE::Thread worldThread(new WorldRunnable);
+    worldThread.setPriority(ACORE::Priority_Highest);
 
-    ACE_Based::Thread* cliThread = NULL;
+    ACORE::Thread* cliThread = NULL;
 
 #ifdef _WIN32
     if (sConfigMgr->GetBoolDefault("Console.Enable", true) && (m_ServiceStatus == -1)/* need disable console in service mode*/)
@@ -195,14 +183,14 @@ int Master::Run()
 #endif
     {
         ///- Launch CliRunnable thread
-        cliThread = new ACE_Based::Thread(new CliRunnable);
+        cliThread = new ACORE::Thread(new CliRunnable);
     }
 
-    ACE_Based::Thread rarThread(new RARunnable);
+    ACORE::Thread rarThread(new RARunnable);
 
     // pussywizard:
-    ACE_Based::Thread auctionLising_thread(new AuctionListingRunnable);
-    auctionLising_thread.setPriority(ACE_Based::High);
+    ACORE::Thread auctionLising_thread(new AuctionListingRunnable);
+    auctionLising_thread.setPriority(ACORE::Priority_High);
 
 #if defined(_WIN32) || defined(__linux__)
     
@@ -274,21 +262,21 @@ int Master::Run()
 #endif
 
     // Start soap serving thread
-    ACE_Based::Thread* soapThread = NULL;
+    ACORE::Thread* soapThread = NULL;
     if (sConfigMgr->GetBoolDefault("SOAP.Enabled", false))
     {
         TCSoapRunnable* runnable = new TCSoapRunnable();
         runnable->SetListenArguments(sConfigMgr->GetStringDefault("SOAP.IP", "127.0.0.1"), uint16(sConfigMgr->GetIntDefault("SOAP.Port", 7878)));
-        soapThread = new ACE_Based::Thread(runnable);
+        soapThread = new ACORE::Thread(runnable);
     }
 
     // Start up freeze catcher thread
-    ACE_Based::Thread* freezeThread = NULL;
+    ACORE::Thread* freezeThread = NULL;
     if (uint32 freezeDelay = sConfigMgr->GetIntDefault("MaxCoreStuckTime", 0))
     {
         FreezeDetectorRunnable* runnable = new FreezeDetectorRunnable(freezeDelay*1000);
-        freezeThread = new ACE_Based::Thread(runnable);
-        freezeThread->setPriority(ACE_Based::Highest);
+        freezeThread = new ACORE::Thread(runnable);
+        freezeThread->setPriority(ACORE::Priority_Highest);
     }
 
     ///- Launch the world listener socket

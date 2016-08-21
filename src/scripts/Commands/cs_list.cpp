@@ -1,18 +1,7 @@
 /*
- * Copyright (C) 
- *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation; either version 2 of the License, or (at your
- * option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
- * more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program. If not, see <http://www.gnu.org/licenses/>.
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
+ * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
 /* ScriptData
@@ -35,20 +24,18 @@ class list_commandscript : public CommandScript
 public:
     list_commandscript() : CommandScript("list_commandscript") { }
 
-    ChatCommand* GetCommands() const
+    std::vector<ChatCommand> GetCommands() const override
     {
-        static ChatCommand listCommandTable[] =
+        static std::vector<ChatCommand> listCommandTable =
         {
-            { "creature",       SEC_ADMINISTRATOR,  true,  &HandleListCreatureCommand,          "", NULL },
-            { "item",           SEC_ADMINISTRATOR,  true,  &HandleListItemCommand,              "", NULL },
-            { "object",         SEC_ADMINISTRATOR,  true,  &HandleListObjectCommand,            "", NULL },
-            { "auras",          SEC_ADMINISTRATOR,  false, &HandleListAurasCommand,             "", NULL },
-            { NULL,             0,                  false, NULL,                                "", NULL }
+            { "creature",       SEC_ADMINISTRATOR,  true,  &HandleListCreatureCommand,          "" },
+            { "item",           SEC_ADMINISTRATOR,  true,  &HandleListItemCommand,              "" },
+            { "object",         SEC_ADMINISTRATOR,  true,  &HandleListObjectCommand,            "" },
+            { "auras",          SEC_ADMINISTRATOR,  false, &HandleListAurasCommand,             "" }
         };
-        static ChatCommand commandTable[] =
+        static std::vector<ChatCommand> commandTable =
         {
-            { "list",          SEC_ADMINISTRATOR,   true, NULL,                                 "", listCommandTable },
-            { NULL,            0,                   false, NULL,                                "", NULL }
+            { "list",          SEC_ADMINISTRATOR,   true, nullptr,                                 "", listCommandTable }
         };
         return commandTable;
     }
@@ -79,7 +66,7 @@ public:
             return false;
         }
 
-        char* countStr = strtok(NULL, " ");
+        char* countStr = strtok(nullptr, " ");
         uint32 count = countStr ? atol(countStr) : 10;
 
         if (count == 0)
@@ -151,7 +138,7 @@ public:
             return false;
         }
 
-        char* countStr = strtok(NULL, " ");
+        char* countStr = strtok(nullptr, " ");
         uint32 count = countStr ? atol(countStr) : 10;
 
         if (count == 0)
@@ -226,7 +213,7 @@ public:
             result = CharacterDatabase.Query(stmt);
         }
         else
-            result = PreparedQueryResult(NULL);
+            result = PreparedQueryResult(nullptr);
 
         if (result)
         {
@@ -273,7 +260,7 @@ public:
             result = CharacterDatabase.Query(stmt);
         }
         else
-            result = PreparedQueryResult(NULL);
+            result = PreparedQueryResult(nullptr);
 
         if (result)
         {
@@ -368,7 +355,7 @@ public:
             return false;
         }
 
-        char* countStr = strtok(NULL, " ");
+        char* countStr = strtok(nullptr, " ");
         uint32 count = countStr ? atol(countStr) : 10;
 
         if (count == 0)

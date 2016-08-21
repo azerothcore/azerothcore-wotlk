@@ -1,19 +1,7 @@
 /*
- * Copyright (C) 
- * Copyright (C) 
- *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation; either version 2 of the License, or (at your
- * option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
- * more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program. If not, see <http://www.gnu.org/licenses/>.
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
+ * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
 /** \file
@@ -63,7 +51,7 @@ void WorldRunnable::run()
         avgDiffTracker.Update(executionTimeDiff > WORLD_SLEEP_CONST ? executionTimeDiff : WORLD_SLEEP_CONST);
 
         if (executionTimeDiff < WORLD_SLEEP_CONST)
-            ACE_Based::Thread::Sleep(WORLD_SLEEP_CONST-executionTimeDiff);
+            ACORE::Thread::Sleep(WORLD_SLEEP_CONST-executionTimeDiff);
 
         #ifdef _WIN32
             if (m_ServiceStatus == 0)
@@ -130,7 +118,7 @@ void AuctionListingRunnable::run()
                     }
             }
         }
-        ACE_Based::Thread::Sleep(1);
+        ACORE::Thread::Sleep(1);
     }
     sLog->outString("Auction House Listing thread exiting without problems.");
 }

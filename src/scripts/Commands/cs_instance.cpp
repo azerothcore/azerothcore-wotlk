@@ -1,18 +1,7 @@
 /*
- * Copyright (C) 
- *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation; either version 2 of the License, or (at your
- * option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
- * more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program. If not, see <http://www.gnu.org/licenses/>.
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
+ * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
 /* ScriptData
@@ -36,23 +25,21 @@ class instance_commandscript : public CommandScript
 public:
     instance_commandscript() : CommandScript("instance_commandscript") { }
 
-    ChatCommand* GetCommands() const
+    std::vector<ChatCommand> GetCommands() const override
     {
-        static ChatCommand instanceCommandTable[] =
+        static std::vector<ChatCommand> instanceCommandTable =
         {
-            { "listbinds",      SEC_ADMINISTRATOR,  false,  &HandleInstanceListBindsCommand,    "", NULL },
-            { "unbind",         SEC_ADMINISTRATOR,  false,  &HandleInstanceUnbindCommand,       "", NULL },
-            { "stats",          SEC_ADMINISTRATOR,  true,   &HandleInstanceStatsCommand,        "", NULL },
-            { "savedata",       SEC_ADMINISTRATOR,  false,  &HandleInstanceSaveDataCommand,     "", NULL },
-            { "setbossstate",   SEC_GAMEMASTER,     true,   &HandleInstanceSetBossStateCommand, "", NULL },
-            { "getbossstate",   SEC_GAMEMASTER,     true,   &HandleInstanceGetBossStateCommand, "", NULL },
-            { NULL,             0,                  false,  NULL,                               "", NULL }
+            { "listbinds",      SEC_ADMINISTRATOR,  false,  &HandleInstanceListBindsCommand,    "" },
+            { "unbind",         SEC_ADMINISTRATOR,  false,  &HandleInstanceUnbindCommand,       "" },
+            { "stats",          SEC_ADMINISTRATOR,  true,   &HandleInstanceStatsCommand,        "" },
+            { "savedata",       SEC_ADMINISTRATOR,  false,  &HandleInstanceSaveDataCommand,     "" },
+            { "setbossstate",   SEC_GAMEMASTER,     true,   &HandleInstanceSetBossStateCommand, "" },
+            { "getbossstate",   SEC_GAMEMASTER,     true,   &HandleInstanceGetBossStateCommand, "" }
         };
 
-        static ChatCommand commandTable[] =
+        static std::vector<ChatCommand> commandTable =
         {
-            { "instance",       SEC_ADMINISTRATOR,  true,   NULL,                               "", instanceCommandTable },
-            { NULL,             0,                  false,  NULL,                               "", NULL }
+            { "instance",       SEC_ADMINISTRATOR,  true,   nullptr,                               "", instanceCommandTable }
         };
 
         return commandTable;
@@ -84,7 +71,7 @@ public:
             {
                 InstanceSave* save = itr->second.save;
                 uint32 resetTime = itr->second.extended ? save->GetExtendedResetTime() : save->GetResetTime();
-                uint32 ttr = (resetTime >= time(NULL) ? resetTime - time(NULL) : 0);
+                uint32 ttr = (resetTime >= time(nullptr) ? resetTime - time(nullptr) : 0);
                 std::string timeleft = GetTimeString(ttr);
                 handler->PSendSysMessage("map: %d, inst: %d, perm: %s, diff: %d, canReset: %s, TTR: %s%s", itr->first, save->GetInstanceId(), itr->second.perm ? "yes" : "no",  save->GetDifficulty(), save->CanReset() ? "yes" : "no", timeleft.c_str(), (itr->second.extended ? " (extended)" : ""));
                 counter++;
@@ -105,7 +92,7 @@ public:
             player = handler->GetSession()->GetPlayer();
 
         char* map = strtok((char*)args, " ");
-        char* pDiff = strtok(NULL, " ");
+        char* pDiff = strtok(nullptr, " ");
         int8 diff = -1;
         if (pDiff)
             diff = atoi(pDiff);
@@ -128,7 +115,7 @@ public:
                 if (itr->first != player->GetMapId() && (!MapId || MapId == itr->first) && (diff == -1 || diff == save->GetDifficulty()))
                 {
                     uint32 resetTime = itr->second.extended ? save->GetExtendedResetTime() : save->GetResetTime();
-                    uint32 ttr = (resetTime >= time(NULL) ? resetTime - time(NULL) : 0);
+                    uint32 ttr = (resetTime >= time(nullptr) ? resetTime - time(nullptr) : 0);
                     std::string timeleft = GetTimeString(ttr);
                     handler->PSendSysMessage("unbinding map: %d, inst: %d, perm: %s, diff: %d, canReset: %s, TTR: %s%s", itr->first, save->GetInstanceId(), itr->second.perm ? "yes" : "no", save->GetDifficulty(), save->CanReset() ? "yes" : "no", timeleft.c_str(), (itr->second.extended ? " (extended)" : ""));
                     sInstanceSaveMgr->PlayerUnbindInstance(player->GetGUIDLow(), itr->first, Difficulty(i), true, player);
@@ -186,11 +173,11 @@ public:
             return false;
 
         char* param1 = strtok((char*)args, " ");
-        char* param2 = strtok(NULL, " ");
-        char* param3 = strtok(NULL, " ");
+        char* param2 = strtok(nullptr, " ");
+        char* param3 = strtok(nullptr, " ");
         uint32 encounterId = 0;
         int32 state = 0;
-        Player* player = NULL;
+        Player* player = nullptr;
         std::string playerName;
 
         // Character name must be provided when using this from console.
@@ -255,9 +242,9 @@ public:
             return false;
 
         char* param1 = strtok((char*)args, " ");
-        char* param2 = strtok(NULL, " ");
+        char* param2 = strtok(nullptr, " ");
         uint32 encounterId = 0;
-        Player* player = NULL;
+        Player* player = nullptr;
         std::string playerName;
 
         // Character name must be provided when using this from console.

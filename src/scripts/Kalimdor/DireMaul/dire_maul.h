@@ -5,6 +5,8 @@ REWRITTEN BY XINEF
 #ifndef DEF_DIRE_MAUL_H
 #define DEF_DIRE_MAUL_H
 
+#include "ScriptPCH.h"
+
 enum DataTypes
 {
     TYPE_EAST_WING_PROGRESS         = 0,

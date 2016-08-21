@@ -31,6 +31,11 @@ This project is brought to you thanks to:
 - All the [TrinityCore developers and contributors](https://github.com/TrinityCore/TrinityCore/blob/3.3.5/THANKS)
 - All the [MaNGOS, ScriptDev2 and UDB developers and contributors](https://github.com/cmangos/mangos-wotlk/blob/master/AUTHORS.md)
 
+## License
+
+- The new AzerothCore source components are released under the [GNU AGPL v3](https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3)
+- The old sources based on MaNGOS/TrinityCore are released under the [GNU GPL v2](https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2)
+
 ## Links
 
 - [Website](https://azerothcore.github.io/)

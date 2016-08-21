@@ -1,9 +1,11 @@
 /*
-REWRITTEN FROM SCRATCH BY PUSSYWIZARD, IT OWNS NOW!
+ * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-AGPL
 */ 
 
 #ifndef DEF_VIOLET_HOLD_H
 #define DEF_VIOLET_HOLD_H
+
+#include "ScriptPCH.h"
 
 #define MAX_ENCOUNTER 3
 

@@ -3,7 +3,9 @@ REWRITTEN BY XINEF
 */
 
 #include "ScriptMgr.h"
+#include "ScriptPCH.h"
 #include "InstanceScript.h"
+#include "PassiveAI.h"
 
 class instance_gnomeregan : public InstanceMapScript
 {

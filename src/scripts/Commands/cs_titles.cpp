@@ -1,18 +1,7 @@
 /*
- * Copyright (C) 
- *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation; either version 2 of the License, or (at your
- * option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
- * more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program. If not, see <http://www.gnu.org/licenses/>.
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
+ * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
 /* ScriptData
@@ -33,25 +22,22 @@ class titles_commandscript : public CommandScript
 public:
     titles_commandscript() : CommandScript("titles_commandscript") { }
 
-    ChatCommand* GetCommands() const
+    std::vector<ChatCommand> GetCommands() const override
     {
-        static ChatCommand titlesSetCommandTable[] =
+        static std::vector<ChatCommand> titlesSetCommandTable =
         {
-            { "mask",           SEC_GAMEMASTER,     false, &HandleTitlesSetMaskCommand,        "", NULL },
-            { NULL,             0,                  false, NULL,                               "", NULL }
+            { "mask",           SEC_GAMEMASTER,     false, &HandleTitlesSetMaskCommand,        "" }
         };
-        static ChatCommand titlesCommandTable[] =
+        static std::vector<ChatCommand> titlesCommandTable =
         {
-            { "add",            SEC_GAMEMASTER,     false, &HandleTitlesAddCommand,            "", NULL },
-            { "current",        SEC_GAMEMASTER,     false, &HandleTitlesCurrentCommand,        "", NULL },
-            { "remove",         SEC_GAMEMASTER,     false, &HandleTitlesRemoveCommand,         "", NULL },
-            { "set",            SEC_GAMEMASTER,     false, NULL,              "", titlesSetCommandTable },
-            { NULL,             0,                  false, NULL,                               "", NULL }
+            { "add",            SEC_GAMEMASTER,     false, &HandleTitlesAddCommand,            "" },
+            { "current",        SEC_GAMEMASTER,     false, &HandleTitlesCurrentCommand,        "" },
+            { "remove",         SEC_GAMEMASTER,     false, &HandleTitlesRemoveCommand,         "" },
+            { "set",            SEC_GAMEMASTER,     false, nullptr,              "", titlesSetCommandTable }
         };
-        static ChatCommand commandTable[] =
+        static std::vector<ChatCommand> commandTable =
         {
-            { "titles",         SEC_GAMEMASTER,     false, NULL,                 "", titlesCommandTable },
-            { NULL,             0,                  false, NULL,                               "", NULL }
+            { "titles",         SEC_GAMEMASTER,     false, nullptr,                 "", titlesCommandTable }
         };
         return commandTable;
     }

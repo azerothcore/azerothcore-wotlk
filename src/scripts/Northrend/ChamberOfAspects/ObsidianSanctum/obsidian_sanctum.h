@@ -1,9 +1,11 @@
 /*
-REWRITTEN FROM SCRATCH BY XINEF, IT OWNS NOW!
+ * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-AGPL
 */
 
 #ifndef DEF_OBSIDIAN_SANCTUM_H
 #define DEF_OBSIDIAN_SANCTUM_H
+
+#include "ScriptPCH.h"
 
 enum Data
 {

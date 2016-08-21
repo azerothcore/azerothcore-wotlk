@@ -1,9 +1,11 @@
 /*
-REWRITTEN FROM SCRATCH BY PUSSYWIZARD, IT OWNS NOW!
+ * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-AGPL
 */
 
 #ifndef DEF_PIT_OF_SARON_H
 #define DEF_PIT_OF_SARON_H
+
+#include "ScriptPCH.h"
 
 enum DataTypes
 {

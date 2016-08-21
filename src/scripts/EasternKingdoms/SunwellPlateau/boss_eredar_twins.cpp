@@ -3,6 +3,7 @@ REWRITTEN BY XINEF
  */
 
 #include "ScriptMgr.h"
+#include "ScriptPCH.h"
 #include "ScriptedCreature.h"
 #include "sunwell_plateau.h"
 #include "SpellInfo.h"

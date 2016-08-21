@@ -1,19 +1,7 @@
 /*
- * Copyright (C) 
- * Copyright (C) 
- *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation; either version 2 of the License, or (at your
- * option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
- * more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program. If not, see <http://www.gnu.org/licenses/>.
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
+ * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
 #ifndef AZEROTHCORE_CHAT_H
@@ -36,13 +24,18 @@ struct GameTele;
 
 class ChatCommand
 {
+    typedef bool(*pHandler)(ChatHandler*, char const*);
+
     public:
-        const char *       Name;
-        uint32             SecurityLevel;                   // function pointer required correct align (use uint32)
-        bool               AllowConsole;
-        bool (*Handler)(ChatHandler*, const char* args);
-        std::string        Help;
-        ChatCommand*      ChildCommands;
+        ChatCommand(char const* name, uint32 securityLevel, bool allowConsole, pHandler handler, std::string help, std::vector<ChatCommand> childCommands = std::vector<ChatCommand>())
+            : Name(name), SecurityLevel(securityLevel), AllowConsole(allowConsole), Handler(handler), Help(std::move(help)), ChildCommands(std::move(childCommands)) { }
+
+        char const* Name;
+        uint32 SecurityLevel;
+        bool AllowConsole;
+        pHandler Handler;
+        std::string Help;
+        std::vector<ChatCommand> ChildCommands;
 };
 
 class ChatHandler
@@ -73,7 +66,7 @@ class ChatHandler
 
         bool ParseCommands(const char* text);
 
-        static ChatCommand* getCommandTable();
+        static std::vector<ChatCommand> const& getCommandTable();
 
         bool isValidChatMessage(const char* msg);
         void SendGlobalSysMessage(const char *str);
@@ -123,12 +116,12 @@ class ChatHandler
         static bool LoadCommandTable() { return load_command_table; }
         static void SetLoadCommandTable(bool val) { load_command_table = val; }
 
-        bool ShowHelpForCommand(ChatCommand* table, const char* cmd);
+        bool ShowHelpForCommand(std::vector<ChatCommand> const& table, const char* cmd);
     protected:
         explicit ChatHandler() : m_session(NULL), sentErrorMessage(false) {}      // for CLI subclass
-        static bool SetDataForCommandInTable(ChatCommand* table, const char* text, uint32 security, std::string const& help, std::string const& fullcommand);
-        bool ExecuteCommandInTable(ChatCommand* table, const char* text, std::string& fullcmd);
-        bool ShowHelpForSubCommands(ChatCommand* table, char const* cmd, char const* subcmd);
+        static bool SetDataForCommandInTable(std::vector<ChatCommand>& table, const char* text, uint32 securityLevel, std::string const& help, std::string const& fullcommand);
+        bool ExecuteCommandInTable(std::vector<ChatCommand> const& table, const char* text, std::string const& fullcmd);
+        bool ShowHelpForSubCommands(std::vector<ChatCommand> const& table, char const* cmd, char const* subcmd);
 
     private:
 

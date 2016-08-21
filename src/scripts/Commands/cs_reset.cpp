@@ -1,18 +1,7 @@
 /*
- * Copyright (C) 
- *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation; either version 2 of the License, or (at your
- * option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
- * more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program. If not, see <http://www.gnu.org/licenses/>.
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
+ * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
 /* ScriptData
@@ -35,23 +24,21 @@ class reset_commandscript : public CommandScript
 public:
     reset_commandscript() : CommandScript("reset_commandscript") { }
 
-    ChatCommand* GetCommands() const
+    std::vector<ChatCommand> GetCommands() const override
     {
-        static ChatCommand resetCommandTable[] =
+        static std::vector<ChatCommand> resetCommandTable =
         {
-            { "achievements",   SEC_ADMINISTRATOR,  true,  &HandleResetAchievementsCommand,     "", NULL },
-            { "honor",          SEC_ADMINISTRATOR,  true,  &HandleResetHonorCommand,            "", NULL },
-            { "level",          SEC_ADMINISTRATOR,  true,  &HandleResetLevelCommand,            "", NULL },
-            { "spells",         SEC_ADMINISTRATOR,  true,  &HandleResetSpellsCommand,           "", NULL },
-            { "stats",          SEC_ADMINISTRATOR,  true,  &HandleResetStatsCommand,            "", NULL },
-            { "talents",        SEC_ADMINISTRATOR,  true,  &HandleResetTalentsCommand,          "", NULL },
-            { "all",            SEC_ADMINISTRATOR,  true,  &HandleResetAllCommand,              "", NULL },
-            { NULL,             0,                  false, NULL,                                "", NULL }
+            { "achievements",   SEC_ADMINISTRATOR,  true,  &HandleResetAchievementsCommand,     "" },
+            { "honor",          SEC_ADMINISTRATOR,  true,  &HandleResetHonorCommand,            "" },
+            { "level",          SEC_ADMINISTRATOR,  true,  &HandleResetLevelCommand,            "" },
+            { "spells",         SEC_ADMINISTRATOR,  true,  &HandleResetSpellsCommand,           "" },
+            { "stats",          SEC_ADMINISTRATOR,  true,  &HandleResetStatsCommand,            "" },
+            { "talents",        SEC_ADMINISTRATOR,  true,  &HandleResetTalentsCommand,          "" },
+            { "all",            SEC_ADMINISTRATOR,  true,  &HandleResetAllCommand,              "" }
         };
-        static ChatCommand commandTable[] =
+        static std::vector<ChatCommand> commandTable =
         {
-            { "reset",          SEC_ADMINISTRATOR,  true, NULL,                                 "", resetCommandTable },
-            { NULL,             0,                  false, NULL,                                "", NULL }
+            { "reset",          SEC_ADMINISTRATOR,  true, nullptr,                                 "", resetCommandTable }
         };
         return commandTable;
     }

@@ -1,18 +1,7 @@
 /*
- * Copyright (C) 
- *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation; either version 2 of the License, or (at your
- * option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
- * more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program. If not, see <http://www.gnu.org/licenses/>.
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
+ * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
 /* ScriptData
@@ -27,28 +16,27 @@ EndScriptData */
 #include "Creature.h"
 #include "Language.h"
 #include "Player.h"
+#include "SpellInfo.h"
 
 class cast_commandscript : public CommandScript
 {
 public:
     cast_commandscript() : CommandScript("cast_commandscript") { }
 
-    ChatCommand* GetCommands() const
+    std::vector<ChatCommand> GetCommands() const override
     {
-        static ChatCommand castCommandTable[] =
+        static std::vector<ChatCommand> castCommandTable =
         {   
-            { "back",           SEC_ADMINISTRATOR,  false, &HandleCastBackCommand,              "", NULL },
-            { "dist",           SEC_ADMINISTRATOR,  false, &HandleCastDistCommand,              "", NULL },
-            { "self",           SEC_ADMINISTRATOR,  false, &HandleCastSelfCommand,              "", NULL },
-            { "target",         SEC_ADMINISTRATOR,  false, &HandleCastTargetCommad,             "", NULL },
-            { "dest",           SEC_ADMINISTRATOR,  false, &HandleCastDestCommand,              "", NULL },
-            { "",               SEC_ADMINISTRATOR,  false, &HandleCastCommand,                  "", NULL },
-            { NULL,             0,                  false, NULL,                                "", NULL }
+            { "back",           SEC_ADMINISTRATOR,  false, &HandleCastBackCommand,              "" },
+            { "dist",           SEC_ADMINISTRATOR,  false, &HandleCastDistCommand,              "" },
+            { "self",           SEC_ADMINISTRATOR,  false, &HandleCastSelfCommand,              "" },
+            { "target",         SEC_ADMINISTRATOR,  false, &HandleCastTargetCommad,             "" },
+            { "dest",           SEC_ADMINISTRATOR,  false, &HandleCastDestCommand,              "" },
+            { "",               SEC_ADMINISTRATOR,  false, &HandleCastCommand,                  "" }
         };
-        static ChatCommand commandTable[] =
+        static std::vector<ChatCommand> commandTable =
         {
-            { "cast",           SEC_ADMINISTRATOR,  false, NULL,                                "", castCommandTable },
-            { NULL,             0,                  false, NULL,                                "", NULL }
+            { "cast",           SEC_ADMINISTRATOR,  false, nullptr,                                "", castCommandTable }
         };
         return commandTable;
     }
@@ -95,7 +83,7 @@ public:
             return false;
         }
 
-        char* triggeredStr = strtok(NULL, " ");
+        char* triggeredStr = strtok(nullptr, " ");
         if (triggeredStr)
         {
             int l = strlen(triggeredStr);
@@ -103,7 +91,7 @@ public:
                 return false;
         }
 
-        bool triggered = (triggeredStr != NULL);
+        bool triggered = (triggeredStr != nullptr);
 
         handler->GetSession()->GetPlayer()->CastSpell(target, spellId, triggered);
 
@@ -150,7 +138,7 @@ public:
             return false;
         }
 
-        char* triggeredStr = strtok(NULL, " ");
+        char* triggeredStr = strtok(nullptr, " ");
         if (triggeredStr)
         {
             int l = strlen(triggeredStr);
@@ -158,7 +146,7 @@ public:
                 return false;
         }
 
-        bool triggered = (triggeredStr != NULL);
+        bool triggered = (triggeredStr != nullptr);
 
         caster->CastSpell(handler->GetSession()->GetPlayer(), spellId, triggered);
 
@@ -199,14 +187,14 @@ public:
             return false;
         }
 
-        char* distStr = strtok(NULL, " ");
+        char* distStr = strtok(nullptr, " ");
 
         float dist = 0;
 
         if (distStr)
             sscanf(distStr, "%f", &dist);
 
-        char* triggeredStr = strtok(NULL, " ");
+        char* triggeredStr = strtok(nullptr, " ");
         if (triggeredStr)
         {
             int l = strlen(triggeredStr);
@@ -214,7 +202,7 @@ public:
                 return false;
         }
 
-        bool triggered = (triggeredStr != NULL);
+        bool triggered = (triggeredStr != nullptr);
 
         float x, y, z;
         handler->GetSession()->GetPlayer()->GetClosePoint(x, y, z, dist);
@@ -266,7 +254,7 @@ public:
             return false;
         }
 
-        char* triggeredStr = strtok(NULL, " ");
+        char* triggeredStr = strtok(nullptr, " ");
         if (triggeredStr)
         {
             int l = strlen(triggeredStr);
@@ -274,7 +262,7 @@ public:
                 return false;
         }
 
-        bool triggered = (triggeredStr != NULL);
+        bool triggered = (triggeredStr != nullptr);
 
         target->CastSpell(target, spellId, triggered);
 
@@ -327,7 +315,7 @@ public:
             return false;
         }
 
-        char* triggeredStr = strtok(NULL, " ");
+        char* triggeredStr = strtok(nullptr, " ");
         if (triggeredStr)
         {
             int l = strlen(triggeredStr);
@@ -335,7 +323,7 @@ public:
                 return false;
         }
 
-        bool triggered = (triggeredStr != NULL);
+        bool triggered = (triggeredStr != nullptr);
 
         caster->CastSpell(caster->GetVictim(), spellId, triggered);
 
@@ -381,9 +369,9 @@ public:
             return false;
         }
 
-        char* posX = strtok(NULL, " ");
-        char* posY = strtok(NULL, " ");
-        char* posZ = strtok(NULL, " ");
+        char* posX = strtok(nullptr, " ");
+        char* posY = strtok(nullptr, " ");
+        char* posZ = strtok(nullptr, " ");
 
         if (!posX || !posY || !posZ)
             return false;
@@ -392,7 +380,7 @@ public:
         float y = float(atof(posY));
         float z = float(atof(posZ));
 
-        char* triggeredStr = strtok(NULL, " ");
+        char* triggeredStr = strtok(nullptr, " ");
         if (triggeredStr)
         {
             int l = strlen(triggeredStr);
@@ -400,7 +388,7 @@ public:
                 return false;
         }
 
-        bool triggered = (triggeredStr != NULL);
+        bool triggered = (triggeredStr != nullptr);
 
         caster->CastSpell(x, y, z, spellId, triggered);
 

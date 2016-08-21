@@ -1,18 +1,7 @@
 /*
- * Copyright (C) 
- *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation; either version 2 of the License, or (at your
- * option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
- * more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program. If not, see <http://www.gnu.org/licenses/>.
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
+ * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
 /* ScriptData
@@ -37,47 +26,43 @@ class lookup_commandscript : public CommandScript
 public:
     lookup_commandscript() : CommandScript("lookup_commandscript") { }
 
-    ChatCommand* GetCommands() const
+    std::vector<ChatCommand> GetCommands() const override
     {
-        static ChatCommand lookupPlayerCommandTable[] =
+        static std::vector<ChatCommand> lookupPlayerCommandTable =
         {
-            { "ip",             SEC_GAMEMASTER,     true,  &HandleLookupPlayerIpCommand,        "", NULL },
-            { "account",        SEC_GAMEMASTER,     true,  &HandleLookupPlayerAccountCommand,   "", NULL },
-            { "email",          SEC_GAMEMASTER,     true,  &HandleLookupPlayerEmailCommand,     "", NULL },
-            { NULL,             0,                  false, NULL,                                "", NULL }
+            { "ip",             SEC_GAMEMASTER,     true,  &HandleLookupPlayerIpCommand,        "" },
+            { "account",        SEC_GAMEMASTER,     true,  &HandleLookupPlayerAccountCommand,   "" },
+            { "email",          SEC_GAMEMASTER,     true,  &HandleLookupPlayerEmailCommand,     "" }
         };
 
-        static ChatCommand lookupSpellCommandTable[] =
+        static std::vector<ChatCommand> lookupSpellCommandTable =
         {
-            { "id",             SEC_ADMINISTRATOR,  true,  &HandleLookupSpellIdCommand,         "", NULL },
-            { "",               SEC_ADMINISTRATOR,  true,  &HandleLookupSpellCommand,           "", NULL },
-            { NULL,             0,                  false, NULL,                                "", NULL }
+            { "id",             SEC_ADMINISTRATOR,  true,  &HandleLookupSpellIdCommand,         "" },
+            { "",               SEC_ADMINISTRATOR,  true,  &HandleLookupSpellCommand,           "" }
         };
 
-        static ChatCommand lookupCommandTable[] =
+        static std::vector<ChatCommand> lookupCommandTable =
         {
-            { "area",           SEC_GAMEMASTER,      true,  &HandleLookupAreaCommand,            "", NULL },
-            { "creature",       SEC_ADMINISTRATOR,  true,  &HandleLookupCreatureCommand,        "", NULL },
-            { "event",          SEC_GAMEMASTER,     true,  &HandleLookupEventCommand,           "", NULL },
-            { "faction",        SEC_ADMINISTRATOR,  true,  &HandleLookupFactionCommand,         "", NULL },
-            { "item",           SEC_ADMINISTRATOR,  true,  &HandleLookupItemCommand,            "", NULL },
-            { "itemset",        SEC_ADMINISTRATOR,  true,  &HandleLookupItemSetCommand,         "", NULL },
-            { "object",         SEC_ADMINISTRATOR,  true,  &HandleLookupObjectCommand,          "", NULL },
-            { "quest",          SEC_ADMINISTRATOR,  true,  &HandleLookupQuestCommand,           "", NULL },
-            { "player",         SEC_GAMEMASTER,     true,  NULL,                                "", lookupPlayerCommandTable },
-            { "skill",          SEC_ADMINISTRATOR,  true,  &HandleLookupSkillCommand,           "", NULL },
-            { "spell",          SEC_ADMINISTRATOR,  true,  NULL,                                "", lookupSpellCommandTable },
-            { "taxinode",       SEC_ADMINISTRATOR,  true,  &HandleLookupTaxiNodeCommand,        "", NULL },
-            { "tele",           SEC_GAMEMASTER,      true,  &HandleLookupTeleCommand,            "", NULL },
-            { "title",          SEC_GAMEMASTER,     true,  &HandleLookupTitleCommand,           "", NULL },
-            { "map",            SEC_ADMINISTRATOR,  true,  &HandleLookupMapCommand,             "", NULL },
-            { NULL,             0,                  false, NULL,                                "", NULL }
+            { "area",           SEC_GAMEMASTER,      true,  &HandleLookupAreaCommand,            "" },
+            { "creature",       SEC_ADMINISTRATOR,  true,  &HandleLookupCreatureCommand,        "" },
+            { "event",          SEC_GAMEMASTER,     true,  &HandleLookupEventCommand,           "" },
+            { "faction",        SEC_ADMINISTRATOR,  true,  &HandleLookupFactionCommand,         "" },
+            { "item",           SEC_ADMINISTRATOR,  true,  &HandleLookupItemCommand,            "" },
+            { "itemset",        SEC_ADMINISTRATOR,  true,  &HandleLookupItemSetCommand,         "" },
+            { "object",         SEC_ADMINISTRATOR,  true,  &HandleLookupObjectCommand,          "" },
+            { "quest",          SEC_ADMINISTRATOR,  true,  &HandleLookupQuestCommand,           "" },
+            { "player",         SEC_GAMEMASTER,     true,  nullptr,                                "", lookupPlayerCommandTable },
+            { "skill",          SEC_ADMINISTRATOR,  true,  &HandleLookupSkillCommand,           "" },
+            { "spell",          SEC_ADMINISTRATOR,  true,  nullptr,                                "", lookupSpellCommandTable },
+            { "taxinode",       SEC_ADMINISTRATOR,  true,  &HandleLookupTaxiNodeCommand,        "" },
+            { "tele",           SEC_GAMEMASTER,      true,  &HandleLookupTeleCommand,            "" },
+            { "title",          SEC_GAMEMASTER,     true,  &HandleLookupTitleCommand,           "" },
+            { "map",            SEC_ADMINISTRATOR,  true,  &HandleLookupMapCommand,             "" }
         };
 
-        static ChatCommand commandTable[] =
+        static std::vector<ChatCommand> commandTable =
         {
-            { "lookup",         SEC_ADMINISTRATOR,  true,  NULL,                                "", lookupCommandTable },
-            { NULL,             0,                  false, NULL,                                "", NULL }
+            { "lookup",         SEC_ADMINISTRATOR,  true,  nullptr,                                "", lookupCommandTable }
         };
         return commandTable;
     }
@@ -268,7 +253,7 @@ public:
         if (!*args)
             return false;
 
-        // Can be NULL at console call
+        // Can be nullptr at console call
         Player* target = handler->getSelectedPlayer();
 
         std::string namePart = args;
@@ -289,7 +274,7 @@ public:
             FactionEntry const* factionEntry = sFactionStore.LookupEntry(id);
             if (factionEntry)
             {
-                FactionState const* factionState = target ? target->GetReputationMgr().GetState(factionEntry) : NULL;
+                FactionState const* factionState = target ? target->GetReputationMgr().GetState(factionEntry) : nullptr;
 
                 int locale = handler->GetSessionDbcLocale();
                 std::string name = factionEntry->name[locale];
@@ -329,7 +314,7 @@ public:
                     else
                         ss << id << " - " << name << ' ' << localeNames[locale];
 
-                    if (factionState) // and then target != NULL also
+                    if (factionState) // and then target != nullptr also
                     {
                         uint32 index = target->GetReputationMgr().GetReputationRankStrIndex(factionEntry);
                         std::string rankName = handler->GetTrinityString(index);
@@ -540,7 +525,7 @@ public:
         if (!*args)
             return false;
 
-        // can be NULL at console call
+        // can be nullptr at console call
         Player* target = handler->getSelectedPlayer();
 
         std::string namePart = args;
@@ -616,7 +601,7 @@ public:
         if (!*args)
             return false;
 
-        // can be NULL in console call
+        // can be nullptr in console call
         Player* target = handler->getSelectedPlayer();
 
         std::string namePart = args;
@@ -704,7 +689,7 @@ public:
         if (!*args)
             return false;
 
-        // can be NULL at console call
+        // can be nullptr at console call
         Player* target = handler->getSelectedPlayer();
 
         std::string namePart = args;
@@ -816,7 +801,7 @@ public:
         if (!*args)
             return false;
 
-        // can be NULL at console call
+        // can be nullptr at console call
         Player* target = handler->getSelectedPlayer();
 
         uint32 id = atoi((char*)args);
@@ -1036,7 +1021,7 @@ public:
         if (!*args)
             return false;
 
-        // can be NULL in console call
+        // can be nullptr in console call
         Player* target = handler->getSelectedPlayer();
 
         // title name have single string arg for player name
@@ -1193,7 +1178,7 @@ public:
         Player* target = handler->getSelectedPlayer();
         if (!*args)
         {
-            // NULL only if used from console
+            // nullptr only if used from console
             if (!target || target == handler->GetSession()->GetPlayer())
                 return false;
 
@@ -1203,7 +1188,7 @@ public:
         else
         {
             ip = strtok((char*)args, " ");
-            limitStr = strtok(NULL, " ");
+            limitStr = strtok(nullptr, " ");
             limit = limitStr ? atoi(limitStr) : -1;
         }
 
@@ -1220,7 +1205,7 @@ public:
             return false;
 
         std::string account = strtok((char*)args, " ");
-        char* limitStr = strtok(NULL, " ");
+        char* limitStr = strtok(nullptr, " ");
         int32 limit = limitStr ? atoi(limitStr) : -1;
 
         if (!AccountMgr::normalizeString
@@ -1240,7 +1225,7 @@ public:
             return false;
 
         std::string email = strtok((char*)args, " ");
-        char* limitStr = strtok(NULL, " ");
+        char* limitStr = strtok(nullptr, " ");
         int32 limit = limitStr ? atoi(limitStr) : -1;
 
         PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_LIST_BY_EMAIL);
@@ -1292,7 +1277,7 @@ public:
                     uint32 guid             = characterFields[0].GetUInt32();
                     std::string name        = characterFields[1].GetString();
                     uint8 plevel = 0, prace = 0, pclass = 0;
-                    bool online = (ObjectAccessor::FindPlayerInOrOutOfWorld(MAKE_NEW_GUID(guid, 0, HIGHGUID_PLAYER)) != NULL);
+                    bool online = (ObjectAccessor::FindPlayerInOrOutOfWorld(MAKE_NEW_GUID(guid, 0, HIGHGUID_PLAYER)) != nullptr);
 
                     if (const GlobalPlayerData* gpd = sWorld->GetGlobalPlayerData(guid))
                     {

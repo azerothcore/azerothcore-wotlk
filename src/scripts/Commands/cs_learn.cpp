@@ -1,18 +1,7 @@
 /*
- * Copyright (C) 
- *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation; either version 2 of the License, or (at your
- * option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
- * more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program. If not, see <http://www.gnu.org/licenses/>.
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
+ * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
 /* ScriptData
@@ -36,40 +25,36 @@ class learn_commandscript : public CommandScript
 public:
     learn_commandscript() : CommandScript("learn_commandscript") { }
 
-    ChatCommand* GetCommands() const
+    std::vector<ChatCommand> GetCommands() const override
     {
-        static ChatCommand learnAllMyCommandTable[] =
+        static std::vector<ChatCommand> learnAllMyCommandTable =
         {
-            { "class",          SEC_ADMINISTRATOR,  false, &HandleLearnAllMyClassCommand,       "", NULL },
-            { "pettalents",     SEC_ADMINISTRATOR,  false, &HandleLearnAllMyPetTalentsCommand,  "", NULL },
-            { "spells",         SEC_ADMINISTRATOR,  false, &HandleLearnAllMySpellsCommand,      "", NULL },
-            { "talents",        SEC_ADMINISTRATOR,  false, &HandleLearnAllMyTalentsCommand,     "", NULL },
-            { NULL,             0,                  false, NULL,                                "", NULL }
+            { "class",          SEC_ADMINISTRATOR,  false, &HandleLearnAllMyClassCommand,       "" },
+            { "pettalents",     SEC_ADMINISTRATOR,  false, &HandleLearnAllMyPetTalentsCommand,  "" },
+            { "spells",         SEC_ADMINISTRATOR,  false, &HandleLearnAllMySpellsCommand,      "" },
+            { "talents",        SEC_ADMINISTRATOR,  false, &HandleLearnAllMyTalentsCommand,     "" }
         };
 
-        static ChatCommand learnAllCommandTable[] =
+        static std::vector<ChatCommand> learnAllCommandTable =
         {
-            { "my",             SEC_ADMINISTRATOR,  false, NULL,                                "",  learnAllMyCommandTable },
-            { "gm",             SEC_GAMEMASTER,     false, &HandleLearnAllGMCommand,            "", NULL },
-            { "crafts",         SEC_GAMEMASTER,     false, &HandleLearnAllCraftsCommand,        "", NULL },
-            { "default",        SEC_GAMEMASTER,      false, &HandleLearnAllDefaultCommand,       "", NULL },
-            { "lang",           SEC_GAMEMASTER,      false, &HandleLearnAllLangCommand,          "", NULL },
-            { "recipes",        SEC_GAMEMASTER,     false, &HandleLearnAllRecipesCommand,       "", NULL },
-            { NULL,             0,                  false, NULL,                                "", NULL }
+            { "my",             SEC_ADMINISTRATOR,  false, nullptr,                                "",  learnAllMyCommandTable },
+            { "gm",             SEC_GAMEMASTER,     false, &HandleLearnAllGMCommand,            "" },
+            { "crafts",         SEC_GAMEMASTER,     false, &HandleLearnAllCraftsCommand,        "" },
+            { "default",        SEC_GAMEMASTER,      false, &HandleLearnAllDefaultCommand,       "" },
+            { "lang",           SEC_GAMEMASTER,      false, &HandleLearnAllLangCommand,          "" },
+            { "recipes",        SEC_GAMEMASTER,     false, &HandleLearnAllRecipesCommand,       "" }
         };
 
-        static ChatCommand learnCommandTable[] =
+        static std::vector<ChatCommand> learnCommandTable =
         {
-            { "all",            SEC_ADMINISTRATOR,  false, NULL,                                "",  learnAllCommandTable },
-            { "",               SEC_ADMINISTRATOR,  false, &HandleLearnCommand,                 "", NULL },
-            { NULL,             0,                  false, NULL,                                "", NULL }
+            { "all",            SEC_ADMINISTRATOR,  false, nullptr,                                "",  learnAllCommandTable },
+            { "",               SEC_ADMINISTRATOR,  false, &HandleLearnCommand,                 "" }
         };
 
-        static ChatCommand commandTable[] =
+        static std::vector<ChatCommand> commandTable =
         {
-            { "learn",          SEC_GAMEMASTER,      false, NULL,                                "", learnCommandTable },
-            { "unlearn",        SEC_ADMINISTRATOR,  false, &HandleUnLearnCommand,               "", NULL },
-            { NULL,             0,                  false, NULL,                                "", NULL }
+            { "learn",          SEC_GAMEMASTER,      false, nullptr,                                "", learnCommandTable },
+            { "unlearn",        SEC_ADMINISTRATOR,  false, &HandleUnLearnCommand,               "" }
         };
         return commandTable;
     }
@@ -114,7 +99,7 @@ public:
             return false;
         }
 
-        char const* all = strtok(NULL, " ");
+        char const* all = strtok(nullptr, " ");
         bool allRanks = all ? (strncmp(all, "all", strlen(all)) == 0) : false;
 
         if (!allRanks && targetPlayer->HasSpell(spell))
@@ -400,7 +385,7 @@ public:
 
         std::string name;
 
-        SkillLineEntry const* targetSkillInfo = NULL;
+        SkillLineEntry const* targetSkillInfo = nullptr;
         for (uint32 i = 1; i < sSkillLineStore.GetNumRows(); ++i)
         {
             SkillLineEntry const* skillInfo = sSkillLineStore.LookupEntry(i);
@@ -496,7 +481,7 @@ public:
         if (!spellId)
             return false;
 
-        char const* allStr = strtok(NULL, " ");
+        char const* allStr = strtok(nullptr, " ");
         bool allRanks = allStr ? (strncmp(allStr, "all", strlen(allStr)) == 0) : false;
 
         Player* target = handler->getSelectedPlayer();
