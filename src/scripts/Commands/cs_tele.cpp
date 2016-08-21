@@ -28,15 +28,15 @@ public:
     {
         static std::vector<ChatCommand> teleCommandTable =
         {
-            { "add",            SEC_ADMINISTRATOR,  false, &HandleTeleAddCommand,             "" },
-            { "del",            SEC_ADMINISTRATOR,  true,  &HandleTeleDelCommand,             "" },
+            { "add",            SEC_ADMINISTRATOR,   false, &HandleTeleAddCommand,             "" },
+            { "del",            SEC_ADMINISTRATOR,   true,  &HandleTeleDelCommand,             "" },
             { "name",           SEC_GAMEMASTER,      true,  &HandleTeleNameCommand,            "" },
             { "group",          SEC_GAMEMASTER,      false, &HandleTeleGroupCommand,           "" },
-            { "",               SEC_GAMEMASTER,      false, &HandleTeleCommand,                "" }
+            { "",               SEC_MODERATOR,       false, &HandleTeleCommand,                "" }
         };
         static std::vector<ChatCommand> commandTable =
         {
-            { "tele",           SEC_GAMEMASTER,      false, nullptr,                   "", teleCommandTable }
+            { "tele",           SEC_MODERATOR,      false, nullptr,                            "", teleCommandTable }
         };
         return commandTable;
     }

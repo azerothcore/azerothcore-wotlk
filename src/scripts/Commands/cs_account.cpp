@@ -27,7 +27,7 @@ public:
     {
         static std::vector<ChatCommand> accountSetCommandTable =
         {
-            { "addon", SEC_ADMINISTRATOR, true, &HandleAccountSetAddonCommand, "" },
+            { "addon", SEC_GAMEMASTER, true, &HandleAccountSetAddonCommand, "" },
             { "gmlevel", SEC_CONSOLE, true, &HandleAccountSetGmLevelCommand, "" },
             { "password", SEC_CONSOLE, true, &HandleAccountSetPasswordCommand, "" }
         };

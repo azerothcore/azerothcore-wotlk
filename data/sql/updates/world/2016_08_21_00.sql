@@ -1,24 +1,6 @@
-/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
-/*!40103 SET TIME_ZONE='+00:00' */;
-/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
-/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
-/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
-/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
-DROP TABLE IF EXISTS `command`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `command`
-(
-  `name` varchar(50) NOT NULL DEFAULT '',
-  `security` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `help` longtext,
-  PRIMARY KEY (`name`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Chat System';
-/*!40101 SET character_set_client = @saved_cs_client */;
+ALTER TABLE world_db_version CHANGE COLUMN 2016_08_14_02 2016_08_21_00 bit;
 
-LOCK TABLES `command` WRITE;
-/*!40000 ALTER TABLE `command` DISABLE KEYS */;
-INSERT INTO `command` (`name`, `security`, `help`) VALUES
+INSERT IGNORE INTO `command` (`name`, `security`, `help`) VALUES
 ('achievement',2,'Syntax: .achievement $subcommand\nType .achievement to see the list of possible subcommands or .help achievement $subcommand to see info on subcommands'),
 ('achievement add',2,'Syntax: .achievement add $achievement\nAdd an achievement to the targeted player.\n$achievement: can be either achievement id or achievement link'),
 ('achievement checkall',3,''),
@@ -509,12 +491,3 @@ INSERT INTO `command` (`name`, `security`, `help`) VALUES
 ('titles set',2,'Syntax: '),
 ('wp',3,'Syntax: wp $subcommand\n Type .wp to see a list of possible subcommands\n or .help wp $subcommand to see info on the subcommand.'),
 ('wp modify',3,'Syntax: ');
-/*!40000 ALTER TABLE `command` ENABLE KEYS */;
-UNLOCK TABLES;
-/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
-
-/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
-/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
-/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
-/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
-

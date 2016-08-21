@@ -28,21 +28,21 @@ public:
     {
         static std::vector<ChatCommand> goCommandTable =
         {
-            { "creature",       SEC_GAMEMASTER,      false, &HandleGoCreatureCommand,          "" },
-            { "graveyard",      SEC_GAMEMASTER,      false, &HandleGoGraveyardCommand,         "" },
-            { "grid",           SEC_GAMEMASTER,      false, &HandleGoGridCommand,              "" },
-            { "object",         SEC_GAMEMASTER,      false, &HandleGoObjectCommand,            "" },
-            { "taxinode",       SEC_GAMEMASTER,      false, &HandleGoTaxinodeCommand,          "" },
-            { "trigger",        SEC_GAMEMASTER,      false, &HandleGoTriggerCommand,           "" },
-            { "zonexy",         SEC_GAMEMASTER,      false, &HandleGoZoneXYCommand,            "" },
-            { "xyz",            SEC_GAMEMASTER,      false, &HandleGoXYZCommand,               "" },
-            { "ticket",         SEC_GAMEMASTER,      false, &HandleGoTicketCommand,            "" },
-            { "",               SEC_GAMEMASTER,      false, &HandleGoXYZCommand,               "" }
+            { "creature",       SEC_MODERATOR,      false, &HandleGoCreatureCommand,          "" },
+            { "graveyard",      SEC_MODERATOR,      false, &HandleGoGraveyardCommand,         "" },
+            { "grid",           SEC_MODERATOR,      false, &HandleGoGridCommand,              "" },
+            { "object",         SEC_MODERATOR,      false, &HandleGoObjectCommand,            "" },
+            { "taxinode",       SEC_MODERATOR,      false, &HandleGoTaxinodeCommand,          "" },
+            { "trigger",        SEC_MODERATOR,      false, &HandleGoTriggerCommand,           "" },
+            { "zonexy",         SEC_MODERATOR,      false, &HandleGoZoneXYCommand,            "" },
+            { "xyz",            SEC_MODERATOR,      false, &HandleGoXYZCommand,               "" },
+            { "ticket",         SEC_GAMEMASTER,     false, &HandleGoTicketCommand,            "" },
+            { "",               SEC_MODERATOR,      false, &HandleGoXYZCommand,               "" }
         };
 
         static std::vector<ChatCommand> commandTable =
         {
-            { "go",             SEC_GAMEMASTER,      false, nullptr,                     "", goCommandTable }
+            { "go",             SEC_MODERATOR,      false, nullptr,                     "", goCommandTable }
         };
         return commandTable;
     }

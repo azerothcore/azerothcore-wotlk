@@ -27,16 +27,16 @@ public:
     {
         static std::vector<ChatCommand> castCommandTable =
         {   
-            { "back",           SEC_ADMINISTRATOR,  false, &HandleCastBackCommand,              "" },
-            { "dist",           SEC_ADMINISTRATOR,  false, &HandleCastDistCommand,              "" },
-            { "self",           SEC_ADMINISTRATOR,  false, &HandleCastSelfCommand,              "" },
-            { "target",         SEC_ADMINISTRATOR,  false, &HandleCastTargetCommad,             "" },
-            { "dest",           SEC_ADMINISTRATOR,  false, &HandleCastDestCommand,              "" },
-            { "",               SEC_ADMINISTRATOR,  false, &HandleCastCommand,                  "" }
+            { "back",           SEC_GAMEMASTER,  false, &HandleCastBackCommand,              "" },
+            { "dist",           SEC_GAMEMASTER,  false, &HandleCastDistCommand,              "" },
+            { "self",           SEC_GAMEMASTER,  false, &HandleCastSelfCommand,              "" },
+            { "target",         SEC_GAMEMASTER,  false, &HandleCastTargetCommad,             "" },
+            { "dest",           SEC_GAMEMASTER,  false, &HandleCastDestCommand,              "" },
+            { "",               SEC_GAMEMASTER,  false, &HandleCastCommand,                  "" }
         };
         static std::vector<ChatCommand> commandTable =
         {
-            { "cast",           SEC_ADMINISTRATOR,  false, nullptr,                                "", castCommandTable }
+            { "cast",           SEC_GAMEMASTER,  false, nullptr,                                "", castCommandTable }
         };
         return commandTable;
     }

@@ -34,11 +34,11 @@ public:
             { "spells",         SEC_ADMINISTRATOR,  true,  &HandleResetSpellsCommand,           "" },
             { "stats",          SEC_ADMINISTRATOR,  true,  &HandleResetStatsCommand,            "" },
             { "talents",        SEC_ADMINISTRATOR,  true,  &HandleResetTalentsCommand,          "" },
-            { "all",            SEC_ADMINISTRATOR,  true,  &HandleResetAllCommand,              "" }
+            { "all",            SEC_CONSOLE,        true,  &HandleResetAllCommand,              "" }
         };
         static std::vector<ChatCommand> commandTable =
         {
-            { "reset",          SEC_ADMINISTRATOR,  true, nullptr,                                 "", resetCommandTable }
+            { "reset",          SEC_ADMINISTRATOR,  true, nullptr,                              "", resetCommandTable }
         };
         return commandTable;
     }

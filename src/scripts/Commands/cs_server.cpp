@@ -64,19 +64,19 @@ public:
         {
             { "corpses",        SEC_GAMEMASTER,     true,  &HandleServerCorpsesCommand,             "" },
             { "exit",           SEC_CONSOLE,        true,  &HandleServerExitCommand,                "" },
-            { "idlerestart",    SEC_ADMINISTRATOR,  true,  nullptr,                                    "", serverIdleRestartCommandTable },
-            { "idleshutdown",   SEC_ADMINISTRATOR,  true,  nullptr,                                    "", serverIdleShutdownCommandTable },
+            { "idlerestart",    SEC_ADMINISTRATOR,  true,  nullptr,                                 "", serverIdleRestartCommandTable },
+            { "idleshutdown",   SEC_ADMINISTRATOR,  true,  nullptr,                                 "", serverIdleShutdownCommandTable },
             { "info",           SEC_PLAYER,         true,  &HandleServerInfoCommand,                "" },
             { "motd",           SEC_PLAYER,         true,  &HandleServerMotdCommand,                "" },
-            { "restart",        SEC_ADMINISTRATOR,  true,  nullptr,                                    "", serverRestartCommandTable },
-            { "shutdown",       SEC_ADMINISTRATOR,  true,  nullptr,                                    "", serverShutdownCommandTable },
-            { "set",            SEC_ADMINISTRATOR,  true,  nullptr,                                    "", serverSetCommandTable },
+            { "restart",        SEC_ADMINISTRATOR,  true,  nullptr,                                 "", serverRestartCommandTable },
+            { "shutdown",       SEC_ADMINISTRATOR,  true,  nullptr,                                 "", serverShutdownCommandTable },
+            { "set",            SEC_ADMINISTRATOR,  true,  nullptr,                                 "", serverSetCommandTable },
             { "togglequerylog", SEC_CONSOLE,        true,  &HandleServerToggleQueryLogging,         "" }
         };
 
          static std::vector<ChatCommand> commandTable =
         {
-            { "server",         SEC_ADMINISTRATOR,  true,  nullptr,                                    "", serverCommandTable }
+            { "server",         SEC_PLAYER,         true,  nullptr,                                 "", serverCommandTable }
         };
         return commandTable;
     }
