@@ -246,6 +246,10 @@ bool ChatHandler::ExecuteCommandInTable(std::vector<ChatCommand> const& table, c
 
     for (uint32 i = 0; i < table.size(); ++i)
     {
+        // for data fill use full explicit command names
+        if (table[i].Name == nullptr || table[i].Name != cmd)
+            continue;
+
         if (!hasStringAbbr(table[i].Name, cmd.c_str()))
             continue;
 
