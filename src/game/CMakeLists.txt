@@ -110,28 +110,28 @@ set(game_STAT_SRCS
 
 include_directories(
   ${CMAKE_BINARY_DIR}
-  ${CMAKE_SOURCE_DIR}/modules/acore/deps/recastnavigation/Detour
-  ${CMAKE_SOURCE_DIR}/modules/acore/deps/recastnavigation/Recast
-  ${CMAKE_SOURCE_DIR}/modules/acore/deps/g3dlite/include
-  ${CMAKE_SOURCE_DIR}/modules/acore/deps/SFMT
-  ${CMAKE_SOURCE_DIR}/modules/acore/deps/zlib
-  ${CMAKE_SOURCE_DIR}/modules/acore/world-engine/collision
-  ${CMAKE_SOURCE_DIR}/modules/acore/world-engine/collision/Management
-  ${CMAKE_SOURCE_DIR}/modules/acore/world-engine/collision/Models
-  ${CMAKE_SOURCE_DIR}/modules/acore/world-engine/collision/Maps
-  ${CMAKE_SOURCE_DIR}/modules/acore/framework
-  ${CMAKE_SOURCE_DIR}/modules/acore/framework/Configuration
-  ${CMAKE_SOURCE_DIR}/modules/acore/framework/Cryptography
-  ${CMAKE_SOURCE_DIR}/modules/acore/framework/Cryptography/Authentication
-  ${CMAKE_SOURCE_DIR}/modules/acore/framework/Database
-  ${CMAKE_SOURCE_DIR}/modules/acore/framework/DataStores
-  ${CMAKE_SOURCE_DIR}/modules/acore/framework/Debugging
-  ${CMAKE_SOURCE_DIR}/modules/acore/framework/Dynamic/LinkedReference
-  ${CMAKE_SOURCE_DIR}/modules/acore/framework/Dynamic
-  ${CMAKE_SOURCE_DIR}/modules/acore/framework/Logging
-  ${CMAKE_SOURCE_DIR}/modules/acore/framework/Packets
-  ${CMAKE_SOURCE_DIR}/modules/acore/framework/Threading
-  ${CMAKE_SOURCE_DIR}/modules/acore/framework/Utilities
+  ${CMAKE_SOURCE_DIR}/modules/worldengine/deps/recastnavigation/Detour
+  ${CMAKE_SOURCE_DIR}/modules/worldengine/deps/recastnavigation/Recast
+  ${CMAKE_SOURCE_DIR}/modules/worldengine/deps/g3dlite/include
+  ${CMAKE_SOURCE_DIR}/modules/worldengine/deps/SFMT
+  ${CMAKE_SOURCE_DIR}/modules/worldengine/deps/zlib
+  ${CMAKE_SOURCE_DIR}/modules/worldengine/lib-collision
+  ${CMAKE_SOURCE_DIR}/modules/worldengine/lib-collision/Management
+  ${CMAKE_SOURCE_DIR}/modules/worldengine/lib-collision/Models
+  ${CMAKE_SOURCE_DIR}/modules/worldengine/lib-collision/Maps
+  ${CMAKE_SOURCE_DIR}/modules/worldengine/nucleus/src
+  ${CMAKE_SOURCE_DIR}/modules/worldengine/nucleus/src/Configuration
+  ${CMAKE_SOURCE_DIR}/modules/worldengine/nucleus/src/Cryptography
+  ${CMAKE_SOURCE_DIR}/modules/worldengine/nucleus/src/Cryptography/Authentication
+  ${CMAKE_SOURCE_DIR}/modules/worldengine/nucleus/src/Database
+  ${CMAKE_SOURCE_DIR}/modules/worldengine/nucleus/src/DataStores
+  ${CMAKE_SOURCE_DIR}/modules/worldengine/nucleus/src/Debugging
+  ${CMAKE_SOURCE_DIR}/modules/worldengine/nucleus/src/Dynamic/LinkedReference
+  ${CMAKE_SOURCE_DIR}/modules/worldengine/nucleus/src/Dynamic
+  ${CMAKE_SOURCE_DIR}/modules/worldengine/nucleus/src/Logging
+  ${CMAKE_SOURCE_DIR}/modules/worldengine/nucleus/src/Packets
+  ${CMAKE_SOURCE_DIR}/modules/worldengine/nucleus/src/Threading
+  ${CMAKE_SOURCE_DIR}/modules/worldengine/nucleus/src/Utilities
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}/Accounts
   ${CMAKE_CURRENT_SOURCE_DIR}/Achievements

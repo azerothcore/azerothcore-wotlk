@@ -2267,7 +2267,7 @@ bool CollisionDetection::fixedSolidSphereIntersectsFixedTriangle(
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// AABB-triangle overlap test code based on Tomas Akenine-MÅˆller's
+// AABB-triangle overlap test code based on Tomas Akenine-MÔøΩÔøΩller's
 // http://www.cs.lth.se/home/Tomas_Akenine_Moller/code/tribox3.txt
 // Ported 2008-12-28
 

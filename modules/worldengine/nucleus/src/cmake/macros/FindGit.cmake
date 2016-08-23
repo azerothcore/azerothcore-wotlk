@@ -7,7 +7,7 @@
 # This program is distributed in the hope that it will be useful, but
 # WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-include(${CMAKE_SOURCE_DIR}/modules/acore/cmake/macros/EnsureVersion.cmake)
+include(${CMAKE_SOURCE_DIR}/modules/worldengine/nucleus/src/cmake/macros/EnsureVersion.cmake)
 
 set(_REQUIRED_GIT_VERSION "1.7")
 

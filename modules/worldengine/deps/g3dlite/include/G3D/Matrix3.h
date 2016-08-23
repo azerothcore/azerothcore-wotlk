@@ -312,7 +312,7 @@ public:
     // "You might be tempted to write [...] them as inline functions 
     // inside their respective header files, but this is something you 
     // must definitely not do. An inline function can be duplicated 
-    // in every file in which it appears њухЅ and this duplication 
+    // in every file in which it appears пїЅпїЅпїЅпїЅ and this duplication 
     // includes the static object definition. Because inline functions 
     // automatically default to internal linkage, this would result in 
     // having multiple static objects across the various translation 

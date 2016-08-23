@@ -12,8 +12,8 @@
 file(GLOB_RECURSE sources *.cpp *.h)
 
 set(include_Dirs
-    ${CMAKE_SOURCE_DIR}/modules/acore/framework
-    ${CMAKE_SOURCE_DIR}/modules/acore/deps/libmpq
+    ${CMAKE_SOURCE_DIR}/modules/worldengine/nucleus/src
+    ${CMAKE_SOURCE_DIR}/modules/worldengine/deps/libmpq
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/loadlib
 )
@@ -21,7 +21,7 @@ set(include_Dirs
 if( WIN32 )
   set(include_Dirs
     ${include_Dirs}
-    ${CMAKE_SOURCE_DIR}/modules/acore/deps/libmpq/win
+    ${CMAKE_SOURCE_DIR}/modules/worldengine/deps/libmpq/win
   )
 endif()
 

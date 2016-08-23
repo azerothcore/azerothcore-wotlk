@@ -4,7 +4,7 @@ add_definitions(-D_BUILD_DIRECTIVE='"${CMAKE_BUILD_TYPE}"')
 set(GCC_EXPECTED_VERSION 4.8.2)
 
 if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS GCC_EXPECTED_VERSION)
-  message(FATAL_ERROR "GCC: AzerothCore requires version ${GCC_EXPECTED_VERSION} to build but found ${CMAKE_CXX_COMPILER_VERSION}")
+  message(FATAL_ERROR "GCC: This project requires version ${GCC_EXPECTED_VERSION} to build but found ${CMAKE_CXX_COMPILER_VERSION}")
 endif()
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")

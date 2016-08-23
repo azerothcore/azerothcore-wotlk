@@ -30,7 +30,7 @@ public:
 	/** \brief Returns true if the intersection of the ray and the solid box is non-empty. 
 
       \cite "Fast Ray / Axis-Aligned Bounding Box Overlap Tests using Ray Slopes" 
-      by Martin Eisemann, Thorsten Grosch, Stefan Müller and Marcus Magnor
+      by Martin Eisemann, Thorsten Grosch, Stefan Mï¿½ller and Marcus Magnor
       Computer Graphics Lab, TU Braunschweig, Germany and
       University of Koblenz-Landau, Germany
     */
@@ -43,7 +43,7 @@ public:
      \a time is not set if there is no intersection.
           
      \cite Slope-Mul method from "Fast Ray / Axis-Aligned Bounding Box Overlap Tests using Ray Slopes" 
-      by Martin Eisemann, Thorsten Grosch, Stefan Müller and Marcus Magnor
+      by Martin Eisemann, Thorsten Grosch, Stefan Mï¿½ller and Marcus Magnor
       Computer Graphics Lab, TU Braunschweig, Germany and
       University of Koblenz-Landau, Germany
       */

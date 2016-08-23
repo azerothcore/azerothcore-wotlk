@@ -21,13 +21,13 @@
 	solution was needed than the one-to-one conversion table. To
 	note a few, here is an example of a Czech sorting sequence:
 
-		co < hlaska < hláska < hlava < chlapec < krtek
+		co < hlaska < hlï¿½ska < hlava < chlapec < krtek
 
 	It because some of the rules are: double char 'ch' is sorted
-	between 'h' and 'i'. Accented character 'á' (a with acute) is
+	between 'h' and 'i'. Accented character 'ï¿½' (a with acute) is
 	sorted after 'a' and before 'b', but only if the word is
 	otherwise the same. However, because 's' is sorted before 'v'
-	in hlava, the accentness of 'á' is overridden. There are many
+	in hlava, the accentness of 'ï¿½' is overridden. There are many
 	more rules.
 
 	This file defines functions my_strxfrm and my_strcoll for
@@ -138,30 +138,30 @@ static struct wordvalue doubles[] = {
 
 	We append 0 to the end.
 ---
-	Neformální popis algoritmu:
+	Neformï¿½lnï¿½ popis algoritmu:
 
-	Procházíme øetìzec zleva doprava.
+	Prochï¿½zï¿½me ï¿½etï¿½zec zleva doprava.
 
-	Konec øetìzce je pøedán buï jako parametr, nebo je to *p == 0.
-	Toto je o¹etøeno makrem IS_END.
+	Konec ï¿½etï¿½zce je pï¿½edï¿½n buï¿½ jako parametr, nebo je to *p == 0.
+	Toto je oï¿½etï¿½eno makrem IS_END.
 
-	Pokud jsme do¹li na konec øetìzce pøi prùchodu 0, nejdeme na
-	zaèátek, ale na ulo¾enou pozici, proto¾e první a druhý prùchod
-	bì¾í souèasnì.
+	Pokud jsme doï¿½li na konec ï¿½etï¿½zce pï¿½i prï¿½chodu 0, nejdeme na
+	zaï¿½ï¿½tek, ale na uloï¿½enou pozici, protoï¿½e prvnï¿½ a druhï¿½ prï¿½chod
+	bï¿½ï¿½ï¿½ souï¿½asnï¿½.
 
-	Konec vstupu (prùchodu) oznaèíme na výstupu hodnotou 1.
+	Konec vstupu (prï¿½chodu) oznaï¿½ï¿½me na vï¿½stupu hodnotou 1.
 
-	Pro ka¾dý znak øetìzce naèteme hodnotu z tøídící tabulky.
+	Pro kaï¿½dï¿½ znak ï¿½etï¿½zce naï¿½teme hodnotu z tï¿½ï¿½dï¿½cï¿½ tabulky.
 
-	Jde-li o hodnotu ignorovat (0), skoèíme ihned na dal¹í znak..
+	Jde-li o hodnotu ignorovat (0), skoï¿½ï¿½me ihned na dalï¿½ï¿½ znak..
 
-	Jde-li o hodnotu konec slova (2) a je to prùchod 0 nebo 1,
-	pøeskoèíme v¹echny dal¹í 0 -- 2 a prohodíme prùchody.
+	Jde-li o hodnotu konec slova (2) a je to prï¿½chod 0 nebo 1,
+	pï¿½eskoï¿½ï¿½me vï¿½echny dalï¿½ï¿½ 0 -- 2 a prohodï¿½me prï¿½chody.
 
-	Jde-li o kompozitní znak (255), otestujeme, zda následuje
-	správný do dvojice, dohledáme správnou hodnotu.
+	Jde-li o kompozitnï¿½ znak (255), otestujeme, zda nï¿½sleduje
+	sprï¿½vnï¿½ do dvojice, dohledï¿½me sprï¿½vnou hodnotu.
 
-	Na konci pøipojíme znak 0
+	Na konci pï¿½ipojï¿½me znak 0
  */
 
 #define ADD_TO_RESULT(dest, len, totlen, value)			\
@@ -315,24 +315,24 @@ static size_t my_strnxfrm_czech(CHARSET_INFO *cs __attribute__((unused)),
 
 
 /*
-	Neformální popis algoritmu:
+	Neformï¿½lnï¿½ popis algoritmu:
 
-	procházíme øetìzec zleva doprava
-	konec øetìzce poznáme podle *p == 0
-	pokud jsme do¹li na konec øetìzce pøi prùchodu 0, nejdeme na
-		zaèátek, ale na ulo¾enou pozici, proto¾e první a druhý
-		prùchod bì¾í souèasnì
-	konec vstupu (prùchodu) oznaèíme na výstupu hodnotou 1
+	prochï¿½zï¿½me ï¿½etï¿½zec zleva doprava
+	konec ï¿½etï¿½zce poznï¿½me podle *p == 0
+	pokud jsme doï¿½li na konec ï¿½etï¿½zce pï¿½i prï¿½chodu 0, nejdeme na
+		zaï¿½ï¿½tek, ale na uloï¿½enou pozici, protoï¿½e prvnï¿½ a druhï¿½
+		prï¿½chod bï¿½ï¿½ï¿½ souï¿½asnï¿½
+	konec vstupu (prï¿½chodu) oznaï¿½ï¿½me na vï¿½stupu hodnotou 1
 
-	naèteme hodnotu z tøídící tabulky
-	jde-li o hodnotu ignorovat (0), skoèíme na dal¹í prùchod
-	jde-li o hodnotu konec slova (2) a je to prùchod 0 nebo 1,
-		pøeskoèíme v¹echny dal¹í 0 -- 2 a prohodíme
-		prùchody
-	jde-li o kompozitní znak (255), otestujeme, zda následuje
-		správný do dvojice, dohledáme správnou hodnotu
+	naï¿½teme hodnotu z tï¿½ï¿½dï¿½cï¿½ tabulky
+	jde-li o hodnotu ignorovat (0), skoï¿½ï¿½me na dalï¿½ï¿½ prï¿½chod
+	jde-li o hodnotu konec slova (2) a je to prï¿½chod 0 nebo 1,
+		pï¿½eskoï¿½ï¿½me vï¿½echny dalï¿½ï¿½ 0 -- 2 a prohodï¿½me
+		prï¿½chody
+	jde-li o kompozitnï¿½ znak (255), otestujeme, zda nï¿½sleduje
+		sprï¿½vnï¿½ do dvojice, dohledï¿½me sprï¿½vnou hodnotu
 
-	na konci pøipojíme znak 0
+	na konci pï¿½ipojï¿½me znak 0
  */
 
 

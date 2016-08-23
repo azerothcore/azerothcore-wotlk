@@ -28,7 +28,7 @@ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH 1)
 set(AC_PATH_ROOT "${CMAKE_SOURCE_DIR}")
 
 # set macro-directory
-set(CMAKE_MODULE_PATH "${AC_PATH_ROOT}/modules/acore/cmake/macros")
+set(CMAKE_MODULE_PATH "${AC_PATH_ROOT}/modules/worldengine/nucleus/src/cmake/macros")
 
 include(CheckCXXSourceRuns)
 include(CheckIncludeFiles)
@@ -87,6 +87,26 @@ include(src/cmake/genrev.cmake)
 # print out the results before continuing
 include(src/cmake/showoptions.cmake)
 
+
+#
+# Loading framework
+#
+
+add_subdirectory(modules/worldengine/deps)
+
+if( SERVERS OR TOOLS)
+  add_subdirectory(modules/worldengine/nucleus)
+  add_subdirectory(modules/worldengine/lib-collision)
+endif()
+
+if( TOOLS )
+  add_subdirectory(modules/acore/extractors)
+endif()
+
+#
+# Loading dyn modules
+#
+
 # add modules and dependencies
 CU_SUBDIRLIST(sub_DIRS  "${CMAKE_SOURCE_DIR}/modules" FALSE FALSE)
 FOREACH(subdir ${sub_DIRS})
@@ -96,6 +116,10 @@ FOREACH(subdir ${sub_DIRS})
         add_subdirectory("${subdir_rel}")
     endif()
 ENDFOREACH()
+
+#
+# Loading application sources
+#
 
 CU_RUN_HOOK("BEFORE_SRC_LOAD")
 
