@@ -48,9 +48,9 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/modules/worldengine/deps/gsoap
   ${CMAKE_SOURCE_DIR}/modules/worldengine/deps/sockets/include
   ${CMAKE_SOURCE_DIR}/modules/worldengine/deps/SFMT
-  ${CMAKE_SOURCE_DIR}/modules/worldengine/lib-collision
-  ${CMAKE_SOURCE_DIR}/modules/worldengine/lib-collision/Management
-  ${CMAKE_SOURCE_DIR}/modules/worldengine/lib-collision/Models
+  ${CMAKE_SOURCE_DIR}/modules/worldengine/lib-collision/src/
+  ${CMAKE_SOURCE_DIR}/modules/worldengine/lib-collision/src/Management
+  ${CMAKE_SOURCE_DIR}/modules/worldengine/lib-collision/src/Models
   ${CMAKE_SOURCE_DIR}/modules/worldengine/nucleus/src
   ${CMAKE_SOURCE_DIR}/modules/worldengine/nucleus/src/Configuration
   ${CMAKE_SOURCE_DIR}/modules/worldengine/nucleus/src/Cryptography

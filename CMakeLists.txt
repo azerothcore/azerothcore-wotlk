@@ -97,6 +97,7 @@ add_subdirectory(modules/worldengine/deps)
 if( SERVERS OR TOOLS)
   add_subdirectory(modules/worldengine/nucleus)
   add_subdirectory(modules/worldengine/lib-collision)
+  add_subdirectory(modules/acore/game-framework)
 endif()
 
 if( TOOLS )

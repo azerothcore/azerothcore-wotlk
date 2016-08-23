@@ -115,10 +115,10 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/modules/worldengine/deps/g3dlite/include
   ${CMAKE_SOURCE_DIR}/modules/worldengine/deps/SFMT
   ${CMAKE_SOURCE_DIR}/modules/worldengine/deps/zlib
-  ${CMAKE_SOURCE_DIR}/modules/worldengine/lib-collision
-  ${CMAKE_SOURCE_DIR}/modules/worldengine/lib-collision/Management
-  ${CMAKE_SOURCE_DIR}/modules/worldengine/lib-collision/Models
-  ${CMAKE_SOURCE_DIR}/modules/worldengine/lib-collision/Maps
+  ${CMAKE_SOURCE_DIR}/modules/worldengine/lib-collision/src/
+  ${CMAKE_SOURCE_DIR}/modules/worldengine/lib-collision/src/Management
+  ${CMAKE_SOURCE_DIR}/modules/worldengine/lib-collision/src/Models
+  ${CMAKE_SOURCE_DIR}/modules/worldengine/lib-collision/src/Maps
   ${CMAKE_SOURCE_DIR}/modules/worldengine/nucleus/src
   ${CMAKE_SOURCE_DIR}/modules/worldengine/nucleus/src/Configuration
   ${CMAKE_SOURCE_DIR}/modules/worldengine/nucleus/src/Cryptography
@@ -132,10 +132,10 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/modules/worldengine/nucleus/src/Packets
   ${CMAKE_SOURCE_DIR}/modules/worldengine/nucleus/src/Threading
   ${CMAKE_SOURCE_DIR}/modules/worldengine/nucleus/src/Utilities
+  ${CMAKE_SOURCE_DIR}/modules/acore/game-framework/src/Addons
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}/Accounts
   ${CMAKE_CURRENT_SOURCE_DIR}/Achievements
-  ${CMAKE_CURRENT_SOURCE_DIR}/Addons
   ${CMAKE_CURRENT_SOURCE_DIR}/AI
   ${CMAKE_CURRENT_SOURCE_DIR}/AI/CoreAI
   ${CMAKE_CURRENT_SOURCE_DIR}/AI/ScriptedAI
@@ -215,6 +215,10 @@ include_directories(
 add_library(game STATIC
   ${game_STAT_SRCS}
   ${game_STAT_PCH_SRC}
+)
+
+target_link_libraries(game
+  gamefw
 )
 
 add_dependencies(game revision.h)
