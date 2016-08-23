@@ -1,11 +1,12 @@
 #!/bin/bash
 
 function checkStatus() {
-        if [ -d "/proc/"$1 ]; then
-                eval "TEST=1"
-        else
-                eval "TEST=0"
-        fi
+    if screen -ls $1 | grep -q "No Sockets found"
+    then 
+    return 0
+    else 
+    return 1
+    fi
 }
 
 function starter() {
@@ -45,24 +46,23 @@ function restarter() {
 
     while :
     do
-            PID=$(cat $SERVERPID)
-            checkStatus $PID
-            if [ $TEST -eq 0 ]; then
-                    DATE=$(date)
-                    echo "Restarting $SCREEN_NAME Core blizz($DATE)"
-                    if [ $GDB_ENABLED -eq 1 ]; then
-                            echo "GDB enabled"
-                            grep -B 10 -A 1800 "$TRACE_BEGIN_STRING" "$SYSLOG" >> "$TRACE_FILE"
-                            cat "$SYSERR" > "$ERR_FILE"
-                            screen -A -m -d -S $SCREEN_NAME "$CURRENT_PATH/starter" $SERVERBIN $GDB "$CONFIG" "$SYSLOG" "$SYSERR" 1
-                    fi
+    if checkStatus $SCREEN_NAME; then
+        DATE=$(date)
+        echo "Restarting $SCREEN_NAME Core blizz($DATE)"
+        echo $PID
+        if [ $GDB_ENABLED -eq 1 ]; then
+                echo "GDB enabled"
+                grep -B 10 -A 1800 "$TRACE_BEGIN_STRING" "$SYSLOG" >> "$TRACE_FILE"
+                cat "$SYSERR" > "$ERR_FILE"
+                screen -A -m -d -S $SCREEN_NAME "$CURRENT_PATH/starter" $SERVERBIN $GDB "$CONFIG" "$SYSLOG" "$SYSERR" 1
+        fi
+    
+        if [ $GDB_ENABLED -eq 0 ]; then
+                echo "GDB disabled"
+                screen -A -m -d -S $SCREEN_NAME "$CURRENT_PATH/starter" $SERVERBIN null "$CONFIG" null null 0
+        fi
+        fi
 
-                    if [ $GDB_ENABLED -eq 0 ]; then
-                            echo "GDB disabled"
-                            screen -A -m -d -S $SCREEN_NAME "$CURRENT_PATH/starter" $SERVERBIN null "$CONFIG" null null 0
-                    fi
-            fi
-
-            sleep 15
+        sleep 15
     done
 }
