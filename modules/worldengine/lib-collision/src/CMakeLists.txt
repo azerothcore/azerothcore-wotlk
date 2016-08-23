@@ -46,7 +46,7 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/modules/worldengine/nucleus/src/Packets
   ${CMAKE_SOURCE_DIR}/modules/worldengine/nucleus/src/Utilities
   ${CMAKE_SOURCE_DIR}/modules/worldengine/nucleus/src/DataStores
-  ${CMAKE_SOURCE_DIR}/src/game/Addons
+  ${CMAKE_SOURCE_DIR}/modules/acore/game-framework/src/Addons
   ${CMAKE_SOURCE_DIR}/src/game/Conditions
   ${CMAKE_SOURCE_DIR}/src/game/Entities/Item
   ${CMAKE_SOURCE_DIR}/src/game/Entities/GameObject

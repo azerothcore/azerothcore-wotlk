@@ -2,6 +2,7 @@ if( USE_COREPCH )
   include_directories(${CMAKE_CURRENT_BINARY_DIR})
 endif()
 
+file(GLOB_RECURSE sources_Addons Addons/*.cpp Addons/*.h)
 file(GLOB sources_localdir *.cpp *.h)
 
 # Build gamefw sourcelist
@@ -14,6 +15,7 @@ endif()
 
 set(gamefw_STAT_SRCS
   ${gamefw_STAT_SRCS}
+  ${sources_Addons}
   ${sources_localdir}
 )
 

@@ -92,14 +92,14 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/modules/worldengine/nucleus/src/Packets
   ${CMAKE_SOURCE_DIR}/modules/worldengine/nucleus/src/Threading
   ${CMAKE_SOURCE_DIR}/modules/worldengine/nucleus/src/Utilities
-  ${CMAKE_SOURCE_DIR}/modules/worldengine/lib-collision
-  ${CMAKE_SOURCE_DIR}/modules/worldengine/lib-collision/Management
-  ${CMAKE_SOURCE_DIR}/modules/worldengine/lib-collision/Models
+  ${CMAKE_SOURCE_DIR}/modules/worldengine/lib-collision/src/
+  ${CMAKE_SOURCE_DIR}/modules/worldengine/lib-collision/src/Management
+  ${CMAKE_SOURCE_DIR}/modules/worldengine/lib-collision/src/Models
   ${CMAKE_SOURCE_DIR}/modules/worldengine/nucleus/src
   ${CMAKE_SOURCE_DIR}/modules/worldengine/nucleus/src/Database
+  ${CMAKE_SOURCE_DIR}/modules/acore/game-framework/src/Addons
   ${CMAKE_SOURCE_DIR}/src/game/Accounts
   ${CMAKE_SOURCE_DIR}/src/game/Achievements
-  ${CMAKE_SOURCE_DIR}/src/game/Addons
   ${CMAKE_SOURCE_DIR}/src/game/AI
   ${CMAKE_SOURCE_DIR}/src/game/AI/CoreAI
   ${CMAKE_SOURCE_DIR}/src/game/AI/ScriptedAI
