@@ -246,9 +246,6 @@ bool ChatHandler::ExecuteCommandInTable(std::vector<ChatCommand> const& table, c
 
     for (uint32 i = 0; i < table.size(); ++i)
     {
-        if (table[i].Name == nullptr)
-            continue;
-
         if (!hasStringAbbr(table[i].Name, cmd.c_str()))
             continue;
 
@@ -257,9 +254,6 @@ bool ChatHandler::ExecuteCommandInTable(std::vector<ChatCommand> const& table, c
         {
             for (uint32 j = 0; j < table.size(); ++j)
             {
-                if (table[j].Name == nullptr)
-                    continue;
-
                 if (!hasStringAbbr(table[j].Name, cmd.c_str()))
                     continue;
 
@@ -355,7 +349,7 @@ bool ChatHandler::SetDataForCommandInTable(std::vector<ChatCommand>& table, char
     for (uint32 i = 0; i < table.size(); i++)
     {
         // for data fill use full explicit command names
-        if (table[i].Name == nullptr || table[i].Name != cmd)
+        if (table[i].Name != cmd)
             continue;
 
         // select subcommand from child commands list (including "")
