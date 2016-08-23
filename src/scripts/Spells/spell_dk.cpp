@@ -1452,6 +1452,8 @@ class spell_dk_death_coil : public SpellScriptLoader
                     if (caster->IsFriendlyTo(target))
                     {
                         int32 heal = int32(665 + caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.15);
+                        if (AuraEffect const* impurityEff = caster->GetDummyAuraEffect(SPELLFAMILY_DEATHKNIGHT, 1986, 0))
+                            heal += impurityEff->GetAmount();
                         caster->CastCustomSpell(target, SPELL_DK_DEATH_COIL_HEAL, &heal, NULL, NULL, true);
                     }
                     else
@@ -1459,6 +1461,8 @@ class spell_dk_death_coil : public SpellScriptLoader
                         int32 damage = int32(443 + caster->GetTotalAttackPowerValue(BASE_ATTACK) * 0.15);
                         if (AuraEffect const* auraEffect = caster->GetAuraEffect(SPELL_DK_ITEM_SIGIL_VENGEFUL_HEART, EFFECT_1))
                             damage += auraEffect->GetBaseAmount();
+                        if (AuraEffect const* impurityEff = caster->GetDummyAuraEffect(SPELLFAMILY_DEATHKNIGHT, 1986, 0))
+                            heal += impurityEff->GetAmount();
                         caster->CastCustomSpell(target, SPELL_DK_DEATH_COIL_DAMAGE, &damage, NULL, NULL, true);
                     }
                 }
