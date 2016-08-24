@@ -1,9 +1,7 @@
 /*
 Insert MovementType to Fizzle Darkstorm (GUID = 6455) and Burning Blade Fanatic (GUID = 6432) npc
-
--- Date: 2016-08-13 17:18
 */
-ALTER TABLE world_db_version CHANGE COLUMN 2016_08_10_01 2016_08_13_00 bit;
+ALTER TABLE world_db_version CHANGE COLUMN 2016_08_21_00 2016_08_24_00 bit;
 
 DELETE FROM `waypoint_data` WHERE `id` IN (645500,643200);
 -- Fizzle Darkstorm
