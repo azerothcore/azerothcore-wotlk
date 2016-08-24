@@ -31,7 +31,7 @@ public:
         {
             { "chat",           SEC_GAMEMASTER,      false, &HandleGMChatCommand,              "" },
             { "fly",            SEC_GAMEMASTER,      false, &HandleGMFlyCommand,               "" },
-            //{ "ingame",         SEC_PLAYER,          true,  &HandleGMListIngameCommand,        "" },
+            { "ingame",         SEC_PLAYER,          true,  &HandleGMListIngameCommand,        "" },
             { "list",           SEC_GAMEMASTER,      true,  &HandleGMListFullCommand,          "" },
             { "visible",        SEC_GAMEMASTER,      false, &HandleGMVisibleCommand,           "" },
             { "",               SEC_GAMEMASTER,      false, &HandleGMCommand,                  "" }
