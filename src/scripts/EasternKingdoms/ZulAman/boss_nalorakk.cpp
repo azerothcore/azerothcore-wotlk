@@ -173,7 +173,7 @@ class boss_nalorakk : public CreatureScript
                     return;
 
                 for (std::list<Creature*>::const_iterator i = templist.begin(); i != templist.end(); ++i)
-                    if ((*i) && me->IsWithinDistInMap((*i), 25))
+                    if ((*i) && me->GetGUID() != (*i)->GetGUID() && me->IsWithinDistInMap((*i), 25))
                         (*i)->AI()->Reset();
             }
 
