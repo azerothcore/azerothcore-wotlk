@@ -1,4 +1,4 @@
-ALTER TABLE world_db_version CHANGE COLUMN 2016_08_19_00 2016_08_19_01 BIT;
+ALTER TABLE world_db_version CHANGE COLUMN 2016_08_14_02 2016_08_19_00 BIT;
 
 /*
 Issue: Not work quest id 11543 #93

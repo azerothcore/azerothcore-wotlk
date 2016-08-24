@@ -1,4 +1,4 @@
-ALTER TABLE world_db_version CHANGE COLUMN 2016_08_14_02 2016_08_21_00 bit;
+ALTER TABLE world_db_version CHANGE COLUMN 2016_08_19_00 2016_08_21_00 bit;
 
 INSERT IGNORE INTO `command` (`name`, `security`, `help`) VALUES
 ('achievement',2,'Syntax: .achievement $subcommand\nType .achievement to see the list of possible subcommands or .help achievement $subcommand to see info on subcommands'),
