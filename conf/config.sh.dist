@@ -92,7 +92,7 @@ OUTPUT_FOLDER="output/"
 
 # FULL DB
 DB_CHARACTERS_PATHS=(
-    $SRCPATH"/data/sql/base/characters"
+    $SRCPATH"/data/sql/base/db_characters"
 )
 
 DB_CHARACTERS_NAME="characters"
@@ -103,7 +103,7 @@ DB_CHARACTERS_CONF="MYSQL_USER='root'; \
                     "
 
 DB_AUTH_PATHS=(
-    $SRCPATH"/data/sql/base/auth/"
+    $SRCPATH"/data/sql/base/db_auth/"
 )
 
 DB_AUTH_NAME="auth"
@@ -114,7 +114,7 @@ DB_AUTH_CONF="MYSQL_USER='root'; \
                     "
 
 DB_WORLD_PATHS=(
-    $SRCPATH"/data/sql/base/world/"
+    $SRCPATH"/data/sql/base/db_world/"
 )
 
 DB_WORLD_NAME="world"
@@ -126,23 +126,26 @@ DB_WORLD_CONF="MYSQL_USER='root'; \
 
 # UPDATES
 DB_CHARACTERS_UPDATE_PATHS=(
-    $SRCPATH"/data/sql/updates/characters/"
+    $SRCPATH"/data/sql/updates/db_characters/"
 )
 
 DB_AUTH_UPDATE_PATHS=(
-    $SRCPATH"/data/sql/updates/auth/"
+    $SRCPATH"/data/sql/updates/db_auth/"
 )
 
 DB_WORLD_UPDATE_PATHS=(
-    $SRCPATH"/data/sql/updates/world/"
+    $SRCPATH"/data/sql/updates/db_world/"
 )
 
 # CUSTOM
 DB_CHARACTERS_CUSTOM_PATHS=(
+    $SRCPATH"/data/sql/custom/db_characters/"
 )
 
 DB_AUTH_CUSTOM_PATHS=(
+    $SRCPATH"/data/sql/custom/db_auth/"
 )
 
 DB_WORLD_CUSTOM_PATHS=(
+    $SRCPATH"/data/sql/custom/db_world/"
 )
