@@ -999,6 +999,10 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
     UpdateAllStats();
 
     SetFullHealth();
+    if (GetEntry() == NPC_RISEN_GHOUL)
+    {
+        SetPower(POWER_ENERGY, GetMaxPower(POWER_ENERGY));
+    }
     SetPower(POWER_MANA, GetMaxPower(POWER_MANA));
     return true;
 }
