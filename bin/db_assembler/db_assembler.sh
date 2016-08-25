@@ -156,10 +156,10 @@ echo "===== STARTING PROCESS ====="
 
     echo "" > $reg_file
 
-    for k in "${!registry__*}"
+    for k in ${!registry__*}
     do
       n=$k
-      echo "$k='${!n}'" >> "$reg_file"
+      echo "$k='${!n}';" >> "$reg_file"
     done
 
 echo "===== DONE ====="
