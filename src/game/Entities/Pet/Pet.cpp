@@ -977,7 +977,6 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
     // Can be summon and guardian
     if (GetEntry() == NPC_RISEN_GHOUL)
     {
-        
         // 100% energy after summon
         SetPower(POWER_ENERGY, GetMaxPower(POWER_ENERGY));
         
