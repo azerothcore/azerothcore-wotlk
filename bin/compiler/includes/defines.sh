@@ -1,5 +1,3 @@
-#!/bin/bash
-
 # you can choose build type from cmd argument
 if [ ! -z $1 ]
 then

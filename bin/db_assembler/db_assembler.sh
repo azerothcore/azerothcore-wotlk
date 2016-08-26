@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 unamestr=`uname`
 if [[ "$unamestr" == 'Darwin' ]]; then
    SRCPATH=$(greadlink -f "../../")

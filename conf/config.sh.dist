@@ -1,5 +1,3 @@
-#!/bin/bash
-
 # absolute root path of your azerothshard repository
 SRCPATH="$AC_PATH_ROOT"
 # absolute path where binary files must be stored

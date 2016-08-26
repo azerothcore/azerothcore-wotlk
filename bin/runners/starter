@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 GDB_FILE="$2"
 CONFIG="$3"
