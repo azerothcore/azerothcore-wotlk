@@ -1,5 +1,3 @@
-#!/bin/bash
-
 unamestr=`uname`
 if [[ "$unamestr" == 'Darwin' ]]; then
    SRCPATH=$(greadlink -f "../../")
@@ -27,19 +25,19 @@ fi
 
 function assemble() {
     # to lowercase
-    database=${1,,}
+    database=$1
     start_sql=$2
     with_base=$3
     with_updates=$4
     with_custom=$5
 
-    var_base="DB_"$1"_PATHS"
+    var_base="DB_"$database"_PATHS"
     base=${!var_base}
 
-    var_updates="DB_"$1"_UPDATE_PATHS"
+    var_updates="DB_"$database"_UPDATE_PATHS"
     updates=${!var_updates}
 
-    var_custom="DB_"$1"_CUSTOM_PATHS"
+    var_custom="DB_"$database"_CUSTOM_PATHS"
     custom=${!var_custom}
 
     echo $updates
