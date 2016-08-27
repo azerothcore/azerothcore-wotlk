@@ -1,6 +1,4 @@
 
-ALTER TABLE world_db_version CHANGE COLUMN 2016_08_21_00 2016_08_23_00 BIT;
-
 /*
 Issue: #89 (https://github.com/AzerothShard/AzerothShard-Issues-ita/issues/89)
 Missing auras and flags on main NPCs and waypoints for enemy NPCs
