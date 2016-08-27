@@ -1,6 +1,4 @@
 
-ALTER TABLE world_db_version CHANGE COLUMN 2016_08_14_02 2016_08_19_00 BIT;
-
 /*
 2016-08-16 00:44:35 ERROR: Table 'creature_loot_template' entry 1 isn't creature entry and not referenced from loot, 
 and then useless.
