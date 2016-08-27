@@ -1182,7 +1182,7 @@ void AddSC_go_scripts()
     // Theirs
     new go_cat_figurine();
     new go_gilded_brazier();
-    new go_shrine_of_the_birds();
+    //new go_shrine_of_the_birds();
     new go_southfury_moonstone();
     new go_tablet_of_madness();
     new go_tablet_of_the_seven();
