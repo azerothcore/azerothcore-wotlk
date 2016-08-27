@@ -448,7 +448,7 @@ public:
 /*######
 ## go_shrine_of_the_birds
 ######*/
-
+/*
 enum ShrineOfTheBirds
 {
     NPC_HAWK_GUARD      = 22992,
@@ -490,7 +490,7 @@ public:
         return false;
     }
 };
-
+*/
 /*######
 ## go_southfury_moonstone
 ######*/
