@@ -2140,47 +2140,11 @@ void ObjectMgr::RemoveGameobjectFromGrid(uint32 guid, GameObjectData const* data
 
 uint64 ObjectMgr::GetPlayerGUIDByName(std::string const& name) const
 {
-    uint32 guidLow;
-
     // Get data from global storage
-    if (guidLow = sWorld->GetGlobalPlayerGUID(name))
+    if (uint32 guidLow = sWorld->GetGlobalPlayerGUID(name))
         return MAKE_NEW_GUID(guidLow, 0, HIGHGUID_PLAYER);
 
-    // Player is not in the global storage, try to get it from the Database
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_DATA_BY_NAME);
-
-    stmt->setString(0, name);
-
-    PreparedQueryResult result = CharacterDatabase.Query(stmt);
-
-    if (result)
-    {
-        // Player was not in the global storage, but it was found in the database
-        // Let's add it to the global storage
-        sLog->outString("Player %s was not found in the global storage, but it was found in the database.", name.c_str());
-
-        Field* fields = result->Fetch();
-
-        guidLow = fields[0].GetUInt32();
-
-        sWorld->AddGlobalPlayerData(
-            guidLow,               /*guid*/
-            fields[1].GetUInt32(), /*accountId*/
-            fields[2].GetString(), /*name*/
-            fields[3].GetUInt8(),  /*gender*/
-            fields[4].GetUInt8(),  /*race*/
-            fields[5].GetUInt8(),  /*class*/
-            fields[6].GetUInt8(),  /*level*/
-            0,                     /*mail count*/
-            0                      /*guild id*/
-        );
-
-        sLog->outString("Player %s added to the global storage.", name.c_str());
-
-        return MAKE_NEW_GUID(guidLow, 0, HIGHGUID_PLAYER);
-    }
-
-    // Player not found
+    // No player found
     return 0;
 }
 

@@ -3201,16 +3201,97 @@ void World::DeleteGlobalPlayerData(uint32 guid, std::string const& name)
 
 GlobalPlayerData const* World::GetGlobalPlayerData(uint32 guid) const
 {
+    // Get data from global storage
     GlobalPlayerDataMap::const_iterator itr = _globalPlayerDataStore.find(guid);
     if (itr != _globalPlayerDataStore.end())
         return &itr->second;
+
+    // Player is not in the global storage, try to get it from the Database
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_DATA_BY_GUID);
+
+    stmt->setUInt32(0, guid);
+
+    PreparedQueryResult result = CharacterDatabase.Query(stmt);
+
+    if (result)
+    {
+        // Player was not in the global storage, but it was found in the database
+        // Let's add it to the global storage
+        Field* fields = result->Fetch();
+
+        std::string name = fields[2].GetString();
+
+        sLog->outString("Player %s [GUID: %u] was not found in the global storage, but it was found in the database.", name.c_str(), guid);
+
+        sWorld->AddGlobalPlayerData(
+            fields[0].GetUInt32(), /*guid*/
+            fields[1].GetUInt32(), /*accountId*/
+            fields[2].GetString(), /*name*/
+            fields[3].GetUInt8(),  /*gender*/
+            fields[4].GetUInt8(),  /*race*/
+            fields[5].GetUInt8(),  /*class*/
+            fields[6].GetUInt8(),  /*level*/
+            0,                     /*mail count*/
+            0                      /*guild id*/
+        );
+
+        itr = _globalPlayerDataStore.find(guid);
+        if (itr != _globalPlayerDataStore.end())
+        {
+            sLog->outString("Player %s [GUID: %u] added to the global storage.", name.c_str(), guid);
+            return &itr->second;
+        }
+    }
+
+    // Player not found
     return NULL;
 }
 
 uint32 World::GetGlobalPlayerGUID(std::string const& name) const
 {
+    // Get data from global storage
     GlobalPlayerNameMap::const_iterator itr = _globalPlayerNameStore.find(name);
     if (itr != _globalPlayerNameStore.end())
         return itr->second;
+
+    // Player is not in the global storage, try to get it from the Database
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_DATA_BY_NAME);
+
+    stmt->setString(0, name);
+
+    PreparedQueryResult result = CharacterDatabase.Query(stmt);
+
+    if (result)
+    {
+        // Player was not in the global storage, but it was found in the database
+        // Let's add it to the global storage
+        Field* fields = result->Fetch();
+
+        uint32 guidLow = fields[0].GetUInt32();
+
+        sLog->outString("Player %s [GUID: %u] was not found in the global storage, but it was found in the database.", name.c_str(), guidLow);
+
+        sWorld->AddGlobalPlayerData(
+            guidLow,               /*guid*/
+            fields[1].GetUInt32(), /*accountId*/
+            fields[2].GetString(), /*name*/
+            fields[3].GetUInt8(),  /*gender*/
+            fields[4].GetUInt8(),  /*race*/
+            fields[5].GetUInt8(),  /*class*/
+            fields[6].GetUInt8(),  /*level*/
+            0,                     /*mail count*/
+            0                      /*guild id*/
+        );
+
+        itr = _globalPlayerNameStore.find(name);
+        if (itr != _globalPlayerNameStore.end())
+        {
+            sLog->outString("Player %s [GUID: %u] added to the global storage.", name.c_str(), guidLow);
+
+            return guidLow;
+        }
+    }
+
+    // Player not found
     return 0;
 }
