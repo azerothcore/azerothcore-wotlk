@@ -27,22 +27,25 @@ fi
 
 function assemble() {
     # to lowercase
-    database=$1
+    database=${1,,}
     start_sql=$2
     with_base=$3
     with_updates=$4
     with_custom=$5
 
-    var_base="DB_"$database"_PATHS"
-    base=${!var_base}
+    uc=${database^^}
 
-    var_updates="DB_"$database"_UPDATE_PATHS"
-    updates=${!var_updates}
+    name="DB_"$uc"_PATHS"
+    v="$name[@]"
+    base=("${!v}")
 
-    var_custom="DB_"$database"_CUSTOM_PATHS"
-    custom=${!var_custom}
+    name="DB_"$uc"_UPDATE_PATHS"
+    v="$name[@]"
+    updates=("${!v}")
 
-    echo $updates
+    name='DB_'$uc'_CUSTOM_PATHS'
+    v="$name[@]"
+    custom=("${!v}")
 
 
     suffix_base="_base"
@@ -145,24 +148,24 @@ function assemble() {
 }
 
 function run() {
-	echo "===== STARTING PROCESS ====="
+    echo "===== STARTING PROCESS ====="
 
-		mkdir -p $OUTPUT_FOLDER
+        mkdir -p $OUTPUT_FOLDER
 
-		for db in ${DATABASES[@]}
-		do
-			assemble "$db" $version".sql" $1 $2 $3
-		done
+        for db in ${DATABASES[@]}
+        do
+            assemble "$db" $version".sql" $1 $2 $3
+        done
 
-		echo "" > $reg_file
+        echo "" > $reg_file
 
-		for k in ${!registry__*}
-		do
-		  n=$k
-		  echo "$k='${!n}';" >> "$reg_file"
-		done
+        for k in ${!registry__*}
+        do
+          n=$k
+          echo "$k='${!n}';" >> "$reg_file"
+        done
 
-	echo "===== DONE ====="
+    echo "===== DONE ====="
 }
 
 PS3='Please enter your choice: '
@@ -182,11 +185,11 @@ do
             run false true false
             break #avoid loop
             ;;
-		"Create only customs")
+        "Create only customs")
             run false false true
             break #avoid loop
             ;;
-		"Clean registry")
+        "Clean registry")
             rm "$reg_file"
             break #avoid loop
             ;;
