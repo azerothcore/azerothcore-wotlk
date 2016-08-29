@@ -144,22 +144,55 @@ function assemble() {
     fi
 }
 
+function run() {
+	echo "===== STARTING PROCESS ====="
 
-echo "===== STARTING PROCESS ====="
+		mkdir -p $OUTPUT_FOLDER
 
-    mkdir -p $OUTPUT_FOLDER
+		for db in ${DATABASES[@]}
+		do
+			assemble "$db" $version".sql" $1 $2 $3
+		done
 
-    for db in ${DATABASES[@]}
-    do
-        assemble "$db" $version".sql" true true true
-    done
+		echo "" > $reg_file
 
-    echo "" > $reg_file
+		for k in ${!registry__*}
+		do
+		  n=$k
+		  echo "$k='${!n}';" >> "$reg_file"
+		done
 
-    for k in ${!registry__*}
-    do
-      n=$k
-      echo "$k='${!n}';" >> "$reg_file"
-    done
+	echo "===== DONE ====="
+}
 
-echo "===== DONE ====="
+PS3='Please enter your choice: '
+options=("Create ALL" "Create only bases" "Create only updates" "Create only customs" "Clean registry" "Quit")
+select opt in "${options[@]}"
+do
+    case $opt in
+        "Create ALL")
+            run true true true
+            break #avoid loop
+            ;;
+        "Create only bases")
+            run true false false
+            break #avoid loop
+            ;;
+        "Create only updates")
+            run false true false
+            break #avoid loop
+            ;;
+		"Create only customs")
+            run false false true
+            break #avoid loop
+            ;;
+		"Clean registry")
+            rm "$reg_file"
+            break #avoid loop
+            ;;
+        "Quit")
+            break
+            ;;
+        *) echo invalid option;;
+    esac
+done
