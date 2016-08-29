@@ -4,12 +4,11 @@ CURRENT_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 source "$CURRENT_PATH/../bash_shared/includes.sh"
 
-
-
 UPDATES_PATH="$AC_PATH_ROOT/data/sql/updates/"
 
 function import() {
-    folder="db_"$1
+    db=$1
+    folder="db_"$db
     pendingPath="$AC_PATH_ROOT/data/sql/updates/pending_$folder"
     updPath="$UPDATES_PATH/$folder"
 
@@ -35,22 +34,65 @@ function import() {
     for entry in "$pendingPath"/*.sql
     do
         if [[ -e $entry ]]; then
-            startTransaction="START TRANSACTION;";
-            updHeader="ALTER TABLE db_version CHANGE COLUMN "$latestUpd" "$dateToday"_"$counter" bit;";
-            endTransaction="COMMIT;";
+            oldVer=$oldDate"_"$oldCnt
 
             cnt=$(printf -v counter "%02d" $counter ; echo $counter)
+
+            newVer=$dateToday"_"$cnt
+
+            startTransaction="START TRANSACTION;";
+            updHeader="ALTER TABLE version_db_"$db" CHANGE COLUMN "$oldVer" "$newVer" bit;";
+            endTransaction="COMMIT;";
+
             newFile="$updPath/"$dateToday"_"$cnt".sql"
 
-            echo "$startTransaction" > "$newFile"
-            echo "$updHeader" >> "$newFile"
-            echo "--" >> "$newFile"
-            echo "--" >> "$newFile"
+            oldFile=$(basename "$entry")
+            prefix=${oldFile%_*.sql}
+            suffix=${oldFile#rev_}
+            rev=${suffix%.sql}
 
-            cat $entry >> "$newFile"
-            echo "$endTransaction" >> "$newFile"
+            [[ $prefix = "rev" && $suffix =~ ^-?[0-9]+$ ]] && isRev=1 || isRev=0
 
-            rm $entry
+            echo "-- DB update $oldVer -> $newVer" > "$newFile";
+
+            if [[ $isRev ]]; then
+                echo "DROP PROCEDURE IF EXISTS \`updateDb\`;" >> "$newFile";
+                echo "DELIMITER //"  >> "$newFile";
+                echo "CREATE PROCEDURE updateDb ()" >> "$newFile";
+                echo "proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';" >> "$newFile";
+            fi
+
+            echo "$startTransaction" >> "$newFile";
+            echo "$updHeader" >> "$newFile";
+
+            if [[ $isRev ]]; then
+                echo "SELECT sql_rev INTO OK FROM version_db_"$db" WHERE sql_rev = '$rev'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;" >> "$newFile";
+            fi;
+
+            echo "--" >> "$newFile";
+            echo "-- START UPDATING QUERIES" >> "$newFile";
+            echo "--" >> "$newFile";
+
+            cat $entry >> "$newFile";
+
+            echo "--" >> "$newFile";
+            echo "-- END UPDATING QUERIES" >> "$newFile";
+            echo "--" >> "$newFile";
+
+            echo "$endTransaction" >> "$newFile";
+
+            if [[ $isRev ]]; then
+                echo "END;" >> "$newFile";
+                echo "//" >> "$newFile";
+                echo "DELIMITER ;" >> "$newFile";
+                echo "CALL updateDb();" >> "$newFile";
+                echo "DROP PROCEDURE IF EXISTS \`updateDb\`;" >> "$newFile";
+            fi;
+
+            #rm $entry;
+
+            oldDate=$dateToday
+            oldCnt=$cnt
 
             ((counter+=1))
         fi
@@ -61,3 +103,5 @@ function import() {
 import "world"
 import "characters"
 import "auth"
+
+echo "Done."
