@@ -89,7 +89,7 @@ function import() {
                 echo "DROP PROCEDURE IF EXISTS \`updateDb\`;" >> "$newFile";
             fi;
 
-            #rm $entry;
+            rm $entry;
 
             oldDate=$dateToday
             oldCnt=$cnt
