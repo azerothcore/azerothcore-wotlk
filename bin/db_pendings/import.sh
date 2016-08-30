@@ -51,11 +51,14 @@ function import() {
             suffix=${oldFile#rev_}
             rev=${suffix%.sql}
 
-            [[ $prefix = "rev" && $suffix =~ ^-?[0-9]+$ ]] && isRev=1 || isRev=0
+            isRev=0
+            if [[ $prefix = "rev" && $rev =~ ^-?[0-9]+$ ]]; then
+                isRev=1
+            fi
 
             echo "-- DB update $oldVer -> $newVer" > "$newFile";
 
-            if [[ $isRev ]]; then
+            if [[ $isRev -eq 1 ]]; then
                 echo "DROP PROCEDURE IF EXISTS \`updateDb\`;" >> "$newFile";
                 echo "DELIMITER //"  >> "$newFile";
                 echo "CREATE PROCEDURE updateDb ()" >> "$newFile";
@@ -65,7 +68,7 @@ function import() {
             echo "$startTransaction" >> "$newFile";
             echo "$updHeader" >> "$newFile";
 
-            if [[ $isRev ]]; then
+            if [[ $isRev -eq 1 ]]; then
                 echo "SELECT sql_rev INTO OK FROM version_db_"$db" WHERE sql_rev = '$rev'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;" >> "$newFile";
             fi;
 
@@ -81,7 +84,7 @@ function import() {
 
             echo "$endTransaction" >> "$newFile";
 
-            if [[ $isRev ]]; then
+            if [[ $isRev -eq 1 ]]; then
                 echo "END;" >> "$newFile";
                 echo "//" >> "$newFile";
                 echo "DELIMITER ;" >> "$newFile";
