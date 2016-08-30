@@ -7,9 +7,6 @@ sudo: required
 dist: trusty
 
 language: cpp
-compiler:
-  - clang
-  - gcc ## Uncomment when we are up to full c++11 standards.
 
 git:
   depth: 1
@@ -18,23 +15,26 @@ branches:
   only:
     - master
 
+compiler:
+  - clang
+  - gcc ## Uncomment when we are up to full c++11 standards.
+
 before_install:
-  - sudo apt-get -qq install build-essential libtool make cmake cmake-data openssl
-  - sudo apt-get -qq install libssl-dev libmysqlclient-dev libmysql++-dev libreadline6-dev zlib1g-dev libbz2-dev libace-dev
-  - sudo apt-get -qq install mysql-server
+  - sudo add-apt-repository ppa:kalakris/cmake -y
+  - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
+  - sudo add-apt-repository 'deb http://llvm.org/apt/precise/ llvm-toolchain-precise-3.7 main'
   - wget -O - http://llvm.org/apt/llvm-snapshot.gpg.key | sudo apt-key add -
   - sudo apt-get update -qq
   - sudo apt-get install clang-3.7
   - sudo apt-get install libace-dev
   - sudo apt-get install libncurses5-dev
   - sudo apt-get install build-essential autoconf libtool make cmake git-core patch wget links zip unzip unrar
+  - sudo apt-get install openssl libssl-dev mysql-server mysql-client libmysqlclient15-dev libmysql++-dev libreadline6-dev zlib1g-dev libbz2-dev
   - if [ "$CXX" = "clang++" ]; then sudo apt-get install -qq libstdc++-4.8-dev; fi
   - if [ "$CXX" = "clang++" ]; then export CXX="clang++-3.7" CC="clang-3.7"; fi
   - if [ "$CXX" = "g++" ]; then sudo apt-get install -qq g++-4.8; fi
   - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
-  - git config user.email "travis@build.bot" && git config user.name "Travis CI"
-  - git tag -a -m "Travis build" init
-
+  
 install:
   - mysql -uroot -e 'create database test_mysql;'
   - cd bin
