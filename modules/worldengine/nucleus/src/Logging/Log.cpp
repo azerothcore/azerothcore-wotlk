@@ -342,12 +342,14 @@ std::string Log::GetTimestampStr()
 
 void Log::outDB(LogTypes type, const char * str)
 {
-    if (!str || type >= MAX_LOG_TYPES)
-         return;
-
-    std::string logStr(str);
-    if (logStr.empty())
+    if(!str || std::string(str).empty() || type >= MAX_LOG_TYPES)
         return;
+
+    std::string new_str(str);
+    LoginDatabase.EscapeString(new_str);
+
+    LoginDatabase.PExecute("INSERT INTO logs (time, realm, type, string) "
+        "VALUES (" UI64FMTD ", %u, %u, '%s');", uint64(time(0)), realm, (uint32)type, new_str.c_str());
 }
 
 void Log::outString(const char * str, ...)
