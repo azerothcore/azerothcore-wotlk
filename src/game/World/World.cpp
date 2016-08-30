@@ -2010,6 +2010,20 @@ void World::Update(uint32 diff)
         WeatherMgr::Update(uint32(m_timers[WUPDATE_WEATHERS].GetInterval()));
     }
 
+    /// <li> Clean logs table
+    if(getIntConfig(CONFIG_LOGDB_CLEARINTERVAL) > 0) // if not enabled, ignore the timer
+    {
+        if (m_timers[WUPDATE_CLEANDB].Passed())
+        {
+            uint32 tmpDiff = (m_gameTime - m_startTime);
+            uint32 maxClientsNum = GetMaxActiveSessionCount();
+
+            m_timers[WUPDATE_CLEANDB].Reset();
+            LoginDatabase.PExecute("DELETE FROM logs WHERE (time + %u) < " UI64FMTD ";",
+                getIntConfig(CONFIG_LOGDB_CLEARINTERVAL), uint64(time(0)));
+        }
+    }
+
     sLFGMgr->Update(diff, 0); // pussywizard: remove obsolete stuff before finding compatibility during map update
 
     sMapMgr->Update(diff);
