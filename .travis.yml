@@ -27,9 +27,9 @@ script:
   - cat data/sql/base/db_auth/*.sql | mysql -uacore -pacore auth
   - cat data/sql/base/db_characters/*.sql | mysql -uacore -pacore characters
   - cat data/sql/base/db_world/*.sql | mysql -uacore -pacore world
-  - cat data/sql/updates/db_auth/*.sql | mysql -utrinity -ptrinity auth
-  - cat data/sql/updates/db_characters/*.sql | mysql -utrinity -ptrinity characters
-  - cat data/sql/updates/db_world/*.sql | mysql -utrinity -ptrinity world
+  - cat data/sql/updates/db_auth/*.sql | mysql -uacore -pacore auth
+  - cat data/sql/updates/db_characters/*.sql | mysql -uacore -pacore characters
+  - cat data/sql/updates/db_world/*.sql | mysql -uacore -pacore world
   - mysql -uroot < data/sql/create/drop_mysql.sql
   - cd bin
   - make -j 8 -k && make install
