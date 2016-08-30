@@ -98,11 +98,12 @@ function assemble() {
                         n="registry__$hash"
                         if [[ -z ${!n} ]]; then
                             if [ ! -e $updFile ]; then
-                                echo "" > $updFile
+                                echo "-- assembled updates" > $updFile
                             fi
 
                             printf -v "registry__${hash}" %s "$file"
                             echo "-- New update sql: "$file
+                            echo "-- $file"
                             cat "$entry" >> $updFile
                         fi
                     done
@@ -112,7 +113,7 @@ function assemble() {
     fi
 
     if [ $with_custom = true ]; then
-        custFile=$OUTPUT_FOLDER$database$suffix_custom"_"$curTime".sql"
+        custFile=$OUTPUT_FOLDER$database$suffix_custom".sql"
 
         if [ ! ${#custom[@]} -eq 0 ]; then
             echo "Generating $OUTPUT_FOLDER$database$suffix_custom ..."
@@ -127,19 +128,12 @@ function assemble() {
                             continue
                         fi
 
-                        file=$(basename "$entry")
-                        hash=$($MD5_CMD "$entry")
-                        hash="${hash%% *}" #remove file path
-                        n="registry__$hash"
-                        if [[ -z ${!n} ]]; then
-                            if [ ! -e $custFile ]; then
-                                echo "" > $custFile
-                            fi
-
-                            printf -v "registry__${hash}" %s "$file"
-                            echo "-- New custom sql: "$file
-                            cat "$entry" >> $custFile
+                        if [[ ! -e $custFile ]]; then
+                            echo "-- assembled custom" > "$custFile"
                         fi
+
+                        echo "-- $file" >> $custFile
+                        cat "$entry" >> $custFile
                     done
                 fi
             done
