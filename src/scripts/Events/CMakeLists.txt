@@ -9,6 +9,6 @@ set(scripts_STAT_SRCS
   ${AC_SCRIPTS_DIR}/Events/midsummer.cpp
 )
 
-AC_ADD_SCRIPT_LOADER("Event" "${AC_SCRIPTS_DIR}/ScriptLoader.h")
+AC_ADD_SCRIPT_LOADER("Event" "ScriptLoader.h")
 
 message("  -> Prepared: Events")

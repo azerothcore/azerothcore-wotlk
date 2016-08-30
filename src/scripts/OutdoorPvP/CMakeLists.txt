@@ -26,6 +26,6 @@ set(scripts_STAT_SRCS
   ${AC_SCRIPTS_DIR}/OutdoorPvP/OutdoorPvPGH.h
 )
 
-AC_ADD_SCRIPT_LOADER("OutdoorPvP" "${AC_SCRIPTS_DIR}/ScriptLoader.h")
+AC_ADD_SCRIPT_LOADER("OutdoorPvP" "ScriptLoader.h")
 
 message("  -> Prepared: Outdoor PVP Zones")

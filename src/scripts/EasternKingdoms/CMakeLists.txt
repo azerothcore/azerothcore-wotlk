@@ -164,6 +164,6 @@ set(scripts_STAT_SRCS
   ${AC_SCRIPTS_DIR}/EasternKingdoms/TheStockade/instance_the_stockade.cpp
 )
 
-AC_ADD_SCRIPT_LOADER("EasternKingdoms" "${AC_SCRIPTS_DIR}/ScriptLoader.h")
+AC_ADD_SCRIPT_LOADER("EasternKingdoms" "ScriptLoader.h")
 
 message("  -> Prepared: Eastern Kingdoms")
