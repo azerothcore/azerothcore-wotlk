@@ -1,6 +1,8 @@
 #!/bin/bash
 
 function checkStatus() {
+    # wipe do : destroy old screens + ls
+    screen -wipe
     if screen -ls $1 | grep -q "No Sockets found"
     then 
     return 0
