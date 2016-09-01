@@ -15,7 +15,13 @@ if [ $GBD_ENABLED -eq 1 ]; then
     [ ! -f "$SYSLOG" ] && touch "$SYSLOG"
     [ ! -f "$SYSERR" ] && touch "$SYSERR"
 
-    gdb -x $GDB_FILE --batch $1 >> "$SYSLOG" 2>> "$SYSERR"
+    if [ $WITH_CONSOLE -eq 0 ]; then
+        gdb -x $GDB_FILE --batch $1 >> "$SYSLOG" 2>> "$SYSERR"
+    else
+        echo "> Console enabled"
+        gdb -x $GDB_FILE --batch $1   > >(tee ${SYSLOG}) 2> >(tee ${SYSERR} >&2)
+    fi
+
 elif [ $GBD_ENABLED -eq 0 ]; then
     "./$1" -c "$CONFIG"
 fi
