@@ -23,6 +23,7 @@
 #include "UpdateFieldFlags.h"
 #include "World.h"
 #include "Transport.h"
+#include "AccountMgr.h"
 
 GameObject::GameObject() : WorldObject(false), MovableMapObject(),
     m_model(NULL), m_goValue(), m_AI(NULL)
@@ -2253,7 +2254,7 @@ void GameObject::BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* t
         return;
 
     bool forcedFlags = GetGoType() == GAMEOBJECT_TYPE_CHEST && GetGOInfo()->chest.groupLootRules && HasLootRecipient();
-    bool targetIsGM = target->IsGameMaster() && target->GetSession()->GetSecurity() >= SEC_GAMEMASTER;
+    bool targetIsGM = target->IsGameMaster() && AccountMgr::IsGMAccount(target->GetSession()->GetSecurity());
 
     ByteBuffer fieldBuffer;
 

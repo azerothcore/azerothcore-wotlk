@@ -34,6 +34,7 @@
 #include "WardenWin.h"
 #include "WardenMac.h"
 #include "SavingSystem.h"
+#include "AccountMgr.h"
 
 namespace {
 
@@ -516,7 +517,7 @@ void WorldSession::LogoutPlayer(bool save)
         }
 
         //! Broadcast a logout message to the player's friends
-        if (GetSecurity() < SEC_GAMEMASTER) // pussywizard: only for non-gms
+        if (AccountMgr::IsGMAccount(GetSecurity())) // pussywizard: only for non-gms
             sSocialMgr->SendFriendStatus(_player, FRIEND_OFFLINE, _player->GetGUIDLow(), true);
         sSocialMgr->RemovePlayerSocial(_player->GetGUIDLow());
 

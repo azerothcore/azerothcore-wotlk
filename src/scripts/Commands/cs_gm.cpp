@@ -83,7 +83,7 @@ public:
             return false;
 
         Player* target =  handler->getSelectedPlayer();
-        if (!target || handler->GetSession()->GetSecurity() < SEC_GAMEMASTER)
+        if (!target || AccountMgr::IsGMAccount(handler->GetSession()->GetSecurity()))
             target = handler->GetSession()->GetPlayer();
 
         WorldPacket data(12);

@@ -2988,14 +2988,14 @@ void Player::SetGameMaster(bool on)
     if (on)
     {
         m_ExtraFlags |= PLAYER_EXTRA_GM_ON;
-        if (GetSession()->GetSecurity() >= SEC_GAMEMASTER)
+        if (AccountMgr::IsGMAccount(GetSession()->GetSecurity()))
             setFaction(35);
         SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_GM);
         SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_ALLOW_CHEAT_SPELLS);
 
         if (Pet* pet = GetPet())
         {
-            if (GetSession()->GetSecurity() >= SEC_GAMEMASTER)
+            if (AccountMgr::IsGMAccount(GetSession()->GetSecurity()))
                 pet->setFaction(35);
             pet->getHostileRefManager().setOnlineOfflineState(false);
         }
@@ -3007,7 +3007,7 @@ void Player::SetGameMaster(bool on)
         CombatStopWithPets();
 
         SetPhaseMask(uint32(PHASEMASK_ANYWHERE), false);    // see and visible in all phases
-        m_serverSideVisibilityDetect.SetValue(SERVERSIDE_VISIBILITY_GM, GetSession()->GetSecurity() == SEC_MODERATOR ? SEC_PLAYER : GetSession()->GetSecurity());
+        m_serverSideVisibilityDetect.SetValue(SERVERSIDE_VISIBILITY_GM, GetSession()->GetSecurity());
     }
     else
     {

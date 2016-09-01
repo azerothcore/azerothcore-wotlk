@@ -18,6 +18,7 @@ EndScriptData */
 #include "Player.h"
 #include "ReputationMgr.h"
 #include "ScriptMgr.h"
+#include "AccountMgr.h"
 
 class modify_commandscript : public CommandScript
 {
@@ -473,7 +474,7 @@ public:
         }
 
         Player* target = handler->getSelectedPlayerOrSelf();
-        if (handler->GetSession()->GetSecurity() < SEC_GAMEMASTER)
+        if (AccountMgr::IsGMAccount(handler->GetSession()->GetSecurity()))
             target = handler->GetSession()->GetPlayer();
         if (!target)
         {
@@ -523,7 +524,7 @@ public:
         }
 
         Player* target = handler->getSelectedPlayerOrSelf();
-        if (handler->GetSession()->GetSecurity() < SEC_GAMEMASTER)
+        if (AccountMgr::IsGMAccount(handler->GetSession()->GetSecurity()))
             target = handler->GetSession()->GetPlayer();
         if (!target)
         {
@@ -570,7 +571,7 @@ public:
         }
 
         Player* target = handler->getSelectedPlayerOrSelf();
-        if (handler->GetSession()->GetSecurity() < SEC_GAMEMASTER)
+        if (AccountMgr::IsGMAccount(handler->GetSession()->GetSecurity()))
             target = handler->GetSession()->GetPlayer();
         if (!target)
         {
@@ -617,7 +618,7 @@ public:
         }
 
         Player* target = handler->getSelectedPlayerOrSelf();
-        if (handler->GetSession()->GetSecurity() < SEC_GAMEMASTER)
+        if (AccountMgr::IsGMAccount(handler->GetSession()->GetSecurity()))
             target = handler->GetSession()->GetPlayer();
         if (!target)
         {
@@ -664,7 +665,7 @@ public:
         }
 
         Player* target = handler->getSelectedPlayerOrSelf();
-        if (handler->GetSession()->GetSecurity() < SEC_GAMEMASTER)
+        if (AccountMgr::IsGMAccount(handler->GetSession()->GetSecurity()))
             target = handler->GetSession()->GetPlayer();
         if (!target)
         {
