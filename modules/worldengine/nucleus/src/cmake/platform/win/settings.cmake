@@ -1,5 +1,5 @@
 # Platform-specfic options
-option(USE_MYSQL_SOURCES "Use included MySQL-sources to build libraries" 1)
+option(USE_MYSQL_SOURCES "Use included MySQL-sources to build libraries" 0)
 
 # Package overloads
 set(ACE_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/modules/worldengine/deps/acelite)
