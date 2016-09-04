@@ -9,7 +9,7 @@ INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `b
 (24783, 0, 0, 0, 1, 0, 43775);
 
 -- Fjord Hawk Matriarch
-UPDATE `creature_template` SET `InhabitType`='5' WHERE  `entry`=24787;
+UPDATE `creature_template` SET `InhabitType`='5', unit_flags='256' WHERE  `entry`=24787;
 -- Pathing for Entry: 24787 'TDB FORMAT' 
 SET @NPC := 115835;
 SET @PATH := @NPC * 10;
