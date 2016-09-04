@@ -368,7 +368,7 @@ class Map : public GridRefManager<NGridType>
 
         uint32 GetInstanceId() const { return i_InstanceId; }
         uint8 GetSpawnMode() const { return (i_spawnMode); }
-        virtual bool CanEnter(Player* /*player*/, bool loginCheck = false) { return true; }
+        virtual bool CanEnter(Player* /*player*/, bool /*loginCheck = false*/) { return true; }
         const char* GetMapName() const;
 
         // have meaning only for instanced map (that have set real difficulty)

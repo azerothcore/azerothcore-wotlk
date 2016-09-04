@@ -484,7 +484,7 @@ public:
                 if (!summon || summon->GetEntry() != NPC_OMINOUS_CLOUD || me->GetDistance(summon) < 20)
                     continue;
 
-                if ((!cloud || (urand(0,1) && !summon->HasAura(SPELL_SUMMON_GUARDIAN_OF_YS))))
+                if ((!cloud || urand(0,1) && !summon->HasAura(SPELL_SUMMON_GUARDIAN_OF_YS)))
                     cloud = summon;
             }
 
