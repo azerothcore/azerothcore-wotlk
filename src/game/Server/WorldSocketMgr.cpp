@@ -186,7 +186,7 @@ class ReactorRunnable : protected ACE_Task_Base
         }
 
     private:
-        typedef std::atomic_long AtomicInt;
+        typedef std::atomic<int> AtomicInt;
         typedef std::set<WorldSocket*> SocketSet;
 
         ACE_Reactor* m_Reactor;
