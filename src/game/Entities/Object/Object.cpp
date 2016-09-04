@@ -2081,7 +2081,7 @@ TempSummon* Map::SummonCreature(uint32 entry, Position const& pos, SummonPropert
     summon->SetHomePosition(pos);
 
     summon->InitStats(duration);
-    AddToMap(summon->ToCreature(), (IS_PLAYER_GUID(summon->GetOwnerGUID()) || (summoner && summoner->GetTransport())));
+    AddToMap(summon->ToCreature(), (IS_PLAYER_GUID(summon->GetOwnerGUID()) || summoner && summoner->GetTransport()));
     summon->InitSummon();
 
     //ObjectAccessor::UpdateObjectVisibility(summon);

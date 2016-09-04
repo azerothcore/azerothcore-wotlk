@@ -47,8 +47,7 @@ void BattlegroundRV::CheckPositionForUnit(Unit* unit)
     {
         float groundZ_vmap = unit->GetMap()->GetHeight(unit->GetPositionX(), unit->GetPositionY(), 37.0f, true, 50.0f);
         float groundZ_dyntree = unit->GetMap()->GetDynamicMapTree().getHeight(unit->GetPositionX(), unit->GetPositionY(), 37.0f, 50.0f, unit->GetPhaseMask());
-        if ((groundZ_vmap > 28.0f && groundZ_vmap < 29.0f) ||
-            (groundZ_dyntree > 28.0f && groundZ_dyntree < 37.0f))
+        if (groundZ_vmap > 28.0f && groundZ_vmap < 29.0f || groundZ_dyntree > 28.0f && groundZ_dyntree < 37.0f)
         {
             float groundZ = std::max<float>(groundZ_vmap, groundZ_dyntree);
             if (unit->GetPositionZ() < groundZ - 0.2f || unit->GetPositionZ() > groundZ + 3.5f)

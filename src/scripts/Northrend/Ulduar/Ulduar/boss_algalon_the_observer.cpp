@@ -275,9 +275,11 @@ class boss_algalon_the_observer : public CreatureScript
             {
                 if (!item) // should not happen, but checked in GetAverageItemLevel()
                     return true;
-                if (item->ItemLevel <= 226 || (item->ItemLevel <= 232 && (item->InventoryType == INVTYPE_SHIELD ||
-                                               item->Class == ITEM_CLASS_WEAPON || 
-                                               (item->Class == ITEM_CLASS_ARMOR && (item->InventoryType == INVTYPE_RELIC || item->InventoryType == INVTYPE_HOLDABLE)))))
+                if (item->ItemLevel <= 226 || item->ItemLevel <= 232 && (
+                    item->InventoryType == INVTYPE_SHIELD || 
+                    item->Class == ITEM_CLASS_WEAPON || 
+                    item->Class == ITEM_CLASS_ARMOR && (item->InventoryType == INVTYPE_RELIC || item->InventoryType == INVTYPE_HOLDABLE)
+                    ))
                     return true;
                 return false;
             }

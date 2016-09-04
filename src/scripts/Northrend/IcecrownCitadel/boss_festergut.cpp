@@ -158,13 +158,8 @@ class boss_festergut : public CreatureScript
                 else if (Player* p = target->ToPlayer())
                 {
                     // Gaseous Blight damage
-                    if ((spell->Id == 69159 ||
-                        spell->Id == 70136 ||
-                        spell->Id == 69161 ||
-                        spell->Id == 70139 ||
-                        spell->Id == 69163 || 
-                        (spell->Id == 70469 && p->GetQuestStatus(QUEST_RESIDUE_RENDEZVOUS_10) == QUEST_STATUS_INCOMPLETE)) ||
-                        ((spell->Id == 70135 || spell->Id == 70138 || spell->Id == 70468 || spell->Id == 70137 || spell->Id == 70140 || spell->Id == 70470) && p->GetQuestStatus(QUEST_RESIDUE_RENDEZVOUS_25) == QUEST_STATUS_INCOMPLETE))
+                    if ((spell->Id == 69159 || spell->Id == 70136 || spell->Id == 69161 || spell->Id == 70139 || spell->Id == 69163 || spell->Id == 70469) && p->GetQuestStatus(QUEST_RESIDUE_RENDEZVOUS_10) == QUEST_STATUS_INCOMPLETE ||
+                        (spell->Id == 70135 || spell->Id == 70138 || spell->Id == 70468 || spell->Id == 70137 || spell->Id == 70140 || spell->Id == 70470) && p->GetQuestStatus(QUEST_RESIDUE_RENDEZVOUS_25) == QUEST_STATUS_INCOMPLETE)
                         p->CastSpell(p, SPELL_ORANGE_BLIGHT_RESIDUE, true);
                 }
             }
