@@ -1956,7 +1956,7 @@ class spell_icc_sprit_alarm : public SpellScriptLoader
                 }
 
                 std::list<Creature*> wards;
-                GetCaster()->GetCreatureListWithEntryInGrid(wards, NPC_DEATHBOUND_WARD, range);
+                GetCaster()->GetCreatureListWithEntryInGrid(wards, NPC_DEATHBOUND_WARD, 150.0f)
                 wards.sort(Trinity::ObjectDistanceOrderPred(GetCaster()));
                 for (std::list<Creature*>::iterator itr = wards.begin(); itr != wards.end(); ++itr)
                 {
