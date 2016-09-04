@@ -16,5 +16,5 @@ endif()
 
 # -Wno-narrowing needed to suppress a warning in g3d
 # -Wno-deprecated-register -Wstring-plus-int -Wpointer-bool-conversion are needed to suppress gsoap warnings on Unix systems.
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wno-narrowing -Wno-deprecated-register -Wstring-plus-int -Wparentheses -Wreorder")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wno-narrowing -Wno-deprecated-register -Wstring-plus-int -Wparentheses -Wreorder -Wlogical-op-parentheses")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG=1")
