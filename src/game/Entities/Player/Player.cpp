@@ -1016,6 +1016,7 @@ bool Player::Create(uint32 guidlow, CharacterCreateInfo* createInfo)
     SetObjectScale(1.0f);
 
     m_realRace = createInfo->Race; // set real race flag
+    m_race = createInfo->Race; // set real race flag
 
     setFactionForRace(createInfo->Race);
 
@@ -17387,6 +17388,7 @@ bool Player::LoadFromDB(uint32 guid, SQLQueryHolder *holder)
     SetUInt32Value(UNIT_FIELD_BYTES_0, bytes0);
 
     m_realRace = fields[3].GetUInt8(); // set real race
+    m_race = fields[3].GetUInt8(); // set real race
 
     SetUInt32Value(UNIT_FIELD_LEVEL, fields[6].GetUInt8());
     SetUInt32Value(PLAYER_XP, fields[7].GetUInt32());
