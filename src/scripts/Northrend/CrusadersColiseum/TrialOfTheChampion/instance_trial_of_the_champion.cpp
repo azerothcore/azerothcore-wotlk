@@ -94,11 +94,9 @@ public:
             if (TeamIdInInstance == TEAM_NEUTRAL)
             {
                 Map::PlayerList const &players = instance->GetPlayers();
-                if (!players.isEmpty())
-                    if (Player* pPlayer = players.begin()->GetSource())
-                        if (Group * group = pPlayer->GetGroup())
-                            if(Player* groupLeader = ObjectAccessor::GetPlayer(*pPlayer,group->GetLeaderGUID()))
-                                TeamIdInInstance = groupLeader->GetTeamId();
+                if( !players.isEmpty() )
+                    if( Player* pPlayer = players.begin()->GetSource() )
+                        TeamIdInInstance = pPlayer->GetTeamId();
             }
 
             switch( creature->GetEntry() )
