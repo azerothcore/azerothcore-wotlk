@@ -9,9 +9,9 @@ DROP TABLE IF EXISTS `battleground_deserters`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `battleground_deserters` 
 (
-  `guid` INT(10) UNSIGNED NOT NULL COMMENT 'characters.guid',
-  `type` TINYINT(3) UNSIGNED NOT NULL COMMENT 'type of the desertion',
-  `datetime` DATETIME NOT NULL COMMENT 'datetime of the desertion'
+  `guid` int(10) unsigned NOT NULL COMMENT 'characters.guid',
+  `type` tinyint(3) unsigned NOT NULL COMMENT 'type of the desertion',
+  `datetime` datetime NOT NULL COMMENT 'datetime of the desertion'
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 

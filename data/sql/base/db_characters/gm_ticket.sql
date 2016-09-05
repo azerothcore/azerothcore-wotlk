@@ -30,7 +30,7 @@ CREATE TABLE `gm_ticket`
   `needMoreHelp` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `resolvedBy` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'GUID of GM who resolved the ticket',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=10572 DEFAULT CHARSET=utf8 COMMENT='Player System';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Player System';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `gm_ticket` WRITE;
