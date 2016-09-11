@@ -1,3 +1,5 @@
+INSERT INTO version_db_world(`sql_rev`) VALUES ('1473583129228647885');
+
 -- areatrigger_teleport
 ALTER TABLE `areatrigger_teleport`
 CHANGE `id` `ID` MEDIUMINT(8) UNSIGNED NOT NULL DEFAULT '0',
