@@ -1,7 +1,7 @@
 INSERT INTO version_db_world(`sql_rev`) VALUES ('1473111186171042200');
 
-// Culling of Stratholme Fix
-// Fix Arthus start senario & Resting point fix
+-- Culling of Stratholme Fix
+-- Fix Arthus start senario & Resting point fix
 
 
 ALTER TABLE world_db_version CHANGE COLUMN 2016_08_14_00 2016_08_14_01 bit;
