@@ -1,7 +1,7 @@
 INSERT INTO version_db_world(`sql_rev`) VALUES ('1473110802988536500');
 
 
-/* Tyrannus Mount fix */
+-- Tyrannus Mount fix 
 
 DELETE from creature_template where `entry` = 36794;
 DELETE from creature_template_addon where entry = 36794;
