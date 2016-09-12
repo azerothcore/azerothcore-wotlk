@@ -1,7 +1,7 @@
 INSERT INTO version_db_world(`sql_rev`) VALUES ('1473111010225487800');
 
 
-/* Ambassitor Kelmer Walk fix */
+-- Ambassitor Kelmer Walk fix 
 
 DELETE FROM `creature_formations` WHERE `leaderGUID`=64973;
 INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, `groupAI`) VALUES
