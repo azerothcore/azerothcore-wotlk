@@ -123,6 +123,7 @@ class Log
         void outErrorDb(const char * str, ...)                  ATTR_PRINTF(2, 3);
         void outChar(const char * str, ...)                     ATTR_PRINTF(2, 3);
         void outCommand(uint32 account, const char * str, ...)  ATTR_PRINTF(3, 4);
+        void outChat(const char * str, ...)                     ATTR_PRINTF(2, 3);
         void outRemote(const char * str, ...)                   ATTR_PRINTF(2, 3);
         void outSQLDriver(const char* str, ...)                 ATTR_PRINTF(2, 3);
         void outMisc(const char * str, ...)                     ATTR_PRINTF(2, 3); // pussywizard
@@ -151,6 +152,7 @@ class Log
         FILE* gmLogfile;
         FILE* charLogfile;
         FILE* dberLogfile;
+        FILE* chatLogfile;
         FILE* sqlLogFile;
         FILE* sqlDevLogFile;
         FILE* miscLogFile;
@@ -182,6 +184,7 @@ class Log
         bool m_dbChar;
         bool m_dbRA;
         bool m_dbGM;
+        bool m_dbChat;
         bool m_charLog_Dump;
         bool m_charLog_Dump_Separate;
         std::string m_dumpsDir;
