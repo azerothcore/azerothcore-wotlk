@@ -119,7 +119,9 @@ public:
 
         void JustSummoned(Creature* summon)
         {
-            instance->SetData64(DATA_SUMMONED_NPC, summon->GetGUID());
+            if (instance)
+                instance->SetData64(DATA_SUMMONED_NPC, summon->GetGUID());
+
             if (summon->GetEntry() == NPC_DP_CRYSTAL_STALKER)
             {
                 summon->DespawnOrUnsummon(25000);
@@ -138,18 +140,21 @@ public:
 
         void SummonedCreatureDespawn(Creature* summon)
         {
-            instance->SetData64(DATA_DELETED_NPC, summon->GetGUID());
+            if (instance)
+                instance->SetData64(DATA_DELETED_NPC, summon->GetGUID());
         }
 
         void MoveInLineOfSight(Unit* who)
         {
-            if (!events.Empty() || instance->GetData(TYPE_AEONUS) == DONE)
+            if (!events.Empty() || (instance && instance->GetData(TYPE_AEONUS) == DONE))
                 return;
 
             if (who->GetTypeId() == TYPEID_PLAYER && me->IsWithinDistInMap(who, 20.0f))
             {
                 Talk(SAY_ENTER);
-                instance->SetData(DATA_MEDIVH, 1);
+                if (instance)
+                    instance->SetData(DATA_MEDIVH, 1);
+
                 me->CastSpell(me, SPELL_MEDIVH_CHANNEL, false);
 
                 events.ScheduleEvent(EVENT_CHECK_HEALTH_75, 500);
@@ -191,7 +196,7 @@ public:
                 case EVENT_CHECK_HEALTH_25:
                 case EVENT_CHECK_HEALTH_50:
                 case EVENT_CHECK_HEALTH_75:
-                    if (instance->GetData(DATA_SHIELD_PERCENT) <= eventId*25)
+                    if (instance && instance->GetData(DATA_SHIELD_PERCENT) <= eventId*25)
                     {
                         Talk(eventId-1);
                         break;
@@ -293,7 +298,7 @@ public:
 
         void Reset()
         {
-            if (instance->GetData(DATA_RIFT_NUMBER) >= 18)
+            if (instance && instance->GetData(DATA_RIFT_NUMBER) >= 18)
             {
                 me->DespawnOrUnsummon(30000);
                 return;
@@ -313,13 +318,15 @@ public:
             Position pos;
             me->GetNearPosition(pos, 10.0f, 2*M_PI*rand_norm());
 
-            if (Creature* summon = me->SummonCreature(entry, pos, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 15000))
-                if (Unit* medivh = ObjectAccessor::GetUnit(*me, instance->GetData64(DATA_MEDIVH)))
-                {
-                    float o = medivh->GetAngle(summon)+frand(-1.0f, 1.0f);
-                    summon->SetHomePosition(medivh->GetPositionX() + 14.0f*cos(o), medivh->GetPositionY() + 14.0f*sin(o), medivh->GetPositionZ(), summon->GetAngle(medivh));
-                    summon->GetMotionMaster()->MoveTargetedHome();
-                    summon->SetReactState(REACT_DEFENSIVE);
+            if (Creature* summon = me->SummonCreature(entry, pos, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 150000))
+                if (instance) {
+                    if (Unit* medivh = ObjectAccessor::GetUnit(*me, instance->GetData64(DATA_MEDIVH)))
+                    {
+                        float o = medivh->GetAngle(summon) + frand(-1.0f, 1.0f);
+                        summon->SetHomePosition(medivh->GetPositionX() + 14.0f*cos(o), medivh->GetPositionY() + 14.0f*sin(o), medivh->GetPositionZ(), summon->GetAngle(medivh));
+                        summon->GetMotionMaster()->MoveTargetedHome();
+                        summon->SetReactState(REACT_DEFENSIVE);
+                    }
                 }
         }
 
@@ -351,7 +358,9 @@ public:
                         Creature* riftKeeper = ObjectAccessor::GetCreature(*me, riftKeeperGUID);
                         if (!riftKeeper || !riftKeeper->IsAlive())
                         {
-                            instance->SetData(DATA_RIFT_KILLED, 1);
+                            if (instance)
+                                instance->SetData(DATA_RIFT_KILLED, 1);
+
                             me->DespawnOrUnsummon(0);
                             break;
                         }
