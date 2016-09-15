@@ -63,8 +63,7 @@ bool ConfigMgr::Reload()
             if (!LoadInitial((*it).c_str()))
                 return false;
         } else {
-            if (!LoadMore((*it).c_str()))
-                return false;
+            LoadMore((*it).c_str());
         }
     }
 
