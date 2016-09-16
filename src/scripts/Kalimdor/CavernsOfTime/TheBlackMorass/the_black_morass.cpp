@@ -113,7 +113,7 @@ public:
             events.Reset();
             me->CastSpell(me, SPELL_MANA_SHIELD, true);
 
-            if (instance->GetData(TYPE_AEONUS) != DONE)
+            if (instance && instance->GetData(TYPE_AEONUS) != DONE)
                 me->CastSpell(me, SPELL_MEDIVH_CHANNEL, false);
         }
 
