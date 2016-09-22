@@ -920,6 +920,9 @@ void World::LoadConfigSettings(bool reload)
         m_timers[WUPDATE_CLEANDB].SetInterval(m_int_configs[CONFIG_LOGDB_CLEARINTERVAL] * MINUTE * IN_MILLISECONDS);
         m_timers[WUPDATE_CLEANDB].Reset();
     }
+    m_int_configs[CONFIG_LOGDB_CLEARTIME] = sConfigMgr->GetIntDefault("LogDB.Opt.ClearTime", 1209600); // 14 days default
+    sLog->outString("Will clear `logs` table of entries older than %i seconds every %u minutes.",
+        m_int_configs[CONFIG_LOGDB_CLEARTIME], m_int_configs[CONFIG_LOGDB_CLEARINTERVAL]);
 
     m_int_configs[CONFIG_TELEPORT_TIMEOUT_NEAR] = sConfigMgr->GetIntDefault("TeleportTimeoutNear", 25); // pussywizard
     m_int_configs[CONFIG_TELEPORT_TIMEOUT_FAR] = sConfigMgr->GetIntDefault("TeleportTimeoutFar", 45); // pussywizard
@@ -2022,16 +2025,18 @@ void World::Update(uint32 diff)
     }
 
     /// <li> Clean logs table
-    if(getIntConfig(CONFIG_LOGDB_CLEARINTERVAL) > 0) // if not enabled, ignore the timer
+    if (sWorld->getIntConfig(CONFIG_LOGDB_CLEARTIME) > 0) // if not enabled, ignore the timer
     {
         if (m_timers[WUPDATE_CLEANDB].Passed())
         {
-            uint32 tmpDiff = (m_gameTime - m_startTime);
-            uint32 maxClientsNum = GetMaxActiveSessionCount();
-
             m_timers[WUPDATE_CLEANDB].Reset();
-            LoginDatabase.PExecute("DELETE FROM logs WHERE (time + %u) < " UI64FMTD ";",
-                getIntConfig(CONFIG_LOGDB_CLEARINTERVAL), uint64(time(0)));
+
+            PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_DEL_OLD_LOGS);
+
+            stmt->setUInt32(0, sWorld->getIntConfig(CONFIG_LOGDB_CLEARTIME));
+            stmt->setUInt32(1, uint32(time(0)));
+
+            LoginDatabase.Execute(stmt);
         }
     }
 
