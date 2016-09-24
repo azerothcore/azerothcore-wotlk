@@ -14,9 +14,6 @@ INSERT INTO version_db_world(`sql_rev`) VALUES ('1473111186171042200');
 -- Culling of Stratholme Fix
 -- Fix Arthus start senario & Resting point fix
 
-
-ALTER TABLE world_db_version CHANGE COLUMN 2016_08_14_00 2016_08_14_01 bit;
-
 DELETE FROM `creature_template` WHERE `entry` IN (11082,14646,28167,28169,28340,28341,28409,28439,28509,28656,29865,29866,29868,30996,31006,31126,31127);
 INSERT INTO `creature_template` VALUES
 (11082, 0, 0, 0, 0, 0, 10547, 0, 0, 0, 'Stratholme Courier', NULL, NULL, 0, 57, 57, 0, 21, 0, 1, 1.14286, 1, 1, 98, 130, 0, 238, 3.5, 2000, 1301, 1, 32832, 2048, 0, 0, 0, 0, 0, 0, 68, 99, 24, 6, 0, 11082, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 604, 794, 'SmartAI', 1, 3, 1, 4.5, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 8388624, 0, '', 12340),
