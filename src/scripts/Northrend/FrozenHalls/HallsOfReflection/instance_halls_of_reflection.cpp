@@ -241,7 +241,7 @@ public:
                     creature->SetVisible(false);
                     NPC_GuardGUID = creature->GetGUID();
                     if (TeamIdInInstance == TEAM_ALLIANCE)
-                        creature->UpdateEntry(NPC_ARCHMAGE_ELANDRA);
+                        creature->UpdateEntry(NPC_ARCHMAGE_KORELN);
                     break;
                 case NPC_UTHER:
                     creature->SetVisible(false);
