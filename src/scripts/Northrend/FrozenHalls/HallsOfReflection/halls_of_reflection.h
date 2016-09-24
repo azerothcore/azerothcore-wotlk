@@ -41,7 +41,7 @@ enum Creatures
     NPC_SYLVANAS_PART2                            = 37554,
 
     NPC_DARK_RANGER_LORALEN                       = 37779,
-    NPC_ARCHMAGE_ELANDRA                          = 37774,
+    NPC_ARCHMAGE_KORELN                           = 37582,
 
     NPC_WAVE_MERCENARY                            = 38177,
     NPC_WAVE_FOOTMAN                              = 38173,
