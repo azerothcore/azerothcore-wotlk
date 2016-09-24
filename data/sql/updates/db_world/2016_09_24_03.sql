@@ -1,3 +1,14 @@
+-- DB update 2016_09_24_02 -> 2016_09_24_03
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2016_09_24_02 2016_09_24_03 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1473152344430838100'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
 INSERT INTO version_db_world(`sql_rev`) VALUES ('1473152344430838100');
 
 /* 
@@ -25,4 +36,12 @@ INSERT INTO smart_scripts (entryorguid, source_type, id, link, event_type, event
 (25216, 0, 11, 0, 2, 3, 100, 1, 0, 15, 0, 0, 25, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Flee at 15% HP'),
 (25216, 0, 12, 0, 7, 3, 100, 1, 0, 0, 0, 0, 22, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Reset on Evade'),
 (25216, 0, 13, 0, 2, 3, 100, 1, 0, 15, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Say Text at 15% HP'),
-(25216, 0, 14, 0, 9, 1, 100, 0, 0, 5, 12300, 19800, 11, 50272, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Cast Unstable Magic on Close');
+(25216, 0, 14, 0, 9, 1, 100, 0, 0, 5, 12300, 19800, 11, 50272, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Cast Unstable Magic on Close');--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END;
+//
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;

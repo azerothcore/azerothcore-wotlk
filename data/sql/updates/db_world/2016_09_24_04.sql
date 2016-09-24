@@ -1,3 +1,14 @@
+-- DB update 2016_09_24_03 -> 2016_09_24_04
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2016_09_24_03 2016_09_24_04 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1474716815295101300'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
 INSERT INTO version_db_world(`sql_rev`) VALUES ('1474716815295101300');
 
 DELETE FROM waypoints WHERE entry = 33519;
@@ -49,3 +60,12 @@ INSERT INTO waypoints (entry, pointid, position_x, position_y, position_z, point
 (33519, 42, 9066.5, 2084.15, 66.2016, 'Black Knight Gryphon WP42'),
 (33519, 43, 9068.36, 2080.14, 66.9176, 'Black Knight Gryphon WP43'),
 (33519, 44, 9069.15, 2078.45, 66.99, 'Black Knight Gryphon WP44');
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END;
+//
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
