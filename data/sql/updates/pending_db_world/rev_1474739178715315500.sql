@@ -1,3 +1,5 @@
+INSERT INTO version_db_world(`sql_rev`) VALUES ('1474739178715315500');
+
 
 /*
 Issue: #89 (https://github.com/AzerothShard/AzerothShard-Issues-ita/issues/89)
