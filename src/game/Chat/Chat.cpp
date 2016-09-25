@@ -270,7 +270,7 @@ bool ChatHandler::ExecuteCommandInTable(std::vector<ChatCommand> const& table, c
         // select subcommand from child commands list
         if (!table[i].ChildCommands.empty())
         {
-            if (!ExecuteCommandInTable(table[i].ChildCommands, text, fullcmd))
+            if (!ExecuteCommandInTable(table[i].ChildCommands, text, fullcmd.c_str()))
             {
                 if (text[0] != '\0')
                     SendSysMessage(LANG_NO_SUBCMD);
