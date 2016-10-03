@@ -35,10 +35,10 @@ public:
 
         static std::vector<ChatCommand> characterDeletedCommandTable =
         {
-            { "delete",        SEC_ADMINISTRATOR,    true,  &HandleCharacterDeletedDeleteCommand,  "" },
+            { "delete",        SEC_CONSOLE,          true,  &HandleCharacterDeletedDeleteCommand,  "" },
             { "list",          SEC_ADMINISTRATOR,    true,  &HandleCharacterDeletedListCommand,    "" },
             { "restore",       SEC_ADMINISTRATOR,    true,  &HandleCharacterDeletedRestoreCommand, "" },
-            { "old",           SEC_ADMINISTRATOR,    true,  &HandleCharacterDeletedOldCommand,     "" },
+            { "old",           SEC_CONSOLE,          true,  &HandleCharacterDeletedOldCommand,     "" },
         };
 
         static std::vector<ChatCommand> characterCommandTable =
@@ -46,6 +46,7 @@ public:
             { "customize",      SEC_GAMEMASTER,     true,  &HandleCharacterCustomizeCommand,       "" },
             { "changefaction",  SEC_GAMEMASTER,     true,  &HandleCharacterChangeFactionCommand,   "" },
             { "changerace",     SEC_GAMEMASTER,     true,  &HandleCharacterChangeRaceCommand,      "" },
+            { "erase",          SEC_CONSOLE,        true,  &HandleCharacterEraseCommand,           "" },
             { "deleted",        SEC_ADMINISTRATOR,  true,  nullptr,                                "", characterDeletedCommandTable },
             { "level",          SEC_GAMEMASTER,     true,  &HandleCharacterLevelCommand,           "" },
             { "rename",         SEC_GAMEMASTER,     true,  &HandleCharacterRenameCommand,          "" },
@@ -55,9 +56,9 @@ public:
 
         static std::vector<ChatCommand> commandTable =
         {
-            { "character",      SEC_GAMEMASTER,     true,  nullptr,                                   "", characterCommandTable },
+            { "character",      SEC_GAMEMASTER,     true,  nullptr,                                "", characterCommandTable },
             { "levelup",        SEC_GAMEMASTER,     false, &HandleLevelUpCommand,                  "" },
-            { "pdump",          SEC_ADMINISTRATOR,  true,  nullptr,                                   "", pdumpCommandTable }
+            { "pdump",          SEC_ADMINISTRATOR,  true,  nullptr,                                "", pdumpCommandTable }
         };
         return commandTable;
     }
@@ -521,7 +522,6 @@ public:
 
         return true;
     }
-    // */
 
     /**
      * Handles the '.character deleted restore' command, which restores all deleted characters which matches the given search string
@@ -634,7 +634,7 @@ public:
      * @see HandleCharacterDeletedListCommand
      * @see HandleCharacterDeletedRestoreCommand
      *
-     * @param args the search string which either contains a player GUID or a part fo the character-name
+     * @param args the search string which either contains a player GUID or a part of the character-name
      */
     static bool HandleCharacterDeletedOldCommand(ChatHandler* /*handler*/, char const* args)
     {
@@ -655,6 +655,57 @@ public:
             return false;
 
         Player::DeleteOldCharacters(uint32(keepDays));
+
+        return true;
+    }
+
+    /**
+     * Handles the '.character erase' command which completly delete a character from the DB
+     *
+     * @see Player::DeleteFromDB
+     *
+     * @param args the search string which either contains a player GUID or a part of the character-name
+     */
+    static bool HandleCharacterEraseCommand(ChatHandler* handler, char const* args)
+    {
+        if (!*args)
+            return false;
+
+        char* characterName_str = strtok((char*)args, " ");
+        if (!characterName_str)
+            return false;
+
+        std::string characterName = characterName_str;
+        if (!normalizePlayerName(characterName))
+            return false;
+
+        uint32 characterGuid;
+        uint32 accountId;
+
+        Player* player = ObjectAccessor::FindPlayerByName(characterName);
+        if (player)
+        {
+            characterGuid = player->GetGUID();
+            accountId = player->GetSession()->GetAccountId();
+            player->GetSession()->KickPlayer();
+        }
+        else
+        {
+            characterGuid = sObjectMgr->GetPlayerGUIDByName(characterName);
+            if (!characterGuid)
+            {
+                handler->PSendSysMessage(LANG_NO_PLAYER, characterName.c_str());
+                handler->SetSentErrorMessage(true);
+                return false;
+            }
+            accountId = sObjectMgr->GetPlayerAccountIdByGUID(characterGuid);
+        }
+
+        std::string accountName;
+        AccountMgr::GetName(accountId, accountName);
+
+        Player::DeleteFromDB(characterGuid, accountId, true, true);
+        handler->PSendSysMessage(LANG_CHARACTER_DELETED, characterName.c_str(), characterGuid, accountName.c_str(), accountId);
 
         return true;
     }
@@ -826,7 +877,7 @@ public:
             do{
                 uint64 _guid = result->Fetch()[0].GetUInt64();
                 char buff[20];
-                sprintf(buff,"%I64u", (uint)_guid);
+                sprintf(buff,"%u", (uint32)_guid);
                 switch(PlayerDumpWriter().WriteDump(buff, uint32(_guid)))
                 {
                     case DUMP_SUCCESS:
