@@ -1,3 +1,4 @@
+INSERT INTO version_db_world(`sql_rev`) VALUES ('1475774267%N');
 -- Winterfin Oracle
 SET @ENTRY := 25216;
 UPDATE `creature_template` SET `AIName`='SmartAI' WHERE `entry`=@ENTRY;
