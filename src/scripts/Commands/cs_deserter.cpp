@@ -42,27 +42,23 @@ public:
     {
         static std::vector<ChatCommand> deserterInstanceCommandTable = 
         {
-            { "add",            SEC_ADMINISTRATOR, false, &HandleDeserterInstanceAdd,          "", NULL },
-            { "remove",         SEC_ADMINISTRATOR, false, &HandleDeserterInstanceRemove,       "", NULL },
-            { NULL,             SEC_PLAYER,        false, NULL,                                "", NULL }
+            { "add",            SEC_ADMINISTRATOR, false, &HandleDeserterInstanceAdd,          ""},
+            { "remove",         SEC_ADMINISTRATOR, false, &HandleDeserterInstanceRemove,       ""},
         };
         static std::vector<ChatCommand> deserterBGCommandTable = 
         {
-            { "add",            SEC_ADMINISTRATOR, false, &HandleDeserterBGAdd,                "", NULL },
-            { "remove",         SEC_ADMINISTRATOR, false, &HandleDeserterBGRemove,             "", NULL },
-            { NULL,             SEC_PLAYER,        false, NULL,                                "", NULL }
+            { "add",            SEC_ADMINISTRATOR, false, &HandleDeserterBGAdd,                ""},
+            { "remove",         SEC_ADMINISTRATOR, false, &HandleDeserterBGRemove,             ""},
         };
 
         static std::vector<ChatCommand> deserterCommandTable = 
         {
             { "instance",       SEC_ADMINISTRATOR, false, NULL,        "", deserterInstanceCommandTable },
             { "bg",             SEC_ADMINISTRATOR, false, NULL,              "", deserterBGCommandTable },
-            { NULL,             SEC_PLAYER,        false, NULL,                                "", NULL }
         };
         static std::vector<ChatCommand> commandTable =
         {
             { "deserter",       SEC_ADMINISTRATOR,  false, NULL,               "", deserterCommandTable },
-            { NULL,             SEC_PLAYER,         false, NULL,                               "", NULL }
         };
         return commandTable;
     }
