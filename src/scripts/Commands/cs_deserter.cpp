@@ -42,28 +42,28 @@ public:
     * @brief Returns the command structure for the system.
     */
 
-    ChatCommand* GetCommands() const
+    std::vector<ChatCommand> GetCommands() const override
     {
-        static ChatCommand deserterInstanceCommandTable[] = 
+        static std::vector<ChatCommand> deserterInstanceCommandTable[] = 
         {
             { "add",            SEC_ADMINISTRATOR, false, &HandleDeserterInstanceAdd,          "", NULL },
             { "remove",         SEC_ADMINISTRATOR, false, &HandleDeserterInstanceRemove,       "", NULL },
             { NULL,             SEC_PLAYER,        false, NULL,                                "", NULL }
         };
-        static ChatCommand deserterBGCommandTable[] = 
+        static std::vector<ChatCommand> deserterBGCommandTable[] = 
         {
             { "add",            SEC_ADMINISTRATOR, false, &HandleDeserterBGAdd,                "", NULL },
             { "remove",         SEC_ADMINISTRATOR, false, &HandleDeserterBGRemove,             "", NULL },
             { NULL,             SEC_PLAYER,        false, NULL,                                "", NULL }
         };
 
-        static ChatCommand deserterCommandTable[] = 
+        static std::vector<ChatCommand> deserterCommandTable[] = 
         {
             { "instance",       SEC_ADMINISTRATOR, false, NULL,        "", deserterInstanceCommandTable },
             { "bg",             SEC_ADMINISTRATOR, false, NULL,              "", deserterBGCommandTable },
             { NULL,             SEC_PLAYER,        false, NULL,                                "", NULL }
         };
-        static ChatCommand commandTable[] =
+        static std::vector<ChatCommand> commandTable[] =
         {
             { "deserter",       SEC_ADMINISTRATOR,  false, NULL,               "", deserterCommandTable },
             { NULL,             SEC_PLAYER,         false, NULL,                               "", NULL }
