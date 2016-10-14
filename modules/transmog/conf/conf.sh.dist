@@ -1,0 +1,58 @@
+#!/bin/bash
+
+DATABASES+=(
+	"EXTRA"
+)
+
+#
+# CUSTOM
+#
+
+DB_CHARACTERS_CUSTOM_PATHS+=(
+	$AZTHSD_PATH_ROOT"/data/sql/db-characters/"
+)
+
+DB_AUTH_CUSTOM_PATHS+=(
+	$AZTHSD_PATH_ROOT"/data/sql/db-auth/"
+)
+
+DB_WORLD_CUSTOM_PATHS+=(
+	$AZTHSD_PATH_ROOT"/data/sql/db-world/"
+)
+
+#
+# EXTRA
+#
+
+DB_EXTRA_CUSTOM_PATHS+=(
+	$AZTHSD_PATH_ROOT"/data/sql/db-extra/"
+)
+
+DB_EXTRA_CONF="MYSQL_USER='root'; \
+                    MYSQL_PASS='root'; \
+                    MYSQL_HOST='localhost';\
+                    "
+
+#
+# UPDATES
+#
+
+DB_CHARACTERS_UPDATE_PATHS+=(
+	$AZTHSD_PATH_ROOT"/data/sql/updates/char/"
+)
+
+DB_WORLD_UPDATE_PATHS+=(
+	$AZTHSD_PATH_ROOT"/data/sql/updates/world/"
+)
+
+# specify compilation type
+CTYPE=Debug
+
+function azth_custom_after_build() {
+  cp -rvf "$AZTHSD_PATH_ROOT/bin/runners/"* "$INSTALL_PATH/bin/"
+}
+
+
+registerHooks "ON_AFTER_BUILD" azth_custom_after_build
+
+
