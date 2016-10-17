@@ -216,6 +216,7 @@ class boss_moroes : public CreatureScript
                         events.ScheduleEvent(EVENT_SPELL_GARROTE, urand(5000, 7000));
                         return;
                     case EVENT_SPELL_GARROTE:
+                        events.SetPhase(0);
                         me->CastSpell(me, SPELL_VANISH_TELEPORT, false);
                         break;
                 }
