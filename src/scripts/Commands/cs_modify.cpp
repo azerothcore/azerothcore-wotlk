@@ -289,9 +289,16 @@ public:
         Creature* target = handler->getSelectedCreature();
         if (!target)
         {
-            handler->SendSysMessage(LANG_SELECT_CREATURE);
-            handler->SetSentErrorMessage(true);
-            return false;
+            Player* target = handler->getSelectedPlayer();
+			if (!target)
+			{
+				handler->SendSysMessage(LANG_SELECT_CREATURE);
+				handler->SetSentErrorMessage(true);
+				return false;
+			}
+			uint32 factionid = atoi((char*)args);
+			target->setFaction(factionid);
+			return false;
         }
 
         if (!pfactionid)
