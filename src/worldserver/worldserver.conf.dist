@@ -3006,3 +3006,15 @@ PlayerDump.DisallowOverwrite = 1
 
 #
 ###################################################################################################
+###################################################################################################
+#
+# CROSSFACTION SYSTEM
+#
+#    CrossFactionSystem.Battlegrounds = 1 - Mixed battleground enabled.
+#    CrossFactionSystem.Battlegrounds = 0 - Mixed battleground disabled.
+
+CrossFactionSystem.Battlegrounds = 1
+
+#
+###################################################################################################
+
