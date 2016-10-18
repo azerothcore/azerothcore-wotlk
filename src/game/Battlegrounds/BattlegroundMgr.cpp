@@ -754,7 +754,10 @@ void BattlegroundMgr::SendToBattleground(Player* player, uint32 instanceId, Batt
     if (Battleground* bg = GetBattleground(instanceId))
     {
         float x, y, z, o;
-        bg->GetTeamStartLoc(player->GetBgTeamId(), x, y, z, o);
+        TeamId team = player->GetBgTeamId();
+		if (team != TEAM_ALLIANCE && team != TEAM_HORDE)
+			 team = player->GetTeamId();
+		bg->GetTeamStartLoc(team, x, y, z, o);
         player->TeleportTo(bg->GetMapId(), x, y, z, o);
     }
 }
