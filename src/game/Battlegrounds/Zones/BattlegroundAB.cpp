@@ -94,7 +94,7 @@ void BattlegroundAB::PostUpdateImpl(uint32 diff)
                     if (honorRewards < uint8(m_TeamScores[teamId] / _honorTics))
                         RewardHonorToTeam(GetBonusHonorFromKill(1), teamId);
                     if (reputationRewards < uint8(m_TeamScores[teamId] / _reputationTics))
-                        RewardReputationToTeam(teamId == TEAM_ALLIANCE ? 509 : 510, 10, teamId);
+                        RewardReputationToTeam(509, 510, 10, teamId == TEAM_ALLIANCE ? TEAM_ALLIANCE : TEAM_HORDE);
                     if (information < uint8(m_TeamScores[teamId] / BG_AB_WARNING_NEAR_VICTORY_SCORE))
                     {
                         SendMessageToAll(teamId == TEAM_ALLIANCE ? LANG_BG_AB_A_NEAR_VICTORY : LANG_BG_AB_H_NEAR_VICTORY, CHAT_MSG_BG_SYSTEM_NEUTRAL);
