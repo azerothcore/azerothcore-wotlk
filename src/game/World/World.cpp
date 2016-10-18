@@ -1066,6 +1066,8 @@ void World::LoadConfigSettings(bool reload)
 
     m_bool_configs[CONFIG_OFFHAND_CHECK_AT_SPELL_UNLEARN]            = sConfigMgr->GetBoolDefault("OffhandCheckAtSpellUnlearn", true);
 
+    m_bool_configs[CROSSFACTION_SYSTEM_BATTLEGROUNDS]				 = sConfigMgr->GetBoolDefault("CrossFactionSystem.Battlegrounds", true);
+    
     if (int32 clientCacheId = sConfigMgr->GetIntDefault("ClientCacheVersion", 0))
     {
         // overwrite DB/old value
