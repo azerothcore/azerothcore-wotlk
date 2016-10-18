@@ -167,7 +167,7 @@ void BattlegroundRV::StartingEventOpenDoors()
 
 void BattlegroundRV::AddPlayer(Player* player)
 {
-    if (GetStatus() == STATUS_WAIT_JOIN && player->GetBgTeamId() == TEAM_HORDE)
+    if (GetStatus() == STATUS_WAIT_JOIN && player->GetTeamId() == TEAM_HORDE)
         player->SetPhaseMask(2, true);
 
     Battleground::AddPlayer(player);
