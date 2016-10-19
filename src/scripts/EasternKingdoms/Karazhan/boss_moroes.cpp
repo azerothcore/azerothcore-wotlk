@@ -233,7 +233,7 @@ class boss_moroes : public CreatureScript
             EventMap _events2;
             uint8 _activeGuests;
         };
-
+	
         CreatureAI* GetAI(Creature* creature) const
         {
             return GetInstanceAI<boss_moroesAI>(creature);
