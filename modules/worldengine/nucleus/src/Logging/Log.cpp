@@ -20,7 +20,7 @@ extern LoginDatabaseWorkerPool LoginDatabase;
 
 Log::Log() :
     raLogfile(NULL), logfile(NULL), gmLogfile(NULL), charLogfile(NULL),
-    dberLogfile(NULL), sqlLogFile(NULL), sqlDevLogFile(NULL), miscLogFile(NULL),
+    dberLogfile(NULL), chatLogfile(NULL), sqlLogFile(NULL), sqlDevLogFile(NULL), miscLogFile(NULL),
     m_gmlog_per_account(false), m_enableLogDB(false), m_colored(false)
 {
     Initialize();
@@ -47,6 +47,10 @@ Log::~Log()
     if (raLogfile != NULL)
         fclose(raLogfile);
     raLogfile = NULL;
+
+    if (chatLogfile != NULL)
+        fclose(chatLogfile);
+    chatLogfile = NULL;
 
     if (sqlLogFile != NULL)
         fclose(sqlLogFile);
@@ -87,6 +91,7 @@ void Log::Initialize()
     m_dbChar = sConfigMgr->GetBoolDefault("LogDB.Char", false);
     m_dbRA = sConfigMgr->GetBoolDefault("LogDB.RA", false);
     m_dbGM = sConfigMgr->GetBoolDefault("LogDB.GM", false);
+    m_dbChat = sConfigMgr->GetBoolDefault("LogDB.Chat", false);
 
     /// Realm must be 0 by default
     SetRealmID(0);
@@ -137,6 +142,7 @@ void Log::Initialize()
     charLogfile = openLogFile("CharLogFile", "CharLogTimestamp", "a");
     dberLogfile = openLogFile("DBErrorLogFile", NULL, "a");
     raLogfile = openLogFile("RaLogFile", NULL, "a");
+    chatLogfile = openLogFile("ChatLogFile", "ChatLogTimestamp", "a");
     sqlLogFile = openLogFile("SQLDriverLogFile", NULL, "a");
     sqlDevLogFile = openLogFile("SQLDeveloperLogFile", NULL, "a");
     miscLogFile = fopen((m_logsDir+"Misc.log").c_str(), "a");
@@ -919,6 +925,33 @@ void Log::outCharDump(const char * str, uint32 account_id, uint32 guid, const ch
         fflush(file);
         if (m_charLog_Dump_Separate)
             fclose(file);
+    }
+}
+
+void Log::outChat(const char * str, ...)
+{
+    if (!str)
+        return;
+
+    if (m_enableLogDB && m_dbChat)
+    {
+        va_list ap2;
+        va_start(ap2, str);
+        char nnew_str[MAX_QUERY_LEN];
+        vsnprintf(nnew_str, MAX_QUERY_LEN, str, ap2);
+        outDB(LOG_TYPE_CHAT, nnew_str);
+        va_end(ap2);
+    }
+
+    if (chatLogfile)
+    {
+        outTimestamp(chatLogfile);
+        va_list ap;
+        va_start(ap, str);
+        vfprintf(chatLogfile, str, ap);
+        fprintf(chatLogfile, "\n");
+        fflush(chatLogfile);
+        va_end(ap);
     }
 }
 

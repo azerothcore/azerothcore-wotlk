@@ -31,10 +31,20 @@ public:
         switch( pInstance->GetData(DATA_INSTANCE_PROGRESS) )
         {
             case INSTANCE_PROGRESS_INITIAL:
-                gossipTextId = 14688;
-                pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_START_EVENT1a, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1338);
-                pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_START_EVENT1b, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1341);
-                break;
+                if(!pPlayer->GetVehicle() )
+				{
+					if (pInstance->GetData(DATA_TEAMID_IN_INSTANCE) == TEAM_HORDE)
+						gossipTextId = 15043; //Horde text
+					else
+						gossipTextId = 14757; //Alliance text
+				}
+				else
+				{
+					gossipTextId = 14688;
+					pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_START_EVENT1a, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1338);
+					pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_START_EVENT1b, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1341);	
+				}
+				break;
             case INSTANCE_PROGRESS_CHAMPIONS_DEAD:
                 gossipTextId = 14737;
                 pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_START_EVENT2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1339);

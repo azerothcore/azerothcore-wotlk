@@ -17,15 +17,15 @@ function configureFiles() {
 function checkStatus() {
     local ret=1
     # wipe do : destroy old screens + ls
-    screen -wipe
-    if screen -ls $1 | grep -q "No Sockets found"
-    then 
-        return 0
-    fi
+    #screen -wipe
+    #if screen -ls $1 | grep -q "No Sockets found"
+    #then
+    #    return 0
+    #fi
 
     local gdbres=$(pgrep -f "gdb -x $GDB --batch $SERVERBIN")
-    if [[ $GDB_ENABLED -eq 0 && -z $gdbres ]]; then
-        return 0
+    if [[ $GDB_ENABLED -eq 1 && ! -z $gdbres ]]; then
+        return 1
     fi
 
     #
@@ -34,23 +34,23 @@ function checkStatus() {
     # This is an extra check
     #
     local binres=$(pgrep -f "$SERVERBIN -c $CONFIG")
-    if [ -z $binres ]; then
-        return 0
+    if [ ! -z $binres ]; then
+        return 1
     fi
 
-    return 1
+    return 0
 }
 
 function run() {
     echo $1
-    if [ ! -z $1 ]; then       
+    if [ ! -z $1 ]; then
         local OPTIONS="-A -m -d -S"
         if [ ! -z "$SCREEN_OPTIONS" ]; then
             OPTIONS=$SCREEN_OPTIONS
         fi
-        
+
         echo "> Starting with screen ( screen $OPTIONS )"
-        
+
         screen $OPTIONS $1 "$RUN_ENGINE_PATH/starter" $2 $3 "$4" "$5" "$6" $7
     else
         $RUN_ENGINE_PATH/starter $2 $3 "$4" "$5" "$6" $7
@@ -61,7 +61,7 @@ function starter() {
     cd $BINPATH
 
     mkdir -p "$LOGS_PATH"
-    
+
     configureFiles
 
     run "$SCREEN_NAME" "$SERVERBIN" "$GDB" "$CONFIG" "$SYSLOG" "$SYSERR" "$GDB_ENABLED"
@@ -72,7 +72,7 @@ function restarter() {
     cd $BINPATH
 
     mkdir -p "$LOGS_PATH"
-    
+
     configureFiles
 
     if [ ! -f $TRACE_FILE ]; then

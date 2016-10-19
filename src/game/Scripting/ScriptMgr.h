@@ -716,6 +716,17 @@ class PlayerScript : public ScriptObject
         // Called when a duel ends
         virtual void OnDuelEnd(Player* /*winner*/, Player* /*loser*/, DuelCompleteType /*type*/) { }
 
+        // The following methods are called when a player sends a chat message.
+        virtual void OnChat(Player* /*player*/, uint32 /*type*/, uint32 /*lang*/, std::string& /*msg*/) { }
+
+        virtual void OnChat(Player* /*player*/, uint32 /*type*/, uint32 /*lang*/, std::string& /*msg*/, Player* /*receiver*/) { }
+
+        virtual void OnChat(Player* /*player*/, uint32 /*type*/, uint32 /*lang*/, std::string& /*msg*/, Group* /*group*/) { }
+
+        virtual void OnChat(Player* /*player*/, uint32 /*type*/, uint32 /*lang*/, std::string& /*msg*/, Guild* /*guild*/) { }
+
+        virtual void OnChat(Player* /*player*/, uint32 /*type*/, uint32 /*lang*/, std::string& /*msg*/, Channel* /*channel*/) { }
+
         // Both of the below are called on emote opcodes.
         virtual void OnEmote(Player* /*player*/, uint32 /*emote*/) { }
 
@@ -771,6 +782,9 @@ class PlayerScript : public ScriptObject
 
         // Called when a player selects an option in a player gossip window
         virtual void OnGossipSelectCode(Player* /*player*/, uint32 /*menu_id*/, uint32 /*sender*/, uint32 /*action*/, const char* /*code*/) { }
+
+        // On player getting charmed 
+        virtual void OnBeingCharmed(Player* /*player*/, Unit* /*charmer*/, uint32 /*oldFactionId*/, uint32 /*newFactionId*/) { }
 };
 
 class GuildScript : public ScriptObject
@@ -1044,6 +1058,7 @@ class ScriptMgr
         void OnPlayerBindToInstance(Player* player, Difficulty difficulty, uint32 mapid, bool permanent);
         void OnPlayerUpdateZone(Player* player, uint32 newZone, uint32 newArea);
         void OnPlayerUpdateFaction(Player* player);
+        void OnPlayerAddToBattleground(Player* player, Battleground* bg);
         void OnPlayerRemoveFromBattleground(Player* player, Battleground* bg);
         void OnAchievementComplete(Player *player, AchievementEntry const* achievement);
         void OnCriteriaProgress(Player *player, AchievementCriteriaEntry const* criteria);
@@ -1051,7 +1066,7 @@ class ScriptMgr
         void OnCriteriaSave(SQLTransaction& trans, Player* player, uint16 critId, CriteriaProgress criteriaData);
         void OnGossipSelect(Player* player, uint32 menu_id, uint32 sender, uint32 action);
         void OnGossipSelectCode(Player* player, uint32 menu_id, uint32 sender, uint32 action, const char* code);
-        void OnPlayerAddToBattleground(Player* player, Battleground* bg);
+        void OnPlayerBeingCharmed(Player* player, Unit* charmer, uint32 oldFactionId, uint32 newFactionId);
 
     public: /* GuildScript */
 

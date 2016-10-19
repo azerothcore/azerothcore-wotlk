@@ -13,6 +13,7 @@ set(scripts_STAT_SRCS
   ${AC_SCRIPTS_DIR}/World/achievement_scripts.cpp
   ${AC_SCRIPTS_DIR}/World/areatrigger_scripts.cpp
   ${AC_SCRIPTS_DIR}/World/boss_emerald_dragons.cpp
+  ${AC_SCRIPTS_DIR}/World/chat_log.cpp
   ${AC_SCRIPTS_DIR}/World/go_scripts.cpp
   ${AC_SCRIPTS_DIR}/World/guards.cpp
   ${AC_SCRIPTS_DIR}/World/item_scripts.cpp

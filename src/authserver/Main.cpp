@@ -242,21 +242,21 @@ extern int main(int argc, char** argv)
                 CPU_SET(i, &mask);
 
         if (sched_setaffinity(0, sizeof(mask), &mask))
-            sLog->outError("server.authserver", "Can't set used processors (hex): %x, error: %s", affinity, strerror(errno));
+            sLog->outError("Can't set used processors (hex): %x, error: %s", affinity, strerror(errno));
         else
         {
             CPU_ZERO(&mask);
             sched_getaffinity(0, sizeof(mask), &mask);
-            sLog->outString("server.authserver", "Using processors (bitmask, hex): %lx", *(__cpu_mask*)(&mask));
+            sLog->outString("Using processors (bitmask, hex): %lx", *(__cpu_mask*)(&mask));
         }
     }
 
     if (highPriority)
     {
         if (setpriority(PRIO_PROCESS, 0, PROCESS_HIGH_PRIORITY))
-            sLog->outError("server.authserver", "Can't set authserver process priority class, error: %s", strerror(errno));
+            sLog->outError("Can't set authserver process priority class, error: %s", strerror(errno));
         else
-            sLog->outString("server.authserver", "authserver process priority class set to %i", getpriority(PRIO_PROCESS, 0));
+            sLog->outString("authserver process priority class set to %i", getpriority(PRIO_PROCESS, 0));
     }
     
 #endif
