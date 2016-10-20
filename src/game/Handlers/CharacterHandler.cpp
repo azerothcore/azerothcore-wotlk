@@ -1137,7 +1137,7 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder* holder)
     // Load pet if any (if player not alive and in taxi flight or another then pet will remember as temporary unsummoned)
     pCurrChar->LoadPet();
 
-    sScriptMgr->OnPlayerLogin(pCurrChar);
+    sScriptMgr->OnPlayerLogin(pCurrChar, firstLogin);
     delete holder;
 }
 
