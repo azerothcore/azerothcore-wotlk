@@ -1072,7 +1072,8 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder* holder)
         SendNotification(LANG_RESET_TALENTS);
     }
 
-    if (pCurrChar->HasAtLoginFlag(AT_LOGIN_FIRST))
+    bool firstLogin = pCurrChar->HasAtLoginFlag(AT_LOGIN_FIRST);
+    if (firstLogin)
         pCurrChar->RemoveAtLoginFlag(AT_LOGIN_FIRST);
 
     if (pCurrChar->HasAtLoginFlag(AT_LOGIN_CHECK_ACHIEVS))
