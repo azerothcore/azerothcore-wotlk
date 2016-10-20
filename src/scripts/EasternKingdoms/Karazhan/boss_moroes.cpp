@@ -219,7 +219,7 @@ class boss_moroes : public CreatureScript
                         Talk(SAY_SPECIAL);
                         events.SetPhase(0);
                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
-				target->CastSpell(target, SPELL_GARROTE, true);
+						target->CastSpell(target, SPELL_GARROTE, true);
                         me->CastSpell(me, SPELL_VANISH_TELEPORT, false);
                         break;
                 }
