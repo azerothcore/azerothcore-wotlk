@@ -1,5 +1,29 @@
+#
+# AzerothCore
+#
+
+conf/*
+!conf/*.dist
+modules/*
+
+#
+# Allow modules to control git ignoring
+#
+!modules/*
+modules/*/*
+!modules/*/.gitignore
+!modules/uwd/*
+modules/uwd/joiner
+!modules/hw-core/*
+!modules/acore/*
+!modules/worldengine/*
 
 build*/
+
+#
+#Generic
+#
+
 .directory
 .mailmap
 *.orig
@@ -16,3 +40,32 @@ CMakeLists.txt.user
 *.BACKUP.*
 *.BASE.*
 *.LOCAL.*
+
+#
+# IDE & other softwares
+#
+/.settings/
+/.externalToolBuilders/*
+# exclude in all levels
+nbproject/
+.sync.ffs_db
+*.kate-swp
+.browse.VC*
+.vscode
+
+#
+# Eclipse
+#
+*.pydevproject
+.metadata
+.gradle
+tmp/
+*.tmp
+*.swp
+*~.nib
+local.properties
+.settings/
+.loadpath
+.project
+.cproject
+
