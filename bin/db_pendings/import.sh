@@ -12,7 +12,7 @@ function import() {
     pendingPath="$AC_PATH_ROOT/data/sql/updates/pending_$folder"
     updPath="$UPDATES_PATH/$folder"
 
-    latestUpd=`ls $updPath/ -1 | tail -n 1`
+    latestUpd=`ls -1 $updPath/ | tail -n 1`
 
     if [ -z $latestUpd ]; then
         echo "FIRST UPDATE FILE MISSING!! DID YOU ARCHIVED IT?";
