@@ -3,7 +3,7 @@
 #ifdef PRESETS
 void Transmogrification::PresetTransmog(Player* player, Item* itemTransmogrified, uint32 fakeEntry, uint8 slot)
 {
-    sLog->outDebug(LOG_FILTER_TRANSMOG, "Transmogrification::PresetTransmog");
+    sLog->outDebug(LOG_FILTER_MODULES, "Transmogrification::PresetTransmog");
 
     if (!EnableSets)
         return;
@@ -30,7 +30,7 @@ void Transmogrification::PresetTransmog(Player* player, Item* itemTransmogrified
 
 void Transmogrification::LoadPlayerSets(uint64 pGUID)
 {
-    sLog->outDebug(LOG_FILTER_TRANSMOG, "Transmogrification::LoadPlayerSets");
+    sLog->outDebug(LOG_FILTER_MODULES, "Transmogrification::LoadPlayerSets");
 
     for (presetData::iterator it = presetById[pGUID].begin(); it != presetById[pGUID].end(); ++it)
         it->second.clear();
@@ -110,7 +110,7 @@ void Transmogrification::UnloadPlayerSets(uint64 pGUID)
 
 const char* Transmogrification::GetSlotName(uint8 slot, WorldSession* /*session*/) const
 {
-    sLog->outDebug(LOG_FILTER_TRANSMOG, "Transmogrification::GetSlotName");
+    sLog->outDebug(LOG_FILTER_MODULES, "Transmogrification::GetSlotName");
 
     switch (slot)
     {
@@ -134,7 +134,7 @@ const char* Transmogrification::GetSlotName(uint8 slot, WorldSession* /*session*
 
 std::string Transmogrification::GetItemIcon(uint32 entry, uint32 width, uint32 height, int x, int y) const
 {
-    sLog->outDebug(LOG_FILTER_TRANSMOG, "Transmogrification::GetItemIcon");
+    sLog->outDebug(LOG_FILTER_MODULES, "Transmogrification::GetItemIcon");
 
     std::ostringstream ss;
     ss << "|TInterface";
@@ -154,7 +154,7 @@ std::string Transmogrification::GetItemIcon(uint32 entry, uint32 width, uint32 h
 
 std::string Transmogrification::GetSlotIcon(uint8 slot, uint32 width, uint32 height, int x, int y) const
 {
-    sLog->outDebug(LOG_FILTER_TRANSMOG, "Transmogrification::GetSlotIcon");
+    sLog->outDebug(LOG_FILTER_MODULES, "Transmogrification::GetSlotIcon");
 
     std::ostringstream ss;
     ss << "|TInterface/PaperDoll/";
@@ -182,7 +182,7 @@ std::string Transmogrification::GetSlotIcon(uint8 slot, uint32 width, uint32 hei
 
 std::string Transmogrification::GetItemLink(Item* item, WorldSession* session) const
 {
-    sLog->outDebug(LOG_FILTER_TRANSMOG, "Transmogrification::GetItemLink");
+    sLog->outDebug(LOG_FILTER_MODULES, "Transmogrification::GetItemLink");
 
     int loc_idx = session->GetSessionDbLocaleIndex();
     const ItemTemplate* temp = item->GetTemplate();
@@ -232,7 +232,7 @@ std::string Transmogrification::GetItemLink(Item* item, WorldSession* session) c
 
 std::string Transmogrification::GetItemLink(uint32 entry, WorldSession* session) const
 {
-    sLog->outDebug(LOG_FILTER_TRANSMOG, "Transmogrification::GetItemLink");
+    sLog->outDebug(LOG_FILTER_MODULES, "Transmogrification::GetItemLink");
 
     const ItemTemplate* temp = sObjectMgr->GetItemTemplate(entry);
     int loc_idx = session->GetSessionDbLocaleIndex();
@@ -249,7 +249,7 @@ std::string Transmogrification::GetItemLink(uint32 entry, WorldSession* session)
 
 uint32 Transmogrification::GetFakeEntry(uint64 itemGUID) const
 {
-    sLog->outDebug(LOG_FILTER_TRANSMOG, "Transmogrification::GetFakeEntry");
+    sLog->outDebug(LOG_FILTER_MODULES, "Transmogrification::GetFakeEntry");
 
     transmogData::const_iterator itr = dataMap.find(itemGUID);
     if (itr == dataMap.end()) return 0;
@@ -262,7 +262,7 @@ uint32 Transmogrification::GetFakeEntry(uint64 itemGUID) const
 
 void Transmogrification::UpdateItem(Player* player, Item* item) const
 {
-    sLog->outDebug(LOG_FILTER_TRANSMOG, "Transmogrification::UpdateItem");
+    sLog->outDebug(LOG_FILTER_MODULES, "Transmogrification::UpdateItem");
 
     if (item->IsEquipped())
     {
@@ -349,7 +349,7 @@ TransmogTrinityStrings Transmogrification::Transmogrify(Player* player, uint64 i
             if (cost) // 0 cost if reverting look
             {
                 if (cost < 0)
-                    sLog->outDebug(LOG_FILTER_TRANSMOG,  "Transmogrification::Transmogrify - %s (%u) transmogrification invalid cost (non negative, amount %i). Transmogrified %u with %u", player->GetName().c_str(), player->GetGUIDLow(), -cost, itemTransmogrified->GetEntry(), itemTransmogrifier->GetEntry());
+                    sLog->outDebug(LOG_FILTER_MODULES,  "Transmogrification::Transmogrify - %s (%u) transmogrification invalid cost (non negative, amount %i). Transmogrified %u with %u", player->GetName().c_str(), player->GetGUIDLow(), -cost, itemTransmogrified->GetEntry(), itemTransmogrifier->GetEntry());
                 else
                 {
                     if (!player->HasEnoughMoney(cost))
