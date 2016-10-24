@@ -17,11 +17,12 @@ struct QEmote
 
 struct GossipTextOption
 {
-    std::string Text_0;
-    std::string Text_1;
-    uint32 Language;
-    float Probability;
-    QEmote Emotes[MAX_GOSSIP_TEXT_EMOTES];
+	std::string Text_0;
+	std::string Text_1;
+	uint32 BroadcastTextID;
+	uint32 Language;
+	float Probability;
+	QEmote Emotes[MAX_GOSSIP_TEXT_EMOTES];
 };
 
 #define MAX_GOSSIP_TEXT_OPTIONS 8

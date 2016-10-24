@@ -5326,98 +5326,119 @@ GossipText const* ObjectMgr::GetGossipText(uint32 Text_ID) const
 
 void ObjectMgr::LoadGossipText()
 {
-    uint32 oldMSTime = getMSTime();
+	uint32 oldMSTime = getMSTime();
 
-    QueryResult result = WorldDatabase.Query("SELECT * FROM npc_text");
+	QueryResult result = WorldDatabase.Query("SELECT ID, "
+		"text0_0, text0_1, BroadcastTextID0, lang0, prob0, em0_0, em0_1, em0_2, em0_3, em0_4, em0_5, "
+		"text1_0, text1_1, BroadcastTextID1, lang1, prob1, em1_0, em1_1, em1_2, em1_3, em1_4, em1_5, "
+		"text2_0, text2_1, BroadcastTextID2, lang2, prob2, em2_0, em2_1, em2_2, em2_3, em2_4, em2_5, "
+		"text3_0, text3_1, BroadcastTextID3, lang3, prob3, em3_0, em3_1, em3_2, em3_3, em3_4, em3_5, "
+		"text4_0, text4_1, BroadcastTextID4, lang4, prob4, em4_0, em4_1, em4_2, em4_3, em4_4, em4_5, "
+		"text5_0, text5_1, BroadcastTextID5, lang5, prob5, em5_0, em5_1, em5_2, em5_3, em5_4, em5_5, "
+		"text6_0, text6_1, BroadcastTextID6, lang6, prob6, em6_0, em6_1, em6_2, em6_3, em6_4, em6_5, "
+		"text7_0, text7_1, BroadcastTextID7, lang7, prob7, em7_0, em7_1, em7_2, em7_3, em7_4, em7_5 "
+		"FROM npc_text");
 
-    int count = 0;
-    if (!result)
-    {
-        sLog->outString(">> Loaded %u npc texts", count);
-        sLog->outString();
-        return;
-    }
-    _gossipTextStore.rehash(result->GetRowCount());
 
-    int cic;
+	if (!result)
+	{
+		sLog->outString(">> Loaded 0 npc texts, table is empty!");
+		return;
+	}
 
-    do
-    {
-        ++count;
-        cic = 0;
+	_gossipTextStore.rehash(result->GetRowCount());
 
-        Field* fields = result->Fetch();
+	uint32 count = 0;
+	uint8 cic;
 
-        uint32 Text_ID    = fields[cic++].GetUInt32();
-        if (!Text_ID)
-        {
-            sLog->outErrorDb("Table `npc_text` has record wit reserved id 0, ignore.");
-            continue;
-        }
+	do
+	{
+		++count;
+		cic = 0;
 
-        GossipText& gText = _gossipTextStore[Text_ID];
+		Field* fields = result->Fetch();
 
-        for (int i = 0; i < MAX_GOSSIP_TEXT_OPTIONS; i++)
-        {
-            gText.Options[i].Text_0           = fields[cic++].GetString();
-            gText.Options[i].Text_1           = fields[cic++].GetString();
+		uint32 id = fields[cic++].GetUInt32();
+		if (!id)
+		{
+			sLog->outErrorDb("Table `npc_text` has record with reserved id 0, ignore.");
+			continue;
+		}
 
-            gText.Options[i].Language         = fields[cic++].GetUInt8();
-            gText.Options[i].Probability      = fields[cic++].GetFloat();
+		GossipText& gText = _gossipTextStore[id];
 
-            for (uint8 j=0; j < MAX_GOSSIP_TEXT_EMOTES; ++j)
-            {
-                gText.Options[i].Emotes[j]._Delay  = fields[cic++].GetUInt16();
-                gText.Options[i].Emotes[j]._Emote  = fields[cic++].GetUInt16();
-            }
-        }
-    } while (result->NextRow());
+		for (uint8 i = 0; i < MAX_GOSSIP_TEXT_OPTIONS; ++i)
+		{
+			gText.Options[i].Text_0 = fields[cic++].GetString();
+			gText.Options[i].Text_1 = fields[cic++].GetString();
+			gText.Options[i].BroadcastTextID = fields[cic++].GetUInt32();
+			gText.Options[i].Language = fields[cic++].GetUInt8();
+			gText.Options[i].Probability = fields[cic++].GetFloat();
 
-    sLog->outString(">> Loaded %u npc texts in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    sLog->outString();
+			for (uint8 j = 0; j < MAX_GOSSIP_TEXT_EMOTES; ++j)
+			{
+				gText.Options[i].Emotes[j]._Delay = fields[cic++].GetUInt16();
+				gText.Options[i].Emotes[j]._Emote = fields[cic++].GetUInt16();
+			}
+		}
+
+		for (uint8 i = 0; i < MAX_GOSSIP_TEXT_OPTIONS; i++)
+		{
+			if (gText.Options[i].BroadcastTextID)
+			{
+				if (!sObjectMgr->GetBroadcastText(gText.Options[i].BroadcastTextID))
+				{
+					sLog->outErrorDb("GossipText (Id: %u) in table `npc_text` has non-existing or incompatible BroadcastTextID%u %u.", id, i, gText.Options[i].BroadcastTextID);
+					gText.Options[i].BroadcastTextID = 0;
+				}
+			}
+		}
+
+	} while (result->NextRow());
+
+	sLog->outString(">> Loaded %u npc texts in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 void ObjectMgr::LoadNpcTextLocales()
 {
-    uint32 oldMSTime = getMSTime();
+	uint32 oldMSTime = getMSTime();
 
-    _npcTextLocaleStore.clear();                              // need for reload case
+	_npcTextLocaleStore.clear();                              // need for reload case
 
-    QueryResult result = WorldDatabase.Query("SELECT ID, "
-        "Text0_0_loc1, Text0_1_loc1, Text1_0_loc1, Text1_1_loc1, Text2_0_loc1, Text2_1_loc1, Text3_0_loc1, Text3_1_loc1, Text4_0_loc1, Text4_1_loc1, Text5_0_loc1, Text5_1_loc1, Text6_0_loc1, Text6_1_loc1, Text7_0_loc1, Text7_1_loc1, "
-        "Text0_0_loc2, Text0_1_loc2, Text1_0_loc2, Text1_1_loc2, Text2_0_loc2, Text2_1_loc2, Text3_0_loc2, Text3_1_loc1, Text4_0_loc2, Text4_1_loc2, Text5_0_loc2, Text5_1_loc2, Text6_0_loc2, Text6_1_loc2, Text7_0_loc2, Text7_1_loc2, "
-        "Text0_0_loc3, Text0_1_loc3, Text1_0_loc3, Text1_1_loc3, Text2_0_loc3, Text2_1_loc3, Text3_0_loc3, Text3_1_loc1, Text4_0_loc3, Text4_1_loc3, Text5_0_loc3, Text5_1_loc3, Text6_0_loc3, Text6_1_loc3, Text7_0_loc3, Text7_1_loc3, "
-        "Text0_0_loc4, Text0_1_loc4, Text1_0_loc4, Text1_1_loc4, Text2_0_loc4, Text2_1_loc4, Text3_0_loc4, Text3_1_loc1, Text4_0_loc4, Text4_1_loc4, Text5_0_loc4, Text5_1_loc4, Text6_0_loc4, Text6_1_loc4, Text7_0_loc4, Text7_1_loc4, "
-        "Text0_0_loc5, Text0_1_loc5, Text1_0_loc5, Text1_1_loc5, Text2_0_loc5, Text2_1_loc5, Text3_0_loc5, Text3_1_loc1, Text4_0_loc5, Text4_1_loc5, Text5_0_loc5, Text5_1_loc5, Text6_0_loc5, Text6_1_loc5, Text7_0_loc5, Text7_1_loc5, "
-        "Text0_0_loc6, Text0_1_loc6, Text1_0_loc6, Text1_1_loc6, Text2_0_loc6, Text2_1_loc6, Text3_0_loc6, Text3_1_loc1, Text4_0_loc6, Text4_1_loc6, Text5_0_loc6, Text5_1_loc6, Text6_0_loc6, Text6_1_loc6, Text7_0_loc6, Text7_1_loc6, "
-        "Text0_0_loc7, Text0_1_loc7, Text1_0_loc7, Text1_1_loc7, Text2_0_loc7, Text2_1_loc7, Text3_0_loc7, Text3_1_loc1, Text4_0_loc7, Text4_1_loc7, Text5_0_loc7, Text5_1_loc7, Text6_0_loc7, Text6_1_loc7, Text7_0_loc7, Text7_1_loc7, "
-        "Text0_0_loc8, Text0_1_loc8, Text1_0_loc8, Text1_1_loc8, Text2_0_loc8, Text2_1_loc8, Text3_0_loc8, Text3_1_loc1, Text4_0_loc8, Text4_1_loc8, Text5_0_loc8, Text5_1_loc8, Text6_0_loc8, Text6_1_loc8, Text7_0_loc8, Text7_1_loc8 "
-        " FROM locales_npc_text");
+	QueryResult result = WorldDatabase.Query("SELECT ID, "
+		"Text0_0_loc1, Text0_1_loc1, Text1_0_loc1, Text1_1_loc1, Text2_0_loc1, Text2_1_loc1, Text3_0_loc1, Text3_1_loc1, Text4_0_loc1, Text4_1_loc1, Text5_0_loc1, Text5_1_loc1, Text6_0_loc1, Text6_1_loc1, Text7_0_loc1, Text7_1_loc1, "
+		"Text0_0_loc2, Text0_1_loc2, Text1_0_loc2, Text1_1_loc2, Text2_0_loc2, Text2_1_loc2, Text3_0_loc2, Text3_1_loc1, Text4_0_loc2, Text4_1_loc2, Text5_0_loc2, Text5_1_loc2, Text6_0_loc2, Text6_1_loc2, Text7_0_loc2, Text7_1_loc2, "
+		"Text0_0_loc3, Text0_1_loc3, Text1_0_loc3, Text1_1_loc3, Text2_0_loc3, Text2_1_loc3, Text3_0_loc3, Text3_1_loc1, Text4_0_loc3, Text4_1_loc3, Text5_0_loc3, Text5_1_loc3, Text6_0_loc3, Text6_1_loc3, Text7_0_loc3, Text7_1_loc3, "
+		"Text0_0_loc4, Text0_1_loc4, Text1_0_loc4, Text1_1_loc4, Text2_0_loc4, Text2_1_loc4, Text3_0_loc4, Text3_1_loc1, Text4_0_loc4, Text4_1_loc4, Text5_0_loc4, Text5_1_loc4, Text6_0_loc4, Text6_1_loc4, Text7_0_loc4, Text7_1_loc4, "
+		"Text0_0_loc5, Text0_1_loc5, Text1_0_loc5, Text1_1_loc5, Text2_0_loc5, Text2_1_loc5, Text3_0_loc5, Text3_1_loc1, Text4_0_loc5, Text4_1_loc5, Text5_0_loc5, Text5_1_loc5, Text6_0_loc5, Text6_1_loc5, Text7_0_loc5, Text7_1_loc5, "
+		"Text0_0_loc6, Text0_1_loc6, Text1_0_loc6, Text1_1_loc6, Text2_0_loc6, Text2_1_loc6, Text3_0_loc6, Text3_1_loc1, Text4_0_loc6, Text4_1_loc6, Text5_0_loc6, Text5_1_loc6, Text6_0_loc6, Text6_1_loc6, Text7_0_loc6, Text7_1_loc6, "
+		"Text0_0_loc7, Text0_1_loc7, Text1_0_loc7, Text1_1_loc7, Text2_0_loc7, Text2_1_loc7, Text3_0_loc7, Text3_1_loc1, Text4_0_loc7, Text4_1_loc7, Text5_0_loc7, Text5_1_loc7, Text6_0_loc7, Text6_1_loc7, Text7_0_loc7, Text7_1_loc7, "
+		"Text0_0_loc8, Text0_1_loc8, Text1_0_loc8, Text1_1_loc8, Text2_0_loc8, Text2_1_loc8, Text3_0_loc8, Text3_1_loc1, Text4_0_loc8, Text4_1_loc8, Text5_0_loc8, Text5_1_loc8, Text6_0_loc8, Text6_1_loc8, Text7_0_loc8, Text7_1_loc8 "
+		" FROM locales_npc_text");
 
-    if (!result)
-        return;
+	if (!result)
+		return;
 
-    do
-    {
-        Field* fields = result->Fetch();
+	do
+	{
+		Field* fields = result->Fetch();
 
-        uint32 entry = fields[0].GetUInt32();
+		uint32 entry = fields[0].GetUInt32();
 
-        NpcTextLocale& data = _npcTextLocaleStore[entry];
+		NpcTextLocale& data = _npcTextLocaleStore[entry];
 
-        for (uint8 i = 1; i < TOTAL_LOCALES; ++i)
-        {
-            LocaleConstant locale = (LocaleConstant) i;
-            for (uint8 j = 0; j < MAX_LOCALES; ++j)
-            {
-                AddLocaleString(fields[1 + 8 * 2 * (i - 1) + 2 * j].GetString(), locale, data.Text_0[j]);
-                AddLocaleString(fields[1 + 8 * 2 * (i - 1) + 2 * j + 1].GetString(), locale, data.Text_1[j]);
-            }
-        }
-    } while (result->NextRow());
+		for (uint8 i = 1; i < TOTAL_LOCALES; ++i)
+		{
+			LocaleConstant locale = (LocaleConstant)i;
+			for (uint8 j = 0; j < MAX_LOCALES; ++j)
+			{
+				AddLocaleString(fields[1 + 8 * 2 * (i - 1) + 2 * j].GetString(), locale, data.Text_0[j]);
+				AddLocaleString(fields[1 + 8 * 2 * (i - 1) + 2 * j + 1].GetString(), locale, data.Text_1[j]);
+			}
+		}
+	} while (result->NextRow());
 
-    sLog->outString(">> Loaded %lu NpcText locale strings in %u ms", (unsigned long)_npcTextLocaleStore.size(), GetMSTimeDiffToNow(oldMSTime));
-    sLog->outString();
+	sLog->outString(">> Loaded %lu NpcText locale strings in %u ms", (unsigned long)_npcTextLocaleStore.size(), GetMSTimeDiffToNow(oldMSTime));
 }
 
 void ObjectMgr::ReturnOrDeleteOldMails(bool serverUp)
@@ -8429,66 +8450,81 @@ void ObjectMgr::LoadGossipMenu()
 
 void ObjectMgr::LoadGossipMenuItems()
 {
-    uint32 oldMSTime = getMSTime();
+	uint32 oldMSTime = getMSTime();
 
-    _gossipMenuItemsStore.clear();
+	_gossipMenuItemsStore.clear();
 
-    QueryResult result = WorldDatabase.Query(
-        //          0              1            2           3              4
-        "SELECT menu_id, id, option_icon, option_text, option_id, npc_option_npcflag, "
-        //       5              6           7          8         9
-        "action_menu_id, action_poi_id, box_coded, box_money, box_text "
-        "FROM gossip_menu_option ORDER BY menu_id, id");
+	QueryResult result = WorldDatabase.Query(
+		//      0        1   2            3            4                      5          6                   7               8              9          10         11        12
+		"SELECT menu_id, id, option_icon, option_text, OptionBroadcastTextID, option_id, npc_option_npcflag, action_menu_id, action_poi_id, box_coded, box_money, box_text, BoxBroadcastTextID "
+		"FROM gossip_menu_option ORDER BY menu_id, id");
 
-    if (!result)
-    {
-        sLog->outErrorDb(">> Loaded 0 gossip_menu_option entries. DB table `gossip_menu_option` is empty!");
-        sLog->outString();
-        return;
-    }
+	if (!result)
+	{
+		sLog->outString(">> Loaded 0 gossip_menu_option entries. DB table `gossip_menu_option` is empty!");
+		return;
+	}
 
-    uint32 count = 0;
+	uint32 count = 0;
 
-    do
-    {
-        Field* fields = result->Fetch();
+	do
+	{
+		Field* fields = result->Fetch();
 
-        GossipMenuItems gMenuItem;
+		GossipMenuItems gMenuItem;
 
-        gMenuItem.MenuId                = fields[0].GetUInt16();
-        gMenuItem.OptionIndex           = fields[1].GetUInt16();
-        gMenuItem.OptionIcon            = fields[2].GetUInt32();
-        gMenuItem.OptionText            = fields[3].GetString();
-        gMenuItem.OptionType            = fields[4].GetUInt8();
-        gMenuItem.OptionNpcflag         = fields[5].GetUInt32();
-        gMenuItem.ActionMenuId          = fields[6].GetUInt32();
-        gMenuItem.ActionPoiId           = fields[7].GetUInt32();
-        gMenuItem.BoxCoded              = fields[8].GetBool();
-        gMenuItem.BoxMoney              = fields[9].GetUInt32();
-        gMenuItem.BoxText               = fields[10].GetString();
+		gMenuItem.MenuId = fields[0].GetUInt16();
+		gMenuItem.OptionIndex = fields[1].GetUInt16();
+		gMenuItem.OptionIcon = fields[2].GetUInt32();
+		gMenuItem.OptionText = fields[3].GetString();
+		gMenuItem.OptionBroadcastTextId = fields[4].GetUInt32();
+		gMenuItem.OptionType = fields[5].GetUInt8();
+		gMenuItem.OptionNpcflag = fields[6].GetUInt32();
+		gMenuItem.ActionMenuId = fields[7].GetUInt32();
+		gMenuItem.ActionPoiId = fields[8].GetUInt32();
+		gMenuItem.BoxCoded = fields[9].GetBool();
+		gMenuItem.BoxMoney = fields[10].GetUInt32();
+		gMenuItem.BoxText = fields[11].GetString();
+		gMenuItem.BoxBroadcastTextId = fields[12].GetUInt32();
 
-        if (gMenuItem.OptionIcon >= GOSSIP_ICON_MAX)
-        {
-            sLog->outErrorDb("Table gossip_menu_option for menu %u, id %u has unknown icon id %u. Replacing with GOSSIP_ICON_CHAT", gMenuItem.MenuId, gMenuItem.OptionIndex, gMenuItem.OptionIcon);
-            gMenuItem.OptionIcon = GOSSIP_ICON_CHAT;
-        }
+		if (gMenuItem.OptionIcon >= GOSSIP_ICON_MAX)
+		{
+			sLog->outString("Table `gossip_menu_option` for menu %u, id %u has unknown icon id %u. Replacing with GOSSIP_ICON_CHAT", gMenuItem.MenuId, gMenuItem.OptionIndex, gMenuItem.OptionIcon);
+			gMenuItem.OptionIcon = GOSSIP_ICON_CHAT;
+		}
 
-        if (gMenuItem.OptionType >= GOSSIP_OPTION_MAX)
-            sLog->outErrorDb("Table gossip_menu_option for menu %u, id %u has unknown option id %u. Option will not be used", gMenuItem.MenuId, gMenuItem.OptionIndex, gMenuItem.OptionType);
+		if (gMenuItem.OptionBroadcastTextId)
+		{
+			if (!GetBroadcastText(gMenuItem.OptionBroadcastTextId))
+			{
+				sLog->outString("Table `gossip_menu_option` for menu %u, id %u has non-existing or incompatible OptionBroadcastTextId %u, ignoring.", gMenuItem.MenuId, gMenuItem.OptionIndex, gMenuItem.OptionBroadcastTextId);
+				gMenuItem.OptionBroadcastTextId = 0;
+			}
+		}
 
-        if (gMenuItem.ActionPoiId && !GetPointOfInterest(gMenuItem.ActionPoiId))
-        {
-            sLog->outErrorDb("Table gossip_menu_option for menu %u, id %u use non-existing action_poi_id %u, ignoring", gMenuItem.MenuId, gMenuItem.OptionIndex, gMenuItem.ActionPoiId);
-            gMenuItem.ActionPoiId = 0;
-        }
+		if (gMenuItem.OptionType >= GOSSIP_OPTION_MAX)
+			sLog->outString("Table `gossip_menu_option` for menu %u, id %u has unknown option id %u. Option will not be used", gMenuItem.MenuId, gMenuItem.OptionIndex, gMenuItem.OptionType);
 
-        _gossipMenuItemsStore.insert(GossipMenuItemsContainer::value_type(gMenuItem.MenuId, gMenuItem));
-        ++count;
-    }
-    while (result->NextRow());
+		if (gMenuItem.ActionPoiId && !GetPointOfInterest(gMenuItem.ActionPoiId))
+		{
+			sLog->outString("Table `gossip_menu_option` for menu %u, id %u use non-existing action_poi_id %u, ignoring", gMenuItem.MenuId, gMenuItem.OptionIndex, gMenuItem.ActionPoiId);
+			gMenuItem.ActionPoiId = 0;
+		}
 
-    sLog->outString(">> Loaded %u gossip_menu_option entries in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    sLog->outString();
+		if (gMenuItem.BoxBroadcastTextId)
+		{
+			if (!GetBroadcastText(gMenuItem.BoxBroadcastTextId))
+			{
+				sLog->outString("Table `gossip_menu_option` for menu %u, id %u has non-existing or incompatible BoxBroadcastTextId %u, ignoring.", gMenuItem.MenuId, gMenuItem.OptionIndex, gMenuItem.BoxBroadcastTextId);
+				gMenuItem.BoxBroadcastTextId = 0;
+			}
+		}
+
+		_gossipMenuItemsStore.insert(GossipMenuItemsContainer::value_type(gMenuItem.MenuId, gMenuItem));
+		++count;
+	} while (result->NextRow());
+
+	sLog->outString(">> Loaded %u gossip_menu_option entries in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 void ObjectMgr::AddVendorItem(uint32 entry, uint32 item, int32 maxcount, uint32 incrtime, uint32 extendedCost, bool persist /*= true*/)
@@ -8701,6 +8737,140 @@ void ObjectMgr::CheckScripts(ScriptsType type, std::set<int32>& ids)
         }
     }
 }
+
+void ObjectMgr::LoadBroadcastTexts()
+{
+	uint32 oldMSTime = getMSTime();
+
+	_broadcastTextStore.clear(); // for reload case
+
+	//                                               0   1         2         3           4         5         6         7            8            9            10       11    12
+	QueryResult result = WorldDatabase.Query("SELECT ID, Language, MaleText, FemaleText, EmoteID0, EmoteID1, EmoteID2, EmoteDelay0, EmoteDelay1, EmoteDelay2, SoundId, Unk1, Unk2 FROM broadcast_text");
+	if (!result)
+	{
+		sLog->outString(">> Loaded 0 broadcast texts. DB table `broadcast_text` is empty.");
+		return;
+	}
+
+	_broadcastTextStore.rehash(result->GetRowCount());
+	uint32 count = 0;
+
+	do
+	{
+		Field* fields = result->Fetch();
+
+		BroadcastText bct;
+
+		bct.Id = fields[0].GetUInt32();
+		bct.Language = fields[1].GetUInt32();
+		bct.MaleText[DEFAULT_LOCALE] = fields[2].GetString();
+		bct.FemaleText[DEFAULT_LOCALE] = fields[3].GetString();
+		bct.EmoteId0 = fields[4].GetUInt32();
+		bct.EmoteId1 = fields[5].GetUInt32();
+		bct.EmoteId2 = fields[6].GetUInt32();
+		bct.EmoteDelay0 = fields[7].GetUInt32();
+		bct.EmoteDelay1 = fields[8].GetUInt32();
+		bct.EmoteDelay2 = fields[9].GetUInt32();
+		bct.SoundId = fields[10].GetUInt32();
+		bct.Unk1 = fields[11].GetUInt32();
+		bct.Unk2 = fields[12].GetUInt32();
+
+		if (bct.SoundId)
+		{
+			if (!sSoundEntriesStore.LookupEntry(bct.SoundId))
+			{
+				// sLog->outString("BroadcastText (Id: %u) in table `broadcast_text` has SoundId %u but sound does not exist. Skipped.", bct.Id, bct.SoundId);
+				// don't load bct of higher expansions
+				continue;
+			}
+		}
+
+		if (!GetLanguageDescByID(bct.Language))
+		{
+			// sLog->outString("BroadcastText (Id: %u) in table `broadcast_text` using Language %u but Language does not exist. Skipped.", bct.Id, bct.Language);
+			// don't load bct of higher expansions
+			continue;
+		}
+
+		if (bct.EmoteId0)
+		{
+			if (!sEmotesStore.LookupEntry(bct.EmoteId0))
+			{
+				// sLog->outString("BroadcastText (Id: %u) in table `broadcast_text` has EmoteId0 %u but emote does not exist. Skipped.", bct.Id, bct.EmoteId0);
+				// don't load bct of higher expansions
+				continue;
+			}
+		}
+
+		if (bct.EmoteId1)
+		{
+			if (!sEmotesStore.LookupEntry(bct.EmoteId1))
+			{
+				// sLog->outString("BroadcastText (Id: %u) in table `broadcast_text` has EmoteId1 %u but emote does not exist. Skipped.", bct.Id, bct.EmoteId1);
+				// don't load bct of higher expansions
+				continue;
+			}
+		}
+
+		if (bct.EmoteId2)
+		{
+			if (!sEmotesStore.LookupEntry(bct.EmoteId2))
+			{
+				// sLog->outString("BroadcastText (Id: %u) in table `broadcast_text` has EmoteId2 %u but emote does not exist. Skipped.", bct.Id, bct.EmoteId2);
+				// don't load bct of higher expansions
+				continue;
+			}
+		}
+
+		_broadcastTextStore[bct.Id] = bct;
+
+		++count;
+	} while (result->NextRow());
+
+	sLog->outString(">> Loaded %u broadcast texts in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+void ObjectMgr::LoadBroadcastTextLocales()
+{
+	uint32 oldMSTime = getMSTime();
+
+	//                                               0   1              2              3              4              5              6              7              8              9                10               11               12               13               14               15               16
+	QueryResult result = WorldDatabase.Query("SELECT Id, MaleText_loc1, MaleText_loc2, MaleText_loc3, MaleText_loc4, MaleText_loc5, MaleText_loc6, MaleText_loc7, MaleText_loc8, FemaleText_loc1, FemaleText_loc2, FemaleText_loc3, FemaleText_loc4, FemaleText_loc5, FemaleText_loc6, FemaleText_loc7, FemaleText_loc8 FROM locales_broadcast_text");
+
+	if (!result)
+	{
+		sLog->outString(">> Loaded 0 broadcast text locales. DB table `locales_broadcast_text` is empty.");
+		return;
+	}
+
+	uint32 count = 0;
+
+	do
+	{
+		Field* fields = result->Fetch();
+
+		uint32 id = fields[0].GetUInt32();
+		BroadcastTextContainer::iterator bct = _broadcastTextStore.find(id);
+		if (bct == _broadcastTextStore.end())
+		{
+			// sLog->outString("BroadcastText (Id: %u) in table `locales_broadcast_text` does not exist or is incompatible. Skipped!", id);
+			// don't load bct of higher expansions
+			continue;
+		}
+
+		for (uint8 i = 1; i < TOTAL_LOCALES; ++i)
+		{
+			LocaleConstant locale = LocaleConstant(i);
+			ObjectMgr::AddLocaleString(fields[1 + (i - 1)].GetString(), locale, bct->second.MaleText);
+			ObjectMgr::AddLocaleString(fields[9 + (i - 1)].GetString(), locale, bct->second.FemaleText);
+		}
+
+		++count;
+	} while (result->NextRow());
+
+	sLog->outString(">> Loaded %u broadcast text locales in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
 
 void ObjectMgr::LoadDbScriptStrings()
 {
