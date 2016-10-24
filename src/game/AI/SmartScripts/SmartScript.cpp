@@ -27,26 +27,26 @@
 #include "SpellMgr.h"
 #include "Vehicle.h"
 
-class TrinityStringTextBuilder
+class BroadcastTextBuilder
 {
-    public:
-        TrinityStringTextBuilder(WorldObject* obj, ChatMsg msgtype, int32 id, uint32 language, WorldObject* target)
-            : _source(obj), _msgType(msgtype), _textId(id), _language(language), _target(target)
-        {
-        }
+public:
+	BroadcastTextBuilder(WorldObject const* obj, ChatMsg msgtype, uint32 id, WorldObject const* target, uint32 gender = GENDER_MALE)
+		: _source(obj), _msgType(msgtype), _textId(id), _target(target), _gender(gender) { }
 
-        size_t operator()(WorldPacket* data, LocaleConstant locale) const
-        {
-            std::string text = sObjectMgr->GetTrinityString(_textId, locale);
-            return ChatHandler::BuildChatPacket(*data, _msgType, Language(_language), _source, _target, text, 0, "", locale);
-        }
+	size_t operator()(WorldPacket* data, LocaleConstant locale) const
+	{
+		BroadcastText const* bct = sObjectMgr->GetBroadcastText(_textId);
 
-        WorldObject* _source;
-        ChatMsg _msgType;
-        int32 _textId;
-        uint32 _language;
-        WorldObject* _target;
+		return ChatHandler::BuildChatPacket(*data, _msgType, bct ? Language(bct->Language) : LANG_UNIVERSAL, _source, _target, bct ? bct->GetText(locale, _gender) : "", 0, "", locale);
+	}
+
+	WorldObject const* _source;
+	ChatMsg _msgType;
+	uint32 _textId;
+	WorldObject const* _target;
+	uint32 _gender;
 };
+
 
 SmartScript::SmartScript()
 {
@@ -789,21 +789,20 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             delete targets;
             break;
         }
-        case SMART_ACTION_FLEE_FOR_ASSIST:
-        {
-            // Xinef: do not allow to flee without control (stun, fear etc)
-            if (!me || me->HasUnitState(UNIT_STATE_LOST_CONTROL) || me->GetSpeed(MOVE_RUN) < 0.1f)
-                break;
+		case SMART_ACTION_FLEE_FOR_ASSIST:
+		{
+			if (!me)
+				break;
 
-            me->DoFleeToGetAssistance();
-            if (e.action.flee.withEmote)
-            {
-                TrinityStringTextBuilder builder(me, CHAT_MSG_MONSTER_EMOTE, LANG_FLEE, LANG_UNIVERSAL, NULL);
-                sCreatureTextMgr->SendChatPacket(me, builder, CHAT_MSG_MONSTER_EMOTE);
-            }
-            ;//sLog->outDebug(LOG_FILTER_DATABASE_AI, "SmartScript::ProcessAction:: SMART_ACTION_FLEE_FOR_ASSIST: Creature %u DoFleeToGetAssistance", me->GetGUIDLow());
-            break;
-        }
+			me->DoFleeToGetAssistance();
+			if (e.action.flee.withEmote)
+			{
+				BroadcastTextBuilder builder(me, CHAT_MSG_MONSTER_EMOTE, BROADCAST_TEXT_FLEE_FOR_ASSIST, NULL, me->getGender());
+				sCreatureTextMgr->SendChatPacket(me, builder, CHAT_MSG_MONSTER_EMOTE);
+			}
+			// TC_LOG_DEBUG("scripts.ai", "SmartScript::ProcessAction:: SMART_ACTION_FLEE_FOR_ASSIST: Creature %u DoFleeToGetAssistance", me->GetGUIDLow());
+			break;
+		}
         case SMART_ACTION_COMBAT_STOP:
         {
             if (!me)
@@ -1063,26 +1062,20 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             delete targets;
             break;
         }
-        case SMART_ACTION_CALL_FOR_HELP:
-        {
-            ObjectList* targets = GetTargets(e, unit);
-            if (!targets)
-                break;
-
-            for (ObjectList::const_iterator itr = targets->begin(); itr != targets->end(); ++itr)
-                if (IsCreature(*itr))
-                {
-                    (*itr)->ToCreature()->CallForHelp((float)e.action.callHelp.range);
-                    if (e.action.callHelp.withEmote)
-                    {
-                        TrinityStringTextBuilder builder(*itr, CHAT_MSG_MONSTER_EMOTE, LANG_CALL_FOR_HELP, LANG_UNIVERSAL, NULL);
-                        sCreatureTextMgr->SendChatPacket(*itr, builder, CHAT_MSG_MONSTER_EMOTE);
-                    }
-                }
-
-            delete targets;
-            break;
-        }
+		case SMART_ACTION_CALL_FOR_HELP:
+		{
+			if (me)
+			{
+				me->CallForHelp((float)e.action.callHelp.range);
+				if (e.action.callHelp.withEmote)
+				{
+					BroadcastTextBuilder builder(me, CHAT_MSG_MONSTER_EMOTE, BROADCAST_TEXT_CALL_FOR_HELP, NULL, me->getGender());
+					sCreatureTextMgr->SendChatPacket(me, builder, CHAT_MSG_MONSTER_EMOTE);
+				}
+				// TC_LOG_DEBUG("scripts.ai", "SmartScript::ProcessAction: SMART_ACTION_CALL_FOR_HELP: Creature %u", me->GetGUIDLow());
+			}
+			break;
+		}
         case SMART_ACTION_SET_SHEATH:
         {
             if (me)

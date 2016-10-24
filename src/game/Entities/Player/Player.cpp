@@ -14566,127 +14566,167 @@ void Player::SendNewItem(Item* item, uint32 count, bool received, bool created, 
 /*********************************************************/
 
 void Player::PrepareGossipMenu(WorldObject* source, uint32 menuId /*= 0*/, bool showQuests /*= false*/)
-{  
-    PlayerMenu* menu = PlayerTalkClass;
-    menu->ClearMenus();
+{
+	PlayerMenu* menu = PlayerTalkClass;
+	menu->ClearMenus();
 
-    menu->GetGossipMenu().SetMenuId(menuId);
+	menu->GetGossipMenu().SetMenuId(menuId);
 
-    GossipMenuItemsMapBounds menuItemBounds = sObjectMgr->GetGossipMenuItemsMapBounds(menuId);
+	GossipMenuItemsMapBounds menuItemBounds = sObjectMgr->GetGossipMenuItemsMapBounds(menuId);
 
-    // if default menuId and no menu options exist for this, use options from default options
-    if (menuItemBounds.first == menuItemBounds.second && menuId == GetDefaultGossipMenuForSource(source))
-        menuItemBounds = sObjectMgr->GetGossipMenuItemsMapBounds(0);
+	// if default menuId and no menu options exist for this, use options from default options
+	if (menuItemBounds.first == menuItemBounds.second && menuId == GetDefaultGossipMenuForSource(source))
+		menuItemBounds = sObjectMgr->GetGossipMenuItemsMapBounds(0);
 
-    uint32 npcflags = 0;
+	uint32 npcflags = 0;
 
-    if (source->GetTypeId() == TYPEID_UNIT)
-    {
-        npcflags = source->GetUInt32Value(UNIT_NPC_FLAGS);
-        if (showQuests && npcflags & UNIT_NPC_FLAG_QUESTGIVER)
-            PrepareQuestMenu(source->GetGUID());
-    }
-    else if (source->GetTypeId() == TYPEID_GAMEOBJECT)
-        if (showQuests && source->ToGameObject()->GetGoType() == GAMEOBJECT_TYPE_QUESTGIVER)
-            PrepareQuestMenu(source->GetGUID());
+	if (source->GetTypeId() == TYPEID_UNIT)
+	{
+		npcflags = source->GetUInt32Value(UNIT_NPC_FLAGS);
+		if (showQuests && npcflags & UNIT_NPC_FLAG_QUESTGIVER)
+			PrepareQuestMenu(source->GetGUID());
+	}
+	else if (source->GetTypeId() == TYPEID_GAMEOBJECT)
+		if (showQuests && source->ToGameObject()->GetGoType() == GAMEOBJECT_TYPE_QUESTGIVER)
+			PrepareQuestMenu(source->GetGUID());
 
-    for (GossipMenuItemsContainer::const_iterator itr = menuItemBounds.first; itr != menuItemBounds.second; ++itr)
-    {
-        bool canTalk = true;
-        if (!sConditionMgr->IsObjectMeetToConditions(this, source, itr->second.Conditions))
-            continue;
+	for (GossipMenuItemsContainer::const_iterator itr = menuItemBounds.first; itr != menuItemBounds.second; ++itr)
+	{
+		bool canTalk = true;
+		if (!sConditionMgr->IsObjectMeetToConditions(this, source, itr->second.Conditions))
+			continue;
 
-        if (Creature* creature = source->ToCreature())
-        {
-            if (!(itr->second.OptionNpcflag & npcflags))
-                continue;
+		if (Creature* creature = source->ToCreature())
+		{
+			if (!(itr->second.OptionNpcflag & npcflags))
+				continue;
 
-            switch (itr->second.OptionType)
-            {
-                case GOSSIP_OPTION_ARMORER:
-                    canTalk = false;                       // added in special mode
-                    break;
-                case GOSSIP_OPTION_SPIRITHEALER:
-                    if (!isDead())
-                        canTalk = false;
-                    break;
-                case GOSSIP_OPTION_VENDOR:
-                {
-                    VendorItemData const* vendorItems = creature->GetVendorItems();
-                    if (!vendorItems || vendorItems->Empty())
-                    {
-                        sLog->outErrorDb("Creature %u (Entry: %u) have UNIT_NPC_FLAG_VENDOR but have empty trading item list.", creature->GetGUIDLow(), creature->GetEntry());
-                        canTalk = false;
-                    }
-                    break;
-                }
-                case GOSSIP_OPTION_LEARNDUALSPEC:
-                    if (!(GetSpecsCount() == 1 && creature->isCanTrainingAndResetTalentsOf(this) && !(getLevel() < sWorld->getIntConfig(CONFIG_MIN_DUALSPEC_LEVEL))))
-                        canTalk = false;
-                    break;
-                case GOSSIP_OPTION_UNLEARNTALENTS:
-                    if (!creature->isCanTrainingAndResetTalentsOf(this))
-                        canTalk = false;
-                    break;
-                case GOSSIP_OPTION_UNLEARNPETTALENTS:
-                    if (!GetPet() || GetPet()->getPetType() != HUNTER_PET || GetPet()->m_spells.size() <= 1 || creature->GetCreatureTemplate()->trainer_type != TRAINER_TYPE_PETS || creature->GetCreatureTemplate()->trainer_class != CLASS_HUNTER)
-                        canTalk = false;
-                    break;
-                case GOSSIP_OPTION_TAXIVENDOR:
-                    if (GetSession()->SendLearnNewTaxiNode(creature))
-                        return;
-                    break;
-                case GOSSIP_OPTION_BATTLEFIELD:
-                    if (!creature->isCanInteractWithBattleMaster(this, false))
-                        canTalk = false;
-                    break;
-                case GOSSIP_OPTION_STABLEPET:
-                    if (getClass() != CLASS_HUNTER)
-                        canTalk = false;
-                    break;
-                case GOSSIP_OPTION_QUESTGIVER:
-                    canTalk = false;
-                    break;
-                case GOSSIP_OPTION_TRAINER:
-                case GOSSIP_OPTION_GOSSIP:
-                case GOSSIP_OPTION_SPIRITGUIDE:
-                case GOSSIP_OPTION_INNKEEPER:
-                case GOSSIP_OPTION_BANKER:
-                case GOSSIP_OPTION_PETITIONER:
-                case GOSSIP_OPTION_TABARDDESIGNER:
-                case GOSSIP_OPTION_AUCTIONEER:
-                    break;                                  // no checks
-                case GOSSIP_OPTION_OUTDOORPVP:
-                    if (!sOutdoorPvPMgr->CanTalkTo(this, creature, itr->second))
-                        canTalk = false;
-                    break;
-                default:
-                    sLog->outErrorDb("Creature entry %u has unknown gossip option %u for menu %u", creature->GetEntry(), itr->second.OptionType, itr->second.MenuId);
-                    canTalk = false;
-                    break;
-            }
-        }
-        else if (GameObject* go = source->ToGameObject())
-        {
-            switch (itr->second.OptionType)
-            {
-                case GOSSIP_OPTION_GOSSIP:
-                    if (go->GetGoType() != GAMEOBJECT_TYPE_QUESTGIVER && go->GetGoType() != GAMEOBJECT_TYPE_GOOBER)
-                        canTalk = false;
-                    break;
-                default:
-                    canTalk = false;
-                    break;
-            }
-        }
+			switch (itr->second.OptionType)
+			{
+			case GOSSIP_OPTION_ARMORER:
+				canTalk = false;                       // added in special mode
+				break;
+			case GOSSIP_OPTION_SPIRITHEALER:
+				if (!isDead())
+					canTalk = false;
+				break;
+			case GOSSIP_OPTION_VENDOR:
+			{
+				VendorItemData const* vendorItems = creature->GetVendorItems();
+				if (!vendorItems || vendorItems->Empty())
+				{
+					sLog->outErrorDb("sql.sql", "Creature %s (Entry: %u GUID: %u DB GUID: %u) has UNIT_NPC_FLAG_VENDOR set but has an empty trading item list.", creature->GetName().c_str(), creature->GetEntry(), creature->GetGUIDLow(), creature->GetDBTableGUIDLow());
+					canTalk = false;
+				}
+				break;
+			}
+			case GOSSIP_OPTION_LEARNDUALSPEC:
+				if (!(GetSpecsCount() == 1 && creature->isCanTrainingAndResetTalentsOf(this) && !(getLevel() < sWorld->getIntConfig(CONFIG_MIN_DUALSPEC_LEVEL))))
+					canTalk = false;
+				break;
+			case GOSSIP_OPTION_UNLEARNTALENTS:
+				if (!creature->isCanTrainingAndResetTalentsOf(this))
+					canTalk = false;
+				break;
+			case GOSSIP_OPTION_UNLEARNPETTALENTS:
+				if (!GetPet() || GetPet()->getPetType() != HUNTER_PET || GetPet()->m_spells.size() <= 1 || creature->GetCreatureTemplate()->trainer_type != TRAINER_TYPE_PETS || creature->GetCreatureTemplate()->trainer_class != CLASS_HUNTER)
+					canTalk = false;
+				break;
+			case GOSSIP_OPTION_TAXIVENDOR:
+				if (GetSession()->SendLearnNewTaxiNode(creature))
+					return;
+				break;
+			case GOSSIP_OPTION_BATTLEFIELD:
+				if (!creature->isCanInteractWithBattleMaster(this, false))
+					canTalk = false;
+				break;
+			case GOSSIP_OPTION_STABLEPET:
+				if (getClass() != CLASS_HUNTER)
+					canTalk = false;
+				break;
+			case GOSSIP_OPTION_QUESTGIVER:
+				canTalk = false;
+				break;
+			case GOSSIP_OPTION_TRAINER:
+				if (creature->GetCreatureTemplate()->trainer_class && getClass() != creature->GetCreatureTemplate()->trainer_class && creature->GetCreatureTemplate()->trainer_type == TRAINER_TYPE_CLASS)
+				{
+					sLog->outErrorDb("sql.sql", "GOSSIP_OPTION_TRAINER:: Player %s (GUID: %u) request wrong gossip menu: %u with wrong class: %u at Creature: %s (Entry: %u, Trainer Class: %u)",
+						GetName().c_str(), GetGUIDLow(), menu->GetGossipMenu().GetMenuId(), getClass(), creature->GetName().c_str(), creature->GetEntry(), creature->GetCreatureTemplate()->trainer_class);
+					canTalk = false;
+				}
+				// no break;
+			case GOSSIP_OPTION_GOSSIP:
+			case GOSSIP_OPTION_SPIRITGUIDE:
+			case GOSSIP_OPTION_INNKEEPER:
+			case GOSSIP_OPTION_BANKER:
+			case GOSSIP_OPTION_PETITIONER:
+			case GOSSIP_OPTION_TABARDDESIGNER:
+			case GOSSIP_OPTION_AUCTIONEER:
+				break;                                  // no checks
+			case GOSSIP_OPTION_OUTDOORPVP:
+				if (!sOutdoorPvPMgr->CanTalkTo(this, creature, itr->second))
+					canTalk = false;
+				break;
+			default:
+				sLog->outErrorDb("sql.sql", "Creature entry %u has unknown gossip option %u for menu %u", creature->GetEntry(), itr->second.OptionType, itr->second.MenuId);
+				canTalk = false;
+				break;
+			}
+		}
+		else if (GameObject* go = source->ToGameObject())
+		{
+			switch (itr->second.OptionType)
+			{
+			case GOSSIP_OPTION_GOSSIP:
+				if (go->GetGoType() != GAMEOBJECT_TYPE_QUESTGIVER && go->GetGoType() != GAMEOBJECT_TYPE_GOOBER)
+					canTalk = false;
+				break;
+			default:
+				canTalk = false;
+				break;
+			}
+		}
 
-        if (canTalk)
-        {
-            menu->GetGossipMenu().AddMenuItem(itr->second.OptionIndex, itr->second.OptionIcon, itr->second.OptionText, 0, itr->second.OptionType, itr->second.BoxText, itr->second.BoxMoney, itr->second.BoxCoded);
-            menu->GetGossipMenu().AddGossipMenuItemData(itr->second.OptionIndex, itr->second.ActionMenuId, itr->second.ActionPoiId);
-        }
-    }
+		if (canTalk)
+		{
+			std::string strOptionText, strBoxText;
+			BroadcastText const* optionBroadcastText = sObjectMgr->GetBroadcastText(itr->second.OptionBroadcastTextId);
+			BroadcastText const* boxBroadcastText = sObjectMgr->GetBroadcastText(itr->second.BoxBroadcastTextId);
+			LocaleConstant locale = GetSession()->GetSessionDbLocaleIndex();
+
+			if (optionBroadcastText)
+				strOptionText = optionBroadcastText->GetText(locale, getGender());
+			else
+				strOptionText = itr->second.OptionText;
+
+			if (boxBroadcastText)
+				strBoxText = boxBroadcastText->GetText(locale, getGender());
+			else
+				strBoxText = itr->second.BoxText;
+
+			if (locale != DEFAULT_LOCALE)
+			{
+				if (!optionBroadcastText)
+				{
+					/// Find localizations from database.
+					if (GossipMenuItemsLocale const* gossipMenuLocale = sObjectMgr->GetGossipMenuItemsLocale(MAKE_PAIR32(menuId, menuId)))
+						ObjectMgr::GetLocaleString(gossipMenuLocale->OptionText, locale, strOptionText);
+				}
+
+				if (!boxBroadcastText)
+				{
+					/// Find localizations from database.
+					if (GossipMenuItemsLocale const* gossipMenuLocale = sObjectMgr->GetGossipMenuItemsLocale(MAKE_PAIR32(menuId, menuId)))
+						ObjectMgr::GetLocaleString(gossipMenuLocale->BoxText, locale, strBoxText);
+				}
+			}
+
+			menu->GetGossipMenu().AddMenuItem(itr->second.OptionIndex, itr->second.OptionIcon, strOptionText, 0, itr->second.OptionType, strBoxText, itr->second.BoxMoney, itr->second.BoxCoded);
+			menu->GetGossipMenu().AddGossipMenuItemData(itr->second.OptionIndex, itr->second.ActionMenuId, itr->second.ActionPoiId);
+		}
+	}
 }
+
 
 void Player::SendPreparedGossip(WorldObject* source)
 { 
