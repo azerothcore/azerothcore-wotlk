@@ -13,11 +13,7 @@ if [ -f "./config.sh"  ]; then
     source "./config.sh" # should overwrite previous
 fi
 
-if [[ "$unamestr" == 'Darwin' ]]; then
-    MD5_CMD="md5"
-else
-    MD5_CMD="md5sum"
-fi
+MD5_CMD="md5sum"
 
 reg_file="$OUTPUT_FOLDER/__db_assembler_registry"
 
