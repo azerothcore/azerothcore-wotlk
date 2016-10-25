@@ -218,11 +218,11 @@ class boss_moroes : public CreatureScript
                         events.ScheduleEvent(EVENT_SPELL_GARROTE, urand(5000, 7000));
                         return;
                     case EVENT_SPELL_GARROTE:
-						Talk(SAY_SPECIAL);
-						if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
-							target->CastSpell(target, SPELL_GARROTE, true);
-						events.SetPhase(0);
-                        break;
+			Talk(SAY_SPECIAL);
+			if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+				target->CastSpell(target, SPELL_GARROTE, true);
+				events.SetPhase(0);
+                break;
                 }
 
                 // Xinef: not in vanish
