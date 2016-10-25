@@ -33,7 +33,7 @@ class boss_maiden_of_virtue : public CreatureScript
 
         struct boss_maiden_of_virtueAI : public BossAI
         {
-            boss_maiden_of_virtueAI(Creature* creature) : BossAI(creature, TYPE_MAIDEN) { }
+            boss_maiden_of_virtueAI(Creature* creature) : BossAI(creature, DATA_MAIDEN) { }
 
             void Reset()
             {
