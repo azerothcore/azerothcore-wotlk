@@ -9,27 +9,25 @@
 
 enum DataTypes
 {
-    TYPE_SERVANT_QUARTERS           = 0,
-    TYPE_ATTUMEN                    = 1,
-    TYPE_MOROES                     = 2,
-    TYPE_MAIDEN                     = 3,
-    TYPE_OPTIONAL_BOSS              = 4,
-    TYPE_OPERA                      = 5,
-    TYPE_CURATOR                    = 6,
-    TYPE_ARAN                       = 7,
-    TYPE_TERESTIAN                  = 8,
-    TYPE_NETHERSPITE                = 9,
-    TYPE_CHESS                      = 10,
-    TYPE_MALCHEZZAR                 = 11,
-    TYPE_NIGHTBANE                  = 12,
+    DATA_SERVANT_QUARTERS           = 0,
+    DATA_ATTUMEN                    = 1,
+    DATA_MOROES                     = 2,
+    DATA_MAIDEN                     = 3,
+    DATA_OPTIONAL_BOSS              = 4,
+    DATA_OPERA                      = 5,
+    DATA_CURATOR                    = 6,
+    DATA_ARAN                       = 7,
+    DATA_TERESTIAN                  = 8,
+    DATA_NETHERSPITE                = 9,
+    DATA_CHESS                      = 10,
+    DATA_MALCHEZZAR                 = 11,
+    DATA_NIGHTBANE                  = 12,
     MAX_ENCOUNTERS                  = 13,
 
     DATA_OPERA_PERFORMANCE          = 13,
     DATA_OPERA_OZ_DEATHCOUNT        = 14,
 
     DATA_KILREK                     = 15,
-    DATA_TERESTIAN                  = 16,
-    DATA_MOROES                     = 17,
     DATA_GO_CURTAINS                = 18,
     DATA_GO_STAGEDOORLEFT           = 19,
     DATA_GO_STAGEDOORRIGHT          = 20,
@@ -43,8 +41,6 @@ enum DataTypes
     DATA_MASTERS_TERRACE_DOOR_1     = 27,
     DATA_MASTERS_TERRACE_DOOR_2     = 28,
     DATA_GO_SIDE_ENTRANCE_DOOR      = 29,
-
-    DATA_NIGHTBANE                  = 30,
 
     DATA_COUNT_SERVANT_QUARTERS_KILLS   = 100,
     DATA_SELECTED_RARE                  = 101,
@@ -73,6 +69,7 @@ enum KarazhanSpells
     SPELL_OVERLOAD                  = 29766,
     SPELL_BLINK                     = 29884
 };
+
 
 #endif
 
