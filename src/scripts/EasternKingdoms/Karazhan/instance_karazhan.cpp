@@ -10,7 +10,6 @@
 
 class instance_karazhan : public InstanceMapScript
 {
-	
     public:
         instance_karazhan() : InstanceMapScript("instance_karazhan", 532) { }
 
@@ -24,47 +23,39 @@ class instance_karazhan : public InstanceMapScript
 		{
             instance_karazhan_InstanceMapScript(Map* map) : InstanceScript(map)
 			
-			{
+		{
 				
-				//TYPE_OPERA = urand(EVENT_OZ, EVENT_RAJ);
+			//TYPE_OPERA = urand(EVENT_OZ, EVENT_RAJ);
 
-				if (GetData(DATA_OPERA_PERFORMANCE) != 0)
-					return;
-				SetData(DATA_OPERA_PERFORMANCE, urand(EVENT_OZ, EVENT_RAJ));
-				m_uiOzDeathCount = 0;
-			}
+		if (GetData(DATA_OPERA_PERFORMANCE) != 0)
+			return;
+		SetData(DATA_OPERA_PERFORMANCE, urand(EVENT_OZ, EVENT_RAJ));
+		m_uiOzDeathCount = 0;
+		}
 			
+		uint32 m_auiEncounter[MAX_ENCOUNTERS];
+		uint32 OperaEvent;
+		uint32 m_uiOzDeathCount;
+		uint32 m_uiTeam;
+		uint64 m_uiCurtainGUID;
+		uint64 m_uiStageDoorLeftGUID;
+		uint64 m_uiStageDoorRightGUID;
+		uint64 m_uiKilrekGUID;
+		uint64 m_uiTerestianGUID;
+		uint64 m_uiMoroesGUID;
+		uint64 m_uiNightBaneGUID;
+		uint64 EchoOfMedivhGUID;
+		uint64 m_uiLibraryDoor;                                     // Door at Shade of Aran
+		uint64 m_uiMassiveDoor;                                     // Door at Netherspite
+		uint64 m_uiSideEntranceDoor;                                // Side Entrance
+		uint64 m_uiGamesmansDoor;                                   // Door before Chess
+		uint64 m_uiGamesmansExitDoor;                               // Door after Chess
+		uint64 m_uiNetherspaceDoor;                                // Door at Malchezaar
+		uint64 m_uiServantsAccessDoor;                              // Door to Brocken Stair
+		uint64 MastersTerraceDoor[2];
+		uint64 ImageGUID;
+		uint64 DustCoveredChest;
 			
-			uint32 m_auiEncounter[MAX_ENCOUNTERS];
-			uint32 OperaEvent;
-			uint32 m_uiOzDeathCount;
-			uint32 m_uiTeam;
-			uint64 m_uiCurtainGUID;
-			uint64 m_uiStageDoorLeftGUID;
-			uint64 m_uiStageDoorRightGUID;
-			uint64 m_uiKilrekGUID;
-			uint64 m_uiTerestianGUID;
-			uint64 m_uiMoroesGUID;
-			uint64 m_uiNightBaneGUID;
-			uint64 EchoOfMedivhGUID;
-
-			uint64 m_uiLibraryDoor;                                     // Door at Shade of Aran
-			uint64 m_uiMassiveDoor;                                     // Door at Netherspite
-			uint64 m_uiSideEntranceDoor;                                // Side Entrance
-			uint64 m_uiGamesmansDoor;                                   // Door before Chess
-			uint64 m_uiGamesmansExitDoor;                               // Door after Chess
-			uint64 m_uiNetherspaceDoor;                                // Door at Malchezaar
-			uint64 m_uiServantsAccessDoor;                              // Door to Brocken Stair
-			uint64 MastersTerraceDoor[2];
-			uint64 ImageGUID;
-			uint64 DustCoveredChest;
-			
-			
-
-			void OnPlayerEnter(Player* pPlayer)
-			{
-				
-			}
 
             void Initialize()
             {
