@@ -74,20 +74,16 @@ class boss_moroes : public CreatureScript
             boss_moroesAI(Creature* creature) : BossAI(creature, DATA_MOROES)
             {
                 _activeGuests = 0;
-				instance = creature->GetInstanceScript();
-				
+				instance = creature->GetInstanceScript();	
             }
 		InstanceScript* instance;
-
 
             void InitializeAI()
             {
                 BossAI::InitializeAI();
                 InitializeGuests();
-				
             }
 			
-
             void JustReachedHome()
             {
                 BossAI::JustReachedHome();
@@ -120,7 +116,6 @@ class boss_moroes : public CreatureScript
                 BossAI::Reset();
                 me->CastSpell(me, SPELL_DUAL_WIELD, true);
 				instance->SetBossState(DATA_MOROES, NOT_STARTED);
-				
             }
 
             void EnterCombat(Unit* who)
@@ -135,7 +130,6 @@ class boss_moroes : public CreatureScript
                 _events2.Reset();
                 me->CallForHelp(20.0f);
 				instance->SetBossState(DATA_MOROES, IN_PROGRESS);
-				
             }
 
             void KilledUnit(Unit* /*victim*/)
