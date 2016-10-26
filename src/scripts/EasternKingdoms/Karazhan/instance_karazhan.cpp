@@ -160,18 +160,18 @@ class instance_karazhan : public InstanceMapScript
                         break;
                     case 185119: DustCoveredChest = go->GetGUID(); break;
 
-						switch (OperaEvent)
-						{
-							/// @todo Set Object visibilities for Opera based on performance
-						case EVENT_OZ:
-							break;
+		switch (OperaEvent)
+		{
+		/// @todo Set Object visibilities for Opera based on performance
+		case EVENT_OZ:
+			break;
 
-						case EVENT_HOOD:
-							break;
+		case EVENT_HOOD:
+			break;
 
-						case EVENT_RAJ:
-							break;
-						}
+		case EVENT_RAJ:
+			break;
+		}
 				
                 }
             }
@@ -182,8 +182,8 @@ class instance_karazhan : public InstanceMapScript
                 {
                     case DATA_SELECTED_RARE:
                         return _selectedRare;
-					case DATA_OPERA_PERFORMANCE:
-						return OperaEvent;
+			case DATA_OPERA_PERFORMANCE:
+			return OperaEvent;
                 }
 
                 return 0;
