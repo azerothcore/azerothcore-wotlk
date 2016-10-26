@@ -291,13 +291,13 @@ public:
                     if (WipeTimer <= diff)
                     {
 
-						Map* map = me->GetMap();
-						if (!map->IsDungeon())
-							return;
+			Map* map = me->GetMap();
+			if (!map->IsDungeon())
+			return;
 
-						Map::PlayerList const &PlayerList = map->GetPlayers();
-						if (PlayerList.isEmpty())
-							return;
+			Map::PlayerList const &PlayerList = map->GetPlayers();
+			if (PlayerList.isEmpty())
+			return;
 
                         RaidWiped = true;
                         for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
