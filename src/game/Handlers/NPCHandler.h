@@ -21,6 +21,7 @@ struct GossipTextOption
     std::string Text_1;
     uint32 Language;
     float Probability;
+    uint32 BroadcastTextID;
     QEmote Emotes[MAX_GOSSIP_TEXT_EMOTES];
 };
 

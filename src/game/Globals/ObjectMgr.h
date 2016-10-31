@@ -398,6 +398,48 @@ struct AreaTrigger
     float  target_Orientation;
 };
 
+struct BroadcastText
+{
+    BroadcastText()
+    {
+        MaleText.resize(DEFAULT_LOCALE + 1);
+        FemaleText.resize(DEFAULT_LOCALE + 1);
+    }
+
+    uint32 Id;
+    uint32 Language;
+    StringVector MaleText;
+    StringVector FemaleText;
+    uint32 EmoteId0;
+    uint32 EmoteId1;
+    uint32 EmoteId2;
+    uint32 EmoteDelay0;
+    uint32 EmoteDelay1;
+    uint32 EmoteDelay2;
+    uint32 SoundId;
+    uint32 Unk1;
+    uint32 Unk2;
+    // uint32 WDBVerified;
+
+    std::string const& GetText(LocaleConstant locale = DEFAULT_LOCALE, uint8 gender = GENDER_MALE, bool forceGender = false) const
+    {
+        if ((gender == GENDER_FEMALE || gender == GENDER_NONE) && (forceGender || !FemaleText[DEFAULT_LOCALE].empty()))
+        {
+            if (FemaleText.size() > size_t(locale) && !FemaleText[locale].empty())
+                return FemaleText[locale];
+            return FemaleText[DEFAULT_LOCALE];
+        }
+        // else if (gender == GENDER_MALE)
+        {
+            if (MaleText.size() > size_t(locale) && !MaleText[locale].empty())
+                return MaleText[locale];
+            return MaleText[DEFAULT_LOCALE];
+        }
+    }
+};
+
+typedef UNORDERED_MAP<uint32, BroadcastText> BroadcastTextContainer;
+
 typedef std::set<uint32> CellGuidSet;
 typedef UNORDERED_MAP<uint32/*player guid*/, uint32/*instance*/> CellCorpseSet;
 struct CellObjectGuids
@@ -515,6 +557,7 @@ struct GossipMenuItems
     uint32          OptionIndex;
     uint8           OptionIcon;
     std::string     OptionText;
+    uint32          OptionBroadcastTextId;
     uint32          OptionType;
     uint32          OptionNpcflag;
     uint32          ActionMenuId;
@@ -522,6 +565,7 @@ struct GossipMenuItems
     bool            BoxCoded;
     uint32          BoxMoney;
     std::string     BoxText;
+    uint32          BoxBroadcastTextId;
     ConditionList   Conditions;
 };
 
@@ -893,6 +937,8 @@ class ObjectMgr
         void ValidateSpellScripts();
         void InitializeSpellInfoPrecomputedData();
 
+        void LoadBroadcastTexts();
+        void LoadBroadcastTextLocales();
         bool LoadTrinityStrings(char const* table, int32 min_value, int32 max_value);
         bool LoadTrinityStrings() { return LoadTrinityStrings("trinity_string", MIN_TRINITY_STRING_ID, MAX_TRINITY_STRING_ID); }
         void LoadDbScriptStrings();
@@ -1039,6 +1085,28 @@ class ObjectMgr
                 return &itr->second;
                    
             return NULL;
+        }
+
+        BroadcastText const* GetBroadcastText(uint32 id) const
+        {
+            BroadcastTextContainer::const_iterator itr = _broadcastTextStore.find(id);
+            if (itr != _broadcastTextStore.end())
+                return &itr->second;
+            return NULL;
+        }
+
+        GossipMenuItemsLocale const* GetGossipMenuItemsLocale(uint32 entry) const
+        {
+            GossipMenuItemsLocaleContainer::const_iterator itr = _gossipMenuItemsLocaleStore.find(entry);
+            if (itr == _gossipMenuItemsLocaleStore.end()) return nullptr;
+            return &itr->second;
+        }
+
+        NpcTextLocale const* GetNpcTextLocale(uint32 entry) const
+        {
+            NpcTextLocaleContainer::const_iterator itr = _npcTextLocaleStore.find(entry);
+            if (itr == _npcTextLocaleStore.end()) return nullptr;
+            return &itr->second;
         }
 
         CreatureData const* GetCreatureData(uint32 guid) const
@@ -1310,6 +1378,7 @@ class ObjectMgr
         /// Stores temp summon data grouped by summoner's entry, summoner's type and group id
         TempSummonDataContainer _tempSummonDataStore;
 
+        BroadcastTextContainer _broadcastTextStore;
         ItemTemplateContainer _itemTemplateStore;
         std::vector<ItemTemplate*> _itemTemplateStoreFast; // pussywizard
         ItemLocaleContainer _itemLocaleStore;
