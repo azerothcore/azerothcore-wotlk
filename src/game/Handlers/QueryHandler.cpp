@@ -206,7 +206,7 @@ void WorldSession::HandleNpcTextQueryOpcode(WorldPacket & recvData)
 
     if (!pGossip)
     {
-        for (uint32 i = 0; i < MAX_GOSSIP_TEXT_OPTIONS; ++i)
+        for (uint8 i = 0; i < MAX_GOSSIP_TEXT_OPTIONS; ++i)
         {
             data << float(0);
             data << "Greetings $N";
@@ -222,23 +222,47 @@ void WorldSession::HandleNpcTextQueryOpcode(WorldPacket & recvData)
     }
     else
     {
-        for (int i = 0; i < MAX_GOSSIP_TEXT_OPTIONS; ++i)
+        std::string text0[MAX_GOSSIP_TEXT_OPTIONS], text1[MAX_GOSSIP_TEXT_OPTIONS];
+        LocaleConstant locale = GetSessionDbLocaleIndex();
+
+        for (uint8 i = 0; i < MAX_GOSSIP_TEXT_OPTIONS; ++i)
         {
+            BroadcastText const* bct = sObjectMgr->GetBroadcastText(pGossip->Options[i].BroadcastTextID);
+            if (bct)
+            {
+                text0[i] = bct->GetText(locale, GENDER_MALE, true);
+                text1[i] = bct->GetText(locale, GENDER_FEMALE, true);
+            }
+            else
+            {
+                text0[i] = pGossip->Options[i].Text_0;
+                text1[i] = pGossip->Options[i].Text_1;
+            }
+
+            if (locale != DEFAULT_LOCALE && !bct)
+            {
+                if (NpcTextLocale const* npcTextLocale = sObjectMgr->GetNpcTextLocale(textID))
+                {
+                    ObjectMgr::GetLocaleString(npcTextLocale->Text_0[i], locale, text0[i]);
+                    ObjectMgr::GetLocaleString(npcTextLocale->Text_1[i], locale, text1[i]);
+                }
+            }
+
             data << pGossip->Options[i].Probability;
 
-            if (pGossip->Options[i].Text_0.empty())
-                data << pGossip->Options[i].Text_1;
+            if (text0[i].empty())
+                data << text1[i];
             else
-                data << pGossip->Options[i].Text_0;
+                data << text0[i];
 
-            if (pGossip->Options[i].Text_1.empty())
-                data << pGossip->Options[i].Text_0;
+            if (text1[i].empty())
+                data << text0[i];
             else
-                data << pGossip->Options[i].Text_1;
+                data << text1[i];
 
             data << pGossip->Options[i].Language;
 
-            for (int j = 0; j < MAX_GOSSIP_TEXT_EMOTES; ++j)
+            for (uint8 j = 0; j < MAX_GOSSIP_TEXT_EMOTES; ++j)
             {
                 data << pGossip->Options[i].Emotes[j]._Delay;
                 data << pGossip->Options[i].Emotes[j]._Emote;
