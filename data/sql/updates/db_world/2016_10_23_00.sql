@@ -9,7 +9,7 @@ SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '147715145811754470
 --
 -- START UPDATING QUERIES
 --
-INSERT INTO version_db_world(`sql_rev`) VALUES (`1477151458117544700`);
+INSERT INTO version_db_world(`sql_rev`) VALUES ('1477151458117544700');
 
 DELETE FROM `creature_loot_template` WHERE `entry` IN (6501, 6502, 6503, 6504, 9162, 9163, 9164) AND `item`=11114;
 
