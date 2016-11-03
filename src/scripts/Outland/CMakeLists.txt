@@ -109,6 +109,6 @@ set(scripts_STAT_SRCS
   ${AC_SCRIPTS_DIR}/Outland/zone_zangarmarsh.cpp
 )
 
-AC_ADD_SCRIPT_LOADER("Outland" "${AC_SCRIPTS_DIR}/ScriptLoader.h")
+AC_ADD_SCRIPT_LOADER("Outland" "ScriptLoader.h")
 
 message("  -> Prepared: Outland")

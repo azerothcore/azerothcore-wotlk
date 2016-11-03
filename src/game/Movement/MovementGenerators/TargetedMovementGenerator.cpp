@@ -121,9 +121,7 @@ void TargetedMovementGeneratorMedium<T,D>::_setTargetLocation(T* owner, bool ini
                         Position dest = {x, y, z, 0.0f};
                         if (GameObject* pillar = ((BattlegroundRV*)bg)->GetPillarAtPosition(&dest))
                         {
-                            if ((pillar->GetGoState() == GO_STATE_READY && pillar->ToTransport()->GetPathProgress() == 0) ||
-                                owner->GetPositionZ() > 31.0f ||
-                                owner->GetTransGUID() == pillar->GetGUID())
+                            if (pillar->GetGoState() == GO_STATE_READY && pillar->ToTransport()->GetPathProgress() == 0 || owner->GetPositionZ() > 31.0f || owner->GetTransGUID() == pillar->GetGUID())
                             {
                                 if (pillar->GetGoState() == GO_STATE_READY && pillar->ToTransport()->GetPathProgress() == 0)
                                     z = std::max(z, 28.28f);
@@ -137,8 +135,7 @@ void TargetedMovementGeneratorMedium<T,D>::_setTargetLocation(T* owner, bool ini
                                 init.Launch();
                                 return;
                             }
-                            if (pillar->GetGoState() == GO_STATE_ACTIVE ||
-                                (pillar->GetGoState() == GO_STATE_READY && pillar->ToTransport()->GetPathProgress() > 0))
+                            if (pillar->GetGoState() == GO_STATE_ACTIVE || pillar->GetGoState() == GO_STATE_READY && pillar->ToTransport()->GetPathProgress() > 0)
                             {
                                 Position pos;
                                 owner->GetFirstCollisionPositionForTotem(pos, owner->GetExactDist2d(i_target.getTarget()), owner->GetAngle(i_target.getTarget())-owner->GetOrientation(), false);
@@ -161,8 +158,7 @@ void TargetedMovementGeneratorMedium<T,D>::_setTargetLocation(T* owner, bool ini
         if (result)
         {
             float maxDist = MELEE_RANGE + owner->GetMeleeReach() + i_target->GetMeleeReach();
-            if ((!forceDest && (i_path->GetPathType() & PATHFIND_NOPATH)) ||
-                (!i_offset && !isPlayerPet && i_target->GetExactDistSq(i_path->GetActualEndPosition().x, i_path->GetActualEndPosition().y, i_path->GetActualEndPosition().z) > maxDist*maxDist))
+            if (!forceDest && (i_path->GetPathType() & PATHFIND_NOPATH || !i_offset && !isPlayerPet && i_target->GetExactDistSq(i_path->GetActualEndPosition().x, i_path->GetActualEndPosition().y, i_path->GetActualEndPosition().z) > maxDist*maxDist))
             {
                 lastPathingFailMSTime = World::GetGameTimeMS();
                 owner->m_targetsNotAcceptable[i_target->GetGUID()] = MMapTargetData(sWorld->GetGameTime()+DISALLOW_TIME_AFTER_FAIL, owner, i_target.getTarget());

@@ -37,32 +37,32 @@ public:
 
         static std::vector<ChatCommand> lookupSpellCommandTable =
         {
-            { "id",             SEC_ADMINISTRATOR,  true,  &HandleLookupSpellIdCommand,         "" },
-            { "",               SEC_ADMINISTRATOR,  true,  &HandleLookupSpellCommand,           "" }
+            { "id",             SEC_MODERATOR,      true,  &HandleLookupSpellIdCommand,         "" },
+            { "",               SEC_MODERATOR,      true,  &HandleLookupSpellCommand,           "" }
         };
 
         static std::vector<ChatCommand> lookupCommandTable =
         {
-            { "area",           SEC_GAMEMASTER,      true,  &HandleLookupAreaCommand,            "" },
-            { "creature",       SEC_ADMINISTRATOR,  true,  &HandleLookupCreatureCommand,        "" },
-            { "event",          SEC_GAMEMASTER,     true,  &HandleLookupEventCommand,           "" },
-            { "faction",        SEC_ADMINISTRATOR,  true,  &HandleLookupFactionCommand,         "" },
-            { "item",           SEC_ADMINISTRATOR,  true,  &HandleLookupItemCommand,            "" },
-            { "itemset",        SEC_ADMINISTRATOR,  true,  &HandleLookupItemSetCommand,         "" },
-            { "object",         SEC_ADMINISTRATOR,  true,  &HandleLookupObjectCommand,          "" },
-            { "quest",          SEC_ADMINISTRATOR,  true,  &HandleLookupQuestCommand,           "" },
+            { "area",           SEC_MODERATOR,      true,  &HandleLookupAreaCommand,            "" },
+            { "creature",       SEC_MODERATOR,      true,  &HandleLookupCreatureCommand,        "" },
+            { "event",          SEC_MODERATOR,      true,  &HandleLookupEventCommand,           "" },
+            { "faction",        SEC_MODERATOR,      true,  &HandleLookupFactionCommand,         "" },
+            { "item",           SEC_MODERATOR,      true,  &HandleLookupItemCommand,            "" },
+            { "itemset",        SEC_MODERATOR,      true,  &HandleLookupItemSetCommand,         "" },
+            { "object",         SEC_MODERATOR,      true,  &HandleLookupObjectCommand,          "" },
+            { "quest",          SEC_MODERATOR,      true,  &HandleLookupQuestCommand,           "" },
             { "player",         SEC_GAMEMASTER,     true,  nullptr,                                "", lookupPlayerCommandTable },
-            { "skill",          SEC_ADMINISTRATOR,  true,  &HandleLookupSkillCommand,           "" },
-            { "spell",          SEC_ADMINISTRATOR,  true,  nullptr,                                "", lookupSpellCommandTable },
-            { "taxinode",       SEC_ADMINISTRATOR,  true,  &HandleLookupTaxiNodeCommand,        "" },
-            { "tele",           SEC_GAMEMASTER,      true,  &HandleLookupTeleCommand,            "" },
-            { "title",          SEC_GAMEMASTER,     true,  &HandleLookupTitleCommand,           "" },
-            { "map",            SEC_ADMINISTRATOR,  true,  &HandleLookupMapCommand,             "" }
+            { "skill",          SEC_MODERATOR,      true,  &HandleLookupSkillCommand,           "" },
+            { "spell",          SEC_MODERATOR,      true,  nullptr,                                "", lookupSpellCommandTable },
+            { "taxinode",       SEC_MODERATOR,      true,  &HandleLookupTaxiNodeCommand,        "" },
+            { "tele",           SEC_MODERATOR,      true,  &HandleLookupTeleCommand,            "" },
+            { "title",          SEC_MODERATOR,      true,  &HandleLookupTitleCommand,           "" },
+            { "map",            SEC_MODERATOR,      true,  &HandleLookupMapCommand,             "" }
         };
 
         static std::vector<ChatCommand> commandTable =
         {
-            { "lookup",         SEC_ADMINISTRATOR,  true,  nullptr,                                "", lookupCommandTable }
+            { "lookup",         SEC_MODERATOR,  true,  nullptr,                                 "", lookupCommandTable }
         };
         return commandTable;
     }
@@ -1287,7 +1287,7 @@ public:
                     }
 
                     if (plevel > 0 && prace > 0 && prace <= RACE_DRAENEI && pclass > 0 && pclass <= CLASS_DRUID)
-                        handler->PSendSysMessage("  %s (GUID %u) - %s - %s - %u%s", name.c_str(), guid, name_races[prace-1], name_classes[pclass-1], plevel, (online ? " - online" : ""));
+                        handler->PSendSysMessage("  %s (GUID %u) - %s - %s - %u%s", name.c_str(), guid, name_races[prace-1], name_classes[pclass-1], plevel, (online ? " - [ONLINE]" : ""));
                     else
                         handler->PSendSysMessage(LANG_LOOKUP_PLAYER_CHARACTER, name.c_str(), guid);
                     ++counter;

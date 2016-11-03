@@ -67,19 +67,19 @@ public:
     {
         static std::vector<ChatCommand> npcAddCommandTable =
         {
-            { "formation",      SEC_GAMEMASTER,      false, &HandleNpcAddFormationCommand,      "" },
-            { "item",           SEC_GAMEMASTER,     false, &HandleNpcAddVendorItemCommand,     "" },
-            { "move",           SEC_GAMEMASTER,     false, &HandleNpcAddMoveCommand,           "" },
-            { "temp",           SEC_GAMEMASTER,     false, &HandleNpcAddTempSpawnCommand,      "" },
+            { "formation",      SEC_ADMINISTRATOR,  false, &HandleNpcAddFormationCommand,      "" },
+            { "item",           SEC_ADMINISTRATOR,  false, &HandleNpcAddVendorItemCommand,     "" },
+            { "move",           SEC_ADMINISTRATOR,  false, &HandleNpcAddMoveCommand,           "" },
+            { "temp",           SEC_ADMINISTRATOR,  false, &HandleNpcAddTempSpawnCommand,      "" },
             //{ TODO: fix or remove this command
             { "weapon",         SEC_ADMINISTRATOR,  false, &HandleNpcAddWeaponCommand,         "" },
             //}
-            { "",               SEC_GAMEMASTER,     false, &HandleNpcAddCommand,               "" }
+            { "",               SEC_ADMINISTRATOR,  false, &HandleNpcAddCommand,               "" }
         };
         static std::vector<ChatCommand> npcDeleteCommandTable =
         {
-            { "item",           SEC_GAMEMASTER,     false, &HandleNpcDeleteVendorItemCommand,  "" },
-            { "",               SEC_GAMEMASTER,     false, &HandleNpcDeleteCommand,            "" }
+            { "item",           SEC_ADMINISTRATOR,  false, &HandleNpcDeleteVendorItemCommand,  "" },
+            { "",               SEC_ADMINISTRATOR,  false, &HandleNpcDeleteCommand,            "" }
         };
         static std::vector<ChatCommand> npcFollowCommandTable =
         {
@@ -90,40 +90,40 @@ public:
         {
             { "allowmove",      SEC_ADMINISTRATOR,  false, &HandleNpcSetAllowMovementCommand,  "" },
             { "entry",          SEC_ADMINISTRATOR,  false, &HandleNpcSetEntryCommand,          "" },
-            { "factionid",      SEC_GAMEMASTER,     false, &HandleNpcSetFactionIdCommand,      "" },
-            { "flag",           SEC_GAMEMASTER,     false, &HandleNpcSetFlagCommand,           "" },
-            { "level",          SEC_GAMEMASTER,     false, &HandleNpcSetLevelCommand,          "" },
-            { "link",           SEC_GAMEMASTER,     false, &HandleNpcSetLinkCommand,           "" },
-            { "model",          SEC_GAMEMASTER,     false, &HandleNpcSetModelCommand,          "" },
-            { "movetype",       SEC_GAMEMASTER,     false, &HandleNpcSetMoveTypeCommand,       "" },
-            { "phase",          SEC_GAMEMASTER,     false, &HandleNpcSetPhaseCommand,          "" },
-            { "spawndist",      SEC_GAMEMASTER,     false, &HandleNpcSetSpawnDistCommand,      "" },
-            { "spawntime",      SEC_GAMEMASTER,     false, &HandleNpcSetSpawnTimeCommand,      "" },
+            { "factionid",      SEC_ADMINISTRATOR,  false, &HandleNpcSetFactionIdCommand,      "" },
+            { "flag",           SEC_ADMINISTRATOR,  false, &HandleNpcSetFlagCommand,           "" },
+            { "level",          SEC_ADMINISTRATOR,  false, &HandleNpcSetLevelCommand,          "" },
+            { "link",           SEC_ADMINISTRATOR,  false, &HandleNpcSetLinkCommand,           "" },
+            { "model",          SEC_ADMINISTRATOR,  false, &HandleNpcSetModelCommand,          "" },
+            { "movetype",       SEC_ADMINISTRATOR,  false, &HandleNpcSetMoveTypeCommand,       "" },
+            { "phase",          SEC_ADMINISTRATOR,  false, &HandleNpcSetPhaseCommand,          "" },
+            { "spawndist",      SEC_ADMINISTRATOR,  false, &HandleNpcSetSpawnDistCommand,      "" },
+            { "spawntime",      SEC_ADMINISTRATOR,  false, &HandleNpcSetSpawnTimeCommand,      "" },
             { "data",           SEC_ADMINISTRATOR,  false, &HandleNpcSetDataCommand,           "" },
             //{ TODO: fix or remove these commands
-            { "name",           SEC_GAMEMASTER,     false, &HandleNpcSetNameCommand,           "" },
-            { "subname",        SEC_GAMEMASTER,     false, &HandleNpcSetSubNameCommand,        "" }
+            { "name",           SEC_ADMINISTRATOR,  false, &HandleNpcSetNameCommand,           "" },
+            { "subname",        SEC_ADMINISTRATOR,  false, &HandleNpcSetSubNameCommand,        "" }
             //}
         };
         static std::vector<ChatCommand> npcCommandTable =
         {
-            { "info",           SEC_ADMINISTRATOR,  false, &HandleNpcInfoCommand,              "" },
+            { "info",           SEC_MODERATOR,      false, &HandleNpcInfoCommand,              "" },
             { "near",           SEC_GAMEMASTER,     false, &HandleNpcNearCommand,              "" },
-            { "move",           SEC_GAMEMASTER,     false, &HandleNpcMoveCommand,              "" },
+            { "move",           SEC_ADMINISTRATOR,  false, &HandleNpcMoveCommand,              "" },
             { "playemote",      SEC_ADMINISTRATOR,  false, &HandleNpcPlayEmoteCommand,         "" },
-            { "say",            SEC_GAMEMASTER,      false, &HandleNpcSayCommand,               "" },
-            { "textemote",      SEC_GAMEMASTER,      false, &HandleNpcTextEmoteCommand,         "" },
-            { "whisper",        SEC_GAMEMASTER,      false, &HandleNpcWhisperCommand,           "" },
-            { "yell",           SEC_GAMEMASTER,      false, &HandleNpcYellCommand,              "" },
+            { "say",            SEC_GAMEMASTER,     false, &HandleNpcSayCommand,               "" },
+            { "textemote",      SEC_GAMEMASTER,     false, &HandleNpcTextEmoteCommand,         "" },
+            { "whisper",        SEC_GAMEMASTER,     false, &HandleNpcWhisperCommand,           "" },
+            { "yell",           SEC_GAMEMASTER,     false, &HandleNpcYellCommand,              "" },
             { "tame",           SEC_GAMEMASTER,     false, &HandleNpcTameCommand,              "" },
-            { "add",            SEC_GAMEMASTER,     false, nullptr,                 "", npcAddCommandTable },
-            { "delete",         SEC_GAMEMASTER,     false, nullptr,              "", npcDeleteCommandTable },
-            { "follow",         SEC_GAMEMASTER,     false, nullptr,              "", npcFollowCommandTable },
-            { "set",            SEC_GAMEMASTER,     false, nullptr,                 "", npcSetCommandTable }
+            { "add",            SEC_GAMEMASTER,     false, nullptr,                            "", npcAddCommandTable },
+            { "delete",         SEC_GAMEMASTER,     false, nullptr,                            "", npcDeleteCommandTable },
+            { "follow",         SEC_GAMEMASTER,     false, nullptr,                            "", npcFollowCommandTable },
+            { "set",            SEC_ADMINISTRATOR,  false, nullptr,                            "", npcSetCommandTable }
         };
         static std::vector<ChatCommand> commandTable =
         {
-            { "npc",            SEC_GAMEMASTER,      false, nullptr,                    "", npcCommandTable }
+            { "npc",            SEC_MODERATOR,      false, nullptr,                            "", npcCommandTable }
         };
         return commandTable;
     }

@@ -33,9 +33,9 @@ public:
     {
         static std::vector<ChatCommand> debugPlayCommandTable =
         {
-            { "cinematic",      SEC_GAMEMASTER,      false, &HandleDebugPlayCinematicCommand,   "" },
-            { "movie",          SEC_GAMEMASTER,      false, &HandleDebugPlayMovieCommand,       "" },
-            { "sound",          SEC_GAMEMASTER,      false, &HandleDebugPlaySoundCommand,       "" }
+            { "cinematic",      SEC_MODERATOR,      false, &HandleDebugPlayCinematicCommand,   "" },
+            { "movie",          SEC_MODERATOR,      false, &HandleDebugPlayMovieCommand,       "" },
+            { "sound",          SEC_MODERATOR,      false, &HandleDebugPlaySoundCommand,       "" }
         };
         static std::vector<ChatCommand> debugSendCommandTable =
         {
@@ -55,17 +55,17 @@ public:
         {
             { "setbit",         SEC_ADMINISTRATOR,  false, &HandleDebugSet32BitCommand,        "" },
             { "threat",         SEC_ADMINISTRATOR,  false, &HandleDebugThreatListCommand,      "" },
-            { "hostil",         SEC_ADMINISTRATOR,  false, &HandleDebugHostileRefListCommand,  "" },
-            { "anim",           SEC_GAMEMASTER,     false, &HandleDebugAnimCommand,            "" },
+            { "hostil",         SEC_MODERATOR,      false, &HandleDebugHostileRefListCommand,  "" },
+            { "anim",           SEC_ADMINISTRATOR,  false, &HandleDebugAnimCommand,            "" },
             { "arena",          SEC_ADMINISTRATOR,  false, &HandleDebugArenaCommand,           "" },
             { "bg",             SEC_ADMINISTRATOR,  false, &HandleDebugBattlegroundCommand,    "" },
             { "getitemstate",   SEC_ADMINISTRATOR,  false, &HandleDebugGetItemStateCommand,    "" },
-            { "lootrecipient",  SEC_GAMEMASTER,     false, &HandleDebugGetLootRecipientCommand, "" },
+            { "lootrecipient",  SEC_ADMINISTRATOR,  false, &HandleDebugGetLootRecipientCommand, "" },
             { "getvalue",       SEC_ADMINISTRATOR,  false, &HandleDebugGetValueCommand,        "" },
             { "getitemvalue",   SEC_ADMINISTRATOR,  false, &HandleDebugGetItemValueCommand,    "" },
             { "Mod32Value",     SEC_ADMINISTRATOR,  false, &HandleDebugMod32ValueCommand,      "" },
-            { "play",           SEC_GAMEMASTER,      false, nullptr,              "", debugPlayCommandTable },
-            { "send",           SEC_ADMINISTRATOR,  false, nullptr,              "", debugSendCommandTable },
+            { "play",           SEC_MODERATOR,      false, nullptr,                            "", debugPlayCommandTable },
+            { "send",           SEC_ADMINISTRATOR,  false, nullptr,                            "", debugSendCommandTable },
             { "setaurastate",   SEC_ADMINISTRATOR,  false, &HandleDebugSetAuraStateCommand,    "" },
             { "setitemvalue",   SEC_ADMINISTRATOR,  false, &HandleDebugSetItemValueCommand,    "" },
             { "setvalue",       SEC_ADMINISTRATOR,  false, &HandleDebugSetValueCommand,        "" },
@@ -76,15 +76,14 @@ public:
             { "update",         SEC_ADMINISTRATOR,  false, &HandleDebugUpdateCommand,          "" },
             { "itemexpire",     SEC_ADMINISTRATOR,  false, &HandleDebugItemExpireCommand,      "" },
             { "areatriggers",   SEC_ADMINISTRATOR,  false, &HandleDebugAreaTriggersCommand,    "" },
-            { "los",            SEC_GAMEMASTER,      false, &HandleDebugLoSCommand,             "" },
+            { "los",            SEC_ADMINISTRATOR,  false, &HandleDebugLoSCommand,             "" },
             { "moveflags",      SEC_ADMINISTRATOR,  false, &HandleDebugMoveflagsCommand,       "" },
             { "unitstate",      SEC_ADMINISTRATOR,  false, &HandleDebugUnitStateCommand,       "" }
         };
         static std::vector<ChatCommand> commandTable =
         {
-            { "debug",          SEC_GAMEMASTER,      true,  nullptr,                 "", debugCommandTable },
-            { "wpgps",          SEC_ADMINISTRATOR,  false, &HandleWPGPSCommand,   "", },
-            { nullptr,             SEC_PLAYER,         false, nullptr,                  "", }
+            { "debug",          SEC_GAMEMASTER,      true,  nullptr,                           "", debugCommandTable },
+            { "wpgps",          SEC_ADMINISTRATOR,  false, &HandleWPGPSCommand,                "", }
         };
         return commandTable;
     }

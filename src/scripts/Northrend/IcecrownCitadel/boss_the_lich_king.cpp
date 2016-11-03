@@ -377,8 +377,7 @@ public:
             return false;
         if (_maxDist && _source->GetExactDist(target) > _maxDist)
             return false;
-        if ((_exclude1 && target->HasAura(_exclude1)) ||
-            (_exclude2 && target->HasAura(_exclude2)))
+        if (_exclude1 && target->HasAura(_exclude1) || _exclude2 && target->HasAura(_exclude2))
             return false;
         if (_reqLOS && !_source->IsWithinLOSInMap(target))
             return false;
@@ -1239,8 +1238,7 @@ class npc_tirion_fordring_tft : public CreatureScript
             void Reset()
             {
                 _events.Reset();
-                if (_instance->GetBossState(DATA_THE_LICH_KING) == DONE ||
-                    (me->GetMap()->IsHeroic() && !_instance->GetData(DATA_LK_HC_AVAILABLE)))
+                if (_instance->GetBossState(DATA_THE_LICH_KING) == DONE || me->GetMap()->IsHeroic() && !_instance->GetData(DATA_LK_HC_AVAILABLE))
                     me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
                 me->SetReactState(REACT_PASSIVE);
             }
@@ -1312,8 +1310,7 @@ class npc_tirion_fordring_tft : public CreatureScript
             void JustReachedHome()
             {
                 ScriptedAI::JustReachedHome();
-                if (!(_instance->GetBossState(DATA_THE_LICH_KING) == DONE ||
-                    (me->GetMap()->IsHeroic() && !_instance->GetData(DATA_LK_HC_AVAILABLE))))
+                if (!(_instance->GetBossState(DATA_THE_LICH_KING) == DONE || me->GetMap()->IsHeroic() && !_instance->GetData(DATA_LK_HC_AVAILABLE)))
                     me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
                 me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
             }

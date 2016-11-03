@@ -16,6 +16,7 @@ modules/*/*
 modules/uwd/joiner
 !modules/hw-core/*
 !modules/acore/*
+!modules/worldengine/*
 
 build*/
 

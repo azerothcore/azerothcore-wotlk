@@ -35,7 +35,7 @@ public:
         };
         static std::vector<ChatCommand> commandTable =
         {
-            { "guild",          SEC_ADMINISTRATOR,  true, nullptr,                                 "", guildCommandTable }
+            { "guild",          SEC_GAMEMASTER,  true, nullptr,                                 "", guildCommandTable }
         };
         return commandTable;
     }

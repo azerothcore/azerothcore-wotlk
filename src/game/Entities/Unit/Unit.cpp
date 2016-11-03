@@ -51,6 +51,7 @@
 #include "WorldSession.h"
 #include "ArenaSpectator.h"
 #include "DynamicVisibility.h"
+#include "AccountMgr.h"
 
 #include <math.h>
 
@@ -146,12 +147,12 @@ _hitMask(hitMask), _spell(spell), _damageInfo(damageInfo), _healInfo(healInfo), 
 #ifdef _MSC_VER
 #pragma warning(disable:4355)
 #endif
-Unit::Unit(bool isWorldObject): WorldObject(isWorldObject),
+Unit::Unit(bool isWorldObject) : WorldObject(isWorldObject),
 m_movedByPlayer(NULL), m_lastSanctuaryTime(0), IsAIEnabled(false), NeedChangeAI(false),
 m_ControlledByPlayer(false), m_CreatedByPlayer(false), movespline(new Movement::MoveSpline()), i_AI(NULL),
 i_disabledAI(NULL), m_procDeep(0), m_removedAurasCount(0), i_motionMaster(new MotionMaster(this)), m_regenTimer(0),
 m_ThreatManager(this), m_vehicle(NULL), m_vehicleKit(NULL), m_unitTypeMask(UNIT_MASK_NONE),
-m_HostileRefManager(this), m_AutoRepeatFirstCast(false)
+m_HostileRefManager(this), m_AutoRepeatFirstCast(false), m_realRace(0), m_race(0)
 {
 #ifdef _MSC_VER
 #pragma warning(default:4355)
@@ -3367,16 +3368,13 @@ bool Unit::isInAccessiblePlaceFor(Creature const* c) const
     else if (c->GetMapId() == 631) // Icecrown Citadel
     {
         // if static transport doesn't match - return false
-        if (c->GetTransport() != this->GetTransport() &&
-            ((c->GetTransport() && c->GetTransport()->IsStaticTransport()) ||
-            (this->GetTransport() && this->GetTransport()->IsStaticTransport())))
+        if (c->GetTransport() != this->GetTransport() && (c->GetTransport() && c->GetTransport()->IsStaticTransport() || this->GetTransport() && this->GetTransport()->IsStaticTransport()))
             return false;
 
         // special handling for ICC (map 631), for non-flying pets in Gunship Battle, for trash npcs this is done via CanAIAttack
         if (IS_PLAYER_GUID(c->GetOwnerGUID()) && !c->CanFly()) 
         {
-            if ((c->GetTransport() && !this->GetTransport()) ||
-                (!c->GetTransport() && this->GetTransport()))
+            if (c->GetTransport() && !this->GetTransport() || !c->GetTransport() && this->GetTransport())
                 return false;
             if (this->GetTransport())
             {
@@ -3661,7 +3659,7 @@ void Unit::HandleSafeUnitPointersOnDelete(Unit* thisUnit)
 bool Unit::IsInWater(bool allowAbove) const
 { 
     const_cast<Unit*>(this)->UpdateEnvironmentIfNeeded(1);
-    return m_last_isinwater_status || (allowAbove && m_last_islittleabovewater_status);
+    return m_last_isinwater_status || allowAbove && m_last_islittleabovewater_status;
 }
 
 bool Unit::IsUnderWater() const
@@ -10376,8 +10374,7 @@ float Unit::SpellPctDamageModsDone(Unit* victim, SpellInfo const* spellProto, Da
                 // Merciless Combat
                 if ((*i)->GetSpellInfo()->SpellIconID == 2656)
                 {
-                    if (spellProto && 
-                        ((spellProto->SpellFamilyFlags[0] & 0x2) || (spellProto->SpellFamilyFlags[1] & 0x2)))
+                    if( spellProto && spellProto->SpellFamilyFlags[0] & 0x2 || spellProto->SpellFamilyFlags[1] & 0x2 )
                         if (!victim->HealthAbovePct(35))
                             AddPct(DoneTotalMod, (*i)->GetAmount());
                 }
@@ -16966,6 +16963,9 @@ bool Unit::SetCharmedBy(Unit* charmer, CharmType type, AuraApplication const* au
     CombatStop();
     DeleteThreatList();
 
+    if (GetTypeId() == TYPEID_PLAYER)
+        sScriptMgr->OnPlayerBeingCharmed(ToPlayer(), charmer, _oldFactionId, charmer->getFaction());
+
     return true;
 }
 
@@ -17856,6 +17856,21 @@ uint32 Unit::GetModelForTotem(PlayerTotemType totemType)
                     return 19071;
             }
             break;
+        }
+        default: // One standard for other races.
+        {
+            switch (totemType)
+                {
+                    case SUMMON_TYPE_TOTEM_FIRE:    // fire
+                        return 4589;
+                    case SUMMON_TYPE_TOTEM_EARTH:   // earth
+                        return 4588;
+                    case SUMMON_TYPE_TOTEM_WATER:   // water
+                        return 4587;
+                    case SUMMON_TYPE_TOTEM_AIR:     // air
+                        return 4590;
+                }
+                break;
         }
     }
     return 0;
@@ -19131,7 +19146,7 @@ void Unit::BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* target)
             else if (index == UNIT_FIELD_FLAGS)
             {
                 uint32 appendValue = m_uint32Values[UNIT_FIELD_FLAGS];
-                if (target->IsGameMaster() && target->GetSession()->GetSecurity() >= SEC_GAMEMASTER)
+                if (target->IsGameMaster() && AccountMgr::IsGMAccount(target->GetSession()->GetSecurity()))
                     appendValue &= ~UNIT_FLAG_NOT_SELECTABLE;
 
                 fieldBuffer << uint32(appendValue);
@@ -19156,7 +19171,7 @@ void Unit::BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* target)
 
                     if (cinfo->flags_extra & CREATURE_FLAG_EXTRA_TRIGGER)
                     {
-                        if (target->IsGameMaster() && target->GetSession()->GetSecurity() >= SEC_GAMEMASTER)
+                        if (target->IsGameMaster() && AccountMgr::IsGMAccount(target->GetSession()->GetSecurity()))
                         {
                             if (cinfo->Modelid1)
                                 displayId = cinfo->Modelid1;    // Modelid1 is a visible model for gms
@@ -19260,4 +19275,23 @@ void Unit::BuildCooldownPacket(WorldPacket& data, uint8 flags, PacketCooldowns c
         data << uint32(itr->first);
         data << uint32(itr->second);
     }
+}
+
+uint8 Unit::getRace(bool original) const
+{
+    if (GetTypeId() == TYPEID_PLAYER)
+    {
+        if (original)
+            return m_realRace;
+        else
+            return m_race;
+    }
+
+    return GetByteValue(UNIT_FIELD_BYTES_0, 0);
+}
+
+void Unit::setRace(uint8 race)
+{
+    if (GetTypeId() == TYPEID_PLAYER)
+        m_race = race;
 }

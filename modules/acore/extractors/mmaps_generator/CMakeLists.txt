@@ -15,33 +15,33 @@ set(mmap_gen_Includes
   ${ACE_INCLUDE_DIR}
   ${MYSQL_INCLUDE_DIR}
   ${OPENSSL_INCLUDE_DIR}
-  ${CMAKE_SOURCE_DIR}/modules/acore/deps/libmpq
-  ${CMAKE_SOURCE_DIR}/modules/acore/deps/zlib
-  ${CMAKE_SOURCE_DIR}/modules/acore/deps/bzip2
-  ${CMAKE_SOURCE_DIR}/modules/acore/deps/g3dlite/include
-  ${CMAKE_SOURCE_DIR}/modules/acore/deps/recastnavigation/Recast
-  ${CMAKE_SOURCE_DIR}/modules/acore/deps/recastnavigation/Detour
-  ${CMAKE_SOURCE_DIR}/modules/acore/world-engine/collision
-  ${CMAKE_SOURCE_DIR}/modules/acore/world-engine/collision/Management
-  ${CMAKE_SOURCE_DIR}/modules/acore/world-engine/collision/Maps
-  ${CMAKE_SOURCE_DIR}/modules/acore/world-engine/collision/Models
-  ${CMAKE_SOURCE_DIR}/modules/acore/framework
-  ${CMAKE_SOURCE_DIR}/modules/acore/framework/Configuration
-  ${CMAKE_SOURCE_DIR}/modules/acore/framework/Cryptography
-  ${CMAKE_SOURCE_DIR}/modules/acore/framework/Cryptography/Authentication
-  ${CMAKE_SOURCE_DIR}/modules/acore/framework/Database
-  ${CMAKE_SOURCE_DIR}/modules/acore/framework/DataStores
-  ${CMAKE_SOURCE_DIR}/modules/acore/framework/Debugging
-  ${CMAKE_SOURCE_DIR}/modules/acore/framework/Dynamic/LinkedReference
-  ${CMAKE_SOURCE_DIR}/modules/acore/framework/Dynamic
-  ${CMAKE_SOURCE_DIR}/modules/acore/framework/Logging
-  ${CMAKE_SOURCE_DIR}/modules/acore/framework/Packets
-  ${CMAKE_SOURCE_DIR}/modules/acore/framework/Threading
-  ${CMAKE_SOURCE_DIR}/modules/acore/framework/Utilities
+  ${CMAKE_SOURCE_DIR}/modules/worldengine/deps/libmpq
+  ${CMAKE_SOURCE_DIR}/modules/worldengine/deps/zlib
+  ${CMAKE_SOURCE_DIR}/modules/worldengine/deps/bzip2
+  ${CMAKE_SOURCE_DIR}/modules/worldengine/deps/g3dlite/include
+  ${CMAKE_SOURCE_DIR}/modules/worldengine/deps/recastnavigation/Recast
+  ${CMAKE_SOURCE_DIR}/modules/worldengine/deps/recastnavigation/Detour
+  ${CMAKE_SOURCE_DIR}/modules/worldengine/lib-collision/src/
+  ${CMAKE_SOURCE_DIR}/modules/worldengine/lib-collision/src/Management
+  ${CMAKE_SOURCE_DIR}/modules/worldengine/lib-collision/src/Maps
+  ${CMAKE_SOURCE_DIR}/modules/worldengine/lib-collision/src/Models
+  ${CMAKE_SOURCE_DIR}/modules/worldengine/nucleus/src
+  ${CMAKE_SOURCE_DIR}/modules/worldengine/nucleus/src/Configuration
+  ${CMAKE_SOURCE_DIR}/modules/worldengine/nucleus/src/Cryptography
+  ${CMAKE_SOURCE_DIR}/modules/worldengine/nucleus/src/Cryptography/Authentication
+  ${CMAKE_SOURCE_DIR}/modules/worldengine/nucleus/src/Database
+  ${CMAKE_SOURCE_DIR}/modules/worldengine/nucleus/src/DataStores
+  ${CMAKE_SOURCE_DIR}/modules/worldengine/nucleus/src/Debugging
+  ${CMAKE_SOURCE_DIR}/modules/worldengine/nucleus/src/Dynamic/LinkedReference
+  ${CMAKE_SOURCE_DIR}/modules/worldengine/nucleus/src/Dynamic
+  ${CMAKE_SOURCE_DIR}/modules/worldengine/nucleus/src/Logging
+  ${CMAKE_SOURCE_DIR}/modules/worldengine/nucleus/src/Packets
+  ${CMAKE_SOURCE_DIR}/modules/worldengine/nucleus/src/Threading
+  ${CMAKE_SOURCE_DIR}/modules/worldengine/nucleus/src/Utilities
+  ${CMAKE_SOURCE_DIR}/modules/acore/game-framework/src/Addons
   ${CMAKE_SOURCE_DIR}/src/game
   ${CMAKE_SOURCE_DIR}/src/game/Accounts
   ${CMAKE_SOURCE_DIR}/src/game/Achievements
-  ${CMAKE_SOURCE_DIR}/src/game/Addons
   ${CMAKE_SOURCE_DIR}/src/game/AI
   ${CMAKE_SOURCE_DIR}/src/game/AI/CoreAI
   ${CMAKE_SOURCE_DIR}/src/game/AI/ScriptedAI
@@ -111,7 +111,7 @@ set(mmap_gen_Includes
 if( WIN32 )
   set(mmap_gen_Includes
     ${mmap_gen_Includes}
-    ${CMAKE_SOURCE_DIR}/modules/acore/deps/libmpq/win
+    ${CMAKE_SOURCE_DIR}/modules/worldengine/deps/libmpq/win
     )
 endif()
 

@@ -962,6 +962,12 @@ std::vector<ChatCommand> ScriptMgr::GetChatCommands()
         table.insert(table.end(), cmds.begin(), cmds.end());
     }
 
+    // Sort commands in alphabetical order
+    std::sort(table.begin(), table.end(), [](const ChatCommand& a, const ChatCommand&b)
+    {
+        return strcmp(a.Name, b.Name) < 0;
+    });
+
     return table;
 }
 
@@ -1207,6 +1213,31 @@ void ScriptMgr::OnPlayerDuelEnd(Player* winner, Player* loser, DuelCompleteType 
     FOREACH_SCRIPT(PlayerScript)->OnDuelEnd(winner, loser, type);
 }
 
+void ScriptMgr::OnPlayerChat(Player* player, uint32 type, uint32 lang, std::string& msg)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnChat(player, type, lang, msg);
+}
+
+void ScriptMgr::OnPlayerChat(Player* player, uint32 type, uint32 lang, std::string& msg, Player* receiver)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnChat(player, type, lang, msg, receiver);
+}
+
+void ScriptMgr::OnPlayerChat(Player* player, uint32 type, uint32 lang, std::string& msg, Group* group)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnChat(player, type, lang, msg, group);
+}
+
+void ScriptMgr::OnPlayerChat(Player* player, uint32 type, uint32 lang, std::string& msg, Guild* guild)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnChat(player, type, lang, msg, guild);
+}
+
+void ScriptMgr::OnPlayerChat(Player* player, uint32 type, uint32 lang, std::string& msg, Channel* channel)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnChat(player, type, lang, msg, channel);
+}
+
 void ScriptMgr::OnPlayerEmote(Player* player, uint32 emote)
 {
     FOREACH_SCRIPT(PlayerScript)->OnEmote(player, emote);
@@ -1257,9 +1288,14 @@ void ScriptMgr::OnPlayerUpdateFaction(Player* player)
     FOREACH_SCRIPT(PlayerScript)->OnUpdateFaction(player);
 }
 
+void ScriptMgr::OnPlayerAddToBattleground(Player* player, Battleground *bg)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnAddToBattleground(player, bg);
+}
+
 void ScriptMgr::OnPlayerRemoveFromBattleground(Player* player, Battleground* bg)
 {
-    FOREACH_SCRIPT(PlayerScript)->OnPlayerRemoveFromBattleground(player, bg);
+    FOREACH_SCRIPT(PlayerScript)->OnRemoveFromBattleground(player, bg);
 }
 
 void ScriptMgr::OnAchievementComplete(Player* player, AchievementEntry const* achievement)
@@ -1280,6 +1316,11 @@ void ScriptMgr::OnAchievementSave(SQLTransaction& trans, Player* player, uint16 
 void ScriptMgr::OnCriteriaSave(SQLTransaction& trans, Player* player, uint16 critId, CriteriaProgress criteriaData)
 {
     FOREACH_SCRIPT(PlayerScript)->OnCriteriaSave(trans, player, critId, criteriaData);
+}
+
+void ScriptMgr::OnPlayerBeingCharmed(Player* player, Unit* charmer, uint32 oldFactionId, uint32 newFactionId)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnBeingCharmed(player, charmer, oldFactionId, newFactionId);
 }
 
 // Guild

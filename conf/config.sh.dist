@@ -1,5 +1,3 @@
-#!/bin/bash
-
 # absolute root path of your azerothshard repository
 SRCPATH="$AC_PATH_ROOT"
 # absolute path where binary files must be stored
@@ -40,47 +38,12 @@ CCOREPCH=ON
 # you can add your custom definitions here ( -D )
 CCUSTOMOPTIONS=""
 
-##############################################
-#
-#  RUNNER CONFIGURATION
-#
-##############################################
-
-# enable/disable GDB execution
-export GDB_ENABLED=0
-
-# gdb file
-export GDB=""
-
-# directory where binary are stored
-export BINPATH=""
-
- ### Put here the pid you configured on your worldserver.conf file ###
-export SERVERPID=""
- 
-# path to conf file
-export CONFIG=""
-
-# path of log files
-export LOGS_PATH="";
-
-# exec name
-export SERVERBIN=""
-
-# name of screen service ( for restarter )
-export SCREEN_NAME=""
-
 
 ##############################################
 #
-#  DB ASSEMBLER CONFIGURATIONS
+#  DB ASSEMBLER / EXPORTER CONFIGURATIONS
 #
 ##############################################
-
-
-# 0 if you want create an sql for each kind of following categories
-# 1 to create a single big file to import ( suggested for new installations )
-ALL_IN_ONE=0
 
 DATABASES=(
 	"AUTH"
@@ -92,57 +55,70 @@ OUTPUT_FOLDER="output/"
 
 # FULL DB
 DB_CHARACTERS_PATHS=(
-    $SRCPATH"/data/sql/base/characters"
+    $SRCPATH"/data/sql/base/db_characters"
 )
 
-DB_CHARACTERS_NAME="characters"
+DB_AUTH_PATHS=(
+    $SRCPATH"/data/sql/base/db_auth/"
+)
+
+DB_WORLD_PATHS=(
+    $SRCPATH"/data/sql/base/db_world/"
+)
+
+# UPDATES
+DB_CHARACTERS_UPDATE_PATHS=(
+    $SRCPATH"/data/sql/updates/db_characters/"
+)
+
+DB_AUTH_UPDATE_PATHS=(
+    $SRCPATH"/data/sql/updates/db_auth/"
+)
+
+DB_WORLD_UPDATE_PATHS=(
+    $SRCPATH"/data/sql/updates/db_world/"
+)
+
+# CUSTOM
+DB_CHARACTERS_CUSTOM_PATHS=(
+    $SRCPATH"/data/sql/custom/db_characters/"
+)
+
+DB_AUTH_CUSTOM_PATHS=(
+    $SRCPATH"/data/sql/custom/db_auth/"
+)
+
+DB_WORLD_CUSTOM_PATHS=(
+    $SRCPATH"/data/sql/custom/db_world/"
+)
+
+##############################################
+#
+#  DB EXPORTER/IMPORTER CONFIGURATIONS
+#
+##############################################
+
+
 
 DB_CHARACTERS_CONF="MYSQL_USER='root'; \
                     MYSQL_PASS='root'; \
                     MYSQL_HOST='localhost';\
                     "
 
-DB_AUTH_PATHS=(
-    $SRCPATH"/data/sql/base/auth/"
-)
-
-DB_AUTH_NAME="auth"
-
 DB_AUTH_CONF="MYSQL_USER='root'; \
                     MYSQL_PASS='root'; \
                     MYSQL_HOST='localhost';\
                     "
-
-DB_WORLD_PATHS=(
-    $SRCPATH"/data/sql/base/world/"
-)
-
-DB_WORLD_NAME="world"
+                    
 
 DB_WORLD_CONF="MYSQL_USER='root'; \
                     MYSQL_PASS='root'; \
                     MYSQL_HOST='localhost';\
                     "
 
-# UPDATES
-DB_CHARACTERS_UPDATE_PATHS=(
-    $SRCPATH"/data/sql/updates/characters/"
-)
 
-DB_AUTH_UPDATE_PATHS=(
-    $SRCPATH"/data/sql/updates/auth/"
-)
+DB_CHARACTERS_NAME="characters"
 
-DB_WORLD_UPDATE_PATHS=(
-    $SRCPATH"/data/sql/updates/world/"
-)
+DB_AUTH_NAME="auth"
 
-# CUSTOM
-DB_CHARACTERS_CUSTOM_PATHS=(
-)
-
-DB_AUTH_CUSTOM_PATHS=(
-)
-
-DB_WORLD_CUSTOM_PATHS=(
-)
+DB_WORLD_NAME="world"

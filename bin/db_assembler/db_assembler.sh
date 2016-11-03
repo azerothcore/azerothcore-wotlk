@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 unamestr=`uname`
 if [[ "$unamestr" == 'Darwin' ]]; then
@@ -13,141 +13,179 @@ if [ -f "./config.sh"  ]; then
     source "./config.sh" # should overwrite previous
 fi
 
-if [[ "$unamestr" == 'Darwin' ]]; then
-    MD5_CMD="md5"
-else
-    MD5_CMD="md5sum"
-fi
+MD5_CMD="md5sum"
 
-reg_file="$OUTPUT_FOLDER/.zzz_db_assembler_registry.sh"
-
-registry=()
+reg_file="$OUTPUT_FOLDER/__db_assembler_registry"
 
 if [ -f "$reg_file" ]; then
     source "$reg_file"
 fi
 
-echo "===== STARTING PROCESS ====="
-
-
 function assemble() {
-    database=$1
+    # to lowercase
+    database=${1,,}
     start_sql=$2
+    with_base=$3
+    with_updates=$4
+    with_custom=$5
 
-    var_base="DB_"$database"_PATHS"
-    base=${!var_base}
+    uc=${database^^}
 
-    var_updates="DB_"$database"_UPDATE_PATHS"
-    updates=${!var_updates}
+    name="DB_"$uc"_PATHS"
+    v="$name[@]"
+    base=("${!v}")
 
-    var_custom="DB_"$database"_CUSTOM_PATHS"
-    custom=${!var_custom}
+    name="DB_"$uc"_UPDATE_PATHS"
+    v="$name[@]"
+    updates=("${!v}")
 
-
-    suffix_base=""
-    suffix_upd=""
-    suffix_custom=""
-
-    if (( $ALL_IN_ONE == 0 )); then
-        suffix_base="_base"
-    fi;
-
-    echo "" > $OUTPUT_FOLDER$database$suffix_base".sql"
+    name='DB_'$uc'_CUSTOM_PATHS'
+    v="$name[@]"
+    custom=("${!v}")
 
 
-    if [ ! ${#base[@]} -eq 0 ]; then
-        echo "Generating $OUTPUT_FOLDER$database$suffix_base ..."
+    suffix_base="_base"
+    suffix_upd="_update"
+    suffix_custom="_custom"
 
-        for d in "${base[@]}"
-        do
-            if [ ! -z $d ]; then
-                for entry in "$d"/*.sql "$d"/**/*.sql
-                do
-                    if [[ -e $entry ]]; then
-                        cat "$entry" >> $OUTPUT_FOLDER$database$suffix_base".sql"
-                    fi
-                done
-            fi
-        done
+    curTime=`date +%Y_%m_%d_%H_%M_%S`
+
+    if [ $with_base = true ]; then
+        echo "" > $OUTPUT_FOLDER$database$suffix_base".sql"
+
+
+        if [ ! ${#base[@]} -eq 0 ]; then
+            echo "Generating $OUTPUT_FOLDER$database$suffix_base ..."
+
+            for d in "${base[@]}"
+            do
+                echo "Searching on $d ..."
+                if [ ! -z $d ]; then
+                    for entry in "$d"/*.sql "$d"/**/*.sql
+                    do
+                        if [[ -e $entry ]]; then
+                            cat "$entry" >> $OUTPUT_FOLDER$database$suffix_base".sql"
+                        fi
+                    done
+                fi
+            done
+        fi
     fi
 
-    if (( $ALL_IN_ONE == 0 )); then
-        suffix_upd="_updates"
+    if [ $with_updates = true ]; then
+        updFile=$OUTPUT_FOLDER$database$suffix_upd"_"$curTime".sql"
 
-        echo "" > $OUTPUT_FOLDER$database$suffix_upd".sql"
-    fi;
+        if [ ! ${#updates[@]} -eq 0 ]; then
+            echo "Generating $OUTPUT_FOLDER$database$suffix_upd ..."
 
-    if [ ! ${#updates[@]} -eq 0 ]; then
-        echo "Generating $OUTPUT_FOLDER$database$suffix_upd ..."
+            for d in "${updates[@]}"
+            do
+                echo "Searching on $d ..."
+                if [ ! -z $d ]; then
+                    for entry in "$d"/*.sql "$d"/**/*.sql
+                    do
+                        if [[ ! -e $entry ]]; then
+                            continue
+                        fi
 
-        for d in "${updates[@]}"
-        do
-            if [ ! -z $d ]; then
-                for entry in "$d"/*.sql "$d"/**/*.sql
-                do
-                    if [[ ! -e $entry ]]; then
-                        continue
-                    fi
+                        file=$(basename "$entry")
+                        hash=$($MD5_CMD "$entry")
+                        hash="${hash%% *}" #remove file path
+                        n="registry__$hash"
+                        if [[ -z ${!n} ]]; then
+                            if [ ! -e $updFile ]; then
+                                echo "-- assembled updates" > $updFile
+                            fi
 
-                    file=$(basename "$entry")
-                    hash=$($MD5_CMD "$entry")
-                    hash="${hash%% *}" #remove file path
-                    if [[ -z ${registry[$hash]} ]]; then
-                        registry["$hash"]="$file"
-                        echo "-- New update sql: "$file
-                        cat "$entry" >> $OUTPUT_FOLDER$database$suffix_upd".sql"
-                    fi
-                done
-            fi
-        done
+                            printf -v "registry__${hash}" %s "$file"
+                            echo "-- New update sql: "$file
+                            echo "-- $file"
+                            cat "$entry" >> $updFile
+                        fi
+                    done
+                fi
+            done
+        fi
     fi
 
-    if (( $ALL_IN_ONE == 0 )); then
-        suffix_custom="_custom"
+    if [ $with_custom = true ]; then
+        custFile=$OUTPUT_FOLDER$database$suffix_custom".sql"
 
-        echo "" > $OUTPUT_FOLDER$database$suffix_custom".sql"
-    fi;
+        if [ ! ${#custom[@]} -eq 0 ]; then
+            echo "Generating $OUTPUT_FOLDER$database$suffix_custom ..."
 
+            for d in "${custom[@]}"
+            do
+                echo "Searching on $d ..."
+                if [ ! -z $d ]; then
+                    for entry in "$d"/*.sql "$d"/**/*.sql
+                    do
+                        if [[ ! -e $entry ]]; then
+                            continue
+                        fi
 
+                        if [[ ! -e $custFile ]]; then
+                            echo "-- assembled custom" > "$custFile"
+                        fi
 
-    if [ ! ${#custom[@]} -eq 0 ]; then
-        echo "Generating $OUTPUT_FOLDER$database$suffix_custom ..."
-
-        for d in "${custom[@]}"
-        do
-            if [ ! -z $d ]; then
-                for entry in "$d"/*.sql "$d"/**/*.sql
-                do
-                    if [[ ! -e $entry ]]; then
-                        continue
-                    fi
-
-                    file=$(basename "$entry")
-                    hash=$($MD5_CMD "$entry")
-                    hash="${hash%% *}" #remove file path
-                    if [[ -z ${registry[$hash]} ]]; then
-                        registry["$hash"]="$file"
-                        echo "-- New custom sql: "$file
-                        cat "$entry" >> $OUTPUT_FOLDER$database$suffix_custom".sql"
-                    fi
-                done
-            fi
-        done
+                        echo "-- $file" >> $custFile
+                        cat "$entry" >> $custFile
+                    done
+                fi
+            done
+        fi
     fi
 }
 
-mkdir -p $OUTPUT_FOLDER
+function run() {
+    echo "===== STARTING PROCESS ====="
 
-for db in ${DATABASES[@]}
+        mkdir -p $OUTPUT_FOLDER
+
+        for db in ${DATABASES[@]}
+        do
+            assemble "$db" $version".sql" $1 $2 $3
+        done
+
+        echo "" > $reg_file
+
+        for k in ${!registry__*}
+        do
+          n=$k
+          echo "$k='${!n}';" >> "$reg_file"
+        done
+
+    echo "===== DONE ====="
+}
+
+PS3='Please enter your choice: '
+options=("Create ALL" "Create only bases" "Create only updates" "Create only customs" "Clean registry" "Quit")
+select opt in "${options[@]}"
 do
-    assemble "$db" $version".sql"
+    case $opt in
+        "Create ALL")
+            run true true true
+            break #avoid loop
+            ;;
+        "Create only bases")
+            run true false false
+            break #avoid loop
+            ;;
+        "Create only updates")
+            run false true false
+            break #avoid loop
+            ;;
+        "Create only customs")
+            run false false true
+            break #avoid loop
+            ;;
+        "Clean registry")
+            rm "$reg_file"
+            break #avoid loop
+            ;;
+        "Quit")
+            break
+            ;;
+        *) echo invalid option;;
+    esac
 done
-
-echo "" > $reg_file
-
-for i in "${!registry[@]}"
-do
-  echo "registry['"$i"']='"${registry[$i]}"'" >> "$reg_file"
-done
-
-echo "===== DONE ====="

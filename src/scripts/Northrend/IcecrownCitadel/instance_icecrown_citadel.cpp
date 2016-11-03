@@ -526,8 +526,7 @@ class instance_icecrown_citadel : public InstanceMapScript
                             return entry;
                         return 0;
                     case NPC_SPIRE_FROSTWYRM:
-                        if ((TeamIdInInstance == TEAM_ALLIANCE && data->posY < 2200.0f) ||
-                            (TeamIdInInstance == TEAM_HORDE && data->posY > 2200.0f))
+                        if (TeamIdInInstance == TEAM_ALLIANCE && data->posY < 2200.0f || TeamIdInInstance == TEAM_HORDE && data->posY > 2200.0f)
                             return 0;
                         break;
                 }

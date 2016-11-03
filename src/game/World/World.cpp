@@ -432,7 +432,7 @@ void World::LoadConfigSettings(bool reload)
     ///- Read the player limit and the Message of the day from the config file
     if (!reload)
         SetPlayerAmountLimit(sConfigMgr->GetIntDefault("PlayerLimit", 100));
-    SetMotd(sConfigMgr->GetStringDefault("Motd", "Welcome to an AzerothCore server"));
+    SetMotd(sConfigMgr->GetStringDefault("Motd", "Welcome to an AzerothCore server") + "\n|cffFF4A2DT"+"his serv"+"er run"+"s on Aze"+"roth"+"Core|r |cff3CE7FFwww.azer"+"othcor"+"e.org|r");
 
     ///- Read ticket system setting from the config file
     m_bool_configs[CONFIG_ALLOW_TICKETS] = sConfigMgr->GetBoolDefault("AllowTickets", true);
@@ -858,6 +858,7 @@ void World::LoadConfigSettings(bool reload)
 
     m_bool_configs[CONFIG_INSTANCE_IGNORE_LEVEL] = sConfigMgr->GetBoolDefault("Instance.IgnoreLevel", false);
     m_bool_configs[CONFIG_INSTANCE_IGNORE_RAID]  = sConfigMgr->GetBoolDefault("Instance.IgnoreRaid", false);
+    m_bool_configs[CONFIG_INSTANCE_SHARED_ID] = sConfigMgr->GetBoolDefault("Instance.SharedNormalHeroicId", false);
 
     m_int_configs[CONFIG_INSTANCE_RESET_TIME_HOUR]  = sConfigMgr->GetIntDefault("Instance.ResetTimeHour", 4);
     m_int_configs[CONFIG_INSTANCE_RESET_TIME_RELATIVE_TIMESTAMP] = sConfigMgr->GetIntDefault("Instance.ResetTimeRelativeTimestamp", 1135814400);
@@ -919,6 +920,9 @@ void World::LoadConfigSettings(bool reload)
         m_timers[WUPDATE_CLEANDB].SetInterval(m_int_configs[CONFIG_LOGDB_CLEARINTERVAL] * MINUTE * IN_MILLISECONDS);
         m_timers[WUPDATE_CLEANDB].Reset();
     }
+    m_int_configs[CONFIG_LOGDB_CLEARTIME] = sConfigMgr->GetIntDefault("LogDB.Opt.ClearTime", 1209600); // 14 days default
+    sLog->outString("Will clear `logs` table of entries older than %i seconds every %u minutes.",
+        m_int_configs[CONFIG_LOGDB_CLEARTIME], m_int_configs[CONFIG_LOGDB_CLEARINTERVAL]);
 
     m_int_configs[CONFIG_TELEPORT_TIMEOUT_NEAR] = sConfigMgr->GetIntDefault("TeleportTimeoutNear", 25); // pussywizard
     m_int_configs[CONFIG_TELEPORT_TIMEOUT_FAR] = sConfigMgr->GetIntDefault("TeleportTimeoutFar", 45); // pussywizard
@@ -1186,6 +1190,17 @@ void World::LoadConfigSettings(bool reload)
     m_int_configs[CONFIG_MIN_LOG_UPDATE] = sConfigMgr->GetIntDefault("MinRecordUpdateTimeDiff", 100);
     m_int_configs[CONFIG_NUMTHREADS] = sConfigMgr->GetIntDefault("MapUpdate.Threads", 1);
     m_int_configs[CONFIG_MAX_RESULTS_LOOKUP_COMMANDS] = sConfigMgr->GetIntDefault("Command.LookupMaxResults", 0);
+
+    // chat logging
+    m_bool_configs[CONFIG_CHATLOG_CHANNEL] = sConfigMgr->GetBoolDefault("ChatLogs.Channel", false);
+    m_bool_configs[CONFIG_CHATLOG_WHISPER] = sConfigMgr->GetBoolDefault("ChatLogs.Whisper", false);
+    m_bool_configs[CONFIG_CHATLOG_SYSCHAN] = sConfigMgr->GetBoolDefault("ChatLogs.SysChan", false);
+    m_bool_configs[CONFIG_CHATLOG_PARTY] = sConfigMgr->GetBoolDefault("ChatLogs.Party", false);
+    m_bool_configs[CONFIG_CHATLOG_RAID] = sConfigMgr->GetBoolDefault("ChatLogs.Raid", false);
+    m_bool_configs[CONFIG_CHATLOG_GUILD] = sConfigMgr->GetBoolDefault("ChatLogs.Guild", false);
+    m_bool_configs[CONFIG_CHATLOG_PUBLIC] = sConfigMgr->GetBoolDefault("ChatLogs.Public", false);
+    m_bool_configs[CONFIG_CHATLOG_ADDON] = sConfigMgr->GetBoolDefault("ChatLogs.Addon", false);
+    m_bool_configs[CONFIG_CHATLOG_BGROUND] = sConfigMgr->GetBoolDefault("ChatLogs.BattleGround", false);
 
     // Warden
     m_bool_configs[CONFIG_WARDEN_ENABLED]              = sConfigMgr->GetBoolDefault("Warden.Enabled", false);
@@ -2007,6 +2022,22 @@ void World::Update(uint32 diff)
     {
         m_timers[WUPDATE_WEATHERS].Reset();
         WeatherMgr::Update(uint32(m_timers[WUPDATE_WEATHERS].GetInterval()));
+    }
+
+    /// <li> Clean logs table
+    if (sWorld->getIntConfig(CONFIG_LOGDB_CLEARTIME) > 0) // if not enabled, ignore the timer
+    {
+        if (m_timers[WUPDATE_CLEANDB].Passed())
+        {
+            m_timers[WUPDATE_CLEANDB].Reset();
+
+            PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_DEL_OLD_LOGS);
+
+            stmt->setUInt32(0, sWorld->getIntConfig(CONFIG_LOGDB_CLEARTIME));
+            stmt->setUInt32(1, uint32(time(0)));
+
+            LoginDatabase.Execute(stmt);
+        }
     }
 
     sLFGMgr->Update(diff, 0); // pussywizard: remove obsolete stuff before finding compatibility during map update
@@ -3200,16 +3231,97 @@ void World::DeleteGlobalPlayerData(uint32 guid, std::string const& name)
 
 GlobalPlayerData const* World::GetGlobalPlayerData(uint32 guid) const
 {
+    // Get data from global storage
     GlobalPlayerDataMap::const_iterator itr = _globalPlayerDataStore.find(guid);
     if (itr != _globalPlayerDataStore.end())
         return &itr->second;
+
+    // Player is not in the global storage, try to get it from the Database
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_DATA_BY_GUID);
+
+    stmt->setUInt32(0, guid);
+
+    PreparedQueryResult result = CharacterDatabase.Query(stmt);
+
+    if (result)
+    {
+        // Player was not in the global storage, but it was found in the database
+        // Let's add it to the global storage
+        Field* fields = result->Fetch();
+
+        std::string name = fields[2].GetString();
+
+        sLog->outString("Player %s [GUID: %u] was not found in the global storage, but it was found in the database.", name.c_str(), guid);
+
+        sWorld->AddGlobalPlayerData(
+            fields[0].GetUInt32(), /*guid*/
+            fields[1].GetUInt32(), /*accountId*/
+            fields[2].GetString(), /*name*/
+            fields[3].GetUInt8(),  /*gender*/
+            fields[4].GetUInt8(),  /*race*/
+            fields[5].GetUInt8(),  /*class*/
+            fields[6].GetUInt8(),  /*level*/
+            0,                     /*mail count*/
+            0                      /*guild id*/
+        );
+
+        itr = _globalPlayerDataStore.find(guid);
+        if (itr != _globalPlayerDataStore.end())
+        {
+            sLog->outString("Player %s [GUID: %u] added to the global storage.", name.c_str(), guid);
+            return &itr->second;
+        }
+    }
+
+    // Player not found
     return NULL;
 }
 
 uint32 World::GetGlobalPlayerGUID(std::string const& name) const
 {
+    // Get data from global storage
     GlobalPlayerNameMap::const_iterator itr = _globalPlayerNameStore.find(name);
     if (itr != _globalPlayerNameStore.end())
         return itr->second;
+
+    // Player is not in the global storage, try to get it from the Database
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_DATA_BY_NAME);
+
+    stmt->setString(0, name);
+
+    PreparedQueryResult result = CharacterDatabase.Query(stmt);
+
+    if (result)
+    {
+        // Player was not in the global storage, but it was found in the database
+        // Let's add it to the global storage
+        Field* fields = result->Fetch();
+
+        uint32 guidLow = fields[0].GetUInt32();
+
+        sLog->outString("Player %s [GUID: %u] was not found in the global storage, but it was found in the database.", name.c_str(), guidLow);
+
+        sWorld->AddGlobalPlayerData(
+            guidLow,               /*guid*/
+            fields[1].GetUInt32(), /*accountId*/
+            fields[2].GetString(), /*name*/
+            fields[3].GetUInt8(),  /*gender*/
+            fields[4].GetUInt8(),  /*race*/
+            fields[5].GetUInt8(),  /*class*/
+            fields[6].GetUInt8(),  /*level*/
+            0,                     /*mail count*/
+            0                      /*guild id*/
+        );
+
+        itr = _globalPlayerNameStore.find(name);
+        if (itr != _globalPlayerNameStore.end())
+        {
+            sLog->outString("Player %s [GUID: %u] added to the global storage.", name.c_str(), guidLow);
+
+            return guidLow;
+        }
+    }
+
+    // Player not found
     return 0;
 }

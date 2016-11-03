@@ -136,7 +136,7 @@ bool ChatHandler::hasStringAbbr(const char* name, const char* part)
         if (!*part)
             return false;
 
-        for (;;)
+        while (true)
         {
             if (!*part)
                 return true;
@@ -244,7 +244,7 @@ bool ChatHandler::ExecuteCommandInTable(std::vector<ChatCommand> const& table, c
 
     while (*text == ' ') ++text;
 
-    for (uint32 i = 0; table[i].Name != nullptr; ++i)
+    for (uint32 i = 0; i < table.size(); ++i)
     {
         if (!hasStringAbbr(table[i].Name, cmd.c_str()))
             continue;
@@ -252,14 +252,12 @@ bool ChatHandler::ExecuteCommandInTable(std::vector<ChatCommand> const& table, c
         bool match = false;
         if (strlen(table[i].Name) > cmd.length())
         {
-            for (uint32 j = 0; table[j].Name != nullptr; ++j)
+            for (uint32 j = 0; j < table.size(); ++j)
             {
                 if (!hasStringAbbr(table[j].Name, cmd.c_str()))
                     continue;
 
-                if (strcmp(table[j].Name, cmd.c_str()) != 0)
-                    continue;
-                else
+                if (strcmp(table[j].Name, cmd.c_str()) == 0)
                 {
                     match = true;
                     break;
@@ -272,9 +270,9 @@ bool ChatHandler::ExecuteCommandInTable(std::vector<ChatCommand> const& table, c
         // select subcommand from child commands list
         if (!table[i].ChildCommands.empty())
         {
-            if (!ExecuteCommandInTable(table[i].ChildCommands, text, fullcmd))
+            if (!ExecuteCommandInTable(table[i].ChildCommands, text, fullcmd.c_str()))
             {
-                if (text && text[0] != '\0')
+                if (text[0] != '\0')
                     SendSysMessage(LANG_NO_SUBCMD);
                 else
                     SendSysMessage(LANG_CMD_SYNTAX);
@@ -351,7 +349,7 @@ bool ChatHandler::SetDataForCommandInTable(std::vector<ChatCommand>& table, char
     for (uint32 i = 0; i < table.size(); i++)
     {
         // for data fill use full explicit command names
-        if (table[i].Name == nullptr || table[i].Name != cmd)
+        if (table[i].Name != cmd)
             continue;
 
         // select subcommand from child commands list (including "")
@@ -396,14 +394,14 @@ bool ChatHandler::ParseCommands(char const* text)
     ASSERT(text);
     ASSERT(*text);
 
-    std::string fullcmd;
+    std::string fullcmd = text;
+
+    if (m_session && AccountMgr::IsPlayerAccount(m_session->GetSecurity()) && !sWorld->getBoolConfig(CONFIG_ALLOW_PLAYER_COMMANDS))
+       return false;
 
     /// chat case (.command or !command format)
     if (m_session)
     {
-        if (m_session && AccountMgr::IsPlayerAccount(m_session->GetSecurity()) && !sWorld->getBoolConfig(CONFIG_ALLOW_PLAYER_COMMANDS))
-           return false;
-
         if (text[0] != '!' && text[0] != '.')
             return false;
     }
@@ -494,7 +492,7 @@ Valid examples:
 bool ChatHandler::ShowHelpForSubCommands(std::vector<ChatCommand> const& table, char const* cmd, char const* subcmd)
 {
     std::string list;
-    for (uint32 i = 0; table[i].Name != nullptr; ++i)
+    for (uint32 i = 0; i < table.size(); ++i)
     {
         // must be available (ignore handler existence for show command with possible available subcommands)
         if (!isAvailable(table[i]))
@@ -533,7 +531,7 @@ bool ChatHandler::ShowHelpForCommand(std::vector<ChatCommand> const& table, cons
 {
     if (*cmd)
     {
-        for (uint32 i = 0; table[i].Name != nullptr; ++i)
+        for (uint32 i = 0; i < table.size(); ++i)
         {
             // must be available (ignore handler existence for show command with possible available subcommands)
             if (!isAvailable(table[i]))
@@ -563,7 +561,7 @@ bool ChatHandler::ShowHelpForCommand(std::vector<ChatCommand> const& table, cons
     }
     else
     {
-        for (uint32 i = 0; table[i].Name != nullptr; ++i)
+        for (uint32 i = 0; i < table.size(); ++i)
         {
             // must be available (ignore handler existence for show command with possible available subcommands)
             if (!isAvailable(table[i]))

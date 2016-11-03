@@ -10,12 +10,12 @@
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 include_directories(
-  ${CMAKE_SOURCE_DIR}/modules/acore/deps/g3dlite/include
-  ${CMAKE_SOURCE_DIR}/modules/acore/framework
-  ${CMAKE_SOURCE_DIR}/modules/acore/framework/Debugging
-  ${CMAKE_SOURCE_DIR}/modules/acore/world-engine/collision
-  ${CMAKE_SOURCE_DIR}/modules/acore/world-engine/collision/Maps
-  ${CMAKE_SOURCE_DIR}/modules/acore/world-engine/collision/Models
+  ${CMAKE_SOURCE_DIR}/modules/worldengine/deps/g3dlite/include
+  ${CMAKE_SOURCE_DIR}/modules/worldengine/nucleus/src
+  ${CMAKE_SOURCE_DIR}/modules/worldengine/nucleus/src/Debugging
+  ${CMAKE_SOURCE_DIR}/modules/worldengine/lib-collision/src/
+  ${CMAKE_SOURCE_DIR}/modules/worldengine/lib-collision/src/Maps
+  ${CMAKE_SOURCE_DIR}/modules/worldengine/lib-collision/src/Models
   ${ACE_INCLUDE_DIR}
   ${ZLIB_INCLUDE_DIR}
 )

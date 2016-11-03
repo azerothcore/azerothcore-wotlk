@@ -37,7 +37,7 @@ public:
             { "customize",      SEC_GAMEMASTER,     true,  &HandleCharacterCustomizeCommand,       "" },
             { "changefaction",  SEC_GAMEMASTER,     true,  &HandleCharacterChangeFactionCommand,   "" },
             { "changerace",     SEC_GAMEMASTER,     true,  &HandleCharacterChangeRaceCommand,      "" },
-            { "level",          SEC_ADMINISTRATOR,  true,  &HandleCharacterLevelCommand,           "" },
+            { "level",          SEC_GAMEMASTER,     true,  &HandleCharacterLevelCommand,           "" },
             { "rename",         SEC_GAMEMASTER,     true,  &HandleCharacterRenameCommand,          "" },
             { "reputation",     SEC_GAMEMASTER,     true,  &HandleCharacterReputationCommand,      "" },
             { "titles",         SEC_GAMEMASTER,     true,  &HandleCharacterTitlesCommand,          "" }
@@ -46,7 +46,7 @@ public:
         static std::vector<ChatCommand> commandTable =
         {
             { "character",      SEC_GAMEMASTER,     true,  nullptr,                                   "", characterCommandTable },
-            { "levelup",        SEC_ADMINISTRATOR,  false, &HandleLevelUpCommand,                  "" },
+            { "levelup",        SEC_GAMEMASTER,     false, &HandleLevelUpCommand,                  "" },
             { "pdump",          SEC_ADMINISTRATOR,  true,  nullptr,                                   "", pdumpCommandTable }
         };
         return commandTable;

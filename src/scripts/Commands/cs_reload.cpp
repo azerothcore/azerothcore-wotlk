@@ -13,6 +13,7 @@ EndScriptData */
 
 #include "AchievementMgr.h"
 #include "AuctionHouseMgr.h"
+#include "BattlegroundMgr.h"
 #include "Chat.h"
 #include "CreatureTextMgr.h"
 #include "DisableMgr.h"
@@ -39,16 +40,16 @@ public:
         static std::vector<ChatCommand> reloadAllCommandTable =
         {
             { "achievement", SEC_ADMINISTRATOR,  true,  &HandleReloadAllAchievementCommand, "" },
-            { "area",       SEC_ADMINISTRATOR,  true,  &HandleReloadAllAreaCommand,       "" },
-            { "gossips",    SEC_ADMINISTRATOR,  true,  &HandleReloadAllGossipsCommand,    "" },
-            { "item",       SEC_ADMINISTRATOR,  true,  &HandleReloadAllItemCommand,       "" },
-            { "locales",    SEC_ADMINISTRATOR,  true,  &HandleReloadAllLocalesCommand,    "" },
-            { "loot",       SEC_ADMINISTRATOR,  true,  &HandleReloadAllLootCommand,       "" },
-            { "npc",        SEC_ADMINISTRATOR,  true,  &HandleReloadAllNpcCommand,        "" },
-            { "quest",      SEC_ADMINISTRATOR,  true,  &HandleReloadAllQuestCommand,      "" },
-            { "scripts",    SEC_ADMINISTRATOR,  true,  &HandleReloadAllScriptsCommand,    "" },
-            { "spell",      SEC_ADMINISTRATOR,  true,  &HandleReloadAllSpellCommand,      "" },
-            { "",           SEC_ADMINISTRATOR,  true,  &HandleReloadAllCommand,           "" }
+            { "area",        SEC_ADMINISTRATOR,  true,  &HandleReloadAllAreaCommand,       "" },
+            { "gossips",     SEC_ADMINISTRATOR,  true,  &HandleReloadAllGossipsCommand,    "" },
+            { "item",        SEC_ADMINISTRATOR,  true,  &HandleReloadAllItemCommand,       "" },
+            { "locales",     SEC_ADMINISTRATOR,  true,  &HandleReloadAllLocalesCommand,    "" },
+            { "loot",        SEC_ADMINISTRATOR,  true,  &HandleReloadAllLootCommand,       "" },
+            { "npc",         SEC_ADMINISTRATOR,  true,  &HandleReloadAllNpcCommand,        "" },
+            { "quest",       SEC_ADMINISTRATOR,  true,  &HandleReloadAllQuestCommand,      "" },
+            { "scripts",     SEC_ADMINISTRATOR,  true,  &HandleReloadAllScriptsCommand,    "" },
+            { "spell",       SEC_ADMINISTRATOR,  true,  &HandleReloadAllSpellCommand,      "" },
+            { "",            SEC_ADMINISTRATOR,  true,  &HandleReloadAllCommand,           "" }
         };
         static std::vector<ChatCommand> reloadCommandTable =
         {
@@ -56,11 +57,12 @@ public:
             { "access_requirement",           SEC_ADMINISTRATOR, true,  &HandleReloadAccessRequirementCommand,          "" },
             { "achievement_criteria_data",    SEC_ADMINISTRATOR, true,  &HandleReloadAchievementCriteriaDataCommand,    "" },
             { "achievement_reward",           SEC_ADMINISTRATOR, true,  &HandleReloadAchievementRewardCommand,          "" },
-            { "all",                          SEC_ADMINISTRATOR, true,  nullptr,                    "", reloadAllCommandTable },
+            { "all",                          SEC_ADMINISTRATOR, true,  nullptr,                                        "", reloadAllCommandTable },
             { "areatrigger_involvedrelation", SEC_ADMINISTRATOR, true,  &HandleReloadQuestAreaTriggersCommand,          "" },
             { "areatrigger_tavern",           SEC_ADMINISTRATOR, true,  &HandleReloadAreaTriggerTavernCommand,          "" },
             { "areatrigger_teleport",         SEC_ADMINISTRATOR, true,  &HandleReloadAreaTriggerTeleportCommand,        "" },
             { "autobroadcast",                SEC_ADMINISTRATOR, true,  &HandleReloadAutobroadcastCommand,              "" },
+            { "battleground_template",        SEC_ADMINISTRATOR, true,  &HandleReloadBattlegroundTemplate,              "" },
             { "command",                      SEC_ADMINISTRATOR, true,  &HandleReloadCommandCommand,                    "" },
             { "conditions",                   SEC_ADMINISTRATOR, true,  &HandleReloadConditions,                        "" },
             { "config",                       SEC_ADMINISTRATOR, true,  &HandleReloadConfigCommand,                     "" },
@@ -142,7 +144,7 @@ public:
         };
         static std::vector<ChatCommand> commandTable =
         {
-            { "reload",         SEC_ADMINISTRATOR,  true,  nullptr,                 "", reloadCommandTable }
+            { "reload",         SEC_ADMINISTRATOR,  true,  nullptr,                                                     "", reloadCommandTable }
         };
         return commandTable;
     }
@@ -179,6 +181,15 @@ public:
         HandleReloadVehicleTemplateAccessoryCommand(handler, "");
 
         HandleReloadAutobroadcastCommand(handler, "");
+        HandleReloadBattlegroundTemplate(handler, "");
+        return true;
+    }
+
+    static bool HandleReloadBattlegroundTemplate(ChatHandler* handler, char const* /*args*/)
+    {
+        sLog->outString("Re-Loading Battleground Templates...");
+        sBattlegroundMgr->CreateInitialBattlegrounds();
+        handler->SendGlobalGMSysMessage("DB table `battleground_template` reloaded.");
         return true;
     }
 

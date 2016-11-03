@@ -32,7 +32,7 @@ public:
             { "gmannounce",     SEC_GAMEMASTER,      true,   &HandleGMAnnounceCommand,           "" },
             { "notify",         SEC_GAMEMASTER,      true,   &HandleNotifyCommand,               "" },
             { "gmnotify",       SEC_GAMEMASTER,      true,   &HandleGMNotifyCommand,             "" },
-            { "whispers",       SEC_GAMEMASTER,      false,  &HandleWhispersCommand,             "" }
+            { "whispers",       SEC_MODERATOR,       false,  &HandleWhispersCommand,             "" }
         };
         return commandTable;
     }

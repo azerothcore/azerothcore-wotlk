@@ -26,16 +26,14 @@ public:
     {
         static std::vector<ChatCommand> questCommandTable =
         {
-            { "add",            SEC_ADMINISTRATOR,  false, &HandleQuestAdd,                    "" },
-            { "complete",       SEC_ADMINISTRATOR,  false, &HandleQuestComplete,               "" },
-            { "remove",         SEC_ADMINISTRATOR,  false, &HandleQuestRemove,                 "" },
-            { "reward",         SEC_ADMINISTRATOR,  false, &HandleQuestReward,                 "" },
-            { nullptr,             SEC_PLAYER,         false, nullptr,                               "" }
+            { "add",            SEC_GAMEMASTER,  false, &HandleQuestAdd,                    "" },
+            { "complete",       SEC_GAMEMASTER,  false, &HandleQuestComplete,               "" },
+            { "remove",         SEC_GAMEMASTER,  false, &HandleQuestRemove,                 "" },
+            { "reward",         SEC_GAMEMASTER,  false, &HandleQuestReward,                 "" },
         };
         static std::vector<ChatCommand> commandTable =
         {
-            { "quest",          SEC_ADMINISTRATOR,  false, nullptr,                  "", questCommandTable },
-            { nullptr,             SEC_PLAYER,         false, nullptr,                               "" }
+            { "quest",          SEC_GAMEMASTER,  false, nullptr, "", questCommandTable },
         };
         return commandTable;
     }

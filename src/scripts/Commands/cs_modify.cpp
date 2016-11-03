@@ -18,6 +18,7 @@ EndScriptData */
 #include "Player.h"
 #include "ReputationMgr.h"
 #include "ScriptMgr.h"
+#include "AccountMgr.h"
 
 class modify_commandscript : public CommandScript
 {
@@ -46,24 +47,24 @@ public:
             { "money",          SEC_GAMEMASTER,      false, &HandleModifyMoneyCommand,         "" },
             { "scale",          SEC_GAMEMASTER,      false, &HandleModifyScaleCommand,         "" },
             { "bit",            SEC_GAMEMASTER,      false, &HandleModifyBitCommand,           "" },
-            { "faction",        SEC_GAMEMASTER,      false, &HandleModifyFactionCommand,       "" },
+            { "faction",        SEC_ADMINISTRATOR,   false, &HandleModifyFactionCommand,       "" },
             { "spell",          SEC_GAMEMASTER,      false, &HandleModifySpellCommand,         "" },
             { "talentpoints",   SEC_GAMEMASTER,      false, &HandleModifyTalentCommand,        "" },
             { "mount",          SEC_GAMEMASTER,      false, &HandleModifyMountCommand,         "" },
             { "honor",          SEC_GAMEMASTER,      false, &HandleModifyHonorCommand,         "" },
-            { "reputation",     SEC_GAMEMASTER,     false, &HandleModifyRepCommand,           "" },
+            { "reputation",     SEC_GAMEMASTER,      false, &HandleModifyRepCommand,           "" },
             { "arenapoints",    SEC_GAMEMASTER,      false, &HandleModifyArenaCommand,         "" },
             { "drunk",          SEC_GAMEMASTER,      false, &HandleModifyDrunkCommand,         "" },
-            { "standstate",     SEC_GAMEMASTER,     false, &HandleModifyStandStateCommand,    "" },
-            { "phase",          SEC_ADMINISTRATOR,  false, &HandleModifyPhaseCommand,         "" },
-            { "gender",         SEC_GAMEMASTER,     false, &HandleModifyGenderCommand,        "" },
-            { "speed",          SEC_GAMEMASTER,      false, nullptr,           "", modifyspeedCommandTable }
+            { "standstate",     SEC_GAMEMASTER,      false, &HandleModifyStandStateCommand,    "" },
+            { "phase",          SEC_GAMEMASTER,      false, &HandleModifyPhaseCommand,         "" },
+            { "gender",         SEC_GAMEMASTER,      false, &HandleModifyGenderCommand,        "" },
+            { "speed",          SEC_GAMEMASTER,      false, nullptr,                           "", modifyspeedCommandTable }
         };
         static std::vector<ChatCommand> commandTable =
         {
-            { "morph",          SEC_GAMEMASTER,     false, &HandleModifyMorphCommand,          "" },
-            { "demorph",        SEC_GAMEMASTER,     false, &HandleDeMorphCommand,              "" },
-            { "modify",         SEC_GAMEMASTER,      false, nullptr,                 "", modifyCommandTable }
+            { "morph",          SEC_MODERATOR,      false, &HandleModifyMorphCommand,          "" },
+            { "demorph",        SEC_MODERATOR,      false, &HandleDeMorphCommand,              "" },
+            { "modify",         SEC_GAMEMASTER,     false, nullptr,                            "", modifyCommandTable }
         };
         return commandTable;
     }
@@ -473,7 +474,7 @@ public:
         }
 
         Player* target = handler->getSelectedPlayerOrSelf();
-        if (handler->GetSession()->GetSecurity() < SEC_GAMEMASTER)
+        if (AccountMgr::IsGMAccount(handler->GetSession()->GetSecurity()))
             target = handler->GetSession()->GetPlayer();
         if (!target)
         {
@@ -523,7 +524,7 @@ public:
         }
 
         Player* target = handler->getSelectedPlayerOrSelf();
-        if (handler->GetSession()->GetSecurity() < SEC_GAMEMASTER)
+        if (AccountMgr::IsGMAccount(handler->GetSession()->GetSecurity()))
             target = handler->GetSession()->GetPlayer();
         if (!target)
         {
@@ -570,7 +571,7 @@ public:
         }
 
         Player* target = handler->getSelectedPlayerOrSelf();
-        if (handler->GetSession()->GetSecurity() < SEC_GAMEMASTER)
+        if (AccountMgr::IsGMAccount(handler->GetSession()->GetSecurity()))
             target = handler->GetSession()->GetPlayer();
         if (!target)
         {
@@ -617,7 +618,7 @@ public:
         }
 
         Player* target = handler->getSelectedPlayerOrSelf();
-        if (handler->GetSession()->GetSecurity() < SEC_GAMEMASTER)
+        if (AccountMgr::IsGMAccount(handler->GetSession()->GetSecurity()))
             target = handler->GetSession()->GetPlayer();
         if (!target)
         {
@@ -664,7 +665,7 @@ public:
         }
 
         Player* target = handler->getSelectedPlayerOrSelf();
-        if (handler->GetSession()->GetSecurity() < SEC_GAMEMASTER)
+        if (AccountMgr::IsGMAccount(handler->GetSession()->GetSecurity()))
             target = handler->GetSession()->GetPlayer();
         if (!target)
         {

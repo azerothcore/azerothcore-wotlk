@@ -34,6 +34,7 @@
 #include "WardenWin.h"
 #include "WardenMac.h"
 #include "SavingSystem.h"
+#include "AccountMgr.h"
 
 namespace {
 
@@ -516,7 +517,7 @@ void WorldSession::LogoutPlayer(bool save)
         }
 
         //! Broadcast a logout message to the player's friends
-        if (GetSecurity() < SEC_GAMEMASTER) // pussywizard: only for non-gms
+        if (AccountMgr::IsGMAccount(GetSecurity())) // pussywizard: only for non-gms
             sSocialMgr->SendFriendStatus(_player, FRIEND_OFFLINE, _player->GetGUIDLow(), true);
         sSocialMgr->RemovePlayerSocial(_player->GetGUIDLow());
 
@@ -867,10 +868,8 @@ void WorldSession::ReadMovementInfo(WorldPacket &data, MovementInfo* mi)
     */
 
     // pussywizard: remade this condition
-    bool canFly = GetPlayer()->m_mover->HasAuraType(SPELL_AURA_FLY) ||
-                  GetPlayer()->m_mover->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) ||
-                  (GetPlayer()->m_mover->GetTypeId() == TYPEID_UNIT && GetPlayer()->m_mover->ToCreature()->CanFly()) ||
-                  GetSecurity() > SEC_PLAYER;
+    bool canFly = GetPlayer()->m_mover->HasAuraType(SPELL_AURA_FLY) || GetPlayer()->m_mover->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) ||
+                  GetPlayer()->m_mover->GetTypeId() == TYPEID_UNIT && GetPlayer()->m_mover->ToCreature()->CanFly() || GetSecurity() > SEC_PLAYER;
     REMOVE_VIOLATING_FLAGS(mi->HasMovementFlag(MOVEMENTFLAG_FLYING | MOVEMENTFLAG_CAN_FLY) && !canFly,
         MOVEMENTFLAG_FLYING | MOVEMENTFLAG_CAN_FLY);
 
@@ -1081,9 +1080,9 @@ void WorldSession::InitializeQueryCallbackParameters()
 {
     // Callback parameters that have pointers in them should be properly
     // initialized to NULL here.
-    _charCreateCallback.SetParam(NULL);
-    _loadPetFromDBFirstCallback.SetFirstParam(NULL);
-    _loadPetFromDBFirstCallback.SetSecondParam(NULL);
+    _charCreateCallback.SetParam(nullptr);
+    _loadPetFromDBFirstCallback.SetFirstParam(0);
+    _loadPetFromDBFirstCallback.SetSecondParam(nullptr);
 }
 
 void WorldSession::ProcessQueryCallbacks()

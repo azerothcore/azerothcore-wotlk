@@ -355,7 +355,7 @@ int RASocket::svc(void)
     for (;;)
     {
         // show prompt
-        if (send("TC> ") == -1)
+        if (send("AC> ") == -1)
             return -1;
 
         std::string line;

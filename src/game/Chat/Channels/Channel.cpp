@@ -380,8 +380,7 @@ void Channel::KickOrBan(Player const* player, std::string const& badname, bool b
             return;
         }
 
-        if ((ban && (_channelRights.flags & CHANNEL_RIGHT_CANT_BAN)) ||
-            (!ban && (_channelRights.flags & CHANNEL_RIGHT_CANT_KICK)))
+        if (ban && (_channelRights.flags & CHANNEL_RIGHT_CANT_BAN) || !ban && (_channelRights.flags & CHANNEL_RIGHT_CANT_KICK))
         {
             WorldPacket data;
             MakeNotModerator(&data);
@@ -649,8 +648,8 @@ void Channel::SetOwner(Player const* player, std::string const& newname)
     Player* newp = ObjectAccessor::FindPlayerByName(newname, false);
     uint64 victim = newp ? newp->GetGUID() : 0;
 
-    if (!victim || !IsOn(victim) ||
-        (newp->GetTeamId() != player->GetTeamId() && !sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_CHANNEL)))
+    if (!victim || !IsOn(victim) || newp->GetTeamId() != player->GetTeamId() &&
+        !sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_CHANNEL))
     {
         WorldPacket data;
         MakePlayerNotFound(&data, newname);

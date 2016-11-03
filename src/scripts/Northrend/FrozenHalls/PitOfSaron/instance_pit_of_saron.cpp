@@ -77,6 +77,8 @@ public:
         void OnPlayerEnter(Player* plr)
         {
             instance->LoadGrid(LeaderIntroPos.GetPositionX(), LeaderIntroPos.GetPositionY());
+            if (Creature* c = instance->GetCreature(GetData64(DATA_LEADER_FIRST_GUID)))
+	    	c->AI()->SetData(DATA_START_INTRO, 0);
         }
 
         uint32 GetCreatureEntry(uint32 /*guidLow*/, CreatureData const* data)

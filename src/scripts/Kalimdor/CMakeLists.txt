@@ -105,6 +105,6 @@ set(scripts_STAT_SRCS
   ${AC_SCRIPTS_DIR}/Kalimdor/DireMaul/dire_maul.h
 )
 
-AC_ADD_SCRIPT_LOADER("Kalimdor" "${AC_SCRIPTS_DIR}/ScriptLoader.h")
+AC_ADD_SCRIPT_LOADER("Kalimdor" "ScriptLoader.h")
 
 message("  -> Prepared: Kalimdor")

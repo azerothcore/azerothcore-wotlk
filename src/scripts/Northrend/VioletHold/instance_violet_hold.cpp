@@ -397,8 +397,7 @@ public:
                 pBoss->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
                 pBoss->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_NPC);
                 pBoss->SetReactState(REACT_AGGRESSIVE);
-                if ((WaveCount == 6 && m_auiEncounter[0] == DONE) ||
-                    (WaveCount == 12 && m_auiEncounter[1] == DONE))
+                if (WaveCount == 6 && m_auiEncounter[0] == DONE || WaveCount == 12 && m_auiEncounter[1] == DONE)
                     pBoss->SetLootMode(0);
             }
         }

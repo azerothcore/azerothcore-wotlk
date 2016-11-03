@@ -196,6 +196,6 @@ set(scripts_STAT_SRCS
   ${AC_SCRIPTS_DIR}/Northrend/DraktharonKeep/boss_dred.cpp
 )
 
-AC_ADD_SCRIPT_LOADER("Northrend" "${AC_SCRIPTS_DIR}/ScriptLoader.h")
+AC_ADD_SCRIPT_LOADER("Northrend" "ScriptLoader.h")
 
 message("  -> Prepared: Northrend")

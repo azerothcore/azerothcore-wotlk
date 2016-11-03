@@ -1964,7 +1964,7 @@ class spell_gen_pet_summoned : public SpellScriptLoader
             {
                 Player* player = GetCaster()->ToPlayer();
                 if (player->GetLastPetNumber() && player->CanResummonPet(player->GetLastPetSpell()))
-                    Pet::LoadPetFromDB(player, PET_LOAD_BG_RESURRECT, 0, player->GetLastPetNumber(), true);
+                    Pet::LoadPetFromDB(player, PET_LOAD_SUMMON_PET, 0, player->GetLastPetNumber(), true);
             }
 
             void Register()
@@ -2159,7 +2159,7 @@ class spell_pvp_trinket_wotf_shared_cd : public SpellScriptLoader
                 // Spell::SendSpellCooldown() skips all spells with TRIGGERED_IGNORE_SPELL_AND_CATEGORY_CD
                 player->AddSpellAndCategoryCooldowns(GetSpellInfo(), GetCastItem() ? GetCastItem()->GetEntry() : 0, GetSpell());
 
-                if (player->GetTeamId() == TEAM_HORDE)
+                if (player->GetTeamId(true) == TEAM_HORDE)
                     if (GetSpellInfo()->Id == SPELL_WILL_OF_THE_FORSAKEN_COOLDOWN_TRIGGER)
                     {
                         WorldPacket data;

@@ -225,7 +225,7 @@ void CreatureGroup::LeaderMoveTo(float x, float y, float z, bool run)
         if (member->HasUnitState(UNIT_STATE_NOT_MOVE))
             continue;
 
-        // Xinef: this should be automatized, if turn angle is greater than PI/2 (90°) we should swap formation angle
+        // Xinef: this should be automatized, if turn angle is greater than PI/2 (90ï¿½) we should swap formation angle
         if (M_PI - fabs(fabs(m_leader->GetOrientation() - pathAngle) - M_PI) > M_PI*0.50f)
         {
             // pussywizard: in both cases should be 2*M_PI - follow_angle

@@ -32,13 +32,13 @@ public:
 
         static std::vector<ChatCommand> honorCommandTable =
         {
-            { "add",            SEC_GAMEMASTER,     false, nullptr,               "", honorAddCommandTable },
+            { "add",            SEC_GAMEMASTER,     false, nullptr,                            "", honorAddCommandTable },
             { "update",         SEC_GAMEMASTER,     false, &HandleHonorUpdateCommand,          "" }
         };
 
         static std::vector<ChatCommand> commandTable =
         {
-            { "honor",          SEC_GAMEMASTER,     false, nullptr,                  "", honorCommandTable }
+            { "honor",          SEC_GAMEMASTER,     false, nullptr,                            "", honorCommandTable }
         };
         return commandTable;
     }

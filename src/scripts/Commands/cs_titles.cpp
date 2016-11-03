@@ -33,11 +33,11 @@ public:
             { "add",            SEC_GAMEMASTER,     false, &HandleTitlesAddCommand,            "" },
             { "current",        SEC_GAMEMASTER,     false, &HandleTitlesCurrentCommand,        "" },
             { "remove",         SEC_GAMEMASTER,     false, &HandleTitlesRemoveCommand,         "" },
-            { "set",            SEC_GAMEMASTER,     false, nullptr,              "", titlesSetCommandTable }
+            { "set",            SEC_GAMEMASTER,     false, nullptr,                            "", titlesSetCommandTable }
         };
         static std::vector<ChatCommand> commandTable =
         {
-            { "titles",         SEC_GAMEMASTER,     false, nullptr,                 "", titlesCommandTable }
+            { "titles",         SEC_GAMEMASTER,     false, nullptr,                            "", titlesCommandTable }
         };
         return commandTable;
     }
