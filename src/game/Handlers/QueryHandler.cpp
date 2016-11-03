@@ -275,7 +275,14 @@ void WorldSession::HandlePageTextQueryOpcode(WorldPacket & recvData)
         }
         else
         {
-            data << pageText->Text;
+            std::string Text = pageText->Text;
+            
+            int loc_idx = GetSessionDbLocaleIndex();
+            if (loc_idx >= 0)
+                if (PageTextLocale const* player = sObjectMgr->GetPageTextLocale(pageID))
+                    ObjectMgr::GetLocaleString(player->Text, loc_idx, Text);
+            
+            data << Text;
             data << uint32(pageText->NextPage);
             pageID = pageText->NextPage;
         }

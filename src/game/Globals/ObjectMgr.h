@@ -1062,6 +1062,12 @@ class ObjectMgr
             if (itr == _gameObjectDataStore.end()) return NULL;
             return &itr->second;
         }
+        PageTextLocale const* GetPageTextLocale(uint32 entry) const
+        {
+            PageTextLocaleContainer::const_iterator itr = _pageTextLocaleStore.find(entry);
+            if (itr == _pageTextLocaleStore.end()) return NULL;
+            return &itr->second;
+        }
         GameObjectData& NewGOData(uint32 guid) { return _gameObjectDataStore[guid]; }
         void DeleteGOData(uint32 guid);
 
