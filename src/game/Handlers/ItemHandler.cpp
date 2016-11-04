@@ -432,13 +432,152 @@ void WorldSession::HandleItemQuerySingleOpcode(WorldPacket & recvData)
 
     ItemTemplate const* pProto = sObjectMgr->GetItemTemplate(item);
     if (pProto)
-        SendPacket(&pProto->queryData);
+    {
+     std::string Name = pProto->Name1;
+     std::string Description = pProto->Description;
+    
+     int loc_idx = GetSessionDbLocaleIndex();
+     if (loc_idx >= 0)
+     {
+         if (ItemLocale const* il = sObjectMgr->GetItemLocale(pProto->ItemId))
+         {
+             ObjectMgr::GetLocaleString(il->Name, loc_idx, Name);
+             ObjectMgr::GetLocaleString(il->Description, loc_idx, Description);
+         }
+     }
+     // guess size
+     WorldPacket queryData(SMSG_ITEM_QUERY_SINGLE_RESPONSE, 600);
+     queryData << pProto->ItemId;
+     queryData << pProto->Class;
+     queryData << pProto->SubClass;
+     queryData << pProto->SoundOverrideSubclass;
+     queryData << Name;
+     queryData << uint8(0x00);                                //pProto->Name2; // blizz not send name there, just uint8(0x00); <-- \0 = empty string = empty name...
+     queryData << uint8(0x00);                                //pProto->Name3; // blizz not send name there, just uint8(0x00);
+     queryData << uint8(0x00);                                //pProto->Name4; // blizz not send name there, just uint8(0x00);
+     queryData << pProto->DisplayInfoID;
+     queryData << pProto->Quality;
+     queryData << pProto->Flags;
+     queryData << pProto->Flags2;
+     queryData << pProto->BuyPrice;
+     queryData << pProto->SellPrice;
+     queryData << pProto->InventoryType;
+     queryData << pProto->AllowableClass;
+     queryData << pProto->AllowableRace;
+     queryData << pProto->ItemLevel;
+     queryData << pProto->RequiredLevel;
+     queryData << pProto->RequiredSkill;
+     queryData << pProto->RequiredSkillRank;
+     queryData << pProto->RequiredSpell;
+     queryData << pProto->RequiredHonorRank;
+     queryData << pProto->RequiredCityRank;
+     queryData << pProto->RequiredReputationFaction;
+     queryData << pProto->RequiredReputationRank;
+     queryData << int32(pProto->MaxCount);
+     queryData << int32(pProto->Stackable);
+     queryData << pProto->ContainerSlots;
+     queryData << pProto->StatsCount;                         // item stats count
+     for (uint32 i = 0; i < pProto->StatsCount; ++i)
+     {
+         queryData << pProto->ItemStat[i].ItemStatType;
+         queryData << pProto->ItemStat[i].ItemStatValue;
+     }
+     queryData << pProto->ScalingStatDistribution;            // scaling stats distribution
+     queryData << pProto->ScalingStatValue;                   // some kind of flags used to determine stat values column
+     for (int i = 0; i < MAX_ITEM_PROTO_DAMAGES; ++i)
+     {
+         queryData << pProto->Damage[i].DamageMin;
+         queryData << pProto->Damage[i].DamageMax;
+         queryData << pProto->Damage[i].DamageType;
+     }
+    
+     // resistances (7)
+     queryData << pProto->Armor;
+     queryData << pProto->HolyRes;
+     queryData << pProto->FireRes;
+     queryData << pProto->NatureRes;
+     queryData << pProto->FrostRes;
+     queryData << pProto->ShadowRes;
+     queryData << pProto->ArcaneRes;
+     
+     queryData << pProto->Delay;
+     queryData << pProto->AmmoType;
+     queryData << pProto->RangedModRange;
+    
+     for (int s = 0; s < MAX_ITEM_PROTO_SPELLS; ++s)
+     {
+         // send DBC data for cooldowns in same way as it used in Spell::SendSpellCooldown
+         // use `item_template` or if not set then only use spell cooldowns
+         SpellInfo const* spell = sSpellMgr->GetSpellInfo(pProto->Spells[s].SpellId);
+         if (spell)
+         {
+             bool db_data = pProto->Spells[s].SpellCooldown >= 0 || pProto->Spells[s].SpellCategoryCooldown >= 0;
+    
+             queryData << pProto->Spells[s].SpellId;
+             queryData << pProto->Spells[s].SpellTrigger;
+             queryData << uint32(-abs(pProto->Spells[s].SpellCharges));
+    
+             if (db_data)
+             {
+                 queryData << uint32(pProto->Spells[s].SpellCooldown);
+                 queryData << uint32(pProto->Spells[s].SpellCategory);
+                 queryData << uint32(pProto->Spells[s].SpellCategoryCooldown);
+             }
+             else
+             {
+                 queryData << uint32(spell->RecoveryTime);
+                 queryData << uint32(spell->GetCategory());
+                 queryData << uint32(spell->CategoryRecoveryTime);
+             }
+         }
+         else
+         {
+             queryData << uint32(0);
+             queryData << uint32(0);
+             queryData << uint32(0);
+             queryData << uint32(-1);
+             queryData << uint32(0);
+             queryData << uint32(-1);
+         }
+     }
+    queryData << pProto->Bonding;
+    queryData << Description;
+    queryData << pProto->PageText;
+    queryData << pProto->LanguageID;
+    queryData << pProto->PageMaterial;
+    queryData << pProto->StartQuest;
+    queryData << pProto->LockID;
+    queryData << int32(pProto->Material);
+    queryData << pProto->Sheath;
+    queryData << pProto->RandomProperty;
+    queryData << pProto->RandomSuffix;
+    queryData << pProto->Block;
+    queryData << pProto->ItemSet;
+    queryData << pProto->MaxDurability;
+    queryData << pProto->Area;
+    queryData << pProto->Map;                                // Added in 1.12.x & 2.0.1 client branch
+    queryData << pProto->BagFamily;
+    queryData << pProto->TotemCategory;
+    for (int s = 0; s < MAX_ITEM_PROTO_SOCKETS; ++s)
+    {
+        queryData << pProto->Socket[s].Color;
+        queryData << pProto->Socket[s].Content;
+    }
+    queryData << pProto->socketBonus;
+    queryData << pProto->GemProperties;
+    queryData << pProto->RequiredDisenchantSkill;
+    queryData << pProto->ArmorDamageModifier;
+    queryData << pProto->Duration;                           // added in 2.4.2.8209, duration (seconds)
+    queryData << pProto->ItemLimitCategory;                  // WotLK, ItemLimitCategory
+    queryData << pProto->HolidayId;                          // Holiday.dbc?
+    SendPacket(&queryData);
+    }
     else
     {
         ;//sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_ITEM_QUERY_SINGLE - NO item INFO! (ENTRY: %u)", item);
-        WorldPacket data(SMSG_ITEM_QUERY_SINGLE_RESPONSE, 4);
-        data << uint32(item | 0x80000000);
-        SendPacket(&data);
+        WorldPacket queryData(SMSG_ITEM_QUERY_SINGLE_RESPONSE, 4);
+        queryData << uint32(item | 0x80000000);
+        SendPacket(&queryData);
     }
 }
 
@@ -1053,9 +1192,15 @@ void WorldSession::HandleItemNameQueryOpcode(WorldPacket & recvData)
     ItemSetNameEntry const* pName = sObjectMgr->GetItemSetNameEntry(itemid);
     if (pName)
     {
-        WorldPacket data(SMSG_ITEM_NAME_QUERY_RESPONSE, (4+pName->name.size()+1+4));
+        std::string Name = pName->name;
+        LocaleConstant loc_idx = GetSessionDbLocaleIndex();
+        if (loc_idx >= 0)
+            if (ItemSetNameLocale const* isnl = sObjectMgr->GetItemSetNameLocale(itemid))
+                ObjectMgr::GetLocaleString(isnl->Name, loc_idx, Name);
+        
+        WorldPacket data(SMSG_ITEM_NAME_QUERY_RESPONSE, (4+Name.size()+1+4));
         data << uint32(itemid);
-        data << pName->name;
+        data << Name;
         data << uint32(pName->InventoryType);
         SendPacket(&data);
     }
