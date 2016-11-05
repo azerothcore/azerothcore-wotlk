@@ -148,15 +148,31 @@ void WorldSession::HandleGameObjectQueryOpcode(WorldPacket & recvData)
     const GameObjectTemplate* info = sObjectMgr->GetGameObjectTemplate(entry);
     if (info)
     {
+        std::string Name;
+        std::string IconName;
+        std::string CastBarCaption;
+        
+        Name = info->name;
+        IconName = info->IconName;
+        CastBarCaption = info->castBarCaption;
+        
+        LocaleConstant localeConstant = GetSessionDbLocaleIndex();
+        if (localeConstant >= LOCALE_enUS)
+            if (GameObjectLocale const* gameObjectLocale = sObjectMgr->GetGameObjectLocale(entry))
+            {
+                ObjectMgr::GetLocaleString(gameObjectLocale->Name, localeConstant, Name);
+                ObjectMgr::GetLocaleString(gameObjectLocale->CastBarCaption, localeConstant, CastBarCaption);
+            }
+
         ;//sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_GAMEOBJECT_QUERY '%s' - Entry: %u. ", info->name.c_str(), entry);
         WorldPacket data (SMSG_GAMEOBJECT_QUERY_RESPONSE, 150);
         data << uint32(entry);
         data << uint32(info->type);
         data << uint32(info->displayId);
-        data << info->name;
+        data << Name;
         data << uint8(0) << uint8(0) << uint8(0);           // name2, name3, name4
-        data << info->IconName;                                   // 2.0.3, string. Icon name to use instead of default icon for go's (ex: "Attack" makes sword)
-        data << info->castBarCaption;                             // 2.0.3, string. Text will appear in Cast Bar when using GO (ex: "Collecting")
+        data << IconName;                                   // 2.0.3, string. Icon name to use instead of default icon for go's (ex: "Attack" makes sword)
+        data << CastBarCaption;                             // 2.0.3, string. Text will appear in Cast Bar when using GO (ex: "Collecting")
         data << info->unk1;                                 // 2.0.3, string
         data.append(info->raw.data, MAX_GAMEOBJECT_DATA);
         data << float(info->size);                          // go size
