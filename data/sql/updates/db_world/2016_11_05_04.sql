@@ -1,3 +1,14 @@
+-- DB update 2016_11_05_03 -> 2016_11_05_04
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2016_11_05_03 2016_11_05_04 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1478360753169893400'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
 INSERT INTO version_db_world(`sql_rev`) VALUES ('1478360753169893400');
 
 -- ----------------------------
@@ -473,3 +484,12 @@ INSERT INTO `locales_points_of_interest` VALUES ('450', null, 'Le club de la Bi�
 INSERT INTO `locales_points_of_interest` VALUES ('451', null, 'Souvenirs de la fête des brasseurs Goblin', 'Goblin Braufest Souvenirs', null, null, '', '', null);
 INSERT INTO `locales_points_of_interest` VALUES ('452', null, 'Bélier de course de la fête des brasseurs Goblin', 'Bier des Monats e.V. Orgrimmar', null, null, '', '', null);
 INSERT INTO `locales_points_of_interest` VALUES ('453', null, 'Le club de la Bière du mois, Orgrimmar', null, null, null, '', '', null);
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END;
+//
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
