@@ -8681,6 +8681,136 @@ uint32 ObjectMgr::GetScriptId(const char *name)
     return uint32(itr - _scriptNamesStore.begin());
 }
 
+void ObjectMgr::LoadBroadcastTexts()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _broadcastTextStore.clear(); // for reload case
+
+    //                                               0   1         2         3           4         5         6         7            8            9            10       11    12
+    QueryResult result = WorldDatabase.Query("SELECT ID, Language, MaleText, FemaleText, EmoteID0, EmoteID1, EmoteID2, EmoteDelay0, EmoteDelay1, EmoteDelay2, SoundId, Unk1, Unk2 FROM broadcast_text");
+    if (!result)
+    {
+        sLog->outString(">> Loaded 0 broadcast texts. DB table `broadcast_text` is empty.");
+        sLog->outString();
+        return;
+    }
+
+    _broadcastTextStore.rehash(result->GetRowCount());
+
+    do
+    {
+        Field* fields = result->Fetch();
+
+        BroadcastText bct;
+
+        bct.Id = fields[0].GetUInt32();
+        bct.Language = fields[1].GetUInt32();
+        bct.MaleText[DEFAULT_LOCALE] = fields[2].GetString();
+        bct.FemaleText[DEFAULT_LOCALE] = fields[3].GetString();
+        bct.EmoteId0 = fields[4].GetUInt32();
+        bct.EmoteId1 = fields[5].GetUInt32();
+        bct.EmoteId2 = fields[6].GetUInt32();
+        bct.EmoteDelay0 = fields[7].GetUInt32();
+        bct.EmoteDelay1 = fields[8].GetUInt32();
+        bct.EmoteDelay2 = fields[9].GetUInt32();
+        bct.SoundId = fields[10].GetUInt32();
+        bct.Unk1 = fields[11].GetUInt32();
+        bct.Unk2 = fields[12].GetUInt32();
+
+        if (bct.SoundId)
+        {
+            if (!sSoundEntriesStore.LookupEntry(bct.SoundId))
+            {
+                sLog->outDebug(LOG_FILTER_NONE, "BroadcastText (Id: %u) in table `broadcast_text` has SoundId %u but sound does not exist.", bct.Id, bct.SoundId);
+                bct.SoundId = 0;
+            }
+        }
+
+        if (!GetLanguageDescByID(bct.Language))
+        {
+            sLog->outDebug(LOG_FILTER_NONE, "BroadcastText (Id: %u) in table `broadcast_text` using Language %u but Language does not exist.", bct.Id, bct.Language);
+            bct.Language = LANG_UNIVERSAL;
+        }
+
+        if (bct.EmoteId0)
+        {
+            if (!sEmotesStore.LookupEntry(bct.EmoteId0))
+            {
+                sLog->outDebug(LOG_FILTER_NONE, "BroadcastText (Id: %u) in table `broadcast_text` has EmoteId0 %u but emote does not exist.", bct.Id, bct.EmoteId0);
+                bct.EmoteId0 = 0;
+            }
+        }
+
+        if (bct.EmoteId1)
+        {
+            if (!sEmotesStore.LookupEntry(bct.EmoteId1))
+            {
+                sLog->outDebug(LOG_FILTER_NONE, "BroadcastText (Id: %u) in table `broadcast_text` has EmoteId1 %u but emote does not exist.", bct.Id, bct.EmoteId1);
+                bct.EmoteId1 = 0;
+            }
+        }
+
+        if (bct.EmoteId2)
+        {
+            if (!sEmotesStore.LookupEntry(bct.EmoteId2))
+            {
+                sLog->outDebug(LOG_FILTER_NONE, "BroadcastText (Id: %u) in table `broadcast_text` has EmoteId2 %u but emote does not exist.", bct.Id, bct.EmoteId2);
+                bct.EmoteId2 = 0;
+            }
+        }
+
+        _broadcastTextStore[bct.Id] = bct;
+    }
+    while (result->NextRow());
+
+    sLog->outString(">> Loaded " SIZEFMTD " broadcast texts in %u ms", _broadcastTextStore.size(), GetMSTimeDiffToNow(oldMSTime));
+    sLog->outString();
+}
+
+void ObjectMgr::LoadBroadcastTextLocales()
+{
+    uint32 oldMSTime = getMSTime();
+
+    //                                               0   1              2              3              4              5              6              7              8              9                10               11               12               13               14               15               16
+    QueryResult result = WorldDatabase.Query("SELECT Id, MaleText_loc1, MaleText_loc2, MaleText_loc3, MaleText_loc4, MaleText_loc5, MaleText_loc6, MaleText_loc7, MaleText_loc8, FemaleText_loc1, FemaleText_loc2, FemaleText_loc3, FemaleText_loc4, FemaleText_loc5, FemaleText_loc6, FemaleText_loc7, FemaleText_loc8 FROM locales_broadcast_text");
+
+    if (!result)
+    {
+        sLog->outString(">> Loaded 0 broadcast text locales. DB table `locales_broadcast_text` is empty.");
+        sLog->outString();
+        return;
+    }
+
+    uint32 count = 0;
+
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        BroadcastTextContainer::iterator bct = _broadcastTextStore.find(id);
+        if (bct == _broadcastTextStore.end())
+        {
+            sLog->outErrorDb("BroadcastText (Id: %u) in table `locales_broadcast_text` does not exist. Skipped!", id);
+            continue;
+        }
+
+        for (uint8 i = TOTAL_LOCALES - 1; i > 0; --i)
+        {
+            LocaleConstant locale = LocaleConstant(i);
+            AddLocaleString(fields[1 + (i - 1)].GetString(), locale, bct->second.MaleText);
+            AddLocaleString(fields[9 + (i - 1)].GetString(), locale, bct->second.FemaleText);
+        }
+
+        ++count;
+    }
+    while (result->NextRow());
+
+    sLog->outString(">> Loaded %u broadcast text locales in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    sLog->outString();
+}
+
 void ObjectMgr::CheckScripts(ScriptsType type, std::set<int32>& ids)
 {
     ScriptMapMap* scripts = GetScriptsMapByType(type);
