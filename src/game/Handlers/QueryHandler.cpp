@@ -87,7 +87,45 @@ void WorldSession::HandleCreatureQueryOpcode(WorldPacket & recvData)
 
     CreatureTemplate const* ci = sObjectMgr->GetCreatureTemplate(entry);
     if (ci)
-        SendPacket(&ci->queryData);
+    {
+        std::string Name, Title;
+        Name = ci->Name;
+        Title = ci->SubName;
+        
+        LocaleConstant loc_idx = GetSessionDbLocaleIndex();
+        if (loc_idx >= 0)
+        {
+            if (CreatureLocale const* cl = sObjectMgr->GetCreatureLocale(entry))
+            {
+                ObjectMgr::GetLocaleString(cl->Name, loc_idx, Name);
+                ObjectMgr::GetLocaleString(cl->Title, loc_idx, Title);
+            }
+        }
+                                                            // guess size
+        WorldPacket data(SMSG_CREATURE_QUERY_RESPONSE, 100);
+        data << uint32(entry);                              // creature entry
+        data << Name;
+        data << uint8(0) << uint8(0) << uint8(0);           // name2, name3, name4, always empty
+        data << Title;
+        data << ci->IconName;                               // "Directions" for guard, string for Icons 2.3.0
+        data << uint32(ci->type_flags);                     // flags
+        data << uint32(ci->type);                           // CreatureType.dbc
+        data << uint32(ci->family);                         // CreatureFamily.dbc
+        data << uint32(ci->rank);                           // Creature Rank (elite, boss, etc)
+        data << uint32(ci->KillCredit[0]);                  // new in 3.1, kill credit
+        data << uint32(ci->KillCredit[1]);                  // new in 3.1, kill credit
+        data << uint32(ci->Modelid1);                       // Modelid1
+        data << uint32(ci->Modelid2);                       // Modelid2
+        data << uint32(ci->Modelid3);                       // Modelid3
+        data << uint32(ci->Modelid4);                       // Modelid4
+        data << float(ci->ModHealth);                       // dmg/hp modifier
+        data << float(ci->ModMana);                         // dmg/mana modifier
+        data << uint8(ci->RacialLeader);
+        for (uint32 i = 0; i < MAX_CREATURE_QUEST_ITEMS; ++i)
+            data << uint32(ci->questItems[i]);              // itemId[6], quest drop
+        data << uint32(ci->movementId);                     // CreatureMovementInfo.dbc
+        SendPacket(&data);
+    }
     else
     {
         ;//sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_CREATURE_QUERY - NO CREATURE INFO! (GUID: %u, ENTRY: %u)",

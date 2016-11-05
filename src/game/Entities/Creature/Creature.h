@@ -218,7 +218,7 @@ typedef UNORDERED_MAP<uint16, CreatureBaseStats> CreatureBaseStatsContainer;
 struct CreatureLocale
 {
     StringVector Name;
-    StringVector SubName;
+    StringVector Title;
 };
 
 struct GossipMenuItemsLocale

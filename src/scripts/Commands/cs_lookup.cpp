@@ -164,6 +164,33 @@ public:
         for (CreatureTemplateContainer::const_iterator itr = ctc->begin(); itr != ctc->end(); ++itr)
         {
             uint32 id = itr->second.Entry;
+            uint8 localeIndex = handler->GetSessionDbLocaleIndex();
+            if (CreatureLocale const* creatureLocale = sObjectMgr->GetCreatureLocale(id))
+            {
+                if (creatureLocale->Name.size() > localeIndex && !creatureLocale->Name[localeIndex].empty())
+                {
+                    std::string name = creatureLocale->Name[localeIndex];
+            
+                    if (Utf8FitTo(name, wNamePart))
+                    {
+                        if (maxResults && count++ == maxResults)
+                        {
+                            handler->PSendSysMessage(LANG_COMMAND_LOOKUP_MAX_RESULTS, maxResults);
+                            return true;
+                        }
+            
+                        if (handler->GetSession())
+                            handler->PSendSysMessage(LANG_CREATURE_ENTRY_LIST_CHAT, id, id, name.c_str());
+                        else
+                            handler->PSendSysMessage(LANG_CREATURE_ENTRY_LIST_CONSOLE, id, name.c_str());
+            
+                        if (!found)
+                            found = true;
+            
+                        continue;
+                    }
+                }
+            }
 
             std::string name = itr->second.Name;
             if (name.empty())
