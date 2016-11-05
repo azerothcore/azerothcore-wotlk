@@ -310,13 +310,13 @@ bool ChatHandler::ExecuteCommandInTable(std::vector<ChatCommand> const& table, c
                 }
 
                 sLog->outCommand(m_session->GetAccountId(), "Command: %s [Player: %s (%ul) (Account: %u) X: %f Y: %f Z: %f Map: %u (%s) Area: %u (%s) Zone: %s Selected: %s (%ul)]",
-                    fullcmd.c_str(), player->GetName().c_str(), player->GetGUID(),
+                    fullcmd.c_str(), player->GetName().c_str(), GUID_LOPART(player->GetGUID()),
                     m_session->GetAccountId(), player->GetPositionX(), player->GetPositionY(),
                     player->GetPositionZ(), player->GetMapId(),
                     player->GetMap() ? player->GetMap()->GetMapName() : "Unknown",
                     areaId, areaName.c_str(), zoneName.c_str(),
                     (player->GetSelectedUnit()) ? player->GetSelectedUnit()->GetName().c_str() : "",
-                    guid);
+                    GUID_LOPART(guid));
             }
         }
         // some commands have custom error messages. Don't send the default one in these cases.
