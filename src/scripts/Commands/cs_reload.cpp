@@ -62,6 +62,7 @@ public:
             { "areatrigger_tavern",           SEC_ADMINISTRATOR, true,  &HandleReloadAreaTriggerTavernCommand,          "" },
             { "areatrigger_teleport",         SEC_ADMINISTRATOR, true,  &HandleReloadAreaTriggerTeleportCommand,        "" },
             { "autobroadcast",                SEC_ADMINISTRATOR, true,  &HandleReloadAutobroadcastCommand,              "" },
+            { "broadcast_text",               SEC_ADMINISTRATOR, true,  &HandleReloadBroadcastTextCommand,              "" },
             { "battleground_template",        SEC_ADMINISTRATOR, true,  &HandleReloadBattlegroundTemplate,              "" },
             { "command",                      SEC_ADMINISTRATOR, true,  &HandleReloadCommandCommand,                    "" },
             { "conditions",                   SEC_ADMINISTRATOR, true,  &HandleReloadConditions,                        "" },
@@ -181,6 +182,7 @@ public:
         HandleReloadVehicleTemplateAccessoryCommand(handler, "");
 
         HandleReloadAutobroadcastCommand(handler, "");
+        HandleReloadBroadcastTextCommand(handler, "");
         HandleReloadBattlegroundTemplate(handler, "");
         return true;
     }
@@ -362,6 +364,15 @@ public:
         sLog->outString("Re-Loading Autobroadcasts...");
         sWorld->LoadAutobroadcasts();
         handler->SendGlobalGMSysMessage("DB table `autobroadcast` reloaded.");
+        return true;
+    }
+
+    static bool HandleReloadBroadcastTextCommand(ChatHandler* handler, const char* /*args*/)
+    {
+        sLog->outString("Re-Loading Broadcast texts...");
+        sObjectMgr->LoadBroadcastTexts();
+        sObjectMgr->LoadBroadcastTextLocales();
+        handler->SendGlobalGMSysMessage("DB table `broadcast_text` reloaded.");
         return true;
     }
 
