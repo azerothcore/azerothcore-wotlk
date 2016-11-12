@@ -1870,9 +1870,9 @@ Chat.MuteFirstLogin = 0
 #
 #    Chat.MuteTimeFirstLogin
 #        Description: The time after which the player will be able to speak.
-#        Default:     2 - (Hour)
+#        Default:     120 - (Minute)
 
-Chat.MuteTimeFirstLogin = 2
+Chat.MuteTimeFirstLogin = 120
 
 #
 #    Channel.RestrictedLfg
