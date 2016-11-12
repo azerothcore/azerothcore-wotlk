@@ -68,9 +68,11 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
             default:
                 if (!sWorld->getBoolConfig(CONFIG_CHAT_MUTE_FIRST_LOGIN))
                 {
-                    if (sender->GetTotalPlayedTime() < sWorld->getIntConfig(CONFIG_CHAT_TIME_MUTE_FIRST_LOGIN) * MINUTE)
+                    uint32 minutes = sWorld->getIntConfig(CONFIG_CHAT_TIME_MUTE_FIRST_LOGIN);
+
+                    if (sender->GetTotalPlayedTime() < minutes * MINUTE)
                     {
-                        SendNotification(LANG_MUTED_PLAYER);
+                        SendNotification(LANG_MUTED_PLAYER, minutes);
                         recvData.rfinish();
                         return;
                     }
