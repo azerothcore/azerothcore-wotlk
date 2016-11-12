@@ -1298,7 +1298,6 @@ enum TrinityStrings
     LANG_CREATURE_NOT_AI_ENABLED                  = 11015,
     LANG_SELECT_PLAYER_OR_PET                     = 11016,
 
-    // Mute for player 2 hour
-    LANG_MUTED_PLAYER   = 11017,
+    LANG_MUTED_PLAYER                             = 30000, // Mute for player 2 hour
 };
 #endif
