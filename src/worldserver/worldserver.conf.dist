@@ -1860,6 +1860,14 @@ ChatFlood.MessageDelay = 1
 ChatFlood.MuteTime = 10
 
 #
+#    Chat.MuteFirstLogin
+#        Description: Speaking is allowed after playing for at least 2 hours. You may use party and guild chat.
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+
+Chat.MuteFirstLogin = 0
+
+#
 #    Channel.RestrictedLfg
 #        Description: Restrict LookupForGroup channel to characters registered in the LFG tool.
 #        Default:     1 - (Enabled, Allow join to channel only if registered in LFG)

@@ -1297,5 +1297,8 @@ enum TrinityStrings
     LANG_INSTANCE_BIND_MISMATCH                   = 11014,
     LANG_CREATURE_NOT_AI_ENABLED                  = 11015,
     LANG_SELECT_PLAYER_OR_PET                     = 11016,
+
+    // Mute for player 2 hour
+    LANG_MUTED_PLAYER   = 11016,
 };
 #endif
