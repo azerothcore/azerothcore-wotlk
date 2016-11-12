@@ -1868,6 +1868,13 @@ ChatFlood.MuteTime = 10
 Chat.MuteFirstLogin = 0
 
 #
+#    Chat.MuteTimeFirstLogin
+#        Description: The time after which the player will be able to speak.
+#        Default:     2 - (Hour)
+
+Chat.MuteTimeFirstLogin = 2
+
+#
 #    Channel.RestrictedLfg
 #        Description: Restrict LookupForGroup channel to characters registered in the LFG tool.
 #        Default:     1 - (Enabled, Allow join to channel only if registered in LFG)
