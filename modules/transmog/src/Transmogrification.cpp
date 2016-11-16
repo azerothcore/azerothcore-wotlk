@@ -511,7 +511,7 @@ bool Transmogrification::SuitableForTransmogrification(Player* player, ItemTempl
     {
         if (!proto->RandomProperty && !proto->RandomSuffix
                 /*[AZTH] Yehonal: we should transmorg also items without stats*/
-                && proto->StatsCount > 0 /*[/AZTH]*/)
+                && proto->StatsCount > 0)
         {
             bool found = false;
             for (uint8 i = 0; i < proto->StatsCount; ++i)

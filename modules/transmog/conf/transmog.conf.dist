@@ -1,227 +1,5 @@
 [worldserver]
 
-Motd = "Benvenuti nel reame di AzerothShard!"
-
-BirthdayTime = 1420822800
-
-StartPlayerMoney = 9000
-
-Quests.LowLevelHideDiff = -1
-
-PlayerLimit = 600
-
-HeroicCharactersPerRealm = 10
-
-DeletedCharacterTicketTrace = 1
-
-Channel.RestrictedLfg = 0
-
-Channel.SilentlyGMJoin = 1
-
-ChatLevelReq.Channel = 10
-ChatLevelReq.Whisper = 10
-
-Rate.Drop.Item.Poor             = 9
-Rate.Drop.Item.Normal           = 5
-Rate.Drop.Item.Uncommon         = 4
-Rate.Drop.Item.Rare             = 4
-Rate.Drop.Item.Epic             = 4
-Rate.Drop.Item.Legendary        = 1
-Rate.Drop.Item.Artifact         = 1
-Rate.Drop.Item.Referenced       = 1
-Rate.Drop.Money                 = 1.5
-
-Rate.XP.Quest   = 6
-Rate.XP.Explore = 3
-
-Rate.XP.BattlegroundKill = 30
-
-Rate.Auction.Deposit = 0
-Rate.Auction.Cut     = 0.1
-
-Rate.Honor = 1.5
-
-SkillGain.Defense   = 5
-SkillGain.Weapon    = 5
-
-AutoBroadcast.On = 1
-
-AutoBroadcast.Timer = 50000
-
-Battleground.QueueAnnouncer.Enable = 1
-
-Battleground.QueueAnnouncer.PlayerOnly = 1
-
-Battleground.GiveXPForKills = 1
-
-Battleground.StoreStatistics.Enable = 1
-
-Battleground.TrackDeserters.Enable = 1
-
-Arena.RatingDiscardTimer = 10000
-
-Arena.AutoDistributePoints = 1
-
-Arena.AutoDistributeInterval = 4
-
-Arena.QueueAnnouncer.Enable = 1
-
-Arena.ArenaStartRating = 1000
-
-Arena.ArenaStartPersonalRating = 1000
-
-Rate.ArenaPoints = 1
-
-
-CharDelete.Method = 1
-
-CharDelete.MinLevel = 15
-
-CharDelete.KeepDays = 30
-
-
-Guild.AllowMultipleGuildMaster = 1
-
-ShowKickInWorld = 1
-
-PlayerDump.DisallowPaths = 0
-
-PlayerDump.DisallowOverwrite = 0
-
-BattleGround.PremadeGroupWaitForMatch = 60000
-
-ChatFlood.MessageDelay = 0
-
-# enable/disable
-ExternalMail = 1
-#minutes
-ExternalMailInterval = 1
-
-#    [AZTH]
-#    Battleground.RandomCrossFaction.Enable
-#        Description: Enable random battleground crossfaction randomizing system
-#        Default:     0 - (Disabled)
-#                     1 - (Enabled)
-
-Battleground.RandomCrossFaction.Enable = 1
-
-#    [AZTH] 
-#    Battleground.InvitationType
-#        Description: Set Battleground invitation type.
-#        Default:     0 - (Normal, Invite as much players to battlegrounds as queued,
-#                          Don't bother with balance)
-#                     1 - (Experimental, Don't allow to invite much more players
-#                          of one faction)
-#                     [AZTH]
-#                     2 - (Experimental, start when teams are even)
-
-Battleground.InvitationType = 2
-
-
-###################################################################################################
-# PLAYER INTERACTION
-#
-#    AllowTwoSide.Accounts
-#        Description: Allow creating characters of both factions on the same account.
-#        Default:     1 - (Enabled)
-#                     0 - (Disabled)
-
-AllowTwoSide.Accounts = 1
-
-#
-#    AllowTwoSide.Interaction.Calendar
-#        Description: Allow calendar invites between factions.
-#        Default:     0 - (Disabled)
-#                     1 - (Enabled)
-
-AllowTwoSide.Interaction.Calendar = 1
-
-#
-#    AllowTwoSide.Interaction.Chat
-#        Description: Allow say chat between factions.
-#        Default:     0 - (Disabled)
-#                     1 - (Enabled)
-
-AllowTwoSide.Interaction.Chat = 1
-
-#
-#    AllowTwoSide.Interaction.Channel
-#        Description: Allow channel chat between factions.
-#        Default:     0 - (Disabled)
-#                     1 - (Enabled)
-
-AllowTwoSide.Interaction.Channel = 1
-
-#
-#    AllowTwoSide.Interaction.Group
-#        Description: Allow group joining between factions.
-#        Default:     0 - (Disabled)
-#                     1 - (Enabled)
-
-AllowTwoSide.Interaction.Group = 1
-
-#
-#    AllowTwoSide.Interaction.Guild
-#        Description: Allow guild joining between factions.
-#        Default:     0 - (Disabled)
-#                     1 - (Enabled)
-
-AllowTwoSide.Interaction.Guild = 1
-
-#
-#    AllowTwoSide.Interaction.Auction
-#        Description: Allow auctions between factions.
-#        Default:     0 - (Disabled)
-#                     1 - (Enabled)
-
-AllowTwoSide.Interaction.Auction = 1
-
-#
-#    AllowTwoSide.Interaction.Mail
-#        Description: Allow sending mails between factions.
-#        Default:     0 - (Disabled)
-#                     1 - (Enabled)
-
-AllowTwoSide.Interaction.Mail = 1
-
-#
-#    AllowTwoSide.WhoList
-#        Description: Show characters from both factions in the /who list.
-#        Default:     0 - (Disabled)
-#                     1 - (Enabled)
-
-AllowTwoSide.WhoList = 1
-
-#
-#    AllowTwoSide.AddFriend
-#        Description: Allow adding friends from other faction the friends list.
-#        Default:     0 - (Disabled)
-#                     1 - (Enabled)
-
-AllowTwoSide.AddFriend = 1
-
-#
-#    AllowTwoSide.Trade
-#        Description: Allow trading between factions.
-#        Default:     0 - (Disabled)
-#                     1 - (Enabled)
-
-AllowTwoSide.Trade = 1
-
-#
-#    TalentsInspecting
-#        Description: Allow inspecting characters from the opposing faction.
-#                     Doesn't affect characters in gamemaster mode.
-#        Default:     1 - (Enabled)
-#                     0 - (Disabled)
-
-TalentsInspecting = 1
-
-#
-###################################################################################################
-
-
-
 
 ###################################################################################################
 #    Transmogrification config
@@ -288,9 +66,9 @@ Transmogrification.CopperCost = 0
 #        Description: Amount of tokens required
 #        Default:    1
 
-Transmogrification.RequireToken = 1
-Transmogrification.TokenEntry = 47241
-Transmogrification.TokenAmount = 3
+Transmogrification.RequireToken = 0
+Transmogrification.TokenEntry = 49426
+Transmogrification.TokenAmount = 1
 
 #
 #    REQUIREMENTS
@@ -367,17 +145,17 @@ Transmogrification.TokenAmount = 3
 #        Description: Ignore stat count > 0 requirement for source items
 #        Default:    0
 
-Transmogrification.AllowPoor = 1
-Transmogrification.AllowCommon = 1
+Transmogrification.AllowPoor = 0
+Transmogrification.AllowCommon = 0
 Transmogrification.AllowUncommon = 1
 Transmogrification.AllowRare = 1
 Transmogrification.AllowEpic = 1
-Transmogrification.AllowLegendary = 1
-Transmogrification.AllowArtifact = 1
+Transmogrification.AllowLegendary = 0
+Transmogrification.AllowArtifact = 0
 Transmogrification.AllowHeirloom = 1
 
-Transmogrification.AllowMixedArmorTypes = 1
-Transmogrification.AllowMixedWeaponTypes = 1
+Transmogrification.AllowMixedArmorTypes = 0
+Transmogrification.AllowMixedWeaponTypes = 0
 Transmogrification.AllowFishingPoles = 0
 
 Transmogrification.IgnoreReqRace = 0
@@ -426,73 +204,3 @@ Transmogrification.SetCopperCost = 0
 
 #
 ###################################################################################################
-#  ANTICHEAT
-#
-#     Anticheat.Enable
-#        Description: Enables or disables the Anticheat System functionality
-#        Default:     1 - (Enabled)
-#                     0 - (Disabled)
-
-Anticheat.Enable = 1
-
-#     Anticheat.ReportsForIngameWarnings
-#        Description: How many reports the player must have to notify to GameMasters ingame when he generates a new report.
-#        Default:     70
-
-Anticheat.ReportsForIngameWarnings = 15
-
-#     Anticheat.DetectionsEnabled
-#        Description: It represents which detections are enabled.
-#
-#        SPEED_HACK_DETECTION            = 1
-#        FLY_HACK_DETECTION              = 2
-#        WALK_WATER_HACK_DETECTION       = 4
-#        JUMP_HACK_DETECTION             = 8
-#        TELEPORT_PLANE_HACK_DETECTION   = 16
-#        CLIMB_HACK_DETECTION            = 32
-#
-#        Default:     31
-
-Anticheat.DetectionsEnabled = 31
-
-#     Anticheat.MaxReportsForDailyReport
-#        Description: How many reports must the player have to make a report that it is in DB for a day (not only during the player's session).
-#        Default:     70
-
-Anticheat.MaxReportsForDailyReport = 30
-
-#
-###################################################################################################
-######################
-### PVP RANK PATCH ###
-######################
-
-PvPRank.Rate.ExtraHonor = 1
-PvPRank.HKPerRank = 10,50,100,200,450,750,1300,2000,3500,6000,9500,15000,21000,30000
-
-###################################################################################################
-
-Azth.Rate.Arena1v1 = 0.2;
-
-###################################################################################################
-# CUSTOM PLAYER XP CONFIGS
-###################################################################################################
-#	Player.customXP.security
-#		Description: Needed security level to run ".azth xp" command
-#		Default: 3
-#
-#	Player.customXP.maxValue
-#		Description: Maximum custom XP multiplier. Watch out: The xp gained is calculated this way: (XP * Rate.XP) * Player.customXP
-#		Default: 1 (Default XP rate)
-#
-#	Player.customXP.showOnLogin
-#		Description: Show custom xp value on login
-#		Default: 0 (Don't show message)
-
-Player.customXP.security = 0
-Player.customXP.maxValue = 6
-Player.customXP.showOnLogin = 1
-
-###################################################################################################
-
-

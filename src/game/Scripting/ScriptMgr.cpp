@@ -1323,6 +1323,11 @@ void ScriptMgr::OnPlayerBeingCharmed(Player* player, Unit* charmer, uint32 oldFa
     FOREACH_SCRIPT(PlayerScript)->OnBeingCharmed(player, charmer, oldFactionId, newFactionId);
 }
 
+void ScriptMgr::OnAfterPlayerSetVisibleItemSlot(Player* player, uint8 slot, Item *item)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnAfterSetVisibleItemSlot(player, slot,item);
+}
+
 // Guild
 void ScriptMgr::OnGuildAddMember(Guild* guild, Player* player, uint8& plRank)
 {
@@ -1409,6 +1414,19 @@ void ScriptMgr::OnGroupDisband(Group* group)
 {
     ASSERT(group);
     FOREACH_SCRIPT(GroupScript)->OnDisband(group);
+}
+
+void ScriptMgr::OnGlobalItemDelFromDB(SQLTransaction& trans, uint32 itemGuid)
+{
+    ASSERT(trans);
+    ASSERT(itemGuid);
+
+    FOREACH_SCRIPT(GlobalScript)->OnItemDelFromDB(trans,itemGuid);
+}
+
+void ScriptMgr::OnGlobalMirrorImageDisplayItem(const Item *item, uint32 &display)
+{
+    FOREACH_SCRIPT(GlobalScript)->OnMirrorImageDisplayItem(item,display);
 }
 
 SpellScriptLoader::SpellScriptLoader(const char* name)
@@ -1555,6 +1573,12 @@ GroupScript::GroupScript(const char* name)
     ScriptRegistry<GroupScript>::AddScript(this);
 }
 
+GlobalScript::GlobalScript(const char* name)
+    : ScriptObject(name)
+{
+    ScriptRegistry<GlobalScript>::AddScript(this);
+}
+
 // Instantiate static members of ScriptRegistry.
 template<class TScript> std::map<uint32, TScript*> ScriptRegistry<TScript>::ScriptPointerList;
 template<class TScript> std::vector<TScript*> ScriptRegistry<TScript>::ALScripts;
@@ -1585,6 +1609,7 @@ template class ScriptRegistry<AchievementCriteriaScript>;
 template class ScriptRegistry<PlayerScript>;
 template class ScriptRegistry<GuildScript>;
 template class ScriptRegistry<GroupScript>;
+template class ScriptRegistry<GlobalScript>;
 
 // Undefine utility macros.
 #undef GET_SCRIPT_RET

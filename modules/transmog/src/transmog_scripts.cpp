@@ -367,6 +367,14 @@ class PS_Transmogrification : public PlayerScript
 public:
     PS_Transmogrification() : PlayerScript("Player_Transmogrify") { }
 
+    void OnSetVisibleItemSlot(Player* player, uint8 slot, Item *item) {
+        if (!item)
+            return;
+
+        if (uint32 entry = sT->GetFakeEntry(item->GetGUID()))
+            player->SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + (slot * 2), entry);
+    }
+    
     void OnLogin(Player* player)
     {
         uint64 playerGUID = player->GetGUID();
@@ -442,9 +450,24 @@ public:
     }
 };
 
-void AddSC_npc_transmogrifier()
-{
+class global_transmog_script : public GlobalScript {
+    public:
+        global_transmog_script() : GlobalScript("global_transmog_script") { }
+        
+        void OnItemDelFromDB(SQLTransaction& trans, uint32 itemGuid) {
+            sT->DeleteFakeFromDB(itemGuid, &trans);
+        }
+        
+        void OnMirrorImageDisplayItem(const Item *item, uint32 &display) {
+            if (uint32 entry = sTransmogrification->GetFakeEntry(item->GetGUID()))
+                display=uint32(sObjectMgr->GetItemTemplate(entry)->DisplayInfoID);
+        }
+};
+
+void AddSC_transmog() {
+    new global_transmog_script();
     new npc_transmogrifier();
     new PS_Transmogrification();
     new WS_Transmogrification();
 }
+
