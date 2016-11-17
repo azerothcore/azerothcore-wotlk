@@ -111,6 +111,8 @@ function assemble() {
     if [ $with_custom = true ]; then
         custFile=$OUTPUT_FOLDER$database$suffix_custom".sql"
 
+        echo "" > $custFile
+
         if [ ! ${#custom[@]} -eq 0 ]; then
             echo "Generating $OUTPUT_FOLDER$database$suffix_custom ..."
 
