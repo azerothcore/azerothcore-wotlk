@@ -235,7 +235,7 @@ class WorldScript : public ScriptObject
 
         // Called after the world configuration is (re)loaded.
         virtual void OnAfterConfigLoad(bool /*reload*/) { }
-        
+
         // Called before the world configuration is (re)loaded.
         virtual void OnBeforeConfigLoad(bool /*reload*/) { }
 
@@ -303,7 +303,7 @@ template<class TMap> class MapScript : public UpdatableScript<TMap>
     public:
         void checkMap() {
             _mapEntry = sMapStore.LookupEntry(_mapId);
-            
+
             if (!_mapEntry)
                 sLog->outError("Invalid MapScript for %u; no such map ID.", _mapId);
         }
@@ -783,8 +783,11 @@ class PlayerScript : public ScriptObject
         // Called when a player selects an option in a player gossip window
         virtual void OnGossipSelectCode(Player* /*player*/, uint32 /*menu_id*/, uint32 /*sender*/, uint32 /*action*/, const char* /*code*/) { }
 
-        // On player getting charmed 
+        // On player getting charmed
         virtual void OnBeingCharmed(Player* /*player*/, Unit* /*charmer*/, uint32 /*oldFactionId*/, uint32 /*newFactionId*/) { }
+
+        // To change behaviour of set visible item slot
+        virtual void OnAfterSetVisibleItemSlot(Player* /*player*/, uint8 /*slot*/, Item* /*item*/) { }
 };
 
 class GuildScript : public ScriptObject
@@ -854,6 +857,20 @@ class GroupScript : public ScriptObject
 
         // Called when a group is disbanded.
         virtual void OnDisband(Group* /*group*/) { }
+};
+
+// following hooks can be used anywhere and are not db bounded
+class GlobalScript : public ScriptObject
+{
+    protected:
+
+        GlobalScript(const char* name);
+
+    public:
+
+        // items
+        virtual void OnItemDelFromDB(SQLTransaction& /*trans*/, uint32 /*itemGuid*/) { }
+        virtual void OnMirrorImageDisplayItem(const Item* /*item*/, uint32& /*display*/) { }
 };
 
 // Placed here due to ScriptRegistry::AddScript dependency.
@@ -1067,6 +1084,7 @@ class ScriptMgr
         void OnGossipSelect(Player* player, uint32 menu_id, uint32 sender, uint32 action);
         void OnGossipSelectCode(Player* player, uint32 menu_id, uint32 sender, uint32 action, const char* code);
         void OnPlayerBeingCharmed(Player* player, Unit* charmer, uint32 oldFactionId, uint32 newFactionId);
+        void OnAfterPlayerSetVisibleItemSlot(Player* player, uint8 /*slot*/, Item *item);
 
     public: /* GuildScript */
 
@@ -1090,6 +1108,10 @@ class ScriptMgr
         void OnGroupRemoveMember(Group* group, uint64 guid, RemoveMethod method, uint64 kicker, const char* reason);
         void OnGroupChangeLeader(Group* group, uint64 newLeaderGuid, uint64 oldLeaderGuid);
         void OnGroupDisband(Group* group);
+
+    public: /* GlobalScript */
+        void OnGlobalItemDelFromDB(SQLTransaction& trans, uint32 itemGuid);
+        void OnGlobalMirrorImageDisplayItem(const Item *item, uint32 &display);
 
     public: /* Scheduled scripts */
 
@@ -1147,7 +1169,7 @@ class ScriptRegistry
         static void AddALScripts() {
             for(ScriptVectorIterator it = ALScripts.begin(); it != ALScripts.end(); ++it) {
                 TScript* const script = *it;
-                
+
                 script->checkValidity();
 
                 if (script->IsDatabaseBound()) {
