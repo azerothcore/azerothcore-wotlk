@@ -9,14 +9,14 @@ DROP TABLE IF EXISTS `points_of_interest`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `points_of_interest` 
 (
-  `entry` mediumint(8) unsigned NOT NULL DEFAULT '0',
-  `x` float NOT NULL DEFAULT '0',
-  `y` float NOT NULL DEFAULT '0',
-  `icon` mediumint(8) unsigned NOT NULL DEFAULT '0',
-  `flags` mediumint(8) unsigned NOT NULL DEFAULT '0',
-  `data` mediumint(8) unsigned NOT NULL DEFAULT '0',
-  `icon_name` text NOT NULL,
-  PRIMARY KEY (`entry`)
+  `ID` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `PositionX` float NOT NULL DEFAULT '0',
+  `PositionY` float NOT NULL DEFAULT '0',
+  `Icon` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `Flags` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `Data` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `Name` text NOT NULL,
+  PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 

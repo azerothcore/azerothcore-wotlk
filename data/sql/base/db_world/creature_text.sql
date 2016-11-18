@@ -7658,6 +7658,7 @@ INSERT INTO `creature_text` VALUES
 (25208,2,0,'This is far enough. I can make it on my own from here.',12,0,100,0,0,0,0,'Lurgglbr'),
 (25208,3,0,'Thank you for rescuing me, $r. Please tell the king that I am back.',12,0,100,0,0,0,0,'Lurgglbr'),
 (25210,0,0,'I am the Keymaster. Are you the Gatekeeper?',12,0,100,0,0,0,0,'Keymaster Urmgrgl'),
+(25216,0,0,'%s attempts to run away in fear!',16,0,100,0,0,0,0,'combat Flee'),
 (25237,0,0,'%s grunts.',16,1,100,0,0,0,0,'Garrosh Hellscream'),
 (25237,1,0,'Shipping lanes... supplies... You bore me to death! We need nothing more than the warrior spirit of the Horde, Saurfang! Now that we are firmly entrenched in this frozen wasteland, nothing shall stop us!',12,1,100,1,0,0,0,'Garrosh Hellscream'),
 (25237,2,0,'Propose? I will show you what I propose!',12,1,100,6,0,0,0,'Garrosh Hellscream'),
@@ -9779,9 +9780,9 @@ INSERT INTO `creature_text` VALUES
 (28942,3,9,'This is a slap in the face! We demand answers!',12,0,100,0,0,0,0,'Citizen of New Avalon'),
 (28942,3,10,'You\'re useless, Quimby!',12,0,100,0,0,0,0,'Citizen of New Avalon'),
 (28942,3,11,'We were promised safety! Security!',12,0,100,0,0,0,0,'Citizen of New Avalon'),
-(28942,3,12,'We\'re done for! Save us, Quimby!',12,0,100,0,0,0,0,'Citizen of New Avalon'),
-(28942,3,13,'Where are those ships going, Quimby! Tell us the truth!',12,0,100,0,0,0,0,'Citizen of New Avalon');
+(28942,3,12,'We\'re done for! Save us, Quimby!',12,0,100,0,0,0,0,'Citizen of New Avalon');
 INSERT INTO `creature_text` VALUES 
+(28942,3,13,'Where are those ships going, Quimby! Tell us the truth!',12,0,100,0,0,0,0,'Citizen of New Avalon'),
 (28948,0,0,'Ahh... there you are. The master told us you\'d be arriving soon.',12,0,100,1,0,0,0,'Malmortis text'),
 (28948,1,0,'Please, follow me, $N. There is much for you to see...',12,0,100,1,0,0,0,'Malmortis text'),
 (28948,2,0,'You should feel honored. You are the first of the master\'s prospects to be shown our operation.',12,0,100,1,0,0,0,'Malmortis text'),
