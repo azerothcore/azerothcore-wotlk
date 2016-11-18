@@ -14,6 +14,16 @@
 class ACE_INET_Addr;
 struct Realm;
 
+enum eStatus
+{
+    STATUS_CHALLENGE,
+    STATUS_LOGON_PROOF,
+    STATUS_RECON_PROOF,
+    STATUS_PATCH,      // unused in CMaNGOS
+    STATUS_AUTHED,
+    STATUS_CLOSED
+};
+
 // Handle login commands
 class AuthSocket: public RealmSocket::Session
 {
@@ -54,7 +64,7 @@ private:
     BigNumber K;
     BigNumber _reconnectProof;
 
-    bool _authed;
+    eStatus _status;
 
     std::string _login;
 
