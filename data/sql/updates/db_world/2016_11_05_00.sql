@@ -1,11 +1,4 @@
--- DB update 2016_10_29_00 -> 2016_11_05_00
-DROP PROCEDURE IF EXISTS `updateDb`;
-DELIMITER //
-CREATE PROCEDURE updateDb ()
-proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
-START TRANSACTION;
 ALTER TABLE version_db_world CHANGE COLUMN 2016_10_29_00 2016_11_05_00 bit;
-SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1478151940273037900'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
 --
 -- START UPDATING QUERIES
 --
@@ -1977,12 +1970,3 @@ INSERT INTO `locales_page_text` VALUES ('3604', null, 'En tant que Réprouvés, 
 INSERT INTO `locales_page_text` VALUES ('3608', null, 'Message urgent à tous les officiers et soldats écarlates :$b$bLa servante du Fléau connue sous le nom de Lilian Voss s’est échappée de la Palissade Écarlate. Elle est extrêmement dangereuse, et doit être abattue à vue. Elle a déjà tué quinze de nos hommes. Elle n’a laissé aucun survivant.$b$bÀ moins d’avoir envie de mourir, n’essayez PAS de l’arrêter. Elle est l’ennemie de notre Croisade et doit être liquidée au plus vite.$b$bLe croisé qui ramènera sa tête au grand prêtre recevra la somme de 1 000 pièces d’or. Si vous avez des questions, adressez-vous à votre officier.$b$b$b~BV', null, null, null, null, null, 'Срочное сообщение для всех офицеров и солдат Алого ордена!\r\nАгент Плети по имени Лилиан Восс сбежала из тюрьмы в Палисаде Алого ордена. Очень опасна, при обнаружении – уничтожить. Преступница убила 15 наших солдат. Она не оставляет в живых никого.$B$BНЕ ПЫТАЙТЕСЬ ее арестовать. Это скорее всего приведет к вашей гибели. Она – враг ордена и должна быть уничтожена как можно скорее.$B$BТот, кто принесет ее голову верховному жрецу, получит в награду 1000 золотых монет. Со всеми вопросами обращайтесь к своим командирам.$B$B$B- БВ');
 INSERT INTO `locales_page_text` VALUES ('3610', null, 'Les autres ne nous comprennent pas. Ils font mine de nous tolérer, mais ils mentent. Même les démonistes ont peur de nous.$b$bPas de problème, parce que nous pouvons compter les uns sur les autres. Mages orques, tous unis ! Vous et moi ! Acrypha et… quel que soit votre nom ! Ha !$b$bNous allons leur montrer de quel bois nous sommes faits. Rendez-moi visite, et je partagerai avec vous les secrets des arcanes que j’ai réussi à maîtriser.', null, null, null, null, null, null);
 INSERT INTO `locales_page_text` VALUES ('3614', null, 'Citoyens d\' Orgrimmar, méfiez-vous des devins et des prophètes de malheur qui ont occupé nos rues. Ne soyez pas une proie pour leur délire fou. Ils ne veulent que nous affaiblir en face de nos vrais ennemis!', null, null, null, 'Ciudadanos de Orgrimmar,tened cuidado con los adivinos y profetas de la fatalidad que se han apoderado de nuestras calles, No os dejeis engañar por esos locos de atar. ¡Ellos sólo quieren debilitarnos ante nuestros verdaderos enemigos!', 'Ciudadanos de Orgrimmar,tened cuidado con los adivinos y profetas de la fatalidad que se han apoderado de nuestras calles, No os dejeis engañar por esos locos de atar. ¡Ellos sólo quieren debilitarnos ante nuestros verdaderos enemigos!', 'Граждане Оргриммара! Остерегайтесь предсказателей и вестников судьбы, которые заполонили улицы нашего города! Не верьте их сумасбродным речам. Их цель – ослабить нас и не дать одолеть нашего настоящего врага!');
---
--- END UPDATING QUERIES
---
-COMMIT;
-END;
-//
-DELIMITER ;
-CALL updateDb();
-DROP PROCEDURE IF EXISTS `updateDb`;
