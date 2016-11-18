@@ -12820,6 +12820,8 @@ void Player::MoveItemFromInventory(uint8 bag, uint8 slot, bool update)
             it->RemoveFromWorld();
             it->DestroyForPlayer(this);
         }
+
+        sScriptMgr->OnAfterPlayerMoveItemFromInventory(this,it,bag,slot,update);
     }
 }
 
