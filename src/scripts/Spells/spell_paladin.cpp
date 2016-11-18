@@ -336,7 +336,7 @@ class spell_pal_ardent_defender : public SpellScriptLoader
                     // Max heal when defense skill denies critical hits from raid bosses
                     // Formula: max defense at level + 140 (raiting from gear)
                     uint32 reqDefForMaxHeal  = victim->getLevel() * 5 + 140;
-                    float pctFromDefense = (defenseSkillValue - victim->getLevel()*5.0f) / 140.0f;
+                    float pctFromDefense = (defenseSkillValue = victim->getLevel()*5.0f) / 140.0f;
                     if (pctFromDefense < 0.0f)
                         pctFromDefense = 0.0f;
                     else if (pctFromDefense > 1.0f)
