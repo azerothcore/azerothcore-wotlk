@@ -19,7 +19,7 @@ enum eStatus
     STATUS_CHALLENGE,
     STATUS_LOGON_PROOF,
     STATUS_RECON_PROOF,
-    STATUS_PATCH,      // unused in CMaNGOS
+    STATUS_PATCH,      // unused
     STATUS_AUTHED,
     STATUS_CLOSED
 };
