@@ -788,6 +788,9 @@ class PlayerScript : public ScriptObject
 
         // To change behaviour of set visible item slot
         virtual void OnAfterSetVisibleItemSlot(Player* /*player*/, uint8 /*slot*/, Item* /*item*/) { }
+               
+        // After an item has been moved from inventory
+        virtual void OnAfterMoveItemFromInventory(Player* /*player*/, Item* /*it*/,uint8 /*bag*/, uint8 /*slot*/, bool /*update*/) { }
 };
 
 class GuildScript : public ScriptObject
@@ -1084,7 +1087,8 @@ class ScriptMgr
         void OnGossipSelect(Player* player, uint32 menu_id, uint32 sender, uint32 action);
         void OnGossipSelectCode(Player* player, uint32 menu_id, uint32 sender, uint32 action, const char* code);
         void OnPlayerBeingCharmed(Player* player, Unit* charmer, uint32 oldFactionId, uint32 newFactionId);
-        void OnAfterPlayerSetVisibleItemSlot(Player* player, uint8 /*slot*/, Item *item);
+        void OnAfterPlayerSetVisibleItemSlot(Player* player, uint8 slot, Item *item);
+        void OnAfterPlayerMoveItemFromInventory(Player* player, Item* it, uint8 bag, uint8 slot, bool update);
 
     public: /* GuildScript */
 
