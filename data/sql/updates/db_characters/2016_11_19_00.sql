@@ -1,0 +1,25 @@
+-- DB update 2016_08_25_00 -> 2016_11_19_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+START TRANSACTION;
+ALTER TABLE version_db_characters CHANGE COLUMN 2016_08_25_00 2016_11_19_00 bit;
+SELECT sql_rev INTO OK FROM version_db_characters WHERE sql_rev = '1478978518254125000'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+INSERT INTO version_db_characters (`sql_rev`) VALUES ('1478978518254125000');
+
+ALTER TABLE `arena_team_member`
+	CHANGE COLUMN `personalRating` `personalRating` SMALLINT(5) NOT NULL DEFAULT '0' AFTER `seasonWins`,
+	DROP COLUMN `personal_rating`;
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END;
+//
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
