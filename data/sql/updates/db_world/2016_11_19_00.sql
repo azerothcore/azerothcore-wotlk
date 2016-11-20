@@ -11,7 +11,7 @@ SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '147723682367413000
 --
 INSERT INTO version_db_world(`sql_rev`) VALUES ('1477236823674130000');
 
-UPDATE `quest_template` SET `SpecialFlags` = "0", `RequiredItemId1` = "31811", `RequiredItemCount1` ="1", `Flags` = "0" WHERE `ID` = "10923"
+UPDATE `quest_template` SET `SpecialFlags` = "0", `RequiredItemId1` = "31811", `RequiredItemCount1` ="1", `Flags` = "0" WHERE `ID` = "10923";
 --
 -- END UPDATING QUERIES
 --
