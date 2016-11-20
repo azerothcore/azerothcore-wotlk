@@ -493,17 +493,11 @@ public:
             cInfo->ModMana            = fields[69].GetFloat();
             cInfo->ModArmor           = fields[70].GetFloat();
             cInfo->RacialLeader       = fields[71].GetBool();
-            cInfo->questItems[0]      = fields[72].GetUInt32();
-            cInfo->questItems[1]      = fields[73].GetUInt32();
-            cInfo->questItems[2]      = fields[74].GetUInt32();
-            cInfo->questItems[3]      = fields[75].GetUInt32();
-            cInfo->questItems[4]      = fields[76].GetUInt32();
-            cInfo->questItems[5]      = fields[77].GetUInt32();
-            cInfo->movementId         = fields[78].GetUInt32();
-            cInfo->RegenHealth        = fields[79].GetBool();
-            cInfo->MechanicImmuneMask = fields[80].GetUInt32();
-            cInfo->flags_extra        = fields[81].GetUInt32();
-            cInfo->ScriptID           = sObjectMgr->GetScriptId(fields[82].GetCString());
+            cInfo->movementId         = fields[72].GetUInt32();
+            cInfo->RegenHealth        = fields[73].GetBool();
+            cInfo->MechanicImmuneMask = fields[74].GetUInt32();
+            cInfo->flags_extra        = fields[75].GetUInt32();
+            cInfo->ScriptID           = sObjectMgr->GetScriptId(fields[76].GetCString());
 
             sObjectMgr->CheckCreatureTemplate(cInfo);
         }

@@ -129,7 +129,6 @@ struct CreatureTemplate
     float   ModMana;
     float   ModArmor;
     bool    RacialLeader;
-    uint32  questItems[MAX_CREATURE_QUEST_ITEMS];
     uint32  movementId;
     bool    RegenHealth;
     uint32  MechanicImmuneMask;
@@ -163,6 +162,9 @@ struct CreatureTemplate
 
     void InitializeQueryData();
 };
+
+typedef std::vector<uint32> CreatureQuestItemList;
+typedef std::unordered_map<uint32, CreatureQuestItemList> CreatureQuestItemMap;
 
 // Benchmarked: Faster than std::map (insert/find)
 typedef UNORDERED_MAP<uint32, CreatureTemplate> CreatureTemplateContainer;
