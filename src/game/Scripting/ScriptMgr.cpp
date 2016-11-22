@@ -1437,12 +1437,6 @@ void ScriptMgr::OnGroupDisband(Group* group)
     FOREACH_SCRIPT(GroupScript)->OnDisband(group);
 }
 
-/*void ScriptMgr::OnGroupJoinBG(Group* group, Battleground* bg)
-{
-	ASSERT(group);
-	FOREACH_SCRIPT(GroupScript)->OnGroupJoinBG(group, bg);
-}*/
-
 void ScriptMgr::OnGlobalItemDelFromDB(SQLTransaction& trans, uint32 itemGuid)
 {
     ASSERT(trans);
