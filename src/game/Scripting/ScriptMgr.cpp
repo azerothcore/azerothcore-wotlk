@@ -1333,6 +1333,22 @@ void ScriptMgr::OnAfterPlayerMoveItemFromInventory(Player* player, Item* it, uin
     FOREACH_SCRIPT(PlayerScript)->OnAfterMoveItemFromInventory(player, it, bag, slot, update);
 }
 
+void ScriptMgr::OnEquip(Player* player, Item* it, uint8 bag, uint8 slot, bool update)
+{
+	FOREACH_SCRIPT(PlayerScript)->OnEquip(player, it, bag, slot, update);
+}
+
+void ScriptMgr::OnPlayerJoinBG(Player* player, Battleground* bg)
+{
+	FOREACH_SCRIPT(PlayerScript)->OnPlayerJoinBG(player, bg);
+}
+
+void ScriptMgr::OnPlayerJoinArena(Player* player, Battleground* bg)
+{
+	FOREACH_SCRIPT(PlayerScript)->OnPlayerJoinArena(player, bg);
+}
+
+
 // Guild
 void ScriptMgr::OnGuildAddMember(Guild* guild, Player* player, uint8& plRank)
 {
@@ -1420,6 +1436,12 @@ void ScriptMgr::OnGroupDisband(Group* group)
     ASSERT(group);
     FOREACH_SCRIPT(GroupScript)->OnDisband(group);
 }
+
+/*void ScriptMgr::OnGroupJoinBG(Group* group, Battleground* bg)
+{
+	ASSERT(group);
+	FOREACH_SCRIPT(GroupScript)->OnGroupJoinBG(group, bg);
+}*/
 
 void ScriptMgr::OnGlobalItemDelFromDB(SQLTransaction& trans, uint32 itemGuid)
 {

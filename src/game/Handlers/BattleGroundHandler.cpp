@@ -22,6 +22,7 @@
 #include "Opcodes.h"
 #include "DisableMgr.h"
 #include "Group.h"
+#include "ScriptMgr.h"
 
 void WorldSession::HandleBattlemasterHelloOpcode(WorldPacket & recvData)
 {
@@ -167,6 +168,11 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket & recvData)
         WorldPacket data;
         sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, bgt, queueSlot, STATUS_WAIT_QUEUE, avgWaitTime, 0, 0, TEAM_NEUTRAL);
         SendPacket(&data);
+
+		//#define sScriptMgr ACE_Singleton<ScriptMgr, ACE_Null_Mutex>::instance()
+		ScriptMgr* sScriptMgr;
+		sScriptMgr->OnPlayerJoinBG(_player, sBattlegroundMgr->GetBattlegroundTemplate(ginfo->BgTypeId));
+		
     }
     // check if group can queue:
     else
@@ -244,6 +250,9 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket & recvData)
 
             sBattlegroundMgr->BuildGroupJoinedBattlegroundPacket(&data, err);
             member->GetSession()->SendPacket(&data);
+
+			ScriptMgr* sScriptMgr;
+			sScriptMgr->OnPlayerJoinBG(member, sBattlegroundMgr->GetBattlegroundTemplate(member->GetBattlegroundTypeId()));
         }
     }
 }
@@ -652,6 +661,9 @@ void WorldSession::HandleBattlemasterJoinArena(WorldPacket & recvData)
         WorldPacket data;
         sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, bgt, queueSlot, STATUS_WAIT_QUEUE, avgWaitTime, 0, arenatype, TEAM_NEUTRAL);
         SendPacket(&data);
+
+		ScriptMgr* sScriptMgr;
+		sScriptMgr->OnPlayerJoinArena(_player, sBattlegroundMgr->GetBattlegroundTemplate(ginfo->BgTypeId));
     }
     // check if group can queue:
     else
@@ -746,6 +758,9 @@ void WorldSession::HandleBattlemasterJoinArena(WorldPacket & recvData)
 
             sBattlegroundMgr->BuildGroupJoinedBattlegroundPacket(&data, err);
             member->GetSession()->SendPacket(&data);
+
+			ScriptMgr* sScriptMgr;
+			sScriptMgr->OnPlayerJoinArena(member, sBattlegroundMgr->GetBattlegroundTemplate(member->GetBattlegroundTypeId()));
         }
 
         // pussywizard: schedule update for rated arena
