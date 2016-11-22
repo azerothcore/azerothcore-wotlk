@@ -790,16 +790,16 @@ class PlayerScript : public ScriptObject
         virtual void OnAfterSetVisibleItemSlot(Player* /*player*/, uint8 /*slot*/, Item* /*item*/) { }
                
         // After an item has been moved from inventory
-		virtual void OnAfterMoveItemFromInventory(Player* /*player*/, Item* /*it*/, uint8 /*bag*/, uint8 /*slot*/, bool /*update*/) { }
+        virtual void OnAfterMoveItemFromInventory(Player* /*player*/, Item* /*it*/, uint8 /*bag*/, uint8 /*slot*/, bool /*update*/) { }
 
-		// After an item has been equipped
-		virtual void OnEquip(Player* /*player*/, Item* /*it*/, uint8 /*bag*/, uint8 /*slot*/, bool /*update*/) { }
+        // After an item has been equipped
+        virtual void OnEquip(Player* /*player*/, Item* /*it*/, uint8 /*bag*/, uint8 /*slot*/, bool /*update*/) { }
 
-		// After player enters queue for BG
-		virtual void OnPlayerJoinBG(Player* player, Battleground* bg) { }
+        // After player enters queue for BG
+        virtual void OnPlayerJoinBG(Player* player, Battleground* bg) { }
 
-		// After player enters queue for Arena
-		virtual void OnPlayerJoinArena(Player* player, Battleground* bg) { }
+        // After player enters queue for Arena
+        virtual void OnPlayerJoinArena(Player* player, Battleground* bg) { }
 };
 
 class GuildScript : public ScriptObject
@@ -869,9 +869,6 @@ class GroupScript : public ScriptObject
 
         // Called when a group is disbanded.
         virtual void OnDisband(Group* /*group*/) { }
-
-		// After group enters queue for BG or Arena
-		//virtual void OnGroupJoinBG(Group* group, Battleground* bg) { }
 };
 
 // following hooks can be used anywhere and are not db bounded
@@ -1101,9 +1098,9 @@ class ScriptMgr
         void OnPlayerBeingCharmed(Player* player, Unit* charmer, uint32 oldFactionId, uint32 newFactionId);
         void OnAfterPlayerSetVisibleItemSlot(Player* player, uint8 slot, Item *item);
         void OnAfterPlayerMoveItemFromInventory(Player* player, Item* it, uint8 bag, uint8 slot, bool update);
-		void OnEquip(Player* player, Item* it, uint8 bag, uint8 slot, bool update);
-		void OnPlayerJoinBG(Player* player, Battleground* bg);
-		void OnPlayerJoinArena(Player* player, Battleground* bg);
+        void OnEquip(Player* player, Item* it, uint8 bag, uint8 slot, bool update);
+        void OnPlayerJoinBG(Player* player, Battleground* bg);
+        void OnPlayerJoinArena(Player* player, Battleground* bg);
 
     public: /* GuildScript */
 
@@ -1127,7 +1124,6 @@ class ScriptMgr
         void OnGroupRemoveMember(Group* group, uint64 guid, RemoveMethod method, uint64 kicker, const char* reason);
         void OnGroupChangeLeader(Group* group, uint64 newLeaderGuid, uint64 oldLeaderGuid);
         void OnGroupDisband(Group* group);
-		//void OnGroupJoinBG(Group* group, Battleground* bg);
 
     public: /* GlobalScript */
         void OnGlobalItemDelFromDB(SQLTransaction& trans, uint32 itemGuid);
