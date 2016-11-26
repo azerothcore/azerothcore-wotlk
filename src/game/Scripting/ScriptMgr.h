@@ -19,6 +19,7 @@
 #include "Weather.h"
 #include "AchievementMgr.h"
 #include "DynamicObject.h"
+#include "ArenaTeam.h"
 
 class AuctionHouseObject;
 class AuraScript;
@@ -883,6 +884,9 @@ class GlobalScript : public ScriptObject
         // items
         virtual void OnItemDelFromDB(SQLTransaction& /*trans*/, uint32 /*itemGuid*/) { }
         virtual void OnMirrorImageDisplayItem(const Item* /*item*/, uint32& /*display*/) { }
+       
+        // On Before arena points distribution
+        virtual void OnBeforeUpdateArenaPoints(ArenaTeam* /*at*/, std::map<uint32, uint32> & /*ap*/) { }
 };
 
 // Placed here due to ScriptRegistry::AddScript dependency.
@@ -1128,6 +1132,7 @@ class ScriptMgr
     public: /* GlobalScript */
         void OnGlobalItemDelFromDB(SQLTransaction& trans, uint32 itemGuid);
         void OnGlobalMirrorImageDisplayItem(const Item *item, uint32 &display);
+        void OnBeforeUpdateArenaPoints(ArenaTeam* at, std::map<uint32, uint32> &ap);
 
     public: /* Scheduled scripts */
 
