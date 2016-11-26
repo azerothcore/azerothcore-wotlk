@@ -886,7 +886,7 @@ class GlobalScript : public ScriptObject
         virtual void OnMirrorImageDisplayItem(const Item* /*item*/, uint32& /*display*/) { }
        
         // On Before arena points distribution
-        virtual void OnBeforeUpdateArenaPoints(ArenaTeam* /*at*/, std::map<uint32, uint32> /*&ap*/) { }
+        virtual void OnBeforeUpdateArenaPoints(ArenaTeam* /*at*/, std::map<uint32, uint32> & /*ap*/) { }
 };
 
 // Placed here due to ScriptRegistry::AddScript dependency.
