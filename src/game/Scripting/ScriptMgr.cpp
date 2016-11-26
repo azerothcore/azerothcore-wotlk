@@ -1450,6 +1450,11 @@ void ScriptMgr::OnGlobalMirrorImageDisplayItem(const Item *item, uint32 &display
     FOREACH_SCRIPT(GlobalScript)->OnMirrorImageDisplayItem(item,display);
 }
 
+void ScriptMgr::OnBeforeUpdateArenaPoints(ArenaTeam* at, std::map<uint32, uint32> &ap)
+{
+    FOREACH_SCRIPT(GlobalScript)->OnBeforeUpdateArenaPoints(at,ap);
+}
+
 SpellScriptLoader::SpellScriptLoader(const char* name)
     : ScriptObject(name)
 {
