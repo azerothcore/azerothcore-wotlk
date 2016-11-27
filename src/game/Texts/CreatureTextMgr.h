@@ -34,6 +34,7 @@ struct CreatureTextEntry
     Emote emote;
     uint32 duration;
     uint32 sound;
+    CreatureTextRange TextRange;
     uint32 BroadcastTextId;
 };
 

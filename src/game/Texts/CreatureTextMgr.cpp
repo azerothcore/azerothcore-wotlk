@@ -98,6 +98,7 @@ void CreatureTextMgr::LoadCreatureTexts()
         temp.duration        = fields[8].GetUInt32();
         temp.sound           = fields[9].GetUInt32();
 		temp.BroadcastTextId = fields[10].GetUInt32();
+		temp.TextRange      = CreatureTextRange(fields[11].GetUInt8());
 
         if (temp.sound)
         {
@@ -124,7 +125,6 @@ void CreatureTextMgr::LoadCreatureTexts()
                 temp.emote = EMOTE_ONESHOT_NONE;
             }
         }
-
 		if (temp.BroadcastTextId)
 		{
 			if (!sObjectMgr->GetBroadcastText(temp.BroadcastTextId))
@@ -133,6 +133,11 @@ void CreatureTextMgr::LoadCreatureTexts()
 				temp.BroadcastTextId = 0;
 			}
 		}
+        if (temp.TextRange > TEXT_RANGE_WORLD)
+        {
+            sLog->outErrorDb("CreatureTextMgr: Entry %u, Group %u, Id %u in table `creature_text` has incorrect TextRange %u.", temp.entry, temp.group, temp.id, temp.TextRange);
+            temp.TextRange = TEXT_RANGE_NORMAL;
+        }
 
         //add the text into our entry's group
         mTextMap[temp.entry][temp.group].push_back(temp);
@@ -254,6 +259,10 @@ uint32 CreatureTextMgr::SendChat(Creature* source, uint8 textGroup, WorldObject 
     ChatMsg finalType = (msgType == CHAT_MSG_ADDON) ? iter->type : msgType;
     Language finalLang = (language == LANG_ADDON) ? iter->lang : language;
     uint32 finalSound = sound ? sound : iter->sound;
+
+    if (range == TEXT_RANGE_NORMAL)
+        range = iter->TextRange;
+
 
     if (finalSound)
         SendSound(source, finalSound, finalType, whisperTarget, range, teamId, gmOnly);
