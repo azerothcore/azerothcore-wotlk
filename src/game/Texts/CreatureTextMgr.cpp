@@ -30,7 +30,7 @@ class CreatureTextBuilder
         }
 
         WorldObject* _source;
-		uint8 _gender;
+        uint8 _gender;
         ChatMsg _msgType;
         uint8 _textGroup;
         uint32 _textId;
