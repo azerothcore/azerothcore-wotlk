@@ -41,8 +41,8 @@ class CreatureTextBuilder
 class PlayerTextBuilder
 {
     public:
-		PlayerTextBuilder(WorldObject* obj, WorldObject* speaker, uint8 gender, ChatMsg msgtype, uint8 textGroup, uint32 id, uint32 language, WorldObject const* target)
-			: _source(obj), _talker(speaker), _gender(gender), _msgType(msgtype), _textGroup(textGroup), _textId(id), _language(language), _target(target)
+        PlayerTextBuilder(WorldObject* obj, WorldObject* speaker, uint8 gender, ChatMsg msgtype, uint8 textGroup, uint32 id, uint32 language, WorldObject const* target)
+            : _source(obj), _talker(speaker), _gender(gender), _msgType(msgtype), _textGroup(textGroup), _textId(id), _language(language), _target(target)
         {
         }
 
@@ -55,7 +55,7 @@ class PlayerTextBuilder
 
         WorldObject* _source;
         WorldObject* _talker;
-		uint8 _gender;
+        uint8 _gender;
         ChatMsg _msgType;
         uint8 _textGroup;
         uint32 _textId;
@@ -97,8 +97,8 @@ void CreatureTextMgr::LoadCreatureTexts()
         temp.emote           = Emote(fields[7].GetUInt32());
         temp.duration        = fields[8].GetUInt32();
         temp.sound           = fields[9].GetUInt32();
-		temp.BroadcastTextId = fields[10].GetUInt32();
-		temp.TextRange      = CreatureTextRange(fields[11].GetUInt8());
+        temp.BroadcastTextId = fields[10].GetUInt32();
+        temp.TextRange       = CreatureTextRange(fields[11].GetUInt8());
 
         if (temp.sound)
         {
@@ -125,14 +125,14 @@ void CreatureTextMgr::LoadCreatureTexts()
                 temp.emote = EMOTE_ONESHOT_NONE;
             }
         }
-		if (temp.BroadcastTextId)
-		{
-			if (!sObjectMgr->GetBroadcastText(temp.BroadcastTextId))
-			{
-				sLog->outErrorDb("CreatureTextMgr: Entry %u, Group %u, Id %u in table `creature_text` has non-existing or incompatible BroadcastTextId %u.", temp.entry, temp.group, temp.id, temp.BroadcastTextId);
-				temp.BroadcastTextId = 0;
-			}
-		}
+        if (temp.BroadcastTextId)
+        {
+            if (!sObjectMgr->GetBroadcastText(temp.BroadcastTextId))
+            {
+                sLog->outErrorDb("CreatureTextMgr: Entry %u, Group %u, Id %u in table `creature_text` has non-existing or incompatible BroadcastTextId %u.", temp.entry, temp.group, temp.id, temp.BroadcastTextId);
+                temp.BroadcastTextId = 0;
+            }
+        }
         if (temp.TextRange > TEXT_RANGE_WORLD)
         {
             sLog->outErrorDb("CreatureTextMgr: Entry %u, Group %u, Id %u in table `creature_text` has incorrect TextRange %u.", temp.entry, temp.group, temp.id, temp.TextRange);
@@ -463,19 +463,19 @@ std::string CreatureTextMgr::GetLocalizedChatString(uint32 entry, uint8 gender, 
     if (groupItr == holderItr->second.end())
         return "";
 
-	if (locale > MAX_LOCALES)
-		 locale = DEFAULT_LOCALE;
-	std::string baseText = "";
-	BroadcastText const* bct = sObjectMgr->GetBroadcastText(groupItr->BroadcastTextId);
-	if (bct)
-		baseText = bct->GetText(locale, gender);
-	else
-		 baseText = groupItr->text;
-	if (locale != DEFAULT_LOCALE && !bct)
-		{
-			LocaleCreatureTextMap::const_iterator locItr = mLocaleTextMap.find(CreatureTextId(entry, uint32(textGroup), id));
-			if (locItr != mLocaleTextMap.end())
-			 	ObjectMgr::GetLocaleString(locItr->second.Text, locale, baseText);
-		}
-		return baseText;
+    if (locale > MAX_LOCALES)
+        locale = DEFAULT_LOCALE;
+    std::string baseText = "";
+    BroadcastText const* bct = sObjectMgr->GetBroadcastText(groupItr->BroadcastTextId);
+    if (bct)
+        baseText = bct->GetText(locale, gender);
+    else
+        baseText = groupItr->text;
+    if (locale != DEFAULT_LOCALE && !bct)
+        {
+            LocaleCreatureTextMap::const_iterator locItr = mLocaleTextMap.find(CreatureTextId(entry, uint32(textGroup), id));
+            if (locItr != mLocaleTextMap.end())
+                ObjectMgr::GetLocaleString(locItr->second.Text, locale, baseText);
+        }
+        return baseText;
 }
