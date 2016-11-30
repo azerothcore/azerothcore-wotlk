@@ -1437,6 +1437,36 @@ DungeonFinder.OptionsMask = 1
 DBC.EnforceItemAttributes = 1
 
 #
+#    Anticheat.Movement.Enable
+#        Enable Movement Anticheat
+#        Default: 1 - on
+#                 0 - off
+#
+
+Anticheat.Movement.Enable = 1
+
+#
+#    Anticheat.Movement.TeleportToPlaneAlarms
+#        maximum alarms before logging mode will be switched from debug to error (default 50, allowed 20 - 100)
+#
+
+Anticheat.Movement.TeleportToPlaneAlarms = 50
+
+#
+#    Anticheat.Movement.MistimingDelta
+#        mistiming intelval between client and serverside (default 15000 ms, allowed 5000 - 50000 ms)
+#
+
+Anticheat.Movement.MistimingDelta = 15000
+
+#
+#    Anticheat.Movement.MistimingAlarms
+#        mistiming alarms before logging mode will be switched from debug to error (default 200, allowed 100 - 500)
+#
+
+Anticheat.Movement.MistimingAlarms = 200
+
+#
 #   AccountInstancesPerHour
 #        Description: Controls the max amount of different instances player can enter within hour
 #        Default:     5

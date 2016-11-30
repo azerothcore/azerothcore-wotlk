@@ -752,6 +752,15 @@ class World
         void UpdateGlobalNameData(uint32 guidLow, std::string const& oldName, std::string const& newName);
         void DeleteGlobalPlayerData(uint32 guid, std::string const& name);
 
+        // movement anticheat
+        static bool GetEnableMvAnticheat()       { return m_EnableMvAnticheat;     }
+        static uint32 GetTeleportToPlaneAlarms() { return m_TeleportToPlaneAlarms; }
+        static uint32 GetMistimingDelta()        { return m_MistimingDelta;        }
+        static uint32 GetMistimingAlarms()       { return m_MistimingAlarms;       }
+        static uint32 GetTeleportToPlanePenalty() { return m_TeleportToPlanePenalty;}
+        static uint32 GetMovementPenalty()        { return m_MovementPenalty;       }
+        // end movement anticheat
+
         void ProcessCliCommands();
         void QueueCliCommand(CliCommandHolder* commandHolder) { cliCmdQueue.add(commandHolder); }
 
@@ -847,6 +856,14 @@ class World
         GlobalPlayerNameMap _globalPlayerNameStore; // xinef
 
         std::string _realmName;
+
+        // movement anticheat enable flag
+        static bool m_EnableMvAnticheat;
+        static uint32 m_TeleportToPlaneAlarms;
+        static uint32 m_TeleportToPlanePenalty;
+        static uint32 m_MovementPenalty;
+        static uint32 m_MistimingDelta;
+        static uint32 m_MistimingAlarms;
 
         // CLI command holder to be thread safe
         ACE_Based::LockedQueue<CliCommandHolder*, ACE_Thread_Mutex> cliCmdQueue;
