@@ -619,7 +619,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 {
                     // Activate
                     // xinef: wtf is this shit?
-                    //(*itr)->ToGameObject()->SetLootState(GO_READY);
+                    (*itr)->ToGameObject()->SetLootState(GO_READY);
                     (*itr)->ToGameObject()->UseDoorOrButton(0, e.action.activateObject.alternative ? true : false, unit);
                     ;//sLog->outDebug(LOG_FILTER_DATABASE_AI, "SmartScript::ProcessAction:: SMART_ACTION_ACTIVATE_GOBJECT. Gameobject %u (entry: %u) activated",
                     //    (*itr)->GetGUIDLow(), (*itr)->GetEntry());
