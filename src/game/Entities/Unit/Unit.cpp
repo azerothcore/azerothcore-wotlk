@@ -680,6 +680,10 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
         if (attacker && attacker->IsAIEnabled)
             attacker->GetAI()->DamageDealt(victim, damage, damagetype);
     }
+	/*Additions for VAS_AutoBalance*/
+	// Hook for OnDamage Event
+	sScriptMgr->OnDamage(attacker, victim, damage);
+	/*End of Additions for VAS_AutoBalance*/
 
     if (victim->GetTypeId() == TYPEID_PLAYER && attacker != victim)
     {
@@ -1181,7 +1185,11 @@ void Unit::CalculateSpellDamageTaken(SpellNonMeleeDamage* damageInfo, int32 dama
         default:
             break;
     }
-
+	/*Additions for VAS_AutoBalance*/
+	// Script Hook For CalculateSpellDamageTaken -- Allow scripts to change the Damage post class mitigation calculations
+	sScriptMgr->ModifySpellDamageTaken(damageInfo->target, damageInfo->attacker, damage);
+	/*End of Additions for VAS_AutoBalance
+	*/
     // Calculate absorb resist
     if (damage > 0)
     {
@@ -1277,7 +1285,12 @@ void Unit::CalculateMeleeDamage(Unit* victim, uint32 damage, CalcDamageInfo* dam
     // Add melee damage bonus
     damage = MeleeDamageBonusDone(damageInfo->target, damage, damageInfo->attackType);
     damage = damageInfo->target->MeleeDamageBonusTaken(this, damage, damageInfo->attackType);
-
+	
+	/*Additions for VAS_AutoBalance*/
+	// Script Hook For CalculateMeleeDamage -- Allow scripts to change the Damage pre class mitigation calculations
+	sScriptMgr->ModifyMeleeDamage(damageInfo->target, damageInfo->attacker, damage);
+	/*End of Additions for VAS_AutoBalance*/
+	
     // Calculate armor reduction
     if (IsDamageReducedByArmor((SpellSchoolMask)(damageInfo->damageSchoolMask)))
     {
@@ -9943,7 +9956,10 @@ int32 Unit::DealHeal(Unit* healer, Unit* victim, uint32 addhealth)
 
     if (addhealth)
         gain = victim->ModifyHealth(int32(addhealth));
-
+	/*Additions for VAS_AutoBalance*/
+	// Hook for OnHeal Event
+	sScriptMgr->OnHeal(healer, victim, (uint32&)gain);
+	/*End of Additions for VAS_AutoBalance*/
     Unit* unit = healer;
 
     if (healer && healer->GetTypeId() == TYPEID_UNIT && healer->ToCreature()->IsTotem())
@@ -10209,7 +10225,9 @@ int32 Unit::HealBySpell(Unit* victim, SpellInfo const* spellInfo, uint32 addHeal
     uint32 absorb = 0;
     // calculate heal absorb and reduce healing
     CalcHealAbsorb(victim, spellInfo, addHealth, absorb);
-
+	/*Additions for VAS_AutoBalance*/
+	sScriptMgr->ModifyHealRecieved(this, victim, addHealth);
+	/*End of Additions for VAS_AutoBalance*/
     int32 gain = Unit::DealHeal(this, victim, addHealth);
     SendHealSpellLog(victim, spellInfo->Id, addHealth, uint32(addHealth - gain), absorb, critical);
     return gain;

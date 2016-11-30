@@ -601,7 +601,9 @@ void ScriptMgr::OnPlayerEnterMap(Map* map, Player* player)
 {
     ASSERT(map);
     ASSERT(player);
-
+	/*Additions for VAS_AutoBalance*/
+	FOREACH_SCRIPT(AllMapScript)->OnPlayerEnterAll(map, player);
+	/*End of Additions for VAS_AutoBalance*/
     FOREACH_SCRIPT(PlayerScript)->OnMapChanged(player);
 
     SCR_MAP_BGN(WorldMapScript, map, itr, end, entry, IsWorldMap);
@@ -621,7 +623,9 @@ void ScriptMgr::OnPlayerLeaveMap(Map* map, Player* player)
 {
     ASSERT(map);
     ASSERT(player);
-
+	/*Additions for VAS_AutoBalance*/
+	FOREACH_SCRIPT(AllMapScript)->OnPlayerLeaveAll(map, player);
+	/*End of Additions for VAS_AutoBalance*/
     SCR_MAP_BGN(WorldMapScript, map, itr, end, entry, IsWorldMap);
         itr->second->OnPlayerLeave(map, player);
     SCR_MAP_END;
@@ -814,6 +818,10 @@ CreatureAI* ScriptMgr::GetCreatureAI(Creature* creature)
 void ScriptMgr::OnCreatureUpdate(Creature* creature, uint32 diff)
 {
     ASSERT(creature);
+
+	/*Additions for VAS_AutoBalance*/
+	FOREACH_SCRIPT(AllCreatureScript)->OnAllCreatureUpdate(creature, diff);
+	/*End of Additions for VAS_AutoBalance*/
 
     GET_SCRIPT(CreatureScript, creature->GetScriptId(), tmpscript);
     tmpscript->OnUpdate(creature, diff);
@@ -1454,7 +1462,65 @@ void ScriptMgr::OnBeforeUpdateArenaPoints(ArenaTeam* at, std::map<uint32, uint32
 {
     FOREACH_SCRIPT(GlobalScript)->OnBeforeUpdateArenaPoints(at,ap);
 }
+/*Additions for VAS_AutoBalance*/
+//Called From Unit::DealDamage
+uint32 ScriptMgr::DealDamage(Unit* AttackerUnit, Unit *pVictim, uint32 damage, DamageEffectType damagetype)
+{
+	FOR_SCRIPTS_RET(UnitScript, itr, end, damage)
+		damage = itr->second->DealDamage(AttackerUnit, pVictim, damage, damagetype);
+	return damage;
+}
+void ScriptMgr::Creature_SelectLevel(const CreatureTemplate *cinfo, Creature* creature)
+{
+	FOREACH_SCRIPT(AllCreatureScript)->Creature_SelectLevel(cinfo, creature);
+}
+void ScriptMgr::OnHeal(Unit* healer, Unit* reciever, uint32& gain)
+{
+	FOREACH_SCRIPT(UnitScript)->OnHeal(healer, reciever, gain);
+}
 
+void ScriptMgr::OnDamage(Unit* attacker, Unit* victim, uint32& damage)
+{
+	FOREACH_SCRIPT(UnitScript)->OnDamage(attacker, victim, damage);
+}
+
+void ScriptMgr::ModifyPeriodicDamageAurasTick(Unit* target, Unit* attacker, uint32& damage)
+{
+	FOREACH_SCRIPT(UnitScript)->ModifyPeriodicDamageAurasTick(target, attacker, damage);
+}
+
+void ScriptMgr::ModifyMeleeDamage(Unit* target, Unit* attacker, uint32& damage)
+{
+	FOREACH_SCRIPT(UnitScript)->ModifyMeleeDamage(target, attacker, damage);
+}
+
+void ScriptMgr::ModifySpellDamageTaken(Unit* target, Unit* attacker, int32& damage)
+{
+	FOREACH_SCRIPT(UnitScript)->ModifySpellDamageTaken(target, attacker, damage);
+}
+
+void ScriptMgr::ModifyHealRecieved(Unit* target, Unit* attacker, uint32& damage)
+{
+	FOREACH_SCRIPT(UnitScript)->ModifyHealRecieved(target, attacker, damage);
+}
+AllMapScript::AllMapScript(const char* name)
+	: ScriptObject(name)
+{
+	ScriptRegistry<AllMapScript>::AddScript(this);
+}
+
+AllCreatureScript::AllCreatureScript(const char* name)
+	: ScriptObject(name)
+{
+	ScriptRegistry<AllCreatureScript>::AddScript(this);
+}
+UnitScript::UnitScript(const char* name, bool addToScripts)
+	: ScriptObject(name)
+{
+	if (addToScripts)
+		ScriptRegistry<UnitScript>::AddScript(this);
+}
+/*End of Additions for VAS_AutoBalance*/
 SpellScriptLoader::SpellScriptLoader(const char* name)
     : ScriptObject(name)
 {
