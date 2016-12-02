@@ -263,7 +263,6 @@ uint32 CreatureTextMgr::SendChat(Creature* source, uint8 textGroup, WorldObject 
     if (range == TEXT_RANGE_NORMAL)
         range = iter->TextRange;
 
-
     if (finalSound)
         SendSound(source, finalSound, finalType, whisperTarget, range, teamId, gmOnly);
 
@@ -472,10 +471,10 @@ std::string CreatureTextMgr::GetLocalizedChatString(uint32 entry, uint8 gender, 
     else
         baseText = groupItr->text;
     if (locale != DEFAULT_LOCALE && !bct)
-        {
-            LocaleCreatureTextMap::const_iterator locItr = mLocaleTextMap.find(CreatureTextId(entry, uint32(textGroup), id));
-            if (locItr != mLocaleTextMap.end())
-                ObjectMgr::GetLocaleString(locItr->second.Text, locale, baseText);
-        }
-        return baseText;
+    {
+        LocaleCreatureTextMap::const_iterator locItr = mLocaleTextMap.find(CreatureTextId(entry, uint32(textGroup), id));
+        if (locItr != mLocaleTextMap.end())
+            ObjectMgr::GetLocaleString(locItr->second.Text, locale, baseText);
+    }
+    return baseText;
 }
