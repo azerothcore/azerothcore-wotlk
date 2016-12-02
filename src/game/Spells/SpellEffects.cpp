@@ -1728,8 +1728,8 @@ void Spell::DoCreateItem(uint8 /*effIndex*/, uint32 itemId)
         // send info to the client
         player->SendNewItem(pItem, addNumber, true, SelfCast);
 		
-		//Hook for OnCreateItem -- 3ndos
-		sScriptMgr->OnCreateItem(player, pItem, addNumber);
+        //Hook for OnCreateItem -- 3ndos
+        sScriptMgr->OnCreateItem(player, pItem, addNumber);
 
         // we succeeded in creating at least one item, so a levelup is possible
         if (SelfCast)

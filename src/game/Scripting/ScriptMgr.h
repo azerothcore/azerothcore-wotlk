@@ -858,14 +858,14 @@ class PlayerScript : public ScriptObject
         // After player enters queue for Arena
         virtual void OnPlayerJoinArena(Player* player, Battleground* bg) { }
 		
-		//After looting item
-		virtual void OnLootItem(Player* player, Item* item, uint32 count, uint64 lootguid) { }
+        //After looting item
+        virtual void OnLootItem(Player* player, Item* item, uint32 count, uint64 lootguid) { }
 
-		//After creating item (eg profession item creation)
-		virtual void OnCreateItem(Player* player, Item* item, uint32 count) { }
+        //After creating item (eg profession item creation)
+        virtual void OnCreateItem(Player* player, Item* item, uint32 count) { }
 
-		//After receiving item as a quest reward
-		virtual void OnQuestRewardItem(Player* player, Item* item, uint32 count) { }
+        //After receiving item as a quest reward
+        virtual void OnQuestRewardItem(Player* player, Item* item, uint32 count) { }
 
 };
 
@@ -1171,9 +1171,9 @@ class ScriptMgr
         void OnEquip(Player* player, Item* it, uint8 bag, uint8 slot, bool update);
         void OnPlayerJoinBG(Player* player, Battleground* bg);
         void OnPlayerJoinArena(Player* player, Battleground* bg);
-		void OnLootItem(Player* player, Item* item, uint32 count, uint64 lootguid);
-		void OnCreateItem(Player* player, Item* item, uint32 count);
-		void OnQuestRewardItem(Player* player, Item* item, uint32 count);
+        void OnLootItem(Player* player, Item* item, uint32 count, uint64 lootguid);
+        void OnCreateItem(Player* player, Item* item, uint32 count);
+        void OnQuestRewardItem(Player* player, Item* item, uint32 count);
 
     public: /* GuildScript */
 
