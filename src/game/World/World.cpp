@@ -85,6 +85,12 @@ float World::m_MaxVisibleDistanceOnContinents = DEFAULT_VISIBILITY_DISTANCE;
 float World::m_MaxVisibleDistanceInInstances  = DEFAULT_VISIBILITY_INSTANCE;
 float World::m_MaxVisibleDistanceInBGArenas   = DEFAULT_VISIBILITY_BGARENAS;
 
+// movement anticheat
+bool World::m_EnableMvAnticheat = true;
+uint32 World::m_TeleportToPlaneAlarms = 50;
+uint32 World::m_MistimingAlarms = 200;
+uint32 World::m_MistimingDelta = 15000;
+
 /// World constructor
 World::World()
 {
@@ -592,6 +598,41 @@ void World::LoadConfigSettings(bool reload)
         rate_values[RATE_DURABILITY_LOSS_BLOCK] = 0.0f;
     }
 
+    // movement anticheat
+    m_EnableMvAnticheat = sConfigMgr->GetBoolDefault("Anticheat.Movement.Enable", true);
+    m_TeleportToPlaneAlarms = sConfigMgr->GetIntDefault("Anticheat.Movement.TeleportToPlaneAlarms", 50);
+    if (m_TeleportToPlaneAlarms < 20)
+    {
+        sLog->outError("Anticheat.Movement.TeleportToPlaneAlarms (%d) must be >= 20. Using 20 instead.", m_TeleportToPlaneAlarms);
+        m_TeleportToPlaneAlarms = 20;
+    }
+    if (m_TeleportToPlaneAlarms > 100)
+    {
+        sLog->outError("Anticheat.Movement.TeleportToPlaneAlarms (%d) must be <= 100. Using 100 instead.", m_TeleportToPlaneAlarms);
+        m_TeleportToPlaneAlarms = 100;
+    }
+    m_MistimingDelta = sConfigMgr->GetIntDefault("Anticheat.Movement.MistimingDelta", 15000);
+    if (m_MistimingDelta < 5000)
+    {
+        sLog->outError("Anticheat.Movement.m_MistimingDelta (%d) must be >= 5000ms. Using 5000ms instead.", m_MistimingDelta);
+        m_MistimingDelta = 5000;
+    }
+    if (m_MistimingDelta > 50000)
+    {
+        sLog->outError("Anticheat.Movement.m_MistimingDelta (%d) must be <= 50000ms. Using 50000ms instead.", m_MistimingDelta);
+        m_MistimingDelta = 50000;
+    }
+    m_MistimingAlarms = sConfigMgr->GetIntDefault("Anticheat.Movement.MistimingAlarms", 200);
+    if (m_MistimingAlarms < 100)
+    {
+        sLog->outError("Anticheat.Movement.MistimingAlarms (%d) must be >= 100. Using 100 instead.", m_MistimingAlarms);
+        m_MistimingAlarms = 100;
+    }
+    if (m_MistimingAlarms > 500)
+    {
+        sLog->outError("Anticheat.Movement.m_MistimingAlarms (%d) must be <= 500. Using 500 instead.", m_MistimingAlarms);
+        m_MistimingAlarms = 500;
+    }	
     ///- Read other configuration items from the config file
 
     m_bool_configs[CONFIG_DURABILITY_LOSS_IN_PVP] = sConfigMgr->GetBoolDefault("DurabilityLoss.InPvP", false);

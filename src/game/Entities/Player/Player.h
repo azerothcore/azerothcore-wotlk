@@ -2831,6 +2831,27 @@ class Player : public Unit, public GridObject<Player>
         uint32 _innTriggerId;
         float _restBonus;
         ////////////////////Rest System/////////////////////
+
+        //////////////// Movement anticheat ////////////////
+        time_t m_anti_LastClientTime;           // last movement client time
+        time_t m_anti_LastServerTime;           // last movement server time
+        time_t m_anti_DeltaClientTime;          // client side session time
+        time_t m_anti_DeltaServerTime;          // server side session time
+        uint32 m_anti_MistimingCount;           // mistiming count
+
+        time_t m_anti_LastSpeedChangeTime;      // last speed change time
+ 
+        float m_anti_Last_HSpeed;               // horizontal speed, default RUN speed
+        float m_anti_Last_VSpeed;               // vertical speed, default max jump height
+ 
+        uint32 m_anti_TeleToPlane_Count;        // Teleport To Plane alarm counter
+ 
+        uint64 m_anti_AlarmCount;               // alarm counter
+ 
+        uint16 m_anti_JumpCount;                // Jump already began, anti air jump check
+        float m_anti_JumpBaseZ;                 // Z coord before jump
+        //////////////// Movement anticheat ////////////////
+ 
         uint32 m_resetTalentsCost;
         time_t m_resetTalentsTime;
         uint32 m_usedTalentCount;
