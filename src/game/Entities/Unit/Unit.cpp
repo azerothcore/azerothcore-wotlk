@@ -681,7 +681,7 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
             attacker->GetAI()->DamageDealt(victim, damage, damagetype);
     }
     
-	// Hook for OnDamage Event
+    // Hook for OnDamage Event
     sScriptMgr->OnDamage(attacker, victim, damage);
     
     if (victim->GetTypeId() == TYPEID_PLAYER && attacker != victim)
@@ -1185,10 +1185,10 @@ void Unit::CalculateSpellDamageTaken(SpellNonMeleeDamage* damageInfo, int32 dama
             break;
     }
     
-	// Script Hook For CalculateSpellDamageTaken -- Allow scripts to change the Damage post class mitigation calculations
+    // Script Hook For CalculateSpellDamageTaken -- Allow scripts to change the Damage post class mitigation calculations
     sScriptMgr->ModifySpellDamageTaken(damageInfo->target, damageInfo->attacker, damage);
     
-	// Calculate absorb resist
+    // Calculate absorb resist
     if (damage > 0)
     {
         Unit::CalcAbsorbResist(this, victim, damageSchoolMask, SPELL_DIRECT_DAMAGE, damage, &damageInfo->absorb, &damageInfo->resist, spellInfo);
@@ -10222,9 +10222,9 @@ int32 Unit::HealBySpell(Unit* victim, SpellInfo const* spellInfo, uint32 addHeal
     // calculate heal absorb and reduce healing
     CalcHealAbsorb(victim, spellInfo, addHealth, absorb);
     
-	sScriptMgr->ModifyHealRecieved(this, victim, addHealth);
+    sScriptMgr->ModifyHealRecieved(this, victim, addHealth);
     
-	int32 gain = Unit::DealHeal(this, victim, addHealth);
+    int32 gain = Unit::DealHeal(this, victim, addHealth);
     SendHealSpellLog(victim, spellInfo->Id, addHealth, uint32(addHealth - gain), absorb, critical);
     return gain;
 }
