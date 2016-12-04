@@ -288,6 +288,7 @@ class FormulaScript : public ScriptObject
         // Called when calculating the experience rate for group experience.
         virtual void OnGroupRateCalculation(float& /*rate*/, uint32 /*count*/, bool /*isRaid*/) { }
 };
+
 template<class TMap> class MapScript : public UpdatableScript<TMap>
 {
     MapEntry const* _mapEntry;
