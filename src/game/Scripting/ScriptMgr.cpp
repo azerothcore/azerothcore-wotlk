@@ -1713,6 +1713,9 @@ template class ScriptRegistry<PlayerScript>;
 template class ScriptRegistry<GuildScript>;
 template class ScriptRegistry<GroupScript>;
 template class ScriptRegistry<GlobalScript>;
+template class ScriptRegistry<Unitscript>;
+template class ScriptRegistry<AllCreatureScript>;
+template class ScriptRegistry<AllMapScript>;
 
 // Undefine utility macros.
 #undef GET_SCRIPT_RET
