@@ -680,11 +680,10 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
         if (attacker && attacker->IsAIEnabled)
             attacker->GetAI()->DamageDealt(victim, damage, damagetype);
     }
-	/*Additions for VAS_AutoBalance*/
+    
 	// Hook for OnDamage Event
-	sScriptMgr->OnDamage(attacker, victim, damage);
-	/*End of Additions for VAS_AutoBalance*/
-
+    sScriptMgr->OnDamage(attacker, victim, damage);
+    
     if (victim->GetTypeId() == TYPEID_PLAYER && attacker != victim)
     {
         // Signal to pets that their owner was attacked
@@ -1185,12 +1184,11 @@ void Unit::CalculateSpellDamageTaken(SpellNonMeleeDamage* damageInfo, int32 dama
         default:
             break;
     }
-	/*Additions for VAS_AutoBalance*/
+    
 	// Script Hook For CalculateSpellDamageTaken -- Allow scripts to change the Damage post class mitigation calculations
-	sScriptMgr->ModifySpellDamageTaken(damageInfo->target, damageInfo->attacker, damage);
-	/*End of Additions for VAS_AutoBalance
-	*/
-    // Calculate absorb resist
+    sScriptMgr->ModifySpellDamageTaken(damageInfo->target, damageInfo->attacker, damage);
+    
+	// Calculate absorb resist
     if (damage > 0)
     {
         Unit::CalcAbsorbResist(this, victim, damageSchoolMask, SPELL_DIRECT_DAMAGE, damage, &damageInfo->absorb, &damageInfo->resist, spellInfo);
@@ -1285,12 +1283,10 @@ void Unit::CalculateMeleeDamage(Unit* victim, uint32 damage, CalcDamageInfo* dam
     // Add melee damage bonus
     damage = MeleeDamageBonusDone(damageInfo->target, damage, damageInfo->attackType);
     damage = damageInfo->target->MeleeDamageBonusTaken(this, damage, damageInfo->attackType);
-	
-	/*Additions for VAS_AutoBalance*/
-	// Script Hook For CalculateMeleeDamage -- Allow scripts to change the Damage pre class mitigation calculations
-	sScriptMgr->ModifyMeleeDamage(damageInfo->target, damageInfo->attacker, damage);
-	/*End of Additions for VAS_AutoBalance*/
-	
+    
+    // Script Hook For CalculateMeleeDamage -- Allow scripts to change the Damage pre class mitigation calculations
+    sScriptMgr->ModifyMeleeDamage(damageInfo->target, damageInfo->attacker, damage);
+    
     // Calculate armor reduction
     if (IsDamageReducedByArmor((SpellSchoolMask)(damageInfo->damageSchoolMask)))
     {
@@ -9956,10 +9952,10 @@ int32 Unit::DealHeal(Unit* healer, Unit* victim, uint32 addhealth)
 
     if (addhealth)
         gain = victim->ModifyHealth(int32(addhealth));
-	/*Additions for VAS_AutoBalance*/
-	// Hook for OnHeal Event
-	sScriptMgr->OnHeal(healer, victim, (uint32&)gain);
-	/*End of Additions for VAS_AutoBalance*/
+   
+    // Hook for OnHeal Event
+    sScriptMgr->OnHeal(healer, victim, (uint32&)gain);
+ 
     Unit* unit = healer;
 
     if (healer && healer->GetTypeId() == TYPEID_UNIT && healer->ToCreature()->IsTotem())
@@ -10225,10 +10221,10 @@ int32 Unit::HealBySpell(Unit* victim, SpellInfo const* spellInfo, uint32 addHeal
     uint32 absorb = 0;
     // calculate heal absorb and reduce healing
     CalcHealAbsorb(victim, spellInfo, addHealth, absorb);
-	/*Additions for VAS_AutoBalance*/
+    
 	sScriptMgr->ModifyHealRecieved(this, victim, addHealth);
-	/*End of Additions for VAS_AutoBalance*/
-    int32 gain = Unit::DealHeal(this, victim, addHealth);
+    
+	int32 gain = Unit::DealHeal(this, victim, addHealth);
     SendHealSpellLog(victim, spellInfo->Id, addHealth, uint32(addHealth - gain), absorb, critical);
     return gain;
 }
