@@ -445,6 +445,19 @@ public:
     //Called when Damage is Dealt
     virtual uint32 DealDamage(Unit* AttackerUnit, Unit *pVictim, uint32 damage, DamageEffectType damagetype) { return damage; }
 };
+
+class MovementHandlerScript : public ScriptObject
+{
+protected:
+   
+    MovementHandlerScript(const char* name);
+    
+public:
+    
+    //Called whenever a player moves
+    virtual void OnPlayerMove(Player* /*player*/, MovementInfo /*movementInfo*/, uint32 /*opcode*/) { }
+};
+
 class AllMapScript : public ScriptObject
 {
 protected:
@@ -459,6 +472,7 @@ public:
     // Called when a player leave any Map
     virtual void OnPlayerLeaveAll(Map* /*map*/, Player* /*player*/) { }
 };
+
 class AllCreatureScript : public ScriptObject
 {
 protected:
@@ -1220,7 +1234,11 @@ class ScriptMgr
         void ModifySpellDamageTaken(Unit* target, Unit* attacker, int32& damage);
         void ModifyHealRecieved(Unit* target, Unit* attacker, uint32& addHealth);
         uint32 DealDamage(Unit* AttackerUnit, Unit *pVictim, uint32 damage, DamageEffectType damagetype);
-
+    
+    public: /* MovementHandlerScript */
+        
+        void OnPlayerMove(Player* player, MovementInfo movementInfo, uint32 opcode);
+        
     public: /* AllCreatureScript */
 
         void OnAllCreatureUpdate(Creature* creature, uint32 diff);
