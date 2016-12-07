@@ -602,6 +602,8 @@ void ScriptMgr::OnPlayerEnterMap(Map* map, Player* player)
     ASSERT(map);
     ASSERT(player);
 
+    FOREACH_SCRIPT(AllMapScript)->OnPlayerEnterAll(map, player);
+
     FOREACH_SCRIPT(PlayerScript)->OnMapChanged(player);
 
     SCR_MAP_BGN(WorldMapScript, map, itr, end, entry, IsWorldMap);
@@ -621,7 +623,9 @@ void ScriptMgr::OnPlayerLeaveMap(Map* map, Player* player)
 {
     ASSERT(map);
     ASSERT(player);
-
+    
+    FOREACH_SCRIPT(AllMapScript)->OnPlayerLeaveAll(map, player);
+    
     SCR_MAP_BGN(WorldMapScript, map, itr, end, entry, IsWorldMap);
         itr->second->OnPlayerLeave(map, player);
     SCR_MAP_END;
@@ -814,6 +818,8 @@ CreatureAI* ScriptMgr::GetCreatureAI(Creature* creature)
 void ScriptMgr::OnCreatureUpdate(Creature* creature, uint32 diff)
 {
     ASSERT(creature);
+
+    FOREACH_SCRIPT(AllCreatureScript)->OnAllCreatureUpdate(creature, diff);
 
     GET_SCRIPT(CreatureScript, creature->GetScriptId(), tmpscript);
     tmpscript->OnUpdate(creature, diff);
@@ -1335,19 +1341,33 @@ void ScriptMgr::OnAfterPlayerMoveItemFromInventory(Player* player, Item* it, uin
 
 void ScriptMgr::OnEquip(Player* player, Item* it, uint8 bag, uint8 slot, bool update)
 {
-	FOREACH_SCRIPT(PlayerScript)->OnEquip(player, it, bag, slot, update);
+    FOREACH_SCRIPT(PlayerScript)->OnEquip(player, it, bag, slot, update);
 }
 
 void ScriptMgr::OnPlayerJoinBG(Player* player, Battleground* bg)
 {
-	FOREACH_SCRIPT(PlayerScript)->OnPlayerJoinBG(player, bg);
+    FOREACH_SCRIPT(PlayerScript)->OnPlayerJoinBG(player, bg);
 }
 
 void ScriptMgr::OnPlayerJoinArena(Player* player, Battleground* bg)
 {
-	FOREACH_SCRIPT(PlayerScript)->OnPlayerJoinArena(player, bg);
+    FOREACH_SCRIPT(PlayerScript)->OnPlayerJoinArena(player, bg);
 }
 
+void ScriptMgr::OnLootItem(Player* player, Item* item, uint32 count, uint64 lootguid)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnLootItem(player, item, count, lootguid);
+}
+
+void ScriptMgr::OnCreateItem(Player* player, Item* item, uint32 count)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnCreateItem(player, item, count);
+}
+
+void ScriptMgr::OnQuestRewardItem(Player* player, Item* item, uint32 count)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnQuestRewardItem(player, item, count);
+}
 
 // Guild
 void ScriptMgr::OnGuildAddMember(Guild* guild, Player* player, uint8& plRank)
@@ -1453,6 +1473,76 @@ void ScriptMgr::OnGlobalMirrorImageDisplayItem(const Item *item, uint32 &display
 void ScriptMgr::OnBeforeUpdateArenaPoints(ArenaTeam* at, std::map<uint32, uint32> &ap)
 {
     FOREACH_SCRIPT(GlobalScript)->OnBeforeUpdateArenaPoints(at,ap);
+}
+
+uint32 ScriptMgr::DealDamage(Unit* AttackerUnit, Unit *pVictim, uint32 damage, DamageEffectType damagetype)
+{
+    FOR_SCRIPTS_RET(UnitScript, itr, end, damage)
+        damage = itr->second->DealDamage(AttackerUnit, pVictim, damage, damagetype);
+    return damage;
+}
+void ScriptMgr::Creature_SelectLevel(const CreatureTemplate *cinfo, Creature* creature)
+{
+    FOREACH_SCRIPT(AllCreatureScript)->Creature_SelectLevel(cinfo, creature);
+}
+void ScriptMgr::OnHeal(Unit* healer, Unit* reciever, uint32& gain)
+{
+    FOREACH_SCRIPT(UnitScript)->OnHeal(healer, reciever, gain);
+}
+
+void ScriptMgr::OnDamage(Unit* attacker, Unit* victim, uint32& damage)
+{
+    FOREACH_SCRIPT(UnitScript)->OnDamage(attacker, victim, damage);
+}
+
+void ScriptMgr::ModifyPeriodicDamageAurasTick(Unit* target, Unit* attacker, uint32& damage)
+{
+    FOREACH_SCRIPT(UnitScript)->ModifyPeriodicDamageAurasTick(target, attacker, damage);
+}
+
+void ScriptMgr::ModifyMeleeDamage(Unit* target, Unit* attacker, uint32& damage)
+{
+    FOREACH_SCRIPT(UnitScript)->ModifyMeleeDamage(target, attacker, damage);
+}
+
+void ScriptMgr::ModifySpellDamageTaken(Unit* target, Unit* attacker, int32& damage)
+{
+    FOREACH_SCRIPT(UnitScript)->ModifySpellDamageTaken(target, attacker, damage);
+}
+
+void ScriptMgr::ModifyHealRecieved(Unit* target, Unit* attacker, uint32& damage)
+{
+    FOREACH_SCRIPT(UnitScript)->ModifyHealRecieved(target, attacker, damage);
+}
+
+void ScriptMgr::OnPlayerMove(Player* player, MovementInfo movementInfo, uint32 opcode)
+{
+    FOREACH_SCRIPT(MovementHandlerScript)->OnPlayerMove(player, movementInfo, opcode);
+}
+
+AllMapScript::AllMapScript(const char* name)
+    : ScriptObject(name)
+{
+    ScriptRegistry<AllMapScript>::AddScript(this);
+}
+
+AllCreatureScript::AllCreatureScript(const char* name)
+    : ScriptObject(name)
+{
+    ScriptRegistry<AllCreatureScript>::AddScript(this);
+}
+
+UnitScript::UnitScript(const char* name, bool addToScripts)
+    : ScriptObject(name)
+{
+    if (addToScripts)
+        ScriptRegistry<UnitScript>::AddScript(this);
+}
+
+MovementHandlerScript::MovementHandlerScript(const char* name)
+    : ScriptObject(name)
+{
+    ScriptRegistry<MovementHandlerScript>::AddScript(this);
 }
 
 SpellScriptLoader::SpellScriptLoader(const char* name)
@@ -1636,6 +1726,10 @@ template class ScriptRegistry<PlayerScript>;
 template class ScriptRegistry<GuildScript>;
 template class ScriptRegistry<GroupScript>;
 template class ScriptRegistry<GlobalScript>;
+template class ScriptRegistry<UnitScript>;
+template class ScriptRegistry<AllCreatureScript>;
+template class ScriptRegistry<AllMapScript>;
+template class ScriptRegistry<MovementHandlerScript>;
 
 // Undefine utility macros.
 #undef GET_SCRIPT_RET
