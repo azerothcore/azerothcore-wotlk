@@ -1,7 +1,3 @@
--- More Blizzlike Waypoint for npc_black_knight_skeletal_gryphon, NPC= 35491
--- Gryphon updated waypoint corrected the orientation when landing.
--- Data is DELETED and RE-INSERTED, becouse new waypoint has new 5 blizzlike waypoint.
-
 DELETE FROM script_waypoint WHERE entry=35491;
 
 INSERT INTO script_waypoint VALUES(35491, 1, 754.709, 646.999, 442.961, 0, "");
