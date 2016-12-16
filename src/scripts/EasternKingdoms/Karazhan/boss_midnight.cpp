@@ -448,4 +448,5 @@ void AddSC_boss_attumen()
     new boss_midnight();
     new boss_attumen();
     new boss_attumen_midnight();
+    new spell_midnight_fixate();
 }
