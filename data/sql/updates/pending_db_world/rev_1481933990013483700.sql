@@ -1,5 +1,4 @@
-INSERT INTO version_db_world (`sql_rev`) VALUES ('1481931567%N');
-UPDATE `creature_template` SET `ScriptName`='npc_scarlet_guard' WHERE `entry`=4295;
+INSERT INTO version_db_world (`sql_rev`) VALUES ('1481933990013483700');
 UPDATE `creature_template` SET `ScriptName`='npc_scarlet_guard' WHERE `entry`=4298;
 UPDATE `creature_template` SET `ScriptName`='npc_scarlet_guard' WHERE `entry`=4301;
 UPDATE `creature_template` SET `ScriptName`='npc_scarlet_guard' WHERE `entry`=4294;
