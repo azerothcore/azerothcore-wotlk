@@ -1,8 +1,6 @@
 /*
  * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2010 - 2012 Myth Project <http://mythprojectnetwork.blogspot.com/>
- * Copyright (C) 2011 gmlt.A
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
  
@@ -28,6 +26,7 @@ EndContentData */
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "Player.h"
+
 
 /*######
 ## npc_gnome_citizen
@@ -185,6 +184,47 @@ class npc_gnome_citizen : public CreatureScript
         {
             return new npc_gnome_citizenAI(creature);
         }
+};
+
+class npc_captain_tread_sparknozzle : public CreatureScript
+{
+public:
+    npc_captain_tread_sparknozzle() : CreatureScript("npc_captain_tread_sparknozzle") { }
+
+    struct npc_captain_tread_sparknozzleAI : public ScriptedAI
+    {
+        npc_captain_tread_sparknozzleAI(Creature* creature) : ScriptedAI(creature) { }
+
+        void MoveInLineOfSight(Unit* who)
+        {
+            ScriptedAI::MoveInLineOfSight(who);
+
+            if(who->GetTypeId() == TYPEID_PLAYER)
+            {
+                if(((Player*)who)->GetQuestStatus(25229) == QUEST_STATUS_INCOMPLETE)
+                {
+                    std::list<Creature*> GnomeList;
+                    me->GetCreatureListWithEntryInGrid(GnomeList, 39624, 7.5f);
+                    if(!GnomeList.empty())
+                    {
+                        for(std::list<Creature*>::const_iterator itr = GnomeList.begin(); itr != GnomeList.end(); ++itr)
+                        {
+                            if(Creature* creature = *itr)
+                            {
+                                creature->DespawnOrUnsummon();
+                                ((Player*)who)->KilledMonsterCredit(39624, 0);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_captain_tread_sparknozzleAI(creature);
+    }
 };
 
 #define STEAM_0 "Well, a bunch of useless gears, let's get to work!"
@@ -395,17 +435,17 @@ class npc_steamcrank : public CreatureScript
         }
 };
 
-#define MEK_1_0    "Пусть они заберут наши жизни, но им никогда не забрать..."
-#define MEK_1_1    "...нашу ИЗОБРЕТАТЕЛЬНОСТЬ!"
-#define LIS_1_0    "Что? Я понятия не имею о чем он говорит! Это ужастно!"
-#define MEK_2_0    "Мы не позволим себя уничтожить! Мы не сдадимся без боя!"
-#define MEK_2_1    "Мы будем жить! Мы будем продолжать жить! Сегодня мы празднуем..."
-#define MEK_2_2    "...наш День Независимости!"
-#define LIS_2_0    "Кошмар! Хотя... может и ничего, если немного подчистить."
-#define MEK_3_0    "Вы должны тщательно обыскать каждую заправку, все дома, склады, фермы, уборные и конуры в этом районе."
-#define MEK_3_1    "Имя беглеца - Анжинер Термоштепсель."
-#define MEK_3_2    "Идите и задержите его."
-#define LIS_3_0    "Пожалуй, должно работать. Хотя чего-то ему явно не хватает."
+#define MEK_1_0 "Let them take away our lives, but they will never take ..."
+#define MEK_1_1 "... our ingenuity!"
+#define LIS_1_0 "What? I have no idea what he was saying! It uzhastno!"
+#define MEK_2_0 "We will not let themselves be destroyed! We will not surrender without a fight!"
+#define MEK_2_1 "We will live! We will continue to live! Today we celebrate ..."
+#define MEK_2_2 "... our Independence Day!"
+#define LIS_2_0 "Nightmare! Although ... maybe nothing, if a little clean up."
+#define MEK_3_0 "You must carefully search every gas station, all the houses, warehouses, farms, kennels and toilets in the area."
+#define MEK_3_1 "fugitive Name - Mekgineer Thermaplugg."
+#define MEK_3_2 "Go and hold it."
+#define LIS_3_0 "Perhaps it should work. Though something it is clearly not enough."
 
 class npc_mekkatorque : public CreatureScript
 {
@@ -630,6 +670,7 @@ class spell_motivate_a_tron : public SpellScriptLoader
 void AddSC_ironforge()
 {
     new npc_gnome_citizen();
+    new npc_captain_tread_sparknozzle();
     new npc_steamcrank();
     new npc_mekkatorque();
     new npc_shoot_bunny();
