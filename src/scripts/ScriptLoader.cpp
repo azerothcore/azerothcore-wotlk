@@ -125,6 +125,7 @@ void AddSC_instance_blackwing_lair();
 void AddSC_boss_mr_smite();
 void AddSC_instance_deadmines();             //Deadmines
 void AddSC_instance_gnomeregan();            //Gnomeregan
+void AddSC_operation_gnomeregan();           //Operation Gnomeregan
 void AddSC_instance_karazhan();              //Karazhan
 void AddSC_boss_servant_quarters();
 void AddSC_boss_attumen();
@@ -703,6 +704,7 @@ void AddEasternKingdomsScripts()
     AddSC_boss_mr_smite();
     AddSC_instance_deadmines();             //Deadmines
     AddSC_instance_gnomeregan();            //Gnomeregan
+    AddSC_operation_gnomeregan();           //Operation Gnomeregan
     AddSC_instance_karazhan();              //Karazhan
     AddSC_boss_servant_quarters();
     AddSC_boss_attumen();

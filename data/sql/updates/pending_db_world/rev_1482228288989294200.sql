@@ -83,8 +83,6 @@ UPDATE `quest_template` SET `NextQuestId` = '25286' WHERE `Id` = '25283';
 UPDATE `creature_template` SET `ScriptName` = 'npc_mekkatorque', `scale` = '0.6', `unit_flags` = '33554752' WHERE `entry` = '39712';
 DELETE FROM `creature_template_addon` WHERE (`entry` = '39712');
 INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `auras`) VALUES ('39712', '0', '0', '0', '0', '0', '8326');
--- Cleanup [delete unused quest]
-DELETE FROM `quest_template` WHERE (`Id` = '25500');
 
 --
 -- Operation 'Gnomeregan'
