@@ -343,3 +343,4 @@ const Position ExplosionBunnySpawn      = {-5183.24f, 608.97f, 410.89f, 4.7f};
 #define MEK_21_1                "Damn! Had to retreat. But Thermaplugg lost, and he knows it ... He only got a small reprieve."
 #define MEK_21_2                "We took over a surface, and when radiation levels decrease, we will return with an army twice and could wrest Gnomeregan!"
 #define SOUND_MEK_21            17558 // 19280
+
