@@ -1,10 +1,5 @@
 INSERT INTO version_db_world (`sql_rev`) VALUES ('1482228288989294200');
 
-/*######
-## IRONFORGE
-######*/
-
-UPDATE `creature_template` SET `ScriptName`='npc_royal_historian_archesonus' WHERE `entry`=8879;
 
 /*######
 ## A Few Good Gnomes
