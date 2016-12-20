@@ -293,8 +293,8 @@ class spell_pal_sacred_shield_base : public SpellScriptLoader
 // 31850 - Ardent Defender
 class spell_pal_ardent_defender : public SpellScriptLoader
 {
-public:
-    spell_pal_ardent_defender() : SpellScriptLoader("spell_pal_ardent_defender") { }
+    public:
+        spell_pal_ardent_defender() : SpellScriptLoader("spell_pal_ardent_defender") { }
 
     class spell_pal_ardent_defender_AuraScript : public AuraScript
     {
