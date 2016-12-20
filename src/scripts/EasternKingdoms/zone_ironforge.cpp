@@ -629,7 +629,6 @@ class spell_motivate_a_tron : public SpellScriptLoader
 
 void AddSC_ironforge()
 {
-    new npc_royal_historian_archesonus();
     new npc_gnome_citizen();
     new npc_steamcrank();
     new npc_mekkatorque();
