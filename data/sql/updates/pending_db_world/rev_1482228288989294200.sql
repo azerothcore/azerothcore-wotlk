@@ -1,9 +1,9 @@
 INSERT INTO version_db_world (`sql_rev`) VALUES ('1482228288989294200');
 
 
-/*######
-## A Few Good Gnomes
-######*/
+--
+-- A Few Good Gnomes
+--
 
 DELETE FROM `spell_script_names` WHERE `spell_id` = '74035';
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES ('74035', 'spell_motivate_a_tron');
@@ -35,36 +35,36 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 ('39253', '0', '0', '0', '8', '0', '100', '0', '73943', '0', '0', '0', '41', '1000', '0', '0', '0', '0', '0', '1', '0', '0', '0', '0', '0', '0', '0', 'Operation Gnomeregan: On spellhit - force despawn'),
 ('39623', '0', '0', '0', '8', '0', '100', '0', '74080', '0', '0', '0', '41', '1000', '0', '0', '0', '0', '0', '1', '0', '0', '0', '0', '0', '0', '0', 'Operation Gnomeregan: On spellhit - force despawn');
 
-/*######
-## Basic Orders
-######*/
+--
+-- Basic Orders
+--
 
 UPDATE `creature_template` SET `ScriptName` = 'npc_steamcrank' WHERE `entry` = '39368';
 
-/*######
-## In and Out
-######*/
+--
+-- In and Out
+--
 
 UPDATE `creature_template` SET `VehicleId` = '745', `spell6` = '74153' WHERE `entry` = '39682';
 
-/*######
-## One Step Forward...
-######*/
+--
+-- One Step Forward...
+--
 
 UPDATE `creature_template` SET `spell1` = '74157', `spell2` = '74159', `spell3` = '74160', `spell4` = '74153' WHERE `entry` = '39713';
 
-/*######
-## Press Fire
-######*/
+--
+-- Press Fire
+--
 
 UPDATE `creature_template` SET `spell4` = '74174', `spell6` = '74153' WHERE `entry` = '39714';
 UPDATE `creature_template` SET `ScriptName` = 'npc_shoot_bunny' WHERE `entry` = '39707';
 DELETE FROM `spell_scripts` WHERE `id` = '74182';
 INSERT INTO `spell_scripts` (`id`, `command`, `datalong`, `datalong2`) VALUES ('74182', '15', '74179', '2');
 
-/*######
-## Vent Horizon
-######*/
+--
+-- Vent Horizon
+--
 
 UPDATE `conditions` SET `ConditionValue1` = '25212' WHERE (`SourceTypeOrReferenceId`='15') AND (`SourceGroup`='11211') AND (`SourceEntry`='0') AND (`ElseGroup`='0') AND (`ConditionTypeOrReference`='9') AND (`ConditionValue1`='25283') AND (`ConditionValue2`='0') AND (`ConditionValue3`='0');
 DELETE FROM `creature_template_addon` WHERE (`entry` = '39420');
@@ -74,9 +74,9 @@ DELETE FROM `conditions` WHERE `SourceEntry`=73082;
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `ConditionTypeOrReference`, `ConditionValue1`, `ConditionValue2`) VALUES 
 ('13', '1', '73082', '31', '3', '39420');
 
-/*######
-## Prepping the Speech
-######*/
+--
+-- Prepping the Speech
+--
 
 UPDATE `quest_template` SET `PrevQuestId` = '25283', `NextQuestId` = '25287' WHERE `Id` = '25286';
 UPDATE `quest_template` SET `NextQuestId` = '25286' WHERE `Id` = '25283';
@@ -86,9 +86,9 @@ INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `b
 -- Cleanup [delete unused quest]
 DELETE FROM `quest_template` WHERE (`Id` = '25500');
 
-/*######
-## Operation 'Gnomeregan'
-######*/
+--
+-- Operation 'Gnomeregan'
+--
 
 UPDATE `creature_template` SET `mechanic_immune_mask` = '12658704', `ScriptName` = 'npc_og_mekkatorque' WHERE `entry` = '39271';
 UPDATE `creature_template` SET `unit_flags` = '393220', `ScriptName` = 'npc_og_rl' WHERE `entry` = '39820';
