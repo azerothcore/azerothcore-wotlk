@@ -85,11 +85,6 @@ DELETE FROM `creature_template_addon` WHERE (`entry` = '39712');
 INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `auras`) VALUES ('39712', '0', '0', '0', '0', '0', '8326');
 -- Cleanup [delete unused quest]
 DELETE FROM `quest_template` WHERE (`Id` = '25500');
-DELETE FROM `creature_questrelation` WHERE (`quest` = '25500');
-DELETE FROM `gameobject_questrelation` WHERE (`quest` = '25500');
-DELETE FROM `creature_involvedrelation` WHERE (`quest` = '25500');
-DELETE FROM `gameobject_involvedrelation` WHERE (`quest` = '25500');
-DELETE FROM `areatrigger_involvedrelation` WHERE (`quest` = '25500');
 
 /*######
 ## Operation 'Gnomeregan'
@@ -98,7 +93,7 @@ DELETE FROM `areatrigger_involvedrelation` WHERE (`quest` = '25500');
 UPDATE `creature_template` SET `mechanic_immune_mask` = '12658704', `ScriptName` = 'npc_og_mekkatorque' WHERE `entry` = '39271';
 UPDATE `creature_template` SET `unit_flags` = '393220', `ScriptName` = 'npc_og_rl' WHERE `entry` = '39820';
 UPDATE `creature_template` SET `npcflag` = '0', `VehicleId` = '0', `ScriptName` = 'npc_og_tank' WHERE `entry` = '39860';
-UPDATE `creature_template` SET `faction_A` = '1771', `faction_H` = '1771', `unit_flags` = '4', `ScriptName` = 'npc_og_cannon' WHERE `entry` = '39759';
+UPDATE `creature_template` SET `faction` = '1771', `unit_flags` = '4', `ScriptName` = 'npc_og_cannon' WHERE `entry` = '39759';
 UPDATE `creature_template` SET `ScriptName` = 'npc_og_bomber' WHERE `entry` = '39735';
 UPDATE `creature_template` SET `ScriptName` = 'npc_og_infantry' WHERE `entry` = '39252';
 UPDATE `creature_template` SET `spell1` = '74764', `ScriptName` = 'npc_og_i_infantry' WHERE `entry` = '39755';
@@ -128,13 +123,13 @@ INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `b
 
 UPDATE `creature_template` SET `modelid2` = '0' WHERE `entry` = '39903';
 -- UPDATE `creature_template` SET `equipment_id` = '39368' WHERE `entry` = '39271';
-UPDATE `creature_template` SET `speed_run` = '1.25', `faction_A` = '1770', `faction_H` = '1770' WHERE `entry` = '39273';
-UPDATE `creature_template` SET `speed_run` = '1.29', `faction_A` = '1770', `faction_H` = '1770' WHERE `entry` = '39910';
+UPDATE `creature_template` SET `speed_run` = '1.25', `faction` = '1771' WHERE `entry` = '39273';
+UPDATE `creature_template` SET `speed_run` = '1.29', `faction` = '1771' WHERE `entry` = '39910';
 
 DELETE FROM `spell_area` WHERE (`spell` = '74310') AND (`area` IN ('1', '135', '721'));
 INSERT INTO `spell_area` VALUES
-('74310', '721', '25287', '1', '25393', '0', '0', '2', '1'),
-('74310', '135', '25287', '1', '25393', '0', '0', '2', '1');
+('74310', '721', '25287', '25393', '0', '0', '2', '1', '74', '11'),
+('74310', '135', '25287', '25393', '0', '0', '2', '1', '74', '11');
 
 UPDATE `gameobject` SET `phaseMask` = '257' WHERE `id` = '194498';
 UPDATE `gameobject` SET `phaseMask` = '256' WHERE `id` = '202922';
@@ -146,7 +141,7 @@ INSERT INTO `spell_scripts` (`id`, `command`, `x`, `y`, `z`, `o`) VALUES
 ('75510', '6', '-5164.767578', '556.341125', '423.753784', '25.29');
 
 DELETE FROM `spell_dbc` WHERE `id` = '75517';
-INSERT INTO `spell_dbc` VALUES ('75517', '0', '0', '384', '1024', '4', '0', '0', '0', '0', '0', '0', '0', '1', '0', '0', '0', '0', '0', '0', '0', '0', '21', '13', '0', '-1', '0', '0', '6', '0', '0', '0', '0', '0', '0', '0', '0', '1', '0', '0', '0', '0', '0', '25', '0', '0', '0', '0', '0', '0', '0', '0', '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '[DND] Bind Sight');
+INSERT INTO `spell_dbc` VALUES (75517,0,0,384,1024,4,0,0,8,0,0,0,0,0,1,0,0,0,0,0,0,0,245,1,0,-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,'Tumultuous Earthstorm');
 
 -- Waypoints for the last battle --
 
