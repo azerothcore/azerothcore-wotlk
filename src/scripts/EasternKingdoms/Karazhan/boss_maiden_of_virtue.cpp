@@ -33,7 +33,7 @@ class boss_maiden_of_virtue : public CreatureScript
 
         struct boss_maiden_of_virtueAI : public BossAI
         {
-            boss_maiden_of_virtueAI(Creature* creature) : BossAI(creature, TYPE_MAIDEN) { }
+            boss_maiden_of_virtueAI(Creature* creature) : BossAI(creature, DATA_MAIDEN) { }
 
             void Reset()
             {
@@ -65,6 +65,7 @@ class boss_maiden_of_virtue : public CreatureScript
                 events.ScheduleEvent(EVENT_SPELL_HOLY_FIRE, 8000);
                 events.ScheduleEvent(EVENT_SPELL_HOLY_WRATH, 15000);
                 events.ScheduleEvent(EVENT_SPELL_ENRAGE, 600000);
+                DoZoneInCombat();
             }
 
             void UpdateAI(uint32 diff)
