@@ -9,8 +9,8 @@ DROP TABLE IF EXISTS `creature_formations`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `creature_formations` 
 (
-  `leaderGUID` int(10) unsigned NOT NULL,
-  `memberGUID` int(10) unsigned NOT NULL,
+  `leaderGUID` int(10) unsigned NOT NULL DEFAULT '0',
+  `memberGUID` int(10) unsigned NOT NULL DEFAULT '0',
   `dist` float unsigned NOT NULL,
   `angle` float unsigned NOT NULL,
   `groupAI` int(10) unsigned NOT NULL,
@@ -279,6 +279,11 @@ INSERT INTO `creature_formations` VALUES
 (62071,62072,3,270,2,0,0),
 (62078,62078,0,0,2,0,0),
 (62078,62079,3,270,2,0,0),
+(64973,64969,3,90,2,0,0),
+(64973,64970,3,150,2,0,0),
+(64973,64971,3,230,2,0,0),
+(64973,64972,3,190,2,0,0),
+(64973,64973,0,0,2,0,0),
 (65508,65506,10,0,2,0,0),
 (65508,65507,20,0,2,0,0),
 (65508,65508,0,0,2,0,0),

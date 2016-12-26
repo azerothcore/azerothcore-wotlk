@@ -9,15 +9,15 @@ DROP TABLE IF EXISTS `areatrigger_teleport`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `areatrigger_teleport` 
 (
-  `id` mediumint(8) unsigned NOT NULL DEFAULT '0' COMMENT 'Identifier',
-  `name` text,
+  `ID` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `Name` text,
   `target_map` smallint(5) unsigned NOT NULL DEFAULT '0',
   `target_position_x` float NOT NULL DEFAULT '0',
   `target_position_y` float NOT NULL DEFAULT '0',
   `target_position_z` float NOT NULL DEFAULT '0',
   `target_orientation` float NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`),
-  FULLTEXT KEY `name` (`name`)
+  PRIMARY KEY (`ID`),
+  FULLTEXT KEY `name` (`Name`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Trigger System';
 /*!40101 SET character_set_client = @saved_cs_client */;
 

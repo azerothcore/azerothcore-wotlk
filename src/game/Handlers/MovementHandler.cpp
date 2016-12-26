@@ -23,6 +23,7 @@
 #include "ArenaSpectator.h"
 #include "Chat.h"
 #include "BattlegroundMgr.h"
+#include "ScriptMgr.h"
 
 #define MOVEMENT_PACKET_TIME_DELAY 0
 
@@ -392,6 +393,8 @@ void WorldSession::HandleMovementOpcodes(WorldPacket & recvData)
         // now client not include swimming flag in case jumping under water
         plrMover->SetInWater(!plrMover->IsInWater() || plrMover->GetBaseMap()->IsUnderWater(movementInfo.pos.GetPositionX(), movementInfo.pos.GetPositionY(), movementInfo.pos.GetPositionZ()));
     }
+    if (plrMover)//Hook for OnPlayerMove
+        sScriptMgr->OnPlayerMove(plrMover, movementInfo, opcode);
     // Dont allow to turn on walking if charming other player
     if (mover->GetGUID() != _player->GetGUID())
         movementInfo.flags &= ~MOVEMENTFLAG_WALKING;

@@ -34,12 +34,6 @@ enum eAuthCmd
     XFER_CANCEL                                  = 0x34
 };
 
-enum eStatus
-{
-    STATUS_CONNECTED                             = 0,
-    STATUS_AUTHED
-};
-
 // GCC have alternative #pragma pack(N) syntax and old gcc version not support pack(push, N), also any gcc version not support it at some paltform
 #if defined(__GNUC__)
 #pragma pack(1)
@@ -168,14 +162,14 @@ private:
 
 const AuthHandler table[] =
 {
-    { AUTH_LOGON_CHALLENGE,     STATUS_CONNECTED, &AuthSocket::_HandleLogonChallenge    },
-    { AUTH_LOGON_PROOF,         STATUS_CONNECTED, &AuthSocket::_HandleLogonProof        },
-    { AUTH_RECONNECT_CHALLENGE, STATUS_CONNECTED, &AuthSocket::_HandleReconnectChallenge},
-    { AUTH_RECONNECT_PROOF,     STATUS_CONNECTED, &AuthSocket::_HandleReconnectProof    },
-    { REALM_LIST,               STATUS_AUTHED,    &AuthSocket::_HandleRealmList         },
-    { XFER_ACCEPT,              STATUS_CONNECTED, &AuthSocket::_HandleXferAccept        },
-    { XFER_RESUME,              STATUS_CONNECTED, &AuthSocket::_HandleXferResume        },
-    { XFER_CANCEL,              STATUS_CONNECTED, &AuthSocket::_HandleXferCancel        }
+    { AUTH_LOGON_CHALLENGE,     STATUS_CHALLENGE,   &AuthSocket::_HandleLogonChallenge      },
+    { AUTH_LOGON_PROOF,         STATUS_LOGON_PROOF, &AuthSocket::_HandleLogonProof          },
+    { AUTH_RECONNECT_CHALLENGE, STATUS_CHALLENGE,   &AuthSocket::_HandleReconnectChallenge  },
+    { AUTH_RECONNECT_PROOF,     STATUS_RECON_PROOF, &AuthSocket::_HandleReconnectProof      },
+    { REALM_LIST,               STATUS_AUTHED,      &AuthSocket::_HandleRealmList           },
+    { XFER_ACCEPT,              STATUS_PATCH,       &AuthSocket::_HandleXferAccept          },
+    { XFER_RESUME,              STATUS_PATCH,       &AuthSocket::_HandleXferResume          },
+    { XFER_CANCEL,              STATUS_PATCH,       &AuthSocket::_HandleXferCancel          }
 };
 
 #define AUTH_TOTAL_COMMANDS 8
@@ -185,7 +179,7 @@ Patcher PatchesCache;
 
 // Constructor - set the N and g values for SRP6
 AuthSocket::AuthSocket(RealmSocket& socket) :
-    pPatch(NULL), socket_(socket), _authed(false), _build(0),
+    pPatch(NULL), socket_(socket), _status(STATUS_CHALLENGE), _build(0),
     _expversion(0), _accountSecurityLevel(SEC_PLAYER)
 {
     N.SetHexStr("894B645E89E1535BBDAD5B8B290650530801B18EBFBF5E8FAB3C82872A3E9BB7");
@@ -233,7 +227,7 @@ void AuthSocket::OnRead()
         // Circle through known commands and call the correct command handler
         for (i = 0; i < AUTH_TOTAL_COMMANDS; ++i)
         {
-            if ((uint8)table[i].cmd == _cmd && (table[i].status == STATUS_CONNECTED || (_authed && table[i].status == STATUS_AUTHED)))
+            if ((uint8)table[i].cmd == _cmd && (table[i].status == _status))
             {
                 ;//sLog->outDebug(LOG_FILTER_NETWORKIO, "Got data for cmd %u recv length %u", (uint32)_cmd, (uint32)socket().recv_len());
 
@@ -305,6 +299,9 @@ bool AuthSocket::_HandleLogonChallenge()
     ;//sLog->outDebug(LOG_FILTER_NETWORKIO, "Entering _HandleLogonChallenge");
     if (socket().recv_len() < sizeof(sAuthLogonChallenge_C))
         return false;
+
+    ///- Session is closed unless overriden
+    _status = STATUS_CLOSED;
 
     // pussywizard: logon flood protection:
     {
@@ -519,6 +516,9 @@ bool AuthSocket::_HandleLogonChallenge()
                     ;//sLog->outDebug(LOG_FILTER_NETWORKIO, "'%s:%d' [AuthChallenge] account %s is using '%c%c%c%c' locale (%u)", socket().getRemoteAddress().c_str(), socket().getRemotePort(),
                     //        _login.c_str (), ch->country[3], ch->country[2], ch->country[1], ch->country[0], GetLocaleByName(_localizationName)
                     //    );
+
+                    ///- All good, await client's proof
+                    _status = STATUS_LOGON_PROOF;
                 }
             }
         }
@@ -539,6 +539,8 @@ bool AuthSocket::_HandleLogonProof()
 
     if (!socket().recv((char *)&lp, sizeof(sAuthLogonProof_C)))
         return false;
+
+    _status = STATUS_CLOSED;
 
     // If the client has no valid version
     if (_expversion == NO_VALID_EXP_FLAG)
@@ -670,7 +672,8 @@ bool AuthSocket::_HandleLogonProof()
             socket().send((char *)&proof, sizeof(proof));
         }
 
-        _authed = true;
+        ///- Set _status to authed!
+        _status = STATUS_AUTHED;
     }
     else
     {
@@ -749,6 +752,9 @@ bool AuthSocket::_HandleReconnectChallenge()
     if ((remaining < sizeof(sAuthLogonChallenge_C) - buf.size()) || (socket().recv_len() < remaining))
         return false;
 
+    ///- Session is closed unless overriden
+    _status = STATUS_CLOSED;
+
     // No big fear of memory outage (size is int16, i.e. < 65536)
     buf.resize(remaining + buf.size() + 1);
     buf[buf.size() - 1] = 0;
@@ -790,6 +796,9 @@ bool AuthSocket::_HandleReconnectChallenge()
 
     K.SetHexStr ((*result)[0].GetCString());
 
+    ///- All good, await client's proof
+    _status = STATUS_RECON_PROOF;
+
     // Sending response
     ByteBuffer pkt;
     pkt << uint8(AUTH_RECONNECT_CHALLENGE);
@@ -809,6 +818,8 @@ bool AuthSocket::_HandleReconnectProof()
     sAuthReconnectProof_C lp;
     if (!socket().recv((char *)&lp, sizeof(sAuthReconnectProof_C)))
         return false;
+
+    _status = STATUS_CLOSED;
 
     if (_login.empty() || !_reconnectProof.GetNumBytes() || !K.GetNumBytes())
         return false;
@@ -830,7 +841,10 @@ bool AuthSocket::_HandleReconnectProof()
         pkt << uint8(0x00);
         pkt << uint16(0x00);                               // 2 bytes zeros
         socket().send((char const*)pkt.contents(), pkt.size());
-        _authed = true;
+
+        ///- Set _status to authed!
+        _status = STATUS_AUTHED;
+
         return true;
     }
     else

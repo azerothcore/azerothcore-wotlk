@@ -66,14 +66,17 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
             case CHAT_MSG_PARTY_LEADER:
                 break;
             default:
-                /*[AC] we should enable it using a conf
-		if (sender->GetTotalPlayedTime() < 2*HOUR)
+                if (sWorld->getBoolConfig(CONFIG_CHAT_MUTE_FIRST_LOGIN))
                 {
-                    SendNotification("Speaking is allowed after playing for at least 2 hours. You may use party and guild chat.");
-                    recvData.rfinish();
-                    return;
-                }*/
-	    break;
+                    uint32 minutes = sWorld->getIntConfig(CONFIG_CHAT_TIME_MUTE_FIRST_LOGIN);
+
+                    if (sender->GetTotalPlayedTime() < minutes * MINUTE)
+                    {
+                        SendNotification(LANG_MUTED_PLAYER, minutes);
+                        recvData.rfinish();
+                        return;
+                    }
+                }
         }
 
     // pussywizard:

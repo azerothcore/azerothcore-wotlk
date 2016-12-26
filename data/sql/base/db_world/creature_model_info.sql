@@ -9,12 +9,12 @@ DROP TABLE IF EXISTS `creature_model_info`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `creature_model_info` 
 (
-  `modelid` mediumint(8) unsigned NOT NULL DEFAULT '0',
-  `bounding_radius` float NOT NULL DEFAULT '0',
-  `combat_reach` float NOT NULL DEFAULT '0',
-  `gender` tinyint(3) unsigned NOT NULL DEFAULT '2',
-  `modelid_other_gender` mediumint(8) unsigned NOT NULL DEFAULT '0',
-  PRIMARY KEY (`modelid`)
+  `DisplayID` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `BoundingRadius` float NOT NULL DEFAULT '0',
+  `CombatReach` float NOT NULL DEFAULT '0',
+  `Gender` tinyint(3) unsigned NOT NULL DEFAULT '2',
+  `DisplayID_Other_Gender` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`DisplayID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Creature System (Model related info)';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
