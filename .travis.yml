@@ -1,5 +1,6 @@
 sudo: required
-dist: trusty
+dist: trusty # (14.04)
+# xenial (16.04) is not supported yet
 
 language: cpp
 compiler:
@@ -9,14 +10,14 @@ git:
   depth: 1
 
 before_install:
-  - sudo apt-get -qq install build-essential libtool make cmake cmake-data openssl
-  - sudo apt-get -qq install libssl-dev libmysqlclient-dev libmysql++-dev libreadline6-dev zlib1g-dev libbz2-dev libace-dev
-  - sudo apt-get -qq install mysql-server
+  - sudo apt-get -y install build-essential libtool make cmake cmake-data openssl
+  - sudo apt-get -y install libssl-dev libmysqlclient-dev libmysql++-dev libreadline6-dev zlib1g-dev libbz2-dev libace-dev
   - git config user.email "travis@build.bot" && git config user.name "Travis CI"
   - git tag -a -m "Travis build" init
 
 install:
   - mysql -uroot -e 'create database test_mysql;'
+  # bin directory already exists in the repo and therefore is not created here
   - cd bin
   - cmake ../ -DWITH_WARNINGS=1 -DWITH_COREDEBUG=0 -DUSE_COREPCH=1 -DUSE_SCRIPTPCH=1 -DTOOLS=0 -DSCRIPTS=1 -DSERVERS=1 -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=check_install
   - cd ..
