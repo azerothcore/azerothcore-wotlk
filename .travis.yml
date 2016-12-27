@@ -11,6 +11,7 @@ git:
 before_install:
   - sudo apt-get -y install build-essential libtool make cmake cmake-data openssl
   - sudo apt-get -y install libssl-dev libmysqlclient-dev libmysql++-dev libreadline6-dev zlib1g-dev libbz2-dev libace-dev
+  - sudo apt-get -y install mysql-client-5.5 mysql-server-core-5.5 
   - sudo apt-get -y install mysql-server-5.5
   - git config user.email "travis@build.bot" && git config user.name "Travis CI"
   - git tag -a -m "Travis build" init
