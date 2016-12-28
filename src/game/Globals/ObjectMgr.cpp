@@ -3852,14 +3852,14 @@ void ObjectMgr::LoadQuests()
     mExclusiveQuestGroups.clear();
 
     QueryResult result = WorldDatabase.Query("SELECT "
-        //0     1      2        3           4           5            6            7               8              9               10             11                 12
-        "ID, Method, QuestLevel, MinLevel, MaxLevel, QuestSortID, QuestType, SuggestedGroupNum, LimitTime, RequiredClasses, RequiredRaces, RequiredSkillId, RequiredSkillPoints, "
+        //0     1      2        3           4           5            6            7                 8              9               10             11                 12
+        "ID, Method, QuestLevel, MinLevel, MaxLevel, QuestSortID, QuestType, SuggestedGroupNum, TimeAllowed, RequiredClasses, RequiredRaces, RequiredSkillId, RequiredSkillPoints, "
         //         13                 14                    15                   16                      17                  18                         19                  20
         "RequiredFactionId1, RequiredFactionId2, RequiredFactionValue1, RequiredFactionValue2, RequiredMinRepFaction, RequiredMaxRepFaction, RequiredMinRepValue, RequiredMaxRepValue, "
-        //     21         22             23                24             25              26                    27                28            29              30              31
-        "PrevQuestId, NextQuestId, ExclusiveGroup, NextQuestIdChain, RewardXPId, RewardOrRequiredMoney, RewardMoneyMaxLevel, RewardSpell, RewardSpellCast, RewardHonor, RewardHonorMultiplier, "
-        //         32                  33            34             35               36         37         38            39                40                41               42
-        "RewardMailTemplateId, RewardMailDelay, SourceItemId, SourceItemCount, SourceSpellId, Flags, SpecialFlags, RewardTitle, RequiredPlayerKills, RewardTalents, RewardArenaPoints, "
+        //     21         22             23                24             25              26               27                28                29           30              31
+        "PrevQuestId, NextQuestId, ExclusiveGroup, RewardNextQuest, RewardXPDifficulty, RewardMoney, RewardBonusMoney, RewardDisplaySpell, RewardSpell, RewardHonor, RewardKillHonor, "
+        //         32                  33          34            35              36         37         38            39                40                41               42
+        "RewardMailTemplateId, RewardMailDelay, StartItem, SourceItemCount, SourceSpellId, Flags, SpecialFlags, RewardTitle, RequiredPlayerKills, RewardTalents, RewardArenaPoints, "
         //      43          44         45             46            47            48             49             50
         "RewardItem1, RewardItem2, RewardItem3, RewardItem4, RewardAmount1, RewardAmount2, RewardAmount3, RewardAmount4, "
         //         51                  52                  53                    54                    55                   56                      57                        58                         59                        60                        61                         62
@@ -3868,10 +3868,10 @@ void ObjectMgr::LoadQuests()
         "RewardFactionID1, RewardFactionID2, RewardFactionID3, RewardFactionID4, RewardFactionID5, RewardFactionValue1, RewardFactionValue2, RewardFactionValue3, RewardFactionValue4, RewardFactionValue5, "
         //                73                                  74                              75                               76                                77
         "RewardFactionOverride1, RewardFactionOverride2, RewardFactionOverride3, RewardFactionOverride4, RewardFactionOverride5, "
-        //    78        79      80         81
-        "PointMapId, PointX, PointY, PointOption, "
-        // 82            83                84           85           86                87              88
-        "LogTitle, LogDescription, QuestDescription, EndText, OfferRewardText, RequestItemsText, QuestCompletionLog, "
+        //    78        79    80       81
+        "POIContinent, POIx, POIy, POIPriority, "
+        // 82            83                84                85           86                87              88
+        "LogTitle, LogDescription, QuestDescription, AreaDescription, OfferRewardText, RequestItemsText, QuestCompletionLog, "
         //        89               90                 91                92                 93                    94                       95                     96
         "RequiredNpcOrGo1, RequiredNpcOrGo2, RequiredNpcOrGo3, RequiredNpcOrGo4, RequiredNpcOrGoCount1, RequiredNpcOrGoCount2, RequiredNpcOrGoCount3, RequiredNpcOrGoCount4, "
         //          97                     98                     99                   100                        101                         102                        103                        104
