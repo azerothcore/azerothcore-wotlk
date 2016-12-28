@@ -237,7 +237,7 @@ class LootTemplate
         // Adds an entry to the group (at loading stage)
         void AddEntry(LootStoreItem* item);
         // Rolls for every item in the template and adds the rolled items the the loot
-        void Process(Loot& loot, bool rate, uint16 lootMode, uint8 groupId = 0) const;
+        void Process(Loot& loot, bool rate, uint16 lootMode, Player const* player, uint8 groupId = 0) const;
         void CopyConditions(ConditionList conditions);
         void CopyConditions(LootItem* li) const;
 
