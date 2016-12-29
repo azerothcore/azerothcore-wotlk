@@ -3852,14 +3852,14 @@ void ObjectMgr::LoadQuests()
     mExclusiveQuestGroups.clear();
 
     QueryResult result = WorldDatabase.Query("SELECT "
-        //0     1         2         3           4           5             6               7             8
-        "ID, QuestType, QuestLevel, MinLevel, QuestSortID, QuestInfoID, SuggestedGroupNum, LimitTime, RequiredRaces,"
+        //0      1         2           3           4           5             6                 7            8
+        "ID, QuestType, QuestLevel, MinLevel, QuestSortID, QuestInfoID, SuggestedGroupNum, TimeAllowed, AllowableRaces,"
         //      9                     10                   11                    12
         "RequiredFactionId1, RequiredFactionId2, RequiredFactionValue1, RequiredFactionValue2, "
-        //      13             14               15                    16               17             18             19               20
-        "NextQuestIdChain, RewardXPId, RewardOrRequiredMoney, RewardMoneyMaxLevel, RewardSpell, RewardSpellCast, RewardHonor, RewardHonorMultiplier, "
-        //      21       22        23              24                25               26
-        "SourceItemId, Flags, RewardTitle, RequiredPlayerKills, RewardTalents, RewardArenaPoints, "
+        //      13                14              15             16                 17              18           19            20
+        "RewardNextQuest, RewardXPDifficulty, RewardMoney, RewardBonusMoney, RewardDisplaySpell, RewardSpell, RewardHonor, RewardKillHonor, "
+        //   21       22       23              24                25               26
+        "StartItem, Flags, RewardTitle, RequiredPlayerKills, RewardTalents, RewardArenaPoints, "
         //    27           28           29          30            31              32            33             34
         "RewardItem1, RewardItem2, RewardItem3, RewardItem4, RewardAmount1, RewardAmount2, RewardAmount3, RewardAmount4, "
         //        35                  36                    37                  38                    39                  40                       41                          42                         43                       44                          45                       46
@@ -3869,13 +3869,13 @@ void ObjectMgr::LoadQuests()
         //      57                          58                     59                      60                      61
         "RewardFactionOverride1, RewardFactionOverride2, RewardFactionOverride3, RewardFactionOverride4, RewardFactionOverride5, "
         //   62        63      64        65
-        "PointMapId, PointX, PointY, PointOption, "
+        "POIContinent, POIx, POIy, POIPriority, "
         //   66          67               68           69            70               71                 72
-        "LogTitle, LogDescription, QuestDescription, EndText, OfferRewardText, RequestItemsText, QuestCompletionLog, "
+        "LogTitle, LogDescription, QuestDescription, AreaDescription, OfferRewardText, RequestItemsText, QuestCompletionLog, "
         //      73                74                75                76                   77                     78                    79                      80
         "RequiredNpcOrGo1, RequiredNpcOrGo2, RequiredNpcOrGo3, RequiredNpcOrGo4, RequiredNpcOrGoCount1, RequiredNpcOrGoCount2, RequiredNpcOrGoCount3, RequiredNpcOrGoCount4, "
-        //         81                     82                    83                     84                        85                       86                        87                        88
-        "RequiredSourceItemId1, RequiredSourceItemId2, RequiredSourceItemId3, RequiredSourceItemId4, RequiredSourceItemCount1, RequiredSourceItemCount2, RequiredSourceItemCount3, RequiredSourceItemCount4, "
+        //  81          82         83         84           85                  86                 87                  88
+        "ItemDrop1, ItemDrop2, ItemDrop3, ItemDrop4, ItemDropQuantity1, ItemDropQuantity2, ItemDropQuantity3, ItemDropQuantity4, "
         //      89               90               91               92               93               94                95                  96                  97                  98                  99                  100
         "RequiredItemId1, RequiredItemId2, RequiredItemId3, RequiredItemId4, RequiredItemId5, RequiredItemId6, RequiredItemCount1, RequiredItemCount2, RequiredItemCount3, RequiredItemCount4, RequiredItemCount5, RequiredItemCount6, "
         //  101          102             103             104             105             106           107            108            109               110                 111                 112                 113
