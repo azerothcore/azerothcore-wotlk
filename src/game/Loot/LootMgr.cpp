@@ -1331,10 +1331,11 @@ void LootTemplate::Process(Loot& loot, bool rate, uint16 lootMode, Player const*
             sScriptMgr->OnAfterRefCount(item, maxcount);
             for (uint32 loop = 0; loop < maxcount; ++loop)      // Ref multiplicator
                 Referenced->Process(loot, rate, lootMode, player, item->group);
-        }
-        else                                                    // Plain entries (not a reference, not grouped)
+        } else  {
+            // Plain entries (not a reference, not grouped)
             sScriptMgr->OnBeforeDropAddItem(player, loot, item);
             loot.AddItem(*item);                                // Chance is already checked, just add
+        }
     }
 
     // Now processing groups
