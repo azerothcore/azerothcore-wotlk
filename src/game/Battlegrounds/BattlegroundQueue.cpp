@@ -145,7 +145,7 @@ GroupQueueInfo* BattlegroundQueue::AddGroup(Player* leader, Group* grp, PvPDiffi
     ginfo->_bracketId = bracketId;
     ginfo->_groupType = index;
 
-    //announce world (this don't need mutex)
+    // announce world (this doesn't need mutex)
     if (isRated && sWorld->getBoolConfig(CONFIG_ARENA_QUEUE_ANNOUNCER_ENABLE))
     {
         ArenaTeam* team = sArenaTeamMgr->GetArenaTeamById(arenateamid);
