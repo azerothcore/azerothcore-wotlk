@@ -287,7 +287,7 @@ public:
             SummonedPortals     = false;
             Berserk             = false;
 
-            instance->SetData(TYPE_TERESTIAN, NOT_STARTED);
+            instance->SetData(DATA_TERESTIAN, NOT_STARTED);
 
             me->RemoveAurasDueToSpell(SPELL_BROKEN_PACT);
 
@@ -342,7 +342,7 @@ public:
 
             Talk(SAY_DEATH);
 
-            instance->SetData(TYPE_TERESTIAN, DONE);
+            instance->SetData(DATA_TERESTIAN, DONE);
         }
 
         void UpdateAI(uint32 diff)

@@ -71,17 +71,19 @@ class boss_moroes : public CreatureScript
 
         struct boss_moroesAI : public BossAI
         {
-            boss_moroesAI(Creature* creature) : BossAI(creature, TYPE_MOROES)
+            boss_moroesAI(Creature* creature) : BossAI(creature, DATA_MOROES)
             {
                 _activeGuests = 0;
+		instance = creature->GetInstanceScript();	
             }
+		InstanceScript* instance;
 
             void InitializeAI()
             {
                 BossAI::InitializeAI();
                 InitializeGuests();
             }
-
+			
             void JustReachedHome()
             {
                 BossAI::JustReachedHome();
@@ -113,21 +115,21 @@ class boss_moroes : public CreatureScript
             {
                 BossAI::Reset();
                 me->CastSpell(me, SPELL_DUAL_WIELD, true);
+		instance->SetBossState(DATA_MOROES, NOT_STARTED);
             }
 
             void EnterCombat(Unit* who)
             {
                 BossAI::EnterCombat(who);
                 Talk(SAY_AGGRO);
-
                 events.ScheduleEvent(EVENT_SPELL_VANISH, 30000);
                 events.ScheduleEvent(EVENT_SPELL_BLIND, 20000);
                 events.ScheduleEvent(EVENT_SPELL_GOUGE, 13000);
                 events.ScheduleEvent(EVENT_CHECK_HEALTH, 5000);
                 events.ScheduleEvent(EVENT_SPELL_ENRAGE, 600000);
-
                 _events2.Reset();
                 me->CallForHelp(20.0f);
+		instance->SetBossState(DATA_MOROES, IN_PROGRESS);
             }
 
             void KilledUnit(Unit* /*victim*/)
@@ -144,7 +146,7 @@ class boss_moroes : public CreatureScript
                 summons.clear();
                 BossAI::JustDied(killer);
                 Talk(SAY_DEATH);
-
+		instance->SetBossState(DATA_MOROES, DONE);
                 instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_GARROTE);
             }
 
@@ -216,8 +218,11 @@ class boss_moroes : public CreatureScript
                         events.ScheduleEvent(EVENT_SPELL_GARROTE, urand(5000, 7000));
                         return;
                     case EVENT_SPELL_GARROTE:
-                        me->CastSpell(me, SPELL_VANISH_TELEPORT, false);
-                        break;
+			Talk(SAY_SPECIAL);
+			if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+			target->CastSpell(target, SPELL_GARROTE, true);
+			events.SetPhase(0);
+                break;
                 }
 
                 // Xinef: not in vanish

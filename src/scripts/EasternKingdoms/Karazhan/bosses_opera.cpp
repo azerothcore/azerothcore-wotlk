@@ -659,7 +659,7 @@ public:
         {
             Talk(SAY_CRONE_DEATH);
 
-            instance->SetData(TYPE_OPERA, DONE);
+            instance->SetData(DATA_OPERA, DONE);
             instance->HandleGameObject(instance->GetData64(DATA_GO_STAGEDOORLEFT), true);
             instance->HandleGameObject(instance->GetData64(DATA_GO_STAGEDOORRIGHT), true);
 
@@ -846,7 +846,7 @@ public:
         {
             DoPlaySoundToSet(me, SOUND_WOLF_DEATH);
 
-            instance->SetData(TYPE_OPERA, DONE);
+            instance->SetData(DATA_OPERA, DONE);
             instance->HandleGameObject(instance->GetData64(DATA_GO_STAGEDOORLEFT), true);
             instance->HandleGameObject(instance->GetData64(DATA_GO_STAGEDOORRIGHT), true);
 
@@ -1090,7 +1090,7 @@ public:
         {
             Talk(SAY_JULIANNE_DEATH02);
 
-            instance->SetData(TYPE_OPERA, DONE);
+            instance->SetData(DATA_OPERA, DONE);
             instance->HandleGameObject(instance->GetData64(DATA_GO_STAGEDOORLEFT), true);
             instance->HandleGameObject(instance->GetData64(DATA_GO_STAGEDOORRIGHT), true);
             if (GameObject* pSideEntrance = instance->instance->GetGameObject(instance->GetData64(DATA_GO_SIDE_ENTRANCE_DOOR)))
@@ -1242,7 +1242,7 @@ public:
         {
             Talk(SAY_ROMULO_DEATH);
 
-            instance->SetData(TYPE_OPERA, DONE);
+            instance->SetData(DATA_OPERA, DONE);
             instance->HandleGameObject(instance->GetData64(DATA_GO_STAGEDOORLEFT), true);
             instance->HandleGameObject(instance->GetData64(DATA_GO_STAGEDOORRIGHT), true);
 

@@ -40,7 +40,7 @@ class boss_curator : public CreatureScript
 
         struct boss_curatorAI : public BossAI
         {
-            boss_curatorAI(Creature* creature) : BossAI(creature, TYPE_CURATOR) { }
+            boss_curatorAI(Creature* creature) : BossAI(creature, DATA_CURATOR) { }
 
             void Reset()
             {

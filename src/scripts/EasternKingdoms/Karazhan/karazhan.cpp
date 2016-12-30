@@ -151,7 +151,7 @@ public:
 
         void StartEvent()
         {
-            instance->SetData(TYPE_OPERA, IN_PROGRESS);
+            instance->SetBossState(DATA_OPERA_PERFORMANCE, IN_PROGRESS);
 
             //resets count for this event, in case earlier failed
             if (m_uiEventId == EVENT_OZ)
@@ -186,8 +186,6 @@ public:
                 case 8:
                     instance->DoUseDoorOrButton(instance->GetData64(DATA_GO_STAGEDOORLEFT));
                     PerformanceReady = true;
-                    break;
-                case 9:
                     PrepareEncounter();
                     instance->DoUseDoorOrButton(instance->GetData64(DATA_GO_CURTAINS));
                     break;
@@ -228,7 +226,7 @@ public:
 
         void PrepareEncounter()
         {
-            ;//sLog->outDebug(LOG_FILTER_TSCR, "TSCR: Barnes Opera Event - Introduction complete - preparing encounter %d", m_uiEventId);
+            //sLog->outDebug(LOG_FILTER_TSCR, "TSCR: Barnes Opera Event - Introduction complete - preparing encounter %d", m_uiEventId);
             uint8 index = 0;
             uint8 count = 0;
 
@@ -292,13 +290,14 @@ public:
                 {
                     if (WipeTimer <= diff)
                     {
-                        Map* map = me->GetMap();
-                        if (!map->IsDungeon())
-                            return;
 
-                        Map::PlayerList const &PlayerList = map->GetPlayers();
-                        if (PlayerList.isEmpty())
-                            return;
+			Map* map = me->GetMap();
+			if (!map->IsDungeon())
+			return;
+
+			Map::PlayerList const &PlayerList = map->GetPlayers();
+			if (PlayerList.isEmpty())
+			return;
 
                         RaidWiped = true;
                         for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
@@ -361,9 +360,10 @@ public:
         if (InstanceScript* instance = creature->GetInstanceScript())
         {
             // Check for death of Moroes and if opera event is not done already
-            if (instance->GetData(TYPE_MOROES) == DONE && instance->GetData(TYPE_OPERA) != DONE)
+            if (instance->GetBossState(DATA_MOROES) == DONE &&  instance->GetBossState(DATA_OPERA_PERFORMANCE) != DONE)
             {
                 player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, OZ_GOSSIP1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+				
 
                 if (player->IsGameMaster())
                 {

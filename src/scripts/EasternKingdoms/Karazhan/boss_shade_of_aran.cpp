@@ -64,7 +64,7 @@ public:
 
     struct boss_aranAI : public BossAI
     {
-        boss_aranAI(Creature* creature) : BossAI(creature, TYPE_ARAN)
+        boss_aranAI(Creature* creature) : BossAI(creature, DATA_ARAN)
         {
         }
 
@@ -117,7 +117,7 @@ public:
             DrinkInturrupted = false;
 
             // Not in progress
-            instance->SetData(TYPE_ARAN, NOT_STARTED);
+            instance->SetData(DATA_ARAN, NOT_STARTED);
             instance->HandleGameObject(instance->GetData64(DATA_GO_LIBRARY_DOOR), true);
         }
 
@@ -130,7 +130,7 @@ public:
         {
             Talk(SAY_DEATH);
 
-            instance->SetData(TYPE_ARAN, DONE);
+            instance->SetData(DATA_ARAN, DONE);
             instance->HandleGameObject(instance->GetData64(DATA_GO_LIBRARY_DOOR), true);
         }
 
@@ -138,7 +138,7 @@ public:
         {
             Talk(SAY_AGGRO);
 
-            instance->SetData(TYPE_ARAN, IN_PROGRESS);
+            instance->SetData(DATA_ARAN, IN_PROGRESS);
             instance->HandleGameObject(instance->GetData64(DATA_GO_LIBRARY_DOOR), false);
         }
 

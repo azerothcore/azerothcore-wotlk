@@ -19,12 +19,47 @@ class instance_karazhan : public InstanceMapScript
         }
 
         struct instance_karazhan_InstanceMapScript : public InstanceScript
-        {
-            instance_karazhan_InstanceMapScript(Map* map) : InstanceScript(map) { }
 
+		{
+            instance_karazhan_InstanceMapScript(Map* map) : InstanceScript(map)
+			
+		{
+				
+			//TYPE_OPERA = urand(EVENT_OZ, EVENT_RAJ);
+
+		if (GetData(DATA_OPERA_PERFORMANCE) != 0)
+			return;
+		SetData(DATA_OPERA_PERFORMANCE, urand(EVENT_OZ, EVENT_RAJ));
+		m_uiOzDeathCount = 0;
+		}
+			
+		uint32 m_auiEncounter[MAX_ENCOUNTERS];
+		uint32 OperaEvent;
+		uint32 m_uiOzDeathCount;
+		uint32 m_uiTeam;
+		uint64 m_uiCurtainGUID;
+		uint64 m_uiStageDoorLeftGUID;
+		uint64 m_uiStageDoorRightGUID;
+		uint64 m_uiKilrekGUID;
+		uint64 m_uiTerestianGUID;
+		uint64 m_uiMoroesGUID;
+		uint64 m_uiNightBaneGUID;
+		uint64 EchoOfMedivhGUID;
+		uint64 m_uiLibraryDoor;                                     // Door at Shade of Aran
+		uint64 m_uiMassiveDoor;                                     // Door at Netherspite
+		uint64 m_uiSideEntranceDoor;                                // Side Entrance
+		uint64 m_uiGamesmansDoor;                                   // Door before Chess
+		uint64 m_uiGamesmansExitDoor;                               // Door after Chess
+		uint64 m_uiNetherspaceDoor;                                // Door at Malchezaar
+		uint64 m_uiServantsAccessDoor;                              // Door to Brocken Stair
+		uint64 MastersTerraceDoor[2];
+		uint64 ImageGUID;
+		uint64 DustCoveredChest;
+			
 
             void Initialize()
             {
+
                 SetBossNumber(MAX_ENCOUNTERS);
                 _servantQuartersKills = 0;
                 _selectedRare = RAND(NPC_HYAKISS_THE_LURKER, NPC_SHADIKITH_THE_GLIDER, NPC_ROKAD_THE_RAVAGER);
@@ -42,37 +77,37 @@ class instance_karazhan : public InstanceMapScript
                     case DATA_COUNT_SERVANT_QUARTERS_KILLS:
                         if (++_servantQuartersKills > 52) // 56 in total, not all have to be killed, almost all
                         {
-                            SetBossState(TYPE_SERVANT_QUARTERS, NOT_STARTED);
-                            SetBossState(TYPE_SERVANT_QUARTERS, DONE);
+                            SetBossState(DATA_SERVANT_QUARTERS, NOT_STARTED);
+                            SetBossState(DATA_SERVANT_QUARTERS, DONE);
                         }
                         SaveToDB();
                         break;
 
-                    /*
-                    case TYPE_ATTUMEN:              m_auiEncounter[0] = uiData; break;
-                    case TYPE_MOROES:
+                    
+                    case DATA_ATTUMEN:              m_auiEncounter[0] = uiData; break;
+                    case DATA_MOROES:
                         if (m_auiEncounter[1] == DONE)
                             break;
                         m_auiEncounter[1] = uiData;
                         break;
-                    case TYPE_MAIDEN:               m_auiEncounter[2] = uiData; break;
-                    case TYPE_OPTIONAL_BOSS:        m_auiEncounter[3] = uiData; break;
-                    case TYPE_OPERA:
+                    case DATA_MAIDEN:               m_auiEncounter[2] = uiData; break;
+                    case DATA_OPTIONAL_BOSS:        m_auiEncounter[3] = uiData; break;
+                    case DATA_OPERA:
                         m_auiEncounter[4] = uiData;
                         if (uiData == DONE)
                             instance->UpdateEncounterState(ENCOUNTER_CREDIT_KILL_CREATURE, 16812, NULL);
                         break;
-                    case TYPE_CURATOR:              m_auiEncounter[5] = uiData; break;
-                    case TYPE_ARAN:                 m_auiEncounter[6] = uiData; break;
-                    case TYPE_TERESTIAN:            m_auiEncounter[7] = uiData; break;
-                    case TYPE_NETHERSPITE:          m_auiEncounter[8] = uiData; break;
-                    case TYPE_CHESS:
+                    case DATA_CURATOR:              m_auiEncounter[5] = uiData; break;
+                    case DATA_ARAN:                 m_auiEncounter[6] = uiData; break;
+                    case DATA_TERESTIAN:            m_auiEncounter[7] = uiData; break;
+                    case DATA_NETHERSPITE:          m_auiEncounter[8] = uiData; break;
+                    case DATA_CHESS:
                         if (uiData == DONE)
                             DoRespawnGameObject(DustCoveredChest, DAY);
                         m_auiEncounter[9]  = uiData;
                         break;
-                    case TYPE_MALCHEZZAR:           m_auiEncounter[10] = uiData; break;
-                    case TYPE_NIGHTBANE:
+                    case DATA_MALCHEZZAR:           m_auiEncounter[10] = uiData; break;
+                    case DATA_NIGHTBANE:
                         if (m_auiEncounter[11] != DONE)
                             m_auiEncounter[11] = uiData;
                         break;
@@ -82,21 +117,21 @@ class instance_karazhan : public InstanceMapScript
                         else if (uiData == IN_PROGRESS)
                             m_uiOzDeathCount = 0;
                         break;
-*/
+
                 }
             }
 
              void SetData64(uint32 identifier, uint64 data)
              {
-                // switch (identifier)
-                // {
-                 //case DATA_IMAGE_OF_MEDIVH: ImageGUID = data;
-                // }
+                 switch (identifier)
+                 {
+                 case DATA_IMAGE_OF_MEDIVH: ImageGUID = data;
+                 }
              }
 
             void OnGameObjectCreate(GameObject* go)
             {
-                /*switch (go->GetEntry())
+                switch (go->GetEntry())
                 {
                     case 183932:   m_uiCurtainGUID          = go->GetGUID();         break;
                     case 184278:
@@ -124,7 +159,21 @@ class instance_karazhan : public InstanceMapScript
                             go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_LOCKED);
                         break;
                     case 185119: DustCoveredChest = go->GetGUID(); break;
-                }*/
+
+		switch (OperaEvent)
+		{
+		/// @todo Set Object visibilities for Opera based on performance
+		case EVENT_OZ:
+			break;
+
+		case EVENT_HOOD:
+			break;
+
+		case EVENT_RAJ:
+			break;
+		}
+				
+                }
             }
 
             uint32 GetData(uint32 data) const
@@ -133,6 +182,8 @@ class instance_karazhan : public InstanceMapScript
                 {
                     case DATA_SELECTED_RARE:
                         return _selectedRare;
+			case DATA_OPERA_PERFORMANCE:
+			return OperaEvent;
                 }
 
                 return 0;
@@ -140,7 +191,7 @@ class instance_karazhan : public InstanceMapScript
 
             uint64 GetData64(uint32 data) const
             {
-                /*switch (uiData)
+                switch (data)
                 {
                     case DATA_KILREK:                   return m_uiKilrekGUID;
                     case DATA_TERESTIAN:                return m_uiTerestianGUID;
@@ -157,9 +208,9 @@ class instance_karazhan : public InstanceMapScript
                     case DATA_MASTERS_TERRACE_DOOR_1:   return MastersTerraceDoor[0];
                     case DATA_MASTERS_TERRACE_DOOR_2:   return MastersTerraceDoor[1];
                     case DATA_IMAGE_OF_MEDIVH:          return ImageGUID;
-                    case DATA_NIGHTBANE:                return m_uiNightbaneGUID;
+                    case DATA_NIGHTBANE:                return m_uiNightBaneGUID;
                 }
-*/
+
                 return 0;
             }
 

@@ -120,10 +120,10 @@ public:
 
             if (instance)
             {
-                if (instance->GetData(TYPE_NIGHTBANE) == DONE)
+                if (instance->GetData(DATA_NIGHTBANE) == DONE)
                     me->DisappearAndDie();
                 else
-                    instance->SetData(TYPE_NIGHTBANE, NOT_STARTED);
+                    instance->SetData(DATA_NIGHTBANE, NOT_STARTED);
             }
 
             HandleTerraceDoors(true);
@@ -150,7 +150,7 @@ public:
         void EnterCombat(Unit* /*who*/)
         {
             if (instance)
-                instance->SetData(TYPE_NIGHTBANE, IN_PROGRESS);
+                instance->SetData(DATA_NIGHTBANE, IN_PROGRESS);
 
             HandleTerraceDoors(false);
            Talk(YELL_AGGRO);
@@ -165,7 +165,7 @@ public:
         void JustDied(Unit* /*killer*/)
         {
             if (instance)
-                instance->SetData(TYPE_NIGHTBANE, DONE);
+                instance->SetData(DATA_NIGHTBANE, DONE);
 
             HandleTerraceDoors(true);
         }
@@ -408,7 +408,7 @@ public:
     {
         if (InstanceScript* pInstance = pGo->GetInstanceScript())
         {
-            if (pInstance->GetData(TYPE_NIGHTBANE) != DONE && !pGo->FindNearestCreature(17225, 40.0f))
+            if (pInstance->GetData(DATA_NIGHTBANE) != DONE && !pGo->FindNearestCreature(17225, 140.0f))
                 if (Creature *cr = ObjectAccessor::GetCreature(*pPlayer, pInstance->GetData64(DATA_NIGHTBANE)))
                     cr->GetMotionMaster()->MovePoint(0, IntroWay[0][0], IntroWay[0][1], IntroWay[0][2]);
         }        
