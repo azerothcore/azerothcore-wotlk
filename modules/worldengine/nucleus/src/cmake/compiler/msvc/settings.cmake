@@ -42,6 +42,10 @@ message(STATUS "MSVC: Disabled NON-SECURE warnings")
 add_definitions(-D_CRT_NONSTDC_NO_WARNINGS)
 message(STATUS "MSVC: Disabled POSIX warnings")
 
+#Ignore warnings about INTMAX_MAX
+add_definitions(-D__STDC_LIMIT_MACROS)
+message(STATUS "MSVC: Disabled INTMAX_MAX warnings")
+
 # disable warnings in Visual Studio 8 and above if not wanted
 if(NOT WITH_WARNINGS)
   if(MSVC AND NOT CMAKE_GENERATOR MATCHES "Visual Studio 7")
