@@ -882,6 +882,9 @@ class PlayerScript : public ScriptObject
         //After receiving item as a quest reward
         virtual void OnQuestRewardItem(Player* player, Item* item, uint32 count) { }
 
+        //Before buying something from any vendor
+        virtual void OnBeforeBuyItemFromVendor(Player* player, uint64 vendorguid, uint32 vendorslot, uint32 item, uint8 count, uint8 bag, uint8 slot);
+
 };
 
 class GuildScript : public ScriptObject
@@ -1191,6 +1194,7 @@ class ScriptMgr
         void OnLootItem(Player* player, Item* item, uint32 count, uint64 lootguid);
         void OnCreateItem(Player* player, Item* item, uint32 count);
         void OnQuestRewardItem(Player* player, Item* item, uint32 count);
+        void OnBeforeBuyItemFromVendor(Player* player, uint64 vendorguid, uint32 vendorslot, uint32 item, uint8 count, uint8 bag, uint8 slot);
 
     public: /* GuildScript */
 

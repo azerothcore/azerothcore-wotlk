@@ -73,6 +73,7 @@
 #include "PoolMgr.h"
 #include "SavingSystem.h"
 #include "TicketMgr.h"
+#include "ScriptMgr.h"
 
 #define ZONE_UPDATE_INTERVAL (2*IN_MILLISECONDS)
 
@@ -21573,6 +21574,12 @@ inline bool Player::_StoreOrEquipNewItem(uint32 vendorslot, uint32 item, uint8 c
 // Return true is the bought item has a max count to force refresh of window by caller
 bool Player::BuyItemFromVendorSlot(uint64 vendorguid, uint32 vendorslot, uint32 item, uint8 count, uint8 bag, uint8 slot)
 { 
+    sScriptMgr->OnBeforeBuyItemFromVendor(this, vendorguid,vendorslot,item,count,bag,slot);
+
+    // this check can be used from the hook to implement a custom vendor process
+    if (item == 0)
+        return true;
+
     // cheating attempt
     if (count < 1) count = 1;
 
