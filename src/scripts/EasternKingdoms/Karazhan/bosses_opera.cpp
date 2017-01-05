@@ -193,7 +193,8 @@ public:
                 {
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                     AggroTimer = 0;
-                } else AggroTimer -= diff;
+                } else 
+                    AggroTimer -= diff;
             }
 
             if (!UpdateVictim())
@@ -203,19 +204,22 @@ public:
             {
                 DoCast(SelectTarget(SELECT_TARGET_RANDOM, 0), SPELL_WATERBOLT);
                 WaterBoltTimer = TitoDied ? 1500 : 5000;
-            } else WaterBoltTimer -= diff;
+            } else 
+                WaterBoltTimer -= diff;
 
             if (FearTimer <= diff)
             {
                 DoCastVictim(SPELL_SCREAM);
                 FearTimer = 30000;
-            } else FearTimer -= diff;
+            } else 
+                FearTimer -= diff;
 
             if (!SummonedTito)
             {
                 if (SummonTitoTimer <= diff)
                     SummonTito();
-                else SummonTitoTimer -= diff;
+                else 
+                    SummonTitoTimer -= diff;
             }
 
             DoMeleeAttackIfReady();
@@ -273,7 +277,8 @@ public:
             {
                 DoCastVictim(SPELL_YIPPING);
                 YipTimer = 10000;
-            } else YipTimer -= diff;
+            } else 
+                YipTimer -= diff;
 
             DoMeleeAttackIfReady();
         }
@@ -383,7 +388,8 @@ public:
                 {
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                     AggroTimer = 0;
-                } else AggroTimer -= diff;
+                } else 
+                    AggroTimer -= diff;
             }
 
             if (!UpdateVictim())
@@ -393,14 +399,16 @@ public:
             {
                 DoCastVictim(SPELL_BRAIN_BASH);
                 BrainBashTimer = 15000;
-            } else BrainBashTimer -= diff;
+            } else 
+                BrainBashTimer -= diff;
 
             if (BrainWipeTimer <= diff)
             {
                 if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
                     DoCast(target, SPELL_BRAIN_WIPE);
                 BrainWipeTimer = 20000;
-            } else BrainWipeTimer -= diff;
+            } else 
+                BrainWipeTimer -= diff;
 
             DoMeleeAttackIfReady();
         }
@@ -489,7 +497,8 @@ public:
                 {
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                     AggroTimer = 0;
-                } else AggroTimer -= diff;
+                } else 
+                    AggroTimer -= diff;
             }
 
             if (!UpdateVictim())
@@ -499,7 +508,8 @@ public:
             {
                 DoCastVictim(SPELL_CLEAVE);
                 CleaveTimer = 5000;
-            } else CleaveTimer -= diff;
+            } else 
+                CleaveTimer -= diff;
 
             if (RustCount < 8)
             {
@@ -509,7 +519,8 @@ public:
                     Talk(EMOTE_RUST);
                     DoCast(me, SPELL_RUST);
                     RustTimer = 6000;
-                } else RustTimer -= diff;
+                } else
+                    RustTimer -= diff;
             }
 
             DoMeleeAttackIfReady();
@@ -597,7 +608,8 @@ public:
                 {
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                     AggroTimer = 0;
-                } else AggroTimer -= diff;
+                } else
+                    AggroTimer -= diff;
             }
 
             if (!UpdateVictim())
@@ -607,19 +619,22 @@ public:
             {
                 DoCastVictim(SPELL_MANGLE);
                 MangleTimer = urand(5000, 8000);
-            } else MangleTimer -= diff;
+            } else
+                MangleTimer -= diff;
 
             if (ShredTimer <= diff)
             {
                 DoCastVictim(SPELL_SHRED);
                 ShredTimer = urand(10000, 15000);
-            } else ShredTimer -= diff;
+            } else
+                ShredTimer -= diff;
 
             if (ScreamTimer <= diff)
             {
                 DoCastVictim(SPELL_FRIGHTENED_SCREAM);
                 ScreamTimer = urand(20000, 30000);
-            } else ScreamTimer -= diff;
+            } else
+                ScreamTimer -= diff;
 
             DoMeleeAttackIfReady();
         }
@@ -695,13 +710,15 @@ public:
                 if (Creature* Cyclone = DoSpawnCreature(CREATURE_CYCLONE, float(urand(0, 9)), float(urand(0, 9)), 0, 0, TEMPSUMMON_TIMED_DESPAWN, 15000))
                     Cyclone->CastSpell(Cyclone, SPELL_CYCLONE_VISUAL, true);
                 CycloneTimer = 22000;
-            } else CycloneTimer -= diff;
+            } else
+                CycloneTimer -= diff;
 
             if (ChainLightningTimer <= diff)
             {
                 DoCastVictim(SPELL_CHAIN_LIGHTNING);
                 ChainLightningTimer = 8000;
-            } else ChainLightningTimer -= diff;
+            } else
+                ChainLightningTimer -= diff;
 
             DoMeleeAttackIfReady();
         }

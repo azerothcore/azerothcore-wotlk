@@ -47,6 +47,10 @@ public:
                 break;
             case NPC_NIGHTBANE:
                 m_uiNightBaneGUID = creature->GetGUID();
+            case NPC_RELAY:
+                m_uiInfernalRelay = creature->GetGUID();
+            case NPC_INFERNAL_TARGET:
+                m_uiInfernaltargetGUID = creature->GetGUID();
             }
         }
 
@@ -215,7 +219,6 @@ public:
                 return OperaEvent;
             case DATA_OPERA_OZ_DEATHCOUNT:
                 return OzDeathCount;
-
             case DATA_KILREK:
                 return m_uiKilrekGUID;
             case DATA_TERESTIAN:
@@ -273,12 +276,14 @@ public:
             case DATA_MASTERS_TERRACE_DOOR_2:   return MastersTerraceDoor[1];
             case DATA_IMAGE_OF_MEDIVH:          return ImageGUID;
             case DATA_NIGHTBANE:                return m_uiNightBaneGUID;
+            case DATA_PRINCE_INFERNAL_RELAY:    return m_uiInfernalRelay;
             }
 
             return 0;
         }
 
     private:
+        uint64 InfernalTargetsGuidList;
         uint32 OperaEvent;
         uint32 OzDeathCount;
         uint32 OptionalBossCount;
@@ -302,6 +307,9 @@ public:
         uint64 MastersTerraceDoor[2];
         uint64 ImageGUID;
         uint64 DustCoveredChest;
+        uint64 m_uiInfernalRelay;                                   // Summoning Infernals From sky.
+        uint64 m_uiInfernaltargetGUID;
+        
     };
 };
 
