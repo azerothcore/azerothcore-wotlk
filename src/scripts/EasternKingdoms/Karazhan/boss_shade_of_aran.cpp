@@ -192,7 +192,8 @@ public:
                     instance->HandleGameObject(instance->GetData64(DATA_GO_LIBRARY_DOOR), false);
                     CloseDoorTimer = 0;
                 }
-                else CloseDoorTimer -= diff;
+                else 
+					CloseDoorTimer -= diff;
             }
 
             //Cooldowns for casts
@@ -200,21 +201,24 @@ public:
             {
                 if (ArcaneCooldown >= diff)
                     ArcaneCooldown -= diff;
-                else ArcaneCooldown = 0;
+                else 
+					ArcaneCooldown = 0;
             }
 
             if (FireCooldown)
             {
                 if (FireCooldown >= diff)
                     FireCooldown -= diff;
-                else FireCooldown = 0;
+                else 
+					FireCooldown = 0;
             }
 
             if (FrostCooldown)
             {
                 if (FrostCooldown >= diff)
                     FrostCooldown -= diff;
-                else FrostCooldown = 0;
+                else 
+					FrostCooldown = 0;
             }
 
             if (!Drinking && me->GetMaxPower(POWER_MANA) && (me->GetPower(POWER_MANA) * 100 / me->GetMaxPower(POWER_MANA)) < 20)
@@ -301,7 +305,8 @@ public:
                 }
                 NormalCastTimer = 1000;
             }
-            else NormalCastTimer -= diff;
+            else 
+				NormalCastTimer -= diff;
 
             if (SecondarySpellTimer <= diff)
             {
@@ -317,7 +322,8 @@ public:
                 }
                 SecondarySpellTimer = urand(5000, 20000);
             }
-            else SecondarySpellTimer -= diff;
+            else 
+				SecondarySpellTimer -= diff;
 
             if (SuperCastTimer <= diff)
             {
@@ -472,14 +478,16 @@ public:
 
                 BerserkTimer = 60000;
             }
-            else BerserkTimer -= diff;
+            else 
+				BerserkTimer -= diff;
 
             //Flame Wreath check
             if (FlameWreathTimer)
             {
                 if (FlameWreathTimer >= diff)
                     FlameWreathTimer -= diff;
-                else FlameWreathTimer = 0;
+                else 
+					FlameWreathTimer = 0;
 
                 if (FlameWreathCheckTime <= diff)
                 {
@@ -498,7 +506,8 @@ public:
                     }
                     FlameWreathCheckTime = 500;
                 }
-                else FlameWreathCheckTime -= diff;
+                else 
+					FlameWreathCheckTime -= diff;
             }
 
             if (ArcaneCooldown && FireCooldown && FrostCooldown)
