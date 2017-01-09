@@ -269,7 +269,7 @@ public:
                 DoCast(SelectTarget(SELECT_TARGET_RANDOM, 1, 45, true), SPELL_VOIDZONE, true);
                 VoidZoneTimer = 15000;
             } else 
-				VoidZoneTimer -= diff;
+                VoidZoneTimer -= diff;
 
             // NetherInfusion Berserk
             if (!Berserk && NetherInfusionTimer <= diff)
@@ -278,7 +278,7 @@ public:
                 DoCast(me, SPELL_NETHERSPITE_ROAR);
                 Berserk = true;
             } else 
-				NetherInfusionTimer -= diff;
+                NetherInfusionTimer -= diff;
 
             if (PortalPhase) // PORTAL PHASE
             {
@@ -288,7 +288,7 @@ public:
                     UpdatePortals();
                     PortalTimer = 1000;
                 } else 
-					PortalTimer -= diff;
+                    PortalTimer -= diff;
 
                 // Empowerment & Nether Burn
                 if (EmpowermentTimer <= diff)
@@ -297,7 +297,7 @@ public:
                     me->AddAura(SPELL_NETHERBURN_AURA, me);
                     EmpowermentTimer = 90000;
                 } else 
-					EmpowermentTimer -= diff;
+                    EmpowermentTimer -= diff;
 
                 if (PhaseTimer <= diff)
                 {
@@ -307,7 +307,7 @@ public:
                         return;
                     }
                 } else 
-					PhaseTimer -= diff;
+                    PhaseTimer -= diff;
             }
             else // BANISH PHASE
             {
@@ -318,7 +318,7 @@ public:
                         DoCast(target, SPELL_NETHERBREATH);
                     NetherbreathTimer = urand(5000, 7000);
                 } else 
-					NetherbreathTimer -= diff;
+                    NetherbreathTimer -= diff;
 
                 if (PhaseTimer <= diff)
                 {
@@ -328,7 +328,7 @@ public:
                         return;
                     }
                 } else 
-					PhaseTimer -= diff;
+                    PhaseTimer -= diff;
             }
 
             DoMeleeAttackIfReady();

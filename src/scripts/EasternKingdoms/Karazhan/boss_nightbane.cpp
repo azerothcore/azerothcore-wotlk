@@ -296,14 +296,14 @@ public:
                     DoCastVictim(SPELL_BELLOWING_ROAR);
                     BellowingRoarTimer = urand(30000, 40000);
                 } else 
-					BellowingRoarTimer -= diff;
+                    BellowingRoarTimer -= diff;
 
                 if (SmolderingBreathTimer <= diff)
                 {
                     DoCastVictim(SPELL_SMOLDERING_BREATH);
                     SmolderingBreathTimer = 20000;
                 } else 
-					SmolderingBreathTimer -= diff;
+                    SmolderingBreathTimer -= diff;
 
                 if (CharredEarthTimer <= diff)
                 {
@@ -311,7 +311,7 @@ public:
                         DoCast(target, SPELL_CHARRED_EARTH);
                     CharredEarthTimer = 20000;
                 } else 
-					CharredEarthTimer -= diff;
+                    CharredEarthTimer -= diff;
 
                 if (TailSweepTimer <= diff)
                 {
@@ -320,7 +320,7 @@ public:
                             DoCast(target, SPELL_TAIL_SWEEP);
                     TailSweepTimer = 15000;
                 } else 
-					TailSweepTimer -= diff;
+                    TailSweepTimer -= diff;
 
                 if (SearingCindersTimer <= diff)
                 {
@@ -328,7 +328,7 @@ public:
                         DoCast(target, SPELL_SEARING_CINDERS);
                     SearingCindersTimer = 10000;
                 } else 
-					SearingCindersTimer -= diff;
+                    SearingCindersTimer -= diff;
 
                 uint32 Prozent = uint32(me->GetHealthPct());
 
@@ -364,7 +364,7 @@ public:
                         RainBones = true;
                         SmokingBlastTimer = 20000;
                     } else 
-						RainofBonesTimer -= diff;
+                        RainofBonesTimer -= diff;
 
                     if (DistractingAshTimer <= diff)
                     {
@@ -372,7 +372,7 @@ public:
                             DoCast(target, SPELL_DISTRACTING_ASH);
                         DistractingAshTimer = 2000; //timer wrong
                     } else 
-						DistractingAshTimer -= diff;
+                        DistractingAshTimer -= diff;
                 }
 
                 if (RainBones)
@@ -382,7 +382,7 @@ public:
                         DoCastVictim(SPELL_SMOKING_BLAST);
                         SmokingBlastTimer = 1500; //timer wrong
                      } else 
-						 SmokingBlastTimer -= diff;
+                        SmokingBlastTimer -= diff;
                 }
 
                 if (FireballBarrageTimer <= diff)
@@ -391,7 +391,7 @@ public:
                         DoCast(target, SPELL_FIREBALL_BARRAGE);
                     FireballBarrageTimer = 20000;
                 } else 
-					FireballBarrageTimer -= diff;
+                    FireballBarrageTimer -= diff;
 
                 if (FlyTimer <= diff) //landing
                 {

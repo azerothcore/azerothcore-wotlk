@@ -193,7 +193,7 @@ public:
                     CloseDoorTimer = 0;
                 }
                 else 
-					CloseDoorTimer -= diff;
+                    CloseDoorTimer -= diff;
             }
 
             //Cooldowns for casts
@@ -202,7 +202,7 @@ public:
                 if (ArcaneCooldown >= diff)
                     ArcaneCooldown -= diff;
                 else 
-					ArcaneCooldown = 0;
+                    ArcaneCooldown = 0;
             }
 
             if (FireCooldown)
@@ -210,7 +210,7 @@ public:
                 if (FireCooldown >= diff)
                     FireCooldown -= diff;
                 else 
-					FireCooldown = 0;
+                    FireCooldown = 0;
             }
 
             if (FrostCooldown)
@@ -218,7 +218,7 @@ public:
                 if (FrostCooldown >= diff)
                     FrostCooldown -= diff;
                 else 
-					FrostCooldown = 0;
+                    FrostCooldown = 0;
             }
 
             if (!Drinking && me->GetMaxPower(POWER_MANA) && (me->GetPower(POWER_MANA) * 100 / me->GetMaxPower(POWER_MANA)) < 20)
@@ -306,7 +306,7 @@ public:
                 NormalCastTimer = 1000;
             }
             else 
-				NormalCastTimer -= diff;
+                NormalCastTimer -= diff;
 
             if (SecondarySpellTimer <= diff)
             {
@@ -323,7 +323,7 @@ public:
                 SecondarySpellTimer = urand(5000, 20000);
             }
             else 
-				SecondarySpellTimer -= diff;
+                SecondarySpellTimer -= diff;
 
             if (SuperCastTimer <= diff)
             {
@@ -384,7 +384,8 @@ public:
 
                 SuperCastTimer = urand(35000, 40000);
             }
-            else SuperCastTimer -= diff;
+            else 
+                SuperCastTimer -= diff;
 
             if (!ElementalsSpawned && HealthBelowPct(40))
             {
@@ -479,7 +480,7 @@ public:
                 BerserkTimer = 60000;
             }
             else 
-				BerserkTimer -= diff;
+                BerserkTimer -= diff;
 
             //Flame Wreath check
             if (FlameWreathTimer)
@@ -487,7 +488,7 @@ public:
                 if (FlameWreathTimer >= diff)
                     FlameWreathTimer -= diff;
                 else 
-					FlameWreathTimer = 0;
+                    FlameWreathTimer = 0;
 
                 if (FlameWreathCheckTime <= diff)
                 {
@@ -507,7 +508,7 @@ public:
                     FlameWreathCheckTime = 500;
                 }
                 else 
-					FlameWreathCheckTime -= diff;
+                    FlameWreathCheckTime -= diff;
             }
 
             if (ArcaneCooldown && FireCooldown && FrostCooldown)
@@ -585,7 +586,8 @@ public:
                 DoCastVictim(SPELL_WATERBOLT);
                 CastTimer = urand(2000, 5000);
             }
-            else CastTimer -= diff;
+            else
+                CastTimer -= diff;
         }
     };
 };

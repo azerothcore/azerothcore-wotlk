@@ -109,7 +109,7 @@ public:
 
                 AmplifyTimer = urand(10000, 20000);
             } else 
-				AmplifyTimer -= diff;
+                AmplifyTimer -= diff;
 
             DoMeleeAttackIfReady();
         }
@@ -224,7 +224,7 @@ public:
                 DoCastVictim(SPELL_FIREBOLT);
                 FireboltTimer = 2200;
             } else 
-				FireboltTimer -= diff;
+                FireboltTimer -= diff;
 
             DoMeleeAttackIfReady();
         }
@@ -370,7 +370,7 @@ public:
                 me->RemoveAura(SPELL_BROKEN_PACT);
             }
             else 
-				SummonKilrekTimer -= diff;
+                SummonKilrekTimer -= diff;
          
             if (SacrificeTimer <= diff)
             {
@@ -390,14 +390,14 @@ public:
                     }
                 }
             } else 
-				SacrificeTimer -= diff;
+                SacrificeTimer -= diff;
 
             if (ShadowboltTimer <= diff)
             {
                 DoCast(SelectTarget(SELECT_TARGET_TOPAGGRO, 0), SPELL_SHADOW_BOLT);
                 ShadowboltTimer = 10000;
             } else 
-				ShadowboltTimer -= diff;
+                ShadowboltTimer -= diff;
 
             if (SummonTimer <= diff)
             {
@@ -414,7 +414,7 @@ public:
                     SummonTimer = 5000;
                 }
             } else 
-				SummonTimer -= diff;
+                SummonTimer -= diff;
 
             if (!Berserk)
             {
@@ -423,7 +423,7 @@ public:
                     DoCast(me, SPELL_BERSERK);
                     Berserk = true;
                 } else 
-					BerserkTimer -= diff;
+                    BerserkTimer -= diff;
             }
 
             DoMeleeAttackIfReady();
