@@ -448,7 +448,7 @@ public:
 
                 if (ElementalFour)
                 {
-                    UnUnit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 100, true);
+                    Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 100, true);
                     if (!target)
                         return;
 
