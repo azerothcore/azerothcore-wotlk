@@ -23,17 +23,17 @@ enum PrinceSay
 
 enum Spells
 {
-    SPELL_ENFEEBLE = 30843,                       //Enfeeble during phase 1 and 2
+    SPELL_ENFEEBLE = 30843,                      //Enfeeble during phase 1 and 2
     SPELL_ENFEEBLE_EFFECT = 41624,
-    SPELL_SHADOWNOVA = 30852,                       //Shadownova used during all phases
+    SPELL_SHADOWNOVA = 30852,                    //Shadownova used during all phases
     SPELL_SW_PAIN = 30854,                       //Shadow word pain during phase 1 and 3 (different targeting rules though)
-    SPELL_THRASH_PASSIVE = 12787,                       //Extra attack chance during phase 2
-    SPELL_SUNDER_ARMOR = 30901,                       //Sunder armor during phase 2
-    SPELL_THRASH_AURA = 12787,                       //Passive proc chance for thrash
-    SPELL_EQUIP_AXES = 30857,                       //Visual for axe equiping
-    SPELL_AMPLIFY_DAMAGE = 39095,                       //Amplifiy during phase 3
-    SPELL_CLEAVE = 30131,                       //Same as Nightbane.
-    SPELL_HELLFIRE = 30859,                       //Infenals' hellfire aura
+    SPELL_THRASH_PASSIVE = 12787,                //Extra attack chance during phase 2
+    SPELL_SUNDER_ARMOR = 30901,                  //Sunder armor during phase 2
+    SPELL_THRASH_AURA = 12787,                   //Passive proc chance for thrash
+    SPELL_EQUIP_AXES = 30857,                    //Visual for axe equiping
+    SPELL_AMPLIFY_DAMAGE = 39095,                //Amplifiy during phase 3
+    SPELL_CLEAVE = 30131,                        //Same as Nightbane.
+    SPELL_HELLFIRE = 30859,                      //Infenals' hellfire aura
 };
 
 enum creatures
@@ -169,7 +169,6 @@ public:
             instance = creature->GetInstanceScript();
         }
 
-
         InstanceScript* instance;
         uint32 EnfeebleTimer;
         uint32 EnfeebleResetTimer;
@@ -304,7 +303,6 @@ public:
              {
                  point = Trinity::Containers::SelectRandomContainerElement(positions);
                  pos.Relocate(point->x, point->y, INFERNAL_Z, frand(0.0f, float(M_PI * 2)));
-                 
              }
 
              if (Creature*  RELAY = me->FindNearestCreature(NPC_RELAY, 100.0f))

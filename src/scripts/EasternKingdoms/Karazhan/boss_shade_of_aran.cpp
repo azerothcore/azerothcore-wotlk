@@ -403,13 +403,14 @@ public:
 
                 if (ElementalOne)
                 {
-                    Unit* pTarget = (SELECT_TARGET_RANDOM, 0);
-                    if (!pTarget)
+                    Unit* target = NULL;
+                    target = SelectTarget(SELECT_TARGET_RANDOM, 1, 100, true);
+                    if (!target)
                         return;
 
-                    DoStartNoMovement(pTarget);
+                    DoStartNoMovement(target);
                     ElementalOne->SetInCombatWithZone();
-                    ElementalOne->CombatStart(pTarget);
+                    ElementalOne->CombatStart(target);
                     ElementalOne->setFaction(me->getFaction());
                     ElementalTwo->SetUnitMovementFlags(MOVEMENTFLAG_ROOT);
                     ElementalOne->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_FROST, true);
@@ -418,13 +419,14 @@ public:
 
                 if (ElementalTwo)
                 {
-                    Unit* pTarget = (SELECT_TARGET_RANDOM, 0);
-                    if (!pTarget)
+                    Unit* target = NULL;
+                    target = SelectTarget(SELECT_TARGET_RANDOM, 1, 100, true);
+                    if (!target)
                         return;
 
-                    DoStartNoMovement(pTarget);
+                    DoStartNoMovement(target);
                     ElementalTwo->SetInCombatWithZone();
-                    ElementalTwo->CombatStart(pTarget);
+                    ElementalTwo->CombatStart(target);
                     ElementalTwo->setFaction(me->getFaction());
                     ElementalTwo->SetUnitMovementFlags(MOVEMENTFLAG_ROOT);
                     ElementalTwo->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_FROST, true);
@@ -433,13 +435,14 @@ public:
 
                 if (ElementalThree)
                 {
-                    Unit* pTarget = (SELECT_TARGET_RANDOM, 0);
-                    if (!pTarget)
+                    Unit* target = NULL;
+                    target = SelectTarget(SELECT_TARGET_RANDOM, 1, 100, true);
+                    if (!target)
                         return;
 
-                    DoStartNoMovement(pTarget);
+                    DoStartNoMovement(target);
                     ElementalThree->SetInCombatWithZone();
-                    ElementalThree->CombatStart(pTarget);
+                    ElementalThree->CombatStart(target);
                     ElementalThree->setFaction(me->getFaction());
                     ElementalTwo->SetUnitMovementFlags(MOVEMENTFLAG_ROOT);
                     ElementalThree->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_FROST, true);
@@ -448,13 +451,14 @@ public:
 
                 if (ElementalFour)
                 {
-                    Unit* pTarget = (SELECT_TARGET_RANDOM, 0);
-                    if (!pTarget)
+                    Unit* target = NULL;
+                    target = SelectTarget(SELECT_TARGET_RANDOM, 1, 100, true);
+                    if (!target)
                         return;
 
-                    DoStartNoMovement(pTarget);
+                    DoStartNoMovement(target);
                     ElementalFour->SetInCombatWithZone();
-                    ElementalFour->CombatStart(pTarget);
+                    ElementalFour->CombatStart(target);
                     ElementalFour->setFaction(me->getFaction());
                     ElementalTwo->SetUnitMovementFlags(MOVEMENTFLAG_ROOT);
                     ElementalFour->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_FROST, true);
