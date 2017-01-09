@@ -303,7 +303,7 @@ public:
                 }
             }
             else 
-				DoCast(me, SPELL_SUMMON_IMP, true);
+                DoCast(me, SPELL_SUMMON_IMP, true);
         }
 
         void EnterCombat(Unit* /*who*/)
