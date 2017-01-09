@@ -403,8 +403,7 @@ public:
 
                 if (ElementalOne)
                 {
-                    Unit* target = NULL;
-                    target = SelectTarget(SELECT_TARGET_RANDOM, 1, 100, true);
+                    Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 100, true);
                     if (!target)
                         return;
 
@@ -419,8 +418,7 @@ public:
 
                 if (ElementalTwo)
                 {
-                    Unit* target = NULL;
-                    target = SelectTarget(SELECT_TARGET_RANDOM, 1, 100, true);
+                    Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 100, true);
                     if (!target)
                         return;
 
@@ -435,8 +433,7 @@ public:
 
                 if (ElementalThree)
                 {
-                    Unit* target = NULL;
-                    target = SelectTarget(SELECT_TARGET_RANDOM, 1, 100, true);
+                    Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 100, true);
                     if (!target)
                         return;
 
@@ -451,8 +448,7 @@ public:
 
                 if (ElementalFour)
                 {
-                    Unit* target = NULL;
-                    target = SelectTarget(SELECT_TARGET_RANDOM, 1, 100, true);
+                    UnUnit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 100, true);
                     if (!target)
                         return;
 
