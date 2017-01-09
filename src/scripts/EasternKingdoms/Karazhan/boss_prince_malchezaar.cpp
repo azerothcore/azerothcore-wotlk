@@ -212,6 +212,7 @@ public:
         void Reset() override
         {
             Initialize();
+            
         }
 
         void KilledUnit(Unit* /*victim*/) override
