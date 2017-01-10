@@ -296,79 +296,89 @@ class spell_pal_ardent_defender : public SpellScriptLoader
     public:
         spell_pal_ardent_defender() : SpellScriptLoader("spell_pal_ardent_defender") { }
 
-        class spell_pal_ardent_defender_AuraScript : public AuraScript
+    class spell_pal_ardent_defender_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_pal_ardent_defender_AuraScript);
+
+    public:
+        spell_pal_ardent_defender_AuraScript()
         {
-            PrepareAuraScript(spell_pal_ardent_defender_AuraScript);
+            absorbPct = 0;
+            healPct = 0;
+        }
 
-            uint32 absorbPct, healPct;
+    private:
+        uint32 absorbPct, healPct;
 
-            enum Spell
-            {
-                PAL_SPELL_ARDENT_DEFENDER_HEAL = 66235,
-            };
-
-            bool Load()
-            {
-                healPct = GetSpellInfo()->Effects[EFFECT_1].CalcValue();
-                absorbPct = GetSpellInfo()->Effects[EFFECT_0].CalcValue();
-                return GetUnitOwner()->GetTypeId() == TYPEID_PLAYER;
-            }
-
-            void CalculateAmount(AuraEffect const* /*aurEff*/, int32 & amount, bool & /*canBeRecalculated*/)
-            {
-                // Set absorbtion amount to unlimited
-                amount = -1;
-            }
-
-            void Absorb(AuraEffect* aurEff, DamageInfo & dmgInfo, uint32 & absorbAmount)
-            {
-                Unit* victim = GetTarget();
-                int32 remainingHealth = victim->GetHealth() - dmgInfo.GetDamage();
-                uint32 allowedHealth = victim->CountPctFromMaxHealth(35);
-                // If damage kills us
-                if (remainingHealth <= 0 && !victim->ToPlayer()->HasSpellCooldown(PAL_SPELL_ARDENT_DEFENDER_HEAL))
-                {
-                    // Cast healing spell, completely avoid damage
-                    absorbAmount = dmgInfo.GetDamage();
-
-                    // xinef: fix logics
-                    uint32 defenseSkillValue = victim->GetDefenseSkillValue();
-                    // Max heal when defense skill denies critical hits from raid bosses
-                    // Formula: max defense at level + 140 (raiting from gear)
-                    uint32 reqDefForMaxHeal  = victim->getLevel() * 5 + 140;
-                    float pctFromDefense = (defenseSkillValue - victim->getLevel()*5.0f) / 140.0f;
-                    if (pctFromDefense < 0.0f)
-                        pctFromDefense = 0.0f;
-                    else if (pctFromDefense > 1.0f)
-                        pctFromDefense = 1.0f;
-
-                    int32 healAmount = int32(victim->CountPctFromMaxHealth(uint32(healPct * pctFromDefense)));
-                    if (healAmount)
-                        victim->CastCustomSpell(victim, PAL_SPELL_ARDENT_DEFENDER_HEAL, &healAmount, NULL, NULL, true, NULL, aurEff);
-
-                    victim->ToPlayer()->AddSpellCooldown(PAL_SPELL_ARDENT_DEFENDER_HEAL, 0, 120000);
-                }
-                else if (remainingHealth < int32(allowedHealth))
-                {
-                    // Reduce damage that brings us under 35% (or full damage if we are already under 35%) by x%
-                    uint32 damageToReduce = (victim->GetHealth() < allowedHealth)
-                        ? dmgInfo.GetDamage()
-                        : allowedHealth - remainingHealth;
-                    absorbAmount = CalculatePct(damageToReduce, absorbPct);
-                }
-            }
-
-            void Register()
-            {
-                 DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_pal_ardent_defender_AuraScript::CalculateAmount, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB);
-                 OnEffectAbsorb += AuraEffectAbsorbFn(spell_pal_ardent_defender_AuraScript::Absorb, EFFECT_0);
-            }
+        enum Spell
+        {
+            PAL_SPELL_ARDENT_DEFENDER_HEAL = 66235
         };
 
-        AuraScript* GetAuraScript() const
+        bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            return new spell_pal_ardent_defender_AuraScript();
+            if (!sSpellMgr->GetSpellInfo(PAL_SPELL_ARDENT_DEFENDER_HEAL))
+                return false;
+            return true;
         }
+
+        bool Load() override
+        {
+            healPct = GetSpellInfo()->Effects[EFFECT_1].CalcValue();
+            absorbPct = GetSpellInfo()->Effects[EFFECT_0].CalcValue();
+            return GetUnitOwner()->GetTypeId() == TYPEID_PLAYER;
+        }
+
+        void CalculateAmount(AuraEffect const* /*aurEff*/, int32 & amount, bool & /*canBeRecalculated*/)
+        {
+            // Set absorbtion amount to unlimited
+            amount = -1;
+        }
+
+        void Absorb(AuraEffect* aurEff, DamageInfo & dmgInfo, uint32 & absorbAmount)
+        {
+            Unit* victim = GetTarget();
+            int32 remainingHealth = victim->GetHealth() - dmgInfo.GetDamage();
+            uint32 allowedHealth = victim->CountPctFromMaxHealth(35);
+            // If damage kills us
+            if (remainingHealth <= 0 && !victim->ToPlayer()->HasSpellCooldown(PAL_SPELL_ARDENT_DEFENDER_HEAL))
+            {
+                // Cast healing spell, completely avoid damage
+                absorbAmount = dmgInfo.GetDamage();
+
+                uint32 defenseSkillValue = victim->GetDefenseSkillValue();
+                // Max heal when defense skill denies critical hits from raid bosses
+                // Formula: max defense at level + 140 (raiting from gear)
+                uint32 reqDefForMaxHeal = victim->getLevel() * 5 + 140;
+                float pctFromDefense = (defenseSkillValue >= reqDefForMaxHeal)
+                    ? 1.0f
+                    : float(defenseSkillValue) / float(reqDefForMaxHeal);
+
+                int32 healAmount = int32(victim->CountPctFromMaxHealth(uint32(healPct * pctFromDefense)));
+                victim->CastCustomSpell(PAL_SPELL_ARDENT_DEFENDER_HEAL, SPELLVALUE_BASE_POINT0, healAmount, victim, true, nullptr, aurEff);
+                victim->ToPlayer()->AddSpellCooldown(PAL_SPELL_ARDENT_DEFENDER_HEAL, 0, 120000);
+            }
+            else if (remainingHealth < int32(allowedHealth))
+            {
+                // Reduce damage that brings us under 35% (or full damage if we are already under 35%) by x%
+                uint32 damageToReduce = (victim->GetHealth() < allowedHealth)
+                    ? dmgInfo.GetDamage()
+                    : allowedHealth - remainingHealth;
+                absorbAmount = CalculatePct(damageToReduce, absorbPct);
+            }
+        }
+
+        void Register() override
+        {
+            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_pal_ardent_defender_AuraScript::CalculateAmount, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB);
+            OnEffectAbsorb += AuraEffectAbsorbFn(spell_pal_ardent_defender_AuraScript::Absorb, EFFECT_0);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_pal_ardent_defender_AuraScript();
+    }
 };
 
 // 31884 - Avenging Wrath
