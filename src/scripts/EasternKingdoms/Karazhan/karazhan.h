@@ -87,7 +87,8 @@ enum KZMiscCreatures
     NPC_PHASE_HOUND = 16178,
     NPC_DREADBEAST = 16177,
     NPC_SHADOWBEAST = 16176,
-    NPC_KILREK = 17229
+    NPC_KILREK = 17229,
+    NPC_RELAY = 17645
 };
 
 enum KZGameObjectIds

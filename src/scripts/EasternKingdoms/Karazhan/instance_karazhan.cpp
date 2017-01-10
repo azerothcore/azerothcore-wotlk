@@ -47,6 +47,8 @@ public:
                 break;
             case NPC_NIGHTBANE:
                 m_uiNightBaneGUID = creature->GetGUID();
+            case NPC_RELAY:
+                m_uiRelayGUID = creature->GetGUID();
             }
         }
 
@@ -302,6 +304,7 @@ public:
         uint64 MastersTerraceDoor[2];
         uint64 ImageGUID;
         uint64 DustCoveredChest;
+        uint64 m_uiRelayGUID;
     };
 };
 

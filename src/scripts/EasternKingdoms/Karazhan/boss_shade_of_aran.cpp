@@ -192,7 +192,8 @@ public:
                     instance->HandleGameObject(instance->GetData64(DATA_GO_LIBRARY_DOOR), false);
                     CloseDoorTimer = 0;
                 }
-                else CloseDoorTimer -= diff;
+                else 
+                    CloseDoorTimer -= diff;
             }
 
             //Cooldowns for casts
@@ -200,21 +201,24 @@ public:
             {
                 if (ArcaneCooldown >= diff)
                     ArcaneCooldown -= diff;
-                else ArcaneCooldown = 0;
+                else 
+                    ArcaneCooldown = 0;
             }
 
             if (FireCooldown)
             {
                 if (FireCooldown >= diff)
                     FireCooldown -= diff;
-                else FireCooldown = 0;
+                else 
+                    FireCooldown = 0;
             }
 
             if (FrostCooldown)
             {
                 if (FrostCooldown >= diff)
                     FrostCooldown -= diff;
-                else FrostCooldown = 0;
+                else 
+                    FrostCooldown = 0;
             }
 
             if (!Drinking && me->GetMaxPower(POWER_MANA) && (me->GetPower(POWER_MANA) * 100 / me->GetMaxPower(POWER_MANA)) < 20)
@@ -301,7 +305,8 @@ public:
                 }
                 NormalCastTimer = 1000;
             }
-            else NormalCastTimer -= diff;
+            else 
+                NormalCastTimer -= diff;
 
             if (SecondarySpellTimer <= diff)
             {
@@ -317,7 +322,8 @@ public:
                 }
                 SecondarySpellTimer = urand(5000, 20000);
             }
-            else SecondarySpellTimer -= diff;
+            else 
+                SecondarySpellTimer -= diff;
 
             if (SuperCastTimer <= diff)
             {
@@ -378,7 +384,8 @@ public:
 
                 SuperCastTimer = urand(35000, 40000);
             }
-            else SuperCastTimer -= diff;
+            else 
+                SuperCastTimer -= diff;
 
             if (!ElementalsSpawned && HealthBelowPct(40))
             {
@@ -396,13 +403,13 @@ public:
 
                 if (ElementalOne)
                 {
-                    Unit* pTarget = (SELECT_TARGET_RANDOM, 0);
-                    if (!pTarget)
+                    Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 100, true);
+                    if (!target)
                         return;
 
-                    DoStartNoMovement(pTarget);
+                    DoStartNoMovement(target);
                     ElementalOne->SetInCombatWithZone();
-                    ElementalOne->CombatStart(pTarget);
+                    ElementalOne->CombatStart(target);
                     ElementalOne->setFaction(me->getFaction());
                     ElementalTwo->SetUnitMovementFlags(MOVEMENTFLAG_ROOT);
                     ElementalOne->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_FROST, true);
@@ -411,13 +418,13 @@ public:
 
                 if (ElementalTwo)
                 {
-                    Unit* pTarget = (SELECT_TARGET_RANDOM, 0);
-                    if (!pTarget)
+                    Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 100, true);
+                    if (!target)
                         return;
 
-                    DoStartNoMovement(pTarget);
+                    DoStartNoMovement(target);
                     ElementalTwo->SetInCombatWithZone();
-                    ElementalTwo->CombatStart(pTarget);
+                    ElementalTwo->CombatStart(target);
                     ElementalTwo->setFaction(me->getFaction());
                     ElementalTwo->SetUnitMovementFlags(MOVEMENTFLAG_ROOT);
                     ElementalTwo->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_FROST, true);
@@ -426,13 +433,13 @@ public:
 
                 if (ElementalThree)
                 {
-                    Unit* pTarget = (SELECT_TARGET_RANDOM, 0);
-                    if (!pTarget)
+                    Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 100, true);
+                    if (!target)
                         return;
 
-                    DoStartNoMovement(pTarget);
+                    DoStartNoMovement(target);
                     ElementalThree->SetInCombatWithZone();
-                    ElementalThree->CombatStart(pTarget);
+                    ElementalThree->CombatStart(target);
                     ElementalThree->setFaction(me->getFaction());
                     ElementalTwo->SetUnitMovementFlags(MOVEMENTFLAG_ROOT);
                     ElementalThree->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_FROST, true);
@@ -441,13 +448,13 @@ public:
 
                 if (ElementalFour)
                 {
-                    Unit* pTarget = (SELECT_TARGET_RANDOM, 0);
-                    if (!pTarget)
+                    Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 100, true);
+                    if (!target)
                         return;
 
-                    DoStartNoMovement(pTarget);
+                    DoStartNoMovement(target);
                     ElementalFour->SetInCombatWithZone();
-                    ElementalFour->CombatStart(pTarget);
+                    ElementalFour->CombatStart(target);
                     ElementalFour->setFaction(me->getFaction());
                     ElementalTwo->SetUnitMovementFlags(MOVEMENTFLAG_ROOT);
                     ElementalFour->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_FROST, true);
@@ -472,14 +479,16 @@ public:
 
                 BerserkTimer = 60000;
             }
-            else BerserkTimer -= diff;
+            else 
+                BerserkTimer -= diff;
 
             //Flame Wreath check
             if (FlameWreathTimer)
             {
                 if (FlameWreathTimer >= diff)
                     FlameWreathTimer -= diff;
-                else FlameWreathTimer = 0;
+                else 
+                    FlameWreathTimer = 0;
 
                 if (FlameWreathCheckTime <= diff)
                 {
@@ -498,7 +507,8 @@ public:
                     }
                     FlameWreathCheckTime = 500;
                 }
-                else FlameWreathCheckTime -= diff;
+                else 
+                    FlameWreathCheckTime -= diff;
             }
 
             if (ArcaneCooldown && FireCooldown && FrostCooldown)
@@ -576,7 +586,8 @@ public:
                 DoCastVictim(SPELL_WATERBOLT);
                 CastTimer = urand(2000, 5000);
             }
-            else CastTimer -= diff;
+            else
+                CastTimer -= diff;
         }
     };
 };
