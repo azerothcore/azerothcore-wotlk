@@ -104,14 +104,14 @@ class boss_mandokir : public CreatureScript
             {
                 if (me->GetPositionZ() > 140.0f)
                 {
-                    _Reset();
+                    
                     killCount = 0;
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
                     events.ScheduleEvent(EVENT_CHECK_START, 1000);
                     if (Creature* speaker = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_VILEBRANCH_SPEAKER)))
                         if (!speaker->IsAlive())
                             speaker->Respawn(true);
                 }
+                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
                 summons.DespawnAll();
                 me->Mount(MODEL_OHGAN_MOUNT);
             }
@@ -174,7 +174,7 @@ class boss_mandokir : public CreatureScript
                     {
                         me->SetHomePosition(PosMandokir[0]);
                         instance->SetBossState(DATA_MANDOKIR, NOT_STARTED);
-                        me->DespawnOrUnsummon(6000); // No idea how to respawn on wipe.
+                        
                     }
                 }
             }
@@ -202,7 +202,6 @@ class boss_mandokir : public CreatureScript
                                     break;
                                 case EVENT_STARTED:
                                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
-                                    me->GetMotionMaster()->MovePath(PATH_MANDOKIR, false);
                                     break;
                                 default:
                                     break;
