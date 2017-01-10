@@ -71,10 +71,13 @@ class boss_moroes : public CreatureScript
 
         struct boss_moroesAI : public BossAI
         {
-            boss_moroesAI(Creature* creature) : BossAI(creature, TYPE_MOROES)
+            boss_moroesAI(Creature* creature) : BossAI(creature, DATA_MOROES)
             {
                 _activeGuests = 0;
+                instance = creature->GetInstanceScript();
             }
+
+            InstanceScript* instance;
 
             void InitializeAI()
             {
@@ -128,6 +131,7 @@ class boss_moroes : public CreatureScript
 
                 _events2.Reset();
                 me->CallForHelp(20.0f);
+                DoZoneInCombat();
             }
 
             void KilledUnit(Unit* /*victim*/)
@@ -144,7 +148,7 @@ class boss_moroes : public CreatureScript
                 summons.clear();
                 BossAI::JustDied(killer);
                 Talk(SAY_DEATH);
-
+                instance->SetBossState(DATA_MOROES, DONE);
                 instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_GARROTE);
             }
 
@@ -216,7 +220,11 @@ class boss_moroes : public CreatureScript
                         events.ScheduleEvent(EVENT_SPELL_GARROTE, urand(5000, 7000));
                         return;
                     case EVENT_SPELL_GARROTE:
+                        Talk(SAY_SPECIAL);
+                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                            target->CastSpell(target, SPELL_GARROTE, true);
                         me->CastSpell(me, SPELL_VANISH_TELEPORT, false);
+                        events.SetPhase(0);
                         break;
                 }
 

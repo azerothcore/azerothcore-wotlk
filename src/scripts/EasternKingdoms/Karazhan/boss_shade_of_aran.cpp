@@ -10,44 +10,44 @@
 
 enum ShadeOfAran
 {
-    SAY_AGGRO                   = 0,
-    SAY_FLAMEWREATH             = 1,
-    SAY_BLIZZARD                = 2,
-    SAY_EXPLOSION               = 3,
-    SAY_DRINK                   = 4,
-    SAY_ELEMENTALS              = 5,
-    SAY_KILL                    = 6,
-    SAY_TIMEOVER                = 7,
-    SAY_DEATH                   = 8,
+    SAY_AGGRO = 0,
+    SAY_FLAMEWREATH = 1,
+    SAY_BLIZZARD = 2,
+    SAY_EXPLOSION = 3,
+    SAY_DRINK = 4,
+    SAY_ELEMENTALS = 5,
+    SAY_KILL = 6,
+    SAY_TIMEOVER = 7,
+    SAY_DEATH = 8,
 
     //Spells
-    SPELL_FROSTBOLT             = 29954,
-    SPELL_FIREBALL              = 29953,
-    SPELL_ARCMISSLE             = 29955,
-    SPELL_CHAINSOFICE           = 29991,
-    SPELL_DRAGONSBREATH         = 29964,
-    SPELL_MASSSLOW              = 30035,
-    SPELL_FLAME_WREATH          = 29946,
-    SPELL_AOE_CS                = 29961,
-    SPELL_PLAYERPULL            = 32265,
-    SPELL_AEXPLOSION            = 29973,
-    SPELL_MASS_POLY             = 29963,
-    SPELL_BLINK_CENTER          = 29967,
-    SPELL_ELEMENTALS            = 29962,
-    SPELL_CONJURE               = 29975,
-    SPELL_DRINK                 = 30024,
-    SPELL_POTION                = 32453,
-    SPELL_AOE_PYROBLAST         = 29978,
+    SPELL_FROSTBOLT = 29954,
+    SPELL_FIREBALL = 29953,
+    SPELL_ARCMISSLE = 29955,
+    SPELL_CHAINSOFICE = 29991,
+    SPELL_DRAGONSBREATH = 29964,
+    SPELL_MASSSLOW = 30035,
+    SPELL_FLAME_WREATH = 29946,
+    SPELL_AOE_CS = 29961,
+    SPELL_PLAYERPULL = 32265,
+    SPELL_AEXPLOSION = 29973,
+    SPELL_MASS_POLY = 29963,
+    SPELL_BLINK_CENTER = 29967,
+    SPELL_ELEMENTALS = 29962,
+    SPELL_CONJURE = 29975,
+    SPELL_DRINK = 30024,
+    SPELL_POTION = 32453,
+    SPELL_AOE_PYROBLAST = 29978,
 
     //Creature Spells
-    SPELL_CIRCULAR_BLIZZARD     = 29951,
-    SPELL_WATERBOLT             = 31012,
-    SPELL_SHADOW_PYRO           = 29978,
+    SPELL_CIRCULAR_BLIZZARD = 29951,
+    SPELL_WATERBOLT = 31012,
+    SPELL_SHADOW_PYRO = 29978,
 
     //Creatures
-    CREATURE_WATER_ELEMENTAL    = 17167,
-    CREATURE_SHADOW_OF_ARAN     = 18254,
-    CREATURE_ARAN_BLIZZARD      = 17161,
+    CREATURE_WATER_ELEMENTAL = 17167,
+    CREATURE_SHADOW_OF_ARAN = 18254,
+    CREATURE_ARAN_BLIZZARD = 17161,
 };
 
 enum SuperSpell
@@ -64,7 +64,7 @@ public:
 
     struct boss_aranAI : public BossAI
     {
-        boss_aranAI(Creature* creature) : BossAI(creature, TYPE_ARAN)
+        boss_aranAI(Creature* creature) : BossAI(creature, DATA_ARAN)
         {
         }
 
@@ -100,7 +100,7 @@ public:
             BerserkTimer = 720000;
             CloseDoorTimer = 15000;
 
-            LastSuperSpell = rand()%3;
+            LastSuperSpell = rand() % 3;
 
             FlameWreathTimer = 0;
             FlameWreathCheckTime = 0;
@@ -117,7 +117,7 @@ public:
             DrinkInturrupted = false;
 
             // Not in progress
-            instance->SetData(TYPE_ARAN, NOT_STARTED);
+            instance->SetData(DATA_ARAN, NOT_STARTED);
             instance->HandleGameObject(instance->GetData64(DATA_GO_LIBRARY_DOOR), true);
         }
 
@@ -130,16 +130,19 @@ public:
         {
             Talk(SAY_DEATH);
 
-            instance->SetData(TYPE_ARAN, DONE);
+            instance->SetData(DATA_ARAN, DONE);
             instance->HandleGameObject(instance->GetData64(DATA_GO_LIBRARY_DOOR), true);
+
         }
 
         void EnterCombat(Unit* /*who*/)
         {
             Talk(SAY_AGGRO);
 
-            instance->SetData(TYPE_ARAN, IN_PROGRESS);
+            instance->SetData(DATA_ARAN, IN_PROGRESS);
             instance->HandleGameObject(instance->GetData64(DATA_GO_LIBRARY_DOOR), false);
+            DoZoneInCombat();
+
         }
 
         void FlameWreathEffect()
@@ -151,7 +154,7 @@ public:
                 return;
 
             //store the threat list in a different container
-            for (ThreatContainer::StorageType::const_iterator itr = t_list.begin(); itr!= t_list.end(); ++itr)
+            for (ThreatContainer::StorageType::const_iterator itr = t_list.begin(); itr != t_list.end(); ++itr)
             {
                 Unit* target = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid());
                 //only on alive players
@@ -161,10 +164,10 @@ public:
 
             //cut down to size if we have more than 3 targets
             while (targets.size() > 3)
-                targets.erase(targets.begin()+rand()%targets.size());
+                targets.erase(targets.begin() + rand() % targets.size());
 
             uint32 i = 0;
-            for (std::vector<Unit*>::const_iterator itr = targets.begin(); itr!= targets.end(); ++itr)
+            for (std::vector<Unit*>::const_iterator itr = targets.begin(); itr != targets.end(); ++itr)
             {
                 if (*itr)
                 {
@@ -188,7 +191,8 @@ public:
                 {
                     instance->HandleGameObject(instance->GetData64(DATA_GO_LIBRARY_DOOR), false);
                     CloseDoorTimer = 0;
-                } else CloseDoorTimer -= diff;
+                }
+                else CloseDoorTimer -= diff;
             }
 
             //Cooldowns for casts
@@ -196,24 +200,24 @@ public:
             {
                 if (ArcaneCooldown >= diff)
                     ArcaneCooldown -= diff;
-            else ArcaneCooldown = 0;
+                else ArcaneCooldown = 0;
             }
 
             if (FireCooldown)
             {
                 if (FireCooldown >= diff)
                     FireCooldown -= diff;
-            else FireCooldown = 0;
+                else FireCooldown = 0;
             }
 
             if (FrostCooldown)
             {
                 if (FrostCooldown >= diff)
                     FrostCooldown -= diff;
-            else FrostCooldown = 0;
+                else FrostCooldown = 0;
             }
 
-            if (!Drinking && me->GetMaxPower(POWER_MANA) && (me->GetPower(POWER_MANA)*100 / me->GetMaxPower(POWER_MANA)) < 20)
+            if (!Drinking && me->GetMaxPower(POWER_MANA) && (me->GetPower(POWER_MANA) * 100 / me->GetMaxPower(POWER_MANA)) < 20)
             {
                 Drinking = true;
                 me->InterruptNonMeleeSpells(false);
@@ -236,7 +240,7 @@ public:
                 Drinking = false;
                 me->RemoveAurasDueToSpell(SPELL_DRINK);
                 me->SetStandState(UNIT_STAND_STATE_STAND);
-                me->SetPower(POWER_MANA, me->GetMaxPower(POWER_MANA)-32000);
+                me->SetPower(POWER_MANA, me->GetMaxPower(POWER_MANA) - 32000);
                 DoCast(me, SPELL_POTION, false);
             }
 
@@ -296,22 +300,24 @@ public:
                     }
                 }
                 NormalCastTimer = 1000;
-            } else NormalCastTimer -= diff;
+            }
+            else NormalCastTimer -= diff;
 
             if (SecondarySpellTimer <= diff)
             {
                 switch (urand(0, 1))
                 {
-                    case 0:
-                        DoCast(me, SPELL_AOE_CS);
-                        break;
-                    case 1:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
-                            DoCast(target, SPELL_CHAINSOFICE);
-                        break;
+                case 0:
+                    DoCast(me, SPELL_AOE_CS);
+                    break;
+                case 1:
+                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                        DoCast(target, SPELL_CHAINSOFICE);
+                    break;
                 }
                 SecondarySpellTimer = urand(5000, 20000);
-            } else SecondarySpellTimer -= diff;
+            }
+            else SecondarySpellTimer -= diff;
 
             if (SuperCastTimer <= diff)
             {
@@ -319,71 +325,133 @@ public:
 
                 switch (LastSuperSpell)
                 {
-                    case SUPER_AE:
-                        Available[0] = SUPER_FLAME;
-                        Available[1] = SUPER_BLIZZARD;
-                        break;
-                    case SUPER_FLAME:
-                        Available[0] = SUPER_AE;
-                        Available[1] = SUPER_BLIZZARD;
-                        break;
-                    case SUPER_BLIZZARD:
-                        Available[0] = SUPER_FLAME;
-                        Available[1] = SUPER_AE;
-                        break;
+                case SUPER_AE:
+                    Available[0] = SUPER_FLAME;
+                    Available[1] = SUPER_BLIZZARD;
+                    break;
+                case SUPER_FLAME:
+                    Available[0] = SUPER_AE;
+                    Available[1] = SUPER_BLIZZARD;
+                    break;
+                case SUPER_BLIZZARD:
+                    Available[0] = SUPER_FLAME;
+                    Available[1] = SUPER_AE;
+                    break;
                 }
 
                 LastSuperSpell = Available[urand(0, 1)];
 
                 switch (LastSuperSpell)
                 {
-                    case SUPER_AE:
-                        Talk(SAY_EXPLOSION);
+                case SUPER_AE:
+                    Talk(SAY_EXPLOSION);
 
-                        DoCast(me, SPELL_BLINK_CENTER, true);
-                        DoCast(me, SPELL_PLAYERPULL, true);
-                        DoCast(me, SPELL_MASSSLOW, true);
-                        DoCast(me, SPELL_AEXPLOSION, false);
-                        break;
+                    DoCast(me, SPELL_BLINK_CENTER, true);
+                    DoCast(me, SPELL_PLAYERPULL, true);
+                    DoCast(me, SPELL_MASSSLOW, true);
+                    DoCast(me, SPELL_AEXPLOSION, false);
+                    break;
 
-                    case SUPER_FLAME:
-                        Talk(SAY_FLAMEWREATH);
+                case SUPER_FLAME:
+                    Talk(SAY_FLAMEWREATH);
 
-                        FlameWreathTimer = 20000;
-                        FlameWreathCheckTime = 500;
+                    FlameWreathTimer = 20000;
+                    FlameWreathCheckTime = 500;
 
-                        FlameWreathTarget[0] = 0;
-                        FlameWreathTarget[1] = 0;
-                        FlameWreathTarget[2] = 0;
+                    FlameWreathTarget[0] = 0;
+                    FlameWreathTarget[1] = 0;
+                    FlameWreathTarget[2] = 0;
 
-                        FlameWreathEffect();
-                        break;
+                    FlameWreathEffect();
+                    break;
 
-                    case SUPER_BLIZZARD:
-                        Talk(SAY_BLIZZARD);
+                case SUPER_BLIZZARD:
+                    Talk(SAY_BLIZZARD);
 
-                        if (Creature* pSpawn = me->SummonCreature(CREATURE_ARAN_BLIZZARD, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 25000))
-                        {
-                            pSpawn->setFaction(me->getFaction());
-                            pSpawn->CastSpell(pSpawn, SPELL_CIRCULAR_BLIZZARD, false);
-                        }
-                        break;
+                    if (Creature* pSpawn = me->SummonCreature(CREATURE_ARAN_BLIZZARD, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 25000))
+                    {
+                        pSpawn->setFaction(me->getFaction());
+                        pSpawn->CastSpell(pSpawn, SPELL_CIRCULAR_BLIZZARD, false);
+                    }
+                    break;
                 }
 
                 SuperCastTimer = urand(35000, 40000);
-            } else SuperCastTimer -= diff;
+            }
+            else SuperCastTimer -= diff;
 
             if (!ElementalsSpawned && HealthBelowPct(40))
             {
                 ElementalsSpawned = true;
 
-                for (uint32 i = 0; i < 4; ++i)
+                Creature* ElementalOne = NULL;
+                Creature* ElementalTwo = NULL;
+                Creature* ElementalThree = NULL;
+                Creature* ElementalFour = NULL;
+
+                ElementalOne = me->SummonCreature(CREATURE_WATER_ELEMENTAL, -11168.1f, -1939.29f, 232.092f, 1.46f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 90000);
+                ElementalTwo = me->SummonCreature(CREATURE_WATER_ELEMENTAL, -11138.2f, -1915.38f, 232.092f, 3.00f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 90000);
+                ElementalThree = me->SummonCreature(CREATURE_WATER_ELEMENTAL, -11161.7f, -1885.36f, 232.092f, 4.59f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 90000);
+                ElementalFour = me->SummonCreature(CREATURE_WATER_ELEMENTAL, -11192.4f, -1909.36f, 232.092f, 6.19f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 90000);
+
+                if (ElementalOne)
                 {
-                    if (Creature* unit = me->SummonCreature(CREATURE_WATER_ELEMENTAL, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 90000))
-                    {
-                        unit->Attack(me->GetVictim(), true);
-                        unit->setFaction(me->getFaction());
-                    }
+                    Unit* pTarget = (SELECT_TARGET_RANDOM, 0);
+                    if (!pTarget)
+                        return;
+
+                    DoStartNoMovement(pTarget);
+                    ElementalOne->SetInCombatWithZone();
+                    ElementalOne->CombatStart(pTarget);
+                    ElementalOne->setFaction(me->getFaction());
+                    ElementalTwo->SetUnitMovementFlags(MOVEMENTFLAG_ROOT);
+                    ElementalOne->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_FROST, true);
+                    ElementalOne->SetModifierValue(UNIT_MOD_RESISTANCE_FROST, BASE_VALUE, 0);
+                }
+
+                if (ElementalTwo)
+                {
+                    Unit* pTarget = (SELECT_TARGET_RANDOM, 0);
+                    if (!pTarget)
+                        return;
+
+                    DoStartNoMovement(pTarget);
+                    ElementalTwo->SetInCombatWithZone();
+                    ElementalTwo->CombatStart(pTarget);
+                    ElementalTwo->setFaction(me->getFaction());
+                    ElementalTwo->SetUnitMovementFlags(MOVEMENTFLAG_ROOT);
+                    ElementalTwo->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_FROST, true);
+                    ElementalTwo->SetModifierValue(UNIT_MOD_RESISTANCE_FROST, BASE_VALUE, 0);
+                }
+
+                if (ElementalThree)
+                {
+                    Unit* pTarget = (SELECT_TARGET_RANDOM, 0);
+                    if (!pTarget)
+                        return;
+
+                    DoStartNoMovement(pTarget);
+                    ElementalThree->SetInCombatWithZone();
+                    ElementalThree->CombatStart(pTarget);
+                    ElementalThree->setFaction(me->getFaction());
+                    ElementalTwo->SetUnitMovementFlags(MOVEMENTFLAG_ROOT);
+                    ElementalThree->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_FROST, true);
+                    ElementalThree->SetModifierValue(UNIT_MOD_RESISTANCE_FROST, BASE_VALUE, 0);
+                }
+
+                if (ElementalFour)
+                {
+                    Unit* pTarget = (SELECT_TARGET_RANDOM, 0);
+                    if (!pTarget)
+                        return;
+
+                    DoStartNoMovement(pTarget);
+                    ElementalFour->SetInCombatWithZone();
+                    ElementalFour->CombatStart(pTarget);
+                    ElementalFour->setFaction(me->getFaction());
+                    ElementalTwo->SetUnitMovementFlags(MOVEMENTFLAG_ROOT);
+                    ElementalFour->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_FROST, true);
+                    ElementalFour->SetModifierValue(UNIT_MOD_RESISTANCE_FROST, BASE_VALUE, 0);
                 }
 
                 Talk(SAY_ELEMENTALS);
@@ -403,7 +471,8 @@ public:
                 Talk(SAY_TIMEOVER);
 
                 BerserkTimer = 60000;
-            } else BerserkTimer -= diff;
+            }
+            else BerserkTimer -= diff;
 
             //Flame Wreath check
             if (FlameWreathTimer)
@@ -428,7 +497,8 @@ public:
                         }
                     }
                     FlameWreathCheckTime = 500;
-                } else FlameWreathCheckTime -= diff;
+                }
+                else FlameWreathCheckTime -= diff;
             }
 
             if (ArcaneCooldown && FireCooldown && FrostCooldown)
@@ -457,9 +527,9 @@ public:
 
             switch (CurrentNormalSpell)
             {
-                case SPELL_ARCMISSLE: ArcaneCooldown = 5000; break;
-                case SPELL_FIREBALL: FireCooldown = 5000; break;
-                case SPELL_FROSTBOLT: FrostCooldown = 5000; break;
+            case SPELL_ARCMISSLE: ArcaneCooldown = 5000; break;
+            case SPELL_FIREBALL: FireCooldown = 5000; break;
+            case SPELL_FROSTBOLT: FrostCooldown = 5000; break;
             }
         }
     };
@@ -482,13 +552,16 @@ public:
 
     struct water_elementalAI : public ScriptedAI
     {
-        water_elementalAI(Creature* creature) : ScriptedAI(creature) { }
+        water_elementalAI(Creature* creature) : ScriptedAI(creature)
+        {
+
+        }
 
         uint32 CastTimer;
 
         void Reset()
         {
-            CastTimer = 2000 + (rand()%3000);
+            CastTimer = 2000 + (rand() % 3000);
         }
 
         void EnterCombat(Unit* /*who*/) { }
@@ -502,7 +575,8 @@ public:
             {
                 DoCastVictim(SPELL_WATERBOLT);
                 CastTimer = urand(2000, 5000);
-            } else CastTimer -= diff;
+            }
+            else CastTimer -= diff;
         }
     };
 };

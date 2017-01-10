@@ -6070,7 +6070,10 @@ void AuraEffect::HandlePeriodicDamageAurasTick(Unit* target, Unit* caster) const
 
     // ignore non positive values (can be result apply spellmods to aura damage
     uint32 damage = std::max(GetAmount(), 0);
-
+    
+    // Script Hook For HandlePeriodicDamageAurasTick -- Allow scripts to change the Damage pre class mitigation calculations
+    sScriptMgr->ModifyPeriodicDamageAurasTick(target, caster, damage);
+    
     if (GetAuraType() == SPELL_AURA_PERIODIC_DAMAGE)
     {
         // xinef: leave only target depending bonuses, rest is handled in calculate amount
@@ -6183,6 +6186,10 @@ void AuraEffect::HandlePeriodicHealthLeechAuraTick(Unit* target, Unit* caster) c
     CleanDamage cleanDamage = CleanDamage(0, 0, BASE_ATTACK, MELEE_HIT_NORMAL);
 
     uint32 damage = std::max(GetAmount(), 0);
+    
+    // Script Hook For HandlePeriodicHealthLeechAurasTick -- Allow scripts to change the Damage pre class mitigation calculations
+    sScriptMgr->ModifyPeriodicDamageAurasTick(target, caster, damage);
+    
     if (GetBase()->GetType() == DYNOBJ_AURA_TYPE)
         damage = caster->SpellDamageBonusDone(target, GetSpellInfo(), damage, DOT, 0.0f, GetBase()->GetStackAmount());
     damage = target->SpellDamageBonusTaken(caster, GetSpellInfo(), damage, DOT, GetBase()->GetStackAmount());
@@ -6370,6 +6377,10 @@ void AuraEffect::HandlePeriodicHealAurasTick(Unit* target, Unit* caster) const
 
     uint32 absorb = 0;
     uint32 heal = uint32(damage);
+
+    // Script Hook For HandlePeriodicDamageAurasTick -- Allow scripts to change the Damage pre class mitigation calculations
+    sScriptMgr->ModifyPeriodicDamageAurasTick(target, caster, heal);
+
     Unit::CalcHealAbsorb(target, GetSpellInfo(), heal, absorb);
     int32 gain = Unit::DealHeal(caster, target, heal);
 

@@ -91,13 +91,15 @@ void SummonCroneIfReady(InstanceScript* instance, Creature* creature)
 
     if (instance->GetData(DATA_OPERA_OZ_DEATHCOUNT) == 4)
     {
-        if (Creature* pCrone = creature->SummonCreature(CREATURE_CRONE, -10891.96f, -1755.95f, creature->GetPositionZ(), 4.64f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, HOUR*2*IN_MILLISECONDS))
+        if (Creature* pCrone = creature->SummonCreature(CREATURE_CRONE, -10891.96f, -1755.95f, creature->GetPositionZ(), 4.64f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, HOUR * 2 * IN_MILLISECONDS))
         {
             if (creature->GetVictim())
                 pCrone->AI()->AttackStart(creature->GetVictim());
+            pCrone->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            pCrone->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
         }
     }
-};
+}
 
 class boss_dorothee : public CreatureScript
 {
@@ -113,21 +115,11 @@ public:
     {
         boss_dorotheeAI(Creature* creature) : ScriptedAI(creature)
         {
+            Initialize();
             instance = creature->GetInstanceScript();
         }
 
-        InstanceScript* instance;
-
-        uint32 AggroTimer;
-
-        uint32 WaterBoltTimer;
-        uint32 FearTimer;
-        uint32 SummonTitoTimer;
-
-        bool SummonedTito;
-        bool TitoDied;
-
-        void Reset()
+        void Initialize()
         {
             AggroTimer = 500;
 
@@ -139,9 +131,28 @@ public:
             TitoDied = false;
         }
 
+        InstanceScript* instance;
+
+
+        uint32 AggroTimer;
+
+        uint32 WaterBoltTimer;
+        uint32 FearTimer;
+        uint32 SummonTitoTimer;
+
+        bool SummonedTito;
+        bool TitoDied;
+
+
+        void Reset()
+        {
+            Initialize();
+        }
+
         void EnterCombat(Unit* /*who*/)
         {
             Talk(SAY_DOROTHEE_AGGRO);
+            DoZoneInCombat();
         }
 
         void JustReachedHome()
@@ -154,7 +165,6 @@ public:
         void JustDied(Unit* /*killer*/)
         {
             Talk(SAY_DOROTHEE_DEATH);
-
             SummonCroneIfReady(instance, me);
         }
 
@@ -236,7 +246,10 @@ public:
             YipTimer = 10000;
         }
 
-        void EnterCombat(Unit* /*who*/) { }
+        void EnterCombat(Unit* /*who*/) 
+        {
+            DoZoneInCombat();
+        }
 
         void JustDied(Unit* /*killer*/)
         {
@@ -304,7 +317,7 @@ public:
 
         void Reset()
         {
-            AggroTimer = 13000;
+            AggroTimer = 11000;
             BrainBashTimer = 5000;
             BrainWipeTimer = 7000;
         }
@@ -329,6 +342,7 @@ public:
         void EnterCombat(Unit* /*who*/)
         {
             Talk(SAY_STRAWMAN_AGGRO);
+            DoZoneInCombat();
         }
 
         void JustReachedHome()
@@ -422,7 +436,7 @@ public:
         {
             AggroTimer = 15000;
             CleaveTimer = 5000;
-            RustTimer   = 30000;
+            RustTimer   = 15000;
 
             RustCount   = 0;
         }
@@ -430,6 +444,7 @@ public:
         void EnterCombat(Unit* /*who*/)
         {
             Talk(SAY_TINHEAD_AGGRO);
+            DoZoneInCombat();
         }
 
         void JustReachedHome()
@@ -554,6 +569,7 @@ public:
         void EnterCombat(Unit* /*who*/)
         {
             Talk(SAY_ROAR_AGGRO);
+            DoZoneInCombat();
         }
 
         void JustReachedHome()
@@ -634,8 +650,8 @@ public:
 
         void Reset()
         {
-            CycloneTimer = 30000;
-            ChainLightningTimer = 10000;
+            CycloneTimer = 22000;
+            ChainLightningTimer = 8000;
         }
 
         void JustReachedHome()
@@ -651,15 +667,14 @@ public:
         void EnterCombat(Unit* /*who*/)
         {
             Talk(SAY_CRONE_AGGRO);
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+            DoZoneInCombat();
         }
 
         void JustDied(Unit* /*killer*/)
         {
             Talk(SAY_CRONE_DEATH);
 
-            instance->SetData(TYPE_OPERA, DONE);
+            instance->SetData(DATA_OPERA_PERFORMANCE, DONE);
             instance->HandleGameObject(instance->GetData64(DATA_GO_STAGEDOORLEFT), true);
             instance->HandleGameObject(instance->GetData64(DATA_GO_STAGEDOORRIGHT), true);
 
@@ -679,13 +694,13 @@ public:
             {
                 if (Creature* Cyclone = DoSpawnCreature(CREATURE_CYCLONE, float(urand(0, 9)), float(urand(0, 9)), 0, 0, TEMPSUMMON_TIMED_DESPAWN, 15000))
                     Cyclone->CastSpell(Cyclone, SPELL_CYCLONE_VISUAL, true);
-                CycloneTimer = 30000;
+                CycloneTimer = 22000;
             } else CycloneTimer -= diff;
 
             if (ChainLightningTimer <= diff)
             {
                 DoCastVictim(SPELL_CHAIN_LIGHTNING);
-                ChainLightningTimer = 15000;
+                ChainLightningTimer = 8000;
             } else ChainLightningTimer -= diff;
 
             DoMeleeAttackIfReady();
@@ -731,7 +746,7 @@ public:
                 Position pos;
                 me->GetRandomNearPosition(pos, 10);
                 me->GetMotionMaster()->MovePoint(0, pos);
-                MoveTimer = urand(5000, 8000);
+                MoveTimer = urand(3.000, 5000);
             } else MoveTimer -= diff;
         }
     };
@@ -830,6 +845,7 @@ public:
         void EnterCombat(Unit* /*who*/)
         {
             Talk(SAY_WOLF_AGGRO);
+            DoZoneInCombat();
         }
 
         void KilledUnit(Unit* /*victim*/)
@@ -846,7 +862,7 @@ public:
         {
             DoPlaySoundToSet(me, SOUND_WOLF_DEATH);
 
-            instance->SetData(TYPE_OPERA, DONE);
+            instance->SetData(DATA_OPERA_PERFORMANCE, DONE);
             instance->HandleGameObject(instance->GetData64(DATA_GO_STAGEDOORLEFT), true);
             instance->HandleGameObject(instance->GetData64(DATA_GO_STAGEDOORRIGHT), true);
 
@@ -1051,7 +1067,10 @@ public:
             RomuloDead = false;
         }
 
-        void EnterCombat(Unit* /*who*/) { }
+        void EnterCombat(Unit* /*who*/)
+        {
+            DoZoneInCombat();
+        }
 
         void AttackStart(Unit* who)
         {
@@ -1090,7 +1109,7 @@ public:
         {
             Talk(SAY_JULIANNE_DEATH02);
 
-            instance->SetData(TYPE_OPERA, DONE);
+            instance->SetData(DATA_OPERA_PERFORMANCE, DONE);
             instance->HandleGameObject(instance->GetData64(DATA_GO_STAGEDOORLEFT), true);
             instance->HandleGameObject(instance->GetData64(DATA_GO_STAGEDOORRIGHT), true);
             if (GameObject* pSideEntrance = instance->instance->GetGameObject(instance->GetData64(DATA_GO_SIDE_ENTRANCE_DOOR)))
@@ -1217,6 +1236,7 @@ public:
 
         void EnterCombat(Unit* /*who*/)
         {
+            DoZoneInCombat();
             Talk(SAY_ROMULO_AGGRO);
             if (JulianneGUID)
             {
@@ -1242,7 +1262,7 @@ public:
         {
             Talk(SAY_ROMULO_DEATH);
 
-            instance->SetData(TYPE_OPERA, DONE);
+            instance->SetData(DATA_OPERA_PERFORMANCE, DONE);
             instance->HandleGameObject(instance->GetData64(DATA_GO_STAGEDOORLEFT), true);
             instance->HandleGameObject(instance->GetData64(DATA_GO_STAGEDOORRIGHT), true);
 

@@ -119,8 +119,6 @@ void CreatureTemplate::InitializeQueryData()
     queryData << float(ModHealth);                       // dmg/hp modifier
     queryData << float(ModMana);                         // dmg/mana modifier
     queryData << uint8(RacialLeader);
-    for (uint32 i = 0; i < MAX_CREATURE_QUEST_ITEMS; ++i)
-        queryData << uint32(questItems[i]);              // itemId[6], quest drop
     queryData << uint32(movementId);                     // CreatureMovementInfo.dbc
 }
 

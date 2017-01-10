@@ -6,17 +6,11 @@ conf/*
 !conf/*.dist
 modules/*
 
-#
-# Allow modules to control git ignoring
-#
-!modules/*
-modules/*/*
-!modules/*/.gitignore
-!modules/uwd/*
-modules/uwd/joiner
-!modules/hw-core/*
-!modules/acore/*
-!modules/worldengine/*
+!modules/drassil/*
+modules/drassil/joiner
+!modules/hw-core
+!modules/acore
+!modules/worldengine
 
 build*/
 
@@ -68,4 +62,17 @@ local.properties
 .loadpath
 .project
 .cproject
+
+
+# ==================
+#
+#  CUSTOM
+#  
+#  put below your custom ignore rules
+#  for example , if you want to include a 
+#  module directly in repositoryyou can do:
+#
+#  !modules/yourmodule
+#
+# ==================
 

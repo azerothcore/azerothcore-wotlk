@@ -405,10 +405,8 @@ void ObjectMgr::LoadCreatureTemplates()
                                              "type_flags, lootid, pickpocketloot, skinloot, resistance1, resistance2, resistance3, resistance4, resistance5, resistance6, spell1, "
     //                                          55      56      57      58      59      60      61          62            63       64       65       66         67
                                              "spell2, spell3, spell4, spell5, spell6, spell7, spell8, PetSpellDataId, VehicleId, mingold, maxgold, AIName, MovementType, "
-    //                                             68          69         70         71          72           73          74          75          76          77          78
-                                             "InhabitType, HoverHeight, Health_mod, Mana_mod, Armor_mod, RacialLeader, questItem1, questItem2, questItem3, questItem4, questItem5, "
-    //                                            79           80           81                83           84
-                                             " questItem6, movementId, RegenHealth, mechanic_immune_mask, flags_extra, ScriptName "
+    //                                             68          69         70         71          72           73          74           75                76               77           78
+                                             "InhabitType, HoverHeight, Health_mod, Mana_mod, Armor_mod, RacialLeader, movementId, RegenHealth, mechanic_immune_mask, flags_extra, ScriptName "
                                              "FROM creature_template;");
 
     if (!result)
@@ -447,7 +445,7 @@ void ObjectMgr::LoadCreatureTemplates()
         creatureTemplate.minlevel          = fields[14].GetUInt8();
         creatureTemplate.maxlevel          = fields[15].GetUInt8();
         creatureTemplate.expansion         = uint32(fields[16].GetInt16());
-        creatureTemplate.faction         = uint32(fields[17].GetUInt16());
+        creatureTemplate.faction           = uint32(fields[17].GetUInt16());
         creatureTemplate.npcflag           = fields[18].GetUInt32();
         creatureTemplate.speed_walk        = fields[19].GetFloat();
         creatureTemplate.speed_run         = fields[20].GetFloat();
@@ -484,27 +482,23 @@ void ObjectMgr::LoadCreatureTemplates()
         for (uint8 i = 0; i < CREATURE_MAX_SPELLS; ++i)
             creatureTemplate.spells[i] = fields[53 + i].GetUInt32();
 
-        creatureTemplate.PetSpellDataId = fields[61].GetUInt32();
-        creatureTemplate.VehicleId      = fields[62].GetUInt32();
-        creatureTemplate.mingold        = fields[63].GetUInt32();
-        creatureTemplate.maxgold        = fields[64].GetUInt32();
-        creatureTemplate.AIName         = fields[65].GetString();
-        creatureTemplate.MovementType   = uint32(fields[66].GetUInt8());
-        creatureTemplate.InhabitType    = uint32(fields[67].GetUInt8());
-        creatureTemplate.HoverHeight    = fields[68].GetFloat();
-        creatureTemplate.ModHealth      = fields[69].GetFloat();
-        creatureTemplate.ModMana        = fields[70].GetFloat();
-        creatureTemplate.ModArmor       = fields[71].GetFloat();
-        creatureTemplate.RacialLeader   = fields[72].GetBool();
-
-        for (uint8 i = 0; i < MAX_CREATURE_QUEST_ITEMS; ++i)
-            creatureTemplate.questItems[i] = fields[73 + i].GetUInt32();
-
-        creatureTemplate.movementId         = fields[79].GetUInt32();
-        creatureTemplate.RegenHealth        = fields[80].GetBool();
-        creatureTemplate.MechanicImmuneMask = fields[81].GetUInt32();
-        creatureTemplate.flags_extra        = fields[82].GetUInt32();
-        creatureTemplate.ScriptID           = GetScriptId(fields[83].GetCString());
+        creatureTemplate.PetSpellDataId     = fields[61].GetUInt32();
+        creatureTemplate.VehicleId          = fields[62].GetUInt32();
+        creatureTemplate.mingold            = fields[63].GetUInt32();
+        creatureTemplate.maxgold            = fields[64].GetUInt32();
+        creatureTemplate.AIName             = fields[65].GetString();
+        creatureTemplate.MovementType       = uint32(fields[66].GetUInt8());
+        creatureTemplate.InhabitType        = uint32(fields[67].GetUInt8());
+        creatureTemplate.HoverHeight        = fields[68].GetFloat();
+        creatureTemplate.ModHealth          = fields[69].GetFloat();
+        creatureTemplate.ModMana            = fields[70].GetFloat();
+        creatureTemplate.ModArmor           = fields[71].GetFloat();
+        creatureTemplate.RacialLeader       = fields[72].GetBool();
+        creatureTemplate.movementId         = fields[73].GetUInt32();
+        creatureTemplate.RegenHealth        = fields[74].GetBool();
+        creatureTemplate.MechanicImmuneMask = fields[75].GetUInt32();
+        creatureTemplate.flags_extra        = fields[76].GetUInt32();
+        creatureTemplate.ScriptID           = GetScriptId(fields[77].GetCString());
 
         ++count;
     }
@@ -1535,7 +1529,7 @@ bool ObjectMgr::SetCreatureLinkedRespawn(uint32 guidLow, uint32 linkedGuidLow)
     const CreatureData* slave = GetCreatureData(linkedGuidLow);
     if (!slave)
     {
-        //TC_LOG_ERROR("sql.sql", "Creature '%u' linking to non-existent creature '%u'.", guidLow, linkedGuidLow);
+        // sLog->outError("sql.sql", "Creature '%u' linking to non-existent creature '%u'.", guidLow, linkedGuidLow);
         return false;
     }
 
@@ -3858,36 +3852,36 @@ void ObjectMgr::LoadQuests()
     mExclusiveQuestGroups.clear();
 
     QueryResult result = WorldDatabase.Query("SELECT "
-        //0     1      2        3           4           5            6            7               8              9               10             11                 12
-        "ID, Method, QuestLevel, MinLevel, MaxLevel, QuestSortID, QuestType, SuggestedGroupNum, LimitTime, RequiredClasses, RequiredRaces, RequiredSkillId, RequiredSkillPoints, "
-        //         13                 14                    15                   16                      17                  18                         19                  20
-        "RequiredFactionId1, RequiredFactionId2, RequiredFactionValue1, RequiredFactionValue2, RequiredMinRepFaction, RequiredMaxRepFaction, RequiredMinRepValue, RequiredMaxRepValue, "
-        //     21         22             23                24             25              26                    27                28            29              30              31
-        "PrevQuestId, NextQuestId, ExclusiveGroup, NextQuestIdChain, RewardXPId, RewardOrRequiredMoney, RewardMoneyMaxLevel, RewardSpell, RewardSpellCast, RewardHonor, RewardHonorMultiplier, "
-        //         32                  33            34             35               36         37         38            39                40                41               42
-        "RewardMailTemplateId, RewardMailDelay, SourceItemId, SourceItemCount, SourceSpellId, Flags, SpecialFlags, RewardTitle, RequiredPlayerKills, RewardTalents, RewardArenaPoints, "
-        //      43          44         45             46            47            48             49             50
+        //0      1         2           3           4           5             6                 7            8
+        "ID, QuestType, QuestLevel, MinLevel, QuestSortID, QuestInfoID, SuggestedGroupNum, TimeAllowed, AllowableRaces,"
+        //      9                     10                   11                    12
+        "RequiredFactionId1, RequiredFactionId2, RequiredFactionValue1, RequiredFactionValue2, "
+        //      13                14              15             16                 17              18           19            20
+        "RewardNextQuest, RewardXPDifficulty, RewardMoney, RewardBonusMoney, RewardDisplaySpell, RewardSpell, RewardHonor, RewardKillHonor, "
+        //   21       22       23              24                25               26
+        "StartItem, Flags, RewardTitle, RequiredPlayerKills, RewardTalents, RewardArenaPoints, "
+        //    27           28           29          30            31              32            33             34
         "RewardItem1, RewardItem2, RewardItem3, RewardItem4, RewardAmount1, RewardAmount2, RewardAmount3, RewardAmount4, "
-        //         51                  52                  53                    54                    55                   56                      57                        58                         59                        60                        61                         62
+        //        35                  36                    37                  38                    39                  40                       41                          42                         43                       44                          45                       46
         "RewardChoiceItemID1, RewardChoiceItemID2, RewardChoiceItemID3, RewardChoiceItemID4, RewardChoiceItemID5, RewardChoiceItemID6, RewardChoiceItemQuantity1, RewardChoiceItemQuantity2, RewardChoiceItemQuantity3, RewardChoiceItemQuantity4, RewardChoiceItemQuantity5, RewardChoiceItemQuantity6, "
-        //        63                64                65                66               67                  68                    69                 70                   71                   72
+        //      47                 48               49                50                 51                  52                  53                   54                   55                  56
         "RewardFactionID1, RewardFactionID2, RewardFactionID3, RewardFactionID4, RewardFactionID5, RewardFactionValue1, RewardFactionValue2, RewardFactionValue3, RewardFactionValue4, RewardFactionValue5, "
-        //                73                                  74                              75                               76                                77
+        //      57                          58                     59                      60                      61
         "RewardFactionOverride1, RewardFactionOverride2, RewardFactionOverride3, RewardFactionOverride4, RewardFactionOverride5, "
-        //    78        79      80         81
-        "PointMapId, PointX, PointY, PointOption, "
-        // 82            83                84           85           86                87              88
-        "LogTitle, LogDescription, QuestDescription, EndText, OfferRewardText, RequestItemsText, QuestCompletionLog, "
-        //        89               90                 91                92                 93                    94                       95                     96
+        //   62        63      64        65
+        "POIContinent, POIx, POIy, POIPriority, "
+        //   66          67               68           69            70               71                 72
+        "LogTitle, LogDescription, QuestDescription, AreaDescription, OfferRewardText, RequestItemsText, QuestCompletionLog, "
+        //      73                74                75                76                   77                     78                    79                      80
         "RequiredNpcOrGo1, RequiredNpcOrGo2, RequiredNpcOrGo3, RequiredNpcOrGo4, RequiredNpcOrGoCount1, RequiredNpcOrGoCount2, RequiredNpcOrGoCount3, RequiredNpcOrGoCount4, "
-        //          97                     98                     99                   100                        101                         102                        103                        104
-        "RequiredSourceItemId1, RequiredSourceItemId2, RequiredSourceItemId3, RequiredSourceItemId4, RequiredSourceItemCount1, RequiredSourceItemCount2, RequiredSourceItemCount3, RequiredSourceItemCount4, "
-        //       105               106             107             108              109             110                 111                  112                113                114                115                  116
+        //  81          82         83         84           85                  86                 87                  88
+        "ItemDrop1, ItemDrop2, ItemDrop3, ItemDrop4, ItemDropQuantity1, ItemDropQuantity2, ItemDropQuantity3, ItemDropQuantity4, "
+        //      89               90               91               92               93               94                95                  96                  97                  98                  99                  100
         "RequiredItemId1, RequiredItemId2, RequiredItemId3, RequiredItemId4, RequiredItemId5, RequiredItemId6, RequiredItemCount1, RequiredItemCount2, RequiredItemCount3, RequiredItemCount4, RequiredItemCount5, RequiredItemCount6, "
-        //  117          118             119             120             121          122            123              124            125               126                 127                 128                 129
+        //  101          102             103             104             105             106           107            108            109               110                 111                 112                 113
         "Unknown0, ObjectiveText1, ObjectiveText2, ObjectiveText3, ObjectiveText4, DetailsEmote1, DetailsEmote2, DetailsEmote3, DetailsEmote4, DetailsEmoteDelay1, DetailsEmoteDelay2, DetailsEmoteDelay3, DetailsEmoteDelay4, "
-        //     130                 131               132               133                 134                 135                136                      137                       138                    139                140
-        "EmoteOnIncomplete, EmoteOnComplete, OfferRewardEmote1, OfferRewardEmote2, OfferRewardEmote3, OfferRewardEmote4, OfferRewardEmoteDelay1, OfferRewardEmoteDelay2, OfferRewardEmoteDelay3, OfferRewardEmoteDelay4, VerifiedBuild"
+        //      114               115                116               117                 118               119                  120                     121                      122                    123
+        "EmoteOnIncomplete, EmoteOnComplete, OfferRewardEmote1, OfferRewardEmote2, OfferRewardEmote3, OfferRewardEmote4, OfferRewardEmoteDelay1, OfferRewardEmoteDelay2, OfferRewardEmoteDelay3, OfferRewardEmoteDelay4"
         " FROM quest_template");
     if (!result)
     {
@@ -3926,6 +3920,27 @@ void ObjectMgr::LoadQuests()
         itr->second->InitializeQueryData();
 
     std::map<uint32, uint32> usedMailTemplates;
+
+    // Load `quest_template_addon`
+    //                                   0   1         2                 3              4            5            6               7                     8
+    result = WorldDatabase.Query("SELECT ID, MaxLevel, AllowableClasses, SourceSpellID, PrevQuestID, NextQuestID, ExclusiveGroup, RewardMailTemplateID, RewardMailDelay, "
+        //9               10                   11                     12                     13                   14                   15                 16
+        "RequiredSkillID, RequiredSkillPoints, RequiredMinRepFaction, RequiredMaxRepFaction, RequiredMinRepValue, RequiredMaxRepValue, ProvidedItemCount, SpecialFlags FROM quest_template_addon");
+
+    if (!result) {
+         sLog->outError(">> Loaded 0 quest template addons. DB table `quest_template_addon` is empty.");
+    } else {
+        do {
+            Field* fields = result->Fetch();
+            uint32 questId = fields[0].GetUInt32();
+
+            auto itr = _questTemplates.find(questId);
+            if (itr != _questTemplates.end())
+                itr->second->LoadQuestTemplateAddon(fields);
+            else
+                 sLog->outError("Table `quest_template_addon` has data for quest %u but such quest does not exist", questId);
+        } while (result->NextRow());
+    }
 
     // Post processing
     for (QuestMap::iterator iter = _questTemplates.begin(); iter != _questTemplates.end(); ++iter)
@@ -4036,7 +4051,7 @@ void ObjectMgr::LoadQuests()
                     qinfo->RequiredClasses = 0;
             }
         }
-        // RequiredRaces, can be 0/RACEMASK_ALL_PLAYABLE to allow any race
+        // AllowableRaces, can be 0/RACEMASK_ALL_PLAYABLE to allow any race
         if (qinfo->RequiredRaces)
             {
             if (!(qinfo->RequiredRaces & RACEMASK_ALL_PLAYABLE))
@@ -6533,11 +6548,11 @@ void ObjectMgr::LoadGameObjectTemplate()
 {
     uint32 oldMSTime = getMSTime();
 
-    //                                                 0      1      2        3       4             5          6      7       8     9        10         11          12
-    QueryResult result = WorldDatabase.Query("SELECT entry, type, displayId, name, IconName, castBarCaption, unk1, faction, flags, size, questItem1, questItem2, questItem3, "
-    //                                            13          14          15       16     17     18     19     20     21     22     23     24     25      26      27      28
-                                             "questItem4, questItem5, questItem6, Data0, Data1, Data2, Data3, Data4, Data5, Data6, Data7, Data8, Data9, Data10, Data11, Data12, "
-    //                                          29      30      31      32      33      34      35      36      37      38      39      40        41
+    //                                                 0      1      2        3       4             5          6      7       8     9
+    QueryResult result = WorldDatabase.Query("SELECT entry, type, displayId, name, IconName, castBarCaption, unk1, faction, flags, size, "
+    //                                          10     11     12     13     14     15     16     17     18     19     20      21      22
+                                             "Data0, Data1, Data2, Data3, Data4, Data5, Data6, Data7, Data8, Data9, Data10, Data11, Data12, "
+    //                                          23      24      25      26      27      28      29      30      31      32      33      34        35
                                              "Data13, Data14, Data15, Data16, Data17, Data18, Data19, Data20, Data21, Data22, Data23, AIName, ScriptName "
                                              "FROM gameobject_template");
 
@@ -6569,14 +6584,11 @@ void ObjectMgr::LoadGameObjectTemplate()
         got.flags          = fields[8].GetUInt32();
         got.size           = fields[9].GetFloat();
 
-        for (uint8 i = 0; i < MAX_GAMEOBJECT_QUEST_ITEMS; ++i)
-            got.questItems[i] = fields[10 + i].GetUInt32();
-
         for (uint8 i = 0; i < MAX_GAMEOBJECT_DATA; ++i)
-            got.raw.data[i] = fields[16 + i].GetInt32(); // data1 and data6 can be -1
+            got.raw.data[i] = fields[10 + i].GetInt32(); // data1 and data6 can be -1
 
-        got.AIName = fields[40].GetString();
-        got.ScriptId = GetScriptId(fields[41].GetCString());
+        got.AIName = fields[34].GetString();
+        got.ScriptId = GetScriptId(fields[35].GetCString());
         got.IsForQuests = false;
 
         // Checks
@@ -9252,4 +9264,64 @@ PlayerInfo const* ObjectMgr::GetPlayerInfo(uint32 race, uint32 class_) const
     if (!info)
         return NULL;
     return info;
+}
+
+void ObjectMgr::LoadGameObjectQuestItems()
+{
+    uint32 oldMSTime = getMSTime();
+
+    //                                               0                1
+    QueryResult result = WorldDatabase.Query("SELECT GameObjectEntry, ItemId FROM gameobject_questitem ORDER BY Idx ASC");
+
+    if (!result)
+    {
+        sLog->outString(">> Loaded 0 gameobject quest items. DB table `gameobject_questitem` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 entry = fields[0].GetUInt32();
+        uint32 item = fields[1].GetUInt32();
+
+        _gameObjectQuestItemStore[entry].push_back(item);
+
+        ++count;
+    }
+    while (result->NextRow());
+
+    sLog->outString(">> Loaded %u gameobject quest items in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+void ObjectMgr::LoadCreatureQuestItems()
+{
+    uint32 oldMSTime = getMSTime();
+
+    //                                               0              1
+    QueryResult result = WorldDatabase.Query("SELECT CreatureEntry, ItemId FROM creature_questitem ORDER BY Idx ASC");
+
+    if (!result)
+    {
+        sLog->outString(">> Loaded 0 creature quest items. DB table `creature_questitem` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 entry = fields[0].GetUInt32();
+        uint32 item = fields[1].GetUInt32();
+
+        _creatureQuestItemStore[entry].push_back(item);
+
+        ++count;
+    }
+    while (result->NextRow());
+
+    sLog->outString(">> Loaded %u creature quest items in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }

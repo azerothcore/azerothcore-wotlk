@@ -9,16 +9,16 @@ DROP TABLE IF EXISTS `quest_poi`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `quest_poi` 
 (
-  `questId` int(10) unsigned NOT NULL DEFAULT '0',
+  `QuestID` int(10) unsigned NOT NULL DEFAULT '0',
   `id` int(10) unsigned NOT NULL DEFAULT '0',
-  `objIndex` int(11) NOT NULL DEFAULT '0',
-  `mapid` int(10) unsigned NOT NULL DEFAULT '0',
+  `ObjectiveIndex` int(11) NOT NULL DEFAULT '0',
+  `MapID` int(10) unsigned NOT NULL DEFAULT '0',
   `WorldMapAreaId` int(10) unsigned NOT NULL DEFAULT '0',
-  `FloorId` int(10) unsigned NOT NULL DEFAULT '0',
-  `unk3` int(10) unsigned NOT NULL DEFAULT '0',
-  `unk4` int(10) unsigned NOT NULL DEFAULT '0',
-  PRIMARY KEY (`questId`,`id`),
-  KEY `idx` (`questId`,`id`)
+  `Floor` int(10) unsigned NOT NULL DEFAULT '0',
+  `Priority` int(10) unsigned NOT NULL DEFAULT '0',
+  `Flags` int(10) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`QuestID`,`id`),
+  KEY `idx` (`QuestID`,`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 

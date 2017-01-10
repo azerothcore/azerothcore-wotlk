@@ -9548,8 +9548,6 @@ INSERT INTO `conditions` VALUES
 (15,9062,1,0,1,9,0,11543,0,0,0,0,0,'','Show gossip option only if player has taken quest 11543'),
 (15,9123,0,0,0,1,0,24755,0,0,1,0,0,'','Gossip Option - Player must not have aura Tricked or Treated'),
 (15,9123,0,0,0,12,0,12,0,0,0,0,0,'','Gossip Option - Hallow\'s End event must be active'),
-(15,9143,0,0,0,9,0,11542,0,0,0,0,0,'','Show gossip option if player has quest 11542 but not complete'),
-(15,9143,0,0,1,9,0,11543,0,0,0,0,0,'','Show gossip option if player has quest 11543 but not complete'),
 (15,9155,0,0,0,2,0,34842,10,0,1,0,0,'','Only show gossip if player has less then 10 outfits'),
 (15,9155,0,0,0,9,0,11658,0,0,0,0,0,'','Only show gossip if player has quest Plan B'),
 (15,9156,0,0,0,2,0,34842,10,0,1,0,0,'','Only show gossip if player has less then 10 outfits'),

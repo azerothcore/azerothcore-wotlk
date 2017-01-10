@@ -249,6 +249,7 @@ public:
         {
             HandleDoors(false);
             SwitchToPortalPhase();
+            DoZoneInCombat();
         }
 
         void JustDied(Unit* /*killer*/)
