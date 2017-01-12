@@ -397,21 +397,22 @@ public:
                     Phase2();
             }
 
-            if (phase == 2)
+             if (phase == 2)
             {
                 if (SunderArmorTimer <= diff)
+                {
                     DoCast(SPELL_SUNDER_ARMOR);
-                SunderArmorTimer = urand(5000, 10000);
-            }
-            else
-                SunderArmorTimer -= diff;
+                    SunderArmorTimer = urand(5000, 10000);
+                }
+                else
+                    SunderArmorTimer -= diff;
 
                 if (HealthBelowPct(30))
                 {
                     Phase3();
                 }
-
             }
+
             if (phase == 3)
             {
                 if (AmplifyDamageTimer <= diff)
