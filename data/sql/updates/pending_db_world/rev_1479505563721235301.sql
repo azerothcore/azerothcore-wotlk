@@ -1,4 +1,4 @@
-INSERT INTO version_db_world (`sql_rev`) VALUES ('1479505563721235300');
+INSERT INTO version_db_world (`sql_rev`) VALUES ('1479505563721235301');
 
 DELETE FROM `smart_scripts` WHERE `entryorguid` = "938";
 
