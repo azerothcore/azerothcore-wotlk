@@ -41,7 +41,7 @@ enum creatures
     NETHERSPITE_INFERNAL = 17646,
     MALCHEZARS_AXE = 17650,
     INFERNAL_MODEL_INVISIBLE = 11686,
-    SPELL_INFERNAL_RELAY =  33814,   // 30835,
+    SPELL_INFERNAL_RELAY = 33814,   // 30835,
     EQUIP_ID_AXE = 33542
 };
 
@@ -110,7 +110,7 @@ public:
                     DoCast(me, SPELL_HELLFIRE);
                     HellfireTimer = 0;
                 }
-                else 
+                else
                     HellfireTimer -= diff;
             }
 
@@ -120,7 +120,7 @@ public:
                 {
                     CleanupTimer = 0;
                 }
-                else 
+                else
                     CleanupTimer -= diff;
             }
         }
@@ -211,7 +211,6 @@ public:
         void Reset() override
         {
             Initialize();
-            
         }
 
         void KilledUnit(Unit* /*victim*/) override
@@ -227,7 +226,6 @@ public:
             {
                 Axe->DespawnOrUnsummon();
             }
-            
         }
 
         void EnterCombat(Unit* /*who*/) override
@@ -292,33 +290,33 @@ public:
 
         void SummonInfernal()
         {
-             InfernalPoint *point = 0;
-             Position pos;
+            InfernalPoint *point = 0;
+            Position pos;
 
-             if ((me->GetMapId() == 532))
-             {
-                 me->GetRandomNearPosition(pos, 40.0);
-             }
-             else
-             {
-                 point = Trinity::Containers::SelectRandomContainerElement(positions);
-                 pos.Relocate(point->x, point->y, INFERNAL_Z, frand(0.0f, float(M_PI * 2)));
-             }
+            if ((me->GetMapId() == 532))
+            {
+                me->GetRandomNearPosition(pos, 40.0);
+            }
+            else
+            {
+                point = Trinity::Containers::SelectRandomContainerElement(positions);
+                pos.Relocate(point->x, point->y, INFERNAL_Z, frand(0.0f, float(M_PI * 2)));
+            }
 
-             if (Creature*  RELAY = me->FindNearestCreature(NPC_RELAY, 100.0f))
-             {
-                 Creature* infernal = RELAY->SummonCreature(NETHERSPITE_INFERNAL, pos, TEMPSUMMON_TIMED_DESPAWN, 180000);
+            if (Creature*  RELAY = me->FindNearestCreature(NPC_RELAY, 100.0f))
+            {
+                Creature* infernal = RELAY->SummonCreature(NETHERSPITE_INFERNAL, pos, TEMPSUMMON_TIMED_DESPAWN, 180000);
 
-                 if (infernal)
-                 {
-                     infernal->SetDisplayId(INFERNAL_MODEL_INVISIBLE);
-                     infernal->setFaction(me->getFaction());
-                     infernals.push_back(infernal->GetGUID());
-                     infernal->SetControlled(true, UNIT_STATE_ROOT);
-                     RELAY->AI()->DoCast(infernal, SPELL_INFERNAL_RELAY);
-                 }
-             } 
-                Talk(SAY_SUMMON);
+                if (infernal)
+                {
+                    infernal->SetDisplayId(INFERNAL_MODEL_INVISIBLE);
+                    infernal->setFaction(me->getFaction());
+                    infernals.push_back(infernal->GetGUID());
+                    infernal->SetControlled(true, UNIT_STATE_ROOT);
+                    RELAY->AI()->DoCast(infernal, SPELL_INFERNAL_RELAY);
+                }
+            }
+            Talk(SAY_SUMMON);
         }
 
         void Phase2()
@@ -395,9 +393,10 @@ public:
                 if (HealthBelowPct(60))
                 {
                     Phase2();
+                }
             }
 
-             if (phase == 2)
+            if (phase == 2)
             {
                 if (SunderArmorTimer <= diff)
                 {
@@ -440,82 +439,82 @@ public:
             }
 
             DoMeleeAttackIfReady();
+            }
+
+        };
+    };
+
+    class prince_axes : public CreatureScript
+    {
+    public:
+        prince_axes() : CreatureScript("prince_axes") { }
+
+        CreatureAI* GetAI(Creature* creature) const override
+        {
+            return GetInstanceAI<prince_axesAI>(creature);
         }
 
+        struct prince_axesAI : public ScriptedAI
+        {
+
+            prince_axesAI(Creature* creature) : ScriptedAI(creature)
+            {
+                Initialize();
+                instance = creature->GetInstanceScript();
+            }
+
+            uint32 AxesTargetSwitchTimer;
+            InstanceScript* instance;
+
+
+            void Initialize()
+            {
+                AxesTargetSwitchTimer = 7500;
+                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                me->SetCanDualWield(true);
+            }
+
+            void Reset()
+            {
+            }
+
+            void EnterCombat(Unit* /*who*/) override
+            {
+                DoZoneInCombat();
+            }
+
+            void changetarget()
+            {
+                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                {
+                    if (me->GetVictim())
+                        DoModifyThreatPercent(me->GetVictim(), -100);
+                    if (target)
+                        me->AddThreat(target, 1000000.0f);
+                }
+            }
+
+            void UpdateAI(uint32 diff) override
+            {
+                if (!UpdateVictim())
+                    return;
+
+                if (AxesTargetSwitchTimer <= diff)
+                {
+                    AxesTargetSwitchTimer = urand(7500, 20000);
+                    changetarget();
+                }
+                else
+                    AxesTargetSwitchTimer -= diff;
+
+                DoMeleeAttackIfReady();
+            }
+        };
     };
-};
 
-class prince_axes : public CreatureScript
-{
-public:
-    prince_axes() : CreatureScript("prince_axes") { }
-
-    CreatureAI* GetAI(Creature* creature) const override
+    void AddSC_boss_malchezaar()
     {
-        return GetInstanceAI<prince_axesAI>(creature);
+        new boss_malchezaar();
+        new prince_axes();
+        new netherspite_infernal();
     }
-
-    struct prince_axesAI : public ScriptedAI
-    {
-
-        prince_axesAI(Creature* creature) : ScriptedAI(creature)
-        {
-            Initialize();
-            instance = creature->GetInstanceScript();
-        }
-
-        uint32 AxesTargetSwitchTimer;
-        InstanceScript* instance;
-
-
-        void Initialize()
-        {
-            AxesTargetSwitchTimer = 7500;
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-            me->SetCanDualWield(true);
-        }
-
-        void Reset()
-        {
-        }
-
-        void EnterCombat(Unit* /*who*/) override
-        {
-            DoZoneInCombat();
-        }
-
-        void changetarget()
-        {
-            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
-            {
-                if (me->GetVictim())
-                    DoModifyThreatPercent(me->GetVictim(), -100);
-                if (target)
-                    me->AddThreat(target, 1000000.0f);
-            }
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            if (AxesTargetSwitchTimer <= diff)
-            {
-                AxesTargetSwitchTimer = urand(7500, 20000);
-                changetarget();
-            }
-            else
-                AxesTargetSwitchTimer -= diff;
-
-            DoMeleeAttackIfReady();
-        }
-    };
-};
-
-void AddSC_boss_malchezaar()
-{
-    new boss_malchezaar();
-    new prince_axes();
-    new netherspite_infernal();
-}
