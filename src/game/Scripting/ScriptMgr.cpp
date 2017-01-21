@@ -1525,6 +1525,11 @@ void ScriptMgr::ModifyHealRecieved(Unit* target, Unit* attacker, uint32& damage)
     FOREACH_SCRIPT(UnitScript)->ModifyHealRecieved(target, attacker, damage);
 }
 
+void ScriptMgr::OnBeforeRollMeleeOutcomeAgainst(const Unit* attacker, const Unit* victim, WeaponAttackType attType, int32 &crit_chance, int32 &miss_chance, int32 &dodge_chance, int32 &parry_chance, int32 &block_chance)
+{
+    FOREACH_SCRIPT(UnitScript)->OnBeforeRollMeleeOutcomeAgainst(attacker, victim, attType, crit_chance, miss_chance, dodge_chance, parry_chance, block_chance);
+}
+
 void ScriptMgr::OnPlayerMove(Player* player, MovementInfo movementInfo, uint32 opcode)
 {
     FOREACH_SCRIPT(MovementHandlerScript)->OnPlayerMove(player, movementInfo, opcode);
@@ -1533,6 +1538,16 @@ void ScriptMgr::OnPlayerMove(Player* player, MovementInfo movementInfo, uint32 o
 void ScriptMgr::OnBeforeBuyItemFromVendor(Player* player, uint64 vendorguid, uint32 vendorslot, uint32 &item, uint8 count, uint8 bag, uint8 slot)
 {
     FOREACH_SCRIPT(PlayerScript)->OnBeforeBuyItemFromVendor(player, vendorguid, vendorslot, item, count, bag, slot);
+}
+
+void ScriptMgr::OnAfterStoreOrEquipNewItem(Player* player, uint32 vendorslot, uint32 &item, uint8 count, uint8 bag, uint8 slot, ItemTemplate const* pProto, Creature* pVendor, VendorItem const* crItem, bool bStore) 
+{
+    FOREACH_SCRIPT(PlayerScript)->OnAfterStoreOrEquipNewItem(player, vendorslot, item, count, bag, slot, pProto, pVendor, crItem, bStore);
+}
+
+void ScriptMgr::OnAfterUpdateMaxPower(Player* player, Powers& power, float& value)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnAfterUpdateMaxPower(player, power, value);
 }
 
 AllMapScript::AllMapScript(const char* name)

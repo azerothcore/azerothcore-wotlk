@@ -12,6 +12,7 @@
 #include "SpellAuras.h"
 #include "SpellAuraEffects.h"
 #include "SpellMgr.h"
+#include "ScriptMgr.h"
 
 inline bool _ModifyUInt32(bool apply, uint32& baseValue, int32& amount)
 {
@@ -290,6 +291,8 @@ void Player::UpdateMaxPower(Powers power)
     UnitMods unitMod = UnitMods(UNIT_MOD_POWER_START + power);
 
     float bonusPower = (power == POWER_MANA && GetCreatePowers(power) > 0) ? GetManaBonusFromIntellect() : 0;
+
+    sScriptMgr->OnAfterUpdateMaxPower(this, power, bonusPower);
 
     float value = GetModifierValue(unitMod, BASE_VALUE) + GetCreatePowers(power);
     value *= GetModifierValue(unitMod, BASE_PCT);
