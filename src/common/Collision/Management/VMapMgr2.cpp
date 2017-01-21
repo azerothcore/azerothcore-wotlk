@@ -172,7 +172,7 @@ namespace VMAP
         }
     }
 
-    bool VMapMgr2::isInLineOfSight(unsigned int mapId, float x1, float y1, float z1, float x2, float y2, float z2)
+    bool VMapMgr2::isInLineOfSight(unsigned int mapId, float x1, float y1, float z1, float x2, float y2, float z2, ModelIgnoreFlags ignoreFlags)
     {
 #if defined(ENABLE_VMAP_CHECKS)
         if (!isLineOfSightCalcEnabled() || IsVMAPDisabledForPtr(mapId, VMAP_DISABLE_LOS))
@@ -188,7 +188,7 @@ namespace VMAP
             Vector3 pos2 = convertPositionToInternalRep(x2, y2, z2);
             if (pos1 != pos2)
             {
-                return instanceTree->second->isInLineOfSight(pos1, pos2);
+                return instanceTree->second->isInLineOfSight(pos1, pos2, ignoreFlags);
             }
         }
 
@@ -338,7 +338,7 @@ namespace VMAP
         }
     }
 
-    WorldModel* VMapMgr2::acquireModelInstance(const std::string& basepath, const std::string& filename)
+    WorldModel* VMapMgr2::acquireModelInstance(const std::string& basepath, const std::string& filename, uint32 flags /* Only used when creating the model */)
     {
         //! Critical section, thread safe access to iLoadedModelFiles
         std::lock_guard<std::mutex> lock(LoadedModelFilesLock);
@@ -354,6 +354,9 @@ namespace VMAP
                 return nullptr;
             }
             LOG_DEBUG("maps", "VMapMgr2: loading file '%s%s'", basepath.c_str(), filename.c_str());
+
+            worldmodel->Flags = flags;
+
             model = iLoadedModelFiles.insert(std::pair<std::string, ManagedModel>(filename, ManagedModel())).first;
             model->second.setModel(worldmodel);
         }
