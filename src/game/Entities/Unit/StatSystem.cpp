@@ -292,13 +292,12 @@ void Player::UpdateMaxPower(Powers power)
 
     float bonusPower = (power == POWER_MANA && GetCreatePowers(power) > 0) ? GetManaBonusFromIntellect() : 0;
 
-    sScriptMgr->OnAfterUpdateMaxPower(this, power, bonusPower);
-
     float value = GetModifierValue(unitMod, BASE_VALUE) + GetCreatePowers(power);
     value *= GetModifierValue(unitMod, BASE_PCT);
     value += GetModifierValue(unitMod, TOTAL_VALUE) +  bonusPower;
     value *= GetModifierValue(unitMod, TOTAL_PCT);
 
+    sScriptMgr->OnAfterUpdateMaxPower(this, power, value);
     SetMaxPower(power, uint32(value));
 }
 
