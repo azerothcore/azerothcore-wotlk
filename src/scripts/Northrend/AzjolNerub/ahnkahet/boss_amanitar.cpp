@@ -172,6 +172,8 @@ public:
         npc_amanitar_mushroomsAI(Creature* c) : ScriptedAI(c)
         {
             SetCombatMovement(false);
+            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
         }
 
         uint32 Timer;
