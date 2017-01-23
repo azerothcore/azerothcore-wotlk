@@ -312,7 +312,6 @@ void Player::UpdateAttackPowerAndDamage(bool ranged)
 { 
     float val2 = 0.0f;
     float level = float(getLevel());
-    sScriptMgr->OnBeforeUpdateAttackPowerAndDamage(this, level, ranged);
 
     UnitMods unitMod = ranged ? UNIT_MOD_ATTACK_POWER_RANGED : UNIT_MOD_ATTACK_POWER;
 
@@ -496,6 +495,7 @@ void Player::UpdateAttackPowerAndDamage(bool ranged)
 
     float attPowerMultiplier = GetModifierValue(unitMod, TOTAL_PCT) - 1.0f;
 
+    sScriptMgr->OnAfterUpdateAttackPowerAndDamage(this, level, base_attPower, attPowerMod, attPowerMultiplier, ranged);
     SetInt32Value(index, (uint32)base_attPower);            //UNIT_FIELD_(RANGED)_ATTACK_POWER field
     SetInt32Value(index_mod, (uint32)attPowerMod);          //UNIT_FIELD_(RANGED)_ATTACK_POWER_MODS field
     SetFloatValue(index_mult, attPowerMultiplier);          //UNIT_FIELD_(RANGED)_ATTACK_POWER_MULTIPLIER field
