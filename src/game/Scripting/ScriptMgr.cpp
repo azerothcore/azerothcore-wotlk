@@ -1555,6 +1555,11 @@ void ScriptMgr::OnAfterUpdateMaxHealth(Player* player, float& value)
     FOREACH_SCRIPT(PlayerScript)->OnAfterUpdateMaxHealth(player, value);
 }
 
+void ScriptMgr::OnBeforeUpdateAttackPowerAndDamage(Player* player, float& level, bool ranged)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnBeforeUpdateAttackPowerAndDamage(player, level, ranged);
+}
+
 AllMapScript::AllMapScript(const char* name)
     : ScriptObject(name)
 {

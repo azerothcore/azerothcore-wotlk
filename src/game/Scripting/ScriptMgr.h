@@ -894,6 +894,8 @@ class PlayerScript : public ScriptObject
 
         virtual void OnAfterUpdateMaxHealth(Player* /*player*/, float& /*value*/) { }
 
+        virtual void OnBeforeUpdateAttackPowerAndDamage(Player* /*player*/, float& /*level*/, bool /*ranged*/) { }
+
 };
 
 class GuildScript : public ScriptObject
@@ -1207,6 +1209,7 @@ class ScriptMgr
         void OnAfterStoreOrEquipNewItem(Player* player, uint32 vendorslot, uint32 &item, uint8 count, uint8 bag, uint8 slot, ItemTemplate const* pProto, Creature* pVendor, VendorItem const* crItem, bool bStore);
         void OnAfterUpdateMaxPower(Player* player, Powers& power, float& value);
         void OnAfterUpdateMaxHealth(Player* player, float& value);
+        void OnBeforeUpdateAttackPowerAndDamage(Player* player, float& level, bool ranged);
 
     public: /* GuildScript */
 
