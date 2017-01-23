@@ -1550,6 +1550,11 @@ void ScriptMgr::OnAfterUpdateMaxPower(Player* player, Powers& power, float& valu
     FOREACH_SCRIPT(PlayerScript)->OnAfterUpdateMaxPower(player, power, value);
 }
 
+void ScriptMgr::OnAfterUpdateMaxHealth(Player* player, float& value)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnAfterUpdateMaxHealth(player, value);
+}
+
 AllMapScript::AllMapScript(const char* name)
     : ScriptObject(name)
 {
