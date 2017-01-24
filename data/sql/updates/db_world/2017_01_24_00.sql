@@ -9,9 +9,9 @@ SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '147725470832194790
 --
 -- START UPDATING QUERIES
 --
-+INSERT INTO version_db_world(`sql_rev`) VALUES ('1477254708321947900');
-+
-+UPDATE `creature_text` SET `text` = "$N! I'm watching you!" WHERE `entry` = "11382" AND `groupid` = "2";
+INSERT INTO version_db_world(`sql_rev`) VALUES ('1477254708321947900');
+
+UPDATE `creature_text` SET `text` = "$N! I'm watching you!" WHERE `entry` = "11382" AND `groupid` = "2";
 --
 -- END UPDATING QUERIES
 --
