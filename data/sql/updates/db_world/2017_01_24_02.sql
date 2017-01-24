@@ -1,3 +1,14 @@
+-- DB update 2017_01_24_01 -> 2017_01_24_02
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2017_01_24_01 2017_01_24_02 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1482409122200235830'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
 INSERT INTO version_db_world (`sql_rev`) VALUES ('1482409122200235830');
 -- creating `quest_template_addon` table
 DROP TABLE IF EXISTS        `quest_template_addon`;
@@ -53,3 +64,12 @@ DROP `SpecialFlags`;
 ALTER TABLE `quest_template`
   CHANGE COLUMN `Method`    `QuestType`   TINYINT(3)  UNSIGNED NOT NULL DEFAULT '2' AFTER `ID`,
   CHANGE COLUMN `QuestType` `QuestInfoID` SMALLINT(5) UNSIGNED NOT NULL DEFAULT '0' AFTER `QuestSortID`;
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END;
+//
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
