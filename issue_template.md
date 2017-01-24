@@ -18,7 +18,7 @@
 
 **Modules**:  Are you using modules? if yes, list them
 
-**Other Customizations**: Are you use core/db patches or other customizations? If yes please specify them here.
+**Other Customizations**: Are you using any core/db patches or other customizations? If yes please specify them here.
 
 
 [//]: # (This template is for problem reports, for other type of reports edit it accordingly)
