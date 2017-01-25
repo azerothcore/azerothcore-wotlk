@@ -1,5 +1,5 @@
 /*
-* Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-AGPL
+ * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-AGPL
 */
 
 #include "ScriptMgr.h"
@@ -9,63 +9,62 @@
 
 enum Yells
 {
-    TEXT_AGGRO = 0,
-    TEXT_SACRIFICE_1 = 1,
-    TEXT_SACRIFICE_2 = 2,
-    TEXT_SLAY = 3,
-    TEXT_DEATH = 4,
-    TEXT_PREACHING = 5
+    TEXT_AGGRO          = 0,
+    TEXT_SACRIFICE_1    = 1,
+    TEXT_SACRIFICE_2    = 2,
+    TEXT_SLAY           = 3,
+    TEXT_DEATH          = 4,
+    TEXT_PREACHING      = 5
 };
 
 enum Spells
 {
     // VISUALS
-    SPELL_PINK_SPHERE = 56075,
-    SPELL_WHITE_SPHERE = 56102,
-    SPELL_LIGHTNING_BOLTS = 56327,
-    SPELL_ACTIVATE_INITIATE = 56868,
-    SPELL_FREEZE_ANIM = 55591,
-    SPELL_SACRIFICE_VISUAL = 56133,
+    SPELL_PINK_SPHERE                       = 56075,
+    SPELL_WHITE_SPHERE                      = 56102,
+    SPELL_LIGHTNING_BOLTS                   = 56327,
+    SPELL_ACTIVATE_INITIATE                 = 56868,
+    SPELL_SACRIFICE_VISUAL                  = 56133,
 
     // FIGHT
-    SPELL_GIFT_OF_THE_HERALD = 56219,
-    SPELL_CYCLONE_STRIKE = 56855, // Self
-    SPELL_CYCLONE_STRIKE_H = 60030,
-    SPELL_LIGHTNING_BOLT = 56891, // 40Y
-    SPELL_LIGHTNING_BOLT_H = 60032, // 40Y
-    SPELL_THUNDERSHOCK = 56926, // 30Y
-    SPELL_THUNDERSHOCK_H = 60029  // 30Y
+    SPELL_GIFT_OF_THE_HERALD                = 56219,
+    SPELL_CYCLONE_STRIKE                    = 56855, // Self
+    SPELL_CYCLONE_STRIKE_H                  = 60030,
+    SPELL_LIGHTNING_BOLT                    = 56891, // 40Y
+    SPELL_LIGHTNING_BOLT_H                  = 60032, // 40Y
+    SPELL_THUNDERSHOCK                      = 56926, // 30Y
+    SPELL_THUNDERSHOCK_H                    = 60029  // 30Y
 };
 
 enum Events
 {
-    EVENT_JEDOGA_CYCLONE = 1,
-    EVENT_JEDOGA_LIGHTNING_BOLT = 2,
-    EVENT_JEDOGA_THUNDERSHOCK = 3,
-    EVENT_JEDOGA_MOVE_UP = 4,
-    EVENT_JEDOGA_MOVE_DOWN = 5,
+    EVENT_JEDOGA_CYCLONE                    = 1,
+    EVENT_JEDOGA_LIGHTNING_BOLT             = 2,
+    EVENT_JEDOGA_THUNDERSHOCK               = 3,
+    EVENT_JEDOGA_MOVE_UP                    = 4,
+    EVENT_JEDOGA_MOVE_DOWN                  = 5,
 };
 
 enum Misc
 {
-    NPC_JEDOGA_CONTROLLER = 30181,
-    NPC_INITIATE = 30114,
+    NPC_JEDOGA_CONTROLLER                   = 30181,
+    NPC_INITIATE                            = 30114,
 
-    ACTION_INITIATE_DIED = 1,
-    ACTION_ACTIVATE = 2,
-    ACTION_HERALD = 3,
-    ACTION_SACRIFICE_FAILED = 4,
+    ACTION_INITIATE_DIED                    = 1,
+    ACTION_ACTIVATE                         = 2,
+    ACTION_HERALD                           = 3,
+    ACTION_SACRIFICE_FAILED                 = 4,
 
-    POINT_DOWN = 1,
-    POINT_UP = 2,
-    POINT_UP_START = 3,
-    POINT_RITUAL = 4,
+    POINT_DOWN                              = 1,
+    POINT_UP                                = 2,
+    POINT_UP_START                          = 3,
+    POINT_RITUAL                            = 4,
 };
 
 const Position JedogaPosition[2] =
 {
-    { 372.330994f, -705.278015f, 0.624178f,  5.427970f },
-    { 372.330994f, -705.278015f, -16.179716f, 5.427970f }
+    {372.330994f, -705.278015f, -2.459692f,  5.628908f},
+    {372.330994f, -705.278015f, -16.179716f, 5.628908f}
 };
 
 class boss_jedoga_shadowseeker : public CreatureScript
@@ -145,7 +144,7 @@ public:
             if (!summons.size())
                 return;
 
-            uint8 rnd = urand(0, summons.size() - 1);
+            uint8 rnd = urand(0, summons.size()-1);
             uint8 loop = 0;
             for (std::list<uint64>::iterator i = summons.begin(); i != summons.end();)
             {
@@ -218,7 +217,6 @@ public:
             MoveUp(true);
             me->CastSpell(me, SPELL_PINK_SPHERE, true);
             me->CastSpell(me, SPELL_LIGHTNING_BOLTS, true);
-            me->CastSpell(me, SPELL_FREEZE_ANIM, true);
         }
 
         void EnterCombat(Unit* who)
@@ -250,6 +248,7 @@ public:
         {
             me->GetMotionMaster()->MoveIdle();
             me->GetMotionMaster()->MovePoint(POINT_DOWN, JedogaPosition[1]);
+            isFlying = false;
         }
 
         void MoveUp(bool start)
@@ -262,12 +261,11 @@ public:
             me->GetMotionMaster()->MovePoint((start ? POINT_UP_START : POINT_UP), JedogaPosition[0]);
 
             me->SetDisableGravity(true);
-            me->CastSpell(me, SPELL_FREEZE_ANIM, true);
         }
-
+        
         void MovementInform(uint32 Type, uint32 PointId)
         {
-            if (Type != POINT_MOTION_TYPE)
+            if (Type != POINT_MOTION_TYPE) 
                 return;
 
             if (PointId == POINT_DOWN)
@@ -275,7 +273,6 @@ public:
                 me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
                 me->RemoveAurasDueToSpell(SPELL_PINK_SPHERE);
                 me->RemoveAurasDueToSpell(SPELL_LIGHTNING_BOLTS);
-                me->RemoveAurasDueToSpell(SPELL_FREEZE_ANIM);
 
                 isFlying = false;
                 me->SetInCombatWithZone();
@@ -340,55 +337,55 @@ public:
 
                 switch (events.GetEvent())
                 {
-                case EVENT_JEDOGA_CYCLONE:
-                {
-                    me->CastSpell(me, IsHeroic() ? SPELL_CYCLONE_STRIKE_H : SPELL_CYCLONE_STRIKE, false);
-                    events.RepeatEvent(urand(10000, 14000));
-                    break;
-                }
-                case EVENT_JEDOGA_LIGHTNING_BOLT:
-                {
-                    if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
-                        me->CastSpell(pTarget, IsHeroic() ? SPELL_LIGHTNING_BOLT_H : SPELL_LIGHTNING_BOLT, false);
-
-                    events.RepeatEvent(urand(11000, 15000));
-                    break;
-                }
-                case EVENT_JEDOGA_THUNDERSHOCK:
-                {
-                    if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
-                        me->CastSpell(pTarget, IsHeroic() ? SPELL_THUNDERSHOCK_H : SPELL_THUNDERSHOCK, false);
-
-                    events.RepeatEvent(urand(16000, 22000));
-                    break;
-                }
-                case EVENT_JEDOGA_MOVE_UP:
-                {
-                    events.PopEvent();
-                    if (!summons.HasEntry(NPC_INITIATE))
-                        break;
-
-                    if (Creature *cr = me->SummonCreature(NPC_JEDOGA_CONTROLLER, 373.48f, -706.00f, -16.18f))
+                    case EVENT_JEDOGA_CYCLONE:
                     {
-                        cr->CastSpell(cr, SPELL_SACRIFICE_VISUAL, true);
-                        summons.Summon(cr);
+                        me->CastSpell(me, IsHeroic() ? SPELL_CYCLONE_STRIKE_H : SPELL_CYCLONE_STRIKE, false);
+                        events.RepeatEvent(urand(10000, 14000));
+                        break;
                     }
+                    case EVENT_JEDOGA_LIGHTNING_BOLT:
+                    {
+                        if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                            me->CastSpell(pTarget, IsHeroic() ? SPELL_LIGHTNING_BOLT_H : SPELL_LIGHTNING_BOLT, false);
 
-                    Talk(TEXT_SACRIFICE_1);
+                        events.RepeatEvent(urand(11000, 15000));
+                        break;
+                    }
+                    case EVENT_JEDOGA_THUNDERSHOCK:
+                    {
+                        if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                            me->CastSpell(pTarget, IsHeroic() ? SPELL_THUNDERSHOCK_H : SPELL_THUNDERSHOCK, false);
 
-                    isFlying = true;
-                    me->GetMotionMaster()->Clear(true);
-                    me->GetMotionMaster()->MovePoint(POINT_RITUAL, JedogaPosition[1]);
-                    break;
-                }
-                case EVENT_JEDOGA_MOVE_DOWN:
-                {
-                    Talk(TEXT_SACRIFICE_2);
-                    summons.DespawnEntry(NPC_JEDOGA_CONTROLLER);
-                    MoveDown();
-                    events.PopEvent();
-                    break;
-                }
+                        events.RepeatEvent(urand(16000, 22000));
+                        break;
+                    }
+                    case EVENT_JEDOGA_MOVE_UP:
+                    {
+                        events.PopEvent();
+                        if (!summons.HasEntry(NPC_INITIATE))
+                            break;
+
+                        if (Creature *cr = me->SummonCreature(NPC_JEDOGA_CONTROLLER, 373.48f, -706.00f, -16.18f))
+                        {
+                            cr->CastSpell(cr, SPELL_SACRIFICE_VISUAL, true);
+                            summons.Summon(cr);
+                        }
+
+                        Talk(TEXT_SACRIFICE_1);
+
+                        isFlying = true;
+                        me->GetMotionMaster()->Clear(true);
+                        me->GetMotionMaster()->MovePoint(POINT_RITUAL, JedogaPosition[1]);
+                        break;
+                    }
+                    case EVENT_JEDOGA_MOVE_DOWN:
+                    {
+                        Talk(TEXT_SACRIFICE_2);
+                        summons.DespawnEntry(NPC_JEDOGA_CONTROLLER);
+                        MoveDown();
+                        events.PopEvent();
+                        break;
+                    }
                 }
 
                 DoMeleeAttackIfReady();
@@ -423,7 +420,7 @@ public:
                 ScriptedAI::AttackStart(who);
         }
 
-        void MoveInLineOfSight(Unit *who)
+        void MoveInLineOfSight(Unit *who) 
         {
             if (!Timer)
                 ScriptedAI::MoveInLineOfSight(who);
@@ -499,15 +496,16 @@ public:
                     me->SetControlled(false, UNIT_STATE_STUNNED);
                     me->RemoveAurasDueToSpell(SPELL_WHITE_SPHERE);
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+                    me->SetWalk(true);
 
-                    float distance = me->GetDistance(373.48f, -706.00f, -16.18f);
+                    float distance = me->GetDistance(JedogaPosition[1]);
 
                     if (distance < 9.0f)
-                        me->SetSpeed(MOVE_RUN, 0.5f, true);
+                        me->SetSpeed(MOVE_WALK, 0.5f, true);
                     else if (distance < 15.0f)
-                        me->SetSpeed(MOVE_RUN, 0.75f, true);
+                        me->SetSpeed(MOVE_WALK, 0.75f, true);
                     else if (distance < 20.0f)
-                        me->SetSpeed(MOVE_RUN, 1.0f, true);
+                        me->SetSpeed(MOVE_WALK, 1.0f, true);
 
                     me->GetMotionMaster()->Clear(false);
                     me->GetMotionMaster()->MovePoint(POINT_RITUAL, 373.48f, -706.00f, -16.18f);

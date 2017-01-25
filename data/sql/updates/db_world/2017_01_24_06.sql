@@ -1,3 +1,14 @@
+-- DB update 2017_01_24_05 -> 2017_01_24_06
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2017_01_24_05 2017_01_24_06 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1485095191251265000'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
 INSERT INTO version_db_world (`sql_rev`) VALUES ('1485095191251265000');
 
 DELETE FROM `creature_template` WHERE `entry` = "34125";
@@ -63,4 +74,12 @@ INSERT INTO `waypoints` (`entry`,`pointid`,`position_x`,`position_y`,`position_z
 (33519,41,9134.763,2036.925,175.1925,'Black Knight''s Gryphon'),
 (33519,42,9128.608,2089.091,141.3593,'Black Knight''s Gryphon'),
 (33519,43,9093.364,2128.384,99.38685,'Black Knight''s Gryphon'),
-(33519,44,9050.709,2123.656,60.24802,'Black Knight''s Gryphon');
+(33519,44,9050.709,2123.656,60.24802,'Black Knight''s Gryphon');--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END;
+//
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
