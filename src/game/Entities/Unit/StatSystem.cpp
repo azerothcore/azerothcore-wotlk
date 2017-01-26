@@ -312,6 +312,8 @@ void Player::UpdateAttackPowerAndDamage(bool ranged)
 { 
     float val2 = 0.0f;
     float level = float(getLevel());
+    
+    sScriptMgr->OnBeforeUpdateAttackPowerAndDamage(this, level, val2, ranged);
 
     UnitMods unitMod = ranged ? UNIT_MOD_ATTACK_POWER_RANGED : UNIT_MOD_ATTACK_POWER;
 

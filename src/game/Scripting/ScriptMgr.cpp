@@ -1555,6 +1555,11 @@ void ScriptMgr::OnAfterUpdateMaxHealth(Player* player, float& value)
     FOREACH_SCRIPT(PlayerScript)->OnAfterUpdateMaxHealth(player, value);
 }
 
+void ScriptMgr::OnBeforeUpdateAttackPowerAndDamage(Player* player, float& level, float& val2, bool ranged)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnBeforeUpdateAttackPowerAndDamage(player, level, val2, ranged);
+}
+
 void ScriptMgr::OnAfterUpdateAttackPowerAndDamage(Player* player, float& level, float& base_attPower, float& attPowerMod, float& attPowerMultiplier, bool ranged)
 {
     FOREACH_SCRIPT(PlayerScript)->OnAfterUpdateAttackPowerAndDamage(player, level, base_attPower, attPowerMod, attPowerMultiplier, ranged);
