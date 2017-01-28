@@ -81,7 +81,7 @@ public:
         void StartGroundPhase()
         {
             me->SetReactState(REACT_AGGRESSIVE);
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_DISABLE_MOVE);
             me->SetControlled(false, UNIT_STATE_ROOT);
 
             events.Reset();
@@ -96,8 +96,9 @@ public:
         {
             me->SetReactState(REACT_PASSIVE);
             me->AttackStop();
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE |UNIT_FLAG_DISABLE_MOVE);
+            me->SetControlled(true, UNIT_STATE_ROOT);
+            
             events.Reset();
             events.ScheduleEvent(EVENT_BALCONY_SUMMON_ANNOUNCE, 4000);
             events.ScheduleEvent(EVENT_MOVE_TO_GROUND, 70000);
