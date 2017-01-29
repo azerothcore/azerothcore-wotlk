@@ -169,7 +169,7 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket & recvData)
         sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, bgt, queueSlot, STATUS_WAIT_QUEUE, avgWaitTime, 0, 0, TEAM_NEUTRAL);
         SendPacket(&data);
 
-        sScriptMgr->OnPlayerJoinBG(_player, sBattlegroundMgr->GetBattlegroundTemplate(ginfo->BgTypeId));
+        sScriptMgr->OnPlayerJoinBG(_player);
 		
     }
     // check if group can queue:
@@ -249,7 +249,7 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket & recvData)
             sBattlegroundMgr->BuildGroupJoinedBattlegroundPacket(&data, err);
             member->GetSession()->SendPacket(&data);
 
-            sScriptMgr->OnPlayerJoinBG(member, sBattlegroundMgr->GetBattlegroundTemplate(member->GetBattlegroundTypeId()));
+            sScriptMgr->OnPlayerJoinBG(member);
         }
     }
 }
@@ -659,7 +659,7 @@ void WorldSession::HandleBattlemasterJoinArena(WorldPacket & recvData)
         sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, bgt, queueSlot, STATUS_WAIT_QUEUE, avgWaitTime, 0, arenatype, TEAM_NEUTRAL);
         SendPacket(&data);
 
-        sScriptMgr->OnPlayerJoinArena(_player, sBattlegroundMgr->GetBattlegroundTemplate(ginfo->BgTypeId));
+        sScriptMgr->OnPlayerJoinArena(_player);
     }
     // check if group can queue:
     else
@@ -755,7 +755,7 @@ void WorldSession::HandleBattlemasterJoinArena(WorldPacket & recvData)
             sBattlegroundMgr->BuildGroupJoinedBattlegroundPacket(&data, err);
             member->GetSession()->SendPacket(&data);
 
-            sScriptMgr->OnPlayerJoinArena(member, sBattlegroundMgr->GetBattlegroundTemplate(member->GetBattlegroundTypeId()));
+            sScriptMgr->OnPlayerJoinArena(member);
         }
 
         // pussywizard: schedule update for rated arena

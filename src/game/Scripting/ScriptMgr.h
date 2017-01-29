@@ -872,10 +872,10 @@ class PlayerScript : public ScriptObject
         virtual void OnEquip(Player* /*player*/, Item* /*it*/, uint8 /*bag*/, uint8 /*slot*/, bool /*update*/) { }
 
         // After player enters queue for BG
-        virtual void OnPlayerJoinBG(Player* player, Battleground* bg) { }
+        virtual void OnPlayerJoinBG(Player* /*player*/) { }
 
         // After player enters queue for Arena
-        virtual void OnPlayerJoinArena(Player* player, Battleground* bg) { }
+        virtual void OnPlayerJoinArena(Player* /*player*/) { }
         
         //After looting item
         virtual void OnLootItem(Player* player, Item* item, uint32 count, uint64 lootguid) { }
@@ -1205,8 +1205,8 @@ class ScriptMgr
         void OnAfterPlayerSetVisibleItemSlot(Player* player, uint8 slot, Item *item);
         void OnAfterPlayerMoveItemFromInventory(Player* player, Item* it, uint8 bag, uint8 slot, bool update);
         void OnEquip(Player* player, Item* it, uint8 bag, uint8 slot, bool update);
-        void OnPlayerJoinBG(Player* player, Battleground* bg);
-        void OnPlayerJoinArena(Player* player, Battleground* bg);
+        void OnPlayerJoinBG(Player* player);
+        void OnPlayerJoinArena(Player* player);
         void OnLootItem(Player* player, Item* item, uint32 count, uint64 lootguid);
         void OnCreateItem(Player* player, Item* item, uint32 count);
         void OnQuestRewardItem(Player* player, Item* item, uint32 count);

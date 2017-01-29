@@ -1344,14 +1344,14 @@ void ScriptMgr::OnEquip(Player* player, Item* it, uint8 bag, uint8 slot, bool up
     FOREACH_SCRIPT(PlayerScript)->OnEquip(player, it, bag, slot, update);
 }
 
-void ScriptMgr::OnPlayerJoinBG(Player* player, Battleground* bg)
+void ScriptMgr::OnPlayerJoinBG(Player* player)
 {
-    FOREACH_SCRIPT(PlayerScript)->OnPlayerJoinBG(player, bg);
+    FOREACH_SCRIPT(PlayerScript)->OnPlayerJoinBG(player);
 }
 
-void ScriptMgr::OnPlayerJoinArena(Player* player, Battleground* bg)
+void ScriptMgr::OnPlayerJoinArena(Player* player)
 {
-    FOREACH_SCRIPT(PlayerScript)->OnPlayerJoinArena(player, bg);
+    FOREACH_SCRIPT(PlayerScript)->OnPlayerJoinArena(player);
 }
 
 void ScriptMgr::OnLootItem(Player* player, Item* item, uint32 count, uint64 lootguid)
