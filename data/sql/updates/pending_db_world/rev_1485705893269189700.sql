@@ -120,7 +120,7 @@ UPDATE `item_template` SET `flagsCustom`=flagsCustom|2 WHERE `entry`=18706;
 
 -- Arena Grandmaster (7838) quest is repeatable (players can get 2x Arena Grand Master trinkets)
 -- https://www.youtube.com/watch?v=fkJ3vrwC4q4&feature=player_detailpage#t=170s
-UPDATE `quest_template` SET `SpecialFlags` = 1 WHERE `Id` = 7838;
+UPDATE quest_template_addon SET SpecialFlags = 1 WHERE Id = 7838;
 
 /*
 Which one is corect 8000 [2h 13min 20 sec] or 10800 [3h]:
