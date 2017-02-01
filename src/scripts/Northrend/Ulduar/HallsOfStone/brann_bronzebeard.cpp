@@ -60,7 +60,7 @@ enum Misc
     ACTION_SJONNIR_DEAD             = 4,
     ACTION_ENTEREVADEMODE           = 5,
     ACTION_WIPE_START               = 6,
-    ACTION_OPEN_DOOR                =7,
+    ACTION_OPEN_DOOR                = 7,
 
     // QUESTS
     QUEST_HALLS_OF_STONE            = 13207,
