@@ -20,41 +20,41 @@ public:
 
     bool OnGossipHello(Player* pPlayer, Creature* pCreature)
     {
-        if( !pCreature->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP) )
+        if (!pCreature->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP))
             return true;
 
         InstanceScript* pInstance = pCreature->GetInstanceScript();
-        if( !pInstance )
+        if (!pInstance)
             return true;
 
         uint32 gossipTextId = 0;
-        switch( pInstance->GetData(DATA_INSTANCE_PROGRESS) )
+        switch (pInstance->GetData(DATA_INSTANCE_PROGRESS))
         {
-            case INSTANCE_PROGRESS_INITIAL:
-                if(!pPlayer->GetVehicle() )
-				{
-					if (pInstance->GetData(DATA_TEAMID_IN_INSTANCE) == TEAM_HORDE)
-						gossipTextId = 15043; //Horde text
-					else
-						gossipTextId = 14757; //Alliance text
-				}
-				else
-				{
-					gossipTextId = 14688;
-					pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_START_EVENT1a, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1338);
-					pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_START_EVENT1b, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1341);	
-				}
-				break;
-            case INSTANCE_PROGRESS_CHAMPIONS_DEAD:
-                gossipTextId = 14737;
-                pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_START_EVENT2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1339);
-                break;
-            case INSTANCE_PROGRESS_ARGENT_CHALLENGE_DIED:
-                gossipTextId = 14738;
-                pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_START_EVENT3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1340);
-                break;
-            default:
-                return true;
+        case INSTANCE_PROGRESS_INITIAL:
+            if (!pPlayer->GetVehicle())
+            {
+                if (pInstance->GetData(DATA_TEAMID_IN_INSTANCE) == TEAM_HORDE)
+                    gossipTextId = 15043; //Horde text
+                else
+                    gossipTextId = 14757; //Alliance text
+            }
+            else
+            {
+                gossipTextId = 14688;
+                pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_START_EVENT1a, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1338);
+                pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_START_EVENT1b, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1341);
+            }
+            break;
+        case INSTANCE_PROGRESS_CHAMPIONS_DEAD:
+            gossipTextId = 14737;
+            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_START_EVENT2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1339);
+            break;
+        case INSTANCE_PROGRESS_ARGENT_CHALLENGE_DIED:
+            gossipTextId = 14738;
+            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_START_EVENT3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1340);
+            break;
+        default:
+            return true;
         }
 
         pPlayer->SEND_GOSSIP_MENU(gossipTextId, pCreature->GetGUID());
