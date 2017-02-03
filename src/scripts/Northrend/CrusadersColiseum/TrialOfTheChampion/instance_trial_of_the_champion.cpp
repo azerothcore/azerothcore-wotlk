@@ -1017,7 +1017,7 @@ public:
                     {
                         if( Creature* announcer = instance->GetCreature(NPC_AnnouncerGUID) )
                             announcer->GetMotionMaster()->MovePoint(0, 735.81f, 661.92f, 412.39f);
-                        if( Creature* boss = instance->SummonCreature(Counter ? NPC_EADRIC : NPC_PALETRESS, SpawnPosition) )
+                        if (Creature* boss = instance->SummonCreature(Counter ? NPC_EADRIC : NPC_PALETRESS, SpawnPosition))
                             boss->GetMotionMaster()->MovePoint(0, 746.881f, 660.263f, 411.7f);
                         events.ScheduleEvent(EVENT_CLOSE_GATE, 5000);
                         events.ScheduleEvent(EVENT_ARGENT_CHALLENGE_SAY_1, 4000);
@@ -1059,8 +1059,8 @@ public:
                     break;
                 case EVENT_ARGENT_CHALLENGE_MOVE_FORWARD:
                     {
-                        if( Creature* boss = instance->GetCreature(NPC_ArgentChampionGUID) )
-                            boss->GetMotionMaster()->MovePoint(0, 746.881f, 635.263f, 411.7f);
+                    if (Creature* boss = instance->GetCreature(NPC_ArgentChampionGUID))
+                        boss->GetMotionMaster()->MovePoint(0, 746.881f, 635.263f, 411.7f);
                         events.ScheduleEvent(EVENT_ARGENT_CHALLENGE_ATTACK, 3000);
                         events.PopEvent();
                     }
