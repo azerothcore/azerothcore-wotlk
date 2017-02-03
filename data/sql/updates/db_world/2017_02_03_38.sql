@@ -10,7 +10,7 @@ SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '148543378304811920
 -- START UPDATING QUERIES
 --
 INSERT INTO version_db_world (`sql_rev`) VALUES ('1485433783048119200');
-DELETE FROM `creature_Loot_template` WHERE `item` = 23612 AND `entry` IN (21060,21061);--
+DELETE FROM `creature_loot_template` WHERE `item` = 23612 AND `entry` IN (21060,21061);--
 -- END UPDATING QUERIES
 --
 COMMIT;
