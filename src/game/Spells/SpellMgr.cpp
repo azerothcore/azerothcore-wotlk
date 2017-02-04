@@ -5992,7 +5992,20 @@ void SpellMgr::LoadDbcDataCorrections()
         case 21855:
             spellInfo->AttributesEx3 |= SPELL_ATTR3_NO_INITIAL_AGGRO;
             break;
-
+        // Convocation at Zol'Heb (12730)
+        case 52956:
+            spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_DEST_AREA_ENTRY;
+            break;
+       // Mangletooth Quests (http://www.wowhead.com/npc=3430)
+        case 7764:
+        case 10767:
+        case 16610:
+        case 16612:
+        case 16618:
+        case 17013:
+             spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
+             spellInfo->AttributesEx5 |= SPELL_ATTR5_SKIP_CHECKCAST_LOS_CHECK;
+             break;
 
 
         // ///////////////////////////////////////////
