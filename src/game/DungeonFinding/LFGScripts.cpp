@@ -53,7 +53,7 @@ void LFGPlayerScript::OnLogout(Player* player)
     sLFGMgr->LfrSearchRemove(player);
 }
 
-void LFGPlayerScript::OnLogin(Player* player)
+void LFGPlayerScript::OnLogin(Player* player, bool firstLogin)
 {
     if (!sLFGMgr->isOptionEnabled(LFG_OPTION_ENABLE_DUNGEON_FINDER | LFG_OPTION_ENABLE_RAID_BROWSER))
         return;
