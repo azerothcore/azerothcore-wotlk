@@ -1136,6 +1136,26 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder* holder)
     // Load pet if any (if player not alive and in taxi flight or another then pet will remember as temporary unsummoned)
     pCurrChar->LoadPet();
 
+    if (pCurrChar->GetSession()->GetRecruiterId() != 0 || pCurrChar->GetSession()->IsARecruiter())
+    {
+        bool isReferrer = pCurrChar->GetSession()->IsARecruiter();
+
+        for (SessionMap::const_iterator itr = sWorld->GetAllSessions().begin(); itr != sWorld->GetAllSessions().end(); ++itr)
+        {
+            if (!itr->second->GetRecruiterId() && !itr->second->IsARecruiter())
+                continue;
+            if (isReferrer && pCurrChar->GetSession()->GetAccountId() == itr->second->GetRecruiterId() || !isReferrer && pCurrChar->GetSession()->GetRecruiterId() == itr->second->GetAccountId())
+            {
+                Player * rf = itr->second->GetPlayer();
+                if (rf != NULL)
+                {
+                    pCurrChar->SendUpdateToPlayer(rf);
+                    rf->SendUpdateToPlayer(pCurrChar);
+                }
+            }
+        }
+    }
+
     sScriptMgr->OnPlayerLogin(pCurrChar);
     delete holder;
 }
