@@ -33,8 +33,6 @@ void WorldRunnable::run()
     uint32 realCurrTime = 0;
     uint32 realPrevTime = getMSTime();
 
-    sScriptMgr->OnStartup();
-
     ///- While we have not World::m_stopEvent, update the world
     while (!World::IsStopped())
     {
