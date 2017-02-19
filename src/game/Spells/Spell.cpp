@@ -2286,7 +2286,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
     uint8 mask = target->effectMask;
 
     Unit* effectUnit = m_caster->GetGUID() == target->targetGUID ? m_caster : ObjectAccessor::GetUnit(*m_caster, target->targetGUID);
-    if (!effectUnit)
+    if (!effectUnit || m_spellInfo->Id == 45927)
     {
         uint8 farMask = 0;
         // create far target mask
@@ -5745,7 +5745,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                 if (!(playerCaster->GetTarget()))
                     return SPELL_FAILED_BAD_TARGETS;
 
-                Player* target = playerCaster->GetSelectedPlayer();
+                Player* target = ObjectAccessor::FindPlayer(m_caster->ToPlayer()->GetTarget());
 
                 if (!target ||
                     !(target->GetSession()->GetRecruiterId() == playerCaster->GetSession()->GetAccountId() || target->GetSession()->GetAccountId() == playerCaster->GetSession()->GetRecruiterId()))
@@ -7160,6 +7160,18 @@ bool Spell::CheckEffectTarget(Unit const* target, uint32 eff) const
             if (MMAP::MMapFactory::IsPathfindingEnabled(m_caster->FindMap()))
                 break;*/
             // else no break intended
+
+        case SPELL_EFFECT_SUMMON_RAF_FRIEND:
+            if (m_caster->GetTypeId() != TYPEID_PLAYER || target->GetTypeId() != TYPEID_PLAYER)
+                return false;
+            if (m_caster->ToPlayer()->GetSession()->IsARecruiter() && target->ToPlayer()->GetSession()->GetRecruiterId() != m_caster->ToPlayer()->GetSession()->GetAccountId())
+                return false;
+            if (m_caster->ToPlayer()->GetSession()->GetRecruiterId() != target->ToPlayer()->GetSession()->GetAccountId() && target->ToPlayer()->GetSession()->IsARecruiter())
+                return false;
+            if (target->ToPlayer()->getLevel() >= sWorld->getIntConfig(CONFIG_MAX_RECRUIT_A_FRIEND_BONUS_PLAYER_LEVEL))
+                return false;
+            break;
+
         default:                                            // normal case
             // Get GO cast coordinates if original caster -> GO
             WorldObject* caster = NULL;
@@ -8077,9 +8089,8 @@ bool WorldObjectSpellTargetCheck::operator()(WorldObject* target)
                     return false;
                 break;
             case TARGET_CHECK_RAID_CLASS:
-                if (_referer->GetTypeId() == unitTarget->GetTypeId())
-                    if (_referer->getClass() != unitTarget->getClass())
-                        return false;
+                if (_referer->getClass() != unitTarget->getClass())
+                    return false;
                 // nobreak;
             case TARGET_CHECK_RAID:
                 if (unitTarget->IsTotem())
