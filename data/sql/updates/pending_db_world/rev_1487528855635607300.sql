@@ -35,4 +35,3 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`,`SourceGroup`,`SourceEntry`,
 (15,10218,0,0,0,23,0,495,0,0,0,0 ,'' , 'Harry''s Bomber - Show gossip option if the npc is in the area 495'),
 (15,10218,0,0,0,9,0,11567,0,0,0,0 ,'' , 'Harry''s Bomber - Show gossip option if player has taken quest 11567'),
 (15,10218,0,0,1,28,0,11567,0,0,0,0 ,'' , 'Harry''s Bomber - Show gossip option if player has quest 11567 completed');
-
