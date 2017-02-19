@@ -1,5 +1,5 @@
 # ![logo](http://arthas.ru/assets/images/logo.png) 
-#ArthasCore
+#ArthasCore Privat Server
 
 [![Gitter](https://badges.gitter.im/azerothcore/azerothcore.svg)](https://gitter.im/azerothcore/azerothcore?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![Bountysource](https://www.bountysource.com/badge/tracker?tracker_id=40032087)](https://www.bountysource.com/teams/azerothcore/bounties) [![Master Build Status](https://travis-ci.org/azerothcore/azerothcore-wotlk.svg)](https://travis-ci.org/azerothcore/azerothcore-wotlk) [![Issue Stats](http://www.issuestats.com/github/AzerothCore/azerothcore-wotlk/badge/issue)
 
