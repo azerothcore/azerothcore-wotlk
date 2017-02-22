@@ -3278,7 +3278,9 @@ void Spell::prepare(SpellCastTargets const* targets, AuraEffect const* triggered
     {
         for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
         {
-            if (m_spellInfo->Effects[i].Effect == SPELL_EFFECT_APPLY_AURA)
+            if (m_spellInfo->Effects[i].Effect == SPELL_EFFECT_APPLY_AURA ||
+                m_spellInfo->Effects[i].Effect == SPELL_EFFECT_APPLY_AREA_AURA_PARTY ||
+                m_spellInfo->Effects[i].Effect == SPELL_EFFECT_APPLY_AREA_AURA_RAID)
             {
                 // Change aura with ranks only if basepoints are taken from spellInfo and aura is positive
                 if (m_spellInfo->IsPositiveEffect(i))
