@@ -1213,6 +1213,15 @@ void Pet::_LoadAuras(PreparedQueryResult result, uint32 timediff)
                 continue;
             }
 
+            // avoid higher level auras if any, and adjust
+            SpellInfo const* scaledSpellInfo = spellInfo->GetAuraRankForLevel(getLevel());
+            if (scaledSpellInfo != spellInfo)
+                spellInfo = scaledSpellInfo;
+
+            // again after level check
+            if (!spellInfo)
+                continue;
+
             // negative effects should continue counting down after logout
             if (remaintime != -1 && !spellInfo->IsPositive())
             {
