@@ -959,7 +959,12 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                 {
                     AddAura(SPELL_HUNTER_PET_SCALING_04, this);
                     AddAura(SPELL_DK_PET_SCALING_01, this);
+                    AddAura(SPELL_DK_PET_SCALING_02, this);
+                    AddAura(SPELL_DK_PET_SCALING_03, this);
                     AddAura(SPELL_PET_AVOIDANCE, this);
+
+                    SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(petlevel - (petlevel / 4)));
+                    SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(petlevel + (petlevel / 4)));
                     break;
                 }
                 case NPC_GENERIC_IMP:
