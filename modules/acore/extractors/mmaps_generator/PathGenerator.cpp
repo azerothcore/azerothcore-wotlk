@@ -6,6 +6,7 @@
 
 #include "PathCommon.h"
 #include "MapBuilder.h"
+#include "Timer.h"
 
 LoginDatabaseWorkerPool LoginDatabase;
 
@@ -232,7 +233,7 @@ int finish(const char* message, int returnValue)
 int main(int argc, char** argv)
 {
     int threads = 3, mapnum = -1;
-    float maxAngle = 55.0f;
+    float maxAngle = 70.0f;
     int tileX = -1, tileY = -1;
     bool skipLiquid = false,
          skipContinents = false,
