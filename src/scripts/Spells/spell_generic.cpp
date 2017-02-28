@@ -4951,7 +4951,7 @@ void AddSC_generic_spell_scripts()
     new spell_gen_break_shield("spell_gen_break_shield");
     new spell_gen_break_shield("spell_gen_tournament_counterattack");
     new spell_gen_mounted_charge();
-	new spell_gen_moss_covered_feet();
+    new spell_gen_moss_covered_feet();
     new spell_gen_defend();
     new spell_gen_tournament_duel();
     new spell_gen_summon_tournament_mount();
