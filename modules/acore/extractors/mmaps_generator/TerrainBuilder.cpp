@@ -70,7 +70,7 @@ struct map_liquidHeader
 namespace MMAP
 {
 
-    char const* MAP_VERSION_MAGIC = "v1.8";
+    char const* MAP_VERSION_MAGIC = "v1.3";
 
     TerrainBuilder::TerrainBuilder(bool skipLiquid) : m_skipLiquid (skipLiquid){ }
     TerrainBuilder::~TerrainBuilder() { }
@@ -700,7 +700,7 @@ namespace MMAP
                         uint8 type = NAV_EMPTY;
 
                         // convert liquid type to NavTerrain
-                        switch (liquid->GetType() & 3)
+                        switch (liquid->GetType())
                         {
                         case 0:
                         case 1:
