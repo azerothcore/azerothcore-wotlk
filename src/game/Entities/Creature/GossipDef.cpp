@@ -154,8 +154,8 @@ void PlayerMenu::SendGossipMenu(uint32 titleTextId, uint64 objectGUID) const
 
         int32 locale = _session->GetSessionDbLocaleIndex();
         if (locale >= 0)
-			if (QuestLocale const* localeData = sObjectMgr->GetQuestLocale(questID))
-				ObjectMgr::GetLocaleString(localeData->Title, locale, title);
+            if (QuestLocale const* localeData = sObjectMgr->GetQuestLocale(questID))
+                ObjectMgr::GetLocaleString(localeData->Title, locale, title);
 
         data << title;
     }
@@ -267,7 +267,7 @@ void PlayerMenu::SendQuestGiverQuestList(QEmote const& eEmote, const std::string
             int32 locale = _session->GetSessionDbLocaleIndex();
             if (locale >= 0)
                 if (QuestLocale const* localeData = sObjectMgr->GetQuestLocale(questID))
-					ObjectMgr::GetLocaleString(localeData->Title, locale, title);
+                    ObjectMgr::GetLocaleString(localeData->Title, locale, title);
             data << uint32(questID);
             data << uint32(qmi.QuestIcon);
             data << int32(quest->GetQuestLevel());
