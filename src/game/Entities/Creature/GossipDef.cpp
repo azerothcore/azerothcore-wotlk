@@ -413,8 +413,8 @@ void PlayerMenu::SendQuestQueryResponse(Quest const* quest) const
     int32 locale = _session->GetSessionDbLocaleIndex();
     if (locale >= 0)
     {
-		if (QuestLocale const* localeData = sObjectMgr->GetQuestLocale(quest->GetQuestId()))
-		{
+        if (QuestLocale const* localeData = sObjectMgr->GetQuestLocale(quest->GetQuestId()))
+        {
             ObjectMgr::GetLocaleString(localeData->Title, locale, questTitle);
             ObjectMgr::GetLocaleString(localeData->Details, locale, questDetails);
             ObjectMgr::GetLocaleString(localeData->Objectives, locale, questObjectives);
@@ -423,7 +423,7 @@ void PlayerMenu::SendQuestQueryResponse(Quest const* quest) const
 
             for (uint8 i = 0; i < QUEST_OBJECTIVES_COUNT; ++i)
                 ObjectMgr::GetLocaleString(localeData->ObjectiveText[i], locale, questObjectiveText[i]);
-		}
+        }
     }
 
     WorldPacket data(SMSG_QUEST_QUERY_RESPONSE, 100);
