@@ -304,7 +304,7 @@ void PlayerMenu::SendQuestGiverQuestDetails(Quest const* quest, uint64 npcGUID, 
 	if (locale >= 0)
 	{
         if (QuestLocale const* localeData = sObjectMgr->GetQuestLocale(quest->GetQuestId()))
-		{
+        {
             ObjectMgr::GetLocaleString(localeData->Title, locale, questTitle);
             ObjectMgr::GetLocaleString(localeData->Details, locale, questDetails);
             ObjectMgr::GetLocaleString(localeData->Objectives, locale, questObjectives);
