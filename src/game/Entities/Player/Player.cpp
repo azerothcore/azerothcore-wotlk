@@ -17071,6 +17071,14 @@ void Player::SendQuestConfirmAccept(const Quest* quest, Player* pReceiver)
 { 
     if (pReceiver)
     {
+        //load locale from db
+        std::string strTitle = quest->GetTitle();
+
+        int loc_idx = pReceiver->GetSession()->GetSessionDbLocaleIndex();
+        if (loc_idx >= 0)
+            if (const QuestLocale* pLocale = sObjectMgr->GetQuestLocale(quest->GetQuestId()))
+                ObjectMgr::GetLocaleString(pLocale->Title, loc_idx, strTitle);
+			
         WorldPacket data(SMSG_QUEST_CONFIRM_ACCEPT, (4 + quest->GetTitle().size() + 8));
         data << uint32(quest->GetQuestId());
         data << quest->GetTitle();
