@@ -540,11 +540,11 @@ void PlayerMenu::SendQuestGiverOfferReward(Quest const* quest, uint64 npcGUID, b
 	int32 locale = _session->GetSessionDbLocaleIndex();
 	if (locale >= 0)
 	{
-		if (QuestLocale const* localeData = sObjectMgr->GetQuestLocale(quest->GetQuestId()))
-		{
-			ObjectMgr::GetLocaleString(localeData->Title, locale, questTitle);
-			ObjectMgr::GetLocaleString(localeData->OfferRewardText, locale, questOfferRewardText);
-		}
+        if (QuestLocale const* localeData = sObjectMgr->GetQuestLocale(quest->GetQuestId()))
+        {
+            ObjectMgr::GetLocaleString(localeData->Title, locale, questTitle);
+            ObjectMgr::GetLocaleString(localeData->OfferRewardText, locale, questOfferRewardText);
+        }
 	}
 
     WorldPacket data(SMSG_QUESTGIVER_OFFER_REWARD, 400);    // guess size
