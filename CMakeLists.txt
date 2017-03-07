@@ -34,7 +34,7 @@ include(CheckCXXSourceRuns)
 include(CheckIncludeFiles)
 
 # some utils for cmake
-include(modules/uwd/cmake-utils/utils.cmake)
+include(modules/drassil/cmake-utils/utils.cmake)
 
 include(src/cmake/ac_macros.cmake)
 
