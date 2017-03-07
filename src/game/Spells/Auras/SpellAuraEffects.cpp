@@ -1824,15 +1824,15 @@ void AuraEffect::HandleAuraModShapeshift(AuraApplication const* aurApp, uint8 mo
     }
 
 	switch (GetId())
-	{
-		// Roc Form
-	case 35200:
-		modelid = 4877;
-		break;
-	default:
-		modelid = target->GetModelForForm(form);
-		break;
-	}
+    {
+        // Roc Form
+        case 35200:
+            modelid = 4877;
+            break;
+        default:
+            modelid = target->GetModelForForm(form);
+            break;
+    }
 
     if (apply)
     {
