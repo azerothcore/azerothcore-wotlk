@@ -587,9 +587,8 @@ void BattlegroundMgr::CreateInitialBattlegrounds()
 
         uint32 bgTypeId = fields[0].GetUInt32();
 
-        // pussywizard: currently not supported
-        //if (DisableMgr::IsDisabledFor(DISABLE_TYPE_BATTLEGROUND, bgTypeId, NULL))
-        //    continue;
+        if (DisableMgr::IsDisabledFor(DISABLE_TYPE_BATTLEGROUND, bgTypeId, NULL))
+            continue;
 
         // can be overwrite by values from DB
         BattlemasterListEntry const* bl = sBattlemasterListStore.LookupEntry(bgTypeId);
