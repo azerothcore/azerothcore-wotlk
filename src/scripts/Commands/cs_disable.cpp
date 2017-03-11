@@ -36,7 +36,6 @@ public:
             { "battleground",         SEC_ADMINISTRATOR,    true, &HandleRemoveDisableBattlegroundCommand,        "" },
             { "outdoorpvp",           SEC_ADMINISTRATOR,    true, &HandleRemoveDisableOutdoorPvPCommand,          "" },
             { "vmap",                 SEC_ADMINISTRATOR,    true, &HandleRemoveDisableVmapCommand,                "" },
-            { "mmap",                 SEC_ADMINISTRATOR,    true, &HandleRemoveDisableMMapCommand,                "" },
         };
         static std::vector<ChatCommand> addDisableCommandTable =
         {
@@ -46,7 +45,6 @@ public:
             { "battleground",         SEC_ADMINISTRATOR,    true, &HandleAddDisableBattlegroundCommand,           "" },
             { "outdoorpvp",           SEC_ADMINISTRATOR,    true, &HandleAddDisableOutdoorPvPCommand,             "" },
             { "vmap",                 SEC_ADMINISTRATOR,    true, &HandleAddDisableVmapCommand,                   "" },
-            { "mmap",                 SEC_ADMINISTRATOR,    true, &HandleAddDisableMMapCommand,                   "" },
         };
         static std::vector<ChatCommand> disableCommandTable =
         {
@@ -146,17 +144,6 @@ public:
                 disableTypeStr = "vmap";
                 break;
             }
-            case DISABLE_TYPE_MMAP:
-            {
-                if (!sMapStore.LookupEntry(entry))
-                {
-                    handler->PSendSysMessage(LANG_COMMAND_NOMAPFOUND);
-                    handler->SetSentErrorMessage(true);
-                    return false;
-                }
-                disableTypeStr = "mmap";
-                break;
-            }
             default:
                 break;
         }
@@ -241,14 +228,6 @@ public:
         return HandleAddDisables(handler, args, DISABLE_TYPE_VMAP);
     }
 
-    static bool HandleAddDisableMMapCommand(ChatHandler* handler, char const* args)
-    {
-        if (!*args)
-            return false;
-
-        return HandleAddDisables(handler, args, DISABLE_TYPE_MMAP);
-    }
-
     static bool HandleRemoveDisables(ChatHandler* handler, char const* args, uint8 disableType)
     {
         char* entryStr = strtok((char*)args, " ");
@@ -281,9 +260,6 @@ public:
                 break;
             case DISABLE_TYPE_VMAP:
                 disableTypeStr = "vmap";
-                break;
-            case DISABLE_TYPE_MMAP:
-                disableTypeStr = "mmap";
                 break;
         }
 
@@ -362,14 +338,6 @@ public:
             return false;
 
         return HandleRemoveDisables(handler, args, DISABLE_TYPE_VMAP);
-    }
-
-    static bool HandleRemoveDisableMMapCommand(ChatHandler* handler, char const* args)
-    {
-        if (!*args)
-            return false;
-
-        return HandleRemoveDisables(handler, args, DISABLE_TYPE_MMAP);
     }
 };
 
