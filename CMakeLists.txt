@@ -75,6 +75,11 @@ if( UNIX )
   find_package(Readline)
   find_package(ZLIB)
   find_package(BZip2)
+
+  if ( WITH_PERFTOOLS )
+    find_package(Gperftools)
+  endif()
+
 endif()
 
 if(NOT WITHOUT_GIT)

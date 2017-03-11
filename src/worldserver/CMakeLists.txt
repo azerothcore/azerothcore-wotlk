@@ -174,6 +174,7 @@ target_link_libraries(worldserver
   g3dlib
   gsoap
   Detour
+  ${GPERFTOOLS_LIBRARIES}
   ${JEMALLOC_LIBRARY}
   ${READLINE_LIBRARY}
   ${TERMCAP_LIBRARY}
