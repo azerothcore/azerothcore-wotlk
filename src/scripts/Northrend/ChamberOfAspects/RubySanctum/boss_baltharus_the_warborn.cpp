@@ -330,7 +330,9 @@ class spell_baltharus_enervating_brand_trigger : public SpellScriptLoader
             {
                 if (Unit* caster = GetOriginalCaster())
                     if (Unit* target = GetHitUnit())
-                        if (target == GetCaster())
+                        if (target == GetCaster() 
+                            // the spell has an unlimited range, so we need this check
+                            && target->GetDistance2d(caster) <= 12.0f)
                             target->CastSpell(caster, SPELL_SIPHONED_MIGHT, true);
             }
 
