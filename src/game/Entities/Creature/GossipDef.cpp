@@ -137,7 +137,9 @@ void PlayerMenu::SendGossipMenu(uint32 titleTextId, uint64 objectGUID) const
         data << item.BoxMessage;                        // accept text (related to money) pop up box, 2.0.3
     }
 
-    data << uint32(_questMenu.GetMenuItemCount());      // max count 0x20
+    size_t count_pos = data.wpos();
+    data << uint32(0);                                  // max count 0x20
+    uint32 count = 0;
 
     for (uint32 iI = 0; iI < _questMenu.GetMenuItemCount(); ++iI)
     {
