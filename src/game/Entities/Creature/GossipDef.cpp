@@ -143,21 +143,23 @@ void PlayerMenu::SendGossipMenu(uint32 titleTextId, uint64 objectGUID) const
     {
         QuestMenuItem const& item = _questMenu.GetItem(iI);
         uint32 questID = item.QuestId;
-        Quest const* quest = sObjectMgr->GetQuestTemplate(questID);
+        if (Quest const* quest = sObjectMgr->GetQuestTemplate(questID))
+        {
+            ++count;
+            data << uint32(questID);
+            data << uint32(item.QuestIcon);
+            data << int32(quest->GetQuestLevel());
+            data << uint32(quest->GetFlags());              // 3.3.3 quest flags
+            data << uint8(0);                               // 3.3.3 changes icon: blue question or yellow exclamation
+            std::string title = quest->GetTitle();          //we need to load it from db
 
-        data << uint32(questID);
-        data << uint32(item.QuestIcon);
-        data << int32(quest->GetQuestLevel());
-        data << uint32(quest->GetFlags());              // 3.3.3 quest flags
-        data << uint8(0);                               // 3.3.3 changes icon: blue question or yellow exclamation
-        std::string title = quest->GetTitle();          //we need to load it from db
+            int32 locale = _session->GetSessionDbLocaleIndex();
+            if (locale >= 0)
+                if (QuestLocale const* localeData = sObjectMgr->GetQuestLocale(questID))
+                    ObjectMgr::GetLocaleString(localeData->Title, locale, title);
 
-        int32 locale = _session->GetSessionDbLocaleIndex();
-        if (locale >= 0)
-            if (QuestLocale const* localeData = sObjectMgr->GetQuestLocale(questID))
-                ObjectMgr::GetLocaleString(localeData->Title, locale, title);
-
-        data << title;
+            data << title;
+        }
     }
 
     _session->SendPacket(&data);
