@@ -1158,6 +1158,12 @@ class ObjectMgr
             if (itr == _questLocaleStore.end()) return NULL;
             return &itr->second;
         }
+        GossipMenuItemsLocale const* GetGossipMenuItemsLocale(uint32 entry) const
+        {
+            GossipMenuItemsLocaleContainer::const_iterator itr = _gossipMenuItemsLocaleStore.find(entry);
+            if (itr == _gossipMenuItemsLocaleStore.end()) return NULL;
+            return &itr->second;
+        }
         PointOfInterestLocale const* GetPointOfInterestLocale(uint32 poi_id) const
         {
             PointOfInterestLocaleContainer::const_iterator itr = _pointOfInterestLocaleStore.find(poi_id);
