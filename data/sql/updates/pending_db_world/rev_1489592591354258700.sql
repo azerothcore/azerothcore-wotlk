@@ -16,7 +16,3 @@ INSERT INTO `item_loot_template` (`Entry`,`Item`,`ChanceOrQuestChance`,`LootMode
 (54218,49286,0.30,1,2,1,1),
 (54218,49285,0.10,1,2,1,1),
 (54218,49282,0.20,1,2,1,1);
-
-
-
-
