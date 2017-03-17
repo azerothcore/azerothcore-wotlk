@@ -129,6 +129,7 @@ target_link_libraries(mmaps_generator
   ${OPENSSL_LIBRARIES}
   ${BZIP2_LIBRARIES}
   ${ZLIB_LIBRARIES}
+  ${CMAKE_THREAD_LIBS_INIT}
 )
 
 if( UNIX )
