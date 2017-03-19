@@ -557,7 +557,7 @@ bool AuthSocket::_HandleLogonProof()
     A.SetBinary(lp.A, 32);
 
     // SRP safeguard: abort if A == 0
-    if (A.isZero())
+    if ((A % N).isZero())
     {
         socket().shutdown();
         return true;
