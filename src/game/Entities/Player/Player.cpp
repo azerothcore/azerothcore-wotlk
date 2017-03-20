@@ -7308,6 +7308,28 @@ bool Player::RewardHonor(Unit* uVictim, uint32 groupsize, int32 honor, bool awar
                 GiveXP(uint32(honor*(3+getLevel()*0.30f)), NULL);   
         }
 
+    if (sWorld->getBoolConfig(CONFIG_PVP_TOKEN_ENABLE))
+    {
+        if (!uVictim || uVictim == this || uVictim->HasAuraType(SPELL_AURA_NO_PVP_CREDIT))
+            return true;
+
+        if (uVictim->GetTypeId() == TYPEID_PLAYER)
+        {
+            // Check if allowed to receive it in current map
+            uint8 MapType = sWorld->getIntConfig(CONFIG_PVP_TOKEN_MAP_TYPE);
+            if ((MapType == 1 && !InBattleground() && !IsFFAPvP())
+                || (MapType == 2 && !IsFFAPvP())
+                || (MapType == 3 && !InBattleground()))
+                return true;
+
+            uint32 itemID = sWorld->getIntConfig(CONFIG_PVP_TOKEN_ID);
+            int32 count = sWorld->getIntConfig(CONFIG_PVP_TOKEN_COUNT);
+
+            if (AddItem(itemID, count))
+                ChatHandler(GetSession()).PSendSysMessage("You have been awarded a token for slaying another player.");
+        }
+    }
+    
     return true;
 }
 
