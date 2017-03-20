@@ -35,6 +35,8 @@ CTOOLS=OFF
 # use precompiled headers ( fatest compilation but not optimized if you change headers often )
 CSCRIPTPCH=ON
 CCOREPCH=ON
+# use semicolon ; to separate modules
+CDISABLED_AC_MODULES=""
 # you can add your custom definitions here ( -D )
 CCUSTOMOPTIONS=""
 
