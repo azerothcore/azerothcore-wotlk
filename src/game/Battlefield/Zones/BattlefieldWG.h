@@ -80,7 +80,7 @@ enum WintergraspSpells
 
 enum WintergraspData
 {
-	BATTLEFIELD_WG_DATA_INTACT_TOWER_ATT,
+    BATTLEFIELD_WG_DATA_INTACT_TOWER_ATT,
     BATTLEFIELD_WG_DATA_DAMAGED_TOWER_ATT,
     BATTLEFIELD_WG_DATA_BROKEN_TOWER_ATT,
     BATTLEFIELD_WG_DATA_MAX_VEHICLE_A,
@@ -1047,7 +1047,7 @@ struct WGWorkshopData
     uint8 id;
     uint32 worldstate;
     uint8 attackText;
-	uint8 takenText;
+    uint8 takenText;
 };
 
 const WGWorkshopData WorkshopsData[WG_MAX_WORKSHOP] =
@@ -1081,7 +1081,7 @@ struct BfWGGameObjectBuilding
         m_WorldState = 0;
         m_State = 0;
         m_damagedText = 0;
-		m_destroyedText = 0;
+        m_destroyedText = 0;
     }
 
     // the team that controls this point
@@ -1104,7 +1104,7 @@ struct BfWGGameObjectBuilding
 
     // Name id for warning text
     uint8 m_damagedText;
-	uint8 m_destroyedText;
+    uint8 m_destroyedText;
 
     // GameObject associations
     GameObjectSet m_GameObjectList[2];
@@ -1133,13 +1133,13 @@ struct BfWGGameObjectBuilding
                 break;
         }
 
-		GameObject* go = ObjectAccessor::GetObjectInWorld(m_Build, (GameObject*)NULL);
-		if (go)
-		{
-		 // Rebuild gameobject
-			go->SetDestructibleState(GO_DESTRUCTIBLE_REBUILDING, NULL, true);
-			go->SetUInt32Value(GAMEOBJECT_FACTION, WintergraspFaction[m_Team]);
-		}
+        GameObject* go = ObjectAccessor::GetObjectInWorld(m_Build, (GameObject*)NULL);
+        if (go)
+        {
+            // Rebuild gameobject
+            go->SetDestructibleState(GO_DESTRUCTIBLE_REBUILDING, NULL, true);
+            go->SetUInt32Value(GAMEOBJECT_FACTION, WintergraspFaction[m_Team]);
+        }
 
         // Update worldstate
         m_State = BATTLEFIELD_WG_OBJECTSTATE_ALLIANCE_INTACT - (m_Team * 3);
@@ -1159,7 +1159,7 @@ struct BfWGGameObjectBuilding
             m_WG->SendWarningToAllInZone(m_damagedText);
 
         for (GuidSet::const_iterator itr = m_CreatureTopList[m_WG->GetAttackerTeam()].begin(); itr != m_CreatureTopList[m_WG->GetAttackerTeam()].end(); ++itr)
-			if (Unit* unit = ObjectAccessor::FindUnit(*itr))
+            if (Unit* unit = ObjectAccessor::FindUnit(*itr))
                 if (Creature* creature = unit->ToCreature())
                     m_WG->HideNpc(creature);
 
@@ -1187,8 +1187,8 @@ struct BfWGGameObjectBuilding
         {
             // Inform the global wintergrasp script of the destruction of this object
             case BATTLEFIELD_WG_OBJECTTYPE_TOWER:
-				m_WG->UpdatedDestroyedTowerCount(TeamId(m_Team), ObjectAccessor::GetObjectInWorld(m_Build, (GameObject*)NULL));
-				break;
+                m_WG->UpdatedDestroyedTowerCount(TeamId(m_Team), ObjectAccessor::GetObjectInWorld(m_Build, (GameObject*)NULL));
+                break;
             case BATTLEFIELD_WG_OBJECTTYPE_DOOR_LAST:
                 m_WG->SetRelicInteractible(true);
                 if (GameObject* go = m_WG->GetRelic())
@@ -1196,11 +1196,11 @@ struct BfWGGameObjectBuilding
                 else
                     sLog->outError("BattlefieldWG: Relic not found.");
                 break;
-			case BATTLEFIELD_WG_OBJECTTYPE_DOOR:
-			case BATTLEFIELD_WG_OBJECTTYPE_WALL:
-			case BATTLEFIELD_WG_OBJECTTYPE_KEEP_TOWER:
-				m_WG->UpdatedDestroyedTowerCount(TeamId(m_Team), ObjectAccessor::GetObjectInWorld(m_Build, (GameObject*)NULL));
-				break;
+            case BATTLEFIELD_WG_OBJECTTYPE_DOOR:
+            case BATTLEFIELD_WG_OBJECTTYPE_WALL:
+            case BATTLEFIELD_WG_OBJECTTYPE_KEEP_TOWER:
+                m_WG->UpdatedDestroyedTowerCount(TeamId(m_Team), ObjectAccessor::GetObjectInWorld(m_Build, (GameObject*)NULL));
+                break;
         }
 
         m_WG->BrokenWallOrTower(TeamId(m_Team));
@@ -1219,7 +1219,7 @@ struct BfWGGameObjectBuilding
 
         // NameId for Warning text
         m_damagedText = damageText;
-		m_destroyedText = destroyText;
+        m_destroyedText = destroyText;
 
         switch (m_Type)
         {
@@ -1376,17 +1376,17 @@ struct BfWGGameObjectBuilding
 
     void UpdateTurretAttack(bool disable)
     {
-		GameObject* build = ObjectAccessor::GetObjectInWorld(m_Build, (GameObject*)NULL);
-		if (!build)
-			return;
+        GameObject* build = ObjectAccessor::GetObjectInWorld(m_Build, (GameObject*)NULL);
+        if (!build)
+            return;
 
-		uint32 faction = 0;
-		switch (build->GetEntry())
+        uint32 faction = 0;
+        switch (build->GetEntry())
         {
             case GO_WINTERGRASP_FORTRESS_TOWER_1:
             case GO_WINTERGRASP_FORTRESS_TOWER_2:
-			case GO_WINTERGRASP_FORTRESS_TOWER_3:
-			case GO_WINTERGRASP_FORTRESS_TOWER_4:
+            case GO_WINTERGRASP_FORTRESS_TOWER_3:
+            case GO_WINTERGRASP_FORTRESS_TOWER_4:
                 faction = WintergraspFaction[m_WG->GetDefenderTeam()];
                 break;
             case GO_WINTERGRASP_SHADOWSIGHT_TOWER:
@@ -1396,19 +1396,19 @@ struct BfWGGameObjectBuilding
                 break;
         }
 
-		for (GuidSet::const_iterator itr = m_TowerCannonBottomList.begin(); itr != m_TowerCannonBottomList.end(); ++itr)
-		{
+        for (GuidSet::const_iterator itr = m_TowerCannonBottomList.begin(); itr != m_TowerCannonBottomList.end(); ++itr)
+        {
             if (Unit* unit = ObjectAccessor::FindUnit(*itr))
-			{
+            {
                 if (Creature* creature = unit->ToCreature())
-				{
-					creature->setFaction(faction);
+                {
+                    creature->setFaction(faction);
                     if (disable)
                         m_WG->HideNpc(creature);
                     else
                         m_WG->ShowNpc(creature, true);
-				}
-			}
+                }
+            }
         }
 
         for (GuidSet::const_iterator itr = m_TurretTopList.begin(); itr != m_TurretTopList.end(); ++itr)
@@ -1417,7 +1417,7 @@ struct BfWGGameObjectBuilding
             {
                 if (Creature* creature = unit->ToCreature())
                 {
-					creature->setFaction(faction);
+                    creature->setFaction(faction);
                     if (disable)
                         m_WG->HideNpc(creature);
                     else
@@ -1487,10 +1487,10 @@ struct WGWorkshop
         }
 
         if (!init)
-		{
+        {
             bf->UpdateCounterVehicle(false);
-			bf->CapturePointTaken(bf->GetAreaByGraveyardId(workshopId));
-		}
+            bf->CapturePointTaken(bf->GetAreaByGraveyardId(workshopId));
+        }
     }
 
     void UpdateGraveyardAndWorkshop()
