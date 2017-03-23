@@ -912,7 +912,7 @@ void BattlefieldWG::SendInitWorldStatesTo(Player* player)
     data << uint32(m_ZoneId);
     data << uint32(0);
     data << uint16(10 + BuildingsInZone.size() + WorkshopsList.size()); // Number of fields
-	
+
     FillInitialWorldStates(data);
 
     player->GetSession()->SendPacket(&data);
@@ -1051,7 +1051,7 @@ uint32 BattlefieldWG::GetHonorBuff(int32 stack) const
 
 void BattlefieldWG::AddUpdateTenacity(Player* player)
 {
-	m_updateTenacityList.insert(player->GetGUID());
+    m_updateTenacityList.insert(player->GetGUID());
 }
 
 void BattlefieldWG::RemoveUpdateTenacity(Player* player)
