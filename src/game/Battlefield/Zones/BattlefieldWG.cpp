@@ -33,8 +33,8 @@ bool BattlefieldWG::SetupBattlefield()
     m_ZoneId = BATTLEFIELD_WG_ZONEID;
     m_MapId = BATTLEFIELD_WG_MAPID;
 
-	// init stalker AFTER setting map id... we spawn it at map=random memory value?...
-	InitStalker(BATTLEFIELD_WG_NPC_STALKER, WintergraspStalkerPos[0], WintergraspStalkerPos[1], WintergraspStalkerPos[2], WintergraspStalkerPos[3]);
+    // init stalker AFTER setting map id... we spawn it at map=random memory value?...
+    InitStalker(BATTLEFIELD_WG_NPC_STALKER, WintergraspStalkerPos[0], WintergraspStalkerPos[1], WintergraspStalkerPos[2], WintergraspStalkerPos[3]);
 
     m_MaxPlayer = sWorld->getIntConfig(CONFIG_WINTERGRASP_PLR_MAX);
     m_IsEnabled = sWorld->getBoolConfig(CONFIG_WINTERGRASP_ENABLE);
@@ -49,7 +49,7 @@ bool BattlefieldWG::SetupBattlefield()
     m_StartGrouping = false;
 
     m_tenacityStack = 0;
-	m_titansRelic = 0;
+    m_titansRelic = 0;
 
     KickPosition.Relocate(5728.117f, 2714.346f, 697.733f, 0);
     KickPosition.m_mapId = m_MapId;
@@ -189,19 +189,19 @@ bool BattlefieldWG::Update(uint32 diff)
     else
         m_saveTimer -= diff;
 
-	// Update Tenacity
-	if (IsWarTime())
-	{
-		if (m_tenacityUpdateTimer <= diff)
-		{
-			m_tenacityUpdateTimer = 10000;
-			if (!m_updateTenacityList.empty())
-				UpdateTenacity();
-			m_updateTenacityList.clear();
-		}
-		else
-			m_tenacityUpdateTimer -= diff;
-	}
+    // Update Tenacity
+    if (IsWarTime())
+    {
+        if (m_tenacityUpdateTimer <= diff)
+        {
+            m_tenacityUpdateTimer = 10000;
+            if (!m_updateTenacityList.empty())
+                UpdateTenacity();
+            m_updateTenacityList.clear();
+        }
+        else
+            m_tenacityUpdateTimer -= diff;
+    }
 
     return m_return;
 }
@@ -217,8 +217,8 @@ void BattlefieldWG::OnBattleStart()
         // Set in use (not allow to click on before last door is broken)
         go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
 
-		// save guid
-		m_titansRelic = go->GetGUID();
+        // save guid
+        m_titansRelic = go->GetGUID();
     }
     else
         sLog->outError("WG: Failed to spawn titan relic.");
@@ -247,7 +247,7 @@ void BattlefieldWG::OnBattleStart()
         }
     }
 
-	SetData(BATTLEFIELD_WG_DATA_INTACT_TOWER_ATT, WG_MAX_ATTACKTOWERS);
+    SetData(BATTLEFIELD_WG_DATA_INTACT_TOWER_ATT, WG_MAX_ATTACKTOWERS);
     SetData(BATTLEFIELD_WG_DATA_BROKEN_TOWER_ATT, 0);
     SetData(BATTLEFIELD_WG_DATA_DAMAGED_TOWER_ATT, 0);
 
@@ -274,9 +274,9 @@ void BattlefieldWG::OnBattleStart()
     // Send start warning to all players
     SendWarningToAllInZone(BATTLEFIELD_WG_TEXT_START);
 
-	// Xinef: reset tenacity counter
-	m_tenacityStack = 0;
-	m_tenacityUpdateTimer = 20000;
+    // Xinef: reset tenacity counter
+    m_tenacityStack = 0;
+    m_tenacityUpdateTimer = 20000;
 
     if (sWorld->getBoolConfig(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_ENABLE))
         sWorld->SendWorldText(BATTLEFIELD_WG_WORLD_START_MESSAGE);
@@ -312,29 +312,29 @@ void BattlefieldWG::UpdateVehicleCountWG()
     for (uint8 i = 0; i < BG_TEAMS_COUNT; ++i)
         for (GuidSet::iterator itr = m_players[i].begin(); itr != m_players[i].end(); ++itr)
             if (Player* player = ObjectAccessor::FindPlayer(*itr))
-			{
+            {
                 player->SendUpdateWorldState(BATTLEFIELD_WG_WORLD_STATE_VEHICLE_H,     GetData(BATTLEFIELD_WG_DATA_VEHICLE_H));
                 player->SendUpdateWorldState(BATTLEFIELD_WG_WORLD_STATE_MAX_VEHICLE_H, GetData(BATTLEFIELD_WG_DATA_MAX_VEHICLE_H));
                 player->SendUpdateWorldState(BATTLEFIELD_WG_WORLD_STATE_VEHICLE_A,     GetData(BATTLEFIELD_WG_DATA_VEHICLE_A));
                 player->SendUpdateWorldState(BATTLEFIELD_WG_WORLD_STATE_MAX_VEHICLE_A, GetData(BATTLEFIELD_WG_DATA_MAX_VEHICLE_A));
-			}
+            }
 }
 
 void BattlefieldWG::CapturePointTaken(uint32 areaId)
 {
-	for (uint8 i = 0; i < BG_TEAMS_COUNT; ++i)
+    for (uint8 i = 0; i < BG_TEAMS_COUNT; ++i)
         for (GuidSet::iterator itr = m_players[i].begin(); itr != m_players[i].end(); ++itr)
             if (Player* player = ObjectAccessor::FindPlayer(*itr))
-				if (player->GetAreaId() == areaId)
-					player->UpdateAreaDependentAuras(areaId);
+                if (player->GetAreaId() == areaId)
+                    player->UpdateAreaDependentAuras(areaId);
 }
 
 void BattlefieldWG::OnBattleEnd(bool endByTimer)
 {
-	// Remove relic
-	if (GameObject* go = GetRelic())
-		go->RemoveFromWorld();
-	m_titansRelic = 0;
+    // Remove relic
+    if (GameObject* go = GetRelic())
+        go->RemoveFromWorld();
+    m_titansRelic = 0;
 
     // Remove turret
     for (GuidSet::const_iterator itr = CanonList.begin(); itr != CanonList.end(); ++itr)
@@ -389,11 +389,11 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
         
     // Saving data
     for (GameObjectBuilding::const_iterator itr = BuildingsInZone.begin(); itr != BuildingsInZone.end(); ++itr)
-	{
-		(*itr)->Rebuild();
+    {
+        (*itr)->Rebuild();
         (*itr)->Save();
-		(*itr)->UpdateTurretAttack(true);
-	}
+        (*itr)->UpdateTurretAttack(true);
+    }
 
     for (Workshop::const_iterator itr = WorkshopsList.begin(); itr != WorkshopsList.end(); ++itr)
         (*itr)->Save();
@@ -403,59 +403,59 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
         for (GuidSet::const_iterator itr = m_vehicles[team].begin(); itr != m_vehicles[team].end(); ++itr)
             if (Unit* unit = ObjectAccessor::FindUnit(*itr))
                 if (Creature* creature = unit->ToCreature())
-					creature->DespawnOrUnsummon(1);
+                    creature->DespawnOrUnsummon(1);
 
         m_vehicles[team].clear();
     }
 
-	uint8 damagedTowersDef = GetData(BATTLEFIELD_WG_DATA_DAMAGED_TOWER_ATT);
-	uint8 brokenTowersDef = GetData(BATTLEFIELD_WG_DATA_BROKEN_TOWER_ATT);
-	uint8 damagedTowersAtt = GetData(BATTLEFIELD_WG_DATA_DAMAGED_TOWER_ATT);
-	uint8 brokenTowersAtt = GetData(BATTLEFIELD_WG_DATA_INTACT_TOWER_ATT);
-	uint32 spellDamagedDef = SPELL_DAMAGED_TOWER;
-	uint32 spellFullDef = SPELL_DESTROYED_TOWER;
-	uint32 spellDamagedAtt = SPELL_DAMAGED_BUILDING;
-	uint32 spellFullAtt = SPELL_INTACT_BUILDING;
+    uint8 damagedTowersDef = GetData(BATTLEFIELD_WG_DATA_DAMAGED_TOWER_ATT);
+    uint8 brokenTowersDef = GetData(BATTLEFIELD_WG_DATA_BROKEN_TOWER_ATT);
+    uint8 damagedTowersAtt = GetData(BATTLEFIELD_WG_DATA_DAMAGED_TOWER_ATT);
+    uint8 brokenTowersAtt = GetData(BATTLEFIELD_WG_DATA_INTACT_TOWER_ATT);
+    uint32 spellDamagedDef = SPELL_DAMAGED_TOWER;
+    uint32 spellFullDef = SPELL_DESTROYED_TOWER;
+    uint32 spellDamagedAtt = SPELL_DAMAGED_BUILDING;
+    uint32 spellFullAtt = SPELL_INTACT_BUILDING;
 
-	if (!endByTimer)
-	{
-		brokenTowersDef = GetData(BATTLEFIELD_WG_DATA_INTACT_TOWER_ATT);
-		brokenTowersAtt = GetData(BATTLEFIELD_WG_DATA_BROKEN_TOWER_ATT);
-		spellDamagedDef = SPELL_DAMAGED_BUILDING;
-		spellFullDef = SPELL_INTACT_BUILDING;
-		spellDamagedAtt = SPELL_DAMAGED_TOWER;
-		spellFullAtt = SPELL_DESTROYED_TOWER;
-	}
+    if (!endByTimer)
+    {
+        brokenTowersDef = GetData(BATTLEFIELD_WG_DATA_INTACT_TOWER_ATT);
+        brokenTowersAtt = GetData(BATTLEFIELD_WG_DATA_BROKEN_TOWER_ATT);
+        spellDamagedDef = SPELL_DAMAGED_BUILDING;
+        spellFullDef = SPELL_INTACT_BUILDING;
+        spellDamagedAtt = SPELL_DAMAGED_TOWER;
+        spellFullAtt = SPELL_DESTROYED_TOWER;
+    }
 
-	for (GuidSet::const_iterator itr = m_PlayersInWar[GetDefenderTeam()].begin(); itr != m_PlayersInWar[GetDefenderTeam()].end(); ++itr)
+    for (GuidSet::const_iterator itr = m_PlayersInWar[GetDefenderTeam()].begin(); itr != m_PlayersInWar[GetDefenderTeam()].end(); ++itr)
     {
         if (Player* player = ObjectAccessor::FindPlayer(*itr))
         {
-			// Victory in Wintergrasp
-			player->AreaExploredOrEventHappens(GetDefenderTeam() ? 13183 : 13181); // HORDE / ALLY win wg quest id
+            // Victory in Wintergrasp
+            player->AreaExploredOrEventHappens(GetDefenderTeam() ? 13183 : 13181); // HORDE / ALLY win wg quest id
             
-			player->CastSpell(player, SPELL_ESSENCE_OF_WINTERGRASP, true);
+            player->CastSpell(player, SPELL_ESSENCE_OF_WINTERGRASP, true);
             player->CastSpell(player, SPELL_VICTORY_REWARD, true);
-			RemoveAurasFromPlayer(player);
+            RemoveAurasFromPlayer(player);
 
-			for (uint8 i = 0; i < damagedTowersDef; ++i)
-				player->CastSpell(player, spellDamagedDef, true);
-			for (uint8 i = 0; i < brokenTowersDef; ++i)
-				player->CastSpell(player, spellFullDef, true);
+            for (uint8 i = 0; i < damagedTowersDef; ++i)
+                player->CastSpell(player, spellDamagedDef, true);
+            for (uint8 i = 0; i < brokenTowersDef; ++i)
+                player->CastSpell(player, spellFullDef, true);
         }
     }
 
     for (GuidSet::const_iterator itr = m_PlayersInWar[GetAttackerTeam()].begin(); itr != m_PlayersInWar[GetAttackerTeam()].end(); ++itr)
         if (Player* player = ObjectAccessor::FindPlayer(*itr))
-		{
+        {
             player->CastSpell(player, SPELL_DEFEAT_REWARD, true);
-			RemoveAurasFromPlayer(player);
+            RemoveAurasFromPlayer(player);
 
-			for (uint8 i = 0; i < damagedTowersAtt; ++i)
-				player->CastSpell(player, spellDamagedAtt, true);
-			for (uint8 i = 0; i < brokenTowersAtt; ++i)
-				player->CastSpell(player, spellFullAtt, true);
-		}
+            for (uint8 i = 0; i < damagedTowersAtt; ++i)
+                player->CastSpell(player, spellDamagedAtt, true);
+            for (uint8 i = 0; i < brokenTowersAtt; ++i)
+                player->CastSpell(player, spellFullAtt, true);
+        }
 
     if (!endByTimer)
     {
