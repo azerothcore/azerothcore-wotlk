@@ -1136,7 +1136,7 @@ struct BfWGGameObjectBuilding
         GameObject* go = ObjectAccessor::GetObjectInWorld(m_Build, (GameObject*)NULL);
         if (go)
         {
-         // Rebuild gameobject
+            // Rebuild gameobject
             go->SetDestructibleState(GO_DESTRUCTIBLE_REBUILDING, NULL, true);
             go->SetUInt32Value(GAMEOBJECT_FACTION, WintergraspFaction[m_Team]);
         }
