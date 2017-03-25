@@ -1264,6 +1264,11 @@ void ScriptMgr::OnPlayerLogin(Player* player)
     FOREACH_SCRIPT(PlayerScript)->OnLogin(player);
 }
 
+void ScriptMgr::OnPlayerLoadFromDB(Player* player)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnLoadFromDB(player);
+}
+
 void ScriptMgr::OnPlayerLogout(Player* player)
 {
     FOREACH_SCRIPT(PlayerScript)->OnLogout(player);
