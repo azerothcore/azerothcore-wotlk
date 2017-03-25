@@ -105,5 +105,21 @@ if ( NOJEM )
   message(" *** DO NOT DISABLE IT UNLESS YOU KNOW WHAT YOU'RE DOING!")
 endif()
 
+# Performance optimization options:
+
+if( DISABLE_EXTRAS )
+  message("* Disable extra features    : Yes")
+  add_definitions(-DDISABLE_EXTRAS)
+else()
+  message("* Disable extra features     : No  (default)")
+endif()
+
+if( DISABLE_VMAP_CHECKS )
+  message("* Disable vmap DisableMgr checks    : Yes")
+  add_definitions(-DDISABLE_VMAP_CHECKS)
+else()
+  message("* Disable vmap DisableMgr checks     : No  (default)")
+endif()
+
 message("")
 
