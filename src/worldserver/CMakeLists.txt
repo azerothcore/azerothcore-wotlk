@@ -65,6 +65,7 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/modules/worldengine/nucleus/src/Threading
   ${CMAKE_SOURCE_DIR}/modules/worldengine/nucleus/src/Utilities
   ${CMAKE_SOURCE_DIR}/modules/acore/game-framework/src/Addons
+  ${game_INCLUDE_DIRS}
   ${CMAKE_SOURCE_DIR}/src/game
   ${CMAKE_SOURCE_DIR}/src/game/Accounts
   ${CMAKE_SOURCE_DIR}/src/game/Achievements

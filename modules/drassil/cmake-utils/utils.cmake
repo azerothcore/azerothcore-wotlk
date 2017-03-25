@@ -58,6 +58,19 @@ MACRO(CU_SET_CACHE name val)
   set(${name} ${val} CACHE INTERNAL "CU Var")
 ENDMACRO()
 
+#
+# CU_LIST_ADD_CACHE
+#
+MACRO(CU_LIST_ADD_CACHE name val)
+
+    # avoid duplicates
+    if (";${${name}};" MATCHES ";${val};")
+      # nothing to do for now
+    else()
+        set(${name} ${val} ${${name}} CACHE INTERNAL "CU Var")
+    endif()
+ENDMACRO()
+
 
 #
 # CU_SET_PATH
@@ -72,14 +85,19 @@ ENDMACRO()
 # CU_ADD_INC_PATH
 #
 MACRO(CU_ADD_INC_PATH val)
-    set(CU_INC_PATHS
-        ${CU_INC_PATHS}
-        ${val}
-    )
 
-    #update cache
-    CU_SET_CACHE("CU_INC_PATHS" "${CU_INC_PATHS}")
-    include_directories(${val})
+    if (";${CU_INC_PATHS};" MATCHES ";${val};")
+      # nothing to do for now
+    else()
+        set(CU_INC_PATHS
+            ${CU_INC_PATHS}
+            ${val}
+        )
+
+        #update cache
+        CU_SET_CACHE("CU_INC_PATHS" "${CU_INC_PATHS}")
+        include_directories(${val})
+    endif()
 ENDMACRO()
 
 
