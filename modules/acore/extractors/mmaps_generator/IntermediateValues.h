@@ -12,8 +12,6 @@
 #include "Recast.h"
 #include "DetourNavMesh.h"
 
-#include "Database/DatabaseEnv.h"
-
 namespace MMAP
 {
     // this class gathers all debug info holding and output

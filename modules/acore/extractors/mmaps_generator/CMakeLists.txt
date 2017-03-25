@@ -120,6 +120,7 @@ include_directories(${mmap_gen_Includes})
 add_executable(mmaps_generator ${mmap_gen_sources})
 
 target_link_libraries(mmaps_generator
+  shared
   collision
   g3dlib
   Recast
