@@ -4154,6 +4154,56 @@ class spell_gen_bandage : public SpellScriptLoader
         }
 };
 
+// Blade Warding - 64440
+enum BladeWarding
+{
+	SPELL_GEN_BLADE_WARDING_TRIGGERED = 64442
+};
+
+class spell_gen_blade_warding : public SpellScriptLoader
+{
+public:
+	spell_gen_blade_warding() : SpellScriptLoader("spell_gen_blade_warding") { }
+
+	class spell_gen_blade_warding_AuraScript : public AuraScript
+	{
+		PrepareAuraScript(spell_gen_blade_warding_AuraScript);
+
+		bool Validate(SpellInfo const* /*spellInfo*/)
+		{
+			if (!sSpellMgr->GetSpellInfo(SPELL_GEN_BLADE_WARDING_TRIGGERED))
+				return false;
+			return true;
+		}
+
+		void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+		{
+			PreventDefaultAction();
+
+			Unit* caster = eventInfo.GetActionTarget();
+			SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(SPELL_GEN_BLADE_WARDING_TRIGGERED);
+
+			uint8 stacks = GetStackAmount();
+			int32 bp = 0;
+
+			for (uint8 i = 0; i < stacks; ++i)
+				bp += spellInfo->Effects[EFFECT_0].CalcValue(caster);
+
+			caster->CastCustomSpell(SPELL_GEN_BLADE_WARDING_TRIGGERED, SPELLVALUE_BASE_POINT0, bp, eventInfo.GetActor(), TRIGGERED_FULL_MASK, nullptr, aurEff);
+		}
+
+		void Register()
+		{
+			OnEffectProc += AuraEffectProcFn(spell_gen_blade_warding_AuraScript::HandleProc, EFFECT_1, SPELL_AURA_PROC_TRIGGER_SPELL);
+		}
+	};
+
+	AuraScript* GetAuraScript() const
+	{
+		return new spell_gen_blade_warding_AuraScript();
+	}
+};
+
 enum GenericLifebloom
 {
     SPELL_HEXLORD_MALACRASS_LIFEBLOOM_FINAL_HEAL        = 43422,
@@ -4964,6 +5014,7 @@ void AddSC_generic_spell_scripts()
     new spell_gen_count_pct_from_max_hp("spell_gen_100pct_count_pct_from_max_hp", 100);
     new spell_gen_despawn_self();
     new spell_gen_bandage();
+    new spell_gen_blade_warding();
     new spell_gen_lifebloom("spell_hexlord_lifebloom", SPELL_HEXLORD_MALACRASS_LIFEBLOOM_FINAL_HEAL);
     new spell_gen_lifebloom("spell_tur_ragepaw_lifebloom", SPELL_TUR_RAGEPAW_LIFEBLOOM_FINAL_HEAL);
     new spell_gen_lifebloom("spell_cenarion_scout_lifebloom", SPELL_CENARION_SCOUT_LIFEBLOOM_FINAL_HEAL);
