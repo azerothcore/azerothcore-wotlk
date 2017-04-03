@@ -1,0 +1,42 @@
+[worldserver]
+#
+###################################################################################################
+
+###################################################################################################
+#
+# RANDOM ENCHANTS OPTIONS
+#
+#     RandomEnchants.AnnounceOnLogin
+#        Announce a message on login for this module
+#        Default:     1
+
+RandomEnchants.AnnounceOnLogin=1
+
+#
+#     RandomEnchants.OnLoginMessage
+#        Message to display on login(Only applies if AnnounceOnLogin is enabled)
+#        Default:    "This server is running a RandomEnchants Module."
+
+RandomEnchants.OnLoginMessage="This server is running a RandomEnchants Module."
+
+#
+#     RandomEnchants.OnLoot
+#        Chance at random enchant on looting an item
+#        Default:     1
+
+RandomEnchants.OnLoot=1
+
+#
+#     RandomEnchants.OnCreate
+#        Chance at random enchant on creating an item via profession
+#        Default:     1
+
+RandomEnchants.OnCreate=1
+
+#
+#     RandomEnchants.OnQuestReward
+#        Chance at random enchant on obtaining item from quest reward
+#        Default:     1
+
+RandomEnchants.OnQuestReward=1
+
