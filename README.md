@@ -1,6 +1,6 @@
 # ![logo](https://raw.githubusercontent.com/azerothcore/azerothcore.github.io/master/images/logo-github.png) AzerothCore
 
-[![Gitter](https://badges.gitter.im/azerothcore/azerothcore.svg)](https://gitter.im/azerothcore/azerothcore?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![Bountysource](https://www.bountysource.com/badge/tracker?tracker_id=40032087)](https://www.bountysource.com/teams/azerothcore/bounties) [![Master Build Status](https://travis-ci.org/azerothcore/azerothcore-wotlk.svg)](https://travis-ci.org/azerothcore/azerothcore-wotlk) [![Issue Stats](http://www.issuestats.com/github/AzerothCore/azerothcore-wotlk/badge/issue)](http://www.issuestats.com/github/AzerothCore/azerothcore-wotlk) [![Issue Stats](http://www.issuestats.com/github/AzerothCore/azerothcore-wotlk/badge/pr)](http://www.issuestats.com/github/AzerothCore/azerothcore-wotlk)
+[![Bountysource](https://www.bountysource.com/badge/tracker?tracker_id=40032087)](https://www.bountysource.com/teams/azerothcore/bounties) [![Master Build Status](https://travis-ci.org/azerothcore/azerothcore-wotlk.svg)](https://travis-ci.org/azerothcore/azerothcore-wotlk) [![Issue Stats](http://www.issuestats.com/github/AzerothCore/azerothcore-wotlk/badge/issue)](http://www.issuestats.com/github/AzerothCore/azerothcore-wotlk) [![Issue Stats](http://www.issuestats.com/github/AzerothCore/azerothcore-wotlk/badge/pr)](http://www.issuestats.com/github/AzerothCore/azerothcore-wotlk)
 
 ## Introduction
 
@@ -19,7 +19,7 @@ We also believe in [software modularity](https://en.wikipedia.org/wiki/Modular_p
 AzerothCore is a learning project.
 If you want to learn how to use C++, SQL, git, etc... you came to the right place! We will gladly to help you: **programming is our passion**.
 
-If you want to contribute, in [our wiki](https://github.com/azerothcore/azerothcore-wotlk/wiki) you fill find a lot of resources that will guide you. Also you can poke us in [our gitter chat channel](https://gitter.im/azerothcore/azerothcore).
+If you want to contribute, in [our wiki](https://github.com/azerothcore/azerothcore-wotlk/wiki) you fill find a lot of resources that will guide you. Also you can poke us in [our discord chat server](https://discord.gg/gkt4y2x).
 
 
 ## Authors & Contributors
