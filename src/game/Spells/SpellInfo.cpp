@@ -2446,8 +2446,8 @@ SpellInfo const* SpellInfo::GetPrevRankSpell() const
 SpellInfo const* SpellInfo::GetAuraRankForLevel(uint8 level) const
 {
     // ignore passive spells
-    if (IsPassive())
-        return this;
+    //if (IsPassive())
+    //    return this;
 
     bool needRankSelection = false;
     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)

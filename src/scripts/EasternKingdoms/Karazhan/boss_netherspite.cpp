@@ -249,6 +249,7 @@ public:
         {
             HandleDoors(false);
             SwitchToPortalPhase();
+            DoZoneInCombat();
         }
 
         void JustDied(Unit* /*killer*/)
@@ -267,7 +268,8 @@ public:
             {
                 DoCast(SelectTarget(SELECT_TARGET_RANDOM, 1, 45, true), SPELL_VOIDZONE, true);
                 VoidZoneTimer = 15000;
-            } else VoidZoneTimer -= diff;
+            } else 
+                VoidZoneTimer -= diff;
 
             // NetherInfusion Berserk
             if (!Berserk && NetherInfusionTimer <= diff)
@@ -275,7 +277,8 @@ public:
                 me->AddAura(SPELL_NETHER_INFUSION, me);
                 DoCast(me, SPELL_NETHERSPITE_ROAR);
                 Berserk = true;
-            } else NetherInfusionTimer -= diff;
+            } else 
+                NetherInfusionTimer -= diff;
 
             if (PortalPhase) // PORTAL PHASE
             {
@@ -284,7 +287,8 @@ public:
                 {
                     UpdatePortals();
                     PortalTimer = 1000;
-                } else PortalTimer -= diff;
+                } else 
+                    PortalTimer -= diff;
 
                 // Empowerment & Nether Burn
                 if (EmpowermentTimer <= diff)
@@ -292,7 +296,8 @@ public:
                     DoCast(me, SPELL_EMPOWERMENT);
                     me->AddAura(SPELL_NETHERBURN_AURA, me);
                     EmpowermentTimer = 90000;
-                } else EmpowermentTimer -= diff;
+                } else 
+                    EmpowermentTimer -= diff;
 
                 if (PhaseTimer <= diff)
                 {
@@ -301,7 +306,8 @@ public:
                         SwitchToBanishPhase();
                         return;
                     }
-                } else PhaseTimer -= diff;
+                } else 
+                    PhaseTimer -= diff;
             }
             else // BANISH PHASE
             {
@@ -311,7 +317,8 @@ public:
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 40, true))
                         DoCast(target, SPELL_NETHERBREATH);
                     NetherbreathTimer = urand(5000, 7000);
-                } else NetherbreathTimer -= diff;
+                } else 
+                    NetherbreathTimer -= diff;
 
                 if (PhaseTimer <= diff)
                 {
@@ -320,7 +327,8 @@ public:
                         SwitchToPortalPhase();
                         return;
                     }
-                } else PhaseTimer -= diff;
+                } else 
+                    PhaseTimer -= diff;
             }
 
             DoMeleeAttackIfReady();

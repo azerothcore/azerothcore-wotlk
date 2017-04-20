@@ -14,8 +14,6 @@
 #include "G3D/Vector3.h"
 #include "G3D/Matrix3.h"
 
-#include "Database/DatabaseEnv.h"
-
 namespace MMAP
 {
     enum Spot

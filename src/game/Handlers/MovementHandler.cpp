@@ -23,6 +23,7 @@
 #include "ArenaSpectator.h"
 #include "Chat.h"
 #include "BattlegroundMgr.h"
+#include "ScriptMgr.h"
 
 #define MOVEMENT_PACKET_TIME_DELAY 0
 
@@ -74,7 +75,7 @@ void WorldSession::HandleMoveWorldportAckOpcode()
     Map* newMap = sMapMgr->CreateMap(loc.GetMapId(), GetPlayer());
     // the CanEnter checks are done in TeleporTo but conditions may change
     // while the player is in transit, for example the map may get full
-    if (!newMap || !newMap->CanEnter(GetPlayer()))
+    if (!newMap || !newMap->CanEnter(GetPlayer(), false))
     {
         sLog->outError("Map %d could not be created for player %d, porting player to homebind", loc.GetMapId(), GetPlayer()->GetGUIDLow());
         GetPlayer()->TeleportTo(GetPlayer()->m_homebindMapId, GetPlayer()->m_homebindX, GetPlayer()->m_homebindY, GetPlayer()->m_homebindZ, GetPlayer()->GetOrientation());
@@ -392,6 +393,8 @@ void WorldSession::HandleMovementOpcodes(WorldPacket & recvData)
         // now client not include swimming flag in case jumping under water
         plrMover->SetInWater(!plrMover->IsInWater() || plrMover->GetBaseMap()->IsUnderWater(movementInfo.pos.GetPositionX(), movementInfo.pos.GetPositionY(), movementInfo.pos.GetPositionZ()));
     }
+    if (plrMover)//Hook for OnPlayerMove
+        sScriptMgr->OnPlayerMove(plrMover, movementInfo, opcode);
     // Dont allow to turn on walking if charming other player
     if (mover->GetGUID() != _player->GetGUID())
         movementInfo.flags &= ~MOVEMENTFLAG_WALKING;

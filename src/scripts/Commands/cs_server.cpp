@@ -30,29 +30,25 @@ public:
         static std::vector<ChatCommand> serverIdleRestartCommandTable =
         {
             { "cancel",         SEC_ADMINISTRATOR,  true,  &HandleServerShutDownCancelCommand,      "" },
-            { ""   ,            SEC_ADMINISTRATOR,  true,  &HandleServerIdleRestartCommand,         "" },
-            { NULL,             0,                  false, NULL,                                    "" }
+            { ""   ,            SEC_ADMINISTRATOR,  true,  &HandleServerIdleRestartCommand,         "" }
         };
 
         static std::vector<ChatCommand> serverIdleShutdownCommandTable =
         {
             { "cancel",         SEC_ADMINISTRATOR,  true,  &HandleServerShutDownCancelCommand,      "" },
-            { ""   ,            SEC_ADMINISTRATOR,  true,  &HandleServerIdleShutDownCommand,        "" },
-            { NULL,             0,                  false, NULL,                                    "" }
+            { ""   ,            SEC_ADMINISTRATOR,  true,  &HandleServerIdleShutDownCommand,        "" }
         };
 
         static std::vector<ChatCommand> serverRestartCommandTable =
         {
             { "cancel",         SEC_ADMINISTRATOR,  true,  &HandleServerShutDownCancelCommand,      "" },
-            { ""   ,            SEC_ADMINISTRATOR,  true,  &HandleServerRestartCommand,             "" },
-            { NULL,             0,                  false, NULL,                                    "" }
+            { ""   ,            SEC_ADMINISTRATOR,  true,  &HandleServerRestartCommand,             "" }
         };
 
         static std::vector<ChatCommand> serverShutdownCommandTable =
         {
             { "cancel",         SEC_ADMINISTRATOR,  true,  &HandleServerShutDownCancelCommand,      "" },
-            { ""   ,            SEC_ADMINISTRATOR,  true,  &HandleServerShutDownCommand,            "" },
-            { NULL,             0,                  false, NULL,                                    "" }
+            { ""   ,            SEC_ADMINISTRATOR,  true,  &HandleServerShutDownCommand,            "" }
         };
 
         static std::vector<ChatCommand> serverSetCommandTable =
@@ -61,29 +57,26 @@ public:
             { "loglevel",       SEC_CONSOLE,        true,  &HandleServerSetLogLevelCommand,         "" },
             { "logfilelevel",   SEC_CONSOLE,        true,  &HandleServerSetLogFileLevelCommand,     "" },
             { "motd",           SEC_ADMINISTRATOR,  true,  &HandleServerSetMotdCommand,             "" },
-            { "closed",         SEC_ADMINISTRATOR,  true,  &HandleServerSetClosedCommand,           "" },
-            { NULL,             0,                  false, NULL,                                    "" }
+            { "closed",         SEC_ADMINISTRATOR,  true,  &HandleServerSetClosedCommand,           "" }
         };
 
         static std::vector<ChatCommand> serverCommandTable =
         {
             { "corpses",        SEC_GAMEMASTER,     true,  &HandleServerCorpsesCommand,             "" },
             { "exit",           SEC_CONSOLE,        true,  &HandleServerExitCommand,                "" },
-            { "idlerestart",    SEC_ADMINISTRATOR,  true,  NULL,                                    "", serverIdleRestartCommandTable },
-            { "idleshutdown",   SEC_ADMINISTRATOR,  true,  NULL,                                    "", serverIdleShutdownCommandTable },
+            { "idlerestart",    SEC_ADMINISTRATOR,  true,  nullptr,                                 "", serverIdleRestartCommandTable },
+            { "idleshutdown",   SEC_ADMINISTRATOR,  true,  nullptr,                                 "", serverIdleShutdownCommandTable },
             { "info",           SEC_PLAYER,         true,  &HandleServerInfoCommand,                "" },
             { "motd",           SEC_PLAYER,         true,  &HandleServerMotdCommand,                "" },
-            { "restart",        SEC_ADMINISTRATOR,  true,  NULL,                                    "", serverRestartCommandTable },
-            { "shutdown",       SEC_ADMINISTRATOR,  true,  NULL,                                    "", serverShutdownCommandTable },
-            { "set",            SEC_ADMINISTRATOR,  true,  NULL,                                    "", serverSetCommandTable },
-            { "togglequerylog", SEC_CONSOLE,        true,  &HandleServerToggleQueryLogging,         "" },
-            { NULL,             0,                  false, NULL,                                    "" }
+            { "restart",        SEC_ADMINISTRATOR,  true,  nullptr,                                 "", serverRestartCommandTable },
+            { "shutdown",       SEC_ADMINISTRATOR,  true,  nullptr,                                 "", serverShutdownCommandTable },
+            { "set",            SEC_ADMINISTRATOR,  true,  nullptr,                                 "", serverSetCommandTable },
+            { "togglequerylog", SEC_CONSOLE,        true,  &HandleServerToggleQueryLogging,         "" }
         };
 
          static std::vector<ChatCommand> commandTable =
         {
-            { "server",         SEC_ADMINISTRATOR,  true,  NULL,                                    "", serverCommandTable },
-            { NULL,             0,                  false, NULL,                                    "" }
+            { "server",         SEC_PLAYER,         true,  nullptr,                                 "", serverCommandTable }
         };
         return commandTable;
     }
@@ -146,7 +139,7 @@ public:
             return false;
 
         char* timeStr = strtok((char*) args, " ");
-        char* exitCodeStr = strtok(NULL, "");
+        char* exitCodeStr = strtok(nullptr, "");
 
         int32 time = atoi(timeStr);
 
@@ -182,7 +175,7 @@ public:
             return false;
 
         char* timeStr = strtok((char*) args, " ");
-        char* exitCodeStr = strtok(NULL, "");
+        char* exitCodeStr = strtok(nullptr, "");
 
         int32 time = atoi(timeStr);
 
@@ -218,7 +211,7 @@ public:
             return false;
 
         char* timeStr = strtok((char*) args, " ");
-        char* exitCodeStr = strtok(NULL, "");
+        char* exitCodeStr = strtok(nullptr, "");
 
         int32 time = atoi(timeStr);
 
@@ -253,7 +246,7 @@ public:
             return false;
 
         char* timeStr = strtok((char*) args, " ");
-        char* exitCodeStr = strtok(NULL, "");
+        char* exitCodeStr = strtok(nullptr, "");
 
         int32 time = atoi(timeStr);
 

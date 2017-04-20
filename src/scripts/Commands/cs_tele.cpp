@@ -28,17 +28,15 @@ public:
     {
         static std::vector<ChatCommand> teleCommandTable =
         {
-            { "add",            SEC_ADMINISTRATOR,  false, &HandleTeleAddCommand,             "" },
-            { "del",            SEC_ADMINISTRATOR,  true,  &HandleTeleDelCommand,             "" },
+            { "add",            SEC_ADMINISTRATOR,   false, &HandleTeleAddCommand,             "" },
+            { "del",            SEC_ADMINISTRATOR,   true,  &HandleTeleDelCommand,             "" },
             { "name",           SEC_GAMEMASTER,      true,  &HandleTeleNameCommand,            "" },
             { "group",          SEC_GAMEMASTER,      false, &HandleTeleGroupCommand,           "" },
-            { "",               SEC_GAMEMASTER,      false, &HandleTeleCommand,                "" },
-            { NULL,             0,                  false, NULL,                              "" }
+            { "",               SEC_MODERATOR,       false, &HandleTeleCommand,                "" }
         };
         static std::vector<ChatCommand> commandTable =
         {
-            { "tele",           SEC_GAMEMASTER,      false, NULL,                   "", teleCommandTable },
-            { NULL,             0,                  false, NULL,                               "" }
+            { "tele",           SEC_MODERATOR,      false, nullptr,                            "", teleCommandTable }
         };
         return commandTable;
     }
@@ -187,7 +185,7 @@ public:
         else
         {
             // check offline security
-            if (handler->HasLowerSecurity(NULL, target_guid))
+            if (handler->HasLowerSecurity(nullptr, target_guid))
                 return false;
 
             std::string nameLink = handler->playerLink(target_name);
@@ -245,7 +243,7 @@ public:
             return false;
         }
 
-        for (GroupReference* itr = grp->GetFirstMember(); itr != NULL; itr = itr->next())
+        for (GroupReference* itr = grp->GetFirstMember(); itr != nullptr; itr = itr->next())
         {
             Player* player = itr->GetSource();
 

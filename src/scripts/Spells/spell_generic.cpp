@@ -1709,6 +1709,47 @@ class spell_gen_create_lance : public SpellScriptLoader
         }
 };
 
+enum MossCoveredFeet
+{
+    SPELL_FALL_DOWN = 6869
+};
+
+// 6870 Moss Covered Feet
+// 31399 Moss Covered Feet
+class spell_gen_moss_covered_feet : public SpellScriptLoader
+{
+    public:
+        spell_gen_moss_covered_feet() : SpellScriptLoader("spell_gen_moss_covered_feet") { }
+
+        class spell_gen_moss_covered_feet_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_gen_moss_covered_feet_AuraScript);
+
+            bool Validate(SpellInfo const* /*spellInfo*/) override
+            {
+                if (!sSpellMgr->GetSpellInfo(SPELL_FALL_DOWN))
+                    return false;
+                return true;
+            }
+
+            void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+            {
+                PreventDefaultAction();
+                eventInfo.GetActionTarget()->CastSpell((Unit*)nullptr, SPELL_FALL_DOWN, true, nullptr, aurEff);
+            }
+
+            void Register() override
+            {
+                OnEffectProc += AuraEffectProcFn(spell_gen_moss_covered_feet_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+            }
+        };
+
+        AuraScript* GetAuraScript() const override
+        {
+            return new spell_gen_moss_covered_feet_AuraScript();
+        }
+};
+
 enum Netherbloom
 {
     SPELL_NETHERBLOOM_POLLEN_1      = 28703
@@ -1964,7 +2005,7 @@ class spell_gen_pet_summoned : public SpellScriptLoader
             {
                 Player* player = GetCaster()->ToPlayer();
                 if (player->GetLastPetNumber() && player->CanResummonPet(player->GetLastPetSpell()))
-                    Pet::LoadPetFromDB(player, PET_LOAD_BG_RESURRECT, 0, player->GetLastPetNumber(), true);
+                    Pet::LoadPetFromDB(player, PET_LOAD_SUMMON_PET, 0, player->GetLastPetNumber(), true);
             }
 
             void Register()
@@ -2159,7 +2200,7 @@ class spell_pvp_trinket_wotf_shared_cd : public SpellScriptLoader
                 // Spell::SendSpellCooldown() skips all spells with TRIGGERED_IGNORE_SPELL_AND_CATEGORY_CD
                 player->AddSpellAndCategoryCooldowns(GetSpellInfo(), GetCastItem() ? GetCastItem()->GetEntry() : 0, GetSpell());
 
-                if (player->GetTeamId() == TEAM_HORDE)
+                if (player->GetTeamId(true) == TEAM_HORDE)
                     if (GetSpellInfo()->Id == SPELL_WILL_OF_THE_FORSAKEN_COOLDOWN_TRIGGER)
                     {
                         WorldPacket data;
@@ -4113,6 +4154,56 @@ class spell_gen_bandage : public SpellScriptLoader
         }
 };
 
+// Blade Warding - 64440
+enum BladeWarding
+{
+	SPELL_GEN_BLADE_WARDING_TRIGGERED = 64442
+};
+
+class spell_gen_blade_warding : public SpellScriptLoader
+{
+public:
+	spell_gen_blade_warding() : SpellScriptLoader("spell_gen_blade_warding") { }
+
+	class spell_gen_blade_warding_AuraScript : public AuraScript
+	{
+		PrepareAuraScript(spell_gen_blade_warding_AuraScript);
+
+		bool Validate(SpellInfo const* /*spellInfo*/)
+		{
+			if (!sSpellMgr->GetSpellInfo(SPELL_GEN_BLADE_WARDING_TRIGGERED))
+				return false;
+			return true;
+		}
+
+		void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+		{
+			PreventDefaultAction();
+
+			Unit* caster = eventInfo.GetActionTarget();
+			SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(SPELL_GEN_BLADE_WARDING_TRIGGERED);
+
+			uint8 stacks = GetStackAmount();
+			int32 bp = 0;
+
+			for (uint8 i = 0; i < stacks; ++i)
+				bp += spellInfo->Effects[EFFECT_0].CalcValue(caster);
+
+			caster->CastCustomSpell(SPELL_GEN_BLADE_WARDING_TRIGGERED, SPELLVALUE_BASE_POINT0, bp, eventInfo.GetActor(), TRIGGERED_FULL_MASK, nullptr, aurEff);
+		}
+
+		void Register()
+		{
+			OnEffectProc += AuraEffectProcFn(spell_gen_blade_warding_AuraScript::HandleProc, EFFECT_1, SPELL_AURA_PROC_TRIGGER_SPELL);
+		}
+	};
+
+	AuraScript* GetAuraScript() const
+	{
+		return new spell_gen_blade_warding_AuraScript();
+	}
+};
+
 enum GenericLifebloom
 {
     SPELL_HEXLORD_MALACRASS_LIFEBLOOM_FINAL_HEAL        = 43422,
@@ -4910,6 +5001,7 @@ void AddSC_generic_spell_scripts()
     new spell_gen_break_shield("spell_gen_break_shield");
     new spell_gen_break_shield("spell_gen_tournament_counterattack");
     new spell_gen_mounted_charge();
+    new spell_gen_moss_covered_feet();
     new spell_gen_defend();
     new spell_gen_tournament_duel();
     new spell_gen_summon_tournament_mount();
@@ -4922,6 +5014,7 @@ void AddSC_generic_spell_scripts()
     new spell_gen_count_pct_from_max_hp("spell_gen_100pct_count_pct_from_max_hp", 100);
     new spell_gen_despawn_self();
     new spell_gen_bandage();
+    new spell_gen_blade_warding();
     new spell_gen_lifebloom("spell_hexlord_lifebloom", SPELL_HEXLORD_MALACRASS_LIFEBLOOM_FINAL_HEAL);
     new spell_gen_lifebloom("spell_tur_ragepaw_lifebloom", SPELL_TUR_RAGEPAW_LIFEBLOOM_FINAL_HEAL);
     new spell_gen_lifebloom("spell_cenarion_scout_lifebloom", SPELL_CENARION_SCOUT_LIFEBLOOM_FINAL_HEAL);

@@ -32,41 +32,37 @@ public:
         {
             { "ip",             SEC_GAMEMASTER,     true,  &HandleLookupPlayerIpCommand,        "" },
             { "account",        SEC_GAMEMASTER,     true,  &HandleLookupPlayerAccountCommand,   "" },
-            { "email",          SEC_GAMEMASTER,     true,  &HandleLookupPlayerEmailCommand,     "" },
-            { NULL,             0,                  false, NULL,                                "" }
+            { "email",          SEC_GAMEMASTER,     true,  &HandleLookupPlayerEmailCommand,     "" }
         };
 
         static std::vector<ChatCommand> lookupSpellCommandTable =
         {
-            { "id",             SEC_ADMINISTRATOR,  true,  &HandleLookupSpellIdCommand,         "" },
-            { "",               SEC_ADMINISTRATOR,  true,  &HandleLookupSpellCommand,           "" },
-            { NULL,             0,                  false, NULL,                                "" }
+            { "id",             SEC_MODERATOR,      true,  &HandleLookupSpellIdCommand,         "" },
+            { "",               SEC_MODERATOR,      true,  &HandleLookupSpellCommand,           "" }
         };
 
         static std::vector<ChatCommand> lookupCommandTable =
         {
-            { "area",           SEC_GAMEMASTER,      true,  &HandleLookupAreaCommand,            "" },
-            { "creature",       SEC_ADMINISTRATOR,  true,  &HandleLookupCreatureCommand,        "" },
-            { "event",          SEC_GAMEMASTER,     true,  &HandleLookupEventCommand,           "" },
-            { "faction",        SEC_ADMINISTRATOR,  true,  &HandleLookupFactionCommand,         "" },
-            { "item",           SEC_ADMINISTRATOR,  true,  &HandleLookupItemCommand,            "" },
-            { "itemset",        SEC_ADMINISTRATOR,  true,  &HandleLookupItemSetCommand,         "" },
-            { "object",         SEC_ADMINISTRATOR,  true,  &HandleLookupObjectCommand,          "" },
-            { "quest",          SEC_ADMINISTRATOR,  true,  &HandleLookupQuestCommand,           "" },
-            { "player",         SEC_GAMEMASTER,     true,  NULL,                                "", lookupPlayerCommandTable },
-            { "skill",          SEC_ADMINISTRATOR,  true,  &HandleLookupSkillCommand,           "" },
-            { "spell",          SEC_ADMINISTRATOR,  true,  NULL,                                "", lookupSpellCommandTable },
-            { "taxinode",       SEC_ADMINISTRATOR,  true,  &HandleLookupTaxiNodeCommand,        "" },
-            { "tele",           SEC_GAMEMASTER,      true,  &HandleLookupTeleCommand,            "" },
-            { "title",          SEC_GAMEMASTER,     true,  &HandleLookupTitleCommand,           "" },
-            { "map",            SEC_ADMINISTRATOR,  true,  &HandleLookupMapCommand,             "" },
-            { NULL,             0,                  false, NULL,                                "" }
+            { "area",           SEC_MODERATOR,      true,  &HandleLookupAreaCommand,            "" },
+            { "creature",       SEC_MODERATOR,      true,  &HandleLookupCreatureCommand,        "" },
+            { "event",          SEC_MODERATOR,      true,  &HandleLookupEventCommand,           "" },
+            { "faction",        SEC_MODERATOR,      true,  &HandleLookupFactionCommand,         "" },
+            { "item",           SEC_MODERATOR,      true,  &HandleLookupItemCommand,            "" },
+            { "itemset",        SEC_MODERATOR,      true,  &HandleLookupItemSetCommand,         "" },
+            { "object",         SEC_MODERATOR,      true,  &HandleLookupObjectCommand,          "" },
+            { "quest",          SEC_MODERATOR,      true,  &HandleLookupQuestCommand,           "" },
+            { "player",         SEC_GAMEMASTER,     true,  nullptr,                                "", lookupPlayerCommandTable },
+            { "skill",          SEC_MODERATOR,      true,  &HandleLookupSkillCommand,           "" },
+            { "spell",          SEC_MODERATOR,      true,  nullptr,                                "", lookupSpellCommandTable },
+            { "taxinode",       SEC_MODERATOR,      true,  &HandleLookupTaxiNodeCommand,        "" },
+            { "tele",           SEC_MODERATOR,      true,  &HandleLookupTeleCommand,            "" },
+            { "title",          SEC_MODERATOR,      true,  &HandleLookupTitleCommand,           "" },
+            { "map",            SEC_MODERATOR,      true,  &HandleLookupMapCommand,             "" }
         };
 
         static std::vector<ChatCommand> commandTable =
         {
-            { "lookup",         SEC_ADMINISTRATOR,  true,  NULL,                                "", lookupCommandTable },
-            { NULL,             0,                  false, NULL,                                "" }
+            { "lookup",         SEC_MODERATOR,  true,  nullptr,                                 "", lookupCommandTable }
         };
         return commandTable;
     }
@@ -168,6 +164,33 @@ public:
         for (CreatureTemplateContainer::const_iterator itr = ctc->begin(); itr != ctc->end(); ++itr)
         {
             uint32 id = itr->second.Entry;
+            uint8 localeIndex = handler->GetSessionDbLocaleIndex();
+            if (CreatureLocale const* creatureLocale = sObjectMgr->GetCreatureLocale(id))
+            {
+                if (creatureLocale->Name.size() > localeIndex && !creatureLocale->Name[localeIndex].empty())
+                {
+                    std::string name = creatureLocale->Name[localeIndex];
+            
+                    if (Utf8FitTo(name, wNamePart))
+                    {
+                        if (maxResults && count++ == maxResults)
+                        {
+                            handler->PSendSysMessage(LANG_COMMAND_LOOKUP_MAX_RESULTS, maxResults);
+                            return true;
+                        }
+            
+                        if (handler->GetSession())
+                            handler->PSendSysMessage(LANG_CREATURE_ENTRY_LIST_CHAT, id, id, name.c_str());
+                        else
+                            handler->PSendSysMessage(LANG_CREATURE_ENTRY_LIST_CONSOLE, id, name.c_str());
+            
+                        if (!found)
+                            found = true;
+            
+                        continue;
+                    }
+                }
+            }
 
             std::string name = itr->second.Name;
             if (name.empty())
@@ -257,7 +280,7 @@ public:
         if (!*args)
             return false;
 
-        // Can be NULL at console call
+        // Can be nullptr at console call
         Player* target = handler->getSelectedPlayer();
 
         std::string namePart = args;
@@ -278,7 +301,7 @@ public:
             FactionEntry const* factionEntry = sFactionStore.LookupEntry(id);
             if (factionEntry)
             {
-                FactionState const* factionState = target ? target->GetReputationMgr().GetState(factionEntry) : NULL;
+                FactionState const* factionState = target ? target->GetReputationMgr().GetState(factionEntry) : nullptr;
 
                 int locale = handler->GetSessionDbcLocale();
                 std::string name = factionEntry->name[locale];
@@ -318,7 +341,7 @@ public:
                     else
                         ss << id << " - " << name << ' ' << localeNames[locale];
 
-                    if (factionState) // and then target != NULL also
+                    if (factionState) // and then target != nullptr also
                     {
                         uint32 index = target->GetReputationMgr().GetReputationRankStrIndex(factionEntry);
                         std::string rankName = handler->GetTrinityString(index);
@@ -376,6 +399,38 @@ public:
         ItemTemplateContainer const* its = sObjectMgr->GetItemTemplateStore();
         for (ItemTemplateContainer::const_iterator itr = its->begin(); itr != its->end(); ++itr)
         {
+            int localeIndex = handler->GetSessionDbLocaleIndex();
+            if (localeIndex >= 0)
+            {
+                uint8 ulocaleIndex = uint8(localeIndex);
+                if (ItemLocale const* il = sObjectMgr->GetItemLocale(itr->second.ItemId))
+                {
+                    if (il->Name.size() > ulocaleIndex && !il->Name[ulocaleIndex].empty())
+                    {
+                        std::string name = il->Name[ulocaleIndex];
+            
+                        if (Utf8FitTo(name, wNamePart))
+                        {
+                            if (maxResults && count++ == maxResults)
+                            {
+                                handler->PSendSysMessage(LANG_COMMAND_LOOKUP_MAX_RESULTS, maxResults);
+                                return true;
+                            }
+            
+                            if (handler->GetSession())
+                                handler->PSendSysMessage(LANG_ITEM_LIST_CHAT, itr->second.ItemId, itr->second.ItemId, name.c_str());
+                            else
+                                handler->PSendSysMessage(LANG_ITEM_LIST_CONSOLE, itr->second.ItemId, name.c_str());
+            
+                            if (!found)
+                                found = true;
+            
+                            continue;
+                        }
+                    }
+                }
+            }
+
             std::string name = itr->second.Name1;
             if (name.empty())
                 continue;
@@ -496,6 +551,34 @@ public:
         GameObjectTemplateContainer const* gotc = sObjectMgr->GetGameObjectTemplates();
         for (GameObjectTemplateContainer::const_iterator itr = gotc->begin(); itr != gotc->end(); ++itr)
         {
+            uint8 localeIndex = handler->GetSessionDbLocaleIndex();
+            if (GameObjectLocale const* objectLocalte = sObjectMgr->GetGameObjectLocale(itr->second.entry))
+            {
+                if (objectLocalte->Name.size() > localeIndex && !objectLocalte->Name[localeIndex].empty())
+                {
+                    std::string name = objectLocalte->Name[localeIndex];
+            
+                    if (Utf8FitTo(name, wNamePart))
+                    {
+                        if (maxResults && count++ == maxResults)
+                        {
+                            handler->PSendSysMessage(LANG_COMMAND_LOOKUP_MAX_RESULTS, maxResults);
+                            return true;
+                        }
+            
+                        if (handler->GetSession())
+                            handler->PSendSysMessage(LANG_GO_ENTRY_LIST_CHAT, itr->second.entry, itr->second.entry, name.c_str());
+                        else
+                            handler->PSendSysMessage(LANG_GO_ENTRY_LIST_CONSOLE, itr->second.entry, name.c_str());
+            
+                        if (!found)
+                            found = true;
+            
+                        continue;
+                    }
+                }
+            }
+
             std::string name = itr->second.name;
             if (name.empty())
                 continue;
@@ -529,7 +612,7 @@ public:
         if (!*args)
             return false;
 
-        // can be NULL at console call
+        // can be nullptr at console call
         Player* target = handler->getSelectedPlayer();
 
         std::string namePart = args;
@@ -605,7 +688,7 @@ public:
         if (!*args)
             return false;
 
-        // can be NULL in console call
+        // can be nullptr in console call
         Player* target = handler->getSelectedPlayer();
 
         std::string namePart = args;
@@ -693,7 +776,7 @@ public:
         if (!*args)
             return false;
 
-        // can be NULL at console call
+        // can be nullptr at console call
         Player* target = handler->getSelectedPlayer();
 
         std::string namePart = args;
@@ -805,7 +888,7 @@ public:
         if (!*args)
             return false;
 
-        // can be NULL at console call
+        // can be nullptr at console call
         Player* target = handler->getSelectedPlayer();
 
         uint32 id = atoi((char*)args);
@@ -1025,7 +1108,7 @@ public:
         if (!*args)
             return false;
 
-        // can be NULL in console call
+        // can be nullptr in console call
         Player* target = handler->getSelectedPlayer();
 
         // title name have single string arg for player name
@@ -1182,7 +1265,7 @@ public:
         Player* target = handler->getSelectedPlayer();
         if (!*args)
         {
-            // NULL only if used from console
+            // nullptr only if used from console
             if (!target || target == handler->GetSession()->GetPlayer())
                 return false;
 
@@ -1192,7 +1275,7 @@ public:
         else
         {
             ip = strtok((char*)args, " ");
-            limitStr = strtok(NULL, " ");
+            limitStr = strtok(nullptr, " ");
             limit = limitStr ? atoi(limitStr) : -1;
         }
 
@@ -1209,7 +1292,7 @@ public:
             return false;
 
         std::string account = strtok((char*)args, " ");
-        char* limitStr = strtok(NULL, " ");
+        char* limitStr = strtok(nullptr, " ");
         int32 limit = limitStr ? atoi(limitStr) : -1;
 
         if (!AccountMgr::normalizeString
@@ -1229,7 +1312,7 @@ public:
             return false;
 
         std::string email = strtok((char*)args, " ");
-        char* limitStr = strtok(NULL, " ");
+        char* limitStr = strtok(nullptr, " ");
         int32 limit = limitStr ? atoi(limitStr) : -1;
 
         PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_LIST_BY_EMAIL);
@@ -1281,7 +1364,7 @@ public:
                     uint32 guid             = characterFields[0].GetUInt32();
                     std::string name        = characterFields[1].GetString();
                     uint8 plevel = 0, prace = 0, pclass = 0;
-                    bool online = (ObjectAccessor::FindPlayerInOrOutOfWorld(MAKE_NEW_GUID(guid, 0, HIGHGUID_PLAYER)) != NULL);
+                    bool online = (ObjectAccessor::FindPlayerInOrOutOfWorld(MAKE_NEW_GUID(guid, 0, HIGHGUID_PLAYER)) != nullptr);
 
                     if (const GlobalPlayerData* gpd = sWorld->GetGlobalPlayerData(guid))
                     {
@@ -1291,7 +1374,7 @@ public:
                     }
 
                     if (plevel > 0 && prace > 0 && prace <= RACE_DRAENEI && pclass > 0 && pclass <= CLASS_DRUID)
-                        handler->PSendSysMessage("  %s (GUID %u) - %s - %s - %u%s", name.c_str(), guid, name_races[prace-1], name_classes[pclass-1], plevel, (online ? " - online" : ""));
+                        handler->PSendSysMessage("  %s (GUID %u) - %s - %s - %u%s", name.c_str(), guid, name_races[prace-1], name_classes[pclass-1], plevel, (online ? " - [ONLINE]" : ""));
                     else
                         handler->PSendSysMessage(LANG_LOOKUP_PLAYER_CHARACTER, name.c_str(), guid);
                     ++counter;

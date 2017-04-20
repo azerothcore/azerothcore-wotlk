@@ -1457,8 +1457,9 @@ class Unit : public WorldObject
         uint8 getLevel() const { return uint8(GetUInt32Value(UNIT_FIELD_LEVEL)); }
         uint8 getLevelForTarget(WorldObject const* /*target*/) const { return getLevel(); }
         void SetLevel(uint8 lvl, bool showLevelChange = true);
-        uint8 getRace() const { return GetByteValue(UNIT_FIELD_BYTES_0, 0); }
-        uint32 getRaceMask() const { return 1 << (getRace()-1); }
+        uint8 getRace(bool original = false) const;
+        void setRace(uint8 race);
+        uint32 getRaceMask() const { return 1 << (getRace(true)-1); }
         uint8 getClass() const { return GetByteValue(UNIT_FIELD_BYTES_0, 1); }
         uint32 getClassMask() const { return 1 << (getClass()-1); }
         uint8 getGender() const { return GetByteValue(UNIT_FIELD_BYTES_0, 2); }
@@ -2367,13 +2368,7 @@ class Unit : public WorldObject
         // pussywizard:
         // MMaps
         std::map<uint64, MMapTargetData> m_targetsNotAcceptable;
-        bool isTargetNotAcceptableByMMaps(uint64 guid, uint32 currTime, const Position* t = NULL) const {
-            std::map<uint64, MMapTargetData>::const_iterator itr = m_targetsNotAcceptable.find(guid);
-            if ((itr != m_targetsNotAcceptable.end() && (itr->second._endTime >= currTime)) ||
-                (t && !itr->second.PosChanged(*this, *t)))
-                return true; 
-            return false;
-            }
+        bool isTargetNotAcceptableByMMaps(uint64 guid, uint32 currTime, const Position* t = NULL) const { std::map<uint64, MMapTargetData>::const_iterator itr = m_targetsNotAcceptable.find(guid); if (itr != m_targetsNotAcceptable.end() && (itr->second._endTime >= currTime || t && !itr->second.PosChanged(*this, *t))) return true; return false; }
         uint32 m_mmapNotAcceptableStartTime;
         // Safe mover
         std::set<SafeUnitPointer*> SafeUnitPointerSet;
@@ -2439,6 +2434,9 @@ class Unit : public WorldObject
         void _DeleteRemovedAuras();
 
         void _UpdateAutoRepeatSpell();
+
+        uint8 m_realRace;
+        uint8 m_race;
 
         bool m_AutoRepeatFirstCast;
 

@@ -1727,6 +1727,8 @@ void Spell::DoCreateItem(uint8 /*effIndex*/, uint32 itemId)
 
         // send info to the client
         player->SendNewItem(pItem, addNumber, true, SelfCast);
+		
+        sScriptMgr->OnCreateItem(player, pItem, addNumber);
 
         // we succeeded in creating at least one item, so a levelup is possible
         if (SelfCast)
@@ -6173,6 +6175,12 @@ void Spell::EffectSummonRaFFriend(SpellEffIndex effIndex)
     if (m_caster->GetTypeId() != TYPEID_PLAYER || !unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
         return;
 
-    // Xinef: Unit Target can be on other map, thank god we dont use RaF...
-    m_caster->CastSpell(unitTarget, m_spellInfo->Effects[effIndex].TriggerSpell, true);
+    float x, y, z;
+    m_caster->GetPosition(x, y, z);
+    unitTarget->ToPlayer()->SetSummonPoint(m_caster->GetMapId(), x, y, z);
+    WorldPacket data(SMSG_SUMMON_REQUEST, 8 + 4 + 4);
+    data << uint64(m_caster->GetGUID());
+    data << uint32(m_caster->GetZoneId());
+    data << uint32(MAX_PLAYER_SUMMON_DELAY*IN_MILLISECONDS); // auto decline after msecs
+    unitTarget->ToPlayer()->GetSession()->SendPacket(&data);
 }

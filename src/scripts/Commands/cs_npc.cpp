@@ -67,69 +67,63 @@ public:
     {
         static std::vector<ChatCommand> npcAddCommandTable =
         {
-            { "formation",      SEC_GAMEMASTER,      false, &HandleNpcAddFormationCommand,      "" },
-            { "item",           SEC_GAMEMASTER,     false, &HandleNpcAddVendorItemCommand,     "" },
-            { "move",           SEC_GAMEMASTER,     false, &HandleNpcAddMoveCommand,           "" },
-            { "temp",           SEC_GAMEMASTER,     false, &HandleNpcAddTempSpawnCommand,      "" },
+            { "formation",      SEC_ADMINISTRATOR,  false, &HandleNpcAddFormationCommand,      "" },
+            { "item",           SEC_ADMINISTRATOR,  false, &HandleNpcAddVendorItemCommand,     "" },
+            { "move",           SEC_ADMINISTRATOR,  false, &HandleNpcAddMoveCommand,           "" },
+            { "temp",           SEC_ADMINISTRATOR,  false, &HandleNpcAddTempSpawnCommand,      "" },
             //{ TODO: fix or remove this command
             { "weapon",         SEC_ADMINISTRATOR,  false, &HandleNpcAddWeaponCommand,         "" },
             //}
-            { "",               SEC_GAMEMASTER,     false, &HandleNpcAddCommand,               "" },
-            { NULL,             0,                  false, NULL,                               "" }
+            { "",               SEC_ADMINISTRATOR,  false, &HandleNpcAddCommand,               "" }
         };
         static std::vector<ChatCommand> npcDeleteCommandTable =
         {
-            { "item",           SEC_GAMEMASTER,     false, &HandleNpcDeleteVendorItemCommand,  "" },
-            { "",               SEC_GAMEMASTER,     false, &HandleNpcDeleteCommand,            "" },
-            { NULL,             0,                  false, NULL,                               "" }
+            { "item",           SEC_ADMINISTRATOR,  false, &HandleNpcDeleteVendorItemCommand,  "" },
+            { "",               SEC_ADMINISTRATOR,  false, &HandleNpcDeleteCommand,            "" }
         };
         static std::vector<ChatCommand> npcFollowCommandTable =
         {
             { "stop",           SEC_GAMEMASTER,     false, &HandleNpcUnFollowCommand,          "" },
-            { "",               SEC_GAMEMASTER,     false, &HandleNpcFollowCommand,            "" },
-            { NULL,             0,                  false, NULL,                               "" }
+            { "",               SEC_GAMEMASTER,     false, &HandleNpcFollowCommand,            "" }
         };
         static std::vector<ChatCommand> npcSetCommandTable =
         {
             { "allowmove",      SEC_ADMINISTRATOR,  false, &HandleNpcSetAllowMovementCommand,  "" },
             { "entry",          SEC_ADMINISTRATOR,  false, &HandleNpcSetEntryCommand,          "" },
-            { "factionid",      SEC_GAMEMASTER,     false, &HandleNpcSetFactionIdCommand,      "" },
-            { "flag",           SEC_GAMEMASTER,     false, &HandleNpcSetFlagCommand,           "" },
-            { "level",          SEC_GAMEMASTER,     false, &HandleNpcSetLevelCommand,          "" },
-            { "link",           SEC_GAMEMASTER,     false, &HandleNpcSetLinkCommand,           "" },
-            { "model",          SEC_GAMEMASTER,     false, &HandleNpcSetModelCommand,          "" },
-            { "movetype",       SEC_GAMEMASTER,     false, &HandleNpcSetMoveTypeCommand,       "" },
-            { "phase",          SEC_GAMEMASTER,     false, &HandleNpcSetPhaseCommand,          "" },
-            { "spawndist",      SEC_GAMEMASTER,     false, &HandleNpcSetSpawnDistCommand,      "" },
-            { "spawntime",      SEC_GAMEMASTER,     false, &HandleNpcSetSpawnTimeCommand,      "" },
+            { "factionid",      SEC_ADMINISTRATOR,  false, &HandleNpcSetFactionIdCommand,      "" },
+            { "flag",           SEC_ADMINISTRATOR,  false, &HandleNpcSetFlagCommand,           "" },
+            { "level",          SEC_ADMINISTRATOR,  false, &HandleNpcSetLevelCommand,          "" },
+            { "link",           SEC_ADMINISTRATOR,  false, &HandleNpcSetLinkCommand,           "" },
+            { "model",          SEC_ADMINISTRATOR,  false, &HandleNpcSetModelCommand,          "" },
+            { "movetype",       SEC_ADMINISTRATOR,  false, &HandleNpcSetMoveTypeCommand,       "" },
+            { "phase",          SEC_ADMINISTRATOR,  false, &HandleNpcSetPhaseCommand,          "" },
+            { "spawndist",      SEC_ADMINISTRATOR,  false, &HandleNpcSetSpawnDistCommand,      "" },
+            { "spawntime",      SEC_ADMINISTRATOR,  false, &HandleNpcSetSpawnTimeCommand,      "" },
             { "data",           SEC_ADMINISTRATOR,  false, &HandleNpcSetDataCommand,           "" },
             //{ TODO: fix or remove these commands
-            { "name",           SEC_GAMEMASTER,     false, &HandleNpcSetNameCommand,           "" },
-            { "subname",        SEC_GAMEMASTER,     false, &HandleNpcSetSubNameCommand,        "" },
+            { "name",           SEC_ADMINISTRATOR,  false, &HandleNpcSetNameCommand,           "" },
+            { "subname",        SEC_ADMINISTRATOR,  false, &HandleNpcSetSubNameCommand,        "" }
             //}
-            { NULL,             0,                  false, NULL,                               "" }
         };
         static std::vector<ChatCommand> npcCommandTable =
         {
-            { "info",           SEC_ADMINISTRATOR,  false, &HandleNpcInfoCommand,              "" },
+            { "info",           SEC_MODERATOR,      false, &HandleNpcInfoCommand,              "" },
             { "near",           SEC_GAMEMASTER,     false, &HandleNpcNearCommand,              "" },
-            { "move",           SEC_GAMEMASTER,     false, &HandleNpcMoveCommand,              "" },
+            { "move",           SEC_ADMINISTRATOR,  false, &HandleNpcMoveCommand,              "" },
             { "playemote",      SEC_ADMINISTRATOR,  false, &HandleNpcPlayEmoteCommand,         "" },
-            { "say",            SEC_GAMEMASTER,      false, &HandleNpcSayCommand,               "" },
-            { "textemote",      SEC_GAMEMASTER,      false, &HandleNpcTextEmoteCommand,         "" },
-            { "whisper",        SEC_GAMEMASTER,      false, &HandleNpcWhisperCommand,           "" },
-            { "yell",           SEC_GAMEMASTER,      false, &HandleNpcYellCommand,              "" },
+            { "say",            SEC_GAMEMASTER,     false, &HandleNpcSayCommand,               "" },
+            { "textemote",      SEC_GAMEMASTER,     false, &HandleNpcTextEmoteCommand,         "" },
+            { "whisper",        SEC_GAMEMASTER,     false, &HandleNpcWhisperCommand,           "" },
+            { "yell",           SEC_GAMEMASTER,     false, &HandleNpcYellCommand,              "" },
             { "tame",           SEC_GAMEMASTER,     false, &HandleNpcTameCommand,              "" },
-            { "add",            SEC_GAMEMASTER,     false, NULL,                 "", npcAddCommandTable },
-            { "delete",         SEC_GAMEMASTER,     false, NULL,              "", npcDeleteCommandTable },
-            { "follow",         SEC_GAMEMASTER,     false, NULL,              "", npcFollowCommandTable },
-            { "set",            SEC_GAMEMASTER,     false, NULL,                 "", npcSetCommandTable },
-            { NULL,             0,                  false, NULL,                               "" }
+            { "add",            SEC_GAMEMASTER,     false, nullptr,                            "", npcAddCommandTable },
+            { "delete",         SEC_GAMEMASTER,     false, nullptr,                            "", npcDeleteCommandTable },
+            { "follow",         SEC_GAMEMASTER,     false, nullptr,                            "", npcFollowCommandTable },
+            { "set",            SEC_ADMINISTRATOR,  false, nullptr,                            "", npcSetCommandTable }
         };
         static std::vector<ChatCommand> commandTable =
         {
-            { "npc",            SEC_GAMEMASTER,      false, NULL,                    "", npcCommandTable },
-            { NULL,             0,                  false, NULL,                               "" }
+            { "npc",            SEC_MODERATOR,      false, nullptr,                            "", npcCommandTable }
         };
         return commandTable;
     }
@@ -144,7 +138,7 @@ public:
         if (!charID)
             return false;
 
-        char* team = strtok(NULL, " ");
+        char* team = strtok(nullptr, " ");
         int32 teamval = 0;
         if (team)
             teamval = atoi(team);
@@ -229,17 +223,17 @@ public:
 
         uint32 itemId = item_int;
 
-        char* fmaxcount = strtok(NULL, " ");                    //add maxcount, default: 0
+        char* fmaxcount = strtok(nullptr, " ");                    //add maxcount, default: 0
         uint32 maxcount = 0;
         if (fmaxcount)
             maxcount = atol(fmaxcount);
 
-        char* fincrtime = strtok(NULL, " ");                    //add incrtime, default: 0
+        char* fincrtime = strtok(nullptr, " ");                    //add incrtime, default: 0
         uint32 incrtime = 0;
         if (fincrtime)
             incrtime = atol(fincrtime);
 
-        char* fextendedcost = strtok(NULL, " ");                //add ExtendedCost, default: 0
+        char* fextendedcost = strtok(nullptr, " ");                //add ExtendedCost, default: 0
         uint32 extendedcost = fextendedcost ? atol(fextendedcost) : 0;
         Creature* vendor = handler->getSelectedCreature();
         if (!vendor)
@@ -272,11 +266,11 @@ public:
             return false;
 
         char* guidStr = strtok((char*)args, " ");
-        char* waitStr = strtok((char*)NULL, " ");
+        char* waitStr = strtok((char*)nullptr, " ");
 
         uint32 lowGuid = atoi((char*)guidStr);
 
-        Creature* creature = NULL;
+        Creature* creature = nullptr;
 
         /* FIXME: impossible without entry
         if (lowguid)
@@ -413,7 +407,7 @@ public:
 
     static bool HandleNpcDeleteCommand(ChatHandler* handler, const char* args)
     {
-        Creature* unit = NULL;
+        Creature* unit = nullptr;
 
         if (*args)
         {
@@ -568,7 +562,7 @@ public:
             return false;
 
         char* arg1 = strtok((char*)args, " ");
-        char* arg2 = strtok((char*)NULL, "");
+        char* arg2 = strtok((char*)nullptr, "");
 
         if (!arg1 || !arg2)
             return false;
@@ -632,7 +626,7 @@ public:
         uint32 Entry = target->GetEntry();
         CreatureTemplate const* cInfo = target->GetCreatureTemplate();
 
-        int64 curRespawnDelay = target->GetRespawnTimeEx()-time(NULL);
+        int64 curRespawnDelay = target->GetRespawnTimeEx()-time(nullptr);
         if (curRespawnDelay < 0)
             curRespawnDelay = 0;
         std::string curRespawnDelayStr = secsToTimeString(uint64(curRespawnDelay), true);
@@ -860,8 +854,8 @@ public:
         //        later switched on/off according to special events (like escort
         //        quests, etc)
         char* guid_str = strtok((char*)args, " ");
-        char* type_str = strtok((char*)NULL, " ");
-        char* dontdel_str = strtok((char*)NULL, " ");
+        char* type_str = strtok((char*)nullptr, " ");
+        char* dontdel_str = strtok((char*)nullptr, " ");
 
         bool doNotDelete = false;
 
@@ -869,7 +863,7 @@ public:
             return false;
 
         uint32 lowguid = 0;
-        Creature* creature = NULL;
+        Creature* creature = nullptr;
 
         if (dontdel_str)
         {
@@ -895,7 +889,7 @@ public:
                 {
                     //sLog->outError("DEBUG: type_str, NODEL ");
                     doNotDelete = true;
-                    type_str = NULL;
+                    type_str = nullptr;
                 }
             }
         }
@@ -935,7 +929,7 @@ public:
         }
 
         // now lowguid is low guid really existed creature
-        // and creature point (maybe) to this creature or NULL
+        // and creature point (maybe) to this creature or nullptr
 
         MovementGeneratorType move_type;
 
@@ -1112,7 +1106,7 @@ public:
             return false;
         }
 
-        creature->MonsterSay(args, LANG_UNIVERSAL, NULL);
+        creature->MonsterSay(args, LANG_UNIVERSAL, nullptr);
 
         // make some emotes
         char lastchar = args[strlen(args) - 1];
@@ -1190,7 +1184,7 @@ public:
             return false;
 
         char* receiver_str = strtok((char*)args, " ");
-        char* text = strtok(NULL, "");
+        char* text = strtok(nullptr, "");
 
         Creature* creature = handler->getSelectedCreature();
         if (!creature || !receiver_str || !text)
@@ -1220,7 +1214,7 @@ public:
             return false;
         }
 
-        creature->MonsterYell(args, LANG_UNIVERSAL, NULL);
+        creature->MonsterYell(args, LANG_UNIVERSAL, nullptr);
 
         // make an emote
         creature->HandleEmoteCommand(EMOTE_ONESHOT_SHOUT);
@@ -1427,7 +1421,7 @@ public:
         if (!pSlotID)
             return false;
 
-        char* pItemID = strtok(NULL, " ");
+        char* pItemID = strtok(nullptr, " ");
         if (!pItemID)
             return false;
 

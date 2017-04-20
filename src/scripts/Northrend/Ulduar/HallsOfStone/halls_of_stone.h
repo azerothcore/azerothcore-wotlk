@@ -14,7 +14,8 @@ enum Encounter
     BOSS_TRIBUNAL_OF_AGES       = 2,
     BOSS_SJONNIR                = 3,
     BRANN_BRONZEBEARD           = 4,
-    MAX_ENCOUNTER               = 5,
+    BRANN_DOOR                  = 5,
+    MAX_ENCOUNTER               = 6,
 
     DATA_BRANN_ACHIEVEMENT,
     DATA_SJONNIR_ACHIEVEMENT,

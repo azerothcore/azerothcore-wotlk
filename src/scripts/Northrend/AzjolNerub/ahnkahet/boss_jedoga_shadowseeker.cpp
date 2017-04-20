@@ -24,7 +24,6 @@ enum Spells
     SPELL_WHITE_SPHERE                      = 56102,
     SPELL_LIGHTNING_BOLTS                   = 56327,
     SPELL_ACTIVATE_INITIATE                 = 56868,
-    SPELL_FREEZE_ANIM                       = 55591,
     SPELL_SACRIFICE_VISUAL                  = 56133,
 
     // FIGHT
@@ -64,8 +63,8 @@ enum Misc
 
 const Position JedogaPosition[2] =
 {
-    {372.330994f, -705.278015f, 0.624178f,  5.427970f},
-    {372.330994f, -705.278015f, -16.179716f, 5.427970f}
+    {372.330994f, -705.278015f, -2.459692f,  5.628908f},
+    {372.330994f, -705.278015f, -16.179716f, 5.628908f}
 };
 
 class boss_jedoga_shadowseeker : public CreatureScript
@@ -218,7 +217,6 @@ public:
             MoveUp(true);
             me->CastSpell(me, SPELL_PINK_SPHERE, true);
             me->CastSpell(me, SPELL_LIGHTNING_BOLTS, true);
-            me->CastSpell(me, SPELL_FREEZE_ANIM, true);
         }
 
         void EnterCombat(Unit* who)
@@ -250,6 +248,7 @@ public:
         {
             me->GetMotionMaster()->MoveIdle();
             me->GetMotionMaster()->MovePoint(POINT_DOWN, JedogaPosition[1]);
+            isFlying = false;
         }
 
         void MoveUp(bool start)
@@ -262,7 +261,6 @@ public:
             me->GetMotionMaster()->MovePoint((start ? POINT_UP_START : POINT_UP), JedogaPosition[0]);
 
             me->SetDisableGravity(true);
-            me->CastSpell(me, SPELL_FREEZE_ANIM, true);
         }
         
         void MovementInform(uint32 Type, uint32 PointId)
@@ -275,7 +273,6 @@ public:
                 me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
                 me->RemoveAurasDueToSpell(SPELL_PINK_SPHERE);
                 me->RemoveAurasDueToSpell(SPELL_LIGHTNING_BOLTS);
-                me->RemoveAurasDueToSpell(SPELL_FREEZE_ANIM);
 
                 isFlying = false;
                 me->SetInCombatWithZone();
@@ -499,15 +496,16 @@ public:
                     me->SetControlled(false, UNIT_STATE_STUNNED);
                     me->RemoveAurasDueToSpell(SPELL_WHITE_SPHERE);
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+                    me->SetWalk(true);
 
-                    float distance = me->GetDistance(373.48f, -706.00f, -16.18f);
+                    float distance = me->GetDistance(JedogaPosition[1]);
 
                     if (distance < 9.0f)
-                        me->SetSpeed(MOVE_RUN, 0.5f, true);
+                        me->SetSpeed(MOVE_WALK, 0.5f, true);
                     else if (distance < 15.0f)
-                        me->SetSpeed(MOVE_RUN, 0.75f, true);
+                        me->SetSpeed(MOVE_WALK, 0.75f, true);
                     else if (distance < 20.0f)
-                        me->SetSpeed(MOVE_RUN, 1.0f, true);
+                        me->SetSpeed(MOVE_WALK, 1.0f, true);
 
                     me->GetMotionMaster()->Clear(false);
                     me->GetMotionMaster()->MovePoint(POINT_RITUAL, 373.48f, -706.00f, -16.18f);

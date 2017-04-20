@@ -13,6 +13,7 @@ EndScriptData */
 
 #include "AchievementMgr.h"
 #include "AuctionHouseMgr.h"
+#include "BattlegroundMgr.h"
 #include "Chat.h"
 #include "CreatureTextMgr.h"
 #include "DisableMgr.h"
@@ -39,17 +40,16 @@ public:
         static std::vector<ChatCommand> reloadAllCommandTable =
         {
             { "achievement", SEC_ADMINISTRATOR,  true,  &HandleReloadAllAchievementCommand, "" },
-            { "area",       SEC_ADMINISTRATOR,  true,  &HandleReloadAllAreaCommand,       "" },
-            { "gossips",    SEC_ADMINISTRATOR,  true,  &HandleReloadAllGossipsCommand,    "" },
-            { "item",       SEC_ADMINISTRATOR,  true,  &HandleReloadAllItemCommand,       "" },
-            { "locales",    SEC_ADMINISTRATOR,  true,  &HandleReloadAllLocalesCommand,    "" },
-            { "loot",       SEC_ADMINISTRATOR,  true,  &HandleReloadAllLootCommand,       "" },
-            { "npc",        SEC_ADMINISTRATOR,  true,  &HandleReloadAllNpcCommand,        "" },
-            { "quest",      SEC_ADMINISTRATOR,  true,  &HandleReloadAllQuestCommand,      "" },
-            { "scripts",    SEC_ADMINISTRATOR,  true,  &HandleReloadAllScriptsCommand,    "" },
-            { "spell",      SEC_ADMINISTRATOR,  true,  &HandleReloadAllSpellCommand,      "" },
-            { "",           SEC_ADMINISTRATOR,  true,  &HandleReloadAllCommand,           "" },
-            { NULL,         0,                  false, NULL,                              "" }
+            { "area",        SEC_ADMINISTRATOR,  true,  &HandleReloadAllAreaCommand,       "" },
+            { "gossips",     SEC_ADMINISTRATOR,  true,  &HandleReloadAllGossipsCommand,    "" },
+            { "item",        SEC_ADMINISTRATOR,  true,  &HandleReloadAllItemCommand,       "" },
+            { "locales",     SEC_ADMINISTRATOR,  true,  &HandleReloadAllLocalesCommand,    "" },
+            { "loot",        SEC_ADMINISTRATOR,  true,  &HandleReloadAllLootCommand,       "" },
+            { "npc",         SEC_ADMINISTRATOR,  true,  &HandleReloadAllNpcCommand,        "" },
+            { "quest",       SEC_ADMINISTRATOR,  true,  &HandleReloadAllQuestCommand,      "" },
+            { "scripts",     SEC_ADMINISTRATOR,  true,  &HandleReloadAllScriptsCommand,    "" },
+            { "spell",       SEC_ADMINISTRATOR,  true,  &HandleReloadAllSpellCommand,      "" },
+            { "",            SEC_ADMINISTRATOR,  true,  &HandleReloadAllCommand,           "" }
         };
         static std::vector<ChatCommand> reloadCommandTable =
         {
@@ -57,11 +57,13 @@ public:
             { "access_requirement",           SEC_ADMINISTRATOR, true,  &HandleReloadAccessRequirementCommand,          "" },
             { "achievement_criteria_data",    SEC_ADMINISTRATOR, true,  &HandleReloadAchievementCriteriaDataCommand,    "" },
             { "achievement_reward",           SEC_ADMINISTRATOR, true,  &HandleReloadAchievementRewardCommand,          "" },
-            { "all",                          SEC_ADMINISTRATOR, true,  NULL,                    "", reloadAllCommandTable },
+            { "all",                          SEC_ADMINISTRATOR, true,  nullptr,                                        "", reloadAllCommandTable },
             { "areatrigger_involvedrelation", SEC_ADMINISTRATOR, true,  &HandleReloadQuestAreaTriggersCommand,          "" },
             { "areatrigger_tavern",           SEC_ADMINISTRATOR, true,  &HandleReloadAreaTriggerTavernCommand,          "" },
             { "areatrigger_teleport",         SEC_ADMINISTRATOR, true,  &HandleReloadAreaTriggerTeleportCommand,        "" },
             { "autobroadcast",                SEC_ADMINISTRATOR, true,  &HandleReloadAutobroadcastCommand,              "" },
+            { "broadcast_text",               SEC_ADMINISTRATOR, true,  &HandleReloadBroadcastTextCommand,              "" },
+            { "battleground_template",        SEC_ADMINISTRATOR, true,  &HandleReloadBattlegroundTemplate,              "" },
             { "command",                      SEC_ADMINISTRATOR, true,  &HandleReloadCommandCommand,                    "" },
             { "conditions",                   SEC_ADMINISTRATOR, true,  &HandleReloadConditions,                        "" },
             { "config",                       SEC_ADMINISTRATOR, true,  &HandleReloadConfigCommand,                     "" },
@@ -139,13 +141,11 @@ public:
             { "waypoint_scripts",             SEC_ADMINISTRATOR, true,  &HandleReloadWpScriptsCommand,                  "" },
             { "waypoint_data",                SEC_ADMINISTRATOR, true,  &HandleReloadWpCommand,                         "" },
             { "vehicle_accessory",            SEC_ADMINISTRATOR, true,  &HandleReloadVehicleAccessoryCommand,           "" },
-            { "vehicle_template_accessory",   SEC_ADMINISTRATOR, true,  &HandleReloadVehicleTemplateAccessoryCommand,   "" },
-            { NULL,                           0,                 false, NULL,                                           "" }
+            { "vehicle_template_accessory",   SEC_ADMINISTRATOR, true,  &HandleReloadVehicleTemplateAccessoryCommand,   "" }
         };
         static std::vector<ChatCommand> commandTable =
         {
-            { "reload",         SEC_ADMINISTRATOR,  true,  NULL,                 "", reloadCommandTable },
-            { NULL,             0,                  false, NULL,                               "" }
+            { "reload",         SEC_ADMINISTRATOR,  true,  nullptr,                                                     "", reloadCommandTable }
         };
         return commandTable;
     }
@@ -182,6 +182,16 @@ public:
         HandleReloadVehicleTemplateAccessoryCommand(handler, "");
 
         HandleReloadAutobroadcastCommand(handler, "");
+        HandleReloadBroadcastTextCommand(handler, "");
+        HandleReloadBattlegroundTemplate(handler, "");
+        return true;
+    }
+
+    static bool HandleReloadBattlegroundTemplate(ChatHandler* handler, char const* /*args*/)
+    {
+        sLog->outString("Re-Loading Battleground Templates...");
+        sBattlegroundMgr->CreateInitialBattlegrounds();
+        handler->SendGlobalGMSysMessage("DB table `battleground_template` reloaded.");
         return true;
     }
 
@@ -357,6 +367,15 @@ public:
         return true;
     }
 
+    static bool HandleReloadBroadcastTextCommand(ChatHandler* handler, const char* /*args*/)
+    {
+        sLog->outString("Re-Loading Broadcast texts...");
+        sObjectMgr->LoadBroadcastTexts();
+        sObjectMgr->LoadBroadcastTextLocales();
+        handler->SendGlobalGMSysMessage("DB table `broadcast_text` reloaded.");
+        return true;
+    }
+
     static bool HandleReloadCommandCommand(ChatHandler* handler, const char* /*args*/)
     {
         handler->SetLoadCommandTable(true);
@@ -474,17 +493,11 @@ public:
             cInfo->ModMana            = fields[69].GetFloat();
             cInfo->ModArmor           = fields[70].GetFloat();
             cInfo->RacialLeader       = fields[71].GetBool();
-            cInfo->questItems[0]      = fields[72].GetUInt32();
-            cInfo->questItems[1]      = fields[73].GetUInt32();
-            cInfo->questItems[2]      = fields[74].GetUInt32();
-            cInfo->questItems[3]      = fields[75].GetUInt32();
-            cInfo->questItems[4]      = fields[76].GetUInt32();
-            cInfo->questItems[5]      = fields[77].GetUInt32();
-            cInfo->movementId         = fields[78].GetUInt32();
-            cInfo->RegenHealth        = fields[79].GetBool();
-            cInfo->MechanicImmuneMask = fields[80].GetUInt32();
-            cInfo->flags_extra        = fields[81].GetUInt32();
-            cInfo->ScriptID           = sObjectMgr->GetScriptId(fields[82].GetCString());
+            cInfo->movementId         = fields[72].GetUInt32();
+            cInfo->RegenHealth        = fields[73].GetBool();
+            cInfo->MechanicImmuneMask = fields[74].GetUInt32();
+            cInfo->flags_extra        = fields[75].GetUInt32();
+            cInfo->ScriptID           = sObjectMgr->GetScriptId(fields[76].GetCString());
 
             sObjectMgr->CheckCreatureTemplate(cInfo);
         }

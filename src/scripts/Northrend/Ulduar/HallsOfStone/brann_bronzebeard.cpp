@@ -13,6 +13,7 @@
 #define GOSSIP_ITEM_1       "Brann, it would be our honor!"
 #define GOSSIP_ITEM_2       "Let's move Brann, enough of the history lessons!"
 #define GOSSIP_ITEM_3       "We dont have time for this right now, we have to keep going."
+#define GOSSIP_ITEM_4       "We're with you Brann! Open it!"
 #define TEXT_ID_START       13100
 #define YELL_AGGRO          "You be dead soon enough!"
 
@@ -59,6 +60,7 @@ enum Misc
     ACTION_SJONNIR_DEAD             = 4,
     ACTION_ENTEREVADEMODE           = 5,
     ACTION_WIPE_START               = 6,
+    ACTION_OPEN_DOOR                = 7,
 
     // QUESTS
     QUEST_HALLS_OF_STONE            = 13207,
@@ -171,6 +173,9 @@ public:
             case 4:
                 player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+4);
                 break;
+            case 5:
+                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
+                break;
             default: break;
             }
 
@@ -199,6 +204,10 @@ public:
                 break;
             case GOSSIP_ACTION_INFO_DEF+4:
                 pCreature->AI()->DoAction(ACTION_WIPE_START);
+                player->CLOSE_GOSSIP_MENU();
+                break;
+            case GOSSIP_ACTION_INFO_DEF+5:
+                pCreature->AI()->DoAction(ACTION_OPEN_DOOR);
                 player->CLOSE_GOSSIP_MENU();
                 break;
             }
@@ -360,6 +369,12 @@ public:
                     ResetEvent();
                     me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
                     break;
+                case ACTION_OPEN_DOOR:
+                    if (GameObject *door = ObjectAccessor::GetGameObject(*me, pInstance->GetData64(GO_SJONNIR_DOOR)))
+                        door->SetGoState(GO_STATE_ACTIVE);
+                    SetEscortPaused(false);
+                    me->RemoveAura(58506);
+                    break;
             }
         }
 
@@ -504,6 +519,9 @@ public:
                 }
                 case EVENT_GO_TO_SJONNIR:
                 {
+
+                    if (GameObject *door = ObjectAccessor::GetGameObject(*me, pInstance->GetData64(GO_SJONNIR_DOOR)))
+                        door->SetGoState(GO_STATE_ACTIVE);
                     SetEscortPaused(false);
                     ResetEvent();
                     me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
@@ -633,12 +651,15 @@ void brann_bronzebeard::brann_bronzebeardAI::WaypointReached(uint32 id)
             break;
         // Before Sjonnir's door
         case 27:
+            SetEscortPaused(true);
             if(pInstance)
             {
-                if (GameObject *door = ObjectAccessor::GetGameObject(*me, pInstance->GetData64(GO_SJONNIR_DOOR)))
-                    door->SetGoState(GO_STATE_ACTIVE);
+                pInstance->SetData(BRANN_BRONZEBEARD, 5);
+                me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
                 if (Creature *cr = ObjectAccessor::GetCreature(*me, pInstance->GetData64(NPC_SJONNIR)))
                     cr->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                me->SetOrientation(3.132660f);
+                DoCast(me, 58506, false);
             }
             break;
         case 28:
@@ -646,6 +667,7 @@ void brann_bronzebeard::brann_bronzebeardAI::WaypointReached(uint32 id)
             break;
         case 29:
             SetEscortPaused(true);
+            me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_USE_STANDING);
             if (pInstance)
                 if (GameObject *console = ObjectAccessor::GetGameObject(*me, pInstance->GetData64(GO_SJONNIR_CONSOLE)))
                     console->SetGoState(GO_STATE_ACTIVE);

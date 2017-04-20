@@ -60,7 +60,7 @@ public:
 
         void MovementInform(uint32 type, uint32 point)
         {
-            if (type == ESCORT_MOTION_TYPE && me->movespline->Finalized())
+            if (type == ESCORT_MOTION_TYPE || point !=0)
                 events.ScheduleEvent(EVENT_REGAIN_CONTROL, 1000);
         }
 

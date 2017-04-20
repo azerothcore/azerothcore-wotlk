@@ -34,27 +34,25 @@ public:
     {
         static std::vector<ChatCommand> lfgCommandTable =
         {
-            {  "player",     SEC_GAMEMASTER, false, &HandleLfgPlayerInfoCommand, "" },
-            {   "group",     SEC_GAMEMASTER, false,  &HandleLfgGroupInfoCommand, "" },
-            {   "queue",     SEC_GAMEMASTER, false,  &HandleLfgQueueInfoCommand, "" },
-            {   "clean",  SEC_ADMINISTRATOR, false,      &HandleLfgCleanCommand, "" },
-            { "options",  SEC_ADMINISTRATOR, false,    &HandleLfgOptionsCommand, "" },
-            {      NULL,         SEC_PLAYER, false,                        NULL, "" }
+            { "player",    SEC_MODERATOR,     false, &HandleLfgPlayerInfoCommand, "" },
+            { "group",     SEC_MODERATOR,     false,  &HandleLfgGroupInfoCommand, "" },
+            { "queue",     SEC_MODERATOR,     false,  &HandleLfgQueueInfoCommand, "" },
+            { "clean",     SEC_ADMINISTRATOR, false,      &HandleLfgCleanCommand, "" },
+            { "options",   SEC_GAMEMASTER,    false,    &HandleLfgOptionsCommand, "" },
         };
 
         static std::vector<ChatCommand> commandTable =
         {
-            {       "lfg",   SEC_GAMEMASTER, false,                        NULL, "", lfgCommandTable },
-            {  NULL,             SEC_PLAYER, false,                        NULL, "" }
+            {  "lfg",   SEC_GAMEMASTER, false,                           nullptr, "", lfgCommandTable },
         };
         return commandTable;
     }
 
     static bool HandleLfgPlayerInfoCommand(ChatHandler* handler, char const* args)
     {
-        Player* target = NULL;
+        Player* target = nullptr;
         std::string playerName;
-        if (!handler->extractPlayerTarget((char*)args, &target, NULL, &playerName))
+        if (!handler->extractPlayerTarget((char*)args, &target, nullptr, &playerName))
             return false;
 
         GetPlayerInfo(handler, target);
@@ -63,9 +61,9 @@ public:
 
     static bool HandleLfgGroupInfoCommand(ChatHandler* handler, char const* args)
     {
-        Player* target = NULL;
+        Player* target = nullptr;
         std::string playerName;
-        if (!handler->extractPlayerTarget((char*)args, &target, NULL, &playerName))
+        if (!handler->extractPlayerTarget((char*)args, &target, nullptr, &playerName))
             return false;
 
         Group* grp = target->GetGroup();
@@ -80,7 +78,7 @@ public:
         handler->PSendSysMessage(LANG_LFG_GROUP_INFO, grp->isLFGGroup(),
             state.c_str(), sLFGMgr->GetDungeon(guid));
 
-        for (GroupReference* itr = grp->GetFirstMember(); itr != NULL; itr = itr->next())
+        for (GroupReference* itr = grp->GetFirstMember(); itr != nullptr; itr = itr->next())
             GetPlayerInfo(handler, itr->GetSource());
         */
         return true;

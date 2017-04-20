@@ -120,10 +120,10 @@ public:
 
             if (instance)
             {
-                if (instance->GetData(TYPE_NIGHTBANE) == DONE)
+                if (instance->GetData64(DATA_NIGHTBANE) == DONE)
                     me->DisappearAndDie();
                 else
-                    instance->SetData(TYPE_NIGHTBANE, NOT_STARTED);
+                    instance->SetData64(DATA_NIGHTBANE, NOT_STARTED);
             }
 
             HandleTerraceDoors(true);
@@ -150,7 +150,7 @@ public:
         void EnterCombat(Unit* /*who*/)
         {
             if (instance)
-                instance->SetData(TYPE_NIGHTBANE, IN_PROGRESS);
+                instance->SetData64(DATA_NIGHTBANE, IN_PROGRESS);
 
             HandleTerraceDoors(false);
            Talk(YELL_AGGRO);
@@ -165,7 +165,7 @@ public:
         void JustDied(Unit* /*killer*/)
         {
             if (instance)
-                instance->SetData(TYPE_NIGHTBANE, DONE);
+                instance->SetData(DATA_NIGHTBANE, DONE);
 
             HandleTerraceDoors(true);
         }
@@ -295,20 +295,23 @@ public:
                 {
                     DoCastVictim(SPELL_BELLOWING_ROAR);
                     BellowingRoarTimer = urand(30000, 40000);
-                } else BellowingRoarTimer -= diff;
+                } else 
+                    BellowingRoarTimer -= diff;
 
                 if (SmolderingBreathTimer <= diff)
                 {
                     DoCastVictim(SPELL_SMOLDERING_BREATH);
                     SmolderingBreathTimer = 20000;
-                } else SmolderingBreathTimer -= diff;
+                } else 
+                    SmolderingBreathTimer -= diff;
 
                 if (CharredEarthTimer <= diff)
                 {
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
                         DoCast(target, SPELL_CHARRED_EARTH);
                     CharredEarthTimer = 20000;
-                } else CharredEarthTimer -= diff;
+                } else 
+                    CharredEarthTimer -= diff;
 
                 if (TailSweepTimer <= diff)
                 {
@@ -316,14 +319,16 @@ public:
                         if (!me->HasInArc(M_PI, target))
                             DoCast(target, SPELL_TAIL_SWEEP);
                     TailSweepTimer = 15000;
-                } else TailSweepTimer -= diff;
+                } else 
+                    TailSweepTimer -= diff;
 
                 if (SearingCindersTimer <= diff)
                 {
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
                         DoCast(target, SPELL_SEARING_CINDERS);
                     SearingCindersTimer = 10000;
-                } else SearingCindersTimer -= diff;
+                } else 
+                    SearingCindersTimer -= diff;
 
                 uint32 Prozent = uint32(me->GetHealthPct());
 
@@ -358,14 +363,16 @@ public:
                         DoCastVictim(SPELL_RAIN_OF_BONES);
                         RainBones = true;
                         SmokingBlastTimer = 20000;
-                    } else RainofBonesTimer -= diff;
+                    } else 
+                        RainofBonesTimer -= diff;
 
                     if (DistractingAshTimer <= diff)
                     {
                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
                             DoCast(target, SPELL_DISTRACTING_ASH);
                         DistractingAshTimer = 2000; //timer wrong
-                    } else DistractingAshTimer -= diff;
+                    } else 
+                        DistractingAshTimer -= diff;
                 }
 
                 if (RainBones)
@@ -374,7 +381,8 @@ public:
                      {
                         DoCastVictim(SPELL_SMOKING_BLAST);
                         SmokingBlastTimer = 1500; //timer wrong
-                     } else SmokingBlastTimer -= diff;
+                     } else 
+                        SmokingBlastTimer -= diff;
                 }
 
                 if (FireballBarrageTimer <= diff)
@@ -382,7 +390,8 @@ public:
                     if (Unit* target = SelectTarget(SELECT_TARGET_FARTHEST, 0))
                         DoCast(target, SPELL_FIREBALL_BARRAGE);
                     FireballBarrageTimer = 20000;
-                } else FireballBarrageTimer -= diff;
+                } else 
+                    FireballBarrageTimer -= diff;
 
                 if (FlyTimer <= diff) //landing
                 {
@@ -392,7 +401,8 @@ public:
                     me->GetMotionMaster()->MovePoint(3, IntroWay[3][0], IntroWay[3][1], IntroWay[3][2]);
 
                     Flying = true;
-                } else FlyTimer -= diff;
+                } else 
+					FlyTimer -= diff;
             }
         }
     };
@@ -408,10 +418,10 @@ public:
     {
         if (InstanceScript* pInstance = pGo->GetInstanceScript())
         {
-            if (pInstance->GetData(TYPE_NIGHTBANE) != DONE && !pGo->FindNearestCreature(17225, 40.0f))
+            if (pInstance->GetData(DATA_NIGHTBANE) != DONE && !pGo->FindNearestCreature(NPC_NIGHTBANE, 40.0f))
                 if (Creature *cr = ObjectAccessor::GetCreature(*pPlayer, pInstance->GetData64(DATA_NIGHTBANE)))
                     cr->GetMotionMaster()->MovePoint(0, IntroWay[0][0], IntroWay[0][1], IntroWay[0][2]);
-        }        
+        }
         return false;
     }
 };

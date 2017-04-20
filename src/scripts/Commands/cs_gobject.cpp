@@ -32,33 +32,29 @@ public:
     {
         static std::vector<ChatCommand> gobjectAddCommandTable =
         {
-            { "temp",           SEC_GAMEMASTER,     false, &HandleGameObjectAddTempCommand,   "" },
-            { "",               SEC_GAMEMASTER,     false, &HandleGameObjectAddCommand,       "" },
-            { NULL,             0,                  false, NULL,                              "" }
+            { "temp",           SEC_GAMEMASTER,        false, &HandleGameObjectAddTempCommand,   "" },
+            { "",               SEC_ADMINISTRATOR,     false, &HandleGameObjectAddCommand,       "" }
         };
         static std::vector<ChatCommand> gobjectSetCommandTable =
         {
-            { "phase",          SEC_GAMEMASTER,     false, &HandleGameObjectSetPhaseCommand,  "" },
-            { "state",          SEC_GAMEMASTER,     false, &HandleGameObjectSetStateCommand,  "" },
-            { NULL,             0,                  false, NULL,                              "" }
+            { "phase",          SEC_ADMINISTRATOR,     false, &HandleGameObjectSetPhaseCommand,  "" },
+            { "state",          SEC_ADMINISTRATOR,     false, &HandleGameObjectSetStateCommand,  "" }
         };
         static std::vector<ChatCommand> gobjectCommandTable =
         {
-            { "activate",       SEC_GAMEMASTER,     false, &HandleGameObjectActivateCommand,  "" },
-            { "delete",         SEC_GAMEMASTER,     false, &HandleGameObjectDeleteCommand,    "" },
-            { "info",           SEC_GAMEMASTER,     false, &HandleGameObjectInfoCommand,      "" },
-            { "move",           SEC_GAMEMASTER,     false, &HandleGameObjectMoveCommand,      "" },
-            { "near",           SEC_GAMEMASTER,     false, &HandleGameObjectNearCommand,      "" },
-            { "target",         SEC_GAMEMASTER,     false, &HandleGameObjectTargetCommand,    "" },
-            { "turn",           SEC_GAMEMASTER,     false, &HandleGameObjectTurnCommand,      "" },
-            { "add",            SEC_GAMEMASTER,     false, NULL,            "", gobjectAddCommandTable },
-            { "set",            SEC_GAMEMASTER,     false, NULL,            "", gobjectSetCommandTable },
-            { NULL,             0,                  false, NULL,                              "" }
+            { "activate",       SEC_ADMINISTRATOR,     false, &HandleGameObjectActivateCommand,  "" },
+            { "delete",         SEC_ADMINISTRATOR,     false, &HandleGameObjectDeleteCommand,    "" },
+            { "info",           SEC_MODERATOR,         false, &HandleGameObjectInfoCommand,      "" },
+            { "move",           SEC_ADMINISTRATOR,     false, &HandleGameObjectMoveCommand,      "" },
+            { "near",           SEC_MODERATOR,         false, &HandleGameObjectNearCommand,      "" },
+            { "target",         SEC_MODERATOR,         false, &HandleGameObjectTargetCommand,    "" },
+            { "turn",           SEC_ADMINISTRATOR,     false, &HandleGameObjectTurnCommand,      "" },
+            { "add",            SEC_ADMINISTRATOR,     false, nullptr,                           "", gobjectAddCommandTable },
+            { "set",            SEC_ADMINISTRATOR,     false, nullptr,                           "", gobjectSetCommandTable }
         };
         static std::vector<ChatCommand> commandTable =
         {
-            { "gobject",        SEC_GAMEMASTER,     false, NULL,                "", gobjectCommandTable },
-            { NULL,             0,                  false, NULL,                               "" }
+            { "gobject",        SEC_MODERATOR,     false, nullptr,                               "", gobjectCommandTable }
         };
         return commandTable;
     }
@@ -76,7 +72,7 @@ public:
         if (!guidLow)
             return false;
 
-        GameObject* object = NULL;
+        GameObject* object = nullptr;
 
         // by DB guid
         if (GameObjectData const* goData = sObjectMgr->GetGOData(guidLow))
@@ -113,7 +109,7 @@ public:
         if (!objectId)
             return false;
 
-        char* spawntimeSecs = strtok(NULL, " ");
+        char* spawntimeSecs = strtok(nullptr, " ");
 
         const GameObjectTemplate* objectInfo = sObjectMgr->GetGameObjectTemplate(objectId);
 
@@ -188,7 +184,7 @@ public:
 
         Player* player = handler->GetSession()->GetPlayer();
 
-        char* spawntime = strtok(NULL, " ");
+        char* spawntime = strtok(nullptr, " ");
         uint32 spawntm = 300;
 
         if (spawntime)
@@ -314,7 +310,7 @@ public:
 
         if (target)
         {
-            int32 curRespawnDelay = int32(target->GetRespawnTimeEx() - time(NULL));
+            int32 curRespawnDelay = int32(target->GetRespawnTimeEx() - time(nullptr));
             if (curRespawnDelay < 0)
                 curRespawnDelay = 0;
 
@@ -338,7 +334,7 @@ public:
         if (!guidLow)
             return false;
 
-        GameObject* object = NULL;
+        GameObject* object = nullptr;
 
         // by DB guid
         if (GameObjectData const* gameObjectData = sObjectMgr->GetGOData(guidLow))
@@ -386,7 +382,7 @@ public:
         if (!guidLow)
             return false;
 
-        GameObject* object = NULL;
+        GameObject* object = nullptr;
 
         // by DB guid
         if (GameObjectData const* gameObjectData = sObjectMgr->GetGOData(guidLow))
@@ -399,17 +395,17 @@ public:
             return false;
         }
 
-        char* orientation = strtok(NULL, " ");
+        char* orientation = strtok(nullptr, " ");
         float oz = 0.f, oy = 0.f, ox = 0.f;
 
         if (orientation)
         {
             oz = float(atof(orientation));
-            orientation = strtok(NULL, " ");
+            orientation = strtok(nullptr, " ");
             if (orientation)
             {
                 oy = float(atof(orientation));
-                orientation = strtok(NULL, " ");
+                orientation = strtok(nullptr, " ");
                 if (orientation)
                     ox = float(atof(orientation));
             }
@@ -444,7 +440,7 @@ public:
         if (!guidLow)
             return false;
 
-        GameObject* object = NULL;
+        GameObject* object = nullptr;
 
         // by DB guid
         if (GameObjectData const* gameObjectData = sObjectMgr->GetGOData(guidLow))
@@ -457,9 +453,9 @@ public:
             return false;
         }
 
-        char* toX = strtok(NULL, " ");
-        char* toY = strtok(NULL, " ");
-        char* toZ = strtok(NULL, " ");
+        char* toX = strtok(nullptr, " ");
+        char* toY = strtok(nullptr, " ");
+        char* toZ = strtok(nullptr, " ");
 
         if (!toX)
         {
@@ -509,7 +505,7 @@ public:
         if (!guidLow)
             return false;
 
-        GameObject* object = NULL;
+        GameObject* object = nullptr;
 
         // by DB guid
         if (GameObjectData const* gameObjectData = sObjectMgr->GetGOData(guidLow))
@@ -522,7 +518,7 @@ public:
             return false;
         }
 
-        char* phase = strtok (NULL, " ");
+        char* phase = strtok (nullptr, " ");
         uint32 phaseMask = phase ? atoi(phase) : 0;
         if (phaseMask == 0)
         {
@@ -589,7 +585,7 @@ public:
         uint32 displayId = 0;
         std::string name;
         uint32 lootId = 0;
-        GameObject* gameObject = NULL;
+        GameObject* gameObject = nullptr;
 
         if (!*args)
         {
@@ -646,7 +642,7 @@ public:
         if (!guidLow)
             return false;
 
-        GameObject* object = NULL;
+        GameObject* object = nullptr;
 
         if (guidLow > 0)
         {
@@ -664,7 +660,7 @@ public:
             return false;
         }
 
-        char* type = strtok(NULL, " ");
+        char* type = strtok(nullptr, " ");
         if (!type)
             return false;
 
@@ -678,7 +674,7 @@ public:
             return true;
         }
 
-        char* state = strtok(NULL, " ");
+        char* state = strtok(nullptr, " ");
         if (!state)
             return false;
 

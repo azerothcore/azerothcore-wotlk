@@ -27,21 +27,18 @@ public:
         static std::vector<ChatCommand> honorAddCommandTable =
         {
             { "kill",           SEC_GAMEMASTER,     false, &HandleHonorAddKillCommand,         "" },
-            { "",               SEC_GAMEMASTER,     false, &HandleHonorAddCommand,             "" },
-            { NULL,             0,                  false, NULL,                               "" }
+            { "",               SEC_GAMEMASTER,     false, &HandleHonorAddCommand,             "" }
         };
 
         static std::vector<ChatCommand> honorCommandTable =
         {
-            { "add",            SEC_GAMEMASTER,     false, NULL,               "", honorAddCommandTable },
-            { "update",         SEC_GAMEMASTER,     false, &HandleHonorUpdateCommand,          "" },
-            { NULL,             0,                  false, NULL,                               "" }
+            { "add",            SEC_GAMEMASTER,     false, nullptr,                            "", honorAddCommandTable },
+            { "update",         SEC_GAMEMASTER,     false, &HandleHonorUpdateCommand,          "" }
         };
 
         static std::vector<ChatCommand> commandTable =
         {
-            { "honor",          SEC_GAMEMASTER,     false, NULL,                  "", honorCommandTable },
-            { NULL,             0,                  false, NULL,                               "" }
+            { "honor",          SEC_GAMEMASTER,     false, nullptr,                            "", honorCommandTable }
         };
         return commandTable;
     }
@@ -64,7 +61,7 @@ public:
             return false;
 
         uint32 amount = (uint32)atoi(args);
-        target->RewardHonor(NULL, 1, amount);
+        target->RewardHonor(nullptr, 1, amount);
         return true;
     }
 

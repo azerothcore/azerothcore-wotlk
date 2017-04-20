@@ -64,9 +64,11 @@ public:
 
         void SummonCryptGuards()
         {
-            me->SummonCreature(NPC_CRYPT_GUARD, 3308.590f, -3466.29f, 287.16f, M_PI, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 60000);
-            if (IsHeroic())
-                me->SummonCreature(NPC_CRYPT_GUARD, 3308.590f, -3486.29f, 287.16f, M_PI, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 60000);
+            if (Is25ManRaid())
+            {
+                me->SummonCreature(NPC_CRYPT_GUARD, 3299.825f, -3502.27f, 287.16f, M_PI, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 60000);
+                me->SummonCreature(NPC_CRYPT_GUARD, 3299.087f, -3450.93f, 287.16f, M_PI, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 60000);
+            }
         }
 
         void Reset() 

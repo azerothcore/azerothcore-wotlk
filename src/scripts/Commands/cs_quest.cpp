@@ -26,16 +26,14 @@ public:
     {
         static std::vector<ChatCommand> questCommandTable =
         {
-            { "add",            SEC_ADMINISTRATOR,  false, &HandleQuestAdd,                    "" },
-            { "complete",       SEC_ADMINISTRATOR,  false, &HandleQuestComplete,               "" },
-            { "remove",         SEC_ADMINISTRATOR,  false, &HandleQuestRemove,                 "" },
-            { "reward",         SEC_ADMINISTRATOR,  false, &HandleQuestReward,                 "" },
-            { NULL,             SEC_PLAYER,         false, NULL,                               "" }
+            { "add",            SEC_GAMEMASTER,  false, &HandleQuestAdd,                    "" },
+            { "complete",       SEC_GAMEMASTER,  false, &HandleQuestComplete,               "" },
+            { "remove",         SEC_GAMEMASTER,  false, &HandleQuestRemove,                 "" },
+            { "reward",         SEC_GAMEMASTER,  false, &HandleQuestReward,                 "" },
         };
         static std::vector<ChatCommand> commandTable =
         {
-            { "quest",          SEC_ADMINISTRATOR,  false, NULL,                  "", questCommandTable },
-            { NULL,             SEC_PLAYER,         false, NULL,                               "" }
+            { "quest",          SEC_GAMEMASTER,  false, nullptr, "", questCommandTable },
         };
         return commandTable;
     }
@@ -80,7 +78,7 @@ public:
 
         // ok, normal (creature/GO starting) quest
         if (player->CanAddQuest(quest, true))
-            player->AddQuestAndCheckCompletion(quest, NULL);
+            player->AddQuestAndCheckCompletion(quest, nullptr);
 
         return true;
     }

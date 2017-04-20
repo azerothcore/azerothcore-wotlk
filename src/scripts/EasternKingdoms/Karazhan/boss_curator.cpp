@@ -1,5 +1,5 @@
 /*
-REWRITTEN BY XINEF
+ * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-AGPL
 */
 
 #include "ScriptMgr.h"
@@ -40,7 +40,7 @@ class boss_curator : public CreatureScript
 
         struct boss_curatorAI : public BossAI
         {
-            boss_curatorAI(Creature* creature) : BossAI(creature, TYPE_CURATOR) { }
+            boss_curatorAI(Creature* creature) : BossAI(creature, DATA_CURATOR) { }
 
             void Reset()
             {
@@ -75,6 +75,7 @@ class boss_curator : public CreatureScript
                 events.ScheduleEvent(EVENT_SPELL_ASTRAL_FLARE, 6000);
                 events.ScheduleEvent(EVENT_SPELL_BERSERK, 600000);
                 events.ScheduleEvent(EVENT_CHECK_HEALTH, 1000);
+                DoZoneInCombat();
             }
 
             void JustSummoned(Creature* summon)

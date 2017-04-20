@@ -51,7 +51,7 @@ class npc_pet_mage_mirror_image : public CreatureScript
             npc_pet_mage_mirror_imageAI(Creature* creature) : CasterAI(creature) { }
 
             uint32 selectionTimer;
-            uint64 _ebonGarogyleGUID;
+            uint64 _ebonGargoyleGUID;
 
             void InitializeAI()
             {
@@ -92,7 +92,7 @@ class npc_pet_mage_mirror_image : public CreatureScript
                     ref = ref->next();
                 }
 
-                _ebonGarogyleGUID = 0;
+                _ebonGargoyleGUID = 0;
 
                 // Xinef: copy caster auras
                 Unit::VisibleAuraMap const* visibleAuraMap = owner->GetVisibleAuras();
@@ -102,8 +102,8 @@ class npc_pet_mage_mirror_image : public CreatureScript
                         // Ebon Gargoyle
                         if (visAura->GetId() == 49206 && me->GetUInt32Value(UNIT_CREATED_BY_SPELL) == SPELL_SUMMON_MIRROR_IMAGE1)
                         {
-                            if (Unit* garogyle = visAura->GetCaster())
-                                _ebonGarogyleGUID = garogyle->GetGUID();
+                            if (Unit* gargoyle = visAura->GetCaster())
+                                _ebonGargoyleGUID = gargoyle->GetGUID();
                             continue;
                         }
                         SpellScriptsBounds bounds = sObjectMgr->GetSpellScriptsBounds(visAura->GetId());
@@ -137,11 +137,12 @@ class npc_pet_mage_mirror_image : public CreatureScript
 
             bool MySelectNextTarget()
             {
-                if (_ebonGarogyleGUID)
+                if (_ebonGargoyleGUID)
                 {
-                    if (Unit* garogyle = ObjectAccessor::GetUnit(*me, _ebonGarogyleGUID))
-                        garogyle->GetAI()->AttackStart(me);
-                    _ebonGarogyleGUID = 0;
+                    Unit* gargoyle = ObjectAccessor::GetUnit(*me, _ebonGargoyleGUID);
+                    if (gargoyle && gargoyle->GetAI())
+                        gargoyle->GetAI()->AttackStart(me);
+                    _ebonGargoyleGUID = 0;
                 }
                 Unit* owner = me->GetOwner();
                 if (owner && owner->GetTypeId() == TYPEID_PLAYER)

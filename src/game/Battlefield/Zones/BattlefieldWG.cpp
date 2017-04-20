@@ -189,13 +189,15 @@ bool BattlefieldWG::Update(uint32 diff)
     else
         m_saveTimer -= diff;
 
-    // Update Tenacity every 2,5 sec.
+    // Update Tenacity
     if (IsWarTime())
     {
         if (m_tenacityUpdateTimer <= diff)
         {
-            m_tenacityUpdateTimer = 2500;
-            UpdateTenacity();
+            m_tenacityUpdateTimer = 10000;
+            if (!m_updateTenacityList.empty())
+                UpdateTenacity();
+            m_updateTenacityList.clear();
         }
         else
             m_tenacityUpdateTimer -= diff;
@@ -905,15 +907,15 @@ void BattlefieldWG::FillInitialWorldStates(WorldPacket& data)
 void BattlefieldWG::SendInitWorldStatesTo(Player* player)
 {
     WorldPacket data(SMSG_INIT_WORLD_STATES, (4 + 4 + 4 + 2 + (BuildingsInZone.size() * 8) + (WorkshopsList.size() * 8)));
-    
+
     data << uint32(m_MapId);
     data << uint32(m_ZoneId);
-    data << uint32(0);  
+    data << uint32(0);
     data << uint16(10 + BuildingsInZone.size() + WorkshopsList.size()); // Number of fields
-    
+
     FillInitialWorldStates(data);
-    
-    player->GetSession()->SendPacket(&data);    
+
+    player->GetSession()->SendPacket(&data);
 }
 
 void BattlefieldWG::SendInitWorldStatesToAll()
@@ -1073,7 +1075,42 @@ void BattlefieldWG::UpdateTenacity()
             newStack = int32((1.0f - ((float)alliancePlayers / hordePlayers)) * 4.0f);  // negative, should cast on horde
     }
 
-    // new way to check:  always add stacks if they exist, to every one in the game
+    // Return if no change in stack and apply tenacity to new player
+    if (newStack == m_tenacityStack)
+    {
+        for (GuidSet::const_iterator itr = m_updateTenacityList.begin(); itr != m_updateTenacityList.end(); ++itr)
+            if (Player* newPlayer = ObjectAccessor::FindPlayer(*itr))
+                if ((newPlayer->GetTeamId() == TEAM_ALLIANCE && m_tenacityStack > 0) || (newPlayer->GetTeamId() == TEAM_HORDE && m_tenacityStack < 0))
+                {
+                    newStack = std::min(abs(newStack), 20);
+                    uint32 buff_honor = GetHonorBuff(newStack);
+                    newPlayer->SetAuraStack(SPELL_TENACITY, newPlayer, newStack);
+                    if (buff_honor)
+                        newPlayer->CastSpell(newPlayer, buff_honor, true);
+                }
+        return;
+    }
+
+    if (m_tenacityStack != 0)
+    {
+        if (m_tenacityStack > 0 && newStack <= 0)               // old buff was on alliance
+            team = TEAM_ALLIANCE;
+        else if (m_tenacityStack < 0 && newStack >= 0)          // old buff was on horde
+            team = TEAM_HORDE;
+    }
+
+    m_tenacityStack = newStack;
+    // Remove old buff
+    if (team != TEAM_NEUTRAL)
+    {
+        for (GuidSet::const_iterator itr = m_PlayersInWar[team].begin(); itr != m_PlayersInWar[team].end(); ++itr)
+            if (Player* player = ObjectAccessor::FindPlayer(*itr))
+                player->RemoveAurasDueToSpell(SPELL_TENACITY);
+
+        for (GuidSet::const_iterator itr = m_vehicles[team].begin(); itr != m_vehicles[team].end(); ++itr)
+            if (Unit* unit = ObjectAccessor::FindUnit(*itr))
+                unit->RemoveAurasDueToSpell(SPELL_TENACITY_VEHICLE);
+    }
 
     // Apply new buff
     if (newStack)
@@ -1098,28 +1135,6 @@ void BattlefieldWG::UpdateTenacity()
                     unit->CastSpell(unit, buff_honor, true);
             }
     }
-
-    if (m_tenacityStack != 0)
-    {
-        if (m_tenacityStack > 0 && newStack <= 0)               // old buff was on alliance
-            team = TEAM_ALLIANCE;
-        else if (m_tenacityStack < 0 && newStack >= 0)          // old buff was on horde
-            team = TEAM_HORDE;
-    }
-
-    // Remove old buff
-    if (team != TEAM_NEUTRAL)
-    {
-        for (GuidSet::const_iterator itr = m_PlayersInWar[team].begin(); itr != m_PlayersInWar[team].end(); ++itr)
-            if (Player* player = ObjectAccessor::FindPlayer(*itr))
-                    player->RemoveAurasDueToSpell(SPELL_TENACITY);
-
-        for (GuidSet::const_iterator itr = m_vehicles[team].begin(); itr != m_vehicles[team].end(); ++itr)
-            if (Unit* unit = ObjectAccessor::FindUnit(*itr))
-                unit->RemoveAurasDueToSpell(SPELL_TENACITY_VEHICLE);
-    }
-
-    m_tenacityStack = newStack; // Assign new tenacity value
 }
 
 WintergraspCapturePoint::WintergraspCapturePoint(BattlefieldWG* battlefield, TeamId teamInControl) : BfCapturePoint(battlefield)

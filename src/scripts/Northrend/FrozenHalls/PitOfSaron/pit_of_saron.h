@@ -175,8 +175,8 @@ const ChampionPosition introPositions[] =
     { { NPC_CHAMPION_2_ALLIANCE, NPC_CHAMPION_3_HORDE }, { 442.526f, 199.361f, 528.84f, 0.0f } },
     { { NPC_CHAMPION_2_ALLIANCE, NPC_CHAMPION_3_HORDE }, { 442.843f, 203.193f, 528.84f, 0.0f } },
 
-    { { NPC_LORALEN, NPC_LORALEN }, { 438.505f, 211.54f, 528.71f, 0.0f } },
-    { { NPC_LORALEN, NPC_KALIRA }, { 438.946f, 215.427f, 528.71f, 0.0f } },
+    { { NPC_LORALEN, NPC_KALIRA }, { 438.505f, 211.54f, 528.71f, 0.0f } },
+    { { NPC_KALIRA, NPC_LORALEN }, { 438.946f, 215.427f, 528.71f, 0.0f } },
 
     { { 0, 0 }, { 0.0f, 0.0f, 0.0f, 0.0f } }
 };

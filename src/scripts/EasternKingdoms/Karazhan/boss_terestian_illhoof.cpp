@@ -48,8 +48,7 @@ enum Creatures
 {
     NPC_DEMONCHAINS             = 17248,
     NPC_FIENDISHIMP             = 17267,
-    NPC_PORTAL                  = 17265,
-    NPC_KILREK                  = 17229
+    NPC_PORTAL                  = 17265
 };
 
 
@@ -109,7 +108,8 @@ public:
                 DoCastVictim(SPELL_AMPLIFY_FLAMES);
 
                 AmplifyTimer = urand(10000, 20000);
-            } else AmplifyTimer -= diff;
+            } else 
+                AmplifyTimer -= diff;
 
             DoMeleeAttackIfReady();
         }
@@ -223,7 +223,8 @@ public:
             {
                 DoCastVictim(SPELL_FIREBOLT);
                 FireboltTimer = 2200;
-            } else FireboltTimer -= diff;
+            } else 
+                FireboltTimer -= diff;
 
             DoMeleeAttackIfReady();
         }
@@ -258,6 +259,7 @@ public:
         uint32 ShadowboltTimer;
         uint32 SummonTimer;
         uint32 BerserkTimer;
+        uint32 SummonKilrekTimer;
 
         bool SummonedPortals;
         bool Berserk;
@@ -278,16 +280,17 @@ public:
                 }
             }
 
-            PortalsCount        =     0;
-            SacrificeTimer      = 30000;
-            ShadowboltTimer     =  5000;
-            SummonTimer         = 10000;
-            BerserkTimer        = 600000;
+            PortalsCount = 0;
+            SacrificeTimer = 30000;
+            ShadowboltTimer = 5000;
+            SummonTimer = 10000;
+            BerserkTimer = 600000;
+            SummonKilrekTimer = 0;
 
-            SummonedPortals     = false;
-            Berserk             = false;
+            SummonedPortals = false;
+            Berserk = false;
 
-            instance->SetData(TYPE_TERESTIAN, NOT_STARTED);
+            instance->SetData(DATA_TERESTIAN, NOT_STARTED);
 
             me->RemoveAurasDueToSpell(SPELL_BROKEN_PACT);
 
@@ -299,12 +302,14 @@ public:
                     DoCast(me, SPELL_SUMMON_IMP, true);
                 }
             }
-            else DoCast(me, SPELL_SUMMON_IMP, true);
+            else 
+                DoCast(me, SPELL_SUMMON_IMP, true);
         }
 
         void EnterCombat(Unit* /*who*/)
         {
             Talk(SAY_AGGRO);
+            DoZoneInCombat();
         }
 
         void JustSummoned(Creature* summoned)
@@ -341,8 +346,7 @@ public:
             }
 
             Talk(SAY_DEATH);
-
-            instance->SetData(TYPE_TERESTIAN, DONE);
+            instance->SetData(DATA_TERESTIAN, DONE);
         }
 
         void UpdateAI(uint32 diff)
@@ -350,6 +354,24 @@ public:
             if (!UpdateVictim())
                 return;
 
+            if (Minion* Kilrek = me->GetFirstMinion())
+            {
+                if (!Kilrek->IsAlive())
+                {
+                    Kilrek->UnSummon();
+                    SummonKilrekTimer = 45000;
+                }
+            }
+            
+
+            if (SummonKilrekTimer <= diff)
+            { 
+                DoCast(me, SPELL_SUMMON_IMP, true);
+                me->RemoveAura(SPELL_BROKEN_PACT);
+            }
+            else 
+                SummonKilrekTimer -= diff;
+         
             if (SacrificeTimer <= diff)
             {
                 Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 100, true);
@@ -362,17 +384,20 @@ public:
                     {
                         CAST_AI(npc_demon_chain::npc_demon_chainAI, Chains->AI())->SacrificeGUID = target->GetGUID();
                         Chains->CastSpell(Chains, SPELL_DEMON_CHAINS, true);
+
                         Talk(SAY_SACRIFICE);
                         SacrificeTimer = 30000;
                     }
                 }
-            } else SacrificeTimer -= diff;
+            } else 
+                SacrificeTimer -= diff;
 
             if (ShadowboltTimer <= diff)
             {
                 DoCast(SelectTarget(SELECT_TARGET_TOPAGGRO, 0), SPELL_SHADOW_BOLT);
                 ShadowboltTimer = 10000;
-            } else ShadowboltTimer -= diff;
+            } else 
+                ShadowboltTimer -= diff;
 
             if (SummonTimer <= diff)
             {
@@ -388,7 +413,8 @@ public:
                         pPortal->CastSpell(me->GetVictim(), SPELL_SUMMON_FIENDISIMP, false);
                     SummonTimer = 5000;
                 }
-            } else SummonTimer -= diff;
+            } else 
+                SummonTimer -= diff;
 
             if (!Berserk)
             {
@@ -396,7 +422,8 @@ public:
                 {
                     DoCast(me, SPELL_BERSERK);
                     Berserk = true;
-                } else BerserkTimer -= diff;
+                } else 
+                    BerserkTimer -= diff;
             }
 
             DoMeleeAttackIfReady();

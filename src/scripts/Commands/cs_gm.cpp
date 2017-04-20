@@ -30,17 +30,15 @@ public:
         static std::vector<ChatCommand> gmCommandTable =
         {
             { "chat",           SEC_GAMEMASTER,      false, &HandleGMChatCommand,              "" },
-            { "fly",            SEC_ADMINISTRATOR,  false, &HandleGMFlyCommand,               "" },
-            //{ "ingame",         SEC_PLAYER,         true,  &HandleGMListIngameCommand,        "" },
-            { "list",           SEC_ADMINISTRATOR,  true,  &HandleGMListFullCommand,          "" },
+            { "fly",            SEC_GAMEMASTER,      false, &HandleGMFlyCommand,               "" },
+            { "ingame",         SEC_PLAYER,          true,  &HandleGMListIngameCommand,        "" },
+            { "list",           SEC_GAMEMASTER,      true,  &HandleGMListFullCommand,          "" },
             { "visible",        SEC_GAMEMASTER,      false, &HandleGMVisibleCommand,           "" },
-            { "",               SEC_GAMEMASTER,      false, &HandleGMCommand,                  "" },
-            { NULL,             0,                  false, NULL,                              "" }
+            { "",               SEC_GAMEMASTER,      false, &HandleGMCommand,                  "" }
         };
         static std::vector<ChatCommand> commandTable =
         {
-            { "gm",             SEC_GAMEMASTER,      false, NULL,                     "", gmCommandTable },
-            { NULL,             0,                  false, NULL,                               "" }
+            { "gm",             SEC_MODERATOR,      false, nullptr,                     "", gmCommandTable }
         };
         return commandTable;
     }
@@ -85,7 +83,7 @@ public:
             return false;
 
         Player* target =  handler->getSelectedPlayer();
-        if (!target || handler->GetSession()->GetSecurity() < SEC_GAMEMASTER)
+        if (!target || AccountMgr::IsGMAccount(handler->GetSession()->GetSecurity()))
             target = handler->GetSession()->GetPlayer();
 
         WorldPacket data(12);

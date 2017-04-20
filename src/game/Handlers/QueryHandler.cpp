@@ -87,7 +87,52 @@ void WorldSession::HandleCreatureQueryOpcode(WorldPacket & recvData)
 
     CreatureTemplate const* ci = sObjectMgr->GetCreatureTemplate(entry);
     if (ci)
-        SendPacket(&ci->queryData);
+    {
+        std::string Name, Title;
+        Name = ci->Name;
+        Title = ci->SubName;
+        
+        LocaleConstant loc_idx = GetSessionDbLocaleIndex();
+        if (loc_idx >= 0)
+        {
+            if (CreatureLocale const* cl = sObjectMgr->GetCreatureLocale(entry))
+            {
+                ObjectMgr::GetLocaleString(cl->Name, loc_idx, Name);
+                ObjectMgr::GetLocaleString(cl->Title, loc_idx, Title);
+            }
+        }
+                                                            // guess size
+        WorldPacket data(SMSG_CREATURE_QUERY_RESPONSE, 100);
+        data << uint32(entry);                              // creature entry
+        data << Name;
+        data << uint8(0) << uint8(0) << uint8(0);           // name2, name3, name4, always empty
+        data << Title;
+        data << ci->IconName;                               // "Directions" for guard, string for Icons 2.3.0
+        data << uint32(ci->type_flags);                     // flags
+        data << uint32(ci->type);                           // CreatureType.dbc
+        data << uint32(ci->family);                         // CreatureFamily.dbc
+        data << uint32(ci->rank);                           // Creature Rank (elite, boss, etc)
+        data << uint32(ci->KillCredit[0]);                  // new in 3.1, kill credit
+        data << uint32(ci->KillCredit[1]);                  // new in 3.1, kill credit
+        data << uint32(ci->Modelid1);                       // Modelid1
+        data << uint32(ci->Modelid2);                       // Modelid2
+        data << uint32(ci->Modelid3);                       // Modelid3
+        data << uint32(ci->Modelid4);                       // Modelid4
+        data << float(ci->ModHealth);                       // dmg/hp modifier
+        data << float(ci->ModMana);                         // dmg/mana modifier
+        data << uint8(ci->RacialLeader);
+
+        CreatureQuestItemList const* items = sObjectMgr->GetCreatureQuestItemList(entry);
+        if (items)
+            for (size_t i = 0; i < MAX_CREATURE_QUEST_ITEMS; ++i)
+                data << (i < items->size() ? uint32((*items)[i]) : uint32(0));
+        else
+            for (size_t i = 0; i < MAX_CREATURE_QUEST_ITEMS; ++i)
+                data << uint32(0);
+
+        data << uint32(ci->movementId);                     // CreatureMovementInfo.dbc
+        SendPacket(&data);
+    }
     else
     {
         ;//sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_CREATURE_QUERY - NO CREATURE INFO! (GUID: %u, ENTRY: %u)",
@@ -110,20 +155,43 @@ void WorldSession::HandleGameObjectQueryOpcode(WorldPacket & recvData)
     const GameObjectTemplate* info = sObjectMgr->GetGameObjectTemplate(entry);
     if (info)
     {
+        std::string Name;
+        std::string IconName;
+        std::string CastBarCaption;
+        
+        Name = info->name;
+        IconName = info->IconName;
+        CastBarCaption = info->castBarCaption;
+        
+        LocaleConstant localeConstant = GetSessionDbLocaleIndex();
+        if (localeConstant >= LOCALE_enUS)
+            if (GameObjectLocale const* gameObjectLocale = sObjectMgr->GetGameObjectLocale(entry))
+            {
+                ObjectMgr::GetLocaleString(gameObjectLocale->Name, localeConstant, Name);
+                ObjectMgr::GetLocaleString(gameObjectLocale->CastBarCaption, localeConstant, CastBarCaption);
+            }
+
         ;//sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_GAMEOBJECT_QUERY '%s' - Entry: %u. ", info->name.c_str(), entry);
         WorldPacket data (SMSG_GAMEOBJECT_QUERY_RESPONSE, 150);
         data << uint32(entry);
         data << uint32(info->type);
         data << uint32(info->displayId);
-        data << info->name;
+        data << Name;
         data << uint8(0) << uint8(0) << uint8(0);           // name2, name3, name4
-        data << info->IconName;                                   // 2.0.3, string. Icon name to use instead of default icon for go's (ex: "Attack" makes sword)
-        data << info->castBarCaption;                             // 2.0.3, string. Text will appear in Cast Bar when using GO (ex: "Collecting")
+        data << IconName;                                   // 2.0.3, string. Icon name to use instead of default icon for go's (ex: "Attack" makes sword)
+        data << CastBarCaption;                             // 2.0.3, string. Text will appear in Cast Bar when using GO (ex: "Collecting")
         data << info->unk1;                                 // 2.0.3, string
         data.append(info->raw.data, MAX_GAMEOBJECT_DATA);
         data << float(info->size);                          // go size
-        for (uint32 i = 0; i < MAX_GAMEOBJECT_QUEST_ITEMS; ++i)
-            data << uint32(info->questItems[i]);              // itemId[6], quest drop
+
+        GameObjectQuestItemList const* items = sObjectMgr->GetGameObjectQuestItemList(entry);
+        if (items)
+            for (size_t i = 0; i < MAX_GAMEOBJECT_QUEST_ITEMS; ++i)
+                data << (i < items->size() ? uint32((*items)[i]) : uint32(0));
+        else
+            for (size_t i = 0; i < MAX_GAMEOBJECT_QUEST_ITEMS; ++i)
+                data << uint32(0);
+
         SendPacket(&data);
         ;//sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Sent SMSG_GAMEOBJECT_QUERY_RESPONSE");
     }
@@ -206,7 +274,7 @@ void WorldSession::HandleNpcTextQueryOpcode(WorldPacket & recvData)
 
     if (!pGossip)
     {
-        for (uint32 i = 0; i < MAX_GOSSIP_TEXT_OPTIONS; ++i)
+        for (uint8 i = 0; i < MAX_GOSSIP_TEXT_OPTIONS; ++i)
         {
             data << float(0);
             data << "Greetings $N";
@@ -222,23 +290,47 @@ void WorldSession::HandleNpcTextQueryOpcode(WorldPacket & recvData)
     }
     else
     {
-        for (int i = 0; i < MAX_GOSSIP_TEXT_OPTIONS; ++i)
+        std::string text0[MAX_GOSSIP_TEXT_OPTIONS], text1[MAX_GOSSIP_TEXT_OPTIONS];
+        LocaleConstant locale = GetSessionDbLocaleIndex();
+        
+        for (uint8 i = 0; i < MAX_GOSSIP_TEXT_OPTIONS; ++i)
         {
+            BroadcastText const* bct = sObjectMgr->GetBroadcastText(pGossip->Options[i].BroadcastTextID);
+            if (bct)
+            {
+                text0[i] = bct->GetText(locale, GENDER_MALE, true);
+                text1[i] = bct->GetText(locale, GENDER_FEMALE, true);
+            }
+            else
+            {
+                text0[i] = pGossip->Options[i].Text_0;
+                text1[i] = pGossip->Options[i].Text_1;
+            }
+
+            if (locale != DEFAULT_LOCALE && !bct)
+            {
+                if (NpcTextLocale const* npcTextLocale = sObjectMgr->GetNpcTextLocale(textID))
+                {
+                    ObjectMgr::GetLocaleString(npcTextLocale->Text_0[i], locale, text0[i]);
+                    ObjectMgr::GetLocaleString(npcTextLocale->Text_1[i], locale, text1[i]);
+                }
+            }
+
             data << pGossip->Options[i].Probability;
 
-            if (pGossip->Options[i].Text_0.empty())
-                data << pGossip->Options[i].Text_1;
+            if (text0[i].empty())
+                data << text1[i];
             else
-                data << pGossip->Options[i].Text_0;
+                data << text0[i];
 
-            if (pGossip->Options[i].Text_1.empty())
-                data << pGossip->Options[i].Text_0;
+            if (text1[i].empty())
+                data << text0[i];
             else
-                data << pGossip->Options[i].Text_1;
+                data << text1[i];
 
             data << pGossip->Options[i].Language;
 
-            for (int j = 0; j < MAX_GOSSIP_TEXT_EMOTES; ++j)
+            for (uint8 j = 0; j < MAX_GOSSIP_TEXT_EMOTES; ++j)
             {
                 data << pGossip->Options[i].Emotes[j]._Delay;
                 data << pGossip->Options[i].Emotes[j]._Emote;
@@ -275,7 +367,14 @@ void WorldSession::HandlePageTextQueryOpcode(WorldPacket & recvData)
         }
         else
         {
-            data << pageText->Text;
+            std::string Text = pageText->Text;
+            
+            int loc_idx = GetSessionDbLocaleIndex();
+            if (loc_idx >= 0)
+                if (PageTextLocale const* player = sObjectMgr->GetPageTextLocale(pageID))
+                    ObjectMgr::GetLocaleString(player->Text, loc_idx, Text);
+            
+            data << Text;
             data << uint32(pageText->NextPage);
             pageID = pageText->NextPage;
         }

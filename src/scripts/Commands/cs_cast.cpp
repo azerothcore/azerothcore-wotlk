@@ -27,18 +27,16 @@ public:
     {
         static std::vector<ChatCommand> castCommandTable =
         {   
-            { "back",           SEC_ADMINISTRATOR,  false, &HandleCastBackCommand,              "" },
-            { "dist",           SEC_ADMINISTRATOR,  false, &HandleCastDistCommand,              "" },
-            { "self",           SEC_ADMINISTRATOR,  false, &HandleCastSelfCommand,              "" },
-            { "target",         SEC_ADMINISTRATOR,  false, &HandleCastTargetCommad,             "" },
-            { "dest",           SEC_ADMINISTRATOR,  false, &HandleCastDestCommand,              "" },
-            { "",               SEC_ADMINISTRATOR,  false, &HandleCastCommand,                  "" },
-            { NULL,             0,                  false, NULL,                                "" }
+            { "back",           SEC_GAMEMASTER,  false, &HandleCastBackCommand,              "" },
+            { "dist",           SEC_GAMEMASTER,  false, &HandleCastDistCommand,              "" },
+            { "self",           SEC_GAMEMASTER,  false, &HandleCastSelfCommand,              "" },
+            { "target",         SEC_GAMEMASTER,  false, &HandleCastTargetCommad,             "" },
+            { "dest",           SEC_GAMEMASTER,  false, &HandleCastDestCommand,              "" },
+            { "",               SEC_GAMEMASTER,  false, &HandleCastCommand,                  "" }
         };
         static std::vector<ChatCommand> commandTable =
         {
-            { "cast",           SEC_ADMINISTRATOR,  false, NULL,                                "", castCommandTable },
-            { NULL,             0,                  false, NULL,                                "" }
+            { "cast",           SEC_GAMEMASTER,  false, nullptr,                                "", castCommandTable }
         };
         return commandTable;
     }
@@ -85,7 +83,7 @@ public:
             return false;
         }
 
-        char* triggeredStr = strtok(NULL, " ");
+        char* triggeredStr = strtok(nullptr, " ");
         if (triggeredStr)
         {
             int l = strlen(triggeredStr);
@@ -93,7 +91,7 @@ public:
                 return false;
         }
 
-        bool triggered = (triggeredStr != NULL);
+        bool triggered = (triggeredStr != nullptr);
 
         handler->GetSession()->GetPlayer()->CastSpell(target, spellId, triggered);
 
@@ -140,7 +138,7 @@ public:
             return false;
         }
 
-        char* triggeredStr = strtok(NULL, " ");
+        char* triggeredStr = strtok(nullptr, " ");
         if (triggeredStr)
         {
             int l = strlen(triggeredStr);
@@ -148,7 +146,7 @@ public:
                 return false;
         }
 
-        bool triggered = (triggeredStr != NULL);
+        bool triggered = (triggeredStr != nullptr);
 
         caster->CastSpell(handler->GetSession()->GetPlayer(), spellId, triggered);
 
@@ -189,14 +187,14 @@ public:
             return false;
         }
 
-        char* distStr = strtok(NULL, " ");
+        char* distStr = strtok(nullptr, " ");
 
         float dist = 0;
 
         if (distStr)
             sscanf(distStr, "%f", &dist);
 
-        char* triggeredStr = strtok(NULL, " ");
+        char* triggeredStr = strtok(nullptr, " ");
         if (triggeredStr)
         {
             int l = strlen(triggeredStr);
@@ -204,7 +202,7 @@ public:
                 return false;
         }
 
-        bool triggered = (triggeredStr != NULL);
+        bool triggered = (triggeredStr != nullptr);
 
         float x, y, z;
         handler->GetSession()->GetPlayer()->GetClosePoint(x, y, z, dist);
@@ -256,7 +254,7 @@ public:
             return false;
         }
 
-        char* triggeredStr = strtok(NULL, " ");
+        char* triggeredStr = strtok(nullptr, " ");
         if (triggeredStr)
         {
             int l = strlen(triggeredStr);
@@ -264,7 +262,7 @@ public:
                 return false;
         }
 
-        bool triggered = (triggeredStr != NULL);
+        bool triggered = (triggeredStr != nullptr);
 
         target->CastSpell(target, spellId, triggered);
 
@@ -317,7 +315,7 @@ public:
             return false;
         }
 
-        char* triggeredStr = strtok(NULL, " ");
+        char* triggeredStr = strtok(nullptr, " ");
         if (triggeredStr)
         {
             int l = strlen(triggeredStr);
@@ -325,7 +323,7 @@ public:
                 return false;
         }
 
-        bool triggered = (triggeredStr != NULL);
+        bool triggered = (triggeredStr != nullptr);
 
         caster->CastSpell(caster->GetVictim(), spellId, triggered);
 
@@ -371,9 +369,9 @@ public:
             return false;
         }
 
-        char* posX = strtok(NULL, " ");
-        char* posY = strtok(NULL, " ");
-        char* posZ = strtok(NULL, " ");
+        char* posX = strtok(nullptr, " ");
+        char* posY = strtok(nullptr, " ");
+        char* posZ = strtok(nullptr, " ");
 
         if (!posX || !posY || !posZ)
             return false;
@@ -382,7 +380,7 @@ public:
         float y = float(atof(posY));
         float z = float(atof(posZ));
 
-        char* triggeredStr = strtok(NULL, " ");
+        char* triggeredStr = strtok(nullptr, " ");
         if (triggeredStr)
         {
             int l = strlen(triggeredStr);
@@ -390,7 +388,7 @@ public:
                 return false;
         }
 
-        bool triggered = (triggeredStr != NULL);
+        bool triggered = (triggeredStr != nullptr);
 
         caster->CastSpell(x, y, z, spellId, triggered);
 

@@ -76,16 +76,16 @@ public:
         InstanceScript* pInstance;
         EventMap events;
         SummonList summons;
-        uint8 totalPhase;
 
         void StartGroundPhase()
         {
             me->SetReactState(REACT_AGGRESSIVE);
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_DISABLE_MOVE);
             me->SetControlled(false, UNIT_STATE_ROOT);
+            events.SetPhase(0);
 
             events.Reset();
-            events.ScheduleEvent(EVENT_MOVE_TO_BALCONY, (totalPhase < 2 ? 110000 : (110000 / totalPhase)));
+            events.ScheduleEvent(EVENT_MOVE_TO_BALCONY, 110000);
             events.ScheduleEvent(EVENT_SPELL_CURSE, 15000);
             events.ScheduleEvent(EVENT_SUMMON_PLAGUED_WARRIOR_ANNOUNCE, 25000);
             if (Is25ManRaid())
@@ -96,8 +96,9 @@ public:
         {
             me->SetReactState(REACT_PASSIVE);
             me->AttackStop();
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE |UNIT_FLAG_DISABLE_MOVE);
+            me->SetControlled(true, UNIT_STATE_ROOT);
+            events.SetPhase(1);
             events.Reset();
             events.ScheduleEvent(EVENT_BALCONY_SUMMON_ANNOUNCE, 4000);
             events.ScheduleEvent(EVENT_MOVE_TO_GROUND, 70000);
@@ -126,7 +127,7 @@ public:
             summons.DespawnAll();
             me->SetControlled(false, UNIT_STATE_ROOT);
             me->SetReactState(REACT_AGGRESSIVE);
-            totalPhase = 0;
+            events.SetPhase(0);
 
             if (pInstance)
                 pInstance->SetData(EVENT_NOTH, NOT_STARTED);
@@ -188,6 +189,7 @@ public:
             {
                 // GROUND
                 case EVENT_SPELL_CURSE:
+                    if (events.GetPhaseMask() == 0)
                     me->CastCustomSpell(RAID_MODE(SPELL_CURSE_OF_THE_PLAGUEBRINGER_10, SPELL_CURSE_OF_THE_PLAGUEBRINGER_25), SPELLVALUE_MAX_TARGETS, RAID_MODE(3, 10), me, false);
                     events.RepeatEvent(25000);
                     break;
@@ -223,9 +225,9 @@ public:
                     break;
                 case EVENT_BALCONY_SUMMON_REAL:
                     me->CastSpell(me, SPELL_SUMMON_PLAGUED_WARRIORS, true); // visual only
-                    if (totalPhase == 0)
+                    if (events.GetPhaseMask() == 0)
                         SummonHelper(NPC_PLAGUED_CHAMPION, RAID_MODE(2,4));
-                    else if (totalPhase == 1)
+                    else if (events.GetPhaseMask() == 1)
                     {
                         SummonHelper(NPC_PLAGUED_CHAMPION, RAID_MODE(1,2));
                         SummonHelper(NPC_PLAGUED_GUARDIAN, RAID_MODE(1,2));
@@ -236,10 +238,8 @@ public:
                     break;
                 case EVENT_MOVE_TO_GROUND:
                     me->MonsterTextEmote("%s teleports back into the battle!", 0, true);
-                    totalPhase++;
                     StartGroundPhase();
                     me->NearTeleportTo(nothPosition.GetPositionX(), nothPosition.GetPositionY(), nothPosition.GetPositionZ(), nothPosition.GetOrientation(), true);
-                    events.PopEvent();
                     break;
             }
 

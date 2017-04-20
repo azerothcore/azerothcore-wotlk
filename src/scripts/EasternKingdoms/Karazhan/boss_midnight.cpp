@@ -1,5 +1,5 @@
 /*
-REWRITTEN BY XINEF
+ * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-AGPL
 */
 
 #include "ScriptMgr.h"
@@ -72,7 +72,7 @@ class boss_midnight : public CreatureScript
 
         struct boss_midnightAI : public BossAI
         {
-            boss_midnightAI(Creature* creature) : BossAI(creature, TYPE_ATTUMEN) { }
+            boss_midnightAI(Creature* creature) : BossAI(creature, DATA_ATTUMEN) { }
 
             void Reset()
             {
@@ -86,6 +86,7 @@ class boss_midnight : public CreatureScript
                 BossAI::EnterCombat(who);
                 events.ScheduleEvent(EVENT_CHECK_HEALTH_95, 0);
                 events.ScheduleEvent(EVENT_SPELL_KNOCKDOWN, 6000);
+                DoZoneInCombat();
             }
 
             void KilledUnit(Unit* /*victim*/)
@@ -448,4 +449,5 @@ void AddSC_boss_attumen()
     new boss_midnight();
     new boss_attumen();
     new boss_attumen_midnight();
+    new spell_midnight_fixate();
 }

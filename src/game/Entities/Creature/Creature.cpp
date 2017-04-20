@@ -119,8 +119,6 @@ void CreatureTemplate::InitializeQueryData()
     queryData << float(ModHealth);                       // dmg/hp modifier
     queryData << float(ModMana);                         // dmg/mana modifier
     queryData << uint8(RacialLeader);
-    for (uint32 i = 0; i < MAX_CREATURE_QUEST_ITEMS; ++i)
-        queryData << uint32(questItems[i]);              // itemId[6], quest drop
     queryData << uint32(movementId);                     // CreatureMovementInfo.dbc
 }
 
@@ -2538,7 +2536,18 @@ TrainerSpellData const* Creature::GetTrainerSpells() const
 
 // overwrite WorldObject function for proper name localization
 std::string const& Creature::GetNameForLocaleIdx(LocaleConstant loc_idx) const
-{ 
+{
+    if (loc_idx != DEFAULT_LOCALE)
+    {
+        uint8 uloc_idx = uint8(loc_idx);
+        CreatureLocale const* cl = sObjectMgr->GetCreatureLocale(GetEntry());
+        if (cl)
+        {
+            if (cl->Name.size() > uloc_idx && !cl->Name[uloc_idx].empty())
+                return cl->Name[uloc_idx];
+        }
+    }
+
     return GetName();
 }
 

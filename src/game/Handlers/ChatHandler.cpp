@@ -66,14 +66,17 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
             case CHAT_MSG_PARTY_LEADER:
                 break;
             default:
-                /*[AC] we should enable it using a conf
-		if (sender->GetTotalPlayedTime() < 2*HOUR)
+                if (sWorld->getBoolConfig(CONFIG_CHAT_MUTE_FIRST_LOGIN))
                 {
-                    SendNotification("Speaking is allowed after playing for at least 2 hours. You may use party and guild chat.");
-                    recvData.rfinish();
-                    return;
-                }*/
-	    break;
+                    uint32 minutes = sWorld->getIntConfig(CONFIG_CHAT_TIME_MUTE_FIRST_LOGIN);
+
+                    if (sender->GetTotalPlayedTime() < minutes * MINUTE)
+                    {
+                        SendNotification(LANG_MUTED_PLAYER, minutes);
+                        recvData.rfinish();
+                        return;
+                    }
+                }
         }
 
     // pussywizard:
@@ -137,6 +140,18 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
                     recvData.rfinish();
                     return;
                 }
+
+                if (sWorld->getBoolConfig(CONFIG_CHATLOG_ADDON))
+                {
+                    std::string msg = "";
+                    recvData >> msg;
+
+                    if (msg.empty())
+                        return;
+
+                    sScriptMgr->OnPlayerChat(sender, uint32(CHAT_MSG_ADDON), lang, msg);
+                }
+
                 break;
             default:
                 sLog->outError("Player %s (GUID: %u) sent a chatmessage with an invalid language/message type combination", 
@@ -373,6 +388,8 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
             if (type == CHAT_MSG_PARTY_LEADER && !group->IsLeader(sender->GetGUID()))
                 return;
 
+            sScriptMgr->OnPlayerChat(GetPlayer(), type, lang, msg, group);
+
             WorldPacket data;
             ChatHandler::BuildChatPacket(data, ChatMsg(type), Language(lang), sender, NULL, msg);
             group->BroadcastPacket(&data, false, group->GetMemberGroup(GetPlayer()->GetGUID()));
@@ -383,6 +400,8 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
             {
                 if (Guild* guild = sGuildMgr->GetGuildById(GetPlayer()->GetGuildId()))
                 {
+                    sScriptMgr->OnPlayerChat(GetPlayer(), type, lang, msg, guild);
+
                     guild->BroadcastToGuild(this, false, msg, lang == LANG_ADDON ? LANG_ADDON : LANG_UNIVERSAL);
                 }
             }
@@ -393,6 +412,8 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
             {
                 if (Guild* guild = sGuildMgr->GetGuildById(GetPlayer()->GetGuildId()))
                 {
+                    sScriptMgr->OnPlayerChat(GetPlayer(), type, lang, msg, guild);
+
                     guild->BroadcastToGuild(this, true, msg, lang == LANG_ADDON ? LANG_ADDON : LANG_UNIVERSAL);
                 }
             }
@@ -407,6 +428,8 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
                 if (!group || group->isBGGroup() || !group->isRaidGroup())
                     return;
             }
+
+            sScriptMgr->OnPlayerChat(GetPlayer(), type, lang, msg, group);
 
             WorldPacket data;
             ChatHandler::BuildChatPacket(data, CHAT_MSG_RAID, Language(lang), sender, NULL, msg);
@@ -423,6 +446,8 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
                     return;
             }
 
+            sScriptMgr->OnPlayerChat(GetPlayer(), type, lang, msg, group);
+
             WorldPacket data;
             ChatHandler::BuildChatPacket(data, CHAT_MSG_RAID_LEADER, Language(lang), sender, NULL, msg);
             group->BroadcastPacket(&data, false);
@@ -432,6 +457,8 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
             Group* group = GetPlayer()->GetGroup();
             if (!group || !group->isRaidGroup() || !(group->IsLeader(GetPlayer()->GetGUID()) || group->IsAssistant(GetPlayer()->GetGUID())) || group->isBGGroup())
                 return;
+
+            sScriptMgr->OnPlayerChat(GetPlayer(), type, lang, msg, group);
 
             WorldPacket data;
             //in battleground, raid warning is sent only to players in battleground - code is ok
@@ -445,6 +472,8 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
             if (!group || !group->isBGGroup())
                 return;
 
+            sScriptMgr->OnPlayerChat(GetPlayer(), type, lang, msg, group);
+
             WorldPacket data;
             ChatHandler::BuildChatPacket(data, CHAT_MSG_BATTLEGROUND, Language(lang), sender, NULL, msg);
             group->BroadcastPacket(&data, false);
@@ -455,6 +484,8 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
             Group* group = GetPlayer()->GetGroup();
             if (!group || !group->isBGGroup() || !group->IsLeader(GetPlayer()->GetGUID()))
                 return;
+
+            sScriptMgr->OnPlayerChat(GetPlayer(), type, lang, msg, group);
 
             WorldPacket data;
             ChatHandler::BuildChatPacket(data, CHAT_MSG_BATTLEGROUND_LEADER, Language(lang), sender, NULL, msg);
@@ -475,6 +506,8 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
             {
                 if (Channel* chn = cMgr->GetChannel(channel, sender))
                 {
+                    sScriptMgr->OnPlayerChat(sender, type, lang, msg, chn);
+
                     chn->Say(sender->GetGUID(), msg.c_str(), lang);
                 }
             }
@@ -499,6 +532,8 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
 
                     sender->ToggleAFK();
                 }
+
+                sScriptMgr->OnPlayerChat(sender, type, lang, msg);
             }
             break;
         }
@@ -520,6 +555,8 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
 
                 sender->ToggleDND();
             }
+
+            sScriptMgr->OnPlayerChat(sender, type, lang, msg);
 
             break;
         }

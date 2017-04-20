@@ -20,18 +20,16 @@ public:
     {
         static std::vector<ChatCommand> spectatorCommandTable =
         {
-            { "version",        SEC_CONSOLE,        false, &HandleSpectatorVersionCommand,    "" },
-            { "reset",          SEC_CONSOLE,        false, &HandleSpectatorResetCommand,      "" },
+            { "version",        SEC_CONSOLE,        false, &HandleSpectatorVersionCommand,                  "" },
+            { "reset",          SEC_CONSOLE,        false, &HandleSpectatorResetCommand,                    "" },
             { "spectate",       SEC_CONSOLE,        false, &ArenaSpectator::HandleSpectatorSpectateCommand, "" },
-            { "watch",          SEC_CONSOLE,        false, &ArenaSpectator::HandleSpectatorWatchCommand, "" },
-            { "leave",          SEC_CONSOLE,        false, &HandleSpectatorLeaveCommand,      "" },
-            { "",               SEC_CONSOLE,        false, &HandleSpectatorCommand,           "" },
-            { NULL,             0,                  false, NULL,                              "" }
+            { "watch",          SEC_CONSOLE,        false, &ArenaSpectator::HandleSpectatorWatchCommand,    "" },
+            { "leave",          SEC_CONSOLE,        false, &HandleSpectatorLeaveCommand,                    "" },
+            { "",               SEC_CONSOLE,        false, &HandleSpectatorCommand,                         "" }
         };
         static std::vector<ChatCommand> commandTable =
         {
-            { "spect",          SEC_CONSOLE,        false, NULL,                              "", spectatorCommandTable },
-            { NULL,             0,                  false, NULL,                              "" }
+            { "spect",          SEC_CONSOLE,        false, nullptr,                                         "", spectatorCommandTable }
         };
         return commandTable;
     }
@@ -182,8 +180,8 @@ bool ArenaSpectator::HandleSpectatorSpectateCommand(ChatHandler* handler, char c
     }
 
     bool bgPreparation = false;
-    if ((!handler->GetSession()->GetSecurity() && bgmap->GetBG()->GetStatus() != STATUS_IN_PROGRESS) ||
-        (handler->GetSession()->GetSecurity() && bgmap->GetBG()->GetStatus() != STATUS_WAIT_JOIN && bgmap->GetBG()->GetStatus() != STATUS_IN_PROGRESS))
+    if (!handler->GetSession()->GetSecurity() && bgmap->GetBG()->GetStatus() != STATUS_IN_PROGRESS ||
+        handler->GetSession()->GetSecurity() && bgmap->GetBG()->GetStatus() != STATUS_WAIT_JOIN && bgmap->GetBG()->GetStatus() != STATUS_IN_PROGRESS)
     {
         bgPreparation = true;
         handler->SendSysMessage("Arena is not in progress yet. You will be invited as soon as it starts.");

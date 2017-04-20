@@ -959,7 +959,12 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                 {
                     AddAura(SPELL_HUNTER_PET_SCALING_04, this);
                     AddAura(SPELL_DK_PET_SCALING_01, this);
+                    AddAura(SPELL_DK_PET_SCALING_02, this);
+                    AddAura(SPELL_DK_PET_SCALING_03, this);
                     AddAura(SPELL_PET_AVOIDANCE, this);
+
+                    SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(petlevel - (petlevel / 4)));
+                    SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(petlevel + (petlevel / 4)));
                     break;
                 }
                 case NPC_GENERIC_IMP:
@@ -977,6 +982,9 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
     // Can be summon and guardian
     if (GetEntry() == NPC_RISEN_GHOUL)
     {
+        // 100% energy after summon
+        SetPower(POWER_ENERGY, GetMaxPower(POWER_ENERGY));
+
         // xinef: fixes orc death knight command racial
         if (m_owner->getRace() == RACE_ORC)
             CastSpell(this, SPELL_ORC_RACIAL_COMMAND, true, NULL, NULL, m_owner->GetGUID());
@@ -1209,6 +1217,15 @@ void Pet::_LoadAuras(PreparedQueryResult result, uint32 timediff)
                 sLog->outError("Unknown aura (spellid %u), ignore.", spellid);
                 continue;
             }
+
+            // avoid higher level auras if any, and adjust
+            SpellInfo const* scaledSpellInfo = spellInfo->GetAuraRankForLevel(getLevel());
+            if (scaledSpellInfo != spellInfo)
+                spellInfo = scaledSpellInfo;
+
+            // again after level check
+            if (!spellInfo)
+                continue;
 
             // negative effects should continue counting down after logout
             if (remaintime != -1 && !spellInfo->IsPositive())

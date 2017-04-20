@@ -18,6 +18,6 @@ set(scripts_STAT_SRCS
   ${AC_SCRIPTS_DIR}/Pet/pet_shaman.cpp
 )
 
-AC_ADD_SCRIPT_LOADER("Pet" "${AC_SCRIPTS_DIR}/ScriptLoader.h")
+AC_ADD_SCRIPT_LOADER("Pet" "ScriptLoader.h")
 
 message("  -> Prepared: Pet")

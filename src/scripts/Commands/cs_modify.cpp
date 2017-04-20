@@ -18,6 +18,7 @@ EndScriptData */
 #include "Player.h"
 #include "ReputationMgr.h"
 #include "ScriptMgr.h"
+#include "AccountMgr.h"
 
 class modify_commandscript : public CommandScript
 {
@@ -33,8 +34,7 @@ public:
             { "walk",           SEC_GAMEMASTER,      false, &HandleModifySpeedCommand,         "" },
             { "backwalk",       SEC_GAMEMASTER,      false, &HandleModifyBWalkCommand,         "" },
             { "swim",           SEC_GAMEMASTER,      false, &HandleModifySwimCommand,          "" },
-            { "",               SEC_GAMEMASTER,      false, &HandleModifyASpeedCommand,        "" },
-            { NULL,             0,                  false, NULL,                              "" }
+            { "",               SEC_GAMEMASTER,      false, &HandleModifyASpeedCommand,        "" }
         };
 
         static std::vector<ChatCommand> modifyCommandTable =
@@ -47,26 +47,24 @@ public:
             { "money",          SEC_GAMEMASTER,      false, &HandleModifyMoneyCommand,         "" },
             { "scale",          SEC_GAMEMASTER,      false, &HandleModifyScaleCommand,         "" },
             { "bit",            SEC_GAMEMASTER,      false, &HandleModifyBitCommand,           "" },
-            { "faction",        SEC_GAMEMASTER,      false, &HandleModifyFactionCommand,       "" },
+            { "faction",        SEC_ADMINISTRATOR,   false, &HandleModifyFactionCommand,       "" },
             { "spell",          SEC_GAMEMASTER,      false, &HandleModifySpellCommand,         "" },
             { "talentpoints",   SEC_GAMEMASTER,      false, &HandleModifyTalentCommand,        "" },
             { "mount",          SEC_GAMEMASTER,      false, &HandleModifyMountCommand,         "" },
             { "honor",          SEC_GAMEMASTER,      false, &HandleModifyHonorCommand,         "" },
-            { "reputation",     SEC_GAMEMASTER,     false, &HandleModifyRepCommand,           "" },
+            { "reputation",     SEC_GAMEMASTER,      false, &HandleModifyRepCommand,           "" },
             { "arenapoints",    SEC_GAMEMASTER,      false, &HandleModifyArenaCommand,         "" },
             { "drunk",          SEC_GAMEMASTER,      false, &HandleModifyDrunkCommand,         "" },
-            { "standstate",     SEC_GAMEMASTER,     false, &HandleModifyStandStateCommand,    "" },
-            { "phase",          SEC_ADMINISTRATOR,  false, &HandleModifyPhaseCommand,         "" },
-            { "gender",         SEC_GAMEMASTER,     false, &HandleModifyGenderCommand,        "" },
-            { "speed",          SEC_GAMEMASTER,      false, NULL,           "", modifyspeedCommandTable },
-            { NULL,             0,                  false, NULL,                                           "" }
+            { "standstate",     SEC_GAMEMASTER,      false, &HandleModifyStandStateCommand,    "" },
+            { "phase",          SEC_GAMEMASTER,      false, &HandleModifyPhaseCommand,         "" },
+            { "gender",         SEC_GAMEMASTER,      false, &HandleModifyGenderCommand,        "" },
+            { "speed",          SEC_GAMEMASTER,      false, nullptr,                           "", modifyspeedCommandTable }
         };
         static std::vector<ChatCommand> commandTable =
         {
-            { "morph",          SEC_GAMEMASTER,     false, &HandleModifyMorphCommand,          "" },
-            { "demorph",        SEC_GAMEMASTER,     false, &HandleDeMorphCommand,              "" },
-            { "modify",         SEC_GAMEMASTER,      false, NULL,                 "", modifyCommandTable },
-            { NULL,             0,                  false, NULL,                               "" }
+            { "morph",          SEC_MODERATOR,      false, &HandleModifyMorphCommand,          "" },
+            { "demorph",        SEC_MODERATOR,      false, &HandleDeMorphCommand,              "" },
+            { "modify",         SEC_GAMEMASTER,     false, nullptr,                            "", modifyCommandTable }
         };
         return commandTable;
     }
@@ -156,7 +154,7 @@ public:
         // if (!pmana)
         //     return false;
 
-        // char* pmanaMax = strtok(NULL, " ");
+        // char* pmanaMax = strtok(nullptr, " ");
         // if (!pmanaMax)
         //     return false;
 
@@ -207,7 +205,7 @@ public:
         // if (!pmana)
         //     return false;
 
-        // char* pmanaMax = strtok(NULL, " ");
+        // char* pmanaMax = strtok(nullptr, " ");
         // if (!pmanaMax)
         //     return false;
 
@@ -319,13 +317,13 @@ public:
         uint32 factionid = atoi(pfactionid);
         uint32 flag;
 
-        char *pflag = strtok(NULL, " ");
+        char *pflag = strtok(nullptr, " ");
         if (!pflag)
             flag = target->GetUInt32Value(UNIT_FIELD_FLAGS);
         else
             flag = atoi(pflag);
 
-        char* pnpcflag = strtok(NULL, " ");
+        char* pnpcflag = strtok(nullptr, " ");
 
         uint32 npcflag;
         if (!pnpcflag)
@@ -333,7 +331,7 @@ public:
         else
             npcflag = atoi(pnpcflag);
 
-        char* pdyflag = strtok(NULL, " ");
+        char* pdyflag = strtok(nullptr, " ");
 
         uint32  dyflag;
         if (!pdyflag)
@@ -368,17 +366,17 @@ public:
         if (!pspellflatid)
             return false;
 
-        char* pop = strtok(NULL, " ");
+        char* pop = strtok(nullptr, " ");
         if (!pop)
             return false;
 
-        char* pval = strtok(NULL, " ");
+        char* pval = strtok(nullptr, " ");
         if (!pval)
             return false;
 
         uint16 mark;
 
-        char* pmark = strtok(NULL, " ");
+        char* pmark = strtok(nullptr, " ");
 
         uint8 spellflatid = atoi(pspellflatid);
         uint8 op   = atoi(pop);
@@ -389,7 +387,7 @@ public:
             mark = atoi(pmark);
 
         Player* target = handler->getSelectedPlayer();
-        if (target == NULL)
+        if (target == nullptr)
         {
             handler->SendSysMessage(LANG_NO_CHAR_SELECTED);
             handler->SetSentErrorMessage(true);
@@ -476,7 +474,7 @@ public:
         }
 
         Player* target = handler->getSelectedPlayerOrSelf();
-        if (handler->GetSession()->GetSecurity() < SEC_GAMEMASTER)
+        if (AccountMgr::IsGMAccount(handler->GetSession()->GetSecurity()))
             target = handler->GetSession()->GetPlayer();
         if (!target)
         {
@@ -526,7 +524,7 @@ public:
         }
 
         Player* target = handler->getSelectedPlayerOrSelf();
-        if (handler->GetSession()->GetSecurity() < SEC_GAMEMASTER)
+        if (AccountMgr::IsGMAccount(handler->GetSession()->GetSecurity()))
             target = handler->GetSession()->GetPlayer();
         if (!target)
         {
@@ -573,7 +571,7 @@ public:
         }
 
         Player* target = handler->getSelectedPlayerOrSelf();
-        if (handler->GetSession()->GetSecurity() < SEC_GAMEMASTER)
+        if (AccountMgr::IsGMAccount(handler->GetSession()->GetSecurity()))
             target = handler->GetSession()->GetPlayer();
         if (!target)
         {
@@ -620,7 +618,7 @@ public:
         }
 
         Player* target = handler->getSelectedPlayerOrSelf();
-        if (handler->GetSession()->GetSecurity() < SEC_GAMEMASTER)
+        if (AccountMgr::IsGMAccount(handler->GetSession()->GetSecurity()))
             target = handler->GetSession()->GetPlayer();
         if (!target)
         {
@@ -667,7 +665,7 @@ public:
         }
 
         Player* target = handler->getSelectedPlayerOrSelf();
-        if (handler->GetSession()->GetSecurity() < SEC_GAMEMASTER)
+        if (AccountMgr::IsGMAccount(handler->GetSession()->GetSecurity()))
             target = handler->GetSession()->GetPlayer();
         if (!target)
         {
@@ -1080,7 +1078,7 @@ public:
         if (!pField)
             return false;
 
-        char* pBit = strtok(NULL, " ");
+        char* pBit = strtok(nullptr, " ");
         if (!pBit)
             return false;
 
@@ -1178,7 +1176,7 @@ public:
         uint32 factionId = atoi(factionTxt);
 
         int32 amount = 0;
-        char *rankTxt = strtok(NULL, " ");
+        char *rankTxt = strtok(nullptr, " ");
         if (!factionTxt || !rankTxt)
             return false;
 
@@ -1207,7 +1205,7 @@ public:
 
                 if (wrank.substr(0, wrankStr.size()) == wrankStr)
                 {
-                    char *deltaTxt = strtok(NULL, " ");
+                    char *deltaTxt = strtok(nullptr, " ");
                     if (deltaTxt)
                     {
                         int32 delta = atoi(deltaTxt);

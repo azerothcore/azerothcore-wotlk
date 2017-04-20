@@ -65,6 +65,15 @@ else()
   message("* Use coreside debug     : No  (default)")
 endif()
 
+if ( UNIX )
+  if( WITH_PERFTOOLS )
+    message("* Use unix gperftools    : Yes")
+    add_definitions(-DPERF_TOOLS)
+  else()
+    message("* Use unix gperftools     : No  (default)")
+  endif()
+endif( UNIX )
+
 if( WIN32 )
   if( USE_MYSQL_SOURCES )
     message("* Use MySQL sourcetree   : Yes (default)")
@@ -94,6 +103,22 @@ if ( NOJEM )
   message(" *** jemalloc linking has been disabled!")
   message(" *** Please note that this is for DEBUGGING WITH VALGRIND only!")
   message(" *** DO NOT DISABLE IT UNLESS YOU KNOW WHAT YOU'RE DOING!")
+endif()
+
+# Performance optimization options:
+
+if( DISABLE_EXTRAS )
+  message("* Disable extra features    : Yes")
+  add_definitions(-DDISABLE_EXTRAS)
+else()
+  message("* Disable extra features     : No  (default)")
+endif()
+
+if( DISABLE_VMAP_CHECKS )
+  message("* Disable vmap DisableMgr checks    : Yes")
+  add_definitions(-DDISABLE_VMAP_CHECKS)
+else()
+  message("* Disable vmap DisableMgr checks     : No  (default)")
 endif()
 
 message("")

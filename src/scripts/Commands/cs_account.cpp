@@ -1,9 +1,8 @@
 /*
-* Copyright (C) 2008-2012 TrinityCore <http://www.trinitycore.org/>
-*
-* Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
-* Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
-*/
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
+ * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ */
 
 /* ScriptData
 Name: account_commandscript
@@ -27,10 +26,9 @@ public:
     {
         static std::vector<ChatCommand> accountSetCommandTable =
         {
-            { "addon", SEC_ADMINISTRATOR, true, &HandleAccountSetAddonCommand, "" },
+            { "addon", SEC_GAMEMASTER, true, &HandleAccountSetAddonCommand, "" },
             { "gmlevel", SEC_CONSOLE, true, &HandleAccountSetGmLevelCommand, "" },
-            { "password", SEC_CONSOLE, true, &HandleAccountSetPasswordCommand, "" },
-            { NULL, SEC_PLAYER, false, NULL, "" }
+            { "password", SEC_CONSOLE, true, &HandleAccountSetPasswordCommand, "" }
         };
         static std::vector<ChatCommand> accountCommandTable =
         {
@@ -39,15 +37,13 @@ public:
             { "delete", SEC_CONSOLE, true, &HandleAccountDeleteCommand, "" },
             { "onlinelist", SEC_CONSOLE, true, &HandleAccountOnlineListCommand, "" },
             { "lock", SEC_PLAYER, false, &HandleAccountLockCommand, "" },
-            { "set", SEC_ADMINISTRATOR, true, NULL, "", accountSetCommandTable },
+            { "set", SEC_ADMINISTRATOR, true, nullptr, "", accountSetCommandTable },
             { "password", SEC_PLAYER, false, &HandleAccountPasswordCommand, "" },
-            { "", SEC_PLAYER, false, &HandleAccountCommand, "" },
-            { NULL, SEC_PLAYER, false, NULL, "" }
+            { "", SEC_PLAYER, false, &HandleAccountCommand, "" }
         };
         static std::vector<ChatCommand> commandTable =
         {
-            { "account", SEC_PLAYER, true, NULL, "", accountCommandTable },
-            { NULL, SEC_PLAYER, false, NULL, "" }
+            { "account", SEC_PLAYER, true, nullptr, "", accountCommandTable }
         };
         return commandTable;
     }
@@ -92,7 +88,7 @@ public:
 
         ///- %Parse the command line arguments
         char* accountName = strtok((char*)args, " ");
-        char* password = strtok(NULL, " ");
+        char* password = strtok(nullptr, " ");
         if (!accountName || !password)
             return false;
 
@@ -160,7 +156,7 @@ public:
         /// Commands not recommended call from chat, but support anyway
         /// can delete only for account with less security
         /// This is also reject self apply in fact
-        if (handler->HasLowerSecurityAccount(NULL, accountId, true))
+        if (handler->HasLowerSecurityAccount(nullptr, accountId, true))
             return false;
 
         AccountOpResult result = AccountMgr::DeleteAccount(accountId);
@@ -281,8 +277,8 @@ public:
         }
 
         char* oldPassword = strtok((char*)args, " ");
-        char* newPassword = strtok(NULL, " ");
-        char* passwordConfirmation = strtok(NULL, " ");
+        char* newPassword = strtok(nullptr, " ");
+        char* passwordConfirmation = strtok(nullptr, " ");
 
         if (!oldPassword || !newPassword || !passwordConfirmation)
         {
@@ -336,7 +332,7 @@ public:
     {
         ///- Get the command line arguments
         char* account = strtok((char*)args, " ");
-        char* exp = strtok(NULL, " ");
+        char* exp = strtok(nullptr, " ");
 
         if (!account)
             return false;
@@ -377,7 +373,7 @@ public:
         // Let set addon state only for lesser (strong) security level
         // or to self account
         if (handler->GetSession() && handler->GetSession()->GetAccountId() != accountId &&
-            handler->HasLowerSecurityAccount(NULL, accountId, true))
+            handler->HasLowerSecurityAccount(nullptr, accountId, true))
             return false;
 
         int expansion = atoi(exp); //get int anyway (0 if error)
@@ -405,8 +401,8 @@ public:
         uint32 targetSecurity = 0;
         uint32 gm = 0;
         char* arg1 = strtok((char*)args, " ");
-        char* arg2 = strtok(NULL, " ");
-        char* arg3 = strtok(NULL, " ");
+        char* arg2 = strtok(nullptr, " ");
+        char* arg3 = strtok(nullptr, " ");
         bool isAccountNameGiven = true;
 
         if (arg1 && !arg3)
@@ -441,7 +437,7 @@ public:
             return false;
         }
 
-        // handler->getSession() == NULL only for console
+        // handler->getSession() == nullptr only for console
         targetAccountId = (isAccountNameGiven) ? AccountMgr::GetId(targetAccountName) : handler->getSelectedPlayer()->GetSession()->GetAccountId();
         int32 gmRealmID = (isAccountNameGiven) ? atoi(arg3) : atoi(arg2);
         uint32 playerSecurity;
@@ -529,8 +525,8 @@ public:
 
         ///- Get the command line arguments
         char* account = strtok((char*)args, " ");
-        char* password = strtok(NULL, " ");
-        char* passwordConfirmation = strtok(NULL, " ");
+        char* password = strtok(nullptr, " ");
+        char* passwordConfirmation = strtok(nullptr, " ");
 
         if (!account || !password || !passwordConfirmation)
             return false;
@@ -553,7 +549,7 @@ public:
 
         /// can set password only for target with less security
         /// This is also reject self apply in fact
-        if (handler->HasLowerSecurityAccount(NULL, targetAccountId, true))
+        if (handler->HasLowerSecurityAccount(nullptr, targetAccountId, true))
             return false;
 
         if (strcmp(password, passwordConfirmation))
