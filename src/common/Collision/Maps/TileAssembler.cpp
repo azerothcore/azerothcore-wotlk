@@ -225,7 +225,7 @@ namespace VMAP
             return false;
         }
         printf("Read coordinate mapping...\n");
-        uint32 mapID, tileX, tileY, check = 0;
+        uint32 mapID, tileX, tileY, check;
         G3D::Vector3 v1, v2;
         ModelSpawn spawn;
         while (!feof(dirf))
@@ -233,11 +233,9 @@ namespace VMAP
             // read mapID, tileX, tileY, Flags, NameSet, UniqueId, Pos, Rot, Scale, Bound_lo, Bound_hi, name
             check = fread(&mapID, sizeof(uint32), 1, dirf);
             if (check == 0) // EoF...
-            {
                 break;
-            }
-            check += fread(&tileX, sizeof(uint32), 1, dirf);
-            check += fread(&tileY, sizeof(uint32), 1, dirf);
+            fread(&tileX, sizeof(uint32), 1, dirf);
+            fread(&tileY, sizeof(uint32), 1, dirf);
             if (!ModelSpawn::readFromFile(dirf, spawn))
             {
                 break;
