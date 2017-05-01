@@ -1,3 +1,18 @@
+-- DB update 2017_05_01_06 -> 2017_05_01_07
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2017_05_01_06';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2017_05_01_06 2017_05_01_07 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1492287920969760300'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
 INSERT INTO version_db_world (`sql_rev`) VALUES ('1492287920969760300');
 -- Burning Skeleton SAI
 SET @ENTRY := 31048;
@@ -9,3 +24,12 @@ INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type
 (@ENTRY,0,2,3,31,0,100,0,58593,0,0,0,86,58599,2,23,0,0,0,1,0,0,0,0,0,0,0,"Burning Skeleton - On Target Spellhit 'Skeleton Check' - Cross Cast 'Abom Credit'"),
 (@ENTRY,0,3,4,61,0,100,0,58593,0,0,0,28,58594,0,0,0,0,0,1,0,0,0,0,0,0,0,"Burning Skeleton - On Target Spellhit 'Skeleton Check' - Remove Aura 'Skeleton Check Master'"),
 (@ENTRY,0,4,0,61,0,100,0,58593,0,0,0,11,58596,0,0,0,0,0,1,0,0,0,0,0,0,0,"Burning Skeleton - On Target Spellhit 'Skeleton Check' - Cast 'Abomination Explosion'");
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END;
+//
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
