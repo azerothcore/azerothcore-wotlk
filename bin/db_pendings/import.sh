@@ -63,6 +63,10 @@ function import() {
                 echo "DELIMITER //"  >> "$newFile";
                 echo "CREATE PROCEDURE updateDb ()" >> "$newFile";
                 echo "proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';" >> "$newFile";
+                echo "SELECT COUNT(*) INTO @COLEXISTS"  >> "$newFile";
+                echo "FROM information_schema.COLUMNS" >> "$newFile";
+                echo "WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_"$db"' AND COLUMN_NAME = '"$oldVer"';" >> "$newFile";
+                echo "IF @COLEXISTS = 0 THEN LEAVE proc; END IF;" >> "$newFile";
             fi
 
             echo "$startTransaction" >> "$newFile";
