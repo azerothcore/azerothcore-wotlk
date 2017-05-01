@@ -1,3 +1,18 @@
+-- DB update 2017_05_01_04 -> 2017_05_01_05
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2017_05_01_04';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2017_05_01_04 2017_05_01_05 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1490985497792697600'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
 INSERT INTO version_db_world (`sql_rev`) VALUES ('1490985497792697600');
 
 -- Crusader Lamoof SAI
@@ -63,3 +78,12 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (28136, 0, 15, 16, 61, 0, 100, 0, 0, 0, 0, 0, 53, 0, 28136, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Crusader Jonathan - On Waypoint 5 Reached - Start Waypoint (No Repeat)'),
 (28136, 0, 16, 0, 61, 0, 100, 0, 0, 0, 0, 0, 83, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Crusader Jonathan - On Waypoint 5 Reached - Remove Npc Flag Gossip (No Repeat)');
 
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END;
+//
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;

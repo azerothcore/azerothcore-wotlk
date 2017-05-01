@@ -1,3 +1,18 @@
+-- DB update 2017_03_04_20 -> 2017_05_01_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2017_03_04_20';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2017_03_04_20 2017_05_01_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1481933990013483700'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
 INSERT INTO version_db_world (`sql_rev`) VALUES ('1481933990013483700');
 
 UPDATE `creature_template` SET `ScriptName`='npc_scarlet_guard' WHERE `entry`=4295;
@@ -147,4 +162,12 @@ INSERT INTO `npc_text` (`ID`, `text0_0`) VALUES
 (100113, "The blade and Mograine were a singular entity. Do you understand? This act corrupted the blade and lead to Mograine's own corruption as a death knight of Kel'Thuzad. I swore that if I lived, I would expose the perpetrators of this heinous crime. For two days I remained under the rot and contagion of Scourge - gathering as much strength as possible to escape the razed city."),
 (100114, "Aye, I did. Much to the dismay of the lesser Mograine, I made my way back to the Scarlet Monastery. I shouted and screamed. I told the tale to any that would listen. And I would be murdered in cold blood for my actions, dragged to this chamber - the dark secret of the order. But some did listen... some heard my words. Thus was born the Argent Dawn..."),
 (100115, "I'm afraid that the blade which you hold in your hands is beyond saving. The hatred runs too deep. But do not lose hope, hero. Where one chapter has ended, a new one begins. $B Find his son - a more devout and pious man you may never meet.It is rumored that he is able to build the Ashbringer anew, without requiring the old, tainted blade."),
-(100116, "<High Inquisitor Fairbanks shakes his head.>\n\nNo, $C; only one of his sons is dead. The other lives...\n\n<High Inquisitor Fairbanks points to the sky>\n\nThe Outland... Find him there...");
+(100116, "<High Inquisitor Fairbanks shakes his head.>\n\nNo, $C; only one of his sons is dead. The other lives...\n\n<High Inquisitor Fairbanks points to the sky>\n\nThe Outland... Find him there...");--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END;
+//
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
