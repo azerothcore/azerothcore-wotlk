@@ -127,14 +127,6 @@ function run() {
             assemble "$db" $version".sql" $1 $2 $3
         done
 
-        echo "" > $reg_file
-
-        for k in ${!registry__*}
-        do
-          n=$k
-          echo "$k='${!n}';" >> "$reg_file"
-        done
-
     echo "===== DONE ====="
 }
 
