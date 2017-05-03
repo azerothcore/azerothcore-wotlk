@@ -2013,6 +2013,10 @@ AuraStateType SpellInfo::LoadAuraState() const
     // Faerie Fire (druid versions)
     if (SpellFamilyName == SPELLFAMILY_DRUID && SpellFamilyFlags[0] & 0x400)
         return AURA_STATE_FAERIE_FIRE;
+    
+    // Touch of Zanzil (Rogue quest spell)
+	if (Id == 9991)
+		return AURA_STATE_FAERIE_FIRE;
 
     // Sting (hunter's pet ability)
     if (GetCategory() == 1133 || Id == 35325)
