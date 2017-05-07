@@ -419,6 +419,9 @@ void LFGMgr::InitializeLockedDungeons(Player* player, uint8 level /* = 0 */)
                     lockData = LFG_LOCKSTATUS_MISSING_ITEM;
         }
 
+
+        sScriptMgr->OnInitializeLockedDungeons(player, level, lockData);
+
         /* TODO VoA closed if WG is not under team control (LFG_LOCKSTATUS_RAID_LOCKED)
             lockData = LFG_LOCKSTATUS_TOO_LOW_GEAR_SCORE;
             lockData = LFG_LOCKSTATUS_TOO_HIGH_GEAR_SCORE;
@@ -429,6 +432,9 @@ void LFGMgr::InitializeLockedDungeons(Player* player, uint8 level /* = 0 */)
         if (lockData)
             lock[dungeon->Entry()] = lockData;
     }
+
+    sScriptMgr->OnAfterInitializeLockedDungeons(player);
+
     SetLockedDungeons(guid, lock);
 }
 
@@ -713,7 +719,7 @@ void LFGMgr::JoinLfg(Player* player, uint8 roles, LfgDungeonSet& dungeons, const
 */
 void LFGMgr::LeaveLfg(uint64 guid)
 {
-    ;//sLog->outDebug((LOG_FILTER_LFG, "LFGMgr::Leave: [" UI64FMTD "]", guid);
+    //sLog->outDebug((LOG_FILTER_LFG, "LFGMgr::LeaveLfg: [" UI64FMTD "]", guid);
 
     uint64 gguid = IS_GROUP_GUID(guid) ? guid : GetGroup(guid);
     LfgState state = GetState(guid);
