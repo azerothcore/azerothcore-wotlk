@@ -345,8 +345,6 @@ class AreaTrigger_at_sentry_point : public AreaTriggerScript
             {
                 if(Creature* tervosh = player->SummonCreature(NPC_TERVOSH, -3476.51, -4105.94, 17.1, 5.3816f, TEMPSUMMON_TIMED_DESPAWN, 60000))
                     tervosh->CastSpell(tervosh, SPELL_TELEPORT_VISUAL, true); //he doesn't do any casting animation, but good enough for now.
-
-                return false;
             }
 
             return true;
