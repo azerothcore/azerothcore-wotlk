@@ -123,7 +123,6 @@ enum Hendel
     EMOTE_SURRENDER             = 4,
 
     QUEST_MISSING_DIPLO_PT16    = 1324,
-    QUEST_MISSING_DIPLO_PT15    = 1266,
     FACTION_HOSTILE             = 168,                      //guessed, may be different
 
     NPC_SENTRY                  = 5184,                     //helps hendel
@@ -194,6 +193,7 @@ public:
 
 enum Tervosh
 {
+    QUEST_MISSING_DIPLO_PT15    = 1266,
     SPELL_PROUDMOORE_DEFENSE = 7120
 };
 
