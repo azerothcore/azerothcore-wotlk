@@ -194,7 +194,7 @@ public:
 enum Tervosh
 {
     QUEST_MISSING_DIPLO_PT15    = 1266,
-    SPELL_PROUDMOORE_DEFENSE = 7120
+    SPELL_PROUDMOORE_DEFENSE    = 7120
 };
 
 class npc_archmage_tervosh : public CreatureScript
