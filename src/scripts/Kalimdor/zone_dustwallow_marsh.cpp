@@ -194,7 +194,8 @@ public:
 enum Tervosh
 {
     QUEST_MISSING_DIPLO_PT14    = 1265,
-    SPELL_PROUDMOORE_DEFENSE    = 7120
+    SPELL_PROUDMOORE_DEFENSE    = 7120,
+    SAY1                        = 0
 };
 
 class npc_archmage_tervosh : public CreatureScript
@@ -205,10 +206,22 @@ public:
     bool OnQuestReward(Player* player, Creature* creature, const Quest* quest, uint32 /*opt*/)
     {
         if (quest->GetQuestId() == QUEST_MISSING_DIPLO_PT14)
+        {
             creature->CastSpell(player, SPELL_PROUDMOORE_DEFENSE);
-
+            creature->AI()->Talk(SAY1);
+        }
         return true;
     }
+
+   CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_archmage_tervoshAI(creature);
+    }
+
+    struct npc_archmage_tervoshAI : public ScriptedAI
+    {
+        npc_archmage_tervoshAI(Creature* creature) : ScriptedAI(creature) { }
+	};
 };
 
 /*######
