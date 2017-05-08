@@ -123,6 +123,7 @@ enum Hendel
     EMOTE_SURRENDER             = 4,
 
     QUEST_MISSING_DIPLO_PT16    = 1324,
+    QUEST_MISSING_DIPLO_PT15    = 1266,
     FACTION_HOSTILE             = 168,                      //guessed, may be different
 
     NPC_SENTRY                  = 5184,                     //helps hendel
@@ -185,6 +186,29 @@ public:
         }
     };
 
+};
+
+/*######
+## npc_tervosh
+######*/
+
+enum Tervosh
+{
+    SPELL_PROUDMOORE_DEFENSE = 7120
+};
+
+class npc_archmage_tervosh : public CreatureScript
+{
+public:
+    npc_archmage_tervosh() : CreatureScript("npc_archmage_tervosh") { }
+
+    bool OnQuestAccept(Player* player, Creature* creature, const Quest* quest)
+    {
+        if (quest->GetQuestId() == QUEST_MISSING_DIPLO_PT15)
+            creature->CastSpell(player, SPELL_PROUDMOORE_DEFENSE);
+
+        return true;
+    }
 };
 
 /*######
@@ -408,6 +432,7 @@ void AddSC_dustwallow_marsh()
     new npc_lady_jaina_proudmoore();
     new npc_nat_pagle();
     new npc_private_hendel();
+    new npc_archmage_tervosh();
     new npc_zelfrax();
     new spell_ooze_zap();
     new spell_ooze_zap_channel_end();
