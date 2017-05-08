@@ -1,3 +1,5 @@
+INSERT INTO version_db_world (`sql_rev`) VALUES ('1494230174323886226');
+
 -- Adds damage to pet_levelstats and fills it with correct damage and stats for every level for every pet
 
 ALTER TABLE `pet_levelstats`
