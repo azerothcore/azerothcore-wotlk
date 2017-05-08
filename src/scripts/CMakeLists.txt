@@ -41,6 +41,7 @@ AC_ADD_SCRIPT_LOADER("Command" "ScriptLoader.h")
 CU_SET_PATH("CMAKE_AC_MODULE_DIR" "${CMAKE_CURRENT_LIST_DIR}")
 
 if(SCRIPTS)
+  include(Custom/CMakeLists.txt)
   include(World/CMakeLists.txt)
   include(OutdoorPvP/CMakeLists.txt)
   include(EasternKingdoms/CMakeLists.txt)
@@ -49,10 +50,6 @@ if(SCRIPTS)
   include(Northrend/CMakeLists.txt)
   include(Events/CMakeLists.txt)
   include(Pet/CMakeLists.txt)
-endif()
-
-if(EXISTS "Custom/CMakeLists.txt")
-include(Custom/CMakeLists.txt)
 endif()
 
 CU_GET_GLOBAL("AC_ADD_SCRIPTS_LIST")

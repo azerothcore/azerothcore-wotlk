@@ -59,6 +59,10 @@ void AddSC_titles_commandscript();
 void AddSC_wp_commandscript();
 
 #ifdef SCRIPTS
+//Custom
+void AddSC_XpWeekend();
+void AddSC_MTG_Npc_Tools();
+
 //world
 void AddSC_areatrigger_scripts();
 void AddSC_emerald_dragons();
@@ -642,6 +646,10 @@ void AddWorldScripts()
     AddSC_npc_taxi();
     AddSC_achievement_scripts();
     AddSC_chat_log();
+
+//Custom
+    AddSC_XpWeekend();
+    AddSC_MTG_Npc_Tools();
 #endif
 }
 
@@ -1166,4 +1174,5 @@ void AddOutdoorPvPScripts()
     AddSC_outdoorpvp_gh();
 #endif
 }
+
 
