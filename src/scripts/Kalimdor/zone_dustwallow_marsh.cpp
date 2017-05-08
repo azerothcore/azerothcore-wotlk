@@ -221,7 +221,7 @@ public:
     struct npc_archmage_tervoshAI : public ScriptedAI
     {
         npc_archmage_tervoshAI(Creature* creature) : ScriptedAI(creature) { }
-	};
+    };
 };
 
 /*######
