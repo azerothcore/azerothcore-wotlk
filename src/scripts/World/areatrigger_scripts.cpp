@@ -326,7 +326,7 @@ class AreaTrigger_at_nats_landing : public AreaTriggerScript
 enum SentryPoint
 {
     SPELL_TELEPORT_VISUAL    = 35517,
-    QUEST_MISSING_DIPLO_PT15 = 1265,
+    QUEST_MISSING_DIPLO_PT14 = 1265,
     NPC_TERVOSH              = 4967
 };
 
@@ -337,7 +337,7 @@ class AreaTrigger_at_sentry_point : public AreaTriggerScript
 
         bool OnTrigger(Player* player, AreaTriggerEntry const* /*trigger*/)
         {
-            auto quest_status = player->GetQuestStatus(QUEST_MISSING_DIPLO_PT15);
+            auto quest_status = player->GetQuestStatus(QUEST_MISSING_DIPLO_PT14);
             if (!player->IsAlive() || quest_status == QUEST_STATUS_NONE || quest_status == QUEST_STATUS_REWARDED)
                 return false;
 
