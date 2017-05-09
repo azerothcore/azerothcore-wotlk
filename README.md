@@ -5,3 +5,5 @@
 ## Links
 
 - [Website](http://rajaxxa.ru)
+- [Forum](http://forum.rajaxxa.ru)
+- [Vkontakte](https://vk.com/rajaxxa_server)
