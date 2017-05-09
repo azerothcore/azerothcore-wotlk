@@ -74,6 +74,7 @@
 #include "SavingSystem.h"
 #include "TicketMgr.h"
 #include "ScriptMgr.h"
+#include "Config.h"
 
 #define ZONE_UPDATE_INTERVAL (2*IN_MILLISECONDS)
 
