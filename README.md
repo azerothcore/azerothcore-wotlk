@@ -1,6 +1,6 @@
 # ![logo](http://dev.rajaxxa.ru/vk1.png) RajaxxaCore
 
-[![Master Build Status](https://travis-ci.org/azerothcore/azerothcore-wotlk.svg)](https://travis-ci.org/azerothcore/azerothcore-wotlk)
+[![Master Build Status](https://travis-ci.org/Devalenok/RajaxxaCore-wotlk.svg?branch=master)](https://travis-ci.org/Devalenok/RajaxxaCore-wotlk.svg?branch=master)
 
 ## Links
 
