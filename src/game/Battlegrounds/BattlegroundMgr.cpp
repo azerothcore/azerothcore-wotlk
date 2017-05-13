@@ -123,18 +123,20 @@ void BattlegroundMgr::Update(uint32 diff)
     // arena points auto-distribution
     if (sWorld->getBoolConfig(CONFIG_ARENA_AUTO_DISTRIBUTE_POINTS))
     {
-        if (time(NULL) > m_NextAutoDistributionTime)
+        if (m_AutoDistributionTimeChecker < diff)
+        {
+			if (time(NULL) > m_NextAutoDistributionTime)
             {
-                sArenaTeamMgr->DistributeArenaPoints();
+				sArenaTeamMgr->DistributeArenaPoints();
                 m_NextAutoDistributionTime = m_NextAutoDistributionTime + BATTLEGROUND_ARENA_POINT_DISTRIBUTION_DAY * sWorld->getIntConfig(CONFIG_ARENA_AUTO_DISTRIBUTE_INTERVAL_DAYS);
                 sWorld->setWorldState(WS_ARENA_DISTRIBUTION_TIME, uint64(m_NextAutoDistributionTime));
             }
             m_AutoDistributionTimeChecker = 600000; // check 10 minutes
-         }
+        }
         else
             m_AutoDistributionTimeChecker -= diff;
     }
-}
+ }
 
 void BattlegroundMgr::BuildBattlegroundStatusPacket(WorldPacket* data, Battleground* bg, uint8 QueueSlot, uint8 StatusID, uint32 Time1, uint32 Time2, uint8 arenatype, TeamId teamId, bool isRated, BattlegroundTypeId forceBgTypeId)
 {
@@ -698,7 +700,6 @@ void BattlegroundMgr::InitAutomaticArenaPointDistribution()
     else
         m_NextAutoDistributionTime = wstime;
 		sLog->outDebug(LOG_FILTER_BATTLEGROUND, "TSCR: bg.battleground", "Automatic Arena Point Distribution initialized.");
- }
 }
 
 void BattlegroundMgr::BuildBattlegroundListPacket(WorldPacket* data, uint64 guid, Player* player, BattlegroundTypeId bgTypeId, uint8 fromWhere)
