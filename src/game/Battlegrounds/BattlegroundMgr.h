@@ -17,6 +17,8 @@
 typedef std::map<uint32, Battleground*> BattlegroundContainer;
 typedef UNORDERED_MAP<uint32, BattlegroundTypeId> BattleMastersMap;
 
+#define BATTLEGROUND_ARENA_POINT_DISTRIBUTION_DAY 86400     // seconds in a day
+
 struct CreateBattlegroundData
 {
     BattlegroundTypeId bgTypeId;
@@ -145,6 +147,7 @@ class BattlegroundMgr
         uint32 m_lastClientVisibleInstanceId;
         uint32 m_NextPeriodicQueueUpdateTime;
         time_t m_NextAutoDistributionTime;
+		uint32 m_AutoDistributionTimeChecker;
         bool   m_ArenaTesting;
         bool   m_Testing;
         BattleMastersMap mBattleMastersMap;
