@@ -1,3 +1,11 @@
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS 
+FROM information_schema.COLUMNS 
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2016_11_26_01';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
 --
 --
 -- ADDED FULL `BroadcastTextID` to creature_text FOR AZEROTHCORE WITH ORIGINAL SOURCE DATA
@@ -12388,3 +12396,10 @@ UPDATE `creature_text` SET `BroadcastTextID`='8386' WHERE `entry`=4489 AND `grou
 UPDATE `creature_text` SET `BroadcastTextID`='8387' WHERE `entry`=4489 AND `groupid`=2 AND `id`=0;
 UPDATE `creature_text` SET `BroadcastTextID`='8388' WHERE `entry`=4489 AND `groupid`=3 AND `id`=0;
 UPDATE `creature_text` SET `BroadcastTextID`='8393' WHERE `entry`=4489 AND `groupid`=4 AND `id`=0;
+
+COMMIT;
+END;
+//
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;

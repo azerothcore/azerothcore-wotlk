@@ -13,14 +13,6 @@ if [ -f "./config.sh"  ]; then
     source "./config.sh" # should overwrite previous
 fi
 
-MD5_CMD="md5sum"
-
-reg_file="$OUTPUT_FOLDER/__db_assembler_registry"
-
-if [ -f "$reg_file" ]; then
-    source "$reg_file"
-fi
-
 function assemble() {
     # to lowercase
     database=${1,,}
@@ -73,7 +65,9 @@ function assemble() {
     fi
 
     if [ $with_updates = true ]; then
-        updFile=$OUTPUT_FOLDER$database$suffix_upd"_"$curTime".sql"
+        updFile=$OUTPUT_FOLDER$database$suffix_upd".sql"
+
+        echo "" > $updFile
 
         if [ ! ${#updates[@]} -eq 0 ]; then
             echo "Generating $OUTPUT_FOLDER$database$suffix_upd ..."
@@ -88,20 +82,8 @@ function assemble() {
                             continue
                         fi
 
-                        file=$(basename "$entry")
-                        hash=$($MD5_CMD "$entry")
-                        hash="${hash%% *}" #remove file path
-                        n="registry__$hash"
-                        if [[ -z ${!n} ]]; then
-                            if [ ! -e $updFile ]; then
-                                echo "-- assembled updates" > $updFile
-                            fi
-
-                            printf -v "registry__${hash}" %s "$file"
-                            echo "-- New update sql: "$file
-                            echo "-- $file"
-                            cat "$entry" >> $updFile
-                        fi
+                        echo "-- $file" >> $updFile
+                        cat "$entry" >> $updFile
                     done
                 fi
             done
@@ -126,10 +108,6 @@ function assemble() {
                             continue
                         fi
 
-                        if [[ ! -e $custFile ]]; then
-                            echo "-- assembled custom" > "$custFile"
-                        fi
-
                         echo "-- $file" >> $custFile
                         cat "$entry" >> $custFile
                     done
@@ -149,19 +127,11 @@ function run() {
             assemble "$db" $version".sql" $1 $2 $3
         done
 
-        echo "" > $reg_file
-
-        for k in ${!registry__*}
-        do
-          n=$k
-          echo "$k='${!n}';" >> "$reg_file"
-        done
-
     echo "===== DONE ====="
 }
 
 PS3='Please enter your choice: '
-options=("Create ALL" "Create only bases" "Create only updates" "Create only customs" "Clean registry" "Quit")
+options=("Create ALL" "Create only bases" "Create only updates" "Create only customs" "Quit")
 select opt in "${options[@]}"
 do
     case $opt in
@@ -179,10 +149,6 @@ do
             ;;
         "Create only customs")
             run false false true
-            break #avoid loop
-            ;;
-        "Clean registry")
-            rm "$reg_file"
             break #avoid loop
             ;;
         "Quit")
