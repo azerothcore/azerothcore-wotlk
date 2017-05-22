@@ -152,9 +152,10 @@ dtPolyRef PathGenerator::GetPolyByLocation(float* point, float* distance) const
 
     // still nothing ..
     // try with bigger search box
-    extents[1] = 80.0f;
-    result = _navMeshQuery->findNearestPoly(point, extents, &_filter, &polyRef, closestPoint);
-    if (DT_SUCCESS == result && polyRef != INVALID_POLYREF)
+    // Note that the extent should not overlap more than 128 polygons in the navmesh (see dtNavMeshQuery::findNearestPoly)
+    extents[1] = 50.0f;
+
+    if (dtStatusSucceed(_navMeshQuery->findNearestPoly(point, extents, &_filter, &polyRef, closestPoint)) && polyRef != INVALID_POLYREF)
     {
         *distance = dtVdist(closestPoint, point);
         return polyRef;
@@ -445,7 +446,7 @@ void PathGenerator::BuildPolyPath(G3D::Vector3 const& startPos, G3D::Vector3 con
                                     (int*)&suffixPolyLength,
                                     MAX_PATH_LENGTH-prefixPolyLength);   // max number of polygons in output path
 
-            if (!suffixPolyLength || dtResult != DT_SUCCESS)
+            if (!_polyLength || dtStatusFailed(dtResult))
             {
                 // this is probably an error state, but we'll leave it
                 // and hopefully recover on the next Update
@@ -470,7 +471,7 @@ void PathGenerator::BuildPolyPath(G3D::Vector3 const& startPos, G3D::Vector3 con
                     (int*)&_polyLength,
                     MAX_PATH_LENGTH);   // max number of polygons in output path
 
-            if (!_polyLength || dtResult != DT_SUCCESS)
+            if (!_polyLength || dtStatusFailed(dtResult))
             {
                 // only happens if we passed bad data to findPath(), or navmesh is messed up
                 BuildShortcut();
@@ -499,7 +500,7 @@ void PathGenerator::BuildPolyPath(G3D::Vector3 const& startPos, G3D::Vector3 con
                 (int*)&_polyLength,
                 MAX_PATH_LENGTH);   // max number of polygons in output path
 
-        if (!_polyLength || dtResult != DT_SUCCESS)
+        if (!_polyLength || dtStatusFailed(dtResult))
         {
             // only happens if we passed bad data to findPath(), or navmesh is messed up
             BuildShortcut();
@@ -658,7 +659,7 @@ void PathGenerator::BuildPointPath(const float *startPoint, const float *endPoin
                 _pointPathLimit);    // maximum number of points
     }
 
-    if (pointCount < 2 || dtResult != DT_SUCCESS)
+    if (pointCount < 2 || dtStatusFailed(dtResult))
     {
         // only happens if pass bad data to findStraightPath or navmesh is broken
         // single point paths can be generated here
@@ -844,7 +845,7 @@ bool PathGenerator::GetSteerTarget(float const* startPos, float const* endPos,
     uint32 nsteerPath = 0;
     dtStatus dtResult = _navMeshQuery->findStraightPath(startPos, endPos, path, pathSize,
                                                 steerPath, steerPathFlags, steerPathPolys, (int*)&nsteerPath, MAX_STEER_POINTS);
-    if (!nsteerPath || DT_SUCCESS != dtResult)
+    if (!nsteerPath || dtStatusFailed(dtResult))
         return false;
 
     // Find vertex far enough to steer to.

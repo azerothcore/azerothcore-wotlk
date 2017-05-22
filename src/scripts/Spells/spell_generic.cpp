@@ -1408,7 +1408,6 @@ class spell_gen_throw_back : public SpellScriptLoader
         }
 };
 
-
 // Theirs
 class spell_gen_absorb0_hitlimit1 : public SpellScriptLoader
 {
@@ -4422,10 +4421,7 @@ class spell_gen_mount : public SpellScriptLoader
                     if (map == 530 || (map == 571 && target->HasSpell(SPELL_COLD_WEATHER_FLYING)))
                         canFly = true;
 
-                    float x, y, z;
-                    target->GetPosition(x, y, z);
-                    uint32 areaFlag = target->GetBaseMap()->GetAreaFlag(x, y, z);
-                    AreaTableEntry const* area = sAreaStore.LookupEntry(areaFlag);
+                    AreaTableEntry const* area = sAreaTableStore.LookupEntry(target->GetAreaId());
                     // Xinef: add battlefield check
                     Battlefield* Bf = sBattlefieldMgr->GetBattlefieldToZoneId(target->GetZoneId());
                     if (!area || (canFly && ((area->flags & AREA_FLAG_NO_FLY_ZONE) || (Bf && !Bf->CanFlyIn()))))

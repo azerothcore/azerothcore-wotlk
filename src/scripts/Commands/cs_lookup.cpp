@@ -86,9 +86,9 @@ public:
         wstrToLower(wNamePart);
 
         // Search in AreaTable.dbc
-        for (uint32 areaflag = 0; areaflag < sAreaStore.GetNumRows(); ++areaflag)
+        for (uint32 i = 0; i < sAreaTableStore.GetNumRows(); ++i)
         {
-            AreaTableEntry const* areaEntry = sAreaStore.LookupEntry(areaflag);
+            AreaTableEntry const* areaEntry = sAreaTableStore.LookupEntry(i);
             if (areaEntry)
             {
                 int locale = handler->GetSessionDbcLocale();
@@ -408,7 +408,7 @@ public:
                     if (il->Name.size() > ulocaleIndex && !il->Name[ulocaleIndex].empty())
                     {
                         std::string name = il->Name[ulocaleIndex];
-            
+
                         if (Utf8FitTo(name, wNamePart))
                         {
                             if (maxResults && count++ == maxResults)
@@ -416,15 +416,15 @@ public:
                                 handler->PSendSysMessage(LANG_COMMAND_LOOKUP_MAX_RESULTS, maxResults);
                                 return true;
                             }
-            
+
                             if (handler->GetSession())
                                 handler->PSendSysMessage(LANG_ITEM_LIST_CHAT, itr->second.ItemId, itr->second.ItemId, name.c_str());
                             else
                                 handler->PSendSysMessage(LANG_ITEM_LIST_CONSOLE, itr->second.ItemId, name.c_str());
-            
+
                             if (!found)
                                 found = true;
-            
+
                             continue;
                         }
                     }
