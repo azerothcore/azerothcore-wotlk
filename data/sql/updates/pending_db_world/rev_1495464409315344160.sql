@@ -138,4 +138,6 @@ DELETE FROM `gameobject_loot_template` WHERE `entry` IN ( 2954, 2959) and `item`
 -- Blue Pearls do not drop from Small Barnacle Clam or Thick Shell Clam items.
 DELETE FROM      `spell_loot_template` WHERE `entry` IN (58168,58172) and `item` = 4611;
 
+-- Black Dragonflight Molt is a guaranteed drop from Hoard of the Black Dragonflight
+UPDATE item_loot_template SET ChanceOrQuestChance = 100 WHERE entry = 10569 AND item = 10575;
 
