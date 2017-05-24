@@ -32,7 +32,7 @@ UPDATE quest_template_addon SET NextQuestID = 11123 WHERE ID = 1302;
 UPDATE quest_template_addon SET PrevQuestID =     0 WHERE ID = 11123;
 
 -- Raising the drop rate on Forked Mudrock Tongues
-UPDATE creature_loot_template SET ChanceOrQuestChance = -40 WHERE entry IN (4396, 4397, 4398, 4399, 4400) AND item = 5883;
+UPDATE creature_loot_template SET ChanceOrQuestChance = -40 WHERE entry IN 4397 AND item = 5883;
 
 -- Trouble in Winterspring! is a breadcrumb quest, not prequest.
 UPDATE quest_template_addon SET PrevQuestID = 0 WHERE ID = 5082;
