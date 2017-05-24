@@ -38,7 +38,11 @@ UPDATE creature_loot_template SET ChanceOrQuestChance = -40 WHERE entry IN 4397 
 UPDATE quest_template_addon SET PrevQuestID = 0 WHERE ID = 5082;
 
 -- Raising the drop rate of Thick Yeti Fur
-UPDATE creature_loot_template SET ChanceOrQuestChance = -50 WHERE entry IN (7457, 7458, 7459, 7460) AND item = 12366;
+UPDATE creature_loot_template SET ChanceOrQuestChance = -71 WHERE entry = 7457 AND item = 12366;
+UPDATE creature_loot_template SET ChanceOrQuestChance = -41 WHERE entry = 7458 AND item = 12366;
+UPDATE creature_loot_template SET ChanceOrQuestChance = -43 WHERE entry = 7459 AND item = 12366;
+UPDATE creature_loot_template SET ChanceOrQuestChance = -45 WHERE entry = 7460 AND item = 12366;
+
 
 -- Flesh Eating Worm adjustment
 UPDATE creature_template SET mindmg = 8, maxdmg = 12, scale=0.4 WHERE entry = 2462;
