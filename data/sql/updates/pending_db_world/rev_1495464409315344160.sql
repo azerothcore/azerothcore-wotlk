@@ -9,8 +9,6 @@ DELETE FROM `creature` WHERE `guid` IN (3137,3255,3261,3262,3548,3551,3554,3558,
 -- The Perfect Stout does not require Rejold's New Brew, it's the otherway around.
 UPDATE `quest_template_addon` SET `NextQuestId` = 0, `PrevQuestID` = 315 WHERE `ID` = 415;
 
--- http://www.wowhead.com/quest=416/rat-catching
--- http://www.wowhead.com/item=3110/tunnel-rat-ear
 -- All Tunnel Rats should be able to drop ears, not just 1 out of 6 types.
 INSERT INTO creature_loot_template VALUES
 (1172, 3110,-38,1,0,1,1),
@@ -25,7 +23,6 @@ UPDATE quest_template_addon SET PrevQuestID = 155 WHERE ID = 214;
 -- Letter to Stormpike follows Encrypted Letter
 UPDATE quest_template_addon SET PrevQuestID = 511 WHERE ID = 514;
 
--- http://www.wowhead.com/item=2633/jungle-remedy#comments:id=163587
 -- Kurzen Jungle Fighter also drops Jungle Remedy
 INSERT INTO creature_loot_template VALUES (937,2633,-33,1,0,1,1);
 
@@ -43,18 +40,13 @@ UPDATE quest_template_addon SET PrevQuestID = 0 WHERE ID = 5082;
 -- Raising the drop rate of Thick Yeti Fur
 UPDATE creature_loot_template SET ChanceOrQuestChance = -50 WHERE entry IN (7457, 7458, 7459, 7460) AND item = 12366;
 
--- http://wow.gamepedia.com/File:Flesh_Eating_Worm.jpg
 -- Flesh Eating Worm adjustment
 UPDATE creature_template SET mindmg = 8, maxdmg = 12, scale=0.4 WHERE entry = 2462;
 
 -- Fool's stout follows Report Back to Fizzlebub
 UPDATE quest_template_addon SET PrevQuestID = 1122 WHERE ID = 1127;
 
--- Fixing Half-Buried Bottle loot table
--- SELECT name, gameobject_loot_template.*
--- FROM item_template
--- JOIN gameobject_loot_template ON item_template.entry = gameobject_loot_template.item
--- WHERE gameobject_loot_template.entry = 2032;
+-- Fixing Half-Buried Bottle loot table, it's not a raptor.
 DELETE FROM `gameobject_loot_template` WHERE `entry` = 2032;
 INSERT INTO `gameobject_loot_template` VALUES
 (2032,1477,2.5,1,0,1,1),
