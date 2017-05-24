@@ -44,7 +44,10 @@ UPDATE `creature_loot_template` SET `ChanceOrQuestChance` = -43 WHERE `entry` = 
 UPDATE `creature_loot_template` SET `ChanceOrQuestChance` = -45 WHERE `entry` = 7460 AND `item` = 12366;
 
 -- Flesh Eating Worm adjustment
-UPDATE `creature_template` SET `mindmg` = 8, `maxdmg` = 12, `scale`=0.4 WHERE `entry` = 2462;
+UPDATE `creature_template` SET `mindmg` = 16, `maxdmg` = 25, `scale`=0.4 WHERE `entry` = 2462;
+
+-- Rotting Worm adjustment
+UPDATE `creature_template` SET `mindmg` = 41, `maxdmg` = 66, `scale`=0.4 WHERE `entry` = 10925;
 
 -- Fool's stout follows Report Back to Fizzlebub
 UPDATE `quest_template_addon` SET `PrevQuestID` = 1122 WHERE `ID` = 1127;
@@ -139,5 +142,6 @@ DELETE FROM `gameobject_loot_template` WHERE `entry` IN ( 2954, 2959) and `item`
 DELETE FROM      `spell_loot_template` WHERE `entry` IN (58168,58172) and `item` = 4611;
 
 -- Black Dragonflight Molt is a guaranteed drop from Hoard of the Black Dragonflight
-UPDATE item_loot_template SET ChanceOrQuestChance = 100 WHERE entry = 10569 AND item = 10575;
+UPDATE `item_loot_template` SET `ChanceOrQuestChance` = 100 WHERE `entry` = 10569 AND `item` = 10575;
+
 
