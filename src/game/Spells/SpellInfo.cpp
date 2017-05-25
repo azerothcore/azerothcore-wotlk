@@ -2013,9 +2013,19 @@ AuraStateType SpellInfo::LoadAuraState() const
     // Faerie Fire (druid versions)
     if (SpellFamilyName == SPELLFAMILY_DRUID && SpellFamilyFlags[0] & 0x400)
         return AURA_STATE_FAERIE_FIRE;
+    
+    // Any Spells that prevent spells can be added here.
+    uint32 StealthPreventionSpellList[] = { 9991, 35331, 9806, 35325 };
+	
+    // Goes through each of the spells and identifies them as Stealth Prevention Spell.
+    for (int i = 0; i < sizeof(StealthPreventionSpellList) / sizeof(uint32); i++) {
+        if (Id == StealthPreventionSpellList[i]) {
+            return AURA_STATE_FAERIE_FIRE;
+	}
+    }
 
     // Sting (hunter's pet ability)
-    if (GetCategory() == 1133 || Id == 35325)
+    if (GetCategory() == 1133)
         return AURA_STATE_FAERIE_FIRE;
 
     // Victorious
