@@ -10,12 +10,13 @@ DELETE FROM `creature` WHERE `guid` IN (3137,3255,3261,3262,3548,3551,3554,3558,
 UPDATE `quest_template_addon` SET `NextQuestID` = 0, `PrevQuestID` = 315 WHERE `ID` = 415;
 
 -- All Tunnel Rats should be able to drop ears, not just 1 out of 6 types.
+DELETE FROM `creature_loot_template` WHERE `entry` in (1172,1174,1175,1176,1177) and `item` = 3110;
 INSERT INTO `creature_loot_template` VALUES
 (1172, 3110,-38,1,0,1,1),
 (1174, 3110,-80,1,0,1,1),
 (1175, 3110,-80,1,0,1,1),
 (1176, 3110,-38,1,0,1,1),
-(1177, 3110,-80,1,0,1,1)
+(1177, 3110,-80,1,0,1,1);
 
 -- Red Silk Bandanas needs The Defias Brotherhood (6), not Red Leather Bandanas.
 UPDATE `quest_template_addon` SET `PrevQuestID` = 155 WHERE `ID` = 214;
@@ -24,6 +25,7 @@ UPDATE `quest_template_addon` SET `PrevQuestID` = 155 WHERE `ID` = 214;
 UPDATE `quest_template_addon` SET `PrevQuestID` = 511 WHERE `ID` = 514;
 
 -- Kurzen Jungle Fighter also drops Jungle Remedy
+DELETE FROM `creature_loot_template` WHERE `entry` = 937 AND `item` = 2633;
 INSERT INTO `creature_loot_template` VALUES (937,2633,-33,1,0,1,1);
 
 -- Inspecting the ruins requires either They Call Him Smilling Jim or James Hyal
@@ -32,7 +34,7 @@ UPDATE `quest_template_addon` SET `NextQuestID` = 11123 WHERE `ID` = 1302;
 UPDATE `quest_template_addon` SET `PrevQuestID` =     0 WHERE `ID` = 11123;
 
 -- Raising the drop rate on Forked Mudrock Tongues
-UPDATE `creature_loot_template` SET `ChanceOrQuestChance` = -40 WHERE `entry` IN 4397 AND `item` = 5883;
+UPDATE `creature_loot_template` SET `ChanceOrQuestChance` = -40 WHERE `entry` = 4397 AND `item` = 5883;
 
 -- Trouble in Winterspring! is a breadcrumb quest, not prequest.
 UPDATE `quest_template_addon` SET `PrevQuestID` = 0 WHERE `ID` = 5082;
@@ -131,7 +133,7 @@ UPDATE `gameobject` SET `position_z`=-10.4   WHERE `guid`=30375;
 UPDATE `gameobject` SET `position_z`=-8.5    WHERE `guid`=30378;
 UPDATE `gameobject` SET `position_z`= 19     WHERE `guid`=31029;
 
---Atal'ai Artifact twin spawn
+-- Atal'ai Artifact twin spawn
 DELETE FROM `gameobject` WHERE `guid`=30593;
 DELETE FROM `gameobject` WHERE `guid`=30594;
 DELETE FROM `gameobject` WHERE `guid`=30587;
