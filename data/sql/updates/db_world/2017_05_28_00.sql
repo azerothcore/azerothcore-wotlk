@@ -1,3 +1,18 @@
+-- DB update 2017_05_01_07 -> 2017_05_28_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2017_05_01_07';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2017_05_01_07 2017_05_28_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1494230174323886226'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
 INSERT INTO version_db_world (`sql_rev`) VALUES ('1494230174323886226');
 
 -- Adds damage to pet_levelstats and fills it with correct damage and stats for every level for every pet
@@ -306,3 +321,12 @@ UPDATE `pet_levelstats` SET `str`=262, `agi`= 78, `sta`=318, `inte`=146, `spi`=2
 UPDATE `pet_levelstats` SET `str`=288, `agi`= 84, `sta`=323, `inte`=148, `spi`=206, `armor`=13422, `min_dmg`=324, `max_dmg`=485 WHERE `creature_entry`=17252 AND `level`=79;
 UPDATE `pet_levelstats` SET `str`=314, `agi`= 90, `sta`=328, `inte`=150, `spi`=209, `armor`=14033, `min_dmg`=329, `max_dmg`=495 WHERE `creature_entry`=17252 AND `level`=80;
 
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END;
+//
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
