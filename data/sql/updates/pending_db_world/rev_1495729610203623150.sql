@@ -9,9 +9,9 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 UPDATE `creature_loot_template` SET `ChanceOrQuestChance` = 100 WHERE `entry` = 19188 AND `item` = 29476;
 
 -- Kurenai
-UPDATE `quest_template SET RewardFactionValue1`    = 7     WHERE `ID` IN (9924,9954, 9917, 10476, 9923, 11502, 10477, 9871, 9873, 9878, 9874, 9921, 9936, 9940, 10116, 10115, 9835, 9833, 9905, 9834,9839,9830, 9902);
-UPDATE `quest_template SET RewardFactionOverride1` = 70000 WHERE `ID` IN (9955,9933,9956,9879,9922,9938);
-UPDATE `quest_template SET RewardFactionValue1`    = 8     WHERE `ID` IN (9918);
+UPDATE `quest_template` SET `RewardFactionValue1`    = 7     WHERE `ID` IN (9924,9954, 9917, 10476, 9923, 11502, 10477, 9871, 9873, 9878, 9874, 9921, 9936, 9940, 10116, 10115, 9835, 9833, 9905, 9834,9839,9830, 9902);
+UPDATE `quest_template` SET `RewardFactionOverride1` = 70000 WHERE `ID` IN (9955,9933,9956,9879,9922,9938);
+UPDATE `quest_template` SET `RewardFactionValue1`    = 8     WHERE `ID` IN (9918);
 
 -- Mag'har
 UPDATE `quest_template` SET `RewardFactionValue1`    = 7      WHERE `ID` IN (9867, 9442,10102,10085, 9447, 9891, 9916, 11503, 9441, 9906, 10478, 9872, 9865, 10479, 9910, 10082, 9888, 10175, 9863, 9935, 9939, 9945, 10101);
