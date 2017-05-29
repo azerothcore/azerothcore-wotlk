@@ -289,6 +289,9 @@ public:
                             for (uint8 i=0; i<2; ++i)
                                 if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_GUARD_1_GUID+i)))
                                     c->CastSpell(c, 70513, false);
+                            for (uint8 i=0; i<2; ++i)
+                                if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_GUARD_2_GUID+i)))
+                                    c->CastSpell(c, 70513, false);
                         }
                     }
                     events.PopEvent();
@@ -304,6 +307,9 @@ public:
                         {
                             for (uint8 i=0; i<2; ++i)
                                 if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_GUARD_1_GUID+i)))
+                                    c->CastSpell(c, 70464, false);
+                             for (uint8 i=0; i<2; ++i)
+                                if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_GUARD_2_GUID+i)))
                                     c->CastSpell(c, 70464, false);
                         }
                     }
