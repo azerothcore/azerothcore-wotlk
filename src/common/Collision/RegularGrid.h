@@ -1,12 +1,12 @@
 #ifndef _REGULAR_GRID_H
 #define _REGULAR_GRID_H
 
+#include "IteratorPair.h"
+#include "Errors.h"
+#include <G3D/Ray.h>
 #include <G3D/BoundsTrait.h>
 #include <G3D/PositionTrait.h>
-#include <G3D/Ray.h>
-#include <G3D/Table.h>
-
-#include "Errors.h"
+#include <unordered_map>
 
 template <class Node>
 class NodeArray
@@ -38,7 +38,7 @@ struct NodeCreator
 template<class T,
          class Node,
          class NodeCreatorFunc = NodeCreator<Node>,
-         /*class BoundsFunc = BoundsTrait<T>,*/
+         class BoundsFunc = BoundsTrait<T>,
          class PositionFunc = PositionTrait<T>
          >
 class RegularGrid2D
@@ -52,7 +52,7 @@ public:
 #define HGRID_MAP_SIZE  (533.33333f * 64.f)     // shouldn't be changed
 #define CELL_SIZE       float(HGRID_MAP_SIZE/(float)CELL_NUMBER)
 
-    typedef G3D::Table<const T*, NodeArray<Node>> MemberTable;
+    typedef std::unordered_multimap<const T*, Node*> MemberTable;
 
     MemberTable memberTable;
     Node* nodes[CELL_NUMBER][CELL_NUMBER];
@@ -73,61 +73,27 @@ public:
 
     void insert(const T& value)
     {
-        G3D::Vector3 pos[9];
-        pos[0] = value.GetBounds().corner(0);
-        pos[1] = value.GetBounds().corner(1);
-        pos[2] = value.GetBounds().corner(2);
-        pos[3] = value.GetBounds().corner(3);
-        pos[4] = (pos[0] + pos[1]) / 2.0f;
-        pos[5] = (pos[1] + pos[2]) / 2.0f;
-        pos[6] = (pos[2] + pos[3]) / 2.0f;
-        pos[7] = (pos[3] + pos[0]) / 2.0f;
-        pos[8] = (pos[0] + pos[2]) / 2.0f;
-
-        NodeArray<Node> na;
-        for (uint8 i = 0; i < 9; ++i)
+        G3D::AABox bounds;
+        BoundsFunc::GetBounds(value, bounds);
+        Cell low = Cell::ComputeCell(bounds.low().x, bounds.low().y);
+        Cell high = Cell::ComputeCell(bounds.high().x, bounds.high().y);
+        for (int x = low.x; x <= high.x; ++x)
         {
-            Cell c = Cell::ComputeCell(pos[i].x, pos[i].y);
-            if (!c.isValid())
+            for (int y = low.y; y <= high.y; ++y)
             {
-                continue;
-            }
-            Node& node = getGridFor(pos[i].x, pos[i].y);
-            na.AddNode(&node);
-        }
-
-        for (uint8 i = 0; i < 9; ++i)
-        {
-            if (na._nodes[i])
-            {
-                na._nodes[i]->insert(value);
-            }
-            else
-            {
-                break;
+                Node& node = getGrid(x, y);
+                node.insert(value);
+                memberTable.insert(MemberTable::value_type(&value, &node));
             }
         }
-
-        memberTable.set(&value, na);
     }
 
     void remove(const T& value)
     {
-        NodeArray<Node>& na = memberTable[&value];
-        for (uint8 i = 0; i < 9; ++i)
-        {
-            if (na._nodes[i])
-            {
-                na._nodes[i]->remove(value);
-            }
-            else
-            {
-                break;
-            }
-        }
-
+        for (MemberTable::value_type& p : Acore::Containers::MapEqualRange(memberTable, &value))
+            p.second->remove(value);
         // Remove the member
-        memberTable.remove(&value);
+        memberTable.erase(&value);
     }
 
     void balance()
@@ -140,8 +106,8 @@ public:
                 }
     }
 
-    bool contains(const T& value) const { return memberTable.containsKey(&value); }
-    int size() const { return memberTable.size(); }
+    bool contains(const T& value) const { return memberTable.count(&value) > 0; }
+    bool empty() const { return memberTable.empty(); }
 
     struct Cell
     {
@@ -156,12 +122,6 @@ public:
 
         bool isValid() const { return x >= 0 && x < CELL_NUMBER && y >= 0 && y < CELL_NUMBER;}
     };
-
-    Node& getGridFor(float fx, float fy)
-    {
-        Cell c = Cell::ComputeCell(fx, fy);
-        return getGrid(c.x, c.y);
-    }
 
     Node& getGrid(int x, int y)
     {

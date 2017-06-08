@@ -60,7 +60,6 @@ public:
     void insert(const GameObjectModel&);
     void remove(const GameObjectModel&);
     [[nodiscard]] bool contains(const GameObjectModel&) const;
-    [[nodiscard]] int size() const;
 
     void balance();
     void update(uint32 diff);
