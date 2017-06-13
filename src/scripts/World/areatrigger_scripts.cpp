@@ -325,7 +325,7 @@ class AreaTrigger_at_nats_landing : public AreaTriggerScript
 
 enum SentryPoint
 {
-    SPELL_TELEPORT_VISUAL    = 35517,
+    SPELL_TELEPORT_VISUAL    = 799,  // TODO Find the correct spell
     QUEST_MISSING_DIPLO_PT14 = 1265,
     NPC_TERVOSH              = 4967
 };
@@ -344,7 +344,7 @@ class AreaTrigger_at_sentry_point : public AreaTriggerScript
             if (!player->FindNearestCreature(NPC_TERVOSH, 100.0f))
             {
                 if(Creature* tervosh = player->SummonCreature(NPC_TERVOSH, -3476.51, -4105.94, 17.1, 5.3816f, TEMPSUMMON_TIMED_DESPAWN, 60000))
-                    tervosh->CastSpell(tervosh, SPELL_TELEPORT_VISUAL, true); //he doesn't do any casting animation, but good enough for now.
+                    tervosh->CastSpell(tervosh, SPELL_TELEPORT_VISUAL, true);
             }
 
             return true;
