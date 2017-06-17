@@ -188,6 +188,43 @@ public:
 };
 
 /*######
+## npc_tervosh
+######*/
+
+enum Tervosh
+{
+    QUEST_MISSING_DIPLO_PT14    = 1265,
+    SPELL_PROUDMOORE_DEFENSE    = 7120,
+    SAY1                        = 0
+};
+
+class npc_archmage_tervosh : public CreatureScript
+{
+public:
+    npc_archmage_tervosh() : CreatureScript("npc_archmage_tervosh") { }
+
+    bool OnQuestReward(Player* player, Creature* creature, const Quest* quest, uint32 /*opt*/)
+    {
+        if (quest->GetQuestId() == QUEST_MISSING_DIPLO_PT14)
+        {
+            creature->CastSpell(player, SPELL_PROUDMOORE_DEFENSE);
+            creature->AI()->Talk(SAY1);
+        }
+        return true;
+    }
+
+   CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_archmage_tervoshAI(creature);
+    }
+
+    struct npc_archmage_tervoshAI : public ScriptedAI
+    {
+        npc_archmage_tervoshAI(Creature* creature) : ScriptedAI(creature) { }
+    };
+};
+
+/*######
 ## npc_zelfrax
 ######*/
 
@@ -408,6 +445,7 @@ void AddSC_dustwallow_marsh()
     new npc_lady_jaina_proudmoore();
     new npc_nat_pagle();
     new npc_private_hendel();
+    new npc_archmage_tervosh();
     new npc_zelfrax();
     new spell_ooze_zap();
     new spell_ooze_zap_channel_end();
