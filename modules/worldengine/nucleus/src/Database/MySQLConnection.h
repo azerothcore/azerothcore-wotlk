@@ -20,7 +20,7 @@ class MySQLPreparedStatement;
 class PingOperation;
 
 enum ConnectionFlags
-{
+{	
     CONNECTION_ASYNC = 0x1,
     CONNECTION_SYNCH = 0x2,
     CONNECTION_BOTH = CONNECTION_ASYNC | CONNECTION_SYNCH

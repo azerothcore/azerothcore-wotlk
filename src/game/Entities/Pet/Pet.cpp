@@ -139,7 +139,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint8 asynchLoadType, uint32 petentry, ui
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_PET_BY_SLOT);
         stmt->setUInt32(0, ownerid);
         stmt->setUInt8(1, uint8(PET_SAVE_AS_CURRENT));
-        stmt->setUInt8(2, uint8(PET_SAVE_LAST_STABLE_SLOT));
+        stmt->setUInt8(2, uint8(PET_SAVE_LAST_STABLE_SLOT));		
     }
 
     if (AsynchPetSummon* info = owner->GetSession()->_loadPetFromDBFirstCallback.GetSecondParam())
@@ -2162,37 +2162,55 @@ void Pet::HandleAsynchLoadFailed(AsynchPetSummon* info, Player* player, uint8 as
             pet->SetDuration(info->m_duration);
 
         // we are almost at home...
-        if (asynchLoadType == PET_LOAD_SUMMON_PET)
-        {
-            Unit* caster = ObjectAccessor::GetObjectInMap(info->m_casterGUID, map, (Unit*)NULL);
-            if (!caster)
-                caster = player;
+		if (asynchLoadType == PET_LOAD_SUMMON_PET)
+		{
+			Unit* caster = ObjectAccessor::GetObjectInMap(info->m_casterGUID, map, (Unit*)NULL);
+			if (!caster)
+				caster = player;
 
-            if (caster->GetTypeId() == TYPEID_UNIT)
-            {
-                if (caster->ToCreature()->IsTotem())
-                    pet->SetReactState(REACT_AGGRESSIVE);
-                else
-                    pet->SetReactState(REACT_DEFENSIVE);
-            }
+			if (caster->GetTypeId() == TYPEID_UNIT)
+			{
+				if (caster->ToCreature()->IsTotem())
+					pet->SetReactState(REACT_AGGRESSIVE);
+				else
+					pet->SetReactState(REACT_DEFENSIVE);
+			}
 
-            // Reset cooldowns
-            if (player->getClass() != CLASS_HUNTER)
-            {
-                pet->m_CreatureSpellCooldowns.clear();
-                player->ToPlayer()->PetSpellInitialize();
-            }
+			// Reset cooldowns
+			if (player->getClass() != CLASS_HUNTER)
+			{
+				pet->m_CreatureSpellCooldowns.clear();
+				player->ToPlayer()->PetSpellInitialize();
+			}
 
-            // Set health to max if new pet is summoned
-            // in this function old pet is saved with current health eg. 20% and new one is loaded from db with same amount
-            // pet should have full health
-            pet->SetHealth(pet->GetMaxHealth());
+			// Set health to max if new pet is summoned
+			// in this function old pet is saved with current health eg. 20% and new one is loaded from db with same amount
+			// pet should have full health
+			pet->SetHealth(pet->GetMaxHealth());
 
-            // generate new name for summon pet
-            std::string new_name=sObjectMgr->GeneratePetName(info->m_entry);
-            if (!new_name.empty())
-                pet->SetName(new_name);
-        }
+			// generate new name for summon pet
+			// EJ hunter's pet will keep its original name
+			std::string new_name = "";
+			if (pet->getPetType() == PetType::HUNTER_PET)
+			{
+				CreatureTemplate const* cinfo = sObjectMgr->GetCreatureTemplate(info->m_entry);
+				if (cinfo)
+				{
+					new_name = cinfo->Name;
+				}
+				else
+				{
+					new_name = sObjectMgr->GeneratePetName(info->m_entry);
+				}
+			}
+			else
+			{
+				new_name = sObjectMgr->GeneratePetName(info->m_entry);
+			}
+
+			if (!new_name.empty())
+				pet->SetName(new_name);
+		}
         else // if GetAsynchLoad() == PET_LOAD_SUMMON_DEAD_PET
         {
             pet->SetUInt32Value(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_NONE);

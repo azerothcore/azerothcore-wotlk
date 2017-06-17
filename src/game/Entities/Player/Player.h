@@ -43,6 +43,10 @@ class PlayerSocial;
 class SpellCastTargets;
 class UpdateMask;
 
+// Playerbot mod
+class PlayerbotAI;
+class PlayerbotMgr;
+
 typedef std::deque<Mail*> PlayerMails;
 
 #define PLAYER_MAX_SKILLS           127
@@ -1119,6 +1123,9 @@ class Player : public Unit, public GridObject<Player>
 
         bool Create(uint32 guidlow, CharacterCreateInfo* createInfo);
 
+		// playerbot mod
+		bool CreateBot(uint32 guidlow, BotCharacterCreateInfo* createInfo);
+
         void Update(uint32 time);
 
         static bool BuildEnumData(PreparedQueryResult result, WorldPacket* data);
@@ -1528,6 +1535,8 @@ class Player : public Unit, public GridObject<Player>
         static bool   LoadPositionFromDB(uint32& mapid, float& x, float& y, float& z, float& o, bool& in_flight, uint64 guid);
 
         static bool IsValidGender(uint8 Gender) { return Gender <= GENDER_FEMALE; }
+
+		static bool ValidateAppearance(uint8 race, uint8 class_, uint8 gender, uint8 hairID, uint8 hairColor, uint8 faceID, uint8 facialHair, uint8 skinColor, bool create = false);
 
         /*********************************************************/
         /***                   SAVE SYSTEM                     ***/
@@ -2516,6 +2525,18 @@ class Player : public Unit, public GridObject<Player>
 
         bool CanFly() const { return m_movementInfo.HasMovementFlag(MOVEMENTFLAG_CAN_FLY); }
 
+		// Playerbot mod:
+		// A Player can either have a playerbotMgr (to manage its bots), or have playerbotAI (if it is a bot), or
+		// neither. Code that enables bots must create the playerbotMgr and set it using SetPlayerbotMgr.
+		EquipmentSets& GetEquipmentSets() { return m_EquipmentSets; }
+		void SetPlayerbotAI(PlayerbotAI* ai) { m_playerbotAI = ai; }
+		PlayerbotAI* GetPlayerbotAI() { return m_playerbotAI; }
+		void SetPlayerbotMgr(PlayerbotMgr* mgr) { m_playerbotMgr = mgr; }
+		PlayerbotMgr* GetPlayerbotMgr() { return m_playerbotMgr; }
+		void SetBotDeathTimer() { m_deathTimer = 0; }
+		PlayerTalentMap& GetTalentMap(uint8 spec) { return m_talents; }
+		bool MinimalLoadFromDB(QueryResult result, uint32 guid);
+
         //! Return collision height sent to client
         float GetCollisionHeight(bool mounted)
         {
@@ -2938,6 +2959,11 @@ class Player : public Unit, public GridObject<Player>
         // duel health and mana reset attributes
         uint32 healthBeforeDuel;
         uint32 manaBeforeDuel;
+
+		// Playerbot mod:
+		WorldLocation _corpseLocation;
+		PlayerbotAI* m_playerbotAI;
+		PlayerbotMgr* m_playerbotMgr;
 };
 
 void AddItemsSetItem(Player*player, Item* item);
