@@ -85,12 +85,12 @@ void GroupMgr::LoadGroups()
         uint32 oldMSTime = getMSTime();
 
         // Delete all groups whose leader does not exist
-        CharacterDatabase.DirectExecute("DELETE FROM groups WHERE leaderGuid NOT IN (SELECT guid FROM characters)");
+        CharacterDatabase.Execute("DELETE FROM groups WHERE leaderGuid NOT IN (SELECT guid FROM characters)");
         // Delete all groups with less than 2 members (or less than 1 for lfg groups)
-        CharacterDatabase.DirectExecute("DELETE groups FROM groups LEFT JOIN ((SELECT guid, count(*) as cnt FROM group_member GROUP BY guid) t) ON groups.guid = t.guid WHERE t.guid IS NULL OR (t.cnt<=1 AND groups.groupType <> 12)");
+        CharacterDatabase.Execute("DELETE groups FROM groups LEFT JOIN ((SELECT guid, count(*) as cnt FROM group_member GROUP BY guid) t) ON groups.guid = t.guid WHERE t.guid IS NULL OR (t.cnt<=1 AND groups.groupType <> 12)");
         // Delete invalid lfg_data
-        CharacterDatabase.DirectExecute("DELETE lfg_data FROM lfg_data LEFT JOIN groups ON lfg_data.guid = groups.guid WHERE groups.guid IS NULL OR groups.groupType <> 12");
-        // CharacterDatabase.DirectExecute("DELETE groups FROM groups LEFT JOIN lfg_data ON groups.guid = lfg_data.guid WHERE groups.groupType=12 AND lfg_data.guid IS NULL"); // group should be left so binds are cleared when disbanded
+        CharacterDatabase.Execute("DELETE lfg_data FROM lfg_data LEFT JOIN groups ON lfg_data.guid = groups.guid WHERE groups.guid IS NULL OR groups.groupType <> 12");
+        // CharacterDatabase.Execute("DELETE groups FROM groups LEFT JOIN lfg_data ON groups.guid = lfg_data.guid WHERE groups.groupType=12 AND lfg_data.guid IS NULL"); // group should be left so binds are cleared when disbanded
 
         InitGroupIds();
 
@@ -134,9 +134,9 @@ void GroupMgr::LoadGroups()
         uint32 oldMSTime = getMSTime();
 
         // Delete all rows from group_member with no group
-        CharacterDatabase.DirectExecute("DELETE FROM group_member WHERE guid NOT IN (SELECT guid FROM groups)");
+        CharacterDatabase.Execute("DELETE FROM group_member WHERE guid NOT IN (SELECT guid FROM groups)");
         // Delete all members that does not exist
-        CharacterDatabase.DirectExecute("DELETE FROM group_member WHERE memberGuid NOT IN (SELECT guid FROM characters)");
+        CharacterDatabase.Execute("DELETE FROM group_member WHERE memberGuid NOT IN (SELECT guid FROM characters)");
 
         //                                                    0        1           2            3       4
         QueryResult result = CharacterDatabase.Query("SELECT guid, memberGuid, memberFlags, subgroup, roles FROM group_member ORDER BY guid");

@@ -141,6 +141,6 @@ void CharacterDatabaseCleaner::CleanCharacterTalent()
 
 void CharacterDatabaseCleaner::CleanCharacterQuestStatus()
 {
-    CharacterDatabase.DirectExecute("DELETE FROM character_queststatus WHERE status = 0");
+    CharacterDatabase.Execute("DELETE FROM character_queststatus WHERE status = 0");
 }
 

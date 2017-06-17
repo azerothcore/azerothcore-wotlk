@@ -41,78 +41,77 @@ namespace AccountMgr
         return AOR_OK;                                          // everything's fine
     }
 
-    AccountOpResult DeleteAccount(uint32 accountId)
-    {
-        // Check if accounts exists
-        PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_BY_ID);
-        stmt->setUInt32(0, accountId);
-        PreparedQueryResult result = LoginDatabase.Query(stmt);
+	AccountOpResult DeleteAccount(uint32 accountId)
+	{
+		// Check if accounts exists
+		PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_BY_ID);
+		stmt->setUInt32(0, accountId);
+		PreparedQueryResult result = LoginDatabase.Query(stmt);
 
-        if (!result)
-            return AOR_NAME_NOT_EXIST;
+		if (!result)
+			return AOR_NAME_NOT_EXIST;
 
-        // Obtain accounts characters
-        stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHARS_BY_ACCOUNT_ID);
+		// Obtain accounts characters
+		stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHARS_BY_ACCOUNT_ID);
 
-        stmt->setUInt32(0, accountId);
+		stmt->setUInt32(0, accountId);
 
-        result = CharacterDatabase.Query(stmt);
+		result = CharacterDatabase.Query(stmt);
 
-        if (result)
-        {
-            do
-            {
-                uint32 guidLow = (*result)[0].GetUInt32();
-                uint64 guid = MAKE_NEW_GUID(guidLow, 0, HIGHGUID_PLAYER);
+		if (result)
+		{
+			do
+			{
+				uint32 guidLow = (*result)[0].GetUInt32();
+				uint64 guid = MAKE_NEW_GUID(guidLow, 0, HIGHGUID_PLAYER);
 
-                // Kick if player is online
-                if (Player* p = ObjectAccessor::FindPlayer(guid))
-                {
-                    WorldSession* s = p->GetSession();
-                    s->KickPlayer();                            // mark session to remove at next session list update
-                    s->LogoutPlayer(false);                     // logout player without waiting next session list update
-                }
+				// Kick if player is online
+				if (Player* p = ObjectAccessor::FindPlayer(guid))
+				{
+					WorldSession* s = p->GetSession();
+					s->KickPlayer();                            // mark session to remove at next session list update
+					s->LogoutPlayer(false);                     // logout player without waiting next session list update
+				}
 
-                Player::DeleteFromDB(guid, accountId, false, true);       // no need to update realm characters
-            } while (result->NextRow());
-        }
+				Player::DeleteFromDB(guid, accountId, false, true);       // no need to update realm characters
+			} while (result->NextRow());
+		}
 
-        // table realm specific but common for all characters of account for realm
-        stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_TUTORIALS);
-        stmt->setUInt32(0, accountId);
-        CharacterDatabase.Execute(stmt);
+		// table realm specific but common for all characters of account for realm
+		stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_TUTORIALS);
+		stmt->setUInt32(0, accountId);
+		CharacterDatabase.Execute(stmt);
 
-        stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ACCOUNT_DATA);
-        stmt->setUInt32(0, accountId);
-        CharacterDatabase.Execute(stmt);
+		stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ACCOUNT_DATA);
+		stmt->setUInt32(0, accountId);
+		CharacterDatabase.Execute(stmt);
 
-        stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHARACTER_BAN);
-        stmt->setUInt32(0, accountId);
-        CharacterDatabase.Execute(stmt);
+		stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHARACTER_BAN);
+		stmt->setUInt32(0, accountId);
+		CharacterDatabase.Execute(stmt);
 
-        SQLTransaction trans = LoginDatabase.BeginTransaction();
+		SQLTransaction trans = LoginDatabase.BeginTransaction();
 
-        stmt = LoginDatabase.GetPreparedStatement(LOGIN_DEL_ACCOUNT);
-        stmt->setUInt32(0, accountId);
-        trans->Append(stmt);
+		stmt = LoginDatabase.GetPreparedStatement(LOGIN_DEL_ACCOUNT);
+		stmt->setUInt32(0, accountId);
+		trans->Append(stmt);
 
-        stmt = LoginDatabase.GetPreparedStatement(LOGIN_DEL_ACCOUNT_ACCESS);
-        stmt->setUInt32(0, accountId);
-        trans->Append(stmt);
+		stmt = LoginDatabase.GetPreparedStatement(LOGIN_DEL_ACCOUNT_ACCESS);
+		stmt->setUInt32(0, accountId);
+		trans->Append(stmt);
 
-        stmt = LoginDatabase.GetPreparedStatement(LOGIN_DEL_REALM_CHARACTERS);
-        stmt->setUInt32(0, accountId);
-        trans->Append(stmt);
+		stmt = LoginDatabase.GetPreparedStatement(LOGIN_DEL_REALM_CHARACTERS);
+		stmt->setUInt32(0, accountId);
+		trans->Append(stmt);
 
-        stmt = LoginDatabase.GetPreparedStatement(LOGIN_DEL_ACCOUNT_BANNED);
-        stmt->setUInt32(0, accountId);
-        trans->Append(stmt);
+		stmt = LoginDatabase.GetPreparedStatement(LOGIN_DEL_ACCOUNT_BANNED);
+		stmt->setUInt32(0, accountId);
+		trans->Append(stmt);
 
-        LoginDatabase.CommitTransaction(trans);
+		LoginDatabase.CommitTransaction(trans);
 
-        return AOR_OK;
-    }
-
+		return AOR_OK;
+	}
 
     AccountOpResult ChangeUsername(uint32 accountId, std::string newUsername, std::string newPassword)
     {
