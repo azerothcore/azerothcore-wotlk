@@ -226,6 +226,13 @@ void RandomPlayerbotFactory::CreateRandomBots()
 					sLog->outBasic("Account ID %d delete result unknown", accountID);
 					break;
 				}
+
+				QueryResultFuture checkDeleteResult = LoginDatabase.AsyncPQuery("SELECT id FROM account where id = '%d'", accountID);
+				while (!checkDeleteResult.ready())
+				{
+					sLog->outBasic("Account ID %d is deleting", accountID);
+					this_thread::sleep_for(std::chrono::milliseconds(100));
+				}
 			} while (results->NextRow());
 		}
 
@@ -238,7 +245,7 @@ void RandomPlayerbotFactory::CreateRandomBots()
 		ostringstream out; out << sPlayerbotAIConfig.randomBotAccountPrefix << accountNumber;
 		string accountName = out.str();
 		const char* name_cstr = accountName.c_str();
-		QueryResult results = LoginDatabase.PQuery("SELECT id FROM account where username = '%s'", name_cstr);
+		QueryResult results = LoginDatabase.PQuery("SELECT id FROM account where username = '%s'", name_cstr);		
 		if (results)
 		{
 			continue;
