@@ -226,19 +226,26 @@ void RandomPlayerbotFactory::CreateRandomBots()
 					sLog->outBasic("Account ID %d delete result unknown", accountID);
 					break;
 				}
+
+				QueryResultFuture checkDeleteResult = LoginDatabase.AsyncPQuery("SELECT id FROM account where id = '%d'", accountID);
+				while (!checkDeleteResult.ready())
+				{
+					sLog->outBasic("Account ID %d is deleting", accountID);
+					this_thread::sleep_for(std::chrono::milliseconds(100));
+				}
 			} while (results->NextRow());
 		}
 
 		CharacterDatabase.DirectExecute("DELETE FROM ai_playerbot_random_bots");
 		sLog->outBasic("Random bot accounts deleted");
 	}
-
-	for (int accountNumber = 0; accountNumber < sPlayerbotAIConfig.randomBotAccountCount; ++accountNumber)
+	int maxBotAccountCount = sPlayerbotAIConfig.randomBotAccountCount;
+	for (int accountNumber = 0; accountNumber < maxBotAccountCount; ++accountNumber)
 	{
 		ostringstream out; out << sPlayerbotAIConfig.randomBotAccountPrefix << accountNumber;
 		string accountName = out.str();
 		const char* name_cstr = accountName.c_str();
-		QueryResult results = LoginDatabase.PQuery("SELECT id FROM account where username = '%s'", name_cstr);
+		QueryResult results = LoginDatabase.PQuery("SELECT id FROM account where username = '%s'", name_cstr);		
 		if (results)
 		{
 			continue;
@@ -275,7 +282,7 @@ void RandomPlayerbotFactory::CreateRandomBots()
 	LoginDatabase.DirectPExecute("UPDATE account SET expansion = '%u' where username like '%s%%'", 2, sPlayerbotAIConfig.randomBotAccountPrefix.c_str());
 
 	int totalRandomBotChars = 0;
-	for (int accountNumber = 0; accountNumber < sPlayerbotAIConfig.randomBotAccountCount; ++accountNumber)
+	for (int accountNumber = 0; accountNumber < maxBotAccountCount; ++accountNumber)
 	{
 		ostringstream out; out << sPlayerbotAIConfig.randomBotAccountPrefix << accountNumber;
 		string accountName = out.str();
@@ -283,7 +290,7 @@ void RandomPlayerbotFactory::CreateRandomBots()
 		QueryResult results = LoginDatabase.PQuery("SELECT id FROM account where username = '%s'", name_cstr);
 		if (!results)
 		{
-			sLog->outError("Account %s not created", accountNumber);
+			sLog->outError("Account %d not created", accountNumber);
 			continue;
 		}
 
