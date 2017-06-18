@@ -26,7 +26,7 @@ public:
 	void OnLogin(Player *player) override {
 		if (sConfigMgr->GetBoolDefault("Solocraft.Enable", true))
 		{
-		ChatHandler(player->GetSession()).SendSysMessage("Solocraft mode activated in raids");
+		ChatHandler(player->GetSession()).SendSysMessage("Solocraft mode activated in dungeons and raids.");
 		}
 	}
 
