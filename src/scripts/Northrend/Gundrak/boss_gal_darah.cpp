@@ -129,6 +129,7 @@ class boss_gal_darah : public CreatureScript
             {
                 Talk(SAY_DEATH);
                 BossAI::JustDied(killer);
+				killer->RemoveAurasDueToSpell(SPELL_PUNCTURE);
             }
 
             void KilledUnit(Unit*)
