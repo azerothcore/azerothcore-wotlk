@@ -44,7 +44,7 @@ namespace MMAP
         fclose(file);
         if (count != 1)
         {
-            ;//TC_LOG_DEBUG(LOG_FILTER_MAPS, "MMAP:loadMapData: Error: Could not read params from file '%s'", fileName);
+            TC_LOG_DEBUG(LOG_FILTER_MAPS, "MMAP:loadMapData: Error: Could not read params from file '%s'", fileName);
             delete [] fileName;
             return false;
         }
