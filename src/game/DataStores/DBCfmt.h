@@ -20,9 +20,11 @@ char const BankBagSlotPricesEntryfmt[] = "ni";
 char const BarberShopStyleEntryfmt[] = "nixxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxiii";
 char const BattlemasterListEntryfmt[] = "niiiiiiiiixssssssssssssssssxiixx";
 char const CharStartOutfitEntryfmt[] = "dbbbXiiiiiiiiiiiiiiiiiiiiiiiixxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
+
+char const CharSectionsEntryfmt[] = "diiixxxiii";
+
 char const CharTitlesEntryfmt[] = "nxssssssssssssssssxssssssssssssssssxi";
-char const ChatChannelsEntryfmt[] = "nixssssssssssssssssxxxxxxxxxxxxxxxxxx";
-                                                            // ChatChannelsEntryfmt, index not used (more compact store)
+char const ChatChannelsEntryfmt[] = "nixssssssssssssssssxxxxxxxxxxxxxxxxxx"; // ChatChannelsEntryfmt, index not used (more compact store)
 char const ChrClassesEntryfmt[] = "nxixxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxixii";
 char const ChrRacesEntryfmt[] = "nxixiixixxxxixssssssssssssssssxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxi";
 char const CinematicSequencesEntryfmt[] = "nxxxxxxxxx";
@@ -38,6 +40,9 @@ char const DurabilityCostsfmt[] = "niiiiiiiiiiiiiiiiiiiiiiiiiiiii";
 char const DurabilityQualityfmt[] = "nf";
 char const EmotesEntryfmt[] = "nxxiiix";
 char const EmotesTextEntryfmt[] = "nxixxxxxxxxxxxxxxxx";
+
+char const EmotesTextSoundEntryfmt[] = "niiii";
+
 char const FactionEntryfmt[] = "niiiiiiiiiiiiiiiiiiffixssssssssssssssssxxxxxxxxxxxxxxxxxx";
 char const FactionTemplateEntryfmt[] = "niiiiiiiiiiiii";
 char const GameObjectDisplayInfofmt[] = "nsxxxxxxxxxxffffffx";
