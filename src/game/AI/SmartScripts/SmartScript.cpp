@@ -144,8 +144,8 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
     if (unit)
         mLastInvoker = unit->GetGUID();
 
-    //if (Unit* tempInvoker = GetLastInvoker())
 #ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+    if (Unit* tempInvoker = GetLastInvoker())
         sLog->outDebug(LOG_FILTER_DATABASE_AI, "SmartScript::ProcessAction: Invoker: %s (guidlow: %u)", tempInvoker->GetName().c_str(), tempInvoker->GetGUIDLow());
 #endif
 
