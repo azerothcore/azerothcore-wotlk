@@ -417,32 +417,32 @@ bool AuthSocket::_HandleLogonChallenge()
                 else
                     ;//sLog->outDebug(LOG_FILTER_NETWORKIO, "[AuthChallenge] Account IP matches");
             }
-			else
+            else
             {
                 ;//sLog->outDebug(LOG_FILTER_NETWORKIO, "[AuthChallenge] Account '%s' is not locked to ip", _login.c_str());
-				std::string accountCountry = fields[3].GetString();
-				if (accountCountry.empty() || accountCountry == "00")
-					;//sLog->outDebug(LOG_FILTER_NETWORKIO, "[AuthChallenge] Account '%s' is not locked to country", _login.c_str());
-				else if (!accountCountry.empty())
+                std::string accountCountry = fields[3].GetString();
+                if (accountCountry.empty() || accountCountry == "00")
+                    ;//sLog->outDebug(LOG_FILTER_NETWORKIO, "[AuthChallenge] Account '%s' is not locked to country", _login.c_str());
+                else if (!accountCountry.empty())
                 {
                     uint32 ip = inet_addr(ip_address.c_str());
                     EndianConvertReverse(ip);
 
                     stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_LOGON_COUNTRY);
                     stmt->setUInt32(0, ip);
-					if (PreparedQueryResult sessionCountryQuery = LoginDatabase.Query(stmt))
-					{
-						std::string loginCountry = (*sessionCountryQuery)[0].GetString();
-						;//sLog->outDebug(LOG_FILTER_NETWORKIO, "[AuthChallenge] Account '%s' is locked to country: '%s' Player country is '%s'", _login.c_str(), accountCountry.c_str(), loginCountry.c_str());
-						if (loginCountry != accountCountry)
-						{
-							;//sLog->outDebug(LOG_FILTER_NETWORKIO, "[AuthChallenge] Account country differs.");
-							pkt << uint8(WOW_FAIL_UNLOCKABLE_LOCK);
-							locked = true;
-						}
-						else
-							;//sLog->outDebug(LOG_FILTER_NETWORKIO, "[AuthChallenge] Account country matches");
-					}
+                    if (PreparedQueryResult sessionCountryQuery = LoginDatabase.Query(stmt))
+                    {
+                        std::string loginCountry = (*sessionCountryQuery)[0].GetString();
+                        ;//sLog->outDebug(LOG_FILTER_NETWORKIO, "[AuthChallenge] Account '%s' is locked to country: '%s' Player country is '%s'", _login.c_str(), accountCountry.c_str(), loginCountry.c_str());
+                        if (loginCountry != accountCountry)
+                        {
+                            ;//sLog->outDebug(LOG_FILTER_NETWORKIO, "[AuthChallenge] Account country differs.");
+                            pkt << uint8(WOW_FAIL_UNLOCKABLE_LOCK);
+                            locked = true;
+                        }
+                        else
+                            ;//sLog->outDebug(LOG_FILTER_NETWORKIO, "[AuthChallenge] Account country matches");
+                    }
                     else
                         ;//sLog->outDebug(LOG_FILTER_NETWORKIO, "[AuthChallenge] IP2NATION Table empty");
                 }

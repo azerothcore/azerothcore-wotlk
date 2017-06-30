@@ -248,9 +248,9 @@ public:
 
         if (!param.empty())
         {
-			if (param == "on")
-			{
-				PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_LOGON_COUNTRY);
+            if (param == "on")
+            {
+                PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_LOGON_COUNTRY);
                 uint32 ip = inet_addr(handler->GetSession()->GetRemoteAddress().c_str());
                 EndianConvertReverse(ip);
                 stmt->setUInt32(0, ip);
@@ -275,8 +275,8 @@ public:
             {
                 PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_LOCK_CONTRY);
                 stmt->setString(0, "00");
-				stmt->setUInt32(1, handler->GetSession()->GetAccountId());
-				LoginDatabase.Execute(stmt);
+                stmt->setUInt32(1, handler->GetSession()->GetAccountId());
+                LoginDatabase.Execute(stmt);
                 handler->PSendSysMessage(LANG_COMMAND_ACCLOCKUNLOCKED);
             }
             return true;
