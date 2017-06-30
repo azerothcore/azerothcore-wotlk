@@ -1,7 +1,7 @@
 INSERT INTO version_db_world (`sql_rev`) VALUES ('1498796247453520600');
 
-DROP TABLE IF EXISTS `ip2nation`;
-DROP TABLE IF EXISTS `ip2nationCountries`;
+DROP TABLE IF EXISTS ip2nation;
+DROP TABLE IF EXISTS ip2nationCountries;
 
 DELETE FROM `command` WHERE `name` in ('account lock', 'account lock ip', 'account lock country');
 INSERT INTO `command` (`name`,`security`,`help`) VALUES
