@@ -718,7 +718,8 @@ bool AuthSocket::_HandleLogonProof()
                         LoginDatabase.Execute(stmt);
 
                         sLog->outDebug(LOG_FILTER_NETWORKIO, "'%s:%d' [AuthChallenge] IP %s got banned for '%u' seconds because account %s failed to authenticate '%u' times",
-                         //   socket().getRemoteAddress().c_str(), socket().getRemotePort(), socket().getRemoteAddress().c_str(), WrongPassBanTime, _login.c_str(), failed_logins);
+                            socket().getRemoteAddress().c_str(), socket().getRemotePort(), socket().getRemoteAddress().c_str(), WrongPassBanTime, _login.c_str(), failed_logins);
+
                     }
                 }
             }

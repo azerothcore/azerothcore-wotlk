@@ -822,7 +822,7 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket& recv_data)
     if (player->IsInFlight())
     {
         sLog->outDebug(LOG_FILTER_NETWORKIO, "HandleAreaTriggerOpcode: Player '%s' (GUID: %u) in flight, ignore Area Trigger ID:%u",
-        //    player->GetName().c_str(), player->GetGUIDLow(), triggerId);
+            player->GetName().c_str(), player->GetGUIDLow(), triggerId);
         return;
     }
 
@@ -830,14 +830,14 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket& recv_data)
     if (!atEntry)
     {
         sLog->outDebug(LOG_FILTER_NETWORKIO, "HandleAreaTriggerOpcode: Player '%s' (GUID: %u) send unknown (by DBC) Area Trigger ID:%u",
-        //    player->GetName().c_str(), player->GetGUIDLow(), triggerId);
+            player->GetName().c_str(), player->GetGUIDLow(), triggerId);
         return;
     }
 
     if (!player->IsInAreaTriggerRadius(atEntry))
     {
         sLog->outDebug(LOG_FILTER_NETWORKIO, "HandleAreaTriggerOpcode: Player '%s' (GUID: %u) too far (trigger map: %u player map: %u), ignore Area Trigger ID: %u",
-        //    player->GetName().c_str(), atEntry->mapid, player->GetMapId(), player->GetGUIDLow(), triggerId);
+            player->GetName().c_str(), atEntry->mapid, player->GetMapId(), player->GetGUIDLow(), triggerId);
         return;
     }
 
@@ -1341,14 +1341,14 @@ void WorldSession::HandleRealmSplitOpcode(WorldPacket & recv_data)
 
 void WorldSession::HandleFarSightOpcode(WorldPacket& recvData)
 {
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_FAR_SIGHT");
+    //sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_FAR_SIGHT");
 
     bool apply;
     recvData >> apply;
 
     if (apply)
     {
-        sLog->outDebug("Added FarSight " UI64FMTD " to player %u", _player->GetUInt64Value(PLAYER_FARSIGHT), _player->GetGUIDLow());
+        //sLog->outDebug("Added FarSight " UI64FMTD " to player %u", _player->GetUInt64Value(PLAYER_FARSIGHT), _player->GetGUIDLow());
         if (WorldObject* target = _player->GetViewpoint())
             _player->SetSeer(target);
         else
@@ -1356,7 +1356,7 @@ void WorldSession::HandleFarSightOpcode(WorldPacket& recvData)
     }
     else
     {
-        sLog->outDebug("Player %u set vision to self", _player->GetGUIDLow());
+        //sLog->outDebug("Player %u set vision to self", _player->GetGUIDLow());
         _player->SetSeer(_player);
     }
 

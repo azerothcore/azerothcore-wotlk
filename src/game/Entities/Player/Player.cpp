@@ -18384,14 +18384,14 @@ Item* Player::_LoadItem(SQLTransaction& trans, uint32 zoneId, uint32 timeDiff, F
             if (IsAlive() && item->IsLimitedToAnotherMapOrZone(GetMapId(), zoneId))
             {
                 sLog->outDebug(LOG_FILTER_PLAYER_LOADING, "Player::_LoadInventory: player (GUID: %u, name: '%s', map: %u) has item (GUID: %u, entry: %u) limited to another map (%u). Deleting item.",
-                //    GetGUIDLow(), GetName().c_str(), GetMapId(), item->GetGUIDLow(), item->GetEntry(), zoneId);
+                    GetGUIDLow(), GetName().c_str(), GetMapId(), item->GetGUIDLow(), item->GetEntry(), zoneId);
                 remove = true;
             }
             // "Conjured items disappear if you are logged out for more than 15 minutes"
             else if (timeDiff > 15 * MINUTE && proto->Flags & ITEM_PROTO_FLAG_CONJURED)
             {
                 sLog->outDebug(LOG_FILTER_PLAYER_LOADING, "Player::_LoadInventory: player (GUID: %u, name: '%s', diff: %u) has conjured item (GUID: %u, entry: %u) with expired lifetime (15 minutes). Deleting item.",
-                //    GetGUIDLow(), GetName().c_str(), timeDiff, item->GetGUIDLow(), item->GetEntry());
+                    GetGUIDLow(), GetName().c_str(), timeDiff, item->GetGUIDLow(), item->GetEntry());
                 remove = true;
             }
             else if (item->HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAG_REFUNDABLE))
@@ -18399,7 +18399,7 @@ Item* Player::_LoadItem(SQLTransaction& trans, uint32 zoneId, uint32 timeDiff, F
                 if (item->GetPlayedTime() > (2 * HOUR))
                 {
                     sLog->outDebug(LOG_FILTER_PLAYER_LOADING, "Player::_LoadInventory: player (GUID: %u, name: '%s') has item (GUID: %u, entry: %u) with expired refund time (%u). Deleting refund data and removing refundable flag.",
-                    //    GetGUIDLow(), GetName().c_str(), item->GetGUIDLow(), item->GetEntry(), item->GetPlayedTime());
+                        GetGUIDLow(), GetName().c_str(), item->GetGUIDLow(), item->GetEntry(), item->GetPlayedTime());
 
                     stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ITEM_REFUND_INSTANCE);
                     stmt->setUInt32(0, item->GetGUIDLow());
@@ -18423,7 +18423,7 @@ Item* Player::_LoadItem(SQLTransaction& trans, uint32 zoneId, uint32 timeDiff, F
                     else
                     {
                         sLog->outDebug(LOG_FILTER_PLAYER_LOADING, "Player::_LoadInventory: player (GUID: %u, name: '%s') has item (GUID: %u, entry: %u) with refundable flags, but without data in item_refund_instance. Removing flag.",
-                        //    GetGUIDLow(), GetName().c_str(), item->GetGUIDLow(), item->GetEntry());
+                            GetGUIDLow(), GetName().c_str(), item->GetGUIDLow(), item->GetEntry());
                         item->RemoveFlag(ITEM_FIELD_FLAGS, ITEM_FLAG_REFUNDABLE);
                     }
                 }
@@ -18451,7 +18451,7 @@ Item* Player::_LoadItem(SQLTransaction& trans, uint32 zoneId, uint32 timeDiff, F
                 else
                 {
                     sLog->outDebug(LOG_FILTER_PLAYER_LOADING, "Player::_LoadInventory: player (GUID: %u, name: '%s') has item (GUID: %u, entry: %u) with ITEM_FLAG_BOP_TRADEABLE flag, but without data in item_soulbound_trade_data. Removing flag.",
-                    //    GetGUIDLow(), GetName().c_str(), item->GetGUIDLow(), item->GetEntry());
+                        GetGUIDLow(), GetName().c_str(), item->GetGUIDLow(), item->GetEntry());
                     item->RemoveFlag(ITEM_FIELD_FLAGS, ITEM_FLAG_BOP_TRADEABLE);
                 }
             }
@@ -19252,7 +19252,7 @@ bool Player::_LoadHomeBind(PreparedQueryResult result)
     }
 
     sLog->outStaticDebug("Setting player home position - mapid: %u, areaid: %u, X: %f, Y: %f, Z: %f",
-    //    m_homebindMapId, m_homebindAreaId, m_homebindX, m_homebindY, m_homebindZ);
+        m_homebindMapId, m_homebindAreaId, m_homebindX, m_homebindY, m_homebindZ);
 
     return true;
 }
@@ -25083,7 +25083,7 @@ void Player::HandleFall(MovementInfo const& movementInfo)
             }
 
             //Z given by moveinfo, LastZ, FallTime, WaterZ, MapZ, Damage, Safefall reduction
-            sLog->outStaticDebug("FALLDAMAGE z=%f sz=%f pZ=%f FallTime=%d mZ=%f damage=%d SF=%d", movementInfo.pos.GetPositionZ(), height, GetPositionZ(), movementInfo.fallTime, height, damage, safe_fall);
+            sLog->outStaticDebug("FALLDAMAGE z=%f sz=%f pZ=%f FallTime=%d mZ=%f damage=%d SF=%d", movementInfo.pos.GetPositionZ(), GetPositionZ(), movementInfo.fallTime, damage, safe_fall);
         }
 
         // recheck alive, might have died of EnvironmentalDamage, avoid cases when player die in fact like Spirit of Redemption case

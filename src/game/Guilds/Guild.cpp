@@ -561,7 +561,7 @@ void Guild::BankTab::SendText(Guild const* guild, WorldSession* session) const
     if (session)
     {
         sLog->outDebug(LOG_FILTER_GUILD, "MSG_QUERY_GUILD_BANK_TEXT [%s]: Tabid: %u, Text: %s"
-        //    , session->GetPlayerInfo().c_str(), m_tabId, m_text.c_str());
+            , session->GetPlayerInfo().c_str(), m_tabId, m_text.c_str());
         session->SendPacket(&data);
     }
     else
@@ -953,7 +953,7 @@ Item* Guild::BankMoveItemData::StoreItem(SQLTransaction& trans, Item* pItem)
         ++itr;
 
         sLog->outDebug(LOG_FILTER_GUILD, "GUILD STORAGE: StoreItem tab = %u, slot = %u, item = %u, count = %u",
-        //    m_container, m_slotId, pItem->GetEntry(), pItem->GetCount());
+            m_container, m_slotId, pItem->GetEntry(), pItem->GetCount());
         pLastItem = _StoreItem(trans, pTab, pItem, pos, itr != m_vec.end());
     }
     return pLastItem;
@@ -1056,7 +1056,7 @@ void Guild::BankMoveItemData::CanStoreItemInTab(Item* pItem, uint8 skipSlotId, b
 InventoryResult Guild::BankMoveItemData::CanStore(Item* pItem, bool swap)
 {
     sLog->outDebug(LOG_FILTER_GUILD, "GUILD STORAGE: CanStore() tab = %u, slot = %u, item = %u, count = %u",
-    //    m_container, m_slotId, pItem->GetEntry(), pItem->GetCount());
+        m_container, m_slotId, pItem->GetEntry(), pItem->GetCount());
 
     uint32 count = pItem->GetCount();
     // Soulbound items cannot be moved
@@ -1154,7 +1154,7 @@ bool Guild::Create(Player* pLeader, std::string const& name)
     _CreateLogHolders();
 
     sLog->outDebug(LOG_FILTER_GUILD, "GUILD: creating guild [%s] for leader %s (%u)",
-    //    name.c_str(), pLeader->GetName().c_str(), GUID_LOPART(m_leaderGuid));
+        name.c_str(), pLeader->GetName().c_str(), GUID_LOPART(m_leaderGuid));
 
     SQLTransaction trans = CharacterDatabase.BeginTransaction();
 
@@ -2865,7 +2865,7 @@ void Guild::_SendBankList(WorldSession* session /* = NULL*/, uint8 tabId /*= 0*/
         data.put<uint32>(rempos, numSlots);
         session->SendPacket(&data);
        sLog->outDebug(LOG_FILTER_GUILD, "SMSG_GUILD_BANK_LIST [%s]: TabId: %u, FullSlots: %u, slots: %d",
-        //               session->GetPlayerInfo().c_str(), tabId, sendAllSlots, numSlots);
+                       session->GetPlayerInfo().c_str(), tabId, sendAllSlots, numSlots);
     }
     else // TODO - Probably this is just sent to session + those that have sent CMSG_GUILD_BANKER_ACTIVATE
     {
@@ -2881,7 +2881,7 @@ void Guild::_SendBankList(WorldSession* session /* = NULL*/, uint8 tabId /*= 0*/
             data.put<uint32>(rempos, numSlots);
             player->GetSession()->SendPacket(&data);
            sLog->outDebug(LOG_FILTER_GUILD, "SMSG_GUILD_BANK_LIST [%s]: TabId: %u, FullSlots: %u, slots: %u"
-           //     , player->GetName().c_str(), tabId, sendAllSlots, numSlots);
+                , player->GetName().c_str(), tabId, sendAllSlots, numSlots);
         }
     }
 }

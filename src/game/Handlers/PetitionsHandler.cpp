@@ -788,7 +788,7 @@ void WorldSession::HandleTurnInPetitionOpcode(WorldPacket & recvData)
         if (signs)
             for (SignatureMap::const_iterator itr = signatureCopy.begin(); itr != signatureCopy.end(); ++itr)
             {
-                sLog->outDebug(LOG_FILTER_NETWORKIO, "PetitionsHandler: Adding arena team (guid: %u) member %u", arenaTeam->GetId(), memberGUID);
+                sLog->outDebug(LOG_FILTER_NETWORKIO, "PetitionsHandler: Adding arena team (guid: %u) member %u", arenaTeam->GetId());
                 arenaTeam->AddMember(MAKE_NEW_GUID(itr->first, 0, HIGHGUID_PLAYER));
             }
     }

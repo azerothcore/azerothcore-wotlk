@@ -1051,7 +1051,7 @@ public:
             target->ModifyMoney(moneyToAdd);
         }
 
-        sLog->outDebug(LOG_FILTER_GENERAL, handler->GetTrinityString(LANG_NEW_MONEY), targetMoney, moneyToAdd, target->GetMoney());
+        //sLog->outDebug(LOG_FILTER_GENERAL, handler->GetTrinityString(LANG_NEW_MONEY), targetMoney, moneyToAdd, target->GetMoney());
 
         return true;
     }

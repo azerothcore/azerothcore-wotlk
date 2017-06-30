@@ -6157,7 +6157,7 @@ void Spell::EffectBind(SpellEffIndex effIndex)
     player->SendDirectMessage(&data);
 
     sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "EffectBind: New homebind X: %f, Y: %f, Z: %f, MapId: %u, AreaId: %u",
-    //    homeLoc.GetPositionX(), homeLoc.GetPositionY(), homeLoc.GetPositionZ(), homeLoc.GetMapId(), areaId);
+        homeLoc.GetPositionX(), homeLoc.GetPositionY(), homeLoc.GetPositionZ(), homeLoc.GetMapId(), areaId);
 
     // zone update
     data.Initialize(SMSG_PLAYERBOUND, 8 + 4);
