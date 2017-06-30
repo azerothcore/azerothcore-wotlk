@@ -408,7 +408,7 @@ bool AuthSocket::_HandleLogonChallenge()
                 ;//sLog->outDebug(LOG_FILTER_NETWORKIO, "[AuthChallenge] Account '%s' is locked to IP - '%s'", _login.c_str(), fields[3].GetCString());
                 ;//sLog->outDebug(LOG_FILTER_NETWORKIO, "[AuthChallenge] Player address is '%s'", ip_address.c_str());
 
-                if (strcmp(fields[3].GetCString(), ip_address.c_str()) != 0)
+                if (strcmp(fields[4].GetCString(), ip_address.c_str()) != 0)
                 {
                     ;//sLog->outDebug(LOG_FILTER_NETWORKIO, "[AuthChallenge] Account IP differs");
                     pkt << uint8(WOW_FAIL_LOCKED_ENFORCED);
@@ -417,8 +417,36 @@ bool AuthSocket::_HandleLogonChallenge()
                 else
                     ;//sLog->outDebug(LOG_FILTER_NETWORKIO, "[AuthChallenge] Account IP matches");
             }
-            else
+			else
+            {
                 ;//sLog->outDebug(LOG_FILTER_NETWORKIO, "[AuthChallenge] Account '%s' is not locked to ip", _login.c_str());
+				std::string accountCountry = fields[3].GetString();
+				if (accountCountry.empty() || accountCountry == "00")
+					;//sLog->outDebug(LOG_FILTER_NETWORKIO, "[AuthChallenge] Account '%s' is not locked to country", _login.c_str());
+				else if (!accountCountry.empty())
+                {
+                    uint32 ip = inet_addr(ip_address.c_str());
+                    EndianConvertReverse(ip);
+
+                    stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_LOGON_COUNTRY);
+                    stmt->setUInt32(0, ip);
+					if (PreparedQueryResult sessionCountryQuery = LoginDatabase.Query(stmt))
+					{
+						std::string loginCountry = (*sessionCountryQuery)[0].GetString();
+						;//sLog->outDebug(LOG_FILTER_NETWORKIO, "[AuthChallenge] Account '%s' is locked to country: '%s' Player country is '%s'", _login.c_str(), accountCountry.c_str(), loginCountry.c_str());
+						if (loginCountry != accountCountry)
+						{
+							;//sLog->outDebug(LOG_FILTER_NETWORKIO, "[AuthChallenge] Account country differs.");
+							pkt << uint8(WOW_FAIL_UNLOCKABLE_LOCK);
+							locked = true;
+						}
+						else
+							;//sLog->outDebug(LOG_FILTER_NETWORKIO, "[AuthChallenge] Account country matches");
+					}
+                    else
+                        ;//sLog->outDebug(LOG_FILTER_NETWORKIO, "[AuthChallenge] IP2NATION Table empty");
+                }
+            }
 
             if (!locked)
             {
@@ -448,8 +476,8 @@ bool AuthSocket::_HandleLogonChallenge()
                     std::string rI = fields[0].GetString();
 
                     // Don't calculate (v, s) if there are already some in the database
-                    std::string databaseV = fields[5].GetString();
-                    std::string databaseS = fields[6].GetString();
+                    std::string databaseV = fields[6].GetString();
+                    std::string databaseS = fields[7].GetString();
 
                     ;//sLog->outDebug(LOG_FILTER_NETWORKIO, "database authentication values: v='%s' s='%s'", databaseV.c_str(), databaseS.c_str());
 
@@ -506,7 +534,7 @@ bool AuthSocket::_HandleLogonChallenge()
                     if (securityFlags & 0x04)               // Security token input
                         pkt << uint8(1);
 
-                    uint8 secLevel = fields[4].GetUInt8();
+                    uint8 secLevel = fields[5].GetUInt8();
                     _accountSecurityLevel = secLevel <= SEC_ADMINISTRATOR ? AccountTypes(secLevel) : SEC_ADMINISTRATOR;
 
                     _localizationName.resize(4);

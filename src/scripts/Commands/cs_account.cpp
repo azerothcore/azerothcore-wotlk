@@ -30,13 +30,18 @@ public:
             { "gmlevel", SEC_CONSOLE, true, &HandleAccountSetGmLevelCommand, "" },
             { "password", SEC_CONSOLE, true, &HandleAccountSetPasswordCommand, "" }
         };
+        static std::vector<ChatCommand> accountLockCommandTable
+        {
+            { "country", SEC_PLAYER, true, &HandleAccountLockCountryCommand, "" },
+            { "ip", SEC_PLAYER, true, &HandleAccountLockIpCommand, "" }
+        };
         static std::vector<ChatCommand> accountCommandTable =
         {
             { "addon", SEC_MODERATOR, false, &HandleAccountAddonCommand, "" },
             { "create", SEC_CONSOLE, true, &HandleAccountCreateCommand, "" },
             { "delete", SEC_CONSOLE, true, &HandleAccountDeleteCommand, "" },
             { "onlinelist", SEC_CONSOLE, true, &HandleAccountOnlineListCommand, "" },
-            { "lock", SEC_PLAYER, false, &HandleAccountLockCommand, "" },
+            { "lock", SEC_PLAYER, false, nullptr, "", accountLockCommandTable },
             { "set", SEC_ADMINISTRATOR, true, nullptr, "", accountSetCommandTable },
             { "password", SEC_PLAYER, false, &HandleAccountPasswordCommand, "" },
             { "", SEC_PLAYER, false, &HandleAccountCommand, "" }
@@ -230,7 +235,59 @@ public:
         return true;
     }
 
-    static bool HandleAccountLockCommand(ChatHandler* handler, char const* args)
+    static bool HandleAccountLockCountryCommand(ChatHandler* handler, char const* args)
+    {
+        if (!*args)
+        {
+            handler->SendSysMessage(LANG_USE_BOL);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        std::string param = (char*)args;
+
+        if (!param.empty())
+        {
+			if (param == "on")
+			{
+				PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_LOGON_COUNTRY);
+                uint32 ip = inet_addr(handler->GetSession()->GetRemoteAddress().c_str());
+                EndianConvertReverse(ip);
+                stmt->setUInt32(0, ip);
+                PreparedQueryResult result = LoginDatabase.Query(stmt);
+                if (result)
+                {
+                    Field* fields = result->Fetch();
+                    std::string country = fields[0].GetString();
+                    stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_LOCK_CONTRY);
+                    stmt->setString(0, country);
+                    stmt->setUInt32(1, handler->GetSession()->GetAccountId());
+                    LoginDatabase.Execute(stmt);
+                    handler->PSendSysMessage(LANG_COMMAND_ACCLOCKLOCKED);
+                }
+                else
+                {
+                    handler->PSendSysMessage("[IP2NATION] Table empty");
+                    ;//sLog->outDebug(LOG_FILTER_NETWORKIO, "[IP2NATION] Table empty");
+                }
+            }
+            else if (param == "off")
+            {
+                PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_LOCK_CONTRY);
+                stmt->setString(0, "00");
+				stmt->setUInt32(1, handler->GetSession()->GetAccountId());
+				LoginDatabase.Execute(stmt);
+                handler->PSendSysMessage(LANG_COMMAND_ACCLOCKUNLOCKED);
+            }
+            return true;
+        }
+
+        handler->SendSysMessage(LANG_USE_BOL);
+        handler->SetSentErrorMessage(true);
+        return false;
+    }
+
+    static bool HandleAccountLockIpCommand(ChatHandler* handler, char const* args)
     {
         if (!*args)
         {
