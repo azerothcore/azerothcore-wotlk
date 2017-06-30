@@ -206,9 +206,8 @@ void WorldSession::HandleGuildSetOfficerNoteOpcode(WorldPacket& recvPacket)
 
 #ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
     sLog->outDebug(LOG_FILTER_GUILD, "CMSG_GUILD_SET_OFFICER_NOTE [%s]: Target: %s, Note: %s",
+         GetPlayerInfo().c_str(), playerName.c_str(), note.c_str());
 #endif
-    //     GetPlayerInfo().c_str(), playerName.c_str(), note.c_str());
-
     if (normalizePlayerName(playerName))
         if (Guild* guild = GetPlayer()->GetGuild())
             guild->HandleSetMemberNote(this, playerName, note, false);
@@ -301,12 +300,11 @@ void WorldSession::HandleSaveGuildEmblemOpcode(WorldPacket& recvPacket)
 
 #ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
     sLog->outDebug(LOG_FILTER_GUILD, "MSG_SAVE_GUILD_EMBLEM [%s]: Guid: [" UI64FMTD
+        "] Style: %d, Color: %d, BorderStyle: %d, BorderColor: %d, BackgroundColor: %d"
+        , GetPlayerInfo().c_str(), vendorGuid, emblemInfo.GetStyle()
+        , emblemInfo.GetColor(), emblemInfo.GetBorderStyle()
+        , emblemInfo.GetBorderColor(), emblemInfo.GetBackgroundColor());
 #endif
-     //   "] Style: %d, Color: %d, BorderStyle: %d, BorderColor: %d, BackgroundColor: %d"
-     //   , GetPlayerInfo().c_str(), vendorGuid, emblemInfo.GetStyle()
-     //   , emblemInfo.GetColor(), emblemInfo.GetBorderStyle()
-      //  , emblemInfo.GetBorderColor(), emblemInfo.GetBackgroundColor());
-
     if (GetPlayer()->GetNPCIfCanInteractWith(vendorGuid, UNIT_NPC_FLAG_TABARDDESIGNER))
     {
         // Remove fake death
@@ -361,9 +359,8 @@ void WorldSession::HandleGuildBankerActivate(WorldPacket& recvData)
 
 #ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
     sLog->outDebug(LOG_FILTER_GUILD, "CMSG_GUILD_BANKER_ACTIVATE [%s]: Go: [" UI64FMTD "] AllSlots: %u"
+        , GetPlayerInfo().c_str(), guid, sendAllSlots);
 #endif
-    //    , GetPlayerInfo().c_str(), guid, sendAllSlots);
-
     Guild * const guild = GetPlayer()->GetGuild();
     if (!guild)
     {
@@ -385,9 +382,8 @@ void WorldSession::HandleGuildBankQueryTab(WorldPacket& recvData)
 
 #ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
     sLog->outDebug(LOG_FILTER_GUILD, "CMSG_GUILD_BANK_QUERY_TAB [%s]: Go: [" UI64FMTD "], TabId: %u, ShowTabs: %u"
+       , GetPlayerInfo().c_str(), guid, tabId, full);
 #endif
-     //   , GetPlayerInfo().c_str(), guid, tabId, full);
-
     if (GetPlayer()->GetGameObjectIfCanInteractWith(guid, GAMEOBJECT_TYPE_GUILD_BANK))
         if (Guild* guild = GetPlayer()->GetGuild())
             guild->SendBankTabData(this, tabId);
@@ -401,9 +397,8 @@ void WorldSession::HandleGuildBankDepositMoney(WorldPacket& recvData)
 
 #ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
     sLog->outDebug(LOG_FILTER_GUILD, "CMSG_GUILD_BANK_DEPOSIT_MONEY [%s]: Go: [" UI64FMTD "], money: %u",
+        GetPlayerInfo().c_str(), guid, money);
 #endif
-   //     GetPlayerInfo().c_str(), guid, money);
-
     if (GetPlayer()->GetGameObjectIfCanInteractWith(guid, GAMEOBJECT_TYPE_GUILD_BANK))
         if (money && GetPlayer()->HasEnoughMoney(money))
             if (Guild* guild = GetPlayer()->GetGuild())
@@ -418,9 +413,8 @@ void WorldSession::HandleGuildBankWithdrawMoney(WorldPacket& recvData)
 
 #ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
     sLog->outDebug(LOG_FILTER_GUILD, "CMSG_GUILD_BANK_WITHDRAW_MONEY [%s]: Go: [" UI64FMTD "], money: %u",
+        GetPlayerInfo().c_str(), guid, money);
 #endif
-   //     GetPlayerInfo().c_str(), guid, money);
-
     if (money && GetPlayer()->GetGameObjectIfCanInteractWith(guid, GAMEOBJECT_TYPE_GUILD_BANK))
         if (Guild* guild = GetPlayer()->GetGuild())
             guild->HandleMemberWithdrawMoney(this, money);
@@ -536,9 +530,8 @@ void WorldSession::HandleGuildBankUpdateTab(WorldPacket& recvData)
 
 #ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
     sLog->outDebug(LOG_FILTER_GUILD, "CMSG_GUILD_BANK_UPDATE_TAB [%s]: Go: [" UI64FMTD "], TabId: %u, Name: %s, Icon: %s"
+        , GetPlayerInfo().c_str(), guid, tabId, name.c_str(), icon.c_str());
 #endif
-    //    , GetPlayerInfo().c_str(), guid, tabId, name.c_str(), icon.c_str());
-
     if (!name.empty() && !icon.empty())
         if (GetPlayer()->GetGameObjectIfCanInteractWith(guid, GAMEOBJECT_TYPE_GUILD_BANK))
             if (Guild* guild = GetPlayer()->GetGuild())

@@ -6197,9 +6197,8 @@ void Spell::EffectBind(SpellEffIndex effIndex)
 
 #ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
     sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "EffectBind: New homebind X: %f, Y: %f, Z: %f, MapId: %u, AreaId: %u",
+        homeLoc.GetPositionX(), homeLoc.GetPositionY(), homeLoc.GetPositionZ(), homeLoc.GetMapId(), areaId);
 #endif
-    //    homeLoc.GetPositionX(), homeLoc.GetPositionY(), homeLoc.GetPositionZ(), homeLoc.GetMapId(), areaId);
-
     // zone update
     data.Initialize(SMSG_PLAYERBOUND, 8 + 4);
     data << uint64(m_caster->GetGUID());

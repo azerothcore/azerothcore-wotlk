@@ -565,9 +565,8 @@ void Guild::BankTab::SendText(Guild const* guild, WorldSession* session) const
     {
 #ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
         sLog->outDebug(LOG_FILTER_GUILD, "MSG_QUERY_GUILD_BANK_TEXT [%s]: Tabid: %u, Text: %s"
-#endif
-        //    , session->GetPlayerInfo().c_str(), m_tabId, m_text.c_str());
-        session->SendPacket(&data);
+            , session->GetPlayerInfo().c_str(), m_tabId, m_text.c_str());
+#endif        session->SendPacket(&data);
     }
     else
     {
@@ -961,9 +960,8 @@ Item* Guild::BankMoveItemData::StoreItem(SQLTransaction& trans, Item* pItem)
 
 #ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
         sLog->outDebug(LOG_FILTER_GUILD, "GUILD STORAGE: StoreItem tab = %u, slot = %u, item = %u, count = %u",
-#endif
-        //    m_container, m_slotId, pItem->GetEntry(), pItem->GetCount());
-        pLastItem = _StoreItem(trans, pTab, pItem, pos, itr != m_vec.end());
+            m_container, m_slotId, pItem->GetEntry(), pItem->GetCount());
+#endif        pLastItem = _StoreItem(trans, pTab, pItem, pos, itr != m_vec.end());
     }
     return pLastItem;
 }
@@ -1066,9 +1064,8 @@ InventoryResult Guild::BankMoveItemData::CanStore(Item* pItem, bool swap)
 {
 #ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
     sLog->outDebug(LOG_FILTER_GUILD, "GUILD STORAGE: CanStore() tab = %u, slot = %u, item = %u, count = %u",
+        m_container, m_slotId, pItem->GetEntry(), pItem->GetCount());
 #endif
-    //    m_container, m_slotId, pItem->GetEntry(), pItem->GetCount());
-
     uint32 count = pItem->GetCount();
     // Soulbound items cannot be moved
     if (pItem->IsSoulBound())
@@ -1166,9 +1163,8 @@ bool Guild::Create(Player* pLeader, std::string const& name)
 
 #ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
     sLog->outDebug(LOG_FILTER_GUILD, "GUILD: creating guild [%s] for leader %s (%u)",
+        name.c_str(), pLeader->GetName().c_str(), GUID_LOPART(m_leaderGuid));
 #endif
-    //    name.c_str(), pLeader->GetName().c_str(), GUID_LOPART(m_leaderGuid));
-
     SQLTransaction trans = CharacterDatabase.BeginTransaction();
 
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_GUILD_MEMBERS);
@@ -2905,9 +2901,8 @@ void Guild::_SendBankList(WorldSession* session /* = NULL*/, uint8 tabId /*= 0*/
         session->SendPacket(&data);
 #ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
        sLog->outDebug(LOG_FILTER_GUILD, "SMSG_GUILD_BANK_LIST [%s]: TabId: %u, FullSlots: %u, slots: %d",
-#endif
-        //               session->GetPlayerInfo().c_str(), tabId, sendAllSlots, numSlots);
-    }
+                       session->GetPlayerInfo().c_str(), tabId, sendAllSlots, numSlots);
+#endif    }
     else // TODO - Probably this is just sent to session + those that have sent CMSG_GUILD_BANKER_ACTIVATE
     {
         for (Members::const_iterator itr = m_members.begin(); itr != m_members.end(); ++itr)
@@ -2923,9 +2918,8 @@ void Guild::_SendBankList(WorldSession* session /* = NULL*/, uint8 tabId /*= 0*/
             player->GetSession()->SendPacket(&data);
 #ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
            sLog->outDebug(LOG_FILTER_GUILD, "SMSG_GUILD_BANK_LIST [%s]: TabId: %u, FullSlots: %u, slots: %u"
-#endif
-           //     , player->GetName().c_str(), tabId, sendAllSlots, numSlots);
-        }
+                , player->GetName().c_str(), tabId, sendAllSlots, numSlots);
+#endif        }
     }
 }
 

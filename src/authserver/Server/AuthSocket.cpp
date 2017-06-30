@@ -766,9 +766,8 @@ bool AuthSocket::_HandleLogonProof()
 
 #ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
                         sLog->outDebug(LOG_FILTER_NETWORKIO, "'%s:%d' [AuthChallenge] IP %s got banned for '%u' seconds because account %s failed to authenticate '%u' times",
-#endif
-                         //   socket().getRemoteAddress().c_str(), socket().getRemotePort(), socket().getRemoteAddress().c_str(), WrongPassBanTime, _login.c_str(), failed_logins);
-                    }
+                            socket().getRemoteAddress().c_str(), socket().getRemotePort(), socket().getRemoteAddress().c_str(), WrongPassBanTime, _login.c_str(), failed_logins);
+#endif                    }
                 }
             }
         }

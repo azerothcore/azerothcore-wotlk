@@ -832,7 +832,7 @@ void WorldSession::HandleTurnInPetitionOpcode(WorldPacket & recvData)
             for (SignatureMap::const_iterator itr = signatureCopy.begin(); itr != signatureCopy.end(); ++itr)
             {
 #ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
-                sLog->outDebug(LOG_FILTER_NETWORKIO, "PetitionsHandler: Adding arena team (guid: %u) member %u", arenaTeam->GetId(), memberGUID);
+                sLog->outDebug(LOG_FILTER_NETWORKIO, "PetitionsHandler: Adding arena team (guid: %u) member %u", arenaTeam->GetId());
 #endif
                 arenaTeam->AddMember(MAKE_NEW_GUID(itr->first, 0, HIGHGUID_PLAYER));
             }

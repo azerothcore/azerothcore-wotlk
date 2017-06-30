@@ -15154,9 +15154,8 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
                 {
 #ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
                     sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "ProcDamageAndSpell: casting mending (triggered by %s dummy aura of spell %u)",
+                        (isVictim?"a victim's":"an attacker's"), triggeredByAura->GetId());
 #endif
-                    //    (isVictim?"a victim's":"an attacker's"), triggeredByAura->GetId());
-
                     if (damage > 0)
                     {
                         HandleAuraRaidProcFromChargeWithValue(triggeredByAura);
@@ -15168,9 +15167,8 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
                 {
 #ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
                     sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "ProcDamageAndSpell: casting mending (triggered by %s dummy aura of spell %u)",
+                        (isVictim?"a victim's":"an attacker's"), triggeredByAura->GetId());
 #endif
-                    //    (isVictim?"a victim's":"an attacker's"), triggeredByAura->GetId());
-
                     HandleAuraRaidProcFromCharge(triggeredByAura);
                     takeCharges = true;
                     break;

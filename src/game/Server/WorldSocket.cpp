@@ -920,10 +920,9 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
 
 #ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
     sLog->outStaticDebug("WorldSocket::HandleAuthSession: Client '%s' authenticated successfully from %s.",
+                account.c_str(),
+                address.c_str());
 #endif
-    //            account.c_str(),
-    //            address.c_str());
-
     // Check if this user is by any chance a recruiter
     stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_RECRUITER);
 

@@ -481,7 +481,7 @@ void FlightPathMovementGenerator::PreloadEndGrid()
     {
 #ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
         sLog->outDetail("Preloading rid (%f, %f) for map %u at node index %u/%u", _endGridX, _endGridY, _endMapId, _preloadTargetNode, (uint32)(i_path->size()-1));
-#endif
+#endi
         endMap->LoadGrid(_endGridX, _endGridY);
     }
     else

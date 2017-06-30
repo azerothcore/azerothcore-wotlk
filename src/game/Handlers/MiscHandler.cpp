@@ -884,9 +884,8 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket& recv_data)
     {
 #ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
         sLog->outDebug(LOG_FILTER_NETWORKIO, "HandleAreaTriggerOpcode: Player '%s' (GUID: %u) in flight, ignore Area Trigger ID:%u",
-#endif
-        //    player->GetName().c_str(), player->GetGUIDLow(), triggerId);
-        return;
+            player->GetName().c_str(), player->GetGUIDLow(), triggerId);
+#endif        return;
     }
 
     AreaTriggerEntry const* atEntry = sAreaTriggerStore.LookupEntry(triggerId);
@@ -894,18 +893,16 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket& recv_data)
     {
 #ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
         sLog->outDebug(LOG_FILTER_NETWORKIO, "HandleAreaTriggerOpcode: Player '%s' (GUID: %u) send unknown (by DBC) Area Trigger ID:%u",
-#endif
-        //    player->GetName().c_str(), player->GetGUIDLow(), triggerId);
-        return;
+            player->GetName().c_str(), player->GetGUIDLow(), triggerId);
+#endif        return;
     }
 
     if (!player->IsInAreaTriggerRadius(atEntry))
     {
 #ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
         sLog->outDebug(LOG_FILTER_NETWORKIO, "HandleAreaTriggerOpcode: Player '%s' (GUID: %u) too far (trigger map: %u player map: %u), ignore Area Trigger ID: %u",
-#endif
-        //    player->GetName().c_str(), atEntry->mapid, player->GetMapId(), player->GetGUIDLow(), triggerId);
-        return;
+            player->GetName().c_str(), atEntry->mapid, player->GetMapId(), player->GetGUIDLow(), triggerId);
+#endif        return;
     }
 
     if (player->isDebugAreaTriggers)
