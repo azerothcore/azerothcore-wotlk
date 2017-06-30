@@ -143,7 +143,7 @@ class ReactorRunnable : protected ACE_Task_Base
 
         virtual int svc()
         {
-            ;//sLog->outStaticDebug ("Network Thread Starting");
+            sLog->outStaticDebug ("Network Thread Starting");
 
             ACE_ASSERT (m_Reactor);
 
@@ -180,7 +180,7 @@ class ReactorRunnable : protected ACE_Task_Base
                 }
             }
 
-            ;//sLog->outStaticDebug ("Network Thread exits");
+            sLog->outStaticDebug ("Network Thread exits");
 
             return 0;
         }
