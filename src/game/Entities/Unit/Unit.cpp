@@ -2287,7 +2287,7 @@ MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(const Unit* victim, WeaponAttackTy
                 && (tmp -= skillBonus) > 0
                 && roll < (sum += tmp))
             {
-                sLog->outStaticDebug ("RollMeleeOutcomeAgainst: PARRY <%d, %d)", sum-tmp2, sum);
+                sLog->outStaticDebug ("RollMeleeOutcomeAgainst: PARRY <%d, %d)", sum-tmp, sum);
                 return MELEE_HIT_PARRY;
             }
         }

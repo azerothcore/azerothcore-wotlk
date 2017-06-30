@@ -752,12 +752,7 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     recvPacket >> unk4;
     recvPacket.read(digest, 20);
 
-    sLog->outStaticDebug ("WorldSocket::HandleAuthSession: client %u, unk2 %u, account %s, unk3 %u, clientseed %u",
-    //            BuiltNumberClient,
-    //            unk2,
-    //            account.c_str(),
-    //            unk3,
-    //            clientSeed);
+    sLog->outStaticDebug ("WorldSocket::HandleAuthSession: client %u, unk2 %u, account %s, unk3 %u, clientseed %u", BuiltNumberClient, unk2, account.c_str(), unk3, clientSeed);
 
     // Get the account information from the realmd database
     //         0           1        2       3          4         5       6          7   8

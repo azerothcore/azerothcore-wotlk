@@ -653,8 +653,8 @@ bool ConditionMgr::IsObjectMeetToConditionList(ConditionSourceInfo& sourceInfo, 
                 }
                 else
                 {
-                    sLog->outDebug(LOG_FILTER_CONDITIONSYS, "IsPlayerMeetToConditionList: Reference template -%u not found",
-                    //    (*i)->ReferenceId);//checked at loading, should never happen
+                    //checked at loading, should never happen
+                    sLog->outDebug(LOG_FILTER_CONDITIONSYS, "IsPlayerMeetToConditionList: Reference template -%u not found", (*i)->ReferenceId);
                 }
 
             }

@@ -201,7 +201,7 @@ void WorldSession::HandlePetitionBuyOpcode(WorldPacket & recvData)
     // datacorruption
     Petition const* petition = sPetitionMgr->GetPetitionByOwnerWithType(_player->GetGUIDLow(), type);
 
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "Invalid petition GUIDs: %s", ssInvalidPetitionGUIDs.str().c_str());
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "Invalid petition GUIDs: %s");
     CharacterDatabase.EscapeString(name);
     SQLTransaction trans = CharacterDatabase.BeginTransaction();
     

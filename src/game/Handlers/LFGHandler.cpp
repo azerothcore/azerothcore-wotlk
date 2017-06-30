@@ -86,7 +86,7 @@ void WorldSession::HandleLfgLeaveOpcode(WorldPacket&  /*recvData*/)
     uint64 guid = GetPlayer()->GetGUID();
     uint64 gguid = group ? group->GetGUID() : guid;
 
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_LFG_LEAVE [" UI64FMTD "] in group: %u", guid, grp ? 1 : 0);
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_LFG_LEAVE [" UI64FMTD "] in group: %u", guid, group ? 1 : 0);
 
     // Check cheating - only leader can leave the queue
     if (!group || group->GetLeaderGUID() == guid)
