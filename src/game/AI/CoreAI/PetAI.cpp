@@ -99,6 +99,13 @@ void PetAI::UpdateAI(uint32 diff)
 
     Unit* owner = me->GetCharmerOrOwner();
 
+    //if Pet is in combat put player in combat
+    if (owner->HasAuraType(SPELL_AURA_MOD_STEALTH) || owner->HasAuraType(SPELL_AURA_FEIGN_DEATH))
+        return;
+    else
+        if (me->IsInCombat())
+            owner->IsInCombat();
+
     if (m_updateAlliesTimer <= diff)
         // UpdateAllies self set update timer
         UpdateAllies();
@@ -306,13 +313,6 @@ void PetAI::UpdateAllies()
         return;
     else if (owner->GetTypeId() == TYPEID_PLAYER)
         group = owner->ToPlayer()->GetGroup();
-
-    //if Pet is in combat put player in combat
-    if (owner->HasAuraType(SPELL_AURA_MOD_STEALTH) || owner->HasAuraType(SPELL_AURA_FEIGN_DEATH))
-        return;
-    else
-        if (me->IsInCombat())
-            owner->IsInCombat();
 
     //only pet and owner/not in group->ok
     if (m_AllySet.size() == 2 && !group)
