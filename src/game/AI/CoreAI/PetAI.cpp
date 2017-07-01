@@ -307,6 +307,13 @@ void PetAI::UpdateAllies()
     else if (owner->GetTypeId() == TYPEID_PLAYER)
         group = owner->ToPlayer()->GetGroup();
 
+    //if Pet is in combat put player in combat
+    if (owner->HasAuraType(SPELL_AURA_MOD_STEALTH) || owner->HasAuraType(SPELL_AURA_FEIGN_DEATH))
+        return;
+    else
+        if (me->IsInCombat())
+            owner->IsInCombat();
+
     //only pet and owner/not in group->ok
     if (m_AllySet.size() == 2 && !group)
         return;
