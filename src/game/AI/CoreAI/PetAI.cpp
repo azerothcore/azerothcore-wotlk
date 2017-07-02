@@ -100,9 +100,6 @@ void PetAI::UpdateAI(uint32 diff)
     Unit* owner = me->GetCharmerOrOwner();
 
     //if Pet is in combat put player in combat
-    if (owner->HasAuraType(SPELL_AURA_MOD_STEALTH) || owner->HasAuraType(SPELL_AURA_FEIGN_DEATH))
-        return;
-    else
         if (me->IsInCombat())
             owner->IsInCombat();
 
