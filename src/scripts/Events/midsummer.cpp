@@ -201,6 +201,60 @@ class npc_midsummer_torch_target : public CreatureScript
 // SPELLS
 ///////////////////////////////
 
+enum CrabDisguise
+{
+    SPELL_CRAB_DISGUISE = 46337,
+    SPELL_APPLY_DIGUISE = 34804,
+    SPELL_FADE_DIGUISE = 47693,
+};
+
+class spell_gen_crab_disguise : public SpellScriptLoader
+{
+public:
+    spell_gen_crab_disguise() : SpellScriptLoader("spell_gen_crab_disguise") { }
+
+    class spell_gen_crab_disguise_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_gen_crab_disguise_AuraScript);
+
+        bool Validate(SpellInfo const* /*spell*/)
+        {
+            if (!sSpellMgr->GetSpellInfo(SPELL_CRAB_DISGUISE))
+                return false;
+            return true;
+        }
+
+        void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            if (Unit* caster = GetCaster())
+            {
+                caster->CastSpell(caster, SPELL_APPLY_DIGUISE, true);
+                caster->setFaction(88);
+            }
+
+        }
+
+        void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            if (Unit* caster = GetCaster())
+            {
+                caster->CastSpell(caster, SPELL_FADE_DIGUISE, true);
+                caster->RestoreFaction();
+            }
+        }
+
+        void Register()
+        {
+            AfterEffectApply += AuraEffectRemoveFn(spell_gen_crab_disguise_AuraScript::OnApply, EFFECT_0, SPELL_AURA_FORCE_REACTION, AURA_EFFECT_HANDLE_REAL);
+            AfterEffectRemove += AuraEffectRemoveFn(spell_gen_crab_disguise_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_FORCE_REACTION, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
+    {
+        return new spell_gen_crab_disguise_AuraScript();
+    }
+
 enum RibbonPole
 {
     SPELL_RIBBON_POLE_CHANNEL_VISUAL    = 29172,
@@ -513,6 +567,7 @@ void AddSC_event_midsummer_scripts()
     new npc_midsummer_torch_target();
 
     // Spells
+    new spell_gen_crab_disguise();
     new spell_midsummer_ribbon_pole();
     new spell_midsummer_torch_quest();
     new spell_midsummer_fling_torch();
