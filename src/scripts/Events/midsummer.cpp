@@ -254,6 +254,7 @@ public:
     {
         return new spell_gen_crab_disguise_AuraScript();
     }
+};
 
 enum RibbonPole
 {
