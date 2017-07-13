@@ -103,6 +103,7 @@ namespace MMAP
                    bool skipBattlegrounds   = false,
                    bool debugOutput         = false,
                    bool bigBaseUnit         = false,
+                   int mapid                = -1,
                    const char* offMeshFilePath = nullptr);
 
         ~MapBuilder();
@@ -163,6 +164,8 @@ namespace MMAP
 
         float m_maxWalkableAngle;
         bool m_bigBaseUnit;
+
+        int32 m_mapid;
         // percentageDone - variables to calculate percentage
         std::atomic<uint32> m_totalTiles;
         std::atomic<uint32> m_totalTilesBuilt;
