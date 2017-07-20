@@ -2014,7 +2014,7 @@ AuraStateType SpellInfo::LoadAuraState() const
     if (SpellFamilyName == SPELLFAMILY_DRUID && SpellFamilyFlags[0] & 0x400)
         return AURA_STATE_FAERIE_FIRE;
     
-    // Any Spells that prevent spells can be added here.
+    // Any Spells that prevent stealth can be added here.
     uint32 StealthPreventionSpellList[] = { 9991, 35331, 9806, 35325 };
 	
     // Goes through each of the spells and identifies them as Stealth Prevention Spell.
