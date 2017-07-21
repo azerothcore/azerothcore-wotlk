@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-$PATH_RUNENGINE=""
+PATH_RUNENGINE="./"
 
 source $PATH_RUNENGINE/run-engine
 

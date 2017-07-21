@@ -5148,6 +5148,8 @@ void Player::BuildPlayerRepop()
 
     // set and clear other
     SetByteValue(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_ALWAYS_STAND);
+
+    sScriptMgr->OnPlayerReleasedGhost(this);
 }
 
 void Player::ResurrectPlayer(float restore_percent, bool applySickness)
@@ -14710,7 +14712,21 @@ void Player::PrepareGossipMenu(WorldObject* source, uint32 menuId /*= 0*/, bool 
 
         if (canTalk)
         {
-            menu->GetGossipMenu().AddMenuItem(itr->second.OptionIndex, itr->second.OptionIcon, itr->second.OptionText, 0, itr->second.OptionType, itr->second.BoxText, itr->second.BoxMoney, itr->second.BoxCoded);
+            std::string strOptionText = itr->second.OptionText;
+            std::string strBoxText = itr->second.BoxText;
+
+            int32 locale = GetSession()->GetSessionDbLocaleIndex();
+            if (locale >= 0)
+            {
+                uint32 idxEntry = MAKE_PAIR32(menuId, itr->second.OptionIndex);
+                if (GossipMenuItemsLocale const* no = sObjectMgr->GetGossipMenuItemsLocale(idxEntry))
+                {
+                    ObjectMgr::GetLocaleString(no->OptionText, locale, strOptionText);
+                    ObjectMgr::GetLocaleString(no->BoxText, locale, strBoxText);
+                }
+            }
+
+            menu->GetGossipMenu().AddMenuItem(itr->second.OptionIndex, itr->second.OptionIcon, strOptionText, 0, itr->second.OptionType, strBoxText, itr->second.BoxMoney, itr->second.BoxCoded);
             menu->GetGossipMenu().AddGossipMenuItemData(itr->second.OptionIndex, itr->second.ActionMenuId, itr->second.ActionPoiId);
         }
     }
@@ -15056,10 +15072,20 @@ void Player::SendPreparedQuest(uint64 guid)
                 if (!gossiptext->Options[0].Text_0.empty())
                 {
                     title = gossiptext->Options[0].Text_0;
+
+                    int loc_idx = GetSession()->GetSessionDbLocaleIndex();
+                    if (loc_idx >= 0)
+                        if (NpcTextLocale const* nl = sObjectMgr->GetNpcTextLocale(textid))
+                            ObjectMgr::GetLocaleString(nl->Text_0[0], loc_idx, title);
                 }
                 else
                 {
                     title = gossiptext->Options[0].Text_1;
+
+                    int loc_idx = GetSession()->GetSessionDbLocaleIndex();
+                    if (loc_idx >= 0)
+                        if (NpcTextLocale const* nl = sObjectMgr->GetNpcTextLocale(textid))
+                            ObjectMgr::GetLocaleString(nl->Text_1[0], loc_idx, title);
                 }
             }
         }
@@ -25837,7 +25863,7 @@ void Player::_SaveCharacter(bool create, SQLTransaction& trans)
         stmt->setString(index++, GetName());
         stmt->setUInt8(index++, getRace(true));
         stmt->setUInt8(index++, getClass());
-        stmt->setUInt8(index++, getGender());
+        stmt->setUInt8(index++, GetByteValue(PLAYER_BYTES_3, 0));   // save gender from PLAYER_BYTES_3, UNIT_BYTES_0 changes with every transform effect
         stmt->setUInt8(index++, getLevel());
         stmt->setUInt32(index++, GetUInt32Value(PLAYER_XP));
         stmt->setUInt32(index++, GetMoney());
@@ -25942,7 +25968,7 @@ void Player::_SaveCharacter(bool create, SQLTransaction& trans)
         stmt->setString(index++, GetName());
         stmt->setUInt8(index++, getRace(true));
         stmt->setUInt8(index++, getClass());
-        stmt->setUInt8(index++, getGender());
+        stmt->setUInt8(index++, GetByteValue(PLAYER_BYTES_3, 0));   // save gender from PLAYER_BYTES_3, UNIT_BYTES_0 changes with every transform effect
         stmt->setUInt8(index++, getLevel());
         stmt->setUInt32(index++, GetUInt32Value(PLAYER_XP));
         stmt->setUInt32(index++, GetMoney());

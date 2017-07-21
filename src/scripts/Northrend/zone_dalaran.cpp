@@ -446,7 +446,7 @@ public:
             if (!who || !who->IsInWorld() || who->GetZoneId() != 4395)
                 return;
 
-            if (!me->IsWithinDist(who, 12.0f, false))
+            if (!me->IsWithinDist(who, 5.0f, false))
                 return;
 
             Player* player = who->GetCharmerOrOwnerPlayerOrPlayerItself();
