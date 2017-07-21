@@ -1071,9 +1071,26 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder* holder)
         pCurrChar->SendTalentsInfoData(false);              // original talents send already in to SendInitialPacketsBeforeAddToMap, resend reset state
         SendNotification(LANG_RESET_TALENTS);
     }
-
-    if (pCurrChar->HasAtLoginFlag(AT_LOGIN_FIRST))
-        pCurrChar->RemoveAtLoginFlag(AT_LOGIN_FIRST);
+    
+    // Fix done by mthsena;
+    bool firstLogin = pCurrChar->HasAtLoginFlag(AT_LOGIN_FIRST);
+      if (firstLogin)
+      {
+          pCurrChar->RemoveAtLoginFlag(AT_LOGIN_FIRST);
+  
+          // Activate [Battle Stance] and [Blood Presence] at first login.
+          switch (pCurrChar->getClass())
+          {
+          case CLASS_WARRIOR:
+              pCurrChar->CastSpell(pCurrChar, 2457, true);
+              break;
+          case CLASS_DEATH_KNIGHT:
+              pCurrChar->CastSpell(pCurrChar, 48266, true);
+              break;
+          default: // Other classes don't need it
+              break;
+          }
+      }
 
     if (pCurrChar->HasAtLoginFlag(AT_LOGIN_CHECK_ACHIEVS))
     {
