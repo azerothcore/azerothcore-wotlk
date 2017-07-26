@@ -1263,6 +1263,11 @@ void ScriptMgr::OnPlayerSpellCast(Player* player, Spell* spell, bool skipCheck)
     FOREACH_SCRIPT(PlayerScript)->OnSpellCast(player, spell, skipCheck);
 }
 
+void ScriptMgr::OnBeforePlayerUpdate(Player* player, uint32 p_time)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnBeforeUpdate(player, p_time);
+}
+
 void ScriptMgr::OnPlayerLogin(Player* player)
 {
     FOREACH_SCRIPT(PlayerScript)->OnLogin(player);
