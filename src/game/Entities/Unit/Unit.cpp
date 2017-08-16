@@ -13634,7 +13634,7 @@ int32 Unit::ModSpellDuration(SpellInfo const* spellProto, Unit const* target, in
     }
     return std::max(duration, 0);
 }
-// [AZTH] fix by MadAgos
+
 void Unit::ModSpellCastTime(SpellInfo const* spellInfo, int32 & castTime, Spell* spell)
 { 
     if (!spellInfo || castTime < 0)
@@ -13646,7 +13646,7 @@ void Unit::ModSpellCastTime(SpellInfo const* spellInfo, int32 & castTime, Spell*
     // called from caster
     if (Player* modOwner = GetSpellModOwner())
 
-		// TODO: (MadAgos) eventualmente controllare ed eliminare l'argomento bool 
+		// TODO:(MadAgos) Eventually check and delete the bool argument
         modOwner->ApplySpellMod(spellInfo->Id, SPELLMOD_CASTING_TIME, castTime, spell, bool(modOwner != this && !IsPet()));
 
 	/*
@@ -13684,8 +13684,6 @@ void Unit::ModSpellCastTime(SpellInfo const* spellInfo, int32 & castTime, Spell*
 		break;
 	}
 }
-
-// [/AZTH]
 
 DiminishingLevels Unit::GetDiminishing(DiminishingGroup group)
 { 
