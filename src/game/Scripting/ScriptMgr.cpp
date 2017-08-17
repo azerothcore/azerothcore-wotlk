@@ -1379,6 +1379,11 @@ void ScriptMgr::OnQuestRewardItem(Player* player, Item* item, uint32 count)
     FOREACH_SCRIPT(PlayerScript)->OnQuestRewardItem(player, item, count);
 }
 
+void ScriptMgr::OnFirstLogin(Player* player)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnFirstLogin(player);
+}
+
 // Guild
 void ScriptMgr::OnGuildAddMember(Guild* guild, Player* player, uint8& plRank)
 {
@@ -1493,6 +1498,16 @@ void ScriptMgr::OnAfterRefCount(LootStoreItem* LootStoreItem, uint32 &maxcount)
 void ScriptMgr::OnBeforeDropAddItem(Player const* player, Loot& loot, LootStoreItem* LootStoreItem)
 {
     FOREACH_SCRIPT(GlobalScript)->OnBeforeDropAddItem(player, loot, LootStoreItem);
+}
+
+void ScriptMgr::OnInitializeLockedDungeons(Player* player, uint8& level, uint32& lockData)
+{
+    FOREACH_SCRIPT(GlobalScript)->OnInitializeLockedDungeons(player, level, lockData);
+}
+
+void ScriptMgr::OnAfterInitializeLockedDungeons(Player* player)
+{
+    FOREACH_SCRIPT(GlobalScript)->OnAfterInitializeLockedDungeons(player);
 }
 
 uint32 ScriptMgr::DealDamage(Unit* AttackerUnit, Unit *pVictim, uint32 damage, DamageEffectType damagetype)

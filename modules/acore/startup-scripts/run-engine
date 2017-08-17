@@ -5,6 +5,16 @@ if [ -e "$RUN_ENGINE_PATH/conf.dist" ]; then
     source "$RUN_ENGINE_PATH/conf.sh.dist"
 fi
 
+function finish {
+    if [ ! -z "$SCREEN_NAME" ]; then
+        screen -X -S "$SCREEN_NAME" quit
+    fi
+}
+
+# disabled for now, but could be useful if we want 
+# shutdown the process if restarter crashes for some reason
+# trap finish EXIT
+
 function configureFiles() {
     TRACE_BEGIN_STRING="SIGSEGV"
     TRACE_FILE="$LOGS_PATH/"$LOG_PREFIX_NAME"_trace.log"
@@ -100,3 +110,4 @@ function restarter() {
         sleep 10
     done
 }
+
