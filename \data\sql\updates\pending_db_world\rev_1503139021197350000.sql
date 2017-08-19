@@ -1,3 +1,5 @@
+INSERT INTO version_db_world (`sql_rev`) VALUES ('1503139021197350000');
+
 -- Instructor Razuvious - Event with Acherus Necromancer and Death Knight Initiate -- http://wow.gamepedia.com/Death_Knight_Initiate
 -- Instructor Razuvious
 SET @NPC := 129307;
