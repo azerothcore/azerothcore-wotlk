@@ -899,7 +899,7 @@ bool BfCapturePoint::SetCapturePointData(GameObject* capturePoint)
 {
     ASSERT(capturePoint);
 
-    ;//sLog->outDebug(LOG_FILTER_BATTLEFIELD, "Creating capture point %u", capturePoint->GetEntry());
+    sLog->outDebug(LOG_FILTER_BATTLEFIELD, "Creating capture point %u", capturePoint->GetEntry());
 
     m_capturePoint = capturePoint->GetGUID();
 

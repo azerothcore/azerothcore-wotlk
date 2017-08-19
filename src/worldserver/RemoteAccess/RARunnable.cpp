@@ -69,5 +69,5 @@ void RARunnable::run()
             break;
     }
 
-    ;//sLog->outStaticDebug("Trinity RA thread exiting");
+    sLog->outStaticDebug("Trinity RA thread exiting");
 }

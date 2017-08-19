@@ -625,7 +625,7 @@ bool Pet::CreateBaseAtCreatureInfo(CreatureTemplate const* cinfo, Unit* owner)
 
 bool Pet::CreateBaseAtTamed(CreatureTemplate const* cinfo, Map* map, uint32 phaseMask)
 { 
-    ;//sLog->outDebug(LOG_FILTER_PETS, "Pet::CreateBaseForTamed");
+    sLog->outDebug(LOG_FILTER_PETS, "Pet::CreateBaseForTamed");
     uint32 guid=sObjectMgr->GenerateLowGuid(HIGHGUID_PET);
     uint32 pet_number = sObjectMgr->GeneratePetNumber();
     if (!Create(guid, map, phaseMask, cinfo->Entry, pet_number))
@@ -1080,7 +1080,7 @@ void Pet::_LoadSpellCooldowns(PreparedQueryResult result)
             cooldowns[spell_id] = cooldown;
             _AddCreatureSpellCooldown(spell_id, cooldown);
 
-            ;//sLog->outDebug(LOG_FILTER_PETS, "Pet (Number: %u) spell %u cooldown loaded (%u secs).", m_charmInfo->GetPetNumber(), spell_id, uint32(db_time-curTime));
+            sLog->outDebug(LOG_FILTER_PETS, "Pet (Number: %u) spell %u cooldown loaded (%u secs).", m_charmInfo->GetPetNumber(), spell_id, uint32(db_time-curTime));
         }
         while (result->NextRow());
 
@@ -1187,7 +1187,7 @@ void Pet::_SaveSpells(SQLTransaction& trans)
 
 void Pet::_LoadAuras(PreparedQueryResult result, uint32 timediff)
 { 
-    ;//sLog->outDebug(LOG_FILTER_PETS, "Loading auras for pet %u", GetGUIDLow());
+    sLog->outDebug(LOG_FILTER_PETS, "Loading auras for pet %u", GetGUIDLow());
 
     if (result)
     {
@@ -1257,7 +1257,7 @@ void Pet::_LoadAuras(PreparedQueryResult result, uint32 timediff)
                 }
                 aura->SetLoadedState(maxduration, remaintime, remaincharges, stackcount, recalculatemask, &damage[0]);
                 aura->ApplyForTargets();
-                ;//sLog->outDetail("Added aura spellid %u, effectmask %u", spellInfo->Id, effmask);
+                sLog->outDetail("Added aura spellid %u, effectmask %u", spellInfo->Id, effmask);
             }
         }
         while (result->NextRow());

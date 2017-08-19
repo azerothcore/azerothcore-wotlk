@@ -282,14 +282,14 @@ int WorldSocket::handle_input (ACE_HANDLE)
                 return Update();                           // interesting line, isn't it ?
             }
 
-            ;//sLog->outStaticDebug("WorldSocket::handle_input: Peer error closing connection errno = %s", ACE_OS::strerror (errno));
+            sLog->outStaticDebug("WorldSocket::handle_input: Peer error closing connection errno = %s", ACE_OS::strerror (errno));
 
             errno = ECONNRESET;
             return -1;
         }
         case 0:
         {
-            ;//sLog->outStaticDebug("WorldSocket::handle_input: Peer has closed connection");
+            sLog->outStaticDebug("WorldSocket::handle_input: Peer has closed connection");
 
             errno = ECONNRESET;
             return -1;
@@ -752,12 +752,7 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     recvPacket >> unk4;
     recvPacket.read(digest, 20);
 
-    ;//sLog->outStaticDebug ("WorldSocket::HandleAuthSession: client %u, unk2 %u, account %s, unk3 %u, clientseed %u",
-    //            BuiltNumberClient,
-    //            unk2,
-    //            account.c_str(),
-    //            unk3,
-    //            clientSeed);
+    sLog->outStaticDebug ("WorldSocket::HandleAuthSession: client %u, unk2 %u, account %s, unk3 %u, clientseed %u", BuiltNumberClient, unk2, account.c_str(), unk3, clientSeed);
 
     // Get the account information from the realmd database
     //         0           1        2       3          4         5       6          7   8
@@ -878,7 +873,7 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
 
     // Check locked state for server
     AccountTypes allowedAccountType = sWorld->GetPlayerSecurityLimit();
-    ;//sLog->outDebug(LOG_FILTER_NETWORKIO, "Allowed Level: %u Player Level %u", allowedAccountType, AccountTypes(security));
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "Allowed Level: %u Player Level %u", allowedAccountType, AccountTypes(security));
     if (AccountTypes(security) < allowedAccountType)
     {
         WorldPacket Packet (SMSG_AUTH_RESPONSE, 1);
@@ -886,7 +881,7 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
 
         SendPacket(packet);
 
-        ;//sLog->outDetail("WorldSocket::HandleAuthSession: User tries to login but his security level is not enough");
+        sLog->outDetail("WorldSocket::HandleAuthSession: User tries to login but his security level is not enough");
         return -1;
     }
 
@@ -914,9 +909,9 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
         return -1;
     }
 
-    ;//sLog->outStaticDebug("WorldSocket::HandleAuthSession: Client '%s' authenticated successfully from %s.",
-    //            account.c_str(),
-    //            address.c_str());
+    sLog->outStaticDebug("WorldSocket::HandleAuthSession: Client '%s' authenticated successfully from %s.",
+                account.c_str(),
+                address.c_str());
 
     // Check if this user is by any chance a recruiter
     stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_RECRUITER);

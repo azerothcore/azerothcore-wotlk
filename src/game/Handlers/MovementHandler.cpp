@@ -29,7 +29,7 @@
 
 void WorldSession::HandleMoveWorldportAckOpcode(WorldPacket & /*recvData*/)
 {
-    ;//sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: got MSG_MOVE_WORLDPORT_ACK.");
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: got MSG_MOVE_WORLDPORT_ACK.");
     HandleMoveWorldportAckOpcode();
 }
 
@@ -222,15 +222,15 @@ void WorldSession::HandleMoveWorldportAckOpcode()
 
 void WorldSession::HandleMoveTeleportAck(WorldPacket& recvData)
 {
-    ;//sLog->outDebug(LOG_FILTER_NETWORKIO, "MSG_MOVE_TELEPORT_ACK");
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "MSG_MOVE_TELEPORT_ACK");
     uint64 guid;
 
     recvData.readPackGUID(guid);
 
     uint32 flags, time;
     recvData >> flags >> time; // unused
-    ;//sLog->outStaticDebug("Guid " UI64FMTD, guid);
-    ;//sLog->outStaticDebug("Flags %u, time %u", flags, time/IN_MILLISECONDS);
+    sLog->outStaticDebug("Guid " UI64FMTD, guid);
+    sLog->outStaticDebug("Flags %u, time %u", flags, time/IN_MILLISECONDS);
 
     Player* plMover = _player->m_mover->ToPlayer();
 
@@ -484,7 +484,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket & recvData)
 void WorldSession::HandleForceSpeedChangeAck(WorldPacket &recvData)
 {
     uint32 opcode = recvData.GetOpcode();
-    ;//sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Recvd %s (%u, 0x%X) opcode", LookupOpcodeName(opcode), opcode, opcode);
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Recvd %s (%u, 0x%X) opcode", LookupOpcodeName(opcode), opcode, opcode);
 
     /* extract packet */
     uint64 guid;
@@ -562,7 +562,7 @@ void WorldSession::HandleForceSpeedChangeAck(WorldPacket &recvData)
 
 void WorldSession::HandleSetActiveMoverOpcode(WorldPacket &recvData)
 {
-    ;//sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Recvd CMSG_SET_ACTIVE_MOVER");
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Recvd CMSG_SET_ACTIVE_MOVER");
 
     uint64 guid;
     recvData >> guid;
@@ -576,7 +576,7 @@ void WorldSession::HandleSetActiveMoverOpcode(WorldPacket &recvData)
 
 void WorldSession::HandleMoveNotActiveMover(WorldPacket &recvData)
 {
-    ;//sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Recvd CMSG_MOVE_NOT_ACTIVE_MOVER");
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Recvd CMSG_MOVE_NOT_ACTIVE_MOVER");
 
     uint64 old_mover_guid;
     recvData.readPackGUID(old_mover_guid);
@@ -605,7 +605,7 @@ void WorldSession::HandleMountSpecialAnimOpcode(WorldPacket& /*recvData*/)
 
 void WorldSession::HandleMoveKnockBackAck(WorldPacket & recvData)
 {
-    ;//sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_MOVE_KNOCK_BACK_ACK");
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_MOVE_KNOCK_BACK_ACK");
 
     uint64 guid;
     recvData.readPackGUID(guid);
@@ -640,7 +640,7 @@ void WorldSession::HandleMoveKnockBackAck(WorldPacket & recvData)
 
 void WorldSession::HandleMoveHoverAck(WorldPacket& recvData)
 {
-    ;//sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_MOVE_HOVER_ACK");
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_MOVE_HOVER_ACK");
 
     uint64 guid;                                            // guid - unused
     recvData.readPackGUID(guid);
@@ -656,7 +656,7 @@ void WorldSession::HandleMoveHoverAck(WorldPacket& recvData)
 
 void WorldSession::HandleMoveWaterWalkAck(WorldPacket& recvData)
 {
-    ;//sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_MOVE_WATER_WALK_ACK");
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_MOVE_WATER_WALK_ACK");
 
     uint64 guid;                                            // guid - unused
     recvData.readPackGUID(guid);

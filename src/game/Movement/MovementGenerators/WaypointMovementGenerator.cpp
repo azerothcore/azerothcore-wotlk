@@ -68,7 +68,7 @@ void WaypointMovementGenerator<Creature>::OnArrived(Creature* creature)
 
     if (i_path->at(i_currentNode)->event_id && urand(0, 99) < i_path->at(i_currentNode)->event_chance)
     {
-        ;//sLog->outDebug(LOG_FILTER_MAPSCRIPTS, "Creature movement start script %u at point %u for " UI64FMTD ".", i_path->at(i_currentNode)->event_id, i_currentNode, creature->GetGUID());
+        sLog->outDebug(LOG_FILTER_MAPSCRIPTS, "Creature movement start script %u at point %u for " UI64FMTD ".", i_path->at(i_currentNode)->event_id, i_currentNode, creature->GetGUID());
         creature->ClearUnitState(UNIT_STATE_ROAMING_MOVE);
         creature->GetMap()->ScriptsStart(sWaypointScripts, i_path->at(i_currentNode)->event_id, creature, NULL);
     }
@@ -439,7 +439,7 @@ void FlightPathMovementGenerator::DoEventIfAny(Player* player, TaxiPathNodeEntry
 {
     if (uint32 eventid = departure ? node->departureEventID : node->arrivalEventID)
     {
-        ;//sLog->outDebug(LOG_FILTER_MAPSCRIPTS, "Taxi %s event %u of node %u of path %u for player %s", departure ? "departure" : "arrival", eventid, node.index, node.path, player.GetName().c_str());
+        sLog->outDebug(LOG_FILTER_MAPSCRIPTS, "Taxi %s event %u of node %u of path %u for player %s", departure ? "departure" : "arrival", eventid, node->index, node->path, player->GetName().c_str());
         player->GetMap()->ScriptsStart(sEventScripts, eventid, player, player);
     }
 }
@@ -475,9 +475,9 @@ void FlightPathMovementGenerator::PreloadEndGrid()
     // Load the grid
     if (endMap)
     {
-        ;//sLog->outDetail("Preloading rid (%f, %f) for map %u at node index %u/%u", _endGridX, _endGridY, _endMapId, _preloadTargetNode, (uint32)(i_path->size()-1));
+       // sLog->outDetail("Preloading rid (%f, %f) for map %u at node index %u/%u", _endGridX, _endGridY, _endMapId, _preloadTargetNode, (uint32)(i_path->size()-1));
         endMap->LoadGrid(_endGridX, _endGridY);
     }
     else
-        ;//sLog->outDetail("Unable to determine map to preload flightmaster grid");
+        sLog->outDetail("Unable to determine map to preload flightmaster grid");
 }

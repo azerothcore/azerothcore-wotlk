@@ -190,7 +190,7 @@ public:
         target->SetMaxPower(POWER_ENERGY, energym);
         target->SetPower(POWER_ENERGY, energy);
 
-        ;//sLog->outDetail(handler->GetTrinityString(LANG_CURRENT_ENERGY), target->GetMaxPower(POWER_ENERGY));
+        sLog->outDetail(handler->GetTrinityString(LANG_CURRENT_ENERGY), target->GetMaxPower(POWER_ENERGY));
 
         return true;
     }
@@ -1051,7 +1051,7 @@ public:
             target->ModifyMoney(moneyToAdd);
         }
 
-        ;//sLog->outDebug(LOG_FILTER_GENERAL, handler->GetTrinityString(LANG_NEW_MONEY), targetMoney, moneyToAdd, target->GetMoney());
+        //sLog->outDebug(LOG_FILTER_GENERAL, handler->GetTrinityString(LANG_NEW_MONEY), targetMoney, moneyToAdd, target->GetMoney());
 
         return true;
     }

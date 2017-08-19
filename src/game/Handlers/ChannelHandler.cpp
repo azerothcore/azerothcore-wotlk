@@ -18,8 +18,7 @@ void WorldSession::HandleJoinChannel(WorldPacket& recvPacket)
 
     recvPacket >> channelId >> unknown1 >> unknown2 >> channelName >> password;
 
-    ;//sLog->outDebug(LOG_FILTER_CHATSYS, "CMSG_JOIN_CHANNEL %s Channel: %u, unk1: %u, unk2: %u, channel: %s, password: %s",
-    //    GetPlayerInfo().c_str(), channelId, unknown1, unknown2, channelName.c_str(), password.c_str());
+    sLog->outDebug(LOG_FILTER_CHATSYS, "CMSG_JOIN_CHANNEL %s Channel: %u, unk1: %u, unk2: %u, channel: %s, password: %s", GetPlayerInfo().c_str(), channelId, unknown1, unknown2, channelName.c_str(), password.c_str());
 
     if (channelId)
     {
@@ -56,8 +55,8 @@ void WorldSession::HandleLeaveChannel(WorldPacket& recvPacket)
     std::string channelName;
     recvPacket >> unk >> channelName;
 
-    ;//sLog->outDebug(LOG_FILTER_CHATSYS, "CMSG_LEAVE_CHANNEL %s Channel: %s, unk1: %u",
-    //    GetPlayerInfo().c_str(), channelName.c_str(), unk);
+    sLog->outDebug(LOG_FILTER_CHATSYS, "CMSG_LEAVE_CHANNEL %s Channel: %s, unk1: %u",
+        GetPlayerInfo().c_str(), channelName.c_str(), unk);
 
     if (channelName.empty())
         return;
@@ -74,9 +73,9 @@ void WorldSession::HandleChannelList(WorldPacket& recvPacket)
     std::string channelName;
     recvPacket >> channelName;
 
-    ;//sLog->outDebug(LOG_FILTER_CHATSYS, "%s %s Channel: %s",
-    //    recvPacket.GetOpcode() == CMSG_CHANNEL_DISPLAY_LIST ? "CMSG_CHANNEL_DISPLAY_LIST" : "CMSG_CHANNEL_LIST",
-    //    GetPlayerInfo().c_str(), channelName.c_str());
+    sLog->outDebug(LOG_FILTER_CHATSYS, "%s %s Channel: %s",
+        recvPacket.GetOpcode() == CMSG_CHANNEL_DISPLAY_LIST ? "CMSG_CHANNEL_DISPLAY_LIST" : "CMSG_CHANNEL_LIST",
+        GetPlayerInfo().c_str(), channelName.c_str());
 
     if (ChannelMgr* cMgr = ChannelMgr::forTeam(GetPlayer()->GetTeamId()))
         if (Channel* channel = cMgr->GetChannel(channelName, GetPlayer()))
@@ -88,8 +87,8 @@ void WorldSession::HandleChannelPassword(WorldPacket& recvPacket)
     std::string channelName, password;
     recvPacket >> channelName >> password;
 
-    ;//sLog->outDebug(LOG_FILTER_CHATSYS, "CMSG_CHANNEL_PASSWORD %s Channel: %s, Password: %s",
-    //    GetPlayerInfo().c_str(), channelName.c_str(), password.c_str());
+    sLog->outDebug(LOG_FILTER_CHATSYS, "CMSG_CHANNEL_PASSWORD %s Channel: %s, Password: %s",
+        GetPlayerInfo().c_str(), channelName.c_str(), password.c_str());
 
     if (password.length() > MAX_CHANNEL_PASS_STR)
         return;
@@ -104,8 +103,8 @@ void WorldSession::HandleChannelSetOwner(WorldPacket& recvPacket)
     std::string channelName, targetName;
     recvPacket >> channelName >> targetName;
 
-    ;//sLog->outDebug(LOG_FILTER_CHATSYS, "CMSG_CHANNEL_SET_OWNER %s Channel: %s, Target: %s",
-    //    GetPlayerInfo().c_str(), channelName.c_str(), targetName.c_str());
+    sLog->outDebug(LOG_FILTER_CHATSYS, "CMSG_CHANNEL_SET_OWNER %s Channel: %s, Target: %s",
+        GetPlayerInfo().c_str(), channelName.c_str(), targetName.c_str());
 
     if (!normalizePlayerName(targetName))
         return;
@@ -120,8 +119,8 @@ void WorldSession::HandleChannelOwner(WorldPacket& recvPacket)
     std::string channelName;
     recvPacket >> channelName;
 
-    ;//sLog->outDebug(LOG_FILTER_CHATSYS, "CMSG_CHANNEL_OWNER %s Channel: %s",
-    //    GetPlayerInfo().c_str(), channelName.c_str());
+    sLog->outDebug(LOG_FILTER_CHATSYS, "CMSG_CHANNEL_OWNER %s Channel: %s",
+        GetPlayerInfo().c_str(), channelName.c_str());
 
     if (ChannelMgr* cMgr = ChannelMgr::forTeam(GetPlayer()->GetTeamId()))
         if (Channel* channel = cMgr->GetChannel(channelName, GetPlayer()))
@@ -133,8 +132,8 @@ void WorldSession::HandleChannelModerator(WorldPacket& recvPacket)
     std::string channelName, targetName;
     recvPacket >> channelName >> targetName;
 
-    ;//sLog->outDebug(LOG_FILTER_CHATSYS, "CMSG_CHANNEL_MODERATOR %s Channel: %s, Target: %s",
-    //    GetPlayerInfo().c_str(), channelName.c_str(), targetName.c_str());
+    sLog->outDebug(LOG_FILTER_CHATSYS, "CMSG_CHANNEL_MODERATOR %s Channel: %s, Target: %s",
+        GetPlayerInfo().c_str(), channelName.c_str(), targetName.c_str());
 
     if (!normalizePlayerName(targetName))
         return;
@@ -149,8 +148,8 @@ void WorldSession::HandleChannelUnmoderator(WorldPacket& recvPacket)
     std::string channelName, targetName;
     recvPacket >> channelName >> targetName;
 
-    ;//sLog->outDebug(LOG_FILTER_CHATSYS, "CMSG_CHANNEL_UNMODERATOR %s Channel: %s, Target: %s",
-    //    GetPlayerInfo().c_str(), channelName.c_str(), targetName.c_str());
+    sLog->outDebug(LOG_FILTER_CHATSYS, "CMSG_CHANNEL_UNMODERATOR %s Channel: %s, Target: %s",
+        GetPlayerInfo().c_str(), channelName.c_str(), targetName.c_str());
 
     if (!normalizePlayerName(targetName))
         return;
@@ -165,8 +164,8 @@ void WorldSession::HandleChannelMute(WorldPacket& recvPacket)
     std::string channelName, targetName;
     recvPacket >> channelName >> targetName;
 
-    ;//sLog->outDebug(LOG_FILTER_CHATSYS, "CMSG_CHANNEL_MUTE %s Channel: %s, Target: %s",
-    //    GetPlayerInfo().c_str(), channelName.c_str(), targetName.c_str());
+    sLog->outDebug(LOG_FILTER_CHATSYS, "CMSG_CHANNEL_MUTE %s Channel: %s, Target: %s",
+        GetPlayerInfo().c_str(), channelName.c_str(), targetName.c_str());
 
     if (!normalizePlayerName(targetName))
         return;
@@ -181,8 +180,8 @@ void WorldSession::HandleChannelUnmute(WorldPacket& recvPacket)
     std::string channelName, targetName;
     recvPacket >> channelName >> targetName;
 
-    ;//sLog->outDebug(LOG_FILTER_CHATSYS, "CMSG_CHANNEL_UNMUTE %s Channel: %s, Target: %s",
-    //    GetPlayerInfo().c_str(), channelName.c_str(), targetName.c_str());
+    sLog->outDebug(LOG_FILTER_CHATSYS, "CMSG_CHANNEL_UNMUTE %s Channel: %s, Target: %s",
+        GetPlayerInfo().c_str(), channelName.c_str(), targetName.c_str());
 
     if (!normalizePlayerName(targetName))
         return;
@@ -197,8 +196,8 @@ void WorldSession::HandleChannelInvite(WorldPacket& recvPacket)
     std::string channelName, targetName;
     recvPacket >> channelName >> targetName;
 
-    ;//sLog->outDebug(LOG_FILTER_CHATSYS, "CMSG_CHANNEL_INVITE %s Channel: %s, Target: %s",
-    //    GetPlayerInfo().c_str(), channelName.c_str(), targetName.c_str());
+    sLog->outDebug(LOG_FILTER_CHATSYS, "CMSG_CHANNEL_INVITE %s Channel: %s, Target: %s",
+        GetPlayerInfo().c_str(), channelName.c_str(), targetName.c_str());
 
     if (!normalizePlayerName(targetName))
         return;
@@ -213,8 +212,8 @@ void WorldSession::HandleChannelKick(WorldPacket& recvPacket)
     std::string channelName, targetName;
     recvPacket >> channelName >> targetName;
 
-    ;//sLog->outDebug(LOG_FILTER_CHATSYS, "CMSG_CHANNEL_KICK %s Channel: %s, Target: %s",
-     //   GetPlayerInfo().c_str(), channelName.c_str(), targetName.c_str());
+    sLog->outDebug(LOG_FILTER_CHATSYS, "CMSG_CHANNEL_KICK %s Channel: %s, Target: %s",
+        GetPlayerInfo().c_str(), channelName.c_str(), targetName.c_str());
 
     if (!normalizePlayerName(targetName))
         return;
@@ -229,8 +228,8 @@ void WorldSession::HandleChannelBan(WorldPacket& recvPacket)
     std::string channelName, targetName;
     recvPacket >> channelName >> targetName;
 
-    ;//sLog->outDebug(LOG_FILTER_CHATSYS, "CMSG_CHANNEL_BAN %s Channel: %s, Target: %s",
-    //    GetPlayerInfo().c_str(), channelName.c_str(), targetName.c_str());
+    sLog->outDebug(LOG_FILTER_CHATSYS, "CMSG_CHANNEL_BAN %s Channel: %s, Target: %s",
+        GetPlayerInfo().c_str(), channelName.c_str(), targetName.c_str());
 
     if (!normalizePlayerName(targetName))
         return;
@@ -245,8 +244,8 @@ void WorldSession::HandleChannelUnban(WorldPacket& recvPacket)
     std::string channelName, targetName;
     recvPacket >> channelName >> targetName;
 
-    ;//sLog->outDebug(LOG_FILTER_CHATSYS, "CMSG_CHANNEL_UNBAN %s Channel: %s, Target: %s",
-    //    GetPlayerInfo().c_str(), channelName.c_str(), targetName.c_str());
+    sLog->outDebug(LOG_FILTER_CHATSYS, "CMSG_CHANNEL_UNBAN %s Channel: %s, Target: %s",
+        GetPlayerInfo().c_str(), channelName.c_str(), targetName.c_str());
 
     if (!normalizePlayerName(targetName))
         return;
@@ -261,8 +260,8 @@ void WorldSession::HandleChannelAnnouncements(WorldPacket& recvPacket)
     std::string channelName;
     recvPacket >> channelName;
 
-    ;//sLog->outDebug(LOG_FILTER_CHATSYS, "CMSG_CHANNEL_ANNOUNCEMENTS %s Channel: %s",
-    //    GetPlayerInfo().c_str(), channelName.c_str());
+    sLog->outDebug(LOG_FILTER_CHATSYS, "CMSG_CHANNEL_ANNOUNCEMENTS %s Channel: %s",
+        GetPlayerInfo().c_str(), channelName.c_str());
 
     if (ChannelMgr* cMgr = ChannelMgr::forTeam(GetPlayer()->GetTeamId()))
         if (Channel* channel = cMgr->GetChannel(channelName, GetPlayer()))
@@ -280,8 +279,8 @@ void WorldSession::HandleGetChannelMemberCount(WorldPacket &recvPacket)
     std::string channelName;
     recvPacket >> channelName;
 
-    ;//sLog->outDebug(LOG_FILTER_CHATSYS, "CMSG_GET_CHANNEL_MEMBER_COUNT %s Channel: %s",
-    //    GetPlayerInfo().c_str(), channelName.c_str());
+    sLog->outDebug(LOG_FILTER_CHATSYS, "CMSG_GET_CHANNEL_MEMBER_COUNT %s Channel: %s",
+        GetPlayerInfo().c_str(), channelName.c_str());
 
     if (ChannelMgr* cMgr = ChannelMgr::forTeam(GetPlayer()->GetTeamId()))
     {
