@@ -1,3 +1,18 @@
+-- DB update 2017_08_19_15 -> 2017_08_19_16
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2017_08_19_15';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2017_08_19_15 2017_08_19_16 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1495729610203623150'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
 INSERT INTO version_db_world (`sql_rev`) VALUES ('1495729610203623150');
 
 -- Bael'Gar's Fiery Essence requires Bael'Gar's Corpse, borrowed from TrinityCore/sql/old/3.3.5a/world/61_2016_10_17/2016_08_23_00_world.sql
@@ -78,3 +93,12 @@ INSERT INTO `creature` (`id`,`map`,`spawnMask`,`phaseMask`,`modelid`,`equipment_
 UPDATE `creature_loot_template` SET `ChanceOrQuestChance` = 15 WHERE `item` = 24504 AND `entry` IN (17158,17159,17160);
 
 
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END;
+//
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;

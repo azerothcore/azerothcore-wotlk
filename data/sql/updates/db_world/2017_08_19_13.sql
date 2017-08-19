@@ -1,3 +1,18 @@
+-- DB update 2017_08_19_12 -> 2017_08_19_13
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2017_08_19_12';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2017_08_19_12 2017_08_19_13 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1493349239278044600'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
 INSERT INTO version_db_world (`sql_rev`) VALUES ('1493349239278044600');
 -- 
 DELETE FROM conditions WHERE SourceTypeOrReferenceId=13 AND SourceEntry=45872;
@@ -22,3 +37,12 @@ INSERT INTO `creature_text` (`entry`,`groupid`,`id`,`text`,`type`,`language`,`pr
 (@ENTRY,1,2,'Live, damn you!',14,0,100,0,0,0,'Part of the Doctor Razorgin ooc lines',24868);
 
 UPDATE `creature` SET `position_x`=4402.431152, `position_y`=4554.557129, `position_z`=88.743332, `orientation`=0.395920, `MovementType`=0, `spawndist`=0 WHERE `id`=@ENTRY;
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END;
+//
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;

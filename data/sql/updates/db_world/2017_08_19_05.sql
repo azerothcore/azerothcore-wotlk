@@ -1,3 +1,18 @@
+-- DB update 2017_08_19_04 -> 2017_08_19_05
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2017_08_19_04';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2017_08_19_04 2017_08_19_05 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1493321166929502700'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
 INSERT INTO version_db_world (`sql_rev`) VALUES ('1493321166929502700');
 SET @BETHOR := 1498;
 SET @GUNTHER := 5666;
@@ -22,3 +37,12 @@ INSERT INTO `creature_text` (`entry`, `groupid`, `id`, `text`, `type`, `language
 (@GUNTHER, 1, 0, "When time permits, we must speak at length.  For we have much to discuss.", 12, 0, 100, 1, 0, 0, 1974, 0, "Gunther's Visage"),
 (@GUNTHER, 2, 0, "And thank you, $n.  Without your aid I may never have found my way to the Forsaken.", 12, 0, 100, 1, 0, 0, 1975, 0, "Gunther's Visage"),
 (@BETHOR, 0, 0, "Farewell, my friend.", 12, 0, 100, 1, 0, 0, 1976, 0, "Bethor Iceshard");
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END;
+//
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
