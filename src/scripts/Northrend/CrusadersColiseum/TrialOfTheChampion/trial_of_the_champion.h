@@ -28,6 +28,7 @@ enum eData
     DATA_PALETRESS,
     DATA_MEMORY_ENTRY,
     DATA_ACHIEV_IVE_HAD_WORSE,
+    DATA_PORTCULLIS
 };
 
 enum eProgress
@@ -133,6 +134,7 @@ enum eNpcs
 enum eGameObjects
 {
     GO_MAIN_GATE                                    = 195647,
+    GO_PORTCULLIS                                   = 195650,
     GO_SOUTH_PORTCULLIS                             = 195649,
     GO_EAST_PORTCULLIS                              = 195648,
 
