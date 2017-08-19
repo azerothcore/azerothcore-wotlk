@@ -91,6 +91,8 @@ set(scripts_STAT_SRCS
   ${AC_SCRIPTS_DIR}/EasternKingdoms/zone_wetlands.cpp
   ${AC_SCRIPTS_DIR}/EasternKingdoms/zone_arathi_highlands.cpp
   ${AC_SCRIPTS_DIR}/EasternKingdoms/Gnomeregan/instance_gnomeregan.cpp
+  ${AC_SCRIPTS_DIR}/EasternKingdoms/OperationGnomeregan/operation_gnomeregan.cpp
+  ${AC_SCRIPTS_DIR}/EasternKingdoms/OperationGnomeregan/operation_gnomeregan.h
   ${AC_SCRIPTS_DIR}/EasternKingdoms/zone_redridge_mountains.cpp
   ${AC_SCRIPTS_DIR}/EasternKingdoms/zone_ironforge.cpp
   ${AC_SCRIPTS_DIR}/EasternKingdoms/ScarletEnclave/chapter2.cpp
