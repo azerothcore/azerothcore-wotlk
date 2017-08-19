@@ -657,10 +657,8 @@ void WorldSession::HandleAddIgnoreOpcode(WorldPacket & recv_data)
         return;
 
 #ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: %s asked to Ignore: '%s'",
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: %s asked to Ignore: '%s'", GetPlayer()->GetName().c_str(), ignoreName.c_str());
 #endif
-    //    GetPlayer()->GetName().c_str(), ignoreName.c_str());
-
     uint32 lowGuid = sWorld->GetGlobalPlayerGUID(ignoreName);
     if (!lowGuid)
         return;

@@ -194,10 +194,8 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             mUseTextTimer = true;
             sCreatureTextMgr->SendChat(talker, uint8(e.action.talk.textGroupID), talkTarget);
 #ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
-            sLog->outDebug(LOG_FILTER_DATABASE_AI, "SmartScript::ProcessAction: SMART_ACTION_TALK: talker: %s (GuidLow: %u), textGuid: %u",
-#endif
-            //    talker->GetName().c_str(), talker->GetGUIDLow(), GUID_LOPART(mTextGUID));
-            break;
+			sLog->outDebug(LOG_FILTER_DATABASE_AI, "SmartScript::ProcessAction: SMART_ACTION_TALK: talker: %s (GuidLow: %u), textGuid: %u", talker->GetName().c_str(), talker->GetGUIDLow(), GUID_LOPART(mTextGUID));
+#endif            break;
         }
         case SMART_ACTION_SIMPLE_TALK:
         {

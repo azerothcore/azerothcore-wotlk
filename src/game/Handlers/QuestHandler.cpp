@@ -77,10 +77,8 @@ void WorldSession::HandleQuestgiverHelloOpcode(WorldPacket & recvData)
     if (!creature)
     {
 #ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleQuestgiverHelloOpcode - Unit (GUID: %u) not found or you can't interact with him.",
-#endif
-        //    GUID_LOPART(guid));
-        return;
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleQuestgiverHelloOpcode - Unit (GUID: %u) not found or you can't interact with him.", GUID_LOPART(guid));
+#endif        return;
     }
 
     // remove fake death

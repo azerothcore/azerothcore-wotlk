@@ -310,10 +310,8 @@ bool Vehicle::AddPassenger(Unit* unit, int8 seatId)
     if (_status == STATUS_UNINSTALLING)
     {
 #ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
-        sLog->outError(LOG_FILTER_VEHICLES, "Passenger GuidLow: %u, Entry: %u, attempting to board vehicle GuidLow: %u, Entry: %u during uninstall! SeatId: %i",
-#endif
-        //    unit->GetGUIDLow(), unit->GetEntry(), _me->GetGUIDLow(), _me->GetEntry(), (int32)seatId);
-        return false;
+        sLog->outError(LOG_FILTER_VEHICLES, "Passenger GuidLow: %u, Entry: %u, attempting to board vehicle GuidLow: %u, Entry: %u during uninstall! SeatId: %i", unit->GetGUIDLow(), unit->GetEntry(), _me->GetGUIDLow(), _me->GetEntry(), (int32)seatId);
+#endif        return false;
     }
 
     if (unit->GetVehicle() != this)

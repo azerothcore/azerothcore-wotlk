@@ -191,10 +191,8 @@ void WorldSession::HandleGuildSetPublicNoteOpcode(WorldPacket& recvPacket)
     recvPacket >> playerName >> note;
 
 #ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
-    sLog->outDebug(LOG_FILTER_GUILD, "CMSG_GUILD_SET_PUBLIC_NOTE [%s]: Target: %s, Note: %s",
+    sLog->outDebug(LOG_FILTER_GUILD, "CMSG_GUILD_SET_PUBLIC_NOTE [%s]: Target: %s, Note: %s", GetPlayerInfo().c_str(), playerName.c_str(), note.c_str());
 #endif
-     //    GetPlayerInfo().c_str(), playerName.c_str(), note.c_str());
-
     if (normalizePlayerName(playerName))
         if (Guild* guild = GetPlayer()->GetGuild())
             guild->HandleSetMemberNote(this, playerName, note, true);

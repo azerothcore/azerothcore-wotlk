@@ -2310,7 +2310,7 @@ MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(const Unit* victim, WeaponAttackTy
                 && roll < (sum += tmp))
             {
 #ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
-                sLog->outStaticDebug ("RollMeleeOutcomeAgainst: PARRY <%d, %d)", sum-tmp2, sum);
+                sLog->outStaticDebug ("RollMeleeOutcomeAgainst: PARRY <%d, %d)", sum-tmp, sum);
 #endif
                 return MELEE_HIT_PARRY;
             }

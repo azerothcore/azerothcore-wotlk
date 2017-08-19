@@ -209,14 +209,15 @@ void WorldSession::HandlePetitionBuyOpcode(WorldPacket & recvData)
     // datacorruption
     Petition const* petition = sPetitionMgr->GetPetitionByOwnerWithType(_player->GetGUIDLow(), type);
 
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "Invalid petition GUIDs: %s", ssInvalidPetitionGUIDs.str().c_str());
-#endif
     CharacterDatabase.EscapeString(name);
     SQLTransaction trans = CharacterDatabase.BeginTransaction();
     
     if (petition)
     {
+#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "Invalid petition GUIDs: %s", petition.str().c_str());
+#endif
+
         trans->PAppend("DELETE FROM petition WHERE petitionguid = %u", petition->petitionGuid);
         trans->PAppend("DELETE FROM petition_sign WHERE petitionguid = %u", petition->petitionGuid);
         // xinef: clear petition store

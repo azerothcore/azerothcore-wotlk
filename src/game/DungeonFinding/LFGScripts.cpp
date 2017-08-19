@@ -103,10 +103,8 @@ void LFGPlayerScript::OnMapChanged(Player* player)
             player->RemoveAurasDueToSpell(LFG_SPELL_LUCK_OF_THE_DRAW);
             player->TeleportTo(player->m_homebindMapId, player->m_homebindX, player->m_homebindY, player->m_homebindZ, 0.0f);
 #ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
-            sLog->outError(LOG_FILTER_LFG, "LFGPlayerScript::OnMapChanged, Player %s (%u) is in LFG dungeon map but does not have a valid group! "
-#endif
-            //    "Teleporting to homebind.", player->GetName().c_str(), player->GetGUIDLow());
-            return;
+            sLog->outDebug(LOG_FILTER_LFG, "LFGPlayerScript::OnMapChanged, Player %s (%u) is in LFG dungeon map but does not have a valid group! Teleporting to homebind.", player->GetName().c_str(), player->GetGUIDLow());
+#endif            return;
         }
 
         for (GroupReference* itr = group->GetFirstMember(); itr != NULL; itr = itr->next())

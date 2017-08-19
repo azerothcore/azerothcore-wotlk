@@ -284,10 +284,8 @@ void MotionMaster::MoveConfused()
     else
     {
 #ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
-        sLog->outStaticDebug("Creature (Entry: %u GUID: %u) move confused",
-#endif
-        //    _owner->GetEntry(), _owner->GetGUIDLow());
-        Mutate(new ConfusedMovementGenerator<Creature>(), MOTION_SLOT_CONTROLLED);
+        sLog->outStaticDebug("Creature (Entry: %u GUID: %u) move confused", _owner->GetEntry(), _owner->GetGUIDLow());
+#endif        Mutate(new ConfusedMovementGenerator<Creature>(), MOTION_SLOT_CONTROLLED);
     }
 }
 

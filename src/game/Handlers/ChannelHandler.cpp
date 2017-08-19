@@ -19,10 +19,8 @@ void WorldSession::HandleJoinChannel(WorldPacket& recvPacket)
     recvPacket >> channelId >> unknown1 >> unknown2 >> channelName >> password;
 
 #ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
-    sLog->outDebug(LOG_FILTER_CHATSYS, "CMSG_JOIN_CHANNEL %s Channel: %u, unk1: %u, unk2: %u, channel: %s, password: %s",
+    sLog->outDebug(LOG_FILTER_CHATSYS, "CMSG_JOIN_CHANNEL %s Channel: %u, unk1: %u, unk2: %u, channel: %s, password: %s", GetPlayerInfo().c_str(), channelId, unknown1, unknown2, channelName.c_str(), password.c_str());
 #endif
-    //    GetPlayerInfo().c_str(), channelId, unknown1, unknown2, channelName.c_str(), password.c_str());
-
     if (channelId)
     {
         ChatChannelsEntry const* channel = sChatChannelsStore.LookupEntry(channelId);

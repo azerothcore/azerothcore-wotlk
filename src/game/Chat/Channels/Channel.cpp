@@ -685,10 +685,8 @@ void Channel::List(Player const* player)
     }
 
 #ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
-    sLog->outDebug(LOG_FILTER_CHATSYS, "SMSG_CHANNEL_LIST %s Channel: %s",
+    sLog->outDebug(LOG_FILTER_CHATSYS, "SMSG_CHANNEL_LIST %s Channel: %s", player->GetSession()->GetPlayerInfo().c_str(), GetName().c_str());
 #endif
-    //    player->GetSession()->GetPlayerInfo().c_str(), GetName().c_str());
-
     WorldPacket data(SMSG_CHANNEL_LIST, 1+(GetName().size()+1)+1+4+playersStore.size()*(8+1));
     data << uint8(1);                                   // channel type?
     data << GetName();                                  // channel name

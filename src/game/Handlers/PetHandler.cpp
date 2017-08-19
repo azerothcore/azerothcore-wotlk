@@ -363,10 +363,8 @@ void WorldSession::HandleDismissCritter(WorldPacket &recvData)
     if (!pet)
     {
 #ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "Vanitypet (guid: %u) does not exist - player '%s' (guid: %u / account: %u) attempted to dismiss it (possibly lagged out)",
-#endif
-        //        uint32(GUID_LOPART(guid)), GetPlayer()->GetName().c_str(), GetPlayer()->GetGUIDLow(), GetAccountId());
-        return;
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "Vanitypet (guid: %u) does not exist - player '%s' (guid: %u / account: %u) attempted to dismiss it (possibly lagged out)", uint32(GUID_LOPART(guid)), GetPlayer()->GetName().c_str(), GetPlayer()->GetGUIDLow(), GetAccountId());
+#endif        return;
     }
 
     if (_player->GetCritterGUID() == pet->GetGUID())

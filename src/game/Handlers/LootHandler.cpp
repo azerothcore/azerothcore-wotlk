@@ -297,7 +297,7 @@ void WorldSession::DoLootRelease(uint64 lguid)
                 if (go->GetGoType() == GAMEOBJECT_TYPE_CHEST && go->GetGOInfo()->chest.eventId)
                 {
 #ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
-                    sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "Chest ScriptStart id %u for GO %u", gameObjTarget->GetGOInfo()->chest.eventId, gameObjTarget->GetDBTableGUIDLow());
+                    sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "Chest ScriptStart id %u for GO %u", go->getLevelForTarget->GetGOInfo()->chest.eventId, go->getLevelForTarget->GetDBTableGUIDLow());
 #endif
                     player->GetMap()->ScriptsStart(sEventScripts, go->GetGOInfo()->chest.eventId, player, go);
                 }

@@ -136,10 +136,8 @@ void WorldSession::HandleCreatureQueryOpcode(WorldPacket & recvData)
     else
     {
 #ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_CREATURE_QUERY - NO CREATURE INFO! (GUID: %u, ENTRY: %u)",
-#endif
-        //    GUID_LOPART(guid), entry);
-        WorldPacket data(SMSG_CREATURE_QUERY_RESPONSE, 4);
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_CREATURE_QUERY - NO CREATURE INFO! (GUID: %u, ENTRY: %u)", GUID_LOPART(guid), entry);
+#endif        WorldPacket data(SMSG_CREATURE_QUERY_RESPONSE, 4);
         data << uint32(entry | 0x80000000);
         SendPacket(&data);
 #ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS

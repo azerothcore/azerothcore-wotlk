@@ -152,10 +152,8 @@ void WorldSession::SendTrainerList(uint64 guid, const std::string& strTitle)
     if (!trainer_spells)
     {
 #ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: SendTrainerList - Training spells not found for creature (GUID: %u Entry: %u)",
-#endif
-        //    GUID_LOPART(guid), unit->GetEntry());
-        return;
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: SendTrainerList - Training spells not found for creature (GUID: %u Entry: %u)", GUID_LOPART(guid), unit->GetEntry());
+#endif        return;
     }
 
     WorldPacket data(SMSG_TRAINER_LIST, 8+4+4+trainer_spells->spellList.size()*38 + strTitle.size()+1);

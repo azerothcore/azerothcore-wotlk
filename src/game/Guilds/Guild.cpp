@@ -93,10 +93,8 @@ void Guild::SendCommandResult(WorldSession* session, GuildCommandType type, Guil
     session->SendPacket(&data);
 
 #ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
-    sLog->outDebug(LOG_FILTER_GUILD, "SMSG_GUILD_COMMAND_RESULT [%s]: Type: %u, code: %u, param: %s"
-#endif
-    //     , session->GetPlayerInfo().c_str(), type, errCode, param.c_str());
-}
+    sLog->outDebug(LOG_FILTER_GUILD, "SMSG_GUILD_COMMAND_RESULT [%s]: Type: %u, code: %u, param: %s", session->GetPlayerInfo().c_str(), type, errCode, param.c_str());
+#endif}
 
 void Guild::SendSaveEmblemResult(WorldSession* session, GuildEmblemError errCode)
 {

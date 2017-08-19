@@ -754,9 +754,8 @@ bool AuthSocket::_HandleLogonProof()
                         LoginDatabase.Execute(stmt);
 
 #ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
-                        sLog->outDebug(LOG_FILTER_NETWORKIO, "'%s:%d' [AuthChallenge] account %s got banned for '%u' seconds because it failed to authenticate '%u' times",
+                        sLog->outDebug(LOG_FILTER_NETWORKIO, "'%s:%d' [AuthChallenge] account %s got banned for '%u' seconds because it failed to authenticate '%u' times", socket().getRemoteAddress().c_str(), socket().getRemotePort(), _login.c_str(), WrongPassBanTime, failed_logins);
 #endif
-                         //   socket().getRemoteAddress().c_str(), socket().getRemotePort(), _login.c_str(), WrongPassBanTime, failed_logins);
                     }
                     else
                     {
