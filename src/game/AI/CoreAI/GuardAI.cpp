@@ -39,7 +39,9 @@ void GuardAI::EnterEvadeMode()
         return;
     }
 
-    ;//sLog->outDebug(LOG_FILTER_UNITS, "Guard entry: %u enters evade mode.", me->GetEntry());
+#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+    sLog->outDebug(LOG_FILTER_UNITS, "Guard entry: %u enters evade mode.", me->GetEntry());
+#endif
 
     me->RemoveAllAuras();
     me->DeleteThreatList();

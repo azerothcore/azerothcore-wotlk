@@ -1510,7 +1510,9 @@ public:
         if (!playerTarget)
             playerTarget = player;
 
-        ;//sLog->outDetail(handler->GetTrinityString(LANG_ADDITEM), itemId, count);
+#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+        sLog->outDetail(handler->GetTrinityString(LANG_ADDITEM), itemId, count);
+#endif
 
         ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(itemId);
         if (!itemTemplate)
@@ -1597,7 +1599,9 @@ public:
         if (!playerTarget)
             playerTarget = player;
 
-        ;//sLog->outDetail(handler->GetTrinityString(LANG_ADDITEMSET), itemSetId);
+#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+        sLog->outDetail(handler->GetTrinityString(LANG_ADDITEMSET), itemSetId);
+#endif
 
         bool found = false;
         ItemTemplateContainer const* its = sObjectMgr->GetItemTemplateStore();
