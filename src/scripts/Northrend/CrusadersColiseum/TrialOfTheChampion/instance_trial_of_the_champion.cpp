@@ -191,11 +191,11 @@ public:
             {
                 case GO_MAIN_GATE:
                     GO_MainGateGUID = go->GetGUID();
-                    HandleGameObject(GO_MainGateGUID, false, go);
+                    HandleGameObject(go->GetGUID(), false, go);
                     break;
-                case GO_PORTCULLIS
-					GO_PortcullisGUID = go-GetGUID();
-					break;
+                case GO_PORTCULLIS:
+                    GO_PortcullisGUID = go->GetGUID();
+                    break;
                 case GO_SOUTH_PORTCULLIS:
                 case GO_EAST_PORTCULLIS:
                     HandleGameObject(go->GetGUID(), false, go);
@@ -451,7 +451,7 @@ public:
                     return NPC_AnnouncerGUID;
                 case DATA_PALETRESS:
                     return NPC_ArgentChampionGUID;
-                case DATA_PORTCULLIS 
+                case DATA_PORTCULLIS:
 					return GO_PortcullisGUID;
             }
 
