@@ -34,7 +34,9 @@ namespace MMAP
         FILE* file = fopen(fileName, "rb");
         if (!file)
         {
+#if defined(DISABLE_EXTRAS) || defined(DISABLE_EXTRA_LOGS)
             sLog->outDebug(LOG_FILTER_MAPS, "MMAP:loadMapData: Error: Could not open mmap file '%s'", fileName);
+#endif
             delete [] fileName;
             return false;
         }

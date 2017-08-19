@@ -757,6 +757,7 @@ class PlayerScript : public ScriptObject
         PlayerScript(const char* name);
 
     public:
+        virtual void OnPlayerReleasedGhost(Player* /*player*/) { }
 
         // Called when a player kills another player
         virtual void OnPVPKill(Player* /*killer*/, Player* /*killed*/) { }
@@ -905,6 +906,8 @@ class PlayerScript : public ScriptObject
         virtual void OnAfterUpdateAttackPowerAndDamage(Player* /*player*/, float& /*level*/, float& /*base_attPower*/, float& /*attPowerMod*/, float& /*attPowerMultiplier*/, bool /*ranged*/) { }
 
         virtual void OnBeforeInitTalentForLevel(Player* /*player*/, uint8& /*level*/, uint32& /*talentPointsForLevel*/) { }
+
+        virtual void OnFirstLogin(Player* /*player*/) { }
 };
 
 class GuildScript : public ScriptObject
@@ -990,6 +993,9 @@ class GlobalScript : public ScriptObject
         virtual void OnMirrorImageDisplayItem(const Item* /*item*/, uint32& /*display*/) { }
         virtual void OnAfterRefCount(LootStoreItem* /*LootStoreItem*/, uint32& /*maxcount*/) { }
         virtual void OnBeforeDropAddItem(Player const* /*player*/, Loot& /*loot*/, LootStoreItem* /*LootStoreItem*/) { }
+
+        virtual void OnInitializeLockedDungeons(Player* /*player*/, uint8& /*level*/, uint32& /*lockData*/) { }
+        virtual void OnAfterInitializeLockedDungeons(Player* /*player*/) { }
        
         // On Before arena points distribution
         virtual void OnBeforeUpdateArenaPoints(ArenaTeam* /*at*/, std::map<uint32, uint32> & /*ap*/) { }
@@ -1171,6 +1177,7 @@ class ScriptMgr
 
     public: /* PlayerScript */
 
+        void OnPlayerReleasedGhost(Player* player);
         void OnPVPKill(Player* killer, Player* killed);
         void OnCreatureKill(Player* killer, Creature* killed);
         void OnPlayerKilledByCreature(Creature* killer, Player* killed);
@@ -1223,6 +1230,7 @@ class ScriptMgr
         void OnBeforeUpdateAttackPowerAndDamage(Player* player, float& level, float& val2, bool ranged);
         void OnAfterUpdateAttackPowerAndDamage(Player* player, float& level, float& base_attPower, float& attPowerMod, float& attPowerMultiplier, bool ranged);
         void OnBeforeInitTalentForLevel(Player* player, uint8& level, uint32& talentPointsForLevel);
+        void OnFirstLogin(Player* player);
 
     public: /* GuildScript */
 
@@ -1253,6 +1261,9 @@ class ScriptMgr
         void OnBeforeUpdateArenaPoints(ArenaTeam* at, std::map<uint32, uint32> &ap);
         void OnAfterRefCount(LootStoreItem* LootStoreItem, uint32 &maxcount);
         void OnBeforeDropAddItem(Player const* player, Loot& loot, LootStoreItem* LootStoreItem);
+        void OnInitializeLockedDungeons(Player* player, uint8& level, uint32& lockData);
+        void OnAfterInitializeLockedDungeons(Player* player);
+
 
     public: /* Scheduled scripts */
 

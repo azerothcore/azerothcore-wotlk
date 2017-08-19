@@ -10,3 +10,4 @@ option(WITH_MESHEXTRACTOR  "Build meshextractor (alpha)"                        
 option(WITHOUT_GIT         "Disable the GIT testing routines"                            0)
 option(DISABLE_EXTRAS      "Set to 1 to disable extra features optimizing performances"  0)
 option(DISABLE_VMAP_CHECKS "Remove DisableMgr Checks on vmap"                            0)
+option(DISABLE_EXTRA_LOGS  "Disable extra log functions that can be CPU intensive"       1)

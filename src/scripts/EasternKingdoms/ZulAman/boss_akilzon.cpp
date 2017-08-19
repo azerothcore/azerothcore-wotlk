@@ -89,6 +89,7 @@ class boss_akilzon : public CreatureScript
                 memset(BirdGUIDs, 0, sizeof(BirdGUIDs));
                 StormCount = 0;
                 isRaining = false;
+                instance->SetData(DATA_AKILZONEVENT, NOT_STARTED);
 
                 SetWeather(WEATHER_STATE_FINE, 0.0f);
             }
@@ -111,6 +112,7 @@ class boss_akilzon : public CreatureScript
             {
                 Talk(SAY_DEATH);
                 _JustDied();
+                instance->SetData(DATA_AKILZONEVENT, DONE);
             }
 
             void KilledUnit(Unit* who)

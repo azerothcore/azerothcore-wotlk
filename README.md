@@ -1,5 +1,6 @@
 # ![logo](https://raw.githubusercontent.com/azerothcore/azerothcore.github.io/master/images/logo-github.png) AzerothCore
 
+[![GetBadges Game](https://azerothcore-azerothcore-wotlk.getbadges.io/shield/company/azerothcore-azerothcore-wotlk)](https://azerothcore-azerothcore-wotlk.getbadges.io/?ref=shield-game)
 [![Bountysource](https://www.bountysource.com/badge/tracker?tracker_id=40032087)](https://www.bountysource.com/teams/azerothcore/bounties) [![Master Build Status](https://travis-ci.org/azerothcore/azerothcore-wotlk.svg)](https://travis-ci.org/azerothcore/azerothcore-wotlk) [![Issue Stats](http://www.issuestats.com/github/AzerothCore/azerothcore-wotlk/badge/issue)](http://www.issuestats.com/github/AzerothCore/azerothcore-wotlk) [![Issue Stats](http://www.issuestats.com/github/AzerothCore/azerothcore-wotlk/badge/pr)](http://www.issuestats.com/github/AzerothCore/azerothcore-wotlk)
 
 ## Introduction

@@ -13635,25 +13635,38 @@ int32 Unit::ModSpellDuration(SpellInfo const* spellProto, Unit const* target, in
     return std::max(duration, 0);
 }
 
-void Unit::ModSpellCastTime(SpellInfo const* spellProto, int32 & castTime, Spell* spell)
-{ 
-    if (!spellProto || castTime < 0)
+void Unit::ModSpellCastTime(SpellInfo const* spellInfo, int32 & castTime, Spell* spell)
+{
+    if (!spellInfo || castTime < 0)
         return;
+
+    if (spellInfo->IsChanneled() && !(spellInfo->AttributesEx5 & SPELL_ATTR5_HASTE_AFFECT_DURATION))
+        return;
+
     // called from caster
     if (Player* modOwner = GetSpellModOwner())
-        modOwner->ApplySpellMod(spellProto->Id, SPELLMOD_CASTING_TIME, castTime, spell, bool(modOwner != this && !IsPet()));
+        // TODO:(MadAgos) Eventually check and delete the bool argument
+        modOwner->ApplySpellMod(spellInfo->Id, SPELLMOD_CASTING_TIME, castTime, spell, bool(modOwner != this && !IsPet()));
 
-    if (!spellProto->HasAttribute(SpellAttr0(SPELL_ATTR0_ABILITY|SPELL_ATTR0_TRADESPELL)) && (spellProto->SpellFamilyName || GetTypeId() != TYPEID_PLAYER))
+    switch (spellInfo->DmgClass)
     {
-        if (CanInstantCast())
-            castTime = 0;
-        else
+    case SPELL_DAMAGE_CLASS_NONE:
+        if (spellInfo->AttributesEx5 & SPELL_ATTR5_HASTE_AFFECT_DURATION) // required double check
             castTime = int32(float(castTime) * GetFloatValue(UNIT_MOD_CAST_SPEED));
-    }
-    else if (spellProto->HasAttribute(SPELL_ATTR0_REQ_AMMO) && !spellProto->HasAttribute(SPELL_ATTR2_AUTOREPEAT_FLAG))
+        else if (spellInfo->SpellVisual[0] == 3881 && HasAura(67556)) // cooking with Chef Hat.
+            castTime = 500;
+        break;
+    case SPELL_DAMAGE_CLASS_MELEE:
+        break; // no known cases
+    case SPELL_DAMAGE_CLASS_MAGIC:
+        castTime = int32(float(castTime) * GetFloatValue(UNIT_MOD_CAST_SPEED));
+        break;
+    case SPELL_DAMAGE_CLASS_RANGED:
         castTime = int32(float(castTime) * m_modAttackSpeedPct[RANGED_ATTACK]);
-    else if (spellProto->SpellVisual[0] == 3881 && HasAura(67556)) // cooking with Chef Hat.
-        castTime = 500;
+        break;
+    default:
+        break;
+    }
 }
 
 DiminishingLevels Unit::GetDiminishing(DiminishingGroup group)

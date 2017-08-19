@@ -5147,6 +5147,8 @@ void Player::BuildPlayerRepop()
 
     // set and clear other
     SetByteValue(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_ALWAYS_STAND);
+
+    sScriptMgr->OnPlayerReleasedGhost(this);
 }
 
 void Player::ResurrectPlayer(float restore_percent, bool applySickness)

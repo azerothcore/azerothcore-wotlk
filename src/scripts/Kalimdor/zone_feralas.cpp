@@ -129,9 +129,9 @@ public:
                 //Second Ambush(3 Gorillas)
                 case 21:
                     Talk(SAY_OOX_AMBUSH);
-                    me->SummonCreature(NPC_GORILLA, -4595.81f, 2005.99f, 53.08f, 3.74f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
-                    me->SummonCreature(NPC_GORILLA, -4597.53f, 2008.31f, 52.70f, 3.78f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
-                    me->SummonCreature(NPC_GORILLA, -4599.37f, 2010.59f, 52.77f, 3.84f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+                    me->SummonCreature(NPC_GORILLA, -4652.76f, 1956.69f, 67.99f, 3.74f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+                    me->SummonCreature(NPC_GORILLA, -4654.73f, 1959.71f, 47.66f, 3.78f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+                    me->SummonCreature(NPC_GORILLA, -4657.01f, 1963.19f, 67.48f, 3.84f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
                     break;
                 //Third Ambush(4 Gnolls)
                 case 30:
