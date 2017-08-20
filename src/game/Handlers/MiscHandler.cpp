@@ -1473,10 +1473,11 @@ void WorldSession::HandleFarSightOpcode(WorldPacket& recvData)
 #endif
         if (WorldObject* target = _player->GetViewpoint())
             _player->SetSeer(target);
-        else
+        else {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
             sLog->outError("Player %s requests non-existing seer " UI64FMTD, _player->GetName().c_str(), _player->GetUInt64Value(PLAYER_FARSIGHT));
 #endif
+        }
     }
     else
     {
