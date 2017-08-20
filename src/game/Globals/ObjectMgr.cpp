@@ -1869,7 +1869,9 @@ uint32 ObjectMgr::AddGOData(uint32 entry, uint32 mapId, float x, float y, float 
 		}
 	}
 
-	;//sLog->outDebug(LOG_FILTER_MAPS, "AddGOData: dbguid %u entry %u map %u x %f y %f z %f o %f", guid, entry, mapId, x, y, z, o);
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+    sLog->outDebug(LOG_FILTER_MAPS, "AddGOData: dbguid %u entry %u map %u x %f y %f z %f o %f", guid, entry, mapId, x, y, z, o);
+#endif
 
 	return guid;
 }
@@ -3101,23 +3103,25 @@ void ObjectMgr::LoadPetLevelInfo()
 			continue;
 		}
 
-		uint32 current_level = fields[1].GetUInt8();
-		if (current_level > sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
-		{
-			if (current_level > STRONG_MAX_LEVEL)        // hardcoded level maximum
-				sLog->outErrorDb("Wrong (> %u) level %u in `pet_levelstats` table, ignoring.", STRONG_MAX_LEVEL, current_level);
-			else
-			{
-				;//sLog->outDetail("Unused (> MaxPlayerLevel in worldserver.conf) level %u in `pet_levelstats` table, ignoring.", current_level);
-				++count;                                // make result loading percent "expected" correct in case disabled detail mode for example.
-			}
-			continue;
-		}
-		else if (current_level < 1)
-		{
-			sLog->outErrorDb("Wrong (<1) level %u in `pet_levelstats` table, ignoring.", current_level);
-			continue;
-		}
+        uint32 current_level = fields[1].GetUInt8();
+        if (current_level > sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
+        {
+            if (current_level > STRONG_MAX_LEVEL)        // hardcoded level maximum
+                sLog->outErrorDb("Wrong (> %u) level %u in `pet_levelstats` table, ignoring.", STRONG_MAX_LEVEL, current_level);
+            else
+            {
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+                sLog->outDetail("Unused (> MaxPlayerLevel in worldserver.conf) level %u in `pet_levelstats` table, ignoring.", current_level);
+#endif
+                ++count;                                // make result loading percent "expected" correct in case disabled detail mode for example.
+            }
+            continue;
+        }
+        else if (current_level < 1)
+        {
+            sLog->outErrorDb("Wrong (<1) level %u in `pet_levelstats` table, ignoring.", current_level);
+            continue;
+        }
 
 		PetLevelInfo*& pInfoMapEntry = _petInfoStore[creature_id];
 
@@ -3596,18 +3600,20 @@ void ObjectMgr::LoadPlayerInfo()
 				continue;
 			}
 
-			uint32 current_level = fields[2].GetUInt8();
-			if (current_level > sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
-			{
-				if (current_level > STRONG_MAX_LEVEL)        // hardcoded level maximum
-					sLog->outErrorDb("Wrong (> %u) level %u in `player_levelstats` table, ignoring.", STRONG_MAX_LEVEL, current_level);
-				else
-				{
-					;//sLog->outDetail("Unused (> MaxPlayerLevel in worldserver.conf) level %u in `player_levelstats` table, ignoring.", current_level);
-					++count;                                // make result loading percent "expected" correct in case disabled detail mode for example.
-				}
-				continue;
-			}
+            uint32 current_level = fields[2].GetUInt8();
+            if (current_level > sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
+            {
+                if (current_level > STRONG_MAX_LEVEL)        // hardcoded level maximum
+                    sLog->outErrorDb("Wrong (> %u) level %u in `player_levelstats` table, ignoring.", STRONG_MAX_LEVEL, current_level);
+                else
+                {
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+                    sLog->outDetail("Unused (> MaxPlayerLevel in worldserver.conf) level %u in `player_levelstats` table, ignoring.", current_level);
+#endif
+                    ++count;                                // make result loading percent "expected" correct in case disabled detail mode for example.
+                }
+                continue;
+            }
 
 			if (PlayerInfo* info = _playerInfo[current_race][current_class])
 			{
@@ -3698,21 +3704,24 @@ void ObjectMgr::LoadPlayerInfo()
 			uint32 current_level = fields[0].GetUInt8();
 			uint32 current_xp = fields[1].GetUInt32();
 
-			if (current_level >= sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
-			{
-				if (current_level > STRONG_MAX_LEVEL)        // hardcoded level maximum
-					sLog->outErrorDb("Wrong (> %u) level %u in `player_xp_for_level` table, ignoring.", STRONG_MAX_LEVEL, current_level);
-				else
-				{
-					;//sLog->outDetail("Unused (> MaxPlayerLevel in worldserver.conf) level %u in `player_xp_for_levels` table, ignoring.", current_level);
-					++count;                                // make result loading percent "expected" correct in case disabled detail mode for example.
-				}
-				continue;
-			}
-			//PlayerXPperLevel
-			_playerXPperLevel[current_level] = current_xp;
-			++count;
-		} while (result->NextRow());
+            if (current_level >= sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
+            {
+                if (current_level > STRONG_MAX_LEVEL)        // hardcoded level maximum
+                    sLog->outErrorDb("Wrong (> %u) level %u in `player_xp_for_level` table, ignoring.", STRONG_MAX_LEVEL, current_level);
+                else
+                {
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+                    sLog->outDetail("Unused (> MaxPlayerLevel in worldserver.conf) level %u in `player_xp_for_levels` table, ignoring.", current_level);
+#endif
+                    ++count;                                // make result loading percent "expected" correct in case disabled detail mode for example.
+                }
+                continue;
+            }
+            //PlayerXPperLevel
+            _playerXPperLevel[current_level] = current_xp;
+            ++count;
+        }
+        while (result->NextRow());
 
 		// fill level gaps
 		for (uint8 level = 1; level < sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL); ++level)

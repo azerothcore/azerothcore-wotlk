@@ -1519,7 +1519,9 @@ public:
         if (!playerTarget)
             playerTarget = player;
 
-        ;//sLog->outDetail(handler->GetTrinityString(LANG_ADDITEM), itemId, count);
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+        sLog->outDetail(handler->GetTrinityString(LANG_ADDITEM), itemId, count);
+#endif
 
         ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(itemId);
         if (!itemTemplate)
@@ -1606,7 +1608,9 @@ public:
         if (!playerTarget)
             playerTarget = player;
 
-        ;//sLog->outDetail(handler->GetTrinityString(LANG_ADDITEMSET), itemSetId);
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+        sLog->outDetail(handler->GetTrinityString(LANG_ADDITEMSET), itemSetId);
+#endif
 
         bool found = false;
         ItemTemplateContainer const* its = sObjectMgr->GetItemTemplateStore();
@@ -1892,7 +1896,19 @@ public:
 #if TRINITY_ENDIAN == BIGENDIAN
                 EndianConvertReverse(ip);
 #endif
+                PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_IP2NATION_COUNTRY);
 
+                stmt->setUInt32(0, ip);
+
+                PreparedQueryResult result2 = WorldDatabase.Query(stmt);
+
+                if (result2)
+                {
+                    Field* fields2 = result2->Fetch();
+                    lastIp.append(" (");
+                    lastIp.append(fields2[0].GetString());
+                    lastIp.append(")");
+                }
             }
             else
             {

@@ -2097,14 +2097,17 @@ void World::Update(uint32 diff)
 		sObjectAccessor->RemoveOldCorpses();
 	}
 
-	///- Process Game events when necessary
-	if (m_timers[WUPDATE_EVENTS].Passed())
-	{
-		m_timers[WUPDATE_EVENTS].Reset();                   // to give time for Update() to be processed
-		uint32 nextGameEvent = sGameEventMgr->Update();
-		m_timers[WUPDATE_EVENTS].SetInterval(nextGameEvent);
-		m_timers[WUPDATE_EVENTS].Reset();
-	}
+    ///- Ping to keep MySQL connections alive
+    if (m_timers[WUPDATE_PINGDB].Passed())
+    {
+        m_timers[WUPDATE_PINGDB].Reset();
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+        sLog->outDetail("Ping MySQL to keep connection alive");
+#endif
+        CharacterDatabase.KeepAlive();
+        LoginDatabase.KeepAlive();
+        WorldDatabase.KeepAlive();
+    }
 
 	///- Ping to keep MySQL connections alive
 	if (m_timers[WUPDATE_PINGDB].Passed())
@@ -2582,9 +2585,11 @@ void World::ShutdownMsg(bool show, Player* player)
 
 		ServerMessageType msgid = (m_ShutdownMask & SHUTDOWN_MASK_RESTART) ? SERVER_MSG_RESTART_TIME : SERVER_MSG_SHUTDOWN_TIME;
 
-		SendServerMessage(msgid, str.c_str(), player);
-		;//sLog->outStaticDebug("Server is %s in %s", (m_ShutdownMask & SHUTDOWN_MASK_RESTART ? "restart" : "shuttingdown"), str.c_str());
-	}
+        SendServerMessage(msgid, str.c_str(), player);
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+        sLog->outStaticDebug("Server is %s in %s", (m_ShutdownMask & SHUTDOWN_MASK_RESTART ? "restart" : "shuttingdown"), str.c_str());
+#endif
+    }
 }
 
 /// Cancel a planned server shutdown
@@ -2601,7 +2606,9 @@ void World::ShutdownCancel()
 	m_ExitCode = SHUTDOWN_EXIT_CODE;                       // to default value
 	SendServerMessage(msgid);
 
-	;//sLog->outStaticDebug("Server %s cancelled.", (m_ShutdownMask & SHUTDOWN_MASK_RESTART ? "restart" : "shuttingdown"));
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+    sLog->outStaticDebug("Server %s cancelled.", (m_ShutdownMask & SHUTDOWN_MASK_RESTART ? "restart" : "shuttingdown"));
+#endif
 
 	sScriptMgr->OnShutdownCancel();
 }
@@ -2690,20 +2697,22 @@ void World::UpdateSessions(uint32 diff)
 // This handles the issued and queued CLI commands
 void World::ProcessCliCommands()
 {
-	CliCommandHolder::Print* zprint = NULL;
-	void* callbackArg = NULL;
-	CliCommandHolder* command = NULL;
-	while (cliCmdQueue.next(command))
-	{
-		;//sLog->outDetail("CLI command under processing...");
-		zprint = command->m_print;
-		callbackArg = command->m_callbackArg;
-		CliHandler handler(callbackArg, zprint);
-		handler.ParseCommands(command->m_command);
-		if (command->m_commandFinished)
-			command->m_commandFinished(callbackArg, !handler.HasSentErrorMessage());
-		delete command;
-	}
+    CliCommandHolder::Print* zprint = NULL;
+    void* callbackArg = NULL;
+    CliCommandHolder* command = NULL;
+    while (cliCmdQueue.next(command))
+    {
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+        sLog->outDetail("CLI command under processing...");
+#endif
+        zprint = command->m_print;
+        callbackArg = command->m_callbackArg;
+        CliHandler handler(callbackArg, zprint);
+        handler.ParseCommands(command->m_command);
+        if (command->m_commandFinished)
+            command->m_commandFinished(callbackArg, !handler.HasSentErrorMessage());
+        delete command;
+    }
 }
 
 void World::SendAutoBroadcast()
@@ -2758,12 +2767,9 @@ void World::SendAutoBroadcast()
 	{
 		sWorld->SendWorldText(LANG_AUTO_BROADCAST, msg.c_str());
 
-		WorldPacket data(SMSG_NOTIFICATION, (msg.size() + 1));
-		data << msg;
-		sWorld->SendGlobalMessage(&data);
-	}
-
-	;//sLog->outDetail("AutoBroadcast: '%s'", msg.c_str());
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+    sLog->outDetail("AutoBroadcast: '%s'", msg.c_str());
+#endif
 }
 
 void World::UpdateRealmCharCount(uint32 accountId)
@@ -2963,7 +2969,9 @@ void World::ResetEventSeasonalQuests(uint16 event_id)
 
 void World::ResetRandomBG()
 {
-	;//sLog->outDetail("Random BG status reset for all characters.");
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+    sLog->outDetail("Random BG status reset for all characters.");
+#endif
 
 	PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_BATTLEGROUND_RANDOM);
 	CharacterDatabase.Execute(stmt);

@@ -280,7 +280,9 @@ void WorldSession::HandleCharEnum(PreparedQueryResult result)
         do
         {
             uint32 guidlow = (*result)[0].GetUInt32();
-            ;//sLog->outDetail("Loading char guid %u from account %u.", guidlow, GetAccountId());
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+            sLog->outDetail("Loading char guid %u from account %u.", guidlow, GetAccountId());
+#endif
             if (Player::BuildEnumData(result, &data))
             {
                 _legitCharacters.insert(guidlow);
@@ -669,7 +671,9 @@ void WorldSession::HandleCharCreateCallback(PreparedQueryResult result, Characte
             {
                 uint8 unk;
                 createInfo->Data >> unk;
-                ;//sLog->outDebug(LOG_FILTER_NETWORKIO, "Character creation %s (account %u) has unhandled tail data: [%u]", createInfo->Name.c_str(), GetAccountId(), unk);
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+                sLog->outDebug(LOG_FILTER_NETWORKIO, "Character creation %s (account %u) has unhandled tail data: [%u]", createInfo->Name.c_str(), GetAccountId(), unk);
+#endif
             }
 
             // pussywizard:
@@ -727,7 +731,9 @@ void WorldSession::HandleCharCreateCallback(PreparedQueryResult result, Characte
             SendPacket(&data);
 
             std::string IP_str = GetRemoteAddress();
-            ;//sLog->outDetail("Account: %d (IP: %s) Create Character:[%s] (GUID: %u)", GetAccountId(), IP_str.c_str(), createInfo->Name.c_str(), newChar.GetGUIDLow());
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+            sLog->outDetail("Account: %d (IP: %s) Create Character:[%s] (GUID: %u)", GetAccountId(), IP_str.c_str(), createInfo->Name.c_str(), newChar.GetGUIDLow());
+#endif
             sLog->outChar("Account: %d (IP: %s) Create Character:[%s] (GUID: %u)", GetAccountId(), IP_str.c_str(), createInfo->Name.c_str(), newChar.GetGUIDLow());
             sScriptMgr->OnPlayerCreate(&newChar);
             sWorld->AddGlobalPlayerData(newChar.GetGUIDLow(), GetAccountId(), newChar.GetName(), newChar.getGender(), newChar.getRace(), newChar.getClass(), newChar.getLevel(), 0, 0);
@@ -786,7 +792,9 @@ void WorldSession::HandleCharDeleteOpcode(WorldPacket& recvData)
         return;
 
     std::string IP_str = GetRemoteAddress();
-    ;//sLog->outDetail("Account: %d (IP: %s) Delete Character:[%s] (GUID: %u)", GetAccountId(), IP_str.c_str(), name.c_str(), GUID_LOPART(guid));
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+    sLog->outDetail("Account: %d (IP: %s) Delete Character:[%s] (GUID: %u)", GetAccountId(), IP_str.c_str(), name.c_str(), GUID_LOPART(guid));
+#endif
     sLog->outChar("Account: %d (IP: %s) Delete Character:[%s] (GUID: %u)", GetAccountId(), IP_str.c_str(), name.c_str(), GUID_LOPART(guid));
     sScriptMgr->OnPlayerDelete(guid);
 
@@ -992,13 +1000,17 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder* holder)
         data.put(0, linecount);
 
         SendPacket(&data);
-        ;//sLog->outStaticDebug("WORLD: Sent motd (SMSG_MOTD)");
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+        sLog->outStaticDebug("WORLD: Sent motd (SMSG_MOTD)");
+#endif
 
         // send server info
         if (sWorld->getIntConfig(CONFIG_ENABLE_SINFO_LOGIN) == 1)
             chH.PSendSysMessage(_FULLVERSION);
 
-        ;//sLog->outStaticDebug("WORLD: Sent server info");
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+        sLog->outStaticDebug("WORLD: Sent server info");
+#endif
     }
 
     if (uint32 guildId = Player::GetGuildIdFromStorage(pCurrChar->GetGUIDLow()))
@@ -1148,8 +1160,11 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder* holder)
         SendNotification(LANG_RESET_TALENTS);
     }
 
-    if (pCurrChar->HasAtLoginFlag(AT_LOGIN_FIRST))
+    if (pCurrChar->HasAtLoginFlag(AT_LOGIN_FIRST)) {
         pCurrChar->RemoveAtLoginFlag(AT_LOGIN_FIRST);
+
+        sScriptMgr->OnFirstLogin(pCurrChar);
+    }
 
     if (pCurrChar->HasAtLoginFlag(AT_LOGIN_CHECK_ACHIEVS))
     {
@@ -1294,13 +1309,17 @@ void WorldSession::HandlePlayerLoginToCharInWorld(Player* pCurrChar)
         data.put(0, linecount);
 
         SendPacket(&data);
-        ;//sLog->outStaticDebug("WORLD: Sent motd (SMSG_MOTD)");
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+        sLog->outStaticDebug("WORLD: Sent motd (SMSG_MOTD)");
+#endif
 
         // send server info
         if (sWorld->getIntConfig(CONFIG_ENABLE_SINFO_LOGIN) == 1)
             chH.PSendSysMessage(_FULLVERSION);
 
-        ;//sLog->outStaticDebug("WORLD: Sent server info");
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+        sLog->outStaticDebug("WORLD: Sent server info");
+#endif
     }
 
     data.Initialize(SMSG_LEARNED_DANCE_MOVES, 4+4);
@@ -1399,7 +1418,9 @@ void WorldSession::HandlePlayerLoginToCharOutOfWorld(Player* pCurrChar)
 
 void WorldSession::HandleSetFactionAtWar(WorldPacket& recvData)
 {
-    ;//sLog->outStaticDebug("WORLD: Received CMSG_SET_FACTION_ATWAR");
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+    sLog->outStaticDebug("WORLD: Received CMSG_SET_FACTION_ATWAR");
+#endif
 
     uint32 repListID;
     uint8  flag;
@@ -1447,7 +1468,9 @@ void WorldSession::HandleTutorialReset(WorldPacket & /*recvData*/)
 
 void WorldSession::HandleSetWatchedFactionOpcode(WorldPacket& recvData)
 {
-    ;//sLog->outStaticDebug("WORLD: Received CMSG_SET_WATCHED_FACTION");
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+    sLog->outStaticDebug("WORLD: Received CMSG_SET_WATCHED_FACTION");
+#endif
     uint32 fact;
     recvData >> fact;
     GetPlayer()->SetUInt32Value(PLAYER_FIELD_WATCHED_FACTION_INDEX, fact);
@@ -1455,7 +1478,9 @@ void WorldSession::HandleSetWatchedFactionOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleSetFactionInactiveOpcode(WorldPacket & recvData)
 {
-    ;//sLog->outStaticDebug("WORLD: Received CMSG_SET_FACTION_INACTIVE");
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+    sLog->outStaticDebug("WORLD: Received CMSG_SET_FACTION_INACTIVE");
+#endif
     uint32 replistid;
     uint8 inactive;
     recvData >> replistid >> inactive;
@@ -1465,14 +1490,18 @@ void WorldSession::HandleSetFactionInactiveOpcode(WorldPacket & recvData)
 
 void WorldSession::HandleShowingHelmOpcode(WorldPacket& recvData)
 {
-    ;//sLog->outStaticDebug("CMSG_SHOWING_HELM for %s", _player->GetName().c_str());
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+    sLog->outStaticDebug("CMSG_SHOWING_HELM for %s", _player->GetName().c_str());
+#endif
     recvData.read_skip<uint8>(); // unknown, bool?
     _player->ToggleFlag(PLAYER_FLAGS, PLAYER_FLAGS_HIDE_HELM);
 }
 
 void WorldSession::HandleShowingCloakOpcode(WorldPacket& recvData)
 {
-    ;//sLog->outStaticDebug("CMSG_SHOWING_CLOAK for %s", _player->GetName().c_str());
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+    sLog->outStaticDebug("CMSG_SHOWING_CLOAK for %s", _player->GetName().c_str());
+#endif
     recvData.read_skip<uint8>(); // unknown, bool?
     _player->ToggleFlag(PLAYER_FLAGS, PLAYER_FLAGS_HIDE_CLOAK);
 }
@@ -1690,7 +1719,9 @@ void WorldSession::HandleSetPlayerDeclinedNames(WorldPacket& recvData)
 
 void WorldSession::HandleAlterAppearance(WorldPacket& recvData)
 {
-    ;//sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_ALTER_APPEARANCE");
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_ALTER_APPEARANCE");
+#endif
 
     uint32 Hair, Color, FacialHair, SkinColor;
     recvData >> Hair >> Color >> FacialHair >> SkinColor;
@@ -1767,7 +1798,9 @@ void WorldSession::HandleRemoveGlyph(WorldPacket& recvData)
 
     if (slot >= MAX_GLYPH_SLOT_INDEX)
     {
-        ;//sLog->outDebug(LOG_FILTER_NETWORKIO, "Client sent wrong glyph slot number in opcode CMSG_REMOVE_GLYPH %u", slot);
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "Client sent wrong glyph slot number in opcode CMSG_REMOVE_GLYPH %u", slot);
+#endif
         return;
     }
 
@@ -1927,7 +1960,9 @@ void WorldSession::HandleCharCustomize(WorldPacket& recvData)
 
 void WorldSession::HandleEquipmentSetSave(WorldPacket &recvData)
 {
-    ;//sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_EQUIPMENT_SET_SAVE");
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_EQUIPMENT_SET_SAVE");
+#endif
 
     uint64 setGuid;
     recvData.readPackGUID(setGuid);
@@ -1986,7 +2021,9 @@ void WorldSession::HandleEquipmentSetSave(WorldPacket &recvData)
 
 void WorldSession::HandleEquipmentSetDelete(WorldPacket &recvData)
 {
-    ;//sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_EQUIPMENT_SET_DELETE");
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_EQUIPMENT_SET_DELETE");
+#endif
 
     uint64 setGuid;
     recvData.readPackGUID(setGuid);
@@ -1996,7 +2033,9 @@ void WorldSession::HandleEquipmentSetDelete(WorldPacket &recvData)
 
 void WorldSession::HandleEquipmentSetUse(WorldPacket &recvData)
 {
-    ;//sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_EQUIPMENT_SET_USE");
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_EQUIPMENT_SET_USE");
+#endif
 
     for (uint32 i = 0; i < EQUIPMENT_SLOT_END; ++i)
     {
@@ -2006,7 +2045,9 @@ void WorldSession::HandleEquipmentSetUse(WorldPacket &recvData)
         uint8 srcbag, srcslot;
         recvData >> srcbag >> srcslot;
 
-        ;//sLog->outDebug(LOG_FILTER_PLAYER_ITEMS, "Item " UI64FMTD ": srcbag %u, srcslot %u", itemGuid, srcbag, srcslot);
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+        sLog->outDebug(LOG_FILTER_PLAYER_ITEMS, "Item " UI64FMTD ": srcbag %u, srcslot %u", itemGuid, srcbag, srcslot);
+#endif
 
         // check if item slot is set to "ignored" (raw value == 1), must not be unequipped then
         if (itemGuid == 1)
