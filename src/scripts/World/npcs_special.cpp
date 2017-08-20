@@ -1843,7 +1843,7 @@ public:
             if (menuId == PET_UNLEARN && gossipListId == YES_PLEASE_DO)
             {
                 player->ResetPetTalents();
-                CloseGossipMenuFor(player);
+                player->PlayerTalkClass->SendCloseGossip();
             }
         }
     };
