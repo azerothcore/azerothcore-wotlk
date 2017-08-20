@@ -306,7 +306,9 @@ CalendarInvite* CalendarMgr::GetInvite(uint64 inviteId) const
             if ((*itr2)->GetInviteId() == inviteId)
                 return *itr2;
 
-    ;//sLog->outDebug(LOG_FILTER_CALENDAR, "CalendarMgr::GetInvite: [" UI64FMTD "] not found!", inviteId);
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+    sLog->outDebug(LOG_FILTER_UNITS, "CalendarMgr::GetInvite: [" UI64FMTD "] not found!", inviteId);
+#endif
     return NULL;
 }
 

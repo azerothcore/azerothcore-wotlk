@@ -289,6 +289,7 @@ inline void Battleground::_CheckSafePositions(uint32 diff)
         m_ValidStartPositionTimer = 0;
 
         Position pos;
+        Player* player;
         float x, y, z, o;
         for (BattlegroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
         {
@@ -296,7 +297,9 @@ inline void Battleground::_CheckSafePositions(uint32 diff)
             GetTeamStartLoc(itr->second->GetBgTeamId(), x, y, z, o);
             if (pos.GetExactDistSq(x, y, z) > maxDist)
             {
-                ;//sLog->outDebug(LOG_FILTER_BATTLEGROUND, "BATTLEGROUND: Sending %s back to start location (map: %u) (possible exploit)", player->GetName().c_str(), GetMapId());
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+                sLog->outDebug(LOG_FILTER_BATTLEGROUND, "BATTLEGROUND: Sending %s back to start location (map: %u) (possible exploit)", itr->second->GetName().c_str(), GetMapId());
+#endif
                 itr->second->TeleportTo(GetMapId(), x, y, z, o);
             }
         }
@@ -1236,7 +1239,9 @@ void Battleground::AddPlayer(Player* player)
     AddOrSetPlayerToCorrectBgGroup(player, teamId);
 
     // Log
-    ;//sLog->outDetail("BATTLEGROUND: Player %s joined the battle.", player->GetName().c_str());
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+    sLog->outDetail("BATTLEGROUND: Player %s joined the battle.", player->GetName().c_str());
+#endif
 }
 
 // this method adds player to his team's bg group, or sets his correct group if player is already in bg group
