@@ -2242,7 +2242,8 @@ class spell_pvp_trinket_wotf_shared_cd : public SpellScriptLoader
 enum AnimalBloodPoolSpell
 {
     SPELL_ANIMAL_BLOOD      = 46221,
-    SPELL_SPAWN_BLOOD_POOL  = 63471
+    SPELL_SPAWN_BLOOD_POOL  = 63471,
+    FACTION_DETHA_ATTACK    = 942
 };
 
 class spell_gen_animal_blood : public SpellScriptLoader
@@ -2266,13 +2267,20 @@ class spell_gen_animal_blood : public SpellScriptLoader
                 // Remove all auras with spell id 46221, except the one currently being applied
                 while (Aura* aur = GetUnitOwner()->GetOwnedAura(SPELL_ANIMAL_BLOOD, 0, 0, 0, GetAura()))
                     GetUnitOwner()->RemoveOwnedAura(aur);
+                if (Unit* owner = GetUnitOwner())
+                {
+                    owner->setFaction(FACTION_DETHA_ATTACK);
+                }
             }
 
             void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
                 if (Unit* owner = GetUnitOwner())
+                {
+                    owner->RestoreFaction();
                     if (owner->IsInWater())
                         owner->CastSpell(owner, SPELL_SPAWN_BLOOD_POOL, true);
+                }
             }
 
             void Register()

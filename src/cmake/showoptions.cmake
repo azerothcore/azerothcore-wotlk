@@ -107,18 +107,25 @@ endif()
 
 # Performance optimization options:
 
-if( DISABLE_EXTRAS )
-  message("* Disable extra features    : Yes")
-  add_definitions(-DDISABLE_EXTRAS)
+if( ENABLE_EXTRAS )
+  message("* Enable extra features    : Yes (default)")
+  add_definitions(-DENABLE_EXTRAS)
 else()
-  message("* Disable extra features     : No  (default)")
+  message("* Enable extra features     : No")
 endif()
 
-if( DISABLE_VMAP_CHECKS )
-  message("* Disable vmap DisableMgr checks    : Yes")
-  add_definitions(-DDISABLE_VMAP_CHECKS)
+if( ENABLE_VMAP_CHECKS )
+  message("* Enable vmap DisableMgr checks    : Yes (default)")
+  add_definitions(-DENABLE_VMAP_CHECKS)
 else()
-  message("* Disable vmap DisableMgr checks     : No  (default)")
+  message("* Enable vmap DisableMgr checks     : No")
+endif()
+
+if( ENABLE_EXTRA_LOGS )
+  message("* Enable extra logging functions    : Yes")
+  add_definitions(-DENABLE_EXTRA_LOGS)
+else()
+  message("* Enable extra logging functions    : No (default)")
 endif()
 
 message("")

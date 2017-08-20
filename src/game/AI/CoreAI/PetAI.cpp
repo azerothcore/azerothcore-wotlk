@@ -61,7 +61,9 @@ void PetAI::_stopAttack()
 {
     if (!me->IsAlive())
     {
-        ;//sLog->outStaticDebug("Creature stoped attacking cuz his dead [guid=%u]", me->GetGUIDLow());
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+        sLog->outStaticDebug("Creature stoped attacking cuz his dead [guid=%u]", me->GetGUIDLow());
+#endif
         me->GetMotionMaster()->Clear();
         me->GetMotionMaster()->MoveIdle();
         me->CombatStop();
@@ -99,6 +101,10 @@ void PetAI::UpdateAI(uint32 diff)
 
     Unit* owner = me->GetCharmerOrOwner();
 
+    //if Pet is in combat put player in combat
+    if (me->IsInCombat())
+        owner->IsInCombat();
+
     if (m_updateAlliesTimer <= diff)
         // UpdateAllies self set update timer
         UpdateAllies();
@@ -116,7 +122,9 @@ void PetAI::UpdateAI(uint32 diff)
 
         if (_needToStop())
         {
-            ;//sLog->outStaticDebug("Pet AI stopped attacking [guid=%u]", me->GetGUIDLow());
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+            sLog->outStaticDebug("Pet AI stopped attacking [guid=%u]", me->GetGUIDLow());
+#endif
             _stopAttack();
             return;
         }
