@@ -197,10 +197,11 @@ bool MapManager::CanPlayerEnter(uint32 mapid, Player* player, bool loginCheck)
             player->ResurrectPlayer(0.5f, false);
             player->SpawnCorpseBones();
         }
-        else
+        else {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
             sLog->outDebug(LOG_FILTER_MAPS, "Map::CanPlayerEnter - player '%s' is dead but does not have a corpse!", player->GetName().c_str());
 #endif
+        }
     }
 
     // if map exists - check for being full, etc.
