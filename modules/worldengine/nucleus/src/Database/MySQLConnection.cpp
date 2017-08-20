@@ -121,7 +121,9 @@ bool MySQLConnection::Open()
             //     sLog->outInfo(LOG_FILTER_SQL, "[WARNING] MySQL client/server version mismatch; may conflict with behaviour of prepared statements.");
         }
 
-        ;//sLog->outDetail("Connected to MySQL database at %s", m_connectionInfo.host.c_str());
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+        sLog->outDetail("Connected to MySQL database at %s", m_connectionInfo.host.c_str());
+#endif
         mysql_autocommit(m_Mysql, 1);
 
         // set connection properties to UTF8 to properly handle locales for different
