@@ -65,16 +65,16 @@ uint32 AuctionHouseMgr::GetAuctionDeposit(AuctionHouseEntry const* entry, uint32
     uint32 timeHr = (((time / 60) / 60) / 12);
     uint32 deposit = uint32(((multiplier * MSV * count / 3) * timeHr * 3) * sWorld->getRate(RATE_AUCTION_DEPOSIT));
 
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_AUCTIONHOUSE, "MSV:        %u", MSV);
 #endif
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_AUCTIONHOUSE, "Items:      %u", count);
 #endif
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_AUCTIONHOUSE, "Multiplier: %f", multiplier);
 #endif
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_AUCTIONHOUSE, "Deposit:    %u", deposit);
 #endif
 

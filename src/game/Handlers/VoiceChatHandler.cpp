@@ -12,7 +12,7 @@
 
 void WorldSession::HandleVoiceSessionEnableOpcode(WorldPacket& recvData)
 {
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_VOICE_SESSION_ENABLE");
 #endif
     // uint8 isVoiceEnabled, uint8 isMicrophoneEnabled
@@ -22,7 +22,7 @@ void WorldSession::HandleVoiceSessionEnableOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleChannelVoiceOnOpcode(WorldPacket& /*recvData*/)
 {
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_CHANNEL_VOICE_ON");
 #endif
     // Enable Voice button in channel context menu
@@ -30,7 +30,7 @@ void WorldSession::HandleChannelVoiceOnOpcode(WorldPacket& /*recvData*/)
 
 void WorldSession::HandleSetActiveVoiceChannel(WorldPacket& recvData)
 {
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_SET_ACTIVE_VOICE_CHANNEL");
 #endif
     recvData.read_skip<uint32>();

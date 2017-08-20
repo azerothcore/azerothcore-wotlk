@@ -204,7 +204,7 @@ void ObjectGridLoader::LoadN(void)
             }
         }
     }
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_MAPS, "%u GameObjects, %u Creatures, and %u Corpses/Bones loaded for grid %u on map %u", i_gameObjects, i_creatures, i_corpses, i_grid.GetGridId(), i_map->GetId());
 #endif
 }

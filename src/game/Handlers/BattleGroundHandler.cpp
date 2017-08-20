@@ -28,7 +28,7 @@ void WorldSession::HandleBattlemasterHelloOpcode(WorldPacket & recvData)
 {
     uint64 guid;
     recvData >> guid;
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Recvd CMSG_BATTLEMASTER_HELLO Message from (GUID: %u TypeId:%u)", GUID_LOPART(guid), GuidHigh2TypeId(GUID_HIPART(guid)));
 #endif
 
@@ -258,7 +258,7 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket & recvData)
 
 void WorldSession::HandleBattlegroundPlayerPositionsOpcode(WorldPacket& /*recvData*/)
 {
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Recvd MSG_BATTLEGROUND_PLAYER_POSITIONS Message");
 #endif
 
@@ -311,7 +311,7 @@ void WorldSession::HandleBattlegroundPlayerPositionsOpcode(WorldPacket& /*recvDa
 
 void WorldSession::HandlePVPLogDataOpcode(WorldPacket & /*recvData*/)
 {
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Recvd MSG_PVP_LOG_DATA Message");
 #endif
 
@@ -327,14 +327,14 @@ void WorldSession::HandlePVPLogDataOpcode(WorldPacket & /*recvData*/)
     sBattlegroundMgr->BuildPvpLogDataPacket(&data, bg);
     SendPacket(&data);
 
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Sent MSG_PVP_LOG_DATA Message");
 #endif
 }
 
 void WorldSession::HandleBattlefieldListOpcode(WorldPacket &recvData)
 {
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Recvd CMSG_BATTLEFIELD_LIST Message");
 #endif
 
@@ -479,7 +479,7 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket &recvData)
 
 void WorldSession::HandleBattlefieldLeaveOpcode(WorldPacket& recvData)
 {
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Recvd CMSG_LEAVE_BATTLEFIELD Message");
 #endif
 
@@ -784,13 +784,13 @@ void WorldSession::HandleReportPvPAFK(WorldPacket & recvData)
 
     if (!reportedPlayer)
     {
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         sLog->outDebug(LOG_FILTER_BATTLEGROUND, "WorldSession::HandleReportPvPAFK: player not found");
 #endif
         return;
     }
 
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_BATTLEGROUND, "WorldSession::HandleReportPvPAFK: %s reported %s", _player->GetName().c_str(), reportedPlayer->GetName().c_str());
 #endif
 

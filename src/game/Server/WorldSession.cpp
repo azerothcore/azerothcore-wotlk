@@ -168,7 +168,7 @@ void WorldSession::SendPacket(WorldPacket const* packet)
     if (!m_Socket)
         return;
 
-#ifdef TRINITY_DEBUG
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS) && defined(TRINITY_DEBUG)
     // Code for network use statistic
     static uint64 sendPacketCount = 0;
     static uint64 sendPacketBytes = 0;
@@ -193,12 +193,10 @@ void WorldSession::SendPacket(WorldPacket const* packet)
     {
         uint64 minTime = uint64(cur_time - lastTime);
         uint64 fullTime = uint64(lastTime - firstTime);
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+
         sLog->outDetail("Send all time packets count: " UI64FMTD " bytes: " UI64FMTD " avr.count/sec: %f avr.bytes/sec: %f time: %u", sendPacketCount, sendPacketBytes, float(sendPacketCount)/fullTime, float(sendPacketBytes)/fullTime, uint32(fullTime));
-#endif
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+
         sLog->outDetail("Send last min packets count: " UI64FMTD " bytes: " UI64FMTD " avr.count/sec: %f avr.bytes/sec: %f", sendLastPacketCount, sendLastPacketBytes, float(sendLastPacketCount)/minTime, float(sendLastPacketBytes)/minTime);
-#endif
 
         lastTime = cur_time;
         sendLastPacketCount = 1;
@@ -547,7 +545,7 @@ void WorldSession::LogoutPlayer(bool save)
         //! Client will respond by sending 3x CMSG_CANCEL_TRADE, which we currently dont handle
         WorldPacket data(SMSG_LOGOUT_COMPLETE, 0);
         SendPacket(&data);
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         sLog->outDebug(LOG_FILTER_NETWORKIO, "SESSION: Sent SMSG_LOGOUT_COMPLETE Message");
 #endif
 
@@ -975,7 +973,7 @@ void WorldSession::ReadAddonsInfo(WorldPacket &data)
 
             addonInfo >> enabled >> crc >> unk1;
 
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
             sLog->outDetail("ADDON: Name: %s, Enabled: 0x%x, CRC: 0x%x, Unknown2: 0x%x", addonName.c_str(), enabled, crc, unk1);
 #endif
 
@@ -989,12 +987,11 @@ void WorldSession::ReadAddonsInfo(WorldPacket &data)
                 if (addon.CRC != savedAddon->CRC)
                     match = false;
 
+
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
                 if (!match)
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
                     sLog->outDetail("ADDON: %s was known, but didn't match known CRC (0x%x)!", addon.Name.c_str(), savedAddon->CRC);
-#endif
                 else
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
                     sLog->outDetail("ADDON: %s was known, CRC is correct (0x%x)", addon.Name.c_str(), savedAddon->CRC);
 #endif
             }
@@ -1002,7 +999,7 @@ void WorldSession::ReadAddonsInfo(WorldPacket &data)
             {
                 AddonMgr::SaveAddon(addon);
 
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
                 sLog->outDetail("ADDON: %s (0x%x) was not known, saving...", addon.Name.c_str(), addon.CRC);
 #endif
             }
@@ -1013,12 +1010,12 @@ void WorldSession::ReadAddonsInfo(WorldPacket &data)
 
         uint32 currentTime;
         addonInfo >> currentTime;
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         sLog->outDebug(LOG_FILTER_NETWORKIO, "ADDON: CurrentTime: %u", currentTime);
 #endif
 
-        //if (addonInfo.rpos() != addonInfo.size())
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+        if (addonInfo.rpos() != addonInfo.size())
             sLog->outDebug(LOG_FILTER_NETWORKIO, "packet under-read!");
 #endif
     }
@@ -1062,7 +1059,7 @@ void WorldSession::SendAddonsInfo()
             data << uint8(usepk);
             if (usepk)                                      // if CRC is wrong, add public key (client need it)
             {
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
                 sLog->outDetail("ADDON: CRC (0x%x) for addon %s is wrong (does not match expected 0x%x), sending pubkey", itr->CRC, itr->Name.c_str(), STANDARD_ADDON_CRC);
 #endif
                 data.append(addonPublicKey, sizeof(addonPublicKey));

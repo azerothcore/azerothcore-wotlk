@@ -240,7 +240,7 @@ public:
             {
                 AddEscortState(STATE_ESCORT_RETURNING);
                 ReturnToLastPoint();
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
                 sLog->outDebug(LOG_FILTER_TSCR, "TSCR: EscortAI has left combat and is now returning to last point");
 #endif
             }

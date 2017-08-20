@@ -116,7 +116,7 @@ void OutdoorPvPMgr::HandlePlayerEnterZone(Player* player, uint32 zoneid)
         return;
 
     itr->second->HandlePlayerEnterZone(player, zoneid);
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_OUTDOORPVP, "Player %u entered outdoorpvp id %u", player->GetGUIDLow(), itr->second->GetTypeId());
 #endif
 }
@@ -134,7 +134,7 @@ void OutdoorPvPMgr::HandlePlayerLeaveZone(Player* player, uint32 zoneid)
         return;
 
     itr->second->HandlePlayerLeaveZone(player, zoneid);
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_OUTDOORPVP, "Player %u left outdoorpvp id %u", player->GetGUIDLow(), itr->second->GetTypeId());
 #endif
 }

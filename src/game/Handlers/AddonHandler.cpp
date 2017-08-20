@@ -66,7 +66,7 @@ bool AddonHandler::BuildAddonPacket(WorldPacket* Source, WorldPacket* Target)
 
             AddOnPacked >> enabled >> crc >> unk2;
 
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
             sLog->outDebug(LOG_FILTER_NETWORKIO, "ADDON: Name: %s, Enabled: 0x%x, CRC: 0x%x, Unknown2: 0x%x", addonName.c_str(), enabled, crc, unk2);
 #endif
 
@@ -122,7 +122,7 @@ bool AddonHandler::BuildAddonPacket(WorldPacket* Source, WorldPacket* Target)
         *Target << uint32(count);
 
         //if (AddOnPacked.rpos() != AddOnPacked.size())
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
             sLog->outDebug(LOG_FILTER_NETWORKIO, "packet under read!");
 #endif
     }

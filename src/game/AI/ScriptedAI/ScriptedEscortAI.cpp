@@ -156,7 +156,7 @@ void npc_escortAI::EnterEvadeMode()
     {
         AddEscortState(STATE_ESCORT_RETURNING);
         ReturnToLastPoint();
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         sLog->outDebug(LOG_FILTER_TSCR, "TSCR: EscortAI has left combat and is now returning to last point");
 #endif
     }
@@ -284,7 +284,7 @@ void npc_escortAI::MovementInform(uint32 moveType, uint32 pointId)
         //Combat start position reached, continue waypoint movement
         if (pointId == POINT_LAST_POINT)
         {
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
             sLog->outDebug(LOG_FILTER_TSCR, "TSCR: EscortAI has returned to original position before combat");
 #endif
 
@@ -296,7 +296,7 @@ void npc_escortAI::MovementInform(uint32 moveType, uint32 pointId)
         }
         else if (pointId == POINT_HOME)
         {
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
             sLog->outDebug(LOG_FILTER_TSCR, "TSCR: EscortAI has returned to original home location and will continue from beginning of waypoint list.");
 #endif
 
@@ -386,7 +386,7 @@ void npc_escortAI::SetRun(bool on)
         if (!m_bIsRunning)
             me->SetWalk(false);
         else
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
             sLog->outDebug(LOG_FILTER_TSCR, "TSCR: EscortAI attempt to set run mode, but is already running.");
 #endif
     }
@@ -395,7 +395,7 @@ void npc_escortAI::SetRun(bool on)
         if (m_bIsRunning)
             me->SetWalk(true);
         else
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
             sLog->outDebug(LOG_FILTER_TSCR, "TSCR: EscortAI attempt to set walk mode, but is already walking.");
 #endif
     }
@@ -443,7 +443,7 @@ void npc_escortAI::Start(bool isActiveAttacker /* = true*/, bool run /* = false 
     m_bCanReturnToStart = canLoopPath;
 
     //if (m_bCanReturnToStart && m_bCanInstantRespawn)
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         sLog->outDebug(LOG_FILTER_TSCR, "TSCR: EscortAI is set to return home after waypoint end and instant respawn at waypoint end. Creature will never despawn.");
 #endif
 
@@ -451,7 +451,7 @@ void npc_escortAI::Start(bool isActiveAttacker /* = true*/, bool run /* = false 
     {
         me->GetMotionMaster()->MovementExpired();
         me->GetMotionMaster()->MoveIdle();
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         sLog->outDebug(LOG_FILTER_TSCR, "TSCR: EscortAI start with WAYPOINT_MOTION_TYPE, changed to MoveIdle.");
 #endif
     }
@@ -464,7 +464,7 @@ void npc_escortAI::Start(bool isActiveAttacker /* = true*/, bool run /* = false 
         me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
     }
 
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_TSCR, "TSCR: EscortAI started with " UI64FMTD " waypoints. ActiveAttacker = %d, Run = %d, PlayerGUID = " UI64FMTD "", uint64(WaypointList.size()), m_bIsActiveAttacker, m_bIsRunning, m_uiPlayerGUID);
 #endif
 

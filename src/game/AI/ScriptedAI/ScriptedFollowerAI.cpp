@@ -141,7 +141,7 @@ void FollowerAI::EnterEvadeMode()
 
     if (HasFollowState(STATE_FOLLOW_INPROGRESS))
     {
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         sLog->outDebug(LOG_FILTER_TSCR, "TSCR: FollowerAI left combat, returning to CombatStartPosition.");
 #endif
 
@@ -169,7 +169,7 @@ void FollowerAI::UpdateAI(uint32 uiDiff)
         {
             if (HasFollowState(STATE_FOLLOW_COMPLETE) && !HasFollowState(STATE_FOLLOW_POSTEVENT))
             {
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
                 sLog->outDebug(LOG_FILTER_TSCR, "TSCR: FollowerAI is set completed, despawns.");
 #endif
                 me->DespawnOrUnsummon();
@@ -182,7 +182,7 @@ void FollowerAI::UpdateAI(uint32 uiDiff)
             {
                 if (HasFollowState(STATE_FOLLOW_RETURNING))
                 {
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
                     sLog->outDebug(LOG_FILTER_TSCR, "TSCR: FollowerAI is returning to leader.");
 #endif
 
@@ -213,7 +213,7 @@ void FollowerAI::UpdateAI(uint32 uiDiff)
 
             if (bIsMaxRangeExceeded)
             {
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
                 sLog->outDebug(LOG_FILTER_TSCR, "TSCR: FollowerAI failed because player/group was to far away or not found");
 #endif
                 me->DespawnOrUnsummon();
@@ -258,7 +258,7 @@ void FollowerAI::StartFollow(Player* player, uint32 factionForFollower, const Qu
 {
     if (me->GetVictim())
     {
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         sLog->outDebug(LOG_FILTER_TSCR, "TSCR: FollowerAI attempt to StartFollow while in combat.");
 #endif
         return;
@@ -282,7 +282,7 @@ void FollowerAI::StartFollow(Player* player, uint32 factionForFollower, const Qu
     {
         me->GetMotionMaster()->Clear();
         me->GetMotionMaster()->MoveIdle();
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         sLog->outDebug(LOG_FILTER_TSCR, "TSCR: FollowerAI start with WAYPOINT_MOTION_TYPE, set to MoveIdle.");
 #endif
     }
@@ -293,7 +293,7 @@ void FollowerAI::StartFollow(Player* player, uint32 factionForFollower, const Qu
 
     me->GetMotionMaster()->MoveFollow(player, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
 
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_TSCR, "TSCR: FollowerAI start follow %s (GUID " UI64FMTD ")", player->GetName().c_str(), m_uiLeaderGUID);
 #endif
 }
@@ -314,7 +314,7 @@ Player* FollowerAI::GetLeaderForFollower()
 
                     if (member && me->IsWithinDistInMap(member, MAX_PLAYER_DISTANCE) && member->IsAlive())
                     {
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
                         sLog->outDebug(LOG_FILTER_TSCR, "TSCR: FollowerAI GetLeader changed and returned new leader.");
 #endif
                         m_uiLeaderGUID = member->GetGUID();
@@ -325,7 +325,7 @@ Player* FollowerAI::GetLeaderForFollower()
         }
     }
 
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_TSCR, "TSCR: FollowerAI GetLeader can not find suitable leader.");
 #endif
     return NULL;

@@ -132,7 +132,7 @@ void CreatureAI::EnterEvadeMode()
     if (!_EnterEvadeMode())
         return;
 
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_UNITS, "Creature %u enters evade mode.", me->GetEntry());
 #endif
 

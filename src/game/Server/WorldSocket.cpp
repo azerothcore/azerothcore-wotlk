@@ -282,7 +282,7 @@ int WorldSocket::handle_input (ACE_HANDLE)
                 return Update();                           // interesting line, isn't it ?
             }
 
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
             sLog->outStaticDebug("WorldSocket::handle_input: Peer error closing connection errno = %s", ACE_OS::strerror (errno));
 #endif
 
@@ -291,7 +291,7 @@ int WorldSocket::handle_input (ACE_HANDLE)
         }
         case 0:
         {
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
             sLog->outStaticDebug("WorldSocket::handle_input: Peer has closed connection");
 #endif
 
@@ -756,7 +756,7 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     recvPacket >> unk4;
     recvPacket.read(digest, 20);
 
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outStaticDebug ("WorldSocket::HandleAuthSession: client %u, unk2 %u, account %s, unk3 %u, clientseed %u", BuiltNumberClient, unk2, account.c_str(), unk3, clientSeed);
 #endif
     // Get the account information from the realmd database
@@ -878,7 +878,7 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
 
     // Check locked state for server
     AccountTypes allowedAccountType = sWorld->GetPlayerSecurityLimit();
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "Allowed Level: %u Player Level %u", allowedAccountType, AccountTypes(security));
 #endif
     if (AccountTypes(security) < allowedAccountType)
@@ -888,7 +888,7 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
 
         SendPacket(packet);
 
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         sLog->outDetail("WorldSocket::HandleAuthSession: User tries to login but his security level is not enough");
 #endif
         return -1;
@@ -918,7 +918,7 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
         return -1;
     }
 
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outStaticDebug("WorldSocket::HandleAuthSession: Client '%s' authenticated successfully from %s.",
                 account.c_str(),
                 address.c_str());

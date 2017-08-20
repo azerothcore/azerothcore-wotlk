@@ -190,7 +190,7 @@ public:
         target->SetMaxPower(POWER_ENERGY, energym);
         target->SetPower(POWER_ENERGY, energy);
 
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         sLog->outDetail(handler->GetTrinityString(LANG_CURRENT_ENERGY), target->GetMaxPower(POWER_ENERGY));
 #endif
 
@@ -1018,8 +1018,8 @@ public:
         {
             int32 newmoney = int32(targetMoney) + moneyToAdd;
 
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
-            sLog->outDebug(LOG_FILTER_GENERAL, handler->GetTrinityString(LANG_CURRENT_MONEY), targetMoney, moneyToAdd, newmoney);
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+            sLog->outDebug(LOG_FILTER_CHATSYS, handler->GetTrinityString(LANG_CURRENT_MONEY), targetMoney, moneyToAdd, newmoney);
 #endif
             if (newmoney <= 0)
             {
@@ -1055,8 +1055,8 @@ public:
             target->ModifyMoney(moneyToAdd);
         }
 
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
-        sLog->outDebug(LOG_FILTER_GENERAL, handler->GetTrinityString(LANG_NEW_MONEY), targetMoney, moneyToAdd, target->GetMoney());
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+        sLog->outDebug(LOG_FILTER_CHATSYS, handler->GetTrinityString(LANG_NEW_MONEY), targetMoney, moneyToAdd, target->GetMoney());
 #endif
 
         return true;

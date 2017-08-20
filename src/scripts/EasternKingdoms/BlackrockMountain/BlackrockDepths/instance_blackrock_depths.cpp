@@ -206,7 +206,7 @@ public:
 
         void SetData64(uint32 type, uint64 data)
         {
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
             sLog->outDebug(LOG_FILTER_TSCR, "TSCR: Instance Blackrock Depths: SetData64 update (Type: %u Data " UI64FMTD ")", type, data);
 #endif
 
@@ -224,7 +224,7 @@ public:
 
         void SetData(uint32 type, uint32 data)
         {
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
             sLog->outDebug(LOG_FILTER_TSCR, "TSCR: Instance Blackrock Depths: SetData update (Type: %u Data %u)", type, data);
 #endif
 

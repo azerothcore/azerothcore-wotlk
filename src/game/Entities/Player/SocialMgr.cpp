@@ -167,7 +167,7 @@ void PlayerSocial::SendSocialList(Player* player)
     }
 
     player->GetSession()->SendPacket(&data);
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Sent SMSG_CONTACT_LIST");
 #endif
 }

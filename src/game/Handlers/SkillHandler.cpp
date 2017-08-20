@@ -26,7 +26,7 @@ void WorldSession::HandleLearnTalentOpcode(WorldPacket & recvData)
 
 void WorldSession::HandleLearnPreviewTalents(WorldPacket& recvPacket)
 {
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_LEARN_PREVIEW_TALENTS");
 #endif
 
@@ -52,7 +52,7 @@ void WorldSession::HandleLearnPreviewTalents(WorldPacket& recvPacket)
 
 void WorldSession::HandleTalentWipeConfirmOpcode(WorldPacket & recvData)
 {
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "MSG_TALENT_WIPE_CONFIRM");
 #endif
     uint64 guid;
@@ -61,7 +61,7 @@ void WorldSession::HandleTalentWipeConfirmOpcode(WorldPacket & recvData)
     Creature* unit = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_TRAINER);
     if (!unit)
     {
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleTalentWipeConfirmOpcode - Unit (GUID: %u) not found or you can't interact with him.", uint32(GUID_LOPART(guid)));
 #endif
         return;

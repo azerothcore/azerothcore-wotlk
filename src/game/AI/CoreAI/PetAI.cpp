@@ -61,7 +61,7 @@ void PetAI::_stopAttack()
 {
     if (!me->IsAlive())
     {
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         sLog->outStaticDebug("Creature stoped attacking cuz his dead [guid=%u]", me->GetGUIDLow());
 #endif
         me->GetMotionMaster()->Clear();
@@ -122,7 +122,7 @@ void PetAI::UpdateAI(uint32 diff)
 
         if (_needToStop())
         {
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
             sLog->outStaticDebug("Pet AI stopped attacking [guid=%u]", me->GetGUIDLow());
 #endif
             _stopAttack();

@@ -92,9 +92,10 @@ void Guild::SendCommandResult(WorldSession* session, GuildCommandType type, Guil
     data << uint32(errCode);
     session->SendPacket(&data);
 
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_GUILD, "SMSG_GUILD_COMMAND_RESULT [%s]: Type: %u, code: %u, param: %s", session->GetPlayerInfo().c_str(), type, errCode, param.c_str());
-#endif}
+#endif
+}
 
 void Guild::SendSaveEmblemResult(WorldSession* session, GuildEmblemError errCode)
 {
@@ -102,7 +103,7 @@ void Guild::SendSaveEmblemResult(WorldSession* session, GuildEmblemError errCode
     data << uint32(errCode);
     session->SendPacket(&data);
 
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_GUILD, "MSG_SAVE_GUILD_EMBLEM [%s] Code: %u", session->GetPlayerInfo().c_str(), errCode);
 #endif
 }
@@ -563,14 +564,15 @@ void Guild::BankTab::SendText(Guild const* guild, WorldSession* session) const
 
     if (session)
     {
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         sLog->outDebug(LOG_FILTER_GUILD, "MSG_QUERY_GUILD_BANK_TEXT [%s]: Tabid: %u, Text: %s"
             , session->GetPlayerInfo().c_str(), m_tabId, m_text.c_str());
-#endif        session->SendPacket(&data);
+#endif
+        session->SendPacket(&data);
     }
     else
     {
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         sLog->outDebug(LOG_FILTER_GUILD, "MSG_QUERY_GUILD_BANK_TEXT [Broadcast]: Tabid: %u, Text: %s", m_tabId, m_text.c_str());
 #endif
         guild->BroadcastPacket(&data);
@@ -958,10 +960,11 @@ Item* Guild::BankMoveItemData::StoreItem(SQLTransaction& trans, Item* pItem)
         ItemPosCount pos(*itr);
         ++itr;
 
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         sLog->outDebug(LOG_FILTER_GUILD, "GUILD STORAGE: StoreItem tab = %u, slot = %u, item = %u, count = %u",
             m_container, m_slotId, pItem->GetEntry(), pItem->GetCount());
-#endif        pLastItem = _StoreItem(trans, pTab, pItem, pos, itr != m_vec.end());
+#endif
+        pLastItem = _StoreItem(trans, pTab, pItem, pos, itr != m_vec.end());
     }
     return pLastItem;
 }
@@ -1062,7 +1065,7 @@ void Guild::BankMoveItemData::CanStoreItemInTab(Item* pItem, uint8 skipSlotId, b
 
 InventoryResult Guild::BankMoveItemData::CanStore(Item* pItem, bool swap)
 {
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_GUILD, "GUILD STORAGE: CanStore() tab = %u, slot = %u, item = %u, count = %u",
         m_container, m_slotId, pItem->GetEntry(), pItem->GetCount());
 #endif
@@ -1161,7 +1164,7 @@ bool Guild::Create(Player* pLeader, std::string const& name)
     m_createdDate = ::time(NULL);
     _CreateLogHolders();
 
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_GUILD, "GUILD: creating guild [%s] for leader %s (%u)",
         name.c_str(), pLeader->GetName().c_str(), GUID_LOPART(m_leaderGuid));
 #endif
@@ -1294,7 +1297,7 @@ void Guild::HandleRoster(WorldSession* session)
         itr->second->WritePacket(data, _HasRankRight(session->GetPlayer(), GR_RIGHT_VIEWOFFNOTE));
 
 
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_GUILD, "SMSG_GUILD_ROSTER [%s]", session->GetPlayerInfo().c_str());
 #endif
     session->SendPacket(&data);
@@ -1319,7 +1322,7 @@ void Guild::HandleQuery(WorldSession* session)
     data << uint32(_GetRanksSize());                                // Number of ranks used
 
     session->SendPacket(&data);
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
    sLog->outDebug(LOG_FILTER_GUILD, "SMSG_GUILD_QUERY_RESPONSE [%s]", session->GetPlayerInfo().c_str());
 #endif
 }
@@ -1445,7 +1448,7 @@ void Guild::HandleSetRankInfo(WorldSession* session, uint8 rankId, std::string c
         SendCommandResult(session, GUILD_COMMAND_CHANGE_RANK, ERR_GUILD_PERMISSIONS);
     else if (RankInfo* rankInfo = GetRankInfo(rankId))
     {
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
        sLog->outDebug(LOG_FILTER_GUILD, "Changed RankName to '%s', rights to 0x%08X", name.c_str(), rights);
 #endif
 
@@ -1533,7 +1536,7 @@ void Guild::HandleInviteMember(WorldSession* session, std::string const& name)
 
     SendCommandResult(session, GUILD_COMMAND_INVITE, ERR_GUILD_COMMAND_SUCCESS, name);
 
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
    sLog->outDebug(LOG_FILTER_GUILD, "Player %s invited %s to join his Guild", player->GetName().c_str(), name.c_str());
 #endif
 
@@ -1544,7 +1547,7 @@ void Guild::HandleInviteMember(WorldSession* session, std::string const& name)
     data << player->GetName();
     data << m_name;
     pInvitee->GetSession()->SendPacket(&data);
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
    sLog->outDebug(LOG_FILTER_GUILD, "SMSG_GUILD_INVITE [%s]", pInvitee->GetName().c_str());
 #endif
 }
@@ -1805,7 +1808,7 @@ void Guild::HandleDisband(WorldSession* session)
     if (_IsLeader(session->GetPlayer()))
     {
         Disband();
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
        sLog->outDebug(LOG_FILTER_GUILD, "Guild Successfully Disbanded");
 #endif
         delete this;
@@ -1822,7 +1825,7 @@ void Guild::SendInfo(WorldSession* session) const
     data << m_accountsNumber;                       // Number of accounts
 
     session->SendPacket(&data);
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
    sLog->outDebug(LOG_FILTER_GUILD, "SMSG_GUILD_INFO [%s]", session->GetPlayerInfo().c_str());
 #endif
 }
@@ -1832,7 +1835,7 @@ void Guild::SendEventLog(WorldSession* session) const
     WorldPacket data(MSG_GUILD_EVENT_LOG_QUERY, 1 + m_eventLog->GetSize() * (1 + 8 + 4));
     m_eventLog->WritePacket(data);
     session->SendPacket(&data);
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
    sLog->outDebug(LOG_FILTER_GUILD, "MSG_GUILD_EVENT_LOG_QUERY [%s]", session->GetPlayerInfo().c_str());
 #endif
 }
@@ -1847,7 +1850,7 @@ void Guild::SendBankLog(WorldSession* session, uint8 tabId) const
         data << uint8(tabId);
         pLog->WritePacket(data);
         session->SendPacket(&data);
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
        sLog->outDebug(LOG_FILTER_GUILD, "MSG_GUILD_BANK_LOG_QUERY [%s]", session->GetPlayerInfo().c_str());
 #endif
     }
@@ -1890,7 +1893,7 @@ void Guild::SendPermissions(WorldSession* session) const
     }
 
     session->SendPacket(&data);
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
    sLog->outDebug(LOG_FILTER_GUILD, "MSG_GUILD_PERMISSIONS [%s] Rank: %u", session->GetPlayerInfo().c_str(), rankId);
 #endif
 }
@@ -1905,7 +1908,7 @@ void Guild::SendMoneyInfo(WorldSession* session) const
     WorldPacket data(MSG_GUILD_BANK_MONEY_WITHDRAWN, 4);
     data << int32(amount);
     session->SendPacket(&data);
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
    sLog->outDebug(LOG_FILTER_GUILD, "MSG_GUILD_BANK_MONEY_WITHDRAWN [%s] Money: %u", session->GetPlayerInfo().c_str(), amount);
 #endif
 }
@@ -1918,7 +1921,7 @@ void Guild::SendLoginInfo(WorldSession* session)
     data << m_motd;
     session->SendPacket(&data);
 
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
    sLog->outDebug(LOG_FILTER_GUILD, "SMSG_GUILD_EVENT [%s] MOTD", session->GetPlayerInfo().c_str());
 #endif
 
@@ -2857,7 +2860,7 @@ void Guild::_BroadcastEvent(GuildEvents guildEvent, uint64 guid, const char* par
         data << uint64(guid);
 
     BroadcastPacket(&data);
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
    sLog->outDebug(LOG_FILTER_GUILD, "SMSG_GUILD_EVENT [Broadcast] Event: %u", guildEvent);
 #endif
 }
@@ -2899,10 +2902,11 @@ void Guild::_SendBankList(WorldSession* session /* = NULL*/, uint8 tabId /*= 0*/
             numSlots = _GetMemberRemainingSlots(member, tabId);
         data.put<uint32>(rempos, numSlots);
         session->SendPacket(&data);
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
        sLog->outDebug(LOG_FILTER_GUILD, "SMSG_GUILD_BANK_LIST [%s]: TabId: %u, FullSlots: %u, slots: %d",
                        session->GetPlayerInfo().c_str(), tabId, sendAllSlots, numSlots);
-#endif    }
+#endif
+    }
     else // TODO - Probably this is just sent to session + those that have sent CMSG_GUILD_BANKER_ACTIVATE
     {
         for (Members::const_iterator itr = m_members.begin(); itr != m_members.end(); ++itr)
@@ -2916,10 +2920,11 @@ void Guild::_SendBankList(WorldSession* session /* = NULL*/, uint8 tabId /*= 0*/
             uint32 numSlots = _GetMemberRemainingSlots(itr->second, tabId);
             data.put<uint32>(rempos, numSlots);
             player->GetSession()->SendPacket(&data);
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
            sLog->outDebug(LOG_FILTER_GUILD, "SMSG_GUILD_BANK_LIST [%s]: TabId: %u, FullSlots: %u, slots: %u"
                 , player->GetName().c_str(), tabId, sendAllSlots, numSlots);
-#endif        }
+#endif
+        }
     }
 }
 

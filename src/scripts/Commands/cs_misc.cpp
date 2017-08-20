@@ -1510,7 +1510,7 @@ public:
         if (!playerTarget)
             playerTarget = player;
 
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         sLog->outDetail(handler->GetTrinityString(LANG_ADDITEM), itemId, count);
 #endif
 
@@ -1599,7 +1599,7 @@ public:
         if (!playerTarget)
             playerTarget = player;
 
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         sLog->outDetail(handler->GetTrinityString(LANG_ADDITEMSET), itemSetId);
 #endif
 

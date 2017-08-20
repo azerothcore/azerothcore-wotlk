@@ -46,28 +46,28 @@ void WardenMac::Init(WorldSession *pClient, BigNumber *K)
 
     _inputCrypto.Init(_inputKey);
     _outputCrypto.Init(_outputKey);
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_WARDEN, "Server side warden for client %u initializing...", pClient->GetAccountId());
 #endif
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_WARDEN, "C->S Key: %s", ByteArrayToHexStr(_inputKey, 16).c_str());
 #endif
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_WARDEN, "S->C Key: %s", ByteArrayToHexStr(_outputKey, 16).c_str());
 #endif
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_WARDEN, "  Seed: %s", ByteArrayToHexStr(_seed, 16).c_str());
 #endif
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_WARDEN, "Loading Module...");
 #endif
 
     _module = GetModuleForClient();
 
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_WARDEN, "Module Key: %s", ByteArrayToHexStr(_module->Key, 16).c_str());
 #endif
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_WARDEN, "Module ID: %s", ByteArrayToHexStr(_module->Id, 16).c_str());
 #endif
     RequestModule();
@@ -96,14 +96,14 @@ ClientWardenModule* WardenMac::GetModuleForClient()
 
 void WardenMac::InitializeModule()
 {
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_WARDEN, "Initialize module");
 #endif
 }
 
 void WardenMac::RequestHash()
 {
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_WARDEN, "Request hash");
 #endif
 
@@ -173,14 +173,14 @@ void WardenMac::HandleHashResult(ByteBuffer &buff)
     // Verify key
     if (memcmp(buff.contents() + 1, sha1.GetDigest(), 20) != 0)
     {
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         sLog->outDebug(LOG_FILTER_WARDEN, "Request hash reply: failed");
 #endif
         Penalty();
         return;
     }
 
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_WARDEN, "Request hash reply: succeed");
 #endif
 
@@ -204,7 +204,7 @@ void WardenMac::HandleHashResult(ByteBuffer &buff)
 
 void WardenMac::RequestData()
 {
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_WARDEN, "Request data");
 #endif
 
@@ -230,7 +230,7 @@ void WardenMac::RequestData()
 
 void WardenMac::HandleData(ByteBuffer &buff)
 {
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_WARDEN, "Handle data");
 #endif
 
@@ -265,7 +265,7 @@ void WardenMac::HandleData(ByteBuffer &buff)
 
     if (memcmp(sha1Hash, sha1.GetDigest(), 20))
     {
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         sLog->outDebug(LOG_FILTER_WARDEN, "Handle data failed: SHA1 hash is wrong!");
 #endif
         //found = true;
@@ -282,7 +282,7 @@ void WardenMac::HandleData(ByteBuffer &buff)
 
     if (memcmp(ourMD5Hash, theirsMD5Hash, 16))
     {
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         sLog->outDebug(LOG_FILTER_WARDEN, "Handle data failed: MD5 hash is wrong!");
 #endif
         //found = true;

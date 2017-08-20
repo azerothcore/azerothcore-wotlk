@@ -12,7 +12,7 @@
 
 void WorldSession::HandleGrantLevel(WorldPacket& recvData)
 {
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_GRANT_LEVEL");
 #endif
 
@@ -56,7 +56,7 @@ void WorldSession::HandleGrantLevel(WorldPacket& recvData)
 
 void WorldSession::HandleAcceptGrantLevel(WorldPacket& recvData)
 {
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_ACCEPT_LEVEL_GRANT");
 #endif
 

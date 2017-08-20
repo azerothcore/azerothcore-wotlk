@@ -44,7 +44,7 @@ namespace VMAP
             AreaInfoCallback(ModelInstance* val): prims(val) {}
             void operator()(const Vector3& point, uint32 entry)
             {
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS && VMAP_DEBUG
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS) && defined(VMAP_DEBUG)
                 sLog->outDebug(LOG_FILTER_MAPS, "AreaInfoCallback: trying to intersect '%s'", prims[entry].name.c_str());
 #endif
                 prims[entry].intersectPoint(point, aInfo);
@@ -60,7 +60,7 @@ namespace VMAP
             LocationInfoCallback(ModelInstance* val, LocationInfo &info): prims(val), locInfo(info), result(false) {}
             void operator()(const Vector3& point, uint32 entry)
             {
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS && VMAP_DEBUG
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS) && defined(VMAP_DEBUG)
                 sLog->outDebug(LOG_FILTER_MAPS, "LocationInfoCallback: trying to intersect '%s'", prims[entry].name.c_str());
 #endif
                 if (prims[entry].GetLocationInfo(point, locInfo))
@@ -373,7 +373,7 @@ namespace VMAP
                     {
                         if (!iLoadedSpawns.count(referencedVal))
                         {
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS && VMAP_DEBUG
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS) && defined(VMAP_DEBUG)
                             if (referencedVal > iNTreeValues)
                             {
                                 sLog->outDebug(LOG_FILTER_MAPS, "StaticMapTree::LoadMapTile() : invalid tree element (%u/%u)", referencedVal, iNTreeValues);
@@ -386,7 +386,7 @@ namespace VMAP
                         else
                         {
                             ++iLoadedSpawns[referencedVal];
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS && VMAP_DEBUG
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS) && defined(VMAP_DEBUG)
                             if (iTreeValues[referencedVal].ID != spawn.ID)
                                 sLog->outDebug(LOG_FILTER_MAPS, "StaticMapTree::LoadMapTile() : trying to load wrong spawn in node");
                             else if (iTreeValues[referencedVal].name != spawn.name)

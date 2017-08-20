@@ -14,7 +14,7 @@
 
 void WorldSession::HandleDismissControlledVehicle(WorldPacket &recvData)
 {
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Recvd CMSG_DISMISS_CONTROLLED_VEHICLE");
 #endif
 
@@ -49,7 +49,7 @@ void WorldSession::HandleDismissControlledVehicle(WorldPacket &recvData)
 
 void WorldSession::HandleChangeSeatsOnControlledVehicle(WorldPacket &recvData)
 {
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Recvd CMSG_CHANGE_SEATS_ON_CONTROLLED_VEHICLE");
 #endif
 
@@ -220,7 +220,7 @@ void WorldSession::HandleEjectPassenger(WorldPacket &data)
 
 void WorldSession::HandleRequestVehicleExit(WorldPacket& /*recvData*/)
 {
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Recvd CMSG_REQUEST_VEHICLE_EXIT");
 #endif
 

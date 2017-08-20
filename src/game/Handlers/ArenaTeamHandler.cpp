@@ -19,13 +19,13 @@
 
 void WorldSession::HandleInspectArenaTeamsOpcode(WorldPacket & recvData)
 {
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "MSG_INSPECT_ARENA_TEAMS");
 #endif
 
     uint64 guid;
     recvData >> guid;
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "Inspect Arena stats (GUID: %u TypeId: %u)", GUID_LOPART(guid), GuidHigh2TypeId(GUID_HIPART(guid)));
 #endif
 
@@ -44,7 +44,7 @@ void WorldSession::HandleInspectArenaTeamsOpcode(WorldPacket & recvData)
 
 void WorldSession::HandleArenaTeamQueryOpcode(WorldPacket & recvData)
 {
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_ARENA_TEAM_QUERY");
 #endif
 
@@ -60,7 +60,7 @@ void WorldSession::HandleArenaTeamQueryOpcode(WorldPacket & recvData)
 
 void WorldSession::HandleArenaTeamRosterOpcode(WorldPacket & recvData)
 {
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_ARENA_TEAM_ROSTER");
 #endif
 
@@ -73,7 +73,7 @@ void WorldSession::HandleArenaTeamRosterOpcode(WorldPacket & recvData)
 
 void WorldSession::HandleArenaTeamInviteOpcode(WorldPacket & recvData)
 {
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_ARENA_TEAM_INVITE");
 #endif
 
@@ -145,7 +145,7 @@ void WorldSession::HandleArenaTeamInviteOpcode(WorldPacket & recvData)
         return;
     }
 
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_BATTLEGROUND, "Player %s Invited %s to Join his ArenaTeam", GetPlayer()->GetName().c_str(), invitedName.c_str());
 #endif
 
@@ -156,14 +156,14 @@ void WorldSession::HandleArenaTeamInviteOpcode(WorldPacket & recvData)
     data << arenaTeam->GetName();
     player->GetSession()->SendPacket(&data);
 
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Sent SMSG_ARENA_TEAM_INVITE");
 #endif
 }
 
 void WorldSession::HandleArenaTeamAcceptOpcode(WorldPacket & /*recvData*/)
 {
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_ARENA_TEAM_ACCEPT");                // empty opcode
 #endif
 
@@ -198,7 +198,7 @@ void WorldSession::HandleArenaTeamAcceptOpcode(WorldPacket & /*recvData*/)
 
 void WorldSession::HandleArenaTeamDeclineOpcode(WorldPacket & /*recvData*/)
 {
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_ARENA_TEAM_DECLINE");               // empty opcode
 #endif
 
@@ -208,7 +208,7 @@ void WorldSession::HandleArenaTeamDeclineOpcode(WorldPacket & /*recvData*/)
 
 void WorldSession::HandleArenaTeamLeaveOpcode(WorldPacket & recvData)
 {
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_ARENA_TEAM_LEAVE");
 #endif
 
@@ -252,7 +252,7 @@ void WorldSession::HandleArenaTeamLeaveOpcode(WorldPacket & recvData)
 
 void WorldSession::HandleArenaTeamDisbandOpcode(WorldPacket & recvData)
 {
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_ARENA_TEAM_DISBAND");
 #endif
 
@@ -276,7 +276,7 @@ void WorldSession::HandleArenaTeamDisbandOpcode(WorldPacket & recvData)
 
 void WorldSession::HandleArenaTeamRemoveOpcode(WorldPacket & recvData)
 {
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_ARENA_TEAM_REMOVE");
 #endif
 
@@ -328,7 +328,7 @@ void WorldSession::HandleArenaTeamRemoveOpcode(WorldPacket & recvData)
 
 void WorldSession::HandleArenaTeamLeaderOpcode(WorldPacket & recvData)
 {
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_ARENA_TEAM_LEADER");
 #endif
 

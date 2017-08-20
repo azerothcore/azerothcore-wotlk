@@ -28,7 +28,7 @@ void FormationMgr::AddCreatureToGroup(uint32 groupId, Creature* member)
     //Add member to an existing group
     if (itr != map->CreatureGroupHolder.end())
     {
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         sLog->outDebug(LOG_FILTER_UNITS, "Group found: %u, inserting creature GUID: %u, Group InstanceID %u", groupId, member->GetGUIDLow(), member->GetInstanceId());
 #endif
         itr->second->AddMember(member);
@@ -36,7 +36,7 @@ void FormationMgr::AddCreatureToGroup(uint32 groupId, Creature* member)
     //Create new group
     else
     {
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         sLog->outDebug(LOG_FILTER_UNITS, "Group not found: %u. Creating new group.", groupId);
 #endif
         CreatureGroup* group = new CreatureGroup(groupId);
@@ -47,7 +47,7 @@ void FormationMgr::AddCreatureToGroup(uint32 groupId, Creature* member)
 
 void FormationMgr::RemoveCreatureFromGroup(CreatureGroup* group, Creature* member)
 {
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_UNITS, "Deleting member pointer to GUID: %u from group %u", group->GetId(), member->GetDBTableGUIDLow());
 #endif
     group->RemoveMember(member);
@@ -58,7 +58,7 @@ void FormationMgr::RemoveCreatureFromGroup(CreatureGroup* group, Creature* membe
         if (!map)
             return;
 
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         sLog->outDebug(LOG_FILTER_UNITS, "Deleting group with InstanceID %u", member->GetInstanceId());
 #endif
         map->CreatureGroupHolder.erase(group->GetId());
@@ -139,14 +139,14 @@ void FormationMgr::LoadCreatureFormations()
 
 void CreatureGroup::AddMember(Creature* member)
 {
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_UNITS, "CreatureGroup::AddMember: Adding unit GUID: %u.", member->GetGUIDLow());
 #endif
 
     //Check if it is a leader
     if (member->GetDBTableGUIDLow() == m_groupID)
     {
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         sLog->outDebug(LOG_FILTER_UNITS, "Unit GUID: %u is formation leader. Adding group.", member->GetGUIDLow());
 #endif
         m_leader = member;
@@ -177,7 +177,7 @@ void CreatureGroup::MemberAttackStart(Creature* member, Unit* target)
     for (CreatureGroupMemberType::iterator itr = m_members.begin(); itr != m_members.end(); ++itr)
     {
         //if (m_leader) // avoid crash if leader was killed and reset.
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
             sLog->outDebug(LOG_FILTER_UNITS, "GROUP ATTACK: group instance id %u calls member instid %u", m_leader->GetInstanceId(), member->GetInstanceId());
 #endif
 
@@ -209,7 +209,7 @@ void CreatureGroup::FormationReset(bool dismiss)
                 itr->first->GetMotionMaster()->Initialize();
             else
                 itr->first->GetMotionMaster()->MoveIdle();
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
             sLog->outDebug(LOG_FILTER_UNITS, "Set %s movement for member GUID: %u", dismiss ? "default" : "idle", itr->first->GetGUIDLow());
 #endif
         }

@@ -102,9 +102,10 @@ void LFGPlayerScript::OnMapChanged(Player* player)
             sLFGMgr->LeaveAllLfgQueues(player->GetGUID(), true);
             player->RemoveAurasDueToSpell(LFG_SPELL_LUCK_OF_THE_DRAW);
             player->TeleportTo(player->m_homebindMapId, player->m_homebindX, player->m_homebindY, player->m_homebindZ, 0.0f);
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
             sLog->outDebug(LOG_FILTER_LFG, "LFGPlayerScript::OnMapChanged, Player %s (%u) is in LFG dungeon map but does not have a valid group! Teleporting to homebind.", player->GetName().c_str(), player->GetGUIDLow());
-#endif            return;
+#endif
+            return;
         }
 
         for (GroupReference* itr = group->GetFirstMember(); itr != NULL; itr = itr->next())
@@ -139,7 +140,7 @@ void LFGGroupScript::OnAddMember(Group* group, uint64 guid)
 
     if (leader == guid)
     {
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         sLog->outDebug(LOG_FILTER_LFG, "LFGScripts::OnAddMember [" UI64FMTD "]: added [" UI64FMTD "] leader " UI64FMTD "]", gguid, guid, leader);
 #endif
         sLFGMgr->SetLeader(gguid, guid);
@@ -148,7 +149,7 @@ void LFGGroupScript::OnAddMember(Group* group, uint64 guid)
     {
         LfgState gstate = sLFGMgr->GetState(gguid);
         LfgState state = sLFGMgr->GetState(guid);
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         sLog->outDebug(LOG_FILTER_LFG, "LFGScripts::OnAddMember [" UI64FMTD "]: added [" UI64FMTD "] leader " UI64FMTD "] gstate: %u, state: %u", gguid, guid, leader, gstate, state);
 #endif
 
@@ -179,7 +180,7 @@ void LFGGroupScript::OnRemoveMember(Group* group, uint64 guid, RemoveMethod meth
         return;
 
     uint64 gguid = group->GetGUID();
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_LFG, "LFGScripts::OnRemoveMember [" UI64FMTD "]: remove [" UI64FMTD "] Method: %d Kicker: [" UI64FMTD "] Reason: %s", gguid, guid, method, kicker, (reason ? reason : ""));
 #endif
 
@@ -240,7 +241,7 @@ void LFGGroupScript::OnDisband(Group* group)
         return;
 
     uint64 gguid = group->GetGUID();
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_LFG, "LFGScripts::OnDisband [" UI64FMTD "]", gguid);
 #endif
 
@@ -258,7 +259,7 @@ void LFGGroupScript::OnChangeLeader(Group* group, uint64 newLeaderGuid, uint64 o
 
     uint64 gguid = group->GetGUID();
 
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_LFG, "LFGScripts::OnChangeLeader [" UI64FMTD "]: old [" UI64FMTD "] new [" UI64FMTD "]", gguid, newLeaderGuid, oldLeaderGuid);
 #endif
     sLFGMgr->SetLeader(gguid, newLeaderGuid);
@@ -275,7 +276,7 @@ void LFGGroupScript::OnInviteMember(Group* group, uint64 guid)
 
     uint64 gguid = group->GetGUID();
     uint64 leader = group->GetLeaderGUID();
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_LFG, "LFGScripts::OnInviteMember [" UI64FMTD "]: invite [" UI64FMTD "] leader [" UI64FMTD "]", gguid, guid, leader);
 #endif
     // No gguid ==  new group being formed

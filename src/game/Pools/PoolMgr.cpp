@@ -409,7 +409,7 @@ void PoolGroup<Quest>::Spawn1Object(PoolObject* obj)
     PooledQuestRelationBoundsNC qr = sPoolMgr->mQuestCreatureRelation.equal_range(obj->guid);
     for (PooledQuestRelation::iterator itr = qr.first; itr != qr.second; ++itr)
     {
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         sLog->outDebug(LOG_FILTER_POOLSYS, "PoolGroup<Quest>: Adding quest %u to creature %u", itr->first, itr->second);
 #endif
         questMap->insert(QuestRelations::value_type(itr->second, itr->first));
@@ -420,7 +420,7 @@ void PoolGroup<Quest>::Spawn1Object(PoolObject* obj)
     qr = sPoolMgr->mQuestGORelation.equal_range(obj->guid);
     for (PooledQuestRelation::iterator itr = qr.first; itr != qr.second; ++itr)
     {
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         sLog->outDebug(LOG_FILTER_POOLSYS, "PoolGroup<Quest>: Adding quest %u to GO %u", itr->first, itr->second);
 #endif
         questMap->insert(QuestRelations::value_type(itr->second, itr->first));
@@ -430,7 +430,7 @@ void PoolGroup<Quest>::Spawn1Object(PoolObject* obj)
 template <>
 void PoolGroup<Quest>::SpawnObject(ActivePoolData& spawns, uint32 limit, uint32 triggerFrom)
 {
-#ifdef ENABLE_EXTRAS && ENABLE_EXTRA_LOGS
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_POOLSYS, "PoolGroup<Quest>: Spawning pool %u", poolId);
 #endif
     // load state from db
