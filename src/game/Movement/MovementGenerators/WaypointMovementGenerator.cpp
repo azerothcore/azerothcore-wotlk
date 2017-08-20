@@ -484,8 +484,9 @@ void FlightPathMovementGenerator::PreloadEndGrid()
 #endif
         endMap->LoadGrid(_endGridX, _endGridY);
     }
-    else
+    else {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         sLog->outDetail("Unable to determine map to preload flightmaster grid");
 #endif
+    }
 }
