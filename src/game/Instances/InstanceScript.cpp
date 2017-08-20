@@ -42,10 +42,11 @@ void InstanceScript::HandleGameObject(uint64 GUID, bool open, GameObject* go)
         go = instance->GetGameObject(GUID);
     if (go)
         go->SetGoState(open ? GO_STATE_ACTIVE : GO_STATE_READY);
-    else
+    else {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         sLog->outDebug(LOG_FILTER_TSCR, "TSCR: InstanceScript: HandleGameObject failed");
 #endif
+    }
 }
 
 bool InstanceScript::IsEncounterInProgress() const
@@ -300,10 +301,11 @@ void InstanceScript::DoUpdateWorldState(uint32 uiStateId, uint32 uiStateData)
             if (Player* player = itr->GetSource())
                 player->SendUpdateWorldState(uiStateId, uiStateData);
     }
-    else
+    else {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         sLog->outDebug(LOG_FILTER_TSCR, "TSCR: DoUpdateWorldState attempt send data but no players in map.");
 #endif
+    }
 }
 
 // Send Notify to all players in instance
