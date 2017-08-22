@@ -1290,13 +1290,15 @@ class ScriptMgr
         
     public: /* AllCreatureScript */
 
-        void OnAllCreatureUpdate(Creature* creature, uint32 diff);
+        //listener function (OnAllCreatureUpdate) is called by OnCreatureUpdate
+        //void OnAllCreatureUpdate(Creature* creature, uint32 diff);
         void Creature_SelectLevel(const CreatureTemplate *cinfo, Creature* creature);
 
     public: /* AllMapScript */
 
-        void OnPlayerEnterMapAll(Map* map, Player* player);
-        void OnPlayerLeaveMapAll(Map* map, Player* player);
+        //listener functions are called by OnPlayerEnterMap and OnPlayerLeaveMap
+        //void OnPlayerEnterAll(Map* map, Player* player);
+        //void OnPlayerLeaveAll(Map* map, Player* player);
 
     private:
 
