@@ -66,12 +66,12 @@ void WorldSession::HandleGroupInviteOpcode(WorldPacket& recvData)
 
     Player* player = ObjectAccessor::FindPlayerByName(membername, false);
 
-    // no player
-    if (!player)
+	// no player or cheat self-invite
+    if (!player || player == GetPlayer())
     {
         SendPartyResult(PARTY_OP_INVITE, membername, ERR_BAD_PLAYER_NAME_S);
         return;
-    }
+	}
 
     if (GetPlayer()->IsSpectator() || player->IsSpectator())
     {
