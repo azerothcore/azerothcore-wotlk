@@ -777,6 +777,9 @@ class PlayerScript : public ScriptObject
         // Called when a player's talent points are reset (right before the reset is done)
         virtual void OnTalentsReset(Player* /*player*/, bool /*noCost*/) { }
 
+        // Called for player::update
+        virtual void OnBeforeUpdate(Player* /*player*/, uint32 /*p_time*/){ }
+
         // Called when a player's money is modified (before the modification is done)
         virtual void OnMoneyChanged(Player* /*player*/, int32& /*amount*/) { }
 
@@ -1177,6 +1180,8 @@ class ScriptMgr
 
     public: /* PlayerScript */
 
+
+        void OnBeforePlayerUpdate(Player* player, uint32 p_time);
         void OnPlayerReleasedGhost(Player* player);
         void OnPVPKill(Player* killer, Player* killed);
         void OnCreatureKill(Player* killer, Creature* killed);

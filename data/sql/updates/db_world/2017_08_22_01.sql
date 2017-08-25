@@ -1,3 +1,18 @@
+-- DB update 2017_08_22_00 -> 2017_08_22_01
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2017_08_22_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2017_08_22_00 2017_08_22_01 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1503204010790637500'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
 INSERT INTO version_db_world (`sql_rev`) VALUES ('1503204010790637500');
 
 -- Pet Trainer
@@ -13,3 +28,12 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`,`SourceGroup`,`SourceEntry`,
 (15,4783,   0,0,0,15,0,4,0,0,0,0,0,'','Show gossip menu 4783 option id 0 if player is a Hunter.'),
 (15,4783,   1,0,0,15,0,4,0,0,0,0,0,'','Show gossip menu 4783 option id 1 if player is a Hunter.');
 
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END;
+//
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
