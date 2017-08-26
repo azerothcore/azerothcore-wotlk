@@ -1854,6 +1854,8 @@ void Player::Update(uint32 p_time)
     if (!IsInWorld())
         return;
 
+    sScriptMgr->OnBeforePlayerUpdate(this, p_time);
+
     // undelivered mail
     if (m_nextMailDelivereTime && m_nextMailDelivereTime <= time(NULL))
     {

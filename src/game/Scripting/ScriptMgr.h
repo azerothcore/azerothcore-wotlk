@@ -777,6 +777,9 @@ class PlayerScript : public ScriptObject
         // Called when a player's talent points are reset (right before the reset is done)
         virtual void OnTalentsReset(Player* /*player*/, bool /*noCost*/) { }
 
+        // Called for player::update
+        virtual void OnBeforeUpdate(Player* /*player*/, uint32 /*p_time*/){ }
+
         // Called when a player's money is modified (before the modification is done)
         virtual void OnMoneyChanged(Player* /*player*/, int32& /*amount*/) { }
 
@@ -1177,6 +1180,8 @@ class ScriptMgr
 
     public: /* PlayerScript */
 
+
+        void OnBeforePlayerUpdate(Player* player, uint32 p_time);
         void OnPlayerReleasedGhost(Player* player);
         void OnPVPKill(Player* killer, Player* killed);
         void OnCreatureKill(Player* killer, Creature* killed);
@@ -1290,13 +1295,15 @@ class ScriptMgr
         
     public: /* AllCreatureScript */
 
-        void OnAllCreatureUpdate(Creature* creature, uint32 diff);
+        //listener function (OnAllCreatureUpdate) is called by OnCreatureUpdate
+        //void OnAllCreatureUpdate(Creature* creature, uint32 diff);
         void Creature_SelectLevel(const CreatureTemplate *cinfo, Creature* creature);
 
     public: /* AllMapScript */
 
-        void OnPlayerEnterMapAll(Map* map, Player* player);
-        void OnPlayerLeaveMapAll(Map* map, Player* player);
+        //listener functions are called by OnPlayerEnterMap and OnPlayerLeaveMap
+        //void OnPlayerEnterAll(Map* map, Player* player);
+        //void OnPlayerLeaveAll(Map* map, Player* player);
 
     private:
 

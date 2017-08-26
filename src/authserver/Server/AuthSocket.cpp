@@ -421,29 +421,21 @@ bool AuthSocket::_HandleLogonChallenge()
             bool locked = false;
             if (fields[2].GetUInt8() == 1)                  // if ip is locked
             {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
                 sLog->outDebug(LOG_FILTER_NETWORKIO, "[AuthChallenge] Account '%s' is locked to IP - '%s'", _login.c_str(), fields[3].GetCString());
                 sLog->outDebug(LOG_FILTER_NETWORKIO, "[AuthChallenge] Player address is '%s'", ip_address.c_str());
-#endif
 
                 if (strcmp(fields[4].GetCString(), ip_address.c_str()) != 0)
                 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
                     sLog->outDebug(LOG_FILTER_NETWORKIO, "[AuthChallenge] Account IP differs");
-#endif
                     pkt << uint8(WOW_FAIL_LOCKED_ENFORCED);
                     locked = true;
                 }
                 else
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
                     sLog->outDebug(LOG_FILTER_NETWORKIO, "[AuthChallenge] Account IP matches");
-#endif
             }
             else
             {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
                 sLog->outDebug(LOG_FILTER_NETWORKIO, "[AuthChallenge] Account '%s' is not locked to ip", _login.c_str());
-#endif
                 std::string accountCountry = fields[3].GetString();
                 if (accountCountry.empty() || accountCountry == "00")
                     sLog->outDebug(LOG_FILTER_NETWORKIO, "[AuthChallenge] Account '%s' is not locked to country", _login.c_str());
@@ -486,16 +478,12 @@ bool AuthSocket::_HandleLogonChallenge()
                     if ((*banresult)[0].GetUInt32() == (*banresult)[1].GetUInt32())
                     {
                         pkt << uint8(WOW_FAIL_BANNED);
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
                         sLog->outDebug(LOG_FILTER_NETWORKIO, "'%s:%d' [AuthChallenge] Banned account %s tried to login!", socket().getRemoteAddress().c_str(), socket().getRemotePort(), _login.c_str ());
-#endif
                     }
                     else
                     {
                         pkt << uint8(WOW_FAIL_SUSPENDED);
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
                         sLog->outDebug(LOG_FILTER_NETWORKIO, "'%s:%d' [AuthChallenge] Temporarily banned account %s tried to login!", socket().getRemoteAddress().c_str(), socket().getRemotePort(), _login.c_str ());
-#endif
                     }
                 }
                 else

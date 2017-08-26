@@ -386,18 +386,14 @@ void npc_escortAI::SetRun(bool on)
         if (!m_bIsRunning)
             me->SetWalk(false);
         else
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
             sLog->outDebug(LOG_FILTER_TSCR, "TSCR: EscortAI attempt to set run mode, but is already running.");
-#endif
     }
     else
     {
         if (m_bIsRunning)
             me->SetWalk(true);
         else
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
             sLog->outDebug(LOG_FILTER_TSCR, "TSCR: EscortAI attempt to set walk mode, but is already walking.");
-#endif
     }
 
     m_bIsRunning = on;

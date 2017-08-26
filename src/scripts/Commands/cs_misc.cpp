@@ -1900,7 +1900,7 @@ public:
 
                 stmt->setUInt32(0, ip);
 
-                PreparedQueryResult result2 = WorldDatabase.Query(stmt);
+                PreparedQueryResult result2 = LoginDatabase.Query(stmt);
 
                 if (result2)
                 {
