@@ -1,12 +1,12 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
- */
+* Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
+* Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
+* Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+*/
 
- /** \file
-	 \ingroup world
- */
+/** \file
+    \ingroup world
+*/
 
 #include "Common.h"
 #include "DatabaseEnv.h"
@@ -2097,23 +2097,22 @@ void World::Update(uint32 diff)
 		sObjectAccessor->RemoveOldCorpses();
 	}
 
-    ///- Ping to keep MySQL connections alive
-    if (m_timers[WUPDATE_PINGDB].Passed())
-    {
-        m_timers[WUPDATE_PINGDB].Reset();
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDetail("Ping MySQL to keep connection alive");
-#endif
-        CharacterDatabase.KeepAlive();
-        LoginDatabase.KeepAlive();
-        WorldDatabase.KeepAlive();
-    }
+	///- Process Game events when necessary
+	if (m_timers[WUPDATE_EVENTS].Passed())
+	{
+		m_timers[WUPDATE_EVENTS].Reset();                   // to give time for Update() to be processed
+		uint32 nextGameEvent = sGameEventMgr->Update();
+		m_timers[WUPDATE_EVENTS].SetInterval(nextGameEvent);
+		m_timers[WUPDATE_EVENTS].Reset();
+	}
 
 	///- Ping to keep MySQL connections alive
 	if (m_timers[WUPDATE_PINGDB].Passed())
 	{
 		m_timers[WUPDATE_PINGDB].Reset();
-		;//sLog->outDetail("Ping MySQL to keep connection alive");
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+		sLog->outDetail("Ping MySQL to keep connection alive");
+#endif
 		CharacterDatabase.KeepAlive();
 		LoginDatabase.KeepAlive();
 		WorldDatabase.KeepAlive();
@@ -2766,6 +2765,11 @@ void World::SendAutoBroadcast()
 	else if (abcenter == 2)
 	{
 		sWorld->SendWorldText(LANG_AUTO_BROADCAST, msg.c_str());
+
+		WorldPacket data(SMSG_NOTIFICATION, (msg.size() + 1));
+		data << msg;
+		sWorld->SendGlobalMessage(&data);
+	}
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDetail("AutoBroadcast: '%s'", msg.c_str());
