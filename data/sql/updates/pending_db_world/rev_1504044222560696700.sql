@@ -13,12 +13,6 @@ RETURNS INT UNSIGNED DETERMINISTIC
 RETURN (yy << 24) | ((mm - 1) << 20) | ((dd - 1) << 14);
 
 INSERT INTO holiday_dates VALUES
--- (181, 0, 120700928),
--- (181, 1, 136675328),
--- (181, 2, 154550272),
--- (181, 3, 170967040),
--- (181, 4, 188071936),
--- (181, 5, 204587008),
 (181, 6, 220692480 + (1 << 14)), -- rescheduled
 (181, 7, 238338048 + (1 << 14)),
 (181, 8, 254869504 + (1 << 14)),
@@ -26,16 +20,6 @@ INSERT INTO holiday_dates VALUES
 (181, 10, 288635520), -- 7.2 (PTR) dbc
 (181, 11, 305166976),
 (181, 12, 322271872),
-
--- (201, 0, 71319552),
--- (201, 1, 88080384),
--- (201, 2, 104284160),
--- (201, 3, 121044992),
--- (201, 4, 138461184),
--- (201, 5, 155222016),
--- (201, 6, 171982848),
--- (201, 7, 188743680),
--- (201, 8, 204931072),
 (201, 9, 221723264),
 (201, 10, 238484096),
 (201, 11, 255244928),
@@ -43,14 +27,6 @@ INSERT INTO holiday_dates VALUES
 (201, 13, 289421952),
 (201, 14, 305625728),
 (201, 15, 322386560),
-
--- (321, 0, 92456960),
--- (321, 1, 110118912),
--- (321, 2, 126208000),
--- (321, 3, 142723072),
--- (321, 4, 159823872),
--- (321, 5, 176420864),
--- (321, 6, 193034240),
 (321, 7, 210106368),
 (321, 8, 226704000),
 (321, 9, 243300992),
@@ -58,14 +34,6 @@ INSERT INTO holiday_dates VALUES
 (321, 11, 276970112),
 (321, 12, 294075008),
 (321, 13, 310672000),
-
--- (327, 0, 101104000),
--- (327, 1, 118749568),
--- (327, 2, 135346560),
--- (327, 3, 151386496),
--- (327, 4, 169048448),
--- (327, 5, 184924160),
--- (327, 6, 201684992),
 (327, 7, 218429440 + (7 << 14)),
 (327, 8, 235207296),
 (327, 9, 252967552),
@@ -73,11 +41,6 @@ INSERT INTO holiday_dates VALUES
 (327, 11, 285555328),
 (327, 12, 303184512),
 (327, 13, 319224448),
-
--- (404, 0, 161824832),
--- (404, 1, 178585664),
--- (404, 2, 195346496),
--- (404, 3, 212090944),
 (404, 4, 228997760),
 (404, 5, 245758592),
 (404, 6, 262519424),
@@ -85,10 +48,6 @@ INSERT INTO holiday_dates VALUES
 (404, 8, 296024704),
 (404, 9, 312785536),
 (404, 10, 329661056),
-
--- (423, 0, 168919040),
--- (423, 1, 185679872),
--- (423, 2, 202440704),
 (423, 3, 219185152 + (7 << 14)),
 (423, 4, 236092032),
 (423, 5, 252738176),
@@ -176,17 +135,15 @@ INSERT INTO holiday_dates VALUES
 (375, 25, packDate(23, 03, 31)),
 (376, 25, packDate(23, 04, 28));
 
-UPDATE holiday_dates SET date_value = date_value & ~0x3FFF; -- All holidays start at 00:00 in 3.3.5 + some unneeded bits
+UPDATE holiday_dates SET date_value = date_value & ~0x3FFF;
 
 DROP FUNCTION packDate;
 
 ALTER TABLE game_event ADD COLUMN holidayStage TINYINT UNSIGNED NOT NULL DEFAULT 0 AFTER holiday;
 
-UPDATE game_event SET holiday = 424 WHERE eventEntry = 64; -- Correct Kalu'ak Fishing Derby
+UPDATE game_event SET holiday = 424 WHERE eventEntry = 64;
 UPDATE game_event SET holiday = 0 WHERE eventEntry = 63;
--- UPDATE game_event SET description = 'Call to Arms: Strand of the Ancients' WHERE eventEntry = 53; -- Wrong descriptions
--- UPDATE game_event SET description = 'Call to Arms: Isle of Conquest' WHERE eventEntry = 54;
-UPDATE game_event SET holiday = 374 WHERE eventEntry = 23;  -- Darkmoon construction
+UPDATE game_event SET holiday = 374 WHERE eventEntry = 23;
 UPDATE game_event SET holiday = 375 WHERE eventEntry = 110;
 UPDATE game_event SET holiday = 376 WHERE eventEntry = 62;
 UPDATE game_event SET holidayStage = 1 WHERE eventEntry IN (1, 2, 7, 8, 9, 10, 11, 12, 18, 19, 20, 21, 23, 24, 26, 50, 51, 53, 54, 62, 110);
