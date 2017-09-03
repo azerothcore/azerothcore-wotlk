@@ -554,7 +554,7 @@ public:
                 {
                     if (Creature* mograine = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_MOGRAINE)))
                     {
-                        me->CastSpell(mograine, SPELL_SCARLET_RESURRECTION, true);
+                        DoCast(SPELL_SCARLET_RESURRECTION);
                         Talk(SAY_WH_RESURRECT);
                         canResurrect = false;
                     }
