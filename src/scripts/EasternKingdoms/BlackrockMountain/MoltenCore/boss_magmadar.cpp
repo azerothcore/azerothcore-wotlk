@@ -27,9 +27,9 @@ enum Spells
 {
     SPELL_FRENZY            = 19451,
     SPELL_MAGMA_SPIT        = 19449,
-    SPELL_PANIC                = 19408,
-    SPELL_LAVA_BOMB            = 19428,
-    SPELL_SERRATED_BITE        = 19771,
+    SPELL_PANIC             = 19408,
+    SPELL_LAVA_BOMB         = 19428,
+    SPELL_SERRATED_BITE     = 19771,
 };
 
 enum Events
