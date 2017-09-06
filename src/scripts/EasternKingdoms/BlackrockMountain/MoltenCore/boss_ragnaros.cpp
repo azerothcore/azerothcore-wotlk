@@ -84,7 +84,7 @@ class boss_ragnaros : public CreatureScript
                 _hasSubmergedOnce = false;
                 _isBanished = false;
                 me->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
-				me->SetOrientation(0.8f);
+                me->SetOrientation(0.8f);
             }
 
             void EnterCombat(Unit* victim)

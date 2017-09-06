@@ -89,27 +89,27 @@ class instance_molten_core : public InstanceMapScript
                     case GO_CACHE_OF_THE_FIRELORD:
                         _cacheOfTheFirelordGUID = go->GetGUID();
                         break;
-					case GO_CIRCLE_BARON:
-						_circlesGUIDs[5] = go->GetGUID();
-						break;
-					case GO_CIRCLE_GARR:
-						_circlesGUIDs[3] = go->GetGUID();
-						break;
-					case GO_CIRCLE_GEHENNAS:
-						_circlesGUIDs[2] = go->GetGUID();
-						break;
-					case GO_CIRCLE_GOLEMAGG:
-						_circlesGUIDs[7] = go->GetGUID();
-						break;
-					case GO_CIRCLE_MAGMADAR:
-						_circlesGUIDs[1] = go->GetGUID();
-						break;
-					case GO_CIRCLE_SHAZZRAH:
-						_circlesGUIDs[4] = go->GetGUID();
-						break;
-					case GO_CIRCLE_SULFURON:
-						_circlesGUIDs[6] = go->GetGUID();
-						break;
+                    case GO_CIRCLE_BARON:
+                        _circlesGUIDs[5] = go->GetGUID();
+                        break;
+                    case GO_CIRCLE_GARR:
+                        _circlesGUIDs[3] = go->GetGUID();
+                        break;
+                    case GO_CIRCLE_GEHENNAS:
+                        _circlesGUIDs[2] = go->GetGUID();
+                        break;
+                    case GO_CIRCLE_GOLEMAGG:
+                        _circlesGUIDs[7] = go->GetGUID();
+                        break;
+                    case GO_CIRCLE_MAGMADAR:
+                        _circlesGUIDs[1] = go->GetGUID();
+                        break;
+                    case GO_CIRCLE_SHAZZRAH:
+                        _circlesGUIDs[4] = go->GetGUID();
+                        break;
+                    case GO_CIRCLE_SULFURON:
+                        _circlesGUIDs[6] = go->GetGUID();
+                        break;
                     default:
                         break;
                 }
@@ -158,19 +158,19 @@ class instance_molten_core : public InstanceMapScript
                 if (state == DONE && bossId < BOSS_MAJORDOMO_EXECUTUS)
                     ++_deadBossCount;
 
-				if (state == DONE && bossId < BOSS_MAJORDOMO_EXECUTUS && _circlesGUIDs[bossId])
-				{
-					GameObject * circle = instance->GetGameObject(_circlesGUIDs[bossId]);
-					if (circle && circle->isSpawned())
-						circle->Delete();
-						circle->SetRespawnTime(7 * DAY);
-						_circlesGUIDs[bossId] = 0;
-				}
-					
-				if (state == DONE && bossId == BOSS_MAGMADAR)
-				{
+                if (state == DONE && bossId < BOSS_MAJORDOMO_EXECUTUS && _circlesGUIDs[bossId])
+                {
+                    GameObject * circle = instance->GetGameObject(_circlesGUIDs[bossId]);
+                    if (circle && circle->isSpawned())
+                        circle->Delete();
+                        circle->SetRespawnTime(7 * DAY);
+                        _circlesGUIDs[bossId] = 0;
+                }
+                    
+                if (state == DONE && bossId == BOSS_MAGMADAR)
+                {
 
-				}
+                }
 
                 if (_isLoading)
                     return true;
@@ -273,7 +273,7 @@ class instance_molten_core : public InstanceMapScript
             uint8 _ragnarosAddDeaths;
             bool _isLoading;
             bool _summonedExecutus;
-			std::unordered_map<uint8, uint64> _circlesGUIDs;
+            std::unordered_map<uint8, uint64> _circlesGUIDs;
         };
 
         InstanceScript* GetInstanceScript(InstanceMap* map) const
