@@ -47,11 +47,20 @@ enum Creatures
     NPC_RAGNAROS                    = 11502,
     NPC_FLAMEWAKER_HEALER           = 11663,
     NPC_FLAMEWAKER_ELITE            = 11664,
+    NPC_CORE_RAGER                  = 11672,
+    NPC_CORE_HOUND                  = 11671,
 };
 
 enum GameObjects
 {
     GO_CACHE_OF_THE_FIRELORD        = 179703,
+    GO_CIRCLE_SULFURON              = 178187,
+    GO_CIRCLE_BARON                 = 178188,
+    GO_CIRCLE_SHAZZRAH              = 178189,
+    GO_CIRCLE_GOLEMAGG              = 178190,
+    GO_CIRCLE_GARR                  = 178191,
+    GO_CIRCLE_MAGMADAR              = 178192,
+    GO_CIRCLE_GEHENNAS              = 178193,
 };
 
 enum Data
