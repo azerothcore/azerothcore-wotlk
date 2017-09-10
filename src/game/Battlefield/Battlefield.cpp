@@ -838,7 +838,7 @@ GameObject* Battlefield::SpawnGameObject(uint32 entry, float x, float y, float z
 // ******************* CapturePoint **********************
 // *******************************************************
 
-BfCapturePoint::BfCapturePoint(Battlefield* battlefield) : m_Bf(battlefield), m_capturePoint(NULL)
+BfCapturePoint::BfCapturePoint(Battlefield* battlefield) : m_Bf(battlefield), m_capturePoint(0)
 {
     m_team = TEAM_NEUTRAL;
     m_value = 0;
