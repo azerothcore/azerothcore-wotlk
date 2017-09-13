@@ -311,8 +311,8 @@ bool Vehicle::AddPassenger(Unit* unit, int8 seatId)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         sLog->outDebug(LOG_FILTER_VEHICLES, "Passenger GuidLow: %u, Entry: %u, attempting to board vehicle GuidLow: %u, Entry: %u during uninstall! SeatId: %i", unit->GetGUIDLow(), unit->GetEntry(), _me->GetGUIDLow(), _me->GetEntry(), (int32)seatId);
-        return false;
 #endif
+        return false;
     }
 
     if (unit->GetVehicle() != this)
