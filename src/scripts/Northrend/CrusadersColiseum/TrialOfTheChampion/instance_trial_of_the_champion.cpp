@@ -51,6 +51,7 @@ public:
         uint64 NPC_BlackKnightVehicleGUID;
         uint64 NPC_BlackKnightGUID;
         uint64 GO_MainGateGUID;
+        uint64 GO_PortcullisGUID;
 
         void Initialize()
         {
@@ -78,6 +79,7 @@ public:
             NPC_BlackKnightVehicleGUID = 0;
             NPC_BlackKnightGUID = 0;
             GO_MainGateGUID = 0;
+            GO_PortcullisGUID = 0;
         }
 
         bool IsEncounterInProgress() const
@@ -189,7 +191,10 @@ public:
             {
                 case GO_MAIN_GATE:
                     GO_MainGateGUID = go->GetGUID();
-                    HandleGameObject(GO_MainGateGUID, false, go);
+                    HandleGameObject(go->GetGUID(), false, go);
+                    break;
+                case GO_PORTCULLIS:
+                    GO_PortcullisGUID = go->GetGUID();
                     break;
                 case GO_SOUTH_PORTCULLIS:
                 case GO_EAST_PORTCULLIS:
@@ -446,6 +451,8 @@ public:
                     return NPC_AnnouncerGUID;
                 case DATA_PALETRESS:
                     return NPC_ArgentChampionGUID;
+                case DATA_PORTCULLIS:
+					return GO_PortcullisGUID;
             }
 
             return 0;
@@ -654,9 +661,17 @@ public:
                         bAchievIveHadWorse = false;
                     break;
             }
+            
+            if (uiType != DATA_ACHIEV_IVE_HAD_WORSE)
+            {
+                if (uiData == DONE || uiData == FAIL)
+                    HandleGameObject(GetData64(DATA_PORTCULLIS), true);
+                else if (uiData == IN_PROGRESS)
+                    HandleGameObject(GetData64(DATA_PORTCULLIS), false);
 
             if( uiData == DONE )
                 SaveToDB();
+            }
         }
 
         void DoSummonGrandChampion(uint32 BossNumber, uint8 BossOrder)
