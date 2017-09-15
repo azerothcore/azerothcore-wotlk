@@ -977,46 +977,49 @@ void Spell::SelectImplicitChannelTargets(SpellEffIndex effIndex, SpellImplicitTa
         return;
     }
 
-    switch (targetType.GetTarget())
-    {
-        case TARGET_UNIT_CHANNEL_TARGET:
-        {
-            // Xinef: All channel selectors have needed data passed in m_targets structure
-            WorldObject* target = m_targets.GetObjectTargetChannel(m_caster);
-            if (target)
-            {
-                CallScriptObjectTargetSelectHandlers(target, effIndex, targetType);
-                // unit target may be no longer avalible - teleported out of map for example
-                if (target && target->ToUnit())
-                    AddUnitTarget(target->ToUnit(), 1 << effIndex);
-            }
-            else
+	switch (targetType.GetTarget())
+	{
+	case TARGET_UNIT_CHANNEL_TARGET:
+	{
+		// Xinef: All channel selectors have needed data passed in m_targets structure
+		WorldObject* target = m_targets.GetObjectTargetChannel(m_caster);
+		if (target)
+		{
+			CallScriptObjectTargetSelectHandlers(target, effIndex, targetType);
+			// unit target may be no longer avalible - teleported out of map for example
+			if (target && target->ToUnit())
+				AddUnitTarget(target->ToUnit(), 1 << effIndex);
+		}
+		else {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "SPELL: cannot find channel spell target for spell ID %u, effect %u", m_spellInfo->Id, effIndex);
+			sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "SPELL: cannot find channel spell target for spell ID %u, effect %u", m_spellInfo->Id, effIndex);
 #endif
-            break;
-        }
-        case TARGET_DEST_CHANNEL_TARGET:
-            if (m_targets.HasDstChannel())
-                m_targets.SetDst(*m_targets.GetDstChannel());
-            else if (WorldObject* target = m_targets.GetObjectTargetChannel(m_caster))
-            {
-                CallScriptObjectTargetSelectHandlers(target, effIndex, targetType);
-                if (target)
-                    m_targets.SetDst(*target);
-            }
-            else //if (!m_targets.HasDst())
+		}
+		break;
+	}
+	case TARGET_DEST_CHANNEL_TARGET:
+		if (m_targets.HasDstChannel())
+			m_targets.SetDst(*m_targets.GetDstChannel());
+		else if (WorldObject* target = m_targets.GetObjectTargetChannel(m_caster))
+		{
+			CallScriptObjectTargetSelectHandlers(target, effIndex, targetType);
+			if (target)
+				m_targets.SetDst(*target);
+		}
+		else //if (!m_targets.HasDst())
+		{
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "SPELL: cannot find channel spell destination for spell ID %u, effect %u", m_spellInfo->Id, effIndex);
+			sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "SPELL: cannot find channel spell destination for spell ID %u, effect %u", m_spellInfo->Id, effIndex);
 #endif
-            break;
-        case TARGET_DEST_CHANNEL_CASTER:
-            if (GetOriginalCaster())
-                m_targets.SetDst(*GetOriginalCaster());
-            break;
-        default:
-            ASSERT(false && "Spell::SelectImplicitChannelTargets: received not implemented target type");
-            break;
+		}
+        break;
+    case TARGET_DEST_CHANNEL_CASTER:
+        if (GetOriginalCaster())
+            m_targets.SetDst(*GetOriginalCaster());
+        break;
+    default:
+        ASSERT(false && "Spell::SelectImplicitChannelTargets: received not implemented target type");
+        break;
     }
 }
 
