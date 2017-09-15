@@ -688,13 +688,17 @@ public:
             }
             else if (map->IsDungeon())
             {
-                // pussywizard: prevent unbinding normal player's perm bind by just summoning him >_>
-                if (!target->GetSession()->GetSecurity())
-                {
-                    handler->PSendSysMessage("Only GMs can be summoned to an instance!");
-                    handler->SetSentErrorMessage(true);
-                    return false;
-                }
+				// Allow GM to summon players or only other GM accounts inside instances.
+				if (!sWorld->getBoolConfig(CONFIG_INSTANCE_GMSUMMON_PLAYER))
+				{
+					// pussywizard: prevent unbinding normal player's perm bind by just summoning him >_>
+					if (!target->GetSession()->GetSecurity())
+					{
+						handler->PSendSysMessage("Only GMs can be summoned to an instance!");
+						handler->SetSentErrorMessage(true);
+						return false;
+					}
+				}
 
                 Map* destMap = target->GetMap();
 
