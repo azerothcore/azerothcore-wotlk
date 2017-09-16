@@ -723,8 +723,8 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     // NOTE: ATM the socket is singlethread, have this in mind ...
     uint8 digest[20];
     uint32 clientSeed;
-    uint32 unk2, unk3, unk5, unk6, unk7;
-    uint64 unk4;
+    uint32 loginServerID, loginServerType, regionID, battlegroupID, realm;
+    uint64 DosResponse;
     uint32 BuiltNumberClient;
     uint32 id, security;
     bool skipQueue = false;
@@ -748,16 +748,18 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
 
     // Read the content of the packet
     recvPacket >> BuiltNumberClient;                        // for now no use
-    recvPacket >> unk2;
+    recvPacket >> loginServerID;
     recvPacket >> account;
-    recvPacket >> unk3;
+    recvPacket >> loginServerType;
     recvPacket >> clientSeed;
-    recvPacket >> unk5 >> unk6 >> unk7;
-    recvPacket >> unk4;
+    recvPacket >> loginServerType;
+    recvPacket >> regionID;
+    recvPacket >> realm;
+    recvPacket >> DosResponse;
     recvPacket.read(digest, 20);
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outStaticDebug ("WorldSocket::HandleAuthSession: client %u, unk2 %u, account %s, unk3 %u, clientseed %u", BuiltNumberClient, unk2, account.c_str(), unk3, clientSeed);
+    sLog->outStaticDebug ("WorldSocket::HandleAuthSession: client %u, loginServerID %u, account %s, loginServerType %u, clientseed %u", BuiltNumberClient, loginServerID, account.c_str(), loginServerType, clientSeed);
 #endif
     // Get the account information from the realmd database
     //         0           1        2       3        4            5         6       7          8      9
@@ -947,6 +949,28 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     ACE_NEW_RETURN (m_Session, WorldSession (id, this, AccountTypes(security), expansion, mutetime, locale, recruiter, isRecruiter, skipQueue), -1);
 
     m_Crypt.Init(&k);
+
+    // First reject the connection if packet contains invalid data or realm state doesn't allow logging in
+    if (sWorld->IsClosed())
+    {
+        packet.Initialize (SMSG_AUTH_RESPONSE, 1);
+        packet << uint8 (AUTH_REJECT);
+        SendPacket(packet);
+
+        sLog->outError("network", "WorldSocket::HandleAuthSession: World closed, denying client (%s).", address.c_str());
+        return -1;
+    }
+
+    if (realm != realmID)
+    {
+        packet.Initialize (SMSG_AUTH_RESPONSE, 1);
+        packet << uint8 (REALM_LIST_REALM_NOT_FOUND);
+        SendPacket(packet);
+
+        sLog->outError("network", "WorldSocket::HandleAuthSession: Client %s requested connecting with realm id %u but this realm has id %u set in config.",
+            address.c_str(), realm, realmID);
+        return -1;
+    }
 
     m_Session->LoadGlobalAccountData();
     m_Session->LoadTutorialsData();
