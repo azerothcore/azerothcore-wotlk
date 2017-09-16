@@ -34,7 +34,7 @@ void EscortMovementGenerator<T>::DoInitialize(T* unit)
 template<class T>
 bool EscortMovementGenerator<T>::DoUpdate(T* unit, uint32 diff)
 {
-    if (!&unit)
+    if (!unit)
         return false;
 
     if (unit->HasUnitState(UNIT_STATE_ROOT | UNIT_STATE_STUNNED))

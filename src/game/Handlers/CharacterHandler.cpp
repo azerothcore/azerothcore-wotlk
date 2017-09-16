@@ -1159,7 +1159,7 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder* holder)
         {
             if (!itr->second->GetRecruiterId() && !itr->second->IsARecruiter())
                 continue;
-            if (isReferrer && pCurrChar->GetSession()->GetAccountId() == itr->second->GetRecruiterId() || !isReferrer && pCurrChar->GetSession()->GetRecruiterId() == itr->second->GetAccountId())
+            if ((isReferrer && pCurrChar->GetSession()->GetAccountId() == itr->second->GetRecruiterId()) || (!isReferrer && pCurrChar->GetSession()->GetRecruiterId() == itr->second->GetAccountId()))
             {
                 Player * rf = itr->second->GetPlayer();
                 if (rf != NULL)
@@ -2134,8 +2134,8 @@ void WorldSession::HandleCharFactionOrRaceChange(WorldPacket& recvData)
 
     // xinef: check money
     bool valid = Player::TeamIdForRace(oldRace) == Player::TeamIdForRace(race);
-    if (level < 10 && money <= 0 || level > 10 && level <= 30 && money <= 3000000 || level > 30 && level <= 50 && money <= 10000000 ||
-        level > 50 && level <= 70 && money <= 50000000 || level > 70 && money <= 200000000)
+    if ((level < 10 && money <= 0) || (level > 10 && level <= 30 && money <= 3000000 ) || (level > 30 && level <= 50 && money <= 10000000) ||
+        (level > 50 && level <= 70 && money <= 50000000) || (level > 70 && money <= 200000000))
         valid = true;
     if (!valid)
     {

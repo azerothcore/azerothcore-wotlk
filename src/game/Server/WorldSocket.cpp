@@ -957,7 +957,7 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
         packet << uint8 (AUTH_REJECT);
         SendPacket(packet);
 
-        sLog->outError("network", "WorldSocket::HandleAuthSession: World closed, denying client (%s).", address.c_str());
+        sLog->outError("WorldSocket::HandleAuthSession: World closed, denying client (%s).", address.c_str());
         return -1;
     }
 
@@ -967,7 +967,7 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
         packet << uint8 (REALM_LIST_REALM_NOT_FOUND);
         SendPacket(packet);
 
-        sLog->outError("network", "WorldSocket::HandleAuthSession: Client %s requested connecting with realm id %u but this realm has id %u set in config.",
+        sLog->outError("WorldSocket::HandleAuthSession: Client %s requested connecting with realm id %u but this realm has id %u set in config.",
             address.c_str(), realm, realmID);
         return -1;
     }

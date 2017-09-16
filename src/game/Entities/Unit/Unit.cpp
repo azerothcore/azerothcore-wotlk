@@ -149,10 +149,8 @@ _hitMask(hitMask), _spell(spell), _damageInfo(damageInfo), _healInfo(healInfo), 
 #endif
 Unit::Unit(bool isWorldObject) : WorldObject(isWorldObject),
 m_movedByPlayer(NULL), m_lastSanctuaryTime(0), IsAIEnabled(false), NeedChangeAI(false),
-m_ControlledByPlayer(false), m_CreatedByPlayer(false), movespline(new Movement::MoveSpline()), i_AI(NULL),
-i_disabledAI(NULL), m_procDeep(0), m_removedAurasCount(0), i_motionMaster(new MotionMaster(this)), m_regenTimer(0),
-m_ThreatManager(this), m_vehicle(NULL), m_vehicleKit(NULL), m_unitTypeMask(UNIT_MASK_NONE),
-m_HostileRefManager(this), m_AutoRepeatFirstCast(false), m_realRace(0), m_race(0)
+m_ControlledByPlayer(false), m_CreatedByPlayer(false), movespline(new Movement::MoveSpline()), i_AI(NULL), i_disabledAI(NULL), m_realRace(0), m_race(0), m_AutoRepeatFirstCast(false), m_procDeep(0), m_removedAurasCount(0),
+i_motionMaster(new MotionMaster(this)), m_regenTimer(0), m_ThreatManager(this), m_vehicle(NULL), m_vehicleKit(NULL), m_unitTypeMask(UNIT_MASK_NONE), m_HostileRefManager(this)
 {
 #ifdef _MSC_VER
 #pragma warning(default:4355)
@@ -3308,9 +3306,7 @@ void Unit::SetCurrentCastedSpell(Spell* pSpell)
 }
 
 void Unit::InterruptSpell(CurrentSpellTypes spellType, bool withDelayed, bool withInstant, bool bySelf)
-{ 
-    ASSERT(spellType < CURRENT_MAX_SPELL);
-
+{
     //sLog->outDebug(LOG_FILTER_UNITS, "Interrupt spell for unit %u.", GetEntry());
     Spell* spell = m_currentSpells[spellType];
     if (spell
@@ -3431,13 +3427,13 @@ bool Unit::isInAccessiblePlaceFor(Creature const* c) const
     else if (c->GetMapId() == 631) // Icecrown Citadel
     {
         // if static transport doesn't match - return false
-        if (c->GetTransport() != this->GetTransport() && (c->GetTransport() && c->GetTransport()->IsStaticTransport() || this->GetTransport() && this->GetTransport()->IsStaticTransport()))
+        if (c->GetTransport() != this->GetTransport() && ((c->GetTransport() && c->GetTransport()->IsStaticTransport()) || (this->GetTransport() && this->GetTransport()->IsStaticTransport())))
             return false;
 
         // special handling for ICC (map 631), for non-flying pets in Gunship Battle, for trash npcs this is done via CanAIAttack
         if (IS_PLAYER_GUID(c->GetOwnerGUID()) && !c->CanFly()) 
         {
-            if (c->GetTransport() && !this->GetTransport() || !c->GetTransport() && this->GetTransport())
+            if ((c->GetTransport() && !this->GetTransport()) || (!c->GetTransport() && this->GetTransport()))
                 return false;
             if (this->GetTransport())
             {
@@ -3694,7 +3690,7 @@ void SafeUnitPointer::UnitDeleted()
     {
         if (Player* p = defaultValue->ToPlayer())
         {
-            sLog->outMisc("SafeUnitPointer::UnitDeleted (A1) - %u, %u, %u, %u, %u, %u, %u, %u", p->GetGUIDLow(), p->GetMapId(), p->GetInstanceId(), p->FindMap(), p->IsInWorld() ? 1 : 0, p->IsDuringRemoveFromWorld() ? 1 : 0, p->IsBeingTeleported() ? 1 : 0, p->isBeingLoaded() ? 1 : 0);
+            sLog->outMisc("SafeUnitPointer::UnitDeleted (A1) - %u, %u, %u, %u, %u, %u, %u, %u", p->GetGUIDLow(), p->GetMapId(), p->GetInstanceId(), p->FindMap()->GetId(), p->IsInWorld() ? 1 : 0, p->IsDuringRemoveFromWorld() ? 1 : 0, p->IsBeingTeleported() ? 1 : 0, p->isBeingLoaded() ? 1 : 0);
             if (ptr)
                 sLog->outMisc("SafeUnitPointer::UnitDeleted (A2)");
 
@@ -3722,7 +3718,7 @@ void Unit::HandleSafeUnitPointersOnDelete(Unit* thisUnit)
 bool Unit::IsInWater(bool allowAbove) const
 { 
     const_cast<Unit*>(this)->UpdateEnvironmentIfNeeded(1);
-    return m_last_isinwater_status || allowAbove && m_last_islittleabovewater_status;
+    return m_last_isinwater_status || (allowAbove && m_last_islittleabovewater_status);
 }
 
 bool Unit::IsUnderWater() const
@@ -8154,7 +8150,7 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
                     case 40336:
                     {
                         // On successful melee or ranged attack gain $29471s1 mana and if possible drain $27526s1 mana from the target.
-                        if (this && IsAlive())
+                        if (IsAlive())
                             CastSpell(this, 29471, true, castItem, triggeredByAura);
                         if (victim && victim->IsAlive())
                             CastSpell(victim, 27526, true, castItem, triggeredByAura);
@@ -10450,7 +10446,7 @@ float Unit::SpellPctDamageModsDone(Unit* victim, SpellInfo const* spellProto, Da
                 // Merciless Combat
                 if ((*i)->GetSpellInfo()->SpellIconID == 2656)
                 {
-                    if( spellProto && spellProto->SpellFamilyFlags[0] & 0x2 || spellProto->SpellFamilyFlags[1] & 0x2 )
+                    if( (spellProto && spellProto->SpellFamilyFlags[0] & 0x2) || spellProto->SpellFamilyFlags[1] & 0x2 )
                         if (!victim->HealthAbovePct(35))
                             AddPct(DoneTotalMod, (*i)->GetAmount());
                 }
@@ -11000,6 +10996,8 @@ float Unit::SpellDoneCritChance(Unit const* /*victim*/, SpellInfo const* spellPr
                     case BASE_ATTACK:   crit_chance = GetFloatValue(PLAYER_CRIT_PERCENTAGE);            break;
                     case OFF_ATTACK:    crit_chance = GetFloatValue(PLAYER_OFFHAND_CRIT_PERCENTAGE);    break;
                     case RANGED_ATTACK: crit_chance = GetFloatValue(PLAYER_RANGED_CRIT_PERCENTAGE); break;
+                    default:
+                        break;
                 }
             }
             else
@@ -18661,8 +18659,8 @@ class AuraMunchingQueue : public BasicEvent
         }
 
     private:
-        uint64 _targetGUID;
         Unit& _owner;
+        uint64 _targetGUID;
         int32 _basePoints;
         uint32 _spellId;
 };

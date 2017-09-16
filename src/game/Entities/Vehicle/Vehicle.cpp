@@ -395,8 +395,8 @@ bool Vehicle::AddPassenger(Unit* unit, int8 seatId)
         catch (...)
         {
             sLog->outString("ZOMG! CRASH! Try-catch in Unit::SetCharmedBy()!");
-            sLog->outString("ZOMG! CRASH! Try-catch in Unit::SetCharmedBy(). not null: %u, this not null: %u", _me ? 1 : 0, this ? 1 : 0);
-            if (!_me || !this)
+            sLog->outString("ZOMG! CRASH! Try-catch in Unit::SetCharmedBy(). not null: %u", _me ? 1 : 0);
+            if (!_me)
                 return false;
             sLog->outString("ZOMG! CRASH! Try-catch in Unit::SetCharmedBy(). Is: %u!", _me->IsInWorld());
             sLog->outString("ZOMG! CRASH! Try-catch in Unit::SetCharmedBy(). Is2: %u!", _me->IsDuringRemoveFromWorld());

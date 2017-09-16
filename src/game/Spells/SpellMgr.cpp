@@ -5000,7 +5000,7 @@ void SpellMgr::LoadDbcDataCorrections()
             spellInfo->EffectRadiusIndex[1] = 12;
             spellInfo->EffectImplicitTargetA[2] = TARGET_SRC_CASTER;
             spellInfo->EffectImplicitTargetB[2] = TARGET_UNIT_SRC_AREA_ENTRY;
-            spellInfo->EffectRadiusIndex[3] = 12;
+            spellInfo->EffectRadiusIndex[2] = 12;
             break;
         // Trial of the Champion, Desecration
         case 67778:

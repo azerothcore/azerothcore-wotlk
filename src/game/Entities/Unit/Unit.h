@@ -1240,12 +1240,11 @@ struct CharmInfo
         bool _isAtStay;
         bool _isFollowing;
         bool _isReturning;
+        int32 _forcedSpellId;
+        uint64 _forcedTargetGUID;
         float _stayX;
         float _stayY;
         float _stayZ;
-
-        int32 _forcedSpellId;
-        uint64 _forcedTargetGUID;
 
         GlobalCooldownMgr _GlobalCooldownMgr;
 };
