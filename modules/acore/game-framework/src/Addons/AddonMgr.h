@@ -36,10 +36,10 @@ struct SavedAddon
 
 struct BannedAddon
 {
-	uint32 Id;
-	uint8 NameMD5[16];
-	uint8 VersionMD5[16];
-	uint32 Timestamp;
+    uint32 Id;
+    uint8 NameMD5[16];
+    uint8 VersionMD5[16];
+    uint32 Timestamp;
 };
 
 #define STANDARD_ADDON_CRC 0x4c1c776d
@@ -50,8 +50,8 @@ namespace AddonMgr
     void SaveAddon(AddonInfo const& addon);
     SavedAddon const* GetAddonInfo(const std::string& name);
 
-	typedef std::list<BannedAddon> BannedAddonList;
-	BannedAddonList const* GetBannedAddons();
+    typedef std::list<BannedAddon> BannedAddonList;
+    BannedAddonList const* GetBannedAddons();
 }
 
 #endif
