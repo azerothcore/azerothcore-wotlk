@@ -1053,6 +1053,8 @@ class spell_item_oracle_ablutions : public SpellScriptLoader
                     case POWER_ENERGY:
                         caster->CastSpell(caster, SPELL_ABLUTION_ENERGY, true);
                         break;
+                    default:
+                        break;
                 }
                 if (Player* player = caster->ToPlayer())
                 {

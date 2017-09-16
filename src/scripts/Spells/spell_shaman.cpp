@@ -662,7 +662,7 @@ class spell_sha_earth_shield : public SpellScriptLoader
                         AddPct(amount, glyphe->GetAmount());
 
                     // xinef: Improved Shields
-                    if (baseAmount = amount - baseAmount)
+                    if ((baseAmount = amount - baseAmount))
                         if (AuraEffect* aurEff = caster->GetAuraEffect(SPELL_AURA_ADD_PCT_MODIFIER, SPELLFAMILY_SHAMAN, 19, EFFECT_1))
                         {
                             ApplyPct(baseAmount, aurEff->GetAmount());

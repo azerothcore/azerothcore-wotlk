@@ -391,8 +391,8 @@ void BattlegroundQueue::FillPlayersToBG(const int32 aliFree, const int32 hordeFr
 
     // quick check if nothing we can do:
     if (!sBattlegroundMgr->isTesting())
-        if (aliFree > hordeFree && m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_ALLIANCE].empty() ||
-            hordeFree > aliFree && m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_HORDE].empty())
+        if ((aliFree > hordeFree && m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_ALLIANCE].empty()) ||
+            (hordeFree > aliFree && m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_HORDE].empty()))
             return;
 
     // ally: at first fill as much as possible
@@ -447,8 +447,8 @@ void BattlegroundQueue::FillPlayersToBGWithSpecific(const int32 aliFree, const i
 
     // quick check if nothing we can do:
     if (!sBattlegroundMgr->isTesting())
-        if (m_QueuedGroups[thisBracketId][BG_QUEUE_NORMAL_ALLIANCE].empty() && specificQueue->m_QueuedGroups[specificBracketId][BG_QUEUE_NORMAL_ALLIANCE].empty() ||
-            m_QueuedGroups[thisBracketId][BG_QUEUE_NORMAL_HORDE].empty() && specificQueue->m_QueuedGroups[specificBracketId][BG_QUEUE_NORMAL_HORDE].empty())
+        if ((m_QueuedGroups[thisBracketId][BG_QUEUE_NORMAL_ALLIANCE].empty() && specificQueue->m_QueuedGroups[specificBracketId][BG_QUEUE_NORMAL_ALLIANCE].empty()) ||
+            (m_QueuedGroups[thisBracketId][BG_QUEUE_NORMAL_HORDE].empty() && specificQueue->m_QueuedGroups[specificBracketId][BG_QUEUE_NORMAL_HORDE].empty()))
             return;
 
     // copy groups from both queues to new joined container
