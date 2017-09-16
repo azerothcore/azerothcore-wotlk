@@ -1012,15 +1012,15 @@ void Spell::SelectImplicitChannelTargets(SpellEffIndex effIndex, SpellImplicitTa
 			sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "SPELL: cannot find channel spell destination for spell ID %u, effect %u", m_spellInfo->Id, effIndex);
 #endif
 		}
-		break;
-	case TARGET_DEST_CHANNEL_CASTER:
-		if (GetOriginalCaster())
-			m_targets.SetDst(*GetOriginalCaster());
-		break;
-	default:
-		ASSERT(false && "Spell::SelectImplicitChannelTargets: received not implemented target type");
-		break;
-	}
+        break;
+    case TARGET_DEST_CHANNEL_CASTER:
+        if (GetOriginalCaster())
+            m_targets.SetDst(*GetOriginalCaster());
+        break;
+    default:
+        ASSERT(false && "Spell::SelectImplicitChannelTargets: received not implemented target type");
+        break;
+    }
 }
 
 void Spell::SelectImplicitNearbyTargets(SpellEffIndex effIndex, SpellImplicitTargetInfo const& targetType, uint32 effMask)
