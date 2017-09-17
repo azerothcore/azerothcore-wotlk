@@ -1090,7 +1090,7 @@ void WorldSession::SendAddonsInfo()
         data << uint32(1);  // IsBanned
     }
 
-SendPacket(&data);
+    SendPacket(&data);
 }
 
 void WorldSession::SetPlayer(Player* player)
