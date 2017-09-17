@@ -317,7 +317,7 @@ public:
         boss_thorimAI(Creature* pCreature) : ScriptedAI(pCreature), summons(me)
         {
             m_pInstance = pCreature->GetInstanceScript();
-            if (_encounterFinished = (!me->IsAlive()))
+            if ((_encounterFinished = (!me->IsAlive())))
                 if (m_pInstance)
                     m_pInstance->SetData(TYPE_THORIM, DONE);
         }
@@ -406,18 +406,18 @@ public:
         void CloseDoors()
         {
             GameObject* go;
-            if (go = GetThorimObject(DATA_THORIM_LEVER))
+            if ((go = GetThorimObject(DATA_THORIM_LEVER)))
             {
                 go->SetUInt32Value(GAMEOBJECT_FLAGS, 48);
                 go->SetGoState(GO_STATE_READY);
             }
-            if (go = GetThorimObject(DATA_THORIM_FIRST_DOORS))
+            if ((go = GetThorimObject(DATA_THORIM_FIRST_DOORS)))
                 go->SetGoState(GO_STATE_READY);
 
-            if (go = GetThorimObject(DATA_THORIM_SECOND_DOORS))
+            if ((go = GetThorimObject(DATA_THORIM_SECOND_DOORS)))
                 go->SetGoState(GO_STATE_READY);
 
-            if (go = GetThorimObject(DATA_THORIM_FENCE))
+            if ((go = GetThorimObject(DATA_THORIM_FENCE)))
                 go->SetGoState(GO_STATE_ACTIVE);
         }
 
@@ -572,14 +572,14 @@ public:
                     events.ScheduleEvent(EVENT_THORIM_OUTRO1, 2000, 0, EVENT_PHASE_OUTRO);
 
                     GameObject* go = NULL;
-                    if (go = GetThorimObject(DATA_THORIM_FENCE))
+                    if ((go = GetThorimObject(DATA_THORIM_FENCE)))
                         go->SetGoState(GO_STATE_ACTIVE);
 
                     uint32 chestId = me->GetMap()->Is25ManRaid() ? GO_THORIM_CHEST_HERO : GO_THORIM_CHEST;
                     if (_hardMode)
                         chestId += 1; // hard mode offset
 
-                    if (go = me->SummonGameObject(chestId, 2134.73f, -286.32f, 419.51f, 0.0f, 0, 0, 0, 0, 0))
+                    if ((go = me->SummonGameObject(chestId, 2134.73f, -286.32f, 419.51f, 0.0f, 0, 0, 0, 0, 0)))
                         go->SetUInt32Value(GAMEOBJECT_FLAGS, 0);
 
                     // Defeat credit
@@ -602,7 +602,7 @@ public:
             for (uint8 i = 0; i < (_spawnCommoners ? 7 : 2); ++i)
             {
                 rnd = urand(0, 13);
-                if (cr = me->SummonCreature((_spawnCommoners ? NPC_DARK_RUNE_COMMONER : RollTable[urand(0,2)]), ArenaNPCs[rnd], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000))
+                if ((cr = me->SummonCreature((_spawnCommoners ? NPC_DARK_RUNE_COMMONER : RollTable[urand(0,2)]), ArenaNPCs[rnd], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000)))
                     cr->GetMotionMaster()->MoveJump(
                         Middle.GetPositionX()+urand(19,24)*cos(Middle.GetAngle(cr)),
                         Middle.GetPositionY()+urand(19,24)*sin(Middle.GetAngle(cr)),
@@ -1405,14 +1405,14 @@ public:
             events.ScheduleEvent(EVENT_RC_RUNIC_SMASH, 0);
             Creature* c;
 
-            if (c = me->SummonCreature(33140, 2221, -385, me->GetPositionZ()))
+            if ((c = me->SummonCreature(33140, 2221, -385, me->GetPositionZ())))
                 _triggerRightGUID[0] = c->GetGUID();
-            if (c = me->SummonCreature(33140, 2210, -385, me->GetPositionZ()))
+            if ((c = me->SummonCreature(33140, 2210, -385, me->GetPositionZ())))
                 _triggerRightGUID[1] = c->GetGUID();
 
-            if (c = me->SummonCreature(33141, 2235, -385, me->GetPositionZ()))
+            if ((c = me->SummonCreature(33141, 2235, -385, me->GetPositionZ())))
                 _triggerLeftGUID[0] = c->GetGUID();
-            if (c = me->SummonCreature(33141, 2246, -385, me->GetPositionZ()))
+            if ((c = me->SummonCreature(33141, 2246, -385, me->GetPositionZ())))
                 _triggerLeftGUID[1] = c->GetGUID();
         }
 

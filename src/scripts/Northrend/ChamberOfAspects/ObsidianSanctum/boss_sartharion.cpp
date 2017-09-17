@@ -262,7 +262,7 @@ public:
             {
                 Unit* cr = NULL;
                 for (uint8 i = 0; i < 3; ++i)
-                    if (cr = ObjectAccessor::GetUnit(*me, pInstance->GetData64(DATA_TENEBRON+i)))
+                    if ((cr = ObjectAccessor::GetUnit(*me, pInstance->GetData64(DATA_TENEBRON+i))))
                     {
                         if (!cr->IsAlive())
                             continue;
@@ -301,7 +301,7 @@ public:
                 Creature* cr = NULL;
                 for (uint8 i = 0; i < 3; ++i)
                     if (dragons[i])
-                        if (cr = ObjectAccessor::GetCreature(*me, dragons[i]))
+                        if ((cr = ObjectAccessor::GetCreature(*me, dragons[i])))
                         {
                             if (combat && cr->IsInCombat())
                                 continue;
@@ -478,7 +478,7 @@ void boss_sartharion::boss_sartharionAI::HandleSartharionAbilities()
             uint8 iter = 0;
             for (SummonList::iterator i = summons.begin(); i != summons.end(); ++i)
             {
-                if (cr = ObjectAccessor::GetCreature(*me, *i))
+                if ((cr = ObjectAccessor::GetCreature(*me, *i)))
                     if (cr->GetEntry() == NPC_FIRE_CYCLONE)
                     {
                         if (iter == rand)
@@ -508,7 +508,7 @@ void boss_sartharion::boss_sartharionAI::HandleSartharionAbilities()
                 summons.RemoveNotExisting();
                 for (SummonList::iterator i = summons.begin(); i != summons.end(); ++i)
                 {
-                    if (cr = ObjectAccessor::GetCreature(*me, *i))
+                    if ((cr = ObjectAccessor::GetCreature(*me, *i)))
                         if (cr->GetEntry() == NPC_FIRE_CYCLONE)
                             cr->CastSpell(cr, SPELL_CYCLONE_AURA_PERIODIC, true);
                 }
@@ -754,12 +754,12 @@ public:
                     Creature* cr = NULL;
                     for (uint8 i = 0; i < 6; ++i)
                     {
-                        if (cr = me->SummonCreature(NPC_TWILIGHT_EGG, EggsPos[isSartharion ? i+6 : i].GetPositionX(), EggsPos[isSartharion ? i+6 : i].GetPositionY(), EggsPos[isSartharion ? i+6 : i].GetPositionZ(), EggsPos[isSartharion ? i+6 : i].GetOrientation(), TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 60000))
+                        if ((cr = me->SummonCreature(NPC_TWILIGHT_EGG, EggsPos[isSartharion ? i+6 : i].GetPositionX(), EggsPos[isSartharion ? i+6 : i].GetPositionY(), EggsPos[isSartharion ? i+6 : i].GetPositionZ(), EggsPos[isSartharion ? i+6 : i].GetOrientation(), TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 60000)))
                         {
                             summons.Summon(cr);
                             cr->SetPhaseMask(16, true);
                         }
-                        if (cr = me->SummonCreature(NPC_TWILIGHT_WHELP, EggsPos[isSartharion ? i+6 : i].GetPositionX(), EggsPos[isSartharion ? i+6 : i].GetPositionY(), EggsPos[isSartharion ? i+6 : i].GetPositionZ(), EggsPos[isSartharion ? i+6 : i].GetOrientation(), TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 60000))
+                        if ((cr = me->SummonCreature(NPC_TWILIGHT_WHELP, EggsPos[isSartharion ? i+6 : i].GetPositionX(), EggsPos[isSartharion ? i+6 : i].GetPositionY(), EggsPos[isSartharion ? i+6 : i].GetPositionZ(), EggsPos[isSartharion ? i+6 : i].GetOrientation(), TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 60000)))
                         {
                             summons.Summon(cr);
                             cr->SetPhaseMask(16, true);
@@ -777,13 +777,13 @@ public:
                     summons.DespawnEntry(NPC_TWILIGHT_WHELP);
                     for (SummonList::iterator i = summons.begin(); i != summons.end(); ++i)
                     {
-                        if (cr = ObjectAccessor::GetCreature(*me, *i))
+                        if ((cr = ObjectAccessor::GetCreature(*me, *i)))
                         {
                             if (!cr->IsAlive())
                                 continue;
 
                             if (cr->GetEntry() == NPC_TWILIGHT_EGG)
-                                if (cr = me->SummonCreature(NPC_TWILIGHT_WHELP, cr->GetPositionX(), cr->GetPositionY(), cr->GetPositionZ(), cr->GetOrientation(), TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 60000))
+                                if ((cr = me->SummonCreature(NPC_TWILIGHT_WHELP, cr->GetPositionX(), cr->GetPositionY(), cr->GetPositionZ(), cr->GetOrientation(), TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 60000)))
                                     summons2.Summon(cr);
                         }
                     }

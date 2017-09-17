@@ -646,10 +646,10 @@ class boss_lady_deathwhisper : public CreatureScript
             }
 
         private:
+            bool _introDone;
             uint64 _darnavanGUID;
             std::deque<uint64> _reanimationQueue;
             uint32 _waveCounter;
-            bool _introDone;
         };
 
         CreatureAI* GetAI(Creature* creature) const

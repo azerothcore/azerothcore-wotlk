@@ -496,7 +496,7 @@ public:
                 if (checkTimer >= 2000)
                 {
                     checkTimer = 1;
-                    if (me->HealthBelowPct(25))
+                    if (me->HealthBelowPct(25)) {
                         if (Player* player = GetValidPlayer())
                         {
                             Talk(3);
@@ -513,6 +513,7 @@ public:
                             EnterEvadeMode();
                             return;
                         }
+                    }
                 }
             }
             else if (checkTimer < 20000)

@@ -378,7 +378,7 @@ class spell_ioc_gunship_portal : public SpellScriptLoader
             {
                 PreventHitDefaultEffect(effIndex);
                 /*Player* caster = GetCaster()->ToPlayer();
-                /*
+                 *
                  * HACK: GetWorldLocation() returns real position and not transportposition.
                  * ServertoClient: SMSG_MOVE_TELEPORT (0x0B39)
                  * counter: 45

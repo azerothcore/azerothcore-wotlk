@@ -58,7 +58,7 @@ class boss_dred : public CreatureScript
             uint32 GetData(uint32 data) const
             {
                 if (data == me->GetEntry())
-                    return uint32(_raptorCount >= _raptorCount);
+                    return uint32(_raptorCount);
                 return 0;
             }
 

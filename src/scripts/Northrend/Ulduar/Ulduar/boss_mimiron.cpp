@@ -491,11 +491,11 @@ public:
                         Creature* VX001 = NULL;
                         Creature* LMK2 = NULL;
                         Creature* ACU = NULL;
-                        if (VX001 = GetVX001())
+                        if ((VX001 = GetVX001()))
                             VX001->CastSpell(VX001, SPELL_BERSERK, true);
-                        if (LMK2 = GetLMK2())
+                        if ((LMK2 = GetLMK2()))
                             LMK2->CastSpell(LMK2, SPELL_BERSERK, true);
-                        if (ACU = GetACU())
+                        if ((ACU = GetACU()))
                             ACU->CastSpell(ACU, SPELL_BERSERK, true);
                         events.RepeatEvent(30000);
                     }

@@ -79,8 +79,8 @@ public:
     }
 
 private:
-    uint64 _targetGUID;
     Creature& _owner;
+    uint64 _targetGUID;
 };
 
 class boss_magtheridon : public CreatureScript

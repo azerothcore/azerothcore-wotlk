@@ -255,7 +255,7 @@ public:
 
         }
 
-        uint64 GetData64(uint32 data) const
+        uint64 GetData64(uint32 data) const override
         {
             switch (data)
             {
@@ -355,7 +355,8 @@ public:
         void PeriodicTick(AuraEffect const* auraEffect)
         {
             PreventDefaultAction();
-            GetUnitOwner()->CastCustomSpell(SPELL_OVERLOAD, SPELLVALUE_BASE_POINT0, int32(auraEffect->GetAmount() * (2.0, auraEffect->GetTickNumber())), GetUnitOwner(), true);
+            //Should stop at 3200 damage, maybe check needed(?)
+            GetUnitOwner()->CastCustomSpell(SPELL_OVERLOAD, SPELLVALUE_BASE_POINT0, int32(auraEffect->GetAmount() * pow(2.0, auraEffect->GetTickNumber())), GetUnitOwner(), true);
         }
 
         void Register()

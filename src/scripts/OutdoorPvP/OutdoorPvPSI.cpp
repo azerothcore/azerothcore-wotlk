@@ -209,6 +209,8 @@ bool OutdoorPvPSI::HandleDropFlag(Player* player, uint32 spellId)
                 }
             }
             break;
+        default:
+            break;
         }
         return true;
     }

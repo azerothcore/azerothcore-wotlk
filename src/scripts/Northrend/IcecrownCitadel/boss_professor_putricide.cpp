@@ -411,7 +411,7 @@ class boss_professor_putricide : public CreatureScript
                 switch (id)
                 {
                     case POINT_FESTERGUT:
-                        if (Creature* c = instance->instance->GetCreature(instance->GetData64(DATA_FESTERGUT)))
+                        if (Creature* c = instance->instance->GetCreature(instance->GetData64(DATA_FESTERGUT))) {
                             if (c->IsInCombat())
                             {
                                 instance->SetBossState(DATA_FESTERGUT, IN_PROGRESS);
@@ -419,18 +419,24 @@ class boss_professor_putricide : public CreatureScript
                                 DoAction(ACTION_FESTERGUT_GAS);
                                 c->CastSpell(c, SPELL_GASEOUS_BLIGHT_LARGE, true, NULL, NULL, c->GetGUID());
                             }
-                            else
+                            else 
+                            {
                                 bCallEvade = true;
+                            }
+                        }
                         break;
                     case POINT_ROTFACE:
-                        if (Creature* c = instance->instance->GetCreature(instance->GetData64(DATA_ROTFACE)))
+                        if (Creature* c = instance->instance->GetCreature(instance->GetData64(DATA_ROTFACE))) {
                             if (c->IsInCombat())
                             {
                                 instance->SetBossState(DATA_ROTFACE, IN_PROGRESS);
                                 me->SetFacingTo(rotfaceWatchPos.GetOrientation());
                             }
-                            else
+                            else 
+                            {
                                 bCallEvade = true;
+                            }
+                        }
                         break;
                     case POINT_TABLE:
                         me->SetFacingTo(tablePos.GetOrientation());
@@ -982,7 +988,7 @@ class spell_putricide_unstable_experiment : public SpellScriptLoader
                 std::list<Creature*> creList;
                 GetCreatureListWithEntryInGrid(creList, GetCaster(), NPC_ABOMINATION_WING_MAD_SCIENTIST_STALKER, 200.0f);
                 for (std::list<Creature*>::iterator itr = creList.begin(); itr != creList.end(); ++itr)
-                    if ((*itr)->GetPositionX() > 4350.0f && stage == 0 || (*itr)->GetPositionX() < 4350.0f && stage == 1)
+                    if (((*itr)->GetPositionX() > 4350.0f && stage == 0) || ((*itr)->GetPositionX() < 4350.0f && stage == 1))
                     {
                         target = (*itr);
                         break;

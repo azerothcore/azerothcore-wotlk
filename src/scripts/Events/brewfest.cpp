@@ -145,7 +145,7 @@ public:
                 for (int i = 0; i < 3; ++i)
                 {
                     float o = rand_norm()*2*M_PI;
-                    if (cr = me->SummonCreature(NPC_ANTAGONIST, me->GetPositionX()+3*cos(o), me->GetPositionY()+3*sin(o), me->GetPositionZ(), me->GetOrientation()))
+                    if ((cr = me->SummonCreature(NPC_ANTAGONIST, me->GetPositionX()+3*cos(o), me->GetPositionY()+3*sin(o), me->GetPositionZ(), me->GetOrientation())))
                     {
                         if (i == 0)
                             cr->MonsterSay("Time to die.", LANG_UNIVERSAL, 0);
@@ -811,24 +811,24 @@ class npc_dark_iron_attack_generator : public CreatureScript
                 Creature* cr;
                 if (me->GetMapId() == 1) // Kalimdor
                 {
-                    if (cr = me->SummonCreature(NPC_DROHN_KEG, 1183.69f, -4315.15f, 21.1875f, 0.750492f))
+                    if ((cr = me->SummonCreature(NPC_DROHN_KEG, 1183.69f, -4315.15f, 21.1875f, 0.750492f)))
                         summons.Summon(cr);
-                    if (cr = me->SummonCreature(NPC_VOODOO_KEG, 1182.42f, -4272.45f, 21.1182f, -1.02974f))
+                    if ((cr = me->SummonCreature(NPC_VOODOO_KEG, 1182.42f, -4272.45f, 21.1182f, -1.02974f)))
                         summons.Summon(cr);
-                    if (cr = me->SummonCreature(NPC_GORDOK_KEG, 1223.78f, -4296.48f, 21.1707f, -2.86234f))
+                    if ((cr = me->SummonCreature(NPC_GORDOK_KEG, 1223.78f, -4296.48f, 21.1707f, -2.86234f)))
                         summons.Summon(cr);
                 }
                 else if (me->GetMapId() == 0) // Eastern Kingdom
                 {
-                    if (cr = me->SummonCreature(NPC_BARLEYBREW_KEG, -5187.23f, -599.779f, 397.176f, 0.017453f))
+                    if ((cr = me->SummonCreature(NPC_BARLEYBREW_KEG, -5187.23f, -599.779f, 397.176f, 0.017453f)))
                         summons.Summon(cr);
-                    if (cr = me->SummonCreature(NPC_THUNDERBREW_KEG, -5160.05f, -632.632f, 397.178f, 1.39626f))
+                    if ((cr = me->SummonCreature(NPC_THUNDERBREW_KEG, -5160.05f, -632.632f, 397.178f, 1.39626f)))
                         summons.Summon(cr);
-                    if (cr = me->SummonCreature(NPC_GORDOK_KEG, -5145.75f, -575.667f, 397.176f, -2.28638f))
+                    if ((cr = me->SummonCreature(NPC_GORDOK_KEG, -5145.75f, -575.667f, 397.176f, -2.28638f)))
                         summons.Summon(cr);
                 }
 
-                if (cr = me->SummonCreature(NPC_DARK_IRON_HERALD, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, 300000))
+                if ((cr = me->SummonCreature(NPC_DARK_IRON_HERALD, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, 300000)))
                     summons.Summon(cr);
 
                 kegCounter = 0;
@@ -1621,20 +1621,20 @@ public:
 
             if (caster->GetMapId() == 1) // Kalimdor
             {
-                if (cr = caster->FindNearestCreature(NPC_NORMAL_VOODOO, 40.0f))
+                if ((cr = caster->FindNearestCreature(NPC_NORMAL_VOODOO, 40.0f)))
                     cr->CastSpell(caster, SPELL_THROW_MUG_TO_PLAYER, true);
-                else if (cr = caster->FindNearestCreature(NPC_NORMAL_DROHN, 40.0f))
+                else if ((cr = caster->FindNearestCreature(NPC_NORMAL_DROHN, 40.0f)))
                     cr->CastSpell(caster, SPELL_THROW_MUG_TO_PLAYER, true);
-                else if (cr = caster->FindNearestCreature(NPC_NORMAL_GORDOK, 40.0f))
+                else if ((cr = caster->FindNearestCreature(NPC_NORMAL_GORDOK, 40.0f)))
                     cr->CastSpell(caster, SPELL_THROW_MUG_TO_PLAYER, true);
             }
             else // EK
             {
-                if (cr = caster->FindNearestCreature(NPC_NORMAL_THUNDERBREW, 40.0f))
+                if ((cr = caster->FindNearestCreature(NPC_NORMAL_THUNDERBREW, 40.0f)))
                     cr->CastSpell(caster, SPELL_THROW_MUG_TO_PLAYER, true);
-                else if (cr = caster->FindNearestCreature(NPC_NORMAL_BARLEYBREW, 40.0f))
+                else if ((cr = caster->FindNearestCreature(NPC_NORMAL_BARLEYBREW, 40.0f)))
                     cr->CastSpell(caster, SPELL_THROW_MUG_TO_PLAYER, true);
-                else if (cr = caster->FindNearestCreature(NPC_NORMAL_GORDOK, 40.0f))
+                else if ((cr = caster->FindNearestCreature(NPC_NORMAL_GORDOK, 40.0f)))
                     cr->CastSpell(caster, SPELL_THROW_MUG_TO_PLAYER, true);
             }
             

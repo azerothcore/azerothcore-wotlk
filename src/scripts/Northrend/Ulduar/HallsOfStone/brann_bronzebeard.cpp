@@ -243,9 +243,9 @@ public:
         void DespawnHeads()
         {
             Creature *cr;
-            if (cr = GetAbedneum()) cr->DespawnOrUnsummon();
-            if (cr = GetMarnak()) cr->DespawnOrUnsummon();
-            if (cr = GetKaddrak()) cr->DespawnOrUnsummon(); 
+            if ((cr = GetAbedneum())) cr->DespawnOrUnsummon();
+            if ((cr = GetMarnak())) cr->DespawnOrUnsummon();
+            if ((cr = GetKaddrak())) cr->DespawnOrUnsummon(); 
             SwitchHeadVisaul(0x7, false);
         }
 
@@ -256,15 +256,15 @@ public:
 
             GameObject *go = NULL;
             if (headMask & 0x1) // Kaddrak
-                if (go = me->GetMap()->GetGameObject(pInstance->GetData64(GO_KADDRAK)))
+                if ((go = me->GetMap()->GetGameObject(pInstance->GetData64(GO_KADDRAK))))
                     activate ? go->SendCustomAnim(0) : go->SetGoState(GO_STATE_READY);
 
             if (headMask & 0x2) // Marnak
-                if (go = me->GetMap()->GetGameObject(pInstance->GetData64(GO_MARNAK)))
+                if ((go = me->GetMap()->GetGameObject(pInstance->GetData64(GO_MARNAK))))
                     activate ? go->SendCustomAnim(0) : go->SetGoState(GO_STATE_READY);
 
             if (headMask & 0x4) // Abedneum
-                if (go = me->GetMap()->GetGameObject(pInstance->GetData64(GO_ABEDNEUM)))
+                if ((go = me->GetMap()->GetGameObject(pInstance->GetData64(GO_ABEDNEUM))))
                     activate ? go->SendCustomAnim(0) : go->SetGoState(GO_STATE_READY);
         }
 
@@ -596,17 +596,17 @@ public:
 void brann_bronzebeard::brann_bronzebeardAI::InitializeEvent()
 {
     Creature* cr = NULL;
-    if (cr = me->SummonCreature(NPC_KADDRAK, 923.7f, 326.9f, 219.5f, 2.1f, TEMPSUMMON_TIMED_DESPAWN, 580000))
+    if ((cr = me->SummonCreature(NPC_KADDRAK, 923.7f, 326.9f, 219.5f, 2.1f, TEMPSUMMON_TIMED_DESPAWN, 580000)))
     {
         cr->SetInCombatWithZone();
         KaddrakGUID = cr->GetGUID();
     }
-    if (cr = me->SummonCreature(NPC_MARNAK, 895.974f, 363.571f, 219.337f, 5.5f, TEMPSUMMON_TIMED_DESPAWN, 580000))
+    if ((cr = me->SummonCreature(NPC_MARNAK, 895.974f, 363.571f, 219.337f, 5.5f, TEMPSUMMON_TIMED_DESPAWN, 580000)))
     {
         cr->SetInCombatWithZone();
         MarnakGUID = cr->GetGUID();
     }
-    if (cr = me->SummonCreature(NPC_ABEDNEUM, 892.25f, 331.25f, 223.86f, 0.6f, TEMPSUMMON_TIMED_DESPAWN, 580000))
+    if ((cr = me->SummonCreature(NPC_ABEDNEUM, 892.25f, 331.25f, 223.86f, 0.6f, TEMPSUMMON_TIMED_DESPAWN, 580000)))
     {
         cr->SetInCombatWithZone();
         AbedneumGUID = cr->GetGUID();

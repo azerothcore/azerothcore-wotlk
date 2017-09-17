@@ -697,6 +697,8 @@ class npc_halion_controller : public CreatureScript
                         --_corporeality;
                         break;
                     }
+                    default:
+                        break;
                 }
 
                 _instance->DoUpdateWorldState(WORLDSTATE_CORPOREALITY_MATERIAL, _corporeality * 10);

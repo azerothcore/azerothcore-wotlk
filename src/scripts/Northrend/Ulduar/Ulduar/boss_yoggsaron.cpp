@@ -484,7 +484,7 @@ public:
                 if (!summon || summon->GetEntry() != NPC_OMINOUS_CLOUD || me->GetDistance(summon) < 20)
                     continue;
 
-                if ((!cloud || urand(0,1) && !summon->HasAura(SPELL_SUMMON_GUARDIAN_OF_YS)))
+                if ((!cloud || (urand(0,1) && !summon->HasAura(SPELL_SUMMON_GUARDIAN_OF_YS))))
                     cloud = summon;
             }
 
@@ -525,7 +525,7 @@ public:
             for (uint8 i = 0; i < RAID_MODE(4, 10); ++i)
             {
                 float ang = i ? (M_PI*2.0f/i) : M_PI*2.0f;
-                if (cr = me->SummonCreature(NPC_DESCEND_INTO_MADNESS, me->GetPositionX()+25*cos(ang), me->GetPositionY()+25*sin(ang), 326, 0, TEMPSUMMON_TIMED_DESPAWN, 15000))
+                if ((cr = me->SummonCreature(NPC_DESCEND_INTO_MADNESS, me->GetPositionX()+25*cos(ang), me->GetPositionY()+25*sin(ang), 326, 0, TEMPSUMMON_TIMED_DESPAWN, 15000)))
                 {
                     cr->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_NON_ATTACKABLE);
                     cr->SetArmor(_currentIllusion);

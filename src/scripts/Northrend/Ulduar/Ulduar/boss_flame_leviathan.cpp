@@ -537,24 +537,24 @@ void boss_flame_leviathan::boss_flame_leviathanAI::TurnGates(bool _start, bool _
     {
         // first one is ALWAYS turned on, unless leviathan is beaten
         GameObject* go = NULL;
-        if (go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(DATA_LIGHTNING_WALL2)))
+        if ((go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(DATA_LIGHTNING_WALL2))))
             go->SetGoState(GO_STATE_READY);
 
         if (m_pInstance->GetData(TYPE_LEVIATHAN) == NOT_STARTED)
-            if (go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(GO_LEVIATHAN_DOORS)))
+            if ((go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(GO_LEVIATHAN_DOORS))))
                 go->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
     }
     else
     {
         GameObject* go = NULL;
         if (_death)
-            if (go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(DATA_LIGHTNING_WALL1)))
+            if ((go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(DATA_LIGHTNING_WALL1))))
                 go->SetGoState(GO_STATE_ACTIVE);
 
-        if (go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(DATA_LIGHTNING_WALL2)))
+        if ((go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(DATA_LIGHTNING_WALL2))))
             go->SetGoState(GO_STATE_ACTIVE);
 
-        if (go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(GO_LEVIATHAN_DOORS)))
+        if ((go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(GO_LEVIATHAN_DOORS))))
         {
             if (m_pInstance->GetData(TYPE_LEVIATHAN) == SPECIAL || m_pInstance->GetData(TYPE_LEVIATHAN) == DONE)
                 go->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
@@ -572,16 +572,16 @@ void boss_flame_leviathan::boss_flame_leviathanAI::TurnHealStations(bool _apply)
     GameObject* go = NULL;
     if (_apply)
     {
-        if (go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(DATA_REPAIR_STATION1)))
+        if ((go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(DATA_REPAIR_STATION1))))
             go->SetLootState(GO_READY);
-        if (go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(DATA_REPAIR_STATION2)))
+        if ((go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(DATA_REPAIR_STATION2))))
             go->SetLootState(GO_READY);
     }
     else
     {
-        if (go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(DATA_REPAIR_STATION1)))
+        if ((go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(DATA_REPAIR_STATION1))))
             go->SetLootState(GO_ACTIVATED);
-        if (go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(DATA_REPAIR_STATION2)))
+        if ((go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(DATA_REPAIR_STATION2))))
             go->SetLootState(GO_ACTIVATED);
     }
 }

@@ -436,11 +436,11 @@ public:
                 SetRun(false);
 
                 Creature* cr = NULL;
-                if (cr = me->SummonCreature(NPC_CITY_MAN3, EventPos[EVENT_SRC_HALL_CITYMAN1]))
+                if ((cr = me->SummonCreature(NPC_CITY_MAN3, EventPos[EVENT_SRC_HALL_CITYMAN1])))
                     cr->AI()->DoAction(ACTION_FORCE_CHANGE_LOCK);
-                if (cr = me->SummonCreature(NPC_CITY_MAN4, EventPos[EVENT_SRC_HALL_CITYMAN2]))
+                if ((cr = me->SummonCreature(NPC_CITY_MAN4, EventPos[EVENT_SRC_HALL_CITYMAN2])))
                     cr->AI()->DoAction(ACTION_FORCE_CHANGE_LOCK);
-                if (cr = me->SummonCreature(NPC_CITY_MAN,  EventPos[EVENT_SRC_HALL_CITYMAN3]))
+                if ((cr = me->SummonCreature(NPC_CITY_MAN,  EventPos[EVENT_SRC_HALL_CITYMAN3])))
                     cr->AI()->DoAction(ACTION_FORCE_CHANGE_LOCK);
             }
             else if (param == ACTION_START_SECRET_PASSAGE)

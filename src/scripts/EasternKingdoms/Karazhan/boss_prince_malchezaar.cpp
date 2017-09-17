@@ -474,7 +474,7 @@ public:
                 me->SetCanDualWield(true);
             }
 
-            void Reset()
+            void Reset() override
             {
             }
 
