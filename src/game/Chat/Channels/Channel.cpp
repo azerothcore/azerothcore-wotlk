@@ -517,7 +517,6 @@ void Channel::UnBan(uint64 guid)
 
 void Channel::Password(Player const* player, std::string const& pass)
 {
-    uint32 sec = player->GetSession()->GetSecurity();
     uint64 guid = player->GetGUID();
 
     ChatHandler chat(player->GetSession());

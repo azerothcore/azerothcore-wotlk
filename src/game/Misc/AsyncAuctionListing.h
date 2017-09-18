@@ -13,6 +13,7 @@ class AuctionListOwnerItemsDelayEvent : public BasicEvent
 
         virtual bool Execute(uint64 e_time, uint32 p_time);
         virtual void Abort(uint64 e_time) {}
+        bool getOwner() { return owner; }
 
     private:
         WorldPacket data;

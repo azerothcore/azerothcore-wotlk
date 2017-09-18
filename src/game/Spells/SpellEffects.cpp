@@ -2872,8 +2872,6 @@ void Spell::EffectEnchantItemPrismatic(SpellEffIndex effIndex)
     if (!itemTarget)
         return;
 
-    Player* p_caster = m_caster->ToPlayer();
-
     uint32 enchant_id = m_spellInfo->Effects[effIndex].MiscValue;
     if (!enchant_id)
         return;

@@ -720,13 +720,12 @@ namespace Trinity
     class GameObjectWithDbGUIDCheck
     {
         public:
-            GameObjectWithDbGUIDCheck(WorldObject const& obj, uint32 db_guid) : i_obj(obj), i_db_guid(db_guid) {}
+            GameObjectWithDbGUIDCheck(uint32 db_guid) : i_db_guid(db_guid) {}
             bool operator()(GameObject const* go) const
             {
                 return go->GetDBTableGUIDLow() == i_db_guid;
             }
         private:
-            WorldObject const& i_obj;
             uint32 i_db_guid;
     };
 
@@ -862,13 +861,12 @@ namespace Trinity
     class CreatureWithDbGUIDCheck
     {
         public:
-            CreatureWithDbGUIDCheck(WorldObject const* obj, uint32 lowguid) : i_obj(obj), i_lowguid(lowguid) {}
+            CreatureWithDbGUIDCheck(uint32 lowguid) : i_lowguid(lowguid) {}
             bool operator()(Creature* u)
             {
                 return u->GetDBTableGUIDLow() == i_lowguid;
             }
         private:
-            WorldObject const* i_obj;
             uint32 i_lowguid;
     };
 
@@ -1441,7 +1439,7 @@ namespace Trinity
     {
         public:
             explicit RandomCheck(uint8 chance) : _chance(chance) { }
-            bool operator()(WorldObject const* object) const
+            bool operator()(WorldObject const* /*object*/) const
             {
                 return roll_chance_i(_chance);
             }

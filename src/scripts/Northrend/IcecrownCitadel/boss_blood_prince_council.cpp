@@ -1665,8 +1665,6 @@ class spell_valanar_kinetic_bomb_summon : public SpellScriptLoader
             {
                 BeforeCast += SpellCastFn(spell_valanar_kinetic_bomb_summon_SpellScript::SelectDest);
             }
-
-            uint32 _targetCount;
         };
 
         SpellScript* GetSpellScript() const

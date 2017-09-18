@@ -506,7 +506,7 @@ class Spell
         void CleanupTargetList();
 
         void SetSpellValue(SpellValueMod mod, int32 value);
-        SpellValue const* const GetSpellValue() { return m_spellValue; }
+        SpellValue const* GetSpellValue() { return m_spellValue; }
 
         // xinef: moved to public
         void LoadScripts();

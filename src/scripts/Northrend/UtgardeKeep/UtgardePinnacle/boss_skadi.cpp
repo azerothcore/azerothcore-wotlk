@@ -71,16 +71,16 @@ enum Events
 
 static Position TrashPosition[]=
 {
-    {441.236f, -512.000f, 104.930f},
-    {478.436f, -494.475f, 104.730f}
+    {441.236f, -512.000f, 104.930f, 0.0f},
+    {478.436f, -494.475f, 104.730f, 0.0f}
 };
 
 static Position SkadiPosition[] =
 {
-    {338.679f, -507.254f, 124.122f},
-    {338.679f, -513.254f, 124.122f},
-    {490.096f, -510.86f, 123.368f},
-    {490.76f, -517.389f, 123.368f}
+    {338.679f, -507.254f, 124.122f, 0.0f},
+    {338.679f, -513.254f, 124.122f, 0.0f},
+    {490.096f, -510.86f, 123.368f, 0.0f},
+    {490.76f, -517.389f, 123.368f, 0.0f}
 };
 
 #define EMOTE_IN_RANGE   "Skadi the Ruthless is within range of the harpoon launchers"

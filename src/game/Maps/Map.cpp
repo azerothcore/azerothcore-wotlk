@@ -107,7 +107,7 @@ bool Map::ExistVMap(uint32 mapid, int gx, int gy)
 
 void Map::LoadMMap(int gx, int gy)
 { 
-    if (!MMAP::MMapFactory::IsPathfindingEnabled(this, true)) // pussywizard
+    if (!MMAP::MMapFactory::IsPathfindingEnabled(this)) // pussywizard
         return;
 
     int mmapLoadResult = MMAP::MMapFactory::createOrGetMMapManager()->loadMap(GetId(), gx, gy);

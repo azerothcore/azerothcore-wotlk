@@ -831,7 +831,7 @@ class spell_valkyr_touch : public SpellScriptLoader
                             {
                                 uint32 absorb=0;
                                 uint32 resist=0;
-                                CleanDamage cleanDamage =  CleanDamage(0, 0, BASE_ATTACK, MELEE_HIT_NORMAL);
+                                CleanDamage(0, 0, BASE_ATTACK, MELEE_HIT_NORMAL);
                                 int32 dmg = urand(2925,3075)*(caster->GetMap()->GetDifficulty()-1);
                                 if (caster->CanApplyResilience())
                                     Unit::ApplyResilience(plr, NULL, &dmg, false, CR_CRIT_TAKEN_SPELL);

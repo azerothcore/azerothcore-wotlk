@@ -926,8 +926,6 @@ class spell_putricide_slime_puddle_spawn : public SpellScriptLoader
             {
                 BeforeCast += SpellCastFn(spell_putricide_slime_puddle_spawn_SpellScript::SelectDest);
             }
-
-            uint32 _targetCount;
         };
 
         SpellScript* GetSpellScript() const

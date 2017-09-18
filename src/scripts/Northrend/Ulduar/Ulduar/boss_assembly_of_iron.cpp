@@ -781,7 +781,7 @@ public:
 
         void SpellHitTarget(Unit* target, const SpellInfo* spellInfo)
         {
-            if (spellInfo->Id == SPELL_CHAIN_LIGHTNING || spellInfo->Id == RAID_MODE(61916, 63482)) // Lightning Whirl triggered
+            if (spellInfo->Id == SPELL_CHAIN_LIGHTNING || spellInfo->Id == uint32(RAID_MODE(61916, 63482))) // Lightning Whirl triggered
                 _stunnedAchievement = false;
         }
 

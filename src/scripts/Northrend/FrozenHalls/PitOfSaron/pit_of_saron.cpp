@@ -954,7 +954,7 @@ public:
                 me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
                 me->GetMotionMaster()->MovePoint(2, TSCenterPos);
 
-                float ZeroAngle = TSSpawnPos.GetAngle(&TSMidPos);
+                TSSpawnPos.GetAngle(&TSMidPos);
 
                 for (std::list<uint64>::iterator itr = summons.begin(); itr != summons.end(); ++itr)
                     if (Creature* c = pInstance->instance->GetCreature(*itr))
@@ -1502,7 +1502,7 @@ public:
 
         void HandleEffectPeriodic(AuraEffect const * aurEff)
         {
-            if (aurEff->GetTickNumber() == aurEff->GetTotalTicks())
+            if (aurEff->GetTotalTicks() >= 0 && aurEff->GetTickNumber() == uint32(aurEff->GetTotalTicks()))
                 if (Unit* target = GetTarget())
                     target->CastSpell(target, 69604, true);
         }

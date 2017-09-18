@@ -919,7 +919,12 @@ public:
         m_heal -= amount;
     }
 
-    uint32 GetHeal() const { return m_heal; };
+    Unit* GetHealer() const { return m_healer; }
+    Unit* GetTarget() const { return m_target; }
+    uint32 GetHeal() const { return m_heal; }
+    uint32 GetAbsorb() const { return m_absorb; }
+    SpellInfo const* GetSpellInfo() const { return m_spellInfo; };
+    SpellSchoolMask GetSchoolMask() const { return m_schoolMask; };
 };
 
 class ProcEventInfo
@@ -1323,7 +1328,7 @@ class SafeUnitPointer
 {
 public:
     explicit SafeUnitPointer(Unit* defVal) :  ptr(defVal), defaultValue(defVal) {}
-    SafeUnitPointer(const SafeUnitPointer& p) { ASSERT(false); }
+    SafeUnitPointer(const SafeUnitPointer& /*p*/) { ASSERT(false); }
     void Initialize(Unit* defVal) { defaultValue = defVal; ptr = defVal; }
     ~SafeUnitPointer();
     void SetPointedTo(Unit* u);
@@ -2405,7 +2410,7 @@ class Unit : public WorldObject
         // cooldowns
         virtual bool HasSpellCooldown(uint32 /*spell_id*/) const { return false; }
         virtual bool HasSpellItemCooldown(uint32 /*spell_id*/, uint32 /*itemid*/) const { return false; }
-        virtual void AddSpellCooldown(uint32 /*spell_id*/, uint32 /*itemid*/, uint32 /*end_time*/, bool needSendToClient = false, bool forceSendToSpectator = false) {}
+        virtual void AddSpellCooldown(uint32 /*spell_id*/, uint32 /*itemid*/, uint32 /*end_time*/, bool needSendToClient = false, bool forceSendToSpectator = false);
 
         bool CanApplyResilience() const { return m_applyResilience; }
 

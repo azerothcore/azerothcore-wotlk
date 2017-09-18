@@ -4202,7 +4202,6 @@ void SmartScript::OnInitialize(WorldObject* obj, AreaTriggerEntry const* at)
 
     GetScript();//load copy of script
 
-    const SpellInfo* spellInfo = NULL;
     uint32 maxDisableDist = 0;
     uint32 minEnableDist = 0;
     for (SmartAIEventList::iterator i = mEvents.begin(); i != mEvents.end(); ++i)

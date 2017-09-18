@@ -2444,7 +2444,6 @@ public:
         if (!go->loot.items.size())
             return false;
 
-        uint8 invalidCount = 0;
         for( std::vector<LootItem>::iterator itr = go->loot.items.begin(); itr != go->loot.items.end(); ++itr )
             if( ItemTemplate const *iProto = sObjectMgr->GetItemTemplate((*itr).itemid) )
                 if( ((iProto->Flags2 & ITEM_FLAGS_EXTRA_HORDE_ONLY) && plr->GetTeamId() != TEAM_HORDE) || ((iProto->Flags2 & ITEM_FLAGS_EXTRA_ALLIANCE_ONLY) && plr->GetTeamId() != TEAM_ALLIANCE) )

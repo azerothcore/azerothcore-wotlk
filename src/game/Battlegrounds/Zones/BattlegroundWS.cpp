@@ -229,8 +229,6 @@ void BattlegroundWS::EventPlayerClickedOnFlag(Player* player, GameObject* gameOb
     if (GetStatus() != STATUS_IN_PROGRESS)
         return;
 
-    int32 message_id = 0;
-    ChatMsg type = CHAT_MSG_BG_SYSTEM_NEUTRAL;
     player->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_ENTER_PVP_COMBAT);
 
     // Alliance Flag picked up from base

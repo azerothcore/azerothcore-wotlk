@@ -297,7 +297,7 @@ enum Misc
     DATA_LOSE_YOUR_ILLUSION     = 2,
 };
 
-const Position Middle = {2134.68f, -263.13f, 419.44f};
+const Position Middle = {2134.68f, -263.13f, 419.44f, M_PI*1.5f};
 
 const uint32 RollTable[3] = { 32877, 32878, 32876 };
 

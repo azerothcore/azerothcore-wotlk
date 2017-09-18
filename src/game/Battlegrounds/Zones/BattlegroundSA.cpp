@@ -763,7 +763,6 @@ void BattlegroundSA::DestroyGate(Player* player, GameObject* go)
 
 WorldSafeLocsEntry const* BattlegroundSA::GetClosestGraveyard(Player* player)
 {
-    uint32 safeloc = 0;
     WorldSafeLocsEntry const* closest = NULL;
     float mindist = 999999.0f;
     float x, y;

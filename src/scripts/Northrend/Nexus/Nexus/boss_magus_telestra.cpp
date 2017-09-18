@@ -286,7 +286,7 @@ class spell_boss_magus_telestra_gravity_well : public SpellScriptLoader
                 {
                     pos.Relocate(GetCaster()->GetPositionX(), GetCaster()->GetPositionY(), GetCaster()->GetPositionZ()+1.0f);
                     float o = frand(0, 2*M_PI);
-                    target->MovePositionToFirstCollision(pos, 20.0f, frand(0, 2*M_PI));
+                    target->MovePositionToFirstCollision(pos, 20.0f, o);
                     pos.m_positionZ += frand(5.0f, 15.0f);
                 }
                 else

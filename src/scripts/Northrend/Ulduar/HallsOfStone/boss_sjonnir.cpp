@@ -86,9 +86,9 @@ enum SummonPhases
 
 static Position RoomPosition[] =
 {
-    {1293.0f, 610.0f, 199.3f},
-    {1294.2f, 724.3f, 199.3f},
-    {1295.2f, 667.1f, 189.7f},
+    {1293.0f, 610.0f, 199.3f, 0.0f},
+    {1294.2f, 724.3f, 199.3f, 0.0f},
+    {1295.2f, 667.1f, 189.7f, 0.0f},
 };
 
 class boss_sjonnir : public CreatureScript

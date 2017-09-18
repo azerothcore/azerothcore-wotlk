@@ -232,7 +232,7 @@ public:
 
         void EnterCombat(Unit* pWho)
         {
-            if (summons.size() != RAID_MODE(8, 16))
+            if (summons.size() != uint32(RAID_MODE(8, 16)))
             {
                 EnterEvadeMode();
                 return;
@@ -1289,7 +1289,7 @@ public:
 
         void HandleEffectPeriodic(AuraEffect const * aurEff)
         {
-            if (aurEff->GetTickNumber() == aurEff->GetTotalTicks()-1)
+            if (aurEff->GetTotalTicks() > 0 && aurEff->GetTickNumber() == uint32(aurEff->GetTotalTicks())-1)
             {
                 Unit* target = GetTarget();
                 Unit* caster = GetCaster();

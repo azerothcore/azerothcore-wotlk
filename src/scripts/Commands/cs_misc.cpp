@@ -3082,10 +3082,10 @@ public:
                 if (flags.empty())
                     flags = "None";
 
-                Player* p = ObjectAccessor::FindPlayerInOrOutOfWorld((*itr).guid);
+                /*Player* p = ObjectAccessor::FindPlayerInOrOutOfWorld((*itr).guid);
                 const char* onlineState = p ? "online" : "offline";
 
-                /*handler->PSendSysMessage(LANG_GROUP_PLAYER_NAME_GUID, slot.name.c_str(), onlineState,
+                handler->PSendSysMessage(LANG_GROUP_PLAYER_NAME_GUID, slot.name.c_str(), onlineState,
                     GUID_LOPART(slot.guid), flags.c_str(), lfg::GetRolesString(slot.roles).c_str());*/
             }
         }

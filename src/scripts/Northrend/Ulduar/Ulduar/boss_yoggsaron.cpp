@@ -295,7 +295,7 @@ enum Misc
     DATA_GET_SARA_PHASE                 = 3,
 };
 
-const Position Middle = {1980.28f, -25.5868f, 329.397f};
+const Position Middle = {1980.28f, -25.5868f, 329.397f, M_PI*1.5f};
 
 
 class boss_yoggsaron_sara : public CreatureScript
@@ -1098,7 +1098,7 @@ public:
                 me->LowerPlayerDamageReq(me->GetMaxHealth()*0.7f);
 
                 me->RemoveAura(SPELL_SHADOW_BARRIER);
-                
+
                 events.ScheduleEvent(EVENT_YS_LUNATIC_GAZE, 7000);
                 events.ScheduleEvent(EVENT_YS_SHADOW_BEACON, 20000);
                 events.ScheduleEvent(EVENT_YS_SUMMON_GUARDIAN, 0);

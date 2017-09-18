@@ -3314,7 +3314,6 @@ void Player::GiveLevel(uint8 level)
 
 void Player::InitTalentForLevel()
 { 
-    uint8 level = getLevel();
     uint32 talentPointsForLevel = CalculateTalentsPoints();
 
     // xinef: more talent points that we have are used, reset
@@ -16953,7 +16952,7 @@ void Player::KilledPlayerCredit()
         if (q_status.Status == QUEST_STATUS_INCOMPLETE && (!GetGroup() || !GetGroup()->isRaidGroup() || qInfo->IsAllowedInRaid(GetMap()->GetDifficulty())))
         {
             // Xinef: PvP Killing quest require player to be in same zone as quest zone (only 2 quests so no doubt, can be extended to conditions in cata ;s)
-            if (qInfo->HasSpecialFlag(QUEST_SPECIAL_FLAGS_PLAYER_KILL) && GetZoneId() == qInfo->GetZoneOrSort())
+            if (qInfo->HasSpecialFlag(QUEST_SPECIAL_FLAGS_PLAYER_KILL) && (qInfo->GetZoneOrSort() >= 0 && GetZoneId() == uint32(qInfo->GetZoneOrSort())))
             {
                 uint32 reqkill = qInfo->GetPlayersSlain();
                 uint16 curkill = q_status.PlayerCount;
@@ -16978,8 +16977,6 @@ void Player::KilledPlayerCredit()
 
 void Player::KillCreditGO(uint32 entry, uint64 guid)
 { 
-    bool isCreature = IS_CRE_OR_VEH_GUID(guid);
-
     uint16 addCastCount = 1;
     for (uint8 i = 0; i < MAX_QUEST_LOG_SIZE; ++i)
     {
@@ -18806,6 +18803,7 @@ void Player::_LoadMailAsynch(PreparedQueryResult result)
     {
         do
         {
+            bool has_items = false;
             Field* fields = result->Fetch();
             if (fields[14].GetUInt32() != prevMailID)
             {
@@ -18820,7 +18818,7 @@ void Player::_LoadMailAsynch(PreparedQueryResult result)
                 m->receiver       = fields[17].GetUInt32();
                 m->subject        = fields[18].GetString();
                 m->body           = fields[19].GetString();
-                bool has_items    = fields[20].GetBool();
+                has_items         = fields[20].GetBool();
                 m->expire_time    = time_t(fields[21].GetUInt32());
                 m->deliver_time   = time_t(fields[22].GetUInt32());
                 m->money          = fields[23].GetUInt32();
@@ -18838,7 +18836,7 @@ void Player::_LoadMailAsynch(PreparedQueryResult result)
                 m->state = MAIL_STATE_UNCHANGED;
             }
 
-            if (m && fields[20].GetBool() /*has_items*/ && fields[12].GetUInt32() /*itemEntry*/)
+            if (m && has_items && fields[12].GetUInt32() /*itemEntry*/)
             {
                 uint32 itemGuid = fields[11].GetUInt32();
                 uint32 itemTemplate = fields[12].GetUInt32();
@@ -26814,11 +26812,7 @@ void Player::PrepareCharmAISpells()
         m_charmAISpells[i] = 0;
 
     uint32 damage_type[4] = {0, 0, 0, 0};
-    uint32 stun_duration = 0;
     uint32 periodic_damage = 0;
-    uint32 b = 0;
-    uint32 temp_spell = 0;
-    uint32 temp_damage = 0;
 
     for (PlayerSpellMap::iterator itr = m_spells.begin(); itr != m_spells.end(); ++itr)
     {
@@ -26832,8 +26826,6 @@ void Player::PrepareCharmAISpells()
         if (!spellInfo->SpellFamilyName || spellInfo->IsPassive() || spellInfo->NeedsComboPoints() || (spellInfo->Stances && !spellInfo->HasAttribute(SPELL_ATTR2_NOT_NEED_SHAPESHIFT)))
             continue;
 
-        bool allow = false;
-        uint8 type = 0;
         float cast = spellInfo->CalcCastTime() / 1000.0f;
         if (cast > 3.0f)
             continue;
@@ -26905,7 +26897,7 @@ void Player::PrepareCharmAISpells()
                 m_charmAISpells[SPELL_ROOT_OR_FEAR] = spellInfo->Id;
                 break;
             }
-        }   
+        }
     }
 }
 

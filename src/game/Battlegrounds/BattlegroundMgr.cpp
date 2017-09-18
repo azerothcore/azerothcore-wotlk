@@ -737,7 +737,6 @@ void BattlegroundMgr::BuildBattlegroundListPacket(WorldPacket* data, uint64 guid
             if (PvPDifficultyEntry const* bracketEntry = GetBattlegroundBracketByLevel(bgt->GetMapId(), player->getLevel()))
             {
                 uint32 count = 0;
-                BattlegroundBracketId bracketId = bracketEntry->GetBracketId();
                 /*for (BattlegroundClientIdsContainer::const_iterator itr = clientIds.begin(); itr != clientIds.end(); ++itr)
                 {
                     *data << uint32(*itr);

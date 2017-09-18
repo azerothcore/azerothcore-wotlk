@@ -155,18 +155,17 @@ public:
 
         bool IsEncounterInProgress() const
         {
-            uint8 aliveCount = 0;
             Map::PlayerList const &pl = instance->GetPlayers();
             for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
                 if( Player* plr = itr->GetSource() )
                     if( plr->IsAlive() && !plr->IsGameMaster() )
                         return EncounterStatus == IN_PROGRESS; // found alive player
-            
+
             if( EncounterStatus != NOT_STARTED )
                 *(const_cast<uint32*>(&EncounterStatus)) = NOT_STARTED;
             return false;
         }
-        
+
         void OnCreatureCreate(Creature* creature)
         {
             switch( creature->GetEntry() )

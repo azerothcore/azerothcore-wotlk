@@ -475,7 +475,7 @@ int WorldSocket::handle_input_header (void)
     if ((header.size < 4) || (header.size > 10240) || (header.cmd  > 10240))
     {
         Player* _player = m_Session ? m_Session->GetPlayer() : NULL;
-        //sLog->outError("WorldSocket::handle_input_header(): client (account: %u, char [GUID: %u, name: %s]) sent malformed packet (size: %d, cmd: %d)", m_Session ? m_Session->GetAccountId() : 0, _player ? _player->GetGUIDLow() : 0, _player ? _player->GetName().c_str() : "<none>", header.size, header.cmd);
+        sLog->outError("WorldSocket::handle_input_header(): client (account: %u, char [GUID: %u, name: %s]) sent malformed packet (size: %d, cmd: %d)", m_Session ? m_Session->GetAccountId() : 0, _player ? _player->GetGUIDLow() : 0, _player ? _player->GetName().c_str() : "<none>", header.size, header.cmd);
 
         errno = EINVAL;
         return -1;
@@ -752,8 +752,8 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     recvPacket >> account;
     recvPacket >> loginServerType;
     recvPacket >> clientSeed;
-    recvPacket >> loginServerType;
     recvPacket >> regionID;
+    recvPacket >> battlegroupID;
     recvPacket >> realm;
     recvPacket >> DosResponse;
     recvPacket.read(digest, 20);

@@ -697,7 +697,6 @@ void BattlefieldWG::HandleKill(Player* killer, Unit* victim)
     if (killer == victim)
         return;
 
-    bool again = false;
     TeamId killerTeam = killer->GetTeamId();
 
     // xinef: tower cannons also grant rank

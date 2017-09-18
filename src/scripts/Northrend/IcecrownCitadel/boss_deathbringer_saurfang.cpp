@@ -221,7 +221,7 @@ Position const chokePos[6] =
     {-510.7041f, 2211.069f, 546.5298f, 0.0f}  // back right
 };
 
-Position const finalPos = {-563.7552f, 2211.328f, 538.7848f, 0.0f};
+//Position const finalPos = {-563.7552f, 2211.328f, 538.7848f, 0.0f};
 
 class boss_deathbringer_saurfang : public CreatureScript
 {

@@ -1255,7 +1255,7 @@ class spell_item_summon_or_dismiss : public SpellScriptLoader
             {
                 for (Unit::ControlSet::iterator itr = GetCaster()->m_Controlled.begin(); itr != GetCaster()->m_Controlled.end(); ++itr)
                 {
-                    if ((*itr)->GetEntry() == GetSpellInfo()->Effects[effIndex].MiscValue)
+                    if (GetSpellInfo()->Effects[effIndex].MiscValue >= 0 && (*itr)->GetEntry() == uint32(GetSpellInfo()->Effects[effIndex].MiscValue))
                     {
                         (*itr)->ToTempSummon()->UnSummon();
                         PreventHitDefaultEffect(effIndex);

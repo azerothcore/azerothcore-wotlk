@@ -260,7 +260,7 @@ class spell_dk_raise_ally_trigger : public SpellScriptLoader
             void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
                 if (Unit* charm = GetUnitOwner()->GetCharm())
-                    if (charm->GetEntry() == GetSpellInfo()->Effects[EFFECT_0].MiscValue)
+                    if (GetSpellInfo()->Effects[EFFECT_0].MiscValue >= 0 && charm->GetEntry() == uint32(GetSpellInfo()->Effects[EFFECT_0].MiscValue))
                         charm->ToCreature()->DespawnOrUnsummon();
             }
 
@@ -782,7 +782,7 @@ class spell_dk_dancing_rune_weapon : public SpellScriptLoader
                 Unit* target = eventInfo.GetActionTarget();
                 Unit* dancingRuneWeapon = NULL;
                 for (Unit::ControlSet::const_iterator itr = player->m_Controlled.begin(); itr != player->m_Controlled.end(); ++itr)
-                    if ((*itr)->GetEntry() == GetSpellInfo()->Effects[EFFECT_0].MiscValue)
+                    if (int32((*itr)->GetEntry()) == GetSpellInfo()->Effects[EFFECT_0].MiscValue)
                     {
                         dancingRuneWeapon = *itr;
                         break;
@@ -1569,7 +1569,6 @@ class spell_dk_death_grip : public SpellScriptLoader
 
             void HandleDummy(SpellEffIndex /*effIndex*/)
             {
-                int32 damage = GetEffectValue();
                 float casterZ = GetCaster()->GetPositionZ(); // for Ring of Valor
                 WorldLocation gripPos = *GetExplTargetDest();
                 if (Unit* target = GetHitUnit())

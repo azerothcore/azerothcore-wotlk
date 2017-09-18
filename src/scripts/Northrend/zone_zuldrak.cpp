@@ -114,7 +114,7 @@ public:
                 questList[playerGUID] = itemCode;
 
                 // Decode Item Entry, Get Item Name, Generate Emotes
-                uint32 itemEntry = GetTaskItemEntry(itemCode);
+                //uint32 itemEntry = GetTaskItemEntry(itemCode);
                 uint32 auraId = GetTaskAura(itemCode);
                 const char* itemName = GetTaskItemName(itemCode);
 
