@@ -293,6 +293,7 @@ enum Misc
     DATA_GET_KEEPERS_COUNT              = 1,
     DATA_GET_CURRENT_ILLUSION           = 2,
     DATA_GET_SARA_PHASE                 = 3,
+    DATA_GET_DRIVE_ME_CRAZY             = 4,
 };
 
 const Position Middle = {1980.28f, -25.5868f, 329.397f, M_PI*1.5f};
@@ -1126,7 +1127,7 @@ public:
 
         uint32 GetData(uint32 param) const
         {
-            if (param == ACTION_FAILED_DRIVE_ME_CRAZY)
+            if (param == DATA_GET_DRIVE_ME_CRAZY)
                 return !_usedInsane;
 
             return 0;
@@ -2874,7 +2875,7 @@ class achievement_yogg_saron_drive_me_crazy : public AchievementCriteriaScript
 
         bool OnCheck(Player* player, Unit* target)
         {
-            return target && target->GetAI()->GetData(ACTION_FAILED_DRIVE_ME_CRAZY); // target = Yogg-Saron
+            return target && target->GetAI()->GetData(DATA_GET_DRIVE_ME_CRAZY); // target = Yogg-Saron
         }
 };
 
