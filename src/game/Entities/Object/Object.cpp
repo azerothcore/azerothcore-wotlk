@@ -315,7 +315,8 @@ void Object::BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
         // 0x08000000
         if (unit->m_movementInfo.GetMovementFlags() & MOVEMENTFLAG_SPLINE_ENABLED)
         {
-            if (unit->movespline->_Spline().getPoints(true).empty() || (!unit->movespline->_Spline().getPoints(true).empty() && &unit->movespline->_Spline().getPoints(true)[0] == NULL))
+            const G3D::Vector3 * p = &unit->movespline->_Spline().getPoints(true)[0];
+            if (unit->movespline->_Spline().getPoints(true).empty() || (!unit->movespline->_Spline().getPoints(true).empty() && !p))
                 const_cast<Unit*>(unit)->DisableSpline();
             else
                 Movement::PacketBuilder::WriteCreate(*unit->movespline, *data);
@@ -2081,7 +2082,7 @@ TempSummon* Map::SummonCreature(uint32 entry, Position const& pos, SummonPropert
     summon->SetHomePosition(pos);
 
     summon->InitStats(duration);
-    AddToMap(summon->ToCreature(), (IS_PLAYER_GUID(summon->GetOwnerGUID()) || summoner && summoner->GetTransport()));
+    AddToMap(summon->ToCreature(), (IS_PLAYER_GUID(summon->GetOwnerGUID()) || (summoner && summoner->GetTransport())));
     summon->InitSummon();
 
     //ObjectAccessor::UpdateObjectVisibility(summon);
@@ -2151,7 +2152,7 @@ void WorldObject::SetZoneScript()
     }
 }
 
-TempSummon* WorldObject::SummonCreature(uint32 entry, const Position &pos, TempSummonType spwtype, uint32 duration, uint32 vehId, SummonPropertiesEntry const *properties) const
+TempSummon* WorldObject::SummonCreature(uint32 entry, const Position &pos, TempSummonType spwtype, uint32 duration, uint32  /*vehId*/, SummonPropertiesEntry const *properties) const
 { 
     if (Map* map = FindMap())
     {

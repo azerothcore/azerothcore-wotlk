@@ -104,7 +104,7 @@ class boss_saviana_ragefire : public CreatureScript
                 me->SetHover(false);
             }
 
-            void KilledUnit(Unit* victim)
+            void KilledUnit(Unit*  /*victim*/)
             {
                 if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
                 {

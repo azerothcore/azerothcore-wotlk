@@ -149,10 +149,8 @@ _hitMask(hitMask), _spell(spell), _damageInfo(damageInfo), _healInfo(healInfo), 
 #endif
 Unit::Unit(bool isWorldObject) : WorldObject(isWorldObject),
 m_movedByPlayer(NULL), m_lastSanctuaryTime(0), IsAIEnabled(false), NeedChangeAI(false),
-m_ControlledByPlayer(false), m_CreatedByPlayer(false), movespline(new Movement::MoveSpline()), i_AI(NULL),
-i_disabledAI(NULL), m_procDeep(0), m_removedAurasCount(0), i_motionMaster(new MotionMaster(this)), m_regenTimer(0),
-m_ThreatManager(this), m_vehicle(NULL), m_vehicleKit(NULL), m_unitTypeMask(UNIT_MASK_NONE),
-m_HostileRefManager(this), m_AutoRepeatFirstCast(false), m_realRace(0), m_race(0)
+m_ControlledByPlayer(false), m_CreatedByPlayer(false), movespline(new Movement::MoveSpline()), i_AI(NULL), i_disabledAI(NULL), m_realRace(0), m_race(0), m_AutoRepeatFirstCast(false), m_procDeep(0), m_removedAurasCount(0),
+i_motionMaster(new MotionMaster(this)), m_regenTimer(0), m_ThreatManager(this), m_vehicle(NULL), m_vehicleKit(NULL), m_unitTypeMask(UNIT_MASK_NONE), m_HostileRefManager(this)
 {
 #ifdef _MSC_VER
 #pragma warning(default:4355)
@@ -666,7 +664,7 @@ void Unit::DealDamageMods(Unit const* victim, uint32 &damage, uint32* absorb)
     }
 }
 
-uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage const* cleanDamage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask, SpellInfo const* spellProto, bool durabilityLoss, bool allowGM)
+uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage const* cleanDamage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask, SpellInfo const* spellProto, bool durabilityLoss, bool  /*allowGM*/)
 {
     // Xinef: initialize damage done for rage calculations
     // Xinef: its rare to modify damage in hooks, however training dummy's sets damage to 0
@@ -3308,9 +3306,7 @@ void Unit::SetCurrentCastedSpell(Spell* pSpell)
 }
 
 void Unit::InterruptSpell(CurrentSpellTypes spellType, bool withDelayed, bool withInstant, bool bySelf)
-{ 
-    ASSERT(spellType < CURRENT_MAX_SPELL);
-
+{
     //sLog->outDebug(LOG_FILTER_UNITS, "Interrupt spell for unit %u.", GetEntry());
     Spell* spell = m_currentSpells[spellType];
     if (spell
@@ -3431,13 +3427,13 @@ bool Unit::isInAccessiblePlaceFor(Creature const* c) const
     else if (c->GetMapId() == 631) // Icecrown Citadel
     {
         // if static transport doesn't match - return false
-        if (c->GetTransport() != this->GetTransport() && (c->GetTransport() && c->GetTransport()->IsStaticTransport() || this->GetTransport() && this->GetTransport()->IsStaticTransport()))
+        if (c->GetTransport() != this->GetTransport() && ((c->GetTransport() && c->GetTransport()->IsStaticTransport()) || (this->GetTransport() && this->GetTransport()->IsStaticTransport())))
             return false;
 
         // special handling for ICC (map 631), for non-flying pets in Gunship Battle, for trash npcs this is done via CanAIAttack
         if (IS_PLAYER_GUID(c->GetOwnerGUID()) && !c->CanFly()) 
         {
-            if (c->GetTransport() && !this->GetTransport() || !c->GetTransport() && this->GetTransport())
+            if ((c->GetTransport() && !this->GetTransport()) || (!c->GetTransport() && this->GetTransport()))
                 return false;
             if (this->GetTransport())
             {
@@ -3694,7 +3690,7 @@ void SafeUnitPointer::UnitDeleted()
     {
         if (Player* p = defaultValue->ToPlayer())
         {
-            sLog->outMisc("SafeUnitPointer::UnitDeleted (A1) - %u, %u, %u, %u, %u, %u, %u, %u", p->GetGUIDLow(), p->GetMapId(), p->GetInstanceId(), p->FindMap(), p->IsInWorld() ? 1 : 0, p->IsDuringRemoveFromWorld() ? 1 : 0, p->IsBeingTeleported() ? 1 : 0, p->isBeingLoaded() ? 1 : 0);
+            sLog->outMisc("SafeUnitPointer::UnitDeleted (A1) - %u, %u, %u, %u, %u, %u, %u, %u", p->GetGUIDLow(), p->GetMapId(), p->GetInstanceId(), p->FindMap()->GetId(), p->IsInWorld() ? 1 : 0, p->IsDuringRemoveFromWorld() ? 1 : 0, p->IsBeingTeleported() ? 1 : 0, p->isBeingLoaded() ? 1 : 0);
             if (ptr)
                 sLog->outMisc("SafeUnitPointer::UnitDeleted (A2)");
 
@@ -3722,7 +3718,7 @@ void Unit::HandleSafeUnitPointersOnDelete(Unit* thisUnit)
 bool Unit::IsInWater(bool allowAbove) const
 { 
     const_cast<Unit*>(this)->UpdateEnvironmentIfNeeded(1);
-    return m_last_isinwater_status || allowAbove && m_last_islittleabovewater_status;
+    return m_last_isinwater_status || (allowAbove && m_last_islittleabovewater_status);
 }
 
 bool Unit::IsUnderWater() const
@@ -3731,7 +3727,7 @@ bool Unit::IsUnderWater() const
     return m_last_isunderwater_status;
 }
 
-void Unit::UpdateUnderwaterState(Map* m, float x, float y, float z)
+void Unit::UpdateUnderwaterState(Map*  /*m*/, float  /*x*/, float  /*y*/, float  /*z*/)
 { 
 }
 
@@ -4046,7 +4042,7 @@ void Unit::_UnapplyAura(AuraApplication * aurApp, AuraRemoveMode removeMode)
 
 void Unit::_RemoveNoStackAurasDueToAura(Aura* aura)
 { 
-    SpellInfo const* spellProto = aura->GetSpellInfo();
+    //SpellInfo const* spellProto = aura->GetSpellInfo();
 
     // passive spell special case (only non stackable with ranks)
 
@@ -7902,7 +7898,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
 
 // Used in case when access to whole aura is needed
 // All procs should be handled like this...
-bool Unit::HandleAuraProc(Unit* victim, uint32 damage, Aura* triggeredByAura, SpellInfo const* procSpell, uint32 /*procFlag*/, uint32 procEx, uint32 cooldown, bool * handled)
+bool Unit::HandleAuraProc(Unit* victim, uint32 damage, Aura* triggeredByAura, SpellInfo const*  /*procSpell*/, uint32 /*procFlag*/, uint32 procEx, uint32  /*cooldown*/, bool * handled)
 { 
     SpellInfo const* dummySpell = triggeredByAura->GetSpellInfo();
 
@@ -8154,7 +8150,7 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
                     case 40336:
                     {
                         // On successful melee or ranged attack gain $29471s1 mana and if possible drain $27526s1 mana from the target.
-                        if (this && IsAlive())
+                        if (IsAlive())
                             CastSpell(this, 29471, true, castItem, triggeredByAura);
                         if (victim && victim->IsAlive())
                             CastSpell(victim, 27526, true, castItem, triggeredByAura);
@@ -10047,7 +10043,7 @@ int32 Unit::DealHeal(Unit* healer, Unit* victim, uint32 addhealth)
     return gain;
 }
 
-bool RedirectSpellEvent::Execute(uint64 e_time, uint32 p_time)
+bool RedirectSpellEvent::Execute(uint64  /*e_time*/, uint32  /*p_time*/)
 {
     if (Unit* auraOwner = ObjectAccessor::GetUnit(_self, _auraOwnerGUID))
     {
@@ -10450,7 +10446,7 @@ float Unit::SpellPctDamageModsDone(Unit* victim, SpellInfo const* spellProto, Da
                 // Merciless Combat
                 if ((*i)->GetSpellInfo()->SpellIconID == 2656)
                 {
-                    if( spellProto && spellProto->SpellFamilyFlags[0] & 0x2 || spellProto->SpellFamilyFlags[1] & 0x2 )
+                    if( (spellProto && spellProto->SpellFamilyFlags[0] & 0x2) || spellProto->SpellFamilyFlags[1] & 0x2 )
                         if (!victim->HealthAbovePct(35))
                             AddPct(DoneTotalMod, (*i)->GetAmount());
                 }
@@ -11000,6 +10996,8 @@ float Unit::SpellDoneCritChance(Unit const* /*victim*/, SpellInfo const* spellPr
                     case BASE_ATTACK:   crit_chance = GetFloatValue(PLAYER_CRIT_PERCENTAGE);            break;
                     case OFF_ATTACK:    crit_chance = GetFloatValue(PLAYER_OFFHAND_CRIT_PERCENTAGE);    break;
                     case RANGED_ATTACK: crit_chance = GetFloatValue(PLAYER_RANGED_CRIT_PERCENTAGE); break;
+                    default:
+                        break;
                 }
             }
             else
@@ -15017,8 +15015,8 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
             continue;
 
         // Triggered spells not triggering additional spells
-        bool triggered = !spellProto->HasAttribute(SPELL_ATTR3_CAN_PROC_WITH_TRIGGERED) ?
-            (procExtra & PROC_EX_INTERNAL_TRIGGERED && !(procFlag & PROC_FLAG_DONE_TRAP_ACTIVATION)) : false;
+        //bool triggered = !spellProto->HasAttribute(SPELL_ATTR3_CAN_PROC_WITH_TRIGGERED) ?
+        //    (procExtra & PROC_EX_INTERNAL_TRIGGERED && !(procFlag & PROC_FLAG_DONE_TRAP_ACTIVATION)) : false;
 
         for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
         {
@@ -18214,7 +18212,7 @@ void Unit::ExitVehicle(Position const* /*exitPosition*/)
     //! Coming Soon(TM)
 }
 
-bool VehicleDespawnEvent::Execute(uint64 e_time, uint32 p_time)
+bool VehicleDespawnEvent::Execute(uint64  /*e_time*/, uint32  /*p_time*/)
 {
     Position pos = _self;
     _self.MovePositionToFirstCollision(pos, 20.0f, M_PI);
@@ -18661,8 +18659,8 @@ class AuraMunchingQueue : public BasicEvent
         }
 
     private:
-        uint64 _targetGUID;
         Unit& _owner;
+        uint64 _targetGUID;
         int32 _basePoints;
         uint32 _spellId;
 };
@@ -18855,7 +18853,7 @@ int32 Unit::CalculateAOEDamageReduction(int32 damage, uint32 schoolMask, Unit* c
     return damage;
 }
 
-bool ConflagrateAuraStateDelayEvent::Execute(uint64 e_time, uint32 p_time)
+bool ConflagrateAuraStateDelayEvent::Execute(uint64  /*e_time*/, uint32  /*p_time*/)
 {
     if (Unit* owner = ObjectAccessor::FindUnit(m_owner))
             if (owner && m_caster && owner->IsInWorld())

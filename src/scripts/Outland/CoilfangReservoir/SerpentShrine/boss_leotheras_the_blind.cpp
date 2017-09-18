@@ -116,7 +116,7 @@ class boss_leotheras_the_blind : public CreatureScript
                     me->SummonCreature(NPC_GREYHEART_SPELLBINDER, channelersPos[i], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
             }
 
-            void MoveInLineOfSight(Unit* who) { }
+            void MoveInLineOfSight(Unit*  /*who*/) { }
 
             void JustSummoned(Creature* summon)
             {
@@ -143,7 +143,7 @@ class boss_leotheras_the_blind : public CreatureScript
                     }
             }
 
-            void KilledUnit(Unit* victim)
+            void KilledUnit(Unit*  /*victim*/)
             {
                 if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
                 {
@@ -420,12 +420,12 @@ class spell_leotheras_insidious_whisper : public SpellScriptLoader
         {
             PrepareAuraScript(spell_leotheras_insidious_whisper_AuraScript)
 
-            void HandleEffectApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+            void HandleEffectApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
                 GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_SUMMON_INNER_DEMON, true);
             }
 
-            void HandleEffectRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+            void HandleEffectRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
                 if (GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_DEFAULT)
                     if (InstanceScript* instance = GetUnitOwner()->GetInstanceScript())

@@ -198,34 +198,34 @@ Position const SkybreakerTeleportExit      = { -17.55738f, -0.090421f, 21.18366f
 uint32 const MuradinExitPathSize = 10;
 Position const MuradinExitPath[MuradinExitPathSize] =
 {
-    { 8.130936f, -0.2699585f, 20.31728f },
-    { 6.380936f, -0.2699585f, 20.31728f },
-    { 3.507703f, 0.02986573f, 20.78463f },
-    { -2.767633f, 3.743143f, 20.37663f },
-    { -4.017633f, 4.493143f, 20.12663f },
-    { -7.242224f, 6.856013f, 20.03468f },
-    { -7.742224f, 8.606013f, 20.78468f },
-    { -7.992224f, 9.856013f, 21.28468f },
-    { -12.24222f, 23.10601f, 21.28468f },
-    { -14.88477f, 25.20844f, 21.59985f },
+    { 8.130936f, -0.2699585f, 20.31728f, 0.0f },
+    { 6.380936f, -0.2699585f, 20.31728f, 0.0f },
+    { 3.507703f, 0.02986573f, 20.78463f, 0.0f },
+    { -2.767633f, 3.743143f, 20.37663f, 0.0f },
+    { -4.017633f, 4.493143f, 20.12663f, 0.0f },
+    { -7.242224f, 6.856013f, 20.03468f, 0.0f },
+    { -7.742224f, 8.606013f, 20.78468f, 0.0f },
+    { -7.992224f, 9.856013f, 21.28468f, 0.0f },
+    { -12.24222f, 23.10601f, 21.28468f, 0.0f },
+    { -14.88477f, 25.20844f, 21.59985f, 0.0f },
 };
 
 uint32 const SaurfangExitPathSize = 13;
 Position const SaurfangExitPath[SaurfangExitPathSize] =
 {
-    { 30.43987f, 0.1475817f, 36.10674f },
-    { 21.36141f, -3.056458f, 35.42970f },
-    { 19.11141f, -3.806458f, 35.42970f },
-    { 19.01736f, -3.299440f, 35.39428f },
-    { 18.6747f, -5.862823f, 35.66611f },
-    { 18.6747f, -7.862823f, 35.66611f },
-    { 18.1747f, -17.36282f, 35.66611f },
-    { 18.1747f, -22.61282f, 35.66611f },
-    { 17.9247f, -24.36282f, 35.41611f },
-    { 17.9247f, -26.61282f, 35.66611f },
-    { 17.9247f, -27.86282f, 35.66611f },
-    { 17.9247f, -29.36282f, 35.66611f },
-    { 15.33203f, -30.42621f, 35.93796f }
+    { 30.43987f, 0.1475817f, 36.10674f, 0.0f },
+    { 21.36141f, -3.056458f, 35.42970f, 0.0f },
+    { 19.11141f, -3.806458f, 35.42970f, 0.0f },
+    { 19.01736f, -3.299440f, 35.39428f, 0.0f },
+    { 18.6747f, -5.862823f, 35.66611f, 0.0f },
+    { 18.6747f, -7.862823f, 35.66611f, 0.0f },
+    { 18.1747f, -17.36282f, 35.66611f, 0.0f },
+    { 18.1747f, -22.61282f, 35.66611f, 0.0f },
+    { 17.9247f, -24.36282f, 35.41611f, 0.0f },
+    { 17.9247f, -26.61282f, 35.66611f, 0.0f },
+    { 17.9247f, -27.86282f, 35.66611f, 0.0f },
+    { 17.9247f, -29.36282f, 35.66611f, 0.0f },
+    { 15.33203f, -30.42621f, 35.93796f, 0.0f }
 };
 
 enum PassengerSlots
@@ -1639,7 +1639,7 @@ class npc_gunship_boarding_leader : public CreatureScript
             {
             }
 
-            void EnterCombat(Unit* target)
+            void EnterCombat(Unit*  /*target*/)
             {
                 _events.Reset();
                 _events.ScheduleEvent(EVENT_BLADESTORM, urand(13000, 18000));
@@ -1787,7 +1787,7 @@ class npc_gunship_mage : public CreatureScript
                 gunship_npc_AI::UpdateAI(diff);
             }
 
-            bool CanAIAttack(const Unit* target) const
+            bool CanAIAttack(const Unit*  /*target*/) const
             {
                 return Instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) == IN_PROGRESS;
             }
@@ -1916,7 +1916,7 @@ class npc_gunship_rocketeer : public CreatureScript
                 me->_AddCreatureSpellCooldown(spellId, 9000);
             }
 
-            bool CanAIAttack(const Unit* target) const
+            bool CanAIAttack(const Unit*  /*target*/) const
             {
                 return Instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) == IN_PROGRESS;
             }

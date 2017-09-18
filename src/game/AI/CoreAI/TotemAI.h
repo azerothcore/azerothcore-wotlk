@@ -36,7 +36,7 @@ class KillMagnetEvent : public BasicEvent
 {
     public:
         KillMagnetEvent(Unit& self) : _self(self) { }
-        bool Execute(uint64 e_time, uint32 p_time)
+        bool Execute(uint64 /*e_time*/, uint32 /*p_time*/)
         {
             _self.setDeathState(JUST_DIED);
             return true;

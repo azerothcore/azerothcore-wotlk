@@ -1092,7 +1092,7 @@ public:
         return true;
     }
 
-    static bool HandleSaveCommand(ChatHandler* handler, char const* /*args*/)
+    static bool HandleSaveCommand(ChatHandler*  /*handler*/, char const* /*args*/)
     {
         // pussywizard: fully disabled on 28.12.2011, but disabled it "silently"
         return true;
@@ -1891,7 +1891,7 @@ public:
 
                 stmt->setUInt32(0, ip);
 
-                PreparedQueryResult result2 = WorldDatabase.Query(stmt);
+                PreparedQueryResult result2 = LoginDatabase.Query(stmt);
 
                 if (result2)
                 {
@@ -3082,10 +3082,10 @@ public:
                 if (flags.empty())
                     flags = "None";
 
-                Player* p = ObjectAccessor::FindPlayerInOrOutOfWorld((*itr).guid);
+                /*Player* p = ObjectAccessor::FindPlayerInOrOutOfWorld((*itr).guid);
                 const char* onlineState = p ? "online" : "offline";
 
-                /*handler->PSendSysMessage(LANG_GROUP_PLAYER_NAME_GUID, slot.name.c_str(), onlineState,
+                handler->PSendSysMessage(LANG_GROUP_PLAYER_NAME_GUID, slot.name.c_str(), onlineState,
                     GUID_LOPART(slot.guid), flags.c_str(), lfg::GetRolesString(slot.roles).c_str());*/
             }
         }

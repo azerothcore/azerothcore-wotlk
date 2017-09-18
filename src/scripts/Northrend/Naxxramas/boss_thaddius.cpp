@@ -182,7 +182,7 @@ public:
                 pInstance->SetData(DATA_IMMORTAL_FAIL, 0);
         }
 
-        void JustDied(Unit* Killer)
+        void JustDied(Unit*  /*Killer*/)
         {
             Talk(SAY_DEATH);
             if (pInstance)
@@ -195,7 +195,7 @@ public:
 
         void JustSummoned(Creature* cr) { summons.Summon(cr); }
 
-        void EnterCombat(Unit *who)
+        void EnterCombat(Unit * /*who*/)
         {
             me->SetInCombatWithZone();
             summons.DoZoneInCombat(NPC_FEUGEN);

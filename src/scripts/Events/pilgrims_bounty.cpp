@@ -102,10 +102,10 @@ class npc_pilgrims_bounty_chair : public CreatureScript
                 me->SetReactState(REACT_PASSIVE);
             }
 
-            void MoveInLineOfSight(Unit* who) {}
+            void MoveInLineOfSight(Unit*  /*who*/) {}
             void AttackStart(Unit*) {}
 
-            void PassengerBoarded(Unit* who, int8 seatId, bool apply)
+            void PassengerBoarded(Unit* who, int8  /*seatId*/, bool apply)
             {
                 if (apply && who->GetTypeId() == TYPEID_PLAYER)
                     who->ToPlayer()->SetClientControl(me, 0, true);
@@ -200,7 +200,7 @@ class npc_pilgrims_bounty_chair : public CreatureScript
                 charm->ToCreature()->AI()->DoAction(spellInfo->Id);
             }
 
-            void SpellHit(Unit* target, const SpellInfo* spellInfo)
+            void SpellHit(Unit*  /*target*/, const SpellInfo* spellInfo)
             {
                 switch (spellInfo->Id)
                 {
@@ -284,7 +284,7 @@ class npc_pilgrims_bounty_plate : public CreatureScript
             {
             }
 
-            void SpellHit(Unit* caster, const SpellInfo* spellInfo)
+            void SpellHit(Unit*  /*caster*/, const SpellInfo* spellInfo)
             {
                 switch (spellInfo->Id)
                 {

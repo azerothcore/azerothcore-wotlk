@@ -165,7 +165,7 @@ class SmartScript
             CellCoord p(Trinity::ComputeCellCoord(searchObject->GetPositionX(), searchObject->GetPositionY()));
             Cell cell(p);
 
-            Trinity::GameObjectWithDbGUIDCheck goCheck(*searchObject, guid);
+            Trinity::GameObjectWithDbGUIDCheck goCheck(guid);
             Trinity::GameObjectSearcher<Trinity::GameObjectWithDbGUIDCheck> checker(searchObject, gameObject, goCheck);
 
             TypeContainerVisitor<Trinity::GameObjectSearcher<Trinity::GameObjectWithDbGUIDCheck>, GridTypeMapContainer > objectChecker(checker);
@@ -180,7 +180,7 @@ class SmartScript
             CellCoord p(Trinity::ComputeCellCoord(searchObject->GetPositionX(), searchObject->GetPositionY()));
             Cell cell(p);
 
-            Trinity::CreatureWithDbGUIDCheck target_check(searchObject, guid);
+            Trinity::CreatureWithDbGUIDCheck target_check(guid);
             Trinity::CreatureSearcher<Trinity::CreatureWithDbGUIDCheck> checker(searchObject, creature, target_check);
 
             TypeContainerVisitor<Trinity::CreatureSearcher <Trinity::CreatureWithDbGUIDCheck>, GridTypeMapContainer > unit_checker(checker);

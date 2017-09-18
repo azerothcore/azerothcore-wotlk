@@ -380,7 +380,7 @@ class boss_professor_putricide : public CreatureScript
                     summon->SetInCombatWithZone();
             }
 
-            void DamageTaken(Unit*, uint32& /*damage*/, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask)
+            void DamageTaken(Unit*, uint32& /*damage*/, DamageEffectType  /*damagetype*/, SpellSchoolMask  /*damageSchoolMask*/)
             {
                 if (bChangePhase)
                     return;
@@ -411,7 +411,7 @@ class boss_professor_putricide : public CreatureScript
                 switch (id)
                 {
                     case POINT_FESTERGUT:
-                        if (Creature* c = instance->instance->GetCreature(instance->GetData64(DATA_FESTERGUT)))
+                        if (Creature* c = instance->instance->GetCreature(instance->GetData64(DATA_FESTERGUT))) {
                             if (c->IsInCombat())
                             {
                                 instance->SetBossState(DATA_FESTERGUT, IN_PROGRESS);
@@ -419,18 +419,24 @@ class boss_professor_putricide : public CreatureScript
                                 DoAction(ACTION_FESTERGUT_GAS);
                                 c->CastSpell(c, SPELL_GASEOUS_BLIGHT_LARGE, true, NULL, NULL, c->GetGUID());
                             }
-                            else
+                            else 
+                            {
                                 bCallEvade = true;
+                            }
+                        }
                         break;
                     case POINT_ROTFACE:
-                        if (Creature* c = instance->instance->GetCreature(instance->GetData64(DATA_ROTFACE)))
+                        if (Creature* c = instance->instance->GetCreature(instance->GetData64(DATA_ROTFACE))) {
                             if (c->IsInCombat())
                             {
                                 instance->SetBossState(DATA_ROTFACE, IN_PROGRESS);
                                 me->SetFacingTo(rotfaceWatchPos.GetOrientation());
                             }
-                            else
+                            else 
+                            {
                                 bCallEvade = true;
+                            }
+                        }
                         break;
                     case POINT_TABLE:
                         me->SetFacingTo(tablePos.GetOrientation());
@@ -871,7 +877,7 @@ class spell_putricide_slime_puddle : public SpellScriptLoader
             }
 
             // big hax to unlock Abomination Eat Ooze ability, requires caster aura spell from difficulty X, but unlocks clientside when got base aura
-            void HandleScript(SpellEffIndex effIndex)
+            void HandleScript(SpellEffIndex  /*effIndex*/)
             {
                 const SpellInfo* s1 = sSpellMgr->GetSpellInfo(70346);
                 const SpellInfo* s2 = sSpellMgr->GetSpellInfo(72456);
@@ -920,8 +926,6 @@ class spell_putricide_slime_puddle_spawn : public SpellScriptLoader
             {
                 BeforeCast += SpellCastFn(spell_putricide_slime_puddle_spawn_SpellScript::SelectDest);
             }
-
-            uint32 _targetCount;
         };
 
         SpellScript* GetSpellScript() const
@@ -939,7 +943,7 @@ class spell_putricide_grow_stacker : public SpellScriptLoader
         {
             PrepareAuraScript(spell_putricide_grow_stacker_AuraScript);
 
-            void HandleTriggerSpell(AuraEffect const* aurEff)
+            void HandleTriggerSpell(AuraEffect const*  /*aurEff*/)
             {
                 if (Unit* target = GetTarget())
                     if (target->HasAura(SPELL_TEAR_GAS_CREATURE))
@@ -982,7 +986,7 @@ class spell_putricide_unstable_experiment : public SpellScriptLoader
                 std::list<Creature*> creList;
                 GetCreatureListWithEntryInGrid(creList, GetCaster(), NPC_ABOMINATION_WING_MAD_SCIENTIST_STALKER, 200.0f);
                 for (std::list<Creature*>::iterator itr = creList.begin(); itr != creList.end(); ++itr)
-                    if ((*itr)->GetPositionX() > 4350.0f && stage == 0 || (*itr)->GetPositionX() < 4350.0f && stage == 1)
+                    if (((*itr)->GetPositionX() > 4350.0f && stage == 0) || ((*itr)->GetPositionX() < 4350.0f && stage == 1))
                     {
                         target = (*itr);
                         break;

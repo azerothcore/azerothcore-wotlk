@@ -90,7 +90,7 @@ class boss_ormorok : public CreatureScript
                 BossAI::JustDied(killer);
             }
 
-            void KilledUnit(Unit *victim)
+            void KilledUnit(Unit * /*victim*/)
             {
                 if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
                 {

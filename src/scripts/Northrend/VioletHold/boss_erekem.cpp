@@ -125,7 +125,7 @@ public:
 
                             Creature *pGuard1 = pInstance->instance->GetCreature(pInstance->GetData64(DATA_EREKEM_GUARD_1_GUID));
                             Creature *pGuard2 = pInstance->instance->GetCreature(pInstance->GetData64(DATA_EREKEM_GUARD_2_GUID));
-                            if (pGuard1 && !pGuard1->IsAlive() || pGuard2 && !pGuard2->IsAlive())
+                            if ((pGuard1 && !pGuard1->IsAlive()) || (pGuard2 && !pGuard2->IsAlive()))
                             {
                                 events.RepeatEvent(urand(3000,6000));
                                 break;

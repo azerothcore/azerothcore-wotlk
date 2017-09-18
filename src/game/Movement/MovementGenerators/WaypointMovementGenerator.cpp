@@ -287,8 +287,6 @@ void FlightPathMovementGenerator::LoadPath(Player* player)
         TaxiPathNodeList const& nodes = sTaxiPathNodesByPath[path];
         if (!nodes.empty())
         {
-            TaxiPathNodeEntry const* start = nodes[0];
-            TaxiPathNodeEntry const* end = nodes[nodes.size() - 1];
             for (uint32 i = 0; i < nodes.size(); ++i)
                 i_path.push_back(nodes[i]);
         }

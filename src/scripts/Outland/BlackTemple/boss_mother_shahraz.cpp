@@ -222,7 +222,7 @@ class spell_mother_shahraz_saber_lash : public SpellScriptLoader
         {
             PrepareAuraScript(spell_mother_shahraz_saber_lash_AuraScript);
 
-            bool CheckProc(ProcEventInfo& eventInfo)
+            bool CheckProc(ProcEventInfo&  /*eventInfo*/)
             {
                 return false;
             }
@@ -275,7 +275,7 @@ class spell_mother_shahraz_fatal_attraction : public SpellScriptLoader
                     }
             }
 
-            void HandleTeleportUnits(SpellEffIndex effIndex)
+            void HandleTeleportUnits(SpellEffIndex  /*effIndex*/)
             {
                 if (Unit* target = GetHitUnit())
                     GetCaster()->CastSpell(target, SPELL_FATAL_ATTRACTION_AURA, true);
@@ -304,7 +304,7 @@ class spell_mother_shahraz_fatal_attraction_dummy : public SpellScriptLoader
         {
             PrepareSpellScript(spell_mother_shahraz_fatal_attraction_dummy_SpellScript);
 
-            void HandleDummy(SpellEffIndex effIndex)
+            void HandleDummy(SpellEffIndex  /*effIndex*/)
             {
                 if (Unit* target = GetHitUnit())
                 {

@@ -39,8 +39,8 @@
 /***            BATTLEGROUND MANAGER                   ***/
 /*********************************************************/
 
-BattlegroundMgr::BattlegroundMgr() : m_ArenaTesting(false), m_Testing(false), 
-    m_lastClientVisibleInstanceId(0), m_NextAutoDistributionTime(0), m_NextPeriodicQueueUpdateTime(5*IN_MILLISECONDS), randomBgDifficultyEntry(999, 0, 80, 80, 0)
+BattlegroundMgr::BattlegroundMgr() : randomBgDifficultyEntry(999, 0, 80, 80, 0), m_ArenaTesting(false), m_Testing(false), 
+    m_lastClientVisibleInstanceId(0), m_NextAutoDistributionTime(0), m_NextPeriodicQueueUpdateTime(5*IN_MILLISECONDS)
 {
     for (uint32 qtype = BATTLEGROUND_QUEUE_NONE; qtype < MAX_BATTLEGROUND_QUEUE_TYPES; ++qtype)
         m_BattlegroundQueues[qtype].SetBgTypeIdAndArenaType(BGTemplateId(BattlegroundQueueTypeId(qtype)), BGArenaType(BattlegroundQueueTypeId(qtype)));
@@ -737,7 +737,6 @@ void BattlegroundMgr::BuildBattlegroundListPacket(WorldPacket* data, uint64 guid
             if (PvPDifficultyEntry const* bracketEntry = GetBattlegroundBracketByLevel(bgt->GetMapId(), player->getLevel()))
             {
                 uint32 count = 0;
-                BattlegroundBracketId bracketId = bracketEntry->GetBracketId();
                 /*for (BattlegroundClientIdsContainer::const_iterator itr = clientIds.begin(); itr != clientIds.end(); ++itr)
                 {
                     *data << uint32(*itr);
@@ -748,7 +747,7 @@ void BattlegroundMgr::BuildBattlegroundListPacket(WorldPacket* data, uint64 guid
     }
 }
 
-void BattlegroundMgr::SendToBattleground(Player* player, uint32 instanceId, BattlegroundTypeId bgTypeId)
+void BattlegroundMgr::SendToBattleground(Player* player, uint32 instanceId, BattlegroundTypeId  /*bgTypeId*/)
 {
     if (Battleground* bg = GetBattleground(instanceId))
     {

@@ -288,7 +288,7 @@ public:
             }
         }
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit*  /*killer*/)
         {
             summons.DespawnAll();
             me->DespawnOrUnsummon(15000);

@@ -521,7 +521,7 @@ public:
                 boss_twin_valkyrAI::JustSummoned(c);
         }
 
-        void JustSummoned(Creature* s) {}
+        void JustSummoned(Creature*  /*s*/) {}
     };
 };
 
@@ -547,7 +547,7 @@ public:
                 boss_twin_valkyrAI::JustSummoned(c);
         }
 
-        void JustSummoned(Creature* s) {}
+        void JustSummoned(Creature*  /*s*/) {}
     };
 };
 
@@ -704,7 +704,7 @@ public:
             me->GetMotionMaster()->MovePoint(0, Locs[LOC_CENTER].GetPositionX()+cos(angle)*47.0f, Locs[LOC_CENTER].GetPositionY()+sin(angle)*47.0f, me->GetPositionZ());
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32  /*diff*/)
         {
             if( despawning )
                 return;
@@ -831,7 +831,7 @@ class spell_valkyr_touch : public SpellScriptLoader
                             {
                                 uint32 absorb=0;
                                 uint32 resist=0;
-                                CleanDamage cleanDamage =  CleanDamage(0, 0, BASE_ATTACK, MELEE_HIT_NORMAL);
+                                CleanDamage(0, 0, BASE_ATTACK, MELEE_HIT_NORMAL);
                                 int32 dmg = urand(2925,3075)*(caster->GetMap()->GetDifficulty()-1);
                                 if (caster->CanApplyResilience())
                                     Unit::ApplyResilience(plr, NULL, &dmg, false, CR_CRIT_TAKEN_SPELL);
@@ -869,7 +869,7 @@ class spell_valkyr_ball_periodic_dummy : public SpellScriptLoader
         {
             PrepareAuraScript(spell_valkyr_ball_periodic_dummyAuraScript)
 
-            void HandleEffectPeriodic(AuraEffect const * aurEff)
+            void HandleEffectPeriodic(AuraEffect const *  /*aurEff*/)
             {
                 if (Unit* target = GetTarget())
                     if (target->GetDisplayId() != 11686)

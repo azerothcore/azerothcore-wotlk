@@ -1613,7 +1613,7 @@ void Spell::EffectHealMechanical(SpellEffIndex /*effIndex*/)
     m_damage -= unitTarget->SpellHealingBonusTaken(m_originalCaster, m_spellInfo, heal, HEAL);
 }
 
-void Spell::EffectHealthLeech(SpellEffIndex effIndex)
+void Spell::EffectHealthLeech(SpellEffIndex  /*effIndex*/)
 {
     if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
         return;
@@ -2722,7 +2722,7 @@ void Spell::EffectUntrainTalents(SpellEffIndex /*effIndex*/)
         unitTarget->ToPlayer()->SendTalentWipeConfirm(guid);
 }
 
-void Spell::EffectTeleUnitsFaceCaster(SpellEffIndex effIndex)
+void Spell::EffectTeleUnitsFaceCaster(SpellEffIndex  /*effIndex*/)
 {
     if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
         return;
@@ -2871,8 +2871,6 @@ void Spell::EffectEnchantItemPrismatic(SpellEffIndex effIndex)
         return;
     if (!itemTarget)
         return;
-
-    Player* p_caster = m_caster->ToPlayer();
 
     uint32 enchant_id = m_spellInfo->Effects[effIndex].MiscValue;
     if (!enchant_id)
@@ -6207,7 +6205,7 @@ void Spell::EffectBind(SpellEffIndex effIndex)
     player->SendDirectMessage(&data);
 }
 
-void Spell::EffectSummonRaFFriend(SpellEffIndex effIndex)
+void Spell::EffectSummonRaFFriend(SpellEffIndex  /*effIndex*/)
 {
     if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
         return;

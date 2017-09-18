@@ -107,7 +107,7 @@ public:
 
         void SummonedCreatureDespawn(Creature* cr) { summons.Despawn(cr); }
 
-        void JustDied(Unit* Killer)
+        void JustDied(Unit*  /*Killer*/)
         {
             summons.DespawnAll();
             if (pInstance)
@@ -132,7 +132,7 @@ public:
                 pInstance->SetData(DATA_IMMORTAL_FAIL, 0);
         }
 
-        void EnterCombat(Unit *who)
+        void EnterCombat(Unit * /*who*/)
         {
             me->CallForHelp(30.0f); // catch helpers
             Talk(SAY_AGGRO);

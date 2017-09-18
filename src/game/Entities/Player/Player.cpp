@@ -181,6 +181,7 @@ void PlayerTaxi::InitTaxiNodesForLevel(uint32 race, uint32 chrClass, uint8 level
     {
         case TEAM_ALLIANCE: SetTaximaskNode(100); break;
         case TEAM_HORDE:    SetTaximaskNode(99);  break;
+        default: break;
     }
     // level dependent taxi hubs
     if (level >= 68)
@@ -1023,7 +1024,7 @@ bool Player::Create(uint32 guidlow, CharacterCreateInfo* createInfo)
 
     if (!IsValidGender(createInfo->Gender))
     {
-        sLog->outError("Player::Create: Possible hacking-attempt: Account %u tried creating a character named '%s' with an invalid gender (%hu) - refusing to do so",
+        sLog->outError("Player::Create: Possible hacking-attempt: Account %u tried creating a character named '%s' with an invalid gender (%u) - refusing to do so",
                 GetSession()->GetAccountId(), m_name.c_str(), createInfo->Gender);
         return false;
     }
@@ -1574,6 +1575,8 @@ void Player::Update(uint32 p_time)
     if (!IsInWorld())
         return;
 
+    sScriptMgr->OnBeforePlayerUpdate(this, p_time);
+
     // undelivered mail
     if (m_nextMailDelivereTime && m_nextMailDelivereTime <= time(NULL))
     {
@@ -2023,7 +2026,7 @@ bool Player::BuildEnumData(PreparedQueryResult result, WorldPacket* data)
     }
     else if (!IsValidGender(gender))
     {
-        sLog->outError("Player (%u) has incorrect gender (%hu), don't build enum.", guid, gender);
+        sLog->outError("Player (%u) has incorrect gender (%u), don't build enum.", guid, gender);
         return false;
     }
 
@@ -3311,7 +3314,6 @@ void Player::GiveLevel(uint8 level)
 
 void Player::InitTalentForLevel()
 { 
-    uint8 level = getLevel();
     uint32 talentPointsForLevel = CalculateTalentsPoints();
 
     // xinef: more talent points that we have are used, reset
@@ -4201,8 +4203,8 @@ void Player::removeSpell(uint32 spellId, uint8 removeSpecMask, bool onlyTemporar
                 continue;
 
             // pussywizard: don't understand why whole skill is removed when just single spell from it is removed
-            if (_spell_idx->second->learnOnGetSkill == ABILITY_LEARNED_ON_GET_RACE_OR_CLASS_SKILL && pSkill->categoryId != SKILL_CATEGORY_CLASS || // pussywizard: don't unlearn class skills
-                (pSkill->id == SKILL_LOCKPICKING || pSkill->id == SKILL_RUNEFORGING) && _spell_idx->second->max_value == 0)
+            if ((_spell_idx->second->learnOnGetSkill == ABILITY_LEARNED_ON_GET_RACE_OR_CLASS_SKILL && pSkill->categoryId != SKILL_CATEGORY_CLASS) || // pussywizard: don't unlearn class skills
+                ((pSkill->id == SKILL_LOCKPICKING || pSkill->id == SKILL_RUNEFORGING) && _spell_idx->second->max_value == 0))
             {
                 // not reset skills for professions and racial abilities
                 if ((pSkill->categoryId == SKILL_CATEGORY_SECONDARY || pSkill->categoryId == SKILL_CATEGORY_PROFESSION) && (IsProfessionSkill(pSkill->id) || _spell_idx->second->racemask != 0))
@@ -4617,7 +4619,7 @@ bool Player::HasSpell(uint32 spell) const
     return (itr != m_spells.end() && itr->second->State != PLAYERSPELL_REMOVED && itr->second->IsInSpec(m_activeSpec));
 }
 
-bool Player::HasTalent(uint32 spell, uint8 spec) const
+bool Player::HasTalent(uint32 spell, uint8  /*spec*/) const
 { 
     PlayerTalentMap::const_iterator itr = m_talents.find(spell);
     return (itr != m_talents.end() && itr->second->State != PLAYERSPELL_REMOVED && itr->second->IsInSpec(m_activeSpec));
@@ -5754,9 +5756,9 @@ void Player::UpdateDefense()
 
 void Player::HandleBaseModValue(BaseModGroup modGroup, BaseModType modType, float amount, bool apply)
 { 
-    if (modGroup >= BASEMOD_END || modType >= MOD_END)
+    if (modGroup >= BASEMOD_END)
     {
-        sLog->outError("ERROR in HandleBaseModValue(): non existed BaseModGroup of wrong BaseModType!");
+        sLog->outError("ERROR in HandleBaseModValue(): non existed BaseModGroup!");
         return;
     }
 
@@ -5785,9 +5787,9 @@ void Player::HandleBaseModValue(BaseModGroup modGroup, BaseModType modType, floa
 
 float Player::GetBaseModValue(BaseModGroup modGroup, BaseModType modType) const
 { 
-    if (modGroup >= BASEMOD_END || modType >= MOD_END)
+    if (modGroup >= BASEMOD_END)
     {
-        sLog->outError("trial to access non existed BaseModGroup or wrong BaseModType!");
+        sLog->outError("trial to access non existed BaseModGroup!");
         return 0.0f;
     }
 
@@ -6009,6 +6011,8 @@ void Player::ApplyRatingMod(CombatRating cr, int32 value, bool apply)
             case CR_HASTE_SPELL:
                 ApplyCastTimePercentMod(oldVal, false);
                 ApplyCastTimePercentMod(newVal, true);
+                break;
+            default: 
                 break;
         }
     }
@@ -16948,7 +16952,7 @@ void Player::KilledPlayerCredit()
         if (q_status.Status == QUEST_STATUS_INCOMPLETE && (!GetGroup() || !GetGroup()->isRaidGroup() || qInfo->IsAllowedInRaid(GetMap()->GetDifficulty())))
         {
             // Xinef: PvP Killing quest require player to be in same zone as quest zone (only 2 quests so no doubt, can be extended to conditions in cata ;s)
-            if (qInfo->HasSpecialFlag(QUEST_SPECIAL_FLAGS_PLAYER_KILL) && GetZoneId() == qInfo->GetZoneOrSort())
+            if (qInfo->HasSpecialFlag(QUEST_SPECIAL_FLAGS_PLAYER_KILL) && (qInfo->GetZoneOrSort() >= 0 && GetZoneId() == uint32(qInfo->GetZoneOrSort())))
             {
                 uint32 reqkill = qInfo->GetPlayersSlain();
                 uint16 curkill = q_status.PlayerCount;
@@ -16973,8 +16977,6 @@ void Player::KilledPlayerCredit()
 
 void Player::KillCreditGO(uint32 entry, uint64 guid)
 { 
-    bool isCreature = IS_CRE_OR_VEH_GUID(guid);
-
     uint16 addCastCount = 1;
     for (uint8 i = 0; i < MAX_QUEST_LOG_SIZE; ++i)
     {
@@ -17645,7 +17647,7 @@ bool Player::LoadFromDB(uint32 guid, SQLQueryHolder *holder)
     uint8 Gender = fields[5].GetUInt8();
     if (!IsValidGender(Gender))
     {
-        sLog->outError("Player (GUID: %u) has wrong gender (%hu), can't be loaded.", guid, Gender);
+        sLog->outError("Player (GUID: %u) has wrong gender (%u), can't be loaded.", guid, Gender);
         return false;
     }
 
@@ -17759,7 +17761,7 @@ bool Player::LoadFromDB(uint32 guid, SQLQueryHolder *holder)
     MapEntry const* mapEntry = sMapStore.LookupEntry(mapId);
 
     // pussywizard: group changed difficulty when player was offline, teleport to the enterance of new difficulty
-    if (mapEntry && (mapEntry->IsNonRaidDungeon() && dungeonDiff != GetDungeonDifficulty() || mapEntry->IsRaid() && raidDiff != GetRaidDifficulty()))
+    if (mapEntry && ((mapEntry->IsNonRaidDungeon() && dungeonDiff != GetDungeonDifficulty()) || (mapEntry->IsRaid() && raidDiff != GetRaidDifficulty())))
     {
         bool fixed = false;
         if (uint32 destInstId = sInstanceSaveMgr->PlayerGetDestinationInstanceId(this, mapId, GetDifficulty(mapEntry->IsRaid())))
@@ -18801,6 +18803,7 @@ void Player::_LoadMailAsynch(PreparedQueryResult result)
     {
         do
         {
+            bool has_items = false;
             Field* fields = result->Fetch();
             if (fields[14].GetUInt32() != prevMailID)
             {
@@ -18815,7 +18818,7 @@ void Player::_LoadMailAsynch(PreparedQueryResult result)
                 m->receiver       = fields[17].GetUInt32();
                 m->subject        = fields[18].GetString();
                 m->body           = fields[19].GetString();
-                bool has_items    = fields[20].GetBool();
+                has_items         = fields[20].GetBool();
                 m->expire_time    = time_t(fields[21].GetUInt32());
                 m->deliver_time   = time_t(fields[22].GetUInt32());
                 m->money          = fields[23].GetUInt32();
@@ -18833,7 +18836,7 @@ void Player::_LoadMailAsynch(PreparedQueryResult result)
                 m->state = MAIL_STATE_UNCHANGED;
             }
 
-            if (m && fields[20].GetBool() /*has_items*/ && fields[12].GetUInt32() /*itemEntry*/)
+            if (m && has_items && fields[12].GetUInt32() /*itemEntry*/)
             {
                 uint32 itemGuid = fields[11].GetUInt32();
                 uint32 itemTemplate = fields[12].GetUInt32();
@@ -22655,7 +22658,7 @@ bool Player::IsVisibleGloballyFor(Player const* u) const
 }
 
 template<class T>
-inline void UpdateVisibilityOf_helper(T* target, std::vector<Unit*>& /*v*/)
+inline void UpdateVisibilityOf_helper(T*  /*target*/, std::vector<Unit*>& /*v*/)
 {
 }
 
@@ -23173,7 +23176,7 @@ void Player::ApplyEquipCooldown(Item* pItem)
 
         // xinef: dont apply equip cooldown if spell on item has insignificant cooldown
         SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellData.SpellId);
-        if (spellData.SpellCooldown <= 3000 && spellData.SpellCategoryCooldown <= 3000 && (!spellInfo || spellInfo->RecoveryTime <= 3000 && spellInfo->CategoryRecoveryTime <= 3000))
+        if (spellData.SpellCooldown <= 3000 && spellData.SpellCategoryCooldown <= 3000 && (!spellInfo || (spellInfo->RecoveryTime <= 3000 && spellInfo->CategoryRecoveryTime <= 3000)))
             continue;
 
         // Don't replace longer cooldowns by equip cooldown if we have any.
@@ -24053,14 +24056,14 @@ void Player::SetMover(Unit* target)
 { 
     if (this != target && target->m_movedByPlayer && target->m_movedByPlayer != target && target->m_movedByPlayer != this)
     {
-        sLog->outMisc("Player::SetMover (A1) - %u, %u, %u, %u, %u, %u, %u, %u", GetGUIDLow(), GetMapId(), GetInstanceId(), FindMap(), IsInWorld() ? 1 : 0, IsDuringRemoveFromWorld() ? 1 : 0, IsBeingTeleported() ? 1 : 0, isBeingLoaded() ? 1 : 0);
-        sLog->outMisc("Player::SetMover (A2) - %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u", target->GetTypeId(), target->GetEntry(), target->GetUnitTypeMask(), target->GetGUIDLow(), target->GetMapId(), target->GetInstanceId(), target->FindMap(), target->IsInWorld() ? 1 : 0, target->IsDuringRemoveFromWorld() ? 1 : 0, (target->ToPlayer() && target->ToPlayer()->IsBeingTeleported() ? 1 : 0), target->isBeingLoaded() ? 1 : 0);
-        sLog->outMisc("Player::SetMover (A3) - %u, %u, %u, %u, %u, %u, %u, %u", target->m_movedByPlayer->GetGUIDLow(), target->m_movedByPlayer->GetMapId(), target->m_movedByPlayer->GetInstanceId(), target->m_movedByPlayer->FindMap(), target->m_movedByPlayer->IsInWorld() ? 1 : 0, target->m_movedByPlayer->IsDuringRemoveFromWorld() ? 1 : 0, target->m_movedByPlayer->ToPlayer()->IsBeingTeleported() ? 1 : 0, target->m_movedByPlayer->isBeingLoaded() ? 1 : 0);
+        sLog->outMisc("Player::SetMover (A1) - %u, %u, %u, %u, %u, %u, %u, %u", GetGUIDLow(), GetMapId(), GetInstanceId(), FindMap()->GetId(), IsInWorld() ? 1 : 0, IsDuringRemoveFromWorld() ? 1 : 0, IsBeingTeleported() ? 1 : 0, isBeingLoaded() ? 1 : 0);
+        sLog->outMisc("Player::SetMover (A2) - %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u", target->GetTypeId(), target->GetEntry(), target->GetUnitTypeMask(), target->GetGUIDLow(), target->GetMapId(), target->GetInstanceId(), target->FindMap()->GetId(), target->IsInWorld() ? 1 : 0, target->IsDuringRemoveFromWorld() ? 1 : 0, (target->ToPlayer() && target->ToPlayer()->IsBeingTeleported() ? 1 : 0), target->isBeingLoaded() ? 1 : 0);
+        sLog->outMisc("Player::SetMover (A3) - %u, %u, %u, %u, %u, %u, %u, %u", target->m_movedByPlayer->GetGUIDLow(), target->m_movedByPlayer->GetMapId(), target->m_movedByPlayer->GetInstanceId(), target->m_movedByPlayer->FindMap()->GetId(), target->m_movedByPlayer->IsInWorld() ? 1 : 0, target->m_movedByPlayer->IsDuringRemoveFromWorld() ? 1 : 0, target->m_movedByPlayer->ToPlayer()->IsBeingTeleported() ? 1 : 0, target->m_movedByPlayer->isBeingLoaded() ? 1 : 0);
     }
     if (this != target && (!target->IsInWorld() || target->IsDuringRemoveFromWorld() || GetMapId() != target->GetMapId() || GetInstanceId() != target->GetInstanceId()))
     {
-        sLog->outMisc("Player::SetMover (B1) - %u, %u, %u, %u, %u, %u, %u, %u", GetGUIDLow(), GetMapId(), GetInstanceId(), FindMap(), IsInWorld() ? 1 : 0, IsDuringRemoveFromWorld() ? 1 : 0, IsBeingTeleported() ? 1 : 0, isBeingLoaded() ? 1 : 0);
-        sLog->outMisc("Player::SetMover (B2) - %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u", target->GetTypeId(), target->GetEntry(), target->GetUnitTypeMask(), target->GetGUIDLow(), target->GetMapId(), target->GetInstanceId(), target->FindMap(), target->IsInWorld() ? 1 : 0, target->IsDuringRemoveFromWorld() ? 1 : 0, (target->ToPlayer() && target->ToPlayer()->IsBeingTeleported() ? 1 : 0), target->isBeingLoaded() ? 1 : 0);
+        sLog->outMisc("Player::SetMover (B1) - %u, %u, %u, %u, %u, %u, %u, %u", GetGUIDLow(), GetMapId(), GetInstanceId(), FindMap()->GetId(), IsInWorld() ? 1 : 0, IsDuringRemoveFromWorld() ? 1 : 0, IsBeingTeleported() ? 1 : 0, isBeingLoaded() ? 1 : 0);
+        sLog->outMisc("Player::SetMover (B2) - %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u", target->GetTypeId(), target->GetEntry(), target->GetUnitTypeMask(), target->GetGUIDLow(), target->GetMapId(), target->GetInstanceId(), target->FindMap()->GetId(), target->IsInWorld() ? 1 : 0, target->IsDuringRemoveFromWorld() ? 1 : 0, (target->ToPlayer() && target->ToPlayer()->IsBeingTeleported() ? 1 : 0), target->isBeingLoaded() ? 1 : 0);
     }
     m_mover->m_movedByPlayer = NULL;
     m_mover = target;
@@ -25344,7 +25347,7 @@ void Player::HandleFall(MovementInfo const& movementInfo)
 
             //Z given by moveinfo, LastZ, FallTime, WaterZ, MapZ, Damage, Safefall reduction
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            sLog->outStaticDebug("FALLDAMAGE z=%f sz=%f pZ=%f FallTime=%d mZ=%f damage=%d SF=%d", movementInfo.pos.GetPositionZ(), GetPositionZ(), movementInfo.fallTime, damage, safe_fall);
+            sLog->outStaticDebug("FALLDAMAGE mZ=%f z=%f fallTime=%u damage=%u SF=%d", movementInfo.pos.GetPositionZ(), GetPositionZ(), movementInfo.fallTime, damage, safe_fall);
 #endif
         }
 
@@ -26714,7 +26717,7 @@ uint8 Player::GetMostPointsTalentTree() const
 bool Player::IsHealerTalentSpec() const
 { 
     uint8 tree = GetMostPointsTalentTree();
-    return (getClass() == CLASS_DRUID && tree == 2 || getClass() == CLASS_PALADIN && tree == 0 || getClass() == CLASS_PRIEST && tree <= 1 || getClass() == CLASS_SHAMAN && tree == 2);
+    return ((getClass() == CLASS_DRUID && tree == 2) || (getClass() == CLASS_PALADIN && tree == 0) || (getClass() == CLASS_PRIEST && tree <= 1) || (getClass() == CLASS_SHAMAN && tree == 2));
 }
 
 void Player::ResetTimeSync()
@@ -26809,11 +26812,7 @@ void Player::PrepareCharmAISpells()
         m_charmAISpells[i] = 0;
 
     uint32 damage_type[4] = {0, 0, 0, 0};
-    uint32 stun_duration = 0;
     uint32 periodic_damage = 0;
-    uint32 b = 0;
-    uint32 temp_spell = 0;
-    uint32 temp_damage = 0;
 
     for (PlayerSpellMap::iterator itr = m_spells.begin(); itr != m_spells.end(); ++itr)
     {
@@ -26827,8 +26826,6 @@ void Player::PrepareCharmAISpells()
         if (!spellInfo->SpellFamilyName || spellInfo->IsPassive() || spellInfo->NeedsComboPoints() || (spellInfo->Stances && !spellInfo->HasAttribute(SPELL_ATTR2_NOT_NEED_SHAPESHIFT)))
             continue;
 
-        bool allow = false;
-        uint8 type = 0;
         float cast = spellInfo->CalcCastTime() / 1000.0f;
         if (cast > 3.0f)
             continue;
@@ -26900,7 +26897,7 @@ void Player::PrepareCharmAISpells()
                 m_charmAISpells[SPELL_ROOT_OR_FEAR] = spellInfo->Id;
                 break;
             }
-        }   
+        }
     }
 }
 

@@ -137,7 +137,7 @@ class spell_najentus_needle_spine : public SpellScriptLoader
         {
             PrepareSpellScript(spell_najentus_needle_spine_SpellScript);
 
-            void HandleDummy(SpellEffIndex effIndex)
+            void HandleDummy(SpellEffIndex  /*effIndex*/)
             {
                 if (Unit* target = GetHitUnit())
                     GetCaster()->CastSpell(target, SPELL_NEEDLE_SPINE_DAMAGE, true);
@@ -164,7 +164,7 @@ class spell_najentus_hurl_spine : public SpellScriptLoader
         {
             PrepareSpellScript(spell_najentus_hurl_spine_SpellScript);
 
-            void HandleSchoolDamage(SpellEffIndex effIndex)
+            void HandleSchoolDamage(SpellEffIndex  /*effIndex*/)
             {
                 Unit* target = GetHitUnit();
                 if (target && target->HasAura(SPELL_TIDAL_SHIELD))

@@ -88,14 +88,14 @@ public:
                 pInstance->SetData(DATA_IMMORTAL_FAIL, 0);
         }
 
-        void JustDied(Unit* Killer)
+        void JustDied(Unit*  /*Killer*/)
         {
             Talk(SAY_DEATH);
             if (pInstance)
                 pInstance->SetData(EVENT_HEIGAN, DONE);
         }
 
-        void EnterCombat(Unit *who)
+        void EnterCombat(Unit * /*who*/)
         {
             me->SetInCombatWithZone();
             Talk(SAY_AGGRO);

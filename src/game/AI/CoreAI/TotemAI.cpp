@@ -28,11 +28,11 @@ TotemAI::TotemAI(Creature* c) : CreatureAI(c), i_victimGuid(0)
     ASSERT(c->IsTotem());
 }
 
-void TotemAI::SpellHit(Unit* /*caster*/, const SpellInfo* spellInfo)
+void TotemAI::SpellHit(Unit* /*caster*/, const SpellInfo* /*spellInfo*/)
 {
 }
 
-void TotemAI::DoAction(int32 param)
+void TotemAI::DoAction(int32 /*param*/)
 {
 }
 

@@ -138,7 +138,7 @@ public:
             _aquanosGUID = 0;
         }  
         
-        void SetData(uint32 type, uint32 data)
+        void SetData(uint32 type, uint32  /*data*/)
         {
             switch(type)
             {
@@ -229,11 +229,10 @@ public:
             uint64 _aquanosGUID;
             uint8 _lCount;
             uint32 _lSource;
-            uint32 _resetTime;
-            
+
             bool _canWash;
     };
-    
+
     bool OnGossipHello(Player* player, Creature* creature)
     {
         if (creature->IsQuestGiver())
@@ -251,7 +250,7 @@ public:
         player->SEND_GOSSIP_MENU(player->GetGossipTextId(creature), creature->GetGUID());
         return true;
     }
-    
+
     bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action)
     {
         switch (action)

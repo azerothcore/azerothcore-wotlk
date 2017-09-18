@@ -991,9 +991,11 @@ void Spell::SelectImplicitChannelTargets(SpellEffIndex effIndex, SpellImplicitTa
                     AddUnitTarget(target->ToUnit(), 1 << effIndex);
             }
             else
+            {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
                 sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "SPELL: cannot find channel spell target for spell ID %u, effect %u", m_spellInfo->Id, effIndex);
 #endif
+            }
             break;
         }
         case TARGET_DEST_CHANNEL_TARGET:
@@ -1006,9 +1008,11 @@ void Spell::SelectImplicitChannelTargets(SpellEffIndex effIndex, SpellImplicitTa
                     m_targets.SetDst(*target);
             }
             else //if (!m_targets.HasDst())
+            {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
                 sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "SPELL: cannot find channel spell destination for spell ID %u, effect %u", m_spellInfo->Id, effIndex);
 #endif
+            }
             break;
         case TARGET_DEST_CHANNEL_CASTER:
             if (GetOriginalCaster())
@@ -2106,7 +2110,7 @@ void Spell::SearchAreaTargets(std::list<WorldObject*>& targets, float range, Pos
     SearchTargets<Trinity::WorldObjectListSearcher<Trinity::WorldObjectSpellAreaTargetCheck> > (searcher, containerTypeMask, m_caster, position, range);
 }
 
-void Spell::SearchChainTargets(std::list<WorldObject*>& targets, uint32 chainTargets, WorldObject* target, SpellTargetObjectTypes objectType, SpellTargetCheckTypes selectType, SpellTargetSelectionCategories selectCategory, ConditionList* condList, bool isChainHeal)
+void Spell::SearchChainTargets(std::list<WorldObject*>& targets, uint32 chainTargets, WorldObject* target, SpellTargetObjectTypes objectType, SpellTargetCheckTypes selectType, SpellTargetSelectionCategories  /*selectCategory*/, ConditionList* condList, bool isChainHeal)
 {
     // max dist for jump target selection
     float jumpRadius = 0.0f;
@@ -2783,7 +2787,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
             caster->ProcDamageAndSpell(unitTarget, procAttacker, procVictim, procEx, 0, m_attackType, m_spellInfo, m_triggeredByAuraSpell);
             // Xinef: eg. rogue poisions can proc off cheap shot, etc. so this block should be here also
             // Xinef: ofc count only spells that HIT the target, little hack used to fool the system
-            if ((procEx & PROC_EX_NORMAL_HIT|PROC_EX_CRITICAL_HIT) && caster->GetTypeId() == TYPEID_PLAYER && m_spellInfo->HasAttribute(SPELL_ATTR0_STOP_ATTACK_TARGET) == 0 &&
+            if (((procEx & PROC_EX_NORMAL_HIT)|PROC_EX_CRITICAL_HIT) && caster->GetTypeId() == TYPEID_PLAYER && m_spellInfo->HasAttribute(SPELL_ATTR0_STOP_ATTACK_TARGET) == 0 &&
                 m_spellInfo->HasAttribute(SPELL_ATTR4_CANT_TRIGGER_ITEM_SPELLS) == 0 && (m_spellInfo->DmgClass == SPELL_DAMAGE_CLASS_MELEE || m_spellInfo->DmgClass == SPELL_DAMAGE_CLASS_RANGED))
                 caster->ToPlayer()->CastItemCombatSpell(unitTarget, m_attackType, procVictim|PROC_FLAG_TAKEN_DAMAGE, procEx);
         }
@@ -3134,12 +3138,14 @@ void Spell::DoTriggersOnSpellHit(Unit* unit, uint8 effMask)
 
     // trigger linked auras remove/apply
     // TODO: remove/cleanup this, as this table is not documented and people are doing stupid things with it
-    if (std::vector<int32> const* spellTriggered = sSpellMgr->GetSpellLinked(m_spellInfo->Id + SPELL_LINK_HIT))
+    if (std::vector<int32> const* spellTriggered = sSpellMgr->GetSpellLinked(m_spellInfo->Id + SPELL_LINK_HIT)) {
         for (std::vector<int32>::const_iterator i = spellTriggered->begin(); i != spellTriggered->end(); ++i)
-            if (*i < 0)
+            if (*i < 0) {
                 unit->RemoveAurasDueToSpell(-(*i));
-            else
+            } else {
                 unit->CastSpell(unit, *i, true, 0, 0, m_caster->GetGUID());
+            }
+    }
 }
 
 void Spell::DoAllEffectOnTarget(GOTargetInfo* target)
@@ -5744,7 +5750,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                             return SPELL_FAILED_BAD_TARGETS;
                 // Xinef: Pass only explicit unit target spells
                 // pussywizard:
-                if (MMAP::MMapFactory::IsPathfindingEnabled(m_caster->FindMap(), true) && m_spellInfo->NeedsExplicitUnitTarget())
+                if (MMAP::MMapFactory::IsPathfindingEnabled(m_caster->FindMap()) && m_spellInfo->NeedsExplicitUnitTarget())
                 {
                     Unit* target = m_targets.GetUnitTarget();
                     if (!target)
@@ -7568,7 +7574,7 @@ bool SpellEvent::IsDeletable() const
     return m_Spell->IsDeletable();
 }
 
-bool ReflectEvent::Execute(uint64 e_time, uint32 p_time)
+bool ReflectEvent::Execute(uint64  /*e_time*/, uint32  /*p_time*/)
 {
     Unit* caster = ObjectAccessor::FindUnit(_casterGUID);
     Unit* target = ObjectAccessor::FindUnit(_targetGUID);

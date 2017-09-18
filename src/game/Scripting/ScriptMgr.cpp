@@ -126,10 +126,9 @@ class ScriptRegistry
 
 // Utility macros for looping over scripts.
 #define FOR_SCRIPTS(T, C, E) \
-    if (SCR_REG_LST(T).empty()) \
-        return; \
-    for (SCR_REG_ITR(T) C = SCR_REG_LST(T).begin(); \
-        C != SCR_REG_LST(T).end(); ++C)
+    if (!SCR_REG_LST(T).empty()) \
+        for (SCR_REG_ITR(T) C = SCR_REG_LST(T).begin(); \
+            C != SCR_REG_LST(T).end(); ++C)
 #define FOR_SCRIPTS_RET(T, C, E, R) \
     if (SCR_REG_LST(T).empty()) \
         return R; \
@@ -1262,6 +1261,11 @@ void ScriptMgr::OnPlayerTextEmote(Player* player, uint32 textEmote, uint32 emote
 void ScriptMgr::OnPlayerSpellCast(Player* player, Spell* spell, bool skipCheck)
 {
     FOREACH_SCRIPT(PlayerScript)->OnSpellCast(player, spell, skipCheck);
+}
+
+void ScriptMgr::OnBeforePlayerUpdate(Player* player, uint32 p_time)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnBeforeUpdate(player, p_time);
 }
 
 void ScriptMgr::OnPlayerLogin(Player* player)

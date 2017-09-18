@@ -276,7 +276,7 @@ public:
         return true;
     }
 
-    bool OnGossipSelect(Player* plr, Creature* npc, uint32 Sender, uint32 uiAction)
+    bool OnGossipSelect(Player* plr, Creature* npc, uint32  /*Sender*/, uint32 uiAction)
     {
         plr->PlayerTalkClass->ClearMenus();
 

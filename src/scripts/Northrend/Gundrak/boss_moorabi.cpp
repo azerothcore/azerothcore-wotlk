@@ -80,7 +80,7 @@ class boss_moorabi : public CreatureScript
                 events.ScheduleEvent(EVENT_TRANSFORMATION, 12000);
             }
 
-            void SpellHitTarget(Unit* caster, const SpellInfo* spellInfo)
+            void SpellHitTarget(Unit*  /*caster*/, const SpellInfo* spellInfo)
             {
                 if (spellInfo->Id == SPELL_TRANSFORMATION)
                 {
@@ -164,7 +164,7 @@ class spell_moorabi_mojo_frenzy : public SpellScriptLoader
         {
             PrepareAuraScript(spell_moorabi_mojo_frenzy_AuraScript);
 
-            void HandlePeriodic(AuraEffect const* aurEff)
+            void HandlePeriodic(AuraEffect const*  /*aurEff*/)
             {
                 PreventDefaultAction();
                 

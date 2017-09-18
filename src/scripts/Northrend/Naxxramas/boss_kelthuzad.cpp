@@ -198,7 +198,7 @@ public:
                 pInstance->SetData(DATA_IMMORTAL_FAIL, 0);
         }
 
-        void JustDied(Unit* Killer)
+        void JustDied(Unit*  /*Killer*/)
         {
             summons.DespawnAll();
             Talk(SAY_DEATH);
@@ -212,7 +212,7 @@ public:
                 AttackStart(who);
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit*  /*who*/)
         {
             Talk(SAY_SUMMON_MINIONS);
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE);
@@ -481,7 +481,7 @@ public:
                 me->AddThreat(who, 1000000.0f);
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit*  /*who*/)
         {
             me->SetInCombatWithZone();
             if (me->GetEntry() == NPC_UNSTOPPABLE_ABOMINATION)

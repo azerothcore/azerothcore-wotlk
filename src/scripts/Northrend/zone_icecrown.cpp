@@ -665,7 +665,7 @@ class npc_tirions_gambit_tirion : public CreatureScript
     public:
         npc_tirions_gambit_tirion(): CreatureScript("npc_tirions_gambit_tirion"){}
 
-        bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action)
+        bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32  /*action*/)
         {
             player->CLOSE_GOSSIP_MENU();
             creature->AI()->DoAction(ACTION_START_EVENT);
