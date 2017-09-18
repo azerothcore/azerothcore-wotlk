@@ -380,7 +380,7 @@ class boss_professor_putricide : public CreatureScript
                     summon->SetInCombatWithZone();
             }
 
-            void DamageTaken(Unit*, uint32& /*damage*/, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask)
+            void DamageTaken(Unit*, uint32& /*damage*/, DamageEffectType  /*damagetype*/, SpellSchoolMask  /*damageSchoolMask*/)
             {
                 if (bChangePhase)
                     return;
@@ -877,7 +877,7 @@ class spell_putricide_slime_puddle : public SpellScriptLoader
             }
 
             // big hax to unlock Abomination Eat Ooze ability, requires caster aura spell from difficulty X, but unlocks clientside when got base aura
-            void HandleScript(SpellEffIndex effIndex)
+            void HandleScript(SpellEffIndex  /*effIndex*/)
             {
                 const SpellInfo* s1 = sSpellMgr->GetSpellInfo(70346);
                 const SpellInfo* s2 = sSpellMgr->GetSpellInfo(72456);
@@ -943,7 +943,7 @@ class spell_putricide_grow_stacker : public SpellScriptLoader
         {
             PrepareAuraScript(spell_putricide_grow_stacker_AuraScript);
 
-            void HandleTriggerSpell(AuraEffect const* aurEff)
+            void HandleTriggerSpell(AuraEffect const*  /*aurEff*/)
             {
                 if (Unit* target = GetTarget())
                     if (target->HasAura(SPELL_TEAR_GAS_CREATURE))

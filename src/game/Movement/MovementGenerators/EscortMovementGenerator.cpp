@@ -32,7 +32,7 @@ void EscortMovementGenerator<T>::DoInitialize(T* unit)
 }
 
 template<class T>
-bool EscortMovementGenerator<T>::DoUpdate(T* unit, uint32 diff)
+bool EscortMovementGenerator<T>::DoUpdate(T* unit, uint32  /*diff*/)
 {
     if (!unit)
         return false;

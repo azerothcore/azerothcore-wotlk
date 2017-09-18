@@ -1639,7 +1639,7 @@ class npc_gunship_boarding_leader : public CreatureScript
             {
             }
 
-            void EnterCombat(Unit* target)
+            void EnterCombat(Unit*  /*target*/)
             {
                 _events.Reset();
                 _events.ScheduleEvent(EVENT_BLADESTORM, urand(13000, 18000));
@@ -1787,7 +1787,7 @@ class npc_gunship_mage : public CreatureScript
                 gunship_npc_AI::UpdateAI(diff);
             }
 
-            bool CanAIAttack(const Unit* target) const
+            bool CanAIAttack(const Unit*  /*target*/) const
             {
                 return Instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) == IN_PROGRESS;
             }
@@ -1916,7 +1916,7 @@ class npc_gunship_rocketeer : public CreatureScript
                 me->_AddCreatureSpellCooldown(spellId, 9000);
             }
 
-            bool CanAIAttack(const Unit* target) const
+            bool CanAIAttack(const Unit*  /*target*/) const
             {
                 return Instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) == IN_PROGRESS;
             }

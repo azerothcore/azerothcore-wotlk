@@ -441,7 +441,7 @@ class boss_twilight_halion : public CreatureScript
                 me->SetReactState(REACT_DEFENSIVE);
             }
 
-            void EnterCombat(Unit* who)
+            void EnterCombat(Unit*  /*who*/)
             {
                 _events.Reset();
                 _events.ScheduleEvent(EVENT_CLEAVE, urand(8000, 10000));
@@ -861,7 +861,7 @@ class spell_halion_meteor_strike_spread : public SpellScriptLoader
         {
             PrepareAuraScript(spell_halion_meteor_strike_spread_AuraScript);
 
-            void HandlePeriodic(AuraEffect const* aurEff)
+            void HandlePeriodic(AuraEffect const*  /*aurEff*/)
             {
                 PreventDefaultAction(); // xinef: 3/5 straight, 2/5 turn
                 if (!GetUnitOwner()->GetInstanceScript() || !GetUnitOwner()->GetInstanceScript()->IsEncounterInProgress())
@@ -977,7 +977,7 @@ class spell_halion_marks : public SpellScriptLoader
                         dispelledUnit->RemoveAurasDueToSpell(_removeSpellId, 0, 0, AURA_REMOVE_BY_EXPIRE);
             }
 
-            void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+            void OnRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
                 if (GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_EXPIRE)
                     return;
@@ -1078,7 +1078,7 @@ class spell_halion_clear_debuffs : public SpellScriptLoader
         {
             PrepareSpellScript(spell_halion_clear_debuffs_SpellScript);
 
-            void HandleScriptEffect(SpellEffIndex effIndex)
+            void HandleScriptEffect(SpellEffIndex  /*effIndex*/)
             {
                 if (Unit* target = GetHitUnit())
                 {
@@ -1366,7 +1366,7 @@ class spell_halion_twilight_division : public SpellScriptLoader
         {
             PrepareSpellScript(spell_halion_twilight_division_SpellScript);
 
-            void HandleDummy(SpellEffIndex effIndex)
+            void HandleDummy(SpellEffIndex  /*effIndex*/)
             {
                 InstanceScript* instance = GetCaster()->GetInstanceScript();
                 Creature* controller = ObjectAccessor::GetCreature(*GetCaster(), instance->GetData64(NPC_HALION_CONTROLLER));
@@ -1412,7 +1412,7 @@ class spell_halion_twilight_mending : public SpellScriptLoader
         {
             PrepareSpellScript(spell_halion_twilight_mending_SpellScript);
 
-            void HandleHealPct(SpellEffIndex effIndex)
+            void HandleHealPct(SpellEffIndex  /*effIndex*/)
             {
                 if (Creature* target = GetHitCreature())
                     target->AI()->Talk(SAY_REGENERATE);

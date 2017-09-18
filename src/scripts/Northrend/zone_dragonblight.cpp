@@ -477,7 +477,7 @@ public:
                 AttackStart(who);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32  /*diff*/)
         {
             if (!UpdateVictim())
                 return;
@@ -788,7 +788,7 @@ public:
             me->GetMotionMaster()->Clear();
         }
 
-        void SetGUID(uint64 guid, int32 id)
+        void SetGUID(uint64 guid, int32  /*id*/)
         {
             if (playerGUID || events.GetNextEventTime(998) || events.GetNextEventTime(2))
                 return;
@@ -1224,7 +1224,7 @@ public:
 
         bool done;
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32  /*diff*/)
         {
             if (!done)
             {

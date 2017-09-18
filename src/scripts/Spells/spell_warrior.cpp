@@ -189,7 +189,7 @@ class spell_warr_improved_spell_reflection_trigger : public SpellScriptLoader
             PrepareAuraScript(spell_warr_improved_spell_reflection_trigger_AuraScript);
 
 
-            void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes mode)
+            void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes  /*mode*/)
             {
                 if (!IsExpired())
                 {

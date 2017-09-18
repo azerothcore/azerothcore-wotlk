@@ -134,7 +134,7 @@ public:
                 events.ScheduleEvent(EVENT_SPELL_CONSECRATION, 1000);
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit*  /*victim*/)
         {
             Talk(SAY_SLAY);
         }

@@ -159,7 +159,7 @@ public:
 
         void JustReachedHome() { me->setActive(false); }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit*  /*who*/)
         {
             if (m_pInstance)
                 m_pInstance->SetData(TYPE_AURIAYA, IN_PROGRESS);
@@ -178,7 +178,7 @@ public:
             me->setActive(true);
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit*  /*victim*/)
         {
             if (urand(0,2))
                 return;
@@ -195,7 +195,7 @@ public:
             }
         }
 
-        void JustDied(Unit *victim)
+        void JustDied(Unit * /*victim*/)
         {
             if (m_pInstance)
                 m_pInstance->SetData(TYPE_AURIAYA, DONE);
@@ -464,7 +464,7 @@ class achievement_auriaya_crazy_cat_lady : public AchievementCriteriaScript
     public:
         achievement_auriaya_crazy_cat_lady() : AchievementCriteriaScript("achievement_auriaya_crazy_cat_lady") {}
 
-        bool OnCheck(Player* player, Unit* target)
+        bool OnCheck(Player*  /*player*/, Unit* target)
         {
             if (target)
                 if (InstanceScript* instance = target->GetInstanceScript())
@@ -480,7 +480,7 @@ class achievement_auriaya_nine_lives : public AchievementCriteriaScript
     public:
         achievement_auriaya_nine_lives() : AchievementCriteriaScript("achievement_auriaya_nine_lives") {}
 
-        bool OnCheck(Player* player, Unit* target)
+        bool OnCheck(Player*  /*player*/, Unit* target)
         {
             if (target)
                 if (InstanceScript* instance = target->GetInstanceScript())

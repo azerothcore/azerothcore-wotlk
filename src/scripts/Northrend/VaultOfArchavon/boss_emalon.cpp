@@ -119,7 +119,7 @@ class boss_emalon : public CreatureScript
                     target->SetFullHealth();
             }
 
-            void EnterCombat(Unit* who)
+            void EnterCombat(Unit*  /*who*/)
             {
                 events.Reset();
                 if (summons.size() < 4)
@@ -201,7 +201,7 @@ class spell_voa_overcharge : public SpellScriptLoader
         {
             PrepareAuraScript(spell_voa_overcharge_AuraScript);
 
-            void HandlePeriodicDummy(AuraEffect const* aurEff)
+            void HandlePeriodicDummy(AuraEffect const*  /*aurEff*/)
             {
                 Unit* target = GetTarget();
                 if (target->GetTypeId() == TYPEID_UNIT && GetAura()->GetStackAmount() >= 10)

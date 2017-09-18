@@ -219,7 +219,7 @@ public:
             return false;
         }
 
-        void ProcessEvent(WorldObject* obj, uint32 eventId)
+        void ProcessEvent(WorldObject*  /*obj*/, uint32 eventId)
         {
             // destory towers
             if (eventId >= EVENT_TOWER_OF_LIFE_DESTROYED && eventId <= EVENT_TOWER_OF_FLAMES_DESTROYED)
@@ -1012,7 +1012,7 @@ public:
 
         void SpawnLeviathanEncounterVehicles(uint8 mode);
 
-        bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const* source, Unit const* target = NULL, uint32 miscvalue1 = 0)
+        bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/)
         {
             switch (criteria_id)
             {

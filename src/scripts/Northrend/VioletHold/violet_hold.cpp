@@ -20,7 +20,7 @@ class go_vh_activation_crystal : public GameObjectScript
 public:
     go_vh_activation_crystal() : GameObjectScript("go_vh_activation_crystal") { }
 
-    bool OnGossipHello(Player* pPlayer, GameObject* pGo)
+    bool OnGossipHello(Player*  /*pPlayer*/, GameObject* pGo)
     {
         if (InstanceScript* pInstance = pGo->GetInstanceScript())
             pInstance->SetData(DATA_ACTIVATE_DEFENSE_SYSTEM, 1);
@@ -1119,7 +1119,7 @@ public:
     {
         PrepareAuraScript(spell_destroy_door_sealAuraScript)
 
-        void HandleEffectPeriodic(AuraEffect const * aurEff)
+        void HandleEffectPeriodic(AuraEffect const *  /*aurEff*/)
         {
             PreventDefaultAction();
             if (Unit* target = GetTarget())

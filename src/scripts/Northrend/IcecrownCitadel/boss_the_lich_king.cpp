@@ -2505,9 +2505,9 @@ class npc_valkyr_shadowguard : public CreatureScript
                 _events.ScheduleEvent(EVENT_MOVE_TO_SIPHON_POS, 0);
             }
 
-            void OnCharmed(bool apply) {}
+            void OnCharmed(bool  /*apply*/) {}
 
-            void PassengerBoarded(Unit* pass, int8 seat, bool apply)
+            void PassengerBoarded(Unit* pass, int8  /*seat*/, bool apply)
             {
                 if (apply)
                 {
@@ -2723,7 +2723,7 @@ class spell_the_lich_king_teleport_to_frostmourne_hc : public SpellScriptLoader
         {
             PrepareSpellScript(spell_the_lich_king_teleport_to_frostmourne_hc_SpellScript);
 
-            void ModDest(SpellEffIndex effIndex)
+            void ModDest(SpellEffIndex  /*effIndex*/)
             {
                 float dist = 2.0f + rand_norm()*18.0f;
                 float angle = rand_norm()*2*M_PI;
@@ -3109,8 +3109,8 @@ class npc_strangulate_vehicle : public CreatureScript
             }
 
             bool IsHeroic() { return me->GetMap()->IsHeroic(); }
-            void OnCharmed(bool apply) {}
-            void PassengerBoarded(Unit* pass, int8 seat, bool apply)
+            void OnCharmed(bool  /*apply*/) {}
+            void PassengerBoarded(Unit* pass, int8  /*seat*/, bool apply)
             {
                 if (!apply)
                     pass->RemoveAurasDueToSpell(VEHICLE_SPELL_PARACHUTE);

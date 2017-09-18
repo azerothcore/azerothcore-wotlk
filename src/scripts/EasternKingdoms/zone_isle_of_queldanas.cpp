@@ -474,7 +474,7 @@ public:
     {
         PrepareSpellScript(spell_bh_cleanse_quel_delar_SpellScript);
 
-        void OnEffect(SpellEffIndex effIndex)
+        void OnEffect(SpellEffIndex  /*effIndex*/)
         {
             if (Unit* caster = GetCaster())
                 if (Creature* c = caster->FindNearestCreature(NPC_ROMMATH, 50.0f, true))

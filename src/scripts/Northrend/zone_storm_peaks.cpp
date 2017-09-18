@@ -130,7 +130,7 @@ public:
             me->SetControlled(false, UNIT_STATE_STUNNED);
         }
 
-        void MovementInform(uint32 type, uint32 pointId)
+        void MovementInform(uint32 type, uint32  /*pointId*/)
         {
             if (type == POINT_MOTION_TYPE)
                 me->SetControlled(true, UNIT_STATE_STUNNED);
@@ -238,7 +238,7 @@ public:
             me->UpdateEntry(roll_chance_i(25) ? NPC_TIME_LOST_PROTO_DRAKE : NPC_VYRAGOSA, 0, false);
         }
 
-        void WaypointReached(uint32 pointId) { }
+        void WaypointReached(uint32  /*pointId*/) { }
 
         void EnterCombat(Unit*)
         {
@@ -394,7 +394,7 @@ public:
         }
 
         void AttackStart(Unit*) { }
-        void MoveInLineOfSight(Unit* who) { }
+        void MoveInLineOfSight(Unit*  /*who*/) { }
 
         void OnCharmed(bool apply)
         {
@@ -920,7 +920,7 @@ public:
             me->SetSpeed(MOVE_RUN, 2.0f);
         }
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 type, uint32  /*id*/)
         {
             if (type == ESCORT_MOTION_TYPE && me->movespline->Finalized())
                 events.ScheduleEvent(EVENT_REACHED_HOME, 2000);

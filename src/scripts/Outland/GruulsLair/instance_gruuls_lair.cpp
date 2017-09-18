@@ -101,7 +101,7 @@ class instance_gruuls_lair : public InstanceMapScript
                 return true;
             }
 
-            void SetData(uint32 type, uint32 id)
+            void SetData(uint32 type, uint32  /*id*/)
             {
                 if (type == DATA_ADDS_KILLED)
                     if (Creature* maulgar = instance->GetCreature(_maulgarGUID))

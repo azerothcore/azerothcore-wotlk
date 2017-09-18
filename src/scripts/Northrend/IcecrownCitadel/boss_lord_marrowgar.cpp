@@ -486,7 +486,7 @@ public:
             targets.push_back(target);
         }
 
-        void HandleScriptEffect(SpellEffIndex effIndex)
+        void HandleScriptEffect(SpellEffIndex  /*effIndex*/)
         {
             Unit* caster = GetCaster();
             float angle = caster->GetAngle(GetHitUnit());

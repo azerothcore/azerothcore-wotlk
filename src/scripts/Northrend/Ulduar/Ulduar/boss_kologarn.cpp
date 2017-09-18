@@ -301,7 +301,7 @@ public:
             Talk(SAY_SLAY);
         }
 
-        void PassengerBoarded(Unit* who, int8 seatId, bool apply)
+        void PassengerBoarded(Unit* who, int8  /*seatId*/, bool apply)
         {
             if (!me->IsAlive())
                 return;
@@ -343,7 +343,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit*  /*who*/)
         {
             if (m_pInstance)
                 m_pInstance->SetData(TYPE_KOLOGARN, IN_PROGRESS);
@@ -502,7 +502,7 @@ public:
         void EnterEvadeMode() {}
         void MoveInLineOfSight(Unit*) {}
         void AttackStart(Unit*) {}
-        void UpdateAI(uint32 diff) {}
+        void UpdateAI(uint32  /*diff*/) {}
 
         void Reset()
         {
@@ -510,7 +510,7 @@ public:
             _damageDone = 0;
         }
 
-        void PassengerBoarded(Unit* who, int8 seatId, bool apply)
+        void PassengerBoarded(Unit*  /*who*/, int8  /*seatId*/, bool apply)
         {
             if (!apply)
                 _damageDone = 0;
@@ -724,7 +724,7 @@ class spell_ulduar_squeezed_lifeless : public SpellScriptLoader
         {
             PrepareSpellScript(spell_ulduar_squeezed_lifeless_SpellScript);
 
-            void HandleInstaKill(SpellEffIndex effIndex)
+            void HandleInstaKill(SpellEffIndex  /*effIndex*/)
             {
                 if (!GetHitPlayer() || !GetHitPlayer()->GetVehicle())
                     return;
@@ -800,7 +800,7 @@ class achievement_kologarn_looks_could_kill : public AchievementCriteriaScript
     public:
         achievement_kologarn_looks_could_kill() : AchievementCriteriaScript("achievement_kologarn_looks_could_kill") {}
 
-        bool OnCheck(Player* player, Unit* target)
+        bool OnCheck(Player*  /*player*/, Unit* target)
         {
             if (target)
                 if (InstanceScript* instance = target->GetInstanceScript())
@@ -816,7 +816,7 @@ class achievement_kologarn_rubble_and_roll : public AchievementCriteriaScript
     public:
         achievement_kologarn_rubble_and_roll() : AchievementCriteriaScript("achievement_kologarn_rubble_and_roll") {}
 
-        bool OnCheck(Player* player, Unit* target)
+        bool OnCheck(Player*  /*player*/, Unit* target)
         {
             if (target)
                 if (InstanceScript* instance = target->GetInstanceScript())
@@ -832,7 +832,7 @@ class achievement_kologarn_with_open_arms : public AchievementCriteriaScript
     public:
         achievement_kologarn_with_open_arms() : AchievementCriteriaScript("achievement_kologarn_with_open_arms") {}
 
-        bool OnCheck(Player* player, Unit* target)
+        bool OnCheck(Player*  /*player*/, Unit* target)
         {
             if (target)
                 if (InstanceScript* instance = target->GetInstanceScript())

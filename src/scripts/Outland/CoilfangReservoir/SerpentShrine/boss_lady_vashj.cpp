@@ -391,7 +391,7 @@ class spell_lady_vashj_magic_barrier : public SpellScriptLoader
         {
             PrepareAuraScript(spell_lady_vashj_magic_barrier_AuraScript)
 
-            void HandleEffectRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+            void HandleEffectRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
                 Unit::DealDamage(GetTarget(), GetTarget(), GetTarget()->CountPctFromMaxHealth(5));
             }

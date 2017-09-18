@@ -1331,7 +1331,7 @@ class spell_sindragosa_soul_preservation : public SpellScriptLoader
         {
             PrepareAuraScript(spell_sindragosa_soul_preservation_AuraScript);
 
-            void PeriodicTick(AuraEffect const* aurEff)
+            void PeriodicTick(AuraEffect const*  /*aurEff*/)
             {
                 PreventDefaultAction();
                 if (Unit* s = GetTarget())

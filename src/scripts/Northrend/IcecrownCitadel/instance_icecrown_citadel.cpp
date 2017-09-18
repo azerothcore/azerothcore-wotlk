@@ -218,7 +218,7 @@ class instance_icecrown_citadel : public InstanceMapScript
                 data << uint32(WORLDSTATE_ATTEMPTS_MAX)       << uint32(MaxHeroicAttempts);
             }
 
-            void OnPlayerAreaUpdate(Player* player, uint32 oldArea, uint32 newArea)
+            void OnPlayerAreaUpdate(Player* player, uint32  /*oldArea*/, uint32 newArea)
             {
                 if (newArea == 4890 /*Putricide's Laboratory of Alchemical Horrors and Fun*/ ||
                     newArea == 4891 /*The Sanctum of Blood*/ ||
@@ -1387,7 +1387,7 @@ class instance_icecrown_citadel : public InstanceMapScript
                 return false;
             }
 
-            bool CheckRequiredBosses(uint32 bossId, Player const* player = NULL) const
+            bool CheckRequiredBosses(uint32 bossId, Player const*  /*player*/) const
             {
                 switch (bossId)
                 {

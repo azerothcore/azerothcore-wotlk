@@ -501,13 +501,13 @@ void Map::InitializeObject(T* /*obj*/)
 }
 
 template<>
-void Map::InitializeObject(Creature* obj)
+void Map::InitializeObject(Creature*  /*obj*/)
 { 
     //obj->_moveState = MAP_OBJECT_CELL_MOVE_NONE; // pussywizard: this is shit
 }
 
 template<>
-void Map::InitializeObject(GameObject* obj)
+void Map::InitializeObject(GameObject*  /*obj*/)
 { 
     //obj->_moveState = MAP_OBJECT_CELL_MOVE_NONE; // pussywizard: this is shit
 }
@@ -650,7 +650,7 @@ void Map::VisitNearbyCellsOf(WorldObject* obj, TypeContainerVisitor<Trinity::Obj
     }
 }
 
-void Map::Update(const uint32 t_diff, const uint32 s_diff, bool thread)
+void Map::Update(const uint32 t_diff, const uint32 s_diff, bool  /*thread*/)
 {
     uint32 mapId = GetId(); // pussywizard: for crashlogs
     sLog->outDebug(LOG_FILTER_POOLSYS, "%u", mapId); // pussywizard: for crashlogs

@@ -11,7 +11,7 @@
 #include "Group.h"
 #include "Player.h"
 
-void GetPlayerInfo(ChatHandler* handler, Player* player)
+void GetPlayerInfo(ChatHandler*  /*handler*/, Player* player)
 {
     if (!player)
         return;
@@ -103,7 +103,7 @@ public:
         return true;
     }
 
-    static bool HandleLfgQueueInfoCommand(ChatHandler* handler, char const* args)
+    static bool HandleLfgQueueInfoCommand(ChatHandler*  /*handler*/, char const*  /*args*/)
     {
         return true;
     }

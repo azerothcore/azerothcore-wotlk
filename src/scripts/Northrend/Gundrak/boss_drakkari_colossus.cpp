@@ -91,7 +91,7 @@ class boss_drakkari_colossus : public CreatureScript
             {
             }
 
-            void MoveInLineOfSight(Unit* who)
+            void MoveInLineOfSight(Unit*  /*who*/)
             {
             }
 
@@ -172,7 +172,7 @@ class boss_drakkari_colossus : public CreatureScript
                 }
             }
 
-            void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType, SpellSchoolMask)
+            void DamageTaken(Unit*  /*attacker*/, uint32& damage, DamageEffectType, SpellSchoolMask)
             {
                 if (damage >= me->GetHealth())
                     damage = 0;

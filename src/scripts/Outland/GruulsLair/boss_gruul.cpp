@@ -69,7 +69,7 @@ class boss_gruul : public CreatureScript
                 events.ScheduleEvent(EVENT_GROUND_SLAM, 35000);
             }
 
-            void KilledUnit(Unit* who)
+            void KilledUnit(Unit*  /*who*/)
             {
                 if (events.GetNextEventTime(EVENT_RECENTLY_SPOKEN) == 0)
                 {

@@ -113,7 +113,7 @@ class spell_npc22275_crystal_prison : public SpellScriptLoader
         {
             PrepareAuraScript(spell_npc22275_crystal_prison_AuraScript);
 
-            void OnPeriodic(AuraEffect const* aurEff)
+            void OnPeriodic(AuraEffect const*  /*aurEff*/)
             {
                 PreventDefaultAction();
                 SetDuration(0);

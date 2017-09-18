@@ -146,7 +146,7 @@ public:
 
         Creature *GetGrauf() { return ObjectAccessor::GetCreature(*me, GraufGUID); }
 
-        void EnterCombat(Unit* pWho)
+        void EnterCombat(Unit*  /*pWho*/)
         {
             if (!EventStarted)
             {
@@ -234,7 +234,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit* pKiller)
+        void JustDied(Unit*  /*pKiller*/)
         {
             summons.DespawnAll();
             Talk(SAY_DEATH);
@@ -246,7 +246,7 @@ public:
             }
         }
 
-        void KilledUnit(Unit* pVictim)
+        void KilledUnit(Unit*  /*pVictim*/)
         {
             if (urand(0,1))
                 return;
@@ -340,7 +340,7 @@ public:
             }
         }
 
-        void MovementInform(uint32 uiType, uint32 Id)
+        void MovementInform(uint32  /*uiType*/, uint32 Id)
         {
             switch(Id)
             {

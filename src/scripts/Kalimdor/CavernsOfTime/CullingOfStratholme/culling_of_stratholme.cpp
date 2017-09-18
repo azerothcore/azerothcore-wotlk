@@ -1409,7 +1409,7 @@ class npc_cos_chromie_start : public CreatureScript
             return true;
         }
 
-        bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action)
+        bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32  /*action*/)
         {
             // final menu id, show crates if hidden and add item if missing
             if (player->PlayerTalkClass->GetGossipMenu().GetMenuId() == 9595)
@@ -1457,7 +1457,7 @@ class npc_cos_chromie_middle : public CreatureScript
             return true;
         }
 
-        bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action)
+        bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32  /*action*/)
         {
             if (!creature->GetInstanceScript() || creature->GetInstanceScript()->GetData(DATA_ARTHAS_EVENT) != COS_PROGRESS_CRATES_FOUND)
                 return true;

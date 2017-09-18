@@ -191,7 +191,7 @@ class spell_warl_improved_demonic_tactics : public SpellScriptLoader
                 amplitude = 10*IN_MILLISECONDS;
             }
 
-            void CalculateAmount(AuraEffect const* aurEff, int32& amount, bool& canBeRecalculated)
+            void CalculateAmount(AuraEffect const* aurEff, int32& amount, bool&  /*canBeRecalculated*/)
             {
                 if (aurEff->GetEffIndex() == EFFECT_0)
                     amount = CalculatePct<int32, float>(GetUnitOwner()->ToPlayer()->GetFloatValue(PLAYER_SPELL_CRIT_PERCENTAGE1 + SPELL_SCHOOL_FROST), GetSpellInfo()->Effects[EFFECT_0].CalcValue());
@@ -362,7 +362,7 @@ class spell_warl_generic_scaling : public SpellScriptLoader
                 }
             }
 
-            void CalculateAPAmount(AuraEffect const* aurEff, int32 & amount, bool & /*canBeRecalculated*/)
+            void CalculateAPAmount(AuraEffect const*  /*aurEff*/, int32 & amount, bool & /*canBeRecalculated*/)
             {
                 // xinef: by default warlock pet inherits 57% of max(SP FIRE, SP SHADOW) as AP
                 if (Unit* owner = GetUnitOwner()->GetOwner())
@@ -374,7 +374,7 @@ class spell_warl_generic_scaling : public SpellScriptLoader
                 }
             }
 
-            void CalculateSPAmount(AuraEffect const* aurEff, int32 & amount, bool & /*canBeRecalculated*/)
+            void CalculateSPAmount(AuraEffect const*  /*aurEff*/, int32 & amount, bool & /*canBeRecalculated*/)
             {
                 // xinef: by default warlock pet inherits 15% of max(SP FIRE, SP SHADOW) as SP
                 if (Unit* owner = GetUnitOwner()->GetOwner())
@@ -479,7 +479,7 @@ class spell_warl_infernal_scaling : public SpellScriptLoader
                 }
             }
 
-            void CalculateAPAmount(AuraEffect const* aurEff, int32 & amount, bool & /*canBeRecalculated*/)
+            void CalculateAPAmount(AuraEffect const*  /*aurEff*/, int32 & amount, bool & /*canBeRecalculated*/)
             {
                 // xinef: by default warlock pet inherits 57% of max(SP FIRE, SP SHADOW) as AP
                 if (Unit* owner = GetUnitOwner()->GetOwner())
@@ -491,7 +491,7 @@ class spell_warl_infernal_scaling : public SpellScriptLoader
                 }
             }
 
-            void CalculateSPAmount(AuraEffect const* aurEff, int32 & amount, bool & /*canBeRecalculated*/)
+            void CalculateSPAmount(AuraEffect const*  /*aurEff*/, int32 & amount, bool & /*canBeRecalculated*/)
             {
                 // xinef: by default warlock pet inherits 15% of max(SP FIRE, SP SHADOW) as SP
                 if (Unit* owner = GetUnitOwner()->GetOwner())

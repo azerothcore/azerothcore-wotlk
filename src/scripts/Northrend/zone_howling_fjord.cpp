@@ -40,7 +40,7 @@ public:
                     me->GetMotionMaster()->MovePoint(0, *owner);
         }
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32  /*type*/, uint32  /*id*/)
         {
             if (Creature* cow = me->FindNearestCreature(24797, 5.0f, true))
             {

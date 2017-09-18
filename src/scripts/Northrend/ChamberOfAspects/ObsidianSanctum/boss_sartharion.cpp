@@ -338,7 +338,7 @@ public:
                 me->CastSpell(me, SPELL_SARTHARION_TWILIGHT_REVENGE, true);
         }
 
-        void EnterCombat(Unit* pWho)
+        void EnterCombat(Unit*  /*pWho*/)
         {
             me->CastSpell(me, SPELL_SARTHARION_PYROBUFFET, true);
             me->SetInCombatWithZone();
@@ -358,7 +358,7 @@ public:
             me->CallForHelp(500.0f);
         }
 
-        void JustDied(Unit* pKiller)
+        void JustDied(Unit*  /*pKiller*/)
         {
             RespawnDragons(true);
             summons.DespawnEntry(NPC_FLAME_TSUNAMI);
@@ -942,7 +942,7 @@ public:
             Talk(SAY_SHADRON_SLAY);
         }
 
-        void SummonedCreatureDies(Creature *summon, Unit*)
+        void SummonedCreatureDies(Creature * /*summon*/, Unit*)
         {
             if (isSartharion && pInstance)
             {
@@ -1172,7 +1172,7 @@ public:
             Talk(SAY_VESPERON_SLAY);
         }
 
-        void SummonedCreatureDies(Creature *summon, Unit*)
+        void SummonedCreatureDies(Creature * /*summon*/, Unit*)
         {
             if (!isSartharion)
                 ClearInstance();

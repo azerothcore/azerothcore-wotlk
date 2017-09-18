@@ -860,7 +860,7 @@ class npc_crok_scourgebane : public CreatureScript
                 }
             }
 
-            void UpdateEscortAI(uint32 diff) {}
+            void UpdateEscortAI(uint32  /*diff*/) {}
 
             void UpdateAI(uint32 diff)
             {
@@ -2075,7 +2075,7 @@ class spell_frost_giant_death_plague : public SpellScriptLoader
                 }
             }
 
-            void HandleScript(SpellEffIndex effIndex)
+            void HandleScript(SpellEffIndex  /*effIndex*/)
             {
                 if (!GetHitUnit()->HasAura(SPELL_RECENTLY_INFECTED) && !GetHitUnit()->HasAura(SPELL_DEATH_PLAGUE_AURA))
                     GetHitUnit()->CastSpell(GetHitUnit(), SPELL_DEATH_PLAGUE_AURA, true);
@@ -2431,7 +2431,7 @@ public:
     {
         PrepareAuraScript(spell_icc_yf_frozen_orb_AuraScript)
 
-        void HandleEffectPeriodic(AuraEffect const * aurEff)
+        void HandleEffectPeriodic(AuraEffect const *  /*aurEff*/)
         {
             PreventDefaultAction();
             if (Unit* c = GetCaster())
@@ -2554,7 +2554,7 @@ public:
         void Reset() { events.Reset(); }
         void AttackStart(Unit* who) { AttackStartCaster(who, 20.0f); }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit*  /*who*/)
         {
             events.Reset();
             events.ScheduleEvent(1, urand(5000,15000));
@@ -2621,7 +2621,7 @@ public:
         void Reset() { events.Reset(); }
         void AttackStart(Unit* who) { AttackStartCaster(who, 20.0f); }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit*  /*who*/)
         {
             events.Reset();
             events.ScheduleEvent(1, urand(5000,10000));
@@ -2675,7 +2675,7 @@ public:
         void Reset() { events.Reset(); }
         void AttackStart(Unit* who) { AttackStartCaster(who, 20.0f); }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit*  /*who*/)
         {
             events.Reset();
             events.ScheduleEvent(1, urand(5000,15000));
@@ -2736,7 +2736,7 @@ public:
         void Reset() { events.Reset(); }
         void AttackStart(Unit* who) { AttackStartCaster(who, 20.0f); }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit*  /*who*/)
         {
             events.Reset();
             events.ScheduleEvent(1, urand(5000,15000));
@@ -3273,7 +3273,7 @@ class npc_icc_buff_switcher : public CreatureScript
 public:
     npc_icc_buff_switcher() : CreatureScript("npc_icc_buff_switcher") { }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 sender, uint32 action)
+    bool OnGossipSelect(Player* player, Creature* creature, uint32  /*sender*/, uint32  /*action*/)
     {
         if ((creature->GetEntry() == NPC_GARROSH_HELLSCREAM && player->PlayerTalkClass->GetGossipMenu().GetMenuId() == 11206) || (creature->GetEntry() == NPC_KING_VARIAN_WRYNN && player->PlayerTalkClass->GetGossipMenu().GetMenuId() == 11204))
         {
@@ -3371,7 +3371,7 @@ public:
             }
         }
 
-        bool CanAIAttack(const Unit* target) const
+        bool CanAIAttack(const Unit*  /*target*/) const
         {
             return !me->HasUnitMovementFlag(MOVEMENTFLAG_CAN_FLY);
         }

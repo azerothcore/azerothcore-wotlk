@@ -127,7 +127,7 @@ public:
                 Talk(YELL_SKARVALD_KILL);
         }
 
-        void JustDied(Unit* Killer)
+        void JustDied(Unit*  /*Killer*/)
         {
             if( me->GetEntry() != NPC_SKARVALD )
                 return;
@@ -280,7 +280,7 @@ public:
             summons.Summon(s);
         }
 
-        void JustDied(Unit* Killer)
+        void JustDied(Unit*  /*Killer*/)
         {
             if( me->GetEntry() != NPC_DALRONN )
                 return;

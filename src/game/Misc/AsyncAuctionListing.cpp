@@ -13,7 +13,7 @@ std::list<AuctionListItemsDelayEvent> AsyncAuctionListingMgr::auctionListingList
 ACE_Thread_Mutex AsyncAuctionListingMgr::auctionListingLock;
 ACE_Thread_Mutex AsyncAuctionListingMgr::auctionListingTempLock;
 
-bool AuctionListOwnerItemsDelayEvent::Execute(uint64 e_time, uint32 p_time)
+bool AuctionListOwnerItemsDelayEvent::Execute(uint64  /*e_time*/, uint32  /*p_time*/)
 {
     if (Player* plr = ObjectAccessor::FindPlayer(playerguid))
         plr->GetSession()->HandleAuctionListOwnerItemsEvent(data);

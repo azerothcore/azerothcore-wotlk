@@ -303,7 +303,7 @@ class boss_deathbringer_saurfang : public CreatureScript
                     creature->AI()->DoAction(ACTION_START_OUTRO);
             }
 
-            bool CanAIAttack(const Unit* target) const
+            bool CanAIAttack(const Unit*  /*target*/) const
             {
                 return _introDone;
             }
@@ -367,7 +367,7 @@ class boss_deathbringer_saurfang : public CreatureScript
                 instance->HandleGameObject(instance->GetData64(GO_SAURFANG_S_DOOR), false);
             }
 
-            void SpellHitTarget(Unit* target, SpellInfo const* spell)
+            void SpellHitTarget(Unit*  /*target*/, SpellInfo const* spell)
             {
                 switch (spell->Id)
                 {
@@ -1051,7 +1051,7 @@ class spell_deathbringer_blood_link_aura : public SpellScriptLoader
                 return eventInfo.GetActor() && eventInfo.GetActionTarget() && (eventInfo.GetDamageInfo()->GetDamage() || eventInfo.GetHitMask() & PROC_EX_ABSORB) && procSpell && procSpell->SpellIconID != 2731; // Xinef: Mark of the Fallen Champion
             }
 
-            void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+            void HandleProc(AuraEffect const*  /*aurEff*/, ProcEventInfo& eventInfo)
             {
                 PreventDefaultAction();
                 Unit* victim = eventInfo.GetActionTarget();
@@ -1102,7 +1102,7 @@ class spell_deathbringer_blood_link_blood_beast_aura : public SpellScriptLoader
                 return eventInfo.GetActor() && eventInfo.GetActionTarget() && (eventInfo.GetDamageInfo()->GetDamage() || eventInfo.GetHitMask() & PROC_EX_ABSORB) && (!procSpell || procSpell->SpellIconID != 2731); // Xinef: Mark of the Fallen Champion
             }
 
-            void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+            void HandleProc(AuraEffect const*  /*aurEff*/, ProcEventInfo& eventInfo)
             {
                 PreventDefaultAction();
 

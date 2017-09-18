@@ -704,7 +704,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* who) { DoZoneInCombat(); }
+        void EnterCombat(Unit*  /*who*/) { DoZoneInCombat(); }
 
         void UpdateAI(uint32 diff)
         {
@@ -800,7 +800,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* who) { DoZoneInCombat(); }
+        void EnterCombat(Unit*  /*who*/) { DoZoneInCombat(); }
 
         void UpdateAI(uint32 diff)
         {
@@ -938,7 +938,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void MoveInLineOfSight(Unit* who) {}
+        void MoveInLineOfSight(Unit*  /*who*/) {}
         void EnterEvadeMode() {}
     };
 

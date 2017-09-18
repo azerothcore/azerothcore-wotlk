@@ -885,9 +885,9 @@ public:
                     sara->AI()->JustSummoned(cr);
         }
 
-        void MoveInLineOfSight(Unit* who) {}
-        void AttackStart(Unit* who) {}
-        void WaypointReached(uint32 point) {}
+        void MoveInLineOfSight(Unit*  /*who*/) {}
+        void AttackStart(Unit*  /*who*/) {}
+        void WaypointReached(uint32  /*point*/) {}
 
         void Reset()
         {
@@ -1044,7 +1044,7 @@ public:
             me->SummonCreature(NPC_IMMORTAL_GUARDIAN, me->GetPositionX()+dist*cos(o), me->GetPositionY()+dist*sin(o), 327.2+Zplus, 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
         }
 
-        void JustDied(Unit* who)
+        void JustDied(Unit*  /*who*/)
         {
             summons.DespawnAll();
             events.Reset();
@@ -1133,7 +1133,7 @@ public:
             return 0;
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spellInfo)
+        void SpellHit(Unit*  /*caster*/, const SpellInfo* spellInfo)
         {
             if (spellInfo->Id == SPELL_IN_THE_MAWS_OF_THE_OLD_GOD)
                 me->AddLootMode(32);
@@ -1488,7 +1488,7 @@ public:
                 me->RemoveAura(SPELL_SHATTERED_ILLUSION);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32  /*diff*/)
         {
             if (!UpdateVictim())
                 return;
@@ -1551,7 +1551,7 @@ public:
             return target;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32  /*diff*/)
         {
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
@@ -2309,7 +2309,7 @@ class spell_yogg_saron_brain_link : public SpellScriptLoader
                     _targetGUID = target->GetGUID();
             }
 
-            void OnPeriodic(AuraEffect const* aurEff)
+            void OnPeriodic(AuraEffect const*  /*aurEff*/)
             {
                 Unit* owner = GetUnitOwner();
                 Unit* _target = ObjectAccessor::GetUnit(*owner, _targetGUID);
@@ -2542,7 +2542,7 @@ class spell_yogg_saron_empowered : public SpellScriptLoader
         {
             PrepareAuraScript(spell_yogg_saron_empowered_AuraScript);
 
-            void OnPeriodic(AuraEffect const* aurEff)
+            void OnPeriodic(AuraEffect const*  /*aurEff*/)
             {
                 Unit* target = GetUnitOwner();
                 uint8 stack = std::min(uint8(target->GetHealthPct()/10), (uint8)9);
@@ -2660,7 +2660,7 @@ class spell_yogg_saron_sanity_well : public SpellScriptLoader
                 amplitude = 2*IN_MILLISECONDS;
             }
 
-            void HandleEffectPeriodic(AuraEffect const * aurEff)
+            void HandleEffectPeriodic(AuraEffect const *  /*aurEff*/)
             {
                 Unit* target = GetTarget();
                 if (!target || target->GetTypeId() != TYPEID_PLAYER)
@@ -2873,7 +2873,7 @@ class achievement_yogg_saron_drive_me_crazy : public AchievementCriteriaScript
     public:
         achievement_yogg_saron_drive_me_crazy() : AchievementCriteriaScript("achievement_yogg_saron_drive_me_crazy") {}
 
-        bool OnCheck(Player* player, Unit* target)
+        bool OnCheck(Player*  /*player*/, Unit* target)
         {
             return target && target->GetAI()->GetData(DATA_GET_DRIVE_ME_CRAZY); // target = Yogg-Saron
         }
@@ -2887,7 +2887,7 @@ class achievement_yogg_saron_darkness : public AchievementCriteriaScript
         {
         }
 
-        bool OnCheck(Player* player, Unit* target /*Yogg-Saron*/)
+        bool OnCheck(Player* player, Unit*  /*target*/ /*Yogg-Saron*/)
         {
             if (player->GetInstanceScript())
                 if (Creature* sara = ObjectAccessor::GetCreature(*player, player->GetInstanceScript()->GetData64(NPC_SARA)))
@@ -2908,7 +2908,7 @@ class achievement_yogg_saron_he_waits_dreaming : public AchievementCriteriaScrip
         {
         }
 
-        bool OnCheck(Player* player, Unit* target /*Yogg-Saron*/)
+        bool OnCheck(Player* player, Unit*  /*target*/ /*Yogg-Saron*/)
         {
             if (player->GetInstanceScript())
                 if (Creature* sara = ObjectAccessor::GetCreature(*player, player->GetInstanceScript()->GetData64(NPC_BRAIN_OF_YOGG_SARON)))
@@ -2927,7 +2927,7 @@ class achievement_yogg_saron_kiss_and_make_up : public AchievementCriteriaScript
     public:
         achievement_yogg_saron_kiss_and_make_up() : AchievementCriteriaScript("achievement_yogg_saron_kiss_and_make_up") {}
 
-        bool OnCheck(Player* player, Unit* target /*Sara*/)
+        bool OnCheck(Player*  /*player*/, Unit* target /*Sara*/)
         {
             return target && target->GetEntry() == NPC_SARA && target->GetAI() && target->GetAI()->GetData(DATA_GET_SARA_PHASE);
         }

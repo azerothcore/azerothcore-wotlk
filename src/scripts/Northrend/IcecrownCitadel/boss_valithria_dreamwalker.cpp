@@ -963,7 +963,7 @@ class npc_suppresser : public CreatureScript
                     AttackStart(valithria);
             }
 
-            void UpdateAI(uint32 diff)
+            void UpdateAI(uint32  /*diff*/)
             {
                 if (!UpdateVictim())
                     return;
@@ -1454,7 +1454,7 @@ class spell_valithria_suppression : public SpellScriptLoader
                     }
             }
 
-            void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes mode)
+            void OnRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes  /*mode*/)
             {
                 Unit* target = GetTarget();
                 Unit::AuraApplicationMap &aam = target->GetAppliedAuras();

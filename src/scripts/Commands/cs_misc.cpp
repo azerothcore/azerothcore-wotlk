@@ -1092,7 +1092,7 @@ public:
         return true;
     }
 
-    static bool HandleSaveCommand(ChatHandler* handler, char const* /*args*/)
+    static bool HandleSaveCommand(ChatHandler*  /*handler*/, char const* /*args*/)
     {
         // pussywizard: fully disabled on 28.12.2011, but disabled it "silently"
         return true;

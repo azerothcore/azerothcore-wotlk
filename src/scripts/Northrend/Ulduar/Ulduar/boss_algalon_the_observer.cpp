@@ -968,7 +968,7 @@ class npc_living_constellation : public CreatureScript
                 _isActive = false;
             }
 
-            uint32 GetData(uint32 param) const
+            uint32 GetData(uint32  /*param*/) const
             {
                 return _isActive;
             }
@@ -1090,7 +1090,7 @@ class go_celestial_planetarium_access : public GameObjectScript
             EventMap events;
             bool _locked;
 
-            bool GossipHello(Player* player, bool reportUse)
+            bool GossipHello(Player* player, bool  /*reportUse*/)
             {
                 bool hasKey = true;
                 if (LockEntry const* lock = sLockStore.LookupEntry(go->GetGOInfo()->goober.lockId))

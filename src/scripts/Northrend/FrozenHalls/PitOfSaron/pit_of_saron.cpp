@@ -46,7 +46,7 @@ public:
                 }
         }
 
-        void SetData(uint32 type, uint32 val)
+        void SetData(uint32 type, uint32  /*val*/)
         {
             if (type == DATA_START_INTRO && pInstance->GetData(DATA_INSTANCE_PROGRESS) == INSTANCE_PROGRESS_NONE && counter == 0 && !me->IsVisible())
             {
@@ -358,8 +358,8 @@ public:
             summons.Despawn(s);
         }
 
-        void AttackStart(Unit* who) {}
-        void MoveInLineOfSight(Unit* who) {}
+        void AttackStart(Unit*  /*who*/) {}
+        void MoveInLineOfSight(Unit*  /*who*/) {}
     };
 
     CreatureAI *GetAI(Creature* creature) const
@@ -467,7 +467,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void MoveInLineOfSight(Unit* who) {}
+        void MoveInLineOfSight(Unit*  /*who*/) {}
     };
 
     CreatureAI *GetAI(Creature* creature) const
@@ -1335,7 +1335,7 @@ public:
     {
         PrepareAuraScript(spell_pos_empowered_blizzardAuraScript)
 
-        void HandleEffectPeriodic(AuraEffect const * aurEff)
+        void HandleEffectPeriodic(AuraEffect const *  /*aurEff*/)
         {
             PreventDefaultAction();
             if (Unit* caster = GetCaster())

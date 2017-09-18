@@ -390,7 +390,7 @@ class spell_dk_master_of_ghouls : public SpellScriptLoader
         {
             PrepareAuraScript(spell_dk_master_of_ghouls_AuraScript);
 
-            void HandleEffectApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+            void HandleEffectApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
                 Unit* target = GetTarget();
                 if (target->GetTypeId() == TYPEID_PLAYER)
@@ -835,7 +835,7 @@ class spell_dk_dancing_rune_weapon_visual : public SpellScriptLoader
         {
             PrepareAuraScript(spell_dk_dancing_rune_weapon_visual_AuraScript);
 
-            void HandleEffectApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+            void HandleEffectApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
                 PreventDefaultAction();
                 if (Unit* owner = GetUnitOwner()->ToTempSummon()->GetSummoner())
@@ -926,7 +926,7 @@ class spell_dk_pet_scaling : public SpellScriptLoader
                 }
             }
 
-            void CalculateSPAmount(AuraEffect const* aurEff, int32 & amount, bool & /*canBeRecalculated*/)
+            void CalculateSPAmount(AuraEffect const*  /*aurEff*/, int32 & amount, bool & /*canBeRecalculated*/)
             {
                 // xinef: dk gargoyle inherits 33% of SP
                 if (GetUnitOwner()->GetEntry() != NPC_EBON_GARGOYLE)
@@ -948,7 +948,7 @@ class spell_dk_pet_scaling : public SpellScriptLoader
                 }
             }
 
-            void CalculateHasteAmount(AuraEffect const* aurEff, int32 & amount, bool & /*canBeRecalculated*/)
+            void CalculateHasteAmount(AuraEffect const*  /*aurEff*/, int32 & amount, bool & /*canBeRecalculated*/)
             {
                 // xinef: scale haste with owners melee haste
                 if (Unit* owner = GetUnitOwner()->GetOwner())
@@ -1120,7 +1120,7 @@ class spell_dk_anti_magic_shell_self : public SpellScriptLoader
                 GetTarget()->CastCustomSpell(SPELL_DK_RUNIC_POWER_ENERGIZE, SPELLVALUE_BASE_POINT0, bp, GetTarget(), true, NULL, aurEff);
             }
 
-            void HandleEffectApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+            void HandleEffectApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
                 Unit* target = GetTarget();
                 target->ApplySpellImmune(GetId(), IMMUNITY_ID, 33786, true); // cyclone

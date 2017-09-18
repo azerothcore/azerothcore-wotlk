@@ -979,7 +979,7 @@ public:
             me->CastSpell(me, SPELL_LIGHTNING_DESTRUCTION, true);
         }
 
-        void WaypointReached(uint32 point)
+        void WaypointReached(uint32  /*point*/)
         {
         }
     };
@@ -1043,9 +1043,9 @@ public:
             SetDespawnAtEnd(false);
         }
 
-        void MoveInLineOfSight(Unit *who) {}
-        void EnterCombat(Unit *who) {}
-        void AttackStart(Unit *who) {}
+        void MoveInLineOfSight(Unit * /*who*/) {}
+        void EnterCombat(Unit * /*who*/) {}
+        void AttackStart(Unit * /*who*/) {}
 
         void InitWaypoint()
         {
@@ -1066,7 +1066,7 @@ public:
             me->CastSpell(me, RAID_MODE(SPELL_BLIZZARD_10, SPELL_BLIZZARD_25), true);
         }
 
-        void WaypointReached(uint32 point)
+        void WaypointReached(uint32  /*point*/)
         {
         }
     };
@@ -1173,7 +1173,7 @@ public:
                     thorim->AI()->DoAction(ACTION_START_TRASH_DIED);
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit*  /*who*/)
         {
             if (me->GetEntry() == NPC_DARK_RUNE_ACOLYTE_I)
             {
@@ -1292,7 +1292,7 @@ public:
             _isCaster = (me->GetEntry() == NPC_DARK_RUNE_ACOLYTE_G);
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit*  /*who*/)
         {
             if (me->GetEntry() == NPC_IRON_RING_GUARD)
             {
@@ -1795,7 +1795,7 @@ class spell_thorim_trash_impale : public SpellScriptLoader
         {
             PrepareAuraScript(spell_thorim_trash_impale_AuraScript);
 
-            void OnPeriodic(AuraEffect const* aurEff)
+            void OnPeriodic(AuraEffect const*  /*aurEff*/)
             {
                 // deals damage until target is healed above 90%
                 if (GetUnitOwner()->HealthAbovePct(90))

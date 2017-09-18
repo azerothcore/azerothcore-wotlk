@@ -184,7 +184,7 @@ public:
         return true;
     }
 
-    bool OnGossipSelect(Player *player, Creature *pCreature, uint32 sender, uint32 action )
+    bool OnGossipSelect(Player *player, Creature *pCreature, uint32  /*sender*/, uint32 action )
     {
         if (action)
         {
@@ -290,7 +290,7 @@ public:
         Creature* GetMarnak() { return ObjectAccessor::GetCreature(*me, MarnakGUID); }
         Creature* GetKaddrak() { return ObjectAccessor::GetCreature(*me, KaddrakGUID); }
 
-        void MoveInLineOfSight(Unit* pWho) { }
+        void MoveInLineOfSight(Unit*  /*pWho*/) { }
         void DamageTaken(Unit*, uint32 &damage, DamageEffectType, SpellSchoolMask)
         { 
             if (damage && pInstance)
@@ -581,7 +581,7 @@ public:
             }
         }
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit*  /*killer*/)
         {
             ResetEvent();
             if(pInstance)

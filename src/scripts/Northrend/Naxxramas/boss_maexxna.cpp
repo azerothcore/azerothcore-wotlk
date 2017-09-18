@@ -89,7 +89,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit *who)
+        void EnterCombat(Unit * /*who*/)
         {
             me->SetInCombatWithZone();
             events.ScheduleEvent(EVENT_WEB_WRAP, 20000);
@@ -107,7 +107,7 @@ public:
             }
         }
 
-        void JustDied(Unit* Killer)
+        void JustDied(Unit*  /*Killer*/)
         {
             if (pInstance)
                 pInstance->SetData(EVENT_MAEXXNA, DONE);
@@ -213,7 +213,7 @@ public:
         boss_maexxna_webwrapAI(Creature *c) : NullCreatureAI(c), victimGUID(0) {}
 
         uint64 victimGUID;
-        void SetGUID(uint64 guid, int32 param)
+        void SetGUID(uint64 guid, int32  /*param*/)
         {
             victimGUID = guid;
             if (me->m_spells[0] && victimGUID)
@@ -221,7 +221,7 @@ public:
                     victim->CastSpell(victim, me->m_spells[0], true, NULL, NULL, me->GetGUID());
         }
 
-        void JustDied(Unit *killer)
+        void JustDied(Unit * /*killer*/)
         {
             if (me->m_spells[0] && victimGUID)
                 if (Unit *victim = ObjectAccessor::GetUnit(*me, victimGUID))

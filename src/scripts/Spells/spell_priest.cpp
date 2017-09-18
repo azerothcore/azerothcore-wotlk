@@ -77,7 +77,7 @@ class spell_pri_shadowfiend_scaling : public SpellScriptLoader
                 }
             }
 
-            void CalculateAPAmount(AuraEffect const* aurEff, int32 & amount, bool & /*canBeRecalculated*/)
+            void CalculateAPAmount(AuraEffect const*  /*aurEff*/, int32 & amount, bool & /*canBeRecalculated*/)
             {
                 // xinef: shadowfiend inherits 333% of SP as AP - 35.7% of damage increase per hit
                 if (Unit* owner = GetUnitOwner()->GetOwner())
@@ -87,7 +87,7 @@ class spell_pri_shadowfiend_scaling : public SpellScriptLoader
                 }
             }
 
-            void CalculateSPAmount(AuraEffect const* aurEff, int32 & amount, bool & /*canBeRecalculated*/)
+            void CalculateSPAmount(AuraEffect const*  /*aurEff*/, int32 & amount, bool & /*canBeRecalculated*/)
             {
                 // xinef: shadowfiend inherits 30% of SP
                 if (Unit* owner = GetUnitOwner()->GetOwner())

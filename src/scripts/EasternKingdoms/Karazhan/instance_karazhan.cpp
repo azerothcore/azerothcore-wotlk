@@ -323,7 +323,7 @@ public:
             amplitude = 5000;
         }
 
-        void Update(AuraEffect const* effect)
+        void Update(AuraEffect const*  /*effect*/)
         {
             PreventDefaultAction();
             if (roll_chance_i(35))

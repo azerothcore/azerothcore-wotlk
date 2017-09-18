@@ -148,7 +148,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit*  /*who*/)
         {
             Talk(SAY_AGGRO);
             
@@ -309,7 +309,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit*  /*killer*/)
         {
             Talk(SAY_DEATH);
 
@@ -325,7 +325,7 @@ public:
             }
         }
 
-        void KilledUnit(Unit *victim)
+        void KilledUnit(Unit * /*victim*/)
         {
             if (urand(0,1))
                 return;
@@ -389,7 +389,7 @@ public:
     {
         boss_sjonnir_dwarfAI(Creature *c) : ScriptedAI(c) { }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32  /*diff*/)
         {
             if (!UpdateVictim())
                 return;             
@@ -423,7 +423,7 @@ public:
         {
             events.ScheduleEvent(EVENT_TOXIC_VOLLEY, 5000);
         }
-        void JustDied(Unit* killer)
+        void JustDied(Unit*  /*killer*/)
         {
             if (InstanceScript *pInstance = me->GetInstanceScript())
                 if (Creature *sjonnir = ObjectAccessor::GetCreature(*me, pInstance->GetData64(NPC_SJONNIR)))

@@ -233,7 +233,7 @@ public:
 
         void MoveInLineOfSight(Unit*) { }
         void UpdateAI(uint32) { }
-        void AttackStart(Unit* who) { }
+        void AttackStart(Unit*  /*who*/) { }
 
         void Reset() { returning = false; }
 

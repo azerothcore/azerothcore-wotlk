@@ -34,7 +34,7 @@ public:
         return commandTable;
     }
 
-    static bool HandleSpectatorCommand(ChatHandler* handler, char const* args)
+    static bool HandleSpectatorCommand(ChatHandler* handler, char const*  /*args*/)
     {
         handler->PSendSysMessage("Incorrect syntax.");
         handler->PSendSysMessage("Command has subcommands:");
@@ -50,7 +50,7 @@ public:
         return true;
     }
 
-    static bool HandleSpectatorResetCommand(ChatHandler* handler, char const* args)
+    static bool HandleSpectatorResetCommand(ChatHandler* handler, char const*  /*args*/)
     {
         Player* p = handler->GetSession()->GetPlayer();
         if (!p->IsSpectator())
@@ -59,7 +59,7 @@ public:
         return true;
     }
 
-    static bool HandleSpectatorLeaveCommand(ChatHandler* handler, char const* args)
+    static bool HandleSpectatorLeaveCommand(ChatHandler* handler, char const*  /*args*/)
     {
         Player* player = handler->GetSession()->GetPlayer();
         if (!player->IsSpectator() || !player->FindMap() || !player->FindMap()->IsBattleArena())

@@ -230,7 +230,7 @@ public:
                 pInstance->SetData(TYPE_HODIR, NOT_STARTED);
         }
 
-        void EnterCombat(Unit* pWho)
+        void EnterCombat(Unit*  /*pWho*/)
         {
             if (summons.size() != uint32(RAID_MODE(8, 16)))
             {
@@ -555,7 +555,7 @@ public:
             return 0;
         }
 
-        void MoveInLineOfSight(Unit* who) {}
+        void MoveInLineOfSight(Unit*  /*who*/) {}
     };
 };
 
@@ -623,7 +623,7 @@ public:
         InstanceScript* pInstance;
         uint16 timer;
 
-        void DamageTaken(Unit* doneBy, uint32 &damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit* doneBy, uint32 & /*damage*/, DamageEffectType, SpellSchoolMask)
         {
             if (pInstance && doneBy)
                 if (pInstance->GetData(TYPE_HODIR) == NOT_STARTED)
@@ -691,7 +691,7 @@ public:
             }
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spell)
+        void SpellHit(Unit*  /*caster*/, const SpellInfo* spell)
         {
             switch( spell->Id )
             {
@@ -789,7 +789,7 @@ public:
             }
         }
 
-        void MoveInLineOfSight(Unit* who) {}
+        void MoveInLineOfSight(Unit*  /*who*/) {}
         void EnterEvadeMode() {}
         bool CanAIAttack(const Unit* t) const { return t->GetEntry() == NPC_HODIR; }
 
@@ -887,7 +887,7 @@ public:
             }
         }
 
-        void MoveInLineOfSight(Unit* who) {}
+        void MoveInLineOfSight(Unit*  /*who*/) {}
         void EnterEvadeMode() {}
         bool CanAIAttack(const Unit* t) const { return t->GetEntry() == NPC_HODIR; }
 
@@ -988,7 +988,7 @@ public:
             }
         }
 
-        void MoveInLineOfSight(Unit* who) {}
+        void MoveInLineOfSight(Unit*  /*who*/) {}
         void EnterEvadeMode() {}
         bool CanAIAttack(const Unit* t) const { return t->GetEntry() == NPC_HODIR; }
 
@@ -1104,7 +1104,7 @@ public:
             }
         }
 
-        void MoveInLineOfSight(Unit* who) {}
+        void MoveInLineOfSight(Unit*  /*who*/) {}
         void EnterEvadeMode() {}
         bool CanAIAttack(const Unit* t) const { return t->GetEntry() == NPC_HODIR; }
 
@@ -1165,7 +1165,7 @@ public:
             return true;
         }
 
-        void HandleEffectPeriodic(AuraEffect const * aurEff)
+        void HandleEffectPeriodic(AuraEffect const *  /*aurEff*/)
         {
             
             if (Unit* target = GetTarget())
@@ -1350,7 +1350,7 @@ public:
     {
         PrepareAuraScript(spell_hodir_storm_power_AuraScript)
 
-        void OnApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+        void OnApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
             if (Unit* caster = GetCaster())
                 if (Aura* a = caster->GetAura(GetId() == SPELL_SHAMAN_STORM_POWER_10 ? SPELL_SHAMAN_STORM_CLOUD_10 : SPELL_SHAMAN_STORM_CLOUD_25))
@@ -1386,7 +1386,7 @@ public:
     {
         PrepareAuraScript(spell_hodir_storm_cloud_AuraScript)
 
-        void HandleEffectPeriodic(AuraEffect const * aurEff)
+        void HandleEffectPeriodic(AuraEffect const *  /*aurEff*/)
         {
             PreventDefaultAction();
             if (Unit* target = GetTarget())
@@ -1410,7 +1410,7 @@ class achievement_cheese_the_freeze : public AchievementCriteriaScript
 public:
     achievement_cheese_the_freeze() : AchievementCriteriaScript("achievement_cheese_the_freeze") {}
 
-    bool OnCheck(Player* player, Unit* target)
+    bool OnCheck(Player*  /*player*/, Unit* target)
     {
         return target && target->GetEntry() == NPC_HODIR && target->GetTypeId() == TYPEID_UNIT && target->ToCreature()->AI()->GetData(1);
     }
@@ -1421,7 +1421,7 @@ class achievement_getting_cold_in_here : public AchievementCriteriaScript
 public:
     achievement_getting_cold_in_here() : AchievementCriteriaScript("achievement_getting_cold_in_here") {}
 
-    bool OnCheck(Player* player, Unit* target)
+    bool OnCheck(Player*  /*player*/, Unit* target)
     {
         return target && target->GetEntry() == NPC_HODIR && target->GetTypeId() == TYPEID_UNIT && target->ToCreature()->AI()->GetData(2);
     }
@@ -1432,7 +1432,7 @@ class achievement_i_could_say_that_this_cache_was_rare : public AchievementCrite
 public:
     achievement_i_could_say_that_this_cache_was_rare() : AchievementCriteriaScript("achievement_i_could_say_that_this_cache_was_rare") {}
 
-    bool OnCheck(Player* player, Unit* target)
+    bool OnCheck(Player*  /*player*/, Unit* target)
     {
         return target && target->GetEntry() == NPC_HODIR && target->GetTypeId() == TYPEID_UNIT && target->ToCreature()->AI()->GetData(3);
     }
@@ -1443,7 +1443,7 @@ class achievement_i_have_the_coolest_friends : public AchievementCriteriaScript
 public:
     achievement_i_have_the_coolest_friends() : AchievementCriteriaScript("achievement_i_have_the_coolest_friends") {}
 
-    bool OnCheck(Player* player, Unit* target)
+    bool OnCheck(Player*  /*player*/, Unit* target)
     {
         return target && target->GetEntry() == NPC_HODIR && target->GetTypeId() == TYPEID_UNIT && target->ToCreature()->AI()->GetData(4);
     }
@@ -1454,7 +1454,7 @@ class achievement_staying_buffed_all_winter_10 : public AchievementCriteriaScrip
 public:
     achievement_staying_buffed_all_winter_10() : AchievementCriteriaScript("achievement_staying_buffed_all_winter_10") {}
 
-    bool OnCheck(Player* player, Unit* target)
+    bool OnCheck(Player* player, Unit*  /*target*/)
     {
         return player && player->HasAura(SPELL_MAGE_TOASTY_FIRE_AURA) && player->HasAura(SPELL_DRUID_STARLIGHT_AREA_AURA) && player->HasAura(SPELL_SHAMAN_STORM_POWER_10);
     }
@@ -1465,7 +1465,7 @@ class achievement_staying_buffed_all_winter_25 : public AchievementCriteriaScrip
 public:
     achievement_staying_buffed_all_winter_25() : AchievementCriteriaScript("achievement_staying_buffed_all_winter_25") {}
 
-    bool OnCheck(Player* player, Unit* target)
+    bool OnCheck(Player* player, Unit*  /*target*/)
     {
         return player && player->HasAura(SPELL_MAGE_TOASTY_FIRE_AURA) && player->HasAura(SPELL_DRUID_STARLIGHT_AREA_AURA) && player->HasAura(SPELL_SHAMAN_STORM_POWER_25);
     }

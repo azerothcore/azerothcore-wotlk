@@ -27,7 +27,7 @@ class spell_item_massive_seaforium_charge : public SpellScriptLoader
         {
             PrepareSpellScript(spell_item_massive_seaforium_charge_SpellScript);
 
-            void HandleItemRemove(SpellEffIndex effIndex)
+            void HandleItemRemove(SpellEffIndex  /*effIndex*/)
             {
                 if (!GetHitUnit() || !GetHitUnit()->ToPlayer())
                     return;
@@ -443,7 +443,7 @@ class spell_item_lil_phylactery : public SpellScriptLoader
                 return eventInfo.GetActionTarget() && (eventInfo.GetActionTarget()->GetTypeId() != TYPEID_UNIT || eventInfo.GetActionTarget()->ToCreature()->isWorldBoss());
             }
 
-            void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+            void HandleProc(AuraEffect const*  /*aurEff*/, ProcEventInfo&  /*eventInfo*/)
             {
                 PreventDefaultAction();
 
@@ -2386,7 +2386,7 @@ class spell_item_shadows_fate : public SpellScriptLoader
         {
             PrepareAuraScript(spell_item_shadows_fate_AuraScript);
 
-            void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+            void HandleProc(AuraEffect const*  /*aurEff*/, ProcEventInfo& eventInfo)
             {
                 PreventDefaultAction();
 

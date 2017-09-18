@@ -619,7 +619,7 @@ void BattlefieldWG::OnCreatureCreate(Creature* creature)
     }
 }
 
-void BattlefieldWG::OnCreatureRemove(Creature* creature)
+void BattlefieldWG::OnCreatureRemove(Creature*  /*creature*/)
 {
 /* possibly can be used later
     if (IsWarTime())
@@ -925,7 +925,7 @@ void BattlefieldWG::SendInitWorldStatesToAll()
                 SendInitWorldStatesTo(player);
 }
 
-void BattlefieldWG::BrokenWallOrTower(TeamId team)
+void BattlefieldWG::BrokenWallOrTower(TeamId  /*team*/)
 {
 // might be some use for this in the future. old code commented out below. KL
 /*    if (team == GetDefenderTeam())

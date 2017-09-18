@@ -167,7 +167,7 @@ public:
                 events.ScheduleEvent(EVENT_DIREBREW_RESPAWN2, 10000);
         }
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit*  /*killer*/)
         {
             summons.DespawnAll();
             summons.DoAction(ACTION_RELEASE_LOOT);
@@ -299,7 +299,7 @@ public:
         }
                 
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit*  /*who*/)
         {
             if (me->GetEntry() == NPC_URSULA_DIREBREW)
                 events.ScheduleEvent(EVENT_SISTERS_BARREL, 18000);
@@ -452,7 +452,7 @@ class npc_brewfest_keg_reciver : public CreatureScript
         return new npc_brewfest_keg_reciverAI(creature);
     }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*uiSender*/, uint32 uiAction)
+    bool OnGossipSelect(Player* player, Creature*  /*creature*/, uint32 /*uiSender*/, uint32 uiAction)
     {
         switch (uiAction)
         {
@@ -549,7 +549,7 @@ class npc_brewfest_bark_trigger : public CreatureScript
                 }
             }
 
-            std::string GetTextFor(uint32 entry, uint32 questId)
+            std::string GetTextFor(uint32  /*entry*/, uint32 questId)
             {
                 std::string str = "";
                 switch (questId)
@@ -680,7 +680,7 @@ class npc_dark_iron_attack_generator : public CreatureScript
             }
 
             // DARK IRON ATTACK EVENT
-            void MoveInLineOfSight(Unit* who) {}
+            void MoveInLineOfSight(Unit*  /*who*/) {}
             void EnterCombat(Unit*) {}
 
             void SpellHit(Unit* caster, const SpellInfo* spellInfo)
@@ -1047,7 +1047,7 @@ class npc_dark_iron_guzzler : public CreatureScript
                 who->CastSpell(who, SPELL_REPORT_DEATH, true);
             }
 
-            void SpellHit(Unit* caster, const SpellInfo* spellInfo)
+            void SpellHit(Unit*  /*caster*/, const SpellInfo* spellInfo)
             {
                 if (me->IsAlive() && spellInfo->Id == SPELL_PLAYER_MUG)
                 {
@@ -1093,7 +1093,7 @@ class npc_brewfest_super_brew_trigger : public CreatureScript
 
             uint32 timer;
             void EnterCombat(Unit*) {}
-            void MoveInLineOfSight(Unit* who)
+            void MoveInLineOfSight(Unit*  /*who*/)
             {
             }
 

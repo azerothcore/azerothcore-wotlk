@@ -120,7 +120,7 @@ class boss_gal_darah : public CreatureScript
                 summon->DespawnOrUnsummon(despawnTime);
             }
 
-            uint32 GetData(uint32 type) const
+            uint32 GetData(uint32  /*type*/) const
             {
                 return impaledList.size();
             }

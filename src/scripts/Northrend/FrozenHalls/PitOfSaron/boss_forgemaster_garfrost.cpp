@@ -90,7 +90,7 @@ public:
                 pInstance->SetData(DATA_GARFROST, NOT_STARTED);
         }
 
-        void SetData(uint32 id, uint32 data)
+        void SetData(uint32 id, uint32  /*data*/)
         {
             if (id == 1 && pInstance)
                 pInstance->SetData(DATA_ACHIEV_ELEVEN, 0);
@@ -156,7 +156,7 @@ public:
             }
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spell)
+        void SpellHitTarget(Unit*  /*target*/, const SpellInfo* spell)
         {
             if (spell->Id == uint32(SPELL_SARONITE_TRIGGERED))
             {

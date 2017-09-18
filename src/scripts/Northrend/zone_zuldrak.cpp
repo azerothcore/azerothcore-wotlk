@@ -476,7 +476,7 @@ public:
                     aura->SetDuration(48000);
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spellInfo)
+        void SpellHit(Unit*  /*caster*/, const SpellInfo* spellInfo)
         {
             if (spellInfo->Id == SPELL_TOUCH_OF_DEATH)
             {
@@ -671,7 +671,7 @@ public:
             DoCast(rageclaw, SPELL_RIGHT_CHAIN, true);
         }
 
-        void UnlockRageclaw(Unit* who, Creature* rageclaw)
+        void UnlockRageclaw(Unit*  /*who*/, Creature* rageclaw)
         {
             // pointer check not needed
             DoCast(rageclaw, SPELL_FREE_RAGECLAW, true);
