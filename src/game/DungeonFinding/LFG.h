@@ -191,11 +191,10 @@ public:
     }
 };
 
-/*
 std::string ConcatenateDungeons(LfgDungeonSet const& dungeons);
 std::string GetRolesString(uint8 roles);
 std::string GetStateString(LfgState state);
-*/
+
 
 } // namespace lfg
 
