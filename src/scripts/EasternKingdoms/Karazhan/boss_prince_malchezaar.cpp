@@ -52,7 +52,7 @@ struct InfernalPoint
 
 #define INFERNAL_Z 275.5f
 
-static InfernalPoint InfernalPoints[] =
+/*static InfernalPoint InfernalPoints[] =
 {
     { -10922.8f, -1985.2f },
     { -10916.2f, -1996.2f },
@@ -72,7 +72,7 @@ static InfernalPoint InfernalPoints[] =
     { -10984.0f, -2019.3f },
     { -10932.8f, -1979.6f },
     { -10935.7f, -1996.0f }
-};
+};*/
 
 
 //---------Infernal code first
@@ -237,7 +237,7 @@ public:
 
         void SummonAxes()
         {
-            Creature* axe = me->SummonCreature(MALCHEZARS_AXE, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 10000);
+            me->SummonCreature(MALCHEZARS_AXE, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 10000);
         }
 
         void EnfeebleHealthEffect()
@@ -474,7 +474,7 @@ public:
                 me->SetCanDualWield(true);
             }
 
-            void Reset()
+            void Reset() override
             {
             }
 

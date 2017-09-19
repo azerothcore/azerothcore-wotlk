@@ -103,7 +103,7 @@ class spell_dtk_raise_dead : public SpellScriptLoader
                 return GetUnitOwner()->GetTypeId() == TYPEID_UNIT;
             }
 
-            void HandleEffectRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+            void HandleEffectRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
                 GetUnitOwner()->ToCreature()->DespawnOrUnsummon(1);
                 GetUnitOwner()->SummonCreature(NPC_RISEN_DRAKKARI_WARRIOR, *GetUnitOwner());

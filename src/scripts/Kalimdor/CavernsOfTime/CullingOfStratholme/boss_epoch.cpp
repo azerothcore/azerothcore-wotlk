@@ -131,7 +131,7 @@ public:
             Talk(SAY_DEATH);
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit*  /*victim*/)
         {
             if (!urand(0,1))
                 return;

@@ -156,7 +156,7 @@ class spell_the_eye_countercharge : public SpellScriptLoader
         {
             PrepareAuraScript(spell_the_eye_counterchargeScript);
 
-            bool PrepareProc(ProcEventInfo& eventInfo)
+            bool PrepareProc(ProcEventInfo&  /*eventInfo*/)
             {
                 // xinef: prevent charge drop
                 PreventDefaultAction();

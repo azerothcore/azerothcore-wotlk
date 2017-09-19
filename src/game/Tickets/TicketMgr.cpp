@@ -20,7 +20,7 @@ inline float GetAge(uint64 t) { return float(time(NULL) - t) / DAY; }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // GM ticket
-GmTicket::GmTicket() : _id(0), _type(TICKET_TYPE_OPEN), _playerGuid(0), _posX(0), _posY(0), _posZ(0), _mapId(0), _createTime(0), _lastModifiedTime(0),
+GmTicket::GmTicket() : _id(0), _playerGuid(0), _type(TICKET_TYPE_OPEN), _posX(0), _posY(0), _posZ(0), _mapId(0), _createTime(0), _lastModifiedTime(0),
                        _closedBy(0), _resolvedBy(0), _assignedTo(0), _completed(false), _escalatedStatus(TICKET_UNASSIGNED), _viewed(false),
                        _needResponse(false), _needMoreHelp(false) { }
 

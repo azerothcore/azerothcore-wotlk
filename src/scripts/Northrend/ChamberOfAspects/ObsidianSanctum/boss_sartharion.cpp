@@ -150,10 +150,10 @@ enum Events
 
 const Position portalPos[4] = 
 {
-    {3247.29f, 529.804f, 58.9595f},
-    {3248.62f, 646.739f, 85.2939f},
-    {3151.20f, 517.862f, 90.3389f},
-    {3351.78f, 517.138f, 99.1620f},
+    {3247.29f, 529.804f, 58.9595f, 0.0f},
+    {3248.62f, 646.739f, 85.2939f, 0.0f},
+    {3151.20f, 517.862f, 90.3389f, 0.0f},
+    {3351.78f, 517.138f, 99.1620f, 0.0f},
 };
 
 const Position EggsPos[12] = 
@@ -262,7 +262,7 @@ public:
             {
                 Unit* cr = NULL;
                 for (uint8 i = 0; i < 3; ++i)
-                    if (cr = ObjectAccessor::GetUnit(*me, pInstance->GetData64(DATA_TENEBRON+i)))
+                    if ((cr = ObjectAccessor::GetUnit(*me, pInstance->GetData64(DATA_TENEBRON+i))))
                     {
                         if (!cr->IsAlive())
                             continue;
@@ -301,7 +301,7 @@ public:
                 Creature* cr = NULL;
                 for (uint8 i = 0; i < 3; ++i)
                     if (dragons[i])
-                        if (cr = ObjectAccessor::GetCreature(*me, dragons[i]))
+                        if ((cr = ObjectAccessor::GetCreature(*me, dragons[i])))
                         {
                             if (combat && cr->IsInCombat())
                                 continue;
@@ -338,7 +338,7 @@ public:
                 me->CastSpell(me, SPELL_SARTHARION_TWILIGHT_REVENGE, true);
         }
 
-        void EnterCombat(Unit* pWho)
+        void EnterCombat(Unit*  /*pWho*/)
         {
             me->CastSpell(me, SPELL_SARTHARION_PYROBUFFET, true);
             me->SetInCombatWithZone();
@@ -358,7 +358,7 @@ public:
             me->CallForHelp(500.0f);
         }
 
-        void JustDied(Unit* pKiller)
+        void JustDied(Unit*  /*pKiller*/)
         {
             RespawnDragons(true);
             summons.DespawnEntry(NPC_FLAME_TSUNAMI);
@@ -478,7 +478,7 @@ void boss_sartharion::boss_sartharionAI::HandleSartharionAbilities()
             uint8 iter = 0;
             for (SummonList::iterator i = summons.begin(); i != summons.end(); ++i)
             {
-                if (cr = ObjectAccessor::GetCreature(*me, *i))
+                if ((cr = ObjectAccessor::GetCreature(*me, *i)))
                     if (cr->GetEntry() == NPC_FIRE_CYCLONE)
                     {
                         if (iter == rand)
@@ -508,7 +508,7 @@ void boss_sartharion::boss_sartharionAI::HandleSartharionAbilities()
                 summons.RemoveNotExisting();
                 for (SummonList::iterator i = summons.begin(); i != summons.end(); ++i)
                 {
-                    if (cr = ObjectAccessor::GetCreature(*me, *i))
+                    if ((cr = ObjectAccessor::GetCreature(*me, *i)))
                         if (cr->GetEntry() == NPC_FIRE_CYCLONE)
                             cr->CastSpell(cr, SPELL_CYCLONE_AURA_PERIODIC, true);
                 }
@@ -754,12 +754,12 @@ public:
                     Creature* cr = NULL;
                     for (uint8 i = 0; i < 6; ++i)
                     {
-                        if (cr = me->SummonCreature(NPC_TWILIGHT_EGG, EggsPos[isSartharion ? i+6 : i].GetPositionX(), EggsPos[isSartharion ? i+6 : i].GetPositionY(), EggsPos[isSartharion ? i+6 : i].GetPositionZ(), EggsPos[isSartharion ? i+6 : i].GetOrientation(), TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 60000))
+                        if ((cr = me->SummonCreature(NPC_TWILIGHT_EGG, EggsPos[isSartharion ? i+6 : i].GetPositionX(), EggsPos[isSartharion ? i+6 : i].GetPositionY(), EggsPos[isSartharion ? i+6 : i].GetPositionZ(), EggsPos[isSartharion ? i+6 : i].GetOrientation(), TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 60000)))
                         {
                             summons.Summon(cr);
                             cr->SetPhaseMask(16, true);
                         }
-                        if (cr = me->SummonCreature(NPC_TWILIGHT_WHELP, EggsPos[isSartharion ? i+6 : i].GetPositionX(), EggsPos[isSartharion ? i+6 : i].GetPositionY(), EggsPos[isSartharion ? i+6 : i].GetPositionZ(), EggsPos[isSartharion ? i+6 : i].GetOrientation(), TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 60000))
+                        if ((cr = me->SummonCreature(NPC_TWILIGHT_WHELP, EggsPos[isSartharion ? i+6 : i].GetPositionX(), EggsPos[isSartharion ? i+6 : i].GetPositionY(), EggsPos[isSartharion ? i+6 : i].GetPositionZ(), EggsPos[isSartharion ? i+6 : i].GetOrientation(), TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 60000)))
                         {
                             summons.Summon(cr);
                             cr->SetPhaseMask(16, true);
@@ -777,13 +777,13 @@ public:
                     summons.DespawnEntry(NPC_TWILIGHT_WHELP);
                     for (SummonList::iterator i = summons.begin(); i != summons.end(); ++i)
                     {
-                        if (cr = ObjectAccessor::GetCreature(*me, *i))
+                        if ((cr = ObjectAccessor::GetCreature(*me, *i)))
                         {
                             if (!cr->IsAlive())
                                 continue;
 
                             if (cr->GetEntry() == NPC_TWILIGHT_EGG)
-                                if (cr = me->SummonCreature(NPC_TWILIGHT_WHELP, cr->GetPositionX(), cr->GetPositionY(), cr->GetPositionZ(), cr->GetOrientation(), TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 60000))
+                                if ((cr = me->SummonCreature(NPC_TWILIGHT_WHELP, cr->GetPositionX(), cr->GetPositionY(), cr->GetPositionZ(), cr->GetOrientation(), TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 60000)))
                                     summons2.Summon(cr);
                         }
                     }
@@ -942,7 +942,7 @@ public:
             Talk(SAY_SHADRON_SLAY);
         }
 
-        void SummonedCreatureDies(Creature *summon, Unit*)
+        void SummonedCreatureDies(Creature * /*summon*/, Unit*)
         {
             if (isSartharion && pInstance)
             {
@@ -1172,7 +1172,7 @@ public:
             Talk(SAY_VESPERON_SLAY);
         }
 
-        void SummonedCreatureDies(Creature *summon, Unit*)
+        void SummonedCreatureDies(Creature * /*summon*/, Unit*)
         {
             if (!isSartharion)
                 ClearInstance();

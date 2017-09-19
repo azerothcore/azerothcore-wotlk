@@ -289,7 +289,7 @@ class FormulaScript : public ScriptObject
         virtual void OnGroupRateCalculation(float& /*rate*/, uint32 /*count*/, bool /*isRaid*/) { }
 
         // Called after calculating arena rating changes
-        virtual void OnAfterArenaRatingCalculation(Battleground *const bg, int32 &winnerMatchmakerChange, int32 &loserMatchmakerChange, int32 &winnerChange, int32 &loserChange) { };
+        virtual void OnAfterArenaRatingCalculation(Battleground *const /*bg*/, int32& /*winnerMatchmakerChange*/, int32& /*loserMatchmakerChange*/, int32& /*winnerChange*/, int32& /*loserChange*/) { };
 };
 
 template<class TMap> class MapScript : public UpdatableScript<TMap>
@@ -446,7 +446,7 @@ public:
     virtual void ModifyHealRecieved(Unit* /*target*/, Unit* /*attacker*/, uint32& /*damage*/) { }
 
     //Called when Damage is Dealt
-    virtual uint32 DealDamage(Unit* AttackerUnit, Unit *pVictim, uint32 damage, DamageEffectType damagetype) { return damage; }
+    virtual uint32 DealDamage(Unit* /*AttackerUnit*/, Unit* /*pVictim*/, uint32 damage, DamageEffectType /*damagetype*/) { return damage; }
 
     virtual void OnBeforeRollMeleeOutcomeAgainst(const Unit* /*attacker*/, const Unit* /*victim*/, WeaponAttackType /*attType*/, int32 &/*attackerMaxSkillValueForLevel*/, int32 &/*victimMaxSkillValueForLevel*/, int32 &/*attackerWeaponSkill*/, int32 &/*victimDefenseSkill*/, int32& /*crit_chance*/, int32& /*miss_chance*/ , int32& /*dodge_chance*/ , int32& /*parry_chance*/ , int32& /*block_chance*/ ) {   };
 };
@@ -887,13 +887,13 @@ class PlayerScript : public ScriptObject
         virtual void OnPlayerJoinArena(Player* /*player*/) { }
         
         //After looting item
-        virtual void OnLootItem(Player* player, Item* item, uint32 count, uint64 lootguid) { }
+        virtual void OnLootItem(Player* /*player*/, Item* /*item*/, uint32 /*count*/, uint64 /*lootguid*/) { }
 
         //After creating item (eg profession item creation)
-        virtual void OnCreateItem(Player* player, Item* item, uint32 count) { }
+        virtual void OnCreateItem(Player* /*player*/, Item* /*item*/, uint32 /*count*/) { }
 
         //After receiving item as a quest reward
-        virtual void OnQuestRewardItem(Player* player, Item* item, uint32 count) { }
+        virtual void OnQuestRewardItem(Player* /*player*/, Item* /*item*/, uint32 /*count*/) { }
 
         //Before buying something from any vendor
         virtual void OnBeforeBuyItemFromVendor(Player* /*player*/, uint64 /*vendorguid*/, uint32 /*vendorslot*/, uint32 &/*item*/, uint8 /*count*/, uint8 /*bag*/, uint8 /*slot*/) { };

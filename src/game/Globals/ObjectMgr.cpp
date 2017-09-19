@@ -7858,7 +7858,7 @@ bool ObjectMgr::LoadTrinityStrings(const char* table, int32 min_value, int32 max
     return true;
 }
 
-const char *ObjectMgr::GetTrinityString(int32 entry, LocaleConstant locale_idx) const
+const char *ObjectMgr::GetTrinityString(int32 entry, LocaleConstant  /*locale_idx*/) const
 {
     if (TrinityStringLocale const* msl = GetTrinityStringLocale(entry))
         return msl->Content[DEFAULT_LOCALE].c_str();

@@ -509,7 +509,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit*  /*killer*/)
         {
             me->CastSpell(me, RAID_MODE(SPELL_TRAITOR_KING_10, SPELL_TRAITOR_KING_25, SPELL_TRAITOR_KING_10, SPELL_TRAITOR_KING_25), true);
             me->m_Events.AddEvent(new HideNpcEvent(*me), me->m_Events.CalculateTime(5000));
@@ -571,7 +571,7 @@ public:
             }
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spell)
+        void SpellHit(Unit*  /*caster*/, const SpellInfo* spell)
         {
             if( spell->Id == SPELL_SPIKE_FAIL )
             {
@@ -710,7 +710,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit*  /*killer*/)
         {
             me->m_Events.AddEvent(new HideNpcEvent(*me), me->m_Events.CalculateTime(5000));
         }
@@ -840,7 +840,7 @@ class spell_pursuing_spikes : public SpellScriptLoader
         {
             PrepareAuraScript(spell_pursuing_spikesAuraScript)
 
-            void HandleEffectPeriodic(AuraEffect const * aurEff)
+            void HandleEffectPeriodic(AuraEffect const *  /*aurEff*/)
             {
                 if( Unit* target = GetTarget() )
                 {

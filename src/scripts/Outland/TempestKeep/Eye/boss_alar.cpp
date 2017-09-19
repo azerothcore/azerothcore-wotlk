@@ -359,7 +359,7 @@ class spell_alar_flame_quills : public SpellScriptLoader
         {
             PrepareAuraScript(spell_alar_flame_quills_AuraScript);
 
-            void HandlePeriodic(AuraEffect const* aurEff)
+            void HandlePeriodic(AuraEffect const*  /*aurEff*/)
             {
                 PreventDefaultAction();
 

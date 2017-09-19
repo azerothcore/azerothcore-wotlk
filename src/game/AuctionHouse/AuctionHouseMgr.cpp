@@ -506,7 +506,7 @@ void AuctionHouseObject::BuildListOwnerItems(WorldPacket& data, Player* player, 
 bool AuctionHouseObject::BuildListAuctionItems(WorldPacket& data, Player* player,
     std::wstring const& wsearchedname, uint32 listfrom, uint8 levelmin, uint8 levelmax, uint8 usable,
     uint32 inventoryType, uint32 itemClass, uint32 itemSubClass, uint32 quality,
-    uint32& count, uint32& totalcount, uint8 getAll)
+    uint32& count, uint32& totalcount, uint8  /*getAll*/)
 {
     uint32 itrcounter = 0;
 

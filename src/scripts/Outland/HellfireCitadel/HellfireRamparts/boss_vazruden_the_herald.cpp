@@ -119,7 +119,7 @@ class boss_vazruden_the_herald : public CreatureScript
                     BossAI::EnterEvadeMode();
             }
 
-            void UpdateAI(uint32 diff)
+            void UpdateAI(uint32  /*diff*/)
             {
                 if (!me->IsVisible() && summons.size() == 0)
                     BossAI::EnterEvadeMode();

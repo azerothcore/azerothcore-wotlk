@@ -133,7 +133,7 @@ class spell_zulfarrak_unlocking : public SpellScriptLoader
         {
             PrepareSpellScript(spell_zulfarrak_unlocking_SpellScript);
 
-            void HandleOpenLock(SpellEffIndex effIndex)
+            void HandleOpenLock(SpellEffIndex  /*effIndex*/)
             {
                 GameObject* cage = GetHitGObj();
                 std::list<WorldObject*> cagesList;

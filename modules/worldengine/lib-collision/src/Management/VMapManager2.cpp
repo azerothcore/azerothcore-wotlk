@@ -274,7 +274,7 @@ namespace VMAP
 
     void VMapManager2::releaseModelInstance(const std::string &filename)
     {
-        /*//! Critical section, thread safe access to iLoadedModelFiles
+        //! Critical section, thread safe access to iLoadedModelFiles
         TRINITY_GUARD(ACE_Thread_Mutex, LoadedModelFilesLock);
 
         ModelFileMap::iterator model = iLoadedModelFiles.find(filename);
@@ -290,7 +290,7 @@ namespace VMAP
 #endif
             delete model->second.getModel();
             iLoadedModelFiles.erase(model);
-        }*/
+        }
     }
 
     bool VMapManager2::existsMap(const char* basePath, unsigned int mapId, int x, int y)

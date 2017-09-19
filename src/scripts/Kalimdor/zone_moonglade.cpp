@@ -261,7 +261,7 @@ float const Clintar_spirit_WP[41][5] =
 };
 
 Position const AspectRavenSummon    = {7472.96f, -3074.18f, 427.566f, 0.0f};
-Position const ClintarSpiritSummon  = {7459.2275f, -3122.5632f, 438.9842f, 0.8594f};
+//Position const ClintarSpiritSummon  = {7459.2275f, -3122.5632f, 438.9842f, 0.8594f};
 
 enum ClintarSpirit
 {

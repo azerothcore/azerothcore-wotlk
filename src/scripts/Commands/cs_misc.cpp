@@ -445,7 +445,7 @@ public:
 
         if (status)
             handler->PSendSysMessage(LANG_LIQUID_STATUS, liquidStatus.level, liquidStatus.depth_level, liquidStatus.entry, liquidStatus.type_flags, status);
-        if (Transport* t = object->GetTransport())
+        if (object->GetTransport())
             handler->PSendSysMessage("Transport offset: %.2f, %.2f, %.2f, %.2f", object->m_movementInfo.transport.pos.GetPositionX(), object->m_movementInfo.transport.pos.GetPositionY(), object->m_movementInfo.transport.pos.GetPositionZ(), object->m_movementInfo.transport.pos.GetOrientation());
 
         return true;
@@ -1092,7 +1092,7 @@ public:
         return true;
     }
 
-    static bool HandleSaveCommand(ChatHandler* handler, char const* /*args*/)
+    static bool HandleSaveCommand(ChatHandler*  /*handler*/, char const* /*args*/)
     {
         // pussywizard: fully disabled on 28.12.2011, but disabled it "silently"
         return true;
@@ -3082,10 +3082,10 @@ public:
                 if (flags.empty())
                     flags = "None";
 
-                Player* p = ObjectAccessor::FindPlayerInOrOutOfWorld((*itr).guid);
+                /*Player* p = ObjectAccessor::FindPlayerInOrOutOfWorld((*itr).guid);
                 const char* onlineState = p ? "online" : "offline";
 
-                /*handler->PSendSysMessage(LANG_GROUP_PLAYER_NAME_GUID, slot.name.c_str(), onlineState,
+                handler->PSendSysMessage(LANG_GROUP_PLAYER_NAME_GUID, slot.name.c_str(), onlineState,
                     GUID_LOPART(slot.guid), flags.c_str(), lfg::GetRolesString(slot.roles).c_str());*/
             }
         }

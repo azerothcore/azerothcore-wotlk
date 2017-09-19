@@ -281,14 +281,14 @@ class spell_hydross_cleansing_field_aura : public SpellScriptLoader
         {
             PrepareAuraScript(spell_hydross_cleansing_field_aura_AuraScript)
 
-            void HandleEffectApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+            void HandleEffectApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
                 if (GetTarget()->GetEntry() == NPC_HYDROSS_THE_UNSTABLE)
                     if (Unit* caster = GetCaster())
                         caster->CastSpell(caster, SPELL_CLEANSING_FIELD, true);
             }
 
-            void HandleEffectRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+            void HandleEffectRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
                 if (GetTarget()->GetEntry() == NPC_HYDROSS_THE_UNSTABLE)
                     if (Unit* caster = GetCaster())
@@ -317,7 +317,7 @@ class spell_hydross_cleansing_field_command : public SpellScriptLoader
         {
             PrepareAuraScript(spell_hydross_cleansing_field_command_AuraScript)
 
-            void HandleEffectRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+            void HandleEffectRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
                 if (GetTarget()->HasUnitState(UNIT_STATE_CASTING))
                     GetTarget()->InterruptNonMeleeSpells(false);
@@ -346,7 +346,7 @@ class spell_hydross_mark_of_hydross : public SpellScriptLoader
         {
             PrepareAuraScript(spell_hydross_mark_of_hydross_AuraScript)
 
-            void HandleEffectApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+            void HandleEffectApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
                 GetTarget()->RemoveAurasByType(SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN, GetCasterGUID(), GetAura());
             }

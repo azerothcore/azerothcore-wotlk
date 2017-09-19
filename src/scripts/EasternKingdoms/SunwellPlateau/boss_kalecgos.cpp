@@ -663,7 +663,7 @@ class spell_kalecgos_curse_of_boundless_agony : public SpellScriptLoader
         {
             PrepareAuraScript(spell_kalecgos_curse_of_boundless_agony_AuraScript);
 
-            void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+            void OnRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
                 if (InstanceScript* instance = GetUnitOwner()->GetInstanceScript())
                     if (instance->IsEncounterInProgress())
@@ -734,7 +734,7 @@ class spell_kalecgos_spectral_realm : public SpellScriptLoader
         {
             PrepareAuraScript(spell_kalecgos_spectral_realm_AuraScript);
 
-            void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+            void OnRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
                 GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_SPECTRAL_EXHAUSTION, true);
                 GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_TELEPORT_NORMAL_REALM, true);

@@ -414,7 +414,8 @@ void WorldSession::HandleLogoutRequestOpcode(WorldPacket & /*recv_data*/)
     if (uint64 lguid = GetPlayer()->GetLootGUID())
         DoLootRelease(lguid);
 
-    bool instantLogout = (GetSecurity() >= sWorld->getIntConfig(CONFIG_INSTANT_LOGOUT) || GetPlayer()->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING) && !GetPlayer()->IsInCombat()) || GetPlayer()->IsInFlight();
+    bool instantLogout = ((GetSecurity() >= 0 && uint32(GetSecurity()) >= sWorld->getIntConfig(CONFIG_INSTANT_LOGOUT)) 
+        || (GetPlayer()->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING) && !GetPlayer()->IsInCombat())) || GetPlayer()->IsInFlight();
 
     /// TODO: Possibly add RBAC permission to log out in combat
     bool canLogoutInCombat = GetPlayer()->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING);
@@ -1654,7 +1655,9 @@ void WorldSession::HandleSetRaidDifficultyOpcode(WorldPacket & recv_data)
                         return;
                     }
 
-                    if (!groupGuy->IsAlive() || groupGuy->IsInCombat() || groupGuy->GetVictim() || groupGuy->m_mover != groupGuy || groupGuy->IsNonMeleeSpellCast(true) || !groupGuy->GetMotionMaster()->empty() && groupGuy->GetMotionMaster()->GetCurrentMovementGeneratorType() != IDLE_MOTION_TYPE || !groupGuy->movespline->Finalized() || !groupGuy->GetMap()->ToInstanceMap() || !groupGuy->GetMap()->ToInstanceMap()->GetInstanceScript() || groupGuy->GetMap()->ToInstanceMap()->GetInstanceScript()->IsEncounterInProgress() || !groupGuy->Satisfy(sObjectMgr->GetAccessRequirement(groupGuy->GetMap()->GetId(), Difficulty(mode)), groupGuy->GetMap()->GetId(), false))
+                    if (!groupGuy->IsAlive() || groupGuy->IsInCombat() || groupGuy->GetVictim() || groupGuy->m_mover != groupGuy || groupGuy->IsNonMeleeSpellCast(true) || (!groupGuy->GetMotionMaster()->empty() && groupGuy->GetMotionMaster()->GetCurrentMovementGeneratorType() != IDLE_MOTION_TYPE)
+                        || !groupGuy->movespline->Finalized() || !groupGuy->GetMap()->ToInstanceMap() || !groupGuy->GetMap()->ToInstanceMap()->GetInstanceScript() || groupGuy->GetMap()->ToInstanceMap()->GetInstanceScript()->IsEncounterInProgress() 
+                        || !groupGuy->Satisfy(sObjectMgr->GetAccessRequirement(groupGuy->GetMap()->GetId(), Difficulty(mode)), groupGuy->GetMap()->GetId(), false))
                     {
                         _player->SendRaidDifficulty(group != NULL);
                         return;
@@ -1678,7 +1681,8 @@ void WorldSession::HandleSetRaidDifficultyOpcode(WorldPacket & recv_data)
                     if (Player* p = itr->GetSource())
                         if (p->GetGroup() != group)
                         {
-                            if (!p->IsInWorld() || !p->IsAlive() || p->IsInCombat() || p->GetVictim() || p->m_mover != p || p->IsNonMeleeSpellCast(true) || !p->GetMotionMaster()->empty() && p->GetMotionMaster()->GetCurrentMovementGeneratorType() != IDLE_MOTION_TYPE || !p->movespline->Finalized() || !p->GetMap()->ToInstanceMap() || !p->GetMap()->ToInstanceMap()->GetInstanceScript() || p->GetMap()->ToInstanceMap()->GetInstanceScript()->IsEncounterInProgress())
+                            if (!p->IsInWorld() || !p->IsAlive() || p->IsInCombat() || p->GetVictim() || p->m_mover != p || p->IsNonMeleeSpellCast(true) || (!p->GetMotionMaster()->empty() && p->GetMotionMaster()->GetCurrentMovementGeneratorType() != IDLE_MOTION_TYPE)
+                                || !p->movespline->Finalized() || !p->GetMap()->ToInstanceMap() || !p->GetMap()->ToInstanceMap()->GetInstanceScript() || p->GetMap()->ToInstanceMap()->GetInstanceScript()->IsEncounterInProgress())
                             {
                                 _player->SendRaidDifficulty(group != NULL);
                                 return;
@@ -1923,7 +1927,7 @@ void WorldSession::HandleHearthAndResurrect(WorldPacket& /*recv_data*/)
     if (_player->IsInFlight())
         return;
 
-    if(Battlefield* bf = sBattlefieldMgr->GetBattlefieldToZoneId(_player->GetZoneId()))
+    if(/*Battlefield* bf = */sBattlefieldMgr->GetBattlefieldToZoneId(_player->GetZoneId()))
     {
         // bf->PlayerAskToLeave(_player); FIXME
         return;

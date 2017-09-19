@@ -56,7 +56,7 @@ class boss_pathaleon_the_calculator : public CreatureScript
                 me->SetReactState(REACT_PASSIVE);
             }
 
-            void DoAction(int32 param)
+            void DoAction(int32  /*param*/)
             {
                 me->SetVisible(true);
                 me->CastSpell(me, SPELL_TELEPORT_VISUAL, true);

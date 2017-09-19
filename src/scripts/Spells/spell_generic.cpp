@@ -107,7 +107,7 @@ class spell_the_flag_of_ownership : public SpellScriptLoader
                 return true;
             }
 
-            void HandleScript(SpellEffIndex effIndex)
+            void HandleScript(SpellEffIndex  /*effIndex*/)
             {
                 Unit* caster = GetCaster();
                 if (!caster || caster->GetTypeId() != TYPEID_PLAYER)
@@ -216,7 +216,7 @@ class spell_gen_mine_sweeper : public SpellScriptLoader
         {
             PrepareSpellScript(spell_gen_mine_sweeper_SpellScript);
 
-            void HandleSchoolDMG(SpellEffIndex effIndex)
+            void HandleSchoolDMG(SpellEffIndex  /*effIndex*/)
             {
                 Unit* caster = GetCaster();
                 Player* target = GetHitPlayer();
@@ -227,7 +227,7 @@ class spell_gen_mine_sweeper : public SpellScriptLoader
                 caster->CastSpell(target, 54402, true);
             }
 
-            void HandleScriptEffect(SpellEffIndex effIndex)
+            void HandleScriptEffect(SpellEffIndex  /*effIndex*/)
             {
                 if (Unit* target = GetHitPlayer())
                     if (Aura* aur = target->GetAura(GetSpellInfo()->Id))
@@ -285,7 +285,7 @@ class spell_gen_reduced_above_60 : public SpellScriptLoader
         {
             PrepareAuraScript(spell_gen_reduced_above_60_AuraScript);
 
-            void CalculateAmount(AuraEffect const* /*aurEff*/, int32 & amount, bool & canBeRecalculated)
+            void CalculateAmount(AuraEffect const* /*aurEff*/, int32 & amount, bool &  /*canBeRecalculated*/)
             {
                 if (Unit* owner = GetUnitOwner())
                     if (owner->getLevel() > 60) 
@@ -404,7 +404,7 @@ public:
             amplitude = 3*IN_MILLISECONDS;
         }
 
-        void Update(AuraEffect* effect)
+        void Update(AuraEffect*  /*effect*/)
         {
             if (Player* player = GetUnitOwner()->GetCharmerOrOwnerPlayerOrPlayerItself())
                 if (MapEntry const* mapEntry = sMapStore.LookupEntry(player->GetMapId()))
@@ -486,7 +486,7 @@ class spell_pet_hit_expertise_scalling : public SpellScriptLoader
                 return (hitChance / cap) * maxChance;
             }
             
-            void CalculateHitAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
+            void CalculateHitAmount(AuraEffect const*  /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
             {
                 if (Player* modOwner = GetUnitOwner()->GetSpellModOwner())
                 {
@@ -499,7 +499,7 @@ class spell_pet_hit_expertise_scalling : public SpellScriptLoader
                 }
             }
 
-            void CalculateSpellHitAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
+            void CalculateSpellHitAmount(AuraEffect const*  /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
             {
                 if (Player* modOwner = GetUnitOwner()->GetSpellModOwner())
                 {
@@ -512,7 +512,7 @@ class spell_pet_hit_expertise_scalling : public SpellScriptLoader
                 }
             }
 
-            void CalculateExpertiseAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
+            void CalculateExpertiseAmount(AuraEffect const*  /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
             {
                 if (Player* modOwner = GetUnitOwner()->GetSpellModOwner())
                 {
@@ -666,7 +666,7 @@ class spell_gen_disabled_above_63 : public SpellScriptLoader
         {
             PrepareAuraScript(spell_gen_disabled_above_63_AuraScript);
 
-            void CalculateAmount(AuraEffect const* /*aurEff*/, int32 & amount, bool & canBeRecalculated)
+            void CalculateAmount(AuraEffect const* /*aurEff*/, int32 & amount, bool &  /*canBeRecalculated*/)
             {
                 Unit* target = GetUnitOwner();
                 if (target->getLevel() <= 63)
@@ -1357,7 +1357,7 @@ class spell_gen_flurry_of_claws : public SpellScriptLoader
         {
             PrepareAuraScript(spell_gen_flurry_of_claws_AuraScript);
 
-            void OnPeriodic(AuraEffect const* aurEff)
+            void OnPeriodic(AuraEffect const*  /*aurEff*/)
             {
                 PreventDefaultAction();
                 if (Unit* target = GetUnitOwner()->SelectNearbyTarget(NULL, 7.0f))
@@ -2200,7 +2200,7 @@ class spell_pvp_trinket_wotf_shared_cd : public SpellScriptLoader
                 // Spell::SendSpellCooldown() skips all spells with TRIGGERED_IGNORE_SPELL_AND_CATEGORY_CD
                 player->AddSpellAndCategoryCooldowns(GetSpellInfo(), GetCastItem() ? GetCastItem()->GetEntry() : 0, GetSpell());
 
-                if (player->GetTeamId(true) == TEAM_HORDE)
+                if (player->GetTeamId(true) == TEAM_HORDE) {
                     if (GetSpellInfo()->Id == SPELL_WILL_OF_THE_FORSAKEN_COOLDOWN_TRIGGER)
                     {
                         WorldPacket data;
@@ -2225,6 +2225,7 @@ class spell_pvp_trinket_wotf_shared_cd : public SpellScriptLoader
                         player->GetSession()->SendPacket(&data2);
 
                     }
+                }
             }
 
             void Register()

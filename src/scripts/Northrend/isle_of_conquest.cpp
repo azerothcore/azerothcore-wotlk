@@ -242,7 +242,7 @@ class boss_isle_of_conquest : public CreatureScript
                 }
             }
 
-            void EnterCombat(Unit* who)
+            void EnterCombat(Unit*  /*who*/)
             {
                 events.ScheduleEvent(EVENT_CHECK_RAGE, 2000);
                 events.ScheduleEvent(EVENT_BRUTAL_STRIKE, 6000);
@@ -336,7 +336,7 @@ class spell_ioc_bomb_blast_criteria : public SpellScriptLoader
         {
             PrepareSpellScript(spell_ioc_bomb_blast_criteria_SpellScript);
 
-            void HandleGameObjectDamage(SpellEffIndex effIndex)
+            void HandleGameObjectDamage(SpellEffIndex  /*effIndex*/)
             {
                 Unit* owner = GetCaster()->GetOwner();
                 if (!owner)
@@ -378,7 +378,7 @@ class spell_ioc_gunship_portal : public SpellScriptLoader
             {
                 PreventHitDefaultEffect(effIndex);
                 /*Player* caster = GetCaster()->ToPlayer();
-                /*
+                 *
                  * HACK: GetWorldLocation() returns real position and not transportposition.
                  * ServertoClient: SMSG_MOVE_TELEPORT (0x0B39)
                  * counter: 45

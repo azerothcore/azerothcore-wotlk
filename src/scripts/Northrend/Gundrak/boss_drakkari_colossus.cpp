@@ -53,11 +53,11 @@ enum Misc
 
 static Position mojoPosition[] =
 {
-    {1663.1f, 743.6f, 143.1f},
-    {1669.97f, 753.7f, 143.1f},
-    {1680.7f, 750.7f, 143.1f},
-    {1680.7f, 737.1f, 143.1f},
-    {1670.4f, 733.5f, 143.1f}
+    {1663.1f, 743.6f, 143.1f, 0.0f},
+    {1669.97f, 753.7f, 143.1f, 0.0f},
+    {1680.7f, 750.7f, 143.1f, 0.0f},
+    {1680.7f, 737.1f, 143.1f, 0.0f},
+    {1670.4f, 733.5f, 143.1f, 0.0f}
 };
 
 class RestoreFight : public BasicEvent
@@ -91,7 +91,7 @@ class boss_drakkari_colossus : public CreatureScript
             {
             }
 
-            void MoveInLineOfSight(Unit* who)
+            void MoveInLineOfSight(Unit*  /*who*/)
             {
             }
 
@@ -172,7 +172,7 @@ class boss_drakkari_colossus : public CreatureScript
                 }
             }
 
-            void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType, SpellSchoolMask)
+            void DamageTaken(Unit*  /*attacker*/, uint32& damage, DamageEffectType, SpellSchoolMask)
             {
                 if (damage >= me->GetHealth())
                     damage = 0;

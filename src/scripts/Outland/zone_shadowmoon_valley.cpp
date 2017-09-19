@@ -45,7 +45,7 @@ class spell_q10612_10613_the_fel_and_the_furious : public SpellScriptLoader
         {
             PrepareSpellScript(spell_q10612_10613_the_fel_and_the_furious_SpellScript);
 
-            void HandleScriptEffect(SpellEffIndex effIndex)
+            void HandleScriptEffect(SpellEffIndex  /*effIndex*/)
             {
                 Player* charmer = GetCaster()->GetCharmerOrOwnerPlayerOrPlayerItself();
                 if (!charmer)
@@ -251,7 +251,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32  /*diff*/)
         {
             if (!UpdateVictim())
                 return;

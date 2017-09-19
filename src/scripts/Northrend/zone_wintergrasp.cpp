@@ -974,7 +974,7 @@ class spell_wintergrasp_hide_small_elementals : public SpellScriptLoader
         {
             PrepareAuraScript(spell_wintergrasp_hide_small_elementals_AuraScript);
 
-            void HandlePeriodicDummy(AuraEffect const* aurEff)
+            void HandlePeriodicDummy(AuraEffect const*  /*aurEff*/)
             {
                 Unit* target = GetTarget();
                 Battlefield* Bf = sBattlefieldMgr->GetBattlefieldToZoneId(target->GetZoneId());
@@ -1082,7 +1082,7 @@ class achievement_wg_within_our_grasp : public AchievementCriteriaScript
 public:
     achievement_wg_within_our_grasp() : AchievementCriteriaScript("achievement_wg_within_our_grasp") { }
 
-    bool OnCheck(Player* source, Unit* target)
+    bool OnCheck(Player*  /*source*/, Unit*  /*target*/)
     {
         Battlefield* wintergrasp = sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_WG);
         if (!wintergrasp)

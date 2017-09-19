@@ -158,15 +158,15 @@ public:
                     me->CastSpell(me->GetVictim(), SPELL_CONJURE_FLAME_SPHERE, false);
                     events.RescheduleEvent(EVENT_PRINCE_VANISH, 14000);
                     Creature *cr;
-                    if (cr = me->SummonCreature(CREATURE_FLAME_SPHERE, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()+5.0f, 0.0f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 10*IN_MILLISECONDS))
+                    if ((cr = me->SummonCreature(CREATURE_FLAME_SPHERE, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()+5.0f, 0.0f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 10*IN_MILLISECONDS)))
                         summons.Summon(cr);
 
                     if (me->GetMap()->IsHeroic())
                     {
-                        if (cr = me->SummonCreature(CREATURE_FLAME_SPHERE_1, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()+5.0f, 0.0f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 10*IN_MILLISECONDS))
+                        if ((cr = me->SummonCreature(CREATURE_FLAME_SPHERE_1, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()+5.0f, 0.0f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 10*IN_MILLISECONDS)))
                             summons.Summon(cr);
 
-                        if (cr = me->SummonCreature(CREATURE_FLAME_SPHERE_2, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()+5.0f, 0.0f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 10*IN_MILLISECONDS))
+                        if ((cr = me->SummonCreature(CREATURE_FLAME_SPHERE_2, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()+5.0f, 0.0f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 10*IN_MILLISECONDS)))
                             summons.Summon(cr);
                     }
                     events.RepeatEvent(15000);
@@ -290,7 +290,7 @@ public:
             }
         }
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32  /*type*/, uint32 id)
         {
             if (id == 0)
                 me->DisappearAndDie();

@@ -422,7 +422,7 @@ void BattlegroundEY::EventPlayerClickedOnFlag(Player* player, GameObject* gameOb
     UpdateWorldState(NETHERSTORM_FLAG, 0);
 }
 
-void BattlegroundEY::EventTeamLostPoint(TeamId teamId, uint32 point)
+void BattlegroundEY::EventTeamLostPoint(TeamId  /*teamId*/, uint32 point)
 {
     TeamId oldTeamId = _capturePointInfo[point]._ownerTeamId;
     if (oldTeamId == TEAM_ALLIANCE)

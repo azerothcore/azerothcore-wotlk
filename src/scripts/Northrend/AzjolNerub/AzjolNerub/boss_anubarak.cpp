@@ -92,7 +92,7 @@ class boss_anub_arak : public CreatureScript
                 BossAI::JustDied(killer);
             }
 
-            void KilledUnit(Unit* victim)
+            void KilledUnit(Unit*  /*victim*/)
             {
                 if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
                 {
@@ -237,7 +237,7 @@ class spell_azjol_nerub_carrion_beetels : public SpellScriptLoader
         {
             PrepareAuraScript(spell_azjol_nerub_carrion_beetelsAuraScript)
 
-            void HandleEffectPeriodic(AuraEffect const* aurEff)
+            void HandleEffectPeriodic(AuraEffect const*  /*aurEff*/)
             {
                 // Xinef: 2 each second
                 GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_SUMMON_CARRION_BEETLES, true);
@@ -265,7 +265,7 @@ class spell_azjol_nerub_pound : public SpellScriptLoader
         {
             PrepareSpellScript(spell_azjol_nerub_pound_SpellScript);
 
-            void HandleApplyAura(SpellEffIndex effIndex)
+            void HandleApplyAura(SpellEffIndex  /*effIndex*/)
             {
                 if (Unit* unitTarget = GetHitUnit())
                     GetCaster()->CastSpell(unitTarget, SPELL_POUND_DAMAGE, true);

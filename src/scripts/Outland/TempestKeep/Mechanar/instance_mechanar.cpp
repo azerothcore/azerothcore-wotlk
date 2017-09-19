@@ -148,7 +148,7 @@ class instance_mechanar : public InstanceMapScript
                             {
                                 for (uint8 i = 0; i < 3; ++i)
                                 {
-                                    Position pos = {135.0f + 2.5f*i, 36.76f, 24.88f};
+                                    Position pos = {135.0f + 2.5f*i, 36.76f, 24.88f, M_PI*1.5f};
                                     if (Creature* creature = instance->SummonCreature(i==1 ? NPC_SUNSEEKER_ASTROMAGE : NPC_BLOODWARDER_PHYSICIAN, pos))
                                         DoSummonAction(creature, player);
                                 }

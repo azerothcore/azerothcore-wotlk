@@ -160,6 +160,8 @@ class spell_botanica_shift_form : public SpellScriptLoader
                         case SPELL_SCHOOL_FROST:    form = SPELL_FROST_FORM;    break;
                         case SPELL_SCHOOL_ARCANE:   form = SPELL_ARCANE_FORM;   break;
                         case SPELL_SCHOOL_SHADOW:   form = SPELL_SHADOW_FORM;   break;
+                        default:
+                            break;
                     }
 
                     if (form)

@@ -345,7 +345,7 @@ public:
                     cr->AI()->DoAction(ACTION_SAPPHIRON_BIRTH);
         }
 
-        bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const* source, Unit const* target = NULL, uint32 miscvalue1 = 0)
+        bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/)
         {
             switch(criteria_id)
             {
@@ -493,25 +493,25 @@ public:
                 {
                     Creature* cr;
                     _horsemanKilled = 0;
-                    if (cr = instance->GetCreature(_blaumeuxGUID))
+                    if ((cr = instance->GetCreature(_blaumeuxGUID)))
                         if (!cr->IsAlive())
                         {
                             cr->SetPosition(cr->GetHomePosition());
                             cr->Respawn();
                         }
-                    if (cr = instance->GetCreature(_rivendareGUID))
+                    if ((cr = instance->GetCreature(_rivendareGUID)))
                         if (!cr->IsAlive())
                         {
                             cr->SetPosition(cr->GetHomePosition());
                             cr->Respawn();
                         }
-                    if (cr = instance->GetCreature(_zeliekGUID))
+                    if ((cr = instance->GetCreature(_zeliekGUID)))
                         if (!cr->IsAlive())
                         {
                             cr->SetPosition(cr->GetHomePosition());
                             cr->Respawn();
                         }
-                    if (cr = instance->GetCreature(_korthazzGUID))
+                    if ((cr = instance->GetCreature(_korthazzGUID)))
                         if (!cr->IsAlive())
                         {
                             cr->SetPosition(cr->GetHomePosition());
@@ -521,13 +521,13 @@ public:
                 else if (data == IN_PROGRESS)
                 {
                     Creature* cr;
-                    if (cr = instance->GetCreature(_blaumeuxGUID))
+                    if ((cr = instance->GetCreature(_blaumeuxGUID)))
                         cr->SetInCombatWithZone();
-                    if (cr = instance->GetCreature(_rivendareGUID))
+                    if ((cr = instance->GetCreature(_rivendareGUID)))
                         cr->SetInCombatWithZone();
-                    if (cr = instance->GetCreature(_zeliekGUID))
+                    if ((cr = instance->GetCreature(_zeliekGUID)))
                         cr->SetInCombatWithZone();
-                    if (cr = instance->GetCreature(_korthazzGUID))
+                    if ((cr = instance->GetCreature(_korthazzGUID)))
                         cr->SetInCombatWithZone();
                 }
 

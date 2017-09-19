@@ -1122,7 +1122,7 @@ class spell_kiljaeden_flame_dart : public SpellScriptLoader
         {
             PrepareSpellScript(spell_kiljaeden_flame_dart_SpellScript);
 
-            void HandleSchoolDamage(SpellEffIndex effIndex)
+            void HandleSchoolDamage(SpellEffIndex  /*effIndex*/)
             {
                 if (Unit* target = GetHitUnit())
                     target->CastSpell(target, SPELL_FLAME_DART_EXPLOSION, true);
@@ -1149,7 +1149,7 @@ class spell_kiljaeden_darkness : public SpellScriptLoader
         {
             PrepareAuraScript(spell_kiljaeden_darkness_AuraScript);
 
-            void HandleRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+            void HandleRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
                 if (GetUnitOwner()->GetTypeId() == TYPEID_UNIT)
                     GetUnitOwner()->ToCreature()->AI()->DoAction(ACTION_NO_KILL_TALK);
@@ -1209,12 +1209,12 @@ class spell_kiljaeden_vengeance_of_the_blue_flight : public SpellScriptLoader
         {
             PrepareAuraScript(spell_kiljaeden_vengeance_of_the_blue_flight_AuraScript);
 
-            void HandleApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+            void HandleApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
                 GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_POSSESS_DRAKE_IMMUNITY, true);
             }
 
-            void HandleRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+            void HandleRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
                 GetUnitOwner()->RemoveAurasDueToSpell(SPELL_POSSESS_DRAKE_IMMUNITY);
             }

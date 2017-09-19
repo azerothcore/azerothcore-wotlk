@@ -47,7 +47,7 @@ public:
         return true;
     }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action)
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32  /*action*/)
     {
         player->PlayerTalkClass->ClearMenus();
         player->CLOSE_GOSSIP_MENU();
@@ -61,13 +61,14 @@ public:
         {
             creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_IMMUNE_TO_NPC);
             Creature* cr;
-            if (cr = creature->SummonCreature(17957, -186, -790, 43.8f, 4.2f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000))
+            if ((cr = creature->SummonCreature(17957, -186, -790, 43.8f, 4.2f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000)))
                 cr->AI()->AttackStart(creature);
-            if (cr = creature->SummonCreature(17960, -188, -783, 43.8f, 4.2f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000))
+            if ((cr = creature->SummonCreature(17960, -188, -783, 43.8f, 4.2f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000)))
                 cr->AI()->AttackStart(player);
-            if (cr = creature->SummonCreature(17957, -196, -783, 43.8f, 4.4f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000))
+            if ((cr = creature->SummonCreature(17957, -196, -783, 43.8f, 4.4f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000)))
                 cr->AI()->AttackStart(player);
-            if (GameObject* cage = creature->FindNearestGameObject(GO_CAGE_ENTRY, 20.0f))
+            GameObject* cage = creature->FindNearestGameObject(GO_CAGE_ENTRY, 20.0f);
+            if (cage)
                 cage->SetGoState(GO_STATE_ACTIVE);
             creature->SetHomePosition(-195.39f, -795.91f, 43.8f, 1.0f);
             creature->AI()->Talk(1);

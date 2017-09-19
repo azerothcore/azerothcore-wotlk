@@ -46,7 +46,7 @@ public:
                 }
         }
 
-        void SetData(uint32 type, uint32 val)
+        void SetData(uint32 type, uint32  /*val*/)
         {
             if (type == DATA_START_INTRO && pInstance->GetData(DATA_INSTANCE_PROGRESS) == INSTANCE_PROGRESS_NONE && counter == 0 && !me->IsVisible())
             {
@@ -358,8 +358,8 @@ public:
             summons.Despawn(s);
         }
 
-        void AttackStart(Unit* who) {}
-        void MoveInLineOfSight(Unit* who) {}
+        void AttackStart(Unit*  /*who*/) {}
+        void MoveInLineOfSight(Unit*  /*who*/) {}
     };
 
     CreatureAI *GetAI(Creature* creature) const
@@ -394,8 +394,8 @@ public:
         {
             if (pInstance && pInstance->GetData(DATA_INSTANCE_PROGRESS) == INSTANCE_PROGRESS_NONE)
             {
-                if (me->GetPositionX() > 490.0f && me->GetPositionX() < 504.0f && me->GetPositionY() > 192.0f && me->GetPositionY() < 206.0f ||
-                    me->GetPositionX() > 490.0f && me->GetPositionX() < 504.0f && me->GetPositionY() > 240.0f && me->GetPositionY() < 254.0f)
+                if ((me->GetPositionX() > 490.0f && me->GetPositionX() < 504.0f && me->GetPositionY() > 192.0f && me->GetPositionY() < 206.0f) ||
+                    (me->GetPositionX() > 490.0f && me->GetPositionX() < 504.0f && me->GetPositionY() > 240.0f && me->GetPositionY() < 254.0f))
                 {
                     isInvincible = true;
                     if (SPELL_NECROLYTE_CHANNELING)
@@ -467,7 +467,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void MoveInLineOfSight(Unit* who) {}
+        void MoveInLineOfSight(Unit*  /*who*/) {}
     };
 
     CreatureAI *GetAI(Creature* creature) const
@@ -954,7 +954,7 @@ public:
                 me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
                 me->GetMotionMaster()->MovePoint(2, TSCenterPos);
 
-                float ZeroAngle = TSSpawnPos.GetAngle(&TSMidPos);
+                TSSpawnPos.GetAngle(&TSMidPos);
 
                 for (std::list<uint64>::iterator itr = summons.begin(); itr != summons.end(); ++itr)
                     if (Creature* c = pInstance->instance->GetCreature(*itr))
@@ -1335,7 +1335,7 @@ public:
     {
         PrepareAuraScript(spell_pos_empowered_blizzardAuraScript)
 
-        void HandleEffectPeriodic(AuraEffect const * aurEff)
+        void HandleEffectPeriodic(AuraEffect const *  /*aurEff*/)
         {
             PreventDefaultAction();
             if (Unit* caster = GetCaster())
@@ -1502,7 +1502,7 @@ public:
 
         void HandleEffectPeriodic(AuraEffect const * aurEff)
         {
-            if (aurEff->GetTickNumber() == aurEff->GetTotalTicks())
+            if (aurEff->GetTotalTicks() >= 0 && aurEff->GetTickNumber() == uint32(aurEff->GetTotalTicks()))
                 if (Unit* target = GetTarget())
                     target->CastSpell(target, 69604, true);
         }

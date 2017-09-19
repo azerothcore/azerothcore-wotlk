@@ -113,7 +113,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit*  /*who*/)
         {
             events.Reset();
             events.ScheduleEvent(EVENT_SPELL_RADIANCE, 16000);
@@ -124,7 +124,7 @@ public:
                 pInstance->SetData(BOSS_ARGENT_CHALLENGE, IN_PROGRESS);
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spell)
+        void SpellHit(Unit*  /*caster*/, const SpellInfo* spell)
         {
             if (spell->Id == 66905 && me->GetHealth() == 1) // hammer throw back damage (15k)
                 me->CastSpell(me, 68197, true);
@@ -244,7 +244,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit*  /*who*/)
         {
             events.Reset();
             events.ScheduleEvent(EVENT_SPELL_HOLY_FIRE, urand(9000,12000));
@@ -807,7 +807,7 @@ class spell_reflective_shield : public SpellScriptLoader
         {
             PrepareAuraScript(spell_reflective_shield_AuraScript)
 
-            void HandleAfterEffectAbsorb(AuraEffect * aurEff, DamageInfo & dmgInfo, uint32 & absorbAmount)
+            void HandleAfterEffectAbsorb(AuraEffect *  /*aurEff*/, DamageInfo & dmgInfo, uint32 & absorbAmount)
             {
                 if( Unit* attacker = dmgInfo.GetAttacker() )
                     if( GetOwner() && attacker->GetGUID() != GetOwner()->GetGUID() )

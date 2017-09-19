@@ -314,7 +314,7 @@ public:
         InstanceScript* pInstance;
         uint32 uiRangeCheck_Timer;
 
-        void SpellHit(Unit* caster, const SpellInfo* spell)
+        void SpellHit(Unit*  /*caster*/, const SpellInfo* spell)
         {
             if (spell->Id == SPELL_CREATE_GLOBULE_VISUAL)
                 me->CastSpell(me, SPELL_WATER_GLOBULE, true);

@@ -225,7 +225,7 @@ public:
             }
         }
 
-        void JustDied(Unit *victim)
+        void JustDied(Unit * /*victim*/)
         {
             me->MonsterYell("You are bad... Toys... Very... Baaaaad!", LANG_UNIVERSAL, 0);
             me->PlayDirectSound(XT_SOUND_DEATH);
@@ -531,7 +531,7 @@ public:
                 }
         }
 
-        void JustDied(Unit *victim)
+        void JustDied(Unit * /*victim*/)
         {
             me->SetVisible(false);
             if (me->GetInstanceScript())
@@ -598,7 +598,7 @@ public:
         }
 
         // tc idiots, they use updateAI, while we have movementinform :)
-        void MovementInform(uint32 type, uint32 param)
+        void MovementInform(uint32 type, uint32  /*param*/)
         {
             if (type == POINT_MOTION_TYPE)
             {
@@ -623,7 +623,7 @@ public:
                 }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32  /*diff*/)
         {
             if (!_locked)
             {
@@ -798,7 +798,7 @@ public:
         }
 
         // tc idiots, they use updateAI, while we have movementinform :)
-        void MovementInform(uint32 type, uint32 param)
+        void MovementInform(uint32 type, uint32  /*param*/)
         {
             if (type == POINT_MOTION_TYPE)
             {
@@ -810,7 +810,7 @@ public:
             //  _kill = true;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32  /*diff*/)
         {
             if (!_locked)
             {
@@ -853,7 +853,7 @@ public:
                 me->DespawnOrUnsummon();
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32  /*diff*/)
         {
             if (!UpdateVictim())
                 return;
@@ -1054,7 +1054,7 @@ class achievement_xt002_nerf_engineering : public AchievementCriteriaScript
     public:
         achievement_xt002_nerf_engineering() : AchievementCriteriaScript("achievement_xt002_nerf_engineering") {}
 
-        bool OnCheck(Player* player, Unit* target)
+        bool OnCheck(Player*  /*player*/, Unit* target)
         {
             if (target)
                 if (InstanceScript* instance = target->GetInstanceScript())
@@ -1070,7 +1070,7 @@ class achievement_xt002_nerf_gravity_bombs : public AchievementCriteriaScript
     public:
         achievement_xt002_nerf_gravity_bombs() : AchievementCriteriaScript("achievement_xt002_nerf_gravity_bombs") {}
 
-        bool OnCheck(Player* player, Unit* target)
+        bool OnCheck(Player*  /*player*/, Unit* target)
         {
             if (target)
                 if (InstanceScript* instance = target->GetInstanceScript())

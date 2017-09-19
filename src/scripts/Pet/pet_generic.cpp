@@ -506,7 +506,7 @@ public:
                 DoStartNoMovement(who);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32  /*diff*/)
         {
             if (!me->GetVictim())
                 return;

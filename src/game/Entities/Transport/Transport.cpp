@@ -220,7 +220,7 @@ void MotionTransport::Update(uint32 diff)
     sScriptMgr->OnTransportUpdate(this, diff);
 }
  
-void MotionTransport::DelayedUpdate(uint32 diff)
+void MotionTransport::DelayedUpdate(uint32  /*diff*/)
 {
     if (GetKeyFrames().size() <= 1)
         return;

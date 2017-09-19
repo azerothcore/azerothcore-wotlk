@@ -1291,7 +1291,7 @@ class achievement_freya_getting_back_to_nature : public AchievementCriteriaScrip
     public:
         achievement_freya_getting_back_to_nature() : AchievementCriteriaScript("achievement_freya_getting_back_to_nature") {}
 
-        bool OnCheck(Player* player, Unit* target /*Freya*/)
+        bool OnCheck(Player*  /*player*/, Unit* target /*Freya*/)
         {
             if (target)
                 if (target->GetAI()->GetData(DATA_BACK_TO_NATURE))
@@ -1308,7 +1308,7 @@ class achievement_freya_knock_on_wood : public AchievementCriteriaScript
         {
         }
 
-        bool OnCheck(Player* player, Unit* target /*Freya*/)
+        bool OnCheck(Player*  /*player*/, Unit* target /*Freya*/)
         {
             return target && _elderCount <= target->GetAI()->GetData(DATA_GET_ELDER_COUNT);
         }

@@ -186,7 +186,7 @@ public:
             amplitude = urand(10*IN_MILLISECONDS, 200*IN_MILLISECONDS);
         }
 
-        void Update(AuraEffect* effect)
+        void Update(AuraEffect*  /*effect*/)
         {
             SetDuration(0);
         }

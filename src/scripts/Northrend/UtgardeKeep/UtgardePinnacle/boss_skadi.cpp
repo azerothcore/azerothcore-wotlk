@@ -71,16 +71,16 @@ enum Events
 
 static Position TrashPosition[]=
 {
-    {441.236f, -512.000f, 104.930f},
-    {478.436f, -494.475f, 104.730f}
+    {441.236f, -512.000f, 104.930f, 0.0f},
+    {478.436f, -494.475f, 104.730f, 0.0f}
 };
 
 static Position SkadiPosition[] =
 {
-    {338.679f, -507.254f, 124.122f},
-    {338.679f, -513.254f, 124.122f},
-    {490.096f, -510.86f, 123.368f},
-    {490.76f, -517.389f, 123.368f}
+    {338.679f, -507.254f, 124.122f, 0.0f},
+    {338.679f, -513.254f, 124.122f, 0.0f},
+    {490.096f, -510.86f, 123.368f, 0.0f},
+    {490.76f, -517.389f, 123.368f, 0.0f}
 };
 
 #define EMOTE_IN_RANGE   "Skadi the Ruthless is within range of the harpoon launchers"
@@ -146,7 +146,7 @@ public:
 
         Creature *GetGrauf() { return ObjectAccessor::GetCreature(*me, GraufGUID); }
 
-        void EnterCombat(Unit* pWho)
+        void EnterCombat(Unit*  /*pWho*/)
         {
             if (!EventStarted)
             {
@@ -234,7 +234,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit* pKiller)
+        void JustDied(Unit*  /*pKiller*/)
         {
             summons.DespawnAll();
             Talk(SAY_DEATH);
@@ -246,7 +246,7 @@ public:
             }
         }
 
-        void KilledUnit(Unit* pVictim)
+        void KilledUnit(Unit*  /*pVictim*/)
         {
             if (urand(0,1))
                 return;
@@ -329,18 +329,18 @@ public:
             if (point == 0)
             {
                 Creature *cr;
-                if (cr = me->SummonCreature(NPC_BREATH_TRIGGER, 483, -484.9f, 105, 0, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 30000))
+                if ((cr = me->SummonCreature(NPC_BREATH_TRIGGER, 483, -484.9f, 105, 0, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 30000)))
                     cr->CastSpell(cr, cr->GetMap()->IsHeroic() ? SPELL_FLAME_BREATH_H : SPELL_FLAME_BREATH_N, true);
-                if (cr = me->SummonCreature(NPC_BREATH_TRIGGER, 471.0f, -484.7f, 105, 0, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 30000))
+                if ((cr = me->SummonCreature(NPC_BREATH_TRIGGER, 471.0f, -484.7f, 105, 0, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 30000)))
                     cr->CastSpell(cr, cr->GetMap()->IsHeroic() ? SPELL_FLAME_BREATH_H : SPELL_FLAME_BREATH_N, true);
                 
                 for (uint8 j = 0; j < 7; j++)
-                    if (cr = me->SummonCreature(NPC_BREATH_TRIGGER, 477.0f, -507.0f+(j*3), 105.0f, 0, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 30000))
+                    if ((cr = me->SummonCreature(NPC_BREATH_TRIGGER, 477.0f, -507.0f+(j*3), 105.0f, 0, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 30000)))
                         cr->CastSpell(cr, cr->GetMap()->IsHeroic() ? SPELL_FLAME_BREATH_H : SPELL_FLAME_BREATH_N, true);
             }
         }
 
-        void MovementInform(uint32 uiType, uint32 Id)
+        void MovementInform(uint32  /*uiType*/, uint32 Id)
         {
             switch(Id)
             {
