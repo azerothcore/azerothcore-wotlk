@@ -2263,19 +2263,19 @@ void LFGMgr::SetState(uint64 guid, LfgState state)
     if (IS_GROUP_GUID(guid))
     {
         LfgGroupData& data = GroupsStore[guid];
-        //char const * const ns = GetStateString(state);
-        //char const * const ps = GetStateString(data.GetState());
-        //char const * const os = GetStateString(data.GetOldState());
-        //sLog->outDebug(LOG_FILTER_LFG, "LFGMgr::SetState: Group: [" UI64FMTD "] newState: %s, previous: %s, oldState: %s", guid, ns, ps, os);
+        std::string ns = GetStateString(state);
+        std::string ps = GetStateString(data.GetState());
+        std::string os = GetStateString(data.GetOldState());
+        sLog->outDebug(LOG_FILTER_LFG, "LFGMgr::SetState: Group: [" UI64FMTD "] newState: %s, previous: %s, oldState: %s", guid, ns.c_str(), ps.c_str(), os.c_str());
         data.SetState(state);
     }
     else
     {
         LfgPlayerData& data = PlayersStore[guid];
-        //char const * const ns = GetStateString(state);
-        //char const * const ps = GetStateString(data.GetState());
-        //char const * const os = GetStateString(data.GetOldState());
-        //sLog->outDebug(LOG_FILTER_LFG, "LFGMgr::SetState: Player: [" UI64FMTD "] newState: %s, previous: %s, oldState: %s", guid, ns, ps, os);
+        std::string ns = GetStateString(state);
+        std::string ps = GetStateString(data.GetState());
+        std::string os = GetStateString(data.GetOldState());
+        sLog->outDebug(LOG_FILTER_LFG, "LFGMgr::SetState: Player: [" UI64FMTD "] newState: %s, previous: %s, oldState: %s", guid, ns.c_str(), ps.c_str(), os.c_str());
         data.SetState(state);
     }
 }

@@ -72,7 +72,7 @@ public:
             handler->PSendSysMessage(LANG_LFG_NOT_IN_GROUP, playerName.c_str());
             return true;
         }
-        /*
+
         uint64 guid = grp->GetGUID();
         std::string const& state = lfg::GetStateString(sLFGMgr->GetState(guid));
         handler->PSendSysMessage(LANG_LFG_GROUP_INFO, grp->isLFGGroup(),
@@ -80,7 +80,7 @@ public:
 
         for (GroupReference* itr = grp->GetFirstMember(); itr != nullptr; itr = itr->next())
             GetPlayerInfo(handler, itr->GetSource());
-        */
+
         return true;
     }
 
