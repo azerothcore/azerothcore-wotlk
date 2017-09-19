@@ -194,7 +194,7 @@ class spell_sladran_grip_of_sladran : public SpellScriptLoader
         {
             PrepareAuraScript(spell_sladran_grip_of_sladran_AuraScript);
 
-            void HandlePeriodic(AuraEffect const* aurEff)
+            void HandlePeriodic(AuraEffect const*  /*aurEff*/)
             {
                 PreventDefaultAction();
                 if (GetStackAmount() >= 5)

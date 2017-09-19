@@ -624,9 +624,9 @@ void BattlegroundSA::EventPlayerDamagedGO(Player* /*player*/, GameObject* go, ui
             case BG_SA_GREEN_GATE:
             {
                 GameObject* go = NULL;
-                if (go = GetBGObject(BG_SA_RED_GATE))
+                if ((go = GetBGObject(BG_SA_RED_GATE)))
                     go->SetDestructibleBuildingModifyState(true);
-                if (go = GetBGObject(BG_SA_PURPLE_GATE))
+                if ((go = GetBGObject(BG_SA_PURPLE_GATE)))
                     go->SetDestructibleBuildingModifyState(true);
                 break;
             }
@@ -763,7 +763,6 @@ void BattlegroundSA::DestroyGate(Player* player, GameObject* go)
 
 WorldSafeLocsEntry const* BattlegroundSA::GetClosestGraveyard(Player* player)
 {
-    uint32 safeloc = 0;
     WorldSafeLocsEntry const* closest = NULL;
     float mindist = 999999.0f;
     float x, y;

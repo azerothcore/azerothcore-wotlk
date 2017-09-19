@@ -298,7 +298,6 @@ bool BattlegroundIC::AllNodesConrolledByTeam(TeamId teamId) const
 
 bool BattlegroundIC::IsResourceGlutAllowed(TeamId teamId) const
 {
-    uint32 count = 0;
     ICNodeState controlledState = teamId == TEAM_ALLIANCE ? NODE_STATE_CONTROLLED_A : NODE_STATE_CONTROLLED_H;
     return nodePoint[NODE_TYPE_QUARRY].nodeState == controlledState && nodePoint[NODE_TYPE_REFINERY].nodeState == controlledState;
 }
@@ -891,7 +890,7 @@ void BattlegroundIC::HandleCapturedNodes(ICNodePoint* nodePoint, bool recapture)
     }
 }
 
-void BattlegroundIC::DestroyGate(Player* player, GameObject* go)
+void BattlegroundIC::DestroyGate(Player*  /*player*/, GameObject* go)
 {
     GateStatus[GetGateIDFromEntry(go->GetEntry())] = BG_IC_GATE_DESTROYED;
     uint32 uws_open = GetWorldStateFromGateEntry(go->GetEntry(), true);

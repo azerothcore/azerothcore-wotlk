@@ -869,7 +869,7 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
             {
                 if (!l.items[i].is_looted && !l.items[i].freeforall && l.items[i].conditions.empty() && l.items[i].AllowedForPlayer(lv.viewer))
                 {
-                    uint8 slot_type;
+                    uint8 slot_type = 0;
 
                     if (l.items[i].is_blocked) // for ML & restricted is_blocked = !is_underthreshold
                     {

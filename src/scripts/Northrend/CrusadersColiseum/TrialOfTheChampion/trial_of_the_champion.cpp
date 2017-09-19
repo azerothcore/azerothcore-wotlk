@@ -105,7 +105,7 @@ public:
                 damage = me->GetHealth()-1;
         }
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 type, uint32  /*id*/)
         {
             if (type != EFFECT_MOTION_TYPE)
                 return;
@@ -118,7 +118,7 @@ public:
             Unit::Kill(me, me); // for bk scene, die after knockback
         }
 
-        void UpdateAI(uint32 diff) {}
+        void UpdateAI(uint32  /*diff*/) {}
     };
 };
 

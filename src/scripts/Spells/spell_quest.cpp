@@ -1197,6 +1197,8 @@ class spell_q6124_6129_apply_salve : public SpellScriptLoader
                                 if (creatureTarget->GetEntry() == NPC_SICKLY_DEER)
                                     newEntry = NPC_CURED_DEER;
                                 break;
+                            default:
+                                break;
                         }
                         if (newEntry)
                         {

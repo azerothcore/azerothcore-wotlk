@@ -87,7 +87,7 @@ class boss_novos : public CreatureScript
                     _achievement = false;
             }
 
-            void MoveInLineOfSight(Unit* who) { }
+            void MoveInLineOfSight(Unit*  /*who*/) { }
 
             void EnterCombat(Unit* who)
             {
@@ -118,7 +118,7 @@ class boss_novos : public CreatureScript
                 instance->SetBossState(DATA_NOVOS_CRYSTALS, DONE);
             }
 
-            void KilledUnit(Unit* victim)
+            void KilledUnit(Unit*  /*victim*/)
             {
                 if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
                 {
@@ -255,7 +255,7 @@ class spell_novos_crystal_handler_death : public SpellScriptLoader
         {
             PrepareAuraScript(spell_novos_crystal_handler_death_AuraScript)
 
-            void HandleEffectApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+            void HandleEffectApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
                 GetUnitOwner()->InterruptNonMeleeSpells(false);
                 if (GameObject* crystal = GetUnitOwner()->FindNearestGameObjectOfType(GAMEOBJECT_TYPE_DOOR, 5.0f))

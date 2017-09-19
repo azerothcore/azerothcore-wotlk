@@ -284,7 +284,7 @@ public:
             }
         }
 
-        void JustDied(Unit* Killer)
+        void JustDied(Unit*  /*Killer*/)
         {
             if (!pInstance)
                 return;
@@ -338,7 +338,7 @@ public:
                 me->CastSpell(me, SPELL_ELECTRICAL_CHARGE, true);
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spellInfo)
+        void SpellHit(Unit*  /*caster*/, const SpellInfo* spellInfo)
         {
             if (spellInfo->Id == SPELL_SUPERCHARGE)
                 UpdatePhase();
@@ -483,7 +483,7 @@ public:
             }
         }
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit*  /*killer*/)
         {
             if (!pInstance)
                 return;
@@ -528,7 +528,7 @@ public:
             }
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spellInfo)
+        void SpellHit(Unit*  /*caster*/, const SpellInfo* spellInfo)
         {
             if (spellInfo->Id == SPELL_SUPERCHARGE)
                 UpdatePhase();
@@ -621,7 +621,7 @@ public:
                 me->DespawnOrUnsummon(1);
         }
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 type, uint32  /*id*/)
         {
             if (type == FOLLOW_MOTION_TYPE && !_boomed)
             {
@@ -728,7 +728,7 @@ public:
             }
         }
 
-        void JustDied(Unit* Killer)
+        void JustDied(Unit*  /*Killer*/)
         {
             if (!pInstance)
                 return;
@@ -773,15 +773,15 @@ public:
             }
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spellInfo)
+        void SpellHit(Unit*  /*caster*/, const SpellInfo* spellInfo)
         {
             if (spellInfo->Id == SPELL_SUPERCHARGE)
                 UpdatePhase();
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spellInfo)
+        void SpellHitTarget(Unit*  /*target*/, const SpellInfo* spellInfo)
         {
-            if (spellInfo->Id == SPELL_CHAIN_LIGHTNING || spellInfo->Id == RAID_MODE(61916, 63482)) // Lightning Whirl triggered
+            if (spellInfo->Id == SPELL_CHAIN_LIGHTNING || spellInfo->Id == uint32(RAID_MODE(61916, 63482))) // Lightning Whirl triggered
                 _stunnedAchievement = false;
         }
 
@@ -1011,7 +1011,7 @@ class achievement_assembly_of_iron : public AchievementCriteriaScript
         {
         }
 
-        bool OnCheck(Player* player, Unit* target)
+        bool OnCheck(Player*  /*player*/, Unit* target)
         {
             return target && target->GetAuraCount(SPELL_SUPERCHARGE) >= 2 && (!_targetEntry || target->GetEntry() == _targetEntry);
         }
@@ -1025,7 +1025,7 @@ class achievement_cant_do_that_while_stunned : public AchievementCriteriaScript
     public:
         achievement_cant_do_that_while_stunned() : AchievementCriteriaScript("achievement_cant_do_that_while_stunned") {}
 
-        bool OnCheck(Player* player, Unit* target)
+        bool OnCheck(Player*  /*player*/, Unit* target)
         {
             bool allow = target && target->GetAuraCount(SPELL_SUPERCHARGE) >= 2;
             if (!allow)

@@ -150,7 +150,7 @@ public:
             }
         }
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit*  /*killer*/)
         {
             if (InstanceScript* instance = me->GetInstanceScript())
                 if (Creature* ignis = ObjectAccessor::GetCreature(*me, instance->GetData64(TYPE_IGNIS)))
@@ -217,7 +217,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit*  /*who*/)
         {
             me->setActive(true);
 
@@ -256,7 +256,7 @@ public:
             }
         }
 
-        void SetData(uint32 id, uint32 value)
+        void SetData(uint32 id, uint32  /*value*/)
         {
             if (id == 1337)
             {
@@ -280,7 +280,7 @@ public:
             me->setActive(false);
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit*  /*victim*/)
         {
             if( rand()%2 )
             {
@@ -294,7 +294,7 @@ public:
             }
         }
 
-        void JustDied(Unit *victim)
+        void JustDied(Unit * /*victim*/)
         {
             me->MonsterYell(TEXT_DEATH, LANG_UNIVERSAL, 0);
             me->PlayDirectSound(SOUND_DEATH);
@@ -318,7 +318,7 @@ public:
             }
         }
 
-        void MoveInLineOfSight(Unit* who) {}
+        void MoveInLineOfSight(Unit*  /*who*/) {}
 
         void UpdateAI(uint32 diff)
         {
@@ -448,7 +448,7 @@ public:
 
         void HandleEffectPeriodic(AuraEffect const * aurEff)
         {
-            if (aurEff->GetTickNumber() == aurEff->GetTotalTicks())
+            if (aurEff->GetTotalTicks() >= 0 && aurEff->GetTickNumber() == uint32(aurEff->GetTotalTicks()))
                 if (Unit* c = GetCaster())
                     if (Creature* s = c->SummonCreature(NPC_SCORCHED_GROUND, c->GetPositionX()+20.0f*cos(c->GetOrientation()), c->GetPositionY()+20.0f*sin(c->GetOrientation()), 361.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 30000))
                     {
@@ -478,7 +478,7 @@ public:
     {
         PrepareSpellScript(spell_ignis_grab_initial_SpellScript);
 
-        void HandleScript(SpellEffIndex effIndex)
+        void HandleScript(SpellEffIndex  /*effIndex*/)
         {
             if (Unit* t = GetHitUnit())
                 t->CastSpell(t, SPELL_GRAB_TRIGGERED, true);
@@ -505,7 +505,7 @@ public:
     {
         PrepareAuraScript(spell_ignis_slag_pot_AuraScript)
 
-        void HandleEffectPeriodic(AuraEffect const * aurEff)
+        void HandleEffectPeriodic(AuraEffect const *  /*aurEff*/)
         {
             if (Unit* c = GetCaster())
                 if (Unit* t = GetTarget())
@@ -551,7 +551,7 @@ class achievement_ignis_shattered : public AchievementCriteriaScript
     public:
         achievement_ignis_shattered() : AchievementCriteriaScript("achievement_ignis_shattered") {}
 
-        bool OnCheck(Player* player, Unit* target)
+        bool OnCheck(Player*  /*player*/, Unit* target)
         {
             if (!target || target->GetTypeId() != TYPEID_UNIT)
                 return false;

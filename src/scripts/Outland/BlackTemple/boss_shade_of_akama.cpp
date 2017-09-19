@@ -553,13 +553,13 @@ class spell_shade_of_akama_shade_soul_channel : public SpellScriptLoader
         {
             PrepareAuraScript(spell_shade_of_akama_shade_soul_channel_AuraScript)
             
-            void HandleEffectApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+            void HandleEffectApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
                 if (Unit* caster = GetCaster())
                     caster->SetFacingToObject(GetTarget());
             }
 
-            void HandleEffectRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+            void HandleEffectRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
                 if (Aura* aura = GetTarget()->GetAura(GetSpellInfo()->Effects[EFFECT_1].TriggerSpell))
                     aura->ModStackAmount(-1);

@@ -373,7 +373,7 @@ public:
                 events.RescheduleEvent(EVENT_SPELL_MISTRESS_KISS, urand(10000,15000));
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spell)
+        void SpellHit(Unit*  /*caster*/, const SpellInfo*  /*spell*/)
         {
             //if (caster && spell && spell->Id == 66287 /*control vehicle*/)
             //  caster->ClearUnitState(UNIT_STATE_ONVEHICLE);
@@ -434,7 +434,7 @@ public:
     {
         PrepareAuraScript(spell_toc25_mistress_kiss_AuraScript)
 
-        void HandleEffectPeriodic(AuraEffect const * aurEff)
+        void HandleEffectPeriodic(AuraEffect const *  /*aurEff*/)
         {
             if (Unit* caster = GetCaster())
                 if (Unit* target = GetTarget())

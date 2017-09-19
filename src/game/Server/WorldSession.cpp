@@ -84,13 +84,11 @@ bool WorldSessionFilter::Process(WorldPacket* packet)
 
 /// WorldSession constructor
 WorldSession::WorldSession(uint32 id, WorldSocket* sock, AccountTypes sec, uint8 expansion, time_t mute_time, LocaleConstant locale, uint32 recruiter, bool isARecruiter, bool skipQueue):
-m_muteTime(mute_time), m_timeOutTime(0), m_GUIDLow(0), _player(NULL), m_Socket(sock),
-_security(sec), _accountId(id), m_expansion(expansion), _logoutTime(0),
+m_muteTime(mute_time), m_timeOutTime(0), _lastAuctionListItemsMSTime(0), _lastAuctionListOwnerItemsMSTime(0), m_GUIDLow(0), _player(NULL), m_Socket(sock),
+_security(sec), _skipQueue(skipQueue), _accountId(id), m_expansion(expansion), _logoutTime(0),
 m_inQueue(false), m_playerLoading(false), m_playerLogout(false), m_playerSave(false),
-m_sessionDbcLocale(sWorld->GetDefaultDbcLocale()),
-m_sessionDbLocaleIndex(locale),
-m_latency(0), m_clientTimeDelay(0), m_TutorialsChanged(false), recruiterId(recruiter),
-isRecruiter(isARecruiter), m_currentBankerGUID(0), timeWhoCommandAllowed(0), _lastAuctionListItemsMSTime(0), _lastAuctionListOwnerItemsMSTime(0), _skipQueue(skipQueue)
+m_sessionDbcLocale(sWorld->GetDefaultDbcLocale()), m_sessionDbLocaleIndex(locale),
+m_latency(0), m_clientTimeDelay(0), m_TutorialsChanged(false), recruiterId(recruiter), isRecruiter(isARecruiter), m_currentBankerGUID(0), timeWhoCommandAllowed(0)
 {
     memset(m_Tutorials, 0, sizeof(m_Tutorials));
 
@@ -298,10 +296,10 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
                             break;
                         (this->*opHandle.handler)(*packet);
                         break;
-                    //case STATUS_NEVER:
-                    //    break;
-                    //case STATUS_UNHANDLED:
-                    //    break;
+                    case STATUS_NEVER:
+                        break;
+                    case STATUS_UNHANDLED:
+                        break;
                 }
             }
             catch(ByteBufferException &)
@@ -873,7 +871,7 @@ void WorldSession::ReadMovementInfo(WorldPacket &data, MovementInfo* mi)
 
     // pussywizard: remade this condition
     bool canFly = GetPlayer()->m_mover->HasAuraType(SPELL_AURA_FLY) || GetPlayer()->m_mover->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) ||
-                  GetPlayer()->m_mover->GetTypeId() == TYPEID_UNIT && GetPlayer()->m_mover->ToCreature()->CanFly() || GetSecurity() > SEC_PLAYER;
+                  (GetPlayer()->m_mover->GetTypeId() == TYPEID_UNIT && GetPlayer()->m_mover->ToCreature()->CanFly()) || GetSecurity() > SEC_PLAYER;
     REMOVE_VIOLATING_FLAGS(mi->HasMovementFlag(MOVEMENTFLAG_FLYING | MOVEMENTFLAG_CAN_FLY) && !canFly,
         MOVEMENTFLAG_FLYING | MOVEMENTFLAG_CAN_FLY);
 
@@ -1079,7 +1077,16 @@ void WorldSession::SendAddonsInfo()
 
     m_addonsList.clear();
 
-    data << uint32(0); // count for an unknown for loop
+    AddonMgr::BannedAddonList const* bannedAddons = AddonMgr::GetBannedAddons();
+    data << uint32(bannedAddons->size());
+    for (AddonMgr::BannedAddonList::const_iterator itr = bannedAddons->begin(); itr != bannedAddons->end(); ++itr)
+    {
+	    data << uint32(itr->Id);
+        data.append(itr->NameMD5, sizeof(itr->NameMD5));
+        data.append(itr->VersionMD5, sizeof(itr->VersionMD5));
+        data << uint32(itr->Timestamp);
+        data << uint32(1);  // IsBanned
+    }
 
     SendPacket(&data);
 }

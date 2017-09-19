@@ -104,7 +104,7 @@ public:
             handler->PSendSysMessage("Connected players: %u. Characters in world: %u.", activeSessionCount, playerCount);
         else
             handler->PSendSysMessage("Connected players: %u. Characters in world: %u. Queue: %u.", activeSessionCount, playerCount, queuedSessionCount);
-        //handler->PSendSysMessage("Connection peak: %u.", connPeak);
+        handler->PSendSysMessage("Connection peak: %u.", connPeak);
         handler->PSendSysMessage(LANG_UPTIME, uptime.c_str());
         handler->PSendSysMessage("Update time diff: %ums, average: %ums.", updateTime, avgUpdateTime);
 
@@ -126,14 +126,14 @@ public:
         return true;
     }
 
-    static bool HandleServerShutDownCancelCommand(ChatHandler* handler, char const* /*args*/)
+    static bool HandleServerShutDownCancelCommand(ChatHandler* /*handler*/, char const* /*args*/)
     {
         sWorld->ShutdownCancel();
 
         return true;
     }
 
-    static bool HandleServerShutDownCommand(ChatHandler* handler, char const* args)
+    static bool HandleServerShutDownCommand(ChatHandler* /*handler*/, char const* args)
     {
         if (!*args)
             return false;
@@ -169,7 +169,7 @@ public:
         return true;
     }
 
-    static bool HandleServerRestartCommand(ChatHandler* handler, char const* args)
+    static bool HandleServerRestartCommand(ChatHandler* /*handler*/, char const* args)
     {
         if (!*args)
             return false;

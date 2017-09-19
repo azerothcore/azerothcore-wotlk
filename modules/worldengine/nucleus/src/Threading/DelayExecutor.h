@@ -26,11 +26,12 @@ class DelayExecutor : protected ACE_Task_Base
 
     private:
 
-        ACE_Message_Queue<ACE_SYNCH> mqueue_;
-        ACE_Activation_Queue queue_;
         ACE_Method_Request* pre_svc_hook_;
         ACE_Method_Request* post_svc_hook_;
         bool activated_;
+        ACE_Message_Queue<ACE_SYNCH> mqueue_;
+        ACE_Activation_Queue queue_;
+
 
         void activated(bool s);
 };

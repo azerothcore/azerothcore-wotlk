@@ -105,9 +105,9 @@ static Wave Wave6[]= // 27 sec
 };
 */
 
-Position const GythLoc =      { 211.762f,  -397.5885f, 111.1817f,  4.747295f   };
+/*Position const GythLoc =      { 211.762f,  -397.5885f, 111.1817f,  4.747295f   };
 Position const Teleport1Loc = { 194.2993f, -474.0814f, 121.4505f, -0.01225555f };
-Position const Teleport2Loc = { 216.485f,  -434.93f,   110.888f,  -0.01225555f };
+Position const Teleport2Loc = { 216.485f,  -434.93f,   110.888f,  -0.01225555f };*/
 
 enum Events
 {

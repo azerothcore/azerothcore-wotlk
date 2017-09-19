@@ -139,7 +139,7 @@ class spell_uldaman_sub_boss_agro_keepers : public SpellScriptLoader
         {
             PrepareSpellScript(spell_uldaman_sub_boss_agro_keepers_SpellScript);
 
-            void HandleSendEvent(SpellEffIndex effIndex)
+            void HandleSendEvent(SpellEffIndex  /*effIndex*/)
             {
                 if (Creature* keeper = GetCaster()->FindNearestCreature(NPC_STONE_KEEPER, 100.0f, true))
                     keeper->AI()->SetData(1, 1);
@@ -207,7 +207,7 @@ class spell_uldaman_boss_agro_archaedas : public SpellScriptLoader
         {
             PrepareSpellScript(spell_uldaman_boss_agro_archaedas_SpellScript);
 
-            void HandleSendEvent(SpellEffIndex effIndex)
+            void HandleSendEvent(SpellEffIndex  /*effIndex*/)
             {
                 InstanceScript* instance = GetCaster()->GetInstanceScript();
                 if (!instance || instance->GetData(DATA_ARCHAEDAS) == IN_PROGRESS)

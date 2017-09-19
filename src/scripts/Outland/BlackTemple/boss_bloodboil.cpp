@@ -94,7 +94,7 @@ class boss_gurtogg_bloodboil : public CreatureScript
                 events.ScheduleEvent(EVENT_SPELL_BERSERK, 600000);
             }
 
-            void KilledUnit(Unit* victim)
+            void KilledUnit(Unit*  /*victim*/)
             {
                 if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
                 {

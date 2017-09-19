@@ -70,7 +70,7 @@ class boss_warchief_kargath_bladefist : public CreatureScript
                         executioner->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
             }
 
-            void EnterCombat(Unit* who)
+            void EnterCombat(Unit*  /*who*/)
             {
                 Talk(SAY_AGGRO);
                 _EnterCombat();

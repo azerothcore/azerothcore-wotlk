@@ -65,7 +65,7 @@ public:
 
         void JustSummoned(Creature* cr) { cr->SetInCombatWithZone(); }
 
-        void SummonedCreatureDies(Creature* cr, Unit*)
+        void SummonedCreatureDies(Creature*  /*cr*/, Unit*)
         {
             if (pInstance)
                 pInstance->SetData(DATA_SPORE_KILLED, 0);
@@ -77,7 +77,7 @@ public:
                 pInstance->SetData(DATA_IMMORTAL_FAIL, 0);
         }
 
-        void EnterCombat(Unit *who)
+        void EnterCombat(Unit * /*who*/)
         {
             if (pInstance)
             {
@@ -93,7 +93,7 @@ public:
             events.ScheduleEvent(EVENT_SPELL_BERSERK, 720000);
         }
 
-        void JustDied(Unit* Killer)
+        void JustDied(Unit*  /*Killer*/)
         {
             if (pInstance)
                 pInstance->SetData(EVENT_LOATHEB, DONE);

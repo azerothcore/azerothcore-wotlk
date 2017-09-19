@@ -181,7 +181,7 @@ public:
         return true;
     }
 
-    bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32 opt)
+    bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32  /*opt*/)
     {
         if (!creature->AI()->GetData(DATA_DERBY_FINISHED) && quest->GetQuestId() == QUEST_FISHING_DERBY)
         {
@@ -290,7 +290,7 @@ public:
         return true;
     }
 
-    bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32 opt)
+    bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32  /*opt*/)
     {
         if (!creature->AI()->GetData(DATA_ANGLER_FINISHED) && quest->GetQuestId() == QUEST_MASTER_ANGLER)
         {

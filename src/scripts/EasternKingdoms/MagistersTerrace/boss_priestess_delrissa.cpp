@@ -116,7 +116,7 @@ public:
             summons.Summon(summon);
         }
 
-        void SummonedCreatureDies(Creature* summon, Unit*)
+        void SummonedCreatureDies(Creature*  /*summon*/, Unit*)
         {
             if (me->IsAlive() && HelpersKilled < SAY_PLAYER_KILLED)
             {
@@ -134,7 +134,7 @@ public:
             ++HelpersKilled;
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit*  /*who*/)
         {
             Talk(SAY_AGGRO);
             summons.DoZoneInCombat();
@@ -266,7 +266,7 @@ struct boss_priestess_lackey_commonAI : public ScriptedAI
     uint32 actualEventId;
     uint8 aiType;
 
-    float GetThreatMod(float dist, float armor, uint32 health, uint32 /*maxhealth*/, Unit* target)
+    float GetThreatMod(float dist, float  /*armor*/, uint32 health, uint32 /*maxhealth*/, Unit* target)
     {
         float unimportant_dist = (aiType == AI_TYPE_MELEE ? 5.0f : 25.0f);
         if (dist > unimportant_dist) dist -= unimportant_dist; else dist = 0.0f;
@@ -426,7 +426,7 @@ public:
             events.ScheduleEvent(EVENT_SPELL_BACKSTAB, 4000);
         }
 
-        void MovementInform(uint32 type, uint32 point)
+        void MovementInform(uint32 type, uint32  /*point*/)
         {
             if (type == CHASE_MOTION_TYPE && me->HasAura(SPELL_VANISH) && me->GetVictim())
                 me->CastSpell(me->GetVictim(), SPELL_KIDNEY_SHOT, false);

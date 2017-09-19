@@ -327,7 +327,7 @@ class spell_muru_summon_blood_elves_periodic : public SpellScriptLoader
                 GetAura()->GetEffect(aurEff->GetEffIndex())->SetPeriodicTimer(10000);
             }
 
-            void OnPeriodic(AuraEffect const* aurEff)
+            void OnPeriodic(AuraEffect const*  /*aurEff*/)
             {
                 GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_SUMMON_FURY_MAGE1, true);
                 GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_SUMMON_FURY_MAGE2, true);
@@ -426,12 +426,12 @@ class spell_entropius_void_zone_visual : public SpellScriptLoader
         {
             PrepareAuraScript(spell_entropius_void_zone_visual_AuraScript);
 
-            void HandleApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+            void HandleApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
                 SetDuration(3000);
             }
 
-            void HandleRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+            void HandleRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
                 GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_SUMMON_DARK_FIEND_ENTROPIUS, true);
             }

@@ -139,7 +139,7 @@ public:
             me->setActive(false);
         }
 
-        void EnterCombat(Unit* pWho)
+        void EnterCombat(Unit*  /*pWho*/)
         {
             me->setActive(true);
             me->SetInCombatWithZone();
@@ -345,7 +345,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit*  /*killer*/)
         {
             summons.DespawnAll();
             if (pInstance)
@@ -379,7 +379,7 @@ public:
             }
         }
 
-        void MoveInLineOfSight(Unit* who) {}
+        void MoveInLineOfSight(Unit*  /*who*/) {}
 
         void JustSummoned(Creature* summon)
         {
@@ -413,7 +413,7 @@ public:
 
         InstanceScript* pInstance;
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit*  /*killer*/)
         {
             me->CastSpell(me, SPELL_SARONITE_VAPORS_AURA, true);
 
@@ -450,7 +450,7 @@ public:
         InstanceScript* pInstance;
         uint16 timer;
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit*  /*killer*/)
         {
             me->DespawnOrUnsummon(3000);
 
@@ -484,7 +484,7 @@ public:
     {
         PrepareAuraScript(spell_aura_of_despair_AuraScript)
 
-        void OnApply(AuraEffect const* aurEff, AuraEffectHandleModes mode)
+        void OnApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes  /*mode*/)
         {
             if (Unit* caster = GetCaster())
                 if (Unit* target = GetTarget())
@@ -532,7 +532,7 @@ public:
     {
         PrepareAuraScript(spell_mark_of_the_faceless_periodic_AuraScript)
 
-        void HandleEffectPeriodic(AuraEffect const * aurEff)
+        void HandleEffectPeriodic(AuraEffect const *  /*aurEff*/)
         {
             if (Unit* caster = GetCaster())
                 if (Unit* target = GetTarget())
@@ -650,7 +650,7 @@ class achievement_smell_saronite : public AchievementCriteriaScript
 public:
     achievement_smell_saronite() : AchievementCriteriaScript("achievement_smell_saronite") {}
 
-    bool OnCheck(Player* player, Unit* target)
+    bool OnCheck(Player*  /*player*/, Unit* target)
     {
         return target && target->GetEntry() == NPC_VEZAX && target->GetTypeId() == TYPEID_UNIT && target->ToCreature()->AI()->GetData(1);
     }
@@ -661,7 +661,7 @@ class achievement_shadowdodger : public AchievementCriteriaScript
 public:
     achievement_shadowdodger() : AchievementCriteriaScript("achievement_shadowdodger") {}
 
-    bool OnCheck(Player* player, Unit* target)
+    bool OnCheck(Player*  /*player*/, Unit* target)
     {
         return target && target->GetEntry() == NPC_VEZAX && target->GetTypeId() == TYPEID_UNIT && target->ToCreature()->AI()->GetData(2);
     }

@@ -70,7 +70,7 @@ public:
             events.Reset();
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit*  /*who*/)
         {
             Talk(SAY_AGGRO);
 
@@ -84,7 +84,7 @@ public:
             events.RescheduleEvent(EVENT_SUMMON, 2000);
         }
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit*  /*killer*/)
         {
             Talk(SAY_DEATH);
 
@@ -103,13 +103,13 @@ public:
 
         }
 
-        void KilledUnit(Unit *victim)
+        void KilledUnit(Unit * /*victim*/)
         {
             Talk(SAY_KILL);
         }
 
-        void MoveInLineOfSight(Unit* who) {}
-        void JustSummoned(Creature* summon) {}
+        void MoveInLineOfSight(Unit*  /*who*/) {}
+        void JustSummoned(Creature*  /*summon*/) {}
 
         void UpdateAI(uint32 diff)
         {
@@ -214,8 +214,8 @@ public:
             PickNewLocation();
         }
 
-        void AttackStart(Unit* who) {}
-        void MoveInLineOfSight(Unit* who) {}
+        void AttackStart(Unit*  /*who*/) {}
+        void MoveInLineOfSight(Unit*  /*who*/) {}
 
         void UpdateAI(uint32 diff)
         {

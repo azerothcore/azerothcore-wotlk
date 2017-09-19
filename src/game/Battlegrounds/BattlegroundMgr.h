@@ -142,11 +142,11 @@ class BattlegroundMgr
         BattlegroundQueue m_BattlegroundQueues[MAX_BATTLEGROUND_QUEUE_TYPES];
 
         std::vector<uint64> m_ArenaQueueUpdateScheduler;
-        uint32 m_lastClientVisibleInstanceId;
-        uint32 m_NextPeriodicQueueUpdateTime;
-        time_t m_NextAutoDistributionTime;
         bool   m_ArenaTesting;
         bool   m_Testing;
+        uint32 m_lastClientVisibleInstanceId;
+        time_t m_NextAutoDistributionTime;
+        uint32 m_NextPeriodicQueueUpdateTime;
         BattleMastersMap mBattleMastersMap;
 };
 

@@ -165,7 +165,7 @@ public:
                 // pussywizard:
                 bool reset = true;
                 if (instance)
-                    if (Creature* nefarian = instance->instance->GetCreature(instance->GetData64(DATA_NEFARIAN)))
+                    if (/*Creature* nefarian = */instance->instance->GetCreature(instance->GetData64(DATA_NEFARIAN)))
                         reset = false;
                 if (reset)
                     _Reset();
@@ -184,7 +184,7 @@ public:
             }
         }
 
-        bool CanAIAttack(const Unit* target) const { return me->IsVisible(); }
+        bool CanAIAttack(const Unit*  /*target*/) const { return me->IsVisible(); }
 
         void JustReachedHome()
         {
@@ -434,7 +434,7 @@ public:
             Talk(SAY_SLAY, victim);
         }
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 type, uint32  /*id*/)
         {
             if (type != POINT_MOTION_TYPE)
                 return;

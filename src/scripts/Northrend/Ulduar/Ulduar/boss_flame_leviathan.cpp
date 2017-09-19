@@ -537,24 +537,24 @@ void boss_flame_leviathan::boss_flame_leviathanAI::TurnGates(bool _start, bool _
     {
         // first one is ALWAYS turned on, unless leviathan is beaten
         GameObject* go = NULL;
-        if (go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(DATA_LIGHTNING_WALL2)))
+        if ((go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(DATA_LIGHTNING_WALL2))))
             go->SetGoState(GO_STATE_READY);
 
         if (m_pInstance->GetData(TYPE_LEVIATHAN) == NOT_STARTED)
-            if (go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(GO_LEVIATHAN_DOORS)))
+            if ((go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(GO_LEVIATHAN_DOORS))))
                 go->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
     }
     else
     {
         GameObject* go = NULL;
         if (_death)
-            if (go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(DATA_LIGHTNING_WALL1)))
+            if ((go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(DATA_LIGHTNING_WALL1))))
                 go->SetGoState(GO_STATE_ACTIVE);
 
-        if (go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(DATA_LIGHTNING_WALL2)))
+        if ((go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(DATA_LIGHTNING_WALL2))))
             go->SetGoState(GO_STATE_ACTIVE);
 
-        if (go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(GO_LEVIATHAN_DOORS)))
+        if ((go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(GO_LEVIATHAN_DOORS))))
         {
             if (m_pInstance->GetData(TYPE_LEVIATHAN) == SPECIAL || m_pInstance->GetData(TYPE_LEVIATHAN) == DONE)
                 go->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
@@ -572,16 +572,16 @@ void boss_flame_leviathan::boss_flame_leviathanAI::TurnHealStations(bool _apply)
     GameObject* go = NULL;
     if (_apply)
     {
-        if (go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(DATA_REPAIR_STATION1)))
+        if ((go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(DATA_REPAIR_STATION1))))
             go->SetLootState(GO_READY);
-        if (go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(DATA_REPAIR_STATION2)))
+        if ((go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(DATA_REPAIR_STATION2))))
             go->SetLootState(GO_READY);
     }
     else
     {
-        if (go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(DATA_REPAIR_STATION1)))
+        if ((go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(DATA_REPAIR_STATION1))))
             go->SetLootState(GO_ACTIVATED);
-        if (go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(DATA_REPAIR_STATION2)))
+        if ((go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(DATA_REPAIR_STATION2))))
             go->SetLootState(GO_ACTIVATED);
     }
 }
@@ -620,7 +620,7 @@ void boss_flame_leviathan::boss_flame_leviathanAI::SayPursue()
     }
 }
 
-void boss_flame_leviathan::boss_flame_leviathanAI::SpellHit(Unit* caster, const SpellInfo* spellInfo)
+void boss_flame_leviathan::boss_flame_leviathanAI::SpellHit(Unit*  /*caster*/, const SpellInfo* spellInfo)
 {
     if (spellInfo->Id == SPELL_SYSTEMS_SHUTDOWN)
     {
@@ -992,7 +992,7 @@ public:
             }
         }
 
-        void MovementInform(uint32 type, uint32 param)
+        void MovementInform(uint32 type, uint32  /*param*/)
         {
             if (type == FOLLOW_MOTION_TYPE && !_timeToHit)
             {
@@ -1179,7 +1179,7 @@ public:
             damage = 0;
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spellInfo)
+        void SpellHit(Unit*  /*caster*/, const SpellInfo* spellInfo)
         {
             if (spellInfo->SchoolMask & SPELL_SCHOOL_MASK_FIRE && !me->HasAura(SPELL_BLAZE))
                 me->CastSpell(me, SPELL_BLAZE, true);
@@ -1201,7 +1201,7 @@ public:
         return true;
     }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 uiSender, uint32 uiAction)
+    bool OnGossipSelect(Player* player, Creature* creature, uint32  /*uiSender*/, uint32 uiAction)
     {
         switch (uiAction)
         {
@@ -1371,7 +1371,7 @@ class npc_brann_ulduar : public CreatureScript
 public:
     npc_brann_ulduar() : CreatureScript("npc_brann_ulduar") { }
 
-    bool OnGossipHello(Player* player, Creature* creature)
+    bool OnGossipHello(Player*  /*player*/, Creature* creature)
     {
         if (creature->GetInstanceScript() && creature->GetInstanceScript()->GetData(TYPE_LEVIATHAN) == NOT_STARTED && !creature->AI()->GetData(DATA_EVENT_STARTED))
             creature->AI()->DoAction(ACTION_START_BRANN_EVENT);
@@ -1673,7 +1673,7 @@ public:
 
         uint32 _allowTimer;
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32  /*type*/, uint32 id)
         {
             if (id == me->GetEntry())
             {
@@ -2114,7 +2114,7 @@ class spell_vehicle_grab_pyrite : public SpellScriptLoader
         class spell_vehicle_grab_pyrite_SpellScript : public SpellScript
         {
             PrepareSpellScript(spell_vehicle_grab_pyrite_SpellScript);
-            void HandleScript(SpellEffIndex effIndex)
+            void HandleScript(SpellEffIndex  /*effIndex*/)
             {
                 if (Unit* target = GetHitUnit())
                     if (Unit* seat = GetCaster()->GetVehicleBase())
@@ -2155,7 +2155,7 @@ class spell_vehicle_circuit_overload : public SpellScriptLoader
         {
             PrepareAuraScript(spell_vehicle_circuit_overload_AuraScript);
 
-            void OnPeriodic(AuraEffect const* aurEff)
+            void OnPeriodic(AuraEffect const*  /*aurEff*/)
             {
                 if (Unit* target = GetTarget())
                     if (int(target->GetAppliedAuras().count(SPELL_OVERLOAD_CIRCUIT)) >= (target->GetMap()->Is25ManRaid() ? 4 : 2))
@@ -2335,7 +2335,7 @@ class achievement_flame_leviathan_towers : public AchievementCriteriaScript
         {
         }
 
-        bool OnCheck(Player* player, Unit* target /*Flame Leviathan*/)
+        bool OnCheck(Player*  /*player*/, Unit* target /*Flame Leviathan*/)
         {
             return target && _towerCount <= target->GetAI()->GetData(DATA_GET_TOWER_COUNT);
         }
@@ -2349,7 +2349,7 @@ class achievement_flame_leviathan_shutout : public AchievementCriteriaScript
     public:
         achievement_flame_leviathan_shutout() : AchievementCriteriaScript("achievement_flame_leviathan_shutout") {}
 
-        bool OnCheck(Player* player, Unit* target /*Flame Leviathan*/)
+        bool OnCheck(Player*  /*player*/, Unit* target /*Flame Leviathan*/)
         {
             if (target)
                 if (target->GetAI()->GetData(DATA_GET_SHUTDOWN))

@@ -88,7 +88,7 @@ public:
             if (timer)
             {
                 timer += diff;
-                if ((timer >= 0 && timer < 10000) || (timer >= 20000 && timer < 30000))
+                if (timer < 10000 || (timer >= 20000 && timer < 30000))
                 {
                     for (uint8 i = 0; i < 3; ++i)
                         if (Creature* cr = me->SummonCreature((roll_chance_i(50) ? 22474 : 22500), me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000))
@@ -113,7 +113,7 @@ class spell_npc22275_crystal_prison : public SpellScriptLoader
         {
             PrepareAuraScript(spell_npc22275_crystal_prison_AuraScript);
 
-            void OnPeriodic(AuraEffect const* aurEff)
+            void OnPeriodic(AuraEffect const*  /*aurEff*/)
             {
                 PreventDefaultAction();
                 SetDuration(0);

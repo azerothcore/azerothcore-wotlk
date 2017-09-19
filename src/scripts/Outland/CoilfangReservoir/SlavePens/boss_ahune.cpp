@@ -288,7 +288,7 @@ public:
             }
         }
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit*  /*killer*/)
         {
             summons.DespawnAll();
             me->DespawnOrUnsummon(15000);
@@ -324,7 +324,7 @@ public:
             return true;
         if (!pPlayer->HasItemCount(ITEM_MAGMA_TOTEM))
             return true;
-        if (Creature* c = pGO->FindNearestCreature(NPC_AHUNE, 200.0f, true))
+        if (pGO->FindNearestCreature(NPC_AHUNE, 200.0f, true))
             return true;
 
         pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Disturb the stone and summon Lord Ahune.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1337);
@@ -340,7 +340,7 @@ public:
             return true;
         if (!pPlayer->HasItemCount(ITEM_MAGMA_TOTEM))
             return true;
-        if (Creature* c = pGO->FindNearestCreature(NPC_AHUNE, 200.0f, true))
+        if (pGO->FindNearestCreature(NPC_AHUNE, 200.0f, true))
             return true;
 
         if (Creature* c = pGO->SummonCreature(NPC_AHUNE, AhuneSummonPos, TEMPSUMMON_MANUAL_DESPAWN))

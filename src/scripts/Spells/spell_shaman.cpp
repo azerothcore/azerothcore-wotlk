@@ -166,7 +166,7 @@ class spell_sha_totemic_mastery : public SpellScriptLoader
         {
             PrepareAuraScript(spell_sha_totemic_mastery_AuraScript);
 
-            void HandlePeriodic(AuraEffect const* aurEff)
+            void HandlePeriodic(AuraEffect const*  /*aurEff*/)
             {
                 PreventDefaultAction();
 
@@ -219,7 +219,7 @@ class spell_sha_feral_spirit_scaling : public SpellScriptLoader
                 }
             }
 
-            void CalculateAPAmount(AuraEffect const* aurEff, int32 & amount, bool & /*canBeRecalculated*/)
+            void CalculateAPAmount(AuraEffect const*  /*aurEff*/, int32 & amount, bool & /*canBeRecalculated*/)
             {
                 // xinef: by default feral spirit inherits 30% of AP
                 if (Unit* owner = GetUnitOwner()->GetOwner())
@@ -232,7 +232,7 @@ class spell_sha_feral_spirit_scaling : public SpellScriptLoader
                 }
             }
 
-            void CalculateSPAmount(AuraEffect const* aurEff, int32 & amount, bool & /*canBeRecalculated*/)
+            void CalculateSPAmount(AuraEffect const*  /*aurEff*/, int32 & amount, bool & /*canBeRecalculated*/)
             {
                 // xinef: by default feral spirit inherits 30% of AP as SP
                 if (Unit* owner = GetUnitOwner()->GetOwner())
@@ -345,7 +345,7 @@ class spell_sha_fire_elemental_scaling : public SpellScriptLoader
                 }
             }
 
-            void CalculateAPAmount(AuraEffect const* aurEff, int32 & amount, bool & /*canBeRecalculated*/)
+            void CalculateAPAmount(AuraEffect const*  /*aurEff*/, int32 & amount, bool & /*canBeRecalculated*/)
             {
                 // xinef: fire elemental inherits 300% / 150% of SP as AP
                 if (Unit* owner = GetUnitOwner()->GetOwner())
@@ -355,7 +355,7 @@ class spell_sha_fire_elemental_scaling : public SpellScriptLoader
                 }
             }
 
-            void CalculateSPAmount(AuraEffect const* aurEff, int32 & amount, bool & /*canBeRecalculated*/)
+            void CalculateSPAmount(AuraEffect const*  /*aurEff*/, int32 & amount, bool & /*canBeRecalculated*/)
             {
                 // xinef: fire elemental inherits 100% of SP
                 if (Unit* owner = GetUnitOwner()->GetOwner())
@@ -662,7 +662,7 @@ class spell_sha_earth_shield : public SpellScriptLoader
                         AddPct(amount, glyphe->GetAmount());
 
                     // xinef: Improved Shields
-                    if (baseAmount = amount - baseAmount)
+                    if ((baseAmount = amount - baseAmount))
                         if (AuraEffect* aurEff = caster->GetAuraEffect(SPELL_AURA_ADD_PCT_MODIFIER, SPELLFAMILY_SHAMAN, 19, EFFECT_1))
                         {
                             ApplyPct(baseAmount, aurEff->GetAmount());
@@ -671,12 +671,12 @@ class spell_sha_earth_shield : public SpellScriptLoader
                 }
             }
 
-            bool CheckProc(ProcEventInfo& eventInfo)
+            bool CheckProc(ProcEventInfo&  /*eventInfo*/)
             {
                 return !GetTarget()->HasSpellCooldown(SPELL_SHAMAN_EARTH_SHIELD_HEAL);
             }
 
-            void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+            void HandleProc(AuraEffect const* aurEff, ProcEventInfo&  /*eventInfo*/)
             {
                 PreventDefaultAction();
                 GetTarget()->CastCustomSpell(SPELL_SHAMAN_EARTH_SHIELD_HEAL, SPELLVALUE_BASE_POINT0, aurEff->GetAmount(), GetTarget(), true, NULL, aurEff, GetCasterGUID());

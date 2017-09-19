@@ -86,9 +86,9 @@ enum SummonPhases
 
 static Position RoomPosition[] =
 {
-    {1293.0f, 610.0f, 199.3f},
-    {1294.2f, 724.3f, 199.3f},
-    {1295.2f, 667.1f, 189.7f},
+    {1293.0f, 610.0f, 199.3f, 0.0f},
+    {1294.2f, 724.3f, 199.3f, 0.0f},
+    {1295.2f, 667.1f, 189.7f, 0.0f},
 };
 
 class boss_sjonnir : public CreatureScript
@@ -148,7 +148,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit*  /*who*/)
         {
             Talk(SAY_AGGRO);
             
@@ -309,7 +309,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit*  /*killer*/)
         {
             Talk(SAY_DEATH);
 
@@ -325,7 +325,7 @@ public:
             }
         }
 
-        void KilledUnit(Unit *victim)
+        void KilledUnit(Unit * /*victim*/)
         {
             if (urand(0,1))
                 return;
@@ -389,7 +389,7 @@ public:
     {
         boss_sjonnir_dwarfAI(Creature *c) : ScriptedAI(c) { }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32  /*diff*/)
         {
             if (!UpdateVictim())
                 return;             
@@ -423,7 +423,7 @@ public:
         {
             events.ScheduleEvent(EVENT_TOXIC_VOLLEY, 5000);
         }
-        void JustDied(Unit* killer)
+        void JustDied(Unit*  /*killer*/)
         {
             if (InstanceScript *pInstance = me->GetInstanceScript())
                 if (Creature *sjonnir = ObjectAccessor::GetCreature(*me, pInstance->GetData64(NPC_SJONNIR)))

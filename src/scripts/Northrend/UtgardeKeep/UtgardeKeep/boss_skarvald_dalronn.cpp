@@ -127,12 +127,12 @@ public:
                 Talk(YELL_SKARVALD_KILL);
         }
 
-        void JustDied(Unit* Killer)
+        void JustDied(Unit*  /*Killer*/)
         {
             if( me->GetEntry() != NPC_SKARVALD )
                 return;
-            if( pInstance )
-                if( Creature* dalronn = pInstance->instance->GetCreature(pInstance->GetData64(DATA_DALRONN)) )
+            if( pInstance ) {
+                if( Creature* dalronn = pInstance->instance->GetCreature(pInstance->GetData64(DATA_DALRONN)) ) {
                     if( dalronn->isDead() )
                     {
                         Talk(YELL_SKARVALD_SKA_DIEDFIRST);
@@ -145,6 +145,9 @@ public:
                         Talk(YELL_SKARVALD_DAL_DIED);
                         dalronn->AI()->DoAction(1);
                     }
+                }
+            }
+
             me->CastSpell((Unit*)NULL, SPELL_SUMMON_SKARVALD_GHOST, true);
         }
 
@@ -277,12 +280,12 @@ public:
             summons.Summon(s);
         }
 
-        void JustDied(Unit* Killer)
+        void JustDied(Unit*  /*Killer*/)
         {
             if( me->GetEntry() != NPC_DALRONN )
                 return;
-            if( pInstance )
-                if( Creature* skarvald = pInstance->instance->GetCreature(pInstance->GetData64(DATA_SKARVALD)) )
+            if( pInstance ) {
+                if( Creature* skarvald = pInstance->instance->GetCreature(pInstance->GetData64(DATA_SKARVALD)) ) {
                     if( skarvald->isDead() )
                     {
                         Talk(YELL_DALRONN_DAL_DIEDFIRST);
@@ -295,6 +298,8 @@ public:
                         Talk(YELL_DALRONN_SKA_DIED);
                         skarvald->AI()->DoAction(1);
                     }
+                }
+            }
             me->CastSpell((Unit*)NULL, SPELL_SUMMON_DALRONN_GHOST, true);
         }
 

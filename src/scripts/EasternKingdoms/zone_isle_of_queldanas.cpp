@@ -323,7 +323,7 @@ public:
                                     spawnPos.m_positionX += 5.0f*cos(4.5f);
                                     spawnPos.m_positionY += 5.0f*sin(4.5f);
                                     for (uint8 i=0; i<5; ++i)
-                                        if (Creature* s = me->SummonCreature(NPC_SCOURGE_ZOMBIE, spawnPos, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2000))
+                                        if (me->SummonCreature(NPC_SCOURGE_ZOMBIE, spawnPos, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2000))
                                         {
                                             spawnPos.m_positionX += 2.5f*cos(4.5f);
                                             spawnPos.m_positionY += 2.5f*sin(4.5f);
@@ -474,7 +474,7 @@ public:
     {
         PrepareSpellScript(spell_bh_cleanse_quel_delar_SpellScript);
 
-        void OnEffect(SpellEffIndex effIndex)
+        void OnEffect(SpellEffIndex  /*effIndex*/)
         {
             if (Unit* caster = GetCaster())
                 if (Creature* c = caster->FindNearestCreature(NPC_ROMMATH, 50.0f, true))

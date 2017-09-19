@@ -1155,7 +1155,7 @@ public:
         return true;
     }
 
-    void SendActionMenu(Player* player, GameObject* gameobject, uint32 uiAction)
+    void SendActionMenu(Player* player, GameObject*  /*gameobject*/, uint32 uiAction)
     {
         switch(uiAction)
         {

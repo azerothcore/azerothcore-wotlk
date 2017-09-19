@@ -183,7 +183,7 @@ bool Weather::ReGenerate()
     return m_type != old_type || m_grade != old_grade;
 }
 
-void Weather::SendWeatherUpdateToPlayer(Player* player)
+void Weather::SendWeatherUpdateToPlayer(Player*  /*player*/)
 {
     WorldPacket data(SMSG_WEATHER, (4 + 4 + 1));
     data << uint32(GetWeatherState());

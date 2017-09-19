@@ -227,7 +227,7 @@ class spell_boss_magus_telestra_summon_telestra_clones : public SpellScriptLoade
                 return GetUnitOwner()->GetTypeId() == TYPEID_UNIT;
             }
 
-            void HandleApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+            void HandleApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
                 GetUnitOwner()->ToCreature()->AI()->Talk(SAY_SPLIT);
                 GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_FIRE_MAGUS_SUMMON, true);
@@ -240,7 +240,7 @@ class spell_boss_magus_telestra_summon_telestra_clones : public SpellScriptLoade
 
             }
 
-            void HandleRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+            void HandleRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
                 GetUnitOwner()->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                 GetUnitOwner()->SetControlled(false, UNIT_STATE_STUNNED);
@@ -286,7 +286,7 @@ class spell_boss_magus_telestra_gravity_well : public SpellScriptLoader
                 {
                     pos.Relocate(GetCaster()->GetPositionX(), GetCaster()->GetPositionY(), GetCaster()->GetPositionZ()+1.0f);
                     float o = frand(0, 2*M_PI);
-                    target->MovePositionToFirstCollision(pos, 20.0f, frand(0, 2*M_PI));
+                    target->MovePositionToFirstCollision(pos, 20.0f, o);
                     pos.m_positionZ += frand(5.0f, 15.0f);
                 }
                 else
