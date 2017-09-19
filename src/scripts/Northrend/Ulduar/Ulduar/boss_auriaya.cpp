@@ -178,10 +178,10 @@ public:
 			me->setActive(true);
 		}
 
-		void KilledUnit(Unit* /*victim*/)
+		void KilledUnit(Unit* victim)
 		{
-            if (victim->GetTypeId() == TYPEID_PLAYER)
-                Talk(SAY_SLAY);
+                    if (victim->GetTypeId() == TYPEID_PLAYER)
+                        Talk(SAY_SLAY);
 		}
 
 		void JustDied(Unit */*victim*/)
