@@ -1,3 +1,12 @@
+<!-- IF YOU DO NOT FILL THIS OUT, WE WILL CLOSE YOUR ISSUE! -->
+<!-- IF YOU DO NOT FILL THIS OUT, WE WILL CLOSE YOUR ISSUE! -->
+<!-- IF YOU DO NOT FILL THIS OUT, WE WILL CLOSE YOUR ISSUE! -->
+<!-- IF YOU DO NOT FILL THIS OUT, WE WILL CLOSE YOUR ISSUE! -->
+<!-- IF YOU DO NOT FILL THIS OUT, WE WILL CLOSE YOUR ISSUE! -->
+<!-- IF YOU DO NOT FILL THIS OUT, WE WILL CLOSE YOUR ISSUE! -->
+<!-- IF YOU DO NOT FILL THIS OUT, WE WILL CLOSE YOUR ISSUE! -->
+<!-- IF YOU DO NOT FILL THIS OUT, WE WILL CLOSE YOUR ISSUE! -->
+
 **Description**:
 
 **Current behaviour**: Tell us what happens
@@ -12,7 +21,7 @@
 
 **Branch(es)**: 0.x / 1.x / master (Specify the branch(es) affected by this issue) 
 
-**AC hash/commit**:  
+**AC hash/commit**:  <!-- IF YOU DO NOT FILL THIS OUT, WE WILL CLOSE YOUR ISSUE! -->
 
 **Operating system**:  
 

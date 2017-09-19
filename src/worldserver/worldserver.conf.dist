@@ -1199,6 +1199,14 @@ Instance.IgnoreLevel = 0
 Instance.IgnoreRaid = 0
 
 #
+#    Instance.GMSummonPlayer
+#        Description: Allow GM to summon players or only other GM accounts inside instances.
+#        Default:     0 - (Disabled, Only GM accounts can be summoned by GM)
+#                     1 - (Enabled, GM and Player accounts can be summoned by GM)
+
+Instance.GMSummonPlayer = 0
+
+#
 #    Instance.ResetTimeHour
 #        Description: Hour of the day when the global instance reset occurs.
 #        Range:       0-23
