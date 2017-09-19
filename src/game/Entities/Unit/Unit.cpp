@@ -8835,7 +8835,7 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
                 if (!roll_chance_i(aurEff->GetAmount()))
                 {
                     // Xinef: dont allow normal proc to override set one
-                    if (Aura* aura = GetAura((trigger_spell_id == 46916) ? 71072 : 71069))
+                    if (GetAura((trigger_spell_id == 46916) ? 71072 : 71069))
                         return false;
                     // Xinef: just to be sure
                     RemoveAurasDueToSpell(70849);

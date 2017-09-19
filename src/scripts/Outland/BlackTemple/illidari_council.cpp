@@ -413,7 +413,7 @@ class boss_high_nethermancer_zerevor : public CreatureScript
                         events.ScheduleEvent(EVENT_SPELL_BLIZZARD, 40000);
                         break;
                     case EVENT_SPELL_ARCANE_EXPLOSION:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 10.0f))
+                        if (SelectTarget(SELECT_TARGET_RANDOM, 0, 10.0f))
                             me->CastSpell(me, SPELL_ARCANE_EXPLOSION, false);
                         events.ScheduleEvent(EVENT_SPELL_ARCANE_EXPLOSION, 10000);
                         break;                      

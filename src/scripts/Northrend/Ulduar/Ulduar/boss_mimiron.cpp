@@ -550,7 +550,7 @@ public:
                     events.ScheduleEvent(EVENT_ELEVATOR_INTERVAL_1, 6000);
                     break;
                 case EVENT_ELEVATOR_INTERVAL_1:
-                    if( Creature* VX001 = me->SummonCreature(NPC_VX001, 2744.65f, 2569.46f, 364.40f, 3.14f, TEMPSUMMON_MANUAL_DESPAWN) )
+                    if(me->SummonCreature(NPC_VX001, 2744.65f, 2569.46f, 364.40f, 3.14f, TEMPSUMMON_MANUAL_DESPAWN))
                     {
                         if( GameObject *elevator = me->FindNearestGameObject(GO_MIMIRON_ELEVATOR, 100.0f) )
                         {

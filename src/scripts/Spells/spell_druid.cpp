@@ -624,7 +624,7 @@ class spell_dru_lifebloom : public SpellScriptLoader
             {
                 if (Unit* target = GetUnitOwner())
                 {
-                    if (AuraEffect const* aurEff = GetEffect(EFFECT_1))
+                    if (GetEffect(EFFECT_1))
                     {
                         Unit* caster = GetCaster();
                         int32 healAmount = GetSpellInfo()->Effects[EFFECT_1].CalcValue(caster ? caster : target, 0, target) * dispelInfo->GetRemovedCharges();

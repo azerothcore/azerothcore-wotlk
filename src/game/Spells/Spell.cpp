@@ -3948,7 +3948,7 @@ void Spell::_handle_finish_phase()
         m_caster->HandleProcExtraAttackFor(m_caster->GetVictim());
 
     if (!IsAutoRepeat() && !IsNextMeleeSwingSpell())
-        if (Player* p = m_caster->GetCharmerOrOwnerPlayerOrPlayerItself())
+        if (m_caster->GetCharmerOrOwnerPlayerOrPlayerItself())
             for (std::list<TargetInfo>::iterator ihit = m_UniqueTargetInfo.begin(); ihit != m_UniqueTargetInfo.end(); ++ihit)
             {
                 // Xinef: Properly clear infinite cooldowns in some cases

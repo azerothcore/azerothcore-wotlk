@@ -1810,7 +1810,7 @@ public:
                         events.RepeatEvent(5000);
                     break;
                 case EVENT_SPELL_STRANGULATE:
-                    if( Unit* target = SelectEnemyCaster(false, 30.0f) )
+                    if(SelectEnemyCaster(false, 30.0f))
                     {
                         me->CastSpell(me->GetVictim(), SPELL_STRANGULATE, false);
                         events.RepeatEvent(120000);

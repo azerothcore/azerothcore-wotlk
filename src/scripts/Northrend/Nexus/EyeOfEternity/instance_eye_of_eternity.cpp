@@ -150,7 +150,7 @@ public:
                             if (GameObject* go = instance->GetGameObject(GO_ExitPortalGUID))
                                 go->SetPhaseMask(1, true);
                             if (Creature* c = instance->GetCreature(NPC_MalygosGUID))
-                                if (Creature* alexstrasza = c->SummonCreature(NPC_ALEXSTRASZA, 798.0f, 1268.0f, 299.0f, 2.45f ,TEMPSUMMON_TIMED_DESPAWN, 604800000))
+                                if (c->SummonCreature(NPC_ALEXSTRASZA, 798.0f, 1268.0f, 299.0f, 2.45f ,TEMPSUMMON_TIMED_DESPAWN, 604800000))
                             break;
                     }
                     if (data == DONE)

@@ -165,7 +165,7 @@ public:
                 // pussywizard:
                 bool reset = true;
                 if (instance)
-                    if (Creature* nefarian = instance->instance->GetCreature(instance->GetData64(DATA_NEFARIAN)))
+                    if (/*Creature* nefarian = */instance->instance->GetCreature(instance->GetData64(DATA_NEFARIAN)))
                         reset = false;
                 if (reset)
                     _Reset();

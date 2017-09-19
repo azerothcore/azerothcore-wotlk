@@ -1871,7 +1871,7 @@ public:
                     events.ScheduleEvent(2, 4500);
                     break;
                 case 3:
-                    if (Unit* target = SelectTargetFromPlayerList(30.0f, 0, true))
+                    if (SelectTargetFromPlayerList(30.0f, 0, true))
                         me->CastSpell(me->GetVictim(), 70145, false);
                     events.ScheduleEvent(3, 9000);
                     break;

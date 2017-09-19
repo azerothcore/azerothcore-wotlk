@@ -1186,7 +1186,7 @@ public:
             }
 
             // Check if exhausted
-            if (Aura* exh = caster->GetAura(SPELL_RAM_EXHAUSTED))
+            if (caster->GetAura(SPELL_RAM_EXHAUSTED))
             {
                 if (privateLevel)
                 {
@@ -1397,7 +1397,7 @@ public:
         SpellCastResult CheckTarget()
         {
             if (Unit* caster = GetCaster())
-                if (Player* pCaster = caster->ToPlayer())
+                if (caster->ToPlayer())
                     if (Unit* target = caster->ToPlayer()->GetSelectedUnit())
                         if (target->GetEntry() == 23487 && target->IsAlive())
                             return SPELL_CAST_OK;

@@ -640,7 +640,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                 {
                     uint8 level = m_caster->getLevel();
                     uint32 block_value = m_caster->GetShieldBlockValue(uint32(float(level) * 29.5f), uint32(float(level) * 34.5f));
-                    if (AuraEffect *aurEff = m_caster->GetAuraEffect(64882, EFFECT_0))
+                    if (m_caster->GetAuraEffect(64882, EFFECT_0))
                         block_value += 225;
                     damage += CalculatePct(block_value, m_spellInfo->Effects[EFFECT_1].CalcValue());
                     break;

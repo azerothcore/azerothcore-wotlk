@@ -734,7 +734,7 @@ void BattlegroundMgr::BuildBattlegroundListPacket(WorldPacket* data, uint64 guid
         *data << uint32(0);                                 // number of bg instances
 
         if (Battleground* bgt = GetBattlegroundTemplate(bgTypeId))
-            if (PvPDifficultyEntry const* bracketEntry = GetBattlegroundBracketByLevel(bgt->GetMapId(), player->getLevel()))
+            if (GetBattlegroundBracketByLevel(bgt->GetMapId(), player->getLevel()))
             {
                 uint32 count = 0;
                 /*for (BattlegroundClientIdsContainer::const_iterator itr = clientIds.begin(); itr != clientIds.end(); ++itr)

@@ -455,7 +455,7 @@ public:
                 }
                 case EVENT_ABEDNEUM_HEAD: // Third
                 {
-                    if (Creature *abedneum = GetAbedneum())
+                    if (GetAbedneum())
                     {
                         Player *plr = SelectTargetFromPlayerList(100.0f);
                         if (!plr)

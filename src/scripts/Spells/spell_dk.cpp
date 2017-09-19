@@ -937,7 +937,7 @@ class spell_dk_pet_scaling : public SpellScriptLoader
                     int32 modifier = 33;
 
                     // xinef: impurity
-                    if (AuraEffect const* impurityEff = owner->GetDummyAuraEffect(SPELLFAMILY_DEATHKNIGHT, 1986, 0))
+                    if (owner->GetDummyAuraEffect(SPELLFAMILY_DEATHKNIGHT, 1986, 0))
                         modifier = 40;
 
                     amount = CalculatePct(std::max<int32>(0, owner->GetTotalAttackPowerValue(BASE_ATTACK)), modifier);
