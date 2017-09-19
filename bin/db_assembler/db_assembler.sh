@@ -269,7 +269,7 @@ do
             break
             ;;
         "Quit")
-            break
+            exit
             ;;
         *) echo invalid option;;
     esac
