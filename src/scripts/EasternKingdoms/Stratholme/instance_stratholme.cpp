@@ -233,7 +233,7 @@ class instance_stratholme : public InstanceMapScript
                 }
             }
 
-            void DoSpawnPlaguedCritters(uint8 uiGate, Player* player)
+            void DoSpawnPlaguedCritters(uint8 /*uiGate*/, Player* player)
             {
                 if (!player)
                     return;
