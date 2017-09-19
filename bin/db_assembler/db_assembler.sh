@@ -118,42 +118,160 @@ function assemble() {
 }
 
 function run() {
-    echo "===== STARTING PROCESS ====="
+    echo "===== STARTING ASSEMBLY PROCESS ====="
 
-        mkdir -p $OUTPUT_FOLDER
+        mkdir -p "$OUTPUT_FOLDER"
 
         for db in ${DATABASES[@]}
         do
             assemble "$db" $version".sql" $1 $2 $3
         done
 
-    echo "===== DONE ====="
+    echo "=====           DONE            ====="
 }
 
+function db_backup() {
+    echo "backing up $1"
+
+    database=${1,,}
+
+    uc=${database^^}
+
+    name="DB_"$uc"_CONF"
+    confs=${!name}
+
+    name="DB_"$uc"_NAME"
+    dbname=${!name}
+
+    eval $confs;
+
+    export MYSQL_PWD=$MYSQL_PASS
+
+    now=`date +%s`
+
+    "$DB_MYSQL_DUMP_EXEC" --opt --user="$MYSQL_USER" --host="$MYSQL_HOST" "$dbname" > "${BACKUP_FOLDER}${database}_backup_${now}.sql" && echo "done"
+}
+
+function db_import() {
+    echo "importing $1 - $2"
+
+    database=${1,,}
+    type=$2
+
+    uc=${database^^}
+
+    name="DB_"$uc"_CONF"
+    confs=${!name}
+
+    name="DB_"$uc"_NAME"
+    dbname=${!name}
+
+    eval $confs;
+
+    export MYSQL_PWD=$MYSQL_PASS
+
+    "$DB_MYSQL_EXEC" -h "$MYSQL_HOST" -u "$MYSQL_USER" "$dbname" < "${OUTPUT_FOLDER}${database}_${type}.sql"
+}
+
+function import () {
+    run $1 $2 $2
+
+
+    with_base=$1
+    with_updates=$2
+    with_custom=$3
+
+    #
+    # BACKUP
+    #
+
+    if [ $BACKUP_ENABLE = true ]; then
+        echo "===== STARTING BACKUP PROCESS ====="
+        mkdir -p "$BACKUP_FOLDER"
+
+        for db in ${DATABASES[@]}
+        do
+            db_backup "$db"
+        done
+        echo "=====           DONE            ====="
+    fi
+
+    echo "===== STARTING IMPORTING PROCESS ====="
+    #
+    # IMPORT
+    #
+    if [ $with_base = true ]; then
+        for db in ${DATABASES[@]}
+        do
+            db_import "$db" "base"
+        done
+    fi 
+
+    if [ $with_updates = true ]; then
+        for db in ${DATABASES[@]}
+        do
+            db_import "$db" "update"
+        done
+    fi 
+
+    if [ $with_custom = true ]; then
+        for db in ${DATABASES[@]}
+        do
+            db_import "$db" "custom"
+        done
+    fi 
+
+    echo "=====           DONE            ====="
+}
+
+while true
+do
+echo "=====     DB ASSEMBLER MENU     ====="
 PS3='Please enter your choice: '
-options=("Create ALL" "Create only bases" "Create only updates" "Create only customs" "Quit")
+options=(
+    "Assemble ALL" "Assemble only bases" "Assemble only updates" "Assemble only customs"
+    "Quit"
+    "Assemble & import ALL" "Assemble & import only bases" "Assemble & import only updates" "Assemble & import only customs" 
+    )
 select opt in "${options[@]}"
 do
     case $opt in
-        "Create ALL")
+        "Assemble ALL")
             run true true true
-            break #avoid loop
+            break
             ;;
-        "Create only bases")
+        "Assemble only bases")
             run true false false
-            break #avoid loop
+            break
             ;;
-        "Create only updates")
+        "Assemble only updates")
             run false true false
-            break #avoid loop
+            break
             ;;
-        "Create only customs")
+        "Assemble only customs")
             run false false true
-            break #avoid loop
+            break
+            ;;
+        "Assemble & import ALL")
+            import true true true
+            break
+            ;;
+        "Assemble & import only bases")
+            import true false false
+            break
+            ;;
+        "Assemble & import only updates")
+            import false true false
+            break
+            ;;
+        "Assemble & import only customs")
+            import false false true
+            break
             ;;
         "Quit")
             break
             ;;
         *) echo invalid option;;
     esac
+done
 done

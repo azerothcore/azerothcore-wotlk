@@ -55,6 +55,15 @@ DATABASES=(
 
 OUTPUT_FOLDER="output/"
 
+#
+# Enable following flag 
+# if you want backup your db
+# before import sql with db_assembler
+#
+BACKUP_ENABLE=true
+
+BACKUP_FOLDER="backup/"
+
 # FULL DB
 DB_CHARACTERS_PATHS=(
     $SRCPATH"/data/sql/base/db_characters"
@@ -71,14 +80,17 @@ DB_WORLD_PATHS=(
 # UPDATES
 DB_CHARACTERS_UPDATE_PATHS=(
     $SRCPATH"/data/sql/updates/db_characters/"
+    $SRCPATH"/data/sql/updates/pending_db_characters/"
 )
 
 DB_AUTH_UPDATE_PATHS=(
     $SRCPATH"/data/sql/updates/db_auth/"
+    $SRCPATH"/data/sql/updates/pending_db_auth/"
 )
 
 DB_WORLD_UPDATE_PATHS=(
     $SRCPATH"/data/sql/updates/db_world/"
+    $SRCPATH"/data/sql/updates/pending_db_world/"
 )
 
 # CUSTOM
@@ -100,7 +112,15 @@ DB_WORLD_CUSTOM_PATHS=(
 #
 ##############################################
 
+#
+# Example:
+#        "C:/Program Files/MySQL/MySQL Server 5.6/bin/mysql.exe"
+#        "/usr/bin/mysql"
+#        "mysql"
+#
 
+DB_MYSQL_EXEC="mysql"
+DB_MYSQL_DUMP_EXEC="mysqldump"
 
 DB_CHARACTERS_CONF="MYSQL_USER='root'; \
                     MYSQL_PASS='root'; \
