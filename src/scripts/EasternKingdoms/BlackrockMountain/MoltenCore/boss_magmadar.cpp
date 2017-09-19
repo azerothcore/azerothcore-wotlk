@@ -148,7 +148,7 @@ public:
 
         }
 
-        void EnterCombat(Unit* victim)
+        void EnterCombat(Unit* /*victim*/)
         {
             events.ScheduleEvent(EVENT_SERRATED_BITE, 10000); // timer may be wrong
             smoldering = false;
