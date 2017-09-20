@@ -191,7 +191,7 @@ public:
             return false;
         }
 
-        if (tokens.size() != count+2)
+        if (tokens.size() != uint16(count+2))
         {
             handler->PSendSysMessage("Invalid number of nicknames for this bracket.");
             handler->SetSentErrorMessage(true);

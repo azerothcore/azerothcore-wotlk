@@ -1009,12 +1009,7 @@ namespace Trinity
         public:
             AnyAttackableUnitExceptForOriginalCasterInObjectRangeCheck(WorldObject const* obj, Unit const* funit, float range)
                 : i_obj(obj), i_funit(funit), i_range(range)
-            {
-                Unit const* check = i_funit;
-                Unit const* owner = i_funit->GetOwner();
-                if (owner)
-                    check = owner;
-            }
+            {}
             bool operator()(Unit* u)
             {
                 if (!u->IsAlive() || u->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE) || (u->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC) && !u->IsInCombat()))

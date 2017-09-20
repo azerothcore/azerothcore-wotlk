@@ -537,9 +537,9 @@ public:
             summons.DoAction(_currentIllusion, pred);
 
             if (_isIllusionReversed)
-                _currentIllusion = _currentIllusion == 3 ? 1 : ++_currentIllusion;
+                _currentIllusion = _currentIllusion == 3 ? 1 : (_currentIllusion+1);
             else
-                _currentIllusion = _currentIllusion == 1 ? 3 : --_currentIllusion;
+                _currentIllusion = _currentIllusion == 1 ? 3 : (_currentIllusion-1);
         }
 
         void SpellSounds()

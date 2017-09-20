@@ -956,7 +956,7 @@ class boss_the_lich_king : public CreatureScript
                 if (me->HasUnitState(UNIT_STATE_CASTING) && !((1 << _phase) & PHASE_MASK_NO_CAST_CHECK))
                     return;
 
-                switch (uint32 eventId = events.ExecuteEvent())
+                switch (events.ExecuteEvent())
                 {
                     case EVENT_BERSERK:
                         Talk(SAY_LK_BERSERK);
@@ -1342,7 +1342,7 @@ class npc_tirion_fordring_tft : public CreatureScript
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
 
-                switch (uint32 eventId = _events.ExecuteEvent())
+                switch (_events.ExecuteEvent())
                 {
                     case EVENT_INTRO_LK_MOVE:
                         if (Creature* theLichKing = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_THE_LICH_KING)))
@@ -1799,7 +1799,7 @@ class npc_shambling_horror_icc : public CreatureScript
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
 
-                switch (uint32 eventId = _events.ExecuteEvent())
+                switch (_events.ExecuteEvent())
                 {
                     case EVENT_SHOCKWAVE:
                         me->CastSpell(me->GetVictim(), SPELL_SHOCKWAVE, false);
@@ -2329,7 +2329,7 @@ class npc_raging_spirit : public CreatureScript
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
 
-                switch (uint32 eventId = _events.ExecuteEvent())
+                switch (_events.ExecuteEvent())
                 {
                     case EVENT_RAGING_SPIRIT_UNROOT:
                         {
@@ -2581,10 +2581,10 @@ class npc_valkyr_shadowguard : public CreatureScript
                             }
                             dropped = true;
                             _events.Reset();
-                            Player* p = NULL;
+                            /*Player* p = NULL;
                             if (Vehicle* v = me->GetVehicleKit())
                                 if (Unit* passenger = v->GetPassenger(0))
-                                    p = passenger->ToPlayer();
+                                    p = passenger->ToPlayer();*/
                             me->CastSpell((Unit*)NULL, SPELL_EJECT_ALL_PASSENGERS, false);
 
                             if (IsHeroic())
@@ -2619,7 +2619,7 @@ class npc_valkyr_shadowguard : public CreatureScript
                 if (me->HasUnitState(UNIT_STATE_CASTING | UNIT_STATE_STUNNED))
                     return;
 
-                switch (uint32 eventId = _events.ExecuteEvent())
+                switch (_events.ExecuteEvent())
                 {
                     case EVENT_GRAB_PLAYER:
                         if (!_grabbedPlayer)
@@ -3154,7 +3154,7 @@ class npc_strangulate_vehicle : public CreatureScript
             {
                 _events.Update(diff);
 
-                switch (uint32 eventId = _events.ExecuteEvent())
+                switch (_events.ExecuteEvent())
                 {
                     case EVENT_TELEPORT:
                         me->GetMotionMaster()->Clear(false);
@@ -3281,7 +3281,7 @@ class npc_terenas_menethil : public CreatureScript
 
                 _events.Update(diff);
 
-                switch (uint32 eventId = _events.ExecuteEvent())
+                switch (_events.ExecuteEvent())
                 {
                     case EVENT_FROSTMOURNE_TALK_1:
                         me->SetControlled(false, UNIT_STATE_ROOT);

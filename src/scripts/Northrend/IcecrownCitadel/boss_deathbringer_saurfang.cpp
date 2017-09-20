@@ -653,7 +653,7 @@ class npc_high_overlord_saurfang_icc : public CreatureScript
             void UpdateAI(uint32 diff)
             {
                 _events.Update(diff);
-                switch (uint32 eventId = _events.ExecuteEvent())
+                switch (_events.ExecuteEvent())
                 {
                     case 0:
                         break;
@@ -894,7 +894,7 @@ class npc_muradin_bronzebeard_icc : public CreatureScript
             void UpdateAI(uint32 diff)
             {
                 _events.Update(diff);
-                switch (uint32 eventId = _events.ExecuteEvent())
+                switch (_events.ExecuteEvent())
                 {
                     case 0:
                         break;
@@ -1057,9 +1057,9 @@ class spell_deathbringer_blood_link_aura : public SpellScriptLoader
                 Unit* victim = eventInfo.GetActionTarget();
                 SpellInfo const* procSpell = eventInfo.GetDamageInfo()->GetSpellInfo();
 
-                uint32 markCount = 0;
-                if (Creature* saurfang = eventInfo.GetActor()->ToCreature())
-                    markCount = saurfang->IsAIEnabled ? saurfang->AI()->GetData(123456 /*FALLEN_CHAMPION_CAST_COUNT*/) : 0;
+                //uint32 markCount = 0;
+                //if (Creature* saurfang = eventInfo.GetActor()->ToCreature())
+                    //markCount = saurfang->IsAIEnabled ? saurfang->AI()->GetData(123456 /*FALLEN_CHAMPION_CAST_COUNT*/) : 0;
                 int32 basepoints = int32(1.0f /*+ 0.5f + 0.5f*markCount*/);
                 switch (procSpell->Id) // some spells give more Blood Power
                 {
@@ -1106,13 +1106,15 @@ class spell_deathbringer_blood_link_blood_beast_aura : public SpellScriptLoader
             {
                 PreventDefaultAction();
 
+                /*
                 uint32 markCount = 0;
                 if (Map* map = eventInfo.GetActor()->FindMap())
                     if (InstanceMap* imap = map->ToInstanceMap())
                         if (InstanceScript* isc = imap->GetInstanceScript())
-                            if (uint64 sguid = isc->GetData64(3 /*DATA_DEATHBRINGER_SAURFANG*/))
+                            if (uint64 sguid = isc->GetData64(3) //DATA_DEATHBRINGER_SAURFANG
                                 if (Creature* saurfang = ObjectAccessor::GetCreature(*eventInfo.GetActor(), sguid))
-                                    markCount = saurfang->IsAIEnabled ? saurfang->AI()->GetData(123456 /*FALLEN_CHAMPION_CAST_COUNT*/) : 0;
+                                    markCount = saurfang->IsAIEnabled ? saurfang->AI()->GetData(123456) : 0; //FALLEN_CHAMPION_CAST_COUNT
+                */
                 int32 basepoints = int32(3.0f /*+ 0.5f + 0.5f*markCount*/);
 
                 eventInfo.GetActor()->CastCustomSpell(SPELL_BLOOD_LINK_DUMMY, SPELLVALUE_BASE_POINT0, basepoints, eventInfo.GetActionTarget(), true);
