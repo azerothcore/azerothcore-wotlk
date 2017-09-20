@@ -1,159 +1,61 @@
 #!/usr/bin/env bash
 
-unamestr=`uname`
-if [[ "$unamestr" == 'Darwin' ]]; then
-   SRCPATH=$(greadlink -f "../../")
-else
-   SRCPATH=$(readlink -f "../../")
-fi
+CURRENT_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-source $SRCPATH"/bin/bash_shared/includes.sh"
+source "$CURRENT_PATH/includes/includes.sh"
 
-if [ -f "./config.sh"  ]; then
-    source "./config.sh" # should overwrite previous
-fi
+cmdopt=$1
 
-function assemble() {
-    # to lowercase
-    database=${1,,}
-    start_sql=$2
-    with_base=$3
-    with_updates=$4
-    with_custom=$5
-
-    uc=${database^^}
-
-    name="DB_"$uc"_PATHS"
-    v="$name[@]"
-    base=("${!v}")
-
-    name="DB_"$uc"_UPDATE_PATHS"
-    v="$name[@]"
-    updates=("${!v}")
-
-    name='DB_'$uc'_CUSTOM_PATHS'
-    v="$name[@]"
-    custom=("${!v}")
-
-
-    suffix_base="_base"
-    suffix_upd="_update"
-    suffix_custom="_custom"
-
-    curTime=`date +%Y_%m_%d_%H_%M_%S`
-
-    if [ $with_base = true ]; then
-        echo "" > $OUTPUT_FOLDER$database$suffix_base".sql"
-
-
-        if [ ! ${#base[@]} -eq 0 ]; then
-            echo "Generating $OUTPUT_FOLDER$database$suffix_base ..."
-
-            for d in "${base[@]}"
-            do
-                echo "Searching on $d ..."
-                if [ ! -z $d ]; then
-                    for entry in "$d"/*.sql "$d"/**/*.sql
-                    do
-                        if [[ -e $entry ]]; then
-                            cat "$entry" >> $OUTPUT_FOLDER$database$suffix_base".sql"
-                        fi
-                    done
-                fi
-            done
-        fi
-    fi
-
-    if [ $with_updates = true ]; then
-        updFile=$OUTPUT_FOLDER$database$suffix_upd".sql"
-
-        echo "" > $updFile
-
-        if [ ! ${#updates[@]} -eq 0 ]; then
-            echo "Generating $OUTPUT_FOLDER$database$suffix_upd ..."
-
-            for d in "${updates[@]}"
-            do
-                echo "Searching on $d ..."
-                if [ ! -z $d ]; then
-                    for entry in "$d"/*.sql "$d"/**/*.sql
-                    do
-                        if [[ ! -e $entry ]]; then
-                            continue
-                        fi
-
-                        echo "-- $file" >> $updFile
-                        cat "$entry" >> $updFile
-                    done
-                fi
-            done
-        fi
-    fi
-
-    if [ $with_custom = true ]; then
-        custFile=$OUTPUT_FOLDER$database$suffix_custom".sql"
-
-        echo "" > $custFile
-
-        if [ ! ${#custom[@]} -eq 0 ]; then
-            echo "Generating $OUTPUT_FOLDER$database$suffix_custom ..."
-
-            for d in "${custom[@]}"
-            do
-                echo "Searching on $d ..."
-                if [ ! -z $d ]; then
-                    for entry in "$d"/*.sql "$d"/**/*.sql
-                    do
-                        if [[ ! -e $entry ]]; then
-                            continue
-                        fi
-
-                        echo "-- $file" >> $custFile
-                        cat "$entry" >> $custFile
-                    done
-                fi
-            done
-        fi
-    fi
-}
-
-function run() {
-    echo "===== STARTING PROCESS ====="
-
-        mkdir -p $OUTPUT_FOLDER
-
-        for db in ${DATABASES[@]}
-        do
-            assemble "$db" $version".sql" $1 $2 $3
-        done
-
-    echo "===== DONE ====="
-}
-
-PS3='Please enter your choice: '
-options=("Create ALL" "Create only bases" "Create only updates" "Create only customs" "Quit")
-select opt in "${options[@]}"
+while true
 do
-    case $opt in
-        "Create ALL")
+echo "=====     DB ASSEMBLER MENU     ====="
+PS3='Please enter your choice: '
+options=(
+    "Assemble ALL" "Assemble only bases" "Assemble only updates" "Assemble only customs"
+    "Quit"
+    "Assemble & import ALL" "Assemble & import only bases" "Assemble & import only updates" "Assemble & import only customs" 
+    )
+
+function _switch() {
+    case $1 in
+        "Assemble ALL")
             run true true true
-            break #avoid loop
             ;;
-        "Create only bases")
+        "Assemble only bases")
             run true false false
-            break #avoid loop
             ;;
-        "Create only updates")
+        "Assemble only updates")
             run false true false
-            break #avoid loop
             ;;
-        "Create only customs")
+        "Assemble only customs")
             run false false true
-            break #avoid loop
+            ;;
+        "Assemble & import ALL")
+            import true true true
+            ;;
+        "Assemble & import only bases")
+            import true false false
+            ;;
+        "Assemble & import only updates")
+            import false true false
+            ;;
+        "Assemble & import only customs")
+            import false false true
             ;;
         "Quit")
-            break
+            echo "Goodbye!"
+            exit
             ;;
         *) echo invalid option;;
     esac
+}
+
+# run option directly if specified in argument
+[ ! -z $1 ] && _switch "${options[$cmdopt-1]}" && exit 0
+
+select opt in "${options[@]}"
+do
+    _switch "$opt"
+    break
+done
 done

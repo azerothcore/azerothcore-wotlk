@@ -206,7 +206,7 @@ public:
         return true;
     }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 sender, uint32 action)
+    bool OnGossipSelect(Player* player, Creature* creature, uint32  /*sender*/, uint32  /*action*/)
     {
         GossipMenuItemData const* gossipMenuItemData = player->PlayerTalkClass->GetGossipMenu().GetItemData(0);
         InstanceScript* instance = creature->GetInstanceScript();
@@ -853,7 +853,7 @@ public:
         return GetInstanceAI<npc_tarethaAI>(creature);
     }
 
-    bool OnGossipHello(Player* player, Creature* creature)
+    bool OnGossipHello(Player*  /*player*/, Creature*  /*creature*/)
     {
         return true;
     }
@@ -867,7 +867,7 @@ public:
 
         InstanceScript* instance;
 
-        void DoAction(int32 param)
+        void DoAction(int32  /*param*/)
         {
             me->SetStandState(UNIT_STAND_STATE_STAND);
             me->RemoveAllAuras();

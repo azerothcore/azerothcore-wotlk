@@ -261,10 +261,11 @@ class BattlegroundAB : public Battleground
             {
             }
 
-            uint8 _state;
+            TeamId _ownerTeamId;
             uint32 _iconNone;
             uint32 _iconCapture;
-            TeamId _ownerTeamId;
+            uint8 _state;
+
             bool _captured;
         };
 

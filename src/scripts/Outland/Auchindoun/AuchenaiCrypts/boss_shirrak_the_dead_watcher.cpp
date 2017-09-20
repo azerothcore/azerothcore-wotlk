@@ -191,7 +191,7 @@ class spell_auchenai_possess : public SpellScriptLoader
                 amplitude = 2000;
             }
 
-            void Update(AuraEffect* effect)
+            void Update(AuraEffect*  /*effect*/)
             {
                 // Xinef: Charm is removed when target is at or below 50%hp
                 if (Unit* owner = GetUnitOwner())

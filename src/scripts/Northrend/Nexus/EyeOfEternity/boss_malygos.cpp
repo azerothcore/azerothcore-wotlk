@@ -260,7 +260,7 @@ public:
             }
         }
 
-        void SpellHit(Unit *caster, const SpellInfo *spell)
+        void SpellHit(Unit * /*caster*/, const SpellInfo *spell)
         {
             if (spell->Id == SPELL_POWER_SPARK_MALYGOS_BUFF) 
             {
@@ -274,7 +274,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit*  /*who*/)
         {
             events.Reset();
             DoZoneInCombat();
@@ -738,7 +738,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit*  /*killer*/)
         {
             me->MonsterYell("UNTHINKABLE! The mortals will destroy... e-everything... my sister... what have you-", LANG_UNIVERSAL, 0);
             me->PlayDirectSound(SOUND_DEATH);
@@ -772,7 +772,7 @@ public:
             }
         }
 
-        void MoveInLineOfSight(Unit* who) {}
+        void MoveInLineOfSight(Unit*  /*who*/) {}
 
         void EnterEvadeMode()
         {
@@ -853,7 +853,7 @@ public:
         bool bUpdatedFlying;
         float VORTEX_RADIUS;
 
-        void PassengerBoarded(Unit* pass, int8 seat, bool apply)
+        void PassengerBoarded(Unit* pass, int8  /*seat*/, bool apply)
         {
             if (pass && !apply && pass->GetTypeId() == TYPEID_PLAYER)
             {
@@ -911,8 +911,8 @@ public:
                 timer -= diff;
         }
 
-        void AttackStart(Unit* who) {}
-        void MoveInLineOfSight(Unit* who) {}
+        void AttackStart(Unit*  /*who*/) {}
+        void MoveInLineOfSight(Unit*  /*who*/) {}
         void DamageTaken(Unit*, uint32 &damage, DamageEffectType, SpellSchoolMask) { damage = 0; }
     };
 };
@@ -1040,7 +1040,7 @@ public:
         EventMap events;
         uint16 timer;
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit*  /*who*/)
         {
             DoZoneInCombat();
             events.Reset();
@@ -1180,8 +1180,8 @@ public:
                 player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_GET_KILLING_BLOWS, 1, 0, me);
         }
 
-        void MoveInLineOfSight(Unit* who) {}
-        void AttackStart(Unit* who) {}
+        void MoveInLineOfSight(Unit*  /*who*/) {}
+        void AttackStart(Unit*  /*who*/) {}
     };
 };
 
@@ -1207,7 +1207,7 @@ public:
         InstanceScript* pInstance;
         EventMap events;
 
-        void PassengerBoarded(Unit *who, int8 seat, bool apply)
+        void PassengerBoarded(Unit *who, int8  /*seat*/, bool apply)
         {
             events.Reset();
             if (!who)
@@ -1325,8 +1325,8 @@ public:
             }
         }
 
-        void MoveInLineOfSight(Unit* who) {}
-        void AttackStart(Unit* who) {}
+        void MoveInLineOfSight(Unit*  /*who*/) {}
+        void AttackStart(Unit*  /*who*/) {}
     };
 };
 
@@ -1391,8 +1391,8 @@ public:
             }
         }
 
-        void MoveInLineOfSight(Unit* who) {}
-        void AttackStart(Unit* who) {}
+        void MoveInLineOfSight(Unit*  /*who*/) {}
+        void AttackStart(Unit*  /*who*/) {}
     };
 };
 
@@ -1411,7 +1411,7 @@ public:
     {
         npc_eoe_wyrmrest_skytalonAI(Creature* pCreature) : VehicleAI(pCreature) { }
 
-        void PassengerBoarded(Unit* pass, int8 seat, bool apply)
+        void PassengerBoarded(Unit* pass, int8  /*seat*/, bool apply)
         {
             if (apply)
             {

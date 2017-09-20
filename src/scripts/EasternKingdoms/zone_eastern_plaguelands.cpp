@@ -259,7 +259,7 @@ public:
                 me->CastSpell(me, SPELL_DEATHS_DOOR, true);
         }
 
-        void MovementInform(uint32 type, uint32 pointId)
+        void MovementInform(uint32 type, uint32  /*pointId*/)
         {
             if (type != POINT_MOTION_TYPE)
                 return;

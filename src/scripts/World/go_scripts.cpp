@@ -127,7 +127,7 @@ class go_arena_ready_marker : public GameObjectScript
 public:
     go_arena_ready_marker() : GameObjectScript("go_arena_ready_marker") { }
 
-    bool OnGossipHello(Player* player, GameObject *go)
+    bool OnGossipHello(Player* player, GameObject * /*go*/)
     {
         if (Battleground* bg = player->GetBattleground())
             bg->ReadyMarkerClicked(player);
@@ -273,19 +273,19 @@ public:
                 go->SummonCreature(NPC_WINTERFIN_TADPOLE, go->GetPositionX()+cos(2*M_PI*i/3.0f)*0.60f, go->GetPositionY()+sin(2*M_PI*i/3.0f)*0.60f, go->GetPositionZ()+0.5f, go->GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30000);
         }
 
-        void OnStateChanged(uint32 state, Unit* unit)
+        void OnStateChanged(uint32 state, Unit*  /*unit*/)
         {
             if (requireSummon == 1 && state == GO_READY)
                 requireSummon = 2;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32  /*diff*/)
         {
             if (go->isSpawned() && requireSummon == 2)
                 SummonTadpoles();
         }
 
-        bool GossipHello(Player* player, bool reportUse)
+        bool GossipHello(Player* player, bool  /*reportUse*/)
         {
             if (requireSummon)
                 return false;

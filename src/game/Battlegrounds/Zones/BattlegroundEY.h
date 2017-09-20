@@ -377,8 +377,8 @@ class BattlegroundEY : public Battleground
             }
 
             TeamId _ownerTeamId;
-            uint32 _areaTrigger;
             int8 _barStatus;
+            uint32 _areaTrigger;
             int8 _playersCount[BG_TEAMS_COUNT];
 
             bool IsUnderControl(TeamId teamId) const { return _ownerTeamId == teamId; }

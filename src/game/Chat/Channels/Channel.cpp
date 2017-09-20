@@ -19,10 +19,10 @@ Channel::Channel(std::string const& name, uint32 channelId, uint32 channelDBId, 
     _IsSaved(false),
     _flags(0),
     _channelId(channelId),
+    _channelDBId(channelDBId),
     _teamId(teamId),
     _ownerGUID(0),
     _name(name),
-    _channelDBId(channelDBId),
     _password("")
 {
     // set special flags if built-in channel
@@ -382,7 +382,7 @@ void Channel::KickOrBan(Player const* player, std::string const& badname, bool b
             return;
         }
 
-        if (ban && (_channelRights.flags & CHANNEL_RIGHT_CANT_BAN) || !ban && (_channelRights.flags & CHANNEL_RIGHT_CANT_KICK))
+        if ((ban && (_channelRights.flags & CHANNEL_RIGHT_CANT_BAN)) || (!ban && (_channelRights.flags & CHANNEL_RIGHT_CANT_KICK)))
         {
             WorldPacket data;
             MakeNotModerator(&data);
@@ -517,7 +517,6 @@ void Channel::UnBan(uint64 guid)
 
 void Channel::Password(Player const* player, std::string const& pass)
 {
-    uint32 sec = player->GetSession()->GetSecurity();
     uint64 guid = player->GetGUID();
 
     ChatHandler chat(player->GetSession());
@@ -650,8 +649,8 @@ void Channel::SetOwner(Player const* player, std::string const& newname)
     Player* newp = ObjectAccessor::FindPlayerByName(newname, false);
     uint64 victim = newp ? newp->GetGUID() : 0;
 
-    if (!victim || !IsOn(victim) || newp->GetTeamId() != player->GetTeamId() &&
-        !sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_CHANNEL))
+    if (!victim || !IsOn(victim) || (newp->GetTeamId() != player->GetTeamId() &&
+        !sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_CHANNEL)))
     {
         WorldPacket data;
         MakePlayerNotFound(&data, newname);
@@ -791,7 +790,7 @@ void Channel::Say(uint64 guid, std::string const& what, uint32 lang)
         {
             std::string timeStr = secsToTimeString(pinfo.lastSpeakTime + speakDelay - sWorld->GetGameTime());
             if (_channelRights.speakMessage.length() > 0)
-                player->GetSession()->SendNotification(_channelRights.speakMessage.c_str());
+                player->GetSession()->SendNotification("%s", _channelRights.speakMessage.c_str());
             player->GetSession()->SendNotification("You must wait %s before speaking again.", timeStr.c_str());
             return;
         }

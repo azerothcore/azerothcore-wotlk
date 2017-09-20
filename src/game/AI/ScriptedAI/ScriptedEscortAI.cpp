@@ -506,7 +506,6 @@ bool npc_escortAI::SetNextWaypoint(uint32 pointId, bool setPosition)
     if (WaypointList.empty())
         return false;
 
-    size_t const size = WaypointList.size();
     Escort_Waypoint waypoint(0, 0, 0, 0, 0);
     for (CurrentWP = WaypointList.begin(); CurrentWP != WaypointList.end(); ++CurrentWP)
     {

@@ -211,7 +211,7 @@ class boss_lord_marrowgar : public CreatureScript
                             Unit* unit = SelectTarget(SELECT_TARGET_RANDOM, 0, BoneStormMoveTargetSelector(me));
                             if (!unit)
                             {
-                                if (unit = SelectTarget(SELECT_TARGET_TOPAGGRO, 0, 175.0f, true))
+                                if ((unit = SelectTarget(SELECT_TARGET_TOPAGGRO, 0, 175.0f, true)))
                                     if (unit->GetPositionX() > -337.0f)
                                     {
                                         EnterEvadeMode();
@@ -486,7 +486,7 @@ public:
             targets.push_back(target);
         }
 
-        void HandleScriptEffect(SpellEffIndex effIndex)
+        void HandleScriptEffect(SpellEffIndex  /*effIndex*/)
         {
             Unit* caster = GetCaster();
             float angle = caster->GetAngle(GetHitUnit());

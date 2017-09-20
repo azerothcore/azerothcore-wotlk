@@ -38,7 +38,7 @@ class boss_nethermancer_sepethrea : public CreatureScript
         {
             boss_nethermancer_sepethreaAI(Creature* creature) : BossAI(creature, DATA_NETHERMANCER_SEPRETHREA) { }
 
-            void EnterCombat(Unit* who)
+            void EnterCombat(Unit*  /*who*/)
             {
                 _EnterCombat();
                 events.ScheduleEvent(EVENT_FROST_ATTACK, 6000);
@@ -194,7 +194,6 @@ class spell_ragin_flames_inferno : public SpellScriptLoader
 
             void HandlePeriodic(AuraEffect const* aurEff)
             {
-                int32 damage = aurEff->GetAmount();
                 GetUnitOwner()->CastCustomSpell(SPELL_INFERNO_DAMAGE, SPELLVALUE_BASE_POINT0, aurEff->GetAmount(), GetUnitOwner(), TRIGGERED_FULL_MASK);
             }
 

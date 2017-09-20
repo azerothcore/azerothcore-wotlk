@@ -107,7 +107,7 @@ bool Map::ExistVMap(uint32 mapid, int gx, int gy)
 
 void Map::LoadMMap(int gx, int gy)
 { 
-    if (!MMAP::MMapFactory::IsPathfindingEnabled(this, true)) // pussywizard
+    if (!MMAP::MMapFactory::IsPathfindingEnabled(this)) // pussywizard
         return;
 
     int mmapLoadResult = MMAP::MMapFactory::createOrGetMMapManager()->loadMap(GetId(), gx, gy);
@@ -216,8 +216,8 @@ void Map::LoadMapAndVMap(int gx, int gy)
 Map::Map(uint32 id, uint32 InstanceId, uint8 SpawnMode, Map* _parent) : 
 i_mapEntry(sMapStore.LookupEntry(id)), i_spawnMode(SpawnMode), i_InstanceId(InstanceId),
 m_unloadTimer(0), m_VisibleDistance(DEFAULT_VISIBILITY_DISTANCE),
-m_activeNonPlayersIter(m_activeNonPlayers.end()), _transportsUpdateIter(_transports.end()),
-_instanceResetPeriod(0), i_scriptLock(false), _defaultLight(GetDefaultMapLight(id))
+_instanceResetPeriod(0), m_activeNonPlayersIter(m_activeNonPlayers.end()),
+_transportsUpdateIter(_transports.end()), i_scriptLock(false), _defaultLight(GetDefaultMapLight(id))
 {
     m_parentMap = (_parent ? _parent : this);
     for (unsigned int idx=0; idx < MAX_NUMBER_OF_GRIDS; ++idx)
@@ -501,13 +501,13 @@ void Map::InitializeObject(T* /*obj*/)
 }
 
 template<>
-void Map::InitializeObject(Creature* obj)
+void Map::InitializeObject(Creature*  /*obj*/)
 { 
     //obj->_moveState = MAP_OBJECT_CELL_MOVE_NONE; // pussywizard: this is shit
 }
 
 template<>
-void Map::InitializeObject(GameObject* obj)
+void Map::InitializeObject(GameObject*  /*obj*/)
 { 
     //obj->_moveState = MAP_OBJECT_CELL_MOVE_NONE; // pussywizard: this is shit
 }
@@ -650,7 +650,7 @@ void Map::VisitNearbyCellsOf(WorldObject* obj, TypeContainerVisitor<Trinity::Obj
     }
 }
 
-void Map::Update(const uint32 t_diff, const uint32 s_diff, bool thread)
+void Map::Update(const uint32 t_diff, const uint32 s_diff, bool  /*thread*/)
 {
     uint32 mapId = GetId(); // pussywizard: for crashlogs
     sLog->outDebug(LOG_FILTER_POOLSYS, "%u", mapId); // pussywizard: for crashlogs

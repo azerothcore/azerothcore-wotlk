@@ -63,7 +63,7 @@ public:
         return true;
     }
 
-    static bool HandleAchievementCheckAllCommand(ChatHandler* handler, char const* args)
+    static bool HandleAchievementCheckAllCommand(ChatHandler* handler, char const*  /*args*/)
     {
         Player* target = handler->getSelectedPlayer();
         if (!target)

@@ -347,7 +347,7 @@ public:
             ScriptedAI::JustReachedHome();
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit*  /*who*/)
         {
             me->setActive(true);
             DoZoneInCombat();
@@ -491,11 +491,11 @@ public:
                         Creature* VX001 = NULL;
                         Creature* LMK2 = NULL;
                         Creature* ACU = NULL;
-                        if (VX001 = GetVX001())
+                        if ((VX001 = GetVX001()))
                             VX001->CastSpell(VX001, SPELL_BERSERK, true);
-                        if (LMK2 = GetLMK2())
+                        if ((LMK2 = GetLMK2()))
                             LMK2->CastSpell(LMK2, SPELL_BERSERK, true);
-                        if (ACU = GetACU())
+                        if ((ACU = GetACU()))
                             ACU->CastSpell(ACU, SPELL_BERSERK, true);
                         events.RepeatEvent(30000);
                     }
@@ -550,7 +550,7 @@ public:
                     events.ScheduleEvent(EVENT_ELEVATOR_INTERVAL_1, 6000);
                     break;
                 case EVENT_ELEVATOR_INTERVAL_1:
-                    if( Creature* VX001 = me->SummonCreature(NPC_VX001, 2744.65f, 2569.46f, 364.40f, 3.14f, TEMPSUMMON_MANUAL_DESPAWN) )
+                    if(me->SummonCreature(NPC_VX001, 2744.65f, 2569.46f, 364.40f, 3.14f, TEMPSUMMON_MANUAL_DESPAWN))
                     {
                         if( GameObject *elevator = me->FindNearestGameObject(GO_MIMIRON_ELEVATOR, 100.0f) )
                         {
@@ -853,7 +853,7 @@ public:
             }
         }
 
-        void MoveInLineOfSight(Unit* mover) {}
+        void MoveInLineOfSight(Unit*  /*mover*/) {}
 
         void EnterEvadeMode()
         {
@@ -946,7 +946,7 @@ public:
                 }
         }
 
-        void SetData(uint32 id, uint32 value)
+        void SetData(uint32  /*id*/, uint32 value)
         {
             switch (value) // end of phase 1-3, 4-6 for voltron
             {
@@ -1267,7 +1267,7 @@ public:
             bIsEvading = false;
         }
 
-        void PassengerBoarded(Unit* p, int8 seat, bool apply)
+        void PassengerBoarded(Unit* p, int8  /*seat*/, bool apply)
         {
             if (p->GetEntry() == NPC_LEVIATHAN_MKII_CANNON && !apply)
             {
@@ -1285,7 +1285,7 @@ public:
             return 0;
         }
 
-        void SpellHit(Unit* caster, const SpellInfo *spell)
+        void SpellHit(Unit*  /*caster*/, const SpellInfo *spell)
         {
             if( spell->Id == SPELL_SELF_REPAIR )
             {
@@ -1382,7 +1382,7 @@ public:
             }
         }
 
-        uint32 GetData(uint32 id) const
+        uint32 GetData(uint32  /*id*/) const
         {
             return spinningUpOrientation;
         }
@@ -1618,13 +1618,13 @@ public:
             bIsEvading = false;
         }
 
-        void PassengerBoarded(Unit* p, int8 seat, bool apply)
+        void PassengerBoarded(Unit* p, int8  /*seat*/, bool apply)
         {
             if (p->GetEntry() == NPC_ROCKET_VISUAL && !apply)
                 p->ToCreature()->DespawnOrUnsummon(8000);
         }
 
-        void SpellHit(Unit* caster, const SpellInfo *spell)
+        void SpellHit(Unit*  /*caster*/, const SpellInfo *spell)
         {
             if( spell->Id == SPELL_SELF_REPAIR )
             {
@@ -1957,7 +1957,7 @@ public:
             summons.Despawn(s);
         }
 
-        void SpellHit(Unit* caster, const SpellInfo *spell)
+        void SpellHit(Unit*  /*caster*/, const SpellInfo *spell)
         {
             if( spell->Id == SPELL_SELF_REPAIR )
             {
@@ -1993,7 +1993,7 @@ public:
 
         void AttackStart(Unit* /*who*/) {}
         void MoveInLineOfSight(Unit* /*who*/) {}
-        bool CanAIAttack(const Unit* target) const { return false; }
+        bool CanAIAttack(const Unit*  /*target*/) const { return false; }
 
         void SpellHitTarget(Unit* target, const SpellInfo* spell)
         {
@@ -2060,12 +2060,12 @@ public:
             me->AddUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
         }
 
-        void SetData(uint32 id, uint32 value)
+        void SetData(uint32  /*id*/, uint32  /*value*/)
         {
             me->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()+100.0f, false, true);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32  /*diff*/)
         {
             if (!me->GetVehicle())
             {
@@ -2107,7 +2107,7 @@ public:
         InstanceScript* pInstance;
         uint16 despawnTimer;
 
-        void SetData(uint32 id, uint32 value)
+        void SetData(uint32  /*id*/, uint32  /*value*/)
         {
             despawnTimer = 20000;
         }
@@ -2241,7 +2241,7 @@ public:
             return true;
         }
 
-        void HandleEffectPeriodic(AuraEffect const * aurEff)
+        void HandleEffectPeriodic(AuraEffect const *  /*aurEff*/)
         {
             if (Unit* c = GetCaster())
             {
@@ -2437,7 +2437,7 @@ public:
     {
         npc_ulduar_flames_spreadAI(Creature *pCreature) : NullCreatureAI(pCreature) {}
 
-        void SpellHit(Unit* caster, const SpellInfo* spell)
+        void SpellHit(Unit*  /*caster*/, const SpellInfo* spell)
         {
             switch( spell->Id )
             {
@@ -2559,7 +2559,7 @@ class achievement_mimiron_firefighter : public AchievementCriteriaScript
 public:
     achievement_mimiron_firefighter() : AchievementCriteriaScript("achievement_mimiron_firefighter") {}
 
-    bool OnCheck(Player* player, Unit* target)
+    bool OnCheck(Player*  /*player*/, Unit* target)
     {
         return target && target->GetEntry() == NPC_MIMIRON && target->GetTypeId() == TYPEID_UNIT && target->ToCreature()->AI()->GetData(1);
     }
@@ -2570,7 +2570,7 @@ class achievement_mimiron_set_up_us_the_bomb_11 : public AchievementCriteriaScri
 public:
     achievement_mimiron_set_up_us_the_bomb_11() : AchievementCriteriaScript("achievement_mimiron_set_up_us_the_bomb_11") {}
 
-    bool OnCheck(Player* player, Unit* target)
+    bool OnCheck(Player*  /*player*/, Unit* target)
     {
         return target && target->GetEntry() == NPC_MIMIRON && target->GetTypeId() == TYPEID_UNIT && !target->ToCreature()->AI()->GetData(11);
     }
@@ -2581,7 +2581,7 @@ class achievement_mimiron_set_up_us_the_bomb_12 : public AchievementCriteriaScri
 public:
     achievement_mimiron_set_up_us_the_bomb_12() : AchievementCriteriaScript("achievement_mimiron_set_up_us_the_bomb_12") {}
 
-    bool OnCheck(Player* player, Unit* target)
+    bool OnCheck(Player*  /*player*/, Unit* target)
     {
         return target && target->GetEntry() == NPC_MIMIRON && target->GetTypeId() == TYPEID_UNIT && !target->ToCreature()->AI()->GetData(12);
     }
@@ -2592,7 +2592,7 @@ class achievement_mimiron_set_up_us_the_bomb_13 : public AchievementCriteriaScri
 public:
     achievement_mimiron_set_up_us_the_bomb_13() : AchievementCriteriaScript("achievement_mimiron_set_up_us_the_bomb_13") {}
 
-    bool OnCheck(Player* player, Unit* target)
+    bool OnCheck(Player*  /*player*/, Unit* target)
     {
         return target && target->GetEntry() == NPC_MIMIRON && target->GetTypeId() == TYPEID_UNIT && !target->ToCreature()->AI()->GetData(13);
     }

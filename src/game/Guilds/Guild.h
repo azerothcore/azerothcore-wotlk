@@ -457,6 +457,7 @@ private:
         ~LogHolder();
 
         uint8 GetSize() const { return uint8(m_log.size()); }
+        uint32 GetGuildId() const { return m_guildId; }
         // Checks if new log entry can be added to holder when loading from DB
         inline bool CanInsert() const { return m_log.size() < m_maxRecords; }
         // Adds event from DB to collection

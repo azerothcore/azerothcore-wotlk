@@ -235,6 +235,8 @@ bool Condition::Meets(ConditionSourceInfo& sourceInfo)
                         case TYPEID_GAMEOBJECT:
                             condMeets &= object->ToGameObject()->GetDBTableGUIDLow() == ConditionValue3;
                             break;
+                        default:
+                            break;
                     }
                 }
             }

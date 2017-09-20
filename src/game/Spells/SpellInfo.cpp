@@ -2018,7 +2018,7 @@ AuraStateType SpellInfo::LoadAuraState() const
     uint32 StealthPreventionSpellList[] = { 9991, 35331, 9806, 35325 };
 	
     // Goes through each of the spells and identifies them as Stealth Prevention Spell.
-    for (int i = 0; i < sizeof(StealthPreventionSpellList) / sizeof(uint32); i++) {
+    for (uint32 i = 0; i < sizeof(StealthPreventionSpellList) / sizeof(uint32); i++) {
         if (Id == StealthPreventionSpellList[i]) {
             return AURA_STATE_FAERIE_FIRE;
 	}

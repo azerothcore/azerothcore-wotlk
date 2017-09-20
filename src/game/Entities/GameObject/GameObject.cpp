@@ -347,7 +347,7 @@ void GameObject::Update(uint32 diff)
                     // Bombs
                     if (goInfo->trap.type == 2)
                         m_cooldownTime = World::GetGameTimeMS()+10*IN_MILLISECONDS;   // Hardcoded tooltip value
-                    else if (Unit* owner = GetOwner())
+                    else if (GetOwner())
                         m_cooldownTime = World::GetGameTimeMS()+goInfo->trap.startDelay*IN_MILLISECONDS;
 
                     m_lootState = GO_READY;

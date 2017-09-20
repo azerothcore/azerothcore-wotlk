@@ -80,7 +80,7 @@ public:
                 pInstance->SetData(DATA_ICK, NOT_STARTED);
         }
 
-        bool CanAIAttack(const Unit* who) const
+        bool CanAIAttack(const Unit*  /*who*/) const
         {
             return pInstance && pInstance->GetData(DATA_INSTANCE_PROGRESS) >= INSTANCE_PROGRESS_FINISHED_INTRO;
         }
@@ -260,7 +260,7 @@ public:
                     k->AI()->Talk(RAND(SAY_SLAY_1, SAY_SLAY_2));
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature*  /*summon*/)
         {
         }
     };

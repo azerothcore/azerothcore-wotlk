@@ -176,7 +176,7 @@ class spell_q10036_torgos : public SpellScriptLoader
         {
             PrepareSpellScript(spell_q10036_torgos_SpellScript);
 
-            void HandleSendEvent(SpellEffIndex effIndex)
+            void HandleSendEvent(SpellEffIndex  /*effIndex*/)
             {
                 if (Creature* torgos = GetCaster()->FindNearestCreature(NPC_TORGOS, 100.0f, true))
                     torgos->GetAI()->AttackStart(GetCaster());
@@ -212,7 +212,7 @@ class spell_q10923_evil_draws_near_summon : public SpellScriptLoader
         {
             PrepareSpellScript(spell_q10923_evil_draws_near_summon_SpellScript);
 
-            void HandleSendEvent(SpellEffIndex effIndex)
+            void HandleSendEvent(SpellEffIndex  /*effIndex*/)
             {
                 if (Creature* auchenai = GetCaster()->FindNearestCreature(NPC_AUCHENAI_DEATH_SPIRIT, 10.0f, true))
                     auchenai->CastSpell(auchenai, SPELL_DUSTIN_UNDEAD_DRAGON_VISUAL_AURA, true);
@@ -239,7 +239,7 @@ class spell_q10923_evil_draws_near_periodic : public SpellScriptLoader
         {
             PrepareAuraScript(spell_q10923_evil_draws_near_periodic_AuraScript);
 
-            void HandlePeriodic(AuraEffect const* aurEff)
+            void HandlePeriodic(AuraEffect const*  /*aurEff*/)
             {
                 PreventDefaultAction();
                 GetUnitOwner()->CastSpell(GetUnitOwner(), RAND(SPELL_DUSTIN_UNDEAD_DRAGON_VISUAL1, SPELL_DUSTIN_UNDEAD_DRAGON_VISUAL2), true);

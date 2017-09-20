@@ -410,6 +410,37 @@ class BattlefieldWG : public Battlefield
         uint32 GetAreaByGraveyardId(uint8 gId) const;
 
         uint32 GetData(uint32 data) const;
+
+        bool IsKeepNpc(uint32 entry)
+        {
+            switch (entry)
+            {
+                case BATTLEFIELD_WG_NPC_GUARD_H:
+                case BATTLEFIELD_WG_NPC_GUARD_A:
+                case BATTLEFIELD_WG_NPC_VIERON_BLAZEFEATHER:
+                case BATTLEFIELD_WG_NPC_BOWYER_RANDOLPH:
+                case BATTLEFIELD_WG_NPC_STONE_GUARD_MUKAR:
+                case BATTLEFIELD_WG_NPC_KNIGHT_DAMERON:
+                case BATTLEFIELD_WG_NPC_HOODOO_MASTER_FU_JIN:
+                case BATTLEFIELD_WG_NPC_SORCERESS_KAYLANA:
+                case BATTLEFIELD_WG_NPC_CHAMPION_ROS_SLAI:
+                case BATTLEFIELD_WG_NPC_MARSHAL_MAGRUDER:
+                case BATTLEFIELD_WG_NPC_COMMANDER_DARDOSH:
+                case BATTLEFIELD_WG_NPC_COMMANDER_ZANNETH:
+                case BATTLEFIELD_WG_NPC_TACTICAL_OFFICER_KILRATH:
+                case BATTLEFIELD_WG_NPC_TACTICAL_OFFICER_AHBRAMIS:
+                case BATTLEFIELD_WG_NPC_HORDE_WARBRINGER:
+                case BATTLEFIELD_WG_NPC_BRIGADIER_GENERAL:
+                case BATTLEFIELD_WG_NPC_SIEGESMITH_STRONGHOOF:
+                case BATTLEFIELD_WG_NPC_SIEGE_MASTER_STOUTHANDLE:
+                case BATTLEFIELD_WG_NPC_PRIMALIST_MULFORT:
+                case BATTLEFIELD_WG_NPC_ANCHORITE_TESSA:
+                case BATTLEFIELD_WG_NPC_LIEUTENANT_MURP:
+                case BATTLEFIELD_WG_NPC_SENIOR_DEMOLITIONIST_LEGOSO:
+                    return true;
+            }
+            return false;
+        }
     protected:
         bool m_isRelicInteractible;
 
@@ -627,37 +658,6 @@ const Position WGTurret[WG_MAX_TURRET] = {
     { 5147.98f, 2861.93f, 421.63f,  3.18792f },
     { 5352.22f, 3061.46f, 421.102f, 1.52235f }
 };
-
-static bool IsKeepNpc(uint32 entry)
-{
-    switch (entry)
-    {
-        case BATTLEFIELD_WG_NPC_GUARD_H:
-        case BATTLEFIELD_WG_NPC_GUARD_A:
-        case BATTLEFIELD_WG_NPC_VIERON_BLAZEFEATHER:
-        case BATTLEFIELD_WG_NPC_BOWYER_RANDOLPH:
-        case BATTLEFIELD_WG_NPC_STONE_GUARD_MUKAR:
-        case BATTLEFIELD_WG_NPC_KNIGHT_DAMERON:
-        case BATTLEFIELD_WG_NPC_HOODOO_MASTER_FU_JIN:
-        case BATTLEFIELD_WG_NPC_SORCERESS_KAYLANA:
-        case BATTLEFIELD_WG_NPC_CHAMPION_ROS_SLAI:
-        case BATTLEFIELD_WG_NPC_MARSHAL_MAGRUDER:
-        case BATTLEFIELD_WG_NPC_COMMANDER_DARDOSH:
-        case BATTLEFIELD_WG_NPC_COMMANDER_ZANNETH:
-        case BATTLEFIELD_WG_NPC_TACTICAL_OFFICER_KILRATH:
-        case BATTLEFIELD_WG_NPC_TACTICAL_OFFICER_AHBRAMIS:
-        case BATTLEFIELD_WG_NPC_HORDE_WARBRINGER:
-        case BATTLEFIELD_WG_NPC_BRIGADIER_GENERAL:
-        case BATTLEFIELD_WG_NPC_SIEGESMITH_STRONGHOOF:
-        case BATTLEFIELD_WG_NPC_SIEGE_MASTER_STOUTHANDLE:
-        case BATTLEFIELD_WG_NPC_PRIMALIST_MULFORT:
-        case BATTLEFIELD_WG_NPC_ANCHORITE_TESSA:
-        case BATTLEFIELD_WG_NPC_LIEUTENANT_MURP:
-        case BATTLEFIELD_WG_NPC_SENIOR_DEMOLITIONIST_LEGOSO:
-            return true;
-    }
-    return false;
-}
 
 // Here there is all npc keeper spawn point
 const WintergraspObjectPositionData WGKeepNPC[WG_MAX_KEEP_NPC] =
@@ -1060,10 +1060,10 @@ const WGWorkshopData WorkshopsData[WG_MAX_WORKSHOP] =
     {BATTLEFIELD_WG_WORKSHOP_SE, WORLDSTATE_WORKSHOP_SE, BATTLEFIELD_WG_TEXT_WORKSHOP_SE_ATTACK, BATTLEFIELD_WG_TEXT_WORKSHOP_SE_TAKEN},
     // SW
     {BATTLEFIELD_WG_WORKSHOP_SW, WORLDSTATE_WORKSHOP_SW, BATTLEFIELD_WG_TEXT_WORKSHOP_SW_ATTACK, BATTLEFIELD_WG_TEXT_WORKSHOP_SW_TAKEN},
-    // KEEP WEST - It can't be taken, so it doesn't have a textid
-    {BATTLEFIELD_WG_WORKSHOP_KEEP_WEST, WORLDSTATE_WORKSHOP_K_W, 0},
-    // KEEP EAST - It can't be taken, so it doesn't have a textid
-    {BATTLEFIELD_WG_WORKSHOP_KEEP_EAST, WORLDSTATE_WORKSHOP_K_E, 0}
+    // KEEP WEST - It can't be taken
+    {BATTLEFIELD_WG_WORKSHOP_KEEP_WEST, WORLDSTATE_WORKSHOP_K_W, 0, BATTLEFIELD_WG_TEXT_WORKSHOP_NE_TAKEN},
+    // KEEP EAST - It can't be taken
+    {BATTLEFIELD_WG_WORKSHOP_KEEP_EAST, WORLDSTATE_WORKSHOP_K_E, 0, BATTLEFIELD_WG_TEXT_WORKSHOP_NE_TAKEN}
 };
 
 // ********************************************************************

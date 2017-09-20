@@ -43,7 +43,7 @@ void FleeingMovementGenerator<T>::_setTargetLocation(T* owner)
 template<class T>
 bool FleeingMovementGenerator<T>::_getPoint(T* owner, float &x, float &y, float &z)
 {
-    if (!&owner)
+    if (!owner)
         return false;
 
     x = owner->GetPositionX();
@@ -304,7 +304,7 @@ void FleeingMovementGenerator<T>::DoInitialize(T* owner)
 template<>
 void FleeingMovementGenerator<Creature>::_Init(Creature* owner)
 {
-    if (!&owner)
+    if (!owner)
         return;
 
     //owner->SetTargetGuid(ObjectGuid());

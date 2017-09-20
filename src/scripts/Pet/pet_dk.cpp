@@ -220,7 +220,7 @@ class npc_pet_dk_ghoul : public CreatureScript
         {
             npc_pet_dk_ghoulAI(Creature *c) : CombatAI(c) { }
 
-            void JustDied(Unit *who)
+            void JustDied(Unit * /*who*/)
             {
                 if (me->IsGuardian() || me->IsSummon())
                     me->ToTempSummon()->UnSummon();

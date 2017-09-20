@@ -107,9 +107,9 @@ struct NonTankTargetSelector : public std::unary_function<Unit*, bool>
 struct PowerUsersSelector : public std::unary_function<Unit*, bool>
 {
     Unit const* _me;
+    Powers const _power;
     float const _dist;
     bool const _playerOnly;
-    Powers const _power;
 
 
     PowerUsersSelector(Unit const* unit, Powers power, float dist, bool playerOnly) : _me(unit), _power(power), _dist(dist), _playerOnly(playerOnly) { }

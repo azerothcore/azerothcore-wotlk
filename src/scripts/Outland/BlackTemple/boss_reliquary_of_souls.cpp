@@ -511,7 +511,7 @@ class boss_essence_of_anger : public CreatureScript
                 }
             }
 
-            void JustDied(Unit* killer)
+            void JustDied(Unit*  /*killer*/)
             {
                 Talk(ANGER_SAY_DEATH);
                 if (me->IsSummon())
@@ -677,7 +677,7 @@ class spell_reliquary_of_souls_aura_of_desire : public SpellScriptLoader
                     amount = std::max<int32>(-100, -5*int32(effect->GetTickNumber()));
             }
 
-            void Update(AuraEffect const* effect)
+            void Update(AuraEffect const*  /*effect*/)
             {                
                 PreventDefaultAction();
                 if (AuraEffect* effect = GetAura()->GetEffect(EFFECT_1))
@@ -708,13 +708,13 @@ class spell_reliquary_of_souls_aura_of_anger : public SpellScriptLoader
         {
             PrepareAuraScript(spell_reliquary_of_souls_aura_of_anger_AuraScript);
 
-            void CalculateAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
+            void CalculateAmount(AuraEffect const*  /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
             {
                 if (AuraEffect* effect = GetAura()->GetEffect(EFFECT_0))
                     amount = amount*effect->GetTickNumber();
             }
 
-            void Update(AuraEffect const* effect)
+            void Update(AuraEffect const*  /*effect*/)
             {
                 if (AuraEffect* effect = GetAura()->GetEffect(EFFECT_0))
                     effect->RecalculateAmount();

@@ -100,7 +100,7 @@ class spell_dru_nurturing_instinct : public SpellScriptLoader
         {
             PrepareAuraScript(spell_dru_nurturing_instinct_AuraScript);
 
-            void AfterApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+            void AfterApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
                 if (Player* player = GetTarget()->ToPlayer())
                     player->addSpell(GetSpellInfo()->GetRank() == 1 ? SPELL_DRUID_NURTURING_INSTINCT_R1 : SPELL_DRUID_NURTURING_INSTINCT_R2, SPEC_MASK_ALL, false, true);
@@ -204,7 +204,7 @@ class spell_dru_brambles_treant : public SpellScriptLoader
         {
             PrepareAuraScript(spell_dru_brambles_treant_AuraScript);
 
-            bool CheckProc(ProcEventInfo& eventInfo)
+            bool CheckProc(ProcEventInfo&  /*eventInfo*/)
             {
                 if (Player* player = GetUnitOwner()->GetSpellModOwner())
                 {
@@ -250,7 +250,7 @@ class spell_dru_barkskin : public SpellScriptLoader
         {
             PrepareAuraScript(spell_dru_barkskin_AuraScript);
 
-            void AfterApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+            void AfterApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
                 if (GetUnitOwner()->HasAura(SPELL_DRUID_GLYPH_OF_BARKSKIN, GetUnitOwner()->GetGUID()))
                     GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_DRUID_GLYPH_OF_BARKSKIN_TRIGGER, true);
@@ -304,7 +304,7 @@ class spell_dru_treant_scaling : public SpellScriptLoader
                 }
             }
 
-            void CalculateAPAmount(AuraEffect const* aurEff, int32 & amount, bool & /*canBeRecalculated*/)
+            void CalculateAPAmount(AuraEffect const*  /*aurEff*/, int32 & amount, bool & /*canBeRecalculated*/)
             {
                 // xinef: treant inherits 105% of SP as AP - 15% of damage increase per hit
                 if (Unit* owner = GetUnitOwner()->GetOwner())
@@ -318,7 +318,7 @@ class spell_dru_treant_scaling : public SpellScriptLoader
                 }
             }
 
-            void CalculateSPAmount(AuraEffect const* aurEff, int32 & amount, bool & /*canBeRecalculated*/)
+            void CalculateSPAmount(AuraEffect const*  /*aurEff*/, int32 & amount, bool & /*canBeRecalculated*/)
             {
                 // xinef: treant inherits 15% of SP
                 if (Unit* owner = GetUnitOwner()->GetOwner())
@@ -624,7 +624,7 @@ class spell_dru_lifebloom : public SpellScriptLoader
             {
                 if (Unit* target = GetUnitOwner())
                 {
-                    if (AuraEffect const* aurEff = GetEffect(EFFECT_1))
+                    if (GetEffect(EFFECT_1))
                     {
                         Unit* caster = GetCaster();
                         int32 healAmount = GetSpellInfo()->Effects[EFFECT_1].CalcValue(caster ? caster : target, 0, target) * dispelInfo->GetRemovedCharges();

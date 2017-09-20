@@ -750,7 +750,7 @@ class spell_kaelthas_remote_toy : public SpellScriptLoader
         {
             PrepareAuraScript(spell_kaelthas_remote_toy_AuraScript);
 
-            void HandlePeriodic(AuraEffect const* aurEff)
+            void HandlePeriodic(AuraEffect const*  /*aurEff*/)
             {
                 PreventDefaultAction();
                 if (roll_chance_i(66))
@@ -859,7 +859,7 @@ class spell_kaelthas_burn : public SpellScriptLoader
         {
             PrepareAuraScript(spell_kaelthas_burn_AuraScript);
 
-            void HandlePeriodic(AuraEffect const* aurEff)
+            void HandlePeriodic(AuraEffect const*  /*aurEff*/)
             {
                 Unit::DealDamage(GetUnitOwner(), GetUnitOwner(), GetUnitOwner()->CountPctFromMaxHealth(5)+1);
             }

@@ -171,7 +171,7 @@ class spell_shadowfang_keep_forsaken_skills : public SpellScriptLoader
                 GetUnitOwner()->CastSpell(GetUnitOwner(), _forsakenSpell, true);
             }
 
-            void HandleDummyTick(AuraEffect const* aurEff)
+            void HandleDummyTick(AuraEffect const*  /*aurEff*/)
             {
                 PreventDefaultAction();
                 GetUnitOwner()->RemoveAurasDueToSpell(_forsakenSpell);

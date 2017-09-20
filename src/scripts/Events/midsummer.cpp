@@ -21,7 +21,7 @@ class go_midsummer_bonfire : public GameObjectScript
 public:
     go_midsummer_bonfire() : GameObjectScript("go_midsummer_bonfire") { }
 
-    bool OnGossipSelect(Player* player, GameObject* go, uint32 /*sender*/, uint32 action)
+    bool OnGossipSelect(Player* player, GameObject*  /*go*/, uint32 /*sender*/, uint32  /*action*/)
     {
         player->CLOSE_GOSSIP_MENU();
         // we know that there is only one gossip.
@@ -274,7 +274,7 @@ public:
     {
         PrepareAuraScript(spell_midsummer_ribbon_pole_AuraScript)
         
-        void HandleEffectPeriodic(AuraEffect const * aurEff)
+        void HandleEffectPeriodic(AuraEffect const *  /*aurEff*/)
         {
             PreventDefaultAction();
             if (Unit *target = GetTarget())

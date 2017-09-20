@@ -571,7 +571,7 @@ class boss_lady_deathwhisper : public CreatureScript
             // helper for summoning wave mobs
             void Summon(uint32 entry, const Position& pos)
             {
-                if (TempSummon* summon = me->SummonCreature(entry, pos, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000))
+                if (me->SummonCreature(entry, pos, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000))
                     if (TempSummon* trigger = me->SummonCreature(WORLD_TRIGGER, pos, TEMPSUMMON_TIMED_DESPAWN, 2000))
                     {
                         trigger->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
@@ -646,10 +646,10 @@ class boss_lady_deathwhisper : public CreatureScript
             }
 
         private:
+            bool _introDone;
             uint64 _darnavanGUID;
             std::deque<uint64> _reanimationQueue;
             uint32 _waveCounter;
-            bool _introDone;
         };
 
         CreatureAI* GetAI(Creature* creature) const
@@ -704,7 +704,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* who) { DoZoneInCombat(); }
+        void EnterCombat(Unit*  /*who*/) { DoZoneInCombat(); }
 
         void UpdateAI(uint32 diff)
         {
@@ -800,7 +800,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* who) { DoZoneInCombat(); }
+        void EnterCombat(Unit*  /*who*/) { DoZoneInCombat(); }
 
         void UpdateAI(uint32 diff)
         {
@@ -938,7 +938,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void MoveInLineOfSight(Unit* who) {}
+        void MoveInLineOfSight(Unit*  /*who*/) {}
         void EnterEvadeMode() {}
     };
 

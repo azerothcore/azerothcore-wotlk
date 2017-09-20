@@ -184,7 +184,7 @@ public:
         bool JustSummoned;
         uint16 despawnTimer;
 
-        void PassengerBoarded(Unit* who, int8 seatid, bool add)
+        void PassengerBoarded(Unit*  /*who*/, int8  /*seatid*/, bool add)
         {
             if (add)
             {
@@ -200,7 +200,7 @@ public:
             }
         }
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit*  /*killer*/)
         {
             me->SetHomePosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation());
             me->DisappearAndDie();

@@ -512,10 +512,6 @@ void ObjectAccessor::UnloadAll()
 
 std::map<std::string, Player*> ObjectAccessor::playerNameToPlayerPointer;
 
-/// Define the static members of HashMapHolder
-
-template <class T> UNORDERED_MAP< uint64, T* > HashMapHolder<T>::m_objectMap;
-template <class T> typename HashMapHolder<T>::LockType HashMapHolder<T>::i_lock;
 
 /// Global definitions for the hashmap storage
 

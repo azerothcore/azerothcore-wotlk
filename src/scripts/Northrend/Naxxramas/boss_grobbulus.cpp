@@ -67,7 +67,7 @@ public:
                 pInstance->SetData(EVENT_GROBBULUS, NOT_STARTED);
         }
 
-        void EnterCombat(Unit *who)
+        void EnterCombat(Unit * /*who*/)
         {
             me->SetInCombatWithZone();
             events.ScheduleEvent(EVENT_SPELL_POISON_CLOUD, 15000);

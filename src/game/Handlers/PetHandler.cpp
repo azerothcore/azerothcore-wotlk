@@ -26,11 +26,12 @@ class LoadPetFromDBQueryHolder : public SQLQueryHolder
 {
     private:
         const uint32 m_petNumber;
-        const uint32 m_diffTime;
         const bool   m_current;
+        const uint32 m_diffTime;
+        const std::string m_actionBar;
         const uint32 m_savedHealth;
         const uint32 m_savedMana;
-        const std::string m_actionBar;
+
     public:
         LoadPetFromDBQueryHolder(uint32 petNumber, bool current, uint32 diffTime, std::string actionBar, uint32 health, uint32 mana)
             : m_petNumber(petNumber), m_current(current), m_diffTime(diffTime), m_actionBar(actionBar),
