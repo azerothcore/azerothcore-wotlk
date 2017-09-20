@@ -56,7 +56,7 @@ public:
     {
         instance_scarlet_monastery_InstanceMapScript(Map* map) : InstanceScript(map) {}
 
-        void OnPlayerEnter(Player* player)
+        void OnPlayerEnter(Player* player) override
         {
             if (player->HasAura(AURA_OF_ASHBRINGER))
             {
@@ -78,7 +78,7 @@ public:
             }
         }
 
-        void OnPlayerAreaUpdate(Player* player, uint32 /*oldArea*/, uint32 /*newArea*/) 
+        void OnPlayerAreaUpdate(Player* player, uint32 /*oldArea*/, uint32 /*newArea*/) override
         {
             if (player->HasAura(AURA_OF_ASHBRINGER))
             {
@@ -337,7 +337,7 @@ public:
             }
         }
 
-        void Reset()
+        void Reset() override
         {
             //Incase wipe during phase that mograine fake death
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -352,7 +352,7 @@ public:
             events.Reset();
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if (who && who->GetDistance2d(me) < 15.0f)
                 if (Player* player = who->ToPlayer())
@@ -422,7 +422,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             timer = timer - diff;
             if (SayAshbringer && step < 15)
@@ -542,7 +542,7 @@ public:
             Talk(SAY_WH_KILL);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
