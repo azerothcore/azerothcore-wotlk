@@ -3,9 +3,19 @@ function inst_configureOS() {
     case "$OSTYPE" in
         solaris*) echo "Solaris is not supported yet" ;;
         darwin*)  source "$AC_PATH_INSTALLER/includes/os_configs/osx.sh" ;;  
-        linux*)   
+        linux*)
+            # If available, use LSB to identify distribution
+            if [ -f /etc/lsb-release -o -d /etc/lsb-release.d ]; then
+                DISTRO=$(lsb_release -i | cut -d: -f2 | sed s/'^\t'//)
+            # Otherwise, use release info file
+            else
+                DISTRO=$(ls -d /etc/[A-Za-z]*[_-][rv]e[lr]* | grep -v "lsb" | cut -d'/' -f3 | cut -d'-' -f1 | cut -d'_' -f1)
+            fi
+
+            DISTRO=${DISTRO,,}
+
             # TODO: implement different configurations by distro
-            source "$AC_PATH_INSTALLER/includes/os_configs/linux.sh"
+            source "$AC_PATH_INSTALLER/includes/os_configs/$DISTRO.sh"
         ;;
         bsd*)     echo "BSD is not supported yet" ;;
         msys*)    source "$AC_PATH_INSTALLER/includes/os_configs/windows.sh" ;;
