@@ -5,7 +5,7 @@ function inst_configureOS() {
         darwin*)  source "$AC_PATH_INSTALLER/includes/os_configs/osx.sh" ;;  
         linux*)   
             # TODO: implement different configurations by distro
-            source "$AC_PATH_INSTALLER/includes/os_configs/linux.sh" ;; 
+            source "$AC_PATH_INSTALLER/includes/os_configs/linux.sh"
         ;;
         bsd*)     echo "BSD is not supported yet" ;;
         msys*)    source "$AC_PATH_INSTALLER/includes/os_configs/windows.sh" ;;
