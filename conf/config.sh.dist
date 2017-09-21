@@ -113,6 +113,12 @@ DB_WORLD_CUSTOM_PATHS=(
 ##############################################
 
 #
+# Skip import of base sql files to avoid
+# table dropping
+#
+DB_SKIP_BASE_IMPORT_IF_EXISTS=true
+
+#
 # Example:
 #        "C:/Program Files/MySQL/MySQL Server 5.6/bin/mysql.exe"
 #        "/usr/bin/mysql"
@@ -139,8 +145,8 @@ DB_WORLD_CONF="MYSQL_USER='root'; \
                     "
 
 
-DB_CHARACTERS_NAME="characters"
+DB_CHARACTERS_NAME="acore_characters"
 
-DB_AUTH_NAME="auth"
+DB_AUTH_NAME="acore_auth"
 
-DB_WORLD_NAME="world"
+DB_WORLD_NAME="acore_world"

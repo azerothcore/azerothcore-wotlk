@@ -19,28 +19,28 @@ options=(
 function _switch() {
     case $1 in
         "Assemble ALL")
-            run true true true
+            dbasm_run true true true
             ;;
         "Assemble only bases")
-            run true false false
+            dbasm_run true false false
             ;;
         "Assemble only updates")
-            run false true false
+            dbasm_run false true false
             ;;
         "Assemble only customs")
-            run false false true
+            dbasm_run false false true
             ;;
         "Assemble & import ALL")
-            import true true true
+            dbasm_import true true true
             ;;
         "Assemble & import only bases")
-            import true false false
+            dbasm_import true false false
             ;;
         "Assemble & import only updates")
-            import false true false
+            dbasm_import false true false
             ;;
         "Assemble & import only customs")
-            import false false true
+            dbasm_import false false true
             ;;
         "Quit")
             echo "Goodbye!"

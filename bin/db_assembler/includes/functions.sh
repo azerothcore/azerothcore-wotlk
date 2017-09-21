@@ -1,4 +1,58 @@
-function assemble() {
+function dbasm_isNotEmpty() {
+    dbname=$1
+    conf=$2
+
+    eval $confs;
+    export MYSQL_PWD=$MYSQL_PASS
+
+    RESULT=`"$DB_MYSQL_EXEC"  -h "$MYSQL_HOST" -u "$MYSQL_USER" --skip-column-names -e "SELECT COUNT(DISTINCT table_name) FROM information_schema.columns WHERE table_schema = '${dbname}'"`
+    if (( $RESULT > 0 )); then
+        true
+    else
+        false
+    fi
+}
+
+function dbasm_dbExists() {
+    dbname=$1
+    conf=$2
+
+    eval $confs;
+    export MYSQL_PWD=$MYSQL_PASS
+
+    RESULT=`"$DB_MYSQL_EXEC"  -h "$MYSQL_HOST" -u "$MYSQL_USER" --skip-column-names -e "SHOW DATABASES LIKE '${dbname}'"`
+    if [ "$RESULT" == "${dbname}" ]; then
+        true
+    else
+        false
+    fi
+}
+
+function dbasm_createDB() {
+    database=${1,,}
+
+    uc=${database^^}
+
+    name="DB_"$uc"_CONF"
+    confs=${!name}
+
+    name="DB_"$uc"_NAME"
+    dbname=${!name}
+
+    eval $confs;
+
+    export MYSQL_PWD=$MYSQL_PASS
+
+    if dbasm_dbExists $dbname "$confs"; then
+        echo "$dbname database exists"
+    else 
+        "$DB_MYSQL_EXEC"  -h "$MYSQL_HOST" -u "$MYSQL_USER" -e "GRANT USAGE ON * . * TO 'acore'@'${MYSQL_HOST}' IDENTIFIED BY 'acore' WITH MAX_QUERIES_PER_HOUR 0 MAX_CONNECTIONS_PER_HOUR 0 MAX_UPDATES_PER_HOUR 0 ;"
+        "$DB_MYSQL_EXEC"  -h "$MYSQL_HOST" -u "$MYSQL_USER" -e "CREATE DATABASE \`${dbname}\`"
+        "$DB_MYSQL_EXEC"  -h "$MYSQL_HOST" -u "$MYSQL_USER" -e "GRANT ALL PRIVILEGES ON \`${dbname}\` . * TO 'acore'@'${MYSQL_HOST}' WITH GRANT OPTION;"
+    fi
+}
+
+function dbasm_assemble() {
     # to lowercase
     database=${1,,}
     start_sql=$2
@@ -102,20 +156,20 @@ function assemble() {
     fi
 }
 
-function run() {
+function dbasm_run() {
     echo "===== STARTING ASSEMBLY PROCESS ====="
 
         mkdir -p "$OUTPUT_FOLDER"
 
         for db in ${DATABASES[@]}
         do
-            assemble "$db" $version".sql" $1 $2 $3
+            dbasm_assemble "$db" $version".sql" $1 $2 $3
         done
 
     echo "=====           DONE            ====="
 }
 
-function db_backup() {
+function dbasm_db_backup() {
     echo "backing up $1"
 
     database=${1,,}
@@ -137,9 +191,7 @@ function db_backup() {
     "$DB_MYSQL_DUMP_EXEC" --opt --user="$MYSQL_USER" --host="$MYSQL_HOST" "$dbname" > "${BACKUP_FOLDER}${database}_backup_${now}.sql" && echo "done"
 }
 
-function db_import() {
-    echo "importing $1 - $2"
-
+function dbasm_db_import() {
     database=${1,,}
     type=$2
 
@@ -151,6 +203,15 @@ function db_import() {
     name="DB_"$uc"_NAME"
     dbname=${!name}
 
+    if [[ $type = "base" && $DB_SKIP_BASE_IMPORT_IF_EXISTS = true ]]; then
+        if dbasm_isNotEmpty $dbname "$confs"; then
+            echo "$dbname is not empty, base importing skipped"
+            return
+        fi
+    fi
+
+    echo "importing $1 - $2 ..."
+
     eval $confs;
 
     export MYSQL_PWD=$MYSQL_PASS
@@ -158,25 +219,31 @@ function db_import() {
     "$DB_MYSQL_EXEC" -h "$MYSQL_HOST" -u "$MYSQL_USER" "$dbname" < "${OUTPUT_FOLDER}${database}_${type}.sql"
 }
 
-function import () {
-    run $1 $2 $2
-
+function dbasm_import() {
+    dbasm_run $1 $2 $2
 
     with_base=$1
     with_updates=$2
     with_custom=$3
+
+    echo "=====       CHECKING DBs        ====="
+    for db in ${DATABASES[@]}
+    do
+        dbasm_createDB "$db"
+    done
+    echo "=====           DONE            ====="
 
     #
     # BACKUP
     #
 
     if [ $BACKUP_ENABLE = true ]; then
-        echo "===== STARTING BACKUP PROCESS ====="
+        echo "===== STARTING BACKUP PROCESS   ====="
         mkdir -p "$BACKUP_FOLDER"
 
         for db in ${DATABASES[@]}
         do
-            db_backup "$db"
+            dbasm_db_backup "$db"
         done
         echo "=====           DONE            ====="
     fi
@@ -188,21 +255,21 @@ function import () {
     if [ $with_base = true ]; then
         for db in ${DATABASES[@]}
         do
-            db_import "$db" "base"
+            dbasm_db_import "$db" "base"
         done
     fi 
 
     if [ $with_updates = true ]; then
         for db in ${DATABASES[@]}
         do
-            db_import "$db" "update"
+            dbasm_db_import "$db" "update"
         done
     fi 
 
     if [ $with_custom = true ]; then
         for db in ${DATABASES[@]}
         do
-            db_import "$db" "custom"
+            dbasm_db_import "$db" "custom"
         done
     fi 
 
