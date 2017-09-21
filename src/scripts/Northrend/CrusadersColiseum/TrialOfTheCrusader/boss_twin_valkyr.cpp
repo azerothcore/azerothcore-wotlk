@@ -564,37 +564,37 @@ public:
                 {
                     uint32 essenceId = 0;
                     uint32 effect2Id = 0;
-                    uint32 empoweredId = 0;
+                    //uint32 empoweredId = 0;
                     uint32 touchId1 = 0;
-                    uint32 touchId2 = 0;
+                    //uint32 touchId2 = 0;
                     switch( creature->GetMap()->GetDifficulty() )
                     {
                         case 0:
                             essenceId = 65684;
-                            empoweredId = 65724;
+                            //empoweredId = 65724;
                             touchId1 = 65950;
-                            touchId2 = 66001;
+                            //touchId2 = 66001;
                             effect2Id = 65827;
                             break;
                         case 1:
                             essenceId = 67176;
-                            empoweredId = 67213;
+                            //empoweredId = 67213;
                             touchId1 = 67296;
-                            touchId2 = 67281;
+                            //touchId2 = 67281;
                             effect2Id = 67179;
                             break;
                         case 2:
                             essenceId = 67177;
-                            empoweredId = 67214;
+                            //empoweredId = 67214;
                             touchId1 = 67297;
-                            touchId2 = 67282;
+                            //touchId2 = 67282;
                             effect2Id = 67180;
                             break;
                         case 3:
                             essenceId = 67178;
-                            empoweredId = 67215;
+                            //empoweredId = 67215;
                             touchId1 = 67298;
-                            touchId2 = 67283;
+                            //touchId2 = 67283;
                             effect2Id = 67181;
                             break;
                     }
@@ -610,36 +610,36 @@ public:
                 {
                     uint32 essenceId = 0;
                     uint32 effect2Id = 0;
-                    uint32 empoweredId = 0;
-                    uint32 touchId1 = 0;
+                    //uint32 empoweredId = 0;
+                    //uint32 touchId1 = 0;
                     uint32 touchId2 = 0;
                     switch( creature->GetMap()->GetDifficulty() )
                     {
                         case 0:
                             essenceId = 65686;
-                            empoweredId = 65748;
-                            touchId1 = 65950;
+                            //empoweredId = 65748;
+                            //touchId1 = 65950;
                             touchId2 = 66001;
                             effect2Id = 65811;
                             break;
                         case 1:
                             essenceId = 67222;
-                            empoweredId = 67216;
-                            touchId1 = 67296;
+                            //empoweredId = 67216;
+                            //touchId1 = 67296;
                             touchId2 = 67281;
                             effect2Id = 67511;
                             break;
                         case 2:
                             essenceId = 67223;
-                            empoweredId = 67217;
-                            touchId1 = 67297;
+                            //empoweredId = 67217;
+                            //touchId1 = 67297;
                             touchId2 = 67282;
                             effect2Id = 67512;
                             break;
                         case 3:
                             essenceId = 67224;
-                            empoweredId = 67218;
-                            touchId1 = 67298;
+                            //empoweredId = 67218;
+                            //touchId1 = 67298;
                             touchId2 = 67283;
                             effect2Id = 67513;
                             break;

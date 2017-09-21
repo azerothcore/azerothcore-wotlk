@@ -2411,7 +2411,9 @@ class Unit : public WorldObject
         virtual bool HasSpellCooldown(uint32 /*spell_id*/) const { return false; }
         virtual bool HasSpellItemCooldown(uint32 /*spell_id*/, uint32 /*itemid*/) const { return false; }
         virtual void AddSpellCooldown(uint32 /*spell_id*/, uint32 /*itemid*/, uint32 /*end_time*/, bool needSendToClient = false, bool forceSendToSpectator = false) {
-            needSendToClient = forceSendToSpectator = false; // workaround for unused parameters
+            // workaround for unused parameters
+            (void)needSendToClient;
+            (void)forceSendToSpectator;
         }
 
         bool CanApplyResilience() const { return m_applyResilience; }

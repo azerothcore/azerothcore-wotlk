@@ -2,6 +2,8 @@
 #include "ScriptMgr.h"
 #include "InstanceScript.h"
 #include "karazhan.h"
+#include "SpellScript.h"
+#include "SpellAuraEffects.h"
 
 const Position OptionalSpawn[] =
 {

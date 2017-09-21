@@ -283,7 +283,7 @@ struct violet_hold_trashAI : public npc_escortAI
     void WaypointReached(uint32 id)
     {
         if (PLoc<6)
-            if (id == PLocWPCount[PLoc] -1 -(bAlt ? 1 : 0))
+            if (id == uint16(PLocWPCount[PLoc] -1 -(bAlt ? 1 : 0)))
                 CreatureStartAttackDoor();
     }
 
