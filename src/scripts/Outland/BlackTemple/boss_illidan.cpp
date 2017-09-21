@@ -459,7 +459,7 @@ class boss_illidan_stormrage : public CreatureScript
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
 
-                switch (uint32 eventId = events.ExecuteEvent())
+                switch (events.ExecuteEvent())
                 {
                     case EVENT_SUMMON_MINIONS:
                         if (me->HealthBelowPct(90))
@@ -579,7 +579,7 @@ class boss_illidan_stormrage : public CreatureScript
                         me->CastSpell(me, SPELL_THROW_GLAIVE2, false);
                         break;
                     case EVENT_PHASE_2_CHANGE_POS:
-                        beamPosId = (++beamPosId)%MAX_EYE_BEAM_POS;
+                        beamPosId = (beamPosId+1)%MAX_EYE_BEAM_POS;
                         events.ScheduleEvent(EVENT_SPELL_FIREBALL, 8000, GROUP_PHASE_2_ABILITY);
                         events.ScheduleEvent(EVENT_SPELL_DARK_BARRAGE, 18000, GROUP_PHASE_2_ABILITY);
                         events.ScheduleEvent(EVENT_PHASE_2_EYE_BEAM, urand(25000, 50000), GROUP_PHASE_2_ABILITY);

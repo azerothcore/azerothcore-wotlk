@@ -7,6 +7,7 @@ REWRITTEN BY XINEF
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SmartAI.h"
+#include "ScriptedGossip.h"
 
 enum AshbringerEventMisc
 {
