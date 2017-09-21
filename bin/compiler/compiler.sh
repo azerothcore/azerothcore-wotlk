@@ -5,9 +5,9 @@ CURRENT_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source "$CURRENT_PATH/includes/includes.sh"
 
 function all() {
-    clean
-    configure
-    build
+    comp_clean
+    comp_configure
+    comp_build
 }
 
 function run_option() {
@@ -19,7 +19,7 @@ function run_option() {
 }
 
 comp_options=("Clean" "Configure" "Build" "All")
-comp_functions=("clean" "configure" "build" "all")
+comp_functions=("comp_clean" "comp_configure" "comp_build" "all")
 
 runHooks "ON_AFTER_OPTIONS" #you can create your custom options
 

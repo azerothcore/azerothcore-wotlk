@@ -220,7 +220,7 @@ function dbasm_db_import() {
 }
 
 function dbasm_import() {
-    dbasm_run $1 $2 $2
+    dbasm_run $1 $2 $3
 
     with_base=$1
     with_updates=$2

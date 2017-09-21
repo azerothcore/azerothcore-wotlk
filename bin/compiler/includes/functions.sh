@@ -1,5 +1,5 @@
 
-function clean() {
+function comp_clean() {
   echo "Cleaning build files"
 
   CWD=$(pwd)
@@ -13,7 +13,7 @@ function clean() {
   cd $CWD
 }
 
-function configure() {
+function comp_configure() {
   CWD=$(pwd)
 
   cd $BUILDPATH
@@ -39,7 +39,7 @@ function configure() {
 }
 
 
-function build() {
+function comp_build() {
   [ $MTHREADS == 0 ] && MTHREADS=`grep -c ^processor /proc/cpuinfo` && MTHREADS=$(($MTHREADS + 2))
 
   echo "Using $MTHREADS threads"

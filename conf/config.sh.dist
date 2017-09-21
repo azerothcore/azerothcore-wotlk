@@ -1,9 +1,14 @@
 # absolute root path of your azerothshard repository
 SRCPATH="$AC_PATH_ROOT"
+
+# absolute path where build files must be stored
+BUILDPATH="$AC_PATH_ROOT/build/"
+
 # absolute path where binary files must be stored
-BINPATH="$AC_PATH_ROOT/build/"
+BINPATH="$AC_PATH_ROOT/build/bin/"
+
 # absolute path where config. files must be stored
-CONFDIR="$AC_PATH_ROOT/build/etc/"
+CONFDIR="$AC_PATH_ROOT/build/bin/etc/"
 
 ##############################################
 #
@@ -12,16 +17,19 @@ CONFDIR="$AC_PATH_ROOT/build/etc/"
 ##############################################
 
 
-# set preferred compilers
+# Set preferred compilers. 
+# To use gcc (not suggested) instead of clang change in:
+#  CCOMPILERC="/usr/bin/gcc"
+#  CCOMPILERCXX="/usr/bin/g++"
+#
 CCOMPILERC="/usr/bin/clang"
 CCOMPILERCXX="/usr/bin/clang++"
-#CCOMPILERC="/usr/bin/gcc"
-#CCOMPILERCXX="/usr/bin/g++"
+
 
 # how many thread must be used for compilation ( leave zero to use all available )
 MTHREADS=0
 # enable/disable warnings during compilation
-CWARNINGS=OFF
+CWARNINGS=ON
 # enable/disable some debug informations ( it's not a debug compilation )
 CDEBUG=OFF
 # specify compilation type
@@ -31,13 +39,18 @@ CSCRIPTS=ON
 # compile server
 CSERVERS=ON
 # compile tools
-CTOOLS=OFF
+CTOOLS=ON
 # use precompiled headers ( fatest compilation but not optimized if you change headers often )
 CSCRIPTPCH=ON
 CCOREPCH=ON
+
+# Skip specific modules from compilation (cmake reconfigure needed)
 # use semicolon ; to separate modules
 CDISABLED_AC_MODULES=""
+
 # you can add your custom definitions here ( -D )
+# example:  CCUSTOMOPTIONS=" -DWITH_PERFTOOLS=ON -DENABLE_EXTRA_LOGS=ON"
+#
 CCUSTOMOPTIONS=""
 
 
@@ -47,6 +60,11 @@ CCUSTOMOPTIONS=""
 #
 ##############################################
 
+#
+# Basically you don't have to edit it
+# but if you have another database you can add it here
+# and create relative confiugurations below
+#
 DATABASES=(
 	"AUTH"
 	"CHARACTERS"
