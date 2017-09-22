@@ -62,7 +62,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit*  /*who*/)
         {
             events.ScheduleEvent(EVENT_STORM, 5000);
             events.ScheduleEvent(EVENT_SHOCK, 26000+rand()%6000);
@@ -124,7 +124,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit*  /*killer*/)
         {
             Talk(SAY_DEATH);
             
@@ -132,7 +132,7 @@ public:
                 pInstance->SetData(BOSS_MAIDEN_OF_GRIEF, DONE);
         }
 
-        void KilledUnit(Unit *victim)
+        void KilledUnit(Unit * /*victim*/)
         {
             if (urand(0,1))
                 return;

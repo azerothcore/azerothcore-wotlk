@@ -79,12 +79,15 @@ std::thread::id Thread::currentId()
 
 void Thread::setPriority(Priority priority)
 {
-    std::thread::native_handle_type handle = m_ThreadImp.native_handle();
-    bool _ok = true;
 #ifdef WIN32
+    std::thread::native_handle_type handle = m_ThreadImp.native_handle();
+#endif
+
+    bool _ok = true;
 
     switch (priority)
     {
+#ifdef WIN32
         case Priority_Realtime: _ok = SetThreadPriority(handle, THREAD_PRIORITY_TIME_CRITICAL); break;
         case Priority_Highest: _ok = SetThreadPriority(handle, THREAD_PRIORITY_HIGHEST);       break;
         case Priority_High: _ok = SetThreadPriority(handle, THREAD_PRIORITY_ABOVE_NORMAL);  break;
@@ -92,8 +95,11 @@ void Thread::setPriority(Priority priority)
         case Priority_Low: _ok = SetThreadPriority(handle, THREAD_PRIORITY_BELOW_NORMAL);  break;
         case Priority_Lowest: _ok = SetThreadPriority(handle, THREAD_PRIORITY_LOWEST);        break;
         case Priority_Idle: _ok = SetThreadPriority(handle, THREAD_PRIORITY_IDLE);          break;
-    }
 #endif
+        default:
+            break;
+    }
+
 
     // remove this ASSERT in case you don't want to know is thread priority change was successful or not
     ASSERT(_ok);

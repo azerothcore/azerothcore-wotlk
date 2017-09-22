@@ -369,7 +369,7 @@ public:
                         for (uint8 i = 0; i < count[phase]; ++i)
                         {
                             me->GetNearPoint(me, x, y, z, me->GetCombatReach(), 10.0f, rand_norm()*2*M_PI);
-                            if (cr = me->SummonCreature(randEntry(), x, y, z+2.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000))
+                            if ((cr = me->SummonCreature(randEntry(), x, y, z+2.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000)))
                             {
                                 cr->CastSpell(cr, SPELL_TELEPORT_EFFECT, true);
                                 cr->AI()->AttackStart(me);
@@ -380,7 +380,7 @@ public:
                     else if (phase == 3)
                     {
                         me->GetNearPoint(me, x, y, z, me->GetCombatReach(), 20.0f, rand_norm()*2*M_PI);
-                        if (cr = me->SummonCreature(NPC_INFINITE_TIMERENDER, x, y, z, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000))
+                        if ((cr = me->SummonCreature(NPC_INFINITE_TIMERENDER, x, y, z, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000)))
                         {
                             cr->CastSpell(cr, SPELL_TELEPORT_EFFECT, true);
                             cr->AI()->AttackStart(me);
@@ -477,7 +477,7 @@ public:
                 AttackStart(who);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32  /*diff*/)
         {
             if (!UpdateVictim())
                 return;
@@ -788,7 +788,7 @@ public:
             me->GetMotionMaster()->Clear();
         }
 
-        void SetGUID(uint64 guid, int32 id)
+        void SetGUID(uint64 guid, int32  /*id*/)
         {
             if (playerGUID || events.GetNextEventTime(998) || events.GetNextEventTime(2))
                 return;
@@ -1224,7 +1224,7 @@ public:
 
         bool done;
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32  /*diff*/)
         {
             if (!done)
             {

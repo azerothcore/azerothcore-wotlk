@@ -377,7 +377,7 @@ public:
             return false;
         if (_maxDist && _source->GetExactDist(target) > _maxDist)
             return false;
-        if (_exclude1 && target->HasAura(_exclude1) || _exclude2 && target->HasAura(_exclude2))
+        if ((_exclude1 && target->HasAura(_exclude1)) || (_exclude2 && target->HasAura(_exclude2)))
             return false;
         if (_reqLOS && !_source->IsWithinLOSInMap(target))
             return false;
@@ -956,7 +956,7 @@ class boss_the_lich_king : public CreatureScript
                 if (me->HasUnitState(UNIT_STATE_CASTING) && !((1 << _phase) & PHASE_MASK_NO_CAST_CHECK))
                     return;
 
-                switch (uint32 eventId = events.ExecuteEvent())
+                switch (events.ExecuteEvent())
                 {
                     case EVENT_BERSERK:
                         Talk(SAY_LK_BERSERK);
@@ -1238,7 +1238,7 @@ class npc_tirion_fordring_tft : public CreatureScript
             void Reset()
             {
                 _events.Reset();
-                if (_instance->GetBossState(DATA_THE_LICH_KING) == DONE || me->GetMap()->IsHeroic() && !_instance->GetData(DATA_LK_HC_AVAILABLE))
+                if (_instance->GetBossState(DATA_THE_LICH_KING) == DONE || (me->GetMap()->IsHeroic() && !_instance->GetData(DATA_LK_HC_AVAILABLE)))
                     me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
                 me->SetReactState(REACT_PASSIVE);
             }
@@ -1310,7 +1310,7 @@ class npc_tirion_fordring_tft : public CreatureScript
             void JustReachedHome()
             {
                 ScriptedAI::JustReachedHome();
-                if (!(_instance->GetBossState(DATA_THE_LICH_KING) == DONE || me->GetMap()->IsHeroic() && !_instance->GetData(DATA_LK_HC_AVAILABLE)))
+                if (!(_instance->GetBossState(DATA_THE_LICH_KING) == DONE || (me->GetMap()->IsHeroic() && !_instance->GetData(DATA_LK_HC_AVAILABLE))))
                     me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
                 me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
             }
@@ -1342,7 +1342,7 @@ class npc_tirion_fordring_tft : public CreatureScript
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
 
-                switch (uint32 eventId = _events.ExecuteEvent())
+                switch (_events.ExecuteEvent())
                 {
                     case EVENT_INTRO_LK_MOVE:
                         if (Creature* theLichKing = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_THE_LICH_KING)))
@@ -1799,7 +1799,7 @@ class npc_shambling_horror_icc : public CreatureScript
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
 
-                switch (uint32 eventId = _events.ExecuteEvent())
+                switch (_events.ExecuteEvent())
                 {
                     case EVENT_SHOCKWAVE:
                         me->CastSpell(me->GetVictim(), SPELL_SHOCKWAVE, false);
@@ -2329,7 +2329,7 @@ class npc_raging_spirit : public CreatureScript
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
 
-                switch (uint32 eventId = _events.ExecuteEvent())
+                switch (_events.ExecuteEvent())
                 {
                     case EVENT_RAGING_SPIRIT_UNROOT:
                         {
@@ -2485,11 +2485,11 @@ class npc_valkyr_shadowguard : public CreatureScript
             }
 
             EventMap _events;
-            InstanceScript* _instance;
             Position _destPoint;
             uint64 _grabbedPlayer;
             bool didbelow50pct;
             bool dropped;
+            InstanceScript* _instance;
 
             bool IsHeroic() { return me->GetMap()->IsHeroic(); }
 
@@ -2505,9 +2505,9 @@ class npc_valkyr_shadowguard : public CreatureScript
                 _events.ScheduleEvent(EVENT_MOVE_TO_SIPHON_POS, 0);
             }
 
-            void OnCharmed(bool apply) {}
+            void OnCharmed(bool  /*apply*/) {}
 
-            void PassengerBoarded(Unit* pass, int8 seat, bool apply)
+            void PassengerBoarded(Unit* pass, int8  /*seat*/, bool apply)
             {
                 if (apply)
                 {
@@ -2581,10 +2581,10 @@ class npc_valkyr_shadowguard : public CreatureScript
                             }
                             dropped = true;
                             _events.Reset();
-                            Player* p = NULL;
+                            /*Player* p = NULL;
                             if (Vehicle* v = me->GetVehicleKit())
                                 if (Unit* passenger = v->GetPassenger(0))
-                                    p = passenger->ToPlayer();
+                                    p = passenger->ToPlayer();*/
                             me->CastSpell((Unit*)NULL, SPELL_EJECT_ALL_PASSENGERS, false);
 
                             if (IsHeroic())
@@ -2619,7 +2619,7 @@ class npc_valkyr_shadowguard : public CreatureScript
                 if (me->HasUnitState(UNIT_STATE_CASTING | UNIT_STATE_STUNNED))
                     return;
 
-                switch (uint32 eventId = _events.ExecuteEvent())
+                switch (_events.ExecuteEvent())
                 {
                     case EVENT_GRAB_PLAYER:
                         if (!_grabbedPlayer)
@@ -2723,7 +2723,7 @@ class spell_the_lich_king_teleport_to_frostmourne_hc : public SpellScriptLoader
         {
             PrepareSpellScript(spell_the_lich_king_teleport_to_frostmourne_hc_SpellScript);
 
-            void ModDest(SpellEffIndex effIndex)
+            void ModDest(SpellEffIndex  /*effIndex*/)
             {
                 float dist = 2.0f + rand_norm()*18.0f;
                 float angle = rand_norm()*2*M_PI;
@@ -3109,8 +3109,8 @@ class npc_strangulate_vehicle : public CreatureScript
             }
 
             bool IsHeroic() { return me->GetMap()->IsHeroic(); }
-            void OnCharmed(bool apply) {}
-            void PassengerBoarded(Unit* pass, int8 seat, bool apply)
+            void OnCharmed(bool  /*apply*/) {}
+            void PassengerBoarded(Unit* pass, int8  /*seat*/, bool apply)
             {
                 if (!apply)
                     pass->RemoveAurasDueToSpell(VEHICLE_SPELL_PARACHUTE);
@@ -3154,7 +3154,7 @@ class npc_strangulate_vehicle : public CreatureScript
             {
                 _events.Update(diff);
 
-                switch (uint32 eventId = _events.ExecuteEvent())
+                switch (_events.ExecuteEvent())
                 {
                     case EVENT_TELEPORT:
                         me->GetMotionMaster()->Clear(false);
@@ -3281,7 +3281,7 @@ class npc_terenas_menethil : public CreatureScript
 
                 _events.Update(diff);
 
-                switch (uint32 eventId = _events.ExecuteEvent())
+                switch (_events.ExecuteEvent())
                 {
                     case EVENT_FROSTMOURNE_TALK_1:
                         me->SetControlled(false, UNIT_STATE_ROOT);

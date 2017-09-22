@@ -7,6 +7,7 @@ REWRITTEN BY XINEF
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SmartAI.h"
+#include "ScriptedGossip.h"
 
 enum AshbringerEventMisc
 {
@@ -276,7 +277,7 @@ public:
         return true;
     }
 
-    bool OnGossipSelect(Player* plr, Creature* npc, uint32 Sender, uint32 uiAction)
+    bool OnGossipSelect(Player* plr, Creature* npc, uint32  /*Sender*/, uint32 uiAction)
     {
         plr->PlayerTalkClass->ClearMenus();
 

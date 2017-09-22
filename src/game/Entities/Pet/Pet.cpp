@@ -27,8 +27,8 @@
 
 Pet::Pet(Player* owner, PetType type) : Guardian(NULL, owner ? owner->GetGUID() : 0, true),
 m_usedTalentCount(0), m_removed(false), m_owner(owner),
-m_happinessTimer(PET_LOSE_HAPPINES_INTERVAL), m_petRegenTimer(PET_FOCUS_REGEN_INTERVAL), m_petType(type), m_duration(0),
-m_auraRaidUpdateMask(0), m_loading(false), m_declinedname(NULL), m_tempspell(0), m_tempspellTarget(NULL), m_tempoldTarget(NULL), m_tempspellIsPositive(false), asynchLoadType(PET_LOAD_DEFAULT)
+m_happinessTimer(PET_LOSE_HAPPINES_INTERVAL), m_petType(type), m_duration(0),
+m_auraRaidUpdateMask(0), m_loading(false), m_petRegenTimer(PET_FOCUS_REGEN_INTERVAL), m_declinedname(NULL), m_tempspellTarget(NULL), m_tempoldTarget(NULL), m_tempspellIsPositive(false), m_tempspell(0), asynchLoadType(PET_LOAD_DEFAULT)
 {
     m_unitTypeMask |= UNIT_MASK_PET;
     if (type == HUNTER_PET)
@@ -493,6 +493,8 @@ void Pet::Update(uint32 diff)
 
             break;
         }
+        default:
+            break;
     }
 
     Creature::Update(diff);
@@ -625,7 +627,9 @@ bool Pet::CreateBaseAtCreatureInfo(CreatureTemplate const* cinfo, Unit* owner)
 
 bool Pet::CreateBaseAtTamed(CreatureTemplate const* cinfo, Map* map, uint32 phaseMask)
 { 
-    ;//sLog->outDebug(LOG_FILTER_PETS, "Pet::CreateBaseForTamed");
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+    sLog->outDebug(LOG_FILTER_PETS, "Pet::CreateBaseForTamed");
+#endif
     uint32 guid=sObjectMgr->GenerateLowGuid(HIGHGUID_PET);
     uint32 pet_number = sObjectMgr->GeneratePetNumber();
     if (!Create(guid, map, phaseMask, cinfo->Entry, pet_number))
@@ -1080,7 +1084,9 @@ void Pet::_LoadSpellCooldowns(PreparedQueryResult result)
             cooldowns[spell_id] = cooldown;
             _AddCreatureSpellCooldown(spell_id, cooldown);
 
-            ;//sLog->outDebug(LOG_FILTER_PETS, "Pet (Number: %u) spell %u cooldown loaded (%u secs).", m_charmInfo->GetPetNumber(), spell_id, uint32(db_time-curTime));
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+            sLog->outDebug(LOG_FILTER_PETS, "Pet (Number: %u) spell %u cooldown loaded (%u secs).", m_charmInfo->GetPetNumber(), spell_id, uint32(db_time-curTime));
+#endif
         }
         while (result->NextRow());
 
@@ -1187,7 +1193,9 @@ void Pet::_SaveSpells(SQLTransaction& trans)
 
 void Pet::_LoadAuras(PreparedQueryResult result, uint32 timediff)
 { 
-    ;//sLog->outDebug(LOG_FILTER_PETS, "Loading auras for pet %u", GetGUIDLow());
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+    sLog->outDebug(LOG_FILTER_PETS, "Loading auras for pet %u", GetGUIDLow());
+#endif
 
     if (result)
     {
@@ -1257,7 +1265,9 @@ void Pet::_LoadAuras(PreparedQueryResult result, uint32 timediff)
                 }
                 aura->SetLoadedState(maxduration, remaintime, remaincharges, stackcount, recalculatemask, &damage[0]);
                 aura->ApplyForTargets();
-                ;//sLog->outDetail("Added aura spellid %u, effectmask %u", spellInfo->Id, effmask);
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+                sLog->outDetail("Added aura spellid %u, effectmask %u", spellInfo->Id, effmask);
+#endif
             }
         }
         while (result->NextRow());

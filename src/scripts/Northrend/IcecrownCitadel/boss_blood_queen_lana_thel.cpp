@@ -186,7 +186,7 @@ class boss_blood_queen_lana_thel : public CreatureScript
                 _creditBloodQuickening = instance->GetData(DATA_BLOOD_QUICKENING_STATE) == IN_PROGRESS;
             }
 
-            void JustDied(Unit* killer)
+            void JustDied(Unit*  /*killer*/)
             {
                 _JustDied();
                 Talk(SAY_DEATH);
@@ -565,7 +565,7 @@ class boss_blood_queen_lana_thel : public CreatureScript
                 BossAI::EnterEvadeMode();
             }
 
-            bool CanAIAttack(const Unit* target) const
+            bool CanAIAttack(const Unit*  /*target*/) const
             {
                 return me->IsVisible();
             }

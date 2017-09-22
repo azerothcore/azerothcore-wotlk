@@ -326,7 +326,7 @@ class boss_prince_keleseth_icc : public CreatureScript
                 }
             }
 
-            void DamageDealt(Unit* target, uint32& damage, DamageEffectType damageType)
+            void DamageDealt(Unit* target, uint32& damage, DamageEffectType  /*damageType*/)
             {
                 if (target->GetTypeId() != TYPEID_PLAYER)
                     return;
@@ -593,7 +593,7 @@ class boss_prince_taldaram_icc : public CreatureScript
                 }
             }
 
-            void DamageDealt(Unit* target, uint32& damage, DamageEffectType damageType)
+            void DamageDealt(Unit* target, uint32& damage, DamageEffectType  /*damageType*/)
             {
                 if (target->GetTypeId() != TYPEID_PLAYER)
                     return;
@@ -884,7 +884,7 @@ class boss_prince_valanar_icc : public CreatureScript
                 }
             }
 
-            void DamageDealt(Unit* target, uint32& damage, DamageEffectType damageType)
+            void DamageDealt(Unit* target, uint32& damage, DamageEffectType  /*damageType*/)
             {
                 if (target->GetTypeId() != TYPEID_PLAYER)
                     return;
@@ -1235,7 +1235,7 @@ class npc_ball_of_flame : public CreatureScript
 
             void MoveInLineOfSight(Unit* /*who*/) {}
 
-            void MovementInform(uint32 type, uint32 id)
+            void MovementInform(uint32 type, uint32  /*id*/)
             {
                 if (type == CHASE_MOTION_TYPE && !_exploded)
                 {
@@ -1283,7 +1283,7 @@ class npc_ball_of_flame : public CreatureScript
                 me->DespawnOrUnsummon(1);
             }
 
-            void DamageDealt(Unit* target, uint32& damage, DamageEffectType damageType)
+            void DamageDealt(Unit* target, uint32& damage, DamageEffectType  /*damageType*/)
             {
                 if (target->GetTypeId() != TYPEID_PLAYER)
                     return;
@@ -1665,8 +1665,6 @@ class spell_valanar_kinetic_bomb_summon : public SpellScriptLoader
             {
                 BeforeCast += SpellCastFn(spell_valanar_kinetic_bomb_summon_SpellScript::SelectDest);
             }
-
-            uint32 _targetCount;
         };
 
         SpellScript* GetSpellScript() const

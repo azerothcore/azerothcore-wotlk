@@ -118,7 +118,7 @@ class boss_general_zarithrian : public CreatureScript
                 Talk(SAY_DEATH);
             }
 
-            void KilledUnit(Unit* victim)
+            void KilledUnit(Unit*  /*victim*/)
             {
                 if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
                 {

@@ -37,7 +37,7 @@ public:
         void EnterCombat(Unit* /*who*/) {}
         void EnterEvadeMode() {}
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32  /*diff*/)
         {
             if (me->GetDistance(2763, -1596, 0) < 20.0f) // Horde ship
             {

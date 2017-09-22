@@ -153,7 +153,7 @@ public:
             ScriptedAI::EnterEvadeMode();
         }
 
-        void EnterCombat(Unit* pWho)
+        void EnterCombat(Unit*  /*pWho*/)
         {
             Talk(SAY_AGGRO);
             if(pInstance)
@@ -315,7 +315,7 @@ public:
             DoMeleeAttackIfReady();  
         }
 
-        void JustDied(Unit* pKiller)
+        void JustDied(Unit*  /*pKiller*/)
         {
             Talk(SAY_DEATH);
             summons.DespawnAll();
@@ -325,7 +325,7 @@ public:
                 pInstance->SetData(DATA_KING_YMIRON, DONE);
         }
 
-        void KilledUnit(Unit* pVictim)
+        void KilledUnit(Unit*  /*pVictim*/)
         {
             if (urand(0,1))
                 return;

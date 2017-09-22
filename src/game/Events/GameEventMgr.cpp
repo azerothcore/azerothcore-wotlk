@@ -1096,13 +1096,17 @@ uint32 GameEventMgr::Update()                               // return the next e
             nextEventDelay = 0;
     for (std::set<uint16>::iterator itr = deactivate.begin(); itr != deactivate.end(); ++itr)
         StopEvent(*itr);
-    ;//sLog->outDetail("Next game event check in %u seconds.", nextEventDelay + 1);
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+    sLog->outDetail("Next game event check in %u seconds.", nextEventDelay + 1);
+#endif
     return (nextEventDelay + 1) * IN_MILLISECONDS;           // Add 1 second to be sure event has started/stopped at next call
 }
 
 void GameEventMgr::UnApplyEvent(uint16 event_id)
 {
-    ;//sLog->outDetail("GameEvent %u \"%s\" removed.", event_id, mGameEvent[event_id].description.c_str());
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+    sLog->outDetail("GameEvent %u \"%s\" removed.", event_id, mGameEvent[event_id].description.c_str());
+#endif
     //! Run SAI scripts with SMART_EVENT_GAME_EVENT_END
     RunSmartAIScripts(event_id, false);
     // un-spawn positive event tagged objects
@@ -1136,7 +1140,9 @@ void GameEventMgr::ApplyNewEvent(uint16 event_id)
             break;
     }
 
-    ;//sLog->outDetail("GameEvent %u \"%s\" started.", event_id, mGameEvent[event_id].description.c_str());
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+    sLog->outDetail("GameEvent %u \"%s\" started.", event_id, mGameEvent[event_id].description.c_str());
+#endif
 
     //! Run SAI scripts with SMART_EVENT_GAME_EVENT_END
     RunSmartAIScripts(event_id, true);

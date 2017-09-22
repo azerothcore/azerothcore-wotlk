@@ -343,7 +343,7 @@ class AreaTrigger_at_sentry_point : public AreaTriggerScript
 
             if (!player->FindNearestCreature(NPC_TERVOSH, 100.0f))
             {
-                if(Creature* tervosh = player->SummonCreature(NPC_TERVOSH, -3476.51, -4105.94, 17.1, 5.3816f, TEMPSUMMON_TIMED_DESPAWN, 60000))
+                if(Creature* tervosh = player->SummonCreature(NPC_TERVOSH, -3476.51f, -4105.94f, 17.1f, 5.3816f, TEMPSUMMON_TIMED_DESPAWN, 60000))
                     tervosh->CastSpell(tervosh, SPELL_TELEPORT_VISUAL, true);
             }
 

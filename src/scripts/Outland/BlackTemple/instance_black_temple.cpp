@@ -379,7 +379,7 @@ class spell_black_temple_curse_of_the_bleakheart : public SpellScriptLoader
                 amplitude = 5000;
             }
 
-            void Update(AuraEffect const* effect)
+            void Update(AuraEffect const*  /*effect*/)
             {                
                 PreventDefaultAction();
                 if (roll_chance_i(20))
@@ -408,7 +408,7 @@ class spell_black_temple_skeleton_shot : public SpellScriptLoader
         {
             PrepareAuraScript(spell_black_temple_skeleton_shot_AuraScript)
 
-            void HandleEffectRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+            void HandleEffectRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
                 if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_DEATH)
                     GetTarget()->CastSpell(GetTarget(), GetSpellInfo()->Effects[EFFECT_2].CalcValue(), true);
@@ -435,7 +435,7 @@ class spell_black_temple_wyvern_sting : public SpellScriptLoader
         {
             PrepareAuraScript(spell_black_temple_wyvern_sting_AuraScript)
 
-            void HandleEffectRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+            void HandleEffectRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
                 if (Unit* caster = GetCaster())
                     caster->CastSpell(GetTarget(), SPELL_WYVERN_STING, true);
@@ -618,7 +618,7 @@ class spell_black_temple_curse_of_vitality : public SpellScriptLoader
         {
             PrepareAuraScript(spell_black_temple_curse_of_vitality_AuraScript);
 
-            void OnPeriodic(AuraEffect const* aurEff)
+            void OnPeriodic(AuraEffect const*  /*aurEff*/)
             {
                 if (GetUnitOwner()->HealthBelowPct(50))
                     SetDuration(0);
@@ -645,7 +645,7 @@ class spell_black_temple_dementia : public SpellScriptLoader
         {
             PrepareAuraScript(spell_black_temple_dementia_AuraScript);
 
-            void OnPeriodic(AuraEffect const* aurEff)
+            void OnPeriodic(AuraEffect const*  /*aurEff*/)
             {
                 if (roll_chance_i(50))
                     GetTarget()->CastSpell(GetTarget(), SPELL_DEMENTIA1, true);

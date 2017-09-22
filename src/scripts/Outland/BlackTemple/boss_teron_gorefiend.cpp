@@ -103,7 +103,7 @@ class boss_teron_gorefiend : public CreatureScript
                 events.ScheduleEvent(EVENT_SPELL_SHADOW_OF_DEATH, 20000);
             }
 
-            void KilledUnit(Unit* victim)
+            void KilledUnit(Unit*  /*victim*/)
             {
                 if (events.GetNextEventTime(EVENT_TALK_KILL) == 0)
                 {
@@ -184,7 +184,7 @@ class spell_teron_gorefiend_shadow_of_death : public SpellScriptLoader
         {
             PrepareAuraScript(spell_teron_gorefiend_shadow_of_death_AuraScript)
 
-            void Absorb(AuraEffect* /*aurEff*/, DamageInfo & dmgInfo, uint32 & absorbAmount)
+            void Absorb(AuraEffect* /*aurEff*/, DamageInfo &  /*dmgInfo*/, uint32 &  /*absorbAmount*/)
             {
                 PreventDefaultAction();
             }
@@ -232,7 +232,7 @@ class spell_teron_gorefiend_spirit_lance : public SpellScriptLoader
                     amount -= (amount / effect->GetTotalTicks()) * effect->GetTickNumber();
             }
 
-            void Update(AuraEffect const* effect)
+            void Update(AuraEffect const*  /*effect*/)
             {                
                 PreventDefaultAction();
                 if (AuraEffect* effect = GetAura()->GetEffect(EFFECT_1))

@@ -22,7 +22,7 @@ OutdoorPvPGH::OutdoorPvPGH()
 bool OutdoorPvPGH::SetupOutdoorPvP()
 {
     RegisterZone(GH_ZONE);
-    if (m_obj = new OPvPCapturePointGH(this))
+    if ((m_obj = new OPvPCapturePointGH(this)))
     {
         AddCapturePoint(m_obj);
         return true;
@@ -94,6 +94,8 @@ void OPvPCapturePointGH::ChangeState()
             sGameEventMgr->StopEvent(GH_HORDE_DEFENSE_EVENT);
             sGameEventMgr->StartEvent(GH_HORDE_DEFENSE_EVENT);
             artkit = 1;
+            break;
+        default:
             break;
     }
 

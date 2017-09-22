@@ -6,6 +6,10 @@ PATH_MODULES="$CUR_PATH/modules/"
 source "$PATH_MODULES/drassil/joiner/joiner.sh"
 
 
+# installing repository dependencies
 if [[ $1 == "dev" ]]; then
     git submodule update --init "$CUR_PATH/data/doc"
 fi
+
+
+source "$CUR_PATH/bin/installer/main.sh"

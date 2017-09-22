@@ -62,10 +62,15 @@ _flags(AFLAG_NONE), _effectsToApply(effMask), _needClientUpdate(false), _disable
             _slot = slot;
             GetTarget()->SetVisibleAura(slot, this);
             SetNeedClientUpdate();
-            ;//sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "Aura: %u Effect: %d put to unit visible auras slot: %u", GetBase()->GetId(), GetEffectMask(), slot);
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+            sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "Aura: %u Effect: %d put to unit visible auras slot: %u", GetBase()->GetId(), GetEffectMask(), slot);
+#endif
         }
-        else
-            ;//sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "Aura: %u Effect: %d could not find empty unit visible slot", GetBase()->GetId(), GetEffectMask());
+        else {
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+            sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "Aura: %u Effect: %d could not find empty unit visible slot", GetBase()->GetId(), GetEffectMask());
+#endif
+        }
     }
 
     _InitFlags(caster, effMask);
@@ -144,7 +149,9 @@ void AuraApplication::_HandleEffect(uint8 effIndex, bool apply)
     ASSERT(aurEff);
     ASSERT(HasEffect(effIndex) == (!apply));
     ASSERT((1<<effIndex) & _effectsToApply);
-    ;//sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "AuraApplication::_HandleEffect: %u, apply: %u: amount: %u", aurEff->GetAuraType(), apply, aurEff->GetAmount());
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+    sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "AuraApplication::_HandleEffect: %u, apply: %u: amount: %u", aurEff->GetAuraType(), apply, aurEff->GetAmount());
+#endif
 
     if (apply)
     {
@@ -852,7 +859,7 @@ void Aura::RefreshTimersWithMods()
 {
     Unit* caster = GetCaster();
     m_maxDuration = CalcMaxDuration();
-    if (caster && caster->HasAuraTypeWithAffectMask(SPELL_AURA_PERIODIC_HASTE, m_spellInfo) || m_spellInfo->HasAttribute(SPELL_ATTR5_HASTE_AFFECT_DURATION))
+    if ((caster && caster->HasAuraTypeWithAffectMask(SPELL_AURA_PERIODIC_HASTE, m_spellInfo)) || m_spellInfo->HasAttribute(SPELL_ATTR5_HASTE_AFFECT_DURATION))
         m_maxDuration = int32(m_maxDuration * caster->GetFloatValue(UNIT_MOD_CAST_SPEED));
     
     // xinef: we should take ModSpellDuration into account, but none of the spells using this function is affected by contents of ModSpellDuration
@@ -1355,7 +1362,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                 if (GetSpellInfo()->SpellFamilyFlags[0] & 0x10 && GetEffect(0))
                 {
                     // Druid T8 Restoration 4P Bonus
-                    if (AuraEffect const * aurEff = caster->GetAuraEffectDummy(64760))
+                    if (caster->GetAuraEffectDummy(64760))
                     {
                         uint32 damage = GetEffect(0)->GetAmount();
                         damage = target->SpellHealingBonusTaken(caster, GetSpellInfo(), damage, DOT);
@@ -2172,7 +2179,9 @@ void Aura::LoadScripts()
             m_loadedScripts.erase(bitr);
             continue;
         }
-        ;//sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "Aura::LoadScripts: Script `%s` for aura `%u` is loaded now", (*itr)->_GetScriptName()->c_str(), m_spellInfo->Id);
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+        sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "Aura::LoadScripts: Script `%s` for aura `%u` is loaded now", (*itr)->_GetScriptName()->c_str(), m_spellInfo->Id);
+#endif
         (*itr)->Register();
         ++itr;
     }

@@ -62,7 +62,7 @@ public:
         return true;
     }
 
-    bool OnGossipSelect(Player* player, GameObject* go, uint32 sender, uint32 action)
+    bool OnGossipSelect(Player* player, GameObject*  /*go*/, uint32 sender, uint32 action)
     {
         if (sender != GOSSIP_SENDER_MAIN || !player->getAttackers().empty())
             return true;
@@ -114,7 +114,7 @@ public:
         return true;
     }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 uiSender, uint32 uiAction)
+    bool OnGossipSelect(Player*  /*player*/, Creature* creature, uint32  /*uiSender*/, uint32  /*uiAction*/)
     {
         creature->SetUInt32Value(UNIT_NPC_FLAGS, 0);
         uint8 _keeper = 0;
@@ -221,7 +221,7 @@ public:
                 }
         }
 
-        void UpdateAI(uint32 diff) {}
+        void UpdateAI(uint32  /*diff*/) {}
     };
 };
 
@@ -343,7 +343,7 @@ public:
             events.ScheduleEvent(3, 1000); // Charged Leap
         }
 
-        void PassengerBoarded(Unit* p, int8 seat, bool apply)
+        void PassengerBoarded(Unit* p, int8  /*seat*/, bool  /*apply*/)
         {
             me->setFaction(p->getFaction());
             me->SetReactState(REACT_PASSIVE);
@@ -378,7 +378,7 @@ public:
                 ScriptedAI::EnterEvadeMode();
         }
 
-        void OnCharmed(bool apply) {}
+        void OnCharmed(bool  /*apply*/) {}
 
         void UpdateAI(uint32 diff)
         {
@@ -438,7 +438,7 @@ public:
     {
         PrepareAuraScript(spell_ulduar_arachnopod_damaged_AuraScript)
 
-        void HandleEffectPeriodic(AuraEffect const * aurEff)
+        void HandleEffectPeriodic(AuraEffect const *  /*aurEff*/)
         {
             if (Unit* c = GetCaster())
                 Unit::Kill(c, c, false);

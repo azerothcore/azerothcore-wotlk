@@ -51,7 +51,7 @@ class boss_curator : public CreatureScript
                 me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_POWER_BURN, true);
             }
 
-            void KilledUnit(Unit* victim)
+            void KilledUnit(Unit*  /*victim*/)
             {
                 if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
                 {

@@ -139,7 +139,7 @@ public:
             ScriptedAI::EnterEvadeMode();
         }
 
-        void EnterCombat(Unit *who)
+        void EnterCombat(Unit * /*who*/)
         {
             Talk(SAY_AGGRO);
             if (pInstance)
@@ -154,7 +154,7 @@ public:
             summon->SetInCombatWithZone();
         }
 
-        void JustDied(Unit* Killer)
+        void JustDied(Unit*  /*Killer*/)
         {
             Talk(SAY_DEATH);
             if (pInstance)

@@ -393,8 +393,6 @@ class spell_black_morass_corrupt_medivh : public SpellScriptLoader
             {
                 OnEffectPeriodic += AuraEffectPeriodicFn(spell_black_morass_corrupt_medivh_AuraScript::PeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
             }
-
-            InstanceScript* _instance;
         };
 
         AuraScript* GetAuraScript() const

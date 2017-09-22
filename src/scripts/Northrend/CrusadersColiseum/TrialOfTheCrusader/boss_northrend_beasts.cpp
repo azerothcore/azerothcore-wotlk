@@ -90,7 +90,7 @@ public:
             events.ScheduleEvent(EVENT_SPELL_FIRE_BOMB, urand(10000,30000));
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit*  /*who*/)
         {
             events.Reset();
             events.ScheduleEvent(EVENT_SPELL_SNOBOLLED, 1500);
@@ -818,7 +818,7 @@ public:
             return false;
         }
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32  /*type*/, uint32 id)
         {
             if( id == EVENT_CHARGE )
             {

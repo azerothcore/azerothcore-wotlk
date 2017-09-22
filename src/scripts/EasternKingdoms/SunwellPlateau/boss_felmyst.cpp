@@ -398,7 +398,7 @@ public:
             me->CastSpell(me, SPELL_DEMONIC_VAPOR_PERIODIC, true);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32  /*diff*/)
         {
             if (me->GetMotionMaster()->GetMotionSlotType(MOTION_SLOT_CONTROLLED) == NULL_MOTION_TYPE)
             {
@@ -501,12 +501,12 @@ class spell_felmyst_fog_of_corruption_charm : public SpellScriptLoader
         {
             PrepareAuraScript(spell_felmyst_fog_of_corruption_charm_AuraScript);
 
-            void HandleApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+            void HandleApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
                 GetTarget()->CastSpell(GetTarget(), SPELL_FOG_OF_CORRUPTION_CHARM2, true);
             }
 
-            void HandleRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+            void HandleRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
                 GetTarget()->RemoveAurasDueToSpell(SPELL_FOG_OF_CORRUPTION_CHARM2);
                 Unit::Kill(GetCaster(), GetTarget(), false);

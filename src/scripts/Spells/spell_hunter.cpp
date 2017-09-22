@@ -130,7 +130,7 @@ class spell_hun_wyvern_sting : public SpellScriptLoader
         {
             PrepareAuraScript(spell_hun_wyvern_sting_AuraScript)
 
-            void HandleEffectRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+            void HandleEffectRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
                 if (Unit* caster = GetCaster())
                     caster->CastSpell(GetTarget(), sSpellMgr->GetSpellWithRank(SPELL_HUNTER_WYVERN_STING_DOT, GetSpellInfo()->GetRank()), true);
@@ -157,7 +157,7 @@ class spell_hun_animal_handler : public SpellScriptLoader
         {
             PrepareAuraScript(spell_hun_animal_handler_AuraScript);
 
-            void CalculateAmount(AuraEffect const* aurEff, int32 & amount, bool & /*canBeRecalculated*/)
+            void CalculateAmount(AuraEffect const*  /*aurEff*/, int32 & amount, bool & /*canBeRecalculated*/)
             {
                 amount = 0;
                 if (Unit* owner = GetUnitOwner()->GetOwner())
@@ -212,7 +212,7 @@ class spell_hun_generic_scaling : public SpellScriptLoader
                 }
             }
 
-            void CalculateAPAmount(AuraEffect const* aurEff, int32 & amount, bool & /*canBeRecalculated*/)
+            void CalculateAPAmount(AuraEffect const*  /*aurEff*/, int32 & amount, bool & /*canBeRecalculated*/)
             {
                 if (Unit* owner = GetUnitOwner()->GetOwner())
                 {
@@ -233,7 +233,7 @@ class spell_hun_generic_scaling : public SpellScriptLoader
                 }
             }
 
-            void CalculateSPAmount(AuraEffect const* aurEff, int32 & amount, bool & /*canBeRecalculated*/)
+            void CalculateSPAmount(AuraEffect const*  /*aurEff*/, int32 & amount, bool & /*canBeRecalculated*/)
             {
                 if (Unit* owner = GetUnitOwner()->GetOwner())
                 {
@@ -407,7 +407,7 @@ class spell_hun_ascpect_of_the_viper : public SpellScriptLoader
                 return true;
             }
 
-            void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+            void HandleProc(AuraEffect const* aurEff, ProcEventInfo&  /*eventInfo*/)
             {
                 PreventDefaultAction();
 

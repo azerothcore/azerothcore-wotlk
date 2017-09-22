@@ -110,7 +110,7 @@ class instance_arcatraz : public InstanceMapScript
                 }
             }
 
-            uint32 GetData(uint32 type) const
+            uint32 GetData(uint32  /*type*/) const
             {
                 return 0;
             }

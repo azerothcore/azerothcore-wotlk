@@ -49,7 +49,7 @@ public:
             amplitude = 1000;
         }
 
-        void Update(AuraEffect* auraEffect)
+        void Update(AuraEffect*  /*auraEffect*/)
         {
             Unit::AuraApplicationMap const& auras = GetUnitOwner()->GetAppliedAuras();
             for (Unit::AuraApplicationMap::const_iterator itr = auras.begin(); itr != auras.end(); ++itr)

@@ -108,7 +108,7 @@ class boss_the_lurker_below : public CreatureScript
                 events.ScheduleEvent(EVENT_PHASE_2, 125000);
             }
 
-            void MoveInLineOfSight(Unit* who)
+            void MoveInLineOfSight(Unit*  /*who*/)
             {
             }
 
@@ -186,7 +186,7 @@ class boss_the_lurker_below : public CreatureScript
 
                 if (target)         
                     me->AttackerStateUpdate(target);
-                else if (target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                else if ((target = SelectTarget(SELECT_TARGET_RANDOM, 0)))
                     me->CastSpell(target, SPELL_WATER_BOLT, false);
 
                 me->resetAttackTimer();

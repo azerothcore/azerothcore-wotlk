@@ -198,7 +198,7 @@ public:
                     events.RescheduleEvent(EVENT_UNFREEZE_MONSTER, 3000);
             }
         }
-        void EnterCombat(Unit* pWho)
+        void EnterCombat(Unit*  /*pWho*/)
         {
             if (m_pInstance)
                 m_pInstance->SetData(DATA_GORTOK_PALEHOOF, IN_PROGRESS);
@@ -310,7 +310,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit* pKiller)
+        void JustDied(Unit*  /*pKiller*/)
         {
             me->SendPlaySound(SOUND_DEATH, false);
             if(m_pInstance)
@@ -444,7 +444,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit* pKiller) 
+        void JustDied(Unit*  /*pKiller*/) 
         {
             if (m_pInstance) 
             {
@@ -554,7 +554,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit* pKiller) 
+        void JustDied(Unit*  /*pKiller*/) 
         {
             if (m_pInstance) 
             {
@@ -662,7 +662,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit* pKiller) 
+        void JustDied(Unit*  /*pKiller*/) 
         {
             if (m_pInstance) 
             {
@@ -770,7 +770,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit* pKiller) 
+        void JustDied(Unit*  /*pKiller*/) 
         {
             if (m_pInstance) 
             {
@@ -786,7 +786,7 @@ class go_palehoof_sphere : public GameObjectScript
 public: 
     go_palehoof_sphere() : GameObjectScript("go_palehoof_sphere") { } 
 
-    bool OnGossipHello(Player *pPlayer, GameObject *pGO)
+    bool OnGossipHello(Player * /*pPlayer*/, GameObject *pGO)
     {
         InstanceScript *pInstance = pGO->GetInstanceScript();
 

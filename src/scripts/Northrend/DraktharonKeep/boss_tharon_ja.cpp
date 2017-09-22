@@ -87,7 +87,7 @@ class boss_tharon_ja : public CreatureScript
                 events.ScheduleEvent(EVENT_SPELL_TURN_FLESH, 1000);
             }
 
-            void KilledUnit(Unit *victim)
+            void KilledUnit(Unit * /*victim*/)
             {
                 if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
                 {
@@ -233,7 +233,7 @@ class spell_tharon_ja_dummy : public SpellScriptLoader
         {
             PrepareAuraScript(spell_tharon_ja_dummy_AuraScript)
 
-            void HandleEffectApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+            void HandleEffectApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
                 PreventDefaultAction();
                 GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_FLESH_VISUAL, true);
@@ -241,7 +241,7 @@ class spell_tharon_ja_dummy : public SpellScriptLoader
                 GetUnitOwner()->SetDisplayId(GetUnitOwner()->GetNativeDisplayId()+1);
             }
 
-            void HandleEffectRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+            void HandleEffectRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
                 PreventDefaultAction();
                 GetUnitOwner()->getThreatManager().resetAllAggro();

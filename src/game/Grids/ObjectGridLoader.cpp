@@ -23,7 +23,7 @@ class ObjectWorldLoader
 {
     public:
         explicit ObjectWorldLoader(ObjectGridLoader& gloader)
-            : i_cell(gloader.i_cell), i_grid(gloader.i_grid), i_map(gloader.i_map), i_corpses (0)
+            : i_cell(gloader.i_cell), i_map(gloader.i_map), i_grid(gloader.i_grid), i_corpses (0)
             {}
 
         void Visit(CorpseMapType &m);
@@ -32,9 +32,9 @@ class ObjectWorldLoader
 
     private:
         Cell i_cell;
-        NGridType &i_grid;
         Map* i_map;
     public:
+        NGridType &i_grid;
         uint32 i_corpses;
 };
 
@@ -204,7 +204,9 @@ void ObjectGridLoader::LoadN(void)
             }
         }
     }
-    ;//sLog->outDebug(LOG_FILTER_MAPS, "%u GameObjects, %u Creatures, and %u Corpses/Bones loaded for grid %u on map %u", i_gameObjects, i_creatures, i_corpses, i_grid.GetGridId(), i_map->GetId());
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+    sLog->outDebug(LOG_FILTER_MAPS, "%u GameObjects, %u Creatures, and %u Corpses/Bones loaded for grid %u on map %u", i_gameObjects, i_creatures, i_corpses, i_grid.GetGridId(), i_map->GetId());
+#endif
 }
 
 template<class T>

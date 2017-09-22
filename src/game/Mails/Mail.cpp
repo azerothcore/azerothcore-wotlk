@@ -120,7 +120,7 @@ void MailDraft::deleteIncludedItems(SQLTransaction& trans, bool inDB /*= false*/
     m_items.clear();
 }
 
-void MailDraft::SendReturnToSender(uint32 sender_acc, uint32 sender_guid, uint32 receiver_guid, SQLTransaction& trans)
+void MailDraft::SendReturnToSender(uint32  /*sender_acc*/, uint32 sender_guid, uint32 receiver_guid, SQLTransaction& trans)
 {
     Player* receiver = ObjectAccessor::FindPlayerInOrOutOfWorld(MAKE_NEW_GUID(receiver_guid, 0, HIGHGUID_PLAYER));
 

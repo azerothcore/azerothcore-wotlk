@@ -1395,7 +1395,7 @@ public:
             }
         }
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 type, uint32  /*id*/)
         {
             // Xinef: dont use 0, it is no longer the last point
             // Xinef: if type is escort and spline is finalized, it means that we reached last point from the path
@@ -1598,7 +1598,7 @@ class npc_hor_leader_second : public CreatureScript
 public:
     npc_hor_leader_second() : CreatureScript("npc_hor_leader_second") { }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*uiSender*/, uint32 uiAction)
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*uiSender*/, uint32  /*uiAction*/)
     {
         if (!creature->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP))
             return true;
@@ -1675,7 +1675,7 @@ public:
             me->GetMotionMaster()->MoveSplinePath(&path);
         }
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 type, uint32  /*id*/)
         {
             if (type == ESCORT_MOTION_TYPE && me->movespline->Finalized())
                 events.ScheduleEvent(EVENT_SAY_LEADER_STOP_TEXT, 1000);
@@ -1792,7 +1792,7 @@ public:
             leaped = false;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32  /*diff*/)
         {
             if (!UpdateVictim())
                 return;
@@ -1871,7 +1871,7 @@ public:
                     events.ScheduleEvent(2, 4500);
                     break;
                 case 3:
-                    if (Unit* target = SelectTargetFromPlayerList(30.0f, 0, true))
+                    if (SelectTargetFromPlayerList(30.0f, 0, true))
                         me->CastSpell(me->GetVictim(), 70145, false);
                     events.ScheduleEvent(3, 9000);
                     break;
@@ -1969,7 +1969,7 @@ public:
     {
         PrepareAuraScript(spell_hor_gunship_cannon_fireAuraScript)
 
-        void HandleEffectPeriodic(AuraEffect const * aurEff)
+        void HandleEffectPeriodic(AuraEffect const *  /*aurEff*/)
         {
             PreventDefaultAction();
             if (Unit* caster = GetCaster())

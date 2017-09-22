@@ -219,7 +219,7 @@ public:
             return false;
         }
 
-        void ProcessEvent(WorldObject* obj, uint32 eventId)
+        void ProcessEvent(WorldObject*  /*obj*/, uint32 eventId)
         {
             // destory towers
             if (eventId >= EVENT_TOWER_OF_LIFE_DESTROYED && eventId <= EVENT_TOWER_OF_FLAMES_DESTROYED)
@@ -618,9 +618,9 @@ public:
                         instance->LoadGrid(364.0f, -16.0f); //make sure leviathan is loaded
                         m_leviathanTowers[type-EVENT_TOWER_OF_LIFE_DESTROYED] = data;
                         GameObject* gobj = NULL;
-                        if (gobj = instance->GetGameObject(m_leviathanVisualTowers[type-EVENT_TOWER_OF_LIFE_DESTROYED][0]))
+                        if ((gobj = instance->GetGameObject(m_leviathanVisualTowers[type-EVENT_TOWER_OF_LIFE_DESTROYED][0])))
                             gobj->SetGoState(GO_STATE_ACTIVE);
-                        if (gobj = instance->GetGameObject(m_leviathanVisualTowers[type-EVENT_TOWER_OF_LIFE_DESTROYED][1]))
+                        if ((gobj = instance->GetGameObject(m_leviathanVisualTowers[type-EVENT_TOWER_OF_LIFE_DESTROYED][1])))
                             gobj->SetGoState(GO_STATE_ACTIVE);
                         return;
                     }
@@ -1012,7 +1012,7 @@ public:
 
         void SpawnLeviathanEncounterVehicles(uint8 mode);
 
-        bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const* source, Unit const* target = NULL, uint32 miscvalue1 = 0)
+        bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/)
         {
             switch (criteria_id)
             {
@@ -1121,11 +1121,11 @@ void instance_ulduar::instance_ulduar_InstanceMapScript::SpawnLeviathanEncounter
         TempSummon* veh = NULL;
         for (uint8 i = 0; i < (instance->Is25ManRaid() ? 5 : 2); ++i)
         {
-            if (veh = instance->SummonCreature(NPC_SALVAGED_SIEGE_ENGINE, vehiclePositions[15*mode+i]))
+            if ((veh = instance->SummonCreature(NPC_SALVAGED_SIEGE_ENGINE, vehiclePositions[15*mode+i])))
                 _leviathanVehicles.push_back(veh->GetGUID());
-            if (veh = instance->SummonCreature(NPC_VEHICLE_CHOPPER, vehiclePositions[15*mode+i+5]))
+            if ((veh = instance->SummonCreature(NPC_VEHICLE_CHOPPER, vehiclePositions[15*mode+i+5])))
                 _leviathanVehicles.push_back(veh->GetGUID());
-            if (veh = instance->SummonCreature(NPC_SALVAGED_DEMOLISHER, vehiclePositions[15*mode+i+10]))
+            if ((veh = instance->SummonCreature(NPC_SALVAGED_DEMOLISHER, vehiclePositions[15*mode+i+10])))
                 _leviathanVehicles.push_back(veh->GetGUID());
         }
     }

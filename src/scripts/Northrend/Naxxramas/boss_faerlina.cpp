@@ -88,7 +88,7 @@ public:
                 pInstance->SetData(EVENT_FAERLINA, NOT_STARTED);
         }
 
-        void EnterCombat(Unit *who)
+        void EnterCombat(Unit * /*who*/)
         {
             me->SetInCombatWithZone();
             Talk(SAY_AGGRO);
@@ -124,7 +124,7 @@ public:
                 pInstance->SetData(DATA_IMMORTAL_FAIL, 0);
         }
 
-        void JustDied(Unit* Killer)
+        void JustDied(Unit*  /*Killer*/)
         {
             Talk(SAY_DEATH);
             if (pInstance)
@@ -162,7 +162,7 @@ public:
             DoMeleeAttackIfReady();
         }
         
-        void SpellHit(Unit* caster, const SpellInfo *spell)
+        void SpellHit(Unit*  /*caster*/, const SpellInfo *spell)
         {
             if (spell->Id == SPELL_WIDOWS_EMBRACE)
             {

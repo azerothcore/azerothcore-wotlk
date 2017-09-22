@@ -649,8 +649,8 @@ void AchievementMgr::SendAchievementEarned(AchievementEntry const* achievement) 
     if (achievement->flags & ACHIEVEMENT_FLAG_HIDDEN)
         return;
 
-    #ifdef TRINITY_DEBUG
-        ;//sLog->outDebug(LOG_FILTER_ACHIEVEMENTSYS, "AchievementMgr::SendAchievementEarned(%u)", achievement->ID);
+    #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS) && defined(TRINITY_DEBUG) 
+        sLog->outDebug(LOG_FILTER_ACHIEVEMENTSYS, "AchievementMgr::SendAchievementEarned(%u)", achievement->ID);
     #endif
 
     if (Guild* guild = sGuildMgr->GetGuildById(GetPlayer()->GetGuildId()))
@@ -705,7 +705,7 @@ void AchievementMgr::SendCriteriaUpdate(AchievementCriteriaEntry const* entry, C
     if (!entry->timeLimit)
         data << uint32(0);
     else
-        data << uint32(/* xinef: timedCompleted ? 0 : 1*/ 0); // this are some flags, 1 is for keeping the counter at 0 in client
+        data << uint32(timedCompleted ? 0 : 1); // 1 is for keeping the counter at 0 in client
     data.AppendPackedTime(progress->date);
     data << uint32(timeElapsed);    // time elapsed in seconds
     data << uint32(0);              // unk
@@ -739,7 +739,9 @@ static const uint32 achievIdForDungeon[][4] =
  */
 void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, uint32 miscValue1 /*= 0*/, uint32 miscValue2 /*= 0*/, Unit* unit /*= NULL*/)
 {
-    ;//sLog->outDebug(LOG_FILTER_ACHIEVEMENTSYS, "AchievementMgr::UpdateAchievementCriteria(%u, %u, %u)", type, miscValue1, miscValue2);
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+    sLog->outDebug(LOG_FILTER_ACHIEVEMENTSYS, "AchievementMgr::UpdateAchievementCriteria(%u, %u, %u)", type, miscValue1, miscValue2);
+#endif
 
     // disable for gamemasters with GM-mode enabled
     if (m_player->IsGameMaster())
@@ -1973,7 +1975,9 @@ void AchievementMgr::SetCriteriaProgress(AchievementCriteriaEntry const* entry, 
     if (entry->timeLimit && timedIter == m_timedAchievements.end())
         return;
 
-    ;//sLog->outDebug(LOG_FILTER_ACHIEVEMENTSYS, "AchievementMgr::SetCriteriaProgress(%u, %u) for (GUID:%u)", entry->ID, changeValue, m_player->GetGUIDLow());
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+    sLog->outDebug(LOG_FILTER_ACHIEVEMENTSYS, "AchievementMgr::SetCriteriaProgress(%u, %u) for (GUID:%u)", entry->ID, changeValue, m_player->GetGUIDLow());
+#endif
 
     CriteriaProgress* progress = GetCriteriaProgress(entry);
     if (!progress)
@@ -2032,7 +2036,7 @@ void AchievementMgr::SetCriteriaProgress(AchievementCriteriaEntry const* entry, 
             m_timedAchievements.erase(timedIter);
     }
 
-    SendCriteriaUpdate(entry, progress, timeElapsed, timedCompleted);
+    SendCriteriaUpdate(entry, progress, timeElapsed, true);
 
     sScriptMgr->OnCriteriaProgress(GetPlayer(), entry);
 }
@@ -2118,7 +2122,9 @@ void AchievementMgr::RemoveTimedAchievement(AchievementCriteriaTimedTypes type, 
 
 void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
 {
-    ;//sLog->outDetail("AchievementMgr::CompletedAchievement(%u)", achievement->ID);
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+    sLog->outDetail("AchievementMgr::CompletedAchievement(%u)", achievement->ID);
+#endif
 
     // disable for gamemasters with GM-mode enabled
     if (m_player->IsGameMaster())
@@ -2177,7 +2183,7 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
     //! Since no common attributes were found, (not even in titleRewardFlags field)
     //! we explicitly check by ID. Maybe in the future we could move the achievement_reward
     //! condition fields to the condition system.
-    if (uint32 titleId = reward->titleId[achievement->ID == 1793 ? GetPlayer()->getGender() : GetPlayer()->GetTeamId()])
+    if (uint32 titleId = reward->titleId[achievement->ID == 1793 ? GetPlayer()->getGender() : uint8(GetPlayer()->GetTeamId())])
         if (CharTitlesEntry const* titleEntry = sCharTitlesStore.LookupEntry(titleId))
             GetPlayer()->SetTitle(titleEntry);
 

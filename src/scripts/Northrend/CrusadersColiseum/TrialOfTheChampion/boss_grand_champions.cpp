@@ -169,7 +169,7 @@ public:
         }
 
         // just in case, should be done in spell_gen_defend
-        void PassengerBoarded(Unit* who, int8 seat, bool apply)
+        void PassengerBoarded(Unit* who, int8  /*seat*/, bool apply)
         {
             if (me->IsDuringRemoveFromWorld())
                 return;
@@ -184,7 +184,7 @@ public:
         }
 
         //void EnterEvadeMode() { CreatureAI::EnterEvadeMode(); }
-        void MoveInLineOfSight(Unit* who) {}
+        void MoveInLineOfSight(Unit*  /*who*/) {}
         void UpdateAI(uint32 diff)
         {
             if (m_ConditionsTimer <= diff)
@@ -198,8 +198,8 @@ public:
             else
                 m_ConditionsTimer -= diff;
         }
-        void AttackStart(Unit* who) {}
-        void EnterCombat(Unit* who) {}
+        void AttackStart(Unit*  /*who*/) {}
+        void EnterCombat(Unit*  /*who*/) {}
     };
 };
 
@@ -629,7 +629,7 @@ public:
             }
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spell)
+        void SpellHit(Unit*  /*caster*/, const SpellInfo* spell)
         {
             switch( spell->Id )
             {

@@ -160,7 +160,7 @@ public:
                 me->GetMotionMaster()->MoveChase(who);
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit*  /*who*/)
         {
             me->SetInCombatWithZone();
             events.Reset();
@@ -190,7 +190,7 @@ public:
                 pInstance->SetData(TYPE_RAZORSCALE, IN_PROGRESS);
         }
 
-        void JustDied(Unit* Killer)
+        void JustDied(Unit*  /*Killer*/)
         {
             summons.DespawnAll();
 
@@ -604,7 +604,7 @@ class npc_ulduar_expedition_commander : public CreatureScript
             return true;
         }
 
-        bool OnGossipSelect(Player* player, Creature* creature, uint32 uiSender, uint32 uiAction)
+        bool OnGossipSelect(Player* player, Creature* creature, uint32  /*uiSender*/, uint32 uiAction)
         {
             if (!player || !creature)
                 return true;
@@ -797,7 +797,7 @@ public:
             fixingGUID = 0;
         }
 
-        void SetData(uint32 id, uint32 value)
+        void SetData(uint32 id, uint32  /*value*/)
         {
             switch (id)
             {
@@ -1094,7 +1094,7 @@ class achievement_quick_shave : public AchievementCriteriaScript
     public:
         achievement_quick_shave() : AchievementCriteriaScript("achievement_quick_shave") {}
 
-        bool OnCheck(Player* player, Unit* target)
+        bool OnCheck(Player*  /*player*/, Unit* target)
         {
             return target && target->GetTypeId() == TYPEID_UNIT && target->GetEntry() == NPC_RAZORSCALE && target->ToCreature()->AI()->GetData(1);
         }
@@ -1105,7 +1105,7 @@ class achievement_iron_dwarf_medium_rare : public AchievementCriteriaScript
     public:
         achievement_iron_dwarf_medium_rare() : AchievementCriteriaScript("achievement_iron_dwarf_medium_rare") {}
 
-        bool OnCheck(Player* player, Unit* target)
+        bool OnCheck(Player*  /*player*/, Unit* target)
         {
             return target && target->GetEntry() == NPC_RAZORSCALE;
         }

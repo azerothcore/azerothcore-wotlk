@@ -12,6 +12,7 @@
 #include "TransportMgr.h"
 #include "DBCfmt.h"
 #include "BattlegroundMgr.h"
+#include "World.h"
 
 #include <map>
 

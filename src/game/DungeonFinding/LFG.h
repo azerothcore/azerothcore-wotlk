@@ -107,7 +107,7 @@ public:
     Lfg5Guids() { memset(&guid, 0, 5*8); roles = NULL; }
     Lfg5Guids(uint64 g) { memset(&guid, 0, 5*8); guid[0] = g; roles = NULL; }
     Lfg5Guids(Lfg5Guids const& x) { memcpy(guid, x.guid, 5*8); if (x.roles) roles = new LfgRolesMap(*(x.roles)); else roles = NULL; }
-    Lfg5Guids(Lfg5Guids const& x, bool copyRoles) { memcpy(guid, x.guid, 5*8); roles = NULL; }
+    Lfg5Guids(Lfg5Guids const& x, bool /*copyRoles*/) { memcpy(guid, x.guid, 5*8); roles = NULL; }
     ~Lfg5Guids() { delete roles; }
     void addRoles(LfgRolesMap const& r) { roles = new LfgRolesMap(r); }
     void clear() { memset(&guid, 0, 5*8); }
@@ -191,11 +191,10 @@ public:
     }
 };
 
-/*
 std::string ConcatenateDungeons(LfgDungeonSet const& dungeons);
 std::string GetRolesString(uint8 roles);
 std::string GetStateString(LfgState state);
-*/
+
 
 } // namespace lfg
 

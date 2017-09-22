@@ -87,7 +87,7 @@ class boss_kelidan_the_breaker : public CreatureScript
                     instance->SetData(DATA_KELIDAN, NOT_STARTED);
             }
 
-            void EnterCombat(Unit* who)
+            void EnterCombat(Unit*  /*who*/)
             {
                 events.ScheduleEvent(EVENT_SPELL_VOLLEY, 1000);
                 events.ScheduleEvent(EVENT_SPELL_CORRUPTION, 5000);
@@ -296,7 +296,7 @@ class npc_shadowmoon_channeler : public CreatureScript
                 return NULL;
             }
 
-            void EnterCombat(Unit* who)
+            void EnterCombat(Unit*  /*who*/)
             {
                 if (Creature* kelidan = GetKelidan())
                     kelidan->AI()->DoAction(ACTION_CHANNELER_ENGAGED);
@@ -306,7 +306,7 @@ class npc_shadowmoon_channeler : public CreatureScript
                 events.ScheduleEvent(EVENT_SPELL_MARK, urand(5000, 6500));
             }
 
-            void JustDied(Unit* killer)
+            void JustDied(Unit*  /*killer*/)
             {
                 if (Creature* kelidan = GetKelidan())
                     kelidan->AI()->DoAction(ACTION_CHANNELER_DIED);

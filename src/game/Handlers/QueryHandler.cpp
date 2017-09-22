@@ -135,12 +135,15 @@ void WorldSession::HandleCreatureQueryOpcode(WorldPacket & recvData)
     }
     else
     {
-        ;//sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_CREATURE_QUERY - NO CREATURE INFO! (GUID: %u, ENTRY: %u)",
-        //    GUID_LOPART(guid), entry);
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_CREATURE_QUERY - NO CREATURE INFO! (GUID: %u, ENTRY: %u)", GUID_LOPART(guid), entry);
+#endif
         WorldPacket data(SMSG_CREATURE_QUERY_RESPONSE, 4);
         data << uint32(entry | 0x80000000);
         SendPacket(&data);
-        ;//sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Sent SMSG_CREATURE_QUERY_RESPONSE");
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Sent SMSG_CREATURE_QUERY_RESPONSE");
+#endif
     }
 }
 
@@ -171,7 +174,9 @@ void WorldSession::HandleGameObjectQueryOpcode(WorldPacket & recvData)
                 ObjectMgr::GetLocaleString(gameObjectLocale->CastBarCaption, localeConstant, CastBarCaption);
             }
 
-        ;//sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_GAMEOBJECT_QUERY '%s' - Entry: %u. ", info->name.c_str(), entry);
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_GAMEOBJECT_QUERY '%s' - Entry: %u. ", info->name.c_str(), entry);
+#endif
         WorldPacket data (SMSG_GAMEOBJECT_QUERY_RESPONSE, 150);
         data << uint32(entry);
         data << uint32(info->type);
@@ -193,22 +198,30 @@ void WorldSession::HandleGameObjectQueryOpcode(WorldPacket & recvData)
                 data << uint32(0);
 
         SendPacket(&data);
-        ;//sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Sent SMSG_GAMEOBJECT_QUERY_RESPONSE");
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Sent SMSG_GAMEOBJECT_QUERY_RESPONSE");
+#endif
     }
     else
     {
-        ;//sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_GAMEOBJECT_QUERY - Missing gameobject info for (GUID: %u, ENTRY: %u)",
-        //    GUID_LOPART(guid), entry);
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_GAMEOBJECT_QUERY - Missing gameobject info for (GUID: %u, ENTRY: %u)",
+           GUID_LOPART(guid), entry);
+#endif
         WorldPacket data (SMSG_GAMEOBJECT_QUERY_RESPONSE, 4);
         data << uint32(entry | 0x80000000);
         SendPacket(&data);
-        ;//sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Sent SMSG_GAMEOBJECT_QUERY_RESPONSE");
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Sent SMSG_GAMEOBJECT_QUERY_RESPONSE");
+#endif
     }
 }
 
 void WorldSession::HandleCorpseQueryOpcode(WorldPacket & /*recvData*/)
 {
-    ;//sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received MSG_CORPSE_QUERY");
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received MSG_CORPSE_QUERY");
+#endif
 
     Corpse* corpse = GetPlayer()->GetCorpse();
 
@@ -263,7 +276,9 @@ void WorldSession::HandleNpcTextQueryOpcode(WorldPacket & recvData)
     uint64 guid;
 
     recvData >> textID;
-    ;//sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_NPC_TEXT_QUERY ID '%u'", textID);
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_NPC_TEXT_QUERY ID '%u'", textID);
+#endif
 
     recvData >> guid;
 
@@ -340,13 +355,17 @@ void WorldSession::HandleNpcTextQueryOpcode(WorldPacket & recvData)
 
     SendPacket(&data);
 
-    ;//sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Sent SMSG_NPC_TEXT_UPDATE");
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Sent SMSG_NPC_TEXT_UPDATE");
+#endif
 }
 
 /// Only _static_ data is sent in this packet !!!
 void WorldSession::HandlePageTextQueryOpcode(WorldPacket & recvData)
 {
-    ;//sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_PAGE_TEXT_QUERY");
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_PAGE_TEXT_QUERY");
+#endif
 
     uint32 pageID;
     recvData >> pageID;
@@ -380,13 +399,17 @@ void WorldSession::HandlePageTextQueryOpcode(WorldPacket & recvData)
         }
         SendPacket(&data);
 
-        ;//sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Sent SMSG_PAGE_TEXT_QUERY_RESPONSE");
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Sent SMSG_PAGE_TEXT_QUERY_RESPONSE");
+#endif
     }
 }
 
 void WorldSession::HandleCorpseMapPositionQuery(WorldPacket & recvData)
 {
-    ;//sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Recv CMSG_CORPSE_MAP_POSITION_QUERY");
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Recv CMSG_CORPSE_MAP_POSITION_QUERY");
+#endif
 
     uint32 unk;
     recvData >> unk;

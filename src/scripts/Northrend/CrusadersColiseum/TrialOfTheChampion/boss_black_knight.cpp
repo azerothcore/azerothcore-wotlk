@@ -176,7 +176,7 @@ public:
             }
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spell)
+        void SpellHitTarget(Unit*  /*target*/, const SpellInfo* spell)
         {
             switch( spell->Id )
             {
@@ -392,7 +392,7 @@ public:
             events.Reset();
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit*  /*who*/)
         {
             events.Reset();
             if (me->GetEntry() == NPC_RISEN_JAEREN || me->GetEntry() == NPC_RISEN_ARELAS)
@@ -400,7 +400,7 @@ public:
             events.RescheduleEvent(2, urand(3000,4000)); // claw
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spell)
+        void SpellHit(Unit*  /*caster*/, const SpellInfo* spell)
         {
             if (spell->Id == SPELL_BK_GHOUL_EXPLODE)
             {

@@ -27,7 +27,7 @@ class spell_item_massive_seaforium_charge : public SpellScriptLoader
         {
             PrepareSpellScript(spell_item_massive_seaforium_charge_SpellScript);
 
-            void HandleItemRemove(SpellEffIndex effIndex)
+            void HandleItemRemove(SpellEffIndex  /*effIndex*/)
             {
                 if (!GetHitUnit() || !GetHitUnit()->ToPlayer())
                     return;
@@ -443,7 +443,7 @@ class spell_item_lil_phylactery : public SpellScriptLoader
                 return eventInfo.GetActionTarget() && (eventInfo.GetActionTarget()->GetTypeId() != TYPEID_UNIT || eventInfo.GetActionTarget()->ToCreature()->isWorldBoss());
             }
 
-            void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+            void HandleProc(AuraEffect const*  /*aurEff*/, ProcEventInfo&  /*eventInfo*/)
             {
                 PreventDefaultAction();
 
@@ -1053,6 +1053,8 @@ class spell_item_oracle_ablutions : public SpellScriptLoader
                     case POWER_ENERGY:
                         caster->CastSpell(caster, SPELL_ABLUTION_ENERGY, true);
                         break;
+                    default:
+                        break;
                 }
                 if (Player* player = caster->ToPlayer())
                 {
@@ -1253,7 +1255,7 @@ class spell_item_summon_or_dismiss : public SpellScriptLoader
             {
                 for (Unit::ControlSet::iterator itr = GetCaster()->m_Controlled.begin(); itr != GetCaster()->m_Controlled.end(); ++itr)
                 {
-                    if ((*itr)->GetEntry() == GetSpellInfo()->Effects[effIndex].MiscValue)
+                    if (GetSpellInfo()->Effects[effIndex].MiscValue >= 0 && (*itr)->GetEntry() == uint32(GetSpellInfo()->Effects[effIndex].MiscValue))
                     {
                         (*itr)->ToTempSummon()->UnSummon();
                         PreventHitDefaultEffect(effIndex);
@@ -2384,7 +2386,7 @@ class spell_item_shadows_fate : public SpellScriptLoader
         {
             PrepareAuraScript(spell_item_shadows_fate_AuraScript);
 
-            void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+            void HandleProc(AuraEffect const*  /*aurEff*/, ProcEventInfo& eventInfo)
             {
                 PreventDefaultAction();
 

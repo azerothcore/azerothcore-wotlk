@@ -59,7 +59,7 @@ class boss_servant_quarters : public CreatureScript
                     me->DespawnOrUnsummon(1);
             }
 
-            void EnterCombat(Unit* who)
+            void EnterCombat(Unit*  /*who*/)
             {
                 me->setActive(true);
                 if (me->GetEntry() == NPC_HYAKISS_THE_LURKER)

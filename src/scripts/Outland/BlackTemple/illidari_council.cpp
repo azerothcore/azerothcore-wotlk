@@ -143,7 +143,7 @@ public:
             BossAI::Reset();
             Creature* member = NULL;
             for (uint8 i = 0; i < 4; ++i)
-                if (member = ObjectAccessor::GetCreature(*me, councilGUIDs[i]))
+                if ((member = ObjectAccessor::GetCreature(*me, councilGUIDs[i])))
                     member->AI()->EnterEvadeMode();
         }
 
@@ -179,7 +179,7 @@ public:
             {
                 Creature* member = NULL;
                 for (uint8 i = 0; i < 4; ++i)
-                    if (member = ObjectAccessor::GetCreature(*me, councilGUIDs[i]))
+                    if ((member = ObjectAccessor::GetCreature(*me, councilGUIDs[i])))
                         member->AI()->DoAction(ACTION_ENRAGE);
             }
             else if (param == ACTION_END_ENCOUNTER)
@@ -187,14 +187,14 @@ public:
                 me->setActive(false);
                 Creature* member = NULL;
                 for (uint8 i = 0; i < 4; ++i)
-                    if (member = ObjectAccessor::GetCreature(*me, councilGUIDs[i]))
+                    if ((member = ObjectAccessor::GetCreature(*me, councilGUIDs[i])))
                         if (member->IsAlive())
                             Unit::Kill(me, member);
                 Unit::Kill(me, me);
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32  /*diff*/)
         {
             if (!me->isActiveObject())
                 return;
@@ -256,7 +256,7 @@ struct boss_illidari_council_memberAI : public ScriptedAI
             council->GetAI()->DoAction(ACTION_END_ENCOUNTER);
     }
 
-    void EnterCombat(Unit* who)
+    void EnterCombat(Unit*  /*who*/)
     {
         if (Creature* council = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_ILLIDARI_COUNCIL)))
             council->GetAI()->DoAction(ACTION_START_ENCOUNTER);
@@ -413,7 +413,7 @@ class boss_high_nethermancer_zerevor : public CreatureScript
                         events.ScheduleEvent(EVENT_SPELL_BLIZZARD, 40000);
                         break;
                     case EVENT_SPELL_ARCANE_EXPLOSION:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 10.0f))
+                        if (SelectTarget(SELECT_TARGET_RANDOM, 0, 10.0f))
                             me->CastSpell(me, SPELL_ARCANE_EXPLOSION, false);
                         events.ScheduleEvent(EVENT_SPELL_ARCANE_EXPLOSION, 10000);
                         break;                      

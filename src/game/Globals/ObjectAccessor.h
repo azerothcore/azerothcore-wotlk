@@ -72,6 +72,11 @@ class HashMapHolder
         static MapType  m_objectMap;
 };
 
+/// Define the static members of HashMapHolder
+
+template <class T> UNORDERED_MAP< uint64, T* > HashMapHolder<T>::m_objectMap;
+template <class T> typename HashMapHolder<T>::LockType HashMapHolder<T>::i_lock;
+
 // pussywizard:
 class DelayedCorpseAction
 {

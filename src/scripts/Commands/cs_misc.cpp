@@ -200,7 +200,7 @@ public:
             return false;
         }
 
-        if (tokens.size() != count+2)
+        if (tokens.size() != uint16(count+2))
         {
             handler->PSendSysMessage("Invalid number of nicknames for this bracket.");
             handler->SetSentErrorMessage(true);
@@ -454,7 +454,7 @@ public:
 
         if (status)
             handler->PSendSysMessage(LANG_LIQUID_STATUS, liquidStatus.level, liquidStatus.depth_level, liquidStatus.entry, liquidStatus.type_flags, status);
-        if (Transport* t = object->GetTransport())
+        if (object->GetTransport())
             handler->PSendSysMessage("Transport offset: %.2f, %.2f, %.2f, %.2f", object->m_movementInfo.transport.pos.GetPositionX(), object->m_movementInfo.transport.pos.GetPositionY(), object->m_movementInfo.transport.pos.GetPositionZ(), object->m_movementInfo.transport.pos.GetOrientation());
 
         return true;
@@ -697,12 +697,16 @@ public:
             }
             else if (map->IsDungeon())
             {
-                // pussywizard: prevent unbinding normal player's perm bind by just summoning him >_>
-                if (!target->GetSession()->GetSecurity())
+                // Allow GM to summon players or only other GM accounts inside instances.
+                if (!sWorld->getBoolConfig(CONFIG_INSTANCE_GMSUMMON_PLAYER))
                 {
-                    handler->PSendSysMessage("Only GMs can be summoned to an instance!");
-                    handler->SetSentErrorMessage(true);
-                    return false;
+                    // pussywizard: prevent unbinding normal player's perm bind by just summoning him >_>
+                    if (!target->GetSession()->GetSecurity())
+                    {
+                        handler->PSendSysMessage("Only GMs can be summoned to an instance!");
+                        handler->SetSentErrorMessage(true);
+                        return false;
+                    }
                 }
 
                 Map* destMap = target->GetMap();
@@ -1101,7 +1105,7 @@ public:
         return true;
     }
 
-    static bool HandleSaveCommand(ChatHandler* handler, char const* /*args*/)
+    static bool HandleSaveCommand(ChatHandler*  /*handler*/, char const* /*args*/)
     {
         // pussywizard: fully disabled on 28.12.2011, but disabled it "silently"
         return true;
@@ -1519,7 +1523,9 @@ public:
         if (!playerTarget)
             playerTarget = player;
 
-        ;//sLog->outDetail(handler->GetTrinityString(LANG_ADDITEM), itemId, count);
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+        sLog->outDetail(handler->GetTrinityString(LANG_ADDITEM), itemId, count);
+#endif
 
         ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(itemId);
         if (!itemTemplate)
@@ -1606,7 +1612,9 @@ public:
         if (!playerTarget)
             playerTarget = player;
 
-        ;//sLog->outDetail(handler->GetTrinityString(LANG_ADDITEMSET), itemSetId);
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+        sLog->outDetail(handler->GetTrinityString(LANG_ADDITEMSET), itemSetId);
+#endif
 
         bool found = false;
         ItemTemplateContainer const* its = sObjectMgr->GetItemTemplateStore();
@@ -1892,7 +1900,19 @@ public:
 #if TRINITY_ENDIAN == BIGENDIAN
                 EndianConvertReverse(ip);
 #endif
+                PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_IP2NATION_COUNTRY);
 
+                stmt->setUInt32(0, ip);
+
+                PreparedQueryResult result2 = LoginDatabase.Query(stmt);
+
+                if (result2)
+                {
+                    Field* fields2 = result2->Fetch();
+                    lastIp.append(" (");
+                    lastIp.append(fields2[0].GetString());
+                    lastIp.append(")");
+                }
             }
             else
             {
@@ -3075,10 +3095,10 @@ public:
                 if (flags.empty())
                     flags = "None";
 
-                Player* p = ObjectAccessor::FindPlayerInOrOutOfWorld((*itr).guid);
+                /*Player* p = ObjectAccessor::FindPlayerInOrOutOfWorld((*itr).guid);
                 const char* onlineState = p ? "online" : "offline";
 
-                /*handler->PSendSysMessage(LANG_GROUP_PLAYER_NAME_GUID, slot.name.c_str(), onlineState,
+                handler->PSendSysMessage(LANG_GROUP_PLAYER_NAME_GUID, slot.name.c_str(), onlineState,
                     GUID_LOPART(slot.guid), flags.c_str(), lfg::GetRolesString(slot.roles).c_str());*/
             }
         }

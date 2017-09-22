@@ -126,10 +126,9 @@ class ScriptRegistry
 
 // Utility macros for looping over scripts.
 #define FOR_SCRIPTS(T, C, E) \
-    if (SCR_REG_LST(T).empty()) \
-        return; \
-    for (SCR_REG_ITR(T) C = SCR_REG_LST(T).begin(); \
-        C != SCR_REG_LST(T).end(); ++C)
+    if (!SCR_REG_LST(T).empty()) \
+        for (SCR_REG_ITR(T) C = SCR_REG_LST(T).begin(); \
+            C != SCR_REG_LST(T).end(); ++C)
 #define FOR_SCRIPTS_RET(T, C, E, R) \
     if (SCR_REG_LST(T).empty()) \
         return R; \
@@ -1161,7 +1160,7 @@ bool ScriptMgr::OnCriteriaCheck(uint32 scriptId, Player* source, Unit* target)
 // Player
 void ScriptMgr::OnPlayerReleasedGhost(Player* player)
 {
-	FOREACH_SCRIPT(PlayerScript)->OnPlayerReleasedGhost(player);
+    FOREACH_SCRIPT(PlayerScript)->OnPlayerReleasedGhost(player);
 }
 
 void ScriptMgr::OnPVPKill(Player* killer, Player* killed)
@@ -1262,6 +1261,11 @@ void ScriptMgr::OnPlayerTextEmote(Player* player, uint32 textEmote, uint32 emote
 void ScriptMgr::OnPlayerSpellCast(Player* player, Spell* spell, bool skipCheck)
 {
     FOREACH_SCRIPT(PlayerScript)->OnSpellCast(player, spell, skipCheck);
+}
+
+void ScriptMgr::OnBeforePlayerUpdate(Player* player, uint32 p_time)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnBeforeUpdate(player, p_time);
 }
 
 void ScriptMgr::OnPlayerLogin(Player* player)
@@ -1379,6 +1383,11 @@ void ScriptMgr::OnQuestRewardItem(Player* player, Item* item, uint32 count)
     FOREACH_SCRIPT(PlayerScript)->OnQuestRewardItem(player, item, count);
 }
 
+void ScriptMgr::OnFirstLogin(Player* player)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnFirstLogin(player);
+}
+
 // Guild
 void ScriptMgr::OnGuildAddMember(Guild* guild, Player* player, uint8& plRank)
 {
@@ -1493,6 +1502,16 @@ void ScriptMgr::OnAfterRefCount(LootStoreItem* LootStoreItem, uint32 &maxcount)
 void ScriptMgr::OnBeforeDropAddItem(Player const* player, Loot& loot, LootStoreItem* LootStoreItem)
 {
     FOREACH_SCRIPT(GlobalScript)->OnBeforeDropAddItem(player, loot, LootStoreItem);
+}
+
+void ScriptMgr::OnInitializeLockedDungeons(Player* player, uint8& level, uint32& lockData)
+{
+    FOREACH_SCRIPT(GlobalScript)->OnInitializeLockedDungeons(player, level, lockData);
+}
+
+void ScriptMgr::OnAfterInitializeLockedDungeons(Player* player)
+{
+    FOREACH_SCRIPT(GlobalScript)->OnAfterInitializeLockedDungeons(player);
 }
 
 uint32 ScriptMgr::DealDamage(Unit* AttackerUnit, Unit *pVictim, uint32 damage, DamageEffectType damagetype)

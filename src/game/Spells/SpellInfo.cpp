@@ -2018,7 +2018,7 @@ AuraStateType SpellInfo::LoadAuraState() const
     uint32 StealthPreventionSpellList[] = { 9991, 35331, 9806, 35325 };
 	
     // Goes through each of the spells and identifies them as Stealth Prevention Spell.
-    for (int i = 0; i < sizeof(StealthPreventionSpellList) / sizeof(uint32); i++) {
+    for (uint32 i = 0; i < sizeof(StealthPreventionSpellList) / sizeof(uint32); i++) {
         if (Id == StealthPreventionSpellList[i]) {
             return AURA_STATE_FAERIE_FIRE;
 	}
@@ -2365,7 +2365,9 @@ int32 SpellInfo::CalcPowerCost(Unit const* caster, SpellSchoolMask schoolMask, S
                 break;
             case POWER_RUNE:
             case POWER_RUNIC_POWER:
-                ;//sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "CalculateManaCost: Not implemented yet!");
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+                sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "CalculateManaCost: Not implemented yet!");
+#endif
                 break;
             default:
                 sLog->outError("CalculateManaCost: Unknown power type '%d' in spell %d", PowerType, Id);

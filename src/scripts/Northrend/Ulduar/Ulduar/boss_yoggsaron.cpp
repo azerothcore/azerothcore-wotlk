@@ -293,9 +293,10 @@ enum Misc
     DATA_GET_KEEPERS_COUNT              = 1,
     DATA_GET_CURRENT_ILLUSION           = 2,
     DATA_GET_SARA_PHASE                 = 3,
+    DATA_GET_DRIVE_ME_CRAZY             = 4,
 };
 
-const Position Middle = {1980.28f, -25.5868f, 329.397f};
+const Position Middle = {1980.28f, -25.5868f, 329.397f, M_PI*1.5f};
 
 
 class boss_yoggsaron_sara : public CreatureScript
@@ -484,7 +485,7 @@ public:
                 if (!summon || summon->GetEntry() != NPC_OMINOUS_CLOUD || me->GetDistance(summon) < 20)
                     continue;
 
-                if ((!cloud || urand(0,1) && !summon->HasAura(SPELL_SUMMON_GUARDIAN_OF_YS)))
+                if ((!cloud || (urand(0,1) && !summon->HasAura(SPELL_SUMMON_GUARDIAN_OF_YS))))
                     cloud = summon;
             }
 
@@ -525,7 +526,7 @@ public:
             for (uint8 i = 0; i < RAID_MODE(4, 10); ++i)
             {
                 float ang = i ? (M_PI*2.0f/i) : M_PI*2.0f;
-                if (cr = me->SummonCreature(NPC_DESCEND_INTO_MADNESS, me->GetPositionX()+25*cos(ang), me->GetPositionY()+25*sin(ang), 326, 0, TEMPSUMMON_TIMED_DESPAWN, 15000))
+                if ((cr = me->SummonCreature(NPC_DESCEND_INTO_MADNESS, me->GetPositionX()+25*cos(ang), me->GetPositionY()+25*sin(ang), 326, 0, TEMPSUMMON_TIMED_DESPAWN, 15000)))
                 {
                     cr->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_NON_ATTACKABLE);
                     cr->SetArmor(_currentIllusion);
@@ -536,9 +537,9 @@ public:
             summons.DoAction(_currentIllusion, pred);
 
             if (_isIllusionReversed)
-                _currentIllusion = _currentIllusion == 3 ? 1 : ++_currentIllusion;
+                _currentIllusion = _currentIllusion == 3 ? 1 : (_currentIllusion+1);
             else
-                _currentIllusion = _currentIllusion == 1 ? 3 : --_currentIllusion;
+                _currentIllusion = _currentIllusion == 1 ? 3 : (_currentIllusion-1);
         }
 
         void SpellSounds()
@@ -884,9 +885,9 @@ public:
                     sara->AI()->JustSummoned(cr);
         }
 
-        void MoveInLineOfSight(Unit* who) {}
-        void AttackStart(Unit* who) {}
-        void WaypointReached(uint32 point) {}
+        void MoveInLineOfSight(Unit*  /*who*/) {}
+        void AttackStart(Unit*  /*who*/) {}
+        void WaypointReached(uint32  /*point*/) {}
 
         void Reset()
         {
@@ -1043,7 +1044,7 @@ public:
             me->SummonCreature(NPC_IMMORTAL_GUARDIAN, me->GetPositionX()+dist*cos(o), me->GetPositionY()+dist*sin(o), 327.2+Zplus, 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
         }
 
-        void JustDied(Unit* who)
+        void JustDied(Unit*  /*who*/)
         {
             summons.DespawnAll();
             events.Reset();
@@ -1098,7 +1099,7 @@ public:
                 me->LowerPlayerDamageReq(me->GetMaxHealth()*0.7f);
 
                 me->RemoveAura(SPELL_SHADOW_BARRIER);
-                
+
                 events.ScheduleEvent(EVENT_YS_LUNATIC_GAZE, 7000);
                 events.ScheduleEvent(EVENT_YS_SHADOW_BEACON, 20000);
                 events.ScheduleEvent(EVENT_YS_SUMMON_GUARDIAN, 0);
@@ -1126,13 +1127,13 @@ public:
 
         uint32 GetData(uint32 param) const
         {
-            if (param == ACTION_FAILED_DRIVE_ME_CRAZY)
+            if (param == DATA_GET_DRIVE_ME_CRAZY)
                 return !_usedInsane;
 
             return 0;
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spellInfo)
+        void SpellHit(Unit*  /*caster*/, const SpellInfo* spellInfo)
         {
             if (spellInfo->Id == SPELL_IN_THE_MAWS_OF_THE_OLD_GOD)
                 me->AddLootMode(32);
@@ -1487,7 +1488,7 @@ public:
                 me->RemoveAura(SPELL_SHATTERED_ILLUSION);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32  /*diff*/)
         {
             if (!UpdateVictim())
                 return;
@@ -1550,7 +1551,7 @@ public:
             return target;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32  /*diff*/)
         {
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
@@ -2308,7 +2309,7 @@ class spell_yogg_saron_brain_link : public SpellScriptLoader
                     _targetGUID = target->GetGUID();
             }
 
-            void OnPeriodic(AuraEffect const* aurEff)
+            void OnPeriodic(AuraEffect const*  /*aurEff*/)
             {
                 Unit* owner = GetUnitOwner();
                 Unit* _target = ObjectAccessor::GetUnit(*owner, _targetGUID);
@@ -2541,7 +2542,7 @@ class spell_yogg_saron_empowered : public SpellScriptLoader
         {
             PrepareAuraScript(spell_yogg_saron_empowered_AuraScript);
 
-            void OnPeriodic(AuraEffect const* aurEff)
+            void OnPeriodic(AuraEffect const*  /*aurEff*/)
             {
                 Unit* target = GetUnitOwner();
                 uint8 stack = std::min(uint8(target->GetHealthPct()/10), (uint8)9);
@@ -2659,7 +2660,7 @@ class spell_yogg_saron_sanity_well : public SpellScriptLoader
                 amplitude = 2*IN_MILLISECONDS;
             }
 
-            void HandleEffectPeriodic(AuraEffect const * aurEff)
+            void HandleEffectPeriodic(AuraEffect const *  /*aurEff*/)
             {
                 Unit* target = GetTarget();
                 if (!target || target->GetTypeId() != TYPEID_PLAYER)
@@ -2872,9 +2873,9 @@ class achievement_yogg_saron_drive_me_crazy : public AchievementCriteriaScript
     public:
         achievement_yogg_saron_drive_me_crazy() : AchievementCriteriaScript("achievement_yogg_saron_drive_me_crazy") {}
 
-        bool OnCheck(Player* player, Unit* target)
+        bool OnCheck(Player*  /*player*/, Unit* target)
         {
-            return target && target->GetAI()->GetData(ACTION_FAILED_DRIVE_ME_CRAZY); // target = Yogg-Saron
+            return target && target->GetAI()->GetData(DATA_GET_DRIVE_ME_CRAZY); // target = Yogg-Saron
         }
 };
 
@@ -2886,7 +2887,7 @@ class achievement_yogg_saron_darkness : public AchievementCriteriaScript
         {
         }
 
-        bool OnCheck(Player* player, Unit* target /*Yogg-Saron*/)
+        bool OnCheck(Player* player, Unit*  /*target*/ /*Yogg-Saron*/)
         {
             if (player->GetInstanceScript())
                 if (Creature* sara = ObjectAccessor::GetCreature(*player, player->GetInstanceScript()->GetData64(NPC_SARA)))
@@ -2907,7 +2908,7 @@ class achievement_yogg_saron_he_waits_dreaming : public AchievementCriteriaScrip
         {
         }
 
-        bool OnCheck(Player* player, Unit* target /*Yogg-Saron*/)
+        bool OnCheck(Player* player, Unit*  /*target*/ /*Yogg-Saron*/)
         {
             if (player->GetInstanceScript())
                 if (Creature* sara = ObjectAccessor::GetCreature(*player, player->GetInstanceScript()->GetData64(NPC_BRAIN_OF_YOGG_SARON)))
@@ -2926,7 +2927,7 @@ class achievement_yogg_saron_kiss_and_make_up : public AchievementCriteriaScript
     public:
         achievement_yogg_saron_kiss_and_make_up() : AchievementCriteriaScript("achievement_yogg_saron_kiss_and_make_up") {}
 
-        bool OnCheck(Player* player, Unit* target /*Sara*/)
+        bool OnCheck(Player*  /*player*/, Unit* target /*Sara*/)
         {
             return target && target->GetEntry() == NPC_SARA && target->GetAI() && target->GetAI()->GetData(DATA_GET_SARA_PHASE);
         }

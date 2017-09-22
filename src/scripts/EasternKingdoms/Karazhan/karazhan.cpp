@@ -228,7 +228,9 @@ public:
 
         void PrepareEncounter()
         {
-            ;//sLog->outDebug(LOG_FILTER_TSCR, "TSCR: Barnes Opera Event - Introduction complete - preparing encounter %d", m_uiEventId);
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+            sLog->outDebug(LOG_FILTER_TSCR, "TSCR: Barnes Opera Event - Introduction complete - preparing encounter %d", m_uiEventId);
+#endif
             uint8 index = 0;
             uint8 count = 0;
 
@@ -409,7 +411,7 @@ public:
 #define SAY_DIALOG_MEDIVH_9         "He should not have angered me. I must go... recover my strength now..."
 
 
-static float MedivPos[4] = {-11161.49f, -1902.24f, 91.48f, 1.94f};
+//static float MedivPos[4] = {-11161.49f, -1902.24f, 91.48f, 1.94f};
 static float ArcanagosPos[4] = {-11169.75f, -1881.48f, 107.39f, 4.83f};
 
 class npc_image_of_medivh : public CreatureScript

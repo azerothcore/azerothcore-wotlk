@@ -221,7 +221,7 @@ class boss_alar : public CreatureScript
                                 me->SummonCreature(NPC_EMBER_OF_ALAR, *me, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 6000);
                             }
                             me->GetMotionMaster()->MovePoint(POINT_PLATFORM, alarPoints[platform], false, true);
-                            platform = (++platform)%4;
+                            platform = (platform+1)%4;
                             events.ScheduleEvent(EVENT_SWITCH_PLATFORM, 30000);
                         }
                         me->setAttackTimer(BASE_ATTACK, 20000);
@@ -359,7 +359,7 @@ class spell_alar_flame_quills : public SpellScriptLoader
         {
             PrepareAuraScript(spell_alar_flame_quills_AuraScript);
 
-            void HandlePeriodic(AuraEffect const* aurEff)
+            void HandlePeriodic(AuraEffect const*  /*aurEff*/)
             {
                 PreventDefaultAction();
 

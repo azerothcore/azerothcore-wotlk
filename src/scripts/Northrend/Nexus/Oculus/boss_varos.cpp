@@ -107,7 +107,7 @@ public:
             me->DisableRotate(false);
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit*  /*who*/)
         {
             Talk(SAY_AGGRO);
 
@@ -121,7 +121,7 @@ public:
             events.RescheduleEvent(EVENT_ENERGIZE_CORES_THIN, 0);
         }
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit*  /*killer*/)
         {
             Talk(SAY_DEATH);
 
@@ -139,8 +139,8 @@ public:
             ScriptedAI::EnterEvadeMode();
         }
 
-        void MoveInLineOfSight(Unit* who) {}
-        void JustSummoned(Creature* summon) {}
+        void MoveInLineOfSight(Unit*  /*who*/) {}
+        void JustSummoned(Creature*  /*summon*/) {}
 
         void UpdateAI(uint32 diff)
         {

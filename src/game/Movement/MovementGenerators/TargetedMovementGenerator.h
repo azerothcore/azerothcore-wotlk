@@ -46,14 +46,14 @@ class TargetedMovementGeneratorMedium : public MovementGeneratorMedium< T, D >, 
     protected:
         void _setTargetLocation(T* owner, bool initial);
 
+        PathGenerator* i_path;
+        uint32 lastPathingFailMSTime;
         TimeTrackerSmall i_recheckDistance;
         TimeTrackerSmall i_recheckDistanceForced;
         float i_offset;
         float i_angle;
         bool i_recalculateTravel : 1;
         bool i_targetReached : 1;
-        PathGenerator* i_path;
-        uint32 lastPathingFailMSTime;
 };
 
 template<class T>

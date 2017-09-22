@@ -248,7 +248,7 @@ public:
                 pInstance->SetData(DATA_IMMORTAL_FAIL, 0);
         }
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit*  /*killer*/)
         {
             if (pInstance)
             {
@@ -262,7 +262,7 @@ public:
             Talk(SAY_DEATH);
         }
 
-        void EnterCombat(Unit *who)
+        void EnterCombat(Unit * /*who*/)
         {
             if (pInstance)
                 pInstance->SetData(EVENT_HORSEMAN, IN_PROGRESS);

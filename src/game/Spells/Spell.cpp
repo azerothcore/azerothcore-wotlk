@@ -959,7 +959,9 @@ void Spell::SelectEffectImplicitTargets(SpellEffIndex effIndex, SpellImplicitTar
             }
             break;
         case TARGET_SELECT_CATEGORY_NYI:
-            ;//sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "SPELL: target type %u, found in spellID %u, effect %u is not implemented yet!", m_spellInfo->Id, effIndex, targetType.GetTarget());
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+            sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "SPELL: target type %u, found in spellID %u, effect %u is not implemented yet!", m_spellInfo->Id, effIndex, targetType.GetTarget());
+#endif
             break;
         default:
             ASSERT(false && "Spell::SelectEffectImplicitTargets: received not implemented select target category");
@@ -989,7 +991,11 @@ void Spell::SelectImplicitChannelTargets(SpellEffIndex effIndex, SpellImplicitTa
                     AddUnitTarget(target->ToUnit(), 1 << effIndex);
             }
             else
-                ;//sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "SPELL: cannot find channel spell target for spell ID %u, effect %u", m_spellInfo->Id, effIndex);
+            {
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+                sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "SPELL: cannot find channel spell target for spell ID %u, effect %u", m_spellInfo->Id, effIndex);
+#endif
+            }
             break;
         }
         case TARGET_DEST_CHANNEL_TARGET:
@@ -1002,7 +1008,11 @@ void Spell::SelectImplicitChannelTargets(SpellEffIndex effIndex, SpellImplicitTa
                     m_targets.SetDst(*target);
             }
             else //if (!m_targets.HasDst())
-                ;//sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "SPELL: cannot find channel spell destination for spell ID %u, effect %u", m_spellInfo->Id, effIndex);
+            {
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+                sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "SPELL: cannot find channel spell destination for spell ID %u, effect %u", m_spellInfo->Id, effIndex);
+#endif
+            }
             break;
         case TARGET_DEST_CHANNEL_CASTER:
             if (GetOriginalCaster())
@@ -1048,7 +1058,9 @@ void Spell::SelectImplicitNearbyTargets(SpellEffIndex effIndex, SpellImplicitTar
     // handle emergency case - try to use other provided targets if no conditions provided
     if (targetType.GetCheckType() == TARGET_CHECK_ENTRY && (!condList || condList->empty()))
     {
-        ;//sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "Spell::SelectImplicitNearbyTargets: no conditions entry for target with TARGET_CHECK_ENTRY of spell ID %u, effect %u - selecting default targets", m_spellInfo->Id, effIndex);
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+        sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "Spell::SelectImplicitNearbyTargets: no conditions entry for target with TARGET_CHECK_ENTRY of spell ID %u, effect %u - selecting default targets", m_spellInfo->Id, effIndex);
+#endif
         switch (targetType.GetObjectType())
         {
             case TARGET_OBJECT_TYPE_GOBJ:
@@ -1075,7 +1087,9 @@ void Spell::SelectImplicitNearbyTargets(SpellEffIndex effIndex, SpellImplicitTar
     WorldObject* target = SearchNearbyTarget(range, targetType.GetObjectType(), targetType.GetCheckType(), condList);
     if (!target)
     {
-        ;//sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "Spell::SelectImplicitNearbyTargets: cannot find nearby target for spell ID %u, effect %u", m_spellInfo->Id, effIndex);
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+        sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "Spell::SelectImplicitNearbyTargets: cannot find nearby target for spell ID %u, effect %u", m_spellInfo->Id, effIndex);
+#endif
         return;
     }
 
@@ -1278,7 +1292,9 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
             }
             else
             {
-                ;//sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "SPELL: unknown target coordinates for spell ID %u", m_spellInfo->Id);
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+                sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "SPELL: unknown target coordinates for spell ID %u", m_spellInfo->Id);
+#endif
                 if (WorldObject* target = m_targets.GetObjectTarget())
                     dest = SpellDestination(*target);
             }
@@ -2094,7 +2110,7 @@ void Spell::SearchAreaTargets(std::list<WorldObject*>& targets, float range, Pos
     SearchTargets<Trinity::WorldObjectListSearcher<Trinity::WorldObjectSpellAreaTargetCheck> > (searcher, containerTypeMask, m_caster, position, range);
 }
 
-void Spell::SearchChainTargets(std::list<WorldObject*>& targets, uint32 chainTargets, WorldObject* target, SpellTargetObjectTypes objectType, SpellTargetCheckTypes selectType, SpellTargetSelectionCategories selectCategory, ConditionList* condList, bool isChainHeal)
+void Spell::SearchChainTargets(std::list<WorldObject*>& targets, uint32 chainTargets, WorldObject* target, SpellTargetObjectTypes objectType, SpellTargetCheckTypes selectType, SpellTargetSelectionCategories  /*selectCategory*/, ConditionList* condList, bool isChainHeal)
 {
     // max dist for jump target selection
     float jumpRadius = 0.0f;
@@ -2771,7 +2787,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
             caster->ProcDamageAndSpell(unitTarget, procAttacker, procVictim, procEx, 0, m_attackType, m_spellInfo, m_triggeredByAuraSpell);
             // Xinef: eg. rogue poisions can proc off cheap shot, etc. so this block should be here also
             // Xinef: ofc count only spells that HIT the target, little hack used to fool the system
-            if ((procEx & PROC_EX_NORMAL_HIT|PROC_EX_CRITICAL_HIT) && caster->GetTypeId() == TYPEID_PLAYER && m_spellInfo->HasAttribute(SPELL_ATTR0_STOP_ATTACK_TARGET) == 0 &&
+            if (((procEx & PROC_EX_NORMAL_HIT)|PROC_EX_CRITICAL_HIT) && caster->GetTypeId() == TYPEID_PLAYER && m_spellInfo->HasAttribute(SPELL_ATTR0_STOP_ATTACK_TARGET) == 0 &&
                 m_spellInfo->HasAttribute(SPELL_ATTR4_CANT_TRIGGER_ITEM_SPELLS) == 0 && (m_spellInfo->DmgClass == SPELL_DAMAGE_CLASS_MELEE || m_spellInfo->DmgClass == SPELL_DAMAGE_CLASS_RANGED))
                 caster->ToPlayer()->CastItemCombatSpell(unitTarget, m_attackType, procVictim|PROC_FLAG_TAKEN_DAMAGE, procEx);
         }
@@ -3097,7 +3113,9 @@ void Spell::DoTriggersOnSpellHit(Unit* unit, uint8 effMask)
             if (CanExecuteTriggersOnHit(effMask, i->triggeredByAura) && roll_chance_i(i->chance))
             {
                 m_caster->CastSpell(unit, i->triggeredSpell, true);
-                ;//sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "Spell %d triggered spell %d by SPELL_AURA_ADD_TARGET_TRIGGER aura", m_spellInfo->Id, i->triggeredSpell->Id);
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+                sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "Spell %d triggered spell %d by SPELL_AURA_ADD_TARGET_TRIGGER aura", m_spellInfo->Id, i->triggeredSpell->Id);
+#endif
 
                 // SPELL_AURA_ADD_TARGET_TRIGGER auras shouldn't trigger auras without duration
                 // set duration of current aura to the triggered spell
@@ -3120,12 +3138,14 @@ void Spell::DoTriggersOnSpellHit(Unit* unit, uint8 effMask)
 
     // trigger linked auras remove/apply
     // TODO: remove/cleanup this, as this table is not documented and people are doing stupid things with it
-    if (std::vector<int32> const* spellTriggered = sSpellMgr->GetSpellLinked(m_spellInfo->Id + SPELL_LINK_HIT))
+    if (std::vector<int32> const* spellTriggered = sSpellMgr->GetSpellLinked(m_spellInfo->Id + SPELL_LINK_HIT)) {
         for (std::vector<int32>::const_iterator i = spellTriggered->begin(); i != spellTriggered->end(); ++i)
-            if (*i < 0)
+            if (*i < 0) {
                 unit->RemoveAurasDueToSpell(-(*i));
-            else
+            } else {
                 unit->CastSpell(unit, *i, true, 0, 0, m_caster->GetGUID());
+            }
+    }
 }
 
 void Spell::DoAllEffectOnTarget(GOTargetInfo* target)
@@ -3397,7 +3417,9 @@ void Spell::prepare(SpellCastTargets const* targets, AuraEffect const* triggered
     // set timer base at cast time
     ReSetTimer();
 
-    ;//sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "Spell::prepare: spell id %u source %u caster %d customCastFlags %u mask %u", m_spellInfo->Id, m_caster->GetEntry(), m_originalCaster ? m_originalCaster->GetEntry() : -1, _triggeredCastFlags, m_targets.GetTargetMask());
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+    sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "Spell::prepare: spell id %u source %u caster %d customCastFlags %u mask %u", m_spellInfo->Id, m_caster->GetEntry(), m_originalCaster ? m_originalCaster->GetEntry() : -1, _triggeredCastFlags, m_targets.GetTargetMask());
+#endif
 
     //Containers for channeled spells have to be set
     //TODO:Apply this to all casted spells if needed
@@ -3758,6 +3780,7 @@ void Spell::handle_immediate()
             // Apply duration mod
             if (Player* modOwner = m_caster->GetSpellModOwner())
                 modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_DURATION, duration);
+
             // Apply haste mods
             if (m_caster->HasAuraTypeWithAffectMask(SPELL_AURA_PERIODIC_HASTE, m_spellInfo) || m_spellInfo->HasAttribute(SPELL_ATTR5_HASTE_AFFECT_DURATION))
                 duration = int32(duration * m_caster->GetFloatValue(UNIT_MOD_CAST_SPEED));
@@ -3780,10 +3803,10 @@ void Spell::handle_immediate()
     // process immediate effects (items, ground, etc.) also initialize some variables
     _handle_immediate_phase();
 
-    for (std::list<TargetInfo>::iterator ihit= m_UniqueTargetInfo.begin(); ihit != m_UniqueTargetInfo.end(); ++ihit)
+    for (std::list<TargetInfo>::iterator ihit = m_UniqueTargetInfo.begin(); ihit != m_UniqueTargetInfo.end(); ++ihit)
         DoAllEffectOnTarget(&(*ihit));
 
-    for (std::list<GOTargetInfo>::iterator ihit= m_UniqueGOTargetInfo.begin(); ihit != m_UniqueGOTargetInfo.end(); ++ihit)
+    for (std::list<GOTargetInfo>::iterator ihit = m_UniqueGOTargetInfo.begin(); ihit != m_UniqueGOTargetInfo.end(); ++ihit)
         DoAllEffectOnTarget(&(*ihit));
 
     FinishTargetProcessing();
@@ -3925,7 +3948,7 @@ void Spell::_handle_finish_phase()
         m_caster->HandleProcExtraAttackFor(m_caster->GetVictim());
 
     if (!IsAutoRepeat() && !IsNextMeleeSwingSpell())
-        if (Player* p = m_caster->GetCharmerOrOwnerPlayerOrPlayerItself())
+        if (m_caster->GetCharmerOrOwnerPlayerOrPlayerItself())
             for (std::list<TargetInfo>::iterator ihit = m_UniqueTargetInfo.begin(); ihit != m_UniqueTargetInfo.end(); ++ihit)
             {
                 // Xinef: Properly clear infinite cooldowns in some cases
@@ -3989,7 +4012,9 @@ void Spell::update(uint32 difftime)
 
     if (m_targets.GetUnitTargetGUID() && !m_targets.GetUnitTarget())
     {
-        ;//sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "Spell %u is cancelled due to removal of target.", m_spellInfo->Id);
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+        sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "Spell %u is cancelled due to removal of target.", m_spellInfo->Id);
+#endif
         cancel();
         return;
     }
@@ -4047,7 +4072,9 @@ void Spell::update(uint32 difftime)
             // Xinef: so the aura can be removed in different updates for all units
             else if ((m_timer < 0 || m_timer > 300) && !UpdateChanneledTargetList())
             {
-                ;//sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "Channeled spell %d is removed due to lack of targets", m_spellInfo->Id);
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+                sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "Channeled spell %d is removed due to lack of targets", m_spellInfo->Id);
+#endif
                 SendChannelUpdate(0);
                 finish();
             }
@@ -4111,7 +4138,9 @@ void Spell::finish(bool ok)
         SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spell);
         if (spellInfo && spellInfo->SpellIconID == 2056)
         {
-            ;//sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "Statue %d is unsummoned in spell %d finish", m_caster->GetGUIDLow(), m_spellInfo->Id);
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+            sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "Statue %d is unsummoned in spell %d finish", m_caster->GetGUIDLow(), m_spellInfo->Id);
+#endif
             m_caster->setDeathState(JUST_DIED);
             return;
         }
@@ -5147,7 +5176,9 @@ void Spell::HandleThreatSpells()
         else if (!m_spellInfo->_IsPositiveSpell() && !IsFriendly && target->CanHaveThreatList())
             target->AddThreat(m_caster, threatToAdd, m_spellInfo->GetSchoolMask(), m_spellInfo);
     }
-    ;//sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "Spell %u, added an additional %f threat for %s %u target(s)", m_spellInfo->Id, threat, m_spellInfo->_IsPositiveSpell() ? "assisting" : "harming", uint32(m_UniqueTargetInfo.size()));
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+    sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "Spell %u, added an additional %f threat for %s %u target(s)", m_spellInfo->Id, threat, m_spellInfo->_IsPositiveSpell() ? "assisting" : "harming", uint32(m_UniqueTargetInfo.size()));
+#endif
 }
 
 void Spell::HandleEffects(Unit* pUnitTarget, Item* pItemTarget, GameObject* pGOTarget, uint32 i, SpellEffectHandleMode mode)
@@ -5160,7 +5191,9 @@ void Spell::HandleEffects(Unit* pUnitTarget, Item* pItemTarget, GameObject* pGOT
 
     uint8 eff = m_spellInfo->Effects[i].Effect;
 
-    ;//sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "Spell: %u Effect : %u", m_spellInfo->Id, eff);
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+    sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "Spell: %u Effect : %u", m_spellInfo->Id, eff);
+#endif
 
     // we do not need DamageMultiplier here.
     damage = CalculateSpellDamage(i, NULL);
@@ -5717,7 +5750,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                             return SPELL_FAILED_BAD_TARGETS;
                 // Xinef: Pass only explicit unit target spells
                 // pussywizard:
-                if (MMAP::MMapFactory::IsPathfindingEnabled(m_caster->FindMap(), true) && m_spellInfo->NeedsExplicitUnitTarget())
+                if (MMAP::MMapFactory::IsPathfindingEnabled(m_caster->FindMap()) && m_spellInfo->NeedsExplicitUnitTarget())
                 {
                     Unit* target = m_targets.GetUnitTarget();
                     if (!target)
@@ -7160,7 +7193,9 @@ void Spell::Delayed() // only called in DealDamage()
     else
         m_timer += delaytime;
 
-    ;//sLog->outDetail("Spell %u partially interrupted for (%d) ms at damage", m_spellInfo->Id, delaytime);
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+    sLog->outDetail("Spell %u partially interrupted for (%d) ms at damage", m_spellInfo->Id, delaytime);
+#endif
 
     WorldPacket data(SMSG_SPELL_DELAYED, 8+4);
     data.append(m_caster->GetPackGUID());
@@ -7198,7 +7233,9 @@ void Spell::DelayedChannel()
     else
         m_timer -= delaytime;
 
-    ;//sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "Spell %u partially interrupted for %i ms, new duration: %u ms", m_spellInfo->Id, delaytime, m_timer);
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+    sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "Spell %u partially interrupted for %i ms, new duration: %u ms", m_spellInfo->Id, delaytime, m_timer);
+#endif
 
     for (std::list<TargetInfo>::const_iterator ihit = m_UniqueTargetInfo.begin(); ihit != m_UniqueTargetInfo.end(); ++ihit)
         if ((*ihit).missCondition == SPELL_MISS_NONE)
@@ -7537,7 +7574,7 @@ bool SpellEvent::IsDeletable() const
     return m_Spell->IsDeletable();
 }
 
-bool ReflectEvent::Execute(uint64 e_time, uint32 p_time)
+bool ReflectEvent::Execute(uint64  /*e_time*/, uint32  /*p_time*/)
 {
     Unit* caster = ObjectAccessor::FindUnit(_casterGUID);
     Unit* target = ObjectAccessor::FindUnit(_targetGUID);
@@ -7855,7 +7892,9 @@ void Spell::LoadScripts()
             m_loadedScripts.erase(bitr);
             continue;
         }
-        ;//sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "Spell::LoadScripts: Script `%s` for spell `%u` is loaded now", (*itr)->_GetScriptName()->c_str(), m_spellInfo->Id);
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+        sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "Spell::LoadScripts: Script `%s` for spell `%u` is loaded now", (*itr)->_GetScriptName()->c_str(), m_spellInfo->Id);
+#endif
         (*itr)->Register();
         ++itr;
     }

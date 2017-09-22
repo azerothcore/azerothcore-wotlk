@@ -181,7 +181,7 @@ public:
         return true;
     }
 
-    bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32 opt)
+    bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32  /*opt*/)
     {
         if (!creature->AI()->GetData(DATA_DERBY_FINISHED) && quest->GetQuestId() == QUEST_FISHING_DERBY)
         {
@@ -290,7 +290,7 @@ public:
         return true;
     }
 
-    bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32 opt)
+    bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32  /*opt*/)
     {
         if (!creature->AI()->GetData(DATA_ANGLER_FINISHED) && quest->GetQuestId() == QUEST_MASTER_ANGLER)
         {
@@ -1824,61 +1824,34 @@ class npc_wormhole : public CreatureScript
 
 enum PetTrainer
 {
-    TEXT_ISHUNTER               = 5838,
-    TEXT_NOTHUNTER              = 5839,
-    TEXT_PETINFO                = 13474,
-    TEXT_CONFIRM                = 7722
+    PET_UNLEARN      = 6520,
+    YES_PLEASE_DO    = 0
 };
-
-#define GOSSIP_PET1             "How do I train my pet?"
-#define GOSSIP_PET2             "I wish to untrain my pet."
-#define GOSSIP_PET_CONFIRM      "Yes, please do."
 
 class npc_pet_trainer : public CreatureScript
 {
 public:
     npc_pet_trainer() : CreatureScript("npc_pet_trainer") { }
 
-    bool OnGossipHello(Player* player, Creature* creature)
+    struct npc_pet_trainerAI : public ScriptedAI
     {
-        if (creature->IsQuestGiver())
-            player->PrepareQuestMenu(creature->GetGUID());
+        npc_pet_trainerAI(Creature* creature) : ScriptedAI(creature) { }
 
-        if (player->getClass() == CLASS_HUNTER)
+
+        void sGossipSelect(Player* player, uint32 menuId, uint32 gossipListId) override
         {
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_PET1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-            if (player->GetPet() && player->GetPet()->getPetType() == HUNTER_PET)
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_PET2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-
-            player->PlayerTalkClass->SendGossipMenu(TEXT_ISHUNTER, creature->GetGUID());
-            return true;
+            if (menuId == PET_UNLEARN && gossipListId == YES_PLEASE_DO)
+            {
+                player->ResetPetTalents();
+                player->PlayerTalkClass->SendCloseGossip();
+            }
         }
-        player->PlayerTalkClass->SendGossipMenu(TEXT_NOTHUNTER, creature->GetGUID());
-        return true;
-    }
+    };
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action)
+
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        player->PlayerTalkClass->ClearMenus();
-        switch (action)
-        {
-            case GOSSIP_ACTION_INFO_DEF + 1:
-                player->PlayerTalkClass->SendGossipMenu(TEXT_PETINFO, creature->GetGUID());
-                break;
-            case GOSSIP_ACTION_INFO_DEF + 2:
-                {
-                    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_PET_CONFIRM, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
-                    player->PlayerTalkClass->SendGossipMenu(TEXT_CONFIRM, creature->GetGUID());
-                }
-                break;
-            case GOSSIP_ACTION_INFO_DEF + 3:
-                {
-                    player->ResetPetTalents();
-                    player->CLOSE_GOSSIP_MENU();
-                }
-                break;
-        }
-        return true;
+        return new npc_pet_trainerAI(creature);
     }
 };
 

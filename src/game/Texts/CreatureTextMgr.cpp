@@ -145,7 +145,7 @@ void CreatureTextMgr::LoadCreatureTexts()
         ++textCount;
     } while (result->NextRow());
 
-    sLog->outString(">> Loaded %u creature texts for %u creatures in %u ms", textCount, mTextMap.size(), GetMSTimeDiffToNow(oldMSTime));
+    sLog->outString(">> Loaded %u creature texts for %lu creatures in %u ms", textCount, mTextMap.size(), GetMSTimeDiffToNow(oldMSTime));
     sLog->outString();
 }
 
@@ -429,7 +429,9 @@ bool CreatureTextMgr::TextExist(uint32 sourceEntry, uint8 textGroup)
     CreatureTextMap::const_iterator sList = mTextMap.find(sourceEntry);
     if (sList == mTextMap.end())
     {
-        ;//sLog->outDebug(LOG_FILTER_UNITS, "CreatureTextMgr::TextExist: Could not find Text for Creature (entry %u) in 'creature_text' table.", sourceEntry);
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+        sLog->outDebug(LOG_FILTER_UNITS, "CreatureTextMgr::TextExist: Could not find Text for Creature (entry %u) in 'creature_text' table.", sourceEntry);
+#endif
         return false;
     }
 
@@ -437,7 +439,9 @@ bool CreatureTextMgr::TextExist(uint32 sourceEntry, uint8 textGroup)
     CreatureTextHolder::const_iterator itr = textHolder.find(textGroup);
     if (itr == textHolder.end())
     {
-        ;//sLog->outDebug(LOG_FILTER_UNITS, "CreatureTextMgr::TextExist: Could not find TextGroup %u for Creature (entry %u).", uint32(textGroup), sourceEntry);
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+        sLog->outDebug(LOG_FILTER_UNITS, "CreatureTextMgr::TextExist: Could not find TextGroup %u for Creature (entry %u).", uint32(textGroup), sourceEntry);
+#endif
         return false;
     }
 
