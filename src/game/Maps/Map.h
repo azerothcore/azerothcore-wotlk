@@ -542,12 +542,25 @@ class Map : public GridRefManager<NGridType>
 
         void buildNGridLinkage(NGridType* pNGridType) { pNGridType->link(this); }
 
-        NGridType* getNGrid(uint32 x, uint32 y) const
+        /*NGridType* getNGrid(uint32 x, uint32 y) const
         {
             ASSERT(x < MAX_NUMBER_OF_GRIDS && y < MAX_NUMBER_OF_GRIDS);
             return i_grids[x][y];
-        }
+        }*/
+		NGridType* getNGrid(uint32 x, uint32 y) const
+		{
+			// ASSERT(x < MAX_NUMBER_OF_GRIDS && y < MAX_NUMBER_OF_GRIDS);
+			//_>
+			if (x < MAX_NUMBER_OF_GRIDS && y < MAX_NUMBER_OF_GRIDS)
+				return i_grids[x][y];
+			else
+			{
+				sLog->outString("ERROR in getNGrid[%u, %u] for map %u instance %u", x, y, GetId(), i_InstanceId);
+				sLog->outDebug(LOG_FILTER_MAPS, "ERROR in getNGrid[%u, %u] for map %u instance %u", x, y, GetId(), i_InstanceId);
 
+				return NULL;
+			}
+		}
         bool EnsureGridLoaded(Cell const&);
         bool isGridObjectDataLoaded(uint32 x, uint32 y) const { return getNGrid(x, y)->isGridObjectDataLoaded(); }
         void setGridObjectDataLoaded(bool pLoaded, uint32 x, uint32 y) { getNGrid(x, y)->setGridObjectDataLoaded(pLoaded); }
