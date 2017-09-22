@@ -51,7 +51,7 @@ if(SCRIPTS)
   include(Pet/CMakeLists.txt)
 endif()
 
-if(EXISTS "Custom/CMakeLists.txt")
+if(EXISTS "${AC_SCRIPTS_DIR}/Custom/CMakeLists.txt")
 include(Custom/CMakeLists.txt)
 endif()
 
