@@ -5297,7 +5297,7 @@ void Player::CreateCorpse()
     uint8 haircolor  = (uint8)(_pb >> 24);
     uint8 facialhair = (uint8)(_pb2);
 
-    _cfb1 = ((0x00) | (race << 8) | (getGender() << 16) | (skin << 24));
+    _cfb1 = ((0x00) | (race << 8) | (GetByteValue(PLAYER_BYTES_3, 0) << 16) | (skin << 24));
     _cfb2 = ((face) | (hairstyle << 8) | (haircolor << 16) | (facialhair << 24));
 
     corpse->SetUInt32Value(CORPSE_FIELD_BYTES_1, _cfb1);
