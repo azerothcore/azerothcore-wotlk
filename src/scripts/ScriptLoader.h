@@ -7,6 +7,7 @@
 #ifndef SC_SCRIPTLOADER_H
 #define SC_SCRIPTLOADER_H
 
+void AddCustomScripts();
 void AddScripts();
 void AddSpellScripts();
 void AddCommandScripts();
