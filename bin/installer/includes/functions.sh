@@ -24,10 +24,12 @@ function inst_configureOS() {
 }
 
 function inst_updateRepo() {
+    cd "$AC_PATH_ROOT"
     git pull origin $(git rev-parse --abbrev-ref HEAD)
 }
 
 function inst_resetRepo() {
+    cd "$AC_PATH_ROOT"
     git reset --hard $(git rev-parse --abbrev-ref HEAD)
     git clean -f
 }
@@ -78,7 +80,7 @@ function inst_module_install {
         read -p "Insert name: " res
     fi
 
-    git clone "https://github.com/azerothcore/$res" "modules/$res" && echo "Done, please re-run compiling and db assembly. Read instruction on module repository for more information"
+    git clone "https://github.com/azerothcore/$res" "$AC_PATH_ROOT/modules/$res" && echo "Done, please re-run compiling and db assembly. Read instruction on module repository for more information"
 
     echo "";
     echo "";
@@ -90,7 +92,7 @@ function inst_module_update {
         read -p "Insert name: " res
     fi
 
-    cd "modules/$res"
+    cd "$AC_PATH_ROOT/modules/$res"
 
     #git reset --hard master
     #git clean -f
@@ -108,7 +110,7 @@ function inst_module_remove {
         read -p "Insert name: " res
     fi
 
-    rm -rf "modules/$res" && echo "Done"
+    rm -rf "$AC_PATH_ROOT/modules/$res" && echo "Done"
 
     echo "";
     echo "";
