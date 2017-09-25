@@ -227,7 +227,7 @@ function dbasm_db_backup() {
 		err=$("$DB_MYSQL_DUMP_EXEC" --opt --user="$MYSQL_USER" --host="$MYSQL_HOST" "$dbname" 2>&1 )
 		if [[ "$err" == *"Access denied"* ]]; then
 			read -p "Insert mysql user:" PROMPT_USER
-			read -p "Insert mysql pass:" PROMPT_PASS
+			read -p "Insert mysql pass:" -s PROMPT_PASS
 			export MYSQL_PWD=$PROMPT_PASS
 
 			"$DB_MYSQL_DUMP_EXEC" --opt --user="$PROMPT_USER" --host="$MYSQL_HOST" "$dbname" > "${BACKUP_FOLDER}${database}_backup_${now}.sql" && echo "done"
@@ -272,7 +272,7 @@ function dbasm_db_import() {
 		err=$("$DB_MYSQL_EXEC" -h "$MYSQL_HOST" -u "$MYSQL_USER" "$dbname" 2>&1 )
 		if [[ "$err" == *"Access denied"* ]]; then
 			read -p "Insert mysql user:" PROMPT_USER
-			read -p "Insert mysql pass:" PROMPT_PASS
+			read -p "Insert mysql pass:" -s PROMPT_PASS
 			export MYSQL_PWD=$PROMPT_PASS
 
 			"$DB_MYSQL_EXEC" -h "$MYSQL_HOST" -u "$PROMPT_USER" "$dbname" < "${OUTPUT_FOLDER}${database}_${type}.sql"
