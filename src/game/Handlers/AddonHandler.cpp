@@ -121,8 +121,8 @@ bool AddonHandler::BuildAddonPacket(WorldPacket* Source, WorldPacket* Target)
         uint32 count = 0;
         *Target << uint32(count);
 
-        //if (AddOnPacked.rpos() != AddOnPacked.size())
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+        if (AddOnPacked.rpos() != AddOnPacked.size())
             sLog->outDebug(LOG_FILTER_NETWORKIO, "packet under read!");
 #endif
     }

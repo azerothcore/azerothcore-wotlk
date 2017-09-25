@@ -201,8 +201,9 @@ bool ItemChatLink::ValidateName(char* buffer, const char* context)
             }
         }
     }
-    //if (!res)
+
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+    if (!res)
         sLog->outDebug(LOG_FILTER_CHATSYS, "ChatHandler::isValidChatMessage('%s'): linked item (id: %u) name wasn't found in any localization", context, _item->ItemId);
 #endif
     return res;
@@ -258,8 +259,8 @@ bool QuestChatLink::ValidateName(char* buffer, const char* context)
 
     bool res = (_quest->GetTitle() == buffer);
 
-    //if (!res)
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+    if (!res)
         sLog->outDebug(LOG_FILTER_CHATSYS, "ChatHandler::isValidChatMessage('%s'): linked quest (id: %u) title wasn't found in any localization", context, _quest->GetQuestId());
 #endif
     return res;
@@ -346,8 +347,8 @@ bool SpellChatLink::ValidateName(char* buffer, const char* context)
             break;
         }
 
-    //if (!res)
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+    if (!res)
         sLog->outDebug(LOG_FILTER_CHATSYS, "ChatHandler::isValidChatMessage('%s'): linked spell (id: %u) name wasn't found in any localization", context, _spell->Id);
 #endif
     return res;
@@ -418,8 +419,8 @@ bool AchievementChatLink::ValidateName(char* buffer, const char* context)
             break;
         }
 
-    //if (!res)
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+    if (!res)
         sLog->outDebug(LOG_FILTER_CHATSYS, "ChatHandler::isValidChatMessage('%s'): linked achievement (id: %u) name wasn't found in any localization", context, _achievement->ID);
 #endif
     return res;

@@ -170,8 +170,8 @@ void BattlegroundAV::HandleQuestComplete(uint32 questid, Player* player)
         case AV_QUEST_H_COMMANDER1:
             m_Team_QuestStatus[teamId][1]++;
             RewardReputationToTeam(teamId, 1, teamId);
-            //if (m_Team_QuestStatus[team][1] == 30)
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+            if (m_Team_QuestStatus[teamId][1] == 30)
                 sLog->outDebug(LOG_FILTER_BATTLEGROUND, "BG_AV Quest %i completed (need to implement some events here", questid);
 #endif
             break;
@@ -179,8 +179,8 @@ void BattlegroundAV::HandleQuestComplete(uint32 questid, Player* player)
         case AV_QUEST_H_COMMANDER2:
             m_Team_QuestStatus[teamId][2]++;
             RewardReputationToTeam(teamId, 1, teamId);
-            //if (m_Team_QuestStatus[team][2] == 60)
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+            if (m_Team_QuestStatus[teamId][2] == 60)
                 sLog->outDebug(LOG_FILTER_BATTLEGROUND, "BG_AV Quest %i completed (need to implement some events here", questid);
 #endif
             break;
@@ -188,8 +188,8 @@ void BattlegroundAV::HandleQuestComplete(uint32 questid, Player* player)
         case AV_QUEST_H_COMMANDER3:
             m_Team_QuestStatus[teamId][3]++;
             RewardReputationToTeam(teamId, 1, teamId);
-            //if (m_Team_QuestStatus[team][3] == 120)
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+            if (m_Team_QuestStatus[teamId][3] == 120)
                 sLog->outDebug(LOG_FILTER_BATTLEGROUND, "BG_AV Quest %i completed (need to implement some events here", questid);
 #endif
             break;
@@ -199,8 +199,8 @@ void BattlegroundAV::HandleQuestComplete(uint32 questid, Player* player)
         case AV_QUEST_A_BOSS2:
         case AV_QUEST_H_BOSS2:
             m_Team_QuestStatus[teamId][4]++;
-            //if (m_Team_QuestStatus[team][4] >= 200)
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+            if (m_Team_QuestStatus[teamId][4] >= 200)
                 sLog->outDebug(LOG_FILTER_BATTLEGROUND, "BG_AV Quest %i completed (need to implement some events here", questid);
 #endif
             break;
@@ -211,9 +211,8 @@ void BattlegroundAV::HandleQuestComplete(uint32 questid, Player* player)
             {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
                 sLog->outDebug(LOG_FILTER_BATTLEGROUND, "BG_AV Quest %i completed (need to implement some events here", questid);
-#endif
-                //if (m_Team_QuestStatus[team][6] == 7)
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+
+                if (m_Team_QuestStatus[teamId][6] == 7)
                     sLog->outDebug(LOG_FILTER_BATTLEGROUND, "BG_AV Quest %i completed (need to implement some events here - ground assault ready", questid);
 #endif
             }
@@ -225,9 +224,8 @@ void BattlegroundAV::HandleQuestComplete(uint32 questid, Player* player)
             {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
                 sLog->outDebug(LOG_FILTER_BATTLEGROUND, "BG_AV Quest %i completed (need to implement some events here", questid);
-#endif
-                //if (m_Team_QuestStatus[team][5] == 20)
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+
+                if (m_Team_QuestStatus[teamId][5] == 20)
                     sLog->outDebug(LOG_FILTER_BATTLEGROUND, "BG_AV Quest %i completed (need to implement some events here - ground assault ready", questid);
 #endif
             }
@@ -239,9 +237,8 @@ void BattlegroundAV::HandleQuestComplete(uint32 questid, Player* player)
             {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
                 sLog->outDebug(LOG_FILTER_BATTLEGROUND, "BG_AV Quest %i completed (need to implement some events here", questid);
-#endif
-                //if (m_Team_QuestStatus[team][8] == 25)
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+
+                if (m_Team_QuestStatus[teamId][8] == 25)
                     sLog->outDebug(LOG_FILTER_BATTLEGROUND, "BG_AV Quest %i completed (need to implement some events here - rider assault ready", questid);
 #endif
             }
@@ -253,9 +250,8 @@ void BattlegroundAV::HandleQuestComplete(uint32 questid, Player* player)
             {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
                 sLog->outDebug(LOG_FILTER_BATTLEGROUND, "BG_AV Quest %i completed (need to implement some events here", questid);
-#endif
-                //if (m_Team_QuestStatus[team][7] == 25)
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+
+                if (m_Team_QuestStatus[teamId][7] == 25)
                     sLog->outDebug(LOG_FILTER_BATTLEGROUND, "BG_AV Quest %i completed (need to implement some events here - rider assault ready", questid);
 #endif
             }
@@ -1394,7 +1390,7 @@ bool BattlegroundAV::SetupBattleground()
         SpawnBGObject(i, RESPAWN_IMMEDIATELY);
 
     SpawnBGObject(BG_AV_OBJECT_AURA_N_SNOWFALL_GRAVE, RESPAWN_IMMEDIATELY);
-    
+
     // Handpacked snowdrift, only during holiday
     if (IsHolidayActive(HOLIDAY_FEAST_OF_WINTER_VEIL))
         for (i = BG_AV_OBJECT_HANDPACKED_SNOWDRIFT_MIN ; i <= BG_AV_OBJECT_HANDPACKED_SNOWDRIFT_MAX; i++)
