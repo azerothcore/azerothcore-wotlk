@@ -15053,7 +15053,6 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
 
         bool takeCharges = false;
         SpellInfo const* spellInfo = i->aura->GetSpellInfo();
-        uint32 Id = i->aura->GetId();
 
         AuraApplication* aurApp = i->aura->GetApplicationOfTarget(GetGUID());
 
@@ -15077,6 +15076,7 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
         if (!handled && HandleAuraProc(target, damage, i->aura, procSpell, procFlag, procExtra, cooldown, &handled))
         {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+            uint32 Id = i->aura->GetId();
             sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "ProcDamageAndSpell: casting spell %u (triggered with value by %s aura of spell %u)", spellInfo->Id, (isVictim?"a victim's":"an attacker's"), Id);
 #endif
             takeCharges = true;

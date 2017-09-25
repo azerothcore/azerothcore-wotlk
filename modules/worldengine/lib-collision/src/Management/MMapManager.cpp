@@ -157,7 +157,6 @@ namespace MMAP
 
         fclose(file);
 
-        dtMeshHeader* header = (dtMeshHeader*)data;
         dtTileRef tileRef = 0;
 
         dtStatus stat;
@@ -172,6 +171,7 @@ namespace MMAP
             mmap->mmapLoadedTiles.insert(std::pair<uint32, dtTileRef>(packedGridPos, tileRef));
             ++loadedTiles;
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+            dtMeshHeader* header = (dtMeshHeader*)data;
             sLog->outDetail("MMAP:loadMap: Loaded mmtile %03i[%02i,%02i] into %03i[%02i,%02i]", mapId, x, y, mapId, header->x, header->y);
 #endif
             return true;

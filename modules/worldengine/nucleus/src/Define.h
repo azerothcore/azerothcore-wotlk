@@ -74,6 +74,8 @@
 
 #define SIZEFMTD ACE_SIZE_T_FORMAT_SPECIFIER
 
+#define UNUSED(x) (void)(x)
+
 typedef std::int64_t int64;
 typedef std::int32_t int32;
 typedef std::int16_t int16;
