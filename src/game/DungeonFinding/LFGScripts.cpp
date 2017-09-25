@@ -176,6 +176,10 @@ void LFGGroupScript::OnAddMember(Group* group, uint64 guid)
 
 void LFGGroupScript::OnRemoveMember(Group* group, uint64 guid, RemoveMethod method, uint64 kicker, char const* reason)
 {
+    // used only with EXTRA_LOGS
+    UNUSED(kicker);
+    UNUSED(reason);
+
     if (!sLFGMgr->isOptionEnabled(LFG_OPTION_ENABLE_DUNGEON_FINDER | LFG_OPTION_ENABLE_RAID_BROWSER))
         return;
 
@@ -271,6 +275,9 @@ void LFGGroupScript::OnChangeLeader(Group* group, uint64 newLeaderGuid, uint64 o
 
 void LFGGroupScript::OnInviteMember(Group* group, uint64 guid)
 {
+    // used only with EXTRA_LOGS
+    UNUSED(guid);
+
     if (!sLFGMgr->isOptionEnabled(LFG_OPTION_ENABLE_DUNGEON_FINDER | LFG_OPTION_ENABLE_RAID_BROWSER))
         return;
 

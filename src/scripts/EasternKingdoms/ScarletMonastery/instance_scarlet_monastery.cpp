@@ -553,7 +553,7 @@ public:
                 //When casting resuruction make sure to delay so on rez when reinstate battle deepsleep runs out
                 if (Wait_Timer <= diff)
                 {
-                    if (Creature* mograine = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_MOGRAINE)))
+                    if (ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_MOGRAINE)))
                     {
                         DoCast(SPELL_SCARLET_RESURRECTION);
                         Talk(SAY_WH_RESURRECT);
