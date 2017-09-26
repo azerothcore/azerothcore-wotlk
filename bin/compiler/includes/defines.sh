@@ -5,10 +5,6 @@ then
     CCTYPE=${CCTYPE^} # capitalize first letter if it's not yet
 fi
 
-BUILDPATH=$BINPATH
+[ $CTYPE == "Debug" ] && BUILDPATH="$BUILDPATH/debug/" ||  BUILDPATH="$BUILDPATH/release/"
 
-INSTALL_PATH=$(readlink -f "$BINPATH/../")
-
-[ $CTYPE == "Debug" ] && BUILDPATH="$BUILDPATH/debug/build/" ||  BUILDPATH="$BUILDPATH/release/build/"
-
-[ $CTYPE == "Debug" ] && BINPATH="$BINPATH/debug" || BINPATH="$BINPATH/release"
+[ $CTYPE == "Debug" ] && BINPATH="$BINPATH/debug/" || BINPATH="$BINPATH/release/"

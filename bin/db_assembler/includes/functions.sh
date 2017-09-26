@@ -29,6 +29,10 @@ function dbasm_mysqlExec() {
 			read -p "Insert mysql pass:" -s PROMPT_PASS
 			export MYSQL_PWD=$PROMPT_PASS
 
+            # create configured account if not exists
+            "$DB_MYSQL_EXEC"  -h "$MYSQL_HOST" -u "$PROMPT_USER" $options -e "CREATE USER '${MYSQL_USER}'@'${MYSQL_HOST}' IDENTIFIED BY '${MYSQL_PASS}' WITH MAX_QUERIES_PER_HOUR 0 MAX_CONNECTIONS_PER_HOUR 0 MAX_UPDATES_PER_HOUR 0;"
+            "$DB_MYSQL_EXEC"  -h "$MYSQL_HOST" -u "$PROMPT_USER" $options -e "GRANT USAGE ON * . * TO '${MYSQL_USER}'@'${MYSQL_HOST}'  WITH GRANT OPTION;"
+
 			retval=$("$DB_MYSQL_EXEC"  -h "$MYSQL_HOST" -u "$PROMPT_USER" $options -e "$command")
 		else
 			exit
@@ -73,11 +77,15 @@ function dbasm_createDB() {
     
     eval $confs
 
+    CONF_USER=$MYSQL_USER
+    CONF_PASS=$MYSQL_PASS
+
     if dbasm_dbExists $dbname "$confs"; then
         echo "$dbname database exists"
     else 
 		echo "Creating DB ${dbname} ..."
         dbasm_mysqlExec "$confs" "CREATE DATABASE \`${dbname}\`" ""
+        dbasm_mysqlExec "$confs" "GRANT ALL PRIVILEGES ON \`${dbname}\` . * TO '${CONF_USER}'@'${MYSQL_HOST}' WITH GRANT OPTION;"
     fi
 }
 
