@@ -210,7 +210,7 @@ void Object::BuildCreateUpdateBlockForPlayer(UpdateData* data, Player* target) c
                     break;
                 default:
                     if (((GameObject*)this)->GetOwner())
-						updatetype = UPDATETYPE_CREATE_OBJECT2;
+			updatetype = UPDATETYPE_CREATE_OBJECT2;
                     break;
             }
         }
