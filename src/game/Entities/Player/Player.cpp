@@ -18836,7 +18836,7 @@ void Player::_LoadMailAsynch(PreparedQueryResult result)
                 m->state = MAIL_STATE_UNCHANGED;
             }
 
-            if (m && has_items && fields[12].GetUInt32() /*itemEntry*/)
+            if (m && fields[20].GetBool() /*has_items*/ && fields[12].GetUInt32() /*itemEntry*/)
             {
                 uint32 itemGuid = fields[11].GetUInt32();
                 uint32 itemTemplate = fields[12].GetUInt32();
