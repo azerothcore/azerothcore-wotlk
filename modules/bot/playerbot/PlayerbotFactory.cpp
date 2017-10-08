@@ -758,6 +758,106 @@ bool PlayerbotFactory::CanEquipItem(ItemTemplate const* proto, uint32 desiredQua
 void PlayerbotFactory::InitEquipment(bool incremental)
 {
 	DestroyItemsVisitor visitor(bot);
+    IterateItems(&visitor, ITERATE_ALL_ITEMS);
+
+    map<uint8, vector<uint32> > items;
+    for(uint8 slot = 0; slot < EQUIPMENT_SLOT_END; ++slot)
+    {
+        if (slot == EQUIPMENT_SLOT_TABARD || slot == EQUIPMENT_SLOT_BODY)
+            continue;
+
+        uint32 desiredQuality = itemQuality;
+        if (urand(0, 100) < 100 * sPlayerbotAIConfig.randomGearLoweringChance && desiredQuality > ITEM_QUALITY_NORMAL) {
+            desiredQuality--;
+        }
+
+        do
+        {
+            ItemTemplateContainer const* itemTemplates = sObjectMgr->GetItemTemplateStore();
+            for (ItemTemplateContainer::const_iterator i = itemTemplates->begin(); i != itemTemplates->end(); ++i)
+            {
+                uint32 itemId = i->first;
+                ItemTemplate const* proto = &i->second;
+                if (!proto)
+                    continue;
+
+                if (proto->Class != ITEM_CLASS_WEAPON &&
+                    proto->Class != ITEM_CLASS_ARMOR &&
+                    proto->Class != ITEM_CLASS_CONTAINER &&
+                    proto->Class != ITEM_CLASS_PROJECTILE)
+                    continue;
+
+                if (!CanEquipItem(proto, desiredQuality))
+                    continue;
+
+                if (proto->Class == ITEM_CLASS_ARMOR && (
+                    slot == EQUIPMENT_SLOT_HEAD ||
+                    slot == EQUIPMENT_SLOT_SHOULDERS ||
+                    slot == EQUIPMENT_SLOT_CHEST ||
+                    slot == EQUIPMENT_SLOT_WAIST ||
+                    slot == EQUIPMENT_SLOT_LEGS ||
+                    slot == EQUIPMENT_SLOT_FEET ||
+                    slot == EQUIPMENT_SLOT_WRISTS ||
+                    slot == EQUIPMENT_SLOT_HANDS) && !CanEquipArmor(proto))
+                        continue;
+
+                if (proto->Class == ITEM_CLASS_WEAPON && !CanEquipWeapon(proto))
+                    continue;
+
+                if (slot == EQUIPMENT_SLOT_OFFHAND && bot->getClass() == CLASS_ROGUE && proto->Class != ITEM_CLASS_WEAPON)
+                    continue;
+
+                uint16 dest = 0;
+                if (CanEquipUnseenItem(slot, dest, itemId))
+                    items[slot].push_back(itemId);
+            }
+        } while (items[slot].empty() && desiredQuality-- > ITEM_QUALITY_NORMAL);
+    }
+
+    for(uint8 slot = 0; slot < EQUIPMENT_SLOT_END; ++slot)
+    {
+        if (slot == EQUIPMENT_SLOT_TABARD || slot == EQUIPMENT_SLOT_BODY)
+            continue;
+
+        vector<uint32>& ids = items[slot];
+        if (ids.empty())
+        {
+            sLog->outMessage("playerbot", LOG_LEVEL_DEBUG,  "%s: no items to equip for slot %d", bot->GetName().c_str(), slot);
+            continue;
+        }
+
+        for (int attempts = 0; attempts < 15; attempts++)
+        {
+            uint32 index = urand(0, ids.size() - 1);
+            uint32 newItemId = ids[index];
+            Item* oldItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, slot);
+
+            if (incremental && !IsDesiredReplacement(oldItem)) {
+                continue;
+            }
+
+            uint16 dest;
+            if (!CanEquipUnseenItem(slot, dest, newItemId))
+                continue;
+
+            if (oldItem)
+            {
+                bot->RemoveItem(INVENTORY_SLOT_BAG_0, slot, true);
+                oldItem->DestroyForPlayer(bot, false);
+            }
+
+            Item* newItem = bot->EquipNewItem(dest, newItemId, true);
+            if (newItem)
+            {
+                newItem->AddToWorld();
+                newItem->AddToUpdateQueueOf(bot);
+                bot->AutoUnequipOffhandIfNeed();
+                EnchantItem(newItem);
+                break;
+            }
+        }
+	}
+	/*DestroyItemsVisitor visitor(bot);
 	IterateItems(&visitor, ITERATE_ALL_ITEMS);
 
 	std::unordered_map<uint32, std::unordered_map<uint32, std::unordered_map<uint32, std::unordered_map<uint32, uint32>>>> categorizedEquipments = sObjectMgr->GetCategorizedEquipmentEntryStore();
@@ -1151,6 +1251,7 @@ void PlayerbotFactory::InitEquipment(bool incremental)
 	offHandSubClasses.clear();
 	twoHandedSubClasses.clear();
 	rangedSubClasses.clear();
+	*/
 }
 
 bool PlayerbotFactory::IsDesiredReplacement(Item* item)
