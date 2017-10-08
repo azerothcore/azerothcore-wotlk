@@ -166,7 +166,7 @@ class Object
             return *((uint64*)&(m_uint32Values[index]));
         }
 		
-		ObjectGuid Object::GetGuidObject(uint16 index) const
+		ObjectGuid GetGuidObject(uint16 index) const
 		{
 			ASSERT(index + 1 < m_valuesCount || PrintIndexError(index, false));
 			return *((ObjectGuid*)&(m_uint32Values[index]));
