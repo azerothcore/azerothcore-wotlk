@@ -822,7 +822,7 @@ void PlayerbotFactory::InitEquipment(bool incremental)
         vector<uint32>& ids = items[slot];
         if (ids.empty())
         {
-            sLog->outMessage("playerbot", LOG_LEVEL_DEBUG,  "%s: no items to equip for slot %d", bot->GetName().c_str(), slot);
+            sLog->outBasic("%s: no items to equip for slot %d", bot->GetName().c_str(), slot);
             continue;
         }
 
