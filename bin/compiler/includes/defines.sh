@@ -5,6 +5,3 @@ then
     CCTYPE=${CCTYPE^} # capitalize first letter if it's not yet
 fi
 
-[ $CTYPE == "Debug" ] && BUILDPATH="$BUILDPATH/debug/" ||  BUILDPATH="$BUILDPATH/release/"
-
-[ $CTYPE == "Debug" ] && BINPATH="$BINPATH/debug/" || BINPATH="$BINPATH/release/"
