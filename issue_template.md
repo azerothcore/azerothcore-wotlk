@@ -21,6 +21,9 @@
 
 **Branch(es)**: 0.x / 1.x / master (Specify the branch(es) affected by this issue) 
 
+<!-- NEVER WRITE "LATEST", ALWAYS PUT THE ACTUAL VALUE INSTEAD -->
+<!-- NEVER WRITE "LATEST", ALWAYS PUT THE ACTUAL VALUE INSTEAD -->
+<!-- NEVER WRITE "LATEST", ALWAYS PUT THE ACTUAL VALUE INSTEAD -->
 **AC hash/commit**:  <!-- IF YOU DO NOT FILL THIS OUT, WE WILL CLOSE YOUR ISSUE! -->
 
 **Operating system**:  

@@ -374,26 +374,16 @@ void MotionMaster::MovePoint(uint32 id, float x, float y, float z, bool generate
 
 void MotionMaster::MoveSplinePath(Movement::PointsArray* path)
 {
-    //uint32 id;
-    //float x, y, z;
-
     // Xinef: do not allow to move with UNIT_FLAG_DISABLE_MOVE
     if (_owner->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE))
         return;
 
     if (_owner->GetTypeId() == TYPEID_PLAYER)
     {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        //sLog->outStaticDebug("Player (GUID: %u) targeted point (Id: %u X: %f Y: %f Z: %f)", _owner->GetGUIDLow(), id, x, y, z);
-#endif
         Mutate(new EscortMovementGenerator<Player>(path), MOTION_SLOT_ACTIVE);
     }
     else
     {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        /*sLog->outStaticDebug("Creature (Entry: %u GUID: %u) targeted point (ID: %u X: %f Y: %f Z: %f)",
-            _owner->GetEntry(), _owner->GetGUIDLow(), id, x, y, z);*/
-#endif
         Mutate(new EscortMovementGenerator<Creature>(path), MOTION_SLOT_ACTIVE);
     }
 }

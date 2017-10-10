@@ -5583,7 +5583,7 @@ void Player::CreateCorpse()
     uint8 haircolor  = (uint8)(_pb >> 24);
     uint8 facialhair = (uint8)(_pb2);
 
-    _cfb1 = ((0x00) | (race << 8) | (getGender() << 16) | (skin << 24));
+    _cfb1 = ((0x00) | (race << 8) | (GetByteValue(PLAYER_BYTES_3, 0) << 16) | (skin << 24));
     _cfb2 = ((face) | (hairstyle << 8) | (haircolor << 16) | (facialhair << 24));
 
     corpse->SetUInt32Value(CORPSE_FIELD_BYTES_1, _cfb1);
@@ -19122,7 +19122,7 @@ void Player::_LoadMailAsynch(PreparedQueryResult result)
                 m->state = MAIL_STATE_UNCHANGED;
             }
 
-            if (m && has_items && fields[12].GetUInt32() /*itemEntry*/)
+            if (m && fields[20].GetBool() /*has_items*/ && fields[12].GetUInt32() /*itemEntry*/)
             {
                 uint32 itemGuid = fields[11].GetUInt32();
                 uint32 itemTemplate = fields[12].GetUInt32();

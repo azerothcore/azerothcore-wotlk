@@ -11,19 +11,36 @@ REWRITTEN BY XINEF
 
 enum AshbringerEventMisc
 {
-    AURA_OF_ASHBRINGER = 28282,
-    NPC_SCARLET_MYRIDON = 4295,
-    NPC_SCARLET_DEFENDER = 4298,
-    NPC_SCARLET_CENTURION = 4301,
-    NPC_SCARLET_SORCERER = 4294,
-    NPC_SCARLET_WIZARD = 4300,
-    NPC_SCARLET_ABBOT = 4303,
-    NPC_SCARLET_MONK = 4540,
-    NPC_SCARLET_CHAMPION = 4302,
-    NPC_SCARLET_CHAPLAIN = 4299,
-    NPC_FAIRBANKS = 4542,
-    NPC_COMMANDER_MOGRAINE = 3976,
-    FACTION_FRIENDLY_TO_ALL = 35,
+    AURA_OF_ASHBRINGER              =   28282,
+    NPC_SCARLET_MYRIDON             =   4295,
+    NPC_SCARLET_DEFENDER            =   4298,
+    NPC_SCARLET_CENTURION           =   4301,
+    NPC_SCARLET_SORCERER            =   4294,
+    NPC_SCARLET_WIZARD              =   4300,
+    NPC_SCARLET_ABBOT               =   4303,
+    NPC_SCARLET_MONK                =   4540,
+    NPC_SCARLET_CHAMPION            =   4302,
+    NPC_SCARLET_CHAPLAIN            =   4299,
+    NPC_FAIRBANKS                   =   4542,
+    NPC_COMMANDER_MOGRAINE          =   3976,
+    NPC_INQUISITOR_WHITEMANE        =   3977,
+    FACTION_FRIENDLY_TO_ALL         =   35,
+    DOOR_HIGH_INQUISITOR_ID         =   104600,
+};
+
+enum DataTypes
+{
+    TYPE_MOGRAINE_AND_WHITE_EVENT   =   1,
+
+    DATA_MOGRAINE                   =   2,
+    DATA_WHITEMANE                  =   3,
+    DATA_DOOR_WHITEMANE             =   4,
+
+    DATA_HORSEMAN_EVENT             =   5,
+    GAMEOBJECT_PUMPKIN_SHRINE       =   6,
+
+    DATA_VORREL                     =   7,
+    DATA_ARCANIST_DOAN              =   8
 };
 
 class instance_scarlet_monastery : public InstanceMapScript
@@ -40,7 +57,7 @@ public:
     {
         instance_scarlet_monastery_InstanceMapScript(Map* map) : InstanceScript(map) {}
 
-        void OnPlayerEnter(Player* player)
+        void OnPlayerEnter(Player* player) override
         {
             if (player->HasAura(AURA_OF_ASHBRINGER))
             {
@@ -62,7 +79,7 @@ public:
             }
         }
 
-        void OnPlayerAreaUpdate(Player* player, uint32 /*oldArea*/, uint32 /*newArea*/) 
+        void OnPlayerAreaUpdate(Player* player, uint32 /*oldArea*/, uint32 /*newArea*/) override
         {
             if (player->HasAura(AURA_OF_ASHBRINGER))
             {
@@ -83,6 +100,68 @@ public:
                         (*itr)->setFaction(FACTION_FRIENDLY_TO_ALL);
             }
         }
+
+        void OnGameObjectCreate(GameObject* go) override
+        {
+            switch (go->GetEntry())
+            {
+                //case ENTRY_PUMPKIN_SHRINE: PumpkinShrineGUID = go->GetGUID(); break;
+                case DOOR_HIGH_INQUISITOR_ID: DoorHighInquisitorGUID = go->GetGUID(); break;
+            }
+        }
+
+        void OnCreatureCreate(Creature* creature) override
+        {
+            switch (creature->GetEntry())
+            {
+                case NPC_COMMANDER_MOGRAINE: MograineGUID = creature->GetGUID(); break;
+                case NPC_INQUISITOR_WHITEMANE: WhitemaneGUID = creature->GetGUID(); break;
+            }
+        }
+
+        void SetData(uint32 type, uint32 data) override
+        {
+            switch(type)
+            {
+            case TYPE_MOGRAINE_AND_WHITE_EVENT:
+                if (data == IN_PROGRESS)
+                {
+                    DoUseDoorOrButton(DoorHighInquisitorGUID);
+                    encounter = IN_PROGRESS;
+                }
+                if (data == FAIL)
+                {
+                    DoUseDoorOrButton(DoorHighInquisitorGUID);
+                    encounter = FAIL;
+                }
+                if (data == SPECIAL)
+                    encounter = SPECIAL;
+                break;
+            }
+        }
+
+        uint64 GetData64(uint32 type) const override
+        {
+            switch (type)
+            {
+                case DATA_MOGRAINE:             return MograineGUID;
+                case DATA_WHITEMANE:            return WhitemaneGUID;
+                case DATA_DOOR_WHITEMANE:       return DoorHighInquisitorGUID;
+            }
+            return 0;
+        }
+
+        uint32 GetData(uint32 type) const override
+        {
+            if (type == TYPE_MOGRAINE_AND_WHITE_EVENT)
+                return encounter;
+            return 0;
+        }
+    private:
+        uint64 DoorHighInquisitorGUID;
+        uint64 MograineGUID;
+        uint64 WhitemaneGUID;
+        uint32 encounter;
     };
 };
 
@@ -143,14 +222,61 @@ public:
     }
 };
 
+enum MograineEvents
+{
+    EVENT_SPELL_CRUSADER_STRIKE     =   1,
+    EVENT_SPELL_HAMMER_OF_JUSTICE   =   2
+};
+
+enum WhitemaneEvents
+{
+    EVENT_SPELL_HOLY_SMITE          =   1,
+    EVENT_SPELL_POWER_WORLD_SHIELD  =   2,
+    EVENT_SPELL_HEAL                =   3
+};
+
+enum Spells
+{
+    //Mograine Spells
+    SPELL_CRUSADER_STRIKE           =   14518,
+    SPELL_HAMMER_OF_JUSTICE         =   5589,
+    SPELL_LAY_ON_HANDS              =   9257,
+    SPELL_RETRIBUTION_AURA          =   8990,
+    SPELL_PERMANENT_FEIGN_DEATH     =   29266,
+
+    //Whitemanes Spells
+    SPELL_SCARLET_RESURRECTION      =   9232,
+    SPELL_DEEP_SLEEP                =   9256,
+    SPELL_DOMINATE_MIND             =   14515,
+    SPELL_HOLY_SMITE                =   9481,
+    SPELL_HEAL                      =   12039,
+    SPELL_POWER_WORD_SHIELD         =   22187
+};
+
+enum Says
+{
+    //Mograine says
+    SAY_MO_AGGRO                    =   0,
+    SAY_MO_KILL                     =   1,
+    SAY_MO_RESURRECTED              =   2,
+
+    //Whitemane says
+    SAY_WH_INTRO                    =   0,
+    SAY_WH_KILL                     =   1,
+    SAY_WH_RESURRECT                =   2,
+};
+
 class npc_mograine : public CreatureScript
 {
 public:
     npc_mograine() : CreatureScript("npc_scarlet_commander_mograine") { }
 
-    struct npc_mograineAI : public SmartAI
+    struct npc_mograineAI : public ScriptedAI
     {
-        npc_mograineAI(Creature* creature) : SmartAI(creature) { }
+        npc_mograineAI(Creature* creature) : ScriptedAI(creature)
+        {
+            instance = creature->GetInstanceScript();
+        }
 
         uint32 AshbringerEvent(uint32 uiSteps)
         {
@@ -212,14 +338,22 @@ public:
             }
         }
 
-        void Reset()
+        void Reset() override
         {
+            //Incase wipe during phase that mograine fake death
+            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            me->RemoveAurasDueToSpell(SPELL_PERMANENT_FEIGN_DEATH);
             SayAshbringer = false;
             timer = 0;
             step = 1;
+            hasDied = false;
+            heal = false;
+            fakeDeath = false;
+            events.Reset();
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if (who && who->GetDistance2d(me) < 15.0f)
                 if (Player* player = who->ToPlayer())
@@ -233,10 +367,63 @@ public:
                         SayAshbringer = true;
                     }
 
-            SmartAI::MoveInLineOfSight(who);
+            ScriptedAI::MoveInLineOfSight(who);
         }
 
-        void UpdateAI(uint32 diff)
+        void EnterCombat(Unit* /*who*/) override
+        {
+            Talk(SAY_MO_AGGRO);
+            me->CallForHelp(150.0f);
+            me->CastSpell(me, SPELL_RETRIBUTION_AURA, true);
+            events.ScheduleEvent(EVENT_SPELL_CRUSADER_STRIKE, urand(1000, 5000));
+            events.ScheduleEvent(EVENT_SPELL_HAMMER_OF_JUSTICE, urand(6000, 11000));
+        }
+
+        void DamageTaken(Unit* /*doneBy*/, uint32& damage, DamageEffectType, SpellSchoolMask) override
+        {
+            if (damage < me->GetHealth() || hasDied || fakeDeath)
+                return;
+
+            //On first death, fake death and open door, as well as initiate whitemane if exist
+            if (Unit* Whitemane = ObjectAccessor::GetUnit(*me, instance->GetData64(DATA_WHITEMANE)))
+            {
+                instance->SetData(TYPE_MOGRAINE_AND_WHITE_EVENT, IN_PROGRESS);
+                Whitemane->GetMotionMaster()->MovePoint(1, 1163.113370f, 1398.856812f, 32.527786f);
+                me->GetMotionMaster()->MovementExpired();
+                me->GetMotionMaster()->MoveIdle();
+                me->SetHealth(0);
+                if (me->IsNonMeleeSpellCast(false))
+                    me->InterruptNonMeleeSpells(false);
+                me->ClearComboPointHolders();
+                me->RemoveAllAuras();
+                me->ClearAllReactives();
+                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                me->CastSpell(me, SPELL_PERMANENT_FEIGN_DEATH, true);
+
+                hasDied = true;
+                fakeDeath = true;
+                damage = 0;
+                ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_WHITEMANE))->SetInCombatWithZone();
+            }
+        }
+
+        void KilledUnit(Unit* /*victim*/) override
+        {
+            Talk(SAY_MO_KILL);
+        }
+
+        void SpellHit(Unit* /*who*/, const SpellInfo* spell) override
+        {
+            //When hit with resurrection say text
+            if (spell->Id == SPELL_SCARLET_RESURRECTION)
+            {
+                Talk(SAY_MO_RESURRECTED);
+                fakeDeath = false;
+                instance->SetData(TYPE_MOGRAINE_AND_WHITE_EVENT, SPECIAL);
+            }
+        }
+
+        void UpdateAI(uint32 diff) override
         {
             timer = timer - diff;
             if (SayAshbringer && step < 15)
@@ -251,6 +438,47 @@ public:
             if (!UpdateVictim())
                 return;
 
+            if (hasDied && !heal && instance->GetData(TYPE_MOGRAINE_AND_WHITE_EVENT) == SPECIAL)
+            {
+                //On resurrection, stop fake death and heal whitemane and resume fight
+                if (Unit* Whitemane = ObjectAccessor::GetUnit(*me, instance->GetData64(DATA_WHITEMANE)))
+                {
+                    //Incase wipe during phase that mograine fake death
+                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    me->RemoveAurasDueToSpell(SPELL_PERMANENT_FEIGN_DEATH);
+                    me->CastSpell(me, SPELL_RETRIBUTION_AURA, true);
+                    me->CastSpell(Whitemane, SPELL_LAY_ON_HANDS, true);
+                    events.ScheduleEvent(EVENT_SPELL_CRUSADER_STRIKE, urand(1000, 5000));
+                    events.ScheduleEvent(EVENT_SPELL_HAMMER_OF_JUSTICE, urand(6000, 11000));
+                    if (me->GetVictim())
+                        me->GetMotionMaster()->MoveChase(me->GetVictim());
+                    heal = true;
+                }
+            }
+
+            //This if-check to make sure mograine does not attack while fake death
+            if (fakeDeath)
+                return;
+
+            events.Update(diff);
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+                return;
+
+            while (uint32 eventId = events.ExecuteEvent())
+            {
+                switch(eventId)
+                {
+                    case EVENT_SPELL_CRUSADER_STRIKE:
+                        me->CastSpell(me->GetVictim(), SPELL_CRUSADER_STRIKE, true);
+                        events.ScheduleEvent(EVENT_SPELL_CRUSADER_STRIKE, 10000);
+                        break;
+                    case EVENT_SPELL_HAMMER_OF_JUSTICE:
+                        me->CastSpell(me->GetVictim(), SPELL_HAMMER_OF_JUSTICE, true);
+                        events.ScheduleEvent(EVENT_SPELL_HAMMER_OF_JUSTICE, 60000);
+                        break;
+                }
+            }
             DoMeleeAttackIfReady();
         }
 
@@ -258,6 +486,11 @@ public:
         bool SayAshbringer = false;
         int timer = 0;
         int step = 1;
+        bool hasDied;
+        bool heal;
+        bool fakeDeath;
+        EventMap events;
+        InstanceScript* instance;
     };
 
     CreatureAI* GetAI(Creature* creature) const
@@ -265,6 +498,149 @@ public:
         return new npc_mograineAI(creature);
     }
 };
+
+class boss_high_inquisitor_whitemane : public CreatureScript
+{
+public:
+    boss_high_inquisitor_whitemane() : CreatureScript("boss_high_inquisitor_whitemane") { }
+
+    struct boss_high_inquisitor_whitemaneAI : public ScriptedAI
+    {
+        boss_high_inquisitor_whitemaneAI(Creature* creature) : ScriptedAI(creature)
+        {
+            instance = creature->GetInstanceScript();
+        }
+
+        void Reset() override
+        {
+            canResurrectCheck = false;
+            canResurrect = false;
+            Wait_Timer = 7000;
+            Heal_Timer = 10000;
+        }
+
+        void JustReachedHome() override
+        {
+            instance->SetData(TYPE_MOGRAINE_AND_WHITE_EVENT, FAIL);
+        }
+
+        void EnterCombat(Unit* /*who*/) override
+        {
+            Talk(SAY_WH_INTRO);
+            events.ScheduleEvent(EVENT_SPELL_HOLY_SMITE, urand(1000, 3000));
+            events.ScheduleEvent(EVENT_SPELL_POWER_WORLD_SHIELD, 6000);
+            events.ScheduleEvent(EVENT_SPELL_HEAL, 9000);
+        }
+
+        void DamageTaken(Unit* /*doneBy*/, uint32& damage, DamageEffectType, SpellSchoolMask) override
+        {
+            if (!canResurrectCheck && damage >= me->GetHealth())
+                damage = me->GetHealth() - 1;
+        }
+
+        void KilledUnit(Unit* /*victim*/) override
+        {
+            Talk(SAY_WH_KILL);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (!UpdateVictim())
+                return;
+
+            if (canResurrect)
+            {
+                //When casting resuruction make sure to delay so on rez when reinstate battle deepsleep runs out
+                if (Wait_Timer <= diff)
+                {
+                    if (ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_MOGRAINE)))
+                    {
+                        DoCast(SPELL_SCARLET_RESURRECTION);
+                        Talk(SAY_WH_RESURRECT);
+                        canResurrect = false;
+                    }
+                }
+                else Wait_Timer -= diff;
+            }
+
+            //Cast Deep sleep when health is less than 50%
+            if (!canResurrectCheck && !HealthAbovePct(50))
+            {
+                if (me->IsNonMeleeSpellCast(false))
+                    me->InterruptNonMeleeSpells(false);
+
+                me->CastSpell(me->GetVictim(), SPELL_DEEP_SLEEP, true);
+                canResurrectCheck = true;
+                canResurrect = true;
+                return;
+            }
+
+            //while in "resurrect-mode", don't do anything
+            if (canResurrect)
+                return;
+
+            //If we are <75% hp cast healing spells at self or Mograine
+            if (Heal_Timer <= diff)
+            {
+                Creature* target = NULL;
+
+                if (!HealthAbovePct(75))
+                    target = me;
+
+                if (Creature* mograine = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_MOGRAINE)))
+                {
+                    // checking canResurrectCheck prevents her healing Mograine while he is "faking death"
+                    if (canResurrectCheck && mograine->IsAlive() && !mograine->HealthAbovePct(75))
+                        target = mograine;
+                }
+
+                if (target)
+                    me->CastSpell(target, SPELL_HEAL, true);
+
+                Heal_Timer = 13000;
+            }
+            else Heal_Timer -= diff;
+
+            events.Update(diff);
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+                return;
+
+            while (uint32 eventId = events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                    case EVENT_SPELL_POWER_WORLD_SHIELD:
+                        me->CastSpell(me, SPELL_POWER_WORD_SHIELD, true);
+                        events.ScheduleEvent(EVENT_SPELL_POWER_WORLD_SHIELD, 15000);
+                        break;
+                    case EVENT_SPELL_HOLY_SMITE:
+                        me->CastSpell(me->GetVictim(), SPELL_HOLY_SMITE, true);
+                        events.ScheduleEvent(EVENT_SPELL_HOLY_SMITE, 6000);
+                        break;
+                    case EVENT_SPELL_HEAL:
+                        me->CastSpell(me, SPELL_HEAL, true);
+                        break;
+                }
+            }
+
+            DoMeleeAttackIfReady();
+        }
+
+    private:
+        InstanceScript* instance;
+        uint32 Heal_Timer;
+        uint32 Wait_Timer;
+        bool canResurrectCheck;
+        bool canResurrect;
+        EventMap events;
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new boss_high_inquisitor_whitemaneAI(creature);
+    }
+};
+
 class npc_fairbanks : public CreatureScript
 {
 public:
@@ -412,4 +788,5 @@ void AddSC_instance_scarlet_monastery()
     new npc_scarlet_guard();
     new npc_fairbanks();
     new npc_mograine();
+    new boss_high_inquisitor_whitemane();
 }
