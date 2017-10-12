@@ -1125,7 +1125,7 @@ PVOID pAddress)
                 else
                 {
     #if _WIN64
-                    pszCurrBuffer += sprintf(pszCurrBuffer, " = 0x%I64X", (DWORD64*)pAddress);
+                    pszCurrBuffer += sprintf(pszCurrBuffer, " = 0x%I64X", (DWORD64)pAddress);
     #else
                     pszCurrBuffer += sprintf(pszCurrBuffer, " = 0x%X", (DWORD)pAddress);
     #endif
@@ -1136,7 +1136,7 @@ PVOID pAddress)
     __except (EXCEPTION_EXECUTE_HANDLER)
     {
 #if _WIN64
-        pszCurrBuffer += sprintf(pszCurrBuffer, " <Unable to read memory> = %I64X", (DWORD64*)pAddress);
+        pszCurrBuffer += sprintf(pszCurrBuffer, " <Unable to read memory> = %I64X", (DWORD64)pAddress);
 #else
         pszCurrBuffer += sprintf(pszCurrBuffer, " <Unable to read memory> = %X", (DWORD)pAddress);
 #endif

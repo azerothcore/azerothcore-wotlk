@@ -20,15 +20,15 @@ EndScriptData */
 
 Position const SummonPositions[10] =
 {
-    {737.850f, -1145.35f, -120.288f, 4.71368f},
-    {744.162f, -1151.63f, -119.726f, 4.58204f},
-    {751.247f, -1152.82f, -119.744f, 4.49673f},
-    {759.206f, -1155.09f, -120.051f, 4.30104f},
-    {755.973f, -1152.33f, -120.029f, 4.25588f},
-    {731.712f, -1147.56f, -120.195f, 4.95955f},
-    {726.499f, -1149.80f, -120.156f, 5.24055f},
-    {722.408f, -1152.41f, -120.029f, 5.33087f},
-    {718.994f, -1156.36f, -119.805f, 5.75738f},
+    {759.542f, -1173.43f, -118.974f, 3.3048f},
+    {761.652f, -1164.30f, -119.533f, 3.3919f},
+    {747.323f, -1149.24f, -120.060f, 3.6629f},
+    {766.734f, -1183.16f, -119.292f, 2.9889f},
+    {757.364f, -1198.31f, -118.652f, 2.3095f},
+    {752.349f, -1159.19f, -119.261f, 3.6032f},
+    {738.015f, -1152.22f, -119.512f, 4.0792f},
+    {757.246f, -1189.79f, -118.633f, 2.5333f},
+    {745.916f, -1199.35f, -118.119f, 1.8932f},
     {838.510f, -829.840f, -232.000f, 2.00000f},
 };
 
@@ -89,6 +89,27 @@ class instance_molten_core : public InstanceMapScript
                     case GO_CACHE_OF_THE_FIRELORD:
                         _cacheOfTheFirelordGUID = go->GetGUID();
                         break;
+                    case GO_CIRCLE_BARON:
+                        _circlesGUIDs[5] = go->GetGUID();
+                        break;
+                    case GO_CIRCLE_GARR:
+                        _circlesGUIDs[3] = go->GetGUID();
+                        break;
+                    case GO_CIRCLE_GEHENNAS:
+                        _circlesGUIDs[2] = go->GetGUID();
+                        break;
+                    case GO_CIRCLE_GOLEMAGG:
+                        _circlesGUIDs[7] = go->GetGUID();
+                        break;
+                    case GO_CIRCLE_MAGMADAR:
+                        _circlesGUIDs[1] = go->GetGUID();
+                        break;
+                    case GO_CIRCLE_SHAZZRAH:
+                        _circlesGUIDs[4] = go->GetGUID();
+                        break;
+                    case GO_CIRCLE_SULFURON:
+                        _circlesGUIDs[6] = go->GetGUID();
+                        break;
                     default:
                         break;
                 }
@@ -136,6 +157,20 @@ class instance_molten_core : public InstanceMapScript
 
                 if (state == DONE && bossId < BOSS_MAJORDOMO_EXECUTUS)
                     ++_deadBossCount;
+
+                if (state == DONE && bossId < BOSS_MAJORDOMO_EXECUTUS && _circlesGUIDs[bossId])
+                {
+                    GameObject * circle = instance->GetGameObject(_circlesGUIDs[bossId]);
+                    if (circle && circle->isSpawned())
+                        circle->Delete();
+                        circle->SetRespawnTime(7 * DAY);
+                        _circlesGUIDs[bossId] = 0;
+                }
+                    
+                if (state == DONE && bossId == BOSS_MAGMADAR)
+                {
+
+                }
 
                 if (_isLoading)
                     return true;
@@ -238,6 +273,7 @@ class instance_molten_core : public InstanceMapScript
             uint8 _ragnarosAddDeaths;
             bool _isLoading;
             bool _summonedExecutus;
+            std::unordered_map<uint8, uint64> _circlesGUIDs;
         };
 
         InstanceScript* GetInstanceScript(InstanceMap* map) const
