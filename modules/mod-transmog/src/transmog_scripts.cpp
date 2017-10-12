@@ -417,7 +417,7 @@ public:
 
     void OnLogout(Player* player)
     {
-        uint32 pGUID = player->GetGUID();
+        uint64 pGUID = player->GetGUID();
         for (Transmogrification::transmogData::const_iterator it = sT->entryMap[pGUID].begin(); it != sT->entryMap[pGUID].end(); ++it)
             sT->dataMap.erase(it->first);
         sT->entryMap.erase(pGUID);
@@ -456,8 +456,9 @@ public:
     void OnBeforeConfigLoad(bool reload) override
     {
         if (!reload) {
-            std::string cfg_file = "transmog.conf";
-            std::string cfg_def_file = cfg_file + ".dist";
+            std::string conf_path = _CONF_DIR;
+            std::string cfg_file = conf_path + "/transmog.conf";
+            std::string cfg_def_file = cfg_file +".dist";
 
             sConfigMgr->LoadMore(cfg_def_file.c_str());
 

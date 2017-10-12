@@ -1,0 +1,8 @@
+[worldserver]
+
+#
+#    RewardSystemEnable
+#        Description: Enable the reward system
+#        Default:     1  - (Enabled)
+#                     0  - (Disabled)
+RewardSystemEnable = 1

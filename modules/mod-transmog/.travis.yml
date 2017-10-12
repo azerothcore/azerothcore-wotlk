@@ -1,0 +1,42 @@
+sudo: required
+dist: trusty # (14.04)
+# xenial (16.04) is not supported yet
+
+language: cpp
+compiler:
+  - clang
+
+git:
+  depth: 1
+
+before_install:
+  - sudo apt-get -y install build-essential libtool make cmake cmake-data openssl
+  - sudo apt-get -y install libssl-dev libmysqlclient-dev libmysql++-dev libreadline6-dev zlib1g-dev libbz2-dev libace-dev
+  - git config user.email "travis@build.bot" && git config user.name "Travis CI"
+  - git tag -a -m "Travis build" init
+
+install:
+  - cd ..
+  - git clone --depth=1 --branch=master https://github.com/azerothcore/azerothcore-wotlk.git azerothcore
+  - mv mod-transmog azerothcore/modules
+  - cd azerothcore
+  - git submodule update --init --recursive
+
+  - mysql -uroot -e 'create database test_mysql;'
+  - cd bin
+  - cmake ../ -DWITH_WARNINGS=1 -DWITH_COREDEBUG=0 -DUSE_COREPCH=1 -DUSE_SCRIPTPCH=1 -DTOOLS=0 -DSCRIPTS=1 -DSERVERS=1 -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=check_install
+  - cd ..
+
+script:
+  - $CXX --version
+  - mysql -uroot < data/sql/create/create_mysql.sql
+  - cat data/sql/base/db_auth/*.sql | mysql -uacore -pacore auth
+  - cat data/sql/base/db_characters/*.sql | mysql -uacore -pacore characters
+  - cat data/sql/base/db_world/*.sql | mysql -uacore -pacore world
+  - cat data/sql/updates/db_auth/*.sql | mysql -uacore -pacore auth
+  - cat data/sql/updates/db_characters/*.sql | mysql -uacore -pacore characters
+  - cat data/sql/updates/db_world/*.sql | mysql -uacore -pacore world
+  - mysql -uroot < data/sql/create/drop_mysql.sql
+  - cd bin
+  - make -j 8 -k && make install
+  - cd check_install/bin

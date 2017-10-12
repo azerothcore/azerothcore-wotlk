@@ -309,12 +309,18 @@ public:
                 else
                 {
                     Creature* trainer = player->SummonCreature(HMAGE, player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 10000);
+                    trainer->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    trainer->GetMotionMaster()->MoveFollow(player, PET_FOLLOW_DIST, player->GetFollowAngle());
+                    trainer->setFaction(player->getFaction());
                 }
                 break;
             case CLASS_PALADIN:
                 if (player->GetTeamId() == TEAM_ALLIANCE)
                 {
                     Creature* trainer = player->SummonCreature(APALADIN, player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 10000);
+                    trainer->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    trainer->GetMotionMaster()->MoveFollow(player, PET_FOLLOW_DIST, player->GetFollowAngle());
+                    trainer->setFaction(player->getFaction());
                 }
                 else
                 {

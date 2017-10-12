@@ -2,7 +2,7 @@
 
 - Latest Transmog build status with azerothcore: [![Build Status](https://travis-ci.org/azerothcore/mod-transmog.svg?branch=master)](https://travis-ci.org/azerothcore/mod-transmog)
 
-This is a module for [AzerothCore](http://www.azerothcore.org) that adds transmog feature.
+This is a module for [AzerothCore](http://www.azerothcore.org) that adds transmog feature, it's based on [Rochet2 Transmog Script](http://rochet2.github.io/Transmogrification.html) 
 
 ## Requirements
 
