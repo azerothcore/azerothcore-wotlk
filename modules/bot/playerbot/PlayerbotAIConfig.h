@@ -49,7 +49,6 @@ public:
     bool randomBotJoinLfg;
     bool randomBotLoginAtStartup;
 	bool randomBotJoinBG;
-	bool randomBotBracketPlayer;
     uint32 randomBotTeleLevel;
     bool logInGroupOnly, logValuesPerTick;
     bool fleeingEnabled;

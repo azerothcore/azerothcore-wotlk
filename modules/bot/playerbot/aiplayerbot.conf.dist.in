@@ -201,4 +201,3 @@ AiPlayerbot.CommandServerPort = 8888
 
 # extra
 AiPlayerbot.randomBotShowHelmet = 1
-AIPlayerbot.RandomBotBracketPlayer = 0
