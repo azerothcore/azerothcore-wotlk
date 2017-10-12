@@ -111,15 +111,14 @@ void PlayerbotFactory::Randomize(bool incremental)
 	bot->SaveToDB(false, true);
 
 	sLog->outBasic("Initializing quests...");
-	/*  Disabled, causing Worldserver to crash.
-		InitQuests();
-	*/
+	InitQuests();
+	
 	// quest rewards boost bot level, so reduce back
-	//bot->SetLevel(level);
-	//ClearInventory();
-	//bot->SetUInt32Value(PLAYER_XP, 0);
-	//CancelAuras();
-	//bot->SaveToDB(false, true);
+	bot->SetLevel(level);
+	ClearInventory();
+	bot->SetUInt32Value(PLAYER_XP, 0);
+	CancelAuras();
+	bot->SaveToDB(false, true);
 
 	sLog->outBasic("Initializing skills...");
 	InitSkills();
@@ -2319,7 +2318,7 @@ uint64 PlayerbotFactory::GetRandomBot()
 	int index = urand(0, guids.size() - 1);
 	return guids[index];
 }
-/*
+
 void AddPrevQuests(uint32 questId, list<uint32>& questIds)
 {
 	Quest const *quest = sObjectMgr->GetQuestTemplate(questId);
@@ -2366,7 +2365,7 @@ void PlayerbotFactory::InitQuests()
 		ClearInventory();
 	}
 }
-*/
+
 void PlayerbotFactory::ClearInventory()
 {
 	DestroyItemsVisitor visitor(bot);
