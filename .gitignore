@@ -8,7 +8,7 @@ env/dist/*
 env/user/*
 modules/*
 build*/
-var/build/*
+var/*
 
 !.gitkeep
 
