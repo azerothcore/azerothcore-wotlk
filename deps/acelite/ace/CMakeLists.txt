@@ -328,9 +328,9 @@ if (USE_COREPCH)
 endif()
 
 include_directories(
-  ${CMAKE_SOURCE_DIR}/modules/worldengine/deps/acelite
+  ${CMAKE_SOURCE_DIR}/deps/acelite
   ${CMAKE_CURRENT_SOURCE_DIR}/PrecompiledHeaders
-  ${CMAKE_SOURCE_DIR}/modules/worldengine/deps/zlib
+  ${CMAKE_SOURCE_DIR}/deps/zlib
 )
 
 # Needed for PCH support

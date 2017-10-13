@@ -19,7 +19,7 @@ endif()
 
 # Create the header, so we can use it
 configure_file(
-  "${CMAKE_SOURCE_DIR}/modules/worldengine/deps/jemalloc/jemalloc_defs.h.in.cmake"
+  "${CMAKE_SOURCE_DIR}/deps/jemalloc/jemalloc_defs.h.in.cmake"
   "${BUILDDIR}/jemalloc_defs.h"
   @ONLY
 )

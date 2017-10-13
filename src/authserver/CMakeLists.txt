@@ -43,15 +43,15 @@ endif()
 
 include_directories(
   ${CMAKE_BINARY_DIR}
-  ${CMAKE_SOURCE_DIR}/modules/worldengine/nucleus/src
-  ${CMAKE_SOURCE_DIR}/modules/worldengine/nucleus/src/Database
-  ${CMAKE_SOURCE_DIR}/modules/worldengine/nucleus/src/Debugging
-  ${CMAKE_SOURCE_DIR}/modules/worldengine/nucleus/src/Packets
-  ${CMAKE_SOURCE_DIR}/modules/worldengine/nucleus/src/Cryptography
-  ${CMAKE_SOURCE_DIR}/modules/worldengine/nucleus/src/Cryptography/Authentication
-  ${CMAKE_SOURCE_DIR}/modules/worldengine/nucleus/src/Logging
-  ${CMAKE_SOURCE_DIR}/modules/worldengine/nucleus/src/Threading
-  ${CMAKE_SOURCE_DIR}/modules/worldengine/nucleus/src/Utilities
+  ${CMAKE_SOURCE_DIR}/src/core
+  ${CMAKE_SOURCE_DIR}/src/core/Database
+  ${CMAKE_SOURCE_DIR}/src/core/Debugging
+  ${CMAKE_SOURCE_DIR}/src/core/Packets
+  ${CMAKE_SOURCE_DIR}/src/core/Cryptography
+  ${CMAKE_SOURCE_DIR}/src/core/Cryptography/Authentication
+  ${CMAKE_SOURCE_DIR}/src/core/Logging
+  ${CMAKE_SOURCE_DIR}/src/core/Threading
+  ${CMAKE_SOURCE_DIR}/src/core/Utilities
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}/Authentication
   ${CMAKE_CURRENT_SOURCE_DIR}/Realms

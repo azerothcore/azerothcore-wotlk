@@ -54,7 +54,7 @@ include_directories(
   ${CMAKE_CURRENT_BINARY_DIR}
   ${CMAKE_BINARY_DIR}
   ${OPENSSL_INCLUDE_DIR}
-  ${CMAKE_SOURCE_DIR}/modules/worldengine/deps/zlib
+  ${CMAKE_SOURCE_DIR}/deps/zlib
   ${CMAKE_CURRENT_SOURCE_DIR}/include
   ${CMAKE_CURRENT_SOURCE_DIR}/include/internal
   ${CMAKE_CURRENT_SOURCE_DIR}/dbug

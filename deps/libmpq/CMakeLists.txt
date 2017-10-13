@@ -17,15 +17,15 @@ set(mpq_STAT_SRCS
 if( UNIX )
   include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}
-    ${CMAKE_SOURCE_DIR}/modules/worldengine/deps/zlib
-    ${CMAKE_SOURCE_DIR}/modules/worldengine/deps/bzip2
+    ${CMAKE_SOURCE_DIR}/deps/zlib
+    ${CMAKE_SOURCE_DIR}/deps/bzip2
   )
 elseif( WIN32 )
   include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/win
-    ${CMAKE_SOURCE_DIR}/modules/worldengine/deps/zlib
-    ${CMAKE_SOURCE_DIR}/modules/worldengine/deps/bzip2
+    ${CMAKE_SOURCE_DIR}/deps/zlib
+    ${CMAKE_SOURCE_DIR}/deps/bzip2
   )
 endif()
 

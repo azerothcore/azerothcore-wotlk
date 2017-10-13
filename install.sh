@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 
 CUR_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+PATH_APPS="$CUR_PATH/apps/"
 PATH_MODULES="$CUR_PATH/modules/"
-[ ! -d $PATH_MODULES/drassil/joiner ] && git clone https://github.com/drassil/joiner $PATH_MODULES/drassil/joiner -b master
-source "$PATH_MODULES/drassil/joiner/joiner.sh"
+[ ! -d $PATH_APPS/drassil/joiner ] && git clone https://github.com/drassil/joiner $PATH_APPS/drassil/joiner -b master
+source "$PATH_APPS/drassil/joiner/joiner.sh"
 
 
 # installing repository dependencies

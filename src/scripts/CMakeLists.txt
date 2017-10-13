@@ -78,29 +78,29 @@ message("")
 include_directories(
   ${scripts_INCLUDE_DIRS}
   ${CMAKE_BINARY_DIR}
-  ${CMAKE_SOURCE_DIR}/modules/worldengine/deps/recastnavigation/Detour
-  ${CMAKE_SOURCE_DIR}/modules/worldengine/deps/recastnavigation/Recast
-  ${CMAKE_SOURCE_DIR}/modules/worldengine/deps/g3dlite/include
-  ${CMAKE_SOURCE_DIR}/modules/worldengine/deps/SFMT
-  ${CMAKE_SOURCE_DIR}/modules/worldengine/deps/zlib
-  ${CMAKE_SOURCE_DIR}/modules/worldengine/nucleus/src
-  ${CMAKE_SOURCE_DIR}/modules/worldengine/nucleus/src/Configuration
-  ${CMAKE_SOURCE_DIR}/modules/worldengine/nucleus/src/Cryptography
-  ${CMAKE_SOURCE_DIR}/modules/worldengine/nucleus/src/Database
-  ${CMAKE_SOURCE_DIR}/modules/worldengine/nucleus/src/DataStores
-  ${CMAKE_SOURCE_DIR}/modules/worldengine/nucleus/src/Debugging
-  ${CMAKE_SOURCE_DIR}/modules/worldengine/nucleus/src/Dynamic/LinkedReference
-  ${CMAKE_SOURCE_DIR}/modules/worldengine/nucleus/src/Dynamic
-  ${CMAKE_SOURCE_DIR}/modules/worldengine/nucleus/src/Logging
-  ${CMAKE_SOURCE_DIR}/modules/worldengine/nucleus/src/Packets
-  ${CMAKE_SOURCE_DIR}/modules/worldengine/nucleus/src/Threading
-  ${CMAKE_SOURCE_DIR}/modules/worldengine/nucleus/src/Utilities
-  ${CMAKE_SOURCE_DIR}/modules/worldengine/lib-collision/src/
-  ${CMAKE_SOURCE_DIR}/modules/worldengine/lib-collision/src/Management
-  ${CMAKE_SOURCE_DIR}/modules/worldengine/lib-collision/src/Models
-  ${CMAKE_SOURCE_DIR}/modules/worldengine/nucleus/src
-  ${CMAKE_SOURCE_DIR}/modules/worldengine/nucleus/src/Database
-  ${CMAKE_SOURCE_DIR}/modules/acore/game-framework/src/Addons
+  ${CMAKE_SOURCE_DIR}/deps/recastnavigation/Detour
+  ${CMAKE_SOURCE_DIR}/deps/recastnavigation/Recast
+  ${CMAKE_SOURCE_DIR}/deps/g3dlite/include
+  ${CMAKE_SOURCE_DIR}/deps/SFMT
+  ${CMAKE_SOURCE_DIR}/deps/zlib
+  ${CMAKE_SOURCE_DIR}/src/core
+  ${CMAKE_SOURCE_DIR}/src/core/Configuration
+  ${CMAKE_SOURCE_DIR}/src/core/Cryptography
+  ${CMAKE_SOURCE_DIR}/src/core/Database
+  ${CMAKE_SOURCE_DIR}/src/core/DataStores
+  ${CMAKE_SOURCE_DIR}/src/core/Debugging
+  ${CMAKE_SOURCE_DIR}/src/core/Dynamic/LinkedReference
+  ${CMAKE_SOURCE_DIR}/src/core/Dynamic
+  ${CMAKE_SOURCE_DIR}/src/core/Logging
+  ${CMAKE_SOURCE_DIR}/src/core/Packets
+  ${CMAKE_SOURCE_DIR}/src/core/Threading
+  ${CMAKE_SOURCE_DIR}/src/core/Utilities
+  ${CMAKE_SOURCE_DIR}/src/libraries/collision/
+  ${CMAKE_SOURCE_DIR}/src/libraries/collision/Management
+  ${CMAKE_SOURCE_DIR}/src/libraries/collision/Models
+  ${CMAKE_SOURCE_DIR}/src/core
+  ${CMAKE_SOURCE_DIR}/src/core/Database
+  ${CMAKE_SOURCE_DIR}/src/framework/Addons
   ${CMAKE_SOURCE_DIR}/src/game/Accounts
   ${CMAKE_SOURCE_DIR}/src/game/Achievements
   ${CMAKE_SOURCE_DIR}/src/game/AI
@@ -116,7 +116,7 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/src/game/Chat
   ${CMAKE_SOURCE_DIR}/src/game/Chat/Channels
   ${CMAKE_SOURCE_DIR}/src/game/Conditions
-  ${CMAKE_SOURCE_DIR}/modules/worldengine/nucleus/src/Configuration
+  ${CMAKE_SOURCE_DIR}/src/core/Configuration
   ${CMAKE_SOURCE_DIR}/src/game/Combat
   ${CMAKE_SOURCE_DIR}/src/game/DataStores
   ${CMAKE_SOURCE_DIR}/src/game/DungeonFinding

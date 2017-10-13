@@ -20,8 +20,8 @@ add_subdirectory(genrev)
 
 if( SERVERS )
   set(sources_windows_Debugging
-    ${CMAKE_SOURCE_DIR}/modules/worldengine/nucleus/src/Debugging/WheatyExceptionReport.cpp
-    ${CMAKE_SOURCE_DIR}/modules/worldengine/nucleus/src/Debugging/WheatyExceptionReport.h
+    ${CMAKE_SOURCE_DIR}/src/core/Debugging/WheatyExceptionReport.cpp
+    ${CMAKE_SOURCE_DIR}/src/core/Debugging/WheatyExceptionReport.h
   )
   add_subdirectory(game)
   add_subdirectory(authserver)
