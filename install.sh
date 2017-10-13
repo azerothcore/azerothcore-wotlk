@@ -12,4 +12,4 @@ if [[ $1 == "dev" ]]; then
 fi
 
 
-source "$CUR_PATH/bin/installer/main.sh"
+source "$CUR_PATH/apps/installer/main.sh"

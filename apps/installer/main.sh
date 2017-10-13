@@ -53,10 +53,10 @@ function _switch() {
             inst_module_remove $2
             ;;
         "Sub Menu >> Compiler")
-            bash "$AC_PATH_BIN/compiler/compiler.sh"
+            bash "$AC_PATH_APPS/compiler/compiler.sh"
             ;;
         "Sub Menu >> DB Assembler")
-            bash "$AC_PATH_BIN/db_assembler/db_assembler.sh"
+            bash "$AC_PATH_APPS/db_assembler/db_assembler.sh"
             ;;
         "Quit")
             echo "Goodbye!"

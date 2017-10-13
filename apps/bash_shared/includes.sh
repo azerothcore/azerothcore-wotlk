@@ -3,13 +3,13 @@
 # force default language for applications
 LC_ALL=C 
 
-AC_PATH_BIN="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../" && pwd )"
+AC_PATH_APPS="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../" && pwd )"
 
-AC_PATH_SHARED="$AC_PATH_BIN/bash_shared"
+AC_PATH_SHARED="$AC_PATH_APPS/bash_shared"
 
 source "$AC_PATH_SHARED/defines.sh"
 
-source "$AC_PATH_MODULES/hw-core/bash-lib-event/src/hooks.sh"
+source "$AC_PATH_DEPS/hw-core/bash-lib-event/src/hooks.sh"
 
 
 function registerHooks() { hwc_event_register_hooks "$@"; }

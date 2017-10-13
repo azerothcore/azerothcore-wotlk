@@ -2,7 +2,7 @@
 
 ROOTPATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../../" && pwd )"
 
-source $ROOTPATH"/bin/bash_shared/includes.sh"
+source $ROOTPATH"/apps/bash_shared/includes.sh"
 
 if [ -f "./config.sh"  ]; then
     source "./config.sh" # should overwrite previous

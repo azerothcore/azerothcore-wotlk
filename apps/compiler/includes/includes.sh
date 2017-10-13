@@ -2,7 +2,7 @@ CURRENT_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 source "$CURRENT_PATH/../../bash_shared/includes.sh"
 
-AC_PATH_COMPILER="$AC_PATH_BIN/compiler"
+AC_PATH_COMPILER="$AC_PATH_APPS/compiler"
 
 if [ -f "$AC_PATH_COMPILER/config.sh"  ]; then
     source "$AC_PATH_COMPILER/config.sh" # should overwrite previous
