@@ -337,6 +337,18 @@ bool MoveRandomAction::Execute(Event event)
         }
     }
 
+	if (!(rand() % 3))
+	{
+		list<ObjectGuid> players = AI_VALUE(list<ObjectGuid>, "nearest friendly players");
+		for (list<ObjectGuid>::iterator i = players.begin(); i != players.end(); i++)
+		{
+			target = ai->GetUnit(*i);
+
+			if (target && bot->GetDistance(target) > sPlayerbotAIConfig.tooCloseDistance)
+				break;
+		}
+	}
+
     float distance = sPlayerbotAIConfig.tooCloseDistance + sPlayerbotAIConfig.grindDistance * urand(3, 10) / 10.0f;
 
     Map* map = bot->GetMap();

@@ -10,6 +10,14 @@
 #include "GuildTaskMgr.h"
 #include "Battleground.h"
 
+#include "GridNotifiers.h"
+#include "GridNotifiersImpl.h"
+#include "CellImpl.h"
+#include "FleeManager.h"
+
+using namespace BotAI;
+using namespace std;
+
 RandomPlayerbotMgr::RandomPlayerbotMgr() : PlayerbotHolder(), processTicks(0)
 {
     sPlayerbotCommandServer.Start();
@@ -49,13 +57,8 @@ void RandomPlayerbotMgr::UpdateAIInternal(uint32 elapsed)
             randomBotsPerInterval = bots.size();
     }
 
-    while (botCount++ < maxAllowedBotCount)
-    {
-        bool alliance = botCount % 2;
-        uint32 bot = AddRandomBot(alliance);
-        if (bot) bots.push_back(bot);
-        else break;
-    }
+	if (botCount < maxAllowedBotCount)
+		AddRandomBots();
 
     int botProcessed = 0;
     for (list<uint32>::iterator i = bots.begin(); i != bots.end(); ++i)
@@ -75,19 +78,58 @@ void RandomPlayerbotMgr::UpdateAIInternal(uint32 elapsed)
     PrintStats();
 }
 
-uint32 RandomPlayerbotMgr::AddRandomBot(bool alliance)
+uint32 RandomPlayerbotMgr::AddRandomBots()
 {
-    vector<uint32> bots = GetFreeBots(alliance);
-    if (bots.size() == 0)
-        return 0;
+	set<uint32> bots;
 
-    int index = urand(0, bots.size() - 1);
-    uint32 bot = bots[index];
-    SetEventValue(bot, "add", 1, urand(sPlayerbotAIConfig.minRandomBotInWorldTime, sPlayerbotAIConfig.maxRandomBotInWorldTime));
-    uint32 randomTime = 30 + urand(sPlayerbotAIConfig.randomBotUpdateInterval, sPlayerbotAIConfig.randomBotUpdateInterval * 3);
-    ScheduleRandomize(bot, randomTime);
-    sLog->outBasic("Random bot %d added", bot);
-    return bot;
+	QueryResult results = CharacterDatabase.PQuery(
+		"select `bot` from ai_playerbot_random_bots where event = 'add'");
+
+	if (results)
+	{
+		do
+		{
+			Field* fields = results->Fetch();
+			uint32 bot = fields[0].GetUInt32();
+			bots.insert(bot);
+		} while (results->NextRow());
+	}
+
+	vector<uint32> guids;
+	int maxAllowedBotCount = GetEventValue(0, "bot_count");
+	for (list<uint32>::iterator i = sPlayerbotAIConfig.randomBotAccounts.begin(); i != sPlayerbotAIConfig.randomBotAccounts.end(); i++)
+	{
+		uint32 accountId = *i;
+		if (!AccountMgr::GetCharactersCount(accountId))
+			continue;
+
+		QueryResult result = CharacterDatabase.PQuery("SELECT guid, race FROM characters WHERE account = '%u'", accountId);
+		if (!result)
+			continue;
+
+		do
+		{
+			Field* fields = result->Fetch();
+			uint32 guid = fields[0].GetUInt32();
+			uint8 race = fields[1].GetUInt8();
+			bool alliance = guids.size() % 2 == 0;
+			if (bots.find(guid) == bots.end() &&
+				((alliance && IsAlliance(race)) || ((!alliance && !IsAlliance(race))
+					)))
+			{
+				guids.push_back(guid);
+				uint32 bot = guid;
+				SetEventValue(bot, "add", 1, urand(sPlayerbotAIConfig.minRandomBotInWorldTime, sPlayerbotAIConfig.maxRandomBotInWorldTime));
+				uint32 randomTime = 30 + urand(sPlayerbotAIConfig.randomBotUpdateInterval, sPlayerbotAIConfig.randomBotUpdateInterval * 3);
+				ScheduleRandomize(bot, randomTime);
+				bots.insert(bot);
+				sLog->outBasic("New random bot %d added", bot);
+				if (bots.size() >= maxAllowedBotCount) break;
+			}
+		} while (result->NextRow());
+	}
+
+	return guids.size();
 }
 
 void RandomPlayerbotMgr::ScheduleRandomize(uint32 bot, uint32 time)
@@ -258,8 +300,8 @@ void RandomPlayerbotMgr::RandomTeleport(Player* bot, vector<WorldLocation> &locs
     {
         int index = urand(0, locs.size() - 1);
         WorldLocation loc = locs[index];
-        float x = loc.m_positionX + urand(0, sPlayerbotAIConfig.grindDistance) - sPlayerbotAIConfig.grindDistance / 2;
-        float y = loc.m_positionY + urand(0, sPlayerbotAIConfig.grindDistance) - sPlayerbotAIConfig.grindDistance / 2;
+		float x = loc.m_positionX + (attemtps > 0 ? urand(0, sPlayerbotAIConfig.grindDistance) - sPlayerbotAIConfig.grindDistance / 2 : 0);
+        float y = loc.m_positionY + (attemtps > 0 ? urand(0, sPlayerbotAIConfig.grindDistance) - sPlayerbotAIConfig.grindDistance / 2 : 0);
         float z = loc.m_positionZ;
 
         Map* map = sMapMgr->FindMap(loc.GetMapId(), 0);
@@ -562,7 +604,6 @@ void RandomPlayerbotMgr::Refresh(Player* bot)
 	{
 		bot->ResurrectPlayer(1.0f);
 		bot->SpawnCorpseBones();
-		bot->SaveToDB(false, true);
 		bot->GetPlayerbotAI()->ResetStrategies();
 	}
 
@@ -624,50 +665,6 @@ list<uint32> RandomPlayerbotMgr::GetBots()
     }
 
     return bots;
-}
-
-vector<uint32> RandomPlayerbotMgr::GetFreeBots(bool alliance)
-{
-    set<uint32> bots;
-
-    QueryResult results = CharacterDatabase.PQuery(
-            "select `bot` from ai_playerbot_random_bots where event = 'add'");
-
-    if (results)
-    {
-        do
-        {
-            Field* fields = results->Fetch();
-            uint32 bot = fields[0].GetUInt32();
-            bots.insert(bot);
-        } while (results->NextRow());
-    }
-
-    vector<uint32> guids;
-    for (list<uint32>::iterator i = sPlayerbotAIConfig.randomBotAccounts.begin(); i != sPlayerbotAIConfig.randomBotAccounts.end(); i++)
-    {
-        uint32 accountId = *i;
-        if (!AccountMgr::GetCharactersCount(accountId))
-            continue;
-
-        QueryResult result = CharacterDatabase.PQuery("SELECT guid, race FROM characters WHERE account = '%u'", accountId);
-        if (!result)
-            continue;
-
-        do
-        {
-            Field* fields = result->Fetch();
-            uint32 guid = fields[0].GetUInt32();
-            uint8 race = fields[1].GetUInt8();
-            if (bots.find(guid) == bots.end() &&
-                    ((alliance && IsAlliance(race)) || ((!alliance && !IsAlliance(race))
-            )))
-                guids.push_back(guid);
-        } while (result->NextRow());
-    }
-
-
-    return guids;
 }
 
 uint32 RandomPlayerbotMgr::GetEventValue(uint32 bot, string event)
@@ -906,7 +903,7 @@ void RandomPlayerbotMgr::PrintStats()
         perClass[cls] = 0;
     }
 
-    int dps = 0, heal = 0, tank = 0;
+    int dps = 0, heal = 0, tank = 0, active = 0;
     for (PlayerBotMap::iterator i = playerBots.begin(); i != playerBots.end(); ++i)
     {
         Player* bot = i->second;
@@ -917,6 +914,9 @@ void RandomPlayerbotMgr::PrintStats()
 
         perRace[bot->getRace()]++;
         perClass[bot->getClass()]++;
+
+		if (bot->GetPlayerbotAI()->IsActive())
+			active++;
 
         int spec = AiFactory::GetPlayerSpecTab(bot);
         switch (bot->getClass())
@@ -993,6 +993,7 @@ void RandomPlayerbotMgr::PrintStats()
     sLog->outBasic("    tank: %d", tank);
     sLog->outBasic("    heal: %d", heal);
     sLog->outBasic("    dps: %d", dps);
+	sLog->outBasic("Active bots: %d", active);
 }
 
 double RandomPlayerbotMgr::GetBuyMultiplier(Player* bot)
