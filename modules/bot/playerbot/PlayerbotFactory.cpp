@@ -35,6 +35,8 @@ uint32 PlayerbotFactory::tradeSkills[] =
 	SKILL_FISHING
 };
 
+list<uint32> PlayerbotFactory::classQuestIds;
+
 void PlayerbotFactory::Randomize()
 {
 	Randomize(true);
@@ -111,14 +113,13 @@ void PlayerbotFactory::Randomize(bool incremental)
 	bot->SaveToDB(false, true);
 
 	sLog->outBasic("Initializing quests...");
-	//InitQuests();
-	
+	/*InitQuests();
 	// quest rewards boost bot level, so reduce back
-	bot->SetLevel(level);
-	ClearInventory();
-	bot->SetUInt32Value(PLAYER_XP, 0);
-	CancelAuras();
-	bot->SaveToDB(false, true);
+    bot->SetLevel(level);
+    ClearInventory();
+    bot->SetUInt32Value(PLAYER_XP, 0);
+    CancelAuras();
+    bot->SaveToDB(false, true);*/
 
 	sLog->outBasic("Initializing skills...");
 	InitSkills();
@@ -2332,38 +2333,40 @@ void AddPrevQuests(uint32 questId, list<uint32>& questIds)
 
 void PlayerbotFactory::InitQuests()
 {
-	ObjectMgr::QuestMap const& questTemplates = sObjectMgr->GetQuestTemplates();
-	list<uint32> questIds;
-	for (ObjectMgr::QuestMap::const_iterator i = questTemplates.begin(); i != questTemplates.end(); ++i)
+	if (classQuestIds.empty())
 	{
-		uint32 questId = i->first;
-		Quest const *quest = i->second;
+		ObjectMgr::QuestMap const& questTemplates = sObjectMgr->GetQuestTemplates();
+		for (ObjectMgr::QuestMap::const_iterator i = questTemplates.begin(); i != questTemplates.end(); ++i)
+		{
+			uint32 questId = i->first;
+			Quest const *quest = i->second;
 
-		if (!quest->GetRequiredClasses() ||
-				quest->GetMinLevel() > bot->getLevel() ||
-				quest->IsDailyOrWeekly() || quest->IsRepeatable() || quest->IsMonthly())
-			continue;
+			if (!quest->GetRequiredClasses() || quest->IsRepeatable())
+				continue;
 
-		AddPrevQuests(questId, questIds);
-		questIds.push_back(questId);
+			AddPrevQuests(questId, classQuestIds);
+			classQuestIds.remove(questId);
+			classQuestIds.push_back(questId);
+		}
 	}
 
-	for (list<uint32>::iterator i = questIds.begin(); i != questIds.end(); ++i)
+	int count = 0;
+	for (list<uint32>::iterator i = classQuestIds.begin(); i != classQuestIds.end(); ++i)
 	{
 		uint32 questId = *i;
 		Quest const *quest = sObjectMgr->GetQuestTemplate(questId);
 
 		if (!bot->SatisfyQuestClass(quest, false) ||
-				!bot->SatisfyQuestRace(quest, false))
+			quest->GetMinLevel() > bot->getLevel() ||
+			!bot->SatisfyQuestRace(quest, false))
 			continue;
 
-		bot->RemoveActiveQuest(questId);
-		bot->RemoveRewardedQuest(questId);
-
 		bot->SetQuestStatus(questId, QUEST_STATUS_COMPLETE);
-		bot->RewardQuest(quest, 0, bot);
-		ClearInventory();
+		bot->RewardQuest(quest, 0, bot, false);
+		if (!(count++ % 10))
+			ClearInventory();
 	}
+	ClearInventory();
 }
 
 void PlayerbotFactory::ClearInventory()

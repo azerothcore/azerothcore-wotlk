@@ -68,4 +68,5 @@ private:
     uint32 level;
     uint32 itemQuality;
     static uint32 tradeSkills[];
+	static list<uint32> classQuestIds;
 };
