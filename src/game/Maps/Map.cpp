@@ -225,7 +225,7 @@ _transportsUpdateIter(_transports.end()), i_scriptLock(false), _defaultLight(Get
         for (unsigned int j=0; j < MAX_NUMBER_OF_GRIDS; ++j)
         {
             //z code
-            GridMaps[idx][j] =NULL;
+            GridMaps[idx][j] = false;
             setNGrid(NULL, idx, j);
         }
     }
@@ -412,22 +412,18 @@ void Map::EnsureGridCreated_i(const GridCoord &p)
     if (!getNGrid(p.x_coord, p.y_coord))
     {
         // pussywizard: moved setNGrid to the end of the function
-        NGridType* ngt = new NGridType(p.x_coord*MAX_NUMBER_OF_GRIDS + p.y_coord, p.x_coord, p.y_coord);
-        
+		setNGrid(new NGridType(p.x_coord * MAX_NUMBER_OF_GRIDS + p.y_coord, p.x_coord, p.y_coord),
+			p.x_coord, p.y_coord);
+
         // build a linkage between this map and NGridType
-        buildNGridLinkage(ngt); // pussywizard: getNGrid(x, y) changed to: ngt
+		buildNGridLinkage(getNGrid(p.x_coord, p.y_coord));
 
         //z coord
         int gx = (MAX_NUMBER_OF_GRIDS - 1) - p.x_coord;
         int gy = (MAX_NUMBER_OF_GRIDS - 1) - p.y_coord;
 
         if (!GridMaps[gx][gy])
-        {
             LoadMapAndVMap(gx, gy);
-        }
-
-        // pussywizard: moved here
-        setNGrid(ngt, p.x_coord, p.y_coord);
     }
 }
 
