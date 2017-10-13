@@ -13,7 +13,7 @@ void NearestNonBotPlayersValue::FindUnits(list<Unit*> &targets)
 {
 	AnyUnitInObjectRangeCheck u_check(bot, range);
 	UnitListSearcher<AnyUnitInObjectRangeCheck> searcher(bot, targets, u_check);
-	bot->VisitNearbyObject(range, searcher);
+	bot->VisitNearbyObject(bot->GetMap()->GetVisibilityRange(), searcher);
 }
 
 bool NearestNonBotPlayersValue::AcceptUnit(Unit* unit)

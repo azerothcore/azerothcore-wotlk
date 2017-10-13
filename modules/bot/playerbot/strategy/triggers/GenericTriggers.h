@@ -584,7 +584,7 @@ namespace BotAI
     public:
         virtual bool IsActive()
         {
-            return AI_VALUE(list<ObjectGuid>, "nearest non bot players").empty();
+			return AI_VALUE(list<uint64>, "nearest non bot players").empty();
         }
     };
 }
