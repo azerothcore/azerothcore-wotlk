@@ -138,9 +138,11 @@ void RandomPlayerbotMgr::ScheduleRandomize(uint32 bot, uint32 time)
     SetEventValue(bot, "logout", 1, time + 30 + urand(sPlayerbotAIConfig.randomBotUpdateInterval, sPlayerbotAIConfig.randomBotUpdateInterval * 3));
 }
 
-void RandomPlayerbotMgr::ScheduleTeleport(uint32 bot)
+void RandomPlayerbotMgr::ScheduleTeleport(uint32 bot, uint32 time)
 {
-    SetEventValue(bot, "teleport", 1, 60 + urand(sPlayerbotAIConfig.randomBotUpdateInterval, sPlayerbotAIConfig.randomBotUpdateInterval * 3));
+    if (!time)
+        time = 60 + urand(sPlayerbotAIConfig.randomBotUpdateInterval, sPlayerbotAIConfig.randomBotUpdateInterval * 3);
+    SetEventValue(bot, "teleport", 1, time);
 }
 
 bool RandomPlayerbotMgr::ProcessBot(uint32 bot)
@@ -163,6 +165,7 @@ bool RandomPlayerbotMgr::ProcessBot(uint32 bot)
         if (!GetEventValue(bot, "online"))
         {
             SetEventValue(bot, "online", 1, sPlayerbotAIConfig.minRandomBotInWorldTime);
+			ScheduleTeleport(bot, 30);
         }
         return true;
     }
