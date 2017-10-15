@@ -1,3 +1,8 @@
+DROP FUNCTION IF EXISTS packDate;
+CREATE FUNCTION packDate (yy TINYINT UNSIGNED, mm TINYINT UNSIGNED, dd TINYINT UNSIGNED)
+RETURNS INT UNSIGNED DETERMINISTIC
+RETURN (yy << 24) | ((mm - 1) << 20) | ((dd - 1) << 14);
+
 -- DB update 2017_09_26_00 -> 2017_10_15_00
 DROP PROCEDURE IF EXISTS `updateDb`;
 DELIMITER //
@@ -26,10 +31,6 @@ CREATE TABLE holiday_dates (
   date_value INT UNSIGNED NOT NULL,
   PRIMARY KEY (id, date_id)
 );
-
-CREATE FUNCTION packDate (yy TINYINT UNSIGNED, mm TINYINT UNSIGNED, dd TINYINT UNSIGNED)
-RETURNS INT UNSIGNED DETERMINISTIC
-RETURN (yy << 24) | ((mm - 1) << 20) | ((dd - 1) << 14);
 
 INSERT INTO holiday_dates VALUES
 (181, 6, 220692480 + (1 << 14)), -- rescheduled
@@ -156,8 +157,6 @@ INSERT INTO holiday_dates VALUES
 
 UPDATE holiday_dates SET date_value = date_value & ~0x3FFF;
 
-DROP FUNCTION packDate;
-
 ALTER TABLE game_event ADD COLUMN holidayStage TINYINT UNSIGNED NOT NULL DEFAULT 0 AFTER holiday;
 
 UPDATE game_event SET holiday = 424 WHERE eventEntry = 64;
@@ -176,3 +175,6 @@ END;
 DELIMITER ;
 CALL updateDb();
 DROP PROCEDURE IF EXISTS `updateDb`;
+
+DROP FUNCTION packDate;
+
