@@ -8,6 +8,7 @@
 
 #include <map>
 #include <string>
+#include <chrono>
 
 #include "Common.h"
 #include <ace/Singleton.h>
@@ -348,15 +349,8 @@ class AchievementGlobalMgr
             return iter != m_criteriaDataMap.end() ? &iter->second : NULL;
         }
 
-        bool IsRealmCompleted(AchievementEntry const* achievement) const
-        {
-            return m_allCompletedAchievements.find(achievement->ID) != m_allCompletedAchievements.end();
-        }
-
-        void SetRealmCompleted(AchievementEntry const* achievement)
-        {
-            m_allCompletedAchievements.insert(achievement->ID);
-        }
+        bool IsRealmCompleted(AchievementEntry const* achievement) const;
+        void SetRealmCompleted(AchievementEntry const* achievement);
 
         void LoadAchievementCriteriaList();
         void LoadAchievementCriteriaData();
@@ -375,7 +369,7 @@ class AchievementGlobalMgr
         // store achievements by referenced achievement id to speed up lookup
         AchievementListByReferencedId m_AchievementListByReferencedId;
 
-        typedef std::set<uint32> AllCompletedAchievements;
+        typedef UNORDERED_MAP<uint32 /*achievementId*/, std::chrono::system_clock::time_point /*completionTime*/> AllCompletedAchievements;
         AllCompletedAchievements m_allCompletedAchievements;
 
         AchievementRewards m_achievementRewards;
