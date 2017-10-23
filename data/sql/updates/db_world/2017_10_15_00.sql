@@ -1,3 +1,23 @@
+DROP FUNCTION IF EXISTS packDate;
+CREATE FUNCTION packDate (yy TINYINT UNSIGNED, mm TINYINT UNSIGNED, dd TINYINT UNSIGNED)
+RETURNS INT UNSIGNED DETERMINISTIC
+RETURN (yy << 24) | ((mm - 1) << 20) | ((dd - 1) << 14);
+
+-- DB update 2017_09_26_00 -> 2017_10_15_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2017_10_14_02';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2017_10_14_02 2017_10_15_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1504044222560696700'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
 INSERT INTO version_db_world (`sql_rev`) VALUES ('1504044222560696700');
 
 -- fix NO_ZERO_DATE error on mysql 5.7 (for latest linux platforms)
@@ -11,10 +31,6 @@ CREATE TABLE holiday_dates (
   date_value INT UNSIGNED NOT NULL,
   PRIMARY KEY (id, date_id)
 );
-
-CREATE FUNCTION packDate (yy TINYINT UNSIGNED, mm TINYINT UNSIGNED, dd TINYINT UNSIGNED)
-RETURNS INT UNSIGNED DETERMINISTIC
-RETURN (yy << 24) | ((mm - 1) << 20) | ((dd - 1) << 14);
 
 INSERT INTO holiday_dates VALUES
 (181, 6, 220692480 + (1 << 14)), -- rescheduled
@@ -141,8 +157,6 @@ INSERT INTO holiday_dates VALUES
 
 UPDATE holiday_dates SET date_value = date_value & ~0x3FFF;
 
-DROP FUNCTION packDate;
-
 ALTER TABLE game_event ADD COLUMN holidayStage TINYINT UNSIGNED NOT NULL DEFAULT 0 AFTER holiday;
 
 UPDATE game_event SET holiday = 424 WHERE eventEntry = 64;
@@ -152,3 +166,15 @@ UPDATE game_event SET holiday = 375 WHERE eventEntry = 110;
 UPDATE game_event SET holiday = 376 WHERE eventEntry = 62;
 UPDATE game_event SET holidayStage = 1 WHERE eventEntry IN (1, 2, 7, 8, 9, 10, 11, 12, 18, 19, 20, 21, 23, 24, 26, 50, 51, 53, 54, 62, 110);
 UPDATE game_event SET holidayStage = 2 WHERE eventEntry IN (3, 4, 5);
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END;
+//
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
+
+DROP FUNCTION packDate;
+

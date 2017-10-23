@@ -1,3 +1,18 @@
+-- DB update 2017_10_15_00 -> 2017_10_15_01
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2017_10_15_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2017_10_15_00 2017_10_15_01 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1504704582101308200'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
 INSERT INTO version_db_world (`sql_rev`) VALUES ('1504704582101308200');
 
 -- Editing the SmartAI script of [Creature] ENTRY 11663 (name: Flamewaker Healer)
@@ -33,4 +48,12 @@ UPDATE `creature_template` SET `scriptname` = 'npc_magmadar_core_hound' WHERE `e
 DELETE FROM `creature_text` WHERE entry = 11671;
 INSERT INTO `creature_text` (`entry`, `groupid`, `id`, `text`, `type`, `language`, `probability`, `emote`, `duration`, `textrange`) VALUES 
 (11671, 0, 0, "%s collapses and begins to smolder.", 16, 0, 100, 0, 2000, 0),
-(11671, 1, 0, "%s reignites from the heat of another Core Hound!", 16, 0, 100, 0, 2000, 0);
+(11671, 1, 0, "%s reignites from the heat of another Core Hound!", 16, 0, 100, 0, 2000, 0);--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END;
+//
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
