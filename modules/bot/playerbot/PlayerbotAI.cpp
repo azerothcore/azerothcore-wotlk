@@ -395,13 +395,13 @@ void PlayerbotAI::ChangeEngine(BotState type)
         switch (type)
         {
         case BOT_STATE_COMBAT:
-            sLog->outBasic("=== %s COMBAT ===", bot->GetName().c_str());
+            sLog->outDetail("=== %s COMBAT ===", bot->GetName().c_str());
             break;
         case BOT_STATE_NON_COMBAT:
-            sLog->outBasic("=== %s NON-COMBAT ===", bot->GetName().c_str());
+            sLog->outDetail("=== %s NON-COMBAT ===", bot->GetName().c_str());
             break;
         case BOT_STATE_DEAD:
-            sLog->outBasic("=== %s DEAD ===", bot->GetName().c_str());
+            sLog->outDetail("=== %s DEAD ===", bot->GetName().c_str());
             break;
         }
     }
