@@ -56,7 +56,7 @@ public:
     void OnBeforeConfigLoad(bool reload) override
     {
         if (!reload) {
-            std::string cfg_file = "reward_system.conf";
+            std::string cfg_file = "Settings/mod_reward_system.conf";
             std::string cfg_def_file = cfg_file + ".dist";
 
             sConfigMgr->LoadMore(cfg_def_file.c_str());

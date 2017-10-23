@@ -20,7 +20,7 @@
 #include "Master.h"
 
 #ifndef _TRINITY_CORE_CONFIG
-# define _TRINITY_CORE_CONFIG  "worldserver.conf"
+# define _TRINITY_CORE_CONFIG  "Settings/server_world.conf"
 #endif
 
 #ifdef _WIN32

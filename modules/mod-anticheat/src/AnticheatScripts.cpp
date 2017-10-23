@@ -55,9 +55,9 @@ public:
 		/* from skeleton module */
 		if (!reload) {
 			std::string conf_path = _CONF_DIR;
-			std::string cfg_file = conf_path + "/Anticheat.conf";
+			std::string cfg_file = conf_path + "Settings/mod_anticheat.conf";
 			#ifdef WIN32
-				cfg_file = "Anticheat.conf";
+				cfg_file = "mod_anticheat.conf";
 			#endif // WIN32
 			std::string cfg_def_file = cfg_file + ".dist";
 			sConfigMgr->LoadMore(cfg_def_file.c_str());

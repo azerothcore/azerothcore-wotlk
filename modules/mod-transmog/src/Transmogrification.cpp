@@ -1,3 +1,12 @@
+/*
+# Modifications by StygianTheBest
+- v2017.08.21 - Updated module announce
+- v2017.08.25 - [Merge](https://github.com/azerothcore/mod-transmog/commit/b3a70aa522f9c8c3db72a6a970eafa2e2bbcf080)
+
+---
+
+*/
+
 #include "Transmogrification.h"
 
 #ifdef PRESETS
@@ -573,7 +582,7 @@ void Transmogrification::LoadConfig(bool reload)
 {
 #ifdef PRESETS
     EnableSetInfo = sConfigMgr->GetBoolDefault("Transmogrification.EnableSetInfo", true);
-    SetNpcText = uint32(sConfigMgr->GetIntDefault("Transmogrification.SetNpcText", 50001));
+    SetNpcText = uint32(sConfigMgr->GetIntDefault("Transmogrification.SetNpcText", 601132));
 
     EnableSets = sConfigMgr->GetBoolDefault("Transmogrification.EnableSets", true);
     MaxSets = (uint8)sConfigMgr->GetIntDefault("Transmogrification.MaxSets", 10);
@@ -600,7 +609,7 @@ void Transmogrification::LoadConfig(bool reload)
 #endif
 
     EnableTransmogInfo = sConfigMgr->GetBoolDefault("Transmogrification.EnableTransmogInfo", true);
-    TransmogNpcText = uint32(sConfigMgr->GetIntDefault("Transmogrification.TransmogNpcText", 50000));
+    TransmogNpcText = uint32(sConfigMgr->GetIntDefault("Transmogrification.TransmogNpcText", 601131));
 
     std::istringstream issAllowed(sConfigMgr->GetStringDefault("Transmogrification.Allowed", ""));
     std::istringstream issNotAllowed(sConfigMgr->GetStringDefault("Transmogrification.NotAllowed", ""));

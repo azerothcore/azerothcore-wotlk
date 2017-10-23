@@ -1,0 +1,33 @@
+[worldserver]
+
+###################################################################################################
+#   CUSTOM LOGIN
+###################################################################################################
+
+# Enable the module? (1: true | 0: false)
+
+CustomLogin.Enable = 1
+
+# Announce the module when the player logs in?
+
+CustomLogin.Announce = 1
+
+# Inform when players enter and exit the game
+
+CustomLogin.PlayerAnnounce = 1
+
+# New characters start with BoA items? (1: true | 0: false)
+
+CustomLogin.BoA = 1
+
+# New characters start with additional weapon skills? (1: true | 0: false)
+
+CustomLogin.Skills = 1
+
+# New characters start with special abilities? (1: true | 0: false)
+
+CustomLogin.SpecialAbility = 1
+
+# New characters start with Exalted reputation for main city factions? (1: true | 0: false)
+
+CustomLogin.Reputation = 1

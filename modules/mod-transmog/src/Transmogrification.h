@@ -17,7 +17,7 @@ struct ItemTemplate;
 
 enum TransmogTrinityStrings // Language.h might have same entries, appears when executing SQL, change if needed
 {
-    LANG_ERR_TRANSMOG_OK = 11100, // change this
+    LANG_ERR_TRANSMOG_OK = 601131, // change this
     LANG_ERR_TRANSMOG_INVALID_SLOT,
     LANG_ERR_TRANSMOG_INVALID_SRC_ENTRY,
     LANG_ERR_TRANSMOG_MISSING_SRC_ITEM,

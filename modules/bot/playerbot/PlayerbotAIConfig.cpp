@@ -30,16 +30,16 @@ bool PlayerbotAIConfig::Initialize()
 
     string error;
 	vector<string> args;
-    if (!config.LoadInitial("aiplayerbot.conf"))
+    if (!config.LoadInitial("Settings/bot_playerbots.conf"))
     {
-        sLog->outBasic("AI Playerbot is Disabled. Unable to open configuration file aiplayerbot.conf");
+        sLog->outBasic("AI Playerbot is Disabled. Unable to open configuration file bot_playerbots.conf");
         return false;
     }
 
     enabled = config.GetBoolDefault("AiPlayerbot.Enabled", true);
     if (!enabled)
     {
-        sLog->outBasic("AI Playerbot is Disabled in aiplayerbot.conf");
+        sLog->outBasic("AI Playerbot is Disabled in bot_playerbots.conf");
         return false;
     }
 

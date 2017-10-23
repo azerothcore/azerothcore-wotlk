@@ -26,9 +26,9 @@ bool AhBotConfig::Initialize()
 {
     string error;
 	vector<string> args;
-    if (!config.LoadInitial("ahbot.conf"))
+    if (!config.LoadInitial("Settings/bot_ahbot.conf"))
     {
-        sLog->outBasic("AhBot is Disabled. Unable to open configuration file ahbot.conf");
+        sLog->outBasic("AhBot is Disabled. Unable to open configuration file bot_ahbot.conf");
         return false;
     }
 

@@ -1,0 +1,18 @@
+[worldserver]
+
+###################################################################################################
+#   STARTING GUILD
+###################################################################################################
+
+# Enable the module? (1: true | 0: false)
+
+StartGuild.Enable = 1
+
+# Announce the module when the player logs in?
+
+StartGuild.Announce = 1
+
+# The GUID for each faction's starting guild
+
+StartGuild.Horde = 1
+StartGuild.Alliance = 2

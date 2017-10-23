@@ -36,7 +36,7 @@
 #endif
 
 #ifndef _TRINITY_REALM_CONFIG
-# define _TRINITY_REALM_CONFIG  "authserver.conf"
+# define _TRINITY_REALM_CONFIG  "Settings/server_login.conf"
 #endif
 
 bool StartDB();

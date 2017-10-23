@@ -1,0 +1,29 @@
+###################################################################################################
+#	BUFFER NPC
+###################################################################################################
+
+# Announce the module when the player logs in?
+
+BufferNPC.Announce = 1
+
+# Cure Ressurection Sickness?
+
+Buff.CureRes = 1
+
+# Buff Defaults (Leave blank to disable a buff)
+# 1. Prayer of Fortitude (48162)
+# 2. Greater Blessing of Kings (43223)
+# 3. Mark of the Wild (48469)
+# 4. Prayer of Spirit (48074)
+# 5. Prayer of Shadow Protection (48170)
+# 6. Arcane Intellect (36880)
+# ----------------------------------------------
+# Fun Stuff
+# 48612 (Dalron the Controller)
+
+Buff.ID1 = 48612
+Buff.ID2 = 43223
+Buff.ID3 = 48469
+Buff.ID4 = 48074
+Buff.ID5 = 48170
+Buff.ID6 = 36880
