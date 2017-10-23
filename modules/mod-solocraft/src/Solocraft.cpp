@@ -26,7 +26,7 @@ public:
 	void OnLogin(Player *player) override {
 		if (sConfigMgr->GetBoolDefault("Solocraft.Enable", true))
 		{
-		ChatHandler(player->GetSession()).SendSysMessage("Solocraft mode activated in raids");
+		ChatHandler(player->GetSession()).SendSysMessage("This server is running a Solocraft Module.");
 		}
 	}
 
@@ -105,7 +105,29 @@ private:
 
 }
 
+class SolocraftWorld : public WorldScript
+{
+public:
+    SolocraftWorld() : WorldScript("SolocraftWorld") { }
+
+    void OnBeforeConfigLoad(bool reload) override
+    {
+        if (!reload) {
+            std::string conf_path = _CONF_DIR;
+            std::string cfg_file = conf_path + "/Solocraft.conf";
+#ifdef WIN32
+				cfg_file = "Solocraft.conf";
+#endif
+			std::string cfg_def_file = cfg_file +".dist";
+            sConfigMgr->LoadMore(cfg_def_file.c_str());
+
+            sConfigMgr->LoadMore(cfg_file.c_str());
+        }
+    }
+};
+
 
 void AddSolocraftScripts() {
+	new SolocraftWorld();
 	new solocraft_player_instance_handler();
 }
