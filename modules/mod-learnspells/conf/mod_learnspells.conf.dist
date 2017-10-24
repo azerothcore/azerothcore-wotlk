@@ -1,0 +1,13 @@
+[worldserver]
+
+###################################################################################################
+#	Learn spells on level-up
+###################################################################################################
+
+# Enable the module? (1: true | 0: false)
+
+LearnSpells.Enable = 1
+
+# Announce the module when the player logs in?
+
+LearnSpells.Announce = 1
