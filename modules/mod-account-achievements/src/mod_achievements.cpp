@@ -92,9 +92,9 @@ public:
 	{
 		if (!reload) {
 			std::string conf_path = _CONF_DIR;
-			std::string cfg_file = conf_path + "Settings/mod_achievement.conf";
+			std::string cfg_file = conf_path + "Settings/mod_achievements.conf";
 #ifdef WIN32
-			cfg_file = "Settings/mod_achievement.conf";
+			cfg_file = "Settings/mod_achievements.conf";
 #endif
 			std::string cfg_def_file = cfg_file + ".dist";
 			sConfigMgr->LoadMore(cfg_def_file.c_str());
