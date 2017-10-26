@@ -373,9 +373,9 @@ public:
 	{
 		if (!reload) {
 			std::string conf_path = _CONF_DIR;
-			std::string cfg_file = conf_path + "Settings/npc_gambler.conf";
+			std::string cfg_file = conf_path + "Settings/modules/npc_gambler.conf";
 #ifdef WIN32
-			cfg_file = "Settings/npc_gambler.conf";
+			cfg_file = "Settings/modules/npc_gambler.conf";
 #endif
 			std::string cfg_def_file = cfg_file + ".dist";
 			sConfigMgr->LoadMore(cfg_def_file.c_str());

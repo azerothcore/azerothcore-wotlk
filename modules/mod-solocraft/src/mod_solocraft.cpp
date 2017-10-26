@@ -213,9 +213,9 @@ public:
 	{
 		if (!reload) {
 			std::string conf_path = _CONF_DIR;
-			std::string cfg_file = conf_path + "Settings/mod_solocraft.conf";
+			std::string cfg_file = conf_path + "Settings/modules/mod_solocraft.conf";
 #ifdef WIN32
-			cfg_file = "Settings/mod_solocraft.conf";
+			cfg_file = "Settings/modules/mod_solocraft.conf";
 #endif
 			std::string cfg_def_file = cfg_file + ".dist";
 			sConfigMgr->LoadMore(cfg_def_file.c_str());

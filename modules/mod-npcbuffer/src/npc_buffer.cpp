@@ -127,9 +127,9 @@ public:
 	{
 		if (!reload) {
 			std::string conf_path = _CONF_DIR;
-			std::string cfg_file = conf_path + "Settings/npc_buffer.conf";
+			std::string cfg_file = conf_path + "Settings/modules/npc_buffer.conf";
 #ifdef WIN32
-			cfg_file = "Settings/npc_buffer.conf";
+			cfg_file = "Settings/modules/npc_buffer.conf";
 #endif
 			std::string cfg_def_file = cfg_file + ".dist";
 			sConfigMgr->LoadMore(cfg_def_file.c_str());

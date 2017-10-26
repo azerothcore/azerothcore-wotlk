@@ -621,9 +621,9 @@ public:
 	{
 		if (!reload) {
 			std::string conf_path = _CONF_DIR;
-			std::string cfg_file = conf_path + "Settings/npc_allmounts.conf";
+			std::string cfg_file = conf_path + "Settings/modules/npc_allmounts.conf";
 #ifdef WIN32
-			cfg_file = "Settings/npc_allmounts.conf";
+			cfg_file = "Settings/modules/npc_allmounts.conf";
 #endif
 			std::string cfg_def_file = cfg_file + ".dist";
 			sConfigMgr->LoadMore(cfg_def_file.c_str());

@@ -462,7 +462,7 @@ public:
 	void OnBeforeConfigLoad(bool reload) override
 	{
 		if (!reload) {
-			std::string cfg_file = "Settings/mod_transmog.conf";
+			std::string cfg_file = "Settings/modules/mod_transmog.conf";
 			std::string cfg_def_file = cfg_file + ".dist";
 
 			sConfigMgr->LoadMore(cfg_def_file.c_str());
