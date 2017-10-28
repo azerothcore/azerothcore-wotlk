@@ -1,0 +1,1 @@
+void AddBoss_AnnouncerScripts();
