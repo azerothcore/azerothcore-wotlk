@@ -1,0 +1,13 @@
+[worldserver]
+
+###################################################################################################
+#	Old School PvP Titles
+###################################################################################################
+
+# Enable the module? (1: true | 0: false)
+
+PvPTitles.Enable = 1
+
+# Announce the module when the player logs in?
+
+PvPTitles.Announce = 1
