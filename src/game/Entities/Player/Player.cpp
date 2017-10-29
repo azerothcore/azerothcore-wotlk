@@ -5927,19 +5927,6 @@ void Player::RepopAtGraveyard()
 			}
 		}
 	}
-    if (ClosestGrave)
-    {
-        TeleportTo(ClosestGrave->map_id, ClosestGrave->x, ClosestGrave->y, ClosestGrave->z, GetOrientation());
-        if (isDead())                                        // not send if alive, because it used in TeleportTo()
-        {
-            WorldPacket data(SMSG_DEATH_RELEASE_LOC, 4*4);  // show spirit healer position on minimap
-            data << ClosestGrave->map_id;
-            data << ClosestGrave->x;
-            data << ClosestGrave->y;
-            data << ClosestGrave->z;
-            GetSession()->SendPacket(&data);
-        }
-    }
     else if (GetPositionZ() < -500.0f)
         TeleportTo(m_homebindMapId, m_homebindX, m_homebindY, m_homebindZ, GetOrientation());
 }
