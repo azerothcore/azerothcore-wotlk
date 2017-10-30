@@ -623,504 +623,113 @@ bool PlayerbotFactory::CanEquipItem(ItemTemplate const* proto, uint32 desiredQua
 	return true;
 }
 
-// EJ rewrite init equipment
 void PlayerbotFactory::InitEquipment(bool incremental)
 {
+	//thesawolf - lets stick the gearlock check here
+	QueryResult gresults = CharacterDatabase.PQuery("SELECT * FROM ai_playerbot_locks WHERE name_id = '%u'", bot->GetGUID());
+	if (gresults)
+		return;
+
 	DestroyItemsVisitor visitor(bot);
-    IterateItems(&visitor, ITERATE_ALL_ITEMS);
-
-    map<uint8, vector<uint32> > items;
-    for(uint8 slot = 0; slot < EQUIPMENT_SLOT_END; ++slot)
-    {
-        if (slot == EQUIPMENT_SLOT_TABARD || slot == EQUIPMENT_SLOT_BODY)
-            continue;
-
-        uint32 desiredQuality = itemQuality;
-        if (urand(0, 100) < 100 * sPlayerbotAIConfig.randomGearLoweringChance && desiredQuality > ITEM_QUALITY_NORMAL) {
-            desiredQuality--;
-        }
-
-        do
-        {
-            ItemTemplateContainer const* itemTemplates = sObjectMgr->GetItemTemplateStore();
-            for (ItemTemplateContainer::const_iterator i = itemTemplates->begin(); i != itemTemplates->end(); ++i)
-            {
-                uint32 itemId = i->first;
-                ItemTemplate const* proto = &i->second;
-                if (!proto)
-                    continue;
-
-                if (proto->Class != ITEM_CLASS_WEAPON &&
-                    proto->Class != ITEM_CLASS_ARMOR &&
-                    proto->Class != ITEM_CLASS_CONTAINER &&
-                    proto->Class != ITEM_CLASS_PROJECTILE)
-                    continue;
-
-                if (!CanEquipItem(proto, desiredQuality))
-                    continue;
-
-                if (proto->Class == ITEM_CLASS_ARMOR && (
-                    slot == EQUIPMENT_SLOT_HEAD ||
-                    slot == EQUIPMENT_SLOT_SHOULDERS ||
-                    slot == EQUIPMENT_SLOT_CHEST ||
-                    slot == EQUIPMENT_SLOT_WAIST ||
-                    slot == EQUIPMENT_SLOT_LEGS ||
-                    slot == EQUIPMENT_SLOT_FEET ||
-                    slot == EQUIPMENT_SLOT_WRISTS ||
-                    slot == EQUIPMENT_SLOT_HANDS) && !CanEquipArmor(proto))
-                        continue;
-
-                if (proto->Class == ITEM_CLASS_WEAPON && !CanEquipWeapon(proto))
-                    continue;
-
-                if (slot == EQUIPMENT_SLOT_OFFHAND && bot->getClass() == CLASS_ROGUE && proto->Class != ITEM_CLASS_WEAPON)
-                    continue;
-
-                uint16 dest = 0;
-                if (CanEquipUnseenItem(slot, dest, itemId))
-                    items[slot].push_back(itemId);
-            }
-        } while (items[slot].empty() && desiredQuality-- > ITEM_QUALITY_NORMAL);
-    }
-
-    for(uint8 slot = 0; slot < EQUIPMENT_SLOT_END; ++slot)
-    {
-        if (slot == EQUIPMENT_SLOT_TABARD || slot == EQUIPMENT_SLOT_BODY)
-            continue;
-
-        vector<uint32>& ids = items[slot];
-        if (ids.empty())
-        {
-            sLog->outBasic("%s: no items to equip for slot %d", bot->GetName().c_str(), slot);
-            continue;
-        }
-
-        for (int attempts = 0; attempts < 15; attempts++)
-        {
-            uint32 index = urand(0, ids.size() - 1);
-            uint32 newItemId = ids[index];
-            Item* oldItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, slot);
-
-            if (incremental && !IsDesiredReplacement(oldItem)) {
-                continue;
-            }
-
-            uint16 dest;
-            if (!CanEquipUnseenItem(slot, dest, newItemId))
-                continue;
-
-            if (oldItem)
-            {
-                bot->RemoveItem(INVENTORY_SLOT_BAG_0, slot, true);
-                oldItem->DestroyForPlayer(bot, false);
-            }
-
-            Item* newItem = bot->EquipNewItem(dest, newItemId, true);
-            if (newItem)
-            {
-                newItem->AddToWorld();
-                newItem->AddToUpdateQueueOf(bot);
-                bot->AutoUnequipOffhandIfNeed();
-                EnchantItem(newItem);
-                break;
-            }
-        }
-	}
-	/*DestroyItemsVisitor visitor(bot);
 	IterateItems(&visitor, ITERATE_ALL_ITEMS);
 
-	std::unordered_map<uint32, std::unordered_map<uint32, std::unordered_map<uint32, std::unordered_map<uint32, uint32>>>> categorizedEquipments = sObjectMgr->GetCategorizedEquipmentEntryStore();
-	std::unordered_map<uint32, uint32> mainHandSubClasses;
-	std::unordered_map<uint32, uint32> twoHandedSubClasses;
-	std::unordered_map<uint32, uint32> offHandSubClasses;
-	std::unordered_map<uint32, uint32> rangedSubClasses;
-
-	uint32 destItemID = 0;
-	uint32 index0 = 0;
-	uint32 index1 = 0;
-	uint32 index2 = 0;
-	uint32 index3 = 0;
-	int spec = AiFactory::GetPlayerSpecTab(bot);
-	bool useShield = false;
-	bool twoHandWeapon = false;
-	bool validIndexes = true;
-
-	if (bot->getClass() == CLASS_WARRIOR)
+	map<uint8, vector<uint32> > items;
+	for (uint8 slot = 0; slot < EQUIPMENT_SLOT_END; ++slot)
 	{
-		if (spec == 2)
-		{
-			useShield = true;
+		if (slot == EQUIPMENT_SLOT_TABARD || slot == EQUIPMENT_SLOT_BODY)
+			continue;
+
+		uint32 desiredQuality = itemQuality;
+		if (urand(0, 100) < 100 * sPlayerbotAIConfig.randomGearLoweringChance && desiredQuality > ITEM_QUALITY_NORMAL) {
+			desiredQuality--;
 		}
-	}
-	else if (bot->getClass() == CLASS_PALADIN)
-	{
-		if (spec == 1)
+
+		do
 		{
-			useShield = true;
-		}
-	}
+			ItemTemplateContainer const* itemTemplates = sObjectMgr->GetItemTemplateStore();
+			for (ItemTemplateContainer::const_iterator i = itemTemplates->begin(); i != itemTemplates->end(); ++i)
+			{
+				uint32 itemId = i->first;
+				ItemTemplate const* proto = &i->second;
+				if (!proto)
+					continue;
 
-	uint32 checkMainHandIndex = 0;
-	uint32 checkOffHandIndex = 0;
-	uint32 checkTwoHandedIndex = 0;
-	uint32 checkRangedIndex = 0;
-	if (bot->HasSkill(SKILL_SWORDS))
-	{
-		mainHandSubClasses.insert(std::pair<uint32, uint32>(checkMainHandIndex, ITEM_SUBCLASS_WEAPON_SWORD));
-		offHandSubClasses.insert(std::pair<uint32, uint32>(checkOffHandIndex, ITEM_SUBCLASS_WEAPON_SWORD));
-		checkMainHandIndex++;
-		checkOffHandIndex++;
-	}
-	if (bot->HasSkill(SKILL_AXES))
-	{
-		mainHandSubClasses.insert(std::pair<uint32, uint32>(checkMainHandIndex, ITEM_SUBCLASS_WEAPON_AXE));
-		offHandSubClasses.insert(std::pair<uint32, uint32>(checkOffHandIndex, ITEM_SUBCLASS_WEAPON_AXE));
-		checkMainHandIndex++;
-		checkOffHandIndex++;
-	}
-	if (bot->HasSkill(SKILL_MACES))
-	{
-		mainHandSubClasses.insert(std::pair<uint32, uint32>(checkMainHandIndex, ITEM_SUBCLASS_WEAPON_MACE));
-		offHandSubClasses.insert(std::pair<uint32, uint32>(checkOffHandIndex, ITEM_SUBCLASS_WEAPON_MACE));
-		checkMainHandIndex++;
-		checkOffHandIndex++;
-	}
-	if (bot->HasSkill(SKILL_DAGGERS))
-	{
-		mainHandSubClasses.insert(std::pair<uint32, uint32>(checkMainHandIndex, ITEM_SUBCLASS_WEAPON_DAGGER));
-		offHandSubClasses.insert(std::pair<uint32, uint32>(checkOffHandIndex, ITEM_SUBCLASS_WEAPON_DAGGER));
-		checkMainHandIndex++;
-		checkOffHandIndex++;
-	}
-	if (bot->HasSkill(SKILL_FIST_WEAPONS))
-	{
-		mainHandSubClasses.insert(std::pair<uint32, uint32>(checkMainHandIndex, ITEM_SUBCLASS_WEAPON_FIST));
-		offHandSubClasses.insert(std::pair<uint32, uint32>(checkOffHandIndex, ITEM_SUBCLASS_WEAPON_FIST));
-		checkMainHandIndex++;
-		checkOffHandIndex++;
-	}
-	offHandSubClasses.insert(std::pair<uint32, uint32>(checkOffHandIndex, ItemSubclassArmor::ITEM_SUBCLASS_ARMOR_IDOL));
-	offHandSubClasses.insert(std::pair<uint32, uint32>(checkOffHandIndex, ItemSubclassArmor::ITEM_SUBCLASS_ARMOR_MISC));
-	if (bot->getClass() == CLASS_PALADIN)
-	{
-		offHandSubClasses.insert(std::pair<uint32, uint32>(checkOffHandIndex, ItemSubclassArmor::ITEM_SUBCLASS_ARMOR_SIGIL));
-	}
-	if (bot->getClass() == CLASS_SHAMAN)
-	{
-		offHandSubClasses.insert(std::pair<uint32, uint32>(checkOffHandIndex, ItemSubclassArmor::ITEM_SUBCLASS_ARMOR_TOTEM));
-	}
+				if (proto->Class != ITEM_CLASS_WEAPON &&
+					proto->Class != ITEM_CLASS_ARMOR &&
+					proto->Class != ITEM_CLASS_CONTAINER &&
+					proto->Class != ITEM_CLASS_PROJECTILE)
+					continue;
 
-	if (bot->HasSkill(SKILL_2H_SWORDS))
-	{
-		twoHandedSubClasses.insert(std::pair<uint32, uint32>(checkTwoHandedIndex, ItemSubclassWeapon::ITEM_SUBCLASS_WEAPON_SWORD2));
-		checkTwoHandedIndex++;
-	}
-	if (bot->HasSkill(SKILL_STAVES))
-	{
-		twoHandedSubClasses.insert(std::pair<uint32, uint32>(checkTwoHandedIndex, ItemSubclassWeapon::ITEM_SUBCLASS_WEAPON_STAFF));
-		checkTwoHandedIndex++;
-	}
-	if (bot->HasSkill(SKILL_2H_MACES))
-	{
-		twoHandedSubClasses.insert(std::pair<uint32, uint32>(checkTwoHandedIndex, ItemSubclassWeapon::ITEM_SUBCLASS_WEAPON_MACE2));
-		checkTwoHandedIndex++;
-	}
-	if (bot->HasSkill(SKILL_2H_AXES))
-	{
-		twoHandedSubClasses.insert(std::pair<uint32, uint32>(checkTwoHandedIndex, ItemSubclassWeapon::ITEM_SUBCLASS_WEAPON_AXE2));
-		checkTwoHandedIndex++;
-	}
-	if (bot->HasSkill(SKILL_POLEARMS))
-	{
-		twoHandedSubClasses.insert(std::pair<uint32, uint32>(checkTwoHandedIndex, ItemSubclassWeapon::ITEM_SUBCLASS_WEAPON_POLEARM));
-		checkTwoHandedIndex++;
-	}
+				if (!CanEquipItem(proto, desiredQuality))
+					continue;
 
-	if (bot->HasSkill(SKILL_BOWS))
-	{
-		rangedSubClasses.insert(std::pair<uint32, uint32>(checkRangedIndex, ItemSubclassWeapon::ITEM_SUBCLASS_WEAPON_BOW));
-		checkRangedIndex++;
-	}
-	if (bot->HasSkill(SKILL_CROSSBOWS))
-	{
-		rangedSubClasses.insert(std::pair<uint32, uint32>(checkRangedIndex, ItemSubclassWeapon::ITEM_SUBCLASS_WEAPON_CROSSBOW));
-		checkRangedIndex++;
-	}
-	if (bot->HasSkill(SKILL_GUNS))
-	{
-		rangedSubClasses.insert(std::pair<uint32, uint32>(checkRangedIndex, ItemSubclassWeapon::ITEM_SUBCLASS_WEAPON_GUN));
-		checkRangedIndex++;
+				if (proto->Class == ITEM_CLASS_ARMOR && (
+					slot == EQUIPMENT_SLOT_HEAD ||
+					slot == EQUIPMENT_SLOT_SHOULDERS ||
+					slot == EQUIPMENT_SLOT_CHEST ||
+					slot == EQUIPMENT_SLOT_WAIST ||
+					slot == EQUIPMENT_SLOT_LEGS ||
+					slot == EQUIPMENT_SLOT_FEET ||
+					slot == EQUIPMENT_SLOT_WRISTS ||
+					slot == EQUIPMENT_SLOT_HANDS) && !CanEquipArmor(proto))
+					continue;
+
+				if (proto->Class == ITEM_CLASS_WEAPON && !CanEquipWeapon(proto))
+					continue;
+
+				if (slot == EQUIPMENT_SLOT_OFFHAND && bot->getClass() == CLASS_ROGUE && proto->Class != ITEM_CLASS_WEAPON)
+					continue;
+
+				uint16 dest = 0;
+				if (CanEquipUnseenItem(slot, dest, itemId))
+					items[slot].push_back(itemId);
+			}
+		} while (items[slot].empty() && desiredQuality-- > ITEM_QUALITY_NORMAL);
 	}
 
 	for (uint8 slot = 0; slot < EQUIPMENT_SLOT_END; ++slot)
 	{
-		destItemID = 0;
-		validIndexes = true;
-		// 0 weapon, 1 aromor, 2 misc
-		uint32 equipmentCategory = 0;
-		switch (slot)
+		if (slot == EQUIPMENT_SLOT_TABARD || slot == EQUIPMENT_SLOT_BODY)
+			continue;
+
+		vector<uint32>& ids = items[slot];
+		if (ids.empty())
 		{
-		case EQUIPMENT_SLOT_HEAD:
-		{
-			index0 = 1;
-			equipmentCategory = 1;
-			break;
-		}
-		case EQUIPMENT_SLOT_SHOULDERS:
-		{
-			index0 = 3;
-			equipmentCategory = 1;
-			break;
-		}
-		case EQUIPMENT_SLOT_CHEST:
-		{
-			index0 = 5;
-			equipmentCategory = 1;
-			break;
-		}
-		case EQUIPMENT_SLOT_WAIST:
-		{
-			index0 = 6;
-			equipmentCategory = 1;
-			break;
-		}
-		case EQUIPMENT_SLOT_LEGS:
-		{
-			index0 = 7;
-			equipmentCategory = 1;
-			break;
-		}
-		case EQUIPMENT_SLOT_FEET:
-		{
-			index0 = 8;
-			equipmentCategory = 1;
-			break;
-		}
-		case EQUIPMENT_SLOT_WRISTS:
-		{
-			index0 = 9;
-			equipmentCategory = 1;
-			break;
-		}
-		case EQUIPMENT_SLOT_HANDS:
-		{
-			index0 = 10;
-			equipmentCategory = 1;
-			break;
-		}
-		case EQUIPMENT_SLOT_NECK:
-		{
-			index0 = 2;
-			equipmentCategory = 2;
-			break;
-		}
-		case EQUIPMENT_SLOT_FINGER1:
-		{
-			index0 = 11;
-			equipmentCategory = 2;
-			break;
-		}
-		case EQUIPMENT_SLOT_FINGER2:
-		{
-			index0 = 11;
-			equipmentCategory = 2;
-			break;
-		}
-		case EQUIPMENT_SLOT_TRINKET1:
-		{
-			index0 = 12;
-			equipmentCategory = 2;
-			break;
-		}
-		case EQUIPMENT_SLOT_TRINKET2:
-		{
-			index0 = 12;
-			equipmentCategory = 2;
-			break;
-		}
-		case EQUIPMENT_SLOT_BACK:
-		{
-			index0 = 16;
-			equipmentCategory = 2;
-			break;
-		}
-		case EQUIPMENT_SLOT_MAINHAND:
-		{
-			index0 = 21;
-			equipmentCategory = 0;
-			if (useShield)
-			{
-				index1 = urand(0, mainHandSubClasses.size() - 1);
-				index1 = mainHandSubClasses[index1];
-			}
-			else
-			{
-				index1 = urand(0, mainHandSubClasses.size() + twoHandedSubClasses.size() - 1);
-				if (index1 >= mainHandSubClasses.size())
-				{
-					index1 = index1 - mainHandSubClasses.size();
-					index1 = twoHandedSubClasses[index1];
-					twoHandWeapon = true;
-				}
-				else
-				{
-					index1 = mainHandSubClasses[index1];
-				}
-			}
-			break;
-		}
-		case EQUIPMENT_SLOT_OFFHAND:
-		{
-			index0 = 22;
-			equipmentCategory = 0;
-			if (twoHandWeapon)
-			{
-				validIndexes = false;
-			}
-			else if (useShield)
-			{
-				index1 = ItemSubclassArmor::ITEM_SUBCLASS_ARMOR_SHIELD;
-			}
-			else
-			{
-				index1 = urand(0, offHandSubClasses.size() - 1);
-				index1 = offHandSubClasses[index1];
-			}
-			break;
-		}
-		case EQUIPMENT_SLOT_RANGED:
-		{
-			index0 = 15;
-			equipmentCategory = 0;
-			if (bot->getClass() == CLASS_ROGUE)
-			{
-				index1 = ItemSubclassWeapon::ITEM_SUBCLASS_WEAPON_THROWN;
-			}
-			else if (bot->getClass() == CLASS_HUNTER)
-			{
-				index1 = urand(0, rangedSubClasses.size() - 1);
-				index1 = rangedSubClasses[index1];
-			}
-			else if (!bot->HasSkill(SKILL_LEATHER))
-			{
-				index1 = ItemSubclassWeapon::ITEM_SUBCLASS_WEAPON_WAND;
-			}
-			else
-			{
-				index1 = urand(0, rangedSubClasses.size());
-				if (index1 == rangedSubClasses.size())
-				{
-					index1 = ItemSubclassWeapon::ITEM_SUBCLASS_WEAPON_THROWN;
-				}
-				else
-				{
-					index1 = rangedSubClasses[index1];
-				}
-			}
-			break;
-		}
-		default:
-		{
-			break;
-		}
+			sLog->outError("%s: no items to equip for slot %d", bot->GetName().c_str(), slot);
+			continue;
 		}
 
-		switch (equipmentCategory)
+		for (int attempts = 0; attempts < 15; attempts++)
 		{
-		case 0:
-		{
-			break;
-		}
-		case 1:
-		{
-			if (bot->HasSkill(SKILL_PLATE_MAIL))
-			{
-				index1 = ITEM_SUBCLASS_ARMOR_PLATE;
-			}
-			else if (bot->HasSkill(SKILL_MAIL))
-			{
-				index1 = ITEM_SUBCLASS_ARMOR_MAIL;
-			}
-			else if (bot->HasSkill(SKILL_LEATHER))
-			{
-				index1 = ITEM_SUBCLASS_ARMOR_LEATHER;
-			}
-			else
-			{
-				index1 = ITEM_SUBCLASS_ARMOR_CLOTH;
-			}
-			break;
-		}
-		case 2:
-		{
-			index1 = ItemSubclassArmor::ITEM_SUBCLASS_ARMOR_MISC;
-			break;
-		}
-		default:
-			break;
-		}
+			uint32 index = urand(0, ids.size() - 1);
+			uint32 newItemId = ids[index];
+			Item* oldItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, slot);
 
-		if (validIndexes)
-		{
-			if (categorizedEquipments[index0].size() == 0)
-			{
-				validIndexes = false;
+			if (incremental && !IsDesiredReplacement(oldItem)) {
+				continue;
 			}
-			else if (categorizedEquipments[index0][index1].size() == 0)
+
+			uint16 dest;
+			if (!CanEquipUnseenItem(slot, dest, newItemId))
+				continue;
+
+			if (oldItem)
 			{
-				validIndexes = false;
+				bot->RemoveItem(INVENTORY_SLOT_BAG_0, slot, true);
+				oldItem->DestroyForPlayer(bot, false);
 			}
-		}
-		if (validIndexes)
-		{
-			int32 equipmentLevel = bot->getLevel() / 10;
-			if (equipmentLevel == 8)
+
+			Item* newItem = bot->EquipNewItem(dest, newItemId, true);
+			if (newItem)
 			{
-				equipmentLevel = 7;
-			}
-			while (equipmentLevel >= 0)
-			{
-				if (categorizedEquipments[index0][index1][equipmentLevel].size() > 0)
-				{
-					index2 = equipmentLevel;
-					break;
-				}
-				else
-				{
-					equipmentLevel = equipmentLevel - 10;
-				}
-			}
-		}
-		index3 = urand(0, categorizedEquipments[index0][index1][index2].size() - 1);
-		destItemID = categorizedEquipments[index0][index1][index2][index3];
-		if (destItemID > 0)
-		{
-			uint16 dest = 0;
-			if (CanEquipUnseenItem(slot, dest, destItemID))
-			{
-				Item* newItem = bot->EquipNewItem(dest, destItemID, true);
-				if (newItem)
-				{
-					int32 randomPropertyId = Item::GenerateItemRandomPropertyId(destItemID);
-					newItem->AddToWorld();
-					newItem->AddToUpdateQueueOf(bot);
-					bot->AutoUnequipOffhandIfNeed();
-					newItem->SetItemRandomProperties(randomPropertyId);
-					EnchantItem(newItem);
-				}
-				else
-				{
-					sLog->outError("Add equipment failed : %s - %s", bot->GetName().c_str(), destItemID);
-				}
+				newItem->AddToWorld();
+				newItem->AddToUpdateQueueOf(bot);
+				bot->AutoUnequipOffhandIfNeed();
+				EnchantItem(newItem);
+				break;
 			}
 		}
 	}
-
-	mainHandSubClasses.clear();
-	offHandSubClasses.clear();
-	twoHandedSubClasses.clear();
-	rangedSubClasses.clear();
-	*/
 }
 
 bool PlayerbotFactory::IsDesiredReplacement(Item* item)
