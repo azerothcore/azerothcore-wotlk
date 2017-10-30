@@ -61,6 +61,9 @@ AiPlayerbot.RandomClassSpecProbability.11.2 = 33
 # All other parameters are optional but can be changed by uncommenting them here
 #
 
+# Level diff to invite randombots (default = 5)
+AiPlayerbot.InvLevel = 3
+
 # Randombots can refuse to DO ANYTHING (While in party) because of loot options(default = 0)
 AiPlayerbot.LootRestrictions = 1
 

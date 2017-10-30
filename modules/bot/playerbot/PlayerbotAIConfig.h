@@ -28,6 +28,7 @@ public:
         fleeDistance, tooCloseDistance, meleeDistance, followDistance, whisperDistance, contactDistance;
     uint32 criticalHealth, lowHealth, mediumHealth, almostFullHealth;
     uint32 lowMana, mediumMana;
+	uint32 InvLevel;
 	bool lootRestrictions;
     bool randomBotAutologin;
     std::string randomBotMapsAsString;
