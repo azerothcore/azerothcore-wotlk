@@ -12,11 +12,11 @@ public:
 	{
 		// Unholy
 		//creators["bone shield"] = &bone_shield;
-		creators["plague strike"] = &plague_strike;
-		creators["death grip"] = &death_grip;
-		creators["death coil"] = &death_coil;
+		//creators["plague strike"] = &plague_strike;
+		//creators["death grip"] = &death_grip;
+		//creators["death coil"] = &death_coil;
 		creators["death strike"] = &death_strike;
-		creators["unholy blight"] = &unholy_blight;
+		//creators["unholy blight"] = &unholy_blight;
 		creators["scourge strike"] = &scourge_strike;
 		//creators["death and decay"] = &death_and_decay;
 		//creators["unholy pressence"] = &unholy_pressence;
@@ -26,23 +26,11 @@ public:
 		//creators["anti magic shell"] = &anti_magic_shell;
 		//creators["anti magic zone"] = &anti_magic_zone;
 		//creators["ghoul frenzy"] = &ghoul_frenzy;
-		//creators["corpse explosion"] = &corpse_explosion;
+		creators["corpse explosion"] = &corpse_explosion;
 	}
 private:
-	static ActionNode* plague_strike(PlayerbotAI* ai)
-	{
-		return new ActionNode("plague strike",
-			/*P*/ NextAction::array(0, new NextAction("unholy pressence"), NULL),
-			/*A*/ NextAction::array(0, new NextAction("melee"), NULL),
-			/*C*/ NULL);
-	}
-	static ActionNode* death_coil(PlayerbotAI* ai)
-	{
-		return new ActionNode("death coil",
-			/*P*/ NextAction::array(0, new NextAction("unholy pressence"), NULL),
-			/*A*/ NextAction::array(0, new NextAction("death strike"), NULL),
-			/*C*/ NULL);
-	}
+	
+	
 	static ActionNode* death_strike(PlayerbotAI* ai)
 	{
 		return new ActionNode("death strike",
@@ -50,16 +38,9 @@ private:
 			/*A*/ NULL,
 			/*C*/ NULL);
 	}
-	static ActionNode* unholy_blight(PlayerbotAI* ai)
+	static ActionNode* corpse_explosion(PlayerbotAI* ai)
 	{
-		return new ActionNode("unholy blight",
-			/*P*/ NextAction::array(0, new NextAction("unholy pressence"), NULL),
-			/*A*/ NULL,
-			/*C*/ NULL);
-	}
-	static ActionNode* death_grip(PlayerbotAI* ai)
-	{
-		return new ActionNode("death grip",
+		return new ActionNode("corpse explosion",
 			/*P*/ NextAction::array(0, new NextAction("unholy pressence"), NULL),
 			/*A*/ NULL,
 			/*C*/ NULL);
@@ -68,7 +49,7 @@ private:
 	{
 		return new ActionNode("scourge strike",
 			/*P*/ NextAction::array(0, new NextAction("unholy pressence"), NULL),
-			/*A*/ NextAction::array(0, new NextAction("unholy blight"), NULL),
+			/*A*/ NextAction::array(0, new NextAction("death strike"), NULL),
 			/*C*/ NULL);
 	}
 };
@@ -76,22 +57,32 @@ private:
 
 	NextAction** UnholyDKStrategy::getDefaultActions()
 	{
-    return NextAction::array(0, new NextAction("scourge strike", 5.0f), NULL);
+    return NextAction::array(0, new NextAction("scourge strike" , ACTION_NORMAL + 3), NULL);
 	}
 
 void UnholyDKStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 {
     GenericDKStrategy::InitTriggers(triggers);
 
-    triggers.push_back(new TriggerNode(
-        "low health",
-        NextAction::array(0, new NextAction("rune tap", 50.0f), NULL)));
+	triggers.push_back(new TriggerNode(
+		"often",
+		NextAction::array(0, new NextAction("ghoul frenzy", ACTION_NORMAL + 2), NULL)));
+
+	triggers.push_back(new TriggerNode(
+		"critical health",
+		NextAction::array(0, new NextAction("death pact", ACTION_EMERGENCY + 1), NULL)));
 }
+
 
 void UnholyDKAoeStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 {
+	triggers.push_back(new TriggerNode(
+		"loot available",
+		NextAction::array(0, new NextAction("corpse explosion", ACTION_NORMAL + 1), NULL)));
+
     triggers.push_back(new TriggerNode(
         "medium aoe",
-        NextAction::array(0, new NextAction("death and decay", 20.0f), NULL)));
+        NextAction::array(0, new NextAction("death and decay", ACTION_NORMAL + 3),
+			new NextAction("corpse explosion", ACTION_NORMAL + 3), NULL)));
 }
 

@@ -78,28 +78,55 @@ namespace BotAI
 	BEGIN_DEBUFF_ACTION(CastHowlingBlastAction, "howling blast")
 	END_SPELL_ACTION()
 
-	//debuff
+	//debuff it
 	BEGIN_DEBUFF_ACTION(CastIcyTouchAction, "icy touch")
 	END_SPELL_ACTION()
+
+
+		class CastIcyTouchOnAttackerAction : public CastDebuffSpellOnAttackerAction
+	{
+	public:
+		CastIcyTouchOnAttackerAction(PlayerbotAI* ai) : CastDebuffSpellOnAttackerAction(ai, "icy touch") {}
+	};
+
+	//debuff ps
+	BEGIN_DEBUFF_ACTION(CastPlagueStrikeAction, "plague strike")
+	END_SPELL_ACTION()
+
+
+		class CastPlagueStrikeOnAttackerAction : public CastDebuffSpellOnAttackerAction
+	{
+	public:
+		CastPlagueStrikeOnAttackerAction(PlayerbotAI* ai) : CastDebuffSpellOnAttackerAction(ai, "plague strike") {}
+	};
 
 	//debuff
 	BEGIN_DEBUFF_ACTION(CastMarkOfBloodAction, "mark of blood")
 	END_SPELL_ACTION()
 
-	BEGIN_MELEE_SPELL_ACTION(CastRaiseDeadAction, "raise dead")
-	END_SPELL_ACTION()
+		class CastMarkOfBloodOnAttackerAction : public CastDebuffSpellOnAttackerAction
+	{
+	public:
+		CastMarkOfBloodOnAttackerAction(PlayerbotAI* ai) : CastDebuffSpellOnAttackerAction(ai, "mark of blood") {}
+	};
 
-	BEGIN_MELEE_SPELL_ACTION(CastUnholyBlightAction, "unholy blight")
-		END_SPELL_ACTION()
+		class CastUnholyBlightAction : public CastBuffSpellAction
+	{
+	public:
+		CastUnholyBlightAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "unholy blight") {}
+	};
 
-	BEGIN_MELEE_SPELL_ACTION(CastArmyOfTheDeadAction, "army of the dead")
-	END_SPELL_ACTION()
+		class CastSummonGargoyleAction : public CastBuffSpellAction
+	{
+	public:
+		CastSummonGargoyleAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "summon gargoyle") {}
+	};
 
-	BEGIN_MELEE_SPELL_ACTION(CastSummonGargoyleAction, "summon gargoyle")
-	END_SPELL_ACTION()
-
-	BEGIN_MELEE_SPELL_ACTION(CastGhoulFrenzyAction, "ghoul frenzy")
-	END_SPELL_ACTION()
+		class CastGhoulFrenzyAction : public CastBuffSpellAction
+	{
+	public:
+		CastGhoulFrenzyAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "ghoul frenzy") {}
+	};
 
 	BEGIN_MELEE_SPELL_ACTION(CastCorpseExplosionAction, "corpse explosion")
 	END_SPELL_ACTION()
@@ -112,12 +139,9 @@ namespace BotAI
 	END_SPELL_ACTION()
 
 
-	BEGIN_MELEE_SPELL_ACTION(CastDeathCoilAction, "death coil")
-	END_SPELL_ACTION()
-
-	class CastChainsOfIceAction : public CastMeleeSpellAction {
+	class CastChainsOfIceAction : public CastSpellAction {
 	public:
-		CastChainsOfIceAction(PlayerbotAI* ai) : CastMeleeSpellAction(ai, "chains of ice") {}
+		CastChainsOfIceAction(PlayerbotAI* ai) : CastSpellAction(ai, "chains of ice") {}
 	};
 
 	class CastHungeringColdAction : public CastMeleeSpellAction {
@@ -150,25 +174,24 @@ namespace BotAI
 		CastDeathStrikeAction(PlayerbotAI* ai) : CastMeleeSpellAction(ai, "death strike") {}
 	};
 
-	
-	class CastPlagueStrikeAction : public CastMeleeSpellAction {
-	public:
-		CastPlagueStrikeAction(PlayerbotAI* ai) : CastMeleeSpellAction(ai, "plague strike") {}
-	};
-
 	class CastScourgeStrikeAction : public CastMeleeSpellAction {
 	public:
 		CastScourgeStrikeAction(PlayerbotAI* ai) : CastMeleeSpellAction(ai, "scorgue strike") {}
 	};
 
-	class CastBloodBoilAction : public CastMeleeSpellAction {
+	class CastDeathCoilAction : public CastSpellAction {
 	public:
-		CastBloodBoilAction(PlayerbotAI* ai) : CastMeleeSpellAction(ai, "blood boil") {}
+		CastDeathCoilAction(PlayerbotAI* ai) : CastSpellAction(ai, "death coill") {}
 	};
 
-	class CastDeathAndDecayAction : public CastMeleeSpellAction {
+	class CastBloodBoilAction : public CastBuffSpellAction {
 	public:
-		CastDeathAndDecayAction(PlayerbotAI* ai) : CastMeleeSpellAction(ai, "death and decay") {}
+		CastBloodBoilAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "blood boil") {}
+	};
+
+	class CastDeathAndDecayAction : public CastSpellAction {
+	public:
+		CastDeathAndDecayAction(PlayerbotAI* ai) : CastSpellAction(ai, "death and decay") {}
 	};
 
 	class CastHornOfWinterAction : public CastBuffSpellAction
@@ -211,6 +234,19 @@ namespace BotAI
 	{
 	public:
 		CastEmpowerRuneWeaponAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "empower rune weapon") {}
+	};
+
+	class CastArmyOfTheDeadAction : public CastBuffSpellAction
+	{
+	public:
+		CastArmyOfTheDeadAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "army of the dead") {}
+	};
+
+
+	class CastRaiseDeadAction : public CastBuffSpellAction
+	{
+	public:
+		CastRaiseDeadAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "raise dead") {}
 	};
 
 	class CastKillingMachineAction : public CastBuffSpellAction
@@ -256,5 +292,10 @@ namespace BotAI
 	class CastRuneTapAction : public CastMeleeSpellAction {
 	public:
 		CastRuneTapAction(PlayerbotAI* ai) : CastMeleeSpellAction(ai, "rune tap") {}
+
+	};
+	class CastBloodTapAction : public CastMeleeSpellAction {
+	public:
+		CastBloodTapAction(PlayerbotAI* ai) : CastMeleeSpellAction(ai, "blood tap") {}
 	};
 }
