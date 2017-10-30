@@ -155,7 +155,7 @@ void PlayerbotFactory::Randomize(bool incremental)
 	InitGlyphs();
 
 	//sLog->outBasic("Initializing guilds...");
-	//InitGuild();
+	InitGuild();
 
 	sLog->outBasic("Initializing pet...");
 	InitPet();
@@ -165,7 +165,6 @@ void PlayerbotFactory::Randomize(bool incremental)
 	bot->SaveToDB(false, true);
 }
 
-// EJ rewrite pet init
 void PlayerbotFactory::InitPet()
 {
 	Pet* pet = bot->GetPet();
@@ -178,40 +177,67 @@ void PlayerbotFactory::InitPet()
 		if (!map)
 			return;
 
-		std::unordered_map<uint32, uint32> tamableBeasts = sObjectMgr->GetTamableBeastsEntryStore();
-		uint32 randomPetCreatureIndex = urand(0, tamableBeasts.size() - 1);
-		randomPetCreatureIndex = tamableBeasts[randomPetCreatureIndex];
-
-		uint32 guid = sObjectMgr->GenerateLowGuid(HIGHGUID_PET);
-		pet = new Pet(bot, HUNTER_PET);
-		if (!pet->Create(guid, map, 0, randomPetCreatureIndex, 0))
+		vector<uint32> ids;
+		CreatureTemplateContainer const* creatureTemplateContainer = sObjectMgr->GetCreatureTemplates();
+		for (CreatureTemplateContainer::const_iterator i = creatureTemplateContainer->begin(); i != creatureTemplateContainer->end(); ++i)
 		{
-			delete pet;
-			pet = NULL;
+			CreatureTemplate const& co = i->second;
+			if (!co.IsTameable(false))
+				continue;
 
-			sLog->outError("Pet create error %s ...", randomPetCreatureIndex);
-			return;
+			if (co.minlevel > bot->getLevel())
+				continue;
 
+			PetLevelInfo const* petInfo = sObjectMgr->GetPetLevelInfo(co.Entry, bot->getLevel());
+			if (!petInfo)
+				continue;
+
+			ids.push_back(i->first);
+		}
+
+		if (ids.empty())
+		{
+			sLog->outBasic("No pets available for bot %s (%d level)", bot->GetName().c_str(), bot->getLevel());
 			return;
 		}
 
-		pet->UpdatePosition(bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), bot->GetOrientation());
-		pet->setFaction(bot->getFaction());
-		pet->SetLevel(bot->getLevel());
-		bot->SetPetGUID(pet->GetGUID());
-		bot->GetMap()->AddToMap(pet->ToCreature());
-		bot->SetMinion(pet, true);
-		pet->InitTalentForLevel();
-		bot->PetSpellInitialize();
-		bot->InitTamedPet(pet, bot->getLevel(), 0);
+		for (int i = 0; i < 100; i++)
+		{
+			int index = urand(0, ids.size() - 1);
+			CreatureTemplate const* co = sObjectMgr->GetCreatureTemplate(ids[index]);
 
-		sLog->outBasic("Bot %s: assign pet %d (%d level)", bot->GetName().c_str(), randomPetCreatureIndex, bot->getLevel());
-		pet->SavePetToDB(PET_SAVE_AS_CURRENT, false);
+			PetLevelInfo const* petInfo = sObjectMgr->GetPetLevelInfo(co->Entry, bot->getLevel());
+			if (!petInfo)
+				continue;
+
+			uint32 guid = sObjectMgr->GenerateLowGuid(HIGHGUID_PET);
+			pet = new Pet(bot, HUNTER_PET);
+			if (!pet->Create(guid, map, 0, ids[index], 0))
+			{
+				delete pet;
+				pet = NULL;
+				continue;
+			}
+
+			pet->SetPosition(bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), bot->GetOrientation());
+			pet->setFaction(bot->getFaction());
+			pet->SetLevel(bot->getLevel());
+			bot->SetPetGUID(pet->GetGUID());
+			bot->GetMap()->AddToMap(pet->ToCreature());
+			bot->SetMinion(pet, true);
+			pet->InitTalentForLevel();
+			bot->PetSpellInitialize();
+			bot->InitTamedPet(pet, bot->getLevel(), 0);
+
+			sLog->outBasic("Bot %s: assign pet %d (%d level)", bot->GetName().c_str(), co->Entry, bot->getLevel());
+			pet->SavePetToDB(PET_SAVE_AS_CURRENT, false);
+			break;
+		}
 	}
 
 	if (!pet)
 	{
-		sLog->outError("Cannot create pet for bot %s", bot->GetName().c_str());
+		sLog->outBasic("Cannot create pet for bot %s", bot->GetName().c_str());
 		return;
 	}
 
