@@ -1295,16 +1295,16 @@ void PlayerbotFactory::EnchantItem(Item* item)
 			if (enchant->requiredLevel && enchant->requiredLevel > level)
 				continue;
 
-			uint8 sph = 0, spd = 0, apa = 0, aps = 0, apr = 0, tank = 0;
+			uint8 sp = 0, ap = 0, tank = 0;
 			for (int i = 0; i < 3; ++i)
 			{
 				if (enchant->type[i] != ITEM_ENCHANTMENT_TYPE_STAT)
 					continue;
 
-				AddItemStats(enchant->spellid[i], sph, spd, apa, aps, apr, tank);
+				AddItemStats(enchant->spellid[i], sp, ap, tank);
 			}
 
-			if (!CheckItemStats(sph, spd, apa, aps, apr, tank))
+			if (!CheckItemStats(sp, ap, tank))
 				continue;
 
 			if (enchant->EnchantmentCondition && !bot->EnchantmentFitsRequirements(enchant->EnchantmentCondition, -1))
@@ -1330,7 +1330,7 @@ void PlayerbotFactory::EnchantItem(Item* item)
 	if (!enchant)
 		return;
 
-	bot->ApplyEnchantment(item, PERM_ENCHANTMENT_SLOT);
+	bot->ApplyEnchantment(item, PERM_ENCHANTMENT_SLOT, false);
 	item->SetEnchantment(PERM_ENCHANTMENT_SLOT, id, 0, 0);
 	bot->ApplyEnchantment(item, PERM_ENCHANTMENT_SLOT, true);
 }
