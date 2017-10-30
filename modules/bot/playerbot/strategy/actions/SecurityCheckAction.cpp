@@ -3,6 +3,7 @@
 #include "../../RandomPlayerbotMgr.h"
 #include "SecurityCheckAction.h"
 #include "../../../Groups/Group.h"
+#include "../../PlayerbotAIConfig.h"
 
 using namespace BotAI;
 
@@ -14,7 +15,10 @@ bool SecurityCheckAction::isUseful()
 
 bool SecurityCheckAction::Execute(Event event)
 {
-    Group* group = bot->GetGroup();
+    if (!sPlayerbotAIConfig.lootRestrictions)
+        return false;
+    
+	Group* group = bot->GetGroup();
     if (group)
     {
         LootMethod method = group->GetLootMethod();
