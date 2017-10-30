@@ -539,3 +539,27 @@ void PlayerbotMgr::OnBotLoginInternal(Player * const bot)
 	bot->GetPlayerbotAI()->SetMaster(master);
 	bot->GetPlayerbotAI()->ResetStrategies();
 }
+
+void PlayerbotMgr::OnPlayerLogin(Player* player)
+{
+	if (!sPlayerbotAIConfig.botAutologin)
+		return;
+
+	uint32 accountId = player->GetSession()->GetAccountId();
+	QueryResult results = CharacterDatabase.PQuery(
+		"SELECT name FROM characters WHERE account = '%u'",
+		accountId);
+	if (results)
+	{
+		ostringstream out; out << "add ";
+		bool first = true;
+		do
+		{
+			Field* fields = results->Fetch();
+			if (first) first = false; else out << ",";
+			out << fields[0].GetString();
+		} while (results->NextRow());
+
+		HandlePlayerbotCommand(out.str().c_str(), player);
+	}
+}

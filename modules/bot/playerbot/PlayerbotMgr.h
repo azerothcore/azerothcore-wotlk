@@ -53,6 +53,7 @@ public:
     void HandleMasterIncomingPacket(const WorldPacket& packet);
     void HandleMasterOutgoingPacket(const WorldPacket& packet);
     void HandleCommand(uint32 type, const string& text);
+	void OnPlayerLogin(Player* player);
 
     virtual void UpdateAIInternal(uint32 elapsed);
 

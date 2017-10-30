@@ -1263,10 +1263,13 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder* holder)
     }
 
 	// playerbot mod
-	if (!_player->GetPlayerbotAI())
+	uint64 guid = ((LoginQueryHolder*)holder)->GetGuid();
+	Player* player = sObjectMgr->GetPlayerByLowGUID(guid);
+	if (player && !player->GetPlayerbotAI())
 	{
-		_player->SetPlayerbotMgr(new PlayerbotMgr(_player));
-		sRandomPlayerbotMgr.OnPlayerLogin(_player);
+		player->SetPlayerbotMgr(new PlayerbotMgr(player));
+		player->GetPlayerbotMgr()->OnPlayerLogin(player);
+		sRandomPlayerbotMgr.OnPlayerLogin(player);
 	}
 
     sScriptMgr->OnPlayerLogin(pCurrChar);
