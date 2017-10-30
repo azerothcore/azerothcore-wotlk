@@ -8,11 +8,12 @@ ConfVersion=2010102201
 # Enable or disable AI Playerbot
 AiPlayerbot.Enabled = 1
 
-# auto-login all player alts as bots on player login
-AiPlayerbot.BotAutologin = 0
+# auto-login all player alts as bots on player login 
+# "RandomBotAutologin" must be set to 0 before use this
+AiPlayerbot.BotAutologin = 1
 
 # Enable random bot system
-AiPlayerbot.RandomBotAutologin = 1
+AiPlayerbot.RandomBotAutologin = 0
 
 # AI Playerbots can join in Battlegrounds
 AiPlayerbot.RandomBotJoinBG = 1

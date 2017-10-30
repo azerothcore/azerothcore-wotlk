@@ -542,6 +542,9 @@ void PlayerbotMgr::OnBotLoginInternal(Player * const bot)
 
 void PlayerbotMgr::OnPlayerLogin(Player* player)
 {
+	if (sPlayerbotAIConfig.randomBotAutologin)
+		return;
+
 	if (!sPlayerbotAIConfig.botAutologin)
 		return;
 
