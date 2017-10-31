@@ -108,7 +108,7 @@ void PlayerbotHolder::AddPlayerBot(uint64 playerGuid, uint32 masterAccount)
 	PlayerbotMgr *mgr = bot->GetPlayerbotMgr();
 	bot->SetPlayerbotMgr(NULL);
 	delete mgr;
-	sRandomPlayerbotMgr.OnPlayerLogout(bot);
+	sRandomPlayerbotMgr.OnPlayerLogin(bot);
 
 	bool allowed = false;
 	if (botAccountId == masterAccount)
@@ -1267,8 +1267,9 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder* holder)
 	{
 		_player->SetPlayerbotMgr(new PlayerbotMgr(_player));
 		_player->GetPlayerbotMgr()->OnPlayerLogin(_player);
-		sRandomPlayerbotMgr.OnPlayerLogin(_player);
 	}
+
+	sRandomPlayerbotMgr.OnPlayerLogin(_player);
 
     sScriptMgr->OnPlayerLogin(pCurrChar);
     delete holder;

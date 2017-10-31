@@ -16,12 +16,6 @@ PlayerbotSecurityLevel PlayerbotSecurity::LevelFor(Player* from, DenyReason* rea
 	if (from->GetSession()->GetSecurity() >= SEC_GAMEMASTER)
 		return PLAYERBOT_SECURITY_ALLOW_ALL;
 
-	if (from->GetPlayerbotAI())
-	{
-		if (reason) *reason = PLAYERBOT_DENY_IS_BOT;
-		return PLAYERBOT_SECURITY_DENY_ALL;
-	}
-
 	if (bot->GetPlayerbotAI()->IsOpposing(from))
 	{
 		if (reason) *reason = PLAYERBOT_DENY_OPPOSING;
