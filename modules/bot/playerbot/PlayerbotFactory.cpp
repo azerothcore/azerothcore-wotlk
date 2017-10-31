@@ -102,8 +102,8 @@ void PlayerbotFactory::Randomize(bool incremental)
 	CancelAuras();
 	bot->SaveToDB(false, true);
 
-	sLog->outBasic("Initializing quests...");
-	/*InitQuests();
+	/*sLog->outBasic("Initializing quests...");
+	InitQuests();
 	// quest rewards boost bot level, so reduce back
     bot->SetLevel(level);
     ClearInventory();
@@ -123,7 +123,7 @@ void PlayerbotFactory::Randomize(bool incremental)
 	InitAvailableSpells();
 	// EJ learn quest spells instead
 	InitQuestSpells();
-	//InitSpecialSpells();
+	InitSpecialSpells();
 
 	sLog->outBasic("Initializing mounts...");
 	InitMounts();
@@ -145,8 +145,8 @@ void PlayerbotFactory::Randomize(bool incremental)
 	sLog->outBasic("Initializing potions...");
 	InitPotions();
 
-	//sLog->outBasic("Initializing second equipment set...");
-	//InitSecondEquipmentSet();
+	sLog->outBasic("Initializing second equipment set...");
+	InitSecondEquipmentSet();
 
 	sLog->outBasic("Initializing inventory...");
 	InitInventory();
@@ -154,7 +154,7 @@ void PlayerbotFactory::Randomize(bool incremental)
 	sLog->outBasic("Initializing glyphs...");
 	InitGlyphs();
 
-	//sLog->outBasic("Initializing guilds...");
+	sLog->outBasic("Initializing guilds...");
 	InitGuild();
 
 	sLog->outBasic("Initializing pet...");
