@@ -109,6 +109,14 @@ bool PlayerbotAIConfig::Initialize()
     randomBotLoginAtStartup = config.GetBoolDefault("AiPlayerbot.RandomBotLoginAtStartup", true);
     randomBotTeleLevel = config.GetIntDefault("AiPlayerbot.RandomBotTeleLevel", 3);
 	randomBotShowHelmet = config.GetBoolDefault("AiPlayerbot.randomBotShowHelmet", true);
+	randomBotBracketPlayer = config.GetBoolDefault("AIPlayerbot.RandomBotBracketPlayer", true);
+	randomBotInitQuest = config.GetBoolDefault("AiPlayerbot.randomBotInitQuest", true);
+
+	// thesawolf - not so random bot creation
+	notrandom = config.GetBoolDefault("AiPlayerbot.NotSoRandom", true);
+	
+	// thesawolf - ARAC chargen support
+	aracgen = config.GetBoolDefault("AiPlayerbot.ARAC", false);
 
     randomChangeMultiplier = config.GetFloatDefault("AiPlayerbot.RandomChangeMultiplier", 1.0);
 

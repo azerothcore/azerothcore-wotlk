@@ -36,7 +36,7 @@ public:
 				std::ostringstream stream;
 				stream << "|CFF" << tag_colour <<
 					"|r|cff" << plr_colour << " " << plr <<
-					"|r 's group killed |CFF" << boss_colour << "[" << boss_n << "]|r " "boss" << "!";
+					"|r's group killed the mighty |CFF" << boss_colour << "[" << boss_n << "]|r " "boss" << "!";
 				sWorld->SendServerMessage(SERVER_MSG_STRING, stream.str().c_str());
 			}
 		}
