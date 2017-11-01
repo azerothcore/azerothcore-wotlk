@@ -88,7 +88,32 @@ enum KZMiscCreatures
     NPC_DREADBEAST = 16177,
     NPC_SHADOWBEAST = 16176,
     NPC_KILREK = 17229,
-    NPC_RELAY = 17645
+    NPC_RELAY = 17645,
+
+    // Chess Event
+    NPC_ECHO_MEDIVH = 16816,
+    NPC_INVISIBLE_STALKER = 22519,                // placeholder for dead chess npcs
+    NPC_CHESS_STATUS_BAR = 22520,                 // npc that controlls the transformation of dead pieces
+    NPC_CHESS_VICTORY_CONTROLLER = 22524,
+    // NPC_CHESS_SOUND_BUNNY        = 21921,      // npc that handles the encounter sounds
+    // NPC_WAITING_ROOM_STALKER     = 17459,      // trigger which marks the teleport location of the players; also used to cast some control spells during the game
+    NPC_SQUARE_WHITE = 17208,                     // chess white square
+    NPC_SQUARE_BLACK = 17305,                     // chess black square
+    // NPC_SQUARE_OUTSIDE_BLACK     = 17316,      // outside chess black square
+    // NPC_SQUARE_OUTSIDE_WHITE     = 17317,      // outside chess white square
+
+    NPC_ORC_GRUNT = 17469,                    // pawn
+    NPC_ORC_WOLF = 21748,                     // knight
+    NPC_ORC_WARLOCK = 21750,                  // queen
+    NPC_ORC_NECROLYTE = 21747,                // bishop
+    NPC_SUMMONED_DAEMON = 21726,              // rook
+    NPC_WARCHIEF_BLACKHAND = 21752,           // king
+    NPC_HUMAN_FOOTMAN = 17211,                // pawn
+    NPC_HUMAN_CHARGER = 21664,                // knight
+    NPC_HUMAN_CONJURER = 21683,               // queen
+    NPC_HUMAN_CLERIC = 21682,                 // bishop
+    NPC_CONJURED_WATER_ELEMENTAL = 21160,     // rook
+    NPC_KING_LLANE = 21684,                   // king
 };
 
 enum KZGameObjectIds
@@ -109,14 +134,26 @@ enum KZGameObjectIds
 
 enum KZMisc
 {
-    OPTIONAL_BOSS_REQUIRED_DEATH_COUNT = 50
+    OPTIONAL_BOSS_REQUIRED_DEATH_COUNT = 50,
+    AI_EVENT_CUSTOM_A = 1,
+    AI_EVENT_CUSTOM_B = 2
 };
 
 enum KarazhanSpells
 {
     SPELL_RATTLED = 32437,
     SPELL_OVERLOAD = 29766,
-    SPELL_BLINK = 29884
+    SPELL_BLINK = 29884,
+
+    // Chess event spells
+    SPELL_CLEAR_BOARD = 37366,                    // spell cast to clear the board at the end of the event
+    SPELL_GAME_IN_SESSION = 39331,                // debuff on players received while the game is in session
+    SPELL_FORCE_KILL_BUNNY = 45260,               // triggers 45259
+    SPELL_GAME_OVER = 39401,                      // cast by Medivh on game end
+    SPELL_VICTORY_VISUAL = 39395,                 // cast by the Victory controller on game end
+    
+    FACTION_ID_CHESS_HORDE = 1689,
+    FACTION_ID_CHESS_ALLIANCE = 1690,
 };
 
 #endif
