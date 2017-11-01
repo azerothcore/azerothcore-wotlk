@@ -68,6 +68,7 @@ namespace BotAI
 			creators["bg tactics ws"] = &WorldPacketActionContext::bg_tactics_ws;
 			creators["security check"] = &WorldPacketActionContext::security_check;
             creators["guild accept"] = &WorldPacketActionContext::guild_accept;
+			creators["inventory change failure"] = &WorldPacketActionContext::inventory_change_failure;
         }
 
     private:
@@ -108,6 +109,7 @@ namespace BotAI
         static Action* accept_all_quests(PlayerbotAI* ai) { return new AcceptAllQuestsAction(ai); }
         static Action* accept_quest_share(PlayerbotAI* ai) { return new AcceptQuestShareAction(ai); }
         static Action* loot_roll(PlayerbotAI* ai) { return (QueryItemUsageAction*)new LootRollAction(ai); }
+		static Action* inventory_change_failure(PlayerbotAI* ai) { return new InventoryChangeFailureAction(ai); }
     };
 
 
