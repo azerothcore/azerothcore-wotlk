@@ -74,7 +74,6 @@ namespace BotAI
             creators["mount"] = &ActionContext::mount;
 			creators["delay"] = &ActionContext::delay;
 			creators["reveal gathering item"] = &ActionContext::reveal_gathering_item;
-			creators["suggest trade"] = &ActionContext::suggest_trade;
         }
 
     private:
@@ -122,7 +121,6 @@ namespace BotAI
         static Action* mount(PlayerbotAI *ai) { return new CastSpellAction(ai,"mount"); }
 		static Action* delay(PlayerbotAI* ai) { return new DelayAction(ai); }
 		static Action* reveal_gathering_item(PlayerbotAI* ai) { return new RevealGatheringItemAction(ai); }
-		static Action* suggest_trade(PlayerbotAI* ai) { return new SuggestTradeAction(ai); }
     };
 
 };
