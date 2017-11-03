@@ -58,7 +58,6 @@
 #include "LastSaidValue.h"
 #include "RandomBotUpdateValue.h"
 #include "NearestNonBotPlayersValue.h"
-#include "NearestFriendlyPlayersValue.h"
 
 namespace BotAI
 {
@@ -67,7 +66,6 @@ namespace BotAI
     public:
         ValueContext()
         {
-			creators["nearest friendly players"] = &ValueContext::nearest_friendly_players;
             creators["nearest game objects"] = &ValueContext::nearest_game_objects;
             creators["nearest npcs"] = &ValueContext::nearest_npcs;
             creators["possible targets"] = &ValueContext::possible_targets;
@@ -154,7 +152,6 @@ namespace BotAI
         }
 
     private:
-		static UntypedValue* nearest_friendly_players(PlayerbotAI* ai) { return new NearestFriendlyPlayersValue(ai); }
         static UntypedValue* item_usage(PlayerbotAI* ai) { return new ItemUsageValue(ai); }
         static UntypedValue* formation(PlayerbotAI* ai) { return new FormationValue(ai); }
         static UntypedValue* mana_save_level(PlayerbotAI* ai) { return new ManaSaveLevelValue(ai); }

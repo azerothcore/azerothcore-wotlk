@@ -2,9 +2,9 @@
 #include "../../playerbot.h"
 #include "NearestNonBotPlayersValue.h"
 
-#include "GridNotifiers.h"
-#include "GridNotifiersImpl.h"
-#include "CellImpl.h"
+#include "../../../Grids/Notifiers/GridNotifiers.h"
+#include "../../../Grids/Notifiers/GridNotifiersImpl.h"
+#include "../../../Grids/Cells/CellImpl.h"
 
 using namespace BotAI;
 using namespace Trinity;

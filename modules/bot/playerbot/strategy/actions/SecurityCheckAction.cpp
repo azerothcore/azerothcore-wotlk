@@ -10,7 +10,7 @@ using namespace BotAI;
 
 bool SecurityCheckAction::isUseful()
 {
-    return sRandomPlayerbotMgr.IsRandomBot(bot) && ai->GetMaster() && ai->GetMaster()->GetSession()->GetSecurity() < SEC_PLAYER; //SEC_GAMEMASTER; thesawolf
+    return sRandomPlayerbotMgr.IsRandomBot(bot) && ai->GetMaster() && ai->GetMaster()->GetSession()->GetSecurity() < SEC_GAMEMASTER;
 }
 
 bool SecurityCheckAction::Execute(Event event)

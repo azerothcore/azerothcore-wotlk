@@ -33,14 +33,15 @@ Unit* PartyMemberValue::FindPartyMember(list<Player*>* party, FindPlayerPredicat
 Unit* PartyMemberValue::FindPartyMember(FindPlayerPredicate &predicate)
 {
     Player* master = GetMaster();
-	list<uint64> nearestPlayers = AI_VALUE(list<uint64>, "nearest friendly players");
+    Group* group = bot->GetGroup();
+    if (!group)
+        return NULL;
 
     list<Player*> healers, tanks, others, masters;
-	if (master) masters.push_back(master);
-	for (list<uint64>::iterator i = nearestPlayers.begin(); i != nearestPlayers.end(); ++i)
+    masters.push_back(master);
+    for (GroupReference *gref = group->GetFirstMember(); gref; gref = gref->next())
     {
-		Player* player = dynamic_cast<Player*>(ai->GetUnit(*i));
-		if (!player || player == bot) continue;
+        Player* player = gref->GetSource();
 
         if (ai->IsHeal(player))
             healers.push_back(player);
@@ -69,6 +70,8 @@ Unit* PartyMemberValue::FindPartyMember(FindPlayerPredicate &predicate)
 
 bool PartyMemberValue::Check(Unit* player)
 {
+
+
     return player && player != bot && player->GetMapId() == bot->GetMapId() &&
         bot->GetDistance(player) < sPlayerbotAIConfig.spellDistance &&
         bot->IsWithinLOS(player->GetPositionX(), player->GetPositionY(), player->GetPositionZ());
@@ -76,14 +79,15 @@ bool PartyMemberValue::Check(Unit* player)
 
 bool PartyMemberValue::IsTargetOfSpellCast(Player* target, SpellEntryPredicate &predicate)
 {
-	list<uint64> nearestPlayers = AI_VALUE(list<uint64>, "nearest friendly players");
+
+    Group* group = bot->GetGroup();
     uint64 targetGuid = target ? target->GetGUID() : bot->GetGUID();
     uint64 corpseGuid = target && target->GetCorpse() ? target->GetCorpse()->GetGUID() : 0;
 
-    for (list<uint64>::iterator i = nearestPlayers.begin(); i != nearestPlayers.end(); ++i)
+    for (GroupReference *gref = group->GetFirstMember(); gref; gref = gref->next())
     {
-        Player* player = dynamic_cast<Player*>(ai->GetUnit(*i));
-        if (!player || player == bot)
+        Player* player = gref->GetSource();
+        if (player == bot)
             continue;
 
         if (player->IsNonMeleeSpellCast(true))

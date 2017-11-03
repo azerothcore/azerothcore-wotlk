@@ -18,7 +18,6 @@
 #include "SayAction.h"
 #include "RandomBotUpdateAction.h"
 #include "CheckMountStateAction.h"
-#include "RevealGatheringItemAction.h"
 
 namespace BotAI
 {
@@ -51,8 +50,7 @@ namespace BotAI
             creators["add all loot"] = &ActionContext::add_all_loot;
             creators["shoot"] = &ActionContext::shoot;
             creators["follow"] = &ActionContext::follow;
-			// thesawolf - why was there a dupe here?
-			//creators["follow"] = &ActionContext::follow;
+            creators["follow"] = &ActionContext::follow;
             creators["runaway"] = &ActionContext::runaway;
             creators["stay"] = &ActionContext::stay;
             creators["attack anything"] = &ActionContext::attack_anything;
@@ -73,7 +71,6 @@ namespace BotAI
             creators["random bot update"] = &ActionContext::random_bot_update;
             creators["mount"] = &ActionContext::mount;
 			creators["delay"] = &ActionContext::delay;
-			creators["reveal gathering item"] = &ActionContext::reveal_gathering_item;
         }
 
     private:
@@ -120,7 +117,6 @@ namespace BotAI
         static Action* random_bot_update(PlayerbotAI* ai) { return new RandomBotUpdateAction(ai); }
         static Action* mount(PlayerbotAI *ai) { return new CastSpellAction(ai,"mount"); }
 		static Action* delay(PlayerbotAI* ai) { return new DelayAction(ai); }
-		static Action* reveal_gathering_item(PlayerbotAI* ai) { return new RevealGatheringItemAction(ai); }
     };
 
 };
