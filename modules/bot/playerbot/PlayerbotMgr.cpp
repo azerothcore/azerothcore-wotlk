@@ -3,6 +3,7 @@
 #include "PlayerbotAIConfig.h"
 #include "PlayerbotFactory.h"
 #include "RandomPlayerbotMgr.h"
+#include "PlayerbotDbStore.h"
 
 #include "Opcodes.h"
 
@@ -58,6 +59,7 @@ void PlayerbotHolder::LogoutPlayerBot(uint64 guid)
 	if (bot)
 	{
 		bot->GetPlayerbotAI()->TellMaster("Goodbye!");
+		sPlayerbotDbStore.Save(bot->GetPlayerbotAI());
 		sLog->outBasic("Bot %s logged out", bot->GetName().c_str());
 		//bot->SaveToDB();
 

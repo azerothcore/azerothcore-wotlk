@@ -118,6 +118,8 @@ public:
     void DoNextAction();
     void DoSpecificAction(string name);
     void ChangeStrategy(string name, BotState type);
+	void ClearStrategies(BotState type);
+	list<string> GetStrategies(BotState type);
     bool ContainsStrategy(StrategyType type);
     bool HasStrategy(string name, BotState type);
     void ResetStrategies();
@@ -180,7 +182,7 @@ protected:
     Engine* engines[BOT_STATE_MAX];
     BotState currentState;
     ChatHelper chatHelper;
-    stack<ChatCommandHolder> chatCommands;
+	queue<ChatCommandHolder> chatCommands;
     PacketHandlingHelper botOutgoingPacketHandlers;
     PacketHandlingHelper masterIncomingPacketHandlers;
     PacketHandlingHelper masterOutgoingPacketHandlers;

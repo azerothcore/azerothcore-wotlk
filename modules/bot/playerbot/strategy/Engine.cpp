@@ -444,6 +444,16 @@ string Engine::ListStrategies()
     return s.substr(0, s.length() - 2);
 }
 
+list<string> Engine::GetStrategies()
+{
+    list<string> result;
+    for (map<string, Strategy*>::iterator i = strategies.begin(); i != strategies.end(); i++)
+    {
+        result.push_back(i->first);
+    }
+    return result;
+}
+
 void Engine::PushAgain(ActionNode* actionNode, float relevance, Event event)
 {
     NextAction** nextAction = new NextAction*[2];

@@ -1,6 +1,7 @@
 #include "../pchdef.h"
 #include "PlayerbotMgr.h"
 #include "playerbot.h"
+#include "PlayerbotDbStore.h"
 
 #include "AiFactory.h"
 
@@ -149,7 +150,7 @@ void PlayerbotAI::UpdateAIInternal(uint32 elapsed)
     ExternalEventHelper helper(aiObjectContext);
     while (!chatCommands.empty())
     {
-        ChatCommandHolder holder = chatCommands.top();
+        ChatCommandHolder holder = chatCommands.front();
         string command = holder.GetCommand();
         Player* owner = holder.GetOwner();
         if (!helper.ParseChatCommand(command, owner) && holder.GetType() == CHAT_MSG_WHISPER)
@@ -480,6 +481,24 @@ void PlayerbotAI::ChangeStrategy(string names, BotState type)
         return;
 
     e->ChangeStrategy(names);
+}
+
+void PlayerbotAI::ClearStrategies(BotState type)
+{
+    Engine* e = engines[type];
+    if (!e)
+        return;
+
+    e->removeAllStrategies();
+}
+
+list<string> PlayerbotAI::GetStrategies(BotState type)
+{
+    Engine* e = engines[type];
+    if (!e)
+        return list<string>();
+
+    return e->GetStrategies();
 }
 
 void PlayerbotAI::DoSpecificAction(string name)
@@ -961,6 +980,7 @@ void PlayerbotAI::ResetStrategies()
     AiFactory::AddDefaultCombatStrategies(bot, this, engines[BOT_STATE_COMBAT]);
     AiFactory::AddDefaultNonCombatStrategies(bot, this, engines[BOT_STATE_NON_COMBAT]);
     AiFactory::AddDefaultDeadStrategies(bot, this, engines[BOT_STATE_DEAD]);
+	sPlayerbotDbStore.Load(this);
 }
 
 bool PlayerbotAI::IsRanged(Player* player)
