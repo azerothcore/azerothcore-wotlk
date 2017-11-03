@@ -544,6 +544,9 @@ void AuctionHouseObject::Update()
     time_t checkTime = sWorld->GetGameTime() + 60;
     ///- Handle expired auctions
 
+	// ahbot mod
+	//auctionbot.Update();
+
     // If storage is empty, no need to update. next == NULL in this case.
     if (AuctionsMap.empty())
         return;
