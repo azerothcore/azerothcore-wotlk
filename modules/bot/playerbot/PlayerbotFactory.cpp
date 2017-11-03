@@ -83,6 +83,10 @@ void PlayerbotFactory::Prepare()
 	bot->CombatStop(true);
 	bot->GiveLevel(level);
 
+	//thesawolf - refill hp/sp since level resets can leave a vacuum
+	bot->SetHealth(bot->GetMaxHealth());
+	bot->SetPower(POWER_MANA, bot->GetMaxPower(POWER_MANA));
+
 	if (!sPlayerbotAIConfig.randomBotShowHelmet)
 	{
 		bot->SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_HIDE_HELM);
@@ -102,14 +106,20 @@ void PlayerbotFactory::Randomize(bool incremental)
 	CancelAuras();
 	bot->SaveToDB(false, true);
 
-	/*sLog->outBasic("Initializing quests...");
-	InitQuests();
+	if (sPlayerbotAIConfig.randomBotInitQuest)
+	{
+		sLog->outBasic("Initializing quests...");
+		InitQuests();
+	}
 	// quest rewards boost bot level, so reduce back
     bot->SetLevel(level);
+	//thesawolf - refill hp/sp since level resets can leave a vacuum
+	bot->SetHealth(bot->GetMaxHealth());
+	bot->SetPower(POWER_MANA, bot->GetMaxPower(POWER_MANA));
     ClearInventory();
     bot->SetUInt32Value(PLAYER_XP, 0);
     CancelAuras();
-    bot->SaveToDB(false, true);*/
+    bot->SaveToDB(false, true);
 
 	sLog->outBasic("Initializing skills...");
 	InitSkills();
@@ -155,8 +165,9 @@ void PlayerbotFactory::Randomize(bool incremental)
 	InitGlyphs();
 
 	sLog->outBasic("Initializing guilds...");
-	InitGuild();
-
+	bot->SaveToDB(false, true); //thesawolf - save save save (hopefully avoids dupes)
+	InitGuild(); //thesawolf - duplicate guild leaders causing segfault CHECK
+	
 	sLog->outBasic("Initializing pet...");
 	InitPet();
 
@@ -2365,6 +2376,7 @@ void PlayerbotFactory::InitGlyphs()
 
 void PlayerbotFactory::InitGuild()
 {
+	bot->SaveToDB(false, true); //thesawolf - save save save
 	if (bot->GetGuildId())
 		return;
 
@@ -2393,4 +2405,5 @@ void PlayerbotFactory::InitGuild()
 
 	if (guild->GetMemberCount() < 10)
 		guild->AddMember(bot->GetGUID(), urand(GR_OFFICER, GR_INITIATE));
+	bot->SaveToDB(false, true); //thesawolf - save save save
 }
