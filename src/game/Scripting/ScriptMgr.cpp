@@ -1148,13 +1148,13 @@ void ScriptMgr::OnShutdown()
     FOREACH_SCRIPT(WorldScript)->OnShutdown();
 }
 
-bool ScriptMgr::OnCriteriaCheck(uint32 scriptId, Player* source, Unit* target)
+bool ScriptMgr::OnCriteriaCheck(uint32 scriptId, Player* source, Unit* target, uint32 criteria_id)
 {
     ASSERT(source);
     // target can be NULL.
 
     GET_SCRIPT_RET(AchievementCriteriaScript, scriptId, tmpscript, false);
-    return tmpscript->OnCheck(source, target);
+    return tmpscript->OnCheck(source, target, criteria_id);
 }
 
 // Player
