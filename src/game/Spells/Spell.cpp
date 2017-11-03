@@ -2395,6 +2395,23 @@ void Spell::AddUnitTarget(Unit* target, uint32 effectMask, bool checkIfValid /*=
         // Increase time interval for reflected spells by 1.5
         m_caster->m_Events.AddEvent(new ReflectEvent(m_caster->GetGUID(), targetInfo.targetGUID, m_spellInfo), m_caster->m_Events.CalculateTime(targetInfo.timeDelay));
         targetInfo.timeDelay += targetInfo.timeDelay >> 1;
+        
+        // HACK: workaround check for succubus seduction case
+        // TODO: seduction should be casted only on humanoids (not demons)
+        if (m_caster->IsPet())
+        {
+            CreatureTemplate const* ci = sObjectMgr->GetCreatureTemplate(m_caster->GetEntry());
+            switch (ci->family)
+            {
+                case CREATURE_FAMILY_SUCCUBUS:
+                {
+                    if (m_spellInfo->SpellIconID != 694) // Soothing Kiss
+                        cancel();
+                }
+                break;
+                    return;
+            }
+        }
     }
     else
         targetInfo.reflectResult = SPELL_MISS_NONE;
