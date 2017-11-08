@@ -1169,3 +1169,15 @@ void AddOutdoorPvPScripts()
 #endif
 }
 
+
+//~ **********************  Put your custom scripts below, like the commented examples, uncomment and edit *************************************
+
+
+//~ void AddSC_MySuperScript();
+
+//~ void AddCustomScripts()
+//~ {
+//~ #ifdef SCRIPTS
+	//~ AddSC_MySuperScript();
+//~ #endif
+//~ }
