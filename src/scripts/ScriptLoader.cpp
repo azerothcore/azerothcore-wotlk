@@ -1175,9 +1175,9 @@ void AddOutdoorPvPScripts()
 
 //~ void AddSC_MySuperScript();
 
-//~ void AddCustomScripts()
-//~ {
-//~ #ifdef SCRIPTS
+void AddCustomScripts()
+{
+#ifdef SCRIPTS
 	//~ AddSC_MySuperScript();
-//~ #endif
-//~ }
+#endif
+}
