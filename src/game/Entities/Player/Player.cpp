@@ -7531,6 +7531,8 @@ void Player::UpdateArea(uint32 newArea)
     // pussywizard: inform instance, needed for Icecrown Citadel
     if (InstanceScript* instance = GetInstanceScript())
         instance->OnPlayerAreaUpdate(this, m_areaUpdateId, newArea);
+    
+    sScriptMgr->OnPlayerUpdateArea(this, m_areaUpdateId, newArea);
 
     // FFA_PVP flags are area and not zone id dependent
     // so apply them accordingly
