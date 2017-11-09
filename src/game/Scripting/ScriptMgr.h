@@ -1001,8 +1001,11 @@ class GlobalScript : public ScriptObject
         // items
         virtual void OnItemDelFromDB(SQLTransaction& /*trans*/, uint32 /*itemGuid*/) { }
         virtual void OnMirrorImageDisplayItem(const Item* /*item*/, uint32& /*display*/) { }
-        virtual void OnAfterRefCount(LootStoreItem* /*LootStoreItem*/, uint32& /*maxcount*/) { }
-        virtual void OnBeforeDropAddItem(Player const* /*player*/, Loot& /*loot*/, LootStoreItem* /*LootStoreItem*/) { }
+        
+        // loot
+        virtual void OnAfterRefCount(Player const* /*player*/, LootStoreItem* /*LootStoreItem*/, Loot& /*loot*/, bool /*canRate*/, uint16 /*lootMode*/, uint32& /*maxcount*/) { }
+        virtual void OnBeforeDropAddItem(Player const* /*player*/, Loot& /*loot*/, bool /*canRate*/, uint16 /*lootMode*/, LootStoreItem* /*LootStoreItem*/) { }
+        virtual void OnBeforeItemRoll(Player const* /*player*/, Loot& /*loot*/, bool /*canRate*/, uint16 /*lootMode*/, LootStoreItem* /*LootStoreItem*/) { };
 
         virtual void OnInitializeLockedDungeons(Player* /*player*/, uint8& /*level*/, uint32& /*lockData*/) { }
         virtual void OnAfterInitializeLockedDungeons(Player* /*player*/) { }
@@ -1271,8 +1274,9 @@ class ScriptMgr
         void OnGlobalItemDelFromDB(SQLTransaction& trans, uint32 itemGuid);
         void OnGlobalMirrorImageDisplayItem(const Item *item, uint32 &display);
         void OnBeforeUpdateArenaPoints(ArenaTeam* at, std::map<uint32, uint32> &ap);
-        void OnAfterRefCount(LootStoreItem* LootStoreItem, uint32 &maxcount);
-        void OnBeforeDropAddItem(Player const* player, Loot& loot, LootStoreItem* LootStoreItem);
+        void OnAfterRefCount(Player const* player, Loot& loot, bool canRate, uint16 lootMode, LootStoreItem* LootStoreItem, uint32 &maxcount);
+        void OnBeforeDropAddItem(Player const* player, Loot& loot, bool canRate, uint16 lootMode, LootStoreItem* LootStoreItem);
+        void OnBeforeItemRoll(Player const* player, Loot& loot, bool canRate, uint16 lootMode, LootStoreItem* LootStoreItem);
         void OnInitializeLockedDungeons(Player* player, uint8& level, uint32& lockData);
         void OnAfterInitializeLockedDungeons(Player* player);
 
