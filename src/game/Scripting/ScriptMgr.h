@@ -1220,6 +1220,7 @@ class ScriptMgr
         void OnPlayerDelete(uint64 guid);
         void OnPlayerBindToInstance(Player* player, Difficulty difficulty, uint32 mapid, bool permanent);
         void OnPlayerUpdateZone(Player* player, uint32 newZone, uint32 newArea);
+        void OnPlayerUpdateArea(Player* player, uint32 oldArea, uint32 newArea);
         void OnPlayerUpdateFaction(Player* player);
         void OnPlayerAddToBattleground(Player* player, Battleground* bg);
         void OnPlayerRemoveFromBattleground(Player* player, Battleground* bg);
