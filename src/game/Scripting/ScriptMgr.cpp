@@ -1303,6 +1303,11 @@ void ScriptMgr::OnPlayerUpdateZone(Player* player, uint32 newZone, uint32 newAre
     FOREACH_SCRIPT(PlayerScript)->OnUpdateZone(player, newZone, newArea);
 }
 
+void ScriptMgr::OnPlayerUpdateArea(Player* player, uint32 oldArea, uint32 newArea)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnUpdateArea(player, oldArea, newArea);
+}
+
 void ScriptMgr::OnPlayerUpdateFaction(Player* player)
 {
     FOREACH_SCRIPT(PlayerScript)->OnUpdateFaction(player);
@@ -1494,14 +1499,18 @@ void ScriptMgr::OnBeforeUpdateArenaPoints(ArenaTeam* at, std::map<uint32, uint32
     FOREACH_SCRIPT(GlobalScript)->OnBeforeUpdateArenaPoints(at,ap);
 }
 
-void ScriptMgr::OnAfterRefCount(LootStoreItem* LootStoreItem, uint32 &maxcount)
+void ScriptMgr::OnAfterRefCount(Player const* player, Loot& loot, bool canRate, uint16 lootMode, LootStoreItem* LootStoreItem, uint32 &maxcount)
 {
-    FOREACH_SCRIPT(GlobalScript)->OnAfterRefCount(LootStoreItem, maxcount);
+    FOREACH_SCRIPT(GlobalScript)->OnAfterRefCount(player, LootStoreItem, loot, canRate, lootMode, maxcount);
 }
 
-void ScriptMgr::OnBeforeDropAddItem(Player const* player, Loot& loot, LootStoreItem* LootStoreItem)
+void ScriptMgr::OnBeforeDropAddItem(Player const* player, Loot& loot, bool canRate, uint16 lootMode, LootStoreItem* LootStoreItem)
 {
-    FOREACH_SCRIPT(GlobalScript)->OnBeforeDropAddItem(player, loot, LootStoreItem);
+    FOREACH_SCRIPT(GlobalScript)->OnBeforeDropAddItem(player, loot, canRate, lootMode, LootStoreItem);
+}
+
+void ScriptMgr::OnBeforeItemRoll(Player const* player, Loot& loot, bool canRate, uint16 lootMode, LootStoreItem* LootStoreItem) {
+    FOREACH_SCRIPT(GlobalScript)->OnBeforeItemRoll(player, loot, canRate, lootMode, LootStoreItem);
 }
 
 void ScriptMgr::OnInitializeLockedDungeons(Player* player, uint8& level, uint32& lockData)
