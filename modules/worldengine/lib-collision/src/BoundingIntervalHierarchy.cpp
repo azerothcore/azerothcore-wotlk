@@ -1,7 +1,19 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2008-2017 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2005-2010 MaNGOS <http://getmangos.com/>
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation; either version 2 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "BoundingIntervalHierarchy.h"
@@ -60,11 +72,11 @@ void BIH::subdivide(int left, int right, std::vector<uint32> &tempTree, buildDat
         axis = d.primaryAxis();
         split = 0.5f * (gridBox.lo[axis] + gridBox.hi[axis]);
         // partition L/R subsets
-        clipL = -G3D::inf();
-        clipR = G3D::inf();
+        clipL = -G3D::finf();
+        clipR = G3D::finf();
         rightOrig = right; // save this for later
-        float nodeL = G3D::inf();
-        float nodeR = -G3D::inf();
+        float nodeL = G3D::finf();
+        float nodeR = -G3D::finf();
         for (int i = left; i <= right;)
         {
             int obj = dat.indices[i];
@@ -140,13 +152,13 @@ void BIH::subdivide(int left, int right, std::vector<uint32> &tempTree, buildDat
         else if (left > right)
         {
             // all right
+            right = rightOrig;
             if (prevAxis == axis && G3D::fuzzyEq(prevSplit, split)) {
                 // we are stuck here - create a leaf
                 stats.updateLeaf(depth, right - left + 1);
                 createNode(tempTree, nodeIndex, left, right);
                 return;
             }
-            right = rightOrig;
             if (clipR >= split) {
                 // keep looping on right half
                 gridBox.lo[axis] = split;
@@ -175,13 +187,13 @@ void BIH::subdivide(int left, int right, std::vector<uint32> &tempTree, buildDat
                     stats.updateInner();
                     tempTree[nodeIndex + 0] = (prevAxis << 30) | nextIndex;
                     tempTree[nodeIndex + 1] = floatToRawIntBits(prevClip);
-                    tempTree[nodeIndex + 2] = floatToRawIntBits(G3D::inf());
+                    tempTree[nodeIndex + 2] = floatToRawIntBits(G3D::finf());
                 } else {
                     // create a node with a right child
                     // write leaf node
                     stats.updateInner();
                     tempTree[nodeIndex + 0] = (prevAxis << 30) | (nextIndex - 3);
-                    tempTree[nodeIndex + 1] = floatToRawIntBits(-G3D::inf());
+                    tempTree[nodeIndex + 1] = floatToRawIntBits(-G3D::finf());
                     tempTree[nodeIndex + 2] = floatToRawIntBits(prevClip);
                 }
                 // count stats for the unused leaf

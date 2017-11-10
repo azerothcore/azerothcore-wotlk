@@ -33,7 +33,7 @@ endif()
 
 add_subdirectory(g3dlite)
 add_subdirectory(recastnavigation)
-
+add_subdirectory(fmt)
 if(SERVERS)
   add_subdirectory(gsoap)
 endif()

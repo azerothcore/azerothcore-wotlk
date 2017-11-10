@@ -1,7 +1,19 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2017 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation; either version 2 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef _GAMEOBJECT_MODEL_H
@@ -13,30 +25,32 @@
 #include <G3D/Ray.h>
 
 #include "Define.h"
+#include <memory>
 
 namespace VMAP
 {
     class WorldModel;
+    enum class ModelIgnoreFlags : uint32;
 }
 
 class GameObject;
 struct GameObjectDisplayInfoEntry;
 
+class GameObjectModelOwnerBase
+{
+public:
+    virtual bool IsSpawned() const { return false; }
+    virtual uint32 GetDisplayId() const { return 0; }
+    virtual uint32 GetPhaseMask() const { return 0; }
+    virtual G3D::Vector3 GetPosition() const { return G3D::Vector3::zero(); }
+    virtual float GetOrientation() const { return 0.0f; }
+    virtual float GetScale() const { return 1.0f; }
+    virtual void DebugVisualizeCorner(G3D::Vector3 const& /*corner*/) const { }
+};
+
 class GameObjectModel /*, public Intersectable*/
 {
-    uint32 phasemask;
-    G3D::AABox iBound;
-    G3D::Matrix3 iInvRot;
-    G3D::Vector3 iPos;
-    //G3D::Vector3 iRot;
-    float iInvScale;
-    float iScale;
-    VMAP::WorldModel* iModel;
-    GameObject const* owner;
-
-    GameObjectModel() : phasemask(0), iInvScale(0), iScale(0), iModel(NULL), owner(NULL) { }
-    bool initialize(const GameObject& go, const GameObjectDisplayInfoEntry& info);
-
+    GameObjectModel() : phasemask(0), iInvScale(0), iScale(0), iModel(nullptr) { }
 public:
     std::string name;
 
@@ -52,11 +66,25 @@ public:
 
     bool isEnabled() const {return phasemask != 0;}
 
-    bool intersectRay(const G3D::Ray& Ray, float& MaxDist, bool StopAtFirstHit, uint32 ph_mask) const;
+    bool intersectRay(const G3D::Ray& Ray, float& MaxDist, bool StopAtFirstHit, uint32 ph_mask, VMAP::ModelIgnoreFlags ignoreFlags) const;
 
-    static GameObjectModel* Create(const GameObject& go);
+    static GameObjectModel* Create(std::unique_ptr<GameObjectModelOwnerBase> modelOwner, std::string const& dataPath);
 
     bool UpdatePosition();
+
+private:
+    bool initialize(std::unique_ptr<GameObjectModelOwnerBase> modelOwner, std::string const& dataPath);
+
+    uint32 phasemask;
+    G3D::AABox iBound;
+    G3D::Matrix3 iInvRot;
+    G3D::Vector3 iPos;
+    float iInvScale;
+    float iScale;
+    VMAP::WorldModel* iModel;
+    std::unique_ptr<GameObjectModelOwnerBase> owner;
 };
+
+void LoadGameObjectModelList(std::string const& dataPath);
 
 #endif // _GAMEOBJECT_MODEL_H

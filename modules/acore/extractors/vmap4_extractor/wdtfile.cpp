@@ -1,24 +1,37 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2008-2017 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation; either version 2 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "vmapexport.h"
 #include "wdtfile.h"
 #include "adtfile.h"
+
 #include <cstdio>
 
 char * wdtGetPlainName(char * FileName)
 {
     char * szTemp;
 
-    if((szTemp = strrchr(FileName, '\\')) != NULL)
+    if((szTemp = strrchr(FileName, '\\')) != nullptr)
         FileName = szTemp + 1;
     return FileName;
 }
 
-WDTFile::WDTFile(char* file_name, char* file_name1) : WDT(file_name), gWmoInstansName(NULL), gnWMO(0)
+WDTFile::WDTFile(char* file_name, char* file_name1) : gWmoInstansName(nullptr), gnWMO(0), WDT(file_name)
 {
     filename.append(file_name1,strlen(file_name1));
 }
@@ -65,7 +78,7 @@ bool WDTFile::init(char* /*map_id*/, unsigned int mapID)
                 WDT.read(buf, size);
                 char *p=buf;
                 int q = 0;
-                gWmoInstansName = new string[size];
+                gWmoInstansName = new std::string[size];
                 while (p < buf + size)
                 {
                     char* s=wdtGetPlainName(p);
@@ -91,6 +104,7 @@ bool WDTFile::init(char* /*map_id*/, unsigned int mapID)
                 }
 
                 delete[] gWmoInstansName;
+                gWmoInstansName = nullptr;
             }
         }
         WDT.seek((int)nextpos);
@@ -109,7 +123,7 @@ WDTFile::~WDTFile(void)
 ADTFile* WDTFile::GetMap(int x, int z)
 {
     if(!(x>=0 && z >= 0 && x<64 && z<64))
-        return NULL;
+        return nullptr;
 
     char name[512];
 

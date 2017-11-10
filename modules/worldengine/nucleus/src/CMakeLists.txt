@@ -60,6 +60,7 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/modules/worldengine/deps/SFMT
   ${CMAKE_SOURCE_DIR}/modules/worldengine/deps/sockets/include
   ${CMAKE_SOURCE_DIR}/modules/worldengine/deps/utf8cpp
+  ${CMAKE_SOURCE_DIR}/modules/worldengine/deps/fmt
   ${CMAKE_SOURCE_DIR}/src
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}/Configuration
