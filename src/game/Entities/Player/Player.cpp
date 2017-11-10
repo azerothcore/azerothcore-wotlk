@@ -3063,14 +3063,21 @@ void Player::SetGameMaster(bool on)
 }
 
 void Player::SetGMVisible(bool on)
-{ 
+{
+    const uint32 VISUAL_AURA = 37800;
+
     if (on)
     {
+        if (HasAura(VISUAL_AURA, 0))
+            RemoveAurasDueToSpell(VISUAL_AURA);
+
         m_ExtraFlags &= ~PLAYER_EXTRA_GM_INVISIBLE;         //remove flag
         m_serverSideVisibility.SetValue(SERVERSIDE_VISIBILITY_GM, SEC_PLAYER);
     }
     else
     {
+        AddAura(VISUAL_AURA, this);
+
         m_ExtraFlags |= PLAYER_EXTRA_GM_INVISIBLE;          //add flag
 
         SetAcceptWhispers(false);
