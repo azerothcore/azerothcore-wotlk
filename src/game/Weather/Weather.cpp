@@ -87,9 +87,8 @@ bool Weather::ReGenerate()
     ACE_OS::localtime_r(&gtime, &ltime);
     uint32 season = ((ltime.tm_yday - 78 + 365)/91)%4;
 
-    static char const* seasonName[WEATHER_SEASONS] = { "spring", "summer", "fall", "winter" };
-
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+    static char const* seasonName[WEATHER_SEASONS] = { "spring", "summer", "fall", "winter" };
     sLog->outDetail("Generating a change in %s weather for zone %u.", seasonName[season], m_zone);
 #endif
 

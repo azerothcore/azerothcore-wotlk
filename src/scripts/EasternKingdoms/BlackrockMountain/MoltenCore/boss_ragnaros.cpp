@@ -61,6 +61,7 @@ enum Events
     EVENT_INTRO_5               = 12
 };
 
+
 class boss_ragnaros : public CreatureScript
 {
     public:
@@ -83,6 +84,7 @@ class boss_ragnaros : public CreatureScript
                 _hasSubmergedOnce = false;
                 _isBanished = false;
                 me->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
+                me->SetOrientation(0.8f);
             }
 
             void EnterCombat(Unit* victim)

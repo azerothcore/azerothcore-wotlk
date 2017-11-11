@@ -438,8 +438,8 @@ void npc_escortAI::Start(bool isActiveAttacker /* = true*/, bool run /* = false 
     m_bCanInstantRespawn = instantRespawn;
     m_bCanReturnToStart = canLoopPath;
 
-    //if (m_bCanReturnToStart && m_bCanInstantRespawn)
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+    if (m_bCanReturnToStart && m_bCanInstantRespawn)
         sLog->outDebug(LOG_FILTER_TSCR, "TSCR: EscortAI is set to return home after waypoint end and instant respawn at waypoint end. Creature will never despawn.");
 #endif
 

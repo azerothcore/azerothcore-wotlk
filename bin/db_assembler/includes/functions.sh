@@ -1,12 +1,51 @@
+# globals
+PROMPT_USER=""
+PROMPT_PASS=""
+
+# use in a subshell
+function dbasm_resetExitCode() {
+	exit 0	
+}
+
+function dbasm_mysqlExec() {
+	confs=$1
+	command=$2
+	options=$3
+
+	eval $confs
+	
+	if [[ ! -z "${PROMPT_USER// }" ]]; then
+		MYSQL_USER=$PROMPT_USER
+		MYSQL_PASS=$PROMPT_PASS
+	fi
+	
+	export MYSQL_PWD=$MYSQL_PASS
+
+	retval=$("$DB_MYSQL_EXEC"  -h "$MYSQL_HOST" -u "$MYSQL_USER" $options -e "$command")
+	if [[ $? -ne 0 ]]; then
+		err=$("$DB_MYSQL_EXEC"  -h "$MYSQL_HOST" -u "$MYSQL_USER" $options -e "$command" 2>&1 )
+		if [[ "$err" == *"Access denied"* ]]; then
+			read -p "Insert mysql user:" PROMPT_USER
+			read -p "Insert mysql pass:" -s PROMPT_PASS
+			export MYSQL_PWD=$PROMPT_PASS
+
+            # create configured account if not exists
+            "$DB_MYSQL_EXEC"  -h "$MYSQL_HOST" -u "$PROMPT_USER" $options -e "CREATE USER '${MYSQL_USER}'@'${MYSQL_HOST}' IDENTIFIED BY '${MYSQL_PASS}' WITH MAX_QUERIES_PER_HOUR 0 MAX_CONNECTIONS_PER_HOUR 0 MAX_UPDATES_PER_HOUR 0;"
+            "$DB_MYSQL_EXEC"  -h "$MYSQL_HOST" -u "$PROMPT_USER" $options -e "GRANT USAGE ON * . * TO '${MYSQL_USER}'@'${MYSQL_HOST}'  WITH GRANT OPTION;"
+
+			retval=$("$DB_MYSQL_EXEC"  -h "$MYSQL_HOST" -u "$PROMPT_USER" $options -e "$command")
+		else
+			exit
+		fi
+	fi
+}
+
 function dbasm_isNotEmpty() {
     dbname=$1
     conf=$2
-
-    eval $confs;
-    export MYSQL_PWD=$MYSQL_PASS
-
-    RESULT=`"$DB_MYSQL_EXEC"  -h "$MYSQL_HOST" -u "$MYSQL_USER" --skip-column-names -e "SELECT COUNT(DISTINCT table_name) FROM information_schema.columns WHERE table_schema = '${dbname}'"`
-    if (( $RESULT > 0 )); then
+    
+    dbasm_mysqlExec "$conf" "SELECT COUNT(DISTINCT table_name) FROM information_schema.columns WHERE table_schema = '${dbname}'" "--skip-column-names"
+    if (( $retval > 0 )); then
         true
     else
         false
@@ -17,11 +56,8 @@ function dbasm_dbExists() {
     dbname=$1
     conf=$2
 
-    eval $confs;
-    export MYSQL_PWD=$MYSQL_PASS
-
-    RESULT=`"$DB_MYSQL_EXEC"  -h "$MYSQL_HOST" -u "$MYSQL_USER" --skip-column-names -e "SHOW DATABASES LIKE '${dbname}'"`
-    if [ "$RESULT" == "${dbname}" ]; then
+    dbasm_mysqlExec "$conf" "SHOW DATABASES LIKE '${dbname}'" "--skip-column-names"
+    if [ "$retval" == "${dbname}" ]; then
         true
     else
         false
@@ -38,17 +74,18 @@ function dbasm_createDB() {
 
     name="DB_"$uc"_NAME"
     dbname=${!name}
+    
+    eval $confs
 
-    eval $confs;
-
-    export MYSQL_PWD=$MYSQL_PASS
+    CONF_USER=$MYSQL_USER
+    CONF_PASS=$MYSQL_PASS
 
     if dbasm_dbExists $dbname "$confs"; then
         echo "$dbname database exists"
     else 
-        "$DB_MYSQL_EXEC"  -h "$MYSQL_HOST" -u "$MYSQL_USER" -e "GRANT USAGE ON * . * TO 'acore'@'${MYSQL_HOST}' IDENTIFIED BY 'acore' WITH MAX_QUERIES_PER_HOUR 0 MAX_CONNECTIONS_PER_HOUR 0 MAX_UPDATES_PER_HOUR 0 ;"
-        "$DB_MYSQL_EXEC"  -h "$MYSQL_HOST" -u "$MYSQL_USER" -e "CREATE DATABASE \`${dbname}\`"
-        "$DB_MYSQL_EXEC"  -h "$MYSQL_HOST" -u "$MYSQL_USER" -e "GRANT ALL PRIVILEGES ON \`${dbname}\` . * TO 'acore'@'${MYSQL_HOST}' WITH GRANT OPTION;"
+		echo "Creating DB ${dbname} ..."
+        dbasm_mysqlExec "$confs" "CREATE DATABASE \`${dbname}\`" ""
+        dbasm_mysqlExec "$confs" "GRANT ALL PRIVILEGES ON \`${dbname}\` . * TO '${CONF_USER}'@'${MYSQL_HOST}' WITH GRANT OPTION;"
     fi
 }
 
@@ -183,12 +220,29 @@ function dbasm_db_backup() {
     dbname=${!name}
 
     eval $confs;
+    
+	if [[ ! -z "${PROMPT_USER// }" ]]; then
+		MYSQL_USER=$PROMPT_USER
+		MYSQL_PASS=$PROMPT_PASS
+	fi
 
     export MYSQL_PWD=$MYSQL_PASS
 
     now=`date +%s`
 
-    "$DB_MYSQL_DUMP_EXEC" --opt --user="$MYSQL_USER" --host="$MYSQL_HOST" "$dbname" > "${BACKUP_FOLDER}${database}_backup_${now}.sql" && echo "done"
+	"$DB_MYSQL_DUMP_EXEC" --opt --user="$MYSQL_USER" --host="$MYSQL_HOST" "$dbname" > "${BACKUP_FOLDER}${database}_backup_${now}.sql" && echo "done"
+	if [[ $? -ne 0 ]]; then
+		err=$("$DB_MYSQL_DUMP_EXEC" --opt --user="$MYSQL_USER" --host="$MYSQL_HOST" "$dbname" 2>&1 )
+		if [[ "$err" == *"Access denied"* ]]; then
+			read -p "Insert mysql user:" PROMPT_USER
+			read -p "Insert mysql pass:" -s PROMPT_PASS
+			export MYSQL_PWD=$PROMPT_PASS
+
+			"$DB_MYSQL_DUMP_EXEC" --opt --user="$PROMPT_USER" --host="$MYSQL_HOST" "$dbname" > "${BACKUP_FOLDER}${database}_backup_${now}.sql" && echo "done"
+		else
+			exit
+		fi
+	fi
 }
 
 function dbasm_db_import() {
@@ -213,10 +267,27 @@ function dbasm_db_import() {
     echo "importing $1 - $2 ..."
 
     eval $confs;
+    
+	if [[ ! -z "${PROMPT_USER// }" ]]; then
+		MYSQL_USER=$PROMPT_USER
+		MYSQL_PASS=$PROMPT_PASS
+	fi
 
     export MYSQL_PWD=$MYSQL_PASS
+    
+	"$DB_MYSQL_EXEC" -h "$MYSQL_HOST" -u "$MYSQL_USER" "$dbname" < "${OUTPUT_FOLDER}${database}_${type}.sql"
+	if [[ $? -ne 0 ]]; then
+		err=$("$DB_MYSQL_EXEC" -h "$MYSQL_HOST" -u "$MYSQL_USER" "$dbname" 2>&1 )
+		if [[ "$err" == *"Access denied"* ]]; then
+			read -p "Insert mysql user:" PROMPT_USER
+			read -p "Insert mysql pass:" -s PROMPT_PASS
+			export MYSQL_PWD=$PROMPT_PASS
 
-    "$DB_MYSQL_EXEC" -h "$MYSQL_HOST" -u "$MYSQL_USER" "$dbname" < "${OUTPUT_FOLDER}${database}_${type}.sql"
+			"$DB_MYSQL_EXEC" -h "$MYSQL_HOST" -u "$PROMPT_USER" "$dbname" < "${OUTPUT_FOLDER}${database}_${type}.sql"
+		else
+			exit
+		fi
+	fi
 }
 
 function dbasm_import() {

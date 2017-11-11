@@ -176,8 +176,8 @@ void CreatureGroup::MemberAttackStart(Creature* member, Unit* target)
 
     for (CreatureGroupMemberType::iterator itr = m_members.begin(); itr != m_members.end(); ++itr)
     {
-        //if (m_leader) // avoid crash if leader was killed and reset.
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+        if (m_leader) // avoid crash if leader was killed and reset.
             sLog->outDebug(LOG_FILTER_UNITS, "GROUP ATTACK: group instance id %u calls member instid %u", m_leader->GetInstanceId(), member->GetInstanceId());
 #endif
 
@@ -200,7 +200,7 @@ void CreatureGroup::FormationReset(bool dismiss)
 {
     if (m_members.size() && m_members.begin()->second->groupAI == 5)
         return;
-    
+
     for (CreatureGroupMemberType::iterator itr = m_members.begin(); itr != m_members.end(); ++itr)
     {
         if (itr->first != m_leader && itr->first->IsAlive())

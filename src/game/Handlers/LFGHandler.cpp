@@ -137,10 +137,10 @@ void WorldSession::HandleLfgSetRolesOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleLfgSetCommentOpcode(WorldPacket&  recvData)
 {
-    uint64 guid = GetPlayer()->GetGUID();
     std::string comment;
     recvData >> comment;
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+    uint64 guid = GetPlayer()->GetGUID();
     sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_LFG_SET_COMMENT [" UI64FMTD "] comment: %s", guid, comment.c_str());
 #endif
 

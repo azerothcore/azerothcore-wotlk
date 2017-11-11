@@ -3,9 +3,19 @@ function inst_configureOS() {
     case "$OSTYPE" in
         solaris*) echo "Solaris is not supported yet" ;;
         darwin*)  source "$AC_PATH_INSTALLER/includes/os_configs/osx.sh" ;;  
-        linux*)   
+        linux*)
+            # If available, use LSB to identify distribution
+            if [ -f /etc/lsb-release -o -d /etc/lsb-release.d ]; then
+                DISTRO=$(lsb_release -i | cut -d: -f2 | sed s/'^\t'//)
+            # Otherwise, use release info file
+            else
+                DISTRO=$(ls -d /etc/[A-Za-z]*[_-][rv]e[lr]* | grep -v "lsb" | cut -d'/' -f3 | cut -d'-' -f1 | cut -d'_' -f1)
+            fi
+
+            DISTRO=${DISTRO,,}
+
             # TODO: implement different configurations by distro
-            source "$AC_PATH_INSTALLER/includes/os_configs/linux.sh"
+            source "$AC_PATH_INSTALLER/includes/os_configs/$DISTRO.sh"
         ;;
         bsd*)     echo "BSD is not supported yet" ;;
         msys*)    source "$AC_PATH_INSTALLER/includes/os_configs/windows.sh" ;;
@@ -14,10 +24,12 @@ function inst_configureOS() {
 }
 
 function inst_updateRepo() {
+    cd "$AC_PATH_ROOT"
     git pull origin $(git rev-parse --abbrev-ref HEAD)
 }
 
 function inst_resetRepo() {
+    cd "$AC_PATH_ROOT"
     git reset --hard $(git rev-parse --abbrev-ref HEAD)
     git clean -f
 }
@@ -68,7 +80,7 @@ function inst_module_install {
         read -p "Insert name: " res
     fi
 
-    git clone "https://github.com/azerothcore/$res" "modules/$res" && echo "Done, please re-run compiling and db assembly. Read instruction on module repository for more information"
+    git clone "https://github.com/azerothcore/$res" "$AC_PATH_ROOT/modules/$res" && echo "Done, please re-run compiling and db assembly. Read instruction on module repository for more information"
 
     echo "";
     echo "";
@@ -80,7 +92,7 @@ function inst_module_update {
         read -p "Insert name: " res
     fi
 
-    cd "modules/$res"
+    cd "$AC_PATH_ROOT/modules/$res"
 
     #git reset --hard master
     #git clean -f
@@ -98,7 +110,7 @@ function inst_module_remove {
         read -p "Insert name: " res
     fi
 
-    rm -rf "modules/$res" && echo "Done"
+    rm -rf "$AC_PATH_ROOT/modules/$res" && echo "Done"
 
     echo "";
     echo "";
