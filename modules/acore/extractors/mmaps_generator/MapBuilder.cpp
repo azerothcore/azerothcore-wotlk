@@ -32,11 +32,21 @@ struct MmapTileHeader
     uint32 dtVersion;
     uint32 mmapVersion;
     uint32 size;
-    bool usesLiquids : 1;
+    char usesLiquids;
+    char padding[3];
 
     MmapTileHeader() : mmapMagic(MMAP_MAGIC), dtVersion(DT_NAVMESH_VERSION),
-        mmapVersion(MMAP_VERSION), size(0), usesLiquids(true) {}
+        mmapVersion(MMAP_VERSION), size(0), usesLiquids(true), padding() {}
 };
+
+// All padding fields must be handled and initialized to ensure mmaps_generator will produce binary-identical *.mmtile files
+static_assert(sizeof(MmapTileHeader) == 20, "MmapTileHeader size is not correct, adjust the padding field size");
+static_assert(sizeof(MmapTileHeader) == (sizeof(MmapTileHeader::mmapMagic) +
+                                         sizeof(MmapTileHeader::dtVersion) +
+                                         sizeof(MmapTileHeader::mmapVersion) +
+                                         sizeof(MmapTileHeader::size) +
+                                         sizeof(MmapTileHeader::usesLiquids) +
+                                         sizeof(MmapTileHeader::padding)), "MmapTileHeader has uninitialized padding fields");
 
 namespace MMAP
 {
@@ -56,6 +66,10 @@ namespace MMAP
         m_terrainBuilder = new TerrainBuilder(skipLiquid);
 
         m_rcContext = new rcContext(false);
+
+        // percentageDone - Initializing
+        m_totalTiles = 0;
+        m_totalTilesBuilt = 0;
 
         discoverTiles();
     }
@@ -136,6 +150,9 @@ namespace MMAP
             }
         }
         printf("found %u.\n\n", count);
+
+        // percentageDone - total tiles to process
+        m_totalTiles = count;
     }
 
     /**************************************************************************/
@@ -382,7 +399,8 @@ namespace MMAP
     /**************************************************************************/
     void MapBuilder::buildTile(uint32 mapID, uint32 tileX, uint32 tileY, dtNavMesh* navMesh)
     {
-        printf("[Map %03i] Building tile [%02u,%02u]\n", mapID, tileX, tileY);
+        // percentageDone - added, now it will show addional reference percentage done of the overall process
+        printf("%u%% [Map %03i] Building tile [%02u,%02u]\n", percentageDone(m_totalTiles, m_totalTilesBuilt), mapID, tileX, tileY);
 
         MeshData meshData;
 
@@ -416,6 +434,9 @@ namespace MMAP
 
         // build navmesh tile
         buildMoveMapTile(mapID, tileX, tileY, meshData, bmin, bmax, navMesh);
+
+        // percentageDone - increment tiles built
+        m_totalTilesBuilt++;
     }
 
     /**************************************************************************/
@@ -970,5 +991,13 @@ namespace MMAP
 
         return true;
     }
+    
+    /**************************************************************************/
+    uint32 MapBuilder::percentageDone(uint32 totalTiles, uint32 totalTilesBuilt)
+    {
+        if (totalTiles)
+            return totalTilesBuilt * 100 / totalTiles;
 
+        return 0;
+    }
 }

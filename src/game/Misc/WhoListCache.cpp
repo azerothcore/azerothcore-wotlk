@@ -35,7 +35,7 @@ void WhoListCacheMgr::Update()
         wstrToLower(wgname);
 
         std::string aname;
-        if (AreaTableEntry const* areaEntry = GetAreaEntryByAreaID(itr->second->GetZoneId()))
+        if (AreaTableEntry const* areaEntry = sAreaTableStore.LookupEntry(itr->second->GetZoneId()))
             aname = areaEntry->area_name[sWorld->GetDefaultDbcLocale()];
 
         if (itr->second->IsSpectator())
