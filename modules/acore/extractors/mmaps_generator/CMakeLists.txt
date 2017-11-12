@@ -20,7 +20,7 @@ set(mmap_gen_Includes
   ${CMAKE_SOURCE_DIR}/modules/worldengine/deps/bzip2
   ${CMAKE_SOURCE_DIR}/modules/worldengine/deps/g3dlite/include
   ${CMAKE_SOURCE_DIR}/modules/worldengine/deps/recastnavigation/Recast
-  ${CMAKE_SOURCE_DIR}/modules/worldengine/deps/recastnavigation/Detour/Include
+  ${CMAKE_SOURCE_DIR}/modules/worldengine/deps/recastnavigation/Detour
   ${CMAKE_SOURCE_DIR}/modules/worldengine/lib-collision/src/
   ${CMAKE_SOURCE_DIR}/modules/worldengine/lib-collision/src/Management
   ${CMAKE_SOURCE_DIR}/modules/worldengine/lib-collision/src/Maps
