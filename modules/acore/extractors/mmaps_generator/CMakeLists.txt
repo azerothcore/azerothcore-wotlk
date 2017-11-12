@@ -124,7 +124,7 @@ target_link_libraries(mmaps_generator
   collision
   g3dlib
   Recast
-  Detour/Include
+  Detour
   ${ACE_LIBRARY}
   ${MYSQL_LIBRARY}
   ${OPENSSL_LIBRARIES}
