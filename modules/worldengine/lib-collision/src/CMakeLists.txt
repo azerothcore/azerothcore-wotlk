@@ -85,7 +85,6 @@ add_library(collision STATIC
 
 target_link_libraries(collision
   shared
-  detour
 )
 
 # Generate precompiled header
