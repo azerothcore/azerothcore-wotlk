@@ -21,7 +21,7 @@ set(gamefw_STAT_SRCS
 
 include_directories(
   ${CMAKE_BINARY_DIR}
-  ${CMAKE_SOURCE_DIR}/modules/worldengine/deps/recastnavigation/Detour/Include
+  ${CMAKE_SOURCE_DIR}/modules/worldengine/deps/recastnavigation/Detour
   ${CMAKE_SOURCE_DIR}/modules/worldengine/deps/recastnavigation/Recast
   ${CMAKE_SOURCE_DIR}/modules/worldengine/deps/g3dlite/include
   ${CMAKE_SOURCE_DIR}/modules/worldengine/deps/SFMT
