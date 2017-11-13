@@ -107,7 +107,7 @@ class spell_the_flag_of_ownership : public SpellScriptLoader
                 return true;
             }
 
-            void HandleScript(SpellEffIndex effIndex)
+            void HandleScript(SpellEffIndex  /*effIndex*/)
             {
                 Unit* caster = GetCaster();
                 if (!caster || caster->GetTypeId() != TYPEID_PLAYER)
@@ -216,7 +216,7 @@ class spell_gen_mine_sweeper : public SpellScriptLoader
         {
             PrepareSpellScript(spell_gen_mine_sweeper_SpellScript);
 
-            void HandleSchoolDMG(SpellEffIndex effIndex)
+            void HandleSchoolDMG(SpellEffIndex  /*effIndex*/)
             {
                 Unit* caster = GetCaster();
                 Player* target = GetHitPlayer();
@@ -227,7 +227,7 @@ class spell_gen_mine_sweeper : public SpellScriptLoader
                 caster->CastSpell(target, 54402, true);
             }
 
-            void HandleScriptEffect(SpellEffIndex effIndex)
+            void HandleScriptEffect(SpellEffIndex  /*effIndex*/)
             {
                 if (Unit* target = GetHitPlayer())
                     if (Aura* aur = target->GetAura(GetSpellInfo()->Id))
@@ -285,7 +285,7 @@ class spell_gen_reduced_above_60 : public SpellScriptLoader
         {
             PrepareAuraScript(spell_gen_reduced_above_60_AuraScript);
 
-            void CalculateAmount(AuraEffect const* /*aurEff*/, int32 & amount, bool & canBeRecalculated)
+            void CalculateAmount(AuraEffect const* /*aurEff*/, int32 & amount, bool &  /*canBeRecalculated*/)
             {
                 if (Unit* owner = GetUnitOwner())
                     if (owner->getLevel() > 60) 
@@ -404,7 +404,7 @@ public:
             amplitude = 3*IN_MILLISECONDS;
         }
 
-        void Update(AuraEffect* effect)
+        void Update(AuraEffect*  /*effect*/)
         {
             if (Player* player = GetUnitOwner()->GetCharmerOrOwnerPlayerOrPlayerItself())
                 if (MapEntry const* mapEntry = sMapStore.LookupEntry(player->GetMapId()))
@@ -486,7 +486,7 @@ class spell_pet_hit_expertise_scalling : public SpellScriptLoader
                 return (hitChance / cap) * maxChance;
             }
             
-            void CalculateHitAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
+            void CalculateHitAmount(AuraEffect const*  /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
             {
                 if (Player* modOwner = GetUnitOwner()->GetSpellModOwner())
                 {
@@ -499,7 +499,7 @@ class spell_pet_hit_expertise_scalling : public SpellScriptLoader
                 }
             }
 
-            void CalculateSpellHitAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
+            void CalculateSpellHitAmount(AuraEffect const*  /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
             {
                 if (Player* modOwner = GetUnitOwner()->GetSpellModOwner())
                 {
@@ -512,7 +512,7 @@ class spell_pet_hit_expertise_scalling : public SpellScriptLoader
                 }
             }
 
-            void CalculateExpertiseAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
+            void CalculateExpertiseAmount(AuraEffect const*  /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
             {
                 if (Player* modOwner = GetUnitOwner()->GetSpellModOwner())
                 {
@@ -666,7 +666,7 @@ class spell_gen_disabled_above_63 : public SpellScriptLoader
         {
             PrepareAuraScript(spell_gen_disabled_above_63_AuraScript);
 
-            void CalculateAmount(AuraEffect const* /*aurEff*/, int32 & amount, bool & canBeRecalculated)
+            void CalculateAmount(AuraEffect const* /*aurEff*/, int32 & amount, bool &  /*canBeRecalculated*/)
             {
                 Unit* target = GetUnitOwner();
                 if (target->getLevel() <= 63)
@@ -1357,7 +1357,7 @@ class spell_gen_flurry_of_claws : public SpellScriptLoader
         {
             PrepareAuraScript(spell_gen_flurry_of_claws_AuraScript);
 
-            void OnPeriodic(AuraEffect const* aurEff)
+            void OnPeriodic(AuraEffect const*  /*aurEff*/)
             {
                 PreventDefaultAction();
                 if (Unit* target = GetUnitOwner()->SelectNearbyTarget(NULL, 7.0f))
@@ -1706,6 +1706,47 @@ class spell_gen_create_lance : public SpellScriptLoader
         SpellScript* GetSpellScript() const
         {
             return new spell_gen_create_lance_SpellScript();
+        }
+};
+
+enum MossCoveredFeet
+{
+    SPELL_FALL_DOWN = 6869
+};
+
+// 6870 Moss Covered Feet
+// 31399 Moss Covered Feet
+class spell_gen_moss_covered_feet : public SpellScriptLoader
+{
+    public:
+        spell_gen_moss_covered_feet() : SpellScriptLoader("spell_gen_moss_covered_feet") { }
+
+        class spell_gen_moss_covered_feet_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_gen_moss_covered_feet_AuraScript);
+
+            bool Validate(SpellInfo const* /*spellInfo*/) override
+            {
+                if (!sSpellMgr->GetSpellInfo(SPELL_FALL_DOWN))
+                    return false;
+                return true;
+            }
+
+            void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+            {
+                PreventDefaultAction();
+                eventInfo.GetActionTarget()->CastSpell((Unit*)nullptr, SPELL_FALL_DOWN, true, nullptr, aurEff);
+            }
+
+            void Register() override
+            {
+                OnEffectProc += AuraEffectProcFn(spell_gen_moss_covered_feet_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+            }
+        };
+
+        AuraScript* GetAuraScript() const override
+        {
+            return new spell_gen_moss_covered_feet_AuraScript();
         }
 };
 
@@ -2159,7 +2200,7 @@ class spell_pvp_trinket_wotf_shared_cd : public SpellScriptLoader
                 // Spell::SendSpellCooldown() skips all spells with TRIGGERED_IGNORE_SPELL_AND_CATEGORY_CD
                 player->AddSpellAndCategoryCooldowns(GetSpellInfo(), GetCastItem() ? GetCastItem()->GetEntry() : 0, GetSpell());
 
-                if (player->GetTeamId(true) == TEAM_HORDE)
+                if (player->GetTeamId(true) == TEAM_HORDE) {
                     if (GetSpellInfo()->Id == SPELL_WILL_OF_THE_FORSAKEN_COOLDOWN_TRIGGER)
                     {
                         WorldPacket data;
@@ -2184,6 +2225,7 @@ class spell_pvp_trinket_wotf_shared_cd : public SpellScriptLoader
                         player->GetSession()->SendPacket(&data2);
 
                     }
+                }
             }
 
             void Register()
@@ -2201,7 +2243,8 @@ class spell_pvp_trinket_wotf_shared_cd : public SpellScriptLoader
 enum AnimalBloodPoolSpell
 {
     SPELL_ANIMAL_BLOOD      = 46221,
-    SPELL_SPAWN_BLOOD_POOL  = 63471
+    SPELL_SPAWN_BLOOD_POOL  = 63471,
+    FACTION_DETHA_ATTACK    = 942
 };
 
 class spell_gen_animal_blood : public SpellScriptLoader
@@ -2225,13 +2268,20 @@ class spell_gen_animal_blood : public SpellScriptLoader
                 // Remove all auras with spell id 46221, except the one currently being applied
                 while (Aura* aur = GetUnitOwner()->GetOwnedAura(SPELL_ANIMAL_BLOOD, 0, 0, 0, GetAura()))
                     GetUnitOwner()->RemoveOwnedAura(aur);
+                if (Unit* owner = GetUnitOwner())
+                {
+                    owner->setFaction(FACTION_DETHA_ATTACK);
+                }
             }
 
             void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
                 if (Unit* owner = GetUnitOwner())
+                {
+                    owner->RestoreFaction();
                     if (owner->IsInWater())
                         owner->CastSpell(owner, SPELL_SPAWN_BLOOD_POOL, true);
+                }
             }
 
             void Register()
@@ -4113,6 +4163,56 @@ class spell_gen_bandage : public SpellScriptLoader
         }
 };
 
+// Blade Warding - 64440
+enum BladeWarding
+{
+	SPELL_GEN_BLADE_WARDING_TRIGGERED = 64442
+};
+
+class spell_gen_blade_warding : public SpellScriptLoader
+{
+public:
+	spell_gen_blade_warding() : SpellScriptLoader("spell_gen_blade_warding") { }
+
+	class spell_gen_blade_warding_AuraScript : public AuraScript
+	{
+		PrepareAuraScript(spell_gen_blade_warding_AuraScript);
+
+		bool Validate(SpellInfo const* /*spellInfo*/)
+		{
+			if (!sSpellMgr->GetSpellInfo(SPELL_GEN_BLADE_WARDING_TRIGGERED))
+				return false;
+			return true;
+		}
+
+		void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+		{
+			PreventDefaultAction();
+
+			Unit* caster = eventInfo.GetActionTarget();
+			SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(SPELL_GEN_BLADE_WARDING_TRIGGERED);
+
+			uint8 stacks = GetStackAmount();
+			int32 bp = 0;
+
+			for (uint8 i = 0; i < stacks; ++i)
+				bp += spellInfo->Effects[EFFECT_0].CalcValue(caster);
+
+			caster->CastCustomSpell(SPELL_GEN_BLADE_WARDING_TRIGGERED, SPELLVALUE_BASE_POINT0, bp, eventInfo.GetActor(), TRIGGERED_FULL_MASK, nullptr, aurEff);
+		}
+
+		void Register()
+		{
+			OnEffectProc += AuraEffectProcFn(spell_gen_blade_warding_AuraScript::HandleProc, EFFECT_1, SPELL_AURA_PROC_TRIGGER_SPELL);
+		}
+	};
+
+	AuraScript* GetAuraScript() const
+	{
+		return new spell_gen_blade_warding_AuraScript();
+	}
+};
+
 enum GenericLifebloom
 {
     SPELL_HEXLORD_MALACRASS_LIFEBLOOM_FINAL_HEAL        = 43422,
@@ -4910,6 +5010,7 @@ void AddSC_generic_spell_scripts()
     new spell_gen_break_shield("spell_gen_break_shield");
     new spell_gen_break_shield("spell_gen_tournament_counterattack");
     new spell_gen_mounted_charge();
+    new spell_gen_moss_covered_feet();
     new spell_gen_defend();
     new spell_gen_tournament_duel();
     new spell_gen_summon_tournament_mount();
@@ -4922,6 +5023,7 @@ void AddSC_generic_spell_scripts()
     new spell_gen_count_pct_from_max_hp("spell_gen_100pct_count_pct_from_max_hp", 100);
     new spell_gen_despawn_self();
     new spell_gen_bandage();
+    new spell_gen_blade_warding();
     new spell_gen_lifebloom("spell_hexlord_lifebloom", SPELL_HEXLORD_MALACRASS_LIFEBLOOM_FINAL_HEAL);
     new spell_gen_lifebloom("spell_tur_ragepaw_lifebloom", SPELL_TUR_RAGEPAW_LIFEBLOOM_FINAL_HEAL);
     new spell_gen_lifebloom("spell_cenarion_scout_lifebloom", SPELL_CENARION_SCOUT_LIFEBLOOM_FINAL_HEAL);

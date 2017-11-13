@@ -4,9 +4,9 @@ GDB_FILE="$2"
 CONFIG="$3"
 SYSLOG="$4"
 SYSERR="$5"
-GBD_ENABLED="$6"
+GDB_ENABLED="$6"
 
-if [ $GBD_ENABLED -eq 1 ]; then
+if [ $GDB_ENABLED -eq 1 ]; then
     echo "set logging on" > "$GDB_FILE"
     echo "set debug timestamp" >> "$GDB_FILE"
     echo "run -c $3" >> "$GDB_FILE"
@@ -22,6 +22,6 @@ if [ $GBD_ENABLED -eq 1 ]; then
         gdb -x $GDB_FILE --batch $1   > >(tee ${SYSLOG}) 2> >(tee ${SYSERR} >&2)
     fi
 
-elif [ $GBD_ENABLED -eq 0 ]; then
+elif [ $GDB_ENABLED -eq 0 ]; then
     "./$1" -c "$CONFIG"
 fi

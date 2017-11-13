@@ -38,9 +38,9 @@ enum Misc
 
 const Position PosWrap[3] =
 {
-    {3546.796f, -3869.082f, 296.450f},
-    {3531.271f, -3847.424f, 299.450f},
-    {3497.067f, -3843.384f, 302.384f}
+    {3546.796f, -3869.082f, 296.450f, 0.0f},
+    {3531.271f, -3847.424f, 299.450f, 0.0f},
+    {3497.067f, -3843.384f, 302.384f, 0.0f}
 };
 
 class boss_maexxna : public CreatureScript
@@ -89,7 +89,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit *who)
+        void EnterCombat(Unit * /*who*/)
         {
             me->SetInCombatWithZone();
             events.ScheduleEvent(EVENT_WEB_WRAP, 20000);
@@ -107,7 +107,7 @@ public:
             }
         }
 
-        void JustDied(Unit* Killer)
+        void JustDied(Unit*  /*Killer*/)
         {
             if (pInstance)
                 pInstance->SetData(EVENT_MAEXXNA, DONE);
@@ -182,9 +182,11 @@ public:
                             target->RemoveAura(RAID_MODE(SPELL_WEB_SPRAY_10, SPELL_WEB_SPRAY_25));
                             uint8 pos = urand(0,2);
 
-                            target->GetMotionMaster()->MoveJump(PosWrap[pos].GetPositionX(), PosWrap[pos].GetPositionY(), PosWrap[pos].GetPositionZ(), 20, 20);
                             if (Creature *wrap = me->SummonCreature(NPC_WEB_WRAP, PosWrap[pos].GetPositionX(), PosWrap[pos].GetPositionY(), PosWrap[pos].GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, 60000))
+                            {
                                 wrap->AI()->SetGUID(target->GetGUID());
+                                target->GetMotionMaster()->MoveJump(PosWrap[pos].GetPositionX(), PosWrap[pos].GetPositionY(), PosWrap[pos].GetPositionZ(), 20, 20);
+                            }
                         }
                     events.RepeatEvent(40000);
                     break;
@@ -211,7 +213,7 @@ public:
         boss_maexxna_webwrapAI(Creature *c) : NullCreatureAI(c), victimGUID(0) {}
 
         uint64 victimGUID;
-        void SetGUID(uint64 guid, int32 param)
+        void SetGUID(uint64 guid, int32  /*param*/)
         {
             victimGUID = guid;
             if (me->m_spells[0] && victimGUID)
@@ -219,7 +221,7 @@ public:
                     victim->CastSpell(victim, me->m_spells[0], true, NULL, NULL, me->GetGUID());
         }
 
-        void JustDied(Unit *killer)
+        void JustDied(Unit * /*killer*/)
         {
             if (me->m_spells[0] && victimGUID)
                 if (Unit *victim = ObjectAccessor::GetUnit(*me, victimGUID))

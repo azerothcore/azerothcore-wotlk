@@ -27,8 +27,8 @@
 
 Pet::Pet(Player* owner, PetType type) : Guardian(NULL, owner ? owner->GetGUID() : 0, true),
 m_usedTalentCount(0), m_removed(false), m_owner(owner),
-m_happinessTimer(PET_LOSE_HAPPINES_INTERVAL), m_petRegenTimer(PET_FOCUS_REGEN_INTERVAL), m_petType(type), m_duration(0),
-m_auraRaidUpdateMask(0), m_loading(false), m_declinedname(NULL), m_tempspell(0), m_tempspellTarget(NULL), m_tempoldTarget(NULL), m_tempspellIsPositive(false), asynchLoadType(PET_LOAD_DEFAULT)
+m_happinessTimer(PET_LOSE_HAPPINES_INTERVAL), m_petType(type), m_duration(0),
+m_auraRaidUpdateMask(0), m_loading(false), m_petRegenTimer(PET_FOCUS_REGEN_INTERVAL), m_declinedname(NULL), m_tempspellTarget(NULL), m_tempoldTarget(NULL), m_tempspellIsPositive(false), m_tempspell(0), asynchLoadType(PET_LOAD_DEFAULT)
 {
     m_unitTypeMask |= UNIT_MASK_PET;
     if (type == HUNTER_PET)
@@ -493,6 +493,8 @@ void Pet::Update(uint32 diff)
 
             break;
         }
+        default:
+            break;
     }
 
     Creature::Update(diff);
@@ -625,7 +627,9 @@ bool Pet::CreateBaseAtCreatureInfo(CreatureTemplate const* cinfo, Unit* owner)
 
 bool Pet::CreateBaseAtTamed(CreatureTemplate const* cinfo, Map* map, uint32 phaseMask)
 { 
-    ;//sLog->outDebug(LOG_FILTER_PETS, "Pet::CreateBaseForTamed");
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+    sLog->outDebug(LOG_FILTER_PETS, "Pet::CreateBaseForTamed");
+#endif
     uint32 guid=sObjectMgr->GenerateLowGuid(HIGHGUID_PET);
     uint32 pet_number = sObjectMgr->GeneratePetNumber();
     if (!Create(guid, map, phaseMask, cinfo->Entry, pet_number))
@@ -770,19 +774,22 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
         }
         case SUMMON_PET:
         {
-            SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(petlevel - (petlevel / 4)));
-            SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(petlevel + (petlevel / 4)));
+
+            if (pInfo)
+            {
+                SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(pInfo->min_dmg));
+                SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(pInfo->max_dmg));
+            }
+            else
+            {
+                SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(petlevel - (petlevel / 4)));
+                SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(petlevel + (petlevel / 4)));
+            }
 
             switch(GetEntry())
             {
                 case NPC_FELGUARD:
                 {
-                    float highAmt = petlevel / 11.0f;
-                    float lowAmt = petlevel / 12.0f;
-
-                    SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, lowAmt*lowAmt*lowAmt);
-                    SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, highAmt*highAmt*highAmt);
-
                     // xinef: Glyph of Felguard, so ugly im crying... no appropriate spell
                     if (AuraEffect* aurEff = m_owner->GetAuraEffectDummy(SPELL_GLYPH_OF_FELGUARD))
                         SetModifierValue(UNIT_MOD_ATTACK_POWER, TOTAL_PCT, 1.0f + float(aurEff->GetAmount() / 100.0f));
@@ -959,7 +966,12 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                 {
                     AddAura(SPELL_HUNTER_PET_SCALING_04, this);
                     AddAura(SPELL_DK_PET_SCALING_01, this);
+                    AddAura(SPELL_DK_PET_SCALING_02, this);
+                    AddAura(SPELL_DK_PET_SCALING_03, this);
                     AddAura(SPELL_PET_AVOIDANCE, this);
+
+                    SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(petlevel - (petlevel / 4)));
+                    SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(petlevel + (petlevel / 4)));
                     break;
                 }
                 case NPC_GENERIC_IMP:
@@ -1072,7 +1084,9 @@ void Pet::_LoadSpellCooldowns(PreparedQueryResult result)
             cooldowns[spell_id] = cooldown;
             _AddCreatureSpellCooldown(spell_id, cooldown);
 
-            ;//sLog->outDebug(LOG_FILTER_PETS, "Pet (Number: %u) spell %u cooldown loaded (%u secs).", m_charmInfo->GetPetNumber(), spell_id, uint32(db_time-curTime));
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+            sLog->outDebug(LOG_FILTER_PETS, "Pet (Number: %u) spell %u cooldown loaded (%u secs).", m_charmInfo->GetPetNumber(), spell_id, uint32(db_time-curTime));
+#endif
         }
         while (result->NextRow());
 
@@ -1179,7 +1193,9 @@ void Pet::_SaveSpells(SQLTransaction& trans)
 
 void Pet::_LoadAuras(PreparedQueryResult result, uint32 timediff)
 { 
-    ;//sLog->outDebug(LOG_FILTER_PETS, "Loading auras for pet %u", GetGUIDLow());
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+    sLog->outDebug(LOG_FILTER_PETS, "Loading auras for pet %u", GetGUIDLow());
+#endif
 
     if (result)
     {
@@ -1213,6 +1229,15 @@ void Pet::_LoadAuras(PreparedQueryResult result, uint32 timediff)
                 continue;
             }
 
+            // avoid higher level auras if any, and adjust
+            SpellInfo const* scaledSpellInfo = spellInfo->GetAuraRankForLevel(getLevel());
+            if (scaledSpellInfo != spellInfo)
+                spellInfo = scaledSpellInfo;
+
+            // again after level check
+            if (!spellInfo)
+                continue;
+
             // negative effects should continue counting down after logout
             if (remaintime != -1 && !spellInfo->IsPositive())
             {
@@ -1240,7 +1265,9 @@ void Pet::_LoadAuras(PreparedQueryResult result, uint32 timediff)
                 }
                 aura->SetLoadedState(maxduration, remaintime, remaincharges, stackcount, recalculatemask, &damage[0]);
                 aura->ApplyForTargets();
-                ;//sLog->outDetail("Added aura spellid %u, effectmask %u", spellInfo->Id, effmask);
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+                sLog->outDetail("Added aura spellid %u, effectmask %u", spellInfo->Id, effmask);
+#endif
             }
         }
         while (result->NextRow());

@@ -34,7 +34,7 @@ public:
         return commandTable;
     }
 
-    static bool HandleSpectatorCommand(ChatHandler* handler, char const* args)
+    static bool HandleSpectatorCommand(ChatHandler* handler, char const*  /*args*/)
     {
         handler->PSendSysMessage("Incorrect syntax.");
         handler->PSendSysMessage("Command has subcommands:");
@@ -50,7 +50,7 @@ public:
         return true;
     }
 
-    static bool HandleSpectatorResetCommand(ChatHandler* handler, char const* args)
+    static bool HandleSpectatorResetCommand(ChatHandler* handler, char const*  /*args*/)
     {
         Player* p = handler->GetSession()->GetPlayer();
         if (!p->IsSpectator())
@@ -59,7 +59,7 @@ public:
         return true;
     }
 
-    static bool HandleSpectatorLeaveCommand(ChatHandler* handler, char const* args)
+    static bool HandleSpectatorLeaveCommand(ChatHandler* handler, char const*  /*args*/)
     {
         Player* player = handler->GetSession()->GetPlayer();
         if (!player->IsSpectator() || !player->FindMap() || !player->FindMap()->IsBattleArena())
@@ -180,8 +180,8 @@ bool ArenaSpectator::HandleSpectatorSpectateCommand(ChatHandler* handler, char c
     }
 
     bool bgPreparation = false;
-    if (!handler->GetSession()->GetSecurity() && bgmap->GetBG()->GetStatus() != STATUS_IN_PROGRESS ||
-        handler->GetSession()->GetSecurity() && bgmap->GetBG()->GetStatus() != STATUS_WAIT_JOIN && bgmap->GetBG()->GetStatus() != STATUS_IN_PROGRESS)
+    if ((!handler->GetSession()->GetSecurity() && bgmap->GetBG()->GetStatus() != STATUS_IN_PROGRESS) ||
+        (handler->GetSession()->GetSecurity() && bgmap->GetBG()->GetStatus() != STATUS_WAIT_JOIN && bgmap->GetBG()->GetStatus() != STATUS_IN_PROGRESS))
     {
         bgPreparation = true;
         handler->SendSysMessage("Arena is not in progress yet. You will be invited as soon as it starts.");
@@ -193,7 +193,7 @@ bool ArenaSpectator::HandleSpectatorSpectateCommand(ChatHandler* handler, char c
     {
         handler->PSendSysMessage("To spectate, please fix the following:");
         for (std::list<std::string>::const_iterator itr = errors.begin(); itr != errors.end(); ++itr)
-            handler->PSendSysMessage(("- "+(*itr)).c_str());
+            handler->PSendSysMessage("- %s",(*itr).c_str());
 
         return true;
     }

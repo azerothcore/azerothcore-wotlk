@@ -77,7 +77,7 @@ public:
             me->SetLootMode(0);
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit*  /*victim*/)
         {
             if (events.GetNextEventTime(EVENT_RECENTLY_SPOKEN) == 0)
             {

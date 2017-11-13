@@ -34,7 +34,7 @@ function export() {
     base_name=${!var_base_name}
 
 
-    bash $AC_PATH_MODULES"/uwd/mysql-tools/mysql-tools" dump "" $base_name "" "$base_conf"
+    bash $AC_PATH_MODULES"/drassil/mysql-tools/mysql-tools" dump "" $base_name "" "$base_conf"
 }
 
 for db in ${DATABASES[@]}

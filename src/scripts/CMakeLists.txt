@@ -10,6 +10,8 @@
 
 # Enable precompiled headers when using the GCC compiler.
 
+CU_RUN_HOOK(BEFORE_SCRIPTS_LIBRARY)
+
 CU_SET_PATH("AC_SCRIPTS_DIR" "${CMAKE_CURRENT_LIST_DIR}")
 
 if (USE_SCRIPTPCH)
@@ -49,7 +51,7 @@ if(SCRIPTS)
   include(Pet/CMakeLists.txt)
 endif()
 
-if(EXISTS "Custom/CMakeLists.txt")
+if(EXISTS "${AC_SCRIPTS_DIR}/Custom/CMakeLists.txt")
 include(Custom/CMakeLists.txt)
 endif()
 
@@ -74,6 +76,7 @@ message(STATUS "SCRIPT PREPARATION COMPLETE")
 message("")
 
 include_directories(
+  ${scripts_INCLUDE_DIRS}
   ${CMAKE_BINARY_DIR}
   ${CMAKE_SOURCE_DIR}/modules/worldengine/deps/recastnavigation/Detour
   ${CMAKE_SOURCE_DIR}/modules/worldengine/deps/recastnavigation/Recast

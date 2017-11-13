@@ -14,7 +14,7 @@
 #define ICCScriptName "instance_icecrown_citadel"
 
 uint32 const WeeklyNPCs = 9;
-uint32 const MaxHeroicAttempts = 25;
+uint32 const MaxHeroicAttempts = 50;
 
 // Defined in boss_valithria_dreamwalker.cpp
 extern Position const ValithriaSpawnPos;

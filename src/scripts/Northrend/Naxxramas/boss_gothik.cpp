@@ -182,7 +182,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit *who)
+        void EnterCombat(Unit * /*who*/)
         {
             me->SetInCombatWithZone();
             Talk(SAY_SPEECH);
@@ -225,7 +225,7 @@ public:
                 pInstance->SetData(DATA_IMMORTAL_FAIL, 0);
         }
 
-        void JustDied(Unit* Killer)
+        void JustDied(Unit*  /*Killer*/)
         {
             Talk(SAY_DEATH);
             summons.DespawnAll();
@@ -293,7 +293,7 @@ public:
             return false;
         }
 
-        void SpellHit(Unit *caster, const SpellInfo* spellInfo)
+        void SpellHit(Unit * /*caster*/, const SpellInfo* spellInfo)
         {
             uint8 pos = urand(0,4);
             switch (spellInfo->Id)
@@ -438,7 +438,7 @@ public:
         bool CanAIAttack(Unit const* target) const { return gateOpened || IsOnSameSide(target); }
 
         void Reset() { events.Reset(); }
-        void EnterCombat(Unit* who) { me->SetInCombatWithZone(); }
+        void EnterCombat(Unit*  /*who*/) { me->SetInCombatWithZone(); }
         void DamageTaken(Unit* attacker, uint32 &damage, DamageEffectType, SpellSchoolMask)
         {
             if (!attacker || (!gateOpened && !IsOnSameSide(attacker)))

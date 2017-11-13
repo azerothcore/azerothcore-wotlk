@@ -115,7 +115,7 @@ public:
                 me->LowerPlayerDamageReq(damage);
         }
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit*  /*killer*/)
         {
             DoPlaySoundToSet(me, SOUND_DEATH);
             me->MonsterYell("An honorable... death...", LANG_UNIVERSAL, 0);
@@ -125,7 +125,7 @@ public:
                 pInstance->SetData(EVENT_RAZUVIOUS, DONE);
         }
 
-        void EnterCombat(Unit *who)
+        void EnterCombat(Unit * /*who*/)
         {
             switch (urand(0,2))
             {

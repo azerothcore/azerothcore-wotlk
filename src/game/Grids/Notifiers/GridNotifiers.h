@@ -720,13 +720,12 @@ namespace Trinity
     class GameObjectWithDbGUIDCheck
     {
         public:
-            GameObjectWithDbGUIDCheck(WorldObject const& obj, uint32 db_guid) : i_obj(obj), i_db_guid(db_guid) {}
+            GameObjectWithDbGUIDCheck(uint32 db_guid) : i_db_guid(db_guid) {}
             bool operator()(GameObject const* go) const
             {
                 return go->GetDBTableGUIDLow() == i_db_guid;
             }
         private:
-            WorldObject const& i_obj;
             uint32 i_db_guid;
     };
 
@@ -862,13 +861,12 @@ namespace Trinity
     class CreatureWithDbGUIDCheck
     {
         public:
-            CreatureWithDbGUIDCheck(WorldObject const* obj, uint32 lowguid) : i_obj(obj), i_lowguid(lowguid) {}
+            CreatureWithDbGUIDCheck(uint32 lowguid) : i_lowguid(lowguid) {}
             bool operator()(Creature* u)
             {
                 return u->GetDBTableGUIDLow() == i_lowguid;
             }
         private:
-            WorldObject const* i_obj;
             uint32 i_lowguid;
     };
 
@@ -1011,12 +1009,7 @@ namespace Trinity
         public:
             AnyAttackableUnitExceptForOriginalCasterInObjectRangeCheck(WorldObject const* obj, Unit const* funit, float range)
                 : i_obj(obj), i_funit(funit), i_range(range)
-            {
-                Unit const* check = i_funit;
-                Unit const* owner = i_funit->GetOwner();
-                if (owner)
-                    check = owner;
-            }
+            {}
             bool operator()(Unit* u)
             {
                 if (!u->IsAlive() || u->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE) || (u->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC) && !u->IsInCombat()))
@@ -1441,7 +1434,7 @@ namespace Trinity
     {
         public:
             explicit RandomCheck(uint8 chance) : _chance(chance) { }
-            bool operator()(WorldObject const* object) const
+            bool operator()(WorldObject const* /*object*/) const
             {
                 return roll_chance_i(_chance);
             }

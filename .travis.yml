@@ -10,16 +10,16 @@ git:
   depth: 1
 
 before_install:
-  - sudo apt-get -y install build-essential libtool make cmake cmake-data openssl
+  - sudo apt-get -y install build-essential libtool make cmake cmake-data openssl libgoogle-perftools-dev
   - sudo apt-get -y install libssl-dev libmysqlclient-dev libmysql++-dev libreadline6-dev zlib1g-dev libbz2-dev libace-dev
   - git config user.email "travis@build.bot" && git config user.name "Travis CI"
   - git tag -a -m "Travis build" init
 
 install:
   - mysql -uroot -e 'create database test_mysql;'
-  # bin directory already exists in the repo and therefore is not created here
-  - cd bin
-  - cmake ../ -DWITH_WARNINGS=1 -DWITH_COREDEBUG=0 -DUSE_COREPCH=1 -DUSE_SCRIPTPCH=1 -DTOOLS=0 -DSCRIPTS=1 -DSERVERS=1 -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=check_install
+  - mkdir build
+  - cd build
+  - cmake ../ -DWITH_WARNINGS=1 -DWITH_COREDEBUG=1 -DUSE_COREPCH=0 -DUSE_SCRIPTPCH=0 -DTOOLS=1 -DSCRIPTS=1 -DSERVERS=1 -DWITH_PERFTOOLS=1 -DENABLE_EXTRA_LOGS=1 -DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_FLAGS="-Werror" -DCMAKE_CXX_FLAGS="-Werror" -DCMAKE_INSTALL_PREFIX=check_install
   - cd ..
 
 script:
@@ -31,7 +31,11 @@ script:
   - cat data/sql/updates/db_auth/*.sql | mysql -uacore -pacore auth
   - cat data/sql/updates/db_characters/*.sql | mysql -uacore -pacore characters
   - cat data/sql/updates/db_world/*.sql | mysql -uacore -pacore world
+  - cat data/sql/updates/pending_db_auth/*.sql | mysql -uacore -pacore auth
+  - cat data/sql/updates/pending_db_characters/*.sql | mysql -uacore -pacore characters
+  - cat data/sql/updates/pending_db_world/*.sql | mysql -uacore -pacore world
   - mysql -uroot < data/sql/create/drop_mysql.sql
-  - cd bin
+  - cd build
   - make -j 8 -k && make install
   - cd check_install/bin
+

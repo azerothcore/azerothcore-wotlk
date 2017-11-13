@@ -919,7 +919,12 @@ public:
         m_heal -= amount;
     }
 
-    uint32 GetHeal() const { return m_heal; };
+    Unit* GetHealer() const { return m_healer; }
+    Unit* GetTarget() const { return m_target; }
+    uint32 GetHeal() const { return m_heal; }
+    uint32 GetAbsorb() const { return m_absorb; }
+    SpellInfo const* GetSpellInfo() const { return m_spellInfo; };
+    SpellSchoolMask GetSchoolMask() const { return m_schoolMask; };
 };
 
 class ProcEventInfo
@@ -1240,12 +1245,11 @@ struct CharmInfo
         bool _isAtStay;
         bool _isFollowing;
         bool _isReturning;
+        int32 _forcedSpellId;
+        uint64 _forcedTargetGUID;
         float _stayX;
         float _stayY;
         float _stayZ;
-
-        int32 _forcedSpellId;
-        uint64 _forcedTargetGUID;
 
         GlobalCooldownMgr _GlobalCooldownMgr;
 };
@@ -1323,8 +1327,8 @@ public:
 class SafeUnitPointer
 {
 public:
-    explicit SafeUnitPointer(Unit* defVal) : defaultValue(defVal), ptr(defVal) {}
-    SafeUnitPointer(const SafeUnitPointer& p) { ASSERT(false); }
+    explicit SafeUnitPointer(Unit* defVal) :  ptr(defVal), defaultValue(defVal) {}
+    SafeUnitPointer(const SafeUnitPointer& /*p*/) { ASSERT(false); }
     void Initialize(Unit* defVal) { defaultValue = defVal; ptr = defVal; }
     ~SafeUnitPointer();
     void SetPointedTo(Unit* u);
@@ -2368,7 +2372,7 @@ class Unit : public WorldObject
         // pussywizard:
         // MMaps
         std::map<uint64, MMapTargetData> m_targetsNotAcceptable;
-        bool isTargetNotAcceptableByMMaps(uint64 guid, uint32 currTime, const Position* t = NULL) const { std::map<uint64, MMapTargetData>::const_iterator itr = m_targetsNotAcceptable.find(guid); if (itr != m_targetsNotAcceptable.end() && (itr->second._endTime >= currTime || t && !itr->second.PosChanged(*this, *t))) return true; return false; }
+        bool isTargetNotAcceptableByMMaps(uint64 guid, uint32 currTime, const Position* t = NULL) const { std::map<uint64, MMapTargetData>::const_iterator itr = m_targetsNotAcceptable.find(guid); if (itr != m_targetsNotAcceptable.end() && (itr->second._endTime >= currTime || (t && !itr->second.PosChanged(*this, *t)))) return true; return false; }
         uint32 m_mmapNotAcceptableStartTime;
         // Safe mover
         std::set<SafeUnitPointer*> SafeUnitPointerSet;
@@ -2406,7 +2410,11 @@ class Unit : public WorldObject
         // cooldowns
         virtual bool HasSpellCooldown(uint32 /*spell_id*/) const { return false; }
         virtual bool HasSpellItemCooldown(uint32 /*spell_id*/, uint32 /*itemid*/) const { return false; }
-        virtual void AddSpellCooldown(uint32 /*spell_id*/, uint32 /*itemid*/, uint32 /*end_time*/, bool needSendToClient = false, bool forceSendToSpectator = false) {}
+        virtual void AddSpellCooldown(uint32 /*spell_id*/, uint32 /*itemid*/, uint32 /*end_time*/, bool needSendToClient = false, bool forceSendToSpectator = false) {
+            // workaround for unused parameters
+            (void)needSendToClient;
+            (void)forceSendToSpectator;
+        }
 
         bool CanApplyResilience() const { return m_applyResilience; }
 

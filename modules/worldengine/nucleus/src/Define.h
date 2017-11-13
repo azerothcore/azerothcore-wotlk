@@ -12,6 +12,7 @@
 #include <cinttypes>
 #include <climits>
 #include <sys/types.h>
+#include <ace/Basic_Types.h>
 #include <ace/ACE_export.h>
 #include <ace/Default_Constants.h>
 
@@ -74,6 +75,8 @@
 #define SI64LIT(N) ACE_INT64_LITERAL(N)
 
 #define SIZEFMTD ACE_SIZE_T_FORMAT_SPECIFIER
+
+#define UNUSED(x) (void)(x)
 
 typedef std::int64_t int64;
 typedef std::int32_t int32;

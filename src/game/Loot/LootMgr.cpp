@@ -15,6 +15,7 @@
 #include "Group.h"
 #include "Player.h"
 #include "Containers.h"
+#include "ScriptMgr.h"
 
 static Rates const qualityToRate[MAX_ITEM_QUALITY] =
 {
@@ -461,7 +462,7 @@ bool Loot::FillLoot(uint32 lootId, LootStore const& store, Player* lootOwner, bo
     items.reserve(MAX_NR_LOOT_ITEMS);
     quest_items.reserve(MAX_NR_QUEST_ITEMS);
 
-    tab->Process(*this, store.IsRatesAllowed(), lootMode);          // Processing is done there, callback via Loot::AddItem()
+    tab->Process(*this, store.IsRatesAllowed(), lootMode, lootOwner);          // Processing is done there, callback via Loot::AddItem()
 
     // Setting access rights for group loot case
     Group* group = lootOwner->GetGroup();
@@ -868,7 +869,7 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
             {
                 if (!l.items[i].is_looted && !l.items[i].freeforall && l.items[i].conditions.empty() && l.items[i].AllowedForPlayer(lv.viewer))
                 {
-                    uint8 slot_type;
+                    uint8 slot_type = 0;
 
                     if (l.items[i].is_blocked) // for ML & restricted is_blocked = !is_underthreshold
                     {
@@ -1296,7 +1297,7 @@ void LootTemplate::CopyConditions(LootItem* li) const
 }
 
 // Rolls for every item in the template and adds the rolled items the the loot
-void LootTemplate::Process(Loot& loot, bool rate, uint16 lootMode, uint8 groupId) const
+void LootTemplate::Process(Loot& loot, bool rate, uint16 lootMode, Player const* player, uint8 groupId) const
 {
     if (groupId)                                            // Group reference uses own processing of the group
     {
@@ -1327,11 +1328,14 @@ void LootTemplate::Process(Loot& loot, bool rate, uint16 lootMode, uint8 groupId
                 continue;                                       // Error message already printed at loading stage
 
             uint32 maxcount = uint32(float(item->maxcount) * sWorld->getRate(RATE_DROP_ITEM_REFERENCED_AMOUNT));
+            sScriptMgr->OnAfterRefCount(item, maxcount);
             for (uint32 loop = 0; loop < maxcount; ++loop)      // Ref multiplicator
-                Referenced->Process(loot, rate, lootMode, item->group);
-        }
-        else                                                    // Plain entries (not a reference, not grouped)
+                Referenced->Process(loot, rate, lootMode, player, item->group);
+        } else  {
+            // Plain entries (not a reference, not grouped)
+            sScriptMgr->OnBeforeDropAddItem(player, loot, item);
             loot.AddItem(*item);                                // Chance is already checked, just add
+        }
     }
 
     // Now processing groups

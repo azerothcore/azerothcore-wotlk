@@ -145,7 +145,7 @@ public:
                 for (int i = 0; i < 3; ++i)
                 {
                     float o = rand_norm()*2*M_PI;
-                    if (cr = me->SummonCreature(NPC_ANTAGONIST, me->GetPositionX()+3*cos(o), me->GetPositionY()+3*sin(o), me->GetPositionZ(), me->GetOrientation()))
+                    if ((cr = me->SummonCreature(NPC_ANTAGONIST, me->GetPositionX()+3*cos(o), me->GetPositionY()+3*sin(o), me->GetPositionZ(), me->GetOrientation())))
                     {
                         if (i == 0)
                             cr->MonsterSay("Time to die.", LANG_UNIVERSAL, 0);
@@ -167,7 +167,7 @@ public:
                 events.ScheduleEvent(EVENT_DIREBREW_RESPAWN2, 10000);
         }
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit*  /*killer*/)
         {
             summons.DespawnAll();
             summons.DoAction(ACTION_RELEASE_LOOT);
@@ -299,7 +299,7 @@ public:
         }
                 
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit*  /*who*/)
         {
             if (me->GetEntry() == NPC_URSULA_DIREBREW)
                 events.ScheduleEvent(EVENT_SISTERS_BARREL, 18000);
@@ -452,7 +452,7 @@ class npc_brewfest_keg_reciver : public CreatureScript
         return new npc_brewfest_keg_reciverAI(creature);
     }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*uiSender*/, uint32 uiAction)
+    bool OnGossipSelect(Player* player, Creature*  /*creature*/, uint32 /*uiSender*/, uint32 uiAction)
     {
         switch (uiAction)
         {
@@ -549,7 +549,7 @@ class npc_brewfest_bark_trigger : public CreatureScript
                 }
             }
 
-            std::string GetTextFor(uint32 entry, uint32 questId)
+            std::string GetTextFor(uint32  /*entry*/, uint32 questId)
             {
                 std::string str = "";
                 switch (questId)
@@ -680,7 +680,7 @@ class npc_dark_iron_attack_generator : public CreatureScript
             }
 
             // DARK IRON ATTACK EVENT
-            void MoveInLineOfSight(Unit* who) {}
+            void MoveInLineOfSight(Unit*  /*who*/) {}
             void EnterCombat(Unit*) {}
 
             void SpellHit(Unit* caster, const SpellInfo* spellInfo)
@@ -811,24 +811,24 @@ class npc_dark_iron_attack_generator : public CreatureScript
                 Creature* cr;
                 if (me->GetMapId() == 1) // Kalimdor
                 {
-                    if (cr = me->SummonCreature(NPC_DROHN_KEG, 1183.69f, -4315.15f, 21.1875f, 0.750492f))
+                    if ((cr = me->SummonCreature(NPC_DROHN_KEG, 1183.69f, -4315.15f, 21.1875f, 0.750492f)))
                         summons.Summon(cr);
-                    if (cr = me->SummonCreature(NPC_VOODOO_KEG, 1182.42f, -4272.45f, 21.1182f, -1.02974f))
+                    if ((cr = me->SummonCreature(NPC_VOODOO_KEG, 1182.42f, -4272.45f, 21.1182f, -1.02974f)))
                         summons.Summon(cr);
-                    if (cr = me->SummonCreature(NPC_GORDOK_KEG, 1223.78f, -4296.48f, 21.1707f, -2.86234f))
+                    if ((cr = me->SummonCreature(NPC_GORDOK_KEG, 1223.78f, -4296.48f, 21.1707f, -2.86234f)))
                         summons.Summon(cr);
                 }
                 else if (me->GetMapId() == 0) // Eastern Kingdom
                 {
-                    if (cr = me->SummonCreature(NPC_BARLEYBREW_KEG, -5187.23f, -599.779f, 397.176f, 0.017453f))
+                    if ((cr = me->SummonCreature(NPC_BARLEYBREW_KEG, -5187.23f, -599.779f, 397.176f, 0.017453f)))
                         summons.Summon(cr);
-                    if (cr = me->SummonCreature(NPC_THUNDERBREW_KEG, -5160.05f, -632.632f, 397.178f, 1.39626f))
+                    if ((cr = me->SummonCreature(NPC_THUNDERBREW_KEG, -5160.05f, -632.632f, 397.178f, 1.39626f)))
                         summons.Summon(cr);
-                    if (cr = me->SummonCreature(NPC_GORDOK_KEG, -5145.75f, -575.667f, 397.176f, -2.28638f))
+                    if ((cr = me->SummonCreature(NPC_GORDOK_KEG, -5145.75f, -575.667f, 397.176f, -2.28638f)))
                         summons.Summon(cr);
                 }
 
-                if (cr = me->SummonCreature(NPC_DARK_IRON_HERALD, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, 300000))
+                if ((cr = me->SummonCreature(NPC_DARK_IRON_HERALD, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, 300000)))
                     summons.Summon(cr);
 
                 kegCounter = 0;
@@ -1047,7 +1047,7 @@ class npc_dark_iron_guzzler : public CreatureScript
                 who->CastSpell(who, SPELL_REPORT_DEATH, true);
             }
 
-            void SpellHit(Unit* caster, const SpellInfo* spellInfo)
+            void SpellHit(Unit*  /*caster*/, const SpellInfo* spellInfo)
             {
                 if (me->IsAlive() && spellInfo->Id == SPELL_PLAYER_MUG)
                 {
@@ -1093,7 +1093,7 @@ class npc_brewfest_super_brew_trigger : public CreatureScript
 
             uint32 timer;
             void EnterCombat(Unit*) {}
-            void MoveInLineOfSight(Unit* who)
+            void MoveInLineOfSight(Unit*  /*who*/)
             {
             }
 
@@ -1186,7 +1186,7 @@ public:
             }
 
             // Check if exhausted
-            if (Aura* exh = caster->GetAura(SPELL_RAM_EXHAUSTED))
+            if (caster->GetAura(SPELL_RAM_EXHAUSTED))
             {
                 if (privateLevel)
                 {
@@ -1397,7 +1397,7 @@ public:
         SpellCastResult CheckTarget()
         {
             if (Unit* caster = GetCaster())
-                if (Player* pCaster = caster->ToPlayer())
+                if (caster->ToPlayer())
                     if (Unit* target = caster->ToPlayer()->GetSelectedUnit())
                         if (target->GetEntry() == 23487 && target->IsAlive())
                             return SPELL_CAST_OK;
@@ -1621,20 +1621,20 @@ public:
 
             if (caster->GetMapId() == 1) // Kalimdor
             {
-                if (cr = caster->FindNearestCreature(NPC_NORMAL_VOODOO, 40.0f))
+                if ((cr = caster->FindNearestCreature(NPC_NORMAL_VOODOO, 40.0f)))
                     cr->CastSpell(caster, SPELL_THROW_MUG_TO_PLAYER, true);
-                else if (cr = caster->FindNearestCreature(NPC_NORMAL_DROHN, 40.0f))
+                else if ((cr = caster->FindNearestCreature(NPC_NORMAL_DROHN, 40.0f)))
                     cr->CastSpell(caster, SPELL_THROW_MUG_TO_PLAYER, true);
-                else if (cr = caster->FindNearestCreature(NPC_NORMAL_GORDOK, 40.0f))
+                else if ((cr = caster->FindNearestCreature(NPC_NORMAL_GORDOK, 40.0f)))
                     cr->CastSpell(caster, SPELL_THROW_MUG_TO_PLAYER, true);
             }
             else // EK
             {
-                if (cr = caster->FindNearestCreature(NPC_NORMAL_THUNDERBREW, 40.0f))
+                if ((cr = caster->FindNearestCreature(NPC_NORMAL_THUNDERBREW, 40.0f)))
                     cr->CastSpell(caster, SPELL_THROW_MUG_TO_PLAYER, true);
-                else if (cr = caster->FindNearestCreature(NPC_NORMAL_BARLEYBREW, 40.0f))
+                else if ((cr = caster->FindNearestCreature(NPC_NORMAL_BARLEYBREW, 40.0f)))
                     cr->CastSpell(caster, SPELL_THROW_MUG_TO_PLAYER, true);
-                else if (cr = caster->FindNearestCreature(NPC_NORMAL_GORDOK, 40.0f))
+                else if ((cr = caster->FindNearestCreature(NPC_NORMAL_GORDOK, 40.0f)))
                     cr->CastSpell(caster, SPELL_THROW_MUG_TO_PLAYER, true);
             }
             

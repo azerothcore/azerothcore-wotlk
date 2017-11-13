@@ -93,6 +93,7 @@ enum WorldBoolConfigs
     CONFIG_INSTANT_TAXI,
     CONFIG_INSTANCE_IGNORE_LEVEL,
     CONFIG_INSTANCE_IGNORE_RAID,
+    CONFIG_INSTANCE_GMSUMMON_PLAYER,
     CONFIG_INSTANCE_SHARED_ID,
     CONFIG_GM_LOG_TRADE,
     CONFIG_ALLOW_GM_GROUP,
@@ -528,7 +529,7 @@ enum GlobalPlayerUpdateMask
     PLAYER_UPDATE_DATA_NAME             = 0x10,
 };
 
-typedef UNORDERED_MAP<uint32, GlobalPlayerData> GlobalPlayerDataMap;
+typedef std::map<uint32, GlobalPlayerData> GlobalPlayerDataMap;
 typedef std::map<std::string, uint32> GlobalPlayerNameMap;
 
 // xinef: petitions storage

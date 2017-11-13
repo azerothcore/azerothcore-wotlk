@@ -129,7 +129,7 @@ class instance_serpent_shrine : public InstanceMapScript
                 return 0;
             }
 
-            void SetData(uint32 type, uint32 data)
+            void SetData(uint32 type, uint32  /*data*/)
             {
                 switch (type)
                 {
@@ -229,7 +229,7 @@ class spell_serpentshrine_cavern_serpentshrine_parasite : public SpellScriptLoad
         {
             PrepareAuraScript(spell_serpentshrine_cavern_serpentshrine_parasite_AuraScript)
 
-            void HandleEffectRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+            void HandleEffectRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
                 if (GetTarget()->GetInstanceScript() && GetTarget()->GetInstanceScript()->IsEncounterInProgress())
                     GetTarget()->CastSpell(GetTarget(), SPELL_SUMMON_SERPENTSHRINE_PARASITE, true);
@@ -256,7 +256,7 @@ class spell_serpentshrine_cavern_serpentshrine_parasite_trigger : public SpellSc
         {
             PrepareAuraScript(spell_serpentshrine_cavern_serpentshrine_parasite_trigger_AuraScript)
 
-            void HandleEffectRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+            void HandleEffectRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
                 if (GetTarget()->GetInstanceScript() && GetTarget()->GetInstanceScript()->IsEncounterInProgress())
                     GetTarget()->CastSpell(GetTarget(), SPELL_SUMMON_SERPENTSHRINE_PARASITE, true);
@@ -338,7 +338,7 @@ class spell_serpentshrine_cavern_coilfang_water : public SpellScriptLoader
         {
             PrepareAuraScript(spell_serpentshrine_cavern_coilfang_water_AuraScript)
 
-            void HandleEffectApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+            void HandleEffectApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
                 if (InstanceScript* instance = GetUnitOwner()->GetInstanceScript())
                     if (instance->GetBossState(DATA_THE_LURKER_BELOW) != DONE)
@@ -346,7 +346,7 @@ class spell_serpentshrine_cavern_coilfang_water : public SpellScriptLoader
                             GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_SCALDING_WATER, true);
             }
 
-            void HandleEffectRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+            void HandleEffectRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
                 GetUnitOwner()->RemoveAurasDueToSpell(SPELL_SCALDING_WATER);
             }
@@ -362,7 +362,7 @@ class spell_serpentshrine_cavern_coilfang_water : public SpellScriptLoader
             }
             
 
-            void HandlePeriodic(AuraEffect const* aurEff)
+            void HandlePeriodic(AuraEffect const*  /*aurEff*/)
             {
                 PreventDefaultAction();
                 InstanceScript* instance = GetUnitOwner()->GetInstanceScript();

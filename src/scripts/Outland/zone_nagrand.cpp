@@ -424,7 +424,7 @@ public:
         uint32 HealTimer;
         uint32 FrostShockTimer;
 
-        void SetGUID(uint64 guid, int32 questId)
+        void SetGUID(uint64 guid, int32  /*questId*/)
         {
             me->SetStandState(UNIT_STAND_STATE_STAND);
             Start(true, false, guid);

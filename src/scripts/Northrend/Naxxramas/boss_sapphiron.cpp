@@ -147,7 +147,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit *who)
+        void EnterCombat(Unit * /*who*/)
         {
             EnterCombatSelfFunction();
             me->CastSpell(me, RAID_MODE(SPELL_FROST_AURA_10, SPELL_FROST_AURA_25), true);
@@ -164,7 +164,7 @@ public:
                 pInstance->SetData(EVENT_SAPPHIRON, IN_PROGRESS);
         }
 
-        void JustDied(Unit* who)
+        void JustDied(Unit*  /*who*/)
         {
             me->CastSpell(me, SPELL_SAPPHIRON_DIES, true);
             if (pInstance)

@@ -34,7 +34,7 @@ include(CheckCXXSourceRuns)
 include(CheckIncludeFiles)
 
 # some utils for cmake
-include(modules/uwd/cmake-utils/utils.cmake)
+include(modules/drassil/cmake-utils/utils.cmake)
 
 include(src/cmake/ac_macros.cmake)
 
@@ -75,6 +75,11 @@ if( UNIX )
   find_package(Readline)
   find_package(ZLIB)
   find_package(BZip2)
+
+  if ( WITH_PERFTOOLS )
+    find_package(Gperftools)
+  endif()
+
 endif()
 
 if(NOT WITHOUT_GIT)
@@ -111,6 +116,13 @@ endif()
 # add modules and dependencies
 CU_SUBDIRLIST(sub_DIRS  "${CMAKE_SOURCE_DIR}/modules" FALSE FALSE)
 FOREACH(subdir ${sub_DIRS})
+
+    get_filename_component(MODULENAME ${subdir} NAME)
+
+    if (";${DISABLED_AC_MODULES};" MATCHES ";${MODULENAME};")
+       continue()
+    endif()
+
     STRING(REGEX REPLACE "^${CMAKE_SOURCE_DIR}/" "" subdir_rel ${subdir})
     if(EXISTS "${subdir}/CMakeLists.txt")
         message("Loading module: ${subdir_rel}")

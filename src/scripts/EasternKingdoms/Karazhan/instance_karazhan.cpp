@@ -2,6 +2,8 @@
 #include "ScriptMgr.h"
 #include "InstanceScript.h"
 #include "karazhan.h"
+#include "SpellScript.h"
+#include "SpellAuraEffects.h"
 
 const Position OptionalSpawn[] =
 {
@@ -255,7 +257,7 @@ public:
 
         }
 
-        uint64 GetData64(uint32 data) const
+        uint64 GetData64(uint32 data) const override
         {
             switch (data)
             {
@@ -284,8 +286,8 @@ public:
         uint32 OperaEvent;
         uint32 OzDeathCount;
         uint32 OptionalBossCount;
-        uint32 m_auiEncounter[MAX_ENCOUNTERS];
-        uint32 m_uiTeam;
+        //uint32 m_auiEncounter[MAX_ENCOUNTERS];
+        //uint32 m_uiTeam;
         uint64 m_uiCurtainGUID;
         uint64 m_uiStageDoorLeftGUID;
         uint64 m_uiStageDoorRightGUID;
@@ -293,14 +295,14 @@ public:
         uint64 m_uiTerestianGUID;
         uint64 m_uiMoroesGUID;
         uint64 m_uiNightBaneGUID;
-        uint64 EchoOfMedivhGUID;
+        //uint64 EchoOfMedivhGUID;
         uint64 m_uiLibraryDoor;                                     // Door at Shade of Aran
         uint64 m_uiMassiveDoor;                                     // Door at Netherspite
         uint64 m_uiSideEntranceDoor;                                // Side Entrance
         uint64 m_uiGamesmansDoor;                                   // Door before Chess
         uint64 m_uiGamesmansExitDoor;                               // Door after Chess
         uint64 m_uiNetherspaceDoor;                                // Door at Malchezaar
-        uint64 m_uiServantsAccessDoor;                              // Door to Brocken Stair
+        //uint64 m_uiServantsAccessDoor;                              // Door to Brocken Stair
         uint64 MastersTerraceDoor[2];
         uint64 ImageGUID;
         uint64 DustCoveredChest;
@@ -323,7 +325,7 @@ public:
             amplitude = 5000;
         }
 
-        void Update(AuraEffect const* effect)
+        void Update(AuraEffect const*  /*effect*/)
         {
             PreventDefaultAction();
             if (roll_chance_i(35))
@@ -355,7 +357,8 @@ public:
         void PeriodicTick(AuraEffect const* auraEffect)
         {
             PreventDefaultAction();
-            GetUnitOwner()->CastCustomSpell(SPELL_OVERLOAD, SPELLVALUE_BASE_POINT0, int32(auraEffect->GetAmount() * (2.0, auraEffect->GetTickNumber())), GetUnitOwner(), true);
+            //Should stop at 3200 damage, maybe check needed(?)
+            GetUnitOwner()->CastCustomSpell(SPELL_OVERLOAD, SPELLVALUE_BASE_POINT0, int32(auraEffect->GetAmount() * pow(2.0, auraEffect->GetTickNumber())), GetUnitOwner(), true);
         }
 
         void Register()

@@ -1,5 +1,5 @@
 
-function clean() {
+function comp_clean() {
   echo "Cleaning build files"
 
   CWD=$(pwd)
@@ -13,7 +13,7 @@ function clean() {
   cd $CWD
 }
 
-function configure() {
+function comp_configure() {
   CWD=$(pwd)
 
   cd $BUILDPATH
@@ -31,7 +31,7 @@ function configure() {
   cmake $SRCPATH -DCMAKE_INSTALL_PREFIX=$BINPATH -DCONF_DIR=$CONFDIR -DSERVERS=$CSERVERS \
   -DSCRIPTS=$CSCRIPTS \
   -DTOOLS=$CTOOLS -DUSE_SCRIPTPCH=$CSCRIPTPCH -DUSE_COREPCH=$CCOREPCH -DWITH_COREDEBUG=$CDEBUG  -DCMAKE_BUILD_TYPE=$CTYPE -DWITH_WARNINGS=$CWARNINGS \
-  -DCMAKE_C_COMPILER=$CCOMPILERC -DCMAKE_CXX_COMPILER=$CCOMPILERCXX $CCUSTOMOPTIONS
+  -DCMAKE_C_COMPILER=$CCOMPILERC -DCMAKE_CXX_COMPILER=$CCOMPILERCXX "-DDISABLED_AC_MODULES=$CDISABLED_AC_MODULES" $CCUSTOMOPTIONS
 
   cd $CWD
 
@@ -39,7 +39,7 @@ function configure() {
 }
 
 
-function build() {
+function comp_build() {
   [ $MTHREADS == 0 ] && MTHREADS=`grep -c ^processor /proc/cpuinfo` && MTHREADS=$(($MTHREADS + 2))
 
   echo "Using $MTHREADS threads"

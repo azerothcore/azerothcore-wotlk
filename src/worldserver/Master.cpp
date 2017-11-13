@@ -30,6 +30,7 @@
 #include "Util.h"
 #include "AuthSocket.h"
 #include "RealmList.h"
+#include "ScriptMgr.h"
 
 #include "BigNumber.h"
 #include "OpenSSLCrypto.h"
@@ -154,6 +155,8 @@ int Master::Run()
 
     ///- Initialize the World
     sWorld->SetInitialWorldSettings();
+
+    sScriptMgr->OnStartup();
 
     ///- Initialize the signal handlers
     WorldServerSignalHandler signalINT, signalTERM; //, signalSEGV

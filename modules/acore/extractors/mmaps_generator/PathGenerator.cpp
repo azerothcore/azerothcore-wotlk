@@ -7,8 +7,6 @@
 #include "PathCommon.h"
 #include "MapBuilder.h"
 
-LoginDatabaseWorkerPool LoginDatabase;
-
 using namespace MMAP;
 
 bool checkDirectories(bool debugOutput)

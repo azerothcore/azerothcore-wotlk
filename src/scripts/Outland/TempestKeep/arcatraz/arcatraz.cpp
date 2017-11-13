@@ -221,6 +221,8 @@ class npc_millhouse_manastorm : public CreatureScript
                                 me->CastSpell(me->GetVictim(), SPELL_FROSTBOLT, false);
                                 events.ScheduleEvent(EVENT_MILL_BASE_SPELL, 4000);
                                 break;
+                            default:
+                                break;
                         }
                         break;
 

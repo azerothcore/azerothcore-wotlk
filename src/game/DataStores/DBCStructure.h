@@ -1451,7 +1451,7 @@ struct ScalingStatValuesEntry
 
     uint32 getArmorMod(uint32 mask) const
     {
-        if (mask & 0x00F001E0)
+        if (mask & 0x00F801E0)
         {
             if (mask & 0x00000020) return armorMod[0];      // Cloth shoulder
             if (mask & 0x00000040) return armorMod[1];      // Leather shoulder

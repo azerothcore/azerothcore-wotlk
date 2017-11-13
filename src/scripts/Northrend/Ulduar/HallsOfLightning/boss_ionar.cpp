@@ -141,7 +141,7 @@ public:
             Creature* spark;
             for (uint8 i = 0; i < 5; ++i)
             {
-                if (spark = me->SummonCreature(NPC_SPARK_OF_IONAR, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 20000))
+                if ((spark = me->SummonCreature(NPC_SPARK_OF_IONAR, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 20000)))
                 {
                     summons.Summon(spark);
                     spark->CastSpell(spark, me->GetMap()->IsHeroic() ? SPELL_SPARK_VISUAL_TRIGGER_H : SPELL_SPARK_VISUAL_TRIGGER_N, true);
@@ -233,7 +233,7 @@ public:
 
         void MoveInLineOfSight(Unit*) { }
         void UpdateAI(uint32) { }
-        void AttackStart(Unit* who) { }
+        void AttackStart(Unit*  /*who*/) { }
 
         void Reset() { returning = false; }
 

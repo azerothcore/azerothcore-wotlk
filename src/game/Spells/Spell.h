@@ -410,6 +410,8 @@ class Spell
         // handler helpers
         void _handle_immediate_phase();
         void _handle_finish_phase();
+    
+        void OnSpellLaunch();
 
         SpellCastResult CheckItems();
         SpellCastResult CheckSpellFocus();
@@ -506,7 +508,7 @@ class Spell
         void CleanupTargetList();
 
         void SetSpellValue(SpellValueMod mod, int32 value);
-        SpellValue const* const GetSpellValue() { return m_spellValue; }
+        SpellValue const* GetSpellValue() { return m_spellValue; }
 
         // xinef: moved to public
         void LoadScripts();

@@ -117,15 +117,14 @@ extern int main(int argc, char** argv)
     cfg_def_file += ".dist";
 
     if (!sConfigMgr->LoadInitial(cfg_def_file.c_str())) {
-        printf("Invalid or missing default configuration file : %s\n", cfg_def_file.c_str());
+        printf("ERROR: Invalid or missing default configuration file : %s\n", cfg_def_file.c_str());
         return 1;
     }
 
     if (!sConfigMgr->LoadMore(cfg_file))
     {
-        printf("Invalid or missing configuration file : %s\n", cfg_file);
+        printf("WARNING: Invalid or missing configuration file : %s\n", cfg_file);
         printf("Verify that the file exists and has \'[worldserver]' written in the top of the file!\n");
-        return 1;
     }
 
     sLog->outString("Using configuration file %s.", cfg_file);

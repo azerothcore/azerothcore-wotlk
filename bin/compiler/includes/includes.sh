@@ -10,8 +10,7 @@ fi
 
 function ac_on_after_build() {
     # move the run engine
-    mkdir -p "$INSTALL_PATH/bin/"
-    cp -rvf "$AC_PATH_MODULES/acore/startup-scripts/"* "$INSTALL_PATH/bin/"
+    cp -rvf "$AC_PATH_MODULES/acore/startup-scripts/"* "$BINPATH"
 }
 
 registerHooks "ON_AFTER_BUILD" ac_on_after_build

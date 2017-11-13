@@ -164,7 +164,7 @@ public:
     {
         PrepareAuraScript(spell_hor_shared_sufferingAuraScript);
 
-        void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes mode)
+        void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes  /*mode*/)
         {
             if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_ENEMY_SPELL) // dispelled
                 if (Unit* caster = GetCaster())

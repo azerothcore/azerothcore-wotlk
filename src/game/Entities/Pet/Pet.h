@@ -28,10 +28,11 @@ class AsynchPetSummon
         AsynchPetSummon(uint32 entry, Position position, PetType petType, uint32 duration, uint32 createdBySpell, uint64 casterGUID) : 
             m_entry(entry), pos(position), m_petType(petType),
             m_duration(duration), m_createdBySpell(createdBySpell), m_casterGUID(casterGUID) { }
-    
+
+        uint32 m_entry;
         Position pos;
-        uint32 m_entry, m_createdBySpell, m_duration;
         PetType m_petType;
+        uint32 m_duration, m_createdBySpell;
         uint64 m_casterGUID;
 };
 

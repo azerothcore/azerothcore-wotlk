@@ -90,7 +90,7 @@ public:
                 pInstance->SetData(DATA_GARFROST, NOT_STARTED);
         }
 
-        void SetData(uint32 id, uint32 data)
+        void SetData(uint32 id, uint32  /*data*/)
         {
             if (id == 1 && pInstance)
                 pInstance->SetData(DATA_ACHIEV_ELEVEN, 0);
@@ -156,9 +156,9 @@ public:
             }
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spell)
+        void SpellHitTarget(Unit*  /*target*/, const SpellInfo* spell)
         {
-            if (spell->Id == SPELL_SARONITE_TRIGGERED)
+            if (spell->Id == uint32(SPELL_SARONITE_TRIGGERED))
             {
                 if (bCanSayBoulderHit)
                 {
@@ -166,7 +166,7 @@ public:
                     Talk(SAY_BOULDER_HIT);
                 }
             }
-            if (spell->Id == SPELL_FORGE_BLADE)
+            if (spell->Id == uint32(SPELL_FORGE_BLADE))
             {
                 events.RescheduleEvent(EVENT_SPELL_CHILLING_WAVE, 10000);
                 SetEquipmentSlots(false, EQUIP_ID_SWORD);
@@ -179,7 +179,7 @@ public:
                     me->SetTarget(me->GetVictim()->GetGUID());
                 }
             }
-            else if (spell->Id == SPELL_FORGE_MACE)
+            else if (spell->Id == uint32(SPELL_FORGE_MACE))
             {
                 events.RescheduleEvent(EVENT_SPELL_DEEP_FREEZE, 10000);
                 SetEquipmentSlots(false, EQUIP_ID_MACE);

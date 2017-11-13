@@ -189,14 +189,14 @@ class npc_cork_gizelton : public CreatureScript
                 me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
 
                 Creature* cr = NULL;
-                if (cr = me->SummonCreature(NPC_RIGGER_GIZELTON, *me))
+                if ((cr = me->SummonCreature(NPC_RIGGER_GIZELTON, *me)))
                 {
                     cr->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
                     summons[0] = cr->GetGUID();
                 }
-                if (cr = me->SummonCreature(NPC_CARAVAN_KODO, *me))
+                if ((cr = me->SummonCreature(NPC_CARAVAN_KODO, *me)))
                     summons[1] = cr->GetGUID();
-                if (cr = me->SummonCreature(NPC_CARAVAN_KODO, *me))
+                if ((cr = me->SummonCreature(NPC_CARAVAN_KODO, *me)))
                     summons[2] = cr->GetGUID();
                 
                 SummonsFollow();
@@ -334,8 +334,8 @@ class npc_cork_gizelton : public CreatureScript
                             float o = (i*M_PI/2)+(M_PI/4);
                             float x = me->GetPositionX()+cos(o)*15.0f;
                             float y = me->GetPositionY()+sin(o)*15.0f;
-                            if (cr = me->SummonCreature((i%2 == 0 ? NPC_KOLKAR_WAYLAYER : NPC_KOLKAR_AMBUSHER),
-                                x, y, me->GetMap()->GetHeight(x, y, MAX_HEIGHT), 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000))
+                            if ((cr = me->SummonCreature((i%2 == 0 ? NPC_KOLKAR_WAYLAYER : NPC_KOLKAR_AMBUSHER),
+                                x, y, me->GetMap()->GetHeight(x, y, MAX_HEIGHT), 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000)))
                                 cr->AI()->AttackStart(me);
                         }
                         if (cr)
@@ -363,7 +363,7 @@ class npc_cork_gizelton : public CreatureScript
                             if (i)
                                 entry = i == 1 ? NPC_DOOMWARDER : NPC_NETHER;
 
-                            if (cr = me->SummonCreature(entry, x, y, me->GetMap()->GetHeight(x, y, MAX_HEIGHT), 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000))
+                            if ((cr = me->SummonCreature(entry, x, y, me->GetMap()->GetHeight(x, y, MAX_HEIGHT), 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000)))
                                 cr->AI()->AttackStart(me);
                         }
                         if (cr)

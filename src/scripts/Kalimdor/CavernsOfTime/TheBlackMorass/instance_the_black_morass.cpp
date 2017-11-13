@@ -133,7 +133,7 @@ public:
             }
         }
 
-        void SetData(uint32 type, uint32 data)
+        void SetData(uint32 type, uint32  /*data*/)
         {
             switch (type)
             {
@@ -281,7 +281,7 @@ public:
                     Events.ScheduleEvent(EVENT_SUMMON_KEEPER, 6000);
                     Events.SetPhase(0);
 
-                    if (Creature* medivh = instance->GetCreature(_medivhGUID))
+                    if (instance->GetCreature(_medivhGUID))
                     {
                         uint8 position = (_currentRift-1)%4;
                         instance->SummonCreature(NPC_TIME_RIFT, PortalLocation[position]);

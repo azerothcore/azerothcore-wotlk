@@ -84,7 +84,7 @@ public:
             me->DespawnOrUnsummon(5000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32  /*diff*/)
         {
             if (PrisonerGUID)
             {

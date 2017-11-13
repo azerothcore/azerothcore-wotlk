@@ -332,8 +332,8 @@ class spell_hadronox_summon_periodic : public SpellScriptLoader
             }
 
         private:
-            uint32 _spellEntry;
             uint32 _delay;
+            uint32 _spellEntry;
         };
 
         AuraScript* GetAuraScript() const
@@ -342,8 +342,8 @@ class spell_hadronox_summon_periodic : public SpellScriptLoader
         }
 
     private:
-        uint32 _spellEntry;
         uint32 _delay;
+        uint32 _spellEntry;
 };
 
 class spell_hadronox_leech_poison : public SpellScriptLoader

@@ -333,7 +333,7 @@ class spell_hallows_end_base_fire : public SpellScriptLoader
             }
         }
 
-        void HandleEffectApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+        void HandleEffectApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
             Unit* target = GetTarget();
             target->SetObjectScale(0.5f);
@@ -493,7 +493,7 @@ public:
         return true;
     }
 
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    bool OnQuestAccept(Player*  /*player*/, Creature* creature, Quest const* quest)
     {
         if ((quest->GetQuestId() == QUEST_LET_THE_FIRES_COME_A || quest->GetQuestId() == QUEST_LET_THE_FIRES_COME_H) && !creature->AI()->GetData(DATA_ALLOW_START))
             creature->AI()->DoAction(ACTION_START_EVENT);
@@ -523,7 +523,7 @@ class npc_soh_fire_trigger : public CreatureScript
                 me->SetDisableGravity(true);
             }
 
-            void SpellHit(Unit* caster, const SpellInfo* spellInfo)
+            void SpellHit(Unit*  /*caster*/, const SpellInfo* spellInfo)
             {
                 if (spellInfo->Id == SPELL_START_FIRE)
                 {
@@ -584,7 +584,7 @@ class npc_hallows_end_soh : public CreatureScript
             std::list<uint64> unitList;
             int32 pos;
             void EnterCombat(Unit*) {}
-            void MoveInLineOfSight(Unit* who){}
+            void MoveInLineOfSight(Unit*  /*who*/){}
 
             void DoAction(int32 param)
             {
@@ -739,7 +739,7 @@ class npc_hallows_end_soh : public CreatureScript
                 }
             }
 
-            void JustDied(Unit* killer)
+            void JustDied(Unit*  /*killer*/)
             {
                 me->MonsterYell("So eager you are, for my blood to spill. Yet to vanquish me, 'tis my head you must kill!", LANG_UNIVERSAL, 0);
                 me->PlayDirectSound(11969);
@@ -904,7 +904,7 @@ class boss_headless_horseman : public CreatureScript
             uint8 phase;
             uint32 health;
 
-            void JustDied(Unit* killer)
+            void JustDied(Unit*  /*killer*/)
             {
                 summons.DespawnAll();
                 me->MonsterSay("This end have I reached before. What new adventure lies in store?", LANG_UNIVERSAL, 0);
@@ -920,7 +920,7 @@ class boss_headless_horseman : public CreatureScript
                     sLFGMgr->FinishDungeon(players.begin()->GetSource()->GetGroup()->GetGUID(), 285, me->FindMap());
             }
 
-            void KilledUnit(Unit* who)
+            void KilledUnit(Unit*  /*who*/)
             {
                 me->MonsterYell("Your body lies beaten, battered and broken. Let my curse be your own, fate has spoken.", LANG_UNIVERSAL, 0);
                 me->PlayDirectSound(SOUND_SLAY);
@@ -940,7 +940,7 @@ class boss_headless_horseman : public CreatureScript
                 }
             }
 
-            void SpellHit(Unit* caster, const SpellInfo* spellInfo)
+            void SpellHit(Unit*  /*caster*/, const SpellInfo* spellInfo)
             {
                 if (spellInfo->Id == SPELL_THROW_HEAD_BACK)
                 {
@@ -985,7 +985,7 @@ class boss_headless_horseman : public CreatureScript
             Player* GetRhymePlayer() { return playerGUID ? ObjectAccessor::GetPlayer(*me, playerGUID) : NULL; }
 
             void EnterCombat(Unit*) { me->SetInCombatWithZone(); }
-            void MoveInLineOfSight(Unit* who) {}
+            void MoveInLineOfSight(Unit*  /*who*/) {}
 
             void DamageTaken(Unit*, uint32 &damage, DamageEffectType, SpellSchoolMask)
             {
@@ -1174,7 +1174,7 @@ class boss_headless_horseman_head : public CreatureScript
             uint32 timer;
             bool handled;
 
-            void SpellHitTarget(Unit* target, const SpellInfo* spellInfo)
+            void SpellHitTarget(Unit*  /*target*/, const SpellInfo* spellInfo)
             {
                 if (spellInfo->Id == SPELL_THROW_HEAD_BACK)
                 {
@@ -1311,7 +1311,7 @@ class boss_headless_horseman_pumpkin : public CreatureScript
                 me->CastSpell(me, SPELL_PUMPKIN_VISUAL, true);
             }
 
-            void SpellHit(Unit* caster, const SpellInfo* spellInfo)
+            void SpellHit(Unit*  /*caster*/, const SpellInfo* spellInfo)
             {
                 if (spellInfo->Id == SPELL_SPROUTING)
                 {

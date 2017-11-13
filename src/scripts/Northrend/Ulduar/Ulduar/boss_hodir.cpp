@@ -230,9 +230,9 @@ public:
                 pInstance->SetData(TYPE_HODIR, NOT_STARTED);
         }
 
-        void EnterCombat(Unit* pWho)
+        void EnterCombat(Unit*  /*pWho*/)
         {
-            if (summons.size() != RAID_MODE(8, 16))
+            if (summons.size() != uint32(RAID_MODE(8, 16)))
             {
                 EnterEvadeMode();
                 return;
@@ -470,8 +470,8 @@ public:
             if( faction )
                 for( uint8 k=0; k<4; ++k )
                 {
-                    if( faction == 'A' && ( k>1 || k==1 && RAID_MODE(1,0) ) ||
-                        faction == 'H' && ( k<2 || k==3 && RAID_MODE(1,0) ) )
+                    if( (faction == 'A' && ( k>1 || (k==1 && RAID_MODE(1,0)) )) ||
+                        (faction == 'H' && ( k<2 || (k==3 && RAID_MODE(1,0)) )) )
                         continue;
 
                     for( uint8 i=0; i<4; ++i )
@@ -555,7 +555,7 @@ public:
             return 0;
         }
 
-        void MoveInLineOfSight(Unit* who) {}
+        void MoveInLineOfSight(Unit*  /*who*/) {}
     };
 };
 
@@ -623,7 +623,7 @@ public:
         InstanceScript* pInstance;
         uint16 timer;
 
-        void DamageTaken(Unit* doneBy, uint32 &damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit* doneBy, uint32 & /*damage*/, DamageEffectType, SpellSchoolMask)
         {
             if (pInstance && doneBy)
                 if (pInstance->GetData(TYPE_HODIR) == NOT_STARTED)
@@ -636,10 +636,10 @@ public:
             if (timer <= diff)
             {
                 timer = 2500;
-                if (me->IsSummon())
+                if (me->IsSummon()) {
                     if (Unit* s = me->ToTempSummon()->GetSummoner())
                     {
-                        if (s->GetTypeId() == TYPEID_PLAYER && !s->HasAura(SPELL_FLASH_FREEZE_TRAPPED_PLAYER) || s->GetTypeId() == TYPEID_UNIT && !s->HasAura(SPELL_FLASH_FREEZE_TRAPPED_NPC))
+                        if ((s->GetTypeId() == TYPEID_PLAYER && !s->HasAura(SPELL_FLASH_FREEZE_TRAPPED_PLAYER)) || (s->GetTypeId() == TYPEID_UNIT && !s->HasAura(SPELL_FLASH_FREEZE_TRAPPED_NPC)))
                             me->DespawnOrUnsummon(2000);
                         else if (s->GetTypeId() == TYPEID_PLAYER)
                             if (InstanceScript* pInstance = me->GetInstanceScript())
@@ -650,7 +650,10 @@ public:
                                 }
                     }
                     else
+                    {
                         me->DespawnOrUnsummon(2000);
+                    }
+                }
             }
             else
                 timer -= diff;
@@ -688,7 +691,7 @@ public:
             }
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spell)
+        void SpellHit(Unit*  /*caster*/, const SpellInfo* spell)
         {
             switch( spell->Id )
             {
@@ -786,7 +789,7 @@ public:
             }
         }
 
-        void MoveInLineOfSight(Unit* who) {}
+        void MoveInLineOfSight(Unit*  /*who*/) {}
         void EnterEvadeMode() {}
         bool CanAIAttack(const Unit* t) const { return t->GetEntry() == NPC_HODIR; }
 
@@ -884,7 +887,7 @@ public:
             }
         }
 
-        void MoveInLineOfSight(Unit* who) {}
+        void MoveInLineOfSight(Unit*  /*who*/) {}
         void EnterEvadeMode() {}
         bool CanAIAttack(const Unit* t) const { return t->GetEntry() == NPC_HODIR; }
 
@@ -985,7 +988,7 @@ public:
             }
         }
 
-        void MoveInLineOfSight(Unit* who) {}
+        void MoveInLineOfSight(Unit*  /*who*/) {}
         void EnterEvadeMode() {}
         bool CanAIAttack(const Unit* t) const { return t->GetEntry() == NPC_HODIR; }
 
@@ -1101,7 +1104,7 @@ public:
             }
         }
 
-        void MoveInLineOfSight(Unit* who) {}
+        void MoveInLineOfSight(Unit*  /*who*/) {}
         void EnterEvadeMode() {}
         bool CanAIAttack(const Unit* t) const { return t->GetEntry() == NPC_HODIR; }
 
@@ -1162,7 +1165,7 @@ public:
             return true;
         }
 
-        void HandleEffectPeriodic(AuraEffect const * aurEff)
+        void HandleEffectPeriodic(AuraEffect const *  /*aurEff*/)
         {
             
             if (Unit* target = GetTarget())
@@ -1286,7 +1289,7 @@ public:
 
         void HandleEffectPeriodic(AuraEffect const * aurEff)
         {
-            if (aurEff->GetTickNumber() == aurEff->GetTotalTicks()-1)
+            if (aurEff->GetTotalTicks() > 0 && aurEff->GetTickNumber() == uint32(aurEff->GetTotalTicks())-1)
             {
                 Unit* target = GetTarget();
                 Unit* caster = GetCaster();
@@ -1347,7 +1350,7 @@ public:
     {
         PrepareAuraScript(spell_hodir_storm_power_AuraScript)
 
-        void OnApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+        void OnApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
             if (Unit* caster = GetCaster())
                 if (Aura* a = caster->GetAura(GetId() == SPELL_SHAMAN_STORM_POWER_10 ? SPELL_SHAMAN_STORM_CLOUD_10 : SPELL_SHAMAN_STORM_CLOUD_25))
@@ -1383,7 +1386,7 @@ public:
     {
         PrepareAuraScript(spell_hodir_storm_cloud_AuraScript)
 
-        void HandleEffectPeriodic(AuraEffect const * aurEff)
+        void HandleEffectPeriodic(AuraEffect const *  /*aurEff*/)
         {
             PreventDefaultAction();
             if (Unit* target = GetTarget())
@@ -1407,7 +1410,7 @@ class achievement_cheese_the_freeze : public AchievementCriteriaScript
 public:
     achievement_cheese_the_freeze() : AchievementCriteriaScript("achievement_cheese_the_freeze") {}
 
-    bool OnCheck(Player* player, Unit* target)
+    bool OnCheck(Player*  /*player*/, Unit* target)
     {
         return target && target->GetEntry() == NPC_HODIR && target->GetTypeId() == TYPEID_UNIT && target->ToCreature()->AI()->GetData(1);
     }
@@ -1418,7 +1421,7 @@ class achievement_getting_cold_in_here : public AchievementCriteriaScript
 public:
     achievement_getting_cold_in_here() : AchievementCriteriaScript("achievement_getting_cold_in_here") {}
 
-    bool OnCheck(Player* player, Unit* target)
+    bool OnCheck(Player*  /*player*/, Unit* target)
     {
         return target && target->GetEntry() == NPC_HODIR && target->GetTypeId() == TYPEID_UNIT && target->ToCreature()->AI()->GetData(2);
     }
@@ -1429,7 +1432,7 @@ class achievement_i_could_say_that_this_cache_was_rare : public AchievementCrite
 public:
     achievement_i_could_say_that_this_cache_was_rare() : AchievementCriteriaScript("achievement_i_could_say_that_this_cache_was_rare") {}
 
-    bool OnCheck(Player* player, Unit* target)
+    bool OnCheck(Player*  /*player*/, Unit* target)
     {
         return target && target->GetEntry() == NPC_HODIR && target->GetTypeId() == TYPEID_UNIT && target->ToCreature()->AI()->GetData(3);
     }
@@ -1440,7 +1443,7 @@ class achievement_i_have_the_coolest_friends : public AchievementCriteriaScript
 public:
     achievement_i_have_the_coolest_friends() : AchievementCriteriaScript("achievement_i_have_the_coolest_friends") {}
 
-    bool OnCheck(Player* player, Unit* target)
+    bool OnCheck(Player*  /*player*/, Unit* target)
     {
         return target && target->GetEntry() == NPC_HODIR && target->GetTypeId() == TYPEID_UNIT && target->ToCreature()->AI()->GetData(4);
     }
@@ -1451,7 +1454,7 @@ class achievement_staying_buffed_all_winter_10 : public AchievementCriteriaScrip
 public:
     achievement_staying_buffed_all_winter_10() : AchievementCriteriaScript("achievement_staying_buffed_all_winter_10") {}
 
-    bool OnCheck(Player* player, Unit* target)
+    bool OnCheck(Player* player, Unit*  /*target*/)
     {
         return player && player->HasAura(SPELL_MAGE_TOASTY_FIRE_AURA) && player->HasAura(SPELL_DRUID_STARLIGHT_AREA_AURA) && player->HasAura(SPELL_SHAMAN_STORM_POWER_10);
     }
@@ -1462,7 +1465,7 @@ class achievement_staying_buffed_all_winter_25 : public AchievementCriteriaScrip
 public:
     achievement_staying_buffed_all_winter_25() : AchievementCriteriaScript("achievement_staying_buffed_all_winter_25") {}
 
-    bool OnCheck(Player* player, Unit* target)
+    bool OnCheck(Player* player, Unit*  /*target*/)
     {
         return player && player->HasAura(SPELL_MAGE_TOASTY_FIRE_AURA) && player->HasAura(SPELL_DRUID_STARLIGHT_AREA_AURA) && player->HasAura(SPELL_SHAMAN_STORM_POWER_25);
     }

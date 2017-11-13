@@ -71,7 +71,7 @@ class npc_preparations_for_war_vehicle : public CreatureScript
                 transportEntry = (me->GetEntry() == NPC_HAMMERHEAD ? TRANSPORT_ORGRIMS_HAMMER : TRANSPORT_THE_SKYBREAKER);
             }
 
-            void MovementInform(uint32 type, uint32 id)
+            void MovementInform(uint32 type, uint32  /*id*/)
             {
                 if (type == ESCORT_MOTION_TYPE)
                     if (++pointId == 17) // path size

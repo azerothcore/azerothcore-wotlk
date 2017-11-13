@@ -521,7 +521,7 @@ public:
                 boss_twin_valkyrAI::JustSummoned(c);
         }
 
-        void JustSummoned(Creature* s) {}
+        void JustSummoned(Creature*  /*s*/) {}
     };
 };
 
@@ -547,7 +547,7 @@ public:
                 boss_twin_valkyrAI::JustSummoned(c);
         }
 
-        void JustSummoned(Creature* s) {}
+        void JustSummoned(Creature*  /*s*/) {}
     };
 };
 
@@ -564,37 +564,37 @@ public:
                 {
                     uint32 essenceId = 0;
                     uint32 effect2Id = 0;
-                    uint32 empoweredId = 0;
+                    //uint32 empoweredId = 0;
                     uint32 touchId1 = 0;
-                    uint32 touchId2 = 0;
+                    //uint32 touchId2 = 0;
                     switch( creature->GetMap()->GetDifficulty() )
                     {
                         case 0:
                             essenceId = 65684;
-                            empoweredId = 65724;
+                            //empoweredId = 65724;
                             touchId1 = 65950;
-                            touchId2 = 66001;
+                            //touchId2 = 66001;
                             effect2Id = 65827;
                             break;
                         case 1:
                             essenceId = 67176;
-                            empoweredId = 67213;
+                            //empoweredId = 67213;
                             touchId1 = 67296;
-                            touchId2 = 67281;
+                            //touchId2 = 67281;
                             effect2Id = 67179;
                             break;
                         case 2:
                             essenceId = 67177;
-                            empoweredId = 67214;
+                            //empoweredId = 67214;
                             touchId1 = 67297;
-                            touchId2 = 67282;
+                            //touchId2 = 67282;
                             effect2Id = 67180;
                             break;
                         case 3:
                             essenceId = 67178;
-                            empoweredId = 67215;
+                            //empoweredId = 67215;
                             touchId1 = 67298;
-                            touchId2 = 67283;
+                            //touchId2 = 67283;
                             effect2Id = 67181;
                             break;
                     }
@@ -610,36 +610,36 @@ public:
                 {
                     uint32 essenceId = 0;
                     uint32 effect2Id = 0;
-                    uint32 empoweredId = 0;
-                    uint32 touchId1 = 0;
+                    //uint32 empoweredId = 0;
+                    //uint32 touchId1 = 0;
                     uint32 touchId2 = 0;
                     switch( creature->GetMap()->GetDifficulty() )
                     {
                         case 0:
                             essenceId = 65686;
-                            empoweredId = 65748;
-                            touchId1 = 65950;
+                            //empoweredId = 65748;
+                            //touchId1 = 65950;
                             touchId2 = 66001;
                             effect2Id = 65811;
                             break;
                         case 1:
                             essenceId = 67222;
-                            empoweredId = 67216;
-                            touchId1 = 67296;
+                            //empoweredId = 67216;
+                            //touchId1 = 67296;
                             touchId2 = 67281;
                             effect2Id = 67511;
                             break;
                         case 2:
                             essenceId = 67223;
-                            empoweredId = 67217;
-                            touchId1 = 67297;
+                            //empoweredId = 67217;
+                            //touchId1 = 67297;
                             touchId2 = 67282;
                             effect2Id = 67512;
                             break;
                         case 3:
                             essenceId = 67224;
-                            empoweredId = 67218;
-                            touchId1 = 67298;
+                            //empoweredId = 67218;
+                            //touchId1 = 67298;
                             touchId2 = 67283;
                             effect2Id = 67513;
                             break;
@@ -704,7 +704,7 @@ public:
             me->GetMotionMaster()->MovePoint(0, Locs[LOC_CENTER].GetPositionX()+cos(angle)*47.0f, Locs[LOC_CENTER].GetPositionY()+sin(angle)*47.0f, me->GetPositionZ());
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32  /*diff*/)
         {
             if( despawning )
                 return;
@@ -831,7 +831,7 @@ class spell_valkyr_touch : public SpellScriptLoader
                             {
                                 uint32 absorb=0;
                                 uint32 resist=0;
-                                CleanDamage cleanDamage =  CleanDamage(0, 0, BASE_ATTACK, MELEE_HIT_NORMAL);
+                                CleanDamage(0, 0, BASE_ATTACK, MELEE_HIT_NORMAL);
                                 int32 dmg = urand(2925,3075)*(caster->GetMap()->GetDifficulty()-1);
                                 if (caster->CanApplyResilience())
                                     Unit::ApplyResilience(plr, NULL, &dmg, false, CR_CRIT_TAKEN_SPELL);
@@ -869,7 +869,7 @@ class spell_valkyr_ball_periodic_dummy : public SpellScriptLoader
         {
             PrepareAuraScript(spell_valkyr_ball_periodic_dummyAuraScript)
 
-            void HandleEffectPeriodic(AuraEffect const * aurEff)
+            void HandleEffectPeriodic(AuraEffect const *  /*aurEff*/)
             {
                 if (Unit* target = GetTarget())
                     if (target->GetDisplayId() != 11686)

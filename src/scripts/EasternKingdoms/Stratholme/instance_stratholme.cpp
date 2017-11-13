@@ -23,6 +23,21 @@ const Position BlackGuardPos[10] =
     {4032.73f-2.0f, -3407.38f-2.0f, 115.56f, 0.0f}
 };
 
+// Creatures to be spawned during the trap events
+static const uint32 aPlaguedCritters[] =
+{
+    NPC_PLAGUED_RAT, NPC_PLAGUED_MAGGOT, NPC_PLAGUED_INSECT
+};
+
+// Positions of the two Gate Traps
+static const Position aGateTrap[] =                    
+{
+    {3612.29f, -3335.39f, 124.077f, 3.14159f},  // Scarlet side
+    {3919.88f, -3547.34f, 134.269f, 2.94961f}   // Undead side
+};
+
+// uint32 m_uiGateTrapTimers[2][3] = { {0,0,0}, {0,0,0} };
+
 class instance_stratholme : public InstanceMapScript
 {
     public:
@@ -53,6 +68,9 @@ class instance_stratholme : public InstanceMapScript
                 _gauntletGateGUID = 0;
                 _slaughterGateGUID = 0;
                 _baronRivendareGUID = 0;
+
+                _gateTrapsCooldown[0] = false;
+                _gateTrapsCooldown[1] = false;
 
                 events.Reset();
             }
@@ -185,6 +203,18 @@ class instance_stratholme : public InstanceMapScript
                         if (_slaughterProgress >= 2)
                             go->SetGoState(GO_STATE_ACTIVE);
                         break;
+                    case GO_PORT_TRAP_GATE_1:
+                        _trapGatesGUIDs[0] = go->GetGUID();
+                        break;
+                    case GO_PORT_TRAP_GATE_2:
+                        _trapGatesGUIDs[1] = go->GetGUID();
+                        break;
+                    case GO_PORT_TRAP_GATE_3:
+                        _trapGatesGUIDs[2] = go->GetGUID();
+                        break;
+                    case GO_PORT_TRAP_GATE_4:
+                        _trapGatesGUIDs[3] = go->GetGUID();
+                        break;
                 }
             }
 
@@ -200,6 +230,23 @@ class instance_stratholme : public InstanceMapScript
                         gate->SetGoState(GO_STATE_ACTIVE);
                     if (GameObject* gate = instance->GetGameObject(_slaughterGateGUID))
                         gate->SetGoState(GO_STATE_ACTIVE);
+                }
+            }
+
+            void DoSpawnPlaguedCritters(uint8 /*uiGate*/, Player* player)
+            {
+                if (!player)
+                    return;
+
+
+                uint32 uiEntry = aPlaguedCritters[urand(0, 2)];
+                for (uint8 i = 0; i < 30; ++i)
+                {
+                    float x, y, z;
+                    const Position pPos = { player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetOrientation() };
+                    player->GetRandomPoint(pPos, 8.0f, x, y, z);
+                    z = player->GetPositionZ() + 1;
+                    player->SummonCreature(uiEntry, x, y, z, 0, TEMPSUMMON_DEAD_DESPAWN, 0)->AI()->AttackStart(player);
                 }
             }
 
@@ -324,8 +371,88 @@ class instance_stratholme : public InstanceMapScript
             void Update(uint32 diff)
             {
                 events.Update(diff);
+
+                Map::PlayerList const& players = instance->GetPlayers();
+                // Loop over the two Gate traps, each one has up to three timers (trap reset, gate opening delay, critters spawning delay)
+                for (uint8 i = 0; i < 2; i++)
+                {
+                    // if the gate is in cooldown, skip the other checks
+                    if (_gateTrapsCooldown[i])
+                        break;
+
+
+                    // Check that the trap is not on cooldown, if so check if player/pet is in range
+                    for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+                    {
+                        if (Player* player = itr->GetSource())
+                        {
+                            // should pet also trigger the trap? could not find any source for it
+                            if (player && !player->IsGameMaster() && player->IsWithinDist2d(aGateTrap[i].m_positionX, aGateTrap[i].m_positionY, 5.5f))
+                            {
+                                // Check if timer was not already set by another player/pet a few milliseconds before
+                                if (_gateTrapsCooldown[i])
+                                    return;
+                               
+                                _gateTrapsCooldown[i] = true;
+
+                                // close the gates
+                                if (_trapGatesGUIDs[2 * i])
+                                    DoUseDoorOrButton(_trapGatesGUIDs[2 * i]);
+                                if (_trapGatesGUIDs[2 * i + 1])
+                                    DoUseDoorOrButton(_trapGatesGUIDs[2 * i + 1]);
+
+                                _trappedPlayerGUID = player->GetGUID();
+
+                                if (i == 0)
+                                {
+                                    // set timer to reset the trap
+                                    events.ScheduleEvent(EVENT_GATE1_TRAP, 30 * MINUTE * IN_MILLISECONDS);
+                                    // set timer to reopen gates
+                                    events.ScheduleEvent(EVENT_GATE1_DELAY, 20 * IN_MILLISECONDS);
+                                    // set timer to spawn the plagued critters
+                                    events.ScheduleEvent(EVENT_GATE1_CRITTER_DELAY, 2 * IN_MILLISECONDS);
+                                }
+                                else if (i == 1)
+                                {
+                                    // set timer to reset the trap
+                                    events.ScheduleEvent(EVENT_GATE2_TRAP, 30 * MINUTE * IN_MILLISECONDS);
+                                    // set timer to reopen gates
+                                    events.ScheduleEvent(EVENT_GATE2_DELAY, 20 * IN_MILLISECONDS);
+                                    // set timer to spawn the plagued critters
+                                    events.ScheduleEvent(EVENT_GATE2_CRITTER_DELAY, 2 * IN_MILLISECONDS);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                int gate = 1;
                 switch (events.ExecuteEvent())
                 {
+                    case EVENT_GATE1_TRAP:
+                        gate = 0;
+                    case EVENT_GATE2_TRAP:
+                        _gateTrapsCooldown[gate] = false;
+                        break;
+                    case EVENT_GATE1_DELAY:
+                        gate = 0;
+                    case EVENT_GATE2_DELAY:
+                        if (_trapGatesGUIDs[2 * gate])
+                            DoUseDoorOrButton(_trapGatesGUIDs[2 * gate]);
+                        if (_trapGatesGUIDs[2 * gate + 1])
+                            DoUseDoorOrButton(_trapGatesGUIDs[2 * gate + 1]);
+                        break;
+                    case EVENT_GATE1_CRITTER_DELAY:
+                        gate = 0;
+                    case EVENT_GATE2_CRITTER_DELAY:
+                        if (_trappedPlayerGUID)
+                        {
+                            if (Player* pPlayer = instance->GetPlayer(_trappedPlayerGUID))
+                            {
+                                DoSpawnPlaguedCritters(gate, pPlayer);
+                            }
+                        }
+                        break;
                     case EVENT_BARON_TIME:
                     {
                         --_baronRunTime;
@@ -434,6 +561,10 @@ class instance_stratholme : public InstanceMapScript
             uint64 _slaughterGateGUID;
             uint64 _gauntletGateGUID;
             uint64 _baronRivendareGUID;
+
+            bool _gateTrapsCooldown[2];
+            uint64 _trappedPlayerGUID;
+            uint64 _trapGatesGUIDs[4];
         };
 
         InstanceScript* GetInstanceScript(InstanceMap* map) const

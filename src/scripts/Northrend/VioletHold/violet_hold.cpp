@@ -20,7 +20,7 @@ class go_vh_activation_crystal : public GameObjectScript
 public:
     go_vh_activation_crystal() : GameObjectScript("go_vh_activation_crystal") { }
 
-    bool OnGossipHello(Player* pPlayer, GameObject* pGo)
+    bool OnGossipHello(Player*  /*pPlayer*/, GameObject* pGo)
     {
         if (InstanceScript* pInstance = pGo->GetInstanceScript())
             pInstance->SetData(DATA_ACTIVATE_DEFENSE_SYSTEM, 1);
@@ -283,7 +283,7 @@ struct violet_hold_trashAI : public npc_escortAI
     void WaypointReached(uint32 id)
     {
         if (PLoc<6)
-            if (id == PLocWPCount[PLoc] -1 -(bAlt ? 1 : 0))
+            if (id == uint16(PLocWPCount[PLoc] -1 -(bAlt ? 1 : 0)))
                 CreatureStartAttackDoor();
     }
 
@@ -1119,7 +1119,7 @@ public:
     {
         PrepareAuraScript(spell_destroy_door_sealAuraScript)
 
-        void HandleEffectPeriodic(AuraEffect const * aurEff)
+        void HandleEffectPeriodic(AuraEffect const *  /*aurEff*/)
         {
             PreventDefaultAction();
             if (Unit* target = GetTarget())

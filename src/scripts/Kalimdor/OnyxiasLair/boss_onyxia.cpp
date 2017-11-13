@@ -193,7 +193,7 @@ public:
             me->GetMap()->ToInstanceMap()->PermBindAllPlayers();
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit*  /*who*/)
         {
             Talk(SAY_AGGRO);
             DoZoneInCombat();
@@ -208,13 +208,13 @@ public:
             BindPlayers();
         }
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit*  /*killer*/)
         {
             if( m_pInstance )
                 m_pInstance->SetData(DATA_ONYXIA, DONE);
         }
 
-        void DamageTaken(Unit*, uint32 &damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32 & /*damage*/, DamageEffectType, SpellSchoolMask)
         {
             switch( Phase )
             {
@@ -645,8 +645,8 @@ public:
     {
         npc_onyxia_triggerAI(Creature* pCreature) : ScriptedAI(pCreature) {}
 
-        void MoveInLineOfSight(Unit* who) {}
-        void UpdateAI(uint32 diff) {}
+        void MoveInLineOfSight(Unit*  /*who*/) {}
+        void UpdateAI(uint32  /*diff*/) {}
     };
 };
 

@@ -326,7 +326,7 @@ class boss_illidan_stormrage : public CreatureScript
 
             void MoveInLineOfSight(Unit*) { }
 
-            void JustDied(Unit* killer)
+            void JustDied(Unit*  /*killer*/)
             {
                 me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE|UNIT_FLAG_NON_ATTACKABLE);
                 summons.DespawnEntry(NPC_PARASITIC_SHADOWFIEND);
@@ -334,7 +334,7 @@ class boss_illidan_stormrage : public CreatureScript
                 instance->SaveToDB();
             }
 
-            void KilledUnit(Unit* victim)
+            void KilledUnit(Unit*  /*victim*/)
             {
                 if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
                 {
@@ -459,7 +459,7 @@ class boss_illidan_stormrage : public CreatureScript
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
 
-                switch (uint32 eventId = events.ExecuteEvent())
+                switch (events.ExecuteEvent())
                 {
                     case EVENT_SUMMON_MINIONS:
                         if (me->HealthBelowPct(90))
@@ -579,7 +579,7 @@ class boss_illidan_stormrage : public CreatureScript
                         me->CastSpell(me, SPELL_THROW_GLAIVE2, false);
                         break;
                     case EVENT_PHASE_2_CHANGE_POS:
-                        beamPosId = (++beamPosId)%MAX_EYE_BEAM_POS;
+                        beamPosId = (beamPosId+1)%MAX_EYE_BEAM_POS;
                         events.ScheduleEvent(EVENT_SPELL_FIREBALL, 8000, GROUP_PHASE_2_ABILITY);
                         events.ScheduleEvent(EVENT_SPELL_DARK_BARRAGE, 18000, GROUP_PHASE_2_ABILITY);
                         events.ScheduleEvent(EVENT_PHASE_2_EYE_BEAM, urand(25000, 50000), GROUP_PHASE_2_ABILITY);
@@ -791,7 +791,7 @@ class npc_akama_illidan : public CreatureScript
                 summons.DespawnAll();
             }
 
-            void sGossipSelect(Player* player, uint32 /*sender*/, uint32 action)
+            void sGossipSelect(Player* player, uint32 /*sender*/, uint32  /*action*/)
             {
                 player->CLOSE_GOSSIP_MENU();
                 me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
@@ -1021,7 +1021,7 @@ class spell_illidan_parasitic_shadowfiend : public SpellScriptLoader
         {
             PrepareAuraScript(spell_illidan_parasitic_shadowfiend_AuraScript)
 
-            void HandleEffectRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+            void HandleEffectRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
                 if (!GetTarget()->HasAura(SPELL_SHADOW_PRISON) && GetTarget()->GetInstanceScript() && GetTarget()->GetInstanceScript()->IsEncounterInProgress())
                     GetTarget()->CastSpell(GetTarget(), SPELL_SUMMON_PARASITIC_SHADOWFIENDS, true);
@@ -1048,7 +1048,7 @@ class spell_illidan_parasitic_shadowfiend_trigger : public SpellScriptLoader
         {
             PrepareAuraScript(spell_illidan_parasitic_shadowfiend_trigger_AuraScript)
 
-            void HandleEffectRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+            void HandleEffectRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
                 if (!GetTarget()->HasAura(SPELL_SHADOW_PRISON) && GetTarget()->GetInstanceScript() && GetTarget()->GetInstanceScript()->IsEncounterInProgress())
                     GetTarget()->CastSpell(GetTarget(), SPELL_SUMMON_PARASITIC_SHADOWFIENDS, true);
@@ -1125,7 +1125,7 @@ class spell_illidan_tear_of_azzinoth_summon_channel : public SpellScriptLoader
         {
             PrepareAuraScript(spell_illidan_tear_of_azzinoth_summon_channel_AuraScript);
 
-            void OnPeriodic(AuraEffect const* aurEff)
+            void OnPeriodic(AuraEffect const*  /*aurEff*/)
             {
                 PreventDefaultAction();
                 if (Unit* caster = GetCaster())
@@ -1200,7 +1200,7 @@ class spell_illidan_demon_transform1 : public SpellScriptLoader
                 return GetUnitOwner()->GetTypeId() == TYPEID_UNIT;
             }
 
-            void OnPeriodic(AuraEffect const* aurEff)
+            void OnPeriodic(AuraEffect const*  /*aurEff*/)
             {
                 PreventDefaultAction();
                 SetDuration(0);
@@ -1378,7 +1378,7 @@ class spell_illidan_cage_trap_stun : public SpellScriptLoader
         {
             PrepareAuraScript(spell_illidan_cage_trap_stun_AuraScript);
 
-            void OnPeriodic(AuraEffect const* aurEff)
+            void OnPeriodic(AuraEffect const*  /*aurEff*/)
             {
                 PreventDefaultAction();
                 SetDuration(0);

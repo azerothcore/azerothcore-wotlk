@@ -74,7 +74,7 @@ public:
             return false;
         }
 
-        void OnPlayerEnter(Player* plr)
+        void OnPlayerEnter(Player*  /*plr*/)
         {
             instance->LoadGrid(LeaderIntroPos.GetPositionX(), LeaderIntroPos.GetPositionY());
             if (Creature* c = instance->GetCreature(GetData64(DATA_LEADER_FIRST_GUID)))
@@ -372,7 +372,7 @@ public:
             return 0;
         }
 
-        bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const* source, Unit const* target = NULL, uint32 miscvalue1 = 0)
+        bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/)
         {
             switch(criteria_id)
             {

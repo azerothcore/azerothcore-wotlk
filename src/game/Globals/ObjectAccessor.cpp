@@ -313,7 +313,9 @@ Corpse* ObjectAccessor::ConvertCorpseForPlayer(uint64 player_guid, bool insignia
         return NULL;
     }
 
-    ;//sLog->outStaticDebug("Deleting Corpse and spawned bones.");
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+    sLog->outStaticDebug("Deleting Corpse and spawned bones.");
+#endif
 
     // Map can be NULL
     Map* map = corpse->FindMap();
@@ -510,10 +512,6 @@ void ObjectAccessor::UnloadAll()
 
 std::map<std::string, Player*> ObjectAccessor::playerNameToPlayerPointer;
 
-/// Define the static members of HashMapHolder
-
-template <class T> UNORDERED_MAP< uint64, T* > HashMapHolder<T>::m_objectMap;
-template <class T> typename HashMapHolder<T>::LockType HashMapHolder<T>::i_lock;
 
 /// Global definitions for the hashmap storage
 

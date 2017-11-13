@@ -41,6 +41,7 @@ char* command_finder(const char* text, int state)
 
     while (idx < cmd.size())
     {
+        ret = cmd[idx].Name;
         if (!cmd[idx].AllowConsole)
         {
             ++idx;

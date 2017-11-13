@@ -327,7 +327,7 @@ class spell_scholomance_shadow_portal : public SpellScriptLoader
                     }
                     else
                     {
-                        room = (++room)%ROOM_MAX;
+                        room = (room+1)%ROOM_MAX;
                         ++attempts;
                     }
                 }

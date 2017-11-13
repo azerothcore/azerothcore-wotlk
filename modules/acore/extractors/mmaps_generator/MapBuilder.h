@@ -21,8 +21,6 @@
 #include <ace/Activation_Queue.h>
 #include <ace/Method_Request.h>
 
-#include "Database/DatabaseEnv.h"
-
 using namespace VMAP;
 
 // G3D namespace typedefs conflicts with ACE typedefs

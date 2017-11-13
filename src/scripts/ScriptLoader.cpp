@@ -32,6 +32,7 @@ void AddSC_bf_commandscript();
 void AddSC_cast_commandscript();
 void AddSC_character_commandscript();
 void AddSC_debug_commandscript();
+void AddSC_disable_commandscript();
 void AddSC_event_commandscript();
 void AddSC_gm_commandscript();
 void AddSC_go_commandscript();
@@ -569,6 +570,7 @@ void AddSC_outdoorpvp_gh();
 
 // player
 void AddSC_chat_log();
+void AddSC_character_creation();
 
 #endif
 
@@ -600,6 +602,7 @@ void AddCommandScripts()
     AddSC_cast_commandscript();
     AddSC_character_commandscript();
     AddSC_debug_commandscript();
+    AddSC_disable_commandscript();
     AddSC_event_commandscript();
     AddSC_gm_commandscript();
     AddSC_go_commandscript();
@@ -640,6 +643,7 @@ void AddWorldScripts()
     AddSC_npc_taxi();
     AddSC_achievement_scripts();
     AddSC_chat_log();
+    AddSC_character_creation();
 #endif
 }
 

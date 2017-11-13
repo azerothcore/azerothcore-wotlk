@@ -67,7 +67,7 @@ public:
                 pInstance->SetData(BOSS_KRYSTALLUS, NOT_STARTED);
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit*  /*who*/)
         {
             events.Reset();
             events.RescheduleEvent(EVENT_BOULDER, 8000);
@@ -153,14 +153,14 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit*  /*killer*/)
         {
             Talk(SAY_DEATH);
             if (pInstance)
                 pInstance->SetData(BOSS_KRYSTALLUS, DONE);
         }
 
-        void KilledUnit(Unit *victim)
+        void KilledUnit(Unit * /*victim*/)
         {
             Talk(SAY_KILL);
         }
