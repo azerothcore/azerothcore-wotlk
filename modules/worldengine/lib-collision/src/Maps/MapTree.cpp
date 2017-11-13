@@ -1,7 +1,19 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2008-2017 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2005-2010 MaNGOS <http://getmangos.com/>
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation; either version 2 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "MapTree.h"
@@ -20,14 +32,13 @@ using G3D::Vector3;
 
 namespace VMAP
 {
-
     class MapRayCallback
     {
         public:
-            MapRayCallback(ModelInstance* val): prims(val), hit(false) {}
-            bool operator()(const G3D::Ray& ray, uint32 entry, float& distance, bool StopAtFirstHit)
+            MapRayCallback(ModelInstance* val, ModelIgnoreFlags ignoreFlags): prims(val), hit(false), flags(ignoreFlags) { }
+            bool operator()(const G3D::Ray& ray, uint32 entry, float& distance, bool pStopAtFirstHit = true)
             {
-                bool result = prims[entry].intersectRay(ray, distance, StopAtFirstHit);
+                bool result = prims[entry].intersectRay(ray, distance, pStopAtFirstHit, flags);
                 if (result)
                     hit = true;
                 return result;
@@ -36,13 +47,14 @@ namespace VMAP
     protected:
         ModelInstance* prims;
         bool hit;
+        ModelIgnoreFlags flags;
     };
 
     class AreaInfoCallback
     {
         public:
-            AreaInfoCallback(ModelInstance* val): prims(val) {}
-            void operator()(const Vector3& point, uint32 entry)
+            AreaInfoCallback(ModelInstance* val): prims(val) { }
+            void operator()(Vector3 const& point, uint32 entry)
             {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS) && defined(VMAP_DEBUG)
                 sLog->outDebug(LOG_FILTER_MAPS, "AreaInfoCallback: trying to intersect '%s'", prims[entry].name.c_str());
@@ -57,8 +69,8 @@ namespace VMAP
     class LocationInfoCallback
     {
         public:
-            LocationInfoCallback(ModelInstance* val, LocationInfo &info): prims(val), locInfo(info), result(false) {}
-            void operator()(const Vector3& point, uint32 entry)
+            LocationInfoCallback(ModelInstance* val, LocationInfo &info): prims(val), locInfo(info), result(false) { }
+            void operator()(Vector3 const& point, uint32 entry)
             {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS) && defined(VMAP_DEBUG)
                 sLog->outDebug(LOG_FILTER_MAPS, "LocationInfoCallback: trying to intersect '%s'", prims[entry].name.c_str());
@@ -100,15 +112,16 @@ namespace VMAP
         return false;
     }
 
-    bool StaticMapTree::GetLocationInfo(const Vector3 &pos, LocationInfo &info) const
+    bool StaticMapTree::GetLocationInfo(Vector3 const& pos, LocationInfo &info) const
     {
         LocationInfoCallback intersectionCallBack(iTreeValues, info);
         iTree.intersectPoint(pos, intersectionCallBack);
         return intersectionCallBack.result;
     }
 
-    StaticMapTree::StaticMapTree(uint32 mapID, const std::string &basePath)
-        : iMapID(mapID), iIsTiled(false), iTreeValues(0), iBasePath(basePath)
+    StaticMapTree::StaticMapTree(uint32 mapID, std::string const& basePath) :
+        iMapID(mapID), iIsTiled(false), iTreeValues(nullptr),
+        iNTreeValues(0), iBasePath(basePath)
     {
         if (iBasePath.length() > 0 && iBasePath[iBasePath.length()-1] != '/' && iBasePath[iBasePath.length()-1] != '\\')
         {
@@ -128,23 +141,22 @@ namespace VMAP
     If intersection is found within pMaxDist, sets pMaxDist to intersection distance and returns true.
     Else, pMaxDist is not modified and returns false;
     */
-
-    bool StaticMapTree::getIntersectionTime(const G3D::Ray& pRay, float &pMaxDist, bool StopAtFirstHit) const
+    bool StaticMapTree::getIntersectionTime(const G3D::Ray& pRay, float &pMaxDist, bool pStopAtFirstHit, ModelIgnoreFlags ignoreFlags) const
     {
         float distance = pMaxDist;
-        MapRayCallback intersectionCallBack(iTreeValues);
-        iTree.intersectRay(pRay, intersectionCallBack, distance, StopAtFirstHit);
+        MapRayCallback intersectionCallBack(iTreeValues, ignoreFlags);
+        iTree.intersectRay(pRay, intersectionCallBack, distance, pStopAtFirstHit);
         if (intersectionCallBack.didHit())
             pMaxDist = distance;
         return intersectionCallBack.didHit();
     }
-    //=========================================================
 
-    bool StaticMapTree::isInLineOfSight(const Vector3& pos1, const Vector3& pos2) const
+    //=========================================================
+    bool StaticMapTree::isInLineOfSight(Vector3 const& pos1, Vector3 const& pos2, ModelIgnoreFlags ignoreFlag) const
     {
         float maxDist = (pos2 - pos1).magnitude();
         // return false if distance is over max float, in case of cheater teleporting to the end of the universe
-        if (maxDist == std::numeric_limits<float>::max() || !myisfinite(maxDist))
+        if (maxDist == std::numeric_limits<float>::max() || !std::isfinite(maxDist))
             return false;
 
         // valid map coords should *never ever* produce float overflow, but this would produce NaNs too
@@ -154,7 +166,7 @@ namespace VMAP
             return true;
         // direction with length of 1
         G3D::Ray ray = G3D::Ray::fromOriginAndDirection(pos1, (pos2 - pos1)/maxDist);
-        if (getIntersectionTime(ray, maxDist, true))
+        if (getIntersectionTime(ray, maxDist, true, ignoreFlag))
             return false;
 
         return true;
@@ -165,9 +177,9 @@ namespace VMAP
     Return the hit pos or the original dest pos
     */
 
-    bool StaticMapTree::getObjectHitPos(const Vector3& pPos1, const Vector3& pPos2, Vector3& pResultHitPos, float pModifyDist) const
+    bool StaticMapTree::getObjectHitPos(Vector3 const& pPos1, Vector3 const& pPos2, Vector3& pResultHitPos, float pModifyDist) const
     {
-        bool result=false;
+        bool result = false;
         float maxDist = (pPos2 - pPos1).magnitude();
         // valid map coords should *never ever* produce float overflow, but this would produce NaNs too
         ASSERT(maxDist < std::numeric_limits<float>::max());
@@ -180,7 +192,7 @@ namespace VMAP
         Vector3 dir = (pPos2 - pPos1)/maxDist;              // direction with length of 1
         G3D::Ray ray(pPos1, dir);
         float dist = maxDist;
-        if (getIntersectionTime(ray, dist, false))
+        if (getIntersectionTime(ray, dist, false, ModelIgnoreFlags::Nothing))
         {
             pResultHitPos = pPos1 + dir * dist;
             if (pModifyDist < 0)
@@ -210,13 +222,13 @@ namespace VMAP
 
     //=========================================================
 
-    float StaticMapTree::getHeight(const Vector3& pPos, float maxSearchDist) const
+    float StaticMapTree::getHeight(Vector3 const& pPos, float maxSearchDist) const
     {
-        float height = G3D::inf();
+        float height = G3D::finf();
         Vector3 dir = Vector3(0, 0, -1);
         G3D::Ray ray(pPos, dir);   // direction with length of 1
         float maxDist = maxSearchDist;
-        if (getIntersectionTime(ray, maxDist, false))
+        if (getIntersectionTime(ray, maxDist, false, ModelIgnoreFlags::Nothing))
         {
             height = pPos.z - maxDist;
         }
@@ -224,47 +236,48 @@ namespace VMAP
     }
 
     //=========================================================
-
-    bool StaticMapTree::CanLoadMap(const std::string &vmapPath, uint32 mapID, uint32 tileX, uint32 tileY)
+    LoadResult StaticMapTree::CanLoadMap(const std::string &vmapPath, uint32 mapID, uint32 tileX, uint32 tileY)
     {
         std::string basePath = vmapPath;
         if (basePath.length() > 0 && basePath[basePath.length()-1] != '/' && basePath[basePath.length()-1] != '\\')
             basePath.push_back('/');
         std::string fullname = basePath + VMapManager2::getMapFileName(mapID);
-        bool success = true;
+
+        LoadResult result = LoadResult::Success;
+
         FILE* rf = fopen(fullname.c_str(), "rb");
         if (!rf)
-            return false;
-        // TODO: check magic number when implemented...
+            return LoadResult::FileNotFound;
+
         char tiled;
         char chunk[8];
         if (!readChunk(rf, chunk, VMAP_MAGIC, 8) || fread(&tiled, sizeof(char), 1, rf) != 1)
         {
             fclose(rf);
-            return false;
+            return LoadResult::VersionMismatch;
         }
         if (tiled)
         {
             std::string tilefile = basePath + getTileFileName(mapID, tileX, tileY);
             FILE* tf = fopen(tilefile.c_str(), "rb");
             if (!tf)
-                success = false;
+                result = LoadResult::FileNotFound;
             else
             {
                 if (!readChunk(tf, chunk, VMAP_MAGIC, 8))
-                    success = false;
+                    result = LoadResult::VersionMismatch;
                 fclose(tf);
             }
         }
         fclose(rf);
-        return success;
+        return result;
     }
 
     //=========================================================
 
     bool StaticMapTree::InitMap(const std::string &fname, VMapManager2* vm)
     {
-        //VMAP_DEBUG_LOG(LOG_FILTER_MAPS, "StaticMapTree::InitMap() : initializing StaticMapTree '%s'", fname.c_str());
+        sLog->outDebug(LOG_FILTER_MAPS, "StaticMapTree::InitMap() : initializing StaticMapTree '%s'", fname.c_str());
         bool success = false;
         std::string fullname = iBasePath + fname;
         FILE* rf = fopen(fullname.c_str(), "rb");
@@ -282,18 +295,18 @@ namespace VMAP
             success = readChunk(rf, chunk, "GOBJ", 4);
         }
 
-        iIsTiled = bool(tiled);
+        iIsTiled = tiled != '\0';
 
         // global model spawns
         // only non-tiled maps have them, and if so exactly one (so far at least...)
         ModelSpawn spawn;
 #ifdef VMAP_DEBUG
-        //TC_LOG_DEBUG(LOG_FILTER_MAPS, "StaticMapTree::InitMap() : map isTiled: %u", static_cast<uint32>(iIsTiled));
+        sLog->outDebug(LOG_FILTER_MAPS, "StaticMapTree::InitMap() : map isTiled: %u", static_cast<uint32>(iIsTiled));
 #endif
         if (!iIsTiled && ModelSpawn::readFromFile(rf, spawn))
         {
-            WorldModel* model = vm->acquireModelInstance(iBasePath, spawn.name);
-            //VMAP_DEBUG_LOG(LOG_FILTER_MAPS, "StaticMapTree::InitMap() : loading %s", spawn.name.c_str());
+            WorldModel* model = vm->acquireModelInstance(iBasePath, spawn.name, spawn.flags);
+            sLog->outDebug(LOG_FILTER_MAPS, "StaticMapTree::InitMap() : loading %s", spawn.name.c_str());
             if (model)
             {
                 // assume that global model always is the first and only tree value (could be improved...)
@@ -303,7 +316,7 @@ namespace VMAP
             else
             {
                 success = false;
-                //VMAP_ERROR_LOG(LOG_FILTER_GENERAL, "StaticMapTree::InitMap() : could not acquire WorldModel pointer for '%s'", spawn.name.c_str());
+                sLog->outDebug(LOG_FILTER_MAPS, "StaticMapTree::InitMap() : could not acquire WorldModel pointer for '%s'", spawn.name.c_str());
             }
         }
 
@@ -338,7 +351,7 @@ namespace VMAP
         }
         if (!iTreeValues)
         {
-            sLog->outError("StaticMapTree::LoadMapTile() : tree has not been initialized [%u, %u]", tileX, tileY);
+            sLog->outDebug(LOG_FILTER_MAPS, "StaticMapTree::LoadMapTile() : tree has not been initialized [%u, %u]", tileX, tileY);
             return false;
         }
         bool result = true;
@@ -362,7 +375,7 @@ namespace VMAP
                 if (result)
                 {
                     // acquire model instance
-                    WorldModel* model = vm->acquireModelInstance(iBasePath, spawn.name);
+                    WorldModel* model = vm->acquireModelInstance(iBasePath, spawn.name, spawn.flags);
                     if (!model)
                         sLog->outError("StaticMapTree::LoadMapTile() : could not acquire WorldModel pointer [%u, %u]", tileX, tileY);
 
@@ -373,10 +386,11 @@ namespace VMAP
                     {
                         if (!iLoadedSpawns.count(referencedVal))
                         {
+
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS) && defined(VMAP_DEBUG)
                             if (referencedVal > iNTreeValues)
                             {
-                                sLog->outDebug(LOG_FILTER_MAPS, "StaticMapTree::LoadMapTile() : invalid tree element (%u/%u)", referencedVal, iNTreeValues);
+                                sLog->outDebug(LOG_FILTER_MAPS, "StaticMapTree::LoadMapTile() : invalid tree element (%u/%u) referenced in tile %s", referencedVal, iNTreeValues, tilefile.c_str());
                                 continue;
                             }
 #endif
@@ -403,6 +417,7 @@ namespace VMAP
         }
         else
             iLoadedTiles[packTileID(tileX, tileY)] = false;
+
         return result;
     }
 
@@ -423,7 +438,7 @@ namespace VMAP
             FILE* tf = fopen(tilefile.c_str(), "rb");
             if (tf)
             {
-                bool result=true;
+                bool result = true;
                 char chunk[8];
                 if (!readChunk(tf, chunk, VMAP_MAGIC, 8))
                     result = false;
@@ -448,7 +463,7 @@ namespace VMAP
                         else
                         {
                             if (!iLoadedSpawns.count(referencedNode))
-                            sLog->outError("StaticMapTree::UnloadMapTile() : trying to unload non-referenced model '%s' (ID:%u)", spawn.name.c_str(), spawn.ID);
+                                sLog->outError("StaticMapTree::UnloadMapTile() : trying to unload non-referenced model '%s' (ID:%u)", spawn.name.c_str(), spawn.ID);
                             else if (--iLoadedSpawns[referencedNode] == 0)
                             {
                                 iTreeValues[referencedNode].setUnloaded();
@@ -461,5 +476,11 @@ namespace VMAP
             }
         }
         iLoadedTiles.erase(tile);
+    }
+
+    void StaticMapTree::getModelInstances(ModelInstance* &models, uint32 &count)
+    {
+        models = iTreeValues;
+        count = iNTreeValues;
     }
 }

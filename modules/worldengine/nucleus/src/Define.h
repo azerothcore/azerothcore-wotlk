@@ -9,6 +9,8 @@
 
 #include <cstdint>
 #include <cstddef>
+#include <cinttypes>
+#include <climits>
 #include <sys/types.h>
 #include <ace/Basic_Types.h>
 #include <ace/ACE_export.h>

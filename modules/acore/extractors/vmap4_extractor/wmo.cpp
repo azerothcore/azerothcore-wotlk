@@ -1,22 +1,32 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2008-2017 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation; either version 2 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "vmapexport.h"
 #include "wmo.h"
 #include "vec3d.h"
+#include "mpq_libmpq04.h"
+
 #include <cstdio>
 #include <cstdlib>
 #include <cassert>
-#include <map>
-#include <fstream>
 #undef min
 #undef max
-#include "mpq_libmpq04.h"
 
-using namespace std;
 extern uint16 *LiqType;
 
 WMORoot::WMORoot(std::string &filename)
@@ -338,9 +348,11 @@ int WMOGroup::ConvertToVMAPGroupWmo(FILE *output, WMORoot *rootWMO, bool precise
         for (int i=0; i<nTriangles; ++i)
         {
             // Skip no collision triangles
-            if (MOPY[2*i]&WMO_MATERIAL_NO_COLLISION ||
-              !(MOPY[2*i]&(WMO_MATERIAL_HINT|WMO_MATERIAL_COLLIDE_HIT)) )
+            bool isRenderFace = (MOPY[2 * i] & WMO_MATERIAL_RENDER) && !(MOPY[2 * i] & WMO_MATERIAL_DETAIL);
+            bool isCollision = MOPY[2 * i] & WMO_MATERIAL_COLLISION || isRenderFace;
+            if (!isCollision)
                 continue;
+
             // Use this triangle
             for (int j=0; j<3; ++j)
             {
@@ -472,23 +484,33 @@ WMOGroup::~WMOGroup()
 }
 
 WMOInstance::WMOInstance(MPQFile& f, char const* WmoInstName, uint32 mapID, uint32 tileX, uint32 tileY, FILE* pDirfile)
-    : currx(0), curry(0), wmo(NULL), doodadset(0), pos(), indx(0), id(0), d2(0), d3(0)
+    : currx(0), curry(0), wmo(nullptr), doodadset(0), pos(), indx(0), id(0)
 {
     float ff[3];
     f.read(&id, 4);
-    f.read(ff,12);
-    pos = Vec3D(ff[0],ff[1],ff[2]);
-    f.read(ff,12);
-    rot = Vec3D(ff[0],ff[1],ff[2]);
-    f.read(ff,12);
-    pos2 = Vec3D(ff[0],ff[1],ff[2]);
-    f.read(ff,12);
-    pos3 = Vec3D(ff[0],ff[1],ff[2]);
-    f.read(&d2,4);
+    f.read(ff, 12);
+    pos = Vec3D(ff[0], ff[1], ff[2]);
+    f.read(ff, 12);
+    rot = Vec3D(ff[0], ff[1], ff[2]);
+    f.read(ff, 12);
+    pos2 = Vec3D(ff[0], ff[1], ff[2]); // bounding box corners
+    f.read(ff, 12);
+    pos3 = Vec3D(ff[0], ff[1], ff[2]); // bounding box corners
 
-    uint16 trash,adtId;
-    f.read(&adtId,2);
-    f.read(&trash,2);
+    uint16 fflags;
+    f.read(&fflags, 2);
+
+    uint16 doodadSet;
+    f.read(&doodadSet, 2);
+
+    uint16 trash, adtId;
+    f.read(&adtId, 2);
+    f.read(&trash, 2);
+
+    // destructible wmo, do not dump. we can handle the vmap for these
+    // in dynamic tree (gameobject vmaps)
+    if ((fflags & 0x01) != 0)
+        return;
 
     //-----------add_in _dir_file----------------
 
@@ -497,7 +519,7 @@ WMOInstance::WMOInstance(MPQFile& f, char const* WmoInstName, uint32 mapID, uint
     FILE *input;
     input = fopen(tempname, "r+b");
 
-    if(!input)
+    if (!input)
     {
         printf("WMOInstance::WMOInstance: couldn't open %s\n", tempname);
         return;
@@ -505,19 +527,19 @@ WMOInstance::WMOInstance(MPQFile& f, char const* WmoInstName, uint32 mapID, uint
 
     fseek(input, 8, SEEK_SET); // get the correct no of vertices
     int nVertices;
-    int count = fread(&nVertices, sizeof (int), 1, input);
+    int count = fread(&nVertices, sizeof(int), 1, input);
     fclose(input);
 
     if (count != 1 || nVertices == 0)
         return;
 
-    float x,z;
+    float x, z;
     x = pos.x;
     z = pos.z;
-    if(x==0 && z == 0)
+    if (x == 0 && z == 0)
     {
-        pos.x = 533.33333f*32;
-        pos.z = 533.33333f*32;
+        pos.x = 533.33333f * 32;
+        pos.z = 533.33333f * 32;
     }
     pos = fixCoords(pos);
     pos2 = fixCoords(pos2);
@@ -525,7 +547,7 @@ WMOInstance::WMOInstance(MPQFile& f, char const* WmoInstName, uint32 mapID, uint
 
     float scale = 1.0f;
     uint32 flags = MOD_HAS_BOUND;
-    if(tileX == 65 && tileY == 65) flags |= MOD_WORLDSPAWN;
+    if (tileX == 65 && tileY == 65) flags |= MOD_WORLDSPAWN;
     //write mapID, tileX, tileY, Flags, ID, Pos, Rot, Scale, Bound_lo, Bound_hi, name
     fwrite(&mapID, sizeof(uint32), 1, pDirfile);
     fwrite(&tileX, sizeof(uint32), 1, pDirfile);
@@ -538,7 +560,7 @@ WMOInstance::WMOInstance(MPQFile& f, char const* WmoInstName, uint32 mapID, uint
     fwrite(&scale, sizeof(float), 1, pDirfile);
     fwrite(&pos2, sizeof(float), 3, pDirfile);
     fwrite(&pos3, sizeof(float), 3, pDirfile);
-    uint32 nlen=strlen(WmoInstName);
+    uint32 nlen = strlen(WmoInstName);
     fwrite(&nlen, sizeof(uint32), 1, pDirfile);
     fwrite(WmoInstName, sizeof(char), nlen, pDirfile);
 

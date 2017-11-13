@@ -1760,12 +1760,12 @@ GridMap* Map::GetGrid(float x, float y)
     return GridMaps[gx][gy];
 }
 
-float Map::GetWaterOrGroundLevel(float x, float y, float z, float* ground /*= NULL*/, bool /*swim = false*/, float maxSearchDist /*= 50.0f*/) const
+float Map::GetWaterOrGroundLevel(uint32 phasemask, float x, float y, float z, float* ground /*= NULL*/, bool /*swim = false*/, float maxSearchDist /*= 50.0f*/) const
 { 
     if (const_cast<Map*>(this)->GetGrid(x, y))
     {
         // we need ground level (including grid height version) for proper return water level in point
-        float ground_z = GetHeight(PHASEMASK_NORMAL, x, y, z, true, maxSearchDist);
+        float ground_z = GetHeight(phasemask, x, y, z, true, maxSearchDist);
         if (ground)
             *ground = ground_z;
 
@@ -1806,7 +1806,7 @@ Transport* Map::GetTransportForPos(uint32 phase, float x, float y, float z, Worl
 }
 
 float Map::GetHeight(float x, float y, float z, bool checkVMap /*= true*/, float maxSearchDist /*= DEFAULT_HEIGHT_SEARCH*/) const
-{ 
+{
     // find raw .map surface under Z coordinates
     float mapHeight = VMAP_INVALID_HEIGHT_VALUE;
     if (GridMap* gmap = const_cast<Map*>(this)->GetGrid(x, y))
@@ -1821,7 +1821,7 @@ float Map::GetHeight(float x, float y, float z, bool checkVMap /*= true*/, float
     if (checkVMap)
     {
         VMAP::IVMapManager* vmgr = VMAP::VMapFactory::createOrGetVMapManager();
-        //if (vmgr->isHeightCalcEnabled()) // pussywizard: optimization
+        if (vmgr->isHeightCalcEnabled())
             vmapHeight = vmgr->getHeight(GetId(), x, y, z + 2.0f, maxSearchDist);   // look from a bit higher pos to find the floor
     }
 
@@ -1833,7 +1833,7 @@ float Map::GetHeight(float x, float y, float z, bool checkVMap /*= true*/, float
         {
             // we have mapheight and vmapheight and must select more appropriate
 
-            // we are already under the surface or vmap height above map heigt
+            // vmap height above map height
             // or if the distance of the vmap height is less the land height distance
             if (vmapHeight > mapHeight || std::fabs(mapHeight - z) > std::fabs(vmapHeight - z))
                 return vmapHeight;
