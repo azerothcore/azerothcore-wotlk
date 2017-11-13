@@ -1785,7 +1785,7 @@ void LoadLootTemplates_Mail()
 
     // remove real entries and check existence loot
     for (uint32 i = 1; i < sAreaTableStore.GetNumRows(); ++i)
-        if (AreaTableEntry const* areaEntry = sAreaTableStore.LookupEntry(i))
+        if (sAreaTableStore.LookupEntry(i))
             if (lootIdSet.find(i) != lootIdSet.end())
                 lootIdSet.erase(i);
 

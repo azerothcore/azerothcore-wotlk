@@ -6593,11 +6593,6 @@ void ObjectMgr::LoadGameObjectTemplate()
         got.flags          = fields[8].GetUInt32();
         got.size           = fields[9].GetFloat();
 
-        if (entry == 3640)
-        {
-            uint8 a = 1;
-        }
-
         for (uint8 i = 0; i < MAX_GAMEOBJECT_DATA; ++i)
             got.raw.data[i] = fields[10 + i].GetInt32(); // data1 and data6 can be -1
 

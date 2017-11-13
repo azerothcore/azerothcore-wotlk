@@ -210,7 +210,6 @@ public:
 
     static bool HandleMmapStatsCommand(ChatHandler* handler, char const* /*args*/)
     {
-        uint32 mapId = handler->GetSession()->GetPlayer()->GetMapId();
         handler->PSendSysMessage("mmap stats:");
         //handler->PSendSysMessage("  global mmap pathfinding is %sabled", DisableMgr::IsPathfindingEnabled(mapId) ? "en" : "dis");
 

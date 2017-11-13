@@ -216,8 +216,8 @@ void Map::LoadMapAndVMap(int gx, int gy)
 Map::Map(uint32 id, uint32 InstanceId, uint8 SpawnMode, Map* _parent) : 
 i_mapEntry(sMapStore.LookupEntry(id)), i_spawnMode(SpawnMode), i_InstanceId(InstanceId),
 m_unloadTimer(0), m_VisibleDistance(DEFAULT_VISIBILITY_DISTANCE),
-m_activeNonPlayersIter(m_activeNonPlayers.end()), _transportsUpdateIter(_transports.end()),
-_instanceResetPeriod(0), i_scriptLock(false), _defaultLight(GetDefaultMapLight(id))
+m_activeNonPlayersIter(m_activeNonPlayers.end()),
+_instanceResetPeriod(0),  _transportsUpdateIter(_transports.end()), i_scriptLock(false), _defaultLight(GetDefaultMapLight(id))
 {
     m_parentMap = (_parent ? _parent : this);
     for (unsigned int idx=0; idx < MAX_NUMBER_OF_GRIDS; ++idx)
@@ -1972,7 +1972,7 @@ bool Map::IsOutdoors(float x, float y, float z) const
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         sLog->outStaticDebug("Got WMOAreaTableEntry! flag %u, areaid %u", wmoEntry->Flags, wmoEntry->areaId);
 #endif
-        atEntry = GetAreaEntryByAreaID(wmoEntry->areaId);
+        atEntry = sAreaTableStore.LookupEntry(wmoEntry->areaId);
     }
     return IsOutdoorWMO(mogpFlags, adtId, rootId, groupId, wmoEntry, atEntry);
 }
