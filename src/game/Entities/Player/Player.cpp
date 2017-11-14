@@ -6917,7 +6917,7 @@ void Player::CheckAreaExploreAndOutdoor()
     if (offset >= PLAYER_EXPLORED_ZONES_SIZE)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outError("Wrong area flag %u in map data for (X: %f Y: %f) point to field PLAYER_EXPLORED_ZONES_1 + %u ( %u must be < %u ).", areaFlag, GetPositionX(), GetPositionY(), offset, offset, PLAYER_EXPLORED_ZONES_SIZE);
+        sLog->outError("Wrong area flag %u in map data for (X: %f Y: %f) point to field PLAYER_EXPLORED_ZONES_1 + %u ( %u must be < %u ).", areaEntry->flags, GetPositionX(), GetPositionY(), offset, offset, PLAYER_EXPLORED_ZONES_SIZE);
 #endif
         return;
     }
@@ -6964,7 +6964,7 @@ void Player::CheckAreaExploreAndOutdoor()
                 SendExplorationExperience(areaId, XP);
             }
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            sLog->outDetail("Player %u discovered a new area: %u", GetGUIDLow(), area);
+            sLog->outDetail("Player %u discovered a new area: %u", GetGUIDLow(), areaId);
 #endif
         }
     }
