@@ -78,7 +78,7 @@ message("")
 include_directories(
   ${scripts_INCLUDE_DIRS}
   ${CMAKE_BINARY_DIR}
-  ${CMAKE_SOURCE_DIR}/modules/worldengine/deps/recastnavigation/Detour
+  ${CMAKE_SOURCE_DIR}/modules/worldengine/deps/recastnavigation/Detour/Include
   ${CMAKE_SOURCE_DIR}/modules/worldengine/deps/recastnavigation/Recast
   ${CMAKE_SOURCE_DIR}/modules/worldengine/deps/g3dlite/include
   ${CMAKE_SOURCE_DIR}/modules/worldengine/deps/SFMT
