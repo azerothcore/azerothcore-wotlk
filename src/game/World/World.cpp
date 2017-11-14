@@ -1276,6 +1276,12 @@ void World::SetInitialWorldSettings()
     sLog->outString("Initializing Scripts...");
     sScriptMgr->Initialize();
 
+    ///- Initialize VMapManager function pointers (to untangle game/collision circular deps)
+    if (VMAP::VMapManager2* vmmgr2 = dynamic_cast<VMAP::VMapManager2*>(VMAP::VMapFactory::createOrGetVMapManager()))
+    {
+        vmmgr2->GetLiquidFlagsPtr = &GetLiquidFlags;
+    }
+
     ///- Initialize config settings
     LoadConfigSettings();
 
