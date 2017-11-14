@@ -9,7 +9,9 @@
 
 #include <vector>
 #include <set>
+#include <atomic>
 #include <map>
+#include <list>
 
 #include "TerrainBuilder.h"
 #include "IntermediateValues.h"
@@ -27,7 +29,24 @@ using namespace VMAP;
 
 namespace MMAP
 {
-    typedef std::map<uint32, std::set<uint32>*> TileList;
+    struct MapTiles
+    {
+        MapTiles() : m_mapId(uint32(-1)), m_tiles(NULL) {}
+
+        MapTiles(uint32 id, std::set<uint32>* tiles) : m_mapId(id), m_tiles(tiles) {}
+        ~MapTiles() {}
+
+        uint32 m_mapId;
+        std::set<uint32>* m_tiles;
+
+        bool operator==(uint32 id)
+        {
+            return m_mapId == id;
+        }
+    };
+
+    typedef std::list<MapTiles> TileList;
+
     struct Tile
     {
         Tile() : chf(NULL), solid(NULL), cset(NULL), pmesh(NULL), dmesh(NULL) {}
@@ -96,6 +115,8 @@ namespace MMAP
             bool shouldSkipMap(uint32 mapID);
             bool isTransportMap(uint32 mapID);
             bool shouldSkipTile(uint32 mapID, uint32 tileX, uint32 tileY);
+            // percentageDone - method to calculate percentage
+            uint32 percentageDone(uint32 totalTiles, uint32 totalTilesDone);
 
             TerrainBuilder* m_terrainBuilder;
             TileList m_tiles;
@@ -109,6 +130,9 @@ namespace MMAP
 
             float m_maxWalkableAngle;
             bool m_bigBaseUnit;
+            // percentageDone - variables to calculate percentage
+            uint32 m_totalTiles;
+            std::atomic<uint32> m_totalTilesBuilt;
 
             // build performance - not really used for now
             rcContext* m_rcContext;

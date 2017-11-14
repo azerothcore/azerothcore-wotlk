@@ -1069,7 +1069,7 @@ bool SpellArea::IsFitToRequirements(Player const* player, uint32 newZone, uint32
             if (!player)
                 return false;
 
-            AreaTableEntry const* pArea = GetAreaEntryByAreaID(player->GetAreaId());
+            AreaTableEntry const* pArea = sAreaTableStore.LookupEntry(player->GetAreaId());
             if (!(pArea && pArea->flags & AREA_FLAG_NO_FLY_ZONE))
                 return false;
             if (!player->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) && !player->HasAuraType(SPELL_AURA_FLY))
@@ -2513,7 +2513,7 @@ void SpellMgr::LoadSpellAreas()
             }
         }
 
-        if (spellArea.areaId && !GetAreaEntryByAreaID(spellArea.areaId))
+        if (spellArea.areaId && !sAreaTableStore.LookupEntry(spellArea.areaId))
         {
             sLog->outErrorDb("Spell %u listed in `spell_area` have wrong area (%u) requirement", spell, spellArea.areaId);
             continue;
@@ -6243,8 +6243,8 @@ void SpellMgr::LoadDbcDataCorrections()
     }
 
     // Xinef: The Veiled Sea area in outlands (Draenei zone), client blocks casting flying mounts
-    for (uint32 i = 0; i < sAreaStore.GetNumRows(); ++i)
-        if (AreaTableEntry* areaEntry = const_cast<AreaTableEntry*>(sAreaStore.LookupEntry(i)))
+    for (uint32 i = 0; i < sAreaTableStore.GetNumRows(); ++i)
+        if (AreaTableEntry* areaEntry = const_cast<AreaTableEntry*>(sAreaTableStore.LookupEntry(i)))
         {
             if (areaEntry->ID == 3479)
                 areaEntry->flags |= AREA_FLAG_NO_FLY_ZONE;
