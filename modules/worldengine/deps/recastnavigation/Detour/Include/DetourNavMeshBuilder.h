@@ -128,14 +128,22 @@ bool dtNavMeshDataSwapEndian(unsigned char* data, const int dataSize);
 // a source file. It reduces clutter in the main section of the header.
 
 /**
+
 @struct dtNavMeshCreateParams
 @par
+
 This structure is used to marshal data between the Recast mesh generation pipeline and Detour navigation components.
+
 See the rcPolyMesh and rcPolyMeshDetail documentation for detailed information related to mesh structure.
+
 Units are usually in voxels (vx) or world units (wu). The units for voxels, grid size, and cell size 
 are all based on the values of #cs and #ch.
+
 The standard navigation mesh build process is to create tile data using dtCreateNavMeshData, then add the tile 
 to a navigation mesh using either the dtNavMesh single tile <tt>init()</tt> function or the dtNavMesh::addTile()
 function.
+
 @see dtCreateNavMeshData
+
 */
+

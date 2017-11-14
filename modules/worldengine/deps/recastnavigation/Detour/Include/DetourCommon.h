@@ -20,11 +20,14 @@
 #define DETOURCOMMON_H
 
 #include "DetourMath.h"
+#include <stddef.h>
 
 /**
 @defgroup detour Detour
+
 Members in this module are used to create, manipulate, and query navigation 
 meshes.
+
 @note This is a summary list of members.  Use the index or search 
 feature to find minor members.
 */
@@ -480,6 +483,23 @@ inline void dtSwapEndian(float* v)
 void dtRandomPointInConvexPoly(const float* pts, const int npts, float* areas,
 							   const float s, const float t, float* out);
 
+template<typename TypeToRetrieveAs>
+TypeToRetrieveAs* dtGetThenAdvanceBufferPointer(const unsigned char*& buffer, const size_t distanceToAdvance)
+{
+	TypeToRetrieveAs* returnPointer = reinterpret_cast<TypeToRetrieveAs*>(buffer);
+	buffer += distanceToAdvance;
+	return returnPointer;
+}
+
+template<typename TypeToRetrieveAs>
+TypeToRetrieveAs* dtGetThenAdvanceBufferPointer(unsigned char*& buffer, const size_t distanceToAdvance)
+{
+	TypeToRetrieveAs* returnPointer = reinterpret_cast<TypeToRetrieveAs*>(buffer);
+	buffer += distanceToAdvance;
+	return returnPointer;
+}
+
+
 /// @}
 
 #endif // DETOURCOMMON_H
@@ -490,28 +510,41 @@ void dtRandomPointInConvexPoly(const float* pts, const int npts, float* areas,
 // a source file. It reduces clutter in the main section of the header.
 
 /**
+
 @fn float dtTriArea2D(const float* a, const float* b, const float* c)
 @par
+
 The vertices are projected onto the xz-plane, so the y-values are ignored.
+
 This is a low cost function than can be used for various purposes.  Its main purpose
 is for point/line relationship testing.
+
 In all cases: A value of zero indicates that all vertices are collinear or represent the same point.
 (On the xz-plane.)
+
 When used for point/line relationship tests, AB usually represents a line against which
 the C point is to be tested.  In this case:
+
 A positive value indicates that point C is to the left of line AB, looking from A toward B.<br/>
 A negative value indicates that point C is to the right of lineAB, looking from A toward B.
+
 When used for evaluating a triangle:
+
 The absolute value of the return value is two times the area of the triangle when it is
 projected onto the xz-plane.
+
 A positive return value indicates:
+
 <ul>
 <li>The vertices are wrapped in the normal Detour wrap direction.</li>
 <li>The triangle's 3D face normal is in the general up direction.</li>
 </ul>
+
 A negative return value indicates:
+
 <ul>
 <li>The vertices are reverse wrapped. (Wrapped opposite the normal Detour wrap direction.)</li>
 <li>The triangle's 3D face normal is in the general down direction.</li>
 </ul>
+
 */

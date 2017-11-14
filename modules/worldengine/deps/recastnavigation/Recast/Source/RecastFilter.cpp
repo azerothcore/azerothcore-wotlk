@@ -22,12 +22,22 @@
 #include "Recast.h"
 #include "RecastAssert.h"
 
-
+/// @par
+///
+/// Allows the formation of walkable regions that will flow over low lying 
+/// objects such as curbs, and up structures such as stairways. 
+/// 
+/// Two neighboring spans are walkable if: <tt>rcAbs(currentSpan.smax - neighborSpan.smax) < waklableClimb</tt>
+/// 
+/// @warning Will override the effect of #rcFilterLedgeSpans.  So if both filters are used, call
+/// #rcFilterLedgeSpans after calling this filter. 
+///
+/// @see rcHeightfield, rcConfig
 void rcFilterLowHangingWalkableObstacles(rcContext* ctx, const int walkableClimb, rcHeightfield& solid)
 {
 	rcAssert(ctx);
 
-	ctx->startTimer(RC_TIMER_FILTER_LOW_OBSTACLES);
+	rcScopedTimer timer(ctx, RC_TIMER_FILTER_LOW_OBSTACLES);
 	
 	const int w = solid.width;
 	const int h = solid.height;
@@ -57,16 +67,24 @@ void rcFilterLowHangingWalkableObstacles(rcContext* ctx, const int walkableClimb
 			}
 		}
 	}
-
-	ctx->stopTimer(RC_TIMER_FILTER_LOW_OBSTACLES);
 }
-	
+
+/// @par
+///
+/// A ledge is a span with one or more neighbors whose maximum is further away than @p walkableClimb
+/// from the current span's maximum.
+/// This method removes the impact of the overestimation of conservative voxelization 
+/// so the resulting mesh will not have regions hanging in the air over ledges.
+/// 
+/// A span is a ledge if: <tt>rcAbs(currentSpan.smax - neighborSpan.smax) > walkableClimb</tt>
+/// 
+/// @see rcHeightfield, rcConfig
 void rcFilterLedgeSpans(rcContext* ctx, const int walkableHeight, const int walkableClimb,
 						rcHeightfield& solid)
 {
 	rcAssert(ctx);
 	
-	ctx->startTimer(RC_TIMER_FILTER_BORDER);
+	rcScopedTimer timer(ctx, RC_TIMER_FILTER_BORDER);
 
 	const int w = solid.width;
 	const int h = solid.height;
@@ -136,26 +154,31 @@ void rcFilterLedgeSpans(rcContext* ctx, const int walkableHeight, const int walk
 				// The current span is close to a ledge if the drop to any
 				// neighbour span is less than the walkableClimb.
 				if (minh < -walkableClimb)
+				{
 					s->area = RC_NULL_AREA;
-					
+				}
 				// If the difference between all neighbours is too large,
 				// we are at steep slope, mark the span as ledge.
-				if ((asmax - asmin) > walkableClimb)
+				else if ((asmax - asmin) > walkableClimb)
 				{
 					s->area = RC_NULL_AREA;
 				}
 			}
 		}
 	}
-	
-	ctx->stopTimer(RC_TIMER_FILTER_BORDER);
-}	
+}
 
+/// @par
+///
+/// For this filter, the clearance above the span is the distance from the span's 
+/// maximum to the next higher span's minimum. (Same grid column.)
+/// 
+/// @see rcHeightfield, rcConfig
 void rcFilterWalkableLowHeightSpans(rcContext* ctx, int walkableHeight, rcHeightfield& solid)
 {
 	rcAssert(ctx);
 	
-	ctx->startTimer(RC_TIMER_FILTER_WALKABLE);
+	rcScopedTimer timer(ctx, RC_TIMER_FILTER_WALKABLE);
 	
 	const int w = solid.width;
 	const int h = solid.height;
@@ -176,6 +199,4 @@ void rcFilterWalkableLowHeightSpans(rcContext* ctx, int walkableHeight, rcHeight
 			}
 		}
 	}
-	
-	ctx->stopTimer(RC_TIMER_FILTER_WALKABLE);
 }

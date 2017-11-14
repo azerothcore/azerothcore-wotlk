@@ -157,11 +157,15 @@ void dtFreeNavMesh(dtNavMesh* navmesh)
 
 /**
 @class dtNavMesh
+
 The navigation mesh consists of one or more tiles defining three primary types of structural data:
+
 A polygon mesh which defines most of the navigation graph. (See rcPolyMesh for its structure.)
 A detail mesh used for determining surface height on the polygon mesh. (See rcPolyMeshDetail for its structure.)
 Off-mesh connections, which define custom point-to-point edges within the navigation graph.
+
 The general build process is as follows:
+
 -# Create rcPolyMesh and rcPolyMeshDetail data using the Recast build pipeline.
 -# Optionally, create off-mesh connection data.
 -# Combine the source data into a dtNavMeshCreateParams structure.
@@ -169,12 +173,15 @@ The general build process is as follows:
 -# Allocate at dtNavMesh object and initialize it. (For single tile navigation meshes,
    the tile data is loaded during this step.)
 -# For multi-tile navigation meshes, load the tile data using dtNavMesh::addTile().
+
 Notes:
+
 - This class is usually used in conjunction with the dtNavMeshQuery class for pathfinding.
 - Technically, all navigation meshes are tiled. A 'solo' mesh is simply a navigation mesh initialized 
   to have only a single tile.
 - This class does not implement any asynchronous methods. So the ::dtStatus result of all methods will 
   always contain either a success or failure flag.
+
 @see dtNavMeshQuery, dtCreateNavMeshData, dtNavMeshCreateParams, #dtAllocNavMesh, #dtFreeNavMesh
 */
 
@@ -186,11 +193,13 @@ dtNavMesh::dtNavMesh() :
 	m_tileLutMask(0),
 	m_posLookup(0),
 	m_nextFree(0),
-	m_tiles(0),
-	m_saltBits(0),
-	m_tileBits(0),
-	m_polyBits(0)
+	m_tiles(0)
 {
+#ifndef DT_POLYREF64
+	m_saltBits = 0;
+	m_tileBits = 0;
+	m_polyBits = 0;
+#endif
 	memset(&m_params, 0, sizeof(dtNavMeshParams));
 	m_orig[0] = 0;
 	m_orig[1] = 0;
@@ -241,11 +250,17 @@ dtStatus dtNavMesh::init(const dtNavMeshParams* params)
 		m_nextFree = &m_tiles[i];
 	}
 	
-    // Edited by TC
-    m_tileBits = STATIC_TILE_BITS;
-    m_polyBits = STATIC_POLY_BITS; 
-    m_saltBits = STATIC_SALT_BITS; 
+	// Init ID generator values.
+#ifndef DT_POLYREF64
+	m_tileBits = dtIlog2(dtNextPow2((unsigned int)params->maxTiles));
+	m_polyBits = dtIlog2(dtNextPow2((unsigned int)params->maxPolys));
+	// Only allow 31 salt bits, since the salt mask is calculated using 32bit uint and it will overflow.
+	m_saltBits = dtMin((unsigned int)31, 32 - m_tileBits - m_polyBits);
 
+	if (m_saltBits < 10)
+		return DT_FAILURE | DT_INVALID_PARAM;
+#endif
+	
 	return DT_SUCCESS;
 }
 
@@ -289,7 +304,7 @@ int dtNavMesh::findConnectingPolys(const float* va, const float* vb,
 	if (!tile) return 0;
 	
 	float amin[2], amax[2];
-	calcSlabEndPoints(va,vb, amin,amax, side);
+	calcSlabEndPoints(va, vb, amin, amax, side);
 	const float apos = getSlabCoord(va, side);
 
 	// Remove links pointing to 'side' and compact the links array. 
@@ -335,7 +350,7 @@ int dtNavMesh::findConnectingPolys(const float* va, const float* vb,
 	return n;
 }
 
-void dtNavMesh::unconnectExtLinks(dtMeshTile* tile, dtMeshTile* target)
+void dtNavMesh::unconnectLinks(dtMeshTile* tile, dtMeshTile* target)
 {
 	if (!tile || !target) return;
 
@@ -348,10 +363,9 @@ void dtNavMesh::unconnectExtLinks(dtMeshTile* tile, dtMeshTile* target)
 		unsigned int pj = DT_NULL_LINK;
 		while (j != DT_NULL_LINK)
 		{
-			if (tile->links[j].side != 0xff &&
-				decodePolyIdTile(tile->links[j].ref) == targetNum)
+			if (decodePolyIdTile(tile->links[j].ref) == targetNum)
 			{
-				// Revove link.
+				// Remove link.
 				unsigned int nj = tile->links[j].next;
 				if (pj == DT_NULL_LINK)
 					poly->firstLink = nj;
@@ -637,9 +651,9 @@ void dtNavMesh::closestPointOnPoly(dtPolyRef ref, const float* pos, float* close
 	if (!dtDistancePtPolyEdgesSqr(pos, verts, nv, edged, edget))
 	{
 		// Point is outside the polygon, dtClamp to nearest edge.
-		float dmin = FLT_MAX;
-		int imin = -1;
-		for (int i = 0; i < nv; ++i)
+		float dmin = edged[0];
+		int imin = 0;
+		for (int i = 1; i < nv; ++i)
 		{
 			if (edged[i] < dmin)
 			{
@@ -823,6 +837,11 @@ int dtNavMesh::queryPolygonsInTile(const dtMeshTile* tile, const float* qmin, co
 /// tile will be restored to the same values they were before the tile was 
 /// removed.
 ///
+/// The nav mesh assumes exclusive access to the data passed and will make
+/// changes to the dynamic portion of the data. For that reason the data
+/// should not be reused in other nav meshes until the tile has been successfully
+/// removed from this nav mesh.
+///
 /// @see dtCreateNavMeshData, #removeTile
 dtStatus dtNavMesh::addTile(unsigned char* data, int dataSize, int flags,
 							dtTileRef lastRef, dtTileRef* result)
@@ -898,14 +917,14 @@ dtStatus dtNavMesh::addTile(unsigned char* data, int dataSize, int flags,
 	const int offMeshLinksSize = dtAlign4(sizeof(dtOffMeshConnection)*header->offMeshConCount);
 	
 	unsigned char* d = data + headerSize;
-	tile->verts = (float*)d; d += vertsSize;
-	tile->polys = (dtPoly*)d; d += polysSize;
-	tile->links = (dtLink*)d; d += linksSize;
-	tile->detailMeshes = (dtPolyDetail*)d; d += detailMeshesSize;
-	tile->detailVerts = (float*)d; d += detailVertsSize;
-	tile->detailTris = (unsigned char*)d; d += detailTrisSize;
-	tile->bvTree = (dtBVNode*)d; d += bvtreeSize;
-	tile->offMeshCons = (dtOffMeshConnection*)d; d += offMeshLinksSize;
+	tile->verts = dtGetThenAdvanceBufferPointer<float>(d, vertsSize);
+	tile->polys = dtGetThenAdvanceBufferPointer<dtPoly>(d, polysSize);
+	tile->links = dtGetThenAdvanceBufferPointer<dtLink>(d, linksSize);
+	tile->detailMeshes = dtGetThenAdvanceBufferPointer<dtPolyDetail>(d, detailMeshesSize);
+	tile->detailVerts = dtGetThenAdvanceBufferPointer<float>(d, detailVertsSize);
+	tile->detailTris = dtGetThenAdvanceBufferPointer<unsigned char>(d, detailTrisSize);
+	tile->bvTree = dtGetThenAdvanceBufferPointer<dtBVNode>(d, bvtreeSize);
+	tile->offMeshCons = dtGetThenAdvanceBufferPointer<dtOffMeshConnection>(d, offMeshLinksSize);
 
 	// If there are no items in the bvtree, reset the tree pointer.
 	if (!bvtreeSize)
@@ -924,7 +943,10 @@ dtStatus dtNavMesh::addTile(unsigned char* data, int dataSize, int flags,
 	tile->flags = flags;
 
 	connectIntLinks(tile);
+
+	// Base off-mesh connections to their starting polygons and connect connections inside the tile.
 	baseOffMeshLinks(tile);
+	connectExtOffMeshLinks(tile, tile, -1);
 
 	// Create connections with neighbour tiles.
 	static const int MAX_NEIS = 32;
@@ -935,11 +957,11 @@ dtStatus dtNavMesh::addTile(unsigned char* data, int dataSize, int flags,
 	nneis = getTilesAt(header->x, header->y, neis, MAX_NEIS);
 	for (int j = 0; j < nneis; ++j)
 	{
-		if (neis[j] != tile)
-		{
-			connectExtLinks(tile, neis[j], -1);
-			connectExtLinks(neis[j], tile, -1);
-		}
+		if (neis[j] == tile)
+			continue;
+	
+		connectExtLinks(tile, neis[j], -1);
+		connectExtLinks(neis[j], tile, -1);
 		connectExtOffMeshLinks(tile, neis[j], -1);
 		connectExtOffMeshLinks(neis[j], tile, -1);
 	}
@@ -1177,25 +1199,24 @@ dtStatus dtNavMesh::removeTile(dtTileRef ref, unsigned char** data, int* dataSiz
 	}
 	
 	// Remove connections to neighbour tiles.
-	// Create connections with neighbour tiles.
 	static const int MAX_NEIS = 32;
 	dtMeshTile* neis[MAX_NEIS];
 	int nneis;
 	
-	// Connect with layers in current tile.
+	// Disconnect from other layers in current tile.
 	nneis = getTilesAt(tile->header->x, tile->header->y, neis, MAX_NEIS);
 	for (int j = 0; j < nneis; ++j)
 	{
 		if (neis[j] == tile) continue;
-		unconnectExtLinks(neis[j], tile);
+		unconnectLinks(neis[j], tile);
 	}
 	
-	// Connect with neighbour tiles.
+	// Disconnect from neighbour tiles.
 	for (int i = 0; i < 8; ++i)
 	{
 		nneis = getNeighbourTilesAt(tile->header->x, tile->header->y, i, neis, MAX_NEIS);
 		for (int j = 0; j < nneis; ++j)
-			unconnectExtLinks(neis[j], tile);
+			unconnectLinks(neis[j], tile);
 	}
 		
 	// Reset tile.
@@ -1227,7 +1248,11 @@ dtStatus dtNavMesh::removeTile(dtTileRef ref, unsigned char** data, int* dataSiz
 	tile->offMeshCons = 0;
 
 	// Update salt, salt should never be zero.
+#ifdef DT_POLYREF64
+	tile->salt = (tile->salt+1) & ((1<<DT_SALT_BITS)-1);
+#else
 	tile->salt = (tile->salt+1) & ((1<<m_saltBits)-1);
+#endif
 	if (tile->salt == 0)
 		tile->salt++;
 
@@ -1300,8 +1325,8 @@ dtStatus dtNavMesh::storeTileState(const dtMeshTile* tile, unsigned char* data, 
 	if (maxDataSize < sizeReq)
 		return DT_FAILURE | DT_BUFFER_TOO_SMALL;
 		
-	dtTileState* tileState = (dtTileState*)data; data += dtAlign4(sizeof(dtTileState));
-	dtPolyState* polyStates = (dtPolyState*)data; data += dtAlign4(sizeof(dtPolyState) * tile->header->polyCount);
+	dtTileState* tileState = dtGetThenAdvanceBufferPointer<dtTileState>(data, dtAlign4(sizeof(dtTileState)));
+	dtPolyState* polyStates = dtGetThenAdvanceBufferPointer<dtPolyState>(data, dtAlign4(sizeof(dtPolyState) * tile->header->polyCount));
 	
 	// Store tile state.
 	tileState->magic = DT_NAVMESH_STATE_MAGIC;
@@ -1332,8 +1357,8 @@ dtStatus dtNavMesh::restoreTileState(dtMeshTile* tile, const unsigned char* data
 	if (maxDataSize < sizeReq)
 		return DT_FAILURE | DT_INVALID_PARAM;
 	
-	const dtTileState* tileState = (const dtTileState*)data; data += dtAlign4(sizeof(dtTileState));
-	const dtPolyState* polyStates = (const dtPolyState*)data; data += dtAlign4(sizeof(dtPolyState) * tile->header->polyCount);
+	const dtTileState* tileState = dtGetThenAdvanceBufferPointer<const dtTileState>(data, dtAlign4(sizeof(dtTileState)));
+	const dtPolyState* polyStates = dtGetThenAdvanceBufferPointer<const dtPolyState>(data, dtAlign4(sizeof(dtPolyState) * tile->header->polyCount));
 	
 	// Check that the restore is possible.
 	if (tileState->magic != DT_NAVMESH_STATE_MAGIC)
@@ -1494,3 +1519,4 @@ dtStatus dtNavMesh::getPolyArea(dtPolyRef ref, unsigned char* resultArea) const
 	
 	return DT_SUCCESS;
 }
+
