@@ -136,7 +136,6 @@ namespace MMAP
 
             // build performance - not really used for now
             rcContext* m_rcContext;
-            std::atomic<bool> _cancelationToken;
     };
 
     class MapBuildRequest : public ACE_Method_Request
