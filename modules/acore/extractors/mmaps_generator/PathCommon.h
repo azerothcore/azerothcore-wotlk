@@ -7,10 +7,9 @@
 #ifndef _MMAP_COMMON_H
 #define _MMAP_COMMON_H
 
+#include "Common.h"
 #include <string>
 #include <vector>
-
-#include "Common.h"
 
 #ifndef _WIN32
     #include <stddef.h>
@@ -52,7 +51,7 @@ namespace MMAP
                 if (*++filter == '\0')   // wildcard at end of filter means all remaing chars match
                     return true;
 
-                while (true)
+                for (;;)
                 {
                     if (*filter == *str)
                         break;

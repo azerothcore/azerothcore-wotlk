@@ -700,7 +700,7 @@ namespace MMAP
                         uint8 type = NAV_EMPTY;
 
                         // convert liquid type to NavTerrain
-                        switch (liquid->GetType())
+                        switch (liquid->GetType() & 3)
                         {
                         case 0:
                         case 1:
@@ -754,12 +754,12 @@ namespace MMAP
                                     }
 
                                     uint32 liqOffset = meshData.liquidVerts.size() / 3;
-                                    for (uint32 i = 0; i < liqVerts.size(); ++i)
-                                        meshData.liquidVerts.append(liqVerts[i].y, liqVerts[i].z, liqVerts[i].x);
+                                    for (uint32 j = 0; j < liqVerts.size(); ++j)
+                                        meshData.liquidVerts.append(liqVerts[j].y, liqVerts[j].z, liqVerts[j].x);
 
-                                    for (uint32 i = 0; i < liqTris.size() / 3; ++i)
+                                    for (uint32 j = 0; j < liqTris.size() / 3; ++j)
                                     {
-                                        meshData.liquidTris.append(liqTris[i*3+1] + liqOffset, liqTris[i*3+2] + liqOffset, liqTris[i*3] + liqOffset);
+                                        meshData.liquidTris.append(liqTris[j*3+1] + liqOffset, liqTris[j*3+2] + liqOffset, liqTris[j*3] + liqOffset);
                                         meshData.liquidType.append(type);
                                     }
                     }
@@ -894,7 +894,7 @@ namespace MMAP
             float p0[3], p1[3];
             uint32 mid, tx, ty;
             float size;
-            if (sscanf(buf, "%d %d,%d (%f %f %f) (%f %f %f) %f", &mid, &tx, &ty,
+            if (sscanf(buf, "%u %u,%u (%f %f %f) (%f %f %f) %f", &mid, &tx, &ty,
                 &p0[0], &p0[1], &p0[2], &p1[0], &p1[1], &p1[2], &size) != 10)
                 continue;
 

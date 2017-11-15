@@ -55,6 +55,9 @@ void TargetedMovementGeneratorMedium<T,D>::_setTargetLocation(T* owner, bool ini
 
     if (!i_offset)
     {
+        if (i_target->IsWithinDistInMap(owner, CONTACT_DISTANCE))
+            return;
+
         float allowedRange = MELEE_RANGE;
         if ((!initial || (owner->movespline->Finalized() && this->GetMovementGeneratorType() == CHASE_MOTION_TYPE)) && i_target->IsWithinMeleeRange(owner, allowedRange) && i_target->IsWithinLOS(owner->GetPositionX(), owner->GetPositionY(), owner->GetPositionZ()))
             return;
