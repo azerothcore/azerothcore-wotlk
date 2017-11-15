@@ -1,7 +1,19 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 
+ * Copyright (C) 
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation; either version 2 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include <iostream>
@@ -26,6 +38,7 @@ namespace VMAP
 {
     VMapManager2::VMapManager2()
     {
+        GetLiquidFlagsPtr = &GetLiquidFlagsDummy;
     }
 
     VMapManager2::~VMapManager2(void)
@@ -76,7 +89,7 @@ namespace VMAP
     }
 
     // load one tile (internal use only)
-    bool VMapManager2::_loadMap(unsigned int mapId, const std::string& basePath, uint32 tileX, uint32 tileY)
+    bool VMapManager2::_loadMap(uint32 mapId, const std::string& basePath, uint32 tileX, uint32 tileY)
     {
         InstanceTreeMap::iterator instanceTree = iInstanceMapTrees.find(mapId);
         if (instanceTree == iInstanceMapTrees.end())
@@ -84,10 +97,10 @@ namespace VMAP
             std::string mapFileName = getMapFileName(mapId);
             StaticMapTree* newTree = new StaticMapTree(mapId, basePath);
             if (!newTree->InitMap(mapFileName, this))
-            {
-                delete newTree;
+			{
+				delete newTree;
                 return false;
-            }
+			}
             instanceTree = iInstanceMapTrees.insert(InstanceTreeMap::value_type(mapId, newTree)).first;
         }
 
@@ -236,7 +249,7 @@ namespace VMAP
                     floor = info.ground_Z;
                     ASSERT(floor < std::numeric_limits<float>::max());
                     type = info.hitModel->GetLiquidType();  // entry from LiquidType.dbc
-                    if (reqLiquidType && !(GetLiquidFlags(type) & reqLiquidType))
+                    if (reqLiquidType && !(GetLiquidFlagsPtr(type) & reqLiquidType))
                         return false;
                     if (info.hitInstance->GetLiquidLevel(pos, info, level))
                         return true;
@@ -276,7 +289,6 @@ namespace VMAP
     {
         //! Critical section, thread safe access to iLoadedModelFiles
         TRINITY_GUARD(ACE_Thread_Mutex, LoadedModelFilesLock);
-
         ModelFileMap::iterator model = iLoadedModelFiles.find(filename);
         if (model == iLoadedModelFiles.end())
         {
