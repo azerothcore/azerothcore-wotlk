@@ -31,6 +31,7 @@ set(scripts_STAT_SRCS
   Commands/cs_lookup.cpp
   Commands/cs_message.cpp
   Commands/cs_misc.cpp
+  Commands/cs_mmaps.cpp
   Commands/cs_modify.cpp
   Commands/cs_npc.cpp
   Commands/cs_quest.cpp

@@ -474,16 +474,26 @@ void WorldSession::HandleMovementOpcodes(WorldPacket & recvData)
 
         plrMover->UpdateFallInformationIfNeed(movementInfo, opcode);
 
-        if (movementInfo.pos.GetPositionZ() < -500.0f)
+        if (movementInfo.pos.GetPositionZ() < plrMover->GetMap()->GetMinHeight(movementInfo.pos.GetPositionX(), movementInfo.pos.GetPositionY()))
             if (!plrMover->GetBattleground() || !plrMover->GetBattleground()->HandlePlayerUnderMap(_player))
             {
                 if (plrMover->IsAlive())
                 {
+                    plrMover->SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_IS_OUT_OF_BOUNDS);
                     plrMover->EnvironmentalDamage(DAMAGE_FALL_TO_VOID, GetPlayer()->GetMaxHealth());
                     // player can be alive if GM
                     if (plrMover->IsAlive())
                         plrMover->KillPlayer();
                 }
+                else if (!plrMover->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_IS_OUT_OF_BOUNDS))
+                {
+                    WorldSafeLocsEntry const* grave = sObjectMgr->GetClosestGraveyard(plrMover->GetPositionX(), plrMover->GetPositionY(), plrMover->GetPositionZ(), plrMover->GetMapId(), plrMover->GetTeamId());
+
+                    if ( grave)
+                        plrMover->TeleportTo(grave->map_id, grave->x, grave->y, grave->z, plrMover->GetOrientation());
+                    plrMover->Relocate(grave->x, grave->y, grave->z, plrMover->GetOrientation());
+                }
+
                 plrMover->StopMovingOnCurrentPos(); // pussywizard: moving corpse can't release spirit
             }
     }

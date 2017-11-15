@@ -44,7 +44,7 @@ endif()
 include_directories(
   ${CMAKE_BINARY_DIR}
   ${CMAKE_SOURCE_DIR}/modules/worldengine/deps/g3dlite/include
-  ${CMAKE_SOURCE_DIR}/modules/worldengine/deps/recastnavigation/Detour
+  ${CMAKE_SOURCE_DIR}/modules/worldengine/deps/recastnavigation/Detour/Include
   ${CMAKE_SOURCE_DIR}/modules/worldengine/deps/gsoap
   ${CMAKE_SOURCE_DIR}/modules/worldengine/deps/sockets/include
   ${CMAKE_SOURCE_DIR}/modules/worldengine/deps/SFMT
