@@ -980,10 +980,10 @@ class boss_the_lich_king : public CreatureScript
                     case EVENT_QUAKE:
                         _phase = PHASE_TWO;
                         events.CancelEventGroup(EVENT_GROUP_ABILITIES);
-                        events.ScheduleEvent(EVENT_INFEST, 12000, EVENT_GROUP_ABILITIES);
+                        events.ScheduleEvent(EVENT_INFEST, 14000, EVENT_GROUP_ABILITIES);
                         events.ScheduleEvent(EVENT_SUMMON_VALKYR, 20000, EVENT_GROUP_ABILITIES);
                         events.ScheduleEvent(EVENT_SOUL_REAPER, 40000, EVENT_GROUP_ABILITIES);
-                        events.ScheduleEvent(EVENT_DEFILE, 36000, EVENT_GROUP_ABILITIES);
+                        events.ScheduleEvent(EVENT_DEFILE, 38000, EVENT_GROUP_ABILITIES);
 
                         me->InterruptNonMeleeSpells(false);
                         me->ClearUnitState(UNIT_STATE_CASTING);
@@ -996,7 +996,7 @@ class boss_the_lich_king : public CreatureScript
                         _phase = PHASE_THREE;
                         events.CancelEventGroup(EVENT_GROUP_ABILITIES);
                         events.ScheduleEvent(EVENT_SOUL_REAPER, 40000, EVENT_GROUP_ABILITIES);
-                        events.ScheduleEvent(EVENT_DEFILE, 36000, EVENT_GROUP_ABILITIES);
+                        events.ScheduleEvent(EVENT_DEFILE, 38000, EVENT_GROUP_ABILITIES);
                         events.ScheduleEvent(EVENT_VILE_SPIRITS, 20000, EVENT_GROUP_VILE_SPIRITS);
                         events.ScheduleEvent(IsHeroic() ? EVENT_HARVEST_SOULS : EVENT_HARVEST_SOUL, 14000, EVENT_GROUP_ABILITIES);
 
@@ -1020,7 +1020,7 @@ class boss_the_lich_king : public CreatureScript
                         break;
                     case EVENT_INFEST:
                         me->CastSpell(me, SPELL_INFEST, false);
-                        events.ScheduleEvent(EVENT_INFEST, 20500, EVENT_GROUP_ABILITIES);
+                        events.ScheduleEvent(EVENT_INFEST, 22500, EVENT_GROUP_ABILITIES);
                         break;
                     case EVENT_NECROTIC_PLAGUE:
                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, NecroticPlagueTargetCheck(me, NECROTIC_PLAGUE_LK, NECROTIC_PLAGUE_PLR)))
@@ -1040,7 +1040,7 @@ class boss_the_lich_king : public CreatureScript
                     case EVENT_PAIN_AND_SUFFERING:
                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
                         {
-                            events.DelayEventsToMax(500, EVENT_GROUP_ABILITIES);
+                            //events.DelayEventsToMax(500, EVENT_GROUP_ABILITIES);
                             me->SetOrientation(me->GetAngle(target));
                             me->CastSpell(target, SPELL_PAIN_AND_SUFFERING, false);
                         }
@@ -1071,7 +1071,7 @@ class boss_the_lich_king : public CreatureScript
                                     break;
                                 } 
 
-                                // if valkyr is coming within 2,5 seconds after defile then we've to
+                                // if valkyr is coming between 1.5 and 3 seconds after defile then we've to
                                 // delay valkyr just a bit
                                 events.RescheduleEvent(EVENT_SUMMON_VALKYR, 5000, EVENT_GROUP_ABILITIES);
                             }
@@ -1082,7 +1082,7 @@ class boss_the_lich_king : public CreatureScript
                                 me->CastSpell(target, SPELL_DEFILE, false);
                                 // defile has a fixed CD (from dbm) that can be variable only
                                 // if no target has been found at the moment (schedule after 1 second)
-                                events.ScheduleEvent(EVENT_DEFILE, 30500, EVENT_GROUP_ABILITIES);
+                                events.ScheduleEvent(EVENT_DEFILE, 32500, EVENT_GROUP_ABILITIES);
                             }
                             else {
                                 // be sure it happen trying each seconds if no target
@@ -1094,8 +1094,7 @@ class boss_the_lich_king : public CreatureScript
                         if (me->IsWithinMeleeRange(me->GetVictim()))
                         {
                             me->CastSpell(me->GetVictim(), SPELL_SOUL_REAPER, false);
-                            events.DelayEventsToMax(12000, EVENT_GROUP_ABILITIES);
-                            events.ScheduleEvent(EVENT_SOUL_REAPER, 30000, EVENT_GROUP_ABILITIES);
+                            events.ScheduleEvent(EVENT_SOUL_REAPER, 30500, EVENT_GROUP_ABILITIES);
                         }
                         else
                             events.ScheduleEvent(EVENT_SOUL_REAPER, 1000, EVENT_GROUP_ABILITIES);
@@ -1111,8 +1110,9 @@ class boss_the_lich_king : public CreatureScript
                             // doesn't exist ( now > next defile ) or defile is coming too soon
                             uint32 minTime = (Is25ManRaid() ? 5000 : 4000);
                             if (uint32 evTime = events.GetNextEventTime(EVENT_DEFILE))
-                                if (events.GetTimer() > evTime || evTime - events.GetTimer() < minTime)
+                                if (events.GetTimer() > evTime || evTime - events.GetTimer() < minTime) {
                                     events.RescheduleEvent(EVENT_DEFILE, minTime, EVENT_GROUP_ABILITIES);
+                                }
                         }
                         break;
                     case EVENT_VILE_SPIRITS:
