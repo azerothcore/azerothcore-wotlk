@@ -576,13 +576,15 @@ class npc_minigob_manabonk : public CreatureScript
                             events.ScheduleEvent(EVENT_BLINK, 3*IN_MILLISECONDS);
                             break;
                         case EVENT_BLINK:
+                        {
                             DoCast(me, SPELL_IMPROVED_BLINK);
                             Position pos;
                             me->GetRandomNearPosition(pos, (urand(15, 40)));
                             me->GetMotionMaster()->MovePoint(0, pos.m_positionX, pos.m_positionY, pos.m_positionZ);
-                            events.ScheduleEvent(EVENT_DESPAWN, 3*IN_MILLISECONDS);
+                            events.ScheduleEvent(EVENT_DESPAWN, 3 * IN_MILLISECONDS);
                             events.ScheduleEvent(EVENT_DESPAWN_VISUAL, 2.5*IN_MILLISECONDS);
                             break;
+                        }
                         case EVENT_DESPAWN_VISUAL:
                             DoCast(me, SPELL_TELEPORT_VISUAL);
                             break;
