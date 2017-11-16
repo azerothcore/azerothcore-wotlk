@@ -721,5 +721,5 @@ void WorldSession::HandleSummonResponseOpcode(WorldPacket& recvData)
         agree = false;
     }
     _player->SetSummonAsSpectator(false);
-    _player->SummonIfPossible(agree);
+    _player->SummonIfPossible(agree, summoner_guid);
 }
