@@ -3029,11 +3029,7 @@ void Player::SetGameMaster(bool on)
     else
     {
         // restore phase
-        uint32 newPhase = 0;
-        AuraEffectList const& phases = GetAuraEffectsByType(SPELL_AURA_PHASE);
-        if (!phases.empty())
-            for (AuraEffectList::const_iterator itr = phases.begin(); itr != phases.end(); ++itr)
-                newPhase |= (*itr)->GetMiscValue();
+        uint32 newPhase = GetPhaseByAuras();
 
         if (!newPhase)
             newPhase = PHASEMASK_NORMAL;
@@ -25241,22 +25237,14 @@ void Player::_LoadSkills(PreparedQueryResult result)
 }
 
 uint32 Player::GetPhaseMaskForSpawn() const
-{ 
-    uint32 phase = PHASEMASK_NORMAL;
-    if (!IsGameMaster())
-        phase = GetPhaseMask();
-    else
-    {
-        AuraEffectList const& phases = GetAuraEffectsByType(SPELL_AURA_PHASE);
-        if (!phases.empty())
-            phase = phases.front()->GetMiscValue();
-    }
+{
+    uint32 phase = IsGameMaster() ? GetPhaseByAuras() : GetPhaseMask();
 
     // some aura phases include 1 normal map in addition to phase itself
     if (uint32 n_phase = phase & ~PHASEMASK_NORMAL)
         return n_phase;
 
-    return PHASEMASK_NORMAL;
+    return phase;
 }
 
 InventoryResult Player::CanEquipUniqueItem(Item* pItem, uint8 eslot, uint32 limit_count) const
