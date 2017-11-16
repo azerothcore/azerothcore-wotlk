@@ -1,3 +1,18 @@
+-- DB update 2017_11_14_01 -> 2017_11_17_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2017_11_14_01';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2017_11_14_01 2017_11_17_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1509353420962391661'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
 INSERT INTO version_db_world (`sql_rev`) VALUES ('1509353420962391661');
 
 -- change script name to arena kills by type
@@ -36,3 +51,12 @@ INSERT INTO achievement_criteria_data (criteria_id,TYPE,ScriptName) VALUES (8595
 INSERT INTO achievement_criteria_data (criteria_id,TYPE,ScriptName) VALUES (8596,11,'achievement_arena_5v5_check');                    
 INSERT INTO achievement_criteria_data (criteria_id,TYPE,ScriptName) VALUES (8597,11,'achievement_arena_5v5_check');                    
 INSERT INTO achievement_criteria_data (criteria_id,TYPE,ScriptName) VALUES (8598,11,'achievement_arena_5v5_check');
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END;
+//
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
