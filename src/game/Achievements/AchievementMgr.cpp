@@ -360,10 +360,16 @@ bool AchievementCriteriaData::Meets(uint32 criteria_id, Player const* source, Un
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_SCRIPT:
             return sScriptMgr->OnCriteriaCheck(ScriptId, const_cast<Player*>(source), const_cast<Unit*>(target), criteria_id);
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_MAP_DIFFICULTY:
+        {
             if (source->GetMap()->IsRaid())
                 if (source->GetMap()->Is25ManRaid() != ((difficulty.difficulty & RAID_DIFFICULTY_MASK_25MAN) != 0))
                     return false;
-            return source->GetMap()->GetSpawnMode() >= difficulty.difficulty;
+
+            AchievementCriteriaEntry const* criteria = sAchievementCriteriaStore.LookupEntry(criteria_id); 
+            uint8 spawnMode = source->GetMap()->GetSpawnMode();
+            // Dungeons completed on heroic mode count towards both in general achievement, but not in statistics.
+            return sAchievementMgr->IsStatisticCriteria(criteria) ? spawnMode == difficulty.difficulty : spawnMode >= difficulty.difficulty;
+        }
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_MAP_PLAYER_COUNT:
             return source->GetMap()->GetPlayersCountExceptGMs() <= map_players.maxcount;
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_T_TEAM:
@@ -2301,6 +2307,32 @@ bool AchievementMgr::CanUpdateCriteria(AchievementCriteriaEntry const* criteria,
         return false;
 
     return true;
+}
+
+bool AchievementGlobalMgr::IsStatisticCriteria(AchievementCriteriaEntry const* achievementCriteria) const
+{
+    return isStatisticAchievement(sAchievementStore.LookupEntry(achievementCriteria->referredAchievement));
+}
+
+bool AchievementGlobalMgr::isStatisticAchievement(AchievementEntry const* achievement) const
+{
+    if (!achievement)
+        return false;
+
+    AchievementCategoryEntry const* cat = sAchievementCategoryStore.LookupEntry(achievement->categoryId);
+    do {
+        switch(cat->ID) {
+            case ACHIEVEMENT_CATEGORY_STATISTICS:
+                return true;
+            case ACHIEVEMENT_CATEOGRY_GENERAL:
+                return false;
+            default:
+                cat = sAchievementCategoryStore.LookupEntry(cat->parentCategory);
+                break;
+        }
+    } while (cat);
+
+    return false;
 }
 
 bool AchievementGlobalMgr::IsRealmCompleted(AchievementEntry const* achievement) const
