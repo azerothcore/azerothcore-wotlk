@@ -23,8 +23,7 @@ UPDATE `quest_template_addon` SET `SpecialFlags` = '0' WHERE `ID` = '342';--
 -- END UPDATING QUERIES
 --
 COMMIT;
-END;
-//
+END //
 DELIMITER ;
 CALL updateDb();
 DROP PROCEDURE IF EXISTS `updateDb`;

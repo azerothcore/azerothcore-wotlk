@@ -24,8 +24,7 @@ INSERT INTO `creature_onkill_reputation` (`creature_id`,`RewOnKillRepFaction1`,`
 -- END UPDATING QUERIES
 --
 COMMIT;
-END;
-//
+END //
 DELIMITER ;
 CALL updateDb();
 DROP PROCEDURE IF EXISTS `updateDb`;

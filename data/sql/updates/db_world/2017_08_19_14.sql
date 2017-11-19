@@ -42,8 +42,7 @@ UPDATE `quest_template` SET RewardXPDifficulty = 0, RewardBonusMoney =    0 WHER
 -- END UPDATING QUERIES
 --
 COMMIT;
-END;
-//
+END //
 DELIMITER ;
 CALL updateDb();
 DROP PROCEDURE IF EXISTS `updateDb`;

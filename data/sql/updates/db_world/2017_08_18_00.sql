@@ -20,8 +20,7 @@ UPDATE `creature_template` SET `modelid1` = '6485' WHERE `entry` = '7780';
 -- END UPDATING QUERIES
 --
 COMMIT;
-END;
-//
+END //
 DELIMITER ;
 CALL updateDb();
 DROP PROCEDURE IF EXISTS `updateDb`;

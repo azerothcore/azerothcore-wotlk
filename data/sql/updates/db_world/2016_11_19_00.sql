@@ -20,8 +20,7 @@ UPDATE `quest_template` SET `SpecialFlags` = "0", `RequiredItemId1` = "31811", `
 -- END UPDATING QUERIES
 --
 COMMIT;
-END;
-//
+END //
 DELIMITER ;
 CALL updateDb();
 DROP PROCEDURE IF EXISTS `updateDb`;
