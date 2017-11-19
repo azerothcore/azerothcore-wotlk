@@ -55,8 +55,7 @@ INSERT INTO achievement_criteria_data (criteria_id,TYPE,ScriptName) VALUES (8598
 -- END UPDATING QUERIES
 --
 COMMIT;
-END;
-//
+END //
 DELIMITER ;
 CALL updateDb();
 DROP PROCEDURE IF EXISTS `updateDb`;

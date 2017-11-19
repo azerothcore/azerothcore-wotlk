@@ -19,8 +19,7 @@ UPDATE `spell_dbc` SET `RangeIndex`=4 WHERE `Id`=61698;
 -- END UPDATING QUERIES
 --
 COMMIT;
-END;
-//
+END //
 DELIMITER ;
 CALL updateDb();
 DROP PROCEDURE IF EXISTS `updateDb`;

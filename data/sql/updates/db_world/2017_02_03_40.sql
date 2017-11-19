@@ -1879,8 +1879,7 @@ UPDATE `creature` SET `SpawnTimeSecs` = 180 WHERE `map` IN (560) AND id IN (2350
 -- END UPDATING QUERIES
 --
 COMMIT;
-END;
-//
+END //
 DELIMITER ;
 CALL updateDb();
 DROP PROCEDURE IF EXISTS `updateDb`;

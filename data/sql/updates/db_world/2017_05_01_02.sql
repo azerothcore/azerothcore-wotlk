@@ -35,8 +35,7 @@ INSERT INTO `item_loot_template` (`Entry`,`Item`,`ChanceOrQuestChance`,`LootMode
 -- END UPDATING QUERIES
 --
 COMMIT;
-END;
-//
+END //
 DELIMITER ;
 CALL updateDb();
 DROP PROCEDURE IF EXISTS `updateDb`;

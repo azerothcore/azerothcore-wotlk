@@ -17,8 +17,7 @@ SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '150404422256069670
 -- END UPDATING QUERIES
 --
 COMMIT;
-END;
-//
+END //
 DELIMITER ;
 CALL updateDb();
 DROP PROCEDURE IF EXISTS `updateDb`;

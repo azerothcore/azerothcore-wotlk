@@ -23,8 +23,7 @@ DELETE FROM `creature_addon` WHERE `guid`=3574;
 -- END UPDATING QUERIES
 --
 COMMIT;
-END;
-//
+END //
 DELIMITER ;
 CALL updateDb();
 DROP PROCEDURE IF EXISTS `updateDb`;

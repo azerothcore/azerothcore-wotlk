@@ -63,8 +63,7 @@ ALTER TABLE `gameobject_template` DROP `questItem1`, DROP `questItem2`, DROP `qu
 -- END UPDATING QUERIES
 --
 COMMIT;
-END;
-//
+END //
 DELIMITER ;
 CALL updateDb();
 DROP PROCEDURE IF EXISTS `updateDb`;

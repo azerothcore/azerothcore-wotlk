@@ -20,8 +20,7 @@ UPDATE `creature` SET `map` = 47 WHERE `guid` = 84369 AND `id` = 4512;
 -- END UPDATING QUERIES
 --
 COMMIT;
-END;
-//
+END //
 DELIMITER ;
 CALL updateDb();
 DROP PROCEDURE IF EXISTS `updateDb`;

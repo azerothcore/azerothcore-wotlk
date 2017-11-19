@@ -22,8 +22,7 @@ ALTER TABLE `account` CHANGE `expansion` `expansion` TINYINT(3) UNSIGNED DEFAULT
 -- END UPDATING QUERIES
 --
 COMMIT;
-END;
-//
+END //
 DELIMITER ;
 CALL updateDb();
 DROP PROCEDURE IF EXISTS `updateDb`;

@@ -20,8 +20,7 @@ UPDATE `creature_text` SET `text` = "$N! I'm watching you!" WHERE `entry` = "113
 -- END UPDATING QUERIES
 --
 COMMIT;
-END;
-//
+END //
 DELIMITER ;
 CALL updateDb();
 DROP PROCEDURE IF EXISTS `updateDb`;

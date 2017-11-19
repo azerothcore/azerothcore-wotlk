@@ -20,8 +20,7 @@ UPDATE `item_template` SET `spellcooldown_1` = 30000 WHERE `entry` IN (44010);
 -- END UPDATING QUERIES
 --
 COMMIT;
-END;
-//
+END //
 DELIMITER ;
 CALL updateDb();
 DROP PROCEDURE IF EXISTS `updateDb`;

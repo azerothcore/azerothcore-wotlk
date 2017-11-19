@@ -79,9 +79,11 @@ function import() {
             echo "--" >> "$newFile";
             echo "-- START UPDATING QUERIES" >> "$newFile";
             echo "--" >> "$newFile";
+            echo "" >> "$newFile";
 
             cat $entry >> "$newFile";
 
+            echo "" >> "$newFile";
             echo "--" >> "$newFile";
             echo "-- END UPDATING QUERIES" >> "$newFile";
             echo "--" >> "$newFile";
