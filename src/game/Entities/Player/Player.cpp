@@ -9269,6 +9269,12 @@ void Player::SendLoot(uint64 guid, LootType loot_type)
                 loot->FillLoot(creature->GetCreatureTemplate()->SkinLootId, LootTemplates_Skinning, this, true);
                 permission = OWNER_PERMISSION;
 
+                //Inform instance if creature is skinned.
+                if (InstanceScript* mapInstance = creature->GetInstanceScript())
+                {
+                    mapInstance->CreatureLooted(creature, LOOT_SKINNING);
+                }
+
                 // Xinef: Set new loot recipient
                 creature->SetLootRecipient(this, false);
             }

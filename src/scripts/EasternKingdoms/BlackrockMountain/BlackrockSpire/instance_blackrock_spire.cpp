@@ -67,6 +67,19 @@ public:
             memset(go_emberseerrunes, 0, sizeof(go_emberseerrunes));
         }
 
+        void CreatureLooted(Creature* creature, LootType loot) override
+        {
+            switch (creature->GetEntry())
+            {
+            case NPC_THE_BEAST:
+                if (loot == LOOT_SKINNING)
+                {
+                    creature->CastSpell(creature, SPELL_FINKLE_IS_EINHORN, true);
+                }
+                break;
+            }
+        }
+
         void OnCreatureCreate(Creature* creature)
         {
             switch (creature->GetEntry())
