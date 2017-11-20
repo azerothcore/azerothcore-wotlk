@@ -1562,7 +1562,10 @@ class spell_dk_death_grip : public SpellScriptLoader
                 Unit* baseTarget = GetExplTargetUnit();
 
                 if (caster != target)
+                {
                     caster->CastSpell(target, 49560, true);
+                    target->InterruptNonMeleeSpells(true);
+                }
                 else
                     baseTarget->CastSpell(caster, 49560, true);
             }
