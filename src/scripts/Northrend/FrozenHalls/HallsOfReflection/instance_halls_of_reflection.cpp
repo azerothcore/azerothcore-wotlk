@@ -880,7 +880,7 @@ public:
             }
             else
             {
-                NextWaveTimer = 65000;
+                NextWaveTimer = 150000;
 
                 uint8 num_to_activate = 5;
                 if (WaveNumber <= 2)
