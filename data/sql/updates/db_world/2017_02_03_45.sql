@@ -20,8 +20,7 @@ UPDATE `creature_text` SET `emote` = "398", `duration` = "3000" WHERE `entry` = 
 -- END UPDATING QUERIES
 --
 COMMIT;
-END;
-//
+END //
 DELIMITER ;
 CALL updateDb();
 DROP PROCEDURE IF EXISTS `updateDb`;

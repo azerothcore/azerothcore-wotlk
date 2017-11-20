@@ -15,8 +15,7 @@ ALTER TABLE version_db_characters CHANGE COLUMN 2016_08_25_00 2016_11_18_00 bit;
 --
 
 COMMIT;
-END;
-//
+END //
 DELIMITER ;
 CALL updateDb();
 DROP PROCEDURE IF EXISTS `updateDb`;

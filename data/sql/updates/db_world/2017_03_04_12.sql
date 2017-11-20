@@ -19,8 +19,7 @@ UPDATE `quest_template` SET `TimeAllowed` = 0 WHERE `id` IN(3364);
 -- END UPDATING QUERIES
 --
 COMMIT;
-END;
-//
+END //
 DELIMITER ;
 CALL updateDb();
 DROP PROCEDURE IF EXISTS `updateDb`;

@@ -1317,6 +1317,8 @@ void LootTemplate::Process(Loot& loot, bool rate, uint16 lootMode, Player const*
         LootStoreItem* item = *i;
         if (!(item->lootmode & lootMode))                         // Do not add if mode mismatch
             continue;
+        
+        sScriptMgr->OnBeforeItemRoll(player, loot, rate, lootMode, item);
 
         if (!item->Roll(rate))
             continue;                                           // Bad luck for the entry
@@ -1328,12 +1330,12 @@ void LootTemplate::Process(Loot& loot, bool rate, uint16 lootMode, Player const*
                 continue;                                       // Error message already printed at loading stage
 
             uint32 maxcount = uint32(float(item->maxcount) * sWorld->getRate(RATE_DROP_ITEM_REFERENCED_AMOUNT));
-            sScriptMgr->OnAfterRefCount(item, maxcount);
+            sScriptMgr->OnAfterRefCount(player, loot, rate, lootMode, item, maxcount);
             for (uint32 loop = 0; loop < maxcount; ++loop)      // Ref multiplicator
                 Referenced->Process(loot, rate, lootMode, player, item->group);
         } else  {
             // Plain entries (not a reference, not grouped)
-            sScriptMgr->OnBeforeDropAddItem(player, loot, item);
+            sScriptMgr->OnBeforeDropAddItem(player, loot, rate, lootMode, item);
             loot.AddItem(*item);                                // Chance is already checked, just add
         }
     }

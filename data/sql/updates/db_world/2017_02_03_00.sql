@@ -19,8 +19,7 @@ UPDATE `creature` SET `MovementType` = 1, `spawndist` = 10  WHERE `guid` IN (197
 -- END UPDATING QUERIES
 --
 COMMIT;
-END;
-//
+END //
 DELIMITER ;
 CALL updateDb();
 DROP PROCEDURE IF EXISTS `updateDb`;

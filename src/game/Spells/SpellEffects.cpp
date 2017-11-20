@@ -3218,7 +3218,7 @@ void Spell::EffectTaunt(SpellEffIndex /*effIndex*/)
         return;
 
     // xinef: Hand of Reckoning, cast before checing canhavethreatlist. fixes damage against pets
-    if (m_spellInfo->Id == 62124 && unitTarget->GetVictim() != m_caster && !unitTarget->IsTotem())
+    if (m_spellInfo->Id == 62124 && unitTarget->GetVictim() != m_caster)
         m_caster->CastSpell(unitTarget, 67485, true);
 
     // this effect use before aura Taunt apply for prevent taunt already attacking target

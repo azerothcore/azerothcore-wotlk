@@ -26,8 +26,7 @@ UPDATE `quest_template_addon` SET `ExclusiveGroup`=11585 WHERE `ID` IN (11585,11
 -- END UPDATING QUERIES
 --
 COMMIT;
-END;
-//
+END //
 DELIMITER ;
 CALL updateDb();
 DROP PROCEDURE IF EXISTS `updateDb`;

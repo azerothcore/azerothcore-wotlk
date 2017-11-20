@@ -2125,6 +2125,7 @@ class Unit : public WorldObject
         void SetModelVisible(bool on);
 
         // common function for visibility checks for player/creatures with detection code
+        uint32 GetPhaseByAuras() const;
         void SetPhaseMask(uint32 newPhaseMask, bool update);// overwrite WorldObject::SetPhaseMask
         void UpdateObjectVisibility(bool forced = true, bool fromUpdate = false);
 

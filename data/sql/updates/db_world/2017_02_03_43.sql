@@ -23,8 +23,7 @@ UPDATE `creature_template` SET `speed_run` = 1.14286  WHERE `entry` IN (34657, 3
 -- END UPDATING QUERIES
 --
 COMMIT;
-END;
-//
+END //
 DELIMITER ;
 CALL updateDb();
 DROP PROCEDURE IF EXISTS `updateDb`;

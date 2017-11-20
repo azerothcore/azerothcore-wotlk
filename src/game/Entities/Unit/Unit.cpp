@@ -13699,7 +13699,7 @@ void Unit::ModSpellCastTime(SpellInfo const* spellInfo, int32 & castTime, Spell*
     if (!spellInfo || castTime < 0)
         return;
 
-    if (spellInfo->IsChanneled() && !(spellInfo->AttributesEx5 & SPELL_ATTR5_HASTE_AFFECT_DURATION))
+    if (spellInfo->IsChanneled() && spellInfo->HasAura(SPELL_AURA_MOUNTED))
         return;
 
     // called from caster
@@ -17554,6 +17554,17 @@ float Unit::MeleeSpellMissChance(const Unit* victim, WeaponAttackType attType, i
     if (missChance > 60.0f)
         return 60.0f;
     return missChance;
+}
+
+uint32 Unit::GetPhaseByAuras() const
+{
+    uint32 currentPhase = 0;
+    AuraEffectList const& phases = GetAuraEffectsByType(SPELL_AURA_PHASE);
+    if (!phases.empty())
+        for (AuraEffectList::const_iterator itr = phases.begin(); itr != phases.end(); ++itr)
+            currentPhase |= (*itr)->GetMiscValue();
+
+    return currentPhase;
 }
 
 void Unit::SetPhaseMask(uint32 newPhaseMask, bool update)

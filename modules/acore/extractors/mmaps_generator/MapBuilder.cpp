@@ -23,7 +23,7 @@ namespace DisableMgr
 }
 
 #define MMAP_MAGIC 0x4d4d4150   // 'MMAP'
-#define MMAP_VERSION 6
+#define MMAP_VERSION 8
 
 struct MmapTileHeader
 {
@@ -573,7 +573,7 @@ namespace MMAP
         config.walkableHeight = m_bigBaseUnit ? 3 : 6;
         // a value >= 3|6 allows npcs to walk over some fences
         // a value >= 4|8 allows npcs to walk over all fences
-        config.walkableClimb = m_bigBaseUnit ? 2 : 4;
+        config.walkableClimb = m_bigBaseUnit ? 4 : 8;
         config.minRegionArea = rcSqr(60);
         config.mergeRegionArea = rcSqr(50);
         config.maxSimplificationError = 1.8f;           // eliminates most jagged edges (tiny polygons)

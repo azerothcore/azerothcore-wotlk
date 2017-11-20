@@ -18,8 +18,7 @@ UPDATE `creature_addon` SET `auras`=55701 WHERE `guid`=100071;--
 -- END UPDATING QUERIES
 --
 COMMIT;
-END;
-//
+END //
 DELIMITER ;
 CALL updateDb();
 DROP PROCEDURE IF EXISTS `updateDb`;
