@@ -216,6 +216,10 @@ enum ScoreType
     //SOTA
     SCORE_DESTROYED_DEMOLISHER  = 18,
     SCORE_DESTROYED_WALL        = 19,
+	
+	/** World of Warcraft Armory **/
+	SCORE_DAMAGE_TAKEN          = 20,
+	SCORE_HEALING_TAKEN         = 21
 };
 
 enum ArenaType
@@ -252,7 +256,7 @@ enum BattlegroundStartingEventsIds
 struct BattlegroundScore
 {
     BattlegroundScore(Player* player) : KillingBlows(0), Deaths(0), HonorableKills(0), BonusHonor(0),
-        DamageDone(0), HealingDone(0), player(player)
+        DamageDone(0), HealingDone(0), DamageTaken(0), HealingTaken(0), player(player) //ARMORY MOD
     { }
 
     virtual ~BattlegroundScore() { }                        //virtual destructor is used when deleting score from scores map
@@ -263,6 +267,8 @@ struct BattlegroundScore
     uint32 BonusHonor;
     uint32 DamageDone;
     uint32 HealingDone;
+	uint32 DamageTaken;
+	uint32 HealingTaken;
     Player* player;
 
     uint32 GetKillingBlows() const { return KillingBlows; }
