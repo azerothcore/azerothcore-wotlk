@@ -2131,6 +2131,7 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
     if (achievement->flags & ACHIEVEMENT_FLAG_COUNTER || HasAchieved(achievement->ID))
         return;
 
+	GetPlayer()->CreateWowarmoryFeed(1, achievement->ID, 0, 0);
     SendAchievementEarned(achievement);
     CompletedAchievementData& ca = m_completedAchievements[achievement->ID];
     ca.date = time(NULL);
