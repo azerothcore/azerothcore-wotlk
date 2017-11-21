@@ -20,8 +20,7 @@ UPDATE `creature` SET `modelid` = 24818 WHERE `guid` IN (117789);--
 -- END UPDATING QUERIES
 --
 COMMIT;
-END;
-//
+END //
 DELIMITER ;
 CALL updateDb();
 DROP PROCEDURE IF EXISTS `updateDb`;

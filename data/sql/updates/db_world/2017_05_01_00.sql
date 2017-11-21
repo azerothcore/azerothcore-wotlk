@@ -166,8 +166,7 @@ INSERT INTO `npc_text` (`ID`, `text0_0`) VALUES
 -- END UPDATING QUERIES
 --
 COMMIT;
-END;
-//
+END //
 DELIMITER ;
 CALL updateDb();
 DROP PROCEDURE IF EXISTS `updateDb`;

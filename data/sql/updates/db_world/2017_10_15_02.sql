@@ -20,8 +20,7 @@ UPDATE creature_template SET flags_extra =+ 2 WHERE entry IN (69,299);
 -- END UPDATING QUERIES
 --
 COMMIT;
-END;
-//
+END //
 DELIMITER ;
 CALL updateDb();
 DROP PROCEDURE IF EXISTS `updateDb`;

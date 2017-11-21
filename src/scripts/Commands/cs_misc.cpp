@@ -621,8 +621,8 @@ public:
             else
                 _player->SaveRecallPosition();
 
-            _player->TeleportTo(target->GetMapId(), target->GetPositionX(), target->GetPositionY(), target->GetPositionZ()+0.25f, _player->GetOrientation(), TELE_TO_GM_MODE);
-            _player->SetPhaseMask(target->GetPhaseMask() | 1, false);
+            if (_player->TeleportTo(target->GetMapId(), target->GetPositionX(), target->GetPositionY(), target->GetPositionZ()+0.25f, _player->GetOrientation(), TELE_TO_GM_MODE, target))
+                _player->SetPhaseMask(target->GetPhaseMask() | 1, false);
         }
         else
         {
@@ -743,8 +743,8 @@ public:
             // before GM
             float x, y, z;
             handler->GetSession()->GetPlayer()->GetClosePoint(x, y, z, target->GetObjectSize());
-            target->TeleportTo(handler->GetSession()->GetPlayer()->GetMapId(), x, y, z, target->GetOrientation());
-            target->SetPhaseMask(handler->GetSession()->GetPlayer()->GetPhaseMask(), false);
+            if (target->TeleportTo(handler->GetSession()->GetPlayer()->GetMapId(), x, y, z, target->GetOrientation(), 0, handler->GetSession()->GetPlayer()))
+                target->SetPhaseMask(handler->GetSession()->GetPlayer()->GetPhaseMask(), false);
         }
         else
         {
@@ -854,7 +854,7 @@ public:
             // before GM
             float x, y, z;
             handler->GetSession()->GetPlayer()->GetClosePoint(x, y, z, player->GetObjectSize());
-            player->TeleportTo(handler->GetSession()->GetPlayer()->GetMapId(), x, y, z, player->GetOrientation());
+            player->TeleportTo(handler->GetSession()->GetPlayer()->GetMapId(), x, y, z, player->GetOrientation(), 0, handler->GetSession()->GetPlayer());
         }
 
         return true;

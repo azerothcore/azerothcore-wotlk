@@ -170,8 +170,7 @@ UPDATE game_event SET holidayStage = 2 WHERE eventEntry IN (3, 4, 5);
 -- END UPDATING QUERIES
 --
 COMMIT;
-END;
-//
+END //
 DELIMITER ;
 CALL updateDb();
 DROP PROCEDURE IF EXISTS `updateDb`;

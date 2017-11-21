@@ -59,6 +59,7 @@ EmotesTextSoundEntry const* FindTextSoundEmoteFor(uint32 emote, uint32 race, uin
 
 extern DBCStorage <AchievementEntry>             sAchievementStore;
 extern DBCStorage <AchievementCriteriaEntry>     sAchievementCriteriaStore;
+extern DBCStorage <AchievementCategoryEntry>     sAchievementCategoryStore;
 extern DBCStorage <AreaTableEntry>               sAreaTableStore;
 extern DBCStorage <AreaGroupEntry>               sAreaGroupStore;
 extern DBCStorage <AreaPOIEntry>                 sAreaPOIStore;

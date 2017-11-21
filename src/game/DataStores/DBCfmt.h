@@ -10,6 +10,7 @@
 char const Achievementfmt[] = "niixssssssssssssssssxxxxxxxxxxxxxxxxxxiixixxxxxxxxxxxxxxxxxxii";
 const std::string CustomAchievementfmt="pppaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaapapaaaaaaaaaaaaaaaaaapp";
 const std::string CustomAchievementIndex = "ID";
+char const AchievementCategoryfmt[] = "nixxxxxxxxxxxxxxxxxx";
 char const AchievementCriteriafmt[] = "niiiiiiiixxxxxxxxxxxxxxxxxiiiix";
 char const AreaTableEntryfmt[] = "niiiixxxxxissssssssssssssssxiiiiixxx";
 char const AreaGroupEntryfmt[] = "niiiiiii";

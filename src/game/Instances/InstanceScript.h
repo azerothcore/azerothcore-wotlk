@@ -134,6 +134,9 @@ class InstanceScript : public ZoneScript
         //On load
         virtual void Load(char const* data) { LoadBossState(data); }
 
+        //Called when creature is Looted
+        virtual void CreatureLooted(Creature* /*creature*/, LootType) {}
+
         //When save is needed, this function generates the data
         virtual std::string GetSaveData() { return GetBossSaveData(); }
 

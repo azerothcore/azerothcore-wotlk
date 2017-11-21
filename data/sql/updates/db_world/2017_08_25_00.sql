@@ -38,8 +38,7 @@ UPDATE `creature_text` SET `sound` = '10159' WHERE `entry` = '17461' AND `groupi
 -- END UPDATING QUERIES
 --
 COMMIT;
-END;
-//
+END //
 DELIMITER ;
 CALL updateDb();
 DROP PROCEDURE IF EXISTS `updateDb`;

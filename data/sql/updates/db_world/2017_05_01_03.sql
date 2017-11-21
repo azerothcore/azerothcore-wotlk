@@ -29,8 +29,7 @@ DELETE FROM `gameobject` WHERE (id = 73941) AND (guid IN (14685));
 -- END UPDATING QUERIES
 --
 COMMIT;
-END;
-//
+END //
 DELIMITER ;
 CALL updateDb();
 DROP PROCEDURE IF EXISTS `updateDb`;

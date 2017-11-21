@@ -22,8 +22,7 @@ UPDATE `creature_template` SET `AIName`= 'PetAI', `mindmg`=1360, `maxdmg`=1840, 
 -- END UPDATING QUERIES
 --
 COMMIT;
-END;
-//
+END //
 DELIMITER ;
 CALL updateDb();
 DROP PROCEDURE IF EXISTS `updateDb`;
