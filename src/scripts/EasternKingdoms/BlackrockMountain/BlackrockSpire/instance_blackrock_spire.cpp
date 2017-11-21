@@ -80,7 +80,7 @@ public:
             }
         }
 
-        void OnCreatureCreate(Creature* creature)
+        void OnCreatureCreate(Creature* creature) override
         {
             switch (creature->GetEntry())
             {
