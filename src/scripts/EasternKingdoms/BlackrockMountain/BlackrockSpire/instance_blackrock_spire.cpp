@@ -67,7 +67,7 @@ public:
             memset(go_emberseerrunes, 0, sizeof(go_emberseerrunes));
         }
 
-        void CreatureLooted(Creature* creature, LootType loot) override
+        void CreatureLooted(Creature* creature, LootType loot)
         {
             switch (creature->GetEntry())
             {
