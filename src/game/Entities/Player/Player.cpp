@@ -25246,8 +25246,13 @@ uint32 Player::GetPhaseMaskForSpawn() const
 {
     uint32 phase = IsGameMaster() ? GetPhaseByAuras() : GetPhaseMask();
 
+    if (!phase)
+        phase = PHASEMASK_NORMAL;
+
+
     // some aura phases include 1 normal map in addition to phase itself
-    if (uint32 n_phase = phase & ~PHASEMASK_NORMAL)
+    uint32 n_phase = phase & ~PHASEMASK_NORMAL;
+    if (n_phase > 0)
         return n_phase;
 
     return phase;
