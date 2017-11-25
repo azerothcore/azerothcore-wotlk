@@ -8,7 +8,6 @@
 # WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-if(CMAKE_SYSTEM_NAME MATCHES "Linux" AND NOT NOJEM)
   # We need to generate the jemalloc_def.h header based on platform-specific settings
   if (PLATFORM EQUAL 32)
     set(JEM_SIZEDEF 2)
@@ -60,37 +59,20 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux" AND NOT NOJEM)
     ${CMAKE_CURRENT_SOURCE_DIR}/src/witness.c
   )
 
-  add_library(jemalloc STATIC ${jemalloc_STAT_SRC})
+include_directories(
+  ${BUILDDIR}/
+  ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
 
-  target_include_directories(jemalloc
-    PRIVATE
-      ${BUILDDIR}
-      ${CMAKE_CURRENT_SOURCE_DIR}/include)
+add_definitions(-D_GNU_SOURCE -D_REENTRANT)
 
-  target_compile_definitions(jemalloc
+add_library(jemalloc STATIC ${jemalloc_STAT_SRC})
+
+target_link_libraries(jemalloc
     PUBLIC
-      -DNO_BUFFERPOOL
-    PRIVATE
-      -D_GNU_SOURCE
-      -D_REENTRAN)
-
-  target_link_libraries(jemalloc
-    PUBLIC
-      threads
-      valgrind
 	  ${CMAKE_DL_LIBS})
-
-  set_target_properties(jemalloc
-      PROPERTIES
-        FOLDER
-          "deps")
-
-else()
-  # Provide a dummy target for jemalloc which is used when jemalloc
-  # is disabled or not supported.
-  add_library(jemalloc INTERFACE)
-  target_link_libraries(jemalloc
-    INTERFACE
-      valgrind)
-
-endif()
+      
+set_target_properties(jemalloc
+    PROPERTIES
+      FOLDER
+        "deps")
