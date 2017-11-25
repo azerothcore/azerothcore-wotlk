@@ -5804,8 +5804,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                         break;
 
                     m_pathFinder = new PathGenerator(m_caster);
-                    float targetObjectSize = std::min(target->GetObjectSize(), 4.0f);
-                    m_pathFinder->CalculatePath(pos.m_positionX, pos.m_positionY, pos.m_positionZ + targetObjectSize, false);
+                    m_pathFinder->CalculatePath(pos.m_positionX, pos.m_positionY, pos.m_positionZ+0.15f, false);
                     G3D::Vector3 endPos = m_pathFinder->GetEndPosition(); // also check distance between target and the point calculated by mmaps
                     if (m_pathFinder->GetPathType() & (PATHFIND_NOPATH | PATHFIND_INCOMPLETE) || target->GetExactDistSq(endPos.x, endPos.y, endPos.z) > maxdist*maxdist || m_pathFinder->getPathLength() > (40.0f + (m_caster->HasAura(58097) ? 5.0f : 0.0f)))
                         return SPELL_FAILED_NOPATH;
