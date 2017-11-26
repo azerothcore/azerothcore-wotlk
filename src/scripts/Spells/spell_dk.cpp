@@ -1564,7 +1564,9 @@ class spell_dk_death_grip : public SpellScriptLoader
                 if (caster != target)
                 {
                     caster->CastSpell(target, 49560, true);
-                    target->InterruptNonMeleeSpells(true);
+                    const SpellInfo* spellInfo = sSpellMgr->GetSpellInfo(1766); // Rogue kick
+                    if (!target->IsImmunedToSpellEffect(spellInfo, EFFECT_0))
+                        target->InterruptNonMeleeSpells(true);
                 }
                 else
                     baseTarget->CastSpell(caster, 49560, true);
