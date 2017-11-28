@@ -1564,7 +1564,7 @@ class spell_dk_death_grip : public SpellScriptLoader
                 Unit* caster = GetCaster();
                 Unit* target = GetHitUnit();
                 Unit* baseTarget = GetExplTargetUnit();
-                Creature* targetCreature;
+                Creature* targetCreature = GetHitCreature();
 
                 if (caster != target)
                 {                    
