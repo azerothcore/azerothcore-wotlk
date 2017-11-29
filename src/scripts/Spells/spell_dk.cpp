@@ -1609,7 +1609,7 @@ class spell_dk_death_grip : public SpellScriptLoader
             {
                 if (m_scriptSpellId == 49576) // xinef: base death grip, add pvp range restriction
                 {
-                    OnCheckCast += SpellCheckCastFn(spell_dk_death_grip_SpellScript::CheckPvPRange);
+                    OnCheckCast += SpellCheckCastFn(spell_dk_death_grip_SpellScript::CheckCast);
                     OnEffectHitTarget += SpellEffectFn(spell_dk_death_grip_SpellScript::HandleBaseDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
                 }
                 else
