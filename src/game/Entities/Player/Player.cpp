@@ -22984,19 +22984,30 @@ bool Player::IsVisibleGloballyFor(Player const* u) const
 }
 
 template<class T>
-inline void UpdateVisibilityOf_helper(T*  /*target*/, std::vector<Unit*>& /*v*/)
+inline void UpdateVisibilityOf_helper(Player::ClientGUIDs& s64, T* target, std::vector<Unit*>& /*v*/)
 {
+    s64.insert(target->GetGUID());
 }
 
 template<>
-inline void UpdateVisibilityOf_helper(Creature* target, std::vector<Unit*>& v)
+inline void UpdateVisibilityOf_helper(Player::ClientGUIDs& s64, GameObject* target, std::vector<Unit*>& /*v*/)
 {
+    // @HACK: This is to prevent objects like deeprun tram from disappearing when player moves far from its spawn point while riding it
+    if ((target->GetGOInfo()->type != GAMEOBJECT_TYPE_TRANSPORT))
+        s64.insert(target->GetGUID());
+}
+
+template<>
+inline void UpdateVisibilityOf_helper(Player::ClientGUIDs& s64, Creature* target, std::vector<Unit*>& v)
+{
+    s64.insert(target->GetGUID());
     v.push_back(target);
 }
 
 template<>
-inline void UpdateVisibilityOf_helper(Player* target, std::vector<Unit*>& v)
+inline void UpdateVisibilityOf_helper(Player::ClientGUIDs& s64, Player* target, std::vector<Unit*>& v)
 {
+    s64.insert(target->GetGUID());
     v.push_back(target);
 }
 
@@ -23110,9 +23121,7 @@ void Player::UpdateVisibilityOf(T* target, UpdateData& data, std::vector<Unit*>&
         if (CanSeeOrDetect(target, false, true))
         {
             target->BuildCreateUpdateBlockForPlayer(&data, this);
-            m_clientGUIDs.insert(target->GetGUID());
-
-            UpdateVisibilityOf_helper(target, visibleNow);
+            UpdateVisibilityOf_helper(m_clientGUIDs, target, visibleNow);
         }
     }
 }
@@ -25558,8 +25567,13 @@ uint32 Player::GetPhaseMaskForSpawn() const
 {
     uint32 phase = IsGameMaster() ? GetPhaseByAuras() : GetPhaseMask();
 
+    if (!phase)
+        phase = PHASEMASK_NORMAL;
+
+
     // some aura phases include 1 normal map in addition to phase itself
-    if (uint32 n_phase = phase & ~PHASEMASK_NORMAL)
+    uint32 n_phase = phase & ~PHASEMASK_NORMAL;
+    if (n_phase > 0)
         return n_phase;
 
     return phase;

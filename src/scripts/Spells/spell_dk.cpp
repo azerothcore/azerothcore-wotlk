@@ -1545,12 +1545,16 @@ class spell_dk_death_grip : public SpellScriptLoader
         {
             PrepareSpellScript(spell_dk_death_grip_SpellScript);
 
-            SpellCastResult CheckPvPRange()
+            SpellCastResult CheckCast()
             {
                 Unit* caster = GetCaster();
-                if (Unit* target = GetExplTargetUnit())
-                    if (target->GetTypeId() == TYPEID_PLAYER && caster->GetExactDist(target) < 8.0f) // xinef: should be 8.0f, but we have to add target size (1.5f)
-                        return SPELL_FAILED_TOO_CLOSE;
+                Unit* target = GetExplTargetUnit();
+
+                if (target->GetTypeId() == TYPEID_PLAYER && caster->GetExactDist(target) < 8.0f) // xinef: should be 8.0f, but we have to add target size (1.5f)
+                    return SPELL_FAILED_TOO_CLOSE;
+
+                if (caster->HasUnitState(UNIT_STATE_JUMPING) || caster->HasUnitMovementFlag(MOVEMENTFLAG_FALLING))
+                    return SPELL_FAILED_MOVING;
 
                 return SPELL_CAST_OK;
             }
@@ -1560,11 +1564,21 @@ class spell_dk_death_grip : public SpellScriptLoader
                 Unit* caster = GetCaster();
                 Unit* target = GetHitUnit();
                 Unit* baseTarget = GetExplTargetUnit();
+                Creature* targetCreature = GetHitCreature();
 
                 if (caster != target)
-                {
-                    caster->CastSpell(target, 49560, true);
-                    target->InterruptNonMeleeSpells(true);
+                {                    
+                    if (targetCreature->isWorldBoss() || targetCreature->IsDungeonBoss())
+                    {
+                        return;
+                    }
+                    else
+                    {
+                        caster->CastSpell(target, 49560, true);
+                        const SpellInfo* spellInfo = sSpellMgr->GetSpellInfo(1766); // Rogue kick
+                        if (!target->IsImmunedToSpellEffect(spellInfo, EFFECT_0))
+                            target->InterruptNonMeleeSpells(true);
+                    }
                 }
                 else
                     baseTarget->CastSpell(caster, 49560, true);
@@ -1595,7 +1609,7 @@ class spell_dk_death_grip : public SpellScriptLoader
             {
                 if (m_scriptSpellId == 49576) // xinef: base death grip, add pvp range restriction
                 {
-                    OnCheckCast += SpellCheckCastFn(spell_dk_death_grip_SpellScript::CheckPvPRange);
+                    OnCheckCast += SpellCheckCastFn(spell_dk_death_grip_SpellScript::CheckCast);
                     OnEffectHitTarget += SpellEffectFn(spell_dk_death_grip_SpellScript::HandleBaseDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
                 }
                 else

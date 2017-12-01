@@ -179,12 +179,14 @@ public:
                     events.RepeatEvent(20000);
                     break;
                 case EVENT_SPELL_LOCUST_SWARM:
+                {
                     me->CastSpell(me, RAID_MODE(SPELL_LOCUST_SWARM_10, SPELL_LOCUST_SWARM_25), false);
                     Position pos;
-                    me->GetNearPosition(pos, 10.0f, rand_norm()*2*M_PI);
+                    me->GetNearPosition(pos, 10.0f, rand_norm() * 2 * M_PI);
                     me->SummonCreature(NPC_CRYPT_GUARD, pos);
                     events.RepeatEvent(90000);
                     break;
+                }
                 case EVENT_SPELL_BERSERK:
                     me->CastSpell(me, SPELL_BERSERK, true);
                     events.PopEvent();
