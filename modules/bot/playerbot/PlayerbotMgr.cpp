@@ -287,7 +287,7 @@ string PlayerbotHolder::ProcessBotCommand(string cmd, uint64 guid, bool admin, u
 		{
 			if (cmd == "init=white" || cmd == "init=common")
 			{
-                if (botAcct != masterGacct)
+                if (botAcct = masterGacct)
                 {            
                     PlayerbotFactory factory(bot, master->getLevel(), ITEM_QUALITY_NORMAL);
                     factory.CleanRandomize();
@@ -298,7 +298,7 @@ string PlayerbotHolder::ProcessBotCommand(string cmd, uint64 guid, bool admin, u
 			}
 			else if (cmd == "init=green" || cmd == "init=uncommon")
 			{
-                if (botAcct != masterGacct)
+                if (botAcct = masterGacct)
                 {            
                     PlayerbotFactory factory(bot, master->getLevel(), ITEM_QUALITY_UNCOMMON);
                     factory.CleanRandomize();
@@ -309,7 +309,7 @@ string PlayerbotHolder::ProcessBotCommand(string cmd, uint64 guid, bool admin, u
 			}
 			else if (cmd == "init=blue" || cmd == "init=rare")
 			{
-                if (botAcct != masterGacct)
+                if (botAcct = masterGacct)
                 {            
                     PlayerbotFactory factory(bot, master->getLevel(), ITEM_QUALITY_RARE);
                     factory.CleanRandomize();
@@ -320,7 +320,7 @@ string PlayerbotHolder::ProcessBotCommand(string cmd, uint64 guid, bool admin, u
 			}
 			else if (cmd == "init=epic" || cmd == "init=purple")
 			{
-                if (botAcct != masterGacct)
+                if (botAcct = masterGacct)
                 {            
                     PlayerbotFactory factory(bot, master->getLevel(), ITEM_QUALITY_EPIC);
                     factory.CleanRandomize();
@@ -331,7 +331,7 @@ string PlayerbotHolder::ProcessBotCommand(string cmd, uint64 guid, bool admin, u
             }
             else if (cmd == "init")
             {
-                if (botAcct != masterGacct)
+                if (botAcct = masterGacct)
                 {            
                     return "Specify quality level to init to.. ie. init=blue"; //thesawolf - give some instructions
                 }
@@ -342,7 +342,7 @@ string PlayerbotHolder::ProcessBotCommand(string cmd, uint64 guid, bool admin, u
 
 		if (cmd == "update")
 		{
-            if (botAcct != masterGacct)
+            if (botAcct = masterGacct)
             {    
                 PlayerbotFactory factory(bot, bot->getLevel());
                 factory.Refresh();
