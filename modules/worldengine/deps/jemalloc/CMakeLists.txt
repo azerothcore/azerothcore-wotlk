@@ -9,6 +9,8 @@
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
   # We need to generate the jemalloc_def.h header based on platform-specific settings
+  CHECK_SYMBOL_EXISTS(MADV_FREE "sys/mman.h" HAVE_MADV_FREE)
+  
   if (PLATFORM EQUAL 32)
     set(JEM_SIZEDEF 2)
     set(JEM_TLSMODEL)
@@ -18,10 +20,16 @@
     set(JEM_TLSMODEL "__attribute__\(\(tls_model\(\"initial-exec\"\)\)\)")
 	set(JEM_VADDRBITS 48)
   endif()
+  
+  if (HAVE_MADV_FREE)
+    set(JEM_MADFREE_DEF "#define")
+  else()
+    set(JEM_MADFREE_DEF "#undef")
+  endif()
 
   # Create the header, so we can use it
   configure_file(
-    "${CMAKE_SOURCE_DIR}/modules/worldengine/deps/jemalloc/jemalloc_internal_defs.h.in.cmake"
+    "${CMAKE_SOURCE_DIR}/modules/worldengine/deps/jemalloc/jemalloc_defs.h.in.cmake"
     "${BUILDDIR}/jemalloc_internal_defs.h"
     @ONLY
   )
