@@ -462,7 +462,7 @@ bool Loot::FillLoot(uint32 lootId, LootStore const& store, Player* lootOwner, bo
     items.reserve(MAX_NR_LOOT_ITEMS);
     quest_items.reserve(MAX_NR_QUEST_ITEMS);
 
-    tab->Process(*this, store.IsRatesAllowed(), lootMode, lootOwner);          // Processing is done there, callback via Loot::AddItem()
+    tab->Process(*this, store, lootMode, lootOwner);          // Processing is done there, callback via Loot::AddItem()
 
     // Setting access rights for group loot case
     Group* group = lootOwner->GetGroup();
@@ -1297,8 +1297,10 @@ void LootTemplate::CopyConditions(LootItem* li) const
 }
 
 // Rolls for every item in the template and adds the rolled items the the loot
-void LootTemplate::Process(Loot& loot, bool rate, uint16 lootMode, Player const* player, uint8 groupId) const
+void LootTemplate::Process(Loot& loot, LootStore const& store, uint16 lootMode, Player const* player, uint8 groupId) const
 {
+    bool rate = store.IsRatesAllowed();
+    
     if (groupId)                                            // Group reference uses own processing of the group
     {
         if (groupId > Groups.size())
@@ -1318,7 +1320,7 @@ void LootTemplate::Process(Loot& loot, bool rate, uint16 lootMode, Player const*
         if (!(item->lootmode & lootMode))                         // Do not add if mode mismatch
             continue;
         
-        sScriptMgr->OnBeforeItemRoll(player, loot, rate, lootMode, item);
+        sScriptMgr->OnBeforeItemRoll(player, loot, rate, lootMode, item, store);
 
         if (!item->Roll(rate))
             continue;                                           // Bad luck for the entry
@@ -1330,12 +1332,12 @@ void LootTemplate::Process(Loot& loot, bool rate, uint16 lootMode, Player const*
                 continue;                                       // Error message already printed at loading stage
 
             uint32 maxcount = uint32(float(item->maxcount) * sWorld->getRate(RATE_DROP_ITEM_REFERENCED_AMOUNT));
-            sScriptMgr->OnAfterRefCount(player, loot, rate, lootMode, item, maxcount);
+            sScriptMgr->OnAfterRefCount(player, loot, rate, lootMode, item, maxcount, store);
             for (uint32 loop = 0; loop < maxcount; ++loop)      // Ref multiplicator
-                Referenced->Process(loot, rate, lootMode, player, item->group);
+                Referenced->Process(loot, store, lootMode, player, item->group);
         } else  {
             // Plain entries (not a reference, not grouped)
-            sScriptMgr->OnBeforeDropAddItem(player, loot, rate, lootMode, item);
+            sScriptMgr->OnBeforeDropAddItem(player, loot, rate, lootMode, item, store);
             loot.AddItem(*item);                                // Chance is already checked, just add
         }
     }
