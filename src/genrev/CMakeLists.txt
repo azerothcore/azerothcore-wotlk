@@ -1,4 +1,4 @@
-# Copyright (C) 
+# Copyright (C)
 #
 # This file is free software; as a special exception the author gives
 # unlimited permission to copy and/or distribute it, with or without
@@ -10,6 +10,6 @@
 
 # Need to pass old ${CMAKE_BINARY_DIR} as param because its different at build stage
 add_custom_target(revision.h ALL
-  COMMAND ${CMAKE_COMMAND} -DBUILDDIR=${CMAKE_BINARY_DIR} -P ${CMAKE_SOURCE_DIR}/cmake/genrev.cmake
+  COMMAND ${CMAKE_COMMAND} -DBUILDDIR=${CMAKE_BINARY_DIR} -P ${CMAKE_SOURCE_DIR}/src/cmake/genrev.cmake
   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
 )

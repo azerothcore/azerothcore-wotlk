@@ -1,5 +1,23 @@
+#
+# AzerothCore
+#
+
+conf/*
+!conf/*.dist
+modules/*
+
+!modules/drassil
+modules/drassil/joiner
+!modules/hw-core
+!modules/acore
+!modules/worldengine
 
 build*/
+
+#
+#Generic
+#
+
 .directory
 .mailmap
 *.orig
@@ -16,3 +34,45 @@ CMakeLists.txt.user
 *.BACKUP.*
 *.BASE.*
 *.LOCAL.*
+
+#
+# IDE & other softwares
+#
+/.settings/
+/.externalToolBuilders/*
+# exclude in all levels
+nbproject/
+.sync.ffs_db
+*.kate-swp
+.browse.VC*
+.vscode
+
+#
+# Eclipse
+#
+*.pydevproject
+.metadata
+.gradle
+tmp/
+*.tmp
+*.swp
+*~.nib
+local.properties
+.settings/
+.loadpath
+.project
+.cproject
+
+
+# ==================
+#
+#  CUSTOM
+#  
+#  put below your custom ignore rules
+#  for example , if you want to include a 
+#  module directly in repositoryyou can do:
+#
+#  !modules/yourmodule
+#
+# ==================
+

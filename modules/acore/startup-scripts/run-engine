@@ -1,0 +1,113 @@
+export RUN_ENGINE_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+# load default conf
+if [ -e "$RUN_ENGINE_PATH/conf.dist" ]; then
+    source "$RUN_ENGINE_PATH/conf.sh.dist"
+fi
+
+function finish {
+    if [ ! -z "$SCREEN_NAME" ]; then
+        screen -X -S "$SCREEN_NAME" quit
+    fi
+}
+
+# disabled for now, but could be useful if we want 
+# shutdown the process if restarter crashes for some reason
+# trap finish EXIT
+
+function configureFiles() {
+    TRACE_BEGIN_STRING="SIGSEGV"
+    TRACE_FILE="$LOGS_PATH/"$LOG_PREFIX_NAME"_trace.log"
+    ERR_FILE="$LOGS_PATH/"$LOG_PREFIX_NAME"_error.log"
+    SYSLOG="$LOGS_PATH/"$LOG_PREFIX_NAME"_system.log"
+    SYSERR="$LOGS_PATH/"$LOG_PREFIX_NAME"_system.err"
+    LINKS_FILE="$LOGS_PATH/"$LOG_PREFIX_NAME"_crash_links.link"
+}
+
+function checkStatus() {
+    local ret=1
+    # wipe do : destroy old screens + ls
+    #screen -wipe
+    #if screen -ls $1 | grep -q "No Sockets found"
+    #then
+    #    return 0
+    #fi
+
+    local gdbres=$(pgrep -f "gdb -x $GDB --batch $SERVERBIN")
+    if [[ $GDB_ENABLED -eq 1 && ! -z $gdbres ]]; then
+        return 1
+    fi
+
+    #
+    # This is a specific check for Azeroth Core in case of screen failure
+    # It is possible since same binary file cannot be launched with same configuration file
+    # This is an extra check
+    #
+    local binres=$(pgrep -f "$SERVERBIN -c $CONFIG")
+    if [ ! -z $binres ]; then
+        return 1
+    fi
+
+    return 0
+}
+
+function run() {
+    echo $1
+    if [ ! -z $1 ]; then
+        local OPTIONS="-A -m -d -S"
+        if [ ! -z "$SCREEN_OPTIONS" ]; then
+            OPTIONS=$SCREEN_OPTIONS
+        fi
+
+        echo "> Starting with screen ( screen $OPTIONS )"
+
+        screen $OPTIONS $1 "$RUN_ENGINE_PATH/starter" $2 $3 "$4" "$5" "$6" $7
+    else
+        $RUN_ENGINE_PATH/starter $2 $3 "$4" "$5" "$6" $7
+    fi
+}
+
+function starter() {
+    cd $BINPATH
+
+    mkdir -p "$LOGS_PATH"
+
+    configureFiles
+
+    run "$SCREEN_NAME" "$SERVERBIN" "$GDB" "$CONFIG" "$SYSLOG" "$SYSERR" "$GDB_ENABLED"
+}
+
+
+function restarter() {
+    cd $BINPATH
+
+    mkdir -p "$LOGS_PATH"
+
+    configureFiles
+
+    if [ ! -f $TRACE_FILE ]; then
+        touch $TRACE_FILE
+    fi
+
+    while :
+    do
+        if checkStatus $SCREEN_NAME; then
+            DATE=$(date)
+            echo "Restarting $SCREEN_NAME Core blizz($DATE)"
+            if [ $GDB_ENABLED -eq 1 ]; then
+                    echo "GDB enabled"
+                    grep -B 10 -A 1800 "$TRACE_BEGIN_STRING" "$SYSLOG" >> "$TRACE_FILE"
+                    cat "$SYSERR" > "$ERR_FILE"
+                    run "$SCREEN_NAME" "$SERVERBIN" "$GDB" "$CONFIG" "$SYSLOG" "$SYSERR" 1
+            fi
+
+            if [ $GDB_ENABLED -eq 0 ]; then
+                    echo "GDB disabled"
+                    run "$SCREEN_NAME" "$SERVERBIN" null "$CONFIG" null null 0
+            fi
+        fi
+
+        sleep 10
+    done
+}
+

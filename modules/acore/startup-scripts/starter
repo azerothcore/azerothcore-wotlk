@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+GDB_FILE="$2"
+CONFIG="$3"
+SYSLOG="$4"
+SYSERR="$5"
+GDB_ENABLED="$6"
+
+if [ $GDB_ENABLED -eq 1 ]; then
+    echo "set logging on" > "$GDB_FILE"
+    echo "set debug timestamp" >> "$GDB_FILE"
+    echo "run -c $3" >> "$GDB_FILE"
+    echo "bt" >> "$GDB_FILE"
+
+    [ ! -f "$SYSLOG" ] && touch "$SYSLOG"
+    [ ! -f "$SYSERR" ] && touch "$SYSERR"
+
+    if [ $WITH_CONSOLE -eq 0 ]; then
+        gdb -x $GDB_FILE --batch $1 >> "$SYSLOG" 2>> "$SYSERR"
+    else
+        echo "> Console enabled"
+        gdb -x $GDB_FILE --batch $1   > >(tee ${SYSLOG}) 2> >(tee ${SYSERR} >&2)
+    fi
+
+elif [ $GDB_ENABLED -eq 0 ]; then
+    "./$1" -c "$CONFIG"
+fi

@@ -1,0 +1,3 @@
+[submodule "data/doc"]
+	path = data/doc
+	url = https://github.com/azerothcore/azerothcore-wotlk.wiki.git
