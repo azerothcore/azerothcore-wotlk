@@ -1519,8 +1519,8 @@ void ScriptMgr::OnBeforeDropAddItem(Player const* player, Loot& loot, bool canRa
     FOREACH_SCRIPT(GlobalScript)->OnBeforeDropAddItem(player, loot, canRate, lootMode, LootStoreItem, store);
 }
 
-void ScriptMgr::OnBeforeItemRoll(Player const* player, Loot& loot, bool canRate, uint16 lootMode, LootStoreItem* LootStoreItem, LootStore const& store) {
-    FOREACH_SCRIPT(GlobalScript)->OnBeforeItemRoll(player, loot, canRate, lootMode, LootStoreItem, store);
+void ScriptMgr::OnItemRoll(Player const* player, LootStoreItem const* LootStoreItem, float &chance, Loot& loot, LootStore const& store) {
+    FOREACH_SCRIPT(GlobalScript)->OnItemRoll(player, LootStoreItem,  chance, loot, store);
 }
 
 void ScriptMgr::OnInitializeLockedDungeons(Player* player, uint8& level, uint32& lockData)
