@@ -1568,7 +1568,7 @@ class spell_dk_death_grip : public SpellScriptLoader
 
                 if (caster != target)
                 {                    
-                    if (targetCreature->isWorldBoss() || targetCreature->IsDungeonBoss())
+                    if (targetCreature && (targetCreature->isWorldBoss() || targetCreature->IsDungeonBoss()))
                     {
                         return;
                     }
