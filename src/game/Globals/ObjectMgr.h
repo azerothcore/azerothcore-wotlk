@@ -722,7 +722,7 @@ class ObjectMgr
         ItemTemplate const* GetItemTemplate(uint32 entry);
         ItemTemplateContainer const* GetItemTemplateStore() const { return &_itemTemplateStore; }
         std::vector<ItemTemplate*> const* GetItemTemplateStoreFast() const { return &_itemTemplateStoreFast; }
-    
+
         ItemSetNameEntry const* GetItemSetNameEntry(uint32 itemId)
         {
             ItemSetNameContainer::iterator itr = _itemSetNameStore.find(itemId);
