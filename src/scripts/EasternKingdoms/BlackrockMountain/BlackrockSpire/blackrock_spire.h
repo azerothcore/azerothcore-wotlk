@@ -110,4 +110,9 @@ enum GameObjectsIds
     GO_UROK_PILE                    = 175621,
 };
 
+enum npcspells
+{
+    SPELL_FINKLE_IS_EINHORN         = 16710
+};
+
 #endif

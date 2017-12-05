@@ -9269,6 +9269,12 @@ void Player::SendLoot(uint64 guid, LootType loot_type)
                 loot->FillLoot(creature->GetCreatureTemplate()->SkinLootId, LootTemplates_Skinning, this, true);
                 permission = OWNER_PERMISSION;
 
+                //Inform instance if creature is skinned.
+                if (InstanceScript* mapInstance = creature->GetInstanceScript())
+                {
+                    mapInstance->CreatureLooted(creature, LOOT_SKINNING);
+                }
+
                 // Xinef: Set new loot recipient
                 creature->SetLootRecipient(this, false);
             }
@@ -20747,7 +20753,7 @@ void Player::Say(const std::string& text, const uint32 language)
     sScriptMgr->OnPlayerChat(this, CHAT_MSG_SAY, language, _text);
 
     WorldPacket data;
-    ChatHandler::BuildChatPacket(data, CHAT_MSG_SAY, Language(language), this, this, text);
+    ChatHandler::BuildChatPacket(data, CHAT_MSG_SAY, Language(language), this, this, _text);
     SendMessageToSetInRange(&data, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY), true);
 }
 
@@ -20757,7 +20763,7 @@ void Player::Yell(const std::string& text, const uint32 language)
     sScriptMgr->OnPlayerChat(this, CHAT_MSG_YELL, language, _text);
 
     WorldPacket data;
-    ChatHandler::BuildChatPacket(data, CHAT_MSG_YELL, Language(language), this, this, text);
+    ChatHandler::BuildChatPacket(data, CHAT_MSG_YELL, Language(language), this, this, _text);
     SendMessageToSetInRange(&data, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_YELL), true);
 }
 
@@ -20767,7 +20773,7 @@ void Player::TextEmote(const std::string& text)
     sScriptMgr->OnPlayerChat(this, CHAT_MSG_EMOTE, LANG_UNIVERSAL, _text);
 
     WorldPacket data;
-    ChatHandler::BuildChatPacket(data, CHAT_MSG_EMOTE, LANG_UNIVERSAL, this, this, text);
+    ChatHandler::BuildChatPacket(data, CHAT_MSG_EMOTE, LANG_UNIVERSAL, this, this, _text);
     SendMessageToSetInRange(&data, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE), true, !sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_CHAT));
 }
 
@@ -20784,14 +20790,14 @@ void Player::Whisper(const std::string& text, uint32 language, uint64 receiver)
     sScriptMgr->OnPlayerChat(this, CHAT_MSG_WHISPER, language, _text, rPlayer);
 
     WorldPacket data;
-    ChatHandler::BuildChatPacket(data, CHAT_MSG_WHISPER, Language(language), this, this, text);
+    ChatHandler::BuildChatPacket(data, CHAT_MSG_WHISPER, Language(language), this, this, _text);
     rPlayer->GetSession()->SendPacket(&data);
 
     // rest stuff shouldn't happen in case of addon message
     if (isAddonMessage)
         return;
 
-    ChatHandler::BuildChatPacket(data, CHAT_MSG_WHISPER_INFORM, Language(language), rPlayer, rPlayer, text);
+    ChatHandler::BuildChatPacket(data, CHAT_MSG_WHISPER_INFORM, Language(language), rPlayer, rPlayer, _text);
     GetSession()->SendPacket(&data);
 
     if (!isAcceptWhispers() && !IsGameMaster() && !rPlayer->IsGameMaster())
@@ -22669,19 +22675,30 @@ bool Player::IsVisibleGloballyFor(Player const* u) const
 }
 
 template<class T>
-inline void UpdateVisibilityOf_helper(T*  /*target*/, std::vector<Unit*>& /*v*/)
+inline void UpdateVisibilityOf_helper(Player::ClientGUIDs& s64, T* target, std::vector<Unit*>& /*v*/)
 {
+    s64.insert(target->GetGUID());
 }
 
 template<>
-inline void UpdateVisibilityOf_helper(Creature* target, std::vector<Unit*>& v)
+inline void UpdateVisibilityOf_helper(Player::ClientGUIDs& s64, GameObject* target, std::vector<Unit*>& /*v*/)
 {
+    // @HACK: This is to prevent objects like deeprun tram from disappearing when player moves far from its spawn point while riding it
+    if ((target->GetGOInfo()->type != GAMEOBJECT_TYPE_TRANSPORT))
+        s64.insert(target->GetGUID());
+}
+
+template<>
+inline void UpdateVisibilityOf_helper(Player::ClientGUIDs& s64, Creature* target, std::vector<Unit*>& v)
+{
+    s64.insert(target->GetGUID());
     v.push_back(target);
 }
 
 template<>
-inline void UpdateVisibilityOf_helper(Player* target, std::vector<Unit*>& v)
+inline void UpdateVisibilityOf_helper(Player::ClientGUIDs& s64, Player* target, std::vector<Unit*>& v)
 {
+    s64.insert(target->GetGUID());
     v.push_back(target);
 }
 
@@ -22795,9 +22812,7 @@ void Player::UpdateVisibilityOf(T* target, UpdateData& data, std::vector<Unit*>&
         if (CanSeeOrDetect(target, false, true))
         {
             target->BuildCreateUpdateBlockForPlayer(&data, this);
-            m_clientGUIDs.insert(target->GetGUID());
-
-            UpdateVisibilityOf_helper(target, visibleNow);
+            UpdateVisibilityOf_helper(m_clientGUIDs, target, visibleNow);
         }
     }
 }
@@ -25240,8 +25255,13 @@ uint32 Player::GetPhaseMaskForSpawn() const
 {
     uint32 phase = IsGameMaster() ? GetPhaseByAuras() : GetPhaseMask();
 
+    if (!phase)
+        phase = PHASEMASK_NORMAL;
+
+
     // some aura phases include 1 normal map in addition to phase itself
-    if (uint32 n_phase = phase & ~PHASEMASK_NORMAL)
+    uint32 n_phase = phase & ~PHASEMASK_NORMAL;
+    if (n_phase > 0)
         return n_phase;
 
     return phase;
