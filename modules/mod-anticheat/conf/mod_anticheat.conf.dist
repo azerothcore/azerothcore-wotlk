@@ -1,0 +1,56 @@
+[worldserver]
+#
+###################################################################################################
+
+###################################################################################################
+#
+#     Anticheat.Enable
+#        Description: Enables or disables the Anticheat System functionality
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+
+Anticheat.Enabled = 1
+
+#Enable detection for GM accounts
+Anticheat.EnabledOnGmAccounts = 0
+
+#
+#     Anticheat.ReportsForIngameWarnings
+#        Description: How many reports the player must have to notify to GameMasters ingame when he generates a new report.
+#        Default:     70
+
+Anticheat.ReportsForIngameWarnings = 70
+
+#
+#     Anticheat.LoginMessage
+#        Description: Enable login message "This server is running an Anticheat module."
+#     	 Default: 1	
+
+Anticheat.LoginMessage = 1
+
+#
+#     Anticheat.Detect
+#        Description: It represents which detections are enabled.
+#		Default 1 (climbhack = 0 by default)
+Anticheat.DetectFlyHack = 1
+
+#Checks moveflag ascending (may give flase positives)
+Anticheat.StricterFlyHackCheck = 0
+
+#kick option for first detect on flyhack, if false positives disable(disabled by default)
+Anticheat.KickPlayerFlyHack = 0
+Anticheat.DetectWaterWalkHack = 1
+
+#kick option for first detect on waterwalkhack, if false positives disable(disabled by default)
+Anticheat.KickPlayerWaterWalkHack = 0
+Anticheat.DetectJumpHack = 1
+Anticheat.DetectTelePlaneHack = 1
+Anticheat.DetectSpeedHack = 1
+Anticheat.DetectClimbHack = 0
+
+#
+#     Anticheat.MaxReportsForDailyReport
+#        Description: How many reports must the player have to make a report that it is in DB for a day (not only during the player's session).
+#        Default:     70
+
+Anticheat.MaxReportsForDailyReport = 70

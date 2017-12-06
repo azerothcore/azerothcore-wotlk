@@ -1,0 +1,8 @@
+[worldserver]
+
+#
+#    PlayerAnnounce
+#        Description: This will show the console on what players are logged in
+#        Default:     Enabled  = 1
+#                     Disabled = 0
+PlayerAnnounce = 1
