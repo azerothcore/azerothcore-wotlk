@@ -94,9 +94,9 @@ public:
         return new boss_thaddiusAI (pCreature);
     }
 
-    struct boss_thaddiusAI : public ScriptedAI
+    struct boss_thaddiusAI : public BossAI
     {
-        boss_thaddiusAI(Creature *c) : ScriptedAI(c), summons(me)
+        boss_thaddiusAI(Creature *c) : BossAI(c, BOSS_THADDIUS), summons(me)
         {
             pInstance = me->GetInstanceScript();
         }
@@ -139,8 +139,9 @@ public:
             }
         }
 
-        void Reset() 
+        void Reset()
         {
+            BossAI::Reset();
             events.Reset();
             summons.DespawnAll();
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -148,9 +149,6 @@ public:
             reviveTimer = 0;
             resetTimer = 1;
             me->SetPosition(me->GetHomePosition());
-
-            if (pInstance) 
-                pInstance->SetData(EVENT_THADDIUS, NOT_STARTED);
 
             me->SummonCreature(NPC_STALAGG, 3450.45f, -2931.42f, 312.091f, 5.49779f);
             me->SummonCreature(NPC_FEUGEN, 3508.14f, -2988.65f, 312.092f, 2.37365f);
@@ -182,12 +180,12 @@ public:
                 pInstance->SetData(DATA_IMMORTAL_FAIL, 0);
         }
 
-        void JustDied(Unit*  /*Killer*/)
+        void JustDied(Unit*  killer)
         {
+            BossAI::JustDied(killer);
             Talk(SAY_DEATH);
             if (pInstance)
             {
-                pInstance->SetData(EVENT_THADDIUS, DONE);
                 pInstance->DoRemoveAurasDueToSpellOnPlayers(28059);
                 pInstance->DoRemoveAurasDueToSpellOnPlayers(28084);
             }
@@ -195,14 +193,12 @@ public:
 
         void JustSummoned(Creature* cr) { summons.Summon(cr); }
 
-        void EnterCombat(Unit * /*who*/)
+        void EnterCombat(Unit * who)
         {
+            BossAI::EnterCombat(who);
             me->SetInCombatWithZone();
             summons.DoZoneInCombat(NPC_FEUGEN);
             summons.DoZoneInCombat(NPC_STALAGG);
-
-            if (pInstance)
-                pInstance->SetData(EVENT_THADDIUS, IN_PROGRESS);
         }
 
         void UpdateAI(uint32 diff)

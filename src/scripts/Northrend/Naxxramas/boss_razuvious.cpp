@@ -60,9 +60,9 @@ public:
         return new boss_razuviousAI (pCreature);
     }
 
-    struct boss_razuviousAI : public ScriptedAI
+    struct boss_razuviousAI : public BossAI
     {
-        boss_razuviousAI(Creature *c) : ScriptedAI(c), summons(me)
+        boss_razuviousAI(Creature *c) : BossAI(c, BOSS_RAZUVIOUS), summons(me)
         {
             pInstance = me->GetInstanceScript();
         }
@@ -86,11 +86,10 @@ public:
 
         void Reset()
         {
+            BossAI::Reset();
             summons.DespawnAll();
             events.Reset();
             SpawnHelpers();
-            if (pInstance)
-                pInstance->SetData(EVENT_RAZUVIOUS, NOT_STARTED);
         }
 
         void KilledUnit(Unit* who)
@@ -115,18 +114,18 @@ public:
                 me->LowerPlayerDamageReq(damage);
         }
 
-        void JustDied(Unit*  /*killer*/)
+        void JustDied(Unit*  killer)
         {
+            BossAI::JustDied(killer);
             DoPlaySoundToSet(me, SOUND_DEATH);
             me->MonsterYell("An honorable... death...", LANG_UNIVERSAL, 0);
             
             me->CastSpell(me, SPELL_HOPELESS, true);
-            if (pInstance)
-                pInstance->SetData(EVENT_RAZUVIOUS, DONE);
         }
 
-        void EnterCombat(Unit * /*who*/)
+        void EnterCombat(Unit * who)
         {
+            BossAI::EnterCombat(who);
             switch (urand(0,2))
             {
                 case 0:
@@ -147,8 +146,6 @@ public:
             events.ScheduleEvent(EVENT_SPELL_DISRUPTING_SHOUT, 25000);
             events.ScheduleEvent(EVENT_SPELL_JAGGED_KNIFE, 15000);
             events.ScheduleEvent(EVENT_PLAY_COMMAND, 40000);
-            if (pInstance)
-                pInstance->SetData(EVENT_RAZUVIOUS, IN_PROGRESS);
 
             summons.DoZoneInCombat();
         }

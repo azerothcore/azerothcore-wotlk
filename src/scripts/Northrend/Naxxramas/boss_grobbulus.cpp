@@ -45,9 +45,9 @@ public:
         return new boss_grobbulusAI (pCreature);
     }
 
-    struct boss_grobbulusAI : public ScriptedAI
+    struct boss_grobbulusAI : public BossAI
     {
-        boss_grobbulusAI(Creature *c) : ScriptedAI(c), summons(me)
+        boss_grobbulusAI(Creature *c) : BossAI(c, BOSS_GROBBULUS), summons(me)
         {
             pInstance = me->GetInstanceScript();
         }
@@ -59,24 +59,20 @@ public:
 
         void Reset()
         {
+            BossAI::Reset();
             events.Reset();
             summons.DespawnAll();
             dropSludgeTimer = 0;
-
-            if (pInstance)
-                pInstance->SetData(EVENT_GROBBULUS, NOT_STARTED);
         }
 
-        void EnterCombat(Unit * /*who*/)
+        void EnterCombat(Unit * who)
         {
+            BossAI::EnterCombat(who);
             me->SetInCombatWithZone();
             events.ScheduleEvent(EVENT_SPELL_POISON_CLOUD, 15000);
             events.ScheduleEvent(EVENT_SPELL_MUTATING_INJECTION, 20000);
             events.ScheduleEvent(EVENT_SPELL_SLIME_SPRAY, 10000);
             events.ScheduleEvent(EVENT_SPELL_BERSERK, RAID_MODE(12*MINUTE*IN_MILLISECONDS, 9*MINUTE*IN_MILLISECONDS));
-
-            if (pInstance)
-                pInstance->SetData(EVENT_GROBBULUS, IN_PROGRESS);
         }
 
         void SpellHitTarget(Unit *target, const SpellInfo* spellInfo)
@@ -95,11 +91,10 @@ public:
 
         void SummonedCreatureDespawn(Creature* summon){ summons.Despawn(summon); }
 
-        void JustDied(Unit*)
+        void JustDied(Unit*  killer)
         {
+            BossAI::JustDied(killer);
             summons.DespawnAll();
-            if (pInstance)
-                pInstance->SetData(EVENT_GROBBULUS, DONE);
         }
 
         void KilledUnit(Unit* who)

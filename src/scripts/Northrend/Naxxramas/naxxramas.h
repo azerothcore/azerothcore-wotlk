@@ -7,23 +7,23 @@
 
 #include "ScriptPCH.h"
 
-enum NXEncounter
+enum Encouters
 {
-    EVENT_PATCHWERK                 = 0,
-    EVENT_GROBBULUS                 = 1,
-    EVENT_GLUTH                     = 2,
-    EVENT_NOTH                      = 3,
-    EVENT_HEIGAN                    = 4,
-    EVENT_LOATHEB                   = 5,
-    EVENT_ANUB                      = 6,
-    EVENT_FAERLINA                  = 7,
-    EVENT_MAEXXNA                   = 8,
-    EVENT_THADDIUS                  = 9,
-    EVENT_RAZUVIOUS                 = 10,
-    EVENT_GOTHIK                    = 11,
-    EVENT_HORSEMAN                  = 12,
-    EVENT_SAPPHIRON                 = 13,
-    EVENT_KELTHUZAD                 = 14,
+    BOSS_PATCHWERK                 = 0,
+    BOSS_GROBBULUS                 = 1,
+    BOSS_GLUTH                     = 2,
+    BOSS_NOTH                      = 3,
+    BOSS_HEIGAN                    = 4,
+    BOSS_LOATHEB                   = 5,
+    BOSS_ANUB                      = 6,
+    BOSS_FAERLINA                  = 7,
+    BOSS_MAEXXNA                   = 8,
+    BOSS_THADDIUS                  = 9,
+    BOSS_RAZUVIOUS                 = 10,
+    BOSS_GOTHIK                    = 11,
+    BOSS_HORSEMAN                  = 12,
+    BOSS_SAPPHIRON                 = 13,
+    BOSS_KELTHUZAD                 = 14,
     MAX_ENCOUNTERS,
 };
 
