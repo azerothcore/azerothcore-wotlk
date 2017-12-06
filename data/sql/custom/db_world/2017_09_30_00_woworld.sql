@@ -1,0 +1,1 @@
+ALTER TABLE `locales_quest`ADD COLUMN `Title_loc0` TEXT NULL AFTER `Id`, DROP COLUMN if exists `Title_loc0`;
