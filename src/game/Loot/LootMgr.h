@@ -110,6 +110,7 @@ enum LootSlotType
 class Player;
 class LootStore;
 class ConditionMgr;
+struct Loot;
 
 struct LootStoreItem
 {
@@ -129,7 +130,7 @@ struct LootStoreItem
         group(_group), needs_quest(_chanceOrQuestChance < 0), maxcount(_maxcount)
          {}
 
-    bool Roll(bool rate) const;                             // Checks if the entry takes it's chance (at loot generation)
+    bool Roll(bool rate, Player const *player, Loot& loot, LootStore const& store) const;                             // Checks if the entry takes it's chance (at loot generation)
     bool IsValid(LootStore const& store, uint32 entry) const;
                                                             // Checks correctness of values
 };
@@ -178,7 +179,6 @@ struct QuestItem
         : index(_index), is_looted(_islooted) {}
 };
 
-struct Loot;
 class LootTemplate;
 
 typedef std::vector<QuestItem> QuestItemList;
@@ -237,7 +237,7 @@ class LootTemplate
         // Adds an entry to the group (at loading stage)
         void AddEntry(LootStoreItem* item);
         // Rolls for every item in the template and adds the rolled items the the loot
-        void Process(Loot& loot, bool rate, uint16 lootMode, Player const* player, uint8 groupId = 0) const;
+        void Process(Loot& loot, LootStore const& store, uint16 lootMode, Player const* player, uint8 groupId = 0) const;
         void CopyConditions(ConditionList conditions);
         void CopyConditions(LootItem* li) const;
 

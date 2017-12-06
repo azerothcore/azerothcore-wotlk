@@ -96,6 +96,7 @@ class Aura
         uint32 GetId() const{ return GetSpellInfo()->Id; }
 
         uint64 GetCastItemGUID() const { return m_castItemGuid; }
+        uint32 GetCastItemEntry() const { return m_castItemEntry; }
         uint64 GetCasterGUID() const { return m_casterGuid; }
         Unit* GetCaster() const;
         WorldObject* GetOwner() const { return m_owner; }
@@ -235,6 +236,7 @@ class Aura
         SpellInfo const* const m_spellInfo;
         uint64 const m_casterGuid;
         uint64 const m_castItemGuid;                        // it is NOT safe to keep a pointer to the item because it may get deleted
+        uint32 const m_castItemEntry;                       // when deleted, we could retrieve some information from template instead
         time_t const m_applyTime;
         WorldObject* const m_owner;                        //
 

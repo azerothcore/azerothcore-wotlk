@@ -115,9 +115,9 @@ public:
         return new boss_kelthuzadAI (pCreature);
     }
 
-    struct boss_kelthuzadAI : public ScriptedAI
+    struct boss_kelthuzadAI : public BossAI
     {
-        boss_kelthuzadAI(Creature* c) : ScriptedAI(c), summons(me)
+        boss_kelthuzadAI(Creature* c) : BossAI(c, BOSS_KELTHUZAD), summons(me)
         {
             pInstance = me->GetInstanceScript();
         }
@@ -162,6 +162,7 @@ public:
 
         void Reset()
         {
+            BossAI::Reset();
             events.Reset();
             summons.DespawnAll();
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_DISABLE_MOVE);
@@ -169,7 +170,6 @@ public:
             
             if (pInstance)
             {
-                pInstance->SetData(EVENT_KELTHUZAD, NOT_STARTED);
                 if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_KELTHUZAD_FLOOR)))
                 {
                     go->SetPhaseMask(1, true);
@@ -198,12 +198,11 @@ public:
                 pInstance->SetData(DATA_IMMORTAL_FAIL, 0);
         }
 
-        void JustDied(Unit*  /*Killer*/)
+        void JustDied(Unit*  killer)
         {
+            BossAI::JustDied(killer);
             summons.DespawnAll();
             Talk(SAY_DEATH);
-            if (pInstance)
-                pInstance->SetData(EVENT_KELTHUZAD, DONE);
         }
 
         void MoveInLineOfSight(Unit* who)
@@ -212,8 +211,9 @@ public:
                 AttackStart(who);
         }
 
-        void EnterCombat(Unit*  /*who*/)
+        void EnterCombat(Unit * who)
         {
+            BossAI::EnterCombat(who);
             Talk(SAY_SUMMON_MINIONS);
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE);
             me->RemoveAllAttackers();
@@ -229,7 +229,6 @@ public:
             events.ScheduleEvent(EVENT_START_SECOND_PHASE, 228000);
             if (pInstance)
             {
-                pInstance->SetData(EVENT_KELTHUZAD, IN_PROGRESS);
                 if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_KELTHUZAD_FLOOR)))
                 {
                     events.ScheduleEvent(EVENT_FLOOR_CHANGE, 15000);

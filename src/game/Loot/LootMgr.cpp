@@ -84,7 +84,7 @@ class LootTemplate::LootGroup                               // A set of loot def
         bool HasQuestDrop() const;                          // True if group includes at least 1 quest drop entry
         bool HasQuestDropForPlayer(Player const* player) const;
                                                             // The same for active quests of the player
-        void Process(Loot& loot, uint16 lootMode) const;    // Rolls an item from the group (if any) and adds the item to the loot
+        void Process(Loot& loot, Player const *player, LootStore const& lootstore, uint16 lootMode) const;    // Rolls an item from the group (if any) and adds the item to the loot
         float RawTotalChance() const;                       // Overall chance for the group (without equal chanced items)
         float TotalChance() const;                          // Overall chance for the group
 
@@ -98,7 +98,7 @@ class LootTemplate::LootGroup                               // A set of loot def
         LootStoreItemList ExplicitlyChanced;                // Entries with chances defined in DB
         LootStoreItemList EqualChanced;                     // Zero chances - every entry takes the same chance
 
-        LootStoreItem const* Roll(Loot& loot, uint16 lootMode) const;   // Rolls an item from the group, returns NULL if all miss their chances
+        LootStoreItem const* Roll(Loot& loot, Player const *player, LootStore const& store, uint16 lootMode) const;   // Rolls an item from the group, returns NULL if all miss their chances
 
         // This class must never be copied - storing pointers
         LootGroup(LootGroup const&);
@@ -279,19 +279,23 @@ void LootStore::ReportNotExistedId(uint32 id) const
 
 // Checks if the entry (quest, non-quest, reference) takes it's chance (at loot generation)
 // RATE_DROP_ITEMS is no longer used for all types of entries
-bool LootStoreItem::Roll(bool rate) const
+bool LootStoreItem::Roll(bool rate, Player const *player, Loot& loot, LootStore const& store) const
 {
-    if (chance >= 100.0f)
+    float _chance = chance;
+
+    sScriptMgr->OnItemRoll(player, this, _chance, loot, store);
+
+    if (_chance >= 100.0f)
         return true;
 
     if (mincountOrRef < 0)                                   // reference case
-        return roll_chance_f(chance* (rate ? sWorld->getRate(RATE_DROP_ITEM_REFERENCED) : 1.0f));
+        return roll_chance_f(_chance* (rate ? sWorld->getRate(RATE_DROP_ITEM_REFERENCED) : 1.0f));
 
     ItemTemplate const* pProto = sObjectMgr->GetItemTemplate(itemid);
 
     float qualityModifier = pProto && rate ? sWorld->getRate(qualityToRate[pProto->Quality]) : 1.0f;
 
-    return roll_chance_f(chance*qualityModifier);
+    return roll_chance_f(_chance*qualityModifier);
 }
 
 // Checks correctness of values
@@ -462,7 +466,7 @@ bool Loot::FillLoot(uint32 lootId, LootStore const& store, Player* lootOwner, bo
     items.reserve(MAX_NR_LOOT_ITEMS);
     quest_items.reserve(MAX_NR_QUEST_ITEMS);
 
-    tab->Process(*this, store.IsRatesAllowed(), lootMode, lootOwner);          // Processing is done there, callback via Loot::AddItem()
+    tab->Process(*this, store, lootMode, lootOwner);          // Processing is done there, callback via Loot::AddItem()
 
     // Setting access rights for group loot case
     Group* group = lootOwner->GetGroup();
@@ -1102,7 +1106,7 @@ void LootTemplate::LootGroup::AddEntry(LootStoreItem* item)
 }
 
 // Rolls an item from the group, returns NULL if all miss their chances
-LootStoreItem const* LootTemplate::LootGroup::Roll(Loot& loot, uint16 lootMode) const
+LootStoreItem const* LootTemplate::LootGroup::Roll(Loot& loot, Player const *player, LootStore const& store, uint16 lootMode) const
 {
     LootStoreItemList possibleLoot = ExplicitlyChanced;
     possibleLoot.remove_if(LootGroupInvalidSelector(loot, lootMode));
@@ -1114,10 +1118,14 @@ LootStoreItem const* LootTemplate::LootGroup::Roll(Loot& loot, uint16 lootMode) 
         for (LootStoreItemList::const_iterator itr = possibleLoot.begin(); itr != possibleLoot.end(); ++itr)   // check each explicitly chanced entry in the template and modify its chance based on quality.
         {
             LootStoreItem* item = *itr;
-            if (item->chance >= 100.0f)
+            float chance = item->chance;
+ 
+            sScriptMgr->OnItemRoll(player, item, chance, loot, store);
+
+            if (chance >= 100.0f)
                 return item;
 
-            roll -= item->chance;
+            roll -= chance;
             if (roll < 0)
                 return item;
         }
@@ -1169,9 +1177,9 @@ void LootTemplate::LootGroup::CopyConditions(ConditionList /*conditions*/)
 }
 
 // Rolls an item from the group (if any takes its chance) and adds the item to the loot
-void LootTemplate::LootGroup::Process(Loot& loot, uint16 lootMode) const
+void LootTemplate::LootGroup::Process(Loot& loot, Player const *player, LootStore const& store, uint16 lootMode) const
 {
-    if (LootStoreItem const* item = Roll(loot, lootMode))
+    if (LootStoreItem const* item = Roll(loot, player, store, lootMode))
         loot.AddItem(*item);
 }
 
@@ -1297,8 +1305,10 @@ void LootTemplate::CopyConditions(LootItem* li) const
 }
 
 // Rolls for every item in the template and adds the rolled items the the loot
-void LootTemplate::Process(Loot& loot, bool rate, uint16 lootMode, Player const* player, uint8 groupId) const
+void LootTemplate::Process(Loot& loot, LootStore const& store, uint16 lootMode, Player const* player, uint8 groupId) const
 {
+    bool rate = store.IsRatesAllowed();
+    
     if (groupId)                                            // Group reference uses own processing of the group
     {
         if (groupId > Groups.size())
@@ -1307,7 +1317,7 @@ void LootTemplate::Process(Loot& loot, bool rate, uint16 lootMode, Player const*
         if (!Groups[groupId - 1])
             return;
 
-        Groups[groupId-1]->Process(loot, lootMode);
+        Groups[groupId-1]->Process(loot, player, store, lootMode);
         return;
     }
 
@@ -1317,10 +1327,8 @@ void LootTemplate::Process(Loot& loot, bool rate, uint16 lootMode, Player const*
         LootStoreItem* item = *i;
         if (!(item->lootmode & lootMode))                         // Do not add if mode mismatch
             continue;
-        
-        sScriptMgr->OnBeforeItemRoll(player, loot, rate, lootMode, item);
 
-        if (!item->Roll(rate))
+        if (!item->Roll(rate, player, loot, store))
             continue;                                           // Bad luck for the entry
 
         if (item->mincountOrRef < 0)                            // References processing
@@ -1330,12 +1338,12 @@ void LootTemplate::Process(Loot& loot, bool rate, uint16 lootMode, Player const*
                 continue;                                       // Error message already printed at loading stage
 
             uint32 maxcount = uint32(float(item->maxcount) * sWorld->getRate(RATE_DROP_ITEM_REFERENCED_AMOUNT));
-            sScriptMgr->OnAfterRefCount(player, loot, rate, lootMode, item, maxcount);
+            sScriptMgr->OnAfterRefCount(player, loot, rate, lootMode, item, maxcount, store);
             for (uint32 loop = 0; loop < maxcount; ++loop)      // Ref multiplicator
-                Referenced->Process(loot, rate, lootMode, player, item->group);
+                Referenced->Process(loot, store, lootMode, player, item->group);
         } else  {
             // Plain entries (not a reference, not grouped)
-            sScriptMgr->OnBeforeDropAddItem(player, loot, rate, lootMode, item);
+            sScriptMgr->OnBeforeDropAddItem(player, loot, rate, lootMode, item, store);
             loot.AddItem(*item);                                // Chance is already checked, just add
         }
     }
@@ -1343,7 +1351,7 @@ void LootTemplate::Process(Loot& loot, bool rate, uint16 lootMode, Player const*
     // Now processing groups
     for (LootGroups::const_iterator i = Groups.begin(); i != Groups.end(); ++i)
         if (LootGroup* group = *i)
-            group->Process(loot, lootMode);
+            group->Process(loot, player, store, lootMode);
 }
 
 // True if template includes at least 1 quest drop entry
