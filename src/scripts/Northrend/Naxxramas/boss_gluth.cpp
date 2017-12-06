@@ -52,9 +52,9 @@ public:
         return new boss_gluthAI (pCreature);
     }
 
-    struct boss_gluthAI : public ScriptedAI
+    struct boss_gluthAI : public BossAI
     {
-        boss_gluthAI(Creature *c) : ScriptedAI(c), summons(me)
+        boss_gluthAI(Creature *c) : BossAI(c, BOSS_GLUTH), summons(me)
         {
             pInstance = me->GetInstanceScript();
         }
@@ -66,14 +66,12 @@ public:
         
         void Reset()
         {
+            BossAI::Reset();
             me->ApplySpellImmune(29306, IMMUNITY_ID, 29306, true);
             events.Reset();
             summons.DespawnAll();
             gazeTarget = 0;
             me->SetReactState(REACT_AGGRESSIVE);
-
-            if (pInstance)
-                pInstance->SetData(EVENT_GLUTH, NOT_STARTED);
         }
 
         void MoveInLineOfSight(Unit *who)
@@ -87,8 +85,9 @@ public:
                 ScriptedAI::MoveInLineOfSight(who);
         }
 
-        void EnterCombat(Unit * /*who*/)
+        void EnterCombat(Unit * who)
         {
+            BossAI::EnterCombat(who);
             me->SetInCombatWithZone();
             events.ScheduleEvent(EVENT_SPELL_MORTAL_WOUND, 10000);
             events.ScheduleEvent(EVENT_SPELL_ENRAGE, 30000);
@@ -96,9 +95,6 @@ public:
             events.ScheduleEvent(EVENT_SPELL_BERSERK, 8*60000);
             events.ScheduleEvent(EVENT_SUMMON_ZOMBIE, 10000);
             events.ScheduleEvent(EVENT_CAN_EAT_ZOMBIE, 1000);
-
-            if (pInstance)
-                pInstance->SetData(EVENT_GLUTH, IN_PROGRESS);
         }
 
         void JustSummoned(Creature *summon)
@@ -120,11 +116,10 @@ public:
                 pInstance->SetData(DATA_IMMORTAL_FAIL, 0);
         }
 
-        void JustDied(Unit*)
+        void JustDied(Unit*  killer)
         {
+            BossAI::JustDied(killer);
             summons.DespawnAll();
-            if (pInstance)
-                pInstance->SetData(EVENT_GLUTH, DONE);
         }
 
         bool SelectPlayerInRoom()

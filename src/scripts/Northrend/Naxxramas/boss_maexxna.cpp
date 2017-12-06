@@ -53,9 +53,9 @@ public:
         return new boss_maexxnaAI (pCreature);
     }
 
-    struct boss_maexxnaAI : public ScriptedAI
+    struct boss_maexxnaAI : public BossAI
     {
-        boss_maexxnaAI(Creature *c) : ScriptedAI(c), summons(me)
+        boss_maexxnaAI(Creature *c) : BossAI(c, BOSS_MAEXXNA), summons(me)
         {
             pInstance = me->GetInstanceScript();
         }
@@ -77,20 +77,21 @@ public:
 
         void Reset()
         {
+            BossAI::Reset();
             events.Reset();
             summons.DespawnAll();
 
             if (pInstance)
             {
-                pInstance->SetData(EVENT_MAEXXNA, NOT_STARTED);
-                if (pInstance->GetData(EVENT_FAERLINA) == DONE)
+                if (pInstance->GetData(BOSS_FAERLINA) == DONE)
                     if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_MAEXXNA_GATE)))
                         go->SetGoState(GO_STATE_ACTIVE);
             }
         }
 
-        void EnterCombat(Unit * /*who*/)
+        void EnterCombat(Unit * who)
         {
+            BossAI::EnterCombat(who);
             me->SetInCombatWithZone();
             events.ScheduleEvent(EVENT_WEB_WRAP, 20000);
             events.ScheduleEvent(EVENT_SPELL_WEB_SPRAY, 40000);
@@ -101,16 +102,9 @@ public:
 
             if (pInstance)
             {
-                pInstance->SetData(EVENT_MAEXXNA, IN_PROGRESS);
                 if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_MAEXXNA_GATE)))
                     go->SetGoState(GO_STATE_READY);
             }
-        }
-
-        void JustDied(Unit*  /*Killer*/)
-        {
-            if (pInstance)
-                pInstance->SetData(EVENT_MAEXXNA, DONE);
         }
 
         void JustSummoned(Creature* cr)
