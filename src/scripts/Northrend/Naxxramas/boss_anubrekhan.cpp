@@ -49,9 +49,9 @@ public:
         return new boss_anubrekhanAI (pCreature);
     }
 
-    struct boss_anubrekhanAI : public ScriptedAI
+    struct boss_anubrekhanAI : public BossAI
     {
-        boss_anubrekhanAI(Creature *c) : ScriptedAI(c), summons(me)
+        boss_anubrekhanAI(Creature *c) : BossAI(c, BOSS_ANUB), summons(me)
         {
             pInstance = c->GetInstanceScript();
             sayGreet = false;
@@ -71,15 +71,15 @@ public:
             }
         }
 
-        void Reset() 
+        void Reset()
         {
+            BossAI::Reset();
             events.Reset();
             summons.DespawnAll();
             SummonCryptGuards();
 
             if (pInstance)
             {
-                pInstance->SetData(EVENT_ANUB, NOT_STARTED);
                 if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_ANUB_GATE)))
                     go->SetGoState(GO_STATE_ACTIVE);
             }
@@ -107,13 +107,13 @@ public:
 
         void SummonedCreatureDespawn(Creature* cr) { summons.Despawn(cr); }
 
-        void JustDied(Unit*  /*Killer*/)
+        void JustDied(Unit*  killer)
         {
+            BossAI::JustDied(killer);
             summons.DespawnAll();
             if (pInstance)
             {
                 pInstance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_TIMED_START_EVENT);
-                pInstance->SetData(EVENT_ANUB, DONE);
             }
         }
 
@@ -132,13 +132,13 @@ public:
                 pInstance->SetData(DATA_IMMORTAL_FAIL, 0);
         }
 
-        void EnterCombat(Unit * /*who*/)
+        void EnterCombat(Unit * who)
         {
+            BossAI::EnterCombat(who);
             me->CallForHelp(30.0f); // catch helpers
             Talk(SAY_AGGRO);
             if (pInstance)
             {
-                pInstance->SetData(EVENT_ANUB, IN_PROGRESS);
                 if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_ANUB_GATE)))
                     go->SetGoState(GO_STATE_READY);
             }

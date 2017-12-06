@@ -49,9 +49,9 @@ public:
         return new boss_faerlinaAI (pCreature);
     }
 
-    struct boss_faerlinaAI : public ScriptedAI
+    struct boss_faerlinaAI : public BossAI
     {
-        boss_faerlinaAI(Creature *c) : ScriptedAI(c), summons(me)
+        boss_faerlinaAI(Creature *c) : BossAI(c, BOSS_FAERLINA), summons(me)
         {
             pInstance = me->GetInstanceScript();
             sayGreet = false;
@@ -81,24 +81,21 @@ public:
 
         void Reset()
         {
+            BossAI::Reset();
             events.Reset();
             summons.DespawnAll();
             SummonHelpers();
-            if (pInstance)
-                pInstance->SetData(EVENT_FAERLINA, NOT_STARTED);
         }
 
-        void EnterCombat(Unit * /*who*/)
+        void EnterCombat(Unit * who)
         {
+            BossAI::EnterCombat(who);
             me->SetInCombatWithZone();
             Talk(SAY_AGGRO);
             events.ScheduleEvent(EVENT_SPELL_POISON_BOLT, urand(12000,15000));
             events.ScheduleEvent(EVENT_SPELL_RAIN_OF_FIRE, urand(6000,18000));
             events.ScheduleEvent(EVENT_SPELL_FRENZY, urand(60000,80000), 1);
             events.SetPhase(1);
-
-            if (pInstance)
-                pInstance->SetData(EVENT_FAERLINA, IN_PROGRESS);
         }
 
         void MoveInLineOfSight(Unit *who)
@@ -124,11 +121,10 @@ public:
                 pInstance->SetData(DATA_IMMORTAL_FAIL, 0);
         }
 
-        void JustDied(Unit*  /*Killer*/)
+        void JustDied(Unit*  killer)
         {
+            BossAI::JustDied(killer);
             Talk(SAY_DEATH);
-            if (pInstance)
-                pInstance->SetData(EVENT_FAERLINA, DONE);
         }
 
         void UpdateAI(uint32 diff)

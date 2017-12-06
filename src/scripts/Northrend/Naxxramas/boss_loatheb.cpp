@@ -42,9 +42,9 @@ public:
         return new boss_loathebAI (pCreature);
     }
 
-    struct boss_loathebAI : public ScriptedAI
+    struct boss_loathebAI : public BossAI
     {
-        boss_loathebAI(Creature *c) : ScriptedAI(c)
+        boss_loathebAI(Creature *c) : BossAI(c, BOSS_LOATHEB)
         {
             pInstance = me->GetInstanceScript();
         }
@@ -54,10 +54,10 @@ public:
 
         void Reset()
         {
+            BossAI::Reset();
             events.Reset();
             if (pInstance)
             {
-                pInstance->SetData(EVENT_LOATHEB, NOT_STARTED);
                 if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_LOATHEB_GATE)))
                     go->SetGoState(GO_STATE_ACTIVE);
             }
@@ -77,11 +77,11 @@ public:
                 pInstance->SetData(DATA_IMMORTAL_FAIL, 0);
         }
 
-        void EnterCombat(Unit * /*who*/)
+        void EnterCombat(Unit * who)
         {
+            BossAI::EnterCombat(who);
             if (pInstance)
             {
-                pInstance->SetData(EVENT_LOATHEB, IN_PROGRESS);
                 if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_LOATHEB_GATE)))
                     go->SetGoState(GO_STATE_READY);
             }
@@ -91,12 +91,6 @@ public:
             events.ScheduleEvent(EVENT_SPELL_DEATHBLOOM, 25000);
             events.ScheduleEvent(EVENT_SPELL_INEVITABLE_DOOM, 120000);
             events.ScheduleEvent(EVENT_SPELL_BERSERK, 720000);
-        }
-
-        void JustDied(Unit*  /*Killer*/)
-        {
-            if (pInstance)
-                pInstance->SetData(EVENT_LOATHEB, DONE);
         }
 
         void UpdateAI(uint32 diff)
