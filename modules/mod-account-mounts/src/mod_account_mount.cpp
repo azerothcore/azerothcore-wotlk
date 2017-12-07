@@ -79,5 +79,6 @@ public:
 
 void AddAccountMountsScripts()
 {
+    new AccountMountsWorld;
     new AccountMounts;
 }

@@ -7,9 +7,9 @@ if( WIN32 )
   elseif ( MINGW )
     add_custom_command(TARGET worldserver
       POST_BUILD
-      COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_MOD_ACHIEVEMENTS_DIR}/conf/mod_account_mount.conf.dist" ${CMAKE_BINARY_DIR}/bin/
+      COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_MOD_ACCOUNT_MOUNTS_DIR}/conf/mod_account_mount.conf.dist" ${CMAKE_BINARY_DIR}/bin/
     )
   endif()
 endif()
 
-install(FILES "${CMAKE_MOD_ACHIEVEMENTS_DIR}/conf/mod_account_mount.conf.dist" DESTINATION ${CONF_DIR})
+install(FILES "${CMAKE_MOD_ACCOUNT_MOUNTS_DIR}/conf/mod_account_mount.conf.dist" DESTINATION ${CONF_DIR})
