@@ -1,5 +1,5 @@
-## mod-account-mount
+## mod-killstreak
 
-# AccountMounts module for AzerothCore.
+# Killstreak System module for AzerothCore.
 
-AccountMounts share the learned mounts with all your characters on the same account.
+Killstreak System shows players killstreaks(5,10,15...) in chat window.
