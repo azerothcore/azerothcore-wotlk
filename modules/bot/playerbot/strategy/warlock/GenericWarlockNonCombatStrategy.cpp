@@ -59,9 +59,9 @@ void GenericWarlockNonCombatStrategy::InitTriggers(std::list<TriggerNode*> &trig
         "spellstone",
         NextAction::array(0, new NextAction("spellstone", 13.0f), NULL)));
 
-    triggers.push_back(new TriggerNode(
+    /*triggers.push_back(new TriggerNode(
         "no pet",
-        NextAction::array(0, new NextAction("summon imp", 10.0f), NULL)));
+        NextAction::array(0, new NextAction("summon imp", 10.0f), NULL)));*/
 
 	triggers.push_back(new TriggerNode(
 		"in battleground without flag",
