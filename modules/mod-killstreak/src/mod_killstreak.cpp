@@ -41,7 +41,7 @@ public:
         if (sConfigMgr->GetBoolDefault("Killstreak.Enable", true))
         {
 
-            ChatHandler(pPlayer->GetSession()).SendSysMessage("This server is running the |cff4CFF00AccountMounts |rmodule.");
+            ChatHandler(pPlayer->GetSession()).SendSysMessage("This server is running the |cff4CFF00Killstreak |rmodule.");
         }
     }
 	
