@@ -79,7 +79,7 @@ bool PlayerbotAIConfig::Initialize()
     LoadList<list<uint32> >(config.GetStringDefault("AiPlayerbot.RandomBotQuestItems", "6948,5175,5176,5177,5178"), randomBotQuestItems);
     LoadList<list<uint32> >(config.GetStringDefault("AiPlayerbot.RandomBotSpellIds", "54197"), randomBotSpellIds);
 
-	botAutologin = config.GetBoolDefault("AiPlayerbot.BotAutologin", false);
+	ClassicBotMode = config.GetBoolDefault("Classic.Playerbots.Mode", false);
     randomBotAutologin = config.GetBoolDefault("AiPlayerbot.RandomBotAutologin", true);
 	lootRestrictions = config.GetBoolDefault("AiPlayerbot.LootRestrictions", false);
     minRandomBots = config.GetIntDefault("AiPlayerbot.MinRandomBots", 50);

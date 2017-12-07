@@ -59,7 +59,7 @@ void PlayerbotHolder::LogoutPlayerBot(uint64 guid)
 	if (bot)
 	{
 		bot->GetPlayerbotAI()->TellMaster("Goodbye!");
-		sPlayerbotDbStore.Save(bot->GetPlayerbotAI());
+		//sPlayerbotDbStore.Save(bot->GetPlayerbotAI());
 		sLog->outBasic("Bot %s logged out", bot->GetName().c_str());
 		//bot->SaveToDB();
 
@@ -831,10 +831,10 @@ void PlayerbotMgr::OnBotLoginInternal(Player * const bot)
 
 void PlayerbotMgr::OnPlayerLogin(Player* player)
 {
-	if (sPlayerbotAIConfig.randomBotAutologin)
-		return;
+	/*if (sPlayerbotAIConfig.randomBotAutologin)
+		return;*/
 
-	if (!sPlayerbotAIConfig.botAutologin)
+	if (!sPlayerbotAIConfig.ClassicBotMode)
 		return;
 
 	uint32 accountId = player->GetSession()->GetAccountId();

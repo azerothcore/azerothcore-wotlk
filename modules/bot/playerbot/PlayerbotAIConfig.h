@@ -35,7 +35,7 @@ public:
 	uint32 InvLevel;
 	bool lootRestrictions;
     bool randomBotAutologin;
-	bool botAutologin;
+	bool ClassicBotMode;
     std::string randomBotMapsAsString;
     std::vector<uint32> randomBotMaps;
     std::list<uint32> randomBotQuestItems;

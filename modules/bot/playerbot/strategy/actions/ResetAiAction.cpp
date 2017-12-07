@@ -7,7 +7,7 @@ using namespace BotAI;
 
 bool ResetAiAction::Execute(Event event)
 {
-	sPlayerbotDbStore.Reset(ai);
+	//sPlayerbotDbStore.Reset(ai);
     ai->ResetStrategies();
     ai->TellMaster("AI was reset to defaults");
     return true;

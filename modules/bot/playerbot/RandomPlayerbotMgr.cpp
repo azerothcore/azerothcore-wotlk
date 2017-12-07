@@ -37,7 +37,7 @@ void RandomPlayerbotMgr::UpdateAIInternal(uint32 elapsed)
 {
     SetNextCheckDelay(sPlayerbotAIConfig.randomBotUpdateInterval * 1000);
 
-    if (!sPlayerbotAIConfig.randomBotAutologin || !sPlayerbotAIConfig.enabled)
+    if (!sPlayerbotAIConfig.randomBotAutologin || !sPlayerbotAIConfig.enabled || sPlayerbotAIConfig.ClassicBotMode)
         return;
 
     int maxAllowedBotCount = GetEventValue(0, "bot_count");
