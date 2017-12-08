@@ -16,7 +16,7 @@ SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '151266437651342504
 
 INSERT INTO version_db_world (`sql_rev`) VALUES ('1512664376513425042');
 
-UPDATE `creature_template` SET `mechanic_immune_mask` = '65536' WHERE `entry` = '29274'
+UPDATE `creature_template` SET `mechanic_immune_mask` = '65536' WHERE `entry` = '29274';
 UPDATE `creature_template` SET `spell2` = '54097' WHERE `entry` = '29274';
 
 DELETE FROM `spell_scripts` WHERE `id` IN
