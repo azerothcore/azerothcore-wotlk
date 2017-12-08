@@ -5913,6 +5913,9 @@ void Player::RepopAtGraveyard()
     // and don't show spirit healer location
 	if (ClosestGrave)
 	{
+		std::string conf_path = _CONF_DIR;
+		std::string cfg_file = conf_path + "Settings/modules/mod_dungeon_checkpoint.conf";
+		sConfigMgr->LoadMore(cfg_file.c_str());
 		if (sConfigMgr->GetBoolDefault("Dungeon.Checkpoints.Enable", true))
 		{
 			if (sDynRes->IsInDungeonOrRaid(this) && sDynRes->CheckForSpawnPoint(this))
