@@ -114,7 +114,7 @@ extern int main(int argc, char** argv)
     }
 
     std::string cfg_def_file=_TRINITY_CORE_CONFIG;
-    cfg_def_file += ".dist";
+    cfg_def_file += "";
 
     if (!sConfigMgr->LoadInitial(cfg_def_file.c_str())) {
         printf("ERROR: Invalid or missing default configuration file : %s\n", cfg_def_file.c_str());
