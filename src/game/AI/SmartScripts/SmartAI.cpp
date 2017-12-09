@@ -1174,17 +1174,17 @@ class SmartTrigger : public AreaTriggerScript
 
         SmartTrigger() : AreaTriggerScript("SmartTrigger") {}
 
-        bool OnTrigger(Player* player, AreaTriggerEntry const* trigger)
+        bool OnTrigger(Player* player, AreaTrigger const* trigger)
         {
             if (!player->IsAlive())
                 return false;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            sLog->outDebug(LOG_FILTER_DATABASE_AI, "AreaTrigger %u is using SmartTrigger script", trigger->id);
+            sLog->outDebug(LOG_FILTER_DATABASE_AI, "AreaTrigger %u is using SmartTrigger script", trigger->entry);
 #endif
             SmartScript script;
             script.OnInitialize(NULL, trigger);
-            script.ProcessEventsFor(SMART_EVENT_AREATRIGGER_ONTRIGGER, player, trigger->id);
+            script.ProcessEventsFor(SMART_EVENT_AREATRIGGER_ONTRIGGER, player, trigger->entry);
             return true;
         }
 };

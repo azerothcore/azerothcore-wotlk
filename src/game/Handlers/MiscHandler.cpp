@@ -886,7 +886,7 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket& recv_data)
         return;
     }
 
-    AreaTriggerEntry const* atEntry = sAreaTriggerStore.LookupEntry(triggerId);
+    AreaTrigger const* atEntry = sObjectMgr->GetAreaTrigger(triggerId);
     if (!atEntry)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
@@ -900,7 +900,7 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket& recv_data)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         sLog->outDebug(LOG_FILTER_NETWORKIO, "HandleAreaTriggerOpcode: Player '%s' (GUID: %u) too far (trigger map: %u player map: %u), ignore Area Trigger ID: %u",
-            player->GetName().c_str(), atEntry->mapid, player->GetMapId(), player->GetGUIDLow(), triggerId);
+            player->GetName().c_str(), atEntry->map, player->GetMapId(), player->GetGUIDLow(), triggerId);
 #endif
         return;
     }
@@ -919,7 +919,7 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket& recv_data)
     if (sObjectMgr->IsTavernAreaTrigger(triggerId))
     {
         // set resting flag we are in the inn
-        player->SetRestState(atEntry->id);
+        player->SetRestState(atEntry->entry);
 
         if (sWorld->IsFFAPvPRealm())
             player->RemoveByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
@@ -938,7 +938,7 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket& recv_data)
         if (pvp->HandleAreaTrigger(_player, triggerId))
             return;
 
-    AreaTrigger const* at = sObjectMgr->GetAreaTrigger(triggerId);
+    AreaTriggerTeleport const* at = sObjectMgr->GetAreaTriggerTeleport(triggerId);
     if (!at)
         return;
 

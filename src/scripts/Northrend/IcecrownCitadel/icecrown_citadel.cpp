@@ -2245,7 +2245,7 @@ class at_icc_saurfang_portal : public AreaTriggerScript
     public:
         at_icc_saurfang_portal() : AreaTriggerScript("at_icc_saurfang_portal") { }
 
-        bool OnTrigger(Player* player, AreaTriggerEntry const* /*areaTrigger*/)
+        bool OnTrigger(Player* player, AreaTrigger const* /*areaTrigger*/)
         {
             InstanceScript* instance = player->GetInstanceScript();
             if (!instance || instance->GetBossState(DATA_DEATHBRINGER_SAURFANG) != DONE)
@@ -2288,7 +2288,7 @@ class at_icc_shutdown_traps : public AreaTriggerScript
     public:
         at_icc_shutdown_traps() : AreaTriggerScript("at_icc_shutdown_traps") { }
 
-        bool OnTrigger(Player* player, AreaTriggerEntry const* /*areaTrigger*/)
+        bool OnTrigger(Player* player, AreaTrigger const* /*areaTrigger*/)
         {
             if (InstanceScript* instance = player->GetInstanceScript())
                 instance->SetData(DATA_COLDFLAME_JETS, DONE);
@@ -2301,7 +2301,7 @@ class at_icc_start_blood_quickening : public AreaTriggerScript
     public:
         at_icc_start_blood_quickening() : AreaTriggerScript("at_icc_start_blood_quickening") { }
 
-        bool OnTrigger(Player* player, AreaTriggerEntry const* /*areaTrigger*/)
+        bool OnTrigger(Player* player, AreaTrigger const* /*areaTrigger*/)
         {
             if (InstanceScript* instance = player->GetInstanceScript())
                 instance->SetData(DATA_BLOOD_QUICKENING_STATE, IN_PROGRESS);
@@ -2314,7 +2314,7 @@ class at_icc_start_frostwing_gauntlet : public AreaTriggerScript
     public:
         at_icc_start_frostwing_gauntlet() : AreaTriggerScript("at_icc_start_frostwing_gauntlet") { }
 
-        bool OnTrigger(Player* player, AreaTriggerEntry const* /*areaTrigger*/)
+        bool OnTrigger(Player* player, AreaTrigger const* /*areaTrigger*/)
         {
             if (InstanceScript* instance = player->GetInstanceScript())
                 if (instance->GetBossState(DATA_SISTER_SVALNA) != DONE)
@@ -3710,7 +3710,7 @@ class at_icc_gauntlet_event : public AreaTriggerScript
     public:
         at_icc_gauntlet_event() : AreaTriggerScript("at_icc_gauntlet_event") { }
 
-        bool OnTrigger(Player* player, AreaTriggerEntry const* /*areaTrigger*/)
+        bool OnTrigger(Player* player, AreaTrigger const* /*areaTrigger*/)
         {
             if (InstanceScript* instance = player->GetInstanceScript())
                 if (instance->GetBossState(DATA_SINDRAGOSA_GAUNTLET) == NOT_STARTED && !player->IsGameMaster())
@@ -3725,7 +3725,7 @@ class at_icc_putricide_trap : public AreaTriggerScript
     public:
         at_icc_putricide_trap() : AreaTriggerScript("at_icc_putricide_trap") { }
 
-        bool OnTrigger(Player* player, AreaTriggerEntry const* /*areaTrigger*/)
+        bool OnTrigger(Player* player, AreaTrigger const* /*areaTrigger*/)
         {           
             if (InstanceScript* instance = player->GetInstanceScript())
                 if (instance->GetData(DATA_PUTRICIDE_TRAP_STATE) == NOT_STARTED && !player->IsGameMaster())
@@ -3740,7 +3740,7 @@ class at_icc_spire_frostwyrm : public AreaTriggerScript
     public:
         at_icc_spire_frostwyrm() : AreaTriggerScript("at_icc_spire_frostwyrm") { }
 
-        bool OnTrigger(Player* player, AreaTriggerEntry const* /*areaTrigger*/)
+        bool OnTrigger(Player* player, AreaTrigger const* /*areaTrigger*/)
         {
             if (Creature* frostwyrm = player->FindNearestCreature(NPC_SPIRE_FROSTWYRM, 150.0f, true))
                 if (frostwyrm->GetPositionZ() > 250.0f && frostwyrm->AI())

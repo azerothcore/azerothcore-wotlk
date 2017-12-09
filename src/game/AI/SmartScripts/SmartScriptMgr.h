@@ -1761,7 +1761,7 @@ class SmartAIMgr
 
         bool IsAreaTriggerValid(SmartScriptHolder const& e, uint32 entry)
         {
-            if (!sAreaTriggerStore.LookupEntry(entry))
+            if (!sObjectMgr->GetAreaTrigger(entry))
             {
                 sLog->outErrorDb("SmartAIMgr: Entry %d SourceType %u Event %u Action %u uses non-existent AreaTrigger entry %u, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), entry);
                 return false;
