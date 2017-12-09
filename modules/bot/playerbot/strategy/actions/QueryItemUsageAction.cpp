@@ -34,7 +34,7 @@ bool QueryItemUsageAction::Execute(Event event)
         data >> suffixFactor;
         data >> itemRandomPropertyId;
         data >> count;
-        data >> invCount;
+        //data >> invCount;
 
         ItemTemplate const *item = sObjectMgr->GetItemTemplate(itemId);
         if (!item)
