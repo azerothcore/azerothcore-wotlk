@@ -5332,7 +5332,7 @@ void Player::DeleteFromDB(uint64 playerguid, uint32 accountId, bool updateRealmC
 			stmt->setUInt32(0, guid);
 			trans->Append(stmt);
 			trans->PAppend("DELETE FROM armory_character_stats WHERE guid = '%u'", guid);
-			trans->PAppend("DELETE FROM character_feed_log WHERE guid = '%u'", guid);
+			//trans->PAppend("DELETE FROM character_feed_log WHERE guid = '%u'", guid);
 			/** World of Warcraft Armory **/
 			
             CharacterDatabase.CommitTransaction(trans);
@@ -19902,7 +19902,7 @@ void Player::SaveToDB(bool create, bool logout)
 	/* World of Warcraft Armory */
 	// Place this code AFTER CharacterDatabase.CommitTransaction(); to avoid some character saving errors.
 	// Wowarmory feeds
-	if (!m_wowarmory_feeds.empty())
+	/*if (!m_wowarmory_feeds.empty())
 	{
 		std::ostringstream sWowarmory;
 		sWowarmory << "INSERT IGNORE INTO character_feed_log (guid,type,data,date,counter,difficulty,item_guid,item_quality) VALUES ";
@@ -19926,7 +19926,7 @@ void Player::SaveToDB(bool create, bool logout)
 	    ps << GetUInt32Value(i) << " ";
 	    ps << "', " << uint64(t) << ");";
 	    CharacterDatabase.PExecute(ps.str().c_str());
-	}
+	}*/
 	    
     // save pet (hunter pet level and experience and all type pets health/mana).
     if (Pet* pet = GetPet())
