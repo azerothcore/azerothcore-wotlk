@@ -1,3 +1,4 @@
+INSERT INTO version_db_world (`sql_rev`) VALUES ('1512840854590821700');
 INSERT INTO item_template (entry, class, subclass, SoundOverrideSubclass, name, Material, displayid, InventoryType, sheath) VALUES (41, 4, 0, -1, 'NPC Equip 41', 7, 4553, 6, 0);
 INSERT INTO item_template (entry, class, subclass, SoundOverrideSubclass, name, Material, displayid, InventoryType, sheath) VALUES (42, 4, 0, -1, 'NPC Equip 42', 7, 4562, 6, 0);
 INSERT INTO item_template (entry, class, subclass, SoundOverrideSubclass, name, Material, displayid, InventoryType, sheath) VALUES (46, 4, 0, -1, 'NPC Equip 46', 7, 4528, 6, 0);
