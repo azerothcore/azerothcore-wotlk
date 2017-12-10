@@ -170,9 +170,9 @@ void SuggestWhatToDoAction::spam(string msg, uint32 channelId)
 
     for (uint32 i = 0; i < sChatChannelsStore.GetNumRows(); ++i)
     {
-		uint32 areaId = bot->GetMap()->GetAreaId(bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ());
+		uint32 areaId = bot->GetAreaId();
         ChatChannelsEntry const* channel = sChatChannelsStore.LookupEntry(i);
-        AreaTableEntry const* area = sAreaTableStore.LookupEntry(areaId);
+        AreaTableEntry const* area = sAreaTableStore.LookupEntry((channel->ChannelID == tradeChannelID) ? areaId : areaId);
         if (channel && area && channel->ChannelID == channelId)
         {
             char channelName[255];
