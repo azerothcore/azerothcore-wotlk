@@ -90,7 +90,7 @@ public:
         void EnterCombat(Unit * who)
         {
             BossAI::EnterCombat(who);
-            me->SetInCombatWithZone();
+            summons.DoZoneInCombat();
             Talk(SAY_AGGRO);
             events.ScheduleEvent(EVENT_SPELL_POISON_BOLT, urand(12000,15000));
             events.ScheduleEvent(EVENT_SPELL_RAIN_OF_FIRE, urand(6000,18000));
