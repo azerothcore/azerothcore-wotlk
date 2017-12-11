@@ -287,6 +287,16 @@ Corpse* SpellCastTargets::GetCorpseTarget() const
     return NULL;
 }
 
+void SpellCastTargets::SetCorpseTarget(Corpse* target)
+{
+    if (!target)
+        return;
+
+    m_objectTarget = target;
+    m_objectTargetGUID = target->GetGUID();
+    m_targetMask |= TARGET_FLAG_CORPSE_MASK;
+}
+
 WorldObject* SpellCastTargets::GetObjectTarget() const
 {
     return m_objectTarget;

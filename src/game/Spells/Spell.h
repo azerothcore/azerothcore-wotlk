@@ -107,6 +107,7 @@ class SpellCastTargets
 
         uint64 GetCorpseTargetGUID() const;
         Corpse* GetCorpseTarget() const;
+        void SetCorpseTarget(Corpse* target);
 
         WorldObject* GetObjectTarget() const;
         uint64 GetObjectTargetGUID() const;
