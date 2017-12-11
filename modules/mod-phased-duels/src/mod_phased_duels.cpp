@@ -17,10 +17,13 @@ class PhasedDueling : public PlayerScript
 public:
     PhasedDueling(): PlayerScript("PhasedDueling") {}
 
-	void OnLogin(Player* pPlayer)
-	{
-		ChatHandler(pPlayer->GetSession()).SendSysMessage("This server is running the |cff4CFF00PhasedDuels |rmodule.");
-	}
+    void OnLogin(Player* pPlayer)
+    {
+        if (sConfigMgr->GetBoolDefault("PhasedDuels.Enable", true))
+        {
+            ChatHandler(pPlayer->GetSession()).SendSysMessage("This server is running the |cff4CFF00PhasedDuels |rmodule.");
+        }
+    }
 
     void OnDuelStart(Player* firstplayer, Player* secondplayer) override
     {
