@@ -1731,7 +1731,7 @@ class SmartAIMgr
 
         bool IsItemValid(SmartScriptHolder const& e, uint32 entry)
         {
-            if (!sItemStore.LookupEntry(entry))
+            if (!sObjectMgr->GetItemTemplate(entry))
             {
                 sLog->outErrorDb("SmartAIMgr: Entry %d SourceType %u Event %u Action %u uses non-existent Item entry %u, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), entry);
                 return false;
