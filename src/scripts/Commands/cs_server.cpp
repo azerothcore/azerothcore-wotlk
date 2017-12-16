@@ -29,54 +29,54 @@ public:
     {
         static std::vector<ChatCommand> serverIdleRestartCommandTable =
         {
-            { "cancel",         SEC_ADMINISTRATOR,  true,  &HandleServerShutDownCancelCommand,      "" },
-            { ""   ,            SEC_ADMINISTRATOR,  true,  &HandleServerIdleRestartCommand,         "" }
+            { "cancel",         RBAC_PERM_COMMAND_SERVER_IDLERESTART_CANCEL,    true,  &HandleServerShutDownCancelCommand,      "" },
+            { ""   ,            RBAC_PERM_COMMAND_SERVER_IDLERESTART,           true,  &HandleServerIdleRestartCommand,         "" }
         };
 
         static std::vector<ChatCommand> serverIdleShutdownCommandTable =
         {
-            { "cancel",         SEC_ADMINISTRATOR,  true,  &HandleServerShutDownCancelCommand,      "" },
-            { ""   ,            SEC_ADMINISTRATOR,  true,  &HandleServerIdleShutDownCommand,        "" }
+            { "cancel",         RBAC_PERM_COMMAND_SERVER_IDLESHUTDOWN_CANCEL,   true,  &HandleServerShutDownCancelCommand,      "" },
+            { ""   ,            RBAC_PERM_COMMAND_SERVER_IDLESHUTDOWN,          true,  &HandleServerIdleShutDownCommand,        "" }
         };
 
         static std::vector<ChatCommand> serverRestartCommandTable =
         {
-            { "cancel",         SEC_ADMINISTRATOR,  true,  &HandleServerShutDownCancelCommand,      "" },
-            { ""   ,            SEC_ADMINISTRATOR,  true,  &HandleServerRestartCommand,             "" }
+            { "cancel",         RBAC_PERM_COMMAND_SERVER_RESTART_CANCEL,    true,  &HandleServerShutDownCancelCommand,      "" },
+            { ""   ,            RBAC_PERM_COMMAND_SERVER_RESTART,           true,  &HandleServerRestartCommand,             "" }
         };
 
         static std::vector<ChatCommand> serverShutdownCommandTable =
         {
-            { "cancel",         SEC_ADMINISTRATOR,  true,  &HandleServerShutDownCancelCommand,      "" },
-            { ""   ,            SEC_ADMINISTRATOR,  true,  &HandleServerShutDownCommand,            "" }
+            { "cancel",         RBAC_PERM_COMMAND_SERVER_SHUTDOWN_CANCEL,   true,  &HandleServerShutDownCancelCommand,      "" },
+            { ""   ,            RBAC_PERM_COMMAND_SERVER_SHUTDOWN,          true,  &HandleServerShutDownCommand,            "" }
         };
 
         static std::vector<ChatCommand> serverSetCommandTable =
         {
-            { "difftime",       SEC_CONSOLE,        true,  &HandleServerSetDiffTimeCommand,         "" },
-            { "loglevel",       SEC_CONSOLE,        true,  &HandleServerSetLogLevelCommand,         "" },
-            { "logfilelevel",   SEC_CONSOLE,        true,  &HandleServerSetLogFileLevelCommand,     "" },
-            { "motd",           SEC_ADMINISTRATOR,  true,  &HandleServerSetMotdCommand,             "" },
-            { "closed",         SEC_ADMINISTRATOR,  true,  &HandleServerSetClosedCommand,           "" }
+            { "difftime",       RBAC_PERM_COMMAND_SERVER_SET_DIFFTIME,      true,  &HandleServerSetDiffTimeCommand,         "" },
+            { "loglevel",       RBAC_PERM_COMMAND_SERVER_SET_LOGLEVEL,      true,  &HandleServerSetLogLevelCommand,         "" },
+            //{ "logfilelevel",   RBAC_PERM_COMMAND_SERVER_SET_LOGFILELEVEL,  true,  &HandleServerSetLogFileLevelCommand,     "" },
+            { "motd",           RBAC_PERM_COMMAND_SERVER_SET_MOTD,          true,  &HandleServerSetMotdCommand,             "" },
+            { "closed",         RBAC_PERM_COMMAND_SERVER_SET_CLOSED,        true,  &HandleServerSetClosedCommand,           "" }
         };
 
         static std::vector<ChatCommand> serverCommandTable =
         {
-            { "corpses",        SEC_GAMEMASTER,     true,  &HandleServerCorpsesCommand,             "" },
-            { "exit",           SEC_CONSOLE,        true,  &HandleServerExitCommand,                "" },
-            { "idlerestart",    SEC_ADMINISTRATOR,  true,  nullptr,                                 "", serverIdleRestartCommandTable },
-            { "idleshutdown",   SEC_ADMINISTRATOR,  true,  nullptr,                                 "", serverIdleShutdownCommandTable },
-            { "info",           SEC_PLAYER,         true,  &HandleServerInfoCommand,                "" },
-            { "motd",           SEC_PLAYER,         true,  &HandleServerMotdCommand,                "" },
-            { "restart",        SEC_ADMINISTRATOR,  true,  nullptr,                                 "", serverRestartCommandTable },
-            { "shutdown",       SEC_ADMINISTRATOR,  true,  nullptr,                                 "", serverShutdownCommandTable },
-            { "set",            SEC_ADMINISTRATOR,  true,  nullptr,                                 "", serverSetCommandTable },
-            { "togglequerylog", SEC_CONSOLE,        true,  &HandleServerToggleQueryLogging,         "" }
+            { "corpses",        RBAC_PERM_COMMAND_SERVER_CORPSES,           true,  &HandleServerCorpsesCommand,             "" },
+            { "exit",           RBAC_PERM_COMMAND_SERVER_EXIT,              true,  &HandleServerExitCommand,                "" },
+            { "idlerestart",    RBAC_PERM_COMMAND_SERVER_IDLERESTART,       true,  nullptr,                                 "", serverIdleRestartCommandTable },
+            { "idleshutdown",   RBAC_PERM_COMMAND_SERVER_IDLESHUTDOWN,      true,  nullptr,                                 "", serverIdleShutdownCommandTable },
+            { "info",           RBAC_PERM_COMMAND_SERVER_INFO,              true,  &HandleServerInfoCommand,                "" },
+            { "motd",           RBAC_PERM_COMMAND_SERVER_MOTD,              true,  &HandleServerMotdCommand,                "" },
+            { "restart",        RBAC_PERM_COMMAND_SERVER_RESTART,           true,  nullptr,                                 "", serverRestartCommandTable },
+            { "shutdown",       RBAC_PERM_COMMAND_SERVER_SHUTDOWN,          true,  nullptr,                                 "", serverShutdownCommandTable },
+            { "set",            RBAC_PERM_COMMAND_SERVER_SET,               true,  nullptr,                                 "", serverSetCommandTable },
+            //{ "togglequerylog", RBAC_PERM_COMMAND_SERVER_TOGGLEQUERYLOG,    true,  &HandleServerToggleQueryLogging,         "" }
         };
 
          static std::vector<ChatCommand> commandTable =
         {
-            { "server",         SEC_PLAYER,         true,  nullptr,                                 "", serverCommandTable }
+            { "server",         RBAC_PERM_COMMAND_SERVER,         true,  nullptr,                                 "", serverCommandTable }
         };
         return commandTable;
     }

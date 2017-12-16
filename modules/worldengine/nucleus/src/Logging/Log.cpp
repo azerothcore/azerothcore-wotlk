@@ -1008,3 +1008,39 @@ void Log::outMisc(const char * str, ...)
         va_end(ap);
     }
 }
+
+void Log::outTradeDB(const char* type, uint32 gmAccountId, uint32 itemId, uint32 count, uint32 money, uint32 targetAccountId)
+{
+    PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_LOG_TRADES);
+    stmt->setUInt32(0, gmAccountId);
+    stmt->setString(1, type);
+    stmt->setUInt32(2, itemId);
+    stmt->setUInt32(3, count);
+    stmt->setUInt32(4, money);
+    stmt->setUInt32(5, targetAccountId);
+    stmt->setUInt8(6, 2/*realmID*/);
+    LoginDatabase.Execute(stmt);
+}
+
+void Log::outCommandDB(const char* command, const char* args, uint32 accountId, uint32 guid, float x, float y, float z, uint32 mapId, uint32 targetType, const char* targetName, uint32 targetGuid)
+{
+    std::string safeArgs(args);
+    std::string safeTargetName(targetName);
+    LoginDatabase.EscapeString(safeArgs);
+    LoginDatabase.EscapeString(safeTargetName);
+
+    PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_LOG_COMMANDS);
+    stmt->setUInt32(0, accountId);
+    stmt->setUInt32(1, guid);
+    stmt->setString(2, command);
+    stmt->setString(3, safeArgs.c_str());
+    stmt->setUInt32(4, targetType);
+    stmt->setString(5, safeTargetName.c_str());
+    stmt->setUInt32(6, targetGuid);
+    stmt->setFloat(7, x);
+    stmt->setFloat(8, y);
+    stmt->setFloat(9, z);
+    stmt->setUInt16(10, mapId);
+    stmt->setUInt8(11, 2/*realmID*/);
+    LoginDatabase.Execute(stmt);
+}

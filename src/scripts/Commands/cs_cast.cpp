@@ -27,16 +27,16 @@ public:
     {
         static std::vector<ChatCommand> castCommandTable =
         {   
-            { "back",           SEC_GAMEMASTER,  false, &HandleCastBackCommand,              "" },
-            { "dist",           SEC_GAMEMASTER,  false, &HandleCastDistCommand,              "" },
-            { "self",           SEC_GAMEMASTER,  false, &HandleCastSelfCommand,              "" },
-            { "target",         SEC_GAMEMASTER,  false, &HandleCastTargetCommad,             "" },
-            { "dest",           SEC_GAMEMASTER,  false, &HandleCastDestCommand,              "" },
-            { "",               SEC_GAMEMASTER,  false, &HandleCastCommand,                  "" }
+            { "back",           RBAC_PERM_COMMAND_CAST_BACK,    false, &HandleCastBackCommand,  "" },
+            { "dist",           RBAC_PERM_COMMAND_CAST_DIST,    false, &HandleCastDistCommand,  "" },
+            { "self",           RBAC_PERM_COMMAND_CAST_SELF,    false, &HandleCastSelfCommand,  "" },
+            { "target",         RBAC_PERM_COMMAND_CAST_TARGET,  false, &HandleCastTargetCommad, "" },
+            { "dest",           RBAC_PERM_COMMAND_CAST_DEST,    false, &HandleCastDestCommand,  "" },
+            { "",               RBAC_PERM_COMMAND_CAST,         false, &HandleCastCommand,      "" }
         };
         static std::vector<ChatCommand> commandTable =
         {
-            { "cast",           SEC_GAMEMASTER,  false, nullptr,                                "", castCommandTable }
+            { "cast",           RBAC_PERM_COMMAND_CAST,  false, nullptr, "", castCommandTable }
         };
         return commandTable;
     }

@@ -19,10 +19,12 @@
 #include "Group.h"
 #include "SpellAuras.h"
 #include "Player.h"
+#include "RBAC.h"
 #include "GroupMgr.h"
 #include "GameEventMgr.h"
 #include "WorldSession.h"
 #include "Opcodes.h"
+
 
 namespace lfg
 {
@@ -376,6 +378,7 @@ void LFGMgr::InitializeLockedDungeons(Player* player, uint8 level /* = 0 */)
     uint8 expansion = player->GetSession()->Expansion();
     LfgDungeonSet const& dungeons = GetDungeonsByRandom(0);
     LfgLockMap lock;
+    bool denyJoin = !player->GetSession()->HasPermission(RBAC_PERM_JOIN_DUNGEON_FINDER);
 
     float avgItemLevel = player->GetAverageItemLevelForDF();
 
@@ -387,7 +390,9 @@ void LFGMgr::InitializeLockedDungeons(Player* player, uint8 level /* = 0 */)
         MapEntry const* mapEntry = sMapStore.LookupEntry(dungeon->map);
 
         uint32 lockData = 0;
-        if (dungeon->expansion > expansion)
+        if (denyJoin)
+            lockData = LFG_LOCKSTATUS_RAID_LOCKED;
+        else if (dungeon->expansion > expansion)
             lockData = LFG_LOCKSTATUS_INSUFFICIENT_EXPANSION;
         else if (DisableMgr::IsDisabledFor(DISABLE_TYPE_MAP, dungeon->map, player))
             lockData = LFG_LOCKSTATUS_RAID_LOCKED;
@@ -541,10 +546,14 @@ void LFGMgr::JoinLfg(Player* player, uint8 roles, LfgDungeonSet& dungeons, const
     if (!isRaid && joinData.result == LFG_JOIN_OK)
     {
         // Check player or group member restrictions
-        if (player->InBattleground() || player->InArena() || player->InBattlegroundQueue())
+        if (!player->GetSession()->HasPermission(RBAC_PERM_JOIN_DUNGEON_FINDER))
+            joinData.result = LFG_JOIN_NOT_MEET_REQS;
+        else if (player->InBattleground() || player->InArena() || player->InBattlegroundQueue())
             joinData.result = LFG_JOIN_USING_BG_SYSTEM;
         else if (player->HasAura(LFG_SPELL_DUNGEON_DESERTER))
             joinData.result = LFG_JOIN_DESERTER;
+        else if (player->HasAura(LFG_SPELL_DUNGEON_COOLDOWN))
+            joinData.result = LFG_JOIN_RANDOM_COOLDOWN;
         else if (dungeons.empty())
             joinData.result = LFG_JOIN_NOT_MEET_REQS;
         else if (grp)
@@ -558,8 +567,12 @@ void LFGMgr::JoinLfg(Player* player, uint8 roles, LfgDungeonSet& dungeons, const
                 {
                     if (Player* plrg = itr->GetSource())
                     {
+                        if (!plrg->GetSession()->HasPermission(RBAC_PERM_JOIN_DUNGEON_FINDER))
+                            joinData.result = LFG_JOIN_PARTY_NOT_MEET_REQS;
                         if (plrg->HasAura(LFG_SPELL_DUNGEON_DESERTER))
                             joinData.result = LFG_JOIN_PARTY_DESERTER;
+                        else if (plrg->HasAura(LFG_SPELL_DUNGEON_COOLDOWN))
+                            joinData.result = LFG_JOIN_PARTY_RANDOM_COOLDOWN;
                         else if (plrg->InBattleground() || plrg->InArena() || plrg->InBattlegroundQueue())
                             joinData.result = LFG_JOIN_USING_BG_SYSTEM;
                         ++memberCount;

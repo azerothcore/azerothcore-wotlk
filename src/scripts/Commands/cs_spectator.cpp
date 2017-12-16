@@ -20,16 +20,16 @@ public:
     {
         static std::vector<ChatCommand> spectatorCommandTable =
         {
-            { "version",        SEC_CONSOLE,        false, &HandleSpectatorVersionCommand,                  "" },
-            { "reset",          SEC_CONSOLE,        false, &HandleSpectatorResetCommand,                    "" },
-            { "spectate",       SEC_CONSOLE,        false, &ArenaSpectator::HandleSpectatorSpectateCommand, "" },
-            { "watch",          SEC_CONSOLE,        false, &ArenaSpectator::HandleSpectatorWatchCommand,    "" },
-            { "leave",          SEC_CONSOLE,        false, &HandleSpectatorLeaveCommand,                    "" },
-            { "",               SEC_CONSOLE,        false, &HandleSpectatorCommand,                         "" }
+            { "version",        RBAC_PERM_COMMAND_SPECTATE_VERSION,     false, &HandleSpectatorVersionCommand,                  "" },
+            { "reset",          RBAC_PERM_COMMAND_SPECTATE_RESET,       false, &HandleSpectatorResetCommand,                    "" },
+            { "spectate",       RBAC_PERM_COMMAND_SPECTATE_VIEW,        false, &ArenaSpectator::HandleSpectatorSpectateCommand, "" },
+            { "watch",          RBAC_PERM_COMMAND_SPECTATE_VIEW,        false, &ArenaSpectator::HandleSpectatorWatchCommand,    "" },
+            { "leave",          RBAC_PERM_COMMAND_SPECTATE_LEAVE,       false, &HandleSpectatorLeaveCommand,                    "" },
+            { "",               RBAC_PERM_COMMAND_SPECTATE,             false, &HandleSpectatorCommand,                         "" }
         };
         static std::vector<ChatCommand> commandTable =
         {
-            { "spect",          SEC_CONSOLE,        false, nullptr,                                         "", spectatorCommandTable }
+            { "spect",          RBAC_PERM_COMMAND_SPECTATE, false, nullptr, "", spectatorCommandTable }
         };
         return commandTable;
     }

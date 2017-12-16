@@ -9,6 +9,7 @@
 
 #include "SharedDefines.h"
 #include "WorldSession.h"
+#include "RBAC.h"
 
 #include <vector>
 
@@ -27,11 +28,11 @@ class ChatCommand
     typedef bool(*pHandler)(ChatHandler*, char const*);
 
     public:
-        ChatCommand(char const* name, uint32 securityLevel, bool allowConsole, pHandler handler, std::string help, std::vector<ChatCommand> childCommands = std::vector<ChatCommand>())
-            : Name(ASSERT_NOTNULL(name)), SecurityLevel(securityLevel), AllowConsole(allowConsole), Handler(handler), Help(std::move(help)), ChildCommands(std::move(childCommands)) { }
+        ChatCommand(char const* name, uint32 permission, bool allowConsole, pHandler handler, std::string help, std::vector<ChatCommand> childCommands = std::vector<ChatCommand>())
+            : Name(ASSERT_NOTNULL(name)), Permission(permission), AllowConsole(allowConsole), Handler(handler), Help(std::move(help)), ChildCommands(std::move(childCommands)) { }
 
         char const* Name;
-        uint32 SecurityLevel;
+        uint32 Permission;
         bool AllowConsole;
         pHandler Handler;
         std::string Help;
@@ -75,6 +76,7 @@ class ChatHandler
 
         // function with different implementation for chat/console
         virtual bool isAvailable(ChatCommand const& cmd) const;
+        virtual bool HasPermission(uint32 permission) const { return m_session->HasPermission(permission); }
         virtual std::string GetNameLink() const { return GetNameLink(m_session->GetPlayer()); }
         virtual bool needReportToTarget(Player* chr) const;
         virtual LocaleConstant GetSessionDbcLocale() const;
@@ -119,7 +121,7 @@ class ChatHandler
         bool ShowHelpForCommand(std::vector<ChatCommand> const& table, const char* cmd);
     protected:
         explicit ChatHandler() : m_session(NULL), sentErrorMessage(false) {}      // for CLI subclass
-        static bool SetDataForCommandInTable(std::vector<ChatCommand>& table, const char* text, uint32 securityLevel, std::string const& help, std::string const& fullcommand);
+        static bool SetDataForCommandInTable(std::vector<ChatCommand>& table, const char* text, uint32 permission, std::string const& help, std::string const& fullcommand);
         bool ExecuteCommandInTable(std::vector<ChatCommand> const& table, const char* text, std::string const& fullcmd);
         bool ShowHelpForSubCommands(std::vector<ChatCommand> const& table, char const* cmd, char const* subcmd);
 
@@ -136,11 +138,12 @@ class CliHandler : public ChatHandler
 {
     public:
         typedef void Print(void*, char const*);
-        explicit CliHandler(void* callbackArg, Print* zprint) : m_callbackArg(callbackArg), m_print(zprint) {}
+        explicit CliHandler(void* callbackArg, Print* zprint, uint32 accountId = 0) : m_callbackArg(callbackArg), m_print(zprint), _accountId(accountId) {}
 
         // overwrite functions
         const char *GetTrinityString(int32 entry) const;
         bool isAvailable(ChatCommand const& cmd) const;
+        bool HasPermission(uint32 permission) const { return _accountId == 0 || AccountMgr::HasPermission(_accountId, permission, -1); }
         void SendSysMessage(const char *str);
         std::string GetNameLink() const;
         bool needReportToTarget(Player* chr) const;
@@ -150,6 +153,7 @@ class CliHandler : public ChatHandler
     private:
         void* m_callbackArg;
         Print* m_print;
+        uint32 _accountId;
 };
 
 #endif

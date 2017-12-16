@@ -29,36 +29,36 @@ public:
     {
         static std::vector<ChatCommand> pdumpCommandTable =
         {
-            { "load",           SEC_ADMINISTRATOR,  true,  &HandlePDumpLoadCommand,                 "" },
-            { "write",          SEC_ADMINISTRATOR,  true,  &HandlePDumpWriteCommand,                "" }
+            { "load",           RBAC_PERM_COMMAND_PDUMP_LOAD,   true,  &HandlePDumpLoadCommand,     "" },
+            { "write",          RBAC_PERM_COMMAND_PDUMP_WRITE,  true,  &HandlePDumpWriteCommand,    "" }
         };
 
         static std::vector<ChatCommand> characterDeletedCommandTable =
         {
-            { "delete",        SEC_CONSOLE,          true,  &HandleCharacterDeletedDeleteCommand,  "" },
-            { "list",          SEC_ADMINISTRATOR,    true,  &HandleCharacterDeletedListCommand,    "" },
-            { "restore",       SEC_ADMINISTRATOR,    true,  &HandleCharacterDeletedRestoreCommand, "" },
-            { "old",           SEC_CONSOLE,          true,  &HandleCharacterDeletedOldCommand,     "" },
+            { "delete",        RBAC_PERM_COMMAND_CHARACTER_DELETED_DELETE,  true,  &HandleCharacterDeletedDeleteCommand,  "" },
+            { "list",          RBAC_PERM_COMMAND_CHARACTER_DELETED_LIST,    true,  &HandleCharacterDeletedListCommand,    "" },
+            { "restore",       RBAC_PERM_COMMAND_CHARACTER_DELETED_RESTORE, true,  &HandleCharacterDeletedRestoreCommand, "" },
+            { "old",           RBAC_PERM_COMMAND_CHARACTER_DELETED_OLD,     true,  &HandleCharacterDeletedOldCommand,     "" },
         };
 
         static std::vector<ChatCommand> characterCommandTable =
         {
-            { "customize",      SEC_GAMEMASTER,     true,  &HandleCharacterCustomizeCommand,       "" },
-            { "changefaction",  SEC_GAMEMASTER,     true,  &HandleCharacterChangeFactionCommand,   "" },
-            { "changerace",     SEC_GAMEMASTER,     true,  &HandleCharacterChangeRaceCommand,      "" },
-            { "erase",          SEC_CONSOLE,        true,  &HandleCharacterEraseCommand,           "" },
-            { "deleted",        SEC_ADMINISTRATOR,  true,  nullptr,                                "", characterDeletedCommandTable },
-            { "level",          SEC_GAMEMASTER,     true,  &HandleCharacterLevelCommand,           "" },
-            { "rename",         SEC_GAMEMASTER,     true,  &HandleCharacterRenameCommand,          "" },
-            { "reputation",     SEC_GAMEMASTER,     true,  &HandleCharacterReputationCommand,      "" },
-            { "titles",         SEC_GAMEMASTER,     true,  &HandleCharacterTitlesCommand,          "" }
+            { "customize",      RBAC_PERM_COMMAND_CHARACTER_CUSTOMIZE,      true,  &HandleCharacterCustomizeCommand,       "" },
+            { "changefaction",  RBAC_PERM_COMMAND_CHARACTER_CHANGEFACTION,  true,  &HandleCharacterChangeFactionCommand,   "" },
+            { "changerace",     RBAC_PERM_COMMAND_CHARACTER_CHANGERACE,     true,  &HandleCharacterChangeRaceCommand,      "" },
+            { "erase",          RBAC_PERM_COMMAND_CHARACTER_ERASE,          true,  &HandleCharacterEraseCommand,           "" },
+            { "deleted",        RBAC_PERM_COMMAND_CHARACTER_DELETED,        true,  nullptr,                                "", characterDeletedCommandTable },
+            { "level",          RBAC_PERM_COMMAND_CHARACTER_LEVEL,          true,  &HandleCharacterLevelCommand,           "" },
+            { "rename",         RBAC_PERM_COMMAND_CHARACTER_RENAME,         true,  &HandleCharacterRenameCommand,          "" },
+            { "reputation",     RBAC_PERM_COMMAND_CHARACTER_REPUTATION,     true,  &HandleCharacterReputationCommand,      "" },
+            { "titles",         RBAC_PERM_COMMAND_CHARACTER_TITLES,         true,  &HandleCharacterTitlesCommand,          "" }
         };
 
         static std::vector<ChatCommand> commandTable =
         {
-            { "character",      SEC_GAMEMASTER,     true,  nullptr,                                "", characterCommandTable },
-            { "levelup",        SEC_GAMEMASTER,     false, &HandleLevelUpCommand,                  "" },
-            { "pdump",          SEC_ADMINISTRATOR,  true,  nullptr,                                "", pdumpCommandTable }
+            { "character",      RBAC_PERM_COMMAND_CHARACTER,    true,  nullptr,                 "", characterCommandTable },
+            { "levelup",        RBAC_PERM_COMMAND_LEVELUP,      false, &HandleLevelUpCommand,   "" },
+            { "pdump",          RBAC_PERM_COMMAND_PDUMP,        true,  nullptr,                 "", pdumpCommandTable }
         };
         return commandTable;
     }

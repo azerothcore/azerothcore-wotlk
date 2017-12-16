@@ -141,7 +141,7 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket & recvData)
             err = ERR_BATTLEGROUND_NOT_IN_BATTLEGROUND;
         else if (GetPlayer()->isUsingLfg()) // using lfg system
             err = ERR_LFG_CANT_USE_BATTLEGROUND;
-        else if (!_player->CanJoinToBattleground()) // has deserter debuff
+        else if (!_player->CanJoinToBattleground(bgt)) // has deserter debuff
             err = ERR_GROUP_JOIN_BATTLEGROUND_DESERTERS;
         else if (_player->InBattlegroundQueueForBattlegroundQueueType(bgQueueTypeIdRandom)) // queued for random bg, so can't queue for anything else
             err = ERR_IN_RANDOM_BG;
@@ -406,7 +406,7 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket &recvData)
     if (action == 1 && ginfo.ArenaType == 0)
     {
         // can't join with deserter, check it here right before joining to be sure
-        if (!_player->CanJoinToBattleground())
+        if (!_player->CanJoinToBattleground(bg))
         {
             WorldPacket data;
             sBattlegroundMgr->BuildGroupJoinedBattlegroundPacket(&data, ERR_GROUP_JOIN_BATTLEGROUND_DESERTERS);

@@ -29,31 +29,31 @@ public:
     {
         static std::vector<ChatCommand> ticketResponseCommandTable =
         {
-            { "append",         SEC_GAMEMASTER,      true,  &HandleGMTicketResponseAppendCommand,    "" },
-            { "appendln",       SEC_GAMEMASTER,      true,  &HandleGMTicketResponseAppendLnCommand,  "" }
+            { "append",         RBAC_PERM_COMMAND_TICKET_RESPONSE_APPEND,      true,  &HandleGMTicketResponseAppendCommand,    "" },
+            { "appendln",       RBAC_PERM_COMMAND_TICKET_RESPONSE_APPENDLN,      true,  &HandleGMTicketResponseAppendLnCommand,  "" }
         };
         static std::vector<ChatCommand> ticketCommandTable =
         {
-            { "assign",         SEC_GAMEMASTER,      true,  &HandleGMTicketAssignToCommand,          "" },
-            { "close",          SEC_GAMEMASTER,      true,  &HandleGMTicketCloseByIdCommand,         "" },
-            { "closedlist",     SEC_GAMEMASTER,      true,  &HandleGMTicketListClosedCommand,        "" },
-            { "comment",        SEC_GAMEMASTER,      true,  &HandleGMTicketCommentCommand,           "" },
-            { "complete",       SEC_GAMEMASTER,      true,  &HandleGMTicketCompleteCommand,          "" },
-            { "delete",         SEC_ADMINISTRATOR,   true,  &HandleGMTicketDeleteByIdCommand,        "" },
-            { "escalate",       SEC_GAMEMASTER,      true,  &HandleGMTicketEscalateCommand,          "" },
-            { "escalatedlist",  SEC_GAMEMASTER,      true,  &HandleGMTicketListEscalatedCommand,     "" },
-            { "list",           SEC_GAMEMASTER,      true,  &HandleGMTicketListCommand,              "" },
-            { "onlinelist",     SEC_GAMEMASTER,      true,  &HandleGMTicketListOnlineCommand,        "" },
-            { "reset",          SEC_CONSOLE,         true,  &HandleGMTicketResetCommand,             "" },
-            { "response",       SEC_GAMEMASTER,      true,  nullptr,                                 "", ticketResponseCommandTable },
-            { "togglesystem",   SEC_ADMINISTRATOR,   true,  &HandleToggleGMTicketSystem,             "" },
-            { "unassign",       SEC_GAMEMASTER,      true,  &HandleGMTicketUnAssignCommand,          "" },
-            { "viewid",         SEC_GAMEMASTER,      true,  &HandleGMTicketGetByIdCommand,           "" },
-            { "viewname",       SEC_GAMEMASTER,      true,  &HandleGMTicketGetByNameCommand,         "" }
+            { "assign",         RBAC_PERM_COMMAND_TICKET_ASSIGN,        true,  &HandleGMTicketAssignToCommand,          "" },
+            { "close",          RBAC_PERM_COMMAND_TICKET_CLOSE,         true,  &HandleGMTicketCloseByIdCommand,         "" },
+            { "closedlist",     RBAC_PERM_COMMAND_TICKET_CLOSEDLIST,    true,  &HandleGMTicketListClosedCommand,        "" },
+            { "comment",        RBAC_PERM_COMMAND_TICKET_COMMENT,       true,  &HandleGMTicketCommentCommand,           "" },
+            { "complete",       RBAC_PERM_COMMAND_TICKET_COMPLETE,      true,  &HandleGMTicketCompleteCommand,          "" },
+            { "delete",         RBAC_PERM_COMMAND_TICKET_DELETE,        true,  &HandleGMTicketDeleteByIdCommand,        "" },
+            { "escalate",       RBAC_PERM_COMMAND_TICKET_ESCALATE,      true,  &HandleGMTicketEscalateCommand,          "" },
+            { "escalatedlist",  RBAC_PERM_COMMAND_TICKET_ESCALATEDLIST, true,  &HandleGMTicketListEscalatedCommand,     "" },
+            { "list",           RBAC_PERM_COMMAND_TICKET_LIST,          true,  &HandleGMTicketListCommand,              "" },
+            { "onlinelist",     RBAC_PERM_COMMAND_TICKET_ONLINELIST,    true,  &HandleGMTicketListOnlineCommand,        "" },
+            { "reset",          RBAC_PERM_COMMAND_TICKET_RESET,         true,  &HandleGMTicketResetCommand,             "" },
+            { "response",       RBAC_PERM_COMMAND_TICKET_RESPONSE,      true,  nullptr,                                 "", ticketResponseCommandTable },
+            { "togglesystem",   RBAC_PERM_COMMAND_TICKET_TOGGLESYSTEM,  true,  &HandleToggleGMTicketSystem,             "" },
+            { "unassign",       RBAC_PERM_COMMAND_TICKET_UNASSIGN,      true,  &HandleGMTicketUnAssignCommand,          "" },
+            { "viewid",         RBAC_PERM_COMMAND_TICKET_VIEWID,        true,  &HandleGMTicketGetByIdCommand,           "" },
+            { "viewname",       RBAC_PERM_COMMAND_TICKET_VIEWNAME,      true,  &HandleGMTicketGetByNameCommand,         "" }
         };
         static std::vector<ChatCommand> commandTable =
         {
-            { "ticket",         SEC_GAMEMASTER,      false, nullptr,                                 "", ticketCommandTable }
+            { "ticket",         RBAC_PERM_COMMAND_TICKET, false, nullptr, "", ticketCommandTable }
         };
         return commandTable;
     }
@@ -84,10 +84,9 @@ public:
         // Get target information
         uint64 targetGuid = sObjectMgr->GetPlayerGUIDByName(target.c_str());
         uint64 targetAccountId = sObjectMgr->GetPlayerAccountIdByGUID(targetGuid);
-        uint32 targetGmLevel = AccountMgr::GetSecurity(targetAccountId, realmID);
 
         // Target must exist and have administrative rights
-        if (!targetGuid || AccountMgr::IsPlayerAccount(targetGmLevel))
+        if (!AccountMgr::HasPermission(targetAccountId, RBAC_PERM_COMMANDS_BE_ASSIGNED_TICKET, realmID))
         {
             handler->SendSysMessage(LANG_COMMAND_TICKETASSIGNERROR_A);
             return true;
@@ -111,7 +110,7 @@ public:
 
         // Assign ticket
         SQLTransaction trans = SQLTransaction(nullptr);
-        ticket->SetAssignedTo(targetGuid, AccountMgr::IsAdminAccount(targetGmLevel));
+        ticket->SetAssignedTo(targetGuid, AccountMgr::IsAdminAccount(sAccountMgr->GetSecurity(targetAccountId, realmID)));
         ticket->SaveToDB(trans);
         sTicketMgr->UpdateLastChange();
 
@@ -381,7 +380,7 @@ public:
         {
             uint64 guid = ticket->GetAssignedToGUID();
             uint32 accountId = sObjectMgr->GetPlayerAccountIdByGUID(guid);
-            security = AccountMgr::GetSecurity(accountId, realmID);
+            security = sAccountMgr->GetSecurity(accountId, realmID);
         }
 
         // Check security

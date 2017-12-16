@@ -25,12 +25,12 @@ public:
     {
         static std::vector<ChatCommand> achievementCommandTable =
         {
-            { "add",            SEC_GAMEMASTER,     false,  &HandleAchievementAddCommand,      "" },
-            { "checkall",       SEC_ADMINISTRATOR,  false,  &HandleAchievementCheckAllCommand, "" }
+            { "add",        RBAC_PERM_COMMAND_ACHIEVEMENT_ADD,  false,  &HandleAchievementAddCommand,      "" },
+            { "checkall",   RBAC_PERM_COMMAND_ACHIEVEMENT,      false,  &HandleAchievementCheckAllCommand, "" }
         };
         static std::vector<ChatCommand> commandTable =
         {
-            { "achievement",    SEC_GAMEMASTER,  false, nullptr,            "", achievementCommandTable }
+            { "achievement", RBAC_PERM_COMMAND_ACHIEVEMENT, false, nullptr, "", achievementCommandTable }
         };
         return commandTable;
     }

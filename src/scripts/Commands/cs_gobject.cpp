@@ -32,29 +32,29 @@ public:
     {
         static std::vector<ChatCommand> gobjectAddCommandTable =
         {
-            { "temp",           SEC_GAMEMASTER,        false, &HandleGameObjectAddTempCommand,   "" },
-            { "",               SEC_ADMINISTRATOR,     false, &HandleGameObjectAddCommand,       "" }
+            { "temp",           RBAC_PERM_COMMAND_GOBJECT_ADD_TEMP, false, &HandleGameObjectAddTempCommand,   "" },
+            { "",               RBAC_PERM_COMMAND_GOBJECT_ADD,      false, &HandleGameObjectAddCommand,       "" }
         };
         static std::vector<ChatCommand> gobjectSetCommandTable =
         {
-            { "phase",          SEC_ADMINISTRATOR,     false, &HandleGameObjectSetPhaseCommand,  "" },
-            { "state",          SEC_ADMINISTRATOR,     false, &HandleGameObjectSetStateCommand,  "" }
+            { "phase",          RBAC_PERM_COMMAND_GOBJECT_SET_PHASE,    false, &HandleGameObjectSetPhaseCommand,  "" },
+            { "state",          RBAC_PERM_COMMAND_GOBJECT_SET_STATE,    false, &HandleGameObjectSetStateCommand,  "" }
         };
         static std::vector<ChatCommand> gobjectCommandTable =
         {
-            { "activate",       SEC_ADMINISTRATOR,     false, &HandleGameObjectActivateCommand,  "" },
-            { "delete",         SEC_ADMINISTRATOR,     false, &HandleGameObjectDeleteCommand,    "" },
-            { "info",           SEC_MODERATOR,         false, &HandleGameObjectInfoCommand,      "" },
-            { "move",           SEC_ADMINISTRATOR,     false, &HandleGameObjectMoveCommand,      "" },
-            { "near",           SEC_MODERATOR,         false, &HandleGameObjectNearCommand,      "" },
-            { "target",         SEC_MODERATOR,         false, &HandleGameObjectTargetCommand,    "" },
-            { "turn",           SEC_ADMINISTRATOR,     false, &HandleGameObjectTurnCommand,      "" },
-            { "add",            SEC_ADMINISTRATOR,     false, nullptr,                           "", gobjectAddCommandTable },
-            { "set",            SEC_ADMINISTRATOR,     false, nullptr,                           "", gobjectSetCommandTable }
+            { "activate",       RBAC_PERM_COMMAND_GOBJECT_ACTIVATE, false, &HandleGameObjectActivateCommand,  "" },
+            { "delete",         RBAC_PERM_COMMAND_GOBJECT_DELETE,   false, &HandleGameObjectDeleteCommand,    "" },
+            { "info",           RBAC_PERM_COMMAND_GOBJECT_INFO,     false, &HandleGameObjectInfoCommand,      "" },
+            { "move",           RBAC_PERM_COMMAND_GOBJECT_MOVE,     false, &HandleGameObjectMoveCommand,      "" },
+            { "near",           RBAC_PERM_COMMAND_GOBJECT_NEAR,     false, &HandleGameObjectNearCommand,      "" },
+            { "target",         RBAC_PERM_COMMAND_GOBJECT_TARGET,   false, &HandleGameObjectTargetCommand,    "" },
+            { "turn",           RBAC_PERM_COMMAND_GOBJECT_TURN,     false, &HandleGameObjectTurnCommand,      "" },
+            { "add",            RBAC_PERM_COMMAND_GOBJECT_ADD,      false, nullptr,                           "", gobjectAddCommandTable },
+            { "set",            RBAC_PERM_COMMAND_GOBJECT_SET,      false, nullptr,                           "", gobjectSetCommandTable }
         };
         static std::vector<ChatCommand> commandTable =
         {
-            { "gobject",        SEC_MODERATOR,     false, nullptr,                               "", gobjectCommandTable }
+            { "gobject",        RBAC_PERM_COMMAND_GOBJECT, false, nullptr, "", gobjectCommandTable }
         };
         return commandTable;
     }

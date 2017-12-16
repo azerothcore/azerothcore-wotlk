@@ -42,6 +42,7 @@ enum DebugLogFilters
     LOG_FILTER_WARDEN                   = 0x00800000,   // Warden related
     LOG_FILTER_BATTLEFIELD              = 0x01000000,   // Battlefield related
     LOG_FILTER_MODULES                  = 0x02000000,   // Modules debug
+    LOG_FILTER_RBAC                     = 0x04000000,   // RBAC permissions
 };
 
 enum LogTypes
@@ -129,6 +130,8 @@ class Log
         void outSQLDriver(const char* str, ...)                 ATTR_PRINTF(2, 3);
         void outMisc(const char * str, ...)                     ATTR_PRINTF(2, 3); // pussywizard
         void outCharDump(const char * str, uint32 account_id, uint32 guid, const char * name);
+        void outTradeDB(const char* type, uint32 gmAccountId, uint32 itemId, uint32 count, uint32 money, uint32 targetAccountId);
+        void outCommandDB(const char* command, const char* args, uint32 accountId, uint32 guid, float x, float y, float z, uint32 mapId, uint32 targetType, const char* targetName, uint32 targetGuid);
 
         static void outTimestamp(FILE* file);
         static std::string GetTimestampStr();

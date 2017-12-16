@@ -46,16 +46,16 @@ public:
     {
         static std::vector<ChatCommand> mmapCommandTable =
         {
-            { "loadedtiles", SEC_ADMINISTRATOR, false, &HandleMmapLoadedTilesCommand, "" },
-            { "loc",         SEC_ADMINISTRATOR,         false, &HandleMmapLocCommand,         "" },
-            { "path",        SEC_ADMINISTRATOR,        false, &HandleMmapPathCommand,        "" },
-            { "stats",       SEC_ADMINISTRATOR,       false, &HandleMmapStatsCommand,       "" },
-            { "testarea",    SEC_ADMINISTRATOR,    false, &HandleMmapTestArea,           "" },
+            { "loadedtiles", RBAC_PERM_COMMAND_MMAP_LOADEDTILES, false, &HandleMmapLoadedTilesCommand, "" },
+            { "loc",         RBAC_PERM_COMMAND_MMAP_LOC,         false, &HandleMmapLocCommand,         "" },
+            { "path",        RBAC_PERM_COMMAND_MMAP_PATH,        false, &HandleMmapPathCommand,        "" },
+            { "stats",       RBAC_PERM_COMMAND_MMAP_STATS,       false, &HandleMmapStatsCommand,       "" },
+            { "testarea",    RBAC_PERM_COMMAND_MMAP_TESTAREA,    false, &HandleMmapTestArea,           "" },
         };
 
         static std::vector<ChatCommand> commandTable =
         {
-            { "mmap", SEC_ADMINISTRATOR, true, NULL, "", mmapCommandTable },
+            { "mmap",        RBAC_PERM_COMMAND_MMAP, true, NULL, "", mmapCommandTable },
         };
         return commandTable;
     }

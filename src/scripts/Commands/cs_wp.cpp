@@ -27,17 +27,17 @@ public:
     {
         static std::vector<ChatCommand> wpCommandTable =
         {
-            { "add",            SEC_ADMINISTRATOR,     false, &HandleWpAddCommand,                "" },
-            { "event",          SEC_ADMINISTRATOR,     false, &HandleWpEventCommand,              "" },
-            { "load",           SEC_ADMINISTRATOR,     false, &HandleWpLoadCommand,               "" },
-            { "modify",         SEC_ADMINISTRATOR,     false, &HandleWpModifyCommand,             "" },
-            { "unload",         SEC_ADMINISTRATOR,     false, &HandleWpUnLoadCommand,             "" },
-            { "reload",         SEC_ADMINISTRATOR,     false, &HandleWpReloadCommand,             "" },
-            { "show",           SEC_ADMINISTRATOR,     false, &HandleWpShowCommand,               "" }
+            { "add",            RBAC_PERM_COMMAND_WP_ADD,       false, &HandleWpAddCommand,                "" },
+            { "event",          RBAC_PERM_COMMAND_WP_EVENT,     false, &HandleWpEventCommand,              "" },
+            { "load",           RBAC_PERM_COMMAND_WP_LOAD,      false, &HandleWpLoadCommand,               "" },
+            { "modify",         RBAC_PERM_COMMAND_WP_MODIFY,    false, &HandleWpModifyCommand,             "" },
+            { "unload",         RBAC_PERM_COMMAND_WP_UNLOAD,    false, &HandleWpUnLoadCommand,             "" },
+            { "reload",         RBAC_PERM_COMMAND_WP_RELOAD,    false, &HandleWpReloadCommand,             "" },
+            { "show",           RBAC_PERM_COMMAND_WP_SHOW,      false, &HandleWpShowCommand,               "" }
         };
         static std::vector<ChatCommand> commandTable =
         {
-            { "wp",             SEC_ADMINISTRATOR,     false, nullptr,                            "", wpCommandTable }
+            { "wp",             RBAC_PERM_COMMAND_WP, false, nullptr, "", wpCommandTable }
         };
         return commandTable;
     }
