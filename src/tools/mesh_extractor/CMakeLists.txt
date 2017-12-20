@@ -13,7 +13,7 @@ file(GLOB_RECURSE meshExtract_Sources *.cpp *.h)
 
 set(include_Base
   ${CMAKE_BINARY_DIR}
-  ${CMAKE_SOURCE_DIR}/src/core
+  ${CMAKE_SOURCE_DIR}/src/common
   ${CMAKE_SOURCE_DIR}/deps/recastnavigation/Recast
   ${CMAKE_SOURCE_DIR}/deps/recastnavigation/Detour
   ${CMAKE_SOURCE_DIR}/deps/libmpq

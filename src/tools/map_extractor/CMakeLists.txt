@@ -12,7 +12,7 @@
 file(GLOB_RECURSE sources *.cpp *.h)
 
 set(include_Dirs
-    ${CMAKE_SOURCE_DIR}/src/core
+    ${CMAKE_SOURCE_DIR}/src/common
     ${CMAKE_SOURCE_DIR}/deps/libmpq
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/loadlib

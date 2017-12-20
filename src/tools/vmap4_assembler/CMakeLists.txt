@@ -11,11 +11,11 @@
 
 include_directories(
   ${CMAKE_SOURCE_DIR}/deps/g3dlite/include
-  ${CMAKE_SOURCE_DIR}/src/core
-  ${CMAKE_SOURCE_DIR}/src/core/Debugging
-  ${CMAKE_SOURCE_DIR}/src/libraries/collision/
-  ${CMAKE_SOURCE_DIR}/src/libraries/collision/Maps
-  ${CMAKE_SOURCE_DIR}/src/libraries/collision/Models
+  ${CMAKE_SOURCE_DIR}/src/common
+  ${CMAKE_SOURCE_DIR}/src/common/Debugging
+  ${CMAKE_SOURCE_DIR}/src/common/Collision/
+  ${CMAKE_SOURCE_DIR}/src/common/Collision/Maps
+  ${CMAKE_SOURCE_DIR}/src/common/Collision/Models
   ${ACE_INCLUDE_DIR}
   ${ZLIB_INCLUDE_DIR}
 )

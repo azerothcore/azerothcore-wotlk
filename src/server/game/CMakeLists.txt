@@ -116,24 +116,24 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/deps/g3dlite/include
   ${CMAKE_SOURCE_DIR}/deps/SFMT
   ${CMAKE_SOURCE_DIR}/deps/zlib
-  ${CMAKE_SOURCE_DIR}/src/libraries/collision/
-  ${CMAKE_SOURCE_DIR}/src/libraries/collision/Management
-  ${CMAKE_SOURCE_DIR}/src/libraries/collision/Models
-  ${CMAKE_SOURCE_DIR}/src/libraries/collision/Maps
-  ${CMAKE_SOURCE_DIR}/src/core
-  ${CMAKE_SOURCE_DIR}/src/core/Configuration
-  ${CMAKE_SOURCE_DIR}/src/core/Cryptography
-  ${CMAKE_SOURCE_DIR}/src/core/Cryptography/Authentication
-  ${CMAKE_SOURCE_DIR}/src/core/Database
-  ${CMAKE_SOURCE_DIR}/src/core/DataStores
-  ${CMAKE_SOURCE_DIR}/src/core/Debugging
-  ${CMAKE_SOURCE_DIR}/src/core/Dynamic/LinkedReference
-  ${CMAKE_SOURCE_DIR}/src/core/Dynamic
-  ${CMAKE_SOURCE_DIR}/src/core/Logging
-  ${CMAKE_SOURCE_DIR}/src/core/Packets
-  ${CMAKE_SOURCE_DIR}/src/core/Threading
-  ${CMAKE_SOURCE_DIR}/src/core/Utilities
-  ${CMAKE_SOURCE_DIR}/src/framework/Addons
+  ${CMAKE_SOURCE_DIR}/src/common/Collision/
+  ${CMAKE_SOURCE_DIR}/src/common/Collision/Management
+  ${CMAKE_SOURCE_DIR}/src/common/Collision/Models
+  ${CMAKE_SOURCE_DIR}/src/common/Collision/Maps
+  ${CMAKE_SOURCE_DIR}/src/common
+  ${CMAKE_SOURCE_DIR}/src/common/Configuration
+  ${CMAKE_SOURCE_DIR}/src/common/Cryptography
+  ${CMAKE_SOURCE_DIR}/src/common/Cryptography/Authentication
+  ${CMAKE_SOURCE_DIR}/src/common/Database
+  ${CMAKE_SOURCE_DIR}/src/common/DataStores
+  ${CMAKE_SOURCE_DIR}/src/common/Debugging
+  ${CMAKE_SOURCE_DIR}/src/common/Dynamic/LinkedReference
+  ${CMAKE_SOURCE_DIR}/src/common/Dynamic
+  ${CMAKE_SOURCE_DIR}/src/common/Logging
+  ${CMAKE_SOURCE_DIR}/src/common/Packets
+  ${CMAKE_SOURCE_DIR}/src/common/Threading
+  ${CMAKE_SOURCE_DIR}/src/common/Utilities
+  ${CMAKE_SOURCE_DIR}/src/server/game/Addons
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}/Accounts
   ${CMAKE_CURRENT_SOURCE_DIR}/Achievements
@@ -206,8 +206,8 @@ include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/World
   ${CMAKE_CURRENT_SOURCE_DIR}/ArenaSpectator
   ${CMAKE_CURRENT_SOURCE_DIR}/Misc
-  ${CMAKE_SOURCE_DIR}/src/scripts/
-  ${CMAKE_SOURCE_DIR}/src/scripts/PrecompiledHeaders
+  ${CMAKE_SOURCE_DIR}/src/server/scripts/
+  ${CMAKE_SOURCE_DIR}/src/server/scripts/PrecompiledHeaders
   ${ACE_INCLUDE_DIR}
   ${MYSQL_INCLUDE_DIR}
   ${OPENSSL_INCLUDE_DIR}

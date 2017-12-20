@@ -28,7 +28,7 @@ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH 1)
 set(AC_PATH_ROOT "${CMAKE_SOURCE_DIR}")
 
 # set macro-directory
-set(CMAKE_MODULE_PATH "${AC_PATH_ROOT}/src/core/cmake/macros")
+set(CMAKE_MODULE_PATH "${AC_PATH_ROOT}/src/cmake/macros")
 
 include(CheckCXXSourceRuns)
 include(CheckIncludeFiles)
@@ -100,9 +100,7 @@ include(src/cmake/showoptions.cmake)
 add_subdirectory(deps)
 
 if( SERVERS OR TOOLS)
-  add_subdirectory(src/core)
-  add_subdirectory(src/libraries/collision)
-  add_subdirectory(src/framework)
+  add_subdirectory(src/common)
 endif()
 
 if( TOOLS )

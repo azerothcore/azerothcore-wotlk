@@ -44,7 +44,7 @@ namespace MMAP
 
     // see following files:
     // contrib/extractor/system.cpp
-    // src/game/Map.cpp
+    // src/server/game/Map.cpp
 
     struct MeshData
     {
