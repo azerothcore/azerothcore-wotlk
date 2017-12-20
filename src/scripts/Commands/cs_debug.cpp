@@ -33,57 +33,57 @@ public:
     {
         static std::vector<ChatCommand> debugPlayCommandTable =
         {
-            { "cinematic",      SEC_MODERATOR,      false, &HandleDebugPlayCinematicCommand,   "" },
-            { "movie",          SEC_MODERATOR,      false, &HandleDebugPlayMovieCommand,       "" },
-            { "sound",          SEC_MODERATOR,      false, &HandleDebugPlaySoundCommand,       "" }
+            { "cinematic",      RBAC_PERM_COMMAND_DEBUG_PLAY_CINEMATIC, false, &HandleDebugPlayCinematicCommand,   "" },
+            { "movie",          RBAC_PERM_COMMAND_DEBUG_PLAY_MOVIE,     false, &HandleDebugPlayMovieCommand,       "" },
+            { "sound",          RBAC_PERM_COMMAND_DEBUG_PLAY_SOUND,     false, &HandleDebugPlaySoundCommand,       "" }
         };
         static std::vector<ChatCommand> debugSendCommandTable =
         {
-            { "buyerror",       SEC_ADMINISTRATOR,  false, &HandleDebugSendBuyErrorCommand,       "" },
-            { "channelnotify",  SEC_ADMINISTRATOR,  false, &HandleDebugSendChannelNotifyCommand,  "" },
-            { "chatmmessage",   SEC_ADMINISTRATOR,  false, &HandleDebugSendChatMsgCommand,        "" },
-            { "equiperror",     SEC_ADMINISTRATOR,  false, &HandleDebugSendEquipErrorCommand,     "" },
-            { "largepacket",    SEC_ADMINISTRATOR,  false, &HandleDebugSendLargePacketCommand,    "" },
-            { "opcode",         SEC_ADMINISTRATOR,  false, &HandleDebugSendOpcodeCommand,         "" },
-            { "qpartymsg",      SEC_ADMINISTRATOR,  false, &HandleDebugSendQuestPartyMsgCommand,  "" },
-            { "qinvalidmsg",    SEC_ADMINISTRATOR,  false, &HandleDebugSendQuestInvalidMsgCommand, "" },
-            { "sellerror",      SEC_ADMINISTRATOR,  false, &HandleDebugSendSellErrorCommand,      "" },
-            { "setphaseshift",  SEC_ADMINISTRATOR,  false, &HandleDebugSendSetPhaseShiftCommand,  "" },
-            { "spellfail",      SEC_ADMINISTRATOR,  false, &HandleDebugSendSpellFailCommand,      "" }
+            { "buyerror",       RBAC_PERM_COMMAND_DEBUG_SEND_BUYERROR,      false, &HandleDebugSendBuyErrorCommand,       "" },
+            { "channelnotify",  RBAC_PERM_COMMAND_DEBUG_SEND_CHANNELNOTIFY, false, &HandleDebugSendChannelNotifyCommand,  "" },
+            { "chatmmessage",   RBAC_PERM_COMMAND_DEBUG_SEND_CHATMESSAGE,   false, &HandleDebugSendChatMsgCommand,        "" },
+            { "equiperror",     RBAC_PERM_COMMAND_DEBUG_SEND_EQUIPERROR,    false, &HandleDebugSendEquipErrorCommand,     "" },
+            { "largepacket",    RBAC_PERM_COMMAND_DEBUG_SEND_LARGEPACKET,   false, &HandleDebugSendLargePacketCommand,    "" },
+            { "opcode",         RBAC_PERM_COMMAND_DEBUG_SEND_OPCODE,        false, &HandleDebugSendOpcodeCommand,         "" },
+            { "qpartymsg",      RBAC_PERM_COMMAND_DEBUG_SEND_QPARTYMSG,     false, &HandleDebugSendQuestPartyMsgCommand,  "" },
+            { "qinvalidmsg",    RBAC_PERM_COMMAND_DEBUG_SEND_QINVALIDMSG,   false, &HandleDebugSendQuestInvalidMsgCommand, "" },
+            { "sellerror",      RBAC_PERM_COMMAND_DEBUG_SEND_SELLERROR,     false, &HandleDebugSendSellErrorCommand,      "" },
+            { "setphaseshift",  RBAC_PERM_COMMAND_DEBUG_SEND_SETPHASESHIFT, false, &HandleDebugSendSetPhaseShiftCommand,  "" },
+            { "spellfail",      RBAC_PERM_COMMAND_DEBUG_SEND_SPELLFAIL,     false, &HandleDebugSendSpellFailCommand,      "" }
         };
         static std::vector<ChatCommand> debugCommandTable =
         {
-            { "setbit",         SEC_ADMINISTRATOR,  false, &HandleDebugSet32BitCommand,        "" },
-            { "threat",         SEC_ADMINISTRATOR,  false, &HandleDebugThreatListCommand,      "" },
-            { "hostil",         SEC_MODERATOR,      false, &HandleDebugHostileRefListCommand,  "" },
-            { "anim",           SEC_ADMINISTRATOR,  false, &HandleDebugAnimCommand,            "" },
-            { "arena",          SEC_ADMINISTRATOR,  false, &HandleDebugArenaCommand,           "" },
-            { "bg",             SEC_ADMINISTRATOR,  false, &HandleDebugBattlegroundCommand,    "" },
-            { "getitemstate",   SEC_ADMINISTRATOR,  false, &HandleDebugGetItemStateCommand,    "" },
-            { "lootrecipient",  SEC_ADMINISTRATOR,  false, &HandleDebugGetLootRecipientCommand, "" },
-            { "getvalue",       SEC_ADMINISTRATOR,  false, &HandleDebugGetValueCommand,        "" },
-            { "getitemvalue",   SEC_ADMINISTRATOR,  false, &HandleDebugGetItemValueCommand,    "" },
-            { "Mod32Value",     SEC_ADMINISTRATOR,  false, &HandleDebugMod32ValueCommand,      "" },
-            { "play",           SEC_MODERATOR,      false, nullptr,                            "", debugPlayCommandTable },
-            { "send",           SEC_ADMINISTRATOR,  false, nullptr,                            "", debugSendCommandTable },
-            { "setaurastate",   SEC_ADMINISTRATOR,  false, &HandleDebugSetAuraStateCommand,    "" },
-            { "setitemvalue",   SEC_ADMINISTRATOR,  false, &HandleDebugSetItemValueCommand,    "" },
-            { "setvalue",       SEC_ADMINISTRATOR,  false, &HandleDebugSetValueCommand,        "" },
-            { "spawnvehicle",   SEC_ADMINISTRATOR,  false, &HandleDebugSpawnVehicleCommand,    "" },
-            { "setvid",         SEC_ADMINISTRATOR,  false, &HandleDebugSetVehicleIdCommand,    "" },
-            { "entervehicle",   SEC_ADMINISTRATOR,  false, &HandleDebugEnterVehicleCommand,    "" },
-            { "uws",            SEC_ADMINISTRATOR,  false, &HandleDebugUpdateWorldStateCommand, "" },
-            { "update",         SEC_ADMINISTRATOR,  false, &HandleDebugUpdateCommand,          "" },
-            { "itemexpire",     SEC_ADMINISTRATOR,  false, &HandleDebugItemExpireCommand,      "" },
-            { "areatriggers",   SEC_ADMINISTRATOR,  false, &HandleDebugAreaTriggersCommand,    "" },
-            { "los",            SEC_ADMINISTRATOR,  false, &HandleDebugLoSCommand,             "" },
-            { "moveflags",      SEC_ADMINISTRATOR,  false, &HandleDebugMoveflagsCommand,       "" },
-            { "unitstate",      SEC_ADMINISTRATOR,  false, &HandleDebugUnitStateCommand,       "" }
+            { "setbit",         RBAC_PERM_COMMAND_DEBUG_SETBIT,         false, &HandleDebugSet32BitCommand,        "" },
+            { "threat",         RBAC_PERM_COMMAND_DEBUG_THREAT,         false, &HandleDebugThreatListCommand,      "" },
+            { "hostil",         RBAC_PERM_COMMAND_DEBUG_HOSTIL,         false, &HandleDebugHostileRefListCommand,  "" },
+            { "anim",           RBAC_PERM_COMMAND_DEBUG_ANIM,           false, &HandleDebugAnimCommand,            "" },
+            { "arena",          RBAC_PERM_COMMAND_DEBUG_ARENA,          false, &HandleDebugArenaCommand,           "" },
+            { "bg",             RBAC_PERM_COMMAND_DEBUG_BG,             false, &HandleDebugBattlegroundCommand,    "" },
+            { "getitemstate",   RBAC_PERM_COMMAND_DEBUG_GETITEMSTATE,   false, &HandleDebugGetItemStateCommand,    "" },
+            { "lootrecipient",  RBAC_PERM_COMMAND_DEBUG_LOOTRECIPIENT,  false, &HandleDebugGetLootRecipientCommand, "" },
+            { "getvalue",       RBAC_PERM_COMMAND_DEBUG_GETVALUE,       false, &HandleDebugGetValueCommand,        "" },
+            { "getitemvalue",   RBAC_PERM_COMMAND_DEBUG_GETITEMVALUE,   false, &HandleDebugGetItemValueCommand,    "" },
+            { "Mod32Value",     RBAC_PERM_COMMAND_DEBUG_MOD32VALUE,     false, &HandleDebugMod32ValueCommand,      "" },
+            { "play",           RBAC_PERM_COMMAND_DEBUG_PLAY,           false, nullptr,                            "", debugPlayCommandTable },
+            { "send",           RBAC_PERM_COMMAND_DEBUG_SEND,           false, nullptr,                            "", debugSendCommandTable },
+            { "setaurastate",   RBAC_PERM_COMMAND_DEBUG_SETAURASTATE,   false, &HandleDebugSetAuraStateCommand,    "" },
+            { "setitemvalue",   RBAC_PERM_COMMAND_DEBUG_SETITEMVALUE,   false, &HandleDebugSetItemValueCommand,    "" },
+            { "setvalue",       RBAC_PERM_COMMAND_DEBUG_SETVALUE,       false, &HandleDebugSetValueCommand,        "" },
+            { "spawnvehicle",   RBAC_PERM_COMMAND_DEBUG_SPAWNVEHICLE,   false, &HandleDebugSpawnVehicleCommand,    "" },
+            { "setvid",         RBAC_PERM_COMMAND_DEBUG_SETVID,         false, &HandleDebugSetVehicleIdCommand,    "" },
+            { "entervehicle",   RBAC_PERM_COMMAND_DEBUG_ENTERVEHICLE,   false, &HandleDebugEnterVehicleCommand,    "" },
+            { "uws",            RBAC_PERM_COMMAND_DEBUG_UWS,            false, &HandleDebugUpdateWorldStateCommand, "" },
+            { "update",         RBAC_PERM_COMMAND_DEBUG_UPDATE,         false, &HandleDebugUpdateCommand,          "" },
+            { "itemexpire",     RBAC_PERM_COMMAND_DEBUG_ITEMEXPIRE,     false, &HandleDebugItemExpireCommand,      "" },
+            { "areatriggers",   RBAC_PERM_COMMAND_DEBUG_AREATRIGGERS,   false, &HandleDebugAreaTriggersCommand,    "" },
+            { "los",            RBAC_PERM_COMMAND_DEBUG_LOS,            false, &HandleDebugLoSCommand,             "" },
+            { "moveflags",      RBAC_PERM_COMMAND_DEBUG_MOVEFLAGS,      false, &HandleDebugMoveflagsCommand,       "" },
+            { "unitstate",      RBAC_PERM_COMMAND_DEBUG,                false, &HandleDebugUnitStateCommand,       "" }
         };
         static std::vector<ChatCommand> commandTable =
         {
-            { "debug",          SEC_GAMEMASTER,      true,  nullptr,                           "", debugCommandTable },
-            { "wpgps",          SEC_ADMINISTRATOR,  false, &HandleWPGPSCommand,                "", }
+            { "debug",          RBAC_PERM_COMMAND_DEBUG,    true,  nullptr,             "", debugCommandTable },
+            { "wpgps",          RBAC_PERM_COMMAND_WPGPS,    false, &HandleWPGPSCommand, "", }
         };
         return commandTable;
     }

@@ -79,7 +79,6 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
                 }
         }
 
-    // pussywizard:
     switch (type)
     {
         case CHAT_MSG_SAY:
@@ -156,7 +155,6 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
             default:
                 sLog->outError("Player %s (GUID: %u) sent a chatmessage with an invalid language/message type combination", 
                                                      GetPlayer()->GetName().c_str(), GetPlayer()->GetGUIDLow());
-
                 recvData.rfinish();
                 return;
         }
@@ -164,52 +162,51 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
     // LANG_ADDON should not be changed nor be affected by flood control
     else
     {
-        uint32 specialMessageLimit = 0;
-        // send in universal language if player in .gmon mode (ignore spell effects)
+        // Universal language if in GM Mode
         if (sender->IsGameMaster())
             lang = LANG_UNIVERSAL;
         else
         {
-            // send in universal language in two side iteration allowed mode
-            if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_CHAT))
+            uint32 specialMessageLimit = 0;
+            Unit::AuraEffectList const& ModLangAuras = sender->GetAuraEffectsByType(SPELL_AURA_MOD_LANGUAGE);
+
+            if (!ModLangAuras.empty())
+                lang = ModLangAuras.front()->GetMiscValue();
+            else if (HasPermission(RBAC_PERM_TWO_SIDE_INTERACTION_CHAT))
                 lang = LANG_UNIVERSAL;
             else
             {
                 switch (type)
                 {
-                case CHAT_MSG_PARTY:
-                case CHAT_MSG_PARTY_LEADER:
-                case CHAT_MSG_RAID:
-                case CHAT_MSG_RAID_LEADER:
-                case CHAT_MSG_RAID_WARNING:
-                    // allow two side chat at group channel if two side group allowed
-                    if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP))
-                        lang = LANG_UNIVERSAL;
+                    case CHAT_MSG_PARTY:
+                    case CHAT_MSG_PARTY_LEADER:
+                    case CHAT_MSG_RAID:
+                    case CHAT_MSG_RAID_LEADER:
+                    case CHAT_MSG_RAID_WARNING:
+                        // allow two side chat at group channel if two side group allowed
+                        if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP))
+                            lang = LANG_UNIVERSAL;
 
-                    specialMessageLimit = 35;
-                    break;
-                case CHAT_MSG_GUILD:
-                case CHAT_MSG_OFFICER:
-                    // allow two side chat at guild channel if two side guild allowed
-                    if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GUILD))
-                        lang = LANG_UNIVERSAL;
+                        specialMessageLimit = 35;
+                        break;
+                    case CHAT_MSG_GUILD:
+                    case CHAT_MSG_OFFICER:
+                        // allow two side chat at guild channel if two side guild allowed
+                        if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GUILD))
+                            lang = LANG_UNIVERSAL;
 
-                    specialMessageLimit = 15;
-                    break;
-                case CHAT_MSG_WHISPER:
-                    if (sender->getLevel() >= 80)
                         specialMessageLimit = 15;
-                    break;
+                        break;
+                    case CHAT_MSG_WHISPER:
+                        if (sender->getLevel() >= 80)
+                            specialMessageLimit = 15;
+                        break;
                 }
             }
-            // but overwrite it by SPELL_AURA_MOD_LANGUAGE auras (only single case used)
-            Unit::AuraEffectList const& ModLangAuras = sender->GetAuraEffectsByType(SPELL_AURA_MOD_LANGUAGE);
-            if (!ModLangAuras.empty())
-                lang = ModLangAuras.front()->GetMiscValue();
-        }
 
-        if (type != CHAT_MSG_AFK && type != CHAT_MSG_DND)
-            sender->UpdateSpeakTime(specialMessageLimit);
+            if (type != CHAT_MSG_AFK && type != CHAT_MSG_DND)
+                sender->UpdateSpeakTime(specialMessageLimit);
+        }
     }
 
     // pussywizard: optimization
@@ -345,20 +342,20 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
             }
 
             Player* receiver = ObjectAccessor::FindPlayerByName(to, false);
-            bool senderIsPlayer = AccountMgr::IsPlayerAccount(GetSecurity());
-            bool receiverIsPlayer = AccountMgr::IsPlayerAccount(receiver ? receiver->GetSession()->GetSecurity() : SEC_PLAYER);
-            if (!receiver || (senderIsPlayer && !receiverIsPlayer && !receiver->isAcceptWhispers() && !receiver->IsInWhisperWhiteList(sender->GetGUID())))
+
+            if (!receiver || (!HasPermission(RBAC_PERM_CAN_FILTER_WHISPERS) && 
+                    !receiver->isAcceptWhispers() && !receiver->IsInWhisperWhiteList(sender->GetGUID())))
             {
                 SendPlayerNotFoundNotice(to);
                 return;
             }
 
-            if (!sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_CHAT) && senderIsPlayer && receiverIsPlayer)
-                if (GetPlayer()->GetTeamId() != receiver->GetTeamId())
-                {
-                    SendWrongFactionNotice();
-                    return;
-                }
+            if (GetPlayer()->GetTeamId() != receiver->GetTeamId() && !HasPermission(RBAC_PERM_TWO_SIDE_INTERACTION_CHAT) &&
+                !receiver->GetSession()->HasPermission(RBAC_PERM_TWO_SIDE_INTERACTION_CHAT))
+            {
+                SendWrongFactionNotice();
+                return;
+            }
 
             // pussywizard: optimization
             /*if (GetPlayer()->HasAura(1852) && !receiver->IsGameMaster())
@@ -368,7 +365,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
             }*/
 
             // If player is a Gamemaster and doesn't accept whisper, we auto-whitelist every player that the Gamemaster is talking to
-            if (!senderIsPlayer && !sender->isAcceptWhispers() && !sender->IsInWhisperWhiteList(receiver->GetGUID()))
+            if (HasPermission(RBAC_PERM_CAN_FILTER_WHISPERS) && !sender->isAcceptWhispers() && !sender->IsInWhisperWhiteList(receiver->GetGUID()))
                 sender->AddWhisperWhiteList(receiver->GetGUID());
 
             GetPlayer()->Whisper(msg, lang, receiver->GetGUID());
@@ -493,7 +490,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
         } break;
         case CHAT_MSG_CHANNEL:
         {
-            if (AccountMgr::IsPlayerAccount(GetSecurity()))
+            if (!HasPermission(RBAC_PERM_SKIP_CHECK_CHAT_CHANNEL_REQ))
             {
                 if (sender->getLevel() < sWorld->getIntConfig(CONFIG_CHAT_CHANNEL_LEVEL_REQ))
                 {

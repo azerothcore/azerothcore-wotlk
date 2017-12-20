@@ -37,83 +37,85 @@ public:
     {
         static std::vector<ChatCommand> groupCommandTable =
         {
-            { "leader",         SEC_GAMEMASTER,             false,  &HandleGroupLeaderCommand,          "" },
-            { "disband",        SEC_GAMEMASTER,             false,  &HandleGroupDisbandCommand,         "" },
-            { "remove",         SEC_GAMEMASTER,             false,  &HandleGroupRemoveCommand,          "" },
-            { "join",           SEC_GAMEMASTER,             false,  &HandleGroupJoinCommand,            "" },
-            { "list",           SEC_GAMEMASTER,             false,  &HandleGroupListCommand,            "" }
+            { "leader",             RBAC_PERM_COMMAND_GROUP_LEADER,     false,  &HandleGroupLeaderCommand,  "" },
+            { "disband",            RBAC_PERM_COMMAND_GROUP_DISBAND,    false,  &HandleGroupDisbandCommand, "" },
+            { "remove",             RBAC_PERM_COMMAND_GROUP_REMOVE,     false,  &HandleGroupRemoveCommand,  "" },
+            { "join",               RBAC_PERM_COMMAND_GROUP_JOIN,       false,  &HandleGroupJoinCommand,    "" },
+            { "list",               RBAC_PERM_COMMAND_GROUP_LIST,       false,  &HandleGroupListCommand,    "" },
+            { "summon",             RBAC_PERM_COMMAND_GROUP_SUMMON,     false, &HandleGroupSummonCommand,   "" },
         };
         static std::vector<ChatCommand> petCommandTable =
         {
-            { "create",             SEC_GAMEMASTER,         false, &HandleCreatePetCommand,             "" },
-            { "learn",              SEC_GAMEMASTER,         false, &HandlePetLearnCommand,              "" },
-            { "unlearn",            SEC_GAMEMASTER,         false, &HandlePetUnlearnCommand,            "" }
+            { "create",             RBAC_PERM_COMMAND_PET_CREATE,   false, &HandleCreatePetCommand,     "" },
+            { "learn",              RBAC_PERM_COMMAND_PET_LEARN,    false, &HandlePetLearnCommand,      "" },
+            { "unlearn",            RBAC_PERM_COMMAND_PET_UNLEARN,  false, &HandlePetUnlearnCommand,    "" }
         };
         static std::vector<ChatCommand> sendCommandTable =
         {
-            { "items",              SEC_GAMEMASTER,         true,  &HandleSendItemsCommand,             "" },
-            { "mail",               SEC_GAMEMASTER,         true,  &HandleSendMailCommand,              "" },
-            { "message",            SEC_ADMINISTRATOR,      true,  &HandleSendMessageCommand,           "" },
-            { "money",              SEC_GAMEMASTER,         true,  &HandleSendMoneyCommand,             "" }
+            { "items",              RBAC_PERM_COMMAND_SEND_ITEMS,   true,  &HandleSendItemsCommand,     "" },
+            { "mail",               RBAC_PERM_COMMAND_SEND_MAIL,    true,  &HandleSendMailCommand,      "" },
+            { "message",            RBAC_PERM_COMMAND_SEND_MESSAGE, true,  &HandleSendMessageCommand,   "" },
+            { "money",              RBAC_PERM_COMMAND_SEND_MONEY,   true,  &HandleSendMoneyCommand,     "" }
         };
         static std::vector<ChatCommand> commandTable =
         {
-            { "dev",                SEC_ADMINISTRATOR,      false, &HandleDevCommand,                   "" },
-            { "gps",                SEC_MODERATOR,          false, &HandleGPSCommand,                   "" },
-            { "aura",               SEC_GAMEMASTER,         false, &HandleAuraCommand,                  "" },
-            { "unaura",             SEC_GAMEMASTER,         false, &HandleUnAuraCommand,                "" },
-            { "appear",             SEC_MODERATOR,          false, &HandleAppearCommand,                "" },
-            { "summon",             SEC_GAMEMASTER,         false, &HandleSummonCommand,                "" },
-            { "groupsummon",        SEC_GAMEMASTER,         false, &HandleGroupSummonCommand,           "" },
-            { "commands",           SEC_PLAYER,             true,  &HandleCommandsCommand,              "" },
-            { "die",                SEC_GAMEMASTER,         false, &HandleDieCommand,                   "" },
-            { "revive",             SEC_GAMEMASTER,         true,  &HandleReviveCommand,                "" },
-            { "dismount",           SEC_PLAYER,             false, &HandleDismountCommand,              "" },
-            { "guid",               SEC_GAMEMASTER,         false, &HandleGUIDCommand,                  "" },
-            { "help",               SEC_PLAYER,             true,  &HandleHelpCommand,                  "" },
-            { "itemmove",           SEC_GAMEMASTER,         false, &HandleItemMoveCommand,              "" },
-            { "cooldown",           SEC_GAMEMASTER,         false, &HandleCooldownCommand,              "" },
-            { "distance",           SEC_ADMINISTRATOR,      false, &HandleGetDistanceCommand,           "" },
-            { "recall",             SEC_GAMEMASTER,         false, &HandleRecallCommand,                "" },
-            { "save",               SEC_PLAYER,             false, &HandleSaveCommand,                  "" },
-            { "saveall",            SEC_GAMEMASTER,         true,  &HandleSaveAllCommand,               "" },
-            { "kick",               SEC_GAMEMASTER,         true,  &HandleKickPlayerCommand,            "" },
-            { "unstuck",            SEC_GAMEMASTER,         true,  &HandleUnstuckCommand,               "" },
-            { "taxicheat",          SEC_GAMEMASTER,         false, &HandleTaxiCheatCommand,             "" },
-            { "linkgrave",          SEC_ADMINISTRATOR,      false, &HandleLinkGraveCommand,             "" },
-            { "neargrave",          SEC_GAMEMASTER,         false, &HandleNearGraveCommand,             "" },
-            { "explorecheat",       SEC_ADMINISTRATOR,      false, &HandleExploreCheatCommand,          "" },
-            { "showarea",           SEC_GAMEMASTER,         false, &HandleShowAreaCommand,              "" },
-            { "hidearea",           SEC_ADMINISTRATOR,      false, &HandleHideAreaCommand,              "" },
-            { "additem",            SEC_GAMEMASTER,         false, &HandleAddItemCommand,               "" },
-            { "additemset",         SEC_GAMEMASTER,         false, &HandleAddItemSetCommand,            "" },
-            { "bank",               SEC_ADMINISTRATOR,      false, &HandleBankCommand,                  "" },
-            { "wchange",            SEC_ADMINISTRATOR,      false, &HandleChangeWeather,                "" },
-            { "maxskill",           SEC_GAMEMASTER,         false, &HandleMaxSkillCommand,              "" },
-            { "setskill",           SEC_GAMEMASTER,         false, &HandleSetSkillCommand,              "" },
-            { "pinfo",              SEC_GAMEMASTER,         true,  &HandlePInfoCommand,                 "" },
-            { "respawn",            SEC_GAMEMASTER,         false, &HandleRespawnCommand,               "" },
-            { "send",               SEC_GAMEMASTER,         true,  nullptr,                             "", sendCommandTable },
-            { "pet",                SEC_GAMEMASTER,         false, nullptr,                             "", petCommandTable },
-            { "mute",               SEC_GAMEMASTER,         true,  &HandleMuteCommand,                  "" },
-            { "unmute",             SEC_GAMEMASTER,         true,  &HandleUnmuteCommand,                "" },
-            { "movegens",           SEC_ADMINISTRATOR,      false, &HandleMovegensCommand,              "" },
-            { "cometome",           SEC_ADMINISTRATOR,      false, &HandleComeToMeCommand,              "" },
-            { "damage",             SEC_GAMEMASTER,         false, &HandleDamageCommand,                "" },
-            { "combatstop",         SEC_GAMEMASTER,         true,  &HandleCombatStopCommand,            "" },
-            { "flusharenapoints",   SEC_ADMINISTRATOR,      false, &HandleFlushArenaPointsCommand,      "" },
-            { "repairitems",        SEC_GAMEMASTER,         true,  &HandleRepairitemsCommand,           "" },
-            { "waterwalk",          SEC_GAMEMASTER,         false, &HandleWaterwalkCommand,             "" },
-            { "freeze",             SEC_GAMEMASTER,         false, &HandleFreezeCommand,                "" },
-            { "unfreeze",           SEC_GAMEMASTER,         false, &HandleUnFreezeCommand,              "" },
-            { "group",              SEC_GAMEMASTER,         false, nullptr,                             "", groupCommandTable },
-            { "possess",            SEC_GAMEMASTER,         false, HandlePossessCommand,                "" },
-            { "unpossess",          SEC_GAMEMASTER,         false, HandleUnPossessCommand,              "" },
-            { "bindsight",          SEC_ADMINISTRATOR,      false, HandleBindSightCommand,              "" },
-            { "unbindsight",        SEC_ADMINISTRATOR,      false, HandleUnbindSightCommand,            "" },
-            { "playall",            SEC_GAMEMASTER,         false, HandlePlayAllCommand,                "" },
-            { "skirmish",           SEC_ADMINISTRATOR,      false, HandleSkirmishCommand,               "" },
-            { "mailbox",            SEC_MODERATOR,          false, &HandleMailBoxCommand,               "" }
+            { "dev",                RBAC_PERM_COMMAND_DEV,              false, &HandleDevCommand,                   "" },
+            { "gps",                RBAC_PERM_COMMAND_GPS,              false, &HandleGPSCommand,                   "" },
+            { "aura",               RBAC_PERM_COMMAND_AURA,             false, &HandleAuraCommand,                  "" },
+            { "unaura",             RBAC_PERM_COMMAND_UNAURA,           false, &HandleUnAuraCommand,                "" },
+            { "appear",             RBAC_PERM_COMMAND_APPEAR,           false, &HandleAppearCommand,                "" },
+            { "summon",             RBAC_PERM_COMMAND_SUMMON,           false, &HandleSummonCommand,                "" },
+            { "commands",           RBAC_PERM_COMMAND_COMMANDS,         true,  &HandleCommandsCommand,              "" },
+            { "die",                RBAC_PERM_COMMAND_DIE,              false, &HandleDieCommand,                   "" },
+            { "revive",             RBAC_PERM_COMMAND_REVIVE,           true,  &HandleReviveCommand,                "" },
+            { "dismount",           RBAC_PERM_COMMAND_DISMOUNT,         false, &HandleDismountCommand,              "" },
+            { "guid",               RBAC_PERM_COMMAND_GUID,             false, &HandleGUIDCommand,                  "" },
+            { "help",               RBAC_PERM_COMMAND_HELP,             true,  &HandleHelpCommand,                  "" },
+            { "itemmove",           RBAC_PERM_COMMAND_ITEMMOVE,         false, &HandleItemMoveCommand,              "" },
+            { "cooldown",           RBAC_PERM_COMMAND_COOLDOWN,         false, &HandleCooldownCommand,              "" },
+            { "distance",           RBAC_PERM_COMMAND_DISTANCE,         false, &HandleGetDistanceCommand,           "" },
+            { "recall",             RBAC_PERM_COMMAND_RECALL,           false, &HandleRecallCommand,                "" },
+            { "save",               RBAC_PERM_COMMAND_SAVE,             false, &HandleSaveCommand,                  "" },
+            { "saveall",            RBAC_PERM_COMMAND_SAVEALL,          true,  &HandleSaveAllCommand,               "" },
+            { "kick",               RBAC_PERM_COMMAND_KICK,             true,  &HandleKickPlayerCommand,            "" },
+            { "unstuck",            RBAC_PERM_COMMAND_UNSTUCK,          true,  &HandleUnstuckCommand,               "" },
+            { "taxicheat",          RBAC_PERM_COMMAND_CHEAT_TAXI,       false, &HandleTaxiCheatCommand,             "" },
+            { "linkgrave",          RBAC_PERM_COMMAND_LINKGRAVE,        false, &HandleLinkGraveCommand,             "" },
+            { "neargrave",          RBAC_PERM_COMMAND_NEARGRAVE,        false, &HandleNearGraveCommand,             "" },
+            { "explorecheat",       RBAC_PERM_COMMAND_CHEAT_EXPLORE,    false, &HandleExploreCheatCommand,          "" },
+            { "showarea",           RBAC_PERM_COMMAND_SHOWAREA,         false, &HandleShowAreaCommand,              "" },
+            { "hidearea",           RBAC_PERM_COMMAND_HIDEAREA,         false, &HandleHideAreaCommand,              "" },
+            { "additem",            RBAC_PERM_COMMAND_ADDITEM,          false, &HandleAddItemCommand,               "" },
+            { "additemset",         RBAC_PERM_COMMAND_ADDITEMSET,       false, &HandleAddItemSetCommand,            "" },
+            { "bank",               RBAC_PERM_COMMAND_BANK,             false, &HandleBankCommand,                  "" },
+            { "wchange",            RBAC_PERM_COMMAND_WCHANGE,          false, &HandleChangeWeather,                "" },
+            { "maxskill",           RBAC_PERM_COMMAND_MAXSKILL,         false, &HandleMaxSkillCommand,              "" },
+            { "setskill",           RBAC_PERM_COMMAND_SETSKILL,         false, &HandleSetSkillCommand,              "" },
+            { "pinfo",              RBAC_PERM_COMMAND_PINFO,            true,  &HandlePInfoCommand,                 "" },
+            { "respawn",            RBAC_PERM_COMMAND_RESPAWN,          false, &HandleRespawnCommand,               "" },
+            { "send",               RBAC_PERM_COMMAND_SEND,             true,  nullptr,                             "", sendCommandTable },
+            { "pet",                RBAC_PERM_COMMAND_PET,              false, nullptr,                             "", petCommandTable },
+            { "mute",               RBAC_PERM_COMMAND_MUTE,             true,  &HandleMuteCommand,                  "" },
+            { "unmute",             RBAC_PERM_COMMAND_UNMUTE,           true,  &HandleUnmuteCommand,                "" },
+            { "movegens",           RBAC_PERM_COMMAND_MOVEGENS,         false, &HandleMovegensCommand,              "" },
+            { "cometome",           RBAC_PERM_COMMAND_COMETOME,         false, &HandleComeToMeCommand,              "" },
+            { "damage",             RBAC_PERM_COMMAND_DAMAGE,           false, &HandleDamageCommand,                "" },
+            { "combatstop",         RBAC_PERM_COMMAND_COMBATSTOP,       true,  &HandleCombatStopCommand,            "" },
+            { "flusharenapoints",   RBAC_PERM_COMMAND_FLUSHARENAPOINTS, false, &HandleFlushArenaPointsCommand,      "" },
+            { "repairitems",        RBAC_PERM_COMMAND_REPAIRITEMS,      true,  &HandleRepairitemsCommand,           "" },
+            { "waterwalk",          RBAC_PERM_COMMAND_CHEAT_WATERWALK,  false, &HandleWaterwalkCommand,             "" },
+            { "freeze",             RBAC_PERM_COMMAND_FREEZE,           false, &HandleFreezeCommand,                "" },
+            { "unfreeze",           RBAC_PERM_COMMAND_UNFREEZE,         false, &HandleUnFreezeCommand,              "" },
+            { "group",              RBAC_PERM_COMMAND_GROUP,            false, nullptr,                             "", groupCommandTable },
+            { "possess",            RBAC_PERM_COMMAND_POSSESS,          false, &HandlePossessCommand,               "" },
+            { "unpossess",          RBAC_PERM_COMMAND_UNPOSSESS,        false, &HandleUnPossessCommand,             "" },
+            { "bindsight",          RBAC_PERM_COMMAND_BINDSIGHT,        false, &HandleBindSightCommand,             "" },
+            { "unbindsight",        RBAC_PERM_COMMAND_UNBINDSIGHT,      false, &HandleUnbindSightCommand,           "" },
+            { "playall",            RBAC_PERM_COMMAND_PLAYALL,          false, &HandlePlayAllCommand,               "" },
+            // TODO: Create permissions for these two
+            { "skirmish",           RBAC_PERM_COMMAND_ARENA,            false, &HandleSkirmishCommand,              "" },
+            { "mailbox",            RBAC_PERM_COMMAND_CHEAT,            false, &HandleMailBoxCommand,               "" }
+            //
         };
         return commandTable;
     }
@@ -898,7 +900,7 @@ public:
 
         if (target)
         {
-            target->ResurrectPlayer(!AccountMgr::IsPlayerAccount(target->GetSession()->GetSecurity()) ? 1.0f : 0.5f);
+            target->ResurrectPlayer(target->GetSession()->HasPermission(RBAC_PERM_RESURRECT_WITH_FULL_HPS) ? 1.0f : 0.5f);
             target->SpawnCorpseBones();
             target->SaveToDB(false, false);
         }
@@ -1096,9 +1098,21 @@ public:
         return true;
     }
 
-    static bool HandleSaveCommand(ChatHandler*  /*handler*/, char const* /*args*/)
+    static bool HandleSaveCommand(ChatHandler* handler, char const* /*args*/)
     {
-        // pussywizard: fully disabled on 28.12.2011, but disabled it "silently"
+        Player* player = handler->GetSession()->GetPlayer();
+
+        // save GM account without delay and output message
+        if (handler->GetSession()->HasPermission(RBAC_PERM_COMMANDS_SAVE_WITHOUT_DELAY))
+        {
+            if (Player* target = handler->getSelectedPlayer())
+                target->SaveToDB(false, false);
+            else
+                player->SaveToDB(false, false);
+            handler->SendSysMessage(LANG_PLAYER_SAVED);
+            return true;
+        }
+
         return true;
     }
 
@@ -1142,7 +1156,7 @@ public:
     static bool HandleUnstuckCommand(ChatHandler* handler, char const* args)
     {
         //No args required for players
-        if (handler->GetSession() && AccountMgr::IsPlayerAccount(handler->GetSession()->GetSecurity()))
+        if (handler->GetSession() && !handler->HasPermission(RBAC_PERM_COMMANDS_USE_UNSTUCK_WITH_ARGS))
         {
             // 7355: "Stuck"
             if (Player* player = handler->GetSession()->GetPlayer())
@@ -1807,12 +1821,25 @@ public:
         uint32 mapId;
         uint32 areaId;
         uint32 phase            = 0;
+        std::string userName    = handler->GetTrinityString(LANG_ERROR);
+        std::string eMail       = handler->GetTrinityString(LANG_ERROR);
+        std::string muteReason  = "";
+        std::string muteBy      = "";
+        std::string lastIp      = handler->GetTrinityString(LANG_ERROR);
+        uint32 security         = 0;
+        std::string lastLogin   = handler->GetTrinityString(LANG_ERROR);
+        std::string bannedby    = "unknown";
+        std::string banreason   = "";
+        int locale = handler->GetSessionDbcLocale();
+        std::string areaName = "<unknown>";
+        std::string zoneName = "";
 
         // pussywizard: guild info
         std::string guildName   = "";
         bool guildIsLeader      = false;
         uint64 guildMoney       = 0;
         uint32 guildMemberCount = 0;
+
         if (const GlobalPlayerData* gpd = sWorld->GetGlobalPlayerData(targetGuid))
             if (gpd->guildId)
                 if (Guild* targetGuild = sGuildMgr->GetGuildById(gpd->guildId))
@@ -1820,6 +1847,7 @@ public:
                     guildName = targetGuild->GetName();
                     guildMoney = targetGuild->GetTotalBankMoney();
                     guildMemberCount = targetGuild->GetMemberCount();
+
                     if (targetGuild->GetLeaderGUID() == targetGuid)
                         guildIsLeader = true;
                 }
@@ -1868,14 +1896,6 @@ public:
             areaId            = fields[7].GetUInt16();
         }
 
-        std::string userName    = handler->GetTrinityString(LANG_ERROR);
-        std::string eMail       = handler->GetTrinityString(LANG_ERROR);
-        std::string muteReason  = "";
-        std::string muteBy      = "";
-        std::string lastIp      = handler->GetTrinityString(LANG_ERROR);
-        uint32 security         = 0;
-        std::string lastLogin   = handler->GetTrinityString(LANG_ERROR);
-
         PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_PINFO);
         stmt->setInt32(0, int32(realmID));
         stmt->setUInt32(1, accId);
@@ -1886,18 +1906,19 @@ public:
             Field* fields = result->Fetch();
             userName      = fields[0].GetString();
             security      = fields[1].GetUInt8();
-            eMail         = fields[2].GetString();
             muteTime      = fields[5].GetUInt64();
             muteReason    = fields[6].GetString();
             muteBy        = fields[7].GetString();
 
-            if (eMail.empty())
-                eMail = "-";
-
-            if (!handler->GetSession() || handler->GetSession()->GetSecurity() >= AccountTypes(security))
+            if (handler->HasPermission(RBAC_PERM_COMMANDS_PINFO_CHECK_PERSONAL_DATA) &&
+                (!handler->GetSession() || handler->GetSession()->GetSecurity() >= AccountTypes(security)))
             {
-                lastIp = fields[3].GetString();
-                lastLogin = fields[4].GetString();
+                lastIp      = fields[3].GetString();
+                lastLogin   = fields[4].GetString();
+                eMail       = fields[2].GetString();
+
+                if (eMail.empty())
+                    eMail = "-";
 
                 uint32 ip = inet_addr(lastIp.c_str());
 #if TRINITY_ENDIAN == BIGENDIAN
@@ -1919,17 +1940,15 @@ public:
             }
             else
             {
-                lastIp = "-";
-                lastLogin = "-";
+                lastIp      = "Unauthorized";
+                lastLogin   = "Unauthorized";
+                eMail       = "Unauthorized";
             }
         }
 
         std::string nameLink = handler->playerLink(targetName);
 
         handler->PSendSysMessage(LANG_PINFO_ACCOUNT, (target ? "" : handler->GetTrinityString(LANG_OFFLINE)), nameLink.c_str(), GUID_LOPART(targetGuid), userName.c_str(), accId, eMail.c_str(), security, lastIp.c_str(), lastLogin.c_str(), latency);
-
-        std::string bannedby = "unknown";
-        std::string banreason = "";
 
         stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_PINFO_BANS);
         stmt->setUInt32(0, accId);
@@ -2031,9 +2050,6 @@ public:
         handler->PSendSysMessage(LANG_PINFO_LEVEL, raceStr.c_str(), ClassStr.c_str(), timeStr.c_str(), level, gold, silv, copp);
 
         // Add map, zone, subzone and phase to output
-        int locale = handler->GetSessionDbcLocale();
-        std::string areaName = "<unknown>";
-        std::string zoneName = "";
 
         MapEntry const* map = sMapStore.LookupEntry(mapId);
 

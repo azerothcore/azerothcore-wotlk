@@ -197,6 +197,10 @@ class ObjectAccessor
         static Player* FindPlayerByName(std::string const& name, bool checkInWorld = true);
         static std::map<std::string, Player*> playerNameToPlayerPointer; // pussywizard: optimization
 
+        // this returns Player even if he is not in world, for example teleporting
+        static Player* FindConnectedPlayer(uint64);
+        static Player* FindConnectedPlayerByName(std::string const& name);
+
         // when using this, you must use the hashmapholder's lock
         static HashMapHolder<Player>::MapType const& GetPlayers()
         {

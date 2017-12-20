@@ -30,30 +30,30 @@ public:
     {
         static std::vector<ChatCommand> removeDisableCommandTable =
         {
-            { "spell",                SEC_ADMINISTRATOR,    true, &HandleRemoveDisableSpellCommand,               "" },
-            { "quest",                SEC_ADMINISTRATOR,    true, &HandleRemoveDisableQuestCommand,               "" },
-            { "map",                  SEC_ADMINISTRATOR,    true, &HandleRemoveDisableMapCommand,                 "" },
-            { "battleground",         SEC_ADMINISTRATOR,    true, &HandleRemoveDisableBattlegroundCommand,        "" },
-            { "outdoorpvp",           SEC_ADMINISTRATOR,    true, &HandleRemoveDisableOutdoorPvPCommand,          "" },
-            { "vmap",                 SEC_ADMINISTRATOR,    true, &HandleRemoveDisableVmapCommand,                "" },
+            { "spell",          RBAC_PERM_COMMAND_DISABLE_REMOVE_SPELL,           true, &HandleRemoveDisableSpellCommand,           "" },
+            { "quest",          RBAC_PERM_COMMAND_DISABLE_REMOVE_QUEST,           true, &HandleRemoveDisableQuestCommand,           "" },
+            { "map",            RBAC_PERM_COMMAND_DISABLE_REMOVE_MAP,             true, &HandleRemoveDisableMapCommand,             "" },
+            { "battleground",   RBAC_PERM_COMMAND_DISABLE_REMOVE_BATTLEGROUND,    true, &HandleRemoveDisableBattlegroundCommand,    "" },
+            { "outdoorpvp",     RBAC_PERM_COMMAND_DISABLE_REMOVE_OUTDOORPVP,      true, &HandleRemoveDisableOutdoorPvPCommand,      "" },
+            { "vmap",           RBAC_PERM_COMMAND_DISABLE_REMOVE_VMAP,            true, &HandleRemoveDisableVmapCommand,            "" },
         };
         static std::vector<ChatCommand> addDisableCommandTable =
         {
-            { "spell",                SEC_ADMINISTRATOR,    true, &HandleAddDisableSpellCommand,                  "" },
-            { "quest",                SEC_ADMINISTRATOR,    true, &HandleAddDisableQuestCommand,                  "" },
-            { "map",                  SEC_ADMINISTRATOR,    true, &HandleAddDisableMapCommand,                    "" },
-            { "battleground",         SEC_ADMINISTRATOR,    true, &HandleAddDisableBattlegroundCommand,           "" },
-            { "outdoorpvp",           SEC_ADMINISTRATOR,    true, &HandleAddDisableOutdoorPvPCommand,             "" },
-            { "vmap",                 SEC_ADMINISTRATOR,    true, &HandleAddDisableVmapCommand,                   "" },
+            { "spell",          RBAC_PERM_COMMAND_DISABLE_ADD_SPELL,        true, &HandleAddDisableSpellCommand,        "" },
+            { "quest",          RBAC_PERM_COMMAND_DISABLE_ADD_QUEST,        true, &HandleAddDisableQuestCommand,        "" },
+            { "map",            RBAC_PERM_COMMAND_DISABLE_ADD_MAP,          true, &HandleAddDisableMapCommand,          "" },
+            { "battleground",   RBAC_PERM_COMMAND_DISABLE_ADD_BATTLEGROUND, true, &HandleAddDisableBattlegroundCommand, "" },
+            { "outdoorpvp",     RBAC_PERM_COMMAND_DISABLE_ADD_OUTDOORPVP,   true, &HandleAddDisableOutdoorPvPCommand,   "" },
+            { "vmap",           RBAC_PERM_COMMAND_DISABLE_ADD_VMAP,         true, &HandleAddDisableVmapCommand,         "" },
         };
         static std::vector<ChatCommand> disableCommandTable =
         {
-            { "add",    SEC_ADMINISTRATOR,  true, NULL, "", addDisableCommandTable },
-            { "remove", SEC_ADMINISTRATOR,  true, NULL, "", removeDisableCommandTable },
+            { "add",            RBAC_PERM_COMMAND_DISABLE_ADD,      true,   NULL, "", addDisableCommandTable },
+            { "remove",         RBAC_PERM_COMMAND_DISABLE_REMOVE,   true,   NULL, "", removeDisableCommandTable },
         };
         static std::vector<ChatCommand> commandTable =
         {
-            { "disable", SEC_ADMINISTRATOR, false, NULL, "", disableCommandTable },
+            { "disable",        RBAC_PERM_COMMAND_DISABLE,          false,  NULL, "", disableCommandTable },
         };
         return commandTable;
     }

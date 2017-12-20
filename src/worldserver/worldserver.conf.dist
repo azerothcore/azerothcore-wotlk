@@ -467,6 +467,9 @@ LogFileLevel = 0
 #             2097152 - Anything related to guilds
 #             4194304 - Anything related to transports
 #             8388608 - Anything related to Warden anti cheat
+#			 16777216 - Anything related to battlefields
+#            33554432 - Anything related to AzerothCore modules
+#            33554432 - Anything related to RBAC permissions
 #
 #                       Simply add the values together to create a bitmask.
 #                       For more info see enum DebugLogFilters in Log.h
@@ -1117,18 +1120,6 @@ RecruitAFriend.MaxLevel = 60
 RecruitAFriend.MaxDifference = 4
 
 #
-#    InstantLogout
-#        Description: Required security level for instantly logging out everywhere.
-#                     Does not work while in combat, dueling or falling.
-#        Default:     1  - (Enabled, Mods/GMs/Admins)
-#                     0  - (Enabled, Everyone)
-#                     2  - (Enabled, GMs/Admins)
-#                     3  - (Enabled, Admins)
-#                     4  - (Disabled)
-
-InstantLogout = 1
-
-#
 #    DisableWaterBreath
 #        Description: Required security level for water breathing.
 #        Default:     4  - (Disabled)
@@ -1442,6 +1433,14 @@ DungeonFinder.OptionsMask = 1
 AccountInstancesPerHour = 5
 
 #
+#   RBAC.DefaultGroups
+#        Description: Comma separated list of groups to be added to any account
+#                     Check auth.rbac_groups for correct ids
+#         Default:    "" (No group)
+
+RBAC.DefaultGroups = ""
+
+#
 #   BirthdayTime
 #        Description: Set to date of project's birth in UNIX time. By default Thu Oct 2, 2008
 #        Default:     1222964635
@@ -1532,28 +1531,12 @@ Warden.BanDuration = 259200
 ###################################################################################################
 # PLAYER INTERACTION
 #
-#    AllowTwoSide.Accounts
-#        Description: Allow creating characters of both factions on the same account.
-#        Default:     1 - (Enabled)
-#                     0 - (Disabled)
-
-AllowTwoSide.Accounts = 1
-
-#
 #    AllowTwoSide.Interaction.Calendar
 #        Description: Allow calendar invites between factions.
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 
 AllowTwoSide.Interaction.Calendar = 0
-
-#
-#    AllowTwoSide.Interaction.Chat
-#        Description: Allow say chat between factions.
-#        Default:     0 - (Disabled)
-#                     1 - (Enabled)
-
-AllowTwoSide.Interaction.Chat = 0
 
 #
 #    AllowTwoSide.Interaction.Channel
@@ -1586,30 +1569,6 @@ AllowTwoSide.Interaction.Guild = 0
 #                     1 - (Enabled)
 
 AllowTwoSide.Interaction.Auction = 0
-
-#
-#    AllowTwoSide.Interaction.Mail
-#        Description: Allow sending mails between factions.
-#        Default:     0 - (Disabled)
-#                     1 - (Enabled)
-
-AllowTwoSide.Interaction.Mail = 0
-
-#
-#    AllowTwoSide.WhoList
-#        Description: Show characters from both factions in the /who list.
-#        Default:     0 - (Disabled)
-#                     1 - (Enabled)
-
-AllowTwoSide.WhoList = 0
-
-#
-#    AllowTwoSide.AddFriend
-#        Description: Allow adding friends from other faction the friends list.
-#        Default:     0 - (Disabled)
-#                     1 - (Enabled)
-
-AllowTwoSide.AddFriend = 0
 
 #
 #    AllowTwoSide.Trade
@@ -1881,15 +1840,6 @@ Chat.MuteTimeFirstLogin = 120
 Channel.RestrictedLfg = 1
 
 #
-#    Channel.SilentlyGMJoin
-#        Description: Silently join GM characters to channels. If set to 1, channel kick and ban
-#                     commands issued by a GM will not be broadcasted.
-#        Default:     0 - (Disabled, Join with announcement)
-#                     1 - (Enabled, Join without announcement)
-
-Channel.SilentlyGMJoin = 0
-
-#
 #    ChatLevelReq.Channel
 #        Description: Level requirement for characters to be able to write in chat channels.
 #        Default:     1
@@ -1909,14 +1859,6 @@ ChatLevelReq.Whisper = 1
 #        Default:     1
 
 ChatLevelReq.Say = 1
-
-#
-#    AllowPlayerCommands
-#        Description: Allow players to use commands.
-#        Default:     1 - (Enabled)
-#                     0 - (Disabled)
-
-AllowPlayerCommands = 1
 
 #
 #    PreserveCustomChannels
@@ -2001,14 +1943,6 @@ GM.InGMList.Level = 3
 GM.InWhoList.Level = 3
 
 #
-#    GM.LogTrade
-#        Description: Include GM trade and trade slot enchanting operations in GM log.
-#        Default:     1 - (Enabled)
-#                     0 - (Disabled)
-
-GM.LogTrade = 1
-
-#
 #    GM.StartLevel
 #        Description: GM character starting level.
 #        Default:     1
@@ -2022,14 +1956,6 @@ GM.StartLevel = 80
 #                     1 - (Enabled)
 
 GM.AllowInvite = 0
-
-#
-#    GM.AllowFriend
-#        Description: Allow players to add GM characters to their friends list.
-#        Default:     0 - (Disabled)
-#                     1 - (Enabled)
-
-GM.AllowFriend = 0
 
 #
 #    GM.LowerSecurity

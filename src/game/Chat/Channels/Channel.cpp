@@ -187,8 +187,7 @@ void Channel::JoinChannel(Player* player, std::string const& pass)
 
     player->JoinedChannel(this);
 
-    if (_announce && (!AccountMgr::IsGMAccount(player->GetSession()->GetSecurity()) ||
-                       !sWorld->getBoolConfig(CONFIG_SILENTLY_GM_JOIN_TO_CHANNEL)))
+    if (_announce && !player->GetSession()->HasPermission(RBAC_PERM_SILENTLY_JOIN_CHANNEL))
     {
         WorldPacket data;
         MakeJoined(&data, guid);
@@ -260,8 +259,7 @@ void Channel::LeaveChannel(Player* player, bool send)
     bool changeowner = playersStore[guid].IsOwner();
 
     playersStore.erase(guid);
-    if (_announce && (!AccountMgr::IsGMAccount(player->GetSession()->GetSecurity()) ||
-                       !sWorld->getBoolConfig(CONFIG_SILENTLY_GM_JOIN_TO_CHANNEL)))
+    if (_announce && !player->GetSession()->HasPermission(RBAC_PERM_SILENTLY_JOIN_CHANNEL))
     {
         WorldPacket data;
         MakeLeft(&data, guid);
@@ -399,24 +397,19 @@ void Channel::KickOrBan(Player const* player, std::string const& badname, bool b
         }
     }
 
-    bool notify = !(AccountMgr::IsGMAccount(sec) && sWorld->getBoolConfig(CONFIG_SILENTLY_GM_JOIN_TO_CHANNEL));
-
-    if (ban)
+    if (ban && !IsBanned(victim))
     {
-        if (!IsBanned(victim))
-        {
-            bannedStore[GUID_LOPART(victim)] = time(NULL) + CHANNEL_BAN_DURATION;
-            AddChannelBanToDB(GUID_LOPART(victim), time(NULL) + CHANNEL_BAN_DURATION);
+        bannedStore[GUID_LOPART(victim)] = time(NULL) + CHANNEL_BAN_DURATION;
+        AddChannelBanToDB(GUID_LOPART(victim), time(NULL) + CHANNEL_BAN_DURATION);
 
-            if (notify)
-            {
-                WorldPacket data;
-                MakePlayerBanned(&data, victim, good);
-                SendToAll(&data);
-            }
+        if (!player->GetSession()->HasPermission(RBAC_PERM_SILENTLY_JOIN_CHANNEL))
+        {
+            WorldPacket data;
+            MakePlayerBanned(&data, victim, good);
+            SendToAll(&data);
         }
     }
-    else if (notify)
+    else if (!player->GetSession()->HasPermission(RBAC_PERM_SILENTLY_JOIN_CHANNEL))
     {
         WorldPacket data;
         MakePlayerKicked(&data, victim, good);
@@ -580,11 +573,12 @@ void Channel::SetMode(Player const* player, std::string const& p2n, bool mod, bo
     Player* newp = ObjectAccessor::FindPlayerByName(p2n, false);
     uint64 victim = newp ? newp->GetGUID() : 0;
 
+    // allow make moderator from another team only if both is GMs
+    // at this moment this only way to show channel post for GM from another team
     if (!victim || !IsOn(victim) ||
-        // allow make moderator from another team only if both is GMs
-        // at this moment this only way to show channel post for GM from another team
-        ((!AccountMgr::IsGMAccount(sec) || !AccountMgr::IsGMAccount(newp->GetSession()->GetSecurity())) && player->GetTeamId() != newp->GetTeamId() && 
-        !sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_CHANNEL)))
+        (player->GetTeamId() != newp->GetTeamId() && 
+            (!player->GetSession()->HasPermission(RBAC_PERM_TWO_SIDE_INTERACTION_CHANNEL) || 
+            !player->GetSession()->HasPermission(RBAC_PERM_TWO_SIDE_INTERACTION_CHANNEL))))
     {
         WorldPacket data;
         MakePlayerNotFound(&data, p2n);
@@ -649,8 +643,10 @@ void Channel::SetOwner(Player const* player, std::string const& newname)
     Player* newp = ObjectAccessor::FindPlayerByName(newname, false);
     uint64 victim = newp ? newp->GetGUID() : 0;
 
-    if (!victim || !IsOn(victim) || (newp->GetTeamId() != player->GetTeamId() &&
-        !sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_CHANNEL)))
+    if (!victim || !IsOn(victim) ||
+        (newp->GetTeamId() != player->GetTeamId() &&
+            (!player->GetSession()->HasPermission(RBAC_PERM_TWO_SIDE_INTERACTION_CHANNEL) ||
+                !newp->GetSession()->HasPermission(RBAC_PERM_TWO_SIDE_INTERACTION_CHANNEL))))
     {
         WorldPacket data;
         MakePlayerNotFound(&data, newname);
@@ -686,6 +682,7 @@ void Channel::List(Player const* player)
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_CHATSYS, "SMSG_CHANNEL_LIST %s Channel: %s", player->GetSession()->GetPlayerInfo().c_str(), GetName().c_str());
 #endif
+
     WorldPacket data(SMSG_CHANNEL_LIST, 1+(GetName().size()+1)+1+4+playersStore.size()*(8+1));
     data << uint8(1);                                   // channel type?
     data << GetName();                                  // channel name
@@ -694,15 +691,23 @@ void Channel::List(Player const* player)
     size_t pos = data.wpos();
     data << uint32(0);                                  // size of list, placeholder
 
+    uint32 gmLevelInWhoList = sWorld->getIntConfig(CONFIG_GM_LEVEL_IN_WHO_LIST);
     uint32 count  = 0;
-    if (!(_channelRights.flags & CHANNEL_RIGHT_CANT_SPEAK))
-        for (PlayerContainer::const_iterator i = playersStore.begin(); i != playersStore.end(); ++i)
-            if (AccountMgr::IsPlayerAccount(i->second.plrPtr->GetSession()->GetSecurity()))
-            {
-                data << uint64(i->first);
-                data << uint8(i->second.flags); // flags seems to be changed...
-                ++count;
-            }
+    for (PlayerContainer::const_iterator i = playersStore.begin(); i != playersStore.end(); ++i)
+    {
+        Player* member = ObjectAccessor::FindConnectedPlayer(i->first);
+
+        // PLAYER can't see MODERATOR, GAME MASTER, ADMINISTRATOR characters
+        // MODERATOR, GAME MASTER, ADMINISTRATOR can see all
+        if (member &&
+            (player->GetSession()->HasPermission(RBAC_PERM_WHO_SEE_ALL_SEC_LEVELS) || member->GetSession()->GetSecurity() <= AccountTypes(gmLevelInWhoList)) &&
+            member->IsVisibleGloballyFor(player))
+        {
+            data << uint64(i->first);
+            data << uint8(i->second.flags); // flags seems to be changed...
+            ++count;
+        }
+    }
 
     data.put<uint32>(pos, count);
 

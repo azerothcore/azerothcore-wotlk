@@ -28,21 +28,21 @@ public:
     {
         static std::vector<ChatCommand> goCommandTable =
         {
-            { "creature",       SEC_MODERATOR,      false, &HandleGoCreatureCommand,          "" },
-            { "graveyard",      SEC_MODERATOR,      false, &HandleGoGraveyardCommand,         "" },
-            { "grid",           SEC_MODERATOR,      false, &HandleGoGridCommand,              "" },
-            { "object",         SEC_MODERATOR,      false, &HandleGoObjectCommand,            "" },
-            { "taxinode",       SEC_MODERATOR,      false, &HandleGoTaxinodeCommand,          "" },
-            { "trigger",        SEC_MODERATOR,      false, &HandleGoTriggerCommand,           "" },
-            { "zonexy",         SEC_MODERATOR,      false, &HandleGoZoneXYCommand,            "" },
-            { "xyz",            SEC_MODERATOR,      false, &HandleGoXYZCommand,               "" },
-            { "ticket",         SEC_GAMEMASTER,     false, &HandleGoTicketCommand,            "" },
-            { "",               SEC_MODERATOR,      false, &HandleGoXYZCommand,               "" }
+            { "creature",   RBAC_PERM_COMMAND_GO_CREATURE,  false, &HandleGoCreatureCommand,          "" },
+            { "graveyard",  RBAC_PERM_COMMAND_GO_GRAVEYARD, false, &HandleGoGraveyardCommand,         "" },
+            { "grid",       RBAC_PERM_COMMAND_GO_GRID,      false, &HandleGoGridCommand,              "" },
+            { "object",     RBAC_PERM_COMMAND_GO_OBJECT,    false, &HandleGoObjectCommand,            "" },
+            { "taxinode",   RBAC_PERM_COMMAND_GO_TAXINODE,  false, &HandleGoTaxinodeCommand,          "" },
+            { "trigger",    RBAC_PERM_COMMAND_GO_TRIGGER,   false, &HandleGoTriggerCommand,           "" },
+            { "zonexy",     RBAC_PERM_COMMAND_GO_ZONEXY,    false, &HandleGoZoneXYCommand,            "" },
+            { "xyz",        RBAC_PERM_COMMAND_GO_XYZ,       false, &HandleGoXYZCommand,               "" },
+            { "ticket",     RBAC_PERM_COMMAND_GO_TICKET,    false, &HandleGoTicketCommand,            "" },
+            { "",           RBAC_PERM_COMMAND_GO,           false, &HandleGoXYZCommand,               "" }
         };
 
         static std::vector<ChatCommand> commandTable =
         {
-            { "go",             SEC_MODERATOR,      false, nullptr,                     "", goCommandTable }
+            { "go",         RBAC_PERM_COMMAND_GO, false, nullptr, "", goCommandTable }
         };
         return commandTable;
     }

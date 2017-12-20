@@ -26,14 +26,14 @@ public:
     {
         static std::vector<ChatCommand> questCommandTable =
         {
-            { "add",            SEC_GAMEMASTER,  false, &HandleQuestAdd,                    "" },
-            { "complete",       SEC_GAMEMASTER,  false, &HandleQuestComplete,               "" },
-            { "remove",         SEC_GAMEMASTER,  false, &HandleQuestRemove,                 "" },
-            { "reward",         SEC_GAMEMASTER,  false, &HandleQuestReward,                 "" },
+            { "add",            RBAC_PERM_COMMAND_QUEST_ADD,        false, &HandleQuestAdd,         "" },
+            { "complete",       RBAC_PERM_COMMAND_QUEST_COMPLETE,   false, &HandleQuestComplete,    "" },
+            { "remove",         RBAC_PERM_COMMAND_QUEST_REMOVE,     false, &HandleQuestRemove,      "" },
+            { "reward",         RBAC_PERM_COMMAND_QUEST_REWARD,     false, &HandleQuestReward,      "" },
         };
         static std::vector<ChatCommand> commandTable =
         {
-            { "quest",          SEC_GAMEMASTER,  false, nullptr, "", questCommandTable },
+            { "quest",          RBAC_PERM_COMMAND_QUEST,  false, nullptr, "", questCommandTable },
         };
         return commandTable;
     }

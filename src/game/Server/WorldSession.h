@@ -19,6 +19,7 @@
 #include "WorldPacket.h"
 #include "GossipDef.h"
 #include "Cryptography/BigNumber.h"
+#include "AccountMgr.h"
 
 class Creature;
 class GameObject;
@@ -30,6 +31,7 @@ class Object;
 class Pet;
 class Player;
 class Quest;
+class RBACData;
 class SpellCastTargets;
 class Unit;
 class Warden;
@@ -209,6 +211,11 @@ class WorldSession
 
         void SendAuthResponse(uint8 code, bool shortForm, uint32 queuePos = 0);
         void SendClientCacheVersion(uint32 version);
+
+        RBACData* GetRBACData();
+        bool HasPermission(uint32 permissionId);
+        void LoadPermissions();
+        void InvalidateRBACData(); // Used to force LoadPermissions at next HasPermission check
 
         AccountTypes GetSecurity() const { return _security; }
         bool CanSkipQueue() const { return _skipQueue; }
@@ -991,6 +998,7 @@ class WorldSession
         uint32 _offlineTime;
         bool _kicked;
         bool _shouldSetOfflineInDB;
+        RBACData* _RBACData;
 };
 #endif
 /// @}

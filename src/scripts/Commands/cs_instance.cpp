@@ -29,17 +29,17 @@ public:
     {
         static std::vector<ChatCommand> instanceCommandTable =
         {
-            { "listbinds",      SEC_MODERATOR,      false,  &HandleInstanceListBindsCommand,    "" },
-            { "unbind",         SEC_MODERATOR,      false,  &HandleInstanceUnbindCommand,       "" },
-            { "stats",          SEC_MODERATOR,      true,   &HandleInstanceStatsCommand,        "" },
-            { "savedata",       SEC_ADMINISTRATOR,  false,  &HandleInstanceSaveDataCommand,     "" },
-            { "setbossstate",   SEC_MODERATOR,      true,   &HandleInstanceSetBossStateCommand, "" },
-            { "getbossstate",   SEC_MODERATOR,      true,   &HandleInstanceGetBossStateCommand, "" }
+            { "listbinds",      RBAC_PERM_COMMAND_INSTANCE_LISTBINDS,   false,  &HandleInstanceListBindsCommand,    "" },
+            { "unbind",         RBAC_PERM_COMMAND_INSTANCE_UNBIND,      false,  &HandleInstanceUnbindCommand,       "" },
+            { "stats",          RBAC_PERM_COMMAND_INSTANCE_STATS,       true,   &HandleInstanceStatsCommand,        "" },
+            { "savedata",       RBAC_PERM_COMMAND_INSTANCE_SAVEDATA,    false,  &HandleInstanceSaveDataCommand,     "" },
+            { "setbossstate",   RBAC_PERM_COMMAND_INSTANCE_SAVEDATA,    true,   &HandleInstanceSetBossStateCommand, "" },
+            { "getbossstate",   RBAC_PERM_COMMAND_INSTANCE,             true,   &HandleInstanceGetBossStateCommand, "" }
         };
 
         static std::vector<ChatCommand> commandTable =
         {
-            { "instance",       SEC_MODERATOR,      true,   nullptr,                            "", instanceCommandTable }
+            { "instance",       RBAC_PERM_COMMAND_INSTANCE, true, nullptr, "", instanceCommandTable }
         };
 
         return commandTable;

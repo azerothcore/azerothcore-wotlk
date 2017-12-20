@@ -26,14 +26,14 @@ public:
     {
         static std::vector<ChatCommand> eventCommandTable =
         {
-            { "activelist",     SEC_GAMEMASTER,     true,  &HandleEventActiveListCommand,     "" },
-            { "start",          SEC_GAMEMASTER,     true,  &HandleEventStartCommand,          "" },
-            { "stop",           SEC_GAMEMASTER,     true,  &HandleEventStopCommand,           "" },
-            { "",               SEC_GAMEMASTER,     true,  &HandleEventInfoCommand,           "" }
+            { "activelist",     RBAC_PERM_COMMAND_EVENT_ACTIVELIST, true,  &HandleEventActiveListCommand,     "" },
+            { "start",          RBAC_PERM_COMMAND_EVENT_START,      true,  &HandleEventStartCommand,          "" },
+            { "stop",           RBAC_PERM_COMMAND_EVENT_STOP,       true,  &HandleEventStopCommand,           "" },
+            { "",               RBAC_PERM_COMMAND_EVENT,            true,  &HandleEventInfoCommand,           "" }
         };
         static std::vector<ChatCommand> commandTable =
         {
-            { "event",          SEC_GAMEMASTER,     false, nullptr,                  "", eventCommandTable }
+            { "event",          RBAC_PERM_COMMAND_EVENT, false, nullptr, "", eventCommandTable }
         };
         return commandTable;
     }

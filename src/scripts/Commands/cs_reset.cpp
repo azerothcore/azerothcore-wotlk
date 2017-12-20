@@ -28,17 +28,17 @@ public:
     {
         static std::vector<ChatCommand> resetCommandTable =
         {
-            { "achievements",   SEC_ADMINISTRATOR,  true,  &HandleResetAchievementsCommand,     "" },
-            { "honor",          SEC_ADMINISTRATOR,  true,  &HandleResetHonorCommand,            "" },
-            { "level",          SEC_ADMINISTRATOR,  true,  &HandleResetLevelCommand,            "" },
-            { "spells",         SEC_ADMINISTRATOR,  true,  &HandleResetSpellsCommand,           "" },
-            { "stats",          SEC_ADMINISTRATOR,  true,  &HandleResetStatsCommand,            "" },
-            { "talents",        SEC_ADMINISTRATOR,  true,  &HandleResetTalentsCommand,          "" },
-            { "all",            SEC_CONSOLE,        true,  &HandleResetAllCommand,              "" }
+            { "achievements",   RBAC_PERM_COMMAND_RESET_ACHIEVEMENTS,   true,  &HandleResetAchievementsCommand,     "" },
+            { "honor",          RBAC_PERM_COMMAND_RESET_HONOR,          true,  &HandleResetHonorCommand,            "" },
+            { "level",          RBAC_PERM_COMMAND_RESET_LEVEL,          true,  &HandleResetLevelCommand,            "" },
+            { "spells",         RBAC_PERM_COMMAND_RESET_SPELLS,         true,  &HandleResetSpellsCommand,           "" },
+            { "stats",          RBAC_PERM_COMMAND_RESET_STATS,          true,  &HandleResetStatsCommand,            "" },
+            { "talents",        RBAC_PERM_COMMAND_RESET_TALENTS,        true,  &HandleResetTalentsCommand,          "" },
+            { "all",            RBAC_PERM_COMMAND_RESET_ALL,            true,  &HandleResetAllCommand,              "" }
         };
         static std::vector<ChatCommand> commandTable =
         {
-            { "reset",          SEC_ADMINISTRATOR,  true, nullptr,                              "", resetCommandTable }
+            { "reset",          RBAC_PERM_COMMAND_RESET,  true, nullptr,                              "", resetCommandTable }
         };
         return commandTable;
     }

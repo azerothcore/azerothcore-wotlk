@@ -28,36 +28,36 @@ public:
     {
         static std::vector<ChatCommand> unbanCommandTable =
         {
-            { "account",        SEC_GAMEMASTER,  true,  &HandleUnBanAccountCommand,          "" },
-            { "character",      SEC_GAMEMASTER,  true,  &HandleUnBanCharacterCommand,        "" },
-            { "playeraccount",  SEC_GAMEMASTER,  true,  &HandleUnBanAccountByCharCommand,    "" },
-            { "ip",             SEC_GAMEMASTER,  true,  &HandleUnBanIPCommand,               "" }
+            { "account",        RBAC_PERM_COMMAND_UNBAN_ACCOUNT,        true,  &HandleUnBanAccountCommand,          "" },
+            { "character",      RBAC_PERM_COMMAND_UNBAN_CHARACTER,      true,  &HandleUnBanCharacterCommand,        "" },
+            { "playeraccount",  RBAC_PERM_COMMAND_UNBAN_PLAYERACCOUNT,  true,  &HandleUnBanAccountByCharCommand,    "" },
+            { "ip",             RBAC_PERM_COMMAND_UNBAN_IP,             true,  &HandleUnBanIPCommand,               "" }
         };
         static std::vector<ChatCommand> banlistCommandTable =
         {
-            { "account",        SEC_GAMEMASTER,  true,  &HandleBanListAccountCommand,        "" },
-            { "character",      SEC_GAMEMASTER,  true,  &HandleBanListCharacterCommand,      "" },
-            { "ip",             SEC_GAMEMASTER,  true,  &HandleBanListIPCommand,             "" }
+            { "account",        RBAC_PERM_COMMAND_BANLIST_ACCOUNT,      true,  &HandleBanListAccountCommand,        "" },
+            { "character",      RBAC_PERM_COMMAND_BANLIST_CHARACTER,    true,  &HandleBanListCharacterCommand,      "" },
+            { "ip",             RBAC_PERM_COMMAND_BANLIST_IP,           true,  &HandleBanListIPCommand,             "" }
         };
         static std::vector<ChatCommand> baninfoCommandTable =
         {
-            { "account",        SEC_GAMEMASTER,  true,  &HandleBanInfoAccountCommand,        "" },
-            { "character",      SEC_GAMEMASTER,  true,  &HandleBanInfoCharacterCommand,      "" },
-            { "ip",             SEC_GAMEMASTER,  true,  &HandleBanInfoIPCommand,             "" }
+            { "account",        RBAC_PERM_COMMAND_BANINFO_ACCOUNT,      true,  &HandleBanInfoAccountCommand,        "" },
+            { "character",      RBAC_PERM_COMMAND_BANINFO_CHARACTER,    true,  &HandleBanInfoCharacterCommand,      "" },
+            { "ip",             RBAC_PERM_COMMAND_BANINFO_IP,           true,  &HandleBanInfoIPCommand,             "" }
         };
         static std::vector<ChatCommand> banCommandTable =
         {
-            { "account",        SEC_GAMEMASTER,  true,  &HandleBanAccountCommand,            "" },
-            { "character",      SEC_GAMEMASTER,  true,  &HandleBanCharacterCommand,          "" },
-            { "playeraccount",  SEC_GAMEMASTER,  true,  &HandleBanAccountByCharCommand,      "" },
-            { "ip",             SEC_GAMEMASTER,  true,  &HandleBanIPCommand,                 "" }
+            { "account",        RBAC_PERM_COMMAND_BAN_ACCOUNT,          true,  &HandleBanAccountCommand,            "" },
+            { "character",      RBAC_PERM_COMMAND_BAN_CHARACTER,        true,  &HandleBanCharacterCommand,          "" },
+            { "playeraccount",  RBAC_PERM_COMMAND_BAN_PLAYERACCOUNT,    true,  &HandleBanAccountByCharCommand,      "" },
+            { "ip",             RBAC_PERM_COMMAND_BAN_IP,               true,  &HandleBanIPCommand,                 "" }
         };
         static std::vector<ChatCommand> commandTable =
         {
-            { "ban",            SEC_GAMEMASTER,  true,  nullptr,                             "", banCommandTable },
-            { "baninfo",        SEC_GAMEMASTER,  true,  nullptr,                             "", baninfoCommandTable },
-            { "banlist",        SEC_GAMEMASTER,  true,  nullptr,                             "", banlistCommandTable },
-            { "unban",          SEC_GAMEMASTER,  true,  nullptr,                             "", unbanCommandTable }
+            { "ban",            RBAC_PERM_COMMAND_BAN,      true,  nullptr, "", banCommandTable },
+            { "baninfo",        RBAC_PERM_COMMAND_BANINFO,  true,  nullptr, "", baninfoCommandTable },
+            { "banlist",        RBAC_PERM_COMMAND_BANLIST,  true,  nullptr, "", banlistCommandTable },
+            { "unban",          RBAC_PERM_COMMAND_UNBAN,    true,  nullptr, "", unbanCommandTable }
         };
         return commandTable;
     }

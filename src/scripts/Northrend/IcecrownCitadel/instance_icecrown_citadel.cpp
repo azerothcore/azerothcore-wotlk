@@ -1387,8 +1387,11 @@ class instance_icecrown_citadel : public InstanceMapScript
                 return false;
             }
 
-            bool CheckRequiredBosses(uint32 bossId, Player const*  /*player*/) const
+            bool CheckRequiredBosses(uint32 bossId, Player const*  player) const
             {
+                if (player && player->GetSession()->HasPermission(RBAC_PERM_SKIP_CHECK_INSTANCE_REQUIRED_BOSSES))
+                    return true;
+                
                 switch (bossId)
                 {
                     case DATA_THE_LICH_KING:

@@ -28,14 +28,14 @@ public:
     {
         static std::vector<ChatCommand> listCommandTable =
         {
-            { "creature",       SEC_MODERATOR,  true,  &HandleListCreatureCommand,          "" },
-            { "item",           SEC_MODERATOR,  true,  &HandleListItemCommand,              "" },
-            { "object",         SEC_MODERATOR,  true,  &HandleListObjectCommand,            "" },
-            { "auras",          SEC_MODERATOR,  false, &HandleListAurasCommand,             "" }
+            { "creature",   RBAC_PERM_COMMAND_LIST_CREATURE,    true,  &HandleListCreatureCommand,  "" },
+            { "item",       RBAC_PERM_COMMAND_LIST_ITEM,        true,  &HandleListItemCommand,      "" },
+            { "object",     RBAC_PERM_COMMAND_LIST_OBJECT,      true,  &HandleListObjectCommand,    "" },
+            { "auras",      RBAC_PERM_COMMAND_LIST_AURAS,       false, &HandleListAurasCommand,     "" }
         };
         static std::vector<ChatCommand> commandTable =
         {
-            { "list",          SEC_MODERATOR,   true, nullptr,                                 "", listCommandTable }
+            { "list",       RBAC_PERM_COMMAND_LIST, true, nullptr, "", listCommandTable }
         };
         return commandTable;
     }

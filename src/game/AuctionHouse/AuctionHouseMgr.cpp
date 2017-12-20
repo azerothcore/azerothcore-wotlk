@@ -85,16 +85,41 @@ void AuctionHouseMgr::SendAuctionWonMail(AuctionEntry* auction, SQLTransaction& 
     if (!pItem)
         return;
 
-    uint64 bidder_guid = MAKE_NEW_GUID(auction->bidder, 0, HIGHGUID_PLAYER);
-    uint32 bidder_accId = 0;
-    Player* bidder = ObjectAccessor::FindPlayerInOrOutOfWorld(bidder_guid);
+    uint32 bidderAccId = 0;
+    uint64 bidderGuid = MAKE_NEW_GUID(auction->bidder, 0, HIGHGUID_PLAYER);
+    Player* bidder = ObjectAccessor::FindPlayerInOrOutOfWorld(bidderGuid);
+    std::string bidderName;
+    bool logGmTrade = false;
+
     if (bidder)
-        bidder_accId = bidder->GetSession()->GetAccountId();
+    {
+        bidderAccId = bidder->GetSession()->GetAccountId();
+        bidderName = bidder->GetName();
+        logGmTrade = bidder->GetSession()->HasPermission(RBAC_PERM_LOG_GM_TRADE);
+    }
     else
-        bidder_accId = sObjectMgr->GetPlayerAccountIdByGUID(bidder_guid);
+    {
+        bidderAccId = sObjectMgr->GetPlayerAccountIdByGUID(bidderGuid);
+        logGmTrade = AccountMgr::HasPermission(bidderAccId, RBAC_PERM_LOG_GM_TRADE, realmID);
+
+        if (logGmTrade && !sObjectMgr->GetPlayerNameByGUID(bidderGuid, bidderName))
+            bidderName = sObjectMgr->GetTrinityStringForDBCLocale(LANG_UNKNOWN);
+    }
+
+    if (logGmTrade)
+    {
+        std::string ownerName;
+        if (!sObjectMgr->GetPlayerNameByGUID(auction->owner, ownerName))
+            ownerName = sObjectMgr->GetTrinityStringForDBCLocale(LANG_UNKNOWN);
+
+        uint32 ownerAccId = sObjectMgr->GetPlayerAccountIdByGUID(auction->owner);
+
+        sLog->outCommand(bidderAccId, "GM %s (Account: %u) won item in auction: %s (Entry: %u Count: %u) and pay money: %u. Original owner %s (Account: %u)",
+            bidderName.c_str(), bidderAccId, pItem->GetTemplate()->Name1.c_str(), pItem->GetEntry(), pItem->GetCount(), auction->bid, ownerName.c_str(), ownerAccId);
+    }
 
     // receiver exist
-    if (bidder || bidder_accId)
+    if (bidder || bidderAccId)
     {
         // set owner to bidder (to prevent delete item with sender char deleting)
         // owner in `data` will set at mail receive and item extracting
@@ -105,7 +130,7 @@ void AuctionHouseMgr::SendAuctionWonMail(AuctionEntry* auction, SQLTransaction& 
 
         if (bidder)
         {
-            bidder->GetSession()->SendAuctionBidderNotification(auction->GetHouseId(), auction->Id, bidder_guid, 0, 0, auction->item_template);
+            bidder->GetSession()->SendAuctionBidderNotification(auction->GetHouseId(), auction->Id, bidderGuid, 0, 0, auction->item_template);
             // FIXME: for offline player need also
             bidder->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_WON_AUCTIONS, 1);
         }
@@ -120,11 +145,11 @@ void AuctionHouseMgr::SendAuctionWonMail(AuctionEntry* auction, SQLTransaction& 
 
 void AuctionHouseMgr::SendAuctionSalePendingMail(AuctionEntry* auction, SQLTransaction& trans)
 {
-    uint64 owner_guid = MAKE_NEW_GUID(auction->owner, 0, HIGHGUID_PLAYER);
-    Player* owner = ObjectAccessor::FindPlayerInOrOutOfWorld(owner_guid);
-    uint32 owner_accId = sObjectMgr->GetPlayerAccountIdByGUID(owner_guid);
+    uint64 ownerGuid = MAKE_NEW_GUID(auction->owner, 0, HIGHGUID_PLAYER);
+    Player* owner = ObjectAccessor::FindPlayerInOrOutOfWorld(ownerGuid);
+    uint32 ownerAccId = sObjectMgr->GetPlayerAccountIdByGUID(ownerGuid);
     // owner exist (online or offline)
-    if (owner || owner_accId)
+    if (owner || ownerAccId)
         MailDraft(auction->BuildAuctionMailSubject(AUCTION_SALE_PENDING), AuctionEntry::BuildAuctionMailBody(auction->bidder, auction->bid, auction->buyout, auction->deposit, auction->GetAuctionCut()))
             .SendMailTo(trans, MailReceiver(owner, auction->owner), auction, MAIL_CHECK_MASK_COPIED);
 }
@@ -132,11 +157,11 @@ void AuctionHouseMgr::SendAuctionSalePendingMail(AuctionEntry* auction, SQLTrans
 //call this method to send mail to auction owner, when auction is successful, it does not clear ram
 void AuctionHouseMgr::SendAuctionSuccessfulMail(AuctionEntry* auction, SQLTransaction& trans)
 {
-    uint64 owner_guid = MAKE_NEW_GUID(auction->owner, 0, HIGHGUID_PLAYER);
-    Player* owner = ObjectAccessor::FindPlayerInOrOutOfWorld(owner_guid);
-    uint32 owner_accId = sObjectMgr->GetPlayerAccountIdByGUID(owner_guid);
+    uint64 ownerGuid = MAKE_NEW_GUID(auction->owner, 0, HIGHGUID_PLAYER);
+    Player* owner = ObjectAccessor::FindPlayerInOrOutOfWorld(ownerGuid);
+    uint32 ownerAccId = sObjectMgr->GetPlayerAccountIdByGUID(ownerGuid);
     // owner exist
-    if (owner || owner_accId)
+    if (owner || ownerAccId)
     {
         uint32 profit = auction->bid + auction->deposit - auction->GetAuctionCut();
 
@@ -154,16 +179,16 @@ void AuctionHouseMgr::SendAuctionSuccessfulMail(AuctionEntry* auction, SQLTransa
         if (auction->bid >= 500*GOLD)
             if (const GlobalPlayerData* gpd = sWorld->GetGlobalPlayerData(auction->bidder))
             {
-                uint64 bidder_guid = MAKE_NEW_GUID(auction->bidder, 0, HIGHGUID_PLAYER);
-                Player* bidder = ObjectAccessor::FindPlayerInOrOutOfWorld(bidder_guid);
-                std::string owner_name = "";
-                uint8 owner_level = 0;
+                uint64 bidderGuid = MAKE_NEW_GUID(auction->bidder, 0, HIGHGUID_PLAYER);
+                Player* bidder = ObjectAccessor::FindPlayerInOrOutOfWorld(bidderGuid);
+                std::string ownerName = "";
+                uint8 ownerLevel = 0;
                 if (const GlobalPlayerData* gpd_owner = sWorld->GetGlobalPlayerData(auction->owner))
                 {
-                    owner_name = gpd_owner->name;
-                    owner_level = gpd_owner->level;
+                    ownerName = gpd_owner->name;
+                    ownerLevel = gpd_owner->level;
                 }
-                CharacterDatabase.PExecute("INSERT INTO log_money VALUES(%u, %u, \"%s\", \"%s\", %u, \"%s\", %u, \"<AH> profit: %ug, bidder: %s %u lvl (guid: %u), seller: %s %u lvl (guid: %u), item %u (%u)\", NOW())", gpd->accountId, auction->bidder, gpd->name.c_str(), bidder ? bidder->GetSession()->GetRemoteAddress().c_str() : "", owner_accId, owner_name.c_str(), auction->bid, (profit/GOLD), gpd->name.c_str(), gpd->level, auction->bidder, owner_name.c_str(), owner_level, auction->owner, auction->item_template, auction->itemCount);
+                CharacterDatabase.PExecute("INSERT INTO log_money VALUES(%u, %u, \"%s\", \"%s\", %u, \"%s\", %u, \"<AH> profit: %ug, bidder: %s %u lvl (guid: %u), seller: %s %u lvl (guid: %u), item %u (%u)\", NOW())", gpd->accountId, auction->bidder, gpd->name.c_str(), bidder ? bidder->GetSession()->GetRemoteAddress().c_str() : "", ownerAccId, ownerName.c_str(), auction->bid, (profit/GOLD), gpd->name.c_str(), gpd->level, auction->bidder, ownerName.c_str(), ownerLevel, auction->owner, auction->item_template, auction->itemCount);
             }
     }
 }
@@ -176,12 +201,12 @@ void AuctionHouseMgr::SendAuctionExpiredMail(AuctionEntry* auction, SQLTransacti
     if (!pItem)
         return;
 
-    uint64 owner_guid = MAKE_NEW_GUID(auction->owner, 0, HIGHGUID_PLAYER);
-    Player* owner = ObjectAccessor::FindPlayerInOrOutOfWorld(owner_guid);
-    uint32 owner_accId = sObjectMgr->GetPlayerAccountIdByGUID(owner_guid);
+    uint64 ownerGuid = MAKE_NEW_GUID(auction->owner, 0, HIGHGUID_PLAYER);
+    Player* owner = ObjectAccessor::FindPlayerInOrOutOfWorld(ownerGuid);
+    uint32 ownerAccId = sObjectMgr->GetPlayerAccountIdByGUID(ownerGuid);
 
     // owner exist
-    if (owner || owner_accId)
+    if (owner || ownerAccId)
     {
         if (owner)
             owner->GetSession()->SendAuctionOwnerNotification(auction);
@@ -197,15 +222,15 @@ void AuctionHouseMgr::SendAuctionExpiredMail(AuctionEntry* auction, SQLTransacti
 //this function sends mail to old bidder
 void AuctionHouseMgr::SendAuctionOutbiddedMail(AuctionEntry* auction, uint32 newPrice, Player* newBidder, SQLTransaction& trans)
 {
-    uint64 oldBidder_guid = MAKE_NEW_GUID(auction->bidder, 0, HIGHGUID_PLAYER);
-    Player* oldBidder = ObjectAccessor::FindPlayerInOrOutOfWorld(oldBidder_guid);
+    uint64 oldBidderGuid = MAKE_NEW_GUID(auction->bidder, 0, HIGHGUID_PLAYER);
+    Player* oldBidder = ObjectAccessor::FindPlayerInOrOutOfWorld(oldBidderGuid);
 
-    uint32 oldBidder_accId = 0;
+    uint32 oldBidderAccId = 0;
     if (!oldBidder)
-        oldBidder_accId = sObjectMgr->GetPlayerAccountIdByGUID(oldBidder_guid);
+        oldBidderAccId = sObjectMgr->GetPlayerAccountIdByGUID(oldBidderGuid);
 
     // old bidder exist
-    if (oldBidder || oldBidder_accId)
+    if (oldBidder || oldBidderAccId)
     {
         if (oldBidder && newBidder)
             oldBidder->GetSession()->SendAuctionBidderNotification(auction->GetHouseId(), auction->Id, newBidder->GetGUID(), newPrice, auction->GetAuctionOutBid(), auction->item_template);
@@ -219,15 +244,15 @@ void AuctionHouseMgr::SendAuctionOutbiddedMail(AuctionEntry* auction, uint32 new
 //this function sends mail, when auction is cancelled to old bidder
 void AuctionHouseMgr::SendAuctionCancelledToBidderMail(AuctionEntry* auction, SQLTransaction& trans)
 {
-    uint64 bidder_guid = MAKE_NEW_GUID(auction->bidder, 0, HIGHGUID_PLAYER);
-    Player* bidder = ObjectAccessor::FindPlayerInOrOutOfWorld(bidder_guid);
+    uint64 bidderGuid = MAKE_NEW_GUID(auction->bidder, 0, HIGHGUID_PLAYER);
+    Player* bidder = ObjectAccessor::FindPlayerInOrOutOfWorld(bidderGuid);
 
-    uint32 bidder_accId = 0;
+    uint32 bidderAccId = 0;
     if (!bidder)
-        bidder_accId = sObjectMgr->GetPlayerAccountIdByGUID(bidder_guid);
+        bidderAccId = sObjectMgr->GetPlayerAccountIdByGUID(bidderGuid);
 
     // bidder exist
-    if (bidder || bidder_accId)
+    if (bidder || bidderAccId)
         MailDraft(auction->BuildAuctionMailSubject(AUCTION_CANCELLED_TO_BIDDER), AuctionEntry::BuildAuctionMailBody(auction->owner, auction->bid, auction->buyout, auction->deposit, 0))
             .AddMoney(auction->bid)
             .SendMailTo(trans, MailReceiver(bidder, auction->bidder), auction, MAIL_CHECK_MASK_COPIED);

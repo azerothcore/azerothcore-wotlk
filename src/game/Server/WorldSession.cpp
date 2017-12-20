@@ -10,7 +10,9 @@
 
 #include "WorldSocket.h"                                    // must be first to make ACE happy with ACE includes in it
 #include "Common.h"
+#include "Config.h"
 #include "DatabaseEnv.h"
+#include "AccountMgr.h"
 #include "Log.h"
 #include "Opcodes.h"
 #include "WorldPacket.h"
@@ -84,11 +86,32 @@ bool WorldSessionFilter::Process(WorldPacket* packet)
 
 /// WorldSession constructor
 WorldSession::WorldSession(uint32 id, WorldSocket* sock, AccountTypes sec, uint8 expansion, time_t mute_time, LocaleConstant locale, uint32 recruiter, bool isARecruiter, bool skipQueue):
-m_muteTime(mute_time), m_timeOutTime(0), _lastAuctionListItemsMSTime(0), _lastAuctionListOwnerItemsMSTime(0), m_GUIDLow(0), _player(NULL), m_Socket(sock),
-_security(sec), _skipQueue(skipQueue), _accountId(id), m_expansion(expansion), _logoutTime(0),
-m_inQueue(false), m_playerLoading(false), m_playerLogout(false), m_playerSave(false),
-m_sessionDbcLocale(sWorld->GetDefaultDbcLocale()), m_sessionDbLocaleIndex(locale),
-m_latency(0), m_clientTimeDelay(0), m_TutorialsChanged(false), recruiterId(recruiter), isRecruiter(isARecruiter), m_currentBankerGUID(0), timeWhoCommandAllowed(0)
+    m_muteTime(mute_time),
+    m_timeOutTime(0),
+    _lastAuctionListItemsMSTime(0),
+    _lastAuctionListOwnerItemsMSTime(0),
+    m_GUIDLow(0),
+    _player(NULL),
+    m_Socket(sock),
+    _security(sec),
+    _skipQueue(skipQueue),
+    _accountId(id),
+    m_expansion(expansion),
+    _logoutTime(0),
+    m_inQueue(false),
+    m_playerLoading(false),
+    m_playerLogout(false),
+    m_playerSave(false),
+    m_sessionDbcLocale(sWorld->GetDefaultDbcLocale()),
+    m_sessionDbLocaleIndex(locale),
+    m_latency(0),
+    m_clientTimeDelay(0),
+    m_TutorialsChanged(false),
+    recruiterId(recruiter),
+    isRecruiter(isARecruiter),
+    m_currentBankerGUID(0),
+    timeWhoCommandAllowed(0),
+    _RBACData(NULL)
 {
     memset(m_Tutorials, 0, sizeof(m_Tutorials));
 
@@ -128,6 +151,9 @@ WorldSession::~WorldSession()
         delete _warden;
         _warden = NULL;
     }
+
+    if (_RBACData)
+        delete _RBACData;
 
     ///- empty incoming packet queue
     WorldPacket* packet = NULL;
@@ -1285,4 +1311,39 @@ void WorldSession::InitWarden(BigNumber* k, std::string const& os)
         // _warden = new WardenMac();
         // _warden->Init(this, k);
     }
+}
+
+void WorldSession::LoadPermissions()
+{
+    uint32 id = GetAccountId();
+    std::string name;
+    AccountMgr::GetName(id, name);
+
+    _RBACData = new RBACData(id, name, realmID);
+    _RBACData->LoadFromDB();
+
+    //TC_LOG_DEBUG(LOG_FILTER_RBAC, "WorldSession::LoadPermissions [AccountId: %u, Name: %s, realmId: %d]", id, name.c_str(), realmID);
+}
+
+RBACData* WorldSession::GetRBACData()
+{
+    return _RBACData;
+}
+
+bool WorldSession::HasPermission(uint32 permission)
+{
+    if (!_RBACData)
+        LoadPermissions();
+
+    bool hasPermission = _RBACData->HasPermission(permission);
+    //TC_LOG_DEBUG(LOG_FILTER_RBAC, "WorldSession::HasPermission [AccountId: %u, Name: %s, realmId: %d]", _RBACData->GetId(), _RBACData->GetName().c_str(), realmID);
+
+    return hasPermission;
+}
+
+void WorldSession::InvalidateRBACData()
+{
+    //TC_LOG_DEBUG(LOG_FILTER_RBAC, "WorldSession::InvalidateRBACData [AccountId: %u, Name: %s, realmId: %d]", _RBACData->GetId(), _RBACData->GetName().c_str(), realmID);
+    delete _RBACData;
+    _RBACData = NULL;
 }

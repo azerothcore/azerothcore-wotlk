@@ -26,29 +26,29 @@ public:
     {
         static std::vector<ChatCommand> accountSetCommandTable =
         {
-            { "addon", SEC_GAMEMASTER, true, &HandleAccountSetAddonCommand, "" },
-            { "gmlevel", SEC_CONSOLE, true, &HandleAccountSetGmLevelCommand, "" },
-            { "password", SEC_CONSOLE, true, &HandleAccountSetPasswordCommand, "" }
+            { "addon",      RBAC_PERM_COMMAND_ACCOUNT_SET_ADDON,    true,   &HandleAccountSetAddonCommand,      "" },
+            { "gmlevel",    RBAC_PERM_COMMAND_ACCOUNT_SET_GMLEVEL,  true,   &HandleAccountSetGmLevelCommand,    "" },
+            { "password",   RBAC_PERM_COMMAND_ACCOUNT_SET_PASSWORD, true,   &HandleAccountSetPasswordCommand,   "" }
         };
         static std::vector<ChatCommand> accountLockCommandTable
         {
-            { "country", SEC_PLAYER, true, &HandleAccountLockCountryCommand, "" },
-            { "ip", SEC_PLAYER, true, &HandleAccountLockIpCommand, "" }
+            { "country",    RBAC_PERM_COMMAND_ACCOUNT_LOCK,         true,   &HandleAccountLockCountryCommand,   "" },
+            { "ip",         RBAC_PERM_COMMAND_ACCOUNT_LOCK,         true,   &HandleAccountLockIpCommand,        "" }
         };
         static std::vector<ChatCommand> accountCommandTable =
         {
-            { "addon", SEC_MODERATOR, false, &HandleAccountAddonCommand, "" },
-            { "create", SEC_CONSOLE, true, &HandleAccountCreateCommand, "" },
-            { "delete", SEC_CONSOLE, true, &HandleAccountDeleteCommand, "" },
-            { "onlinelist", SEC_CONSOLE, true, &HandleAccountOnlineListCommand, "" },
-            { "lock", SEC_PLAYER, false, nullptr, "", accountLockCommandTable },
-            { "set", SEC_ADMINISTRATOR, true, nullptr, "", accountSetCommandTable },
-            { "password", SEC_PLAYER, false, &HandleAccountPasswordCommand, "" },
-            { "", SEC_PLAYER, false, &HandleAccountCommand, "" }
+            { "addon",      RBAC_PERM_COMMAND_ACCOUNT_ADDON,        false,  &HandleAccountAddonCommand,         "" },
+            { "create",     RBAC_PERM_COMMAND_ACCOUNT_CREATE,       true,   &HandleAccountCreateCommand,        "" },
+            { "delete",     RBAC_PERM_COMMAND_ACCOUNT_DELETE,       true,   &HandleAccountDeleteCommand,        "" },
+            { "onlinelist", RBAC_PERM_COMMAND_ACCOUNT_ONLINE_LIST,  true,   &HandleAccountOnlineListCommand,    "" },
+            { "lock",       RBAC_PERM_COMMAND_ACCOUNT_LOCK,         false,  nullptr,                            "", accountLockCommandTable   },
+            { "set",        RBAC_PERM_COMMAND_ACCOUNT_SET,          true,   nullptr,                            "", accountSetCommandTable    },
+            { "password",   RBAC_PERM_COMMAND_ACCOUNT_PASSWORD,     false,  &HandleAccountPasswordCommand,      "" },
+            { "",           RBAC_PERM_COMMAND_ACCOUNT,              false,  &HandleAccountCommand,              "" }
         };
         static std::vector<ChatCommand> commandTable =
         {
-            { "account", SEC_PLAYER, true, nullptr, "", accountCommandTable }
+            { "account",    RBAC_PERM_COMMAND_ACCOUNT, true, nullptr, "", accountCommandTable }
         };
         return commandTable;
     }
@@ -97,7 +97,7 @@ public:
         if (!accountName || !password)
             return false;
 
-        AccountOpResult result = AccountMgr::CreateAccount(std::string(accountName), std::string(password));
+        AccountOpResult result = sAccountMgr->CreateAccount(std::string(accountName), std::string(password));
         switch (result)
         {
         case AOR_OK:
@@ -499,13 +499,13 @@ public:
         int32 gmRealmID = (isAccountNameGiven) ? atoi(arg3) : atoi(arg2);
         uint32 playerSecurity;
         if (handler->GetSession())
-            playerSecurity = AccountMgr::GetSecurity(handler->GetSession()->GetAccountId(), gmRealmID);
+            playerSecurity = sAccountMgr->GetSecurity(handler->GetSession()->GetAccountId(), gmRealmID);
         else
             playerSecurity = SEC_CONSOLE;
 
         // can set security level only for target with less security and to less security that we have
         // This is also reject self apply in fact
-        targetSecurity = AccountMgr::GetSecurity(targetAccountId, gmRealmID);
+        targetSecurity = sAccountMgr->GetSecurity(targetAccountId, gmRealmID);
         if (targetSecurity >= playerSecurity || gm >= playerSecurity)
         {
             handler->SendSysMessage(LANG_YOURS_SECURITY_IS_LOW);
@@ -531,44 +531,8 @@ public:
             }
         }
 
-        // Check if provided realmID has a negative value other than -1
-        if (gmRealmID < -1)
-        {
-            handler->SendSysMessage(LANG_INVALID_REALMID);
-            handler->SetSentErrorMessage(true);
-            return false;
-        }
-
-        // If gmRealmID is -1, delete all values for the account id, else, insert values for the specific realmID
-        PreparedStatement* stmt;
-
-        if (gmRealmID == -1)
-        {
-            stmt = LoginDatabase.GetPreparedStatement(LOGIN_DEL_ACCOUNT_ACCESS);
-
-            stmt->setUInt32(0, targetAccountId);
-        }
-        else
-        {
-            stmt = LoginDatabase.GetPreparedStatement(LOGIN_DEL_ACCOUNT_ACCESS_BY_REALM);
-
-            stmt->setUInt32(0, targetAccountId);
-            stmt->setUInt32(1, realmID);
-        }
-
-        LoginDatabase.Execute(stmt);
-
-        if (gm != 0)
-        {
-            stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_ACCOUNT_ACCESS);
-
-            stmt->setUInt32(0, targetAccountId);
-            stmt->setUInt8(1, uint8(gm));
-            stmt->setInt32(2, gmRealmID);
-
-            LoginDatabase.Execute(stmt);
-        }
-
+        RBACData* rbac = isAccountNameGiven ? NULL : handler->getSelectedPlayer()->GetSession()->GetRBACData();
+        sAccountMgr->UpdateAccountAccess(rbac, targetAccountId, uint8(gm), gmRealmID);
 
         handler->PSendSysMessage(LANG_YOU_CHANGE_SECURITY, targetAccountName.c_str(), gm);
         return true;
