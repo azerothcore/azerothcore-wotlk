@@ -20,8 +20,11 @@ using namespace std;
 
 RandomPlayerbotMgr::RandomPlayerbotMgr() : PlayerbotHolder(), processTicks(0)
 {
-    sPlayerbotCommandServer.Start();
-	PrepareTeleportCache();
+    if (sPlayerbotAIConfig.enabled || sPlayerbotAIConfig.randomBotAutologin || !sPlayerbotAIConfig.ClassicBotMode)
+    {
+        sPlayerbotCommandServer.Start();
+        PrepareTeleportCache();
+    }
 }
 
 RandomPlayerbotMgr::~RandomPlayerbotMgr()
