@@ -175,7 +175,7 @@ class instance_steam_vault : public InstanceMapScript
                 OUT_SAVE_INST_DATA;
 
                 std::ostringstream stream;
-                stream << "S V " << m_auiEncounter[0] << ' ' << m_auiEncounter[1] << ' ' << m_auiEncounter[2] << ' ' << m_auiEncounter[3];
+                stream << "S V " << m_auiEncounter[0] << ' ' << m_auiEncounter[1] << ' ' << m_auiEncounter[2];
 
                 OUT_SAVE_INST_DATA_COMPLETE;
                 return stream.str();
