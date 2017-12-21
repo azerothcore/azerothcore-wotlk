@@ -2,13 +2,13 @@
 SRCPATH="$AC_PATH_ROOT"
 
 # absolute path where build files must be stored
-BUILDPATH="$AC_PATH_ROOT/build/obj"
+BUILDPATH="$AC_PATH_ROOT/var/build/obj"
 
 # absolute path where binary files must be stored
-BINPATH="$AC_PATH_ROOT/build/dist"
+BINPATH="$AC_PATH_ROOT/env/dist"
 
 # absolute path where config. files must be stored
-CONFDIR="$AC_PATH_ROOT/build/dist/etc/"
+CONFDIR="$AC_PATH_ROOT/env/dist/etc/"
 
 ##############################################
 #
@@ -71,7 +71,7 @@ DATABASES=(
 	"WORLD"
 )
 
-OUTPUT_FOLDER="$AC_PATH_ROOT/bin/db_assembler/output/"
+OUTPUT_FOLDER="$AC_PATH_ROOT/env/dist/sql/"
 
 #
 # Enable following flag 
@@ -80,7 +80,7 @@ OUTPUT_FOLDER="$AC_PATH_ROOT/bin/db_assembler/output/"
 #
 BACKUP_ENABLE=true
 
-BACKUP_FOLDER="$AC_PATH_ROOT/bin/db_assembler/backup/"
+BACKUP_FOLDER="$AC_PATH_ROOT/env/dist/sql/backup/"
 
 # FULL DB
 DB_CHARACTERS_PATHS=(

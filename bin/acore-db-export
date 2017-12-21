@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+bash ../apps/db_exporter/db_exporter.sh
