@@ -218,10 +218,6 @@ add_library(game STATIC
   ${game_STAT_PCH_SRC}
 )
 
-target_link_libraries(game
-  gamefw
-)
-
 add_dependencies(game revision.h)
 
 # Generate precompiled header
