@@ -12,7 +12,6 @@ if( USE_COREPCH )
   include_directories(${CMAKE_CURRENT_BINARY_DIR})
 endif()
 
-file(GLOB_RECURSE sources_Collision Collision/*.cpp Collision/*.h)
 file(GLOB_RECURSE sources_Configuration Configuration/*.cpp Configuration/*.h)
 file(GLOB_RECURSE sources_Cryptography Cryptography/*.cpp Cryptography/*.h)
 file(GLOB_RECURSE sources_Database Database/*.cpp Database/*.h)
@@ -41,7 +40,6 @@ endif()
 
 set(shared_STAT_SRCS
   ${shared_STAT_SRCS}
-  ${sources_Collision}
   ${sources_Configuration}
   ${sources_Cryptography}
   ${sources_Database}
@@ -64,7 +62,6 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/deps/utf8cpp
   ${CMAKE_SOURCE_DIR}/src
   ${CMAKE_CURRENT_SOURCE_DIR}
-  ${CMAKE_CURRENT_SOURCE_DIR}/Collision
   ${CMAKE_CURRENT_SOURCE_DIR}/Configuration
   ${CMAKE_CURRENT_SOURCE_DIR}/Cryptography
   ${CMAKE_CURRENT_SOURCE_DIR}/Database
@@ -94,3 +91,5 @@ target_link_libraries(shared
 if (USE_COREPCH)
   add_cxx_pch(shared ${shared_STAT_PCH_HDR} ${shared_STAT_PCH_SRC})
 endif ()
+
+add_subdirectory(Collision)
