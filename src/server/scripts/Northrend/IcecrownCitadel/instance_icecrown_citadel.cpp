@@ -1548,7 +1548,8 @@ class instance_icecrown_citadel : public InstanceMapScript
                 std::ostringstream saveStream;
                 saveStream << "I C " << GetBossSaveData() << HeroicAttempts << ' '
                     << ColdflameJetsState << ' ' << BloodQuickeningState << ' ' << BloodQuickeningMinutes << ' ' << WeeklyQuestId10 << ' ' << PutricideEventProgress << ' ' 
-                    << uint32(LichKingHeroicAvailable ? 1 : 0) << ' ' << BloodPrinceTrashCount;
+                    << uint32(LichKingHeroicAvailable ? 1 : 0) << ' ' << BloodPrinceTrashCount << ' ' << uint32(IsBuffAvailable ? 1 : 0);
+
 
                 OUT_SAVE_INST_DATA_COMPLETE;
                 return saveStream.str();
@@ -1600,6 +1601,8 @@ class instance_icecrown_citadel : public InstanceMapScript
                     loadStream >> temp;
                     LichKingHeroicAvailable = temp ? true : false;
                     loadStream >> BloodPrinceTrashCount;
+                    loadStream >> temp;
+                    SetData(DATA_BUFF_AVAILABLE, temp ? true : false);
                 }
                 else
                     OUT_LOAD_INST_DATA_FAIL;

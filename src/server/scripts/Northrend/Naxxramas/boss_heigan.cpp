@@ -48,9 +48,9 @@ public:
         return new boss_heiganAI (pCreature);
     }
 
-    struct boss_heiganAI : public ScriptedAI
+    struct boss_heiganAI : public BossAI
     {
-        boss_heiganAI(Creature *c) : ScriptedAI(c)
+        boss_heiganAI(Creature *c) : BossAI(c, BOSS_HEIGAN)
         {
             pInstance = me->GetInstanceScript();
         }
@@ -63,6 +63,7 @@ public:
 
         void Reset()
         {
+            BossAI::Reset();
             events.Reset();
             currentPhase = 0;
             currentSection = 3;
@@ -70,7 +71,6 @@ public:
 
             if (pInstance)
             {
-                pInstance->SetData(EVENT_HEIGAN, NOT_STARTED);
                 if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_HEIGAN_ENTER_GATE)))
                     go->SetGoState(GO_STATE_ACTIVE);
             }
@@ -88,20 +88,19 @@ public:
                 pInstance->SetData(DATA_IMMORTAL_FAIL, 0);
         }
 
-        void JustDied(Unit*  /*Killer*/)
+        void JustDied(Unit*  killer)
         {
+            BossAI::JustDied(killer);
             Talk(SAY_DEATH);
-            if (pInstance)
-                pInstance->SetData(EVENT_HEIGAN, DONE);
         }
 
-        void EnterCombat(Unit * /*who*/)
+        void EnterCombat(Unit * who)
         {
+            BossAI::EnterCombat(who);
             me->SetInCombatWithZone();
             Talk(SAY_AGGRO);
             if (pInstance)
             {
-                pInstance->SetData(EVENT_HEIGAN, IN_PROGRESS);
                 if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_HEIGAN_ENTER_GATE)))
                     go->SetGoState(GO_STATE_READY);
             }

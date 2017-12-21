@@ -80,6 +80,8 @@ class boss_majordomo : public CreatureScript
                 events.ScheduleEvent(EVENT_DAMAGE_REFLECTION, 15000);
                 events.ScheduleEvent(EVENT_BLAST_WAVE, 10000);
                 events.ScheduleEvent(EVENT_TELEPORT, 20000);
+                // Call every flamewaker around him
+                me->CallForHelp(30);
             }
 
             void UpdateAI(uint32 diff)

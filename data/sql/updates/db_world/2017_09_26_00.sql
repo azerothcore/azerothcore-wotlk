@@ -28,8 +28,7 @@ UPDATE `creature_template` SET `AIName`='', `ScriptName`='boss_high_inquisitor_w
 -- END UPDATING QUERIES
 --
 COMMIT;
-END;
-//
+END //
 DELIMITER ;
 CALL updateDb();
 DROP PROCEDURE IF EXISTS `updateDb`;

@@ -747,7 +747,11 @@ class AchievementCriteriaScript : public ScriptObject
         bool IsDatabaseBound() const { return true; }
 
         // Called when an additional criteria is checked.
-        virtual bool OnCheck(Player* source, Unit* target) = 0;
+        virtual bool OnCheck(Player* source, Unit* target, uint32 /*criteria_id*/) { 
+            return OnCheck(source, target);
+        }
+        // deprecated/legacy
+        virtual bool OnCheck(Player* /*source*/, Unit* /*target*/) { return true; };
 };
 
 class PlayerScript : public ScriptObject
@@ -838,8 +842,14 @@ class PlayerScript : public ScriptObject
         // Called when a player switches to a new zone
         virtual void OnUpdateZone(Player* /*player*/, uint32 /*newZone*/, uint32 /*newArea*/) { }
 
+        // Called when a player switches to a new area (more accurate than UpdateZone)
+        virtual void OnUpdateArea(Player* /*player*/, uint32 /*oldArea*/, uint32 /*newArea*/) { }
+
         // Called when a player changes to a new map (after moving to new map)
         virtual void OnMapChanged(Player* /*player*/) { }
+
+        // Called before a player is being teleported to new coords
+        virtual bool OnBeforeTeleport(Player* /*player*/, uint32 /*mapid*/, float /*x*/, float /*y*/, float /*z*/, float /*orientation*/, uint32 /*options*/, Unit* /*target*/) { return true; }
 
         // Called when team/faction is set on player
         virtual void OnUpdateFaction(Player* /*player*/) { }
@@ -994,8 +1004,11 @@ class GlobalScript : public ScriptObject
         // items
         virtual void OnItemDelFromDB(SQLTransaction& /*trans*/, uint32 /*itemGuid*/) { }
         virtual void OnMirrorImageDisplayItem(const Item* /*item*/, uint32& /*display*/) { }
-        virtual void OnAfterRefCount(LootStoreItem* /*LootStoreItem*/, uint32& /*maxcount*/) { }
-        virtual void OnBeforeDropAddItem(Player const* /*player*/, Loot& /*loot*/, LootStoreItem* /*LootStoreItem*/) { }
+        
+        // loot
+        virtual void OnAfterRefCount(Player const* /*player*/, LootStoreItem* /*LootStoreItem*/, Loot& /*loot*/, bool /*canRate*/, uint16 /*lootMode*/, uint32& /*maxcount*/, LootStore const& /*store*/) { }
+        virtual void OnBeforeDropAddItem(Player const* /*player*/, Loot& /*loot*/, bool /*canRate*/, uint16 /*lootMode*/, LootStoreItem* /*LootStoreItem*/, LootStore const& /*store*/) { }
+        virtual void OnItemRoll(Player const* /*player*/, LootStoreItem const* /*LootStoreItem*/, float& /*chance*/, Loot& /*loot*/, LootStore const& /*store*/) { };
 
         virtual void OnInitializeLockedDungeons(Player* /*player*/, uint8& /*level*/, uint32& /*lockData*/) { }
         virtual void OnAfterInitializeLockedDungeons(Player* /*player*/) { }
@@ -1176,7 +1189,7 @@ class ScriptMgr
 
     public: /* AchievementCriteriaScript */
 
-        bool OnCriteriaCheck(uint32 scriptId, Player* source, Unit* target);
+        bool OnCriteriaCheck(uint32 scriptId, Player* source, Unit* target, uint32 criteria_id);
 
     public: /* PlayerScript */
 
@@ -1210,6 +1223,8 @@ class ScriptMgr
         void OnPlayerDelete(uint64 guid);
         void OnPlayerBindToInstance(Player* player, Difficulty difficulty, uint32 mapid, bool permanent);
         void OnPlayerUpdateZone(Player* player, uint32 newZone, uint32 newArea);
+        void OnPlayerUpdateArea(Player* player, uint32 oldArea, uint32 newArea);
+        bool OnBeforePlayerTeleport(Player* player, uint32 mapid, float x, float y, float z, float orientation, uint32 options, Unit *target);
         void OnPlayerUpdateFaction(Player* player);
         void OnPlayerAddToBattleground(Player* player, Battleground* bg);
         void OnPlayerRemoveFromBattleground(Player* player, Battleground* bg);
@@ -1264,8 +1279,9 @@ class ScriptMgr
         void OnGlobalItemDelFromDB(SQLTransaction& trans, uint32 itemGuid);
         void OnGlobalMirrorImageDisplayItem(const Item *item, uint32 &display);
         void OnBeforeUpdateArenaPoints(ArenaTeam* at, std::map<uint32, uint32> &ap);
-        void OnAfterRefCount(LootStoreItem* LootStoreItem, uint32 &maxcount);
-        void OnBeforeDropAddItem(Player const* player, Loot& loot, LootStoreItem* LootStoreItem);
+        void OnAfterRefCount(Player const* player, Loot& loot, bool canRate, uint16 lootMode, LootStoreItem* LootStoreItem, uint32 &maxcount, LootStore const& store);
+        void OnBeforeDropAddItem(Player const* player, Loot& loot, bool canRate, uint16 lootMode, LootStoreItem* LootStoreItem, LootStore const& store);
+        void OnItemRoll(Player const* player, LootStoreItem const* LootStoreItem, float &chance, Loot& loot, LootStore const& store);
         void OnInitializeLockedDungeons(Player* player, uint8& level, uint32& lockData);
         void OnAfterInitializeLockedDungeons(Player* player);
 

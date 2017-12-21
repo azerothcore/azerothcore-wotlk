@@ -165,8 +165,7 @@ UPDATE `waypoint_data` SET `action_chance`=100 WHERE `action` IN (@SCRIPTID);--
 -- END UPDATING QUERIES
 --
 COMMIT;
-END;
-//
+END //
 DELIMITER ;
 CALL updateDb();
 DROP PROCEDURE IF EXISTS `updateDb`;

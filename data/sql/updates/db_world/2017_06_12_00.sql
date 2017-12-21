@@ -25,8 +25,7 @@ INSERT INTO command (name, security, help) VALUES
 -- END UPDATING QUERIES
 --
 COMMIT;
-END;
-//
+END //
 DELIMITER ;
 CALL updateDb();
 DROP PROCEDURE IF EXISTS `updateDb`;

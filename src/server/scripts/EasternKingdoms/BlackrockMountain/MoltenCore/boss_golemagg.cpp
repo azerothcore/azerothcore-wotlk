@@ -61,6 +61,17 @@ class boss_golemagg : public CreatureScript
             {
                 BossAI::EnterCombat(victim);
                 events.ScheduleEvent(EVENT_PYROBLAST, 7000);
+
+                // The two ragers should join the fight alongside me against my foes.
+                std::list<Creature *> ragers;
+                me->GetCreaturesWithEntryInRange(ragers, 100, NPC_CORE_RAGER);
+                for (Creature * i : ragers)
+                {
+                    if (i && i->IsAlive() && !i->IsInCombat())
+                    {
+                        i->AI()->AttackStart(victim);
+                    }
+                }
             }
 
             void DamageTaken(Unit*, uint32& /*damage*/, DamageEffectType, SpellSchoolMask)

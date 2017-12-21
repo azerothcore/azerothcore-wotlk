@@ -23,7 +23,7 @@ class Player;
 
 #define MAX_NUMBER_OF_GRIDS      64
 
-#define SIZE_OF_GRIDS            533.33333f
+#define SIZE_OF_GRIDS            533.3333f
 #define CENTER_GRID_ID           (MAX_NUMBER_OF_GRIDS/2)
 
 #define CENTER_GRID_OFFSET      (SIZE_OF_GRIDS/2)
@@ -213,7 +213,7 @@ namespace Trinity
 
     inline bool IsValidMapCoord(float x, float y, float z)
     {
-        return IsValidMapCoord(x, y) && isfinite(z);
+        return IsValidMapCoord(x, y) && IsValidMapCoord(z);
     }
 
     inline bool IsValidMapCoord(float x, float y, float z, float o)

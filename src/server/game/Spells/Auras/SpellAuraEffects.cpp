@@ -1711,20 +1711,16 @@ void AuraEffect::HandlePhase(AuraApplication const* aurApp, uint8 mode, bool app
     Unit* target = aurApp->GetTarget();
 
     // no-phase is also phase state so same code for apply and remove
-    uint32 newPhase = 0;
-    Unit::AuraEffectList const& phases = target->GetAuraEffectsByType(SPELL_AURA_PHASE);
-    if (!phases.empty())
-        for (Unit::AuraEffectList::const_iterator itr = phases.begin(); itr != phases.end(); ++itr)
-            newPhase |= (*itr)->GetMiscValue();
+    uint32 newPhase = target->GetPhaseByAuras();
 
     if (Player* player = target->ToPlayer())
     {
         if (!newPhase)
             newPhase = PHASEMASK_NORMAL;
 
-        // GM-mode have mask 0xFFFFFFFF
+        // do not change phase to GM with all phases enabled
         if (player->IsGameMaster())
-            newPhase = 0xFFFFFFFF;
+            newPhase = PHASEMASK_ANYWHERE;
 
         player->SetPhaseMask(newPhase, false);
         player->GetSession()->SendSetPhaseShift(newPhase);
@@ -1769,7 +1765,7 @@ void AuraEffect::HandlePhase(AuraApplication const* aurApp, uint8 mode, bool app
 
 void AuraEffect::HandleAuraModShapeshift(AuraApplication const* aurApp, uint8 mode, bool apply) const
 {
-    if (!(mode & AURA_EFFECT_HANDLE_REAL))
+    if (!(mode & AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK))
         return;
 
     Unit* target = aurApp->GetTarget();
@@ -3582,6 +3578,9 @@ void AuraEffect::HandleModMechanicImmunity(AuraApplication const* aurApp, uint8 
 
     switch (GetId())
     {
+        case 46924: // BladeStorm
+            target->ApplySpellImmune(GetId(), IMMUNITY_MECHANIC, MECHANIC_STUN, apply);
+            break;
         case 34471: // The Beast Within
         case 19574: // Bestial Wrath
             mechanic = IMMUNE_TO_MOVEMENT_IMPAIRMENT_AND_LOSS_CONTROL_MASK;

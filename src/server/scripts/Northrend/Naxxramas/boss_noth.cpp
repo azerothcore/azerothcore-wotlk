@@ -66,9 +66,9 @@ public:
         return new boss_nothAI (pCreature);
     }
 
-    struct boss_nothAI : public ScriptedAI
+    struct boss_nothAI : public BossAI
     {
-        boss_nothAI(Creature *c) : ScriptedAI(c), summons(me)
+        boss_nothAI(Creature *c) : BossAI(c, BOSS_NOTH), summons(me)
         {
             pInstance = me->GetInstanceScript();
         }
@@ -123,14 +123,12 @@ public:
 
         void Reset()
         {
+            BossAI::Reset();
             events.Reset();
             summons.DespawnAll();
             me->SetControlled(false, UNIT_STATE_ROOT);
             me->SetReactState(REACT_AGGRESSIVE);
             events.SetPhase(0);
-
-            if (pInstance)
-                pInstance->SetData(EVENT_NOTH, NOT_STARTED);
         }
 
         void EnterEvadeMode()
@@ -139,12 +137,10 @@ public:
             ScriptedAI::EnterEvadeMode();
         }
 
-        void EnterCombat(Unit * /*who*/)
+        void EnterCombat(Unit * who)
         {
+            BossAI::EnterCombat(who);
             Talk(SAY_AGGRO);
-            if (pInstance)
-                pInstance->SetData(EVENT_NOTH, IN_PROGRESS);
-
             StartGroundPhase();
         }
 
@@ -154,11 +150,10 @@ public:
             summon->SetInCombatWithZone();
         }
 
-        void JustDied(Unit*  /*Killer*/)
+        void JustDied(Unit*  killer)
         {
+            BossAI::JustDied(killer);
             Talk(SAY_DEATH);
-            if (pInstance)
-                pInstance->SetData(EVENT_NOTH, DONE);
         }
 
         void KilledUnit(Unit* who)

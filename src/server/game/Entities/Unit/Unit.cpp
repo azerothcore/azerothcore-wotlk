@@ -3395,6 +3395,15 @@ int32 Unit::GetCurrentSpellCastTime(uint32 spell_id) const
     return 0;
 }
 
+bool Unit::CanMoveDuringChannel() const
+{
+    if (Spell* spell = m_currentSpells[CURRENT_CHANNELED_SPELL])
+        if (spell->getState() != SPELL_STATE_FINISHED)
+            return spell->GetSpellInfo()->HasAttribute(SPELL_ATTR5_CAN_CHANNEL_WHEN_MOVING) && spell->IsChannelActive();
+
+    return false;
+}
+
 bool Unit::isInFrontInMap(Unit const* target, float distance,  float arc) const
 {
     return IsWithinDistInMap(target, distance) && HasInArc(arc, target);
@@ -13690,7 +13699,7 @@ void Unit::ModSpellCastTime(SpellInfo const* spellInfo, int32 & castTime, Spell*
     if (!spellInfo || castTime < 0)
         return;
 
-    if (spellInfo->IsChanneled() && !(spellInfo->AttributesEx5 & SPELL_ATTR5_HASTE_AFFECT_DURATION))
+    if (spellInfo->IsChanneled() && spellInfo->HasAura(SPELL_AURA_MOUNTED))
         return;
 
     // called from caster
@@ -14493,7 +14502,7 @@ void CharmInfo::InitPossessCreateSpells()
         {
             uint32 spellId = _unit->ToCreature()->m_spells[i];
             SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
-            if (spellInfo && !spellInfo->HasAttribute(SPELL_ATTR0_CASTABLE_WHILE_DEAD))
+            if (spellInfo)
             {
                 if (spellInfo->IsPassive())
                     _unit->CastSpell(_unit, spellInfo, true);
@@ -14523,7 +14532,7 @@ void CharmInfo::InitCharmCreateSpells()
         uint32 spellId = _unit->ToCreature()->m_spells[x];
         SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
 
-        if (!spellInfo || spellInfo->HasAttribute(SPELL_ATTR0_CASTABLE_WHILE_DEAD))
+        if (!spellInfo)
         {
             _charmspells[x].SetActionAndType(spellId, ACT_DISABLED);
             continue;
@@ -17545,6 +17554,17 @@ float Unit::MeleeSpellMissChance(const Unit* victim, WeaponAttackType attType, i
     if (missChance > 60.0f)
         return 60.0f;
     return missChance;
+}
+
+uint32 Unit::GetPhaseByAuras() const
+{
+    uint32 currentPhase = 0;
+    AuraEffectList const& phases = GetAuraEffectsByType(SPELL_AURA_PHASE);
+    if (!phases.empty())
+        for (AuraEffectList::const_iterator itr = phases.begin(); itr != phases.end(); ++itr)
+            currentPhase |= (*itr)->GetMiscValue();
+
+    return currentPhase;
 }
 
 void Unit::SetPhaseMask(uint32 newPhaseMask, bool update)

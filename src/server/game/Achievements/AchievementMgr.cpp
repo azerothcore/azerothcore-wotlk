@@ -167,7 +167,7 @@ bool AchievementCriteriaData::IsValid(AchievementCriteriaEntry const* criteria)
             return true;
         }
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_S_AREA:
-            if (!GetAreaEntryByAreaID(area.id))
+            if (!sAreaTableStore.LookupEntry(area.id))
             {
                 sLog->outErrorDb("Table `achievement_criteria_data` (Entry: %u Type: %u) for data type ACHIEVEMENT_CRITERIA_DATA_TYPE_S_AREA (%u) has wrong area id in value1 (%u), ignored.",
                     criteria->ID, criteria->requiredType, dataType, area.id);
@@ -358,12 +358,18 @@ bool AchievementCriteriaData::Meets(uint32 criteria_id, Player const* source, Un
                 return false;
             return target->getGender() == gender.gender;
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_SCRIPT:
-            return sScriptMgr->OnCriteriaCheck(ScriptId, const_cast<Player*>(source), const_cast<Unit*>(target));
+            return sScriptMgr->OnCriteriaCheck(ScriptId, const_cast<Player*>(source), const_cast<Unit*>(target), criteria_id);
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_MAP_DIFFICULTY:
+        {
             if (source->GetMap()->IsRaid())
                 if (source->GetMap()->Is25ManRaid() != ((difficulty.difficulty & RAID_DIFFICULTY_MASK_25MAN) != 0))
                     return false;
-            return source->GetMap()->GetSpawnMode() >= difficulty.difficulty;
+
+            AchievementCriteriaEntry const* criteria = sAchievementCriteriaStore.LookupEntry(criteria_id); 
+            uint8 spawnMode = source->GetMap()->GetSpawnMode();
+            // Dungeons completed on heroic mode count towards both in general achievement, but not in statistics.
+            return sAchievementMgr->IsStatisticCriteria(criteria) ? spawnMode == difficulty.difficulty : spawnMode >= difficulty.difficulty;
+        }
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_MAP_PLAYER_COUNT:
             return source->GetMap()->GetPlayersCountExceptGMs() <= map_players.maxcount;
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_T_TEAM:
@@ -1277,17 +1283,15 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                 bool matchFound = false;
                 for (int j = 0; j < MAX_WORLD_MAP_OVERLAY_AREA_IDX; ++j)
                 {
-                    uint32 area_id = worldOverlayEntry->areatableID[j];
-                    if (!area_id)                            // array have 0 only in empty tail
+                    AreaTableEntry const* area = sAreaTableStore.LookupEntry(worldOverlayEntry->areatableID[j]);
+                    if (!area)
                         break;
 
-                    int32 exploreFlag = GetAreaFlagByAreaID(area_id);
-                    if (exploreFlag < 0)
+                    uint32 playerIndexOffset = uint32(area->exploreFlag) / 32;
+                    if (playerIndexOffset >= PLAYER_EXPLORED_ZONES_SIZE)
                         continue;
 
-                    uint32 playerIndexOffset = uint32(exploreFlag) / 32;
-                    uint32 mask = 1<< (uint32(exploreFlag) % 32);
-
+                    uint32 mask = 1 << (uint32(area->exploreFlag) % 32);
                     if (GetPlayer()->GetUInt32Value(PLAYER_EXPLORED_ZONES_1 + playerIndexOffset) & mask)
                     {
                         matchFound = true;
@@ -1661,8 +1665,14 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                 SetCriteriaProgress(achievementCriteria, 1, PROGRESS_ACCUMULATE);
                 break;
             }
+            case ACHIEVEMENT_CRITERIA_TYPE_PLAY_ARENA:
             case ACHIEVEMENT_CRITERIA_TYPE_WIN_ARENA: // This also behaves like ACHIEVEMENT_CRITERIA_TYPE_WIN_RATED_ARENA
             {
+                // those requirements couldn't be found in the dbc
+                AchievementCriteriaDataSet const* data = sAchievementMgr->GetCriteriaDataSet(achievementCriteria);
+                if (!data || !data->Meets(GetPlayer(), NULL))
+                    continue;
+
                 // Check map id requirement
                 if (miscValue1 == achievementCriteria->win_arena.mapID)
                     SetCriteriaProgress(achievementCriteria, 1, PROGRESS_ACCUMULATE);
@@ -1678,7 +1688,6 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                 break;
             // FIXME: not triggered in code as result, need to implement
             case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_RAID:
-            case ACHIEVEMENT_CRITERIA_TYPE_PLAY_ARENA:
             case ACHIEVEMENT_CRITERIA_TYPE_OWN_RANK:
             case ACHIEVEMENT_CRITERIA_TYPE_TOTAL:
                 break;                                   // Not implemented yet :(
@@ -1876,6 +1885,7 @@ bool AchievementMgr::IsCompletedCriteria(AchievementCriteriaEntry const* achieve
         case ACHIEVEMENT_CRITERIA_TYPE_QUEST_ABANDONED:
         case ACHIEVEMENT_CRITERIA_TYPE_FLIGHT_PATHS_TAKEN:
         case ACHIEVEMENT_CRITERIA_TYPE_ACCEPTED_SUMMONINGS:
+        case ACHIEVEMENT_CRITERIA_TYPE_PLAY_ARENA:
         default:
             break;
     }
@@ -2163,9 +2173,7 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
                     }
     }
 
-    // don't insert for ACHIEVEMENT_FLAG_REALM_FIRST_KILL since otherwise only the first group member would reach that achievement
-    // TODO: where do set this instead?
-    if (!(achievement->flags & ACHIEVEMENT_FLAG_REALM_FIRST_KILL))
+    if (achievement->flags & (ACHIEVEMENT_FLAG_REALM_FIRST_REACH | ACHIEVEMENT_FLAG_REALM_FIRST_KILL))
         sAchievementMgr->SetRealmCompleted(achievement);
 
     UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_ACHIEVEMENT, achievement->ID);
@@ -2305,6 +2313,61 @@ bool AchievementMgr::CanUpdateCriteria(AchievementCriteriaEntry const* criteria,
         return false;
 
     return true;
+}
+
+bool AchievementGlobalMgr::IsStatisticCriteria(AchievementCriteriaEntry const* achievementCriteria) const
+{
+    return isStatisticAchievement(sAchievementStore.LookupEntry(achievementCriteria->referredAchievement));
+}
+
+bool AchievementGlobalMgr::isStatisticAchievement(AchievementEntry const* achievement) const
+{
+    if (!achievement)
+        return false;
+
+    AchievementCategoryEntry const* cat = sAchievementCategoryStore.LookupEntry(achievement->categoryId);
+    do {
+        switch(cat->ID) {
+            case ACHIEVEMENT_CATEGORY_STATISTICS:
+                return true;
+            case ACHIEVEMENT_CATEOGRY_GENERAL:
+                return false;
+            default:
+                cat = sAchievementCategoryStore.LookupEntry(cat->parentCategory);
+                break;
+        }
+    } while (cat);
+
+    return false;
+}
+
+bool AchievementGlobalMgr::IsRealmCompleted(AchievementEntry const* achievement) const
+{
+    auto itr = m_allCompletedAchievements.find(achievement->ID);
+    if (itr == m_allCompletedAchievements.end())
+        return false;
+
+    if (itr->second == std::chrono::system_clock::time_point::min())
+        return false;
+
+    if (itr->second == std::chrono::system_clock::time_point::max())
+        return true;
+
+    // Allow completing the realm first kill for entire minute after first person did it
+    // it may allow more than one group to achieve it (highly unlikely)
+    // but apparently this is how blizz handles it as well
+    if (achievement->flags & ACHIEVEMENT_FLAG_REALM_FIRST_KILL)
+        return (std::chrono::system_clock::now() - itr->second) > std::chrono::minutes(1);
+
+    return true;
+}
+
+void AchievementGlobalMgr::SetRealmCompleted(AchievementEntry const* achievement)
+{
+    if (IsRealmCompleted(achievement))
+        return;
+
+    m_allCompletedAchievements[achievement->ID] = std::chrono::system_clock::now();
 }
 
 //==========================================================
@@ -2628,6 +2691,14 @@ void AchievementGlobalMgr::LoadCompletedAchievements()
 
     QueryResult result = CharacterDatabase.Query("SELECT achievement FROM character_achievement GROUP BY achievement");
 
+    // Populate _allCompletedAchievements with all realm first achievement ids to make multithreaded access safer
+    // while it will not prevent races, it will prevent crashes that happen because std::unordered_map key was added
+    // instead the only potential race will happen on value associated with the key
+    for (uint32 i = 0; i < sAchievementStore.GetNumRows(); ++i)
+        if (AchievementEntry const* achievement = sAchievementStore.LookupEntry(i))
+            if (achievement->flags & (ACHIEVEMENT_FLAG_REALM_FIRST_REACH | ACHIEVEMENT_FLAG_REALM_FIRST_KILL))
+                m_allCompletedAchievements[achievement->ID] = std::chrono::system_clock::time_point::min();
+
     if (!result)
     {
         sLog->outString(">> Loaded 0 completed achievements. DB table `character_achievement` is empty.");
@@ -2655,7 +2726,7 @@ void AchievementGlobalMgr::LoadCompletedAchievements()
             continue;
         }
         else if (achievement->flags & (ACHIEVEMENT_FLAG_REALM_FIRST_REACH | ACHIEVEMENT_FLAG_REALM_FIRST_KILL))
-            m_allCompletedAchievements.insert(achievementId);
+            m_allCompletedAchievements[achievementId] =  std::chrono::system_clock::time_point::max();
     } while (result->NextRow());
 
     sLog->outString(">> Loaded %lu completed achievements in %u ms", (unsigned long)m_allCompletedAchievements.size(), GetMSTimeDiffToNow(oldMSTime));

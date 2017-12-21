@@ -1148,13 +1148,13 @@ void ScriptMgr::OnShutdown()
     FOREACH_SCRIPT(WorldScript)->OnShutdown();
 }
 
-bool ScriptMgr::OnCriteriaCheck(uint32 scriptId, Player* source, Unit* target)
+bool ScriptMgr::OnCriteriaCheck(uint32 scriptId, Player* source, Unit* target, uint32 criteria_id)
 {
     ASSERT(source);
     // target can be NULL.
 
     GET_SCRIPT_RET(AchievementCriteriaScript, scriptId, tmpscript, false);
-    return tmpscript->OnCheck(source, target);
+    return tmpscript->OnCheck(source, target, criteria_id);
 }
 
 // Player
@@ -1301,6 +1301,21 @@ void ScriptMgr::OnPlayerBindToInstance(Player* player, Difficulty difficulty, ui
 void ScriptMgr::OnPlayerUpdateZone(Player* player, uint32 newZone, uint32 newArea)
 {
     FOREACH_SCRIPT(PlayerScript)->OnUpdateZone(player, newZone, newArea);
+}
+
+void ScriptMgr::OnPlayerUpdateArea(Player* player, uint32 oldArea, uint32 newArea)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnUpdateArea(player, oldArea, newArea);
+}
+
+bool ScriptMgr::OnBeforePlayerTeleport(Player* player, uint32 mapid, float x, float y, float z, float orientation, uint32 options, Unit *target)
+{
+    bool ret=true;
+    FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
+        if (!itr->second->OnBeforeTeleport(player, mapid, x, y, z, orientation, options, target))
+            ret=false; // we change ret value only when scripts return false
+
+    return ret;
 }
 
 void ScriptMgr::OnPlayerUpdateFaction(Player* player)
@@ -1494,14 +1509,18 @@ void ScriptMgr::OnBeforeUpdateArenaPoints(ArenaTeam* at, std::map<uint32, uint32
     FOREACH_SCRIPT(GlobalScript)->OnBeforeUpdateArenaPoints(at,ap);
 }
 
-void ScriptMgr::OnAfterRefCount(LootStoreItem* LootStoreItem, uint32 &maxcount)
+void ScriptMgr::OnAfterRefCount(Player const* player, Loot& loot, bool canRate, uint16 lootMode, LootStoreItem* LootStoreItem, uint32 &maxcount, LootStore const& store)
 {
-    FOREACH_SCRIPT(GlobalScript)->OnAfterRefCount(LootStoreItem, maxcount);
+    FOREACH_SCRIPT(GlobalScript)->OnAfterRefCount(player, LootStoreItem, loot, canRate, lootMode, maxcount, store);
 }
 
-void ScriptMgr::OnBeforeDropAddItem(Player const* player, Loot& loot, LootStoreItem* LootStoreItem)
+void ScriptMgr::OnBeforeDropAddItem(Player const* player, Loot& loot, bool canRate, uint16 lootMode, LootStoreItem* LootStoreItem, LootStore const& store)
 {
-    FOREACH_SCRIPT(GlobalScript)->OnBeforeDropAddItem(player, loot, LootStoreItem);
+    FOREACH_SCRIPT(GlobalScript)->OnBeforeDropAddItem(player, loot, canRate, lootMode, LootStoreItem, store);
+}
+
+void ScriptMgr::OnItemRoll(Player const* player, LootStoreItem const* LootStoreItem, float &chance, Loot& loot, LootStore const& store) {
+    FOREACH_SCRIPT(GlobalScript)->OnItemRoll(player, LootStoreItem,  chance, loot, store);
 }
 
 void ScriptMgr::OnInitializeLockedDungeons(Player* player, uint8& level, uint32& lockData)

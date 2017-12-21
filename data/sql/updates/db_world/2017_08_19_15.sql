@@ -166,8 +166,7 @@ UPDATE `item_loot_template` SET `ChanceOrQuestChance` = 100 WHERE `entry` = 1056
 -- END UPDATING QUERIES
 --
 COMMIT;
-END;
-//
+END //
 DELIMITER ;
 CALL updateDb();
 DROP PROCEDURE IF EXISTS `updateDb`;

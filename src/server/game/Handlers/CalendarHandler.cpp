@@ -34,6 +34,7 @@ Copied events should probably have a new owner
 #include "GuildMgr.h"
 #include "ArenaTeamMgr.h"
 #include "WorldSession.h"
+#include "GameEventMgr.h"
 
 void WorldSession::HandleCalendarGetCalendar(WorldPacket& /*recvData*/)
 {
@@ -139,11 +140,10 @@ void WorldSession::HandleCalendarGetCalendar(WorldPacket& /*recvData*/)
     data.append(dataBuffer);
 
     // TODO: Fix this, how we do know how many and what holidays to send?
-    uint32 holidayCount = 0;
-    data << uint32(holidayCount);
-    for (uint32 i = 0; i < holidayCount; ++i)
+    data << uint32(sGameEventMgr->modifiedHolidays.size());
+    for (uint32 entry : sGameEventMgr->modifiedHolidays)
     {
-        HolidaysEntry const* holiday = sHolidaysStore.LookupEntry(666);
+        HolidaysEntry const* holiday = sHolidaysStore.LookupEntry(entry);
 
         data << uint32(holiday->Id);                        // m_ID
         data << uint32(holiday->Region);                    // m_region, might be looping

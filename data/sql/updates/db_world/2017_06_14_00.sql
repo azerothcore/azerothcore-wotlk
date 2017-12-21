@@ -30,8 +30,7 @@ INSERT INTO `creature_text` VALUES (4967, 0, 0, 'Go with grace, and may the Lady
 -- END UPDATING QUERIES
 --
 COMMIT;
-END;
-//
+END //
 DELIMITER ;
 CALL updateDb();
 DROP PROCEDURE IF EXISTS `updateDb`;
