@@ -325,8 +325,7 @@ UPDATE `pet_levelstats` SET `str`=314, `agi`= 90, `sta`=328, `inte`=150, `spi`=2
 -- END UPDATING QUERIES
 --
 COMMIT;
-END;
-//
+END //
 DELIMITER ;
 CALL updateDb();
 DROP PROCEDURE IF EXISTS `updateDb`;

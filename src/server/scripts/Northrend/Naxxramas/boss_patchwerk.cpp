@@ -47,9 +47,9 @@ public:
         return new boss_patchwerkAI (pCreature);
     }
 
-    struct boss_patchwerkAI : public ScriptedAI
+    struct boss_patchwerkAI : public BossAI
     {
-        boss_patchwerkAI(Creature *c) : ScriptedAI(c) 
+        boss_patchwerkAI(Creature *c) : BossAI(c, BOSS_PATCHWERK) 
         {
             pInstance = me->GetInstanceScript();
         }
@@ -59,9 +59,8 @@ public:
 
         void Reset()
         {
+            BossAI::Reset();
             events.Reset();
-            if (pInstance)
-                pInstance->SetData(EVENT_PATCHWERK, NOT_STARTED);
         }
 
         void KilledUnit(Unit* who)
@@ -76,15 +75,15 @@ public:
                 pInstance->SetData(DATA_IMMORTAL_FAIL, 0);
         }
 
-        void JustDied(Unit*  /*Killer*/)
+        void JustDied(Unit*  killer)
         {
+            BossAI::JustDied(killer);
             Talk(SAY_DEATH);
-            if (pInstance)
-                pInstance->SetData(EVENT_PATCHWERK, DONE);
         }
 
-        void EnterCombat(Unit * /*who*/)
+        void EnterCombat(Unit * who)
         {
+            BossAI::EnterCombat(who);
             Talk(SAY_AGGRO);
             
             me->SetInCombatWithZone();
@@ -95,7 +94,6 @@ public:
             if (pInstance)
             {
                 pInstance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_TIMED_START_EVENT);
-                pInstance->SetData(EVENT_PATCHWERK, IN_PROGRESS);
             }
         }
 

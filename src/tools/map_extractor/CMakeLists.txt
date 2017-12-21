@@ -12,8 +12,10 @@
 file(GLOB_RECURSE sources *.cpp *.h)
 
 set(include_Dirs
+    ${CMAKE_SOURCE_DIR}/src/common/Utilities
     ${CMAKE_SOURCE_DIR}/src/common
     ${CMAKE_SOURCE_DIR}/deps/libmpq
+    ${CMAKE_SOURCE_DIR}/modules/worldengine/deps/g3dlite/include
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/loadlib
 )

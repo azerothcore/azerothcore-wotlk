@@ -1434,16 +1434,6 @@ DeletedCharacterTicketTrace = 0
 
 DungeonFinder.OptionsMask = 1
 
-
-#
-#   DBC.EnforceItemAttributes
-#        Description: Disallow overriding item attributes stored in DBC files with values from the
-#                     database.
-#        Default:     1 - (Enabled, Enforce DBC values)
-#                     0 - (Disabled, Use database values)
-
-DBC.EnforceItemAttributes = 1
-
 #
 #   AccountInstancesPerHour
 #        Description: Controls the max amount of different instances player can enter within hour

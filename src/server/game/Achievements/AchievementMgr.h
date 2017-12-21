@@ -8,6 +8,7 @@
 
 #include <map>
 #include <string>
+#include <chrono>
 
 #include "Common.h"
 #include <ace/Singleton.h>
@@ -55,8 +56,13 @@ enum AchievementCriteriaDataType
     ACHIEVEMENT_CRITERIA_DATA_TYPE_NTH_BIRTHDAY        = 22, // N                            login on day of N-th Birthday
     ACHIEVEMENT_CRITERIA_DATA_TYPE_S_KNOWN_TITLE       = 23  // title_id                     known (pvp) title, values from dbc
 };
-
 #define MAX_ACHIEVEMENT_CRITERIA_DATA_TYPE               24 // maximum value in AchievementCriteriaDataType enum
+
+enum AchievementCommonCategories
+{  
+    ACHIEVEMENT_CATEOGRY_GENERAL                       = -1,
+    ACHIEVEMENT_CATEGORY_STATISTICS                    =  1
+};
 
 class Player;
 class Unit;
@@ -294,6 +300,9 @@ class AchievementGlobalMgr
         ~AchievementGlobalMgr() {}
 
     public:
+        bool IsStatisticCriteria(AchievementCriteriaEntry const* achievementCriteria) const;
+        bool isStatisticAchievement(AchievementEntry const* achievement) const;
+        
         AchievementCriteriaEntryList const* GetAchievementCriteriaByType(AchievementCriteriaTypes type) const
         {
             return &m_AchievementCriteriasByType[type];
@@ -348,15 +357,8 @@ class AchievementGlobalMgr
             return iter != m_criteriaDataMap.end() ? &iter->second : NULL;
         }
 
-        bool IsRealmCompleted(AchievementEntry const* achievement) const
-        {
-            return m_allCompletedAchievements.find(achievement->ID) != m_allCompletedAchievements.end();
-        }
-
-        void SetRealmCompleted(AchievementEntry const* achievement)
-        {
-            m_allCompletedAchievements.insert(achievement->ID);
-        }
+        bool IsRealmCompleted(AchievementEntry const* achievement) const;
+        void SetRealmCompleted(AchievementEntry const* achievement);
 
         void LoadAchievementCriteriaList();
         void LoadAchievementCriteriaData();
@@ -375,7 +377,7 @@ class AchievementGlobalMgr
         // store achievements by referenced achievement id to speed up lookup
         AchievementListByReferencedId m_AchievementListByReferencedId;
 
-        typedef std::set<uint32> AllCompletedAchievements;
+        typedef UNORDERED_MAP<uint32 /*achievementId*/, std::chrono::system_clock::time_point /*completionTime*/> AllCompletedAchievements;
         AllCompletedAchievements m_allCompletedAchievements;
 
         AchievementRewards m_achievementRewards;

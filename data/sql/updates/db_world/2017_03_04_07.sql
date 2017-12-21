@@ -20,8 +20,7 @@ UPDATE `creature_template` SET `flags_extra`=32768 WHERE `entry`=7980;--
 -- END UPDATING QUERIES
 --
 COMMIT;
-END;
-//
+END //
 DELIMITER ;
 CALL updateDb();
 DROP PROCEDURE IF EXISTS `updateDb`;

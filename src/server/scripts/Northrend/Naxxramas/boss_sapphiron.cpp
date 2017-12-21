@@ -77,9 +77,9 @@ public:
         return new boss_sapphironAI (pCreature);
     }
 
-    struct boss_sapphironAI : public ScriptedAI
+    struct boss_sapphironAI : public BossAI
     {
-        boss_sapphironAI(Creature* c) : ScriptedAI(c)
+        boss_sapphironAI(Creature* c) : BossAI(c, BOSS_SAPPHIRON)
         {
             pInstance = me->GetInstanceScript();
         }
@@ -113,6 +113,7 @@ public:
 
         void Reset()
         {
+            BossAI::Reset();
             if (me->IsVisible())
                 me->SetReactState(REACT_AGGRESSIVE);
 
@@ -121,9 +122,6 @@ public:
             spawnTimer = 0;
             currentTarget = 0;
             blockList.clear();
-
-            if (pInstance)
-                pInstance->SetData(EVENT_SAPPHIRON, NOT_STARTED);
         }
 
         void EnterCombatSelfFunction()
@@ -147,8 +145,9 @@ public:
             }
         }
 
-        void EnterCombat(Unit * /*who*/)
+        void EnterCombat(Unit * who)
         {
+            BossAI::EnterCombat(who);
             EnterCombatSelfFunction();
             me->CastSpell(me, RAID_MODE(SPELL_FROST_AURA_10, SPELL_FROST_AURA_25), true);
 
@@ -159,16 +158,12 @@ public:
             events.ScheduleEvent(EVENT_SPELL_BLIZZARD, 21000);
             events.ScheduleEvent(EVENT_FLIGHT_START, 45000);
             events.ScheduleEvent(EVENT_HUNDRED_CLUB, 5000);
-
-            if (pInstance)
-                pInstance->SetData(EVENT_SAPPHIRON, IN_PROGRESS);
         }
 
-        void JustDied(Unit*  /*who*/)
+        void JustDied(Unit*  killer)
         {
+            BossAI::JustDied(killer);
             me->CastSpell(me, SPELL_SAPPHIRON_DIES, true);
-            if (pInstance)
-                pInstance->SetData(EVENT_SAPPHIRON, DONE);
         }
 
         void DoAction(int32 param)

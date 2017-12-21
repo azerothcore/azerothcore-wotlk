@@ -1979,30 +1979,50 @@ void WorldSession::HandleEquipmentSetUse(WorldPacket &recvData)
             item = _player->GetItemByGuid(itemGuid);
 
         uint16 dstpos = i | (INVENTORY_SLOT_BAG_0 << 8);
+        
+        InventoryResult msg;
 
-        if (!item)
-        {
-            Item* uItem = _player->GetItemByPos(INVENTORY_SLOT_BAG_0, i);
-            if (!uItem)
-                continue;
-
-            ItemPosCountVec sDest;
-            InventoryResult msg = _player->CanStoreItem(NULL_BAG, NULL_SLOT, sDest, uItem, false);
-            if (msg == EQUIP_ERR_OK)
-            {
-                _player->RemoveItem(INVENTORY_SLOT_BAG_0, i, true);
-                _player->StoreItem(sDest, uItem, true);
+        Item* uItem = _player->GetItemByPos(INVENTORY_SLOT_BAG_0, i);
+        if (uItem) {
+            if (uItem->IsEquipped()) {
+                msg = _player->CanUnequipItem(dstpos, true);
+                if (msg != EQUIP_ERR_OK) {
+                    _player->SendEquipError(msg, uItem, NULL);
+                    continue;
+                }
             }
-            else
-                _player->SendEquipError(msg, uItem, NULL);
 
-            continue;
+            if (!item)
+            {
+                ItemPosCountVec sDest;
+                msg = _player->CanStoreItem(NULL_BAG, NULL_SLOT, sDest, uItem, false);
+                if (msg == EQUIP_ERR_OK)
+                {
+                    _player->RemoveItem(INVENTORY_SLOT_BAG_0, i, true);
+                    _player->StoreItem(sDest, uItem, true);
+                }
+                else
+                    _player->SendEquipError(msg, uItem, NULL);
+
+                continue;
+            }
         }
 
-        if (item->GetPos() == dstpos)
-            continue;
+        if (item) {
+            if (item->GetPos() == dstpos)
+                continue;
 
-        _player->SwapItem(item->GetPos(), dstpos);
+            if (!item->IsEquipped()) {
+                uint16 _candidatePos;
+                msg = _player->CanEquipItem(NULL_SLOT, _candidatePos, item, true);
+                if (msg != EQUIP_ERR_OK) {
+                    _player->SendEquipError(msg, item, NULL);
+                    continue;
+                }
+            }
+
+            _player->SwapItem(item->GetPos(), dstpos);
+        }
     }
 
     WorldPacket data(SMSG_EQUIPMENT_SET_USE_RESULT, 1);

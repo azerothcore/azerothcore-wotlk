@@ -135,9 +135,9 @@ public:
         return new boss_gothikAI (pCreature);
     }
 
-    struct boss_gothikAI : public ScriptedAI
+    struct boss_gothikAI : public BossAI
     {
-        boss_gothikAI(Creature *c) : ScriptedAI(c), summons(me)
+        boss_gothikAI(Creature *c) : BossAI(c, BOSS_GOTHIK), summons(me)
         {
             pInstance = me->GetInstanceScript();
         }
@@ -162,6 +162,7 @@ public:
 
         void Reset()
         {
+            BossAI::Reset();
             events.Reset();
             summons.DespawnAll();
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE|UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_DISABLE_MOVE);
@@ -172,7 +173,6 @@ public:
 
             if (pInstance)
             {
-                pInstance->SetData(EVENT_GOTHIK, NOT_STARTED);
                 if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_GOTHIK_ENTER_GATE)))
                     go->SetGoState(GO_STATE_ACTIVE);
                 if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_GOTHIK_INNER_GATE)))
@@ -182,8 +182,9 @@ public:
             }
         }
 
-        void EnterCombat(Unit * /*who*/)
+        void EnterCombat(Unit * who)
         {
+            BossAI::EnterCombat(who);
             me->SetInCombatWithZone();
             Talk(SAY_SPEECH);
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE|UNIT_FLAG_DISABLE_MOVE);
@@ -194,7 +195,6 @@ public:
             
             if (pInstance)
             {
-                pInstance->SetData(EVENT_GOTHIK, IN_PROGRESS);
                 if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_GOTHIK_ENTER_GATE)))
                     go->SetGoState(GO_STATE_READY);
                 if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_GOTHIK_INNER_GATE)))
@@ -225,14 +225,14 @@ public:
                 pInstance->SetData(DATA_IMMORTAL_FAIL, 0);
         }
 
-        void JustDied(Unit*  /*Killer*/)
+        void JustDied(Unit*  killer)
         {
+            BossAI::JustDied(killer);
             Talk(SAY_DEATH);
             summons.DespawnAll();
 
             if (pInstance)
             {
-                pInstance->SetData(EVENT_GOTHIK, DONE);
                 if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_GOTHIK_ENTER_GATE)))
                     go->SetGoState(GO_STATE_ACTIVE);
                 if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_GOTHIK_INNER_GATE)))

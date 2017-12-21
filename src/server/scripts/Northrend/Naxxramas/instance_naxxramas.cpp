@@ -49,7 +49,7 @@ public:
     {
         instance_naxxramas_InstanceMapScript(Map* pMap) : InstanceScript(pMap)
         {
-            memset(&Encounters, 0, sizeof(Encounters));
+            SetBossNumber(MAX_ENCOUNTERS);
             for (uint8 i = 0; i < 4; ++i)
                 HeiganEruption[i].clear();
 
@@ -101,7 +101,6 @@ public:
             immortalAchievement = 1;
         }
 
-        uint32 Encounters[MAX_ENCOUNTERS];
         std::set<GameObject*> HeiganEruption[4];
 
         // GOs
@@ -169,17 +168,17 @@ public:
             }
         }
 
-        bool IsEncounterInProgress() const
+        bool IsEncounterInProgress() const override
         {
             for (uint8 i = 0; i < MAX_ENCOUNTERS; ++i)
             {
-                if (Encounters[i] == IN_PROGRESS)
+                if (GetBossState(i) == IN_PROGRESS)
                     return true;
             }
             return false;
         }
 
-        void OnCreatureCreate(Creature* creature)
+        void OnCreatureCreate(Creature* creature) override
         {
             switch(creature->GetEntry())
             {
@@ -216,7 +215,7 @@ public:
             }
         }
 
-        void OnGameObjectCreate(GameObject* pGo)
+        void OnGameObjectCreate(GameObject* pGo) override
         {
             if (pGo->GetGOInfo()->displayId == 6785 || pGo->GetGOInfo()->displayId == 1287)
             {
@@ -228,57 +227,57 @@ public:
             {
                 case GO_PATCHWERK_GATE:
                     _patchwerkGateGUID = pGo->GetGUID();
-                    if (Encounters[EVENT_PATCHWERK] == DONE)
+                    if (GetBossState(BOSS_PATCHWERK) == DONE)
                         pGo->SetGoState(GO_STATE_ACTIVE);
                     break;
                 case GO_GLUTH_GATE:
                     _gluthGateGUID = pGo->GetGUID();
-                    if (Encounters[EVENT_GLUTH] == DONE)
+                    if (GetBossState(BOSS_GLUTH) == DONE)
                         pGo->SetGoState(GO_STATE_ACTIVE);
                     break;
                 case GO_NOTH_GATE:
                     _nothGateGUID = pGo->GetGUID();
-                    if (Encounters[EVENT_NOTH] == DONE)
+                    if (GetBossState(BOSS_NOTH) == DONE)
                         pGo->SetGoState(GO_STATE_ACTIVE);
                     break;
                 case GO_HEIGAN_ENTERANCE_GATE:
                     _heiganGateGUID = pGo->GetGUID();
-                    if (Encounters[EVENT_HEIGAN] == DONE || Encounters[EVENT_NOTH] == DONE)
+                    if (GetBossState(BOSS_HEIGAN) == DONE || GetBossState(BOSS_NOTH) == DONE)
                         pGo->SetGoState(GO_STATE_ACTIVE);
                     break;
                 case GO_HEIGAN_EXIT_GATE:
                     _heiganGateExitGUID = pGo->GetGUID();
-                    if (Encounters[EVENT_HEIGAN] == DONE)
+                    if (GetBossState(BOSS_HEIGAN) == DONE)
                         pGo->SetGoState(GO_STATE_ACTIVE);
                     break;
                 case GO_LOATHEB_GATE:
                     _loathebGateGUID = pGo->GetGUID();
-                    if (Encounters[EVENT_LOATHEB] == DONE)
+                    if (GetBossState(BOSS_LOATHEB) == DONE)
                         pGo->SetGoState(GO_STATE_ACTIVE);
                     break;
                 case GO_ANUB_GATE:
                     _anubGateGUID = pGo->GetGUID();
-                    if (Encounters[EVENT_ANUB] == DONE)
+                    if (GetBossState(BOSS_ANUB) == DONE)
                         pGo->SetGoState(GO_STATE_ACTIVE);
                     break;
                 case GO_ANUB_NEXT_GATE:
                     _anubNextGateGUID = pGo->GetGUID();
-                    if (Encounters[EVENT_ANUB] == DONE)
+                    if (GetBossState(BOSS_ANUB) == DONE)
                         pGo->SetGoState(GO_STATE_ACTIVE);
                     break;
                 case GO_FAERLINA_GATE:
                     _faerlinaGateGUID = pGo->GetGUID();
-                    if (Encounters[EVENT_FAERLINA] == DONE)
+                    if (GetBossState(BOSS_FAERLINA) == DONE)
                         pGo->SetGoState(GO_STATE_ACTIVE);
                     break;
                 case GO_MAEXXNA_GATE:
                     _maexxnaGateGUID = pGo->GetGUID();
-                    if (Encounters[EVENT_FAERLINA] == DONE) // faerlina is correct
+                    if (GetBossState(BOSS_FAERLINA) == DONE) // faerlina is correct
                         pGo->SetGoState(GO_STATE_ACTIVE);
                     break;
                 case GO_THADDIUS_GATE:
                     _thaddiusGateGUID = pGo->GetGUID();
-                    if (Encounters[EVENT_GLUTH] == DONE) // gluth is correct
+                    if (GetBossState(BOSS_GLUTH) == DONE) // gluth is correct
                         pGo->SetGoState(GO_STATE_ACTIVE);
                     break;
                 case GO_GOTHIK_ENTER_GATE:
@@ -289,12 +288,12 @@ public:
                     break;
                 case GO_GOTHIK_EXIT_GATE:
                     _gothikExitGateGUID = pGo->GetGUID();
-                    if (Encounters[EVENT_GOTHIK] == DONE)
+                    if (GetBossState(BOSS_GOTHIK) == DONE)
                         pGo->SetGoState(GO_STATE_ACTIVE);
                     break;
                 case GO_HORSEMAN_GATE:
                     _horsemanGateGUID = pGo->GetGUID();
-                    if (Encounters[EVENT_GOTHIK] == DONE) // correct
+                    if (GetBossState(BOSS_GOTHIK) == DONE) // correct
                         pGo->SetGoState(GO_STATE_ACTIVE);
                     break;
                 case GO_KELTHUZAD_FLOOR:
@@ -305,33 +304,33 @@ public:
                 break;
                 case GO_SAPPHIRON_GATE:
                     _sapphironGateGUID = pGo->GetGUID();
-                    if (Encounters[EVENT_SAPPHIRON] == DONE)
+                    if (GetBossState(BOSS_SAPPHIRON) == DONE)
                         pGo->SetGoState(GO_STATE_ACTIVE);
                     break;
                 case GO_DEATHKNIGHT_WING: 
                     _loathebPortalGUID = pGo->GetGUID();
-                    if (Encounters[EVENT_LOATHEB] == DONE)
+                    if (GetBossState(BOSS_LOATHEB) == DONE)
                          pGo->SetPhaseMask(1, true);
                     break;
                 case GO_THADDIUS_PORTAL: 
                     _thaddiusPortalGUID = pGo->GetGUID();
-                    if (Encounters[EVENT_THADDIUS] == DONE)
+                    if (GetBossState(BOSS_THADDIUS) == DONE)
                          pGo->SetPhaseMask(1, true);
                     break;
                 case GO_MAEXXNA_PORTAL: 
                     _maexxnaPortalGUID = pGo->GetGUID();
-                    if (Encounters[EVENT_MAEXXNA] == DONE)
+                    if (GetBossState(BOSS_MAEXXNA) == DONE)
                          pGo->SetPhaseMask(1, true);
                     break;
                 case GO_HORSEMAN_PORTAL: 
                     _horsemanPortalGUID = pGo->GetGUID();
-                    if (Encounters[EVENT_HORSEMAN] == DONE)
+                    if (GetBossState(BOSS_HORSEMAN) == DONE)
                          pGo->SetPhaseMask(1, true);
                     break;
             }
         }
 
-        void OnGameObjectRemove(GameObject* pGo)
+        void OnGameObjectRemove(GameObject* pGo) override
         {
             if (pGo->GetGOInfo()->displayId == 6785 || pGo->GetGOInfo()->displayId == 1287)
             {
@@ -345,7 +344,7 @@ public:
                     cr->AI()->DoAction(ACTION_SAPPHIRON_BIRTH);
         }
 
-        bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/)
+        bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/) override
         {
             switch(criteria_id)
             {
@@ -389,7 +388,7 @@ public:
                 {
                     uint8 count = 0;
                     for (uint8 i = 0; i < MAX_ENCOUNTERS; ++i)
-                        if (Encounters[i] == NOT_STARTED)
+                        if (GetBossState(i) == NOT_STARTED)
                             ++count;
 
                     return !count && immortalAchievement;
@@ -398,57 +397,10 @@ public:
             return false;
         }
 
-        void SetData(uint32 id, uint32 data)
+        void SetData(uint32 id, uint32 data) override
         {
-            // Bosses data
             switch(id)
             {
-                case EVENT_PATCHWERK:
-                case EVENT_GROBBULUS:
-                case EVENT_GLUTH:
-                case EVENT_NOTH:
-                case EVENT_ANUB:
-                case EVENT_MAEXXNA:
-                case EVENT_RAZUVIOUS:
-                case EVENT_GOTHIK:
-                // EVENT_HORSEMAN HANDLED BELOW
-                    Encounters[id] = data;
-                    break;
-                case EVENT_KELTHUZAD:
-                    if (data == NOT_STARTED)
-                        abominationsKilled = 0;
-                    Encounters[id] = data;
-                    break;
-                case EVENT_FAERLINA:
-                    if (data == NOT_STARTED)
-                        faerlinaAchievement = true;
-                    Encounters[id] = data;
-                    break;
-                case EVENT_THADDIUS:
-                    if (data == NOT_STARTED)
-                        thaddiusAchievement = true;
-                    Encounters[id] = data;
-                    break;
-                case EVENT_LOATHEB:
-                    if (data == NOT_STARTED)
-                        loathebAchievement = true;
-                    Encounters[id] = data;
-                    break;
-                case EVENT_HEIGAN:
-                    if (data == NOT_STARTED)
-                        heiganAchievement = true;
-                    Encounters[id] = data;
-                    break;
-                case DATA_HEIGAN_ERUPTION:
-                    HeiganEruptSections(data);
-                    return;
-                case EVENT_SAPPHIRON:
-                    Encounters[id] = data;
-                    if (data == DONE)
-                        _speakTimer = 1;
-                    else if (data == NOT_STARTED)
-                        sapphironAchievement = true;
-                    break;
                 case DATA_ABOMINATION_KILLED:
                     abominationsKilled++;
                     return;
@@ -471,17 +423,24 @@ public:
                     immortalAchievement = 0;
                     SaveToDB();
                     return;
+                case DATA_HEIGAN_ERUPTION:
+                    HeiganEruptSections(data);
+                    return;
             }
-
+        }
+        
+        bool SetBossState(uint32 bossId, EncounterState state) override
+        {
             // Horseman handling
-            if (id == EVENT_HORSEMAN)
+            if (bossId == BOSS_HORSEMAN)
             {
-                if (data == DONE)
+                if (state == DONE)
                 {
                     _horsemanTimer++;
                     _horsemanKilled++;
-                    if (_horsemanKilled < 4)
-                        return;
+                    if (_horsemanKilled < 4) {
+                        return false;
+                    }
 
                     // All horsemans are killed
                     if (Creature* cr = instance->GetCreature(_blaumeuxGUID))
@@ -489,7 +448,7 @@ public:
                 }
 
                 // respawn
-                else if (data == NOT_STARTED && _horsemanKilled > 0)
+                else if (state == NOT_STARTED && _horsemanKilled > 0)
                 {
                     Creature* cr;
                     _horsemanKilled = 0;
@@ -518,7 +477,7 @@ public:
                             cr->Respawn();
                         }
                 }
-                else if (data == IN_PROGRESS)
+                else if (state == IN_PROGRESS)
                 {
                     Creature* cr;
                     if ((cr = instance->GetCreature(_blaumeuxGUID)))
@@ -531,66 +490,99 @@ public:
                         cr->SetInCombatWithZone();
                 }
 
-                if (data == NOT_STARTED)
+                if (state == NOT_STARTED)
                     _horsemanTimer = 0;
-
-                Encounters[id] = data;
             }
-
+            
+            
+            if (!InstanceScript::SetBossState(bossId, state))
+                return false;
+            
+            // Bosses data
+            switch(bossId)
+            {
+                case BOSS_KELTHUZAD:
+                    if (state == NOT_STARTED)
+                        abominationsKilled = 0;
+                    break;
+                case BOSS_FAERLINA:
+                    if (state == NOT_STARTED)
+                        faerlinaAchievement = true;
+                    break;
+                case BOSS_THADDIUS:
+                    if (state == NOT_STARTED)
+                        thaddiusAchievement = true;
+                    break;
+                case BOSS_LOATHEB:
+                    if (state == NOT_STARTED)
+                        loathebAchievement = true;
+                    break;
+                case BOSS_HEIGAN:
+                    if (state == NOT_STARTED)
+                        heiganAchievement = true;
+                    break;
+                case BOSS_SAPPHIRON:
+                    if (state == DONE)
+                        _speakTimer = 1;
+                    else if (state == NOT_STARTED)
+                        sapphironAchievement = true;
+                    break;
+            }
+                    
             // Save instance and open gates
-            if (data == DONE)
+            if (state == DONE)
             {
                 SaveToDB();
 
-                switch (id)
+                switch (bossId)
                 {
-                    case EVENT_PATCHWERK:
+                    case BOSS_PATCHWERK:
                         if (GameObject* go = instance->GetGameObject(_patchwerkGateGUID))
                             go->SetGoState(GO_STATE_ACTIVE);
                         break;
-                    case EVENT_GLUTH:
+                    case BOSS_GLUTH:
                         if (GameObject* go = instance->GetGameObject(_gluthGateGUID))
                             go->SetGoState(GO_STATE_ACTIVE);
                         if (GameObject* go = instance->GetGameObject(_thaddiusGateGUID))
                             go->SetGoState(GO_STATE_ACTIVE);
                         break;
-                    case EVENT_NOTH:
+                    case BOSS_NOTH:
                         if (GameObject* go = instance->GetGameObject(_nothGateGUID))
                             go->SetGoState(GO_STATE_ACTIVE);
                         if (GameObject* go = instance->GetGameObject(_heiganGateGUID))
                             go->SetGoState(GO_STATE_ACTIVE);
                         break;
-                    case EVENT_HEIGAN:
+                    case BOSS_HEIGAN:
                         if (GameObject* go = instance->GetGameObject(_heiganGateGUID))
                             go->SetGoState(GO_STATE_ACTIVE);
                         if (GameObject* go = instance->GetGameObject(_heiganGateExitGUID))
                             go->SetGoState(GO_STATE_ACTIVE);
                         break;
-                    case EVENT_LOATHEB:
+                    case BOSS_LOATHEB:
                         if (GameObject* go = instance->GetGameObject(_loathebGateGUID))
                             go->SetGoState(GO_STATE_ACTIVE);
                         if (GameObject* go = instance->GetGameObject(_loathebPortalGUID))
                             go->SetPhaseMask(1, true);
                         break;
-                    case EVENT_ANUB:
+                    case BOSS_ANUB:
                         if (GameObject* go = instance->GetGameObject(_anubGateGUID))
                             go->SetGoState(GO_STATE_ACTIVE);
                         if (GameObject* go = instance->GetGameObject(_anubNextGateGUID))
                             go->SetGoState(GO_STATE_ACTIVE);
                         break;
-                    case EVENT_FAERLINA:
+                    case BOSS_FAERLINA:
                         if (GameObject* go = instance->GetGameObject(_faerlinaGateGUID))
                             go->SetGoState(GO_STATE_ACTIVE);
                         if (GameObject* go = instance->GetGameObject(_maexxnaGateGUID))
                             go->SetGoState(GO_STATE_ACTIVE);
                         break;
-                    case EVENT_MAEXXNA:
+                    case BOSS_MAEXXNA:
                         if (GameObject* go = instance->GetGameObject(_maexxnaGateGUID))
                             go->SetGoState(GO_STATE_ACTIVE);
                         if (GameObject* go = instance->GetGameObject(_maexxnaPortalGUID))
                             go->SetPhaseMask(1, true);
                         break;
-                    case EVENT_GOTHIK:
+                    case BOSS_GOTHIK:
                         if (GameObject* go = instance->GetGameObject(_gothikEnterGateGUID))
                             go->SetGoState(GO_STATE_ACTIVE);
                         if (GameObject* go = instance->GetGameObject(_gothikExitGateGUID))
@@ -598,33 +590,25 @@ public:
                         if (GameObject* go = instance->GetGameObject(_horsemanGateGUID))
                             go->SetGoState(GO_STATE_ACTIVE);
                         break;
-                    case EVENT_SAPPHIRON:
+                    case BOSS_SAPPHIRON:
                         if (GameObject* go = instance->GetGameObject(_sapphironGateGUID))
                             go->SetGoState(GO_STATE_ACTIVE);
                         break;
-                    case EVENT_THADDIUS:
+                    case BOSS_THADDIUS:
                         if (GameObject* go = instance->GetGameObject(_thaddiusPortalGUID))
                             go->SetPhaseMask(1, true);
                         break;
-                    case EVENT_HORSEMAN:
+                    case BOSS_HORSEMAN:
                         if (GameObject* go = instance->GetGameObject(_horsemanPortalGUID))
                             go->SetPhaseMask(1, true);
                         break;
                 }
             }
+                
+            return true;
         }
 
-        uint32 GetData(uint32 identifier) const
-        {
-            switch(identifier)
-            {
-                case EVENT_HORSEMAN:
-                    return Encounters[identifier];
-            }
-            return 0;
-        }
-
-        void Update(uint32 diff)
+        void Update(uint32 diff) override
         {
             if (_speakTimer)
             {
@@ -666,7 +650,7 @@ public:
                 _horsemanTimer += diff;
         }
 
-        uint64 GetData64(uint32 id) const
+        uint64 GetData64(uint32 id) const override
         {
             switch (id)
             {
@@ -703,21 +687,18 @@ public:
             return 0;
         }
 
-        std::string GetSaveData()
+        std::string GetSaveData() override
         {
             OUT_SAVE_INST_DATA;
 
             std::ostringstream saveStream;
-            saveStream << "N X X " << Encounters[0] << ' ' << Encounters[1] << ' ' << Encounters[2] << ' ' << Encounters[3]
-                 << ' ' << Encounters[4] << ' ' << Encounters[5] << ' ' << Encounters[6] << ' ' << Encounters[7] 
-                 << ' ' << Encounters[8] << ' ' << Encounters[9] << ' ' << Encounters[10] << ' ' << Encounters[11]
-                 << ' ' << Encounters[12] << ' ' << Encounters[13] << ' ' << Encounters[14] << ' ' << immortalAchievement;
+            saveStream << "N X X " << GetBossSaveData() << ' ' << immortalAchievement;
 
             OUT_SAVE_INST_DATA_COMPLETE;
             return saveStream.str();
         }
 
-        void Load(const char* in)
+        void Load(const char* in) override
         {
             if (!in)
             {
@@ -735,9 +716,12 @@ public:
             {
                 for (uint8 i = 0; i < MAX_ENCOUNTERS; ++i)
                 {
-                    loadStream >> Encounters[i];
-                    if (Encounters[i] == IN_PROGRESS)
-                        Encounters[i] = NOT_STARTED;
+                    uint32 tmpState;
+                    loadStream >> tmpState;
+                    if (tmpState == IN_PROGRESS)
+                        tmpState = NOT_STARTED;
+                    
+                    SetBossState(i, EncounterState(tmpState));
                 }
                 loadStream >> immortalAchievement;
 

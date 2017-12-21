@@ -46,7 +46,7 @@ struct AchievementEntry
 struct AchievementCategoryEntry
 {
     uint32    ID;                                           // 0
-    uint32    parentCategory;                               // 1 -1 for main category
+    int32    parentCategory;                               // 1 -1 for main category
     //char *name[16];                                       // 2-17
     //uint32 name_flags;                                    // 18
     //uint32    sortOrder;                                  // 19
@@ -1090,18 +1090,6 @@ struct HolidaysEntry
     uint32 Priority;                                        // 52       m_priority
     uint32 CalendarFilterType;                              // 53       m_calendarFilterType (-1 = Fishing Contest, 0 = Unk, 1 = Darkmoon Festival, 2 = Yearly holiday)
     //uint32 flags;                                         // 54       m_flags (0 = Darkmoon Faire, Fishing Contest and Wotlk Launch, rest is 1)
-};
-
-struct ItemEntry
-{
-   uint32   ID;                                             // 0
-   uint32   Class;                                          // 1
-   uint32   SubClass;                                       // 2 some items have strange subclasses
-   int32    SoundOverrideSubclass;                          // 3
-   int32    Material;                                       // 4
-   uint32   DisplayId;                                      // 5
-   uint32   InventoryType;                                  // 6
-   uint32   Sheath;                                         // 7
 };
 
 struct ItemBagFamilyEntry

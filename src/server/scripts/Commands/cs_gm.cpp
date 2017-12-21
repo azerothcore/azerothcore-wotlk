@@ -191,14 +191,10 @@ public:
             return false;
         }
 
-        const uint32 VISUAL_AURA = 37800;
         std::string param = (char*)args;
 
         if (param == "on")
         {
-            if (_player->HasAura(VISUAL_AURA, 0))
-                _player->RemoveAurasDueToSpell(VISUAL_AURA);
-
             _player->SetGMVisible(true);
             //_player->UpdateObjectVisibility();
             handler->GetSession()->SendNotification(LANG_INVISIBLE_VISIBLE);
@@ -208,7 +204,6 @@ public:
 
         if (param == "off")
         {
-            _player->AddAura(VISUAL_AURA, _player);
             _player->SetGMVisible(false);
             //_player->UpdateObjectVisibility();
             handler->GetSession()->SendNotification(LANG_INVISIBLE_INVISIBLE);

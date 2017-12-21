@@ -121,9 +121,9 @@ public:
         return new boss_four_horsemenAI (pCreature);
     }
 
-    struct boss_four_horsemenAI : public ScriptedAI
+    struct boss_four_horsemenAI : public BossAI
     {
-        boss_four_horsemenAI(Creature *c) : ScriptedAI(c)
+        boss_four_horsemenAI(Creature *c) : BossAI(c, BOSS_HORSEMAN)
         {
             pInstance = me->GetInstanceScript();
             switch (me->GetEntry())
@@ -174,14 +174,12 @@ public:
 
         void Reset()
         {
+            BossAI::Reset();
             me->SetPosition(me->GetHomePosition());
             movementPhase = MOVE_PHASE_NONE;
             currentWaypoint = 0;
             me->SetReactState(REACT_AGGRESSIVE);
             events.Reset();
-
-            if (pInstance)
-                pInstance->SetData(EVENT_HORSEMAN, NOT_STARTED);
 
             // Schedule Events
             events.RescheduleEvent(EVENT_SPELL_MARK_CAST, 24000);
@@ -248,25 +246,24 @@ public:
                 pInstance->SetData(DATA_IMMORTAL_FAIL, 0);
         }
 
-        void JustDied(Unit*  /*killer*/)
+        void JustDied(Unit*  killer)
         {
+            BossAI::JustDied(killer);
             if (pInstance)
             {
-                pInstance->SetData(EVENT_HORSEMAN, DONE);
-                if (pInstance->GetData(EVENT_HORSEMAN) == DONE)
+                if (pInstance->GetBossState(BOSS_HORSEMAN) == DONE) {
                     if (!me->GetMap()->GetPlayers().isEmpty())
                         if (Player* player = me->GetMap()->GetPlayers().getFirst()->GetSource())
                             player->SummonGameObject(RAID_MODE(GO_HORSEMEN_CHEST_10, GO_HORSEMEN_CHEST_25), 2514.8f, -2944.9f, 245.55f, 5.51f, 0, 0, 0, 0, 0);
+                }
             }
 
             Talk(SAY_DEATH);
         }
 
-        void EnterCombat(Unit * /*who*/)
+        void EnterCombat(Unit * who)
         {
-            if (pInstance)
-                pInstance->SetData(EVENT_HORSEMAN, IN_PROGRESS);
-
+            BossAI::EnterCombat(who);
             if (movementPhase == MOVE_PHASE_NONE)
             {
                 Talk(SAY_AGGRO);

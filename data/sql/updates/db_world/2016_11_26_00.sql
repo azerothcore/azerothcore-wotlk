@@ -23,8 +23,7 @@ INSERT INTO trinity_string(`entry`,`content_default`,`content_loc6`,`content_loc
 -- END UPDATING QUERIES
 --
 COMMIT;
-END;
-//
+END //
 DELIMITER ;
 CALL updateDb();
 DROP PROCEDURE IF EXISTS `updateDb`;
