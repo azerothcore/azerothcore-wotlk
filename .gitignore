@@ -6,7 +6,6 @@ conf/*
 !conf/*.dist
 env/dist/*
 env/user/*
-modules/*
 build*/
 var/*
 
