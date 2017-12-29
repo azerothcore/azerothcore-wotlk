@@ -7,6 +7,7 @@
 #ifndef _PLAYER_H
 #define _PLAYER_H
 
+#include "DataMap.h"
 #include "DBCStores.h"
 #include "GroupReference.h"
 #include "MapReference.h"
@@ -2594,6 +2595,8 @@ class Player : public Unit, public GridObject<Player>
         const PlayerTalentMap& GetTalentMap() const { return m_talents; }
         uint32 GetNextSave() const { return m_nextSave; }
         SpellModList const& GetSpellModList(uint32 type) const { return m_spellMods[type]; }
+
+        DataMap DataMap;
 
     protected:
         // Gamemaster whisper whitelist
