@@ -28,4 +28,4 @@
 *.RTF    diff=astextplain
 
 # Ignore sql/* files
-sql/*    linguist-documentation
+data/sql/*    linguist-documentation
