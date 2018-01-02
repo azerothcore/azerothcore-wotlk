@@ -106,7 +106,7 @@ class at_ancient_leaf : public AreaTriggerScript
     public:
         at_ancient_leaf() : AreaTriggerScript("at_ancient_leaf") { }
 
-        bool OnTrigger(Player* player, AreaTriggerEntry const* /*trigger*/)
+        bool OnTrigger(Player* player, AreaTrigger const* /*trigger*/)
         {
             if (player->IsGameMaster() || !player->IsAlive())
                 return false;

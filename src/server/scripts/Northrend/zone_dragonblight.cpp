@@ -1033,7 +1033,7 @@ class at_q24545_frostmourne_cavern : public AreaTriggerScript
     public:
         at_q24545_frostmourne_cavern() : AreaTriggerScript("at_q24545_frostmourne_cavern") { }
 
-        bool OnTrigger(Player* player, AreaTriggerEntry const* /*areaTrigger*/)
+        bool OnTrigger(Player* player, AreaTrigger const* /*areaTrigger*/)
         {
             if (player->GetPhaseMask() & 2)
                 if (Creature* c = player->FindNearestCreature(NPC_SAC_LICH_KING, 60.0f, true))
