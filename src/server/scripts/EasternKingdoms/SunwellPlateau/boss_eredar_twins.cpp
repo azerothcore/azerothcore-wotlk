@@ -487,7 +487,7 @@ class AreaTrigger_at_sunwell_eredar_twins : public AreaTriggerScript
 
         AreaTrigger_at_sunwell_eredar_twins() : AreaTriggerScript("at_sunwell_eredar_twins") {}
 
-        bool OnTrigger(Player* player, AreaTriggerEntry const* /*trigger*/)
+        bool OnTrigger(Player* player, AreaTrigger const* /*trigger*/)
         {
             if (InstanceScript* instance = player->GetInstanceScript())
                 if (instance->GetBossState(DATA_EREDAR_TWINS_INTRO) != DONE)

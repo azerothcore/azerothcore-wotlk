@@ -5551,7 +5551,7 @@ void ObjectMgr::LoadQuestAreaTriggers()
         uint32 trigger_ID = fields[0].GetUInt32();
         uint32 quest_ID   = fields[1].GetUInt32();
 
-        AreaTriggerEntry const* atEntry = sAreaTriggerStore.LookupEntry(trigger_ID);
+        AreaTrigger const* atEntry = GetAreaTrigger(trigger_ID);
         if (!atEntry)
         {
             sLog->outErrorDb("Area trigger (ID:%u) does not exist in `AreaTrigger.dbc`.", trigger_ID);
@@ -5609,7 +5609,7 @@ void ObjectMgr::LoadTavernAreaTriggers()
 
         uint32 Trigger_ID      = fields[0].GetUInt32();
 
-        AreaTriggerEntry const* atEntry = sAreaTriggerStore.LookupEntry(Trigger_ID);
+        AreaTrigger const* atEntry = GetAreaTrigger(Trigger_ID);
         if (!atEntry)
         {
             sLog->outErrorDb("Area trigger (ID:%u) does not exist in `AreaTrigger.dbc`.", Trigger_ID);
@@ -5648,7 +5648,7 @@ void ObjectMgr::LoadAreaTriggerScripts()
         uint32 Trigger_ID      = fields[0].GetUInt32();
         const char *scriptName = fields[1].GetCString();
 
-        AreaTriggerEntry const* atEntry = sAreaTriggerStore.LookupEntry(Trigger_ID);
+        AreaTrigger const* atEntry = GetAreaTrigger(Trigger_ID);
         if (!atEntry)
         {
             sLog->outErrorDb("Area trigger (ID:%u) does not exist in `AreaTrigger.dbc`.", Trigger_ID);
@@ -6048,11 +6048,62 @@ void ObjectMgr::RemoveGraveyardLink(uint32 id, uint32 zoneId, TeamId teamId, boo
     }
 }
 
+void ObjectMgr::LoadAreaTriggers()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _areaTriggerStore.clear();
+
+    QueryResult result = WorldDatabase.Query("SELECT entry, map, x, y, z, radius, length, width, height, orientation FROM areatrigger");
+
+    if (!result)
+    {
+        sLog->outString(">> Loaded 0 area trigger definitions. DB table `areatrigger` is empty.");
+        sLog->outString();
+        return;
+    }
+
+    uint32 count = 0;
+
+    do
+    {
+        Field* fields = result->Fetch();
+
+        ++count;
+
+        AreaTrigger at;
+
+        at.entry = fields[0].GetUInt32();
+        at.map = fields[1].GetUInt32();
+        at.x = fields[2].GetFloat();
+        at.y = fields[3].GetFloat();
+        at.z = fields[4].GetFloat();
+        at.radius = fields[5].GetFloat();
+        at.length = fields[6].GetFloat();
+        at.width = fields[7].GetFloat();
+        at.height = fields[8].GetFloat();
+        at.orientation = fields[9].GetFloat();
+
+        MapEntry const* mapEntry = sMapStore.LookupEntry(at.map);
+        if (!mapEntry)
+        {
+            sLog->outErrorDb("Area trigger (ID:%u) map (ID: %u) does not exist in `Map.dbc`.", at.entry, at.map);
+            continue;
+        }
+
+        _areaTriggerStore[at.entry] = at;
+
+    } while (result->NextRow());
+
+    sLog->outString(">> Loaded %u area trigger definitions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    sLog->outString();
+}
+
 void ObjectMgr::LoadAreaTriggerTeleports()
 {
     uint32 oldMSTime = getMSTime();
 
-    _areaTriggerStore.clear();                                  // need for reload case
+    _areaTriggerTeleportStore.clear();                                  // need for reload case
 
     //                                               0        1              2                  3                  4                   5
     QueryResult result = WorldDatabase.Query("SELECT ID,  target_map, target_position_x, target_position_y, target_position_z, target_orientation FROM areatrigger_teleport");
@@ -6074,7 +6125,7 @@ void ObjectMgr::LoadAreaTriggerTeleports()
 
         uint32 Trigger_ID = fields[0].GetUInt32();
 
-        AreaTrigger at;
+        AreaTriggerTeleport at;
 
         at.target_mapId             = fields[1].GetUInt16();
         at.target_X                 = fields[2].GetFloat();
@@ -6082,7 +6133,7 @@ void ObjectMgr::LoadAreaTriggerTeleports()
         at.target_Z                 = fields[4].GetFloat();
         at.target_Orientation       = fields[5].GetFloat();
 
-        AreaTriggerEntry const* atEntry = sAreaTriggerStore.LookupEntry(Trigger_ID);
+        AreaTrigger const* atEntry = GetAreaTrigger(Trigger_ID);
         if (!atEntry)
         {
             sLog->outErrorDb("Area trigger (ID:%u) does not exist in `AreaTrigger.dbc`.", Trigger_ID);
@@ -6102,7 +6153,7 @@ void ObjectMgr::LoadAreaTriggerTeleports()
             continue;
         }
 
-        _areaTriggerStore[Trigger_ID] = at;
+        _areaTriggerTeleportStore[Trigger_ID] = at;
 
     } while (result->NextRow());
 
@@ -6212,7 +6263,7 @@ void ObjectMgr::LoadAccessRequirements()
 /*
  * Searches for the areatrigger which teleports players out of the given map with instance_template.parent field support
  */
-AreaTrigger const* ObjectMgr::GetGoBackTrigger(uint32 Map) const
+AreaTriggerTeleport const* ObjectMgr::GetGoBackTrigger(uint32 Map) const
 {
     bool useParentDbValue = false;
     uint32 parentId = 0;
@@ -6232,11 +6283,11 @@ AreaTrigger const* ObjectMgr::GetGoBackTrigger(uint32 Map) const
     }
 
     uint32 entrance_map = uint32(mapEntry->entrance_map);
-    for (AreaTriggerContainer::const_iterator itr = _areaTriggerStore.begin(); itr != _areaTriggerStore.end(); ++itr)
+    for (AreaTriggerTeleportContainer::const_iterator itr = _areaTriggerTeleportStore.begin(); itr != _areaTriggerTeleportStore.end(); ++itr)
         if ((!useParentDbValue && itr->second.target_mapId == entrance_map) || (useParentDbValue && itr->second.target_mapId == parentId))
         {
-            AreaTriggerEntry const* atEntry = sAreaTriggerStore.LookupEntry(itr->first);
-            if (atEntry && atEntry->mapid == Map)
+            AreaTrigger const* atEntry = GetAreaTrigger(itr->first);
+            if (atEntry && atEntry->map == Map)
                 return &itr->second;
         }
     return NULL;
@@ -6245,9 +6296,9 @@ AreaTrigger const* ObjectMgr::GetGoBackTrigger(uint32 Map) const
 /**
  * Searches for the areatrigger which teleports players to the given map
  */
-AreaTrigger const* ObjectMgr::GetMapEntranceTrigger(uint32 Map) const
+AreaTriggerTeleport const* ObjectMgr::GetMapEntranceTrigger(uint32 Map) const
 {
-    for (AreaTriggerContainer::const_iterator itr = _areaTriggerStore.begin(); itr != _areaTriggerStore.end(); ++itr)
+    for (AreaTriggerTeleportContainer::const_iterator itr = _areaTriggerTeleportStore.begin(); itr != _areaTriggerTeleportStore.end(); ++itr)
     {
         if (itr->second.target_mapId == Map) // Id is used to determine correct Scarlet Monastery instance
         {
