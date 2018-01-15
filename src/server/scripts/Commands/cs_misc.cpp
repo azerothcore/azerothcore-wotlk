@@ -96,6 +96,7 @@ public:
             { "send",               SEC_GAMEMASTER,         true,  nullptr,                             "", sendCommandTable },
             { "pet",                SEC_GAMEMASTER,         false, nullptr,                             "", petCommandTable },
             { "mute",               SEC_GAMEMASTER,         true,  &HandleMuteCommand,                  "" },
+            { "mutehistory",        SEC_GAMEMASTER,         true,  &HandleMuteInfoCommand,              "" },
             { "unmute",             SEC_GAMEMASTER,         true,  &HandleUnmuteCommand,                "" },
             { "movegens",           SEC_ADMINISTRATOR,      false, &HandleMovegensCommand,              "" },
             { "cometome",           SEC_ADMINISTRATOR,      false, &HandleComeToMeCommand,              "" },
@@ -2159,6 +2160,13 @@ public:
         stmt->setString(2, muteBy.c_str());
         stmt->setUInt32(3, accountId);
         LoginDatabase.Execute(stmt);
+        stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_ACCOUNT_MUTE);
+        stmt->setUInt32(0, accountId);
+        stmt->setUInt32(1, notSpeakTime);
+        stmt->setString(2, muteBy.c_str());
+        stmt->setString(3, muteReasonStr.c_str());
+        LoginDatabase.Execute(stmt);
+
         std::string nameLink = handler->playerLink(targetName);
 
         // pussywizard: notify all online GMs
@@ -2220,6 +2228,65 @@ public:
         return true;
     }
 
+    // mutehistory command
+    static bool HandleMuteInfoCommand(ChatHandler* handler, char const* args)
+    {
+        if (!*args)
+            return false;
+
+        char *nameStr = strtok((char*)args, "");
+        if (!nameStr)
+            return false;
+
+        std::string accountName = nameStr;
+        if (!AccountMgr::normalizeString(accountName))
+        {
+            handler->PSendSysMessage(LANG_ACCOUNT_NOT_EXIST, accountName.c_str());
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        uint32 accountId = AccountMgr::GetId(accountName);
+        if (!accountId)
+        {
+            handler->PSendSysMessage(LANG_ACCOUNT_NOT_EXIST, accountName.c_str());
+            return false;
+        }
+
+        return HandleMuteInfoHelper(accountId, accountName.c_str(), handler);
+    }
+
+    // helper for mutehistory
+    static bool HandleMuteInfoHelper(uint32 accountId, char const* accountName, ChatHandler* handler)
+    {
+        PreparedStatement *stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_MUTE_INFO);
+        stmt->setUInt16(0, accountId);
+        PreparedQueryResult result = LoginDatabase.Query(stmt);
+
+        if (!result)
+        {
+            handler->PSendSysMessage(LANG_COMMAND_MUTEHISTORY_EMPTY, accountName);
+            return true;
+        }
+
+        handler->PSendSysMessage(LANG_COMMAND_MUTEHISTORY, accountName);
+        do
+        {
+            Field* fields = result->Fetch();
+
+            // we have to manually set the string for mutedate
+            time_t sqlTime = fields[0].GetUInt32();
+            tm timeInfo;
+            char buffer[80];
+
+            // set it to string
+            ACE_OS::localtime_r(&sqlTime, &timeInfo);
+            strftime(buffer, sizeof(buffer), "%Y-%m-%d %I:%M%p", &timeInfo);
+
+            handler->PSendSysMessage(LANG_COMMAND_MUTEHISTORY_OUTPUT, buffer, fields[1].GetUInt32(), fields[2].GetCString(), fields[3].GetCString());
+        } while (result->NextRow());
+        return true;
+    }
 
     static bool HandleMovegensCommand(ChatHandler* handler, char const* /*args*/)
     {
