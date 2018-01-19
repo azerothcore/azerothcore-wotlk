@@ -2708,7 +2708,7 @@ float Creature::GetAggroRange(Unit const* target) const
         levelDiff = -25;
 
     // The base aggro radius for mob of same level
-    float aggroRadius = 20.0f;
+    float aggroRadius = 10.0f;
 
     // Aggro Radius varies with level difference at a rate of roughly 1 yard/level
     aggroRadius -= (float)levelDiff;
