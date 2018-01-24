@@ -173,15 +173,15 @@ public:
     bool operator()(WorldObject* object) const
     {
         if (!object)
-            return true;
+            return false;
         if (Player* p = object->ToPlayer())
         {
             if (p == _source->GetVictim() || p->GetExactDist(_source) >= 45.0f)
-                return true;
+                return false;
 
-            return false;
+            return true;
         }
-        return true;
+        return false;
     }
 private:
     Creature const* _source;
