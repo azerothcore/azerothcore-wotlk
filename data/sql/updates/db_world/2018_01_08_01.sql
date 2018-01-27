@@ -1,3 +1,19 @@
+-- DB update 2018_01_08_00 -> 2018_01_08_01
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2018_01_08_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2018_01_08_00 2018_01_08_01 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1512840854590821700'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO version_db_world (`sql_rev`) VALUES ('1512840854590821700');
 INSERT INTO item_template (entry, class, subclass, SoundOverrideSubclass, name, Material, displayid, InventoryType, sheath) VALUES (41, 4, 0, -1, 'NPC Equip 41', 7, 4553, 6, 0);
 INSERT INTO item_template (entry, class, subclass, SoundOverrideSubclass, name, Material, displayid, InventoryType, sheath) VALUES (42, 4, 0, -1, 'NPC Equip 42', 7, 4562, 6, 0);
@@ -7485,3 +7501,12 @@ INSERT INTO item_template (entry, class, subclass, SoundOverrideSubclass, name, 
 INSERT INTO item_template (entry, class, subclass, SoundOverrideSubclass, name, Material, displayid, InventoryType, sheath) VALUES (54612, 2, 14, -1, 'NPC Equip 54612', 1, 67215, 13, 0);
 INSERT INTO item_template (entry, class, subclass, SoundOverrideSubclass, name, Material, displayid, InventoryType, sheath) VALUES (54647, 0, 0, -1, 'NPC Equip 54647', 7, 66184, 16, 0);
 INSERT INTO item_template (entry, class, subclass, SoundOverrideSubclass, name, Material, displayid, InventoryType, sheath) VALUES (54848, 4, 3, -1, 'NPC Equip 54848', 5, 65233, 3, 0);
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;

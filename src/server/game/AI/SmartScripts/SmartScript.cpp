@@ -4096,7 +4096,7 @@ void SmartScript::OnUpdate(uint32 const diff)
     }
 }
 
-void SmartScript::FillScript(SmartAIEventList e, WorldObject* obj, AreaTriggerEntry const* at)
+void SmartScript::FillScript(SmartAIEventList e, WorldObject* obj, AreaTrigger const* at)
 {
     if (e.empty())
     {
@@ -4105,7 +4105,7 @@ void SmartScript::FillScript(SmartAIEventList e, WorldObject* obj, AreaTriggerEn
             sLog->outDebug(LOG_FILTER_DATABASE_AI, "SmartScript: EventMap for Entry %u is empty but is using SmartScript.", obj->GetEntry());
 
         if (at)
-            sLog->outDebug(LOG_FILTER_DATABASE_AI, "SmartScript: EventMap for AreaTrigger %u is empty but is using SmartScript.", at->id);
+            sLog->outDebug(LOG_FILTER_DATABASE_AI, "SmartScript: EventMap for AreaTrigger %u is empty but is using SmartScript.", at->entry);
 #endif
         return;
     }
@@ -4132,7 +4132,7 @@ void SmartScript::FillScript(SmartAIEventList e, WorldObject* obj, AreaTriggerEn
     if (mEvents.empty() && obj)
         sLog->outErrorDb("SmartScript: Entry %u has events but no events added to list because of instance flags.", obj->GetEntry());
     if (mEvents.empty() && at)
-        sLog->outErrorDb("SmartScript: AreaTrigger %u has events but no events added to list because of instance flags. NOTE: triggers can not handle any instance flags.", at->id);
+        sLog->outErrorDb("SmartScript: AreaTrigger %u has events but no events added to list because of instance flags. NOTE: triggers can not handle any instance flags.", at->entry);
 }
 
 void SmartScript::GetScript()
@@ -4154,12 +4154,12 @@ void SmartScript::GetScript()
     }
     else if (trigger)
     {
-        e = sSmartScriptMgr->GetScript((int32)trigger->id, mScriptType);
+        e = sSmartScriptMgr->GetScript((int32)trigger->entry, mScriptType);
         FillScript(e, NULL, trigger);
     }
 }
 
-void SmartScript::OnInitialize(WorldObject* obj, AreaTriggerEntry const* at)
+void SmartScript::OnInitialize(WorldObject* obj, AreaTrigger const* at)
 {
     if (obj)//handle object based scripts
     {
@@ -4189,7 +4189,7 @@ void SmartScript::OnInitialize(WorldObject* obj, AreaTriggerEntry const* at)
         mScriptType = SMART_SCRIPT_TYPE_AREATRIGGER;
         trigger = at;
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_DATABASE_AI, "SmartScript::OnInitialize: source is AreaTrigger %u", trigger->id);
+        sLog->outDebug(LOG_FILTER_DATABASE_AI, "SmartScript::OnInitialize: source is AreaTrigger %u", trigger->entry);
 #endif
     }
     else

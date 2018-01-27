@@ -1296,7 +1296,7 @@ class at_hor_shadow_throne : public AreaTriggerScript
     public:
         at_hor_shadow_throne() : AreaTriggerScript("at_hor_shadow_throne") { }
 
-        bool OnTrigger(Player* player, const AreaTriggerEntry* /*at*/)
+        bool OnTrigger(Player* player, const AreaTrigger* /*at*/)
         {
             if (player->IsGameMaster())
                 return false;
@@ -1996,7 +1996,7 @@ class at_hor_battered_hilt_start : public AreaTriggerScript
     public:
         at_hor_battered_hilt_start() : AreaTriggerScript("at_hor_battered_hilt_start") { }
 
-        bool OnTrigger(Player* player, AreaTriggerEntry const* /*areaTrigger*/)
+        bool OnTrigger(Player* player, AreaTrigger const* /*areaTrigger*/)
         {
             if (player->HasAura(70013))
                 if (InstanceScript* instance = player->GetInstanceScript())
@@ -2010,7 +2010,7 @@ class at_hor_battered_hilt_throw : public AreaTriggerScript
     public:
         at_hor_battered_hilt_throw() : AreaTriggerScript("at_hor_battered_hilt_throw") { }
 
-        bool OnTrigger(Player* player, AreaTriggerEntry const* /*areaTrigger*/)
+        bool OnTrigger(Player* player, AreaTrigger const* /*areaTrigger*/)
         {
             if (player->HasAura(70013))
                 if (InstanceScript* instance = player->GetInstanceScript())
