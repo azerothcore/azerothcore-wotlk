@@ -1149,7 +1149,7 @@ void ObjectMgr::LoadEquipmentTemplates()
 
         if (!sObjectMgr->GetCreatureTemplate(entry))
         {
-            sLog->outError("Creature template (Entry: %u) does not exist but has a record in `creature_equip_template`", entry);
+            sLog->outError("Creature template (CreatureID: %u) does not exist but has a record in `creature_equip_template`", entry);
             continue;
         }
 
@@ -1175,8 +1175,8 @@ void ObjectMgr::LoadEquipmentTemplates()
 
             if (!item)
             {
-                sLog->outErrorDb("Unknown item (entry=%u) in creature_equip_template.itemEntry%u for entry = %u, forced to 0.",
-                    equipmentInfo.ItemEntry[i], i+1, entry);
+                sLog->outErrorDb("Unknown item (ID=%u) in creature_equip_template.ItemID%u for CreatureID = %u and ID = %u, forced to 0.",
+                    equipmentInfo.ItemEntry[i], i+1, entry, id);
                 equipmentInfo.ItemEntry[i] = 0;
                 continue;
             }
@@ -1191,8 +1191,8 @@ void ObjectMgr::LoadEquipmentTemplates()
                 item->InventoryType != INVTYPE_THROWN &&
                 item->InventoryType != INVTYPE_RANGEDRIGHT)
             {
-                sLog->outErrorDb("Item (entry=%u) in creature_equip_template.itemEntry%u for entry = %u is not equipable in a hand, forced to 0.",
-                    equipmentInfo.ItemEntry[i], i+1, entry);
+                sLog->outErrorDb("Item (ID=%u) in creature_equip_template.ItemID%u for CreatureID = %u and ID = %u is not equipable in a hand, forced to 0.",
+                    equipmentInfo.ItemEntry[i], i+1, entry, id);
                 equipmentInfo.ItemEntry[i] = 0;
             }
         }
