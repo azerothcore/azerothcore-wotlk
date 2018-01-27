@@ -13,7 +13,7 @@ bool ReachAreaTriggerAction::Execute(Event event)
     p.rpos(0);
     p >> triggerId;
 
-    AreaTriggerEntry const* atEntry = sAreaTriggerStore.LookupEntry(triggerId);
+	AreaTrigger const* atEntry = sObjectMgr->GetAreaTrigger(triggerId);
     if(!atEntry)
         return false;
 
@@ -28,7 +28,7 @@ bool ReachAreaTriggerAction::Execute(Event event)
         return true;
     }
 
-    if (bot->GetMapId() != atEntry->mapid || bot->GetDistance(atEntry->x, atEntry->y, atEntry->z) > sPlayerbotAIConfig.sightDistance)
+    if (bot->GetMapId() != atEntry->map || bot->GetDistance(atEntry->x, atEntry->y, atEntry->z) > sPlayerbotAIConfig.sightDistance)
     {
         ai->TellMaster("I won't follow: too far away");
         return true;
@@ -36,7 +36,7 @@ bool ReachAreaTriggerAction::Execute(Event event)
 
     MotionMaster &mm = *bot->GetMotionMaster();
     mm.Clear();
-	mm.MovePoint(atEntry->mapid, atEntry->x, atEntry->y, atEntry->z);
+	mm.MovePoint(atEntry->map, atEntry->x, atEntry->y, atEntry->z);
     float distance = bot->GetDistance(atEntry->x, atEntry->y, atEntry->z);
     float delay = 1000.0f * distance / bot->GetSpeed(MOVE_RUN) + sPlayerbotAIConfig.reactDelay;
     bot->Say("Wait for me", LANG_UNIVERSAL);
@@ -55,7 +55,7 @@ bool AreaTriggerAction::Execute(Event event)
     uint32 triggerId = movement.lastAreaTrigger;
     movement.lastAreaTrigger = 0;
 
-    AreaTriggerEntry const* atEntry = sAreaTriggerStore.LookupEntry(triggerId);
+	AreaTrigger const* atEntry = sObjectMgr->GetAreaTrigger(triggerId);
     if(!atEntry)
         return false;
 
