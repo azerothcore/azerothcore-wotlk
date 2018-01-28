@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+
 CUR_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 PATH_APPS="$CUR_PATH/apps/"
 PATH_MODULES="$CUR_PATH/modules/"
