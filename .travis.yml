@@ -17,8 +17,7 @@ before_install:
   - cd ..
   # push changes to git if any
   - git fetch --unshallow
-  - git checkout master
-  - [[ -z $(git status -uno --porcelain) ]] &&  git add -A . && git commit -am "Importing pending sql" && git push https://$GITHUB_API_KEY@github.com/azerothcore/azerothcore-wotlk.git master;
+  - [[ -z $(git status -uno --porcelain) ]] &&  git add -A . && git commit -am "Importing pending sql" && git push https://$GITHUB_API_KEY@github.com/azerothcore/azerothcore-wotlk.git HEAD;
 
 install:
   # install OS deps (apt-get)
