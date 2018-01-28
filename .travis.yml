@@ -17,7 +17,8 @@ before_install:
   - cd ..
   # push changes to git if any
   - git fetch --unshallow
-  - git add -A . && git diff --cached --quiet || git commit -am "Importing pending sql" && git push https://$GITHUB_API_KEY@github.com/azerothcore/azerothcore-wotlk.git HEAD;
+  - git checkout $TRAVIS_BRANCH
+  - git add -A . && git diff --cached --quiet || git commit -am "Importing pending sql" && git push https://$GITHUB_API_KEY@github.com/$TRAVIS_REPO_SLUG.git $TRAVIS_BRANCH;
 
 install:
   # install OS deps (apt-get)
