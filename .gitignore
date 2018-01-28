@@ -4,6 +4,7 @@
 
 conf/*
 !conf/*.dist
+apps/drassil/*
 env/dist/*
 env/user/*
 modules/*
