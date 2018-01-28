@@ -17,6 +17,7 @@ before_install:
   - cd ..
   # push changes to git if any
   - git fetch --unshallow
+  - git checkout master
   - git add -A .
   - git commit -am "Importing pending sql"
   - git push https://$GITHUB_API_KEY@github.com/azerothcore/azerothcore-wotlk.git master;
