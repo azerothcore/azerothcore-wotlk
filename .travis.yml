@@ -11,14 +11,14 @@ git:
 
 before_install:
   - git config user.email "travis@build.bot" && git config user.name "Travis CI"
-  - cd bin/
+  - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then cd bin/; fi
   # import pending sql
-  - bash acore-db-pendings
-  - cd ..
+  - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then bash acore-db-pendings; fi
+  - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then cd ..; fi
   # push changes to git if any
-  - git fetch --unshallow
-  - git checkout master
-  - git diff --quiet --exit-code --cached && git add -A . && git commit -am "Importing pending sql" && git push https://$GITHUB_API_KEY@github.com/azerothcore/azerothcore-wotlk.git master;
+  - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then git fetch --unshallow; fi
+  - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then git checkout $TRAVIS_BRANCH; fi
+  - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then git add -A . && git diff --cached --quiet || git commit -am "Importing pending sql" && git push https://$GITHUB_API_KEY@github.com/$TRAVIS_REPO_SLUG.git $TRAVIS_BRANCH; fi
 
 install:
   # install OS deps (apt-get)
