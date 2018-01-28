@@ -10,32 +10,25 @@ git:
   depth: 1
 
 before_install:
-  - sudo apt-get -y install build-essential libtool make cmake cmake-data openssl libgoogle-perftools-dev
-  - sudo apt-get -y install libssl-dev libmysqlclient-dev libmysql++-dev libreadline6-dev zlib1g-dev libbz2-dev libace-dev
   - git config user.email "travis@build.bot" && git config user.name "Travis CI"
-  - git tag -a -m "Travis build" init
+  - cd bin/
+  # import pending sql
+  - bash acore-db-pendings
+  - cd ..
+  # push changes to git if any
+  - git fetch --unshallow
+  - git add -A .
+  - git commit -am "Importing pending sql"
+  - git push https://$GITHUB_API_KEY@github.com/azerothcore/azerothcore-wotlk.git master;
 
 install:
-  - mysql -uroot -e 'create database test_mysql;'
-  - mkdir build
-  - cd build
-  - cmake ../ -DWITH_WARNINGS=1 -DWITH_COREDEBUG=1 -DUSE_COREPCH=0 -DUSE_SCRIPTPCH=0 -DTOOLS=1 -DSCRIPTS=1 -DSERVERS=1 -DWITH_PERFTOOLS=1 -DENABLE_EXTRA_LOGS=1 -DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_FLAGS="-Werror" -DCMAKE_CXX_FLAGS="-Werror" -DCMAKE_INSTALL_PREFIX=check_install
-  - cd ..
+  # install OS deps (apt-get)
+  - bash ./install.sh 2
+  # create and import mysql
+  - bash ./install.sh 7
 
 script:
-  - $CXX --version
-  - mysql -uroot < data/sql/create/create_mysql.sql
-  - cat data/sql/base/db_auth/*.sql | mysql -uacore -pacore auth
-  - cat data/sql/base/db_characters/*.sql | mysql -uacore -pacore characters
-  - cat data/sql/base/db_world/*.sql | mysql -uacore -pacore world
-  - cat data/sql/updates/db_auth/*.sql | mysql -uacore -pacore auth
-  - cat data/sql/updates/db_characters/*.sql | mysql -uacore -pacore characters
-  - cat data/sql/updates/db_world/*.sql | mysql -uacore -pacore world
-  - cat data/sql/updates/pending_db_auth/*.sql | mysql -uacore -pacore auth
-  - cat data/sql/updates/pending_db_characters/*.sql | mysql -uacore -pacore characters
-  - cat data/sql/updates/pending_db_world/*.sql | mysql -uacore -pacore world
-  - mysql -uroot < data/sql/create/drop_mysql.sql
-  - cd build
-  - make -j 8 -k && make install
-  - cd check_install/bin
-
+  # create config file
+  - echo "CCUSTOMOPTIONS='-DWITH_WARNINGS=1 -DWITH_COREDEBUG=1 -DUSE_COREPCH=0 -DUSE_SCRIPTPCH=0 -DTOOLS=1 -DSCRIPTS=1 -DSERVERS=1 -DWITH_PERFTOOLS=1 -DENABLE_EXTRA_LOGS=1 -DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_FLAGS=\"-Werror\" -DCMAKE_CXX_FLAGS=\"-Werror\"';" >> conf/config.sh
+  # compile
+  - bash ./install.sh 5
