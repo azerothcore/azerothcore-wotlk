@@ -240,6 +240,8 @@ class WorldScript : public ScriptObject
         // Called before the world configuration is (re)loaded.
         virtual void OnBeforeConfigLoad(bool /*reload*/) { }
 
+        virtual void SetInitialWorldSettingsModule() {}
+
         // Called before the message of the day is changed.
         virtual void OnMotdChange(std::string& /*newMotd*/) { }
 
@@ -1036,6 +1038,7 @@ class ScriptMgr
         void Initialize();
         void LoadDatabase();
         void FillSpellSummary();
+        void SetInitialWorldSettingsModule();
         void CheckIfScriptsInDatabaseExist();
 
         const char* ScriptsVersion() const { return "Integrated Trinity Scripts"; }

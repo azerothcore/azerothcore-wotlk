@@ -1749,6 +1749,10 @@ void World::SetInitialWorldSettings()
     sLog->outString("Loading Scripts...");
     sScriptMgr->LoadDatabase();
 
+    //load module output
+    sLog->outString("Loading Module Translations");
+    sScriptMgr->SetInitialWorldSettingsModule();
+
     sLog->outString("Validating spell scripts...");
     sObjectMgr->ValidateSpellScripts();
 
