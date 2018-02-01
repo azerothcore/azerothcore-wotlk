@@ -43,7 +43,7 @@ public:
         if (T* v = Get<T>(k))
             return v;
         T* v = new T();
-        cont.emplace(k, std::unique_ptr<T>(v));
+        Container.emplace(k, std::unique_ptr<T>(v));
         return v;
     }
     
@@ -55,7 +55,7 @@ public:
     /**
      * Removes objects with given key and returns true if one was removed, false otherwise
      */
-    bool Erase(std::string const & k) { cont.erase(k) != 0; }
+    bool Erase(std::string const & k) { Container.erase(k) != 0; }
 
 private:
     std::unordered_map<std::string, std::unique_ptr<Base>> Container;
