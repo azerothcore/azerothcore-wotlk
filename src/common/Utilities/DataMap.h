@@ -38,7 +38,7 @@ public:
      * Returns a pointer to object of requested type stored with given key
      * or default constructs one and returns that one
      */
-    template<class T, typename std::enable_if<std::is_default_constructible<T>{}, int>::type = 0>
+    template<class T, typename std::enable_if<std::is_default_constructible<T>::value, int>::type = 0>
     T* GetDefault(std::string const & k) {
         static_assert(std::is_base_of<Base, T>::value, "T must derive from Base");
         if (T* v = Get<T>(k))
