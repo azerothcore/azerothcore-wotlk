@@ -2699,6 +2699,7 @@ float Creature::GetAggroRange(Unit const* target) const
     // Determines the aggro range for creatures
     // Based on data from wowwiki due to lack of 3.3.5a data
 
+    aggroRadius *= sWorld->getRate(RATE_CREATURE_AGGRO); //02.03.2018
     uint32 targetLevel = target->getLevelForTarget(this);
     uint32 myLevel = getLevelForTarget(target);
     int32 levelDiff = int32(targetLevel) - int32(myLevel);
@@ -2708,7 +2709,7 @@ float Creature::GetAggroRange(Unit const* target) const
         levelDiff = -25;
 
     // The base aggro radius for mob of same level
-    float aggroRadius = 10.0f;
+    float aggroRadius = 20.0f;
 
     // Aggro Radius varies with level difference at a rate of roughly 1 yard/level
     aggroRadius -= (float)levelDiff;
