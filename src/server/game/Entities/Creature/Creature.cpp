@@ -2728,7 +2728,9 @@ float Creature::GetAggroRange(Unit const* target) const
     float minRange = IsPet() ? 10.0f : 5.0f;
     if (aggroRadius < minRange)
         aggroRadius = minRange;
-
+	
+	aggroRadius *= sWorld->getRate(RATE_CREATURE_AGGRO); // Multiply aggroRadius by setting in config file
+    
     return aggroRadius;
 }
 
