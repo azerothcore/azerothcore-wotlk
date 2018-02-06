@@ -184,6 +184,7 @@ class boss_ossirian : public CreatureScript
                     {
                         CrystalGUID = Crystal->GetGUID();
                         ++CrystalIterator;
+                        Crystal->SetOwnerGUID(0);
                     }
                 }
             }
