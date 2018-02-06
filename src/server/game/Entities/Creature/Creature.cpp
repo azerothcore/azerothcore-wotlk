@@ -2699,9 +2699,9 @@ float Creature::GetAggroRange(Unit const* target) const
     // Determines the aggro range for creatures
     // Based on data from wowwiki due to lack of 3.3.5a data
 
-	float aggroRate = sWorld->getRate(RATE_CREATURE_AGGRO); // Multiply aggroRate by setting in config file
-	if (aggroRate == 0)
-		return 0.0f;
+    float aggroRate = sWorld->getRate(RATE_CREATURE_AGGRO); // Multiply aggroRate by setting in config file
+    if (aggroRate == 0)
+        return 0.0f;
 	
     uint32 targetLevel = target->getLevelForTarget(this);
     uint32 myLevel = getLevelForTarget(target);
@@ -2727,20 +2727,20 @@ float Creature::GetAggroRange(Unit const* target) const
     if (aggroRadius > MAX_AGGRO_RADIUS)
         aggroRadius = MAX_AGGRO_RADIUS;
 
-	// "Minimum Aggro Radius for a mob seems to be combat range (5 yards)"
-	if (aggroRadius < 5)
-		aggroRadius = 5;
+    // "Minimum Aggro Radius for a mob seems to be combat range (5 yards)"
+    if (aggroRadius < 5)
+        aggroRadius = 5;
 
-	// Youfie <Nostalrius> Baron Rivendare
-	if ((GetEntry() == 10440))
-		aggroRadius = 2;
+    // Youfie <Nostalrius> Baron Rivendare
+    if ((GetEntry() == 10440))
+        aggroRadius = 2;
 
-	// hunter pets seem to ignore minimum aggro radius so we'll default it a little higher
+    // hunter pets seem to ignore minimum aggro radius so we'll default it a little higher
     float minRange = IsPet() ? 10.0f : 5.0f;
     if (aggroRadius < minRange)
         aggroRadius = minRange;
   
-	return (aggroRadius * aggroRate);
+    return (aggroRadius * aggroRate);
 }
 
 void Creature::SetObjectScale(float scale)
