@@ -28,12 +28,25 @@ function dbasm_mysqlExec() {
 			read -p "Insert mysql user:" PROMPT_USER
 			read -p "Insert mysql pass:" -s PROMPT_PASS
 			export MYSQL_PWD=$PROMPT_PASS
+            
+            retval=$("$DB_MYSQL_EXEC"  -h "$MYSQL_HOST" -u "$PROMPT_USER" $options -e "$command")
 
             # create configured account if not exists
             "$DB_MYSQL_EXEC"  -h "$MYSQL_HOST" -u "$PROMPT_USER" $options -e "CREATE USER '${MYSQL_USER}'@'${MYSQL_HOST}' IDENTIFIED BY '${MYSQL_PASS}' WITH MAX_QUERIES_PER_HOUR 0 MAX_CONNECTIONS_PER_HOUR 0 MAX_UPDATES_PER_HOUR 0;"
-            "$DB_MYSQL_EXEC"  -h "$MYSQL_HOST" -u "$PROMPT_USER" $options -e "GRANT USAGE ON * . * TO '${MYSQL_USER}'@'${MYSQL_HOST}'  WITH GRANT OPTION;"
+            "$DB_MYSQL_EXEC"  -h "$MYSQL_HOST" -u "$PROMPT_USER" $options -e "GRANT CREATE ON *.* TO '${MYSQL_USER}'@'${MYSQL_HOST}'  WITH GRANT OPTION;"
+            for db in ${DATABASES[@]}
+            do
+                local _uc=${db^^}
+                local _name="DB_"$_uc"_CONF"
+                local _confs=${!_name}
 
-			retval=$("$DB_MYSQL_EXEC"  -h "$MYSQL_HOST" -u "$PROMPT_USER" $options -e "$command")
+                local _name="DB_"$_uc"_NAME"
+                local _dbname=${!_name}
+                
+                eval $_confs
+                echo "Grant permissions for ${MYSQL_USER}'@'${MYSQL_HOST} to ${_dbname}"
+                "$DB_MYSQL_EXEC"  -h "$MYSQL_HOST" -u "$PROMPT_USER" $options -e "GRANT ALL PRIVILEGES ON ${_dbname}.* TO '${MYSQL_USER}'@'${MYSQL_HOST}'  WITH GRANT OPTION;"
+            done
 		else
 			exit
 		fi
@@ -85,7 +98,7 @@ function dbasm_createDB() {
     else 
 		echo "Creating DB ${dbname} ..."
         dbasm_mysqlExec "$confs" "CREATE DATABASE \`${dbname}\`" ""
-        dbasm_mysqlExec "$confs" "GRANT ALL PRIVILEGES ON \`${dbname}\` . * TO '${CONF_USER}'@'${MYSQL_HOST}' WITH GRANT OPTION;"
+        dbasm_mysqlExec "$confs" "GRANT ALL PRIVILEGES ON \`${dbname}\`.* TO '${CONF_USER}'@'${MYSQL_HOST}' WITH GRANT OPTION;"
     fi
 }
 
@@ -261,6 +274,8 @@ function dbasm_db_import() {
         if dbasm_isNotEmpty $dbname "$confs"; then
             echo "$dbname is not empty, base importing skipped"
             return
+	else
+	    echo "$dbname seems empty"
         fi
     fi
 
