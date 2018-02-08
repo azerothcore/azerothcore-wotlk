@@ -31,7 +31,8 @@ public:
             { "delete",         SEC_GAMEMASTER,     true,  &HandleGuildDeleteCommand,           "" },
             { "invite",         SEC_GAMEMASTER,     true,  &HandleGuildInviteCommand,           "" },
             { "uninvite",       SEC_GAMEMASTER,     true,  &HandleGuildUninviteCommand,         "" },
-            { "rank",           SEC_GAMEMASTER,     true,  &HandleGuildRankCommand,             "" }
+            { "rank",           SEC_GAMEMASTER,     true,  &HandleGuildRankCommand,             "" },
+            { "info",           SEC_GAMEMASTER,     true,  &HandleGuildInfoCommand,             "" }
         };
         static std::vector<ChatCommand> commandTable =
         {
@@ -179,6 +180,44 @@ public:
 
         uint8 newRank = uint8(atoi(rankStr));
         return targetGuild->ChangeMemberRank(targetGuid, newRank);
+    }
+
+    static bool HandleGuildInfoCommand(ChatHandler* handler, char const* args)
+    {
+        Guild* guild = nullptr;
+
+        if (args && args[0] != '\0')
+        {
+            if (isNumeric(args))
+                guild = sGuildMgr->GetGuildById(strtoull(args, nullptr, 10));
+            else
+                guild = sGuildMgr->GetGuildByName(args);
+        }
+        else if (Player* target = handler->getSelectedPlayerOrSelf())
+            guild = target->GetGuild();
+
+        if (!guild)
+            return false;
+
+        // Display Guild Information
+        handler->PSendSysMessage(LANG_GUILD_INFO_NAME, guild->GetName().c_str(), guild->GetId()); // Guild Id + Name
+        std::string guildMasterName;
+        if (sObjectMgr->GetPlayerNameByGUID(guild->GetLeaderGUID(), guildMasterName))
+            handler->PSendSysMessage(LANG_GUILD_INFO_GUILD_MASTER, guildMasterName.c_str(), GUID_LOPART(guild->GetLeaderGUID())); // Guild Master
+
+        // Format creation date
+        char createdDateStr[20];
+        time_t createdDate = guild->GetCreatedDate();
+        tm localTm;
+        ACE_OS::localtime_r(&createdDate, &localTm);
+        strftime(createdDateStr, 20, "%Y-%m-%d %H:%M:%S", &localTm);
+
+        handler->PSendSysMessage(LANG_GUILD_INFO_CREATION_DATE, createdDateStr); // Creation Date
+        handler->PSendSysMessage(LANG_GUILD_INFO_MEMBER_COUNT, guild->GetMemberCount()); // Number of Members
+        handler->PSendSysMessage(LANG_GUILD_INFO_BANK_GOLD, guild->GetTotalBankMoney() / 100 / 100); // Bank Gold (in gold coins)
+        handler->PSendSysMessage(LANG_GUILD_INFO_MOTD, guild->GetMOTD().c_str()); // Message of the day
+        handler->PSendSysMessage(LANG_GUILD_INFO_EXTRA_INFO, guild->GetInfo().c_str()); // Extra Information
+        return true;
     }
 };
 

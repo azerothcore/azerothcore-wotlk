@@ -8,6 +8,7 @@
 #define _OBJECT_H
 
 #include "Common.h"
+#include "DataMap.h"
 #include "UpdateMask.h"
 #include "UpdateData.h"
 #include "GridReference.h"
@@ -324,6 +325,8 @@ class Object
 
         DynamicObject* ToDynObject() { if (GetTypeId() == TYPEID_DYNAMICOBJECT) return reinterpret_cast<DynamicObject*>(this); else return NULL; }
         DynamicObject const* ToDynObject() const { if (GetTypeId() == TYPEID_DYNAMICOBJECT) return reinterpret_cast<DynamicObject const*>(this); else return NULL; }
+
+        DataMap CustomData;
 
     protected:
 

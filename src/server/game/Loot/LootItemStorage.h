@@ -43,8 +43,8 @@ class LootItemStorage
         void AddNewStoredLoot(Loot* loot, Player* player);
         bool LoadStoredLoot(Item* item);
 
-        void RemoveStoredLootItem(uint32 containerId, uint32 itemid, uint32 count);
-        void RemoveStoredLootMoney(uint32 containerId);
+        void RemoveStoredLootItem(uint32 containerId, uint32 itemid, uint32 count, Loot* loot);
+        void RemoveStoredLootMoney(uint32 containerId, Loot* loot);
         void RemoveStoredLoot(uint32 containerId);
 
     private:

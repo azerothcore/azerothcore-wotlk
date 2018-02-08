@@ -205,7 +205,7 @@ void WorldSession::HandleLootMoneyOpcode(WorldPacket & /*recvData*/)
 
         // Delete the money loot record from the DB
         if (loot->containerId > 0)
-            sLootItemStorage->RemoveStoredLootMoney(loot->containerId);
+            sLootItemStorage->RemoveStoredLootMoney(loot->containerId, loot);
 
         // Delete container if empty
         if (loot->isLooted() && IS_ITEM_GUID(guid))

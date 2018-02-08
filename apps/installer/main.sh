@@ -67,7 +67,8 @@ function _switch() {
 }
 
 # run option directly if specified in argument
-[ ! -z $1 ] && _switch "${options[$cmdopt-1]}" && exit 0
+[ ! -z $1 ] && _switch "${options[$cmdopt-1]}"
+[ ! -z $1 ] && exit 0
 
 select opt in "${options[@]}"
 do

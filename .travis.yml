@@ -10,32 +10,27 @@ git:
   depth: 1
 
 before_install:
-  - sudo apt-get -y install build-essential libtool make cmake cmake-data openssl libgoogle-perftools-dev
-  - sudo apt-get -y install libssl-dev libmysqlclient-dev libmysql++-dev libreadline6-dev zlib1g-dev libbz2-dev libace-dev
   - git config user.email "travis@build.bot" && git config user.name "Travis CI"
-  - git tag -a -m "Travis build" init
+  - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then cd bin/; fi
+  # import pending sql
+  - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then bash acore-db-pendings; fi
+  - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then cd ..; fi
+  # push changes to git if any
+  - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then git fetch --unshallow; fi
+  - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then git checkout $TRAVIS_BRANCH; fi
+  - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then git add -A . && git diff --cached --quiet || git commit -am "Importing pending sql" && git push https://$GITHUB_API_KEY@github.com/$TRAVIS_REPO_SLUG.git $TRAVIS_BRANCH; fi
 
 install:
-  - mysql -uroot -e 'create database test_mysql;'
-  - mkdir build
-  - cd build
-  - cmake ../ -DWITH_WARNINGS=1 -DWITH_COREDEBUG=1 -DUSE_COREPCH=0 -DUSE_SCRIPTPCH=0 -DTOOLS=1 -DSCRIPTS=1 -DSERVERS=1 -DWITH_PERFTOOLS=1 -DENABLE_EXTRA_LOGS=1 -DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_FLAGS="-Werror" -DCMAKE_CXX_FLAGS="-Werror" -DCMAKE_INSTALL_PREFIX=check_install
-  - cd ..
+  # install OS deps (apt-get)
+  - bash ./install.sh 2
+  # create config file
+  - echo "CCUSTOMOPTIONS='-DWITH_WARNINGS=1 -DWITH_COREDEBUG=1 -DUSE_COREPCH=0 -DUSE_SCRIPTPCH=0 -DTOOLS=1 -DSCRIPTS=1 -DSERVERS=1 -DWITH_PERFTOOLS=1 -DENABLE_EXTRA_LOGS=1 -DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_FLAGS=\"-Werror\" -DCMAKE_CXX_FLAGS=\"-Werror\"';" >> conf/config.sh
+  - echo "DB_CHARACTERS_CONF=\"MYSQL_USER='root'; MYSQL_PASS=''; MYSQL_HOST='127.0.0.1';\"" >> conf/config.sh
+  - echo "DB_AUTH_CONF=\"MYSQL_USER='root'; MYSQL_PASS=''; MYSQL_HOST='127.0.0.1';\"" >> conf/config.sh
+  - echo "DB_WORLD_CONF=\"MYSQL_USER='root'; MYSQL_PASS=''; MYSQL_HOST='127.0.0.1';\"" >> conf/config.sh  
+  # create and import mysql
+  - bash ./install.sh 7
 
 script:
-  - $CXX --version
-  - mysql -uroot < data/sql/create/create_mysql.sql
-  - cat data/sql/base/db_auth/*.sql | mysql -uacore -pacore auth
-  - cat data/sql/base/db_characters/*.sql | mysql -uacore -pacore characters
-  - cat data/sql/base/db_world/*.sql | mysql -uacore -pacore world
-  - cat data/sql/updates/db_auth/*.sql | mysql -uacore -pacore auth
-  - cat data/sql/updates/db_characters/*.sql | mysql -uacore -pacore characters
-  - cat data/sql/updates/db_world/*.sql | mysql -uacore -pacore world
-  - cat data/sql/updates/pending_db_auth/*.sql | mysql -uacore -pacore auth
-  - cat data/sql/updates/pending_db_characters/*.sql | mysql -uacore -pacore characters
-  - cat data/sql/updates/pending_db_world/*.sql | mysql -uacore -pacore world
-  - mysql -uroot < data/sql/create/drop_mysql.sql
-  - cd build
-  - make -j 8 -k && make install
-  - cd check_install/bin
-
+  # compile
+  - bash ./install.sh 5
