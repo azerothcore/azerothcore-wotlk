@@ -465,7 +465,7 @@ class AreaTrigger_at_celestial_planetarium_enterance : public AreaTriggerScript
         {
         }
 
-        bool OnTrigger(Player* player, AreaTriggerEntry const* /*trigger*/)
+        bool OnTrigger(Player* player, AreaTrigger const* /*trigger*/)
         {
             if (player->IsAlive())
                 if (uint32 questId = (player->GetMap()->Is25ManRaid() ? 13816 : 13607 /*QUEST_CELESTIAL_PLANETARIUM*/))

@@ -512,7 +512,7 @@ class AreaTrigger_at_sunwell_madrigosa : public AreaTriggerScript
 
         AreaTrigger_at_sunwell_madrigosa() : AreaTriggerScript("at_sunwell_madrigosa") {}
 
-        bool OnTrigger(Player* player, AreaTriggerEntry const* /*trigger*/)
+        bool OnTrigger(Player* player, AreaTrigger const* /*trigger*/)
         {
             if (InstanceScript* instance = player->GetInstanceScript())
                 if (instance->GetBossState(DATA_MADRIGOSA) != DONE)

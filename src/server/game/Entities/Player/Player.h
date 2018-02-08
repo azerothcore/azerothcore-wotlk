@@ -19,6 +19,7 @@
 #include "Unit.h"
 #include "Battleground.h"
 #include "WorldSession.h"
+#include "ObjectMgr.h"
 
 #include <string>
 #include <vector>
@@ -1135,7 +1136,7 @@ class Player : public Unit, public GridObject<Player>
         bool IsInWater(bool allowAbove = false) const;
         bool IsUnderWater() const;
         bool IsFalling() const;
-        bool IsInAreaTriggerRadius(const AreaTriggerEntry* trigger) const;
+        bool IsInAreaTriggerRadius(const AreaTrigger* trigger) const;
 
         void SendInitialPacketsBeforeAddToMap();
         void SendInitialPacketsAfterAddToMap();

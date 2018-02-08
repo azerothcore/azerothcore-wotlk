@@ -3266,9 +3266,9 @@ void Player::SetInWater(bool apply)
     getHostileRefManager().updateThreatTables();
 }
 
-bool Player::IsInAreaTriggerRadius(const AreaTriggerEntry* trigger) const
+bool Player::IsInAreaTriggerRadius(const AreaTrigger* trigger) const
 {
-    if (!trigger || GetMapId() != trigger->mapid)
+    if (!trigger || GetMapId() != trigger->map)
         return false;
 
     if (trigger->radius > 0.f)
@@ -3280,8 +3280,8 @@ bool Player::IsInAreaTriggerRadius(const AreaTriggerEntry* trigger) const
     }
     else
     {
-        Position center = {trigger->x, trigger->y, trigger->z, trigger->box_orientation};
-        if (!IsWithinBox(center, trigger->box_x / 2.f, trigger->box_y / 2.f, trigger->box_z / 2.f))
+        Position center = {trigger->x, trigger->y, trigger->z, trigger->orientation};
+        if (!IsWithinBox(center, trigger->length / 2.f, trigger->width / 2.f, trigger->height / 2.f))
             return false;
     }
 
@@ -7920,7 +7920,7 @@ void Player::UpdateArea(uint32 newArea)
     }
     else if (!(areaFlags & AREA_FLAG_CAPITAL))
     {
-        AreaTriggerEntry const* atEntry = sAreaTriggerStore.LookupEntry(GetInnTriggerId());
+        AreaTrigger const* atEntry = sObjectMgr->GetAreaTrigger(GetInnTriggerId());
         if (!atEntry || !IsInAreaTriggerRadius(atEntry))
             RemoveRestState();
     }
@@ -18096,7 +18096,7 @@ bool Player::LoadFromDB(uint32 guid, SQLQueryHolder *holder)
         if (uint32 destInstId = sInstanceSaveMgr->PlayerGetDestinationInstanceId(this, mapId, GetDifficulty(mapEntry->IsRaid())))
         {
             instanceId = destInstId;
-            if (AreaTrigger const* at = sObjectMgr->GetMapEntranceTrigger(mapId))
+            if (AreaTriggerTeleport const* at = sObjectMgr->GetMapEntranceTrigger(mapId))
             {
                 Relocate(at->target_X, at->target_Y, at->target_Z, at->target_Orientation);
                 fixed = true;
@@ -18188,7 +18188,7 @@ bool Player::LoadFromDB(uint32 guid, SQLQueryHolder *holder)
         {
             bool fixed = false;
             if (mapEntry->Instanceable())
-                if (AreaTrigger const* at = sObjectMgr->GetMapEntranceTrigger(mapId))
+                if (AreaTriggerTeleport const* at = sObjectMgr->GetMapEntranceTrigger(mapId))
                 {
                     fixed = true;
                     Relocate(at->target_X, at->target_Y, at->target_Z, at->target_Orientation);
@@ -18234,7 +18234,7 @@ bool Player::LoadFromDB(uint32 guid, SQLQueryHolder *holder)
     // if the player is in an instance and it has been reset in the meantime teleport him to the entrance
     if ((instanceId && !sInstanceSaveMgr->GetInstanceSave(instanceId) && !mapEntry->IsBattlegroundOrArena()) || (!instanceId && mapEntry->IsDungeon()))
     {
-        AreaTrigger const* at = sObjectMgr->GetMapEntranceTrigger(mapId);
+        AreaTriggerTeleport const* at = sObjectMgr->GetMapEntranceTrigger(mapId);
         if (at)
             Relocate(at->target_X, at->target_Y, at->target_Z, at->target_Orientation);
         else
@@ -18248,7 +18248,7 @@ bool Player::LoadFromDB(uint32 guid, SQLQueryHolder *holder)
     if (!map)
     {
         instanceId = 0;
-        AreaTrigger const* at = sObjectMgr->GetGoBackTrigger(mapId);
+        AreaTriggerTeleport const* at = sObjectMgr->GetGoBackTrigger(mapId);
         if (at)
         {
             sLog->outError("Player (guidlow %d) is teleported to gobacktrigger (Map: %u X: %f Y: %f Z: %f O: %f).", guid, mapId, GetPositionX(), GetPositionY(), GetPositionZ(), GetOrientation());

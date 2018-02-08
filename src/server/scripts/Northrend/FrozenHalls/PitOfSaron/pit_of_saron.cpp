@@ -1556,7 +1556,7 @@ class at_tyrannus_event_starter : public AreaTriggerScript
     public:
         at_tyrannus_event_starter() : AreaTriggerScript("at_tyrannus_event_starter") { }
 
-        bool OnTrigger(Player* player, const AreaTriggerEntry* /*at*/)
+        bool OnTrigger(Player* player, const AreaTrigger* /*at*/)
         {
             InstanceScript* inst = player->GetInstanceScript();
             if (!inst)
