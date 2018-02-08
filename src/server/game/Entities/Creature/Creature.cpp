@@ -2715,7 +2715,7 @@ float Creature::GetAggroRange(Unit const* target) const
     float aggroRadius = 20.0f;
 
     // Aggro Radius varies with level difference at a rate of roughly 1 yard/level
-	aggroRadius -= (float)levelDiff);
+    aggroRadius -= (float)levelDiff;
 
     // detect range auras
     aggroRadius += GetTotalAuraModifier(SPELL_AURA_MOD_DETECT_RANGE);
