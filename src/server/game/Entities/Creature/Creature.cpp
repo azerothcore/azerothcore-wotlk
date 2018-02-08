@@ -2708,8 +2708,9 @@ float Creature::GetAggroRange(Unit const* target) const
     int32 levelDiff = int32(targetLevel) - int32(myLevel);
     
     // The maximum Aggro Radius is capped at 45 yards (25 level difference)
-    if (levelDiff < -25)
-        levelDiff = -25;
+    // Set to 0 or min/max of 20 because with bots aggro > 20 is unfair
+    if (levelDiff < 0) //-15
+        levelDiff = 0; //-25
 
     // The base aggro radius for mob of same level
     float aggroRadius = 20.0f;
