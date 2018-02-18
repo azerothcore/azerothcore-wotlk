@@ -143,13 +143,14 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
 
                 if (sWorld->getBoolConfig(CONFIG_CHATLOG_ADDON))
                 {
-                    std::string msg = "";
-                    recvData >> msg;
+                    std::string to, msg;
+                    recvData >> to >> msg;
+                    Player* receiver = ObjectAccessor::FindPlayerByName(to, false); 
 
                     if (msg.empty())
                         return;
 
-                    sScriptMgr->OnPlayerChat(sender, uint32(CHAT_MSG_ADDON), lang, msg);
+                    sScriptMgr->OnPlayerChat(sender, type, lang, msg, receiver);
                 }
 
                 break;
