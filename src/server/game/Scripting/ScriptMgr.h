@@ -1017,6 +1017,15 @@ class GlobalScript : public ScriptObject
         virtual void OnBeforeUpdateArenaPoints(ArenaTeam* /*at*/, std::map<uint32, uint32> & /*ap*/) { }
 };
 
+// this class can be used to be extended by Modules
+// creating their own custom hooks inside module itself
+class ModuleScript : public ScriptObject
+{
+    protected:
+
+        ModuleScript(const char* name);
+};
+
 // Placed here due to ScriptRegistry::AddScript dependency.
 #define sScriptMgr ACE_Singleton<ScriptMgr, ACE_Null_Mutex>::instance()
 
@@ -1459,5 +1468,10 @@ class ScriptRegistry
         // Counter used for code-only scripts.
         static uint32 _scriptIdCounter;
 };
+
+// Instantiate static members of ScriptRegistry.
+template<class TScript> std::map<uint32, TScript*> ScriptRegistry<TScript>::ScriptPointerList;
+template<class TScript> std::vector<TScript*> ScriptRegistry<TScript>::ALScripts;
+template<class TScript> uint32 ScriptRegistry<TScript>::_scriptIdCounter = 0;
 
 #endif
