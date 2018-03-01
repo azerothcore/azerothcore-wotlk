@@ -28,6 +28,9 @@ public:
      */
     template<class T> T* Get(std::string const & k) const {
         static_assert(std::is_base_of<Base, T>::value, "T must derive from Base");
+        if (Container.empty())
+            return nullptr;
+
         auto it = Container.find(k);
         if (it != Container.end())
             return dynamic_cast<T*>(it->second.get());
