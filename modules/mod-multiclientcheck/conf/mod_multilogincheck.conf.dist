@@ -1,0 +1,17 @@
+[worldserver]
+
+###################################################################################################
+#	Disallow Multiple Client
+###################################################################################################
+
+#
+#    Disallow.Multiple.Client
+#        Description: This option disallow to use multiple game from the same network.
+#        Default:    0 (disabled)
+#                    1 (enabled)
+
+Disallow.Multiple.Client = 0
+
+# Announce the module when the player logs in?
+
+Disallow.Multiple.Client.Announce = 1
