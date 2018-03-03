@@ -3567,6 +3567,8 @@ void Player::GiveLevel(uint8 level)
     if (sWorld->getBoolConfig(CONFIG_ALWAYS_MAXSKILL)) // Max weapon skill when leveling up
         UpdateSkillsToMaxSkillsForLevel();
 
+    _ApplyAllLevelScaleItemMods(true);
+
     // set current level health and mana/energy to maximum after applying all mods.
     SetFullHealth();
     SetPower(POWER_MANA, GetMaxPower(POWER_MANA));
@@ -3575,8 +3577,6 @@ void Player::GiveLevel(uint8 level)
         SetPower(POWER_RAGE, GetMaxPower(POWER_RAGE));
     SetPower(POWER_FOCUS, 0);
     SetPower(POWER_HAPPINESS, 0);
-
-    _ApplyAllLevelScaleItemMods(true);
 
     // update level to hunter/summon pet
     if (Pet* pet = GetPet())
@@ -25412,8 +25412,8 @@ void Player::StoreLootItem(uint8 lootSlot, Loot* loot)
 
         // LootItem is being removed (looted) from the container, delete it from the DB.
         if (loot->containerId > 0)
-            sLootItemStorage->RemoveStoredLootItem(loot->containerId, item->itemid, item->count);
-        
+            sLootItemStorage->RemoveStoredLootItem(loot->containerId, item->itemid, item->count, loot);
+
         sScriptMgr->OnLootItem(this, newitem, item->count, this->GetLootGUID());
     }
     else

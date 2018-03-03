@@ -6021,7 +6021,10 @@ void SpellMgr::LoadDbcDataCorrections()
              spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
              spellInfo->AttributesEx5 |= SPELL_ATTR5_SKIP_CHECKCAST_LOS_CHECK;
              break;
-
+        //Crushing the Crown
+        case 71024:
+            spellInfo->EffectImplicitTargetA[0] = TARGET_DEST_DYNOBJ_NONE;
+            break;
 
         // ///////////////////////////////////////////
         // ////////////////ITEMS//////////////////////
