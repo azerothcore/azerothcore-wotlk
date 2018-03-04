@@ -2699,6 +2699,10 @@ float Creature::GetAggroRange(Unit const* target) const
     // Determines the aggro range for creatures
     // Based on data from wowwiki due to lack of 3.3.5a data
 
+    float aggroRate = sWorld->getRate(RATE_CREATURE_AGGRO);
+    if (aggroRate == 0)
+        return 0.0f;
+
     uint32 targetLevel = target->getLevelForTarget(this);
     uint32 myLevel = getLevelForTarget(target);
     int32 levelDiff = int32(targetLevel) - int32(myLevel);
@@ -2729,7 +2733,7 @@ float Creature::GetAggroRange(Unit const* target) const
     if (aggroRadius < minRange)
         aggroRadius = minRange;
 
-    return aggroRadius;
+    return (aggroRadius * aggroRate);
 }
 
 void Creature::SetObjectScale(float scale)
