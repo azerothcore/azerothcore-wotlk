@@ -75,7 +75,7 @@ public:
             memset(&NPC_GrandChampionMinionsGUID, 0, sizeof(NPC_GrandChampionMinionsGUID));
             memset(&NPC_ArgentSoldierGUID, 0, sizeof(NPC_ArgentSoldierGUID));
             NPC_ArgentChampionGUID = 0;
-1            NPC_MemoryEntry = 0;
+            NPC_MemoryEntry = 0;
             NPC_BlackKnightVehicleGUID = 0;
             NPC_BlackKnightGUID = 0;
             GO_MainGateGUID = 0;
