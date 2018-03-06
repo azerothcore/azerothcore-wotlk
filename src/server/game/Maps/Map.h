@@ -26,6 +26,7 @@
 #include "DynamicTree.h"
 #include "GameObjectModel.h"
 #include "Log.h"
+#include "DataMap.h"
 
 #include <bitset>
 #include <list>
@@ -505,6 +506,8 @@ class Map : public GridRefManager<NGridType>
         bool AllTransportsEmpty() const; // pussywizard
         void AllTransportsRemovePassengers(); // pussywizard
         TransportsContainer const& GetAllTransports() const { return _transports; }
+
+        DataMap CustomData;
 
     private:
         void LoadMapAndVMap(int gx, int gy);
