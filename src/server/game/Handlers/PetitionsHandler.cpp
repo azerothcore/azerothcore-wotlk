@@ -262,24 +262,22 @@ void WorldSession::HandlePetitionShowSignOpcode(WorldPacket& recvData)
         return;
 
     Signatures const* signatures = sPetitionMgr->GetSignature(petitionGuidLow);
-    uint8 signs = signatures ? signatures->signatureMap.size() : 0;
-
+    uint8 size = signatures->signatureMap.size();
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_PETITION_SHOW_SIGNATURES petition entry: '%u'", petitionGuidLow);
 #endif
 
-    WorldPacket data(SMSG_PETITION_SHOW_SIGNATURES, (8+8+4+1+signs*12));
+    WorldPacket data(SMSG_PETITION_SHOW_SIGNATURES, (8 + 8 + 4 + 1 + size * 12));
     data << uint64(petitionguid);                           // petition guid
     data << uint64(_player->GetGUID());                     // owner guid
     data << uint32(petitionGuidLow);                        // guild guid
-    data << uint8(signs);                                   // sign's count
+    data << uint8(size);         // sign's count
 
-    if (signs)
-        for (SignatureMap::const_iterator itr = signatures->signatureMap.begin(); itr != signatures->signatureMap.begin(); ++itr)
-        {
+    for (SignatureMap::const_iterator itr = signatures->signatureMap.begin(); itr != signatures->signatureMap.end(); ++itr)
+    {
             data << uint64(MAKE_NEW_GUID(itr->first, 0, HIGHGUID_PLAYER)); // Player GUID
             data << uint32(0);                                  // there 0 ...
-        }
+    }
 
     SendPacket(&data);
 }
