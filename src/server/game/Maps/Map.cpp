@@ -815,8 +815,8 @@ void Map::RemovePlayerFromMap(Player* player, bool remove)
 
     if (remove)
     {
-        DeleteFromWorld(player);
         sScriptMgr->OnPlayerLeaveMap(this, player);
+        DeleteFromWorld(player);
     }
 }
 
