@@ -1,3 +1,0 @@
-INSERT INTO version_db_world (`sql_rev`) VALUES ('1520798198281695500');
-
-ALTER TABLE `gameobject` CHANGE COLUMN `map` `map` SMALLINT UNSIGNED NOT NULL DEFAULT '0' COMMENT 'Map Identifier' AFTER `id`;
