@@ -1,5 +1,5 @@
-/*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-AGPL
+﻿/*
+ * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
 #include "ScriptMgr.h"
@@ -165,19 +165,18 @@ public:
             BossAI::Reset();
             events.Reset();
             summons.DespawnAll();
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_DISABLE_MOVE);
+            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE);
             me->SetReactState(REACT_AGGRESSIVE);
-            
-            if (pInstance)
+
+            if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_KELTHUZAD_FLOOR)))
             {
-                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_KELTHUZAD_FLOOR)))
-                {
-                    go->SetPhaseMask(1, true);
-                    go->SetGoState(GO_STATE_READY);
-                }
-                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_KELTHUZAD_GATE)))
-                    go->SetGoState(GO_STATE_ACTIVE);
+                go->SetPhaseMask(1, true);
+                go->SetGoState(GO_STATE_READY);
             }
+
+            if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_KELTHUZAD_GATE)))
+                go->SetGoState(GO_STATE_ACTIVE);
+
         }
 
         void EnterEvadeMode()
@@ -203,6 +202,9 @@ public:
             BossAI::JustDied(killer);
             summons.DespawnAll();
             Talk(SAY_DEATH);
+
+            if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_KELTHUZAD_GATE)))
+                go->SetGoState(GO_STATE_ACTIVE);
         }
 
         void MoveInLineOfSight(Unit* who)
