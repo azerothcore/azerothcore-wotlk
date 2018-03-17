@@ -433,7 +433,7 @@ void TransportMgr::SpawnContinentTransports()
         do
         {
             Field* fields = result->Fetch();
-            uint32 mapId = fields[0].GetUInt32();
+            uint16 mapId = fields[0].GetUInt16();
             float x = fields[1].GetFloat();
             float y = fields[2].GetFloat();
 
