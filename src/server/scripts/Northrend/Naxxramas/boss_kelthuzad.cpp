@@ -203,8 +203,11 @@ public:
             summons.DespawnAll();
             Talk(SAY_DEATH);
 
-            if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_KELTHUZAD_GATE)))
-                go->SetGoState(GO_STATE_ACTIVE);
+            if (pInstance)
+            {
+                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_KELTHUZAD_GATE)))
+                    go->SetGoState(GO_STATE_ACTIVE);
+            }
         }
 
         void MoveInLineOfSight(Unit* who)

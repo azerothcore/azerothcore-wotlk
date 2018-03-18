@@ -80,8 +80,12 @@ public:
             BossAI::Reset();
             events.Reset();
             summons.DespawnAll();
-            if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_MAEXXNA_GATE)))
-                go->SetGoState(GO_STATE_ACTIVE);
+
+            if (pInstance)
+            {
+                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_MAEXXNA_GATE)))
+                    go->SetGoState(GO_STATE_ACTIVE);
+            }
         
         }
 
