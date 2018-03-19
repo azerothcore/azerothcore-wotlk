@@ -1,5 +1,5 @@
 /*
- * Originally written by Rochet2 - Copyright (C) 2018+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-AGPL
+ * Originally written by Rochet2 - Copyright (C) 2018+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: http://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
  */
 
 #ifndef _DATA_MAP_H_
@@ -28,6 +28,9 @@ public:
      */
     template<class T> T* Get(std::string const & k) const {
         static_assert(std::is_base_of<Base, T>::value, "T must derive from Base");
+        if (Container.empty())
+            return nullptr;
+
         auto it = Container.find(k);
         if (it != Container.end())
             return dynamic_cast<T*>(it->second.get());

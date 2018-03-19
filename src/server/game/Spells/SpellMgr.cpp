@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -6337,6 +6337,9 @@ void SpellMgr::LoadDbcDataCorrections()
     const_cast<WorldSafeLocsEntry*>(entry)->z += 6.0f;
     entry = sWorldSafeLocsStore.LookupEntry(1365);
     const_cast<WorldSafeLocsEntry*>(entry)->z += 6.0f;
+
+    LockEntry* key = const_cast<LockEntry*>(sLockStore.LookupEntry(36)); // 3366 Opening, allows to open without proper key
+    key->Type[2] = LOCK_KEY_NONE;
 
     sLog->outString(">> Loading spell dbc data corrections  in %u ms", GetMSTimeDiffToNow(oldMSTime));
     sLog->outString();
