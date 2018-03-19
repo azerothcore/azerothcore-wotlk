@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
@@ -241,48 +241,51 @@ void WorldSession::HandlePetitionBuyOpcode(WorldPacket & recvData)
 
 void WorldSession::HandlePetitionShowSignOpcode(WorldPacket& recvData)
 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "Received opcode CMSG_PETITION_SHOW_SIGNATURES");
-#endif
-
+    uint8 signs = 0;
     uint64 petitionguid;
     recvData >> petitionguid;                              // petition guid
 
-    // solve (possible) some strange compile problems with explicit use GUID_LOPART(petitionguid) at some GCC versions (wrong code optimization in compiler?)
-    uint32 petitionGuidLow = GUID_LOPART(petitionguid);
+                                                            // solve (possible) some strange compile problems with explicit use GUID_LOPART(petitionguid) at some GCC versions (wrong code optimization in compiler?)
+    uint32 petitionguid_low = GUID_LOPART(petitionguid);
 
-    Petition const* petition = sPetitionMgr->GetPetition(petitionGuidLow);
-    if (!petition)
+    QueryResult  result = CharacterDatabase.PQuery("SELECT type FROM petition WHERE petitionguid = '%u'", petitionguid_low);
+
+    if (!result)      
         return;
 
-    uint32 type = petition->petitionType;
+
+    Field* fields = result->Fetch();
+    uint32 type = fields[0].GetUInt32();
 
     // if guild petition and has guild => error, return;
     if (type == GUILD_CHARTER_TYPE && _player->GetGuildId())
         return;
 
-    Signatures const* signatures = sPetitionMgr->GetSignature(petitionGuidLow);
-    uint8 signs = signatures ? signatures->signatureMap.size() : 0;
+    result = CharacterDatabase.PQuery("SELECT playerguid FROM petition_sign WHERE petitionguid = '%u'", petitionguid_low);
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_PETITION_SHOW_SIGNATURES petition entry: '%u'", petitionGuidLow);
-#endif
+    // result == NULL also correct in case no sign yet
+    if (result)
+        signs = result->GetRowCount();
 
-    WorldPacket data(SMSG_PETITION_SHOW_SIGNATURES, (8+8+4+1+signs*12));
-    data << uint64(petitionguid);                           // petition guid
-    data << uint64(_player->GetGUID());                     // owner guid
-    data << uint32(petitionGuidLow);                        // guild guid
-    data << uint8(signs);                                   // sign's count
+    WorldPacket data(SMSG_PETITION_SHOW_SIGNATURES, (8 + 8 + 4 + 1 + signs * 12));
+    data << petitionguid;                                   // petition guid
+    data << _player->GetGUID();                             // owner guid
+    data << petitionguid_low;                               // guild guid (in Oregon always same as GUID_LOPART(petitionguid)
+    data << signs;                                          // sign's count
 
-    if (signs)
-        for (SignatureMap::const_iterator itr = signatures->signatureMap.begin(); itr != signatures->signatureMap.begin(); ++itr)
-        {
-            data << uint64(MAKE_NEW_GUID(itr->first, 0, HIGHGUID_PLAYER)); // Player GUID
-            data << uint32(0);                                  // there 0 ...
-        }
+    for (uint8 i = 1; i <= signs; ++i)
+    {
+        Field* fields = result->Fetch();
+        uint64 plguid = fields[0].GetUInt64();
 
+        data << plguid;                                     // Player GUID
+        data << (uint32)0;                                  // there 0 ...
+
+        result->NextRow();
+    }
     SendPacket(&data);
 }
+
 
 void WorldSession::HandlePetitionQueryOpcode(WorldPacket & recvData)
 {
