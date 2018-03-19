@@ -270,7 +270,7 @@ void WorldSession::HandlePetitionShowSignOpcode(WorldPacket& recvData)
     WorldPacket data(SMSG_PETITION_SHOW_SIGNATURES, (8 + 8 + 4 + 1 + signs * 12));
     data << petitionguid;                                   // petition guid
     data << _player->GetGUID();                             // owner guid
-    data << petitionguid_low;                               // guild guid (in Oregon always same as GUID_LOPART(petitionguid)
+    data << petitionguid_low;                               // guild guid
     data << signs;                                          // sign's count
 
     for (uint8 i = 1; i <= signs; ++i)

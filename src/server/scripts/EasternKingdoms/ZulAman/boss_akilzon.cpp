@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
@@ -89,7 +89,9 @@ class boss_akilzon : public CreatureScript
                 memset(BirdGUIDs, 0, sizeof(BirdGUIDs));
                 StormCount = 0;
                 isRaining = false;
-                instance->SetData(DATA_AKILZONEVENT, NOT_STARTED);
+
+                if (instance)
+                    instance->SetData(DATA_AKILZONEVENT, NOT_STARTED);
 
                 SetWeather(WEATHER_STATE_FINE, 0.0f);
             }
@@ -105,14 +107,17 @@ class boss_akilzon : public CreatureScript
 
                 Talk(SAY_AGGRO);
                 //DoZoneInCombat();
-                instance->SetData(DATA_AKILZONEVENT, IN_PROGRESS);
+
+                if (instance)
+                    instance->SetData(DATA_AKILZONEVENT, IN_PROGRESS);
             }
 
             void JustDied(Unit* /*killer*/)
             {
                 Talk(SAY_DEATH);
                 _JustDied();
-                instance->SetData(DATA_AKILZONEVENT, DONE);
+                if (instance)
+                    instance->SetData(DATA_AKILZONEVENT, DONE);
             }
 
             void KilledUnit(Unit* who)
