@@ -1171,6 +1171,8 @@ void Creature::SelectLevel(bool changelevel)
 
     SetModifierValue(UNIT_MOD_ATTACK_POWER, BASE_VALUE, cInfo->attackpower);
     SetModifierValue(UNIT_MOD_ATTACK_POWER_RANGED, BASE_VALUE, cInfo->rangedattackpower);
+
+    sScriptMgr->Creature_SelectLevel(cInfo, this);
 }
 
 float Creature::_GetHealthMod(int32 Rank)
