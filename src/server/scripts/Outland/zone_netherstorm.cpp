@@ -956,6 +956,167 @@ public:
     }
 };
 
+/*  ###################################
+    # QUEST: Deathblow to the legion  #
+    ###################################
+*/
+
+enum DeathblowToTheLegionNpcs
+{
+    ADYEN_THE_LIGHTBRINGER  = 50000,
+    ANCHORITE_KARJA         = 50001,
+    EXARCH_ORELIS           = 50002,
+    SOCRETHAR               = 20132,
+    // GUY CONTROLLED BY SOCRETHAR
+    ISHANAH_HIGH_PRIESTESS  = 50005,
+};
+
+enum Adyen
+{
+    // EVENTS
+    EVENT_CRUSADER_STRIKE   = 0,
+    EVENT_HAMMER_OF_JUSTICE = 1,
+    EVENT_HOLY_LIGHT        = 2,
+
+    // SPELLS
+    CRUSADER_STRIKE     = 14518,
+    HAMMER_OF_JUSTICE   = 13005,
+    HOLY_LIGHT          = 13952,
+};
+
+const Position AdyenCoords  { 4804.839355f, 3773.218750f, 210.530884f, 5.517495f };
+const Position OrelisCoords { 4805.345215f, 3774.829346f, 210.535095f, 5.517495f };
+const Position KarjaCoords  { 4803.249512f, 3772.649170f, 210.535095f, 5.517495f };
+
+class deathblow_to_the_legion_trigger : public CreatureScript
+{
+    public:
+        deathblow_to_the_legion_trigger() : CreatureScript("deathblow_to_the_legion_trigger") { }
+
+        CreatureAI* GetAI(Creature* creature) const
+        {
+            return new deathblow_to_the_legion_triggerAI(creature);
+        }
+
+        struct deathblow_to_the_legion_triggerAI : public ScriptedAI
+        {
+            deathblow_to_the_legion_triggerAI(Creature* creature) : ScriptedAI(creature), _summons(me) { }
+
+            EventMap _events;
+            SummonList _summons;
+
+            void JustSummoned(Creature* cr) { _summons.Summon(cr); }
+
+            void MoveInLineOfSight(Unit* who)
+            {
+                if (who->GetTypeId() == TYPEID_PLAYER && who->IsAlive())
+                {
+                    if (!_summons.HasEntry(ADYEN_THE_LIGHTBRINGER))
+                    {
+                        me->SummonCreature(ADYEN_THE_LIGHTBRINGER, AdyenCoords, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 120000);
+                        me->SummonCreature(EXARCH_ORELIS, OrelisCoords, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 120000);
+                        me->SummonCreature(ANCHORITE_KARJA, KarjaCoords, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 120000);
+                    }
+                }
+            }
+        };
+};
+
+class adyen_the_lightbringer : public CreatureScript
+{
+    public:
+        adyen_the_lightbringer(): CreatureScript("adyen_the_lightbringer") { }
+
+        CreatureAI* GetAI(Creature* creature) const { return new adyen_the_lightbringerAI(creature); }
+
+        struct adyen_the_lightbringerAI : public ScriptedAI
+        {
+            adyen_the_lightbringerAI(Creature* creature) : ScriptedAI(creature) { }
+
+            EventMap _events;
+
+            void EnterCombat(Unit * who)
+            {
+                AttackStart(who);
+                _events.ScheduleEvent(EVENT_CRUSADER_STRIKE, urand(2000, 3500));
+                _events.ScheduleEvent(EVENT_HAMMER_OF_JUSTICE, urand(5000, 7000));
+            }
+
+            void UpdateAI(uint32 diff) override
+            {
+                if (!UpdateVictim())
+                    return;
+
+                _events.Update(diff);
+
+                if (me->GetHealthPct() <= 45)
+                    _events.ScheduleEvent(EVENT_HOLY_LIGHT, 1000);
+
+                switch (_events.GetEvent())
+                {
+                    case EVENT_CRUSADER_STRIKE:
+                        DoCastVictim(CRUSADER_STRIKE);
+                        _events.RepeatEvent(urand(3000,4000));
+                        break;
+                    case EVENT_HAMMER_OF_JUSTICE:
+                        DoCastVictim(HAMMER_OF_JUSTICE);
+                        _events.RepeatEvent(urand(10000, 14000));
+                        break;
+                    case EVENT_HOLY_LIGHT:
+                        DoCast(HOLY_LIGHT);
+                        break;
+                }
+
+                DoMeleeAttackIfReady();
+            }
+        };
+};
+
+class anchorite_karja : public CreatureScript
+{
+public:
+    anchorite_karja() : CreatureScript("anchorite_karja") { }
+private:
+    EventMap _events;
+};
+
+class exarch_orelis : public CreatureScript
+{
+public:
+    exarch_orelis() : CreatureScript("exarch_orelis") { }
+private:
+    EventMap _events;
+};
+
+class socrethar : public CreatureScript
+{
+public:
+    socrethar() : CreatureScript("socrethar") { }
+private:
+    EventMap _events;
+};
+
+/*
+# Guy controlled by Socrethar 
+class anchorite_karja : public CreatureScript
+{
+public:
+    anchorite_karja() : CreatureScript("anchorite_karja") { }
+private:
+    EventMap _events;
+};
+
+# Priestess
+class anchorite_karja : public CreatureScript
+{
+public:
+    anchorite_karja() : CreatureScript("anchorite_karja") { }
+private:
+    EventMap _events;
+};
+
+*/
+
 void AddSC_netherstorm()
 {
     // Ours
@@ -968,4 +1129,10 @@ void AddSC_netherstorm()
     new npc_phase_hunter();
     new npc_bessy();
     new npc_maxx_a_million_escort();
+
+    // Deathblow to the legion
+    new deathblow_to_the_legion_trigger();
+    new adyen_the_lightbringer();
+    new anchorite_karja();
+    new exarch_orelis();
 }
