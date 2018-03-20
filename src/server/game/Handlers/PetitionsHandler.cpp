@@ -241,51 +241,48 @@ void WorldSession::HandlePetitionBuyOpcode(WorldPacket & recvData)
 
 void WorldSession::HandlePetitionShowSignOpcode(WorldPacket& recvData)
 {
-    uint8 signs = 0;
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "Received opcode CMSG_PETITION_SHOW_SIGNATURES");
+#endif
+
     uint64 petitionguid;
     recvData >> petitionguid;                              // petition guid
 
-                                                            // solve (possible) some strange compile problems with explicit use GUID_LOPART(petitionguid) at some GCC versions (wrong code optimization in compiler?)
-    uint32 petitionguid_low = GUID_LOPART(petitionguid);
+    // solve (possible) some strange compile problems with explicit use GUID_LOPART(petitionguid) at some GCC versions (wrong code optimization in compiler?)
+    uint32 petitionGuidLow = GUID_LOPART(petitionguid);
 
-    QueryResult  result = CharacterDatabase.PQuery("SELECT type FROM petition WHERE petitionguid = '%u'", petitionguid_low);
-
-    if (!result)      
+    Petition const* petition = sPetitionMgr->GetPetition(petitionGuidLow);
+    if (!petition)
         return;
 
-
-    Field* fields = result->Fetch();
-    uint32 type = fields[0].GetUInt32();
+    uint32 type = petition->petitionType;
 
     // if guild petition and has guild => error, return;
     if (type == GUILD_CHARTER_TYPE && _player->GetGuildId())
         return;
 
-    result = CharacterDatabase.PQuery("SELECT playerguid FROM petition_sign WHERE petitionguid = '%u'", petitionguid_low);
+    Signatures const* signatures = sPetitionMgr->GetSignature(petitionGuidLow);
+    uint8 signs = signatures ? signatures->signatureMap.size() : 0;
 
-    // result == NULL also correct in case no sign yet
-    if (result)
-        signs = result->GetRowCount();
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_PETITION_SHOW_SIGNATURES petition entry: '%u'", petitionGuidLow);
+#endif
 
-    WorldPacket data(SMSG_PETITION_SHOW_SIGNATURES, (8 + 8 + 4 + 1 + signs * 12));
-    data << petitionguid;                                   // petition guid
-    data << _player->GetGUID();                             // owner guid
-    data << petitionguid_low;                               // guild guid
-    data << signs;                                          // sign's count
+    WorldPacket data(SMSG_PETITION_SHOW_SIGNATURES, (8+8+4+1+signs*12));
+    data << uint64(petitionguid);                           // petition guid
+    data << uint64(_player->GetGUID());                     // owner guid
+    data << uint32(petitionGuidLow);                        // guild guid
+    data << uint8(signs);                                   // sign's count
 
-    for (uint8 i = 1; i <= signs; ++i)
-    {
-        Field* fields = result->Fetch();
-        uint64 plguid = fields[0].GetUInt64();
+    if (signs)
+        for (SignatureMap::const_iterator itr = signatures->signatureMap.begin(); itr != signatures->signatureMap.end(); ++itr)
+        {
+            data << uint64(MAKE_NEW_GUID(itr->first, 0, HIGHGUID_PLAYER)); // Player GUID
+            data << uint32(0);                                  // there 0 ...
+        }
 
-        data << plguid;                                     // Player GUID
-        data << (uint32)0;                                  // there 0 ...
-
-        result->NextRow();
-    }
     SendPacket(&data);
 }
-
 
 void WorldSession::HandlePetitionQueryOpcode(WorldPacket & recvData)
 {
