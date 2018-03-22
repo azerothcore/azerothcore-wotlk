@@ -2,7 +2,7 @@
 #include "Player.h"
 #include "Creature.h"
 #include "AccountMgr.h"
-#include "ScriptedAI\ScriptedCreature.h"
+#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
 #include "Define.h"
 #include "GossipDef.h"
@@ -25,7 +25,7 @@ public:
         if (!sConfigMgr->GetBoolDefault("PvPChest", true))
             return;
 
-        std::string name = killer->GetOwner()->GetName();
+        //std::string name = killer->GetOwner()->GetName();
 
         //if killer has same IP as death player do not drop loot as its cheating!
         if (spawnchestIP)
@@ -51,15 +51,15 @@ public:
                 return;
 
         //Dont Drop chest if player is no worth XP
-        if (!killed->isHonorOrXPTarget(killer->GetOwner()))
-            return;
+        //if (!killed->isHonorOrXPTarget(killer->GetOwner()))
+        //    return;
 
         // if target is killed and killer is pet
         if (!killed->IsAlive() && killer->IsPet())
         {
             if (GameObject* go = killer->SummonGameObject(SUMMON_CHEST, killed->GetPositionX(), killed->GetPositionY(), killed->GetPositionZ(), killed->GetOrientation(), 0.0f, 0.0f, 0.0f, 0.0f, chest_despawn, false))
             {
-                switch (KillAnnounce)
+                /*switch (KillAnnounce)
                 {
                 case 1: //Announce in chat handler
                     ChatHandler(killed->GetSession()).PSendSysMessage("You have been killed by player [%s] ", name.c_str());
@@ -71,7 +71,7 @@ public:
                     killed->GetSession()->SendNotification("You have been slain by [%s]", name.c_str());
                     ChatHandler(killed->GetSession()).PSendSysMessage("You have been killed by player [%s] ", name.c_str());
                     break;
-                }
+                }*/
 
                 killer->AddGameObject(go);
                 go->SetOwnerGUID(NULL); //This is so killed players can also loot the chest

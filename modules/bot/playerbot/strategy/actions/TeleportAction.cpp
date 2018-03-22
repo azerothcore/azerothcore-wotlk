@@ -2,7 +2,7 @@
 #include "../../playerbot.h"
 #include "TeleportAction.h"
 #include "../values/LastMovementValue.h"
-#include "../../playerbotAI.h"
+#include "../../PlayerbotAI.h"
 
 using namespace BotAI;
 

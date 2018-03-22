@@ -65,6 +65,7 @@ public:
 			for (auto& i : Achievement)
 			{
 				auto sAchievement = sAchievementStore.LookupEntry(i);
+                if (sAchievement > 0)
 					AddAchievements(pPlayer, sAchievement->ID);
 			}
 		}

@@ -56,6 +56,12 @@ bool MovementAction::MoveNear(WorldObject* target, float distance)
 	{
 		if (isnan(followAngle))
 			break;
+        if (isnan(target->GetPositionX() + cos(angle) * distance))
+            break;
+        if (isnan(target->GetPositionY() + sin(angle) * distance))
+            break;
+        if (isnan(target->GetPositionZ()))
+            break;
 		bool moved = MoveTo(target->GetMapId(),
 			target->GetPositionX() + cos(angle) * distance,
 			target->GetPositionY() + sin(angle) * distance,

@@ -66,7 +66,7 @@ to make up the non-deal party makeup.
 */
 
 #include <map>
-#include "Config.h"
+//#include "Config.h"
 #include "ScriptMgr.h"
 #include "Unit.h"
 #include "Player.h"
@@ -88,9 +88,11 @@ namespace {
         // Announce Module
         void OnLogin(Player *player)
         {
-            if (sConfigMgr->GetBoolDefault("Solocraft.Enable", true))
+            //if (sConfigMgr->GetBoolDefault("Solocraft.Enable", true))
+            if (true)
             {
-                if (sConfigMgr->GetBoolDefault("Solocraft.Announce", true))
+                //if (sConfigMgr->GetBoolDefault("Solocraft.Announce", true))
+                if (true)
                 {
                     ChatHandler(player->GetSession()).SendSysMessage("This server is running the |cff4CFF00SoloCraft |rmodule.");
                 }
@@ -98,7 +100,8 @@ namespace {
         }
 
         void OnMapChanged(Player *player) override {
-            if (sConfigMgr->GetBoolDefault("Solocraft.Enable", true))
+            if (true)
+            //if (sConfigMgr->GetBoolDefault("Solocraft.Enable", true))
             {
                 Map *map = player->GetMap();
                 int difficulty = CalculateDifficulty(map, player);
@@ -112,10 +115,14 @@ namespace {
         std::map<uint32, int> _unitDifficulty;
 
         // Get difficulty values from config
-        const uint32 D5 = sConfigMgr->GetIntDefault("Solocraft.Dungeon", 5);
+        /*const uint32 D5 = sConfigMgr->GetIntDefault("Solocraft.Dungeon", 5);
         const uint32 D10 = sConfigMgr->GetIntDefault("Solocraft.Heroic", 10);
         const uint32 D25 = sConfigMgr->GetIntDefault("Solocraft.Raid25", 25);
-        const uint32 D40 = sConfigMgr->GetIntDefault("Solocraft.Raid40", 40);
+        const uint32 D40 = sConfigMgr->GetIntDefault("Solocraft.Raid40", 40);*/
+        const uint32 D5 = 5;
+        const uint32 D10 = 10;
+        const uint32 D25 = 25;
+        const uint32 D40 = 40;
 
         // Set the instance difficulty
         int CalculateDifficulty(Map *map, Player *player) {
@@ -212,7 +219,7 @@ public:
 	void OnBeforeConfigLoad(bool reload) override
 	{
 		if (!reload) {
-			std::string conf_path = _CONF_DIR;
+			/*std::string conf_path = _CONF_DIR;
 			std::string cfg_file = conf_path + "Settings/modules/mod_solocraft.conf";
 #ifdef WIN32
 			cfg_file = "Settings/modules/mod_solocraft.conf";
@@ -220,7 +227,7 @@ public:
 			std::string cfg_def_file = cfg_file + ".dist";
 			sConfigMgr->LoadMore(cfg_def_file.c_str());
 
-			sConfigMgr->LoadMore(cfg_file.c_str());
+			sConfigMgr->LoadMore(cfg_file.c_str());*/
 		}
 	}
 };

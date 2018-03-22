@@ -68,7 +68,7 @@ gold. Beware.. He doesn't like cheapskates!
 
 */
 
-#include "config.h"
+//#include "Config.h"
 
 class GamblerAnnounce : public PlayerScript
 {
@@ -80,7 +80,8 @@ public:
     void OnLogin(Player* player)
     {
         // Announce Module
-        if (sConfigMgr->GetBoolDefault("GamblerNPC.Announce", true))
+        //if (sConfigMgr->GetBoolDefault("GamblerNPC.Announce", true))
+        if (true)
         {
             ChatHandler(player->GetSession()).SendSysMessage("This server is running the |cff4CFF00GamblerNPC |rmodule.");
         }
@@ -95,12 +96,18 @@ public:
     gamble_npc() : CreatureScript("gamble_npc") { }
 
     // Get bet amounts from config
-    const uint32 Bet1 = sConfigMgr->GetIntDefault("Gambler.Amount1", 1);
+    /*const uint32 Bet1 = sConfigMgr->GetIntDefault("Gambler.Amount1", 1);
     const uint32 Bet2 = sConfigMgr->GetIntDefault("Gambler.Amount2", 2);
     const uint32 Bet3 = sConfigMgr->GetIntDefault("Gambler.Amount3", 3);
     const uint32 Bet4 = sConfigMgr->GetIntDefault("Gambler.Amount4", 4);
     const uint32 Bet5 = sConfigMgr->GetIntDefault("Gambler.Amount5", 5);
-    const uint32 Jackpot = sConfigMgr->GetIntDefault("Gambler.Jackpot", 50);
+    const uint32 Jackpot = sConfigMgr->GetIntDefault("Gambler.Jackpot", 50);*/
+    const uint32 Bet1 = 1;
+    const uint32 Bet2 = 2;
+    const uint32 Bet3 = 3;
+    const uint32 Bet4 = 4;
+    const uint32 Bet5 = 5;
+    const uint32 Jackpot = 50;
 
     // How much $$$ the player has
     uint32 Pocket = 0;
@@ -372,7 +379,7 @@ public:
 	void OnBeforeConfigLoad(bool reload) override
 	{
 		if (!reload) {
-			std::string conf_path = _CONF_DIR;
+			/*std::string conf_path = _CONF_DIR;
 			std::string cfg_file = conf_path + "Settings/modules/npc_gambler.conf";
 #ifdef WIN32
 			cfg_file = "Settings/modules/npc_gambler.conf";
@@ -380,7 +387,7 @@ public:
 			std::string cfg_def_file = cfg_file + ".dist";
 			sConfigMgr->LoadMore(cfg_def_file.c_str());
 
-			sConfigMgr->LoadMore(cfg_file.c_str());
+			sConfigMgr->LoadMore(cfg_file.c_str());*/
 		}
 	}
 };
