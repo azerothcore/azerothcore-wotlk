@@ -992,20 +992,6 @@ enum Adyen
 const Position AdyenSpawnPosition   { 4804.839355f, 3773.218750f, 210.530884f, 5.517495f };
 const Position OrelisSpawnPosition  { 4805.345215f, 3774.829346f, 210.535095f, 5.517495f };
 const Position KarjaSpawnPosition   { 4803.249512f, 3772.649170f, 210.535095f, 5.517495f };
-const Position AdyenMovement[10] =
-{
-    // Waypoints
-    {4814.519531f, 3767.184326f, 210.535004f, 5.727116f },
-    {4836.751953f, 3774.636986f, 207.521347f, 0.318750f },
-    {4849.922363f, 3780.485352f, 203.478897f, 0.464049f },
-    {4860.426270f, 3791.417480f, 199.593185f, 0.808459f },
-    {4865.639658f, 3799.127197f, 199.072739f, 0.981247f },
-    {4884.826172f, 3808.667480f, 198.972305f, 0.451103f },
-    {4889.639648f, 3811.746338f, 202.370239f, 0.568913f },
-    {4898.127441f, 3817.173828f, 208.018463f, 0.568913f },
-    {4907.468750f, 3823.147217f, 211.487274f, 0.568913f },
-    {4925.355469f, 3834.584717f, 211.493652f, 0.568913f },
-};
 
 class deathblow_to_the_legion_trigger : public CreatureScript
 {
@@ -1085,7 +1071,7 @@ class adyen_the_lightbringer : public CreatureScript
             {
                 if (param == EVENT_START_PLAYER_READY)
                 {
-                    me->GetMotionMaster()->MovePoint(0, AdyenMovement[0], false);
+                    me->GetMotionMaster()->MovePath(610210, false);
                     SetRun(false);
                 }
             }
@@ -1094,37 +1080,7 @@ class adyen_the_lightbringer : public CreatureScript
             {
                 switch (uiPointId)
                 {
-                case 0:
-                    me->GetMotionMaster()->MovePoint(0, AdyenMovement[1], false);
-                    break;
-                case 1:
-                    me->GetMotionMaster()->MovePoint(0, AdyenMovement[2], false);
-                    break;
-                case 2:
-                    me->GetMotionMaster()->MovePoint(0, AdyenMovement[3], false);
-                    break;
-                case 3:
-                    me->GetMotionMaster()->MovePoint(0, AdyenMovement[4], false);
-                    break;
-                case 4:
-                    me->GetMotionMaster()->MovePoint(0, AdyenMovement[5], false);
-                    break;
-                case 5:
-                    me->GetMotionMaster()->MovePoint(0, AdyenMovement[6], false);
-                    break;
-                case 6:
-                    me->GetMotionMaster()->MovePoint(0, AdyenMovement[7], false);
-                    break;
-                case 7:
-                    me->GetMotionMaster()->MovePoint(0, AdyenMovement[8], false);
-                    break;
-                case 8:
-                    me->GetMotionMaster()->MovePoint(0, AdyenMovement[9], false);
-                    break;
                 case 9:
-                    me->GetMotionMaster()->MovePoint(0, AdyenMovement[10], false);
-                    break;
-                case 10:
                     break;
                 }
             }
