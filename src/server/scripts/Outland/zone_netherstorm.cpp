@@ -963,12 +963,16 @@ public:
 
 enum DeathblowToTheLegionNpcs
 {
-    ADYEN_THE_LIGHTBRINGER  = 50000,
+    ADYEN_THE_LIGHTBRINGER  = 61021,
     ANCHORITE_KARJA         = 50001,
     EXARCH_ORELIS           = 50002,
     SOCRETHAR               = 20132,
     // GUY CONTROLLED BY SOCRETHAR
     ISHANAH_HIGH_PRIESTESS  = 50005,
+
+    // Quest ID
+    DEATHBLOW_TO_THE_LEGION = 10409,
+    SOCRETHAR_TP_STONE      = 29796,
 };
 
 enum Adyen
@@ -984,9 +988,23 @@ enum Adyen
     HOLY_LIGHT          = 13952,
 };
 
-const Position AdyenCoords  { 4804.839355f, 3773.218750f, 210.530884f, 5.517495f };
-const Position OrelisCoords { 4805.345215f, 3774.829346f, 210.535095f, 5.517495f };
-const Position KarjaCoords  { 4803.249512f, 3772.649170f, 210.535095f, 5.517495f };
+const Position AdyenSpawnPosition   { 4804.839355f, 3773.218750f, 210.530884f, 5.517495f };
+const Position OrelisSpawnPosition  { 4805.345215f, 3774.829346f, 210.535095f, 5.517495f };
+const Position KarjaSpawnPosition   { 4803.249512f, 3772.649170f, 210.535095f, 5.517495f };
+const Position AdyenMovement[10] =
+{
+    // Waypoints
+    {4814.519531f, 3767.184326f, 210.535004f, 5.727116f },
+    {4836.751953f, 3774.636986f, 207.521347f, 0.318750f },
+    {4849.922363f, 3780.485352f, 203.478897f, 0.464049f },
+    {4860.426270f, 3791.417480f, 199.593185f, 0.808459f },
+    {4865.639658f, 3799.127197f, 199.072739f, 0.981247f },
+    {4884.826172f, 3808.667480f, 198.972305f, 0.451103f },
+    {4889.639648f, 3811.746338f, 202.370239f, 0.568913f },
+    {4898.127441f, 3817.173828f, 208.018463f, 0.568913f },
+    {4907.468750f, 3823.147217f, 211.487274f, 0.568913f },
+    {4925.355469f, 3834.584717f, 211.493652f, 0.568913f },
+};
 
 class deathblow_to_the_legion_trigger : public CreatureScript
 {
@@ -1013,14 +1031,16 @@ class deathblow_to_the_legion_trigger : public CreatureScript
                 {
                     if (!_summons.HasEntry(ADYEN_THE_LIGHTBRINGER))
                     {
-                        me->SummonCreature(ADYEN_THE_LIGHTBRINGER, AdyenCoords, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 120000);
-                        me->SummonCreature(EXARCH_ORELIS, OrelisCoords, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 120000);
-                        me->SummonCreature(ANCHORITE_KARJA, KarjaCoords, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 120000);
+                        me->SummonCreature(ADYEN_THE_LIGHTBRINGER, AdyenSpawnPosition, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 300000);
+                        me->SummonCreature(EXARCH_ORELIS, OrelisSpawnPosition, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 300000);
+                        me->SummonCreature(ANCHORITE_KARJA, KarjaSpawnPosition, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 300000);
                     }
                 }
             }
         };
 };
+
+#define GOSSIP_ADYEN_START "I'm ready, Adyen."
 
 class adyen_the_lightbringer : public CreatureScript
 {
@@ -1029,41 +1049,123 @@ class adyen_the_lightbringer : public CreatureScript
 
         CreatureAI* GetAI(Creature* creature) const { return new adyen_the_lightbringerAI(creature); }
 
+        bool OnGossipHello(Player* player, Creature* creature)
+        {
+            if (creature->IsQuestGiver())
+                player->PrepareQuestMenu(creature->GetGUID());
+
+            if (player->GetQuestStatus(DEATHBLOW_TO_THE_LEGION) == QUEST_STATUS_INCOMPLETE)
+                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ADYEN_START, GOSSIP_SENDER_MAIN, GOSSIP_SENDER_INFO);
+
+            player->SEND_GOSSIP_MENU(player->GetGossipTextId(creature), creature->GetGUID());
+
+            return true;
+        }
+
+        bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action)
+        {
+            player->PlayerTalkClass->ClearMenus();
+            creature->SetWalk(true);
+            creature->UpdatePosition(AdyenMovement[0]);
+            return true;
+        }
+
         struct adyen_the_lightbringerAI : public ScriptedAI
         {
             adyen_the_lightbringerAI(Creature* creature) : ScriptedAI(creature) { }
 
             EventMap _events;
 
+            void WaypointReached(uint32 AdyenPosition)
+            {
+                switch (AdyenPosition)
+                {
+                    case 0:
+                        me->UpdatePosition(AdyenMovement[1]);
+                        break;
+                    case 1:
+                        me->UpdatePosition(AdyenMovement[2]);
+                        break;
+                    case 2:
+                        me->UpdatePosition(AdyenMovement[3]);
+                        break;
+                    case 3:
+                        me->UpdatePosition(AdyenMovement[4]);
+                        break;
+                    case 4:
+                        me->UpdatePosition(AdyenMovement[5]);
+                        break;
+                    case 5:
+                        me->UpdatePosition(AdyenMovement[6]);
+                        break;
+                    case 6:
+                        me->UpdatePosition(AdyenMovement[7]);
+                        break;
+                    case 7:
+                        me->UpdatePosition(AdyenMovement[8]);
+                        break;
+                    case 8:
+                        me->UpdatePosition(AdyenMovement[9]);
+                        break;
+                    case 9:
+                        me->UpdatePosition(AdyenMovement[10]);
+                        break;
+                }
+            }
+
             void EnterCombat(Unit * who)
             {
                 AttackStart(who);
-                _events.ScheduleEvent(EVENT_CRUSADER_STRIKE, urand(2000, 3500));
-                _events.ScheduleEvent(EVENT_HAMMER_OF_JUSTICE, urand(5000, 7000));
+                me->SetWalk(false);
+                _events.ScheduleEvent(EVENT_CRUSADER_STRIKE, 3000, false);
+                _events.ScheduleEvent(EVENT_HAMMER_OF_JUSTICE, 6000, false);
             }
 
             void UpdateAI(uint32 diff) override
             {
                 if (!UpdateVictim())
+                {
+                    me->SetWalk(true);
                     return;
-
+                }
+                    
                 _events.Update(diff);
-
-                if (me->GetHealthPct() <= 45)
-                    _events.ScheduleEvent(EVENT_HOLY_LIGHT, 1000);
 
                 switch (_events.GetEvent())
                 {
                     case EVENT_CRUSADER_STRIKE:
                         DoCastVictim(CRUSADER_STRIKE);
-                        _events.RepeatEvent(urand(3000,4000));
+                        _events.ScheduleEvent(EVENT_CRUSADER_STRIKE, 3000, false);
                         break;
                     case EVENT_HAMMER_OF_JUSTICE:
                         DoCastVictim(HAMMER_OF_JUSTICE);
-                        _events.RepeatEvent(urand(10000, 14000));
+                        _events.ScheduleEvent(EVENT_HAMMER_OF_JUSTICE, 12000, false);
                         break;
                     case EVENT_HOLY_LIGHT:
-                        DoCast(HOLY_LIGHT);
+                        // if low enough will heal and trigger again in 18s.
+                        if (me->GetHealthPct() <= 45)
+                        {
+                            DoCast(HOLY_LIGHT);
+                            _events.ScheduleEvent(EVENT_HOLY_LIGHT, 18000);
+                        }
+                        else if (Unit* who = me->FindNearestCreature(ANCHORITE_KARJA, 30.0f, true))
+                        {
+                            if (who->GetHealthPct() <= 45)
+                            {
+                                me->CastSpell(who, HOLY_LIGHT, false);
+                                _events.ScheduleEvent(EVENT_HOLY_LIGHT, 18000);
+                            }
+                        }
+                        else if (Unit* who = me->FindNearestCreature(EXARCH_ORELIS, 30.0f, true))
+                        {
+                            if (who->GetHealthPct() <= 45)
+                            {
+                                me->CastSpell(who, HOLY_LIGHT, false);
+                                _events.ScheduleEvent(EVENT_HOLY_LIGHT, 18000);
+                            }
+                        }
+                        else
+                            _events.ScheduleEvent(EVENT_HOLY_LIGHT, 1000);
                         break;
                 }
 
