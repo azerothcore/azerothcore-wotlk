@@ -967,7 +967,7 @@ enum DeathblowToTheLegionNpcs
     ANCHORITE_KARJA         = 50001,
     EXARCH_ORELIS           = 50002,
     SOCRETHAR               = 20132,
-    // GUY CONTROLLED BY SOCRETHAR
+    KAYLAAN_THE_LOST        = 20794,
     ISHANAH_HIGH_PRIESTESS  = 50005,
 
     // Quest ID
@@ -978,9 +978,10 @@ enum DeathblowToTheLegionNpcs
 enum Adyen
 {
     // EVENTS
-    EVENT_CRUSADER_STRIKE   = 0,
-    EVENT_HAMMER_OF_JUSTICE = 1,
-    EVENT_HOLY_LIGHT        = 2,
+    EVENT_CRUSADER_STRIKE       = 0,
+    EVENT_HAMMER_OF_JUSTICE     = 1,
+    EVENT_HOLY_LIGHT            = 2,
+    EVENT_START_PLAYER_READY    = 3,
 
     // SPELLS
     CRUSADER_STRIKE     = 14518,
@@ -1047,8 +1048,6 @@ class adyen_the_lightbringer : public CreatureScript
     public:
         adyen_the_lightbringer(): CreatureScript("adyen_the_lightbringer") { }
 
-        CreatureAI* GetAI(Creature* creature) const { return new adyen_the_lightbringerAI(creature); }
-
         bool OnGossipHello(Player* player, Creature* creature)
         {
             if (creature->IsQuestGiver())
@@ -1064,52 +1063,69 @@ class adyen_the_lightbringer : public CreatureScript
 
         bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action)
         {
-            player->PlayerTalkClass->ClearMenus();
-            creature->SetWalk(true);
-            creature->UpdatePosition(AdyenMovement[0]);
+            player->CLOSE_GOSSIP_MENU();
+            creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+            creature->AI()->DoAction(EVENT_START_PLAYER_READY);
             return true;
         }
 
-        struct adyen_the_lightbringerAI : public ScriptedAI
+        CreatureAI* GetAI(Creature* creature) const
         {
-            adyen_the_lightbringerAI(Creature* creature) : ScriptedAI(creature) { }
+            return new adyen_the_lightbringerAI(creature);
+        }
+
+        struct adyen_the_lightbringerAI : public npc_escortAI
+        {
+            adyen_the_lightbringerAI(Creature* creature) : npc_escortAI(creature) { }
 
             EventMap _events;
+            void HandleAdyenSpells();
 
-            void WaypointReached(uint32 AdyenPosition)
+            void DoAction(int32 param)
             {
-                switch (AdyenPosition)
+                if (param == EVENT_START_PLAYER_READY)
                 {
-                    case 0:
-                        me->UpdatePosition(AdyenMovement[1]);
-                        break;
-                    case 1:
-                        me->UpdatePosition(AdyenMovement[2]);
-                        break;
-                    case 2:
-                        me->UpdatePosition(AdyenMovement[3]);
-                        break;
-                    case 3:
-                        me->UpdatePosition(AdyenMovement[4]);
-                        break;
-                    case 4:
-                        me->UpdatePosition(AdyenMovement[5]);
-                        break;
-                    case 5:
-                        me->UpdatePosition(AdyenMovement[6]);
-                        break;
-                    case 6:
-                        me->UpdatePosition(AdyenMovement[7]);
-                        break;
-                    case 7:
-                        me->UpdatePosition(AdyenMovement[8]);
-                        break;
-                    case 8:
-                        me->UpdatePosition(AdyenMovement[9]);
-                        break;
-                    case 9:
-                        me->UpdatePosition(AdyenMovement[10]);
-                        break;
+                    me->GetMotionMaster()->MovePoint(0, AdyenMovement[0], false);
+                    SetRun(false);
+                }
+            }
+
+            void WaypointReached(uint32 uiPointId)
+            {
+                switch (uiPointId)
+                {
+                case 0:
+                    me->GetMotionMaster()->MovePoint(0, AdyenMovement[1], false);
+                    break;
+                case 1:
+                    me->GetMotionMaster()->MovePoint(0, AdyenMovement[2], false);
+                    break;
+                case 2:
+                    me->GetMotionMaster()->MovePoint(0, AdyenMovement[3], false);
+                    break;
+                case 3:
+                    me->GetMotionMaster()->MovePoint(0, AdyenMovement[4], false);
+                    break;
+                case 4:
+                    me->GetMotionMaster()->MovePoint(0, AdyenMovement[5], false);
+                    break;
+                case 5:
+                    me->GetMotionMaster()->MovePoint(0, AdyenMovement[6], false);
+                    break;
+                case 6:
+                    me->GetMotionMaster()->MovePoint(0, AdyenMovement[7], false);
+                    break;
+                case 7:
+                    me->GetMotionMaster()->MovePoint(0, AdyenMovement[8], false);
+                    break;
+                case 8:
+                    me->GetMotionMaster()->MovePoint(0, AdyenMovement[9], false);
+                    break;
+                case 9:
+                    me->GetMotionMaster()->MovePoint(0, AdyenMovement[10], false);
+                    break;
+                case 10:
+                    break;
                 }
             }
 
@@ -1121,103 +1137,111 @@ class adyen_the_lightbringer : public CreatureScript
                 _events.ScheduleEvent(EVENT_HAMMER_OF_JUSTICE, 6000, false);
             }
 
+            void Reset()
+            {
+                SetRun(false);
+                //me->UpdatePosition(me->GetHomePosition());
+            }
+
             void UpdateAI(uint32 diff) override
             {
-                if (!UpdateVictim())
-                {
-                    me->SetWalk(true);
-                    return;
-                }
-                    
+                SetRun(true);
+
                 _events.Update(diff);
 
-                switch (_events.GetEvent())
-                {
-                    case EVENT_CRUSADER_STRIKE:
-                        DoCastVictim(CRUSADER_STRIKE);
-                        _events.ScheduleEvent(EVENT_CRUSADER_STRIKE, 3000, false);
-                        break;
-                    case EVENT_HAMMER_OF_JUSTICE:
-                        DoCastVictim(HAMMER_OF_JUSTICE);
-                        _events.ScheduleEvent(EVENT_HAMMER_OF_JUSTICE, 12000, false);
-                        break;
-                    case EVENT_HOLY_LIGHT:
-                        // if low enough will heal and trigger again in 18s.
-                        if (me->GetHealthPct() <= 45)
-                        {
-                            DoCast(HOLY_LIGHT);
-                            _events.ScheduleEvent(EVENT_HOLY_LIGHT, 18000);
-                        }
-                        else if (Unit* who = me->FindNearestCreature(ANCHORITE_KARJA, 30.0f, true))
-                        {
-                            if (who->GetHealthPct() <= 45)
-                            {
-                                me->CastSpell(who, HOLY_LIGHT, false);
-                                _events.ScheduleEvent(EVENT_HOLY_LIGHT, 18000);
-                            }
-                        }
-                        else if (Unit* who = me->FindNearestCreature(EXARCH_ORELIS, 30.0f, true))
-                        {
-                            if (who->GetHealthPct() <= 45)
-                            {
-                                me->CastSpell(who, HOLY_LIGHT, false);
-                                _events.ScheduleEvent(EVENT_HOLY_LIGHT, 18000);
-                            }
-                        }
-                        else
-                            _events.ScheduleEvent(EVENT_HOLY_LIGHT, 1000);
-                        break;
-                }
-
+                // Not in Combat
+                if (!UpdateVictim())
+                    return;
+                    
+                // Combat
+                HandleAdyenSpells();
                 DoMeleeAttackIfReady();
             }
         };
 };
 
+void adyen_the_lightbringer::adyen_the_lightbringerAI::HandleAdyenSpells()
+{
+    Unit* target = me->GetVictim();
+    switch (_events.GetEvent())
+    {
+        case EVENT_CRUSADER_STRIKE:
+            me->CastSpell(target, CRUSADER_STRIKE, false);
+            _events.RepeatEvent(urand(3000, 4500));
+            break;
+        case EVENT_HAMMER_OF_JUSTICE:
+            me->CastSpell(target, HAMMER_OF_JUSTICE, false);
+            _events.RepeatEvent(urand(10000, 14000));
+            break;
+        case EVENT_HOLY_LIGHT:
+            // if low enough will heal and trigger again in 18s.
+            if (me->GetHealthPct() <= 45)
+            {
+                me->CastSpell(me, HOLY_LIGHT, false);
+                _events.RepeatEvent(urand(18000, 22000));
+            }
+            else if (Unit* who = me->FindNearestCreature(ANCHORITE_KARJA, 30.0f, true))
+            {
+                if (who->GetHealthPct() <= 45)
+                {
+                    me->CastSpell(who, HOLY_LIGHT, false);
+                    _events.RepeatEvent(urand(18000, 22000));
+                }
+            }
+            else if (Unit* who = me->FindNearestCreature(EXARCH_ORELIS, 30.0f, true))
+            {
+                if (who->GetHealthPct() <= 45)
+                {
+                    me->CastSpell(who, HOLY_LIGHT, false);
+                    _events.RepeatEvent(urand(18000, 22000));
+                }
+            }
+            else
+                _events.RepeatEvent(1000);
+            break;
+    }
+}
+
 class anchorite_karja : public CreatureScript
 {
-public:
-    anchorite_karja() : CreatureScript("anchorite_karja") { }
-private:
-    EventMap _events;
+    public:
+        anchorite_karja() : CreatureScript("anchorite_karja") { }
+    private:
+        EventMap _events;
 };
 
 class exarch_orelis : public CreatureScript
 {
-public:
-    exarch_orelis() : CreatureScript("exarch_orelis") { }
-private:
-    EventMap _events;
+    public:
+        exarch_orelis() : CreatureScript("exarch_orelis") { }
+    private:
+        EventMap _events;
 };
 
 class socrethar : public CreatureScript
 {
-public:
-    socrethar() : CreatureScript("socrethar") { }
-private:
-    EventMap _events;
+    public:
+        socrethar() : CreatureScript("socrethar") { }
+    private:
+        EventMap _events;
 };
 
-/*
-# Guy controlled by Socrethar 
-class anchorite_karja : public CreatureScript
+
+class kaylaan_the_lost : public CreatureScript
 {
-public:
-    anchorite_karja() : CreatureScript("anchorite_karja") { }
-private:
-    EventMap _events;
+    public:
+        kaylaan_the_lost() : CreatureScript("kaylaan_the_lost") { }
+    private:
+        EventMap _events;
 };
 
-# Priestess
-class anchorite_karja : public CreatureScript
+class ishanah : public CreatureScript
 {
-public:
-    anchorite_karja() : CreatureScript("anchorite_karja") { }
-private:
-    EventMap _events;
+    public:
+        ishanah() : CreatureScript("ishanah_high_priestess") { }
+    private:
+        EventMap _events;
 };
-
-*/
 
 void AddSC_netherstorm()
 {
@@ -1237,4 +1261,7 @@ void AddSC_netherstorm()
     new adyen_the_lightbringer();
     new anchorite_karja();
     new exarch_orelis();
+    new kaylaan_the_lost();
+    new ishanah();
+    new socrethar();
 }
