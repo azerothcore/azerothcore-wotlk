@@ -62,24 +62,8 @@ void RandomPlayerbotMgr::UpdateAIInternal(uint32 elapsed)
 
 	if (botCount < maxAllowedBotCount)
 		AddRandomBots();
-    //bots = GetBots();
     int botProcessed = 0;
-    QueryResult results = CharacterDatabase.Query(
-            "select bot from ai_playerbot_random_bots where owner = 0 and event = 'add'");
-    if (results)
-    {
-        do
-        {
-            Field* fields = results->Fetch();
-            uint32 bot = fields[0].GetUInt32();
-            if (ProcessBot(bot))
-            botProcessed++;
-
-            if (botProcessed >= randomBotsPerInterval)
-                break;
-            } while (results->NextRow());
-    }
-    /*for (list<uint32>::iterator i = bots.begin(); i != bots.end(); ++i)
+    for (list<uint32>::iterator i = bots.begin(); i != bots.end(); ++i)
     {
         uint32 bot = *i;
         if (ProcessBot(bot))
@@ -87,7 +71,7 @@ void RandomPlayerbotMgr::UpdateAIInternal(uint32 elapsed)
 
         if (botProcessed >= randomBotsPerInterval)
             break;
-    }*/
+    }
 
     ostringstream out; out << "Random bots are now scheduled to be processed in the background. Next re-schedule in " << sPlayerbotAIConfig.randomBotUpdateInterval << " seconds";
     sLog->outBasic(out.str().c_str());

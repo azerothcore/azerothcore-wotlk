@@ -161,6 +161,11 @@ set_target_properties(bot
     PROPERTIES
       FOLDER
         "server")
+if( NOT WIN32 )
+  set_target_properties(bot PROPERTIES
+    COMPILE_DEFINITIONS _TRINITY_BOT_CONFIG="${CONF_DIR}/aiplayerbot.conf"
+  )
+endif()
 
 if( BUILD_SHARED_LIBS )
   if( UNIX )
