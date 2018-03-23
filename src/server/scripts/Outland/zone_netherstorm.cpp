@@ -984,9 +984,83 @@ enum Adyen
     EVENT_START_PLAYER_READY    = 3,
 
     // SPELLS
-    CRUSADER_STRIKE     = 14518,
-    HAMMER_OF_JUSTICE   = 13005,
-    HOLY_LIGHT          = 13952,
+    CRUSADER_STRIKE             = 14518,
+    HAMMER_OF_JUSTICE           = 13005,
+    HOLY_LIGHT                  = 13952,
+};
+
+enum Karja
+{
+    // Events
+    EVENT_SPELL_HOLY_SMITE  = 0,
+
+    // Spells
+    HOLY_SMITE_KARJA        = 9734,
+};
+
+enum Orelis
+{
+    // Events
+    EVENT_SPELL_DEMORALIZING_SHOUT  = 0,
+    EVENT_SPELL_HEROIC_STRIKE       = 1,
+    EVENT_SPELL_REND                = 2,
+
+    // Spells
+    DEMORALIZING_SHOUT              = 13730,
+    HEROIC_STRIKE                   = 29426,
+    REND                            = 16509
+};
+
+enum Kaylaan
+{
+    // Events
+    EVENT_SPELL_BURNING_LIGHT   = 0,
+    EVENT_SPELL_CONSECRATION    = 1,
+    EVENT_SPELL_HEAL            = 2,
+    EVENT_SPELL_KAYLAANS_WRATH  = 3,
+
+    // Spells
+    BURNING_LIGHT               = 37552,
+    CONSECRATION                = 37553,
+    HEAL                        = 37569,
+    KAYLAANS_WRATH              = 35614,
+};
+
+enum Socrethar
+{
+    // Events
+    EVENT_SPELL_ANTI_MAGIC_SHIELD   = 0,
+    EVENT_SPELL_BACKÇASH            = 1,
+    EVENT_SPELL_CLEAVE              = 2,
+    EVENT_SPELL_FIREBALL_BARRAGE    = 3,
+    EVENT_SPELL_NETHER_PROTECTION   = 4,
+    EVENT_SPELL_POWER_OF_THE_LEGION = 5,
+    EVENT_SPELL_SHADOW_BOLT_VOLLEY  = 6,
+    EVENT_SPELL_WRATH_OF_SOCRETHAR  = 7,
+
+    // Spells
+    ANTI_MAGIC_SHIELD               = 37538,
+    BACKÇASH                        = 37537,
+    CLEAVE                          = 15496,
+    FIREBALL_BARRAGE                = 37540,
+    NETHER_PROTECTION               = 37539,
+    POWER_OF_THE_LEGION             = 35596,
+    SHADOW_BOLT_VOLLEY              = 28448,
+    WRATH_OF_SOCRETHAR              = 35600,
+    //WRATH_OF_SOCRETHAR2           = 35598 Not sure if should use this one yet
+};
+
+enum Ishanah
+{
+    // Events
+    EVENT_SPELL_GREATER_HEAL        = 0,
+    EVENT_SPELL_HOLY_SMITE          = 1,
+    EVENT_SPELL_POWER_WORD_SHIELD   = 2,
+
+    // Spells
+    GREATER_HEAL                    = 35096,
+    HOLY_SMITE_ISHANAH              = 15238,
+    POWER_WORLD_SHIELD              = 22187
 };
 
 const Position AdyenSpawnPosition   { 4804.839355f, 3773.218750f, 210.530884f, 5.517495f };
@@ -1065,98 +1139,84 @@ class adyen_the_lightbringer : public CreatureScript
             adyen_the_lightbringerAI(Creature* creature) : npc_escortAI(creature) { }
 
             EventMap _events;
-            void HandleAdyenSpells();
-
+            
             void DoAction(int32 param)
             {
                 if (param == EVENT_START_PLAYER_READY)
-                {
                     me->GetMotionMaster()->MovePath(610210, false);
-                    SetRun(false);
-                }
             }
 
             void WaypointReached(uint32 uiPointId)
             {
                 switch (uiPointId)
                 {
-                case 9:
-                    break;
+                    case 9:
+                        break;
                 }
             }
 
             void EnterCombat(Unit * who)
             {
                 AttackStart(who);
-                me->SetWalk(false);
                 _events.ScheduleEvent(EVENT_CRUSADER_STRIKE, 3000, false);
                 _events.ScheduleEvent(EVENT_HAMMER_OF_JUSTICE, 6000, false);
             }
 
-            void Reset()
-            {
-                SetRun(false);
-                //me->UpdatePosition(me->GetHomePosition());
-            }
-
             void UpdateAI(uint32 diff) override
             {
-                SetRun(true);
+
+                if (!me->GetVictim())
+                    return;
 
                 _events.Update(diff);
 
-                // Not in Combat
-                if (!UpdateVictim())
+                if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
                     
-                // Combat
-                HandleAdyenSpells();
+                Unit* target = me->GetVictim();
+
+                switch (_events.GetEvent())
+                {
+                    case EVENT_CRUSADER_STRIKE:
+                        me->CastSpell(target, CRUSADER_STRIKE, false);
+                        _events.RepeatEvent(urand(3000, 4500));
+                        break;
+                    case EVENT_HAMMER_OF_JUSTICE:
+                        me->CastSpell(target, HAMMER_OF_JUSTICE, false);
+                        _events.RepeatEvent(urand(10000, 14000));
+                        break;
+                    case EVENT_HOLY_LIGHT:
+                        // if low enough will heal and trigger again in 18s.
+                        if (me->GetHealthPct() <= 45)
+                        {
+                            me->CastSpell(me, HOLY_LIGHT, false);
+                            _events.RepeatEvent(urand(18000, 22000));
+                        }
+                        else if (Unit* who = me->FindNearestCreature(ANCHORITE_KARJA, 30.0f, true))
+                        {
+                            if (who->GetHealthPct() <= 45)
+                            {
+                                me->CastSpell(who, HOLY_LIGHT, false);
+                                _events.RepeatEvent(urand(18000, 22000));
+                            }
+                        }
+                        else if (Unit* who = me->FindNearestCreature(EXARCH_ORELIS, 30.0f, true))
+                        {
+                            if (who->GetHealthPct() <= 45)
+                            {
+                                me->CastSpell(who, HOLY_LIGHT, false);
+                                _events.RepeatEvent(urand(18000, 22000));
+                            }
+                        }
+                        else
+                            _events.RepeatEvent(1000);
+                        break;
+                }
+
                 DoMeleeAttackIfReady();
             }
         };
 };
-
-void adyen_the_lightbringer::adyen_the_lightbringerAI::HandleAdyenSpells()
-{
-    Unit* target = me->GetVictim();
-    switch (_events.GetEvent())
-    {
-        case EVENT_CRUSADER_STRIKE:
-            me->CastSpell(target, CRUSADER_STRIKE, false);
-            _events.RepeatEvent(urand(3000, 4500));
-            break;
-        case EVENT_HAMMER_OF_JUSTICE:
-            me->CastSpell(target, HAMMER_OF_JUSTICE, false);
-            _events.RepeatEvent(urand(10000, 14000));
-            break;
-        case EVENT_HOLY_LIGHT:
-            // if low enough will heal and trigger again in 18s.
-            if (me->GetHealthPct() <= 45)
-            {
-                me->CastSpell(me, HOLY_LIGHT, false);
-                _events.RepeatEvent(urand(18000, 22000));
-            }
-            else if (Unit* who = me->FindNearestCreature(ANCHORITE_KARJA, 30.0f, true))
-            {
-                if (who->GetHealthPct() <= 45)
-                {
-                    me->CastSpell(who, HOLY_LIGHT, false);
-                    _events.RepeatEvent(urand(18000, 22000));
-                }
-            }
-            else if (Unit* who = me->FindNearestCreature(EXARCH_ORELIS, 30.0f, true))
-            {
-                if (who->GetHealthPct() <= 45)
-                {
-                    me->CastSpell(who, HOLY_LIGHT, false);
-                    _events.RepeatEvent(urand(18000, 22000));
-                }
-            }
-            else
-                _events.RepeatEvent(1000);
-            break;
-    }
-}
 
 class anchorite_karja : public CreatureScript
 {
