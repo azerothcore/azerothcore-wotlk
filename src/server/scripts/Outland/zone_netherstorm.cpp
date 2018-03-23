@@ -1420,16 +1420,80 @@ class kaylaan_the_lost : public CreatureScript
 {
     public:
         kaylaan_the_lost() : CreatureScript("kaylaan_the_lost") { }
-    private:
-        EventMap _events;
+
+        CreatureAI* GetAI(Creature* creature) const
+        {
+            return new kaylaan_the_lostAI(creature);
+        }
+
+        struct kaylaan_the_lostAI : public ScriptedAI
+        {
+            kaylaan_the_lostAI(Creature* creature) : ScriptedAI(creature) { }
+
+            EventMap _events;
+
+            void DoAction(uint32 param) {}
+            void EnterCombat(Unit* who) {}
+            void WaypointReached(uint32 waypoint) {}
+
+            void UpdateAI(uint32 diff) override
+            {
+                _events.Update(diff);
+
+                if (!me->GetVictim())
+                    return;
+
+                if (me->HasUnitState == UNIT_STATE_CASTING)
+                    return;
+
+                switch (_events.GetEvent())
+                {
+
+                }
+
+                DoMeleeAttackIfReady();
+            }
+        };
 };
 
 class ishanah : public CreatureScript
 {
     public:
         ishanah() : CreatureScript("ishanah_high_priestess") { }
-    private:
-        EventMap _events;
+
+        CreatureAI* GetAI(Creature* creature) const
+        {
+            return new ishanahAI(creature);
+        }
+
+        struct ishanahAI : public ScriptedAI
+        {
+            ishanahAI(Creature* creature) : ScriptedAI(creature) { }
+
+            EventMap _events;
+
+            void DoAction(uint32 param) {}
+            void EnterCombat(Unit* who) {}
+            void WaypointReached(uint32 waypoint) {}
+
+            void UpdateAI(uint32 diff) override
+            {
+                _events.Update(diff);
+
+                if (!me->GetVictim())
+                    return;
+
+                if (me->HasUnitState == UNIT_STATE_CASTING)
+                    return;
+
+                switch (_events.GetEvent())
+                {
+
+                }
+
+                DoMeleeAttackIfReady();
+            }
+        };
 };
 
 void AddSC_netherstorm()
