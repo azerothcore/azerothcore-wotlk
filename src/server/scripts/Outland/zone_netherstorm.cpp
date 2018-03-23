@@ -993,6 +993,7 @@ enum Karja
 {
     // Events
     EVENT_SPELL_HOLY_SMITE  = 0,
+    EVENT_KARJA_WALK        = 1,
 
     // Spells
     HOLY_SMITE_KARJA        = 9734,
@@ -1004,6 +1005,7 @@ enum Orelis
     EVENT_SPELL_DEMORALIZING_SHOUT  = 0,
     EVENT_SPELL_HEROIC_STRIKE       = 1,
     EVENT_SPELL_REND                = 2,
+    EVENT_ORELIS_WALK               = 3,
 
     // Spells
     DEMORALIZING_SHOUT              = 13730,
@@ -1030,7 +1032,7 @@ enum Socrethar
 {
     // Events
     EVENT_SPELL_ANTI_MAGIC_SHIELD   = 0,
-    EVENT_SPELL_BACKÇASH            = 1,
+    EVENT_SPELL_BACKLASH            = 1,
     EVENT_SPELL_CLEAVE              = 2,
     EVENT_SPELL_FIREBALL_BARRAGE    = 3,
     EVENT_SPELL_NETHER_PROTECTION   = 4,
@@ -1040,7 +1042,7 @@ enum Socrethar
 
     // Spells
     ANTI_MAGIC_SHIELD               = 37538,
-    BACKÇASH                        = 37537,
+    BACKLASH                        = 37537,
     CLEAVE                          = 15496,
     FIREBALL_BARRAGE                = 37540,
     NETHER_PROTECTION               = 37539,
@@ -1126,6 +1128,10 @@ class adyen_the_lightbringer : public CreatureScript
             player->CLOSE_GOSSIP_MENU();
             creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
             creature->AI()->DoAction(EVENT_START_PLAYER_READY);
+            Creature* Orelis = creature->FindNearestCreature(EXARCH_ORELIS, 15.0f, true);
+            Creature* Karja = creature->FindNearestCreature(ANCHORITE_KARJA, 15.0f, true);
+            Orelis->AI()->DoAction(EVENT_ORELIS_WALK);
+            Karja->AI()->DoAction(EVENT_KARJA_WALK);
             return true;
         }
 
@@ -1222,14 +1228,123 @@ class anchorite_karja : public CreatureScript
 {
     public:
         anchorite_karja() : CreatureScript("anchorite_karja") { }
-    private:
-        EventMap _events;
+
+        CreatureAI* GetAI(Creature* creature) const
+        {
+            return new anchorite_karjaAI(creature);
+        }
+
+        struct anchorite_karjaAI : public ScriptedAI
+        {
+            anchorite_karjaAI(Creature* creature) : ScriptedAI(creature) { }
+
+            EventMap _events;
+
+            void DoAction(uint32 param)
+            {
+                if (param == EVENT_KARJA_WALK)
+                {
+                    me->GetMotionMaster()->MovePath(500020, false); // TODO: Path needs to be added on db
+                }
+            }
+
+            void EnterCombat(Unit* who)
+            {
+                AttackStart(who);
+                _events.ScheduleEvent(EVENT_SPELL_HOLY_SMITE, 1); // 1 MS so she starts casting asap
+            }
+
+            void UpdateAI(uint32 diff) override
+            {
+                _events.Update(diff);
+
+                if (!me->GetVictim())
+                    return;
+
+                if (me->HasUnitState == UNIT_STATE_CASTING)
+                    return;
+
+                switch (_events.GetEvent())
+                {
+                    case EVENT_SPELL_HOLY_SMITE:
+                        me->CastSpell(me->GetVictim(), HOLY_SMITE_KARJA, false);
+                        _events.RepeatEvent(2500);
+                        break;
+                }
+
+                DoMeleeAttackIfReady();
+            }
+        };
 };
 
 class exarch_orelis : public CreatureScript
 {
     public:
         exarch_orelis() : CreatureScript("exarch_orelis") { }
+
+        CreatureAI* GetAI(Creature* creature) const
+        {
+            return new exarch_orelisAI(creature);
+        }
+
+        struct exarch_orelisAI : public ScriptedAI
+        {
+            exarch_orelisAI(Creature* creature) : ScriptedAI(creature) { }
+
+            EventMap _events;
+
+            void DoAction(uint32 param)
+            {
+                if (param == EVENT_ORELIS_WALK)
+                {
+                    me->GetMotionMaster()->MovePath(500010, false); // TODO: Path needs to be added on db
+                }
+            }
+
+            void EnterCombat(Unit* who)
+            {
+                AttackStart(who);
+                _events.ScheduleEvent(EVENT_SPELL_DEMORALIZING_SHOUT, 1000);
+                _events.ScheduleEvent(EVENT_SPELL_HEROIC_STRIKE, urand(2500, 4000));
+                _events.ScheduleEvent(EVENT_SPELL_REND, urand(1500, 6000));
+            }
+
+            void UpdateAI(uint32 diff) override
+            {
+                _events.Update(diff);
+
+                if (!me->GetVictim())
+                    return;
+
+                if (me->HasUnitState == UNIT_STATE_CASTING)
+                    return;
+
+                Unit* target = me->GetVictim();
+
+                switch (_events.GetEvent())
+                {
+                    case EVENT_SPELL_DEMORALIZING_SHOUT:
+                        if (me->FindNearestCreature(target->GetGUID(), 10.0f, true))
+                        {
+                            me->CastSpell(target, HOLY_SMITE_KARJA, false);
+                            _events.RepeatEvent(15000);
+                        }
+                        else
+                            _events.RepeatEvent(1000);
+                        break;
+                    case EVENT_SPELL_HEROIC_STRIKE:
+                        me->CastSpell(target, HEROIC_STRIKE, false);
+                        _events.RepeatEvent(urand(3000, 4500));
+                        break;
+                    case EVENT_SPELL_REND:
+                        me->CastSpell(target, REND, false);
+                        _events.RepeatEvent(urand(8000, 12000));
+                        break;
+                }
+
+                DoMeleeAttackIfReady();
+            }
+        };
     private:
         EventMap _events;
 };
@@ -1238,8 +1353,66 @@ class socrethar : public CreatureScript
 {
     public:
         socrethar() : CreatureScript("socrethar") { }
-    private:
-        EventMap _events;
+
+        CreatureAI* GetAI(Creature* creature) const
+        {
+            return new socretharAI(creature);
+        }
+
+        struct socretharAI : public ScriptedAI
+        {
+            socretharAI(Creature* creature) : ScriptedAI(creature) { }
+
+            EventMap _events;
+
+            void EnterCombat(Unit* who)
+            {
+                AttackStart(who);
+                _events.ScheduleEvent(EVENT_SPELL_ANTI_MAGIC_SHIELD, urand(8000, 15000));
+                _events.ScheduleEvent(EVENT_SPELL_BACKLASH, urand(3000, 7000));
+                _events.ScheduleEvent(EVENT_SPELL_CLEAVE, urand(1000, 4000));
+                _events.ScheduleEvent(EVENT_SPELL_FIREBALL_BARRAGE, urand(8000, 10000));
+                _events.ScheduleEvent(EVENT_SPELL_NETHER_PROTECTION, 1);
+            }
+
+            void UpdateAI(uint32 diff) override
+            {
+                _events.Update(diff);
+
+                if (!me->GetVictim())
+                    return;
+
+                if (me->HasUnitState == UNIT_STATE_CASTING)
+                    return;
+
+                switch (_events.GetEvent())
+                {
+                    case EVENT_SPELL_NETHER_PROTECTION:
+                        if (!me->HasAura(NETHER_PROTECTION))
+                            me->CastSpell(me, NETHER_PROTECTION, false);
+                        break;
+                    case EVENT_SPELL_ANTI_MAGIC_SHIELD:
+                        me->CastSpell(me, ANTI_MAGIC_SHIELD, false);
+                        _events.RepeatEvent(urand(20000,25000));
+                        break;
+                    case EVENT_SPELL_BACKLASH:
+                        me->CastSpell(me->GetVictim(),BACKLASH, false);
+                        _events.RepeatEvent(urand(3500, 6500));
+                        break;
+                    case EVENT_SPELL_CLEAVE:
+                        me->CastSpell(me->GetVictim(), CLEAVE, false);
+                        _events.RepeatEvent(urand(4000, 9000));
+                        break;
+                    case EVENT_SPELL_FIREBALL_BARRAGE:
+                        me->CastSpell(me->GetVictim(), FIREBALL_BARRAGE, false);
+                        _events.RepeatEvent(urand(12000, 20000));
+                        break;
+                }
+
+                DoMeleeAttackIfReady();
+            }
+
+        };
 };
 
 
