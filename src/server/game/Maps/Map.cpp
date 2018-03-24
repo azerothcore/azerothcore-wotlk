@@ -3106,6 +3106,8 @@ void Map::UpdateEncounterState(EncounterCreditType type, uint32 creditEntry, Uni
 
     // pussywizard:
     LogEncounterFinished(type, creditEntry);
+    
+    sScriptMgr->OnAfterUpdateEncounterState(this, type, creditEntry, source, difficulty_fixed, encounters, dungeonId);
 
     if (dungeonId)
     {

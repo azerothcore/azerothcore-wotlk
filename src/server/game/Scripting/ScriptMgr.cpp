@@ -1539,6 +1539,11 @@ void ScriptMgr::OnAfterInitializeLockedDungeons(Player* player)
     FOREACH_SCRIPT(GlobalScript)->OnAfterInitializeLockedDungeons(player);
 }
 
+void ScriptMgr::OnAfterUpdateEncounterState(Map* map, EncounterCreditType type, uint32 creditEntry, Unit* source, Difficulty difficulty_fixed, DungeonEncounterList const* encounters, uint32 dungeonCompleted) 
+{
+    FOREACH_SCRIPT(GlobalScript)->OnAfterUpdateEncounterState(map, type, creditEntry, source, difficulty_fixed, encounters, dungeonCompleted);
+}
+
 uint32 ScriptMgr::DealDamage(Unit* AttackerUnit, Unit *pVictim, uint32 damage, DamageEffectType damagetype)
 {
     FOR_SCRIPTS_RET(UnitScript, itr, end, damage)

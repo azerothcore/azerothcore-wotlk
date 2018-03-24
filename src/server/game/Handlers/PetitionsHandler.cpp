@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
@@ -275,7 +275,7 @@ void WorldSession::HandlePetitionShowSignOpcode(WorldPacket& recvData)
     data << uint8(signs);                                   // sign's count
 
     if (signs)
-        for (SignatureMap::const_iterator itr = signatures->signatureMap.begin(); itr != signatures->signatureMap.begin(); ++itr)
+        for (SignatureMap::const_iterator itr = signatures->signatureMap.begin(); itr != signatures->signatureMap.end(); ++itr)
         {
             data << uint64(MAKE_NEW_GUID(itr->first, 0, HIGHGUID_PLAYER)); // Player GUID
             data << uint32(0);                                  // there 0 ...
