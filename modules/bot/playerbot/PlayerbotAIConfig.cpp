@@ -5,7 +5,7 @@
 #include "../../game/Accounts/AccountMgr.h"
 
 #ifndef _TRINITY_BOT_CONFIG
-# define _TRINITY_BOT_CONFIG  "aiplayerbot.conf"
+# define _TRINITY_BOT_CONFIG  "Settings/modules/bot_playerbots.conf"
 #endif
 
 using namespace std;
