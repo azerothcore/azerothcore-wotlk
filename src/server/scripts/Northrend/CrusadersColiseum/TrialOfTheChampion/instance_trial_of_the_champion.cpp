@@ -200,7 +200,7 @@ public:
                 case GO_NORTH_PORTCULLIS:
                     HandleGameObject(go->GetGUID(), true, go);
                     GO_EnterGateGUID = go->GetGUID();
-                     break;
+                    break;
             }
         }
 
