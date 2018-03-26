@@ -1076,7 +1076,6 @@ enum Kaylaan
     // KAYLAAN SPELLS
     BURNING_LIGHT               = 37552,
     CONSECRATION                = 37553,
-    HEAL                        = 37569,
     KAYLAANS_WRATH              = 35614,
 };
 
@@ -1108,7 +1107,7 @@ enum Ishanah
 {
     // ISHANAH SPELL EVENTS
     EVENT_SPELL_GREATER_HEAL        = 2,
-    EVENT_SPELL_HOLY_SMITE          = 3,
+    EVENT_SPELL_ISHANAH_HOLY_SMITE  = 3,
     EVENT_SPELL_POWER_WORD_SHIELD   = 4,
     EVENT_JUST_SPAWNED              = 5, // Start waypath
     
@@ -1290,19 +1289,21 @@ class anchorite_karja : public CreatureScript
             return new anchorite_karjaAI(creature);
         }
 
-        struct anchorite_karjaAI : public ScriptedAI
+        struct anchorite_karjaAI : public npc_escortAI
         {
-            anchorite_karjaAI(Creature* creature) : ScriptedAI(creature) { }
+            anchorite_karjaAI(Creature* creature) : npc_escortAI(creature) { }
 
             EventMap _events;
 
-            void DoAction(uint32 param)
+            void DoAction(int32 param)
             {
                 if (param == EVENT_KARJA_WALK)
                 {
                     me->GetMotionMaster()->MovePath(500020, false); // TODO: Path needs to be added on db
                 }
             }
+
+            void WaypointReached(uint32 wp) { }
 
             void EnterCombat(Unit* who)
             {
@@ -1317,7 +1318,7 @@ class anchorite_karja : public CreatureScript
                 if (!me->GetVictim())
                     return;
 
-                if (me->HasUnitState == UNIT_STATE_CASTING)
+                if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
 
                 switch (_events.GetEvent())
@@ -1349,7 +1350,7 @@ class exarch_orelis : public CreatureScript
 
             EventMap _events;
 
-            void DoAction(uint32 param)
+            void DoAction(int32 param)
             {
                 if (param == EVENT_ORELIS_WALK)
                 {
@@ -1372,7 +1373,7 @@ class exarch_orelis : public CreatureScript
                 if (!me->GetVictim())
                     return;
 
-                if (me->HasUnitState == UNIT_STATE_CASTING)
+                if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
 
                 Unit* target = me->GetVictim();
@@ -1415,22 +1416,25 @@ class socrethar : public CreatureScript
             return new socretharAI(creature);
         }
 
-        void DoAction(uint32 param)
+        struct socretharAI : public npc_escortAI
         {
-            switch (param)
-            {
-                case EVENT_ADYEN_SAY_1:
-                    DeathblowStarted = true;
-                    break;
-            }
-        }
-
-        struct socretharAI : public ScriptedAI
-        {
-            socretharAI(Creature* creature) : ScriptedAI(creature) { }
+            socretharAI(Creature* creature) : npc_escortAI(creature) { }
 
             EventMap _events;
             bool DeathblowToTheLegionRunning;
+
+            void WaypointReached(uint32 wp) {}
+
+            void DoAction(int32 param)
+            {
+                switch (param)
+                {
+                    case EVENT_ADYEN_SAY_1:
+                        _events.ScheduleEvent(EVENT_ADYEN_SAY_1, 2000);
+                        DeathblowToTheLegionRunning = true;
+                        break;
+                }
+            }
 
             void EnterCombat(Unit* who)
             {
@@ -1442,22 +1446,9 @@ class socrethar : public CreatureScript
                 _events.ScheduleEvent(EVENT_SPELL_NETHER_PROTECTION, 1);
             }
 
-            void startEvent()
-            {
-                if (DeathblowStarted)
-                {
-                    _events.ScheduleEvent(EVENT_ADYEN_SAY_1, 2000);
-                    DeathblowToTheLegionRunning = true;
-                }
-            }
-
             void UpdateAI(uint32 diff) override
             {
                 _events.Update(diff);
-
-                // Checks if event is ready to be started
-                if (!DeathblowToTheLegionRunning)
-                    startEvent();
 
                 if (DeathblowToTheLegionRunning)
                 {
@@ -1491,7 +1482,7 @@ class socrethar : public CreatureScript
                 if (!me->GetVictim())
                     return;
 
-                if (me->HasUnitState == UNIT_STATE_CASTING)
+                if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
 
                 switch (_events.GetEvent())
@@ -1522,8 +1513,6 @@ class socrethar : public CreatureScript
             }
 
         };
-        private:
-            bool static DeathblowStarted;
 };
 
 
@@ -1558,7 +1547,7 @@ class kaylaan_the_lost : public CreatureScript
                 if (!me->GetVictim())
                     return;
 
-                if (me->HasUnitState == UNIT_STATE_CASTING)
+                if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
 
                 Unit* target = me->GetVictim();
@@ -1605,7 +1594,7 @@ class ishanah : public CreatureScript
 
             EventMap _events;
 
-            void DoAction(uint32 param) {}
+            void DoAction(int32 param) {}
 
             void EnterCombat(Unit* who)
             {
@@ -1629,7 +1618,7 @@ class ishanah : public CreatureScript
                 if (!me->GetVictim())
                     return;
 
-                if (me->HasUnitState == UNIT_STATE_CASTING)
+                if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
 
                 switch (_events.GetEvent())
