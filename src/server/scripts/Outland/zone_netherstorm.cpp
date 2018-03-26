@@ -1432,7 +1432,10 @@ class kaylaan_the_lost : public CreatureScript
 
             EventMap _events;
 
-            void DoAction(uint32 param) {}
+            void DoAction(uint32 param)
+            {
+
+            }
             void EnterCombat(Unit* who) {}
             void WaypointReached(uint32 waypoint) {}
 
@@ -1446,9 +1449,27 @@ class kaylaan_the_lost : public CreatureScript
                 if (me->HasUnitState == UNIT_STATE_CASTING)
                     return;
 
+                Unit* target = me->GetVictim();
+
                 switch (_events.GetEvent())
                 {
-
+                case EVENT_SPELL_BURNING_LIGHT:
+                    me->CastSpell(target, BURNING_LIGHT, false);
+                    _events.RepeatEvent(urand(4000,7000));
+                    break;
+                case EVENT_SPELL_CONSECRATION:
+                    if (me->FindNearestCreature(target->GetGUID(), 10.0f, true))
+                        me->CastSpell(me, CONSECRATION, false);
+                    _events.RepeatEvent(urand(12000, 15000));
+                    break;
+                case EVENT_SPELL_HEAL:
+                    if (me->GetHealthPct() <= 45)
+                    {
+                        me->CastSpell(me, HEAL, false);
+                        _events.RepeatEvent(urand(20000, 25000));
+                    }
+                    _events.RepeatEvent(1000);
+                    break;
                 }
 
                 DoMeleeAttackIfReady();
