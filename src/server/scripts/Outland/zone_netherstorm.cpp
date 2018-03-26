@@ -961,7 +961,7 @@ public:
     ###################################
 */
 
-enum DeathblowToTheLegionNpcs
+enum DeathblowToTheLegion
 {
     ADYEN_THE_LIGHTBRINGER  = 61021,
     ANCHORITE_KARJA         = 50001,
@@ -975,15 +975,63 @@ enum DeathblowToTheLegionNpcs
     SOCRETHAR_TP_STONE      = 29796,
 };
 
+enum RoleplayActions
+{
+    // ADYEN TEXTS
+    EVENT_ADYEN_SAY_1           = 0,
+    EVENT_ADYEN_SAY_2           = 1,
+    EVENT_ADYEN_SAY_3           = 2,
+    EVENT_ADYEN_SAY_4           = 3,
+
+    // SOCRETHAR TEXT
+    EVENT_SOCRETHAR_SAY_1       = 4,
+    EVENT_SOCRETHAR_SAY_2       = 5,
+    EVENT_SOCRETHAR_SAY_3       = 6,
+    EVENT_SOCRETHAR_SAY_4       = 7,
+    EVENT_SOCRETHAR_SAY_5       = 8,
+    EVENT_SOCRETHAR_SAY_6       = 9,
+
+    // KAYLAAN TEXT
+    EVENT_KAYLAAN_SAY_1         = 10,
+    EVENT_KAYLAAN_SAY_2         = 11,
+    EVENT_KAYLAAN_SAY_3         = 12,
+    EVENT_KAYLAAN_SAY_4         = 13,
+    EVENT_KAYLAAN_SAY_5         = 14,    // Spawn Ishanah at this point
+    EVENT_KAYLAAN_SAY_6         = 15,
+
+    // ISHANAH TEXT
+    EVENT_ISHANAH_SAY_1         = 16, // Make kaylaan bow
+    EVENT_ISHANAH_SAY_2         = 17,
+
+    // SOCRETHAR ROLEPLAY EVENTS
+    EVENT_BUFF_KAYLAAN          = 18,
+    EVENT_KILL_ISHANAH          = 19,
+    EVENT_KILL_KAYLAAN          = 20,
+    EVENT_FINAL_FIGHT           = 21, // On death grant credit to all players on threat list
+
+    // KAYLAAN ROLEPLAY EVENTS
+    EVENT_KAYLAAN_START_POINT   = 22,
+    EVENT_KAYLAAN_KNEEL         = 23,    // Adyen talks and 3s later he triggers next event
+    EVENT_WALK_FRONT_ALDOR_TEAM = 24,
+    EVENT_IN_FRONT_OF_ALDOR     = 25,    // Set orientation to adyen and w8 4s
+    EVENT_KAYLAAN_REPENT        = 27,   // Waypath, unkneel, remove aura and talk. When he reaches final point, become friendly
+    EVENT_KAYLAAN_INSPIRATION   = 28,   // Light bubble and talk
+    EVENT_KAYLAAN_RESSURECTION  = 29,   // Ress Ishanah
+    EVENT_FIGHT_ALDOR           = 30,
+    EVENT_END_ALDOR_FIGHT       = 31,
+};
+
 enum Adyen
 {
-    // EVENTS
+    // ADYEN SPELL EVENTS
     EVENT_CRUSADER_STRIKE       = 0,
     EVENT_HAMMER_OF_JUSTICE     = 1,
     EVENT_HOLY_LIGHT            = 2,
+
+    // ADYEN ROLEPLAY EVENTS
     EVENT_START_PLAYER_READY    = 3,
 
-    // SPELLS
+    // ADYEN SPELLS
     CRUSADER_STRIKE             = 14518,
     HAMMER_OF_JUSTICE           = 13005,
     HOLY_LIGHT                  = 13952,
@@ -991,23 +1039,27 @@ enum Adyen
 
 enum Karja
 {
-    // Events
+    // KARJA SPELL EVENTS
     EVENT_SPELL_HOLY_SMITE  = 0,
+
+    // KARJA ROLEPLAY EVENTS
     EVENT_KARJA_WALK        = 1,
 
-    // Spells
+    // KARJA SPELLS
     HOLY_SMITE_KARJA        = 9734,
 };
 
 enum Orelis
 {
-    // Events
+    // ORELIS SPELL EVENTS
     EVENT_SPELL_DEMORALIZING_SHOUT  = 0,
     EVENT_SPELL_HEROIC_STRIKE       = 1,
     EVENT_SPELL_REND                = 2,
+
+    // ORELIS ROLEPLAY EVENTS
     EVENT_ORELIS_WALK               = 3,
 
-    // Spells
+    // ORELIS SPELLS
     DEMORALIZING_SHOUT              = 13730,
     HEROIC_STRIKE                   = 29426,
     REND                            = 16509
@@ -1015,13 +1067,13 @@ enum Orelis
 
 enum Kaylaan
 {
-    // Events
-    EVENT_SPELL_BURNING_LIGHT   = 0,
-    EVENT_SPELL_CONSECRATION    = 1,
-    EVENT_SPELL_HEAL            = 2,
-    EVENT_SPELL_KAYLAANS_WRATH  = 3,
+    // KAYLAAN SPELL EVENTS
+    EVENT_SPELL_BURNING_LIGHT   = 6,
+    EVENT_SPELL_CONSECRATION    = 7,
+    EVENT_SPELL_HEAL            = 8,
+    EVENT_SPELL_KAYLAANS_WRATH  = 9,
 
-    // Spells
+    // KAYLAAN SPELLS
     BURNING_LIGHT               = 37552,
     CONSECRATION                = 37553,
     HEAL                        = 37569,
@@ -1030,17 +1082,17 @@ enum Kaylaan
 
 enum Socrethar
 {
-    // Events
-    EVENT_SPELL_ANTI_MAGIC_SHIELD   = 0,
-    EVENT_SPELL_BACKLASH            = 1,
-    EVENT_SPELL_CLEAVE              = 2,
-    EVENT_SPELL_FIREBALL_BARRAGE    = 3,
-    EVENT_SPELL_NETHER_PROTECTION   = 4,
-    EVENT_SPELL_POWER_OF_THE_LEGION = 5,
-    EVENT_SPELL_SHADOW_BOLT_VOLLEY  = 6,
-    EVENT_SPELL_WRATH_OF_SOCRETHAR  = 7,
+    // SOCRETHAR SPELL EVENTS # start high to avoid issues with RP enum
+    EVENT_SPELL_ANTI_MAGIC_SHIELD   = 40,
+    EVENT_SPELL_BACKLASH            = 41,
+    EVENT_SPELL_CLEAVE              = 42,
+    EVENT_SPELL_FIREBALL_BARRAGE    = 43,
+    EVENT_SPELL_NETHER_PROTECTION   = 44,
+    EVENT_SPELL_POWER_OF_THE_LEGION = 45,
+    EVENT_SPELL_SHADOW_BOLT_VOLLEY  = 46,
+    EVENT_SPELL_WRATH_OF_SOCRETHAR  = 47,
 
-    // Spells
+    // SOCRETHAR SPELLS
     ANTI_MAGIC_SHIELD               = 37538,
     BACKLASH                        = 37537,
     CLEAVE                          = 15496,
@@ -1054,12 +1106,13 @@ enum Socrethar
 
 enum Ishanah
 {
-    // Events
-    EVENT_SPELL_GREATER_HEAL        = 0,
-    EVENT_SPELL_HOLY_SMITE          = 1,
-    EVENT_SPELL_POWER_WORD_SHIELD   = 2,
-
-    // Spells
+    // ISHANAH SPELL EVENTS
+    EVENT_SPELL_GREATER_HEAL        = 2,
+    EVENT_SPELL_HOLY_SMITE          = 3,
+    EVENT_SPELL_POWER_WORD_SHIELD   = 4,
+    EVENT_JUST_SPAWNED              = 5, // Start waypath
+    
+    // ISHANAH SPELLS
     GREATER_HEAL                    = 35096,
     HOLY_SMITE_ISHANAH              = 15238,
     POWER_WORLD_SHIELD              = 22187
@@ -1068,6 +1121,8 @@ enum Ishanah
 const Position AdyenSpawnPosition   { 4804.839355f, 3773.218750f, 210.530884f, 5.517495f };
 const Position OrelisSpawnPosition  { 4805.345215f, 3774.829346f, 210.535095f, 5.517495f };
 const Position KarjaSpawnPosition   { 4803.249512f, 3772.649170f, 210.535095f, 5.517495f };
+const Position KaylaanSpawnPosition {}; // TO DO: Record his spawn position
+const Position IshanahSpawnPosition {}; // TO DO: Record her spawn position
 
 class deathblow_to_the_legion_trigger : public CreatureScript
 {
@@ -1145,7 +1200,7 @@ class adyen_the_lightbringer : public CreatureScript
             adyen_the_lightbringerAI(Creature* creature) : npc_escortAI(creature) { }
 
             EventMap _events;
-            
+
             void DoAction(int32 param)
             {
                 if (param == EVENT_START_PLAYER_READY)
@@ -1157,6 +1212,8 @@ class adyen_the_lightbringer : public CreatureScript
                 switch (uiPointId)
                 {
                     case 9:
+                        if (Creature* socrethar = me->FindNearestCreature(SOCRETHAR, 50.0f, true))
+                            socrethar->AI()->DoAction(EVENT_ADYEN_SAY_1);
                         break;
                 }
             }
@@ -1170,11 +1227,10 @@ class adyen_the_lightbringer : public CreatureScript
 
             void UpdateAI(uint32 diff) override
             {
+                _events.Update(diff);
 
                 if (!me->GetVictim())
                     return;
-
-                _events.Update(diff);
 
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
@@ -1359,11 +1415,22 @@ class socrethar : public CreatureScript
             return new socretharAI(creature);
         }
 
+        void DoAction(uint32 param)
+        {
+            switch (param)
+            {
+                case EVENT_ADYEN_SAY_1:
+                    DeathblowStarted = true;
+                    break;
+            }
+        }
+
         struct socretharAI : public ScriptedAI
         {
             socretharAI(Creature* creature) : ScriptedAI(creature) { }
 
             EventMap _events;
+            bool DeathblowToTheLegionRunning;
 
             void EnterCombat(Unit* who)
             {
@@ -1375,9 +1442,51 @@ class socrethar : public CreatureScript
                 _events.ScheduleEvent(EVENT_SPELL_NETHER_PROTECTION, 1);
             }
 
+            void startEvent()
+            {
+                if (DeathblowStarted)
+                {
+                    _events.ScheduleEvent(EVENT_ADYEN_SAY_1, 2000);
+                    DeathblowToTheLegionRunning = true;
+                }
+            }
+
             void UpdateAI(uint32 diff) override
             {
                 _events.Update(diff);
+
+                // Checks if event is ready to be started
+                if (!DeathblowToTheLegionRunning)
+                    startEvent();
+
+                if (DeathblowToTheLegionRunning)
+                {
+                    switch (_events.GetEvent())
+                    {
+                        case EVENT_ADYEN_SAY_1:
+                            if (Creature* adyen = me->FindNearestCreature(ADYEN_THE_LIGHTBRINGER, 50.0f, true))
+                            {
+                                adyen->AI()->Talk(0);
+                                _events.ScheduleEvent(EVENT_SOCRETHAR_SAY_1, 11000);
+                            }
+                            break;
+                        case EVENT_SOCRETHAR_SAY_1:
+                            Talk(0);
+                            _events.ScheduleEvent(EVENT_ADYEN_SAY_2, 7000);
+                            break;
+                        case EVENT_ADYEN_SAY_2:
+                            if (Creature* adyen = me->FindNearestCreature(ADYEN_THE_LIGHTBRINGER, 50.0f, true))
+                            {
+                                adyen->AI()->Talk(1);
+                                _events.ScheduleEvent(EVENT_SOCRETHAR_SAY_2, 11000);
+                            }
+                            break;
+                        case EVENT_SOCRETHAR_SAY_2:
+                            Talk(1);
+                            _events.ScheduleEvent(EVENT_ADYEN_SAY_2, 7000);
+                            break;
+                    }
+                }
 
                 if (!me->GetVictim())
                     return;
@@ -1413,6 +1522,8 @@ class socrethar : public CreatureScript
             }
 
         };
+        private:
+            bool static DeathblowStarted;
 };
 
 
@@ -1432,11 +1543,12 @@ class kaylaan_the_lost : public CreatureScript
 
             EventMap _events;
 
-            void DoAction(uint32 param)
+            void EnterCombat(Unit* who)
             {
-
+                AttackStart(who);
+                _events.ScheduleEvent(EVENT_SPELL_BURNING_LIGHT, urand(1000, 3000));
+                _events.ScheduleEvent(EVENT_SPELL_CONSECRATION, urand(1000, 5000));
             }
-            void EnterCombat(Unit* who) {}
             void WaypointReached(uint32 waypoint) {}
 
             void UpdateAI(uint32 diff) override
@@ -1453,23 +1565,23 @@ class kaylaan_the_lost : public CreatureScript
 
                 switch (_events.GetEvent())
                 {
-                case EVENT_SPELL_BURNING_LIGHT:
-                    me->CastSpell(target, BURNING_LIGHT, false);
-                    _events.RepeatEvent(urand(4000,7000));
-                    break;
-                case EVENT_SPELL_CONSECRATION:
-                    if (me->FindNearestCreature(target->GetGUID(), 10.0f, true))
-                        me->CastSpell(me, CONSECRATION, false);
-                    _events.RepeatEvent(urand(12000, 15000));
-                    break;
-                case EVENT_SPELL_HEAL:
-                    if (me->GetHealthPct() <= 45)
-                    {
-                        me->CastSpell(me, HEAL, false);
-                        _events.RepeatEvent(urand(20000, 25000));
-                    }
-                    _events.RepeatEvent(1000);
-                    break;
+                    case EVENT_SPELL_BURNING_LIGHT:
+                        me->CastSpell(target, BURNING_LIGHT, false);
+                        _events.RepeatEvent(urand(4000,7000));
+                        break;
+                    case EVENT_SPELL_CONSECRATION:
+                        if (me->FindNearestCreature(target->GetGUID(), 10.0f, true))
+                            me->CastSpell(me, CONSECRATION, false);
+                        _events.RepeatEvent(urand(12000, 15000));
+                        break;
+                    case EVENT_SPELL_HEAL:
+                        if (me->GetHealthPct() <= 45)
+                        {
+                            me->CastSpell(me, HEAL, false);
+                            _events.RepeatEvent(urand(20000, 25000));
+                        }
+                        _events.RepeatEvent(1000);
+                        break;
                 }
 
                 DoMeleeAttackIfReady();
@@ -1494,8 +1606,21 @@ class ishanah : public CreatureScript
             EventMap _events;
 
             void DoAction(uint32 param) {}
-            void EnterCombat(Unit* who) {}
-            void WaypointReached(uint32 waypoint) {}
+
+            void EnterCombat(Unit* who)
+            {
+                AttackStart(who);
+                _events.ScheduleEvent(EVENT_SPELL_HOLY_SMITE, 1000);
+            }
+
+            void WaypointReached(uint32 waypoint)
+            {
+                switch (waypoint)
+                {
+                    case 3:
+                        break;
+                }
+            }
 
             void UpdateAI(uint32 diff) override
             {
@@ -1509,7 +1634,10 @@ class ishanah : public CreatureScript
 
                 switch (_events.GetEvent())
                 {
-
+                    case EVENT_SPELL_HOLY_SMITE:
+                        me->CastSpell(me->GetVictim(), HOLY_SMITE_ISHANAH, false);
+                        _events.RepeatEvent(2500);
+                        break;
                 }
 
                 DoMeleeAttackIfReady();
