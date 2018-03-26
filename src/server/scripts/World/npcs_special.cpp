@@ -757,12 +757,12 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_chicken_cluckAI(creature);
     }
 
-    bool OnQuestAccept(Player* /*player*/, Creature* creature, Quest const* quest)
+    bool OnQuestAccept(Player* /*player*/, Creature* creature, Quest const* quest) override
     {
         if (quest->GetQuestId() == QUEST_CLUCK)
             CAST_AI(npc_chicken_cluck::npc_chicken_cluckAI, creature->AI())->Reset();
