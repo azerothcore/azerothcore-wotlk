@@ -1424,7 +1424,7 @@ class socrethar : public CreatureScript
             bool DeathblowToTheLegionRunning;
             SummonList _summons;
 
-            void WaypointReached(uint32 wp) {}
+            void WaypointReached(uint32 /*wp*/) {}
 
             void Reset()
             {
