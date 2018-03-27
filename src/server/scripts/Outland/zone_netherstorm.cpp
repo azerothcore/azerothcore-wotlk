@@ -1739,7 +1739,7 @@ class ishanah : public CreatureScript
 
             EventMap _events;
 
-            void DoAction(int32 param) {}
+            void DoAction(int32 /*param*/) {}
 
             void EnterCombat(Unit* who)
             {
