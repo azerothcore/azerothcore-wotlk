@@ -1011,7 +1011,7 @@ enum RoleplayActions
 
     // KAYLAAN ROLEPLAY EVENTS
     EVENT_KAYLAAN_START_POINT   = 22,
-    EVENT_KAYLAAN_KNEEL         = 23,    // Adyen talks and 3s later he triggers next event
+    EVENT_KAYLAAN_WALK_TO_ADYEN = 23,    // Adyen talks and 3s later he triggers next event
     EVENT_WALK_FRONT_ALDOR_TEAM = 24,
     EVENT_IN_FRONT_OF_ALDOR     = 25,    // Set orientation to adyen and w8 4s
     EVENT_KAYLAAN_REPENT        = 27,   // Waypath, unkneel, remove aura and talk. When he reaches final point, become friendly
@@ -1418,10 +1418,11 @@ class socrethar : public CreatureScript
 
         struct socretharAI : public npc_escortAI
         {
-            socretharAI(Creature* creature) : npc_escortAI(creature) { }
+            socretharAI(Creature* creature) : npc_escortAI(creature), _summons(me) { }
 
             EventMap _events;
             bool DeathblowToTheLegionRunning;
+            SummonList _summons;
 
             void WaypointReached(uint32 wp) {}
 
@@ -1432,6 +1433,12 @@ class socrethar : public CreatureScript
                     case EVENT_ADYEN_SAY_1:
                         _events.ScheduleEvent(EVENT_ADYEN_SAY_1, 2000);
                         DeathblowToTheLegionRunning = true;
+                        break;
+                    case EVENT_ADYEN_SAY_3:
+                        _events.ScheduleEvent(EVENT_ADYEN_SAY_3, 2000);
+                        break;
+                    case EVENT_KAYLAAN_SAY_1:
+                        _events.ScheduleEvent(EVENT_KAYLAAN_SAY_1, 4000);
                         break;
                 }
             }
@@ -1445,6 +1452,8 @@ class socrethar : public CreatureScript
                 _events.ScheduleEvent(EVENT_SPELL_FIREBALL_BARRAGE, urand(8000, 10000));
                 _events.ScheduleEvent(EVENT_SPELL_NETHER_PROTECTION, 1);
             }
+
+            void JustSummoned(Creature* cr) { _summons.Summon(cr); }
 
             void UpdateAI(uint32 diff) override
             {
@@ -1475,6 +1484,33 @@ class socrethar : public CreatureScript
                         case EVENT_SOCRETHAR_SAY_2:
                             Talk(1);
                             _events.ScheduleEvent(EVENT_ADYEN_SAY_2, 7000);
+                            if (Creature* kaylaan = me->SummonCreature(KAYLAAN_THE_LOST, KaylaanSpawnPosition, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 240000))
+                                kaylaan->AI()->DoAction(EVENT_KAYLAAN_START_POINT);
+                            break;
+                        case EVENT_ADYEN_SAY_3:
+                            if (Creature* adyen = me->FindNearestCreature(ADYEN_THE_LIGHTBRINGER, 50.0f, true))
+                            {
+                                adyen->AI()->Talk(2);
+                                _events.ScheduleEvent(EVENT_KAYLAAN_WALK_TO_ADYEN, 6500);
+                            }
+                            break;
+                        case EVENT_KAYLAAN_WALK_TO_ADYEN:
+                            if (Creature* kaylaan = me->SummonCreature(KAYLAAN_THE_LOST, KaylaanSpawnPosition, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 240000))
+                            {
+                                kaylaan->SetStandState(UNIT_STAND_STATE_STAND);
+                                /*
+                                    1st waypath is spawn->socrethar (0 after id = 1st)
+                                    2nd waypath is socrethar->front of aldor (needs the delay of 1s on 1st point so he can dislay standing) (1 after id = 2nd)
+                                    3rd waypath is front of aldor->ishanah (2 after id = 3rd)
+                                */
+                                kaylaan->GetMotionMaster()->MovePath(207941, false); 
+                            }
+                            break;
+                        case EVENT_KAYLAAN_SAY_1:
+                            if (Creature* kaylaan = me->SummonCreature(KAYLAAN_THE_LOST, KaylaanSpawnPosition, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 240000))
+                            {
+                                kaylaan->AI()->Talk(0);
+                            }
                             break;
                     }
                 }
@@ -1531,6 +1567,7 @@ class kaylaan_the_lost : public CreatureScript
             kaylaan_the_lostAI(Creature* creature) : ScriptedAI(creature) { }
 
             EventMap _events;
+            bool first_waypath_done = false;
 
             void EnterCombat(Unit* who)
             {
@@ -1538,7 +1575,38 @@ class kaylaan_the_lost : public CreatureScript
                 _events.ScheduleEvent(EVENT_SPELL_BURNING_LIGHT, urand(1000, 3000));
                 _events.ScheduleEvent(EVENT_SPELL_CONSECRATION, urand(1000, 5000));
             }
-            void WaypointReached(uint32 waypoint) {}
+
+            void DoAction(int32 param)
+            {
+                switch (param)
+                {
+                    case EVENT_KAYLAAN_START_POINT:
+                        me->GetMotionMaster()->MovePath(207940, false);
+                        break;
+                }
+            }
+
+            void WaypointReached(uint32 waypoint)
+            {
+                switch (waypoint)
+                {
+                    case 5: // 1st waypath
+                        me->SetStandState(UNIT_STAND_STATE_KNEEL);
+                        if (Creature* socrethar = me->FindNearestCreature(SOCRETHAR, 30.0f, true))
+                            socrethar->AI()->DoAction(EVENT_ADYEN_SAY_3);
+                        first_waypath_done = true;
+                        break;
+                    case 3: // 2nd waypath
+                        if (first_waypath_done)
+                        {
+                            if (Creature* adyen = me->FindNearestCreature(ADYEN_THE_LIGHTBRINGER, 30.0f, true))
+                                me->SetOrientation(adyen->GetPositionX());
+                            if (Creature* socrethar = me->FindNearestCreature(SOCRETHAR, 30.0f, true))
+                                socrethar->AI()->DoAction(EVENT_KAYLAAN_SAY_1);
+                        }
+                        break;
+                }
+            }
 
             void UpdateAI(uint32 diff) override
             {
