@@ -1303,7 +1303,7 @@ class anchorite_karja : public CreatureScript
                 }
             }
 
-            void WaypointReached(uint32 wp) { }
+            void WaypointReached(uint32 /*wp*/) { }
 
             void EnterCombat(Unit* who)
             {
