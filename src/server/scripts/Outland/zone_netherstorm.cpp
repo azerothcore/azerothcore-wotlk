@@ -1466,6 +1466,10 @@ class socrethar : public CreatureScript
 
                 if (DeathblowToTheLegionRunning)
                 {
+                    Creature * adyen = me->FindNearestCreature(ADYEN_THE_LIGHTBRINGER, 50.0f, true);
+                    Creature* orelis = me->FindNearestCreature(EXARCH_ORELIS, 50.0f, true);
+                    Creature* karja = me->FindNearestCreature(ANCHORITE_KARJA, 50.0f, true);
+
                     switch (_events.GetEvent())
                     {
                         case EVENT_ADYEN_SAY_1:
@@ -1553,9 +1557,6 @@ class socrethar : public CreatureScript
                             _events.ScheduleEvent(EVENT_FIGHT_ALDOR, 3000);
                             break;
                         case EVENT_FIGHT_ALDOR:
-                            Creature * adyen = me->FindNearestCreature(ADYEN_THE_LIGHTBRINGER, 50.0f, true);
-                            Creature* orelis = me->FindNearestCreature(EXARCH_ORELIS, 50.0f, true);
-                            Creature* karja = me->FindNearestCreature(ANCHORITE_KARJA, 50.0f, true);
                             if (Creature* kaylaan = me->FindNearestCreature(KAYLAAN_THE_LOST, 50.0f, true))
                             {
                                 kaylaan->setFaction(1770);
@@ -1566,9 +1567,6 @@ class socrethar : public CreatureScript
                             }
                             break;
                         case EVENT_END_ALDOR_FIGHT:
-                            Creature * adyen = me->FindNearestCreature(ADYEN_THE_LIGHTBRINGER, 50.0f, true);
-                            Creature* orelis = me->FindNearestCreature(EXARCH_ORELIS, 50.0f, true);
-                            Creature* karja = me->FindNearestCreature(ANCHORITE_KARJA, 50.0f, true);
                             if (Creature* kaylaan = me->FindNearestCreature(KAYLAAN_THE_LOST, 50.0f, true))
                             {
                                 kaylaan->setFaction(1786);
@@ -1602,7 +1600,7 @@ class socrethar : public CreatureScript
                     return;
 
                 if (Creature* kaylaan = me->FindNearestCreature(KAYLAAN_THE_LOST, 100.0f, true))
-                    if (kaylaan->GetHealthPct <= 30)
+                    if (kaylaan->GetHealthPct() <= 30)
                         _events.ScheduleEvent(EVENT_END_ALDOR_FIGHT, 1000);
 
                 switch (_events.GetEvent())
