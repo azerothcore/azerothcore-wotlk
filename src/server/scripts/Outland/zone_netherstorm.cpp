@@ -1426,6 +1426,11 @@ class socrethar : public CreatureScript
 
             void WaypointReached(uint32 wp) {}
 
+            void Reset()
+            {
+                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE);
+            }
+
             void DoAction(int32 param)
             {
                 switch (param)
@@ -1507,10 +1512,85 @@ class socrethar : public CreatureScript
                             }
                             break;
                         case EVENT_KAYLAAN_SAY_1:
-                            if (Creature* kaylaan = me->SummonCreature(KAYLAAN_THE_LOST, KaylaanSpawnPosition, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 240000))
+                            if (Creature* kaylaan = me->FindNearestCreature(KAYLAAN_THE_LOST, 50.0f, true))
                             {
                                 kaylaan->AI()->Talk(0);
+                                _events.ScheduleEvent(EVENT_KAYLAAN_SAY_2, 9000);
                             }
+                            break;
+                        case EVENT_KAYLAAN_SAY_2:
+                            if (Creature* kaylaan = me->FindNearestCreature(KAYLAAN_THE_LOST, 50.0f, true))
+                            {
+                                kaylaan->AI()->Talk(1);
+                                _events.ScheduleEvent(EVENT_KAYLAAN_SAY_3, 8000);
+                            }
+                            break;
+                        case EVENT_KAYLAAN_SAY_3:
+                            if (Creature* kaylaan = me->FindNearestCreature(KAYLAAN_THE_LOST, 50.0f, true))
+                            {
+                                kaylaan->AI()->Talk(2);
+                                _events.ScheduleEvent(EVENT_ADYEN_SAY_4, 8000);
+                            }
+                            break;
+                        case EVENT_ADYEN_SAY_4:
+                            if (Creature* adyen = me->FindNearestCreature(ADYEN_THE_LIGHTBRINGER, 50.0f, true))
+                            {
+                                adyen->AI()->Talk(3);
+                                _events.ScheduleEvent(EVENT_KAYLAAN_SAY_4, 11000);
+                            }
+                            break;
+                        case EVENT_KAYLAAN_SAY_4:
+                            if (Creature* kaylaan = me->FindNearestCreature(KAYLAAN_THE_LOST, 50.0f, true))
+                            {
+                                kaylaan->AI()->Talk(3);
+                                _events.ScheduleEvent(EVENT_SPELL_POWER_OF_THE_LEGION, 5000);
+                            }
+                            break;
+                        case EVENT_SPELL_POWER_OF_THE_LEGION:
+                            if (Creature* kaylaan = me->FindNearestCreature(KAYLAAN_THE_LOST, 50.0f, true))
+                                me->CastSpell(kaylaan, POWER_OF_THE_LEGION, false);
+                            Talk(2);
+                            _events.ScheduleEvent(EVENT_FIGHT_ALDOR, 3000);
+                            break;
+                        case EVENT_FIGHT_ALDOR:
+                            Creature * adyen = me->FindNearestCreature(ADYEN_THE_LIGHTBRINGER, 50.0f, true);
+                            Creature* orelis = me->FindNearestCreature(EXARCH_ORELIS, 50.0f, true);
+                            Creature* karja = me->FindNearestCreature(ANCHORITE_KARJA, 50.0f, true);
+                            if (Creature* kaylaan = me->FindNearestCreature(KAYLAAN_THE_LOST, 50.0f, true))
+                            {
+                                kaylaan->setFaction(1770);
+                                kaylaan->AI()->AttackStart(adyen);
+                                adyen->AI()->AttackStart(kaylaan);
+                                orelis->AI()->AttackStart(kaylaan);
+                                karja->AI()->AttackStart(kaylaan);
+                            }
+                            break;
+                        case EVENT_END_ALDOR_FIGHT:
+                            Creature * adyen = me->FindNearestCreature(ADYEN_THE_LIGHTBRINGER, 50.0f, true);
+                            Creature* orelis = me->FindNearestCreature(EXARCH_ORELIS, 50.0f, true);
+                            Creature* karja = me->FindNearestCreature(ANCHORITE_KARJA, 50.0f, true);
+                            if (Creature* kaylaan = me->FindNearestCreature(KAYLAAN_THE_LOST, 50.0f, true))
+                            {
+                                kaylaan->setFaction(1786);
+                                kaylaan->CombatStop();
+                                kaylaan->ClearInCombat();
+                                orelis->CombatStop();
+                                orelis->ClearInCombat();
+                                karja->CombatStop();
+                                karja->ClearInCombat();
+                                _events.ScheduleEvent(EVENT_SOCRETHAR_SAY_1, 2000);
+                            }
+                            break;
+                        case EVENT_SOCRETHAR_SAY_4:
+                            Talk(3);
+                            _events.ScheduleEvent(EVENT_KAYLAAN_SAY_5, 6000);
+                            break;
+                        case EVENT_KAYLAAN_SAY_5:
+                            if (Creature* kaylaan = me->FindNearestCreature(KAYLAAN_THE_LOST, 50.0f, true))
+                                kaylaan->AI()->Talk(4);
+
+                            if (Creature* ishanah = me->SummonCreature(ISHANAH_HIGH_PRIESTESS, IshanahSpawnPosition, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 180000))
+                                ishanah->GetMotionMaster()->MovePath(500050, false); // TODO: Add her path to the DB
                             break;
                     }
                 }
@@ -1520,6 +1600,10 @@ class socrethar : public CreatureScript
 
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
+
+                if (Creature* kaylaan = me->FindNearestCreature(KAYLAAN_THE_LOST, 100.0f, true))
+                    if (kaylaan->GetHealthPct <= 30)
+                        _events.ScheduleEvent(EVENT_END_ALDOR_FIGHT, 1000);
 
                 switch (_events.GetEvent())
                 {
@@ -1599,6 +1683,7 @@ class kaylaan_the_lost : public CreatureScript
                     case 3: // 2nd waypath
                         if (first_waypath_done)
                         {
+                            me->SetHomePosition(me->GetPosition());
                             if (Creature* adyen = me->FindNearestCreature(ADYEN_THE_LIGHTBRINGER, 30.0f, true))
                                 me->SetOrientation(adyen->GetPositionX());
                             if (Creature* socrethar = me->FindNearestCreature(SOCRETHAR, 30.0f, true))
@@ -1630,14 +1715,6 @@ class kaylaan_the_lost : public CreatureScript
                         if (me->FindNearestCreature(target->GetGUID(), 10.0f, true))
                             me->CastSpell(me, CONSECRATION, false);
                         _events.RepeatEvent(urand(12000, 15000));
-                        break;
-                    case EVENT_SPELL_HEAL:
-                        if (me->GetHealthPct() <= 45)
-                        {
-                            me->CastSpell(me, HEAL, false);
-                            _events.RepeatEvent(urand(20000, 25000));
-                        }
-                        _events.RepeatEvent(1000);
                         break;
                 }
 
