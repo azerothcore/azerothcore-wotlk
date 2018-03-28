@@ -1020,6 +1020,7 @@ enum RoleplayActions
     EVENT_KAYLAAN_RESSURECTION  = 29,   // Ress Ishanah
     EVENT_FIGHT_ALDOR           = 30,
     EVENT_END_ALDOR_FIGHT       = 31,
+    EVENT_SOCRETHAR_DEAD        = 32
 };
 
 enum Adyen
@@ -1213,7 +1214,8 @@ class adyen_the_lightbringer : public CreatureScript
             {
                 switch (uiPointId)
                 {
-                    case 9:
+                    case 10:
+                        Talk(0);
                         if (Creature* socrethar = me->FindNearestCreature(SOCRETHAR, 50.0f, true))
                             socrethar->AI()->DoAction(EVENT_ADYEN_SAY_1);
                         break;
@@ -1229,7 +1231,7 @@ class adyen_the_lightbringer : public CreatureScript
 
             void UpdateAI(uint32 diff) override
             {
-                _events.Update(diff);
+                npc_escortAI::UpdateAI(diff);
 
                 if (!me->GetVictim())
                     return;
@@ -1424,7 +1426,7 @@ class socrethar : public CreatureScript
             socretharAI(Creature* creature) : npc_escortAI(creature), _summons(me) { }
 
             EventMap _events;
-            bool DeathblowToTheLegionRunning;
+            bool DeathblowToTheLegionRunning = false;
             SummonList _summons;
 
             void WaypointReached(uint32 /*wp*/) {}
@@ -1441,8 +1443,8 @@ class socrethar : public CreatureScript
                 switch (param)
                 {
                     case EVENT_ADYEN_SAY_1:
-                        _events.ScheduleEvent(EVENT_ADYEN_SAY_1, 2000);
                         DeathblowToTheLegionRunning = true;
+                        _events.ScheduleEvent(EVENT_ADYEN_SAY_1, 2000);
                         break;
                     case EVENT_ADYEN_SAY_3:
                         _events.ScheduleEvent(EVENT_ADYEN_SAY_3, 2000);
@@ -1462,6 +1464,9 @@ class socrethar : public CreatureScript
 
                 if (player->GetQuestStatus(DEATHBLOW_TO_THE_LEGION) == QUEST_STATUS_INCOMPLETE)
                     player->CompleteQuest(DEATHBLOW_TO_THE_LEGION);
+
+                if (Creature* ishanah = me->FindNearestCreature(ISHANAH_HIGH_PRIESTESS, 30.0f, true))
+                    ishanah->AI()->DoAction(EVENT_SOCRETHAR_DEAD);
             }
 
             void EnterCombat(Unit* who)
@@ -1478,7 +1483,7 @@ class socrethar : public CreatureScript
 
             void UpdateAI(uint32 diff) override
             {
-                _events.Update(diff);
+                npc_escortAI::UpdateAI(diff);
 
                 if (DeathblowToTheLegionRunning)
                 {
@@ -1766,7 +1771,20 @@ class ishanah : public CreatureScript
 
             EventMap _events;
 
-            void DoAction(int32 /*param*/) {}
+            void Reset()
+            {
+                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+            }
+
+            void DoAction(int32 param)
+            {
+                switch (param)
+                {
+                    case EVENT_SOCRETHAR_DEAD:
+                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                        break;
+                }
+            }
 
             void EnterCombat(Unit* who)
             {
