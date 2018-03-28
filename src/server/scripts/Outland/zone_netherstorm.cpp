@@ -1432,6 +1432,8 @@ class socrethar : public CreatureScript
             void Reset()
             {
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE);
+                me->SetReactState(REACT_PASSIVE);
+                me->setFaction(1786);
             }
 
             void DoAction(int32 param)
@@ -1449,6 +1451,17 @@ class socrethar : public CreatureScript
                         _events.ScheduleEvent(EVENT_KAYLAAN_SAY_1, 4000);
                         break;
                 }
+            }
+
+            void JustDied(Unit*  killer)
+            {
+                Player* player = killer->ToPlayer();
+
+                if (!player)
+                    return;
+
+                if (player->GetQuestStatus(DEATHBLOW_TO_THE_LEGION) == QUEST_STATUS_INCOMPLETE)
+                    player->CompleteQuest(DEATHBLOW_TO_THE_LEGION);
             }
 
             void EnterCombat(Unit* who)
@@ -1496,21 +1509,21 @@ class socrethar : public CreatureScript
                                 kaylaan->AI()->DoAction(EVENT_KAYLAAN_START_POINT);
                             break;
                         case EVENT_ADYEN_SAY_3:
-                                adyen->AI()->Talk(2);
-                                _events.ScheduleEvent(EVENT_KAYLAAN_WALK_TO_ADYEN, 6500);
+                            adyen->AI()->Talk(2);
+                            _events.ScheduleEvent(EVENT_KAYLAAN_WALK_TO_ADYEN, 6500);
                             break;
                         case EVENT_KAYLAAN_WALK_TO_ADYEN:
-                                kaylaan->SetStandState(UNIT_STAND_STATE_STAND);
-                                /*
-                                    1st waypath is spawn->socrethar (0 after his id)
-                                    2nd waypath is socrethar->front of aldor (needs the delay of 1s on 1st point so he can dislay standing) (1 after his id)
-                                    3rd waypath is front of aldor->ishanah (2 after his id)
-                                */
-                                kaylaan->GetMotionMaster()->MovePath(207941, false); 
+                            kaylaan->SetStandState(UNIT_STAND_STATE_STAND);
+                            /*
+                                1st waypath is spawn->socrethar (0 after his id)
+                                2nd waypath is socrethar->front of aldor (needs the delay of 1s on 1st point so he can dislay standing) (1 after his id)
+                                3rd waypath is front of aldor->ishanah (2 after his id)
+                            */
+                            kaylaan->GetMotionMaster()->MovePath(207941, false); 
                             break;
                         case EVENT_KAYLAAN_SAY_1:
-                                kaylaan->AI()->Talk(0);
-                                _events.ScheduleEvent(EVENT_KAYLAAN_SAY_2, 9000);
+                            kaylaan->AI()->Talk(0);
+                            _events.ScheduleEvent(EVENT_KAYLAAN_SAY_2, 9000);
                             break;
                         case EVENT_KAYLAAN_SAY_2:
                             kaylaan->AI()->Talk(1);
@@ -1601,6 +1614,10 @@ class socrethar : public CreatureScript
                             _events.ScheduleEvent(EVENT_FINAL_FIGHT, 3000);
                             break;
                         case EVENT_FINAL_FIGHT:
+                            me->setFaction(1770); // before fight faction 1786 in case i break him
+                            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE);
+                            me->SetReactState(REACT_AGGRESSIVE);
+                            me->Attack(ishanah, true);
                             break;
                     }
                 }
