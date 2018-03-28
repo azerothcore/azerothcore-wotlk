@@ -1469,29 +1469,25 @@ class socrethar : public CreatureScript
 
                 if (DeathblowToTheLegionRunning)
                 {
-                    Creature * adyen = me->FindNearestCreature(ADYEN_THE_LIGHTBRINGER, 50.0f, true);
-                    Creature* orelis = me->FindNearestCreature(EXARCH_ORELIS, 50.0f, true);
-                    Creature* karja = me->FindNearestCreature(ANCHORITE_KARJA, 50.0f, true);
+                    Creature* adyen     = me->FindNearestCreature(ADYEN_THE_LIGHTBRINGER, 50.0f, true);
+                    Creature* orelis    = me->FindNearestCreature(EXARCH_ORELIS, 50.0f, true);
+                    Creature* karja     = me->FindNearestCreature(ANCHORITE_KARJA, 50.0f, true);
+                    Creature* kaylaan   = me->FindNearestCreature(KAYLAAN_THE_LOST, 50.0f, true);
+                    Creature* ishanah   = me->FindNearestCreature(ISHANAH_HIGH_PRIESTESS, 50.0f, true);
 
                     switch (_events.GetEvent())
                     {
                         case EVENT_ADYEN_SAY_1:
-                            if (Creature* adyen = me->FindNearestCreature(ADYEN_THE_LIGHTBRINGER, 50.0f, true))
-                            {
-                                adyen->AI()->Talk(0);
-                                _events.ScheduleEvent(EVENT_SOCRETHAR_SAY_1, 11000);
-                            }
+                            adyen->AI()->Talk(0);
+                            _events.ScheduleEvent(EVENT_SOCRETHAR_SAY_1, 11000);
                             break;
                         case EVENT_SOCRETHAR_SAY_1:
                             Talk(0);
                             _events.ScheduleEvent(EVENT_ADYEN_SAY_2, 7000);
                             break;
                         case EVENT_ADYEN_SAY_2:
-                            if (Creature* adyen = me->FindNearestCreature(ADYEN_THE_LIGHTBRINGER, 50.0f, true))
-                            {
-                                adyen->AI()->Talk(1);
-                                _events.ScheduleEvent(EVENT_SOCRETHAR_SAY_2, 11000);
-                            }
+                            adyen->AI()->Talk(1);
+                            _events.ScheduleEvent(EVENT_SOCRETHAR_SAY_2, 11000);
                             break;
                         case EVENT_SOCRETHAR_SAY_2:
                             Talk(1);
@@ -1500,148 +1496,100 @@ class socrethar : public CreatureScript
                                 kaylaan->AI()->DoAction(EVENT_KAYLAAN_START_POINT);
                             break;
                         case EVENT_ADYEN_SAY_3:
-                            if (Creature* adyen = me->FindNearestCreature(ADYEN_THE_LIGHTBRINGER, 50.0f, true))
-                            {
                                 adyen->AI()->Talk(2);
                                 _events.ScheduleEvent(EVENT_KAYLAAN_WALK_TO_ADYEN, 6500);
-                            }
                             break;
                         case EVENT_KAYLAAN_WALK_TO_ADYEN:
-                            if (Creature* kaylaan = me->SummonCreature(KAYLAAN_THE_LOST, KaylaanSpawnPosition, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 240000))
-                            {
                                 kaylaan->SetStandState(UNIT_STAND_STATE_STAND);
                                 /*
-                                    1st waypath is spawn->socrethar (0 after id = 1st)
-                                    2nd waypath is socrethar->front of aldor (needs the delay of 1s on 1st point so he can dislay standing) (1 after id = 2nd)
-                                    3rd waypath is front of aldor->ishanah (2 after id = 3rd)
+                                    1st waypath is spawn->socrethar (0 after his id)
+                                    2nd waypath is socrethar->front of aldor (needs the delay of 1s on 1st point so he can dislay standing) (1 after his id)
+                                    3rd waypath is front of aldor->ishanah (2 after his id)
                                 */
                                 kaylaan->GetMotionMaster()->MovePath(207941, false); 
-                            }
                             break;
                         case EVENT_KAYLAAN_SAY_1:
-                            if (Creature* kaylaan = me->FindNearestCreature(KAYLAAN_THE_LOST, 50.0f, true))
-                            {
                                 kaylaan->AI()->Talk(0);
                                 _events.ScheduleEvent(EVENT_KAYLAAN_SAY_2, 9000);
-                            }
                             break;
                         case EVENT_KAYLAAN_SAY_2:
-                            if (Creature* kaylaan = me->FindNearestCreature(KAYLAAN_THE_LOST, 50.0f, true))
-                            {
-                                kaylaan->AI()->Talk(1);
-                                _events.ScheduleEvent(EVENT_KAYLAAN_SAY_3, 8000);
-                            }
+                            kaylaan->AI()->Talk(1);
+                            _events.ScheduleEvent(EVENT_KAYLAAN_SAY_3, 8000);
                             break;
                         case EVENT_KAYLAAN_SAY_3:
-                            if (Creature* kaylaan = me->FindNearestCreature(KAYLAAN_THE_LOST, 50.0f, true))
-                            {
-                                kaylaan->AI()->Talk(2);
-                                _events.ScheduleEvent(EVENT_ADYEN_SAY_4, 8000);
-                            }
+                            kaylaan->AI()->Talk(2);
+                            _events.ScheduleEvent(EVENT_ADYEN_SAY_4, 8000);
                             break;
                         case EVENT_ADYEN_SAY_4:
-                            if (Creature* adyen = me->FindNearestCreature(ADYEN_THE_LIGHTBRINGER, 50.0f, true))
-                            {
-                                adyen->AI()->Talk(3);
-                                _events.ScheduleEvent(EVENT_KAYLAAN_SAY_4, 11000);
-                            }
+                            adyen->AI()->Talk(3);
+                            _events.ScheduleEvent(EVENT_KAYLAAN_SAY_4, 11000);
                             break;
                         case EVENT_KAYLAAN_SAY_4:
-                            if (Creature* kaylaan = me->FindNearestCreature(KAYLAAN_THE_LOST, 50.0f, true))
-                            {
-                                kaylaan->AI()->Talk(3);
-                                _events.ScheduleEvent(EVENT_SPELL_POWER_OF_THE_LEGION, 5000);
-                            }
+                            kaylaan->AI()->Talk(3);
+                            _events.ScheduleEvent(EVENT_SPELL_POWER_OF_THE_LEGION, 5000);
                             break;
                         case EVENT_SPELL_POWER_OF_THE_LEGION:
-                            if (Creature* kaylaan = me->FindNearestCreature(KAYLAAN_THE_LOST, 50.0f, true))
-                                me->CastSpell(kaylaan, POWER_OF_THE_LEGION, false);
+                            me->CastSpell(kaylaan, POWER_OF_THE_LEGION, false);
                             Talk(2);
                             _events.ScheduleEvent(EVENT_FIGHT_ALDOR, 3000);
                             break;
                         case EVENT_FIGHT_ALDOR:
-                            if (Creature* kaylaan = me->FindNearestCreature(KAYLAAN_THE_LOST, 50.0f, true))
-                            {
-                                kaylaan->setFaction(1770);
-                                kaylaan->AI()->AttackStart(adyen);
-                                adyen->AI()->AttackStart(kaylaan);
-                                orelis->AI()->AttackStart(kaylaan);
-                                karja->AI()->AttackStart(kaylaan);
-                            }
+                            kaylaan->setFaction(1770);
+                            kaylaan->AI()->AttackStart(adyen);
+                            adyen->AI()->AttackStart(kaylaan);
+                            orelis->AI()->AttackStart(kaylaan);
+                            karja->AI()->AttackStart(kaylaan);
                             break;
                         case EVENT_END_ALDOR_FIGHT:
-                            if (Creature* kaylaan = me->FindNearestCreature(KAYLAAN_THE_LOST, 50.0f, true))
-                            {
-                                kaylaan->setFaction(1786);
-                                kaylaan->CombatStop();
-                                kaylaan->ClearInCombat();
-                                orelis->CombatStop();
-                                orelis->ClearInCombat();
-                                karja->CombatStop();
-                                karja->ClearInCombat();
-                                _events.ScheduleEvent(EVENT_SOCRETHAR_SAY_1, 2000);
-                            }
+                            kaylaan->setFaction(1786);
+                            kaylaan->CombatStop();
+                            kaylaan->ClearInCombat();
+                            orelis->CombatStop();
+                            orelis->ClearInCombat();
+                            karja->CombatStop();
+                            karja->ClearInCombat();
+                            _events.ScheduleEvent(EVENT_SOCRETHAR_SAY_1, 2000);
                             break;
                         case EVENT_SOCRETHAR_SAY_4:
                             Talk(3);
                             _events.ScheduleEvent(EVENT_KAYLAAN_SAY_5, 6000);
                             break;
                         case EVENT_KAYLAAN_SAY_5:
-                            if (Creature* kaylaan = me->FindNearestCreature(KAYLAAN_THE_LOST, 50.0f, true))
-                                kaylaan->AI()->Talk(4);
-
+                            kaylaan->AI()->Talk(4);
                             if (Creature* ishanah = me->SummonCreature(ISHANAH_HIGH_PRIESTESS, IshanahSpawnPosition, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 180000))
                                 ishanah->GetMotionMaster()->MovePath(500050, false); // TODO: Add her path to the DB
                             break;
                         case EVENT_ISHANAH_SAY_1:
-                            if (Creature* ishanah = me->FindNearestCreature(ISHANAH_HIGH_PRIESTESS, 30.0f, true))
-                            {
-                                ishanah->AI()->Talk(0);
-                                if (Creature* kaylaan = me->FindNearestCreature(KAYLAAN_THE_LOST, 30.0f, true))
-                                    kaylaan->SetStandState(UNIT_STAND_STATE_KNEEL);
-                                _events.ScheduleEvent(EVENT_ISHANAH_SAY_2, 6000);
-                            }
+                            ishanah->AI()->Talk(0);
+                            kaylaan->SetStandState(UNIT_STAND_STATE_KNEEL);
+                            _events.ScheduleEvent(EVENT_ISHANAH_SAY_2, 6000);
                             break;
                         case EVENT_ISHANAH_SAY_2:
-                            if (Creature* ishanah = me->FindNearestCreature(ISHANAH_HIGH_PRIESTESS, 30.0f, true))
-                            {
-                                ishanah->AI()->Talk(1);
-                                _events.ScheduleEvent(EVENT_SOCRETHAR_SAY_5, 8000);
-                            }
+                            ishanah->AI()->Talk(1);
+                            _events.ScheduleEvent(EVENT_SOCRETHAR_SAY_5, 8000);
                             break;
                         case EVENT_SOCRETHAR_SAY_5:
                             Talk(4);
                             _events.ScheduleEvent(EVENT_KILL_ISHANAH, 4000);
                             break;
                         case EVENT_KILL_ISHANAH:
-                            if (Creature* ishanah = me->FindNearestCreature(ISHANAH_HIGH_PRIESTESS, 30.0f, true))
-                                me->CastSpell(ishanah, WRATH_OF_SOCRETHAR);
+                            me->CastSpell(ishanah, WRATH_OF_SOCRETHAR);
                             _events.ScheduleEvent(EVENT_KAYLAAN_SAY_6, 4000);
                             break;
                         case EVENT_KAYLAAN_SAY_6:
-                            if (Creature* kaylaan = me->FindNearestCreature(KAYLAAN_THE_LOST, 30.0f, true))
-                            {
-                                kaylaan->AI()->Talk(5); /* No! What have I done? */
-                                kaylaan->SetStandState(UNIT_STAND_STATE_STAND);
-                                kaylaan->GetMotionMaster()->MovePath(207942, false);
-                                kaylaan->RemoveAurasDueToSpell(POWER_OF_THE_LEGION);
-                            }
+                            kaylaan->AI()->Talk(5); /* No! What have I done? */
+                            kaylaan->SetStandState(UNIT_STAND_STATE_STAND);
+                            kaylaan->GetMotionMaster()->MovePath(207942, false);
+                            kaylaan->RemoveAurasDueToSpell(POWER_OF_THE_LEGION);
                             _events.ScheduleEvent(EVENT_KAYLAAN_SAY_7, 9000);
                             break;
                         case EVENT_KAYLAAN_SAY_7:
-                            if (Creature* kaylaan = me->FindNearestCreature(KAYLAAN_THE_LOST, 30.0f, true))
-                            {
-                                kaylaan->AI()->Talk(6);
-                                kaylaan->CastSpell(kaylaan, DIVINE_SHIELD); // Must test this redemption spell id
-                            }
+                            kaylaan->AI()->Talk(6);
+                            kaylaan->CastSpell(kaylaan, DIVINE_SHIELD);
                             _events.ScheduleEvent(EVENT_KAYLAAN_RESSURECTION, 1000);
                             break;
                         case EVENT_KAYLAAN_RESSURECTION:
-                            if (Creature* kaylaan = me->FindNearestCreature(KAYLAAN_THE_LOST, 30.0f, true))
-                            {
-                                if (Creature* ishanah = me->FindNearestCreature(ISHANAH_HIGH_PRIESTESS, 30.0f, true))
-                                    kaylaan->CastSpell(ishanah, REDEMPTION); // Must test this redemption spell id
-                            }
+                            kaylaan->CastSpell(ishanah, REDEMPTION); // Must test this redemption spell id
                             _events.ScheduleEvent(EVENT_SOCRETHAR_SAY_6, 13000);
                             break;
                         case EVENT_SOCRETHAR_SAY_6:
@@ -1649,8 +1597,7 @@ class socrethar : public CreatureScript
                             _events.ScheduleEvent(EVENT_KILL_KAYLAAN, 4000);
                             break;
                         case EVENT_KILL_KAYLAAN:
-                            if (Creature* kaylaan = me->FindNearestCreature(KAYLAAN_THE_LOST, 30.0f, true))
-                                me->CastSpell(kaylaan, WRATH_OF_SOCRETHAR);
+                            me->CastSpell(kaylaan, WRATH_OF_SOCRETHAR);
                             _events.ScheduleEvent(EVENT_FINAL_FIGHT, 3000);
                             break;
                         case EVENT_FINAL_FIGHT:
