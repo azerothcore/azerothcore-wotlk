@@ -998,22 +998,23 @@ enum RoleplayActions
     EVENT_KAYLAAN_SAY_4         = 13,
     EVENT_KAYLAAN_SAY_5         = 14,    // Spawn Ishanah at this point
     EVENT_KAYLAAN_SAY_6         = 15,
+    EVENT_KAYLAAN_SAY_7         = 16,
 
     // ISHANAH TEXT
-    EVENT_ISHANAH_SAY_1         = 16, // Make kaylaan bow
-    EVENT_ISHANAH_SAY_2         = 17,
+    EVENT_ISHANAH_SAY_1         = 17, // Make kaylaan bow
+    EVENT_ISHANAH_SAY_2         = 18,
 
     // SOCRETHAR ROLEPLAY EVENTS
-    EVENT_BUFF_KAYLAAN          = 18,
-    EVENT_KILL_ISHANAH          = 19,
-    EVENT_KILL_KAYLAAN          = 20,
-    EVENT_FINAL_FIGHT           = 21, // On death grant credit to all players on threat list
+    EVENT_BUFF_KAYLAAN          = 19,
+    EVENT_KILL_ISHANAH          = 20,
+    EVENT_KILL_KAYLAAN          = 21,
+    EVENT_FINAL_FIGHT           = 22, // On death grant credit to all players on threat list
 
     // KAYLAAN ROLEPLAY EVENTS
-    EVENT_KAYLAAN_START_POINT   = 22,
-    EVENT_KAYLAAN_WALK_TO_ADYEN = 23,    // Adyen talks and 3s later he triggers next event
-    EVENT_WALK_FRONT_ALDOR_TEAM = 24,
-    EVENT_IN_FRONT_OF_ALDOR     = 25,    // Set orientation to adyen and w8 4s
+    EVENT_KAYLAAN_START_POINT   = 23,
+    EVENT_KAYLAAN_WALK_TO_ADYEN = 24,    // Adyen talks and 3s later he triggers next event
+    EVENT_WALK_FRONT_ALDOR_TEAM = 25,
+    EVENT_IN_FRONT_OF_ALDOR     = 26,    // Set orientation to adyen and w8 4s
     EVENT_KAYLAAN_REPENT        = 27,   // Waypath, unkneel, remove aura and talk. When he reaches final point, become friendly
     EVENT_KAYLAAN_INSPIRATION   = 28,   // Light bubble and talk
     EVENT_KAYLAAN_RESSURECTION  = 29,   // Ress Ishanah
@@ -1035,6 +1036,8 @@ enum Adyen
     CRUSADER_STRIKE             = 14518,
     HAMMER_OF_JUSTICE           = 13005,
     HOLY_LIGHT                  = 13952,
+    REDEMPTION                  = 7328,
+    DIVINE_SHIELD               = 40733,
 };
 
 enum Karja
@@ -1590,6 +1593,68 @@ class socrethar : public CreatureScript
                             if (Creature* ishanah = me->SummonCreature(ISHANAH_HIGH_PRIESTESS, IshanahSpawnPosition, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 180000))
                                 ishanah->GetMotionMaster()->MovePath(500050, false); // TODO: Add her path to the DB
                             break;
+                        case EVENT_ISHANAH_SAY_1:
+                            if (Creature* ishanah = me->FindNearestCreature(ISHANAH_HIGH_PRIESTESS, 30.0f, true))
+                            {
+                                ishanah->AI()->Talk(0);
+                                if (Creature* kaylaan = me->FindNearestCreature(KAYLAAN_THE_LOST, 30.0f, true))
+                                    kaylaan->SetStandState(UNIT_STAND_STATE_KNEEL);
+                                _events.ScheduleEvent(EVENT_ISHANAH_SAY_2, 6000);
+                            }
+                            break;
+                        case EVENT_ISHANAH_SAY_2:
+                            if (Creature* ishanah = me->FindNearestCreature(ISHANAH_HIGH_PRIESTESS, 30.0f, true))
+                            {
+                                ishanah->AI()->Talk(1);
+                                _events.ScheduleEvent(EVENT_SOCRETHAR_SAY_5, 8000);
+                            }
+                            break;
+                        case EVENT_SOCRETHAR_SAY_5:
+                            Talk(4);
+                            _events.ScheduleEvent(EVENT_KILL_ISHANAH, 4000);
+                            break;
+                        case EVENT_KILL_ISHANAH:
+                            if (Creature* ishanah = me->FindNearestCreature(ISHANAH_HIGH_PRIESTESS, 30.0f, true))
+                                me->CastSpell(ishanah, WRATH_OF_SOCRETHAR);
+                            _events.ScheduleEvent(EVENT_KAYLAAN_SAY_6, 4000);
+                            break;
+                        case EVENT_KAYLAAN_SAY_6:
+                            if (Creature* kaylaan = me->FindNearestCreature(KAYLAAN_THE_LOST, 30.0f, true))
+                            {
+                                kaylaan->AI()->Talk(5); /* No! What have I done? */
+                                kaylaan->SetStandState(UNIT_STAND_STATE_STAND);
+                                kaylaan->GetMotionMaster()->MovePath(207942, false);
+                                kaylaan->RemoveAurasDueToSpell(POWER_OF_THE_LEGION);
+                            }
+                            _events.ScheduleEvent(EVENT_KAYLAAN_SAY_7, 9000);
+                            break;
+                        case EVENT_KAYLAAN_SAY_7:
+                            if (Creature* kaylaan = me->FindNearestCreature(KAYLAAN_THE_LOST, 30.0f, true))
+                            {
+                                kaylaan->AI()->Talk(6);
+                                kaylaan->CastSpell(kaylaan, DIVINE_SHIELD); // Must test this redemption spell id
+                            }
+                            _events.ScheduleEvent(EVENT_KAYLAAN_RESSURECTION, 1000);
+                            break;
+                        case EVENT_KAYLAAN_RESSURECTION:
+                            if (Creature* kaylaan = me->FindNearestCreature(KAYLAAN_THE_LOST, 30.0f, true))
+                            {
+                                if (Creature* ishanah = me->FindNearestCreature(ISHANAH_HIGH_PRIESTESS, 30.0f, true))
+                                    kaylaan->CastSpell(ishanah, REDEMPTION); // Must test this redemption spell id
+                            }
+                            _events.ScheduleEvent(EVENT_SOCRETHAR_SAY_6, 13000);
+                            break;
+                        case EVENT_SOCRETHAR_SAY_6:
+                            Talk(5);
+                            _events.ScheduleEvent(EVENT_KILL_KAYLAAN, 4000);
+                            break;
+                        case EVENT_KILL_KAYLAAN:
+                            if (Creature* kaylaan = me->FindNearestCreature(KAYLAAN_THE_LOST, 30.0f, true))
+                                me->CastSpell(kaylaan, WRATH_OF_SOCRETHAR);
+                            _events.ScheduleEvent(EVENT_FINAL_FIGHT, 3000);
+                            break;
+                        case EVENT_FINAL_FIGHT:
+                            break;
                     }
                 }
 
@@ -1750,6 +1815,16 @@ class ishanah : public CreatureScript
                 switch (waypoint)
                 {
                     case 3:
+                        if (Creature* kaylaan = me->FindNearestCreature(KAYLAAN_THE_LOST, 30.0f, true))
+                        {
+                            kaylaan->AI()->Talk(5); /* Teacher... */
+                            kaylaan->SetOrientation(me->GetPositionX());
+                            if (Creature* socrethar = me->FindNearestCreature(SOCRETHAR, 30.0f, true))
+                            {
+                                socrethar->AI()->DoAction(EVENT_ISHANAH_SAY_1);
+                                socrethar->SetOrientation(me->GetPositionX());
+                            }
+                        }
                         break;
                 }
             }
