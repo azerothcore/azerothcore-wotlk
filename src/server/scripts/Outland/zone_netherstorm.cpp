@@ -1215,7 +1215,8 @@ class adyen_the_lightbringer : public CreatureScript
                 switch (uiPointId)
                 {
                     case 10:
-                        Talk(0);
+                        // Testing talk events, currently not triggering
+                        //me->MonsterSay(0, 0, me->FindNearestCreature(SOCRETHAR, 30.0f, true));
                         if (Creature* socrethar = me->FindNearestCreature(SOCRETHAR, 50.0f, true))
                             socrethar->AI()->DoAction(EVENT_ADYEN_SAY_1);
                         break;
