@@ -154,8 +154,13 @@ class npc_pet_mage_mirror_image : public CreatureScript
                     {
                         me->getThreatManager().resetAllAggro();
                         me->AddThreat(selection, 1000000.0f);
-                        AttackStart(selection);
+
+                        if (owner->IsInCombat())
+                            AttackStart(selection);
                     }
+
+                    if (!owner->IsInCombat() && !me->GetVictim())
+                        EnterEvadeMode();
                 }
             }
 
@@ -170,9 +175,6 @@ class npc_pet_mage_mirror_image : public CreatureScript
                 events.Update(diff);
                 if (events.GetTimer() < 1200)
                     return;
-
-                if (!me->GetVictim() || !me->GetVictim()->IsAlive())
-                    EnterEvadeMode();
 
                 if (!me->IsInCombat() || !me->GetVictim())
                 {
