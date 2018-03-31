@@ -102,8 +102,7 @@ UPDATE `waypoint_data` SET `move_type`=1 WHERE `id`=@PATH;--
 -- END UPDATING QUERIES
 --
 COMMIT;
-END;
-//
+END //
 DELIMITER ;
 CALL updateDb();
 DROP PROCEDURE IF EXISTS `updateDb`;

@@ -57,8 +57,7 @@ INSERT INTO `waypoint_data`(`id`,`point`,`position_x`,`position_y`,`position_z`,
 -- END UPDATING QUERIES
 --
 COMMIT;
-END;
-//
+END //
 DELIMITER ;
 CALL updateDb();
 DROP PROCEDURE IF EXISTS `updateDb`;

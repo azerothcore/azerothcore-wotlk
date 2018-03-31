@@ -19,8 +19,7 @@ UPDATE `creature_template` SET `faction` = 1873 WHERE `entry` = 16927;
 -- END UPDATING QUERIES
 --
 COMMIT;
-END;
-//
+END //
 DELIMITER ;
 CALL updateDb();
 DROP PROCEDURE IF EXISTS `updateDb`;

@@ -146,8 +146,7 @@ UPDATE `gameobject` SET `spawntimesecs` = 10800 WHERE `guid` = 12029;
 -- END UPDATING QUERIES
 --
 COMMIT;
-END;
-//
+END //
 DELIMITER ;
 CALL updateDb();
 DROP PROCEDURE IF EXISTS `updateDb`;

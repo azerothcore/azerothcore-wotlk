@@ -22,8 +22,7 @@ UPDATE creature_equip_template SET ItemID1= 38723, ItemID2= 12932 WHERE Creature
 -- END UPDATING QUERIES
 --
 COMMIT;
-END;
-//
+END //
 DELIMITER ;
 CALL updateDb();
 DROP PROCEDURE IF EXISTS `updateDb`;

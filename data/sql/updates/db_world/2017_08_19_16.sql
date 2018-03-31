@@ -97,8 +97,7 @@ UPDATE `creature_loot_template` SET `ChanceOrQuestChance` = 15 WHERE `item` = 24
 -- END UPDATING QUERIES
 --
 COMMIT;
-END;
-//
+END //
 DELIMITER ;
 CALL updateDb();
 DROP PROCEDURE IF EXISTS `updateDb`;

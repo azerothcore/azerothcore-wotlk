@@ -23,8 +23,7 @@ UPDATE `creature_template_addon` SET `auras`=10848 WHERE `entry` IN (8888);
 -- END UPDATING QUERIES
 --
 COMMIT;
-END;
-//
+END //
 DELIMITER ;
 CALL updateDb();
 DROP PROCEDURE IF EXISTS `updateDb`;

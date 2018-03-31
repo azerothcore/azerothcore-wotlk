@@ -207,8 +207,7 @@ INSERT INTO `game_event_gameobject` (`guid`, `eventEntry`) VALUES
 -- END UPDATING QUERIES
 --
 COMMIT;
-END;
-//
+END //
 DELIMITER ;
 CALL updateDb();
 DROP PROCEDURE IF EXISTS `updateDb`;

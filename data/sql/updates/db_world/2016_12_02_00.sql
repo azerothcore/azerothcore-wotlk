@@ -12398,8 +12398,7 @@ UPDATE `creature_text` SET `BroadcastTextID`='8388' WHERE `entry`=4489 AND `grou
 UPDATE `creature_text` SET `BroadcastTextID`='8393' WHERE `entry`=4489 AND `groupid`=4 AND `id`=0;
 
 COMMIT;
-END;
-//
+END //
 DELIMITER ;
 CALL updateDb();
 DROP PROCEDURE IF EXISTS `updateDb`;

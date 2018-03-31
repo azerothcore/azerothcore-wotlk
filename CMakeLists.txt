@@ -28,13 +28,13 @@ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH 1)
 set(AC_PATH_ROOT "${CMAKE_SOURCE_DIR}")
 
 # set macro-directory
-set(CMAKE_MODULE_PATH "${AC_PATH_ROOT}/modules/worldengine/nucleus/src/cmake/macros")
+set(CMAKE_MODULE_PATH "${AC_PATH_ROOT}/src/cmake/macros")
 
 include(CheckCXXSourceRuns)
 include(CheckIncludeFiles)
 
 # some utils for cmake
-include(modules/drassil/cmake-utils/utils.cmake)
+include(deps/drassil/cmake-utils/utils.cmake)
 
 include(src/cmake/ac_macros.cmake)
 
@@ -97,16 +97,14 @@ include(src/cmake/showoptions.cmake)
 # Loading framework
 #
 
-add_subdirectory(modules/worldengine/deps)
+add_subdirectory(deps)
 
 if( SERVERS OR TOOLS)
-  add_subdirectory(modules/worldengine/nucleus)
-  add_subdirectory(modules/worldengine/lib-collision)
-  add_subdirectory(modules/acore/game-framework)
+  add_subdirectory(src/common)
 endif()
 
 if( TOOLS )
-  add_subdirectory(modules/acore/extractors)
+  add_subdirectory(src/tools)
 endif()
 
 #

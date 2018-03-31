@@ -24,8 +24,7 @@ UPDATE `spell_proc` SET `Cooldown`=0 WHERE `SpellId`=64440;
 -- END UPDATING QUERIES
 --
 COMMIT;
-END;
-//
+END //
 DELIMITER ;
 CALL updateDb();
 DROP PROCEDURE IF EXISTS `updateDb`;

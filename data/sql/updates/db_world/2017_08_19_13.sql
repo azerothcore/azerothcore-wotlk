@@ -41,8 +41,7 @@ UPDATE `creature` SET `position_x`=4402.431152, `position_y`=4554.557129, `posit
 -- END UPDATING QUERIES
 --
 COMMIT;
-END;
-//
+END //
 DELIMITER ;
 CALL updateDb();
 DROP PROCEDURE IF EXISTS `updateDb`;
