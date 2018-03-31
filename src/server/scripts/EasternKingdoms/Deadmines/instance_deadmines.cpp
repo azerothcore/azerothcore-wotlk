@@ -22,20 +22,11 @@ class instance_deadmines : public InstanceMapScript
                 memset(&_encounters, 0, sizeof(_encounters));
             }
 
-            uint64 GetData64(uint32 data) const override
-            {
-                switch (data)
-                {
-                    GO_FACTORY_DOOR: return DATA_FACTORY_DOORGUID;
-                }
-            }
-
             void OnGameObjectCreate(GameObject* gameobject)
             {
                 switch (gameobject->GetEntry())
                 {
                     case GO_FACTORY_DOOR:
-                        DATA_FACTORY_DOORGUID = gameobject->GetGUID();
                         if (_encounters[TYPE_RHAHK_ZOR] == DONE)
                             gameobject->SetGoState(GO_STATE_ACTIVE);
                         break;
@@ -88,7 +79,6 @@ class instance_deadmines : public InstanceMapScript
 
         private:
             uint32 _encounters[MAX_ENCOUNTERS];
-            uint64 DATA_FACTORY_DOORGUID;
         };
 
         InstanceScript* GetInstanceScript(InstanceMap* map) const
