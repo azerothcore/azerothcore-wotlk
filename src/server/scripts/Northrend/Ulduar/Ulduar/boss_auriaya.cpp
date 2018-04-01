@@ -174,7 +174,7 @@ public:
 
 			summons.DoZoneInCombat(NPC_SANCTUM_SENTRY);
 
-            Talk(SAY_AGGRO);
+			Talk(SAY_AGGRO);
 			me->setActive(true);
 		}
 
@@ -184,7 +184,7 @@ public:
                         Talk(SAY_SLAY);
 		}
 
-		void JustDied(Unit */*victim*/)
+		void JustDied(Unit* /*victim*/)
 		{
 			if (m_pInstance)
 				m_pInstance->SetData(TYPE_AURIAYA, DONE);
@@ -215,7 +215,7 @@ public:
 			switch (events.GetEvent())
 			{
 				case EVENT_SUMMON_FERAL_DEFENDER:
-                    Talk(EMOTE_DEFENDER);
+					Talk(EMOTE_DEFENDER);
 					me->CastSpell(me, SPELL_ACTIVATE_FERAL_DEFENDER, true);
 					events.PopEvent();
 					me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_INTERRUPT_CAST, true);
@@ -226,7 +226,7 @@ public:
 					me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_INTERRUPT_CAST, false);
 					break;
 				case EVENT_TERRIFYING_SCREECH:
-                    Talk(EMOTE_FEAR);
+					Talk(EMOTE_FEAR);
 					me->CastSpell(me, SPELL_TERRIFYING_SCREECH, false);
 					events.RepeatEvent(35000);
 					break;
@@ -251,7 +251,7 @@ public:
 					break;
 				}
 				case EVENT_ENRAGE:
-                    Talk(SAY_BERSERK);
+					Talk(SAY_BERSERK);
 					me->CastSpell(me, SPELL_ENRAGE, true);
 					events.PopEvent();
 					break;
@@ -265,63 +265,63 @@ public:
 class npc_auriaya_sanctum_sentry : public CreatureScript
 {
 public:
-    npc_auriaya_sanctum_sentry() : CreatureScript("npc_auriaya_sanctum_sentry") { }
+	npc_auriaya_sanctum_sentry() : CreatureScript("npc_auriaya_sanctum_sentry") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
-    {
-        return new npc_auriaya_sanctum_sentryAI (pCreature);
-    }
+	CreatureAI* GetAI(Creature* pCreature) const
+	{
+	    return new npc_auriaya_sanctum_sentryAI (pCreature);
+	}
 
 	struct npc_auriaya_sanctum_sentryAI : public ScriptedAI
 	{
-		npc_auriaya_sanctum_sentryAI(Creature* pCreature) : ScriptedAI(pCreature) { }
+	    npc_auriaya_sanctum_sentryAI(Creature* pCreature) : ScriptedAI(pCreature) { }
 
-		uint32 _savagePounceTimer;
-		uint32 _ripFleshTimer;
+	    uint32 _savagePounceTimer;
+	    uint32 _ripFleshTimer;
 
-		void EnterCombat(Unit*)
-		{
+	    void EnterCombat(Unit*)
+	    {
 			if (me->GetInstanceScript())
 				if (Creature* cr = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetData64(TYPE_AURIAYA)))
 					cr->SetInCombatWithZone();
-		}
+	    }
 
-		void Reset()
-		{
+	    void Reset()
+	    {
 			_savagePounceTimer = 5000;
 			_ripFleshTimer = 0;
 
 			me->CastSpell(me, SPELL_STRENGTH_OF_THE_PACK, true);
-		}
+	    }
 
-		void UpdateAI(uint32 diff)
-		{
-			if (!UpdateVictim())
-				return;
+	    void UpdateAI(uint32 diff)
+	    {
+	        if (!UpdateVictim())
+	            return;
 
-			_savagePounceTimer += diff;
-			_ripFleshTimer += diff;
+	        _savagePounceTimer += diff;
+	        _ripFleshTimer += diff;
 
-			if (_savagePounceTimer >= 5000)
-			{
-				float dist = me->GetDistance(me->GetVictim());
-				if (dist >= 8 && dist < 25 && me->IsWithinLOSInMap(me->GetVictim()))
-				{
+	        if (_savagePounceTimer >= 5000)
+	        {
+	            float dist = me->GetDistance(me->GetVictim());
+	            if (dist >= 8 && dist < 25 && me->IsWithinLOSInMap(me->GetVictim()))
+	            {
 					me->CastSpell(me->GetVictim(), SPELL_SAVAGE_POUNCE, false);
 					_savagePounceTimer = 0;
 					return;
-				}
-				_savagePounceTimer = 200;
-			}
-			else if (_ripFleshTimer >= 10000)
-			{
-				me->CastSpell(me->GetVictim(), SPELL_RIP_FLESH, false);
-				_ripFleshTimer = 0;
-			}
+	            }
+	            _savagePounceTimer = 200;
+	        }
+	        else if (_ripFleshTimer >= 10000)
+	        {
+	            me->CastSpell(me->GetVictim(), SPELL_RIP_FLESH, false);
+	            _ripFleshTimer = 0;
+	        }
 
-			DoMeleeAttackIfReady();
-		}
-	};
+	        DoMeleeAttackIfReady();
+	    }
+    };
 };
 
 class npc_auriaya_feral_defender : public CreatureScript
