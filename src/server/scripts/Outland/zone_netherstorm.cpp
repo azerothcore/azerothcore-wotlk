@@ -963,7 +963,7 @@ public:
 
 enum DeathblowToTheLegion
 {
-    ADYEN_THE_LIGHTBRINGER  = 61021,
+    ADYEN_THE_LIGHTBRINGER  = 61022,
     ANCHORITE_KARJA         = 50001,
     EXARCH_ORELIS           = 50002,
     SOCRETHAR               = 20132,
@@ -1210,18 +1210,20 @@ class adyen_the_lightbringer : public CreatureScript
                     me->GetMotionMaster()->MovePath(610210, false);
             }
 
-            void WaypointReached(uint32 uiPointId)
+            void MovementInform(uint32 type, uint32 point)
             {
-                switch (uiPointId)
+                if (type != WAYPOINT_MOTION_TYPE)
+                    return;
+
+                if (point == 10)
                 {
-                    case 10:
-                        Talk(0);
-                        if (Creature* socrethar = me->FindNearestCreature(SOCRETHAR, 50.0f, true))
-                            socrethar->AI()->DoAction(EVENT_ADYEN_SAY_1);
-                        break;
+                    if (Creature* socrethar = me->FindNearestCreature(SOCRETHAR, 50.0f, true))
+                        socrethar->AI()->DoAction(EVENT_ADYEN_SAY_1);
                 }
             }
 
+            void WaypointReached(uint32 /*point*/) { }
+            
             void EnterCombat(Unit * who)
             {
                 AttackStart(who);
