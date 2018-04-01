@@ -1,5 +1,5 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/LICENSE-AGPL
+ * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
 #include "CreatureTextMgr.h"
@@ -12,32 +12,32 @@
 
 enum AuriayaSpells
 {
-	// BASIC
-	SPELL_TERRIFYING_SCREECH            = 64386,
-	SPELL_SENTINEL_BLAST_10             = 64389,
-	SPELL_SENTINEL_BLAST_25             = 64678,
-	SPELL_SONIC_SCREECH_10              = 64422,
-	SPELL_SONIC_SCREECH_25              = 64688,
-	SPELL_GUARDIAN_SWARM                = 64396,
-	SPELL_ENRAGE                        = 47008,
-	SPELL_ACTIVATE_FERAL_DEFENDER       = 64449,
+    // BASIC
+    SPELL_TERRIFYING_SCREECH            = 64386,
+    SPELL_SENTINEL_BLAST_10             = 64389,
+    SPELL_SENTINEL_BLAST_25             = 64678,
+    SPELL_SONIC_SCREECH_10              = 64422,
+    SPELL_SONIC_SCREECH_25              = 64688,
+    SPELL_GUARDIAN_SWARM                = 64396,
+    SPELL_ENRAGE                        = 47008,
+    SPELL_ACTIVATE_FERAL_DEFENDER       = 64449,
 
-	// Sanctum Sentry
-	SPELL_SAVAGE_POUNCE_10              = 64666,
-	SPELL_SAVAGE_POUNCE_25              = 64374,
-	SPELL_RIP_FLESH_10                  = 64375,
-	SPELL_RIP_FLESH_25                  = 64667,
-	SPELL_STRENGTH_OF_THE_PACK          = 64369,
+    // Sanctum Sentry
+    SPELL_SAVAGE_POUNCE_10              = 64666,
+    SPELL_SAVAGE_POUNCE_25              = 64374,
+    SPELL_RIP_FLESH_10                  = 64375,
+    SPELL_RIP_FLESH_25                  = 64667,
+    SPELL_STRENGTH_OF_THE_PACK          = 64369,
 
-	// Feral Defender
-	SPELL_FERAL_ESSENCE                 = 64455,
-	SPELL_FERAL_POUNCE_10               = 64478,
-	SPELL_FERAL_POUNCE_25               = 64669,
-	SPELL_FERAL_RUSH_10                 = 64496,
-	SPELL_FERAL_RUSH_25                 = 64674,
-	//SPELL_SEEPING_FERAL_ESSENCE_SUMMON	= 64457,
-	SPELL_SEEPING_FERAL_ESSENCE_10      = 64458,
-	SPELL_SEEPING_FERAL_ESSENCE_25      = 64676,
+    // Feral Defender
+    SPELL_FERAL_ESSENCE                 = 64455,
+    SPELL_FERAL_POUNCE_10               = 64478,
+    SPELL_FERAL_POUNCE_25               = 64669,
+    SPELL_FERAL_RUSH_10                 = 64496,
+    SPELL_FERAL_RUSH_25                 = 64674,
+    //SPELL_SEEPING_FERAL_ESSENCE_SUMMON	= 64457,
+    SPELL_SEEPING_FERAL_ESSENCE_10      = 64458,
+    SPELL_SEEPING_FERAL_ESSENCE_25      = 64676,
 };
 
 #define SPELL_SONIC_SCREECH             RAID_MODE(SPELL_SONIC_SCREECH_10, SPELL_SONIC_SCREECH_25)
@@ -50,22 +50,22 @@ enum AuriayaSpells
 
 enum AuriayaNPC
 {
-	NPC_FERAL_DEFENDER                  = 34035,
-	NPC_SANCTUM_SENTRY                  = 34014,
-	NPC_SEEPING_FERAL_ESSENCE           = 34098,
+    NPC_FERAL_DEFENDER                  = 34035,
+    NPC_SANCTUM_SENTRY                  = 34014,
+    NPC_SEEPING_FERAL_ESSENCE           = 34098,
 };
 
 enum AuriayaEvents
 {
-	EVENT_SUMMON_FERAL_DEFENDER         = 1,
-	EVENT_TERRIFYING_SCREECH            = 2,
-	EVENT_SONIC_SCREECH                 = 3,
-	EVENT_GUARDIAN_SWARM                = 4,
-	EVENT_SENTINEL_BLAST                = 5,
-	EVENT_REMOVE_IMMUNE                 = 6,
+    EVENT_SUMMON_FERAL_DEFENDER         = 1,
+    EVENT_TERRIFYING_SCREECH            = 2,
+    EVENT_SONIC_SCREECH                 = 3,
+    EVENT_GUARDIAN_SWARM                = 4,
+    EVENT_SENTINEL_BLAST                = 5,
+    EVENT_REMOVE_IMMUNE                 = 6,
 
-	EVENT_RESPAWN_FERAL_DEFENDER        = 9,
-	EVENT_ENRAGE                        = 10,
+    EVENT_RESPAWN_FERAL_DEFENDER        = 9,
+    EVENT_ENRAGE                        = 10,
 };
 
 enum AuriayaYells
@@ -80,13 +80,13 @@ enum AuriayaYells
 
 enum Misc
 {
-	ACTION_FERAL_RESPAWN                = 1,
-	ACTION_FERAL_DEATH                  = 2,
-	ACTION_DESPAWN_ADDS                 = 3,
-	ACTION_FERAL_DEATH_WITH_STACK       = 4,
+    ACTION_FERAL_RESPAWN                = 1,
+    ACTION_FERAL_DEATH                  = 2,
+    ACTION_DESPAWN_ADDS                 = 3,
+    ACTION_FERAL_DEATH_WITH_STACK       = 4,
 
-	DATA_CRAZY_CAT                      = 10,
-	DATA_NINE_LIVES                     = 11,
+    DATA_CRAZY_CAT                      = 10,
+    DATA_NINE_LIVES                     = 11,
 };
 
 class boss_auriaya : public CreatureScript
