@@ -29,7 +29,27 @@ enum Spells
     SPELL_INFORM_DEAD_KNIGHT        = 27931,
     SPELL_INFORM_DEAD_RIDER         = 27937,
 
-    SPELL_SHADOW_MARK               = 27825
+    // TRAINEES
+    SPELL_DEATH_PLAGUE              = 55604,    // LIVING TRAINEE
+    SPELL_ARCANE_EXPLOSION          = 27989,    // DEAD TRAINEE (20y)
+
+    // KNIGHT
+    SPELL_SHADOW_MARK               = 27825,    // LIVING KNIGHT
+    SPELL_WHIRLWIND                 = 56408,    // DEAD KNIGHT
+
+    // RIDER
+    SPELL_BLOOD_PRESENCE            = 55212,    // LIVING RIDER
+    SPELL_DEATH_COIL                = 55209,    // LIVING RIDER
+    SPELL_HASTE_AURA                = 13589,    // LIVING RIDER
+    SPELL_HYSTERIA                  = 55213,    // LIVING RIDER
+    SPELL_INTIMIDATING_SHOUT        = 5246,     // LIVING RIDER
+    SPELL_VEIL_OF_DARKNESS          = 28350,    // LIVING RIDER
+    SPELL_DRAIN_LIFE                = 27994,    // DEAD RIDER
+    SPELL_UNHOLY_AURA               = 55606,    // DEAD RIDER
+    SPELL_UNHOLY_FRENZY             = 55648,    // DEAD RIDER
+
+    // HORSE
+    SPELL_STOMP                     = 27993     // DEAD HORSE
 };
 
 enum Misc
