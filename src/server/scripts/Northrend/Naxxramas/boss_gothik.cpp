@@ -563,17 +563,68 @@ public:
                     me->CastSpell(me->GetVictim(), SPELL_DEATH_PLAGUE, false);
                     events.RepeatEvent(urand(15000,20000));
                     break;
-                case NPC_DEAD_TRAINEE:
+                case EVENT_SPELL_ARCANE_EXPLOSION:
+                    if (Unit* victim = me->GetVictim())
+                        if (victim->IsWithinDist(me, 20))
+                            me->CastSpell(victim, SPELL_ARCANE_EXPLOSION, false);
+                    events.RepeatEvent(urand(5000, 10000));
                     break;
-                case NPC_LIVING_KNIGHT:
+                case EVENT_SPELL_SHADOW_MARK:
+                    if (Unit* victim = me->GetVictim())
+                        if (!victim->HasAura(SPELL_SHADOW_MARK))
+                            me->CastSpell(me->GetVictim(), SPELL_SHADOW_MARK, false);
+                    events.RepeatEvent(urand(15000, 20000));
                     break;
-                case NPC_DEAD_KNIGHT:
+                case EVENT_SPELL_WHIRLWIND:
+                    if (Unit* victim = me->GetVictim())
+                        if (victim->IsWithinDist(me, 10))
+                            me->CastSpell(victim, SPELL_WHIRLWIND, false);
+                    events.RepeatEvent(urand(5000, 8000));
                     break;
-                case NPC_LIVING_RIDER:
+                case EVENT_SPELL_BLOOD_PRESENCE:
+                    if (!me->HasAura(SPELL_BLOOD_PRESENCE))
+                        me->CastSpell(me, SPELL_BLOOD_PRESENCE, false);
                     break;
-                case NPC_DEAD_RIDER:
+                case EVENT_SPELL_HASTE_AURA:
+                    if (!me->HasAura(SPELL_HASTE_AURA))
+                        me->CastSpell(me, SPELL_HASTE_AURA, false);
+                    break;
+                case EVENT_SPELL_DEATH_COIL:
+                    me->CastSpell(me->GetVictim(), SPELL_DEATH_COIL, false);
+                    events.RepeatEvent(urand(5000, 9000));
+                    break;
+                case EVENT_SPELL_HYSTERIA:
+                    if (!me->HasAura(SPELL_HYSTERIA))
+                        me->CastSpell(me, SPELL_HYSTERIA, false);
+                    events.RepeatEvent(urand(15000, 20000));
+                    break;
+                case EVENT_SPELL_INTIMIDATING_SHOUT:
+                    if (Unit* victim = me->GetVictim())
+                        if (victim->IsWithinDist(me, 10))
+                            me->CastSpell(victim, SPELL_INTIMIDATING_SHOUT, false);
+                    events.RepeatEvent(urand(14000, 22000));
+                    break;
+                case EVENT_SPELL_VEIL_OF_DARKNESS:
+                    me->CastSpell(me->GetVictim(), SPELL_VEIL_OF_DARKNESS, false);
+                    events.RepeatEvent(urand(13000, 19000));
+                    break;
+                case EVENT_SPELL_DRAIN_LIFE:
+                    me->CastSpell(me->GetVictim(), SPELL_DRAIN_LIFE, false);
+                    events.RepeatEvent(urand(6000, 15000));
+                    break;
+                case EVENT_SPELL_UNHOLY_AURA:
+                    if (!me->HasAura(SPELL_UNHOLY_AURA))
+                        me->CastSpell(me, SPELL_UNHOLY_AURA, false);
+                    events.RepeatEvent(urand(2000, 5000));
+                    break;
+                case EVENT_SPELL_UNHOLY_FRENZY:
+                    if (!me->HasAura(SPELL_UNHOLY_FRENZY))
+                        me->CastSpell(me, SPELL_UNHOLY_FRENZY, false);
+                    events.RepeatEvent(urand(2000, 5000));
                     break;
                 case NPC_DEAD_HORSE:
+                    me->CastSpell(me->GetVictim(), SPELL_STOMP, false);
+                    events.RepeatEvent(urand(4000, 9000));
                     break;
                 default:
                     break;
