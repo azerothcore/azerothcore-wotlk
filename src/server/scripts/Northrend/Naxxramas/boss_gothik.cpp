@@ -73,6 +73,28 @@ enum Events
     EVENT_TELEPORT                  = 4,
     EVENT_CHECK_HEALTH              = 5,
     EVENT_CHECK_PLAYERS             = 6,
+
+    // TRAINEES
+    EVENT_SPELL_DEATH_PLAGUE        = 7,
+    EVENT_SPELL_ARCANE_EXPLOSION    = 8,
+
+    // KNIGHT
+    EVENT_SPELL_SHADOW_MARK         = 9,
+    EVENT_SPELL_WHIRLWIND           = 10,
+
+    // RIDER
+    EVENT_SPELL_BLOOD_PRESENCE      = 11,
+    EVENT_SPELL_DEATH_COIL          = 12,
+    EVENT_SPELL_HASTE_AURA          = 13,
+    EVENT_SPELL_HYSTERIA            = 14,
+    EVENT_SPELL_INTIMIDATING_SHOUT  = 15,
+    EVENT_SPELL_VEIL_OF_DARKNESS    = 16,
+    EVENT_SPELL_DRAIN_LIFE          = 17,
+    EVENT_SPELL_UNHOLY_AURA         = 18,
+    EVENT_SPELL_UNHOLY_FRENZY       = 19,
+
+    // HORSE
+    EVENT_SPELL_STOMP               = 20
 };
 
 const uint32 gothikWaves[24][2] =
@@ -458,7 +480,42 @@ public:
         bool CanAIAttack(Unit const* target) const { return gateOpened || IsOnSameSide(target); }
 
         void Reset() { events.Reset(); }
-        void EnterCombat(Unit*  /*who*/) { me->SetInCombatWithZone(); }
+        void EnterCombat(Unit*  /*who*/)
+        {
+            me->SetInCombatWithZone();
+
+            switch (me->GetGUID())
+            {
+                case NPC_LIVING_TRAINEE:
+                    events.ScheduleEvent(EVENT_SPELL_DEATH_PLAGUE, 2000);
+                    break;
+                case NPC_DEAD_TRAINEE:
+                    events.ScheduleEvent(EVENT_SPELL_ARCANE_EXPLOSION, 2000);
+                    break;
+                case NPC_LIVING_KNIGHT:
+                    events.ScheduleEvent(EVENT_SPELL_SHADOW_MARK, 2000);
+                    break;
+                case NPC_DEAD_KNIGHT:
+                    events.ScheduleEvent(EVENT_SPELL_WHIRLWIND, 2000);
+                    break;
+                case NPC_LIVING_RIDER:
+                    events.ScheduleEvent(EVENT_SPELL_BLOOD_PRESENCE, 1);
+                    events.ScheduleEvent(EVENT_SPELL_DEATH_COIL, 3000);
+                    events.ScheduleEvent(EVENT_SPELL_HYSTERIA, 10000);
+                    events.ScheduleEvent(EVENT_SPELL_HASTE_AURA, 1000);
+                    events.ScheduleEvent(EVENT_SPELL_INTIMIDATING_SHOUT, urand(4000, 9000));
+                    events.ScheduleEvent(EVENT_SPELL_VEIL_OF_DARKNESS, urand(5000,7000));
+                    break;
+                case NPC_DEAD_RIDER:
+                    events.ScheduleEvent(EVENT_SPELL_DRAIN_LIFE, urand(2000, 3500));
+                    events.ScheduleEvent(EVENT_SPELL_UNHOLY_AURA, 1);
+                    events.ScheduleEvent(EVENT_SPELL_UNHOLY_FRENZY, urand(5000, 9000));
+                    break;
+                case NPC_DEAD_HORSE:
+                    events.ScheduleEvent(EVENT_SPELL_STOMP, urand(2000, 5000));
+                    break;
+            }
+        }
         void DamageTaken(Unit* attacker, uint32 &damage, DamageEffectType, SpellSchoolMask)
         {
             if (!attacker || (!gateOpened && !IsOnSameSide(attacker)))
@@ -491,6 +548,36 @@ public:
         {
             if (who->GetTypeId() == TYPEID_PLAYER && me->GetInstanceScript())
                 me->GetInstanceScript()->SetData(DATA_IMMORTAL_FAIL, 0);
+        }
+
+        void UpdateAI(uint32 diff)
+        {
+            events.Update(diff);
+
+            if (me->GetUnitState() == UNIT_STATE_CASTING)
+                return;
+
+            switch (events.GetEvent())
+            {
+                case EVENT_SPELL_DEATH_PLAGUE:
+                    me->CastSpell(me->GetVictim(), SPELL_DEATH_PLAGUE, false);
+                    events.RepeatEvent(urand(15000,20000));
+                    break;
+                case NPC_DEAD_TRAINEE:
+                    break;
+                case NPC_LIVING_KNIGHT:
+                    break;
+                case NPC_DEAD_KNIGHT:
+                    break;
+                case NPC_LIVING_RIDER:
+                    break;
+                case NPC_DEAD_RIDER:
+                    break;
+                case NPC_DEAD_HORSE:
+                    break;
+                default:
+                    break;
+            }
         }
     };
 
