@@ -1198,9 +1198,9 @@ class adyen_the_lightbringer : public CreatureScript
             return new adyen_the_lightbringerAI(creature);
         }
 
-        struct adyen_the_lightbringerAI : public npc_escortAI
+        struct adyen_the_lightbringerAI : public ScriptedAI
         {
-            adyen_the_lightbringerAI(Creature* creature) : npc_escortAI(creature) { }
+            adyen_the_lightbringerAI(Creature* creature) : ScriptedAI(creature) { }
 
             EventMap _events;
 
@@ -1233,7 +1233,7 @@ class adyen_the_lightbringer : public CreatureScript
 
             void UpdateAI(uint32 diff) override
             {
-                npc_escortAI::UpdateAI(diff);
+                _events.Update(diff);
 
                 if (!me->GetVictim())
                     return;
