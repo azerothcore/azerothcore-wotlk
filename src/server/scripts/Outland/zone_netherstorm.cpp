@@ -23,6 +23,7 @@ EndContentData */
 #include "ScriptedGossip.h"
 #include "ScriptedEscortAI.h"
 #include "Player.h"
+#include "SpellInfo.h"
 #include "GameObjectAI.h"
 
 // Ours
@@ -1217,6 +1218,7 @@ class adyen_the_lightbringer : public CreatureScript
 
                 if (point == 10)
                 {
+                    Talk(0);
                     if (Creature* socrethar = me->FindNearestCreature(SOCRETHAR, 50.0f, true))
                         socrethar->AI()->DoAction(EVENT_ADYEN_SAY_1);
                 }
@@ -1233,7 +1235,7 @@ class adyen_the_lightbringer : public CreatureScript
 
             void UpdateAI(uint32 diff) override
             {
-                _events.Update(diff);
+                npc_escortAI::UpdateAI(diff);
 
                 if (!me->GetVictim())
                     return;
