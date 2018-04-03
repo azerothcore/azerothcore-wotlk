@@ -963,7 +963,7 @@ public:
 
 enum DeathblowToTheLegion
 {
-    ADYEN_THE_LIGHTBRINGER  = 61022,
+    ADYEN_THE_LIGHTBRINGER  = 61021,
     ANCHORITE_KARJA         = 50001,
     EXARCH_ORELIS           = 50002,
     SOCRETHAR               = 20132,
