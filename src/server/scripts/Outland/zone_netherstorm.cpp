@@ -1198,9 +1198,9 @@ class adyen_the_lightbringer : public CreatureScript
             return new adyen_the_lightbringerAI(creature);
         }
 
-        struct adyen_the_lightbringerAI : public ScriptedAI
+        struct adyen_the_lightbringerAI : public npc_escortAI
         {
-            adyen_the_lightbringerAI(Creature* creature) : ScriptedAI(creature) { }
+            adyen_the_lightbringerAI(Creature* creature) : npc_escortAI(creature) { }
 
             EventMap _events;
 
