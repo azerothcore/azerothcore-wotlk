@@ -1199,9 +1199,9 @@ class adyen_the_lightbringer : public CreatureScript
             return new adyen_the_lightbringerAI(creature);
         }
 
-        struct adyen_the_lightbringerAI : public npc_escortAI
+        struct adyen_the_lightbringerAI : public NullCreatureAI
         {
-            adyen_the_lightbringerAI(Creature* creature) : npc_escortAI(creature) { }
+            adyen_the_lightbringerAI(Creature* creature) : NullCreatureAI(creature) { }
 
             EventMap _events;
 
@@ -1211,21 +1211,21 @@ class adyen_the_lightbringer : public CreatureScript
                     me->GetMotionMaster()->MovePath(610210, false);
             }
 
-            void MovementInform(uint32 type, uint32 point)
+            void MovementInform(uint32 /*type*/, uint32 point)
             {
-                if (type != WAYPOINT_MOTION_TYPE)
-                    return;
-
-                if (point == 10)
+                switch (point)
                 {
-                    Talk(0);
-                    if (Creature* socrethar = me->FindNearestCreature(SOCRETHAR, 50.0f, true))
-                        socrethar->AI()->DoAction(EVENT_ADYEN_SAY_1);
+                    case 9:
+                        if (Creature* socrethar = me->FindNearestCreature(SOCRETHAR, 50.0f, true))
+                            socrethar->AI()->DoAction(EVENT_ADYEN_SAY_1);
+
+                        //Talk(0);
+                        //Like this it works and doesn't spam.
+                        //Fixed after removing movementtype and waypointreached and changed to nullcreatureAI
+                        break;
                 }
             }
 
-            void WaypointReached(uint32 /*point*/) { }
-            
             void EnterCombat(Unit * who)
             {
                 AttackStart(who);
@@ -1233,9 +1233,9 @@ class adyen_the_lightbringer : public CreatureScript
                 _events.ScheduleEvent(EVENT_HAMMER_OF_JUSTICE, 6000, false);
             }
 
-            void UpdateAI(uint32 diff) override
+            void UpdateAI(uint32 diff)
             {
-                npc_escortAI::UpdateAI(diff);
+                _events.Update(diff);
 
                 if (!me->GetVictim())
                     return;
@@ -1320,7 +1320,7 @@ class anchorite_karja : public CreatureScript
                 _events.ScheduleEvent(EVENT_SPELL_HOLY_SMITE, 1); // 1 MS so she starts casting asap
             }
 
-            void UpdateAI(uint32 diff) override
+            void UpdateAI(uint32 diff)
             {
                 _events.Update(diff);
 
@@ -1375,7 +1375,7 @@ class exarch_orelis : public CreatureScript
                 _events.ScheduleEvent(EVENT_SPELL_REND, urand(1500, 6000));
             }
 
-            void UpdateAI(uint32 diff) override
+            void UpdateAI(uint32 diff)
             {
                 _events.Update(diff);
 
@@ -1411,8 +1411,6 @@ class exarch_orelis : public CreatureScript
                 DoMeleeAttackIfReady();
             }
         };
-    private:
-        EventMap _events;
 };
 
 class socrethar : public CreatureScript
@@ -1425,15 +1423,36 @@ class socrethar : public CreatureScript
             return new socretharAI(creature);
         }
 
-        struct socretharAI : public npc_escortAI
+        struct socretharAI : public ScriptedAI
         {
-            socretharAI(Creature* creature) : npc_escortAI(creature), _summons(me) { }
+            socretharAI(Creature* creature) : ScriptedAI(creature), _summons(me) { }
 
             EventMap _events;
             bool DeathblowToTheLegionRunning = false;
             SummonList _summons;
+            Creature* adyen, *orelis, *karja, *kaylaan, *ishanah;
 
-            void WaypointReached(uint32 /*wp*/) {}
+            void GetCreature(uint32 CreatureID)
+            {
+                switch (CreatureID)
+                {
+                    case ADYEN_THE_LIGHTBRINGER:
+                        adyen = me->FindNearestCreature(ADYEN_THE_LIGHTBRINGER, 100.0f, true);
+                        break;
+                    case EXARCH_ORELIS:
+                        orelis = me->FindNearestCreature(EXARCH_ORELIS, 100.0f, true);
+                        break;
+                    case ANCHORITE_KARJA:
+                        karja = me->FindNearestCreature(ANCHORITE_KARJA, 100.0f, true);
+                        break;
+                    case KAYLAAN_THE_LOST:
+                        kaylaan = me->FindNearestCreature(KAYLAAN_THE_LOST, 100.0f, true);
+                        break;
+                    case ISHANAH_HIGH_PRIESTESS:
+                        ishanah = me->FindNearestCreature(ISHANAH_HIGH_PRIESTESS, 100.0f, true);
+                        break;
+                }
+            }
 
             void Reset()
             {
@@ -1448,6 +1467,7 @@ class socrethar : public CreatureScript
                 {
                     case EVENT_ADYEN_SAY_1:
                         DeathblowToTheLegionRunning = true;
+                        GetCreature(ADYEN_THE_LIGHTBRINGER); // define adyen pointer
                         _events.ScheduleEvent(EVENT_ADYEN_SAY_1, 2000);
                         break;
                     case EVENT_ADYEN_SAY_3:
@@ -1485,19 +1505,13 @@ class socrethar : public CreatureScript
 
             void JustSummoned(Creature* cr) { _summons.Summon(cr); }
 
-            void UpdateAI(uint32 diff) override
+            void UpdateAI(uint32 diff)
             {
-                npc_escortAI::UpdateAI(diff);
+                _events.Update(diff);
 
                 if (DeathblowToTheLegionRunning)
                 {
-                    Creature* adyen     = me->FindNearestCreature(ADYEN_THE_LIGHTBRINGER, 50.0f, true);
-                    Creature* orelis    = me->FindNearestCreature(EXARCH_ORELIS, 50.0f, true);
-                    Creature* karja     = me->FindNearestCreature(ANCHORITE_KARJA, 50.0f, true);
-                    Creature* kaylaan   = me->FindNearestCreature(KAYLAAN_THE_LOST, 50.0f, true);
-                    Creature* ishanah   = me->FindNearestCreature(ISHANAH_HIGH_PRIESTESS, 50.0f, true);
-
-                    switch (_events.GetEvent())
+                    switch (_events.ExecuteEvent())
                     {
                         case EVENT_ADYEN_SAY_1:
                             adyen->AI()->Talk(0);
@@ -1514,7 +1528,7 @@ class socrethar : public CreatureScript
                         case EVENT_SOCRETHAR_SAY_2:
                             Talk(1);
                             _events.ScheduleEvent(EVENT_ADYEN_SAY_2, 7000);
-                            if (Creature* kaylaan = me->SummonCreature(KAYLAAN_THE_LOST, KaylaanSpawnPosition, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 240000))
+                            if (kaylaan = me->SummonCreature(KAYLAAN_THE_LOST, KaylaanSpawnPosition, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 240000))
                                 kaylaan->AI()->DoAction(EVENT_KAYLAAN_START_POINT);
                             break;
                         case EVENT_ADYEN_SAY_3:
@@ -1556,6 +1570,8 @@ class socrethar : public CreatureScript
                             _events.ScheduleEvent(EVENT_FIGHT_ALDOR, 3000);
                             break;
                         case EVENT_FIGHT_ALDOR:
+                            GetCreature(EXARCH_ORELIS); // define orelis pointer
+                            GetCreature(ANCHORITE_KARJA); // define karja pointer
                             kaylaan->setFaction(1770);
                             kaylaan->AI()->AttackStart(adyen);
                             adyen->AI()->AttackStart(kaylaan);
@@ -1578,7 +1594,7 @@ class socrethar : public CreatureScript
                             break;
                         case EVENT_KAYLAAN_SAY_5:
                             kaylaan->AI()->Talk(4);
-                            if (Creature* ishanah = me->SummonCreature(ISHANAH_HIGH_PRIESTESS, IshanahSpawnPosition, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 180000))
+                            if (ishanah = me->SummonCreature(ISHANAH_HIGH_PRIESTESS, IshanahSpawnPosition, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 180000))
                                 ishanah->GetMotionMaster()->MovePath(500050, false); // TODO: Add her path to the DB
                             break;
                         case EVENT_ISHANAH_SAY_1:
@@ -1637,9 +1653,8 @@ class socrethar : public CreatureScript
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
 
-                if (Creature* kaylaan = me->FindNearestCreature(KAYLAAN_THE_LOST, 100.0f, true))
-                    if (kaylaan->GetHealthPct() <= 30)
-                        _events.ScheduleEvent(EVENT_END_ALDOR_FIGHT, 1000);
+                if (kaylaan->GetHealthPct() <= 30)
+                    _events.ScheduleEvent(EVENT_END_ALDOR_FIGHT, 1000);
 
                 switch (_events.GetEvent())
                 {
