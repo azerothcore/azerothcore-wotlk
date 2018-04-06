@@ -1212,6 +1212,8 @@ class adyen_the_lightbringer : public CreatureScript
                     me->GetMotionMaster()->MovePath(610210, false);
             }
 
+            void Reset() { _events.Reset(); }
+
             void MovementInform(uint32 /*type*/, uint32 point)
             {
                 switch (point)
@@ -1220,7 +1222,7 @@ class adyen_the_lightbringer : public CreatureScript
                         //if (Creature* socrethar = me->FindNearestCreature(SOCRETHAR, 50.0f, true))
                             //socrethar->AI()->DoAction(EVENT_ADYEN_SAY_1);
 
-                        //Talk(0);
+                        Talk(0);
                         //Like this it works and doesn't spam.
                         break;
                 }
@@ -1236,8 +1238,8 @@ class adyen_the_lightbringer : public CreatureScript
             void UpdateAI(uint32 diff)
             {
                 _events.Update(diff);
-
-                switch (_events.GetEvent())
+                
+                switch (_events.ExecuteEvent())
                 {
                     case EVENT_ADYEN_SAY_1:
                         Talk(0);
@@ -1430,9 +1432,9 @@ class socrethar : public CreatureScript
             return new socretharAI(creature);
         }
 
-        struct socretharAI : public NullCreatureAI
+        struct socretharAI : public ScriptedAI
         {
-            socretharAI(Creature* creature) : NullCreatureAI(creature), _summons(me) { }
+            socretharAI(Creature* creature) : ScriptedAI(creature), _summons(me) { }
 
             EventMap _actionEvents, combatEvents;
             bool DeathblowToTheLegionRunning = false;
@@ -1466,6 +1468,10 @@ class socrethar : public CreatureScript
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE);
                 me->SetReactState(REACT_PASSIVE);
                 me->setFaction(1786);
+                adyen   = NULL;
+                orelis  = NULL;
+                karja   = NULL;
+                ishanah = NULL;
             }
 
             void DoAction(int32 param)
