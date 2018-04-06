@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -1015,6 +1015,9 @@ class GlobalScript : public ScriptObject
        
         // On Before arena points distribution
         virtual void OnBeforeUpdateArenaPoints(ArenaTeam* /*at*/, std::map<uint32, uint32> & /*ap*/) { }
+        
+        // Called when a dungeon encounter is updated.
+        virtual void OnAfterUpdateEncounterState(Map* /*map*/, EncounterCreditType /*type*/,  uint32 /*creditEntry*/, Unit* /*source*/, Difficulty /*difficulty_fixed*/, DungeonEncounterList const* /*encounters*/, uint32 /*dungeonCompleted*/) { }
 };
 
 // this class can be used to be extended by Modules
@@ -1293,6 +1296,7 @@ class ScriptMgr
         void OnItemRoll(Player const* player, LootStoreItem const* LootStoreItem, float &chance, Loot& loot, LootStore const& store);
         void OnInitializeLockedDungeons(Player* player, uint8& level, uint32& lockData);
         void OnAfterInitializeLockedDungeons(Player* player);
+        void OnAfterUpdateEncounterState(Map* map, EncounterCreditType type, uint32 creditEntry, Unit* source, Difficulty difficulty_fixed, DungeonEncounterList const* encounters, uint32 dungeonCompleted);
 
 
     public: /* Scheduled scripts */

@@ -1,5 +1,5 @@
-/*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-AGPL
+﻿/*
+ * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
 #include "ScriptMgr.h"
@@ -361,7 +361,7 @@ public:
         void JustDied(Unit*  /*pKiller*/)
         {
             RespawnDragons(true);
-            summons.DespawnEntry(NPC_FLAME_TSUNAMI);
+            summons.DespawnAll();
             Talk(SAY_SARTHARION_DEATH);
 
             if (pInstance)
