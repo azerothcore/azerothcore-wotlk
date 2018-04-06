@@ -1199,11 +1199,12 @@ class adyen_the_lightbringer : public CreatureScript
             return new adyen_the_lightbringerAI(creature);
         }
 
-        struct adyen_the_lightbringerAI : public NullCreatureAI
+        struct adyen_the_lightbringerAI : public ScriptedAI
         {
-            adyen_the_lightbringerAI(Creature* creature) : NullCreatureAI(creature) { }
+            adyen_the_lightbringerAI(Creature* creature) : ScriptedAI(creature) { }
 
             EventMap _events;
+            uint32  eventTimer, eventPhase;
 
             void DoAction(int32 param)
             {
@@ -1216,12 +1217,11 @@ class adyen_the_lightbringer : public CreatureScript
                 switch (point)
                 {
                     case 9:
-                        if (Creature* socrethar = me->FindNearestCreature(SOCRETHAR, 50.0f, true))
-                            socrethar->AI()->DoAction(EVENT_ADYEN_SAY_1);
+                        //if (Creature* socrethar = me->FindNearestCreature(SOCRETHAR, 50.0f, true))
+                            //socrethar->AI()->DoAction(EVENT_ADYEN_SAY_1);
 
                         //Talk(0);
                         //Like this it works and doesn't spam.
-                        //Fixed after removing movementtype and waypointreached and changed to nullcreatureAI
                         break;
                 }
             }
@@ -1236,6 +1236,13 @@ class adyen_the_lightbringer : public CreatureScript
             void UpdateAI(uint32 diff)
             {
                 _events.Update(diff);
+
+                switch (_events.GetEvent())
+                {
+                    case EVENT_ADYEN_SAY_1:
+                        Talk(0);
+                        break;
+                }
 
                 if (!me->GetVictim())
                     return;
@@ -1423,11 +1430,11 @@ class socrethar : public CreatureScript
             return new socretharAI(creature);
         }
 
-        struct socretharAI : public ScriptedAI
+        struct socretharAI : public NullCreatureAI
         {
-            socretharAI(Creature* creature) : ScriptedAI(creature), _summons(me) { }
+            socretharAI(Creature* creature) : NullCreatureAI(creature), _summons(me) { }
 
-            EventMap _events;
+            EventMap _actionEvents, combatEvents;
             bool DeathblowToTheLegionRunning = false;
             SummonList _summons;
             Creature* adyen, *orelis, *karja, *kaylaan, *ishanah;
@@ -1468,13 +1475,13 @@ class socrethar : public CreatureScript
                     case EVENT_ADYEN_SAY_1:
                         DeathblowToTheLegionRunning = true;
                         GetCreature(ADYEN_THE_LIGHTBRINGER); // define adyen pointer
-                        _events.ScheduleEvent(EVENT_ADYEN_SAY_1, 2000);
+                        _actionEvents.ScheduleEvent(EVENT_ADYEN_SAY_1, 2000);
                         break;
                     case EVENT_ADYEN_SAY_3:
-                        _events.ScheduleEvent(EVENT_ADYEN_SAY_3, 2000);
+                        _actionEvents.ScheduleEvent(EVENT_ADYEN_SAY_3, 2000);
                         break;
                     case EVENT_KAYLAAN_SAY_1:
-                        _events.ScheduleEvent(EVENT_KAYLAAN_SAY_1, 4000);
+                        _actionEvents.ScheduleEvent(EVENT_KAYLAAN_SAY_1, 4000);
                         break;
                 }
             }
@@ -1496,44 +1503,44 @@ class socrethar : public CreatureScript
             void EnterCombat(Unit* who)
             {
                 AttackStart(who);
-                _events.ScheduleEvent(EVENT_SPELL_ANTI_MAGIC_SHIELD, urand(8000, 15000));
-                _events.ScheduleEvent(EVENT_SPELL_BACKLASH, urand(3000, 7000));
-                _events.ScheduleEvent(EVENT_SPELL_CLEAVE, urand(1000, 4000));
-                _events.ScheduleEvent(EVENT_SPELL_FIREBALL_BARRAGE, urand(8000, 10000));
-                _events.ScheduleEvent(EVENT_SPELL_NETHER_PROTECTION, 1);
+                combatEvents.ScheduleEvent(EVENT_SPELL_ANTI_MAGIC_SHIELD, urand(8000, 15000));
+                combatEvents.ScheduleEvent(EVENT_SPELL_BACKLASH, urand(3000, 7000));
+                combatEvents.ScheduleEvent(EVENT_SPELL_CLEAVE, urand(1000, 4000));
+                combatEvents.ScheduleEvent(EVENT_SPELL_FIREBALL_BARRAGE, urand(8000, 10000));
+                combatEvents.ScheduleEvent(EVENT_SPELL_NETHER_PROTECTION, 1);
             }
 
             void JustSummoned(Creature* cr) { _summons.Summon(cr); }
 
             void UpdateAI(uint32 diff)
             {
-                _events.Update(diff);
-
                 if (DeathblowToTheLegionRunning)
                 {
-                    switch (_events.ExecuteEvent())
+                    _actionEvents.Update(diff);
+
+                    switch (_actionEvents.GetEvent())
                     {
                         case EVENT_ADYEN_SAY_1:
                             adyen->AI()->Talk(0);
-                            _events.ScheduleEvent(EVENT_SOCRETHAR_SAY_1, 11000);
+                            _actionEvents.ScheduleEvent(EVENT_SOCRETHAR_SAY_1, 11000);
                             break;
                         case EVENT_SOCRETHAR_SAY_1:
                             Talk(0);
-                            _events.ScheduleEvent(EVENT_ADYEN_SAY_2, 7000);
+                            _actionEvents.ScheduleEvent(EVENT_ADYEN_SAY_2, 7000);
                             break;
                         case EVENT_ADYEN_SAY_2:
                             adyen->AI()->Talk(1);
-                            _events.ScheduleEvent(EVENT_SOCRETHAR_SAY_2, 11000);
+                            //_actionEvents.ScheduleEvent(EVENT_SOCRETHAR_SAY_2, 11000);
                             break;
                         case EVENT_SOCRETHAR_SAY_2:
                             Talk(1);
-                            _events.ScheduleEvent(EVENT_ADYEN_SAY_2, 7000);
+                            _actionEvents.ScheduleEvent(EVENT_ADYEN_SAY_2, 7000);
                             if (kaylaan = me->SummonCreature(KAYLAAN_THE_LOST, KaylaanSpawnPosition, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 240000))
                                 kaylaan->AI()->DoAction(EVENT_KAYLAAN_START_POINT);
                             break;
                         case EVENT_ADYEN_SAY_3:
                             adyen->AI()->Talk(2);
-                            _events.ScheduleEvent(EVENT_KAYLAAN_WALK_TO_ADYEN, 6500);
+                            _actionEvents.ScheduleEvent(EVENT_KAYLAAN_WALK_TO_ADYEN, 6500);
                             break;
                         case EVENT_KAYLAAN_WALK_TO_ADYEN:
                             kaylaan->SetStandState(UNIT_STAND_STATE_STAND);
@@ -1546,28 +1553,28 @@ class socrethar : public CreatureScript
                             break;
                         case EVENT_KAYLAAN_SAY_1:
                             kaylaan->AI()->Talk(0);
-                            _events.ScheduleEvent(EVENT_KAYLAAN_SAY_2, 9000);
+                            _actionEvents.ScheduleEvent(EVENT_KAYLAAN_SAY_2, 9000);
                             break;
                         case EVENT_KAYLAAN_SAY_2:
                             kaylaan->AI()->Talk(1);
-                            _events.ScheduleEvent(EVENT_KAYLAAN_SAY_3, 8000);
+                            _actionEvents.ScheduleEvent(EVENT_KAYLAAN_SAY_3, 8000);
                             break;
                         case EVENT_KAYLAAN_SAY_3:
                             kaylaan->AI()->Talk(2);
-                            _events.ScheduleEvent(EVENT_ADYEN_SAY_4, 8000);
+                            _actionEvents.ScheduleEvent(EVENT_ADYEN_SAY_4, 8000);
                             break;
                         case EVENT_ADYEN_SAY_4:
                             adyen->AI()->Talk(3);
-                            _events.ScheduleEvent(EVENT_KAYLAAN_SAY_4, 11000);
+                            _actionEvents.ScheduleEvent(EVENT_KAYLAAN_SAY_4, 11000);
                             break;
                         case EVENT_KAYLAAN_SAY_4:
                             kaylaan->AI()->Talk(3);
-                            _events.ScheduleEvent(EVENT_SPELL_POWER_OF_THE_LEGION, 5000);
+                            _actionEvents.ScheduleEvent(EVENT_SPELL_POWER_OF_THE_LEGION, 5000);
                             break;
                         case EVENT_SPELL_POWER_OF_THE_LEGION:
                             me->CastSpell(kaylaan, POWER_OF_THE_LEGION, false);
                             Talk(2);
-                            _events.ScheduleEvent(EVENT_FIGHT_ALDOR, 3000);
+                            _actionEvents.ScheduleEvent(EVENT_FIGHT_ALDOR, 3000);
                             break;
                         case EVENT_FIGHT_ALDOR:
                             GetCreature(EXARCH_ORELIS); // define orelis pointer
@@ -1586,11 +1593,11 @@ class socrethar : public CreatureScript
                             orelis->ClearInCombat();
                             karja->CombatStop();
                             karja->ClearInCombat();
-                            _events.ScheduleEvent(EVENT_SOCRETHAR_SAY_1, 2000);
+                            _actionEvents.ScheduleEvent(EVENT_SOCRETHAR_SAY_1, 2000);
                             break;
                         case EVENT_SOCRETHAR_SAY_4:
                             Talk(3);
-                            _events.ScheduleEvent(EVENT_KAYLAAN_SAY_5, 6000);
+                            _actionEvents.ScheduleEvent(EVENT_KAYLAAN_SAY_5, 6000);
                             break;
                         case EVENT_KAYLAAN_SAY_5:
                             kaylaan->AI()->Talk(4);
@@ -1600,43 +1607,43 @@ class socrethar : public CreatureScript
                         case EVENT_ISHANAH_SAY_1:
                             ishanah->AI()->Talk(0);
                             kaylaan->SetStandState(UNIT_STAND_STATE_KNEEL);
-                            _events.ScheduleEvent(EVENT_ISHANAH_SAY_2, 6000);
+                            _actionEvents.ScheduleEvent(EVENT_ISHANAH_SAY_2, 6000);
                             break;
                         case EVENT_ISHANAH_SAY_2:
                             ishanah->AI()->Talk(1);
-                            _events.ScheduleEvent(EVENT_SOCRETHAR_SAY_5, 8000);
+                            _actionEvents.ScheduleEvent(EVENT_SOCRETHAR_SAY_5, 8000);
                             break;
                         case EVENT_SOCRETHAR_SAY_5:
                             Talk(4);
-                            _events.ScheduleEvent(EVENT_KILL_ISHANAH, 4000);
+                            _actionEvents.ScheduleEvent(EVENT_KILL_ISHANAH, 4000);
                             break;
                         case EVENT_KILL_ISHANAH:
                             me->CastSpell(ishanah, WRATH_OF_SOCRETHAR);
-                            _events.ScheduleEvent(EVENT_KAYLAAN_SAY_6, 4000);
+                            _actionEvents.ScheduleEvent(EVENT_KAYLAAN_SAY_6, 4000);
                             break;
                         case EVENT_KAYLAAN_SAY_6:
                             kaylaan->AI()->Talk(5); /* No! What have I done? */
                             kaylaan->SetStandState(UNIT_STAND_STATE_STAND);
                             kaylaan->GetMotionMaster()->MovePath(207942, false);
                             kaylaan->RemoveAurasDueToSpell(POWER_OF_THE_LEGION);
-                            _events.ScheduleEvent(EVENT_KAYLAAN_SAY_7, 9000);
+                            _actionEvents.ScheduleEvent(EVENT_KAYLAAN_SAY_7, 9000);
                             break;
                         case EVENT_KAYLAAN_SAY_7:
                             kaylaan->AI()->Talk(6);
                             kaylaan->CastSpell(kaylaan, DIVINE_SHIELD);
-                            _events.ScheduleEvent(EVENT_KAYLAAN_RESSURECTION, 1000);
+                            _actionEvents.ScheduleEvent(EVENT_KAYLAAN_RESSURECTION, 1000);
                             break;
                         case EVENT_KAYLAAN_RESSURECTION:
                             kaylaan->CastSpell(ishanah, REDEMPTION); // Must test this redemption spell id
-                            _events.ScheduleEvent(EVENT_SOCRETHAR_SAY_6, 13000);
+                            _actionEvents.ScheduleEvent(EVENT_SOCRETHAR_SAY_6, 13000);
                             break;
                         case EVENT_SOCRETHAR_SAY_6:
                             Talk(5);
-                            _events.ScheduleEvent(EVENT_KILL_KAYLAAN, 4000);
+                            _actionEvents.ScheduleEvent(EVENT_KILL_KAYLAAN, 4000);
                             break;
                         case EVENT_KILL_KAYLAAN:
                             me->CastSpell(kaylaan, WRATH_OF_SOCRETHAR);
-                            _events.ScheduleEvent(EVENT_FINAL_FIGHT, 3000);
+                            _actionEvents.ScheduleEvent(EVENT_FINAL_FIGHT, 3000);
                             break;
                         case EVENT_FINAL_FIGHT:
                             me->setFaction(1770); // before fight faction 1786 in case i break him
@@ -1653,10 +1660,12 @@ class socrethar : public CreatureScript
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
 
-                if (kaylaan->GetHealthPct() <= 30)
-                    _events.ScheduleEvent(EVENT_END_ALDOR_FIGHT, 1000);
+                combatEvents.Update(diff);
 
-                switch (_events.GetEvent())
+                if (kaylaan->GetHealthPct() <= 30)
+                    _actionEvents.ScheduleEvent(EVENT_END_ALDOR_FIGHT, 1000);
+
+                switch (combatEvents.GetEvent())
                 {
                     case EVENT_SPELL_NETHER_PROTECTION:
                         if (!me->HasAura(NETHER_PROTECTION))
@@ -1664,19 +1673,19 @@ class socrethar : public CreatureScript
                         break;
                     case EVENT_SPELL_ANTI_MAGIC_SHIELD:
                         me->CastSpell(me, ANTI_MAGIC_SHIELD, false);
-                        _events.RepeatEvent(urand(20000,25000));
+                        combatEvents.RepeatEvent(urand(20000,25000));
                         break;
                     case EVENT_SPELL_BACKLASH:
                         me->CastSpell(me->GetVictim(),BACKLASH, false);
-                        _events.RepeatEvent(urand(3500, 6500));
+                        combatEvents.RepeatEvent(urand(3500, 6500));
                         break;
                     case EVENT_SPELL_CLEAVE:
                         me->CastSpell(me->GetVictim(), CLEAVE, false);
-                        _events.RepeatEvent(urand(4000, 9000));
+                        combatEvents.RepeatEvent(urand(4000, 9000));
                         break;
                     case EVENT_SPELL_FIREBALL_BARRAGE:
                         me->CastSpell(me->GetVictim(), FIREBALL_BARRAGE, false);
-                        _events.RepeatEvent(urand(12000, 20000));
+                        combatEvents.RepeatEvent(urand(12000, 20000));
                         break;
                 }
 
