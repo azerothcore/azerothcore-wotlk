@@ -21,6 +21,7 @@
 #include "adtfile.h"
 #include <cassert>
 #include "mpq_libmpq04.h"
+#include "VMapDefinitions.h"
 #include <G3D/Quat.h>
 #include <algorithm>
 #include <cstdio>

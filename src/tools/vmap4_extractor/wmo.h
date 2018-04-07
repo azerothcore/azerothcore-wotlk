@@ -26,9 +26,6 @@
 #include "vec3d.h"
 #include "loadlib/loadlib.h"
 
-#define TILESIZE (533.33333f)
-#define CHUNKSIZE ((TILESIZE) / 16.0f)
-
 // MOPY flags
 enum MopyFlags
 {
@@ -105,7 +102,7 @@ struct WMOLiquidHeader
     float pos_x;
     float pos_y;
     float pos_z;
-    short type;
+    short material;
 };
 
 struct WMOLiquidVert
@@ -141,7 +138,7 @@ public:
     uint16 moprNItems;
     uint16 nBatchA;
     uint16 nBatchB;
-    uint32 nBatchC, fogIdx, liquidType, groupWMOID;
+    uint32 nBatchC, fogIdx, groupLiquid, groupWMOID;
 
     int mopy_size, moba_size;
     int LiquEx_size;
@@ -154,8 +151,9 @@ public:
     WMOGroup(std::string const& filename);
     ~WMOGroup();
 
-    bool open();
+    bool open(WMORoot* rootWMO);
     int ConvertToVMAPGroupWmo(FILE* output, WMORoot* rootWMO, bool preciseVectorData);
+    uint32 GetLiquidTypeId(uint32 liquidTypeId);
 };
 
 namespace MapObject

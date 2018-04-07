@@ -18,6 +18,7 @@ add_executable(vmap4extractor ${PRIVATE_SOURCES})
 
 target_link_libraries(vmap4extractor
   PUBLIC
+    common
     g3dlib
     mpq)
 

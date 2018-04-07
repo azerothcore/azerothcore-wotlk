@@ -1325,7 +1325,8 @@ GridMap::GridMap()
     _maxHeight = nullptr;
     _minHeight = nullptr;
     // Liquid data
-    _liquidType    = 0;
+    _liquidGlobalEntry = 0;
+    _liquidGlobalFlags = 0;
     _liquidOffX   = 0;
     _liquidOffY   = 0;
     _liquidWidth  = 0;
@@ -1502,7 +1503,8 @@ bool GridMap::loadLiquidData(FILE* in, uint32 offset, uint32 /*size*/)
     if (fread(&header, sizeof(header), 1, in) != 1 || header.fourcc != MapLiquidMagic.asUInt)
         return false;
 
-    _liquidType   = header.liquidType;
+    _liquidGlobalEntry = header.liquidType;
+    _liquidGlobalFlags = header.liquidFlags;
     _liquidOffX  = header.offsetX;
     _liquidOffY  = header.offsetY;
     _liquidWidth = header.width;
@@ -1882,85 +1884,81 @@ inline LiquidData const GridMap::GetLiquidData(float x, float y, float z, float 
     LiquidData liquidData;
 
     // Check water type (if no water return)
-    if (_liquidType || _liquidFlags)
+    if (!_liquidGlobalFlags && !_liquidFlags)
+        return liquidData;
+
+    // Get cell
+    float cx = MAP_RESOLUTION * (32 - x / SIZE_OF_GRIDS);
+    float cy = MAP_RESOLUTION * (32 - y / SIZE_OF_GRIDS);
+
+    int x_int = (int) cx & (MAP_RESOLUTION - 1);
+    int y_int = (int) cy & (MAP_RESOLUTION - 1);
+
+    // Check water type in cell
+    int    idx   = (x_int >> 3) * 16 + (y_int >> 3);
+    uint8  type  = _liquidFlags ? _liquidFlags[idx] : _liquidGlobalFlags;
+    uint32 entry = _liquidEntry ? _liquidEntry[idx] : _liquidGlobalEntry;
+    if (LiquidTypeEntry const* liquidEntry = sLiquidTypeStore.LookupEntry(entry))
     {
-        // Get cell
-        float cx = MAP_RESOLUTION * (32 - x / SIZE_OF_GRIDS);
-        float cy = MAP_RESOLUTION * (32 - y / SIZE_OF_GRIDS);
-
-        int x_int = (int) cx & (MAP_RESOLUTION - 1);
-        int y_int = (int) cy & (MAP_RESOLUTION - 1);
-
-        // Check water type in cell
-        int    idx   = (x_int >> 3) * 16 + (y_int >> 3);
-        uint8  type  = _liquidFlags ? _liquidFlags[idx] : _liquidType;
-        uint32 entry = 0;
-        if (_liquidEntry)
+        type &= MAP_LIQUID_TYPE_DARK_WATER;
+        uint32 liqTypeIdx = liquidEntry->Type;
+        if (entry < 21)
         {
-            if (LiquidTypeEntry const* liquidEntry = sLiquidTypeStore.LookupEntry(_liquidEntry[idx]))
+            if (AreaTableEntry const* area = sAreaTableStore.LookupEntry(getArea(x, y)))
             {
-                entry = liquidEntry->Id;
-                type &= MAP_LIQUID_TYPE_DARK_WATER;
-                uint32 liqTypeIdx = liquidEntry->Type;
-                if (entry < 21)
+                uint32 overrideLiquid = area->LiquidTypeOverride[liquidEntry->Type];
+                if (!overrideLiquid && area->zone)
                 {
-                    if (AreaTableEntry const* area = sAreaTableStore.LookupEntry(getArea(x, y)))
-                    {
-                        uint32 overrideLiquid = area->LiquidTypeOverride[liquidEntry->Type];
-                        if (!overrideLiquid && area->zone)
-                        {
-                            area = sAreaTableStore.LookupEntry(area->zone);
-                            if (area)
-                                overrideLiquid = area->LiquidTypeOverride[liquidEntry->Type];
-                        }
-
-                        if (LiquidTypeEntry const* liq = sLiquidTypeStore.LookupEntry(overrideLiquid))
-                        {
-                            entry      = overrideLiquid;
-                            liqTypeIdx = liq->Type;
-                        }
-                    }
+                    area = sAreaTableStore.LookupEntry(area->zone);
+                    if (area)
+                        overrideLiquid = area->LiquidTypeOverride[liquidEntry->Type];
                 }
 
-                type |= 1 << liqTypeIdx;
+                if (LiquidTypeEntry const* liq = sLiquidTypeStore.LookupEntry(overrideLiquid))
+                {
+                    entry      = overrideLiquid;
+                    liqTypeIdx = liq->Type;
+                }
             }
         }
 
-         // Check req liquid type mask
-        if (type != 0 && (!ReqLiquidType || (ReqLiquidType & type) != 0))
+        type |= 1 << liqTypeIdx;
+    }
+
+        // Check req liquid type mask
+    if (type != 0 && (!ReqLiquidType || (ReqLiquidType & type) != 0))
+    {
+        // Check water level:
+        // Check water height map
+        int lx_int = x_int - _liquidOffY;
+        int ly_int = y_int - _liquidOffX;
+        if (lx_int >= 0 && lx_int < _liquidHeight && ly_int >= 0 && ly_int < _liquidWidth)
         {
-            // Check water level:
-            // Check water height map
-            int lx_int = x_int - _liquidOffY;
-            int ly_int = y_int - _liquidOffX;
-            if (lx_int >= 0 && lx_int < _liquidHeight && ly_int >= 0 && ly_int < _liquidWidth)
+            // Get water level
+            float liquid_level = _liquidMap ? _liquidMap[lx_int * _liquidWidth + ly_int] : _liquidLevel;
+            // Get ground level (sub 0.2 for fix some errors)
+            float ground_level = getHeight(x, y);
+
+            // Check water level and ground level
+            if (liquid_level >= ground_level && z >= ground_level - 2)
             {
-                // Get water level
-                float liquid_level = _liquidMap ? _liquidMap[lx_int * _liquidWidth + ly_int] : _liquidLevel;
-                // Get ground level (sub 0.2 for fix some errors)
-                float ground_level = getHeight(x, y);
+                // All ok in water -> store data
+                liquidData.Entry  = entry;
+                liquidData.Flags = type;
+                liquidData.Level = liquid_level;
+                liquidData.DepthLevel = ground_level;
 
-                // Check water level and ground level
-                if (liquid_level >= ground_level && z >= ground_level - 2)
-                {
-                    // All ok in water -> store data
-                    liquidData.Entry  = entry;
-                    liquidData.Flags = type;
-                    liquidData.Level = liquid_level;
-                    liquidData.DepthLevel = ground_level;
+                // For speed check as int values
+                float delta = liquid_level - z;
 
-                    // For speed check as int values
-                    float delta = liquid_level - z;
-
-                    if (delta > collisionHeight)
-                        liquidData.Status = LIQUID_MAP_UNDER_WATER;
-                    else if (delta > 0.2f)
-                        liquidData.Status = LIQUID_MAP_IN_WATER;
-                    else if (delta > -0.2f)
-                        liquidData.Status = LIQUID_MAP_WATER_WALK;
-                    else
-                        liquidData.Status = LIQUID_MAP_ABOVE_WATER;
-                }
+                if (delta > collisionHeight)
+                    liquidData.Status = LIQUID_MAP_UNDER_WATER;
+                else if (delta > 0.2f)
+                    liquidData.Status = LIQUID_MAP_IN_WATER;
+                else if (delta > -0.2f)
+                    liquidData.Status = LIQUID_MAP_WATER_WALK;
+                else
+                    liquidData.Status = LIQUID_MAP_ABOVE_WATER;
             }
         }
     }

@@ -19,6 +19,7 @@
 #include "wdtfile.h"
 #include "adtfile.h"
 
+#include "StringFormat.h"
 #include <cstdio>
 
 char* wdtGetPlainName(char* FileName)

@@ -22,12 +22,6 @@
 #include <string>
 #include <unordered_map>
 
-namespace VMAP
-{
-    const char VMAP_MAGIC[] = "VMAP_4.6";
-    const char RAW_VMAP_MAGIC[] = "VMAP046";                // used in extracted vmap files with raw data
-}
-
 enum ModelFlags
 {
     MOD_M2 = 1,

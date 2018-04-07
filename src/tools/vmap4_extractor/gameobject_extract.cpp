@@ -19,6 +19,7 @@
 #include "dbcfile.h"
 #include "adtfile.h"
 #include "vmapexport.h"
+#include "VMapDefinitions.h"
 #include <algorithm>
 #include <cstdio>
 
