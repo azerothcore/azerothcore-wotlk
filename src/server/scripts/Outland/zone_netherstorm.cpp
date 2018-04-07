@@ -26,6 +26,10 @@ EndContentData */
 #include "SpellInfo.h"
 #include "GameObjectAI.h"
 
+#include "ScriptPCH.h"
+#include "ScriptedFollowerAI.h"
+#include "WorldSession.h"
+
 // Ours
 enum saeed
 {
@@ -979,60 +983,60 @@ enum DeathblowToTheLegion
 enum RoleplayActions
 {
     // ADYEN TEXTS
-    EVENT_ADYEN_SAY_1           = 0,
-    EVENT_ADYEN_SAY_2           = 1,
-    EVENT_ADYEN_SAY_3           = 2,
-    EVENT_ADYEN_SAY_4           = 3,
+    EVENT_ADYEN_SAY_1           = 1,
+    EVENT_ADYEN_SAY_2           = 2,
+    EVENT_ADYEN_SAY_3           = 3,
+    EVENT_ADYEN_SAY_4           = 4,
 
     // SOCRETHAR TEXT
-    EVENT_SOCRETHAR_SAY_1       = 4,
-    EVENT_SOCRETHAR_SAY_2       = 5,
-    EVENT_SOCRETHAR_SAY_3       = 6,
-    EVENT_SOCRETHAR_SAY_4       = 7,
-    EVENT_SOCRETHAR_SAY_5       = 8,
-    EVENT_SOCRETHAR_SAY_6       = 9,
+    EVENT_SOCRETHAR_SAY_1       = 5,
+    EVENT_SOCRETHAR_SAY_2       = 6,
+    EVENT_SOCRETHAR_SAY_3       = 7,
+    EVENT_SOCRETHAR_SAY_4       = 8,
+    EVENT_SOCRETHAR_SAY_5       = 9,
+    EVENT_SOCRETHAR_SAY_6       = 10,
 
     // KAYLAAN TEXT
-    EVENT_KAYLAAN_SAY_1         = 10,
-    EVENT_KAYLAAN_SAY_2         = 11,
-    EVENT_KAYLAAN_SAY_3         = 12,
-    EVENT_KAYLAAN_SAY_4         = 13,
-    EVENT_KAYLAAN_SAY_5         = 14,    // Spawn Ishanah at this point
-    EVENT_KAYLAAN_SAY_6         = 15,
-    EVENT_KAYLAAN_SAY_7         = 16,
+    EVENT_KAYLAAN_SAY_1         = 11,
+    EVENT_KAYLAAN_SAY_2         = 12,
+    EVENT_KAYLAAN_SAY_3         = 13,
+    EVENT_KAYLAAN_SAY_4         = 14,
+    EVENT_KAYLAAN_SAY_5         = 15,    // Spawn Ishanah at this point
+    EVENT_KAYLAAN_SAY_6         = 16,
+    EVENT_KAYLAAN_SAY_7         = 17,
 
     // ISHANAH TEXT
-    EVENT_ISHANAH_SAY_1         = 17, // Make kaylaan bow
-    EVENT_ISHANAH_SAY_2         = 18,
+    EVENT_ISHANAH_SAY_1         = 18, // Make kaylaan bow
+    EVENT_ISHANAH_SAY_2         = 19,
 
     // SOCRETHAR ROLEPLAY EVENTS
-    EVENT_BUFF_KAYLAAN          = 19,
-    EVENT_KILL_ISHANAH          = 20,
-    EVENT_KILL_KAYLAAN          = 21,
-    EVENT_FINAL_FIGHT           = 22, // On death grant credit to all players on threat list
+    EVENT_BUFF_KAYLAAN          = 20,
+    EVENT_KILL_ISHANAH          = 21,
+    EVENT_KILL_KAYLAAN          = 22,
+    EVENT_FINAL_FIGHT           = 23, // On death grant credit to all players on threat list
 
     // KAYLAAN ROLEPLAY EVENTS
-    EVENT_KAYLAAN_START_POINT   = 23,
-    EVENT_KAYLAAN_WALK_TO_ADYEN = 24,    // Adyen talks and 3s later he triggers next event
-    EVENT_WALK_FRONT_ALDOR_TEAM = 25,
-    EVENT_IN_FRONT_OF_ALDOR     = 26,    // Set orientation to adyen and w8 4s
-    EVENT_KAYLAAN_REPENT        = 27,   // Waypath, unkneel, remove aura and talk. When he reaches final point, become friendly
-    EVENT_KAYLAAN_INSPIRATION   = 28,   // Light bubble and talk
-    EVENT_KAYLAAN_RESSURECTION  = 29,   // Ress Ishanah
-    EVENT_FIGHT_ALDOR           = 30,
-    EVENT_END_ALDOR_FIGHT       = 31,
-    EVENT_SOCRETHAR_DEAD        = 32
+    EVENT_KAYLAAN_START_POINT   = 24,
+    EVENT_KAYLAAN_WALK_TO_ADYEN = 25,    // Adyen talks and 3s later he triggers next event
+    EVENT_WALK_FRONT_ALDOR_TEAM = 26,
+    EVENT_IN_FRONT_OF_ALDOR     = 27,    // Set orientation to adyen and w8 4s
+    EVENT_KAYLAAN_REPENT        = 28,   // Waypath, unkneel, remove aura and talk. When he reaches final point, become friendly
+    EVENT_KAYLAAN_INSPIRATION   = 29,   // Light bubble and talk
+    EVENT_KAYLAAN_RESSURECTION  = 30,   // Ress Ishanah
+    EVENT_FIGHT_ALDOR           = 31,
+    EVENT_END_ALDOR_FIGHT       = 32,
+    EVENT_SOCRETHAR_DEAD        = 33
 };
 
 enum Adyen
 {
     // ADYEN SPELL EVENTS
-    EVENT_CRUSADER_STRIKE       = 0,
-    EVENT_HAMMER_OF_JUSTICE     = 1,
-    EVENT_HOLY_LIGHT            = 2,
+    EVENT_CRUSADER_STRIKE       = 1,
+    EVENT_HAMMER_OF_JUSTICE     = 2,
+    EVENT_HOLY_LIGHT            = 3,
 
     // ADYEN ROLEPLAY EVENTS
-    EVENT_START_PLAYER_READY    = 3,
+    EVENT_START_PLAYER_READY    = 4,
 
     // ADYEN SPELLS
     CRUSADER_STRIKE             = 14518,
@@ -1045,10 +1049,10 @@ enum Adyen
 enum Karja
 {
     // KARJA SPELL EVENTS
-    EVENT_SPELL_HOLY_SMITE  = 0,
+    EVENT_SPELL_HOLY_SMITE  = 1,
 
     // KARJA ROLEPLAY EVENTS
-    EVENT_KARJA_WALK        = 1,
+    EVENT_KARJA_WALK        = 2,
 
     // KARJA SPELLS
     HOLY_SMITE_KARJA        = 9734,
@@ -1057,12 +1061,12 @@ enum Karja
 enum Orelis
 {
     // ORELIS SPELL EVENTS
-    EVENT_SPELL_DEMORALIZING_SHOUT  = 0,
-    EVENT_SPELL_HEROIC_STRIKE       = 1,
-    EVENT_SPELL_REND                = 2,
+    EVENT_SPELL_DEMORALIZING_SHOUT  = 1,
+    EVENT_SPELL_HEROIC_STRIKE       = 2,
+    EVENT_SPELL_REND                = 3,
 
     // ORELIS ROLEPLAY EVENTS
-    EVENT_ORELIS_WALK               = 3,
+    EVENT_ORELIS_WALK               = 4,
 
     // ORELIS SPELLS
     DEMORALIZING_SHOUT              = 13730,
@@ -1125,7 +1129,7 @@ enum Ishanah
 const Position AdyenSpawnPosition   { 4804.839355f, 3773.218750f, 210.530884f, 5.517495f };
 const Position OrelisSpawnPosition  { 4805.345215f, 3774.829346f, 210.535095f, 5.517495f };
 const Position KarjaSpawnPosition   { 4803.249512f, 3772.649170f, 210.535095f, 5.517495f };
-const Position KaylaanSpawnPosition {}; // TO DO: Record his spawn position
+const Position KaylaanSpawnPosition { 4955.089355f, 3916.570557f, 209.577209f, 4.603052f };
 const Position IshanahSpawnPosition {}; // TO DO: Record her spawn position
 
 class deathblow_to_the_legion_trigger : public CreatureScript
@@ -1167,7 +1171,7 @@ class deathblow_to_the_legion_trigger : public CreatureScript
 class adyen_the_lightbringer : public CreatureScript
 {
     public:
-        adyen_the_lightbringer(): CreatureScript("adyen_the_lightbringer") { }
+        adyen_the_lightbringer(): CreatureScript("NPC_ADYEN_LIGHTBRINGER") { }
 
         bool OnGossipHello(Player* player, Creature* creature)
         {
@@ -1187,16 +1191,13 @@ class adyen_the_lightbringer : public CreatureScript
             player->CLOSE_GOSSIP_MENU();
             creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
             creature->AI()->DoAction(EVENT_START_PLAYER_READY);
+            /*
             Creature* Orelis = creature->FindNearestCreature(EXARCH_ORELIS, 15.0f, true);
             Creature* Karja = creature->FindNearestCreature(ANCHORITE_KARJA, 15.0f, true);
             Orelis->AI()->DoAction(EVENT_ORELIS_WALK);
             Karja->AI()->DoAction(EVENT_KARJA_WALK);
+            */
             return true;
-        }
-
-        CreatureAI* GetAI(Creature* creature) const
-        {
-            return new adyen_the_lightbringerAI(creature);
         }
 
         struct adyen_the_lightbringerAI : public ScriptedAI
@@ -1214,18 +1215,14 @@ class adyen_the_lightbringer : public CreatureScript
 
             void Reset() { _events.Reset(); }
 
-            void MovementInform(uint32 /*type*/, uint32 point)
+            void MovementInform(uint32 type, uint32 point)
             {
-                switch (point)
-                {
-                    case 9:
-                        //if (Creature* socrethar = me->FindNearestCreature(SOCRETHAR, 50.0f, true))
-                            //socrethar->AI()->DoAction(EVENT_ADYEN_SAY_1);
-
-                        Talk(0);
-                        //Like this it works and doesn't spam.
-                        break;
-                }
+                if (type != POINT_MOTION_TYPE)
+                    if (point == 9)
+                    {
+                        Creature* socrethar = me->FindNearestCreature(SOCRETHAR, 50.0f, true);
+                        socrethar->AI()->DoAction(EVENT_ADYEN_SAY_1+1);
+                    }
             }
 
             void EnterCombat(Unit * who)
@@ -1237,14 +1234,7 @@ class adyen_the_lightbringer : public CreatureScript
 
             void UpdateAI(uint32 diff)
             {
-                _events.Update(diff);
-                
-                switch (_events.ExecuteEvent())
-                {
-                    case EVENT_ADYEN_SAY_1:
-                        Talk(0);
-                        break;
-                }
+                _events.Update(diff);   
 
                 if (!me->GetVictim())
                     return;
@@ -1295,6 +1285,11 @@ class adyen_the_lightbringer : public CreatureScript
                 DoMeleeAttackIfReady();
             }
         };
+
+        CreatureAI* GetAI(Creature* creature) const
+        {
+            return new adyen_the_lightbringerAI(creature); 
+        }
 };
 
 class anchorite_karja : public CreatureScript
@@ -1317,7 +1312,7 @@ class anchorite_karja : public CreatureScript
             {
                 if (param == EVENT_KARJA_WALK)
                 {
-                    me->GetMotionMaster()->MovePath(500020, false); // TODO: Path needs to be added on db
+                    me->GetMotionMaster()->MovePath(500010, false); // TODO: Path needs to be added on db
                 }
             }
 
@@ -1372,7 +1367,7 @@ class exarch_orelis : public CreatureScript
             {
                 if (param == EVENT_ORELIS_WALK)
                 {
-                    me->GetMotionMaster()->MovePath(500010, false); // TODO: Path needs to be added on db
+                    me->GetMotionMaster()->MovePath(500020, false); // TODO: Path needs to be added on db
                 }
             }
 
@@ -1478,15 +1473,15 @@ class socrethar : public CreatureScript
             {
                 switch (param)
                 {
-                    case EVENT_ADYEN_SAY_1:
+                    case EVENT_ADYEN_SAY_1+1:
                         DeathblowToTheLegionRunning = true;
                         GetCreature(ADYEN_THE_LIGHTBRINGER); // define adyen pointer
-                        _actionEvents.ScheduleEvent(EVENT_ADYEN_SAY_1, 2000);
+                        _actionEvents.ScheduleEvent(EVENT_ADYEN_SAY_1 + 1, 1000);
                         break;
-                    case EVENT_ADYEN_SAY_3:
+                    case EVENT_ADYEN_SAY_3+1:
                         _actionEvents.ScheduleEvent(EVENT_ADYEN_SAY_3, 2000);
                         break;
-                    case EVENT_KAYLAAN_SAY_1:
+                    case EVENT_KAYLAAN_SAY_1+1:
                         _actionEvents.ScheduleEvent(EVENT_KAYLAAN_SAY_1, 4000);
                         break;
                 }
@@ -1524,7 +1519,7 @@ class socrethar : public CreatureScript
                 {
                     _actionEvents.Update(diff);
 
-                    switch (_actionEvents.GetEvent())
+                    switch (_actionEvents.ExecuteEvent())
                     {
                         case EVENT_ADYEN_SAY_1:
                             adyen->AI()->Talk(0);
