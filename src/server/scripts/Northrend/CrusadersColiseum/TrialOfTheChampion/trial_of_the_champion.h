@@ -135,6 +135,7 @@ enum eGameObjects
     GO_MAIN_GATE                                    = 195647,
     GO_SOUTH_PORTCULLIS                             = 195649,
     GO_EAST_PORTCULLIS                              = 195648,
+    GO_NORTH_PORTCULLIS                             = 195650,
 
     GO_CHAMPIONS_LOOT                               = 195709,
     GO_CHAMPIONS_LOOT_H                             = 195710,
