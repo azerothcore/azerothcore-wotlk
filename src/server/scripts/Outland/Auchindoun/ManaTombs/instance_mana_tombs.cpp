@@ -34,7 +34,7 @@ class instance_mana_tombs : public InstanceMapScript
 
             void Load(char const* data) override { LoadBossState(data); }
             
-            std::string GetSaveData() { return DataHeader + GetBossSaveData(); }
+            std::string GetSaveData() override { return DataHeader + GetBossSaveData(); }
         };
 
         InstanceScript* GetInstanceScript(InstanceMap* map) const override
