@@ -1130,7 +1130,7 @@ const Position AdyenSpawnPosition   { 4804.839355f, 3773.218750f, 210.530884f, 5
 const Position OrelisSpawnPosition  { 4805.345215f, 3774.829346f, 210.535095f, 5.517495f };
 const Position KarjaSpawnPosition   { 4803.249512f, 3772.649170f, 210.535095f, 5.517495f };
 const Position KaylaanSpawnPosition { 4955.089355f, 3916.570557f, 209.577209f, 4.603052f };
-const Position IshanahSpawnPosition {}; // TO DO: Record her spawn position
+const Position IshanahSpawnPosition { 4926.066895f, 3825.549072f, 211.494125f, 0.510522f };
 
 class deathblow_to_the_legion_trigger : public CreatureScript
 {
@@ -1191,12 +1191,10 @@ class adyen_the_lightbringer : public CreatureScript
             player->CLOSE_GOSSIP_MENU();
             creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
             creature->AI()->DoAction(EVENT_START_PLAYER_READY);
-            /*
             Creature* Orelis = creature->FindNearestCreature(EXARCH_ORELIS, 15.0f, true);
             Creature* Karja = creature->FindNearestCreature(ANCHORITE_KARJA, 15.0f, true);
             Orelis->AI()->DoAction(EVENT_ORELIS_WALK);
             Karja->AI()->DoAction(EVENT_KARJA_WALK);
-            */
             return true;
         }
 
@@ -1221,7 +1219,7 @@ class adyen_the_lightbringer : public CreatureScript
                     if (point == 9)
                     {
                         Creature* socrethar = me->FindNearestCreature(SOCRETHAR, 50.0f, true);
-                        socrethar->AI()->DoAction(EVENT_ADYEN_SAY_1+1);
+                        socrethar->AI()->DoAction(EVENT_ADYEN_SAY_1);
                     }
             }
 
@@ -1312,7 +1310,7 @@ class anchorite_karja : public CreatureScript
             {
                 if (param == EVENT_KARJA_WALK)
                 {
-                    me->GetMotionMaster()->MovePath(500010, false); // TODO: Path needs to be added on db
+                    me->GetMotionMaster()->MovePath(500010, false);
                 }
             }
 
@@ -1321,7 +1319,7 @@ class anchorite_karja : public CreatureScript
             void EnterCombat(Unit* who)
             {
                 AttackStart(who);
-                _events.ScheduleEvent(EVENT_SPELL_HOLY_SMITE, 1); // 1 MS so she starts casting asap
+                _events.ScheduleEvent(EVENT_SPELL_HOLY_SMITE, 1000);
             }
 
             void UpdateAI(uint32 diff)
@@ -1367,7 +1365,7 @@ class exarch_orelis : public CreatureScript
             {
                 if (param == EVENT_ORELIS_WALK)
                 {
-                    me->GetMotionMaster()->MovePath(500020, false); // TODO: Path needs to be added on db
+                    me->GetMotionMaster()->MovePath(500020, false);
                 }
             }
 
@@ -1473,15 +1471,15 @@ class socrethar : public CreatureScript
             {
                 switch (param)
                 {
-                    case EVENT_ADYEN_SAY_1+1:
+                    case EVENT_ADYEN_SAY_1:
                         DeathblowToTheLegionRunning = true;
                         GetCreature(ADYEN_THE_LIGHTBRINGER); // define adyen pointer
-                        _actionEvents.ScheduleEvent(EVENT_ADYEN_SAY_1 + 1, 1000);
+                        _actionEvents.ScheduleEvent(EVENT_ADYEN_SAY_1, 1000);
                         break;
-                    case EVENT_ADYEN_SAY_3+1:
+                    case EVENT_ADYEN_SAY_3:
                         _actionEvents.ScheduleEvent(EVENT_ADYEN_SAY_3, 2000);
                         break;
-                    case EVENT_KAYLAAN_SAY_1+1:
+                    case EVENT_KAYLAAN_SAY_1:
                         _actionEvents.ScheduleEvent(EVENT_KAYLAAN_SAY_1, 4000);
                         break;
                 }
@@ -1524,6 +1522,7 @@ class socrethar : public CreatureScript
                         case EVENT_ADYEN_SAY_1:
                             adyen->AI()->Talk(0);
                             _actionEvents.ScheduleEvent(EVENT_SOCRETHAR_SAY_1, 11000);
+                            me->SetOrientation(adyen->GetPositionX());
                             break;
                         case EVENT_SOCRETHAR_SAY_1:
                             Talk(0);
@@ -1531,26 +1530,20 @@ class socrethar : public CreatureScript
                             break;
                         case EVENT_ADYEN_SAY_2:
                             adyen->AI()->Talk(1);
-                            //_actionEvents.ScheduleEvent(EVENT_SOCRETHAR_SAY_2, 11000);
+                            _actionEvents.ScheduleEvent(EVENT_SOCRETHAR_SAY_2, 11000);
                             break;
                         case EVENT_SOCRETHAR_SAY_2:
                             Talk(1);
-                            _actionEvents.ScheduleEvent(EVENT_ADYEN_SAY_2, 7000);
-                            if (kaylaan = me->SummonCreature(KAYLAAN_THE_LOST, KaylaanSpawnPosition, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 240000))
-                                kaylaan->AI()->DoAction(EVENT_KAYLAAN_START_POINT);
+                            if (Creature* summonKaylaan = me->SummonCreature(KAYLAAN_THE_LOST, KaylaanSpawnPosition, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 240000))
+                            {
+                                summonKaylaan->AI()->DoAction(EVENT_KAYLAAN_START_POINT);
+                                GetCreature(summonKaylaan->GetGUID());
+                            }
                             break;
                         case EVENT_ADYEN_SAY_3:
                             adyen->AI()->Talk(2);
-                            _actionEvents.ScheduleEvent(EVENT_KAYLAAN_WALK_TO_ADYEN, 6500);
-                            break;
-                        case EVENT_KAYLAAN_WALK_TO_ADYEN:
+                            _actionEvents.ScheduleEvent(EVENT_KAYLAAN_WALK_TO_ADYEN, 3500);
                             kaylaan->SetStandState(UNIT_STAND_STATE_STAND);
-                            /*
-                                1st waypath is spawn->socrethar (0 after his id)
-                                2nd waypath is socrethar->front of aldor (needs the delay of 1s on 1st point so he can dislay standing) (1 after his id)
-                                3rd waypath is front of aldor->ishanah (2 after his id)
-                            */
-                            kaylaan->GetMotionMaster()->MovePath(207941, false); 
                             break;
                         case EVENT_KAYLAAN_SAY_1:
                             kaylaan->AI()->Talk(0);
@@ -1602,8 +1595,11 @@ class socrethar : public CreatureScript
                             break;
                         case EVENT_KAYLAAN_SAY_5:
                             kaylaan->AI()->Talk(4);
-                            if (ishanah = me->SummonCreature(ISHANAH_HIGH_PRIESTESS, IshanahSpawnPosition, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 180000))
-                                ishanah->GetMotionMaster()->MovePath(500050, false); // TODO: Add her path to the DB
+                            if (Creature* summonIshanah = me->SummonCreature(ISHANAH_HIGH_PRIESTESS, IshanahSpawnPosition, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 180000))
+                            {
+                                summonIshanah->GetMotionMaster()->MovePath(500050, false);
+                                GetCreature(summonIshanah->GetGUID());
+                            }
                             break;
                         case EVENT_ISHANAH_SAY_1:
                             ishanah->AI()->Talk(0);
@@ -1713,6 +1709,7 @@ class kaylaan_the_lost : public CreatureScript
 
             EventMap _events;
             bool first_waypath_done = false;
+            bool second_waypath_done = false;
 
             void EnterCombat(Unit* who)
             {
@@ -1731,30 +1728,42 @@ class kaylaan_the_lost : public CreatureScript
                 }
             }
 
-            void WaypointReached(uint32 waypoint)
+            void MovementInform(uint32 type, uint32 point)
             {
-                switch (waypoint)
+                if (type != POINT_MOTION_TYPE)
                 {
-                    case 5: // 1st waypath
+                    if (point == 4)
+                    {
+                        // First waypath complete
                         me->SetStandState(UNIT_STAND_STATE_KNEEL);
                         if (Creature* socrethar = me->FindNearestCreature(SOCRETHAR, 30.0f, true))
                             socrethar->AI()->DoAction(EVENT_ADYEN_SAY_3);
                         first_waypath_done = true;
-                        break;
-                    case 3: // 2nd waypath
+                    }
+                    else if (point == 0)
+                    {
                         if (first_waypath_done)
                         {
-                            me->SetHomePosition(me->GetPosition());
-                            if (Creature* adyen = me->FindNearestCreature(ADYEN_THE_LIGHTBRINGER, 30.0f, true))
-                                me->SetOrientation(adyen->GetPositionX());
-                            if (Creature* socrethar = me->FindNearestCreature(SOCRETHAR, 30.0f, true))
-                                socrethar->AI()->DoAction(EVENT_KAYLAAN_SAY_1);
+                            if (!second_waypath_done)
+                            {
+                                // Second waypath complete
+                                me->SetHomePosition(me->GetPosition());
+                                if (Creature* adyen = me->FindNearestCreature(ADYEN_THE_LIGHTBRINGER, 30.0f, true))
+                                    me->SetOrientation(adyen->GetPositionX());
+                                if (Creature* socrethar = me->FindNearestCreature(SOCRETHAR, 30.0f, true))
+                                    socrethar->AI()->DoAction(EVENT_KAYLAAN_SAY_1);
+                                second_waypath_done = true;
+                            }
+                            else
+                            {
+                                // Third waypath done
+                            }
                         }
-                        break;
+                    }
                 }
             }
 
-            void UpdateAI(uint32 diff) override
+            void UpdateAI(uint32 diff)
             {
                 _events.Update(diff);
 
@@ -1825,7 +1834,7 @@ class ishanah : public CreatureScript
             {
                 switch (waypoint)
                 {
-                    case 3:
+                    case 2:
                         if (Creature* kaylaan = me->FindNearestCreature(KAYLAAN_THE_LOST, 30.0f, true))
                         {
                             kaylaan->AI()->Talk(5); /* Teacher... */
