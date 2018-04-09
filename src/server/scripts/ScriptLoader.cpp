@@ -466,8 +466,10 @@ void AddSC_wintergrasp();
 
 //outland
 void AddSC_boss_exarch_maladaar();           //Auchindoun Auchenai Crypts
+void AddSC_instance_auchenai_crypts();
 void AddSC_boss_shirrak_the_dead_watcher();
 void AddSC_boss_nexusprince_shaffar();       //Auchindoun Mana Tombs
+void AddSC_instance_mana_tombs();
 void AddSC_boss_talon_king_ikiss();          //Auchindoun Sekketh Halls
 void AddSC_instance_sethekk_halls();
 void AddSC_instance_shadow_labyrinth();      //Auchindoun Shadow Labyrinth
@@ -497,7 +499,9 @@ void AddSC_boss_mekgineer_steamrigger();
 void AddSC_boss_warlord_kalithresh();
 void AddSC_instance_steam_vault();
 void AddSC_boss_the_black_stalker();         //CR Underbog
+void AddSC_instance_the_underbog();
 void AddSC_boss_ahune();
+void AddSC_instance_the_slave_pens();
 void AddSC_boss_gruul();                     //Gruul's Lair
 void AddSC_boss_high_king_maulgar();
 void AddSC_instance_gruuls_lair();
@@ -893,8 +897,10 @@ void AddOutlandScripts()
 {
 #ifdef SCRIPTS
     AddSC_boss_exarch_maladaar();           //Auchindoun Auchenai Crypts
+    AddSC_instance_auchenai_crypts();
     AddSC_boss_shirrak_the_dead_watcher();
     AddSC_boss_nexusprince_shaffar();       //Auchindoun Mana Tombs
+    AddSC_instance_mana_tombs();
     AddSC_boss_talon_king_ikiss();          //Auchindoun Sekketh Halls
     AddSC_instance_sethekk_halls();
     AddSC_instance_shadow_labyrinth();      //Auchindoun Shadow Labyrinth
@@ -924,7 +930,9 @@ void AddOutlandScripts()
     AddSC_boss_warlord_kalithresh();
     AddSC_instance_steam_vault();
     AddSC_boss_the_black_stalker();         //CR Underbog
+    AddSC_instance_the_underbog();
     AddSC_boss_ahune();
+    AddSC_instance_the_slave_pens();
     AddSC_boss_gruul();                     //Gruul's Lair
     AddSC_boss_high_king_maulgar();
     AddSC_instance_gruuls_lair();
