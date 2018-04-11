@@ -1025,7 +1025,8 @@ enum RoleplayActions
     EVENT_KAYLAAN_RESSURECTION  = 30,   // Ress Ishanah
     EVENT_FIGHT_ALDOR           = 31,
     EVENT_END_ALDOR_FIGHT       = 32,
-    EVENT_SOCRETHAR_DEAD        = 33
+    EVENT_SOCRETHAR_DEAD        = 33,
+    EVENT_SHEDULE_EVENTS        = 34
 };
 
 enum Adyen
@@ -1199,7 +1200,14 @@ class adyen_the_lightbringer : public CreatureScript
             void DoAction(int32 param)
             {
                 if (param == EVENT_START_PLAYER_READY)
+                {
                     me->GetMotionMaster()->MovePath(610210, false);
+                }
+                else if (param == EVENT_SHEDULE_EVENTS)
+                {
+                    _events.ScheduleEvent(EVENT_CRUSADER_STRIKE, 3000, false);
+                    _events.ScheduleEvent(EVENT_HAMMER_OF_JUSTICE, 6000, false);
+                }
             }
 
             void Reset() { _events.Reset(); }
@@ -1211,6 +1219,7 @@ class adyen_the_lightbringer : public CreatureScript
                     {
                         if (Creature* socrethar = me->FindNearestCreature(SOCRETHAR, 50.0f, true))
                             socrethar->AI()->DoAction(EVENT_ADYEN_SAY_1);
+                        me->SetHomePosition(me->GetPosition());
                     }
             }
 
@@ -1291,9 +1300,9 @@ class anchorite_karja : public CreatureScript
             return new anchorite_karjaAI(creature);
         }
 
-        struct anchorite_karjaAI : public npc_escortAI
+        struct anchorite_karjaAI : public ScriptedAI
         {
-            anchorite_karjaAI(Creature* creature) : npc_escortAI(creature) { }
+            anchorite_karjaAI(Creature* creature) : ScriptedAI(creature) { }
 
             EventMap _events;
 
@@ -1305,7 +1314,12 @@ class anchorite_karja : public CreatureScript
                 }
             }
 
-            void WaypointReached(uint32 /*wp*/) { }
+            void MovementInform(uint32 type, uint32 point)
+            {
+                if (type != POINT_MOTION_TYPE)
+                    if (point == 11)
+                        me->SetHomePosition(me->GetPosition());
+            }
 
             void EnterCombat(Unit* who)
             {
@@ -1358,6 +1372,13 @@ class exarch_orelis : public CreatureScript
                 {
                     me->GetMotionMaster()->MovePath(500020, false);
                 }
+            }
+
+            void MovementInform(uint32 type, uint32 point)
+            {
+                if (type != POINT_MOTION_TYPE)
+                    if (point == 11)
+                        me->SetHomePosition(me->GetPosition());
             }
 
             void EnterCombat(Unit* who)
@@ -1582,6 +1603,7 @@ class socrethar : public CreatureScript
                             //karja->setFaction(1770);
                             //karja->AI()->EnterCombat(kaylaan);
                             kaylaan->AI()->EnterCombat(adyen);
+                            adyen->AI()->DoAction(EVENT_SHEDULE_EVENTS);
                             break;
                         case EVENT_END_ALDOR_FIGHT:
                             kaylaan->setFaction(1743);
@@ -1591,6 +1613,8 @@ class socrethar : public CreatureScript
                             //karja->setFaction(1743);
                             kaylaan->CombatStop();
                             kaylaan->ClearInCombat();
+                            adyen->GetMotionMaster()->MoveTargetedHome();
+                            orelis->GetMotionMaster()->MoveTargetedHome();
                             orelis->CombatStop();
                             orelis->ClearInCombat();
                             //karja->CombatStop();
@@ -1742,12 +1766,6 @@ class kaylaan_the_lost : public CreatureScript
                 _events.ScheduleEvent(EVENT_SPELL_CONSECRATION, urand(1000, 5000));
             }
 
-            void SpellHit(Unit* /*caster*/, const SpellInfo* spell)
-            {
-                if (spell->Id == WRATH_OF_SOCRETHAR)
-                    me->Kill(me, me);
-            }
-
             void DoAction(int32 param)
             {
                 switch (param)
@@ -1785,10 +1803,6 @@ class kaylaan_the_lost : public CreatureScript
                                     socrethar->AI()->DoAction(EVENT_KAYLAAN_SAY_1);
                                     second_waypath_done = true;
                                 }
-                            }
-                            else
-                            {
-                                // Third waypath done
                             }
                         }
                     }
