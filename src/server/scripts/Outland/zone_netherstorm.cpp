@@ -1226,8 +1226,8 @@ class adyen_the_lightbringer : public CreatureScript
             void EnterCombat(Unit * who)
             {
                 AttackStart(who);
-                _events.ScheduleEvent(EVENT_CRUSADER_STRIKE, 3000, false);
-                _events.ScheduleEvent(EVENT_HAMMER_OF_JUSTICE, 6000, false);
+                _events.ScheduleEvent(EVENT_CRUSADER_STRIKE, 3000);
+                _events.ScheduleEvent(EVENT_HAMMER_OF_JUSTICE, 6000);
             }
 
             void UpdateAI(uint32 diff)
@@ -1237,33 +1237,28 @@ class adyen_the_lightbringer : public CreatureScript
                 if (!me->GetVictim())
                     return;
 
-                if (me->HasUnitState(UNIT_STATE_CASTING))
-                    return;
-                    
-                Unit* target = me->GetVictim();
-
-                switch (_events.GetEvent())
+                switch (_events.ExecuteEvent())
                 {
                     case EVENT_CRUSADER_STRIKE:
-                        me->CastSpell(target, CRUSADER_STRIKE, false);
-                        _events.RepeatEvent(urand(3000, 4500));
+                        me->CastSpell(me->GetVictim(), CRUSADER_STRIKE, true);
+                        _events.ScheduleEvent(EVENT_CRUSADER_STRIKE, 3500);
                         break;
                     case EVENT_HAMMER_OF_JUSTICE:
-                        me->CastSpell(target, HAMMER_OF_JUSTICE, false);
+                        me->CastSpell(me->GetVictim(), HAMMER_OF_JUSTICE, true);
                         _events.RepeatEvent(urand(10000, 14000));
                         break;
                     case EVENT_HOLY_LIGHT:
                         // if low enough will heal and trigger again in 18s.
                         if (me->GetHealthPct() <= 45)
                         {
-                            me->CastSpell(me, HOLY_LIGHT, false);
+                            me->CastSpell(me, HOLY_LIGHT, true);
                             _events.RepeatEvent(urand(18000, 22000));
                         }
                         else if (Unit* who = me->FindNearestCreature(ANCHORITE_KARJA, 30.0f, true))
                         {
                             if (who->GetHealthPct() <= 45)
                             {
-                                me->CastSpell(who, HOLY_LIGHT, false);
+                                me->CastSpell(who, HOLY_LIGHT, true);
                                 _events.RepeatEvent(urand(18000, 22000));
                             }
                         }
@@ -1271,7 +1266,7 @@ class adyen_the_lightbringer : public CreatureScript
                         {
                             if (who->GetHealthPct() <= 45)
                             {
-                                me->CastSpell(who, HOLY_LIGHT, false);
+                                me->CastSpell(who, HOLY_LIGHT, true);
                                 _events.RepeatEvent(urand(18000, 22000));
                             }
                         }
@@ -1337,10 +1332,10 @@ class anchorite_karja : public CreatureScript
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
 
-                switch (_events.GetEvent())
+                switch (_events.ExecuteEvent())
                 {
                     case EVENT_SPELL_HOLY_SMITE:
-                        me->CastSpell(me->GetVictim(), HOLY_SMITE_KARJA, false);
+                        me->CastSpell(me->GetVictim(), HOLY_SMITE_KARJA, true);
                         _events.RepeatEvent(2500);
                         break;
                 }
@@ -1401,23 +1396,23 @@ class exarch_orelis : public CreatureScript
 
                 Unit* target = me->GetVictim();
 
-                switch (_events.GetEvent())
+                switch (_events.ExecuteEvent())
                 {
                     case EVENT_SPELL_DEMORALIZING_SHOUT:
                         if (me->FindNearestCreature(target->GetGUID(), 10.0f, true))
                         {
-                            me->CastSpell(target, HOLY_SMITE_KARJA, false);
+                            me->CastSpell(me->GetVictim(), DEMORALIZING_SHOUT, true);
                             _events.RepeatEvent(15000);
                         }
                         else
                             _events.RepeatEvent(1000);
                         break;
                     case EVENT_SPELL_HEROIC_STRIKE:
-                        me->CastSpell(target, HEROIC_STRIKE, false);
+                        me->CastSpell(target, HEROIC_STRIKE, true);
                         _events.RepeatEvent(urand(3000, 4500));
                         break;
                     case EVENT_SPELL_REND:
-                        me->CastSpell(target, REND, false);
+                        me->CastSpell(target, REND, true);
                         _events.RepeatEvent(urand(8000, 12000));
                         break;
                 }
@@ -1520,10 +1515,10 @@ class socrethar : public CreatureScript
             void EnterCombat(Unit* who)
             {
                 AttackStart(who);
-                combatEvents.ScheduleEvent(EVENT_SPELL_ANTI_MAGIC_SHIELD, urand(8000, 15000));
-                combatEvents.ScheduleEvent(EVENT_SPELL_BACKLASH, urand(3000, 7000));
-                combatEvents.ScheduleEvent(EVENT_SPELL_CLEAVE, urand(1000, 4000));
-                combatEvents.ScheduleEvent(EVENT_SPELL_FIREBALL_BARRAGE, urand(8000, 10000));
+                combatEvents.ScheduleEvent(EVENT_SPELL_ANTI_MAGIC_SHIELD, 9000);
+                combatEvents.ScheduleEvent(EVENT_SPELL_BACKLASH, 4000);
+                combatEvents.ScheduleEvent(EVENT_SPELL_CLEAVE, 2000);
+                combatEvents.ScheduleEvent(EVENT_SPELL_FIREBALL_BARRAGE, 7000);
                 combatEvents.ScheduleEvent(EVENT_SPELL_NETHER_PROTECTION, 1);
             }
 
@@ -1710,7 +1705,7 @@ class socrethar : public CreatureScript
 
                 combatEvents.Update(diff);
                 
-                switch (combatEvents.GetEvent())
+                switch (combatEvents.ExecuteEvent())
                 {
                     case EVENT_SPELL_NETHER_PROTECTION:
                         if (!me->HasAura(NETHER_PROTECTION))
@@ -1718,19 +1713,19 @@ class socrethar : public CreatureScript
                         break;
                     case EVENT_SPELL_ANTI_MAGIC_SHIELD:
                         me->CastSpell(me, ANTI_MAGIC_SHIELD, false);
-                        combatEvents.RepeatEvent(urand(20000,25000));
+                        combatEvents.ScheduleEvent(EVENT_SPELL_ANTI_MAGIC_SHIELD, 20000);
                         break;
                     case EVENT_SPELL_BACKLASH:
-                        me->CastSpell(me->GetVictim(),BACKLASH, false);
-                        combatEvents.RepeatEvent(urand(3500, 6500));
+                        DoCastVictim(BACKLASH);
+                        combatEvents.ScheduleEvent(EVENT_SPELL_BACKLASH, 7000);
                         break;
                     case EVENT_SPELL_CLEAVE:
                         me->CastSpell(me->GetVictim(), CLEAVE, false);
-                        combatEvents.RepeatEvent(urand(4000, 9000));
+                        combatEvents.ScheduleEvent(EVENT_SPELL_CLEAVE, 3000);
                         break;
                     case EVENT_SPELL_FIREBALL_BARRAGE:
                         me->CastSpell(me->GetVictim(), FIREBALL_BARRAGE, false);
-                        combatEvents.RepeatEvent(urand(12000, 20000));
+                        combatEvents.ScheduleEvent(EVENT_SPELL_FIREBALL_BARRAGE, 15000);
                         break;
                 }
 
@@ -1762,8 +1757,8 @@ class kaylaan_the_lost : public CreatureScript
             void EnterCombat(Unit* who)
             {
                 AttackStart(who);
-                _events.ScheduleEvent(EVENT_SPELL_BURNING_LIGHT, urand(1000, 3000));
-                _events.ScheduleEvent(EVENT_SPELL_CONSECRATION, urand(1000, 5000));
+                _events.ScheduleEvent(EVENT_SPELL_BURNING_LIGHT, 2000);
+                _events.ScheduleEvent(EVENT_SPELL_CONSECRATION, 3000);
             }
 
             void DoAction(int32 param)
@@ -1825,16 +1820,16 @@ class kaylaan_the_lost : public CreatureScript
                     if (Creature* socrethar = me->FindNearestCreature(SOCRETHAR, 200.0f, true))
                         socrethar->AI()->DoAction(EVENT_END_ALDOR_FIGHT);
 
-                switch (_events.GetEvent())
+                switch (_events.ExecuteEvent())
                 {
                     case EVENT_SPELL_BURNING_LIGHT:
                         me->CastSpell(target, BURNING_LIGHT, false);
-                        _events.RepeatEvent(urand(4000,7000));
+                        _events.ScheduleEvent(EVENT_SPELL_BURNING_LIGHT, 4000);
                         break;
                     case EVENT_SPELL_CONSECRATION:
                         if (me->FindNearestCreature(target->GetGUID(), 10.0f, true))
                             me->CastSpell(me, CONSECRATION, false);
-                        _events.RepeatEvent(urand(12000, 15000));
+                        _events.ScheduleEvent(EVENT_SPELL_CONSECRATION, 14000);
                         break;
                 }
 

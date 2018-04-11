@@ -526,7 +526,7 @@ public:
 			if (me->HasUnitState(UNIT_STATE_CASTING))
 				return;
 
-			switch (_events.GetEvent())
+			switch (_events.ExecuteEvent())
 			{
 			case EVENT_SPELL_ISHANAH_HOLY_SMITE:
 				me->CastSpell(me->GetVictim(), HOLY_SMITE_ISHANAH, false);
