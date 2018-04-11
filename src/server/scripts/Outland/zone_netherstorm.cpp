@@ -973,7 +973,7 @@ enum DeathblowToTheLegion
     EXARCH_ORELIS           = 50002,
     SOCRETHAR               = 20132,
     KAYLAAN_THE_LOST        = 20794,
-    ISHANAH_HIGH_PRIESTESS  = 50005,
+    ISHANAH_HIGH_PRIESTESS  = 18538,
 
     // Quest ID
     DEATHBLOW_TO_THE_LEGION = 10409,
@@ -1099,6 +1099,9 @@ enum Socrethar
     EVENT_SPELL_POWER_OF_THE_LEGION = 45,
     EVENT_SPELL_SHADOW_BOLT_VOLLEY  = 46,
     EVENT_SPELL_WRATH_OF_SOCRETHAR  = 47,
+    EVENT_ISHANAH_DIES              = 48,
+    EVENT_KAYLAAN_DIES              = 49,
+    EVENT_ISHANAH_IS_BACK_AGAIN     = 50,
 
     // SOCRETHAR SPELLS
     ANTI_MAGIC_SHIELD               = 37538,
@@ -1112,19 +1115,7 @@ enum Socrethar
     //WRATH_OF_SOCRETHAR2           = 35598 Not sure if should use this one yet
 };
 
-enum Ishanah
-{
-    // ISHANAH SPELL EVENTS
-    EVENT_SPELL_GREATER_HEAL        = 2,
-    EVENT_SPELL_ISHANAH_HOLY_SMITE  = 3,
-    EVENT_SPELL_POWER_WORD_SHIELD   = 4,
-    EVENT_JUST_SPAWNED              = 5, // Start waypath
-    
-    // ISHANAH SPELLS
-    GREATER_HEAL                    = 35096,
-    HOLY_SMITE_ISHANAH              = 15238,
-    POWER_WORLD_SHIELD              = 22187
-};
+// Ishanah script part is in zone shattrath city . cpp
 
 const Position AdyenSpawnPosition   { 4804.839355f, 3773.218750f, 210.530884f, 5.517495f };
 const Position OrelisSpawnPosition  { 4805.345215f, 3774.829346f, 210.535095f, 5.517495f };
@@ -1218,8 +1209,8 @@ class adyen_the_lightbringer : public CreatureScript
                 if (type != POINT_MOTION_TYPE)
                     if (point == 9)
                     {
-                        Creature* socrethar = me->FindNearestCreature(SOCRETHAR, 50.0f, true);
-                        socrethar->AI()->DoAction(EVENT_ADYEN_SAY_1);
+                        if (Creature* socrethar = me->FindNearestCreature(SOCRETHAR, 50.0f, true))
+                            socrethar->AI()->DoAction(EVENT_ADYEN_SAY_1);
                     }
             }
 
@@ -1482,6 +1473,12 @@ class socrethar : public CreatureScript
                     case EVENT_KAYLAAN_SAY_1:
                         _actionEvents.ScheduleEvent(EVENT_KAYLAAN_SAY_1, 4000);
                         break;
+                    case EVENT_END_ALDOR_FIGHT:
+                        _actionEvents.ScheduleEvent(EVENT_END_ALDOR_FIGHT, 1);
+                        break;
+                    case EVENT_ISHANAH_SAY_1:
+                        _actionEvents.ScheduleEvent(EVENT_ISHANAH_SAY_1, 2000);
+                        break;
                 }
             }
 
@@ -1495,8 +1492,8 @@ class socrethar : public CreatureScript
                 if (player->GetQuestStatus(DEATHBLOW_TO_THE_LEGION) == QUEST_STATUS_INCOMPLETE)
                     player->CompleteQuest(DEATHBLOW_TO_THE_LEGION);
 
-                if (Creature* ishanah = me->FindNearestCreature(ISHANAH_HIGH_PRIESTESS, 30.0f, true))
-                    ishanah->AI()->DoAction(EVENT_SOCRETHAR_DEAD);
+                ishanah->AI()->DoAction(EVENT_SOCRETHAR_DEAD);
+                ishanah->SetFlag(UNIT_FIELD_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
             }
 
             void EnterCombat(Unit* who)
@@ -1522,7 +1519,6 @@ class socrethar : public CreatureScript
                         case EVENT_ADYEN_SAY_1:
                             adyen->AI()->Talk(0);
                             _actionEvents.ScheduleEvent(EVENT_SOCRETHAR_SAY_1, 11000);
-                            me->SetOrientation(adyen->GetPositionX());
                             break;
                         case EVENT_SOCRETHAR_SAY_1:
                             Talk(0);
@@ -1548,6 +1544,7 @@ class socrethar : public CreatureScript
                             break;
                         case EVENT_KAYLAAN_SAY_1:
                             kaylaan->AI()->Talk(0);
+                            kaylaan->SetHomePosition(kaylaan->GetPosition());
                             _actionEvents.ScheduleEvent(EVENT_KAYLAAN_SAY_2, 9000);
                             break;
                         case EVENT_KAYLAAN_SAY_2:
@@ -1573,19 +1570,32 @@ class socrethar : public CreatureScript
                             break;
                         case EVENT_FIGHT_ALDOR:
                             GetCreature(EXARCH_ORELIS); // define orelis pointer
-                            GetCreature(ANCHORITE_KARJA); // define karja pointer
+                            //GetCreature(ANCHORITE_KARJA); // define karja pointer
                             kaylaan->setFaction(1769);
-                            kaylaan->AI()->AttackStart(adyen);
+                            kaylaan->AddThreat(adyen, 100.0f);
+                            kaylaan->AddThreat(orelis, 90.0f);
+                            //kaylaan->AddThreat(karja, 100.0f);
+                            orelis->setFaction(1770);
+                            adyen->setFaction(1770);
+                            adyen->AI()->EnterCombat(kaylaan);
+                            orelis->AI()->EnterCombat(kaylaan);
+                            //karja->setFaction(1770);
+                            //karja->AI()->EnterCombat(kaylaan);
+                            kaylaan->AI()->EnterCombat(adyen);
                             break;
                         case EVENT_END_ALDOR_FIGHT:
-                            kaylaan->setFaction(1786);
+                            kaylaan->setFaction(1743);
+                            kaylaan->GetMotionMaster()->MoveTargetedHome();
+                            orelis->setFaction(1743);
+                            adyen->setFaction(1743);
+                            //karja->setFaction(1743);
                             kaylaan->CombatStop();
                             kaylaan->ClearInCombat();
                             orelis->CombatStop();
                             orelis->ClearInCombat();
-                            karja->CombatStop();
-                            karja->ClearInCombat();
-                            _actionEvents.ScheduleEvent(EVENT_SOCRETHAR_SAY_1, 2000);
+                            //karja->CombatStop();
+                            //karja->ClearInCombat();
+                            _actionEvents.ScheduleEvent(EVENT_SOCRETHAR_SAY_4, 2000);
                             break;
                         case EVENT_SOCRETHAR_SAY_4:
                             Talk(3);
@@ -1594,7 +1604,10 @@ class socrethar : public CreatureScript
                         case EVENT_KAYLAAN_SAY_5:
                             kaylaan->AI()->Talk(4);
                             if (Creature* summonIshanah = me->SummonCreature(ISHANAH_HIGH_PRIESTESS, IshanahSpawnPosition, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 180000))
+                            {
                                 summonIshanah->GetMotionMaster()->MovePath(500050, false);
+                                summonIshanah->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+                            }
                             break;
                         case EVENT_ISHANAH_SAY_1:
                             GetCreature(ISHANAH_HIGH_PRIESTESS);
@@ -1612,23 +1625,31 @@ class socrethar : public CreatureScript
                             break;
                         case EVENT_KILL_ISHANAH:
                             me->CastSpell(ishanah, WRATH_OF_SOCRETHAR);
+                            _actionEvents.ScheduleEvent(EVENT_ISHANAH_DIES, 1500);
+                            break;
+                        case EVENT_ISHANAH_DIES:
+                            me->Kill(me,ishanah);
                             _actionEvents.ScheduleEvent(EVENT_KAYLAAN_SAY_6, 4000);
                             break;
                         case EVENT_KAYLAAN_SAY_6:
-                            kaylaan->AI()->Talk(5); /* No! What have I done? */
+                            kaylaan->AI()->Talk(6); /* No! What have I done? */
                             kaylaan->SetStandState(UNIT_STAND_STATE_STAND);
                             kaylaan->GetMotionMaster()->MovePath(207942, false);
                             kaylaan->RemoveAurasDueToSpell(POWER_OF_THE_LEGION);
                             _actionEvents.ScheduleEvent(EVENT_KAYLAAN_SAY_7, 9000);
                             break;
                         case EVENT_KAYLAAN_SAY_7:
-                            kaylaan->AI()->Talk(6);
+                            kaylaan->AI()->Talk(7);
                             kaylaan->CastSpell(kaylaan, DIVINE_SHIELD);
                             _actionEvents.ScheduleEvent(EVENT_KAYLAAN_RESSURECTION, 1000);
                             break;
                         case EVENT_KAYLAAN_RESSURECTION:
                             kaylaan->CastSpell(ishanah, REDEMPTION); // Must test this redemption spell id
-                            _actionEvents.ScheduleEvent(EVENT_SOCRETHAR_SAY_6, 13000);
+                            _actionEvents.ScheduleEvent(EVENT_ISHANAH_IS_BACK_AGAIN, 11000);
+                            break;
+                        case EVENT_ISHANAH_IS_BACK_AGAIN:
+                            ishanah->Respawn();
+                            _actionEvents.ScheduleEvent(EVENT_SOCRETHAR_SAY_6, 3000);
                             break;
                         case EVENT_SOCRETHAR_SAY_6:
                             Talk(5);
@@ -1636,13 +1657,23 @@ class socrethar : public CreatureScript
                             break;
                         case EVENT_KILL_KAYLAAN:
                             me->CastSpell(kaylaan, WRATH_OF_SOCRETHAR);
+                            _actionEvents.ScheduleEvent(EVENT_KAYLAAN_DIES, 1500);
+                            break;
+                        case EVENT_KAYLAAN_DIES:
+                            me->Kill(me, kaylaan);
                             _actionEvents.ScheduleEvent(EVENT_FINAL_FIGHT, 3000);
                             break;
                         case EVENT_FINAL_FIGHT:
-                            me->setFaction(1770); // before fight faction 1786 in case i break him
+                            me->setFaction(1769); // before fight faction 1786 in case i break him
+                            ishanah->setFaction(1770);
+                            adyen->setFaction(1770);
+                            orelis->setFaction(1770);
                             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE);
                             me->SetReactState(REACT_AGGRESSIVE);
-                            me->Attack(ishanah, true);
+                            adyen->AI()->EnterCombat(me);
+                            orelis->AI()->AttackStart(me);
+                            ishanah->AI()->EnterCombat(me);
+                            //karja->Attack(me, true);
                             break;
                     }
                 }
@@ -1711,6 +1742,12 @@ class kaylaan_the_lost : public CreatureScript
                 _events.ScheduleEvent(EVENT_SPELL_CONSECRATION, urand(1000, 5000));
             }
 
+            void SpellHit(Unit* /*caster*/, const SpellInfo* spell)
+            {
+                if (spell->Id == WRATH_OF_SOCRETHAR)
+                    me->Kill(me, me);
+            }
+
             void DoAction(int32 param)
             {
                 switch (param)
@@ -1771,7 +1808,7 @@ class kaylaan_the_lost : public CreatureScript
                 Unit* target = me->GetVictim();
 
                 if (me->GetHealthPct() <= 30)
-                    if (Creature* socrethar = me->FindNearestCreature(SOCRETHAR, 50.0f, true))
+                    if (Creature* socrethar = me->FindNearestCreature(SOCRETHAR, 200.0f, true))
                         socrethar->AI()->DoAction(EVENT_END_ALDOR_FIGHT);
 
                 switch (_events.GetEvent())
@@ -1784,85 +1821,6 @@ class kaylaan_the_lost : public CreatureScript
                         if (me->FindNearestCreature(target->GetGUID(), 10.0f, true))
                             me->CastSpell(me, CONSECRATION, false);
                         _events.RepeatEvent(urand(12000, 15000));
-                        break;
-                }
-
-                DoMeleeAttackIfReady();
-            }
-        };
-};
-
-class ishanah : public CreatureScript
-{
-    public:
-        ishanah() : CreatureScript("ishanah_high_priestess") { }
-
-        CreatureAI* GetAI(Creature* creature) const
-        {
-            return new ishanahAI(creature);
-        }
-
-        struct ishanahAI : public ScriptedAI
-        {
-            ishanahAI(Creature* creature) : ScriptedAI(creature) { }
-
-            EventMap _events;
-
-            void Reset()
-            {
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-            }
-
-            void DoAction(int32 param)
-            {
-                switch (param)
-                {
-                    case EVENT_SOCRETHAR_DEAD:
-                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-                        break;
-                }
-            }
-
-            void EnterCombat(Unit* who)
-            {
-                AttackStart(who);
-                _events.ScheduleEvent(EVENT_SPELL_HOLY_SMITE, 1000);
-            }
-
-            void WaypointReached(uint32 waypoint)
-            {
-                switch (waypoint)
-                {
-                    case 2:
-                        if (Creature* kaylaan = me->FindNearestCreature(KAYLAAN_THE_LOST, 30.0f, true))
-                        {
-                            kaylaan->AI()->Talk(5); /* Teacher... */
-                            kaylaan->SetOrientation(me->GetPositionX());
-                            if (Creature* socrethar = me->FindNearestCreature(SOCRETHAR, 30.0f, true))
-                            {
-                                socrethar->AI()->DoAction(EVENT_ISHANAH_SAY_1);
-                                socrethar->SetOrientation(me->GetPositionX());
-                            }
-                        }
-                        break;
-                }
-            }
-
-            void UpdateAI(uint32 diff) override
-            {
-                _events.Update(diff);
-
-                if (!me->GetVictim())
-                    return;
-
-                if (me->HasUnitState(UNIT_STATE_CASTING))
-                    return;
-
-                switch (_events.GetEvent())
-                {
-                    case EVENT_SPELL_HOLY_SMITE:
-                        me->CastSpell(me->GetVictim(), HOLY_SMITE_ISHANAH, false);
-                        _events.RepeatEvent(2500);
                         break;
                 }
 
@@ -1890,6 +1848,5 @@ void AddSC_netherstorm()
     new anchorite_karja();
     new exarch_orelis();
     new kaylaan_the_lost();
-    new ishanah();
     new socrethar();
 }

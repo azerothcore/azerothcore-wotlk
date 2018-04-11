@@ -419,6 +419,24 @@ public:
 # npc_ishanah
 ######*/
 
+enum Ishanah
+{
+	// ISHANAH SPELL EVENTS
+	EVENT_SPELL_GREATER_HEAL		= 2,
+	EVENT_SPELL_ISHANAH_HOLY_SMITE	= 3,
+	EVENT_SPELL_POWER_WORD_SHIELD	= 4,
+	EVENT_JUST_SPAWNED				= 5, // Start waypath
+	EVENT_SOCRETHAR_DEAD			= 33,
+	EVENT_ISHANAH_SAY_1				= 18, // Make kaylaan bow
+	SOCRETHAR						= 20132,
+	KAYLAAN_THE_LOST				= 20794,
+
+	// ISHANAH SPELLS
+	GREATER_HEAL					= 35096,
+	HOLY_SMITE_ISHANAH				= 15238,
+	POWER_WORLD_SHIELD				= 22187
+};
+
 #define ISANAH_GOSSIP_1 "Who are the Sha'tar?"
 #define ISANAH_GOSSIP_2 "Isn't Shattrath a draenei city? Why do you allow others here?"
 
@@ -450,6 +468,75 @@ public:
 
         return true;
     }
+
+	CreatureAI* GetAI(Creature* creature) const
+	{
+		return new ishanahAI(creature);
+	}
+
+	struct ishanahAI : public ScriptedAI
+	{
+		ishanahAI(Creature* creature) : ScriptedAI(creature) { }
+
+		EventMap _events;
+
+		void DoAction(int32 param)
+		{
+			switch (param)
+			{
+				case EVENT_SOCRETHAR_DEAD:
+					me->SetFlag(UNIT_FIELD_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+					break;
+			}
+		}
+
+		void EnterCombat(Unit* who)
+		{
+			AttackStart(who);
+			_events.ScheduleEvent(EVENT_SPELL_ISHANAH_HOLY_SMITE, 1000);
+		}
+
+		void MovementInform(uint32 type, uint32 point)
+		{
+			if (type != POINT_MOTION_TYPE)
+			{
+				if (point == 2)
+				{
+					if (Creature* kaylaan = me->FindNearestCreature(KAYLAAN_THE_LOST, 30.0f, true))
+					{
+						kaylaan->AI()->Talk(5); /* Teacher... */
+						kaylaan->SetOrientation(me->GetPositionX());
+						if (Creature* socrethar = me->FindNearestCreature(SOCRETHAR, 30.0f, true))
+						{
+							socrethar->AI()->DoAction(EVENT_ISHANAH_SAY_1);
+							socrethar->SetOrientation(me->GetPositionX());
+						}
+					}
+				}
+			}
+		}
+
+		void UpdateAI(uint32 diff) override
+		{
+			_events.Update(diff);
+
+			if (!me->GetVictim())
+				return;
+
+			if (me->HasUnitState(UNIT_STATE_CASTING))
+				return;
+
+			switch (_events.GetEvent())
+			{
+			case EVENT_SPELL_ISHANAH_HOLY_SMITE:
+				me->CastSpell(me->GetVictim(), HOLY_SMITE_ISHANAH, false);
+				_events.RepeatEvent(2500);
+				break;
+			}
+
+			DoMeleeAttackIfReady();
+		}
+	};
 };
 
 void AddSC_shattrath_city()
