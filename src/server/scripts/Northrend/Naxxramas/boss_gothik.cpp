@@ -480,11 +480,12 @@ public:
         bool CanAIAttack(Unit const* target) const { return gateOpened || IsOnSameSide(target); }
 
         void Reset() { events.Reset(); }
-        void EnterCombat(Unit*  /*who*/)
+        void EnterCombat(Unit*  who)
         {
+			AttackStart(who);
             me->SetInCombatWithZone();
 
-            switch (me->GetGUID())
+            switch (me->GetEntry())
             {
                 case NPC_LIVING_TRAINEE:
                     events.ScheduleEvent(EVENT_SPELL_DEATH_PLAGUE, 2000);
@@ -629,6 +630,8 @@ public:
                 default:
                     break;
             }
+
+			DoMeleeAttackIfReady();
         }
     };
 
