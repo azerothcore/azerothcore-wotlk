@@ -480,9 +480,8 @@ public:
         bool CanAIAttack(Unit const* target) const { return gateOpened || IsOnSameSide(target); }
 
         void Reset() { events.Reset(); }
-        void EnterCombat(Unit*  who)
+        void EnterCombat(Unit*  /*who*/)
         {
-			AttackStart(who);
             me->SetInCombatWithZone();
 
             switch (me->GetEntry())
