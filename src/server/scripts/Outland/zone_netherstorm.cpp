@@ -1223,9 +1223,8 @@ class adyen_the_lightbringer : public CreatureScript
                     }
             }
 
-            void EnterCombat(Unit * who)
+            void EnterCombat(Unit * /*who*/)
             {
-                AttackStart(who);
                 _events.ScheduleEvent(EVENT_CRUSADER_STRIKE, 3000);
                 _events.ScheduleEvent(EVENT_HAMMER_OF_JUSTICE, 6000);
             }
@@ -1305,7 +1304,7 @@ class anchorite_karja : public CreatureScript
             {
                 if (param == EVENT_KARJA_WALK)
                 {
-                    me->GetMotionMaster()->MovePath(500010, false);
+                    me->GetMotionMaster()->MovePath(500020, false);
                 }
             }
 
@@ -1365,7 +1364,7 @@ class exarch_orelis : public CreatureScript
             {
                 if (param == EVENT_ORELIS_WALK)
                 {
-                    me->GetMotionMaster()->MovePath(500020, false);
+                    me->GetMotionMaster()->MovePath(500010, false);
                 }
             }
 
@@ -1376,9 +1375,8 @@ class exarch_orelis : public CreatureScript
                         me->SetHomePosition(me->GetPosition());
             }
 
-            void EnterCombat(Unit* who)
+            void EnterCombat(Unit* /*who*/)
             {
-                AttackStart(who);
                 _events.ScheduleEvent(EVENT_SPELL_DEMORALIZING_SHOUT, 1000);
                 _events.ScheduleEvent(EVENT_SPELL_HEROIC_STRIKE, urand(2500, 4000));
                 _events.ScheduleEvent(EVENT_SPELL_REND, urand(1500, 6000));
@@ -1512,9 +1510,8 @@ class socrethar : public CreatureScript
                 ishanah->SetFlag(UNIT_FIELD_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
             }
 
-            void EnterCombat(Unit* who)
+            void EnterCombat(Unit* /*who*/)
             {
-                AttackStart(who);
                 combatEvents.ScheduleEvent(EVENT_SPELL_ANTI_MAGIC_SHIELD, 9000);
                 combatEvents.ScheduleEvent(EVENT_SPELL_BACKLASH, 4000);
                 combatEvents.ScheduleEvent(EVENT_SPELL_CLEAVE, 2000);
@@ -1586,17 +1583,17 @@ class socrethar : public CreatureScript
                             break;
                         case EVENT_FIGHT_ALDOR:
                             GetCreature(EXARCH_ORELIS); // define orelis pointer
-                            //GetCreature(ANCHORITE_KARJA); // define karja pointer
+                            GetCreature(ANCHORITE_KARJA); // define karja pointer
                             kaylaan->setFaction(1769);
                             kaylaan->AddThreat(adyen, 100.0f);
                             kaylaan->AddThreat(orelis, 90.0f);
-                            //kaylaan->AddThreat(karja, 100.0f);
+                            kaylaan->AddThreat(karja, 100.0f);
                             orelis->setFaction(1770);
                             adyen->setFaction(1770);
                             adyen->AI()->EnterCombat(kaylaan);
                             orelis->AI()->EnterCombat(kaylaan);
-                            //karja->setFaction(1770);
-                            //karja->AI()->EnterCombat(kaylaan);
+                            karja->setFaction(1770);
+                            karja->AI()->EnterCombat(kaylaan);
                             kaylaan->AI()->EnterCombat(adyen);
                             adyen->AI()->DoAction(EVENT_SHEDULE_EVENTS);
                             break;
@@ -1605,15 +1602,15 @@ class socrethar : public CreatureScript
                             kaylaan->GetMotionMaster()->MoveTargetedHome();
                             orelis->setFaction(1743);
                             adyen->setFaction(1743);
-                            //karja->setFaction(1743);
+                            karja->setFaction(1743);
                             kaylaan->CombatStop();
                             kaylaan->ClearInCombat();
                             adyen->GetMotionMaster()->MoveTargetedHome();
                             orelis->GetMotionMaster()->MoveTargetedHome();
                             orelis->CombatStop();
                             orelis->ClearInCombat();
-                            //karja->CombatStop();
-                            //karja->ClearInCombat();
+                            karja->CombatStop();
+                            karja->ClearInCombat();
                             _actionEvents.ScheduleEvent(EVENT_SOCRETHAR_SAY_4, 2000);
                             break;
                         case EVENT_SOCRETHAR_SAY_4:
@@ -1663,7 +1660,7 @@ class socrethar : public CreatureScript
                             _actionEvents.ScheduleEvent(EVENT_KAYLAAN_RESSURECTION, 1000);
                             break;
                         case EVENT_KAYLAAN_RESSURECTION:
-                            kaylaan->CastSpell(ishanah, REDEMPTION); // Must test this redemption spell id
+                            kaylaan->CastSpell(ishanah, REDEMPTION);
                             _actionEvents.ScheduleEvent(EVENT_ISHANAH_IS_BACK_AGAIN, 11000);
                             break;
                         case EVENT_ISHANAH_IS_BACK_AGAIN:
@@ -1692,7 +1689,7 @@ class socrethar : public CreatureScript
                             adyen->AI()->EnterCombat(me);
                             orelis->AI()->AttackStart(me);
                             ishanah->AI()->EnterCombat(me);
-                            //karja->Attack(me, true);
+                            karja->Attack(me, true);
                             break;
                     }
                 }
@@ -1754,9 +1751,8 @@ class kaylaan_the_lost : public CreatureScript
             bool first_waypath_done = false;
             bool second_waypath_done = false;
 
-            void EnterCombat(Unit* who)
+            void EnterCombat(Unit* /*who*/)
             {
-                AttackStart(who);
                 _events.ScheduleEvent(EVENT_SPELL_BURNING_LIGHT, 2000);
                 _events.ScheduleEvent(EVENT_SPELL_CONSECRATION, 3000);
             }
