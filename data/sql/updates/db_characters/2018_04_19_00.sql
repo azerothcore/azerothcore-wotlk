@@ -1,3 +1,19 @@
+-- DB update 2017_09_18_00 -> 2018_04_19_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_characters' AND COLUMN_NAME = '2017_09_18_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_characters CHANGE COLUMN 2017_09_18_00 2018_04_19_00 bit;
+SELECT sql_rev INTO OK FROM version_db_characters WHERE sql_rev = '1515873371010860000'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO version_db_characters (`sql_rev`) VALUES ('1515873371010860000');
 
 ALTER TABLE `characters`
@@ -19,3 +35,12 @@ UPDATE `characters` SET
 	`restState`=(`playerBytes2`>>24)&0xFF;
 	
 ALTER TABLE `characters` DROP `playerBytes`, DROP `playerBytes2`;
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
