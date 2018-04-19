@@ -186,7 +186,7 @@ public:
                     }
                 case EVENT_CAN_EAT_ZOMBIE:
                     events.RepeatEvent(1000);
-                    if (me->FindNearestCreature(NPC_ZOMBIE_CHOW, 4.0f, true))
+                    if (me->IsWithinMeleeRange(me->FindNearestCreature(NPC_ZOMBIE_CHOW, 5.0f, true)))
                     {
                         me->CastCustomSpell(SPELL_CHOW_SEARCHER, SPELLVALUE_RADIUS_MOD, 20000, me, true);
                         me->MonsterTextEmote("%s devour all nearby zombies!", 0, false);
