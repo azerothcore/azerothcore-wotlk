@@ -26,10 +26,6 @@ EndContentData */
 #include "SpellInfo.h"
 #include "GameObjectAI.h"
 
-#include "ScriptPCH.h"
-#include "ScriptedFollowerAI.h"
-#include "WorldSession.h"
-
 // Ours
 enum saeed
 {
@@ -1165,7 +1161,7 @@ class adyen_the_lightbringer : public CreatureScript
     public:
         adyen_the_lightbringer(): CreatureScript("NPC_ADYEN_LIGHTBRINGER") { }
 
-        bool OnGossipHello(Player* player, Creature* creature)
+        bool OnGossipHello(Player* player, Creature* creature) override
         {
             if (creature->IsQuestGiver())
                 player->PrepareQuestMenu(creature->GetGUID());
@@ -1178,7 +1174,7 @@ class adyen_the_lightbringer : public CreatureScript
             return true;
         }
 
-        bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 /*action*/)
+        bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 /*action*/) override
         {
             player->CLOSE_GOSSIP_MENU();
             creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
@@ -1210,9 +1206,7 @@ class adyen_the_lightbringer : public CreatureScript
                 }
             }
 
-            void Reset() { _events.Reset(); }
-
-            void MovementInform(uint32 type, uint32 point)
+            void MovementInform(uint32 type, uint32 point) override
             {
                 if (type != POINT_MOTION_TYPE)
                     if (point == 9)
@@ -1223,13 +1217,14 @@ class adyen_the_lightbringer : public CreatureScript
                     }
             }
 
-            void EnterCombat(Unit * /*who*/)
+            void EnterCombat(Unit * who) override
             {
+				AttackStart(who);
                 _events.ScheduleEvent(EVENT_CRUSADER_STRIKE, 3000);
                 _events.ScheduleEvent(EVENT_HAMMER_OF_JUSTICE, 6000);
             }
 
-            void UpdateAI(uint32 diff)
+            void UpdateAI(uint32 diff) override
             {
                 _events.Update(diff);   
 
@@ -1239,6 +1234,7 @@ class adyen_the_lightbringer : public CreatureScript
                 switch (_events.ExecuteEvent())
                 {
                     case EVENT_CRUSADER_STRIKE:
+						printf("%s %d", "Casting spell", CRUSADER_STRIKE);
                         me->CastSpell(me->GetVictim(), CRUSADER_STRIKE, true);
                         _events.ScheduleEvent(EVENT_CRUSADER_STRIKE, 3500);
                         break;
@@ -1278,7 +1274,7 @@ class adyen_the_lightbringer : public CreatureScript
             }
         };
 
-        CreatureAI* GetAI(Creature* creature) const
+        CreatureAI* GetAI(Creature* creature) const override
         {
             return new adyen_the_lightbringerAI(creature); 
         }
