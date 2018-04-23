@@ -1161,7 +1161,7 @@ class adyen_the_lightbringer : public CreatureScript
     public:
         adyen_the_lightbringer(): CreatureScript("NPC_ADYEN_LIGHTBRINGER") { }
 
-        bool OnGossipHello(Player* player, Creature* creature) override
+        bool OnGossipHello(Player* player, Creature* creature)
         {
             if (creature->IsQuestGiver())
                 player->PrepareQuestMenu(creature->GetGUID());
@@ -1206,7 +1206,7 @@ class adyen_the_lightbringer : public CreatureScript
                 }
             }
 
-            void MovementInform(uint32 type, uint32 point) override
+            void MovementInform(uint32 type, uint32 point)
             {
                 if (type != POINT_MOTION_TYPE)
                     if (point == 9)
