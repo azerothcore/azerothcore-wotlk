@@ -449,6 +449,7 @@ enum GameObjectsIds
     GO_FROZEN_LAVAMAN                       = 202436,
     GO_LAVAMAN_PILLARS_CHAINED              = 202437,
     GO_LAVAMAN_PILLARS_UNCHAINED            = 202438,
+    GO_BLOODWING_SAURFANG_DOOR              = 201921
 };
 
 enum AchievementCriteriaIds
