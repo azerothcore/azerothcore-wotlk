@@ -61,6 +61,11 @@ class Field
             return static_cast<int8>(atol((char*)data.value));
         }
 
+        enum_field_types GetType() const
+        {
+            return data.type;
+        }
+
         uint16 GetUInt16() const
         {
             if (!data.value)

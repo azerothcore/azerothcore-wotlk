@@ -146,6 +146,9 @@ include_directories(
   ${ACE_INCLUDE_DIR}
   ${MYSQL_INCLUDE_DIR}
   ${OPENSSL_INCLUDE_DIR}
+  ${CMAKE_SOURCE_DIR}/modules/mod-LuaEngine
+  ${CMAKE_SOURCE_DIR}/modules/mod-LuaEngine/LuaEngine
+  ${CMAKE_SOURCE_DIR}/modules/mod-LuaEngine/lualib
 )
 
 add_executable(worldserver

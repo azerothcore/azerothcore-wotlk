@@ -11,6 +11,11 @@
 #include "DetourNavMesh.h"
 #include <cassert>
 
+#ifdef ELUNA
+#define AZEROTHCORE
+#define WOTLK
+#endif
+
 enum SpellEffIndex
 {
     EFFECT_0 = 0,

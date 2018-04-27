@@ -185,6 +185,12 @@ bool PreparedResultSet::_NextRow()
     return retval;
 }
 
+char* ResultSet::GetFieldName(uint32 index) const
+{
+    ASSERT(index < _fieldCount);
+    return _fields[index].name;
+}
+
 void ResultSet::CleanUp()
 {
     if (_currentRow)
