@@ -2,6 +2,6 @@
 	path = data/doc
 	url = https://github.com/azerothcore/azerothcore-wotlk.wiki.git
 
-[submodule "modules/mod-LuaEngine/LuaEngine"]
-	path = modules/mod-LuaEngine/LuaEngine
-	url = https://github.com/ElunaLuaEngine/Eluna.git
+[submodule "modules/mod-LuaEngine"]
+	path = modules/mod-LuaEngine
+	url = https://github.com/AyaseCore/mod-LuaEngine.git
