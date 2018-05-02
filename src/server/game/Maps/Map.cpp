@@ -3090,6 +3090,7 @@ void Map::UpdateEncounterState(EncounterCreditType type, uint32 creditEntry, Uni
         return;
 
     uint32 dungeonId = 0;
+    bool updated = false;
 
     for (DungeonEncounterList::const_iterator itr = encounters->begin(); itr != encounters->end(); ++itr)
     {
@@ -3097,8 +3098,12 @@ void Map::UpdateEncounterState(EncounterCreditType type, uint32 creditEntry, Uni
         if (encounter->creditType == type && encounter->creditEntry == creditEntry)
         {
             if (source)
-                if (InstanceScript* instanceScript = source->GetInstanceScript())
+                if (InstanceScript* instanceScript = source->GetInstanceScript()) {
+                    uint32 prevMask = instanceScript->GetCompletedEncounterMask();
                     instanceScript->SetCompletedEncountersMask((1 << encounter->dbcEntry->encounterIndex)|instanceScript->GetCompletedEncounterMask(), true);
+                    if (prevMask != instanceScript->GetCompletedEncounterMask())
+                        updated = true;
+                }
 
             if (encounter->lastEncounterDungeon)
             {
@@ -3111,7 +3116,7 @@ void Map::UpdateEncounterState(EncounterCreditType type, uint32 creditEntry, Uni
     // pussywizard:
     LogEncounterFinished(type, creditEntry);
     
-    sScriptMgr->OnAfterUpdateEncounterState(this, type, creditEntry, source, difficulty_fixed, encounters, dungeonId);
+    sScriptMgr->OnAfterUpdateEncounterState(this, type, creditEntry, source, difficulty_fixed, encounters, dungeonId, updated);
 
     if (dungeonId)
     {
