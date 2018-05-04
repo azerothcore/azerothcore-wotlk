@@ -185,11 +185,13 @@ bool PreparedResultSet::_NextRow()
     return retval;
 }
 
+#ifdef ELUNA
 char* ResultSet::GetFieldName(uint32 index) const
 {
     ASSERT(index < _fieldCount);
     return _fields[index].name;
 }
+#endif
 
 void ResultSet::CleanUp()
 {

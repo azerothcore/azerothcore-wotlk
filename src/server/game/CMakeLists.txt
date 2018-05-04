@@ -208,9 +208,6 @@ include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/Misc
   ${CMAKE_SOURCE_DIR}/src/server/scripts/
   ${CMAKE_SOURCE_DIR}/src/server/scripts/PrecompiledHeaders
-  ${CMAKE_SOURCE_DIR}/modules/mod-LuaEngine
-  ${CMAKE_SOURCE_DIR}/modules/mod-LuaEngine/LuaEngine
-  ${CMAKE_SOURCE_DIR}/modules/mod-LuaEngine/lualib
   ${ACE_INCLUDE_DIR}
   ${MYSQL_INCLUDE_DIR}
   ${OPENSSL_INCLUDE_DIR}

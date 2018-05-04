@@ -178,9 +178,9 @@ include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/PrecompiledHeaders
   ${ACE_INCLUDE_DIR}
   ${MYSQL_INCLUDE_DIR}
-  ${CMAKE_SOURCE_DIR}/modules/mod-LuaEngine
-  ${CMAKE_SOURCE_DIR}/modules/mod-LuaEngine/LuaEngine
-  ${CMAKE_SOURCE_DIR}/modules/mod-LuaEngine/lualib
+  ${CMAKE_MOD_ELUNA_ENGINE_DIR}
+  ${CMAKE_MOD_ELUNA_ENGINE_DIR}/LuaEngine
+  ${CMAKE_MOD_ELUNA_ENGINE_DIR}/lualib
 )
 
 add_library(scripts STATIC
