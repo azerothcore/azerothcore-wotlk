@@ -978,12 +978,12 @@ m_phaseMask(PHASEMASK_NORMAL), m_notifyflags(0), m_executed_notifies(0)
     m_serverSideVisibilityDetect.SetValue(SERVERSIDE_VISIBILITY_GHOST, GHOST_VISIBILITY_ALIVE);
 }
 
+#ifdef ELUNA
 void WorldObject::Update(uint32 time_diff)
 {
-#ifdef ELUNA
     elunaEvents->Update(time_diff);
-#endif
 }
+#endif
 
 void WorldObject::SetWorldObject(bool on)
 { 

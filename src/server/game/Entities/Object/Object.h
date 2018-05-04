@@ -725,8 +725,11 @@ class WorldObject : public Object, public WorldLocation
     public:
         virtual ~WorldObject();
 
+#ifdef ELUNA
         virtual void Update(uint32 /*time_diff*/);
-
+#else
+        virtual void Update(uint32 /*time_diff*/) { };
+#endif
         void _Create(uint32 guidlow, HighGuid guidhigh, uint32 phaseMask);
 
         virtual void RemoveFromWorld()
