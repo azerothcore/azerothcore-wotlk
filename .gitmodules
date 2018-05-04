@@ -1,7 +1,3 @@
 [submodule "data/doc"]
 	path = data/doc
 	url = https://github.com/azerothcore/azerothcore-wotlk.wiki.git
-
-[submodule "modules/mod-LuaEngine"]
-	path = modules/mod-LuaEngine
-	url = https://github.com/AyaseCore/mod-LuaEngine.git
