@@ -1159,7 +1159,7 @@ class deathblow_to_the_legion_trigger : public CreatureScript
 class adyen_the_lightbringer : public CreatureScript
 {
     public:
-        adyen_the_lightbringer(): CreatureScript("NPC_ADYEN_LIGHTBRINGER") { }
+        adyen_the_lightbringer(): CreatureScript("adyen_the_lightbringer") { }
 
         bool OnGossipHello(Player* player, Creature* creature)
         {
