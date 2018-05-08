@@ -3415,6 +3415,8 @@ void Spell::prepare(SpellCastTargets const* targets, AuraEffect const* triggered
     if (m_CastItem)
     {
         bool selectTargets = false;
+        bool nearbyDest = false;
+
         for (uint8 i = EFFECT_0; i < MAX_SPELL_EFFECTS; ++i)
         {
             if (!m_spellInfo->Effects[i].IsEffect())
@@ -3426,6 +3428,11 @@ void Spell::prepare(SpellCastTargets const* targets, AuraEffect const* triggered
                 break;
             }
 
+            if (m_spellInfo->Effects[i].TargetA.GetObjectType() == TARGET_OBJECT_TYPE_DEST)
+            {
+                nearbyDest = true;
+            }
+
             // xinef: by default set it to false, and to true if any valid target is found
             selectTargets = true;
         }
@@ -3434,8 +3441,26 @@ void Spell::prepare(SpellCastTargets const* targets, AuraEffect const* triggered
         {
             SelectSpellTargets();
             _spellTargetsSelected = true;
+            bool spellFailed = false;
 
             if (m_UniqueTargetInfo.empty() && m_UniqueGOTargetInfo.empty())
+            {
+                // no valid nearby target unit or game object found; check if nearby destination type
+                if (nearbyDest)
+                {
+                    if (!m_targets.HasDst())
+                    {
+                        // no valid target destination
+                        spellFailed = true;
+                    }
+                }
+                else
+                {
+                    spellFailed = true;
+                }
+            }
+
+            if (spellFailed)
             {
                 SendCastResult(SPELL_FAILED_CASTER_AURASTATE);
                 finish(false);
