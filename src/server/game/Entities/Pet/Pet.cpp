@@ -671,20 +671,18 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
 
     //Determine pet type
     PetType petType = MAX_PET_TYPE;
+
     if (IsPet() && m_owner->GetTypeId() == TYPEID_PLAYER)
     {
-        if (m_owner->getClass() == CLASS_WARLOCK ||
-            m_owner->getClass() == CLASS_SHAMAN ||          // Fire Elemental
-            m_owner->getClass() == CLASS_DEATH_KNIGHT ||    // Risen Ghoul
-            m_owner->getClass() == CLASS_MAGE)              // Water Elemental with glyph
-            petType = SUMMON_PET;
-        else if (m_owner->getClass() == CLASS_HUNTER)
+        if (cinfo->IsTameable(true))
         {
             petType = HUNTER_PET;
             m_unitTypeMask |= UNIT_MASK_HUNTER_PET;
         }
         else
-            sLog->outError("Unknown type pet %u is summoned by player class %u", GetEntry(), m_owner->getClass());
+        {
+            petType = SUMMON_PET;
+        }
     }
 
     uint32 creature_ID = (petType == HUNTER_PET) ? 1 : cinfo->Entry;
