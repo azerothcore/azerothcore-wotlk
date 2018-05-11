@@ -6,6 +6,10 @@ language: cpp
 compiler:
   - clang
 
+addons:
+  apt:
+    update: true
+
 git:
   depth: 1
 
