@@ -16546,7 +16546,10 @@ void Unit::Kill(Unit* killer, Unit* victim, bool durabilityLoss, WeaponAttackTyp
             if (instanceMap->IsDungeon() && player)
                 if (instanceMap->IsRaidOrHeroicDungeon())
                     if (creature->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_INSTANCE_BIND)
+					{
                         instanceMap->ToInstanceMap()->PermBindAllPlayers();
+						player->CreateWowarmoryFeed(3, creature->GetCreatureTemplate()->Entry, 0, 0);
+					}	
         }
     }
 

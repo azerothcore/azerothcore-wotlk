@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -141,8 +141,8 @@ Position const DrakeSpawnLoc[2] = // drakonid
 
 Position const NefarianLoc[2] =
 {
-    {-7449.763672f, -1387.816040f, 526.783691f, 3.0f}, // nefarian spawn
-    {-7535.456543f, -1279.562500f, 476.798706f, 3.0f}  // nefarian move
+    {-7530.313672f, -1274.516040f, 526.783691f, 3.0f}, // nefarian spawn
+    {-7530.313672f, -1274.516040f, 476.798706f, 3.0f}  // nefarian move
 };
 
 uint32 const Entry[5] = {NPC_BRONZE_DRAKANOID, NPC_BLUE_DRAKANOID, NPC_RED_DRAKANOID, NPC_GREEN_DRAKANOID, NPC_BLACK_DRAKANOID};

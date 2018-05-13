@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -177,6 +177,11 @@ class spell_egg_event : public SpellScriptLoader
             {
                 if (InstanceScript* instance = GetCaster()->GetInstanceScript())
                     instance->SetData(DATA_EGG_EVENT, SPECIAL);
+				if (GameObject* egg = GetCaster()->FindNearestGameObject(177807, 10.0f))
+				{
+					egg->SetUInt32Value(GAMEOBJECT_FLAGS, 0);
+					egg->RemoveFromWorld();
+				}
             }
 
             void Register()

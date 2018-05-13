@@ -3412,7 +3412,7 @@ void Spell::prepare(SpellCastTargets const* targets, AuraEffect const* triggered
     }
 
     // xinef: if spell have nearby target entry only, do not allow to cast if no targets are found
-    if (m_CastItem)
+	if (m_CastItem && m_spellInfo->Id != 9082)
     {
         bool selectTargets = false;
         for (uint8 i = EFFECT_0; i < MAX_SPELL_EFFECTS; ++i)

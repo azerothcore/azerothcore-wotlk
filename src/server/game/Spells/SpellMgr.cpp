@@ -5922,6 +5922,9 @@ void SpellMgr::LoadDbcDataCorrections()
             break;
         // Investigate the Blue Recluse (1920)
         // Investigate the Alchemist Shop (1960)
+        case 9082:
+            spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_NEARBY_ENTRY;
+			break;
         case 9095:
             spellInfo->EffectApplyAuraName[0] = SPELL_AURA_DUMMY;
             spellInfo->EffectRadiusIndex[0] = 13;
