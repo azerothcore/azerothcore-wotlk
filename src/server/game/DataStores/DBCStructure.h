@@ -609,14 +609,41 @@ struct BattlemasterListEntry
 
 struct CharStartOutfitEntry
 {
-    //uint32 Id;                                            // 0
-    uint8 Race;                                             // 1
-    uint8 Class;                                            // 2
-    uint8 Gender;                                           // 3
-    //uint8 Unused;                                         // 4
-    int32 ItemId[MAX_OUTFIT_ITEMS];                         // 5-28
-    //int32 ItemDisplayId[MAX_OUTFIT_ITEMS];                // 29-52 not required at server side
-    //int32 ItemInventorySlot[MAX_OUTFIT_ITEMS];            // 53-76 not required at server side
+	//uint32 Id;                                            // 0
+	uint8 Race;                                             // 1
+	uint8 Class;                                            // 2
+	uint8 Gender;                                           // 3
+															//uint8 Unused;                                         // 4
+	int32 ItemId[MAX_OUTFIT_ITEMS];                         // 5-28
+															//int32 ItemDisplayId[MAX_OUTFIT_ITEMS];                // 29-52 not required at server side
+															//int32 ItemInventorySlot[MAX_OUTFIT_ITEMS];            // 53-76 not required at server side
+};
+
+enum CharSectionFlags
+{
+	SECTION_FLAG_PLAYER = 0x01,
+	SECTION_FLAG_DEATH_KNIGHT = 0x04
+};
+
+enum CharSectionType
+{
+	SECTION_TYPE_SKIN = 0,
+	SECTION_TYPE_FACE = 1,
+	SECTION_TYPE_FACIAL_HAIR = 2,
+	SECTION_TYPE_HAIR = 3,
+	SECTION_TYPE_UNDERWEAR = 4
+};
+
+struct CharSectionsEntry
+{
+	//uint32 Id;
+	uint32 Race;
+	uint32 Gender;
+	uint32 GenType;
+	//char* TexturePath[3];
+	uint32 Flags;
+	uint32 Type;
+	uint32 Color;
 };
 
 struct CharTitlesEntry
@@ -858,6 +885,15 @@ struct EmotesTextEntry
     uint32  textid;
 };
 
+struct EmotesTextSoundEntry
+{
+	uint32 Id;                                              // 0
+	uint32 EmotesTextId;                                    // 1
+	uint32 RaceId;                                          // 2
+	uint32 SexId;                                           // 3, 0 male / 1 female
+	uint32 SoundId;                                         // 4
+};
+
 struct FactionEntry
 {
     uint32      ID;                                         // 0        m_ID
@@ -1076,6 +1112,18 @@ struct HolidaysEntry
     uint32 Priority;                                        // 52       m_priority
     uint32 CalendarFilterType;                              // 53       m_calendarFilterType (-1 = Fishing Contest, 0 = Unk, 1 = Darkmoon Festival, 2 = Yearly holiday)
     //uint32 flags;                                         // 54       m_flags (0 = Darkmoon Faire, Fishing Contest and Wotlk Launch, rest is 1)
+};
+
+struct ItemEntry
+{
+	uint32   ID;                                             // 0
+	uint32   Class;                                          // 1
+	uint32   SubClass;                                       // 2 some items have strange subclasses
+	int32    SoundOverrideSubclass;                          // 3
+	int32    Material;                                       // 4
+	uint32   DisplayId;                                      // 5
+	uint32   InventoryType;                                  // 6
+	uint32   Sheath;                                         // 7
 };
 
 struct ItemBagFamilyEntry

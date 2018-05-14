@@ -763,7 +763,7 @@ class PlayerScript : public ScriptObject
     public:
         virtual void OnPlayerReleasedGhost(Player* /*player*/) { }
 
-        // Called when a player kills another player
+		// Called when a player kills another player
         virtual void OnPVPKill(Player* /*killer*/, Player* /*killed*/) { }
 
         // Called when a player kills a creature

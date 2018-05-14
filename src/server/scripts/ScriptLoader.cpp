@@ -577,6 +577,9 @@ void AddSC_outdoorpvp_gh();
 void AddSC_chat_log();
 void AddSC_character_creation();
 
+//Custom
+void AddSC_Dynamic_Resurrections();
+
 #endif
 
 void AddSpellScripts()
@@ -650,6 +653,7 @@ void AddWorldScripts()
     AddSC_achievement_scripts();
     AddSC_chat_log();
     AddSC_character_creation();
+	AddSC_Dynamic_Resurrections();
 #endif
 }
 

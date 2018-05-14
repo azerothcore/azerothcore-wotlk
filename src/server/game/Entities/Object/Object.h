@@ -15,6 +15,7 @@
 #include "ObjectDefines.h"
 #include "GridDefines.h"
 #include "Map.h"
+#include "ObjectGuid.h"
 
 #include <set>
 #include <string>
@@ -125,7 +126,7 @@ class Object
 
         virtual void AddToWorld();
         virtual void RemoveFromWorld();
-
+		ObjectGuid GetGUIDObject() const { return GetGuidObject(OBJECT_FIELD_GUID); }
         uint64 GetGUID() const { return GetUInt64Value(0); }
         uint32 GetGUIDLow() const { return GUID_LOPART(GetUInt64Value(0)); }
         uint32 GetGUIDMid() const { return GUID_ENPART(GetUInt64Value(0)); }
@@ -165,6 +166,12 @@ class Object
             ASSERT(index + 1 < m_valuesCount || PrintIndexError(index, false));
             return *((uint64*)&(m_uint32Values[index]));
         }
+		
+		ObjectGuid GetGuidObject(uint16 index) const
+		{
+			ASSERT(index + 1 < m_valuesCount || PrintIndexError(index, false));
+			return *((ObjectGuid*)&(m_uint32Values[index]));
+		}
 
         float GetFloatValue(uint16 index) const
         {

@@ -23,6 +23,8 @@ set(scripts_STAT_SRCS
   ${AC_SCRIPTS_DIR}/World/npc_taxi.cpp
   ${AC_SCRIPTS_DIR}/World/npcs_special.cpp
   ${AC_SCRIPTS_DIR}/World/character_creation.cpp
+  ${AC_SCRIPTS_DIR}/World/DynamicResurrection.cpp
+  ${AC_SCRIPTS_DIR}/World/DynamicResurrections.cpp
 )
 
 AC_ADD_SCRIPT_LOADER("World" "ScriptLoader.h")

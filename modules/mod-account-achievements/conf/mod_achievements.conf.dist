@@ -1,0 +1,13 @@
+[worldserver]
+
+###################################################################################################
+#	Account Achievements module
+###################################################################################################
+
+# Enable the module? (1: true | 0: false)
+
+Account.Achievements.Enable = 1
+
+# Announce the module when the player logs in?
+
+Account.Achievements.Announce = 1

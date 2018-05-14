@@ -1344,6 +1344,10 @@ private:
 class Unit : public WorldObject
 {
     public:
+		// Playerbot mod
+		//Random preference
+		uint8 Preference = urand(0, 9);
+
         typedef UNORDERED_SET<Unit*> AttackerSet;
         typedef std::set<Unit*> ControlSet;
 

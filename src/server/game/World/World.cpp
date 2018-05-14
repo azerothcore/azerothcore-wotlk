@@ -77,6 +77,15 @@
 #include "SavingSystem.h"
 #include <VMapManager2.h>
 
+// playerbot mod
+#include "../../modules/bot/playerbot/playerbot.h"
+#include "../../modules/bot/playerbot/PlayerbotAIConfig.h"
+#include "../../modules/bot/playerbot/RandomPlayerbotMgr.h"
+
+// AHBot mod
+#include "AuctionHouseBot.h"
+#include "../../modules/bot/ahbot/AhBot.h"
+
 ACE_Atomic_Op<ACE_Thread_Mutex, bool> World::m_stopEvent = false;
 uint8 World::m_ExitCode = SHUTDOWN_EXIT_CODE;
 uint32 World::m_worldLoopCounter = 0;
@@ -1259,6 +1268,9 @@ void World::LoadConfigSettings(bool reload)
 
     m_int_configs[CONFIG_BIRTHDAY_TIME] = sConfigMgr->GetIntDefault("BirthdayTime", 1222964635);
 
+	// AHBot
+	m_int_configs[CONFIG_AHBOT_UPDATE_INTERVAL] = sConfigMgr->GetIntDefault("AuctionHouseBot.Update.Interval", 20);
+
     // call ScriptMgr if we're reloading the configuration
     sScriptMgr->OnAfterConfigLoad(reload);
 }
@@ -1774,6 +1786,7 @@ void World::SetInitialWorldSettings()
     m_timers[WUPDATE_WEATHERS].SetInterval(1*IN_MILLISECONDS);
     m_timers[WUPDATE_AUCTIONS].SetInterval(MINUTE*IN_MILLISECONDS);
     m_timers[WUPDATE_AUCTIONS].SetCurrent(MINUTE*IN_MILLISECONDS);
+	m_timers[WUPDATE_AUCTIONS_PENDING].SetInterval(250);
     m_timers[WUPDATE_UPTIME].SetInterval(m_int_configs[CONFIG_UPTIME_UPDATE]*MINUTE*IN_MILLISECONDS);
                                                             //Update "uptime" table based on configuration entry in minutes.
 
@@ -1800,6 +1813,9 @@ void World::SetInitialWorldSettings()
     sLog->outString("Starting Game Event system...");
     uint32 nextGameEvent = sGameEventMgr->StartSystem();
     m_timers[WUPDATE_EVENTS].SetInterval(nextGameEvent);    //depend on next event
+
+	// for AHBot
+	m_timers[WUPDATE_AHBOT].SetInterval(getIntConfig(CONFIG_AHBOT_UPDATE_INTERVAL) * IN_MILLISECONDS); // every 20 sec
 
     // Delete all characters which have been deleted X days before
     Player::DeleteOldCharacters();
@@ -1870,6 +1886,14 @@ void World::SetInitialWorldSettings()
     mgr->LoadChannels();
     mgr = ChannelMgr::forTeam(TEAM_HORDE);
     mgr->LoadChannels();
+
+	// playerbot mod
+	sLog->outString("Initializing AuctionHouseBot...");
+	sAuctionBot->Initialize();
+	//sAuctionBotConfig->Initialize();
+
+	//auctionbot.Init();
+	sPlayerbotAIConfig.Initialize();
 
     uint32 startupDuration = GetMSTimeDiffToNow(startupBegin);
     sLog->outString();
@@ -2020,6 +2044,16 @@ void World::Update(uint32 diff)
 
     if (m_gameTime > m_NextGuildReset)
         ResetGuildCap();
+	
+	// playerbot mod
+	sRandomPlayerbotMgr.UpdateAI(diff);
+	sRandomPlayerbotMgr.UpdateSessions(diff);
+
+	if (m_timers[WUPDATE_AHBOT].Passed())
+	{
+		sAuctionBot->Update();
+		m_timers[WUPDATE_AHBOT].Reset();
+	}
 
     // pussywizard:
     // acquire mutex now, this is kind of waiting for listing thread to finish it's work (since it can't process next packet)
@@ -2049,6 +2083,14 @@ void World::Update(uint32 diff)
     } 
     // end of section with mutex
     AsyncAuctionListingMgr::SetAuctionListingAllowed(true);
+
+
+	if (m_timers[WUPDATE_AUCTIONS_PENDING].Passed())
+	{
+		m_timers[WUPDATE_AUCTIONS_PENDING].Reset();
+
+		sAuctionMgr->UpdatePendingAuctions();
+	}
 
     /// <li> Handle weather updates when the timer has passed
     if (m_timers[WUPDATE_WEATHERS].Passed())
@@ -2583,6 +2625,9 @@ void World::ShutdownServ(uint32 time, uint32 options, uint8 exitcode)
         m_ShutdownTimer = time;
         ShutdownMsg(true);
     }
+
+	// playerbot mod
+	sRandomPlayerbotMgr.LogoutAllBots();
 
     sScriptMgr->OnShutdownInitiate(ShutdownExitCode(exitcode), ShutdownMask(options));
 }

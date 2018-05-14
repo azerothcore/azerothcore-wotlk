@@ -22,6 +22,9 @@
 #include "AvgDiffTracker.h"
 #include "AsyncAuctionListing.h"
 
+// AHBot mod
+#include "../../modules/bot/ahbot/AhBot.h"
+
 enum eAuctionHouse
 {
     AH_MINIMUM_DEPOSIT = 100,
@@ -151,6 +154,9 @@ void AuctionHouseMgr::SendAuctionSuccessfulMail(AuctionEntry* auction, SQLTransa
             .AddMoney(profit)
             .SendMailTo(trans, MailReceiver(owner, auction->owner), auction, MAIL_CHECK_MASK_COPIED, sWorld->getIntConfig(CONFIG_MAIL_DELIVERY_DELAY));
 
+		// AHBot mod
+		auctionbot.Won(auction);
+
         if (auction->bid >= 500*GOLD)
             if (const GlobalPlayerData* gpd = sWorld->GetGlobalPlayerData(auction->bidder))
             {
@@ -189,7 +195,9 @@ void AuctionHouseMgr::SendAuctionExpiredMail(AuctionEntry* auction, SQLTransacti
         MailDraft(auction->BuildAuctionMailSubject(AUCTION_EXPIRED), AuctionEntry::BuildAuctionMailBody(0, 0, auction->buyout, auction->deposit, 0))
             .AddItem(pItem)
             .SendMailTo(trans, MailReceiver(owner, auction->owner), auction, MAIL_CHECK_MASK_COPIED, 0);
-    }
+		// AHBot mod
+		auctionbot.Expired(auction);
+	}
     else
         sAuctionMgr->RemoveAItem(auction->item_guidlow, true);
 }
@@ -354,6 +362,115 @@ bool AuctionHouseMgr::RemoveAItem(uint32 id, bool deleteFromDB)
     return true;
 }
 
+void AuctionHouseMgr::PendingAuctionAdd(Player* player, AuctionEntry* aEntry)
+{
+	PlayerAuctions* thisAH;
+	auto itr = pendingAuctionMap.find(player->GetGUID());
+	if (itr != pendingAuctionMap.end())
+		thisAH = itr->second.first;
+	else
+	{
+		thisAH = new PlayerAuctions;
+		pendingAuctionMap[player->GetGUID()] = AuctionPair(thisAH, 0);
+	}
+	thisAH->push_back(aEntry);
+}
+
+uint32 AuctionHouseMgr::PendingAuctionCount(const Player* player) const
+{
+	auto const itr = pendingAuctionMap.find(player->GetGUID());
+	if (itr != pendingAuctionMap.end())
+		return itr->second.first->size();
+
+	return 0;
+}
+
+void AuctionHouseMgr::PendingAuctionProcess(Player* player)
+{
+	auto iterMap = pendingAuctionMap.find(player->GetGUID());
+	if (iterMap == pendingAuctionMap.end())
+		return;
+
+	PlayerAuctions* thisAH = iterMap->second.first;
+
+	SQLTransaction trans = CharacterDatabase.BeginTransaction();
+
+	uint32 totalItems = 0;
+	for (auto itrAH = thisAH->begin(); itrAH != thisAH->end(); ++itrAH)
+	{
+		AuctionEntry* AH = (*itrAH);
+		totalItems += AH->itemCount;
+	}
+
+	uint32 totaldeposit = 0;
+	auto itr = (*thisAH->begin());
+
+	if (Item* item = GetAItem(itr->item_guidlow))
+		totaldeposit = GetAuctionDeposit(itr->auctionHouseEntry, itr->etime, item, totalItems);
+
+	uint32 depositremain = totaldeposit;
+	for (auto itr = thisAH->begin(); itr != thisAH->end(); ++itr)
+	{
+		AuctionEntry* AH = (*itr);
+
+		if (next(itr) == thisAH->end())
+			AH->deposit = depositremain;
+		else
+		{
+			AH->deposit = totaldeposit / thisAH->size();
+			depositremain -= AH->deposit;
+		}
+
+		AH->DeleteFromDB(trans);
+		AH->SaveToDB(trans);
+	}
+
+	CharacterDatabase.CommitTransaction(trans);
+	pendingAuctionMap.erase(player->GetGUID());
+	delete thisAH;
+	player->ModifyMoney(-int32(totaldeposit));
+}
+
+void AuctionHouseMgr::UpdatePendingAuctions()
+{
+	for (auto itr = pendingAuctionMap.begin(); itr != pendingAuctionMap.end();)
+	{
+		uint64 playerGUID = itr->first;
+		if (Player* player = ObjectAccessor::FindConnectedPlayer(playerGUID))
+		{
+			// Check if there were auctions since last update process if not
+			if (PendingAuctionCount(player) == itr->second.second)
+			{
+				++itr;
+				PendingAuctionProcess(player);
+			}
+			else
+			{
+				++itr;
+				pendingAuctionMap[playerGUID].second = PendingAuctionCount(player);
+			}
+		}
+		else
+		{
+			// Expire any auctions that we couldn't get a deposit for
+			//sLog->outDebug(LOG_FILTER_AUCTIONHOUSE, "Player %s was offline, unable to retrieve deposit!", playerGUID.ToString().c_str());
+			PlayerAuctions* thisAH = itr->second.first;
+			++itr;
+			SQLTransaction trans = CharacterDatabase.BeginTransaction();
+			for (auto AHitr = thisAH->begin(); AHitr != thisAH->end();)
+			{
+				AuctionEntry* AH = (*AHitr);
+				++AHitr;
+				AH->expire_time = time(NULL);
+				AH->DeleteFromDB(trans);
+				AH->SaveToDB(trans);
+			}
+			CharacterDatabase.CommitTransaction(trans);
+			pendingAuctionMap.erase(playerGUID);
+			delete thisAH;
+		}
+	}
+}
 void AuctionHouseMgr::Update()
 {
     mHordeAuctions.Update();
@@ -426,6 +543,9 @@ void AuctionHouseObject::Update()
 {
     time_t checkTime = sWorld->GetGameTime() + 60;
     ///- Handle expired auctions
+
+	// ahbot mod
+	//auctionbot.Update();
 
     // If storage is empty, no need to update. next == NULL in this case.
     if (AuctionsMap.empty())

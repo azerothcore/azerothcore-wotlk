@@ -138,6 +138,26 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/src/server/scripts/PrecompiledHeaders
   ${CMAKE_SOURCE_DIR}/src/server/authserver/Server
   ${CMAKE_SOURCE_DIR}/src/server/authserver/Realms
+  ${CMAKE_SOURCE_DIR}/modules/bot
+  ${CMAKE_SOURCE_DIR}/modules/bot/pch
+  ${CMAKE_SOURCE_DIR}/modules/bot/ahbot
+  ${CMAKE_SOURCE_DIR}/modules/bot/playerbot
+  ${CMAKE_SOURCE_DIR}/modules/bot/playerbot/strategy
+  ${CMAKE_SOURCE_DIR}/modules/bot/playerbot/strategy/actions
+  ${CMAKE_SOURCE_DIR}/modules/bot/playerbot/strategy/DK
+  ${CMAKE_SOURCE_DIR}/modules/bot/playerbot/strategy/druid
+  ${CMAKE_SOURCE_DIR}/modules/bot/playerbot/strategy/generic
+  ${CMAKE_SOURCE_DIR}/modules/bot/playerbot/strategy/hunter
+  ${CMAKE_SOURCE_DIR}/modules/bot/playerbot/strategy/mage
+  ${CMAKE_SOURCE_DIR}/modules/bot/playerbot/strategy/paladin
+  ${CMAKE_SOURCE_DIR}/modules/bot/playerbot/strategy/priest
+  ${CMAKE_SOURCE_DIR}/modules/bot/playerbot/strategy/rogue
+  ${CMAKE_SOURCE_DIR}/modules/bot/playerbot/strategy/shaman
+  ${CMAKE_SOURCE_DIR}/modules/bot/playerbot/strategy/triggers
+  ${CMAKE_SOURCE_DIR}/modules/bot/playerbot/strategy/values
+  ${CMAKE_SOURCE_DIR}/modules/bot/playerbot/strategy/values/formations
+  ${CMAKE_SOURCE_DIR}/modules/bot/playerbot/strategy/warlock
+  ${CMAKE_SOURCE_DIR}/modules/bot/playerbot/strategy/warrior
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}/CommandLine
   ${CMAKE_CURRENT_SOURCE_DIR}/RemoteAccess
@@ -169,6 +189,7 @@ set_target_properties(worldserver PROPERTIES LINK_FLAGS "${worldserver_LINK_FLAG
 
 target_link_libraries(worldserver
   game
+  bot
   shared
   scripts
   collision

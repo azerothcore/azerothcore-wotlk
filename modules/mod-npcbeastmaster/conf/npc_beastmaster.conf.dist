@@ -1,0 +1,21 @@
+[worldserver]
+
+###################################################################################################
+#	BEASTMASTER NPC
+###################################################################################################
+
+# Announce the module when the player logs in?
+
+BeastMaster.Announce = 1
+
+# Enable only for the Hunter class?
+
+BeastMaster.HunterOnly = 0
+
+# Allow Exotic Beast Taming without spec?
+
+BeastMaster.ExoticNoSpec = 1
+
+# Pet Scale Value (float - default: 1.00)
+
+BeastMaster.PetScale = 1.00

@@ -7,7 +7,6 @@ conf/*
 apps/drassil/*
 env/dist/*
 env/user/*
-modules/*
 build*/
 var/*
 

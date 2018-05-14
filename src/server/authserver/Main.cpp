@@ -36,7 +36,7 @@
 #endif
 
 #ifndef _TRINITY_REALM_CONFIG
-# define _TRINITY_REALM_CONFIG  "authserver.conf"
+# define _TRINITY_REALM_CONFIG  "Settings/server_login.conf"
 #endif
 
 bool StartDB();
@@ -93,7 +93,7 @@ extern int main(int argc, char** argv)
     }
 
     std::string cfg_def_file=_TRINITY_REALM_CONFIG;
-    cfg_def_file += ".dist";
+    cfg_def_file += "";
 
     if (!sConfigMgr->LoadInitial(cfg_def_file.c_str())) {
         printf("ERROR: Invalid or missing default configuration file : %s\n", cfg_def_file.c_str());

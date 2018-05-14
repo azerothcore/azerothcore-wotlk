@@ -1,0 +1,15 @@
+[worldserver]
+
+###################################################################################################
+#	CUSTOM SERVER
+###################################################################################################
+
+# Announce the module when the player logs in?
+
+CustomServer.Announce = 1
+
+# Fireworks go off when the player levels up at specific intervals
+# Intervals: 5, 10, 20, 30, 40, 50, 60, 70, 80
+# Enable the module? (1: true | 0: false)
+
+Custom.FireworkLevels = 1

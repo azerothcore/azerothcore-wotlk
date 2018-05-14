@@ -52,6 +52,13 @@ enum MailAuctionAnswers
     AUCTION_SALE_PENDING        = 6
 };
 
+enum AuctionHouses
+{
+	AUCTIONHOUSE_ALLIANCE = 2,
+	AUCTIONHOUSE_HORDE = 6,
+	AUCTIONHOUSE_NEUTRAL = 7
+};
+
 struct AuctionEntry
 {
     uint32 Id;
@@ -66,6 +73,7 @@ struct AuctionEntry
     time_t expire_time;
     uint32 bidder;
     uint32 deposit;                                         //deposit can be calculated only when creating auction
+	uint32 etime;
     AuctionHouseEntry const* auctionHouseEntry;             // in AuctionHouse.dbc
     uint32 factionTemplateId;
 
@@ -114,7 +122,7 @@ class AuctionHouseObject
     bool RemoveAuction(AuctionEntry* auction);
 
     void Update();
-
+	
     void BuildListBidderItems(WorldPacket& data, Player* player, uint32& count, uint32& totalcount);
     void BuildListOwnerItems(WorldPacket& data, Player* player, uint32& count, uint32& totalcount);
     bool BuildListAuctionItems(WorldPacket& data, Player* player,
@@ -140,6 +148,8 @@ class AuctionHouseMgr
     public:
 
         typedef UNORDERED_MAP<uint32, Item*> ItemMap;
+		typedef std::vector<AuctionEntry*> PlayerAuctions;
+		typedef std::pair<PlayerAuctions*, uint32> AuctionPair;
 
         AuctionHouseObject* GetAuctionsMap(uint32 factionTemplateId);
         AuctionHouseObject* GetBidsMap(uint32 factionTemplateId);
@@ -174,12 +184,18 @@ class AuctionHouseMgr
         bool RemoveAItem(uint32 id, bool deleteFromDB = false);
 
         void Update();
+		void UpdatePendingAuctions();
+		uint32 PendingAuctionCount(const Player* player) const;
+		void PendingAuctionAdd(Player* player, AuctionEntry* aEntry);
+		void PendingAuctionProcess(Player* player);
 
     private:
 
         AuctionHouseObject mHordeAuctions;
         AuctionHouseObject mAllianceAuctions;
         AuctionHouseObject mNeutralAuctions;
+
+		std::map<uint64, AuctionPair> pendingAuctionMap;
 
         ItemMap mAitems;
 };

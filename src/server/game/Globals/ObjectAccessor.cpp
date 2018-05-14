@@ -41,6 +41,32 @@ Player* ObjectAccessor::GetObjectInWorld(uint64 guid, Player* /*typeSpecifier*/)
     return player && player->IsInWorld() ? player : NULL;
 }
 
+namespace PlayerNameMapHolder
+{
+	typedef std::unordered_map<std::string, Player*> MapType;
+	static MapType PlayerNameMap;
+
+	void Insert(Player* p)
+	{
+		PlayerNameMap[p->GetName()] = p;
+	}
+
+	void Remove(Player* p)
+	{
+		PlayerNameMap.erase(p->GetName());
+	}
+
+	Player* Find(std::string const& name)
+	{
+		std::string charName(name);
+		if (!normalizePlayerName(charName))
+			return nullptr;
+
+		auto itr = PlayerNameMap.find(charName);
+		return (itr != PlayerNameMap.end()) ? itr->second : nullptr;
+	}
+} // namespace PlayerNameMapHolder
+
 WorldObject* ObjectAccessor::GetWorldObject(WorldObject const& p, uint64 guid)
 {
     switch (GUID_HIPART(guid))
@@ -159,6 +185,16 @@ Pet* ObjectAccessor::FindPet(uint64 guid)
 Player* ObjectAccessor::FindPlayer(uint64 guid)
 {
     return GetObjectInWorld(guid, (Player*)NULL);
+}
+
+Player* ObjectAccessor::FindConnectedPlayer(uint64 const& guid)
+{
+	return HashMapHolder<Player>::Find(guid);
+}
+
+Player* ObjectAccessor::FindConnectedPlayerByName(std::string const& name)
+{
+	return PlayerNameMapHolder::Find(name);
 }
 
 Player* ObjectAccessor::FindPlayerInOrOutOfWorld(uint64 guid)
