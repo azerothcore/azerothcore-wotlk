@@ -653,13 +653,15 @@ public:
                     {
                         m_auiEncounter[2] = uiData;
                         if (uiData == NOT_STARTED)
-						{ 
+                        {
+                            HandleGameObject(GO_EnterGateGUID, false);
                             bAchievIveHadWorse = true;
-						    HandleGameObject(GO_EnterGateGUID, false);
-						}
+                        }
                         else if( uiData == DONE )
-							HandleGameObject(GO_EnterGateGUID, true);
+                        {
+                            HandleGameObject(GO_EnterGateGUID, true);
                             InstanceProgress = INSTANCE_PROGRESS_FINISHED;
+                        }
                     }
                     break;
                 case DATA_ACHIEV_IVE_HAD_WORSE:

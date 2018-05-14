@@ -43,7 +43,11 @@ set(scripts_STAT_SRCS
   ${AC_SCRIPTS_DIR}/Outland/CoilfangReservoir/SerpentShrine/boss_lurker_below.cpp
   ${AC_SCRIPTS_DIR}/Outland/CoilfangReservoir/SerpentShrine/boss_morogrim_tidewalker.cpp
   ${AC_SCRIPTS_DIR}/Outland/CoilfangReservoir/underbog/boss_the_black_stalker.cpp
+  ${AC_SCRIPTS_DIR}/Outland/CoilfangReservoir/underbog/instance_the_underbog.cpp
+  ${AC_SCRIPTS_DIR}/Outland/CoilfangReservoir/underbog/the_underbog.h
   ${AC_SCRIPTS_DIR}/Outland/CoilfangReservoir/SlavePens/boss_ahune.cpp
+  ${AC_SCRIPTS_DIR}/Outland/CoilfangReservoir/SlavePens/instance_the_slave_pens.cpp
+  ${AC_SCRIPTS_DIR}/Outland/CoilfangReservoir/SlavePens/the_slave_pens.h
   ${AC_SCRIPTS_DIR}/Outland/zone_shattrath_city.cpp
   ${AC_SCRIPTS_DIR}/Outland/TempestKeep/Mechanar/boss_mechano_lord_capacitus.cpp
   ${AC_SCRIPTS_DIR}/Outland/TempestKeep/Mechanar/boss_pathaleon_the_calculator.cpp
@@ -74,7 +78,11 @@ set(scripts_STAT_SRCS
   ${AC_SCRIPTS_DIR}/Outland/TempestKeep/arcatraz/arcatraz.cpp
   ${AC_SCRIPTS_DIR}/Outland/Auchindoun/AuchenaiCrypts/boss_shirrak_the_dead_watcher.cpp
   ${AC_SCRIPTS_DIR}/Outland/Auchindoun/AuchenaiCrypts/boss_exarch_maladaar.cpp
+  ${AC_SCRIPTS_DIR}/Outland/Auchindoun/AuchenaiCrypts/instance_auchenai_crypts.cpp
+  ${AC_SCRIPTS_DIR}/Outland/Auchindoun/AuchenaiCrypts/auchenai_crypts.h
   ${AC_SCRIPTS_DIR}/Outland/Auchindoun/ManaTombs/boss_nexusprince_shaffar.cpp
+  ${AC_SCRIPTS_DIR}/Outland/Auchindoun/ManaTombs/instance_mana_tombs.cpp
+  ${AC_SCRIPTS_DIR}/Outland/Auchindoun/ManaTombs/mana_tombs.h
   ${AC_SCRIPTS_DIR}/Outland/Auchindoun/SethekkHalls/boss_talon_king_ikiss.cpp
   ${AC_SCRIPTS_DIR}/Outland/Auchindoun/SethekkHalls/instance_sethekk_halls.cpp
   ${AC_SCRIPTS_DIR}/Outland/Auchindoun/SethekkHalls/sethekk_halls.h
