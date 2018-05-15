@@ -1199,11 +1199,6 @@ class adyen_the_lightbringer : public CreatureScript
                 {
                     me->GetMotionMaster()->MovePath(610210, false);
                 }
-                else if (param == EVENT_SHEDULE_EVENTS)
-                {
-                    _events.ScheduleEvent(EVENT_CRUSADER_STRIKE, 3000, false);
-                    _events.ScheduleEvent(EVENT_HAMMER_OF_JUSTICE, 6000, false);
-                }
             }
 
             void MovementInform(uint32 type, uint32 point)
@@ -1231,10 +1226,11 @@ class adyen_the_lightbringer : public CreatureScript
                 if (!me->GetVictim())
                     return;
 
-                switch (_events.ExecuteEvent())
+                while (uint32 eventId = _events.ExecuteEvent())
                 {
+                    switch (eventId)
+                    {
                     case EVENT_CRUSADER_STRIKE:
-						printf("%s %d", "Casting spell", CRUSADER_STRIKE);
                         me->CastSpell(me->GetVictim(), CRUSADER_STRIKE, true);
                         _events.ScheduleEvent(EVENT_CRUSADER_STRIKE, 3500);
                         break;
@@ -1268,13 +1264,14 @@ class adyen_the_lightbringer : public CreatureScript
                         else
                             _events.RepeatEvent(1000);
                         break;
+                    }
                 }
 
                 DoMeleeAttackIfReady();
             }
         };
 
-        CreatureAI* GetAI(Creature* creature) const override
+        CreatureAI* GetAI(Creature* creature) const
         {
             return new adyen_the_lightbringerAI(creature); 
         }

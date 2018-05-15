@@ -10,7 +10,6 @@ SD%Complete: 100
 SDComment: Quest support: 10004, 10009, 10211. Flask vendors, Teleport to Caverns of Time
 SDCategory: Shattrath City
 EndScriptData */
-
 /* ContentData
 npc_raliq_the_drunk
 npc_salsalabim
