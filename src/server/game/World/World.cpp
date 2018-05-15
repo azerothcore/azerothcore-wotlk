@@ -1292,7 +1292,12 @@ void World::SetInitialWorldSettings()
 #ifdef ELUNA
     ///- Initialize Lua Engine
     TC_LOG_INFO("server.loading", "Initialize Eluna Lua Engine...");
-    std::string cfg_file = "mod_LuaEngine.conf";
+
+    std::string conf_path = _CONF_DIR;
+    std::string cfg_file = conf_path + "/mod_LuaEngine.conf";
+#ifdef WIN32
+    cfg_file = "mod_LuaEngine.conf";
+#endif
     std::string cfg_def_file = cfg_file + ".dist";
     sConfigMgr->LoadMore(cfg_def_file.c_str());
     sConfigMgr->LoadMore(cfg_file.c_str());
