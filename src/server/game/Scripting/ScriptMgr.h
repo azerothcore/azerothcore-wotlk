@@ -221,6 +221,14 @@ class ServerScript : public ScriptObject
         // Called when a socket is closed. Do not store the socket object, and do not rely on the connection
         // being open; it is not.
         virtual void OnSocketClose(WorldSocket* /*socket*/, bool /*wasNew*/) { }
+
+        // Called when a packet is sent to a client. The packet object is a copy of the original packet, so reading
+        // and modifying it is safe.
+        virtual void OnPacketSend(WorldSession* /*session*/, WorldPacket& /*packet*/) { }
+
+        // Called when a (valid) packet is received by a client. The packet object is a copy of the original packet, so
+        // reading and modifying it is safe. Make sure to check WorldSession pointer before usage, it might be null in case of auth packets
+        virtual void OnPacketReceive(WorldSession* /*session*/, WorldPacket& /*packet*/) { }
 };
 
 class WorldScript : public ScriptObject
@@ -409,6 +417,9 @@ class ItemScript : public ScriptObject
 
         // Called when a player uses the item.
         virtual bool OnUse(Player* /*player*/, Item* /*item*/, SpellCastTargets const& /*targets*/) { return false; }
+
+        // Called when the item is destroyed.
+        virtual bool OnRemove(Player* /*player*/, Item* /*item*/) { return false; }
 
         // Called when the item expires (is destroyed).
         virtual bool OnExpire(Player* /*player*/, ItemTemplate const* /*proto*/) { return false; }
@@ -836,6 +847,9 @@ class PlayerScript : public ScriptObject
         // Called when a player is deleted.
         virtual void OnDelete(uint64 /*guid*/) { }
 
+        // Called when a player is about to be saved.
+        virtual void OnSave(Player* /*player*/) { }
+
         // Called when a player is bound to an instance
         virtual void OnBindToInstance(Player* /*player*/, Difficulty /*difficulty*/, uint32 /*mapId*/, bool /*permanent*/) { }
 
@@ -1071,6 +1085,8 @@ class ScriptMgr
         void OnNetworkStop();
         void OnSocketOpen(WorldSocket* socket);
         void OnSocketClose(WorldSocket* socket, bool wasNew);
+        void OnPacketReceive(WorldSession* session, WorldPacket const& packet);
+        void OnPacketSend(WorldSession* session, WorldPacket const& packet);
 
     public: /* WorldScript */
 
@@ -1114,6 +1130,7 @@ class ScriptMgr
         bool OnQuestAccept(Player* player, Item* item, Quest const* quest);
         bool OnItemUse(Player* player, Item* item, SpellCastTargets const& targets);
         bool OnItemExpire(Player* player, ItemTemplate const* proto);
+        bool OnItemRemove(Player* player, Item* item);
         void OnGossipSelect(Player* player, Item* item, uint32 sender, uint32 action);
         void OnGossipSelectCode(Player* player, Item* item, uint32 sender, uint32 action, const char* code);
 
@@ -1232,6 +1249,7 @@ class ScriptMgr
         void OnPlayerLoadFromDB(Player* player);
         void OnPlayerLogout(Player* player);
         void OnPlayerCreate(Player* player);
+        void OnPlayerSave(Player* player);
         void OnPlayerDelete(uint64 guid);
         void OnPlayerBindToInstance(Player* player, Difficulty difficulty, uint32 mapid, bool permanent);
         void OnPlayerUpdateZone(Player* player, uint32 newZone, uint32 newArea);

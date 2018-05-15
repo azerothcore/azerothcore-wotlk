@@ -76,6 +76,9 @@
 #include "AsyncAuctionListing.h"
 #include "SavingSystem.h"
 #include <VMapManager2.h>
+#ifdef ELUNA
+#include "LuaEngine.h"
+#endif
 
 // playerbot mod
 #include "../../modules/bot/playerbot/playerbot.h"
@@ -1298,6 +1301,16 @@ void World::SetInitialWorldSettings()
         vmmgr2->GetLiquidFlagsPtr = &GetLiquidFlags;
     }
 
+#ifdef ELUNA
+    ///- Initialize Lua Engine
+    TC_LOG_INFO("server.loading", "Initialize Eluna Lua Engine...");
+    std::string cfg_file = "mod_LuaEngine.conf";
+    std::string cfg_def_file = cfg_file + ".dist";
+    sConfigMgr->LoadMore(cfg_def_file.c_str());
+    sConfigMgr->LoadMore(cfg_file.c_str());
+    Eluna::Initialize();
+#endif
+
     ///- Initialize config settings
     LoadConfigSettings();
 
@@ -1895,6 +1908,13 @@ void World::SetInitialWorldSettings()
 	//auctionbot.Init();
 	sPlayerbotAIConfig.Initialize();
 
+#ifdef ELUNA
+    ///- Run eluna scripts.
+    // in multithread foreach: run scripts
+    sEluna->RunScripts();
+    sEluna->OnConfigLoad(false,false); // Must be done after Eluna is initialized and scripts have run.
+#endif
+    
     uint32 startupDuration = GetMSTimeDiffToNow(startupBegin);
     sLog->outString();
     sLog->outError("WORLD: World initialized in %u minutes %u seconds", (startupDuration / 60000), ((startupDuration % 60000) / 1000));

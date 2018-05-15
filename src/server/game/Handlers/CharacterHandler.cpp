@@ -38,6 +38,9 @@
 #include "WorldPacket.h"
 #include "WorldSession.h"
 #include "Transport.h"
+#ifdef ELUNA
+#include "LuaEngine.h"
+#endif
 
  // Playerbot mod:
 #include "../../modules/bot/playerbot/playerbot.h"
