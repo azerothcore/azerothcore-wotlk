@@ -1,3 +1,19 @@
+-- DB update 2018_05_13_01 -> 2018_05_16_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2018_05_13_01';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2018_05_13_01 2018_05_16_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1526486038703940708'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO version_db_world (`sql_rev`) VALUES ('1526486038703940708');
 
 -- Add missing waypoints on patrolling mobs before the Ogre boss
@@ -13,3 +29,12 @@ INSERT INTO waypoint_data (id, point, position_x, position_y, position_z, orient
 (793730, 9, -172.693, -407.324, 56.4777, 0, 0, 0, 0, 100, 214533),
 (793730, 10, -169.554, -402.835, 57.1019, 0, 0, 0, 0, 100, 214534);
 
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
