@@ -3018,4 +3018,109 @@ PlayerDump.DisallowPaths = 1
 PlayerDump.DisallowOverwrite = 1
 
 #
+#     DisconnectToleranceInterval
+#        Description: Allows to skip queue after being disconnected for a given number of seconds.
+#        Default:     0
+
+DisconnectToleranceInterval = 0
+
+#
+#     MonsterSight
+#        Description: The maximum distance in yards that a "monster" creature can see
+#                     regardless of level difference (through CreatureAI::IsVisible).
+#                     Increases CONFIG_SIGHT_MONSTER to 50 yards. Used to be 20 yards.
+#        Default:     50.000000
+
+MonsterSight = 50.000000
+
+#
+#    StrictChannelNames
+#        Description: Limit channel names to language specific symbol set.
+#                     Prevents charter creation if not allowed symbols are used.
+#        Default:     0 - (Disable, Limited server timezone dependent client check)
+#                     1 - (Enabled, Strictly basic Latin characters)
+#                     2 - (Enabled, Strictly realm zone specific, See RealmZone setting,
+#                         Note: Client needs to have the appropriate fonts installed which support
+#                         the charset. For non-official localization, custom fonts need to be
+#                         placed in clientdir/Fonts.
+#                     3 - (Enabled, Basic Latin characters + server timezone specific)
+
+StrictChannelNames = 0
+
+#
+#	Instance.SharedNormalHeroicId
+#		Description: 	No description
+#		Default:		0 - Disable
+#						1 - Enable
+#
+
+Instance.SharedNormalHeroicId = 0
+
+#
+#     Instance.ResetTimeRelativeTimestamp
+#        Description: Needed for displaying valid instance reset times in ingame calendar.
+#                     This timestamp should be set to a date in the past (midnight) on which
+#                     both 3-day and 7-day raids were reset.
+#        Default:     1135814400 - (Thu, 29 Dec 2005 00:00:00 GMT - meaning that 7-day raid reset falls on Thursdays,
+#                                   while 3-day reset falls on "Thu 29 Dec 2005", "Sun 01 Jan 2006", "Wed 04 Jan 2006", and so on)
+
+Instance.ResetTimeRelativeTimestamp = 1135814400
+
+#
+#	TeleportTimeoutNear
+#		Description: 	No description
+#		Default:		25
+#
+
+TeleportTimeoutNear = 25
+
+#
+#	TeleportTimeoutFar
+#		Description: 	No description
+#		Default:		45
+#
+
+TeleportTimeoutFar = 45
+
+#
+#     MaxAllowedMMRDrop
+#        Description: Some players continuously lose arena matches to lower their MMR and then fight with weaker opponents.
+#                     This setting prevents lowering MMR too much from max achieved MMR.
+#                     Eg. if max achieved MMR for a character was 2400, with default setting (MaxAllowedMMRDrop = 500) the character can't get below 1900 MMR no matter what.
+#        Default:     500
+
+MaxAllowedMMRDrop = 500
+
+#
+#     EnableLoginAfterDC
+#        Description: After not logging out properly (clicking Logout and waiting 20 seconds),
+#                     characters stay in game world for a full minute, even if the client connection was closed.
+#                     Such behaviour prevents for example exploiting boss encounters by alt+f4
+#                     and skipping crucial boss abilities, or escaping opponents in PvP.
+#                     This setting is used to allow/disallow players to log back into characters that are left in world.
+#        Default:     1 - (by clicking "Enter World" player will log back into a character that is already in world)
+#                     0 - (by clicking "Enter World" player will get an error message when trying to log into a character
+#                          that is left in world, and has to wait a minute for the character to be removed from world)
+
+EnableLoginAfterDC = 1
+
+#
+#     DontCacheRandomMovementPaths
+#        Description: Random movement paths (calculated using MoveMaps) can be cached to save cpu time, 
+#                     but this may use up considerable amount of memory and can be prevented by setting this option to 1.
+#                     Recommended setting for populated servers is having enough RAM and setting this to 0.
+#        Default:     0 - (cache paths, uses more memory)
+#                     1 - (don't cache, uses more cpu)
+
+DontCacheRandomMovementPaths = 0
+
+#
+#    MoveMaps.Enable
+#        Description: Enable/Disable pathfinding using mmaps - recommended.
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+
+MoveMaps.Enable = 1
+
+#
 ###################################################################################################
