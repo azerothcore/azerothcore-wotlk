@@ -1049,7 +1049,7 @@ void Battleground::EndBattleground(TeamId winnerTeamId)
         SendMessageToAll(winmsg_id, CHAT_MSG_BG_SYSTEM_NEUTRAL);
 
 #ifdef ELUNA
-    sEluna->OnBGEnd(this, GetBgTypeID(), GetInstanceID(), winnerTeamId);
+    sEluna->OnBGEnd(this, GetBgTypeID(), GetInstanceID(), winnerTeamId == TEAM_NEUTRAL ? TEAM_OTHER : (winnerTeamId== TEAM_ALLIANCE ? ALLIANCE: HORDE));
 #endif
 }
 
