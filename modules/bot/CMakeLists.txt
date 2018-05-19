@@ -194,12 +194,3 @@ if( WIN32 )
     )
   endif()
 endif()
-
-install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/playerbot/aiplayerbot.conf.dist" DESTINATION ${CONF_DIR})
-install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/ahbot/ahbot.conf.dist" DESTINATION ${CONF_DIR})
-
-
-# Generate precompiled header
-if (USE_COREPCH)
-  add_cxx_pch(bot ${PRIVATE_PCH_HEADER} ${PRIVATE_PCH_SOURCE})
-endif ()
