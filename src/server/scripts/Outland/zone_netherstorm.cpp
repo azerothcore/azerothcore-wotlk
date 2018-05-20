@@ -1225,6 +1225,8 @@ class adyen_the_lightbringer : public CreatureScript
 
                 if (!me->GetVictim())
                     return;
+                else
+                    Unit * enemy = me->GetVictim();
 
                 while (uint32 eventId = _events.ExecuteEvent())
                 {
