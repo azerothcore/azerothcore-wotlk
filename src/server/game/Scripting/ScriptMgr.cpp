@@ -452,6 +452,11 @@ void ScriptMgr::OnBeforeConfigLoad(bool reload)
     FOREACH_SCRIPT(WorldScript)->OnBeforeConfigLoad(reload);
 }
 
+void ScriptMgr::SetInitialWorldSettingsModule()
+{
+    FOREACH_SCRIPT(WorldScript)->SetInitialWorldSettingsModule();
+}
+
 void ScriptMgr::OnAfterConfigLoad(bool reload)
 {
     FOREACH_SCRIPT(WorldScript)->OnAfterConfigLoad(reload);
