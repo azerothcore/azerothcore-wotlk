@@ -516,8 +516,8 @@ void InstanceSaveManager::_ResetOrWarnAll(uint32 mapid, Difficulty difficulty, b
         SetExtendedResetTimeFor(mapid, difficulty, next_reset + period);
         ScheduleReset(time_t(next_reset-3600), InstResetEvent(1, mapid, difficulty));
 
-        //if diff time < 2 reset cycles. not executed the SQL command.
-        if ((now - resetTime) < (period + diff) * 2)
+        //if diff time < 1.1 reset cycles. not executed the SQL command.
+        if ((now - resetTime) < (period + diff) * 1.1)
         {
             // update it in the DB
             PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GLOBAL_INSTANCE_RESETTIME);
