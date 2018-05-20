@@ -257,4 +257,12 @@ LoginDatabaseInfo = "127.0.0.1;3306;acore;acore;acore_auth"
 LoginDatabase.WorkerThreads = 1
 
 #
+#    LoginDatabase.SynchThreads
+#        Description: The amount of MySQL connections spawned to handle.
+#        Default:     1 - (LoginDatabase.WorkerThreads)
+#
+
+LoginDatabase.SynchThreads = 1
+
+#
 ###################################################################################################
