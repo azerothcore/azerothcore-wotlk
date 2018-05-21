@@ -974,6 +974,9 @@ enum DeathblowToTheLegion
     // Quest ID
     DEATHBLOW_TO_THE_LEGION = 10409,
     SOCRETHAR_TP_STONE      = 29796,
+
+    EXODAR_FACTION          = 1694,
+    EXODAR_ENEMY_FACTION    = 1769
 };
 
 enum RoleplayActions
@@ -1174,7 +1177,7 @@ class adyen_the_lightbringer : public CreatureScript
             return true;
         }
 
-        bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 /*action*/) override
+        bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 /*action*/)
         {
             player->CLOSE_GOSSIP_MENU();
             creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
@@ -1201,6 +1204,8 @@ class adyen_the_lightbringer : public CreatureScript
                 }
             }
 
+            void Reset() { }
+
             void MovementInform(uint32 type, uint32 point)
             {
                 if (type != POINT_MOTION_TYPE)
@@ -1212,21 +1217,19 @@ class adyen_the_lightbringer : public CreatureScript
                     }
             }
 
-            void EnterCombat(Unit * who) override
+            void EnterCombat(Unit * who)
             {
 				AttackStart(who);
                 _events.ScheduleEvent(EVENT_CRUSADER_STRIKE, 3000);
                 _events.ScheduleEvent(EVENT_HAMMER_OF_JUSTICE, 6000);
             }
 
-            void UpdateAI(uint32 diff) override
+            void UpdateAI(uint32 diff)
             {
                 _events.Update(diff);   
 
                 if (!me->GetVictim())
                     return;
-                else
-                    Unit * enemy = me->GetVictim();
 
                 while (uint32 eventId = _events.ExecuteEvent())
                 {
@@ -1284,11 +1287,6 @@ class anchorite_karja : public CreatureScript
     public:
         anchorite_karja() : CreatureScript("anchorite_karja") { }
 
-        CreatureAI* GetAI(Creature* creature) const
-        {
-            return new anchorite_karjaAI(creature);
-        }
-
         struct anchorite_karjaAI : public ScriptedAI
         {
             anchorite_karjaAI(Creature* creature) : ScriptedAI(creature) { }
@@ -1330,24 +1328,24 @@ class anchorite_karja : public CreatureScript
                 {
                     case EVENT_SPELL_HOLY_SMITE:
                         me->CastSpell(me->GetVictim(), HOLY_SMITE_KARJA, true);
-                        _events.RepeatEvent(2500);
+                        _events.ScheduleEvent(EVENT_SPELL_HOLY_SMITE, 2500);
                         break;
                 }
 
                 DoMeleeAttackIfReady();
             }
         };
+
+        CreatureAI* GetAI(Creature* creature) const
+        {
+            return new anchorite_karjaAI(creature);
+        }
 };
 
 class exarch_orelis : public CreatureScript
 {
     public:
         exarch_orelis() : CreatureScript("exarch_orelis") { }
-
-        CreatureAI* GetAI(Creature* creature) const
-        {
-            return new exarch_orelisAI(creature);
-        }
 
         struct exarch_orelisAI : public ScriptedAI
         {
@@ -1370,8 +1368,9 @@ class exarch_orelis : public CreatureScript
                         me->SetHomePosition(me->GetPosition());
             }
 
-            void EnterCombat(Unit* /*who*/)
+            void EnterCombat(Unit* who)
             {
+                AttackStart(who);
                 _events.ScheduleEvent(EVENT_SPELL_DEMORALIZING_SHOUT, 1000);
                 _events.ScheduleEvent(EVENT_SPELL_HEROIC_STRIKE, urand(2500, 4000));
                 _events.ScheduleEvent(EVENT_SPELL_REND, urand(1500, 6000));
@@ -1387,43 +1386,41 @@ class exarch_orelis : public CreatureScript
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
 
-                Unit* target = me->GetVictim();
-
-                switch (_events.ExecuteEvent())
+                switch (uint32 eventId = _events.ExecuteEvent())
                 {
                     case EVENT_SPELL_DEMORALIZING_SHOUT:
-                        if (me->FindNearestCreature(target->GetGUID(), 10.0f, true))
+                        if (me->FindNearestCreature(me->GetVictim()->GetGUID(), 10.0f, true))
                         {
                             me->CastSpell(me->GetVictim(), DEMORALIZING_SHOUT, true);
-                            _events.RepeatEvent(15000);
+                            _events.ScheduleEvent(EVENT_SPELL_DEMORALIZING_SHOUT, urand(10000, 12000));
                         }
                         else
-                            _events.RepeatEvent(1000);
+                            _events.ScheduleEvent(EVENT_SPELL_DEMORALIZING_SHOUT, 1000);
                         break;
                     case EVENT_SPELL_HEROIC_STRIKE:
-                        me->CastSpell(target, HEROIC_STRIKE, true);
-                        _events.RepeatEvent(urand(3000, 4500));
+                        me->CastSpell(me->GetVictim(), HEROIC_STRIKE, true);
+                        _events.ScheduleEvent(EVENT_SPELL_HEROIC_STRIKE, urand(3000, 4000));
                         break;
                     case EVENT_SPELL_REND:
-                        me->CastSpell(target, REND, true);
-                        _events.RepeatEvent(urand(8000, 12000));
+                        me->CastSpell(me->GetVictim(), REND, true);
+                        _events.ScheduleEvent(EVENT_SPELL_REND, urand(5000, 8000));
                         break;
                 }
 
                 DoMeleeAttackIfReady();
             }
         };
+
+        CreatureAI* GetAI(Creature* creature) const
+        {
+            return new exarch_orelisAI(creature);
+        }
 };
 
 class socrethar : public CreatureScript
 {
     public:
         socrethar() : CreatureScript("socrethar") { }
-
-        CreatureAI* GetAI(Creature* creature) const
-        {
-            return new socretharAI(creature);
-        }
 
         struct socretharAI : public ScriptedAI
         {
@@ -1505,8 +1502,9 @@ class socrethar : public CreatureScript
                 ishanah->SetFlag(UNIT_FIELD_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
             }
 
-            void EnterCombat(Unit* /*who*/)
+            void EnterCombat(Unit* who) 
             {
+                AttackStart(who);
                 combatEvents.ScheduleEvent(EVENT_SPELL_ANTI_MAGIC_SHIELD, 9000);
                 combatEvents.ScheduleEvent(EVENT_SPELL_BACKLASH, 4000);
                 combatEvents.ScheduleEvent(EVENT_SPELL_CLEAVE, 2000);
@@ -1516,7 +1514,7 @@ class socrethar : public CreatureScript
 
             void JustSummoned(Creature* cr) { _summons.Summon(cr); }
 
-            void UpdateAI(uint32 diff)
+            void UpdateAI(uint32 diff) 
             {
                 if (DeathblowToTheLegionRunning)
                 {
@@ -1579,33 +1577,27 @@ class socrethar : public CreatureScript
                         case EVENT_FIGHT_ALDOR:
                             GetCreature(EXARCH_ORELIS); // define orelis pointer
                             GetCreature(ANCHORITE_KARJA); // define karja pointer
-                            kaylaan->setFaction(1769);
-                            kaylaan->AddThreat(adyen, 100.0f);
+                            kaylaan->setFaction(EXODAR_ENEMY_FACTION);
+                            /*kaylaan->AddThreat(adyen, 100.0f);
                             kaylaan->AddThreat(orelis, 90.0f);
-                            kaylaan->AddThreat(karja, 100.0f);
-                            orelis->setFaction(1770);
-                            adyen->setFaction(1770);
-                            adyen->AI()->EnterCombat(kaylaan);
+                            kaylaan->AddThreat(karja, 100.0f);*/
+                            /*adyen->AI()->EnterCombat(kaylaan);
                             orelis->AI()->EnterCombat(kaylaan);
-                            karja->setFaction(1770);
-                            karja->AI()->EnterCombat(kaylaan);
+                            karja->AI()->EnterCombat(kaylaan);*/
                             kaylaan->AI()->EnterCombat(adyen);
                             adyen->AI()->DoAction(EVENT_SHEDULE_EVENTS);
                             break;
                         case EVENT_END_ALDOR_FIGHT:
                             kaylaan->setFaction(1743);
                             kaylaan->GetMotionMaster()->MoveTargetedHome();
-                            orelis->setFaction(1743);
-                            adyen->setFaction(1743);
-                            karja->setFaction(1743);
-                            kaylaan->CombatStop();
-                            kaylaan->ClearInCombat();
+                            /*kaylaan->CombatStop();
+                            kaylaan->ClearInCombat();*/
                             adyen->GetMotionMaster()->MoveTargetedHome();
                             orelis->GetMotionMaster()->MoveTargetedHome();
-                            orelis->CombatStop();
+                            /*orelis->CombatStop();
                             orelis->ClearInCombat();
                             karja->CombatStop();
-                            karja->ClearInCombat();
+                            karja->ClearInCombat();*/
                             _actionEvents.ScheduleEvent(EVENT_SOCRETHAR_SAY_4, 2000);
                             break;
                         case EVENT_SOCRETHAR_SAY_4:
@@ -1675,10 +1667,8 @@ class socrethar : public CreatureScript
                             _actionEvents.ScheduleEvent(EVENT_FINAL_FIGHT, 3000);
                             break;
                         case EVENT_FINAL_FIGHT:
-                            me->setFaction(1769); // before fight faction 1786 in case i break him
-                            ishanah->setFaction(1770);
-                            adyen->setFaction(1770);
-                            orelis->setFaction(1770);
+                            me->setFaction(EXODAR_ENEMY_FACTION); // before fight faction 1786 in case i break him
+                            ishanah->setFaction(EXODAR_FACTION);
                             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE);
                             me->SetReactState(REACT_AGGRESSIVE);
                             adyen->AI()->EnterCombat(me);
@@ -1697,7 +1687,7 @@ class socrethar : public CreatureScript
 
                 combatEvents.Update(diff);
                 
-                switch (combatEvents.ExecuteEvent())
+                switch (uint32 combatEventId = combatEvents.ExecuteEvent())
                 {
                     case EVENT_SPELL_NETHER_PROTECTION:
                         if (!me->HasAura(NETHER_PROTECTION))
@@ -1725,6 +1715,11 @@ class socrethar : public CreatureScript
             }
 
         };
+
+        CreatureAI* GetAI(Creature* creature) const
+        {
+            return new socretharAI(creature);
+        }
 };
 
 
@@ -1732,11 +1727,6 @@ class kaylaan_the_lost : public CreatureScript
 {
     public:
         kaylaan_the_lost() : CreatureScript("kaylaan_the_lost") { }
-
-        CreatureAI* GetAI(Creature* creature) const
-        {
-            return new kaylaan_the_lostAI(creature);
-        }
 
         struct kaylaan_the_lostAI : public ScriptedAI
         {
@@ -1746,13 +1736,14 @@ class kaylaan_the_lost : public CreatureScript
             bool first_waypath_done = false;
             bool second_waypath_done = false;
 
-            void EnterCombat(Unit* /*who*/)
+            void EnterCombat(Unit* who) override
             {
+                AttackStart(who);
                 _events.ScheduleEvent(EVENT_SPELL_BURNING_LIGHT, 2000);
                 _events.ScheduleEvent(EVENT_SPELL_CONSECRATION, 3000);
             }
 
-            void DoAction(int32 param)
+            void DoAction(int32 param) override
             {
                 switch (param)
                 {
@@ -1762,7 +1753,7 @@ class kaylaan_the_lost : public CreatureScript
                 }
             }
 
-            void MovementInform(uint32 type, uint32 point)
+            void MovementInform(uint32 type, uint32 point) override
             {
                 if (type != POINT_MOTION_TYPE)
                 {
@@ -1795,7 +1786,7 @@ class kaylaan_the_lost : public CreatureScript
                 }
             }
 
-            void UpdateAI(uint32 diff)
+            void UpdateAI(uint32 diff) override
             {
                 _events.Update(diff);
 
@@ -1805,20 +1796,18 @@ class kaylaan_the_lost : public CreatureScript
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
 
-                Unit* target = me->GetVictim();
-
                 if (me->GetHealthPct() <= 30)
                     if (Creature* socrethar = me->FindNearestCreature(SOCRETHAR, 200.0f, true))
                         socrethar->AI()->DoAction(EVENT_END_ALDOR_FIGHT);
 
-                switch (_events.ExecuteEvent())
+                switch (uint32 eventId = _events.ExecuteEvent())
                 {
                     case EVENT_SPELL_BURNING_LIGHT:
-                        me->CastSpell(target, BURNING_LIGHT, false);
+                        me->CastSpell(me->GetVictim(), BURNING_LIGHT, false);
                         _events.ScheduleEvent(EVENT_SPELL_BURNING_LIGHT, 4000);
                         break;
                     case EVENT_SPELL_CONSECRATION:
-                        if (me->FindNearestCreature(target->GetGUID(), 10.0f, true))
+                        if (me->FindNearestCreature(me->GetVictim()->GetGUID(), 10.0f, true))
                             me->CastSpell(me, CONSECRATION, false);
                         _events.ScheduleEvent(EVENT_SPELL_CONSECRATION, 14000);
                         break;
@@ -1827,6 +1816,11 @@ class kaylaan_the_lost : public CreatureScript
                 DoMeleeAttackIfReady();
             }
         };
+
+        CreatureAI* GetAI(Creature* creature) const
+        {
+            return new kaylaan_the_lostAI(creature);
+        }
 };
 
 void AddSC_netherstorm()

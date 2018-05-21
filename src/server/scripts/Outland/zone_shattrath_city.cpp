@@ -441,101 +441,101 @@ enum Ishanah
 
 class npc_ishanah : public CreatureScript
 {
-public:
-    npc_ishanah() : CreatureScript("npc_ishanah") { }
+	public:
+		npc_ishanah() : CreatureScript("npc_ishanah") { }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action)
-    {
-        player->PlayerTalkClass->ClearMenus();
-        if (action == GOSSIP_ACTION_INFO_DEF+1)
-            player->SEND_GOSSIP_MENU(9458, creature->GetGUID());
-        else if (action == GOSSIP_ACTION_INFO_DEF+2)
-            player->SEND_GOSSIP_MENU(9459, creature->GetGUID());
-
-        return true;
-    }
-
-    bool OnGossipHello(Player* player, Creature* creature)
-    {
-        if (creature->IsQuestGiver())
-            player->PrepareQuestMenu(creature->GetGUID());
-
-        player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, ISANAH_GOSSIP_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
-        player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, ISANAH_GOSSIP_2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+2);
-
-        player->SEND_GOSSIP_MENU(player->GetGossipTextId(creature), creature->GetGUID());
-
-        return true;
-    }
-
-	CreatureAI* GetAI(Creature* creature) const
-	{
-		return new ishanahAI(creature);
-	}
-
-	struct ishanahAI : public ScriptedAI
-	{
-		ishanahAI(Creature* creature) : ScriptedAI(creature) { }
-
-		EventMap _events;
-
-		void DoAction(int32 param)
+		bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action)
 		{
-			switch (param)
-			{
-				case EVENT_SOCRETHAR_DEAD:
-					me->SetFlag(UNIT_FIELD_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-					break;
-			}
+			player->PlayerTalkClass->ClearMenus();
+			if (action == GOSSIP_ACTION_INFO_DEF+1)
+				player->SEND_GOSSIP_MENU(9458, creature->GetGUID());
+			else if (action == GOSSIP_ACTION_INFO_DEF+2)
+				player->SEND_GOSSIP_MENU(9459, creature->GetGUID());
+
+			return true;
 		}
 
-		void EnterCombat(Unit* who)
+		bool OnGossipHello(Player* player, Creature* creature)
 		{
-			AttackStart(who);
-			_events.ScheduleEvent(EVENT_SPELL_ISHANAH_HOLY_SMITE, 1000);
+			if (creature->IsQuestGiver())
+				player->PrepareQuestMenu(creature->GetGUID());
+
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, ISANAH_GOSSIP_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, ISANAH_GOSSIP_2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+2);
+
+			player->SEND_GOSSIP_MENU(player->GetGossipTextId(creature), creature->GetGUID());
+
+			return true;
 		}
 
-		void MovementInform(uint32 type, uint32 point)
+		struct ishanahAI : public ScriptedAI
 		{
-			if (type != POINT_MOTION_TYPE)
+			ishanahAI(Creature* creature) : ScriptedAI(creature) { }
+
+			EventMap _events;
+
+			void DoAction(int32 param)
 			{
-				if (point == 2)
+				switch (param)
 				{
-					if (Creature* kaylaan = me->FindNearestCreature(KAYLAAN_THE_LOST, 30.0f, true))
+					case EVENT_SOCRETHAR_DEAD:
+						me->SetFlag(UNIT_FIELD_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+						break;
+				}
+			}
+
+			void EnterCombat(Unit* who) override
+			{
+				AttackStart(who);
+				_events.ScheduleEvent(EVENT_SPELL_ISHANAH_HOLY_SMITE, 1000);
+			}
+
+			void MovementInform(uint32 type, uint32 point)
+			{
+				if (type != POINT_MOTION_TYPE)
+				{
+					if (point == 2)
 					{
-						kaylaan->AI()->Talk(5); /* Teacher... */
-						kaylaan->SetOrientation(me->GetPositionX());
-						if (Creature* socrethar = me->FindNearestCreature(SOCRETHAR, 30.0f, true))
+						if (Creature* kaylaan = me->FindNearestCreature(KAYLAAN_THE_LOST, 30.0f, true))
 						{
-							socrethar->AI()->DoAction(EVENT_ISHANAH_SAY_1);
-							socrethar->SetOrientation(me->GetPositionX());
+							kaylaan->AI()->Talk(5); /* Teacher... */
+							kaylaan->SetOrientation(me->GetPositionX());
+							if (Creature* socrethar = me->FindNearestCreature(SOCRETHAR, 30.0f, true))
+							{
+								socrethar->AI()->DoAction(EVENT_ISHANAH_SAY_1);
+								socrethar->SetOrientation(me->GetPositionX());
+							}
 						}
 					}
 				}
 			}
-		}
 
-		void UpdateAI(uint32 diff) override
-		{
-			_events.Update(diff);
-
-			if (!me->GetVictim())
-				return;
-
-			if (me->HasUnitState(UNIT_STATE_CASTING))
-				return;
-
-			switch (_events.ExecuteEvent())
+			void UpdateAI(uint32 diff) override
 			{
-			case EVENT_SPELL_ISHANAH_HOLY_SMITE:
-				me->CastSpell(me->GetVictim(), HOLY_SMITE_ISHANAH, false);
-				_events.RepeatEvent(2500);
-				break;
-			}
+				_events.Update(diff);
 
-			DoMeleeAttackIfReady();
+				if (!me->GetVictim())
+					return;
+
+				if (me->HasUnitState(UNIT_STATE_CASTING))
+					return;
+
+				switch (uint32 eventId = _events.ExecuteEvent())
+				{
+				case EVENT_SPELL_ISHANAH_HOLY_SMITE:
+					me->CastSpell(me->GetVictim(), HOLY_SMITE_ISHANAH, false);
+					_events.ScheduleEvent(EVENT_SPELL_ISHANAH_HOLY_SMITE, 2500);
+					break;
+				}
+
+				DoMeleeAttackIfReady();
+			}
+		};
+
+		CreatureAI* GetAI(Creature* creature) const
+		{
+			return new ishanahAI(creature);
 		}
-	};
 };
 
 void AddSC_shattrath_city()
