@@ -29,7 +29,27 @@ enum Spells
     SPELL_INFORM_DEAD_KNIGHT        = 27931,
     SPELL_INFORM_DEAD_RIDER         = 27937,
 
-    SPELL_SHADOW_MARK               = 27825
+    // TRAINEES
+    SPELL_DEATH_PLAGUE              = 55604,    // LIVING TRAINEE
+    SPELL_ARCANE_EXPLOSION          = 27989,    // DEAD TRAINEE (20y)
+
+    // KNIGHT
+    SPELL_SHADOW_MARK               = 27825,    // LIVING KNIGHT
+    SPELL_WHIRLWIND                 = 56408,    // DEAD KNIGHT
+
+    // RIDER
+    SPELL_BLOOD_PRESENCE            = 55212,    // LIVING RIDER
+    SPELL_DEATH_COIL                = 55209,    // LIVING RIDER
+    SPELL_HASTE_AURA                = 13589,    // LIVING RIDER
+    SPELL_HYSTERIA                  = 55213,    // LIVING RIDER
+    SPELL_INTIMIDATING_SHOUT        = 5246,     // LIVING RIDER
+    SPELL_VEIL_OF_DARKNESS          = 28350,    // LIVING RIDER
+    SPELL_DRAIN_LIFE                = 27994,    // DEAD RIDER
+    SPELL_UNHOLY_AURA               = 55606,    // DEAD RIDER
+    SPELL_UNHOLY_FRENZY             = 55648,    // DEAD RIDER
+
+    // HORSE
+    SPELL_STOMP                     = 27993     // DEAD HORSE
 };
 
 enum Misc
@@ -53,6 +73,28 @@ enum Events
     EVENT_TELEPORT                  = 4,
     EVENT_CHECK_HEALTH              = 5,
     EVENT_CHECK_PLAYERS             = 6,
+
+    // TRAINEES
+    EVENT_SPELL_DEATH_PLAGUE        = 7,
+    EVENT_SPELL_ARCANE_EXPLOSION    = 8,
+
+    // KNIGHT
+    EVENT_SPELL_SHADOW_MARK         = 9,
+    EVENT_SPELL_WHIRLWIND           = 10,
+
+    // RIDER
+    EVENT_SPELL_BLOOD_PRESENCE      = 11,
+    EVENT_SPELL_DEATH_COIL          = 12,
+    EVENT_SPELL_HASTE_AURA          = 13,
+    EVENT_SPELL_HYSTERIA            = 14,
+    EVENT_SPELL_INTIMIDATING_SHOUT  = 15,
+    EVENT_SPELL_VEIL_OF_DARKNESS    = 16,
+    EVENT_SPELL_DRAIN_LIFE          = 17,
+    EVENT_SPELL_UNHOLY_AURA         = 18,
+    EVENT_SPELL_UNHOLY_FRENZY       = 19,
+
+    // HORSE
+    EVENT_SPELL_STOMP               = 20
 };
 
 const uint32 gothikWaves[24][2] =
@@ -438,7 +480,42 @@ public:
         bool CanAIAttack(Unit const* target) const { return gateOpened || IsOnSameSide(target); }
 
         void Reset() { events.Reset(); }
-        void EnterCombat(Unit*  /*who*/) { me->SetInCombatWithZone(); }
+        void EnterCombat(Unit*  /*who*/)
+        {
+            me->SetInCombatWithZone();
+
+            switch (me->GetEntry())
+            {
+                case NPC_LIVING_TRAINEE:
+                    events.ScheduleEvent(EVENT_SPELL_DEATH_PLAGUE, 2000);
+                    break;
+                case NPC_DEAD_TRAINEE:
+                    events.ScheduleEvent(EVENT_SPELL_ARCANE_EXPLOSION, 2000);
+                    break;
+                case NPC_LIVING_KNIGHT:
+                    events.ScheduleEvent(EVENT_SPELL_SHADOW_MARK, 2000);
+                    break;
+                case NPC_DEAD_KNIGHT:
+                    events.ScheduleEvent(EVENT_SPELL_WHIRLWIND, 2000);
+                    break;
+                case NPC_LIVING_RIDER:
+                    events.ScheduleEvent(EVENT_SPELL_BLOOD_PRESENCE, 1);
+                    events.ScheduleEvent(EVENT_SPELL_DEATH_COIL, 3000);
+                    events.ScheduleEvent(EVENT_SPELL_HYSTERIA, 10000);
+                    events.ScheduleEvent(EVENT_SPELL_HASTE_AURA, 1000);
+                    events.ScheduleEvent(EVENT_SPELL_INTIMIDATING_SHOUT, urand(4000, 9000));
+                    events.ScheduleEvent(EVENT_SPELL_VEIL_OF_DARKNESS, urand(5000,7000));
+                    break;
+                case NPC_DEAD_RIDER:
+                    events.ScheduleEvent(EVENT_SPELL_DRAIN_LIFE, urand(2000, 3500));
+                    events.ScheduleEvent(EVENT_SPELL_UNHOLY_AURA, 1);
+                    events.ScheduleEvent(EVENT_SPELL_UNHOLY_FRENZY, urand(5000, 9000));
+                    break;
+                case NPC_DEAD_HORSE:
+                    events.ScheduleEvent(EVENT_SPELL_STOMP, urand(2000, 5000));
+                    break;
+            }
+        }
         void DamageTaken(Unit* attacker, uint32 &damage, DamageEffectType, SpellSchoolMask)
         {
             if (!attacker || (!gateOpened && !IsOnSameSide(attacker)))
@@ -471,6 +548,89 @@ public:
         {
             if (who->GetTypeId() == TYPEID_PLAYER && me->GetInstanceScript())
                 me->GetInstanceScript()->SetData(DATA_IMMORTAL_FAIL, 0);
+        }
+
+        void UpdateAI(uint32 diff)
+        {
+            events.Update(diff);
+
+            if (me->GetUnitState() == UNIT_STATE_CASTING)
+                return;
+
+            switch (events.GetEvent())
+            {
+                case EVENT_SPELL_DEATH_PLAGUE:
+                    me->CastSpell(me->GetVictim(), SPELL_DEATH_PLAGUE, false);
+                    events.RepeatEvent(urand(15000,20000));
+                    break;
+                case EVENT_SPELL_ARCANE_EXPLOSION:
+                    if (Unit* victim = me->GetVictim())
+                        if (victim->IsWithinDist(me, 20))
+                            me->CastSpell(victim, SPELL_ARCANE_EXPLOSION, false);
+                    events.RepeatEvent(urand(5000, 10000));
+                    break;
+                case EVENT_SPELL_SHADOW_MARK:
+                    if (Unit* victim = me->GetVictim())
+                        if (!victim->HasAura(SPELL_SHADOW_MARK))
+                            me->CastSpell(me->GetVictim(), SPELL_SHADOW_MARK, false);
+                    events.RepeatEvent(urand(15000, 20000));
+                    break;
+                case EVENT_SPELL_WHIRLWIND:
+                    if (Unit* victim = me->GetVictim())
+                        if (victim->IsWithinDist(me, 10))
+                            me->CastSpell(victim, SPELL_WHIRLWIND, false);
+                    events.RepeatEvent(urand(5000, 8000));
+                    break;
+                case EVENT_SPELL_BLOOD_PRESENCE:
+                    if (!me->HasAura(SPELL_BLOOD_PRESENCE))
+                        me->CastSpell(me, SPELL_BLOOD_PRESENCE, false);
+                    break;
+                case EVENT_SPELL_HASTE_AURA:
+                    if (!me->HasAura(SPELL_HASTE_AURA))
+                        me->CastSpell(me, SPELL_HASTE_AURA, false);
+                    break;
+                case EVENT_SPELL_DEATH_COIL:
+                    me->CastSpell(me->GetVictim(), SPELL_DEATH_COIL, false);
+                    events.RepeatEvent(urand(5000, 9000));
+                    break;
+                case EVENT_SPELL_HYSTERIA:
+                    if (!me->HasAura(SPELL_HYSTERIA))
+                        me->CastSpell(me, SPELL_HYSTERIA, false);
+                    events.RepeatEvent(urand(15000, 20000));
+                    break;
+                case EVENT_SPELL_INTIMIDATING_SHOUT:
+                    if (Unit* victim = me->GetVictim())
+                        if (victim->IsWithinDist(me, 10))
+                            me->CastSpell(victim, SPELL_INTIMIDATING_SHOUT, false);
+                    events.RepeatEvent(urand(14000, 22000));
+                    break;
+                case EVENT_SPELL_VEIL_OF_DARKNESS:
+                    me->CastSpell(me->GetVictim(), SPELL_VEIL_OF_DARKNESS, false);
+                    events.RepeatEvent(urand(13000, 19000));
+                    break;
+                case EVENT_SPELL_DRAIN_LIFE:
+                    me->CastSpell(me->GetVictim(), SPELL_DRAIN_LIFE, false);
+                    events.RepeatEvent(urand(6000, 15000));
+                    break;
+                case EVENT_SPELL_UNHOLY_AURA:
+                    if (!me->HasAura(SPELL_UNHOLY_AURA))
+                        me->CastSpell(me, SPELL_UNHOLY_AURA, false);
+                    events.RepeatEvent(urand(2000, 5000));
+                    break;
+                case EVENT_SPELL_UNHOLY_FRENZY:
+                    if (!me->HasAura(SPELL_UNHOLY_FRENZY))
+                        me->CastSpell(me, SPELL_UNHOLY_FRENZY, false);
+                    events.RepeatEvent(urand(2000, 5000));
+                    break;
+                case NPC_DEAD_HORSE:
+                    me->CastSpell(me->GetVictim(), SPELL_STOMP, false);
+                    events.RepeatEvent(urand(4000, 9000));
+                    break;
+                default:
+                    break;
+            }
+
+			DoMeleeAttackIfReady();
         }
     };
 
