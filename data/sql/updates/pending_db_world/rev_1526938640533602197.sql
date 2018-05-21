@@ -1,6 +1,6 @@
 INSERT INTO version_db_world (`sql_rev`) VALUES ('1526938640533602197');
 
-UPDATE `smart_scripts` SET `event_param1` = 2, `event_param2` = 30, `comment` = 'Scarlet Captain - Within 5-30 Range - Shoot' WHERE `entryorguid` = 28611 AND `id` = 0;
+UPDATE `smart_scripts` SET `event_param1` = 2, `event_param2` = 30, `comment` = 'Scarlet Captain - Within 2-30 Range - Shoot' WHERE `entryorguid` = 28611 AND `id` = 0;
 
 DELETE FROM `smart_scripts` where `entryorguid` = 28611 and `id` = 4;
 INSERT INTO `smart_scripts`
