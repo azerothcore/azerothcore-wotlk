@@ -53,6 +53,11 @@
 #include "DynamicVisibility.h"
 #include "AccountMgr.h"
 
+#ifdef ELUNA
+#include "LuaEngine.h"
+#include "ElunaEventMgr.h"
+#endif
+
 #include <math.h>
 
 float baseMoveSpeed[MAX_MOVE_TYPE] =
@@ -335,6 +340,9 @@ Unit::~Unit()
 
 void Unit::Update(uint32 p_time)
 {
+#ifdef ELUNA
+    elunaEvents->Update(p_time);
+#endif
     // WARNING! Order of execution here is important, do not change.
     // Spells must be processed with event system BEFORE they go to _UpdateSpells.
     // Or else we may have some SPELL_STATE_FINISHED spells stalled in pointers, that is bad.
@@ -12552,6 +12560,10 @@ void Unit::SetInCombatState(bool PvP, Unit* enemy, uint32 duration)
 
         controlled->SetInCombatState(PvP, enemy);
     }
+#ifdef ELUNA
+    if (Player* player = this->ToPlayer())
+        sEluna->OnPlayerEnterCombat(player, enemy);
+#endif
 }
 
 void Unit::ClearInCombat()
@@ -12580,6 +12592,10 @@ void Unit::ClearInCombat()
             for (uint8 i = 0; i < MAX_RUNES; ++i)
                 player->SetGracePeriod(i, 0);
     }
+#ifdef ELUNA
+    if (Player* player = this->ToPlayer())
+        sEluna->OnPlayerLeaveCombat(player);
+#endif
 }
 
 void Unit::ClearInPetCombat()

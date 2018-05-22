@@ -27,6 +27,9 @@
 #include "LFGMgr.h"
 #include "Chat.h"
 #include "AvgDiffTracker.h"
+#ifdef ELUNA
+#include "LuaEngine.h"
+#endif
 
 MapManager::MapManager()
 {
@@ -42,6 +45,7 @@ MapManager::~MapManager()
 void MapManager::Initialize()
 {
     int num_threads(sWorld->getIntConfig(CONFIG_NUMTHREADS));
+
     // Start mtmaps if needed.
     if (num_threads > 0 && m_updater.activate(num_threads) == -1)
         abort();
