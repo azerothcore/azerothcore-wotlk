@@ -76,6 +76,9 @@
 #include "AsyncAuctionListing.h"
 #include "SavingSystem.h"
 #include <VMapManager2.h>
+#ifdef ELUNA
+#include "LuaEngine.h"
+#endif
 
 ACE_Atomic_Op<ACE_Thread_Mutex, bool> World::m_stopEvent = false;
 uint8 World::m_ExitCode = SHUTDOWN_EXIT_CODE;
@@ -1283,6 +1286,21 @@ void World::SetInitialWorldSettings()
         vmmgr2->GetLiquidFlagsPtr = &GetLiquidFlags;
     }
 
+#ifdef ELUNA
+    ///- Initialize Lua Engine
+    sLog->outString("Initialize Eluna Lua Engine...");
+
+    std::string conf_path = _CONF_DIR;
+    std::string cfg_file = conf_path + "/mod_LuaEngine.conf";
+#ifdef WIN32
+    cfg_file = "mod_LuaEngine.conf";
+#endif
+    std::string cfg_def_file = cfg_file + ".dist";
+    sConfigMgr->LoadMore(cfg_def_file.c_str());
+    sConfigMgr->LoadMore(cfg_file.c_str());
+    Eluna::Initialize();
+#endif
+
     ///- Initialize config settings
     LoadConfigSettings();
 
@@ -1868,6 +1886,13 @@ void World::SetInitialWorldSettings()
     mgr = ChannelMgr::forTeam(TEAM_HORDE);
     mgr->LoadChannels();
 
+#ifdef ELUNA
+    ///- Run eluna scripts.
+    // in multithread foreach: run scripts
+    sEluna->RunScripts();
+    sEluna->OnConfigLoad(false,false); // Must be done after Eluna is initialized and scripts have run.
+#endif
+    
     uint32 startupDuration = GetMSTimeDiffToNow(startupBegin);
     sLog->outString();
     sLog->outError("WORLD: World initialized in %u minutes %u seconds", (startupDuration / 60000), ((startupDuration % 60000) / 1000));

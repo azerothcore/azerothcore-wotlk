@@ -24,6 +24,9 @@
 #include "VMapFactory.h"
 #include "LFGMgr.h"
 #include "Chat.h"
+#ifdef ELUNA
+#include "LuaEngine.h"
+#endif
 
 union u_map_magic
 {
@@ -2695,18 +2698,35 @@ void InstanceMap::CreateInstanceScript(bool load, std::string data, uint32 compl
 { 
     if (instance_script != NULL)
         return;
+#ifdef ELUNA
+    bool isElunaAI = false;
+    instance_script = sEluna->GetInstanceData(this);
+    if (instance_script)
+        isElunaAI = true;
 
-    InstanceTemplate const* mInstance = sObjectMgr->GetInstanceTemplate(GetId());
-    if (mInstance)
+    // if Eluna AI was fetched succesfully we should not call CreateInstanceData nor set the unused scriptID
+    if (!isElunaAI)
     {
-        i_script_id = mInstance->ScriptId;
-        instance_script = sScriptMgr->CreateInstanceScript(this);
+#endif
+        InstanceTemplate const* mInstance = sObjectMgr->GetInstanceTemplate(GetId());
+        if (mInstance)
+        {
+            i_script_id = mInstance->ScriptId;
+            instance_script = sScriptMgr->CreateInstanceScript(this);
+        }
+#ifdef ELUNA
     }
+#endif
 
     if (!instance_script)
         return;
 
-    instance_script->Initialize();
+#ifdef ELUNA
+    // use mangos behavior if we are dealing with Eluna AI
+    // initialize should then be called only if load is false
+    if (!isElunaAI || !load)
+#endif
+        instance_script->Initialize();
 
     if (load)
     {
