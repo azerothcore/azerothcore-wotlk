@@ -2,6 +2,8 @@ INSERT INTO version_db_world (`sql_rev`) VALUES ('1524043640342111200');
 
 # Kaylaan
 DELETE FROM `creature` WHERE `id`=20794;
+DELETE FROM `creature_template` WHERE `entry`=20794;
+INSERT INTO `creature_template` (`entry`, `difficulty_entry_1`, `difficulty_entry_2`, `difficulty_entry_3`, `KillCredit1`, `KillCredit2`, `modelid1`, `modelid2`, `modelid3`, `modelid4`, `name`, `subname`, `IconName`, `gossip_menu_id`, `minlevel`, `maxlevel`, `exp`, `faction`, `npcflag`, `speed_walk`, `speed_run`, `scale`, `rank`, `mindmg`, `maxdmg`, `dmgschool`, `attackpower`, `dmg_multiplier`, `baseattacktime`, `rangeattacktime`, `unit_class`, `unit_flags`, `unit_flags2`, `dynamicflags`, `family`, `trainer_type`, `trainer_spell`, `trainer_class`, `trainer_race`, `minrangedmg`, `maxrangedmg`, `rangedattackpower`, `type`, `type_flags`, `lootid`, `pickpocketloot`, `skinloot`, `resistance1`, `resistance2`, `resistance3`, `resistance4`, `resistance5`, `resistance6`, `spell1`, `spell2`, `spell3`, `spell4`, `spell5`, `spell6`, `spell7`, `spell8`, `PetSpellDataId`, `VehicleId`, `mingold`, `maxgold`, `AIName`, `MovementType`, `InhabitType`, `HoverHeight`, `Health_mod`, `Mana_mod`, `Armor_mod`, `RacialLeader`, `movementId`, `RegenHealth`, `mechanic_immune_mask`, `flags_extra`, `ScriptName`, `VerifiedBuild`) VALUES (20794, 0, 0, 0, 0, 0, 20182, 0, 0, 0, 'Kaylaan the Lost', NULL, NULL, 0, 71, 71, 1, 35, 0, 1.48, 1.14286, 1, 1, 296, 424, 0, 290, 4.6, 2000, 2000, 2, 0, 2048, 0, 0, 0, 0, 0, 0, 260, 387, 37, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 37552, 37569, 37553, 35614, 0, 0, 0, 0, 0, 0, 0, 0, '', 1, 3, 1, 20, 6, 1, 0, 0, 1, 0, 2, 'kaylaan_the_lost', 12340);
 
 # Adyen
 DELETE FROM `creature_template` WHERE `entry`=61021;
