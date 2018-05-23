@@ -2,7 +2,7 @@
 
 -  
 -  
--  
+
 
 **Target branch(es):**
 
@@ -11,12 +11,17 @@
 
 **Issues addressed:**
 
+<!-- Just paste the link to the issue you close -->
 Closes #
 
 
 **Tests performed:**
 
-<!-- Does it build without errors? Did you test in-game? What did you test? etc)
+<!-- Does it build without errors?
+Did you test in-game?
+What did you test?
+Did you do all these tests on Linux, Mac or Windows?
+etc)-->
 
 
 **How to test the changes:**
@@ -40,7 +45,7 @@ Try to make the work easy for testers, please -->
 <!--
 /!\
 /!\
-**NOTE** You no longer need to squash your commits, on merge we will squash them for you (when there are too many commits).
+**NOTE** You no longer need to squash your commits, on merge we will squash them for you (when there are too many commits we merge them into one big commit).
 /!\
 /!\
 -->
