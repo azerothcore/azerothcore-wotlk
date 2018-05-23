@@ -512,8 +512,25 @@ void InstanceSaveManager::_ResetOrWarnAll(uint32 mapid, Difficulty difficulty, b
             period = DAY;
 
         uint32 next_reset = uint32(((resetTime + MINUTE) / DAY * DAY) + period + diff);
-        while (time_t(next_reset - 3600) < now) // while next reset in past, skip to next reset time
-            next_reset = uint32(((next_reset + MINUTE) / DAY * DAY) + period + diff);
+        uint32 previous_reset = resetTime;
+        uint8 event_type = 1;
+        while (time_t(next_reset - 3600) < now) // while next_reset in past, skip to next reset time
+        {
+            bool warn = event_type < 5;
+            if (warn)
+            {
+                ++event_type;
+                next_reset = next_reset - ResetTimeDelay[event_type - 1];
+            }
+            else
+            {
+                event_type = 1;
+                previous_reset = next_reset;
+                next_reset = uint32(((next_reset + MINUTE) / DAY * DAY) + period + diff);
+            }
+        }
+        if (previous_reset != resetTime && event_type != 1) // if previous_reset is not current reset and next_reset is scheduled from warn, use last non-warning reset time
+            next_reset = previous_reset;
 
         SetResetTimeFor(mapid, difficulty, next_reset);
         SetExtendedResetTimeFor(mapid, difficulty, next_reset + period);
