@@ -512,20 +512,20 @@ void InstanceSaveManager::_ResetOrWarnAll(uint32 mapid, Difficulty difficulty, b
             period = DAY;
 
         uint32 next_reset = uint32(((resetTime + MINUTE) / DAY * DAY) + period + diff);
+        while (time_t(next_reset - 3600) < now) // while next reset in past, skip to next reset time
+            next_reset = uint32(((next_reset + MINUTE) / DAY * DAY) + period + diff);
+
         SetResetTimeFor(mapid, difficulty, next_reset);
         SetExtendedResetTimeFor(mapid, difficulty, next_reset + period);
         ScheduleReset(time_t(next_reset-3600), InstResetEvent(1, mapid, difficulty));
 
-        //if diff time < 1.1 reset cycles. not executed the SQL command.
-        if ((now - resetTime) < (period + diff) * 1.1)
-        {
-            // update it in the DB
-            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GLOBAL_INSTANCE_RESETTIME);
-            stmt->setUInt32(0, next_reset);
-            stmt->setUInt16(1, uint16(mapid));
-            stmt->setUInt8(2, uint8(difficulty));
-            CharacterDatabase.Execute(stmt);
-        }
+        // update it in the DB
+        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GLOBAL_INSTANCE_RESETTIME);
+        stmt->setUInt32(0, next_reset);
+        stmt->setUInt16(1, uint16(mapid));
+        stmt->setUInt8(2, uint8(difficulty));
+        CharacterDatabase.Execute(stmt);
+
         // remove all binds to instances of the given map and delete from db (delete per instance id, no mass deletion!)
         // do this after new reset time is calculated
         for (InstanceSaveHashMap::iterator itr = m_instanceSaveById.begin(), itr2; itr != m_instanceSaveById.end(); )
