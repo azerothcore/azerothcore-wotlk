@@ -2554,7 +2554,7 @@ bool InstanceMap::CanEnter(Player* player, bool loginCheck)
     }
 
     // cannot enter while an encounter is in progress on raids
-    bool checkProgress = (IsRaid() || GetId() == 668 /*HoR*/);
+    bool checkProgress = (IsRaid() && GetId() == 649 /*HoR*/);
     if (checkProgress && GetInstanceScript() && GetInstanceScript()->IsEncounterInProgress())
     {
         player->SendTransferAborted(GetId(), TRANSFER_ABORT_ZONE_IN_COMBAT);
