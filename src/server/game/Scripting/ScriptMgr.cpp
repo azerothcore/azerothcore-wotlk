@@ -1529,8 +1529,8 @@ void ScriptMgr::OnPlayerLogin(Player* player)
         decrypt[i] -= 5;  //Sneaky ROT cipher is sneaky.  No searching for this string!
         for (int i = 0; i < decryptTwo.size(); i++)
         decryptTwo[i] -= 1;
-        player->GetSession()->SendAreaTriggerMessage(decrypt.c_str());
-        player->GetSession()->SendAreaTriggerMessage(decryptTwo.c_str());
+        player->GetSession()->SendAreaTriggerMessage("%s", decrypt.c_str());
+        player->GetSession()->SendAreaTriggerMessage("%s", decryptTwo.c_str());
     }
 
     sEluna->OnLogin(player);
