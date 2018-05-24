@@ -18,7 +18,9 @@
 #include "UnitAI.h"
 #include "GameObjectAI.h"
 #include "Transport.h"
-
+#ifdef ELUNA
+#include "LuaEngine.h"
+#endif
 #include <time.h>
 
 bool GameEventMgr::CheckOneGameEvent(uint16 entry) const
@@ -125,6 +127,10 @@ bool GameEventMgr::StartEvent(uint16 event_id, bool overwrite)
             if (data.end <= data.start)
                 data.end = data.start + data.length;
         }
+#ifdef ELUNA
+        if (IsActiveEvent(event_id))
+            sEluna->OnGameEventStart(event_id);
+#endif
         return false;
     }
     else
@@ -147,7 +153,10 @@ bool GameEventMgr::StartEvent(uint16 event_id, bool overwrite)
         // or to scedule another update where the next event will be started
         if (overwrite && conditions_met)
             sWorld->ForceGameEventUpdate();
-
+#ifdef ELUNA
+        if (IsActiveEvent(event_id))
+            sEluna->OnGameEventStart(event_id);
+#endif
         return conditions_met;
     }
 }
@@ -190,6 +199,10 @@ void GameEventMgr::StopEvent(uint16 event_id, bool overwrite)
             CharacterDatabase.CommitTransaction(trans);
         }
     }
+#ifdef ELUNA
+    if (!IsActiveEvent(event_id))
+        sEluna->OnGameEventStop(event_id);
+#endif
 }
 
 void GameEventMgr::LoadFromDB()

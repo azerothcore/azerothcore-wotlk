@@ -32,7 +32,9 @@
 #include "BattlegroundRV.h"
 #include "Transport.h"
 #include "ScriptMgr.h"
-
+#ifdef ELUNA
+#include "LuaEngine.h"
+#endif
 namespace Trinity
 {
     class BattlegroundChatBuilder
@@ -200,6 +202,10 @@ Battleground::~Battleground()
     size = uint32(BgObjects.size());
     for (uint32 i = 0; i < size; ++i)
         DelObject(i);
+
+#ifdef ELUNA
+    sEluna->OnBGDestroy(this, GetBgTypeID(), GetInstanceID());
+#endif
 
     sBattlegroundMgr->RemoveBattleground(GetBgTypeID(), GetInstanceID());
     // unload map
@@ -492,6 +498,10 @@ inline void Battleground::_ProcessJoin(uint32 diff)
         m_Events |= BG_STARTING_EVENT_4;
 
         StartingEventOpenDoors();
+
+#ifdef ELUNA
+        sEluna->OnBGStart(this, GetBgTypeID(), GetInstanceID());
+#endif
 
         SendWarningToAll(StartMessageIds[BG_STARTING_EVENT_FOURTH]);
         SetStatus(STATUS_IN_PROGRESS);
@@ -1037,6 +1047,10 @@ void Battleground::EndBattleground(TeamId winnerTeamId)
 
     if (winmsg_id)
         SendMessageToAll(winmsg_id, CHAT_MSG_BG_SYSTEM_NEUTRAL);
+
+#ifdef ELUNA
+    sEluna->OnBGEnd(this, GetBgTypeID(), GetInstanceID(), winnerTeamId);
+#endif
 }
 
 uint32 Battleground::GetBonusHonorFromKill(uint32 kills) const
