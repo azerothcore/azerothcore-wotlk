@@ -1521,7 +1521,7 @@ void ScriptMgr::OnBeforePlayerUpdate(Player* player, uint32 p_time)
 
 void ScriptMgr::OnPlayerLogin(Player* player)
 {
-  // Display for any user with admin level 2 or higher access
+    // Display for any user with admin level 2 or higher access
     if (AccountMgr::GetSecurity(player->GetSession()->GetAccountId()) > 1){
         string decrypt = "Its,y%ktwljy%yt%otns%zx%ts%Inxhtwi&";
         string decryptTwo = "Zpvs!qbsujdjqbujpo!xjmm!ifmq!jnqspwf!B{fspuiDpsf\"";
