@@ -283,14 +283,17 @@ public:
 
         void UpdateAI(uint32 diff)
         {
-            if (timer != -1 && timer <= diff)
+            if (timer != -1)
             {
-                timer = -1;
-                playerGUIDs.clear();
-            }
-            else
-            {
-                timer -= diff;
+                if (timer <= diff)
+                {
+                    timer = -1;
+                    playerGUIDs.clear();
+                }
+                else
+                {
+                    timer -= diff;
+                }
             }
 
             events.Update(diff);
