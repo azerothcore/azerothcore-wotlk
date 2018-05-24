@@ -1533,7 +1533,10 @@ void ScriptMgr::OnPlayerLogin(Player* player)
         player->GetSession()->SendAreaTriggerMessage("%s", decryptTwo.c_str());
     }
 
+    #ifdef ELUNA
     sEluna->OnLogin(player);
+    #endif
+    
     FOREACH_SCRIPT(PlayerScript)->OnLogin(player);
 
 }
