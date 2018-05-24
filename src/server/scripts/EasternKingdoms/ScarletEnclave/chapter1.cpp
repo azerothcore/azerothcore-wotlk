@@ -217,7 +217,7 @@ public:
         uint64 _duelGUID;
         EventMap events;
         std::set<uint32> playerGUIDs;
-        uint32 timer = -1;
+        uint32 timer = 0;
 
         uint32 GetData(uint32 data) const
         {
@@ -283,11 +283,11 @@ public:
 
         void UpdateAI(uint32 diff)
         {
-            if (timer != -1)
+            if (timer != 0)
             {
                 if (timer <= diff)
                 {
-                    timer = -1;
+                    timer = 0;
                     playerGUIDs.clear();
                 }
                 else
