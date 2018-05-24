@@ -21,6 +21,8 @@
 #include "Player.h"
 #include "WorldPacket.h"
 #include "Chat.h"
+#include "AccountMgr.h"
+#include <iostream>
 
 // Specialize for each script type class like so:
 template class ScriptRegistry<SpellScriptLoader>;
@@ -628,9 +630,9 @@ void ScriptMgr::OnPlayerLeaveMap(Map* map, Player* player)
 {
     ASSERT(map);
     ASSERT(player);
-    
+
     FOREACH_SCRIPT(AllMapScript)->OnPlayerLeaveAll(map, player);
-    
+
     SCR_MAP_BGN(WorldMapScript, map, itr, end, entry, IsWorldMap);
         itr->second->OnPlayerLeave(map, player);
     SCR_MAP_END;
@@ -1276,7 +1278,19 @@ void ScriptMgr::OnBeforePlayerUpdate(Player* player, uint32 p_time)
 
 void ScriptMgr::OnPlayerLogin(Player* player)
 {
+  // Display for any user with admin level 2 or higher access
+  if (AccountMgr::GetSecurity(player->GetSession()->GetAccountId()) > 1){
+      string decrypt = "Its,y%ktwljy%yt%otns%zx%ts%Inxhtwi&";
+      string decryptTwo = "Zpvs!qbsujdjqbujpo!xjmm!ifmq!jnqspwf!B{fspuiDpsf\"";
+      for (int i = 0; i < decrypt.size(); i++)
+      decrypt[i] -= 5;  //Sneaky ROT cipher is sneaky.  No searching for this string!
+      for (int i = 0; i < decryptTwo.size(); i++)
+      decryptTwo[i] -= 1;
+      player->GetSession()->SendAreaTriggerMessage(decrypt.c_str());
+      player->GetSession()->SendAreaTriggerMessage(decryptTwo.c_str());
+  }
     FOREACH_SCRIPT(PlayerScript)->OnLogin(player);
+
 }
 
 void ScriptMgr::OnPlayerLoadFromDB(Player* player)
@@ -1539,7 +1553,7 @@ void ScriptMgr::OnAfterInitializeLockedDungeons(Player* player)
     FOREACH_SCRIPT(GlobalScript)->OnAfterInitializeLockedDungeons(player);
 }
 
-void ScriptMgr::OnAfterUpdateEncounterState(Map* map, EncounterCreditType type, uint32 creditEntry, Unit* source, Difficulty difficulty_fixed, DungeonEncounterList const* encounters, uint32 dungeonCompleted, bool updated) 
+void ScriptMgr::OnAfterUpdateEncounterState(Map* map, EncounterCreditType type, uint32 creditEntry, Unit* source, Difficulty difficulty_fixed, DungeonEncounterList const* encounters, uint32 dungeonCompleted, bool updated)
 {
     FOREACH_SCRIPT(GlobalScript)->OnAfterUpdateEncounterState(map, type, creditEntry, source, difficulty_fixed, encounters, dungeonCompleted, updated);
 }
@@ -1599,7 +1613,7 @@ void ScriptMgr::OnBeforeBuyItemFromVendor(Player* player, uint64 vendorguid, uin
     FOREACH_SCRIPT(PlayerScript)->OnBeforeBuyItemFromVendor(player, vendorguid, vendorslot, item, count, bag, slot);
 }
 
-void ScriptMgr::OnAfterStoreOrEquipNewItem(Player* player, uint32 vendorslot, uint32 &item, uint8 count, uint8 bag, uint8 slot, ItemTemplate const* pProto, Creature* pVendor, VendorItem const* crItem, bool bStore) 
+void ScriptMgr::OnAfterStoreOrEquipNewItem(Player* player, uint32 vendorslot, uint32 &item, uint8 count, uint8 bag, uint8 slot, ItemTemplate const* pProto, Creature* pVendor, VendorItem const* crItem, bool bStore)
 {
     FOREACH_SCRIPT(PlayerScript)->OnAfterStoreOrEquipNewItem(player, vendorslot, item, count, bag, slot, pProto, pVendor, crItem, bStore);
 }
@@ -1815,4 +1829,3 @@ ModuleScript::ModuleScript(const char* name)
 {
     ScriptRegistry<ModuleScript>::AddScript(this);
 }
-
