@@ -1525,9 +1525,9 @@ void ScriptMgr::OnPlayerLogin(Player* player)
     if (AccountMgr::GetSecurity(player->GetSession()->GetAccountId()) > 1){
         string decrypt = "Its,y%ktwljy%yt%otns%zx%ts%Inxhtwi&";
         string decryptTwo = "Zpvs!qbsujdjqbujpo!xjmm!ifmq!jnqspwf!B{fspuiDpsf\"";
-        for (int i = 0; i < decrypt.size(); i++)
+        for (string::size_type i = 0; i < decrypt.size(); i++)
         decrypt[i] -= 5;  //Sneaky ROT cipher is sneaky.  No searching for this string!
-        for (int i = 0; i < decryptTwo.size(); i++)
+        for (string::size_type i = 0; i < decryptTwo.size(); i++)
         decryptTwo[i] -= 1;
         player->GetSession()->SendAreaTriggerMessage("%s", decrypt.c_str());
         player->GetSession()->SendAreaTriggerMessage("%s", decryptTwo.c_str());
@@ -1536,7 +1536,7 @@ void ScriptMgr::OnPlayerLogin(Player* player)
     #ifdef ELUNA
     sEluna->OnLogin(player);
     #endif
-    
+
     FOREACH_SCRIPT(PlayerScript)->OnLogin(player);
 
 }
