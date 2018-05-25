@@ -1475,24 +1475,28 @@ class socrethar : public CreatureScript
                 switch (CreatureID)
                 {
                     case ADYEN_THE_LIGHTBRINGER:
-                        if (adyen = me->FindNearestCreature(ADYEN_THE_LIGHTBRINGER, 100.0f, true))
+                        adyen = NULL;
+                        adyen = me->FindNearestCreature(ADYEN_THE_LIGHTBRINGER, 100.0f, true);
+                        if (adyen != NULL)
                             return true;
                         break;
                     case EXARCH_ORELIS:
-                        if (orelis = me->FindNearestCreature(EXARCH_ORELIS, 100.0f, true))
+                        orelis = NULL;
+                        orelis = me->FindNearestCreature(EXARCH_ORELIS, 100.0f, true);
+                        if (orelis != NULL)
                             return true;
                         break;
                     case ANCHORITE_KARJA:
-                        if (karja = me->FindNearestCreature(ANCHORITE_KARJA, 100.0f, true))
+                        karja = NULL;
+                        karja = me->FindNearestCreature(ANCHORITE_KARJA, 100.0f, true);
+                        if (karja != NULL)
                             return true;
                         break;
                     case KAYLAAN_THE_LOST:
-                        if (kaylaan = me->FindNearestCreature(KAYLAAN_THE_LOST, 100.0f, true))
-                            return true;
+                        kaylaan = me->FindNearestCreature(KAYLAAN_THE_LOST, 100.0f, true);
                         break;
                     case ISHANAH_HIGH_PRIESTESS:
-                        if (ishanah = me->FindNearestCreature(ISHANAH_HIGH_PRIESTESS, 100.0f, true))
-                            return true;
+                        ishanah = me->FindNearestCreature(ISHANAH_HIGH_PRIESTESS, 100.0f, true);
                         break;
                 }
                 return false; // When he doesn't find anyone
