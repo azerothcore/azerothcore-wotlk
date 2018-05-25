@@ -290,6 +290,12 @@ void InstanceSaveManager::LoadResetTimes()
             SetResetTimeFor(mapid, difficulty, t);
             CharacterDatabase.DirectPExecute("INSERT INTO instance_reset VALUES ('%u', '%u', '%u')", mapid, difficulty, (uint32)t);
         }
+        else
+        {
+            // next reset should be in future. If its not, skip to future.
+            while (t < now)
+                t = uint32(((t + MINUTE) / DAY * DAY) + period + diff);
+        }
         SetExtendedResetTimeFor(mapid, difficulty, t + period);
 
         // schedule the global reset/warning
@@ -512,26 +518,6 @@ void InstanceSaveManager::_ResetOrWarnAll(uint32 mapid, Difficulty difficulty, b
             period = DAY;
 
         uint32 next_reset = uint32(((resetTime + MINUTE) / DAY * DAY) + period + diff);
-        uint32 previous_reset = resetTime;
-        uint8 event_type = 1;
-        while (time_t(next_reset - 3600) < now) // while next_reset in past, skip to next reset time
-        {
-            bool warn = event_type < 5;
-            if (warn)
-            {
-                ++event_type;
-                next_reset = next_reset - ResetTimeDelay[event_type - 1];
-            }
-            else
-            {
-                event_type = 1;
-                previous_reset = next_reset;
-                next_reset = uint32(((next_reset + MINUTE) / DAY * DAY) + period + diff);
-            }
-        }
-        if (previous_reset != resetTime && event_type != 1) // if previous_reset is not current reset and next_reset is scheduled from warn, use last non-warning reset time
-            next_reset = previous_reset;
-
         SetResetTimeFor(mapid, difficulty, next_reset);
         SetExtendedResetTimeFor(mapid, difficulty, next_reset + period);
         ScheduleReset(time_t(next_reset-3600), InstResetEvent(1, mapid, difficulty));
