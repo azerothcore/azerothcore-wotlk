@@ -1350,7 +1350,7 @@ class anchorite_karja : public CreatureScript
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
 
-                switch (uint32 eventId = _events.ExecuteEvent())
+                switch ( _events.ExecuteEvent())
                 {
                     case EVENT_SPELL_HOLY_SMITE:
                         me->CastSpell(me->GetVictim(), HOLY_SMITE_KARJA, true);
@@ -1425,7 +1425,7 @@ class exarch_orelis : public CreatureScript
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
 
-                switch (uint32 eventId = _events.ExecuteEvent())
+                switch (_events.ExecuteEvent())
                 {
                     case EVENT_SPELL_DEMORALIZING_SHOUT:
                         if (me->FindNearestCreature(me->GetVictim()->GetEntry(), 10.0f, true))
@@ -1466,7 +1466,7 @@ class socrethar : public CreatureScript
             socretharAI(Creature* creature) : ScriptedAI(creature), _summons(me) { }
 
             EventMap _actionEvents, combatEvents;
-            bool DeathblowToTheLegionRunning = false, returnValue=false;
+            bool DeathblowToTheLegionRunning = false;
             SummonList _summons;
             Creature* adyen, *orelis, *karja, *kaylaan, *ishanah;
 
@@ -1476,27 +1476,26 @@ class socrethar : public CreatureScript
                 {
                     case ADYEN_THE_LIGHTBRINGER:
                         if (adyen = me->FindNearestCreature(ADYEN_THE_LIGHTBRINGER, 100.0f, true))
-                            returnValue = true;
+                            return true;
                         break;
                     case EXARCH_ORELIS:
                         if (orelis = me->FindNearestCreature(EXARCH_ORELIS, 100.0f, true))
-                            returnValue = true;
+                            return true;
                         break;
                     case ANCHORITE_KARJA:
                         if (karja = me->FindNearestCreature(ANCHORITE_KARJA, 100.0f, true))
-                            returnValue = true;
+                            return true;
                         break;
                     case KAYLAAN_THE_LOST:
                         if (kaylaan = me->FindNearestCreature(KAYLAAN_THE_LOST, 100.0f, true))
-                            returnValue = true;
+                            return true;
                         break;
                     case ISHANAH_HIGH_PRIESTESS:
                         if (ishanah = me->FindNearestCreature(ISHANAH_HIGH_PRIESTESS, 100.0f, true))
-                            returnValue = true;
+                            return true;
                         break;
                 }
-
-                return returnValue;
+                return false; // When he doesn't find anyone
             }
 
             void Reset()
@@ -1763,7 +1762,7 @@ class socrethar : public CreatureScript
 
                 combatEvents.Update(diff);
                 
-                switch (uint32 combatEventId = combatEvents.ExecuteEvent())
+                switch (combatEvents.ExecuteEvent())
                 {
                     case EVENT_SPELL_NETHER_PROTECTION:
                         if (!me->HasAura(NETHER_PROTECTION))
@@ -1922,7 +1921,7 @@ class kaylaan_the_lost : public CreatureScript
                     if (Creature* socrethar = me->FindNearestCreature(SOCRETHAR, 200.0f, true))
                         socrethar->AI()->DoAction(EVENT_END_ALDOR_FIGHT);
 
-                switch (uint32 eventId = _events.ExecuteEvent())
+                switch (_events.ExecuteEvent())
                 {
                     case EVENT_SPELL_BURNING_LIGHT:
                         me->CastSpell(me->GetVictim(), BURNING_LIGHT, false);
