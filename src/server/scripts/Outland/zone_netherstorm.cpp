@@ -1025,7 +1025,8 @@ enum RoleplayActions
     EVENT_FIGHT_ALDOR           = 31,
     EVENT_END_ALDOR_FIGHT       = 32,
     EVENT_SOCRETHAR_DEAD        = 33,
-    EVENT_SHEDULE_EVENTS        = 34
+    EVENT_SHEDULE_EVENTS        = 34,
+    RESET_DEATHBLOW_EVENT       = 35
 };
 
 enum Adyen
@@ -1202,9 +1203,21 @@ class adyen_the_lightbringer : public CreatureScript
                 {
                     me->GetMotionMaster()->MovePath(610210, false);
                 }
+                else if (param == RESET_DEATHBLOW_EVENT)
+                {
+                    me->ClearInCombat();
+                    me->AttackStop();
+                    me->GetMotionMaster()->MoveTargetedHome();
+                    me->DespawnOrUnsummon(15000);
+                }
             }
 
-            void Reset() { }
+            void Reset()
+            {
+                me->GetMotionMaster()->MoveTargetedHome();
+                me->CombatStop();
+                me->ClearInCombat();
+            }
 
             void MovementInform(uint32 type, uint32 point)
             {
@@ -1217,9 +1230,8 @@ class adyen_the_lightbringer : public CreatureScript
                     }
             }
 
-            void EnterCombat(Unit * who)
+            void EnterCombat(Unit * /*who*/)
             {
-				AttackStart(who);
                 _events.ScheduleEvent(EVENT_CRUSADER_STRIKE, 3000);
                 _events.ScheduleEvent(EVENT_HAMMER_OF_JUSTICE, 6000);
             }
@@ -1235,40 +1247,40 @@ class adyen_the_lightbringer : public CreatureScript
                 {
                     switch (eventId)
                     {
-                    case EVENT_CRUSADER_STRIKE:
-                        me->CastSpell(me->GetVictim(), CRUSADER_STRIKE, true);
-                        _events.ScheduleEvent(EVENT_CRUSADER_STRIKE, 3500);
-                        break;
-                    case EVENT_HAMMER_OF_JUSTICE:
-                        me->CastSpell(me->GetVictim(), HAMMER_OF_JUSTICE, true);
-                        _events.RepeatEvent(urand(10000, 14000));
-                        break;
-                    case EVENT_HOLY_LIGHT:
-                        // if low enough will heal and trigger again in 18s.
-                        if (me->GetHealthPct() <= 45)
-                        {
-                            me->CastSpell(me, HOLY_LIGHT, true);
-                            _events.RepeatEvent(urand(18000, 22000));
-                        }
-                        else if (Unit* who = me->FindNearestCreature(ANCHORITE_KARJA, 30.0f, true))
-                        {
-                            if (who->GetHealthPct() <= 45)
+                        case EVENT_CRUSADER_STRIKE:
+                            me->CastSpell(me->GetVictim(), CRUSADER_STRIKE, true);
+                            _events.ScheduleEvent(EVENT_CRUSADER_STRIKE, 3500);
+                            break;
+                        case EVENT_HAMMER_OF_JUSTICE:
+                            me->CastSpell(me->GetVictim(), HAMMER_OF_JUSTICE, true);
+                            _events.RepeatEvent(urand(10000, 14000));
+                            break;
+                        case EVENT_HOLY_LIGHT:
+                            // if low enough will heal and trigger again in 18s.
+                            if (me->GetHealthPct() <= 45)
                             {
-                                me->CastSpell(who, HOLY_LIGHT, true);
+                                me->CastSpell(me, HOLY_LIGHT, true);
                                 _events.RepeatEvent(urand(18000, 22000));
                             }
-                        }
-                        else if (Unit* who = me->FindNearestCreature(EXARCH_ORELIS, 30.0f, true))
-                        {
-                            if (who->GetHealthPct() <= 45)
+                            else if (Unit* who = me->FindNearestCreature(ANCHORITE_KARJA, 30.0f, true))
                             {
-                                me->CastSpell(who, HOLY_LIGHT, true);
-                                _events.RepeatEvent(urand(18000, 22000));
+                                if (who->GetHealthPct() <= 45)
+                                {
+                                    me->CastSpell(who, HOLY_LIGHT, true);
+                                    _events.RepeatEvent(urand(18000, 22000));
+                                }
                             }
-                        }
-                        else
-                            _events.RepeatEvent(1000);
-                        break;
+                            else if (Unit* who = me->FindNearestCreature(EXARCH_ORELIS, 30.0f, true))
+                            {
+                                if (who->GetHealthPct() <= 45)
+                                {
+                                    me->CastSpell(who, HOLY_LIGHT, true);
+                                    _events.RepeatEvent(urand(18000, 22000));
+                                }
+                            }
+                            else
+                                _events.RepeatEvent(1000);
+                            break;
                     }
                 }
 
@@ -1299,6 +1311,20 @@ class anchorite_karja : public CreatureScript
                 {
                     me->GetMotionMaster()->MovePath(500020, false);
                 }
+                else if (param == RESET_DEATHBLOW_EVENT)
+                {
+                    me->ClearInCombat();
+                    me->AttackStop();
+                    me->GetMotionMaster()->MoveTargetedHome();
+                    me->DespawnOrUnsummon(15000);
+                }
+            }
+
+            void Reset()
+            {
+                me->GetMotionMaster()->MoveTargetedHome();
+                me->CombatStop();
+                me->ClearInCombat();
             }
 
             void MovementInform(uint32 type, uint32 point)
@@ -1308,13 +1334,13 @@ class anchorite_karja : public CreatureScript
                         me->SetHomePosition(me->GetPosition());
             }
 
-            void EnterCombat(Unit* who)
+            void EnterCombat(Unit* who) override
             {
                 AttackStart(who);
                 _events.ScheduleEvent(EVENT_SPELL_HOLY_SMITE, 1000);
             }
 
-            void UpdateAI(uint32 diff)
+            void UpdateAI(uint32 diff) override
             {
                 _events.Update(diff);
 
@@ -1324,7 +1350,7 @@ class anchorite_karja : public CreatureScript
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
 
-                switch (_events.ExecuteEvent())
+                switch (uint32 eventId = _events.ExecuteEvent())
                 {
                     case EVENT_SPELL_HOLY_SMITE:
                         me->CastSpell(me->GetVictim(), HOLY_SMITE_KARJA, true);
@@ -1359,6 +1385,20 @@ class exarch_orelis : public CreatureScript
                 {
                     me->GetMotionMaster()->MovePath(500010, false);
                 }
+                else if (param == RESET_DEATHBLOW_EVENT)
+                {
+                    me->ClearInCombat();
+                    me->AttackStop();
+                    me->GetMotionMaster()->MoveTargetedHome();
+                    me->DespawnOrUnsummon(15000);
+                }
+            }
+
+            void Reset()
+            {
+                me->GetMotionMaster()->MoveTargetedHome();
+                me->CombatStop();
+                me->ClearInCombat();
             }
 
             void MovementInform(uint32 type, uint32 point)
@@ -1368,9 +1408,8 @@ class exarch_orelis : public CreatureScript
                         me->SetHomePosition(me->GetPosition());
             }
 
-            void EnterCombat(Unit* who)
+            void EnterCombat(Unit* /*who*/)
             {
-                AttackStart(who);
                 _events.ScheduleEvent(EVENT_SPELL_DEMORALIZING_SHOUT, 1000);
                 _events.ScheduleEvent(EVENT_SPELL_HEROIC_STRIKE, urand(2500, 4000));
                 _events.ScheduleEvent(EVENT_SPELL_REND, urand(1500, 6000));
@@ -1389,7 +1428,7 @@ class exarch_orelis : public CreatureScript
                 switch (uint32 eventId = _events.ExecuteEvent())
                 {
                     case EVENT_SPELL_DEMORALIZING_SHOUT:
-                        if (me->FindNearestCreature(me->GetVictim()->GetGUID(), 10.0f, true))
+                        if (me->FindNearestCreature(me->GetVictim()->GetEntry(), 10.0f, true))
                         {
                             me->CastSpell(me->GetVictim(), DEMORALIZING_SHOUT, true);
                             _events.ScheduleEvent(EVENT_SPELL_DEMORALIZING_SHOUT, urand(10000, 12000));
@@ -1427,30 +1466,37 @@ class socrethar : public CreatureScript
             socretharAI(Creature* creature) : ScriptedAI(creature), _summons(me) { }
 
             EventMap _actionEvents, combatEvents;
-            bool DeathblowToTheLegionRunning = false;
+            bool DeathblowToTheLegionRunning = false, returnValue=false;
             SummonList _summons;
             Creature* adyen, *orelis, *karja, *kaylaan, *ishanah;
 
-            void GetCreature(uint32 CreatureID)
+            bool GetCreature(uint32 CreatureID)
             {
                 switch (CreatureID)
                 {
                     case ADYEN_THE_LIGHTBRINGER:
-                        adyen = me->FindNearestCreature(ADYEN_THE_LIGHTBRINGER, 100.0f, true);
+                        if (adyen = me->FindNearestCreature(ADYEN_THE_LIGHTBRINGER, 100.0f, true))
+                            returnValue = true;
                         break;
                     case EXARCH_ORELIS:
-                        orelis = me->FindNearestCreature(EXARCH_ORELIS, 100.0f, true);
+                        if (orelis = me->FindNearestCreature(EXARCH_ORELIS, 100.0f, true))
+                            returnValue = true;
                         break;
                     case ANCHORITE_KARJA:
-                        karja = me->FindNearestCreature(ANCHORITE_KARJA, 100.0f, true);
+                        if (karja = me->FindNearestCreature(ANCHORITE_KARJA, 100.0f, true))
+                            returnValue = true;
                         break;
                     case KAYLAAN_THE_LOST:
-                        kaylaan = me->FindNearestCreature(KAYLAAN_THE_LOST, 100.0f, true);
+                        if (kaylaan = me->FindNearestCreature(KAYLAAN_THE_LOST, 100.0f, true))
+                            returnValue = true;
                         break;
                     case ISHANAH_HIGH_PRIESTESS:
-                        ishanah = me->FindNearestCreature(ISHANAH_HIGH_PRIESTESS, 100.0f, true);
+                        if (ishanah = me->FindNearestCreature(ISHANAH_HIGH_PRIESTESS, 100.0f, true))
+                            returnValue = true;
                         break;
                 }
+
+                return returnValue;
             }
 
             void Reset()
@@ -1485,6 +1531,10 @@ class socrethar : public CreatureScript
                     case EVENT_ISHANAH_SAY_1:
                         _actionEvents.ScheduleEvent(EVENT_ISHANAH_SAY_1, 2000);
                         break;
+                    case RESET_DEATHBLOW_EVENT:
+                        DeathblowToTheLegionRunning = false;
+                        Reset();
+                        break;
                 }
             }
 
@@ -1500,11 +1550,22 @@ class socrethar : public CreatureScript
 
                 ishanah->AI()->DoAction(EVENT_SOCRETHAR_DEAD);
                 ishanah->SetFlag(UNIT_FIELD_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+
+                // Adyen might have died, get his pointer again
+                if (GetCreature(ADYEN_THE_LIGHTBRINGER))
+                    adyen->GetAI()->DoAction(RESET_DEATHBLOW_EVENT);
+
+                // Orelis might have died, get his pointer again
+                if (GetCreature(EXARCH_ORELIS))
+                    orelis->GetAI()->DoAction(RESET_DEATHBLOW_EVENT);
+
+                // Karja might have died, get his pointer again
+                if (GetCreature(ANCHORITE_KARJA))
+                    karja->GetAI()->DoAction(RESET_DEATHBLOW_EVENT);
             }
 
-            void EnterCombat(Unit* who) 
+            void EnterCombat(Unit* /*who*/) 
             {
-                AttackStart(who);
                 combatEvents.ScheduleEvent(EVENT_SPELL_ANTI_MAGIC_SHIELD, 9000);
                 combatEvents.ScheduleEvent(EVENT_SPELL_BACKLASH, 4000);
                 combatEvents.ScheduleEvent(EVENT_SPELL_CLEAVE, 2000);
@@ -1578,31 +1639,43 @@ class socrethar : public CreatureScript
                             GetCreature(EXARCH_ORELIS); // define orelis pointer
                             GetCreature(ANCHORITE_KARJA); // define karja pointer
                             kaylaan->setFaction(EXODAR_ENEMY_FACTION);
-                            /*kaylaan->AddThreat(adyen, 100.0f);
-                            kaylaan->AddThreat(orelis, 90.0f);
-                            kaylaan->AddThreat(karja, 100.0f);*/
-                            /*adyen->AI()->EnterCombat(kaylaan);
-                            orelis->AI()->EnterCombat(kaylaan);
-                            karja->AI()->EnterCombat(kaylaan);*/
                             kaylaan->AI()->EnterCombat(adyen);
                             adyen->AI()->DoAction(EVENT_SHEDULE_EVENTS);
                             break;
                         case EVENT_END_ALDOR_FIGHT:
                             kaylaan->setFaction(1743);
                             kaylaan->GetMotionMaster()->MoveTargetedHome();
-                            /*kaylaan->CombatStop();
-                            kaylaan->ClearInCombat();*/
-                            adyen->GetMotionMaster()->MoveTargetedHome();
-                            orelis->GetMotionMaster()->MoveTargetedHome();
-                            /*orelis->CombatStop();
-                            orelis->ClearInCombat();
-                            karja->CombatStop();
-                            karja->ClearInCombat();*/
+                            kaylaan->CombatStop();
+                            kaylaan->ClearInCombat();
+
+                            // Adyen might have died, get his pointer again
+                            if (GetCreature(ADYEN_THE_LIGHTBRINGER))
+                            {
+                                adyen->GetMotionMaster()->MoveTargetedHome();
+                                adyen->CombatStop();
+                                adyen->ClearInCombat();
+                            }
+
+                            // Orelis might have died, get his pointer again
+                            if (GetCreature(EXARCH_ORELIS))
+                            {
+                                orelis->GetMotionMaster()->MoveTargetedHome();
+                                orelis->CombatStop();
+                                orelis->ClearInCombat();
+                            }
+
+                            // Karja might have died, get his pointer again
+                            if (GetCreature(ANCHORITE_KARJA))
+                            {
+                                karja->GetMotionMaster()->MoveTargetedHome();
+                                karja->CombatStop();
+                                karja->ClearInCombat();
+                            }
                             _actionEvents.ScheduleEvent(EVENT_SOCRETHAR_SAY_4, 2000);
                             break;
                         case EVENT_SOCRETHAR_SAY_4:
                             Talk(3);
-                            _actionEvents.ScheduleEvent(EVENT_KAYLAAN_SAY_5, 6000);
+                            _actionEvents.ScheduleEvent(EVENT_KAYLAAN_SAY_5, 8000);
                             break;
                         case EVENT_KAYLAAN_SAY_5:
                             kaylaan->AI()->Talk(4);
@@ -1667,14 +1740,17 @@ class socrethar : public CreatureScript
                             _actionEvents.ScheduleEvent(EVENT_FINAL_FIGHT, 3000);
                             break;
                         case EVENT_FINAL_FIGHT:
-                            me->setFaction(EXODAR_ENEMY_FACTION); // before fight faction 1786 in case i break him
+                            me->setFaction(EXODAR_ENEMY_FACTION);
                             ishanah->setFaction(EXODAR_FACTION);
                             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE);
                             me->SetReactState(REACT_AGGRESSIVE);
-                            adyen->AI()->EnterCombat(me);
-                            orelis->AI()->AttackStart(me);
+                            if (GetCreature(ADYEN_THE_LIGHTBRINGER))
+                                adyen->AI()->EnterCombat(me);
+                            if (GetCreature(EXARCH_ORELIS))
+                                orelis->AI()->AttackStart(me);
+                            if (GetCreature(ANCHORITE_KARJA))
+                                karja->AI()->AttackStart(me);
                             ishanah->AI()->EnterCombat(me);
-                            karja->Attack(me, true);
                             break;
                     }
                 }
@@ -1735,12 +1811,58 @@ class kaylaan_the_lost : public CreatureScript
             EventMap _events;
             bool first_waypath_done = false;
             bool second_waypath_done = false;
+            bool adyen_dead = false, karja_dead = false, orelis_dead = false;
 
             void EnterCombat(Unit* who) override
             {
                 AttackStart(who);
                 _events.ScheduleEvent(EVENT_SPELL_BURNING_LIGHT, 2000);
                 _events.ScheduleEvent(EVENT_SPELL_CONSECRATION, 3000);
+            }
+
+            void Reset()
+            {
+                me->GetMotionMaster()->MoveTargetedHome();
+                me->CombatStop();
+                me->ClearInCombat();
+            }
+
+            void ResetDeathblowEvent(bool event_over /* If true then reset the event*/)
+            {
+                me->RemoveAurasDueToSpell(POWER_OF_THE_LEGION);
+                me->GetMotionMaster()->MoveTargetedHome();
+
+                // Get socrethar AI so we can reset the event
+                if (event_over)
+                {
+                    if (Unit * socrethar = me->FindNearestCreature(SOCRETHAR, 100.0f, true))
+                        socrethar->GetAI()->DoAction(RESET_DEATHBLOW_EVENT);
+
+                    karja_dead  = NULL;
+                    orelis_dead = NULL;
+                    adyen_dead  = NULL;
+
+                    me->DespawnOrUnsummon(5000); // Despawn in 5 seconds to reset event
+                }
+            }
+
+            void KilledUnit(Unit* victim) override
+            {
+                switch (victim->GetEntry())
+                {
+                    case ADYEN_THE_LIGHTBRINGER:
+                        adyen_dead = true;
+                        break;
+                    case ANCHORITE_KARJA:
+                        karja_dead = true;
+                        break;
+                    case EXARCH_ORELIS:
+                        orelis_dead = true;
+                        break;
+                }
+
+                if (adyen_dead && karja_dead && orelis_dead)
+                    ResetDeathblowEvent(true);
             }
 
             void DoAction(int32 param) override
