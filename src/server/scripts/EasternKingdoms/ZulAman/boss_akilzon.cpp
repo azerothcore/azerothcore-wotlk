@@ -116,6 +116,7 @@ class boss_akilzon : public CreatureScript
             {
                 Talk(SAY_DEATH);
                 _JustDied();
+                me->SummonCreature(23999, 400, 1414, 74.36f, 3.3f, TEMPSUMMON_TIMED_DESPAWN, 300000);
                 if (instance)
                     instance->SetData(DATA_AKILZONEVENT, DONE);
             }
