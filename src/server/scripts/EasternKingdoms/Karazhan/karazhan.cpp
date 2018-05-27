@@ -50,16 +50,16 @@ enum Creatures
 # npc_barnesAI
 ######*/
 
-#define GOSSIP_READY        "I'm not an actor."
+#define GOSSIP_READY        "我不是一个演员。"
 
-#define SAY_READY           "Splendid, I'm going to get the audience ready. Break a leg!"
-#define SAY_OZ_INTRO1       "Finally, everything is in place. Are you ready for your big stage debut?"
-#define OZ_GOSSIP1          "I'm not an actor."
-#define SAY_OZ_INTRO2       "Don't worry, you'll be fine. You look like a natural!"
-#define OZ_GOSSIP2          "Ok, I'll give it a try, then."
+#define SAY_READY           "你真是艳光四射，我得要去让观众准备好了。祝你好运！"
+#define SAY_OZ_INTRO1       "你准备好你的大舞台亮相了吗？"
+#define OZ_GOSSIP1          "我不是一个演员。"
+#define SAY_OZ_INTRO2       "不用担心，你会没事的。你看上去很自然！"
+#define OZ_GOSSIP2          "好吧，我等下会试试看。"
 
-#define SAY_RAJ_INTRO1      "The romantic plays are really tough, but you'll do better this time. You have TALENT. Ready?"
-#define RAJ_GOSSIP1         "I've never been more ready."
+#define SAY_RAJ_INTRO1      "浪漫的戏剧是非常艰难的，但你会做的更好，你有天赋，准备好了吗？"
+#define RAJ_GOSSIP1         "我从来没有做过更好的准备。"
 
 #define OZ_GM_GOSSIP1       "[GM] Change event to EVENT_OZ"
 #define OZ_GM_GOSSIP2       "[GM] Change event to EVENT_HOOD"
