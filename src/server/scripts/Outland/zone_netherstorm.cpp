@@ -1373,6 +1373,11 @@ class exarch_orelis : public CreatureScript
     public:
         exarch_orelis() : CreatureScript("exarch_orelis") { }
 
+        CreatureAI* GetAI(Creature* creature) const
+        {
+            return new exarch_orelisAI(creature);
+        }
+
         struct exarch_orelisAI : public ScriptedAI
         {
             exarch_orelisAI(Creature* creature) : ScriptedAI(creature) { }
@@ -1396,12 +1401,21 @@ class exarch_orelis : public CreatureScript
 
             void Reset()
             {
+                _events.Reset();
                 me->GetMotionMaster()->MoveTargetedHome();
-                me->CombatStop();
-                me->ClearInCombat();
             }
 
-            void MovementInform(uint32 type, uint32 point)
+            void JustSummoned(Creature *) override
+            {
+                me->SetHomePosition(me->GetPosition());
+            }
+
+            void AttackStart(Unit* who) override
+            {
+                ScriptedAI::AttackStart(who);
+            }
+
+            void MovementInform(uint32 type, uint32 point) override
             {
                 if (type != POINT_MOTION_TYPE)
                     if (point == 11)
@@ -1415,7 +1429,7 @@ class exarch_orelis : public CreatureScript
                 _events.ScheduleEvent(EVENT_SPELL_REND, urand(1500, 6000));
             }
 
-            void UpdateAI(uint32 diff)
+            void UpdateAI(uint32 diff) override
             {
                 _events.Update(diff);
 
@@ -1449,11 +1463,6 @@ class exarch_orelis : public CreatureScript
                 DoMeleeAttackIfReady();
             }
         };
-
-        CreatureAI* GetAI(Creature* creature) const
-        {
-            return new exarch_orelisAI(creature);
-        }
 };
 
 class socrethar : public CreatureScript
@@ -1816,9 +1825,8 @@ class kaylaan_the_lost : public CreatureScript
             bool second_waypath_done = false;
             bool adyen_dead = false, karja_dead = false, orelis_dead = false;
 
-            void EnterCombat(Unit* who) override
+            void EnterCombat(Unit* /*who*/)
             {
-                AttackStart(who);
                 _events.ScheduleEvent(EVENT_SPELL_BURNING_LIGHT, 2000);
                 _events.ScheduleEvent(EVENT_SPELL_CONSECRATION, 3000);
             }
@@ -1841,15 +1849,15 @@ class kaylaan_the_lost : public CreatureScript
                     if (Unit * socrethar = me->FindNearestCreature(SOCRETHAR, 100.0f, true))
                         socrethar->GetAI()->DoAction(RESET_DEATHBLOW_EVENT);
 
-                    karja_dead  = NULL;
-                    orelis_dead = NULL;
-                    adyen_dead  = NULL;
+                    karja_dead  = false;
+                    orelis_dead = false;
+                    adyen_dead  = false;
 
                     me->DespawnOrUnsummon(5000); // Despawn in 5 seconds to reset event
                 }
             }
 
-            void KilledUnit(Unit* victim) override
+            void KilledUnit(Unit* victim)
             {
                 switch (victim->GetEntry())
                 {
@@ -1868,7 +1876,7 @@ class kaylaan_the_lost : public CreatureScript
                     ResetDeathblowEvent(true);
             }
 
-            void DoAction(int32 param) override
+            void DoAction(int32 param)
             {
                 switch (param)
                 {
@@ -1878,7 +1886,7 @@ class kaylaan_the_lost : public CreatureScript
                 }
             }
 
-            void MovementInform(uint32 type, uint32 point) override
+            void MovementInform(uint32 type, uint32 point)
             {
                 if (type != POINT_MOTION_TYPE)
                 {
@@ -1911,7 +1919,7 @@ class kaylaan_the_lost : public CreatureScript
                 }
             }
 
-            void UpdateAI(uint32 diff) override
+            void UpdateAI(uint32 diff)
             {
                 _events.Update(diff);
 
