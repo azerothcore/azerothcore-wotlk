@@ -42,7 +42,7 @@ void WorldSession::HandleLfgJoinOpcode(WorldPacket& recvData)
 
     // pussywizard:
     if (Group* g = GetPlayer()->GetGroup())
-        if (g->isLFGGroup() ? g->GetMembersCount() == MAXGROUPSIZE : g->GetLeaderGUID() != GetPlayer()->GetGUID())
+        if (g->isLFGGroup() && g->GetLeaderGUID() != GetPlayer()->GetGUID())
         {
             recvData.rfinish();
             return;
