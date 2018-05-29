@@ -169,6 +169,7 @@ void WorldSession::HandleGroupInviteOpcode(WorldPacket& recvData)
             delete group;
             return;
         }
+        // If group has been disbanded, delete group and pending invites and return
         if (!group->AddInvite(player))
         {
             group->RemoveAllInvites();
@@ -178,7 +179,7 @@ void WorldSession::HandleGroupInviteOpcode(WorldPacket& recvData)
     }
     else
     {
-        // Group already existing, if can't add any more player (full group?), then just leave
+        // Group already existing, if can't add any more player (full group?), then remove invites and return
         if (!group->AddInvite(player))
         {
             group->RemoveAllInvites();
