@@ -171,15 +171,17 @@ void WorldSession::HandleGroupInviteOpcode(WorldPacket& recvData)
         }
         if (!group->AddInvite(player))
         {
+            group->RemoveAllInvites();
             delete group;
             return;
         }
     }
     else
     {
-        // already existed group: if can't add then just leave
+        // Group already existing, if can't add any more player (full group?), then just leave
         if (!group->AddInvite(player))
         {
+            group->RemoveAllInvites();
             return;
         }
     }
