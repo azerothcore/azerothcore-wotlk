@@ -1,3 +1,5 @@
+<!-- First of all, thank you for your contribution. If you intend to contribute more than once, you should really join us on our discord channel! (link is on site, in the readme etc) We can set cosmetic ranks for contributors like you! -->
+
 **Changes proposed:**
 
 -  
