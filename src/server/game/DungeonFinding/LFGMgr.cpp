@@ -495,10 +495,11 @@ void LFGMgr::JoinLfg(Player* player, uint8 roles, LfgDungeonSet& dungeons, const
         case LFG_STATE_PROPOSAL: // if joining again during proposal
             joinData.result = LFG_JOIN_INTERNAL_ERROR;
             break;
-        case LFG_STATE_FINISHED_DUNGEON:
+        /*case LFG_STATE_FINISHED_DUNGEON:
             if (grp && grp->isLFGGroup())
                 joinData.result = LFG_JOIN_PARTY_NOT_MEET_REQS;
             break;
+        */
         default:
             break;
     }
