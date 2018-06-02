@@ -19648,13 +19648,10 @@ void Player::SaveToDB(bool create, bool logout)
     // Character stats
     std::ostringstream ps;
     time_t t = time(NULL);
-    
-  {
-	    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_ARMORY_CHARACTER_STATS);
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_ARMORY_CHARACTER_STATS);
         stmt->setUInt32(0, GetGUIDLow());
+        trans->Append(stmt);
         CharacterDatabase.Execute(stmt);
-  }
-    
     ps << "INSERT INTO armory_character_stats (guid, data, save_date) VALUES (" << GetGUIDLow() << ", '";
     for (uint16 i = 0; i < m_valuesCount; ++i)
         ps << GetUInt32Value(i) << " ";
