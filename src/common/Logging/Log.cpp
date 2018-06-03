@@ -87,12 +87,6 @@ void Log::SetLogFileLevel(char *Level)
 
 void Log::Initialize()
 {
-    /// Check whether we'll log GM commands/RA events/character outputs/chat stuffs
-    m_dbChar = sConfigMgr->GetBoolDefault("LogDB.Char", false);
-    m_dbRA = sConfigMgr->GetBoolDefault("LogDB.RA", false);
-    m_dbGM = sConfigMgr->GetBoolDefault("LogDB.GM", false);
-    m_dbChat = sConfigMgr->GetBoolDefault("LogDB.Chat", false);
-
     /// Realm must be 0 by default
     SetRealmID(0);
 
@@ -108,45 +102,6 @@ void Log::Initialize()
     logfile = openLogFile("LogFile", "LogTimestamp", "w");
     InitColors(sConfigMgr->GetStringDefault("LogColors", ""));
 
-    m_gmlog_per_account = sConfigMgr->GetBoolDefault("GmLogPerAccount", false);
-    if (!m_gmlog_per_account)
-        gmLogfile = openLogFile("GMLogFile", "GmLogTimestamp", "a");
-    else
-    {
-        // GM log settings for per account case
-        m_gmlog_filename_format = sConfigMgr->GetStringDefault("GMLogFile", "");
-        if (!m_gmlog_filename_format.empty())
-        {
-            bool m_gmlog_timestamp = sConfigMgr->GetBoolDefault("GmLogTimestamp", false);
-
-            size_t dot_pos = m_gmlog_filename_format.find_last_of('.');
-            if (dot_pos!=m_gmlog_filename_format.npos)
-            {
-                if (m_gmlog_timestamp)
-                    m_gmlog_filename_format.insert(dot_pos, m_logsTimestamp);
-
-                m_gmlog_filename_format.insert(dot_pos, "_#%u");
-            }
-            else
-            {
-                m_gmlog_filename_format += "_#%u";
-
-                if (m_gmlog_timestamp)
-                    m_gmlog_filename_format += m_logsTimestamp;
-            }
-
-            m_gmlog_filename_format = m_logsDir + m_gmlog_filename_format;
-        }
-    }
-
-    charLogfile = openLogFile("CharLogFile", "CharLogTimestamp", "a");
-    dberLogfile = openLogFile("DBErrorLogFile", NULL, "a");
-    raLogfile = openLogFile("RaLogFile", NULL, "a");
-    chatLogfile = openLogFile("ChatLogFile", "ChatLogTimestamp", "a");
-    sqlLogFile = openLogFile("SQLDriverLogFile", NULL, "a");
-    sqlDevLogFile = openLogFile("SQLDeveloperLogFile", NULL, "a");
-    miscLogFile = fopen((m_logsDir+"Misc.log").c_str(), "a");
-
     // Main log file settings
     m_logLevel     = sConfigMgr->GetIntDefault("LogLevel", LOGL_NORMAL);
     m_logFileLevel = sConfigMgr->GetIntDefault("LogFileLevel", LOGL_NORMAL);
@@ -154,17 +109,6 @@ void Log::Initialize()
     m_sqlDriverQueryLogging  = sConfigMgr->GetBoolDefault("SQLDriverQueryLogging", false);
 
     m_DebugLogMask = DebugLogFilters(sConfigMgr->GetIntDefault("DebugLogMask", LOG_FILTER_NONE));
-
-    // Char log settings
-    m_charLog_Dump = sConfigMgr->GetBoolDefault("CharLogDump", false);
-    m_charLog_Dump_Separate = sConfigMgr->GetBoolDefault("CharLogDump.Separate", false);
-    if (m_charLog_Dump_Separate)
-    {
-        m_dumpsDir = sConfigMgr->GetStringDefault("CharLogDump.SeparateDir", "");
-        if (!m_dumpsDir.empty())
-            if ((m_dumpsDir.at(m_dumpsDir.length() - 1) != '/') && (m_dumpsDir.at(m_dumpsDir.length() - 1) != '\\'))
-                m_dumpsDir.push_back('/');
-    }
 }
 
 void Log::ReloadConfig()
@@ -502,6 +446,8 @@ void Log::outSQLDriver(const char* str, ...)
     if (!str)
         return;
 
+    sqlLogFile = openLogFile("SQLDriverLogFile", NULL, "a");
+
     va_list ap;
     va_start(ap, str);
     vutf8printf(stdout, str, &ap);
@@ -566,6 +512,8 @@ void Log::outErrorDb(const char * err, ...)
         fprintf(logfile, "\n" );
         fflush(logfile);
     }
+
+    dberLogfile = openLogFile("DBErrorLogFile", NULL, "a");
 
     if (dberLogfile)
     {
@@ -681,6 +629,8 @@ void Log::outSQLDev(const char* str, ...)
     va_end(ap);
 
     printf("\n");
+
+    sqlDevLogFile = openLogFile("SQLDeveloperLogFile", NULL, "a");
 
     if (sqlDevLogFile)
     {
@@ -813,6 +763,8 @@ void Log::outCommand(uint32 account, const char * str, ...)
     if (!str)
         return;
 
+    m_dbGM = sConfigMgr->GetBoolDefault("LogDB.GM", false);
+
     // TODO: support accountid
     if (m_enableLogDB && m_dbGM)
     {
@@ -851,6 +803,37 @@ void Log::outCommand(uint32 account, const char * str, ...)
         }
     }
 
+    m_gmlog_per_account = sConfigMgr->GetBoolDefault("GmLogPerAccount", false);
+    if (!m_gmlog_per_account)
+        gmLogfile = openLogFile("GMLogFile", "GmLogTimestamp", "a");
+    else
+    {
+        // GM log settings for per account case
+        m_gmlog_filename_format = sConfigMgr->GetStringDefault("GMLogFile", "");
+        if (!m_gmlog_filename_format.empty())
+        {
+            bool m_gmlog_timestamp = sConfigMgr->GetBoolDefault("GmLogTimestamp", false);
+
+            size_t dot_pos = m_gmlog_filename_format.find_last_of('.');
+            if (dot_pos != m_gmlog_filename_format.npos)
+            {
+                if (m_gmlog_timestamp)
+                    m_gmlog_filename_format.insert(dot_pos, m_logsTimestamp);
+
+                m_gmlog_filename_format.insert(dot_pos, "_#%u");
+            }
+            else
+            {
+                m_gmlog_filename_format += "_#%u";
+
+                if (m_gmlog_timestamp)
+                    m_gmlog_filename_format += m_logsTimestamp;
+            }
+
+            m_gmlog_filename_format = m_logsDir + m_gmlog_filename_format;
+        }
+    }
+
     if (m_gmlog_per_account)
     {
         if (FILE* per_file = openGmlogPerAccount (account))
@@ -883,6 +866,8 @@ void Log::outChar(const char * str, ...)
     if (!str)
         return;
 
+    m_dbChar = sConfigMgr->GetBoolDefault("LogDB.Char", false);
+
     if (m_enableLogDB && m_dbChar)
     {
         va_list ap2;
@@ -892,6 +877,8 @@ void Log::outChar(const char * str, ...)
         outDB(LOG_TYPE_CHAR, nnew_str);
         va_end(ap2);
     }
+
+    charLogfile = openLogFile("CharLogFile", "CharLogTimestamp", "a");
 
     if (charLogfile)
     {
@@ -908,6 +895,10 @@ void Log::outChar(const char * str, ...)
 void Log::outCharDump(const char * str, uint32 account_id, uint32 guid, const char * name)
 {
     FILE* file = NULL;
+
+    charLogfile = openLogFile("CharLogFile", "CharLogTimestamp", "a");
+
+    m_charLog_Dump_Separate = sConfigMgr->GetBoolDefault("CharLogDump.Separate", false);
     if (m_charLog_Dump_Separate)
     {
         char fileName[29]; // Max length: name(12) + guid(11) + _.log (5) + \0
@@ -918,6 +909,7 @@ void Log::outCharDump(const char * str, uint32 account_id, uint32 guid, const ch
     }
     else
         file = charLogfile;
+
     if (file)
     {
         fprintf(file, "== START DUMP == (account: %u guid: %u name: %s )\n%s\n== END DUMP ==\n",
@@ -933,6 +925,8 @@ void Log::outChat(const char * str, ...)
     if (!str)
         return;
 
+    m_dbChat = sConfigMgr->GetBoolDefault("LogDB.Chat", false);
+
     if (m_enableLogDB && m_dbChat)
     {
         va_list ap2;
@@ -942,6 +936,8 @@ void Log::outChat(const char * str, ...)
         outDB(LOG_TYPE_CHAT, nnew_str);
         va_end(ap2);
     }
+
+    chatLogfile = openLogFile("ChatLogFile", "ChatLogTimestamp", "a");
 
     if (chatLogfile)
     {
@@ -960,6 +956,8 @@ void Log::outRemote(const char * str, ...)
     if (!str)
         return;
 
+    m_dbRA = sConfigMgr->GetBoolDefault("LogDB.RA", false);
+
     if (m_enableLogDB && m_dbRA)
     {
         va_list ap2;
@@ -969,6 +967,8 @@ void Log::outRemote(const char * str, ...)
         outDB(LOG_TYPE_RA, nnew_str);
         va_end(ap2);
     }
+
+    raLogfile = openLogFile("RaLogFile", NULL, "a");
 
     if (raLogfile)
     {
@@ -986,6 +986,8 @@ void Log::outMisc(const char * str, ...)
 {
     if (!str)
         return;
+
+    miscLogFile = fopen((m_logsDir + "Misc.log").c_str(), "a");
 
     if (m_enableLogDB)
     {
