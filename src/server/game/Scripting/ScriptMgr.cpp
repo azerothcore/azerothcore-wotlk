@@ -1383,6 +1383,11 @@ void ScriptMgr::OnCreatureKill(Player* killer, Creature* killed)
     FOREACH_SCRIPT(PlayerScript)->OnCreatureKill(killer, killed);
 }
 
+void ScriptMgr::OnCreatureKilledByPet(Player* petOwner, Creature* killed)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnCreatureKilledByPet(petOwner, killed);
+}
+
 void ScriptMgr::OnPlayerKilledByCreature(Creature* killer, Player* killed)
 {
 #ifdef ELUNA
