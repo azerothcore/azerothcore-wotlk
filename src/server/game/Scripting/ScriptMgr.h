@@ -780,6 +780,9 @@ class PlayerScript : public ScriptObject
         // Called when a player kills a creature
         virtual void OnCreatureKill(Player* /*killer*/, Creature* /*killed*/) { }
 
+        // Called when a player's pet kills a creature
+        virtual void OnCreatureKilledByPet(Player* /*PetOwner*/, Creature* /*killed*/) { }
+
         // Called when a player is killed by a creature
         virtual void OnPlayerKilledByCreature(Creature* /*killer*/, Player* /*killed*/) { }
 
@@ -1227,6 +1230,7 @@ class ScriptMgr
         void OnPlayerReleasedGhost(Player* player);
         void OnPVPKill(Player* killer, Player* killed);
         void OnCreatureKill(Player* killer, Creature* killed);
+        void OnCreatureKilledByPet(Player* petOwner, Creature* killed);
         void OnPlayerKilledByCreature(Creature* killer, Player* killed);
         void OnPlayerLevelChanged(Player* player, uint8 oldLevel);
         void OnPlayerFreeTalentPointsChanged(Player* player, uint32 newPoints);
