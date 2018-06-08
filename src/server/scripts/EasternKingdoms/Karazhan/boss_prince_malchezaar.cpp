@@ -421,6 +421,7 @@ public:
 
                     if (target)
                         DoCast(target, SPELL_AMPLIFY_DAMAGE);
+                        AmplifyDamageTimer = urand(20000, 30000);
                 }
                 else
                     AmplifyDamageTimer -= diff;
