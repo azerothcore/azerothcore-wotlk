@@ -403,11 +403,11 @@ void TransportMgr::SpawnContinentTransports()
     if (_transportTemplates.empty())
         return;
 
+    uint32 oldMSTime = getMSTime();
+    uint32 count = 0;
     if (sWorld->getBoolConfig(CONFIG_ENABLE_CONTINENT_TRANSPORT))
     {
-        uint32 oldMSTime = getMSTime();
         QueryResult result = WorldDatabase.Query("SELECT guid, entry FROM transports");
-        uint32 count = 0;
         if (result)
         {
             do
