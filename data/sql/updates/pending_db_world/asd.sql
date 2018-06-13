@@ -1,4 +1,10 @@
--- maexxna portals
-REPLACE INTO `gameobject` (`guid`, `id`, `map`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `VerifiedBuild`, `zoneId`, `areaId`) VALUES 
-(65857, 181233, 533, 3, 1, 3465.16, -3940.45, 308.788, 0.441179, -0.305481, 0.637715, 0.305481, 0.637716, 180, 0, 1, 0, 0, 0),
-(268045, 181575, 533, 3, 2, 3465.16, -3940.45, 308.788, 0.441179, -0.305481, 0.637715, 0.305481, 0.637716, 180, 0, 1, 0, 0, 0);
+-- proper coords: 
+-- 3465.16, -3940.45, 308.788, 0.441179, -0.305481, 0.637715, 0.305481, 0.637716,
+-- requires two guids, one for the 'visual effect' and one for the 
+-- teleporter gameobject itself
+
+update `gameobject` set
+    `spawnmask` = 3, `phasemask`= 1,
+    `position_x` = 3465.16, `position_y` = -3940.45, `position_z` = 308.788,`orientation` = 0.441179, 
+    `rotation0` = -0.305481, `rotation1` = 0.637715, `rotation2` = 0.305481, `rotation3` = 0.637716
+    where `guid` in(65857,268045); -- check if guid is valid
