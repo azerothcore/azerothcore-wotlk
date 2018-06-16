@@ -1235,6 +1235,7 @@ void GameObject::Use(Unit* user)
     Unit* spellCaster = user;
     uint32 spellId = 0;
     bool triggered = false;
+    bool tmpfish = false;
 
     if (Player* playerUser = user->ToPlayer())
     {
@@ -1447,7 +1448,8 @@ void GameObject::Use(Unit* user)
             // cast this spell later if provided
             spellId = info->goober.spellId;
             spellCaster = user;
-
+            tmpfish = true;
+            
             break;
         }
         case GAMEOBJECT_TYPE_CAMERA:                        //13
@@ -1535,6 +1537,8 @@ void GameObject::Use(Unit* user)
                     }
                     else // else: junk
                         player->SendLoot(GetGUID(), LOOT_FISHING_JUNK);
+                        
+                    tmpfish = true;
                     break;
                 }
                 case GO_JUST_DEACTIVATED:                   // nothing to do, will be deleted at next update
@@ -1549,7 +1553,10 @@ void GameObject::Use(Unit* user)
                 }
             }
 
-            player->InterruptSpell(CURRENT_CHANNELED_SPELL, true, true, true);
+            if(tmpfish)
+                player->FinishSpell(CURRENT_CHANNELED_SPELL, true);
+            else
+                player->InterruptSpell(CURRENT_CHANNELED_SPELL, true, true, true);
             return;
         }
 
