@@ -698,7 +698,7 @@ void BattlegroundMgr::InitAutomaticArenaPointDistribution()
     if (wstime < curtime)
     {
         m_NextAutoDistributionTime = curtime;           // reset will be called in the next update
-        sLog->outString("AzerothCore Battleground: Battleground: Next arena point distribution time in the past, reseting it now.");
+        sLog->outString("AzerothCore Battleground: Next arena point distribution time in the past, reseting it now.");
     }
     else
         m_NextAutoDistributionTime = wstime;
