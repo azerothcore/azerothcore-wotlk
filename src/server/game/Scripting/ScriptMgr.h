@@ -1037,6 +1037,29 @@ class GlobalScript : public ScriptObject
         virtual void OnAfterUpdateEncounterState(Map* /*map*/, EncounterCreditType /*type*/,  uint32 /*creditEntry*/, Unit* /*source*/, Difficulty /*difficulty_fixed*/, DungeonEncounterList const* /*encounters*/, uint32 /*dungeonCompleted*/, bool /*updated*/) { }
 };
 
+class BGScript : public ScriptObject
+{
+protected:
+
+    BGScript(const char* name);
+
+public:
+
+    bool IsDatabaseBound() const { return false; }
+
+    // Start Battlegroud
+    virtual void OnBattlegroudStart(Battleground* /*bg*/) { }
+
+    // End Battleground
+    virtual void OnBattlegroudEndReward(Battleground* /*bg*/, Player* /*player*/, TeamId /*winnerTeamId*/) { }
+
+    // Update Battlegroud
+    virtual void OnBattlegroudUpdate(Battleground* /*bg*/, uint32 /*diff*/) { }
+
+    // Add Player in Battlegroud
+    virtual void OnBattlegroudAddPlayer(Battleground* /*bg*/, Player* /*player*/) { }
+};
+
 // this class can be used to be extended by Modules
 // creating their own custom hooks inside module itself
 class ModuleScript : public ScriptObject
@@ -1355,6 +1378,13 @@ class ScriptMgr
         //listener functions are called by OnPlayerEnterMap and OnPlayerLeaveMap
         //void OnPlayerEnterAll(Map* map, Player* player);
         //void OnPlayerLeaveAll(Map* map, Player* player);
+
+    public: /* BGScript */
+
+        void OnBattlegroudStart(Battleground* bg);
+        void OnBattlegroudEndReward(Battleground* bg, Player* player, TeamId winnerTeamId);
+        void OnBattlegroudUpdate(Battleground* bg, uint32 diff);
+        void OnBattlegroudAddPlayer(Battleground* bg, Player* player);
 
     private:
 
