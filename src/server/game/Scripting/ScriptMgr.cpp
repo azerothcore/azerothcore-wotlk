@@ -57,6 +57,7 @@ template class ScriptRegistry<UnitScript>;
 template class ScriptRegistry<AllCreatureScript>;
 template class ScriptRegistry<AllMapScript>;
 template class ScriptRegistry<MovementHandlerScript>;
+template class ScriptRegistry<BGScript>;
 
 #include "ScriptMgrMacros.h"
 
@@ -207,6 +208,7 @@ void ScriptMgr::Unload()
     SCR_CLEAR(GroupScript);
     SCR_CLEAR(GlobalScript);
     SCR_CLEAR(ModuleScript);
+    SCR_CLEAR(BGScript);
 
     #undef SCR_CLEAR
 }
@@ -276,6 +278,7 @@ void ScriptMgr::CheckIfScriptsInDatabaseExist()
                 !ScriptRegistry<AchievementCriteriaScript>::GetScriptById(sid) &&
                 !ScriptRegistry<PlayerScript>::GetScriptById(sid) &&
                 !ScriptRegistry<GuildScript>::GetScriptById(sid) &&
+                !ScriptRegistry<BGScript>::GetScriptById(sid) &&
                 !ScriptRegistry<GroupScript>::GetScriptById(sid))
                 sLog->outErrorDb("Script named '%s' is assigned in database, but has no code!", (*itr).c_str());
         }
@@ -1960,6 +1963,27 @@ void ScriptMgr::OnAfterArenaRatingCalculation(Battleground *const bg, int32 &win
     FOREACH_SCRIPT(FormulaScript)->OnAfterArenaRatingCalculation(bg, winnerMatchmakerChange, loserMatchmakerChange, winnerChange, loserChange);
 }
 
+// BGScript
+void ScriptMgr::OnBattlegroudStart(Battleground* bg)
+{
+    FOREACH_SCRIPT(BGScript)->OnBattlegroudStart(bg);
+}
+
+void ScriptMgr::OnBattlegroudEndReward(Battleground* bg, Player* player, TeamId winnerTeamId)
+{
+    FOREACH_SCRIPT(BGScript)->OnBattlegroudEndReward(bg, player, winnerTeamId);
+}
+
+void ScriptMgr::OnBattlegroudUpdate(Battleground* bg, uint32 diff)
+{
+    FOREACH_SCRIPT(BGScript)->OnBattlegroudUpdate(bg, diff);
+}
+
+void ScriptMgr::OnBattlegroudAddPlayer(Battleground* bg, Player* player)
+{
+    FOREACH_SCRIPT(BGScript)->OnBattlegroudAddPlayer(bg, player);
+}
+
 AllMapScript::AllMapScript(const char* name)
     : ScriptObject(name)
 {
@@ -2133,6 +2157,12 @@ GlobalScript::GlobalScript(const char* name)
     : ScriptObject(name)
 {
     ScriptRegistry<GlobalScript>::AddScript(this);
+}
+
+BGScript::BGScript(char const* name)
+    : ScriptObject(name)
+{
+    ScriptRegistry<BGScript>::AddScript(this);
 }
 
 ModuleScript::ModuleScript(const char* name)
