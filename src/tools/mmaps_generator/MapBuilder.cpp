@@ -23,7 +23,7 @@ namespace DisableMgr
 }
 
 #define MMAP_MAGIC 0x4d4d4150   // 'MMAP'
-#define MMAP_VERSION 8
+#define MMAP_VERSION 9
 
 struct MmapTileHeader
 {
