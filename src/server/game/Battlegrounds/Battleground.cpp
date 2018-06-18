@@ -282,7 +282,7 @@ void Battleground::Update(uint32 diff)
 
     PostUpdateImpl(diff);
 
-    sScriptMgr->OnBattlegroudUpdate(this, diff);
+    sScriptMgr->OnBattlegroundUpdate(this, diff);
 }
 
 inline void Battleground::_CheckSafePositions(uint32 diff)
@@ -584,7 +584,7 @@ inline void Battleground::_ProcessJoin(uint32 diff)
             if (sWorld->getBoolConfig(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_ENABLE))
                 sWorld->SendWorldText(LANG_BG_STARTED_ANNOUNCE_WORLD, GetName(), std::min(GetMinLevel(), (uint32)80), std::min(GetMaxLevel(), (uint32)80));
 
-            sScriptMgr->OnBattlegroudStart(this);
+            sScriptMgr->OnBattlegroundStart(this);
         }
     }
 }
@@ -978,7 +978,7 @@ void Battleground::EndBattleground(TeamId winnerTeamId)
         uint32 loser_kills = player->GetRandomWinner() ? BG_REWARD_LOSER_HONOR_LAST : BG_REWARD_LOSER_HONOR_FIRST;
         uint32 winner_arena = player->GetRandomWinner() ? BG_REWARD_WINNER_ARENA_LAST : BG_REWARD_WINNER_ARENA_FIRST;
 
-        sScriptMgr->OnBattlegroudEndReward(this, player, winnerTeamId);
+        sScriptMgr->OnBattlegroundEndReward(this, player, winnerTeamId);
 
         // Reward winner team
         if (bgTeamId == winnerTeamId)
@@ -1259,7 +1259,7 @@ void Battleground::AddPlayer(Player* player)
     PlayerAddedToBGCheckIfBGIsRunning(player);
     AddOrSetPlayerToCorrectBgGroup(player, teamId);
 
-    sScriptMgr->OnBattlegroudAddPlayer(this, player);
+    sScriptMgr->OnBattlegroundAddPlayer(this, player);
 
     // Log
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
