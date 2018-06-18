@@ -116,10 +116,10 @@ void Master::LodaModuleConfigSettings()
         configFile += ".conf";
 
         std::string conf_path = _CONF_DIR;
-        std::string cfg_file = conf_path + "/Settings/" + configFile;
+        std::string cfg_file = conf_path + "/" + configFile;
 
 #if PLATFORM == PLATFORM_WINDOWS
-        cfg_file = "Settings/" + configFile;
+        cfg_file = configFile;
 #endif
         std::string cfg_def_file = cfg_file + ".dist";
 

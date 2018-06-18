@@ -220,19 +220,16 @@ if( WIN32 )
   if ( MSVC )
     add_custom_command(TARGET worldserver
       POST_BUILD
-      COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/bin/$(ConfigurationName)/Settings/"
-      COMMAND ${CMAKE_COMMAND} -E copy "${configFile}" ${CMAKE_BINARY_DIR}/bin/$(ConfigurationName)/Settings/
+      COMMAND ${CMAKE_COMMAND} -E copy "${configFile}" ${CMAKE_BINARY_DIR}/bin/$(ConfigurationName)/
     )
   elseif ( MINGW )
     add_custom_command(TARGET worldserver
       POST_BUILD
-      COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/bin/Settings/"
-      COMMAND ${CMAKE_COMMAND} -E copy "${configFile}" ${CMAKE_BINARY_DIR}/bin/Settings/
+      COMMAND ${CMAKE_COMMAND} -E copy "${configFile}" ${CMAKE_BINARY_DIR}/bin/
     )
   endif()
 endif()
-install(DIRECTORY "" DESTINATION "${CMAKE_INSTALL_PREFIX}/bin/Settings/")
-install(FILES "${configFile}" DESTINATION ${CONF_DIR}/Settings)
+install(FILES "${configFile}" DESTINATION ${CONF_DIR})
 ENDFOREACH()
 
 CU_GET_GLOBAL("MODULE_CONFIG_FILE_LIST")
