@@ -1048,16 +1048,16 @@ public:
     bool IsDatabaseBound() const { return false; }
 
     // Start Battlegroud
-    virtual void OnBattlegroudStart(Battleground* /*bg*/) { }
+    virtual void OnBattlegroundStart(Battleground* /*bg*/) { }
 
     // End Battleground
-    virtual void OnBattlegroudEndReward(Battleground* /*bg*/, Player* /*player*/, TeamId /*winnerTeamId*/) { }
+    virtual void OnBattlegroundEndReward(Battleground* /*bg*/, Player* /*player*/, TeamId /*winnerTeamId*/) { }
 
     // Update Battlegroud
-    virtual void OnBattlegroudUpdate(Battleground* /*bg*/, uint32 /*diff*/) { }
+    virtual void OnBattlegroundUpdate(Battleground* /*bg*/, uint32 /*diff*/) { }
 
     // Add Player in Battlegroud
-    virtual void OnBattlegroudAddPlayer(Battleground* /*bg*/, Player* /*player*/) { }
+    virtual void OnBattlegroundAddPlayer(Battleground* /*bg*/, Player* /*player*/) { }
 };
 
 // this class can be used to be extended by Modules
@@ -1381,10 +1381,10 @@ class ScriptMgr
 
     public: /* BGScript */
 
-        void OnBattlegroudStart(Battleground* bg);
-        void OnBattlegroudEndReward(Battleground* bg, Player* player, TeamId winnerTeamId);
-        void OnBattlegroudUpdate(Battleground* bg, uint32 diff);
-        void OnBattlegroudAddPlayer(Battleground* bg, Player* player);
+        void OnBattlegroundStart(Battleground* bg);
+        void OnBattlegroundEndReward(Battleground* bg, Player* player, TeamId winnerTeamId);
+        void OnBattlegroundUpdate(Battleground* bg, uint32 diff);
+        void OnBattlegroundAddPlayer(Battleground* bg, Player* player);
 
     private:
 
