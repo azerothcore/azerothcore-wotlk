@@ -1964,24 +1964,24 @@ void ScriptMgr::OnAfterArenaRatingCalculation(Battleground *const bg, int32 &win
 }
 
 // BGScript
-void ScriptMgr::OnBattlegroudStart(Battleground* bg)
+void ScriptMgr::OnBattlegroundStart(Battleground* bg)
 {
-    FOREACH_SCRIPT(BGScript)->OnBattlegroudStart(bg);
+    FOREACH_SCRIPT(BGScript)->OnBattlegroundStart(bg);
 }
 
-void ScriptMgr::OnBattlegroudEndReward(Battleground* bg, Player* player, TeamId winnerTeamId)
+void ScriptMgr::OnBattlegroundEndReward(Battleground* bg, Player* player, TeamId winnerTeamId)
 {
-    FOREACH_SCRIPT(BGScript)->OnBattlegroudEndReward(bg, player, winnerTeamId);
+    FOREACH_SCRIPT(BGScript)->OnBattlegroundEndReward(bg, player, winnerTeamId);
 }
 
-void ScriptMgr::OnBattlegroudUpdate(Battleground* bg, uint32 diff)
+void ScriptMgr::OnBattlegroundUpdate(Battleground* bg, uint32 diff)
 {
-    FOREACH_SCRIPT(BGScript)->OnBattlegroudUpdate(bg, diff);
+    FOREACH_SCRIPT(BGScript)->OnBattlegroundUpdate(bg, diff);
 }
 
-void ScriptMgr::OnBattlegroudAddPlayer(Battleground* bg, Player* player)
+void ScriptMgr::OnBattlegroundAddPlayer(Battleground* bg, Player* player)
 {
-    FOREACH_SCRIPT(BGScript)->OnBattlegroudAddPlayer(bg, player);
+    FOREACH_SCRIPT(BGScript)->OnBattlegroundAddPlayer(bg, player);
 }
 
 AllMapScript::AllMapScript(const char* name)
