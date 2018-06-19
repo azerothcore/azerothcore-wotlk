@@ -445,6 +445,7 @@ public:
     virtual void OnDamage(Unit* /*attacker*/, Unit* /*victim*/, uint32& /*damage*/) { }
 
     // Called when DoT's Tick Damage is being Dealt
+    // Attacker can be NULL if he is despawned while the aura still exists on target
     virtual void ModifyPeriodicDamageAurasTick(Unit* /*target*/, Unit* /*attacker*/, uint32& /*damage*/) { }
 
     // Called when Melee Damage is being Dealt
