@@ -76,8 +76,6 @@ Object::Object() : m_PackGUID(sizeof(uint64)+1)
     m_inWorld           = false;
     m_objectUpdated     = false;
 
-    CustomData.Set("base",new DataMap::Base); // avoid crash when access not initialized CustomData
-
     m_PackGUID.appendPackGUID(0);
 }
 
