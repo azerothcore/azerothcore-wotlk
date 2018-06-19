@@ -111,9 +111,9 @@ public:
 void Master::LodaModuleConfigSettings()
 {
     Tokenizer configFileList(CONFIG_FILE_LIST, ',');
-    for each (std::string configFile in configFileList)
+    for(auto i = configFileList.begin();i!= configFileList.end();i++)
     {
-        configFile += ".conf";
+        std::string configFile = (*i) + std::string(".conf");
 
         std::string conf_path = _CONF_DIR;
         std::string cfg_file = conf_path + "/" + configFile;
