@@ -108,7 +108,7 @@ public:
     }
 };
 
-void Master::LodaModuleConfigSettings()
+void Master::LoadModuleConfigSettings()
 {
     Tokenizer configFileList(CONFIG_FILE_LIST, ',');
     for(auto i = configFileList.begin();i!= configFileList.end();i++)
@@ -191,7 +191,7 @@ int Master::Run()
     LoginDatabase.DirectPExecute("UPDATE realmlist SET flag = (flag & ~%u) | %u WHERE id = '%d'", REALM_FLAG_OFFLINE, REALM_FLAG_INVALID, realmID);
 
     //read modules config setting
-    LodaModuleConfigSettings();
+    LoadModuleConfigSettings();
 
     ///- Initialize the World
     sWorld->SetInitialWorldSettings();
