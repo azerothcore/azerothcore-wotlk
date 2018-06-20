@@ -13,6 +13,7 @@
 #include "Player.h"
 #include "Util.h"
 #include "WorldSession.h"
+#include "GameGraveyard.h"
 
 BattlegroundAB::BattlegroundAB()
 {
@@ -424,10 +425,10 @@ void BattlegroundAB::EndBattleground(TeamId winnerTeamId)
     _bgEvents.Reset();
 }
 
-WorldSafeLocsEntry const* BattlegroundAB::GetClosestGraveyard(Player* player)
+GraveyardStruct const* BattlegroundAB::GetClosestGraveyard(Player* player)
 {
-    WorldSafeLocsEntry const* entry = sWorldSafeLocsStore.LookupEntry(BG_AB_GraveyardIds[BG_AB_SPIRIT_ALIANCE + player->GetTeamId()]);
-    WorldSafeLocsEntry const* nearestEntry = entry;
+    GraveyardStruct const* entry = sGraveyard->GetGraveyard(BG_AB_GraveyardIds[BG_AB_SPIRIT_ALIANCE + player->GetTeamId()]);
+    GraveyardStruct const* nearestEntry = entry;
 
     float pX = player->GetPositionX();
     float pY = player->GetPositionY();
@@ -437,7 +438,7 @@ WorldSafeLocsEntry const* BattlegroundAB::GetClosestGraveyard(Player* player)
     for (uint8 i = BG_AB_NODE_STABLES; i < BG_AB_DYNAMIC_NODES_COUNT; ++i)
         if (_capturePointInfo[i]._ownerTeamId == player->GetTeamId())
         {
-            entry = sWorldSafeLocsStore.LookupEntry(BG_AB_GraveyardIds[i]);
+            entry = sGraveyard->GetGraveyard(BG_AB_GraveyardIds[i]);
             dist = (entry->x - pX)*(entry->x - pX) + (entry->y - pY)*(entry->y - pY);
             if (dist < minDist)
             {

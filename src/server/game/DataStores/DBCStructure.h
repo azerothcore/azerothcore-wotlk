@@ -2044,17 +2044,6 @@ struct WorldMapOverlayEntry
                                                             // 9-16 some ints
 };
 
-struct WorldSafeLocsEntry
-{
-    uint32    ID;                                           // 0
-    uint32    map_id;                                       // 1
-    float     x;                                            // 2
-    float     y;                                            // 3
-    float     z;                                            // 4
-    //char*   name[16]                                      // 5-20 name, unused
-                                                            // 21 name flags, unused
-};
-
 /*
 struct WorldStateSounds
 {
