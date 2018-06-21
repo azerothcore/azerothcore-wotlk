@@ -1,5 +1,5 @@
 #include "GameGraveyard.h"
-#include "Map.h"
+#include "MapManager.h"
 #include "DBCStores.h"
 #include "Log.h"
 
@@ -239,7 +239,7 @@ void Graveyard::RemoveGraveyardLink(uint32 id, uint32 zoneId, TeamId teamId, boo
     GraveyardMapBoundsNonConst range = GraveyardStore.equal_range(zoneId);
     if (range.first == range.second)
     {
-        sLog->outError("Table `game_graveyard_zone` incomplete: Zone %u Team %u does not have a linked graveyard.", zoneId);
+        sLog->outError("Table `game_graveyard_zone` incomplete: Zone %u Team %u does not have a linked graveyard.", zoneId, teamId);
         return;
     }
 

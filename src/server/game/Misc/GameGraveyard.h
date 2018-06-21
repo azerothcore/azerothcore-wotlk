@@ -2,6 +2,8 @@
 #define _GAMEGRAVEYARD_H_
 
 #include "Common.h"
+#include "SharedDefines.h"
+#include <ace/Singleton.h>
 
 struct GraveyardStruct
 {
