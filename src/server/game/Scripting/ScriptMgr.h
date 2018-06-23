@@ -1061,6 +1061,21 @@ public:
     virtual void OnBattlegroundAddPlayer(Battleground* /*bg*/, Player* /*player*/) { }
 };
 
+class SpellSC : public ScriptObject
+{
+protected:
+
+    SpellSC(const char* name);
+
+public:
+
+    bool IsDatabaseBound() const { return false; }
+
+    // Calculate max duration in applying aura 
+    virtual void OnCalcMaxDuration(Aura const* /*aura*/, int32& /*maxDuration*/) { }
+
+};
+
 // this class can be used to be extended by Modules
 // creating their own custom hooks inside module itself
 class ModuleScript : public ScriptObject
@@ -1386,6 +1401,10 @@ class ScriptMgr
         void OnBattlegroundEndReward(Battleground* bg, Player* player, TeamId winnerTeamId);
         void OnBattlegroundUpdate(Battleground* bg, uint32 diff);
         void OnBattlegroundAddPlayer(Battleground* bg, Player* player);
+
+    public: /* SpellSC */ 
+ 
+        void OnCalcMaxDuration(Aura const* aura, int32& maxDuration); 
 
     private:
 

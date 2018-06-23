@@ -58,6 +58,7 @@ template class ScriptRegistry<AllCreatureScript>;
 template class ScriptRegistry<AllMapScript>;
 template class ScriptRegistry<MovementHandlerScript>;
 template class ScriptRegistry<BGScript>;
+template class ScriptRegistry<SpellSC>;
 
 #include "ScriptMgrMacros.h"
 
@@ -209,6 +210,7 @@ void ScriptMgr::Unload()
     SCR_CLEAR(GlobalScript);
     SCR_CLEAR(ModuleScript);
     SCR_CLEAR(BGScript);
+    SCR_CLEAR(SpellSC);
 
     #undef SCR_CLEAR
 }
@@ -279,6 +281,7 @@ void ScriptMgr::CheckIfScriptsInDatabaseExist()
                 !ScriptRegistry<PlayerScript>::GetScriptById(sid) &&
                 !ScriptRegistry<GuildScript>::GetScriptById(sid) &&
                 !ScriptRegistry<BGScript>::GetScriptById(sid) &&
+                !ScriptRegistry<SpellSC>::GetScriptById(sid) &&
                 !ScriptRegistry<GroupScript>::GetScriptById(sid))
                 sLog->outErrorDb("Script named '%s' is assigned in database, but has no code!", (*itr).c_str());
         }
@@ -1984,6 +1987,12 @@ void ScriptMgr::OnBattlegroundAddPlayer(Battleground* bg, Player* player)
     FOREACH_SCRIPT(BGScript)->OnBattlegroundAddPlayer(bg, player);
 }
 
+// SpellSC
+void ScriptMgr::OnCalcMaxDuration(Aura const* aura, int32& maxDuration)
+{
+    FOREACH_SCRIPT(SpellSC)->OnCalcMaxDuration(aura, maxDuration);
+}
+
 AllMapScript::AllMapScript(const char* name)
     : ScriptObject(name)
 {
@@ -2163,6 +2172,12 @@ BGScript::BGScript(char const* name)
     : ScriptObject(name)
 {
     ScriptRegistry<BGScript>::AddScript(this);
+}
+
+SpellSC::SpellSC(char const* name)
+    : ScriptObject(name)
+{
+    ScriptRegistry<SpellSC>::AddScript(this);
 }
 
 ModuleScript::ModuleScript(const char* name)
