@@ -76,7 +76,7 @@ public:
 
         void MoveInLineOfSight(Unit *who)
         {
-            if ((!me->GetVictim() || me->GetVictim()->GetEntry() != NPC_ZOMBIE_CHOW) && who->GetEntry() == NPC_ZOMBIE_CHOW && me->IsWithinDistInMap(who, 15))
+            if ((!me->GetVictim() || me->GetVictim()->GetEntry() != NPC_ZOMBIE_CHOW) && who->GetEntry() == NPC_ZOMBIE_CHOW && me->IsWithinDistInMap(who, 6.5f))
             {
                 SetGazeOn(who);
                 me->MonsterTextEmote("%s spots a nearby zombie to devour!", 0, false);
