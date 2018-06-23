@@ -155,7 +155,7 @@ public:
             events.ScheduleEvent(EVENT_SPELL_CLEAVE, 5000);
             events.ScheduleEvent(EVENT_SPELL_TAIL_SWEEP, 10000);
             events.ScheduleEvent(EVENT_SPELL_LIFE_DRAIN, 17000);
-            events.ScheduleEvent(EVENT_SPELL_BLIZZARD, 21000);
+            events.ScheduleEvent(EVENT_SPELL_BLIZZARD, 17000);
             events.ScheduleEvent(EVENT_FLIGHT_START, 45000);
             events.ScheduleEvent(EVENT_HUNDRED_CLUB, 5000);
         }
@@ -285,6 +285,7 @@ public:
                     me->SendMeleeAttackStop(me->GetVictim());
                     me->HandleEmoteCommand(EMOTE_ONESHOT_LIFTOFF);
                     me->SetDisableGravity(true);
+                    me->SetHover(true);
                     currentTarget = 0;
                     events.PopEvent();
                     events.ScheduleEvent(EVENT_FLIGHT_ICEBOLT, 3000);
@@ -356,6 +357,7 @@ public:
                     me->HandleEmoteCommand(EMOTE_ONESHOT_LAND);
                     me->SetDisableGravity(false);
 
+                    me->SetHover(false);
                     events.PopEvent();
                     events.ScheduleEvent(EVENT_GROUND, 1500);
                     return;
