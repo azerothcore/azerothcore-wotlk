@@ -454,8 +454,8 @@ public:
         bool SetBossState(uint32 bossId, EncounterState state) override
         {
             // pull all the trash if not killed
-            case EVENT_PATCHWERK:
-                if (data == IN_PROGRESS)
+            if (bossId == BOSS_PATCHWERK)
+                if (state == IN_PROGRESS)
                     if (Creature* patch = instance->GetCreature(_patchwerkGUID))
                         if (!PatchwerkRoomTrash.empty())
                             for (std::list<uint64>::iterator itr = PatchwerkRoomTrash.begin(); itr != PatchwerkRoomTrash.end(); ++itr)
