@@ -453,7 +453,6 @@ public:
         
         bool SetBossState(uint32 bossId, EncounterState state) override
         {
-            
             // pull all the trash if not killed
             case EVENT_PATCHWERK:
                 if (data == IN_PROGRESS)
@@ -465,7 +464,7 @@ public:
                                 if (trash && trash->IsAlive() && !trash->IsInCombat())
                                     trash->AI()->AttackStart(patch->GetVictim());                                
                             }
-            
+
             // Horseman handling
             if (bossId == BOSS_HORSEMAN)
             {
