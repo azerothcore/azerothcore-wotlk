@@ -4,6 +4,7 @@
 
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "ScriptedEscortAI.h"
 #include "culling_of_stratholme.h"
 #include "SpellScript.h"
 
