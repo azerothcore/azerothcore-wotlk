@@ -40,11 +40,25 @@ public:
         return new boss_meathookAI (creature);
     }
 
-    struct boss_meathookAI : public ScriptedAI
+    struct boss_meathookAI : public npc_escortAI
     {
-        boss_meathookAI(Creature* c) : ScriptedAI(c)
+        boss_meathookAI(Creature* c) : npc_escortAI(c)
         {
             Talk(SAY_SPAWN);
+
+            AddWaypoint(1, 2349.07f, 1181.84f, 130.416f, 0);
+            AddWaypoint(2, 2240.9f, 1173.33f, 137.171f, 0);
+            AddWaypoint(3, 2171.15f, 1251.85f, 135.168f, 0);
+            AddWaypoint(4, 2180.95f, 1329.96f, 129.991f, 0);
+            AddWaypoint(5, 2219.12f, 1331.17f, 128.11f, 0);
+            AddWaypoint(6, 2139.14f, 1351.94f, 132.072f, 0);
+            AddWaypoint(7, 2186.49f, 1335.78f, 130.049f, 0);
+            AddWaypoint(8, 2170.9f, 1255.13f, 134.816f, 0);
+            AddWaypoint(9, 2245.52f, 1169.46f, 137.59f, 0);
+            AddWaypoint(10, 2325.94f, 1176.1f, 132.979f, 0);
+            AddWaypoint(11, 2351.52f, 1197.95f, 130.444f, 0);
+
+            Start(true, false, 0, NULL, false, true);
         }
 
         EventMap events;
@@ -71,7 +85,9 @@ public:
             Talk(SAY_SLAY);
         }
 
-        void UpdateAI(uint32 diff)
+        void WaypointReached(uint32 Point) { /* do something? idk.. */ }
+
+        void UpdateEscortAI(uint32 diff)
         {
             if (!UpdateVictim())
                 return;
