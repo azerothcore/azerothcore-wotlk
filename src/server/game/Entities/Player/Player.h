@@ -458,6 +458,12 @@ enum PlayerFlags
 
 #define KNOWN_TITLES_SIZE   3
 #define MAX_TITLE_INDEX     (KNOWN_TITLES_SIZE*64)          // 3 uint64 fields
+ 
+enum PlayerFieldBytes2Offsets
+{
+    PLAYER_FIELD_BYTES_2_OFFSET_IGNORE_POWER_REGEN_PREDICTION_MASK = 0,
+    PLAYER_FIELD_BYTES_2_OFFSET_AURA_VISION = 1,
+};
 
 // used in PLAYER_FIELD_BYTES values
 enum PlayerFieldByteFlags
