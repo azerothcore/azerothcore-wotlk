@@ -118,8 +118,6 @@ public:
                     }
         }
 
-        void WaypointReached(uint32 Point) { /* do something? idk.. */ }
-
         void UpdateEscortAI(uint32 diff)
         {
             if (!UpdateVictim())
