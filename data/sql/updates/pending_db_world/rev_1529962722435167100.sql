@@ -1,3 +1,0 @@
-INSERT INTO version_db_world (`sql_rev`) VALUES ('1529962722435167100');
-INSERT INTO `creature` VALUES (2023136, 6491, 0, 1, 1, 0, 0, -12550.3, -588.485, 39.0025, 0.437805, 300, 0, 0, 4121, 0, 0, 0, 0, 0);
-
