@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
@@ -26812,6 +26812,12 @@ bool Player::IsHealerTalentSpec() const
 { 
     uint8 tree = GetMostPointsTalentTree();
     return ((getClass() == CLASS_DRUID && tree == 2) || (getClass() == CLASS_PALADIN && tree == 0) || (getClass() == CLASS_PRIEST && tree <= 1) || (getClass() == CLASS_SHAMAN && tree == 2));
+}
+
+bool Player::IsTankTalentSpec() const
+{
+    uint8 tree = GetMostPointsTalentTree();
+    return ((getClass() == CLASS_PALADIN && tree == 1) || (getClass() == CLASS_WARRIOR && tree == 2) || (getClass() == CLASS_DRUID && tree == 1) || (getClass() == CLASS_DEATH_KNIGHT && tree == 1));
 }
 
 void Player::ResetTimeSync()
