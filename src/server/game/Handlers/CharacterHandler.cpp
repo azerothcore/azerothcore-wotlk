@@ -31,7 +31,7 @@
 #include "SocialMgr.h"
 #include "SpellAuras.h"
 #include "SpellAuraEffects.h"
-#include "SystemConfig.h"
+#include "GitRevision.h"
 #include "UpdateMask.h"
 #include "Util.h"
 #include "World.h"
@@ -1009,7 +1009,7 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder* holder)
 
         // send server info
         if (sWorld->getIntConfig(CONFIG_ENABLE_SINFO_LOGIN) == 1)
-            chH.PSendSysMessage(_FULLVERSION);
+            chH.PSendSysMessage("%s", GitRevision::GetFullVersion());
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         sLog->outStaticDebug("WORLD: Sent server info");
@@ -1335,7 +1335,7 @@ void WorldSession::HandlePlayerLoginToCharInWorld(Player* pCurrChar)
 
         // send server info
         if (sWorld->getIntConfig(CONFIG_ENABLE_SINFO_LOGIN) == 1)
-            chH.PSendSysMessage(_FULLVERSION);
+            chH.PSendSysMessage("%s", GitRevision::GetFullVersion());
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         sLog->outStaticDebug("WORLD: Sent server info");

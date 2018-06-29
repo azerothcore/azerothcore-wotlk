@@ -420,7 +420,10 @@ public:
                     target = SelectTarget(SELECT_TARGET_RANDOM, 1, 100, true);
 
                     if (target)
+                    {
                         DoCast(target, SPELL_AMPLIFY_DAMAGE);
+                        AmplifyDamageTimer = urand(20000, 30000);
+                    }
                 }
                 else
                     AmplifyDamageTimer -= diff;

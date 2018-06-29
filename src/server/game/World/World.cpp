@@ -11,7 +11,7 @@
 #include "Common.h"
 #include "DatabaseEnv.h"
 #include "Config.h"
-#include "SystemConfig.h"
+#include "GitRevision.h"
 #include "Log.h"
 #include "Opcodes.h"
 #include "WorldSession.h"
@@ -1300,8 +1300,13 @@ void World::SetInitialWorldSettings()
 
 #ifdef ELUNA
     ///- Initialize Lua Engine
-    TC_LOG_INFO("server.loading", "Initialize Eluna Lua Engine...");
-    std::string cfg_file = "mod_LuaEngine.conf";
+    sLog->outString("Initialize Eluna Lua Engine...");
+
+    std::string conf_path = _CONF_DIR;
+    std::string cfg_file = conf_path + "/mod_LuaEngine.conf";
+#ifdef WIN32
+    cfg_file = "mod_LuaEngine.conf";
+#endif
     std::string cfg_def_file = cfg_file + ".dist";
     sConfigMgr->LoadMore(cfg_def_file.c_str());
     sConfigMgr->LoadMore(cfg_file.c_str());
@@ -1789,7 +1794,7 @@ void World::SetInitialWorldSettings()
     m_startTime = m_gameTime;
 
     LoginDatabase.PExecute("INSERT INTO uptime (realmid, starttime, uptime, revision) VALUES(%u, %u, 0, '%s')",
-                            realmID, uint32(m_startTime), _FULLVERSION);       // One-time query
+                            realmID, uint32(m_startTime), GitRevision::GetFullVersion());       // One-time query
 
 
 

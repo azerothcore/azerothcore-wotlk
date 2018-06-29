@@ -1,4 +1,4 @@
-# absolute root path of your azerothshard repository
+# absolute root path of your azerothcore repository
 SRCPATH="$AC_PATH_ROOT"
 
 # absolute path where build files must be stored
@@ -73,14 +73,15 @@ DATABASES=(
 
 OUTPUT_FOLDER="$AC_PATH_ROOT/env/dist/sql/"
 
-#
-# Enable following flag 
-# if you want backup your db
-# before import sql with db_assembler
-#
-BACKUP_ENABLE=true
+####### BACKUP
+# Set to true if you want to backup your azerothcore databases before importing the SQL with the db_assembler
+# Do not forget to stop your database software (mysql) before doing so
+
+BACKUP_ENABLE=false
 
 BACKUP_FOLDER="$AC_PATH_ROOT/env/dist/sql/backup/"
+
+#######
 
 # FULL DB
 DB_CHARACTERS_PATHS=(

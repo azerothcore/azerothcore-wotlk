@@ -290,6 +290,12 @@ void InstanceSaveManager::LoadResetTimes()
             SetResetTimeFor(mapid, difficulty, t);
             CharacterDatabase.DirectPExecute("INSERT INTO instance_reset VALUES ('%u', '%u', '%u')", mapid, difficulty, (uint32)t);
         }
+        else
+        {
+            // next reset should be in future. If its not, skip to future.
+            while (t < now)
+                t = uint32(((t + MINUTE) / DAY * DAY) + period + diff);
+        }
         SetExtendedResetTimeFor(mapid, difficulty, t + period);
 
         // schedule the global reset/warning

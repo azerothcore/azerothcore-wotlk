@@ -21,6 +21,10 @@
 class ElunaEventProcessor;
 #endif
 
+#ifdef ELUNA
+class ElunaEventProcessor;
+#endif
+
 #include <set>
 #include <string>
 #include <sstream>
