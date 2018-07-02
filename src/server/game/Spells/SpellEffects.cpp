@@ -4215,6 +4215,10 @@ void Spell::EffectSanctuary(SpellEffIndex /*effIndex*/)
         && (m_spellInfo->SpellFamilyFlags[0] & SPELLFAMILYFLAG_ROGUE_VANISH))
     {
         m_caster->ToPlayer()->RemoveAurasByType(SPELL_AURA_MOD_ROOT);
+
+        //Clean Escape
+        if (m_caster->HasAura(23582))
+            m_caster->CastSpell(m_caster, 23583, true);
     }
 }
 
