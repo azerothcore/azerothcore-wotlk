@@ -262,12 +262,26 @@ bool GameObject::Create(uint32 guidlow, uint32 name_id, Map* map, uint32 phaseMa
     }
 
     GameObjectAddon const* addon = sObjectMgr->GetGameObjectAddon(guidlow);
-    // xinef: hackfix - but make it possible to use original WorldRotation (using special gameobject addon data) 
-    // pussywizard: temporarily calculate WorldRotation from orientation, do so until values in db are correct
-    if (addon && addon->invisibilityType == INVISIBILITY_GENERAL && addon->InvisibilityValue == 0)
-        SetWorldRotation(rotation);
-    else
-        SetWorldRotationAngles(NormalizeOrientation(GetOrientation()), 0.0f, 0.0f);
+
+    // hackfix for the hackfix down below
+    switch (goinfo->entry)
+    {
+        // excluded ids from the hackfix below
+        // used switch since there should be more
+        case 181233: // maexxna portal effect
+        case 181575: // maexxna portal
+            SetWorldRotation(rotation);
+            break;
+        default:
+            // xinef: hackfix - but make it possible to use original WorldRotation (using special gameobject addon data) 
+            // pussywizard: temporarily calculate WorldRotation from orientation, do so until values in db are correct
+            if (addon && addon->invisibilityType == INVISIBILITY_GENERAL && addon->InvisibilityValue == 0)
+                SetWorldRotation(rotation);
+            else
+                SetWorldRotationAngles(NormalizeOrientation(GetOrientation()), 0.0f, 0.0f);
+            break;
+    }
+
     // pussywizard: no PathRotation for normal gameobjects
     SetTransportPathRotation(0.0f, 0.0f, 0.0f, 1.0f);
 
