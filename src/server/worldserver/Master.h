@@ -17,7 +17,6 @@
 class Master
 {
     public:
-        void LoadModuleConfigSettings();
         int Run();
 
     private:
