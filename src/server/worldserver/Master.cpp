@@ -108,43 +108,6 @@ public:
     }
 };
 
-void Master::LoadModuleConfigSettings()
-{
-    Tokenizer configFileList(CONFIG_FILE_LIST, ',');
-    for(auto i = configFileList.begin();i!= configFileList.end();i++)
-    {
-        std::string configFile = (*i) + std::string(".conf");
-
-        std::string conf_path = _CONF_DIR;
-        std::string cfg_file = conf_path + "/" + configFile;
-
-#if PLATFORM == PLATFORM_WINDOWS
-        cfg_file = configFile;
-#endif
-        std::string cfg_def_file = cfg_file + ".dist";
-
-        // Load .conf.dist config
-        if (!sConfigMgr->LoadMore(cfg_def_file.c_str()))
-        {
-            sLog->outString();
-            sLog->outError("Module config: Invalid or missing configuration dist file : %s", cfg_def_file.c_str());
-            sLog->outError("Module config: Verify that the file exists and has \'[worldserver]' written in the top of the file!");
-            sLog->outError("Module config: Use default settings!");
-            sLog->outString();
-        }
-
-        // Load .conf config
-        if (!sConfigMgr->LoadMore(cfg_file.c_str()))
-        {
-            sLog->outString();
-            sLog->outError("Module config: Invalid or missing configuration file : %s", cfg_file.c_str());
-            sLog->outError("Module config: Verify that the file exists and has \'[worldserver]' written in the top of the file!");
-            sLog->outError("Module config: Use default settings!");
-            sLog->outString();
-        }
-    }
-}
-
 /// Main function
 int Master::Run()
 {
@@ -190,8 +153,8 @@ int Master::Run()
     // set server offline (not connectable)
     LoginDatabase.DirectPExecute("UPDATE realmlist SET flag = (flag & ~%u) | %u WHERE id = '%d'", REALM_FLAG_OFFLINE, REALM_FLAG_INVALID, realmID);
 
-    //read modules config setting
-    LoadModuleConfigSettings();
+    //set module config file list
+    sWorld->SetConfigFileList(CONFIG_FILE_LIST);
 
     ///- Initialize the World
     sWorld->SetInitialWorldSettings();
