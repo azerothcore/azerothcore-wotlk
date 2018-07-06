@@ -76,7 +76,7 @@ public:
 
         void MoveInLineOfSight(Unit *who)
         {
-            if ((!me->GetVictim() || me->GetVictim()->GetEntry() != NPC_ZOMBIE_CHOW) && who->GetEntry() == NPC_ZOMBIE_CHOW && me->IsWithinDistInMap(who, 15))
+            if ((!me->GetVictim() || me->GetVictim()->GetEntry() != NPC_ZOMBIE_CHOW) && who->GetEntry() == NPC_ZOMBIE_CHOW && me->IsWithinDistInMap(who, 6.5f))
             {
                 SetGazeOn(who);
                 me->MonsterTextEmote("%s spots a nearby zombie to devour!", 0, false);
@@ -174,15 +174,21 @@ public:
                     break;
                 case EVENT_SUMMON_ZOMBIE:
                     {
-                    uint8 rand = urand(0,2);
-                    for (int32 i = 0; i < RAID_MODE(1,2); ++i)
-                    {
-                        me->SummonCreature(NPC_ZOMBIE_CHOW, zombiePos[urand(0,2)]);
-                        (rand == 2 ? rand = 0 : rand++);
-                    }
+                        uint8 rand = urand(0,2);
+                        for (int32 i = 0; i < RAID_MODE(1,2); ++i)
+                        {
+                            // In 10 man raid, normal mode - should spawn only from mid gate
+                            // \1 |0 /2 pos
+                            // In 25 man raid - should spawn from all 3 gates
+                            if (me->GetMap()->GetDifficulty() == RAID_DIFFICULTY_10MAN_NORMAL)
+                                me->SummonCreature(NPC_ZOMBIE_CHOW, zombiePos[0]);
+                            else
+                                me->SummonCreature(NPC_ZOMBIE_CHOW, zombiePos[urand(0, 2)]);
+                            (rand == 2 ? rand = 0 : rand++);
+                        }
 
-                    events.RepeatEvent(10000);
-                    break;
+                        events.RepeatEvent(10000);
+                        break;
                     }
                 case EVENT_CAN_EAT_ZOMBIE:
                     events.RepeatEvent(1000);
