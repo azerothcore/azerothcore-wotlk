@@ -490,7 +490,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket & recvData)
                     if(WorldSafeLocsEntry const* grave = sObjectMgr->GetClosestGraveyard(plrMover->GetPositionX(), plrMover->GetPositionY(), plrMover->GetPositionZ(), plrMover->GetMapId(), plrMover->GetTeamId()))
                     {
                         plrMover->TeleportTo(grave->map_id, grave->x, grave->y, grave->z, plrMover->GetOrientation());
-                    plrMover->Relocate(grave->x, grave->y, grave->z, plrMover->GetOrientation());
+                        plrMover->Relocate(grave->x, grave->y, grave->z, plrMover->GetOrientation());
                     }
                 }
 
