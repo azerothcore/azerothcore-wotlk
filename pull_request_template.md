@@ -7,24 +7,24 @@
 <!-- WRITE A RELEVANT TITLE -->
 
 
-**CHANGES PROPOSED:**
+##### CHANGES PROPOSED:
 
 -  
 -  
 
 
-**ISSUES ADDRESSED:**
+###### ISSUES ADDRESSED:
 <!-- If the issue doesn't exist, describe it and how to reproduce it, please. If the issue already exists, just paste the link to the issue you close, like this: Closes https://github.com/azerothcore/azerothcore-wotlk/issues/967 -->
 
 Closes 
 
 
-**TESTS PERFORMED:**
+##### TESTS PERFORMED:
 <!-- Does it build without errors? Did you test in-game? What did you test? Did you do all these tests on Linux, Mac or Windows? Other tests performed -->
 
 
 
-**HOW TO TEST THE CHANGES:**
+##### HOW TO TEST THE CHANGES:
 <!-- We need to confirm the changes first, so try to make the work easy for testers, please:
  - Which commands to use? Which NPC to teleport to?
  - Do we need to enable debug flags on Cmake?
@@ -34,14 +34,14 @@ Closes
 
 
 
-**KNOWN ISSUES AND TODO LIST:**
+##### KNOWN ISSUES AND TODO LIST:
 <!-- This is a TODO list with checkboxes to tick -->
 
 - [ ]
 - [ ] 
 
 
-**Target branch(es):**
+##### Target branch(es):
 
 Master
 
