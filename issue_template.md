@@ -1,94 +1,88 @@
 <!-- IF YOU DO NOT FILL THIS TEMPLATE OUT, WE WILL CLOSE YOUR ISSUE! -->
-<!-- IF YOU DO NOT FILL THIS TEMPLATE OUT, WE WILL CLOSE YOUR ISSUE! -->
-<!-- IF YOU DO NOT FILL THIS TEMPLATE OUT, WE WILL CLOSE YOUR ISSUE! -->
-<!-- IF YOU DO NOT FILL THIS TEMPLATE OUT, WE WILL CLOSE YOUR ISSUE! -->
-<!-- IF YOU DO NOT FILL THIS TEMPLATE OUT, WE WILL CLOSE YOUR ISSUE! -->
 
-[//]: # ( This template is for problem reports, for other type of reports like feature suggestion, feel free to edit it. )
-[//]: # ( If this is a crash report, upload the crashlog on https://gist.github.com/ )
-[//]: # ( For issues containing a fix, please create a Pull Request following this tutorial https://github.com/azerothcore/azerothcore-wotlk/wiki/Contribute#how-to-create-a-pull-request )
+<!-- This template is for problem reports, for feature suggestion etc... feel free to edit it.
+ If this is a crash report, upload the crashlog on https://gist.github.com/
+ For issues containing a fix, please create a Pull Request following this tutorial: https://github.com/azerothcore/azerothcore-wotlk/wiki/Contribute#how-to-create-a-pull-request -->
 
 
 <!-- WRITE A RELEVANT TITLE -->
 
 
-**Small description**:
 
+##### SMALL DESCRIPTION:
 <!-- Add a one line description of the bug -->
 
 
 
-**Current behaviour**:
-
-<!-- Describe the bug in details. Give as much information as possible -->
-<!-- Use this to link spells, NPCs, quests etc https://wowgaming.altervista.org/aowow/ -->
+##### CURRENT BEHAVIOUR:
+<!-- Describe the bug in details. Database to link spells, NPCs, quests etc https://wowgaming.altervista.org/aowow/ -->
 
 
 
-**Expected behaviour**:
-
-<!-- Describe how it should be working without the bug. Give as much information as possible -->
-<!-- Use this to link spells, NPCs, quests etc https://wowgaming.altervista.org/aowow/ -->
+##### EXPECTED BEHAVIOUR:
+<!-- Describe how it should be working without the bug. -->
 
 
 
-**Steps to reproduce the problem**:
+
+##### STEPS TO REPRODUCE THE PROBLEM:
+<!-- Describe precisely how to reproduce the bug so we can fix it or confirm its existence:
+ - Which commands to use? Which NPC to teleport to?
+ - Do we need to have debug flags on Cmake?
+ - Do we need to look at the console while the bug happens?
+ - Other steps
+-->
 
 1. 
 2. 
 3. 
 
-<!-- Describe precisely how to reproduce the bug so we can confirm it's a real bug: -->
-<!--  - Which commands to use? Which NPC to teleport to? -->
-<!--  - Do we need to have debug flags on Cmake? -->
-<!--  - Do we need to look at the console? etc... -->
 
 
-**Branch(es)**:
 
-<!-- Specify the branch(es) affected by this issue: master, 0.x, 1.x, or another branch -->
+##### BRANCH(ES):
+<!-- Specify the branch(es) affected by this issue: master, 0.x, 1.x, or another branch. -->
+
 master
 
 
-**AC hash/commit**:
 
-<!-- NEVER WRITE "LATEST", ALWAYS PUT THE ACTUAL VALUE INSTEAD -->
-<!-- NEVER WRITE "LATEST", ALWAYS PUT THE ACTUAL VALUE INSTEAD -->
-<!-- IF YOU DO NOT FILL THIS OUT, WE WILL CLOSE YOUR ISSUE! -->
-<!-- IF YOU DO NOT FILL THIS OUT, WE WILL CLOSE YOUR ISSUE! -->
-<!-- Find the commit hash (unique identifier) by running "git log" on your own clone of AzerothCore or by looking at here https://github.com/azerothcore/azerothcore-wotlk/commits/master -->
+##### AC HASH/COMMIT:
+<!-- IF YOU DO NOT FILL THIS OUT, WE WILL CLOSE YOUR ISSUE! NEVER WRITE "LATEST", ALWAYS PUT THE ACTUAL VALUE INSTEAD.
+Find the commit hash (unique identifier) by running "git log" on your own clone of AzerothCore or by looking at here https://github.com/azerothcore/azerothcore-wotlk/commits/master -->
 
 
-**Operating system**:
 
+
+##### OPERATING SYSTEM:
 <!-- Windows 7/10, Debian 8/9/10, Ubuntu 16/18 etc... -->
 
 
-**Modules**:
 
+
+##### MODULES:
 <!-- Are you using modules? If yes, list them (note them down in a .txt for opening future issues) -->
 
 
-**Other Customizations**:
 
+##### OTHER CUSTOMIZATIONS:
 <!-- Are you using any extra script?
-<!-- Did you apply any core patch/diff?
-<!-- Did you modify your database?
-<!-- Or do you have other customizations?
-<!-- If yes please specify them here. -->
+ - Did you apply any core patch/diff?
+ - Did you modify your database?
+ - Or do you have other customizations? If yes please specify them here.
+-->
 
 
 
 
 <!-- Thank you for your contribution.
-<!-- -------------------------------- -->
-<!-- If you use AzerothCore regularly, we really NEED your help to:
-<!--  - TEST our fixes ( https://github.com/azerothcore/azerothcore-wotlk/wiki/Contribute#how-to-test-a-pull-request )
-<!--  - Report issues
-<!--  - Improve the documentation/wiki
-<!-- Without this kind of help, the project is not evolving at full speed! 
-<!-- -------------------------------- -->
+If you use AzerothCore regularly, we really NEED your help to:
+ - TEST our fixes ( https://github.com/azerothcore/azerothcore-wotlk/wiki/Contribute#how-to-test-a-pull-request )
+ - Report issues
+ - Improve the documentation/wiki
+With your help the project can evolve much quicker!
+-->
 
-<!-- If you intend to contribute more than once, you should really join us on our discord channel!
-<!-- The link is on our site http://azerothcore.org/ or in the readme https://github.com/azerothcore/azerothcore-wotlk etc...
-<!-- We set cosmetic ranks for our contributors and may give access to special resources/knowledge to them! -->
+
+<!-- NOTE: If you intend to contribute more than once, you should really join us on our discord channel! We set cosmetic ranks for our contributors and may give access to special resources/knowledge to them! The link is on our site http://azerothcore.org/
+-->
