@@ -58,7 +58,7 @@ function comp_compile() {
 
 function comp_build() {
   comp_configure
-  comp_build
+  comp_compile
 }
 
 function comp_all() {
