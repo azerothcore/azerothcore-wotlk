@@ -26,15 +26,15 @@ before_install:
 
 install:
   # install OS deps (apt-get)
-  - bash ./install.sh 2
+  - bash ./acore.sh "install-deps"
   # create config file
   - echo "CCUSTOMOPTIONS='-DWITH_WARNINGS=1 -DWITH_COREDEBUG=1 -DUSE_COREPCH=0 -DUSE_SCRIPTPCH=0 -DTOOLS=1 -DSCRIPTS=1 -DSERVERS=1 -DWITH_PERFTOOLS=1 -DENABLE_EXTRA_LOGS=1 -DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_FLAGS=\"-Werror\" -DCMAKE_CXX_FLAGS=\"-Werror\"';" >> conf/config.sh
   - echo "DB_CHARACTERS_CONF=\"MYSQL_USER='root'; MYSQL_PASS=''; MYSQL_HOST='127.0.0.1';\"" >> conf/config.sh
   - echo "DB_AUTH_CONF=\"MYSQL_USER='root'; MYSQL_PASS=''; MYSQL_HOST='127.0.0.1';\"" >> conf/config.sh
   - echo "DB_WORLD_CONF=\"MYSQL_USER='root'; MYSQL_PASS=''; MYSQL_HOST='127.0.0.1';\"" >> conf/config.sh  
   # create and import mysql
-  - bash ./install.sh 7
+  - bash ./acore.sh "db-assembler" "import-all"
 
 script:
   # compile
-  - bash ./install.sh 5
+  - bash ./acore.sh "compiler" "all"
