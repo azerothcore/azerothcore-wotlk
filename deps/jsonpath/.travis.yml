@@ -1,0 +1,10 @@
+language: python
+
+addons:
+  apt:
+    packages:
+      - bash
+
+# Whatever the current shebang, replace with hardcoded shell
+script: >
+  ./all-tests.sh

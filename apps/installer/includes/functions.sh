@@ -44,10 +44,6 @@ function inst_cleanCompile() {
     inst_compile
 }
 
-function inst_assembleDb {
-    dbasm_import true true true
-}
-
 function inst_allInOne() {
     inst_configureOS
     inst_updateRepo
@@ -55,19 +51,66 @@ function inst_allInOne() {
     inst_assembleDb
 }
 
+function inst_getVersionBranch() {
+    local res="master"
+    local v="not-defined"
+    local MODULE_MAJOR=0
+    local MODULE_MINOR=0
+    local MODULE_PATCH=0
+    local MODULE_SPECIAL=0;
+    local ACV_MAJOR=0
+    local ACV_MINOR=0
+    local ACV_PATCH=0
+    local ACV_SPECIAL=0;
+    local curldata=$(curl -f --silent -H 'Cache-Control: no-cache' "$1" || echo "{}")
+    local parsed=$(echo "$curldata" | "$AC_PATH_DEPS/jsonpath/JSONPath.sh" -b '$.compatibility.*.[version,branch]')
+
+    semverParseInto "$ACORE_VERSION" ACV_MAJOR ACV_MINOR ACV_PATCH ACV_SPECIAL
+
+    if [[ ! -z "$parsed" ]]; then
+        readarray -t vers < <(echo "$parsed")
+        local idx
+        res="none"
+        # since we've the pair version,branch alternated in not associative and one-dimensional
+        # array, we've to simulate the association with length/2 trick
+        for idx in `seq 0 $((${#vers[*]}/2-1))`; do
+            semverParseInto "${vers[idx*2]}" MODULE_MAJOR MODULE_MINOR MODULE_PATCH MODULE_SPECIAL
+            if [[ $MODULE_MAJOR -eq $ACV_MAJOR && $MODULE_MINOR -le $ACV_MINOR ]]; then
+                res="${vers[idx*2+1]}"
+                v="${vers[idx*2]}"
+            fi
+        done
+    fi
+
+    echo "$v" "$res"
+}
+
 function inst_module_search {
-    search=""
+
+    local res="$1"
+    local idx=0;
+
     if [ -z "$1" ]; then
         echo "Type what to search or leave blank for full list"
         read -p "Insert name: " res
-
-        search="+$res"
     fi
-    echo "Searching ..."
+
+    local search="+$res"
+
+    echo "Searching $res..."
     echo "";
 
-    for i in `curl -s "https://api.github.com/search/repositories?q=org%3Aazerothcore${search}+fork%3Atrue+topic%3Acore-module+sort%3Astars&type=" | grep \"name\" | cut -d ':' -f 2-3|tr -d '",'`; do
-        echo "-> $i"; 
+    readarray -t MODS < <(curl --silent "https://api.github.com/search/repositories?q=org%3Aazerothcore${search}+fork%3Atrue+topic%3Acore-module+sort%3Astars&type=" \
+        | "$AC_PATH_DEPS/jsonpath/JSONPath.sh" -b '$.items.*.name')
+    while (( ${#MODS[@]} > idx )); do
+        mod="${MODS[idx++]}"
+        read v b < <(inst_getVersionBranch "https://raw.githubusercontent.com/azerothcore/$mod/master/acore-module.json")
+
+        if [[ "$b" != "none" ]]; then
+            echo "-> $mod (tested with AC v$v)"
+        else
+            echo "-> $mod (no revision available for AC v$AC_VERSION, it could not work!)"
+        fi
     done
 
     echo "";
@@ -75,30 +118,50 @@ function inst_module_search {
 }
 
 function inst_module_install {
+    local res
     if [ -z "$1" ]; then
         echo "Type the name of the module to install"
         read -p "Insert name: " res
+    else
+        res="$1"
     fi
 
-    git clone "https://github.com/azerothcore/$res" "$AC_PATH_ROOT/modules/$res" && echo "Done, please re-run compiling and db assembly. Read instruction on module repository for more information"
+    read v b < <(inst_getVersionBranch "https://raw.githubusercontent.com/azerothcore/$res/master/acore-module.json")
+
+    if [[ "$b" != "none" ]]; then
+        Joiner:add_repo "https://github.com/azerothcore/$res" "$res" "$b" && echo "Done, please re-run compiling and db assembly. Read instruction on module repository for more information"
+    else
+        echo "Cannot install $res module: it doesn't exists or no version compatible with AC v$ACORE_VERSION are available"   
+    fi
 
     echo "";
     echo "";
 }
 
 function inst_module_update {
+    local res;
+    local _tmp;
+    local branch;
+    local p;
+
     if [ -z "$1" ]; then
         echo "Type the name of the module to update"
         read -p "Insert name: " res
+    else
+        res="$1"
     fi
 
-    cd "$AC_PATH_ROOT/modules/$res"
+    _tmp=$PWD
 
-    #git reset --hard master
-    #git clean -f
-    git pull origin master && echo "Done"
+    if [ -d "$J_PATH_MODULES/$res/" ]; then
+        cd "$J_PATH_MODULES/$res/"
+        branch=`git rev-parse --abbrev-ref HEAD`
 
-    cd "../../"
+        Joiner:upd_repo "https://github.com/azerothcore/$res" "$res" "$branch" && echo "Done, please re-run compiling and db assembly" || echo "Cannot update"
+        cd $_tmp
+    else
+        echo "Cannot update! Path doesn't exist"
+    fi;
 
     echo "";
     echo "";
@@ -108,10 +171,29 @@ function inst_module_remove {
     if [ -z "$1" ]; then
         echo "Type the name of the module to remove"
         read -p "Insert name: " res
+    else
+        res="$1"
     fi
 
-    rm -rf "$AC_PATH_ROOT/modules/$res" && echo "Done"
+    Joiner:remove "$res" && echo "Done, please re-run compiling"  || echo "Cannot remove"
 
     echo "";
     echo "";
+}
+
+
+function inst_simple_restarter {
+    echo "Running $1 in background..."
+    bash "$AC_PATH_APPS/startup-scripts/simple-restarter" "$BINPATH" "$1" &
+}
+
+function inst_download_client_data {
+    path="$BINPATH/data"
+    if [ -e "$path/.git/" ]; then
+        # if exists , update
+        git --git-dir="$path/.git/" rev-parse && git --git-dir="$path/.git/" pull origin master | grep 'Already up-to-date.' && changed="no"
+    else
+        # otherwise clone
+        git clone "https://github.com/wowgaming/client-data" -c advice.detachedHead=0 -b master --depth=1 $path
+    fi
 }

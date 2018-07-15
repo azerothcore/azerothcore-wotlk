@@ -1,0 +1,9 @@
+#PARAMETER 1: directory
+#PARAMETER 2: binary file
+
+_bin_path=$1
+_bin_file=$2
+while true
+do
+    cd "$_bin_path" && "./$_bin_file" &>/dev/null; echo "$_bin_file crashed (?), restarting..."
+done
