@@ -39,7 +39,7 @@ function comp_configure() {
 }
 
 
-function comp_build() {
+function comp_compile() {
   [ $MTHREADS == 0 ] && MTHREADS=`grep -c ^processor /proc/cpuinfo` && MTHREADS=$(($MTHREADS + 2))
 
   echo "Using $MTHREADS threads"
@@ -54,4 +54,14 @@ function comp_build() {
   cd $CWD
 
   runHooks "ON_AFTER_BUILD"
+}
+
+function comp_build() {
+  comp_configure
+  comp_build
+}
+
+function comp_all() {
+    comp_clean
+    comp_build
 }
