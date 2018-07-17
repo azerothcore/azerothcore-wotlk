@@ -189,8 +189,11 @@ function inst_module_remove {
 
 
 function inst_simple_restarter {
-    echo "Running $1 in background..."
-    bash "$AC_PATH_APPS/startup-scripts/simple-restarter" "$AC_BINPATH_FULL" "$1" &
+    echo "Running $1 ..."
+    bash "$AC_PATH_APPS/startup-scripts/simple-restarter" "$AC_BINPATH_FULL" "$1"
+    echo
+    #disown -a
+    #jobs -l
 }
 
 function inst_download_client_data {
