@@ -14,6 +14,8 @@ function inst_configureOS() {
 
             DISTRO=${DISTRO,,}
 
+            echo "Distro: $DISTRO"
+
             # TODO: implement different configurations by distro
             source "$AC_PATH_INSTALLER/includes/os_configs/$DISTRO.sh"
         ;;
