@@ -13,3 +13,5 @@ source "$AC_PATH_DEPS/hw-core/bash-lib-event/src/hooks.sh"
 
 source "$AC_PATH_SHARED/common.sh"
 
+[[ "$OSTYPE" = "msys" ]] && AC_BINPATH_FULL="$BINPATH" || AC_BINPATH_FULL="$BINPATH/bin"
+

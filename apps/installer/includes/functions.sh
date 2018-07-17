@@ -48,7 +48,7 @@ function inst_allInOne() {
     inst_configureOS
     inst_updateRepo
     inst_compile
-    inst_assembleDb
+    dbasm_import true true true
 }
 
 function inst_getVersionBranch() {
@@ -107,7 +107,7 @@ function inst_module_search {
         read v b < <(inst_getVersionBranch "https://raw.githubusercontent.com/azerothcore/$mod/master/acore-module.json")
 
         if [[ "$b" != "none" ]]; then
-            echo "-> $mod (tested with AC v$v)"
+            echo "-> $mod (tested with AC version: $v)"
         else
             echo "-> $mod (no revision available for AC v$AC_VERSION, it could not work!)"
         fi
@@ -154,10 +154,16 @@ function inst_module_update {
     _tmp=$PWD
 
     if [ -d "$J_PATH_MODULES/$res/" ]; then
-        cd "$J_PATH_MODULES/$res/"
-        branch=`git rev-parse --abbrev-ref HEAD`
+        read v b < <(inst_getVersionBranch "https://raw.githubusercontent.com/azerothcore/$res/master/acore-module.json")
 
-        Joiner:upd_repo "https://github.com/azerothcore/$res" "$res" "$branch" && echo "Done, please re-run compiling and db assembly" || echo "Cannot update"
+        cd "$J_PATH_MODULES/$res/"
+
+        # use current branch if something wrong with json
+        if [[ "$v" == "none" || "$v" == "not-defined" ]]; then
+            b=`git rev-parse --abbrev-ref HEAD`
+        fi
+
+        Joiner:upd_repo "https://github.com/azerothcore/$res" "$res" "$b" && echo "Done, please re-run compiling and db assembly" || echo "Cannot update"
         cd $_tmp
     else
         echo "Cannot update! Path doesn't exist"
@@ -184,16 +190,13 @@ function inst_module_remove {
 
 function inst_simple_restarter {
     echo "Running $1 in background..."
-    bash "$AC_PATH_APPS/startup-scripts/simple-restarter" "$BINPATH" "$1" &
+    bash "$AC_PATH_APPS/startup-scripts/simple-restarter" "$AC_BINPATH_FULL" "$1" &
 }
 
 function inst_download_client_data {
-    path="$BINPATH/data"
-    if [ -e "$path/.git/" ]; then
-        # if exists , update
-        git --git-dir="$path/.git/" rev-parse && git --git-dir="$path/.git/" pull origin master | grep 'Already up-to-date.' && changed="no"
-    else
-        # otherwise clone
-        git clone "https://github.com/wowgaming/client-data" -c advice.detachedHead=0 -b master --depth=1 $path
-    fi
+    local path="$AC_BINPATH_FULL"
+
+    echo "Downloading client data in: $path/data.zip ..."
+    curl -L https://github.com/wowgaming/client-data/releases/download/v4/data.zip > "$path/data.zip" \
+        && unzip -o "$path/data.zip" -d "$path/" && rm "$path/data.zip"
 }

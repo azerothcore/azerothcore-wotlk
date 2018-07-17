@@ -1,9 +1,40 @@
+#!/usr/bin/env bash
+
 #PARAMETER 1: directory
 #PARAMETER 2: binary file
 
 _bin_path=$1
 _bin_file=$2
+
+_instant_crash_cnt=0
+_total_crashes=0
+
 while true
 do
+    if [ ! -f "$_bin_path/$_bin_file" ]; then
+        echo "$_bin_path/$_bin_file doesn't exists!"
+        exit 0
+    fi
+
+    STARTING_TIME=$(date +%s)
+
     cd "$_bin_path" && "./$_bin_file" &>/dev/null; echo "$_bin_file crashed (?), restarting..."
+
+    ENDING_TIME=$(date +%s)
+    DIFFERENCE=$(( $ENDING_TIME - $STARTING_TIME ))
+
+    echo "Crashed after $DIFFERENCE seconds, total crashes: $_total_crashes"
+    ((_total_crashes++))
+
+    if [ $DIFFERENCE -lt 10 ]; then
+        # increment instant crash if runtime is lower than 10 seconds 
+        ((_instant_crash_cnt++))
+    else
+        _instant_crash_cnt=0 # reset count
+    fi
+
+    if [ $_instant_crash_cnt -gt 5 ]; then
+        echo "Restarted exited. Infinite crash loop prevented. Please check your system"
+        exit 0
+    fi
 done
