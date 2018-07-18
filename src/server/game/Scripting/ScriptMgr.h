@@ -246,7 +246,7 @@ class WorldScript : public ScriptObject
         virtual void OnAfterConfigLoad(bool /*reload*/) { }
 
         // Called when loading custom database tables
-        virtual void OnLoadCustomDatabeTable() { }
+        virtual void OnLoadCustomDatabaseTable() { }
 
         // Called before the world configuration is (re)loaded.
         virtual void OnBeforeConfigLoad(bool /*reload*/) { }
@@ -1135,7 +1135,7 @@ class ScriptMgr
 
     public: /* WorldScript */
 
-        void OnLoadCustomDatabeTable();
+        void OnLoadCustomDatabaseTable();
         void OnOpenStateChange(bool open);
         void OnBeforeConfigLoad(bool reload);
         void OnAfterConfigLoad(bool reload);

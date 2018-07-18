@@ -1356,7 +1356,7 @@ void World::SetInitialWorldSettings()
     CharacterDatabase.Execute(stmt);
 
     ///- Custom Hook for loading DB items
-    sScriptMgr->OnLoadCustomDatabeTable();
+    sScriptMgr->OnLoadCustomDatabaseTable();
 
     ///- Load the DBC files
     sLog->outString("Initialize data stores...");
