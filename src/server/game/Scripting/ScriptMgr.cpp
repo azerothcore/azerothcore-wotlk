@@ -483,9 +483,9 @@ void ScriptMgr::OnOpenStateChange(bool open)
 }
 
 
-void ScriptMgr::OnLoadCustomDatabeTable()
+void ScriptMgr::OnLoadCustomDatabaseTable()
 {
-    FOREACH_SCRIPT(WorldScript)->OnLoadCustomDatabeTable();
+    FOREACH_SCRIPT(WorldScript)->OnLoadCustomDatabaseTable();
 }
 
 void ScriptMgr::OnBeforeConfigLoad(bool reload)
