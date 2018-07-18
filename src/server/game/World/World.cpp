@@ -1355,6 +1355,9 @@ void World::SetInitialWorldSettings()
     stmt->setUInt32(0, 3 * DAY);
     CharacterDatabase.Execute(stmt);
 
+    ///- Custom Hook for loading DB items
+    sScriptMgr->OnLoadCustomDatabeTable();
+
     ///- Load the DBC files
     sLog->outString("Initialize data stores...");
     LoadDBCStores(m_dataPath);

@@ -482,6 +482,12 @@ void ScriptMgr::OnOpenStateChange(bool open)
     FOREACH_SCRIPT(WorldScript)->OnOpenStateChange(open);
 }
 
+
+void ScriptMgr::OnLoadCustomDatabeTable()
+{
+    FOREACH_SCRIPT(WorldScript)->OnLoadCustomDatabeTable();
+}
+
 void ScriptMgr::OnBeforeConfigLoad(bool reload)
 {
 #ifdef ELUNA
