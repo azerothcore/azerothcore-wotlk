@@ -153,6 +153,9 @@ int Master::Run()
     // set server offline (not connectable)
     LoginDatabase.DirectPExecute("UPDATE realmlist SET flag = (flag & ~%u) | %u WHERE id = '%d'", REALM_FLAG_OFFLINE, REALM_FLAG_INVALID, realmID);
 
+    //set module config file list
+    sWorld->SetConfigFileList(CONFIG_FILE_LIST);
+
     ///- Initialize the World
     sWorld->SetInitialWorldSettings();
 
