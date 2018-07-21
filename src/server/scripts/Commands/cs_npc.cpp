@@ -130,13 +130,19 @@ public:
             { "stop",           SEC_GAMEMASTER,     false, &HandleNpcUnFollowCommand,          "" },
             { "",               SEC_GAMEMASTER,     false, &HandleNpcFollowCommand,            "" }
         };
+
+        static std::vector<ChatCommand> npcFactionCommandTable =
+        {
+            { "Permanent",      SEC_ADMINISTRATOR,  false, &HandleNpcSetFactionIdCommand,      "" },
+            { "Temp",           SEC_ADMINISTRATOR,  false, &HandleNpcSetFactionTempIdCommand,  "" },
+            { "Original",       SEC_ADMINISTRATOR,  false, &HandleNpcSetOriginalFaction,       "" }
+        };
+
         static std::vector<ChatCommand> npcSetCommandTable =
         {
             { "allowmove",      SEC_ADMINISTRATOR,  false, &HandleNpcSetAllowMovementCommand,  "" },
             { "entry",          SEC_ADMINISTRATOR,  false, &HandleNpcSetEntryCommand,          "" },
-            { "factionid",      SEC_ADMINISTRATOR,  false, &HandleNpcSetFactionIdCommand,      "" },
-            { "factiontempid",  SEC_ADMINISTRATOR,  false, &HandleNpcSetFactionTempIdCommand,  "" },
-            { "originalFaction",SEC_ADMINISTRATOR,  false, &HandleNpcSetOriginalFaction,       "" },
+            { "faction",        SEC_ADMINISTRATOR,  false, nullptr,                            "", npcFactionCommandTable},
             { "flag",           SEC_ADMINISTRATOR,  false, &HandleNpcSetFlagCommand,           "" },
             { "level",          SEC_ADMINISTRATOR,  false, &HandleNpcSetLevelCommand,          "" },
             { "link",           SEC_ADMINISTRATOR,  false, &HandleNpcSetLinkCommand,           "" },
