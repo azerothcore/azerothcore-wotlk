@@ -26708,10 +26708,11 @@ void Player::ActivateSpec(uint8 spec)
     }
 
     // xinef: apply glyphs from second spec
-    for (uint8 slot = 0; slot < MAX_GLYPH_SLOT_INDEX; ++slot)
-        if (uint32 glyphId = m_Glyphs[GetActiveSpec()][slot])
-            if (GlyphPropertiesEntry const* glyphEntry = sGlyphPropertiesStore.LookupEntry(glyphId))
-                CastSpell(this, glyphEntry->SpellId, TriggerCastFlags(TRIGGERED_FULL_MASK&~(TRIGGERED_IGNORE_SHAPESHIFT|TRIGGERED_IGNORE_CASTER_AURASTATE)));
+    if(GetActiveSpec() != oldSpec)
+        for (uint8 slot = 0; slot < MAX_GLYPH_SLOT_INDEX; ++slot)
+            if (uint32 glyphId = m_Glyphs[GetActiveSpec()][slot])
+                if (GlyphPropertiesEntry const* glyphEntry = sGlyphPropertiesStore.LookupEntry(glyphId))
+                    CastSpell(this, glyphEntry->SpellId, TriggerCastFlags(TRIGGERED_FULL_MASK&~(TRIGGERED_IGNORE_SHAPESHIFT|TRIGGERED_IGNORE_CASTER_AURASTATE)));
 
     m_usedTalentCount = spentTalents;
     InitTalentForLevel();
