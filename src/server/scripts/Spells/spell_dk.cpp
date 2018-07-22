@@ -1563,9 +1563,9 @@ class spell_dk_death_grip : public SpellScriptLoader
             {
                 Creature* targetCreature = GetHitCreature();
 
-                switch (entry = targetCreature->GetEntry())
+                switch (targetCreature->GetEntry())
                 {
-                //Alliance Faction Champions
+                    //Alliance Faction Champions
                 case 34461:
                 case 34460:
                 case 34469:
@@ -1581,7 +1581,7 @@ class spell_dk_death_grip : public SpellScriptLoader
                 case 34474:
                 case 34475:
 
-                //Horde Faction Champions
+                    //Horde Faction Champions
                 case 34458:
                 case 34451:
                 case 34459:
@@ -1596,10 +1596,10 @@ class spell_dk_death_grip : public SpellScriptLoader
                 case 34455:
                 case 34450:
                 case 34453:
-                    break;
-                default:
+                    return entry;
                     break;
                 }
+                return 0;
             }
 
             void HandleBaseDummy(SpellEffIndex /*effIndex*/)
