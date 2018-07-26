@@ -8,6 +8,7 @@ apps/drassil/*
 env/dist/*
 env/user/*
 modules/*
+!modules/config.cmake
 build*/
 var/*
 

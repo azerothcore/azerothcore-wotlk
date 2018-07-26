@@ -49,7 +49,7 @@ endif()
 #
 # Loading dyn modules
 #
-
+include(modules/config.cmake)
 # add modules and dependencies
 CU_SUBDIRLIST(sub_DIRS  "${CMAKE_SOURCE_DIR}/modules" FALSE FALSE)
 FOREACH(subdir ${sub_DIRS})
