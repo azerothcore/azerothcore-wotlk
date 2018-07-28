@@ -42,7 +42,7 @@ include(src/cmake/ac_macros.cmake)
 include(conf/config.cmake.dist)
 
 # load custom configurations for cmake if exists
-if(EXISTS "conf/config.cmake")
+if(EXISTS "${CMAKE_SOURCE_DIR}/conf/config.cmake")
   include(conf/config.cmake)
 endif()
 
