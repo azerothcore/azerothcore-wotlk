@@ -3123,4 +3123,12 @@ DontCacheRandomMovementPaths = 0
 MoveMaps.Enable = 1
 
 #
+#     Minigob.Manabonk.Enable
+#        Description: Enable/ Disable Minigob Manabonk 
+#        Default:     1
+
+Minigob.Manabonk.Enable = 1
+
+
+#
 ###################################################################################################
