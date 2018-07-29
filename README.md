@@ -23,7 +23,7 @@ We also believe in [software modularity](https://en.wikipedia.org/wiki/Modular_p
 ## Learning project
 
 AzerothCore is a learning project.
-If you want to learn how to use C++, SQL, git, etc... you came to the right place! We will gladly to help you: **programming is our passion**.
+If you want to learn how to use C++, SQL, git, etc... you came to the right place! We will gladly help you: **programming is our passion**.
 
 If you want to contribute, in [our wiki](https://github.com/azerothcore/azerothcore-wotlk/wiki) you fill find a lot of resources that will guide you. Also you can poke us in [our discord chat server](https://discord.gg/gkt4y2x).
 
