@@ -29,6 +29,7 @@
 #include "Player.h"
 #include "PoolMgr.h"
 #include "GameGraveyard.h"
+#include "World.h"
 
 #define GOSSIP_HELLO_DEMO1  "Build catapult."
 #define GOSSIP_HELLO_DEMO2  "Build demolisher."
@@ -275,6 +276,9 @@ class npc_wg_queue : public CreatureScript
 
         bool OnGossipHello(Player* player, Creature* creature)
         {
+            if (CONFIG_WINTERGRASP_ENABLE == false)
+                return false;
+
             if (creature->IsQuestGiver())
                 player->PrepareQuestMenu(creature->GetGUID());
 
@@ -337,6 +341,9 @@ class npc_wg_queue : public CreatureScript
 
             void UpdateAI(uint32 diff)
             {
+                if (CONFIG_WINTERGRASP_ENABLE == false)
+                    return;
+
                 ScriptedAI::UpdateAI(diff);
 
                 events.Update(diff);

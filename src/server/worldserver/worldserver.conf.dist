@@ -1451,6 +1451,27 @@ AccountInstancesPerHour = 5
 BirthdayTime = 1222964635
 
 #
+#   IsContinentTransport.Enabled
+#        Description: Controls the continent transport (ships, zeppelins etc..)
+#        Default:     1 - (Enabled) 
+#
+#
+
+IsContinentTransport.Enabled = 1
+
+#
+#   IsPreloadedContinentTransport.Enabled
+#        Description: Should we preload the transport? 
+#           (Not recommended on low-end servers as it consumes 100% more ram)
+#           and it's not really necessary to be enabled.
+#
+#        Default:     0 - (Disabled) 
+#
+#
+
+IsPreloadedContinentTransport.Enabled = 0
+
+#
 ###################################################################################################
 
 ###################################################################################################
@@ -3121,6 +3142,14 @@ DontCacheRandomMovementPaths = 0
 #                     1 - (Enabled)
 
 MoveMaps.Enable = 1
+
+#
+#     Minigob.Manabonk.Enable
+#        Description: Enable/ Disable Minigob Manabonk 
+#        Default:     1
+
+Minigob.Manabonk.Enable = 1
+
 
 #
 ###################################################################################################

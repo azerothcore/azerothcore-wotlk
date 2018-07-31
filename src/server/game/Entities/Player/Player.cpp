@@ -4554,7 +4554,7 @@ bool Player::resetTalents(bool noResetCost)
 
 void Player::SetFreeTalentPoints(uint32 points)
 { 
-    //sScriptMgr->OnPlayerFreeTalentPointsChanged(this, points);
+    sScriptMgr->OnPlayerFreeTalentPointsChanged(this, points);
     SetUInt32Value(PLAYER_CHARACTER_POINTS1, points);
 }
 
@@ -26709,10 +26709,11 @@ void Player::ActivateSpec(uint8 spec)
     }
 
     // xinef: apply glyphs from second spec
-    for (uint8 slot = 0; slot < MAX_GLYPH_SLOT_INDEX; ++slot)
-        if (uint32 glyphId = m_Glyphs[GetActiveSpec()][slot])
-            if (GlyphPropertiesEntry const* glyphEntry = sGlyphPropertiesStore.LookupEntry(glyphId))
-                CastSpell(this, glyphEntry->SpellId, TriggerCastFlags(TRIGGERED_FULL_MASK&~(TRIGGERED_IGNORE_SHAPESHIFT|TRIGGERED_IGNORE_CASTER_AURASTATE)));
+    if(GetActiveSpec() != oldSpec)
+        for (uint8 slot = 0; slot < MAX_GLYPH_SLOT_INDEX; ++slot)
+            if (uint32 glyphId = m_Glyphs[GetActiveSpec()][slot])
+                if (GlyphPropertiesEntry const* glyphEntry = sGlyphPropertiesStore.LookupEntry(glyphId))
+                    CastSpell(this, glyphEntry->SpellId, TriggerCastFlags(TRIGGERED_FULL_MASK&~(TRIGGERED_IGNORE_SHAPESHIFT|TRIGGERED_IGNORE_CASTER_AURASTATE)));
 
     m_usedTalentCount = spentTalents;
     InitTalentForLevel();
@@ -26813,6 +26814,12 @@ bool Player::IsHealerTalentSpec() const
 { 
     uint8 tree = GetMostPointsTalentTree();
     return ((getClass() == CLASS_DRUID && tree == 2) || (getClass() == CLASS_PALADIN && tree == 0) || (getClass() == CLASS_PRIEST && tree <= 1) || (getClass() == CLASS_SHAMAN && tree == 2));
+}
+
+bool Player::IsTankTalentSpec() const
+{
+    uint8 tree = GetMostPointsTalentTree();
+    return ((getClass() == CLASS_PALADIN && tree == 1) || (getClass() == CLASS_WARRIOR && tree == 2) || (getClass() == CLASS_DRUID && tree == 1) || (getClass() == CLASS_DEATH_KNIGHT && tree == 1));
 }
 
 void Player::ResetTimeSync()

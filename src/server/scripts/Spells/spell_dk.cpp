@@ -1559,6 +1559,49 @@ class spell_dk_death_grip : public SpellScriptLoader
                 return SPELL_CAST_OK;
             }
 
+            uint32 EntryCheck(uint32 entry)
+            {
+                Creature* targetCreature = GetHitCreature();
+
+                switch (targetCreature->GetEntry())
+                {
+                    //Alliance Faction Champions
+                case 34461:
+                case 34460:
+                case 34469:
+                case 34467:
+                case 34468:
+                case 34465:
+                case 34471:
+                case 34466:
+                case 34473:
+                case 34472:
+                case 34470:
+                case 34463:
+                case 34474:
+                case 34475:
+
+                    //Horde Faction Champions
+                case 34458:
+                case 34451:
+                case 34459:
+                case 34448:
+                case 34449:
+                case 34445:
+                case 34456:
+                case 34447:
+                case 34441:
+                case 34454:
+                case 34444:
+                case 34455:
+                case 34450:
+                case 34453:
+                    return entry;
+                    break;
+                }
+                return 0;
+            }
+
             void HandleBaseDummy(SpellEffIndex /*effIndex*/)
             {
                 Unit* caster = GetCaster();
@@ -1568,7 +1611,7 @@ class spell_dk_death_grip : public SpellScriptLoader
 
                 if (caster != target)
                 {                    
-                    if (targetCreature && (targetCreature->isWorldBoss() || targetCreature->IsDungeonBoss()))
+                    if (targetCreature && (targetCreature->isWorldBoss() || targetCreature->IsDungeonBoss()) && targetCreature->GetEntry() != EntryCheck(targetCreature->GetEntry()))
                     {
                         return;
                     }

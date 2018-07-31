@@ -1,3 +1,5 @@
 #!/usr/bin/env bash
 
-bash ../apps/installer/main.sh
+CUR_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+source "$CUR_PATH/../apps/installer/main.sh"
