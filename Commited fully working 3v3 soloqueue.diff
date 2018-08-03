@@ -1,0 +1,1498 @@
+From 697c82a73665cd873761caa0d746c53f76a10123 Mon Sep 17 00:00:00 2001
+From: Quadral <liam-ashdown@outlook.com>
+Date: Sun, 9 Apr 2017 15:47:40 +0100
+Subject: [PATCH] [Core/Custom] Commited fully working 3v3 soloqueue
+
+---
+ src/server/game/Battlegrounds/ArenaTeam.cpp        | 166 ++++++++++
+ src/server/game/Battlegrounds/ArenaTeam.h          |  10 +
+ src/server/game/Battlegrounds/ArenaTeamMgr.cpp     |  23 +-
+ src/server/game/Battlegrounds/ArenaTeamMgr.h       |   3 +
+ src/server/game/Battlegrounds/Battleground.cpp     |  68 ++++
+ src/server/game/Battlegrounds/Battleground.h       |  14 +-
+ src/server/game/Battlegrounds/BattlegroundMgr.cpp  |  15 +-
+ .../game/Battlegrounds/BattlegroundQueue.cpp       | 150 ++++++++-
+ src/server/game/Battlegrounds/BattlegroundQueue.h  |   3 +
+ src/server/game/Entities/Player/Player.cpp         |  29 +-
+ src/server/game/Groups/Group.cpp                   |   4 +
+ src/server/game/Miscellaneous/SharedDefines.h      |   3 +-
+ src/server/game/Scripting/ScriptLoader.cpp         |   2 +
+ src/server/game/Spells/Spell.cpp                   |  21 +-
+ src/server/game/World/World.cpp                    |  17 +-
+ src/server/game/World/World.h                      |   9 +
+ src/server/scripts/Custom/3v3_npc.cpp              | 355 +++++++++++++++++++++
+ src/server/scripts/Custom/CMakeLists.txt           |   2 +
+ src/server/scripts/Custom/npc_solo3v3.h            | 185 +++++++++++
+ 19 files changed, 1035 insertions(+), 44 deletions(-)
+ create mode 100644 src/server/scripts/Custom/3v3_npc.cpp
+ create mode 100644 src/server/scripts/Custom/npc_solo3v3.h
+
+diff --git a/src/server/game/Battlegrounds/ArenaTeam.cpp b/src/server/game/Battlegrounds/ArenaTeam.cpp
+index 6951436..9037e5a 100644
+--- a/src/server/game/Battlegrounds/ArenaTeam.cpp
++++ b/src/server/game/Battlegrounds/ArenaTeam.cpp
+@@ -27,6 +27,11 @@
+ #include "Opcodes.h"
+ #include "InfoMgr.h"
+ 
++#ifndef UNORDERED_MAP
++#define UNORDERED_MAP std::unordered_map
++#endif
++
++
+ ArenaTeam::ArenaTeam()
+     : TeamId(0), Type(0), TeamName(), CaptainGuid(0), BackgroundColor(0), EmblemStyle(0), EmblemColor(0),
+     BorderStyle(0), BorderColor(0)
+@@ -89,6 +94,59 @@ bool ArenaTeam::Create(uint64 captainGuid, uint8 type, std::string const& arenaT
+     return true;
+ }
+ 
++void ArenaTeam::CreateTempForSolo3v3(Player* plr[], uint8 team)
++ {
++ 	// Generate new arena team id
++ 	TeamId = sArenaTeamMgr->GenerateTempArenaTeamId();
++ 	// Assign member variables
++ 	CaptainGuid = plr[0]->GetGUID();
++ 	Type = ARENA_TEAM_5v5;
++ 
++ 	std::stringstream ssTeamName;
++ 	ssTeamName << "Solo Team " << (team + 1);
++ 	TeamName = ssTeamName.str();
++  	BackgroundColor = 0;
++ 	EmblemStyle = 0;
++ 	EmblemColor = 0;
++ 	BorderStyle = 0;
++ 	BorderColor = 0;
++ 
++ 	Stats.WeekGames = 0;
++ 	Stats.SeasonGames = 0;
++ 	Stats.Rating = 0;
++ 	Stats.WeekWins = 0;
++ 	Stats.SeasonWins = 0;
++ 
++ 	for (int i = 0; i < 3; i++)
++ 	{
++ 		ArenaTeam* team = sArenaTeamMgr->GetArenaTeamById(plr[i]->GetArenaTeamId(GetSlotByType(ARENA_TEAM_5v5)));
++ 
++ 		if (!team)
++ 			continue;
++ 
++ 		ArenaTeamMember newMember;
++ 		for (MemberList::const_iterator itr = team->Members.begin(); itr != team->Members.end(); ++itr)
++ 		{
++ 			newMember = *itr;
++ 		}
++ 
++ 		Stats.WeekGames += team->Stats.WeekGames;
++ 		Stats.SeasonGames += team->Stats.SeasonGames;
++ 		Stats.Rating += team->GetRating();
++ 		Stats.WeekWins += team->Stats.WeekWins;
++ 		Stats.SeasonWins += team->Stats.SeasonWins;
++ 
++ 		Members.push_back(newMember);
++ 	}
++ 
++ 	Stats.WeekGames /= 3;
++ 	Stats.SeasonGames /= 3;
++ 	Stats.Rating /= 3;
++ 	Stats.WeekWins /= 3;
++ 	Stats.SeasonWins /= 3;
++ }
++ 
++
+ bool ArenaTeam::AddMember(uint64 playerGuid)
+ {
+     std::string playerName;
+@@ -214,6 +272,26 @@ bool ArenaTeam::LoadArenaTeamFromDB(QueryResult result)
+     return true;
+ }
+ 
++uint32 ArenaTeam::GetAverageMMR()
++ {
++ 	uint32 matchMakerRating = 0;
++ 	uint32 playerDivider = 0;
++ 	for (MemberList::const_iterator itr = Members.begin(); itr != Members.end(); ++itr)
++ 	{
++ 		matchMakerRating += itr->MatchMakerRating;
++ 		++playerDivider;
++ 	}
++ 
++ 	// x/0 = crash
++ 	if (playerDivider == 0)
++ 		playerDivider = 1;
++ 
++ 	matchMakerRating /= playerDivider;
++ 
++ 	return matchMakerRating;
++ }
++ 
++
+ bool ArenaTeam::LoadMembersFromDB(QueryResult result)
+ {
+     if (!result)
+@@ -539,6 +617,7 @@ uint8 ArenaTeam::GetSlotByType(uint32 type)
+     {
+         case ARENA_TEAM_2v2: return 0;
+         case ARENA_TEAM_3v3: return 1;
++		case ARENA_TEAM_SOLO_3v3:
+         case ARENA_TEAM_5v5: return 2;
+         default:
+             break;
+@@ -802,6 +881,93 @@ void ArenaTeam::MemberWon(Player* player, uint32 againstMatchmakerRating, int32
+ 
+ void ArenaTeam::SaveToDB()
+ {
++	// If not a temp arena team, just save this one (normal 2v2 and 3v3)
++	if (TeamId < 0xFFF00000)
++	{
++		SaveToDBHelper();
++		return;
++	}
++
++ 	// else it's a temp team, so we have to save the real one for each player
++ 
++ 	// Init some variables for speedup the programm
++ 	ArenaTeam* realTeams[3];
++ 	uint32 itrRealTeam = 0;
++ 	for (; itrRealTeam < 3; itrRealTeam++)
++ 		realTeams[itrRealTeam] = NULL;
++ 	itrRealTeam = 0;
++ 
++ 	uint32 oldRating = 0;
++ 
++ 	// First get the old average rating by looping through all members in temp team and add up the rating
++ 	for (MemberList::const_iterator itr = Members.begin(); itr != Members.end(); ++itr)
++ 	{
++ 		ArenaTeam* plrArenaTeam = NULL;
++ 
++ 		// Find real arena team for player
++ 		for (UNORDERED_MAP<uint32, ArenaTeam*>::iterator itrMgr = sArenaTeamMgr->GetArenaTeamMapBegin(); itrMgr != sArenaTeamMgr->GetArenaTeamMapEnd(); itrMgr++)
++ 		{
++ 			if (itrMgr->first < 0xFFF00000 && itrMgr->second->CaptainGuid == itr->Guid && itrMgr->second->Type == ARENA_TEAM_5v5)
++ 			{
++ 				plrArenaTeam = itrMgr->second; // found!
++ 				break;
++ 			}
++ 		}
++ 
++ 		if (!plrArenaTeam)
++ 			continue; // Not found? Maybe player has left the game and deleted it before the arena game ends.
++ 
++ 		ASSERT(itrRealTeam < 3);
++ 		realTeams[itrRealTeam++] = plrArenaTeam;
++ 
++ 		oldRating += plrArenaTeam->GetRating(); // add up all ratings from each player team
++ 	}
++ 
++ 	if (Members.size() > 0)
++ 		oldRating /= Members.size(); // Get average
++ 
++ 	int32 ratingModifier = GetRating() - oldRating; // GetRating() contains the new rating and oldRating is the old average rating
++ 
++ 	itrRealTeam = 0;
++ 
++ 	// Let's loop again through temp arena team and add the new rating
++ 	for (MemberList::const_iterator itr = Members.begin(); itr != Members.end(); ++itr)
++ 	{
++ 		ArenaTeam* plrArenaTeam = realTeams[itrRealTeam++];
++ 
++ 		if (!plrArenaTeam)
++ 			continue;
++ 
++ 		if (int32(plrArenaTeam->Stats.Rating) + ratingModifier < 0)
++ 			plrArenaTeam->Stats.Rating = 0;
++ 		else
++ 			plrArenaTeam->Stats.Rating += ratingModifier;
++ 
++ 		plrArenaTeam->Stats.SeasonGames = itr->SeasonGames;
++ 		plrArenaTeam->Stats.SeasonWins = itr->SeasonWins;
++ 		plrArenaTeam->Stats.WeekGames = itr->WeekGames;
++ 		plrArenaTeam->Stats.WeekWins = itr->WeekWins;
++ 
++ 		for (MemberList::iterator realMemberItr = plrArenaTeam->Members.begin(); realMemberItr != plrArenaTeam->Members.end(); ++realMemberItr)
++ 		{
++ 			if (realMemberItr->Guid == plrArenaTeam->GetCaptain())
++ 			{
++ 				realMemberItr->PersonalRating = itr->PersonalRating;
++ 				realMemberItr->MatchMakerRating = itr->MatchMakerRating;
++ 				realMemberItr->SeasonGames = itr->SeasonGames;
++ 				realMemberItr->SeasonWins = itr->SeasonWins;
++ 				realMemberItr->WeekGames = itr->WeekGames;
++ 				realMemberItr->WeekWins = itr->WeekWins;
++ 			}
++ 		}
++ 
++ 		plrArenaTeam->SaveToDBHelper();
++ 		plrArenaTeam->NotifyStatsChanged();
++ 	}
++ }
++ void ArenaTeam::SaveToDBHelper()
++ {	
++ 	// Moved from SaveToDB() to SaveToDBHelper() for solo 3v3
+     // Save team and member stats to db
+     // Called after a match has ended or when calculating arena_points
+ 
+diff --git a/src/server/game/Battlegrounds/ArenaTeam.h b/src/server/game/Battlegrounds/ArenaTeam.h
+index 97d316f..ffa9848 100644
+--- a/src/server/game/Battlegrounds/ArenaTeam.h
++++ b/src/server/game/Battlegrounds/ArenaTeam.h
+@@ -77,6 +77,7 @@ enum ArenaTeamTypes
+ {
+     ARENA_TEAM_2v2      = 2,
+     ARENA_TEAM_3v3      = 3,
++	ARENA_TEAM_SOLO_3v3 = 4,
+     ARENA_TEAM_5v5      = 5
+ };
+ 
+@@ -119,6 +120,11 @@ class ArenaTeam
+                                       uint8 borderStyle, uint32 borderColor);
+         void Disband(WorldSession* session);
+ 
++		// arena solo 3v3 queue
++		void CreateTempForSolo3v3(Player* plr[], uint8 team);
++		uint32 GetAverageMMR();
++		void SaveToDBHelper();
++
+         typedef std::list<ArenaTeamMember> MemberList;
+ 
+         uint32 GetId() const { return TeamId; }
+@@ -135,6 +141,8 @@ class ArenaTeam
+ 
+         void SetCaptain(uint64 guid);
+         bool AddMember(uint64 PlayerGuid);
++		MemberList::iterator m_membersBegin() { return Members.begin(); }
++		MemberList::iterator m_membersEnd()   { return Members.end(); }
+         void DelMember(uint64 guid, bool cleanDb);
+ 
+         size_t GetMembersSize() const         { return Members.size(); }
+@@ -167,6 +175,7 @@ class ArenaTeam
+         static float GetChanceAgainst(uint32 ownRating, uint32 opponentRating);
+ 
+         int32 WonAgainst(uint32 ownMMRating, uint32 opponentMMRating, int32& rating_change);
++		uint64 playerGuid;
+         void MemberWon(Player* player, uint32 againstMatchmakerRating, int32 matchmakerRatingChange = 12);
+ 
+         int32 LostAgainst(uint32 ownMMRating, uint32 opponentMMRating, int32& rating_change);
+@@ -179,6 +188,7 @@ class ArenaTeam
+     protected:
+ 
+         uint32 TeamId;
++
+         uint8  Type;
+         std::string TeamName;
+         uint64 CaptainGuid;
+diff --git a/src/server/game/Battlegrounds/ArenaTeamMgr.cpp b/src/server/game/Battlegrounds/ArenaTeamMgr.cpp
+index f268d76..870deca 100644
+--- a/src/server/game/Battlegrounds/ArenaTeamMgr.cpp
++++ b/src/server/game/Battlegrounds/ArenaTeamMgr.cpp
+@@ -27,6 +27,7 @@
+ ArenaTeamMgr::ArenaTeamMgr()
+ {
+     NextArenaTeamId = 1;
++	NextTempArenaTeamId = 0xFFF00000;
+ }
+ 
+ ArenaTeamMgr::~ArenaTeamMgr()
+@@ -78,15 +79,25 @@ void ArenaTeamMgr::RemoveArenaTeam(uint32 arenaTeamId)
+     ArenaTeamStore.erase(arenaTeamId);
+ }
+ 
++
+ uint32 ArenaTeamMgr::GenerateArenaTeamId()
+ {
+-    if (NextArenaTeamId >= 0xFFFFFFFE)
+-    {
+-        sLog->outError(LOG_FILTER_BATTLEGROUND, "Arena team ids overflow!! Can't continue, shutting down server. ");
+-        World::StopNow(ERROR_EXIT_CODE);
+-    }
+-    return NextArenaTeamId++;
++	//if (NextArenaTeamId >= 0xFFFFFFFE)
++	if (NextArenaTeamId >= 0xFFF00000)
++	{
++		sLog->outError(LOG_FILTER_BATTLEGROUND, "Arena team ids overflow!! Can't continue, shutting down server. ");
++		World::StopNow(ERROR_EXIT_CODE);
++	}
++	return NextArenaTeamId++;
++}
++
++uint32 ArenaTeamMgr::GenerateTempArenaTeamId()
++{
++	if (NextTempArenaTeamId >= 0xFFFFFFFE)
++		NextTempArenaTeamId = 0xFFF00000;
++	return NextTempArenaTeamId++;
+ }
++ 
+ 
+ void ArenaTeamMgr::LoadArenaTeams()
+ {
+diff --git a/src/server/game/Battlegrounds/ArenaTeamMgr.h b/src/server/game/Battlegrounds/ArenaTeamMgr.h
+index 99df622..68a899b 100644
+--- a/src/server/game/Battlegrounds/ArenaTeamMgr.h
++++ b/src/server/game/Battlegrounds/ArenaTeamMgr.h
+@@ -40,10 +40,13 @@ public:
+     ArenaTeamContainer::iterator GetArenaTeamMapBegin() { return ArenaTeamStore.begin(); }
+     ArenaTeamContainer::iterator GetArenaTeamMapEnd()   { return ArenaTeamStore.end(); }
+ 
++	uint32 GenerateTempArenaTeamId();
++
+     uint32 GenerateArenaTeamId();
+     void SetNextArenaTeamId(uint32 Id) { NextArenaTeamId = Id; }
+ 
+ protected:
++	uint32 NextTempArenaTeamId;
+     uint32 NextArenaTeamId;
+     ArenaTeamContainer ArenaTeamStore;
+ };
+diff --git a/src/server/game/Battlegrounds/Battleground.cpp b/src/server/game/Battlegrounds/Battleground.cpp
+index 4a3aeda..301d485 100644
+--- a/src/server/game/Battlegrounds/Battleground.cpp
++++ b/src/server/game/Battlegrounds/Battleground.cpp
+@@ -37,6 +37,8 @@
+ #include "Util.h"
+ #include "World.h"
+ #include "WorldPacket.h"
++#include "ArenaTeamMgr.h"
++#include "../../../src/server/scripts/custom/npc_solo3v3.h"
+ 
+ namespace Trinity
+ {
+@@ -237,6 +239,27 @@ Battleground::~Battleground()
+ 
+ 	for (BattlegroundScoreMap::const_iterator itr = PlayerScores.begin(); itr != PlayerScores.end(); ++itr)
+ 		delete itr->second;
++
++	
++ 	// Cleanup temp arena teams for solo 3v3
++ 	if (isArena() && isRated() && GetArenaType() == ARENA_TYPE_3v3_SOLO)
++ 	{
++ 		ArenaTeam *tempAlliArenaTeam = sArenaTeamMgr->GetArenaTeamById(GetArenaTeamIdForTeam(ALLIANCE));
++ 		ArenaTeam *tempHordeArenaTeam = sArenaTeamMgr->GetArenaTeamById(GetArenaTeamIdForTeam(HORDE));
++ 
++ 		if (tempAlliArenaTeam && tempAlliArenaTeam->GetId() >= 0xFFF00000)
++ 		{
++ 			sArenaTeamMgr->RemoveArenaTeam(tempAlliArenaTeam->GetId());
++ 			delete tempAlliArenaTeam;
++ 		}
++ 
++ 		if (tempHordeArenaTeam && tempHordeArenaTeam->GetId() >= 0xFFF00000)
++ 		{
++ 			sArenaTeamMgr->RemoveArenaTeam(tempHordeArenaTeam->GetId());
++ 			delete tempHordeArenaTeam;
++ 		}
++ 
++ 	}
+ }
+ 
+ void Battleground::Update(uint32 diff)
+@@ -604,6 +627,7 @@ inline void Battleground::_ProcessJoin(uint32 diff)
+ 				}
+ 
+ 			CheckArenaWinConditions();
++			CheckStartSolo3v3Arena();
+ 		}
+ 		else
+ 		{
+@@ -2099,6 +2123,50 @@ void Battleground::UpdateArenaWorldState()
+ 	UpdateWorldState(0xe11, GetAlivePlayersCountByTeam(ALLIANCE));
+ }
+ 
++void Battleground::CheckStartSolo3v3Arena()
++ {
++ 	if (GetArenaType() != ARENA_TYPE_3v3_SOLO)
++ 		return;
++ 
++ 	if (GetStatus() != STATUS_IN_PROGRESS)
++ 		return;  // if CheckArenaWinConditions ends the game
++  
++ 	bool someoneNotInArena = false;
++ 
++ 	ArenaTeam* team[2];
++ 	team[0] = sArenaTeamMgr->GetArenaTeamById(GetArenaTeamIdForTeam(ALLIANCE));
++ 	team[1] = sArenaTeamMgr->GetArenaTeamById(GetArenaTeamIdForTeam(HORDE));
++ 
++ 	ASSERT(team[0] && team[1]);
++ 
++ 	for (int i = 0; i < 2; i++)
++ 	{
++ 		for (ArenaTeam::MemberList::iterator itr = team[i]->m_membersBegin(); itr != team[i]->m_membersEnd(); itr++)
++ 		{
++ 			Player* plr = sObjectAccessor->FindPlayer(itr->Guid);
++ 			if (!plr)
++ 			{
++ 				someoneNotInArena = true;
++ 				continue;
++ 			}
++ 
++ 			if (plr->GetInstanceId() != GetInstanceID())
++ 			{
++ 				if (sWorld->getBoolConfig(CONFIG_SOLO_3V3_CAST_DESERTER_ON_AFK))
++ 					plr->CastSpell(plr, 26013, true); // Deserter
++ 				someoneNotInArena = true;
++ 			}
++ 		}
++ 	}
++ 
++ 	if (someoneNotInArena && sWorld->getBoolConfig(CONFIG_SOLO_3V3_STOP_GAME_INCOMPLETE))
++ 	{
++ 		SetRated(false);
++ 		EndBattleground(LANG_BG_A_WINS);
++ 	}
++ }
++ 
++
+ void Battleground::SetBgRaid(uint32 TeamID, Group* bg_raid)
+ {
+ 	Group*& old_raid = TeamID == ALLIANCE ? m_BgRaids[TEAM_ALLIANCE] : m_BgRaids[TEAM_HORDE];
+diff --git a/src/server/game/Battlegrounds/Battleground.h b/src/server/game/Battlegrounds/Battleground.h
+index 618e8e9..7a14988 100644
+--- a/src/server/game/Battlegrounds/Battleground.h
++++ b/src/server/game/Battlegrounds/Battleground.h
+@@ -204,6 +204,7 @@ enum ArenaType
+ {
+     ARENA_TYPE_2v2          = 2,
+     ARENA_TYPE_3v3          = 3,
++	ARENA_TYPE_3v3_SOLO		= 4, // 3v3 soloqueue
+     ARENA_TYPE_5v5          = 1
+ };
+ 
+@@ -477,10 +478,15 @@ class Battleground
+         int32 GetArenaTeamRatingChangeByIndex(uint32 index) const   { return m_ArenaTeamRatingChanges[index]; }
+         void SetArenaMatchmakerRating(uint32 Team, uint32 MMR){ m_ArenaTeamMMR[GetTeamIndexByTeamId(Team)] = MMR; }
+         uint32 GetArenaMatchmakerRating(uint32 Team) const          { return m_ArenaTeamMMR[GetTeamIndexByTeamId(Team)]; }
+-        uint32 GetArenaMatchmakerRatingByIndex(uint32 index) const  { return m_ArenaTeamMMR[index]; }
+-        void CheckArenaAfterTimerConditions();
+-        void CheckArenaWinConditions();
+-        void UpdateArenaWorldState();
++        //uint32 GetArenaMatchmakerRatingByIndex(uint32 index) const  { return m_ArenaTeamMMR[index]; }
++        //void CheckArenaAfterTimerConditions();
++        //void CheckArenaWinConditions();
++       // void UpdateArenaWorldState();
++		uint32 GetArenaMatchmakerRatingByIndex(uint32 index) const  { return m_ArenaTeamMMR[index]; }
++		void CheckArenaAfterTimerConditions();
++		void CheckArenaWinConditions();
++		void UpdateArenaWorldState();
++		void CheckStartSolo3v3Arena();
+ 
+         // Triggers handle
+         // must be implemented in BG subclass
+diff --git a/src/server/game/Battlegrounds/BattlegroundMgr.cpp b/src/server/game/Battlegrounds/BattlegroundMgr.cpp
+index 9fee350..c757c4b 100644
+--- a/src/server/game/Battlegrounds/BattlegroundMgr.cpp
++++ b/src/server/game/Battlegrounds/BattlegroundMgr.cpp
+@@ -905,8 +905,8 @@ Battleground* BattlegroundMgr::CreateNewBattleground(BattlegroundTypeId original
+ 		case ARENA_TYPE_3v3:
+ 			maxPlayersPerTeam = 3;
+ 			break;
+-		case ARENA_TYPE_5v5:
+-			maxPlayersPerTeam = 1;
++		case ARENA_TYPE_3v3_SOLO:
++			maxPlayersPerTeam = 3; // 3v3 soloqeueue
+ 			break;
+ 		}
+ 
+@@ -1255,8 +1255,8 @@ BattlegroundQueueTypeId BattlegroundMgr::BGQueueTypeId(BattlegroundTypeId bgType
+ 			return BATTLEGROUND_QUEUE_2v2;
+ 		case ARENA_TYPE_3v3:
+ 			return BATTLEGROUND_QUEUE_3v3;
+-		case ARENA_TYPE_5v5:
+-			return BATTLEGROUND_QUEUE_5v5;
++		case ARENA_TYPE_3v3_SOLO:
++			return BATTLEGROUND_QUEUE_3v3_SOLO;
+ 
+ 		default:
+ 			return BATTLEGROUND_QUEUE_NONE;
+@@ -1291,6 +1291,7 @@ BattlegroundTypeId BattlegroundMgr::BGTemplateId(BattlegroundQueueTypeId bgQueue
+ 	case BATTLEGROUND_QUEUE_2v2:
+ 	case BATTLEGROUND_QUEUE_3v3:
+ 	case BATTLEGROUND_QUEUE_5v5:
++	case BATTLEGROUND_QUEUE_3v3_SOLO:
+ 		return BATTLEGROUND_AA;
+ 	default:
+ 		return BattlegroundTypeId(0);                   // used for unknown template (it existed and do nothing)
+@@ -1305,8 +1306,8 @@ uint8 BattlegroundMgr::BGArenaType(BattlegroundQueueTypeId bgQueueTypeId)
+ 		return ARENA_TYPE_2v2;
+ 	case BATTLEGROUND_QUEUE_3v3:
+ 		return ARENA_TYPE_3v3;
+-	case BATTLEGROUND_QUEUE_5v5:
+-		return ARENA_TYPE_5v5;
++	case BATTLEGROUND_QUEUE_3v3_SOLO:
++		return ARENA_TYPE_3v3_SOLO;
+ 	default:
+ 		return 0;
+ 	}
+@@ -1326,7 +1327,7 @@ void BattlegroundMgr::ToggleArenaTesting()
+ 
+ void BattlegroundMgr::SetHolidayWeekends(uint32 mask)
+ {
+-	for (uint32 bgtype = 1; bgtype < MAX_BATTLEGROUND_TYPE_ID; ++bgtype)
++	for (uint32 bgtype = 1; bgtype < MAX_BATTLEGROUND_TYPE_ID && bgtype < 32; ++bgtype)
+ 	{
+ 		if (Battleground* bg = GetBattlegroundTemplate(BattlegroundTypeId(bgtype)))
+ 		{
+diff --git a/src/server/game/Battlegrounds/BattlegroundQueue.cpp b/src/server/game/Battlegrounds/BattlegroundQueue.cpp
+index 84a7ebd..69cc73a 100644
+--- a/src/server/game/Battlegrounds/BattlegroundQueue.cpp
++++ b/src/server/game/Battlegrounds/BattlegroundQueue.cpp
+@@ -26,6 +26,7 @@
+ #include "Language.h"
+ #include "ObjectMgr.h"
+ #include "Player.h"
++#include "../../scripts/Custom/npc_solo3v3.h"
+ 
+ /*********************************************************/
+ /***            BATTLEGROUND QUEUE SYSTEM              ***/
+@@ -167,12 +168,12 @@ GroupQueueInfo* BattlegroundQueue::AddGroup(Player* leader, Group* grp, Battlegr
+ 	uint32 lastOnlineTime = getMSTime();
+ 
+ 	//announce world (this don't need mutex)
+-	if (isRated && sWorld->getBoolConfig(CONFIG_ARENA_QUEUE_ANNOUNCER_ENABLE))
++	/*if (isRated && sWorld->getBoolConfig(CONFIG_ARENA_QUEUE_ANNOUNCER_ENABLE))
+ 	{
+ 		ArenaTeam* Team = sArenaTeamMgr->GetArenaTeamById(arenateamid);
+ 		if (Team && (ginfo->ArenaType != ARENA_TEAM_5v5))
+ 			sWorld->SendWorldText(LANG_ARENA_QUEUE_ANNOUNCE_WORLD_JOIN, Team->GetName().c_str(), ginfo->ArenaType, ginfo->ArenaType, ginfo->ArenaTeamRating);
+-	}
++	} TO CHANGE: QUADRAL! */
+ 
+ 	//add players from group to ginfo
+ 	if (grp)
+@@ -386,10 +387,10 @@ void BattlegroundQueue::RemovePlayer(uint64 guid, bool decreaseInvitedCount)
+ 	m_QueuedPlayers.erase(itr);
+ 
+ 	// announce to world if arena team left queue for rated match, show only once
+-	if (group->ArenaType && group->IsRated && group->Players.empty() && sWorld->getBoolConfig(CONFIG_ARENA_QUEUE_ANNOUNCER_ENABLE))
++	/*if (group->ArenaType && group->IsRated && group->Players.empty() && sWorld->getBoolConfig(CONFIG_ARENA_QUEUE_ANNOUNCER_ENABLE))
+ 		if (ArenaTeam* Team = sArenaTeamMgr->GetArenaTeamById(group->ArenaTeamId))
+ 			if (group->ArenaType != ARENA_TEAM_5v5)
+-				sWorld->SendWorldText(LANG_ARENA_QUEUE_ANNOUNCE_WORLD_EXIT, Team->GetName().c_str(), group->ArenaType, group->ArenaType, group->ArenaTeamRating);
++				sWorld->SendWorldText(LANG_ARENA_QUEUE_ANNOUNCE_WORLD_EXIT, Team->GetName().c_str(), group->ArenaType, group->ArenaType, group->ArenaTeamRating); TO CHANGE: QUADRAL */
+ 
+ 	// if player leaves queue and he is invited to rated arena match, then he have to lose
+ 	if (group->IsInvitedToBGInstanceGUID && group->IsRated && decreaseInvitedCount)
+@@ -769,6 +770,112 @@ bool BattlegroundQueue::CheckSkirmishForSameFaction(BattlegroundBracketId bracke
+ 	return true;
+ }
+ 
++bool BattlegroundQueue::CheckSolo3v3Arena(BattlegroundBracketId bracket_id)
++ {
++ 	bool soloTeam[BG_TEAMS_COUNT][MAX_TALENT_CAT]; // 2 teams and each team 3 players - set to true when slot is taken
++ 	for (int i = 0; i < BG_TEAMS_COUNT; i++)
++ 		for (int j = 0; j < MAX_TALENT_CAT; j++)
++ 			soloTeam[i][j] = false; // default false = slot not taken
++ 
++ 	m_SelectionPools[TEAM_ALLIANCE].Init();
++ 	m_SelectionPools[TEAM_HORDE].Init();
++ 
++ 	bool filterTalents = sWorld->getBoolConfig(CONFIG_SOLO_3V3_FILTER_TALENTS);
++ 
++ 	for (int teamId = 0; teamId < 2; teamId++) // BG_QUEUE_PREMADE_ALLIANCE and BG_QUEUE_PREMADE_HORDE
++ 	{
++ 		for (GroupsQueueType::iterator itr = m_QueuedGroups[bracket_id][teamId].begin(); itr != m_QueuedGroups[bracket_id][teamId].end(); ++itr)
++ 		{
++ 			if ((*itr)->IsInvitedToBGInstanceGUID) // Skip when invited
++ 				continue;
++ 
++ 			std::map<uint64, PlayerQueueInfo*> *grpPlr = &(*itr)->Players;
++ 			for (std::map<uint64, PlayerQueueInfo*>::iterator grpPlrItr = grpPlr->begin(); grpPlrItr != grpPlr->end(); grpPlrItr++)
++ 			{
++ 				Player* plr = sObjectAccessor->FindPlayer(grpPlrItr->first);
++ 				if (!plr)
++ 					continue;
++ 
++ 				if (!filterTalents && m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() + m_SelectionPools[TEAM_HORDE].GetPlayerCount() == 6)
++ 					return true;
++ 
++ 				Solo3v3TalentCat plrCat = GetTalentCatForSolo3v3(plr); // get talent cat
++ 
++ 				if (filterTalents && soloTeam[TEAM_ALLIANCE][plrCat] == false // is slot free in alliance team?
++ 					|| (!filterTalents && m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() != 3))
++ 				{
++ 					if (m_SelectionPools[TEAM_ALLIANCE].AddGroup((*itr), 3)) // added successfully?
++ 					{
++ 						soloTeam[TEAM_ALLIANCE][plrCat] = true; // okay take this slot
++ 
++ 						if ((*itr)->Team != ALLIANCE) // move to other team
++ 						{
++ 							(*itr)->Team = ALLIANCE;
++ 							m_QueuedGroups[bracket_id][BG_QUEUE_PREMADE_ALLIANCE].push_front((*itr));
++ 							itr = m_QueuedGroups[bracket_id][BG_QUEUE_PREMADE_HORDE].erase(itr);
++ 							return CheckSolo3v3Arena(bracket_id);
++ 						}
++ 					}
++ 				}
++ 				else if (filterTalents && soloTeam[TEAM_HORDE][plrCat] == false || !filterTalents) // nope? and in horde team?
++ 				{
++ 					if (m_SelectionPools[TEAM_HORDE].AddGroup((*itr), 3))
++ 					{
++ 						soloTeam[TEAM_HORDE][plrCat] = true;
++ 
++ 						if ((*itr)->Team != HORDE) // move to other team
++ 						{
++ 							(*itr)->Team = HORDE;
++ 							m_QueuedGroups[bracket_id][BG_QUEUE_PREMADE_HORDE].push_front((*itr));
++ 							itr = m_QueuedGroups[bracket_id][BG_QUEUE_PREMADE_ALLIANCE].erase(itr);
++ 							return CheckSolo3v3Arena(bracket_id);
++ 						}
++ 					}
++ 				}
++ 			}
++ 		}
++ 	}
++ 
++ 	int countAll = 0;
++ 	for (int i = 0; i < BG_TEAMS_COUNT; i++)
++ 	{
++ 		for (int j = 0; j < MAX_TALENT_CAT; j++)
++ 			if (soloTeam[i][j])
++ 				countAll++;
++ 	}
++ 
++ 	return countAll == 6 ||
++ 		(!filterTalents && m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() + m_SelectionPools[TEAM_HORDE].GetPlayerCount() == 6);
++ }
++ void BattlegroundQueue::CreateTempArenaTeamForQueue(ArenaTeam *arenaTeams[])
++ {
++ 	// Create temp arena team
++ 	for (uint32 i = 0; i < BG_TEAMS_COUNT; i++)
++ 	{
++ 		ArenaTeam* tempArenaTeam = new ArenaTeam();  // delete it when all players have left the arena match. Stored in sArenaTeamMgr
++ 		Player* atPlr[3];
++ 		uint32 atPlrItr = 0;
++ 
++ 		for (GroupsQueueType::const_iterator citr = m_SelectionPools[TEAM_ALLIANCE + i].SelectedGroups.begin(); citr != m_SelectionPools[TEAM_ALLIANCE + i].SelectedGroups.end(); ++citr)
++ 		{
++ 			if (atPlrItr >= 3)
++ 				break; // Should never happen
++ 
++ 			for (std::map<uint64, PlayerQueueInfo*>::iterator itr = (*citr)->Players.begin(); itr != (*citr)->Players.end(); ++itr)
++ 			{
++ 				if (Player* pPlr = sObjectAccessor->FindPlayer(itr->first))
++ 					atPlr[atPlrItr++] = pPlr;
++ 				break;
++ 			}
++ 		}
++ 
++ 		tempArenaTeam->CreateTempForSolo3v3(atPlr, i);
++ 		sArenaTeamMgr->AddArenaTeam(tempArenaTeam);
++ 		arenaTeams[i] = tempArenaTeam;
++ 	}
++ }
++ 
++
+ void BattlegroundQueue::UpdateEvents(uint32 diff)
+ {
+ 	m_events.Update(diff);
+@@ -913,6 +1020,41 @@ void BattlegroundQueue::BattlegroundQueueUpdate(uint32 /*diff*/, BattlegroundTyp
+ 			bg2->StartBattleground();
+ 		}
+ 	}
++		
++ 	else if (arenaType == ARENA_TYPE_3v3_SOLO)
++ 	{
++ 		// Solo 3v3
++ 		if (CheckSolo3v3Arena(bracket_id))
++ 		{
++ 			// we successfully created a pool
++ 			Battleground* arena = sBattlegroundMgr->CreateNewBattleground(bgTypeId, bracketEntry, arenaType, isRated);
++ 			if (!arena)
++ 				return;
++ 
++ 			// Create temp arena team and store arenaTeamId
++ 			ArenaTeam* arenaTeams[BG_TEAMS_COUNT];
++ 			CreateTempArenaTeamForQueue(arenaTeams);
++ 
++ 			// invite those selection pools
++ 			for (uint32 i = 0; i < BG_TEAMS_COUNT; i++)
++ 				for (GroupsQueueType::const_iterator citr = m_SelectionPools[TEAM_ALLIANCE + i].SelectedGroups.begin(); citr != m_SelectionPools[TEAM_ALLIANCE + i].SelectedGroups.end(); ++citr)
++ 				{
++ 					(*citr)->ArenaTeamId = arenaTeams[i]->GetId();
++ 					InviteGroupToBG((*citr), arena, (*citr)->Team);
++ 				}
++ 			// Override ArenaTeamId to temp arena team (was first set in InviteGroupToBG)
++ 			arena->SetArenaTeamIdForTeam(ALLIANCE, arenaTeams[TEAM_ALLIANCE]->GetId());
++ 			arena->SetArenaTeamIdForTeam(HORDE, arenaTeams[TEAM_HORDE]->GetId());
++ 
++ 			// Set matchmaker rating for calculating rating-modifier on EndBattleground (when a team has won/lost)
++ 			arena->SetArenaMatchmakerRating(ALLIANCE, arenaTeams[TEAM_ALLIANCE]->GetAverageMMR());
++ 			arena->SetArenaMatchmakerRating(HORDE, arenaTeams[TEAM_HORDE]->GetAverageMMR());
++ 
++ 			// start bg
++ 			arena->StartBattleground();
++ 		}
++ 	}
++ 	
+ 	else if (bg_template->isArena())
+ 	{
+ 		// Check if Queues are empty
+diff --git a/src/server/game/Battlegrounds/BattlegroundQueue.h b/src/server/game/Battlegrounds/BattlegroundQueue.h
+index 26cb507..ad910fe 100644
+--- a/src/server/game/Battlegrounds/BattlegroundQueue.h
++++ b/src/server/game/Battlegrounds/BattlegroundQueue.h
+@@ -23,6 +23,7 @@
+ #include "DBCEnums.h"
+ #include "Battleground.h"
+ #include "EventProcessor.h"
++#include "ArenaTeam.h"
+ 
+ #include <deque>
+ 
+@@ -87,6 +88,8 @@ class BattlegroundQueue
+         bool CheckPremadeMatch(BattlegroundBracketId bracket_id, uint32 MinPlayersPerTeam, uint32 MaxPlayersPerTeam);
+         bool CheckNormalMatch(Battleground* bg_template, BattlegroundBracketId bracket_id, uint32 minPlayers, uint32 maxPlayers);
+         bool CheckSkirmishForSameFaction(BattlegroundBracketId bracket_id, uint32 minPlayersPerTeam);
++		bool CheckSolo3v3Arena(BattlegroundBracketId bracket_id);
++		void CreateTempArenaTeamForQueue(ArenaTeam *arenaTeams[]);
+         GroupQueueInfo* AddGroup(Player* leader, Group* group, BattlegroundTypeId bgTypeId, PvPDifficultyEntry const*  bracketEntry, uint8 ArenaType, bool isRated, bool isPremade, uint32 ArenaRating, uint32 MatchmakerRating, uint32 ArenaTeamId = 0);
+         void RemovePlayer(uint64 guid, bool decreaseInvitedCount);
+         bool IsPlayerInvited(uint64 pl_guid, const uint32 bgInstanceGuid, const uint32 removeTime);
+diff --git a/src/server/game/Entities/Player/Player.cpp b/src/server/game/Entities/Player/Player.cpp
+index e37c9c3..0e82069 100644
+--- a/src/server/game/Entities/Player/Player.cpp
++++ b/src/server/game/Entities/Player/Player.cpp
+@@ -23112,20 +23112,21 @@ void Player::SetBattlegroundEntryPoint()
+ void Player::LeaveBattleground(bool teleportToEntryPoint)
+ {
+ 	if (Battleground* bg = GetBattleground())
+-	{
+-		bg->RemovePlayerAtLeave(GetGUID(), teleportToEntryPoint, true);
+-
+-		// call after remove to be sure that player resurrected for correct cast
+-		if (bg->isBattleground() && !isGameMaster() && sWorld->getBoolConfig(CONFIG_BATTLEGROUND_CAST_DESERTER))
+-		{
+-			if (bg->GetStatus() == STATUS_IN_PROGRESS || bg->GetStatus() == STATUS_WAIT_JOIN)
+-			{
+-				//lets check if player was teleported from BG and schedule delayed Deserter spell cast
+-				if (IsBeingTeleportedFar())
+-				{
+-					ScheduleDelayedOperation(DELAYED_SPELL_CAST_DESERTER);
+-					return;
+-				}
++ 	{
++ 		bg->RemovePlayerAtLeave(GetGUID(), teleportToEntryPoint, true);
++ 		// call after remove to be sure that player resurrec// returns the maximal personal arena rating that can be used to purchase items requiring this conditionted for correct cast
++ 		//if (bg->isBattleground() && !isGameMaster() && sWorld->getBoolConfig(CONFIG_BATTLEGROUND_CAST_DESERTER))
++ 		if ((bg->isBattleground() || bg->GetArenaType() == ARENA_TYPE_3v3_SOLO && sWorld->getBoolConfig(CONFIG_SOLO_3V3_CAST_DESERTER_ON_LEAVE))
++ 			&& !isGameMaster() && sWorld->getBoolConfig(CONFIG_BATTLEGROUND_CAST_DESERTER))
++ 		{
++ 			if (bg->GetStatus() == STATUS_IN_PROGRESS || bg->GetStatus() == STATUS_WAIT_JOIN)
++ 			{
++ 				//lets check if player was teleported from BG and schedule delayed Deserter spell cast
++ 				if (IsBeingTeleportedFar())
++ 				{
++ 					ScheduleDelayedOperation(DELAYED_SPELL_CAST_DESERTER);
++ 					return;
++ 				}
+ 
+ 				CastSpell(this, 26013, true);               // Deserter
+ 			}
+diff --git a/src/server/game/Groups/Group.cpp b/src/server/game/Groups/Group.cpp
+index b0ba6bd..4f12566 100644
+--- a/src/server/game/Groups/Group.cpp
++++ b/src/server/game/Groups/Group.cpp
+@@ -1869,6 +1869,10 @@ GroupJoinBattlegroundResult Group::CanJoinBattlegroundQueue(Battleground const*
+     if (memberscount > bgEntry->maxGroupSize)                // no MinPlayerCount for battlegrounds
+         return ERR_BATTLEGROUND_NONE;                        // ERR_GROUP_JOIN_BATTLEGROUND_TOO_MANY handled on client side
+ 
++	// Dont allow to join as group in solo 3v3
++	if (arenaSlot == 2 && memberscount > 1)
++		return ERR_BATTLEGROUND_JOIN_FAILED;
++
+     // get a player as reference, to compare other players' stats to (arena team id, queue id based on level, etc.)
+     Player* reference = GetFirstMember()->getSource();
+     // no reference found, can't join this way
+diff --git a/src/server/game/Miscellaneous/SharedDefines.h b/src/server/game/Miscellaneous/SharedDefines.h
+index f81b736..b56a529 100644
+--- a/src/server/game/Miscellaneous/SharedDefines.h
++++ b/src/server/game/Miscellaneous/SharedDefines.h
+@@ -3782,7 +3782,8 @@ enum BattlegroundQueueTypeId
+     BATTLEGROUND_QUEUE_RB       = 9,
+     BATTLEGROUND_QUEUE_2v2      = 10,
+     BATTLEGROUND_QUEUE_3v3      = 11,
+-    BATTLEGROUND_QUEUE_5v5      = 12,
++	BATTLEGROUND_QUEUE_3v3_SOLO = 12,
++    BATTLEGROUND_QUEUE_5v5      = 13,
+     MAX_BATTLEGROUND_QUEUE_TYPES
+ };
+ 
+diff --git a/src/server/game/Scripting/ScriptLoader.cpp b/src/server/game/Scripting/ScriptLoader.cpp
+index 88df503..8a4f81f 100644
+--- a/src/server/game/Scripting/ScriptLoader.cpp
++++ b/src/server/game/Scripting/ScriptLoader.cpp
+@@ -1589,6 +1589,7 @@ void AddBattlegroundScripts()
+ 	void AddSC_arena_spectator_script();
+ 	void AddSC_Arena_Template();
+ 	void AddSC_Poll_NPC();
++	void AddSC_npc_solo3v3();
+ #endif
+ 
+ void AddCustomScripts()
+@@ -1606,5 +1607,6 @@ void AddCustomScripts()
+ 	AddSC_arena_spectator_script();
+ 	AddSC_Arena_Template();
+ 	AddSC_Poll_NPC();
++	AddSC_npc_solo3v3();
+ #endif 
+ }
+diff --git a/src/server/game/Spells/Spell.cpp b/src/server/game/Spells/Spell.cpp
+index 400e9ab..89764a9 100644
+--- a/src/server/game/Spells/Spell.cpp
++++ b/src/server/game/Spells/Spell.cpp
+@@ -5983,12 +5983,21 @@ SpellCastResult Spell::CheckCast(bool strict)
+                 break;
+             }
+             case SPELL_EFFECT_TALENT_SPEC_SELECT:
+-                // can't change during already started arena/battleground
+-                if (m_caster->GetTypeId() == TYPEID_PLAYER)
+-                    if (Battleground const* bg = m_caster->ToPlayer()->GetBattleground())
+-                        if (bg->GetStatus() == STATUS_IN_PROGRESS)
+-                            return SPELL_FAILED_NOT_IN_BATTLEGROUND;
+-                break;
++             // can't change during already started arena/battleground
++ 				if (m_caster->GetTypeId() == TYPEID_PLAYER)
++ 				{
++ 					Player* plr = m_caster->ToPlayer();
++ 					if (plr->InBattlegroundQueueForBattlegroundQueueType(BATTLEGROUND_QUEUE_3v3_SOLO) ||
++ 						plr->InBattlegroundQueueForBattlegroundQueueType(BATTLEGROUND_QUEUE_5v5))
++ 					{
++ 						plr->GetSession()->SendAreaTriggerMessage("You can't change your talents while in queue for 1v1 or 3v3.");
++ 						return SPELL_FAILED_DONT_REPORT;
++ 					}
++ 					if (Battleground const* bg = m_caster->ToPlayer()->GetBattleground())
++ 						if (bg->GetStatus() == STATUS_IN_PROGRESS)
++ 							return SPELL_FAILED_NOT_IN_BATTLEGROUND;
++ 				}
++				break;
+             default:
+                 break;
+         }
+diff --git a/src/server/game/World/World.cpp b/src/server/game/World/World.cpp
+index 92aef7a..e63afb9 100644
+--- a/src/server/game/World/World.cpp
++++ b/src/server/game/World/World.cpp
+@@ -1084,15 +1084,28 @@ void World::LoadConfigSettings(bool reload)
+     m_bool_configs[CONFIG_ARENA_SEASON_IN_PROGRESS]                  = ConfigMgr::GetBoolDefault("Arena.ArenaSeason.InProgress", true);
+     m_bool_configs[CONFIG_ARENA_LOG_EXTENDED_INFO]                   = ConfigMgr::GetBoolDefault("ArenaLog.ExtendedInfo", false);
+ 
++	// 3v3 soloqueue
++	m_bool_configs[CONFIG_SOLO_3V3_ENABLE] = ConfigMgr::GetBoolDefault("Solo.3v3.Enable", 1);
++	m_int_configs[CONFIG_SOLO_3V3_MIN_LEVEL] = ConfigMgr::GetIntDefault("Solo.3v3.MinLevel", 85);
++	//m_int_configs[CONFIG_SOLO_3V3_COSTS] = ConfigMgr::GetIntDefault("Solo.3v3.Costs", 400000);
++	//m_float_configs[CONFIG_SOLO_3V3_ARENAPOINTS_MULTI] = ConfigMgr::GetFloatDefault("Solo.3v3.ArenaPointsMulti", 0.64f);
++	m_bool_configs[CONFIG_SOLO_3V3_FILTER_TALENTS] = ConfigMgr::GetBoolDefault("Solo.3v3.FilterTalents", true);
++	m_bool_configs[CONFIG_SOLO_3V3_VENDOR_RATING] = ConfigMgr::GetBoolDefault("Solo.3v3.VendorRating", true);
++	//	m_bool_configs[CONFIG_ARENA_1V1_BLOCK_FORBIDDEN_TALENTS] = sConfigMgr->GetBoolDefault("Arena.1v1.BlockForbiddenTalents", true);
++	m_bool_configs[CONFIG_ARENA_CHECK_EQUIP_AND_TALENTS] = ConfigMgr::GetBoolDefault("Arena.CheckEquipAndTalents", true);
++	m_bool_configs[CONFIG_SOLO_3V3_CAST_DESERTER_ON_AFK] = ConfigMgr::GetBoolDefault("Solo.3v3.CastDeserterOnAfk", true);
++	m_bool_configs[CONFIG_SOLO_3V3_CAST_DESERTER_ON_LEAVE] = ConfigMgr::GetBoolDefault("Solo.3v3.CastDeserterOnLeave", true);
++	m_bool_configs[CONFIG_SOLO_3V3_STOP_GAME_INCOMPLETE] = ConfigMgr::GetBoolDefault("Solo.3v3.StopGameIncomplete", true);
++
+     m_bool_configs[CONFIG_RATED_BATTLEGROUND_ENABLED]                = ConfigMgr::GetBoolDefault("Rated.BG.Enable", true);
+ 
+-    m_bool_configs[CONFIG_ARENA_1V1_ENABLE]							 = ConfigMgr::GetBoolDefault("Arena.1v1.Enable", true);
++    /*m_bool_configs[CONFIG_ARENA_1V1_ENABLE]							 = ConfigMgr::GetBoolDefault("Arena.1v1.Enable", true);
+     m_bool_configs[CONFIG_ARENA_1V1_ANNOUNCER]						 = ConfigMgr::GetBoolDefault("Arena.1v1.Announcer", false);
+     m_int_configs[CONFIG_ARENA_1V1_MIN_LEVEL]						 = ConfigMgr::GetIntDefault("Arena.1v1.MinLevel", 80);
+     m_int_configs[CONFIG_ARENA_1V1_COSTS]							 = ConfigMgr::GetIntDefault("Arena.1v1.Costs", 400000);
+     m_bool_configs[CONFIG_ARENA_1V1_VENDOR_RATING]					 = ConfigMgr::GetBoolDefault("Arena.1v1.VendorRating", false);
+     m_float_configs[CONFIG_ARENA_1V1_ARENAPOINTS_MULTI]				 = ConfigMgr::GetFloatDefault("Arena.1v1.ArenaPointsMulti", 0.64f);
+-    m_float_configs[CONFIG_ARENA_1V1_BLOCK_FORBIDDEN_TALENTS]		 = ConfigMgr::GetFloatDefault("Arena.1v1.BlockForbiddenTalents", true);
++    m_float_configs[CONFIG_ARENA_1V1_BLOCK_FORBIDDEN_TALENTS]		 = ConfigMgr::GetFloatDefault("Arena.1v1.BlockForbiddenTalents", true);*/
+ 
+ 
+     /// Now it seems to be that only Arena Season ID is send to client (0 if arena isn't in progress)
+diff --git a/src/server/game/World/World.h b/src/server/game/World/World.h
+index 1493036..25e0383 100644
+--- a/src/server/game/World/World.h
++++ b/src/server/game/World/World.h
+@@ -134,6 +134,13 @@ enum WorldBoolConfigs
+     CONFIG_GM_LOWER_SECURITY,
+     CONFIG_SKILL_PROSPECTING,
+     CONFIG_SKILL_MILLING,
++	CONFIG_SOLO_3V3_ENABLE,
++	CONFIG_SOLO_3V3_FILTER_TALENTS,
++	CONFIG_SOLO_3V3_VENDOR_RATING,
++	CONFIG_ARENA_CHECK_EQUIP_AND_TALENTS,
++	CONFIG_SOLO_3V3_CAST_DESERTER_ON_AFK,
++	CONFIG_SOLO_3V3_CAST_DESERTER_ON_LEAVE,
++	CONFIG_SOLO_3V3_STOP_GAME_INCOMPLETE,
+     CONFIG_SAVE_RESPAWN_TIME_IMMEDIATELY,
+     CONFIG_WEATHER,
+     CONFIG_QUEST_IGNORE_RAID,
+@@ -227,6 +234,8 @@ enum WorldIntConfigs
+     CONFIG_INTERVAL_CHANGEWEATHER,
+     CONFIG_INTERVAL_DISCONNECT_TOLERANCE,
+     CONFIG_PORT_WORLD,
++	CONFIG_SOLO_3V3_COSTS,
++	CONFIG_SOLO_3V3_MIN_LEVEL,
+     CONFIG_SOCKET_TIMEOUTTIME,
+     CONFIG_SESSION_ADD_DELAY,
+     CONFIG_GAME_TYPE,
+diff --git a/src/server/scripts/Custom/3v3_npc.cpp b/src/server/scripts/Custom/3v3_npc.cpp
+new file mode 100644
+index 0000000..e34e94b
+--- /dev/null
++++ b/src/server/scripts/Custom/3v3_npc.cpp
+@@ -0,0 +1,355 @@
++/*
++ *
++ * Copyright (C) 2014 Ladrek
++ * Written by Ladrek <Kargath-WoW>
++ *
++ */
++
++#include "ScriptMgr.h"
++#include "ArenaTeamMgr.h"
++#include "Common.h"
++#include "DisableMgr.h"
++#include "BattlegroundMgr.h"
++#include "Battleground.h"
++#include "ArenaTeam.h"
++#include "Language.h"
++#include "npc_solo3v3.h"
++#include "BattlegroundQueue.h"
++
++
++class npc_solo3v3 : public CreatureScript
++{
++public:
++    npc_solo3v3() : CreatureScript("npc_solo3v3") 
++    {
++        for (int i = 0; i < MAX_TALENT_CAT; i++)
++            cache3v3Queue[i] = 0;
++
++        lastFetchQueueList = 0;
++    }
++
++    bool OnGossipHello(Player* player, Creature* me)
++    {
++        if(!player || !me)
++            return true;
++
++        if (sWorld->getBoolConfig(CONFIG_SOLO_3V3_ENABLE) == false)
++        {
++            ChatHandler(player->GetSession()).SendSysMessage("Arena disabled!");
++            return true;
++        }
++
++        fetchQueueList();
++        std::stringstream infoQueue;
++        infoQueue << "Solo 3vs3 Arena\n";
++        infoQueue << "Queued Players: " << (cache3v3Queue[MELEE] + cache3v3Queue[RANGE] + cache3v3Queue[HEALER]);
++        
++        if (sWorld->getBoolConfig(CONFIG_SOLO_3V3_FILTER_TALENTS))
++        {
++            infoQueue << "\n\n";
++			infoQueue << "Queued Melees: " << cache3v3Queue[MELEE] << "\n";
++            infoQueue << "Queued Casters: " << cache3v3Queue[RANGE] << "\n";
++            infoQueue << "Queued Healers: " << cache3v3Queue[HEALER] << "\n";;
++        }
++
++        if (player->InBattlegroundQueueForBattlegroundQueueType(BATTLEGROUND_QUEUE_5v5) 
++            || player->InBattlegroundQueueForBattlegroundQueueType(BATTLEGROUND_QUEUE_3v3_SOLO))
++            player->ADD_GOSSIP_ITEM_EXTENDED(GOSSIP_ICON_INTERACT_1, "Leave Solo queue", GOSSIP_SENDER_MAIN, 3, "Are you sure you want to remove the solo queue?", 0, false);
++
++        if(player->GetArenaTeamId(ArenaTeam::GetSlotByType(ARENA_TEAM_5v5)) == NULL)
++            player->ADD_GOSSIP_ITEM_EXTENDED(GOSSIP_ICON_INTERACT_1, "Create new Solo arena team", GOSSIP_SENDER_MAIN, 1, "Create new solo arena team?", 0, false);
++        else
++        {
++            if (player->InBattlegroundQueueForBattlegroundQueueType(BATTLEGROUND_QUEUE_5v5) == false && 
++                player->InBattlegroundQueueForBattlegroundQueueType(BATTLEGROUND_QUEUE_3v3_SOLO) == false)
++            {
++              //  player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Queue up for 1vs1 Wargame\n", GOSSIP_SENDER_MAIN, 20);
++                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Queue up for 3vs3 Arena Solo\n", GOSSIP_SENDER_MAIN, 2);
++            }
++        }
++
++        player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, infoQueue.str().c_str(), GOSSIP_SENDER_MAIN, 0);
++        player->SEND_GOSSIP_MENU(60015, me->GetGUID());
++        return true;
++    }
++
++
++
++    bool OnGossipSelect(Player* player, Creature* me, uint32 /*uiSender*/, uint32 uiAction)
++    {
++        if(!player || !me)
++            return true;
++
++        player->PlayerTalkClass->ClearMenus();
++
++        switch (uiAction)
++        {
++            case 1: // Create new Arenateam
++                {
++					CreateArenateam(player, me);
++                }
++                break;
++
++            case 2: // 3v3 Join Queue Arena (rated)
++                {
++                    // check Deserter debuff
++                        if (player->HasAura(26013) && 
++                            (sWorld->getBoolConfig(CONFIG_SOLO_3V3_CAST_DESERTER_ON_AFK) || sWorld->getBoolConfig(CONFIG_SOLO_3V3_CAST_DESERTER_ON_LEAVE)))
++                    {
++						Battleground* bg = NULL;
++                        WorldPacket data;
++						sBattlegroundMgr->BuildStatusFailedPacket(&data, bg, player, 0, ERR_GROUP_JOIN_BATTLEGROUND_DESERTERS);
++                        player->GetSession()->SendPacket(&data);
++                    }
++                    else
++						if (ArenaCheckFullEquipAndTalents(player)
++							&& JoinQueueArena(player, me, true, ARENA_TYPE_3v3_SOLO) == false)
++							ChatHandler(player->GetSession()).SendSysMessage("Something went wrong while joining queue. Already in another queue?");
++
++						player->CLOSE_GOSSIP_MENU();
++						return true;
++                }
++
++           /* case 20: // 1v1 Join Queue Arena (rated)
++                {
++					if (ArenaCheckFullEquipAndTalents(player)
++						&& JoinQueueArena(player, me, true, ARENA_TYPE_3v3_SOLO) == false)
++						ChatHandler(player->GetSession()).SendSysMessage("Something went wrong while joining queue. Already in another queue?");
++
++					player->CLOSE_GOSSIP_MENU();
++					return true;
++                }*/
++
++            case 3: // Leave Queue
++                {
++                    uint8 arenaType = ARENA_TYPE_5v5;
++                    if (player->InBattlegroundQueueForBattlegroundQueueType(BATTLEGROUND_QUEUE_3v3_SOLO))
++                        arenaType = ARENA_TYPE_3v3_SOLO;
++					Battleground* bg = sBattlegroundMgr->GetBattlegroundTemplate(BATTLEGROUND_AA);
++					BattlegroundTypeId bgTypeId = bg->GetTypeID();
++					BattlegroundQueueTypeId bgQueueTypeId = BattlegroundMgr::BGQueueTypeId(bgTypeId, arenaType);
++                    WorldPacket Data;
++					uint32 queueSlot = player->AddBattlegroundQueueId(bgQueueTypeId);
++					Data << (uint32)0x0 << (uint32)queueSlot << (uint32)BATTLEGROUND_AA << (uint16)0x0 << (uint8)0x0;
++                    player->GetSession()->HandleBattleFieldPortOpcode(Data);
++                    player->CLOSE_GOSSIP_MENU();
++                    return true;
++                }
++        }
++
++        OnGossipHello(player, me);
++        return true;
++    }
++
++private:
++    int cache3v3Queue[MAX_TALENT_CAT];
++    uint32 lastFetchQueueList;
++
++    bool ArenaCheckFullEquipAndTalents(Player* player)
++    {
++        if (!player)
++            return false;
++
++        if (sWorld->getBoolConfig(CONFIG_ARENA_CHECK_EQUIP_AND_TALENTS) == false)
++            return true;
++
++        std::stringstream err;
++
++        if (player->GetFreeTalentPoints() > 0)
++            err << "You have currently " << player->GetFreeTalentPoints() << " free talent points. Please spend all your talent points before queueing arena.\n";
++
++        Item* newItem = NULL;
++        for (uint8 slot = EQUIPMENT_SLOT_START; slot < EQUIPMENT_SLOT_END; ++slot)
++        {
++            if (slot == EQUIPMENT_SLOT_OFFHAND || slot == EQUIPMENT_SLOT_RANGED || slot == EQUIPMENT_SLOT_TABARD || slot == EQUIPMENT_SLOT_BODY)
++                continue;
++
++            newItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, slot);
++            if (newItem == NULL)
++            {
++                err << "Your character is not fully equipped.\n";
++                break;
++            }
++        }
++
++        if (err.str().length() > 0)
++        {
++            ChatHandler(player->GetSession()).SendSysMessage(err.str().c_str());
++            return false;
++        }
++        return true;
++    }
++
++    bool JoinQueueArena(Player* player, Creature* me, bool isRated, uint8 arenatype)
++    {
++        if (!player || !me)
++            return false;
++
++        if (sWorld->getIntConfig(CONFIG_SOLO_3V3_MIN_LEVEL) > player->getLevel())
++            return false;
++
++        uint64 guid = player->GetGUID();
++        uint8 arenaslot = ArenaTeam::GetSlotByType(ARENA_TEAM_5v5);
++        uint32 arenaRating = 0;
++        uint32 matchmakerRating = 0;
++
++        // ignore if we already in BG or BG queue
++        if (player->InBattleground() || player->InBattlegroundQueue())
++            return false;
++
++        //check existance
++        Battleground* bg = sBattlegroundMgr->GetBattlegroundTemplate(BATTLEGROUND_AA);
++        if (!bg)
++            return false;
++
++        if (DisableMgr::IsDisabledFor(DISABLE_TYPE_BATTLEGROUND, BATTLEGROUND_AA, NULL))
++        {
++            ChatHandler(player->GetSession()).PSendSysMessage(LANG_ARENA_DISABLED);
++            return false;
++        }
++
++        BattlegroundTypeId bgTypeId = bg->GetTypeID();
++        BattlegroundQueueTypeId bgQueueTypeId = BattlegroundMgr::BGQueueTypeId(bgTypeId, arenatype);
++        PvPDifficultyEntry const* bracketEntry = GetBattlegroundBracketByLevel(bg->GetMapId(), player->getLevel());
++        if (!bracketEntry)
++            return false;
++
++        // check if already in queue
++        if (player->GetBattlegroundQueueIndex(bgQueueTypeId) < PLAYER_MAX_BATTLEGROUND_QUEUES)
++            //player is already in this queue
++            return false;
++        // check if has free queue slots
++        if (!player->HasFreeBattlegroundQueueId())
++            return false;
++
++        uint32 ateamId = 0;
++
++        if (isRated)
++        {
++            ateamId = player->GetArenaTeamId(arenaslot);
++            ArenaTeam* at = sArenaTeamMgr->GetArenaTeamById(ateamId);
++            if (!at)
++            {
++                player->GetSession()->SendNotInArenaTeamPacket(arenatype);
++                return false;
++            }
++
++            // get the team rating for queueing
++            arenaRating = at->GetRating();
++            matchmakerRating = at->GetAverageMMR();
++            // the arenateam id must match for everyone in the group
++
++            if (arenaRating <= 0)
++                arenaRating = 1;
++        }
++
++        BattlegroundQueue &bgQueue = sBattlegroundMgr->GetBattlegroundQueue(bgQueueTypeId);
++		//BattlegroundQueue &bgQueue = sBattlegroundMgr->m_BattlegroundQueues[bgQueueTypeId];
++        bg->SetRated(isRated);
++
++        GroupQueueInfo* ginfo = bgQueue.AddGroup(player, NULL, bgTypeId, bracketEntry, arenatype, isRated, false, arenaRating, matchmakerRating, ateamId);
++        uint32 avgTime = bgQueue.GetAverageQueueWaitTime(ginfo, bracketEntry->GetBracketId());
++        uint32 queueSlot = player->AddBattlegroundQueueId(bgQueueTypeId);
++
++		bool isPremade = false;
++        WorldPacket data;
++        // send status packet (in queue)
++		sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, bg, player, queueSlot, STATUS_WAIT_QUEUE, avgTime, ginfo->JoinTime, arenatype);
++        player->GetSession()->SendPacket(&data);
++
++        sBattlegroundMgr->ScheduleQueueUpdate(matchmakerRating, arenatype, bgQueueTypeId, bgTypeId, bracketEntry->GetBracketId());
++
++        return true;
++    }
++
++    bool CreateArenateam(Player* player, Creature* me)
++    {
++        if (!player || !me)
++            return false;
++
++        uint8 slot = ArenaTeam::GetSlotByType(ARENA_TEAM_5v5);
++        if (slot >= MAX_ARENA_SLOT)
++            return false;
++
++        // Check if player is already in an arena team
++        if (player->GetArenaTeamId(slot))
++        {
++            player->GetSession()->SendArenaTeamCommandResult(ERR_ARENA_TEAM_CREATE_S, player->GetName(), "", ERR_ALREADY_IN_ARENA_TEAM);
++            return false;
++        }
++
++        // Teamname = playername
++        // if team name exist, we have to choose another name (playername + number)
++        int i = 1;
++        std::stringstream teamName;
++		teamName << "3vs3 Solo - " << player->GetName();
++       // teamName << player->GetName();
++        do
++        {
++            if (sArenaTeamMgr->GetArenaTeamByName(teamName.str()) != NULL) // teamname exist, so choose another name
++            {
++                teamName.str(std::string());
++                teamName << player->GetName() << i++;
++            }
++            else
++                break;
++        } while (i < 100); // should never happen
++
++        // Create arena team
++        ArenaTeam* arenaTeam = new ArenaTeam();
++
++        if (!arenaTeam->Create(player->GetGUID(), ARENA_TEAM_5v5, teamName.str(), 4283124816, 45, 4294242303, 5, 4294705149))
++        {
++            delete arenaTeam;
++            return false;
++        }
++
++        // Register arena team
++        sArenaTeamMgr->AddArenaTeam(arenaTeam);
++        arenaTeam->AddMember(player->GetGUID());
++
++        ChatHandler(player->GetSession()).SendSysMessage("Arena team successful created!");
++
++        return true;
++    }
++
++    void fetchQueueList()
++    {
++        if (GetMSTimeDiffToNow(lastFetchQueueList) < 1000)
++            return; // prevent spamming
++        lastFetchQueueList = getMSTime();
++
++        BattlegroundQueue* queue = &sBattlegroundMgr->GetBattlegroundQueue(BATTLEGROUND_QUEUE_3v3_SOLO);
++//		BattlegroundQueue* queue = &sBattlegroundMgr->BattlegroundQueue(BATTLEGROUND_QUEUE_3v3_SOLO);
++
++        for (int i = 0; i < MAX_TALENT_CAT; i++)
++            cache3v3Queue[i] = 0;
++
++        for (int i = BG_BRACKET_ID_FIRST; i <= BG_BRACKET_ID_LAST; i++)
++        for (int j = 0; j < 2; j++)
++        {
++            for (BattlegroundQueue::GroupsQueueType::iterator itr = queue->m_QueuedGroups[i][j].begin(); itr != queue->m_QueuedGroups[i][j].end(); itr++)
++            {
++                if ((*itr)->IsInvitedToBGInstanceGUID) // Skip when invited
++                    continue;
++
++                std::map<uint64, PlayerQueueInfo*> *grpPlr = &(*itr)->Players;
++				for (std::map<uint64, PlayerQueueInfo*>::iterator grpPlrItr = grpPlr->begin(); grpPlrItr != grpPlr->end(); grpPlrItr++)
++                {
++                    Player* plr = sObjectAccessor->FindPlayer(grpPlrItr->first);
++                    if (!plr)
++                        continue;
++
++                    Solo3v3TalentCat plrCat = GetTalentCatForSolo3v3(plr); // get talent cat
++                    cache3v3Queue[plrCat]++;
++                }
++            }
++        }
++    }
++};
++
++
++void AddSC_npc_solo3v3()
++{
++    new npc_solo3v3();
++}
+\ No newline at end of file
+diff --git a/src/server/scripts/Custom/CMakeLists.txt b/src/server/scripts/Custom/CMakeLists.txt
+index f26fd15..0292835 100644
+--- a/src/server/scripts/Custom/CMakeLists.txt
++++ b/src/server/scripts/Custom/CMakeLists.txt
+@@ -28,6 +28,8 @@ set(scripts_STAT_SRCS
+   Custom/Arena_Template.cpp
+   Custom/Arena_Template.h
+   Custom/Poll_NPC.cpp
++  Custom/3v3_npc.cpp
++  Custom/npc_solo3v3.h
+ )
+ 
+ message("  -> Prepared: Custom")
+diff --git a/src/server/scripts/Custom/npc_solo3v3.h b/src/server/scripts/Custom/npc_solo3v3.h
+new file mode 100644
+index 0000000..12c94bd
+--- /dev/null
++++ b/src/server/scripts/Custom/npc_solo3v3.h
+@@ -0,0 +1,185 @@
++/*
++ *
++ * Copyright (C) 2014 Teiby
++ * Written by Ladrek <Kargath-WoW>
++ *
++ */
++
++#ifndef SOLO_3V3_H
++#define SOLO_3V3_H
++
++// SOLO_3V3_TALENTS found in: TalentTab.dbc -> TalentTabID
++
++// Warrior, Rogue, Deathknight etc.
++const uint32 SOLO_3V3_TALENTS_MELEE[] =
++{
++    845, // WarriorProtection
++    746, // arms
++    182, // assination
++    398, // blood
++    750, // feral combat
++    181, // combat
++    855, // retrubution
++    399, // dk frost
++    183, // rogue sublety
++    263, // enhancement
++    400, // dk unholy
++    0 // End
++};
++
++// Mage, Hunter, Warlock etc.
++const uint32 SOLO_3V3_TALENTS_RANGE[] =
++{
++    181, // elemental
++	399, // mage frost
++	752, // balance
++	795, // shadow
++	799, // arcane
++	823, // frost
++	851, // fire
++	865, // destruction
++	867, // demonlogy
++	871, // affliction
++    0 // End
++};
++
++const uint32 SOLO_3V3_TALENTS_HEAL[] =
++{
++    760, // PriestDiscipline
++    813, // PriestHoly
++    831, // PaladinHoly
++    262, // ShamanRestoration
++    748, // DruidRestoration
++    0 // End
++};
++
++enum Solo3v3TalentCat
++{
++    MELEE = 0,
++    RANGE,
++    HEALER,
++    MAX_TALENT_CAT
++};
++
++// TalentTab.dbc -> TalentTabID
++const uint32 FORBIDDEN_TALENTS_IN_1V1_ARENA[] = 
++{
++	// Healer
++	760, // PriestDiscipline
++	813, // PriestHoly
++	831, // PaladinHoly
++	262, // ShamanRestoration
++	748, // DruidRestoration
++
++	// Tanks
++	//383, // PaladinProtection
++	//163, // WarriorProtection
++
++	0 // End
++};
++
++
++
++// Returns MELEE, RANGE or HEALER (depends on talent builds)
++static Solo3v3TalentCat GetTalentCatForSolo3v3(Player* player)
++{
++    if (!player)
++        return MELEE;
++
++    uint32 count[MAX_TALENT_CAT];
++    for (int i = 0; i < MAX_TALENT_CAT; i++)
++        count[i] = 0;
++
++    for (uint32 talentId = 0; talentId < sTalentStore.GetNumRows(); ++talentId)
++    {
++        TalentEntry const* talentInfo = sTalentStore.LookupEntry(talentId);
++
++        if (!talentInfo)
++            continue;
++
++        for (int8 rank = MAX_TALENT_RANK-1; rank >= 0; --rank)
++        {
++            if (talentInfo->RankID[rank] == 0)
++                continue;
++                        
++            if (player->HasTalent(talentInfo->RankID[rank], player->GetActiveSpec()))
++            {
++                for (int8 i = 0; SOLO_3V3_TALENTS_MELEE[i] != 0; i++)
++                    if (SOLO_3V3_TALENTS_MELEE[i] == talentInfo->TalentTab)
++                        count[MELEE] += rank + 1;
++
++				for (int8 i = 0; SOLO_3V3_TALENTS_RANGE[i] != 0; i++)
++					if (SOLO_3V3_TALENTS_RANGE[i] == talentInfo->TalentTab)
++						count[RANGE] += rank + 1;
++
++                for (int8 i = 0; SOLO_3V3_TALENTS_HEAL[i] != 0; i++)
++                    if (SOLO_3V3_TALENTS_HEAL[i] == talentInfo->TalentTab)
++                        count[HEALER] += rank + 1;
++            }
++        }
++    }
++
++
++    uint32 prevCount = 0;
++    Solo3v3TalentCat talCat = MELEE; // Default MELEE (if no talent points set)
++    for (int i = 0; i < MAX_TALENT_CAT; i++)
++    {
++        if (count[i] > prevCount)
++        {
++            talCat = (Solo3v3TalentCat)i;
++            prevCount = count[i];
++        }
++    }
++
++    return talCat;
++}
++
++
++// Return false, if player have invested more than 35 talentpoints in a forbidden talenttree.
++static bool Arena1v1CheckTalents(Player* player)
++{
++	if(!player)
++		return false;
++
++//	if(sWorld->getBoolConfig(CONFIG_ARENA_1V1_BLOCK_FORBIDDEN_TALENTS) == false)
++		return true;
++
++	uint32 count = 0;
++	for (uint32 talentId = 0; talentId < sTalentStore.GetNumRows(); ++talentId)
++	{
++		TalentEntry const* talentInfo = sTalentStore.LookupEntry(talentId);
++
++		if (!talentInfo)
++			continue;
++
++		for (int8 rank = MAX_TALENT_RANK-1; rank >= 0; --rank)
++		{
++			if (talentInfo->RankID[rank] == 0)
++				continue;
++						
++			if (player->HasTalent(talentInfo->RankID[rank], player->GetActiveSpec()))
++			{
++				for(int8 i = 0; FORBIDDEN_TALENTS_IN_1V1_ARENA[i] != 0; i++)
++					if(FORBIDDEN_TALENTS_IN_1V1_ARENA[i] == talentInfo->TalentTab)
++						count += rank + 1;
++			}
++		}
++	}
++
++	if(count >= 36)
++	{
++		// Dont show error message for healers already in
++		// arena because of the bonus rewards for healers
++		if (player->InArena())
++			return false;
++		else
++		{
++		    player->GetSession()->SendAreaTriggerMessage("You can't join, because you have invested too many points in a forbidden talent. Please edit your talents.");
++		    return false;
++		}
++	}
++	else
++		return true;
++}
++
++#endif
+\ No newline at end of file
+-- 
+2.10.1.windows.1
