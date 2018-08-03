@@ -10,6 +10,7 @@
 #include "Common.h"
 #include <ace/Task.h>
 #include <ace/Singleton.h>
+#include <ace/Thread_Mutex.h>
 
 class WorldPacket;
 
@@ -145,7 +146,8 @@ class Log
         void SetLogDB(bool enable) { m_enableLogDB = enable; }
         bool GetSQLDriverQueryLogging() const { return m_sqlDriverQueryLogging; }
     private:
-        FILE* openLogFile(char const* configFileName, char const* configTimeStampFlag, char const* mode);
+        void openLogFile(FILE** file, char const* configFileName, char const* configTimeStampFlag, char const* mode);
+        void openLogFile(FILE** file, char const* fileName, char const* mode);
         FILE* openGmlogPerAccount(uint32 account);
 
         FILE* raLogfile;
@@ -157,6 +159,8 @@ class Log
         FILE* sqlLogFile;
         FILE* sqlDevLogFile;
         FILE* miscLogFile;
+
+        std::string CharLogSeparate;
 
         // cache values for after initilization use (like gm log per account case)
         std::string m_logsDir;
@@ -191,6 +195,7 @@ class Log
         std::string m_dumpsDir;
 
         DebugLogFilters m_DebugLogMask;
+        ACE_Thread_Mutex m_mutex;
 };
 
 #define sLog ACE_Singleton<Log, ACE_Thread_Mutex>::instance()
