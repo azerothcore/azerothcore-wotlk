@@ -99,7 +99,7 @@ void Log::Initialize()
     m_logsTimestamp = "_" + GetTimestampStr();
 
     /// Open specific log files
-    openLogFile(& logfile, "LogFile", "LogTimestamp", "w");
+    logfile = openLogFile("LogFile", "LogTimestamp", "w");
     InitColors(sConfigMgr->GetStringDefault("LogColors", ""));
 
     // Main log file settings
@@ -120,42 +120,22 @@ void Log::ReloadConfig()
     m_DebugLogMask = DebugLogFilters(sConfigMgr->GetIntDefault("DebugLogMask", LOG_FILTER_NONE));
 }
 
-void Log::openLogFile(FILE** file, char const* configFileName, char const* configTimeStampFlag, char const* mode)
+FILE* Log::openLogFile(char const* configFileName, char const* configTimeStampFlag, char const* mode)
 {
-    TRINITY_GUARD(ACE_Thread_Mutex, m_mutex);
+    std::string logfn=sConfigMgr->GetStringDefault(configFileName, "");
+    if (logfn.empty())
+        return NULL;
 
-    if (! *file)
+    if (configTimeStampFlag && sConfigMgr->GetBoolDefault(configTimeStampFlag, false))
     {
-        std::string logfn=sConfigMgr->GetStringDefault(configFileName, "");
-
-        if (logfn.empty())
-        {
-            *file = NULL;
-            return;
-        }
-
-        if (configTimeStampFlag && sConfigMgr->GetBoolDefault(configTimeStampFlag, false))
-        {
-            size_t dot_pos = logfn.find_last_of(".");
-
-            if (dot_pos!=logfn.npos)
-                logfn.insert(dot_pos, m_logsTimestamp);
-            else
-                logfn += m_logsTimestamp;
-        }
-
-        *file = fopen((m_logsDir+logfn).c_str(), mode);
+        size_t dot_pos = logfn.find_last_of(".");
+        if (dot_pos!=logfn.npos)
+            logfn.insert(dot_pos, m_logsTimestamp);
+        else
+            logfn += m_logsTimestamp;
     }
-}
 
-void Log::openLogFile(FILE** file, char const* fileName, char const* mode)
-{
-    TRINITY_GUARD(ACE_Thread_Mutex, m_mutex);
-
-    if (! *file)
-    {
-        *file = fopen(fileName, mode);
-    }
+    return fopen((m_logsDir+logfn).c_str(), mode);
 }
 
 FILE* Log::openGmlogPerAccount(uint32 account)
@@ -466,8 +446,11 @@ void Log::outSQLDriver(const char* str, ...)
     if (!str)
         return;
 
-    if (!sqlLogFile)
-        openLogFile(& sqlLogFile, "SQLDriverLogFile", NULL, "a");
+    {
+        TRINITY_GUARD(ACE_Thread_Mutex, m_mutex);
+        if (!sqlLogFile)
+            sqlLogFile = openLogFile("SQLDriverLogFile", NULL, "a");
+    }
 
     va_list ap;
     va_start(ap, str);
@@ -534,8 +517,11 @@ void Log::outErrorDb(const char * err, ...)
         fflush(logfile);
     }
 
-    if (!dberLogfile)
-        openLogFile(& dberLogfile, "DBErrorLogFile", NULL, "a");
+    {
+        TRINITY_GUARD(ACE_Thread_Mutex, m_mutex);
+        if (!dberLogfile)
+            dberLogfile = openLogFile("DBErrorLogFile", NULL, "a");
+    }
 
     if (dberLogfile)
     {
@@ -652,8 +638,11 @@ void Log::outSQLDev(const char* str, ...)
 
     printf("\n");
 
-    if (!sqlDevLogFile)
-        openLogFile(& sqlDevLogFile, "SQLDeveloperLogFile", NULL, "a");
+    {
+        TRINITY_GUARD(ACE_Thread_Mutex, m_mutex);
+        if (!sqlDevLogFile)
+            sqlDevLogFile = openLogFile("SQLDeveloperLogFile", NULL, "a");
+    }
 
     if (sqlDevLogFile)
     {
@@ -828,8 +817,11 @@ void Log::outCommand(uint32 account, const char * str, ...)
 
     m_gmlog_per_account = sConfigMgr->GetBoolDefault("GmLogPerAccount", false);
     if (!m_gmlog_per_account)
+    {
+        TRINITY_GUARD(ACE_Thread_Mutex, m_mutex);
         if (!gmLogfile)
-            openLogFile(& gmLogfile, "GMLogFile", "GmLogTimestamp", "a");
+            gmLogfile = openLogFile("GMLogFile", "GmLogTimestamp", "a");
+    }
     else
     {
         if (m_gmlog_filename_format.empty())
@@ -905,8 +897,11 @@ void Log::outChar(const char * str, ...)
         va_end(ap2);
     }
 
-    if (!charLogfile)
-        openLogFile(& charLogfile, "CharLogFile", "CharLogTimestamp", "a");
+    {
+        TRINITY_GUARD(ACE_Thread_Mutex, m_mutex);
+        if (!charLogfile)
+            charLogfile = openLogFile("CharLogFile", "CharLogTimestamp", "a");
+    }
 
     if (charLogfile)
     {
@@ -924,8 +919,11 @@ void Log::outCharDump(const char * str, uint32 account_id, uint32 guid, const ch
 {
     FILE* file = NULL;
 
-    if (!charLogfile)
-        openLogFile(& charLogfile, "CharLogFile", "CharLogTimestamp", "a");
+    {
+        TRINITY_GUARD(ACE_Thread_Mutex, m_mutex);
+        if (!charLogfile)
+            charLogfile = openLogFile("CharLogFile", "CharLogTimestamp", "a");
+    }
 
     m_charLog_Dump_Separate = sConfigMgr->GetBoolDefault("CharLogDump.Separate", false);
     if (m_charLog_Dump_Separate)
@@ -970,8 +968,11 @@ void Log::outChat(const char * str, ...)
         va_end(ap2);
     }
 
-    if (!chatLogfile)
-        openLogFile(& chatLogfile, "ChatLogFile", "ChatLogTimestamp", "a");
+    {
+        TRINITY_GUARD(ACE_Thread_Mutex, m_mutex);
+        if (!chatLogfile)
+            chatLogfile = openLogFile("ChatLogFile", "ChatLogTimestamp", "a");
+    }
 
     if (chatLogfile)
     {
@@ -1002,8 +1003,11 @@ void Log::outRemote(const char * str, ...)
         va_end(ap2);
     }
 
-    if (!raLogfile)
-        openLogFile(& raLogfile, "RaLogFile", NULL, "a");
+    {
+        TRINITY_GUARD(ACE_Thread_Mutex, m_mutex);
+        if (!raLogfile)
+            raLogfile = openLogFile("RaLogFile", NULL, "a");
+    }
 
     if (raLogfile)
     {
@@ -1022,8 +1026,11 @@ void Log::outMisc(const char * str, ...)
     if (!str)
         return;
 
-    if(!miscLogFile)
-        openLogFile(& miscLogFile, (m_logsDir + "Misc.log").c_str(), "a");
+    {
+        TRINITY_GUARD(ACE_Thread_Mutex, m_mutex);
+        if(!miscLogFile)
+            miscLogFile = fopen((m_logsDir + "Misc.log").c_str(), "a");
+    }
 
     if (m_enableLogDB)
     {

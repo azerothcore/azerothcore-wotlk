@@ -146,8 +146,7 @@ class Log
         void SetLogDB(bool enable) { m_enableLogDB = enable; }
         bool GetSQLDriverQueryLogging() const { return m_sqlDriverQueryLogging; }
     private:
-        void openLogFile(FILE** file, char const* configFileName, char const* configTimeStampFlag, char const* mode);
-        void openLogFile(FILE** file, char const* fileName, char const* mode);
+        FILE* openLogFile(char const* configFileName, char const* configTimeStampFlag, char const* mode);
         FILE* openGmlogPerAccount(uint32 account);
 
         FILE* raLogfile;
