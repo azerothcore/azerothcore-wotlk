@@ -275,7 +275,7 @@ class npc_wg_queue : public CreatureScript
 
         bool OnGossipHello(Player* player, Creature* creature)
         {
-            if (CONFIG_WINTERGRASP_ENABLE == false)
+            if (!sWorld->getBoolConfig(CONFIG_MINIGOB_MANABONK))
                 return false;
 
             if (creature->IsQuestGiver())
