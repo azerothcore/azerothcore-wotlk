@@ -560,7 +560,7 @@ class npc_minigob_manabonk : public CreatureScript
             void UpdateAI(uint32 diff)
             {
 
-                if (CONFIG_MINIGOB_MANABONK == false)
+                if (!sWorld->getBoolConfig(CONFIG_MINIGOB_MANABONK))
                     return;
 
                 events.Update(diff);
