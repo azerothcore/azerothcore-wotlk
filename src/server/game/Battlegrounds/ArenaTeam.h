@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
@@ -71,6 +71,7 @@ enum ArenaTeamTypes
 {
     ARENA_TEAM_2v2      = 2,
     ARENA_TEAM_3v3      = 3,
+	ARENA_TEAM_SOLO_3v3 = 4,
     ARENA_TEAM_5v5      = 5
 };
 
@@ -111,6 +112,11 @@ class ArenaTeam
 
         bool Create(uint64 captainGuid, uint8 type, std::string const& teamName, uint32 backgroundColor, uint8 emblemStyle, uint32 emblemColor, uint8 borderStyle, uint32 borderColor);
         void Disband(WorldSession* session);
+		
+		// arena solo 3v3 queue
+		void CreateTempForSolo3v3(Player* plr[], uint8 team);
+		uint32 GetAverageMMR();
+		void SaveToDBHelper();
 
         typedef std::list<ArenaTeamMember> MemberList;
 
@@ -172,6 +178,8 @@ class ArenaTeam
 
         void FinishWeek();
         void FinishGame(int32 mod, const Map* bgMap);
+		
+		uint64 playerGuid;
 
     protected:
 

@@ -7,6 +7,9 @@
 #include "ScriptLoader.h"
 #include "ScriptMgr.h"
 
+// custom
+void AddSC_npc_solo3v3();
+
 // spells
 void AddSC_deathknight_spell_scripts();
 void AddSC_druid_spell_scripts();
@@ -598,6 +601,10 @@ void AddSpellScripts()
 
 void AddCommandScripts()
 {
+	// custom
+	AddSC_npc_solo3v3();
+	
+	// command
     AddSC_server_commandscript();
 
     AddSC_account_commandscript();

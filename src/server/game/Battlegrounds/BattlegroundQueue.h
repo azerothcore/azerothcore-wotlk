@@ -11,14 +11,22 @@
 #include "DBCEnums.h"
 #include "Battleground.h"
 #include "EventProcessor.h"
+#include "ArenaTeam.h"
 
 #include <deque>
 
 #define COUNT_OF_PLAYERS_TO_AVERAGE_WAIT_TIME 10
 
+struct GroupQueueInfo;                                      // type predefinition
+struct PlayerQueueInfo                                      // stores information for players in queue
+{
+    //uint32  LastOnlineTime;                                 // for tracking and removing offline players from queue after 5 minutes
+    GroupQueueInfo* GroupInfo;                             // pointer to the associated groupqueueinfo
+};
+
 struct GroupQueueInfo                                       // stores information about the group in queue (also used when joined as solo!)
 {
-    std::set<uint64> Players;                               // player guid set
+    std::map<uint64, PlayerQueueInfo*> Players;         	// player queue info map
     TeamId  teamId;                                         // Player team (TEAM_ALLIANCE/TEAM_HORDE)
     BattlegroundTypeId BgTypeId;                            // battleground type id
     bool    IsRated;                                        // rated
@@ -61,6 +69,8 @@ class BattlegroundQueue
         bool CheckPremadeMatch(BattlegroundBracketId bracket_id, uint32 MinPlayersPerTeam, uint32 MaxPlayersPerTeam);
         bool CheckNormalMatch(Battleground* bgTemplate, BattlegroundBracketId bracket_id, uint32 minPlayers, uint32 maxPlayers);
         bool CheckSkirmishForSameFaction(BattlegroundBracketId bracket_id, uint32 minPlayersPerTeam);
+		bool CheckSolo3v3Arena(BattlegroundBracketId bracket_id);
+		void CreateTempArenaTeamForQueue(ArenaTeam *arenaTeams[]);
         GroupQueueInfo* AddGroup(Player* leader, Group* group, PvPDifficultyEntry const*  bracketEntry, bool isRated, bool isPremade, uint32 ArenaRating, uint32 MatchmakerRating, uint32 ArenaTeamId);
         void RemovePlayer(uint64 guid, bool sentToBg, uint32 playerQueueSlot);
         bool IsPlayerInvitedToRatedArena(uint64 pl_guid);
@@ -72,7 +82,7 @@ class BattlegroundQueue
         void SetBgTypeIdAndArenaType(BattlegroundTypeId b, uint8 a) { m_bgTypeId = b; m_arenaType = ArenaType(a); } // pussywizard
         void AddEvent(BasicEvent* Event, uint64 e_time);
 
-        typedef std::map<uint64, GroupQueueInfo*> QueuedPlayersMap;
+        typedef std::map<uint64, PlayerQueueInfo> QueuedPlayersMap;
         QueuedPlayersMap m_QueuedPlayers;
 
         //do NOT use deque because deque.erase() invalidates ALL iterators

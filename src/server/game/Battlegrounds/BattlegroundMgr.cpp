@@ -497,8 +497,8 @@ Battleground* BattlegroundMgr::CreateNewBattleground(BattlegroundTypeId bgTypeId
             case ARENA_TYPE_3v3:
                 maxPlayersPerTeam = 3;
                 break;
-            case ARENA_TYPE_5v5:
-                maxPlayersPerTeam = 5;
+			case ARENA_TYPE_3v3_SOLO:
+				maxPlayersPerTeam = 3; // 3v3 soloqeueue
                 break;
         }
 
@@ -823,8 +823,8 @@ BattlegroundQueueTypeId BattlegroundMgr::BGQueueTypeId(BattlegroundTypeId bgType
                     return BATTLEGROUND_QUEUE_2v2;
                 case ARENA_TYPE_3v3:
                     return BATTLEGROUND_QUEUE_3v3;
-                case ARENA_TYPE_5v5:
-                    return BATTLEGROUND_QUEUE_5v5;
+                case ARENA_TYPE_3v3_SOLO:
+                    return BATTLEGROUND_QUEUE_3v3_SOLO;
                 default:
                     return BATTLEGROUND_QUEUE_NONE;
             }
@@ -854,6 +854,7 @@ BattlegroundTypeId BattlegroundMgr::BGTemplateId(BattlegroundQueueTypeId bgQueue
         case BATTLEGROUND_QUEUE_2v2:
         case BATTLEGROUND_QUEUE_3v3:
         case BATTLEGROUND_QUEUE_5v5:
+		case BATTLEGROUND_QUEUE_3v3_SOLO:
             return BATTLEGROUND_AA;
         default:
             return BattlegroundTypeId(0);                   // used for unknown template (it existed and do nothing)
@@ -868,8 +869,8 @@ uint8 BattlegroundMgr::BGArenaType(BattlegroundQueueTypeId bgQueueTypeId)
             return ARENA_TYPE_2v2;
         case BATTLEGROUND_QUEUE_3v3:
             return ARENA_TYPE_3v3;
-        case BATTLEGROUND_QUEUE_5v5:
-            return ARENA_TYPE_5v5;
+		case BATTLEGROUND_QUEUE_3v3_SOLO:
+			return ARENA_TYPE_3v3_SOLO;
         default:
             return 0;
     }
@@ -889,7 +890,8 @@ void BattlegroundMgr::ToggleArenaTesting()
 
 void BattlegroundMgr::SetHolidayWeekends(uint32 mask)
 {
-    for (uint32 bgtype = 1; bgtype < MAX_BATTLEGROUND_TYPE_ID; ++bgtype)
+    //for (uint32 bgtype = 1; bgtype < MAX_BATTLEGROUND_TYPE_ID; ++bgtype)
+	for (uint32 bgtype = 1; bgtype < MAX_BATTLEGROUND_TYPE_ID && bgtype < 32; ++bgtype) // 3v3 soloqeueue
     {
         if (bgtype == BATTLEGROUND_RB)
             continue;
@@ -1053,10 +1055,10 @@ void BattlegroundMgr::InviteGroupToBG(GroupQueueInfo* ginfo, Battleground* bg, T
     ginfo->RemoveInviteTime = World::GetGameTimeMS() + INVITE_ACCEPT_WAIT_TIME;
 
     // loop through the players
-    for (std::set<uint64>::iterator itr = ginfo->Players.begin(); itr != ginfo->Players.end(); ++itr)
+    for (std::map<uint64, PlayerQueueInfo*>::iterator itr = ginfo->Players.begin(); itr != ginfo->Players.end(); ++itr)
     {
         // get the player
-        Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(*itr);
+        Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(itr->first);
 
         // player is removed from queue when logging out
         ASSERT(player);

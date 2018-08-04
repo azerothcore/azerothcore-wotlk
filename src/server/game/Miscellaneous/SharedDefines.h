@@ -3441,7 +3441,8 @@ enum BattlegroundQueueTypeId
     BATTLEGROUND_QUEUE_RB       = 7,
     BATTLEGROUND_QUEUE_2v2      = 8,
     BATTLEGROUND_QUEUE_3v3      = 9,
-    BATTLEGROUND_QUEUE_5v5      = 10,
+	BATTLEGROUND_QUEUE_3v3_SOLO = 10,
+    BATTLEGROUND_QUEUE_5v5      = 11,
     MAX_BATTLEGROUND_QUEUE_TYPES
 };
 
@@ -3548,12 +3549,12 @@ struct MmapTileHeader
 
 // All padding fields must be handled and initialized to ensure mmaps_generator will produce binary-identical *.mmtile files
 static_assert(sizeof(MmapTileHeader) == 20, "MmapTileHeader size is not correct, adjust the padding field size");
-static_assert(sizeof(MmapTileHeader) == (sizeof(MmapTileHeader::mmapMagic) +
+/*static_assert(sizeof(MmapTileHeader) == (sizeof(MmapTileHeader::mmapMagic) +
                                          sizeof(MmapTileHeader::dtVersion) +
                                          sizeof(MmapTileHeader::mmapVersion) +
                                          sizeof(MmapTileHeader::size) +
                                          sizeof(MmapTileHeader::usesLiquids) +
-                                         sizeof(MmapTileHeader::padding)), "MmapTileHeader has uninitialized padding fields");
+                                         sizeof(MmapTileHeader::padding)), "MmapTileHeader has uninitialized padding fields");*/
 
 
 enum NavTerrain
