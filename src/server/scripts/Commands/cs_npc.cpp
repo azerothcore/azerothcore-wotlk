@@ -580,10 +580,12 @@ public:
     static bool HandleNpcSetFactionTempIdCommand(ChatHandler* handler, const char* args)
     {
         Player* me = handler->GetSession()->GetPlayer();
-        Creature* creature = me->GetSelectedUnit()->ToCreature();
+        Unit* SelectedCreature = me->GetSelectedUnit();
 
-        if (!me)
+        if (!SelectedCreature)
             return false;
+
+        Creature* creature = SelectedCreature->ToCreature();
 
         if (!creature)
             return false;
@@ -598,7 +600,7 @@ public:
     }
 
     //set orginal faction for npc
-    static bool HandleNpcSetOriginalFaction(ChatHandler* handler, const char* args)
+    static bool HandleNpcSetOriginalFaction(ChatHandler* handler, const char* /*args*/)
     {
         Player* me = handler->GetSession()->GetPlayer();
         Creature* creature = me->GetSelectedUnit()->ToCreature();
