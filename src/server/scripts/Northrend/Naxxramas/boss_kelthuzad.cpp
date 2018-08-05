@@ -81,13 +81,14 @@ enum Event
 const Position SummonPositions[12] =
 {
     // Portals
-    { 3782.51f, -5062.36f, 143.24f, 3.74f },     //LEFT_FAR
-    { 3732.37f, -5028.54f, 143.43f, 4.48f },     //LEFT_MIDDLE
-    { 3678.73f, -5044.95f, 143.43f, 5.34f },     //LEFT_NEAR
-    { 3760.33f, -5172.84f, 143.18f, 2.14f },     //RIGHT_FAR
-    { 3700.43f, -5185.27f, 143.47f, 1.41f },     //RIGHT_MIDDLE
-    { 3655.10f, -5148.81f, 143.28f, 0.66f },     //RIGHT_NEAR
-    // Edges
+    { 3782.98f, -5063.15f, 143.79f, 3.76f },     //LEFT_FAR
+    { 3732.07f, -5027.28f, 143.96f, 4.54f },     //LEFT_MIDDLE
+    { 3675.62f, -5045.71f, 143.55f, 5.46f },     //LEFT_NEAR
+    { 3760.54f, -5172.78f, 143.79f, 2.15f },     //RIGHT_FAR
+    { 3700.65f, -5185.30f, 143.93f, 1.44f },     //RIGHT_MIDDLE
+    { 3655.69f, -5149.56f, 143.59f, 0.66f },     //RIGHT_NEAR
+
+                                                     // Edges
     //{3754.431396f, -5080.727734f, 142.036316f, 3.736189f},     //LEFT_FAR
    // {3724.396484f, -5061.330566f, 142.032700f, 4.564785f},     //LEFT_MIDDLE
     //{3687.158424f, -5076.834473f, 142.017319f, 5.237086f},     //LEFT_NEAR
@@ -96,12 +97,12 @@ const Position SummonPositions[12] =
    // {3739.500000f, -5141.883989f, 142.014113f, 2.121412f}      //RIGHT_NEAR
 
     // Middle
-    { 3768.62f, -5070.77f, 143.24f, 3.74f },     //LEFT_FAR
-    { 3730.24f, -5042.45f, 143.43f, 4.48f },     //LEFT_MIDDLE
-    { 3680.30f, -5054.42f, 143.43f, 5.34f },     //LEFT_NEAR
-    { 3750.48f, -5157.85f, 143.18f, 2.14f },     //RIGHT_FAR
-    { 3705.39f, -5171.77f, 143.47f, 1.41f },     //RIGHT_MIDDLE
-    { 3664.53f, -5143.15f, 143.28f, 0.66f },     //RIGHT_NEAR
+    { 3769.78f, -5072.15f, 143.23f, 3.76f },     //LEFT_FAR
+    { 3729.32f, -5042.77f, 143.41f, 4.54f },     //LEFT_MIDDLE
+    { 3681.34f, -5053.59f, 143.21f, 5.46f },     //LEFT_NEAR
+    { 3752.71f, -5161.33f, 143.28f, 2.15f },     //RIGHT_FAR
+    { 3703.54f, -5170.68f, 143.40f, 1.44f },     //RIGHT_MIDDLE
+    { 3663.13f, -5141.75f, 143.21f, 0.66f },     //RIGHT_NEAR
 };
 
 class boss_kelthuzad : public CreatureScript
