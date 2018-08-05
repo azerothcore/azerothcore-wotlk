@@ -158,6 +158,8 @@ class Log
         FILE* sqlDevLogFile;
         FILE* miscLogFile;
 
+        std::string CharLogSeparate;
+
         // cache values for after initilization use (like gm log per account case)
         std::string m_logsDir;
         std::string m_logsTimestamp;
