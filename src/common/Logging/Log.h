@@ -10,6 +10,7 @@
 #include "Common.h"
 #include <ace/Task.h>
 #include <ace/Singleton.h>
+#include <ace/Thread_Mutex.h>
 
 class WorldPacket;
 
@@ -158,6 +159,8 @@ class Log
         FILE* sqlDevLogFile;
         FILE* miscLogFile;
 
+        std::string CharLogSeparate;
+
         // cache values for after initilization use (like gm log per account case)
         std::string m_logsDir;
         std::string m_logsTimestamp;
@@ -191,6 +194,7 @@ class Log
         std::string m_dumpsDir;
 
         DebugLogFilters m_DebugLogMask;
+        ACE_Thread_Mutex m_mutex;
 };
 
 #define sLog ACE_Singleton<Log, ACE_Thread_Mutex>::instance()
