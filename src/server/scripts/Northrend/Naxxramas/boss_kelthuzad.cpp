@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
@@ -81,14 +81,14 @@ enum Event
 const Position SummonPositions[12] =
 {
     // Portals
-    {3783.272705f, -5062.697266f, 143.711203f, 3.617599f},     //LEFT_FAR
-    {3730.291260f, -5027.239258f, 143.956909f, 4.461900f},     //LEFT_MIDDLE
-    {3683.868652f, -5057.281250f, 143.183884f, 5.237086f},     //LEFT_NEAR
-    {3759.355225f, -5174.128418f, 143.802383f, 2.170104f},     //RIGHT_FAR
-    {3700.724365f, -5185.123047f, 143.928024f, 1.309310f},     //RIGHT_MIDDLE
-    {3665.121094f, -5138.679199f, 143.183212f, 0.604023f},     //RIGHT_NEAR
+    { 3782.98f, -5063.15f, 143.79f, 3.76f },     //LEFT_FAR
+    { 3730.76f, -5028.67f, 143.91f, 4.56f },     //LEFT_MIDDLE
+    { 3675.62f, -5045.71f, 143.55f, 5.46f },     //LEFT_NEAR
+    { 3760.54f, -5172.78f, 143.79f, 2.15f },     //RIGHT_FAR
+    { 3700.65f, -5185.30f, 143.93f, 1.44f },     //RIGHT_MIDDLE
+    { 3655.69f, -5149.56f, 143.59f, 0.66f },     //RIGHT_NEAR
 
-    // Edges
+                                                     // Edges
     //{3754.431396f, -5080.727734f, 142.036316f, 3.736189f},     //LEFT_FAR
    // {3724.396484f, -5061.330566f, 142.032700f, 4.564785f},     //LEFT_MIDDLE
     //{3687.158424f, -5076.834473f, 142.017319f, 5.237086f},     //LEFT_NEAR
@@ -97,12 +97,12 @@ const Position SummonPositions[12] =
    // {3739.500000f, -5141.883989f, 142.014113f, 2.121412f}      //RIGHT_NEAR
 
     // Middle
-    {3769.34f, -5071.80f, 143.2082f, 3.658f},
-    {3729.78f, -5043.56f, 143.3867f, 4.475f},
-    {3682.75f, -5055.26f, 143.1848f, 5.295f},
-    {3752.58f, -5161.82f, 143.2944f, 2.126f},
-    {3702.83f, -5171.70f, 143.4356f, 1.305f},
-    {3665.30f, -5141.55f, 143.1846f, 0.566f}
+    { 3769.78f, -5072.15f, 143.23f, 3.76f },     //LEFT_FAR
+    { 3728.51f, -5044.36f, 143.35f, 4.56f },     //LEFT_MIDDLE
+    { 3681.34f, -5053.59f, 143.21f, 5.46f },     //LEFT_NEAR
+    { 3752.71f, -5161.33f, 143.28f, 2.15f },     //RIGHT_FAR
+    { 3703.54f, -5170.68f, 143.40f, 1.44f },     //RIGHT_MIDDLE
+    { 3663.13f, -5141.75f, 143.21f, 0.66f },     //RIGHT_NEAR
 };
 
 class boss_kelthuzad : public CreatureScript
@@ -141,7 +141,7 @@ public:
                 for (uint8 j = 0; j < 8; ++j)
                 {
                     float angle = M_PI*2/8*j;
-                    me->SummonCreature(NPC_SOLDIER_OF_THE_FROZEN_WASTES, SummonPositions[i].GetPositionX()+6*cos(angle), SummonPositions[i].GetPositionY()+6*sin(angle), SummonPositions[i].GetPositionZ()+0.5f, SummonPositions[i].GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000);
+                    me->SummonCreature(NPC_SOLDIER_OF_THE_FROZEN_WASTES, SummonPositions[i].GetPositionX()+6*cos(angle), SummonPositions[i].GetPositionY()+6*sin(angle), SummonPositions[i].GetPositionZ()+1.0f, SummonPositions[i].GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000);
                 }
             for (uint8 i = 6; i < 12; ++i)
                 for (uint8 j = 1; j < 4; ++j)
@@ -149,14 +149,14 @@ public:
                     float dist = j == 2 ? 0.0f : 8.0f; // second in middle
                     float angle = SummonPositions[i].GetOrientation() + M_PI*2/4*j;
                     NormalizeOrientation(angle);
-                    me->SummonCreature(NPC_UNSTOPPABLE_ABOMINATION, SummonPositions[i].GetPositionX()+dist*cos(angle), SummonPositions[i].GetPositionY()+dist*sin(angle), SummonPositions[i].GetPositionZ()+0.5f, SummonPositions[i].GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000);
+                    me->SummonCreature(NPC_UNSTOPPABLE_ABOMINATION, SummonPositions[i].GetPositionX()+dist*cos(angle), SummonPositions[i].GetPositionY()+dist*sin(angle), SummonPositions[i].GetPositionZ()+1.0f, SummonPositions[i].GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000);
                 }
             for (uint8 i = 6; i < 12; ++i)
                 for (uint8 j = 0; j < 1; ++j)
                 {
                     float angle = SummonPositions[i].GetOrientation() + M_PI;
                     NormalizeOrientation(angle);
-                    me->SummonCreature(NPC_SOUL_WEAVER, SummonPositions[i].GetPositionX()+6*cos(angle), SummonPositions[i].GetPositionY()+6*sin(angle), SummonPositions[i].GetPositionZ()+0.5f, SummonPositions[i].GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000);
+                    me->SummonCreature(NPC_SOUL_WEAVER, SummonPositions[i].GetPositionX()+6*cos(angle), SummonPositions[i].GetPositionY()+6*sin(angle), SummonPositions[i].GetPositionZ()+1.0f, SummonPositions[i].GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000);
                 }
         }
 
