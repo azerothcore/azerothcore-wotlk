@@ -82,7 +82,7 @@ const Position SummonPositions[12] =
 {
     // Portals
     { 3782.98f, -5063.15f, 143.79f, 3.76f },     //LEFT_FAR
-    { 3732.07f, -5027.28f, 143.96f, 4.54f },     //LEFT_MIDDLE
+    { 3730.76f, -5028.67f, 143.91f, 4.56f },     //LEFT_MIDDLE
     { 3675.62f, -5045.71f, 143.55f, 5.46f },     //LEFT_NEAR
     { 3760.54f, -5172.78f, 143.79f, 2.15f },     //RIGHT_FAR
     { 3700.65f, -5185.30f, 143.93f, 1.44f },     //RIGHT_MIDDLE
@@ -98,7 +98,7 @@ const Position SummonPositions[12] =
 
     // Middle
     { 3769.78f, -5072.15f, 143.23f, 3.76f },     //LEFT_FAR
-    { 3729.32f, -5042.77f, 143.41f, 4.54f },     //LEFT_MIDDLE
+    { 3728.51f, -5044.36f, 143.35f, 4.56f },     //LEFT_MIDDLE
     { 3681.34f, -5053.59f, 143.21f, 5.46f },     //LEFT_NEAR
     { 3752.71f, -5161.33f, 143.28f, 2.15f },     //RIGHT_FAR
     { 3703.54f, -5170.68f, 143.40f, 1.44f },     //RIGHT_MIDDLE
