@@ -6,7 +6,6 @@
 
 #include "Config.h"
 #include "Errors.h"
-#include "Log.h"
 
 // Defined here as it must not be exposed to end-users.
 bool ConfigMgr::GetValueHelper(const char* name, ACE_TString &result)
@@ -87,15 +86,6 @@ bool ConfigMgr::LoadData(char const* file)
 std::string ConfigMgr::GetStringDefault(const char* name, const std::string &def)
 {
     ACE_TString val;
-
-    if (GetValueHelper(name, val))
-        return val.c_str();
-    else
-    {
-        sLog->outError("-> Not found option '%s'. The default value is used (%s)", name, def.c_str());
-        return def;
-    }
-
     return GetValueHelper(name, val) ? val.c_str() : def;
 }
 
@@ -104,10 +94,7 @@ bool ConfigMgr::GetBoolDefault(const char* name, bool def)
     ACE_TString val;
 
     if (!GetValueHelper(name, val))
-    {
-        def ? sLog->outError("-> Not found option '%s'. The default value is used (Yes)", name) : sLog->outError(">> Not found option '%s'. The default value is used (No)", name);
         return def;
-    }
 
     return (val == "true" || val == "TRUE" || val == "yes" || val == "YES" ||
         val == "1");
@@ -116,27 +103,13 @@ bool ConfigMgr::GetBoolDefault(const char* name, bool def)
 int ConfigMgr::GetIntDefault(const char* name, int def)
 {
     ACE_TString val;
-
-    if (GetValueHelper(name, val))
-        return atoi(val.c_str());
-    else
-    {
-        sLog->outError("-> Not found option '%s'. The default value is used (%i)", name, def);
-        return def;
-    }
+    return GetValueHelper(name, val) ? atoi(val.c_str()) : def;
 }
 
 float ConfigMgr::GetFloatDefault(const char* name, float def)
 {
     ACE_TString val;
-
-    if (GetValueHelper(name, val))
-        return (float)atof(val.c_str());
-    else
-    {
-        sLog->outError("-> Not found option '%s'. The default value is used (%f)", name, def);
-        return def;
-    }
+    return GetValueHelper(name, val) ? (float)atof(val.c_str()) : def;
 }
 
 std::list<std::string> ConfigMgr::GetKeysByString(std::string const& name)
