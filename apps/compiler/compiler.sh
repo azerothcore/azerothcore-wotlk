@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+
 CURRENT_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 source "$CURRENT_PATH/includes/includes.sh"
