@@ -96,8 +96,6 @@ std::string ConfigMgr::GetStringDefault(const char* name, const std::string &def
             sLog->outError("-> Not found option '%s'. The default value is used (%s)", name, def.c_str());
         return def;
     }
-
-    return GetValueHelper(name, val) ? val.c_str() : def;
 }
 
 bool ConfigMgr::GetBoolDefault(const char* name, bool def, bool logUnused /*= true*/)
@@ -107,7 +105,7 @@ bool ConfigMgr::GetBoolDefault(const char* name, bool def, bool logUnused /*= tr
     if (!GetValueHelper(name, val))
     {
         if (logUnused)
-            def ? sLog->outError("-> Not found option '%s'. The default value is used (Yes)", name) : sLog->outError(">> Not found option '%s'. The default value is used (No)", name);
+            def ? sLog->outError("-> Not found option '%s'. The default value is used (Yes)", name) : sLog->outError("-> Not found option '%s'. The default value is used (No)", name);
         return def;
     }
 
