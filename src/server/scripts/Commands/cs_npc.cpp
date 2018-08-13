@@ -133,9 +133,9 @@ public:
 
         static std::vector<ChatCommand> npcFactionCommandTable =
         {
-            { "Permanent",      SEC_ADMINISTRATOR,  false, &HandleNpcSetFactionIdCommand,      "" },
-            { "Temp",           SEC_ADMINISTRATOR,  false, &HandleNpcSetFactionTempIdCommand,  "" },
-            { "Original",       SEC_ADMINISTRATOR,  false, &HandleNpcSetOriginalFaction,       "" }
+            { "permanent",      SEC_ADMINISTRATOR,  false, &HandleNpcSetFactionIdCommand,      "" },
+            { "temp",           SEC_ADMINISTRATOR,  false, &HandleNpcSetFactionTempIdCommand,  "" },
+            { "original",       SEC_ADMINISTRATOR,  false, &HandleNpcSetOriginalFaction,       "" }
         };
 
         static std::vector<ChatCommand> npcSetCommandTable =
