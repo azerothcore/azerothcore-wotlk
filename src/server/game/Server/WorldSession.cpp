@@ -86,12 +86,33 @@ bool WorldSessionFilter::Process(WorldPacket* packet)
 }
 
 /// WorldSession constructor
-WorldSession::WorldSession(uint32 id, WorldSocket* sock, AccountTypes sec, uint8 expansion, time_t mute_time, LocaleConstant locale, uint32 recruiter, bool isARecruiter, bool skipQueue):
-m_muteTime(mute_time), m_timeOutTime(0), _lastAuctionListItemsMSTime(0), _lastAuctionListOwnerItemsMSTime(0), m_GUIDLow(0), _player(NULL), m_Socket(sock),
-_security(sec), _skipQueue(skipQueue), _accountId(id), m_expansion(expansion), _logoutTime(0),
-m_inQueue(false), m_playerLoading(false), m_playerLogout(false), m_playerSave(false),
-m_sessionDbcLocale(sWorld->GetDefaultDbcLocale()), m_sessionDbLocaleIndex(locale),
-m_latency(0), m_clientTimeDelay(0), m_TutorialsChanged(false), recruiterId(recruiter), isRecruiter(isARecruiter), m_currentBankerGUID(0), timeWhoCommandAllowed(0)
+WorldSession::WorldSession(uint32 id, WorldSocket* sock, AccountTypes sec, uint8 expansion, time_t mute_time, LocaleConstant locale, uint32 recruiter, bool isARecruiter, bool skipQueue, uint32 TotalTime):
+    m_muteTime(mute_time),
+    m_timeOutTime(0),
+    _lastAuctionListItemsMSTime(0),
+    _lastAuctionListOwnerItemsMSTime(0),
+    m_GUIDLow(0),
+    _player(NULL),
+    m_Socket(sock),
+    _security(sec),
+    _skipQueue(skipQueue),
+    _accountId(id),
+    m_expansion(expansion),
+    _logoutTime(0),
+    m_inQueue(false),
+    m_playerLoading(false),
+    m_playerLogout(false),
+    m_playerSave(false),
+    m_sessionDbcLocale(sWorld->GetDefaultDbcLocale()),
+    m_sessionDbLocaleIndex(locale),
+    m_latency(0),
+    m_clientTimeDelay(0),
+    m_TutorialsChanged(false),
+    recruiterId(recruiter),
+    isRecruiter(isARecruiter),
+    m_total_time(TotalTime),
+    m_currentBankerGUID(0),
+    timeWhoCommandAllowed(0)
 {
     memset(m_Tutorials, 0, sizeof(m_Tutorials));
 
@@ -131,6 +152,8 @@ WorldSession::~WorldSession()
         delete _warden;
         _warden = NULL;
     }
+
+    LoginDatabase.PExecute("UPDATE account SET totaltime = %u WHERE id = %u", GetTotalTime(), GetAccountId());
 
     ///- empty incoming packet queue
     WorldPacket* packet = NULL;
