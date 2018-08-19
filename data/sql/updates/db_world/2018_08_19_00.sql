@@ -1,3 +1,19 @@
+-- DB update 2018_08_13_00 -> 2018_08_19_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2018_08_13_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2018_08_13_00 2018_08_19_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1532111086201966800'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO version_db_world (`sql_rev`) VALUES ('1532111086201966800');
 INSERT INTO `creature_text` (`entry`, `groupid`, `id`, `text`, `type`, `language`, `probability`, `emote`, `duration`, `sound`, `BroadcastTextID`, `TextRange`, `comment`) VALUES (29, 1, 0, 'Let the battle for the Strand of the Ancients begin!', 41, 0, 100, 0, 0, 0, 28844, 3, 'Kanrethad');
 INSERT INTO `creature_text` (`entry`, `groupid`, `id`, `text`, `type`, `language`, `probability`, `emote`, `duration`, `sound`, `BroadcastTextID`, `TextRange`, `comment`) VALUES (29, 2, 0, 'Round 1 - Finished!', 41, 0, 100, 0, 0, 0, 28989, 3, 'Kanrethad');
@@ -2505,3 +2521,12 @@ INSERT INTO `creature_text` (`entry`, `groupid`, `id`, `text`, `type`, `language
 INSERT INTO `creature_text` (`entry`, `groupid`, `id`, `text`, `type`, `language`, `probability`, `emote`, `duration`, `sound`, `BroadcastTextID`, `TextRange`, `comment`) VALUES (40083, 0, 0, 'The orbiting spheres pulse with dark energy!', 41, 0, 100, 0, 0, 0, 40071, 0, 'Shadow Orb');
 INSERT INTO `creature_text` (`entry`, `groupid`, `id`, `text`, `type`, `language`, `probability`, `emote`, `duration`, `sound`, `BroadcastTextID`, `TextRange`, `comment`) VALUES (40446, 0, 0, 'How DARE you! You will not stop the coming of Lord Ahune!', 14, 0, 100, 0, 0, 0, 40437, 0, 'Skar\'this the Summoner');
 
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
