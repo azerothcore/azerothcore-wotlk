@@ -109,8 +109,8 @@ WorldSession::WorldSession(uint32 id, WorldSocket* sock, AccountTypes sec, uint8
     m_clientTimeDelay(0),
     m_TutorialsChanged(false),
     recruiterId(recruiter),
-    isRecruiter(isARecruiter),
     m_total_time(TotalTime),
+    isRecruiter(isARecruiter),
     m_currentBankerGUID(0),
     timeWhoCommandAllowed(0)
 {
