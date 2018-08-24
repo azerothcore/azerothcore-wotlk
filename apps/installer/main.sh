@@ -84,9 +84,9 @@ do
     [ ! -z $1 ] && _switch $@ # old method: "${options[$cmdopt-1]}"
     [ ! -z $1 ] && exit 0
 
+    echo "==== ACORE DASHBOARD ===="
     select opt in "${options[@]}"
     do
-        echo "==== ACORE DASHBOARD ===="
         _switch $REPLY
         break
     done
