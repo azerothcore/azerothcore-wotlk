@@ -14,14 +14,13 @@
 
 
 
-##### CURRENT BEHAVIOUR:
-<!-- Describe the bug in details. Database to link spells, NPCs, quests etc https://wowgaming.altervista.org/aowow/ -->
-
-
-
-##### EXPECTED BEHAVIOUR:
+##### EXPECTED BLIZZLIKE BEHAVIOUR:
 <!-- Describe how it should be working without the bug. -->
 
+
+
+##### CURRENT BEHAVIOUR:
+<!-- Describe the bug in detail. Database to link spells, NPCs, quests etc https://wowgaming.altervista.org/aowow/ -->
 
 
 
@@ -39,12 +38,10 @@
 
 
 
-
 ##### BRANCH(ES):
 <!-- Specify the branch(es) affected by this issue: master, 0.x, 1.x, or another branch. -->
 
 master
-
 
 
 ##### AC HASH/COMMIT:
@@ -53,10 +50,8 @@ Find the commit hash (unique identifier) by running "git log" on your own clone 
 
 
 
-
 ##### OPERATING SYSTEM:
 <!-- Windows 7/10, Debian 8/9/10, Ubuntu 16/18 etc... -->
-
 
 
 
@@ -75,7 +70,8 @@ Find the commit hash (unique identifier) by running "git log" on your own clone 
 
 
 
-<!-- Thank you for your contribution.
+<!-- ------------------------- THE END ------------------------------
+Thank you for your contribution.
 If you use AzerothCore regularly, we really NEED your help to:
  - TEST our fixes ( https://github.com/azerothcore/azerothcore-wotlk/wiki/Contribute#how-to-test-a-pull-request )
  - Report issues
