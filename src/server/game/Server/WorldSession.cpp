@@ -135,6 +135,8 @@ WorldSession::WorldSession(uint32 id, WorldSocket* sock, AccountTypes sec, uint8
 /// WorldSession destructor
 WorldSession::~WorldSession()
 {
+    LoginDatabase.PExecute("UPDATE account SET totaltime = %u WHERE id = %u", GetTotalTime(), GetAccountId());
+
     ///- unload player if not unloaded
     if (_player)
         LogoutPlayer (true);
@@ -152,8 +154,6 @@ WorldSession::~WorldSession()
         delete _warden;
         _warden = NULL;
     }
-
-    LoginDatabase.PExecute("UPDATE account SET totaltime = %u WHERE id = %u", GetTotalTime(), GetAccountId());
 
     ///- empty incoming packet queue
     WorldPacket* packet = NULL;
