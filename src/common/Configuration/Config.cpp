@@ -6,6 +6,7 @@
 
 #include "Config.h"
 #include "Errors.h"
+#include "Log.h"
 
 // Defined here as it must not be exposed to end-users.
 bool ConfigMgr::GetValueHelper(const char* name, ACE_TString &result)
@@ -83,33 +84,61 @@ bool ConfigMgr::LoadData(char const* file)
     return false;
 }
 
-std::string ConfigMgr::GetStringDefault(const char* name, const std::string &def)
+std::string ConfigMgr::GetStringDefault(const char* name, const std::string &def, bool logUnused /*= true*/)
 {
     ACE_TString val;
-    return GetValueHelper(name, val) ? val.c_str() : def;
+
+    if (GetValueHelper(name, val))
+        return val.c_str();
+    else
+    {
+        if (logUnused)
+            sLog->outError("-> Not found option '%s'. The default value is used (%s)", name, def.c_str());
+        return def;
+    }
 }
 
-bool ConfigMgr::GetBoolDefault(const char* name, bool def)
+bool ConfigMgr::GetBoolDefault(const char* name, bool def, bool logUnused /*= true*/)
 {
     ACE_TString val;
 
     if (!GetValueHelper(name, val))
+    {
+        if (logUnused)
+            def ? sLog->outError("-> Not found option '%s'. The default value is used (Yes)", name) : sLog->outError("-> Not found option '%s'. The default value is used (No)", name);
         return def;
+    }
 
     return (val == "true" || val == "TRUE" || val == "yes" || val == "YES" ||
         val == "1");
 }
 
-int ConfigMgr::GetIntDefault(const char* name, int def)
+int ConfigMgr::GetIntDefault(const char* name, int def, bool logUnused /*= true*/)
 {
     ACE_TString val;
-    return GetValueHelper(name, val) ? atoi(val.c_str()) : def;
+
+    if (GetValueHelper(name, val))
+        return atoi(val.c_str());
+    else
+    {
+        if (logUnused)
+            sLog->outError("-> Not found option '%s'. The default value is used (%i)", name, def);
+        return def;
+    }
 }
 
-float ConfigMgr::GetFloatDefault(const char* name, float def)
+float ConfigMgr::GetFloatDefault(const char* name, float def, bool logUnused /*= true*/)
 {
     ACE_TString val;
-    return GetValueHelper(name, val) ? (float)atof(val.c_str()) : def;
+
+    if (GetValueHelper(name, val))
+        return (float)atof(val.c_str());
+    else
+    {
+        if (logUnused)
+            sLog->outError("-> Not found option '%s'. The default value is used (%f)", name, def);
+        return def;
+    }
 }
 
 std::list<std::string> ConfigMgr::GetKeysByString(std::string const& name)
