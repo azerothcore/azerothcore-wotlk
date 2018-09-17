@@ -2153,7 +2153,7 @@ void AchievementMgr::RemoveTimedAchievement(AchievementCriteriaTimedTypes type, 
 
 void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
 {
-
+    // disable for gamemasters with GM-mode enabled
     if (m_player->IsGameMaster())
     {
         sLog->outString("Not available in GM mode.");
