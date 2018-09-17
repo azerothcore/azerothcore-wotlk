@@ -35,8 +35,8 @@ function dbasm_mysqlExec() {
                 # it happens on new mysql 5.7 installations
                 # since mysql_native_password is explicit now
                 if [[ "$err" == *"Access denied"* ]]; then
-                    echo "Setting mysql_native_password for  $PROMPT_USER ..."
-                    sudo "$DB_MYSQL_EXEC"  -h "$MYSQL_HOST" -u "$PROMPT_USER" $options -e "ALTER USER '${PROMPT_USER}'@'localhost' IDENTIFIED WITH mysql_native_password BY '${PROMPT_PASS}';"
+                    echo "Setting mysql_native_password and  for  $PROMPT_USER ..."
+                    sudo -h "$MYSQL_HOST" "$DB_MYSQL_EXEC" -e "UPDATE mysql.user SET authentication_string=PASSWORD('${PROMPT_PASS}'), plugin='mysql_native_password' WHERE User='${PROMPT_USER}'; FLUSH PRIVILEGES;"
                 fi
             fi
 
