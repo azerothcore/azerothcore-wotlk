@@ -25,7 +25,9 @@ enum DeathKnightSpells
     SPELL_DK_DISMISS_GARGOYLE       = 50515,
     SPELL_DK_SANCTUARY              = 54661,
     SPELL_DK_NIGHT_OF_THE_DEAD      = 62137,
-    SPELL_DK_PET_SCALING            = 61017
+    SPELL_DK_PET_SCALING            = 61017,
+    SPELL_DK_UNHOLY_PRESENCE                    = 48265,
+    SPELL_DK_UNHOLY_PRESENCE_TRIGGERED          = 49772
 };
 
 class npc_pet_dk_ebon_gargoyle : public CreatureScript
@@ -41,6 +43,7 @@ class npc_pet_dk_ebon_gargoyle : public CreatureScript
                 _despawning = false;
                 _initialSelection = true;
                 _targetGUID = 0;
+		_maxcasttime_owner_= 0.0f;
             }
 
             void MovementInform(uint32 type, uint32 point)
@@ -73,7 +76,7 @@ class npc_pet_dk_ebon_gargoyle : public CreatureScript
                 me->SetDisableGravity(true);
                 _selectionTimer = 2000;
                 _initialCastTimer = 0;
-            }
+	    }
 
             void MySelectNextTarget()
             {
@@ -181,8 +184,43 @@ class npc_pet_dk_ebon_gargoyle : public CreatureScript
                         MySelectNextTarget();
                         _selectionTimer = 0;
                     }
-                    if (_initialCastTimer >= 2000 && !me->HasUnitState(UNIT_STATE_CASTING | UNIT_STATE_LOST_CONTROL) && me->GetMotionMaster()->GetMotionSlotType(MOTION_SLOT_CONTROLLED) == NULL_MOTION_TYPE)
+                    if (_initialCastTimer >= 2000 && !me->HasUnitState(UNIT_STATE_CASTING | UNIT_STATE_LOST_CONTROL) && me->GetMotionMaster()->GetMotionSlotType(MOTION_SLOT_CONTROLLED) == NULL_MOTION_TYPE){
+
+
+			if(_maxcasttime_owner_ != me->GetOwner()->GetFloatValue(UNIT_MOD_CAST_SPEED) 
+				|| (!me->GetOwner()->HasAura(SPELL_DK_UNHOLY_PRESENCE_TRIGGERED) 
+				|| me->GetOwner()->HasAura(SPELL_DK_UNHOLY_PRESENCE_TRIGGERED)))
+			{
+				
+
+				float has_unholy_precense = 1.0f;
+				uint32 max_acction_ = 0; 
+				
+				if(me->GetOwner()->HasAura(SPELL_DK_UNHOLY_PRESENCE)){
+					has_unholy_precense = 0.85f;
+				}
+
+				float calc_ = ( has_unholy_precense - (1.0f - (me->GetOwner()->GetFloatValue(UNIT_MOD_CAST_SPEED)))) ;
+					
+				if(calc_ > me->GetFloatValue(UNIT_MOD_CAST_SPEED)){
+					while(calc_ > me->GetFloatValue(UNIT_MOD_CAST_SPEED) && max_acction_++ < 100)
+						me->ApplyCastTimePercentMod(1.01f, false);
+
+					
+				}else{
+					while(calc_ < me->GetFloatValue(UNIT_MOD_CAST_SPEED) && max_acction_++ < 100)
+						me->ApplyCastTimePercentMod(0.1f, true);
+
+				}
+				
+
+				_maxcasttime_owner_= me->GetOwner()->GetFloatValue(UNIT_MOD_CAST_SPEED);
+				
+			}
+
+
                         me->CastSpell(me->GetVictim(), 51963, false);
+		    }
                 }
                 else
                 {
@@ -203,6 +241,7 @@ class npc_pet_dk_ebon_gargoyle : public CreatureScript
             uint32 _initialCastTimer;
             bool _despawning;
             bool _initialSelection;
+	    float _maxcasttime_owner_;
         };
 
         CreatureAI* GetAI(Creature* creature) const
