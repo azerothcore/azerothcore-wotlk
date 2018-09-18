@@ -195,7 +195,6 @@ class npc_pet_dk_ebon_gargoyle : public CreatureScript
 
 				float has_unholy_precense = 1.0f;
 				uint32 max_acction_ = 0; 
-				bool keep_while = true;
 				
 				if(me->GetOwner()->HasAura(SPELL_DK_UNHOLY_PRESENCE)){
 					has_unholy_precense = 0.85f;
@@ -243,7 +242,6 @@ class npc_pet_dk_ebon_gargoyle : public CreatureScript
             bool _despawning;
             bool _initialSelection;
 	    float _maxcasttime_owner_;
-	    uint32 _old_precense;
         };
 
         CreatureAI* GetAI(Creature* creature) const
