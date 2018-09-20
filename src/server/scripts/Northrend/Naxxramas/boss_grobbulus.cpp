@@ -69,6 +69,7 @@ public:
         {
             BossAI::EnterCombat(who);
             me->SetInCombatWithZone();
+            me->CallForHelp(VISIBLE_RANGE);
             events.ScheduleEvent(EVENT_SPELL_POISON_CLOUD, 15000);
             events.ScheduleEvent(EVENT_SPELL_MUTATING_INJECTION, 20000);
             events.ScheduleEvent(EVENT_SPELL_SLIME_SPRAY, 10000);

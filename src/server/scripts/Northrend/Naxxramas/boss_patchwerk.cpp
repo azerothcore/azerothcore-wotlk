@@ -85,7 +85,7 @@ public:
         {
             BossAI::EnterCombat(who);
             Talk(SAY_AGGRO);
-            
+            me->CallForHelp(VISIBLE_RANGE);
             me->SetInCombatWithZone();
             events.ScheduleEvent(EVENT_SPELL_HATEFUL_STRIKE, 1200);
             events.ScheduleEvent(EVENT_SPELL_BERSERK, 360000);
