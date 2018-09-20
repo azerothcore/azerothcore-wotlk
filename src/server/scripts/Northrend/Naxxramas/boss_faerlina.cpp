@@ -95,7 +95,7 @@ public:
             Talk(SAY_AGGRO);
             events.ScheduleEvent(EVENT_SPELL_POISON_BOLT, urand(12000,15000));
             events.ScheduleEvent(EVENT_SPELL_RAIN_OF_FIRE, urand(6000,18000));
-            events.ScheduleEvent(EVENT_SPELL_FRENZY, urand(60000,80000), 1);
+            events.ScheduleEvent(EVENT_SPELL_FRENZY, 60000, 1);
             events.SetPhase(1);
         }
 
@@ -152,7 +152,7 @@ public:
                 case EVENT_SPELL_FRENZY:
                     me->MonsterTextEmote("%s goes into a frenzy!", 0, true);
                     me->CastSpell(me, RAID_MODE(SPELL_FRENZY_10, SPELL_FRENZY_25), true);
-                    events.RepeatEvent(70000);
+                    events.RepeatEvent(60000);
                     break;
             }
 
