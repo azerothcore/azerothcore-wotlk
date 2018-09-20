@@ -943,7 +943,7 @@ class spell_warl_life_tap : public SpellScriptLoader
                 Player* caster = GetCaster()->ToPlayer();
                 if (Unit* target = GetHitUnit())
                 {
-                    int32 damage = GetEffectValue();
+                    int32 damage = GetEffectValue() + 1.0f + (caster->GetStat(STAT_SPIRIT) * 1.5f);
                     int32 mana = int32(damage + (caster->GetInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS+SPELL_SCHOOL_SHADOW) * 0.5f));
 
                     // Shouldn't Appear in Combat Log
