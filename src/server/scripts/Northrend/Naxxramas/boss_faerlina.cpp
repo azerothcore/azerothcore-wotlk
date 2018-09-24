@@ -61,6 +61,7 @@ public:
         EventMap events;
         SummonList summons;
         bool sayGreet;
+        const int frenzyCooldown = 60000;
 
         void SummonHelpers()
         {
@@ -95,7 +96,7 @@ public:
             Talk(SAY_AGGRO);
             events.ScheduleEvent(EVENT_SPELL_POISON_BOLT, urand(12000,15000));
             events.ScheduleEvent(EVENT_SPELL_RAIN_OF_FIRE, urand(6000,18000));
-            events.ScheduleEvent(EVENT_SPELL_FRENZY, 60000, 1);
+            events.ScheduleEvent(EVENT_SPELL_FRENZY, frenzyCooldown, 1);
             events.SetPhase(1);
         }
 
@@ -150,9 +151,14 @@ public:
                     events.RepeatEvent(12000);
                     break;
                 case EVENT_SPELL_FRENZY:
-                    me->MonsterTextEmote("%s goes into a frenzy!", 0, true);
-                    me->CastSpell(me, RAID_MODE(SPELL_FRENZY_10, SPELL_FRENZY_25), true);
-                    events.RepeatEvent(60000);
+                    if (!me->HasAura(RAID_MODE(SPELL_FRENZY_10, SPELL_FRENZY_25)))
+                    {
+                        me->MonsterTextEmote("%s goes into a frenzy!", 0, true);
+                        me->CastSpell(me, RAID_MODE(SPELL_FRENZY_10, SPELL_FRENZY_25), true);
+                        events.RepeatEvent(frenzyCooldown);
+                    }
+                    else
+                        events.RepeatEvent(frenzyCooldown / 2);
                     break;
             }
 
@@ -167,10 +173,8 @@ public:
                 if (me->HasAura(RAID_MODE(SPELL_FRENZY_10, SPELL_FRENZY_25)))
                 {
                     me->RemoveAurasDueToSpell(RAID_MODE(SPELL_FRENZY_10, SPELL_FRENZY_25));
-                    events.DelayEvents(60000, 1);
+                    events.RescheduleEvent(EVENT_SPELL_FRENZY, frenzyCooldown);
                 }
-                else
-                    events.DelayEvents(30000, 1);
 
                 if (pInstance)
                     pInstance->SetData(DATA_FRENZY_REMOVED, 0);
