@@ -542,7 +542,7 @@ public:
                     //all members of raid must get this buff
                     DoCastVictim(SPELL_PROTECTION_OF_ELUNE, true);
                     HasProtected = true;
-                    Enraged = true;
+                    MeleeRangeCheckTimer = 0;
                 }
 
                 if (SummonWispTimer <= diff)
@@ -608,7 +608,7 @@ public:
 
             if (MeleeRangeCheckTimer <= diff)
             {
-                if (CanUseFingerOfDeath())
+                if (CanUseFingerOfDeath() || HasProtected)
                 {
                     DoCast(SelectTarget(SELECT_TARGET_RANDOM, 0), SPELL_FINGER_OF_DEATH);
                     MeleeRangeCheckTimer = 1000;
