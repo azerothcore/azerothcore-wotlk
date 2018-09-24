@@ -32,6 +32,7 @@ public:
             { "graveyard",      SEC_MODERATOR,      false, &HandleGoGraveyardCommand,         "" },
             { "grid",           SEC_MODERATOR,      false, &HandleGoGridCommand,              "" },
             { "object",         SEC_MODERATOR,      false, &HandleGoObjectCommand,            "" },
+            { "gobject",        SEC_MODERATOR,      false, &HandleGoObjectCommand,            "" },
             { "taxinode",       SEC_MODERATOR,      false, &HandleGoTaxinodeCommand,          "" },
             { "trigger",        SEC_MODERATOR,      false, &HandleGoTriggerCommand,           "" },
             { "zonexy",         SEC_MODERATOR,      false, &HandleGoZoneXYCommand,            "" },
