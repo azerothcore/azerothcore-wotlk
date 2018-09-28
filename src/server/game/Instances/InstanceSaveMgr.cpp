@@ -214,6 +214,9 @@ void InstanceSaveManager::LoadInstances()
     // Delete instance with no binds
     CharacterDatabase.DirectExecute("DELETE i.* FROM instance AS i LEFT JOIN character_instance AS ci ON i.id = ci.instance WHERE ci.guid IS NULL");
 
+    // Delete Instance_reset so it can generate a new patch for this
+    CharacterDatabase.DirectExecute("DELETE FROM instance_reset");
+
     // Delete creature_respawn, gameobject_respawn and creature_instance for non-existent instance
     CharacterDatabase.DirectExecute("DELETE FROM creature_respawn WHERE instanceId > 0 AND instanceId NOT IN (SELECT id FROM instance)");
     CharacterDatabase.DirectExecute("DELETE FROM gameobject_respawn WHERE instanceId > 0 AND instanceId NOT IN (SELECT id FROM instance)");
@@ -290,12 +293,7 @@ void InstanceSaveManager::LoadResetTimes()
             SetResetTimeFor(mapid, difficulty, t);
             CharacterDatabase.DirectPExecute("INSERT INTO instance_reset VALUES ('%u', '%u', '%u')", mapid, difficulty, (uint32)t);
         }
-        else
-        {
-            // next reset should be in future. If its not, skip to future.
-            while (t < now)
-                t = uint32(((t + MINUTE) / DAY * DAY) + period + diff);
-        }
+
         SetExtendedResetTimeFor(mapid, difficulty, t + period);
 
         // schedule the global reset/warning
