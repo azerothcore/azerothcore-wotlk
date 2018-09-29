@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
@@ -53,6 +53,7 @@ class npc_pet_mage_mirror_image : public CreatureScript
             uint32 selectionTimer;
             uint64 _ebonGargoyleGUID;
             uint32 checktarget;
+            uint32 dist = urand(1, 5);
 
             void InitializeAI()
             {
@@ -80,7 +81,11 @@ class npc_pet_mage_mirror_image : public CreatureScript
                 }
 
                 ((Minion*)me)->SetFollowAngle(angle);
-                me->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST, me->GetFollowAngle(), MOTION_SLOT_ACTIVE);
+                if (owner->IsInCombat())
+                    me->NearTeleportTo(me->GetPositionX() + cos(angle)*dist, me->GetPositionY() + sin(angle)*dist, me->GetPositionZ(), me->GetOrientation(), false, false, false, false);
+                else
+                    me->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST, me->GetFollowAngle(), MOTION_SLOT_ACTIVE);
+
                 me->SetReactState(REACT_DEFENSIVE);
 
                 // Xinef: Inherit Master's Threat List (not yet implemented)

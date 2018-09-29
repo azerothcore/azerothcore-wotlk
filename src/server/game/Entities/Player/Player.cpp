@@ -1633,6 +1633,7 @@ void Player::Update(uint32 p_time)
         uint32 elapsed = uint32(now - m_Last_tick);
         m_Played_time[PLAYED_TIME_TOTAL] += elapsed;        // Total played time
         m_Played_time[PLAYED_TIME_LEVEL] += elapsed;        // Level played time
+        GetSession()->SetTotalTime(GetSession()->GetTotalTime() + elapsed);
         m_Last_tick = now;
     }
 
