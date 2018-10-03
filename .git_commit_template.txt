@@ -1,9 +1,9 @@
 ### TITLE
 ## Type(Scope/Subscope): Commit ultra short explanation
 ## |---- Write below the examples with a maximum of 50 characters ----|
-## Example 1: fix(DB/SAI): Add missing spell to NPC Hogger
-## Example 2: fix(CORE/Raid): Fix phase 2 of Ragnaros
-## Example 3: feat(CORE/Commands): Add "new_name" GM command to do something
+## Example 1: fix(DB/SAI): Missing spell to NPC Hogger
+## Example 2: fix(CORE/Raid): Phase 2 of Ragnaros
+## Example 3: feat(CORE/Commands): New GM command to do something
 
 
 ### DESCRIPTION
@@ -29,7 +29,7 @@
 ##    style    (formatting, missing semi colons, etc; no code change)
 ##    docs     (changes to documentation)
 ##    test     (adding or refactoring tests; no production code change)
-##    chore    (updating grunt tasks etc; no production code change)
+##    chore    (updating bash scripts, git files etc; no production code change)
 ## --------------------
 ## Remember to
 ##    Capitalize the subject line
