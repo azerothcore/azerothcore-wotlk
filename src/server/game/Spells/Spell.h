@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
@@ -59,6 +59,14 @@ enum SpellCastFlags
     CAST_FLAG_UNKNOWN_30         = 0x20000000,
     CAST_FLAG_UNKNOWN_31         = 0x40000000,
     CAST_FLAG_UNKNOWN_32         = 0x80000000,
+};
+
+//Spells casted on self should not be diminished.
+enum SpellFlags
+{
+    SPELL_FLAG_NORMAL = 0x00,
+    SPELL_FLAG_REFLECTED = 0x01,        // reflected spell
+    SPELL_FLAG_REDIRECTED = 0x02        // redirected spell
 };
 
 enum SpellRangeFlag
@@ -553,6 +561,9 @@ class Spell
         int32 m_casttime;                                   // Calculated spell cast time initialized only in Spell::prepare
         int32 m_channeledDuration;                          // Calculated channeled spell duration in order to calculate correct pushback.
         bool m_canReflect;                                  // can reflect this spell?
+
+        uint8 m_spellFlags;                                 // for spells whose target was changed in cast i.e. due to reflect
+
         bool m_autoRepeat;
         uint8 m_runesState;
 
