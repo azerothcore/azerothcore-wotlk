@@ -6,3 +6,12 @@ INSERT INTO `command` (`name`, `security`, `help`) VALUES ('list gobject', 1, 'S
 DELETE FROM `command` WHERE `name`='lookup gobject';
 INSERT INTO `command` (`name`, `security`, `help`) VALUES ('lookup gobject', 1, 'Syntax: .lookup object $objname\r\n\r\nLooks up an gameobject by $objname, and returns all matches with their Gameobject ID\'s.');
 
+-- Add deprecated notice
+UPDATE `command` SET `help` = '[DEPRECATED]: use ".go gobject" instead.\r\nSyntax: .go object #object_guid\r\nTeleport your character to gameobject with guid #object_guid'
+WHERE `name` = 'go object' COLLATE utf8mb4_bin;
+
+UPDATE `command` SET `help` = '[DEPRECATED]: use ".lookup gobject" instead.\r\nSyntax: .go object #object_guid\r\nTeleport your character to gameobject with guid #object_guid'
+WHERE `name` = 'lookup object' COLLATE utf8mb4_bin;
+
+UPDATE `command` SET `help` = '[DEPRECATED]: use ".list gobject" instead.\r\nSyntax: .go object #object_guid\r\nTeleport your character to gameobject with guid #object_guid'
+WHERE `name` = 'list object' COLLATE utf8mb4_bin;
