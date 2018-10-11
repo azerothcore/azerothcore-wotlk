@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
@@ -225,7 +225,7 @@ public:
             }
         }
 
-        void JustDied(Unit * /*victim*/)
+        void JustDied(Unit * /*victim*/) override
         {
             me->MonsterYell("You are bad... Toys... Very... Baaaaad!", LANG_UNIVERSAL, 0);
             me->PlayDirectSound(XT_SOUND_DEATH);
@@ -234,7 +234,10 @@ public:
             {
                 m_pInstance->SetData(TYPE_XT002, DONE);
                 if (GameObject *pGo = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(GO_XT002_DOORS)))
+                {
                     pGo->SetGoState(GO_STATE_ACTIVE);
+                }
+
             }
 
             // Despawn summons

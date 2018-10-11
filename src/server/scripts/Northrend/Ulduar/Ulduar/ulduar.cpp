@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
@@ -9,98 +9,6 @@
 #include "SpellScript.h"
 #include "SpellAuraEffects.h"
 #include "Player.h"
-
-#define BASE_CAMP    200
-#define GROUNDS      201
-#define FORGE        202
-#define SCRAPYARD    203
-#define ANTECHAMBER  204
-#define WALKWAY      205
-#define CONSERVATORY 206
-#define MADNESS      207
-#define SPARK        208
-
-class go_ulduar_teleporter : public GameObjectScript
-{
-public:
-    go_ulduar_teleporter() : GameObjectScript("ulduar_teleporter") { }
-
-    bool OnGossipHello(Player* player, GameObject* go)
-    {
-        InstanceScript* pInstance = go->GetInstanceScript();
-        if (!pInstance)
-            return true;
-
-        player->ADD_GOSSIP_ITEM(0, "Teleport to the Expedition Base Camp.", GOSSIP_SENDER_MAIN, BASE_CAMP);
-        if (pInstance->GetData(TYPE_LEVIATHAN) >= DONE) // count special
-        {
-            player->ADD_GOSSIP_ITEM(0, "Teleport to the Formation Grounds.", GOSSIP_SENDER_MAIN, GROUNDS);
-            if (pInstance->GetData(TYPE_LEVIATHAN) == DONE)
-            {
-                player->ADD_GOSSIP_ITEM(0, "Teleport to the Colossal Forge.", GOSSIP_SENDER_MAIN, FORGE);
-                if (pInstance->GetData(TYPE_XT002) == DONE)
-                {
-                    player->ADD_GOSSIP_ITEM(0, "Teleport to the Scrapyard.", GOSSIP_SENDER_MAIN, SCRAPYARD);
-                    player->ADD_GOSSIP_ITEM(0, "Teleport to the Antechamber of Ulduar.", GOSSIP_SENDER_MAIN, ANTECHAMBER);
-                    if (pInstance->GetData(TYPE_KOLOGARN) == DONE)
-                    {
-                        player->ADD_GOSSIP_ITEM(0, "Teleport to the Shattered Walkway.", GOSSIP_SENDER_MAIN, WALKWAY);
-                        if (pInstance->GetData(TYPE_AURIAYA) == DONE)
-                        {
-                            player->ADD_GOSSIP_ITEM(0, "Teleport to the Conservatory of Life.", GOSSIP_SENDER_MAIN, CONSERVATORY);
-                            if (pInstance->GetData(DATA_CALL_TRAM))
-                                player->ADD_GOSSIP_ITEM(0, "Teleport to the Spark of Imagination.", GOSSIP_SENDER_MAIN, SPARK);
-                            if (pInstance->GetData(TYPE_VEZAX) == DONE)
-                                player->ADD_GOSSIP_ITEM(0, "Teleport to the Prison of Yogg-Saron.", GOSSIP_SENDER_MAIN, MADNESS);
-                        }
-                    }
-                }
-            }
-        }
-
-        player->SEND_GOSSIP_MENU(14424, go->GetGUID());
-        return true;
-    }
-
-    bool OnGossipSelect(Player* player, GameObject*  /*go*/, uint32 sender, uint32 action)
-    {
-        if (sender != GOSSIP_SENDER_MAIN || !player->getAttackers().empty())
-            return true;
-
-        switch(action)
-        {
-            case BASE_CAMP:
-                player->TeleportTo(603, -706.122f, -92.6024f, 429.876f, 0);
-                player->CLOSE_GOSSIP_MENU(); break;
-            case GROUNDS:
-                player->TeleportTo(603, 131.248f, -35.3802f, 409.804f, 0);
-                player->CLOSE_GOSSIP_MENU(); break;
-            case FORGE:
-                player->TeleportTo(603, 553.233f, -12.3247f, 409.679f, 0);
-                player->CLOSE_GOSSIP_MENU(); break;
-            case SCRAPYARD:
-                player->TeleportTo(603, 926.292f, -11.4635f, 418.595f, 0);
-                player->CLOSE_GOSSIP_MENU(); break;
-            case ANTECHAMBER:
-                player->TeleportTo(603, 1498.09f, -24.246f, 420.967f, 0);
-                player->CLOSE_GOSSIP_MENU(); break;
-            case WALKWAY:
-                player->TeleportTo(603, 1859.45f, -24.1f, 448.9f, 0);
-                player->CLOSE_GOSSIP_MENU(); break;
-            case CONSERVATORY:
-                player->TeleportTo(603, 2086.27f, -24.3134f, 421.239f, 0);
-                player->CLOSE_GOSSIP_MENU(); break;
-            case MADNESS:
-                player->TeleportTo(603, 1854.8f, -11.46f, 334.57f, 4.8f);
-                player->CLOSE_GOSSIP_MENU(); break;
-            case SPARK:
-                player->TeleportTo(603, 2517.9f, 2568.9f, 412.7f, 0);
-                player->CLOSE_GOSSIP_MENU(); break;
-        }
-
-        return true;
-    }
-};
 
 class npc_ulduar_keeper : public CreatureScript
 {
@@ -502,11 +410,98 @@ public:
     }
 };
 
+class spell_ulduar_teleporter : public SpellScriptLoader
+{
+public:
+    spell_ulduar_teleporter() : SpellScriptLoader("spell_ulduar_teleporter") { }
+
+    enum Teleport_Spells
+    {
+        BASE_CAMP = 64014,
+        GROUNDS = 64032,
+        FORGE = 64028,
+        SCRAPYARD = 64031,
+        ANTECHAMBER = 64030,
+        WALKWAY = 64029,
+        CONSERVATORY = 64024,
+        MADNESS = 64025,
+        SPARK = 65042
+    };
+
+    class spell_ulduar_teleporter_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_ulduar_teleporter_SpellScript);
+
+        SpellCastResult CheckRequirement()
+        {
+            if (GetExplTargetUnit()->GetTypeId() != TYPEID_PLAYER)
+                return SPELL_FAILED_DONT_REPORT;
+
+            if (GetExplTargetUnit()->IsInCombat())
+            {
+                Spell::SendCastResult(GetExplTargetUnit()->ToPlayer(), GetSpellInfo(), 0, SPELL_FAILED_AFFECTING_COMBAT);
+                return SPELL_FAILED_AFFECTING_COMBAT;
+            }
+
+            return SPELL_CAST_OK;
+        }
+
+        //doing real teleporting because all spells are just broken
+        void TeleportPlayer()
+        {
+            auto SpellID = GetSpellInfo()->Id;
+            auto player = (Player*)GetExplTargetUnit();
+
+            switch (SpellID)
+            {
+            case BASE_CAMP:
+                player->TeleportTo(603, -706.122f, -92.6024f, 429.876f, 0);
+                break;
+            case GROUNDS:
+                player->TeleportTo(603, 131.248f, -35.3802f, 409.804f, 0);
+                break;
+            case FORGE:
+                player->TeleportTo(603, 553.233f, -12.3247f, 409.679f, 0);
+                break;
+            case SCRAPYARD:
+                player->TeleportTo(603, 926.292f, -11.4635f, 418.595f, 0);
+                break;
+            case ANTECHAMBER:
+                player->TeleportTo(603, 1498.09f, -24.246f, 420.967f, 0);
+                break;
+            case WALKWAY:
+                player->TeleportTo(603, 1859.45f, -24.1f, 448.9f, 0);
+                break;
+            case CONSERVATORY:
+                player->TeleportTo(603, 2086.27f, -24.3134f, 421.239f, 0);
+                break;
+            case MADNESS:
+                player->TeleportTo(603, 1854.8f, -11.46f, 334.57f, 4.8f);
+                break;
+            case SPARK:
+                player->TeleportTo(603, 2517.9f, 2568.9f, 412.7f, 0);
+                break;
+            }
+        }
+
+        void Register() override
+        {
+            OnCheckCast += SpellCheckCastFn(spell_ulduar_teleporter_SpellScript::CheckRequirement);
+            AfterCast   += SpellCastFn(spell_ulduar_teleporter_SpellScript::TeleportPlayer);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_ulduar_teleporter_SpellScript();
+    }
+};
+
 
 void AddSC_ulduar()
 {
-    new go_ulduar_teleporter();
     new npc_ulduar_keeper();
+    new spell_ulduar_teleporter();
 
     new spell_ulduar_energy_sap();
     new npc_ulduar_snow_mound();
