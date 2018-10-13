@@ -1,3 +1,19 @@
+-- DB update 2018_10_05_00 -> 2018_10_13_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2018_10_05_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2018_10_05_00 2018_10_13_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1537455748525502400'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO version_db_world (`sql_rev`) VALUES ('1537455748525502400');
 -- Sand Skitterer
 UPDATE `creature_template` SET `AIName`="SmartAI" WHERE `entry`=11738;
@@ -364,3 +380,12 @@ UPDATE `creature` SET `MovementType`=1, `spawndist`=15 WHERE `guid` IN (51837, 4
 
 -- Fix spawn position for one creature
 UPDATE `creature` SET `position_x`=-7162.57, `position_y`=1380.36, `position_z`=2.92073, `orientation`=2.05615 WHERE `guid`=42906;
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
