@@ -15,6 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 #include "TOTP.h"
+#include <cstring>
+
 int base32_decode(const char* encoded, char* result, int bufSize)
 {
     // Base32 implementation
@@ -56,7 +58,9 @@ int base32_decode(const char* encoded, char* result, int bufSize)
         result[count] = '\000';
     return count;
 }
+
 #define HMAC_RES_SIZE 20
+
 namespace TOTP
 {
     unsigned int GenerateToken(const char* b32key)
