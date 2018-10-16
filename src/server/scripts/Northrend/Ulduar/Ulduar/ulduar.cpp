@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
@@ -449,8 +449,8 @@ public:
         //doing real teleporting because all spells are just broken
         void TeleportPlayer()
         {
-            auto SpellID = GetSpellInfo()->Id;
-            auto player = (Player*)GetExplTargetUnit();
+            uint32 SpellID = GetSpellInfo()->Id;
+            Player* player = static_cast<Player*>(GetExplTargetUnit());
 
             switch (SpellID)
             {
