@@ -1,3 +1,19 @@
+-- DB update 2018_10_15_00 -> 2018_10_16_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2018_10_15_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2018_10_15_00 2018_10_16_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1527664423307226600'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO version_db_world (`sql_rev`) VALUES ('1527664423307226600');
 
 DELETE FROM `pool_gameobject` WHERE `guid` BETWEEN 75000 AND 75119;
@@ -122,3 +138,12 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VA
 (75117, 4739, 60, "Ghostlands Spawn Point 40 (Copper)"),
 (75118, 4739, 30, "Ghostlands Spawn Point 40 (Tin)"),
 (75119, 4739, 10, "Ghostlands Spawn Point 40 (Silver)");
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
