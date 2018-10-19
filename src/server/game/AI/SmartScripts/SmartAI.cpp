@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
@@ -674,7 +674,14 @@ void SmartAI::MoveInLineOfSight(Unit* who)
         return;
 
     if (me->CanStartAttack(who))
+    {
+        if (me->HasUnitState(UNIT_STATE_DISTRACTED))
+        {
+            me->ClearUnitState(UNIT_STATE_DISTRACTED);
+            me->GetMotionMaster()->Clear();
+        }
         AttackStart(who);
+    }
 }
 
 bool SmartAI::CanAIAttack(const Unit* /*who*/) const
