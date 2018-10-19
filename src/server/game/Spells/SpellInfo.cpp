@@ -2563,6 +2563,7 @@ bool SpellInfo::_IsPositiveEffect(uint8 effIndex, bool deep) const
                 case 61988: // Divine Shield exclude aura
                 case 72998: // Shadow Prison (Blood Prince Council, ICC Encounter)
                     return false;
+				case 24732: // Bat Costume
                 case 30877: // Tag Murloc
                 case 61716: // Rabbit Costume
                 case 61734: // Noblegarden Bunny
