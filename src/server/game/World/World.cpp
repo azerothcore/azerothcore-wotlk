@@ -431,7 +431,7 @@ void World::LoadModuleConfigSettings()
     {
         for (auto& p : fs::recursive_directory_iterator(fs::current_path()))
         {
-            if (p.path().extension() == std::string(".dist"))
+            if (p.path().extension() == std::string(".conf"))
             {
                 std::string cfg_file = p.path().filename().u8string();
                 std::string cfg_def_file = cfg_file + ".dist";
