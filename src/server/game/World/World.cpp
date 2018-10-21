@@ -80,6 +80,8 @@
 #include "LuaEngine.h"
 #endif
 
+#include <experimental/filesystem>
+
 ACE_Atomic_Op<ACE_Thread_Mutex, bool> World::m_stopEvent = false;
 uint8 World::m_ExitCode = SHUTDOWN_EXIT_CODE;
 uint32 World::m_worldLoopCounter = 0;
@@ -416,7 +418,6 @@ bool World::RemoveQueuedPlayer(WorldSession* sess)
     return found;
 }
 
-#include <filesystem>
 void World::LoadModuleConfigSettings()
 {
     //GetConfigFileList() can return an empty list if module makers didn't call AC_ADD_CONFIG_FILE("${CMAKE_CURRENT_LIST_DIR}/conf/my_custom.conf.dist") in their
