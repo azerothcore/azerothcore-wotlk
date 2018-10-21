@@ -416,8 +416,49 @@ bool World::RemoveQueuedPlayer(WorldSession* sess)
     return found;
 }
 
+#include <filesystem>
 void World::LoadModuleConfigSettings()
 {
+    //GetConfigFileList() can return an empty list if module makers didn't call AC_ADD_CONFIG_FILE("${CMAKE_CURRENT_LIST_DIR}/conf/my_custom.conf.dist") in their
+    //Cmakelist.txt
+
+    //also if you ported executable to another machine but hasn't maintain fixed file structure on that machine, CMAKE_CURRENT_LIST_DIR doesn't exists
+    //thus GetConfigFileList() return an wrong file list, too
+
+    //so here we make another loading path
+    namespace fs = std::experimental::filesystem;
+    if (!fs::exists(_CONF_DIR)) //another machine, _CONF_DIR doesn't exist
+    {
+        for (auto& p : fs::recursive_directory_iterator(fs::current_path()))
+        {
+            if (p.path().extension() == std::string(".dist"))
+            {
+                std::string cfg_file = p.path().filename().u8string();
+                std::string cfg_def_file = cfg_file + ".dist";
+
+                // Load .conf.dist config
+                if (!sConfigMgr->LoadMore(cfg_def_file.c_str()))
+                {
+                    sLog->outString();
+                    sLog->outError("Module config: Invalid or missing configuration dist file : %s", cfg_def_file.c_str());
+                    sLog->outError("Module config: Verify that the file exists and has \'[worldserver]' written in the top of the file!");
+                    sLog->outError("Module config: Use default settings!");
+                    sLog->outString();
+                }
+
+                // Load .conf config
+                if (!sConfigMgr->LoadMore(cfg_file.c_str()))
+                {
+                    sLog->outString();
+                    sLog->outError("Module config: Invalid or missing configuration file : %s", cfg_file.c_str());
+                    sLog->outError("Module config: Verify that the file exists and has \'[worldserver]' written in the top of the file!");
+                    sLog->outError("Module config: Use default settings!");
+                    sLog->outString();
+                }
+            }
+        }
+    }
+    
     Tokenizer configFileList(GetConfigFileList(), ',');
     for (auto i = configFileList.begin(); i != configFileList.end(); i++)
     {
