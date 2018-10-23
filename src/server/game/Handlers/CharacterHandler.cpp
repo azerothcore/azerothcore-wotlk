@@ -1117,28 +1117,28 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder* holder)
 
         switch (pCurrChar->getFaction())
         {
-        case ALLIANCE:
-            repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(72), 42999, false);
-            repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(47), 42999, false);
-            repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(69), 42999, false);
-            repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(930), 42999, false);
-            repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(730), 42999, false);
-            repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(978), 42999, false);
-            repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(54), 42999, false);
-            repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(946), 42999, false);
-            break;
-        case HORDE:
-            repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(76), 42999, false);
-            repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(68), 42999, false);
-            repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(81), 42999, false);
-            repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(911), 42999, false);
-            repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(729), 42999, false);
-            repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(941), 42999, false);
-            repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(530), 42999, false);
-            repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(947), 42999, false);
-            break;
-        default:
-            break;
+            case ALLIANCE:
+                repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(72), 42999, false);
+                repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(47), 42999, false);
+                repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(69), 42999, false);
+                repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(930), 42999, false);
+                repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(730), 42999, false);
+                repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(978), 42999, false);
+                repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(54), 42999, false);
+                repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(946), 42999, false);
+                break;
+            case HORDE:
+                repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(76), 42999, false);
+                repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(68), 42999, false);
+                repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(81), 42999, false);
+                repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(911), 42999, false);
+                repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(729), 42999, false);
+                repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(941), 42999, false);
+                repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(530), 42999, false);
+                repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(947), 42999, false);
+                break;
+            default:
+                break;
         }
         repMgr.SendStates();
     }
