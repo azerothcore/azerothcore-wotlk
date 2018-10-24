@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
@@ -2820,34 +2820,34 @@ float Creature::GetAttackDistance(Unit const* player) const
     if (!player)
         return 0.0f;
 
-    uint32 playerlevel = player->getLevelForTarget(this);
-    uint32 creaturelevel = getLevelForTarget(player);
+    uint32 playerLevel = player->getLevelForTarget(this);
+    uint32 creatureLevel = getLevelForTarget(player);
 
-    int32 leveldif = int32(playerlevel) - int32(creaturelevel);
+    int32 levelDiff = int32(playerLevel) - int32(creatureLevel);
 
     // "The maximum Aggro Radius has a cap of 25 levels under. Example: A level 30 char has the same Aggro Radius of a level 5 char on a level 60 mob."
-    if (leveldif < -25)
-        leveldif = -25;
+    if (levelDiff < -25)
+        levelDiff = -25;
 
     // "The aggro radius of a mob having the same level as the player is roughly 20 yards"
-    float RetDistance = 20;
+    float retDistance = 20.0f;
 
     // "Aggro Radius varies with level difference at a rate of roughly 1 yard/level"
     // radius grow if playlevel < creaturelevel
-    RetDistance -= (float)leveldif;
+    retDistance -= static_cast<float>(levelDiff);
 
-    if (creaturelevel + 5 <= sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
+    if (creatureLevel + 5 <= sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
     {
         // detect range auras
-        RetDistance += GetTotalAuraModifier(SPELL_AURA_MOD_DETECT_RANGE);
+        retDistance += static_cast<float>( GetTotalAuraModifier(SPELL_AURA_MOD_DETECT_RANGE) );
 
         // detected range auras
-        RetDistance += player->GetTotalAuraModifier(SPELL_AURA_MOD_DETECTED_RANGE);
+        retDistance += static_cast<float>( player->GetTotalAuraModifier(SPELL_AURA_MOD_DETECTED_RANGE) );
     }
 
     // "Minimum Aggro Radius for a mob seems to be combat range (5 yards)"
-    if (RetDistance < 5)
-        RetDistance = 5;
+    if (retDistance < 5.0f)
+        retDistance = 5.0f;
 
-    return (RetDistance*aggroRate);
+    return (retDistance*aggroRate);
 }
