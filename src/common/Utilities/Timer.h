@@ -126,9 +126,12 @@ struct TimeTrackerSmall
         {
         }
 
-        void Update(int32 diff)
+        void Update(uint32 diff)
         {
-            i_expiryTime -= diff;
+			if (i_expiryTime <= diff)
+				i_expiryTime = 0;
+			else
+				i_expiryTime -= diff;
         }
 
         bool Passed() const
@@ -141,14 +144,14 @@ struct TimeTrackerSmall
             i_expiryTime = interval;
         }
 
-        int32 GetExpiry() const
+        uint32 GetExpiry() const
         {
             return i_expiryTime;
         }
 
     private:
 
-        int32 i_expiryTime;
+        uint32 i_expiryTime;
 };
 
 struct PeriodicTimer

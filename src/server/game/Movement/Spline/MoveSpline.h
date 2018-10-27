@@ -47,7 +47,7 @@ namespace Movement
 
         MoveSplineFlag  splineflags;
 
-        int32           time_passed;
+        uint32           time_passed;
         // currently duration mods are unused, but its _currently_
         //float           duration_mod;
         //float           duration_mod_next;
@@ -64,14 +64,14 @@ namespace Movement
         void computeParabolicElevation(float& el) const;
         void computeFallElevation(float& el) const;
 
-        UpdateResult _updateState(int32& ms_time_diff);
-        int32 next_timestamp() const { return spline.length(point_Idx + 1); }
-        int32 segment_time_elapsed() const { return next_timestamp() - time_passed; }
+        UpdateResult _updateState(uint32& ms_time_diff);
+        uint32 next_timestamp() const { return spline.length(point_Idx + 1); }
+        uint32 segment_time_elapsed() const { return next_timestamp() - time_passed; }
 
     public:
-        int32 timeElapsed() const { return Duration() - time_passed; }  // xinef: moved to public for waypoint movegen
-        int32 timePassed() const { return time_passed; }                // xinef: moved to public for waypoint movegen
-        int32 Duration() const { return spline.length(); }
+        uint32 timeElapsed() const { return Duration() - time_passed; }  // xinef: moved to public for waypoint movegen
+        uint32 timePassed() const { return time_passed; }                // xinef: moved to public for waypoint movegen
+        uint32 Duration() const { return spline.length(); }
         MySpline const& _Spline() const { return spline; }
         int32 _currentSplineIdx() const { return point_Idx; }
         void _Finalize();
@@ -84,7 +84,7 @@ namespace Movement
         MoveSpline();
 
         template<class UpdateHandler>
-        void updateState(int32 difftime, UpdateHandler& handler)
+        void updateState(uint32 difftime, UpdateHandler& handler)
         {
             ASSERT(Initialized());
             do
@@ -92,7 +92,7 @@ namespace Movement
             while (difftime > 0);
         }
 
-        void updateState(int32 difftime)
+        void updateState(uint32 difftime)
         {
             ASSERT(Initialized());
             do _updateState(difftime);
