@@ -187,18 +187,20 @@ float SplineBase::SegLengthBezier3(index_type index) const
     return length;
 }
 
-void SplineBase::init_spline(const Vector3 * controls, index_type count, EvaluationMode m)
+void SplineBase::init_spline(const Vector3 * controls, index_type count, EvaluationMode m, float orientation)
 {
     m_mode = m;
     cyclic = false;
+	initialOrientation = orientation;
 
     (this->*initializers[m_mode])(controls, count, cyclic, 0);
 }
 
-void SplineBase::init_cyclic_spline(const Vector3 * controls, index_type count, EvaluationMode m, index_type cyclic_point)
+void SplineBase::init_cyclic_spline(const Vector3 * controls, index_type count, EvaluationMode m, index_type cyclic_point, float orientation)
 {
     m_mode = m;
     cyclic = true;
+	initialOrientation = orientation;
 
     (this->*initializers[m_mode])(controls, count, cyclic, cyclic_point);
 }
@@ -238,17 +240,17 @@ void SplineBase::InitCatmullRom(const Vector3* controls, index_type count, bool 
     // these points are required for proper C_Evaluate and C_Evaluate_Derivative methtod work
     if (cyclic)
     {
-        if (cyclic_point == 0)
-            points[0] = controls[count-1];
-        else
-            points[0] = controls[0].lerp(controls[1], -1);
+		if (cyclic_point == 0)
+			points[0] = controls[count - 1];
+		else
+			points[0] = controls[0] - G3D::Vector3{ cos(initialOrientation), sin(initialOrientation), 0.0f };
 
         points[high_index+1] = controls[cyclic_point];
         points[high_index+2] = controls[cyclic_point+1];
     }
     else
     {
-        points[0] = controls[0].lerp(controls[1], -1);
+        points[0] = controls[0] - G3D::Vector3{ cos(initialOrientation), sin(initialOrientation), 0.0f };
         points[high_index+1] = controls[count-1];
     }
 
