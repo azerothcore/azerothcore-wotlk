@@ -971,7 +971,7 @@ class spell_warl_life_tap : public SpellScriptLoader
 
             SpellCastResult CheckCast()
             {
-                if ((int32(GetCaster()->GetHealth()) > int32(GetSpellInfo()->Effects[EFFECT_0].CalcValue() + (6.3875 * GetSpellInfo()->BaseLevel))))
+                if ((int32(GetCaster()->GetHealth()) > int32(GetSpellInfo()->Effects[EFFECT_0].CalcValue() + (6.3875 * GetSpellInfo()->BaseLevel) + (GetCaster()->GetStat(STAT_SPIRIT) * 1.5f) + 1.0f )))
                     return SPELL_CAST_OK;
                 return SPELL_FAILED_FIZZLE;
             }
