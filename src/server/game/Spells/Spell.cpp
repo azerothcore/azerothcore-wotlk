@@ -4437,7 +4437,7 @@ void Spell::SendSpellStart()
     m_targets.Write(data);
 
     if (castFlags & CAST_FLAG_POWER_LEFT_SELF)
-        data << uint32(m_caster->GetPower((Powers)m_spellInfo->PowerType));
+        data << uint32(m_caster->GetPower(m_spellInfo->PowerType));
 
     if (castFlags & CAST_FLAG_AMMO)
         WriteAmmoToPacket(&data);
@@ -4512,7 +4512,7 @@ void Spell::SendSpellGo()
     m_targets.Write(data);
 
     if (castFlags & CAST_FLAG_POWER_LEFT_SELF)
-        data << uint32(m_caster->GetPower((Powers)m_spellInfo->PowerType));
+        data << uint32(m_caster->GetPower(m_spellInfo->PowerType));
 
     if (castFlags & CAST_FLAG_RUNE_LIST)                   // rune cooldowns list
     {
@@ -6653,7 +6653,7 @@ SpellCastResult Spell::CheckPower()
     }
 
     // Check power amount
-    Powers powerType = Powers(m_spellInfo->PowerType);
+    Powers powerType = m_spellInfo->PowerType;
     if (int32(m_caster->GetPower(powerType)) < m_powerCost)
         return SPELL_FAILED_NO_POWER;
     else

@@ -797,7 +797,7 @@ SpellInfo::SpellInfo(SpellEntry const* spellEntry)
     BaseLevel = spellEntry->baseLevel;
     SpellLevel = spellEntry->spellLevel;
     DurationEntry = spellEntry->DurationIndex ? sSpellDurationStore.LookupEntry(spellEntry->DurationIndex) : NULL;
-    PowerType = spellEntry->powerType;
+    PowerType = static_cast<Powers>(spellEntry->powerType);
     ManaCost = spellEntry->manaCost;
     ManaCostPerlevel = spellEntry->manaCostPerlevel;
     ManaPerSecond = spellEntry->manaPerSecond;
@@ -2338,7 +2338,7 @@ int32 SpellInfo::CalcPowerCost(Unit const* caster, SpellSchoolMask schoolMask, S
             return caster->GetHealth();
         // Else drain all power
         if (PowerType < MAX_POWERS)
-            return caster->GetPower(Powers(PowerType));
+            return caster->GetPower(PowerType);
         sLog->outError("SpellInfo::CalcPowerCost: Unknown power type '%d' in spell %d", PowerType, Id);
         return 0;
     }
@@ -2361,7 +2361,7 @@ int32 SpellInfo::CalcPowerCost(Unit const* caster, SpellSchoolMask schoolMask, S
             case POWER_FOCUS:
             case POWER_ENERGY:
             case POWER_HAPPINESS:
-                powerCost += int32(CalculatePct(caster->GetMaxPower(Powers(PowerType)), ManaCostPercentage));
+                powerCost += int32(CalculatePct(caster->GetMaxPower(PowerType), ManaCostPercentage));
                 break;
             case POWER_RUNE:
             case POWER_RUNIC_POWER:
