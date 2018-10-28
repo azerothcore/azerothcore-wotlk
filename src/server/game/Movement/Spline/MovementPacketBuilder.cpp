@@ -60,7 +60,7 @@ namespace Movement
         // Xinef: this flag breaks cycle for ground movement, client teleports npc between last and first point instead of using smooth movement
         if (splineflags & MoveSplineFlag::Flying)
             splineflags.enter_cycle = move_spline.isCyclic();
-        data << uint32(splineflags & uint32(~MoveSplineFlag::Mask_No_Monster_Move));
+        data << uint32(splineflags & ~MoveSplineFlag::Mask_No_Monster_Move);
 
         if (splineflags.animation)
         {
