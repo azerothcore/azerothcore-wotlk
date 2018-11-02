@@ -8,7 +8,7 @@
 
 ### DESCRIPTION
 ## Explain why this change is being made, what does it fix etc...
-## |---- Write below the examples with a maximum of 72 characters ----|
+## |---- Write below the examples with a maximum of 72 characters per lines ----|
 ## Example: Hogger (id: 492) was not charging player when being engaged.
 
 
