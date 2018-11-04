@@ -1725,6 +1725,15 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                                 owner->RemoveAurasDueToSpell(34471);
                         }
                     }
+
+					// Animal Handler
+					else if (GetId() == 68361)
+					{
+						if (Unit * owner = target->GetOwner())
+							if (AuraEffect * auraEff = owner->GetDummyAuraEffect(SPELLFAMILY_HUNTER, 2234, 1))
+								GetEffect(0)->SetAmount(auraEff->GetAmount());
+					}
+
                     break;
             }
             break;
