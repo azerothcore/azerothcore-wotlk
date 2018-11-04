@@ -1687,6 +1687,8 @@ class Unit : public WorldObject
         bool IsInFlight()  const { return HasUnitState(UNIT_STATE_IN_FLIGHT); }
 
         bool IsInCombat() const { return HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IN_COMBAT); }
+        bool IsInCombatWith(Unit const* who) const;
+
         bool IsPetInCombat() const { return HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PET_IN_COMBAT); }
         void CombatStart(Unit* target, bool initialAggro = true);
         void CombatStartOnCast(Unit* target, bool initialAggro = true, uint32 duration = 0);
