@@ -63,6 +63,16 @@ enum BG_WS_WorldStates
     BG_WS_STATE_TIMER_ACTIVE      = 4247
 };
 
+enum BG_WS_WinOrMapFlag
+{
+	BG_WS_NORMAL_FLAG_CAPTURE_REPUTATION          = 35,
+    BG_WS_WEEKEND_FLAG_CAPTURE_REPUTATION         = 45,
+    BG_WS_NORMAL_WIN_KILLS                        = 1,
+    BG_WS_WEEKEND_WIN_KILLS                       = 3,
+    BG_WS_NORMAL_MAP_COMPLETE_KILLS               = 2,
+    BG_WS_WEEKEND_MAP_COMPLETE_KILLS              = 4
+};
+
 enum BG_WS_ObjectTypes
 {
     BG_WS_OBJECT_DOOR_A_1       = 0,

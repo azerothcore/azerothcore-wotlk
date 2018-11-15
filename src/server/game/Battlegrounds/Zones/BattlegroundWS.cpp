@@ -440,15 +440,15 @@ void BattlegroundWS::Init()
 
     if (sBattlegroundMgr->IsBGWeekend(GetBgTypeID()))
     {
-        _reputationCapture = 45;
-        _honorWinKills = 3;
-        _honorEndKills = 4;
+        _reputationCapture = BG_WS_WEEKEND_FLAG_CAPTURE_REPUTATION;
+        _honorWinKills = BG_WS_WEEKEND_WIN_KILLS;
+        _honorEndKills = BG_WS_WEEKEND_MAP_COMPLETE_KILLS;
     }
     else
     {
-        _reputationCapture = 35;
-        _honorWinKills = 1;
-        _honorEndKills = 2;
+        _reputationCapture = BG_WS_NORMAL_FLAG_CAPTURE_REPUTATION;
+        _honorWinKills = BG_WS_NORMAL_WIN_KILLS;
+        _honorEndKills = BG_WS_NORMAL_MAP_COMPLETE_KILLS;
     }
 }
 
