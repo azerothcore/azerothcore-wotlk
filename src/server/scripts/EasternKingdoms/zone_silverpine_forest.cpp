@@ -262,9 +262,15 @@ public:
             switch (Phase)
             {
                 case 0:
-					if (WaitTimer == WAIT_SECS)
-						me->AI()->Talk(NPCSAY_INIT);
-
+					if (WaitTimer == WAIT_SECS) {
+						if (PlayerGUID)
+						{
+							if (Player* player = ObjectAccessor::GetPlayer(*me, PlayerGUID))
+							{
+								me->AI()->Talk(NPCSAY_INIT, player);
+							}
+						}
+					}
                     if (WaitTimer <= diff)
                     {
                         WaitTimer -= diff;
