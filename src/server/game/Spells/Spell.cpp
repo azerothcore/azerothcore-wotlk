@@ -639,6 +639,8 @@ m_caster((info->HasAttribute(SPELL_ATTR6_CAST_BY_CHARMER) && caster->GetCharmerO
 
     m_channelTargetEffectMask = 0;
 
+    m_spellFlags = SPELL_FLAG_NORMAL;
+
     // Determine if spell can be reflected back to the caster
     // Patch 1.2 notes: Spell Reflection no longer reflects abilities
     m_canReflect = m_spellInfo->DmgClass == SPELL_DAMAGE_CLASS_MAGIC && !m_spellInfo->HasAttribute(SPELL_ATTR0_ABILITY)
@@ -774,7 +776,11 @@ void Spell::SelectExplicitTargets()
                     break;
             }
             if (redirect && (redirect != target))
+            {
                 m_targets.SetUnitTarget(redirect);
+                m_spellFlags |= SPELL_FLAG_REDIRECTED;
+            }
+               
         }
     }
 }
@@ -2406,6 +2412,8 @@ void Spell::AddUnitTarget(Unit* target, uint32 effectMask, bool checkIfValid /*=
         // Increase time interval for reflected spells by 1.5
         m_caster->m_Events.AddEvent(new ReflectEvent(m_caster->GetGUID(), targetInfo.targetGUID, m_spellInfo), m_caster->m_Events.CalculateTime(targetInfo.timeDelay));
         targetInfo.timeDelay += targetInfo.timeDelay >> 1;
+
+        m_spellFlags |= SPELL_FLAG_REFLECTED;
         
         // HACK: workaround check for succubus seduction case
         // TODO: seduction should be casted only on humanoids (not demons)
@@ -2964,11 +2972,15 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
         if (effectMask & (1 << i) && m_spellInfo->Effects[i].IsUnitOwnedAuraEffect())
             aura_effmask |= 1 << i;
 
+    Unit * originalCaster = GetOriginalCaster();
+    if (!originalCaster)
+        originalCaster = m_caster;
+
     // Get Data Needed for Diminishing Returns, some effects may have multiple auras, so this must be done on spell hit, not aura add
     // Xinef: Do not increase diminishing level for self cast
     m_diminishGroup = GetDiminishingReturnsGroupForSpell(m_spellInfo, m_triggeredByAuraSpell);
     // xinef: do not increase diminish level for bosses (eg. Void Reaver silence is never diminished)
-    if (aura_effmask && m_diminishGroup && unit != m_caster && (m_caster->GetTypeId() != TYPEID_UNIT || !m_caster->ToCreature()->isWorldBoss()))
+    if (((m_spellFlags & SPELL_FLAG_REFLECTED) && !(unit->HasAuraType(SPELL_AURA_REFLECT_SPELLS))) || (aura_effmask && m_diminishGroup && unit != m_caster && (m_caster->GetTypeId() != TYPEID_UNIT || !m_caster->ToCreature()->isWorldBoss())))
     {
         m_diminishLevel = unit->GetDiminishing(m_diminishGroup);
         DiminishingReturnsType type = GetDiminishingReturnsGroupType(m_diminishGroup);
@@ -5506,7 +5518,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                 return SPELL_FAILED_NOT_INFRONT;
 
             if (m_caster->GetEntry() != WORLD_TRIGGER) // Ignore LOS for gameobjects casts (wrongly casted by a trigger)
-                if ((!m_caster->IsTotem() || !m_spellInfo->IsPositive()) && !m_spellInfo->HasAttribute(SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS) && !m_spellInfo->HasAttribute(SPELL_ATTR5_SKIP_CHECKCAST_LOS_CHECK) && !m_caster->IsWithinLOSInMap(target))
+                if ((!m_caster->IsTotem() || !m_spellInfo->IsPositive()) && !m_spellInfo->HasAttribute(SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS) && !m_spellInfo->HasAttribute(SPELL_ATTR5_SKIP_CHECKCAST_LOS_CHECK) && !m_caster->IsWithinLOSInMap(target) && !(m_spellFlags & SPELL_FLAG_REDIRECTED))
                     return SPELL_FAILED_LINE_OF_SIGHT;
         }
     }
@@ -7430,7 +7442,7 @@ bool Spell::CheckEffectTarget(Unit const* target, uint32 eff) const
                 if (target->GetGUID() != corpse->GetOwnerGUID())
                     return false;
 
-                if (!corpse->IsWithinLOSInMap(m_caster))
+                if (!corpse->IsWithinLOSInMap(m_caster) && !(m_spellFlags & SPELL_FLAG_REDIRECTED))
                     return false;
             }
             break;
