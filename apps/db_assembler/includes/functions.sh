@@ -357,7 +357,7 @@ function dbasm_import() {
     if [ $with_updates = true ]; then
         for db in ${DATABASES[@]}
         do
-            dbasm_db_import "$db" "update"
+            dbasm_db_import "$db" "updates"
         done
     fi 
 
