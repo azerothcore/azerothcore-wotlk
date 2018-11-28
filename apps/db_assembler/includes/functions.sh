@@ -135,7 +135,7 @@ function dbasm_assemble() {
 
 
     suffix_base="_base"
-    suffix_upd="_update"
+    suffix_upd="_updates"
     suffix_custom="_custom"
 
     curTime=`date +%Y_%m_%d_%H_%M_%S`
