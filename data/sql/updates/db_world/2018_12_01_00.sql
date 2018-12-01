@@ -20,7 +20,6 @@ INSERT INTO `trinity_string`(`entry`, `content_default`, `content_loc1`, `conten
 INSERT INTO `trinity_string`(`entry`, `content_default`, `content_loc1`, `content_loc2`, `content_loc3`, `content_loc4`, `content_loc5`, `content_loc6`, `content_loc7`, `content_loc8`) VALUES (35403, '├─ Muted: (Reason: %s, Time: %s, By: %s)', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO `trinity_string`(`entry`, `content_default`, `content_loc1`, `content_loc2`, `content_loc3`, `content_loc4`, `content_loc5`, `content_loc6`, `content_loc7`, `content_loc8`) VALUES (35404, '│ Account: %s (ID: %u), GMLevel: %u', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO `trinity_string`(`entry`, `content_default`, `content_loc1`, `content_loc2`, `content_loc3`, `content_loc4`, `content_loc5`, `content_loc6`, `content_loc7`, `content_loc8`) VALUES (35406, '└ Registration Email: %s - Email: %s', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO `trinity_string`(`entry`, `content_default`, `content_loc1`, `content_loc2`, `content_loc3`, `content_loc4`, `content_loc5`, `content_loc6`, `content_loc7`, `content_loc8`) VALUES (35407, '│ Map: %s, Zone: %s', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 UPDATE `trinity_string` SET `content_default` = '│ Map: %s, Zone: %s' WHERE `entry` = 848;
 UPDATE `trinity_string` SET `content_default` = '│ Mails: %d Read/%u Total' WHERE `entry` = 854;
 INSERT INTO `trinity_string`(`entry`, `content_default`) VALUES (35407, 'No reason given.');
