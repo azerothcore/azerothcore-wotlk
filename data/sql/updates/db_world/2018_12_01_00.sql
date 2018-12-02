@@ -14,11 +14,13 @@ SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '154368216494786090
 -- START UPDATING QUERIES
 --
 
+INSERT INTO version_db_world (`sql_rev`) VALUES ('1543682164947860900');
 INSERT INTO `trinity_string`(`entry`, `content_default`, `content_loc1`, `content_loc2`, `content_loc3`, `content_loc4`, `content_loc5`, `content_loc6`, `content_loc7`, `content_loc8`) VALUES (35400, '│Player %s %s (guid: %u)', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO `trinity_string`(`entry`, `content_default`, `content_loc1`, `content_loc2`, `content_loc3`, `content_loc4`, `content_loc5`, `content_loc6`, `content_loc7`, `content_loc8`) VALUES (35401, '│ GM Mode active, Phase: -1', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO `trinity_string`(`entry`, `content_default`, `content_loc1`, `content_loc2`, `content_loc3`, `content_loc4`, `content_loc5`, `content_loc6`, `content_loc7`, `content_loc8`) VALUES (35402, '├─ Banned: (Type: %s, Reason: %s, Time: %s, By: %s)', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO `trinity_string`(`entry`, `content_default`, `content_loc1`, `content_loc2`, `content_loc3`, `content_loc4`, `content_loc5`, `content_loc6`, `content_loc7`, `content_loc8`) VALUES (35403, '├─ Muted: (Reason: %s, Time: %s, By: %s)', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO `trinity_string`(`entry`, `content_default`, `content_loc1`, `content_loc2`, `content_loc3`, `content_loc4`, `content_loc5`, `content_loc6`, `content_loc7`, `content_loc8`) VALUES (35404, '│ Account: %s (ID: %u), GMLevel: %u', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO `trinity_string`(`entry`, `content_default`, `content_loc1`, `content_loc2`, `content_loc3`, `content_loc4`, `content_loc5`, `content_loc6`, `content_loc7`, `content_loc8`) VALUES (35405, '│ Last Login: %s (Failed Logins: %u)', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO `trinity_string`(`entry`, `content_default`, `content_loc1`, `content_loc2`, `content_loc3`, `content_loc4`, `content_loc5`, `content_loc6`, `content_loc7`, `content_loc8`) VALUES (35406, '└ Registration Email: %s - Email: %s', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 UPDATE `trinity_string` SET `content_default` = '│ Map: %s, Zone: %s' WHERE `entry` = 848;
 UPDATE `trinity_string` SET `content_default` = '│ Mails: %d Read/%u Total' WHERE `entry` = 854;
