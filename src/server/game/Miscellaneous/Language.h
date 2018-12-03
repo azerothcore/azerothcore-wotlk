@@ -811,8 +811,8 @@ enum TrinityStrings
     LANG_PINFO_CHR_PLAYEDTIME           = 853,
     LANG_PINFO_CHR_MAILS                = 854,
     LANG_PINFO_CHR_LEVEL_HIGH           = 871,
-    LANG_NO_REASON             			= 35407,
-    LANG_UNAUTHORIZED             		= 35408,
+    LANG_NO_REASON                      = 35407,
+    LANG_UNAUTHORIZED                   = 35408,
     LANG_PINFO_CHR_MAP_WITH_AREA        = 35409,
 
     LANG_CHARACTER_GENDER_MALE          = 855,
