@@ -1797,7 +1797,7 @@ public:
         else if (!handler->extractPlayerTarget((char*)args, &target, &targetGuid, &targetName))
             return false;
 
-		// Account data print variables
+        // Account data print variables
         std::string userName          = handler->GetTrinityString(LANG_ERROR);
         uint32 accId                  = 0;
         std::string eMail             = handler->GetTrinityString(LANG_ERROR);
@@ -1840,7 +1840,7 @@ public:
         char const* areaName    = nullptr;
         char const* zoneName    = nullptr;
 		
-	    // Guild data print variables defined so that they exist, but are not necessarily used
+        // Guild data print variables defined so that they exist, but are not necessarily used
         uint32 guildId           = 0;
         uint8 guildRankId        = 0;
         std::string guildName;
@@ -1860,13 +1860,13 @@ public:
             totalPlayerTime   = target->GetTotalPlayedTime();
             level             = target->getLevel();
             latency           = target->GetSession()->GetLatency();
-			raceid            = target->getRace();
+            raceid            = target->getRace();
             classid           = target->getClass();
             muteTime          = target->GetSession()->m_muteTime;
             mapId             = target->GetMapId();
             areaId            = target->GetAreaId();
-			alive             = target->IsAlive() ? handler->GetTrinityString(LANG_YES) : handler->GetTrinityString(LANG_NO);
-			gender            = target->getGender();
+            alive             = target->IsAlive() ? handler->GetTrinityString(LANG_YES) : handler->GetTrinityString(LANG_NO);
+            gender            = target->getGender();
             phase             = target->GetPhaseMask();
         }
         // get additional information from DB
@@ -1877,7 +1877,7 @@ public:
                 return false;
 
             // Query informations from the DB
-			stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_PINFO);
+            stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_PINFO);
             stmt->setUInt32(0, GUID_LOPART(targetGuid));
             PreparedQueryResult result = CharacterDatabase.Query(stmt);
 
@@ -1903,7 +1903,7 @@ public:
                 alive = handler->GetTrinityString(LANG_YES);
         }
 		
-		// Query the prepared statement for login data
+        // Query the prepared statement for login data
         stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_PINFO);
         stmt->setInt32(0, int32(realmID));
         stmt->setUInt32(1, accId);
