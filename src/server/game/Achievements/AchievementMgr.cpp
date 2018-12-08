@@ -493,7 +493,17 @@ void AchievementMgr::Reset()
 
 void AchievementMgr::ResetAchievementCriteria(AchievementCriteriaCondition condition, uint32 value, bool evenIfCriteriaComplete)
 {
-    AchievementCriteriaEntryList const* achievementCriteriaList = sAchievementMgr->GetAchievementCriteriaByCondition(condition, value);
+    // disable for gamemasters with GM-mode enabled
+    if (m_player->IsGameMaster())
+    {
+        sLog->outString("Not available in GM mode.");
+        ChatHandler(m_player->GetSession()).PSendSysMessage("Not available in GM mode");        
+        return;
+    }
+
+    sLog->outDebug(LOG_FILTER_ACHIEVEMENTSYS, "AchievementMgr::ResetAchievementCriteria(%u, %u, %u)", condition, value, evenIfCriteriaComplete);
+
+     AchievementCriteriaEntryList const* achievementCriteriaList = sAchievementMgr->GetAchievementCriteriaByCondition(condition, value);
     if (!achievementCriteriaList)
         return;
 
@@ -745,13 +755,24 @@ static const uint32 achievIdForDungeon[][4] =
  */
 void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, uint32 miscValue1 /*= 0*/, uint32 miscValue2 /*= 0*/, Unit* unit /*= NULL*/)
 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_ACHIEVEMENTSYS, "AchievementMgr::UpdateAchievementCriteria(%u, %u, %u)", type, miscValue1, miscValue2);
-#endif
 
     // disable for gamemasters with GM-mode enabled
     if (m_player->IsGameMaster())
+    {
+        sLog->outString("Not available in GM mode.");
+        ChatHandler(m_player->GetSession()).PSendSysMessage("Not available in GM mode");        
         return;
+    }
+
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+    if (type >= ACHIEVEMENT_CRITERIA_TYPE_TOTAL)
+    {
+        sLog->outDebug(LOG_FILTER_ACHIEVEMENTSYS, "UpdateAchievementCriteria: Wrong criteria type %u", type);
+        return;
+    }
+    
+    sLog->outDebug(LOG_FILTER_ACHIEVEMENTSYS, "AchievementMgr::UpdateAchievementCriteria(%u, %u, %u)", type, miscValue1, miscValue2);
+#endif
 
     AchievementCriteriaEntryList const* achievementCriteriaList = NULL;
 
@@ -2132,16 +2153,20 @@ void AchievementMgr::RemoveTimedAchievement(AchievementCriteriaTimedTypes type, 
 
 void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDetail("AchievementMgr::CompletedAchievement(%u)", achievement->ID);
-#endif
-
     // disable for gamemasters with GM-mode enabled
     if (m_player->IsGameMaster())
+    {
+        sLog->outString("Not available in GM mode.");
+        ChatHandler(m_player->GetSession()).PSendSysMessage("Not available in GM mode");        
         return;
+    }
 
     if (achievement->flags & ACHIEVEMENT_FLAG_COUNTER || HasAchieved(achievement->ID))
         return;
+
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+    sLog->outDetail("AchievementMgr::CompletedAchievement(%u)", achievement->ID);
+#endif
 
     SendAchievementEarned(achievement);
     CompletedAchievementData& ca = m_completedAchievements[achievement->ID];
