@@ -60,9 +60,8 @@ struct Wave
     float  x_pos;
     float  y_pos;
     float  z_pos;
-    float  o_pos;
 };
-
+	
 static Wave Wave1[] = // 22 sec
 {
     { 10447, 202.511f, -421.307f, 110.9877f },
