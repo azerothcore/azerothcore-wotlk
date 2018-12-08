@@ -187,9 +187,9 @@ public:
             instance->SetBossState(DATA_WARCHIEF_REND_BLACKHAND, NOT_STARTED);
         }
 
-        void SummonWave(Wave wave[])
+        void SummonWave(Wave* wave)
         {
-            for (uint8 i = 0; i < sizeof(wave); i++)
+            for (uint8 i = 0; i < sizeof(wave); ++i)
                 me->SummonCreature(wave[i].entry, wave[i].x_pos, wave[i].y_pos, wave[i].z_pos, M_PI);
 
             if (GameObject* waveDoor = me->GetMap()->GetGameObject(waveDoorGUID))
