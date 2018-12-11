@@ -1,3 +1,19 @@
+-- DB update 2018_12_09_00 -> 2018_12_11_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2018_12_09_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2018_12_09_00 2018_12_11_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1544365875726165400'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO version_db_world (`sql_rev`) VALUES ('1544365875726165400');
 SET @OGUID     := 5596; -- 1 free guid already exist in DB
 SET @QUEST     := 12326;
@@ -116,3 +132,12 @@ INSERT INTO `creature_text` (`entry`, `groupid`, `id`, `text`, `type`, `language
 (@ENGI, 0, 4, 'Keep the bad guys off me!', 12, 7, 100, 0, 0, 0, 26853, 0, '7th Legion Siege Engineer'),
 (@ENGI, 1, 0, '%s deftly assembles a strange machine.', 16, 7, 100, 0, 0, 0, 26856, 0, '7th Legion Siege Engineer'),
 (@ENGI, 2, 0, 'That oughta do it! Just a few more seconds now.', 12, 7, 100, 0, 0, 0, 26858, 0, '7th Legion Siege Engineer');
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
