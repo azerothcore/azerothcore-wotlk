@@ -24,13 +24,13 @@ INSERT INTO `command` (`name`, `security`, `help`) VALUES ('lookup gobject', 1, 
 
 -- Add deprecated notice
 UPDATE `command` SET `help` = '[DEPRECATED]: use ".go gobject" instead.\r\nSyntax: .go object #object_guid\r\nTeleport your character to gameobject with guid #object_guid'
-WHERE `name` = 'go object' COLLATE utf8mb4_bin;
+WHERE `name` = 'go object';
 
 UPDATE `command` SET `help` = '[DEPRECATED]: use ".lookup gobject" instead.\r\nSyntax: .go object #object_guid\r\nTeleport your character to gameobject with guid #object_guid'
-WHERE `name` = 'lookup object' COLLATE utf8mb4_bin;
+WHERE `name` = 'lookup object';
 
 UPDATE `command` SET `help` = '[DEPRECATED]: use ".list gobject" instead.\r\nSyntax: .go object #object_guid\r\nTeleport your character to gameobject with guid #object_guid'
-WHERE `name` = 'list object' COLLATE utf8mb4_bin;
+WHERE `name` = 'list object';
 
 --
 -- END UPDATING QUERIES

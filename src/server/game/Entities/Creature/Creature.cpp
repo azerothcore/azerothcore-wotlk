@@ -577,6 +577,12 @@ void Creature::Update(uint32 diff)
                 SelectVictim();
             }
 
+            Unit* owner = GetCharmerOrOwner();
+            if (IsCharmed() && !IsWithinDistInMap(owner, GetMap()->GetVisibilityRange()))
+            {
+                RemoveCharmAuras();
+            }
+
             if (!IsInEvadeMode() && IsAIEnabled)
             {
                 // do not allow the AI to be changed during update
