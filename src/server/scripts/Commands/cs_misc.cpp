@@ -1785,7 +1785,7 @@ public:
         Player* target;
         uint64 targetGuid;
         std::string targetName;
-		PreparedStatement* stmt = nullptr;
+        PreparedStatement* stmt = nullptr;
 		
         uint32 parseGUID = MAKE_NEW_GUID(atol((char*)args), 0, HIGHGUID_PLAYER);
 
@@ -1930,7 +1930,7 @@ public:
                     lastIp.append(")");
                 } **/
 				
-				uint32 ip = inet_addr(lastIp.c_str());
+                uint32 ip = inet_addr(lastIp.c_str());
 #if TRINITY_ENDIAN == BIGENDIAN
                 EndianConvertReverse(ip);
 #endif
