@@ -495,9 +495,7 @@ void AchievementMgr::ResetAchievementCriteria(AchievementCriteriaCondition condi
 {
     // disable for gamemasters with GM-mode enabled
     if (m_player->IsGameMaster())
-    {  
         return;
-    }
 
     sLog->outDebug(LOG_FILTER_ACHIEVEMENTSYS, "AchievementMgr::ResetAchievementCriteria(%u, %u, %u)", condition, value, evenIfCriteriaComplete);
 
@@ -756,9 +754,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
 
     // disable for gamemasters with GM-mode enabled
     if (m_player->IsGameMaster())
-    {  
         return;
-    }
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     if (type >= ACHIEVEMENT_CRITERIA_TYPE_TOTAL)
