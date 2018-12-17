@@ -495,15 +495,13 @@ void AchievementMgr::ResetAchievementCriteria(AchievementCriteriaCondition condi
 {
     // disable for gamemasters with GM-mode enabled
     if (m_player->IsGameMaster())
-    {
-        sLog->outString("Not available in GM mode.");
-        ChatHandler(m_player->GetSession()).PSendSysMessage("Not available in GM mode");        
+    {  
         return;
     }
 
     sLog->outDebug(LOG_FILTER_ACHIEVEMENTSYS, "AchievementMgr::ResetAchievementCriteria(%u, %u, %u)", condition, value, evenIfCriteriaComplete);
 
-     AchievementCriteriaEntryList const* achievementCriteriaList = sAchievementMgr->GetAchievementCriteriaByCondition(condition, value);
+    AchievementCriteriaEntryList const* achievementCriteriaList = sAchievementMgr->GetAchievementCriteriaByCondition(condition, value);
     if (!achievementCriteriaList)
         return;
 
@@ -758,9 +756,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
 
     // disable for gamemasters with GM-mode enabled
     if (m_player->IsGameMaster())
-    {
-        sLog->outString("Not available in GM mode.");
-        ChatHandler(m_player->GetSession()).PSendSysMessage("Not available in GM mode");        
+    {  
         return;
     }
 
