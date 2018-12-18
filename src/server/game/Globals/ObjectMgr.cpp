@@ -4082,7 +4082,7 @@ void ObjectMgr::LoadQuests()
             {
             if (!(qinfo->AllowableRaces & RACEMASK_ALL_PLAYABLE))
                 {
-                    sLog->outErrorDb("Quest %u does not contain any playable races in `RequiredRaces` (%u), value set to 0 (all races).", qinfo->GetQuestId(), qinfo->AllowableRaces);
+                    sLog->outErrorDb("Quest %u does not contain any playable races in `AllowableRaces` (%u), value set to 0 (all races).", qinfo->GetQuestId(), qinfo->AllowableRaces);
                     qinfo->AllowableRaces = 0;
                 }
             }
@@ -4189,20 +4189,20 @@ void ObjectMgr::LoadQuests()
         {
             if (!sObjectMgr->GetItemTemplate(qinfo->StartItem))
             {
-                sLog->outErrorDb("Quest %u has `SourceItemId` = %u but item with entry %u does not exist, quest can't be done.",
+                sLog->outErrorDb("Quest %u has `StartItem` = %u but item with entry %u does not exist, quest can't be done.",
                     qinfo->GetQuestId(), qinfo->StartItem, qinfo->StartItem);
                 qinfo->StartItem = 0;                       // quest can't be done for this requirement
             }
             else if (qinfo->StartItemCount == 0)
             {
-                sLog->outErrorDb("Quest %u has `SourceItemId` = %u but `SourceItemIdCount` = 0, set to 1 but need fix in DB.",
+                sLog->outErrorDb("Quest %u has `StartItem` = %u but `StartItemCount` = 0, set to 1 but need fix in DB.",
                     qinfo->GetQuestId(), qinfo->StartItem);
                 qinfo->StartItemCount = 1;                    // update to 1 for allow quest work for backward compatibility with DB
             }
         }
         else if (qinfo->StartItemCount > 0)
         {
-            sLog->outErrorDb("Quest %u has `SourceItemId` = 0 but `SourceItemIdCount` = %u, useless value.",
+            sLog->outErrorDb("Quest %u has `StartItem` = 0 but `StartItemCount` = %u, useless value.",
                 qinfo->GetQuestId(), qinfo->StartItemCount);
             qinfo->StartItemCount = 0;                          // no quest work changes in fact
         }
@@ -4397,21 +4397,21 @@ void ObjectMgr::LoadQuests()
 
             if (!spellInfo)
             {
-                sLog->outErrorDb("Quest %u has `RewardSpell` = %u but spell %u does not exist, spell removed as display reward.",
+                sLog->outErrorDb("Quest %u has `RewardDisplaySpell` = %u but spell %u does not exist, spell removed as display reward.",
                     qinfo->GetQuestId(), qinfo->RewardDisplaySpell, qinfo->RewardDisplaySpell);
                 qinfo->RewardDisplaySpell = 0;                        // no spell reward will display for this quest
             }
 
             else if (!SpellMgr::ComputeIsSpellValid(spellInfo))
             {
-                sLog->outErrorDb("Quest %u has `RewardSpell` = %u but spell %u is broken, quest will not have a spell reward.",
+                sLog->outErrorDb("Quest %u has `RewardDisplaySpell` = %u but spell %u is broken, quest will not have a spell reward.",
                     qinfo->GetQuestId(), qinfo->RewardDisplaySpell, qinfo->RewardDisplaySpell);
                 qinfo->RewardDisplaySpell = 0;                        // no spell reward will display for this quest
             }
 
             else if (GetTalentSpellCost(qinfo->RewardDisplaySpell))
             {
-                sLog->outErrorDb("Quest %u has `RewardSpell` = %u but spell %u is talent, quest will not have a spell reward.",
+                sLog->outErrorDb("Quest %u has `RewardDisplaySpell` = %u but spell %u is talent, quest will not have a spell reward.",
                     qinfo->GetQuestId(), qinfo->RewardDisplaySpell, qinfo->RewardDisplaySpell);
                 qinfo->RewardDisplaySpell = 0;                        // no spell reward will display for this quest
             }
@@ -4423,21 +4423,21 @@ void ObjectMgr::LoadQuests()
 
             if (!spellInfo)
             {
-                sLog->outErrorDb("Quest %u has `RewardSpellCast` = %u but spell %u does not exist, quest will not have a spell reward.",
+                sLog->outErrorDb("Quest %u has `RewardSpell` = %u but spell %u does not exist, quest will not have a spell reward.",
                     qinfo->GetQuestId(), qinfo->RewardSpell, qinfo->RewardSpell);
                 qinfo->RewardSpell = 0;                    // no spell will be casted on player
             }
 
             else if (!SpellMgr::ComputeIsSpellValid(spellInfo))
             {
-                sLog->outErrorDb("Quest %u has `RewardSpellCast` = %u but spell %u is broken, quest will not have a spell reward.",
+                sLog->outErrorDb("Quest %u has `RewardSpell` = %u but spell %u is broken, quest will not have a spell reward.",
                     qinfo->GetQuestId(), qinfo->RewardSpell, qinfo->RewardSpell);
                 qinfo->RewardSpell = 0;                    // no spell will be casted on player
             }
 
             else if (GetTalentSpellCost(qinfo->RewardSpell))
             {
-                sLog->outErrorDb("Quest %u has `RewardSpell` = %u but spell %u is talent, quest will not have a spell reward.",
+                sLog->outErrorDb("Quest %u has `RewardDisplaySpell` = %u but spell %u is talent, quest will not have a spell reward.",
                     qinfo->GetQuestId(), qinfo->RewardSpell, qinfo->RewardSpell);
                 qinfo->RewardSpell = 0;                    // no spell will be casted on player
             }
