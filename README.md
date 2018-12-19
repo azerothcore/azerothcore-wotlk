@@ -29,6 +29,11 @@ If you want to learn how to use C++, SQL, git, etc... you came to the right plac
 
 If you want to contribute, in [our wiki](https://github.com/azerothcore/azerothcore-wotlk/wiki) you fill find a lot of resources that will guide you. Also you can poke us in [our discord chat server](https://discord.gg/gkt4y2x).
 
+## Instructions & Support
+
+Installation instructions are available [here](https://github.com/AzerothCore/azerothcore-wotlk/wiki/Installation).
+
+For help requests, it is recommended to ask your question on [StackOverflow](https://stackoverflow.com/questions/tagged/azerothcore) and link it in [our chat](https://discordapp.com/channels/217589275766685707/284406375495368704).
 
 ## Authors & Contributors
 
