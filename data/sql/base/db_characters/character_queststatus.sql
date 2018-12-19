@@ -23,7 +23,7 @@ CREATE TABLE `character_queststatus`
   `itemcount3` smallint(5) unsigned NOT NULL DEFAULT '0',
   `itemcount4` smallint(5) unsigned NOT NULL DEFAULT '0',
   `itemcount5` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `itemcount6` smallint(5) unsigned NOT NULL DEFAULT '0'
+  `itemcount6` smallint(5) unsigned NOT NULL DEFAULT '0',
   `playercount` smallint(5) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`guid`,`quest`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Player System';
