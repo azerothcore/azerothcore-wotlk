@@ -18236,8 +18236,8 @@ bool Player::LoadFromDB(uint32 guid, SQLQueryHolder *holder)
     _LoadBrewOfTheMonth(holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_BREW_OF_THE_MONTH));
 
     // Players are immune to taunt
-    ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TAUNT, true);
-    ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_ATTACK_ME, true);
+    ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TAUNT, false);
+    ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_ATTACK_ME, false);
 
     // Init charm info
     PrepareCharmAISpells();
