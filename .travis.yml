@@ -1,6 +1,6 @@
 sudo: required
-dist: trusty # (14.04)
-# xenial (16.04) is not supported yet
+dist: xenial # (16.04)
+# bionic (18.04) is not yet available in travis
 
 language: cpp
 compiler:
