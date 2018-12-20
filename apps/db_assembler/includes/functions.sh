@@ -108,6 +108,7 @@ function dbasm_createDB() {
 		echo "Creating DB ${dbname} ..."
         dbasm_mysqlExec "$confs" "CREATE DATABASE \`${dbname}\`" ""
         dbasm_mysqlExec "$confs" "GRANT ALL PRIVILEGES ON \`${dbname}\`.* TO '${CONF_USER}'@'${MYSQL_HOST}' IDENTIFIED BY '${CONF_PASS}' WITH GRANT OPTION;"
+        echo "DB ${dbname} created"
     fi
 }
 
