@@ -10,6 +10,9 @@ addons:
   apt:
     update: true
 
+services:
+  - mysql
+
 git:
   depth: 1
 
