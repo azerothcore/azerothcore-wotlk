@@ -111,7 +111,7 @@ function dbasm_createDB() {
         echo "DB ${dbname} created"
         echo "Granting ALL privileges on DB ${dbname} for user ${CONF_USER}..."
         dbasm_mysqlExec "$confs" "FLUSH PRIVILEGES;"
-        dbasm_mysqlExec "$confs" "GRANT ALL PRIVILEGES ON \`${dbname}\`.* TO '${CONF_USER}'@'${MYSQL_HOST}' IDENTIFIED BY '${CONF_PASS}' WITH GRANT OPTION;"
+        "$DB_MYSQL_EXEC" -h "$MYSQL_HOST" -u "$CONF_USER" -e "GRANT ALL PRIVILEGES ON ${_dbname}.* TO '${MYSQL_USER}'@'${MYSQL_HOST}'  WITH GRANT OPTION;"
         echo "ALL privileges on DB ${dbname} for user ${CONF_USER} granted."
     fi
 }
