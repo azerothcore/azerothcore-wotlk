@@ -1,3 +1,19 @@
+-- DB update 2018_12_19_00 -> 2018_12_21_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2018_12_19_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2018_12_19_00 2018_12_21_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1544169970525311500'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO version_db_world (`sql_rev`) VALUES ('1544169970525311500');
 DELETE FROM `smart_scripts` WHERE `entryorguid` IN (3692, 369200, 369201);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
@@ -38,3 +54,12 @@ INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `positi
 (369200, 1, 4606.61, 2.96905, 69.909, "Volcor"),
 (369200, 2, 4612.4858, 14.2943, 69.8441, "Volcor");
 UPDATE `creature` SET `position_x`='4758.35', `position_y`='203.678', `position_z`='53.895' WHERE `guid`=37101;
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
