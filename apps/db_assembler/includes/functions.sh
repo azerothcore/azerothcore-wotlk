@@ -107,7 +107,7 @@ function dbasm_createDB() {
         echo "$dbname database exists"
     else 
 		echo "Creating DB ${dbname} ..."
-        dbasm_mysqlExec "$confs" "CREATE DATABASE \`${dbname}\`; USE DATABASE \`${dbname}\`" ""
+        dbasm_mysqlExec "$confs" "CREATE DATABASE \`${dbname}\`; USE \`${dbname}\`" ""
         echo "DB ${dbname} created"
         echo "Granting ALL privileges on DB ${dbname} for user ${CONF_USER}..."
         dbasm_mysqlExec "$confs" "FLUSH PRIVILEGES;"
