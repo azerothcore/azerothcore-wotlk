@@ -314,13 +314,13 @@ bool LootStoreItem::IsValid(LootStore const& store, uint32 entry) const
         return false;
     }
 
-    if (reference == 0)
+    if (mincount == 0)
     {
-        sLog->outErrorDb("Table '%s' Entry %d Item %d: item entry not listed in `item_template` - skipped", store.GetName(), entry, itemid);
+        sLog->outErrorDb("Table '%s' Entry %d Item %d: wrong MinCount (%d) - skipped", store.GetName(), entry, itemid, mincount);
         return false;
     }
 
-    if (reference > 0)                                  // item (quest or non-quest) entry, maybe grouped
+    if (reference == 0)                                  // item (quest or non-quest) entry, maybe grouped
     {
         ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemid);
         if (!proto)
@@ -344,7 +344,7 @@ bool LootStoreItem::IsValid(LootStore const& store, uint32 entry) const
 
         if (maxcount < mincount)                       // wrong max count
         {
-            sLog->outErrorDb("Table '%s' entry %d item %d: max count (%u) less that min count (%i) - skipped", store.GetName(), entry, itemid, int32(maxcount), mincountOrRef);
+            sLog->outErrorDb("Table '%s' Entry %d Item %d: MaxCount (%u) less that MinCount (%i) - skipped", store.GetName(), entry, itemid, int32(maxcount), mincount);
             return false;
         }
     }
