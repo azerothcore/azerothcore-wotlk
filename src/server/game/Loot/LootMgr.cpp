@@ -310,7 +310,7 @@ bool LootStoreItem::IsValid(LootStore const& store, uint32 entry) const
 {
     if (groupid >= 1 << 7)                                     // it stored in 7 bit field
     {
-        sLog->outErrorDb("Table '%s' Entry %d Item %d: GroupId (%u) must be less %u - skipped", store.GetName(), entry, item, groupid, 1 << 7);
+        sLog->outErrorDb("Table '%s' Entry %d Item %d: GroupId (%u) must be less %u - skipped", store.GetName(), entry, itemid, groupid, 1 << 7);
         return false;
     }
 
