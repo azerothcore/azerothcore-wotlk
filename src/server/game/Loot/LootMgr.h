@@ -127,8 +127,8 @@ struct LootStoreItem
     // Constructor
     // displayid is filled in IsValid() which must be called after
     LootStoreItem(uint32 _itemid, uint32 _reference, float _chance, bool _needs_quest, uint16 _lootmode, uint8 _groupid, int32 _mincount, uint8 _maxcount)
-        : itemid(_itemid), reference(_reference), chance(_chance), lootmode(_lootmode),
-        needs_quest(_needs_quest), groupid(_groupid), mincount(_mincount), maxcount(_maxcount)
+        : itemid(_itemid), reference(_reference), chance(_chance), needs_quest(_needs_quest), 
+        lootmode(_lootmode), groupid(_groupid), mincount(_mincount), maxcount(_maxcount)
          {}
 
     bool Roll(bool rate, Player const *player, Loot& loot, LootStore const& store) const;                             // Checks if the entry takes it's chance (at loot generation)
@@ -204,6 +204,7 @@ class LootStore
         void Verify() const;
         void CheckLootRefs(LootIdSet* ref_set = NULL) const; // check existence reference and remove it from ref_set
         void ReportUnusedIds(LootIdSet const& ids_set) const;
+        void ReportNonExistingId(uint32 lootId) const;
         void ReportNonExistingId(uint32 id) const;
 
         bool HaveLootFor(uint32 loot_id) const { return m_LootTemplates.find(loot_id) != m_LootTemplates.end(); }
