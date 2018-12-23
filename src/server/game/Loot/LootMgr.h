@@ -205,7 +205,6 @@ class LootStore
         void CheckLootRefs(LootIdSet* ref_set = NULL) const; // check existence reference and remove it from ref_set
         void ReportUnusedIds(LootIdSet const& ids_set) const;
         void ReportNonExistingId(uint32 lootId) const;
-        void ReportNonExistingId(uint32 id) const;
 
         bool HaveLootFor(uint32 loot_id) const { return m_LootTemplates.find(loot_id) != m_LootTemplates.end(); }
         bool HaveQuestLootFor(uint32 loot_id) const;
