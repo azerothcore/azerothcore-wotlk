@@ -274,6 +274,7 @@ void LootStore::ReportNonExistingId(uint32 lootId) const
 {
     sLog->outErrorDb("Table '%s' Entry %d does not exist", GetName(), lootId);
 }
+
 void LootStore::ReportNonExistingId(uint32 lootId, const char* ownerType, uint32 ownerId) const
 {
     sLog->outErrorDb("Table '%s' Entry %d does not exist but it is used by %s %d", GetName(), lootId, ownerType, ownerId);
@@ -309,7 +310,7 @@ bool LootStoreItem::IsValid(LootStore const& store, uint32 entry) const
 {
     if (groupid >= 1 << 7)                                     // it stored in 7 bit field
     {
-        sLog->outErrorDb("Table '%s' Entry %d Item %d: GroupId (%u) must be less %u - skipped", GetName(), entry, item, groupid, 1 << 7);
+        sLog->outErrorDb("Table '%s' Entry %d Item %d: GroupId (%u) must be less %u - skipped", store.GetName(), entry, item, groupid, 1 << 7);
         return false;
     }
 
