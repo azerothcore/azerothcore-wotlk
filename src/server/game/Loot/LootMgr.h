@@ -121,7 +121,7 @@ struct LootStoreItem
     uint16  lootmode;
     uint8   groupid     : 7;
     uint8   mincount;                                       // mincount for drop items
-    uint8   maxcount    : 8;                                // max drop count for the item mincount or Ref multiplicator
+    uint8   maxcount;                                       // max drop count for the item mincount or Ref multiplicator
     ConditionList conditions;                               // additional loot condition
 
     // Constructor
