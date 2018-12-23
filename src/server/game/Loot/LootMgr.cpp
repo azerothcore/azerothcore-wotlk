@@ -270,11 +270,6 @@ void LootStore::ReportUnusedIds(LootIdSet const& lootIdSet) const
         sLog->outErrorDb("Table '%s' Entry %d isn't %s and not referenced from loot, and thus useless.", GetName(), *itr, GetEntryName());
 }
 
-void LootStore::ReportNonExistingId(uint32 lootId) const
-{
-    sLog->outErrorDb("Table '%s' Entry %d does not exist", GetName(), lootId);
-}
-
 void LootStore::ReportNonExistingId(uint32 lootId, const char* ownerType, uint32 ownerId) const
 {
     sLog->outErrorDb("Table '%s' Entry %d (%s) does not exist but is used as loot id in DB.", GetName(), id, GetEntryName());
