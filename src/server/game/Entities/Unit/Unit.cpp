@@ -178,6 +178,7 @@ i_motionMaster(new MotionMaster(this)), m_regenTimer(0), m_ThreatManager(this), 
     m_rootTimes = 0;
 
     m_state = 0;
+    m_petCatchUp = false;
     m_deathState = ALIVE;
 
     for (uint8 i = 0; i < CURRENT_MAX_SPELL; ++i)
@@ -13093,8 +13094,43 @@ void Unit::UpdateSpeed(UnitMoveType mtype, bool forced)
                 Unit* pOwner = GetCharmerOrOwner();
                 if (pOwner && !IsInCombat() && !IsVehicle() && !HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED) && (IsPet() || IsGuardian() || GetGUID() == pOwner->GetCritterGUID() || GetCharmerGUID() == pOwner->GetGUID()))
                 {
-                    if (speed < pOwner->GetSpeedRate(mtype)+0.1f)
-                        speed = pOwner->GetSpeedRate(mtype)+0.1f; // pets derive speed from owner when not in combat
+                    if (pOwner->GetTypeId() != TYPEID_PLAYER)
+                    {
+                        if (speed < pOwner->GetSpeedRate(mtype)+0.1f)
+                            speed = pOwner->GetSpeedRate(mtype)+0.1f; // pets derive speed from owner when not in combat
+                    }
+                    else
+                    {
+                        // special treatment for player pets in order to avoid stuttering
+                        float ownerSpeed = pOwner->GetSpeedRate(mtype);
+
+                        if (ToCreature()->GetCreatureType() == CREATURE_TYPE_NON_COMBAT_PET)
+                        {
+                            // vanity pets have to be treated different than normal pets
+                            if (GetDistance(pOwner) < 5.0f && m_petCatchUp)
+                                m_petCatchUp = false;
+
+                            if (GetDistance(pOwner) > 10.0f && !m_petCatchUp)
+                                m_petCatchUp = true;
+
+                            if (m_petCatchUp)
+                            {
+                                if (GetDistance(pOwner) > 20.0f)
+                                    speed = ownerSpeed*2.0f;
+                                else
+                                    speed = ownerSpeed*1.05f;
+                            }
+                            else
+                                speed = ownerSpeed*0.95f;
+                        }
+                        else
+                        {
+                            if (ToCreature()->IsWithinMeleeRange(pOwner))
+                                speed = ownerSpeed;
+                            else
+                                speed = ownerSpeed*1.05f;
+                        }
+                    }
                 }
                 else
                     speed *= ToCreature()->GetCreatureTemplate()->speed_run;    // at this point, MOVE_WALK is never reached
