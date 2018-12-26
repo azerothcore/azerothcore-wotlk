@@ -488,10 +488,12 @@ void WorldSession::HandleMovementOpcodes(WorldPacket & recvData)
                 else if (!plrMover->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_IS_OUT_OF_BOUNDS))
                 {
                     WorldSafeLocsEntry const* grave = sObjectMgr->GetClosestGraveyard(plrMover->GetPositionX(), plrMover->GetPositionY(), plrMover->GetPositionZ(), plrMover->GetMapId(), plrMover->GetTeamId());
-
-                    if ( grave)
+                    
+                    if (grave)
+                    {
                         plrMover->TeleportTo(grave->map_id, grave->x, grave->y, grave->z, plrMover->GetOrientation());
-                    plrMover->Relocate(grave->x, grave->y, grave->z, plrMover->GetOrientation());
+                        plrMover->Relocate(grave->x, grave->y, grave->z, plrMover->GetOrientation());
+                    }
                 }
 
                 plrMover->StopMovingOnCurrentPos(); // pussywizard: moving corpse can't release spirit
