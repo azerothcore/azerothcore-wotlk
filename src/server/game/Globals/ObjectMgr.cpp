@@ -4858,8 +4858,9 @@ void ObjectMgr::LoadScripts(ScriptsType type)
             {
                 if (!sSpellMgr->GetSpellInfo(tmp.CastSpell.SpellID))
                 {
-                    sLog->outErrorDb("Table `%s` using non-existent spell (id: %u) in SCRIPT_COMMAND_CAST_SPELL for script id %u",
-                        tableName.c_str(), tmp.CastSpell.SpellID, tmp.id);
+                    // TODO: disabled due to https://github.com/azerothcore/azerothcore-wotlk/issues/1152
+                    // sLog->outErrorDb("Table `%s` using non-existent spell (id: %u) in SCRIPT_COMMAND_CAST_SPELL for script id %u",
+                    //    tableName.c_str(), tmp.CastSpell.SpellID, tmp.id);
                     continue;
                 }
                 if (tmp.CastSpell.Flags > 4)                      // targeting type
