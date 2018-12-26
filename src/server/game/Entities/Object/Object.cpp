@@ -41,6 +41,11 @@
 #include "Chat.h"
 #include "DynamicVisibility.h"
 
+#ifdef ELUNA
+#include "LuaEngine.h"
+#include "ElunaEventMgr.h"
+#endif
+
 uint32 GuidHigh2TypeId(uint32 guid_hi)
 {
     switch (guid_hi)
@@ -71,13 +76,16 @@ Object::Object() : m_PackGUID(sizeof(uint64)+1)
     m_inWorld           = false;
     m_objectUpdated     = false;
 
-    CustomData.Set("base",new DataMap::Base); // avoid crash when access not initialized CustomData
-
     m_PackGUID.appendPackGUID(0);
 }
 
 WorldObject::~WorldObject()
 {
+#ifdef ELUNA
+    delete elunaEvents;
+    elunaEvents = NULL;
+#endif
+
     // this may happen because there are many !create/delete
     if (IsWorldObject() && m_currMap)
     {
@@ -957,6 +965,9 @@ void MovementInfo::OutDebug()
 }
 
 WorldObject::WorldObject(bool isWorldObject) : WorldLocation(), LastUsedScriptID(0),
+#ifdef ELUNA
+elunaEvents(NULL),
+#endif
 m_name(""), m_isActive(false), m_isWorldObject(isWorldObject), m_zoneScript(NULL),
 m_transport(NULL), m_currMap(NULL), m_InstanceId(0),
 m_phaseMask(PHASEMASK_NORMAL), m_notifyflags(0), m_executed_notifies(0)
@@ -964,6 +975,13 @@ m_phaseMask(PHASEMASK_NORMAL), m_notifyflags(0), m_executed_notifies(0)
     m_serverSideVisibility.SetValue(SERVERSIDE_VISIBILITY_GHOST, GHOST_VISIBILITY_ALIVE | GHOST_VISIBILITY_GHOST);
     m_serverSideVisibilityDetect.SetValue(SERVERSIDE_VISIBILITY_GHOST, GHOST_VISIBILITY_ALIVE);
 }
+
+#ifdef ELUNA
+void WorldObject::Update(uint32 time_diff)
+{
+    elunaEvents->Update(time_diff);
+}
+#endif
 
 void WorldObject::SetWorldObject(bool on)
 { 
@@ -1533,8 +1551,8 @@ float WorldObject::GetSightRange(const WorldObject* target) const
     return 0.0f;
 }
 
-bool WorldObject::CanSeeOrDetect(WorldObject const* obj, bool ignoreStealth, bool distanceCheck) const
-{ 
+bool WorldObject::CanSeeOrDetect(WorldObject const* obj, bool ignoreStealth, bool distanceCheck, bool checkAlert) const
+{
     if (this == obj)
         return true;
 
@@ -1629,12 +1647,12 @@ bool WorldObject::CanSeeOrDetect(WorldObject const* obj, bool ignoreStealth, boo
     if (obj->IsInvisibleDueToDespawn())
         return false;
 
-     // pussywizard: arena spectator
+    // pussywizard: arena spectator
     if (this->GetTypeId() == TYPEID_PLAYER)
         if (((const Player*)this)->IsSpectator() && ((const Player*)this)->FindMap()->IsBattleArena() && (obj->m_invisibility.GetFlags() || obj->m_stealth.GetFlags()))
             return false;
 
-    if (!CanDetect(obj, ignoreStealth, !distanceCheck))
+    if (!CanDetect(obj, ignoreStealth, !distanceCheck, checkAlert))
         return false;
 
     return true;
@@ -1647,7 +1665,7 @@ bool WorldObject::CanNeverSee(WorldObject const* obj) const
     return GetMap() != obj->GetMap() || !InSamePhase(obj);
 }
 
-bool WorldObject::CanDetect(WorldObject const* obj, bool ignoreStealth, bool checkClient) const
+bool WorldObject::CanDetect(WorldObject const* obj, bool ignoreStealth, bool checkClient, bool checkAlert) const
 { 
     const WorldObject* seer = this;
 
@@ -1664,7 +1682,7 @@ bool WorldObject::CanDetect(WorldObject const* obj, bool ignoreStealth, bool che
         if (!seer->CanDetectInvisibilityOf(obj)) // xinef: added ignoreStealth, allow AoE spells to hit invisible targets!
             return false;
 
-        if (!seer->CanDetectStealthOf(obj))
+        if (!seer->CanDetectStealthOf(obj, checkAlert))
         {
             // xinef: ignore units players have at client, this cant be cheated!
             if (checkClient)
@@ -1722,7 +1740,7 @@ bool WorldObject::CanDetectInvisibilityOf(WorldObject const* obj) const
     return true;
 }
 
-bool WorldObject::CanDetectStealthOf(WorldObject const* obj) const
+bool WorldObject::CanDetectStealthOf(WorldObject const* obj, bool checkAlert) const
 { 
     // Combat reach is the minimal distance (both in front and behind),
     //   and it is also used in the range calculation.
@@ -1779,8 +1797,21 @@ bool WorldObject::CanDetectStealthOf(WorldObject const* obj) const
         // Calculate max distance
         float visibilityRange = float(detectionValue) * 0.3f + combatReach;
 
-        if (visibilityRange > MAX_PLAYER_STEALTH_DETECT_RANGE)
+        Unit const* unit = ToUnit();
+
+        // If this unit is an NPC then player detect range doesn't apply
+        if (unit && unit->GetTypeId() == TYPEID_PLAYER && visibilityRange > MAX_PLAYER_STEALTH_DETECT_RANGE)
             visibilityRange = MAX_PLAYER_STEALTH_DETECT_RANGE;
+
+        if (checkAlert)
+            visibilityRange += (visibilityRange * 0.08f) + 1.5f;
+
+
+        Unit const* targetUnit = obj->ToUnit();
+
+        // If checking for alert, and creature's visibility range is greater than aggro distance, No alert
+        if (checkAlert && unit && unit->ToCreature() && visibilityRange >= unit->ToCreature()->GetAttackDistance(targetUnit) + unit->ToCreature()->m_CombatDistance)
+            return false;
 
         if (distance > visibilityRange)
             return false;
@@ -1990,6 +2021,13 @@ void WorldObject::SetMap(Map* map)
     m_currMap = map;
     m_mapId = map->GetId();
     m_InstanceId = map->GetInstanceId();
+
+#ifdef ELUNA
+    delete elunaEvents;
+    // On multithread replace this with a pointer to map's Eluna pointer stored in a map
+    elunaEvents = new ElunaEventProcessor(&Eluna::GEluna, this);
+#endif
+
     if (IsWorldObject())
         m_currMap->AddWorldObject(this);
 }
@@ -2000,6 +2038,12 @@ void WorldObject::ResetMap()
     ASSERT(!IsInWorld());
     if (IsWorldObject())
         m_currMap->RemoveWorldObject(this);
+
+#ifdef ELUNA
+    delete elunaEvents;
+    elunaEvents = NULL;
+#endif
+
     m_currMap = NULL;
     //maybe not for corpse
     //m_mapId = 0;

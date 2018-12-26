@@ -32,7 +32,9 @@
 #include "BattlegroundRV.h"
 #include "Transport.h"
 #include "ScriptMgr.h"
-
+#ifdef ELUNA
+#include "LuaEngine.h"
+#endif
 namespace Trinity
 {
     class BattlegroundChatBuilder
@@ -201,6 +203,10 @@ Battleground::~Battleground()
     for (uint32 i = 0; i < size; ++i)
         DelObject(i);
 
+#ifdef ELUNA
+    sEluna->OnBGDestroy(this, GetBgTypeID(), GetInstanceID());
+#endif
+
     sBattlegroundMgr->RemoveBattleground(GetBgTypeID(), GetInstanceID());
     // unload map
     if (m_Map)
@@ -275,6 +281,8 @@ void Battleground::Update(uint32 diff)
     m_ResetStatTimer += diff;
 
     PostUpdateImpl(diff);
+
+    sScriptMgr->OnBattlegroundUpdate(this, diff);
 }
 
 inline void Battleground::_CheckSafePositions(uint32 diff)
@@ -493,6 +501,10 @@ inline void Battleground::_ProcessJoin(uint32 diff)
 
         StartingEventOpenDoors();
 
+#ifdef ELUNA
+        sEluna->OnBGStart(this, GetBgTypeID(), GetInstanceID());
+#endif
+
         SendWarningToAll(StartMessageIds[BG_STARTING_EVENT_FOURTH]);
         SetStatus(STATUS_IN_PROGRESS);
         SetStartDelayTime(StartDelayTimes[BG_STARTING_EVENT_FOURTH]);
@@ -571,6 +583,8 @@ inline void Battleground::_ProcessJoin(uint32 diff)
             // Announce BG starting
             if (sWorld->getBoolConfig(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_ENABLE))
                 sWorld->SendWorldText(LANG_BG_STARTED_ANNOUNCE_WORLD, GetName(), std::min(GetMinLevel(), (uint32)80), std::min(GetMaxLevel(), (uint32)80));
+
+            sScriptMgr->OnBattlegroundStart(this);
         }
     }
 }
@@ -964,6 +978,8 @@ void Battleground::EndBattleground(TeamId winnerTeamId)
         uint32 loser_kills = player->GetRandomWinner() ? BG_REWARD_LOSER_HONOR_LAST : BG_REWARD_LOSER_HONOR_FIRST;
         uint32 winner_arena = player->GetRandomWinner() ? BG_REWARD_WINNER_ARENA_LAST : BG_REWARD_WINNER_ARENA_FIRST;
 
+        sScriptMgr->OnBattlegroundEndReward(this, player, winnerTeamId);
+
         // Reward winner team
         if (bgTeamId == winnerTeamId)
         {
@@ -1037,6 +1053,10 @@ void Battleground::EndBattleground(TeamId winnerTeamId)
 
     if (winmsg_id)
         SendMessageToAll(winmsg_id, CHAT_MSG_BG_SYSTEM_NEUTRAL);
+
+#ifdef ELUNA
+    sEluna->OnBGEnd(this, GetBgTypeID(), GetInstanceID(), winnerTeamId);
+#endif
 }
 
 uint32 Battleground::GetBonusHonorFromKill(uint32 kills) const
@@ -1238,6 +1258,8 @@ void Battleground::AddPlayer(Player* player)
     // setup BG group membership
     PlayerAddedToBGCheckIfBGIsRunning(player);
     AddOrSetPlayerToCorrectBgGroup(player, teamId);
+
+    sScriptMgr->OnBattlegroundAddPlayer(this, player);
 
     // Log
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)

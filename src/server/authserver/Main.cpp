@@ -23,7 +23,7 @@
 #include "Database/DatabaseEnv.h"
 #include "Configuration/Config.h"
 #include "Log.h"
-#include "SystemConfig.h"
+#include "GitRevision.h"
 #include "Util.h"
 #include "SignalHandler.h"
 #include "RealmList.h"
@@ -106,7 +106,7 @@ extern int main(int argc, char** argv)
         printf("Verify that the file exists and has \'[authserver]\' written in the top of the file!\n");
     }
 
-    sLog->outString("%s (authserver)", _FULLVERSION);
+    sLog->outString("%s (authserver)", GitRevision::GetFullVersion());
     sLog->outString("<Ctrl-C> to stop.\n");
 
     sLog->outString("   █████╗ ███████╗███████╗██████╗  ██████╗ ████████╗██╗  ██╗");           
@@ -114,9 +114,9 @@ extern int main(int argc, char** argv)
     sLog->outString("  ███████║  ███╔╝ █████╗  ██████╔╝██║   ██║   ██║   ███████║");           
     sLog->outString("  ██╔══██║ ███╔╝  ██╔══╝  ██╔══██╗██║   ██║   ██║   ██╔══██║");           
     sLog->outString("  ██║  ██║███████╗███████╗██║  ██║╚██████╔╝   ██║   ██║  ██║");           
-    sLog->outString("  ╚═╝  ╚═╝╚══════╝╚══════╝╚═╝  ╚═╝ ╚═════╝    ╚═╝   ╚═╝  ╚═╝");                                                                
+    sLog->outString("  ╚═╝  ╚═╝╚══════╝╚══════╝╚═╝  ╚═╝ ╚═════╝    ╚═╝   ╚═╝  ╚═╝");
     sLog->outString("                                ██████╗ ██████╗ ██████╗ ███████╗");
-    sLog->outString("                                ██╔════╝██╔═══██╗██╔══██╗██╔════╝");
+    sLog->outString("                                ██╔════╝██╔═══██╗██╔══██╗██╔═══╝");
     sLog->outString("                                ██║     ██║   ██║██████╔╝█████╗");  
     sLog->outString("                                ██║     ██║   ██║██╔══██╗██╔══╝");  
     sLog->outString("                                ╚██████╗╚██████╔╝██║  ██║███████╗");

@@ -9,6 +9,7 @@
 #include "LFGMgr.h"
 #include "PassiveAI.h"
 #include "Group.h"
+#include "CellImpl.h"
 
 ///////////////////////////////////////
 ////// ITEMS FIXES, BASIC STUFF
@@ -661,9 +662,15 @@ class npc_hallows_end_soh : public CreatureScript
                             return;
                         }
                         if (counter == 5)
+                        {
                             me->MonsterYell("The sky is dark. The fire burns. You strive in vain as Fate's wheel turns.", LANG_UNIVERSAL, 0);
+                            me->PlayDirectSound(12570);
+                        }
                         else if (counter == 10)
+                        {
                             me->MonsterYell("The town still burns. A cleansing fire! Time is short, I'll soon retire!", LANG_UNIVERSAL, 0);
+                            me->PlayDirectSound(12571);
+                        }
 
                         if (Unit* trigger = getTrigger())
                             me->CastSpell(trigger, SPELL_START_FIRE, true);

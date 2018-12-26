@@ -96,7 +96,15 @@ void npc_escortAI::MoveInLineOfSight(Unit* who)
             return;
 
     if (me->CanStartAttack(who))
+    {
+        if (me->HasUnitState(UNIT_STATE_DISTRACTED))
+        {
+            me->ClearUnitState(UNIT_STATE_DISTRACTED);
+            me->GetMotionMaster()->Clear();
+        }
         AttackStart(who);
+    }
+
 }
 
 void npc_escortAI::JustDied(Unit* /*killer*/)

@@ -130,11 +130,19 @@ public:
             { "stop",           SEC_GAMEMASTER,     false, &HandleNpcUnFollowCommand,          "" },
             { "",               SEC_GAMEMASTER,     false, &HandleNpcFollowCommand,            "" }
         };
+
+        static std::vector<ChatCommand> npcFactionCommandTable =
+        {
+            { "permanent",      SEC_ADMINISTRATOR,  false, &HandleNpcSetFactionIdCommand,      "" },
+            { "temp",           SEC_ADMINISTRATOR,  false, &HandleNpcSetFactionTempIdCommand,  "" },
+            { "original",       SEC_ADMINISTRATOR,  false, &HandleNpcSetOriginalFaction,       "" }
+        };
+
         static std::vector<ChatCommand> npcSetCommandTable =
         {
             { "allowmove",      SEC_ADMINISTRATOR,  false, &HandleNpcSetAllowMovementCommand,  "" },
             { "entry",          SEC_ADMINISTRATOR,  false, &HandleNpcSetEntryCommand,          "" },
-            { "factionid",      SEC_ADMINISTRATOR,  false, &HandleNpcSetFactionIdCommand,      "" },
+            { "faction",        SEC_ADMINISTRATOR,  false, nullptr,                            "", npcFactionCommandTable},
             { "flag",           SEC_ADMINISTRATOR,  false, &HandleNpcSetFlagCommand,           "" },
             { "level",          SEC_ADMINISTRATOR,  false, &HandleNpcSetLevelCommand,          "" },
             { "link",           SEC_ADMINISTRATOR,  false, &HandleNpcSetLinkCommand,           "" },
@@ -564,6 +572,46 @@ public:
         stmt->setUInt32(1, creature->GetEntry());
 
         WorldDatabase.Execute(stmt);
+
+        return true;
+    }
+
+    //set tempfaction for creature
+    static bool HandleNpcSetFactionTempIdCommand(ChatHandler* handler, const char* args)
+    {
+        Player* me = handler->GetSession()->GetPlayer();
+        Unit* SelectedCreature = me->GetSelectedUnit();
+
+        if (!SelectedCreature)
+            return false;
+
+        Creature* creature = SelectedCreature->ToCreature();
+
+        if (!creature)
+            return false;
+
+        if (!*args)
+            return false;
+
+        uint32 tempfaction = (uint32)atoi((char*)args);
+
+        creature->setFaction(tempfaction);
+        return true;
+    }
+
+    //set orginal faction for npc
+    static bool HandleNpcSetOriginalFaction(ChatHandler* handler, const char* /*args*/)
+    {
+        Player* me = handler->GetSession()->GetPlayer();
+        Creature* creature = me->GetSelectedUnit()->ToCreature();
+
+        if (!me)
+            return false;
+
+        if (!creature)
+            return false;
+
+        creature->RestoreFaction();
 
         return true;
     }

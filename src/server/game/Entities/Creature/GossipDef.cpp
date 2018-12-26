@@ -344,10 +344,10 @@ void PlayerMenu::SendQuestGiverStatus(uint8 questStatus, uint64 npcGUID) const
 
 void PlayerMenu::SendQuestGiverQuestDetails(Quest const* quest, uint64 npcGUID, bool activateAccept) const
 {
-	std::string questTitle = quest->GetTitle();
-	std::string questDetails = quest->GetDetails();
-	std::string questObjectives = quest->GetObjectives();
-	std::string questEndText = quest->GetEndText();
+	std::string questTitle           = quest->GetTitle();
+	std::string questDetails         = quest->GetDetails();
+	std::string questObjectives      = quest->GetObjectives();
+	std::string questAreaDescription = quest->GetAreaDescription();
 
 	int32 locale = _session->GetSessionDbLocaleIndex();
 	if (locale >= 0)
@@ -357,7 +357,7 @@ void PlayerMenu::SendQuestGiverQuestDetails(Quest const* quest, uint64 npcGUID, 
             ObjectMgr::GetLocaleString(localeData->Title, locale, questTitle);
             ObjectMgr::GetLocaleString(localeData->Details, locale, questDetails);
             ObjectMgr::GetLocaleString(localeData->Objectives, locale, questObjectives);
-            ObjectMgr::GetLocaleString(localeData->EndText, locale, questEndText);
+            ObjectMgr::GetLocaleString(localeData->AreaDescription, locale, questAreaDescription);
         }
 	}
 	
@@ -451,11 +451,11 @@ void PlayerMenu::SendQuestGiverQuestDetails(Quest const* quest, uint64 npcGUID, 
 
 void PlayerMenu::SendQuestQueryResponse(Quest const* quest) const
 {
-    std::string questTitle = quest->GetTitle();
-    std::string questDetails = quest->GetDetails();
-    std::string questObjectives = quest->GetObjectives();
-    std::string questEndText = quest->GetEndText();
-    std::string questCompletedText = quest->GetCompletedText();
+    std::string questTitle           = quest->GetTitle();
+    std::string questDetails         = quest->GetDetails();
+    std::string questObjectives      = quest->GetObjectives();
+    std::string questAreaDescription = quest->GetAreaDescription();
+    std::string questCompletedText   = quest->GetCompletedText();
 
     std::string questObjectiveText[QUEST_OBJECTIVES_COUNT];
     for (uint8 i = 0; i < QUEST_OBJECTIVES_COUNT; ++i)
@@ -469,7 +469,7 @@ void PlayerMenu::SendQuestQueryResponse(Quest const* quest) const
             ObjectMgr::GetLocaleString(localeData->Title, locale, questTitle);
             ObjectMgr::GetLocaleString(localeData->Details, locale, questDetails);
             ObjectMgr::GetLocaleString(localeData->Objectives, locale, questObjectives);
-            ObjectMgr::GetLocaleString(localeData->EndText, locale, questEndText);
+            ObjectMgr::GetLocaleString(localeData->AreaDescription, locale, questAreaDescription);
             ObjectMgr::GetLocaleString(localeData->CompletedText, locale, questCompletedText);
 
             for (uint8 i = 0; i < QUEST_OBJECTIVES_COUNT; ++i)
@@ -547,15 +547,15 @@ void PlayerMenu::SendQuestQueryResponse(Quest const* quest) const
     for (uint8 i = 0; i < QUEST_REPUTATIONS_COUNT; ++i)        // unk (0)
         data << int32(quest->RewardFactionValueIdOverride[i]);
 
-    data << uint32(quest->GetPointMapId());
-    data << float(quest->GetPointX());
-    data << float(quest->GetPointY());
+    data << uint32(quest->GetPOIContinent());
+    data << float(quest->GetPOIx());
+    data << float(quest->GetPOIy());
     data << uint32(quest->GetPointOpt());
 
     data << questTitle;
     data << questObjectives;
     data << questDetails;
-    data << questEndText;
+    data << questAreaDescription;
     data << questCompletedText;                                 // display in quest objectives window once all objectives are completed
 
     for (uint8 i = 0; i < QUEST_OBJECTIVES_COUNT; ++i)
@@ -566,7 +566,7 @@ void PlayerMenu::SendQuestQueryResponse(Quest const* quest) const
             data << uint32(quest->RequiredNpcOrGo[i]);
 
         data << uint32(quest->RequiredNpcOrGoCount[i]);
-        data << uint32(quest->RequiredSourceItemId[i]);
+        data << uint32(quest->ItemDrop[i]);
         data << uint32(0);                                  // req source count?
     }
 

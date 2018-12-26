@@ -391,6 +391,8 @@ void LFGMgr::InitializeLockedDungeons(Player* player, uint8 level /* = 0 */)
             lockData = LFG_LOCKSTATUS_INSUFFICIENT_EXPANSION;
         else if (DisableMgr::IsDisabledFor(DISABLE_TYPE_MAP, dungeon->map, player))
             lockData = LFG_LOCKSTATUS_RAID_LOCKED;
+        else if (DisableMgr::IsDisabledFor(DISABLE_TYPE_LFG_MAP, dungeon->map, player))
+            lockData = LFG_LOCKSTATUS_RAID_LOCKED;
         else if (dungeon->difficulty > DUNGEON_DIFFICULTY_NORMAL && (!mapEntry || !mapEntry->IsRaid()) && sInstanceSaveMgr->PlayerIsPermBoundToInstance(player->GetGUIDLow(), dungeon->map, Difficulty(dungeon->difficulty)))
             lockData = LFG_LOCKSTATUS_RAID_LOCKED;
         else if (dungeon->minlevel > level)
@@ -495,10 +497,11 @@ void LFGMgr::JoinLfg(Player* player, uint8 roles, LfgDungeonSet& dungeons, const
         case LFG_STATE_PROPOSAL: // if joining again during proposal
             joinData.result = LFG_JOIN_INTERNAL_ERROR;
             break;
-        case LFG_STATE_FINISHED_DUNGEON:
+        /*case LFG_STATE_FINISHED_DUNGEON:
             if (grp && grp->isLFGGroup())
                 joinData.result = LFG_JOIN_PARTY_NOT_MEET_REQS;
             break;
+        */
         default:
             break;
     }

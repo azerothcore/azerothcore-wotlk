@@ -1,5 +1,5 @@
 ###############################################
-# Trinity Core Auth Server configuration file #
+# AzerothCore Auth Server configuration file #
 ###############################################
 [authserver]
 
@@ -181,8 +181,11 @@ DBLogLevel = 1
 #
 #    UseProcessors
 #        Description: Processors mask for Windows and Linux based multi-processor systems.
-#        Example:     A computer with 2 CPUs:
-#                     1 - 1st CPU only, 2 - 2nd CPU only, 3 - 1st and 2nd CPU, because 1 | 2 is 3
+#        Example:  For a computer with 3 CPUs:
+#                     1 - 1st CPU only
+#                     2 - 2nd CPU only
+#                     4 - 3rd CPU only
+#                     6 - 2nd + 3rd CPUs, because "2 | 4" -> 6
 #        Default:     0  - (Selected by OS)
 #                     1+ - (Bit mask value of selected processors)
 
@@ -255,6 +258,14 @@ LoginDatabaseInfo = "127.0.0.1;3306;acore;acore;acore_auth"
 #        Default:     1
 
 LoginDatabase.WorkerThreads = 1
+
+#
+#    LoginDatabase.SynchThreads
+#        Description: The amount of MySQL connections spawned to handle.
+#        Default:     1 - (LoginDatabase.WorkerThreads)
+#
+
+LoginDatabase.SynchThreads = 1
 
 #
 ###################################################################################################

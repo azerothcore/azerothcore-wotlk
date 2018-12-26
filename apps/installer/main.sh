@@ -4,75 +4,90 @@ CURRENT_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 source "$CURRENT_PATH/includes/includes.sh"
 
-cmdopt=$1
-
-while true
-do
-echo "=====     INSTALLER SCRIPT     ====="
-PS3='Please enter your choice: '
+PS3='[Please enter your choice]: '
 options=(
-    "First Installation" "Configure OS dep" "Update Repository" "Reset & Clean Repository"
-    "Compile" "Clean & Compile" "Assemble & Import DB" "Module Search" "Module Install" "Module Update" "Module Remove"
-    "Sub Menu >> Compiler" "Sub Menu >> DB Assembler"
-    "Quit"
+    "init (i): First Installation"                  # 1
+    "install-deps (d): Configure OS dep"            # 2
+    "pull (u): Update Repository"                   # 3
+    "reset (r): Reset & Clean Repository"           # 4
+    "compiler (c): Run compiler tool"               # 5
+    "db-assembler (a): Run db assembler tool"       # 6
+    "module-search (ms): Module Search by keyword" # 7
+    "module-install (mi): Module Install by name"  # 8
+    "module-update (mu): Module Update by name"    # 9
+    "module-remove: (mr): Module Remove by name"   # 10
+    "client-data: (gd): download client data from github repository (beta)"   # 11
+    "run-worldserver (rw): execute a simple restarter for worldserver" # 12
+    "run-authserver (ra): execute a simple restarter for authserver" # 13
+    "quit: Exit from this menu"                     # 14
     )
 
 function _switch() {
-    case $1 in
-        "First Installation")
+    _reply="$1"
+    _opt="$2"
+
+    case $_reply in
+        ""|"i"|"init"|"1")
             inst_allInOne
             ;;
-        "Configure OS dep")
+        ""|"d"|"install-deps"|"2")
             inst_configureOS
             ;;
-        "Update Repository")
+        ""|"u"|"pull"|"3")
             inst_updateRepo
             ;;
-        "Reset & Clean Repository")
+        ""|"r"|"reset"|"4")
             inst_resetRepo
             ;;
-        "Compile")
-            inst_compile
+        ""|"c"|"compiler"|"5")
+            bash "$AC_PATH_APPS/compiler/compiler.sh" $_opt
             ;;
-        "Clean & Compile")
-            inst_cleanCompile
+        ""|"a"|"db-assembler"|"6")
+            bash "$AC_PATH_APPS/db_assembler/db_assembler.sh" $_opt
             ;;
-        "Assemble & Import DB")
-            inst_assembleDb
+        ""|"ms"|"module-search"|"7")
+            inst_module_search "$_opt"
             ;;
-        "Module Search")
-            inst_module_search $2
+        ""|"mi"|"module-install"|"8")
+            inst_module_install "$_opt"
             ;;
-        "Module Install")
-            inst_module_install $2
+        ""|"mu"|"module-update"|"9")
+            inst_module_update "$_opt"
             ;;
-        "Module Update")
-            inst_module_update $2
+        ""|"mr"|"module-remove"|"10")
+            inst_module_remove "$_opt"
             ;;
-        "Module Remove")
-            inst_module_remove $2
+        ""|"gd"|"client-data"|"11")
+            inst_download_client_data
             ;;
-        "Sub Menu >> Compiler")
-            bash "$AC_PATH_APPS/compiler/compiler.sh"
+        ""|"rw"|"run-worldserver"|"12")
+            inst_simple_restarter worldserver
             ;;
-        "Sub Menu >> DB Assembler")
-            bash "$AC_PATH_APPS/db_assembler/db_assembler.sh"
+        ""|"ra"|"run-authserver"|"13")
+            inst_simple_restarter authserver
             ;;
-        "Quit")
+        ""|"quit"|"14")
             echo "Goodbye!"
             exit
             ;;
-        *) echo invalid option;;
+        ""|"--help")
+            echo "Available commands:"
+            printf '%s\n' "${options[@]}"
+            ;;
+        *) echo "invalid option, use --help option for the commands list";;
     esac
 }
 
-# run option directly if specified in argument
-[ ! -z $1 ] && _switch "${options[$cmdopt-1]}"
-[ ! -z $1 ] && exit 0
-
-select opt in "${options[@]}"
+while true
 do
-    _switch "$opt"
-    break
-done
+    # run option directly if specified in argument
+    [ ! -z $1 ] && _switch $@ # old method: "${options[$cmdopt-1]}"
+    [ ! -z $1 ] && exit 0
+
+    echo "==== ACORE DASHBOARD ===="
+    select opt in "${options[@]}"
+    do
+        _switch $REPLY
+        break
+    done
 done

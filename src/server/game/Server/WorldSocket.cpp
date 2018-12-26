@@ -33,6 +33,9 @@
 #include "PacketLog.h"
 #include "ScriptMgr.h"
 #include "AccountMgr.h"
+#ifdef ELUNA
+#include "LuaEngine.h"
+#endif
 
 #if defined(__GNUC__)
 #pragma pack(1)
@@ -727,6 +730,7 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     uint64 DosResponse;
     uint32 BuiltNumberClient;
     uint32 id, security;
+    uint32 TotalTime = 0;
     bool skipQueue = false;
     //uint8 expansion = 0;
     LocaleConstant locale;
@@ -762,8 +766,8 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     sLog->outStaticDebug ("WorldSocket::HandleAuthSession: client %u, loginServerID %u, account %s, loginServerType %u, clientseed %u", BuiltNumberClient, loginServerID, account.c_str(), loginServerType, clientSeed);
 #endif
     // Get the account information from the realmd database
-    //         0           1        2       3        4            5         6       7          8      9
-    // SELECT id, sessionkey, last_ip, locked, lock_country, expansion, mutetime, locale, recruiter, os FROM account WHERE username = ?
+    //         0           1        2       3        4            5         6       7          8      9      10
+    // SELECT id, sessionkey, last_ip, locked, lock_country, expansion, mutetime, locale, recruiter, os, totaltime FROM account WHERE username = ?
     PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_INFO_BY_NAME);
 
     stmt->setString(0, account);
@@ -831,6 +835,7 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
 
     uint32 recruiter = fields[8].GetUInt32();
     std::string os = fields[9].GetString();
+    TotalTime = fields[10].GetUInt32();
 
     // Must be done before WorldSession is created
     if (sWorld->getBoolConfig(CONFIG_WARDEN_ENABLED) && os != "Win" && os != "OSX")
@@ -946,7 +951,7 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     LoginDatabase.Execute(stmt);
 
     // NOTE ATM the socket is single-threaded, have this in mind ...
-    ACE_NEW_RETURN (m_Session, WorldSession (id, this, AccountTypes(security), expansion, mutetime, locale, recruiter, isRecruiter, skipQueue), -1);
+    ACE_NEW_RETURN(m_Session, WorldSession(id, this, AccountTypes(security), expansion, mutetime, locale, recruiter, isRecruiter, skipQueue, TotalTime), -1);
 
     m_Crypt.Init(&k);
 

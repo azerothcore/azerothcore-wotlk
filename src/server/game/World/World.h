@@ -152,13 +152,15 @@ enum WorldBoolConfigs
     CONFIG_WINTERGRASP_ENABLE,
     CONFIG_PDUMP_NO_PATHS,
     CONFIG_PDUMP_NO_OVERWRITE,
-    CONFIG_FREE_DUAL_SPEC, // pussywizard
     CONFIG_ENABLE_MMAPS, // pussywizard
     CONFIG_ENABLE_LOGIN_AFTER_DC, // pussywizard
     CONFIG_DONT_CACHE_RANDOM_MOVEMENT_PATHS, // pussywizard
     CONFIG_QUEST_IGNORE_AUTO_ACCEPT,
     CONFIG_QUEST_IGNORE_AUTO_COMPLETE,
     CONFIG_WARDEN_ENABLED,
+    CONFIG_ENABLE_CONTINENT_TRANSPORT,
+    CONFIG_ENABLE_CONTINENT_TRANSPORT_PRELOADING,
+    CONFIG_MINIGOB_MANABONK,
     BOOL_CONFIG_VALUE_COUNT
 };
 
@@ -167,7 +169,6 @@ enum WorldFloatConfigs
     CONFIG_GROUP_XP_DISTANCE = 0,
     CONFIG_MAX_RECRUIT_A_FRIEND_DISTANCE,
     CONFIG_SIGHT_MONSTER,
-    CONFIG_SIGHT_GUARDER,
     CONFIG_LISTEN_RANGE_SAY,
     CONFIG_LISTEN_RANGE_TEXTEMOTE,
     CONFIG_LISTEN_RANGE_YELL,
@@ -644,6 +645,7 @@ class World
 
         void SetInitialWorldSettings();
         void LoadConfigSettings(bool reload = false);
+        void LoadModuleConfigSettings();
 
         void SendWorldText(int32 string_id, ...);
         void SendGlobalText(const char* text, WorldSession* self);
@@ -781,6 +783,9 @@ class World
         std::string const& GetRealmName() const { return _realmName; } // pussywizard
         void SetRealmName(std::string name) { _realmName = name; } // pussywizard
 
+        std::string GetConfigFileList() { return m_configFileList; }
+        void SetConfigFileList(std::string list) { m_configFileList = list; }
+
     protected:
         void _UpdateGameTime();
         // callback for UpdateRealmCharacters
@@ -878,6 +883,8 @@ class World
 
         void ProcessQueryCallbacks();
         ACE_Future_Set<PreparedQueryResult> m_realmCharCallbacks;
+
+        std::string m_configFileList;
 };
 
 #define sWorld ACE_Singleton<World, ACE_Null_Mutex>::instance()

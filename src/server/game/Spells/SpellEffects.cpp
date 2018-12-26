@@ -57,6 +57,9 @@
 #include "InstanceScript.h"
 #include "ReputationMgr.h"
 #include "Transport.h"
+#ifdef ELUNA
+#include "LuaEngine.h"
+#endif
 
 pEffect SpellEffects[TOTAL_SPELL_EFFECTS]=
 {
@@ -773,6 +776,14 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
     sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "Spell ScriptStart spellid %u in EffectDummy(%u)", m_spellInfo->Id, effIndex);
 #endif
     m_caster->GetMap()->ScriptsStart(sSpellScripts, uint32(m_spellInfo->Id | (effIndex << 24)), m_caster, unitTarget);
+#ifdef ELUNA
+    if (gameObjTarget)
+        sEluna->OnDummyEffect(m_caster, m_spellInfo->Id, effIndex, gameObjTarget);
+    else if (unitTarget && unitTarget->GetTypeId() == TYPEID_UNIT)
+        sEluna->OnDummyEffect(m_caster, m_spellInfo->Id, effIndex, unitTarget->ToCreature());
+    else if (itemTarget)
+        sEluna->OnDummyEffect(m_caster, m_spellInfo->Id, effIndex, itemTarget);
+#endif
 }
 
 void Spell::EffectTriggerSpell(SpellEffIndex effIndex)
@@ -3219,7 +3230,10 @@ void Spell::EffectTaunt(SpellEffIndex /*effIndex*/)
 
     // xinef: Hand of Reckoning, cast before checing canhavethreatlist. fixes damage against pets
     if (m_spellInfo->Id == 62124 && unitTarget->GetVictim() != m_caster)
+    {
         m_caster->CastSpell(unitTarget, 67485, true);
+        unitTarget->CombatStart(m_caster);
+    }
 
     // this effect use before aura Taunt apply for prevent taunt already attacking target
     // for spell as marked "non effective at already attacking target"
@@ -4204,6 +4218,10 @@ void Spell::EffectSanctuary(SpellEffIndex /*effIndex*/)
         && (m_spellInfo->SpellFamilyFlags[0] & SPELLFAMILYFLAG_ROGUE_VANISH))
     {
         m_caster->ToPlayer()->RemoveAurasByType(SPELL_AURA_MOD_ROOT);
+
+        //Clean Escape
+        if (m_caster->HasAura(23582))
+            m_caster->CastSpell(m_caster, 23583, true);
     }
 }
 

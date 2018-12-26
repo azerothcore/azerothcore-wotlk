@@ -28,8 +28,17 @@ function dbasm_mysqlExec() {
 			read -p "Insert mysql user:" PROMPT_USER
 			read -p "Insert mysql pass:" -s PROMPT_PASS
 			export MYSQL_PWD=$PROMPT_PASS
-            
+
             retval=$("$DB_MYSQL_EXEC"  -h "$MYSQL_HOST" -u "$PROMPT_USER" $options -e "$command")
+            if [[ $? -ne 0 ]]; then
+                err=$("$DB_MYSQL_EXEC"  -h "$MYSQL_HOST" -u "$PROMPT_USER" $options -e "$command" 2>&1 )
+                # it happens on new mysql 5.7 installations
+                # since mysql_native_password is explicit now
+                if [[ "$err" == *"Access denied"* ]]; then
+                    echo "Setting mysql_native_password and  for  $PROMPT_USER ..."
+                    sudo -h "$MYSQL_HOST" "$DB_MYSQL_EXEC" -e "UPDATE mysql.user SET authentication_string=PASSWORD('${PROMPT_PASS}'), plugin='mysql_native_password' WHERE User='${PROMPT_USER}'; FLUSH PRIVILEGES;"
+                fi
+            fi
 
             # create configured account if not exists
             "$DB_MYSQL_EXEC"  -h "$MYSQL_HOST" -u "$PROMPT_USER" $options -e "CREATE USER '${MYSQL_USER}'@'${MYSQL_HOST}' IDENTIFIED BY '${MYSQL_PASS}' WITH MAX_QUERIES_PER_HOUR 0 MAX_CONNECTIONS_PER_HOUR 0 MAX_UPDATES_PER_HOUR 0;"

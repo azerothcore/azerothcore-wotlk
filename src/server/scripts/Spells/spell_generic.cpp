@@ -2268,17 +2268,12 @@ class spell_gen_animal_blood : public SpellScriptLoader
                 // Remove all auras with spell id 46221, except the one currently being applied
                 while (Aura* aur = GetUnitOwner()->GetOwnedAura(SPELL_ANIMAL_BLOOD, 0, 0, 0, GetAura()))
                     GetUnitOwner()->RemoveOwnedAura(aur);
-                if (Unit* owner = GetUnitOwner())
-                {
-                    owner->setFaction(FACTION_DETHA_ATTACK);
-                }
             }
 
             void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
                 if (Unit* owner = GetUnitOwner())
                 {
-                    owner->RestoreFaction();
                     if (owner->IsInWater())
                         owner->CastSpell(owner, SPELL_SPAWN_BLOOD_POOL, true);
                 }

@@ -35,6 +35,9 @@
 #include "WardenMac.h"
 #include "SavingSystem.h"
 #include "AccountMgr.h"
+#ifdef ELUNA
+#include "LuaEngine.h"
+#endif
 
 namespace {
 
@@ -83,12 +86,33 @@ bool WorldSessionFilter::Process(WorldPacket* packet)
 }
 
 /// WorldSession constructor
-WorldSession::WorldSession(uint32 id, WorldSocket* sock, AccountTypes sec, uint8 expansion, time_t mute_time, LocaleConstant locale, uint32 recruiter, bool isARecruiter, bool skipQueue):
-m_muteTime(mute_time), m_timeOutTime(0), _lastAuctionListItemsMSTime(0), _lastAuctionListOwnerItemsMSTime(0), m_GUIDLow(0), _player(NULL), m_Socket(sock),
-_security(sec), _skipQueue(skipQueue), _accountId(id), m_expansion(expansion), _logoutTime(0),
-m_inQueue(false), m_playerLoading(false), m_playerLogout(false), m_playerSave(false),
-m_sessionDbcLocale(sWorld->GetDefaultDbcLocale()), m_sessionDbLocaleIndex(locale),
-m_latency(0), m_clientTimeDelay(0), m_TutorialsChanged(false), recruiterId(recruiter), isRecruiter(isARecruiter), m_currentBankerGUID(0), timeWhoCommandAllowed(0)
+WorldSession::WorldSession(uint32 id, WorldSocket* sock, AccountTypes sec, uint8 expansion, time_t mute_time, LocaleConstant locale, uint32 recruiter, bool isARecruiter, bool skipQueue, uint32 TotalTime):
+    m_muteTime(mute_time),
+    m_timeOutTime(0),
+    _lastAuctionListItemsMSTime(0),
+    _lastAuctionListOwnerItemsMSTime(0),
+    m_GUIDLow(0),
+    _player(NULL),
+    m_Socket(sock),
+    _security(sec),
+    _skipQueue(skipQueue),
+    _accountId(id),    
+    m_expansion(expansion),
+    m_total_time(TotalTime),
+    _logoutTime(0),
+    m_inQueue(false),
+    m_playerLoading(false),
+    m_playerLogout(false),
+    m_playerSave(false),
+    m_sessionDbcLocale(sWorld->GetDefaultDbcLocale()),
+    m_sessionDbLocaleIndex(locale),
+    m_latency(0),
+    m_clientTimeDelay(0),
+    m_TutorialsChanged(false),
+    recruiterId(recruiter),    
+    isRecruiter(isARecruiter),
+    m_currentBankerGUID(0),
+    timeWhoCommandAllowed(0)
 {
     memset(m_Tutorials, 0, sizeof(m_Tutorials));
 
@@ -111,6 +135,8 @@ m_latency(0), m_clientTimeDelay(0), m_TutorialsChanged(false), recruiterId(recru
 /// WorldSession destructor
 WorldSession::~WorldSession()
 {
+    LoginDatabase.PExecute("UPDATE account SET totaltime = %u WHERE id = %u", GetTotalTime(), GetAccountId());
+
     ///- unload player if not unloaded
     if (_player)
         LogoutPlayer (true);
@@ -202,6 +228,13 @@ void WorldSession::SendPacket(WorldPacket const* packet)
     }
 #endif                                                      // !TRINITY_DEBUG
 
+    sScriptMgr->OnPacketSend(this, *packet);
+
+#ifdef ELUNA
+    if (!sEluna->OnPacketSend(this, *packet))
+        return;
+#endif
+
     if (m_Socket->SendPacket(*packet) == -1)
         m_Socket->CloseSocket();
 }
@@ -276,6 +309,11 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
                                     delete movementPacket;
                                     movementPacket = NULL;
                                 }
+                                sScriptMgr->OnPacketReceive(this, *packet);
+#ifdef ELUNA
+                                if (!sEluna->OnPacketReceive(this, *packet))
+                                    break;
+#endif
                                 (this->*opHandle.handler)(*packet);
                             }
                         }
@@ -288,12 +326,23 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
                                 delete movementPacket;
                                 movementPacket = NULL;
                             }
+                            sScriptMgr->OnPacketReceive(this, *packet);
+#ifdef ELUNA
+                            if (!sEluna->OnPacketReceive(this, *packet))
+                                break;
+#endif
                             (this->*opHandle.handler)(*packet);
                         }
                         break;
                     case STATUS_AUTHED:
                         if (m_inQueue) // prevent cheating
                             break;
+
+                        sScriptMgr->OnPacketReceive(this, *packet);
+#ifdef ELUNA
+                        if (!sEluna->OnPacketReceive(this, *packet))
+                            break;
+#endif
                         (this->*opHandle.handler)(*packet);
                         break;
                     case STATUS_NEVER:

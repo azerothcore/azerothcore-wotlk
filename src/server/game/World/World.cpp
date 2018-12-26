@@ -11,7 +11,7 @@
 #include "Common.h"
 #include "DatabaseEnv.h"
 #include "Config.h"
-#include "SystemConfig.h"
+#include "GitRevision.h"
 #include "Log.h"
 #include "Opcodes.h"
 #include "WorldSession.h"
@@ -76,6 +76,9 @@
 #include "AsyncAuctionListing.h"
 #include "SavingSystem.h"
 #include <VMapManager2.h>
+#ifdef ELUNA
+#include "LuaEngine.h"
+#endif
 
 ACE_Atomic_Op<ACE_Thread_Mutex, bool> World::m_stopEvent = false;
 uint8 World::m_ExitCode = SHUTDOWN_EXIT_CODE;
@@ -116,6 +119,8 @@ World::World()
     m_isClosed = false;
 
     m_CleaningFlags = 0;
+
+    m_configFileList = "";
 
     memset(rate_values, 0, sizeof(rate_values));
     memset(m_int_configs, 0, sizeof(m_int_configs));
@@ -411,6 +416,43 @@ bool World::RemoveQueuedPlayer(WorldSession* sess)
     return found;
 }
 
+void World::LoadModuleConfigSettings()
+{
+    Tokenizer configFileList(GetConfigFileList(), ',');
+    for (auto i = configFileList.begin(); i != configFileList.end(); i++)
+    {
+        std::string configFile = (*i) + std::string(".conf");
+
+        std::string conf_path = _CONF_DIR;
+        std::string cfg_file = conf_path + "/" + configFile;
+
+#if PLATFORM == PLATFORM_WINDOWS
+        cfg_file = configFile;
+#endif
+        std::string cfg_def_file = cfg_file + ".dist";
+
+        // Load .conf.dist config
+        if (!sConfigMgr->LoadMore(cfg_def_file.c_str()))
+        {
+            sLog->outString();
+            sLog->outError("Module config: Invalid or missing configuration dist file : %s", cfg_def_file.c_str());
+            sLog->outError("Module config: Verify that the file exists and has \'[worldserver]' written in the top of the file!");
+            sLog->outError("Module config: Use default settings!");
+            sLog->outString();
+        }
+
+        // Load .conf config
+        if (!sConfigMgr->LoadMore(cfg_file.c_str()))
+        {
+            sLog->outString();
+            sLog->outError("Module config: Invalid or missing configuration file : %s", cfg_file.c_str());
+            sLog->outError("Module config: Verify that the file exists and has \'[worldserver]' written in the top of the file!");
+            sLog->outError("Module config: Use default settings!");
+            sLog->outString();
+        }
+    }
+}
+
 /// Initialize config values
 void World::LoadConfigSettings(bool reload)
 {
@@ -423,6 +465,7 @@ void World::LoadConfigSettings(bool reload)
         }
     }
 
+    LoadModuleConfigSettings();
     sScriptMgr->OnBeforeConfigLoad(reload);
 
     // Reload log levels and filters
@@ -654,7 +697,6 @@ void World::LoadConfigSettings(bool reload)
 
     /// \todo Add MonsterSight and GuarderSight (with meaning) in worldserver.conf or put them as define
     m_float_configs[CONFIG_SIGHT_MONSTER] = sConfigMgr->GetFloatDefault("MonsterSight", 50);
-    m_float_configs[CONFIG_SIGHT_GUARDER] = sConfigMgr->GetFloatDefault("GuarderSight", 50);
 
     if (reload)
     {
@@ -937,7 +979,6 @@ void World::LoadConfigSettings(bool reload)
     m_int_configs[CONFIG_MAX_ALLOWED_MMR_DROP] = sConfigMgr->GetIntDefault("MaxAllowedMMRDrop", 500); // pussywizard
     m_bool_configs[CONFIG_ENABLE_LOGIN_AFTER_DC] = sConfigMgr->GetBoolDefault("EnableLoginAfterDC", true); // pussywizard
     m_bool_configs[CONFIG_DONT_CACHE_RANDOM_MOVEMENT_PATHS] = sConfigMgr->GetBoolDefault("DontCacheRandomMovementPaths", true); // pussywizard
-    SetRealmName(sConfigMgr->GetStringDefault("RealmName", "X"));
 
     m_int_configs[CONFIG_SKILL_CHANCE_ORANGE] = sConfigMgr->GetIntDefault("SkillChance.Orange", 100);
     m_int_configs[CONFIG_SKILL_CHANCE_YELLOW] = sConfigMgr->GetIntDefault("SkillChance.Yellow", 75);
@@ -1244,7 +1285,6 @@ void World::LoadConfigSettings(bool reload)
     // misc
     m_bool_configs[CONFIG_PDUMP_NO_PATHS] = sConfigMgr->GetBoolDefault("PlayerDump.DisallowPaths", true);
     m_bool_configs[CONFIG_PDUMP_NO_OVERWRITE] = sConfigMgr->GetBoolDefault("PlayerDump.DisallowOverwrite", true);
-    m_bool_configs[CONFIG_FREE_DUAL_SPEC] = sConfigMgr->GetBoolDefault("FreeDualTalentSpecialization", false);
     m_bool_configs[CONFIG_ENABLE_MMAPS] = sConfigMgr->GetBoolDefault("MoveMaps.Enable", true);
     MMAP::MMapFactory::InitializeDisabledMaps();
 
@@ -1258,6 +1298,10 @@ void World::LoadConfigSettings(bool reload)
     m_int_configs[CONFIG_WINTERGRASP_RESTART_AFTER_CRASH] = sConfigMgr->GetIntDefault("Wintergrasp.CrashRestartTimer", 10);
 
     m_int_configs[CONFIG_BIRTHDAY_TIME] = sConfigMgr->GetIntDefault("BirthdayTime", 1222964635);
+    m_bool_configs[CONFIG_MINIGOB_MANABONK] = sConfigMgr->GetBoolDefault("Minigob.Manabonk.Enable", true);
+
+    m_bool_configs[CONFIG_ENABLE_CONTINENT_TRANSPORT] = sConfigMgr->GetBoolDefault("IsContinentTransport.Enabled", true);
+    m_bool_configs[CONFIG_ENABLE_CONTINENT_TRANSPORT_PRELOADING] = sConfigMgr->GetBoolDefault("IsPreloadedContinentTransport.Enabled", false);
 
     // call ScriptMgr if we're reloading the configuration
     sScriptMgr->OnAfterConfigLoad(reload);
@@ -1285,6 +1329,21 @@ void World::SetInitialWorldSettings()
     {
         vmmgr2->GetLiquidFlagsPtr = &GetLiquidFlags;
     }
+
+#ifdef ELUNA
+    ///- Initialize Lua Engine
+    sLog->outString("Initialize Eluna Lua Engine...");
+
+    std::string conf_path = _CONF_DIR;
+    std::string cfg_file = conf_path + "/mod_LuaEngine.conf";
+#ifdef WIN32
+    cfg_file = "mod_LuaEngine.conf";
+#endif
+    std::string cfg_def_file = cfg_file + ".dist";
+    sConfigMgr->LoadMore(cfg_def_file.c_str());
+    sConfigMgr->LoadMore(cfg_file.c_str());
+    Eluna::Initialize();
+#endif
 
     ///- Initialize config settings
     LoadConfigSettings();
@@ -1339,6 +1398,9 @@ void World::SetInitialWorldSettings()
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_OLD_CORPSES);
     stmt->setUInt32(0, 3 * DAY);
     CharacterDatabase.Execute(stmt);
+
+    ///- Custom Hook for loading DB items
+    sScriptMgr->OnLoadCustomDatabaseTable();
 
     ///- Load the DBC files
     sLog->outString("Initialize data stores...");
@@ -1767,7 +1829,7 @@ void World::SetInitialWorldSettings()
     m_startTime = m_gameTime;
 
     LoginDatabase.PExecute("INSERT INTO uptime (realmid, starttime, uptime, revision) VALUES(%u, %u, 0, '%s')",
-                            realmID, uint32(m_startTime), _FULLVERSION);       // One-time query
+                            realmID, uint32(m_startTime), GitRevision::GetFullVersion());       // One-time query
 
 
 
@@ -1871,6 +1933,13 @@ void World::SetInitialWorldSettings()
     mgr = ChannelMgr::forTeam(TEAM_HORDE);
     mgr->LoadChannels();
 
+#ifdef ELUNA
+    ///- Run eluna scripts.
+    // in multithread foreach: run scripts
+    sEluna->RunScripts();
+    sEluna->OnConfigLoad(false,false); // Must be done after Eluna is initialized and scripts have run.
+#endif
+    
     uint32 startupDuration = GetMSTimeDiffToNow(startupBegin);
     sLog->outString();
     sLog->outError("WORLD: World initialized in %u minutes %u seconds", (startupDuration / 60000), ((startupDuration % 60000) / 1000));

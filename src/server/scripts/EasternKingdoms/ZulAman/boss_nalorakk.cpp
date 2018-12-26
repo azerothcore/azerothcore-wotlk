@@ -1,4 +1,4 @@
- /*
+﻿ /*
  * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
@@ -138,7 +138,10 @@ class boss_nalorakk : public CreatureScript
                     (*me).GetMotionMaster()->MovePoint(0, NalorakkWay[7][0], NalorakkWay[7][1], NalorakkWay[7][2]);
                 }
 
-                instance->SetData(DATA_NALORAKKEVENT, NOT_STARTED);
+                if (instance)
+                {
+                    instance->SetData(DATA_NALORAKKEVENT, NOT_STARTED);
+                }
 
                 Surge_Timer = urand(15000, 20000);
                 BrutalSwipe_Timer = urand(7000, 12000);
@@ -291,7 +294,8 @@ class boss_nalorakk : public CreatureScript
 
             void EnterCombat(Unit* /*who*/)
             {
-                instance->SetData(DATA_NALORAKKEVENT, IN_PROGRESS);
+                if (instance)
+                    instance->SetData(DATA_NALORAKKEVENT, IN_PROGRESS);
 
                 me->MonsterYell(YELL_AGGRO, LANG_UNIVERSAL, NULL);
                 DoPlaySoundToSet(me, SOUND_YELL_AGGRO);
@@ -301,7 +305,9 @@ class boss_nalorakk : public CreatureScript
             void JustDied(Unit* /*killer*/)
             {
                 ResetMobs();
-                instance->SetData(DATA_NALORAKKEVENT, DONE);
+
+                if (instance)
+                    instance->SetData(DATA_NALORAKKEVENT, DONE);
 
                 me->MonsterYell(YELL_DEATH, LANG_UNIVERSAL, NULL);
                 DoPlaySoundToSet(me, SOUND_YELL_DEATH);
