@@ -153,7 +153,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
 
                     sScriptMgr->OnPlayerChat(sender, type, lang, msg);
 #ifdef ELUNA
-                    if (!sEluna->OnChat(sender, type, lang, msg, receiver))
+                    if (!sEluna->OnChat(sender, type, lang, msg))
                         return;
 #endif
                 }
