@@ -5221,7 +5221,7 @@ void ObjectMgr::LoadPageTextLocales()
 
     } while (result->NextRow());
 
-    sLog->outString(">> Loaded %lu Page Text Locale strings in %u ms", (uint32)_pageTextLocaleStore.size(), GetMSTimeDiffToNow(oldMSTime));
+    sLog->outString(">> Loaded %lu Page Text Locale strings in %u ms", (unsigned long)_pageTextLocaleStore.size(), GetMSTimeDiffToNow(oldMSTime));
 }
 
 void ObjectMgr::LoadInstanceTemplate()
