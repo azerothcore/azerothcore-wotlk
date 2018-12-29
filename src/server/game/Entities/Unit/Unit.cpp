@@ -2194,6 +2194,21 @@ void Unit::HandleProcExtraAttackFor(Unit* victim)
     }
 }
 
+bool isInEvasiveManeuvers(const Unit* victim)
+{
+    if (victim->HasAura(50240))
+    {
+        // we also drop 1 charge of Evasive charges
+        if (Aura* evasiveCharges = victim->GetAura(50241))
+            if (evasiveCharges->GetStackAmount() > 1)
+                evasiveCharges->SetStackAmount(evasiveCharges->GetStackAmount() - 1);
+            else
+                evasiveCharges->Remove();
+        return true;
+    }
+    return false;
+}
+
 MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(const Unit* victim, WeaponAttackType attType) const
 {
     // This is only wrapper
@@ -2278,6 +2293,10 @@ MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(const Unit* victim, WeaponAttackTy
         dodge_chance = int32 (float (dodge_chance) * GetTotalAuraMultiplier(SPELL_AURA_MOD_ENEMY_DODGE));
 
         tmp = dodge_chance;
+
+        // If target has evasive maneuvers result should always be dodge
+        if (isInEvasiveManeuvers(victim))
+            return MELEE_HIT_DODGE;
 
         // xinef: if casting or stunned - cant dodge
         if (victim->IsNonMeleeSpellCast(false, false, true) || victim->HasUnitState(UNIT_STATE_CONTROLLED))
@@ -2790,6 +2809,10 @@ SpellMissInfo Unit::MagicSpellHitResult(Unit* victim, SpellInfo const* spell)
             modHitChance -= int32(victim->ToPlayer()->GetRatingBonusValue(CR_HIT_TAKEN_SPELL));
     }
 
+    // If target has evasive maneuvers result should always be dodge
+    if (isInEvasiveManeuvers(victim))
+        return SPELL_MISS_DODGE;
+
     int32 HitChance = modHitChance * 100;
     // Increase hit chance from attacker SPELL_AURA_MOD_SPELL_HIT_CHANCE and attacker ratings
     // Xinef: Totems should inherit casters ratings?
@@ -2889,6 +2912,10 @@ SpellMissInfo Unit::SpellHitResult(Unit* victim, SpellInfo const* spell, bool Ca
     // Return evade for units in evade mode
     if (victim->GetTypeId() == TYPEID_UNIT && victim->ToCreature()->IsInEvadeMode() && !spell->HasAura(SPELL_AURA_CONTROL_VEHICLE))
         return SPELL_MISS_EVADE;
+
+    // If target has evasive maneuvers result should always be dodge
+    if (isInEvasiveManeuvers(victim))
+        return SPELL_MISS_RESIST;
 
     // Try victim reflect spell
     if (CanReflect)
@@ -12468,6 +12495,12 @@ void Unit::CombatStart(Unit* target, bool initialAggro)
             target->SetInCombatWith(owner);
         }
     }
+
+    //Patch 3.0.8: All player spells which cause a creature to become aggressive to you will now also immediately cause the creature to be tapped.
+    if (Creature* creature = target->ToCreature())
+        if (!creature->hasLootRecipient() && GetTypeId() == TYPEID_PLAYER)
+            creature->SetLootRecipient(this);
+
 
     Unit* who = target->GetCharmerOrOwnerOrSelf();
     if (who->GetTypeId() == TYPEID_PLAYER)
