@@ -2219,7 +2219,7 @@ void ObjectMgr::LoadItemLocales()
 
     } while (result->NextRow());
 
-    sLog->outString(">> Loaded %lu Item Locale strings in %u ms", (uint32)_itemLocaleStore.size(), GetMSTimeDiffToNow(oldMSTime));
+    sLog->outString(">> Loaded %lu Item Locale strings in %u ms", (unsigned long)_itemLocaleStore.size(), GetMSTimeDiffToNow(oldMSTime));
 }
 
 void ObjectMgr::LoadItemTemplates()
