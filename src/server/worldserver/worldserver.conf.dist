@@ -147,7 +147,12 @@ BindIP = "0.0.0.0"
 # PERFORMANCE SETTINGS
 #
 #    UseProcessors
-#        Description: Processors mask for Windows based multi-processor systems.
+#        Description: Processors mask for Windows and Linux based multi-processor systems.
+#        Example:  For a computer with 3 CPUs:
+#                     1 - 1st CPU only
+#                     2 - 2nd CPU only
+#                     4 - 3rd CPU only
+#                     6 - 2nd + 3rd CPUs, because "2 | 4" -> 6
 #        Default:     0  - (Selected by OS)
 #                     1+ - (Bit mask value of selected processors)
 
@@ -344,7 +349,8 @@ LogDB.Opt.ClearTime = 1209600
 #    MaxCoreStuckTime
 #        Description: Time (in seconds) before the server is forced to crash if it is frozen.
 #        Default:     0   - (Disabled)
-#                     10+ - (Enabled, Recommended 10+)
+#                     10+ - (Enabled, Recommended 30+)
+# Note: If enabled and the setting is too low, it can cause unexpected crash.
 
 MaxCoreStuckTime = 0
 
@@ -1298,7 +1304,7 @@ Guild.BankEventLogRecordsCount = 25
 #
 #    MaxPrimaryTradeSkill
 #        Description: Maximum number of primary professions a character can learn.
-#        Range:       0-10
+#        Range:       0-11
 #        Default:     2
 
 MaxPrimaryTradeSkill = 2
@@ -1453,7 +1459,7 @@ BirthdayTime = 1222964635
 #
 #   IsContinentTransport.Enabled
 #        Description: Controls the continent transport (ships, zeppelins etc..)
-#        Default:     1 - (Enabled) 
+#        Default:     1 - (Enabled)
 #
 #
 
@@ -1461,11 +1467,11 @@ IsContinentTransport.Enabled = 1
 
 #
 #   IsPreloadedContinentTransport.Enabled
-#        Description: Should we preload the transport? 
+#        Description: Should we preload the transport?
 #           (Not recommended on low-end servers as it consumes 100% more ram)
 #           and it's not really necessary to be enabled.
 #
-#        Default:     0 - (Disabled) 
+#        Default:     0 - (Disabled)
 #
 #
 
@@ -3127,7 +3133,7 @@ EnableLoginAfterDC = 1
 
 #
 #     DontCacheRandomMovementPaths
-#        Description: Random movement paths (calculated using MoveMaps) can be cached to save cpu time, 
+#        Description: Random movement paths (calculated using MoveMaps) can be cached to save cpu time,
 #                     but this may use up considerable amount of memory and can be prevented by setting this option to 1.
 #                     Recommended setting for populated servers is having enough RAM and setting this to 0.
 #        Default:     0 - (cache paths, uses more memory)
@@ -3145,7 +3151,7 @@ MoveMaps.Enable = 1
 
 #
 #     Minigob.Manabonk.Enable
-#        Description: Enable/ Disable Minigob Manabonk 
+#        Description: Enable/ Disable Minigob Manabonk
 #        Default:     1
 
 Minigob.Manabonk.Enable = 1

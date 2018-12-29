@@ -1,6 +1,6 @@
 ## Description
 
-This script allows you to assemble all sql files into one so you can easily import it to your databases (or use the main script to import directly).
+This script allows you to assemble all sql files into one so you can easily import it to your databases (or use the main script to import directly). By default, it creates the merged files in `/env/dist`.
 
 ## How to use:
 

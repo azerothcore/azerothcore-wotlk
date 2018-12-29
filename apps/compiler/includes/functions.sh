@@ -6,8 +6,8 @@ function comp_clean() {
 
   cd $BUILDPATH
 
-  make -f Makefile clean
-  make clean
+  make -f Makefile clean || true
+  make clean || true
   find -iname '*cmake*' -not -name CMakeLists.txt -exec rm -rf {} \+
 
   cd $CWD

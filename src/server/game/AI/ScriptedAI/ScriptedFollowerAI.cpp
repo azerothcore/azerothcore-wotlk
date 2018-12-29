@@ -89,7 +89,14 @@ void FollowerAI::MoveInLineOfSight(Unit* who)
             return;
 
     if (me->CanStartAttack(who))
+    {
+        if (me->HasUnitState(UNIT_STATE_DISTRACTED))
+        {
+            me->ClearUnitState(UNIT_STATE_DISTRACTED);
+            me->GetMotionMaster()->Clear();
+        }
         AttackStart(who);
+    }
 }
 
 void FollowerAI::JustDied(Unit* /*pKiller*/)

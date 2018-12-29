@@ -1099,6 +1099,50 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder* holder)
         pCurrChar->CheckAllAchievementCriteria();
     }
 
+        // Reputations if "StartAllReputation" is enabled, -- TODO: Fix this in a better way
+    if (sWorld->getBoolConfig(CONFIG_START_ALL_REP))
+    {
+        ReputationMgr& repMgr = pCurrChar->GetReputationMgr();
+        repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(942), 42999, false);
+        repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(935), 42999, false);
+        repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(936), 42999, false);
+        repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(1011), 42999, false);
+        repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(970), 42999, false);
+        repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(967), 42999, false);
+        repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(989), 42999, false);
+        repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(932), 42999, false);
+        repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(934), 42999, false);
+        repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(1038), 42999, false);
+        repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(1077), 42999, false);
+
+        switch (pCurrChar->getFaction())
+        {
+            case ALLIANCE:
+                repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(72), 42999, false);
+                repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(47), 42999, false);
+                repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(69), 42999, false);
+                repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(930), 42999, false);
+                repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(730), 42999, false);
+                repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(978), 42999, false);
+                repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(54), 42999, false);
+                repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(946), 42999, false);
+                break;
+            case HORDE:
+                repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(76), 42999, false);
+                repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(68), 42999, false);
+                repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(81), 42999, false);
+                repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(911), 42999, false);
+                repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(729), 42999, false);
+                repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(941), 42999, false);
+                repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(530), 42999, false);
+                repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(947), 42999, false);
+                break;
+            default:
+                break;
+        }
+        repMgr.SendStates();
+    }
+
     // show time before shutdown if shutdown planned.
     if (sWorld->IsShuttingDown())
         sWorld->ShutdownMsg(true, pCurrChar);
@@ -2518,7 +2562,7 @@ void WorldSession::HandleCharFactionOrRaceChange(WorldPacket& recvData)
                 {
                     Quest const* quest = iter->second;
                     uint32 newRaceMask = (team == TEAM_ALLIANCE) ? RACEMASK_ALLIANCE : RACEMASK_HORDE;
-                    if (quest->GetRequiredRaces() && !(quest->GetRequiredRaces() & newRaceMask))
+                    if (quest->GetAllowableRaces() && !(quest->GetAllowableRaces() & newRaceMask))
                     {
                         stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_QUESTSTATUS_REWARDED_ACTIVE_BY_QUEST);
                         stmt->setUInt32(0, quest->GetQuestId());

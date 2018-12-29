@@ -133,9 +133,9 @@ public:
 
         static std::vector<ChatCommand> npcFactionCommandTable =
         {
-            { "Permanent",      SEC_ADMINISTRATOR,  false, &HandleNpcSetFactionIdCommand,      "" },
-            { "Temp",           SEC_ADMINISTRATOR,  false, &HandleNpcSetFactionTempIdCommand,  "" },
-            { "Original",       SEC_ADMINISTRATOR,  false, &HandleNpcSetOriginalFaction,       "" }
+            { "permanent",      SEC_ADMINISTRATOR,  false, &HandleNpcSetFactionIdCommand,      "" },
+            { "temp",           SEC_ADMINISTRATOR,  false, &HandleNpcSetFactionTempIdCommand,  "" },
+            { "original",       SEC_ADMINISTRATOR,  false, &HandleNpcSetOriginalFaction,       "" }
         };
 
         static std::vector<ChatCommand> npcSetCommandTable =
@@ -580,10 +580,12 @@ public:
     static bool HandleNpcSetFactionTempIdCommand(ChatHandler* handler, const char* args)
     {
         Player* me = handler->GetSession()->GetPlayer();
-        Creature* creature = me->GetSelectedUnit()->ToCreature();
+        Unit* SelectedCreature = me->GetSelectedUnit();
 
-        if (!me)
+        if (!SelectedCreature)
             return false;
+
+        Creature* creature = SelectedCreature->ToCreature();
 
         if (!creature)
             return false;
@@ -598,7 +600,7 @@ public:
     }
 
     //set orginal faction for npc
-    static bool HandleNpcSetOriginalFaction(ChatHandler* handler, const char* args)
+    static bool HandleNpcSetOriginalFaction(ChatHandler* handler, const char* /*args*/)
     {
         Player* me = handler->GetSession()->GetPlayer();
         Creature* creature = me->GetSelectedUnit()->ToCreature();

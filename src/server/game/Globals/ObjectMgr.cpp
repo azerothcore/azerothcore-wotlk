@@ -3822,27 +3822,23 @@ void ObjectMgr::LoadQuests()
         //   21       22       23              24                25               26
         "StartItem, Flags, RewardTitle, RequiredPlayerKills, RewardTalents, RewardArenaPoints, "
         //    27           28           29          30            31              32            33             34
-        "RewardItem1, RewardItem2, RewardItem3, RewardItem4, RewardAmount1, RewardAmount2, RewardAmount3, RewardAmount4, "
-        //        35                  36                    37                  38                    39                  40                       41                          42                         43                       44                          45                       46
-        "RewardChoiceItemID1, RewardChoiceItemID2, RewardChoiceItemID3, RewardChoiceItemID4, RewardChoiceItemID5, RewardChoiceItemID6, RewardChoiceItemQuantity1, RewardChoiceItemQuantity2, RewardChoiceItemQuantity3, RewardChoiceItemQuantity4, RewardChoiceItemQuantity5, RewardChoiceItemQuantity6, "
-        //      47                 48               49                50                 51                  52                  53                   54                   55                  56
-        "RewardFactionID1, RewardFactionID2, RewardFactionID3, RewardFactionID4, RewardFactionID5, RewardFactionValue1, RewardFactionValue2, RewardFactionValue3, RewardFactionValue4, RewardFactionValue5, "
-        //      57                          58                     59                      60                      61
-        "RewardFactionOverride1, RewardFactionOverride2, RewardFactionOverride3, RewardFactionOverride4, RewardFactionOverride5, "
+        "RewardItem1, RewardAmount1, RewardItem2, RewardAmount2, RewardItem3, RewardAmount3, RewardItem4, RewardAmount4, "
+        //        35                      36                      37                      38                      39                      40                      41                      42                      43                      44                     45                      46
+        "RewardChoiceItemID1, RewardChoiceItemQuantity1, RewardChoiceItemID2, RewardChoiceItemQuantity2, RewardChoiceItemID3, RewardChoiceItemQuantity3, RewardChoiceItemID4, RewardChoiceItemQuantity4, RewardChoiceItemID5, RewardChoiceItemQuantity5, RewardChoiceItemID6, RewardChoiceItemQuantity6, "
+        //       47                 48                     49                  50                  51                     52                 53                  54                     55                  56                  57                    58                   59                 60                      61
+        "RewardFactionID1, RewardFactionValue1, RewardFactionOverride1, RewardFactionID2, RewardFactionValue2, RewardFactionOverride2, RewardFactionID3, RewardFactionValue3, RewardFactionOverride3, RewardFactionID4, RewardFactionValue4, RewardFactionOverride4, RewardFactionID5, RewardFactionValue5,  RewardFactionOverride5,"
         //   62        63      64        65
         "POIContinent, POIx, POIy, POIPriority, "
-        //   66          67               68           69            70               71                 72
-        "LogTitle, LogDescription, QuestDescription, AreaDescription, OfferRewardText, RequestItemsText, QuestCompletionLog, "
-        //      73                74                75                76                   77                     78                    79                      80
+        //   66          67               68           69                    70 
+        "LogTitle, LogDescription, QuestDescription, AreaDescription, QuestCompletionLog, "
+        //      71                72                73                74                   75                     76                    77                      78
         "RequiredNpcOrGo1, RequiredNpcOrGo2, RequiredNpcOrGo3, RequiredNpcOrGo4, RequiredNpcOrGoCount1, RequiredNpcOrGoCount2, RequiredNpcOrGoCount3, RequiredNpcOrGoCount4, "
-        //  81          82         83         84           85                  86                 87                  88
+        //  79          80         81         82           83                  84                 85                  86
         "ItemDrop1, ItemDrop2, ItemDrop3, ItemDrop4, ItemDropQuantity1, ItemDropQuantity2, ItemDropQuantity3, ItemDropQuantity4, "
-        //      89               90               91               92               93               94                95                  96                  97                  98                  99                  100
+        //      87               88               89               90               91               92                93                  94                  95                  96                  97                  98
         "RequiredItemId1, RequiredItemId2, RequiredItemId3, RequiredItemId4, RequiredItemId5, RequiredItemId6, RequiredItemCount1, RequiredItemCount2, RequiredItemCount3, RequiredItemCount4, RequiredItemCount5, RequiredItemCount6, "
-        //  101          102             103             104             105             106           107            108            109               110                 111                 112                 113
-        "Unknown0, ObjectiveText1, ObjectiveText2, ObjectiveText3, ObjectiveText4, DetailsEmote1, DetailsEmote2, DetailsEmote3, DetailsEmote4, DetailsEmoteDelay1, DetailsEmoteDelay2, DetailsEmoteDelay3, DetailsEmoteDelay4, "
-        //      114               115                116               117                 118               119                  120                     121                      122                    123
-        "EmoteOnIncomplete, EmoteOnComplete, OfferRewardEmote1, OfferRewardEmote2, OfferRewardEmote3, OfferRewardEmote4, OfferRewardEmoteDelay1, OfferRewardEmoteDelay2, OfferRewardEmoteDelay3, OfferRewardEmoteDelay4"
+        //  99          100             101             102             103
+        "Unknown0, ObjectiveText1, ObjectiveText2, ObjectiveText3, ObjectiveText4"
         " FROM quest_template");
     if (!result)
     {
@@ -3881,6 +3877,75 @@ void ObjectMgr::LoadQuests()
         itr->second->InitializeQueryData();
 
     std::map<uint32, uint32> usedMailTemplates;
+
+    // Load `quest_details`
+    //                                   0   1       2       3       4       5            6            7            8
+    result = WorldDatabase.Query("SELECT ID, Emote1, Emote2, Emote3, Emote4, EmoteDelay1, EmoteDelay2, EmoteDelay3, EmoteDelay4 FROM quest_details");
+
+    if (!result)
+    {
+        sLog->outError(">> Loaded 0 quest details. DB table `quest_details` is empty.");
+    }
+    else
+    {
+        do
+        {
+            Field* fields = result->Fetch();
+            uint32 questId = fields[0].GetUInt32();
+
+            auto itr = _questTemplates.find(questId);
+            if (itr != _questTemplates.end())
+                itr->second->LoadQuestDetails(fields);
+            else
+                sLog->outError("Table `quest_details` has data for quest %u but such quest does not exist", questId);
+        } while (result->NextRow());
+    }
+
+    // Load `quest_request_items`
+    //                                   0   1                2                  3
+    result = WorldDatabase.Query("SELECT ID, EmoteOnComplete, EmoteOnIncomplete, CompletionText FROM quest_request_items");
+
+    if (!result)
+    {
+        sLog->outError(">> Loaded 0 quest request items. DB table `quest_request_items` is empty.");
+    }
+    else
+    {
+        do
+        {
+            Field* fields = result->Fetch();
+            uint32 questId = fields[0].GetUInt32();
+
+            auto itr = _questTemplates.find(questId);
+            if (itr != _questTemplates.end())
+                itr->second->LoadQuestRequestItems(fields);
+            else
+                sLog->outError("Table `quest_request_items` has data for quest %u but such quest does not exist", questId);
+        } while (result->NextRow());
+    }
+
+    // Load `quest_offer_reward`
+    //                                   0   1       2       3       4       5            6            7            8            9
+    result = WorldDatabase.Query("SELECT ID, Emote1, Emote2, Emote3, Emote4, EmoteDelay1, EmoteDelay2, EmoteDelay3, EmoteDelay4, RewardText FROM quest_offer_reward");
+
+    if (!result)
+    {
+        sLog->outError(">> Loaded 0 quest reward emotes. DB table `quest_offer_reward` is empty.");
+    }
+    else
+    {
+        do
+        {
+            Field* fields = result->Fetch();
+            uint32 questId = fields[0].GetUInt32();
+
+            auto itr = _questTemplates.find(questId);
+            if (itr != _questTemplates.end())
+                itr->second->LoadQuestOfferReward(fields);
+            else
+                sLog->outError("Table `quest_offer_reward` has data for quest %u but such quest does not exist", questId);
+        } while (result->NextRow());
+    }
 
     // Load `quest_template_addon`
     //                                   0   1         2                 3              4            5            6               7                     8
@@ -4013,12 +4078,12 @@ void ObjectMgr::LoadQuests()
             }
         }
         // AllowableRaces, can be 0/RACEMASK_ALL_PLAYABLE to allow any race
-        if (qinfo->RequiredRaces)
+        if (qinfo->AllowableRaces)
             {
-            if (!(qinfo->RequiredRaces & RACEMASK_ALL_PLAYABLE))
+            if (!(qinfo->AllowableRaces & RACEMASK_ALL_PLAYABLE))
                 {
-                    sLog->outErrorDb("Quest %u does not contain any playable races in `RequiredRaces` (%u), value set to 0 (all races).", qinfo->GetQuestId(), qinfo->RequiredRaces);
-                    qinfo->RequiredRaces = 0;
+                    sLog->outErrorDb("Quest %u does not contain any playable races in `AllowableRaces` (%u), value set to 0 (all races).", qinfo->GetQuestId(), qinfo->AllowableRaces);
+                    qinfo->AllowableRaces = 0;
                 }
             }
         // RequiredSkillId, can be 0
@@ -4120,26 +4185,26 @@ void ObjectMgr::LoadQuests()
             // quest can't reward this title
         }
 
-        if (qinfo->SourceItemId)
+        if (qinfo->StartItem)
         {
-            if (!sObjectMgr->GetItemTemplate(qinfo->SourceItemId))
+            if (!sObjectMgr->GetItemTemplate(qinfo->StartItem))
             {
-                sLog->outErrorDb("Quest %u has `SourceItemId` = %u but item with entry %u does not exist, quest can't be done.",
-                    qinfo->GetQuestId(), qinfo->SourceItemId, qinfo->SourceItemId);
-                qinfo->SourceItemId = 0;                       // quest can't be done for this requirement
+                sLog->outErrorDb("Quest %u has `StartItem` = %u but item with entry %u does not exist, quest can't be done.",
+                    qinfo->GetQuestId(), qinfo->StartItem, qinfo->StartItem);
+                qinfo->StartItem = 0;                       // quest can't be done for this requirement
             }
-            else if (qinfo->SourceItemIdCount == 0)
+            else if (qinfo->StartItemCount == 0)
             {
-                sLog->outErrorDb("Quest %u has `SourceItemId` = %u but `SourceItemIdCount` = 0, set to 1 but need fix in DB.",
-                    qinfo->GetQuestId(), qinfo->SourceItemId);
-                qinfo->SourceItemIdCount = 1;                    // update to 1 for allow quest work for backward compatibility with DB
+                sLog->outErrorDb("Quest %u has `StartItem` = %u but `StartItemCount` = 0, set to 1 but need fix in DB.",
+                    qinfo->GetQuestId(), qinfo->StartItem);
+                qinfo->StartItemCount = 1;                    // update to 1 for allow quest work for backward compatibility with DB
             }
         }
-        else if (qinfo->SourceItemIdCount>0)
+        else if (qinfo->StartItemCount > 0)
         {
-            sLog->outErrorDb("Quest %u has `SourceItemId` = 0 but `SourceItemIdCount` = %u, useless value.",
-                qinfo->GetQuestId(), qinfo->SourceItemIdCount);
-            qinfo->SourceItemIdCount=0;                          // no quest work changes in fact
+            sLog->outErrorDb("Quest %u has `StartItem` = 0 but `StartItemCount` = %u, useless value.",
+                qinfo->GetQuestId(), qinfo->StartItemCount);
+            qinfo->StartItemCount = 0;                          // no quest work changes in fact
         }
 
         if (qinfo->SourceSpellid)
@@ -4190,22 +4255,22 @@ void ObjectMgr::LoadQuests()
 
         for (uint8 j = 0; j < QUEST_SOURCE_ITEM_IDS_COUNT; ++j)
         {
-            uint32 id = qinfo->RequiredSourceItemId[j];
+            uint32 id = qinfo->ItemDrop[j];
             if (id)
             {
                 if (!sObjectMgr->GetItemTemplate(id))
                 {
-                    sLog->outErrorDb("Quest %u has `RequiredSourceItemId%d` = %u but item with entry %u does not exist, quest can't be done.",
+                    sLog->outErrorDb("Quest %u has `ItemDrop%d` = %u but item with entry %u does not exist, quest can't be done.",
                         qinfo->GetQuestId(), j+1, id, id);
                     // no changes, quest can't be done for this requirement
                 }
             }
             else
             {
-                if (qinfo->RequiredSourceItemCount[j]>0)
+                if (qinfo->ItemDropQuantity[j]>0)
                 {
-                    sLog->outErrorDb("Quest %u has `RequiredSourceItemId%d` = 0 but `RequiredSourceItemCount%d` = %u.",
-                        qinfo->GetQuestId(), j+1, j+1, qinfo->RequiredSourceItemCount[j]);
+                    sLog->outErrorDb("Quest %u has `ItemDrop%d` = 0 but `ItemDropQuantity%d` = %u.",
+                        qinfo->GetQuestId(), j+1, j+1, qinfo->ItemDropQuantity[j]);
                     // no changes, quest ignore this data
                 }
             }
@@ -4326,55 +4391,55 @@ void ObjectMgr::LoadQuests()
             }
         }
 
-        if (qinfo->RewardSpell)
+        if (qinfo->RewardDisplaySpell)
+        {
+            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(qinfo->RewardDisplaySpell);
+
+            if (!spellInfo)
+            {
+                sLog->outErrorDb("Quest %u has `RewardDisplaySpell` = %u but spell %u does not exist, spell removed as display reward.",
+                    qinfo->GetQuestId(), qinfo->RewardDisplaySpell, qinfo->RewardDisplaySpell);
+                qinfo->RewardDisplaySpell = 0;                        // no spell reward will display for this quest
+            }
+
+            else if (!SpellMgr::ComputeIsSpellValid(spellInfo))
+            {
+                sLog->outErrorDb("Quest %u has `RewardDisplaySpell` = %u but spell %u is broken, quest will not have a spell reward.",
+                    qinfo->GetQuestId(), qinfo->RewardDisplaySpell, qinfo->RewardDisplaySpell);
+                qinfo->RewardDisplaySpell = 0;                        // no spell reward will display for this quest
+            }
+
+            else if (GetTalentSpellCost(qinfo->RewardDisplaySpell))
+            {
+                sLog->outErrorDb("Quest %u has `RewardDisplaySpell` = %u but spell %u is talent, quest will not have a spell reward.",
+                    qinfo->GetQuestId(), qinfo->RewardDisplaySpell, qinfo->RewardDisplaySpell);
+                qinfo->RewardDisplaySpell = 0;                        // no spell reward will display for this quest
+            }
+        }
+
+        if (qinfo->RewardSpell > 0)
         {
             SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(qinfo->RewardSpell);
 
             if (!spellInfo)
             {
-                sLog->outErrorDb("Quest %u has `RewardSpell` = %u but spell %u does not exist, spell removed as display reward.",
+                sLog->outErrorDb("Quest %u has `RewardSpell` = %u but spell %u does not exist, quest will not have a spell reward.",
                     qinfo->GetQuestId(), qinfo->RewardSpell, qinfo->RewardSpell);
-                qinfo->RewardSpell = 0;                        // no spell reward will display for this quest
+                qinfo->RewardSpell = 0;                    // no spell will be casted on player
             }
 
             else if (!SpellMgr::ComputeIsSpellValid(spellInfo))
             {
                 sLog->outErrorDb("Quest %u has `RewardSpell` = %u but spell %u is broken, quest will not have a spell reward.",
                     qinfo->GetQuestId(), qinfo->RewardSpell, qinfo->RewardSpell);
-                qinfo->RewardSpell = 0;                        // no spell reward will display for this quest
+                qinfo->RewardSpell = 0;                    // no spell will be casted on player
             }
 
             else if (GetTalentSpellCost(qinfo->RewardSpell))
             {
-                sLog->outErrorDb("Quest %u has `RewardSpell` = %u but spell %u is talent, quest will not have a spell reward.",
+                sLog->outErrorDb("Quest %u has `RewardDisplaySpell` = %u but spell %u is talent, quest will not have a spell reward.",
                     qinfo->GetQuestId(), qinfo->RewardSpell, qinfo->RewardSpell);
-                qinfo->RewardSpell = 0;                        // no spell reward will display for this quest
-            }
-        }
-
-        if (qinfo->RewardSpellCast > 0)
-        {
-            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(qinfo->RewardSpellCast);
-
-            if (!spellInfo)
-            {
-                sLog->outErrorDb("Quest %u has `RewardSpellCast` = %u but spell %u does not exist, quest will not have a spell reward.",
-                    qinfo->GetQuestId(), qinfo->RewardSpellCast, qinfo->RewardSpellCast);
-                qinfo->RewardSpellCast = 0;                    // no spell will be casted on player
-            }
-
-            else if (!SpellMgr::ComputeIsSpellValid(spellInfo))
-            {
-                sLog->outErrorDb("Quest %u has `RewardSpellCast` = %u but spell %u is broken, quest will not have a spell reward.",
-                    qinfo->GetQuestId(), qinfo->RewardSpellCast, qinfo->RewardSpellCast);
-                qinfo->RewardSpellCast = 0;                    // no spell will be casted on player
-            }
-
-            else if (GetTalentSpellCost(qinfo->RewardSpellCast))
-            {
-                sLog->outErrorDb("Quest %u has `RewardSpell` = %u but spell %u is talent, quest will not have a spell reward.",
-                    qinfo->GetQuestId(), qinfo->RewardSpellCast, qinfo->RewardSpellCast);
-                qinfo->RewardSpellCast = 0;                    // no spell will be casted on player
+                qinfo->RewardSpell = 0;                    // no spell will be casted on player
             }
         }
 
@@ -4399,14 +4464,14 @@ void ObjectMgr::LoadQuests()
                 usedMailTemplates[qinfo->RewardMailTemplateId] = qinfo->GetQuestId();
         }
 
-        if (qinfo->NextQuestIdChain)
+        if (qinfo->RewardNextQuest)
         {
-            QuestMap::iterator qNextItr = _questTemplates.find(qinfo->NextQuestIdChain);
+            QuestMap::iterator qNextItr = _questTemplates.find(qinfo->RewardNextQuest);
             if (qNextItr == _questTemplates.end())
             {
-                sLog->outErrorDb("Quest %u has `NextQuestIdChain` = %u but quest %u does not exist, quest chain will not work.",
-                    qinfo->GetQuestId(), qinfo->NextQuestIdChain, qinfo->NextQuestIdChain);
-                qinfo->NextQuestIdChain = 0;
+                sLog->outErrorDb("Quest %u has `RewardNextQuest` = %u but quest %u does not exist, quest chain will not work.",
+                    qinfo->GetQuestId(), qinfo->RewardNextQuest, qinfo->RewardNextQuest);
+                qinfo->RewardNextQuest = 0;
             }
             else
                 qNextItr->second->prevChainQuests.push_back(qinfo->GetQuestId());
@@ -4441,7 +4506,7 @@ void ObjectMgr::LoadQuests()
 
         if (qinfo->ExclusiveGroup)
             mExclusiveQuestGroups.insert(std::pair<int32, uint32>(qinfo->ExclusiveGroup, qinfo->GetQuestId()));
-        if (qinfo->LimitTime)
+        if (qinfo->TimeAllowed)
             qinfo->SetSpecialFlag(QUEST_SPECIAL_FLAGS_TIMED);
         if (qinfo->RequiredPlayerKills)
             qinfo->SetSpecialFlag(QUEST_SPECIAL_FLAGS_PLAYER_KILL);
@@ -4519,7 +4584,7 @@ void ObjectMgr::LoadQuestLocales()
             AddLocaleString(fields[1 + 11 * (i - 1) + 2].GetString(), locale, data.Objectives);
             AddLocaleString(fields[1 + 11 * (i - 1) + 3].GetString(), locale, data.OfferRewardText);
             AddLocaleString(fields[1 + 11 * (i - 1) + 4].GetString(), locale, data.RequestItemsText);
-            AddLocaleString(fields[1 + 11 * (i - 1) + 5].GetString(), locale, data.EndText);
+            AddLocaleString(fields[1 + 11 * (i - 1) + 5].GetString(), locale, data.AreaDescription);
             AddLocaleString(fields[1 + 11 * (i - 1) + 6].GetString(), locale, data.CompletedText);
 
             for (uint8 k = 0; k < 4; ++k)

@@ -577,6 +577,12 @@ void Creature::Update(uint32 diff)
                 SelectVictim();
             }
 
+            Unit* owner = GetCharmerOrOwner();
+            if (IsCharmed() && !IsWithinDistInMap(owner, GetMap()->GetVisibilityRange()))
+            {
+                RemoveCharmAuras();
+            }
+
             if (!IsInEvadeMode() && IsAIEnabled)
             {
                 // do not allow the AI to be changed during update
@@ -2808,4 +2814,46 @@ void Creature::ReleaseFocus(Spell const* focusSpell)
 
     if (focusSpell->GetSpellInfo()->HasAttribute(SPELL_ATTR5_DONT_TURN_DURING_CAST))
         ClearUnitState(UNIT_STATE_ROTATING);
+}
+
+float Creature::GetAttackDistance(Unit const* player) const
+{
+    float aggroRate = sWorld->getRate(RATE_CREATURE_AGGRO);
+
+    if (aggroRate == 0)
+        return 0.0f;
+
+    if (!player)
+        return 0.0f;
+
+    uint32 playerLevel = player->getLevelForTarget(this);
+    uint32 creatureLevel = getLevelForTarget(player);
+
+    int32 levelDiff = static_cast<int32>(playerLevel) - static_cast<int32>(creatureLevel);
+
+    // "The maximum Aggro Radius has a cap of 25 levels under. Example: A level 30 char has the same Aggro Radius of a level 5 char on a level 60 mob."
+    if (levelDiff < -25)
+        levelDiff = -25;
+
+    // "The aggro radius of a mob having the same level as the player is roughly 20 yards"
+    float retDistance = 20.0f;
+
+    // "Aggro Radius varies with level difference at a rate of roughly 1 yard/level"
+    // radius grow if playlevel < creaturelevel
+    retDistance -= static_cast<float>(levelDiff);
+
+    if (creatureLevel + 5 <= sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
+    {
+        // detect range auras
+        retDistance += static_cast<float>( GetTotalAuraModifier(SPELL_AURA_MOD_DETECT_RANGE) );
+
+        // detected range auras
+        retDistance += static_cast<float>( player->GetTotalAuraModifier(SPELL_AURA_MOD_DETECTED_RANGE) );
+    }
+
+    // "Minimum Aggro Radius for a mob seems to be combat range (5 yards)"
+    if (retDistance < 5.0f)
+        retDistance = 5.0f;
+
+    return (retDistance*aggroRate);
 }
