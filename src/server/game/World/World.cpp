@@ -3210,8 +3210,7 @@ void World::LoadGlobalPlayerDataStore()
     QueryResult result = CharacterDatabase.Query("SELECT guid, account, name, gender, race, class, level FROM characters WHERE deleteDate IS NULL");
     if (!result)
     {
-        sLog->outString();
-        sLog->outErrorDb(">>  Loaded 0 Players data!");
+        sLog->outString(">> Loaded 0 Players data.");
         return;
     }
 
