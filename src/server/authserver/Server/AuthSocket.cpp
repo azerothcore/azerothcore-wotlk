@@ -213,7 +213,7 @@ void AuthSocket::OnRead()
     {
         if (!socket().recv_soft((char *)&_cmd, 1))
             return;
-        
+
         if (_cmd == AUTH_LOGON_CHALLENGE || _cmd == REALM_LIST) // realmlist packet
         {
             ++challengesInARow;
