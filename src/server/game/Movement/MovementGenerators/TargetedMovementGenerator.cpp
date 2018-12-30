@@ -84,7 +84,7 @@ void TargetedMovementGeneratorMedium<T,D>::_setTargetLocation(T* owner, bool ini
         //  be (GetCombatReach() + i_offset) away.
         // Only applies when i_target is pet's owner otherwise pets and mobs end up
         //   doing a "dance" while fighting
-        if (i_target->GetTypeId() == TYPEID_PLAYER && (owner->IsPet() || owner->ToCreature()->GetCreatureType() == CREATURE_TYPE_NON_COMBAT_PET))
+        if (owner->IsPet() && i_target->GetTypeId() == TYPEID_PLAYER)
         {
             dist = i_target->GetCombatReach();
             size = i_target->GetCombatReach() - i_target->GetObjectSize();
@@ -105,6 +105,7 @@ void TargetedMovementGeneratorMedium<T,D>::_setTargetLocation(T* owner, bool ini
             // fix distance and angle for vanity pets
             dist = 0.3f;
             angle = PET_FOLLOW_ANGLE + M_PI * 0.2f;
+            size = i_target->GetCombatReach() - i_target->GetObjectSize();
         }
 
         // Xinef: Fix follow angle for hostile units
