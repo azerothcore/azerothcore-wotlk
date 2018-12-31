@@ -181,6 +181,12 @@ class CharacterCreateInfo
         virtual ~CharacterCreateInfo(){};
 };
 
+struct PacketCounter
+{
+    time_t lastReceiveTime;
+    uint32 amountCounter;
+};
+
 /// Player session in the World
 class WorldSession
 {
@@ -932,6 +938,36 @@ class WorldSession
 
         QueryResultHolderFuture _loadPetFromDBSecondCallback;
         QueryCallback_3<PreparedQueryResult, uint8, uint8, uint32> _openWrappedItemCallback;
+
+    friend class World;
+    protected:
+        class DosProtection
+        {
+            friend class World;
+            public:
+                DosProtection(WorldSession* s) : Session(s), _policy((Policy)sWorld->getIntConfig(CONFIG_PACKET_SPOOF_POLICY)) { }
+                bool EvaluateOpcode(WorldPacket& p, time_t time) const;
+            protected:
+                enum Policy
+                {
+                    POLICY_LOG,
+                    POLICY_KICK,
+                    POLICY_BAN,
+                };
+
+                uint32 GetMaxPacketCounterAllowed(uint16 opcode) const;
+
+                WorldSession* Session;
+
+            private:
+                Policy _policy;
+                typedef std::unordered_map<uint16, PacketCounter> PacketThrottlingMap;
+                // mark this member as "mutable" so it can be modified even in const functions
+                mutable PacketThrottlingMap _PacketThrottlingMap;
+
+                DosProtection(DosProtection const& right) = delete;
+                DosProtection& operator=(DosProtection const& right) = delete;
+} AntiDOS;
 
     public:
         // xinef: those must be public, requires calls out of worldsession :(
