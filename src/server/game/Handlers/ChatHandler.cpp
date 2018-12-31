@@ -315,6 +315,24 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
     }
 
 
+    // GS Reguest(addon) — check for broken addons that cause client cras
+    if (lang == LANG_ADDON)
+    {
+        size_t foundGS;
+        std::string msgGs = msg.substr(0,10);
+
+        foundGS = msgGs.find("GSY");
+        if (foundGS != std::string::npos)
+        {
+            time_t pNow = time(NULL);
+
+            if (pNow - timerGsSpam < 6)
+                return;
+            else 
+                timerGsSpam = pNow;
+        }
+    }
+
     switch (type)
     {
         case CHAT_MSG_SAY:

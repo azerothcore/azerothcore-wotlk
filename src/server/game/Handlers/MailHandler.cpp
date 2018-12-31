@@ -4,6 +4,7 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
+#include "Chat.h"
 #include "DatabaseEnv.h"
 #include "Mail.h"
 #include "WorldPacket.h"
@@ -186,6 +187,10 @@ void WorldSession::HandleSendMail(WorldPacket & recvData)
         player->SendMailResult(0, MAIL_SEND, MAIL_ERR_NOT_YOUR_TEAM);
         return;
     }
+
+    //check for fake packets and bad addons that cause client to crash
+    if (!ChatHandler(this).isValidChatMessage(subject.c_str()) || !ChatHandler(this).isValidChatMessage(body.c_str()))
+        return;
 
     Item* items[MAX_MAIL_ITEMS];
 

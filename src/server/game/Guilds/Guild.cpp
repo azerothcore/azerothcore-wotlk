@@ -1529,6 +1529,10 @@ void Guild::HandleInviteMember(WorldSession* session, std::string const& name)
         return;
     }
 
+    //check for fake packets and bad addons that cause client to crash
+    if (!ChatHandler(player->GetSession()).isValidChatMessage(m_name.c_str()))
+        return;
+
     SendCommandResult(session, GUILD_COMMAND_INVITE, ERR_GUILD_COMMAND_SUCCESS, name);
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
