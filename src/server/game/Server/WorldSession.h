@@ -946,9 +946,12 @@ class WorldSession
         {
             friend class World;
             public:
+
                 DosProtection(WorldSession* s) : Session(s), _policy((Policy)sWorld->getIntConfig(CONFIG_PACKET_SPOOF_POLICY)) { }
                 bool EvaluateOpcode(WorldPacket& p, time_t time) const;
+
             protected:
+
                 enum Policy
                 {
                     POLICY_LOG,
@@ -961,14 +964,17 @@ class WorldSession
                 WorldSession* Session;
 
             private:
+
                 Policy _policy;
                 typedef std::unordered_map<uint16, PacketCounter> PacketThrottlingMap;
+
                 // mark this member as "mutable" so it can be modified even in const functions
                 mutable PacketThrottlingMap _PacketThrottlingMap;
 
                 DosProtection(DosProtection const& right) = delete;
                 DosProtection& operator=(DosProtection const& right) = delete;
-} AntiDOS;
+                
+        } AntiDOS;
 
     public:
         // xinef: those must be public, requires calls out of worldsession :(
