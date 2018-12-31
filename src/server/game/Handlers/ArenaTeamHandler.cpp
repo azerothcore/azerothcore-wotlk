@@ -18,7 +18,6 @@
 #include "ArenaTeamMgr.h"
 #include "Opcodes.h"
 
-
 void WorldSession::HandleInspectArenaTeamsOpcode(WorldPacket & recvData)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
