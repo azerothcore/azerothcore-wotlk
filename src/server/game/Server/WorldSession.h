@@ -19,6 +19,7 @@
 #include "WorldPacket.h"
 #include "GossipDef.h"
 #include "Cryptography/BigNumber.h"
+#include "AccountMgr.h"
 
 class Creature;
 class GameObject;
