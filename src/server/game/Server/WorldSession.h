@@ -991,6 +991,7 @@ class WorldSession
         bool isRecruiter;
         ACE_Based::LockedQueue<WorldPacket*, ACE_Thread_Mutex> _recvQueue;
         uint64 m_currentBankerGUID;
+        time_t timerGsSpam;
         time_t timeWhoCommandAllowed;
         uint32 _offlineTime;
         bool _kicked;

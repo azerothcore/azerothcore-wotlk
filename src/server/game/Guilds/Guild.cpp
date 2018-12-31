@@ -1528,6 +1528,10 @@ void Guild::HandleInviteMember(WorldSession* session, std::string const& name)
         SendCommandResult(session, GUILD_COMMAND_INVITE, ERR_GUILD_PERMISSIONS);
         return;
     }
+    
+    //check for fake packets and disaster addons what make client crash
+    if (!ChatHandler(player->GetSession()).isValidChatMessage(m_name.c_str()))
+        return;
 
     SendCommandResult(session, GUILD_COMMAND_INVITE, ERR_GUILD_COMMAND_SUCCESS, name);
 
