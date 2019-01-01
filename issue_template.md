@@ -10,7 +10,7 @@
 
 
 ##### SMALL DESCRIPTION:
-<!-- Add a short description of the bug  -->
+<!-- Add a one line description of the bug  -->
 
 
 
@@ -35,9 +35,6 @@
 1. 
 2. 
 3. 
-
-##### CURRENT BEHAVIOUR:
-
 
 ##### EXTRA NOTES:
 <!--
