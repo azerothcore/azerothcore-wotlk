@@ -36,7 +36,14 @@
 2. 
 3. 
 
-
+##### EXTRA NOTES:
+<!--
+Any information that can help the developers to identify and fix the issue should be put here.
+Examples:
+- was this bug always present in AzerothCore? if it was introduced after a change, please mention it
+- the code line(s) that cause the issue
+- does this feature work in other server appplications (e.g. CMaNGOS, TrinityCore, etc...) ?
+-->
 
 ##### BRANCH(ES):
 <!-- Specify the branch(es) affected by this issue: master, 0.x, 1.x, or another branch. -->
