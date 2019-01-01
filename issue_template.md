@@ -10,7 +10,7 @@
 
 
 ##### SMALL DESCRIPTION:
-<!-- Add a one line description of the bug  -->
+<!-- Add a one line description of the bug -->
 
 
 
