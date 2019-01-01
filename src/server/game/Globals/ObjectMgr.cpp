@@ -4660,13 +4660,6 @@ void ObjectMgr::LoadScripts(ScriptsType type)
                         tableName.c_str(), tmp.Talk.TextID, tmp.id);
                     continue;
                 }
-                if (tmp.Talk.TextID < MIN_DB_SCRIPT_STRING_ID || tmp.Talk.TextID >= MAX_DB_SCRIPT_STRING_ID)
-                {
-                    sLog->outErrorDb("Table `%s` has out of range text id (dataint = %i expected %u-%u) in SCRIPT_COMMAND_TALK for script id %u",
-                        tableName.c_str(), tmp.Talk.TextID, MIN_DB_SCRIPT_STRING_ID, MAX_DB_SCRIPT_STRING_ID, tmp.id);
-                    continue;
-                }
-
                 break;
             }
 
@@ -5373,49 +5366,74 @@ void ObjectMgr::LoadGossipText()
 {
     uint32 oldMSTime = getMSTime();
 
-    QueryResult result = WorldDatabase.Query("SELECT * FROM npc_text");
+    QueryResult result = WorldDatabase.Query("SELECT ID, "
+        "text0_0, text0_1, BroadcastTextID0, lang0, Probability0, em0_0, em0_1, em0_2, em0_3, em0_4, em0_5, "
+        "text1_0, text1_1, BroadcastTextID1, lang1, Probability1, em1_0, em1_1, em1_2, em1_3, em1_4, em1_5, "
+        "text2_0, text2_1, BroadcastTextID2, lang2, Probability2, em2_0, em2_1, em2_2, em2_3, em2_4, em2_5, "
+        "text3_0, text3_1, BroadcastTextID3, lang3, Probability3, em3_0, em3_1, em3_2, em3_3, em3_4, em3_5, "
+        "text4_0, text4_1, BroadcastTextID4, lang4, Probability4, em4_0, em4_1, em4_2, em4_3, em4_4, em4_5, "
+        "text5_0, text5_1, BroadcastTextID5, lang5, Probability5, em5_0, em5_1, em5_2, em5_3, em5_4, em5_5, "
+        "text6_0, text6_1, BroadcastTextID6, lang6, Probability6, em6_0, em6_1, em6_2, em6_3, em6_4, em6_5, "
+        "text7_0, text7_1, BroadcastTextID7, lang7, Probability7, em7_0, em7_1, em7_2, em7_3, em7_4, em7_5 "
+        "FROM npc_text");
 
-    int count = 0;
     if (!result)
     {
-        sLog->outString(">> Loaded %u npc texts", count);
+        sLog->outErrorDb(">> Loaded 0 npc texts, table is empty!");
         sLog->outString();
         return;
     }
+
     _gossipTextStore.rehash(result->GetRowCount());
 
-    int cic;
+    uint32 count = 0;
+    uint8 cic;
 
     do
     {
-        ++count;
+        
         cic = 0;
 
         Field* fields = result->Fetch();
 
-        uint32 Text_ID    = fields[cic++].GetUInt32();
-        if (!Text_ID)
+        uint32 id = fields[cic++].GetUInt32();
+        if (!id)
         {
             sLog->outErrorDb("Table `npc_text` has record wit reserved id 0, ignore.");
             continue;
         }
 
-        GossipText& gText = _gossipTextStore[Text_ID];
+        GossipText& gText = _gossipTextStore[id];
 
-        for (int i = 0; i < MAX_GOSSIP_TEXT_OPTIONS; i++)
+        for (uint8 i = 0; i < MAX_GOSSIP_TEXT_OPTIONS; ++i)
         {
             gText.Options[i].Text_0           = fields[cic++].GetString();
             gText.Options[i].Text_1           = fields[cic++].GetString();
-
+            gText.Options[i].BroadcastTextID  = fields[cic++].GetUInt32();
             gText.Options[i].Language         = fields[cic++].GetUInt8();
             gText.Options[i].Probability      = fields[cic++].GetFloat();
 
-            for (uint8 j=0; j < MAX_GOSSIP_TEXT_EMOTES; ++j)
+            for (uint8 j = 0; j < MAX_GOSSIP_TEXT_EMOTES; ++j)
             {
-                gText.Options[i].Emotes[j]._Delay  = fields[cic++].GetUInt16();
-                gText.Options[i].Emotes[j]._Emote  = fields[cic++].GetUInt16();
+                gText.Options[i].Emotes[j]._Delay = fields[cic++].GetUInt16();
+                gText.Options[i].Emotes[j]._Emote = fields[cic++].GetUInt16();
             }
         }
+
+        for (uint8 i = 0; i < MAX_GOSSIP_TEXT_OPTIONS; i++)
+        {
+            if (gText.Options[i].BroadcastTextID)
+            {
+                if (!sObjectMgr->GetBroadcastText(gText.Options[i].BroadcastTextID))
+                {
+                    sLog->outErrorDb("GossipText (Id: %u) in table `npc_text` has non-existing or incompatible BroadcastTextID%u %u.", id, i, gText.Options[i].BroadcastTextID);
+                    gText.Options[i].BroadcastTextID = 0;
+                }
+            }
+        }
+
+        count++;
+
     } while (result->NextRow());
 
     sLog->outString(">> Loaded %u npc texts in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
@@ -7829,108 +7847,52 @@ void ObjectMgr::LoadGameObjectForQuests()
     sLog->outString();
 }
 
-bool ObjectMgr::LoadTrinityStrings(const char* table, int32 min_value, int32 max_value)
+bool ObjectMgr::LoadTrinityStrings()
 {
     uint32 oldMSTime = getMSTime();
 
-    int32 start_value = min_value;
-    int32 end_value   = max_value;
-    // some string can have negative indexes range
-    if (start_value < 0)
-    {
-        if (end_value >= start_value)
-        {
-            sLog->outErrorDb("Table '%s' attempt loaded with invalid range (%d - %d), strings not loaded.", table, min_value, max_value);
-            return false;
-        }
-
-        // real range (max+1, min+1) exaple: (-10, -1000) -> -999...-10+1
-        std::swap(start_value, end_value);
-        ++start_value;
-        ++end_value;
-    }
-    else
-    {
-        if (start_value >= end_value)
-        {
-            sLog->outErrorDb("Table '%s' attempt loaded with invalid range (%d - %d), strings not loaded.", table, min_value, max_value);
-            return false;
-        }
-    }
-
-    // cleanup affected map part for reloading case
-    for (TrinityStringLocaleContainer::iterator itr = _trinityStringLocaleStore.begin(); itr != _trinityStringLocaleStore.end();)
-    {
-        if (itr->first >= start_value && itr->first < end_value)
-            _trinityStringLocaleStore.erase(itr++);
-        else
-            ++itr;
-    }
-
-    QueryResult result = WorldDatabase.PQuery("SELECT entry, content_default, content_loc1, content_loc2, content_loc3, content_loc4, content_loc5, content_loc6, content_loc7, content_loc8 FROM %s", table);
-
+    _trinityStringStore.clear(); // for reload case
+    QueryResult result = WorldDatabase.PQuery("SELECT entry, content_default, content_loc1, content_loc2, content_loc3, content_loc4, content_loc5, content_loc6, content_loc7, content_loc8 FROM trinity_string");
     if (!result)
     {
-        if (min_value == MIN_TRINITY_STRING_ID)              // error only in case internal strings
-            sLog->outErrorDb(">> Loaded 0 trinity strings. DB table `%s` is empty. Cannot continue.", table);
-        else
-            sLog->outString(">> Loaded 0 string templates. DB table `%s` is empty.", table);
+        sLog->outString(">> Loaded 0 trinity strings. DB table `trinity_strings` is empty.");
         sLog->outString();
         return false;
     }
-
-    uint32 count = 0;
 
     do
     {
         Field* fields = result->Fetch();
 
-        int32 entry = fields[0].GetInt32();
+        uint32 entry = fields[0].GetUInt32();
 
-        if (entry == 0)
-        {
-            sLog->outErrorDb("Table `%s` contain reserved entry 0, ignored.", table);
-            continue;
-        }
-        else if (entry < start_value || entry >= end_value)
-        {
-            sLog->outErrorDb("Table `%s` contain entry %i out of allowed range (%d - %d), ignored.", table, entry, min_value, max_value);
-            continue;
-        }
+        TrinityString& data = _trinityStringStore[entry];
 
-        TrinityStringLocale& data = _trinityStringLocaleStore[entry];
-
-        if (!data.Content.empty())
-        {
-            sLog->outErrorDb("Table `%s` contain data for already loaded entry  %i (from another table?), ignored.", table, entry);
-            continue;
-        }
-
-        data.Content.resize(1);
-        ++count;
+        data.Content.resize(DEFAULT_LOCALE + 1);
 
         for (uint8 i = 0; i < TOTAL_LOCALES; ++i)
             AddLocaleString(fields[i + 1].GetString(), LocaleConstant(i), data.Content);
+
     } while (result->NextRow());
 
-    if (min_value == MIN_TRINITY_STRING_ID)
-        sLog->outString(">> Loaded %u Trinity strings from table %s in %u ms", count, table, GetMSTimeDiffToNow(oldMSTime));
-    else
-        sLog->outString(">> Loaded %u string templates from %s in %u ms", count, table, GetMSTimeDiffToNow(oldMSTime));
-
+    sLog->outString(">> Loaded %u trinity strings in %u ms", (uint32)_trinityStringStore.size(), GetMSTimeDiffToNow(oldMSTime));
     sLog->outString();
+
     return true;
 }
 
-const char *ObjectMgr::GetTrinityString(int32 entry, LocaleConstant  /*locale_idx*/) const
+char const* ObjectMgr::GetTrinityString(uint32 entry, LocaleConstant locale) const
 {
-    if (TrinityStringLocale const* msl = GetTrinityStringLocale(entry))
-        return msl->Content[DEFAULT_LOCALE].c_str();
+    if (TrinityString const* ts = GetTrinityString(entry))
+    {
+        if (ts->Content.size() > size_t(locale) && !ts->Content[locale].empty())
+            return ts->Content[locale].c_str();
 
-    if (entry > 0)
-        sLog->outErrorDb("Entry %i not found in `trinity_string` table.", entry);
-    else
-        sLog->outErrorDb("Trinity string entry %i not found in DB.", entry);
+        return ts->Content[DEFAULT_LOCALE].c_str();
+    }
+
+    sLog->outErrorDb("Trinity string entry %u not found in DB.", entry);
+
     return "<error>";
 }
 
@@ -8899,63 +8861,6 @@ void ObjectMgr::LoadBroadcastTextLocales()
 
     sLog->outString(">> Loaded %u Broadcast Text Locales in %u ms", uint32(_broadcastTextStore.size()), GetMSTimeDiffToNow(oldMSTime));
     sLog->outString();
-}
-
-void ObjectMgr::CheckScripts(ScriptsType type, std::set<int32>& ids)
-{
-    ScriptMapMap* scripts = GetScriptsMapByType(type);
-    if (!scripts)
-        return;
-
-    for (ScriptMapMap::const_iterator itrMM = scripts->begin(); itrMM != scripts->end(); ++itrMM)
-    {
-        for (ScriptMap::const_iterator itrM = itrMM->second.begin(); itrM != itrMM->second.end(); ++itrM)
-        {
-            switch (itrM->second.command)
-            {
-                case SCRIPT_COMMAND_TALK:
-                {
-                    if (!GetTrinityStringLocale (itrM->second.Talk.TextID))
-                        sLog->outErrorDb("Table `%s` references invalid text id %u from `db_script_string`, script id: %u.", GetScriptsTableNameByType(type).c_str(), itrM->second.Talk.TextID, itrMM->first);
-
-                    if (ids.find(itrM->second.Talk.TextID) != ids.end())
-                        ids.erase(itrM->second.Talk.TextID);
-                }
-                default:
-                    break;
-            }
-        }
-    }
-}
-
-void ObjectMgr::LoadDbScriptStrings()
-{
-    LoadTrinityStrings("db_script_string", MIN_DB_SCRIPT_STRING_ID, MAX_DB_SCRIPT_STRING_ID);
-
-    std::set<int32> ids;
-
-    for (int32 i = MIN_DB_SCRIPT_STRING_ID; i < MAX_DB_SCRIPT_STRING_ID; ++i)
-        if (GetTrinityStringLocale(i))
-            ids.insert(i);
-
-    for (int type = SCRIPTS_FIRST; type < SCRIPTS_LAST; ++type)
-        CheckScripts(ScriptsType(type), ids);
-
-    for (std::set<int32>::const_iterator itr = ids.begin(); itr != ids.end(); ++itr)
-        sLog->outErrorDb("Table `db_script_string` has unused string id  %u", *itr);
-}
-
-bool LoadTrinityStrings(const char* table, int32 start_value, int32 end_value)
-{
-    // MAX_DB_SCRIPT_STRING_ID is max allowed negative value for scripts (scrpts can use only more deep negative values
-    // start/end reversed for negative values
-    if (start_value > MAX_DB_SCRIPT_STRING_ID || end_value >= start_value)
-    {
-        sLog->outErrorDb("Table '%s' load attempted with range (%d - %d) reserved by Trinity, strings not loaded.", table, start_value, end_value+1);
-        return false;
-    }
-
-    return sObjectMgr->LoadTrinityStrings(table, start_value, end_value);
 }
 
 CreatureBaseStats const* ObjectMgr::GetCreatureBaseStats(uint8 level, uint8 unitClass)
