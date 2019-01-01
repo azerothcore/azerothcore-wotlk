@@ -13103,33 +13103,29 @@ void Unit::UpdateSpeed(UnitMoveType mtype, bool forced)
                     {
                         // special treatment for player pets in order to avoid stuttering
                         float ownerSpeed = pOwner->GetSpeedRate(mtype);
+                        float minDist = 1.0f;
 
                         if (ToCreature()->GetCreatureType() == CREATURE_TYPE_NON_COMBAT_PET)
                         {
                             // vanity pets have to be treated different than normal pets
-                            if (GetDistance(pOwner) < 5.0f && m_petCatchUp)
-                                m_petCatchUp = false;
-
-                            if (GetDistance(pOwner) > 10.0f && !m_petCatchUp)
-                                m_petCatchUp = true;
-
-                            if (m_petCatchUp)
-                            {
-                                if (GetDistance(pOwner) > 20.0f)
-                                    speed = ownerSpeed*2.0f;
-                                else
-                                    speed = ownerSpeed*1.05f;
-                            }
-                            else
-                                speed = ownerSpeed*0.95f;
+                            minDist = 5.0f;
                         }
-                        else
+
+                        if (GetDistance(pOwner) < minDist && m_petCatchUp)
+                            m_petCatchUp = false;
+
+                        if (GetDistance(pOwner) > minDist * 2 && !m_petCatchUp)
+                            m_petCatchUp = true;
+
+                        if (m_petCatchUp)
                         {
-                            if (ToCreature()->IsWithinMeleeRange(pOwner))
-                                speed = ownerSpeed*0.95f;
+                            if (GetDistance(pOwner) > minDist * 4)
+                                speed = ownerSpeed*2.0f;
                             else
                                 speed = ownerSpeed*1.05f;
                         }
+                        else
+                            speed = ownerSpeed*0.95f;
                     }
                 }
                 else
