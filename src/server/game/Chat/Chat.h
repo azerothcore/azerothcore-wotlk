@@ -141,11 +141,11 @@ class CliHandler : public ChatHandler
         // overwrite functions
         char const* GetTrinityString(uint32 entry) const override;
         bool isAvailable(ChatCommand const& cmd) const override;
-        void SendSysMessage(const char *str);
-        std::string GetNameLink() const;
-        bool needReportToTarget(Player* chr) const;
-        LocaleConstant GetSessionDbcLocale() const;
-        int GetSessionDbLocaleIndex() const;
+        void SendSysMessage(const char *str) override;
+        std::string GetNameLink() const override;
+        bool needReportToTarget(Player* chr) const override;
+        LocaleConstant GetSessionDbcLocale() const override;
+        int GetSessionDbLocaleIndex() const override;
 
     private:
         void* m_callbackArg;
