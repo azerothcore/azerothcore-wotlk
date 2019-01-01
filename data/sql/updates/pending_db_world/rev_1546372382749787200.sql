@@ -42,3 +42,6 @@ ALTER TABLE `gossip_menu_option` CHANGE `box_text` `BoxText` text;
 ALTER TABLE `gossip_menu_option` ADD `OptionBroadcastTextID` MEDIUMINT(6) DEFAULT 0 NOT NULL AFTER `OptionText`;
 ALTER TABLE `gossip_menu_option` ADD `BoxBroadcastTextID` MEDIUMINT(6) DEFAULT 0 NOT NULL AFTER `BoxText`;
 ALTER TABLE `gossip_menu_option` ADD COLUMN `VerifiedBuild` smallint(5) NOT NULL DEFAULT 0 AFTER `BoxBroadcastTextID`;
+
+-- Drop table
+DROP TABLE `db_script_string`; -- RIP
