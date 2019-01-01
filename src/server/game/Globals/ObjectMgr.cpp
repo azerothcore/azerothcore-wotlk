@@ -8482,16 +8482,14 @@ void ObjectMgr::LoadGossipMenu()
 
     _gossipMenusStore.clear();
 
-    QueryResult result = WorldDatabase.Query("SELECT entry, text_id FROM gossip_menu");
+    QueryResult result = WorldDatabase.Query("SELECT MenuID, TextID FROM gossip_menu");
 
     if (!result)
     {
-        sLog->outErrorDb(">> Loaded 0  gossip_menu entries. DB table `gossip_menu` is empty!");
+        sLog->outErrorDb(">> Loaded 0 gossip_menu entries. DB table `gossip_menu` is empty!");
         sLog->outString();
         return;
     }
-
-    uint32 count = 0;
 
     do
     {
@@ -8499,22 +8497,20 @@ void ObjectMgr::LoadGossipMenu()
 
         GossipMenus gMenu;
 
-        gMenu.entry             = fields[0].GetUInt16();
-        gMenu.text_id           = fields[1].GetUInt32();
+        gMenu.MenuID        = fields[0].GetUInt16();
+        gMenu.TextID        = fields[1].GetUInt32();
 
-        if (!GetGossipText(gMenu.text_id))
+        if (!GetGossipText(gMenu.TextID))
         {
-            sLog->outErrorDb("Table gossip_menu entry %u are using non-existing text_id %u", gMenu.entry, gMenu.text_id);
+            sLog->outErrorDb("Table gossip_menu entry %u are using non-existing TextID %u", gMenu.MenuID, gMenu.TextID);
             continue;
         }
 
-        _gossipMenusStore.insert(GossipMenusContainer::value_type(gMenu.entry, gMenu));
+        _gossipMenusStore.insert(GossipMenusContainer::value_type(gMenu.MenuID, gMenu));
 
-        ++count;
-    }
-    while (result->NextRow());
+    } while (result->NextRow());
 
-    sLog->outString(">> Loaded %u gossip_menu entries in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    sLog->outString(">> Loaded %u gossip_menu entries in %u ms", (uint32)_gossipMenusStore.size(), GetMSTimeDiffToNow(oldMSTime));
     sLog->outString();
 }
 
@@ -8525,20 +8521,16 @@ void ObjectMgr::LoadGossipMenuItems()
     _gossipMenuItemsStore.clear();
 
     QueryResult result = WorldDatabase.Query(
-        //          0              1            2           3              4
-        "SELECT menu_id, id, option_icon, option_text, option_id, npc_option_npcflag, "
-        //       5              6           7          8         9
-        "action_menu_id, action_poi_id, box_coded, box_money, box_text "
-        "FROM gossip_menu_option ORDER BY menu_id, id");
+    //      0       1         2           3           4                      5           6              7             8            9         10        11       12  
+    "SELECT MenuID, OptionID, OptionIcon, OptionText, OptionBroadcastTextID, OptionType, OptionNpcFlag, ActionMenuID, ActionPoiID, BoxCoded, BoxMoney, BoxText, BoxBroadcastTextID "
+    "FROM gossip_menu_option ORDER BY MenuID, OptionID");
 
     if (!result)
     {
-        sLog->outErrorDb(">> Loaded 0 gossip_menu_option entries. DB table `gossip_menu_option` is empty!");
+        sLog->outErrorDb(">> Loaded 0 gossip_menu_option IDs. DB table `gossip_menu_option` is empty!");
         sLog->outString();
         return;
     }
-
-    uint32 count = 0;
 
     do
     {
@@ -8546,39 +8538,52 @@ void ObjectMgr::LoadGossipMenuItems()
 
         GossipMenuItems gMenuItem;
 
-        gMenuItem.MenuId                = fields[0].GetUInt16();
-        gMenuItem.OptionIndex           = fields[1].GetUInt16();
-        gMenuItem.OptionIcon            = fields[2].GetUInt32();
-        gMenuItem.OptionText            = fields[3].GetString();
-        gMenuItem.OptionType            = fields[4].GetUInt8();
-        gMenuItem.OptionNpcflag         = fields[5].GetUInt32();
-        gMenuItem.ActionMenuId          = fields[6].GetUInt32();
-        gMenuItem.ActionPoiId           = fields[7].GetUInt32();
-        gMenuItem.BoxCoded              = fields[8].GetBool();
-        gMenuItem.BoxMoney              = fields[9].GetUInt32();
-        gMenuItem.BoxText               = fields[10].GetString();
+        gMenuItem.MenuID                    = fields[0].GetUInt16();
+        gMenuItem.OptionID                  = fields[1].GetUInt16();
+        gMenuItem.OptionIcon                = fields[2].GetUInt32();
+        gMenuItem.OptionText                = fields[3].GetString();
+        gMenuItem.OptionBroadcastTextID     = fields[4].GetUInt32();
+        gMenuItem.OptionType                = fields[5].GetUInt8();
+        gMenuItem.OptionNpcFlag             = fields[6].GetUInt32();
+        gMenuItem.ActionMenuID              = fields[7].GetUInt32();
+        gMenuItem.ActionPoiID               = fields[8].GetUInt32();
+        gMenuItem.BoxCoded                  = fields[9].GetBool();
+        gMenuItem.BoxMoney                  = fields[10].GetUInt32();
+        gMenuItem.BoxText                   = fields[11].GetString();
+        gMenuItem.BoxBroadcastTextID        = fields[12].GetUInt32();
 
         if (gMenuItem.OptionIcon >= GOSSIP_ICON_MAX)
         {
-            sLog->outErrorDb("Table gossip_menu_option for menu %u, id %u has unknown icon id %u. Replacing with GOSSIP_ICON_CHAT", gMenuItem.MenuId, gMenuItem.OptionIndex, gMenuItem.OptionIcon);
+            sLog->outErrorDb("Table `gossip_menu_option` for menu %u, id %u has unknown icon id %u. Replacing with GOSSIP_ICON_CHAT", gMenuItem.MenuID, gMenuItem.OptionID, gMenuItem.OptionIcon);
             gMenuItem.OptionIcon = GOSSIP_ICON_CHAT;
         }
 
-        if (gMenuItem.OptionType >= GOSSIP_OPTION_MAX)
-            sLog->outErrorDb("Table gossip_menu_option for menu %u, id %u has unknown option id %u. Option will not be used", gMenuItem.MenuId, gMenuItem.OptionIndex, gMenuItem.OptionType);
-
-        if (gMenuItem.ActionPoiId && !GetPointOfInterest(gMenuItem.ActionPoiId))
+        if (gMenuItem.OptionBroadcastTextID && !GetBroadcastText(gMenuItem.OptionBroadcastTextID))
         {
-            sLog->outErrorDb("Table gossip_menu_option for menu %u, id %u use non-existing action_poi_id %u, ignoring", gMenuItem.MenuId, gMenuItem.OptionIndex, gMenuItem.ActionPoiId);
-            gMenuItem.ActionPoiId = 0;
+            sLog->outErrorDb("Table `gossip_menu_option` for menu %u, id %u has non-existing or incompatible OptionBroadcastTextID %u, ignoring.", gMenuItem.MenuID, gMenuItem.OptionID, gMenuItem.OptionBroadcastTextID);
+            gMenuItem.OptionBroadcastTextID = 0;
         }
 
-        _gossipMenuItemsStore.insert(GossipMenuItemsContainer::value_type(gMenuItem.MenuId, gMenuItem));
-        ++count;
-    }
-    while (result->NextRow());
+        if (gMenuItem.OptionType >= GOSSIP_OPTION_MAX)
+            sLog->outErrorDb("Table `gossip_menu_option` for menu %u, id %u has unknown option id %u. Option will not be used", gMenuItem.MenuID, gMenuItem.OptionID, gMenuItem.OptionType);
 
-    sLog->outString(">> Loaded %u gossip_menu_option entries in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+        if (gMenuItem.ActionPoiID && !GetPointOfInterest(gMenuItem.ActionPoiID))
+        {
+            sLog->outErrorDb("Table `gossip_menu_option` for menu %u, id %u use non-existing ActionPoiID %u, ignoring", gMenuItem.MenuID, gMenuItem.OptionID, gMenuItem.ActionPoiID);
+            gMenuItem.ActionPoiID = 0;
+        }
+
+        if (gMenuItem.BoxBroadcastTextID && !GetBroadcastText(gMenuItem.BoxBroadcastTextID))
+        {
+            sLog->outErrorDb("Table `gossip_menu_option` for menu %u, id %u has non-existing or incompatible BoxBroadcastTextID %u, ignoring.", gMenuItem.MenuID, gMenuItem.OptionID, gMenuItem.BoxBroadcastTextID);
+            gMenuItem.BoxBroadcastTextID = 0;
+        }
+
+        _gossipMenuItemsStore.insert(GossipMenuItemsContainer::value_type(gMenuItem.MenuID, gMenuItem));
+
+    } while (result->NextRow());
+
+    sLog->outString(">> Loaded %u gossip_menu_option entries in %u ms", uint32(_gossipMenuItemsStore.size()), GetMSTimeDiffToNow(oldMSTime));
     sLog->outString();
 }
 
