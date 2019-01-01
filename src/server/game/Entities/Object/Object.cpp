@@ -1859,7 +1859,7 @@ namespace Trinity
                     ChatHandler::BuildChatPacket(data, i_msgtype, i_language, i_object, i_target, text, 0, "", loc_idx);
                 }
                 else
-                    sLog->outError("entities.unit", "MonsterChatBuilder: `broadcast_text` id %i missing", i_textId);
+                    sLog->outError("MonsterChatBuilder: `broadcast_text` id %i missing", i_textId);
             }
 
         private:
