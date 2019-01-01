@@ -13126,7 +13126,7 @@ void Unit::UpdateSpeed(UnitMoveType mtype, bool forced)
                         else
                         {
                             if (ToCreature()->IsWithinMeleeRange(pOwner))
-                                speed = ownerSpeed;
+                                speed = ownerSpeed*0.95f;
                             else
                                 speed = ownerSpeed*1.05f;
                         }
