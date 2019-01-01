@@ -355,7 +355,7 @@ void ObjectMgr::LoadGossipMenuItemsLocales()
 
     } while (result->NextRow());
 
-    sLog->outString(">> Loaded %lu Gossip Menu Option Locale strings in %u ms", (unsigned long)_gossipMenuItemsLocaleStore.size(), GetMSTimeDiffToNow(oldMSTime));
+    sLog->outString(">> Loaded %u Gossip Menu Option Locale strings in %u ms", (uint32)_gossipMenuItemsLocaleStore.size(), GetMSTimeDiffToNow(oldMSTime));
 }
 
 void ObjectMgr::LoadPointOfInterestLocales()
@@ -387,7 +387,7 @@ void ObjectMgr::LoadPointOfInterestLocales()
 
     } while (result->NextRow());
 
-    sLog->outString(">> Loaded %lu Points Of Interest Locale strings in %u ms", (unsigned long)_pointOfInterestLocaleStore.size(), GetMSTimeDiffToNow(oldMSTime));
+    sLog->outString(">> Loaded %u Points Of Interest Locale strings in %u ms", (uint32)_pointOfInterestLocaleStore.size(), GetMSTimeDiffToNow(oldMSTime));
 }
 
 void ObjectMgr::LoadCreatureTemplates()
@@ -2219,7 +2219,7 @@ void ObjectMgr::LoadItemLocales()
 
     } while (result->NextRow());
 
-    sLog->outString(">> Loaded %lu Item Locale strings in %u ms", (unsigned long)_itemLocaleStore.size(), GetMSTimeDiffToNow(oldMSTime));
+    sLog->outString(">> Loaded %u Item Locale strings in %u ms", (uint32)_itemLocaleStore.size(), GetMSTimeDiffToNow(oldMSTime));
 }
 
 void ObjectMgr::LoadItemTemplates()
@@ -2845,7 +2845,7 @@ void ObjectMgr::LoadItemSetNameLocales()
 
     } while (result->NextRow());
 
-    sLog->outString(">> Loaded " UI64FMTD " Item Set Name Locale strings in %u ms", uint64(_itemSetNameLocaleStore.size()), GetMSTimeDiffToNow(oldMSTime));
+    sLog->outString(">> Loaded %u Item Set Name Locale strings in %u ms", uint32(_itemSetNameLocaleStore.size()), GetMSTimeDiffToNow(oldMSTime));
 }
 
 void ObjectMgr::LoadItemSetNames()
@@ -4590,7 +4590,7 @@ void ObjectMgr::LoadQuestLocales()
 
     } while (result->NextRow());
 
-    sLog->outString(">> Loaded %lu Quest Locale strings in %u ms", (unsigned long)_questLocaleStore.size(), GetMSTimeDiffToNow(oldMSTime));
+    sLog->outString(">> Loaded %u Quest Locale strings in %u ms", (uint32)_questLocaleStore.size(), GetMSTimeDiffToNow(oldMSTime));
 }
 
 void ObjectMgr::LoadScripts(ScriptsType type)
@@ -5221,7 +5221,7 @@ void ObjectMgr::LoadPageTextLocales()
 
     } while (result->NextRow());
 
-    sLog->outString(">> Loaded %lu Page Text Locale strings in %u ms", (unsigned long)_pageTextLocaleStore.size(), GetMSTimeDiffToNow(oldMSTime));
+    sLog->outString(">> Loaded %u Page Text Locale strings in %u ms", (uint32)_pageTextLocaleStore.size(), GetMSTimeDiffToNow(oldMSTime));
 }
 
 void ObjectMgr::LoadInstanceTemplate()
@@ -5456,7 +5456,7 @@ void ObjectMgr::LoadNpcTextLocales()
 
     } while (result->NextRow());
 
-    sLog->outString(">> Loaded %lu Npc Text Locale strings in %u ms", (unsigned long)_npcTextLocaleStore.size(), GetMSTimeDiffToNow(oldMSTime));
+    sLog->outString(">> Loaded %u Npc Text Locale strings in %u ms", (uint32)_npcTextLocaleStore.size(), GetMSTimeDiffToNow(oldMSTime));
 }
 
 void ObjectMgr::ReturnOrDeleteOldMails(bool serverUp)
@@ -6555,7 +6555,7 @@ void ObjectMgr::LoadGameObjectLocales()
 
     } while (result->NextRow());
 
-    sLog->outString(">> Loaded %lu Gameobject Locale strings in %u ms", (unsigned long)_gameObjectLocaleStore.size(), GetMSTimeDiffToNow(oldMSTime));
+    sLog->outString(">> Loaded %u Gameobject Locale strings in %u ms", (uint32)_gameObjectLocaleStore.size(), GetMSTimeDiffToNow(oldMSTime));
 }
 
 inline void CheckGOLockId(GameObjectTemplate const* goInfo, uint32 dataN, uint32 N)
