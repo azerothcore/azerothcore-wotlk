@@ -140,7 +140,7 @@ class CliHandler : public ChatHandler
 
         // overwrite functions
         char const* GetTrinityString(uint32 entry) const override;
-        bool isAvailable(ChatCommand const& cmd) const;
+        bool isAvailable(ChatCommand const& cmd) const override;
         void SendSysMessage(const char *str);
         std::string GetNameLink() const;
         bool needReportToTarget(Player* chr) const;
