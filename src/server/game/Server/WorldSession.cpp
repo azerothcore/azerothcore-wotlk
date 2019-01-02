@@ -1378,7 +1378,7 @@ bool WorldSession::DosProtection::EvaluateOpcode(WorldPacket& p, time_t time) co
             switch (bm)
             {
                 case BAN_CHARACTER: // not supported, ban account
-                case BAN_ACCOUNT: (void)AccountMgr->GetName(Session->GetAccountId(), nameOrIp); break;
+                case BAN_ACCOUNT: (void)AccountMgr::GetName(Session->GetAccountId(), nameOrIp); break;
                 case BAN_IP: nameOrIp = Session->GetRemoteAddress(); break;
             }
             sWorld->BanAccount(bm, nameOrIp, duration, "DOS (Packet Flooding/Spoofing", "Server: AutoDOS");
