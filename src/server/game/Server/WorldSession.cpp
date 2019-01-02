@@ -91,6 +91,7 @@ WorldSession::WorldSession(uint32 id, WorldSocket* sock, AccountTypes sec, uint8
     m_timeOutTime(0),
     _lastAuctionListItemsMSTime(0),
     _lastAuctionListOwnerItemsMSTime(0),
+    AntiDOS(this),
     m_GUIDLow(0),
     _player(NULL),
     m_Socket(sock),
@@ -112,7 +113,6 @@ WorldSession::WorldSession(uint32 id, WorldSocket* sock, AccountTypes sec, uint8
     recruiterId(recruiter),    
     isRecruiter(isARecruiter),
     m_currentBankerGUID(0),
-    AntiDOS(this),
     timeWhoCommandAllowed(0)
 {
     memset(m_Tutorials, 0, sizeof(m_Tutorials));
@@ -1378,7 +1378,7 @@ bool WorldSession::DosProtection::EvaluateOpcode(WorldPacket& p, time_t time) co
             switch (bm)
             {
                 case BAN_CHARACTER: // not supported, ban account
-                case BAN_ACCOUNT: (void)sAccountMgr->GetName(Session->GetAccountId(), nameOrIp); break;
+                case BAN_ACCOUNT: (void)AccountMgr->GetName(Session->GetAccountId(), nameOrIp); break;
                 case BAN_IP: nameOrIp = Session->GetRemoteAddress(); break;
             }
             sWorld->BanAccount(bm, nameOrIp, duration, "DOS (Packet Flooding/Spoofing", "Server: AutoDOS");
