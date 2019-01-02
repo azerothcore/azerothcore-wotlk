@@ -1366,7 +1366,7 @@ bool WorldSession::DosProtection::EvaluateOpcode(WorldPacket& p, time_t time) co
             return true;
         case POLICY_KICK:
         {
-            sLog->outString("network", "AntiDOS: Player kicked!");
+            sLog->outString("AntiDOS: Player kicked!");
             Session->KickPlayer();
             return false;
         }
