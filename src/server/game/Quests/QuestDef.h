@@ -246,6 +246,7 @@ class Quest
         int32  GetRewSpellCast() const { return RewardSpell; }
         uint32 GetRewMailTemplateId() const { return RewardMailTemplateId; }
         uint32 GetRewMailDelaySecs() const { return RewardMailDelay; }
+        uint32 GetRewMailSenderEntry() const { return RewardMailSenderEntry; }
         uint32 GetPOIContinent() const { return POIContinent; }
         float  GetPOIx() const { return POIx; }
         float  GetPOIy() const { return POIy; }
@@ -371,6 +372,7 @@ class Quest
         uint32 RequiredMaxRepFaction  = 0;
         int32  RequiredMaxRepValue    = 0;
         uint32 StartItemCount         = 0;
+        uint32 RewardMailSenderEntry  = 0;
         uint32 SpecialFlags           = 0; // custom flags, not sniffed/WDB
 };
 
