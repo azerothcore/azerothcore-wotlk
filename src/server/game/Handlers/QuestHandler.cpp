@@ -426,6 +426,17 @@ void WorldSession::HandleQuestLogRemoveQuest(WorldPacket& recvData)
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
             sLog->outDetail("Player %u abandoned quest %u", _player->GetGUIDLow(), questId);
 #endif
+            // check if Quest Tracker is enabled
+            if (sWorld->getBoolConfig(CONFIG_QUEST_ENABLE_QUEST_TRACKER))
+            {
+                // prepare Quest Tracker datas
+                PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_QUEST_TRACK_ABANDON_TIME);
+                stmt->setUInt32(0, questId);
+                stmt->setUInt32(1, _player->GetGUIDLow());
+
+                // add to Quest Tracker
+                CharacterDatabase.Execute(stmt);
+            }
         }
 
         _player->SetQuestSlot(slot, 0);
