@@ -13103,29 +13103,30 @@ void Unit::UpdateSpeed(UnitMoveType mtype, bool forced)
                     {
                         // special treatment for player pets in order to avoid stuttering
                         float ownerSpeed = pOwner->GetSpeedRate(mtype);
-                        float minDist = 1.0f;
+                        float distOwner = GetDistance(pOwner);
+                        float minDist = 2.5f;
 
                         if (ToCreature()->GetCreatureType() == CREATURE_TYPE_NON_COMBAT_PET)
                         {
-                            // vanity pets have to be treated different than normal pets
+                            // different minimum distance for vanity pets
                             minDist = 5.0f;
+
+                            if (mtype == MOVE_FLIGHT)
+                                mtype = MOVE_RUN; // vanity pets use run speed for flight
                         }
 
-                        if (GetDistance(pOwner) < minDist && m_petCatchUp)
+                        float maxDist = ownerSpeed >= 1.0f ? minDist * ownerSpeed * 1.5f : minDist * 1.5f;
+
+                        if (distOwner < minDist && m_petCatchUp)
                             m_petCatchUp = false;
 
-                        if (GetDistance(pOwner) > minDist * 2 && !m_petCatchUp)
+                        if (distOwner > maxDist && !m_petCatchUp)
                             m_petCatchUp = true;
 
                         if (m_petCatchUp)
-                        {
-                            if (GetDistance(pOwner) > minDist * 4)
-                                speed = ownerSpeed*2.0f;
-                            else
-                                speed = ownerSpeed*1.05f;
-                        }
+                            speed = ownerSpeed * 1.05f;
                         else
-                            speed = ownerSpeed*0.95f;
+                            speed = ownerSpeed * 0.95f;
                     }
                 }
                 else

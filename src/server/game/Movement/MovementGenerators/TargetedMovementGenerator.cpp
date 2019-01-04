@@ -313,9 +313,10 @@ bool TargetedMovementGeneratorMedium<T,D>::DoUpdate(T* owner, uint32 time_diff)
     if (pOwner && pOwner->GetTypeId() == TYPEID_PLAYER)
     {
         // Update pet speed for players in order to avoid stuttering
-        owner->UpdateSpeed(MOVE_RUN, true);
-        owner->UpdateSpeed(MOVE_WALK, true);
-        owner->UpdateSpeed(MOVE_FLIGHT, true);
+        if (pOwner->IsFlying())
+            owner->UpdateSpeed(MOVE_FLIGHT, true);
+        else
+            owner->UpdateSpeed(MOVE_RUN, true);
     }
 
     return true;
