@@ -684,8 +684,8 @@ int WorldSocket::ProcessIncoming(WorldPacket* new_pct)
             case CMSG_KEEP_ALIVE:
                 ACE_GUARD_RETURN (LockType, Guard, m_SessionLock, -1);
                 
-                if (_worldSession)
-                    _worldSession->ResetTimeOutTime(true);
+                if (m_Session)
+                    m_Session->ResetTimeOutTime(true);
                 break;
             default:
             {
