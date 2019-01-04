@@ -264,6 +264,7 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
     bool deletePacket = true;
     WorldPacket* firstDelayedPacket = NULL;
     uint32 processedPackets = 0;
+    time_t currentTime = time(nullptr);
 
     while (m_Socket && !m_Socket->IsClosed() && !_recvQueue.empty() && _recvQueue.peek(true) != firstDelayedPacket && _recvQueue.next(packet, updater))
     {
