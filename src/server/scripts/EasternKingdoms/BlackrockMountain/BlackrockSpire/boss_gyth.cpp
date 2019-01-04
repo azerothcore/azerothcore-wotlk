@@ -51,7 +51,8 @@ public:
             SummonedRend = false;
             if (instance->GetBossState(DATA_GYTH) == IN_PROGRESS)
             {
-                instance->SetBossState(DATA_GYTH, DONE);
+                instance->SetBossState(DATA_GYTH, NOT_STARTED);
+                summons.DespawnAll();
                 me->DespawnOrUnsummon();
             }
         }
@@ -83,10 +84,16 @@ public:
             }
         }
 
+        void JustSummoned(Creature* summon)
+        {
+            summons.Summon(summon);
+            summon->AI()->AttackStart(me->SelectVictim());
+        }
+
         void UpdateAI(uint32 diff)
         {
 
-            if (!SummonedRend && HealthBelowPct(5))
+            if (!SummonedRend && HealthBelowPct(25))
             {
                 DoCast(me, SPELL_SUMMON_REND);
                 me->RemoveAura(SPELL_REND_MOUNTS);
