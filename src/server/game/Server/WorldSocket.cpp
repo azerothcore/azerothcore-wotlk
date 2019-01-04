@@ -682,7 +682,11 @@ int WorldSocket::ProcessIncoming(WorldPacket* new_pct)
                 }
                 return HandleAuthSession (*new_pct);
             case CMSG_KEEP_ALIVE:
-                return 0;
+                ACE_GUARD_RETURN (LockType, Guard, m_SessionLock, -1);
+                
+                if (_worldSession)
+                    _worldSession->ResetTimeOutTime(true);
+                break;
             default:
             {
                 ACE_GUARD_RETURN (LockType, Guard, m_SessionLock, -1);
@@ -691,7 +695,7 @@ int WorldSocket::ProcessIncoming(WorldPacket* new_pct)
                 {
                     // Our Idle timer will reset on any non PING opcodes.
                     // Catches people idling on the login screen and any lingering ingame connections.
-                    m_Session->ResetTimeOutTime();
+                    m_Session->ResetTimeOutTime(false);
 
                     // OK, give the packet to WorldSession
                     aptr.release();
