@@ -259,7 +259,7 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
     HandleTeleportTimeout(updater.ProcessLogout());
 
     uint32 _startMSTime = getMSTime();
-    WorldPacket* packet = NULL;
+    WorldPacket* packet = nullptr;
     WorldPacket* movementPacket = NULL;
     bool deletePacket = true;
     WorldPacket* firstDelayedPacket = NULL;
@@ -275,11 +275,11 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
                 switch (opHandle.status)
                 {
                     case STATUS_LOGGEDIN:
-                        if (!_player)
+                        if (!_player && AntiDOS.EvaluateOpcode(*packet, currentTime))
                         {
                             // pussywizard: such packets were sent to do something for a character that has already logged out, skip them
                         }
-                        else if (!_player->IsInWorld())
+                        else if (!_player->IsInWorld() && AntiDOS.EvaluateOpcode(*packet, currentTime))
                         {
                             // pussywizard: such packets may do something important and the player is just being teleported, move to the end of the queue
                             // pussywizard: previously such were skipped, so leave it as it is xD proper code below if we wish to change that
@@ -295,14 +295,14 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
                         }
                         else
                         {
-                            if (opHandle.isGrouppedMovementOpcode)
+                            if (opHandle.isGrouppedMovementOpcode && AntiDOS.EvaluateOpcode(*packet, currentTime))
                             {
                                 if (movementPacket)
                                     delete movementPacket;
                                 movementPacket = new WorldPacket(packet->GetOpcode(), 0);
                                 movementPacket->append(*((ByteBuffer*)packet));
                             }
-                            else
+                            else if(AntiDOS.EvaluateOpcode(*packet, currentTime))
                             {
                                 if (movementPacket)
                                 {
@@ -320,7 +320,7 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
                         }
                         break;
                     case STATUS_TRANSFER:
-                        if (_player && !_player->IsInWorld())
+                        if (_player && !_player->IsInWorld() && AntiDOS.EvaluateOpcode(*packet, currentTime))
                         {
                             if (movementPacket)
                             {
@@ -338,13 +338,15 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
                     case STATUS_AUTHED:
                         if (m_inQueue) // prevent cheating
                             break;
-
-                        sScriptMgr->OnPacketReceive(this, *packet);
+                        if(AntiDOS.EvaluateOpcode(*packet, currentTime))
+                        {
+                            sScriptMgr->OnPacketReceive(this, *packet);
 #ifdef ELUNA
-                        if (!sEluna->OnPacketReceive(this, *packet))
-                            break;
+                            if (!sEluna->OnPacketReceive(this, *packet))
+                                break;
 #endif
-                        (this->*opHandle.handler)(*packet);
+                            (this->*opHandle.handler)(*packet);
+                        }
                         break;
                     case STATUS_NEVER:
                         break;
