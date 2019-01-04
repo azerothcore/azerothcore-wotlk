@@ -1303,6 +1303,9 @@ void World::LoadConfigSettings(bool reload)
     m_bool_configs[CONFIG_ENABLE_CONTINENT_TRANSPORT] = sConfigMgr->GetBoolDefault("IsContinentTransport.Enabled", true);
     m_bool_configs[CONFIG_ENABLE_CONTINENT_TRANSPORT_PRELOADING] = sConfigMgr->GetBoolDefault("IsPreloadedContinentTransport.Enabled", false);
 
+    // Whether to use LoS from game objects
+    m_bool_configs[CONFIG_CHECK_GOBJECT_LOS] = sConfigMgr->GetBoolDefault("CheckGameObjectLoS", true);
+
     // call ScriptMgr if we're reloading the configuration
     sScriptMgr->OnAfterConfigLoad(reload);
 }
