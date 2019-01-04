@@ -35,6 +35,7 @@
 #include "Guild.h"
 #include "GuildMgr.h"
 #include "GitRevision.h"
+#include "revision.h"
 #include "InstanceSaveMgr.h"
 #include "InstanceScript.h"
 #include "Language.h"
