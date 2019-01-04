@@ -940,6 +940,16 @@ class WorldSession
         QueryResultHolderFuture _loadPetFromDBSecondCallback;
         QueryCallback_3<PreparedQueryResult, uint8, uint8, uint32> _openWrappedItemCallback;
 
+    public:
+        // xinef: those must be public, requires calls out of worldsession :(
+        QueryCallback_2<PreparedQueryResult, uint32, AsynchPetSummon*> _loadPetFromDBFirstCallback;
+        PreparedQueryResultFuture _loadActionsSwitchSpecCallback;
+        PreparedQueryResultFuture _CharacterAuraFrozenCallback;
+
+    /***
+    END OF CALLBACKS
+    ***/
+
     friend class World;
     protected:
         class DosProtection
@@ -947,7 +957,7 @@ class WorldSession
             friend class World;
             public:
 
-                DosProtection(WorldSession* s) : Session(s), _policy((Policy)sWorld->getIntConfig(CONFIG_PACKET_SPOOF_POLICY)) { }
+                DosProtection(WorldSession* s);
                 bool EvaluateOpcode(WorldPacket& p, time_t time) const;
 
             protected:
@@ -973,18 +983,8 @@ class WorldSession
 
                 DosProtection(DosProtection const& right) = delete;
                 DosProtection& operator=(DosProtection const& right) = delete;
-                
         } AntiDOS;
 
-    public:
-        // xinef: those must be public, requires calls out of worldsession :(
-        QueryCallback_2<PreparedQueryResult, uint32, AsynchPetSummon*> _loadPetFromDBFirstCallback;
-        PreparedQueryResultFuture _loadActionsSwitchSpecCallback;
-        PreparedQueryResultFuture _CharacterAuraFrozenCallback;
-
-    /***
-    END OF CALLBACKS
-    ***/
     private:
         // private trade methods
         void moveItems(Item* myItems[], Item* hisItems[]);
