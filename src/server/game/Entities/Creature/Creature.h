@@ -13,6 +13,7 @@
 #include "ItemPrototype.h"
 #include "LootMgr.h"
 #include "DatabaseEnv.h"
+#include "GameTime.h"
 #include "Cell.h"
 
 #include <list>

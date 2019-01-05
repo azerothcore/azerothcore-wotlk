@@ -375,7 +375,7 @@ private:
     class LogEntry
     {
     public:
-        LogEntry(ObjectGuid::LowType guildId, uint32 guid);
+        LogEntry(uint32 guildId, uint32 guid);
         LogEntry(uint32 guildId, uint32 guid, time_t timestamp) : m_guildId(guildId), m_guid(guid), m_timestamp(timestamp) { }
         virtual ~LogEntry() { }
 
