@@ -108,7 +108,7 @@ bool LoginQueryHolder::Initialize()
 
     stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHARACTER_MAILCOUNT);
     stmt->setUInt32(0, lowGuid);
-    stmt->setUInt64(1, uint64(time(NULL)));
+    stmt->setUInt64(1, uint64(GameTime::GetGameTime()));
     res &= SetPreparedQuery(PLAYER_LOGIN_QUERY_LOAD_MAIL_COUNT, stmt);
 
     stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHARACTER_MAILDATE);
@@ -1034,7 +1034,7 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder* holder)
         if (mapDiff->resetTime)
             if (time_t timeReset = sInstanceSaveMgr->GetResetTimeFor(pCurrChar->GetMap()->GetId(), pCurrChar->GetMap()->GetDifficulty()))
             {
-                uint32 timeleft = uint32(timeReset - time(NULL));
+                uint32 timeleft = uint32(timeReset - GameTime::GetGameTime());
                 pCurrChar->SendInstanceResetWarning(pCurrChar->GetMap()->GetId(), pCurrChar->GetMap()->GetDifficulty(), timeleft, true);
             }
 
@@ -1354,7 +1354,7 @@ void WorldSession::HandlePlayerLoginToCharInWorld(Player* pCurrChar)
         if (mapDiff->resetTime)
             if (time_t timeReset = sInstanceSaveMgr->GetResetTimeFor(pCurrChar->GetMap()->GetId(), pCurrChar->GetMap()->GetDifficulty()))
             {
-                uint32 timeleft = uint32(timeReset - time(NULL));
+                uint32 timeleft = uint32(timeReset - GameTime::GetGameTime());
                 GetPlayer()->SendInstanceResetWarning(pCurrChar->GetMap()->GetId(), pCurrChar->GetMap()->GetDifficulty(), timeleft, true);
             }
 

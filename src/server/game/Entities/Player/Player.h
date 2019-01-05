@@ -1106,14 +1106,14 @@ class Player : public Unit, public GridObject<Player>
 
         void SetSummonPoint(uint32 mapid, float x, float y, float z, uint32 delay = 0, bool asSpectator = false)
         {
-            m_summon_expire = time(NULL) + (delay ? delay : MAX_PLAYER_SUMMON_DELAY);
+            m_summon_expire = GameTime::GetGameTime() + (delay ? delay : MAX_PLAYER_SUMMON_DELAY);
             m_summon_mapid = mapid;
             m_summon_x = x;
             m_summon_y = y;
             m_summon_z = z;
             m_summon_asSpectator = asSpectator;
         }
-        bool IsSummonAsSpectator() const { return m_summon_asSpectator && m_summon_expire >= time(NULL); }
+        bool IsSummonAsSpectator() const { return m_summon_asSpectator && m_summon_expire >= GameTime::GetGameTime(); }
         void SetSummonAsSpectator(bool on) { m_summon_asSpectator = on; }
         void SummonIfPossible(bool agree, uint32 summoner_guid);
         time_t GetSummonExpireTimer() const { return m_summon_expire; }

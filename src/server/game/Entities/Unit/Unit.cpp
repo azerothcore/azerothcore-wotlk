@@ -5136,7 +5136,7 @@ uint32 Unit::GetDiseasesByCaster(uint64 casterGUID, uint8 mode)
                 {
                     Aura* aura = (*i)->GetBase();
                     if (aura && !aura->IsRemoved() && aura->GetDuration() > 0)
-                        if ((aura->GetApplyTime() + aura->GetMaxDuration()/1000 + 8) > (time(NULL) + aura->GetDuration()/1000))
+                        if ((aura->GetApplyTime() + aura->GetMaxDuration()/1000 + 8) > (GameTime::GetGameTime() + aura->GetDuration()/1000))
                             aura->SetDuration(aura->GetDuration()+3000);
                 }
             }
@@ -6818,7 +6818,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                         if (AuraEffect* aurEff = victim->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_ROGUE, 0x100000, 0, 0, GetGUID()))
                             if (Aura* aur = aurEff->GetBase())
                                 if (!aur->IsRemoved() && aur->GetDuration() > 0)
-                                    if ((aur->GetApplyTime() + aur->GetMaxDuration()/1000 + 5) > (time(NULL) + aur->GetDuration()/1000) )
+                                    if ((aur->GetApplyTime() + aur->GetMaxDuration()/1000 + 5) > (GameTime::GetGameTime() + aur->GetDuration()/1000) )
                                     {
                                         aur->SetDuration(aur->GetDuration()+2000);
                                         return true;
@@ -17073,7 +17073,7 @@ bool Unit::SetCharmedBy(Unit* charmer, CharmType type, AuraApplication const* au
                             GetCharmInfo()->SetPetNumber(sObjectMgr->GeneratePetNumber(), true);
 
                         // if charmed two demons the same session, the 2nd gets the 1st one's name
-                        SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, uint32(time(NULL))); // cast can't be helped
+                        SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, uint32(GameTime::GetGameTime())); // cast can't be helped
                     }
                 }
                 GetMotionMaster()->MoveFollow(charmer, PET_FOLLOW_DIST, GetFollowAngle());
@@ -18298,7 +18298,7 @@ void Unit::_ExitVehicle(Position const* exitPosition)
     AddUnitState(UNIT_STATE_MOVE);
 
     if (player)
-        player->SetFallInformation(time(NULL), GetPositionZ());
+        player->SetFallInformation(GameTime::GetGameTime(), GetPositionZ());
     else if (HasUnitMovementFlag(MOVEMENTFLAG_ROOT))
     {
         WorldPacket data(SMSG_SPLINE_MOVE_UNROOT, 8);

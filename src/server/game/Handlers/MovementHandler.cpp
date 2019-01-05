@@ -151,7 +151,7 @@ void WorldSession::HandleMoveWorldportAckOpcode()
             _player->SetIsSpectator(false);
 
         GetPlayer()->SetPendingSpectatorForBG(0);
-        timeWhoCommandAllowed = time(NULL) + sWorld->GetNextWhoListUpdateDelaySecs() + 1; // after exiting arena Subscribe will scan for a player and cached data says he is still in arena, so disallow until next update
+        timeWhoCommandAllowed = GameTime::GetGameTime() + sWorld->GetNextWhoListUpdateDelaySecs() + 1; // after exiting arena Subscribe will scan for a player and cached data says he is still in arena, so disallow until next update
 
         if (uint32 inviteInstanceId = _player->GetPendingSpectatorInviteInstanceId())
         {
@@ -192,7 +192,7 @@ void WorldSession::HandleMoveWorldportAckOpcode()
             if (mapDiff->resetTime)
                 if (time_t timeReset = sInstanceSaveMgr->GetResetTimeFor(mEntry->MapID, diff))
                 {
-                    uint32 timeleft = uint32(timeReset - time(NULL));
+                    uint32 timeleft = uint32(timeReset - GameTime::GetGameTime());
                     GetPlayer()->SendInstanceResetWarning(mEntry->MapID, diff, timeleft, true);
                 }
         allowMount = mInstance->AllowMount;

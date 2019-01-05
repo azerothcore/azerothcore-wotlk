@@ -237,7 +237,7 @@ void Pet::SavePetToDB(PetSaveMode mode, bool logout)
         stmt->setUInt32(12, curhealth);
         stmt->setUInt32(13, curmana);
         stmt->setUInt32(14, GetPower(POWER_HAPPINESS));
-        stmt->setUInt32(15, time(NULL));
+        stmt->setUInt32(15, GameTime::GetGameTime());
 
         std::ostringstream ss;
         for (uint32 i = ACTION_BAR_INDEX_START; i < ACTION_BAR_INDEX_END; ++i)
@@ -321,7 +321,7 @@ void Pet::Update(uint32 diff)
     {
         case CORPSE:
         {
-            if (getPetType() != HUNTER_PET || m_corpseRemoveTime <= time(NULL))
+            if (getPetType() != HUNTER_PET || m_corpseRemoveTime <= GameTime::GetGameTime())
             {
                 Remove(PET_SAVE_NOT_IN_SLOT);               //hunters' pets never get removed because of death, NEVER!
                 return;
@@ -1059,7 +1059,7 @@ void Pet::_LoadSpellCooldowns(PreparedQueryResult result)
 
     if (result)
     {
-        time_t curTime = time(NULL);
+        time_t curTime = GameTime::GetGameTime();
 
         PacketCooldowns cooldowns;
         WorldPacket data;
@@ -1105,7 +1105,7 @@ void Pet::_SaveSpellCooldowns(SQLTransaction& trans, bool logout)
     stmt->setUInt32(0, m_charmInfo->GetPetNumber());
     trans->Append(stmt);
 
-    time_t curTime = time(NULL);
+    time_t curTime = GameTime::GetGameTime();
     uint32 checkTime = GameTime::GetGameTimeMS() + 30*IN_MILLISECONDS;
 
     // remove oudated and save active
@@ -2143,7 +2143,7 @@ void Pet::HandleAsynchLoadFailed(AsynchPetSummon* info, Player* player, uint8 as
             pet->SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, 1000);
             pet->SetFullHealth();
             pet->SetPower(POWER_MANA, pet->GetMaxPower(POWER_MANA));
-            pet->SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, uint32(time(NULL))); // cast can't be helped in this case
+            pet->SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, uint32(GameTime::GetGameTime())); // cast can't be helped in this case
         }
 
         map->AddToMap(pet->ToCreature(), true);

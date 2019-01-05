@@ -6022,7 +6022,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                     return SPELL_FAILED_BAD_TARGETS;
 
                 // Xinef: Implement summon pending error
-                if (target->GetSummonExpireTimer() > time(NULL))
+                if (target->GetSummonExpireTimer() > GameTime::GetGameTime())
                     return SPELL_FAILED_SUMMON_PENDING;
 
                 // check if our map is dungeon
@@ -6062,7 +6062,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                     return SPELL_FAILED_BAD_TARGETS;
 
                 // Xinef: Implement summon pending error
-                if (target->GetSummonExpireTimer() > time(NULL))
+                if (target->GetSummonExpireTimer() > GameTime::GetGameTime())
                     return SPELL_FAILED_SUMMON_PENDING;
 
                 break;

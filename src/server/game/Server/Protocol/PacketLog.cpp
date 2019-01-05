@@ -40,7 +40,7 @@ void PacketLog::LogPacket(WorldPacket const& packet, Direction direction)
     ByteBuffer data(4+4+4+1+packet.size());
     data << int32(packet.GetOpcode());
     data << int32(packet.size());
-    data << uint32(time(NULL));
+    data << uint32(GameTime::GetGameTime());
     data << uint8(direction);
 
     for (uint32 i = 0; i < packet.size(); i++)

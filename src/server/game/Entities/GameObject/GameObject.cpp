@@ -6,6 +6,7 @@
 
 #include <G3D/Quat.h>
 #include "GameObjectAI.h"
+#include "GameTime.h"
 #include "BattlegroundAV.h"
 #include "CellImpl.h"
 #include "CreatureAISelector.h"
@@ -383,7 +384,7 @@ void GameObject::Update(uint32 diff)
                 case GAMEOBJECT_TYPE_FISHINGNODE:
                 {
                     // fishing code (bobber ready)
-                    if (time(NULL) > m_respawnTime - FISHING_BOBBER_READY_TIME)
+                    if (GameTime::GetGameTime() > m_respawnTime - FISHING_BOBBER_READY_TIME)
                     {
                         // splash bobber (bobber ready now)
                         Unit* caster = GetOwner();
@@ -481,7 +482,7 @@ void GameObject::Update(uint32 diff)
         {
             if (m_respawnTime > 0)                          // timer on
             {
-                time_t now = time(NULL);
+                time_t now = GameTime::GetGameTime();
                 if (m_respawnTime <= now)            // timer expired
                 {
                     uint64 dbtableHighGuid = MAKE_NEW_GUID(m_DBTableGuid, GetEntry(), HIGHGUID_GAMEOBJECT);
@@ -723,7 +724,7 @@ void GameObject::Update(uint32 diff)
                 return;
             }
 
-            m_respawnTime = time(NULL) + m_respawnDelayTime;
+            m_respawnTime = GameTime::GetGameTime() + m_respawnDelayTime;
 
             // if option not set then object will be saved at grid unload
             if (GetMap()->IsDungeon())
@@ -929,7 +930,7 @@ bool GameObject::LoadGameObjectFromDB(uint32 guid, Map* map, bool addToMap)
             m_respawnTime = GetMap()->GetGORespawnTime(m_DBTableGuid);
 
             // ready to respawn
-            if (m_respawnTime && m_respawnTime <= time(NULL))
+            if (m_respawnTime && m_respawnTime <= GameTime::GetGameTime())
             {
                 m_respawnTime = 0;
                 GetMap()->RemoveGORespawnTime(m_DBTableGuid);
@@ -1013,7 +1014,7 @@ Unit* GameObject::GetOwner() const
 
 void GameObject::SaveRespawnTime()
 { 
-    if (m_goData && m_goData->dbData && m_respawnTime > time(NULL) && m_spawnedByDefault)
+    if (m_goData && m_goData->dbData && m_respawnTime > GameTime::GetGameTime() && m_spawnedByDefault)
         GetMap()->SaveGORespawnTime(m_DBTableGuid, m_respawnTime);
 }
 
@@ -1068,11 +1069,26 @@ bool GameObject::IsInvisibleDueToDespawn() const
     return false;
 }
 
+time_t GameObject::GetRespawnTimeEx() const
+{
+    time_t now = GameTime::GetGameTime();
+    if (m_respawnTime > now)
+        return m_respawnTime;
+    else
+        return now;
+}
+
+void GameObject::SetRespawnTime(int32 respawn)
+{
+    m_respawnTime = respawn > 0 ? GameTime::GetGameTime() + respawn : 0;
+    m_respawnDelayTime = respawn > 0 ? respawn : 0;
+}
+
 void GameObject::Respawn()
 { 
     if (m_spawnedByDefault && m_respawnTime > 0)
     {
-        m_respawnTime = time(NULL);
+        m_respawnTime = GameTime::GetGameTime();
         GetMap()->RemoveGORespawnTime(m_DBTableGuid);
     }
 }
@@ -2182,6 +2198,11 @@ void GameObject::SetLootState(LootState state, Unit* unit)
         else if (state == GO_READY)
             EnableCollision(!startOpen);
     }*/
+}
+
+void GameObject::SetLootGenerationTime()
+{
+    m_lootGenerationTime = GameTime::GetGameTime();
 }
 
 void GameObject::SetGoState(GOState state)

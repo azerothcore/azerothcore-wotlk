@@ -179,13 +179,13 @@ class instance_vault_of_archavon : public InstanceMapScript
                     switch (type)
                     {
                         case EVENT_ARCHAVON:
-                            ArchavonDeath = time(NULL);
+                            ArchavonDeath = GameTime::GetGameTime();
                             break;
                         case EVENT_EMALON:
-                            EmalonDeath = time(NULL);
+                            EmalonDeath = GameTime::GetGameTime();
                             break;
                         case EVENT_KORALON:
-                            KoralonDeath = time(NULL);
+                            KoralonDeath = GameTime::GetGameTime();
                             break;
                         default:
                             return;

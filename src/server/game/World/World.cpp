@@ -268,7 +268,7 @@ void World::AddSession_(WorldSession* s)
         WorldSession* oldSession = old->second;
 
         if (!RemoveQueuedPlayer(oldSession) && getIntConfig(CONFIG_INTERVAL_DISCONNECT_TOLERANCE))
-            m_disconnects[s->GetAccountId()] = time(NULL);
+            m_disconnects[s->GetAccountId()] = GameTime::GetGameTime();
 
         // pussywizard:
         if (oldSession->HandleSocketClosed())
@@ -282,7 +282,7 @@ void World::AddSession_(WorldSession* s)
                 tmp->SetShouldSetOfflineInDB(false);
                 delete tmp;
             }
-            oldSession->SetOfflineTime(time(NULL));
+            oldSession->SetOfflineTime(GameTime::GetGameTime());
             m_offlineSessions[oldSession->GetAccountId()] = oldSession;
         }
         else
@@ -324,7 +324,7 @@ bool World::HasRecentlyDisconnected(WorldSession* session)
     {
         for (DisconnectMap::iterator i = m_disconnects.begin(); i != m_disconnects.end();)
         {
-            if ((time(NULL) - i->second) < tolerance)
+            if ((GameTime::GetGameTime() - i->second) < tolerance)
             {
                 if (i->first == session->GetAccountId())
                     return true;
@@ -1314,7 +1314,7 @@ void World::SetInitialWorldSettings()
     uint32 startupBegin = getMSTime();
 
     ///- Initialize the random number generator
-    srand((unsigned int)time(NULL));
+    srand((unsigned int)GameTime::GetGameTime());
 
     ///- Initialize detour memory management
     dtAllocSetCustom(dtCustomAlloc, dtCustomFree);
@@ -1847,7 +1847,7 @@ void World::SetInitialWorldSettings()
     // our speed up
     m_timers[WUPDATE_5_SECS].SetInterval(5*IN_MILLISECONDS);
 
-    mail_expire_check_timer = time(NULL) + 6*3600;
+    mail_expire_check_timer = GameTime::GetGameTime() + 6*3600;
 
     ///- Initilize static helper structures
     AIRegistry::Initialize();
@@ -2483,7 +2483,7 @@ BanReturn World::BanAccount(BanMode mode, std::string const& nameOrIP, std::stri
             PreparedStatement* stmtx = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_BANNED);
             stmtx->setUInt32(0, account);
             PreparedQueryResult banresultx = LoginDatabase.Query(stmtx);
-            if (banresultx && ((*banresultx)[0].GetUInt32() == (*banresultx)[1].GetUInt32() || ((*banresultx)[1].GetUInt32() > time(NULL)+duration_secs && duration_secs)))
+            if (banresultx && ((*banresultx)[0].GetUInt32() == (*banresultx)[1].GetUInt32() || ((*banresultx)[1].GetUInt32() > GameTime::GetGameTime()+duration_secs && duration_secs)))
                 return BAN_LONGER_EXISTS;
 
             // make sure there is only one active ban
@@ -2738,7 +2738,7 @@ void World::UpdateSessions(uint32 diff)
         if (pSession->HandleSocketClosed())
         {
             if (!RemoveQueuedPlayer(pSession) && getIntConfig(CONFIG_INTERVAL_DISCONNECT_TOLERANCE))
-                m_disconnects[pSession->GetAccountId()] = time(NULL);
+                m_disconnects[pSession->GetAccountId()] = GameTime::GetGameTime();
             m_sessions.erase(itr);
             // there should be no offline session if current one is logged onto a character
             SessionMap::iterator iter;
@@ -2749,7 +2749,7 @@ void World::UpdateSessions(uint32 diff)
                 tmp->SetShouldSetOfflineInDB(false);
                 delete tmp;
             }
-            pSession->SetOfflineTime(time(NULL));
+            pSession->SetOfflineTime(GameTime::GetGameTime());
             m_offlineSessions[pSession->GetAccountId()] = pSession;
             continue;
         }
@@ -2757,7 +2757,7 @@ void World::UpdateSessions(uint32 diff)
         if (!pSession->Update(diff, updater))
         {
             if (!RemoveQueuedPlayer(pSession) && getIntConfig(CONFIG_INTERVAL_DISCONNECT_TOLERANCE))
-                m_disconnects[pSession->GetAccountId()] = time(NULL);
+                m_disconnects[pSession->GetAccountId()] = GameTime::GetGameTime();
             m_sessions.erase(itr);
             if (m_offlineSessions.find(pSession->GetAccountId()) != m_offlineSessions.end()) // pussywizard: don't set offline in db because offline session for that acc is present (character is in world)
                 pSession->SetShouldSetOfflineInDB(false);
@@ -2768,7 +2768,7 @@ void World::UpdateSessions(uint32 diff)
     // pussywizard:
     if (m_offlineSessions.empty())
         return;
-    uint32 currTime = time(NULL);
+    uint32 currTime = GameTime::GetGameTime();
     for (SessionMap::iterator itr = m_offlineSessions.begin(), next; itr != m_offlineSessions.end(); itr = next)
     {
         next = itr;
@@ -2906,7 +2906,7 @@ time_t World::GetNextTimeWithDayAndHour(int8 dayOfWeek, int8 hour)
 {
     if (hour < 0 || hour > 23)
         hour = 0;
-    time_t curr = time(NULL);
+    time_t curr = GameTime::GetGameTime();
     tm localTm;
     ACE_OS::localtime_r(&curr, &localTm);
     localTm.tm_hour = hour;
@@ -2927,7 +2927,7 @@ time_t World::GetNextTimeWithMonthAndHour(int8 month, int8 hour)
 {
     if (hour < 0 || hour > 23)
         hour = 0;
-    time_t curr = time(NULL);
+    time_t curr = GameTime::GetGameTime();
     tm localTm;
     ACE_OS::localtime_r(&curr, &localTm);
     localTm.tm_mday = 1;

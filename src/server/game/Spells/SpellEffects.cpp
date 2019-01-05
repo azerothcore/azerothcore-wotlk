@@ -702,7 +702,7 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                 case 17731:
                 case 69294:
                 {
-                    if( !gameObjTarget || gameObjTarget->GetRespawnTime() > time(NULL) )
+                    if( !gameObjTarget || gameObjTarget->GetRespawnTime() > GameTime::GetGameTime() )
                         return;
 
                     gameObjTarget->SetRespawnTime(10);
@@ -4942,7 +4942,7 @@ void Spell::EffectCharge(SpellEffIndex /*effIndex*/)
 
         // charge changes fall time
         if( m_caster->GetTypeId() == TYPEID_PLAYER )
-            m_caster->ToPlayer()->SetFallInformation(time(NULL), m_caster->GetPositionZ());
+            m_caster->ToPlayer()->SetFallInformation(GameTime::GetGameTime(), m_caster->GetPositionZ());
 
         if (m_pathFinder)
         {
@@ -5063,7 +5063,7 @@ void Spell::EffectLeapBack(SpellEffIndex effIndex)
 
     // xinef: changes fall time
     if (m_caster->GetTypeId() == TYPEID_PLAYER)
-        m_caster->ToPlayer()->SetFallInformation(time(NULL), m_caster->GetPositionZ());
+        m_caster->ToPlayer()->SetFallInformation(GameTime::GetGameTime(), m_caster->GetPositionZ());
 }
 
 void Spell::EffectQuestClear(SpellEffIndex effIndex)
