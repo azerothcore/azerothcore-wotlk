@@ -924,8 +924,8 @@ namespace Trinity
     class AnyGroupedUnitInObjectRangeCheck
     {
         public:
-            AnyGroupedUnitInObjectRangeCheck(WorldObject const* obj, Unit const* funit, float range, bool raid, bool playerOnly = false, bool incOwnRadius = true, bool incTargetRadius = true) 
-                : _source(obj), _refUnit(funit), _range(range), _raid(raid), _playerOnly(playerOnly), i_incOwnRadius(incOwnRadius), i_incTargetRadius(incTargetRadius) { }
+            AnyGroupedUnitInObjectRangeCheck(WorldObject const* obj, Unit const* funit, float range, bool raid, bool incOwnRadius = true, bool incTargetRadius = true) 
+                : _source(obj), _refUnit(funit), _range(range), _raid(raid), i_incOwnRadius(incOwnRadius), i_incTargetRadius(incTargetRadius) { }
             bool operator()(Unit* u)
             {
                 if (_raid)
@@ -956,7 +956,6 @@ namespace Trinity
             Unit const* _refUnit;
             float _range;
             bool _raid;
-            bool _playerOnly;
             bool i_incOwnRadius;
             bool i_incTargetRadius;
     };
