@@ -184,7 +184,7 @@ class npc_midsummer_torch_target : public CreatureScript
                 Position pos;
                 pos.Relocate(posVec.at(num));
                 me->m_last_notify_position.Relocate(0.0f, 0.0f, 0.0f);
-                me->m_last_notify_mstime = World::GetGameTimeMS() + 10000;
+                me->m_last_notify_mstime = GameTime::GetGameTimeMS() + 10000;
 
                 me->NearTeleportTo(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation());
             }

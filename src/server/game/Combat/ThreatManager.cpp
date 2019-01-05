@@ -295,7 +295,7 @@ HostileReference* ThreatContainer::selectNextVictim(Creature* attacker, HostileR
     HostileReference* currentRef = NULL;
     bool found = false;
     bool noPriorityTargetFound = false;
-    uint32 currTime = sWorld->GetGameTime();
+    uint32 currTime = GameTime::GetGameTime();
 
     // pussywizard: currentVictim is needed to compare if threat was exceeded by 10%/30% for melee/range targets (only then switching current target)
     if (currentVictim)

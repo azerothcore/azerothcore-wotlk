@@ -2236,7 +2236,7 @@ public:
 
         bool Load()
         {
-            lastMSTime = World::GetGameTimeMS();
+            lastMSTime = GameTime::GetGameTimeMS();
             lastOrientation = -1.0f;
             return true;
         }
@@ -2247,14 +2247,14 @@ public:
             {
                 if (c->GetTypeId() != TYPEID_UNIT)
                     return;
-                uint32 diff = getMSTimeDiff(lastMSTime, World::GetGameTimeMS());
+                uint32 diff = getMSTimeDiff(lastMSTime, GameTime::GetGameTimeMS());
                 if (lastOrientation == -1.0f)
                 {
                     lastOrientation = (c->ToCreature()->AI()->GetData(0)*2*M_PI)/100.0f;
                     diff = 0;
                 }
                 float new_o = Position::NormalizeOrientation(lastOrientation-(M_PI/60)*(diff/250.0f));
-                lastMSTime = World::GetGameTimeMS();
+                lastMSTime = GameTime::GetGameTimeMS();
                 lastOrientation = new_o;
                 c->SetOrientation(new_o);
                 c->SetFacingTo(new_o);

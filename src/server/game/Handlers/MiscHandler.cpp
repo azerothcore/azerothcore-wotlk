@@ -1524,7 +1524,7 @@ void WorldSession::HandleTimeSyncResp(WorldPacket & recv_data)
 {
     uint32 counter, clientTicks;
     recv_data >> counter >> clientTicks;
-    //uint32 ourTicks = clientTicks + (World::GetGameTimeMS() - _player->m_timeSyncServer);
+    //uint32 ourTicks = clientTicks + (GameTime::GetGameTimeMS() - _player->m_timeSyncServer);
     _player->m_timeSyncClient = clientTicks;
 }
 

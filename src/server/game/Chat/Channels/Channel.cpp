@@ -788,7 +788,7 @@ void Channel::Say(uint64 guid, std::string const& what, uint32 lang)
 
         if (!pinfo.IsAllowedToSpeak(speakDelay))
         {
-            std::string timeStr = secsToTimeString(pinfo.lastSpeakTime + speakDelay - sWorld->GetGameTime());
+            std::string timeStr = secsToTimeString(pinfo.lastSpeakTime + speakDelay - GameTime::GetGameTime());
             if (_channelRights.speakMessage.length() > 0)
                 player->GetSession()->SendNotification("%s", _channelRights.speakMessage.c_str());
             player->GetSession()->SendNotification("You must wait %s before speaking again.", timeStr.c_str());

@@ -2126,7 +2126,7 @@ bool Creature::CanCreatureAttack(Unit const* victim, bool skipDistCheck) const
 
         // pussywizard: don't check distance to home position if recently damaged (allow kiting away from spawnpoint!)
         // xinef: this should include taunt auras
-        if (!isWorldBoss() && (GetLastDamagedTime() > sWorld->GetGameTime() || HasAuraType(SPELL_AURA_MOD_TAUNT)))
+        if (!isWorldBoss() && (GetLastDamagedTime() > GameTime::GetGameTime() || HasAuraType(SPELL_AURA_MOD_TAUNT)))
             return true;
     }
 
@@ -2294,7 +2294,7 @@ void Creature::ProhibitSpellSchool(SpellSchoolMask idSchoolMask, uint32 unTimeMs
 {
     for (uint8 i = SPELL_SCHOOL_NORMAL; i < MAX_SPELL_SCHOOL; ++i)
         if (idSchoolMask & (1 << i))
-            m_ProhibitSchoolTime[i] = World::GetGameTimeMS() + unTimeMs;
+            m_ProhibitSchoolTime[i] = GameTime::GetGameTimeMS() + unTimeMs;
 }
 
 bool Creature::IsSpellProhibited(SpellSchoolMask idSchoolMask) const
@@ -2305,7 +2305,7 @@ bool Creature::IsSpellProhibited(SpellSchoolMask idSchoolMask) const
 
     for (uint8 i = SPELL_SCHOOL_NORMAL; i < MAX_SPELL_SCHOOL; ++i)
         if (idSchoolMask & (1 << i))
-            if (m_ProhibitSchoolTime[i] >= World::GetGameTimeMS())
+            if (m_ProhibitSchoolTime[i] >= GameTime::GetGameTimeMS())
                 return true;
 
     return false;
@@ -2313,7 +2313,7 @@ bool Creature::IsSpellProhibited(SpellSchoolMask idSchoolMask) const
 
 void Creature::_AddCreatureSpellCooldown(uint32 spell_id, uint32 end_time)
 { 
-    m_CreatureSpellCooldowns[spell_id] = World::GetGameTimeMS()+end_time;
+    m_CreatureSpellCooldowns[spell_id] = GameTime::GetGameTimeMS()+end_time;
 }
 
 void Creature::AddSpellCooldown(uint32 spell_id, uint32 /*itemid*/, uint32 end_time, bool /*needSendToClient*/, bool /*forceSendToSpectator*/)
@@ -2360,13 +2360,13 @@ uint32 Creature::GetSpellCooldown(uint32 spell_id) const
     if (itr == m_CreatureSpellCooldowns.end())
         return 0;
     
-    return itr->second > World::GetGameTimeMS() ? itr->second - World::GetGameTimeMS() : 0;
+    return itr->second > GameTime::GetGameTimeMS() ? itr->second - GameTime::GetGameTimeMS() : 0;
 }
 
 bool Creature::HasSpellCooldown(uint32 spell_id) const
 { 
     CreatureSpellCooldowns::const_iterator itr = m_CreatureSpellCooldowns.find(spell_id);
-    return (itr != m_CreatureSpellCooldowns.end() && itr->second > World::GetGameTimeMS());
+    return (itr != m_CreatureSpellCooldowns.end() && itr->second > GameTime::GetGameTimeMS());
 }
 
 bool Creature::HasSpell(uint32 spellID) const

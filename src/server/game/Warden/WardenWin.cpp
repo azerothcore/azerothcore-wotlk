@@ -183,7 +183,7 @@ void WardenWin::HandleHashResult(ByteBuffer &buff)
 
     _initialized = true;
 
-    _previousTimestamp = World::GetGameTimeMS();
+    _previousTimestamp = GameTime::GetGameTimeMS();
 }
 
 void WardenWin::RequestData()
@@ -199,7 +199,7 @@ void WardenWin::RequestData()
     if (_otherChecksTodo.empty())
         _otherChecksTodo.assign(sWardenCheckMgr->OtherChecksIdPool.begin(), sWardenCheckMgr->OtherChecksIdPool.end());
 
-    _serverTicks = World::GetGameTimeMS();
+    _serverTicks = GameTime::GetGameTimeMS();
 
     uint16 id;
     uint8 type;
@@ -387,7 +387,7 @@ void WardenWin::HandleData(ByteBuffer &buff)
         buff >> newClientTicks;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        uint32 ticksNow = World::GetGameTimeMS();
+        uint32 ticksNow = GameTime::GetGameTimeMS();
         uint32 ourTicks = newClientTicks + (ticksNow - _serverTicks);
 
         sLog->outDebug(LOG_FILTER_WARDEN, "ServerTicks %u", ticksNow);         // Now

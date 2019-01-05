@@ -887,7 +887,7 @@ void LFGMgr::UpdateRaidBrowser(uint32 diff)
             m_raidBrowserUpdateTimer[team] = 0;
     }
 
-    if (getMSTimeDiff(World::GetGameTimeMS(), getMSTime()) > (70*7)/5) // prevent lagging
+    if (getMSTimeDiff(GameTime::GetGameTimeMS(), getMSTime()) > (70*7)/5) // prevent lagging
         return;
 
     uint64 guid, groupGuid, instanceGuid;

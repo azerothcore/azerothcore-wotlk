@@ -1106,7 +1106,7 @@ void Pet::_SaveSpellCooldowns(SQLTransaction& trans, bool logout)
     trans->Append(stmt);
 
     time_t curTime = time(NULL);
-    uint32 checkTime = World::GetGameTimeMS() + 30*IN_MILLISECONDS;
+    uint32 checkTime = GameTime::GetGameTimeMS() + 30*IN_MILLISECONDS;
 
     // remove oudated and save active
     CreatureSpellCooldowns::iterator itr, itr2;
@@ -1114,11 +1114,11 @@ void Pet::_SaveSpellCooldowns(SQLTransaction& trans, bool logout)
     {
         itr2 = itr;
         ++itr;
-        if (itr2->second <= World::GetGameTimeMS()+1000)
+        if (itr2->second <= GameTime::GetGameTimeMS()+1000)
             m_CreatureSpellCooldowns.erase(itr2);
         else if (logout || itr2->second > checkTime)
         {
-            uint32 cooldown = ((itr2->second-World::GetGameTimeMS())/IN_MILLISECONDS) + curTime;
+            uint32 cooldown = ((itr2->second-GameTime::GetGameTimeMS())/IN_MILLISECONDS) + curTime;
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_PET_SPELL_COOLDOWN);
             stmt->setUInt32(0, m_charmInfo->GetPetNumber());
             stmt->setUInt32(1, itr2->first);

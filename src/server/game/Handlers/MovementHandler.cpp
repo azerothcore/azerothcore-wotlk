@@ -407,7 +407,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket & recvData)
     if (mover->GetGUID() != _player->GetGUID())
         movementInfo.flags &= ~MOVEMENTFLAG_WALKING;
 
-    uint32 mstime = World::GetGameTimeMS();
+    uint32 mstime = GameTime::GetGameTimeMS();
     /*----------------------*/
     if(m_clientTimeDelay == 0)
         m_clientTimeDelay = mstime > movementInfo.time ? std::min(mstime - movementInfo.time, (uint32)100) : 0;
