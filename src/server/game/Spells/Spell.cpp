@@ -1562,7 +1562,7 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
         {
             float dist;
             float angle = targetType.CalcDirectionAngle();
-            float objSize = m_caster->GetObjectSize();
+            float objSize = m_caster->GetCombatReach();
             if (targetType.GetTarget() == TARGET_DEST_CASTER_SUMMON)
                 dist = PET_FOLLOW_DIST;
             else
@@ -1625,7 +1625,7 @@ void Spell::SelectImplicitTargetDestTargets(SpellEffIndex effIndex, SpellImplici
         default:
         {
             float angle = targetType.CalcDirectionAngle();
-            float objSize = target->GetObjectSize();
+            float objSize = target->GetCombatReach();
             float dist = m_spellInfo->Effects[effIndex].CalcRadius(m_caster);
             if (dist < objSize)
                 dist = objSize;
@@ -1837,7 +1837,7 @@ void Spell::SelectImplicitTrajTargets(SpellEffIndex effIndex, SpellImplicitTarge
             if (m_caster == *itr || m_caster->IsOnVehicle(unitTarget) || (unitTarget)->GetVehicle())//(*itr)->IsOnVehicle(m_caster))
                 continue;
 
-        const float size = std::max((*itr)->GetObjectSize() * 0.7f, 1.0f); // 1/sqrt(3)
+        const float size = std::max((*itr)->GetCombatReach() * 0.7f, 1.0f); // 1/sqrt(3)
         // TODO: all calculation should be based on src instead of m_caster
         const float objDist2d = fabs(m_targets.GetSrcPos()->GetExactDist2d(*itr) * cos(m_targets.GetSrcPos()->GetRelativeAngle(*itr)));
         const float dz = fabs((*itr)->GetPositionZ() - m_targets.GetSrcPos()->m_positionZ);
@@ -1928,7 +1928,7 @@ void Spell::SelectImplicitTrajTargets(SpellEffIndex effIndex, SpellImplicitTarge
         if (itr != targets.end())
         {
             float distSq = (*itr)->GetExactDistSq(x, y, z);
-            float sizeSq = (*itr)->GetObjectSize();
+            float sizeSq = (*itr)->GetCombatReach();
             sizeSq *= sizeSq;
             DEBUG_TRAJ(sLog->outError("Initial %f %f %f %f %f", x, y, z, distSq, sizeSq);)
             if (distSq > sizeSq)
@@ -8504,7 +8504,7 @@ bool WorldObjectSpellConeTargetCheck::operator()(WorldObject* target)
     }
     else if (_spellInfo->HasAttribute(SPELL_ATTR0_CU_CONE_LINE))
     {
-        if (!_caster->HasInLine(target, _caster->GetObjectSize()))
+        if (!_caster->HasInLine(target, _caster->GetCombatReach()))
             return false;
     }
     else

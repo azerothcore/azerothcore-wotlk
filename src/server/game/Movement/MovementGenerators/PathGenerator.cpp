@@ -91,7 +91,7 @@ bool PathGenerator::CalculatePath(float destX, float destY, float destZ, bool fo
     // make sure navMesh works - we can run on map w/o mmap
     // check if the start and end point have a .mmtile loaded (can we pass via not loaded tile on the way?)
     if (!_navMesh || !_navMeshQuery || _sourceUnit->HasUnitState(UNIT_STATE_IGNORE_PATHFINDING) ||
-        _sourceUnit->GetObjectSize() >= SIZE_OF_GRIDS/2.0f || _sourceUnit->GetExactDistSq(destX, destY, destZ) >= (SIZE_OF_GRIDS*SIZE_OF_GRIDS/4.0f) || 
+        _sourceUnit->GetCombatReach() >= SIZE_OF_GRIDS/2.0f || _sourceUnit->GetExactDistSq(destX, destY, destZ) >= (SIZE_OF_GRIDS*SIZE_OF_GRIDS/4.0f) || 
         !HaveTile(start) || !HaveTile(dest))
     {
         BuildShortcut();
@@ -569,7 +569,7 @@ void PathGenerator::BuildPolyPath(G3D::Vector3 const& startPos, G3D::Vector3 con
                 for (uint32 j = 1; j < i; ++j)
                 {
                     float sqDist = (_pathPoints[j] - ClosestPointOnLine(_pathPoints[0], _pathPoints[i], _pathPoints[j])).squaredLength();
-                    float oSize = _sourceUnit->GetObjectSize();
+                    float oSize = _sourceUnit->GetCombatReach();
                     if (sqDist > 1.0f*1.0f || sqDist > oSize*oSize)
                     {
                         ok = false;
@@ -597,7 +597,7 @@ void PathGenerator::BuildPolyPath(G3D::Vector3 const& startPos, G3D::Vector3 con
                         for (uint32 j = 1; j < i; ++j)
                         {
                             float sqDist = (_pathPoints[j] - ClosestPointOnLine(_pathPoints[0], newPoint, _pathPoints[j])).squaredLength();
-                            float oSize = _sourceUnit->GetObjectSize();
+                            float oSize = _sourceUnit->GetCombatReach();
                             if (sqDist > 1.0f*1.0f || sqDist > oSize*oSize)
                             {
                                 ok2 = false;

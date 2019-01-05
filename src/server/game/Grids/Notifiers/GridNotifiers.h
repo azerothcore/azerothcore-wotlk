@@ -873,19 +873,34 @@ namespace Trinity
     class AnyFriendlyUnitInObjectRangeCheck
     {
         public:
-            AnyFriendlyUnitInObjectRangeCheck(WorldObject const* obj, Unit const* funit, float range, bool playerOnly = false) : i_obj(obj), i_funit(funit), i_range(range), i_playerOnly(playerOnly) {}
+            AnyFriendlyUnitInObjectRangeCheck(WorldObject const* obj, Unit const* funit, float range, bool playerOnly = false, bool incOwnRadius = true, bool incTargetRadius = true)
+                : i_obj(obj), i_funit(funit), i_range(range), i_playerOnly(playerOnly), i_incOwnRadius(incOwnRadius), i_incTargetRadius(incTargetRadius) { }
             bool operator()(Unit* u)
             {
-                if (u->IsAlive() && i_obj->IsWithinDistInMap(u, i_range) && i_funit->IsFriendlyTo(u) && (!i_playerOnly || u->GetTypeId() == TYPEID_PLAYER))
-                    return true;
-                else
+                if (!u->IsAlive())
                     return false;
+
+                float searchRadius = i_range;
+                if (i_incOwnRadius) 
+                    searchRadius += i_obj->GetCombatReach();
+                if (i_incTargetRadius) 
+                    searchRadius += u->GetCombatReach();
+
+                if (!u->IsInMap(i_obj) || !u->InSamePhase(i_obj) || !u->IsWithinDoubleVerticalCylinder(i_obj, searchRadius, searchRadius))
+                    return false;
+
+                if (!i_funit->IsFriendlyTo(u))
+                    return false;
+
+                return !i_playerOnly || u->GetTypeId() == TYPEID_PLAYER;
             }
         private:
             WorldObject const* i_obj;
             Unit const* i_funit;
             float i_range;
             bool i_playerOnly;
+            bool i_incOwnRadius;
+            bool i_incTargetRadius;
     };
 
     class AnyFriendlyNotSelfUnitInObjectRangeCheck

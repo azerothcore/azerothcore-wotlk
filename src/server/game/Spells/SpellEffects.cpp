@@ -3153,7 +3153,7 @@ void Spell::EffectSummonPet(SpellEffIndex effIndex)
             //OldSummon->GetMap()->Remove(OldSummon->ToCreature(), false);
 
             float px, py, pz;
-            owner->GetClosePoint(px, py, pz, OldSummon->GetObjectSize());
+            owner->GetClosePoint(px, py, pz, OldSummon->GetCombatReach());
 
             OldSummon->NearTeleportTo(px, py, pz, OldSummon->GetOrientation());
             OldSummon->UpdateObjectVisibility();
@@ -3185,7 +3185,7 @@ void Spell::EffectSummonPet(SpellEffIndex effIndex)
     }
 
     float x, y, z;
-    owner->GetClosePoint(x, y, z, owner->GetObjectSize());
+    owner->GetClosePoint(x, y, z, owner->GetCombatReach());
     owner->SummonPet(petentry, x, y, z, owner->GetOrientation(), SUMMON_PET, 0, m_spellInfo->Id, m_caster->GetGUID(), PET_LOAD_SUMMON_PET);
     //if (!pet)
     //    return;

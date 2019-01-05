@@ -79,7 +79,7 @@ void TargetedMovementGeneratorMedium<T,D>::_setTargetLocation(T* owner, bool ini
         float size;
 
         // Pets need special handling.
-        // We need to subtract GetObjectSize() because it gets added back further down the chain
+        // We need to subtract GetCombatReach() because it gets added back further down the chain
         //  and that makes pets too far away. Subtracting it allows pets to properly
         //  be (GetCombatReach() + i_offset) away.
         // Only applies when i_target is pet's owner otherwise pets and mobs end up
@@ -87,12 +87,12 @@ void TargetedMovementGeneratorMedium<T,D>::_setTargetLocation(T* owner, bool ini
         if (owner->IsPet() && i_target->GetTypeId() == TYPEID_PLAYER)
         {
             dist = i_target->GetCombatReach();
-            size = i_target->GetCombatReach() - i_target->GetObjectSize();
+            size = i_target->GetCombatReach() - i_target->GetCombatReach();
         }
         else
         {
             dist = i_offset;
-            size = owner->GetObjectSize();
+            size = owner->GetCombatReach();
         }
 
         if ((!initial || (owner->movespline->Finalized() && this->GetMovementGeneratorType() == CHASE_MOTION_TYPE)) && i_target->IsWithinDistInMap(owner, dist) && i_target->IsWithinLOS(owner->GetPositionX(), owner->GetPositionY(), owner->GetPositionZ()))
@@ -258,7 +258,7 @@ bool TargetedMovementGeneratorMedium<T,D>::DoUpdate(T* owner, uint32 time_diff)
     {
         i_recheckDistance.Reset(50);
         //More distance let have better performance, less distance let have more sensitive reaction at target move.
-        float allowed_dist_sq = i_target->GetObjectSize() + owner->GetObjectSize() + MELEE_RANGE - 0.5f;
+        float allowed_dist_sq = i_target->GetCombatReach() + owner->GetCombatReach() + MELEE_RANGE - 0.5f;
 
         // xinef: if offset is negative (follow distance is smaller than just object sizes), reduce minimum allowed distance which is based purely on object sizes
         if (i_offset < 0.0f)

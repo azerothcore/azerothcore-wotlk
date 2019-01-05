@@ -6828,7 +6828,7 @@ void Player::SendMessageToSetInRange(WorldPacket* data, float dist, bool self, b
     if (self)
         GetSession()->SendPacket(data);
 
-    dist += GetObjectSize();
+    dist += GetCombatReach();
     if (includeMargin)
         dist += VISIBILITY_COMPENSATION; // pussywizard: to ensure everyone receives all important packets
     Trinity::MessageDistDeliverer notifier(this, data, dist, false, skipped_rcvr);
