@@ -1004,8 +1004,8 @@ namespace Trinity
     class AnyAoETargetUnitInObjectRangeCheck
     {
         public:
-            AnyAoETargetUnitInObjectRangeCheck(WorldObject const* obj, Unit const* funit, float range, SpellInfo const* spellInfo = nullptr, bool incOwnRadius = true, bool incTargetRadius = true)
-                : i_obj(obj), i_funit(funit), _spellInfo(spellInfo), i_range(range), i_incOwnRadius(incOwnRadius), i_incTargetRadius(incTargetRadius)
+            AnyAoETargetUnitInObjectRangeCheck(WorldObject const* obj, Unit const* funit, float range, bool incOwnRadius = true, bool incTargetRadius = true)
+                : i_obj(obj), i_funit(funit),  _spellInfo(NULL), i_range(range), i_incOwnRadius(incOwnRadius), i_incTargetRadius(incTargetRadius)
             {
                 Unit const* check = i_funit;
                 Unit const* owner = i_funit->GetOwner();
