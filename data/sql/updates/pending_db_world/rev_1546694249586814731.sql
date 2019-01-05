@@ -17,6 +17,9 @@ VALUES
 (36908,0,0,50331648,0,0,''),
 (36909,0,0,50331648,0,0,'');
 
+-- The smart script for the Wind Rider Cub can also be used for the Gryphon Hatchling:
+UPDATE `creature_template` SET `ScriptName` = 'npc_pet_gen_wind_rider_cub' WHERE `entry` = 36908;
+
 -- Dragonhawk Hatchlings:
 DELETE FROM `creature_template_addon` WHERE `entry` IN (21055,21056,21063,21064);
 INSERT INTO `creature_template_addon` (`entry`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`auras`)
