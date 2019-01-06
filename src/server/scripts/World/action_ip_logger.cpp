@@ -91,6 +91,9 @@ public:
      // ACCOUNT_LOGOUT = 6
     void AccountIPLogAction(uint32 accountId, IPLoggingTypes aType)
     {
+        if (!sWorld->getBoolConfig(CONFIG_IP_BASED_ACTION_LOGGING))
+            return;
+
         // Action IP Logger is only intialized if config is set up
         // Else, this script isn't loaded in the first place: We require no config check.
 
@@ -196,6 +199,9 @@ public:
     /// Logs a number of actions done by players with an IP
     void CharacterIPLogAction(Player* player, IPLoggingTypes aType)
     {
+        if (!sWorld->getBoolConfig(CONFIG_IP_BASED_ACTION_LOGGING))
+            return;
+
         // Action IP Logger is only intialized if config is set up
         // Else, this script isn't loaded in the first place: We require no config check.
 
@@ -265,6 +271,9 @@ public:
 
     void DeleteIPLogAction(uint64 guid, uint32 playerGuid, IPLoggingTypes aType)
     {
+        if (!sWorld->getBoolConfig(CONFIG_IP_BASED_ACTION_LOGGING))
+            return;
+
         // Action IP Logger is only intialized if config is set up
         // Else, this script isn't loaded in the first place: We require no config check.
 

@@ -653,9 +653,7 @@ void AddWorldScripts()
     AddSC_achievement_scripts();
     AddSC_chat_log(); // location: scripts\World\chat_log.cpp
     AddSC_character_creation();
-    // To avoid duplicate code, we check once /*ONLY*/ if logging is permitted or not.
-    if (sWorld->getBoolConfig(CONFIG_IP_BASED_ACTION_LOGGING))
-        AddSC_action_ip_logger(); // location: scripts\World\action_ip_logger.cpp
+    AddSC_action_ip_logger(); // location: scripts\World\action_ip_logger.cpp
 #endif
 }
 
