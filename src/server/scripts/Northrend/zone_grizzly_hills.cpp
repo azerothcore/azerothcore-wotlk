@@ -318,7 +318,53 @@ public:
         return new npc_mrfloppyAI(creature);
     }
 };
+// Ravenous Worg
+class npc_ravenous_worg : public CreatureScript
+{
+public:
+    npc_ravenous_worg() : CreatureScript("npc_ravenous_worg") { }
 
+    struct npc_ravenous_worgAI : public CombatAI
+    {
+        npc_ravenous_worgAI(Creature* creature) : CombatAI(creature)
+        {
+            _pacified = false;
+            _attack = false;
+        }
+
+        void AttackStart(Unit* who)
+        {
+            if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED))
+                _pacified = true;
+
+            if (_pacified && !me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED))
+                _attack = true;
+
+            if (_attack)
+                CombatAI::AttackStart(who);
+        }
+
+        void UpdateAI(uint32 diff)
+        {
+            if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED))
+                _pacified = true;
+
+            if (_pacified && !me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED))
+                _attack = true;
+
+            CombatAI::UpdateAI(diff);
+        }
+
+        private:
+            bool   _pacified;
+            bool   _attack;
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_ravenous_worgAI(creature);
+    }
+};
 /*######
 ## Quest 12227: Doing Your Duty
 ######*/
