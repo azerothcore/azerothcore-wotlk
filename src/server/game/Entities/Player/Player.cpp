@@ -34,6 +34,8 @@
 #include "GroupMgr.h"
 #include "Guild.h"
 #include "GuildMgr.h"
+#include "GitRevision.h"
+#include "revision.h"
 #include "InstanceSaveMgr.h"
 #include "InstanceScript.h"
 #include "Language.h"
@@ -15662,6 +15664,20 @@ void Player::AddQuest(Quest const* quest, Object* questGiver)
 
     SendQuestUpdate(quest_id);
 
+    // check if Quest Tracker is enabled
+    if (sWorld->getBoolConfig(CONFIG_QUEST_ENABLE_QUEST_TRACKER))
+    {
+        // prepare Quest Tracker datas
+        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_QUEST_TRACK);
+        stmt->setUInt32(0, quest_id);
+        stmt->setUInt32(1, GetGUIDLow());
+        stmt->setString(2, _HASH);
+        stmt->setString(3, _DATE);
+
+        // add to Quest Tracker
+        CharacterDatabase.Execute(stmt);
+    }
+
     // Xinef: area auras may change on quest accept!
     UpdateZoneDependentAuras(GetZoneId());
     UpdateAreaDependentAuras(GetAreaId());
@@ -15689,6 +15705,18 @@ void Player::CompleteQuest(uint32 quest_id)
         UpdateZoneDependentAuras(GetZoneId());
         UpdateAreaDependentAuras(GetAreaId());
         AdditionalSavingAddMask(ADDITIONAL_SAVING_INVENTORY_AND_GOLD | ADDITIONAL_SAVING_QUEST_STATUS);
+    }
+
+    // check if Quest Tracker is enabled
+    if (sWorld->getBoolConfig(CONFIG_QUEST_ENABLE_QUEST_TRACKER))
+    {
+        // prepare Quest Tracker datas
+        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_QUEST_TRACK_COMPLETE_TIME);
+        stmt->setUInt32(0, quest_id);
+        stmt->setUInt32(1, GetGUIDLow());
+
+        // add to Quest Tracker
+        CharacterDatabase.Execute(stmt);
     }
 }
 
