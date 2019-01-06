@@ -704,7 +704,6 @@ public:
     {
         npc_pet_gen_wind_rider_cubAI(Creature *c) : NullCreatureAI(c)
         {
-            allowMove = true;
             isFlying = true;
             checkTimer = 0;
             checkTimer2 = 2000;
@@ -712,15 +711,8 @@ public:
         }
 
         bool isFlying;
-        bool allowMove;
         uint32 checkTimer;
         uint32 checkTimer2;
-
-        void MovementInform(uint32 type, uint32 id)
-        {
-            if (type == POINT_MOTION_TYPE && id == 1)
-                allowMove = true;
-        }
 
         void UpdateAI(uint32 diff)
         {
@@ -730,7 +722,7 @@ public:
                 checkTimer2 = 0;
                 if (Unit* owner = me->GetOwner())
                 {
-                    if (owner->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED))
+                    if (owner->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) || owner->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_SPEED))
                     {
                         isFlying = true;
                         me->SetCanFly(true);
@@ -743,24 +735,6 @@ public:
                         me->SetDisableGravity(false);
                         me->GetMotionMaster()->MoveFall();
                     }
-                }
-            }
-
-            checkTimer += diff;
-            if (allowMove || checkTimer > 2000)
-            {
-                allowMove = false;
-                checkTimer = 0;
-                if (Unit* owner = me->GetOwner())
-                {
-                    if (me->GetMotionMaster()->GetMotionSlotType(MOTION_SLOT_ACTIVE) == POINT_MOTION_TYPE ||
-                        me->GetDistance(owner) < 1.0f)
-                        return;
-                    float x, y, z;
-                    owner->GetNearPoint2D(x, y, 0.5f, owner->GetOrientation()+PET_FOLLOW_ANGLE);
-                    z = owner->GetPositionZ() + (isFlying ? 2.5f : 0.0f);
-
-                    me->GetMotionMaster()->MovePoint(1, x, y, z);
                 }
             }
         }
@@ -956,6 +930,27 @@ public:
     }
 };
 
+class npc_pet_gen_moth : public CreatureScript
+{
+public:
+    npc_pet_gen_moth() : CreatureScript("npc_pet_gen_moth") { }
+
+    struct npc_pet_gen_mothAI : public NullCreatureAI
+    {
+        npc_pet_gen_mothAI(Creature *c) : NullCreatureAI(c)
+        {
+            me->AddUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
+            me->SetCanFly(true);
+            me->SetDisableGravity(true);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* pCreature) const
+    {
+        return new npc_pet_gen_mothAI (pCreature);
+    }
+};
+
 void AddSC_generic_pet_scripts()
 {
     new npc_pet_gen_mojo();
@@ -970,4 +965,5 @@ void AddSC_generic_pet_scripts()
     new npc_pet_gen_plump_turkey();
     new npc_pet_gen_toxic_wasteling();
     new npc_pet_gen_fetch_ball();
+    new npc_pet_gen_moth();
 }
