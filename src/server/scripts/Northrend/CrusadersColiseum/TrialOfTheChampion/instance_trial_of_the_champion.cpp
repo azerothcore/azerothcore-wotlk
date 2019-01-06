@@ -1162,7 +1162,7 @@ public:
                     {
                         if( Creature* bk = instance->GetCreature(NPC_BlackKnightGUID) )
                         {
-                            Position exitPos = {745.016f, 631.506f, 411.575f, M_PI};
+                            Position exitPos = { 751.003357f, 638.145508f, 411.570129f, M_PI };
                             bk->ExitVehicle(/*&exitPos*/);
                             bk->GetMotionMaster()->MoveJump(exitPos, 2.0f, 2.0f);
                             bk->AI()->Talk(TEXT_BK_SPOILED);
