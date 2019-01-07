@@ -1,4 +1,5 @@
 INSERT INTO version_db_world (`sql_rev`) VALUES ('1546882798358682300');
+
 -- Vile Fin Minor Oracle SAI
 SET @ENTRY := 1544;
 UPDATE `creature_template` SET `AIName`="SmartAI" WHERE `entry`=@ENTRY;
@@ -9,5 +10,6 @@ INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type
 (@ENTRY,0,2,0,1,0,100,0,500,1000,600000,600000,11,324,0,0,0,0,0,1,0,0,0,0,0,0,0,"Vile Fin Minor Oracle - Out of Combat - Cast Lightning Shield"),
 (@ENTRY,0,3,0,16,0,100,0,324,1,15000,30000,11,324,0,0,0,0,0,1,0,0,0,0,0,0,0,"Vile Fin Minor Oracle - On Friendly Unit Missing Buff Lightning Shield - Cast Lightning Shield"),
 (@ENTRY,0,4,0,2,0,100,1,0,15,0,0,25,1,0,0,0,0,0,0,0,0,0,0,0,0,0,"Vile Fin Minor Oracle - Between 0-15% Health - Flee For Assist (No Repeat)");
--- Monsters Wolf
+
+-- Ragged Scavenger and Young Scavenger
 UPDATE `creature_template` SET `flags_extra` =+ 2 WHERE `entry` IN (1509, 1508);
