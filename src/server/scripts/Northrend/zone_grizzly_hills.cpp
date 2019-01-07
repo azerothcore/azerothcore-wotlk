@@ -366,6 +366,7 @@ public:
         return new npc_ravenous_worgAI(creature);
     }
 };
+
 /*######
 ## Quest 12227: Doing Your Duty
 ######*/
