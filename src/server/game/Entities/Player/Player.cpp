@@ -8474,7 +8474,7 @@ void Player::CastItemCombatSpell(Unit* target, WeaponAttackType attType, uint32 
     }
 }
 
-void Player::CastItemCombatSpell(Unit* target, WeaponAttackType attType, uint32 procVictim, uint32 procEx, Item* item, ItemTemplate const* proto)
+void Player::CastItemCombatSpell(Unit* target, WeaponAttackType attType, uint32 procVictim, uint32 procEx, Item* item, ItemTemplate const* proto, DamageInfo const& damageInfo)
 { 
     // Can do effect if any damage done to target
     if (procVictim & PROC_FLAG_TAKEN_DAMAGE)
@@ -8536,10 +8536,10 @@ void Player::CastItemCombatSpell(Unit* target, WeaponAttackType attType, uint32 
 
             SpellEnchantProcEntry const* entry = sSpellMgr->GetSpellEnchantProcEvent(enchant_id);
 
-            if (entry && entry->procEx)
+            if (entry && entry->HitMask)
             {
                 // Check hit/crit/dodge/parry requirement
-                if ((entry->procEx & procEx) == 0)
+                if ((entry->HitMask & procEx) == 0)
                     continue;
             }
             else
@@ -8549,6 +8549,10 @@ void Player::CastItemCombatSpell(Unit* target, WeaponAttackType attType, uint32 
                 //if (!(damageInfo->procVictim & PROC_FLAG_TAKEN_ANY_DAMAGE))
                     continue;
             }
+
+            // check if enchant procs only on white hits
+            if (entry && (entry->AttributesMask & ENCHANT_PROC_ATTR_WHITE_HIT) && sSpellMgr->GetSpellInfo(pEnchant->spellid[s]))
+                continue;
 
             SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(pEnchant->spellid[s]);
             if (!spellInfo)
@@ -8562,10 +8566,10 @@ void Player::CastItemCombatSpell(Unit* target, WeaponAttackType attType, uint32 
 
             if (entry)
             {
-                if (entry->PPMChance)
-                    chance = GetPPMProcChance(proto->Delay, entry->PPMChance, spellInfo);
-                else if (entry->customChance)
-                    chance = (float)entry->customChance;
+                if (entry->ProcsPerMinute)
+                    chance = GetPPMProcChance(proto->Delay, entry->ProcsPerMinute, spellInfo);
+                else if (entry->Chance)
+                    chance = entry->Chance;
             }
 
             // Apply spell mods
@@ -8577,22 +8581,25 @@ void Player::CastItemCombatSpell(Unit* target, WeaponAttackType attType, uint32 
 
             if (roll_chance_f(chance))
             {
-                // Xinef: implement enchant charges
-                if (uint32 charges = item->GetEnchantmentCharges(EnchantmentSlot(e_slot)))
+                Unit* target = spellInfo->IsPositive() ? this : damageInfo.GetVictim();
+
+                // reduce effect values if enchant is limited
+                CustomSpellValues values;
+                if ((entry->AttributesMask & ENCHANT_PROC_ATTR_LIMIT_60) && target->getLevel() > 60)
                 {
-                    if (!--charges)
+                    int32 const lvlDifference = target->getLevel() - 60;
+                    int32 const lvlPenaltyFactor = 4; // 4% lost effectiveness per level
+
+                    int32 const effectPct = std::max(0, 100 - (lvlDifference * lvlPenaltyFactor));
+
+                    for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
                     {
-                        ApplyEnchantment(item, EnchantmentSlot(e_slot), false);
-                        item->ClearEnchantment(EnchantmentSlot(e_slot));
+                        if (spellInfo->Effects[i].IsEffect())
+                            values.AddSpellMod(static_cast<SpellValueMod>(SPELLVALUE_BASE_POINT0 + i), CalculatePct(spellInfo->Effects[i].CalcValue(this), effectPct));
                     }
-                    else
-                        item->SetEnchantmentCharges(EnchantmentSlot(e_slot), charges);
                 }
 
-                if (spellInfo->IsPositive())
-                    CastSpell(this, spellInfo, TriggerCastFlags(TRIGGERED_FULL_MASK&~TRIGGERED_IGNORE_SPELL_AND_CATEGORY_CD), item);
-                else
-                    CastSpell(target, spellInfo, TriggerCastFlags(TRIGGERED_FULL_MASK&~TRIGGERED_IGNORE_SPELL_AND_CATEGORY_CD), item);
+                CastCustomSpell(spellInfo->Id, values, target, TRIGGERED_FULL_MASK, item);
             }
         }
     }

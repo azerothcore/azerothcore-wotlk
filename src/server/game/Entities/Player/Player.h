@@ -2167,7 +2167,7 @@ class Player : public Unit, public GridObject<Player>
         void UpdateEquipSpellsAtFormChange();
         void CastItemCombatSpell(Unit* target, WeaponAttackType attType, uint32 procVictim, uint32 procEx);
         void CastItemUseSpell(Item* item, SpellCastTargets const& targets, uint8 cast_count, uint32 glyphIndex);
-        void CastItemCombatSpell(Unit* target, WeaponAttackType attType, uint32 procVictim, uint32 procEx, Item* item, ItemTemplate const* proto);
+        void CastItemCombatSpell(Unit* target, WeaponAttackType attType, uint32 procVictim, uint32 procEx, Item* item, ItemTemplate const* proto, DamageInfo const& damageInfo);
 
         void SendEquipmentSetList();
         void SetEquipmentSet(uint32 index, EquipmentSet eqset);
