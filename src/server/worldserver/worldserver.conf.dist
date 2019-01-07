@@ -3164,6 +3164,19 @@ MoveMaps.Enable = 1
 
 Minigob.Manabonk.Enable = 1
 
+#
+#     Calculate.Creature.Zone.Area.Data
+#        Description: Calculate at loading creature zoneId / areaId and save in creature table (WARNING: SLOW WORLD SERVER STARTUP)
+#        Default:     0  - (Do not show)
+
+Calculate.Creature.Zone.Area.Data = 0
+
+#
+#     Calculate.Gameoject.Zone.Area.Data
+#        Description: Calculate at loading gameobject zoneId / areaId and save in gameobject table (WARNING: SLOW WORLD SERVER STARTUP)
+#        Default:     0  - (Do not show)
+
+Calculate.Gameoject.Zone.Area.Data = 0
 
 #
 ###################################################################################################
