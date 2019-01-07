@@ -318,6 +318,7 @@ public:
         return new npc_mrfloppyAI(creature);
     }
 };
+
 // Ravenous Worg
 class npc_ravenous_worg : public CreatureScript
 {
