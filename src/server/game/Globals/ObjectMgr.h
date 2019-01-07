@@ -1221,7 +1221,7 @@ class ObjectMgr
         GameObjectData& NewGOData(uint32 guid) { return _gameObjectDataStore[guid]; }
         void DeleteGOData(uint32 guid);
        
-		TrinityString const* GetTrinityString(uint32 entry) const
+	TrinityString const* GetTrinityString(uint32 entry) const
         {
             TrinityStringContainer::const_iterator itr = _trinityStringStore.find(entry);
             if (itr == _trinityStringStore.end())
