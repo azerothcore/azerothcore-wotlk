@@ -178,6 +178,7 @@ i_motionMaster(new MotionMaster(this)), m_regenTimer(0), m_ThreatManager(this), 
     m_rootTimes = 0;
 
     m_state = 0;
+    m_petCatchUp = false;
     m_deathState = ALIVE;
 
     for (uint8 i = 0; i < CURRENT_MAX_SPELL; ++i)
@@ -13093,8 +13094,40 @@ void Unit::UpdateSpeed(UnitMoveType mtype, bool forced)
                 Unit* pOwner = GetCharmerOrOwner();
                 if (pOwner && !IsInCombat() && !IsVehicle() && !HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED) && (IsPet() || IsGuardian() || GetGUID() == pOwner->GetCritterGUID() || GetCharmerGUID() == pOwner->GetGUID()))
                 {
-                    if (speed < pOwner->GetSpeedRate(mtype)+0.1f)
-                        speed = pOwner->GetSpeedRate(mtype)+0.1f; // pets derive speed from owner when not in combat
+                    if (pOwner->GetTypeId() != TYPEID_PLAYER)
+                    {
+                        if (speed < pOwner->GetSpeedRate(mtype)+0.1f)
+                            speed = pOwner->GetSpeedRate(mtype)+0.1f; // pets derive speed from owner when not in combat
+                    }
+                    else
+                    {
+                        // special treatment for player pets in order to avoid stuttering
+                        float ownerSpeed = pOwner->GetSpeedRate(mtype);
+                        float distOwner = GetDistance(pOwner);
+                        float minDist = 2.5f;
+
+                        if (ToCreature()->GetCreatureType() == CREATURE_TYPE_NON_COMBAT_PET)
+                        {
+                            // different minimum distance for vanity pets
+                            minDist = 5.0f;
+
+                            if (mtype == MOVE_FLIGHT)
+                                mtype = MOVE_RUN; // vanity pets use run speed for flight
+                        }
+
+                        float maxDist = ownerSpeed >= 1.0f ? minDist * ownerSpeed * 1.5f : minDist * 1.5f;
+
+                        if (distOwner < minDist && m_petCatchUp)
+                            m_petCatchUp = false;
+
+                        if (distOwner > maxDist && !m_petCatchUp)
+                            m_petCatchUp = true;
+
+                        if (m_petCatchUp)
+                            speed = ownerSpeed * 1.05f;
+                        else
+                            speed = ownerSpeed * 0.95f;
+                    }
                 }
                 else
                     speed *= ToCreature()->GetCreatureTemplate()->speed_run;    // at this point, MOVE_WALK is never reached
