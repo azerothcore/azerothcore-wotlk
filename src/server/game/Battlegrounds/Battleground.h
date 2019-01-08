@@ -31,7 +31,7 @@ class BattlegroundRV;
 class BattlegroundIC;
 
 struct PvPDifficultyEntry;
-struct WorldSafeLocsEntry;
+struct GraveyardStruct;
 
 enum BattlegroundDesertionType
 {
@@ -541,7 +541,7 @@ class Battleground
         virtual void HandlePlayerResurrect(Player* /*player*/) {}
 
         // Death related
-        virtual WorldSafeLocsEntry const* GetClosestGraveyard(Player* player);
+        virtual GraveyardStruct const* GetClosestGraveyard(Player* player);
 
         virtual void AddPlayer(Player* player);                // must be implemented in BG subclass
 
