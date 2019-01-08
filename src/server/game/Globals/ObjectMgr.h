@@ -625,16 +625,6 @@ struct QuestPOI
 typedef std::vector<QuestPOI> QuestPOIVector;
 typedef UNORDERED_MAP<uint32, QuestPOIVector> QuestPOIContainer;
 
-struct GraveyardData
-{
-    uint32 safeLocId;
-    TeamId teamId;
-};
-
-typedef std::multimap<uint32, GraveyardData> GraveyardContainer;
-typedef std::pair<GraveyardContainer::const_iterator, GraveyardContainer::const_iterator> GraveyardMapBounds;
-typedef std::pair<GraveyardContainer::iterator, GraveyardContainer::iterator> GraveyardMapBoundsNonConst;
-
 typedef UNORDERED_MAP<uint32, VendorItemData> CacheVendorItemContainer;
 typedef UNORDERED_MAP<uint32, TrainerSpellData> CacheTrainerSpellContainer;
 
@@ -811,14 +801,7 @@ class ObjectMgr
             return _tavernAreaTriggerStore.find(Trigger_ID) != _tavernAreaTriggerStore.end();
         }
 
-        GossipText const* GetGossipText(uint32 Text_ID) const;
-
-        WorldSafeLocsEntry const* GetDefaultGraveyard(TeamId teamId);
-        WorldSafeLocsEntry const* GetClosestGraveyard(float x, float y, float z, uint32 MapId, TeamId teamId);
-        bool AddGraveyardLink(uint32 id, uint32 zoneId, TeamId teamId, bool persist = true);
-        void RemoveGraveyardLink(uint32 id, uint32 zoneId, TeamId teamId, bool persist = false);
-        void LoadGraveyardZones();
-        GraveyardData const* FindGraveyardData(uint32 id, uint32 zone);
+        GossipText const* GetGossipText(uint32 Text_ID) const;       
 
         AreaTrigger const* GetAreaTrigger(uint32 trigger) const
         {
@@ -1303,9 +1286,6 @@ class ObjectMgr
         {
             return _gossipMenuItemsStore.equal_range(uiMenuId);
         }
-
-        // for wintergrasp only
-        GraveyardContainer GraveyardStore;
 
         static void AddLocaleString(std::string const& s, LocaleConstant locale, StringVector& data);
         static inline void GetLocaleString(const StringVector& data, int loc_idx, std::string& value)
