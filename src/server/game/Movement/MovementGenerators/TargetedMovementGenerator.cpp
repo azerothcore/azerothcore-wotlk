@@ -105,7 +105,7 @@ void TargetedMovementGeneratorMedium<T,D>::_setTargetLocation(T* owner, bool ini
             // fix distance and angle for vanity pets
             dist = 0.3f;
             angle = PET_FOLLOW_ANGLE + M_PI * 0.2f;
-            size = i_target->GetCombatReach() - i_target->GetObjectSize();
+            size = i_target->GetCombatReach() - i_target->GetCombatReach();
         }
 
         // Xinef: Fix follow angle for hostile units
