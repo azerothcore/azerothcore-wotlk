@@ -10,6 +10,19 @@
 #include "SpellAuraEffects.h"
 #include "Player.h"
 
+enum Teleport_Spells
+{
+    BASE_CAMP    = 64014,
+    GROUNDS      = 64032,
+    FORGE        = 64028,
+    SCRAPYARD    = 64031,
+    ANTECHAMBER  = 64030,
+    WALKWAY      = 64029,
+    CONSERVATORY = 64024,
+    MADNESS      = 64025,
+    SPARK        = 65042
+};
+
 class npc_ulduar_keeper : public CreatureScript
 {
 public:
@@ -410,6 +423,79 @@ public:
     }
 };
 
+class spell_ulduar_teleporter : public SpellScriptLoader
+{
+public:
+    spell_ulduar_teleporter() : SpellScriptLoader("spell_ulduar_teleporter") { }
+
+    class spell_ulduar_teleporter_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_ulduar_teleporter_SpellScript);
+
+        SpellCastResult CheckRequirement()
+        {
+            if (GetExplTargetUnit()->GetTypeId() != TYPEID_PLAYER)
+                return SPELL_FAILED_DONT_REPORT;
+
+            if (GetExplTargetUnit()->IsInCombat())
+            {
+                Spell::SendCastResult(GetExplTargetUnit()->ToPlayer(), GetSpellInfo(), 0, SPELL_FAILED_AFFECTING_COMBAT);
+                return SPELL_FAILED_AFFECTING_COMBAT;
+            }
+
+            return SPELL_CAST_OK;
+        }
+
+        //doing real teleporting because all spells are just broken
+        void TeleportPlayer()
+        {
+            uint32 SpellID = GetSpellInfo()->Id;
+            Player* player = static_cast<Player*>(GetExplTargetUnit());
+
+            switch (SpellID)
+            {
+            case BASE_CAMP:
+                player->TeleportTo(603, -706.122f, -92.6024f, 429.876f, 0);
+                break;
+            case GROUNDS:
+                player->TeleportTo(603, 131.248f, -35.3802f, 409.804f, 0);
+                break;
+            case FORGE:
+                player->TeleportTo(603, 553.233f, -12.3247f, 409.679f, 0);
+                break;
+            case SCRAPYARD:
+                player->TeleportTo(603, 926.292f, -11.4635f, 418.595f, 0);
+                break;
+            case ANTECHAMBER:
+                player->TeleportTo(603, 1498.09f, -24.246f, 420.967f, 0);
+                break;
+            case WALKWAY:
+                player->TeleportTo(603, 1859.45f, -24.1f, 448.9f, 0);
+                break;
+            case CONSERVATORY:
+                player->TeleportTo(603, 2086.27f, -24.3134f, 421.239f, 0);
+                break;
+            case MADNESS:
+                player->TeleportTo(603, 1854.8f, -11.46f, 334.57f, 4.8f);
+                break;
+            case SPARK:
+                player->TeleportTo(603, 2517.9f, 2568.9f, 412.7f, 0);
+                break;
+            }
+        }
+
+        void Register() override
+        {
+            OnCheckCast += SpellCheckCastFn(spell_ulduar_teleporter_SpellScript::CheckRequirement);
+            AfterCast   += SpellCastFn(spell_ulduar_teleporter_SpellScript::TeleportPlayer);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_ulduar_teleporter_SpellScript();
+    }
+};
 
 void AddSC_ulduar()
 {
@@ -420,6 +506,7 @@ void AddSC_ulduar()
     new npc_ulduar_storm_tempered_keeper();
     new npc_ulduar_arachnopod_destroyer();
     new spell_ulduar_arachnopod_damaged();
+    new spell_ulduar_teleporter();
 
     new AreaTrigger_at_celestial_planetarium_enterance();
     new go_call_tram();
