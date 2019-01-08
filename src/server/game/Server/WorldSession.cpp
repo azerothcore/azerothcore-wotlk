@@ -126,7 +126,7 @@ WorldSession::WorldSession(uint32 id, WorldSocket* sock, AccountTypes sec, uint8
     {
         m_Address = sock->GetRemoteAddress();
         sock->AddReference();
-        ResetTimeOutTime();
+        ResetTimeOutTime(false);
         LoginDatabase.PExecute("UPDATE account SET online = online | (1<<(%u-1)) WHERE id = %u;", realmID, GetAccountId());
     }
 
@@ -252,6 +252,9 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
     if (updater.ProcessLogout())
     {
         UpdateTimeOutTime(diff);
+        
+        /// If necessary, kick the player because the client didn't send anything for too long
+        /// (or they've been idling in character select)
         if (IsConnectionIdle())
             m_Socket->CloseSocket();
     }
