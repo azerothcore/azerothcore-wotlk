@@ -75,6 +75,7 @@
 #include "WhoListCache.h"
 #include "AsyncAuctionListing.h"
 #include "SavingSystem.h"
+#include "GameGraveyard.h"
 #include <VMapManager2.h>
 #ifdef ELUNA
 #include "LuaEngine.h"
@@ -1413,6 +1414,9 @@ void World::SetInitialWorldSettings()
     LoadDBCStores(m_dataPath);
     DetectDBCLang();
 
+    sLog->outString("Loading Game Graveyard...");
+    sGraveyard->LoadGraveyardFromDB();
+
     sLog->outString("Loading spell dbc data corrections...");
     sSpellMgr->LoadDbcDataCorrections();
 
@@ -1641,7 +1645,7 @@ void World::SetInitialWorldSettings()
     sLFGMgr->LoadRewards();
 
     sLog->outString("Loading Graveyard-zone links...");
-    sObjectMgr->LoadGraveyardZones();
+    sGraveyard->LoadGraveyardZones();
 
     sLog->outString("Loading spell pet auras...");
     sSpellMgr->LoadSpellPetAuras();

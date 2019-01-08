@@ -29,6 +29,7 @@ EndScriptData */
 #include "TicketMgr.h"
 #include "WardenCheckMgr.h"
 #include "WaypointManager.h"
+#include "GameGraveyard.h"
 
 class reload_commandscript : public CommandScript
 {
@@ -80,6 +81,7 @@ public:
             { "disenchant_loot_template",     SEC_ADMINISTRATOR, true,  &HandleReloadLootTemplatesDisenchantCommand,    "" },
             { "event_scripts",                SEC_ADMINISTRATOR, true,  &HandleReloadEventScriptsCommand,               "" },
             { "fishing_loot_template",        SEC_ADMINISTRATOR, true,  &HandleReloadLootTemplatesFishingCommand,       "" },
+            { "game_graveyard",               SEC_ADMINISTRATOR, true,  &HandleReloadGameGraveyardCommand,              "" },
             { "game_graveyard_zone",          SEC_ADMINISTRATOR, true,  &HandleReloadGameGraveyardZoneCommand,          "" },
             { "game_tele",                    SEC_ADMINISTRATOR, true,  &HandleReloadGameTeleCommand,                   "" },
             { "gameobject_questender",        SEC_ADMINISTRATOR, true,  &HandleReloadGOQuestEnderCommand,               "" },
@@ -1022,7 +1024,7 @@ public:
     {
         sLog->outString("Re-Loading Graveyard-zone links...");
 
-        sObjectMgr->LoadGraveyardZones();
+        sGraveyard->LoadGraveyardZones();
 
         handler->SendGlobalGMSysMessage("DB table `game_graveyard_zone` reloaded.");
 
@@ -1201,6 +1203,14 @@ public:
         sLog->outString("Reloading vehicle_template_accessory table...");
         sObjectMgr->LoadVehicleTemplateAccessories();
         handler->SendGlobalGMSysMessage("Vehicle template accessories reloaded.");
+        return true;
+    }
+
+    static bool HandleReloadGameGraveyardCommand(ChatHandler* handler, const char* /*args*/)
+    {
+        sLog->outString("Reloading game_graveyard table...");
+        sGraveyard->LoadGraveyardFromDB();
+        handler->SendGlobalGMSysMessage("DB table `game_graveyard` reloaded.");
         return true;
     }
 };

@@ -32,6 +32,7 @@
 #include "BattlegroundRV.h"
 #include "Transport.h"
 #include "ScriptMgr.h"
+#include "GameGraveyard.h"
 #ifdef ELUNA
 #include "LuaEngine.h"
 #endif
@@ -1434,7 +1435,7 @@ void Battleground::RelocateDeadPlayers(uint64 queueIndex)
     std::vector<uint64>& ghostList = m_ReviveQueue[queueIndex];
     if (!ghostList.empty())
     {
-        WorldSafeLocsEntry const* closestGrave = NULL;
+        GraveyardStruct const* closestGrave = NULL;
         for (std::vector<uint64>::const_iterator itr = ghostList.begin(); itr != ghostList.end(); ++itr)
         {
             Player* player = ObjectAccessor::FindPlayer(*itr);
@@ -1914,9 +1915,9 @@ void Battleground::SetBgRaid(TeamId teamId, Group* bg_raid)
     old_raid = bg_raid;
 }
 
-WorldSafeLocsEntry const* Battleground::GetClosestGraveyard(Player* player)
+GraveyardStruct const* Battleground::GetClosestGraveyard(Player* player)
 {
-    return sObjectMgr->GetClosestGraveyard(player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetMapId(), player->GetBgTeamId());
+    return sGraveyard->GetClosestGraveyard(player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetMapId(), player->GetBgTeamId());
 }
 
 void Battleground::StartTimedAchievement(AchievementCriteriaTimedTypes type, uint32 entry)
