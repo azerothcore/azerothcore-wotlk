@@ -27,6 +27,7 @@
 #include "GroupMgr.h"
 #include "BattlegroundMgr.h"
 #include "MapManager.h"
+#include "GameGraveyard.h"
 
 class misc_commandscript : public CommandScript
 {
@@ -1268,7 +1269,7 @@ public:
         else
             return false;
 
-        WorldSafeLocsEntry const* graveyard = sWorldSafeLocsStore.LookupEntry(graveyardId);
+        GraveyardStruct const* graveyard = sGraveyard->GetGraveyard(graveyardId);
 
         if (!graveyard)
         {
@@ -1289,7 +1290,7 @@ public:
             return false;
         }
 
-        if (sObjectMgr->AddGraveyardLink(graveyardId, zoneId, teamId))
+        if (sGraveyard->AddGraveyardLink(graveyardId, zoneId, teamId))
             handler->PSendSysMessage(LANG_COMMAND_GRAVEYARDLINKED, graveyardId, zoneId);
         else
             handler->PSendSysMessage(LANG_COMMAND_GRAVEYARDALRLINKED, graveyardId, zoneId);
@@ -1315,13 +1316,13 @@ public:
         Player* player = handler->GetSession()->GetPlayer();
         uint32 zone_id = player->GetZoneId();
 
-        WorldSafeLocsEntry const* graveyard = sObjectMgr->GetClosestGraveyard(player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetMapId(), teamId);
+        GraveyardStruct const* graveyard = sGraveyard->GetClosestGraveyard(player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetMapId(), teamId);
 
         if (graveyard)
         {
             uint32 graveyardId = graveyard->ID;
 
-            GraveyardData const* data = sObjectMgr->FindGraveyardData(graveyardId, zone_id);
+            GraveyardData const* data = sGraveyard->FindGraveyardData(graveyardId, zone_id);
             if (!data)
             {
                 handler->PSendSysMessage(LANG_COMMAND_GRAVEYARDERROR, graveyardId);

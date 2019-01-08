@@ -34,6 +34,7 @@
 #include "DisableMgr.h"
 #include "Opcodes.h"
 #include "BattlegroundQueue.h"
+#include "GameGraveyard.h"
 #ifdef ELUNA
 #include "LuaEngine.h"
 #endif
@@ -649,7 +650,7 @@ void BattlegroundMgr::CreateInitialBattlegrounds()
         else
         {
             uint32 startId = fields[5].GetUInt32();
-            if (WorldSafeLocsEntry const* start = sWorldSafeLocsStore.LookupEntry(startId))
+            if (GraveyardStruct const* start = sGraveyard->GetGraveyard(startId))
             {
                 data.Team1StartLocX = start->x;
                 data.Team1StartLocY = start->y;
@@ -658,12 +659,12 @@ void BattlegroundMgr::CreateInitialBattlegrounds()
             }
             else
             {
-                sLog->outError("Table `battleground_template` for id %u have non-existed WorldSafeLocs.dbc id %u in field `AllianceStartLoc`. BG not created.", data.bgTypeId, startId);
+                sLog->outError("Table `battleground_template` for id %u have non-existed `game_graveyard` table id %u in field `AllianceStartLoc`. BG not created.", data.bgTypeId, startId);
                 continue;
             }
 
             startId = fields[7].GetUInt32();
-            if (WorldSafeLocsEntry const* start = sWorldSafeLocsStore.LookupEntry(startId))
+            if (GraveyardStruct const* start = sGraveyard->GetGraveyard(startId))
             {
                 data.Team2StartLocX = start->x;
                 data.Team2StartLocY = start->y;
@@ -672,7 +673,7 @@ void BattlegroundMgr::CreateInitialBattlegrounds()
             }
             else
             {
-                sLog->outError("Table `battleground_template` for id %u have non-existed WorldSafeLocs.dbc id %u in field `HordeStartLoc`. BG not created.", data.bgTypeId, startId);
+                sLog->outError("Table `battleground_template` for id %u have non-existed `game_graveyard` table id %u in field `HordeStartLoc`. BG not created.", data.bgTypeId, startId);
                 continue;
             }
         }

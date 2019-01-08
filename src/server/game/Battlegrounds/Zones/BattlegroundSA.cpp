@@ -11,6 +11,7 @@
 #include "ObjectMgr.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
+#include "GameGraveyard.h"
 
 BattlegroundSA::BattlegroundSA()
 {
@@ -163,8 +164,8 @@ bool BattlegroundSA::ResetObjs()
     //Graveyards!
     for (uint8 i = 0;i < BG_SA_MAX_GY; i++)
     {
-        WorldSafeLocsEntry const* sg = NULL;
-        sg = sWorldSafeLocsStore.LookupEntry(BG_SA_GYEntries[i]);
+        GraveyardStruct const* sg = NULL;
+        sg = sGraveyard->GetGraveyard(BG_SA_GYEntries[i]);
 
         if (!sg)
         {
@@ -761,9 +762,9 @@ void BattlegroundSA::DestroyGate(Player* player, GameObject* go)
     }
 }
 
-WorldSafeLocsEntry const* BattlegroundSA::GetClosestGraveyard(Player* player)
+GraveyardStruct const* BattlegroundSA::GetClosestGraveyard(Player* player)
 {
-    WorldSafeLocsEntry const* closest = NULL;
+    GraveyardStruct const* closest = NULL;
     float mindist = 999999.0f;
     float x, y;
 
@@ -774,7 +775,7 @@ WorldSafeLocsEntry const* BattlegroundSA::GetClosestGraveyard(Player* player)
         if (GraveyardStatus[i] != player->GetTeamId())
             continue;
 
-        WorldSafeLocsEntry const* ret = sWorldSafeLocsStore.LookupEntry(BG_SA_GYEntries[i]);
+        GraveyardStruct const* ret = sGraveyard->GetGraveyard(BG_SA_GYEntries[i]);
         
         // if on beach
         if (i == BG_SA_BEACH_GY)
@@ -792,7 +793,7 @@ WorldSafeLocsEntry const* BattlegroundSA::GetClosestGraveyard(Player* player)
         }
     }
     if (!closest && GraveyardStatus[BG_SA_BEACH_GY] == player->GetTeamId())
-        return sWorldSafeLocsStore.LookupEntry(BG_SA_GYEntries[BG_SA_BEACH_GY]);
+        return sGraveyard->GetGraveyard(BG_SA_GYEntries[BG_SA_BEACH_GY]);
 
 
     return closest;
@@ -883,7 +884,7 @@ void BattlegroundSA::CaptureGraveyard(BG_SA_Graveyards i, Player *Source)
     std::vector<uint64> ghost_list = m_ReviveQueue[BgCreatures[BG_SA_MAXNPC + i]];
     if (!ghost_list.empty())
     {
-        WorldSafeLocsEntry const* ClosestGrave = NULL;
+        GraveyardStruct const* ClosestGrave = NULL;
         for (std::vector<uint64>::const_iterator itr = ghost_list.begin(); itr != ghost_list.end(); ++itr)
         {
             Player* player = ObjectAccessor::FindPlayer(*itr);
@@ -902,7 +903,7 @@ void BattlegroundSA::CaptureGraveyard(BG_SA_Graveyards i, Player *Source)
 
     DelCreature(BG_SA_MAXNPC + i);
     
-    WorldSafeLocsEntry const* sg = sWorldSafeLocsStore.LookupEntry(BG_SA_GYEntries[i]);
+    GraveyardStruct const* sg = sGraveyard->GetGraveyard(BG_SA_GYEntries[i]);
     if (!sg)
     {
         sLog->outError("BattlegroundSA::CaptureGraveyard: non-existant GY entry: %u", BG_SA_GYEntries[i]);

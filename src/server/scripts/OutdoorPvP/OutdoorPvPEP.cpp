@@ -16,6 +16,7 @@
 #include "Language.h"
 #include "World.h"
 #include "GossipDef.h"
+#include "GameGraveyard.h"
 
 OPvPCapturePointEP_EWT::OPvPCapturePointEP_EWT(OutdoorPvP* pvp)
 : OPvPCapturePoint(pvp), m_TowerState(EP_TS_N), m_UnitsSummonedSideId(TEAM_NEUTRAL)
@@ -419,8 +420,8 @@ void OPvPCapturePointEP_CGT::LinkGraveyard(TeamId teamId)
 {
     if (m_GraveyardSide != teamId)
     {
-        sObjectMgr->RemoveGraveyardLink(EP_GraveYardId, EP_GraveYardZone, m_GraveyardSide, false);
-        sObjectMgr->AddGraveyardLink(EP_GraveYardId, EP_GraveYardZone, teamId, false);
+        sGraveyard->RemoveGraveyardLink(EP_GraveYardId, EP_GraveYardZone, m_GraveyardSide, false);
+        sGraveyard->AddGraveyardLink(EP_GraveYardId, EP_GraveYardZone, teamId, false);
         m_GraveyardSide = teamId;
     }
 }

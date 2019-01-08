@@ -20,6 +20,7 @@
 #include "CreatureTextMgr.h"
 #include "GroupMgr.h"
 #include "Transport.h"
+#include "GameGraveyard.h"
 
 Battlefield::Battlefield()
 {
@@ -583,7 +584,7 @@ BfGraveyard* Battlefield::GetGraveyardById(uint32 id) const
     return NULL;
 }
 
-WorldSafeLocsEntry const * Battlefield::GetClosestGraveyard(Player* player)
+GraveyardStruct const * Battlefield::GetClosestGraveyard(Player* player)
 {
     BfGraveyard* closestGY = NULL;
     float maxdist = -1;
@@ -604,7 +605,7 @@ WorldSafeLocsEntry const * Battlefield::GetClosestGraveyard(Player* player)
     }
 
     if (closestGY)
-        return sWorldSafeLocsStore.LookupEntry(closestGY->GetGraveyardId());
+        return sGraveyard->GetGraveyard(closestGY->GetGraveyardId());
 
     return NULL;
 }
@@ -682,7 +683,7 @@ void BfGraveyard::SetSpirit(Creature* spirit, TeamId team)
 
 float BfGraveyard::GetDistance(Player* player)
 {
-    const WorldSafeLocsEntry* safeLoc = sWorldSafeLocsStore.LookupEntry(m_GraveyardId);
+    const GraveyardStruct* safeLoc = sGraveyard->GetGraveyard(m_GraveyardId);
     return player->GetDistance2d(safeLoc->x, safeLoc->y);
 }
 
@@ -744,7 +745,7 @@ void BfGraveyard::GiveControlTo(TeamId team)
 
 void BfGraveyard::RelocateDeadPlayers()
 {
-    WorldSafeLocsEntry const* closestGrave = NULL;
+    GraveyardStruct const* closestGrave = NULL;
     for (GuidSet::const_iterator itr = m_ResurrectQueue.begin(); itr != m_ResurrectQueue.end(); ++itr)
     {
         Player* player = ObjectAccessor::FindPlayer(*itr);
