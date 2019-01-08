@@ -245,6 +245,9 @@ class WorldScript : public ScriptObject
         // Called after the world configuration is (re)loaded.
         virtual void OnAfterConfigLoad(bool /*reload*/) { }
 
+        // Called when loading custom database tables
+        virtual void OnLoadCustomDatabaseTable() { }
+
         // Called before the world configuration is (re)loaded.
         virtual void OnBeforeConfigLoad(bool /*reload*/) { }
 
@@ -445,6 +448,7 @@ public:
     virtual void OnDamage(Unit* /*attacker*/, Unit* /*victim*/, uint32& /*damage*/) { }
 
     // Called when DoT's Tick Damage is being Dealt
+    // Attacker can be NULL if he is despawned while the aura still exists on target
     virtual void ModifyPeriodicDamageAurasTick(Unit* /*target*/, Unit* /*attacker*/, uint32& /*damage*/) { }
 
     // Called when Melee Damage is being Dealt
@@ -1037,6 +1041,44 @@ class GlobalScript : public ScriptObject
         virtual void OnAfterUpdateEncounterState(Map* /*map*/, EncounterCreditType /*type*/,  uint32 /*creditEntry*/, Unit* /*source*/, Difficulty /*difficulty_fixed*/, DungeonEncounterList const* /*encounters*/, uint32 /*dungeonCompleted*/, bool /*updated*/) { }
 };
 
+class BGScript : public ScriptObject
+{
+protected:
+
+    BGScript(const char* name);
+
+public:
+
+    bool IsDatabaseBound() const { return false; }
+
+    // Start Battlegroud
+    virtual void OnBattlegroundStart(Battleground* /*bg*/) { }
+
+    // End Battleground
+    virtual void OnBattlegroundEndReward(Battleground* /*bg*/, Player* /*player*/, TeamId /*winnerTeamId*/) { }
+
+    // Update Battlegroud
+    virtual void OnBattlegroundUpdate(Battleground* /*bg*/, uint32 /*diff*/) { }
+
+    // Add Player in Battlegroud
+    virtual void OnBattlegroundAddPlayer(Battleground* /*bg*/, Player* /*player*/) { }
+};
+
+class SpellSC : public ScriptObject
+{
+protected:
+
+    SpellSC(const char* name);
+
+public:
+
+    bool IsDatabaseBound() const { return false; }
+
+    // Calculate max duration in applying aura 
+    virtual void OnCalcMaxDuration(Aura const* /*aura*/, int32& /*maxDuration*/) { }
+
+};
+
 // this class can be used to be extended by Modules
 // creating their own custom hooks inside module itself
 class ModuleScript : public ScriptObject
@@ -1093,6 +1135,7 @@ class ScriptMgr
 
     public: /* WorldScript */
 
+        void OnLoadCustomDatabaseTable();
         void OnOpenStateChange(bool open);
         void OnBeforeConfigLoad(bool reload);
         void OnAfterConfigLoad(bool reload);
@@ -1355,6 +1398,17 @@ class ScriptMgr
         //listener functions are called by OnPlayerEnterMap and OnPlayerLeaveMap
         //void OnPlayerEnterAll(Map* map, Player* player);
         //void OnPlayerLeaveAll(Map* map, Player* player);
+
+    public: /* BGScript */
+
+        void OnBattlegroundStart(Battleground* bg);
+        void OnBattlegroundEndReward(Battleground* bg, Player* player, TeamId winnerTeamId);
+        void OnBattlegroundUpdate(Battleground* bg, uint32 diff);
+        void OnBattlegroundAddPlayer(Battleground* bg, Player* player);
+
+    public: /* SpellSC */ 
+ 
+        void OnCalcMaxDuration(Aura const* aura, int32& maxDuration); 
 
     private:
 

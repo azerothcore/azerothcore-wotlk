@@ -84,7 +84,7 @@ bool ConfigMgr::LoadData(char const* file)
     return false;
 }
 
-std::string ConfigMgr::GetStringDefault(const char* name, const std::string &def)
+std::string ConfigMgr::GetStringDefault(const char* name, const std::string &def, bool logUnused /*= true*/)
 {
     ACE_TString val;
 
@@ -92,20 +92,20 @@ std::string ConfigMgr::GetStringDefault(const char* name, const std::string &def
         return val.c_str();
     else
     {
-        sLog->outError("-> Not found option '%s'. The default value is used (%s)", name, def.c_str());
+        if (logUnused)
+            sLog->outError("-> Not found option '%s'. The default value is used (%s)", name, def.c_str());
         return def;
     }
-
-    return GetValueHelper(name, val) ? val.c_str() : def;
 }
 
-bool ConfigMgr::GetBoolDefault(const char* name, bool def)
+bool ConfigMgr::GetBoolDefault(const char* name, bool def, bool logUnused /*= true*/)
 {
     ACE_TString val;
 
     if (!GetValueHelper(name, val))
     {
-        def ? sLog->outError("-> Not found option '%s'. The default value is used (Yes)", name) : sLog->outError(">> Not found option '%s'. The default value is used (No)", name);
+        if (logUnused)
+            def ? sLog->outError("-> Not found option '%s'. The default value is used (Yes)", name) : sLog->outError("-> Not found option '%s'. The default value is used (No)", name);
         return def;
     }
 
@@ -113,7 +113,7 @@ bool ConfigMgr::GetBoolDefault(const char* name, bool def)
         val == "1");
 }
 
-int ConfigMgr::GetIntDefault(const char* name, int def)
+int ConfigMgr::GetIntDefault(const char* name, int def, bool logUnused /*= true*/)
 {
     ACE_TString val;
 
@@ -121,12 +121,13 @@ int ConfigMgr::GetIntDefault(const char* name, int def)
         return atoi(val.c_str());
     else
     {
-        sLog->outError("-> Not found option '%s'. The default value is used (%i)", name, def);
+        if (logUnused)
+            sLog->outError("-> Not found option '%s'. The default value is used (%i)", name, def);
         return def;
     }
 }
 
-float ConfigMgr::GetFloatDefault(const char* name, float def)
+float ConfigMgr::GetFloatDefault(const char* name, float def, bool logUnused /*= true*/)
 {
     ACE_TString val;
 
@@ -134,7 +135,8 @@ float ConfigMgr::GetFloatDefault(const char* name, float def)
         return (float)atof(val.c_str());
     else
     {
-        sLog->outError("-> Not found option '%s'. The default value is used (%f)", name, def);
+        if (logUnused)
+            sLog->outError("-> Not found option '%s'. The default value is used (%f)", name, def);
         return def;
     }
 }

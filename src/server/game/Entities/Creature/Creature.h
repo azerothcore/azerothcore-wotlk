@@ -596,6 +596,7 @@ class Creature : public Unit, public GridObject<Creature>, public MovableMapObje
 
         bool CanStartAttack(Unit const* u) const;
         float GetAggroRange(Unit const* target) const;
+        float GetAttackDistance(Unit const* player) const;
 
         void SendAIReaction(AiReaction reactionType);
 

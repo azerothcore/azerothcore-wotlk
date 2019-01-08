@@ -213,4 +213,31 @@ if( USE_COREPCH )
   add_cxx_pch(worldserver ${worldserver_PCH_HDR} ${worldserver_PCH_SRC})
 endif()
 
+# handle config file
+CU_GET_GLOBAL("MODULE_CONFIG_FILE_LIST")
+FOREACH(configFile ${MODULE_CONFIG_FILE_LIST})
+if( WIN32 )
+  if ( MSVC )
+    add_custom_command(TARGET worldserver
+      POST_BUILD
+      COMMAND ${CMAKE_COMMAND} -E copy "${configFile}" ${CMAKE_BINARY_DIR}/bin/$(ConfigurationName)/
+    )
+  elseif ( MINGW )
+    add_custom_command(TARGET worldserver
+      POST_BUILD
+      COMMAND ${CMAKE_COMMAND} -E copy "${configFile}" ${CMAKE_BINARY_DIR}/bin/
+    )
+  endif()
+endif()
+install(FILES "${configFile}" DESTINATION ${CONF_DIR})
+ENDFOREACH()
+
+CU_GET_GLOBAL("MODULE_CONFIG_FILE_LIST")
+FOREACH(configFile ${MODULE_CONFIG_FILE_LIST})
+    get_filename_component(file_name ${configFile} NAME_WE)
+    set(CONFIG_LIST ${CONFIG_LIST}${file_name},)
+ENDFOREACH()
+add_definitions(-DCONFIG_FILE_LIST="\\"${CONFIG_LIST}\\"")
+# end handle config file
+
 CU_RUN_HOOK("AFTER_WORLDSERVER_CMAKE")

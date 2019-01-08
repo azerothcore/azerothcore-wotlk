@@ -18,6 +18,7 @@ Script Data End */
 #include "Player.h"
 #include "WorldSession.h"
 #include "ScriptedEscortAI.h"
+#include "World.h"
 
 // Ours
 class npc_steam_powered_auctioneer : public CreatureScript
@@ -558,6 +559,10 @@ class npc_minigob_manabonk : public CreatureScript
 
             void UpdateAI(uint32 diff)
             {
+
+                if (!sWorld->getBoolConfig(CONFIG_MINIGOB_MANABONK))
+                    return;
+
                 events.Update(diff);
 
                 while (uint32 eventId = events.ExecuteEvent())

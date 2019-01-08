@@ -3047,6 +3047,7 @@ void SpellMgr::LoadSpellCustomAttr()
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_IGNORE_ARMOR;
                 break;
             case 64422: // Sonic Screech (Auriaya)
+            case 13877: // Blade Flurry (Rogue Spell) should ignore armor and share damage to 2nd mob
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_SHARE_DAMAGE;
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_IGNORE_ARMOR;
                 break;
@@ -3098,6 +3099,7 @@ void SpellMgr::LoadSpellCustomAttr()
             case 34655: // Snake Trap, Deadly Poison
             case 11971: // Sunder Armor
             case 58567: // Player Sunder Armor
+            case 29306: // Naxxramas(Gluth's Zombies): Infected Wound
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_SINGLE_AURA_STACK;
                 break;
             case 43138: // North Fleet Reservist Kill Credit

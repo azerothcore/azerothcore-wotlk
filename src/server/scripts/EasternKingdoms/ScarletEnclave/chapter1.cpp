@@ -217,6 +217,7 @@ public:
         uint64 _duelGUID;
         EventMap events;
         std::set<uint32> playerGUIDs;
+        uint32 timer = 0;
 
         uint32 GetData(uint32 data) const
         {
@@ -243,6 +244,9 @@ public:
                 playerGUIDs.insert(caster->GetGUIDLow());
                 _duelGUID = caster->GetGUID();
                 _duelInProgress = true;
+
+                timer = 600000; // clear playerGUIDs after 10 minutes if no one initiates a duel
+                me->GetMotionMaster()->MoveFollow(caster, 2.0f, 0.0f);
 
                 events.ScheduleEvent(EVENT_SPEAK, 3000);
                 events.ScheduleEvent(EVENT_SPEAK+1, 7000);
@@ -279,6 +283,19 @@ public:
 
         void UpdateAI(uint32 diff)
         {
+            if (timer != 0)
+            {
+                if (timer <= diff)
+                {
+                    timer = 0;
+                    playerGUIDs.clear();
+                }
+                else
+                {
+                    timer -= diff;
+                }
+            }
+
             events.Update(diff);
             switch (events.ExecuteEvent())
             {
@@ -715,7 +732,7 @@ public:
                 me->CastSpell(me, SPELL_DK_INITIATE_VISUAL, true);
 
                 if (Player* starter = ObjectAccessor::GetPlayer(*me, playerGUID))
-                    sCreatureTextMgr->SendChat(me, SAY_EVENT_ATTACK, NULL, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_NORMAL, 0, TEAM_NEUTRAL, false, starter);
+                    Talk(SAY_EVENT_ATTACK, starter);
 
                 phase = PHASE_TO_ATTACK;
             }

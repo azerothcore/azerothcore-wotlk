@@ -57,6 +57,8 @@ template class ScriptRegistry<UnitScript>;
 template class ScriptRegistry<AllCreatureScript>;
 template class ScriptRegistry<AllMapScript>;
 template class ScriptRegistry<MovementHandlerScript>;
+template class ScriptRegistry<BGScript>;
+template class ScriptRegistry<SpellSC>;
 
 #include "ScriptMgrMacros.h"
 
@@ -207,6 +209,8 @@ void ScriptMgr::Unload()
     SCR_CLEAR(GroupScript);
     SCR_CLEAR(GlobalScript);
     SCR_CLEAR(ModuleScript);
+    SCR_CLEAR(BGScript);
+    SCR_CLEAR(SpellSC);
 
     #undef SCR_CLEAR
 }
@@ -276,6 +280,8 @@ void ScriptMgr::CheckIfScriptsInDatabaseExist()
                 !ScriptRegistry<AchievementCriteriaScript>::GetScriptById(sid) &&
                 !ScriptRegistry<PlayerScript>::GetScriptById(sid) &&
                 !ScriptRegistry<GuildScript>::GetScriptById(sid) &&
+                !ScriptRegistry<BGScript>::GetScriptById(sid) &&
+                !ScriptRegistry<SpellSC>::GetScriptById(sid) &&
                 !ScriptRegistry<GroupScript>::GetScriptById(sid))
                 sLog->outErrorDb("Script named '%s' is assigned in database, but has no code!", (*itr).c_str());
         }
@@ -474,6 +480,12 @@ void ScriptMgr::OnOpenStateChange(bool open)
     sEluna->OnOpenStateChange(open);
 #endif
     FOREACH_SCRIPT(WorldScript)->OnOpenStateChange(open);
+}
+
+
+void ScriptMgr::OnLoadCustomDatabaseTable()
+{
+    FOREACH_SCRIPT(WorldScript)->OnLoadCustomDatabaseTable();
 }
 
 void ScriptMgr::OnBeforeConfigLoad(bool reload)
@@ -1960,6 +1972,33 @@ void ScriptMgr::OnAfterArenaRatingCalculation(Battleground *const bg, int32 &win
     FOREACH_SCRIPT(FormulaScript)->OnAfterArenaRatingCalculation(bg, winnerMatchmakerChange, loserMatchmakerChange, winnerChange, loserChange);
 }
 
+// BGScript
+void ScriptMgr::OnBattlegroundStart(Battleground* bg)
+{
+    FOREACH_SCRIPT(BGScript)->OnBattlegroundStart(bg);
+}
+
+void ScriptMgr::OnBattlegroundEndReward(Battleground* bg, Player* player, TeamId winnerTeamId)
+{
+    FOREACH_SCRIPT(BGScript)->OnBattlegroundEndReward(bg, player, winnerTeamId);
+}
+
+void ScriptMgr::OnBattlegroundUpdate(Battleground* bg, uint32 diff)
+{
+    FOREACH_SCRIPT(BGScript)->OnBattlegroundUpdate(bg, diff);
+}
+
+void ScriptMgr::OnBattlegroundAddPlayer(Battleground* bg, Player* player)
+{
+    FOREACH_SCRIPT(BGScript)->OnBattlegroundAddPlayer(bg, player);
+}
+
+// SpellSC
+void ScriptMgr::OnCalcMaxDuration(Aura const* aura, int32& maxDuration)
+{
+    FOREACH_SCRIPT(SpellSC)->OnCalcMaxDuration(aura, maxDuration);
+}
+
 AllMapScript::AllMapScript(const char* name)
     : ScriptObject(name)
 {
@@ -2133,6 +2172,18 @@ GlobalScript::GlobalScript(const char* name)
     : ScriptObject(name)
 {
     ScriptRegistry<GlobalScript>::AddScript(this);
+}
+
+BGScript::BGScript(char const* name)
+    : ScriptObject(name)
+{
+    ScriptRegistry<BGScript>::AddScript(this);
+}
+
+SpellSC::SpellSC(char const* name)
+    : ScriptObject(name)
+{
+    ScriptRegistry<SpellSC>::AddScript(this);
 }
 
 ModuleScript::ModuleScript(const char* name)
