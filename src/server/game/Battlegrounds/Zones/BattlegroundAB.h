@@ -235,7 +235,7 @@ class BattlegroundAB : public Battleground
         bool SetupBattleground();
         void Init();
         void EndBattleground(TeamId winnerTeamId);
-        WorldSafeLocsEntry const* GetClosestGraveyard(Player* player);
+        GraveyardStruct const* GetClosestGraveyard(Player* player);
 
         void UpdatePlayerScore(Player* player, uint32 type, uint32 value, bool doAddHonor = true);
         void FillInitialWorldStates(WorldPacket& data);

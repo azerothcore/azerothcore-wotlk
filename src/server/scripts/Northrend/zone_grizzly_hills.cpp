@@ -140,7 +140,12 @@ public:
                     if (ObjectAccessor::GetCreature(*me, _mrfloppyGUID))
                     {
                         Talk(SAY_WORGHAGGRO1);
-                        me->SummonCreature(NPC_HUNGRY_WORG, me->GetPositionX()+5, me->GetPositionY()+2, me->GetPositionZ()+1, 3.229f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 120000);
+                        if (Creature* worg = me->SummonCreature(NPC_HUNGRY_WORG, me->GetPositionX() + 5, me->GetPositionY() + 2, me->GetPositionZ() + 1, 3.229f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 120000))
+                            if (Creature* Mrfloppy = ObjectAccessor::GetCreature(*me, _mrfloppyGUID))
+                            {
+                                worg->SetReactState(REACT_AGGRESSIVE);
+                                worg->GetAI()->AttackStart(Mrfloppy);
+                            }
                     }
                     break;
                 case 11:
@@ -153,7 +158,9 @@ public:
                     Talk(SAY_WORGRAGGRO3);
                     if (Creature* RWORG = me->SummonCreature(NPC_RAVENOUS_WORG, me->GetPositionX()+10, me->GetPositionY()+8, me->GetPositionZ()+2, 3.229f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 120000))
                     {
-                        RWORG->setFaction(35);
+                        RWORG->SetReactState(REACT_PASSIVE);
+                        RWORG->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                        RWORG->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
                         _RavenousworgGUID = RWORG->GetGUID();
                     }
                     break;
@@ -162,7 +169,7 @@ public:
                     {
                         if (Creature* RWORG = ObjectAccessor::GetCreature(*me, _RavenousworgGUID))
                             RWORG->GetMotionMaster()->MovePoint(0, Mrfloppy->GetPositionX(), Mrfloppy->GetPositionY(), Mrfloppy->GetPositionZ());
-                        DoCast(Mrfloppy, SPELL_MRFLOPPY);
+                        me->AddAura(SPELL_MRFLOPPY, Mrfloppy);
                     }
                     break;
                 case 19:
@@ -186,8 +193,9 @@ public:
                         {
                             Unit::Kill(RWORG, Mrfloppy);
                             Mrfloppy->ExitVehicle();
-                            RWORG->setFaction(14);
-                            RWORG->GetMotionMaster()->MovePoint(0, RWORG->GetPositionX()+10, RWORG->GetPositionY()+80, RWORG->GetPositionZ());
+                            RWORG->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                            RWORG->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
+                            RWORG->AI()->AttackStart(player);
                             Talk(SAY_VICTORY2);
                         }
                     }
@@ -197,8 +205,6 @@ public:
                     {
                         if (Mrfloppy->isDead())
                         {
-                            if (Creature* RWORG = ObjectAccessor::GetCreature(*me, _RavenousworgGUID))
-                                RWORG->DisappearAndDie();
                             me->GetMotionMaster()->MovePoint(0, Mrfloppy->GetPositionX(), Mrfloppy->GetPositionY(), Mrfloppy->GetPositionZ());
                             Mrfloppy->setDeathState(ALIVE);
                             Mrfloppy->GetMotionMaster()->MoveFollow(me, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
@@ -291,7 +297,11 @@ public:
             }
         }
 
-        void EnterEvadeMode() { }
+        void EnterEvadeMode()
+        {
+            if (Creature* Emily = GetClosestCreatureWithEntry(me, NPC_EMILY, 50.0f))
+                me->GetMotionMaster()->MoveFollow(Emily, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
+        }
 
         void MoveInLineOfSight(Unit* /*who*/) { }
 
@@ -306,6 +316,54 @@ public:
     CreatureAI* GetAI(Creature* creature) const
     {
         return new npc_mrfloppyAI(creature);
+    }
+};
+
+// Ravenous Worg
+class npc_ravenous_worg : public CreatureScript
+{
+public:
+    npc_ravenous_worg() : CreatureScript("npc_ravenous_worg") { }
+
+    struct npc_ravenous_worgAI : public CombatAI
+    {
+        npc_ravenous_worgAI(Creature* creature) : CombatAI(creature)
+        {
+            _pacified = false;
+            _attack = false;
+        }
+
+        void AttackStart(Unit* who)
+        {
+            if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED))
+                _pacified = true;
+
+            if (_pacified && !me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED))
+                _attack = true;
+
+            if (_attack)
+                CombatAI::AttackStart(who);
+        }
+
+        void UpdateAI(uint32 diff)
+        {
+            if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED))
+                _pacified = true;
+
+            if (_pacified && !me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED))
+                _attack = true;
+
+            CombatAI::UpdateAI(diff);
+        }
+
+        private:
+            bool   _pacified;
+            bool   _attack;
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_ravenous_worgAI(creature);
     }
 };
 
