@@ -1,3 +1,19 @@
+-- DB update 2019_01_07_00 -> 2019_01_08_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2019_01_07_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2019_01_07_00 2019_01_08_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1529507878019895700'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO version_db_world (`sql_rev`) VALUES ('1529507878019895700');
 
 -- ----------------------------
@@ -707,3 +723,11 @@ INSERT INTO `game_graveyard` VALUES (1682, 571, 6447.49, 2060.86, 564.03, 'Ле�
 INSERT INTO `game_graveyard` VALUES (1683, 580, 1620.95, 624.701, 32.8968, 'Вход в Солнечный Колодец - Кель\'Делар');
 INSERT INTO `game_graveyard` VALUES (1691, 0, -13205.6, 272.703, 21.8571, 'AAA - Arena (Dev Test)');
 INSERT INTO `game_graveyard` VALUES (1720, 571, 2585.83, -5808.93, 296.197, 'Ревущий фьорд, Кладбище Ледяного Клинка');
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
