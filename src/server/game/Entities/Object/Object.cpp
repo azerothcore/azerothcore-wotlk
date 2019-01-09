@@ -1134,7 +1134,7 @@ bool WorldObject::IsWithinLOS(float ox, float oy, float oz, LineOfSightChecks ch
     return true;
 }
 
-bool WorldObject::IsWithinLOSInMap(const WorldObject* obj, LineOfSightChecks checks)
+bool WorldObject::IsWithinLOSInMap(const WorldObject* obj, LineOfSightChecks checks) const
 {
     if (!IsInMap(obj))
         return false;
