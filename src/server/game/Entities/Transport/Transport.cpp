@@ -16,6 +16,7 @@
 #include "Vehicle.h"
 #include "MapReference.h"
 #include "Player.h"
+#include "GameTime.h"
 #include "Cell.h"
 #include "CellImpl.h"
 #include "WorldModel.h"

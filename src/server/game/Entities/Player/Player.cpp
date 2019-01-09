@@ -7166,7 +7166,7 @@ void Player::UpdateHonorFields()
 { 
     /// called when rewarding honor and at each save
     time_t now = time_t(GameTime::GetGameTime());
-    time_t today = time_t(GameTime::GetGameTime() / DAY * DAY;
+    time_t today = time_t(GameTime::GetGameTime() / DAY * DAY);
 
     if (m_lastHonorUpdateTime < today)
     {
@@ -27443,7 +27443,7 @@ void Player::SummonPet(uint32 entry, float x, float y, float z, float ang, PetTy
     Pet::LoadPetFromDB(this, asynchLoadType, entry, 0, false, asynchPetInfo);
 }
 
-void Player::SetSummonPoint(uint32 mapid, float x, float y, float z, uint32 delay = 0, bool asSpectator = false)
+void Player::SetSummonPoint(uint32 mapid, float x, float y, float z, uint32 delay, bool asSpectator)
 {
     m_summon_expire = GameTime::GetGameTime() + (delay ? delay : MAX_PLAYER_SUMMON_DELAY);
     m_summon_mapid = mapid;

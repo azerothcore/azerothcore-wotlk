@@ -9,6 +9,7 @@
 #include "DBCStores.h"
 #include "DisableMgr.h"
 #include "ObjectMgr.h"
+#include "GameTime.h"
 #include "SocialMgr.h"
 #include "Language.h"
 #include "LFGMgr.h"

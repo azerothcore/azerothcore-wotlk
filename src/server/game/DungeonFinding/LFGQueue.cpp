@@ -30,6 +30,9 @@
 namespace lfg
 {
 
+LfgQueueData::LfgQueueData() : joinTime(GameTime::GetGameTime()), lastRefreshTime(joinTime), tanks(LFG_TANKS_NEEDED), healers(LFG_HEALERS_NEEDED), dps(LFG_DPS_NEEDED)
+{ }
+
 void LFGQueue::AddToQueue(uint64 guid, bool failedProposal)
 {
     //sLog->outString("ADD AddToQueue: %u, failed proposal: %u", GUID_LOPART(guid), failedProposal ? 1 : 0);

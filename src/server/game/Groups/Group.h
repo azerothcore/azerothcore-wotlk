@@ -299,13 +299,9 @@ class Group
         bool IsLfgHeroic() const { return isLFGGroup() && (m_lfgGroupFlags & GROUP_LFG_FLAG_IS_HEROIC); }
 
         // Difficulty Change
-        uint32 GetDifficultyChangePreventionTime() const { return _difficultyChangePreventionTime > GameTime::GetGameTime() ? _difficultyChangePreventionTime - GameTime::GetGameTime() : 0; }
+        uint32 GetDifficultyChangePreventionTime() const;
         DifficultyPreventionChangeType GetDifficultyChangePreventionReason() const { return _difficultyChangePreventionType; }
-        void SetDifficultyChangePrevention(DifficultyPreventionChangeType type)
-        {
-            _difficultyChangePreventionTime = GameTime::GetGameTime() + MINUTE;
-            _difficultyChangePreventionType = type;
-        }
+        void SetDifficultyChangePrevention(DifficultyPreventionChangeType type);
 
     protected:
         void _homebindIfInstance(Player* player);
