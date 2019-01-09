@@ -9,6 +9,7 @@
 #include "Player.h"
 #include "GameObject.h"
 #include "ObjectMgr.h"
+#include "GameTime.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
 #include "GameGraveyard.h"

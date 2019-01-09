@@ -7,6 +7,7 @@
 #include "ChannelMgr.h"
 #include "Chat.h"
 #include "ObjectMgr.h"
+#include "GameTime.h"
 #include "SocialMgr.h"
 #include "World.h"
 #include "DatabaseEnv.h"

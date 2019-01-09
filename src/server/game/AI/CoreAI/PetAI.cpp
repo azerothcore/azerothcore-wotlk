@@ -9,6 +9,7 @@
 #include "Pet.h"
 #include "Player.h"
 #include "DBCStores.h"
+#include "GameTime.h"
 #include "Spell.h"
 #include "ObjectAccessor.h"
 #include "SpellMgr.h"

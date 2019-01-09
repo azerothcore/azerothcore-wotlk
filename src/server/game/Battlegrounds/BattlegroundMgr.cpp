@@ -9,6 +9,7 @@
 #include "ArenaTeamMgr.h"
 #include "World.h"
 #include "WorldPacket.h"
+#include "GameTime.h"
 
 #include "ArenaTeam.h"
 #include "BattlegroundMgr.h"

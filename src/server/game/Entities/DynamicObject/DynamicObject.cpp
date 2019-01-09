@@ -10,6 +10,7 @@
 #include "World.h"
 #include "ObjectAccessor.h"
 #include "DatabaseEnv.h"
+#include "GameTime.h"
 #include "GridNotifiers.h"
 #include "CellImpl.h"
 #include "GridNotifiersImpl.h"

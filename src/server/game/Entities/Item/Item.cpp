@@ -9,6 +9,7 @@
 #include "ObjectMgr.h"
 #include "WorldPacket.h"
 #include "DatabaseEnv.h"
+#include "GameTime.h"
 #include "ItemEnchantmentMgr.h"
 #include "SpellMgr.h"
 #include "SpellInfo.h"

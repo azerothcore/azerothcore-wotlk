@@ -8,6 +8,7 @@
 #include "BattlefieldMgr.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
+#include "GameTime.h"
 #include "Map.h"
 #include "MapManager.h"
 #include "Group.h"

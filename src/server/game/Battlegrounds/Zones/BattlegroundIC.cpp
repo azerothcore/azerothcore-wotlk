@@ -11,6 +11,7 @@
 #include "WorldPacket.h"
 #include "GameObject.h"
 #include "ObjectMgr.h"
+#include "GameTime.h"
 #include "Vehicle.h"
 #include "Transport.h"
 #include "WorldSession.h"

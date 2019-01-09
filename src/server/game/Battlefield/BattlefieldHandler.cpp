@@ -7,6 +7,7 @@
 #include "Common.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
+#include "GameTime.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
 

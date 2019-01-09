@@ -10,6 +10,7 @@
 #include "Spell.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
+#include "GameTime.h"
 #include "Cell.h"
 #include "CellImpl.h"
 #include "ObjectMgr.h"

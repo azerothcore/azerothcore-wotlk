@@ -11,6 +11,7 @@
 #include "Map.h"
 #include "Player.h"
 #include "ObjectAccessor.h"
+#include "GameTime.h"
 #include "UnitEvents.h"
 #include "SpellAuras.h"
 #include "SpellMgr.h"

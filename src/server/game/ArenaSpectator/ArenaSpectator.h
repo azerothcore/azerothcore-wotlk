@@ -6,6 +6,7 @@
 #include "World.h"
 #include "Map.h"
 #include "Battleground.h"
+#include "GameTime.h"
 #include "Pet.h"
 #include "SpellAuras.h"
 #include "SpellAuraEffects.h"

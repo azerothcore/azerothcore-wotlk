@@ -10,6 +10,7 @@
 #include "Creature.h"
 #include "Language.h"
 #include "Object.h"
+#include "GameTime.h"
 #include "Player.h"
 #include "Util.h"
 #include "WorldSession.h"

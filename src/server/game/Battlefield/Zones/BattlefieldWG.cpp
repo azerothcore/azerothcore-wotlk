@@ -10,6 +10,7 @@
 
 #include "BattlefieldWG.h"
 #include "ObjectMgr.h"
+#include "GameTime.h"
 #include "Opcodes.h"
 #include "Player.h"
 #include "SpellAuras.h"

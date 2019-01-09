@@ -12,6 +12,7 @@
 #include <string>
 
 #include "Common.h"
+#include "GameTime.h"
 
 #include "Opcodes.h"
 #include "WorldPacket.h"

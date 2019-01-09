@@ -8,6 +8,7 @@
 #include "ArenaTeamMgr.h"
 #include "BattlegroundMgr.h"
 #include "BattlegroundQueue.h"
+#include "GameTime.h"
 #include "Chat.h"
 #include "Group.h"
 #include "Log.h"
