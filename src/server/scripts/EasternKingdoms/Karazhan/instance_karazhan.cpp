@@ -393,7 +393,7 @@ public:
                         square = GetClosestCreatureWithEntry(chessPiece, NPC_SQUARE_WHITE, 2.0f);
                     if (!square)
                     {
-                        sLog->outError("Instance Karazhan: ERROR Failed to properly load the Chess square for %llu.", chessPiece->GetGUID());
+                        sLog->outError("Instance Karazhan: ERROR Failed to properly load the Chess square for %lu.", chessPiece->GetGUID());
                         return;
                     }
 
@@ -413,7 +413,7 @@ public:
                         square = GetClosestCreatureWithEntry(chessPiece, NPC_SQUARE_WHITE, 2.0f);
                     if (!square)
                     {
-                        sLog->outError("Instance Karazhan: ERROR Failed to properly load the Chess square for %llu.", chessPiece->GetGUID());
+                        sLog->outError("Instance Karazhan: ERROR Failed to properly load the Chess square for %lu.", chessPiece->GetGUID());
                         return;
                     }
 

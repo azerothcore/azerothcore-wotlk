@@ -779,7 +779,7 @@ public:
 
         if (InstanceScript* instance = (InstanceScript*)creature->GetInstanceScript())
         {
-            if (instance->GetData(DATA_CHESS) != DONE && player->GetTeamId() == ALLIANCE)
+            if (instance->GetData(DATA_CHESS) != DONE && player->GetTeamId() == TEAM_ALLIANCE)
                 player->PlayerTalkClass->GetGossipMenu().AddMenuItem(GOSSIP_ICON_CHAT, GOSSIP_ITEM_KING_LLANE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
         }
 
@@ -896,7 +896,7 @@ public:
 
         if (InstanceScript* instance = (InstanceScript*)creature->GetInstanceScript())
         {
-            if (instance->GetData(DATA_CHESS) != DONE && player->GetTeamId() == HORDE)
+            if (instance->GetData(DATA_CHESS) != DONE && player->GetTeamId() == TEAM_HORDE)
                 player->PlayerTalkClass->GetGossipMenu().AddMenuItem(GOSSIP_ICON_CHAT, GOSSIP_ITEM_WARCHIEF_BLACKHAND, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
         }
 
@@ -985,7 +985,7 @@ public:
 
         if (InstanceScript* instance = (InstanceScript*)creature->GetInstanceScript())
         {
-            if (instance->GetData(DATA_CHESS) == IN_PROGRESS && player->GetTeamId() == ALLIANCE)
+            if (instance->GetData(DATA_CHESS) == IN_PROGRESS && player->GetTeamId() == TEAM_ALLIANCE)
                 player->PlayerTalkClass->GetGossipMenu().AddMenuItem(GOSSIP_ICON_CHAT, GOSSIP_ITEM_HUMAN_CONJURER, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
         }
 
@@ -1072,7 +1072,7 @@ public:
 
         if (InstanceScript* instance = (InstanceScript*)creature->GetInstanceScript())
         {
-            if (instance->GetData(DATA_CHESS) == IN_PROGRESS && player->GetTeamId() == HORDE)
+            if (instance->GetData(DATA_CHESS) == IN_PROGRESS && player->GetTeamId() == TEAM_HORDE)
                 player->PlayerTalkClass->GetGossipMenu().AddMenuItem(GOSSIP_ICON_CHAT, GOSSIP_ITEM_ORC_WARLOCK, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
         }
 
@@ -1172,7 +1172,7 @@ public:
 
         if (InstanceScript* instance = (InstanceScript*)creature->GetInstanceScript())
         {
-            if (instance->GetData(DATA_CHESS) == IN_PROGRESS && player->GetTeamId() == ALLIANCE)
+            if (instance->GetData(DATA_CHESS) == IN_PROGRESS && player->GetTeamId() == TEAM_ALLIANCE)
                 player->PlayerTalkClass->GetGossipMenu().AddMenuItem(GOSSIP_ICON_CHAT, GOSSIP_ITEM_HUMAN_FOOTMAN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
         }
 
@@ -1272,7 +1272,7 @@ public:
 
         if (InstanceScript* instance = (InstanceScript*)creature->GetInstanceScript())
         {
-            if (instance->GetData(DATA_CHESS) == IN_PROGRESS && player->GetTeamId() == HORDE)
+            if (instance->GetData(DATA_CHESS) == IN_PROGRESS && player->GetTeamId() == TEAM_HORDE)
                 player->PlayerTalkClass->GetGossipMenu().AddMenuItem(GOSSIP_ICON_CHAT, GOSSIP_ITEM_ORC_GRUNT, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
         }
 
@@ -1358,7 +1358,7 @@ public:
 
         if (InstanceScript* instance = (InstanceScript*)creature->GetInstanceScript())
         {
-            if (instance->GetData(DATA_CHESS) == IN_PROGRESS && player->GetTeamId() == ALLIANCE)
+            if (instance->GetData(DATA_CHESS) == IN_PROGRESS && player->GetTeamId() == TEAM_ALLIANCE)
                 player->PlayerTalkClass->GetGossipMenu().AddMenuItem(GOSSIP_ICON_CHAT, GOSSIP_ITEM_WATER_ELEMENTAL, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
         }
 
@@ -1444,7 +1444,7 @@ public:
 
         if (InstanceScript* instance = (InstanceScript*)creature->GetInstanceScript())
         {
-            if (instance->GetData(DATA_CHESS) == IN_PROGRESS && player->GetTeamId() == HORDE)
+            if (instance->GetData(DATA_CHESS) == IN_PROGRESS && player->GetTeamId() == TEAM_HORDE)
                 player->PlayerTalkClass->GetGossipMenu().AddMenuItem(GOSSIP_ICON_CHAT, GOSSIP_ITEM_SUMMONED_DEAMON, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
         }
 
@@ -1530,7 +1530,7 @@ public:
 
         if (InstanceScript* instance = (InstanceScript*)creature->GetInstanceScript())
         {
-            if (instance->GetData(DATA_CHESS) == IN_PROGRESS && player->GetTeamId() == ALLIANCE)
+            if (instance->GetData(DATA_CHESS) == IN_PROGRESS && player->GetTeamId() == TEAM_ALLIANCE)
                 player->PlayerTalkClass->GetGossipMenu().AddMenuItem(GOSSIP_ICON_CHAT, GOSSIP_ITEM_HUMAN_CHARGER, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
         }
 
@@ -1616,7 +1616,7 @@ public:
 
         if (InstanceScript* instance = (InstanceScript*)creature->GetInstanceScript())
         {
-            if (instance->GetData(DATA_CHESS) == IN_PROGRESS && player->GetTeamId() == HORDE)
+            if (instance->GetData(DATA_CHESS) == IN_PROGRESS && player->GetTeamId() == TEAM_HORDE)
                 player->PlayerTalkClass->GetGossipMenu().AddMenuItem(GOSSIP_ICON_CHAT, GOSSIP_ITEM_ORC_WOLF, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
         }
 
@@ -1702,7 +1702,7 @@ public:
 
         if (InstanceScript* instance = (InstanceScript*)creature->GetInstanceScript())
         {
-            if (instance->GetData(DATA_CHESS) == IN_PROGRESS && player->GetTeamId() == ALLIANCE)
+            if (instance->GetData(DATA_CHESS) == IN_PROGRESS && player->GetTeamId() == TEAM_ALLIANCE)
                 player->PlayerTalkClass->GetGossipMenu().AddMenuItem(GOSSIP_ICON_CHAT, GOSSIP_ITEM_HUMAN_CLERIC, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
         }
 
@@ -1789,7 +1789,7 @@ public:
 
         if (InstanceScript* instance = (InstanceScript*)creature->GetInstanceScript())
         {
-            if (instance->GetData(DATA_CHESS) == IN_PROGRESS && player->GetTeamId() == HORDE)
+            if (instance->GetData(DATA_CHESS) == IN_PROGRESS && player->GetTeamId() == TEAM_HORDE)
                 player->PlayerTalkClass->GetGossipMenu().AddMenuItem(GOSSIP_ICON_CHAT, GOSSIP_ITEM_ORC_NECROLYTE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
         }
 
