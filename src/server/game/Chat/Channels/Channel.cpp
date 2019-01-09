@@ -1236,3 +1236,14 @@ void Channel::RemoveWatching(Player* p)
     if (itr != playersWatchingStore.end())
         playersWatchingStore.erase(itr);
 }
+
+bool Channel::IsAllowedToSpeak(uint32 speakDelay)
+{
+    if (lastSpeakTime+speakDelay <= GameTime::GetGameTime())
+    {
+        lastSpeakTime = GameTime::GetGameTime();
+            return true;
+    }
+    else
+        return false;
+}

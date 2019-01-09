@@ -21,6 +21,7 @@
 #include "Opcodes.h"
 #include "Pet.h"
 #include "Player.h"
+#include "GameTime.h"
 #include "Vehicle.h"
 #include "World.h"
 #include "WorldPacket.h"

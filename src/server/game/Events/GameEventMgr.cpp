@@ -14,6 +14,7 @@
 #include "MapManager.h"
 #include "GossipDef.h"
 #include "Player.h"
+#include "GameTime.h"
 #include "BattlegroundMgr.h"
 #include "UnitAI.h"
 #include "GameObjectAI.h"
