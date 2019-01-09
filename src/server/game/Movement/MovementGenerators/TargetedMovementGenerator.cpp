@@ -100,12 +100,17 @@ void TargetedMovementGeneratorMedium<T,D>::_setTargetLocation(T* owner, bool ini
 
         float angle = i_angle;
 
-        if (i_target->GetTypeId() == TYPEID_PLAYER && owner->ToCreature()->GetCreatureType() == CREATURE_TYPE_NON_COMBAT_PET)
+        if (i_target->GetTypeId() == TYPEID_PLAYER)
         {
-            // fix distance and angle for vanity pets
-            dist = 0.3f;
-            angle = PET_FOLLOW_ANGLE + M_PI * 0.2f;
-            size = i_target->GetCombatReach() - i_target->GetObjectSize();
+            Creature* creature = owner->ToCreature();
+
+            if (creature && creature->GetCreatureType() == CREATURE_TYPE_NON_COMBAT_PET)
+            {
+                // fix distance and angle for vanity pets
+                dist = 0.3f;
+                angle = PET_FOLLOW_ANGLE + M_PI * 0.2f;
+                size = i_target->GetCombatReach() - i_target->GetObjectSize();
+            }
         }
 
         // Xinef: Fix follow angle for hostile units
