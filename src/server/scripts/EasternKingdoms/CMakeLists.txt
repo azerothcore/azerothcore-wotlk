@@ -151,6 +151,7 @@ set(scripts_STAT_SRCS
   ${AC_SCRIPTS_DIR}/EasternKingdoms/Karazhan/boss_nightbane.cpp
   ${AC_SCRIPTS_DIR}/EasternKingdoms/Karazhan/karazhan.cpp
   ${AC_SCRIPTS_DIR}/EasternKingdoms/Karazhan/boss_curator.cpp
+  ${AC_SCRIPTS_DIR}/EasternKingdoms/Karazhan/boss_chess_event.cpp
   ${AC_SCRIPTS_DIR}/EasternKingdoms/Karazhan/boss_shade_of_aran.cpp
   ${AC_SCRIPTS_DIR}/EasternKingdoms/Karazhan/boss_netherspite.cpp
   ${AC_SCRIPTS_DIR}/EasternKingdoms/Karazhan/boss_maiden_of_virtue.cpp
