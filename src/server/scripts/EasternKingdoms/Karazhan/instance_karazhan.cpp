@@ -42,11 +42,11 @@ public:
         void GetChessPiecesByFaction(std::list<uint64>& lList, uint32 uiFaction) { lList = uiFaction == FACTION_ID_CHESS_ALLIANCE ? m_lChessPiecesAlliance : m_lChessPiecesHorde; };
         Creature* GetCreatureByGUID(uint64 guid) { return instance->GetCreature(guid); };
 
-        void OnPlayerEnter(Player* pPlayer) override
+        void OnPlayerEnter(Player* player)
         {
             // only once, taking the first player to enter
             if (!m_uiTeam)
-                m_uiTeam = pPlayer->GetTeamId();
+                m_uiTeam = player->GetTeamId();
         }
 
         void OnCreatureCreate(Creature* creature) override
