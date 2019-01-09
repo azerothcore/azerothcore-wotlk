@@ -19,6 +19,7 @@
 #include "ItemPrototype.h"
 #include "NPCHandler.h"
 #include "DatabaseEnv.h"
+#include "GameTime.h"
 #include "Mail.h"
 #include "Map.h"
 #include "ObjectAccessor.h"

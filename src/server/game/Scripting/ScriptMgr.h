@@ -17,6 +17,7 @@
 #include "SharedDefines.h"
 #include "World.h"
 #include "Weather.h"
+#include "GameTime.h"
 #include "AchievementMgr.h"
 #include "DynamicObject.h"
 #include "ArenaTeam.h"

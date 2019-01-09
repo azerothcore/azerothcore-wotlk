@@ -9,6 +9,7 @@
 #include "Log.h"
 #include "WorldPacket.h"
 #include "ObjectMgr.h"
+#include "GameTime.h"
 #include "SpellMgr.h"
 #include "Pet.h"
 #include "Formulas.h"
