@@ -2866,3 +2866,13 @@ float Creature::GetAttackDistance(Unit const* player) const
 
     return (retDistance*aggroRate);
 }
+
+void Creature::SetPickPocketLootTime()
+{
+    lootPickPocketRestoreTime = GameTime::GetGameTime() + MINUTE + GetCorpseDelay() + GetRespawnTime();
+}
+
+bool Creature::CanGeneratePickPocketLoot() const
+{
+    return (lootPickPocketRestoreTime == 0 || lootPickPocketRestoreTime < GameTime::GetGameTime());
+}

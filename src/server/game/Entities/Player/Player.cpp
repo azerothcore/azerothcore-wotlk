@@ -27442,3 +27442,36 @@ void Player::SummonPet(uint32 entry, float x, float y, float z, float ang, PetTy
     AsynchPetSummon* asynchPetInfo = new AsynchPetSummon(entry, pos, petType, duration, createdBySpell, casterGUID);
     Pet::LoadPetFromDB(this, asynchLoadType, entry, 0, false, asynchPetInfo);
 }
+
+void Player::SetSummonPoint(uint32 mapid, float x, float y, float z, uint32 delay = 0, bool asSpectator = false)
+{
+    m_summon_expire = GameTime::GetGameTime() + (delay ? delay : MAX_PLAYER_SUMMON_DELAY);
+    m_summon_mapid = mapid;
+    m_summon_x = x;
+    m_summon_y = y;
+    m_summon_z = z;
+    m_summon_asSpectator = asSpectator;
+}
+
+bool Player::IsSummonAsSpectator() const
+{
+    return m_summon_asSpectator && m_summon_expire >= GameTime::GetGameTime();
+}
+
+bool Player::HasSpellCooldown(uint32 spell_id) const
+{
+    SpellCooldowns::const_iterator itr = m_spellCooldowns.find(spell_id);
+        return itr != m_spellCooldowns.end() && itr->second.end > GameTime::GetGameTimeMS();
+}
+
+bool Player::HasSpellItemCooldown(uint32 spell_id, uint32 itemid) const
+{
+    SpellCooldowns::const_iterator itr = m_spellCooldowns.find(spell_id);
+        return itr != m_spellCooldowns.end() && itr->second.end > GameTime::GetGameTimeMS() && itr->second.itemid == itemid;
+}
+
+uint32 Player::GetSpellCooldownDelay(uint32 spell_id) const
+{
+    SpellCooldowns::const_iterator itr = m_spellCooldowns.find(spell_id);
+        return uint32(itr != m_spellCooldowns.end() && itr->second.end > GameTime::GetGameTimeMS() ? itr->second.end - GameTime::GetGameTimeMS() : 0);
+}

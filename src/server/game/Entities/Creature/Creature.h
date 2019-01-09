@@ -13,7 +13,6 @@
 #include "ItemPrototype.h"
 #include "LootMgr.h"
 #include "DatabaseEnv.h"
-#include "GameTime.h"
 #include "Cell.h"
 
 #include <list>
@@ -573,8 +572,8 @@ class Creature : public Unit, public GridObject<Creature>, public MovableMapObje
         Group* GetLootRecipientGroup() const;
         bool hasLootRecipient() const { return m_lootRecipient || m_lootRecipientGroup; }
         bool isTappedBy(Player const* player) const;                          // return true if the creature is tapped by the player or a member of his party.
-        bool CanGeneratePickPocketLoot() const { return lootPickPocketRestoreTime == 0 || lootPickPocketRestoreTime < GameTime::GetGameTime(); }
-        void SetPickPocketLootTime() { lootPickPocketRestoreTime = GameTime::GetGameTime() + MINUTE + GetCorpseDelay() + GetRespawnTime(); }
+        bool CanGeneratePickPocketLoot() const;
+        void SetPickPocketLootTime();
         void ResetPickPocketLootTime() { lootPickPocketRestoreTime = 0; }
 
         void SetLootRecipient (Unit* unit, bool withGroup = true);

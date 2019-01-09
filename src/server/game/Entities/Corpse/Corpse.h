@@ -9,7 +9,6 @@
 
 #include "Object.h"
 #include "DatabaseEnv.h"
-#include "GameTime.h"
 #include "GridDefines.h"
 #include "LootMgr.h"
 

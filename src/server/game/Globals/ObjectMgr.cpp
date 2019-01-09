@@ -1022,7 +1022,7 @@ void ObjectMgr::LoadCreatureAddons()
 
 void ObjectMgr::LoadGameObjectAddons()
 {
-    uint32 oldMSTime = getMSTime();
+    uint32 oldMSTime = GameTime::GetGameTimeMS();
 
     //                                               0     1                 2
     QueryResult result = WorldDatabase.Query("SELECT guid, invisibilityType, invisibilityValue FROM gameobject_addon");
