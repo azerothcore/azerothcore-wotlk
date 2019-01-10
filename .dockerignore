@@ -1,0 +1,7 @@
+build*/
+var/*
+data/contrib/*
+data/doc/*
+modules/*
+conf/*
+!conf/*.dist
