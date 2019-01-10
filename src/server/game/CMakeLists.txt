@@ -213,6 +213,9 @@ include_directories(
   ${OPENSSL_INCLUDE_DIR}
 )
 
+# Group sources
+GroupSources(${CMAKE_CURRENT_SOURCE_DIR})
+
 add_library(game STATIC
   ${game_STAT_SRCS}
   ${game_STAT_PCH_SRC}
