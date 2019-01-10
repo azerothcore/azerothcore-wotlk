@@ -11,7 +11,7 @@ Instances (containers) can be easily set up and then destroyed, so you can alway
 
 # Setup & usage instructions
 
-## Requirements
+### Requirements
 
 The only requirement is [Docker](https://docs.docker.com/install/). You can install it on any operating system.
 
