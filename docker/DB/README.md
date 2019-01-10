@@ -4,7 +4,7 @@ This provides a way to quickly launch one or more instances of a fully-ready Aze
 
 For example, with this you can quickly create a new, clean instance of the AzerothCore DB. Or create **multiple** instances each one available on a different **port** (that can be handy to test & compare things).
 
-Instances (containers) can be easily set up and then destroyed, so you can always switch to a clean state after your experiments.
+Instances (containers) can be easily set up and then destroyed, so you can always switch to a clean state after your experiments. Every instance will have the three `acore_auth`, `acore_characters` and `acore_world` mysql databases.
 
 **NOTE**: you do **not** need to install any mysql-server manually in your system and if you already have it, the docker instances will **not** interfere with it.
 
