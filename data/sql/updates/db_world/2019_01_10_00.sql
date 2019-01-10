@@ -1,3 +1,19 @@
+-- DB update 2019_01_08_02 -> 2019_01_10_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2019_01_08_02';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2019_01_08_02 2019_01_10_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1546972023891859400'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1546972023891859400');
 
 UPDATE `game_graveyard` SET `Comment` = 'Stormwind' WHERE `ID` = 1;
@@ -685,3 +701,12 @@ UPDATE `game_graveyard` SET `Comment` = 'Icecrown Glacier, Citadel GY' WHERE `ID
 UPDATE `game_graveyard` SET `Comment` = 'Sunwell - Quel\'Delar Entrance' WHERE `ID` = 1683;
 UPDATE `game_graveyard` SET `Comment` = 'AAA - Arena (Dev Test)' WHERE `ID` = 1691;
 UPDATE `game_graveyard` SET `Comment` = 'Howling Fjord, Frostblade GY' WHERE `ID` = 1720;
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
