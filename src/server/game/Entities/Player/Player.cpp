@@ -16013,7 +16013,7 @@ void Player::AbandonQuest(uint32 questId)
         for (uint8 i = 0; i < QUEST_ITEM_OBJECTIVES_COUNT; ++i)
             if (ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(quest->RequiredItemId[i]))
                 if (quest->RequiredItemCount[i] > 0 && itemTemplate->Bonding == BIND_QUEST_ITEM)
-                    DDestroyItemCount(quest->RequiredItemId[i], quest->RequiredItemCount[i], true);
+                    DestroyItemCount(quest->RequiredItemId[i], quest->RequiredItemCount[i], true);
 
         for (uint8 i = 0; i < QUEST_SOURCE_ITEM_IDS_COUNT; ++i)
             if (ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(quest->ItemDrop[i]))
