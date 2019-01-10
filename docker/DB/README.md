@@ -9,14 +9,14 @@ Instances (containers) can be easily set up and then destroyed, so you can alway
 **NOTE**: you do **not** need to install any mysql-server manually in your system and if you already have it, the docker instances will **not** interfere with it.
 
 
-## Setup & usage instructions
+# Setup & usage instructions
 
-### Requirements
+## Requirements
 
 The only requirement is [Docker](https://docs.docker.com/install/). You can install it on any operating system.
 
 
-### Building the container image
+## Building the container image
 
 To build the container image you have to be in the **main folder** of your local AzerothCore sources directory.
 
@@ -35,7 +35,7 @@ You can build the image using:
 *For more information about the `docker build` command, check the [docker build doc](https://docs.docker.com/engine/reference/commandline/build/).*
 
 
-### How to launch a container
+## How to launch a container
 
 Run the following command to launch a container:
 
@@ -62,7 +62,7 @@ You can optionally pass option `-d` to detach the container run from your termin
 
 *For more information about the `docker run` command, check the [docker run doc](https://docs.docker.com/engine/reference/run/).*
 
-### Launching more instances
+## Launching more instances
 
 You can easily run more instances. You just have to specify a different **name** and **port** for each.
 
@@ -72,7 +72,11 @@ Example: I want to launch three instances of the AzerothCore databases, each one
 `docker run --name azt-db-2 -p 127.0.0.1:9002:3306 -e MYSQL_ROOT_PASSWORD=password -d azerothcore/database`
 `docker run --name azt-db-3 -p 127.0.0.1:9003:3306 -e MYSQL_ROOT_PASSWORD=password -d azerothcore/database`
 
-### Stopping / removing
+You can use the `docker ps` command to check your running containers.
+
+*For more information about the `docker ps` command, check the [docker ps doc](https://docs.docker.com/engine/reference/commandline/ps/).*
+
+## Stopping / removing
 
 You can stop a container using `docker stop name-of-the container`, for example `docker stop azt-db-1`.
 
