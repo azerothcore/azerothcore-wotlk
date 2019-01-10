@@ -79,7 +79,7 @@ public:
         }
 
     private:
-        std::array<uint32, 3> _itemId;
+        std::array<uint32, 3> _itemId = {0, 0, 0};
         uint32 _modelId;
         bool _hasFlag;
     };
