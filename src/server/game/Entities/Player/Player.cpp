@@ -34,6 +34,8 @@
 #include "GroupMgr.h"
 #include "Guild.h"
 #include "GuildMgr.h"
+#include "GitRevision.h"
+#include "revision.h"
 #include "InstanceSaveMgr.h"
 #include "InstanceScript.h"
 #include "Language.h"
@@ -74,6 +76,7 @@
 #include "SavingSystem.h"
 #include "TicketMgr.h"
 #include "ScriptMgr.h"
+#include "GameGraveyard.h"
 
 #ifdef ELUNA
 #include "LuaEngine.h"
@@ -5576,7 +5579,7 @@ void Player::RepopAtGraveyard()
         SpawnCorpseBones();
     }
 
-    WorldSafeLocsEntry const* ClosestGrave = NULL;
+    GraveyardStruct const* ClosestGrave = NULL;
 
     // Special handle for battleground maps
     if (Battleground* bg = GetBattleground())
@@ -5586,7 +5589,7 @@ void Player::RepopAtGraveyard()
         if (sBattlefieldMgr->GetBattlefieldToZoneId(GetZoneId()))
             ClosestGrave = sBattlefieldMgr->GetBattlefieldToZoneId(GetZoneId())->GetClosestGraveyard(this);
         else
-            ClosestGrave = sObjectMgr->GetClosestGraveyard(GetPositionX(), GetPositionY(), GetPositionZ(), GetMapId(), GetTeamId());
+            ClosestGrave = sGraveyard->GetClosestGraveyard(GetPositionX(), GetPositionY(), GetPositionZ(), GetMapId(), GetTeamId());
     }
 
     // stop countdown until repop
@@ -5596,11 +5599,11 @@ void Player::RepopAtGraveyard()
     // and don't show spirit healer location
     if (ClosestGrave)
     {
-        TeleportTo(ClosestGrave->map_id, ClosestGrave->x, ClosestGrave->y, ClosestGrave->z, GetOrientation());
+        TeleportTo(ClosestGrave->Map, ClosestGrave->x, ClosestGrave->y, ClosestGrave->z, GetOrientation());
         if (isDead())                                        // not send if alive, because it used in TeleportTo()
         {
             WorldPacket data(SMSG_DEATH_RELEASE_LOC, 4*4);  // show spirit healer position on minimap
-            data << ClosestGrave->map_id;
+            data << ClosestGrave->Map;
             data << ClosestGrave->x;
             data << ClosestGrave->y;
             data << ClosestGrave->z;
@@ -15647,15 +15650,15 @@ void Player::AddQuest(Quest const* quest, Object* questGiver)
     uint32 qtime = 0;
     if (quest->HasSpecialFlag(QUEST_SPECIAL_FLAGS_TIMED))
     {
-        uint32 limittime = quest->GetLimitTime();
+        uint32 timeAllowed = quest->GetTimeAllowed();
 
         // shared timed quest
         if (questGiver && questGiver->GetTypeId() == TYPEID_PLAYER)
-            limittime = questGiver->ToPlayer()->getQuestStatusMap()[quest_id].Timer / IN_MILLISECONDS;
+            timeAllowed = questGiver->ToPlayer()->getQuestStatusMap()[quest_id].Timer / IN_MILLISECONDS;
 
         AddTimedQuest(quest_id);
-        questStatusData.Timer = limittime * IN_MILLISECONDS;
-        qtime = static_cast<uint32>(time(NULL)) + limittime;
+        questStatusData.Timer = timeAllowed * IN_MILLISECONDS;
+        qtime = static_cast<uint32>(time(NULL)) + timeAllowed;
     }
     else
         questStatusData.Timer = 0;
@@ -15673,6 +15676,20 @@ void Player::AddQuest(Quest const* quest, Object* questGiver)
     StartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_QUEST, quest_id);
 
     SendQuestUpdate(quest_id);
+
+    // check if Quest Tracker is enabled
+    if (sWorld->getBoolConfig(CONFIG_QUEST_ENABLE_QUEST_TRACKER))
+    {
+        // prepare Quest Tracker datas
+        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_QUEST_TRACK);
+        stmt->setUInt32(0, quest_id);
+        stmt->setUInt32(1, GetGUIDLow());
+        stmt->setString(2, _HASH);
+        stmt->setString(3, _DATE);
+
+        // add to Quest Tracker
+        CharacterDatabase.Execute(stmt);
+    }
 
     // Xinef: area auras may change on quest accept!
     UpdateZoneDependentAuras(GetZoneId());
@@ -15702,6 +15719,18 @@ void Player::CompleteQuest(uint32 quest_id)
         UpdateAreaDependentAuras(GetAreaId());
         AdditionalSavingAddMask(ADDITIONAL_SAVING_INVENTORY_AND_GOLD | ADDITIONAL_SAVING_QUEST_STATUS);
     }
+
+    // check if Quest Tracker is enabled
+    if (sWorld->getBoolConfig(CONFIG_QUEST_ENABLE_QUEST_TRACKER))
+    {
+        // prepare Quest Tracker datas
+        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_QUEST_TRACK_COMPLETE_TIME);
+        stmt->setUInt32(0, quest_id);
+        stmt->setUInt32(1, GetGUIDLow());
+
+        // add to Quest Tracker
+        CharacterDatabase.Execute(stmt);
+    }
 }
 
 void Player::IncompleteQuest(uint32 quest_id)
@@ -15730,15 +15759,23 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
     uint32 quest_id = quest->GetQuestId();
 
     for (uint8 i = 0; i < QUEST_ITEM_OBJECTIVES_COUNT; ++i)
-        if (quest->RequiredItemId[i])
-            DestroyItemCount(quest->RequiredItemId[i], quest->RequiredItemCount[i], true);
-
+    {
+        if (ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(quest->RequiredItemId[i]))
+        {
+            if (quest->RequiredItemCount[i] > 0 && itemTemplate->Bonding == BIND_QUEST_ITEM && !quest->IsRepeatable() && !HasQuestForItem(quest->RequiredItemId[i], quest_id, true))
+                DestroyItemCount(quest->RequiredItemId[i], 9999, true);
+            else
+                DestroyItemCount(quest->RequiredItemId[i], quest->RequiredItemCount[i], true);
+        }
+    }
     for (uint8 i = 0; i < QUEST_SOURCE_ITEM_IDS_COUNT; ++i)
     {
-        if (quest->RequiredSourceItemId[i])
+        if (ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(quest->ItemDrop[i]))
         {
-            uint32 count = quest->RequiredSourceItemCount[i];
-            DestroyItemCount(quest->RequiredSourceItemId[i], count ? count : 9999, true);
+            if (quest->ItemDropQuantity[i] > 0 && itemTemplate->Bonding == BIND_QUEST_ITEM && !quest->IsRepeatable() && !HasQuestForItem(quest->ItemDrop[i], quest_id))
+                DestroyItemCount(quest->ItemDrop[i], 9999, true);
+            else
+                DestroyItemCount(quest->ItemDrop[i], quest->ItemDropQuantity[i], true);
         }
     }
 
@@ -15969,14 +16006,32 @@ void Player::FailQuest(uint32 questId)
             SendQuestFailed(questId);
 
         // Destroy quest items on quest failure.
-        for (uint8 i = 0; i < QUEST_OBJECTIVES_COUNT; ++i)
-            if (quest->RequiredItemId[i] > 0 && quest->RequiredItemCount[i] > 0)
-                // Destroy items received on starting the quest.
-                DestroyItemCount(quest->RequiredItemId[i], quest->RequiredItemCount[i], true, true);
+        for (uint8 i = 0; i < QUEST_ITEM_OBJECTIVES_COUNT; ++i)
+            if (ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(quest->RequiredItemId[i]))
+                if (quest->RequiredItemCount[i] > 0 && itemTemplate->Bonding == BIND_QUEST_ITEM)
+                    DestroyItemCount(quest->RequiredItemId[i], 9999, true);
+
         for (uint8 i = 0; i < QUEST_SOURCE_ITEM_IDS_COUNT; ++i)
-            if (quest->RequiredSourceItemId[i] > 0 && quest->RequiredSourceItemCount[i] > 0)
-                // Destroy items received during the quest.
-                DestroyItemCount(quest->RequiredSourceItemId[i], quest->RequiredSourceItemCount[i], true, true);
+            if (ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(quest->ItemDrop[i]))
+                if (quest->ItemDropQuantity[i] > 0 && itemTemplate->Bonding == BIND_QUEST_ITEM)
+                    DestroyItemCount(quest->ItemDrop[i], 9999, true);
+    }
+}
+
+void Player::AbandonQuest(uint32 questId)
+{
+    if (Quest const* quest = sObjectMgr->GetQuestTemplate(questId))
+    {
+        // It will Destroy quest items on quests abandons.
+        for (uint8 i = 0; i < QUEST_ITEM_OBJECTIVES_COUNT; ++i)
+            if (ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(quest->RequiredItemId[i]))
+                if (quest->RequiredItemCount[i] > 0 && itemTemplate->Bonding == BIND_QUEST_ITEM)
+                    DestroyItemCount(quest->RequiredItemId[i], 9999, true);
+
+        for (uint8 i = 0; i < QUEST_SOURCE_ITEM_IDS_COUNT; ++i)
+            if (ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(quest->ItemDrop[i]))
+                if (quest->ItemDropQuantity[i] > 0 && itemTemplate->Bonding == BIND_QUEST_ITEM)
+                    DestroyItemCount(quest->ItemDrop[i], 9999, true);
     }
 }
 
@@ -16140,7 +16195,7 @@ bool Player::SatisfyQuestClass(Quest const* qInfo, bool msg) const
 
 bool Player::SatisfyQuestRace(Quest const* qInfo, bool msg) const
 { 
-    uint32 reqraces = qInfo->GetRequiredRaces();
+    uint32 reqraces = qInfo->GetAllowableRaces();
     if (reqraces == 0)
         return true;
     if ((reqraces & getRaceMask()) == 0)
@@ -17204,12 +17259,12 @@ void Player::ReputationChanged2(FactionEntry const* factionEntry)
     }
 }
 
-bool Player::HasQuestForItem(uint32 itemid) const
+bool Player::HasQuestForItem(uint32 itemid, uint32 excludeQuestId /* 0 */, bool turnIn /* false */) const
 { 
     for (uint8 i = 0; i < MAX_QUEST_LOG_SIZE; ++i)
     {
         uint32 questid = GetQuestSlotQuestId(i);
-        if (questid == 0)
+        if (questid == 0 || questid == excludeQuestId)
             continue;
 
         QuestStatusMap::const_iterator qs_itr = m_QuestStatus.find(questid);
@@ -17218,7 +17273,7 @@ bool Player::HasQuestForItem(uint32 itemid) const
 
         QuestStatusData const& q_status = qs_itr->second;
 
-        if (q_status.Status == QUEST_STATUS_INCOMPLETE)
+        if ((q_status.Status == QUEST_STATUS_INCOMPLETE) || (turnIn && q_status.Status == QUEST_STATUS_COMPLETE))
         {
             Quest const* qinfo = sObjectMgr->GetQuestTemplate(questid);
             if (!qinfo)
@@ -17233,27 +17288,28 @@ bool Player::HasQuestForItem(uint32 itemid) const
             // This part for ReqItem drop
             for (uint8 j = 0; j < QUEST_ITEM_OBJECTIVES_COUNT; ++j)
             {
-                if (itemid == qinfo->RequiredItemId[j] && q_status.ItemCount[j] < qinfo->RequiredItemCount[j])
+                if ((itemid == qinfo->RequiredItemId[j] && q_status.ItemCount[j] < qinfo->RequiredItemCount[j]) || (turnIn && q_status.ItemCount[j] >= qinfo->RequiredItemCount[j]))
                     return true;
             }
             // This part - for ReqSource
             for (uint8 j = 0; j < QUEST_SOURCE_ITEM_IDS_COUNT; ++j)
             {
                 // examined item is a source item
-                if (qinfo->RequiredSourceItemId[j] == itemid)
+                if (qinfo->ItemDrop[j] == itemid)
                 {
                     ItemTemplate const* pProto = sObjectMgr->GetItemTemplate(itemid);
-
+                    uint32 ownedCount = GetItemCount(itemid, true);
                     // 'unique' item
-                    if (pProto->MaxCount && int32(GetItemCount(itemid, true)) < pProto->MaxCount)
+                    if ((pProto->MaxCount && int32(ownedCount) < pProto->MaxCount) || (turnIn && int32(ownedCount) >= pProto->MaxCount))
                         return true;
 
                     // allows custom amount drop when not 0
-                    if (qinfo->RequiredSourceItemCount[j])
+                    if (qinfo->ItemDropQuantity[j])
                     {
-                        if (GetItemCount(itemid, true) < qinfo->RequiredSourceItemCount[j])
+                        if ((ownedCount < qinfo->ItemDropQuantity[j]) || (turnIn && ownedCount >= qinfo->ItemDropQuantity[j]))
                             return true;
-                    } else if (GetItemCount(itemid, true) < pProto->GetMaxStackSize())
+                    }
+                    else if (ownedCount < pProto->GetMaxStackSize())
                         return true;
                 }
             }
@@ -18150,7 +18206,7 @@ bool Player::LoadFromDB(uint32 guid, SQLQueryHolder *holder)
 
     // check PLAYER_CHOSEN_TITLE compatibility with PLAYER__FIELD_KNOWN_TITLES
     // note: PLAYER__FIELD_KNOWN_TITLES updated at quest status loaded
-    uint32 curTitle = fields[46].GetUInt32();
+    uint32 curTitle = fields[51].GetUInt32();
     if (curTitle && !HasTitle(curTitle))
         curTitle = 0;
 
@@ -18990,8 +19046,8 @@ void Player::_LoadQuestStatus(PreparedQueryResult result)
 
     ////                                                       0      1       2        3        4           5          6         7           8           9           10
     //QueryResult* result = CharacterDatabase.PQuery("SELECT quest, status, explored, timer, mobcount1, mobcount2, mobcount3, mobcount4, itemcount1, itemcount2, itemcount3,
-    //                                                    11           12
-    //                                                itemcount4, playercount FROM character_queststatus WHERE guid = '%u'", GetGUIDLow());
+    //                                                    11          12          13           14
+    //                                                itemcount4, itemcount5, itemcount6, playercount FROM character_queststatus WHERE guid = '%u'", GetGUIDLow());
 
     if (result)
     {
@@ -19033,15 +19089,13 @@ void Player::_LoadQuestStatus(PreparedQueryResult result)
                 else
                     quest_time = 0;
 
-                questStatusData.CreatureOrGOCount[0] = fields[4].GetUInt16();
-                questStatusData.CreatureOrGOCount[1] = fields[5].GetUInt16();
-                questStatusData.CreatureOrGOCount[2] = fields[6].GetUInt16();
-                questStatusData.CreatureOrGOCount[3] = fields[7].GetUInt16();
-                questStatusData.ItemCount[0] = fields[8].GetUInt16();
-                questStatusData.ItemCount[1] = fields[9].GetUInt16();
-                questStatusData.ItemCount[2] = fields[10].GetUInt16();
-                questStatusData.ItemCount[3] = fields[11].GetUInt16();
-                questStatusData.PlayerCount = fields[12].GetUInt16();
+                for (uint32 i = 0; i < QUEST_OBJECTIVES_COUNT; ++i)
+                    questStatusData.CreatureOrGOCount[i] = fields[4 + i].GetUInt16();
+
+                for (uint32 i = 0; i < QUEST_ITEM_OBJECTIVES_COUNT; ++i)
+                    questStatusData.ItemCount[i] = fields[8 + i].GetUInt16();
+
+                questStatusData.PlayerCount = fields[14].GetUInt16();
 
                 // add to quest log
                 if (slot < MAX_QUEST_LOG_SIZE && questStatusData.Status != QUEST_STATUS_NONE)
@@ -19996,10 +20050,10 @@ void Player::_SaveQuestStatus(SQLTransaction& trans)
                 stmt->setBool(index++, statusItr->second.Explored);
                 stmt->setUInt32(index++, uint32(statusItr->second.Timer / IN_MILLISECONDS+ sWorld->GetGameTime()));
 
-                for (uint8 i = 0; i < 4; i++)
+                for (uint8 i = 0; i < QUEST_OBJECTIVES_COUNT; i++)
                     stmt->setUInt16(index++, statusItr->second.CreatureOrGOCount[i]);
 
-                for (uint8 i = 0; i < 4; i++)
+                for (uint8 i = 0; i < QUEST_ITEM_OBJECTIVES_COUNT; i++)
                     stmt->setUInt16(index++, statusItr->second.ItemCount[i]);
 
                 stmt->setUInt16(index, statusItr->second.PlayerCount);
@@ -22582,8 +22636,8 @@ void Player::SetEntryPoint()
 
         if (GetMap()->IsDungeon())
         {
-            if (const WorldSafeLocsEntry* entry = sObjectMgr->GetClosestGraveyard(GetPositionX(), GetPositionY(), GetPositionZ(), GetMapId(), GetTeamId()))
-                m_entryPointData.joinPos = WorldLocation(entry->map_id, entry->x, entry->y, entry->z, 0.0f);
+            if (const GraveyardStruct* entry = sGraveyard->GetClosestGraveyard(GetPositionX(), GetPositionY(), GetPositionZ(), GetMapId(), GetTeamId()))
+                m_entryPointData.joinPos = WorldLocation(entry->Map, entry->x, entry->y, entry->z, 0.0f);
         }
         else if (!GetMap()->IsBattlegroundOrArena())
             m_entryPointData.joinPos = WorldLocation(GetMapId(), GetPositionX(), GetPositionY(), GetPositionZ(), GetOrientation());

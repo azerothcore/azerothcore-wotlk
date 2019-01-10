@@ -12,6 +12,7 @@
 #include "Player.h"
 #include "World.h"
 #include "WorldPacket.h"
+#include "GameGraveyard.h"
 
 BattlegroundWS::BattlegroundWS()
 {
@@ -401,10 +402,10 @@ bool BattlegroundWS::SetupBattleground()
     AddObject(BG_WS_OBJECT_DOOR_H_4, BG_OBJECT_DOOR_H_4_WS_ENTRY, 950.7952f, 1459.583f, 342.1523f, 0.05235988f, 0, 0, 0.02617695f, 0.9996573f, RESPAWN_IMMEDIATELY);
     
 
-    WorldSafeLocsEntry const* sg = sWorldSafeLocsStore.LookupEntry(WS_GRAVEYARD_MAIN_ALLIANCE);
+    GraveyardStruct const* sg = sGraveyard->GetGraveyard(WS_GRAVEYARD_MAIN_ALLIANCE);
     AddSpiritGuide(WS_SPIRIT_MAIN_ALLIANCE, sg->x, sg->y, sg->z, 3.124139f, TEAM_ALLIANCE);
 
-    sg = sWorldSafeLocsStore.LookupEntry(WS_GRAVEYARD_MAIN_HORDE);
+    sg = sGraveyard->GetGraveyard(WS_GRAVEYARD_MAIN_HORDE);
     AddSpiritGuide(WS_SPIRIT_MAIN_HORDE, sg->x, sg->y, sg->z, 3.193953f, TEAM_HORDE);
 
     for (uint32 i = BG_WS_OBJECT_DOOR_A_1; i < BG_WS_OBJECT_MAX; ++i)
@@ -495,12 +496,12 @@ void BattlegroundWS::UpdatePlayerScore(Player* player, uint32 type, uint32 value
     }
 }
 
-WorldSafeLocsEntry const* BattlegroundWS::GetClosestGraveyard(Player* player)
+GraveyardStruct const* BattlegroundWS::GetClosestGraveyard(Player* player)
 {
     if (GetStatus() == STATUS_IN_PROGRESS)
-        return sWorldSafeLocsStore.LookupEntry(player->GetTeamId() == TEAM_ALLIANCE ? WS_GRAVEYARD_MAIN_ALLIANCE : WS_GRAVEYARD_MAIN_HORDE);
+        return sGraveyard->GetGraveyard(player->GetTeamId() == TEAM_ALLIANCE ? WS_GRAVEYARD_MAIN_ALLIANCE : WS_GRAVEYARD_MAIN_HORDE);
     else
-        return sWorldSafeLocsStore.LookupEntry(player->GetTeamId() == TEAM_ALLIANCE ? WS_GRAVEYARD_FLAGROOM_ALLIANCE : WS_GRAVEYARD_FLAGROOM_HORDE);
+        return sGraveyard->GetGraveyard(player->GetTeamId() == TEAM_ALLIANCE ? WS_GRAVEYARD_FLAGROOM_ALLIANCE : WS_GRAVEYARD_FLAGROOM_HORDE);
 }
 
 void BattlegroundWS::FillInitialWorldStates(WorldPacket& data)
