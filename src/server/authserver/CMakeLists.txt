@@ -83,6 +83,7 @@ target_link_libraries(authserver
   ${OPENSSL_LIBRARIES}
   ${CMAKE_THREAD_LIBS_INIT}
   ${ACE_LIBRARY}
+  ${Boost_LIBRARIES}
 )
 
 if( WIN32 )

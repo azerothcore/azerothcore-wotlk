@@ -15,6 +15,10 @@ project(AzerothCore)
 cmake_minimum_required(VERSION 2.8)
 cmake_policy(SET CMP0005 OLD)
 
+if(POLICY CMP0054)
+  cmake_policy(SET CMP0054 NEW) # Only interpret if() arguments as variables or keywords when unquoted - prevents intepreting if (SOME_STRING_VARIABLE MATCHES "MSVC") as if (SOME_STRING_VARIABLE MATCHES "1")
+endif()
+
 # add this options before PROJECT keyword
 set(CMAKE_DISABLE_SOURCE_CHANGES ON)
 set(CMAKE_DISABLE_IN_SOURCE_BUILD ON)
@@ -92,6 +96,8 @@ find_package(ACE REQUIRED)
 find_package(OpenSSL REQUIRED)
 find_package(Threads REQUIRED)
 find_package(MySQL REQUIRED)
+
+include(ConfigureBoost)
 
 if( UNIX )
   find_package(Readline)
