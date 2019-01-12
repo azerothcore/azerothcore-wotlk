@@ -7,7 +7,7 @@
 LogsDir = "/azeroth-server/etc/logs"
 
 # Change this configuration accordingly with your setup
-LoginDatabaseInfo = "127.0.0.1;9000;root;password;acore_auth"
+LoginDatabaseInfo = "127.0.0.1;3600;root;password;acore_auth"
 
 # Add more configuration overwrites
 LogLevel = 3
