@@ -8,75 +8,44 @@
 #include <condition_variable>
 
 #include "MapUpdater.h"
-#include "DelayExecutor.h"
 #include "Map.h"
-#include "DatabaseEnv.h"
 #include "LFGMgr.h"
 #include "AvgDiffTracker.h"
 
-class WDBThreadStartReq1 : public ACE_Method_Request
-{
-    public:
-
-        WDBThreadStartReq1()
-        {
-        }
-
-        virtual int call()
-        {
-            return 0;
-        }
-};
-
-class WDBThreadEndReq1 : public ACE_Method_Request
-{
-    public:
-
-        WDBThreadEndReq1()
-        {
-        }
-
-        virtual int call()
-        {
-            return 0;
-        }
-};
-
-class MapUpdateRequest : public ACE_Method_Request
+class MapUpdateRequest
 {
     private:
 
         Map& m_map;
         MapUpdater& m_updater;
-        ACE_UINT32 m_diff;
-        ACE_UINT32 s_diff;
+        uint32 m_diff;
+        uint32 s_diff;
 
     public:
 
-        MapUpdateRequest(Map& m, MapUpdater& u, ACE_UINT32 d, ACE_UINT32 sd)
+        MapUpdateRequest(Map& m, MapUpdater& u, uint32 d, uint32 sd)
             : m_map(m), m_updater(u), m_diff(d), s_diff(sd)
         {
         }
 
-        virtual int call()
+        void call()
         {
             m_map.Update (m_diff, s_diff);
             m_updater.update_finished();
-            return 0;
         }
 };
 
-class LFGUpdateRequest : public ACE_Method_Request
+class LFGUpdateRequest
 {
     private:
 
         MapUpdater& m_updater;
-        ACE_UINT32 m_diff;
+        uint32 m_diff;
 
     public:
-        LFGUpdateRequest(MapUpdater& u, ACE_UINT32 d) : m_updater(u), m_diff(d) {}
+        LFGUpdateRequest(MapUpdater& u, uint32 d) : m_updater(u), m_diff(d) {}
 
-        virtual int call()
+        void call()
         {
             uint32 startTime = getMSTime();
             sLFGMgr->Update(m_diff, 1);
@@ -87,28 +56,29 @@ class LFGUpdateRequest : public ACE_Method_Request
         }
 };
 
-MapUpdater::MapUpdater(): m_executor(), pending_requests(0) { }
+void MapUpdater::activate(size_t num_threads)
 {
+    for (size_t i = 0; i < num_threads; ++i)
+    {
+        _workerThreads.push_back(std::thread(&MapUpdater::WorkerThread, this));
+    }
 }
 
-MapUpdater::~MapUpdater()
+void MapUpdater::deactivate()
 {
-    deactivate();
-}
-
-int MapUpdater::activate(size_t num_threads)
-{
-    return m_executor.start((int)num_threads, new WDBThreadStartReq1, new WDBThreadEndReq1);
-}
-
-int MapUpdater::deactivate()
-{
+    cancelationToken = true;
+    
     wait();
 
-    return m_executor.deactivate();
+    queue.Cancel();
+
+    for (auto& thread : _workerThreads)
+    {
+        thread.join();
+    }
 }
 
-int MapUpdater::wait()
+void MapUpdater::wait()
 {
     std::lock_guard<std::mutex> lock(m_mutex);
 
@@ -116,42 +86,24 @@ int MapUpdater::wait()
         _condition.wait(lock);
 
     lock.unlock();
-
-    return 0;
 }
 
-int MapUpdater::schedule_update(Map& map, ACE_UINT32 diff, ACE_UINT32 s_diff)
+void MapUpdater::schedule_update(Map& map, uint32 diff, uint32 s_diff)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
 
     ++pending_requests;
-
-    if (m_executor.execute(new MapUpdateRequest(map, *this, diff, s_diff)) == -1)
-    {
-        ACE_DEBUG((LM_ERROR, ACE_TEXT("(%t) \n"), ACE_TEXT("Failed to schedule Map Update")));
-
-        --pending_requests;
-        return -1;
-    }
-
-    return 0;
+    
+    _queue.Push(new MapUpdateRequest(map, *this, diff, s_diff));
 }
 
-int MapUpdater::schedule_lfg_update(ACE_UINT32 diff)
+void MapUpdater::schedule_lfg_update(ACE_UINT32 diff)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
 
     ++pending_requests;
-
-    if (m_executor.execute(new LFGUpdateRequest(*this, diff)) == -1)
-    {
-        ACE_DEBUG((LM_ERROR, ACE_TEXT("(%t) \n"), ACE_TEXT("Failed to schedule LFG Update")));
-
-        --pending_requests;
-        return -1;
-    }
-
-    return 0;
+   
+    _queue.Push(new LFGUpdateRequest(map, *this, diff));
 }
 
 bool MapUpdater::activated()
@@ -159,18 +111,27 @@ bool MapUpdater::activated()
     return m_executor.activated();
 }
 
+void MapUpdater::WorkerThread()
+{
+    while (1)
+    {
+        MapUpdateRequest* request = nullptr;
+
+        _queue.WaitAndPop(request);
+
+        if (_cancelationToken)
+            return;
+
+        request->call();
+
+        delete request;
+    }
+}
+
 void MapUpdater::update_finished()
 {
     std::lock_guard<std::mutex> lock(m_mutex);
-
-    if (pending_requests == 0)
-    {
-        ACE_ERROR((LM_ERROR, ACE_TEXT("(%t)\n"), ACE_TEXT("MapUpdater::update_finished BUG, report to devs")));
-        sLog->outMisc("WOOT! pending_requests == 0 before decrement!");
-        _condition.notify_all();
-        return;
-    }
-
+    
     --pending_requests;
 
    _condition.notify_all();
