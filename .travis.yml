@@ -9,7 +9,7 @@ compiler:
 addons:
   apt:
     update: true
-    sources: ['llvm-toolchain-trusty-6.0']
+    sources: ['llvm-toolchain-trusty-6.0', 'ubuntu-toolchain-r-test']
     packages: ['clang-6.0']
 
 services:
