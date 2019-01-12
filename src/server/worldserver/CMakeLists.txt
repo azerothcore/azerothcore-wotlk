@@ -153,6 +153,9 @@ add_executable(worldserver
   ${worldserver_PCH_SRC}
 )
 
+# Group sources
+GroupSources(${CMAKE_CURRENT_SOURCE_DIR})
+
 if( NOT WIN32 )
   set_target_properties(worldserver PROPERTIES
     COMPILE_DEFINITIONS _TRINITY_CORE_CONFIG="${CONF_DIR}/worldserver.conf"
