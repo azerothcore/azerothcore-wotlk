@@ -81,7 +81,6 @@
 #include "Threading/LockedQueue.h"
 #include "Threading/Threading.h"
 
-#include <ace/OS_NS_time.h>
 #include <ace/Stack_Trace.h>
 
 #if PLATFORM == PLATFORM_WINDOWS

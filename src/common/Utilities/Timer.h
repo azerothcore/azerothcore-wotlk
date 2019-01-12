@@ -7,13 +7,16 @@
 #ifndef TRINITY_TIMER_H
 #define TRINITY_TIMER_H
 
-#include "ace/OS_NS_sys_time.h"
 #include "Common.h"
+#include <chrono>
+
+using namespace std::chrono;
 
 inline uint32 getMSTime()
 {
-    static const ACE_Time_Value ApplicationStartTime = ACE_OS::gettimeofday();
-    return (ACE_OS::gettimeofday() - ApplicationStartTime).msec();
+    static const system_clock::time_point ApplicationStartTime = system_clock::now();
+
+    return duration_cast<milliseconds>(system_clock::now() - ApplicationStartTime).count();
 }
 
 inline uint32 getMSTimeDiff(uint32 oldMSTime, uint32 newMSTime)

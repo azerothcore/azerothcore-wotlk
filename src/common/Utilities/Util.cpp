@@ -120,6 +120,17 @@ void stripLineInvisibleChars(std::string &str)
 
 }
 
+std::tm localtime_r(const time_t& time)
+{
+    std::tm tm_snapshot;
+#if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
+    localtime_s(&tm_snapshot, &time);
+#else
+    localtime_r(&time, &tm_snapshot); // POSIX
+#endif
+    return tm_snapshot;
+}
+
 std::string secsToTimeString(uint64 timeInSecs, bool shortText)
 {
     uint64 secs    = timeInSecs % MINUTE;
@@ -210,8 +221,7 @@ uint32 TimeStringToSecs(const std::string& timestring)
 
 std::string TimeToTimestampStr(time_t t)
 {
-    tm aTm;
-    ACE_OS::localtime_r(&t, &aTm);
+    tm aTm = localtime_r(t);
     //       YYYY   year
     //       MM     month (2 digits 01-12)
     //       DD     day (2 digits 01-31)
