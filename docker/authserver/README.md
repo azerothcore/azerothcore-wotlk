@@ -8,7 +8,7 @@ This provides a way to launch a container with the AzerothCore authserver runnin
 
 2) You need to first build the [AzerothCore Build Image](https://github.com/FrancescoBorzi/azerothcore-wotlk/tree/docker-server/docker/build).
 
-3) You have to copy the file `docker/authserver/authserver.conf.dist` and rename it to `docker/authserver/authserver.conf`. Then open it and change the values where needed (you may need to change the DB port).
+3) You have to copy the file `docker/authserver/authserver.conf.dist` and rename the copied file to `docker/authserver/authserver.conf`. Then open it and change the values where needed (you may need to change the DB port).
 
 ## Building the container image
 
