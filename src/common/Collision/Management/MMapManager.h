@@ -73,9 +73,9 @@ namespace MMAP
             uint32 getLoadedTilesCount() const { return loadedTiles; }
             uint32 getLoadedMapsCount() const { return loadedMMaps.size(); }
 
-            ACE_RW_Thread_Mutex& GetMMapLock(uint32 mapId);
-            ACE_RW_Thread_Mutex& GetMMapGeneralLock() { return MMapLock; } // pussywizard: in case a per-map mutex can't be found, should never happen
-            ACE_RW_Thread_Mutex& GetManagerLock() { return MMapManagerLock; }
+            boost::shared_mutex& GetMMapLock(uint32 mapId);
+            boost::shared_mutex& GetMMapGeneralLock() { return MMapLock; } // pussywizard: in case a per-map mutex can't be found, should never happen
+            boost::shared_mutex& GetManagerLock() { return MMapManagerLock; }
         private:
             bool loadMapData(uint32 mapId);
             uint32 packTileID(int32 x, int32 y);
@@ -83,8 +83,8 @@ namespace MMAP
             MMapDataSet loadedMMaps;
             uint32 loadedTiles;
 
-            ACE_RW_Thread_Mutex MMapManagerLock;
-            ACE_RW_Thread_Mutex MMapLock; // pussywizard: in case a per-map mutex can't be found, should never happen
+            boost::shared_mutex MMapManagerLock;
+            boost::shared_mutex MMapLock; // pussywizard: in case a per-map mutex can't be found, should never happen
     };
 }
 

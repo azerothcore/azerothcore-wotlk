@@ -1,12 +1,18 @@
+/*
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ */
+
+#include <mutex>
+#include <condition_variable>
+
 #include "MapUpdater.h"
 #include "DelayExecutor.h"
 #include "Map.h"
 #include "DatabaseEnv.h"
 #include "LFGMgr.h"
 #include "AvgDiffTracker.h"
-
-#include <ace/Guard_T.h>
-#include <ace/Method_Request.h>
 
 class WDBThreadStartReq1 : public ACE_Method_Request
 {
@@ -81,8 +87,7 @@ class LFGUpdateRequest : public ACE_Method_Request
         }
 };
 
-MapUpdater::MapUpdater():
-m_executor(), m_mutex(), m_condition(m_mutex), pending_requests(0)
+MapUpdater::MapUpdater(): m_executor(), pending_requests(0) { }
 {
 }
 
@@ -105,17 +110,19 @@ int MapUpdater::deactivate()
 
 int MapUpdater::wait()
 {
-    TRINITY_GUARD(ACE_Thread_Mutex, m_mutex);
+    std::lock_guard<std::mutex> lock(m_mutex);
 
     while (pending_requests > 0)
-        m_condition.wait();
+        _condition.wait(lock);
+
+    lock.unlock();
 
     return 0;
 }
 
 int MapUpdater::schedule_update(Map& map, ACE_UINT32 diff, ACE_UINT32 s_diff)
 {
-    TRINITY_GUARD(ACE_Thread_Mutex, m_mutex);
+    std::lock_guard<std::mutex> lock(m_mutex);
 
     ++pending_requests;
 
@@ -132,7 +139,7 @@ int MapUpdater::schedule_update(Map& map, ACE_UINT32 diff, ACE_UINT32 s_diff)
 
 int MapUpdater::schedule_lfg_update(ACE_UINT32 diff)
 {
-    TRINITY_GUARD(ACE_Thread_Mutex, m_mutex);
+    std::lock_guard<std::mutex> lock(m_mutex);
 
     ++pending_requests;
 
@@ -154,17 +161,17 @@ bool MapUpdater::activated()
 
 void MapUpdater::update_finished()
 {
-    TRINITY_GUARD(ACE_Thread_Mutex, m_mutex);
+    std::lock_guard<std::mutex> lock(m_mutex);
 
     if (pending_requests == 0)
     {
         ACE_ERROR((LM_ERROR, ACE_TEXT("(%t)\n"), ACE_TEXT("MapUpdater::update_finished BUG, report to devs")));
         sLog->outMisc("WOOT! pending_requests == 0 before decrement!");
-        m_condition.broadcast();
+        _condition.notify_all();
         return;
     }
 
     --pending_requests;
 
-    m_condition.broadcast();
+   _condition.notify_all();
 }

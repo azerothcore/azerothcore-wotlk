@@ -44,7 +44,7 @@ class RASocket : public ACE_Svc_Handler<ACE_SOCK_STREAM, ACE_MT_SYNCH>
 
     private:
         uint8 _minLevel; ///< Minimum security level required to connect
-        ACE_Atomic_Op<ACE_Thread_Mutex, bool> _commandExecuting;
+        ACE_Atomic_Op<std::mutex, bool> _commandExecuting;
 };
 
 #endif

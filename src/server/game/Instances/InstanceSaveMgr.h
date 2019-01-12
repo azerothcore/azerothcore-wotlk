@@ -9,7 +9,6 @@
 
 #include "Define.h"
 #include <ace/Null_Mutex.h>
-#include <ace/Thread_Mutex.h>
 #include <list>
 #include <map>
 #include "UnorderedMap.h"
@@ -90,7 +89,7 @@ class InstanceSave
         std::string m_instanceData;
         uint32 m_completedEncounterMask;
 
-        ACE_Thread_Mutex _lock;
+        std::mutex _lock;
 };
 
 typedef UNORDERED_MAP<uint32 /*PAIR32(map, difficulty)*/, time_t /*resetTime*/> ResetTimeByMapDifficultyMap;

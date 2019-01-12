@@ -7,11 +7,10 @@
 
 #include <OpenSSLCrypto.h>
 #include <openssl/crypto.h>
-#include <ace/Thread_Mutex.h>
 #include <vector>
 #include <ace/Thread.h>
 
-std::vector<ACE_Thread_Mutex*> cryptoLocks;
+std::vector<std::mutex*> cryptoLocks;
 
 static void lockingCallback(int mode, int type, const char* /*file*/, int /*line*/)
 {
@@ -36,7 +35,7 @@ void OpenSSLCrypto::threadsSetup()
     cryptoLocks.resize(CRYPTO_num_locks());
     for(int i = 0 ; i < CRYPTO_num_locks(); ++i)
     {
-        cryptoLocks[i] = new ACE_Thread_Mutex();
+        cryptoLocks[i] = new std::mutex();
     }
     CRYPTO_THREADID_set_callback(threadIdCallback);
     CRYPTO_set_locking_callback(lockingCallback);

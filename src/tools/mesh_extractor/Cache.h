@@ -7,10 +7,10 @@
 
 #ifndef CACHE_H
 #define CACHE_H
+
 #include <string>
 #include <map>
 #include "Define.h"
-#include <ace/Guard_T.h>
 #include <ace/Synch.h>
 #include "WorldModelRoot.h"
 #include "Model.h"
@@ -25,7 +25,7 @@ public:
 
     void Insert(K key, T* val)
     {
-        ACE_GUARD(ACE_Thread_Mutex, g, mutex);
+        ACE_GUARD(std::mutex, g, mutex);
 
         if (_items.size() > FlushLimit)
             Clear();
@@ -34,7 +34,7 @@ public:
 
     T* Get(K key)
     {
-        ACE_GUARD_RETURN(ACE_Thread_Mutex, g, mutex, NULL);
+        ACE_GUARD_RETURN(std::mutex, g, mutex, NULL);
         typename std::map<K, T*>::iterator itr = _items.find(key);
         if (itr != _items.end())
             return itr->second;
@@ -49,7 +49,7 @@ public:
     }
 private:
     std::map<K, T*> _items;
-    ACE_Thread_Mutex mutex;
+    std::mutex mutex;
 };
 
 class CacheClass

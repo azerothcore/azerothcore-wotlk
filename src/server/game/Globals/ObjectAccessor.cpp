@@ -25,6 +25,8 @@
 #include "World.h"
 #include "WorldPacket.h"
 
+#include <boost/thread/shared_mutex.hpp>
+#include <boost/thread/locks.hpp>
 #include <cmath>
 
 ObjectAccessor* ObjectAccessor::instance()
@@ -179,7 +181,7 @@ Unit* ObjectAccessor::FindUnit(uint64 guid)
 
 Player* ObjectAccessor::FindPlayerByName(std::string const& name, bool checkInWorld)
 {
-    /*TRINITY_READ_GUARD(HashMapHolder<Player>::LockType, *HashMapHolder<Player>::GetLock());
+    /*boost::shared_lock<boost::shared_mutex> lock(*HashMapHolder<Player>::GetLock());
     std::string nameStr = name;
     std::transform(nameStr.begin(), nameStr.end(), nameStr.begin(), ::tolower);
     HashMapHolder<Player>::MapType const& m = GetPlayers();
@@ -206,7 +208,7 @@ Player* ObjectAccessor::FindPlayerByName(std::string const& name, bool checkInWo
 
 void ObjectAccessor::SaveAllPlayers()
 {
-    TRINITY_READ_GUARD(HashMapHolder<Player>::LockType, *HashMapHolder<Player>::GetLock());
+    boost::shared_lock<boost::shared_mutex> lock(*HashMapHolder<Player>::GetLock());
     HashMapHolder<Player>::MapType const& m = GetPlayers();
     for (HashMapHolder<Player>::MapType::const_iterator itr = m.begin(); itr != m.end(); ++itr)
         itr->second->SaveToDB(false, false);
@@ -214,7 +216,7 @@ void ObjectAccessor::SaveAllPlayers()
 
 Corpse* ObjectAccessor::GetCorpseForPlayerGUID(uint64 guid)
 {
-    TRINITY_READ_GUARD(ACE_RW_Thread_Mutex, i_corpseLock);
+    boost::shared_lock<boost::shared_mutex> lock(i_corpseLock);
 
     Player2CorpsesMapType::iterator iter = i_player2corpse.find(guid);
     if (iter == i_player2corpse.end())
@@ -229,9 +231,12 @@ void ObjectAccessor::RemoveCorpse(Corpse* corpse, bool final)
 {
     ASSERT(corpse && corpse->GetType() != CORPSE_BONES);
 
+    boost::upgrade_lock<boost::shared_mutex> lock(_corpseLock);
+
     if (!final)
     {
-        TRINITY_WRITE_GUARD(ACE_RW_Thread_Mutex, i_corpseLock);
+        boost::upgrade_to_unique_lock<boost::shared_mutex> uniqueLock(lock);
+
         Player2CorpsesMapType::iterator iter = i_player2corpse.find(corpse->GetOwnerGUID());
         if (iter == i_player2corpse.end())
             return;
@@ -258,7 +263,7 @@ void ObjectAccessor::RemoveCorpse(Corpse* corpse, bool final)
 
     // Critical section
     {
-        TRINITY_WRITE_GUARD(ACE_RW_Thread_Mutex, i_corpseLock);
+        boost::upgrade_to_unique_lock<boost::shared_mutex> uniqueLock(lock);
 
         // build mapid*cellid -> guid_set map
         CellCoord cellCoord = Trinity::ComputeCellCoord(corpse->GetPositionX(), corpse->GetPositionY());
@@ -274,7 +279,7 @@ void ObjectAccessor::AddCorpse(Corpse* corpse)
 
     // Critical section
     {
-        TRINITY_WRITE_GUARD(ACE_RW_Thread_Mutex, i_corpseLock);
+        boost::unique_lock<boost::shared_mutex> lock(_corpseLock);
 
         ASSERT(i_player2corpse.find(corpse->GetOwnerGUID()) == i_player2corpse.end());
         i_player2corpse[corpse->GetOwnerGUID()] = corpse;
@@ -287,7 +292,7 @@ void ObjectAccessor::AddCorpse(Corpse* corpse)
 
 void ObjectAccessor::AddCorpsesToGrid(GridCoord const& gridpair, GridType& grid, Map* map)
 {
-    TRINITY_READ_GUARD(ACE_RW_Thread_Mutex, i_corpseLock);
+    boost::shared_lock<boost::shared_mutex> lock(i_corpseLock);
 
     for (Player2CorpsesMapType::iterator iter = i_player2corpse.begin(); iter != i_player2corpse.end(); ++iter)
     {
@@ -375,7 +380,7 @@ Corpse* ObjectAccessor::ConvertCorpseForPlayer(uint64 player_guid, bool insignia
         }
 
         // pussywizard: for deleting bones
-        TRINITY_WRITE_GUARD(ACE_RW_Thread_Mutex, i_corpseLock);
+        boost::shared_lock<boost::shared_mutex> lock(i_corpseLock);
         i_playerBones.push_back(bones->GetGUID());
     }
 
@@ -402,7 +407,8 @@ void ObjectAccessor::RemoveOldCorpses()
 
     // pussywizard: for deleting bones
     std::list<uint64>::iterator next2;
-    TRINITY_WRITE_GUARD(ACE_RW_Thread_Mutex, i_corpseLock);
+    boost::unique_lock<boost::shared_mutex> lock(i_corpseLock); // Maybe NO...
+
     for (std::list<uint64>::iterator itr = i_playerBones.begin(); itr != i_playerBones.end(); itr = next2)
     {
         next2 = itr;
@@ -435,13 +441,13 @@ void ObjectAccessor::RemoveOldCorpses()
 
 void ObjectAccessor::AddDelayedCorpseAction(Corpse* corpse, uint8 action, uint32 mapId, uint32 instanceId)
 {
-    TRINITY_GUARD(ACE_Thread_Mutex, DelayedCorpseLock);
+    std::lock_guard<std::mutex> lock(DelayedCorpseLock);
     i_delayedCorpseActions.push_back(DelayedCorpseAction(corpse, action, mapId, instanceId));
 }
 
 void ObjectAccessor::ProcessDelayedCorpseActions()
 {
-    TRINITY_GUARD(ACE_Thread_Mutex, DelayedCorpseLock);
+    std::lock_guard<std::mutex> lock(DelayedCorpseLock);
     for (std::list<DelayedCorpseAction>::iterator itr = i_delayedCorpseActions.begin(); itr != i_delayedCorpseActions.end(); ++itr)
     {
         DelayedCorpseAction a = (*itr);

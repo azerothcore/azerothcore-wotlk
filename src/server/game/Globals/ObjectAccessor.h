@@ -8,7 +8,6 @@
 #define TRINITY_OBJECTACCESSOR_H
 
 #include "Define.h"
-#include <ace/Thread_Mutex.h>
 #include "UnorderedMap.h"
 
 #include "UpdateData.h"
@@ -37,23 +36,23 @@ class HashMapHolder
     public:
 
         typedef UNORDERED_MAP<uint64, T*> MapType;
-        typedef ACE_RW_Thread_Mutex LockType;
+        typedef boost::shared_mutex LockType;
 
         static void Insert(T* o)
         {
-            TRINITY_WRITE_GUARD(LockType, i_lock);
+            boost::shared_lock<boost::shared_mutex> lock(_lock);
             m_objectMap[o->GetGUID()] = o;
         }
 
         static void Remove(T* o)
         {
-            TRINITY_WRITE_GUARD(LockType, i_lock);
+            boost::unique_lock<boost::shared_mutex> lock(_lock);
             m_objectMap.erase(o->GetGUID());
         }
 
         static T* Find(uint64 guid)
         {
-            TRINITY_READ_GUARD(LockType, i_lock);
+            boost::shared_lock<boost::shared_mutex> lock(i_lock);
             typename MapType::iterator itr = m_objectMap.find(guid);
             return (itr != m_objectMap.end()) ? itr->second : NULL;
         }
@@ -73,8 +72,8 @@ class HashMapHolder
 
 /// Define the static members of HashMapHolder
 
-template <class T> UNORDERED_MAP< uint64, T* > HashMapHolder<T>::m_objectMap;
-template <class T> typename HashMapHolder<T>::LockType HashMapHolder<T>::i_lock;
+template <class T> std::unordered_map< uint64, T* > HashMapHolder<T>::m_objectMap;
+template <class T> boost::shared_mutex HashMapHolder<T>::i_lock;
 
 // pussywizard:
 class DelayedCorpseAction
@@ -229,7 +228,7 @@ class ObjectAccessor
         //non-static functions
         void AddUpdateObject(Object* obj)
         {
-            TRINITY_GUARD(ACE_Thread_Mutex, i_objectLock);
+            std::lock_guard<std::mutex> lock(i_objectLock);
             if (obj->GetTypeId() < TYPEID_UNIT) // these are not in map: TYPEID_OBJECT, TYPEID_ITEM, TYPEID_CONTAINER
                 i_objects.insert(obj);
             else
@@ -238,7 +237,7 @@ class ObjectAccessor
 
         void RemoveUpdateObject(Object* obj)
         {
-            TRINITY_GUARD(ACE_Thread_Mutex, i_objectLock);
+            std::lock_guard<std::mutex> lock(i_objectLock);
             if (obj->GetTypeId() < TYPEID_UNIT) // these are not in map: TYPEID_OBJECT, TYPEID_ITEM, TYPEID_CONTAINER
                 i_objects.erase(obj);
             else
@@ -273,10 +272,10 @@ class ObjectAccessor
         Player2CorpsesMapType i_player2corpse;
         std::list<uint64> i_playerBones;
 
-        ACE_Thread_Mutex i_objectLock;
-        ACE_RW_Thread_Mutex i_corpseLock;
+        std::mutex i_objectLock;
+        boost::shared_mutex i_corpseLock;
         std::list<DelayedCorpseAction> i_delayedCorpseActions;
-        mutable ACE_Thread_Mutex DelayedCorpseLock;
+        mutable std::mutex DelayedCorpseLock;
 };
 
 #define sObjectAccessor ObjectAccessor::instance()

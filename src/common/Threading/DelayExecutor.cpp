@@ -1,4 +1,3 @@
-#include <ace/Thread_Mutex.h>
 #include <ace/Log_Msg.h>
 #include "Threading.h"
 
