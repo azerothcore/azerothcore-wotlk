@@ -21,6 +21,7 @@
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "Group.h"
+#include "GameTime.h"
 #include "InstanceScript.h"
 #include "LFGMgr.h"
 #include "Pet.h"

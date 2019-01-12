@@ -22,6 +22,7 @@
 #include "GuildMgr.h"
 #include "Group.h"
 #include "Guild.h"
+#include "GameTime.h"
 #include "World.h"
 #include "ObjectAccessor.h"
 #include "BattlegroundMgr.h"

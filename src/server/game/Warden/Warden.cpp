@@ -13,6 +13,7 @@
 #include <openssl/md5.h>
 #include <openssl/sha.h>
 #include "World.h"
+#include "GameTime.h"
 #include "Player.h"
 #include "Util.h"
 #include "Warden.h"

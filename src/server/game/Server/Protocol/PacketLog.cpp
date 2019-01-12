@@ -8,6 +8,7 @@
 #include "Config.h"
 #include "ByteBuffer.h"
 #include "WorldPacket.h"
+#include "GameTime.h"
 
 PacketLog::PacketLog() : _file(NULL)
 {

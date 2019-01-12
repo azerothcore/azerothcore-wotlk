@@ -25,6 +25,7 @@
 #include "ByteBuffer.h"
 #include "Opcodes.h"
 #include "DatabaseEnv.h"
+#include "GameTime.h"
 #include "BigNumber.h"
 #include "SHA1.h"
 #include "WorldSession.h"

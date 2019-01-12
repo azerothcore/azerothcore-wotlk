@@ -12,6 +12,7 @@
 #include "WorldPacket.h"
 #include "Player.h"
 #include "World.h"
+#include "GameTime.h"
 #include "Log.h"
 #include "ObjectMgr.h"
 #include "Util.h"

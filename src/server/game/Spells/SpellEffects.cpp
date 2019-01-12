@@ -21,6 +21,7 @@
 #include "SpellAuras.h"
 #include "SpellAuraEffects.h"
 #include "Group.h"
+#include "GameTime.h"
 #include "UpdateData.h"
 #include "MapManager.h"
 #include "ObjectAccessor.h"

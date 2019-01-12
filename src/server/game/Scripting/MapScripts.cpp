@@ -12,6 +12,7 @@
 #include "MapManager.h"
 #include "MapRefManager.h"
 #include "ObjectMgr.h"
+#include "GameTime.h"
 #include "Pet.h"
 #include "ScriptedCreature.h"
 #include "ScriptMgr.h"

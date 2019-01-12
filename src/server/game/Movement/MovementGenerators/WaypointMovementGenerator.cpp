@@ -9,6 +9,7 @@
 #include "ObjectMgr.h"
 #include "World.h"
 #include "Transport.h"
+#include "GameTime.h"
 //Flightmaster grid preloading
 #include "MapManager.h"
 //Creature-specific headers

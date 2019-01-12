@@ -21,6 +21,7 @@
 #include "Formulas.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
+#include "GameTime.h"
 #include "CellImpl.h"
 #include "ScriptMgr.h"
 #include "Vehicle.h"

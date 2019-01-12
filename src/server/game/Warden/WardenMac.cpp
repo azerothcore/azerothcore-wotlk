@@ -13,6 +13,7 @@
 #include "ByteBuffer.h"
 #include <openssl/md5.h>
 #include "World.h"
+#include "GameTime.h"
 #include "Player.h"
 #include "Util.h"
 #include "WardenMac.h"
