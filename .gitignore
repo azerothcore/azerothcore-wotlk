@@ -13,7 +13,7 @@ modules/*
 build*/
 var/*
 docker/authserver/authserver.conf
-docker/authserver/worlserver.conf
+docker/worlserver/worlserver.conf
 
 !.gitkeep
 
