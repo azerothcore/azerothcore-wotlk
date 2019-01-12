@@ -24,10 +24,6 @@ To build the container image you have to be in the **main** folder of your local
 
 Replace `/path/to/your/data` with the path of where your data folder is.
 
-```docker run --name azt-worldserver --mount type=bind,source=/path/to/your/data,target=/azeroth-server/data --network host -it azerothcore/worldserver`
+```docker run --name azt-worldserver --mount type=bind,source=/path/to/your/data,target=/azeroth-server/data --network host -it azerothcore/worldserver```
 
 *For more information about the `docker run` command, check the [docker run doc](https://docs.docker.com/engine/reference/run/).*
-
-
-
-``
