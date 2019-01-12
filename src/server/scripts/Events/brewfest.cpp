@@ -10,6 +10,7 @@
 #include "SpellScript.h"
 #include "GameEventMgr.h"
 #include "Group.h"
+#include "GameTime.h"
 #include "LFGMgr.h"
 
 ///////////////////////////////////////

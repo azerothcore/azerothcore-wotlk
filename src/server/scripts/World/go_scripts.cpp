@@ -36,6 +36,7 @@ EndContentData */
 #include "GameObjectAI.h"
 #include "Spell.h"
 #include "Player.h"
+#include "GameTime.h"
 #include "WorldSession.h"
 
 // Ours

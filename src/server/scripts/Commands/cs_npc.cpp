@@ -20,6 +20,7 @@ EndScriptData */
 #include "TargetedMovementGenerator.h"                      // for HandleNpcUnFollowCommand
 #include "CreatureAI.h"
 #include "Player.h"
+#include "GameTime.h"
 #include "Pet.h"
 
 struct NpcFlagText

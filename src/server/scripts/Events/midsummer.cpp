@@ -1,6 +1,7 @@
 // Scripted by Xinef
 
 #include "ScriptMgr.h"
+#include "GameTime.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "Spell.h"

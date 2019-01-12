@@ -15,6 +15,7 @@ EndScriptData */
 #include "GameEventMgr.h"
 #include "Language.h"
 #include "Player.h"
+#include "GameTime.h"
 #include "ScriptMgr.h"
 
 class event_commandscript : public CommandScript

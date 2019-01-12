@@ -19,6 +19,7 @@ EndScriptData */
 #include "Chat.h"
 #include "Language.h"
 #include "Player.h"
+#include "GameTime.h"
 #include "Opcodes.h"
 #include "Transport.h"
 #include "GameObject.h"

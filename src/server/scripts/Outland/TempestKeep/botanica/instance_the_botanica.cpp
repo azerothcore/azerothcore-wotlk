@@ -3,6 +3,7 @@
 */
 
 #include "ScriptMgr.h"
+#include "GameTime.h"
 #include "InstanceScript.h"
 #include "the_botanica.h"
 

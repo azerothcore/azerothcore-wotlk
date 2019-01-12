@@ -29,6 +29,7 @@
 #include "Player.h"
 #include "PoolMgr.h"
 #include "GameGraveyard.h"
+#include "GameTime.h"
 #include "World.h"
 
 #define GOSSIP_HELLO_DEMO1  "Build catapult."

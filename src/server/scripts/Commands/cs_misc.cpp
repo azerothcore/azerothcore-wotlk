@@ -22,6 +22,7 @@
 #include "WeatherMgr.h"
 #include "ace/INET_Addr.h"
 #include "Player.h"
+#include "GameTime.h"
 #include "Pet.h"
 #include "LFG.h"
 #include "GroupMgr.h"

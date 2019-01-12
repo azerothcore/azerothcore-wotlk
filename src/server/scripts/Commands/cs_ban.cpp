@@ -17,6 +17,7 @@ EndScriptData */
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Player.h"
+#include "GameTime.h"
 #include "ScriptMgr.h"
 
 class ban_commandscript : public CommandScript

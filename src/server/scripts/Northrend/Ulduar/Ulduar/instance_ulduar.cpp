@@ -7,6 +7,7 @@
 #include "ulduar.h"
 #include "Vehicle.h"
 #include "Player.h"
+#include "GameTime.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
 #include "Transport.h"

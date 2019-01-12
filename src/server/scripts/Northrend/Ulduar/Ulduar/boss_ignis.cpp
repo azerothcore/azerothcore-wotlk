@@ -5,6 +5,7 @@
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
+#include "GameTime.h"
 #include "ulduar.h"
 #include "Vehicle.h"
 #include "SpellAuras.h"

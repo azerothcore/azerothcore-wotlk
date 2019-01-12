@@ -33,6 +33,7 @@ EndContentData */
 #include "ObjectMgr.h"
 #include "ScriptMgr.h"
 #include "World.h"
+#include "GameTime.h"
 #include "CreatureTextMgr.h"
 #include "PassiveAI.h"
 #include "GameEventMgr.h"

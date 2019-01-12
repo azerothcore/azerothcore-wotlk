@@ -18,6 +18,7 @@ EndScriptData */
 #include "InstanceScript.h"
 #include "MapManager.h"
 #include "Player.h"
+#include "GameTime.h"
 #include "Language.h"
 
 class instance_commandscript : public CommandScript

@@ -11,6 +11,7 @@
 #include "BattlefieldMgr.h"
 #include "SpellAuras.h"
 #include "Player.h"
+#include "GameTime.h"
 
 /* Vault of Archavon encounters:
 1 - Archavon the Stone Watcher event

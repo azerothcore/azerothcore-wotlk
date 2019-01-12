@@ -5,6 +5,7 @@
 #include "ObjectMgr.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "GameTime.h"
 #include "GridNotifiers.h"
 #include "icecrown_citadel.h"
 #include "Player.h"
