@@ -8,4 +8,6 @@ Note: every time you update your AzerothCore sources, you **must** build again t
 
 # Usage
 
+To build the container image you have to be in the **main** folder of your local AzerothCore sources directory.
+
 ```docker build -t azerothcore/build -f docker/build/Dockerfile . ```
