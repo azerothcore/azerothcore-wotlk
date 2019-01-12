@@ -8,26 +8,22 @@
 #include <OpenSSLCrypto.h>
 #include <openssl/crypto.h>
 #include <vector>
-#include <ace/Thread.h>
+#include <thread>
+#include <mutex>
 
 std::vector<std::mutex*> cryptoLocks;
 
 static void lockingCallback(int mode, int type, const char* /*file*/, int /*line*/)
 {
     if (mode & CRYPTO_LOCK)
-        cryptoLocks[type]->acquire();
+        cryptoLocks[type]->lock();
     else
-        cryptoLocks[type]->release();
+        cryptoLocks[type]->unlock();
 }
 
 static void threadIdCallback(CRYPTO_THREADID * id)
 {
-/// ACE_thread_t turns out to be a struct under Mac OS.
-#ifndef __APPLE__
-    CRYPTO_THREADID_set_numeric(id, ACE_Thread::self());
-#else
-    CRYPTO_THREADID_set_pointer(id, ACE_Thread::self());
-#endif
+    CRYPTO_THREADID_set_numeric(id, std::this_thread::get_id().hash());
 }
 
 void OpenSSLCrypto::threadsSetup()
