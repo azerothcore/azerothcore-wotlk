@@ -14,7 +14,6 @@ build*/
 var/*
 docker/authserver/authserver.conf
 docker/worldserver/worldserver.conf
-docker/worldserver/data
 
 !.gitkeep
 
