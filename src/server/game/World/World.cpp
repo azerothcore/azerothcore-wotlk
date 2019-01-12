@@ -81,7 +81,7 @@
 #include "LuaEngine.h"
 #endif
 
-ACE_Atomic_Op<std::mutex, bool> World::m_stopEvent = false;
+std::atomic<bool> World::m_stopEvent = false;
 uint8 World::m_ExitCode = SHUTDOWN_EXIT_CODE;
 uint32 World::m_worldLoopCounter = 0;
 uint32 World::m_gameMSTime = 0;

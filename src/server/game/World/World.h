@@ -13,7 +13,6 @@
 
 #include "Common.h"
 #include "Timer.h"
-#include <ace/Atomic_Op.h>
 #include "SharedDefines.h"
 #include "QueryResult.h"
 #include "Callback.h"
@@ -807,7 +806,7 @@ class World
         void ResetRandomBG();
         void ResetGuildCap();
     private:
-        static ACE_Atomic_Op<std::mutex, bool> m_stopEvent;
+        static std::atomic<bool> m_stopEvent;
         static uint8 m_ExitCode;
         uint32 m_ShutdownTimer;
         uint32 m_ShutdownMask;
