@@ -28,7 +28,7 @@ and cd into it `cd azerothcore-wotlk`.
 
 You can build the image using:
 
-`docker build -t azerothcore/database -f docker/DB/Dockerfile .`
+`docker build -t azerothcore/database -f docker/database/Dockerfile .`
 
 **Note:** the version of your DB will be the one of your sources when you built the image. If you want to update it, just update your sources (`git pull`) and build the image again.
 
@@ -58,7 +58,13 @@ Where:
 
 `azerothcore/database` will be the name of your docker image.
 
+When the container is ready, you will see a message similar to:
+
+> Version: '5.7.24'  socket: '/var/run/mysqld/mysqld.sock'  port: 3306  MySQL Community Server (GPL)
+
 You can optionally pass option `-d` to detach the container run from your terminal.
+
+You can optionally pass option `-it` to run the container as an interactive process (so you can kill it with ctrl+c).
 
 *For more information about the `docker run` command, check the [docker run doc](https://docs.docker.com/engine/reference/run/).*
 

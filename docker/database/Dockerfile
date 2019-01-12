@@ -15,4 +15,4 @@ FROM mysql:5.7
 
 COPY --from=builder /azerothcore/env/dist/sql /sql
 
-ADD docker/DB/generate-databases.sh /docker-entrypoint-initdb.d
+ADD docker/database/generate-databases.sh /docker-entrypoint-initdb.d
