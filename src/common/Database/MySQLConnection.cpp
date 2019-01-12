@@ -35,7 +35,7 @@ m_connectionFlags(CONNECTION_SYNCH)
 {
 }
 
-MySQLConnection::MySQLConnection(ACE_Activation_Queue* queue, MySQLConnectionInfo& connInfo) :
+MySQLConnection::MySQLConnection(ProducerConsumerQueue<SQLOperation*>* queue, MySQLConnectionInfo& connInfo) :
 m_reconnecting(false),
 m_prepareError(false),
 m_queue(queue),

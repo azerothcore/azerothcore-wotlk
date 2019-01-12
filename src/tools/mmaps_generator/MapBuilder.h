@@ -157,10 +157,10 @@ namespace MMAP
     {
     private:
         MapBuilder* _builder;
-        ACE_Activation_Queue* _queue;
+        ProducerConsumerQueue<SQLOperation*>* _queue;
 
     public:
-        BuilderThread(MapBuilder* builder, ACE_Activation_Queue* queue) : _builder(builder), _queue(queue) { activate(); }
+        BuilderThread(MapBuilder* builder, ProducerConsumerQueue<SQLOperation*>* queue) : _builder(builder), _queue(queue) { activate(); }
 
         int svc()
         {
@@ -189,10 +189,10 @@ namespace MMAP
                 _queue->enqueue(request);
             }
 
-            ACE_Activation_Queue* Queue() { return _queue; }
+            ProducerConsumerQueue<SQLOperation*>* Queue() { return _queue; }
 
         private:
-            ACE_Activation_Queue* _queue;
+            ProducerConsumerQueue<SQLOperation*>* _queue;
     };
 }
 
