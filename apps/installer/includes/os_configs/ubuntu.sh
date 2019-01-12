@@ -4,6 +4,10 @@ UBUNTU_VERSION=$(lsb_release -sr);
 if [[ $TRAVIS && $CONTINUOUS_INTEGRATION ]]; then
   sudo apt-get -y install build-essential libtool make cmake cmake-data openssl libgoogle-perftools-dev \
   libssl-dev libmysqlclient-dev libmysql++-dev libreadline6-dev zlib1g-dev libbz2-dev libace-dev
+  wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
+  sudo apt-add-repository "deb http://apt.llvm.org/xenial/ llvm-toolchain-xenial-6.0 main"
+  sudo apt-get update
+  sudo apt-get install -y clang-6.0
 else
   case $UBUNTU_VERSION in
     "14.04")
