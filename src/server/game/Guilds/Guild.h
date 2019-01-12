@@ -281,7 +281,6 @@ public: // pussywizard: public class Member
             m_level(0),
             m_class(0),
             m_flags(GUILDMEMBER_STATUS_NONE),
-            m_logoutTime(::GameTime::GetGameTime()),
             m_accountId(0),
             m_rankId(rankId)
         {

@@ -17,6 +17,7 @@
 #include "SpellAuraEffects.h"
 #include "SkillDiscovery.h"
 #include "Battleground.h"
+#include "GameTime.h"
 
 class spell_item_massive_seaforium_charge : public SpellScriptLoader
 {

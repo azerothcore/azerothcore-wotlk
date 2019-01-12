@@ -161,7 +161,7 @@ inline uint32 Guild::LogHolder::GetNextGUID()
     return m_nextGUID;
 }
 
-Guild::LogEntry::LogEntry(ObjectGuid::LowType guildId, uint32 guid) : m_guildId(guildId), m_guid(guid), m_timestamp(GameTime::GetGameTime()) { }
+Guild::LogEntry::LogEntry(uint32 guildId, uint32 guid) : m_guildId(guildId), m_guid(guid), m_timestamp(GameTime::GetGameTime()) { }
 
 // EventLogEntry
 void Guild::EventLogEntry::SaveToDB(SQLTransaction& trans) const

@@ -9,6 +9,7 @@
 #include "Language.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
+#include "GameTime.h"
 #include "Player.h"
 #include "TicketMgr.h"
 #include "Util.h"

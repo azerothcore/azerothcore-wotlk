@@ -20,6 +20,7 @@
 #include "ObjectMgr.h"
 #include "World.h"
 #include "Group.h"
+#include "GameTime.h"
 #include "InstanceScript.h"
 #include "ScriptMgr.h"
 

@@ -14,6 +14,7 @@
 #include "ArenaTeam.h"
 #include "BattlegroundMgr.h"
 #include "Battleground.h"
+#include "GameTime.h"
 #include "Chat.h"
 #include "Language.h"
 #include "Log.h"

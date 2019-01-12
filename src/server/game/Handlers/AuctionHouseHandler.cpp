@@ -13,6 +13,7 @@
 #include "AuctionHouseMgr.h"
 #include "Log.h"
 #include "Language.h"
+#include "GameTime.h"
 #include "Opcodes.h"
 #include "UpdateMask.h"
 #include "Util.h"

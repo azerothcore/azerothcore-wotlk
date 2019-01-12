@@ -13,6 +13,7 @@
 #include "MoveSplineInit.h"
 #include "MoveSpline.h"
 #include "Player.h"
+#include "GameTime.h"
 #include "Spell.h"
 #include "BattlegroundRV.h"
 #include "VehicleDefines.h"

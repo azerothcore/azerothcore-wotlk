@@ -23,6 +23,7 @@ Channel::Channel(std::string const& name, uint32 channelId, uint32 channelDBId, 
     _channelDBId(channelDBId),
     _teamId(teamId),
     _ownerGUID(0),
+    lastSpeakTime(0),
     _name(name),
     _password("")
 {
@@ -199,7 +200,6 @@ void Channel::JoinChannel(Player* player, std::string const& pass)
     PlayerInfo pinfo;
     pinfo.player = guid;
     pinfo.flags = MEMBER_FLAG_NONE;
-    pinfo.lastSpeakTime = 0;
     pinfo.plrPtr = player;
 
     playersStore[guid] = pinfo;
@@ -787,9 +787,9 @@ void Channel::Say(uint64 guid, std::string const& what, uint32 lang)
         else if (playersStore.size() >= 10)
             speakDelay = 5;
 
-        if (!pinfo.IsAllowedToSpeak(speakDelay))
+        if (IsAllowedToSpeak(speakDelay))
         {
-            std::string timeStr = secsToTimeString(pinfo.lastSpeakTime + speakDelay - GameTime::GetGameTime());
+            std::string timeStr = secsToTimeString(lastSpeakTime + speakDelay - GameTime::GetGameTime());
             if (_channelRights.speakMessage.length() > 0)
                 player->GetSession()->SendNotification("%s", _channelRights.speakMessage.c_str());
             player->GetSession()->SendNotification("You must wait %s before speaking again.", timeStr.c_str());
@@ -1238,7 +1238,7 @@ void Channel::RemoveWatching(Player* p)
 }
 
 bool Channel::IsAllowedToSpeak(uint32 speakDelay)
-{
+{  
     if (lastSpeakTime+speakDelay <= GameTime::GetGameTime())
     {
         lastSpeakTime = GameTime::GetGameTime();

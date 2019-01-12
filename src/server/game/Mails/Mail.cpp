@@ -9,6 +9,7 @@
 #include "Log.h"
 #include "World.h"
 #include "ObjectMgr.h"
+#include "GameTime.h"
 #include "Player.h"
 #include "Unit.h"
 #include "BattlegroundMgr.h"

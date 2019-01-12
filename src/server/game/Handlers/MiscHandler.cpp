@@ -15,6 +15,7 @@
 #include "World.h"
 #include "ObjectMgr.h"
 #include "GuildMgr.h"
+#include "GameTime.h"
 #include "WorldSession.h"
 #include "BigNumber.h"
 #include "SHA1.h"

@@ -9,6 +9,7 @@
 #include "WorldPacket.h"
 #include "WorldSession.h"
 #include "Opcodes.h"
+#include "GameTime.h"
 #include "Log.h"
 #include "World.h"
 #include "ObjectMgr.h"

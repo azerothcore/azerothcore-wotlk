@@ -7,6 +7,7 @@
 #include "MotionMaster.h"
 #include "CreatureAISelector.h"
 #include "Creature.h"
+#include "GameTime.h"
 
 #include "ConfusedMovementGenerator.h"
 #include "FleeingMovementGenerator.h"

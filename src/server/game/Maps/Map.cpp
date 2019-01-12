@@ -23,6 +23,7 @@
 #include "Vehicle.h"
 #include "VMapFactory.h"
 #include "LFGMgr.h"
+#include "GameTime.h"
 #include "Chat.h"
 #ifdef ELUNA
 #include "LuaEngine.h"

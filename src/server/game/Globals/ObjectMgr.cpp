@@ -11,6 +11,7 @@
 #include "Chat.h"
 #include "Common.h"
 #include "DatabaseEnv.h"
+#include "GameTime.h"
 #include "DisableMgr.h"
 #include "GameEventMgr.h"
 #include "GossipDef.h"

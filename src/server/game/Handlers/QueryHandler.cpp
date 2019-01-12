@@ -7,6 +7,7 @@
 #include "Common.h"
 #include "Language.h"
 #include "DatabaseEnv.h"
+#include "GameTime.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
 #include "Opcodes.h"

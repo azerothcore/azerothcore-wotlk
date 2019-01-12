@@ -13,6 +13,7 @@
 #include "Chat.h"
 #include "Common.h"
 #include "DatabaseEnv.h"
+#include "GameTime.h"
 #include "Group.h"
 #include "Guild.h"
 #include "GuildMgr.h"

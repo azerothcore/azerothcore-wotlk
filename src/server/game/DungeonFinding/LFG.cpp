@@ -7,7 +7,6 @@
 #include "LFG.h"
 #include "Language.h"
 #include "ObjectMgr.h"
-#include "GameTime.h"
 
 namespace lfg
 {
