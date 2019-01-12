@@ -224,7 +224,7 @@ public:
         return true;
     }
 
-    static bool HandleSpyStatusCommand(ChatHandler* handler, const char* args)
+    static bool HandleSpyStatusCommand(ChatHandler* handler, const char* /*args*/)
     {
         uint32 guidlow = handler->GetSession()->GetPlayer()->GetGUIDLow();
         std::map<uint32,uint32>::iterator next;
