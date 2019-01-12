@@ -533,6 +533,12 @@ void PoolGroup<Quest>::ReSpawn1Object(PoolObject* /*obj*/)
 ////////////////////////////////////////////////////////////
 // Methods of class PoolMgr
 
+PoolMgr* PoolMgr::instance()
+{
+    static PoolMgr instance;
+    return &instance;
+}
+
 PoolMgr::PoolMgr() : max_pool_id(0)
 {
 }

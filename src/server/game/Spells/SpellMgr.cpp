@@ -342,6 +342,12 @@ bool IsDiminishingReturnsGroupDurationLimited(DiminishingGroup group)
     }
 }
 
+SpellMgr* SpellMgr::instance()
+{
+    static SpellMgr instance;
+    return &instance;
+}
+
 SpellMgr::SpellMgr()
 {
 }

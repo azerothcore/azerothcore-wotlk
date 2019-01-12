@@ -572,6 +572,12 @@ uint32 Condition::GetMaxAvailableConditionTargets()
     }
 }
 
+ConditionMgr* ConditionMgr::instance()
+{
+    static ConditionMgr instance;
+    return &instance;
+}
+
 ConditionMgr::ConditionMgr()
 {
 }

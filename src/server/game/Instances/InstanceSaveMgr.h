@@ -8,7 +8,6 @@
 #define _INSTANCESAVEMGR_H
 
 #include "Define.h"
-#include <ace/Singleton.h>
 #include <ace/Null_Mutex.h>
 #include <ace/Thread_Mutex.h>
 #include <list>
@@ -98,7 +97,6 @@ typedef UNORDERED_MAP<uint32 /*PAIR32(map, difficulty)*/, time_t /*resetTime*/> 
 
 class InstanceSaveManager
 {
-    friend class ACE_Singleton<InstanceSaveManager, ACE_Thread_Mutex>;
     friend class InstanceSave;
 
     private:
@@ -106,6 +104,8 @@ class InstanceSaveManager
         ~InstanceSaveManager();
 
     public:
+        static InstanceSaveManager* instance();
+        
         typedef UNORDERED_MAP<uint32 /*InstanceId*/, InstanceSave*> InstanceSaveHashMap;
 
         struct InstResetEvent
@@ -189,5 +189,5 @@ class InstanceSaveManager
         ResetTimeQueue m_resetTimeQueue;
 };
 
-#define sInstanceSaveMgr ACE_Singleton<InstanceSaveManager, ACE_Thread_Mutex>::instance()
+#define sInstanceSaveMgr InstanceSaveManager::instance()
 #endif

@@ -458,6 +458,12 @@ bool AchievementCriteriaDataSet::Meets(Player const* source, Unit const* target,
     return true;
 }
 
+AchievementMgr* AchievementMgr::instance()
+{
+    static AchievementMgr instance;
+    return &instance;
+}
+
 AchievementMgr::AchievementMgr(Player* player)
 {
     m_player = player;

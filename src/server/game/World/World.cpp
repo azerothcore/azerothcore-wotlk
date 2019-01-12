@@ -90,6 +90,12 @@ float World::m_MaxVisibleDistanceOnContinents = DEFAULT_VISIBILITY_DISTANCE;
 float World::m_MaxVisibleDistanceInInstances  = DEFAULT_VISIBILITY_INSTANCE;
 float World::m_MaxVisibleDistanceInBGArenas   = DEFAULT_VISIBILITY_BGARENAS;
 
+World* World::instance()
+{
+    static World instance;
+    return &instance;
+}
+
 /// World constructor
 World::World()
 {

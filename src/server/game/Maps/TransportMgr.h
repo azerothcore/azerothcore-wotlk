@@ -7,7 +7,6 @@
 #ifndef TRANSPORTMGR_H
 #define TRANSPORTMGR_H
 
-#include <ace/Singleton.h>
 #include <G3D/Quat.h>
 #include "Spline.h"
 #include "DBCStores.h"
@@ -89,10 +88,11 @@ typedef std::map<uint32, TransportAnimation> TransportAnimationContainer;
 
 class TransportMgr
 {
-        friend class ACE_Singleton<TransportMgr, ACE_Thread_Mutex>;
         friend void LoadDBCStores(std::string const&);
 
     public:
+        static TransportMgr* instance();
+        
         void Unload();
 
         void LoadTransportTemplates();
@@ -148,6 +148,6 @@ class TransportMgr
         TransportAnimationContainer _transportAnimations;
 };
 
-#define sTransportMgr ACE_Singleton<TransportMgr, ACE_Thread_Mutex>::instance()
+#define sTransportMgr TransportMgr::instance()
 
 #endif // TRANSPORTMGR_H

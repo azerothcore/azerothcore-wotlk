@@ -10,6 +10,12 @@
 #include "World.h"
 #include "DBCStores.h"
 
+GroupMgr* GroupMgr::instance()
+{
+    static GroupMgr instance;
+    return &instance;
+}
+
 GroupMgr::GroupMgr()
 {
     _nextGroupId = 0;

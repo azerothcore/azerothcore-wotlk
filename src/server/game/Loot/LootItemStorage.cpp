@@ -8,6 +8,12 @@ Xinef
 #include "PreparedStatement.h"
 #include "ObjectMgr.h"
 
+LootItemStorage* LootItemStorage::instance()
+{
+    static LootItemStorage instance;
+    return &instance;
+}
+
 LootItemStorage::LootItemStorage()
 {
 }

@@ -203,6 +203,12 @@ class ReactorRunnable : protected ACE_Task_Base
         ACE_Thread_Mutex m_NewSockets_Lock;
 };
 
+WorldSocketMgr* WorldSocketMgr::instance()
+{
+    static WorldSocketMgr instance;
+    return &instance;
+}
+
 WorldSocketMgr::WorldSocketMgr() :
     m_NetThreads(0),
     m_NetThreadsCount(0),

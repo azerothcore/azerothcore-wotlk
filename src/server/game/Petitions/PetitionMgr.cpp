@@ -8,6 +8,11 @@ Xinef
 #include "Log.h"
 #include "DatabaseEnv.h"
 
+PetitionMgr* PetitionMgr::instance()
+{
+    static PetitionMgr instance;
+    return &instance;
+}
 
 PetitionMgr::PetitionMgr()
 {

@@ -10,6 +10,12 @@
 #include "MapManager.h"
 #include "Log.h"
 
+WaypointMgr* WaypointMgr::instance()
+{
+    static WaypointMgr instance;
+    return &instance;
+}
+
 WaypointMgr::WaypointMgr()
 {
 }

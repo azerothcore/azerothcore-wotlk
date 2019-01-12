@@ -21,6 +21,12 @@ TransportTemplate::~TransportTemplate()
         delete *itr;
 }
 
+TransportMgr* TransportMgr::instance()
+{
+    static TransportMgr instance;
+    return &instance;
+}
+
 TransportMgr::TransportMgr() { }
 
 TransportMgr::~TransportMgr() { }

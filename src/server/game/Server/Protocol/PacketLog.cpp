@@ -9,6 +9,12 @@
 #include "ByteBuffer.h"
 #include "WorldPacket.h"
 
+PacketLog* PacketLog::instance()
+{
+    static PacketLog instance;
+    return &instance;
+}
+
 PacketLog::PacketLog() : _file(NULL)
 {
     Initialize();

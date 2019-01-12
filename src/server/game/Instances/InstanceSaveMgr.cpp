@@ -27,6 +27,12 @@ uint16 InstanceSaveManager::ResetTimeDelay[] = {3600, 900, 300, 60, 0};
 PlayerBindStorage InstanceSaveManager::playerBindStorage;
 BoundInstancesMap InstanceSaveManager::emptyBoundInstancesMap;
 
+InstanceSaveManager* InstanceSaveManager::instance()
+{
+    static InstanceSaveManager instance;
+    return &instance;
+}
+
 InstanceSaveManager::~InstanceSaveManager()
 {
     lock_instLists = true;

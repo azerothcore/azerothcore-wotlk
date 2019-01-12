@@ -10,6 +10,12 @@
 #include "Opcodes.h"
 #include "Log.h"
 
+AddonHandler* AddonHandler::instance()
+{
+    static AddonHandler instance;
+    return &instance;
+}
+
 AddonHandler::AddonHandler()
 {
 }

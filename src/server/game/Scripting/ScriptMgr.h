@@ -8,7 +8,6 @@
 #define SC_SCRIPTMGR_H
 
 #include "Common.h"
-#include <ace/Singleton.h>
 #include <atomic>
 
 #include "ObjectMgr.h"
@@ -1089,12 +1088,11 @@ class ModuleScript : public ScriptObject
 };
 
 // Placed here due to ScriptRegistry::AddScript dependency.
-#define sScriptMgr ACE_Singleton<ScriptMgr, ACE_Null_Mutex>::instance()
+#define sScriptMgr ScriptMgr::instance()
 
 // Manages registration, loading, and execution of scripts.
 class ScriptMgr
 {
-    friend class ACE_Singleton<ScriptMgr, ACE_Null_Mutex>;
     friend class ScriptObject;
 
     private:
@@ -1103,6 +1101,8 @@ class ScriptMgr
         virtual ~ScriptMgr();
 
     public: /* Initialization */
+
+        static ScriptMgr* instance();
 
         void Initialize();
         void LoadDatabase();

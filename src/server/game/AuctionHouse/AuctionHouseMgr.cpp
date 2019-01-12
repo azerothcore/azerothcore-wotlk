@@ -27,6 +27,12 @@ enum eAuctionHouse
     AH_MINIMUM_DEPOSIT = 100,
 };
 
+AuctionHouseMgr* AuctionHouseMgr::instance()
+{
+    static AuctionHouseMgr instance;
+    return &instance;
+}
+
 AuctionHouseMgr::AuctionHouseMgr()
 {
 }

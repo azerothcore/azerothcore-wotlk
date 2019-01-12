@@ -19,13 +19,22 @@ ChannelMgr::~ChannelMgr()
 ChannelMgr* ChannelMgr::forTeam(TeamId teamId)
 {
     if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_CHANNEL))
-        return ACE_Singleton<AllianceChannelMgr, ACE_Null_Mutex>::instance();        // cross-faction
+    {
+        static AllianceChannelMgr instance;
+        return &instance;
+    }
 
     if (teamId == TEAM_ALLIANCE)
-        return ACE_Singleton<AllianceChannelMgr, ACE_Null_Mutex>::instance();
+    {
+        static AllianceChannelMgr instance;
+        return &instance;
+    }
 
     if (teamId == TEAM_HORDE)
-        return ACE_Singleton<HordeChannelMgr, ACE_Null_Mutex>::instance();
+    {
+        static HordeChannelMgr instance;
+        return &instance;
+    }
 
     return NULL;
 }

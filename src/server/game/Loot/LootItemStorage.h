@@ -30,13 +30,13 @@ typedef UNORDERED_MAP<uint32, StoredLootItemList> LootItemContainer;
 
 class LootItemStorage
 {
-    friend class ACE_Singleton<LootItemStorage, ACE_Thread_Mutex>;
-
     private:
         LootItemStorage();
         ~LootItemStorage();
 
     public:
+        static LootItemStorage* instance();
+        
         void LoadStorageFromDB();
         void RemoveEntryFromDB(uint32 containerId, uint32 itemid, uint32 count);
 
@@ -51,5 +51,5 @@ class LootItemStorage
         LootItemContainer lootItemStore;
 };
 
-#define sLootItemStorage ACE_Singleton<LootItemStorage, ACE_Thread_Mutex>::instance()
+#define sLootItemStorage LootItemStorage::instance()
 #endif

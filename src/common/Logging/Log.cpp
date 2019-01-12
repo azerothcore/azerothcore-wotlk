@@ -18,6 +18,12 @@ extern LoginDatabaseWorkerPool LoginDatabase;
 #include <stdio.h>
 #include <ace/Stack_Trace.h>
 
+Log* Log::instance()
+{
+    static Log instance;
+    return &instance;
+}
+
 Log::Log() :
     raLogfile(NULL), logfile(NULL), gmLogfile(NULL), charLogfile(NULL),
     dberLogfile(NULL), chatLogfile(NULL), sqlLogFile(NULL), sqlDevLogFile(NULL), miscLogFile(NULL),

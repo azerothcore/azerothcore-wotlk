@@ -27,6 +27,12 @@
 
 #include <cmath>
 
+ObjectAccessor* ObjectAccessor::instance()
+{
+    static ObjectAccessor instance;
+    return &instance;
+}
+
 ObjectAccessor::ObjectAccessor()
 {
 }

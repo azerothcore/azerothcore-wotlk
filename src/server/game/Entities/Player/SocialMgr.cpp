@@ -188,6 +188,12 @@ bool PlayerSocial::HasIgnore(uint32 ignore_guid) const
     return false;
 }
 
+SocialMgr* SocialMgr::instance()
+{
+    static SocialMgr instance;
+    return &instance;
+}
+
 SocialMgr::SocialMgr()
 {
 }

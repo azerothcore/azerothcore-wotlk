@@ -31,6 +31,12 @@
 #include "LuaEngine.h"
 #endif
 
+MapManager* MapManager::instance()
+{
+    static MapManager instance;
+    return &instance;
+}
+
 MapManager::MapManager()
 {
     i_timer[3].SetInterval(sWorld->getIntConfig(CONFIG_INTERVAL_MAPUPDATE));

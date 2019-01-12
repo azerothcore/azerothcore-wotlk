@@ -13,6 +13,12 @@
 #include "WardenCheckMgr.h"
 #include "Warden.h"
 
+WardenCheckMgr* WardenCheckMgr::instance()
+{
+    static WardenCheckMgr instance;
+    return &instance;
+}
+
 WardenCheckMgr::WardenCheckMgr()
 {
 }

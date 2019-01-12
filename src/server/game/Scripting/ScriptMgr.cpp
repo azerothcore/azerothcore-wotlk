@@ -159,6 +159,12 @@ class ScriptRegistry
         static uint32 _scriptIdCounter;
 };*/
 
+ScriptMgr* ScriptMgr::instance()
+{
+    static ScriptMgr instance;
+    return &instance;
+}
+
 ScriptMgr::ScriptMgr()
     : _scriptCount(0), _scheduledScripts(0)
 {

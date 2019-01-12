@@ -11,6 +11,12 @@
 #include "CreatureAI.h"
 #include "MoveSplineInit.h"
 
+FormationMgr* FormationMgr::instance()
+{
+    static FormationMgr instance;
+    return &instance;
+}
+
 FormationMgr::~FormationMgr()
 {
     for (CreatureGroupInfoType::iterator itr = CreatureGroupMap.begin(); itr != CreatureGroupMap.end(); ++itr)

@@ -6,7 +6,6 @@ Xinef
 #define _PETITIONMGR_H
 
 #include "Common.h"
-#include <ace/Singleton.h>
 
 typedef std::map<uint32, uint32> SignatureMap;
 
@@ -29,13 +28,13 @@ typedef std::map<uint32, Petition> PetitionContainer;
 
 class PetitionMgr
 {
-    friend class ACE_Singleton<PetitionMgr, ACE_Thread_Mutex>;
-
     private:
         PetitionMgr();
         ~PetitionMgr();
 
     public:
+        static PetitionMgr* instance();
+        
         void LoadPetitions();
         void LoadSignatures();
         
@@ -59,5 +58,5 @@ class PetitionMgr
         SignatureContainer SignatureStore;
 };
 
-#define sPetitionMgr ACE_Singleton<PetitionMgr, ACE_Thread_Mutex>::instance()
+#define sPetitionMgr PetitionMgr::instance()
 #endif

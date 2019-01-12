@@ -14,6 +14,12 @@
 #include "Player.h"
 #include "ScriptMgr.h"
 
+ArenaTeamMgr* ArenaTeamMgr::instance()
+{
+    static ArenaTeamMgr instance;
+    return &instance;
+}
+
 ArenaTeamMgr::ArenaTeamMgr()
 {
     NextArenaTeamId = 1;

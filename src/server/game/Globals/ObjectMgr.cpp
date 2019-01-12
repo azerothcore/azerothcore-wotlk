@@ -215,6 +215,12 @@ bool SpellClickInfo::IsFitToRequirements(Unit const* clicker, Unit const* clicke
     return true;
 }
 
+ObjectMgr* ObjectMgr::instance()
+{
+    static ObjectMgr instance;
+    return &instance;
+}
+
 ObjectMgr::ObjectMgr():
     _auctionId(1),
     _equipmentSetGuid(1),

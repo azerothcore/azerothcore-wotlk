@@ -13,7 +13,6 @@
 
 #include "Common.h"
 #include "Timer.h"
-#include <ace/Singleton.h>
 #include <ace/Atomic_Op.h>
 #include "SharedDefines.h"
 #include "QueryResult.h"
@@ -551,6 +550,8 @@ class World
         World();
         ~World();
 
+        static World* instance();
+        
         WorldSession* FindSession(uint32 id) const;
         WorldSession* FindOfflineSession(uint32 id) const;
         WorldSession* FindOfflineSessionForCharacterGUID(uint32 guidLow) const;
@@ -891,6 +892,6 @@ class World
         std::string m_configFileList;
 };
 
-#define sWorld ACE_Singleton<World, ACE_Null_Mutex>::instance()
+#define sWorld World::instance()
 #endif
 /// @}

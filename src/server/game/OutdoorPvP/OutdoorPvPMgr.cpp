@@ -10,6 +10,12 @@
 #include "DisableMgr.h"
 #include "ScriptMgr.h"
 
+OutdoorPvPMgr* OutdoorPvPMgr::instance()
+{
+    static OutdoorPvPMgr instance;
+    return &instance;
+}
+
 OutdoorPvPMgr::OutdoorPvPMgr()
 {
     m_UpdateTimer = 0;

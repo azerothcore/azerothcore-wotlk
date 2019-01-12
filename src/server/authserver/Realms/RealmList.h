@@ -7,7 +7,6 @@
 #ifndef _REALMLIST_H
 #define _REALMLIST_H
 
-#include <ace/Singleton.h>
 #include <ace/Null_Mutex.h>
 #include <ace/INET_Addr.h>
 #include "Common.h"
@@ -45,6 +44,8 @@ struct Realm
 class RealmList
 {
 public:
+    static RealmList* instance();
+    
     typedef std::map<std::string, Realm> RealmMap;
 
     RealmList();
@@ -69,5 +70,5 @@ private:
     time_t   m_NextUpdateTime;
 };
 
-#define sRealmList ACE_Singleton<RealmList, ACE_Null_Mutex>::instance()
+#define sRealmList RealmList::instance()
 #endif

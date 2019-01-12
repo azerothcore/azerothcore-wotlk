@@ -7,6 +7,12 @@
 #include "Common.h"
 #include "GuildMgr.h"
 
+GuildMgr* GuildMgr::instance()
+{
+    static GuildMgr instance;
+    return &instance;
+}
+
 GuildMgr::GuildMgr() : NextGuildId(1)
 { }
 

@@ -12,7 +12,6 @@
 #include "Battleground.h"
 #include "BattlegroundQueue.h"
 #include "CreatureAIImpl.h"
-#include <ace/Singleton.h>
 
 typedef std::map<uint32, Battleground*> BattlegroundContainer;
 typedef UNORDERED_MAP<uint32, BattlegroundTypeId> BattleMastersMap;
@@ -59,13 +58,13 @@ class RandomBattlegroundSystem
 
 class BattlegroundMgr
 {
-    friend class ACE_Singleton<BattlegroundMgr, ACE_Null_Mutex>;
-
     private:
         BattlegroundMgr();
         ~BattlegroundMgr();
 
     public:
+        static BattlegroundMgr* instance();
+        
         void Update(uint32 diff);
 
         /* Packet Building */
@@ -153,5 +152,5 @@ class BattlegroundMgr
         BattleMastersMap mBattleMastersMap;
 };
 
-#define sBattlegroundMgr ACE_Singleton<BattlegroundMgr, ACE_Null_Mutex>::instance()
+#define sBattlegroundMgr BattlegroundMgr::instance()
 #endif

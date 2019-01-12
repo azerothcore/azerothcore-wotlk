@@ -22,6 +22,12 @@ CalendarEvent::~CalendarEvent()
     sCalendarMgr->FreeEventId(_eventId);
 }
 
+CalendarMgr* CalendarMgr::instance()
+{
+    static CalendarMgr instance;
+    return &instance;
+}
+
 CalendarMgr::CalendarMgr() : _maxEventId(0), _maxInviteId(0) { }
 
 CalendarMgr::~CalendarMgr()
