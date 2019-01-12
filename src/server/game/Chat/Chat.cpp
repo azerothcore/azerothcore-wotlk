@@ -59,7 +59,7 @@ std::vector<ChatCommand> const& ChatHandler::getCommandTable()
     return commandTableCache;
 }
 
-std::string ChatHandler::PGetParseString(int32 entry, ...) const
+std::string ChatHandler::PGetParseString(uint32 entry, ...) const
 {
     const char *format = GetTrinityString(entry);
     char str[1024];
@@ -70,7 +70,7 @@ std::string ChatHandler::PGetParseString(int32 entry, ...) const
     return std::string(str);
 }
 
-const char *ChatHandler::GetTrinityString(int32 entry) const
+char const* ChatHandler::GetTrinityString(uint32 entry) const
 {
     return m_session->GetTrinityString(entry);
 }
@@ -209,12 +209,12 @@ void ChatHandler::SendGlobalGMSysMessage(const char *str)
     free(buf);
 }
 
-void ChatHandler::SendSysMessage(int32 entry)
+void ChatHandler::SendSysMessage(uint32 entry)
 {
     SendSysMessage(GetTrinityString(entry));
 }
 
-void ChatHandler::PSendSysMessage(int32 entry, ...)
+void ChatHandler::PSendSysMessage(uint32 entry, ...)
 {
     const char *format = GetTrinityString(entry);
     va_list ap;
@@ -1217,7 +1217,7 @@ std::string ChatHandler::GetNameLink(Player* chr) const
     return playerLink(chr->GetName());
 }
 
-const char *CliHandler::GetTrinityString(int32 entry) const
+char const* CliHandler::GetTrinityString(uint32 entry) const
 {
     return sObjectMgr->GetTrinityStringForDBCLocale(entry);
 }
