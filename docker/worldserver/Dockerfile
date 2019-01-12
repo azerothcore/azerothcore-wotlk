@@ -8,4 +8,4 @@ RUN apt update && apt install -y libmysqlclient-dev libssl-dev libace-6.* libace
     rm /azeroth-server/etc/authserver.conf.dist; \
     mkdir /azeroth-server/logs;
 
-CMD  azeroth-server/bin/worldserver
+CMD ["/azeroth-server/bin/worldserver"]
