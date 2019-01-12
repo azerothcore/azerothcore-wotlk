@@ -58,7 +58,13 @@ Where:
 
 `azerothcore/database` will be the name of your docker image.
 
+When the container is ready, you will see a message similar to:
+
+> Version: '5.7.24'  socket: '/var/run/mysqld/mysqld.sock'  port: 3306  MySQL Community Server (GPL)
+
 You can optionally pass option `-d` to detach the container run from your terminal.
+
+You can optionally pass option `-it` to run the container as an interactive process (so you can kill it with ctrl+c).
 
 *For more information about the `docker run` command, check the [docker run doc](https://docs.docker.com/engine/reference/run/).*
 
