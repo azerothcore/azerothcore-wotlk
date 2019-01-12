@@ -6,7 +6,7 @@ This provides a way to launch a container with the AzerothCore authserver runnin
 
 - You need to have [Docker](https://docs.docker.com/install/) installed in your system. You can install it on any operating system.
 
-- You need to first build the [AzerothCore Build Image](https://github.com/FrancescoBorzi/azerothcore-wotlk/tree/docker-server/docker/build).
+- You need to first build the [AzerothCore Build Image](https://github.com/azerothcore/azerothcore-wotlk/tree/master/docker/build).
 
 - You have to copy the file `docker/worldserver/worldserver.conf.dist` and rename the copied file to `docker/worldserver/worldserver.conf`. Then open it and change the values where needed (you may need to change the DB port).
 
