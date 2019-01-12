@@ -76,10 +76,11 @@
 #include <algorithm>
 #include <vector>
 
+#include "Debugging/Errors.h"
+
 #include "Threading/LockedQueue.h"
 #include "Threading/Threading.h"
 
-#include <ace/Basic_Types.h>
 #include <ace/Guard_T.h>
 #include <ace/RW_Thread_Mutex.h>
 #include <ace/Thread_Mutex.h>
