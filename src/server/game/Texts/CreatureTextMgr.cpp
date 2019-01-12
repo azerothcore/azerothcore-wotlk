@@ -155,27 +155,31 @@ void CreatureTextMgr::LoadCreatureTextLocales()
 
     mLocaleTextMap.clear(); // for reload case
 
-    QueryResult result = WorldDatabase.Query("SELECT entry, groupid, id, text_loc1, text_loc2, text_loc3, text_loc4, text_loc5, text_loc6, text_loc7, text_loc8 FROM locales_creature_text");
+    QueryResult result = WorldDatabase.Query("SELECT CreatureId, GroupId, ID, Locale, Text FROM creature_text_locale");
 
     if (!result)
         return;
 
-    uint32 textCount = 0;
-
     do
     {
         Field* fields = result->Fetch();
-        CreatureTextLocale& loc = mLocaleTextMap[CreatureTextId(fields[0].GetUInt32(), uint32(fields[1].GetUInt8()), uint32(fields[2].GetUInt8()))];
-        for (uint8 i = 1; i < TOTAL_LOCALES; ++i)
-        {
-            LocaleConstant locale = LocaleConstant(i);
-            ObjectMgr::AddLocaleString(fields[3 + i - 1].GetString(), locale, loc.Text);
-        }
 
-        ++textCount;
+        uint32 CreatureId           = fields[0].GetUInt32();
+        uint32 GroupId              = fields[1].GetUInt8();
+        uint32 ID                   = fields[2].GetUInt8();
+        std::string LocaleName      = fields[3].GetString();
+        std::string Text            = fields[4].GetString();
+
+        CreatureTextLocale& data = mLocaleTextMap[CreatureTextId(CreatureId, GroupId, ID)];
+        LocaleConstant locale = GetLocaleByName(LocaleName);
+        if (locale == LOCALE_enUS)
+            continue;
+
+        ObjectMgr::AddLocaleString(Text, locale, data.Text);
+
     } while (result->NextRow());
 
-    sLog->outString(">> Loaded %u creature localized texts in %u ms", textCount, GetMSTimeDiffToNow(oldMSTime));
+    sLog->outString(">> Loaded %u Creature Text Locale in %u ms", uint32(mLocaleTextMap.size()), GetMSTimeDiffToNow(oldMSTime));
     sLog->outString();
 }
 
@@ -468,17 +472,21 @@ std::string CreatureTextMgr::GetLocalizedChatString(uint32 entry, uint8 gender, 
 
     if (locale > MAX_LOCALES)
         locale = DEFAULT_LOCALE;
+
     std::string baseText = "";
+
     BroadcastText const* bct = sObjectMgr->GetBroadcastText(groupItr->BroadcastTextId);
     if (bct)
         baseText = bct->GetText(locale, gender);
     else
         baseText = groupItr->text;
+
     if (locale != DEFAULT_LOCALE && !bct)
     {
         LocaleCreatureTextMap::const_iterator locItr = mLocaleTextMap.find(CreatureTextId(entry, uint32(textGroup), id));
         if (locItr != mLocaleTextMap.end())
             ObjectMgr::GetLocaleString(locItr->second.Text, locale, baseText);
     }
+
     return baseText;
 }

@@ -651,9 +651,9 @@ class World
         void LoadConfigSettings(bool reload = false);
         void LoadModuleConfigSettings();
 
-        void SendWorldText(int32 string_id, ...);
+        void SendWorldText(uint32 string_id, ...);
         void SendGlobalText(const char* text, WorldSession* self);
-        void SendGMText(int32 string_id, ...);
+        void SendGMText(uint32 string_id, ...);
         void SendGlobalMessage(WorldPacket* packet, WorldSession* self = 0, TeamId teamId = TEAM_NEUTRAL);
         void SendGlobalGMMessage(WorldPacket* packet, WorldSession* self = 0, TeamId teamId = TEAM_NEUTRAL);
         bool SendZoneMessage(uint32 zone, WorldPacket* packet, WorldSession* self = 0, TeamId teamId = TEAM_NEUTRAL);
