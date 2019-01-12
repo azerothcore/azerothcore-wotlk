@@ -10,7 +10,7 @@ The **only** requirement is having Docker installed into your system. Forget abo
 
 ### Installation instructions
 
-To install AzerothCore using Docker, you have to:
+To install AzerothCore using Docker, you have to follow these steps (**respecting the order**):
 
 1) Install [Docker](https://docs.docker.com/install/).
 
