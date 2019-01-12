@@ -6,6 +6,8 @@ Docker. is a software that performs operating-system-level virtualization, allow
 
 Thanks to Docker, you can quickly setup and run AzerothCore in any operating system.
 
+The **only** requirement is having Docker installed into your system. Forget about installing mysql, visual studio, cmake, etc...
+
 ### Installation instructions
 
 To install AzerothCore using Docker, you have to:
