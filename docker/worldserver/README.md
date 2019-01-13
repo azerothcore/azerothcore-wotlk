@@ -8,6 +8,8 @@ This provides a way to launch a container with the AzerothCore authserver runnin
 
 - You need to first build the [AzerothCore Build Image](https://github.com/azerothcore/azerothcore-wotlk/tree/master/docker/build).
 
+- If you haven't created a docker network yet, create it by simply using `docker network create ac-network`.
+
 - You have to copy the file `docker/worldserver/worldserver.conf.dockerdist` and rename the copied file to `docker/worldserver/worldserver.conf`. Then open it and change the values where needed (you may need to change the DB port).
 
 - You need to have the **data files** somewhere in your system. If you don't have them yet, check the step ["Download the data files" from the installation guide](https://github.com/AzerothCore/azerothcore-wotlk/wiki/Installation#5-download-the-data-files).
@@ -25,11 +27,12 @@ To build the container image you have to be in the **main** folder of your local
 Replace `/path/to/your/data` with the path of where your data folder is.
 
 ```
-docker run --name azt-worldserver \
-    --mount type=bind,source=/mnt/70DD9E0635B3A813/azeroth-server/data,target=/azeroth-server/data \
+docker run --name ac-world-container \
+    --mount type=bind,source=/path/to/your/data,target=/azeroth-server/data \
     --mount type=bind,source="$(pwd)"/docker/worldserver/etc/,target=/azeroth-server/etc \
     --mount type=bind,source="$(pwd)"/docker/worldserver/logs/,target=/azeroth-server/logs \
-    --network host \
+    -p 127.0.0.1:8085:8085 \
+    --network ac-network \
     -it azerothcore/worldserver
 ```
 
