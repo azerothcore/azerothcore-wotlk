@@ -28,7 +28,7 @@ Replace `/path/to/your/data` with the path of where your data folder is.
 
 ```
 docker run --name ac-world-container \
-    --mount type=bind,source=/mnt/70DD9E0635B3A813/azeroth-server/data,target=/azeroth-server/data \
+    --mount type=bind,source=/path/to/your/data,target=/azeroth-server/data \
     --mount type=bind,source="$(pwd)"/docker/worldserver/etc/,target=/azeroth-server/etc \
     --mount type=bind,source="$(pwd)"/docker/worldserver/logs/,target=/azeroth-server/logs \
     -p 127.0.0.1:8085:8085 \
