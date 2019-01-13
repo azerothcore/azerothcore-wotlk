@@ -1,0 +1,16 @@
+################################################
+# AzerothCore World Server configuration file #
+################################################
+[worldserver]
+
+# Do not change those
+LogsDir = "/azeroth-server/logs"
+DataDir = "/azeroth-server/data"
+
+# Change those configuration accordingly with your setup
+LoginDatabaseInfo     = "127.0.0.1;3600;root;password;acore_auth"
+WorldDatabaseInfo     = "127.0.0.1;3600;root;password;acore_world"
+CharacterDatabaseInfo = "127.0.0.1;3600;root;password;acore_characters"
+
+# Add more configuration overwrites
+LogLevel = 2
