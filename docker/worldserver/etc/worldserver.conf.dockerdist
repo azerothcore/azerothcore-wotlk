@@ -4,7 +4,7 @@
 [worldserver]
 
 # Do not change those
-LogsDir = "/azeroth-server/etc/logs"
+LogsDir = "/azeroth-server/logs"
 DataDir = "/azeroth-server/data"
 
 # Change those configuration accordingly with your setup
