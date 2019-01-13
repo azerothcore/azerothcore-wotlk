@@ -1,7 +1,7 @@
 INSERT INTO version_db_world (`sql_rev`) VALUES ('1546933586341240000');
 
 -- Ulag the cleaver SAI
-SET @OGUID  =1532;
+SET @OGUID  =195629;
 DELETE FROM `gameobject` WHERE `guid`=@OGUID;
 INSERT INTO `gameobject` (`guid`,`id`,`map`,`spawnMask`,`phaseMask`,`position_x`,`position_y`,`position_z`,`orientation`,`spawntimesecs`,`animprogress`,`state`, `rotation2`, `rotation3`) VALUES
 (@OGUID,103813,0,1,1,2388.808, 338.269, 37.013, 2.242750, 10, 255,1, -0.891996, -0.452044);
