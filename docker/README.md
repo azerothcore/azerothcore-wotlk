@@ -14,13 +14,15 @@ To install AzerothCore using Docker, you have to follow these steps (**respectin
 
 1) Install [Docker](https://docs.docker.com/install/).
 
-2) Launch one instance of the [AzerothCore Dockerized Database](https://github.com/azerothcore/azerothcore-wotlk/tree/master/docker/database)
+2) Create a Docker Network: `docker network create ac-network`. All your docker containers will use it to communicate to each other.
 
-3) Create an image of the [AzerothCore Dockerized Build](https://github.com/azerothcore/azerothcore-wotlk/tree/master/docker/build)
+3) Launch one instance of the [AzerothCore Dockerized Database](https://github.com/azerothcore/azerothcore-wotlk/tree/master/docker/database)
 
-4) Launch one instance of the [AzerothCore Dockerized Authserver](https://github.com/azerothcore/azerothcore-wotlk/tree/master/docker/authserver)
+4) Create an image of the [AzerothCore Dockerized Build](https://github.com/azerothcore/azerothcore-wotlk/tree/master/docker/build)
 
-5)  Launch one instance of the [AzerothCore Dockerized Worldserver](https://github.com/azerothcore/azerothcore-wotlk/tree/master/docker/worldserver)
+5) Launch one instance of the [AzerothCore Dockerized Authserver](https://github.com/azerothcore/azerothcore-wotlk/tree/master/docker/authserver)
+
+6)  Launch one instance of the [AzerothCore Dockerized Worldserver](https://github.com/azerothcore/azerothcore-wotlk/tree/master/docker/worldserver)
 
 
 ### Memory usage
