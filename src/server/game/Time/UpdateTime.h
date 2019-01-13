@@ -7,6 +7,8 @@
 #ifndef __UPDATETIME_H
 #define __UPDATETIME_H
 
+#include <array>
+
 #include "Define.h"
 
 #define AVG_DIFF_COUNT 500
