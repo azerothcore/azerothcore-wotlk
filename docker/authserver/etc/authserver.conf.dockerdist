@@ -4,7 +4,7 @@
 [authserver]
 
 # Do not change this
-LogsDir = "/azeroth-server/etc/logs"
+LogsDir = "/azeroth-server/logs"
 
 # Change this configuration accordingly with your setup
 LoginDatabaseInfo = "127.0.0.1;3600;root;password;acore_auth"
