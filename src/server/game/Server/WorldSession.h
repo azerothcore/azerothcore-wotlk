@@ -341,7 +341,7 @@ class WorldSession
         // Locales
         LocaleConstant GetSessionDbcLocale() const { return m_sessionDbcLocale; }
         LocaleConstant GetSessionDbLocaleIndex() const { return m_sessionDbLocaleIndex; }
-        const char *GetTrinityString(int32 entry) const;
+        char const* GetTrinityString(uint32 entry) const;
 
         uint32 GetLatency() const { return m_latency; }
         void SetLatency(uint32 latency) { m_latency = latency; }
@@ -355,9 +355,12 @@ class WorldSession
             else
                 m_timeOutTime -= diff;
         }
-        void ResetTimeOutTime()
+        void ResetTimeOutTime(bool onlyActive)
         {
-            m_timeOutTime = sWorld->getIntConfig(CONFIG_SOCKET_TIMEOUTTIME);
+            if (GetPlayer())
+                m_timeOutTime = int32(sWorld->getIntConfig(CONFIG_SOCKET_TIMEOUTTIME_ACTIVE));
+            else if (!onlyActive)
+                m_timeOutTime = int32(sWorld->getIntConfig(CONFIG_SOCKET_TIMEOUTTIME));
         }
         bool IsConnectionIdle() const
         {

@@ -911,7 +911,7 @@ class BattlegroundIC : public Battleground
         void EventPlayerDamagedGO(Player* /*player*/, GameObject* go, uint32 eventType);
         void DestroyGate(Player* player, GameObject* go);
 
-        WorldSafeLocsEntry const* GetClosestGraveyard(Player* player);
+        GraveyardStruct const* GetClosestGraveyard(Player* player);
 
         /* Scorekeeping */
         void UpdatePlayerScore(Player* player, uint32 type, uint32 value, bool doAddHonor = true);

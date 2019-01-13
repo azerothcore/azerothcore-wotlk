@@ -12,6 +12,11 @@ modules/*
 !modules/*.sh
 build*/
 var/*
+docker/authserver/etc/authserver.conf
+docker/worldserver/etc/worldserver.conf
+docker/authserver/logs/
+docker/worldserver/logs/
+!docker/build
 
 !.gitkeep
 
