@@ -5846,6 +5846,7 @@ void SpellMgr::LoadDbcDataCorrections()
             spellInfo->Effect[1] = SPELL_EFFECT_DUMMY;
             spellInfo->EffectRadiusIndex[1] = spellInfo->EffectRadiusIndex[0];
             spellInfo->EffectImplicitTargetA[1] = TARGET_UNIT_DEST_AREA_ENTRY;
+			spellInfo->AttributesEx4 &= ~SPELL_ATTR4_CAN_CAST_WHILE_CASTING;
             break;
         // Still At It (12644)
         case 51931:
