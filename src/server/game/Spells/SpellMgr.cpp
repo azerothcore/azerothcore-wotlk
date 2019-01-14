@@ -5717,6 +5717,7 @@ void SpellMgr::LoadDbcDataCorrections()
         case 69030: // Val'kyr Target Search
             spellInfo->EffectRadiusIndex[0] = EFFECT_RADIUS_200_YARDS;   // 200yd
             spellInfo->EffectRadiusIndex[1] = EFFECT_RADIUS_200_YARDS;   // 200yd
+            spellInfo->Attributes |= SPELL_ATTR0_UNAFFECTED_BY_INVULNERABILITY;
             break;
         case 73654: // Harvest Souls
         case 74295: // Harvest Souls
@@ -5845,6 +5846,7 @@ void SpellMgr::LoadDbcDataCorrections()
             spellInfo->Effect[1] = SPELL_EFFECT_DUMMY;
             spellInfo->EffectRadiusIndex[1] = spellInfo->EffectRadiusIndex[0];
             spellInfo->EffectImplicitTargetA[1] = TARGET_UNIT_DEST_AREA_ENTRY;
+			spellInfo->AttributesEx4 &= ~SPELL_ATTR4_CAN_CAST_WHILE_CASTING;
             break;
         // Still At It (12644)
         case 51931:

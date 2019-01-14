@@ -1,0 +1,19 @@
+###############################################
+# AzerothCore Auth Server configuration file #
+###############################################
+[authserver]
+
+# Do not change this
+LogsDir = "/azeroth-server/logs" # will reflect on your host directory: docker/worldserver/logs
+
+# Change this configuration accordingly with your docker setup
+# The format is "hostname;port;username;password;database":
+# - docker containers must be on the same docker network to be able to communicate
+# - the DB hostname will be the name of the database docker container
+LoginDatabaseInfo = "ac-db-container;3306;root;password;acore_auth"
+
+# Add more configuration overwrites by copying settings from from authserver.conf.dist
+LogLevel = 3
+SQLDriverLogFile = "SQLDriver.log"
+SQLDriverQueryLogging = 1
+
