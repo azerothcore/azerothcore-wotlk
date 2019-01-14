@@ -37,7 +37,6 @@ install:
   - echo "DB_WORLD_CONF=\"MYSQL_USER='root'; MYSQL_PASS=''; MYSQL_HOST='127.0.0.1';\"" >> conf/config.sh  
   # create and import mysql
   - mysql -e "SET GLOBAL sql_mode = '';" # this is necessary because of mysql 5.7
-  - mysql -e "SET GLOBAL max_allowed_packet=128*1024*1024;"
   - bash ./acore.sh "db-assembler" "import-all"
 
 script:
