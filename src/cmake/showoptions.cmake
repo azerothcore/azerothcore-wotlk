@@ -66,10 +66,10 @@ else()
 endif()
 
 if( MARIADB )
-  message("* Build with MariaDB 10.2+ Support  : Yes")
+  message("* Enable MariaDB 10.2+ support    : Yes")
   add_definitions(-DMARIADB)
 else()
-  message("* Build with MariaDB 10.2+ Support  : No (default)")
+  message("* Enable MariaDB 10.2+ support    : No (default)")
 endif()
 
 if ( UNIX )
