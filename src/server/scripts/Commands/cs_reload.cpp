@@ -1051,8 +1051,6 @@ public:
         sLog->outString("Re-Loading Achievement Reward Data Locale...");
         sAchievementMgr->LoadRewardLocales();
         handler->SendGlobalGMSysMessage("DB table `achievement_reward_locale` reloaded.");
-        handler->SendGlobalGMSysMessage("DB table `locales_achievement_reward` reloaded.");
-        handler->SendGlobalGMSysMessage("|cff6C8CD5#|cFFFF0000 Таблица|r `achievement_reward_locale` |cFFFF0000перезагружена.|r");
         return true;
     }
 
