@@ -42,7 +42,7 @@ CMakeLists.txt.user
 *.LOCAL.*
 
 #
-# IDE & other softwares
+# IDE & other software
 #
 /.settings/
 /.externalToolBuilders/*
@@ -52,6 +52,8 @@ nbproject/
 *.kate-swp
 .browse.VC*
 .vscode
+.idea
+cmake-build-debug/*
 
 #
 # Eclipse
