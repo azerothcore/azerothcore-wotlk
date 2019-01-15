@@ -3883,6 +3883,10 @@ void SpellMgr::LoadDbcDataCorrections()
         case 55268:
             spellInfo->AttributesEx3 |= SPELL_ATTR3_BLOCKABLE_SPELL;
             break;
+        // Death Knight T10 Tank 2p Bonus
+        case 70650:
+            spellInfo->EffectApplyAuraName[0] = SPELL_AURA_ADD_PCT_MODIFIER;
+            break;
 
 
 
