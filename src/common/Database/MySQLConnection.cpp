@@ -113,10 +113,10 @@ bool MySQLConnection::Open()
     #endif
 
     // Possible improvement for future: make ATTEMPTS and SECONDS configurable values
-    uint const ATTEMPTS = 180;
-    uint const SECONDS = 10;
+    uint32 const ATTEMPTS = 180;
+    uint32 const SECONDS = 10;
 
-    uint count = 0;
+    uint32 count = 0;
     do {
         m_Mysql = mysql_real_connect(
             mysqlInit,
