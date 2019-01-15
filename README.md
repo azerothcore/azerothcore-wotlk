@@ -48,3 +48,10 @@ This project is brought to you thanks to:
 ## Links
 
 - [Website](https://azerothcore.github.io/)
+
+
+## Sponsors
+
+List of organizations that help the AzerothCore project:
+
+[![JetBrains](https://user-images.githubusercontent.com/75517/51205146-7f225c80-1905-11e9-82e0-835627be170d.png)](https://www.jetbrains.com/?from=AzerothCore)
