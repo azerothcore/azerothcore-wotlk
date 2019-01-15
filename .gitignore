@@ -8,8 +8,15 @@ apps/drassil/*
 env/dist/*
 env/user/*
 modules/*
+!modules/*.md
+!modules/*.sh
 build*/
 var/*
+docker/authserver/etc/authserver.conf
+docker/worldserver/etc/worldserver.conf
+docker/authserver/logs/
+docker/worldserver/logs/
+!docker/build
 
 !.gitkeep
 

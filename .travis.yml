@@ -1,6 +1,6 @@
 sudo: required
-dist: trusty # (14.04)
-# xenial (16.04) is not supported yet
+dist: xenial # (16.04)
+# bionic (18.04) is not yet available in travis
 
 language: cpp
 compiler:
@@ -9,6 +9,9 @@ compiler:
 addons:
   apt:
     update: true
+
+services:
+  - mysql
 
 git:
   depth: 1
@@ -33,6 +36,7 @@ install:
   - echo "DB_AUTH_CONF=\"MYSQL_USER='root'; MYSQL_PASS=''; MYSQL_HOST='127.0.0.1';\"" >> conf/config.sh
   - echo "DB_WORLD_CONF=\"MYSQL_USER='root'; MYSQL_PASS=''; MYSQL_HOST='127.0.0.1';\"" >> conf/config.sh  
   # create and import mysql
+  - mysql -e "SET GLOBAL sql_mode = '';" # this is necessary because of mysql 5.7
   - bash ./acore.sh "db-assembler" "import-all"
 
 script:

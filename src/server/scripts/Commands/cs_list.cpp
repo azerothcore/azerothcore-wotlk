@@ -31,6 +31,7 @@ public:
             { "creature",       SEC_MODERATOR,  true,  &HandleListCreatureCommand,          "" },
             { "item",           SEC_MODERATOR,  true,  &HandleListItemCommand,              "" },
             { "object",         SEC_MODERATOR,  true,  &HandleListObjectCommand,            "" },
+            { "gobject",        SEC_MODERATOR,  true,  &HandleListObjectCommand,            "" },
             { "auras",          SEC_MODERATOR,  false, &HandleListAurasCommand,             "" }
         };
         static std::vector<ChatCommand> commandTable =

@@ -1,12 +1,10 @@
 # ![logo](https://raw.githubusercontent.com/azerothcore/azerothcore.github.io/master/images/logo-github.png) AzerothCore
 
-<a href="https://scan.coverity.com/projects/azerothcore-azerothcore-wotlk">
-  <img alt="Coverity Scan Build Status"
-       src="https://scan.coverity.com/projects/13814/badge.svg"/>
-</a>
+[![Coverity](https://scan.coverity.com/projects/13814/badge.svg)](https://scan.coverity.com/projects/azerothcore-azerothcore-wotlk)
+[![Master Build Status](https://travis-ci.org/azerothcore/azerothcore-wotlk.svg)](https://travis-ci.org/azerothcore/azerothcore-wotlk)
+[![Bountysource](https://www.bountysource.com/badge/tracker?tracker_id=40032087)](https://www.bountysource.com/teams/azerothcore/bounties)
+[![StackOverflow](http://img.shields.io/badge/stackoverflow-azerothcore-blue.svg)]( http://stackoverflow.com/questions/tagged/azerothcore )
 
-[![GetBadges Game](https://azerothcore-azerothcore-wotlk.getbadges.io/shield/company/azerothcore-azerothcore-wotlk)](https://azerothcore-azerothcore-wotlk.getbadges.io/?ref=shield-game)
-[![Bountysource](https://www.bountysource.com/badge/tracker?tracker_id=40032087)](https://www.bountysource.com/teams/azerothcore/bounties) [![Master Build Status](https://travis-ci.org/azerothcore/azerothcore-wotlk.svg)](https://travis-ci.org/azerothcore/azerothcore-wotlk) [![Issue Stats](http://www.issuestats.com/github/AzerothCore/azerothcore-wotlk/badge/issue)](http://www.issuestats.com/github/AzerothCore/azerothcore-wotlk) [![Issue Stats](http://www.issuestats.com/github/AzerothCore/azerothcore-wotlk/badge/pr)](http://www.issuestats.com/github/AzerothCore/azerothcore-wotlk)
 
 ## Introduction
 
@@ -27,6 +25,11 @@ If you want to learn how to use C++, SQL, git, etc... you came to the right plac
 
 If you want to contribute, in [our wiki](https://github.com/azerothcore/azerothcore-wotlk/wiki) you fill find a lot of resources that will guide you. Also you can poke us in [our discord chat server](https://discord.gg/gkt4y2x).
 
+## Instructions & Support
+
+Installation instructions are available [here](https://github.com/AzerothCore/azerothcore-wotlk/wiki/Installation).
+
+For help requests, it is recommended to ask your question on [StackOverflow](https://stackoverflow.com/questions/tagged/azerothcore) and link it in [our chat](https://discordapp.com/channels/217589275766685707/284406375495368704).
 
 ## Authors & Contributors
 

@@ -1591,7 +1591,7 @@ class BattlegroundAV : public Battleground
 
         void EndBattleground(TeamId winnerTeamId);
 
-        WorldSafeLocsEntry const* GetClosestGraveyard(Player* player);
+        GraveyardStruct const* GetClosestGraveyard(Player* player);
 
         /* achievement req. */
         bool IsBothMinesControlledByTeam(TeamId teamId) const;

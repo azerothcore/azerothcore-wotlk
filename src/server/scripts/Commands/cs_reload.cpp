@@ -29,6 +29,7 @@ EndScriptData */
 #include "TicketMgr.h"
 #include "WardenCheckMgr.h"
 #include "WaypointManager.h"
+#include "GameGraveyard.h"
 
 class reload_commandscript : public CommandScript
 {
@@ -75,11 +76,11 @@ public:
             { "creature_onkill_reputation",   SEC_ADMINISTRATOR, true,  &HandleReloadOnKillReputationCommand,           "" },
             { "creature_queststarter",        SEC_ADMINISTRATOR, true,  &HandleReloadCreatureQuestStarterCommand,       "" },
             { "creature_template",            SEC_ADMINISTRATOR, true,  &HandleReloadCreatureTemplateCommand,           "" },
-            //{ "db_script_string",             SEC_ADMINISTRATOR, true,  &HandleReloadDbScriptStringCommand,            "" },
             { "disables",                     SEC_ADMINISTRATOR, true,  &HandleReloadDisablesCommand,                   "" },
             { "disenchant_loot_template",     SEC_ADMINISTRATOR, true,  &HandleReloadLootTemplatesDisenchantCommand,    "" },
             { "event_scripts",                SEC_ADMINISTRATOR, true,  &HandleReloadEventScriptsCommand,               "" },
             { "fishing_loot_template",        SEC_ADMINISTRATOR, true,  &HandleReloadLootTemplatesFishingCommand,       "" },
+            { "game_graveyard",               SEC_ADMINISTRATOR, true,  &HandleReloadGameGraveyardCommand,              "" },
             { "game_graveyard_zone",          SEC_ADMINISTRATOR, true,  &HandleReloadGameGraveyardZoneCommand,          "" },
             { "game_tele",                    SEC_ADMINISTRATOR, true,  &HandleReloadGameTeleCommand,                   "" },
             { "gameobject_questender",        SEC_ADMINISTRATOR, true,  &HandleReloadGOQuestEnderCommand,               "" },
@@ -92,17 +93,19 @@ public:
             { "item_loot_template",           SEC_ADMINISTRATOR, true,  &HandleReloadLootTemplatesItemCommand,          "" },
             { "item_set_names",               SEC_ADMINISTRATOR, true,  &HandleReloadItemSetNamesCommand,               "" },
             { "lfg_dungeon_rewards",          SEC_ADMINISTRATOR, true,  &HandleReloadLfgRewardsCommand,                 "" },
-            { "locales_achievement_reward",   SEC_ADMINISTRATOR, true,  &HandleReloadLocalesAchievementRewardCommand,   "" },
-            { "locales_creature",             SEC_ADMINISTRATOR, true,  &HandleReloadLocalesCreatureCommand,            "" },
-            { "locales_creature_text",        SEC_ADMINISTRATOR, true,  &HandleReloadLocalesCreatureTextCommand,        "" },
-            { "locales_gameobject",           SEC_ADMINISTRATOR, true,  &HandleReloadLocalesGameobjectCommand,          "" },
-            { "locales_gossip_menu_option",   SEC_ADMINISTRATOR, true,  &HandleReloadLocalesGossipMenuOptionCommand,    "" },
-            { "locales_item",                 SEC_ADMINISTRATOR, true,  &HandleReloadLocalesItemCommand,                "" },
-            { "locales_item_set_name",        SEC_ADMINISTRATOR, true,  &HandleReloadLocalesItemSetNameCommand,         "" },
-            { "locales_npc_text",             SEC_ADMINISTRATOR, true,  &HandleReloadLocalesNpcTextCommand,             "" },
-            { "locales_page_text",            SEC_ADMINISTRATOR, true,  &HandleReloadLocalesPageTextCommand,            "" },
-            { "locales_points_of_interest",   SEC_ADMINISTRATOR, true,  &HandleReloadLocalesPointsOfInterestCommand,    "" },
-            { "locales_quest",                SEC_ADMINISTRATOR, true,  &HandleReloadLocalesQuestCommand,               "" },
+            { "achievement_reward_locale",    SEC_ADMINISTRATOR, true,  &HandleReloadLocalesAchievementRewardCommand,   "" },
+            { "creature_template_locale",     SEC_ADMINISTRATOR, true,  &HandleReloadLocalesCreatureCommand,            "" },
+            { "creature_text_locale",         SEC_ADMINISTRATOR, true,  &HandleReloadLocalesCreatureTextCommand,        "" },
+            { "gameobject_template_locale",   SEC_ADMINISTRATOR, true,  &HandleReloadLocalesGameobjectCommand,          "" },
+            { "gossip_menu_option_locale",    SEC_ADMINISTRATOR, true,  &HandleReloadLocalesGossipMenuOptionCommand,    "" },
+            { "item_template_locale",         SEC_ADMINISTRATOR, true,  &HandleReloadLocalesItemCommand,                "" },
+            { "item_set_name_locale",         SEC_ADMINISTRATOR, true,  &HandleReloadLocalesItemSetNameCommand,         "" },
+            { "npc_text_locale",              SEC_ADMINISTRATOR, true,  &HandleReloadLocalesNpcTextCommand,             "" },
+            { "page_text_locale",             SEC_ADMINISTRATOR, true,  &HandleReloadLocalesPageTextCommand,            "" },
+            { "points_of_interest_locale",    SEC_ADMINISTRATOR, true,  &HandleReloadLocalesPointsOfInterestCommand,    "" },
+            { "quest_template_locale",        SEC_ADMINISTRATOR, true,  &HandleReloadLocalesQuestCommand,               "" },
+            { "quest_offer_reward_locale",    SEC_ADMINISTRATOR, true,  &HandleReloadLocalesQuestOfferRewardCommand,    "" },
+            { "quest_request_item_locale",    SEC_ADMINISTRATOR, true,  &HandleReloadLocalesQuestRequestItemsCommand,   "" },
             { "mail_level_reward",            SEC_ADMINISTRATOR, true,  &HandleReloadMailLevelRewardCommand,            "" },
             { "mail_loot_template",           SEC_ADMINISTRATOR, true,  &HandleReloadLootTemplatesMailCommand,          "" },
             { "milling_loot_template",        SEC_ADMINISTRATOR, true,  &HandleReloadLootTemplatesMillingCommand,       "" },
@@ -256,7 +259,6 @@ public:
         HandleReloadEventScriptsCommand(handler, "a");
         HandleReloadSpellScriptsCommand(handler, "a");
         handler->SendGlobalGMSysMessage("DB tables `*_scripts` reloaded.");
-        HandleReloadDbScriptStringCommand(handler, "a");
         HandleReloadWpScriptsCommand(handler, "a");
         HandleReloadWpCommand(handler, "a");
         return true;
@@ -308,6 +310,8 @@ public:
         HandleReloadLocalesPageTextCommand(handler, "a");
         HandleReloadLocalesPointsOfInterestCommand(handler, "a");
         HandleReloadLocalesQuestCommand(handler, "a");
+        HandleReloadLocalesQuestOfferRewardCommand(handler, "a");
+        HandleReloadLocalesQuestRequestItemsCommand(handler, "a");
         return true;
     }
 
@@ -1010,19 +1014,11 @@ public:
         return true;
     }
 
-    static bool HandleReloadDbScriptStringCommand(ChatHandler* handler, const char* /*args*/)
-    {
-        sLog->outString("Re-Loading Script strings from `db_script_string`...");
-        sObjectMgr->LoadDbScriptStrings();
-        handler->SendGlobalGMSysMessage("DB table `db_script_string` reloaded.");
-        return true;
-    }
-
     static bool HandleReloadGameGraveyardZoneCommand(ChatHandler* handler, const char* /*args*/)
     {
         sLog->outString("Re-Loading Graveyard-zone links...");
 
-        sObjectMgr->LoadGraveyardZones();
+        sGraveyard->LoadGraveyardZones();
 
         handler->SendGlobalGMSysMessage("DB table `game_graveyard_zone` reloaded.");
 
@@ -1052,9 +1048,9 @@ public:
 
     static bool HandleReloadLocalesAchievementRewardCommand(ChatHandler* handler, const char* /*args*/)
     {
-        sLog->outString("Re-Loading Locales Achievement Reward Data...");
+        sLog->outString("Re-Loading Achievement Reward Data Locale...");
         sAchievementMgr->LoadRewardLocales();
-        handler->SendGlobalGMSysMessage("DB table `locales_achievement_reward` reloaded.");
+        handler->SendGlobalGMSysMessage("DB table `achievement_reward_locale` reloaded.");
         return true;
     }
 
@@ -1068,73 +1064,73 @@ public:
 
     static bool HandleReloadLocalesCreatureCommand(ChatHandler* handler, const char* /*args*/)
     {
-        sLog->outString("Re-Loading Locales Creature ...");
+        sLog->outString("Re-Loading Creature Template Locale...");
         sObjectMgr->LoadCreatureLocales();
-        handler->SendGlobalGMSysMessage("DB table `locales_creature` reloaded.");
+        handler->SendGlobalGMSysMessage("DB table `creature_template_locale` reloaded.");
         return true;
     }
 
     static bool HandleReloadLocalesCreatureTextCommand(ChatHandler* handler, const char* /*args*/)
     {
-        sLog->outString("Re-Loading Locales Creature Texts...");
+        sLog->outString("Re-Loading Creature Texts Locale...");
         sCreatureTextMgr->LoadCreatureTextLocales();
-        handler->SendGlobalGMSysMessage("DB table `locales_creature_text` reloaded.");
+        handler->SendGlobalGMSysMessage("DB table `creature_text_locale` reloaded.");
         return true;
     }
 
     static bool HandleReloadLocalesGameobjectCommand(ChatHandler* handler, const char* /*args*/)
     {
-        sLog->outString("Re-Loading Locales Gameobject ... ");
+        sLog->outString("Re-Loading Gameobject Template Locale ... ");
         sObjectMgr->LoadGameObjectLocales();
-        handler->SendGlobalGMSysMessage("DB table `locales_gameobject` reloaded.");
+        handler->SendGlobalGMSysMessage("DB table `gameobject_template_locale` reloaded.");
         return true;
     }
 
     static bool HandleReloadLocalesGossipMenuOptionCommand(ChatHandler* handler, const char* /*args*/)
     {
-        sLog->outString( "Re-Loading Locales Gossip Menu Option ... ");
+        sLog->outString( "Re-Loading Gossip Menu Option Locale ... ");
         sObjectMgr->LoadGossipMenuItemsLocales();
-        handler->SendGlobalGMSysMessage("DB table `locales_gossip_menu_option` reloaded.");
+        handler->SendGlobalGMSysMessage("DB table `gossip_menu_option_locale` reloaded.");
         return true;
     }
 
     static bool HandleReloadLocalesItemCommand(ChatHandler* handler, const char* /*args*/)
     {
-        sLog->outString("Re-Loading Locales Item ... ");
+        sLog->outString("Re-Loading Item Template Locale ... ");
         sObjectMgr->LoadItemLocales();
-        handler->SendGlobalGMSysMessage("DB table `locales_item` reloaded.");
+        handler->SendGlobalGMSysMessage("DB table `item_template_locale` reloaded.");
         return true;
     }
 
     static bool HandleReloadLocalesItemSetNameCommand(ChatHandler* handler, const char* /*args*/)
     {
-        sLog->outString("Re-Loading Locales Item set name... ");
+        sLog->outString("Re-Loading Item set name Locale... ");
         sObjectMgr->LoadItemSetNameLocales();
-        handler->SendGlobalGMSysMessage("DB table `locales_item_set_name` reloaded.");
+        handler->SendGlobalGMSysMessage("DB table `item_set_name_locale` reloaded.");
         return true;
     }
 
     static bool HandleReloadLocalesNpcTextCommand(ChatHandler* handler, const char* /*args*/)
     {
-        sLog->outString("Re-Loading Locales NPC Text ... ");
+        sLog->outString("Re-Loading NPC Text Locale ... ");
         sObjectMgr->LoadNpcTextLocales();
-        handler->SendGlobalGMSysMessage("DB table `locales_npc_text` reloaded.");
+        handler->SendGlobalGMSysMessage("DB table `npc_text_locale` reloaded.");
         return true;
     }
 
     static bool HandleReloadLocalesPageTextCommand(ChatHandler* handler, const char* /*args*/)
     {
-        sLog->outString("Re-Loading Locales Page Text ... ");
+        sLog->outString("Re-Loading Page Text Locale ... ");
         sObjectMgr->LoadPageTextLocales();
-        handler->SendGlobalGMSysMessage("DB table `locales_page_text` reloaded.");
+        handler->SendGlobalGMSysMessage("DB table `page_text_locale` reloaded.");
         return true;
     }
 
     static bool HandleReloadLocalesPointsOfInterestCommand(ChatHandler* handler, const char* /*args*/)
     {
-        sLog->outString("Re-Loading Locales Points Of Interest ... ");
+        sLog->outString("Re-Loading Points Of Interest Locale ... ");
         sObjectMgr->LoadPointOfInterestLocales();
-        handler->SendGlobalGMSysMessage("DB table `locales_points_of_interest` reloaded.");
+        handler->SendGlobalGMSysMessage("DB table `points_of_interest_locale` reloaded.");
         return true;
     }
 
@@ -1142,7 +1138,23 @@ public:
     {
         sLog->outString("Re-Loading Locales Quest ... ");
         sObjectMgr->LoadQuestLocales();
-        handler->SendGlobalGMSysMessage("DB table `locales_quest` reloaded.");
+        handler->SendGlobalGMSysMessage("DB table `quest_template_locale` reloaded.");
+        return true;
+    }
+
+    static bool HandleReloadLocalesQuestOfferRewardCommand(ChatHandler* handler, char const* /*args*/)
+    {
+        sLog->outString("Re-Loading Quest Offer Reward Locale... ");
+        sObjectMgr->LoadQuestOfferRewardLocale();
+        handler->SendGlobalGMSysMessage("DB table `quest_offer_reward_locale` reloaded.");
+        return true;
+    }
+
+    static bool HandleReloadLocalesQuestRequestItemsCommand(ChatHandler* handler, char const* /*args*/)
+    {
+        sLog->outString("Re-Loading Quest Request Item Locale... ");
+        sObjectMgr->LoadQuestRequestItemsLocale();
+        handler->SendGlobalGMSysMessage("DB table `quest_request_item_locale` reloaded.");
         return true;
     }
 
@@ -1201,6 +1213,14 @@ public:
         sLog->outString("Reloading vehicle_template_accessory table...");
         sObjectMgr->LoadVehicleTemplateAccessories();
         handler->SendGlobalGMSysMessage("Vehicle template accessories reloaded.");
+        return true;
+    }
+
+    static bool HandleReloadGameGraveyardCommand(ChatHandler* handler, const char* /*args*/)
+    {
+        sLog->outString("Reloading game_graveyard table...");
+        sGraveyard->LoadGraveyardFromDB();
+        handler->SendGlobalGMSysMessage("DB table `game_graveyard` reloaded.");
         return true;
     }
 };

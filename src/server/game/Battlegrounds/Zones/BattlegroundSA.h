@@ -445,7 +445,7 @@ class BattlegroundSA : public Battleground
         /// Called when a player kill a unit in bg
         void HandleKillUnit(Creature* creature, Player* killer);
         /// Return the nearest graveyard where player can respawn
-        WorldSafeLocsEntry const* GetClosestGraveyard(Player* player);
+        GraveyardStruct const* GetClosestGraveyard(Player* player);
         /// Called when a player click on flag (graveyard flag)
         void EventPlayerClickedOnFlag(Player* Source, GameObject* gameObject);
         /// Called when a player use a gamobject (relic)

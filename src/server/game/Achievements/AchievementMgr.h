@@ -232,8 +232,8 @@ typedef std::map<uint32, AchievementReward> AchievementRewards;
 
 struct AchievementRewardLocale
 {
-    StringVector subject;
-    StringVector text;
+    StringVector Subject;
+    StringVector Text;
 };
 
 typedef std::map<uint32, AchievementRewardLocale> AchievementRewardLocales;

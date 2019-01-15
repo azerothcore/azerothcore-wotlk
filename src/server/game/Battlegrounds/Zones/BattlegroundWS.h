@@ -176,7 +176,7 @@ class BattlegroundWS : public Battleground
         bool SetupBattleground();
         void Init();
         void EndBattleground(TeamId winnerTeamId);
-        WorldSafeLocsEntry const* GetClosestGraveyard(Player* player);
+        GraveyardStruct const* GetClosestGraveyard(Player* player);
 
         void UpdateFlagState(TeamId teamId, uint32 value);
         void UpdatePlayerScore(Player* player, uint32 type, uint32 value, bool doAddHonor = true);
