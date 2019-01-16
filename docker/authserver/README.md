@@ -23,7 +23,7 @@ To build the container image you have to be in the **main** folder of your local
 ## Run the container
 
 ```
-docker run --name ac-auth-container \
+docker run --name ac-authserver \
     --mount type=bind,source="$(pwd)"/docker/authserver/etc/,target=/azeroth-server/etc \
     --mount type=bind,source="$(pwd)"/docker/authserver/logs/,target=/azeroth-server/logs \
     -p 127.0.0.1:3724:3724 \

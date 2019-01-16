@@ -27,7 +27,7 @@ To build the container image you have to be in the **main** folder of your local
 Replace `/path/to/your/data` with the path of where your data folder is.
 
 ```
-docker run --name ac-world-container \
+docker run --name ac-worldserver \
     --mount type=bind,source=/path/to/your/data,target=/azeroth-server/data \
     --mount type=bind,source="$(pwd)"/docker/worldserver/etc/,target=/azeroth-server/etc \
     --mount type=bind,source="$(pwd)"/docker/worldserver/logs/,target=/azeroth-server/logs \

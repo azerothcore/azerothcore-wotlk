@@ -39,7 +39,7 @@ You can build the image using:
 
 Run the following command to launch a container:
 
-```docker run --name ac-db-container \
+```docker run --name ac-database \
    -p 127.0.0.1:3306:3306 \
    -e MYSQL_ROOT_PASSWORD=password \
    --network ac-network \
@@ -48,7 +48,7 @@ Run the following command to launch a container:
 
 Where:
 
-`--name` is followed by a container name like `ac-db-container`. Put whatever name you like, each container should have an unique name.
+`--name` is followed by a container name like `ac-database`. Put whatever name you like, each container should have an unique name.
 
 `-p` (port) is followed by `IP_ADDRESS:EXTERNAL_PORT:INTERNAL_PORT`.
 
@@ -59,7 +59,7 @@ Where:
 
 **NOTE**: You may want to use an external port different than 3306 in case you have already mysql-server installed in your system (or some other service that is using that port). So you can use for example port 9000 with `-p 127.0.0.1:9000:3306`
 
-`docker run --name ac-db-container -p 9000:3306 -e MYSQL_ROOT_PASSWORD=password azerothcore/database`
+`docker run --name ac-database -p 9000:3306 -e MYSQL_ROOT_PASSWORD=password azerothcore/database`
 
 `-e MYSQL_ROOT_PASSWORD=password` lets you change the default password for the `root` user.
 
@@ -81,9 +81,9 @@ You can easily run more instances. You just have to specify a different **name**
 
 Example: I want to launch three instances of the AzerothCore databases, each one listening respectively on port 9001, 9002 and 9003. I can do it with the following commands:
 
-`docker run --name ac-db-container-1 -p 127.0.0.1:9001:3306 -e MYSQL_ROOT_PASSWORD=password -d azerothcore/database`
-`docker run --name ac-db-container-2 -p 127.0.0.1:9002:3306 -e MYSQL_ROOT_PASSWORD=password -d azerothcore/database`
-`docker run --name ac-db-container-3 -p 127.0.0.1:9003:3306 -e MYSQL_ROOT_PASSWORD=password -d azerothcore/database`
+`docker run --name ac-database-1 -p 127.0.0.1:9001:3306 -e MYSQL_ROOT_PASSWORD=password -d azerothcore/database`
+`docker run --name ac-database-2 -p 127.0.0.1:9002:3306 -e MYSQL_ROOT_PASSWORD=password -d azerothcore/database`
+`docker run --name ac-database-3 -p 127.0.0.1:9003:3306 -e MYSQL_ROOT_PASSWORD=password -d azerothcore/database`
 
 You can use the `docker ps` command to check your running containers.
 
@@ -91,6 +91,6 @@ You can use the `docker ps` command to check your running containers.
 
 ## Stopping / removing
 
-You can stop a container using `docker stop name-of-the container`, for example `docker stop ac-db-container-1`.
+You can stop a container using `docker stop name-of-the container`, for example `docker stop ac-database-1`.
 
-You can then remove the container using `docker rm name-of-the container`, for example `docker rm ac-db-container-1`.
+You can then remove the container using `docker rm name-of-the container`, for example `docker rm ac-database-1`.
