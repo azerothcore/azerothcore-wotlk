@@ -20,7 +20,7 @@ before_install:
   - git config user.email "travis@build.bot" && git config user.name "Travis CI"
   - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then cd bin/; fi
   # import pending sql
-  - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then bash acore-db-pendings; fi
+  - if [ "$TRAVIS_PULL_REQUEST" = "false" ] && [ "$TRAVIS_BRANCH" = "master" ]; then bash acore-db-pendings; fi
   - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then cd ..; fi
   # push changes to git if any
   - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then git fetch --unshallow; fi
