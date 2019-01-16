@@ -28,7 +28,9 @@ and cd into it `cd azerothcore-wotlk`.
 
 You can build the image using:
 
-`docker build -t azerothcore/database -f docker/database/Dockerfile .`
+```
+docker build -t azerothcore/database -f docker/database/Dockerfile .
+```
 
 **Note:** the version of your DB will be the one of your sources when you built the image. If you want to update it, just update your sources (`git pull`) and build the image again.
 
@@ -39,7 +41,8 @@ You can build the image using:
 
 Run the following command to launch a container:
 
-```docker run --name ac-database \
+```
+docker run --name ac-database \
    -p 127.0.0.1:3306:3306 \
    -e MYSQL_ROOT_PASSWORD=password \
    --network ac-network \
