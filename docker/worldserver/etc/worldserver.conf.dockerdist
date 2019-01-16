@@ -11,9 +11,9 @@ DataDir = "/azeroth-server/data"
 # The format is "hostname;port;username;password;database":
 # - docker containers must be on the same docker network to be able to communicate
 # - the DB hostname will be the name of the database docker container
-LoginDatabaseInfo     = "ac-db-container;3306;root;password;acore_auth"
-WorldDatabaseInfo     = "ac-db-container;3306;root;password;acore_world"
-CharacterDatabaseInfo = "ac-db-container;3306;root;password;acore_characters"
+LoginDatabaseInfo     = "ac-database;3306;root;password;acore_auth"
+WorldDatabaseInfo     = "ac-database;3306;root;password;acore_world"
+CharacterDatabaseInfo = "ac-database;3306;root;password;acore_characters"
 
 # Add more configuration overwrites by copying settings from worldserver.conf.dist
 LogLevel = 2
