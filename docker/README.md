@@ -6,23 +6,29 @@ Docker. is a software that performs operating-system-level virtualization, allow
 
 Thanks to Docker, you can quickly setup and run AzerothCore in any operating system.
 
-The **only** requirement is having Docker installed into your system. Forget about installing mysql, visual studio, cmake, etc...
+The **only** requirement is having [Docker](https://docs.docker.com/install/) installed into your system. Forget about installing mysql, visual studio, cmake, etc...
 
 ### Installation instructions
 
-To install AzerothCore using Docker, you have to follow these steps (**respecting the order**):
+To install and AzerothCore using Docker, you have two options
 
-1) Install [Docker](https://docs.docker.com/install/).
+#### Option A. Using Docker Compose (very easy - recommended)
 
-2) Create a Docker Network: `docker network create ac-network`. All your docker containers will use it to communicate to each other.
+- Check the [Install with Docker](https://github.com/azerothcore/azerothcore-wotlk/wiki/install-with-Docker) guide.
 
-3) Launch one instance of the [AzerothCore Dockerized Database](https://github.com/azerothcore/azerothcore-wotlk/tree/master/docker/database)
+#### Option B. Build and start each container manually (longer - not recommended)
 
-4) Create an image of the [AzerothCore Dockerized Build](https://github.com/azerothcore/azerothcore-wotlk/tree/master/docker/build)
+You have to follow these steps (**respecting the order**):
 
-5) Launch one instance of the [AzerothCore Dockerized Authserver](https://github.com/azerothcore/azerothcore-wotlk/tree/master/docker/authserver)
+1) Create a Docker Network: `docker network create ac-network`. All your docker containers will use it to communicate to each other.
 
-6)  Launch one instance of the [AzerothCore Dockerized Worldserver](https://github.com/azerothcore/azerothcore-wotlk/tree/master/docker/worldserver)
+2) Launch one instance of the [AzerothCore Dockerized Database](https://github.com/azerothcore/azerothcore-wotlk/tree/master/docker/database)
+
+3) Create an image of the [AzerothCore Dockerized Build](https://github.com/azerothcore/azerothcore-wotlk/tree/master/docker/build)
+
+4) Launch one instance of the [AzerothCore Dockerized Authserver](https://github.com/azerothcore/azerothcore-wotlk/tree/master/docker/authserver)
+
+5)  Launch one instance of the [AzerothCore Dockerized Worldserver](https://github.com/azerothcore/azerothcore-wotlk/tree/master/docker/worldserver)
 
 
 ### Memory usage

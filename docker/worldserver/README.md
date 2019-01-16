@@ -1,6 +1,8 @@
 # AzerothCore Dockerized Worldserver
 
-This provides a way to launch a container with the AzerothCore authserver running inside it.
+This provides a way to build and launch a container with the AzerothCore authserver running inside it.
+
+If you just want to install the whole AzerothCore quickly using Docker Compose, we recommend following [this guide instead](https://github.com/azerothcore/azerothcore-wotlk/wiki/install-with-Docker).
 
 ## Requirements
 
