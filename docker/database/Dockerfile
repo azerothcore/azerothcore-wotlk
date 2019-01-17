@@ -8,6 +8,11 @@ ADD data /azerothcore/data
 ADD deps /azerothcore/deps
 ADD acore.json /azerothcore/acore.json
 
+RUN ls -al /azerothcore/
+RUN ls -al /azerothcore/apps/
+RUN ls -al /azerothcore/apps/db_assembler/
+RUN cat /azerothcore/apps/db_assembler/db_assembler.sh
+
 RUN chmod 755 /azerothcore/apps/db_assembler/db_assembler.sh; \
     /azerothcore/apps/db_assembler/db_assembler.sh 1
 
