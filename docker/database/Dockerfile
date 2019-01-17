@@ -2,14 +2,14 @@ FROM alpine:latest as builder
 
 RUN apk add --no-cache bash
 
-ADD apps /azerothcore/apps
-ADD conf /azerothcore/conf
-ADD data /azerothcore/data
-ADD deps /azerothcore/deps
-ADD acore.json /azerothcore/acore.json
+COPY apps /azerothcore/apps
+COPY bin /azerothcore/bin
+COPY conf /azerothcore/conf
+COPY data /azerothcore/data
+COPY deps /azerothcore/deps
+COPY acore.json /azerothcore/acore.json
 
-RUN chmod 755 azerothcore/apps/db_assembler/db_assembler.sh; \
-    /azerothcore/apps/db_assembler/db_assembler.sh 1
+RUN ./azerothcore/bin/acore-db-asm 1
 
 FROM mysql:5.7
 
