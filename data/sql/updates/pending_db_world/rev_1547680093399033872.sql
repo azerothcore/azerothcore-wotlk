@@ -35,7 +35,7 @@ VALUES
 (@ID_GO_ALIEN_EGG,1,7,0,59,0,100,1,3,0,0,0,41,0,0,0,0,0,0,1,0,0,0,0,0,0,0,'Alien Egg - On Timed Event ID 3 - Force Despawn');
 
 
-UPDATE `creature_template` SET `AIName` = 'SmartAI', `unit_flags` = 2, `flags_extra` = 2 WHERE `entry` = @ID_NPC_YOUNG_ARIKARA;
+UPDATE `creature_template` SET `AIName` = 'SmartAI', `unit_flags` = 2, `flags_extra` = 2, `rank` = 0 WHERE `entry` = @ID_NPC_YOUNG_ARIKARA;
 
 DELETE FROM `smart_scripts` WHERE `entryorguid` = @ID_NPC_YOUNG_ARIKARA;
 INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`)
