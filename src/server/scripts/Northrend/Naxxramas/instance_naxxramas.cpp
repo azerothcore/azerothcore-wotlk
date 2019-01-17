@@ -35,8 +35,6 @@ inline uint8 GetEruptionSection(float x, float y)
     return 3;
 }
 
-const int KelThuzadSummonDuration = 105000;
-
 class instance_naxxramas : public InstanceMapScript
 {
 public:
@@ -528,9 +526,9 @@ public:
                 case BOSS_SAPPHIRON:
                     if (state == DONE) {
                         _speakTimer = 1;
-			// Load KT's grid so he can talk
-			instance->LoadGrid(3763.43f, -5115.87f);
-		    }
+                        // Load KT's grid so he can talk
+                        instance->LoadGrid(3763.43f, -5115.87f);
+                    }
                     else if (state == NOT_STARTED)
                         sapphironAchievement = true;
                     break;
@@ -600,7 +598,7 @@ public:
                     case BOSS_SAPPHIRON:
                         if (GameObject* go = instance->GetGameObject(_sapphironGateGUID))
                             go->SetGoState(GO_STATE_ACTIVE);
-			break;
+                        break;
                     case BOSS_THADDIUS:
                         if (GameObject* go = instance->GetGameObject(_thaddiusPortalGUID))
                             go->SetPhaseMask(1, true);
@@ -650,13 +648,13 @@ public:
                     kel->AI()->Talk(SAY_SAPP_DIALOG5);
                     _speakTimer = 100000;
                 }
-		else if (_speakTimer > KelThuzadSummonDuration)
-		{
-			kel->AI()->Talk(SAY_SAPP_DIALOG6);
-			_speakTimer = 0;
-			if (GameObject* go = instance->GetGameObject(_kelthuzadgateGUID))
-				go->SetGoState(GO_STATE_ACTIVE);
-		}
+                else if (_speakTimer > 105000)
+                {
+                    kel->AI()->Talk(SAY_SAPP_DIALOG6);
+                    _speakTimer = 0;
+                    if (GameObject* go = instance->GetGameObject(_kelthuzadgateGUID))
+                        go->SetGoState(GO_STATE_ACTIVE);
+                }
             }
 
             // And They would all
