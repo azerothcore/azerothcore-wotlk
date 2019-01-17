@@ -8,7 +8,7 @@ ADD data /azerothcore/data
 ADD deps /azerothcore/deps
 ADD acore.json /azerothcore/acore.json
 
-RUN chmod 755 azerothcore/apps/db_assembler/db_assembler.sh; \
+RUN chmod 755 /azerothcore/apps/db_assembler/db_assembler.sh; \
     /azerothcore/apps/db_assembler/db_assembler.sh 1
 
 FROM mysql:5.7
