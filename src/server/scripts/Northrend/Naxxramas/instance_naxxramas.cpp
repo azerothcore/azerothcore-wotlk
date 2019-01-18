@@ -524,7 +524,8 @@ public:
                         heiganAchievement = true;
                     break;
                 case BOSS_SAPPHIRON:
-                    if (state == DONE) {
+                    if (state == DONE)
+                    {
                         _speakTimer = 1;
                         // Load KT's grid so he can talk
                         instance->LoadGrid(3763.43f, -5115.87f);
