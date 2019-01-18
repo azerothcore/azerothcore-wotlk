@@ -364,11 +364,7 @@ class ByteBuffer
             lt.tm_mon = (packedDate >> 20) & 0xF;
             lt.tm_year = ((packedDate >> 24) & 0x1F) + 100;
 
-            #ifdef OS_WIN
-                return uint32(mktime(&lt) + _timezone);
-            #else
-                return uint32(mktime(&lt) + timezone);
-            #endif
+            return uint32(mktime(&lt));
 
         }
 
