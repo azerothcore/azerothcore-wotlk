@@ -120,11 +120,13 @@ public:
         boss_kelthuzadAI(Creature* c) : BossAI(c, BOSS_KELTHUZAD), summons(me)
         {
             pInstance = me->GetInstanceScript();
+            _justSpawned=true;
         }
 
         EventMap events;
         SummonList summons;
         InstanceScript* pInstance;
+        bool _justSpawned;
 
         float NormalizeOrientation(float o)
         {
@@ -175,7 +177,11 @@ public:
             }
 
             if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_KELTHUZAD_GATE)))
-                go->SetGoState(GO_STATE_ACTIVE);
+            {
+                if(!_justSpawned) /* Don't open the door if we just spawned and are still doing the RP */
+                    go->SetGoState(GO_STATE_ACTIVE);
+            }
+            _justSpawned=false;
 
         }
 
