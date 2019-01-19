@@ -15,9 +15,6 @@ ALTER TABLE `item_template`
 ALTER TABLE `quest_template`
   CHANGE COLUMN `VerifiedBuild` `VerifiedBuild` smallint(5) DEFAULT '0';
 
-ALTER TABLE `quest_template_addon`
-  CHANGE COLUMN `NextQuestID` `NextQuestID` mediumint(8) unsigned NOT NULL DEFAULT '0';
-
 ALTER TABLE `spell_bonus_data`
   CHANGE COLUMN `entry` `entry` mediumint(8) unsigned NOT NULL DEFAULT '0';
 
