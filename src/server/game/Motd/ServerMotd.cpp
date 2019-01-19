@@ -6,6 +6,7 @@
 #include "ServerMotd.h"
 #include "Common.h"
 #include "ScriptMgr.h"
+#include "Opcodes.h"
 #include "Util.h"
 #include "WorldPacket.h"
 #include <iterator>
