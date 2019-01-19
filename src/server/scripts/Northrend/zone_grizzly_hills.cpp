@@ -942,6 +942,7 @@ void AddSC_grizzly_hills()
     // Theirs
     new npc_emily();
     new npc_mrfloppy();
+    new npc_ravenous_worg();
     new npc_outhouse_bunny();
     new npc_tallhorn_stag();
     new npc_amberpine_woodsman();
