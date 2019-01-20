@@ -395,7 +395,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                                 sLog->outDebug(
                                         "LOG_FILTER_DATABASE_AI",
                                         "SmartScript::ProcessAction:: SMART_ACTION_OFFER_QUEST: Player guidLow %u - offering quest %u",
-                                        pTarget->GetGUID().GetCounter(),
+                                        (*itr)->GetGUIDLow(),
                                         e.action.questOffer.questID);
 #endif
                             }
@@ -407,7 +407,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                         sLog->outDebug(
                                 "LOG_FILTER_DATABASE_AI",
                                 "SmartScript::ProcessAction:: SMART_ACTION_OFFER_QUEST: Player guidLow %u - quest %u added",
-                                     pTarget->GetGUID().GetCounter(),
+                                     (*itr)->GetGUIDLow(),
                                      e.action.questOffer.questID);
 #endif
                     }
