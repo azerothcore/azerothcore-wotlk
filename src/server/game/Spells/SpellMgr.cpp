@@ -4159,11 +4159,7 @@ void SpellMgr::LoadDbcDataCorrections()
         case 59725:
             spellInfo->EffectImplicitTargetA[EFFECT_0] = TARGET_UNIT_CASTER_AREA_PARTY;
             break;
-        // Shockwave
-        case 46968:
-            spellInfo->EffectRadiusIndex[0] = EFFECT_RADIUS_10_YARDS; // 10yds
-            spellInfo->EffectRadiusIndex[1] = EFFECT_RADIUS_10_YARDS; // 10yds
-            break;
+
 
 
         /////////////////////////////////
