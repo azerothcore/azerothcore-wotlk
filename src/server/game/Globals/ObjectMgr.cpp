@@ -399,15 +399,15 @@ void ObjectMgr::LoadCreatureTemplates()
     //                                           9       10      11       12           13           14        15     16      17          18       19         20         21
                                              "modelid4, name, subname, IconName, gossip_menu_id, minlevel, maxlevel, exp, faction, npcflag, speed_walk, speed_run, "
     //                                         22     23     24     25        26          27             28              29                30           31          32          33
-                                             "scale, rank, mindmg, maxdmg, dmgschool, attackpower, dmg_multiplier, baseattacktime, rangeattacktime, unit_class, unit_flags, unit_flags2, "
+                                             "scale, rank, mindmg, maxdmg, dmgschool, attackpower, DamageModifier, BaseAttackTime, RangeAttackTime, unit_class, unit_flags, unit_flags2, "
     //                                             34         35         36             37             38             39          40           41              42           43
                                              "dynamicflags, family, trainer_type, trainer_spell, trainer_class, trainer_race, minrangedmg, maxrangedmg, rangedattackpower, type, "
     //                                            44        45          46           47          48          49           50           51           52           53         54
                                              "type_flags, lootid, pickpocketloot, skinloot, resistance1, resistance2, resistance3, resistance4, resistance5, resistance6, spell1, "
     //                                          55      56      57      58      59      60      61          62            63       64       65       66         67
                                              "spell2, spell3, spell4, spell5, spell6, spell7, spell8, PetSpellDataId, VehicleId, mingold, maxgold, AIName, MovementType, "
-    //                                             68          69         70         71          72           73          74           75                76               77           78
-                                             "InhabitType, HoverHeight, Health_mod, Mana_mod, Armor_mod, RacialLeader, movementId, RegenHealth, mechanic_immune_mask, flags_extra, ScriptName "
+    //                                             68          69             70             71             72            73           74           75                76               77           78
+                                             "InhabitType, HoverHeight, HealthModifier, ManaModifier, ArmorModifier, RacialLeader, movementId, RegenHealth, mechanic_immune_mask, flags_extra, ScriptName "
                                              "FROM creature_template;");
 
     if (!result)
@@ -456,9 +456,9 @@ void ObjectMgr::LoadCreatureTemplates()
         creatureTemplate.maxdmg            = fields[24].GetFloat();
         creatureTemplate.dmgschool         = uint32(fields[25].GetInt8());
         creatureTemplate.attackpower       = fields[26].GetUInt32();
-        creatureTemplate.dmg_multiplier    = fields[27].GetFloat();
-        creatureTemplate.baseattacktime    = fields[28].GetUInt32();
-        creatureTemplate.rangeattacktime   = fields[29].GetUInt32();
+        creatureTemplate.DamageModifier    = fields[27].GetFloat();
+        creatureTemplate.BaseAttackTime    = fields[28].GetUInt32();
+        creatureTemplate.RangeAttackTime   = fields[29].GetUInt32();
         creatureTemplate.unit_class        = uint32(fields[30].GetUInt8());
         creatureTemplate.unit_flags        = fields[31].GetUInt32();
         creatureTemplate.unit_flags2       = fields[32].GetUInt32();
@@ -840,11 +840,11 @@ void ObjectMgr::CheckCreatureTemplate(CreatureTemplate const* cInfo)
         const_cast<CreatureTemplate*>(cInfo)->dmgschool = SPELL_SCHOOL_NORMAL;
     }
 
-    if (cInfo->baseattacktime == 0)
-        const_cast<CreatureTemplate*>(cInfo)->baseattacktime  = BASE_ATTACK_TIME;
+    if (cInfo->BaseAttackTime == 0)
+        const_cast<CreatureTemplate*>(cInfo)->BaseAttackTime  = BASE_ATTACK_TIME;
 
-    if (cInfo->rangeattacktime == 0)
-        const_cast<CreatureTemplate*>(cInfo)->rangeattacktime = BASE_ATTACK_TIME;
+    if (cInfo->RangeAttackTime == 0)
+        const_cast<CreatureTemplate*>(cInfo)->RangeAttackTime = BASE_ATTACK_TIME;
 
     if ((cInfo->npcflag & UNIT_NPC_FLAG_TRAINER) && cInfo->trainer_type >= MAX_TRAINER_TYPE)
         sLog->outErrorDb("Creature (Entry: %u) has wrong trainer type %u.", cInfo->Entry, cInfo->trainer_type);
@@ -939,7 +939,7 @@ void ObjectMgr::CheckCreatureTemplate(CreatureTemplate const* cInfo)
         const_cast<CreatureTemplate*>(cInfo)->flags_extra &= CREATURE_FLAG_EXTRA_DB_ALLOWED;
     }
 
-    const_cast<CreatureTemplate*>(cInfo)->dmg_multiplier *= Creature::_GetDamageMod(cInfo->rank);
+    const_cast<CreatureTemplate*>(cInfo)->DamageModifier *= Creature::_GetDamageMod(cInfo->rank);
 }
 
 void ObjectMgr::LoadCreatureAddons()
