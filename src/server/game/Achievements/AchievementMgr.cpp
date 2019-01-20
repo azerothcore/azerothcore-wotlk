@@ -2883,7 +2883,7 @@ void AchievementGlobalMgr::LoadRewardLocales()
 
     if (!result)
     {
-        sLog->outErrorDb(">> Loaded 0 achievement reward locale strings.  DB table `achievement_reward_locale` is empty");
+        sLog->outString(">> Loaded 0 achievement reward locale strings.  DB table `achievement_reward_locale` is empty");
         sLog->outString();
         return;
     }
