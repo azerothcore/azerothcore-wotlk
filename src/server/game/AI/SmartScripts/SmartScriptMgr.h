@@ -558,25 +558,35 @@ enum SMART_ACTION
     SMART_ACTION_REMOVE_ALL_GAMEOBJECTS             = 126,
     // RESERVED                                     = 127,
     // RESERVED                                     = 128,
-    // RESERVED                                     = 129,
-    // 113!
-    SMART_ACTION_MOVE_TO_POS_TARGET                 = 130,    // pointId
-    SMART_ACTION_SET_GO_STATE                       = 131,    // state
-    SMART_ACTION_EXIT_VEHICLE                       = 132,    // none
-    SMART_ACTION_SET_UNIT_MOVEMENT_FLAGS            = 133,    // flags
-    SMART_ACTION_SET_COMBAT_DISTANCE                = 134,    // combatDistance
-    SMART_ACTION_SET_CASTER_COMBAT_DIST             = 135,    // followDistance, resetToMax
-    SMART_ACTION_SET_HOVER                          = 141,    // 0/1
-    SMART_ACTION_ADD_IMMUNITY                       = 142,    // type, id, value
-    SMART_ACTION_REMOVE_IMMUNITY                    = 143,    // type, id, value
-    SMART_ACTION_FALL                               = 144,    // 
-    SMART_ACTION_SET_EVENT_FLAG_RESET               = 145,    // 0/1
-    SMART_ACTION_STOP_MOTION                        = 147,    // stopMoving, movementExpired
-    SMART_ACTION_NO_ENVIRONMENT_UPDATE              = 148,
-    SMART_ACTION_ZONE_UNDER_ATTACK                  = 149,
-    SMART_ACTION_LOAD_GRID                          = 150,
+    // RESERVED                                     = 130,
+    // RESERVED                                     = 131,
+    // RESERVED                                     = 132,
+    // RESERVED                                     = 133,
+    // RESERVED                                     = 134,
 
-    SMART_ACTION_END                                = 151,    // ZOMG!, zmienic w sql
+    SMART_ACTION_TC_END                             = 135,    // placeholder
+
+    // AC-only SmartActions:
+
+    SMART_ACTION_AC_START                           = 200,    // placeholder
+
+    SMART_ACTION_MOVE_TO_POS_TARGET                 = 201,    // pointId
+    SMART_ACTION_SET_GO_STATE                       = 202,    // state
+    SMART_ACTION_EXIT_VEHICLE                       = 203,    // none
+    SMART_ACTION_SET_UNIT_MOVEMENT_FLAGS            = 204,    // flags
+    SMART_ACTION_SET_COMBAT_DISTANCE                = 205,    // combatDistance
+    SMART_ACTION_SET_CASTER_COMBAT_DIST             = 206,    // followDistance, resetToMax
+    SMART_ACTION_SET_HOVER                          = 207,    // 0/1
+    SMART_ACTION_ADD_IMMUNITY                       = 208,    // type, id, value
+    SMART_ACTION_REMOVE_IMMUNITY                    = 209,    // type, id, value
+    SMART_ACTION_FALL                               = 210,    //
+    SMART_ACTION_SET_EVENT_FLAG_RESET               = 211,    // 0/1
+    SMART_ACTION_STOP_MOTION                        = 212,    // stopMoving, movementExpired
+    SMART_ACTION_NO_ENVIRONMENT_UPDATE              = 213,
+    SMART_ACTION_ZONE_UNDER_ATTACK                  = 214,
+    SMART_ACTION_LOAD_GRID                          = 215,
+
+    SMART_ACTION_AC_END                             = 216,    // placeholder
 };
 
 struct SmartAction
