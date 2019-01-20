@@ -353,7 +353,9 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
         sLog->outErrorDb("SmartAIMgr: EntryOrGuid %d, event type %u can not be used for Script type %u", e.entryOrGuid, e.GetEventType(), e.GetScriptType());
         return false;
     }
-    if (e.action.type <= 0 || e.action.type >= SMART_ACTION_END)
+    if (e.action.type <= 0
+        || (e.action.type >= SMART_ACTION_TC_END && e.action.type <= SMART_ACTION_AC_START)
+        || e.action.type >= SMART_ACTION_AC_END)
     {
         sLog->outErrorDb("SmartAIMgr: EntryOrGuid %d using event(%u) has invalid action type (%u), skipped.", e.entryOrGuid, e.event_id, e.GetActionType());
         return false;
