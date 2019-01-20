@@ -463,9 +463,9 @@ public:
             cInfo->maxdmg             = fields[23].GetFloat();
             cInfo->dmgschool          = fields[24].GetUInt8();
             cInfo->attackpower        = fields[25].GetUInt32();
-            cInfo->dmg_multiplier     = fields[26].GetFloat();
-            cInfo->baseattacktime     = fields[27].GetUInt32();
-            cInfo->rangeattacktime    = fields[28].GetUInt32();
+            cInfo->DamageModifier     = fields[26].GetFloat();
+            cInfo->BaseAttackTime     = fields[27].GetUInt32();
+            cInfo->RangeAttackTime    = fields[28].GetUInt32();
             cInfo->unit_class         = fields[29].GetUInt8();
             cInfo->unit_flags         = fields[30].GetUInt32();
             cInfo->unit_flags2        = fields[31].GetUInt32();
