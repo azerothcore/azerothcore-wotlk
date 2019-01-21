@@ -382,6 +382,8 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
             sLog->outErrorDb("SmartAIMgr: EntryOrGuid %d using event(%u) has an action type that is not yet supported on AzerothCore (%u), skipped.",
                              e.entryOrGuid, e.event_id, e.GetActionType());
             return false;
+        default:
+            break;
     }
     if (e.event.event_phase_mask > SMART_EVENT_PHASE_ALL)
     {
