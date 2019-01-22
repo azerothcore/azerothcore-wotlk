@@ -61,6 +61,13 @@ MailSender::MailSender(Player* sender)
     m_senderId = sender->GetGUIDLow();
 }
 
+MailSender::MailSender(uint32 senderEntry)
+{
+    m_messageType = MAIL_CREATURE;
+    m_senderId = senderEntry;
+    m_stationery = MAIL_STATIONERY_DEFAULT;
+}
+
 MailReceiver::MailReceiver(Player* receiver) : m_receiver(receiver), m_receiver_lowguid(receiver->GetGUIDLow())
 {
 }

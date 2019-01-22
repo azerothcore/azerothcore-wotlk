@@ -1,6 +1,5 @@
 # ![logo](https://raw.githubusercontent.com/azerothcore/azerothcore.github.io/master/images/logo-github.png) AzerothCore
 
-[![Coverity](https://scan.coverity.com/projects/13814/badge.svg)](https://scan.coverity.com/projects/azerothcore-azerothcore-wotlk)
 [![Master Build Status](https://travis-ci.org/azerothcore/azerothcore-wotlk.svg)](https://travis-ci.org/azerothcore/azerothcore-wotlk)
 [![Bountysource](https://www.bountysource.com/badge/tracker?tracker_id=40032087)](https://www.bountysource.com/teams/azerothcore/bounties)
 [![StackOverflow](http://img.shields.io/badge/stackoverflow-azerothcore-blue.svg)]( http://stackoverflow.com/questions/tagged/azerothcore )
@@ -48,3 +47,10 @@ This project is brought to you thanks to:
 ## Links
 
 - [Website](https://azerothcore.github.io/)
+
+
+## Sponsors
+
+List of organizations that help the AzerothCore project:
+
+[![JetBrains](https://user-images.githubusercontent.com/75517/51205146-7f225c80-1905-11e9-82e0-835627be170d.png)](https://www.jetbrains.com/?from=AzerothCore)

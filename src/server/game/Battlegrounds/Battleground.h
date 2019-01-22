@@ -488,12 +488,12 @@ class Battleground
         void EndBattleground(TeamId winnerTeamId);
         void BlockMovement(Player* player);
 
-        void SendWarningToAll(int32 entry, ...);
-        void SendMessageToAll(int32 entry, ChatMsg type, Player const* source = NULL);
-        void PSendMessageToAll(int32 entry, ChatMsg type, Player const* source, ...);
+        void SendWarningToAll(uint32 entry, ...);
+        void SendMessageToAll(uint32 entry, ChatMsg type, Player const* source = NULL);
+        void PSendMessageToAll(uint32 entry, ChatMsg type, Player const* source, ...);
 
         // specialized version with 2 string id args
-        void SendMessage2ToAll(int32 entry, ChatMsg type, Player const* source, int32 strId1 = 0, int32 strId2 = 0);
+        void SendMessage2ToAll(uint32 entry, ChatMsg type, Player const* source, uint32 strId1 = 0, uint32 strId2 = 0);
 
         // Raid Group
         Group* GetBgRaid(TeamId teamId) const { return m_BgRaids[teamId]; }

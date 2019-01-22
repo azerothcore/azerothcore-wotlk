@@ -3884,6 +3884,10 @@ void SpellMgr::LoadDbcDataCorrections()
         case 55268:
             spellInfo->AttributesEx3 |= SPELL_ATTR3_BLOCKABLE_SPELL;
             break;
+        // Death Knight T10 Tank 2p Bonus
+        case 70650:
+            spellInfo->EffectApplyAuraName[0] = SPELL_AURA_ADD_PCT_MODIFIER;
+            break;
 
 
 
@@ -5846,6 +5850,7 @@ void SpellMgr::LoadDbcDataCorrections()
             spellInfo->Effect[1] = SPELL_EFFECT_DUMMY;
             spellInfo->EffectRadiusIndex[1] = spellInfo->EffectRadiusIndex[0];
             spellInfo->EffectImplicitTargetA[1] = TARGET_UNIT_DEST_AREA_ENTRY;
+			spellInfo->AttributesEx4 &= ~SPELL_ATTR4_CAN_CAST_WHILE_CASTING;
             break;
         // Still At It (12644)
         case 51931:

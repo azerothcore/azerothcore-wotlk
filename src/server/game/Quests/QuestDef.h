@@ -176,6 +176,16 @@ struct QuestLocale
     std::vector< StringVector > ObjectiveText;
 };
 
+struct QuestRequestItemsLocale
+{
+    std::vector<std::string> CompletionText;
+};
+
+struct QuestOfferRewardLocale
+{
+    std::vector<std::string> RewardText;
+};
+
 // This Quest class provides a convenient way to access a few pretotaled (cached) quest details,
 // all base quest information, and any utility functions such as generating the amount of
 // xp to give
@@ -246,6 +256,7 @@ class Quest
         int32  GetRewSpellCast() const { return RewardSpell; }
         uint32 GetRewMailTemplateId() const { return RewardMailTemplateId; }
         uint32 GetRewMailDelaySecs() const { return RewardMailDelay; }
+        uint32 GetRewMailSenderEntry() const { return RewardMailSenderEntry; }
         uint32 GetPOIContinent() const { return POIContinent; }
         float  GetPOIx() const { return POIx; }
         float  GetPOIy() const { return POIy; }
@@ -371,6 +382,7 @@ class Quest
         uint32 RequiredMaxRepFaction  = 0;
         int32  RequiredMaxRepValue    = 0;
         uint32 StartItemCount         = 0;
+        uint32 RewardMailSenderEntry  = 0;
         uint32 SpecialFlags           = 0; // custom flags, not sniffed/WDB
 };
 

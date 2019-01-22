@@ -301,7 +301,9 @@ public:
                     break;
                 case GO_KELTHUZAD_GATE:
                     _kelthuzadgateGUID = pGo->GetGUID();
-                break;
+                    if (GetBossState(BOSS_SAPPHIRON) == DONE && _speakTimer==0)
+                        pGo->SetGoState(GO_STATE_ACTIVE);
+               	   break;
                 case GO_SAPPHIRON_GATE:
                     _sapphironGateGUID = pGo->GetGUID();
                     if (GetBossState(BOSS_SAPPHIRON) == DONE)
@@ -523,7 +525,11 @@ public:
                     break;
                 case BOSS_SAPPHIRON:
                     if (state == DONE)
+                    {
                         _speakTimer = 1;
+                        // Load KT's grid so he can talk
+                        instance->LoadGrid(3763.43f, -5115.87f);
+                    }
                     else if (state == NOT_STARTED)
                         sapphironAchievement = true;
                     break;
@@ -618,30 +624,37 @@ public:
                     _speakTimer += diff;
                 else
                     return;
-                if (_speakTimer > 20000 && _speakTimer < 30000)
+                if (_speakTimer > 10000 && _speakTimer < 20000)
                 {
                     kel->AI()->Talk(SAY_SAPP_DIALOG1);
-                    _speakTimer = 30000;
+                    _speakTimer = 20000;
                 }
-                else if (_speakTimer > 45000 && _speakTimer < 50000)
+                else if (_speakTimer > 30000 && _speakTimer < 40000)
                 {
                     lich->AI()->Talk(SAY_SAPP_DIALOG2_LICH);
-                    _speakTimer = 50000;
+                    _speakTimer = 40000;
                 }
-                else if (_speakTimer > 58000 && _speakTimer < 70000)
+                else if (_speakTimer > 54000 && _speakTimer < 60000)
                 {
                     kel->AI()->Talk(SAY_SAPP_DIALOG3);
-                    _speakTimer = 70000;
+                    _speakTimer = 60000;
                 }
-                else if (_speakTimer > 78000 && _speakTimer < 90000)
+                else if (_speakTimer > 70000 && _speakTimer < 80000)
                 {
                     lich->AI()->Talk(SAY_SAPP_DIALOG4_LICH);
-                    _speakTimer = 90000;
+                    _speakTimer = 80000;
                 }
-                else if (_speakTimer > 98000)
+                else if (_speakTimer > 92000 && _speakTimer < 100000)
                 {
                     kel->AI()->Talk(SAY_SAPP_DIALOG5);
+                    _speakTimer = 100000;
+                }
+                else if (_speakTimer > 105000)
+                {
+                    kel->AI()->Talk(SAY_SAPP_DIALOG6);
                     _speakTimer = 0;
+                    if (GameObject* go = instance->GetGameObject(_kelthuzadgateGUID))
+                        go->SetGoState(GO_STATE_ACTIVE);
                 }
             }
 
