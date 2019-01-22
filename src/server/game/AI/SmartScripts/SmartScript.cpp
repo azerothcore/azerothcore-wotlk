@@ -393,7 +393,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                                 menu.SendQuestGiverQuestDetails(q, me->GetGUID(), true);
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
                                 sLog->outDebug(
-                                        "LOG_FILTER_DATABASE_AI",
+                                        LOG_FILTER_DATABASE_AI,
                                         "SmartScript::ProcessAction:: SMART_ACTION_OFFER_QUEST: Player guidLow %u - offering quest %u",
                                         (*itr)->GetGUIDLow(),
                                         e.action.questOffer.questID);
@@ -405,7 +405,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                         (*itr)->ToPlayer()->AddQuestAndCheckCompletion(q, nullptr);
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
                         sLog->outDebug(
-                                "LOG_FILTER_DATABASE_AI",
+                                LOG_FILTER_DATABASE_AI,
                                 "SmartScript::ProcessAction:: SMART_ACTION_OFFER_QUEST: Player guidLow %u - quest %u added",
                                      (*itr)->GetGUIDLow(),
                                      e.action.questOffer.questID);
