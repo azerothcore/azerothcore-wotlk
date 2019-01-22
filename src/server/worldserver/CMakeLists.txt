@@ -114,6 +114,7 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/src/server/game/Mails
   ${CMAKE_SOURCE_DIR}/src/server/game/Maps
   ${CMAKE_SOURCE_DIR}/src/server/game/Miscellaneous
+  ${CMAKE_SOURCE_DIR}/src/server/game/Motd
   ${CMAKE_SOURCE_DIR}/src/server/game/Movement
   ${CMAKE_SOURCE_DIR}/src/server/game/Movement/Spline
   ${CMAKE_SOURCE_DIR}/src/server/game/Movement/MovementGenerators
@@ -152,6 +153,9 @@ add_executable(worldserver
   ${worldserver_SRCS}
   ${worldserver_PCH_SRC}
 )
+
+# Group sources
+GroupSources(${CMAKE_CURRENT_SOURCE_DIR})
 
 if( NOT WIN32 )
   set_target_properties(worldserver PROPERTIES

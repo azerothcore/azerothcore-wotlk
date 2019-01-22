@@ -789,14 +789,14 @@ enum TrinityStrings
     LANG_NPCINFO_PLAYER_VEHICLE         = 842,
 
     // Pinfo commands
-    LANG_PINFO_PLAYER                   = 453,
-    LANG_PINFO_GM_ACTIVE                = 548,
-    LANG_PINFO_BANNED                   = 549,
-    LANG_PINFO_MUTED                    = 550,
-    LANG_PINFO_ACC_ACCOUNT              = 714,
-    LANG_PINFO_ACC_LASTLOGIN            = 716,
+    LANG_PINFO_PLAYER                   = 35400,
+    LANG_PINFO_GM_ACTIVE                = 35401,
+    LANG_PINFO_BANNED                   = 35402,
+    LANG_PINFO_MUTED                    = 35403,
+    LANG_PINFO_ACC_ACCOUNT              = 35404,
+    LANG_PINFO_ACC_LASTLOGIN            = 35405,
     LANG_PINFO_ACC_OS                   = 749,
-    LANG_PINFO_ACC_REGMAILS             = 879,
+    LANG_PINFO_ACC_REGMAILS             = 35406,
     LANG_PINFO_ACC_IP                   = 752,
     LANG_PINFO_CHR_LEVEL_LOW            = 843,
     LANG_PINFO_CHR_RACE                 = 844,
@@ -811,6 +811,9 @@ enum TrinityStrings
     LANG_PINFO_CHR_PLAYEDTIME           = 853,
     LANG_PINFO_CHR_MAILS                = 854,
     LANG_PINFO_CHR_LEVEL_HIGH           = 871,
+    LANG_NO_REASON                      = 35407,
+    LANG_UNAUTHORIZED                   = 35408,
+    LANG_PINFO_CHR_MAP_WITH_AREA        = 35409,
 
     LANG_CHARACTER_GENDER_MALE          = 855,
     LANG_CHARACTER_GENDER_FEMALE        = 856,
@@ -1143,7 +1146,19 @@ enum TrinityStrings
     LANG_COMMAND_MUTEHISTORY_EMPTY      = 5060,
     LANG_COMMAND_MUTEHISTORY_OUTPUT     = 5061,
 
-    // Room for more Trinity strings      5062-9999
+    // Spy command
+    LANG_COMMAND_SPY_FOLLOWING           = 5062,
+    LANG_COMMAND_SPY_UNFOLLOW            = 5063,
+    LANG_COMMAND_SPY_ALREADY_FOLLOWED_BY = 5064,
+    LANG_COMMAND_SPY_FOLLOWING_GROUP     = 5065,
+    LANG_COMMAND_SPY_UNFOLLOW_GROUP      = 5066,
+    LANG_COMMAND_SPY_NOT_FOLLOWING_GROUP = 5067,
+    LANG_COMMAND_SPY_CLEARED             = 5068,
+    LANG_COMMAND_SPY_LIST                = 5069,
+    LANG_COMMAND_SPY_WHISPERS_PLAYER     = 5070,
+    LANG_COMMAND_SPY_TELLS_GROUP         = 5071,
+
+    // Room for more Trinity strings      5072-9999
 
     // Level requirement notifications
     LANG_SAY_REQ                        = 6604,

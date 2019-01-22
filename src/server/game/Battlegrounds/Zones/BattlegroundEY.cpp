@@ -13,6 +13,7 @@
 #include "Player.h"
 #include "Util.h"
 #include "WorldSession.h"
+#include "GameGraveyard.h"
 
 BattlegroundEY::BattlegroundEY()
 {
@@ -309,11 +310,11 @@ bool BattlegroundEY::SetupBattleground()
         AddObject(BG_EY_OBJECT_SPEEDBUFF_FEL_REAVER + i * 3 + 2, Buff_Entries[2], at->x, at->y, at->z, 0.907571f, 0, 0, 0.438371f, 0.898794f, RESPAWN_ONE_DAY);
     }
 
-    WorldSafeLocsEntry const* sg = NULL;
-    sg = sWorldSafeLocsStore.LookupEntry(BG_EY_GRAVEYARD_MAIN_ALLIANCE);
+    GraveyardStruct const* sg = NULL;
+    sg = sGraveyard->GetGraveyard(BG_EY_GRAVEYARD_MAIN_ALLIANCE);
     AddSpiritGuide(BG_EY_SPIRIT_MAIN_ALLIANCE, sg->x, sg->y, sg->z, 3.124139f, TEAM_ALLIANCE);
 
-    sg = sWorldSafeLocsStore.LookupEntry(BG_EY_GRAVEYARD_MAIN_HORDE);
+    sg = sGraveyard->GetGraveyard(BG_EY_GRAVEYARD_MAIN_HORDE);
     AddSpiritGuide(BG_EY_SPIRIT_MAIN_HORDE, sg->x, sg->y, sg->z, 3.193953f, TEAM_HORDE);
 
     for (uint32 i = BG_EY_OBJECT_DOOR_A; i < BG_EY_OBJECT_MAX; ++i)
@@ -480,7 +481,7 @@ void BattlegroundEY::EventTeamCapturedPoint(TeamId teamId, uint32 point)
     if (BgCreatures[point])
         DelCreature(point);
 
-    WorldSafeLocsEntry const* sg = sWorldSafeLocsStore.LookupEntry(m_CapturingPointTypes[point].GraveYardId);
+    GraveyardStruct const* sg = sGraveyard->GetGraveyard(m_CapturingPointTypes[point].GraveYardId);
     AddSpiritGuide(point, sg->x, sg->y, sg->z, 3.124139f, teamId);
 
     UpdatePointsIcons(point);
@@ -565,10 +566,10 @@ void BattlegroundEY::FillInitialWorldStates(WorldPacket& data)
     data << uint32(PROGRESS_BAR_STATUS)             << uint32(0);
 }
 
-WorldSafeLocsEntry const* BattlegroundEY::GetClosestGraveyard(Player* player)
+GraveyardStruct const* BattlegroundEY::GetClosestGraveyard(Player* player)
 {
-    WorldSafeLocsEntry const* entry = sWorldSafeLocsStore.LookupEntry(BG_EY_GRAVEYARD_MAIN_ALLIANCE + player->GetTeamId());
-    WorldSafeLocsEntry const* nearestEntry = entry;
+    GraveyardStruct const* entry = sGraveyard->GetGraveyard(BG_EY_GRAVEYARD_MAIN_ALLIANCE + player->GetTeamId());
+    GraveyardStruct const* nearestEntry = entry;
 
     float pX = player->GetPositionX();
     float pY = player->GetPositionY();
@@ -579,7 +580,7 @@ WorldSafeLocsEntry const* BattlegroundEY::GetClosestGraveyard(Player* player)
     for (uint8 i = 0; i < EY_POINTS_MAX; ++i)
         if (_capturePointInfo[i].IsUnderControl(player->GetTeamId()))
         {
-            entry = sWorldSafeLocsStore.LookupEntry(m_CapturingPointTypes[i].GraveYardId);
+            entry = sGraveyard->GetGraveyard(m_CapturingPointTypes[i].GraveYardId);
             dist = (entry->x - pX)*(entry->x - pX) + (entry->y - pY)*(entry->y - pY) + (entry->z - pZ)*(entry->z - pZ);
             if (dist < minDist)
             {

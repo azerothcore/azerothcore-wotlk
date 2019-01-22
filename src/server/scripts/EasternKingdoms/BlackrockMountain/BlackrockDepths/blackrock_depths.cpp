@@ -12,6 +12,8 @@
 #include "Player.h"
 #include "WorldSession.h"
 
+uint32 braziersUsed = 0;
+
 //go_shadowforge_brazier
 class go_shadowforge_brazier : public GameObjectScript
 {
@@ -27,10 +29,23 @@ public:
             else
                 instance->SetData(TYPE_LYCEUM, IN_PROGRESS);
             // If used brazier open linked doors (North or South)
-            if (go->GetGUID() == instance->GetData64(DATA_SF_BRAZIER_N))
-                instance->HandleGameObject(instance->GetData64(DATA_GOLEM_DOOR_N), true);
-            else if (go->GetGUID() == instance->GetData64(DATA_SF_BRAZIER_S))
-                instance->HandleGameObject(instance->GetData64(DATA_GOLEM_DOOR_S), true);
+            if (go->GetGUID() == instance->GetData64(DATA_SF_BRAZIER_N)) {
+                if (braziersUsed == 0) {
+                    braziersUsed = 1;
+                }else if(braziersUsed == 2){
+                    instance->HandleGameObject(instance->GetData64(DATA_GOLEM_DOOR_N), true);
+                    instance->HandleGameObject(instance->GetData64(DATA_GOLEM_DOOR_S), true);
+                    braziersUsed = 0;
+                }
+            }else if (go->GetGUID() == instance->GetData64(DATA_SF_BRAZIER_S)) {
+                if (braziersUsed == 0) {
+                    braziersUsed = 2;
+                }else if (braziersUsed == 1) {
+                    instance->HandleGameObject(instance->GetData64(DATA_GOLEM_DOOR_N), true);
+                    instance->HandleGameObject(instance->GetData64(DATA_GOLEM_DOOR_S), true);
+                    braziersUsed = 0;
+                }
+            }
         }
         return false;
     }

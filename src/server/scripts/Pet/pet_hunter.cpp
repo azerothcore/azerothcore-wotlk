@@ -110,7 +110,7 @@ class npc_pet_hunter_snake_trap : public CreatureScript
                     me->SetMaxHealth(health);
                     //Add delta to make them not all hit the same time
                     uint32 delta = urand(0, 700);
-                    me->SetAttackTime(BASE_ATTACK, Info->baseattacktime + delta);
+                    me->SetAttackTime(BASE_ATTACK, Info->BaseAttackTime + delta);
                     me->SetStatFloatValue(UNIT_FIELD_RANGED_ATTACK_POWER , float(Info->attackpower));
                     me->CastSpell(me, SPELL_HUNTER_DEADLY_POISON_PASSIVE, true);
 

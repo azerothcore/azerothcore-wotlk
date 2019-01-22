@@ -17,6 +17,7 @@
 #include "Util.h"
 #include "World.h"
 #include "SHA1.h"
+#include "ServerMotd.h"
 
 RASocket::RASocket()
 {
@@ -349,7 +350,7 @@ int RASocket::svc(void)
     }
 
     // send motd
-    if (send(std::string(sWorld->GetMotd()) + "\r\n") == -1)
+    if (send(std::string(Motd::GetMotd()) + "\r\n") == -1)
         return -1;
 
     for (;;)

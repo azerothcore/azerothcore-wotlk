@@ -1,0 +1,61 @@
+version: '3.2'
+
+services:
+
+  ac-database:
+    image: azerothcore/database
+    build:
+      context: .
+      dockerfile: ./docker/database/Dockerfile
+    networks:
+      - ac-network
+    ports:
+      - ${DB_EXTERNAL_PORT:-3306}:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD:-password}
+
+  ac-worldserver:
+    stdin_open: true
+    tty: true
+    image: azerothcore/worldserver
+    build:
+      context: ./docker/worldserver
+      dockerfile: Dockerfile
+    networks:
+      - ac-network
+    ports:
+      - ${WORLD_EXTERNAL_PORT:-8085}:8085
+    volumes:
+      - type: bind
+        source: ${WORLDSERVER_ETC:-./docker/worldserver/etc}
+        target: /azeroth-server/etc
+      - type: bind
+        source: ${WORLDSERVER_LOGS:-./docker/worldserver/logs}
+        target: /azeroth-server/logs
+      - type: bind
+        source: ${WORLDSERVER_DATA:-./docker/worldserver/data}
+        target: /azeroth-server/data
+    depends_on:
+      - ac-database
+
+  ac-authserver:
+    image: azerothcore/authserver
+    build:
+      context: ./docker/authserver
+      dockerfile: Dockerfile
+    networks:
+      - ac-network
+    ports:
+      - ${AUTH_EXTERNAL_PORT:-3724}:3724
+    volumes:
+      - type: bind
+        source: ${AUTHSERVER_ETC:-./docker/authserver/etc}
+        target: /azeroth-server/etc
+      - type: bind
+        source: ${AUTHSERVER_LOGS:-./docker/authserver/logs}
+        target: /azeroth-server/logs
+    depends_on:
+      - ac-database
+
+networks:
+  ac-network:

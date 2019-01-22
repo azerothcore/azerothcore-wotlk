@@ -299,7 +299,12 @@ function dbasm_db_import() {
 
     export MYSQL_PWD=$MYSQL_PASS
 
-	"$DB_MYSQL_EXEC" -h "$MYSQL_HOST" -u "$MYSQL_USER" "$dbname" < "${OUTPUT_FOLDER}${database}_${type}.sql"
+
+    # TODO: remove this line after we squash our DB updates
+    "$DB_MYSQL_EXEC" -h "$MYSQL_HOST" -u "$MYSQL_USER" -e "SET GLOBAL max_allowed_packet=128*1024*1024;"
+
+	"$DB_MYSQL_EXEC" -h "$MYSQL_HOST" -u "$MYSQL_USER" --default-character-set=utf8 "$dbname" < "${OUTPUT_FOLDER}${database}_${type}.sql"
+
 	if [[ $? -ne 0 ]]; then
 		err=$("$DB_MYSQL_EXEC" -h "$MYSQL_HOST" -u "$MYSQL_USER" "$dbname" 2>&1 )
 		if [[ "$err" == *"Access denied"* ]]; then
