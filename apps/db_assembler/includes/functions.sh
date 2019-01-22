@@ -4,7 +4,7 @@ PROMPT_PASS=""
 
 # use in a subshell
 function dbasm_resetExitCode() {
-	exit 0	
+	exit 0
 }
 
 function dbasm_mysqlExec() {
@@ -13,12 +13,12 @@ function dbasm_mysqlExec() {
 	options=$3
 
 	eval $confs
-	
+
 	if [[ ! -z "${PROMPT_USER// }" ]]; then
 		MYSQL_USER=$PROMPT_USER
 		MYSQL_PASS=$PROMPT_PASS
 	fi
-	
+
 	export MYSQL_PWD=$MYSQL_PASS
 
 	retval=$("$DB_MYSQL_EXEC"  -h "$MYSQL_HOST" -u "$MYSQL_USER" $options -e "$command")
@@ -51,7 +51,7 @@ function dbasm_mysqlExec() {
 
                 local _name="DB_"$_uc"_NAME"
                 local _dbname=${!_name}
-                
+
                 eval $_confs
                 echo "Grant permissions for ${MYSQL_USER}'@'${MYSQL_HOST} to ${_dbname}"
                 "$DB_MYSQL_EXEC"  -h "$MYSQL_HOST" -u "$PROMPT_USER" $options -e "GRANT ALL PRIVILEGES ON ${_dbname}.* TO '${MYSQL_USER}'@'${MYSQL_HOST}'  WITH GRANT OPTION;"
@@ -65,7 +65,7 @@ function dbasm_mysqlExec() {
 function dbasm_isNotEmpty() {
     dbname=$1
     conf=$2
-    
+
     dbasm_mysqlExec "$conf" "SELECT COUNT(DISTINCT table_name) FROM information_schema.columns WHERE table_schema = '${dbname}'" "--skip-column-names"
     if (( $retval > 0 )); then
         true
@@ -96,7 +96,7 @@ function dbasm_createDB() {
 
     name="DB_"$uc"_NAME"
     dbname=${!name}
-    
+
     eval $confs
 
     CONF_USER=$MYSQL_USER
@@ -104,7 +104,7 @@ function dbasm_createDB() {
 
     if dbasm_dbExists $dbname "$confs"; then
         echo "$dbname database exists"
-    else 
+    else
 		echo "Creating DB ${dbname} ..."
         dbasm_mysqlExec "$confs" "CREATE DATABASE \`${dbname}\`" ""
         dbasm_mysqlExec "$confs" "GRANT ALL PRIVILEGES ON \`${dbname}\`.* TO '${CONF_USER}'@'${MYSQL_HOST}' WITH GRANT OPTION;"
@@ -125,7 +125,7 @@ function dbasm_assemble() {
     v="$name[@]"
     base=("${!v}")
 
-    name="DB_"$uc"_UPDATE_PATHS"
+    name="DB_"$uc"_UPDATES_PATHS"
     v="$name[@]"
     updates=("${!v}")
 
@@ -242,7 +242,7 @@ function dbasm_db_backup() {
     dbname=${!name}
 
     eval $confs;
-    
+
 	if [[ ! -z "${PROMPT_USER// }" ]]; then
 		MYSQL_USER=$PROMPT_USER
 		MYSQL_PASS=$PROMPT_PASS
@@ -291,14 +291,14 @@ function dbasm_db_import() {
     echo "importing $1 - $2 ..."
 
     eval $confs;
-    
+
 	if [[ ! -z "${PROMPT_USER// }" ]]; then
 		MYSQL_USER=$PROMPT_USER
 		MYSQL_PASS=$PROMPT_PASS
 	fi
 
     export MYSQL_PWD=$MYSQL_PASS
-    
+
 	"$DB_MYSQL_EXEC" -h "$MYSQL_HOST" -u "$MYSQL_USER" "$dbname" < "${OUTPUT_FOLDER}${database}_${type}.sql"
 	if [[ $? -ne 0 ]]; then
 		err=$("$DB_MYSQL_EXEC" -h "$MYSQL_HOST" -u "$MYSQL_USER" "$dbname" 2>&1 )
@@ -352,21 +352,21 @@ function dbasm_import() {
         do
             dbasm_db_import "$db" "base"
         done
-    fi 
+    fi
 
     if [ $with_updates = true ]; then
         for db in ${DATABASES[@]}
         do
             dbasm_db_import "$db" "updates"
         done
-    fi 
+    fi
 
     if [ $with_custom = true ]; then
         for db in ${DATABASES[@]}
         do
             dbasm_db_import "$db" "custom"
         done
-    fi 
+    fi
 
     echo "=====           DONE            ====="
 }
