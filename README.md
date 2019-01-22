@@ -35,7 +35,7 @@ For help requests, it is recommended to ask your question on [StackOverflow](htt
 This project is brought to you thanks to:
 
 - The [AzerothCore developers and contributors](https://github.com/AzerothCore/azerothcore-wotlk/graphs/contributors)
-- The SunwellCore developers **xinef** and **pussywizard**
+- The [SunwellCore developers xinef and pussywizard](http://www.azerothcore.org/pages/sunwell.pl/)
 - All the [TrinityCore developers and contributors](https://github.com/TrinityCore/TrinityCore/blob/3.3.5/THANKS)
 - All the [MaNGOS, ScriptDev2 and UDB developers and contributors](https://github.com/cmangos/mangos-wotlk/blob/master/AUTHORS.md)
 
