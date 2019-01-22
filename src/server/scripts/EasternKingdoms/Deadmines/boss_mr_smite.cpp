@@ -43,9 +43,13 @@ class boss_mr_smite : public CreatureScript
             }
 
             EventMap events;
+            bool health67;
+            bool health34;
 
             void Reset()
             {
+                health67 = false;
+                health34 = false;
                 me->LoadEquipment(EQUIP_SWORD);
                 me->SetCanDualWield(false);
                 me->SetStandState(UNIT_STAND_STATE_STAND);
@@ -73,7 +77,7 @@ class boss_mr_smite : public CreatureScript
                         events.ScheduleEvent(EVENT_SMITE_SLAM, 15000);
                         break;
                     case EVENT_CHECK_HEALTH1:
-                        if (me->HealthBelowPct(67))
+                        if (me->HealthBelowPct(67) && !health67)
                         {
                             me->CastSpell(me, SPELL_SMITE_STOMP, false);
                             events.DelayEvents(10000);
@@ -82,12 +86,13 @@ class boss_mr_smite : public CreatureScript
                             Talk(SAY_SWAP1);
                             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
                             me->SetReactState(REACT_PASSIVE);
+                            health67 = true;
                             break;
                         }
                         events.ScheduleEvent(EVENT_CHECK_HEALTH1, 500);
                         break;
                     case EVENT_CHECK_HEALTH2:
-                        if (me->HealthBelowPct(34))
+                        if (me->HealthBelowPct(34) && !health34)
                         {
                             me->CastSpell(me, SPELL_SMITE_STOMP, false);
                             events.DelayEvents(10000);
@@ -96,6 +101,7 @@ class boss_mr_smite : public CreatureScript
                             Talk(SAY_SWAP2);
                             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
                             me->SetReactState(REACT_PASSIVE);
+                            health34 = true;
                             break;
                         }
                         events.ScheduleEvent(EVENT_CHECK_HEALTH2, 500);
