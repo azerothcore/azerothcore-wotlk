@@ -17,7 +17,7 @@ git:
   depth: 1
 
 before_install:
-  - git config user.email "travis@build.bot" && git config user.name "Travis CI"
+  - git config user.email "azerothcorebot@gmail.com" && git config user.name "AzerothCoreBot"
   - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then cd bin/; fi
   # import pending sql
   - if [ "$TRAVIS_PULL_REQUEST" = "false" ] && [ "$TRAVIS_BRANCH" = "master" ]; then bash acore-db-pendings; fi
