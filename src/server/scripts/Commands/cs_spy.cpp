@@ -7,10 +7,10 @@
 std::map<uint32,uint32> gmListening;
 std::map<uint32,uint32> gmListeningGroup;
 
-class chat_spy_script : public PlayerScript
+class chat_spy_playerscript : public PlayerScript
 {
 public:
-    chat_spy_script() : PlayerScript("chat_spy_script") { }
+    chat_spy_playerscript() : PlayerScript("chat_spy_playerscript") { }
 
     void OnChat(Player *sender, uint32 /*type*/, uint32 lang, std::string& msg, Player *receiver)
     {
@@ -271,9 +271,9 @@ public:
     }
 };
 
-void AddSC_spy_scripts()
+void AddSC_spy_commandscript()
 {
-    new chat_spy_script();
+    new chat_spy_playerscript();
     new chat_spy_commandscript();
     new chat_spy_logout_cleaner();
 }
