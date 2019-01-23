@@ -629,6 +629,7 @@ void AddCommandScripts()
     AddSC_reload_commandscript();
     AddSC_reset_commandscript();
     AddSC_spectator_commandscript();
+    AddSC_spy_scripts();
     AddSC_tele_commandscript();
     AddSC_ticket_commandscript();
     AddSC_titles_commandscript();
