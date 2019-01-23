@@ -17,7 +17,7 @@ git:
   depth: 1
 
 before_install:
-  - git config user.email "travis@build.bot" && git config user.name "Travis CI"
+  - git config user.email "azerothcorebot@gmail.com" && git config user.name "AzerothCoreBot"
   - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then cd bin/; fi
   # import pending sql
   - if [ "$TRAVIS_PULL_REQUEST" = "false" ] && [ "$TRAVIS_BRANCH" = "master" ]; then bash acore-db-pendings; fi
@@ -25,7 +25,7 @@ before_install:
   # push changes to git if any
   - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then git fetch --unshallow; fi
   - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then git checkout $TRAVIS_BRANCH; fi
-  - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then git add -A . && git diff --cached --quiet || git commit -am "Importing pending sql" && git push https://$GITHUB_API_KEY@github.com/$TRAVIS_REPO_SLUG.git $TRAVIS_BRANCH; fi
+  - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then git add -A . && git diff --cached --quiet || git commit -am "Import pending SQL update file" && git push https://$GITHUB_API_KEY@github.com/$TRAVIS_REPO_SLUG.git $TRAVIS_BRANCH; fi
 
 install:
   # install OS deps (apt-get)
