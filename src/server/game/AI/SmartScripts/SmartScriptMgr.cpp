@@ -360,6 +360,31 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
         sLog->outErrorDb("SmartAIMgr: EntryOrGuid %d using event(%u) has invalid action type (%u), skipped.", e.entryOrGuid, e.event_id, e.GetActionType());
         return false;
     }
+    switch (e.action.type)
+    {
+        case SMART_ACTION_RESERVED_16:
+        case SMART_ACTION_PLAY_ANIMKIT:
+        case SMART_ACTION_SCENE_PLAY:
+        case SMART_ACTION_SCENE_CANCEL:
+            sLog->outErrorDb("SmartAIMgr: EntryOrGuid %d using event(%u) has an action type that is not supported on 3.3.5a (%u), skipped.",
+                             e.entryOrGuid, e.event_id, e.GetActionType());
+            return false;
+        case SMART_ACTION_RANDOM_SOUND:
+        case SMART_ACTION_SET_CORPSE_DELAY:
+        case SMART_ACTION_DISABLE_EVADE:
+        case SMART_ACTION_GO_SET_GO_STATE:
+        case SMART_ACTION_SET_CAN_FLY:
+        case SMART_ACTION_REMOVE_AURAS_BY_TYPE:
+        case SMART_ACTION_REMOVE_MOVEMENT:
+        case SMART_ACTION_SPAWN_SPAWNGROUP:
+        case SMART_ACTION_DESPAWN_SPAWNGROUP:
+        case SMART_ACTION_RESPAWN_BY_SPAWNID:
+            sLog->outErrorDb("SmartAIMgr: EntryOrGuid %d using event(%u) has an action type that is not yet supported on AzerothCore (%u), skipped.",
+                             e.entryOrGuid, e.event_id, e.GetActionType());
+            return false;
+        default:
+            break;
+    }
     if (e.event.event_phase_mask > SMART_EVENT_PHASE_ALL)
     {
         sLog->outErrorDb("SmartAIMgr: EntryOrGuid %d using event(%u) has invalid phase mask (%u), skipped.", e.entryOrGuid, e.event_id, e.event.event_phase_mask);
