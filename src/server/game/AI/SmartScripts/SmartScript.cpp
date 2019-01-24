@@ -372,7 +372,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
         delete targets;
         break;
     }
-    case SMART_ACTION_ADD_QUEST:
+    case SMART_ACTION_OFFER_QUEST:
     {
         ObjectList* targets = GetTargets(e, unit);
         if (!targets)
@@ -380,15 +380,37 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
 
         for (ObjectList::const_iterator itr = targets->begin(); itr != targets->end(); ++itr)
         {
-            if (IsPlayer(*itr))
+            if (Player* pTarget = (*itr)->ToPlayer())
             {
-                if (Quest const* q = sObjectMgr->GetQuestTemplate(e.action.quest.quest))
+                if (Quest const* q = sObjectMgr->GetQuestTemplate(e.action.questOffer.questID))
                 {
-                    (*itr)->ToPlayer()->AddQuestAndCheckCompletion(q, NULL);
+                    if (me && e.action.questOffer.directAdd == 0)
+                    {
+                        if (pTarget->CanTakeQuest(q, true))
+                            if (WorldSession* session = pTarget->GetSession())
+                            {
+                                PlayerMenu menu(session);
+                                menu.SendQuestGiverQuestDetails(q, me->GetGUID(), true);
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                    sLog->outDebug(LOG_FILTER_DATABASE_AI, "SmartScript::ProcessAction:: SMART_ACTION_ADD_QUEST: Player guidLow %u add quest %u",
-                        (*itr)->GetGUIDLow(), e.action.quest.quest);
+                                sLog->outDebug(
+                                        LOG_FILTER_DATABASE_AI,
+                                        "SmartScript::ProcessAction:: SMART_ACTION_OFFER_QUEST: Player guidLow %u - offering quest %u",
+                                        (*itr)->GetGUIDLow(),
+                                        e.action.questOffer.questID);
 #endif
+                            }
+                    }
+                    else
+                    {
+                        (*itr)->ToPlayer()->AddQuestAndCheckCompletion(q, nullptr);
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+                        sLog->outDebug(
+                                LOG_FILTER_DATABASE_AI,
+                                "SmartScript::ProcessAction:: SMART_ACTION_OFFER_QUEST: Player guidLow %u - quest %u added",
+                                     (*itr)->GetGUIDLow(),
+                                     e.action.questOffer.questID);
+#endif
+                    }
                 }
             }
         }
