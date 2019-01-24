@@ -4528,16 +4528,13 @@ void ObjectMgr::LoadQuests()
 
         if (qinfo->NextQuestId)
         {
-            QuestMap::iterator qNextItr = _questTemplates.find(abs(qinfo->GetNextQuestId()));
+            QuestMap::iterator qNextItr = _questTemplates.find(qinfo->GetNextQuestId());
             if (qNextItr == _questTemplates.end())
             {
-                sLog->outErrorDb("Quest %d has NextQuestId %i, but no such quest", qinfo->GetQuestId(), qinfo->GetNextQuestId());
+                sLog->outErrorDb("Quest %d has NextQuestId %u, but no such quest", qinfo->GetQuestId(), qinfo->GetNextQuestId());
             }
             else
-            {
-                int32 signedQuestId = qinfo->NextQuestId < 0 ? -int32(qinfo->GetQuestId()) : int32(qinfo->GetQuestId());
-                qNextItr->second->prevQuests.push_back(signedQuestId);
-            }
+                qNextItr->second->prevQuests.push_back(static_cast<int32>(qinfo->GetQuestId()));
         }
 
         if (qinfo->ExclusiveGroup)
