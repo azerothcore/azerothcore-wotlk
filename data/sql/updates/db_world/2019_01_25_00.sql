@@ -1,3 +1,19 @@
+-- DB update 2019_01_24_00 -> 2019_01_25_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2019_01_24_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2019_01_24_00 2019_01_25_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1548248436991481500'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO version_db_world (`sql_rev`) VALUES ('1548248436991481500');
 
 -- [Q] Lazy Peons -- https://wotlk.evowow.com/?quest=5441
@@ -1282,3 +1298,12 @@ INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type
 (@ENTRY,9,23,0,0,0,100,0,5000,5000,0,0,17,0,0,0,0,0,0,1,0,0,0,0,0,0,0,"Lazy Peon - On Script - Set Emote State 0"),
 (@ENTRY,9,24,0,0,0,100,0,0,0,0,0,69,0,0,0,0,0,0,8,0,0,0,@POSITION_X_SPAWN_PEON14,@POSITION_Y_SPAWN_PEON14,@POSITION_Z_SPAWN_PEON14,@POSITION_O_SPAWN_PEON14,"Lazy Peon - On Script - Move To Position"),
 (@ENTRY,9,25,0,0,0,100,0,5000,5000,0,0,11,17743,0,0,0,0,0,1,0,0,0,0,0,0,0,"Lazy Peon - On Script - Cast 'Peon Sleeping'");
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
