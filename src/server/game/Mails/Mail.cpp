@@ -9,6 +9,7 @@
 #include "Log.h"
 #include "World.h"
 #include "ObjectMgr.h"
+#include "GameTime.h"
 #include "Player.h"
 #include "Unit.h"
 #include "BattlegroundMgr.h"
@@ -175,7 +176,7 @@ void MailDraft::SendMailTo(SQLTransaction& trans, MailReceiver const& receiver, 
 
     uint32 mailId = sObjectMgr->GenerateMailID();
 
-    time_t deliver_time = time(NULL) + deliver_delay;
+    time_t deliver_time = GameTime::GetGameTime() + deliver_delay;
 
     //expire time if COD 3 days, if no COD 30 days, if auction sale pending 1 hour
     uint32 expire_delay;

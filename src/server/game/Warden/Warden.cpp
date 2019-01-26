@@ -13,6 +13,7 @@
 #include <openssl/md5.h>
 #include <openssl/sha.h>
 #include "World.h"
+#include "GameTime.h"
 #include "Player.h"
 #include "Util.h"
 #include "Warden.h"
@@ -88,7 +89,7 @@ void Warden::Update()
 {
     if (_initialized)
     {
-        uint32 currentTimestamp = World::GetGameTimeMS();
+        uint32 currentTimestamp = GameTime::GetGameTimeMS();
         uint32 diff = getMSTimeDiff(_previousTimestamp, currentTimestamp);
         _previousTimestamp = currentTimestamp;
 
