@@ -30,6 +30,10 @@ Installation instructions are available [here](https://github.com/AzerothCore/az
 
 For help requests, it is recommended to ask your question on [StackOverflow](https://stackoverflow.com/questions/tagged/azerothcore) and link it in [our chat](https://discordapp.com/channels/217589275766685707/284406375495368704).
 
+## Docker
+
+Dockerization of AzerothCore is fully supported. 
+
 ## Authors & Contributors
 
 This project is brought to you thanks to:
