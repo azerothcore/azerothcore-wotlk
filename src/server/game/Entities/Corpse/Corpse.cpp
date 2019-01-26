@@ -6,6 +6,7 @@
 
 #include "Common.h"
 #include "Corpse.h"
+#include "GameTime.h"
 #include "Player.h"
 #include "UpdateMask.h"
 #include "ObjectAccessor.h"
@@ -23,7 +24,7 @@ Corpse::Corpse(CorpseType type) : WorldObject(type != CORPSE_BONES), m_type(type
 
     m_valuesCount = CORPSE_END;
 
-    m_time = time(NULL);
+    m_time = GameTime::GetGameTime();
 
     lootRecipient = NULL;
 }
@@ -130,6 +131,11 @@ void Corpse::DeleteFromDB(SQLTransaction& trans)
         stmt->setUInt32(0, GUID_LOPART(GetOwnerGUID()));
     }
     trans->Append(stmt);
+}
+
+void Corpse::ResetGhostTime()
+{
+    m_time = GameTime::GetGameTime();
 }
 
 bool Corpse::LoadCorpseFromDB(uint32 guid, Field* fields)

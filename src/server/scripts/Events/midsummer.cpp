@@ -1,6 +1,7 @@
 // Scripted by Xinef
 
 #include "ScriptMgr.h"
+#include "GameTime.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "Spell.h"
@@ -184,7 +185,7 @@ class npc_midsummer_torch_target : public CreatureScript
                 Position pos;
                 pos.Relocate(posVec.at(num));
                 me->m_last_notify_position.Relocate(0.0f, 0.0f, 0.0f);
-                me->m_last_notify_mstime = World::GetGameTimeMS() + 10000;
+                me->m_last_notify_mstime = GameTime::GetGameTimeMS() + 10000;
 
                 me->NearTeleportTo(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation());
             }
@@ -300,7 +301,7 @@ public:
                 }
 
                 // Achievement
-                if ((time(NULL) - GetApplyTime()) > 60 && target->GetTypeId() == TYPEID_PLAYER)
+                if ((GameTime::GetGameTime() - GetApplyTime()) > 60 && target->GetTypeId() == TYPEID_PLAYER)
                     target->ToPlayer()->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET, 58934, 0, target);
             }
         }

@@ -15,6 +15,7 @@
 #include "World.h"
 #include "ObjectMgr.h"
 #include "GuildMgr.h"
+#include "GameTime.h"
 #include "WorldSession.h"
 #include "BigNumber.h"
 #include "SHA1.h"
@@ -218,7 +219,7 @@ void WorldSession::HandleWhoOpcode(WorldPacket& recvData)
 {
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Recvd CMSG_WHO Message");
 
-    time_t now = time(NULL);
+    time_t now = GameTime::GetGameTime();
     if (now < timeWhoCommandAllowed)
         return;
     timeWhoCommandAllowed = now + 3;
@@ -466,7 +467,7 @@ void WorldSession::HandleLogoutRequestOpcode(WorldPacket & /*recv_data*/)
         GetPlayer()->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
     }
 
-    LogoutRequest(time(NULL));
+    LogoutRequest(GameTime::GetGameTime());
 }
 
 void WorldSession::HandlePlayerLogoutOpcode(WorldPacket & /*recv_data*/)
@@ -817,7 +818,7 @@ void WorldSession::HandleReclaimCorpseOpcode(WorldPacket &recv_data)
         return;
 
     // prevent resurrect before 30-sec delay after body release not finished
-    if (time_t(corpse->GetGhostTime() + _player->GetCorpseReclaimDelay(corpse->GetType() == CORPSE_RESURRECTABLE_PVP)) > time_t(time(NULL)))
+    if (time_t(corpse->GetGhostTime() + _player->GetCorpseReclaimDelay(corpse->GetType() == CORPSE_RESURRECTABLE_PVP)) > time_t(GameTime::GetGameTime()))
         return;
 
     if (!corpse->IsWithinDistInMap(_player, CORPSE_RECLAIM_RADIUS, true))
@@ -1524,7 +1525,7 @@ void WorldSession::HandleTimeSyncResp(WorldPacket & recv_data)
 {
     uint32 counter, clientTicks;
     recv_data >> counter >> clientTicks;
-    //uint32 ourTicks = clientTicks + (World::GetGameTimeMS() - _player->m_timeSyncServer);
+    //uint32 ourTicks = clientTicks + (GameTime::GetGameTimeMS() - _player->m_timeSyncServer);
     _player->m_timeSyncClient = clientTicks;
 }
 
@@ -1858,7 +1859,7 @@ void WorldSession::HandleWorldStateUITimerUpdate(WorldPacket& /*recv_data*/)
 #endif
 
     WorldPacket data(SMSG_WORLD_STATE_UI_TIMER_UPDATE, 4);
-    data << uint32(time(NULL));
+    data << uint32(GameTime::GetGameTime());
     SendPacket(&data);
 }
 
