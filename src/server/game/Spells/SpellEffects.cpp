@@ -5364,6 +5364,25 @@ void Spell::EffectTransmitted(SpellEffIndex effIndex)
         fz = m_caster->GetPositionZ();
     }
 
+    if (m_spellInfo->Id == 9082) // Investigate the XXX - Mage quest
+    {
+        std::list<Creature*> targetList;
+        m_caster->GetCreatureListWithEntryInGrid(targetList, 6492, 26.0f);
+
+        bool riftFound = false;
+        for (std::list<Creature*>::const_iterator itr = targetList.begin(); itr != targetList.end(); ++itr)
+        {
+            if ((*itr)->HasAura(9032))
+            {
+                fx = (*itr)->GetPositionX();
+                fy = (*itr)->GetPositionY();
+                fz = (*itr)->GetPositionZ();
+                riftFound = true;
+            }
+        }
+        if (!riftFound) return;
+    }
+	
     Map *cMap = m_caster->GetMap();
     // if gameobject is summoning object, it should be spawned right on caster's position
     if (goinfo->type == GAMEOBJECT_TYPE_SUMMONING_RITUAL)
