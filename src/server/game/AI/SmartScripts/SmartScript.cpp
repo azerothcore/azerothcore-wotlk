@@ -264,6 +264,50 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
         }
         break;
     }
+    case SMART_ACTION_RANDOM_SOUND:
+    {
+        ObjectList* targets = GetTargets(e, unit);
+        if (!targets)
+            break;
+
+        uint32 sounds[4];
+        sounds[0] = e.action.randomSound.sound1;
+        sounds[1] = e.action.randomSound.sound2;
+        sounds[2] = e.action.randomSound.sound3;
+        sounds[3] = e.action.randomSound.sound4;
+        uint32 temp[4];
+        uint32 count = 0;
+        for (uint8 i = 0; i < 4; i++)
+        {
+            if (sounds[i])
+            {
+                temp[count] = sounds[i];
+                ++count;
+            }
+        }
+
+        if (count == 0)
+        {
+            delete targets;
+            break;
+        }
+
+        for (ObjectList::const_iterator itr = targets->begin(); itr != targets->end(); ++itr)
+        {
+            if (IsUnit(*itr))
+            {
+                uint32 sound = temp[urand(0, count - 1)];
+                (*itr)->SendPlaySound(sound, e.action.randomSound.onlySelf > 0);
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+                sLog->outDebug(LOG_FILTER_DATABASE_AI, "SmartScript::ProcessAction:: SMART_ACTION_RANDOM_SOUND: target: %s (GuidLow: %u), sound: %u, onlyself: %u",
+                    (*itr)->GetName().c_str(), (*itr)->GetGUIDLow(), sound, e.action.randomSound.onlySelf);
+#endif
+            }
+        }
+
+        delete targets;
+        break;
+    }
     case SMART_ACTION_SET_FACTION:
     {
         ObjectList* targets = GetTargets(e, unit);
