@@ -1,6 +1,5 @@
 # ![logo](https://raw.githubusercontent.com/azerothcore/azerothcore.github.io/master/images/logo-github.png) AzerothCore
 
-[![Coverity](https://scan.coverity.com/projects/13814/badge.svg)](https://scan.coverity.com/projects/azerothcore-azerothcore-wotlk)
 [![Master Build Status](https://travis-ci.org/azerothcore/azerothcore-wotlk.svg)](https://travis-ci.org/azerothcore/azerothcore-wotlk)
 [![Bountysource](https://www.bountysource.com/badge/tracker?tracker_id=40032087)](https://www.bountysource.com/teams/azerothcore/bounties)
 [![StackOverflow](http://img.shields.io/badge/stackoverflow-azerothcore-blue.svg)]( http://stackoverflow.com/questions/tagged/azerothcore )
@@ -31,12 +30,16 @@ Installation instructions are available [here](https://github.com/AzerothCore/az
 
 For help requests, it is recommended to ask your question on [StackOverflow](https://stackoverflow.com/questions/tagged/azerothcore) and link it in [our chat](https://discordapp.com/channels/217589275766685707/284406375495368704).
 
+## Docker
+
+Dockerization of AzerothCore is fully supported. More details about Docker and the setup instructions are available [here](https://github.com/azerothcore/azerothcore-wotlk/wiki/Install-with-Docker).
+
 ## Authors & Contributors
 
 This project is brought to you thanks to:
 
 - The [AzerothCore developers and contributors](https://github.com/AzerothCore/azerothcore-wotlk/graphs/contributors)
-- The SunwellCore developers **xinef** and **pussywizard**
+- The [SunwellCore developers xinef and pussywizard](http://www.azerothcore.org/pages/sunwell.pl/)
 - All the [TrinityCore developers and contributors](https://github.com/TrinityCore/TrinityCore/blob/3.3.5/THANKS)
 - All the [MaNGOS, ScriptDev2 and UDB developers and contributors](https://github.com/cmangos/mangos-wotlk/blob/master/AUTHORS.md)
 
@@ -48,3 +51,10 @@ This project is brought to you thanks to:
 ## Links
 
 - [Website](https://azerothcore.github.io/)
+
+
+## Sponsors
+
+List of organizations that help the AzerothCore project:
+
+[![JetBrains](https://user-images.githubusercontent.com/75517/51205146-7f225c80-1905-11e9-82e0-835627be170d.png)](https://www.jetbrains.com/?from=AzerothCore)

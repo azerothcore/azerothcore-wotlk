@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+docker build -t azerothcore/build -f docker/build/Dockerfile .

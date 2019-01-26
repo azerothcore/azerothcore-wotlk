@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 
- *
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -14,6 +13,8 @@
 #include <mysql.h>
 #include <mysqld_error.h>
 #include <errmsg.h>
+#include <chrono>
+#include <thread>
 
 #include "MySQLConnection.h"
 #include "MySQLThreading.h"
@@ -23,6 +24,9 @@
 #include "DatabaseWorker.h"
 #include "Timer.h"
 #include "Log.h"
+
+using namespace std::this_thread;
+using namespace std::chrono;
 
 MySQLConnection::MySQLConnection(MySQLConnectionInfo& connInfo) :
 m_reconnecting(false),
@@ -107,36 +111,59 @@ bool MySQLConnection::Open()
     }
     #endif
 
-    m_Mysql = mysql_real_connect(mysqlInit, m_connectionInfo.host.c_str(), m_connectionInfo.user.c_str(),
-        m_connectionInfo.password.c_str(), m_connectionInfo.database.c_str(), port, unix_socket, 0);
+    // Possible improvement for future: make ATTEMPTS and SECONDS configurable values
+    uint32 const ATTEMPTS = 180;
+    uint32 const SECONDS = 10;
 
-    if (m_Mysql)
-    {
-        if (!m_reconnecting)
+    uint32 count = 0;
+    do {
+        m_Mysql = mysql_real_connect(
+            mysqlInit,
+            m_connectionInfo.host.c_str(),
+            m_connectionInfo.user.c_str(),
+            m_connectionInfo.password.c_str(),
+            m_connectionInfo.database.c_str(),
+            port,
+            unix_socket,
+            0);
+
+        if (m_Mysql)
         {
-            sLog->outSQLDriver("MySQL client library: %s", mysql_get_client_info());
-            sLog->outSQLDriver("MySQL server ver: %s ", mysql_get_server_info(m_Mysql));
-            // MySQL version above 5.1 IS required in both client and server and there is no known issue with different versions above 5.1
-            // if (mysql_get_server_version(m_Mysql) != mysql_get_client_version())
-            //     sLog->outInfo(LOG_FILTER_SQL, "[WARNING] MySQL client/server version mismatch; may conflict with behaviour of prepared statements.");
-        }
+            if (!m_reconnecting)
+            {
+                sLog->outSQLDriver("MySQL client library: %s", mysql_get_client_info());
+                sLog->outSQLDriver("MySQL server ver: %s ", mysql_get_server_info(m_Mysql));
+                // MySQL version above 5.1 IS required in both client and server and there is no known issue with different versions above 5.1
+                // if (mysql_get_server_version(m_Mysql) != mysql_get_client_version())
+                //     sLog->outInfo(LOG_FILTER_SQL, "[WARNING] MySQL client/server version mismatch; may conflict with behaviour of prepared statements.");
+            }
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDetail("Connected to MySQL database at %s", m_connectionInfo.host.c_str());
+            sLog->outDetail("Connected to MySQL database at %s", m_connectionInfo.host.c_str());
 #endif
-        mysql_autocommit(m_Mysql, 1);
+            mysql_autocommit(m_Mysql, 1);
 
-        // set connection properties to UTF8 to properly handle locales for different
-        // server configs - core sends data in UTF8, so MySQL must expect UTF8 too
-        mysql_set_character_set(m_Mysql, "utf8");
-        return PrepareStatements();
-    }
-    else
-    {
-        sLog->outError("Could not connect to MySQL database at %s: %s\n", m_connectionInfo.host.c_str(), mysql_error(mysqlInit));
-        mysql_close(mysqlInit);
-        return false;
-    }
+            // set connection properties to UTF8 to properly handle locales for different
+            // server configs - core sends data in UTF8, so MySQL must expect UTF8 too
+            mysql_set_character_set(m_Mysql, "utf8");
+            return PrepareStatements();
+        }
+        else
+        {
+            count++;
+            sLog->outError("Could not connect to MySQL database at %s: %s\n", m_connectionInfo.host.c_str(), mysql_error(mysqlInit));
+            sLog->outError("Retrying in 10 seconds...\n\n");
+            sleep_for(seconds(SECONDS));
+        }
+    } while (!m_Mysql && count < ATTEMPTS);
+
+    sLog->outError(
+        "Could not connect to MySQL database at %s: %s after %d attempts\n",
+        m_connectionInfo.host.c_str(),
+        mysql_error(mysqlInit),
+        ATTEMPTS);
+    mysql_close(mysqlInit);
+    return false;
 }
 
 bool MySQLConnection::PrepareStatements()

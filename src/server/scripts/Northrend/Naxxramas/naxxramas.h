@@ -123,10 +123,11 @@ enum NXMisc
 enum NXSays
 {
     SAY_SAPP_DIALOG1                = 0,
-    SAY_SAPP_DIALOG2_LICH           = 0,
+    SAY_SAPP_DIALOG2_LICH           = 1,
     SAY_SAPP_DIALOG3                = 2,
-    SAY_SAPP_DIALOG4_LICH           = 1,
+    SAY_SAPP_DIALOG4_LICH           = 2,
     SAY_SAPP_DIALOG5                = 4,
+    SAY_SAPP_DIALOG6                = 20,
     SAY_CAT_DIED                    = 0
 };
 
