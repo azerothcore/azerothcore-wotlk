@@ -32,7 +32,7 @@ For help requests, it is recommended to ask your question on [StackOverflow](htt
 
 ## Docker
 
-Dockerization of AzerothCore is fully supported. 
+Dockerization of AzerothCore is fully supported. More details about Docker and the setup instructions are available [here](https://github.com/azerothcore/azerothcore-wotlk/wiki/Install-with-Docker).
 
 ## Authors & Contributors
 
