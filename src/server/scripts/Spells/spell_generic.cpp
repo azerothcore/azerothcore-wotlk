@@ -21,6 +21,7 @@
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "Group.h"
+#include "GameTime.h"
 #include "InstanceScript.h"
 #include "LFGMgr.h"
 #include "Pet.h"
@@ -45,7 +46,6 @@ public:
 
         bool Load()
         {
-            memset(_itemId, 0, sizeof(_itemId));
             _modelId = 0;
             _hasFlag = false;
             return true;
@@ -56,7 +56,7 @@ public:
             _modelId = GetUnitOwner()->GetDisplayId();
             _hasFlag = GetUnitOwner()->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
             for (uint8 i = 0; i < 3; ++i)
-                _itemId[i] = GetUnitOwner()->GetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + i);
+                _itemId.at(i) = GetUnitOwner()->GetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + i);
 
             GetUnitOwner()->SetDisplayId(11686);
             GetUnitOwner()->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
@@ -70,7 +70,7 @@ public:
             if (!_hasFlag)
                 GetUnitOwner()->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
             for (uint8 i = 0; i < 3; ++i)
-                 GetUnitOwner()->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + i, _itemId[i]);
+                GetUnitOwner()->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + i, _itemId.at(i));
         }
 
         void Register()
@@ -80,7 +80,7 @@ public:
         }
 
     private:
-        uint32 _itemId[3];
+        std::array<uint32, 3> _itemId = { {0, 0, 0} };
         uint32 _modelId;
         bool _hasFlag;
     };
@@ -2650,12 +2650,12 @@ class spell_gen_turkey_marker : public SpellScriptLoader
             {
                 if (GetStackAmount() > stackAmount)
                 {
-                    _applyTimes.push_back(World::GetGameTimeMS());
+                    _applyTimes.push_back(GameTime::GetGameTimeMS());
                     stackAmount++;
                 }
 
                 // pop stack if it expired for us
-                if (_applyTimes.front() + GetMaxDuration() < World::GetGameTimeMS())
+                if (_applyTimes.front() + GetMaxDuration() < GameTime::GetGameTimeMS())
                 {
                     stackAmount--;
                     ModStackAmount(-1, AURA_REMOVE_BY_EXPIRE);

@@ -10,6 +10,7 @@
 #include "World.h"
 #include "ObjectAccessor.h"
 #include "DatabaseEnv.h"
+#include "GameTime.h"
 #include "GridNotifiers.h"
 #include "CellImpl.h"
 #include "GridNotifiersImpl.h"
@@ -107,7 +108,7 @@ bool DynamicObject::CreateDynamicObject(uint32 guidlow, Unit* caster, uint32 spe
     SetByteValue(DYNAMICOBJECT_BYTES, 0, type);
     SetUInt32Value(DYNAMICOBJECT_SPELLID, spellId);
     SetFloatValue(DYNAMICOBJECT_RADIUS, radius);
-    SetUInt32Value(DYNAMICOBJECT_CASTTIME, World::GetGameTimeMS());
+    SetUInt32Value(DYNAMICOBJECT_CASTTIME, GameTime::GetGameTimeMS());
 
     if (IsWorldObject())
         setActive(true);    //must before add to map to be put in world container
