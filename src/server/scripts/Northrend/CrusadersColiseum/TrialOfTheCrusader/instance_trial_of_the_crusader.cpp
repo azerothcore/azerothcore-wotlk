@@ -6,6 +6,7 @@
 #include "ScriptedCreature.h"
 #include "trial_of_the_crusader.h"
 #include "Group.h"
+#include "GameTime.h"
 #include "Player.h"
 
 #define CLEANUP_CHECK_INTERVAL  5000
@@ -322,7 +323,7 @@ public:
                                 c->DespawnOrUnsummon(10000);
                             if( Creature* c = instance->GetCreature(NPC_DreadscaleGUID) )
                                 c->DespawnOrUnsummon(10000);
-                            if( AchievementTimer+10 >= time(NULL) )
+                            if( AchievementTimer+10 >= GameTime::GetGameTime() )
                                 DoUpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET, SPELL_JORMUNGAR_ACHIEV);
                             AchievementTimer = 0;
 
@@ -339,7 +340,7 @@ public:
                         }
                         else // first one died, start timer for achievement
                         {
-                            AchievementTimer = time(NULL);
+                            AchievementTimer = GameTime::GetGameTime();
                         }
                     }
                     else
@@ -428,14 +429,14 @@ public:
 
                             HandleGameObject(GO_EnterGateGUID, true);
 
-                            if( AchievementTimer+60 >= time(NULL) )
+                            if( AchievementTimer+60 >= GameTime::GetGameTime() )
                                 DoUpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET, SPELL_RESILIENCE_WILL_FIX_IT_CREDIT);
                             AchievementTimer = 0;
 
                             SaveToDB();
                         }
                         else if( Counter == 1 )
-                            AchievementTimer = time(NULL);
+                            AchievementTimer = GameTime::GetGameTime();
                     }
                     break;
                 case TYPE_FACTION_CHAMPIONS_START:

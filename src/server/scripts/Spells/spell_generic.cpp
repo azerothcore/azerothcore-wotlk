@@ -21,6 +21,7 @@
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "Group.h"
+#include "GameTime.h"
 #include "InstanceScript.h"
 #include "LFGMgr.h"
 #include "Pet.h"
@@ -2649,12 +2650,12 @@ class spell_gen_turkey_marker : public SpellScriptLoader
             {
                 if (GetStackAmount() > stackAmount)
                 {
-                    _applyTimes.push_back(World::GetGameTimeMS());
+                    _applyTimes.push_back(GameTime::GetGameTimeMS());
                     stackAmount++;
                 }
 
                 // pop stack if it expired for us
-                if (_applyTimes.front() + GetMaxDuration() < World::GetGameTimeMS())
+                if (_applyTimes.front() + GetMaxDuration() < GameTime::GetGameTimeMS())
                 {
                     stackAmount--;
                     ModStackAmount(-1, AURA_REMOVE_BY_EXPIRE);

@@ -20,6 +20,7 @@ EndScriptData */
 #include "TargetedMovementGenerator.h"                      // for HandleNpcUnFollowCommand
 #include "CreatureAI.h"
 #include "Player.h"
+#include "GameTime.h"
 #include "Pet.h"
 
 struct NpcFlagText
@@ -719,7 +720,7 @@ public:
         uint32 nativeid = target->GetNativeDisplayId();
         uint32 Entry = target->GetEntry();
 
-        int64 curRespawnDelay = target->GetRespawnTimeEx()-time(nullptr);
+        int64 curRespawnDelay = target->GetRespawnTimeEx()-GameTime::GetGameTime();
         if (curRespawnDelay < 0)
             curRespawnDelay = 0;
         std::string curRespawnDelayStr = secsToTimeString(uint64(curRespawnDelay), true);

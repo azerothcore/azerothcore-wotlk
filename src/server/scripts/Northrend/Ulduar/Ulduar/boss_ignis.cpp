@@ -5,6 +5,7 @@
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
+#include "GameTime.h"
 #include "ulduar.h"
 #include "Vehicle.h"
 #include "SpellAuras.h"
@@ -261,10 +262,10 @@ public:
             if (id == 1337)
             {
                 if (lastShatterMSTime)
-                    if (getMSTimeDiff(lastShatterMSTime, World::GetGameTimeMS()) <= 5000)
+                    if (getMSTimeDiff(lastShatterMSTime, GameTime::GetGameTimeMS()) <= 5000)
                         bShattered = true;
 
-                lastShatterMSTime = World::GetGameTimeMS();
+                lastShatterMSTime = GameTime::GetGameTimeMS();
             }
         }
 
