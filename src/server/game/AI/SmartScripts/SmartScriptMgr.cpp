@@ -369,7 +369,6 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
             sLog->outErrorDb("SmartAIMgr: EntryOrGuid %d using event(%u) has an action type that is not supported on 3.3.5a (%u), skipped.",
                              e.entryOrGuid, e.event_id, e.GetActionType());
             return false;
-        case SMART_ACTION_RANDOM_SOUND:
         case SMART_ACTION_SET_CORPSE_DELAY:
         case SMART_ACTION_DISABLE_EVADE:
         case SMART_ACTION_GO_SET_GO_STATE:
@@ -768,6 +767,19 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
             break;
         case SMART_ACTION_SOUND:
             if (!IsSoundValid(e, e.action.sound.sound))
+                return false;
+            break;
+        case SMART_ACTION_RANDOM_SOUND:
+            if (e.action.randomSound.sound1 && !IsSoundValid(e, e.action.randomSound.sound1))
+                return false;
+
+            if (e.action.randomSound.sound2 && !IsSoundValid(e, e.action.randomSound.sound2))
+                return false;
+
+            if (e.action.randomSound.sound3 && !IsSoundValid(e, e.action.randomSound.sound3))
+                return false;
+
+            if (e.action.randomSound.sound4 && !IsSoundValid(e, e.action.randomSound.sound4))
                 return false;
             break;
         case SMART_ACTION_SET_EMOTE_STATE:
