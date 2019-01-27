@@ -774,7 +774,7 @@ public:
         void Reset()
         {
             float x, y, z;
-            me->GetClosePoint(x, y, z, me->GetObjectSize() / 3, 25.0f);
+            me->GetClosePoint(x, y, z, me->GetCombatReach() / 3, 25.0f);
             me->GetMotionMaster()->MovePoint(0, x, y, z);
         }
 

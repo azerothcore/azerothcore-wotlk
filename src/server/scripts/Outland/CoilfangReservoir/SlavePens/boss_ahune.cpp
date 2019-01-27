@@ -217,7 +217,7 @@ public:
                             int32 dmg = urand(5500,6000);
                             me->CastCustomSpell(target, SPELL_COLD_SLAP, &dmg, NULL, NULL, false);
                             float x, y, z;
-                            target->GetNearPoint(target, x, y, z, target->GetObjectSize(), 30.0f, target->GetAngle(me->GetPositionX(), me->GetPositionY()) + M_PI);
+                            target->GetNearPoint(target, x, y, z, target->GetCombatReach(), 30.0f, target->GetAngle(me->GetPositionX(), me->GetPositionY()) + M_PI);
                             target->GetMotionMaster()->MoveJump(x, y, z+20.0f, 10.0f, 20.0f);
                         }
                     events.RepeatEvent(1500);
