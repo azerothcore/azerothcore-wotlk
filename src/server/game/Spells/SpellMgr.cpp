@@ -6176,6 +6176,11 @@ void SpellMgr::LoadDbcDataCorrections()
             spellInfo->DurationIndex = 18;
             spellInfo->EffectImplicitTargetA[0] = 25;
             break;
+        // Flare
+        case 1543:
+            spellInfo->EffectRadiusIndex[0] = EFFECT_RADIUS_10_YARDS; //10yd
+            spellInfo->EffectRadiusIndex[1] = EFFECT_RADIUS_10_YARDS; //10yd
+            break;
 
         //////////////////////////////////////////
         ////////// Hallow's End
