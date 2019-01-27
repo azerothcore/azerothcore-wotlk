@@ -1315,7 +1315,7 @@ void ObjectMgr::LoadCreatureModelInfo()
         }
 
         if (modelInfo.combat_reach < 0.1f)
-            modelInfo.combat_reach = DEFAULT_COMBAT_REACH;
+            modelInfo.combat_reach = DEFAULT_PLAYER_COMBAT_REACH;
 
         ++count;
     }

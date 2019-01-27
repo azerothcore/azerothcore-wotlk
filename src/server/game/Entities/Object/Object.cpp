@@ -892,7 +892,7 @@ bool Position::HasInLine(WorldObject const* target, float width) const
 {
     if (!HasInArc(M_PI, target))
         return false;
-    width += target->GetObjectSize();
+    width += target->GetCombatReach();
     float angle = GetRelativeAngle(target);
     return fabs(sin(angle)) * GetExactDist2d(target->GetPositionX(), target->GetPositionY()) < width;
 }
@@ -1076,46 +1076,38 @@ InstanceScript* WorldObject::GetInstanceScript()
 float WorldObject::GetDistanceZ(const WorldObject* obj) const
 { 
     float dz = fabs(GetPositionZ() - obj->GetPositionZ());
-    float sizefactor = GetObjectSize() + obj->GetObjectSize();
+    float sizefactor = GetCombatReach() + obj->GetCombatReach();
     float dist = dz - sizefactor;
     return (dist > 0 ? dist : 0);
 }
 
-bool WorldObject::_IsWithinDist(WorldObject const* obj, float dist2compare, bool is3D) const
+bool WorldObject::_IsWithinDist(WorldObject const* obj, float dist2compare, bool is3D, bool incOwnRadius, bool incTargetRadius) const
 { 
-    float sizefactor = GetObjectSize() + obj->GetObjectSize();
+    float sizefactor = 0;
+    sizefactor += incOwnRadius ? GetCombatReach() : 0.0f;
+    sizefactor += incTargetRadius ? obj->GetCombatReach() : 0.0f;
     float maxdist = dist2compare + sizefactor;
+
+    Position const* thisOrTransport = this;
+    Position const* objOrObjTransport = obj;
 
     if (m_transport && obj->GetTransport() &&  obj->GetTransport()->GetGUIDLow() == m_transport->GetGUIDLow())
     {
-        float dtx = m_movementInfo.transport.pos.m_positionX - obj->m_movementInfo.transport.pos.m_positionX;
-        float dty = m_movementInfo.transport.pos.m_positionY - obj->m_movementInfo.transport.pos.m_positionY;
-        float disttsq = dtx * dtx + dty * dty;
-        if (is3D)
-        {
-            float dtz = m_movementInfo.transport.pos.m_positionZ - obj->m_movementInfo.transport.pos.m_positionZ;
-            disttsq += dtz * dtz;
-        }
-        return disttsq < (maxdist * maxdist);
+        thisOrTransport = &m_movementInfo.transport.pos;
+        objOrObjTransport = &obj->m_movementInfo.transport.pos;
     }
 
-    float dx = GetPositionX() - obj->GetPositionX();
-    float dy = GetPositionY() - obj->GetPositionY();
-    float distsq = dx*dx + dy*dy;
     if (is3D)
-    {
-        float dz = GetPositionZ() - obj->GetPositionZ();
-        distsq += dz*dz;
-    }
-
-    return distsq < maxdist * maxdist;
+        return thisOrTransport->IsInDist(objOrObjTransport, maxdist);
+    else
+        return thisOrTransport->IsInDist2d(objOrObjTransport, maxdist);
 }
 
 Position WorldObject::GetHitSpherePointFor(Position const& dest) const
 {
     G3D::Vector3 vThis(GetPositionX(), GetPositionY(), GetPositionZ());
     G3D::Vector3 vObj(dest.GetPositionX(), dest.GetPositionY(), dest.GetPositionZ());
-    G3D::Vector3 contactPoint = vThis + (vObj - vThis).directionOrZero() * std::min(dest.GetExactDist(this), GetObjectSize());
+    G3D::Vector3 contactPoint = vThis + (vObj - vThis).directionOrZero() * std::min(dest.GetExactDist(this), GetCombatReach());
 
     return Position(contactPoint.x, contactPoint.y, contactPoint.z, GetAngle(contactPoint.x, contactPoint.y));
 }
@@ -1137,6 +1129,7 @@ bool WorldObject::IsWithinLOS(float ox, float oy, float oz, LineOfSightChecks ch
 
 bool WorldObject::IsWithinLOSInMap(const WorldObject* obj, LineOfSightChecks checks) const
 {
+
     if (!IsInMap(obj))
         return false;
 
@@ -1191,7 +1184,7 @@ bool WorldObject::IsInRange(WorldObject const* obj, float minRange, float maxRan
         distsq += dz*dz;
     }
 
-    float sizefactor = GetObjectSize() + obj->GetObjectSize();
+    float sizefactor = GetCombatReach() + obj->GetCombatReach();
 
     // check only for real range
     if (minRange > 0.0f)
@@ -1211,7 +1204,7 @@ bool WorldObject::IsInRange2d(float x, float y, float minRange, float maxRange) 
     float dy = GetPositionY() - y;
     float distsq = dx*dx + dy*dy;
 
-    float sizefactor = GetObjectSize();
+    float sizefactor = GetCombatReach();
 
     // check only for real range
     if (minRange > 0.0f)
@@ -1232,7 +1225,7 @@ bool WorldObject::IsInRange3d(float x, float y, float z, float minRange, float m
     float dz = GetPositionZ() - z;
     float distsq = dx*dx + dy*dy + dz*dz;
 
-    float sizefactor = GetObjectSize();
+    float sizefactor = GetCombatReach();
 
     // check only for real range
     if (minRange > 0.0f)
@@ -1331,6 +1324,13 @@ bool Position::IsWithinBox(const Position& center, float xradius, float yradius,
     return true;
 }
 
+
+bool Position::IsWithinDoubleVerticalCylinder(Position const* center, float radius, float height) const
+{
+    float verticalDelta = GetPositionZ() - center->GetPositionZ();
+    return IsInDist2d(center, radius) && std::abs(verticalDelta) <= height;
+}
+
 bool Position::HasInArc(float arc, const Position* obj, float targetRadius) const
 {
     // always have self in arc
@@ -1372,7 +1372,7 @@ bool WorldObject::IsInBetween(const WorldObject* obj1, const WorldObject* obj2, 
         return false;
 
     if (!size)
-        size = GetObjectSize() / 2;
+        size = GetCombatReach() / 2;
 
     float pdist = obj1->GetExactDist2dSq(obj2) + size / 2.0f;
     if (GetExactDist2dSq(obj1) >= pdist || GetExactDist2dSq(obj2) >= pdist)
@@ -2005,7 +2005,7 @@ void Unit::BuildHeartBeatMsg(WorldPacket* data) const
 // pussywizard!
 void WorldObject::SendMessageToSetInRange(WorldPacket* data, float dist, bool /*self*/, bool includeMargin, Player const* skipped_rcvr)
 { 
-    dist += GetObjectSize();
+    dist += GetCombatReach();
     if (includeMargin)
         dist += VISIBILITY_COMPENSATION; // pussywizard: to ensure everyone receives all important packets
     Trinity::MessageDistDeliverer notifier(this, data, dist, false, skipped_rcvr);
@@ -2458,7 +2458,7 @@ namespace Trinity
 
                 // dist include size of u
                 float dist2d = i_object.GetDistance2d(x, y);
-                i_selector.AddUsedPos(u->GetObjectSize(), angle, dist2d + i_object.GetObjectSize());
+                i_selector.AddUsedPos(u->GetCombatReach(), angle, dist2d + i_object.GetCombatReach());
             }
         private:
             WorldObject const& i_object;
@@ -2473,8 +2473,8 @@ namespace Trinity
 
 void WorldObject::GetNearPoint2D(float &x, float &y, float distance2d, float absAngle) const
 { 
-    x = GetPositionX() + (GetObjectSize() + distance2d) * cos(absAngle);
-    y = GetPositionY() + (GetObjectSize() + distance2d) * sin(absAngle);
+    x = GetPositionX() + (GetCombatReach() + distance2d) * cos(absAngle);
+    y = GetPositionY() + (GetCombatReach() + distance2d) * sin(absAngle);
 
     Trinity::NormalizeMapCoord(x);
     Trinity::NormalizeMapCoord(y);
@@ -2532,7 +2532,7 @@ bool WorldObject::GetClosePoint(float &x, float &y, float &z, float size, float 
             if (const Unit* u = forWho->ToUnit())
                 u->UpdateAllowedPositionZ(x, y, z);
     }
-    float maxDist = GetObjectSize() + size + distance2d + 1.0f;
+    float maxDist = GetCombatReach() + size + distance2d + 1.0f;
     if (GetExactDistSq(x, y, z) >= maxDist*maxDist)
     {
         if (force)
@@ -2550,7 +2550,7 @@ bool WorldObject::GetClosePoint(float &x, float &y, float &z, float size, float 
 void WorldObject::GetContactPoint(const WorldObject* obj, float &x, float &y, float &z, float distance2d) const
 { 
     // angle to face `obj` to `this` using distance includes size of `obj`
-    GetNearPoint(obj, x, y, z, obj->GetObjectSize(), distance2d, GetAngle(obj));
+    GetNearPoint(obj, x, y, z, obj->GetCombatReach(), distance2d, GetAngle(obj));
 
     if (fabs(this->GetPositionZ()-z) > 3.0f || !IsWithinLOS(x, y, z))
     {
@@ -2565,7 +2565,7 @@ void WorldObject::GetContactPoint(const WorldObject* obj, float &x, float &y, fl
 void WorldObject::GetChargeContactPoint(const WorldObject* obj, float &x, float &y, float &z, float distance2d) const
 { 
     // angle to face `obj` to `this` using distance includes size of `obj`
-    GetNearPoint(obj, x, y, z, obj->GetObjectSize(), distance2d, GetAngle(obj));
+    GetNearPoint(obj, x, y, z, obj->GetCombatReach(), distance2d, GetAngle(obj));
 
     if (fabs(this->GetPositionZ()-z) > 3.0f || !IsWithinLOS(x, y, z))
     {

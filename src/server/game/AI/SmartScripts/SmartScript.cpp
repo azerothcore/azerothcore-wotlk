@@ -1338,7 +1338,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             break;
 
         float x, y, z;
-        me->GetClosePoint(x, y, z, me->GetObjectSize() / 3, (float)e.action.moveRandom.distance);
+        me->GetClosePoint(x, y, z, me->GetCombatReach() / 3, (float)e.action.moveRandom.distance);
         me->GetMotionMaster()->MovePoint(SMART_RANDOM_POINT, x, y, z);
         break;
     }

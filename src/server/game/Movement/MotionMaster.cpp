@@ -457,7 +457,7 @@ void MotionMaster::MoveKnockbackFrom(float srcX, float srcY, float speedXY, floa
     float max_height = -Movement::computeFallElevation(moveTimeHalf, false, -speedZ);
 
     Position pos;
-    _owner->GetNearPoint(_owner, pos.m_positionX, pos.m_positionY, pos.m_positionZ, _owner->GetObjectSize(), dist, _owner->GetAngle(srcX, srcY) + M_PI);
+    _owner->GetNearPoint(_owner, pos.m_positionX, pos.m_positionY, pos.m_positionZ, _owner->GetCombatReach(), dist, _owner->GetAngle(srcX, srcY) + M_PI);
 
     // xinef: check LoS!
     if (!_owner->IsWithinLOS(pos.m_positionX, pos.m_positionY, pos.m_positionZ))
@@ -485,7 +485,7 @@ void MotionMaster::MoveJumpTo(float angle, float speedXY, float speedZ)
 
     float moveTimeHalf = speedZ / Movement::gravity;
     float dist = 2 * moveTimeHalf * speedXY;
-    _owner->GetClosePoint(x, y, z, _owner->GetObjectSize(), dist, angle);
+    _owner->GetClosePoint(x, y, z, _owner->GetCombatReach(), dist, angle);
     MoveJump(x, y, z, speedXY, speedZ);
 }
 
