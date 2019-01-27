@@ -1954,7 +1954,7 @@ bool GameObject::IsInRange(float x, float y, float z, float radius) const
 // pussywizard!
 void GameObject::SendMessageToSetInRange(WorldPacket* data, float dist, bool /*self*/, bool includeMargin, Player const* skipped_rcvr)
 { 
-    dist += GetObjectSize();
+    dist += GetCombatReach();
     if (includeMargin)
         dist += VISIBILITY_COMPENSATION * 2.0f; // pussywizard: to ensure everyone receives all important packets
     Trinity::MessageDistDeliverer notifier(this, data, dist, false, skipped_rcvr);

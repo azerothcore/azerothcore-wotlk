@@ -38,11 +38,11 @@ class ElunaEventProcessor;
 #define DEFAULT_VISIBILITY_INSTANCE 120.0f // default visible distance in instances, 120 yards
 #define DEFAULT_VISIBILITY_BGARENAS 150.0f // default visible distance in BG/Arenas, 150 yards
 
-#define DEFAULT_WORLD_OBJECT_SIZE   0.388999998569489f      // player size, also currently used (correctly?) for any non Unit world objects
-#define DEFAULT_COMBAT_REACH        1.5f
-#define MIN_MELEE_REACH             2.0f
-#define NOMINAL_MELEE_RANGE         5.0f
-#define MELEE_RANGE                 (NOMINAL_MELEE_RANGE - MIN_MELEE_REACH * 2) //center to center for players
+#define DEFAULT_PLAYER_BOUNDING_RADIUS      0.388999998569489f     // player size, also currently used (correctly?) for any non Unit world objects
+#define DEFAULT_PLAYER_COMBAT_REACH         1.5f
+#define MIN_MELEE_REACH                     2.0f
+#define NOMINAL_MELEE_RANGE                 5.0f
+#define MELEE_RANGE                         (NOMINAL_MELEE_RANGE - MIN_MELEE_REACH * 2) //center to center for players
 
 enum TypeMask
 {
@@ -532,6 +532,10 @@ struct Position
     }
 
     bool IsWithinBox(const Position& center, float xradius, float yradius, float zradius) const;
+    /*
+    search using this relation: dist2d < radius && abs(dz) < height
+    */
+    bool IsWithinDoubleVerticalCylinder(Position const* center, float radius, float height) const;
     bool HasInArc(float arcangle, const Position* pos, float targetRadius = 0.0f) const;
     bool HasInLine(WorldObject const* target, float width) const;
     std::string ToString() const;
@@ -776,10 +780,7 @@ class WorldObject : public Object, public WorldLocation
         void GetContactPoint(const WorldObject* obj, float &x, float &y, float &z, float distance2d = CONTACT_DISTANCE) const;
         void GetChargeContactPoint(const WorldObject* obj, float &x, float &y, float &z, float distance2d = CONTACT_DISTANCE) const;
 
-        float GetObjectSize() const
-        {
-            return (m_valuesCount > UNIT_FIELD_COMBATREACH) ? m_floatValues[UNIT_FIELD_COMBATREACH] : DEFAULT_WORLD_OBJECT_SIZE;
-        }
+        virtual float GetCombatReach() const { return 0.0f; } // overridden (only) in Unit
         void UpdateGroundPositionZ(float x, float y, float &z) const;
         void UpdateAllowedPositionZ(float x, float y, float &z) const;
 
@@ -811,27 +812,27 @@ class WorldObject : public Object, public WorldLocation
 
         float GetDistance(const WorldObject* obj) const
         {
-            float d = GetExactDist(obj) - GetObjectSize() - obj->GetObjectSize();
+            float d = GetExactDist(obj) - GetCombatReach() - obj->GetCombatReach();
             return d > 0.0f ? d : 0.0f;
         }
         float GetDistance(const Position &pos) const
         {
-            float d = GetExactDist(&pos) - GetObjectSize();
+            float d = GetExactDist(&pos) - GetCombatReach();
             return d > 0.0f ? d : 0.0f;
         }
         float GetDistance(float x, float y, float z) const
         {
-            float d = GetExactDist(x, y, z) - GetObjectSize();
+            float d = GetExactDist(x, y, z) - GetCombatReach();
             return d > 0.0f ? d : 0.0f;
         }
         float GetDistance2d(const WorldObject* obj) const
         {
-            float d = GetExactDist2d(obj) - GetObjectSize() - obj->GetObjectSize();
+            float d = GetExactDist2d(obj) - GetCombatReach() - obj->GetCombatReach();
             return d > 0.0f ? d : 0.0f;
         }
         float GetDistance2d(float x, float y) const
         {
-            float d = GetExactDist2d(x, y) - GetObjectSize();
+            float d = GetExactDist2d(x, y) - GetCombatReach();
             return d > 0.0f ? d : 0.0f;
         }
         float GetDistanceZ(const WorldObject* obj) const;
@@ -849,21 +850,21 @@ class WorldObject : public Object, public WorldLocation
             return false;
         }
         bool IsWithinDist3d(float x, float y, float z, float dist) const
-            { return IsInDist(x, y, z, dist + GetObjectSize()); }
+            { return IsInDist(x, y, z, dist + GetCombatReach()); }
         bool IsWithinDist3d(const Position* pos, float dist) const
-            { return IsInDist(pos, dist + GetObjectSize()); }
+            { return IsInDist(pos, dist + GetCombatReach()); }
         bool IsWithinDist2d(float x, float y, float dist) const
-            { return IsInDist2d(x, y, dist + GetObjectSize()); }
+            { return IsInDist2d(x, y, dist + GetCombatReach()); }
         bool IsWithinDist2d(const Position* pos, float dist) const
-            { return IsInDist2d(pos, dist + GetObjectSize()); }
+            { return IsInDist2d(pos, dist + GetCombatReach()); }
         // use only if you will sure about placing both object at same map
         bool IsWithinDist(WorldObject const* obj, float dist2compare, bool is3D = true) const
         {
             return obj && _IsWithinDist(obj, dist2compare, is3D);
         }
-        bool IsWithinDistInMap(WorldObject const* obj, float dist2compare, bool is3D = true) const
+        bool IsWithinDistInMap(WorldObject const* obj, float dist2compare, bool is3D = true, bool incOwnRadius = true, bool incTargetRadius = true) const
         {
-            return obj && IsInMap(obj) && InSamePhase(obj) && _IsWithinDist(obj, dist2compare, is3D);
+            return obj && IsInMap(obj) && InSamePhase(obj) && _IsWithinDist(obj, dist2compare, is3D, incOwnRadius, incTargetRadius);
         }
         bool IsWithinLOS(float x, float y, float z, LineOfSightChecks checks = LINEOFSIGHT_ALL_CHECKS) const;
         bool IsWithinLOSInMap(WorldObject const* obj, LineOfSightChecks checks = LINEOFSIGHT_ALL_CHECKS) const;
@@ -938,7 +939,7 @@ class WorldObject : public Object, public WorldLocation
         {
             if (!x && !y && !z)
             {
-                GetClosePoint(x, y, z, GetObjectSize());
+                GetClosePoint(x, y, z, GetCombatReach());
                 ang = GetOrientation();
             }
             Position pos;
@@ -1044,7 +1045,7 @@ class WorldObject : public Object, public WorldLocation
         uint16 m_notifyflags;
         uint16 m_executed_notifies;
 
-        virtual bool _IsWithinDist(WorldObject const* obj, float dist2compare, bool is3D) const;
+        virtual bool _IsWithinDist(WorldObject const* obj, float dist2compare, bool is3D, bool incOwnRadius = true, bool incTargetRadius = true) const;
 
         bool CanNeverSee(WorldObject const* obj) const;
         virtual bool CanAlwaysSee(WorldObject const* /*obj*/) const { return false; }

@@ -490,7 +490,7 @@ public:
         {
             Unit* caster = GetCaster();
             float angle = caster->GetAngle(GetHitUnit());
-            float dist = caster->GetObjectSize()/2.0f;
+            float dist = caster->GetCombatReach()/2.0f;
             float z = caster->GetPositionZ()+2.5f;
             float nx = caster->GetPositionX()+dist*cos(angle);
             float ny = caster->GetPositionY()+dist*sin(angle);

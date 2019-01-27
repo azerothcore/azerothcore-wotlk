@@ -1323,8 +1323,8 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
              float dis = (float)rand_norm() * (max_dis - min_dis) + min_dis;
              float x, y, z, angle;
              angle = (float)rand_norm() * static_cast<float>(M_PI * 35.0f / 180.0f) - static_cast<float>(M_PI * 17.5f / 180.0f);
-            //m_caster->GetClosePoint(x, y, z, DEFAULT_WORLD_OBJECT_SIZE, dis, angle); this contains extra code that breaks fishing
-            m_caster->GetNearPoint(m_caster, x, y, z, DEFAULT_WORLD_OBJECT_SIZE, dis, m_caster->GetOrientation() + angle);
+            //m_caster->GetClosePoint(x, y, z, DEFAULT_PLAYER_BOUNDING_RADIUS, dis, angle); this contains extra code that breaks fishing
+            m_caster->GetNearPoint(m_caster, x, y, z, DEFAULT_PLAYER_BOUNDING_RADIUS, dis, m_caster->GetOrientation() + angle);
 
             float ground = m_caster->GetMap()->GetHeight(m_caster->GetPhaseMask(), x, y, z, true, 120.0f);
             float liquidLevel = VMAP_INVALID_HEIGHT_VALUE;
@@ -1563,7 +1563,7 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
         {
             float dist;
             float angle = targetType.CalcDirectionAngle();
-            float objSize = m_caster->GetObjectSize();
+            float objSize = m_caster->GetCombatReach();
             if (targetType.GetTarget() == TARGET_DEST_CASTER_SUMMON)
                 dist = PET_FOLLOW_DIST;
             else
@@ -1626,7 +1626,7 @@ void Spell::SelectImplicitTargetDestTargets(SpellEffIndex effIndex, SpellImplici
         default:
         {
             float angle = targetType.CalcDirectionAngle();
-            float objSize = target->GetObjectSize();
+            float objSize = target->GetCombatReach();
             float dist = m_spellInfo->Effects[effIndex].CalcRadius(m_caster);
             if (dist < objSize)
                 dist = objSize;
@@ -1838,7 +1838,7 @@ void Spell::SelectImplicitTrajTargets(SpellEffIndex effIndex, SpellImplicitTarge
             if (m_caster == *itr || m_caster->IsOnVehicle(unitTarget) || (unitTarget)->GetVehicle())//(*itr)->IsOnVehicle(m_caster))
                 continue;
 
-        const float size = std::max((*itr)->GetObjectSize() * 0.7f, 1.0f); // 1/sqrt(3)
+        const float size = std::max((*itr)->GetCombatReach() * 0.7f, 1.0f); // 1/sqrt(3)
         // TODO: all calculation should be based on src instead of m_caster
         const float objDist2d = fabs(m_targets.GetSrcPos()->GetExactDist2d(*itr) * cos(m_targets.GetSrcPos()->GetRelativeAngle(*itr)));
         const float dz = fabs((*itr)->GetPositionZ() - m_targets.GetSrcPos()->m_positionZ);
@@ -1929,7 +1929,7 @@ void Spell::SelectImplicitTrajTargets(SpellEffIndex effIndex, SpellImplicitTarge
         if (itr != targets.end())
         {
             float distSq = (*itr)->GetExactDistSq(x, y, z);
-            float sizeSq = (*itr)->GetObjectSize();
+            float sizeSq = (*itr)->GetCombatReach();
             sizeSq *= sizeSq;
             DEBUG_TRAJ(sLog->outError("Initial %f %f %f %f %f", x, y, z, distSq, sizeSq);)
             if (distSq > sizeSq)
@@ -8478,7 +8478,8 @@ WorldObjectSpellAreaTargetCheck::WorldObjectSpellAreaTargetCheck(float range, Po
 
 bool WorldObjectSpellAreaTargetCheck::operator()(WorldObject* target)
 {
-    if (target->GetTypeId() == TYPEID_GAMEOBJECT)
+     //keep old code 
+    /*if (target->GetTypeId() == TYPEID_GAMEOBJECT)
     {
         if (!target->ToGameObject()->IsInRange(_position->GetPositionX(), _position->GetPositionY(), _position->GetPositionZ(), _range))
             return false;
@@ -8486,7 +8487,22 @@ bool WorldObjectSpellAreaTargetCheck::operator()(WorldObject* target)
     else if (!target->IsWithinDist3d(_position, _range))
         return false;
     else if (target->GetTypeId() == TYPEID_UNIT && target->ToCreature()->IsAvoidingAOE()) // pussywizard
-        return false;
+        return false;*/
+
+    if (target->ToGameObject())
+    {
+        // isInRange including the dimension of the GO
+        bool isInRange = target->ToGameObject()->IsInRange(_position->GetPositionX(), _position->GetPositionY(), _position->GetPositionZ(), _range);
+        if (!isInRange)
+            return false;
+    }
+    else
+    {
+        bool isInsideCylinder = target->IsWithinDist2d(_position, _range) && std::abs(target->GetPositionZ() - _position->GetPositionZ()) <= _range;
+        if (!isInsideCylinder)
+            return false;
+    }
+
     return WorldObjectSpellTargetCheck::operator ()(target);
 }
 
@@ -8505,7 +8521,7 @@ bool WorldObjectSpellConeTargetCheck::operator()(WorldObject* target)
     }
     else if (_spellInfo->HasAttribute(SPELL_ATTR0_CU_CONE_LINE))
     {
-        if (!_caster->HasInLine(target, _caster->GetObjectSize()))
+        if (!_caster->HasInLine(target, _caster->GetCombatReach()))
             return false;
     }
     else

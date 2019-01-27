@@ -895,10 +895,10 @@ class GameObject : public WorldObject, public GridObject<GameObject>, public Mov
         void UpdatePackedRotation();
 
         //! Object distance/size - overridden from Object::_IsWithinDist. Needs to take in account proper GO size.
-        bool _IsWithinDist(WorldObject const* obj, float dist2compare, bool /*is3D*/) const
+        bool _IsWithinDist(WorldObject const* obj, float dist2compare, bool /*is3D*/, bool /*incOwnRadius*/, bool /*incTargetRadius*/) const
         {
             //! Following check does check 3d distance
-            dist2compare += obj->GetObjectSize();
+            dist2compare += obj->GetCombatReach();
             return IsInRange(obj->GetPositionX(), obj->GetPositionY(), obj->GetPositionZ(), dist2compare);
         }
         GameObjectAI* m_AI;
