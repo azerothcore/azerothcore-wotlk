@@ -357,7 +357,7 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
         || (e.action.type >= SMART_ACTION_TC_END && e.action.type <= SMART_ACTION_AC_START)
         || e.action.type >= SMART_ACTION_AC_END)
     {
-        sLog->outErrorDb("SmartAIMgr: EntryOrGuid %d using event(%u) has invalid action type (%u), skipped.", e.entryOrGuid, e.event_id, e.GetActionType());
+        sLog->outErrorDb("SmartAIMgr: EntryOrGuid %d using event(%u) has an invalid action type (%u), skipped.", e.entryOrGuid, e.event_id, e.GetActionType());
         return false;
     }
     switch (e.action.type)
@@ -383,6 +383,17 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
             return false;
         default:
             break;
+    }
+    if (e.target.type < 0 || e.target.type >= SMART_TARGET_END)
+    {
+        sLog->outErrorDb("SmartAIMgr: EntryOrGuid %d using event(%u) has an invalid target type (%u), skipped.",
+                e.entryOrGuid, e.event_id, e.GetTargetType());
+        return false;
+    }
+    if (e.target.type == SMART_TARGET_LOOT_RECIPIENTS || e.target.type == SMART_TARGET_VEHICLE_PASSENGER) {
+        sLog->outErrorDb("SmartAIMgr: EntryOrGuid %d using event(%u) has a target type that is not yet supported on AzerothCore (%u), skipped.",
+                e.entryOrGuid, e.event_id, e.GetTargetType());
+        return false;
     }
     if (e.event.event_phase_mask > SMART_EVENT_PHASE_ALL)
     {
