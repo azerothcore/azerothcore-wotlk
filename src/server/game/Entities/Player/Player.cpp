@@ -20860,7 +20860,7 @@ void Player::TextEmote(const std::string& text, const uint32 language)
 #endif
     WorldPacket data;
     ChatHandler::BuildChatPacket(data, CHAT_MSG_EMOTE, Language(language), this, this, _text);
-    SendMessageToSetInRange(&data, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE), true, !sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_CHAT));
+    SendMessageToSetInRange(&data, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE), true);
 }
 
 void Player::Whisper(const std::string& text, uint32 language, uint64 receiver)
