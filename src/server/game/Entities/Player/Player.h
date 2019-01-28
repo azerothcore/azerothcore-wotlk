@@ -20,6 +20,7 @@
 #include "Battleground.h"
 #include "WorldSession.h"
 #include "ObjectMgr.h"
+#include "Language.h"
 
 #include <string>
 #include <vector>
@@ -1200,7 +1201,7 @@ class Player : public Unit, public GridObject<Player>
 
         void Say(std::string const& text, const uint32 language);
         void Yell(std::string const& text, const uint32 language);
-        void TextEmote(std::string const& text);
+        void TextEmote(std::string const& text, const uint32 language = LANG_UNIVERSAL);
         void Whisper(std::string const& text, const uint32 language, uint64 receiver);
 
         /*********************************************************/
