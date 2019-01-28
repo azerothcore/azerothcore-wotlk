@@ -1,3 +1,19 @@
+-- DB update 2019_01_28_00 -> 2019_01_28_01
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2019_01_28_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2019_01_28_00 2019_01_28_01 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1548367133880932410'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1548367133880932410');
 
 -- original fix by Killyana
@@ -11,3 +27,12 @@ UPDATE `quest_template_addon` SET `PrevQuestID`=12294, `NextQuestID`=12225, `Exc
 
 -- original fix by ariel-
 ALTER TABLE `quest_template_addon` CHANGE `NextQuestID` `NextQuestID` MEDIUMINT(8) UNSIGNED NOT NULL DEFAULT 0;
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
