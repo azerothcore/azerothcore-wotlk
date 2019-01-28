@@ -133,9 +133,9 @@ enum ConditionSourceType
     CONDITION_SOURCE_TYPE_SMART_EVENT                    = 22,
     CONDITION_SOURCE_TYPE_NPC_VENDOR                     = 23,
     CONDITION_SOURCE_TYPE_SPELL_PROC                     = 24,
-    CONDITION_SOURCE_TYPE_TERRAIN_SWAP                   = 25, // only master
-    CONDITION_SOURCE_TYPE_PHASE                          = 26, // only master
-    CONDITION_SOURCE_TYPE_GRAVEYARD                      = 27, // only master
+    CONDITION_SOURCE_TYPE_TERRAIN_SWAP                   = 25, // don't use on 3.3.5a
+    CONDITION_SOURCE_TYPE_PHASE                          = 26, // don't use on 3.3.5a
+    CONDITION_SOURCE_TYPE_GRAVEYARD                      = 27, // don't use on 3.3.5a
     CONDITION_SOURCE_TYPE_MAX                            = 28  // MAX
 };
 
