@@ -62,18 +62,21 @@ enum ConditionTypes
     CONDITION_HP_PCT                = 38,                   // hpPct            ComparisonType 0                  true if unit's hp matches given pct
     CONDITION_REALM_ACHIEVEMENT     = 39,                   // achievement_id   0              0                  true if realm achievement is complete
     CONDITION_IN_WATER              = 40,                   // 0                0              0                  true if unit in water
-    // RESERVED                     = 41,
-    // RESERVED                     = 42,
-    // RESERVED                     = 43,
-    // RESERVED                     = 44,
-    // RESERVED                     = 45,
-    // RESERVED                     = 46,
-    // RESERVED                     = 47,
-    // RESERVED                     = 48,
-    // RESERVED                     = 49,
-    CONDITION_QUEST_SATISFY_EXCLUSIVE = 50,                 // quest_id         0              0                  true if satisfied exclusive group
-    CONDITION_HAS_AURA_TYPE         = 51,                   // aura_type        0              0                  true if has aura type
-    CONDITION_MAX                   = 52                    // MAX
+    CONDITION_TERRAIN_SWAP          = 41,                   // don't use on 3.3.5a
+    CONDITION_STAND_STATE           = 42,                   // TODO: NOT SUPPORTED YET
+    CONDITION_DAILY_QUEST_DONE      = 43,                   // TODO: NOT SUPPORTED YET
+    CONDITION_CHARMED               = 44,                   // TODO: NOT SUPPORTED YET
+    CONDITION_PET_TYPE              = 45,                   // TODO: NOT SUPPORTED YET
+    CONDITION_TAXI                  = 46,                   // TODO: NOT SUPPORTED YET
+    CONDITION_QUESTSTATE            = 47,                   // TODO: NOT SUPPORTED YET
+    CONDITION_QUEST_OBJECTIVE_COMPLETE = 48,                // don't use on 3.3.5a
+    CONDITION_DIFFICULTY_ID            = 49,                // don't use on 3.3.5a
+    CONDITION_TC_END                   = 50,                // placeholder
+
+    CONDITION_AC_START                 = 100,
+    CONDITION_QUEST_SATISFY_EXCLUSIVE  = 101,                // quest_id         0              0                  true if satisfied exclusive group
+    CONDITION_HAS_AURA_TYPE            = 102,                // aura_type        0              0                  true if has aura type
+    CONDITION_AC_END                   = 103                 // placeholder
 };
 
 /*! Documentation on implementing a new ConditionSourceType:
@@ -130,8 +133,10 @@ enum ConditionSourceType
     CONDITION_SOURCE_TYPE_SMART_EVENT                    = 22,
     CONDITION_SOURCE_TYPE_NPC_VENDOR                     = 23,
     CONDITION_SOURCE_TYPE_SPELL_PROC                     = 24,
-    CONDITION_SOURCE_TYPE_PHASE_DEFINITION               = 25, // only 4.3.4
-    CONDITION_SOURCE_TYPE_MAX                            = 26  // MAX
+    CONDITION_SOURCE_TYPE_TERRAIN_SWAP                   = 25, // don't use on 3.3.5a
+    CONDITION_SOURCE_TYPE_PHASE                          = 26, // don't use on 3.3.5a
+    CONDITION_SOURCE_TYPE_GRAVEYARD                      = 27, // don't use on 3.3.5a
+    CONDITION_SOURCE_TYPE_MAX                            = 28  // placeholder
 };
 
 enum RelationType
