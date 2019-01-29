@@ -32,8 +32,8 @@ public:
 
             case CHAT_MSG_EMOTE:
                 if (sWorld->getBoolConfig(CONFIG_CHATLOG_PUBLIC))
-                    sLog->outChat("[TEXTEMOTE] Player %s emotes: %s",
-                        player->GetName().c_str(), msg.c_str());
+                    sLog->outChat("[TEXTEMOTE] Player %s emotes (language %u): %s",
+                        player->GetName().c_str(), lang, msg.c_str());
                 break;
 
             case CHAT_MSG_YELL:
