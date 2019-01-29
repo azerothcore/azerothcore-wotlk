@@ -1,3 +1,19 @@
+-- DB update 2019_01_28_02 -> 2019_01_29_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2019_01_28_02';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2019_01_28_02 2019_01_29_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1548473216184905600'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1548473216184905600');
 
 UPDATE `creature_template` SET `ScriptName`='', `AIName`='SmartAI' WHERE `entry`=1855;
@@ -17,3 +33,12 @@ INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId`=15 AND `SourceGroup`=3502;
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
 (15,3502,0,0,0,9,0,5742,0,0,0,0,0,"","Show gossip option if player does have quest 5742 taken");
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
