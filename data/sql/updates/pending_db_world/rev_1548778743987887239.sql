@@ -16,6 +16,6 @@ VALUES
 DELETE FROM `creature_text` WHERE `CreatureID` IN (27047,32711,29506);
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`)
 VALUES
-(27047, 0, 0, '', 12, 0, 100, 0, 0, 0, 0, 0, 'Invisible Stalker (Floating Only)'),
+(27047, 0, 0, '', 16, 0, 100, 0, 0, 0, 0, 0, 'Invisible Stalker (Floating Only)'),
 (32711, 0, 0, 'So peaceful...', 12, 0, 100, 0, 0, 0, 0, 0, 'Warp-Huntress Kula'),
 (29506, 0, 0, 'Welcome traveler!', 12, 0, 100, 0, 0, 0, 0, 0, 'Orland Schaeffer');
