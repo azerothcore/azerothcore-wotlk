@@ -1502,18 +1502,35 @@ class spell_item_arcane_shroud : public SpellScriptLoader
 };
 
 // 64415 - Val'anyr Hammer of Ancient Kings - Equip Effect
-class spell_item_valanyr_hammer_of_acient_kings : public AuraScript
+class spell_item_valanyr_hammer_of_acient_kings : public SpellScriptLoader
 {
-    PrepareAuraScript(spell_item_valanyr_hammer_of_acient_kings);
+public:
+    spell_item_valanyr_hammer_of_acient_kings() : SpellScriptLoader("spell_item_valanyr_hammer_of_acient_kings") { }
 
-    bool CheckProc(ProcEventInfo& eventInfo)
+    class spell_item_valanyr_hammer_of_acient_kingsAuraScript : public AuraScript
     {
-        return eventInfo.GetHealInfo() && eventInfo.GetHealInfo()->GetHeal() > 0;
-    }
+        PrepareAuraScript(spell_item_valanyr_hammer_of_acient_kingsAuraScript);
 
-    void Register()
+        bool CheckProc(ProcEventInfo& eventInfo)
+        {
+
+            SpellInfo const* spellInfo = eventInfo.GetHealInfo()->GetSpellInfo();
+            if (!spellInfo || !spellInfo->HasEffect(SPELL_EFFECT_HEAL))
+                return false;
+
+            return eventInfo.GetHealInfo() && eventInfo.GetHealInfo()->GetHeal() > 0;
+
+        }
+
+        void Register()
+        {
+            DoCheckProc += AuraCheckProcFn(spell_item_valanyr_hammer_of_acient_kingsAuraScript::CheckProc);
+        }
+    };
+
+    AuraScript* GetAuraScript() const
     {
-        DoCheckProc += AuraCheckProcFn(spell_item_valanyr_hammer_of_acient_kings::CheckProc);
+        return new spell_item_valanyr_hammer_of_acient_kingsAuraScript();
     }
 };
 
