@@ -1919,7 +1919,7 @@ class FlameLeviathanPursuedTargetSelector
     };
 
     public:
-        explicit FlameLeviathanPursuedTargetSelector(Unit* unit) : _me(unit) {};
+        explicit FlameLeviathanPursuedTargetSelector(Unit* unit) {};
 
         bool operator()(WorldObject* target) const
         {
@@ -1949,9 +1949,6 @@ class FlameLeviathanPursuedTargetSelector
 
             return !playerFound;
         }
-
-    private:
-        Unit const* _me;
 };
 
 class spell_pursue : public SpellScriptLoader
