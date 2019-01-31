@@ -1502,14 +1502,14 @@ class spell_item_arcane_shroud : public SpellScriptLoader
 };
 
 // 64415 - Val'anyr Hammer of Ancient Kings - Equip Effect
-class spell_item_valanyr_hammer_of_acient_kings : public SpellScriptLoader
+class spell_item_valanyr_hammer_of_ancient_kings : public SpellScriptLoader
 {
 public:
-    spell_item_valanyr_hammer_of_acient_kings() : SpellScriptLoader("spell_item_valanyr_hammer_of_acient_kings") { }
+    spell_item_valanyr_hammer_of_ancient_kings() : SpellScriptLoader("spell_item_valanyr_hammer_of_ancient_kings") { }
 
-    class spell_item_valanyr_hammer_of_acient_kingsAuraScript : public AuraScript
+    class spell_item_valanyr_hammer_of_ancient_kingsAuraScript : public AuraScript
     {
-        PrepareAuraScript(spell_item_valanyr_hammer_of_acient_kingsAuraScript);
+        PrepareAuraScript(spell_item_valanyr_hammer_of_ancient_kingsAuraScript);
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
@@ -1524,13 +1524,13 @@ public:
 
         void Register()
         {
-            DoCheckProc += AuraCheckProcFn(spell_item_valanyr_hammer_of_acient_kingsAuraScript::CheckProc);
+            DoCheckProc += AuraCheckProcFn(spell_item_valanyr_hammer_of_ancient_kingsAuraScript::CheckProc);
         }
     };
 
     AuraScript* GetAuraScript() const
     {
-        return new spell_item_valanyr_hammer_of_acient_kingsAuraScript();
+        return new spell_item_valanyr_hammer_of_ancient_kingsAuraScript();
     }
 };
 
@@ -3968,7 +3968,7 @@ void AddSC_item_spell_scripts()
     new spell_item_aegis_of_preservation();
     new spell_item_arcane_shroud();
     new spell_item_blessing_of_ancient_kings();
-    new spell_item_valanyr_hammer_of_acient_kings();
+    new spell_item_valanyr_hammer_of_ancient_kings();
     new spell_item_defibrillate("spell_item_goblin_jumper_cables", 67, SPELL_GOBLIN_JUMPER_CABLES_FAIL);
     new spell_item_defibrillate("spell_item_goblin_jumper_cables_xl", 50, SPELL_GOBLIN_JUMPER_CABLES_XL_FAIL);
     new spell_item_defibrillate("spell_item_gnomish_army_knife", 33);
