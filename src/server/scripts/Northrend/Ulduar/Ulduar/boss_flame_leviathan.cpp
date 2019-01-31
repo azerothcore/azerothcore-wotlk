@@ -1919,7 +1919,7 @@ class FlameLeviathanPursuedTargetSelector
     };
 
     public:
-        explicit FlameLeviathanPursuedTargetSelector(Unit* unit) {};
+        explicit FlameLeviathanPursuedTargetSelector(Unit* /*unit*/) {};
 
         bool operator()(WorldObject* target) const
         {
