@@ -288,8 +288,11 @@ bool GameObject::Create(uint32 guidlow, uint32 name_id, Map* map, uint32 phaseMa
 
     SetObjectScale(goinfo->size);
 
-    SetUInt32Value(GAMEOBJECT_FACTION, goinfo->faction);
-    SetUInt32Value(GAMEOBJECT_FLAGS, goinfo->flags);
+    if (GameObjectTemplateAddon const* addon = GetTemplateAddon())
+    {
+        SetUInt32Value(GAMEOBJECT_FACTION, addon->faction);
+        SetUInt32Value(GAMEOBJECT_FLAGS, addon->flags);
+    }
 
     SetEntry(goinfo->entry);
 
@@ -689,8 +692,9 @@ void GameObject::Update(uint32 diff)
                 //any return here in case battleground traps
                 // Xinef: Do not return here for summoned gos that should be deleted few lines below
                 // Xinef: Battleground objects are treated as spawned by default
-                if ((GetGOInfo()->flags & GO_FLAG_NODESPAWN) && isSpawnedByDefault())
-                    return;
+                if (GameObjectTemplateAddon const* addon = GetTemplateAddon())
+                    if ((addon->flags & GO_FLAG_NODESPAWN) && isSpawnedByDefault())
+                        return;
             }
 
             loot.clear();
@@ -711,7 +715,8 @@ void GameObject::Update(uint32 diff)
             {
                 SendObjectDeSpawnAnim(GetGUID());
                 //reset flags
-                SetUInt32Value(GAMEOBJECT_FLAGS, GetGOInfo()->flags);
+                if (GameObjectTemplateAddon const* addon = GetTemplateAddon())
+                    SetUInt32Value(GAMEOBJECT_FLAGS, addon->flags);
             }
 
             if (!m_respawnDelayTime)
@@ -735,6 +740,11 @@ void GameObject::Update(uint32 diff)
         }
     }
     sScriptMgr->OnGameObjectUpdate(this, diff);
+}
+
+GameObjectTemplateAddon const* GameObject::GetTemplateAddon() const
+{
+    return sObjectMgr->GetGameObjectTemplateAddon(GetGOInfo()->entry);
 }
 
 void GameObject::Refresh()
@@ -761,7 +771,9 @@ void GameObject::Delete()
     SendObjectDeSpawnAnim(GetGUID());
 
     SetGoState(GO_STATE_READY);
-    SetUInt32Value(GAMEOBJECT_FLAGS, GetGOInfo()->flags);
+
+    if (GameObjectTemplateAddon const* addon = GetTemplateAddon())
+        SetUInt32Value(GAMEOBJECT_FLAGS, addon->flags);
 
     // Xinef: if ritual gameobject is removed, clear anim spells
     if (GetGOInfo()->type == GAMEOBJECT_TYPE_SUMMONING_RITUAL)

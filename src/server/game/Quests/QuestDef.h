@@ -230,7 +230,7 @@ class Quest
         uint32 GetSuggestedPlayers() const { return SuggestedPlayers; }
         uint32 GetTimeAllowed() const { return TimeAllowed; }
         int32  GetPrevQuestId() const { return PrevQuestId; }
-        int32  GetNextQuestId() const { return NextQuestId; }
+        uint32 GetNextQuestId() const { return NextQuestId; }
         int32  GetExclusiveGroup() const { return ExclusiveGroup; }
         uint32 GetNextQuestInChain() const { return RewardNextQuest; }
         uint32 GetCharTitleId() const { return RewardTitleId; }
@@ -371,7 +371,7 @@ class Quest
         uint32 RequiredClasses        = 0;
         uint32 SourceSpellid          = 0;
         int32  PrevQuestId            = 0;
-        int32  NextQuestId            = 0;
+        uint32 NextQuestId            = 0;
         int32  ExclusiveGroup         = 0;
         uint32 RewardMailTemplateId   = 0;
         uint32 RewardMailDelay        = 0;

@@ -1216,22 +1216,11 @@ enum SMARTAI_TARGETS
     SMART_TARGET_THREAT_LIST                    = 24,   // All units on creature's threat list, maxdist, playerOnly
     SMART_TARGET_CLOSEST_ENEMY                  = 25,   // maxDist, playerOnly
     SMART_TARGET_CLOSEST_FRIENDLY               = 26,   // maxDist, playerOnly
-    // RESERVED                                 = 27,
-    // RESERVED                                 = 28,
-    // RESERVED                                 = 29,
-    // RESERVED                                 = 30,
-    // RESERVED                                 = 31,
-    // RESERVED                                 = 32,
-    // RESERVED                                 = 33,
-    // RESERVED                                 = 34,
-    // RESERVED                                 = 35,
-    // RESERVED                                 = 36,
-    // RESERVED                                 = 37,
-    // RESERVED                                 = 38,
-    // RESERVED                                 = 39,
-    SMART_TARGET_FARTHEST                       = 40,
+    SMART_TARGET_LOOT_RECIPIENTS                = 27,   // TODO: NOT SUPPORTED YET
+    SMART_TARGET_FARTHEST                       = 28,   // maxDist, playerOnly, isInLos
+    SMART_TARGET_VEHICLE_PASSENGER              = 29,   // TODO: NOT SUPPORTED YET
 
-    SMART_TARGET_END                            = 41
+    SMART_TARGET_END                            = 30
 };
 
 struct SmartTarget

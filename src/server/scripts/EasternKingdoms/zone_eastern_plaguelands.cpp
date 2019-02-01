@@ -401,59 +401,6 @@ public:
     };
 };
 
-/*######
-## npc_tirion_fordring
-######*/
-
-#define GOSSIP_HELLO    "I am ready to hear your tale, Tirion."
-#define GOSSIP_SELECT1  "Thank you, Tirion.  What of your identity?"
-#define GOSSIP_SELECT2  "That is terrible."
-#define GOSSIP_SELECT3  "I will, Tirion."
-
-class npc_tirion_fordring : public CreatureScript
-{
-public:
-    npc_tirion_fordring() : CreatureScript("npc_tirion_fordring") { }
-
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action)
-    {
-        player->PlayerTalkClass->ClearMenus();
-        switch (action)
-        {
-            case GOSSIP_ACTION_INFO_DEF+1:
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_SELECT1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-                player->SEND_GOSSIP_MENU(4493, creature->GetGUID());
-                break;
-            case GOSSIP_ACTION_INFO_DEF+2:
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_SELECT2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
-                player->SEND_GOSSIP_MENU(4494, creature->GetGUID());
-                break;
-            case GOSSIP_ACTION_INFO_DEF+3:
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_SELECT3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
-                player->SEND_GOSSIP_MENU(4495, creature->GetGUID());
-                break;
-            case GOSSIP_ACTION_INFO_DEF+4:
-                player->CLOSE_GOSSIP_MENU();
-                player->AreaExploredOrEventHappens(5742);
-                break;
-        }
-        return true;
-    }
-
-    bool OnGossipHello(Player* player, Creature* creature)
-    {
-        if (creature->IsQuestGiver())
-            player->PrepareQuestMenu(creature->GetGUID());
-
-        if (player->GetQuestStatus(5742) == QUEST_STATUS_INCOMPLETE && player->getStandState() == UNIT_STAND_STATE_SIT)
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_HELLO, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
-
-        player->SEND_GOSSIP_MENU(player->GetGossipTextId(creature), creature->GetGUID());
-
-        return true;
-    }
-};
-
 void AddSC_eastern_plaguelands()
 {
     // Ours
@@ -464,5 +411,4 @@ void AddSC_eastern_plaguelands()
     new npc_ghoul_flayer();
     new npc_augustus_the_touched();
     new npc_darrowshire_spirit();
-    new npc_tirion_fordring();
 }

@@ -1469,6 +1469,9 @@ void World::SetInitialWorldSettings()
     sLog->outString("Loading Game Object Templates...");         // must be after LoadPageTexts
     sObjectMgr->LoadGameObjectTemplate();
 
+    sLog->outString("Loading Game Object template addons...");
+    sObjectMgr->LoadGameObjectTemplateAddons();
+
     sLog->outString("Loading Transport templates...");
     sTransportMgr->LoadTransportTemplates();
 
