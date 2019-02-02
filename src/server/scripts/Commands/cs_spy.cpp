@@ -3,8 +3,9 @@
 #include "Language.h"
 #include "Group.h"
 
-// Maps to store followed players
+// Maps to store followed players <targetGuid, gamemasterGuid>
 std::map<uint32,uint32> gmListening;
+// Maps to store followed groups <groupGuid, gamemasterGuid>
 std::map<uint32,uint32> gmListeningGroup;
 
 class chat_spy_playerscript : public PlayerScript
@@ -35,6 +36,22 @@ public:
             if(Player* gm = GetGmFromGroupList(group))
                 ChatHandler(gm->GetSession()).PSendSysMessage(LANG_COMMAND_SPY_TELLS_GROUP,
                     sender->GetName().c_str(), msg.c_str());
+    }
+
+    void OnLogout(Player* player)
+    {
+        if(player && player->IsGameMaster())
+        {
+            uint32 guidlow = player->GetGUIDLow();
+            std::map<uint32,uint32>::iterator next;
+            for(std::map<uint32,uint32>::iterator itr = gmListening.begin(); itr != gmListening.end(); itr = next)
+            {
+                next = itr; // Save a reference to the next one
+                ++next;
+                if(itr->second == guidlow)
+                    gmListening.erase(itr);
+            }
+        }
     }
 
     Player* GetGmFromList(Player* from)
@@ -249,31 +266,8 @@ public:
 
 };
 
-class chat_spy_logout_cleaner : public PlayerScript
-{
-public:
-    chat_spy_logout_cleaner() : PlayerScript("chat_spy_logout_cleaner") { }
-
-    void OnLogout(Player* player)
-    {
-        if(player && player->IsGameMaster())
-        {
-            uint32 guidlow = player->GetGUIDLow();
-            std::map<uint32,uint32>::iterator next;
-            for(std::map<uint32,uint32>::iterator itr = gmListening.begin(); itr != gmListening.end(); itr = next)
-            {
-                next = itr; // Save a reference to the next one
-                ++next;
-                if(itr->second == guidlow)
-                    gmListening.erase(itr);
-            }
-        }
-    }
-};
-
 void AddSC_spy_commandscript()
 {
     new chat_spy_playerscript();
     new chat_spy_commandscript();
-    new chat_spy_logout_cleaner();
 }
