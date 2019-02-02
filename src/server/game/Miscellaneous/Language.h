@@ -1157,8 +1157,9 @@ enum TrinityStrings
     LANG_COMMAND_SPY_LIST                = 5069,
     LANG_COMMAND_SPY_WHISPERS_PLAYER     = 5070,
     LANG_COMMAND_SPY_TELLS_GROUP         = 5071,
+    LANG_COMMAND_SPY_SELF                = 5072,
 
-    // Room for more Trinity strings      5072-9999
+    // Room for more Trinity strings      5073-9999
 
     // Level requirement notifications
     LANG_SAY_REQ                        = 6604,

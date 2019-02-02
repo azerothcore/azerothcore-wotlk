@@ -108,23 +108,35 @@ public:
             return true;
         }
 
-        if(Player* target = ObjectAccessor::FindPlayer(sObjectMgr->GetPlayerGUIDByName(pTarget.c_str())))
-        {
-            std::map<uint32,uint32>::const_iterator itr = gmListening.find(target->GetGUIDLow());
-            if(itr != gmListening.end())
-            {
-                if(Player* gm = sObjectMgr->GetPlayerByLowGUID(itr->second))
-                {
-                    handler->PSendSysMessage(LANG_COMMAND_SPY_ALREADY_FOLLOWED_BY, target->GetName().c_str(), gm->GetName().c_str());
-                    return true;
-                }
+        Player* target = ObjectAccessor::FindPlayer(sObjectMgr->GetPlayerGUIDByName(pTarget.c_str()));
 
-                gmListening[target->GetGUIDLow()] = handler->GetSession()->GetPlayer()->GetGUIDLow();
-                handler->PSendSysMessage(LANG_COMMAND_SPY_FOLLOWING, target->GetName().c_str());
-            }
-        }
-        else
+        if (!target) {
             handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);
+            return false;
+        }
+
+        if (handler->GetSession() && target == handler->GetSession()->GetPlayer())
+        {
+            handler->SendSysMessage(LANG_COMMAND_SPY_SELF);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (handler->HasLowerSecurity(target, 0))
+            return false;
+
+        std::map<uint32,uint32>::const_iterator itr = gmListening.find(target->GetGUIDLow());
+        if(itr != gmListening.end())
+        {
+            if(Player* gm = sObjectMgr->GetPlayerByLowGUID(itr->second))
+            {
+                handler->PSendSysMessage(LANG_COMMAND_SPY_ALREADY_FOLLOWED_BY, target->GetName().c_str(), gm->GetName().c_str());
+                return true;
+            }
+
+            gmListening[target->GetGUIDLow()] = handler->GetSession()->GetPlayer()->GetGUIDLow();
+            handler->PSendSysMessage(LANG_COMMAND_SPY_FOLLOWING, target->GetName().c_str());
+        }
 
         return true;
     }
@@ -145,28 +157,43 @@ public:
             return true;
         }
 
-        if(Player* target = ObjectAccessor::FindPlayer(sObjectMgr->GetPlayerGUIDByName(pTarget.c_str())))
-        {
-            if(Group* group = target->GetGroup())
-            {
-                std::map<uint32,uint32>::const_iterator itr = gmListeningGroup.find(group->GetLowGUID());
-                if(itr != gmListeningGroup.end())
-                {
-                    if(Player* gm = sObjectMgr->GetPlayerByLowGUID(itr->second))
-                    {
-                        handler->PSendSysMessage(LANG_COMMAND_SPY_ALREADY_FOLLOWED_BY, target->GetName().c_str(), gm->GetName().c_str());
-                        return true;
-                    }
+        Player* target = ObjectAccessor::FindPlayer(sObjectMgr->GetPlayerGUIDByName(pTarget.c_str()));
 
-                    gmListeningGroup[group->GetLowGUID()] = handler->GetSession()->GetPlayer()->GetGUIDLow();
-                    handler->PSendSysMessage(LANG_COMMAND_SPY_FOLLOWING_GROUP, target->GetName().c_str());
-                }
-            }
-            else
-                handler->PSendSysMessage(LANG_NOT_IN_GROUP, target->GetName().c_str());
-        }
-        else
+        if (!target) {
             handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);
+            return false;
+        }
+
+        if (handler->GetSession() && target == handler->GetSession()->GetPlayer())
+        {
+            handler->SendSysMessage(LANG_COMMAND_SPY_SELF);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (handler->HasLowerSecurity(target, 0))
+            return false;
+
+        Group* group = target->GetGroup();
+
+        if(!group)
+        {
+            handler->PSendSysMessage(LANG_NOT_IN_GROUP, target->GetName().c_str());
+            return false;
+        }
+
+        std::map<uint32,uint32>::const_iterator itr = gmListeningGroup.find(group->GetLowGUID());
+        if(itr != gmListeningGroup.end())
+        {
+            if(Player* gm = sObjectMgr->GetPlayerByLowGUID(itr->second))
+            {
+                handler->PSendSysMessage(LANG_COMMAND_SPY_ALREADY_FOLLOWED_BY, target->GetName().c_str(), gm->GetName().c_str());
+                return true;
+            }
+
+            gmListeningGroup[group->GetLowGUID()] = handler->GetSession()->GetPlayer()->GetGUIDLow();
+            handler->PSendSysMessage(LANG_COMMAND_SPY_FOLLOWING_GROUP, target->GetName().c_str());
+        }
 
         return true;
     }
