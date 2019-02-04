@@ -1352,7 +1352,7 @@ void World::SetInitialWorldSettings()
 
     if (!sConfigMgr->isDryRun())
     {
-        ///- Check the existence of the map files for all races' startup areas.
+        ///- Check the existence of the map files for all starting areas.
         if (!MapManager::ExistMapAndVMap(0, -6240.32f, 331.033f)
             || !MapManager::ExistMapAndVMap(0, -8949.95f, -132.493f)
             || !MapManager::ExistMapAndVMap(1, -618.518f, -4251.67f)
