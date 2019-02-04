@@ -11,6 +11,8 @@ AzerothCore is an open source game-server application for World of Warcraft, cur
 
 It is written in C++ and based on MaNGOS, TrinityCore and SunwellCore.
 
+:moneybag: You can support the project by financing the resolution of issues [using Bountysource](https://github.com/azerothcore/azerothcore-wotlk/wiki/Bountysource).
+
 ## Why AzerothCore?
 
 Our main goal is to create a playable game server, offering a fully working game experience. In short, we focus on the **user experience (UX)**.
