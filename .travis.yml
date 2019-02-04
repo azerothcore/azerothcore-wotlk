@@ -44,3 +44,5 @@ install:
 script:
   # compile
   - bash ./acore.sh "compiler" "all"
+  - git clone --depth=1 --single-branch https://github.com/ac-data/ac-data.git .env/dist
+  - ./env/dist/bin/worldserver --dry-run
