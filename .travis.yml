@@ -47,3 +47,4 @@ script:
   - git clone --depth=1 --branch=master --single-branch https://github.com/ac-data/ac-data.git /home/travis/build/azerothcore/azerothcore-wotlk/env/dist/data
   - cp ./data/travis/worldserver.conf ./env/dist/etc/worldserver.conf
   - ./env/dist/bin/worldserver --dry-run
+  - ./apps/ci-error-check.sh
