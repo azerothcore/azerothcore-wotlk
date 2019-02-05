@@ -912,6 +912,8 @@ Player::Player(WorldSession* session): Unit(true), m_mover(this)
 
     SetPendingBind(0, 0);
 
+    _activeCheats = CHEAT_NONE;
+
     m_achievementMgr = new AchievementMgr(this);
     m_reputationMgr = new ReputationMgr(this);
 
