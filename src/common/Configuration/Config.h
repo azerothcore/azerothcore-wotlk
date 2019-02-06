@@ -46,7 +46,12 @@ public:
 
     std::list<std::string> GetKeysByString(std::string const& name);
 
+    bool isDryRun() { return this->dryRun; }
+    void setDryRun(bool mode) { this->dryRun = mode; }
+
 private:
+    bool dryRun = false;
+
     bool GetValueHelper(const char* name, ACE_TString &result);
     bool LoadData(char const* file);
 
