@@ -1350,18 +1350,21 @@ void World::SetInitialWorldSettings()
     ///- Init highest guids before any table loading to prevent using not initialized guids in some code.
     sObjectMgr->SetHighestGuids();
 
-    ///- Check the existence of the map files for all races' startup areas.
-    if (!MapManager::ExistMapAndVMap(0, -6240.32f, 331.033f)
-        || !MapManager::ExistMapAndVMap(0, -8949.95f, -132.493f)
-        || !MapManager::ExistMapAndVMap(1, -618.518f, -4251.67f)
-        || !MapManager::ExistMapAndVMap(0, 1676.35f, 1677.45f)
-        || !MapManager::ExistMapAndVMap(1, 10311.3f, 832.463f)
-        || !MapManager::ExistMapAndVMap(1, -2917.58f, -257.98f)
-        || (m_int_configs[CONFIG_EXPANSION] && (
-            !MapManager::ExistMapAndVMap(530, 10349.6f, -6357.29f) ||
-            !MapManager::ExistMapAndVMap(530, -3961.64f, -13931.2f))))
+    if (!sConfigMgr->isDryRun())
     {
-        exit(1);
+        ///- Check the existence of the map files for all starting areas.
+        if (!MapManager::ExistMapAndVMap(0, -6240.32f, 331.033f)
+            || !MapManager::ExistMapAndVMap(0, -8949.95f, -132.493f)
+            || !MapManager::ExistMapAndVMap(1, -618.518f, -4251.67f)
+            || !MapManager::ExistMapAndVMap(0, 1676.35f, 1677.45f)
+            || !MapManager::ExistMapAndVMap(1, 10311.3f, 832.463f)
+            || !MapManager::ExistMapAndVMap(1, -2917.58f, -257.98f)
+            || (m_int_configs[CONFIG_EXPANSION] && (
+                !MapManager::ExistMapAndVMap(530, 10349.6f, -6357.29f) ||
+                !MapManager::ExistMapAndVMap(530, -3961.64f, -13931.2f))))
+        {
+            exit(1);
+        }
     }
 
     ///- Initialize pool manager
@@ -1951,6 +1954,11 @@ void World::SetInitialWorldSettings()
     {
         sLog->outString("Enabling database logging...");
         sLog->SetLogDB(true);
+    }
+
+    if (sConfigMgr->isDryRun()) {
+        sLog->outString("AzerothCore dry run completed, terminating.");
+        exit(0);
     }
 }
 
