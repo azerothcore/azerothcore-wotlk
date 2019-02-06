@@ -5,8 +5,6 @@
 #ifndef DEF_ULDAMAN_H
 #define DEF_ULDAMAN_H
 
-#include "ScriptPCH.h"
-
 enum DataTypes
 {
     DATA_IRONAYA_DOORS                  = 0,

@@ -3,7 +3,6 @@
 */
 
 #include "ScriptMgr.h"
-#include "ScriptPCH.h"
 #include "ScriptedCreature.h"
 #include "magisters_terrace.h"
 #include "WorldPacket.h"

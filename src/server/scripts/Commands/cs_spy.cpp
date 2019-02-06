@@ -1,4 +1,6 @@
-#include "ScriptPCH.h"
+#include "Player.h"
+#include "ScriptMgr.h"
+#include "Chat.h"
 #include "Channel.h"
 #include "Language.h"
 #include "Group.h"
