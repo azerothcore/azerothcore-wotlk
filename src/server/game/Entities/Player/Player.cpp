@@ -15986,6 +15986,8 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
     // Xinef: area auras may change on quest completion!
     UpdateZoneDependentAuras(GetZoneId());
     UpdateAreaDependentAuras(GetAreaId());
+    
+    sScriptMgr->OnPlayerCompleteQuest(this, quest);
 }
 
 void Player::FailQuest(uint32 questId)
