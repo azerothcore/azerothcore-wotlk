@@ -777,6 +777,9 @@ class PlayerScript : public ScriptObject
 
     public:
         virtual void OnPlayerReleasedGhost(Player* /*player*/) { }
+        
+        // Called when a player completes a quest
+        virtual void OnPlayerCompleteQuest(Player* /*player*/, Quest const* /*quest_id*/) { }
 
         // Called when a player kills another player
         virtual void OnPVPKill(Player* /*killer*/, Player* /*killed*/) { }
@@ -1328,6 +1331,7 @@ class ScriptMgr
         void OnAfterUpdateAttackPowerAndDamage(Player* player, float& level, float& base_attPower, float& attPowerMod, float& attPowerMultiplier, bool ranged);
         void OnBeforeInitTalentForLevel(Player* player, uint8& level, uint32& talentPointsForLevel);
         void OnFirstLogin(Player* player);
+        void OnPlayerCompleteQuest(Player* player, Quest const* quest);
 
     public: /* GuildScript */
 
