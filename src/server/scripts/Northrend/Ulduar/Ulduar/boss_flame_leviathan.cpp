@@ -1919,7 +1919,7 @@ class FlameLeviathanPursuedTargetSelector
     };
 
     public:
-        explicit FlameLeviathanPursuedTargetSelector(Unit* /*unit*/) {};
+        explicit FlameLeviathanPursuedTargetSelector() {};
 
         bool operator()(WorldObject* target) const
         {
@@ -1962,7 +1962,7 @@ class spell_pursue : public SpellScriptLoader
 
             void FilterTargets(std::list<WorldObject*>& targets)
             {
-                targets.remove_if(FlameLeviathanPursuedTargetSelector(GetCaster()));
+                targets.remove_if(FlameLeviathanPursuedTargetSelector());
                 if (targets.empty())
                 {
                     if (Creature* caster = GetCaster()->ToCreature())
