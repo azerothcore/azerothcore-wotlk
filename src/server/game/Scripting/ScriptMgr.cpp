@@ -1375,9 +1375,9 @@ bool ScriptMgr::OnCriteriaCheck(uint32 scriptId, Player* source, Unit* target, u
 
 // Player
 
-void ScriptMgr::OnPlayerCompleteQuest(Player* player, Quest const* quest_id)
+void ScriptMgr::OnPlayerCompleteQuest(Player* player, Quest const* quest)
 {
-    FOREACH_SCRIPT(PlayerScript)->OnPlayerCompleteQuest(player, quest_id);
+    FOREACH_SCRIPT(PlayerScript)->OnPlayerCompleteQuest(player, quest);
 }
 
 void ScriptMgr::OnPlayerReleasedGhost(Player* player)
