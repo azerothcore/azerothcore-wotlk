@@ -908,7 +908,7 @@ void SmartAI::InitializeAI()
     }
 }
 
-void SmartAI::OnCharmed(bool apply)
+void SmartAI::OnCharmed(bool /*apply*/)
 {
     bool const charmed = me->IsCharmed();
     if (charmed) // do this before we change charmed state, as charmed state might prevent these things from processing
