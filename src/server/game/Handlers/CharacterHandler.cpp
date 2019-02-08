@@ -678,10 +678,13 @@ void WorldSession::HandleCharDeleteOpcode(WorldPacket& recvData)
 {
     uint64 guid;
     recvData >> guid;
+    // Initiating
+    uint32 initAccountId = GetAccountId();
 
     // can't delete loaded character
     if (ObjectAccessor::FindPlayerInOrOutOfWorld(guid) || sWorld->FindOfflineSessionForCharacterGUID(GUID_LOPART(guid)))
     {
+        sScriptMgr->OnPlayerFailedDelete(guid, initAccountId);
         WorldPacket data(SMSG_CHAR_DELETE, 1);
         data << (uint8)CHAR_DELETE_FAILED;
         SendPacket(&data);
@@ -694,6 +697,7 @@ void WorldSession::HandleCharDeleteOpcode(WorldPacket& recvData)
     // is guild leader
     if (sGuildMgr->GetGuildByLeader(guid))
     {
+        sScriptMgr->OnPlayerFailedDelete(guid, initAccountId);
         WorldPacket data(SMSG_CHAR_DELETE, 1);
         data << (uint8)CHAR_DELETE_FAILED_GUILD_LEADER;
         SendPacket(&data);
@@ -703,6 +707,7 @@ void WorldSession::HandleCharDeleteOpcode(WorldPacket& recvData)
     // is arena team captain
     if (sArenaTeamMgr->GetArenaTeamByCaptain(guid))
     {
+        sScriptMgr->OnPlayerFailedDelete(guid, initAccountId);
         WorldPacket data(SMSG_CHAR_DELETE, 1);
         data << (uint8)CHAR_DELETE_FAILED_ARENA_CAPTAIN;
         SendPacket(&data);
@@ -716,15 +721,21 @@ void WorldSession::HandleCharDeleteOpcode(WorldPacket& recvData)
     }
 
     // prevent deleting other players' characters using cheating tools
-    if (accountId != GetAccountId())
+    if (accountId != initAccountId)
+    {
+        sScriptMgr->OnPlayerFailedDelete(guid, initAccountId);
         return;
+    }
 
     std::string IP_str = GetRemoteAddress();
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDetail("Account: %d (IP: %s) Delete Character:[%s] (GUID: %u)", GetAccountId(), IP_str.c_str(), name.c_str(), GUID_LOPART(guid));
 #endif
     sLog->outChar("Account: %d (IP: %s) Delete Character:[%s] (GUID: %u)", GetAccountId(), IP_str.c_str(), name.c_str(), GUID_LOPART(guid));
-    sScriptMgr->OnPlayerDelete(guid);
+
+    // To prevent hook failure, place hook before removing reference from DB
+    sScriptMgr->OnPlayerDelete(guid, initAccountId); // To prevent race conditioning, but as it also makes sense, we hand the accountId over for successful delete.
+    // Shouldn't interfere with character deletion though
 
     if (sLog->IsOutCharDump())                                // optimize GetPlayerDump call
     {
