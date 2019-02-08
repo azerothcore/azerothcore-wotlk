@@ -219,7 +219,7 @@ class SmartAI : public CreatureAI
         bool mForcedPaused;
         uint32 mInvincibilityHpLevel;
 
-        bool AssistPlayerInCombat(Unit* who);
+        bool AssistPlayerInCombatAgainst(Unit* who);
 
         uint32 mDespawnTime;
         uint32 mDespawnState;
