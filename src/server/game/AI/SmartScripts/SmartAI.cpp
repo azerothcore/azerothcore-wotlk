@@ -60,6 +60,7 @@ SmartAI::SmartAI(Creature* c) : CreatureAI(c)
     mFollowArrivedTimer = 0;
     mInvincibilityHpLevel = 0;
 
+    mIsCharmed = false;
     mJustReset = false;
 
     // Xinef: Vehicle conditions
@@ -857,9 +858,6 @@ void SmartAI::SummonedCreatureDespawn(Creature* unit)
     GetScript()->ProcessEventsFor(SMART_EVENT_SUMMON_DESPAWNED, unit);
 }
 
-void SmartAI::UpdateAIWhileCharmed(const uint32 /*diff*/)
-{
-}
 
 void SmartAI::CorpseRemoved(uint32& respawnDelay)
 {
