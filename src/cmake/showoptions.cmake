@@ -65,6 +65,13 @@ else()
   message("* Use coreside debug              : No  (default)")
 endif()
 
+if( MARIADB )
+  message("* Enable MariaDB 10.2+ support    : Yes")
+  add_definitions(-DMARIADB)
+else()
+  message("* Enable MariaDB 10.2+ support    : No (default)")
+endif()
+
 if ( UNIX )
   if( WITH_PERFTOOLS )
     message("* Use unix gperftools             : Yes")
