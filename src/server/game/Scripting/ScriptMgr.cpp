@@ -59,6 +59,7 @@ template class ScriptRegistry<AllMapScript>;
 template class ScriptRegistry<MovementHandlerScript>;
 template class ScriptRegistry<BGScript>;
 template class ScriptRegistry<SpellSC>;
+template class ScriptRegistry<AccountScript>;
 
 #include "ScriptMgrMacros.h"
 
@@ -205,6 +206,7 @@ void ScriptMgr::Unload()
     SCR_CLEAR(TransportScript);
     SCR_CLEAR(AchievementCriteriaScript);
     SCR_CLEAR(PlayerScript);
+    SCR_CLEAR(AccountScript);
     SCR_CLEAR(GuildScript);
     SCR_CLEAR(GroupScript);
     SCR_CLEAR(GlobalScript);
@@ -1374,6 +1376,12 @@ bool ScriptMgr::OnCriteriaCheck(uint32 scriptId, Player* source, Unit* target, u
 }
 
 // Player
+
+void ScriptMgr::OnPlayerCompleteQuest(Player* player, Quest const* quest)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnPlayerCompleteQuest(player, quest);
+}
+
 void ScriptMgr::OnPlayerReleasedGhost(Player* player)
 {
     FOREACH_SCRIPT(PlayerScript)->OnPlayerReleasedGhost(player);
@@ -1571,12 +1579,17 @@ void ScriptMgr::OnPlayerSave(Player * player)
     FOREACH_SCRIPT(PlayerScript)->OnSave(player);
 }
 
-void ScriptMgr::OnPlayerDelete(uint64 guid)
+void ScriptMgr::OnPlayerDelete(uint64 guid, uint32 accountId)
 {
 #ifdef ELUNA
     sEluna->OnDelete(GUID_LOPART(guid));
 #endif
-    FOREACH_SCRIPT(PlayerScript)->OnDelete(guid);
+    FOREACH_SCRIPT(PlayerScript)->OnDelete(guid, accountId);
+}
+
+void ScriptMgr::OnPlayerFailedDelete(uint64 guid, uint32 accountId)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnFailedDelete(guid, accountId);
 }
 
 void ScriptMgr::OnPlayerBindToInstance(Player* player, Difficulty difficulty, uint32 mapid, bool permanent)
@@ -1696,6 +1709,37 @@ void ScriptMgr::OnFirstLogin(Player* player)
     sEluna->OnFirstLogin(player);
 #endif
     FOREACH_SCRIPT(PlayerScript)->OnFirstLogin(player);
+}
+
+// Account
+void ScriptMgr::OnAccountLogin(uint32 accountId)
+{
+    FOREACH_SCRIPT(AccountScript)->OnAccountLogin(accountId);
+}
+
+void ScriptMgr::OnFailedAccountLogin(uint32 accountId)
+{
+    FOREACH_SCRIPT(AccountScript)->OnFailedAccountLogin(accountId);
+}
+
+void ScriptMgr::OnEmailChange(uint32 accountId)
+{
+    FOREACH_SCRIPT(AccountScript)->OnEmailChange(accountId);
+}
+
+void ScriptMgr::OnFailedEmailChange(uint32 accountId)
+{
+    FOREACH_SCRIPT(AccountScript)->OnFailedEmailChange(accountId);
+}
+
+void ScriptMgr::OnPasswordChange(uint32 accountId)
+{
+    FOREACH_SCRIPT(AccountScript)->OnPasswordChange(accountId);
+}
+
+void ScriptMgr::OnFailedPasswordChange(uint32 accountId)
+{
+    FOREACH_SCRIPT(AccountScript)->OnFailedPasswordChange(accountId);
 }
 
 // Guild
@@ -2154,6 +2198,12 @@ PlayerScript::PlayerScript(const char* name)
     : ScriptObject(name)
 {
     ScriptRegistry<PlayerScript>::AddScript(this);
+}
+
+AccountScript::AccountScript(const char* name)
+    : ScriptObject(name)
+{
+    ScriptRegistry<AccountScript>::AddScript(this);
 }
 
 GuildScript::GuildScript(const char* name)

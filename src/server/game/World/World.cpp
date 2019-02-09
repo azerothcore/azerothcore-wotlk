@@ -75,6 +75,7 @@
 #include "WhoListCache.h"
 #include "AsyncAuctionListing.h"
 #include "SavingSystem.h"
+#include "ServerMotd.h"
 #include "GameGraveyard.h"
 #include <VMapManager2.h>
 #ifdef ELUNA
@@ -187,18 +188,6 @@ void World::SetClosed(bool val)
 
     // Invert the value, for simplicity for scripters.
     sScriptMgr->OnOpenStateChange(!val);
-}
-
-void World::SetMotd(const std::string& motd)
-{
-    m_motd = motd;
-
-    sScriptMgr->OnMotdChange(m_motd);
-}
-
-const char* World::GetMotd() const
-{
-    return m_motd.c_str();
 }
 
 /// Find a session by its id
@@ -477,7 +466,7 @@ void World::LoadConfigSettings(bool reload)
     ///- Read the player limit and the Message of the day from the config file
     if (!reload)
         SetPlayerAmountLimit(sConfigMgr->GetIntDefault("PlayerLimit", 100));
-    SetMotd(sConfigMgr->GetStringDefault("Motd", "Welcome to an AzerothCore server") + "\n|cffFF4A2DT"+"his serv"+"er run"+"s on Aze"+"roth"+"Core|r |cff3CE7FFwww.azer"+"othcor"+"e.org|r");
+    Motd::SetMotd(sConfigMgr->GetStringDefault("Motd", "Welcome to an AzerothCore server"));
 
     ///- Read ticket system setting from the config file
     m_bool_configs[CONFIG_ALLOW_TICKETS] = sConfigMgr->GetBoolDefault("AllowTickets", true);
@@ -1307,6 +1296,8 @@ void World::LoadConfigSettings(bool reload)
     m_bool_configs[CONFIG_ENABLE_CONTINENT_TRANSPORT] = sConfigMgr->GetBoolDefault("IsContinentTransport.Enabled", true);
     m_bool_configs[CONFIG_ENABLE_CONTINENT_TRANSPORT_PRELOADING] = sConfigMgr->GetBoolDefault("IsPreloadedContinentTransport.Enabled", false);
 
+    m_bool_configs[CONFIG_IP_BASED_ACTION_LOGGING] = sConfigMgr->GetBoolDefault("Allow.IP.Based.Action.Logging", false);
+  
     m_bool_configs[CONFIG_CALCULATE_CREATURE_ZONE_AREA_DATA] = sConfigMgr->GetBoolDefault("Calculate.Creature.Zone.Area.Data", false);
     m_bool_configs[CONFIG_CALCULATE_GAMEOBJECT_ZONE_AREA_DATA] = sConfigMgr->GetBoolDefault("Calculate.Gameoject.Zone.Area.Data", false);
 
@@ -1361,18 +1352,21 @@ void World::SetInitialWorldSettings()
     ///- Init highest guids before any table loading to prevent using not initialized guids in some code.
     sObjectMgr->SetHighestGuids();
 
-    ///- Check the existence of the map files for all races' startup areas.
-    if (!MapManager::ExistMapAndVMap(0, -6240.32f, 331.033f)
-        || !MapManager::ExistMapAndVMap(0, -8949.95f, -132.493f)
-        || !MapManager::ExistMapAndVMap(1, -618.518f, -4251.67f)
-        || !MapManager::ExistMapAndVMap(0, 1676.35f, 1677.45f)
-        || !MapManager::ExistMapAndVMap(1, 10311.3f, 832.463f)
-        || !MapManager::ExistMapAndVMap(1, -2917.58f, -257.98f)
-        || (m_int_configs[CONFIG_EXPANSION] && (
-            !MapManager::ExistMapAndVMap(530, 10349.6f, -6357.29f) ||
-            !MapManager::ExistMapAndVMap(530, -3961.64f, -13931.2f))))
+    if (!sConfigMgr->isDryRun())
     {
-        exit(1);
+        ///- Check the existence of the map files for all starting areas.
+        if (!MapManager::ExistMapAndVMap(0, -6240.32f, 331.033f)
+            || !MapManager::ExistMapAndVMap(0, -8949.95f, -132.493f)
+            || !MapManager::ExistMapAndVMap(1, -618.518f, -4251.67f)
+            || !MapManager::ExistMapAndVMap(0, 1676.35f, 1677.45f)
+            || !MapManager::ExistMapAndVMap(1, 10311.3f, 832.463f)
+            || !MapManager::ExistMapAndVMap(1, -2917.58f, -257.98f)
+            || (m_int_configs[CONFIG_EXPANSION] && (
+                !MapManager::ExistMapAndVMap(530, 10349.6f, -6357.29f) ||
+                !MapManager::ExistMapAndVMap(530, -3961.64f, -13931.2f))))
+        {
+            exit(1);
+        }
     }
 
     ///- Initialize pool manager
@@ -1479,6 +1473,9 @@ void World::SetInitialWorldSettings()
 
     sLog->outString("Loading Game Object Templates...");         // must be after LoadPageTexts
     sObjectMgr->LoadGameObjectTemplate();
+
+    sLog->outString("Loading Game Object template addons...");
+    sObjectMgr->LoadGameObjectTemplateAddons();
 
     sLog->outString("Loading Transport templates...");
     sTransportMgr->LoadTransportTemplates();
@@ -1959,6 +1956,11 @@ void World::SetInitialWorldSettings()
     {
         sLog->outString("Enabling database logging...");
         sLog->SetLogDB(true);
+    }
+
+    if (sConfigMgr->isDryRun()) {
+        sLog->outString("AzerothCore dry run completed, terminating.");
+        exit(0);
     }
 }
 

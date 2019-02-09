@@ -162,6 +162,7 @@ enum WorldBoolConfigs
     CONFIG_ENABLE_CONTINENT_TRANSPORT,
     CONFIG_ENABLE_CONTINENT_TRANSPORT_PRELOADING,
     CONFIG_MINIGOB_MANABONK,
+    CONFIG_IP_BASED_ACTION_LOGGING,
     CONFIG_CALCULATE_CREATURE_ZONE_AREA_DATA,
     CONFIG_CALCULATE_GAMEOBJECT_ZONE_AREA_DATA,
     BOOL_CONFIG_VALUE_COUNT
@@ -608,11 +609,6 @@ class World
         /// Allow/Disallow object movements
         void SetAllowMovement(bool allow) { m_allowMovement = allow; }
 
-        /// Set a new Message of the Day
-        void SetMotd(std::string const& motd);
-        /// Get the current Message of the Day
-        const char* GetMotd() const;
-
         /// Set the string for new characters (first login)
         void SetNewCharString(std::string const& str) { m_newCharString = str; }
         /// Get the string for new characters (first login)
@@ -845,7 +841,6 @@ class World
         uint32 m_availableDbcLocaleMask;                       // by loaded DBC
         void DetectDBCLang();
         bool m_allowMovement;
-        std::string m_motd;
         std::string m_dataPath;
 
         // for max speed access

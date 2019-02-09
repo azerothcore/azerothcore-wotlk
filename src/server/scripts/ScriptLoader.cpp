@@ -6,6 +6,7 @@
 
 #include "ScriptLoader.h"
 #include "ScriptMgr.h"
+#include "World.h"
 
 // spells
 void AddSC_deathknight_spell_scripts();
@@ -54,6 +55,7 @@ void AddSC_reload_commandscript();
 void AddSC_reset_commandscript();
 void AddSC_server_commandscript();
 void AddSC_spectator_commandscript();
+void AddSC_spy_commandscript();
 void AddSC_tele_commandscript();
 void AddSC_ticket_commandscript();
 void AddSC_titles_commandscript();
@@ -72,6 +74,7 @@ void AddSC_npc_innkeeper();
 void AddSC_npcs_special();
 void AddSC_npc_taxi();
 void AddSC_achievement_scripts();
+void AddSC_action_ip_logger();
 
 //events
 void AddSC_event_brewfest_scripts();
@@ -576,6 +579,7 @@ void AddSC_outdoorpvp_gh();
 // player
 void AddSC_chat_log();
 void AddSC_character_creation();
+void AddSC_action_ip_logger();
 
 #endif
 
@@ -628,6 +632,7 @@ void AddCommandScripts()
     AddSC_reload_commandscript();
     AddSC_reset_commandscript();
     AddSC_spectator_commandscript();
+    AddSC_spy_commandscript();
     AddSC_tele_commandscript();
     AddSC_ticket_commandscript();
     AddSC_titles_commandscript();
@@ -648,8 +653,9 @@ void AddWorldScripts()
     AddSC_npcs_special();
     AddSC_npc_taxi();
     AddSC_achievement_scripts();
-    AddSC_chat_log();
+    AddSC_chat_log(); // location: scripts\World\chat_log.cpp
     AddSC_character_creation();
+    AddSC_action_ip_logger(); // location: scripts\World\action_ip_logger.cpp
 #endif
 }
 

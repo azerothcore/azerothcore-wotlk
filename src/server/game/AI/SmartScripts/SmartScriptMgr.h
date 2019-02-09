@@ -414,6 +414,7 @@ struct SmartEvent
             uint32 param2;
             uint32 param3;
             uint32 param4;
+            uint32 param5;
         } raw;
     };
 };
@@ -435,7 +436,7 @@ enum SMART_ACTION
     SMART_ACTION_SOUND                              = 4,      // SoundId, onlySelf
     SMART_ACTION_PLAY_EMOTE                         = 5,      // EmoteId
     SMART_ACTION_FAIL_QUEST                         = 6,      // QuestID
-    SMART_ACTION_ADD_QUEST                          = 7,      // QuestID
+    SMART_ACTION_OFFER_QUEST                        = 7,      // QuestID, directAdd
     SMART_ACTION_SET_REACT_STATE                    = 8,      // state
     SMART_ACTION_ACTIVATE_GOBJECT                   = 9,      //
     SMART_ACTION_RANDOM_EMOTE                       = 10,     // EmoteId1, EmoteId2, EmoteId3...
@@ -444,7 +445,7 @@ enum SMART_ACTION
     SMART_ACTION_THREAT_SINGLE_PCT                  = 13,     // Threat%
     SMART_ACTION_THREAT_ALL_PCT                     = 14,     // Threat%
     SMART_ACTION_CALL_AREAEXPLOREDOREVENTHAPPENS    = 15,     // QuestID
-    SMART_ACTION_UNUSED_16                          = 16,     // UNUSED
+    SMART_ACTION_RESERVED_16                        = 16,     // used on 4.3.4 and higher scripts
     SMART_ACTION_SET_EMOTE_STATE                    = 17,     // emoteID
     SMART_ACTION_SET_UNIT_FLAG                      = 18,     // Flags (may be more than one field OR'd together), Target
     SMART_ACTION_REMOVE_UNIT_FLAG                   = 19,     // Flags (may be more than one field OR'd together), Target
@@ -543,45 +544,50 @@ enum SMART_ACTION
     SMART_ACTION_GAME_EVENT_START                   = 112,    // GameEventId
     SMART_ACTION_START_CLOSEST_WAYPOINT             = 113,    // wp1, wp2, wp3, wp4, wp5, wp6, wp7
     SMART_ACTION_RISE_UP                            = 114,    // distance
-    // RESERVED                                     = 115,
-    // RESERVED                                     = 116,
-    // RESERVED                                     = 117,
-    // RESERVED                                     = 118,
-    // RESERVED                                     = 119,
-    // RESERVED                                     = 120,
-    // RESERVED                                     = 121,
-    // RESERVED                                     = 122,
-    // RESERVED                                     = 123,
-    // RESERVED                                     = 124,
-    // RESERVED                                     = 125,
-    // RESERVED                                     = 126,
-    // RESERVED                                     = 127,
-    // RESERVED                                     = 128,
-    // RESERVED                                     = 129,
-    // 113!
-    SMART_ACTION_MOVE_TO_POS_TARGET                 = 130,    // pointId
-    SMART_ACTION_SET_GO_STATE                       = 131,    // state
-    SMART_ACTION_EXIT_VEHICLE                       = 132,    // none
-    SMART_ACTION_SET_UNIT_MOVEMENT_FLAGS            = 133,    // flags
-    SMART_ACTION_SET_COMBAT_DISTANCE                = 134,    // combatDistance
-    SMART_ACTION_SET_CASTER_COMBAT_DIST             = 135,    // followDistance, resetToMax
-    SMART_ACTION_SET_SIGHT_DIST                     = 136,    // sightDistance
-    SMART_ACTION_FLEE                               = 137,    // fleeTime
-    SMART_ACTION_ADD_THREAT                         = 138,    // +threat, -threat
-    SMART_ACTION_LOAD_EQUIPMENT                     = 139,    // id
-    SMART_ACTION_TRIGGER_RANDOM_TIMED_EVENT         = 140,    // id min range, id max range
-    SMART_ACTION_SET_HOVER                          = 141,    // 0/1
-    SMART_ACTION_ADD_IMMUNITY                       = 142,    // type, id, value
-    SMART_ACTION_REMOVE_IMMUNITY                    = 143,    // type, id, value
-    SMART_ACTION_FALL                               = 144,    // 
-    SMART_ACTION_SET_EVENT_FLAG_RESET               = 145,    // 0/1
-    SMART_ACTION_REMOVE_ALL_GAMEOBJECTS             = 146,
-    SMART_ACTION_STOP_MOTION                        = 147,    // stopMoving, movementExpired
-    SMART_ACTION_NO_ENVIRONMENT_UPDATE              = 148,
-    SMART_ACTION_ZONE_UNDER_ATTACK                  = 149,
-    SMART_ACTION_LOAD_GRID                          = 150,
+    SMART_ACTION_RANDOM_SOUND                       = 115,    // SoundId1, SoundId2, SoundId3, SoundId4, onlySelf
+    SMART_ACTION_SET_CORPSE_DELAY                   = 116,    // TODO: NOT SUPPORTED YET
+    SMART_ACTION_DISABLE_EVADE                      = 117,    // TODO: NOT SUPPORTED YET
+    SMART_ACTION_GO_SET_GO_STATE                    = 118,    // TODO: NOT SUPPORTED YET
+    SMART_ACTION_SET_CAN_FLY                        = 119,    // TODO: NOT SUPPORTED YET
+    SMART_ACTION_REMOVE_AURAS_BY_TYPE               = 120,    // TODO: NOT SUPPORTED YET
+    SMART_ACTION_SET_SIGHT_DIST                     = 121,    // sightDistance
+    SMART_ACTION_FLEE                               = 122,    // fleeTime
+    SMART_ACTION_ADD_THREAT                         = 123,    // +threat, -threat
+    SMART_ACTION_LOAD_EQUIPMENT                     = 124,    // id
+    SMART_ACTION_TRIGGER_RANDOM_TIMED_EVENT         = 125,    // id min range, id max range
+    SMART_ACTION_REMOVE_ALL_GAMEOBJECTS             = 126,
+    SMART_ACTION_REMOVE_MOVEMENT                    = 127,    // TODO: NOT SUPPORTED YET
+    SMART_ACTION_PLAY_ANIMKIT                       = 128,    // don't use on 3.3.5a
+    SMART_ACTION_SCENE_PLAY                         = 129,    // don't use on 3.3.5a
+    SMART_ACTION_SCENE_CANCEL                       = 130,    // don't use on 3.3.5a
+    SMART_ACTION_SPAWN_SPAWNGROUP                   = 131,    // TODO: NOT SUPPORTED YET
+    SMART_ACTION_DESPAWN_SPAWNGROUP                 = 132,    // TODO: NOT SUPPORTED YET
+    SMART_ACTION_RESPAWN_BY_SPAWNID                 = 133,    // TODO: NOT SUPPORTED YET
+    // SMART_ACTION_INVOKER_CAST                    = 134,    // TODO: solve name conflicts
 
-    SMART_ACTION_END                                = 151,    // ZOMG!, zmienic w sql
+    SMART_ACTION_TC_END                             = 135,    // placeholder
+
+    // AC-only SmartActions:
+
+    SMART_ACTION_AC_START                           = 200,    // placeholder
+
+    SMART_ACTION_MOVE_TO_POS_TARGET                 = 201,    // pointId
+    SMART_ACTION_SET_GO_STATE                       = 202,    // state
+    SMART_ACTION_EXIT_VEHICLE                       = 203,    // none
+    SMART_ACTION_SET_UNIT_MOVEMENT_FLAGS            = 204,    // flags
+    SMART_ACTION_SET_COMBAT_DISTANCE                = 205,    // combatDistance
+    SMART_ACTION_SET_CASTER_COMBAT_DIST             = 206,    // followDistance, resetToMax
+    SMART_ACTION_SET_HOVER                          = 207,    // 0/1
+    SMART_ACTION_ADD_IMMUNITY                       = 208,    // type, id, value
+    SMART_ACTION_REMOVE_IMMUNITY                    = 209,    // type, id, value
+    SMART_ACTION_FALL                               = 210,    //
+    SMART_ACTION_SET_EVENT_FLAG_RESET               = 211,    // 0/1
+    SMART_ACTION_STOP_MOTION                        = 212,    // stopMoving, movementExpired
+    SMART_ACTION_NO_ENVIRONMENT_UPDATE              = 213,
+    SMART_ACTION_ZONE_UNDER_ATTACK                  = 214,
+    SMART_ACTION_LOAD_GRID                          = 215,
+
+    SMART_ACTION_AC_END                             = 216,    // placeholder
 };
 
 struct SmartAction
@@ -616,6 +622,15 @@ struct SmartAction
 
         struct
         {
+            uint32 sound1;
+            uint32 sound2;
+            uint32 sound3;
+            uint32 sound4;
+            uint32 onlySelf;
+        } randomSound;
+
+        struct
+        {
             uint32 emote;
         } emote;
 
@@ -623,6 +638,12 @@ struct SmartAction
         {
             uint32 quest;
         } quest;
+
+        struct
+        {
+            uint32 questID;
+            uint32 directAdd;
+        } questOffer;
 
         struct
         {
@@ -1195,22 +1216,11 @@ enum SMARTAI_TARGETS
     SMART_TARGET_THREAT_LIST                    = 24,   // All units on creature's threat list, maxdist, playerOnly
     SMART_TARGET_CLOSEST_ENEMY                  = 25,   // maxDist, playerOnly
     SMART_TARGET_CLOSEST_FRIENDLY               = 26,   // maxDist, playerOnly
-    // RESERVED                                 = 27,
-    // RESERVED                                 = 28,
-    // RESERVED                                 = 29,
-    // RESERVED                                 = 30,
-    // RESERVED                                 = 31,
-    // RESERVED                                 = 32,
-    // RESERVED                                 = 33,
-    // RESERVED                                 = 34,
-    // RESERVED                                 = 35,
-    // RESERVED                                 = 36,
-    // RESERVED                                 = 37,
-    // RESERVED                                 = 38,
-    // RESERVED                                 = 39,
-    SMART_TARGET_FARTHEST                       = 40,
+    SMART_TARGET_LOOT_RECIPIENTS                = 27,   // TODO: NOT SUPPORTED YET
+    SMART_TARGET_FARTHEST                       = 28,   // maxDist, playerOnly, isInLos
+    SMART_TARGET_VEHICLE_PASSENGER              = 29,   // TODO: NOT SUPPORTED YET
 
-    SMART_TARGET_END                            = 41
+    SMART_TARGET_END                            = 30
 };
 
 struct SmartTarget

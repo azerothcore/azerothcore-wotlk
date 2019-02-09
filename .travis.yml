@@ -17,15 +17,17 @@ git:
   depth: 1
 
 before_install:
-  - git config user.email "travis@build.bot" && git config user.name "Travis CI"
+  - git config user.email "azerothcorebot@gmail.com" && git config user.name "AzerothCoreBot"
   - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then cd bin/; fi
   # import pending sql
-  - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then bash acore-db-pendings; fi
+  - if [ "$TRAVIS_PULL_REQUEST" = "false" ] && [ "$TRAVIS_BRANCH" = "master" ]; then bash acore-db-pendings; fi
   - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then cd ..; fi
   # push changes to git if any
   - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then git fetch --unshallow; fi
   - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then git checkout $TRAVIS_BRANCH; fi
-  - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then git add -A . && git diff --cached --quiet || git commit -am "Importing pending sql" && git push https://$GITHUB_API_KEY@github.com/$TRAVIS_REPO_SLUG.git $TRAVIS_BRANCH; fi
+  - if [ "$TRAVIS_PULL_REQUEST" = "false" ] && [[ -n "$GITHUB_API_KEY" ]]; then git add -A . && git diff --cached --quiet || git commit -am "Import pending SQL update file" && git push https://$GITHUB_API_KEY@github.com/$TRAVIS_REPO_SLUG.git $TRAVIS_BRANCH; fi
+  # sync staging with master
+  - if [ "$TRAVIS_PULL_REQUEST" = "false" ] && [ "$TRAVIS_BRANCH" = "master" ] && [[ -n "$GITHUB_API_KEY" ]]; then git fetch origin staging:staging && git checkout staging && git merge --no-edit master && git push https://$GITHUB_API_KEY@github.com/$TRAVIS_REPO_SLUG.git staging; git checkout master; fi
 
 install:
   # install OS deps (apt-get)
@@ -37,9 +39,12 @@ install:
   - echo "DB_WORLD_CONF=\"MYSQL_USER='root'; MYSQL_PASS=''; MYSQL_HOST='127.0.0.1';\"" >> conf/config.sh  
   # create and import mysql
   - mysql -e "SET GLOBAL sql_mode = '';" # this is necessary because of mysql 5.7
-  - mysql -e "SET GLOBAL max_allowed_packet=128*1024*1024;"
   - bash ./acore.sh "db-assembler" "import-all"
 
 script:
   # compile
   - bash ./acore.sh "compiler" "all"
+  - git clone --depth=1 --branch=master --single-branch https://github.com/ac-data/ac-data.git /home/travis/build/azerothcore/azerothcore-wotlk/env/dist/data
+  - cp ./data/travis/worldserver.conf ./env/dist/etc/worldserver.conf
+  - ./env/dist/bin/worldserver --dry-run
+  - ./apps/ci-error-check.sh

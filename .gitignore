@@ -16,7 +16,9 @@ docker/authserver/etc/authserver.conf
 docker/worldserver/etc/worldserver.conf
 docker/authserver/logs/
 docker/worldserver/logs/
+docker/worldserver/data/
 !docker/build
+.env
 
 !.gitkeep
 
@@ -42,7 +44,7 @@ CMakeLists.txt.user
 *.LOCAL.*
 
 #
-# IDE & other softwares
+# IDE & other software
 #
 /.settings/
 /.externalToolBuilders/*
@@ -52,6 +54,8 @@ nbproject/
 *.kate-swp
 .browse.VC*
 .vscode
+.idea
+cmake-build-debug/*
 
 #
 # Eclipse

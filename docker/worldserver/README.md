@@ -1,6 +1,8 @@
 # AzerothCore Dockerized Worldserver
 
-This provides a way to launch a container with the AzerothCore authserver running inside it.
+This provides a way to build and launch a container with the AzerothCore authserver running inside it.
+
+If you just want to install the whole AzerothCore quickly using Docker Compose, we recommend following [this guide instead](https://github.com/azerothcore/azerothcore-wotlk/wiki/install-with-Docker).
 
 ## Requirements
 
@@ -27,7 +29,7 @@ To build the container image you have to be in the **main** folder of your local
 Replace `/path/to/your/data` with the path of where your data folder is.
 
 ```
-docker run --name ac-world-container \
+docker run --name ac-worldserver \
     --mount type=bind,source=/path/to/your/data,target=/azeroth-server/data \
     --mount type=bind,source="$(pwd)"/docker/worldserver/etc/,target=/azeroth-server/etc \
     --mount type=bind,source="$(pwd)"/docker/worldserver/logs/,target=/azeroth-server/logs \
