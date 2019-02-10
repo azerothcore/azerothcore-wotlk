@@ -78,7 +78,7 @@ script:
   # compile
   - export CCACHE_CPP2=true
   - ccache -s
-  - timeout 2400 bash ./acore.sh "compiler" "all"
+  - timeout 2580 bash ./acore.sh "compiler" "all"
   - ccache -s
   - git clone --depth=1 --branch=master --single-branch https://github.com/ac-data/ac-data.git /home/travis/build/azerothcore/azerothcore-wotlk/env/dist/data
   - cp ./data/travis/worldserver.conf ./env/dist/etc/worldserver.conf
