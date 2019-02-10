@@ -41,69 +41,69 @@
 #endif
 
 std::unordered_map<BattlegroundTypeId, BattlegroundQueueTypeId> bgToQueue({
-                                                                                  // Battlegrounds
-                                                                                  { BATTLEGROUND_AV, BATTLEGROUND_QUEUE_AV },
-                                                                                  { BATTLEGROUND_WS, BATTLEGROUND_QUEUE_WS },
-                                                                                  { BATTLEGROUND_AB, BATTLEGROUND_QUEUE_AB },
-                                                                                  { BATTLEGROUND_EY, BATTLEGROUND_QUEUE_EY },
-                                                                                  { BATTLEGROUND_SA, BATTLEGROUND_QUEUE_SA },
-                                                                                  { BATTLEGROUND_IC, BATTLEGROUND_QUEUE_IC },
-                                                                                  { BATTLEGROUND_RB, BATTLEGROUND_QUEUE_RB },
-                                                                                  // Arenas, it's needed?
-                                                                                  { BATTLEGROUND_NA, BattlegroundQueueTypeId(0) },		// Nagrand Arena
-                                                                                  { BATTLEGROUND_BE, BattlegroundQueueTypeId(0) },		// Blade's Edge Arena
-                                                                                  { BATTLEGROUND_AA, BattlegroundQueueTypeId(0) },		// All Arena
-                                                                                  { BATTLEGROUND_RL, BattlegroundQueueTypeId(0) },		// Ruins of Lordaernon
-                                                                                  { BATTLEGROUND_DS, BattlegroundQueueTypeId(0) },		// Dalaran Sewer
-                                                                                  { BATTLEGROUND_RV, BattlegroundQueueTypeId(0) },		// Ring of Valor
-                                                                          });
+    // Battlegrounds
+    { BATTLEGROUND_AV, BATTLEGROUND_QUEUE_AV },
+    { BATTLEGROUND_WS, BATTLEGROUND_QUEUE_WS },
+    { BATTLEGROUND_AB, BATTLEGROUND_QUEUE_AB },
+    { BATTLEGROUND_EY, BATTLEGROUND_QUEUE_EY },
+    { BATTLEGROUND_SA, BATTLEGROUND_QUEUE_SA },
+    { BATTLEGROUND_IC, BATTLEGROUND_QUEUE_IC },
+    { BATTLEGROUND_RB, BATTLEGROUND_QUEUE_RB },
+    // Arenas, it's needed?
+    { BATTLEGROUND_NA, BattlegroundQueueTypeId(0) },		// Nagrand Arena
+    { BATTLEGROUND_BE, BattlegroundQueueTypeId(0) },		// Blade's Edge Arena
+    { BATTLEGROUND_AA, BattlegroundQueueTypeId(0) },		// All Arena
+    { BATTLEGROUND_RL, BattlegroundQueueTypeId(0) },		// Ruins of Lordaernon
+    { BATTLEGROUND_DS, BattlegroundQueueTypeId(0) },		// Dalaran Sewer
+    { BATTLEGROUND_RV, BattlegroundQueueTypeId(0) },		// Ring of Valor
+});
 
 std::unordered_map<BattlegroundQueueTypeId, BattlegroundTypeId> queueToBg({
-                                                                                  { BATTLEGROUND_QUEUE_NONE , BATTLEGROUND_TYPE_NONE },
-                                                                                  { BATTLEGROUND_QUEUE_AV, BATTLEGROUND_AV },
-                                                                                  { BATTLEGROUND_QUEUE_WS, BATTLEGROUND_WS },
-                                                                                  { BATTLEGROUND_QUEUE_AB, BATTLEGROUND_AB },
-                                                                                  { BATTLEGROUND_QUEUE_EY, BATTLEGROUND_EY },
-                                                                                  { BATTLEGROUND_QUEUE_SA, BATTLEGROUND_SA },
-                                                                                  { BATTLEGROUND_QUEUE_IC, BATTLEGROUND_IC },
-                                                                                  { BATTLEGROUND_QUEUE_RB, BATTLEGROUND_RB },
-                                                                                  { BATTLEGROUND_QUEUE_2v2, BATTLEGROUND_AA },
-                                                                                  { BATTLEGROUND_QUEUE_3v3, BATTLEGROUND_AA },
-                                                                                  { BATTLEGROUND_QUEUE_5v5, BATTLEGROUND_AA },
-                                                                          });
+    { BATTLEGROUND_QUEUE_NONE , BATTLEGROUND_TYPE_NONE },
+    { BATTLEGROUND_QUEUE_AV, BATTLEGROUND_AV },
+    { BATTLEGROUND_QUEUE_WS, BATTLEGROUND_WS },
+    { BATTLEGROUND_QUEUE_AB, BATTLEGROUND_AB },
+    { BATTLEGROUND_QUEUE_EY, BATTLEGROUND_EY },
+    { BATTLEGROUND_QUEUE_SA, BATTLEGROUND_SA },
+    { BATTLEGROUND_QUEUE_IC, BATTLEGROUND_IC },
+    { BATTLEGROUND_QUEUE_RB, BATTLEGROUND_RB },
+    { BATTLEGROUND_QUEUE_2v2, BATTLEGROUND_AA },
+    { BATTLEGROUND_QUEUE_3v3, BATTLEGROUND_AA },
+    { BATTLEGROUND_QUEUE_5v5, BATTLEGROUND_AA },
+});
 
 std::unordered_map<BattlegroundTypeId, Battleground*> bgtypeToBattleground({
-                                                                                   { BATTLEGROUND_AV, new BattlegroundAV },
-                                                                                   { BATTLEGROUND_WS, new BattlegroundWS },
-                                                                                   { BATTLEGROUND_AB, new BattlegroundAB },
-                                                                                   { BATTLEGROUND_NA, new BattlegroundNA },
-                                                                                   { BATTLEGROUND_BE, new BattlegroundBE },
-                                                                                   { BATTLEGROUND_EY, new BattlegroundEY },
-                                                                                   { BATTLEGROUND_RL, new BattlegroundRL },
-                                                                                   { BATTLEGROUND_SA, new BattlegroundSA },
-                                                                                   { BATTLEGROUND_DS, new BattlegroundDS },
-                                                                                   { BATTLEGROUND_RV, new BattlegroundRV },
-                                                                                   { BATTLEGROUND_IC, new BattlegroundIC },
-                                                                                   { BATTLEGROUND_AA, new Battleground   },
-                                                                                   { BATTLEGROUND_RB, new Battleground   },
-                                                                           });
+    { BATTLEGROUND_AV, new BattlegroundAV },
+    { BATTLEGROUND_WS, new BattlegroundWS },
+    { BATTLEGROUND_AB, new BattlegroundAB },
+    { BATTLEGROUND_NA, new BattlegroundNA },
+    { BATTLEGROUND_BE, new BattlegroundBE },
+    { BATTLEGROUND_EY, new BattlegroundEY },
+    { BATTLEGROUND_RL, new BattlegroundRL },
+    { BATTLEGROUND_SA, new BattlegroundSA },
+    { BATTLEGROUND_DS, new BattlegroundDS },
+    { BATTLEGROUND_RV, new BattlegroundRV },
+    { BATTLEGROUND_IC, new BattlegroundIC },
+    { BATTLEGROUND_AA, new Battleground   },
+    { BATTLEGROUND_RB, new Battleground   },
+});
 
 std::unordered_map<BattlegroundTypeId, bgRef> bgTypeToTemplate({
-                                                                       { BATTLEGROUND_AV, [](Battleground *bg_t) -> Battleground*{ return new BattlegroundAV(*(BattlegroundAV*)bg_t); } },
-                                                                       { BATTLEGROUND_WS, [](Battleground *bg_t) -> Battleground*{ return new BattlegroundWS(*(BattlegroundWS*)bg_t); } },
-                                                                       { BATTLEGROUND_AB, [](Battleground *bg_t) -> Battleground*{ return new BattlegroundAB(*(BattlegroundAB*)bg_t); } },
-                                                                       { BATTLEGROUND_NA, [](Battleground *bg_t) -> Battleground*{ return new BattlegroundNA(*(BattlegroundNA*)bg_t); } },
-                                                                       { BATTLEGROUND_BE, [](Battleground *bg_t) -> Battleground*{ return new BattlegroundBE(*(BattlegroundBE*)bg_t); } },
-                                                                       { BATTLEGROUND_EY, [](Battleground *bg_t) -> Battleground*{ return new BattlegroundEY(*(BattlegroundEY*)bg_t); } },
-                                                                       { BATTLEGROUND_RL, [](Battleground *bg_t) -> Battleground*{ return new BattlegroundRL(*(BattlegroundRL*)bg_t); } },
-                                                                       { BATTLEGROUND_SA, [](Battleground *bg_t) -> Battleground*{ return new BattlegroundSA(*(BattlegroundSA*)bg_t); } },
-                                                                       { BATTLEGROUND_DS, [](Battleground *bg_t) -> Battleground*{ return new BattlegroundDS(*(BattlegroundDS*)bg_t); } },
-                                                                       { BATTLEGROUND_RV, [](Battleground *bg_t) -> Battleground*{ return new BattlegroundRV(*(BattlegroundRV*)bg_t); } },
-                                                                       { BATTLEGROUND_IC, [](Battleground *bg_t) -> Battleground*{ return new BattlegroundIC(*(BattlegroundIC*)bg_t); } },
+    { BATTLEGROUND_AV, [](Battleground *bg_t) -> Battleground*{ return new BattlegroundAV(*(BattlegroundAV*)bg_t); } },
+    { BATTLEGROUND_WS, [](Battleground *bg_t) -> Battleground*{ return new BattlegroundWS(*(BattlegroundWS*)bg_t); } },
+    { BATTLEGROUND_AB, [](Battleground *bg_t) -> Battleground*{ return new BattlegroundAB(*(BattlegroundAB*)bg_t); } },
+    { BATTLEGROUND_NA, [](Battleground *bg_t) -> Battleground*{ return new BattlegroundNA(*(BattlegroundNA*)bg_t); } },
+    { BATTLEGROUND_BE, [](Battleground *bg_t) -> Battleground*{ return new BattlegroundBE(*(BattlegroundBE*)bg_t); } },
+    { BATTLEGROUND_EY, [](Battleground *bg_t) -> Battleground*{ return new BattlegroundEY(*(BattlegroundEY*)bg_t); } },
+    { BATTLEGROUND_RL, [](Battleground *bg_t) -> Battleground*{ return new BattlegroundRL(*(BattlegroundRL*)bg_t); } },
+    { BATTLEGROUND_SA, [](Battleground *bg_t) -> Battleground*{ return new BattlegroundSA(*(BattlegroundSA*)bg_t); } },
+    { BATTLEGROUND_DS, [](Battleground *bg_t) -> Battleground*{ return new BattlegroundDS(*(BattlegroundDS*)bg_t); } },
+    { BATTLEGROUND_RV, [](Battleground *bg_t) -> Battleground*{ return new BattlegroundRV(*(BattlegroundRV*)bg_t); } },
+    { BATTLEGROUND_IC, [](Battleground *bg_t) -> Battleground*{ return new BattlegroundIC(*(BattlegroundIC*)bg_t); } },
 
-                                                                       { BATTLEGROUND_RB, [](Battleground *bg_t) -> Battleground*{ return new Battleground(*bg_t); }                    },
-                                                                       { BATTLEGROUND_AA, [](Battleground *bg_t) -> Battleground*{ return new Battleground(*bg_t); }                    },
-                                                               });
+    { BATTLEGROUND_RB, [](Battleground *bg_t) -> Battleground*{ return new Battleground(*bg_t); }                    },
+    { BATTLEGROUND_AA, [](Battleground *bg_t) -> Battleground*{ return new Battleground(*bg_t); }                    },
+});
 
 /*********************************************************/
 /***            BATTLEGROUND MANAGER                   ***/
