@@ -3,8 +3,9 @@
 */
 
 #include "ScriptMgr.h"
-#include "ScriptPCH.h"
 #include "InstanceScript.h"
+#include "SpellScript.h"
+#include "CreatureAI.h"
 #include "uldaman.h"
 
 enum Spells

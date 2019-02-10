@@ -7,7 +7,6 @@
 #ifndef OUTDOOR_PVP_EP_
 #define OUTDOOR_PVP_EP_
 
-#include "ScriptPCH.h"
 #include "DBCStructure.h"
 #include "OutdoorPvP.h"
 

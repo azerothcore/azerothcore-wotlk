@@ -18,7 +18,6 @@ avatar_of_freya
 EndContentData */
 
 #include "ScriptMgr.h"
-#include "ScriptPCH.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "ScriptedEscortAI.h"
@@ -27,6 +26,8 @@ EndContentData */
 #include "Player.h"
 #include "Vehicle.h"
 #include "WaypointManager.h"
+#include "PassiveAI.h"
+#include "CombatAI.h"
 
 // Ours
 enum songOfWindandWater

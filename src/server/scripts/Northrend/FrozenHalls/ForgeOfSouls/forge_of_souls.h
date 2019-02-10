@@ -5,7 +5,7 @@
 #ifndef DEF_FORGE_OF_SOULS_H
 #define DEF_FORGE_OF_SOULS_H
 
-#include "ScriptPCH.h"
+#include "GridNotifiers.h"
 
 enum Data
 {
