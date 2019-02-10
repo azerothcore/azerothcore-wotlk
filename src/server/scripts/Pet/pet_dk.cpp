@@ -10,13 +10,14 @@
  */
 
 #include "ScriptMgr.h"
-#include "ScriptPCH.h"
 #include "ScriptedCreature.h"
 #include "CombatAI.h"
 #include "Cell.h"
 #include "CellImpl.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
+#include "PassiveAI.h"
+#include "SpellAuraEffects.h"
 
 enum DeathKnightSpells
 {

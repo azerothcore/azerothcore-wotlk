@@ -5,7 +5,7 @@
 #ifndef DEF_THE_BOTANICA_H
 #define DEF_THE_BOTANICA_H
 
-#include "ScriptPCH.h"
+#include "SpellScript.h"
 
 enum DataTypes
 {

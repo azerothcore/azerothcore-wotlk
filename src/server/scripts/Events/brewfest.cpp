@@ -1,7 +1,6 @@
 // Scripted by Xinef
 
 #include "ScriptMgr.h"
-#include "ScriptPCH.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "SpellAuras.h"
@@ -12,6 +11,8 @@
 #include "Group.h"
 #include "GameTime.h"
 #include "LFGMgr.h"
+#include "PassiveAI.h"
+#include "CellImpl.h"
 
 ///////////////////////////////////////
 ////// GOS

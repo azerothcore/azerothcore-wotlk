@@ -5,8 +5,6 @@
 #ifndef BFD_H_
 #define BFD_H_
 
-#include "ScriptPCH.h"
-
 enum Data
 {
     TYPE_GELIHAST               = 0,

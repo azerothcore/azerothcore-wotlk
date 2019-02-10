@@ -5,7 +5,6 @@
  */
 
 #include "ScriptMgr.h"
-#include "ScriptPCH.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "Vehicle.h"
@@ -14,6 +13,7 @@
 #include "Pet.h"
 #include "SpellInfo.h"
 #include "CreatureTextMgr.h"
+#include "SpellScript.h"
 
 // Ours
 enum qRedRocket
