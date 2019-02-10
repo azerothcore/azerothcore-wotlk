@@ -2,8 +2,6 @@
 #ifndef DEF_AHNKAHET_H
 #define DEF_AHNKAHET_H
 
-#include "ScriptPCH.h"
-
 #define MAX_ENCOUNTER           5
 enum Data64
 {

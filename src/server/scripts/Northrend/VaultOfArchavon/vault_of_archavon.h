@@ -7,8 +7,6 @@
 #ifndef DEF_ARCHAVON_H
 #define DEF_ARCHAVON_H
 
-#include "ScriptPCH.h"
-
 enum Creatures
 {
     CREATURE_ARCHAVON                           = 31125,

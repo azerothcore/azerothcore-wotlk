@@ -5,7 +5,7 @@
 #ifndef DEF_PIT_OF_SARON_H
 #define DEF_PIT_OF_SARON_H
 
-#include "ScriptPCH.h"
+#include "Chat.h"
 
 enum DataTypes
 {

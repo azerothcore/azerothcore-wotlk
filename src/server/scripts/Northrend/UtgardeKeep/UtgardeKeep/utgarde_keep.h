@@ -5,7 +5,7 @@
 #ifndef DEF_UTGARDE_KEEP_H
 #define DEF_UTGARDE_KEEP_H
 
-#include "ScriptPCH.h"
+#include "SpellScript.h"
 
 enum eData
 {
