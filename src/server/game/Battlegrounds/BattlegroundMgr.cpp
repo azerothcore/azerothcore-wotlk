@@ -798,6 +798,10 @@ BattlegroundQueueTypeId BattlegroundMgr::BGQueueTypeId(BattlegroundTypeId bgType
         }
     }
 
+    if (bgToQueue.find(bgTypeId) == bgToQueue.end()) {
+        return BATTLEGROUND_QUEUE_NONE;
+    }
+
     return bgToQueue[bgTypeId];
 }
 
