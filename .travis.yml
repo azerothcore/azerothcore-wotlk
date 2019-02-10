@@ -38,6 +38,7 @@ install:
   - echo "DB_AUTH_CONF=\"MYSQL_USER='root'; MYSQL_PASS=''; MYSQL_HOST='127.0.0.1';\"" >> conf/config.sh
   - echo "DB_WORLD_CONF=\"MYSQL_USER='root'; MYSQL_PASS=''; MYSQL_HOST='127.0.0.1';\"" >> conf/config.sh  
   # create and import mysql
+  - mysql -e "FLUSH PRIVILEGES;"
   - bash ./acore.sh "db-assembler" "import-all"
 
 script:
