@@ -6,13 +6,6 @@ UPDATE `quest_template_addon` SET `PrevQuestID`='436' WHERE `ID`=297;
 -- Find bingles and bingles missing supplies quest fix
 UPDATE `quest_template_addon` SET `PrevQuestID`='2039' WHERE `ID`=2038;
 
--- Data rescue quest fix
-DELETE FROM conditions WHERE SourceTypeOrReferenceId=15 AND SourceGroup=1050;
-INSERT INTO conditions VALUES (15, 1052, 0, 0, 0, 2, 0, 9281, 1, 0, 0, 0, 0, '', 'Display option if player has red card');
-INSERT INTO conditions VALUES (15, 1052, 1, 0, 0, 2, 0, 9281, 1, 0, 0, 0, 0, '', 'Display option if player has red card');
-INSERT INTO conditions VALUES (15, 1052, 1, 0, 0, 2, 0, 9327, 1, 0, 0, 0, 0, '', 'Display option if player has delta card');
-INSERT INTO conditions VALUES (15, 1052, 1, 0, 0, 25, 0, 3959, 0, 0, 1, 0, 0, '', 'Display option if player has no Discombobulator Ray spell');
-
 -- Fixed the SmartAI scripts for Cursed and Tainted Ooze - The corpse must disappear on Spell Hit
 UPDATE `creature_template` SET `AIName`='SmartAI' WHERE  `entry`=7086;
 DELETE FROM `smart_scripts` WHERE `entryorguid`=7086 AND `source_type`=0;
