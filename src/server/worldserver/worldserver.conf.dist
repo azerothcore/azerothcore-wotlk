@@ -180,11 +180,11 @@ Compression = 1
 #        Description: Maximum number of players in the world. Excluding Mods, GMs and Admins.
 #          Important: If you want to block players and only allow Mods, GMs or Admins to join the
 #                     server, use the DB field "auth.realmlist.allowedSecurityLevel".
-#            Default: 100 - (Enabled)
-#                     1+  - (Enabled)
-#                     0   - (Disabled, No limit)
+#            Default: 1000 - (Enabled)
+#                     1+   - (Enabled)
+#                     0    - (Disabled, No limit)
 
-PlayerLimit = 100
+PlayerLimit = 1000
 
 #
 #    SaveRespawnTimeImmediately
@@ -335,7 +335,7 @@ TargetPosRecalculateRange = 1.5
 #        Default:     10 - (10 minutes)
 #                     1+
 
-UpdateUptimeInterval = 1
+UpdateUptimeInterval = 10
 
 #
 #    LogDB.Opt.ClearInterval
@@ -656,7 +656,7 @@ LogColors = ""
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 
-EnableLogDB = 0
+EnableLogDB = 1
 
 #
 #    DBLogLevel
@@ -2526,7 +2526,7 @@ Battleground.CastDeserter = 1
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 
-Battleground.QueueAnnouncer.Enable = 0
+Battleground.QueueAnnouncer.Enable = 1
 
 #
 #    Battleground.QueueAnnouncer.PlayerOnly
@@ -2561,7 +2561,7 @@ BattleGround.PremadeGroupWaitForMatch = 1800000
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 
-Battleground.GiveXPForKills = 0
+Battleground.GiveXPForKills = 1
 
 #
 #    Battleground.Random.ResetHour

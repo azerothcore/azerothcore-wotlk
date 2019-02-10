@@ -166,7 +166,7 @@ LogColors = ""
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 
-EnableLogDB = 0
+EnableLogDB = 1
 
 #
 #    DBLogLevel
