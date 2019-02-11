@@ -5,8 +5,6 @@
 #ifndef DEF_HALLS_OF_STONE_H
 #define DEF_HALLS_OF_STONE_H
 
-#include "ScriptPCH.h"
-
 enum Encounter
 {
     BOSS_KRYSTALLUS             = 0,

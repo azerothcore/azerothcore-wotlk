@@ -65,6 +65,11 @@ extern int main(int argc, char** argv)
     int c = 1;
     while (c < argc)
     {
+        if (strcmp(argv[c], "--dry-run") == 0)
+        {
+            sConfigMgr->setDryRun(true);
+        }
+
         if (!strcmp(argv[c], "-c"))
         {
             if (++c >= argc)

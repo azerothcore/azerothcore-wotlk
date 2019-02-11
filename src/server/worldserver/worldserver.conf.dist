@@ -3174,6 +3174,14 @@ MoveMaps.Enable = 1
 Minigob.Manabonk.Enable = 1
 
 #
+
+#    Allow.IP.Based.Action.Logging
+#        Description: Logs actions, e.g. account login and logout to name a few, based on IP of current session.
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+ 
+Allow.IP.Based.Action.Logging = 0
+
 #     Calculate.Creature.Zone.Area.Data
 #        Description: Calculate at loading creature zoneId / areaId and save in creature table (WARNING: SLOW WORLD SERVER STARTUP)
 #        Default:     0  - (Do not show)

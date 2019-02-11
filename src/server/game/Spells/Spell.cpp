@@ -8241,13 +8241,6 @@ void Spell::PrepareTriggersExecutedOnHit()
 
             break;
         }
-        case SPELLFAMILY_MAGE:
-        {
-            // Permafrost
-            if (m_spellInfo->SpellFamilyFlags[1] & 0x00001000 ||  m_spellInfo->SpellFamilyFlags[0] & 0x00100220)
-            m_preCastSpell = 68391;
-            break;
-        }
     }
 
     // handle SPELL_AURA_ADD_TARGET_TRIGGER auras:

@@ -5,7 +5,7 @@
 #ifndef DEF_NAXXRAMAS_H
 #define DEF_NAXXRAMAS_H
 
-#include "ScriptPCH.h"
+#include "SpellScript.h"
 
 enum Encouters
 {

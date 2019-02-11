@@ -5,8 +5,6 @@
 #ifndef DEF_OLD_HILLSBRAD_H
 #define DEF_OLD_HILLSBRAD_H
 
-#include "ScriptPCH.h"
-
 enum DataIds
 {
     DATA_ESCORT_PROGRESS    = 0,

@@ -3,8 +3,8 @@ dist: xenial # (16.04)
 # bionic (18.04) is not yet available in travis
 
 language: cpp
-compiler:
-  - clang
+
+cache: ccache
 
 addons:
   apt:
@@ -15,6 +15,28 @@ services:
 
 git:
   depth: 1
+
+matrix:
+  include:
+    - os: linux
+      addons:
+        apt:
+          packages:
+            - clang-3.8
+      env:
+        - CCOMPILERC="clang-3.8"
+        - CCOMPILERCXX="clang++-3.8"
+
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - llvm-toolchain-xenial-7
+          packages:
+            - clang-7
+      env:
+        - CCOMPILERC="clang-7"
+        - CCOMPILERCXX="clang++-7"
 
 before_install:
   - git config user.email "azerothcorebot@gmail.com" && git config user.name "AzerothCoreBot"
@@ -33,7 +55,18 @@ install:
   # install OS deps (apt-get)
   - bash ./acore.sh "install-deps"
   # create config file
-  - echo "CCUSTOMOPTIONS='-DWITH_WARNINGS=1 -DWITH_COREDEBUG=1 -DUSE_COREPCH=0 -DUSE_SCRIPTPCH=0 -DTOOLS=1 -DSCRIPTS=1 -DSERVERS=1 -DWITH_PERFTOOLS=1 -DENABLE_EXTRA_LOGS=1 -DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_FLAGS=\"-Werror\" -DCMAKE_CXX_FLAGS=\"-Werror\"';" >> conf/config.sh
+  - echo "CCOMPILERC=$CCOMPILERC" >> conf/config.sh
+  - echo "CCOMPILERCXX=$CCOMPILERCXX" >> conf/config.sh
+  - echo "MTHREADS=4" >> conf/config.sh
+  - echo "CWARNINGS=ON" >> conf/config.sh
+  - echo "CDEBUG=OFF" >> conf/config.sh
+  - echo "CTYPE=Release" >> conf/config.sh
+  - echo "CSCRIPTS=ON" >> conf/config.sh
+  - echo "CSERVERS=ON" >> conf/config.sh
+  - echo "CTOOLS=ON" >> conf/config.sh
+  - echo "CSCRIPTPCH=OFF" >> conf/config.sh
+  - echo "CCOREPCH=OFF" >> conf/config.sh
+  - echo "CCUSTOMOPTIONS='-DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_FLAGS=\"-Werror\" -DCMAKE_CXX_FLAGS=\"-Werror\"'" >> conf/config.sh
   - echo "DB_CHARACTERS_CONF=\"MYSQL_USER='root'; MYSQL_PASS=''; MYSQL_HOST='127.0.0.1';\"" >> conf/config.sh
   - echo "DB_AUTH_CONF=\"MYSQL_USER='root'; MYSQL_PASS=''; MYSQL_HOST='127.0.0.1';\"" >> conf/config.sh
   - echo "DB_WORLD_CONF=\"MYSQL_USER='root'; MYSQL_PASS=''; MYSQL_HOST='127.0.0.1';\"" >> conf/config.sh  
@@ -43,4 +76,11 @@ install:
 
 script:
   # compile
-  - bash ./acore.sh "compiler" "all"
+  - export CCACHE_CPP2=true
+  - ccache -s
+  - timeout 2580 bash ./acore.sh "compiler" "all"
+  - ccache -s
+  - git clone --depth=1 --branch=master --single-branch https://github.com/ac-data/ac-data.git /home/travis/build/azerothcore/azerothcore-wotlk/env/dist/data
+  - cp ./data/travis/worldserver.conf ./env/dist/etc/worldserver.conf
+  - ./env/dist/bin/worldserver --dry-run
+  - ./apps/ci-error-check.sh

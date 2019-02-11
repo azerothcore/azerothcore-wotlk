@@ -5,7 +5,12 @@
 #ifndef BLACK_TEMPLE_H_
 #define BLACK_TEMPLE_H_
 
-#include "ScriptPCH.h"
+#include "Player.h"
+#include "ScriptedGossip.h"
+#include "SpellScript.h"
+#include "SpellAuraEffects.h"
+#include "PassiveAI.h"
+#include "GridNotifiers.h"
 
 enum DataTypes
 {
