@@ -212,7 +212,7 @@ TO DO: get correct spell IDs and timings for spells cast upon dragon transformat
 TO DO: Dragons should use the HandleEmoteCommand(EMOTE_ONESHOT_LIFTOFF) after transformation, but for some unknown reason it doesnt work.
 EndContentData */
 
-#define EVENT_AREA_RADIUS 65 //65yds
+#define EVENT_AREA_RADIUS 68 //68yds
 #define EVENT_COOLDOWN 500000 //in ms. appear after event completed or failed (should be = Adds despawn time)
 
 struct QuestCinematic
@@ -243,7 +243,7 @@ static QuestCinematic EventAnim[]=
     {ARYGOS_YELL_1, 2, 3000},
     {0, 3, 3000}, //Morph
     {0, 3, 4000}, //EmoteLiftoff
-    {0, 3, 4000}, // spell
+    {0, 3, 5000}, // spell
     {0, 3, 1000}, //fly
     {0, 3, 1000}, //remove flags
     {CAELESTRASZ_SAY_2, 4, 5000},
@@ -278,16 +278,19 @@ static QuestCinematic EventAnim[]=
     {ANACHRONOS_SAY_9, 0, 3000},
     {FANDRAL_SAY_6, 1, 3000}, //fandral goes away
     {ANACHRONOS_EMOTE_2, 0, 3000},
-    {ANACHRONOS_EMOTE_3, 0, 3000},
+    {ANACHRONOS_EMOTE_3, 0, 3500},
+    {0, 0, 200}, //Kneel
     {0, 0, 2000},
-    {0, 0, 2000},
-    {0, 0, 4000},
+    {0, 0, 210}, //Kneel
+    {0, 0, 1000},
+    {0, 0, 200}, //Kneel
+    {0, 0, 1600},
+    {0, 0, 200}, //Kneel
     {ANACHRONOS_SAY_10, 0, 3000},
     {0, 0, 2000},
     {0, 0, 3000},
-    {0, 0, 15000},
+    {0, 0, 13000},
     {0, 0, 5000},
-    {0, 0, 3500},
     {0, 0, 5000},
     {0, 0, 3500},
     {0, 0, 5000},
@@ -341,7 +344,7 @@ Position const SpawnLocation[] =
 
     {-8088.0f, 1510.0f, 2.61f, 0.0f}, //Anubisath Conqueror
     {-8084.0f, 1520.0f, 2.61f, 0.0f}, //Anubisath Conqueror
-    {-8088.0f, 1530.0f, 2.61f, 0.0f}, //Anubisath Conqueror
+    {-8092.0f, 1530.0f, 2.61f, 0.0f}, //Anubisath Conqueror
 
     {-8080.0f, 1513.0f, 2.61f, 0.0f}, //Qiraj Wasp
     {-8082.0f, 1523.0f, 2.61f, 0.0f}, //Qiraj Wasp
@@ -363,10 +366,6 @@ Position const SpawnLocation[] =
     {-8081.0f, 1512.0f, 2.61f, 0.0f}, //Qiraj Tank
     {-8082.0f, 1520.0f, 2.61f, 0.0f}, //Qiraj Tank
     {-8081.0f, 1528.0f, 2.61f, 0.0f}, //Qiraj Tank
-
-    {-8082.0f, 1513.0f, 2.61f, 3.141592f}, //Anubisath Conqueror
-    {-8082.0f, 1520.0f, 2.61f, 3.141592f}, //Anubisath Conqueror
-    {-8082.0f, 1527.0f, 2.61f, 3.141592f}, //Anubisath Conqueror
 };
 
 struct WaveData
@@ -378,7 +377,7 @@ struct WaveData
 
 static WaveData WavesInfo[5] =
 {
-    {30,  0, 15423, 0, 0, 24000, 0},    // Kaldorei Soldier
+    {35,  0, 15423, 0, 0, 24000, 0},    // Kaldorei Soldier
     { 3, 35, 15424, 0, 0, 24000, 0},    // Anubisath Conqueror
     {12, 38, 15414, 0, 0, 24000, 0},    // Qiraji Wasps
     { 6, 50, 15422, 0, 0, 24000, 0},    // Qiraji Tanks
@@ -394,9 +393,10 @@ struct SpawnSpells
 static SpawnSpells SpawnCast[4] =
 {
     {100000, 2000, 33652},   // Stop Time
-    {38500, 300000, 28528},  // Poison Cloud
+    {36500, 300000, 28528},  // Poison Cloud
     {58000, 300000, 35871},  // Frost Debuff (need correct spell)
-    {80950, 300000, 42075},  // Fire Explosion (need correct spell however this one looks cool)
+    {81950, 300000, 42075}  // Fire Explosion (need correct spell however this one looks cool)
+
 };
 /*#####
 # npc_anachronos_the_ancient
@@ -447,10 +447,10 @@ public:
             if (!player)
                 return;
 
-            Creature* Fandral = player->FindNearestCreature(C_FANDRAL_STAGHELM, 100.0f);
-            Creature* Arygos = player->FindNearestCreature(C_ARYGOS, 100.0f);
-            Creature* Caelestrasz = player->FindNearestCreature(C_CAELESTRASZ, 100.0f);
-            Creature* Merithra = player->FindNearestCreature(C_MERITHRA, 100.0f);
+            Creature* Fandral = player->FindNearestCreature(C_FANDRAL_STAGHELM, 200.0f);
+            Creature* Arygos = player->FindNearestCreature(C_ARYGOS, 200.0f);
+            Creature* Caelestrasz = player->FindNearestCreature(C_CAELESTRASZ, 200.0f);
+            Creature* Merithra = player->FindNearestCreature(C_MERITHRA, 200.0f);
 
             if (!Fandral || !Arygos || !Caelestrasz || !Merithra)
                 return;
@@ -493,23 +493,24 @@ public:
                         break;
                     case 9:
                         Merithra->CastSpell(Merithra, 25105, true);
+                        Merithra->SetDisableGravity(true);
                         break;
                     case 10:
-                        Merithra->HandleEmoteCommand(EMOTE_ONESHOT_LIFTOFF);
-                        Merithra->SetDisableGravity(true);
-                        Merithra->GetMotionMaster()->MoveCharge(-8065, 1530, 6.61f, 3);
+                        Merithra->SetUInt32Value(UNIT_FIELD_BYTES_1, 33554432);
+                        Merithra->GetMotionMaster()->MoveTakeoff(15378, -8065, 1530, 15.61f, 3);
                         break;
                     case 11:
                         Merithra->CastSpell(Merithra, 24818, false);
                         break;
                     case 12:
                         Merithra->GetMotionMaster()->MoveCharge(-8100, 1530, 50, 42);
+                        Merithra->SetDisableGravity(true);
                         break;
                     case 13:
+                        Merithra->SetVisible(false);
                         break;
                     case 14:
                         Arygos->AI()->Talk(ARYGOS_SAY_1);
-                        Merithra->SetVisible(false);
                         break;
                     case 15:
                         Arygos->GetMotionMaster()->MoveCharge(-8065, 1530, 2.61f, 10);
@@ -520,26 +521,27 @@ public:
                         break;
                     case 17:
                         Arygos->CastSpell(Arygos, 25107, true);
+                        Arygos->SetDisableGravity(true);
                         break;
                     case 18:
-                        Arygos->HandleEmoteCommand(EMOTE_ONESHOT_LIFTOFF);
-                        Arygos->SetDisableGravity(true);
-                        Arygos->GetMotionMaster()->MoveCharge(-8065, 1530, 6.61f, 42);
+                        Arygos->SetUInt32Value(UNIT_FIELD_BYTES_1, 33554432);
+                        Arygos->GetMotionMaster()->MoveTakeoff(15380, -8065, 1530, 15.61f, 3);
                         break;
                     case 19:
                         Arygos->CastSpell(Arygos, 50505, false);
                         break;
                     case 20:
-                        Arygos->GetMotionMaster()->MoveCharge(-8095, 1530, 50, 42);
+                        Arygos->GetMotionMaster()->MoveCharge(-8100, 1530, 50, 42);
+                        Arygos->SetDisableGravity(true);
                         break;
                     case 21:
+                        Arygos->SetVisible(false);
                         break;
                     case 22:
                         Caelestrasz->AI()->Talk(CAELESTRASZ_SAY_2, Fandral);
                         break;
                     case 23:
                         Caelestrasz->GetMotionMaster()->MoveCharge(-8065, 1530, 2.61f, 10);
-                        Arygos->SetVisible(false);
                         Arygos->GetMotionMaster()->MoveCharge(-8034.535f, 1535.14f, 2.61f, 10);
                         break;
                     case 24:
@@ -547,21 +549,23 @@ public:
                         break;
                     case 25:
                         Caelestrasz->CastSpell(Caelestrasz, 25106, true);
+                        Caelestrasz->SetDisableGravity(true);
                         break;
                     case 26:
-                        Caelestrasz->HandleEmoteCommand(254);
-                        Caelestrasz->SetDisableGravity(true);
-                        Caelestrasz->GetMotionMaster()->MoveCharge(-8065, 1530, 7.61f, 4);
+                        Caelestrasz->SetUInt32Value(UNIT_FIELD_BYTES_1, 33554432);
+                        Caelestrasz->GetMotionMaster()->MoveTakeoff(15379, -8065, 1530, 15.61f, 3);
                         break;
                     case 27:
                         Caelestrasz->CastSpell(Caelestrasz, 54293, false);
                         break;
                     case 28:
                         Talk(ANACHRONOS_SAY_2, Fandral);
+                        Caelestrasz->GetMotionMaster()->MoveCharge(-8100, 1530, 50, 42);
+                        Caelestrasz->SetDisableGravity(true);
                         break;
                     case 29:
-                        Caelestrasz->GetMotionMaster()->MoveCharge(-8095, 1530, 50, 42);
                         Fandral->AI()->Talk(FANDRAL_SAY_2);
+                        Caelestrasz->SetVisible(false);
                         break;
                     case 30:
                         break;
@@ -569,7 +573,6 @@ public:
                         Talk(ANACHRONOS_SAY_3, Fandral);
                         break;
                     case 32:
-                        Caelestrasz->SetVisible(false);
                         Caelestrasz->GetMotionMaster()->MoveCharge(-8034.535f, 1535.14f, 2.61f, 42);
                         Fandral->GetMotionMaster()->MoveCharge(-8108, 1529, 2.77f, 8);
                         me->GetMotionMaster()->MoveCharge(-8113, 1525, 2.77f, 8);
@@ -607,6 +610,7 @@ public:
                     case 42:
                         me->CastStop();
                         Fandral->AI()->Talk(FANDRAL_EMOTE_1);
+                        Fandral->HandleEmoteCommand(398);
                         break;
                     case 43:
                         Fandral->CastStop();
@@ -647,8 +651,8 @@ public:
                                 mob = player->FindNearestCreature(15423, 50, me);
                             }
                         }
-                        break;
                     }
+                        break;
                     case 52:
                         Fandral->GetMotionMaster()->MoveCharge(-8028.75f, 1538.795f, 2.61f, 4);
                         Fandral->AI()->Talk(ANACHRONOS_SAY_9, me);
@@ -667,35 +671,44 @@ public:
                         me->GetMotionMaster()->MoveCharge(-8116, 1522, 3.65f, 4);
                         break;
                     case 57:
-                        me->GetMotionMaster()->MoveCharge(-8116.7f, 1527, 3.7f, 4);
+                        me->HandleEmoteCommand(398);
                         break;
                     case 58:
-                        me->GetMotionMaster()->MoveCharge(-8112.67f, 1529.9f, 2.86f, 4);
+                        me->GetMotionMaster()->MoveCharge(-8116.7f, 1527, 3.7f, 4);
                         break;
                     case 59:
-                        me->GetMotionMaster()->MoveCharge(-8117.99f, 1532.24f, 3.94f, 4);
+                        me->HandleEmoteCommand(398);
                         break;
                     case 60:
-                        if (player)
-                            Talk(ANACHRONOS_SAY_10, player);
-                        me->GetMotionMaster()->MoveCharge(-8113.46f, 1524.16f, 2.89f, 4);
+                        me->GetMotionMaster()->MoveCharge(-8112.67f, 1529.9f, 2.86f, 4);
                         break;
                     case 61:
+                        me->HandleEmoteCommand(398);
+                        break;
+                    case 62:
+                        me->GetMotionMaster()->MoveCharge(-8117.99f, 1532.24f, 3.94f, 4);
+                        break;
+                    case 63:
+                        me->HandleEmoteCommand(398);
+                        break;
+                    case 64:
+                        Talk(ANACHRONOS_SAY_10, player);
+                        me->GetMotionMaster()->MoveCharge(-8113.46f, 1524.16f, 2.89f, 4);
+                        break;
+                    case 65:
                         me->GetMotionMaster()->MoveCharge(-8057.1f, 1470.32f, 2.61f, 6);
                         if (player->IsInRange(me, 0, 15))
                             player->GroupEventHappens(QUEST_A_PAWN_ON_THE_ETERNAL_BOARD, me);
                         break;
-                    case 62:
+                    case 66:
                         me->SetDisplayId(15500);
+                        me->SetUInt32Value(UNIT_FIELD_BYTES_1, 33554432);
                         break;
-                    case 63:
-                        me->HandleEmoteCommand(254);
+                    case 67:
                         me->SetDisableGravity(true);
                         break;
-                    case 64:
-                        me->GetMotionMaster()->MoveCharge(-8000, 1400, 150, 9);
-                        break;
-                    case 65:
+                    case 68:
+                        me->GetMotionMaster()->MoveTakeoff(15381, -8000, 1400, 150, 9);
                         me->SetVisible(false);
                         if (Creature* AnachronosQuestTrigger = (ObjectAccessor::GetCreature(*me, AnachronosQuestTriggerGUID)))
                         {
@@ -716,9 +729,9 @@ public:
                     HandleAnimation();
                 else AnimationTimer -= diff;
             }
-            if (AnimationCount < 65)
+            if (AnimationCount < 68)
                 me->CombatStop();
-            if (AnimationCount == 65 || eventEnd)
+            if (AnimationCount == 68 || eventEnd)
                 EnterEvadeMode();
         }
     };
@@ -779,7 +792,7 @@ public:
                 if (SpellTimer1 <= diff)
                 {
                     DoCast(me, SpawnCast[1].SpellId);
-                    DoCast(me, 24319);
+                    DoCast(me, 18951);
                     SpellTimer1 = SpawnCast[1].Timer2;
                 } else SpellTimer1 -= diff;
                 if (SpellTimer2 <= diff)
@@ -800,7 +813,7 @@ public:
                     me->RemoveAllAttackers();
                     me->AttackStop();
                     DoCast(me, 15533);
-                    SpellTimer4 = SpawnCast[0].Timer2;
+                    SpellTimer4 = SpawnCast[0].Timer1;
                 } else SpellTimer4 -= diff;
             }
             if (!hasTarget)
