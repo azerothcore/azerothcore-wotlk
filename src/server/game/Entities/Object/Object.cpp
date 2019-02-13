@@ -1104,14 +1104,8 @@ bool WorldObject::_IsWithinDist(WorldObject const* obj, float dist2compare, bool
 
 bool WorldObject::IsWithinLOSInMap(const WorldObject* obj) const
 {
-<<<<<<< HEAD
     if (!IsInMap(obj))
         return false;
-=======
-    G3D::Vector3 vThis(GetPositionX(), GetPositionY(), GetPositionZ());
-    G3D::Vector3 vObj(dest.GetPositionX(), dest.GetPositionY(), dest.GetPositionZ());
-    G3D::Vector3 contactPoint = vThis + (vObj - vThis).directionOrZero() * std::min(dest.GetExactDist(this), GetCombatReach());
->>>>>>> 812b9d7e... fix(Core/Spells): wrong distance calculations in AoE spells
 
     float x, y, z;
     if (obj->GetTypeId() == TYPEID_PLAYER)
