@@ -21,4 +21,4 @@ DELETE FROM `smart_scripts` WHERE `entryorguid`=7572;
 INSERT INTO `smart_scripts` VALUES (7572, 0, 0, 2, 62, 0, 100, 1, 842, 0, 0, 0, 0, 26, 2784, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Fallen Hero of the Horde - On Gossip Option 0 Selected - Quest Credit \'Fall From Grace\'');
 INSERT INTO `smart_scripts` VALUES (7572, 0, 1, 3, 62, 0, 100, 1, 881, 0, 0, 0, 0, 26, 2801, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Fallen Hero of the Horde - On Gossip Option 1 Selected - Quest Credit \'A Tale of Sorrow\'');
 INSERT INTO `smart_scripts` VALUES (7572, 0, 2, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 72, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Fallen Hero of the Horde - On Gossip Option 0 Selected - Close Gossip');
-INSERT INTO `smart_scripts` VALUES (7572, 0, 3, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 72, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Fallen Hero of the Horde - On Gossip Option 1 Selected - Close Gossip'); 
+INSERT INTO `smart_scripts` VALUES (7572, 0, 3, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 72, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Fallen Hero of the Horde - On Gossip Option 1 Selected - Close Gossip');
