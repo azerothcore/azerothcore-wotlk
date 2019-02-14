@@ -1,5 +1,5 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1550101831834633300');
-INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1550098994179305900');
+
 -- Fallen Hero of the Horde 
 -- Fixes gossip text and completion of quest
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId`=14 AND `SourceGroup`=840;
@@ -18,8 +18,9 @@ INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionTex
 (842,0,0,"Tragic...",3830,1,1,0,0,0,0,"",0,0);
 
 DELETE FROM `smart_scripts` WHERE `entryorguid`=7572;
-INSERT INTO `smart_scripts` VALUES (7572, 0, 0, 2, 62, 0, 100, 1, 842, 0, 0, 0, 0, 26, 2784, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Fallen Hero of the Horde - On Gossip Option 0 Selected - Quest Credit \'Fall From Grace\'');
-INSERT INTO `smart_scripts` VALUES (7572, 0, 1, 3, 62, 0, 100, 1, 881, 0, 0, 0, 0, 26, 2801, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Fallen Hero of the Horde - On Gossip Option 1 Selected - Quest Credit \'A Tale of Sorrow\'');
-INSERT INTO `smart_scripts` VALUES (7572, 0, 2, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 72, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Fallen Hero of the Horde - On Gossip Option 0 Selected - Close Gossip');
-INSERT INTO `smart_scripts` VALUES (7572, 0, 3, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 72, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Fallen Hero of the Horde - On Gossip Option 1 Selected - Close Gossip');
+INSERT INTO `smart_scripts` VALUES 
+(7572, 0, 0, 2, 62, 0, 100, 1, 842, 0, 0, 0, 0, 26, 2784, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Fallen Hero of the Horde - On Gossip Option 0 Selected - Quest Credit \'Fall From Grace\''),
+(7572, 0, 1, 3, 62, 0, 100, 1, 881, 0, 0, 0, 0, 26, 2801, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Fallen Hero of the Horde - On Gossip Option 1 Selected - Quest Credit \'A Tale of Sorrow\''),
+(7572, 0, 2, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 72, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Fallen Hero of the Horde - On Gossip Option 0 Selected - Close Gossip'),
+(7572, 0, 3, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 72, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Fallen Hero of the Horde - On Gossip Option 1 Selected - Close Gossip');
 
