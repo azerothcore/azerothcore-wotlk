@@ -1212,6 +1212,8 @@ bool Player::Create(uint32 guidlow, CharacterCreateInfo* createInfo)
     }
     // all item positions resolved
 
+    CheckAllAchievementCriteria();
+
     return true;
 }
 
