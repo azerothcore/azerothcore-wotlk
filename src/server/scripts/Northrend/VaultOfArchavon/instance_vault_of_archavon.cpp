@@ -11,6 +11,7 @@
 #include "BattlefieldMgr.h"
 #include "SpellAuras.h"
 #include "Player.h"
+#include "GameTime.h"
 
 /* Vault of Archavon encounters:
 1 - Archavon the Stone Watcher event
@@ -179,13 +180,13 @@ class instance_vault_of_archavon : public InstanceMapScript
                     switch (type)
                     {
                         case EVENT_ARCHAVON:
-                            ArchavonDeath = time(NULL);
+                            ArchavonDeath = GameTime::GetGameTime();
                             break;
                         case EVENT_EMALON:
-                            EmalonDeath = time(NULL);
+                            EmalonDeath = GameTime::GetGameTime();
                             break;
                         case EVENT_KORALON:
-                            KoralonDeath = time(NULL);
+                            KoralonDeath = GameTime::GetGameTime();
                             break;
                         default:
                             return;

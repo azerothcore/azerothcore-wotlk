@@ -23,6 +23,7 @@
 #include "Vehicle.h"
 #include "VMapFactory.h"
 #include "LFGMgr.h"
+#include "GameTime.h"
 #include "Chat.h"
 #ifdef ELUNA
 #include "LuaEngine.h"
@@ -2164,10 +2165,15 @@ float Map::GetWaterLevel(float x, float y) const
         return 0;
 }
 
-bool Map::isInLineOfSight(float x1, float y1, float z1, float x2, float y2, float z2, uint32 phasemask) const
-{ 
-    return VMAP::VMapFactory::createOrGetVMapManager()->isInLineOfSight(GetId(), x1, y1, z1, x2, y2, z2)
-        && _dynamicTree.isInLineOfSight(x1, y1, z1, x2, y2, z2, phasemask);
+bool Map::isInLineOfSight(float x1, float y1, float z1, float x2, float y2, float z2, uint32 phasemask, LineOfSightChecks checks) const
+{
+    if ((checks & LINEOFSIGHT_CHECK_VMAP) && !VMAP::VMapFactory::createOrGetVMapManager()->isInLineOfSight(GetId(), x1, y1, z1, x2, y2, z2))
+        return false;
+    
+    if (sWorld->getBoolConfig(CONFIG_CHECK_GOBJECT_LOS) && (checks & LINEOFSIGHT_CHECK_GOBJECT)
+      && !_dynamicTree.isInLineOfSight(x1, y1, z1, x2, y2, z2, phasemask))
+        return false;
+    return true;
 }
 
 bool Map::getObjectHitPos(uint32 phasemask, float x1, float y1, float z1, float x2, float y2, float z2, float& rx, float& ry, float& rz, float modifyDist)
@@ -2643,7 +2649,7 @@ bool InstanceMap::AddPlayerToMap(Player* player)
         // increase current instances (hourly limit)
         // xinef: specific instances are still limited
         if (!group || !group->isLFGGroup() || !group->IsLfgRandomInstance())
-            player->AddInstanceEnterTime(GetInstanceId(), time(NULL));
+            player->AddInstanceEnterTime(GetInstanceId(), GameTime::GetGameTime());
 
         if (!playerBind->perm && !mapSave->CanReset() && (!group || !group->isLFGGroup() || !group->IsLfgRandomInstance()))
         {
@@ -2989,7 +2995,7 @@ void Map::SaveCreatureRespawnTime(uint32 dbGuid, time_t& respawnTime)
         return;
     }
 
-    time_t now = time(NULL);
+    time_t now = GameTime::GetGameTime();
     if (GetInstanceResetPeriod() > 0 && respawnTime-now+5 >= GetInstanceResetPeriod())
         respawnTime = now+YEAR;
 
@@ -3023,7 +3029,7 @@ void Map::SaveGORespawnTime(uint32 dbGuid, time_t& respawnTime)
         return;
     }
 
-    time_t now = time(NULL);
+    time_t now = GameTime::GetGameTime();
     if (GetInstanceResetPeriod() > 0 && respawnTime-now+5 >= GetInstanceResetPeriod())
         respawnTime = now+YEAR;
 

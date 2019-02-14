@@ -1104,16 +1104,8 @@ class Player : public Unit, public GridObject<Player>
         }
         bool TeleportToEntryPoint();
 
-        void SetSummonPoint(uint32 mapid, float x, float y, float z, uint32 delay = 0, bool asSpectator = false)
-        {
-            m_summon_expire = time(NULL) + (delay ? delay : MAX_PLAYER_SUMMON_DELAY);
-            m_summon_mapid = mapid;
-            m_summon_x = x;
-            m_summon_y = y;
-            m_summon_z = z;
-            m_summon_asSpectator = asSpectator;
-        }
-        bool IsSummonAsSpectator() const { return m_summon_asSpectator && m_summon_expire >= time(NULL); }
+        void SetSummonPoint(uint32 mapid, float x, float y, float z, uint32 delay = 0, bool asSpectator = false);
+        bool IsSummonAsSpectator() const;
         void SetSummonAsSpectator(bool on) { m_summon_asSpectator = on; }
         void SummonIfPossible(bool agree, uint32 summoner_guid);
         time_t GetSummonExpireTimer() const { return m_summon_expire; }
@@ -1738,21 +1730,9 @@ class Player : public Unit, public GridObject<Player>
 
         static uint32 const infinityCooldownDelay = 0x9A7EC800;  // used for set "infinity cooldowns" for spells and check, MONTH*IN_MILLISECONDS
         static uint32 const infinityCooldownDelayCheck = 0x4D3F6400; //MONTH*IN_MILLISECONDS/2;
-        virtual bool HasSpellCooldown(uint32 spell_id) const
-        {
-            SpellCooldowns::const_iterator itr = m_spellCooldowns.find(spell_id);
-            return itr != m_spellCooldowns.end() && itr->second.end > World::GetGameTimeMS();
-        }
-        virtual bool HasSpellItemCooldown(uint32 spell_id, uint32 itemid) const
-        {
-            SpellCooldowns::const_iterator itr = m_spellCooldowns.find(spell_id);
-            return itr != m_spellCooldowns.end() && itr->second.end > World::GetGameTimeMS() && itr->second.itemid == itemid;
-        }
-        uint32 GetSpellCooldownDelay(uint32 spell_id) const
-        {
-            SpellCooldowns::const_iterator itr = m_spellCooldowns.find(spell_id);
-            return uint32(itr != m_spellCooldowns.end() && itr->second.end > World::GetGameTimeMS() ? itr->second.end - World::GetGameTimeMS() : 0);
-        }
+        virtual bool HasSpellCooldown(uint32 spell_id) const;
+        virtual bool HasSpellItemCooldown(uint32 spell_id, uint32 itemid) const;
+        uint32 GetSpellCooldownDelay(uint32 spell_id) const;
         void AddSpellAndCategoryCooldowns(SpellInfo const* spellInfo, uint32 itemId, Spell* spell = NULL, bool infinityCooldown = false);
         virtual void AddSpellCooldown(uint32 spell_id, uint32 itemid, uint32 end_time, bool needSendToClient = false, bool forceSendToSpectator = false);
         void ModifySpellCooldown(uint32 spellId, int32 cooldown);

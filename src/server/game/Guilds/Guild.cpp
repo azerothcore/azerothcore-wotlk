@@ -9,6 +9,7 @@
 #include "Chat.h"
 #include "Config.h"
 #include "DatabaseEnv.h"
+#include "GameTime.h"
 #include "Guild.h"
 #include "GuildMgr.h"
 #include "Language.h"
@@ -160,6 +161,8 @@ inline uint32 Guild::LogHolder::GetNextGUID()
     return m_nextGUID;
 }
 
+Guild::LogEntry::LogEntry(uint32 guildId, uint32 guid) : m_guildId(guildId), m_guid(guid), m_timestamp(GameTime::GetGameTime()) { }
+
 // EventLogEntry
 void Guild::EventLogEntry::SaveToDB(SQLTransaction& trans) const
 {
@@ -193,7 +196,7 @@ void Guild::EventLogEntry::WritePacket(WorldPacket& data) const
     if (m_eventType == GUILD_EVENT_LOG_PROMOTE_PLAYER || m_eventType == GUILD_EVENT_LOG_DEMOTE_PLAYER)
         data << uint8(m_newRank);
     // Event timestamp
-    data << uint32(::time(NULL) - m_timestamp);
+    data << uint32(::GameTime::GetGameTime() - m_timestamp);
 }
 
 // BankEventLogEntry
@@ -243,7 +246,7 @@ void Guild::BankEventLogEntry::WritePacket(WorldPacket& data) const
             data << uint32(m_itemOrMoney);
     }
 
-    data << uint32(time(NULL) - m_timestamp);
+    data << uint32(GameTime::GetGameTime() - m_timestamp);
 }
 
 // RankInfo
@@ -638,6 +641,11 @@ void Guild::Member::ChangeRank(uint8 newRank)
     CharacterDatabase.Execute(stmt);
 }
 
+void Guild::Member::UpdateLogoutTime()
+{
+    m_logoutTime = GameTime::GetGameTime();
+}
+
 void Guild::Member::SaveToDB(SQLTransaction& trans) const
 {
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_GUILD_MEMBER);
@@ -708,7 +716,7 @@ void Guild::Member::WritePacket(WorldPacket& data, bool sendOfficerNote) const
          << uint32(m_zoneId);
 
     if (!m_flags)
-        data << float(float(::time(NULL) - m_logoutTime) / DAY);
+        data << float(float(::GameTime::GetGameTime() - m_logoutTime) / DAY);
 
     data << m_publicNote;
 
@@ -1161,7 +1169,7 @@ bool Guild::Create(Player* pLeader, std::string const& name)
     m_info = "";
     m_motd = "No message set.";
     m_bankMoney = 0;
-    m_createdDate = sWorld->GetGameTime();
+    m_createdDate = GameTime::GetGameTime();
     _CreateLogHolders();
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
