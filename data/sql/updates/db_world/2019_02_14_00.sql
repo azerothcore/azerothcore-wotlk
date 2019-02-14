@@ -16,7 +16,7 @@ SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '154789704638036458
 
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1547897046380364588');
 
-UPDATE `acore_world`.`version` SET `db_version`='ACDB 335.2 (dev)', `cache_id`=2
+UPDATE `acore_world`.`version` SET `db_version`='ACDB 335.2 (dev)', `cache_id`=2;
 
 --
 -- END UPDATING QUERIES
