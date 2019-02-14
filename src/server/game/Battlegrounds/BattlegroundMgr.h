@@ -136,10 +136,10 @@ class BattlegroundMgr
         const BattlegroundContainer& GetBattlegroundList() { return m_Battlegrounds; } // pussywizard
         RandomBattlegroundSystem RandomSystem; // pussywizard
 
-        static std::unordered_map<BattlegroundTypeId, BattlegroundQueueTypeId> bgToQueue;
-        static std::unordered_map<BattlegroundQueueTypeId, BattlegroundTypeId> queueToBg;
-        static std::unordered_map<BattlegroundTypeId, Battleground*> bgtypeToBattleground;
-        static std::unordered_map<BattlegroundTypeId, bgRef> bgTypeToTemplate;
+        static std::unordered_map<int, BattlegroundQueueTypeId> bgToQueue; // BattlegroundTypeId -> BattlegroundQueueTypeId
+        static std::unordered_map<int, BattlegroundTypeId> queueToBg; // BattlegroundQueueTypeId -> BattlegroundTypeId
+        static std::unordered_map<int, Battleground*> bgtypeToBattleground; // BattlegroundTypeId -> Battleground*
+        static std::unordered_map<int, bgRef> bgTypeToTemplate; // BattlegroundTypeId -> bgRef
 
     private:
         bool CreateBattleground(CreateBattlegroundData& data);

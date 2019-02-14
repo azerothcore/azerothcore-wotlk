@@ -1036,7 +1036,7 @@ void RandomBattlegroundSystem::BattlegroundCreated(BattlegroundTypeId bgTypeId)
 
 // init/update unordered_map
 // Battlegrounds
-std::unordered_map<BattlegroundTypeId, BattlegroundQueueTypeId> BattlegroundMgr::bgToQueue = {
+std::unordered_map<int, BattlegroundQueueTypeId> BattlegroundMgr::bgToQueue = {
     { BATTLEGROUND_AV, BATTLEGROUND_QUEUE_AV},
     { BATTLEGROUND_WS, BATTLEGROUND_QUEUE_WS},
     { BATTLEGROUND_AB, BATTLEGROUND_QUEUE_AB},
@@ -1053,7 +1053,7 @@ std::unordered_map<BattlegroundTypeId, BattlegroundQueueTypeId> BattlegroundMgr:
     { BATTLEGROUND_RV, BattlegroundQueueTypeId(0)},        // Ring of Valor
 };
 
-std::unordered_map<BattlegroundQueueTypeId, BattlegroundTypeId> BattlegroundMgr::queueToBg = {
+std::unordered_map<int, BattlegroundTypeId> BattlegroundMgr::queueToBg = {
     { BATTLEGROUND_QUEUE_NONE,  BATTLEGROUND_TYPE_NONE },
     { BATTLEGROUND_QUEUE_AV,    BATTLEGROUND_AV },
     { BATTLEGROUND_QUEUE_WS,    BATTLEGROUND_WS },
@@ -1067,7 +1067,7 @@ std::unordered_map<BattlegroundQueueTypeId, BattlegroundTypeId> BattlegroundMgr:
     { BATTLEGROUND_QUEUE_5v5,   BATTLEGROUND_AA },
 };
 
-std::unordered_map<BattlegroundTypeId, Battleground*> BattlegroundMgr::bgtypeToBattleground = {
+std::unordered_map<int, Battleground*> BattlegroundMgr::bgtypeToBattleground = {
     { BATTLEGROUND_AV, new BattlegroundAV },
     { BATTLEGROUND_WS, new BattlegroundWS },
     { BATTLEGROUND_AB, new BattlegroundAB },
@@ -1083,7 +1083,7 @@ std::unordered_map<BattlegroundTypeId, Battleground*> BattlegroundMgr::bgtypeToB
     { BATTLEGROUND_RB, new Battleground },
 };
 
-std::unordered_map<BattlegroundTypeId, bgRef> BattlegroundMgr::bgTypeToTemplate = {
+std::unordered_map<int, bgRef> BattlegroundMgr::bgTypeToTemplate = {
     { BATTLEGROUND_AV, [](Battleground *bg_t) -> Battleground*{ return new BattlegroundAV(*(BattlegroundAV*)bg_t); } },
     { BATTLEGROUND_WS, [](Battleground *bg_t) -> Battleground*{ return new BattlegroundWS(*(BattlegroundWS*)bg_t); } },
     { BATTLEGROUND_AB, [](Battleground *bg_t) -> Battleground*{ return new BattlegroundAB(*(BattlegroundAB*)bg_t); } },
