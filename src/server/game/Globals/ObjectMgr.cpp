@@ -11,6 +11,7 @@
 #include "Chat.h"
 #include "Common.h"
 #include "DatabaseEnv.h"
+#include "GameTime.h"
 #include "DisableMgr.h"
 #include "GameEventMgr.h"
 #include "GossipDef.h"
@@ -1023,7 +1024,7 @@ void ObjectMgr::LoadCreatureAddons()
 
 void ObjectMgr::LoadGameObjectAddons()
 {
-    uint32 oldMSTime = getMSTime();
+    uint32 oldMSTime = GameTime::GetGameTimeMS();
 
     //                                               0     1                 2
     QueryResult result = WorldDatabase.Query("SELECT guid, invisibilityType, invisibilityValue FROM gameobject_addon");
@@ -5506,7 +5507,7 @@ void ObjectMgr::ReturnOrDeleteOldMails(bool serverUp)
 {
     uint32 oldMSTime = getMSTime();
 
-    time_t curTime = time(NULL);
+    time_t curTime = GameTime::GetGameTime();
 
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_EXPIRED_MAIL);
     stmt->setUInt32(0, curTime);

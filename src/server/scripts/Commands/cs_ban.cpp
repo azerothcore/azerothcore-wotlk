@@ -17,6 +17,7 @@ EndScriptData */
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Player.h"
+#include "GameTime.h"
 #include "ScriptMgr.h"
 
 class ban_commandscript : public CommandScript
@@ -245,7 +246,7 @@ public:
 
             time_t unbanDate = time_t(fields[3].GetUInt32());
             bool active = false;
-            if (fields[2].GetBool() && (fields[1].GetUInt64() == uint64(0) || unbanDate >= time(nullptr)))
+            if (fields[2].GetBool() && (fields[1].GetUInt64() == uint64(0) || unbanDate >= GameTime::GetGameTime()))
                 active = true;
             bool permanent = (fields[1].GetUInt64() == uint64(0));
             std::string banTime = permanent ? handler->GetTrinityString(LANG_BANINFO_INFINITE) : secsToTimeString(fields[1].GetUInt64(), true);
@@ -293,7 +294,7 @@ public:
             Field* fields = result->Fetch();
             time_t unbanDate = time_t(fields[3].GetUInt32());
             bool active = false;
-            if (fields[2].GetUInt8() && (!fields[1].GetUInt32() || unbanDate >= time(nullptr)))
+            if (fields[2].GetUInt8() && (!fields[1].GetUInt32() || unbanDate >= GameTime::GetGameTime()))
                 active = true;
             bool permanent = (fields[1].GetUInt32() == uint32(0));
             std::string banTime = permanent ? handler->GetTrinityString(LANG_BANINFO_INFINITE) : secsToTimeString(fields[1].GetUInt64(), true);

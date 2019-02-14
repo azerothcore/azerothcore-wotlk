@@ -19,6 +19,7 @@
 #include "Util.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
+#include "GameTime.h"
 #include "CellImpl.h"
 #include "ScriptMgr.h"
 #include "SpellScript.h"
@@ -395,7 +396,7 @@ Aura* Aura::Create(SpellInfo const* spellproto, uint8 effMask, WorldObject* owne
 
 Aura::Aura(SpellInfo const* spellproto, WorldObject* owner, Unit* caster, Item* castItem, uint64 casterGUID) :
 m_spellInfo(spellproto), m_casterGuid(casterGUID ? casterGUID : caster->GetGUID()),
-m_castItemGuid(castItem ? castItem->GetGUID() : 0),m_castItemEntry(castItem ? castItem->GetEntry() : 0), m_applyTime(time(NULL)),
+m_castItemGuid(castItem ? castItem->GetGUID() : 0),m_castItemEntry(castItem ? castItem->GetEntry() : 0), m_applyTime(GameTime::GetGameTime()),
 m_owner(owner), m_timeCla(0), m_updateTargetMapInterval(0),
 m_casterLevel(caster ? caster->getLevel() : m_spellInfo->SpellLevel), m_procCharges(0), m_stackAmount(1),
 m_isRemoved(false), m_isSingleTarget(false), m_isUsingCharges(false)
@@ -2015,7 +2016,7 @@ bool Aura::IsProcOnCooldown() const
 {
     /*if (m_procCooldown)
     {
-        if (m_procCooldown > time(NULL))
+        if (m_procCooldown > GameTime::GetGameTime())
             return true;
     }*/
     return false;
@@ -2023,7 +2024,7 @@ bool Aura::IsProcOnCooldown() const
 
 void Aura::AddProcCooldown(uint32 /*msec*/)
 {
-    //m_procCooldown = time(NULL) + msec;
+    //m_procCooldown = GameTime::GetGameTime() + msec;
 }
 
 void Aura::PrepareProcToTrigger(AuraApplication* aurApp, ProcEventInfo& eventInfo)

@@ -15,6 +15,7 @@
 #include "Player.h"
 #include "Vehicle.h"
 #include "ObjectMgr.h"
+#include "GameTime.h"
 #include "UpdateData.h"
 #include "UpdateMask.h"
 #include "Util.h"
@@ -940,7 +941,7 @@ void MovementInfo::OutDebug()
     sLog->outString("guid " UI64FMTD, guid);
     sLog->outString("flags %u", flags);
     sLog->outString("flags2 %u", flags2);
-    sLog->outString("time %u current time " UI64FMTD "", flags2, uint64(::time(NULL)));
+    sLog->outString("time %u current time " UI64FMTD "", flags2, uint64(::GameTime::GetGameTime()));
     sLog->outString("position: `%s`", pos.ToString().c_str());
     if (flags & MOVEMENTFLAG_ONTRANSPORT)
     {
@@ -1102,32 +1103,17 @@ bool WorldObject::_IsWithinDist(WorldObject const* obj, float dist2compare, bool
         return thisOrTransport->IsInDist2d(objOrObjTransport, maxdist);
 }
 
-bool WorldObject::IsWithinLOSInMap(const WorldObject* obj) const
+Position WorldObject::GetHitSpherePointFor(Position const& dest) const
 {
-<<<<<<< HEAD
-    if (!IsInMap(obj))
-        return false;
-=======
     G3D::Vector3 vThis(GetPositionX(), GetPositionY(), GetPositionZ());
     G3D::Vector3 vObj(dest.GetPositionX(), dest.GetPositionY(), dest.GetPositionZ());
     G3D::Vector3 contactPoint = vThis + (vObj - vThis).directionOrZero() * std::min(dest.GetExactDist(this), GetCombatReach());
->>>>>>> 812b9d7e... fix(Core/Spells): wrong distance calculations in AoE spells
 
-    float x, y, z;
-    if (obj->GetTypeId() == TYPEID_PLAYER)
-        obj->GetPosition(x, y, z);
-    else
-        obj->GetHitSpherePointFor(GetPosition(), x, y, z);
-
-    return IsWithinLOS(x, y, z);
+    return Position(contactPoint.x, contactPoint.y, contactPoint.z, GetAngle(contactPoint.x, contactPoint.y));
 }
 
-bool WorldObject::IsWithinLOS(float ox, float oy, float oz) const
+bool WorldObject::IsWithinLOS(float ox, float oy, float oz, LineOfSightChecks checks) const
 { 
-    /*float x, y, z;
-    GetPosition(x, y, z);
-    VMAP::IVMapManager* vMapManager = VMAP::VMapFactory::createOrGetVMapManager();
-    return vMapManager->isInLineOfSight(GetMapId(), x, y, z+2.0f, ox, oy, oz+2.0f);*/
     if (IsInWorld())
     {
         float x, y, z;
@@ -1136,19 +1122,24 @@ bool WorldObject::IsWithinLOS(float ox, float oy, float oz) const
         else
             GetHitSpherePointFor({ ox, oy, oz }, x, y, z);
 
-        return GetMap()->isInLineOfSight(x, y, z + 2.0f, ox, oy, oz + 2.0f, GetPhaseMask());
+        return GetMap()->isInLineOfSight(x, y, z + 2.0f, ox, oy, oz + 2.0f, GetPhaseMask(), checks);
     }
-
     return true;
 }
 
-Position WorldObject::GetHitSpherePointFor(Position const& dest) const
+bool WorldObject::IsWithinLOSInMap(const WorldObject* obj, LineOfSightChecks checks) const
 {
-    G3D::Vector3 vThis(GetPositionX(), GetPositionY(), GetPositionZ());
-    G3D::Vector3 vObj(dest.GetPositionX(), dest.GetPositionY(), dest.GetPositionZ());
-    G3D::Vector3 contactPoint = vThis + (vObj - vThis).directionOrZero() * std::min(dest.GetExactDist(this), GetCombatReach());
 
-    return Position(contactPoint.x, contactPoint.y, contactPoint.z, GetAngle(contactPoint.x, contactPoint.y));
+    if (!IsInMap(obj))
+        return false;
+
+    float x, y, z;
+    if (obj->GetTypeId() == TYPEID_PLAYER)
+        obj->GetPosition(x, y, z);
+    else
+        obj->GetHitSpherePointFor(GetPosition(), x, y, z);
+
+    return IsWithinLOS(x, y, z, checks);
 }
 
 void WorldObject::GetHitSpherePointFor(Position const& dest, float& x, float& y, float& z) const
@@ -2895,13 +2886,13 @@ void WorldObject::AddToNotify(uint16 f)
             {
                 uint32 EVENT_VISIBILITY_DELAY = u->FindMap() ? DynamicVisibilityMgr::GetVisibilityNotifyDelay(u->FindMap()->GetEntry()->map_type) : 1000;
 
-                uint32 diff = getMSTimeDiff(u->m_last_notify_mstime, World::GetGameTimeMS());
+                uint32 diff = getMSTimeDiff(u->m_last_notify_mstime, GameTime::GetGameTimeMS());
                 if (diff >= EVENT_VISIBILITY_DELAY/2)
                     EVENT_VISIBILITY_DELAY /= 2;
                 else
                     EVENT_VISIBILITY_DELAY -= diff;
                 u->m_delayed_unit_relocation_timer = EVENT_VISIBILITY_DELAY;
-                u->m_last_notify_mstime = World::GetGameTimeMS()+EVENT_VISIBILITY_DELAY-1;
+                u->m_last_notify_mstime = GameTime::GetGameTimeMS()+EVENT_VISIBILITY_DELAY-1;
             }
             else if (f & NOTIFY_AI_RELOCATION)
             {
