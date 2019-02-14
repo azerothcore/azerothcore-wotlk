@@ -10,6 +10,7 @@
 #include "Spell.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
+#include "GameTime.h"
 #include "Cell.h"
 #include "CellImpl.h"
 #include "ObjectMgr.h"
@@ -417,9 +418,9 @@ bool ScriptedAI::EnterEvadeIfOutOfCombatArea()
     if (me->IsInEvadeMode() || !me->IsInCombat())
         return false;
 
-    if (_evadeCheckCooldown == time(NULL))
+    if (_evadeCheckCooldown == GameTime::GetGameTime())
         return false;
-    _evadeCheckCooldown = time(NULL);
+    _evadeCheckCooldown = GameTime::GetGameTime();
 
     if (!CheckEvadeIfOutOfCombatArea())
         return false;

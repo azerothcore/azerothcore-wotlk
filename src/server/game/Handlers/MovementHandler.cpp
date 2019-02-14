@@ -152,7 +152,7 @@ void WorldSession::HandleMoveWorldportAckOpcode()
             _player->SetIsSpectator(false);
 
         GetPlayer()->SetPendingSpectatorForBG(0);
-        timeWhoCommandAllowed = time(NULL) + sWorld->GetNextWhoListUpdateDelaySecs() + 1; // after exiting arena Subscribe will scan for a player and cached data says he is still in arena, so disallow until next update
+        timeWhoCommandAllowed = GameTime::GetGameTime() + sWorld->GetNextWhoListUpdateDelaySecs() + 1; // after exiting arena Subscribe will scan for a player and cached data says he is still in arena, so disallow until next update
 
         if (uint32 inviteInstanceId = _player->GetPendingSpectatorInviteInstanceId())
         {
@@ -193,7 +193,7 @@ void WorldSession::HandleMoveWorldportAckOpcode()
             if (mapDiff->resetTime)
                 if (time_t timeReset = sInstanceSaveMgr->GetResetTimeFor(mEntry->MapID, diff))
                 {
-                    uint32 timeleft = uint32(timeReset - time(NULL));
+                    uint32 timeleft = uint32(timeReset - GameTime::GetGameTime());
                     GetPlayer()->SendInstanceResetWarning(mEntry->MapID, diff, timeleft, true);
                 }
         allowMount = mInstance->AllowMount;
@@ -408,7 +408,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket & recvData)
     if (mover->GetGUID() != _player->GetGUID())
         movementInfo.flags &= ~MOVEMENTFLAG_WALKING;
 
-    uint32 mstime = World::GetGameTimeMS();
+    uint32 mstime = GameTime::GetGameTimeMS();
     /*----------------------*/
     if(m_clientTimeDelay == 0)
         m_clientTimeDelay = mstime > movementInfo.time ? std::min(mstime - movementInfo.time, (uint32)100) : 0;
