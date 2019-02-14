@@ -1,3 +1,19 @@
+-- DB update 2019_02_14_00 -> 2019_02_14_01
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2019_02_14_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2019_02_14_00 2019_02_14_01 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1549338391766716500'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1549338391766716500');
 
 UPDATE `creature_template` SET `ScriptName`='', `AIName`='SmartAI' WHERE `entry`=9563;
@@ -34,3 +50,12 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 (15,2061,0,0,1,9,0,4866,0,0,0,0,0,"","Show gossip 2061 option 0 if player does have quest 4866 taken"),
 (15,2061,0,0,1,1,0,16468,0,0,0,0,0,"","Show Gossip 2061 option 0 only if player has aura 16468"),
 (15,2061,1,0,2,9,0,4224,0,0,0,0,0,"","Show gossip 2061 option 1 if player does have quest 4224 taken");
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
