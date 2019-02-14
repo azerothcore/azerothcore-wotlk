@@ -19,10 +19,6 @@ typedef std::map<uint32, Battleground*> BattlegroundContainer;
 typedef UNORDERED_MAP<uint32, BattlegroundTypeId> BattleMastersMap;
 typedef Battleground*(*bgRef)(Battleground*);
 
-extern std::unordered_map<BattlegroundTypeId, BattlegroundQueueTypeId> bgToQueue;
-extern std::unordered_map<BattlegroundQueueTypeId, BattlegroundTypeId> queueToBg;
-extern std::unordered_map<BattlegroundTypeId, Battleground*> bgtypeToBattleground;
-extern std::unordered_map<BattlegroundTypeId, bgRef> bgTypeToTemplate;
 
 #define BATTLEGROUND_ARENA_POINT_DISTRIBUTION_DAY 86400 // how many seconds in day
 
@@ -139,6 +135,11 @@ class BattlegroundMgr
 
         const BattlegroundContainer& GetBattlegroundList() { return m_Battlegrounds; } // pussywizard
         RandomBattlegroundSystem RandomSystem; // pussywizard
+
+        static std::unordered_map<BattlegroundTypeId, BattlegroundQueueTypeId> bgToQueue;
+        static std::unordered_map<BattlegroundQueueTypeId, BattlegroundTypeId> queueToBg;
+        static std::unordered_map<BattlegroundTypeId, Battleground*> bgtypeToBattleground;
+        static std::unordered_map<BattlegroundTypeId, bgRef> bgTypeToTemplate;
 
     private:
         bool CreateBattleground(CreateBattlegroundData& data);
