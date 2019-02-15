@@ -29,7 +29,6 @@
 #include "Player.h"
 #include "PoolMgr.h"
 #include "GameGraveyard.h"
-#include "GameTime.h"
 #include "World.h"
 
 #define GOSSIP_HELLO_DEMO1  "Build catapult."
@@ -295,7 +294,7 @@ class npc_wg_queue : public CreatureScript
             else
             {
                 uint32 timer = wintergrasp->GetTimer() / 1000;
-                player->SendUpdateWorldState(4354, GameTime::GetGameTime() + timer);
+                player->SendUpdateWorldState(4354, time(NULL) + timer);
                 if (timer < 15 * MINUTE)
                 {
                     player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Queue for Wintergrasp.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);

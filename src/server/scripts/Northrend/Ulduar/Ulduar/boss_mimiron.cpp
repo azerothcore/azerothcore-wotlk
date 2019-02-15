@@ -5,7 +5,6 @@
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
-#include "GameTime.h"
 #include "ulduar.h"
 #include "Vehicle.h"
 #include "Spell.h"
@@ -453,7 +452,7 @@ public:
                 case EVENT_SPAWN_FLAMES_INITIAL:
                     {
                         if (changeAllowedFlameSpreadTime)
-                            allowedFlameSpreadTime = GameTime::GetGameTime();
+                            allowedFlameSpreadTime = time(NULL);
 
                         std::vector<Player*> pg;
                         Map::PlayerList const &pl = me->GetMap()->GetPlayers();
@@ -2237,7 +2236,7 @@ public:
 
         bool Load()
         {
-            lastMSTime = GameTime::GetGameTimeMS();
+            lastMSTime = World::GetGameTimeMS();
             lastOrientation = -1.0f;
             return true;
         }
@@ -2248,14 +2247,14 @@ public:
             {
                 if (c->GetTypeId() != TYPEID_UNIT)
                     return;
-                uint32 diff = getMSTimeDiff(lastMSTime, GameTime::GetGameTimeMS());
+                uint32 diff = getMSTimeDiff(lastMSTime, World::GetGameTimeMS());
                 if (lastOrientation == -1.0f)
                 {
                     lastOrientation = (c->ToCreature()->AI()->GetData(0)*2*M_PI)/100.0f;
                     diff = 0;
                 }
                 float new_o = Position::NormalizeOrientation(lastOrientation-(M_PI/60)*(diff/250.0f));
-                lastMSTime = GameTime::GetGameTimeMS();
+                lastMSTime = World::GetGameTimeMS();
                 lastOrientation = new_o;
                 c->SetOrientation(new_o);
                 c->SetFacingTo(new_o);
@@ -2317,7 +2316,7 @@ public:
     {
         npc_ulduar_flames_initialAI(Creature *pCreature) : NullCreatureAI(pCreature)
         {
-            CreateTime = GameTime::GetGameTime();
+            CreateTime = time(NULL);
             events.Reset();
             events.ScheduleEvent(EVENT_FLAMES_SPREAD, 5750);
             if( Creature* flame = me->SummonCreature(NPC_FLAMES_SPREAD, me->GetPositionX(), me->GetPositionY(), 364.32f, 0.0f) )
