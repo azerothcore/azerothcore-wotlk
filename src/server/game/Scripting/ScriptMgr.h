@@ -20,6 +20,7 @@
 #include "AchievementMgr.h"
 #include "DynamicObject.h"
 #include "ArenaTeam.h"
+#include "GameEventMgr.h"
 
 class AuctionHouseObject;
 class AuraScript;
@@ -1126,6 +1127,18 @@ class ModuleScript : public ScriptObject
         ModuleScript(const char* name);
 };
 
+class GameEventScript : public ScriptObject
+{
+protected:
+    GameEventScript(const char* name);
+
+public:
+    // Runs on start event
+    virtual void OnStart(uint16 EventID) {}
+    // Runs on stop event
+    virtual void OnStop(uint16 EventID) {}
+};
+
 // Placed here due to ScriptRegistry::AddScript dependency.
 #define sScriptMgr ACE_Singleton<ScriptMgr, ACE_Null_Mutex>::instance()
 
@@ -1457,7 +1470,12 @@ class ScriptMgr
 
     public: /* SpellSC */ 
  
-        void OnCalcMaxDuration(Aura const* aura, int32& maxDuration); 
+        void OnCalcMaxDuration(Aura const* aura, int32& maxDuration);
+
+    public: /* GameEventScript */
+
+        void OnGameEventStart(uint16 EventID);
+        void OnGameEventStop(uint16 EventID);
 
     private:
 
