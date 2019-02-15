@@ -15,7 +15,6 @@ EndScriptData */
 #include "GameEventMgr.h"
 #include "Language.h"
 #include "Player.h"
-#include "GameTime.h"
 #include "ScriptMgr.h"
 
 class event_commandscript : public CommandScript
@@ -105,8 +104,8 @@ public:
         std::string endTimeStr = TimeToTimestampStr(eventData.end);
 
         uint32 delay = sGameEventMgr->NextCheck(eventId);
-        time_t nextTime = GameTime::GetGameTime() + delay;
-        std::string nextStr = nextTime >= eventData.start && nextTime < eventData.end ? TimeToTimestampStr(GameTime::GetGameTime() + delay) : "-";
+        time_t nextTime = time(nullptr) + delay;
+        std::string nextStr = nextTime >= eventData.start && nextTime < eventData.end ? TimeToTimestampStr(time(nullptr) + delay) : "-";
 
         std::string occurenceStr = secsToTimeString(eventData.occurence * MINUTE, true);
         std::string lengthStr = secsToTimeString(eventData.length * MINUTE, true);

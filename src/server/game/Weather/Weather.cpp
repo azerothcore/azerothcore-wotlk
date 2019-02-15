@@ -12,7 +12,6 @@
 #include "WorldPacket.h"
 #include "Player.h"
 #include "World.h"
-#include "GameTime.h"
 #include "Log.h"
 #include "ObjectMgr.h"
 #include "Util.h"
@@ -83,7 +82,7 @@ bool Weather::ReGenerate()
 
     //78 days between January 1st and March 20nd; 365/4=91 days by season
     // season source http://aa.usno.navy.mil/data/docs/EarthSeasons.html
-    time_t gtime = GameTime::GetGameTime();
+    time_t gtime = sWorld->GetGameTime();
     struct tm ltime;
     ACE_OS::localtime_r(&gtime, &ltime);
     uint32 season = ((ltime.tm_yday - 78 + 365)/91)%4;

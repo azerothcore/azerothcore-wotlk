@@ -9,7 +9,6 @@
 #include "Player.h"
 #include "GameObject.h"
 #include "ObjectMgr.h"
-#include "GameTime.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
 #include "GameGraveyard.h"
@@ -1060,11 +1059,11 @@ void BattlegroundSA::UpdateDemolisherSpawns()
                     // Demolisher is not in list
                     if (DemoliserRespawnList.find(i) == DemoliserRespawnList.end())
                     {
-                        DemoliserRespawnList[i] = GameTime::GetGameTimeMS()+30000;
+                        DemoliserRespawnList[i] = World::GetGameTimeMS()+30000;
                     }
                     else
                     {
-                        if (DemoliserRespawnList[i] < GameTime::GetGameTimeMS())
+                        if (DemoliserRespawnList[i] < World::GetGameTimeMS())
                         {
                             Demolisher->Relocate(BG_SA_NpcSpawnlocs[i][0], BG_SA_NpcSpawnlocs[i][1],
                                 BG_SA_NpcSpawnlocs[i][2], BG_SA_NpcSpawnlocs[i][3]);
