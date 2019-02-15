@@ -12,7 +12,6 @@
 #include <string>
 
 #include "Common.h"
-#include "GameTime.h"
 
 #include "Opcodes.h"
 #include "WorldPacket.h"
@@ -140,6 +139,7 @@ class Channel
     {
         uint64 player;
         uint8 flags;
+        uint32 lastSpeakTime; // pussywizard
         Player* plrPtr; // pussywizard
 
         bool HasFlag(uint8 flag) const { return flags & flag; }
@@ -161,6 +161,16 @@ class Channel
         {
             if (state) flags |= MEMBER_FLAG_MUTED;
             else flags &= ~MEMBER_FLAG_MUTED;
+        }
+        bool IsAllowedToSpeak(uint32 speakDelay) // pussywizard
+        {
+            if (lastSpeakTime+speakDelay <= sWorld->GetGameTime())
+            {
+                lastSpeakTime = sWorld->GetGameTime();
+                return true;
+            }
+            else
+                return false;
         }
     };
 
@@ -209,7 +219,6 @@ class Channel
         // pussywizard:
         void AddWatching(Player* p);
         void RemoveWatching(Player* p);
-        bool IsAllowedToSpeak(uint32 speakDelay); // pussywizard
 
     private:
         // initial packet data (notify type and channel name)
@@ -311,7 +320,6 @@ class Channel
         uint32 _channelDBId;
         TeamId _teamId;
         uint64 _ownerGUID;
-        uint32 lastSpeakTime;
         std::string _name;
         std::string _password;
         ChannelRights _channelRights;

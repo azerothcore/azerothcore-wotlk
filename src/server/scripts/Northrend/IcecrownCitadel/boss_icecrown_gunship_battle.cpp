@@ -11,7 +11,6 @@
 #include "TransportMgr.h"
 #include "Vehicle.h"
 #include "icecrown_citadel.h"
-#include "GameTime.h"
 
 enum Texts
 {
@@ -407,7 +406,7 @@ public:
             return false;
 
         bool summoned = false;
-        time_t now = GameTime::GetGameTime();
+        time_t now = time(NULL);
         for (int32 i = first; i <= last; ++i)
         {
             if (_respawnCooldowns[i] > now)
@@ -443,7 +442,7 @@ public:
     void ClearSlot(PassengerSlots slot)
     {
         _controlledSlots[slot] = 0;
-        _respawnCooldowns[slot] = GameTime::GetGameTime() + _slotInfo[slot].Cooldown;
+        _respawnCooldowns[slot] = time(NULL) + _slotInfo[slot].Cooldown;
     }
 
 private:
@@ -732,7 +731,7 @@ class npc_high_overlord_saurfang_igb : public CreatureScript
                 _controller.ResetSlots(TEAM_HORDE, creature->GetTransport()->ToMotionTransport());
                 me->SetRegeneratingHealth(false);
                 me->m_CombatDistance = 70.0f;
-                _firstMageCooldown = GameTime::GetGameTime() + 45;
+                _firstMageCooldown = time(NULL) + 45;
                 _axethrowersYellCooldown = time_t(0);
                 _rocketeersYellCooldown = time_t(0);
                 checkTimer = 1000;
@@ -797,7 +796,7 @@ class npc_high_overlord_saurfang_igb : public CreatureScript
                 }
                 else if (action == ACTION_SPAWN_MAGE)
                 {
-                    time_t now = GameTime::GetGameTime();
+                    time_t now = time(NULL);
                     if (_firstMageCooldown > now)
                         _events.ScheduleEvent(EVENT_SUMMON_MAGE, (_firstMageCooldown - now) * IN_MILLISECONDS);
                     else
@@ -972,10 +971,10 @@ class npc_high_overlord_saurfang_igb : public CreatureScript
                     case EVENT_CHECK_RIFLEMAN:
                         if (_controller.SummonCreatures(me, SLOT_RIFLEMAN_1, Is25ManRaid() ? SLOT_RIFLEMAN_8 : SLOT_RIFLEMAN_4))
                         {
-                            if (_axethrowersYellCooldown < GameTime::GetGameTime())
+                            if (_axethrowersYellCooldown < time(NULL))
                             {
                                 Talk(SAY_SAURFANG_AXETHROWERS);
-                                _axethrowersYellCooldown = GameTime::GetGameTime() + 5;
+                                _axethrowersYellCooldown = time(NULL) + 5;
                             }
                         }
                         _events.ScheduleEvent(EVENT_CHECK_RIFLEMAN, 1500);
@@ -983,10 +982,10 @@ class npc_high_overlord_saurfang_igb : public CreatureScript
                     case EVENT_CHECK_MORTAR:
                         if (_controller.SummonCreatures(me, SLOT_MORTAR_1, Is25ManRaid() ? SLOT_MORTAR_4 : SLOT_MORTAR_2))
                         {
-                            if (_rocketeersYellCooldown < GameTime::GetGameTime())
+                            if (_rocketeersYellCooldown < time(NULL))
                             {
                                 Talk(SAY_SAURFANG_ROCKETEERS);
-                                _rocketeersYellCooldown = GameTime::GetGameTime() + 5;
+                                _rocketeersYellCooldown = time(NULL) + 5;
                             }
                         }
                         _events.ScheduleEvent(EVENT_CHECK_MORTAR, 1500);
@@ -1067,7 +1066,7 @@ class npc_muradin_bronzebeard_igb : public CreatureScript
                 _controller.ResetSlots(TEAM_ALLIANCE, creature->GetTransport()->ToMotionTransport());
                 me->SetRegeneratingHealth(false);
                 me->m_CombatDistance = 70.0f;
-                _firstMageCooldown = GameTime::GetGameTime() + 45;
+                _firstMageCooldown = time(NULL) + 45;
                 _riflemanYellCooldown = time_t(0);
                 _mortarYellCooldown = time_t(0);
                 checkTimer = 1000;
@@ -1133,7 +1132,7 @@ class npc_muradin_bronzebeard_igb : public CreatureScript
                 }
                 else if (action == ACTION_SPAWN_MAGE)
                 {
-                    time_t now = GameTime::GetGameTime();
+                    time_t now = time(NULL);
                     if (_firstMageCooldown > now)
                         _events.ScheduleEvent(EVENT_SUMMON_MAGE, (_firstMageCooldown - now) * IN_MILLISECONDS);
                     else
@@ -1311,10 +1310,10 @@ class npc_muradin_bronzebeard_igb : public CreatureScript
                     case EVENT_CHECK_RIFLEMAN:
                         if (_controller.SummonCreatures(me, SLOT_RIFLEMAN_1, Is25ManRaid() ? SLOT_RIFLEMAN_8 : SLOT_RIFLEMAN_4))
                         {
-                            if (_riflemanYellCooldown < GameTime::GetGameTime())
+                            if (_riflemanYellCooldown < time(NULL))
                             {
                                 Talk(SAY_MURADIN_RIFLEMAN);
-                                _riflemanYellCooldown = GameTime::GetGameTime() + 5;
+                                _riflemanYellCooldown = time(NULL) + 5;
                             }
                         }
                         _events.ScheduleEvent(EVENT_CHECK_RIFLEMAN, 1500);
@@ -1322,10 +1321,10 @@ class npc_muradin_bronzebeard_igb : public CreatureScript
                     case EVENT_CHECK_MORTAR:
                         if (_controller.SummonCreatures(me, SLOT_MORTAR_1, Is25ManRaid() ? SLOT_MORTAR_4 : SLOT_MORTAR_2))
                         {
-                            if (_mortarYellCooldown < GameTime::GetGameTime())
+                            if (_mortarYellCooldown < time(NULL))
                             {
                                 Talk(SAY_MURADIN_MORTAR);
-                                _mortarYellCooldown = GameTime::GetGameTime() + 5;
+                                _mortarYellCooldown = time(NULL) + 5;
                             }
                         }
                         _events.ScheduleEvent(EVENT_CHECK_MORTAR, 1500);

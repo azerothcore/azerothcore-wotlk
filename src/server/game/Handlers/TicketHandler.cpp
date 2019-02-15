@@ -9,7 +9,6 @@
 #include "Language.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
-#include "GameTime.h"
 #include "Player.h"
 #include "TicketMgr.h"
 #include "Util.h"
@@ -238,7 +237,7 @@ void WorldSession::HandleReportLag(WorldPacket& recv_data)
     stmt->setFloat (4, y);
     stmt->setFloat (5, z);
     stmt->setUInt32(6, GetLatency());
-    stmt->setUInt32(7, GameTime::GetGameTime());
+    stmt->setUInt32(7, time(NULL));
     CharacterDatabase.Execute(stmt);
 }
 
