@@ -31,7 +31,7 @@
 
 WMORoot::WMORoot(std::string const& filename)
     : filename(filename), color(0), nTextures(0), nGroups(0), nPortals(0), nLights(0),
-    nDoodadNames(0), nDoodadDefs(0), nDoodadSets(0), RootWMOID(0), liquidType(0)
+    nDoodadNames(0), nDoodadDefs(0), nDoodadSets(0), RootWMOID(0), flags(0)
 {
     memset(bbcorn1, 0, sizeof(bbcorn1));
     memset(bbcorn2, 0, sizeof(bbcorn2));
@@ -72,7 +72,7 @@ bool WMORoot::open()
             f.read(&RootWMOID, 4);
             f.read(bbcorn1, 12);
             f.read(bbcorn2, 12);
-            f.read(&liquidType, 4);
+            f.read(&flags, 4);
         }
         else if (!strcmp(fourcc, "MODS"))
         {
@@ -431,7 +431,7 @@ int WMOGroup::ConvertToVMAPGroupWmo(FILE* output, WMORoot* rootWMO, bool precise
 
         // according to WoW.Dev Wiki:
         uint32 liquidEntry;
-        if (rootWMO->liquidType & 4)
+        if (rootWMO->flags & 4)
             liquidEntry = liquidType;
         else if (liquidType == 15)
             liquidEntry = 0;

@@ -84,7 +84,7 @@ private:
     std::string filename;
 public:
     unsigned int color;
-    uint32 nTextures, nGroups, nPortals, nLights, nDoodadNames, nDoodadDefs, nDoodadSets, RootWMOID, liquidType;
+    uint32 nTextures, nGroups, nPortals, nLights, nDoodadNames, nDoodadDefs, nDoodadSets, RootWMOID, flags;
     float bbcorn1[3];
     float bbcorn2[3];
 
