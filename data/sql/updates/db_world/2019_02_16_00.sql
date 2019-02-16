@@ -1,3 +1,19 @@
+-- DB update 2019_02_15_00 -> 2019_02_16_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2019_02_15_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2019_02_15_00 2019_02_16_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1549809565412286900'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO version_db_world (`sql_rev`) VALUES ('1549809565412286900');
 
 -- Ironband's excavation and gathering idols quest fix
@@ -25,3 +41,12 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`,`SourceGroup`,`SourceEntry`,
 (17, 0, 15698, 0, 0, 36, 1, 0,    0, 0, 1, 0, 0, '', "'Filling Empty Jar' - Target must be dead"),
 (17, 0, 15699, 0, 0, 31, 1, 3, 7092, 0, 0, 0, 0, '', "'Filling Empty Jar' must target Tainted Ooze"),
 (17, 0, 15699, 0, 0, 36, 1, 0,    0, 0, 1, 0, 0, '', "'Filling Empty Jar' - Target must be dead");
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
