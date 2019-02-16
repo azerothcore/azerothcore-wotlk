@@ -11,3 +11,4 @@ UPDATE `creature_template` SET `dynamicflags`=32 WHERE  `entry`=21727;
 
 -- Duplicate creature Commander Jordan
 DELETE FROM `creature` WHERE `guid`=105029;
+DELETE FROM `creature_addon` WHERE `guid`=105029;
