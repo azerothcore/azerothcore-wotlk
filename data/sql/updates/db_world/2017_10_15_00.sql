@@ -20,10 +20,6 @@ SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '150404422256069670
 --
 INSERT INTO version_db_world (`sql_rev`) VALUES ('1504044222560696700');
 
--- fix NO_ZERO_DATE error on mysql 5.7 (for latest linux platforms)
--- please use 5.6 on windows
-SET SESSION sql_mode = "ONLY_FULL_GROUP_BY,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION,STRICT_TRANS_TABLES";
-
 DROP TABLE IF EXISTS holiday_dates;
 CREATE TABLE holiday_dates (
   id INT UNSIGNED NOT NULL,
