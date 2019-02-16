@@ -1134,7 +1134,7 @@ protected:
 
 public:
     // Runs on start event
-    virtual void OnStart(uint16 EventID) {}
+    virtual void OnStart(uint16 /*EventID*/) {}
     // Runs on stop event
     virtual void OnStop(uint16 EventID) {}
 };
