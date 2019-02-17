@@ -1464,6 +1464,21 @@ void ScriptMgr::OnPlayerReputationChange(Player* player, uint32 factionID, int32
     FOREACH_SCRIPT(PlayerScript)->OnReputationChange(player, factionID, standing, incremental);
 }
 
+void ScriptMgr::OnPlayerReputationRankChange(Player* player, uint32 factionID, ReputationRank newRank, ReputationRank oldRank, bool increased)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnReputationRankChange(player, factionID, newRank, oldRank, increased);
+}
+
+void ScriptMgr::OnPlayerLearnSpell(Player* player, uint32 spellID)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnLearnSpell(player, spellID);
+}
+
+void ScriptMgr::OnPlayerForgotSpell(Player* player, uint32 spellID)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnForgotSpell(player, spellID);
+}
+
 void ScriptMgr::OnPlayerDuelRequest(Player* target, Player* challenger)
 {
 #ifdef ELUNA

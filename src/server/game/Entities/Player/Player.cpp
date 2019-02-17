@@ -4029,10 +4029,13 @@ void Player::learnSpell(uint32 spellId)
     uint32 firstRankSpellId = sSpellMgr->GetFirstSpellInChain(spellId);
     bool thisSpec = GetTalentSpellCost(firstRankSpellId) > 0 || sSpellMgr->IsAdditionalTalentSpell(firstRankSpellId);
     bool added = addSpell(spellId, thisSpec ? GetActiveSpecMask() : SPEC_MASK_ALL, true);
-    if (added && IsInWorld())
+    if (added)
     {
+        sScriptMgr->OnPlayerLearnSpell(this, spellId);
+
         // pussywizard: a system message "you have learnt spell X (rank Y)"
-        SendLearnPacket(spellId, true);
+        if (IsInWorld())
+            SendLearnPacket(spellId, true);
     }
 
     // pussywizard: rank stuff at the end!
@@ -4196,7 +4199,10 @@ void Player::removeSpell(uint32 spellId, uint8 removeSpecMask, bool onlyTemporar
 
     // pussywizard: remove from spell book (can't be replaced by previous rank, because such spells can't be unlearnt)
     if (!onlyTemporary || ((!spellInfo->HasAttribute(SpellAttr0(SPELL_ATTR0_PASSIVE | SPELL_ATTR0_HIDDEN_CLIENTSIDE)) || !spellInfo->HasAnyAura()) && !spellInfo->HasEffect(SPELL_EFFECT_LEARN_SPELL)))
+    {
+        sScriptMgr->OnPlayerForgotSpell(this, spellId);
         SendLearnPacket(spellId, false);
+    }
 }
 
 bool Player::Has310Flyer(bool checkAllSpells, uint32 excludeSpellId)

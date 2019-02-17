@@ -814,6 +814,15 @@ class PlayerScript : public ScriptObject
         // Called when a player's reputation changes (before it is actually changed)
         virtual void OnReputationChange(Player* /*player*/, uint32 /*factionId*/, int32& /*standing*/, bool /*incremental*/) { }
 
+        // Called when a player's reputation rank changes (before it is actually changed)
+        virtual void OnReputationRankChange(Player* /*player*/, uint32 /*factionID*/, ReputationRank /*newRank*/, ReputationRank /*olRank*/, bool /*increased*/) { }
+
+        // Called when a player learned new spell
+        virtual void OnLearnSpell(Player* /*player*/, uint32 /*spellID*/) {}
+
+        // Called when a player forgot spell
+        virtual void OnForgotSpell(Player* /*player*/, uint32 /*spellID*/) {}
+
         // Called when a duel is requested
         virtual void OnDuelRequest(Player* /*target*/, Player* /*challenger*/) { }
 
@@ -1319,6 +1328,9 @@ class ScriptMgr
         void OnPlayerMoneyChanged(Player* player, int32& amount);
         void OnGivePlayerXP(Player* player, uint32& amount, Unit* victim);
         void OnPlayerReputationChange(Player* player, uint32 factionID, int32& standing, bool incremental);
+        void OnPlayerReputationRankChange(Player* player, uint32 factionID, ReputationRank newRank, ReputationRank oldRank, bool increased);
+        void OnPlayerLearnSpell(Player* player, uint32 spellID);
+        void OnPlayerForgotSpell(Player* player, uint32 spellID);
         void OnPlayerDuelRequest(Player* target, Player* challenger);
         void OnPlayerDuelStart(Player* player1, Player* player2);
         void OnPlayerDuelEnd(Player* winner, Player* loser, DuelCompleteType type);
