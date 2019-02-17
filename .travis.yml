@@ -75,22 +75,15 @@ install:
   - echo "DB_CHARACTERS_NAME=characters_$RND_NAME" >> conf/config.sh
   - echo "DB_WORLD_NAME=world_$RND_NAME" >> conf/config.sh
 
-before_script:
+script:
   # compile
   - export CCACHE_CPP2=true
   - ccache -s
   - timeout 2580 bash ./acore.sh "compiler" "all"
   - ccache -s
-
-jobs:
-  include:
-    - stage: db_test
-      env:
-        - TRAVIS_BUILD_ID="1"
-      script:
-        # create and import mysql
-        - bash ./acore.sh "db-assembler" "import-all"
-        - git clone --depth=1 --branch=master --single-branch https://github.com/ac-data/ac-data.git /home/travis/build/azerothcore/azerothcore-wotlk/env/dist/data
-        - cp ./data/travis/worldserver.conf ./env/dist/etc/worldserver.conf
-        - ./env/dist/bin/worldserver --dry-run
-        - ./apps/ci-error-check.sh
+  # create and import mysql
+  - if [ "$TRAVIS_BUILD_ID" = "1" ]; then bash ./acore.sh "db-assembler" "import-all"; fi
+  - if [ "$TRAVIS_BUILD_ID" = "1" ]; then git clone --depth=1 --branch=master --single-branch https://github.com/ac-data/ac-data.git /home/travis/build/azerothcore/azerothcore-wotlk/env/dist/data; fi
+  - if [ "$TRAVIS_BUILD_ID" = "1" ]; then cp ./data/travis/worldserver.conf ./env/dist/etc/worldserver.conf; fi
+  - if [ "$TRAVIS_BUILD_ID" = "1" ]; then ./env/dist/bin/worldserver --dry-run; fi
+  - if [ "$TRAVIS_BUILD_ID" = "1" ]; then ./apps/ci-error-check.sh; fi
