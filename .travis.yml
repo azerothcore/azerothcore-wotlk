@@ -75,7 +75,7 @@ install:
   - echo "DB_CHARACTERS_NAME=characters_$RND_NAME" >> conf/config.sh
   - echo "DB_WORLD_NAME=world_$RND_NAME" >> conf/config.sh
 
-script:
+before_script:
   # compile
   - export CCACHE_CPP2=true
   - ccache -s
