@@ -196,9 +196,7 @@ class UnitAI
         template <class PREDICATE> Unit* SelectTarget(SelectAggroTarget targetType, uint32 position, PREDICATE const& predicate)
         {
             ThreatContainer::StorageType const& threatlist = me->getThreatManager().getThreatList();
-            if (targetType != SELECT_TARGET_FARTHEST_RANDOM && position >= threatlist.size())
-                return NULL;
-            else if (targetType == SELECT_TARGET_FARTHEST_RANDOM && position > threatlist.size())
+            if (position >= threatlist.size())
                 return NULL;
 
             std::list<Unit*> targetList;
@@ -206,9 +204,7 @@ class UnitAI
                 if (predicate((*itr)->getTarget()))
                     targetList.push_back((*itr)->getTarget());
 
-            if (targetType != SELECT_TARGET_FARTHEST_RANDOM && position >= threatlist.size())
-                return NULL;
-            else if (targetType == SELECT_TARGET_FARTHEST_RANDOM && position > threatlist.size())
+            if (position >= threatlist.size())
                 return NULL;
 
             if (targetType == SELECT_TARGET_NEAREST || targetType == SELECT_TARGET_FARTHEST || targetType == SELECT_TARGET_FARTHEST_RANDOM)
