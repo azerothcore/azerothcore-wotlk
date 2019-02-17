@@ -16,7 +16,6 @@
 #include "Vehicle.h"
 #include "MapReference.h"
 #include "Player.h"
-#include "GameTime.h"
 #include "Cell.h"
 #include "CellImpl.h"
 #include "WorldModel.h"
@@ -282,7 +281,7 @@ void MotionTransport::RemovePassenger(WorldObject* passenger, bool withAll)
         if (Player* plr = passenger->ToPlayer())
         {
             sScriptMgr->OnRemovePassenger(ToTransport(), plr);
-            plr->SetFallInformation(GameTime::GetGameTime(), plr->GetPositionZ());
+            plr->SetFallInformation(time(NULL), plr->GetPositionZ());
         }
 
         if (withAll)
@@ -956,7 +955,7 @@ void StaticTransport::RemovePassenger(WorldObject* passenger, bool withAll)
         if (Player* plr = passenger->ToPlayer())
         {
             sScriptMgr->OnRemovePassenger(ToTransport(), plr);
-            plr->SetFallInformation(GameTime::GetGameTime(), plr->GetPositionZ());
+            plr->SetFallInformation(time(NULL), plr->GetPositionZ());
         }
 
         if (withAll)

@@ -36,7 +36,6 @@ EndContentData */
 #include "GameObjectAI.h"
 #include "Spell.h"
 #include "Player.h"
-#include "GameTime.h"
 #include "WorldSession.h"
 
 // Ours
@@ -837,7 +836,7 @@ class go_inconspicuous_landmark : public GameObjectScript
     public:
         go_inconspicuous_landmark() : GameObjectScript("go_inconspicuous_landmark")
         {
-            _lastUsedTime = GameTime::GetGameTime();
+            _lastUsedTime = time(NULL);
         }
 
         bool OnGossipHello(Player* player, GameObject* /*go*/)
@@ -845,10 +844,10 @@ class go_inconspicuous_landmark : public GameObjectScript
             if (player->HasItemCount(ITEM_CUERGOS_KEY))
                 return true;
 
-            if (_lastUsedTime > GameTime::GetGameTime())
+            if (_lastUsedTime > time(NULL))
                 return true;
 
-            _lastUsedTime = GameTime::GetGameTime() + MINUTE;
+            _lastUsedTime = time(NULL) + MINUTE;
             player->CastSpell(player, SPELL_SUMMON_PIRATES_TREASURE_AND_TRIGGER_MOB, true);
             return true;
         }
