@@ -211,7 +211,7 @@ class boss_lord_marrowgar : public CreatureScript
                             Unit* unit = SelectTarget(SELECT_TARGET_FARTHEST_RANDOM, RAID_MODE<uint32>(2, 4, 2, 4), BoneStormMoveTargetSelector(me));
                             if (!unit)
                             {
-                                if ((unit = SelectTarget(SELECT_TARGET_FARTHEST_RANDOM, RAID_MODE<uint32>(4, 8, 4, 8), 175.0f, true)))
+                                if ((unit = SelectTarget(SELECT_TARGET_FARTHEST_RANDOM, RAID_MODE<uint32>(1, 2, 1, 2), 175.0f, true)))
                                     if (unit->GetPositionX() > -337.0f)
                                     {
                                         EnterEvadeMode();
