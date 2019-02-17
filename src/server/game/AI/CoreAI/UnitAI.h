@@ -239,7 +239,7 @@ class UnitAI
                 case SELECT_TARGET_FARTHEST_RANDOM:
                 {
                     std::list<Unit*>::reverse_iterator ritr = targetList.rbegin();
-                    std::advance(ritr, urand(0, std::max(0, position - 1)));
+                    std::advance(ritr, position == 0 ? position : urand(0, position - 1));
                     return *ritr;
                 }
                 default:
