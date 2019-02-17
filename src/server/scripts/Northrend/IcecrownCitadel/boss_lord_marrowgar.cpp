@@ -208,10 +208,10 @@ class boss_lord_marrowgar : public CreatureScript
                                 break;
                             }
                             events.RepeatEvent(5000);
-                            Unit* unit = SelectTarget(SELECT_TARGET_RANDOM, 0, BoneStormMoveTargetSelector(me));
+                            Unit* unit = SelectTarget(SELECT_TARGET_FARTHEST_RANDOM, RAID_MODE<uint32>(2, 4, 2, 4), BoneStormMoveTargetSelector(me));
                             if (!unit)
                             {
-                                if ((unit = SelectTarget(SELECT_TARGET_TOPAGGRO, 0, 175.0f, true)))
+                                if ((unit = SelectTarget(SELECT_TARGET_FARTHEST_RANDOM, RAID_MODE<uint32>(4, 8, 4, 8), 175.0f, true)))
                                     if (unit->GetPositionX() > -337.0f)
                                     {
                                         EnterEvadeMode();
