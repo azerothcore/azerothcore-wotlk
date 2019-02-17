@@ -196,7 +196,9 @@ class UnitAI
         template <class PREDICATE> Unit* SelectTarget(SelectAggroTarget targetType, uint32 position, PREDICATE const& predicate)
         {
             ThreatContainer::StorageType const& threatlist = me->getThreatManager().getThreatList();
-            if (position >= threatlist.size())
+            if (targetType != SELECT_TARGET_FARTHEST_RANDOM && position >= threatlist.size())
+                return NULL;
+            else if (targetType == SELECT_TARGET_FARTHEST_RANDOM && position > threatlist.size())
                 return NULL;
 
             std::list<Unit*> targetList;
@@ -204,10 +206,12 @@ class UnitAI
                 if (predicate((*itr)->getTarget()))
                     targetList.push_back((*itr)->getTarget());
 
-            if (position >= targetList.size())
+            if (targetType != SELECT_TARGET_FARTHEST_RANDOM && position >= threatlist.size())
+                return NULL;
+            else if (targetType == SELECT_TARGET_FARTHEST_RANDOM && position > threatlist.size())
                 return NULL;
 
-            if (targetType == SELECT_TARGET_NEAREST || targetType == SELECT_TARGET_FARTHEST)
+            if (targetType == SELECT_TARGET_NEAREST || targetType == SELECT_TARGET_FARTHEST || targetType == SELECT_TARGET_FARTHEST_RANDOM)
                 targetList.sort(Trinity::ObjectDistanceOrderPred(me));
 
             switch (targetType)
@@ -235,7 +239,7 @@ class UnitAI
                 case SELECT_TARGET_FARTHEST_RANDOM:
                 {
                     std::list<Unit*>::reverse_iterator ritr = targetList.rbegin();
-                    std::advance(ritr, urand(0, std::max(position - 1, targetList.size() - 1));
+                    std::advance(ritr, urand(0, std::max(0, position - 1)));
                     return *ritr;
                 }
                 default:
