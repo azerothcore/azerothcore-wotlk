@@ -204,7 +204,7 @@ class UnitAI
                 if (predicate((*itr)->getTarget()))
                     targetList.push_back((*itr)->getTarget());
 
-            if (position >= threatlist.size())
+            if (position >= targetList.size())
                 return NULL;
 
             if (targetType == SELECT_TARGET_NEAREST || targetType == SELECT_TARGET_FARTHEST || targetType == SELECT_TARGET_FARTHEST_RANDOM)
