@@ -1,0 +1,90 @@
+ALTER TABLE world_db_version CHANGE COLUMN 2016_07_10_00 2016_07_10_01 bit;
+
+/* Spawn missing Midsummer bonfire */
+SET @STARTGUID := 268968;
+DELETE FROM `gameobject` WHERE guid = @STARTGUID+0;
+DELETE FROM `gameobject` WHERE guid = @STARTGUID+1;
+/* Ironforge */
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `VerifiedBuild`) VALUES (@STARTGUID+0, 181371, 0, 1, 1, -4699.790039, -1222.770020, 501.658997, -1.378810, 0, 0, 0, 0, 300, 0, 1, 0);
+/* Shattrath */
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `VerifiedBuild`) VALUES (@STARTGUID+1, 181371, 530, 1, 1, -1747.849976, 5326.290039, -12.428100, -3.019420, 0, 0, 0, 0, 300, 0, 1, 0);
+
+/* Add missing Midsummer creature */
+SET @STARTGUID := 248565;
+
+DELETE FROM `creature` WHERE `guid` BETWEEN @STARTGUID+00 AND @STARTGUID+29;
+DELETE FROM `game_event_creature` WHERE `guid` BETWEEN @STARTGUID+00 AND @STARTGUID+29;
+
+INSERT INTO `creature` (`guid`, `id`, `map`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `spawndist`, `MovementType`) VALUES
+(@STARTGUID+0, 32801, 571, 1, 1, 4131.279, 5394.604, 26.09047, 3.595378, 120, 0, 0), -- 32801
+(@STARTGUID+1, 32809, 571, 1, 1, 4454.667, 5623.537, 56.91562, 4.13643, 120, 0, 0), -- 32809
+(@STARTGUID+2, 32810, 571, 1, 1, 5499.812, 4878.976, -197.8652, 3.176499, 120, 0, 0), -- 32810
+(@STARTGUID+3, 32802, 571, 1, 1, 5360.002, 4834.393, -196.3981, 5.550147, 120, 0, 0), -- 32802
+(@STARTGUID+4, 32811, 571, 1, 1, 3762.387, 1481.287, 92.8882, 3.438299, 120, 0, 0), -- 32811
+(@STARTGUID+5, 32803, 571, 1, 1, 3936.924, -595.4437, 241.1534, 5.951573, 120, 0, 0), -- 32803
+(@STARTGUID+6, 32812, 571, 1, 1, 2586.682, -4337.068, 276.0698, 4.13643, 120, 0, 0), -- 32812
+(@STARTGUID+7, 32804, 571, 1, 1, 2466.965, -4892.675, 262.5474, 2.303835, 120, 0, 0), -- 32804
+(@STARTGUID+8, 32813, 571, 1, 1, 3376.009, -2124.778, 124.664, 0.1396263, 120, 0, 0), -- 32813
+(@STARTGUID+9, 32805, 571, 1, 1, 3400.944, -2890.375, 201.4968, 2.303835, 120, 0, 0), -- 32805
+(@STARTGUID+10, 32814, 571, 1, 1, 6150.945, -1023.05, 408.3642, 1.43117, 120, 0, 0), -- 32814
+(@STARTGUID+11, 32806, 571, 1, 1, 6087.442, -1105.523, 418.2672, 1.099557, 120, 0, 0), -- 32806
+(@STARTGUID+12, 32815, 571, 1, 1, 5536.516, -733.7185, 149.6217, 3.124139, 120, 0, 0), -- 32815
+(@STARTGUID+13, 32807, 571, 1, 1, 5141.776, -685.0027, 170.2738, 5.951573, 120, 0, 0), -- 32807
+(@STARTGUID+14, 32816, 571, 1, 1, 5280.307, -2766.146, 292.5019, 2.303835, 120, 0, 0), -- 32816
+(@STARTGUID+15, 32808, 571, 1, 1, 5627.932, -2616.493, 292.5019, 1.518436, 120, 0, 0), -- 32808
+(@STARTGUID+16, 25892, 0, 1, 1, -8258.798, -2618.704, 133.3752, 1.343904, 120, 0, 0), -- 25892
+(@STARTGUID+17, 25899, 1, 1, 1, -4391.495, 2187.865, 12.22644, 5.864306, 120, 0, 0), -- 25899
+(@STARTGUID+18, 25936, 1, 1, 1, -2321.744, -619.7491, -9.089149, 5.67232, 120, 0, 0), -- 25936
+(@STARTGUID+19, 25888, 530, 1, 1, -4219.219, -12310.55, 2.439188, 5.934119, 120, 0, 0), -- 25888
+(@STARTGUID+20, 25891, 530, 1, 1, -2234.83, -11895.94, 26.62421, 4.694936, 120, 0, 0), -- 25891
+(@STARTGUID+21, 25907, 530, 1, 1, -2998.854, 4164.042, 5.169014, 0.5934119, 120, 0, 0), -- 25907
+(@STARTGUID+22, 25938, 530, 1, 1, -3067.278, 2387.903, 62.19349, 3.368485, 120, 0, 0), -- 25938
+(@STARTGUID+23, 25905, 530, 1, 1, -3951.305, 2045.65, 95.14804, 4.520403, 120, 0, 0), -- 25905
+(@STARTGUID+24, 25912, 530, 1, 1, 193.7309, 6016.713, 22.73373, 6.161012, 120, 0, 0), -- 25912
+(@STARTGUID+25, 25903, 530, 1, 1, -2517.064, 7555.085, -1.793157, 5.375614, 120, 0, 0), -- 25903
+(@STARTGUID+26, 25889, 530, 1, 1, 2024.906, 6590.532, 135.3214, 5.934119, 120, 0, 0), -- 25889
+(@STARTGUID+27, 25926, 530, 1, 1, 2286.707, 6137.618, 136.3056, 1.570796, 120, 0, 0), -- 25926
+(@STARTGUID+28, 25913, 530, 1, 1, 3127.551, 3743.148, 141.7706, 6.161012, 120, 0, 0), -- 25913
+(@STARTGUID+29, 25918, 530, 1, 1, 2917.222, 3693.411, 143.7703, 2.932153, 120, 0, 0); -- 25918
+
+INSERT INTO `game_event_creature` (`eventEntry`, `guid`) VALUES
+(1, @STARTGUID+00),
+(1, @STARTGUID+01),
+(1, @STARTGUID+02),
+(1, @STARTGUID+03),
+(1, @STARTGUID+04),
+(1, @STARTGUID+05),
+(1, @STARTGUID+06),
+(1, @STARTGUID+07),
+(1, @STARTGUID+08),
+(1, @STARTGUID+09),
+(1, @STARTGUID+10),
+(1, @STARTGUID+11),
+(1, @STARTGUID+12),
+(1, @STARTGUID+13),
+(1, @STARTGUID+14),
+(1, @STARTGUID+15),
+(1, @STARTGUID+16),
+(1, @STARTGUID+17),
+(1, @STARTGUID+18),
+(1, @STARTGUID+19),
+(1, @STARTGUID+20),
+(1, @STARTGUID+21),
+(1, @STARTGUID+22),
+(1, @STARTGUID+23),
+(1, @STARTGUID+24),
+(1, @STARTGUID+25),
+(1, @STARTGUID+26),
+(1, @STARTGUID+27),
+(1, @STARTGUID+28),
+(1, @STARTGUID+29);
+
+/* Delete some double spawn creature of midsummer fire festival */
+DELETE FROM `creature` WHERE `guid`=86358 AND `id`=25915;
+DELETE FROM `creature` WHERE `guid`=86387 AND `id`=25920;
+DELETE FROM `creature` WHERE `guid`=86241 AND `id`=25887;
+DELETE FROM `creature` WHERE `guid`=86327 AND `id`=25914;
+DELETE FROM `creature` WHERE `guid`=86376 AND `id`=25916;
+DELETE FROM `creature` WHERE `guid`=86426 AND `id`=25921;
+DELETE FROM `creature` WHERE `guid`=86165 AND `id`=26123;
+DELETE FROM `creature` WHERE `guid`=202863 AND `id`=25975;

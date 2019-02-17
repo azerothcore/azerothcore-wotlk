@@ -11,7 +11,7 @@ CREATE TABLE `version_db_characters`
 (
   `sql_rev` varchar(100) NOT NULL,
   `required_rev` varchar(100) DEFAULT NULL,
-  `2016_08_25_00` bit(1) DEFAULT NULL,
+  `2019_01_06_00` bit(1) DEFAULT NULL,
   PRIMARY KEY (`sql_rev`),
   KEY `required` (`required_rev`),
   CONSTRAINT `required` FOREIGN KEY (`required_rev`) REFERENCES `version_db_characters` (`sql_rev`)
@@ -20,6 +20,13 @@ CREATE TABLE `version_db_characters`
 
 LOCK TABLES `version_db_characters` WRITE;
 /*!40000 ALTER TABLE `version_db_characters` DISABLE KEYS */;
+INSERT INTO `version_db_characters` VALUES 
+('1478978518254125000',NULL,NULL),
+('1505652328111029300',NULL,NULL),
+('1515873371010860000',NULL,NULL),
+('1533752199192020422',NULL,NULL),
+('1545178470896804464',NULL,NULL),
+('1546637940772193620',NULL,NULL);
 /*!40000 ALTER TABLE `version_db_characters` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
