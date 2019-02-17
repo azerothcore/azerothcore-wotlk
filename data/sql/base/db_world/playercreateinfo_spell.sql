@@ -61,6 +61,7 @@ INSERT INTO `playercreateinfo_spell` VALUES
 (0,32,10846,'First Aid'),
 (0,32,18629,'Runecloth Bandage'),
 (0,32,18630,'Heavy Runecloth Bandage'),
+(0,32,33388,'Apprentice Riding'),
 (0,32,33391,'Journeyman Riding'),
 (0,32,45462,'Plague Strike'),
 (0,32,45477,'Icy Touch'),
