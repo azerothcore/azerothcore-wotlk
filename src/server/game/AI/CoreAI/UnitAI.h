@@ -25,6 +25,7 @@ enum SelectAggroTarget
     SELECT_TARGET_BOTTOMAGGRO,                              //Selects targets from bottom aggro to top
     SELECT_TARGET_NEAREST,
     SELECT_TARGET_FARTHEST,
+    SELECT_TARGET_FARTHEST_RANDOM,
 };
 
 // default predicate function to select target based on distance, player and/or aura criteria
@@ -230,6 +231,12 @@ class UnitAI
                     std::list<Unit*>::iterator itr = targetList.begin();
                     std::advance(itr, urand(position, targetList.size() - 1));
                     return *itr;
+                }
+                case SELECT_TARGET_FARTHEST_RANDOM:
+                {
+                    std::list<Unit*>::reverse_iterator ritr = targetList.rbegin();
+                    std::advance(ritr, urand(0, std::max(position - 1, targetList.size() - 1));
+                    return *ritr;
                 }
                 default:
                     break;
