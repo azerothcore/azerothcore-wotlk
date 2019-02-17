@@ -24,6 +24,7 @@ matrix:
           packages:
             - clang-3.8
       env:
+        - TRAVIS_BUILD_ID="1"
         - CCOMPILERC="clang-3.8"
         - CCOMPILERCXX="clang++-3.8"
 
@@ -35,21 +36,22 @@ matrix:
           packages:
             - clang-7
       env:
+        - TRAVIS_BUILD_ID="2"
         - CCOMPILERC="clang-7"
         - CCOMPILERCXX="clang++-7"
 
 before_install:
   - git config user.email "azerothcorebot@gmail.com" && git config user.name "AzerothCoreBot"
-  - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then cd bin/; fi
+  - if [ "$TRAVIS_BUILD_ID" = "1" ] && [ "$TRAVIS_PULL_REQUEST" = "false" ]; then cd bin/; fi
   # import pending sql
-  - if [ "$TRAVIS_PULL_REQUEST" = "false" ] && [ "$TRAVIS_BRANCH" = "master" ]; then bash acore-db-pendings; fi
-  - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then cd ..; fi
+  - if [ "$TRAVIS_BUILD_ID" = "1" ] && [ "$TRAVIS_PULL_REQUEST" = "false" ] && [ "$TRAVIS_BRANCH" = "master" ]; then bash acore-db-pendings; fi
+  - if [ "$TRAVIS_BUILD_ID" = "1" ] && [ "$TRAVIS_PULL_REQUEST" = "false" ]; then cd ..; fi
   # push changes to git if any
-  - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then git fetch --unshallow; fi
-  - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then git checkout $TRAVIS_BRANCH; fi
-  - if [ "$TRAVIS_PULL_REQUEST" = "false" ] && [[ -n "$GITHUB_API_KEY" ]]; then git add -A . && git diff --cached --quiet || git commit -am "Import pending SQL update file" && git push https://$GITHUB_API_KEY@github.com/$TRAVIS_REPO_SLUG.git $TRAVIS_BRANCH; fi
+  - if [ "$TRAVIS_BUILD_ID" = "1" ] && [ "$TRAVIS_PULL_REQUEST" = "false" ]; then git fetch --unshallow; fi
+  - if [ "$TRAVIS_BUILD_ID" = "1" ] && [ "$TRAVIS_PULL_REQUEST" = "false" ]; then git checkout $TRAVIS_BRANCH; fi
+  - if [ "$TRAVIS_BUILD_ID" = "1" ] && [ "$TRAVIS_PULL_REQUEST" = "false" ] && [[ -n "$GITHUB_API_KEY" ]]; then git add -A . && git diff --cached --quiet || git commit -am "Import pending SQL update file" && git push https://$GITHUB_API_KEY@github.com/$TRAVIS_REPO_SLUG.git $TRAVIS_BRANCH; fi
   # sync staging with master
-  - if [ "$TRAVIS_PULL_REQUEST" = "false" ] && [ "$TRAVIS_BRANCH" = "master" ] && [[ -n "$GITHUB_API_KEY" ]]; then git fetch origin staging:staging && git checkout staging && git merge --no-edit master && git push https://$GITHUB_API_KEY@github.com/$TRAVIS_REPO_SLUG.git staging; git checkout master; fi
+  - if [ "$TRAVIS_BUILD_ID" = "1" ] && [ "$TRAVIS_PULL_REQUEST" = "false" ] && [ "$TRAVIS_BRANCH" = "master" ] && [[ -n "$GITHUB_API_KEY" ]]; then git fetch origin staging:staging && git checkout staging && git merge --no-edit master && git push https://$GITHUB_API_KEY@github.com/$TRAVIS_REPO_SLUG.git staging; git checkout master; fi
 
 install:
   # install OS deps (apt-get)
