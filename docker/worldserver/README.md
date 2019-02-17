@@ -2,7 +2,7 @@
 
 This provides a way to build and launch a container with the AzerothCore authserver running inside it.
 
-If you just want to install the whole AzerothCore quickly using Docker Compose, we recommend following [this guide instead](https://github.com/azerothcore/azerothcore-wotlk/wiki/install-with-Docker).
+If you just want to install the whole AzerothCore quickly using Docker Compose, we recommend following [this guide instead](http://www.azerothcore.org/wiki/install-with-Docker).
 
 ## Requirements
 
@@ -14,7 +14,7 @@ If you just want to install the whole AzerothCore quickly using Docker Compose, 
 
 - You have to copy the file `docker/worldserver/worldserver.conf.dockerdist` and rename the copied file to `docker/worldserver/worldserver.conf`. Then open it and change the values where needed (you may need to change the DB port).
 
-- You need to have the **data files** somewhere in your system. If you don't have them yet, check the step ["Download the data files" from the installation guide](https://github.com/AzerothCore/azerothcore-wotlk/wiki/Installation#5-download-the-data-files).
+- You need to have the **data files** somewhere in your system. If you don't have them yet, check the step ["Download the data files" from the installation guide](http://www.azerothcore.org/wiki/Installation#5-download-the-data-files).
 
 ## Building the container image
 

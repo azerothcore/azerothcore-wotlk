@@ -11,30 +11,30 @@ AzerothCore is an open source game-server application for World of Warcraft, cur
 
 It is written in C++ and based on MaNGOS, TrinityCore and SunwellCore.
 
-:moneybag: You can support the project by financing the resolution of issues [using Bountysource](https://github.com/azerothcore/azerothcore-wotlk/wiki/Bountysource).
+:moneybag: You can support the project by financing the resolution of issues [using Bountysource](http://www.azerothcore.org/wiki/Bountysource).
 
 ## Why AzerothCore?
 
 Our main goal is to create a playable game server, offering a fully working game experience. In short, we focus on the **user experience (UX)**.
 
-We also believe in [software modularity](https://en.wikipedia.org/wiki/Modular_programming), because the more the software is modular, and the more it will be easy to be maintained, understood, developed, etc... So we organized the structure of AzerothCore as modular as possible, giving the possibility to [create new modules](https://github.com/azerothcore/azerothcore-wotlk/wiki/Create-a-Module) to add custom features (instead of patching the core).
+We also believe in [software modularity](https://en.wikipedia.org/wiki/Modular_programming), because the more the software is modular, and the more it will be easy to be maintained, understood, developed, etc... So we organized the structure of AzerothCore as modular as possible, giving the possibility to [create new modules](http://www.azerothcore.org/wiki/Create-a-Module) to add custom features (instead of patching the core).
 
 ## Learning project
 
 AzerothCore is a learning project.
 If you want to learn how to use C++, SQL, git, etc... you came to the right place! We will gladly help you: **programming is our passion**.
 
-If you want to contribute, in [our wiki](https://github.com/azerothcore/azerothcore-wotlk/wiki) you fill find a lot of resources that will guide you. Also you can poke us in [our discord chat server](https://discord.gg/gkt4y2x).
+If you want to contribute, in [our wiki](http://www.azerothcore.org/wiki) you fill find a lot of resources that will guide you. Also you can poke us in [our discord chat server](https://discord.gg/gkt4y2x).
 
 ## Instructions & Support
 
-Installation instructions are available [here](https://github.com/AzerothCore/azerothcore-wotlk/wiki/Installation).
+Installation instructions are available [here](http://www.azerothcore.org/wiki/Installation).
 
 For help requests, it is recommended to ask your question on [StackOverflow](https://stackoverflow.com/questions/tagged/azerothcore) and link it in [our chat](https://discordapp.com/channels/217589275766685707/284406375495368704).
 
 ## Docker
 
-Dockerization of AzerothCore is fully supported. More details about Docker and the setup instructions are available [here](https://github.com/azerothcore/azerothcore-wotlk/wiki/Install-with-Docker).
+Dockerization of AzerothCore is fully supported. More details about Docker and the setup instructions are available [here](http://www.azerothcore.org/wiki/Install-with-Docker).
 
 ## Authors & Contributors
 
