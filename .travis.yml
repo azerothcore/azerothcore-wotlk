@@ -74,6 +74,7 @@ install:
   - echo "DB_AUTH_NAME=auth_$DB_RND_NAME" >> conf/config.sh
   - echo "DB_CHARACTERS_NAME=characters_$DB_RND_NAME" >> conf/config.sh
   - echo "DB_WORLD_NAME=world_$DB_RND_NAME" >> conf/config.sh
+  - if [ "$TRAVIS_BUILD_ID" = "1" ]; then bash ./acore.sh "db-assembler" "import-all"; fi
 
 script:
   # compile
@@ -82,7 +83,6 @@ script:
   - timeout 2580 bash ./acore.sh "compiler" "all"
   - ccache -s
   # create and import mysql
-  - if [ "$TRAVIS_BUILD_ID" = "1" ]; then bash ./acore.sh "db-assembler" "import-all"; fi
   - if [ "$TRAVIS_BUILD_ID" = "1" ]; then git clone --depth=1 --branch=master --single-branch https://github.com/ac-data/ac-data.git /home/travis/build/azerothcore/azerothcore-wotlk/env/dist/data; fi
   - if [ "$TRAVIS_BUILD_ID" = "1" ]; then sed -e "s/acore_auth/auth_$DB_RND_NAME/" -e "s/acore_world/world_$DB_RND_NAME/" -e "s/acore_characters/characters_$DB_RND_NAME/" ./data/travis/worldserver.conf >./env/dist/etc/worldserver.conf; fi
   - if [ "$TRAVIS_BUILD_ID" = "1" ]; then ./env/dist/bin/worldserver --dry-run; fi
