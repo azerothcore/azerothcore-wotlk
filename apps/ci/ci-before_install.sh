@@ -4,9 +4,7 @@ if [ "$TRAVIS_BUILD_ID" = "1" ]
 then
   export CCOMPILERC="clang-3.8"
   export CCOMPILERCXX="clang++-3.8"
-fi
-
-if [ "$TRAVIS_BUILD_ID" = "2" ]
+elif [ "$TRAVIS_BUILD_ID" = "2" ]
 then
   export CCOMPILERC="clang-7"
   export CCOMPILERCXX="clang++-7"
