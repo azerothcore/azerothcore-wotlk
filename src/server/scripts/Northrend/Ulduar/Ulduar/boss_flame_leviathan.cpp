@@ -475,7 +475,7 @@ public:
             {
                 ++_destroyedTurretCount;
 
-                if (_destroyedTurretCount == RAID_MODE(2, 4))
+                if (_destroyedTurretCount == (uint32)RAID_MODE(2, 4))
                 {
                     _destroyedTurretCount = 0;
                     me->CastSpell(me,SPELL_SYSTEMS_SHUTDOWN,true);
