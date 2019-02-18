@@ -475,7 +475,7 @@ public:
             {
                 ++_destroyedTurretCount;
 
-                if (_destroyedTurretCount == (uint32)RAID_MODE(2, 4))
+                if (_destroyedTurretCount == RAID_MODE<uint32>(2, 4))
                 {
                     _destroyedTurretCount = 0;
                     me->CastSpell(me,SPELL_SYSTEMS_SHUTDOWN,true);
@@ -645,7 +645,7 @@ void boss_flame_leviathan::boss_flame_leviathanAI::KilledUnit(Unit* who)
     if (who == me->GetVictim())
         events.RescheduleEvent(EVENT_PURSUE, 0);
 
-    if (Player* plr = who->ToPlayer())
+    if (who->GetTypeId() == TYPEID_PLAYER)
         Talk(FLAME_LEVIATHAN_SAY_SLAY);
 }
 
