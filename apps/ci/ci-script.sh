@@ -1,12 +1,12 @@
 #!/bin/bash
 
-# compile
+echo "compile core"
 export CCACHE_CPP2=true
 ccache -s
 timeout 2580 bash ./acore.sh "compiler" "all"
 ccache -s
 
-# create and import mysql
+echo "start worldserver dry-run"
 if [ "$TRAVIS_BUILD_ID" = "1" ]
 then
   git clone --depth=1 --branch=master --single-branch https://github.com/ac-data/ac-data.git /home/travis/build/azerothcore/azerothcore-wotlk/env/dist/data

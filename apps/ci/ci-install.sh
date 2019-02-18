@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# install OS deps (apt-get)
+echo "install OS deps (apt-get)"
 bash ./acore.sh "install-deps"
 
-# create config file
+echo "create config.sh"
 cat >>conf/config.sh <<CONFIG_SH
 CCOMPILERC=$CCOMPILERC
 CCOMPILERCXX=$CCOMPILERCXX
@@ -27,5 +27,6 @@ CONFIG_SH
 
 if [ "$TRAVIS_BUILD_ID" = "1" ]
 then
+  echo "import DB"
   bash ./acore.sh "db-assembler" "import-all"
 fi
