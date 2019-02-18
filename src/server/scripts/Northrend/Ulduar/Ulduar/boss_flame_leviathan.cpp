@@ -1062,9 +1062,9 @@ public:
         uint32 _spellTimer;
         uint32 _recastTimer;
 
-        void AttackStart(Unit*) { }
-        void MoveInLineOfSight(Unit*) { }
-        void WaypointReached(uint32 /*waypointId*/) { }
+        void AttackStart(Unit*) override { }
+        void MoveInLineOfSight(Unit*) override { }
+        void WaypointReached(uint32 /*waypointId*/) override { }
 
         void DoAction(int32 param) override
         {
@@ -1257,7 +1257,6 @@ public:
         bool _running;
         int32 _checkTimer;
         uint8 _step;
-        uint64 _dellorahGUID;
         Creature* _dellorah;
 
         uint32 GetData(uint32 param) const override
@@ -1272,7 +1271,7 @@ public:
             _running = false;
             _checkTimer = 0;
             _step = 0;
-            _dellorahGUID = 0;
+            _dellorah = me->FindNearestCreature(NPC_HIGH_EXPLORER_DELLORAH, 20.0f, true);
             me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
         }
 
@@ -1356,7 +1355,6 @@ public:
                             _running = false;
                             _checkTimer = 0;
                             _step = 0;
-                            _dellorahGUID = 0;
                             return;
                     }
             }
@@ -1370,10 +1368,7 @@ public:
             if (param == ACTION_START_NORGANNON_EVENT)
             {
                 if (Creature* cr = me->FindNearestCreature(NPC_HIGH_EXPLORER_DELLORAH, 20.0f, true))
-                {
                     _dellorah = cr;
-                    _dellorahGUID = cr->GetGUID();
-                }
 
                 _eventStarted = true;
                 _running = true;
@@ -1922,7 +1917,7 @@ class spell_systems_shutdown : public SpellScriptLoader
             }
         };
 
-        AuraScript* GetAuraScript() const
+        AuraScript* GetAuraScript() const override
         {
             return new spell_systems_shutdown_AuraScript();
         }
