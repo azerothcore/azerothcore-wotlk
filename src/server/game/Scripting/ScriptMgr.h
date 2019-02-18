@@ -1129,10 +1129,10 @@ class ModuleScript : public ScriptObject
 
 class GameEventScript : public ScriptObject
 {
-protected:    
+protected:
     GameEventScript(const char* name);
 
-public:    
+public:
     // Runs on start event
     virtual void OnStart(uint16 /*EventID*/) { }
     
