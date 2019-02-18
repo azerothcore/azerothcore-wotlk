@@ -195,6 +195,9 @@ class UnitAI
         // predicate shall extend std::unary_function<Unit*, bool>
         template <class PREDICATE> Unit* SelectTarget(SelectAggroTarget targetType, uint32 position, PREDICATE const& predicate)
         {
+            if (targetType == SELECT_TARGET_FARTHEST_RANDOM)
+                --position;
+
             ThreatContainer::StorageType const& threatlist = me->getThreatManager().getThreatList();
             if (position >= threatlist.size())
                 return NULL;
@@ -235,7 +238,7 @@ class UnitAI
                 case SELECT_TARGET_FARTHEST_RANDOM:
                 {
                     std::list<Unit*>::reverse_iterator ritr = targetList.rbegin();
-                    std::advance(ritr, position == 0 ? position : urand(0, position - 1));
+                    std::advance(ritr, position == 0 ? position : urand(0, position));
                     return *ritr;
                 }
                 default:
