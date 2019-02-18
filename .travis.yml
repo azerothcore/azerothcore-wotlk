@@ -16,15 +16,9 @@ services:
 git:
   depth: 1
 
-matrix:
-  include:
-    - os: linux
-      env:
-        - TRAVIS_BUILD_ID="1"
-
-    - os: linux
-      env:
-        - TRAVIS_BUILD_ID="2"
+env:
+  - TRAVIS_BUILD_ID="1"
+  - TRAVIS_BUILD_ID="2"
 
 before_install:
   - git config user.email "azerothcorebot@gmail.com" && git config user.name "AzerothCoreBot"
