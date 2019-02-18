@@ -1087,7 +1087,7 @@ public:
         void JustSummoned(Creature* cr) override { summons.Summon(cr); }
         void SummonedCreatureDespawn(Creature* cr)  override { summons.Despawn(cr); }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             npc_escortAI::UpdateAI(diff);
 
