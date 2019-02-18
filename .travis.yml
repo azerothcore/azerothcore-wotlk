@@ -67,10 +67,10 @@ install:
   - echo "CSCRIPTPCH=OFF" >> conf/config.sh
   - echo "CCOREPCH=OFF" >> conf/config.sh
   - echo "CCUSTOMOPTIONS='-DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_FLAGS=\"-Werror\" -DCMAKE_CXX_FLAGS=\"-Werror\"'" >> conf/config.sh
-  - echo "DB_CHARACTERS_CONF=\"MYSQL_USER='root'; MYSQL_PASS=''; MYSQL_HOST='127.0.0.1';\"" >> conf/config.sh
-  - echo "DB_AUTH_CONF=\"MYSQL_USER='root'; MYSQL_PASS=''; MYSQL_HOST='127.0.0.1';\"" >> conf/config.sh
-  - echo "DB_WORLD_CONF=\"MYSQL_USER='root'; MYSQL_PASS=''; MYSQL_HOST='127.0.0.1';\"" >> conf/config.sh
   - export DB_RND_NAME=$(cat /dev/urandom | tr -dc 'a-z' | fold -w 5 | head -n 1)
+  - echo "DB_CHARACTERS_CONF=\"MYSQL_USER='root'; MYSQL_PASS='$DB_RND_NAME'; MYSQL_HOST='127.0.0.1';\"" >> conf/config.sh
+  - echo "DB_AUTH_CONF=\"MYSQL_USER='root'; MYSQL_PASS='$DB_RND_NAME'; MYSQL_HOST='127.0.0.1';\"" >> conf/config.sh
+  - echo "DB_WORLD_CONF=\"MYSQL_USER='root'; MYSQL_PASS='$DB_RND_NAME'; MYSQL_HOST='127.0.0.1';\"" >> conf/config.sh
   - echo "DB_AUTH_NAME=auth_$DB_RND_NAME" >> conf/config.sh
   - echo "DB_CHARACTERS_NAME=characters_$DB_RND_NAME" >> conf/config.sh
   - echo "DB_WORLD_NAME=world_$DB_RND_NAME" >> conf/config.sh
@@ -84,6 +84,6 @@ script:
   - ccache -s
   # create and import mysql
   - if [ "$TRAVIS_BUILD_ID" = "1" ]; then git clone --depth=1 --branch=master --single-branch https://github.com/ac-data/ac-data.git /home/travis/build/azerothcore/azerothcore-wotlk/env/dist/data; fi
-  - if [ "$TRAVIS_BUILD_ID" = "1" ]; then sed -e "s/acore_auth/auth_$DB_RND_NAME/" -e "s/acore_world/world_$DB_RND_NAME/" -e "s/acore_characters/characters_$DB_RND_NAME/" ./data/travis/worldserver.conf >./env/dist/etc/worldserver.conf; fi
+  - if [ "$TRAVIS_BUILD_ID" = "1" ]; then sed -e "s/;;acore_auth/;$DB_RND_NAME;auth_$DB_RND_NAME/" -e "s/;;acore_world/;$DB_RND_NAME;world_$DB_RND_NAME/" -e "s/;;acore_characters/;$DB_RND_NAME;characters_$DB_RND_NAME/" ./data/travis/worldserver.conf >./env/dist/etc/worldserver.conf; fi
   - if [ "$TRAVIS_BUILD_ID" = "1" ]; then ./env/dist/bin/worldserver --dry-run; fi
   - if [ "$TRAVIS_BUILD_ID" = "1" ]; then ./apps/ci-error-check.sh; fi
