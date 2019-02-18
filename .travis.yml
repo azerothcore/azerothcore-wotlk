@@ -19,20 +19,10 @@ git:
 matrix:
   include:
     - os: linux
-      addons:
-        apt:
-          packages:
-            - clang-3.8
       env:
         - TRAVIS_BUILD_ID="1"
 
     - os: linux
-      addons:
-        apt:
-          sources:
-            - llvm-toolchain-xenial-7
-          packages:
-            - clang-7
       env:
         - TRAVIS_BUILD_ID="2"
 
