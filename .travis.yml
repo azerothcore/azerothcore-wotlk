@@ -50,6 +50,10 @@ before_install:
   - if [ "$TRAVIS_BUILD_ID" = "1" ] && [ "$TRAVIS_PULL_REQUEST" = "false" ] && [ "$TRAVIS_BRANCH" = "master" ] && [[ -n "$GITHUB_API_KEY" ]]; then git fetch origin staging:staging && git checkout staging && git merge --no-edit master && git push https://$GITHUB_API_KEY@github.com/$TRAVIS_REPO_SLUG.git staging; git checkout master; fi
   - if [ "$TRAVIS_BUILD_ID" = "1" ]; then export CCOMPILERC="clang-3.8"; export CCOMPILERCXX="clang++-3.8"; fi
   - if [ "$TRAVIS_BUILD_ID" = "2" ]; then export CCOMPILERC="clang-7"; export CCOMPILERCXX="clang++-7"; fi
+  - export DB_RND_NAME=$(cat /dev/urandom | tr -dc 'a-z' | fold -w 5 | head -n 1)
+  - sudo mysql -e "use mysql; update user set authentication_string=PASSWORD('$DB_RND_NAME') where User='root'; update user set plugin='mysql_native_password';FLUSH PRIVILEGES;"
+  - sudo mysql_upgrade -u root -p$DB_RND_NAME
+  - sudo service mysql restart
 
 install:
   # install OS deps (apt-get)
@@ -67,7 +71,6 @@ install:
   - echo "CSCRIPTPCH=OFF" >> conf/config.sh
   - echo "CCOREPCH=OFF" >> conf/config.sh
   - echo "CCUSTOMOPTIONS='-DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_FLAGS=\"-Werror\" -DCMAKE_CXX_FLAGS=\"-Werror\"'" >> conf/config.sh
-  - export DB_RND_NAME=$(cat /dev/urandom | tr -dc 'a-z' | fold -w 5 | head -n 1)
   - echo "DB_CHARACTERS_CONF=\"MYSQL_USER='root'; MYSQL_PASS='$DB_RND_NAME'; MYSQL_HOST='127.0.0.1';\"" >> conf/config.sh
   - echo "DB_AUTH_CONF=\"MYSQL_USER='root'; MYSQL_PASS='$DB_RND_NAME'; MYSQL_HOST='127.0.0.1';\"" >> conf/config.sh
   - echo "DB_WORLD_CONF=\"MYSQL_USER='root'; MYSQL_PASS='$DB_RND_NAME'; MYSQL_HOST='127.0.0.1';\"" >> conf/config.sh
