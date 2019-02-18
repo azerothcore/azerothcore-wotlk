@@ -2254,7 +2254,7 @@ class spell_shield_generator : public SpellScriptLoader
 
             uint32 absorbPct;
 
-            bool Load()
+            bool Load() override
             {
                 absorbPct = GetSpellInfo()->Effects[EFFECT_0].CalcValue(GetCaster());
                 return true;
