@@ -19,4 +19,5 @@ sudo service mysql restart
 printf "[client]\npassword=%s" "$DB_RND_NAME" >~/.my.cnf
 chmod 400 ~/.my.cnf
 wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
-sudo echo "deb http://apt.llvm.org/xenial/ llvm-toolchain-xenial-7 main" >/etc/apt/sources.list.d/llvm.list
+echo "deb http://apt.llvm.org/xenial/ llvm-toolchain-xenial-7 main" | sudo tee -a /etc/apt/sources.list
+sudo apt-get update -qq
