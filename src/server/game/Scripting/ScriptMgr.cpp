@@ -2063,7 +2063,7 @@ void ScriptMgr::OnCalcMaxDuration(Aura const* aura, int32& maxDuration)
 void ScriptMgr::OnGameEventStart(uint16 EventID)
 {
 #ifdef ELUNA
-    sEluna->OnGameEventStart(EventId);
+    sEluna->OnGameEventStart(EventID);
 #endif
     FOREACH_SCRIPT(GameEventScript)->OnStart(EventID);
 }
