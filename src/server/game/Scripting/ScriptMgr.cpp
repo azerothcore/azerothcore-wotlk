@@ -60,6 +60,7 @@ template class ScriptRegistry<MovementHandlerScript>;
 template class ScriptRegistry<BGScript>;
 template class ScriptRegistry<SpellSC>;
 template class ScriptRegistry<AccountScript>;
+template class ScriptRegistry<GameEventScript>;
 
 #include "ScriptMgrMacros.h"
 
@@ -213,6 +214,7 @@ void ScriptMgr::Unload()
     SCR_CLEAR(ModuleScript);
     SCR_CLEAR(BGScript);
     SCR_CLEAR(SpellSC);
+    SCR_CLEAR(GameEventScript);
 
     #undef SCR_CLEAR
 }
@@ -2058,6 +2060,22 @@ void ScriptMgr::OnCalcMaxDuration(Aura const* aura, int32& maxDuration)
     FOREACH_SCRIPT(SpellSC)->OnCalcMaxDuration(aura, maxDuration);
 }
 
+void ScriptMgr::OnGameEventStart(uint16 EventID)
+{
+#ifdef ELUNA
+    sEluna->OnGameEventStart(EventId);
+#endif
+    FOREACH_SCRIPT(GameEventScript)->OnStart(EventID);
+}
+
+void ScriptMgr::OnGameEventStop(uint16 EventID)
+{
+#ifdef ELUNA
+    sEluna->OnGameEventStop(EventID);
+#endif
+    FOREACH_SCRIPT(GameEventScript)->OnStop(EventID);
+}
+
 AllMapScript::AllMapScript(const char* name)
     : ScriptObject(name)
 {
@@ -2255,5 +2273,11 @@ ModuleScript::ModuleScript(const char* name)
     : ScriptObject(name)
 {
     ScriptRegistry<ModuleScript>::AddScript(this);
+}
+
+GameEventScript::GameEventScript(const char* name)
+    : ScriptObject(name)
+{
+    ScriptRegistry<GameEventScript>::AddScript(this);
 }
 
