@@ -5,7 +5,7 @@ set -e
 echo "compile core"
 export CCACHE_CPP2=true
 ccache -s
-timeout 3 bash ./acore.sh "compiler" "all"
+timeout 2700 bash ./acore.sh "compiler" "all"
 ccache -s
 
 if [ "$TRAVIS_BUILD_ID" = "1" ]
