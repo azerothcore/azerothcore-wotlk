@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 echo "install OS deps (apt-get)"
 bash ./acore.sh "install-deps"
 
