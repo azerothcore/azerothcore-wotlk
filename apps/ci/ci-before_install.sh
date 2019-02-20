@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 if [ "$TRAVIS_BUILD_ID" = "1" ]
 then
   export CCOMPILERC="clang-3.8"
