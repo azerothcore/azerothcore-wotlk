@@ -7798,15 +7798,13 @@ void ObjectMgr::LoadFishingBaseSkillLevel()
 
 void ObjectMgr::ChangeFishingBaseSkillLevel(uint32 entry, int32 skill)
 {
-
     AreaTableEntry const* fArea = sAreaTableStore.LookupEntry(entry);
-
     if (!fArea)
     {
         sLog->outErrorDb("AreaId %u defined in `skill_fishing_base_level` does not exist", entry);
         return;
     }
-
+    
     _fishingBaseForAreaStore[entry] = skill;
 
     sLog->outString(">> Fishing base skill level of area %u changed to %u", entry, skill);
