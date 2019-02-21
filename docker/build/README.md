@@ -2,7 +2,7 @@
 
 The AzerothCore Build Dockerfile will create a container that will run the AC build.
 
-It will generate:
+When this container runs, it will compile AC and generate:
 
 - the build cache in the `docker/build/cache` directory
 - the `worldserver` executable file in `docker/worldserver/bin`
