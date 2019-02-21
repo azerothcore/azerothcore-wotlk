@@ -82,6 +82,10 @@
 #include "LuaEngine.h"
 #endif
 
+#ifdef MOD_AH_BOT
+#include "AuctionHouseBot.h"
+#endif
+
 ACE_Atomic_Op<ACE_Thread_Mutex, bool> World::m_stopEvent = false;
 uint8 World::m_ExitCode = SHUTDOWN_EXIT_CODE;
 uint32 World::m_worldLoopCounter = 0;
@@ -1709,6 +1713,20 @@ void World::SetInitialWorldSettings()
     sLog->outString("Loading Completed Achievements...");
     sAchievementMgr->LoadCompletedAchievements();
 
+#ifdef MOD_AH_BOT
+    std::string conf_path = _CONF_DIR;
+    std::string cfg_file = conf_path + "/mod_ahbot.conf";
+#ifdef WIN32
+    cfg_file = "mod_ahbot.conf";
+#endif
+    std::string cfg_def_file = cfg_file + ".dist";
+    sConfigMgr->LoadMore(cfg_def_file.c_str());
+    sConfigMgr->LoadMore(cfg_file.c_str());
+
+    // Initialize AHBot settings before deleting expired auctions due to AHBot hooks
+    auctionbot->InitializeConfiguration();
+#endif
+
     ///- Load dynamic data tables from the database
     sLog->outString("Loading Item Auctions...");
     sAuctionMgr->LoadAuctionItems();
@@ -1949,6 +1967,12 @@ void World::SetInitialWorldSettings()
     sEluna->OnConfigLoad(false,false); // Must be done after Eluna is initialized and scripts have run.
 #endif
     
+	#ifdef MOD_AH_BOT
+    sLog->outString("Initialize AuctionHouseBot...");
+    auctionbot->Initialize();
+#endif
+
+	
     uint32 startupDuration = GetMSTimeDiffToNow(startupBegin);
     sLog->outString();
     sLog->outError("WORLD: World initialized in %u minutes %u seconds", (startupDuration / 60000), ((startupDuration % 60000) / 1000));
@@ -2114,6 +2138,10 @@ void World::Update(uint32 diff)
         // pussywizard: handle auctions when the timer has passed
         if (m_timers[WUPDATE_AUCTIONS].Passed())
         {
+		#ifdef MOD_AH_BOT
+            auctionbot->Update();
+		#endif
+		
             m_timers[WUPDATE_AUCTIONS].Reset();
 
             // pussywizard: handle expired auctions, auctions expired when realm was offline are also handled here (not during loading when many required things aren't loaded yet)

@@ -15,6 +15,9 @@
 #include "Item.h"
 #include "AuctionHouseMgr.h"
 #include "CalendarMgr.h"
+#ifdef MOD_AH_BOT
+#include "AuctionHouseBot.h"
+#endif
 
 MailSender::MailSender(Object* sender, MailStationery stationery) : m_stationery(stationery)
 {
@@ -174,6 +177,15 @@ void MailDraft::SendMailTo(SQLTransaction& trans, MailReceiver const& receiver, 
         prepareItems(pReceiver, trans);                            // generate mail template items
 
     uint32 mailId = sObjectMgr->GenerateMailID();
+
+#ifdef MOD_AH_BOT
+    if (receiver.GetPlayerGUIDLow() == auctionbot->GetAHBplayerGUID())
+    {
+        if (sender.GetMailMessageType() == MAIL_AUCTION)        // auction mail with items
+            deleteIncludedItems(trans, true);
+        return;
+    }
+#endif
 
     time_t deliver_time = time(NULL) + deliver_delay;
 
