@@ -331,12 +331,12 @@ public:
 
         void Reset() {}
         
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* /*who*/)
         {
             DoCast(IsHeroic() ? H_SPELL_EMPOWERING_BLOWS : SPELL_EMPOWERING_BLOWS);
         }
 
-        void UpdateAI(const uint32 uiDiff)
+        void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
                 return;
