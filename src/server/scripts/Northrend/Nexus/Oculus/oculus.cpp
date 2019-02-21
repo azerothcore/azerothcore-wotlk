@@ -329,9 +329,8 @@ public:
     {
         npc_centrifuge_constructAI(Creature *creature) : ScriptedAI(creature) {}
 
-
         void Reset() {}
-
+        
         void EnterCombat(Unit* who)
         {
             DoCast(IsHeroic() ? H_SPELL_EMPOWERING_BLOWS : SPELL_EMPOWERING_BLOWS);
