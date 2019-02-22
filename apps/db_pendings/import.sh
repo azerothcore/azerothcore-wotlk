@@ -6,6 +6,8 @@ source "$CURRENT_PATH/../bash_shared/includes.sh"
 
 UPDATES_PATH="$AC_PATH_ROOT/data/sql/updates/"
 
+COMMIT_HASH=
+
 function import() {
     db=$1
     folder="db_"$db
@@ -30,8 +32,6 @@ function import() {
     if [ "$oldDate" = "$dateToday" ]; then
         ((counter=$oldCnt+1))
     fi;
-
-    COMMIT_HASH=
 
     for entry in "$pendingPath"/*.sql
     do
