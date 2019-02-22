@@ -19,7 +19,7 @@ echo "create config.sh"
 cat >>conf/config.sh <<CONFIG_SH
 CCOMPILERC=$CCOMPILERC
 CCOMPILERCXX=$CCOMPILERCXX
-MTHREADS=4
+MTHREADS=$(expr $(grep -c ^processor /proc/cpuinfo) + 2)
 CWARNINGS=ON
 CDEBUG=OFF
 CTYPE=Release
