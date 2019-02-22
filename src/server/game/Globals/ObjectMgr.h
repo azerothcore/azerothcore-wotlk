@@ -1013,6 +1013,7 @@ class ObjectMgr
         void LoadPetNumber();
         void LoadCorpses();
         void LoadFishingBaseSkillLevel();
+        void ChangeFishingBaseSkillLevel(uint32 entry, int32 skill);
 
         void LoadReputationRewardRate();
         void LoadReputationOnKill();
