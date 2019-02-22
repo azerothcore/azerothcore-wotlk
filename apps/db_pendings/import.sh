@@ -31,6 +31,8 @@ function import() {
         ((counter=$oldCnt+1))
     fi;
 
+    COMMIT_HASH=
+
     for entry in "$pendingPath"/*.sql
     do
         if [[ -e $entry ]]; then
@@ -97,6 +99,7 @@ function import() {
                 echo "DROP PROCEDURE IF EXISTS \`updateDb\`;" >> "$newFile";
             fi;
 
+            COMMIT_HASH="$COMMIT_HASH $(git log --diff-filter=A "$entry" | grep "^commit " | sed -e 's/commit //')"
             rm $entry;
 
             oldDate=$dateToday
