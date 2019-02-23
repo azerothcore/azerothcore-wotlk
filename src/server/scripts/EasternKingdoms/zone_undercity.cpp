@@ -940,19 +940,19 @@ public:
         player->PlayerTalkClass->ClearMenus();
         switch (action)
         {
-        case GOSSIP_ACTION_INFO_DEF + 1:
-            player->CLOSE_GOSSIP_MENU();
-            if (auto ai = CAST_AI(npc_varian_wrynn::npc_varian_wrynnAI, creature->AI()))
-            {
-                ai->Start(true, true, player->GetGUID());
-                if (Creature* jaina = GetClosestCreatureWithEntry(creature, NPC_JAINA, 50.0f))
-                    ai->jainaGUID = jaina->GetGUID();
-                else
-                    ai->jainaGUID = 0;
-                ai->SetDespawnAtEnd(false);
-                ai->SetDespawnAtFar(false);
-            }
-            break;
+            case GOSSIP_ACTION_INFO_DEF + 1:
+                player->CLOSE_GOSSIP_MENU();
+                if (auto ai = CAST_AI(npc_varian_wrynn::npc_varian_wrynnAI, creature->AI()))
+                {
+                    ai->Start(true, true, player->GetGUID());
+                    if (Creature* jaina = GetClosestCreatureWithEntry(creature, NPC_JAINA, 50.0f))
+                        ai->jainaGUID = jaina->GetGUID();
+                    else
+                        ai->jainaGUID = 0;
+                    ai->SetDespawnAtEnd(false);
+                    ai->SetDespawnAtFar(false);
+                }
+                break;
         }
         return true;
     }
@@ -1081,14 +1081,14 @@ public:
         {
             switch (summoned->GetEntry())
             {
-            case NPC_GENERATOR:
-                summoned->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                summoned->ApplySpellImmune(0, IMMUNITY_ID, SPELL_WRYNN_BUFF, true);
-                summoned->ApplySpellImmune(0, IMMUNITY_ID, SPELL_THRALL_BUFF, true);
-                summoned->ApplySpellImmune(0, IMMUNITY_ID, SPELL_SYLVANAS_BUFF, true);
-                break;
-            default:
-                break;
+                case NPC_GENERATOR:
+                    summoned->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    summoned->ApplySpellImmune(0, IMMUNITY_ID, SPELL_WRYNN_BUFF, true);
+                    summoned->ApplySpellImmune(0, IMMUNITY_ID, SPELL_THRALL_BUFF, true);
+                    summoned->ApplySpellImmune(0, IMMUNITY_ID, SPELL_SYLVANAS_BUFF, true);
+                    break;
+                default:
+                    break;
             }
         }
 
@@ -1096,18 +1096,18 @@ public:
         {
             switch (summon->GetEntry())
             {
-            case NPC_BLIGHTWORM:
-                UpdateWorldState(me->GetMap(), WORLD_STATE_SEWERS_FIGHT_A, 0);
-                UpdateWorldState(me->GetMap(), WORLD_STATE_SEWERS_DONE_A, 1);
-                bStepping = true;
-                break;
-            case NPC_PUTRESS:
-                UpdateWorldState(me->GetMap(), WORLD_STATE_APOTHECARIUM_FIGHT_A, 0);
-                UpdateWorldState(me->GetMap(), WORLD_STATE_APOTHECARIUM_DONE_A, 1);
-                bStepping = true;
-                break;
-            default:
-                break;
+                case NPC_BLIGHTWORM:
+                    UpdateWorldState(me->GetMap(), WORLD_STATE_SEWERS_FIGHT_A, 0);
+                    UpdateWorldState(me->GetMap(), WORLD_STATE_SEWERS_DONE_A, 1);
+                    bStepping = true;
+                    break;
+                case NPC_PUTRESS:
+                    UpdateWorldState(me->GetMap(), WORLD_STATE_APOTHECARIUM_FIGHT_A, 0);
+                    UpdateWorldState(me->GetMap(), WORLD_STATE_APOTHECARIUM_DONE_A, 1);
+                    bStepping = true;
+                    break;
+                default:
+                    break;
             }
         }
 
@@ -1140,276 +1140,276 @@ public:
         {
             switch (waveId)
             {
-            case 0:
-                me->SummonCreature(NPC_GUARDIAN, AllianceSpawn[0].x, AllianceSpawn[0].y, AllianceSpawn[0].z, TEMPSUMMON_DEAD_DESPAWN);
-                break;
-            case 1:
-                for (uint8 i = 0; i < WAVE_MAXCOUNT; ++i)
-                {
-                    switch (urand(0, 12))
+                case 0:
+                    me->SummonCreature(NPC_GUARDIAN, AllianceSpawn[0].x, AllianceSpawn[0].y, AllianceSpawn[0].z, TEMPSUMMON_DEAD_DESPAWN);
+                    break;
+                case 1:
+                    for (uint8 i = 0; i < WAVE_MAXCOUNT; ++i)
                     {
-                    case 0:
-                        me->SummonCreature(NPC_DREADLORD, AllianceSpawn[1].x + rand32() % 5, AllianceSpawn[1].y + rand32() % 5, AllianceSpawn[1].z, TEMPSUMMON_DEAD_DESPAWN);
-                        break;
-                    case 1:
-                    case 2:
-                    case 3:
-                        me->SummonCreature(NPC_DOCTOR, AllianceSpawn[1].x + rand32() % 5, AllianceSpawn[1].y + rand32() % 5, AllianceSpawn[1].z, TEMPSUMMON_DEAD_DESPAWN);
-                        break;
-                    case 4:
-                    case 5:
-                    case 6:
-                        me->SummonCreature(NPC_FELBEAST, AllianceSpawn[1].x + rand32() % 5, AllianceSpawn[1].y + rand32() % 5, AllianceSpawn[1].z, TEMPSUMMON_DEAD_DESPAWN);
-                        break;
-                    case 7:
-                    case 8:
-                    case 9:
-                        me->SummonCreature(NPC_BETRAYER, AllianceSpawn[1].x + rand32() % 5, AllianceSpawn[1].y + rand32() % 5, AllianceSpawn[1].z, TEMPSUMMON_DEAD_DESPAWN);
-                        break;
-                    case 10:
-                    case 11:
-                    case 12:
-                        me->SummonCreature(NPC_COLLABORATOR, AllianceSpawn[1].x + rand32() % 5, AllianceSpawn[1].y + rand32() % 5, AllianceSpawn[1].z, TEMPSUMMON_DEAD_DESPAWN);
-                        break;
-                    }
-                }
-                break;
-            case 2:
-                for (uint8 i = 0; i < WAVE_MAXCOUNT; ++i)
-                {
-                    switch (urand(0, 3))
-                    {
-                    case 0:
-                        me->SummonCreature(NPC_COLLABORATOR, AllianceSpawn[2].x - rand32() % 5, AllianceSpawn[2].y - rand32() % 5, AllianceSpawn[2].z, TEMPSUMMON_DEAD_DESPAWN);
-                        break;
-                    case 1:
-                        me->SummonCreature(NPC_DOCTOR, AllianceSpawn[2].x - rand32() % 5, AllianceSpawn[2].y - rand32() % 5, AllianceSpawn[2].z, TEMPSUMMON_DEAD_DESPAWN);
-                        break;
-                    case 2:
-                        me->SummonCreature(NPC_FELBEAST, AllianceSpawn[2].x - rand32() % 5, AllianceSpawn[2].y - rand32() % 5, AllianceSpawn[2].z, TEMPSUMMON_DEAD_DESPAWN);
-                        break;
-                    case 3:
-                        me->SummonCreature(NPC_BETRAYER, AllianceSpawn[2].x - rand32() % 5, AllianceSpawn[2].y - rand32() % 5, AllianceSpawn[2].z, TEMPSUMMON_DEAD_DESPAWN);
-                        break;
-                    }
-                }
-                break;
-            case 3:
-                for (uint8 i = 0; i < WAVE_MAXCOUNT; ++i)
-                {
-                    switch (urand(0, 4))
-                    {
-                    case 0:
-                        me->SummonCreature(NPC_GUARDIAN, AllianceSpawn[3].x - rand32() % 5, AllianceSpawn[3].y - rand32() % 5, AllianceSpawn[3].z, TEMPSUMMON_DEAD_DESPAWN);
-                        break;
-                    case 1:
-                    case 2:
-                        me->SummonCreature(NPC_CHEMIST, AllianceSpawn[3].x - rand32() % 5, AllianceSpawn[3].y - rand32() % 5, AllianceSpawn[3].z, TEMPSUMMON_DEAD_DESPAWN);
-                        break;
-                    case 3:
-                    case 4:
-                        me->SummonCreature(NPC_DOCTOR, AllianceSpawn[3].x - rand32() % 5, AllianceSpawn[3].y - rand32() % 5, AllianceSpawn[3].z, TEMPSUMMON_DEAD_DESPAWN);
-                        break;
-                    }
-                }
-                break;
-            case 4:
-                for (uint8 i = 0; i < WAVE_MAXCOUNT; ++i)
-                {
-                    switch (urand(0, 5))
-                    {
-                    case 0:
-                        if (Unit* temp = me->SummonCreature(NPC_DOCTOR, AllianceSpawn[4].x - rand32() % 5, AllianceSpawn[4].y - rand32() % 5, AllianceSpawn[4].z, TEMPSUMMON_DEAD_DESPAWN))
-                            temp->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), false);
-                        break;
-                    case 1:
-                        if (Unit* temp = me->SummonCreature(NPC_CHEMIST, AllianceSpawn[4].x - rand32() % 5, AllianceSpawn[4].y - rand32() % 5, AllianceSpawn[4].z, TEMPSUMMON_DEAD_DESPAWN))
-                            temp->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), false);
-                        break;
-                    case 2:
-                        if (Unit* temp = me->SummonCreature(NPC_BETRAYER, AllianceSpawn[4].x - rand32() % 5, AllianceSpawn[4].y - rand32() % 5, AllianceSpawn[4].z, TEMPSUMMON_DEAD_DESPAWN))
-                            temp->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), false);
-                        break;
-                    case 3:
-                        if (Unit* temp = me->SummonCreature(NPC_DOCTOR, AllianceSpawn[5].x - rand32() % 5, AllianceSpawn[5].y - rand32() % 5, AllianceSpawn[5].z, TEMPSUMMON_DEAD_DESPAWN))
-                            temp->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), false);
-                        break;
-                    case 4:
-                        if (Unit* temp = me->SummonCreature(NPC_CHEMIST, AllianceSpawn[5].x - rand32() % 5, AllianceSpawn[5].y - rand32() % 5, AllianceSpawn[5].z, TEMPSUMMON_DEAD_DESPAWN))
-                            temp->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), false);
-                        break;
-                    case 5:
-                        if (Unit* temp = me->SummonCreature(NPC_BETRAYER, AllianceSpawn[5].x - rand32() % 5, AllianceSpawn[5].y - rand32() % 5, AllianceSpawn[5].z, TEMPSUMMON_DEAD_DESPAWN))
-                            temp->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), false);
-                        break;
-                    }
-                }
-                break;
-            case 5:
-                for (uint8 i = 0; i < WAVE_MAXCOUNT; ++i)
-                    if (Unit* temp = me->SummonCreature(NPC_GUARDIAN, AllianceSpawn[6].x - rand32() % 5, AllianceSpawn[6].y - rand32() % 5, AllianceSpawn[6].z, TEMPSUMMON_DEAD_DESPAWN))
-                        temp->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), false);
-                break;
-            case 6:
-                if (Unit* temp = me->SummonCreature(NPC_BLIGHTWORM, AllianceSpawn[7].x, AllianceSpawn[7].y, AllianceSpawn[7].z, TEMPSUMMON_MANUAL_DESPAWN))
-                {
-                    blightWormGUID = temp->GetGUID();
-                    temp->AddThreat(me, 100.0f);
-                    me->AddThreat(temp, 100.0f);
-                    if (Creature* jaina = ObjectAccessor::GetCreature(*me, jainaGUID))
-                    {
-                        temp->AddThreat(jaina, 100.0f);
-                        jaina->AddThreat(temp, 100.0f);
-                    }
-                }
-                if (Unit* temp = me->SummonCreature(NPC_KHANOK, HordeSpawn[0].x, HordeSpawn[0].y, HordeSpawn[0].z, TEMPSUMMON_MANUAL_DESPAWN))
-                {
-                    khanokGUID = temp->GetGUID();
-                    if (Creature* khanok = ObjectAccessor::GetCreature(*me, khanokGUID))
-                        khanok->setDeathState(JUST_DIED);
-                }
-                if (Unit* temp = me->SummonCreature(NPC_PUTRESS, AllianceSpawn[12].x, AllianceSpawn[12].y, AllianceSpawn[12].z, TEMPSUMMON_MANUAL_DESPAWN))
-                {
-                    putressGUID = temp->GetGUID();
-                    temp->CastSpell(temp, SPELL_PUTRESS_CASTING_STATE);
-                }
-                for (uint8 i = 0; i < GENERATOR_MAXCOUNT; ++i)
-                {
-                    switch (i)
-                    {
-                    case 0:
-                        if (Unit* temp = me->SummonCreature(NPC_GENERATOR, 1433.142212f, 402.493835f, -80.515945f, TEMPSUMMON_MANUAL_DESPAWN))
+                        switch (urand(0, 12))
                         {
-                            generatorGUID[i] = temp->GetGUID();
-                            if (Creature* putress = ObjectAccessor::GetCreature(*me, putressGUID))
-                                temp->CastSpell(putress, SPELL_BLIGHT_EMPOWERMENT);
+                            case 0:
+                                me->SummonCreature(NPC_DREADLORD, AllianceSpawn[1].x + rand32() % 5, AllianceSpawn[1].y + rand32() % 5, AllianceSpawn[1].z, TEMPSUMMON_DEAD_DESPAWN);
+                                break;
+                            case 1:
+                            case 2:
+                            case 3:
+                                me->SummonCreature(NPC_DOCTOR, AllianceSpawn[1].x + rand32() % 5, AllianceSpawn[1].y + rand32() % 5, AllianceSpawn[1].z, TEMPSUMMON_DEAD_DESPAWN);
+                                break;
+                            case 4:
+                            case 5:
+                            case 6:
+                                me->SummonCreature(NPC_FELBEAST, AllianceSpawn[1].x + rand32() % 5, AllianceSpawn[1].y + rand32() % 5, AllianceSpawn[1].z, TEMPSUMMON_DEAD_DESPAWN);
+                                break;
+                            case 7:
+                            case 8:
+                            case 9:
+                                me->SummonCreature(NPC_BETRAYER, AllianceSpawn[1].x + rand32() % 5, AllianceSpawn[1].y + rand32() % 5, AllianceSpawn[1].z, TEMPSUMMON_DEAD_DESPAWN);
+                                break;
+                            case 10:
+                            case 11:
+                            case 12:
+                                me->SummonCreature(NPC_COLLABORATOR, AllianceSpawn[1].x + rand32() % 5, AllianceSpawn[1].y + rand32() % 5, AllianceSpawn[1].z, TEMPSUMMON_DEAD_DESPAWN);
+                                break;
                         }
-                        break;
-                    case 1:
-                        if (Unit* temp = me->SummonCreature(NPC_GENERATOR, 1428.677979f, 399.753418f, -79.141609f, TEMPSUMMON_MANUAL_DESPAWN))
-                        {
-                            generatorGUID[i] = temp->GetGUID();
-                            if (Creature* putress = ObjectAccessor::GetCreature(*me, putressGUID))
-                                temp->CastSpell(putress, SPELL_BLIGHT_EMPOWERMENT, false, 0, 0, generatorGUID[0]);
-                        }
-                        break;
-                    case 2:
-                        if (Unit* temp = me->SummonCreature(NPC_GENERATOR, 1425.163330f, 402.268951f, -79.299744f, TEMPSUMMON_MANUAL_DESPAWN))
-                        {
-                            generatorGUID[i] = temp->GetGUID();
-                            if (Creature* putress = ObjectAccessor::GetCreature(*me, putressGUID))
-                                temp->CastSpell(putress, SPELL_BLIGHT_EMPOWERMENT, false, 0, 0, generatorGUID[0]);
-                        }
-                        break;
-                    case 3:
-                        if (Unit* temp = me->SummonCreature(NPC_GENERATOR, 1427.323242f, 406.853088f, -78.195641f, TEMPSUMMON_MANUAL_DESPAWN))
-                        {
-                            generatorGUID[i] = temp->GetGUID();
-                            if (Creature* putress = ObjectAccessor::GetCreature(*me, putressGUID))
-                                temp->CastSpell(putress, SPELL_BLIGHT_EMPOWERMENT, false, 0, 0, generatorGUID[0]);
-                        }
-                        break;
-                    case 4:
-                        if (Unit* temp = me->SummonCreature(NPC_GENERATOR, 1432.465210f, 407.460022f, -81.689384f, TEMPSUMMON_MANUAL_DESPAWN))
-                        {
-                            generatorGUID[i] = temp->GetGUID();
-                            if (Creature* putress = ObjectAccessor::GetCreature(*me, putressGUID))
-                                temp->CastSpell(putress, SPELL_BLIGHT_EMPOWERMENT, false, 0, 0, generatorGUID[0]);
-                        }
-                        break;
                     }
-                }
-                break;
-            case 7:
-                if (Unit* temp = me->SummonCreature(NPC_SW_SOLDIER, AllianceSpawn[8].x, AllianceSpawn[8].y, AllianceSpawn[8].z, 0, TEMPSUMMON_TIMED_DESPAWN, 90000))
-                    temp->GetMotionMaster()->MovePath(NPC_SW_SOLDIER * 10, false);
-                if (Unit* temp = me->SummonCreature(NPC_SW_SOLDIER, AllianceSpawn[8].x, AllianceSpawn[8].y, AllianceSpawn[8].z, 0, TEMPSUMMON_TIMED_DESPAWN, 90000))
-                    temp->GetMotionMaster()->MovePath((NPC_SW_SOLDIER * 10) + 1, false);
-                if (Unit* temp = me->SummonCreature(NPC_SW_SOLDIER, AllianceSpawn[8].x, AllianceSpawn[8].y, AllianceSpawn[8].z, 0, TEMPSUMMON_TIMED_DESPAWN, 90000))
-                    temp->GetMotionMaster()->MovePath((NPC_SW_SOLDIER * 10) + 2, false);
-                if (Unit* temp = me->SummonCreature(NPC_SW_SOLDIER, AllianceSpawn[8].x, AllianceSpawn[8].y, AllianceSpawn[8].z, 0, TEMPSUMMON_TIMED_DESPAWN, 90000))
-                    temp->GetMotionMaster()->MovePath((NPC_SW_SOLDIER * 10) + 3, false);
-                break;
-            case 8:
-                break;
-            case 9:
-                for (uint8 i = 0; i < WAVE_MAXCOUNT; ++i)
-                    me->SummonCreature(NPC_GUARDIAN, AllianceSpawn[10].x + rand32() % 13, AllianceSpawn[10].y + rand32() % 13, AllianceSpawn[10].z, TEMPSUMMON_DEAD_DESPAWN);
-                break;
-            case 10:
-                if (Unit* temp = me->SummonCreature(NPC_DREADLORD, AllianceSpawn[11].x, AllianceSpawn[11].y, AllianceSpawn[11].z, TEMPSUMMON_DEAD_DESPAWN))
-                {
-                    temp->GetMotionMaster()->MovePath(NPC_DREADLORD * 10, false);
-                    temp->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
-                    temp->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK_DEST, true);
-                }
-                break;
-            case 11:
-                for (uint8 i = 0; i < WAVE_MAXCOUNT; ++i)
-                {
-                    switch (urand(0, 3))
+                    break;
+                case 2:
+                    for (uint8 i = 0; i < WAVE_MAXCOUNT; ++i)
                     {
-                    case 0:
-                        if (Unit* temp = me->SummonCreature(NPC_EXPERIMENT, AllianceSpawn[13].x + rand32() % 5, AllianceSpawn[13].y + rand32() % 5, AllianceSpawn[13].z, TEMPSUMMON_DEAD_DESPAWN))
-                            temp->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
-                        break;
-                    case 1:
-                        if (Unit* temp = me->SummonCreature(NPC_EXPERIMENT, AllianceSpawn[14].x + rand32() % 5, AllianceSpawn[14].y + rand32() % 5, AllianceSpawn[14].z, TEMPSUMMON_DEAD_DESPAWN))
-                            temp->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
-                        break;
-                    case 2:
-                        if (Unit* temp = me->SummonCreature(NPC_EXPERIMENT, AllianceSpawn[15].x + rand32() % 5, AllianceSpawn[15].y + rand32() % 5, AllianceSpawn[15].z, TEMPSUMMON_DEAD_DESPAWN))
-                            temp->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
-                        break;
-                    case 3:
-                        if (Unit* temp = me->SummonCreature(NPC_EXPERIMENT, AllianceSpawn[16].x + rand32() % 5, AllianceSpawn[16].y + rand32() % 5, AllianceSpawn[16].z, TEMPSUMMON_DEAD_DESPAWN))
-                            temp->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
-                        break;
+                        switch (urand(0, 3))
+                        {
+                            case 0:
+                                me->SummonCreature(NPC_COLLABORATOR, AllianceSpawn[2].x - rand32() % 5, AllianceSpawn[2].y - rand32() % 5, AllianceSpawn[2].z, TEMPSUMMON_DEAD_DESPAWN);
+                                break;
+                            case 1:
+                                me->SummonCreature(NPC_DOCTOR, AllianceSpawn[2].x - rand32() % 5, AllianceSpawn[2].y - rand32() % 5, AllianceSpawn[2].z, TEMPSUMMON_DEAD_DESPAWN);
+                                break;
+                            case 2:
+                                me->SummonCreature(NPC_FELBEAST, AllianceSpawn[2].x - rand32() % 5, AllianceSpawn[2].y - rand32() % 5, AllianceSpawn[2].z, TEMPSUMMON_DEAD_DESPAWN);
+                                break;
+                            case 3:
+                                me->SummonCreature(NPC_BETRAYER, AllianceSpawn[2].x - rand32() % 5, AllianceSpawn[2].y - rand32() % 5, AllianceSpawn[2].z, TEMPSUMMON_DEAD_DESPAWN);
+                                break;
+                        }
                     }
-                }
-                break;
-            case 12:
-                if (Creature* temp = me->SummonCreature(NPC_THRALL, AllianceSpawn[17].x, AllianceSpawn[17].y, AllianceSpawn[17].z, TEMPSUMMON_MANUAL_DESPAWN))
-                {
-                    thrallGUID = temp->GetGUID();
-                    temp->SetReactState(REACT_PASSIVE);
-                    temp->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
-                    temp->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
-                    temp->CastSpell(temp, SPELL_THRALL_BUFF);
-                    temp->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY2H);
-                }
-                if (Creature* temp = me->SummonCreature(NPC_SYLVANAS, AllianceSpawn[18].x, AllianceSpawn[18].y, AllianceSpawn[18].z, TEMPSUMMON_MANUAL_DESPAWN))
-                {
-                    sylvanasGUID = temp->GetGUID();
-                    temp->SetReactState(REACT_PASSIVE);
-                    temp->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
-                    temp->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
-                    temp->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY2H);
-                }
-                for (uint8 i = 0; i < HORDE_FORCE_MAXCOUNT; ++i)
-                {
-                    if (Creature* temp = me->SummonCreature(NPC_HORDE_SOLDIER, AllianceSpawn[i + 19].x, AllianceSpawn[i + 19].y, AllianceSpawn[i + 19].z, TEMPSUMMON_MANUAL_DESPAWN))
+                    break;
+                case 3:
+                    for (uint8 i = 0; i < WAVE_MAXCOUNT; ++i)
                     {
-                        hordeForcesGUID[i] = temp->GetGUID();
+                        switch (urand(0, 4))
+                        {
+                            case 0:
+                                me->SummonCreature(NPC_GUARDIAN, AllianceSpawn[3].x - rand32() % 5, AllianceSpawn[3].y - rand32() % 5, AllianceSpawn[3].z, TEMPSUMMON_DEAD_DESPAWN);
+                                break;
+                            case 1:
+                            case 2:
+                                me->SummonCreature(NPC_CHEMIST, AllianceSpawn[3].x - rand32() % 5, AllianceSpawn[3].y - rand32() % 5, AllianceSpawn[3].z, TEMPSUMMON_DEAD_DESPAWN);
+                                break;
+                            case 3:
+                            case 4:
+                                me->SummonCreature(NPC_DOCTOR, AllianceSpawn[3].x - rand32() % 5, AllianceSpawn[3].y - rand32() % 5, AllianceSpawn[3].z, TEMPSUMMON_DEAD_DESPAWN);
+                                break;
+                        }
+                    }
+                    break;
+                case 4:
+                    for (uint8 i = 0; i < WAVE_MAXCOUNT; ++i)
+                    {
+                        switch (urand(0, 5))
+                        {
+                            case 0:
+                                if (Unit* temp = me->SummonCreature(NPC_DOCTOR, AllianceSpawn[4].x - rand32() % 5, AllianceSpawn[4].y - rand32() % 5, AllianceSpawn[4].z, TEMPSUMMON_DEAD_DESPAWN))
+                                    temp->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), false);
+                                break;
+                            case 1:
+                                if (Unit* temp = me->SummonCreature(NPC_CHEMIST, AllianceSpawn[4].x - rand32() % 5, AllianceSpawn[4].y - rand32() % 5, AllianceSpawn[4].z, TEMPSUMMON_DEAD_DESPAWN))
+                                    temp->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), false);
+                                break;
+                            case 2:
+                                if (Unit* temp = me->SummonCreature(NPC_BETRAYER, AllianceSpawn[4].x - rand32() % 5, AllianceSpawn[4].y - rand32() % 5, AllianceSpawn[4].z, TEMPSUMMON_DEAD_DESPAWN))
+                                    temp->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), false);
+                                break;
+                            case 3:
+                                if (Unit* temp = me->SummonCreature(NPC_DOCTOR, AllianceSpawn[5].x - rand32() % 5, AllianceSpawn[5].y - rand32() % 5, AllianceSpawn[5].z, TEMPSUMMON_DEAD_DESPAWN))
+                                    temp->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), false);
+                                break;
+                            case 4:
+                                if (Unit* temp = me->SummonCreature(NPC_CHEMIST, AllianceSpawn[5].x - rand32() % 5, AllianceSpawn[5].y - rand32() % 5, AllianceSpawn[5].z, TEMPSUMMON_DEAD_DESPAWN))
+                                    temp->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), false);
+                                break;
+                            case 5:
+                                if (Unit* temp = me->SummonCreature(NPC_BETRAYER, AllianceSpawn[5].x - rand32() % 5, AllianceSpawn[5].y - rand32() % 5, AllianceSpawn[5].z, TEMPSUMMON_DEAD_DESPAWN))
+                                    temp->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), false);
+                                break;
+                        }
+                    }
+                    break;
+                case 5:
+                    for (uint8 i = 0; i < WAVE_MAXCOUNT; ++i)
+                        if (Unit* temp = me->SummonCreature(NPC_GUARDIAN, AllianceSpawn[6].x - rand32() % 5, AllianceSpawn[6].y - rand32() % 5, AllianceSpawn[6].z, TEMPSUMMON_DEAD_DESPAWN))
+                            temp->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), false);
+                    break;
+                case 6:
+                    if (Unit* temp = me->SummonCreature(NPC_BLIGHTWORM, AllianceSpawn[7].x, AllianceSpawn[7].y, AllianceSpawn[7].z, TEMPSUMMON_MANUAL_DESPAWN))
+                    {
+                        blightWormGUID = temp->GetGUID();
+                        temp->AddThreat(me, 100.0f);
+                        me->AddThreat(temp, 100.0f);
+                        if (Creature* jaina = ObjectAccessor::GetCreature(*me, jainaGUID))
+                        {
+                            temp->AddThreat(jaina, 100.0f);
+                            jaina->AddThreat(temp, 100.0f);
+                        }
+                    }
+                    if (Unit* temp = me->SummonCreature(NPC_KHANOK, HordeSpawn[0].x, HordeSpawn[0].y, HordeSpawn[0].z, TEMPSUMMON_MANUAL_DESPAWN))
+                    {
+                        khanokGUID = temp->GetGUID();
+                        if (Creature* khanok = ObjectAccessor::GetCreature(*me, khanokGUID))
+                            khanok->setDeathState(JUST_DIED);
+                    }
+                    if (Unit* temp = me->SummonCreature(NPC_PUTRESS, AllianceSpawn[12].x, AllianceSpawn[12].y, AllianceSpawn[12].z, TEMPSUMMON_MANUAL_DESPAWN))
+                    {
+                        putressGUID = temp->GetGUID();
+                        temp->CastSpell(temp, SPELL_PUTRESS_CASTING_STATE);
+                    }
+                    for (uint8 i = 0; i < GENERATOR_MAXCOUNT; ++i)
+                    {
+                        switch (i)
+                        {
+                            case 0:
+                                if (Unit* temp = me->SummonCreature(NPC_GENERATOR, 1433.142212f, 402.493835f, -80.515945f, TEMPSUMMON_MANUAL_DESPAWN))
+                                {
+                                    generatorGUID[i] = temp->GetGUID();
+                                    if (Creature* putress = ObjectAccessor::GetCreature(*me, putressGUID))
+                                        temp->CastSpell(putress, SPELL_BLIGHT_EMPOWERMENT);
+                                }
+                                break;
+                            case 1:
+                                if (Unit* temp = me->SummonCreature(NPC_GENERATOR, 1428.677979f, 399.753418f, -79.141609f, TEMPSUMMON_MANUAL_DESPAWN))
+                                {
+                                    generatorGUID[i] = temp->GetGUID();
+                                    if (Creature* putress = ObjectAccessor::GetCreature(*me, putressGUID))
+                                        temp->CastSpell(putress, SPELL_BLIGHT_EMPOWERMENT, false, 0, 0, generatorGUID[0]);
+                                }
+                                break;
+                            case 2:
+                                if (Unit* temp = me->SummonCreature(NPC_GENERATOR, 1425.163330f, 402.268951f, -79.299744f, TEMPSUMMON_MANUAL_DESPAWN))
+                                {
+                                    generatorGUID[i] = temp->GetGUID();
+                                    if (Creature* putress = ObjectAccessor::GetCreature(*me, putressGUID))
+                                        temp->CastSpell(putress, SPELL_BLIGHT_EMPOWERMENT, false, 0, 0, generatorGUID[0]);
+                                }
+                                break;
+                            case 3:
+                                if (Unit* temp = me->SummonCreature(NPC_GENERATOR, 1427.323242f, 406.853088f, -78.195641f, TEMPSUMMON_MANUAL_DESPAWN))
+                                {
+                                    generatorGUID[i] = temp->GetGUID();
+                                    if (Creature* putress = ObjectAccessor::GetCreature(*me, putressGUID))
+                                        temp->CastSpell(putress, SPELL_BLIGHT_EMPOWERMENT, false, 0, 0, generatorGUID[0]);
+                                }
+                                break;
+                            case 4:
+                                if (Unit* temp = me->SummonCreature(NPC_GENERATOR, 1432.465210f, 407.460022f, -81.689384f, TEMPSUMMON_MANUAL_DESPAWN))
+                                {
+                                    generatorGUID[i] = temp->GetGUID();
+                                    if (Creature* putress = ObjectAccessor::GetCreature(*me, putressGUID))
+                                        temp->CastSpell(putress, SPELL_BLIGHT_EMPOWERMENT, false, 0, 0, generatorGUID[0]);
+                                }
+                                break;
+                        }
+                    }
+                    break;
+                case 7:
+                    if (Unit* temp = me->SummonCreature(NPC_SW_SOLDIER, AllianceSpawn[8].x, AllianceSpawn[8].y, AllianceSpawn[8].z, 0, TEMPSUMMON_TIMED_DESPAWN, 90000))
+                        temp->GetMotionMaster()->MovePath(NPC_SW_SOLDIER * 10, false);
+                    if (Unit* temp = me->SummonCreature(NPC_SW_SOLDIER, AllianceSpawn[8].x, AllianceSpawn[8].y, AllianceSpawn[8].z, 0, TEMPSUMMON_TIMED_DESPAWN, 90000))
+                        temp->GetMotionMaster()->MovePath((NPC_SW_SOLDIER * 10) + 1, false);
+                    if (Unit* temp = me->SummonCreature(NPC_SW_SOLDIER, AllianceSpawn[8].x, AllianceSpawn[8].y, AllianceSpawn[8].z, 0, TEMPSUMMON_TIMED_DESPAWN, 90000))
+                        temp->GetMotionMaster()->MovePath((NPC_SW_SOLDIER * 10) + 2, false);
+                    if (Unit* temp = me->SummonCreature(NPC_SW_SOLDIER, AllianceSpawn[8].x, AllianceSpawn[8].y, AllianceSpawn[8].z, 0, TEMPSUMMON_TIMED_DESPAWN, 90000))
+                        temp->GetMotionMaster()->MovePath((NPC_SW_SOLDIER * 10) + 3, false);
+                    break;
+                case 8:
+                    break;
+                case 9:
+                    for (uint8 i = 0; i < WAVE_MAXCOUNT; ++i)
+                        me->SummonCreature(NPC_GUARDIAN, AllianceSpawn[10].x + rand32() % 13, AllianceSpawn[10].y + rand32() % 13, AllianceSpawn[10].z, TEMPSUMMON_DEAD_DESPAWN);
+                    break;
+                case 10:
+                    if (Unit* temp = me->SummonCreature(NPC_DREADLORD, AllianceSpawn[11].x, AllianceSpawn[11].y, AllianceSpawn[11].z, TEMPSUMMON_DEAD_DESPAWN))
+                    {
+                        temp->GetMotionMaster()->MovePath(NPC_DREADLORD * 10, false);
+                        temp->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
+                        temp->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK_DEST, true);
+                    }
+                    break;
+                case 11:
+                    for (uint8 i = 0; i < WAVE_MAXCOUNT; ++i)
+                    {
+                        switch (urand(0, 3))
+                        {
+                            case 0:
+                                if (Unit* temp = me->SummonCreature(NPC_EXPERIMENT, AllianceSpawn[13].x + rand32() % 5, AllianceSpawn[13].y + rand32() % 5, AllianceSpawn[13].z, TEMPSUMMON_DEAD_DESPAWN))
+                                    temp->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
+                                break;
+                            case 1:
+                                if (Unit* temp = me->SummonCreature(NPC_EXPERIMENT, AllianceSpawn[14].x + rand32() % 5, AllianceSpawn[14].y + rand32() % 5, AllianceSpawn[14].z, TEMPSUMMON_DEAD_DESPAWN))
+                                    temp->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
+                                break;
+                            case 2:
+                                if (Unit* temp = me->SummonCreature(NPC_EXPERIMENT, AllianceSpawn[15].x + rand32() % 5, AllianceSpawn[15].y + rand32() % 5, AllianceSpawn[15].z, TEMPSUMMON_DEAD_DESPAWN))
+                                    temp->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
+                                break;
+                            case 3:
+                                if (Unit* temp = me->SummonCreature(NPC_EXPERIMENT, AllianceSpawn[16].x + rand32() % 5, AllianceSpawn[16].y + rand32() % 5, AllianceSpawn[16].z, TEMPSUMMON_DEAD_DESPAWN))
+                                    temp->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
+                                break;
+                        }
+                    }
+                    break;
+                case 12:
+                    if (Creature* temp = me->SummonCreature(NPC_THRALL, AllianceSpawn[17].x, AllianceSpawn[17].y, AllianceSpawn[17].z, TEMPSUMMON_MANUAL_DESPAWN))
+                    {
+                        thrallGUID = temp->GetGUID();
+                        temp->SetReactState(REACT_PASSIVE);
+                        temp->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+                        temp->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                        temp->CastSpell(temp, SPELL_THRALL_BUFF);
+                        temp->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY2H);
+                    }
+                    if (Creature* temp = me->SummonCreature(NPC_SYLVANAS, AllianceSpawn[18].x, AllianceSpawn[18].y, AllianceSpawn[18].z, TEMPSUMMON_MANUAL_DESPAWN))
+                    {
+                        sylvanasGUID = temp->GetGUID();
                         temp->SetReactState(REACT_PASSIVE);
                         temp->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
                         temp->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
                         temp->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY2H);
                     }
-                }
-                break;
-            case 13:
-                for (uint8 i = 0; i < ALLIANCE_FORCE_MAXCOUNT; ++i)
-                {
-                    if (Unit* temp = me->SummonCreature(NPC_SW_SOLDIER, AllianceSpawn[i + 25].x, AllianceSpawn[i + 25].y, AllianceSpawn[i + 25].z, AllianceSpawn[i + 25].o, TEMPSUMMON_MANUAL_DESPAWN))
+                    for (uint8 i = 0; i < HORDE_FORCE_MAXCOUNT; ++i)
                     {
-                        allianceForcesGUID[i] = temp->GetGUID();
-                        temp->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
-                        temp->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
-                        temp->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY2H);
+                        if (Creature* temp = me->SummonCreature(NPC_HORDE_SOLDIER, AllianceSpawn[i + 19].x, AllianceSpawn[i + 19].y, AllianceSpawn[i + 19].z, TEMPSUMMON_MANUAL_DESPAWN))
+                        {
+                            hordeForcesGUID[i] = temp->GetGUID();
+                            temp->SetReactState(REACT_PASSIVE);
+                            temp->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+                            temp->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                            temp->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY2H);
+                        }
                     }
-                }
-                break;
+                    break;
+                case 13:
+                    for (uint8 i = 0; i < ALLIANCE_FORCE_MAXCOUNT; ++i)
+                    {
+                        if (Unit* temp = me->SummonCreature(NPC_SW_SOLDIER, AllianceSpawn[i + 25].x, AllianceSpawn[i + 25].y, AllianceSpawn[i + 25].z, AllianceSpawn[i + 25].o, TEMPSUMMON_MANUAL_DESPAWN))
+                        {
+                            allianceForcesGUID[i] = temp->GetGUID();
+                            temp->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+                            temp->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                            temp->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY2H);
+                        }
+                    }
+                    break;
             }
         }
 
@@ -1417,67 +1417,67 @@ public:
         {
             switch (waypointId)
             {
-            case 0:
-                SetHoldState(true);
-                bStepping = true;
-                break;
-            case 2:
-                SetHoldState(true);
-                bStepping = true;
-                break;
-            case 38:
-                if (Creature* jaina = ObjectAccessor::GetCreature(*me, jainaGUID))
-                {
-                    jaina->GetMotionMaster()->Clear();
-                    jaina->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
-                    jaina->SetReactState(REACT_AGGRESSIVE);
-                }
-                SetHoldState(true);
-                bStepping = true;
-                break;
-            case 45:
-                SetHoldState(true);
-                bStepping = true;
-                if (Creature* jaina = ObjectAccessor::GetCreature(*me, jainaGUID))
-                {
-                    jaina->GetMotionMaster()->Clear();
-                    jaina->GetMotionMaster()->MovePoint(0, AllianceWP[6].x, AllianceWP[6].y, AllianceWP[6].z);
-                }
-                break;
-            case 46:
-                SetHoldState(true);
-                bStepping = true;
-                break;
-            case 48:
-                if (Creature* putress = ObjectAccessor::GetCreature(*me, putressGUID))
-                    putress->AI()->Talk(PUTRESS_SAY_2);
-                if (Player* player = GetPlayerForEscort())
-                    player->PlayDirectSound(SOUND_PUTRESS, player);
-                break;
-            case 50:
-                SetHoldState(true);
-                bStepping = true;
-                break;
-            case 63:
-                SetHoldState(true);
-                bStepping = true;
-                break;
-            case 65:
-                SetHoldState(true);
-                bStepping = true;
-                break;
-            case 66:
-                SetHoldState(true);
-                bStepping = true;
-                break;
-            case 87:
-                SetHoldState(true);
-                bStepping = true;
-                break;
-            case 88:
-                SetHoldState(true);
-                bStepping = true;
-                break;
+                case 0:
+                    SetHoldState(true);
+                    bStepping = true;
+                    break;
+                case 2:
+                    SetHoldState(true);
+                    bStepping = true;
+                    break;
+                case 38:
+                    if (Creature* jaina = ObjectAccessor::GetCreature(*me, jainaGUID))
+                    {
+                        jaina->GetMotionMaster()->Clear();
+                        jaina->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+                        jaina->SetReactState(REACT_AGGRESSIVE);
+                    }
+                    SetHoldState(true);
+                    bStepping = true;
+                    break;
+                case 45:
+                    SetHoldState(true);
+                    bStepping = true;
+                    if (Creature* jaina = ObjectAccessor::GetCreature(*me, jainaGUID))
+                    {
+                        jaina->GetMotionMaster()->Clear();
+                        jaina->GetMotionMaster()->MovePoint(0, AllianceWP[6].x, AllianceWP[6].y, AllianceWP[6].z);
+                    }
+                    break;
+                case 46:
+                    SetHoldState(true);
+                    bStepping = true;
+                    break;
+                case 48:
+                    if (Creature* putress = ObjectAccessor::GetCreature(*me, putressGUID))
+                        putress->AI()->Talk(PUTRESS_SAY_2);
+                    if (Player* player = GetPlayerForEscort())
+                        player->PlayDirectSound(SOUND_PUTRESS, player);
+                    break;
+                case 50:
+                    SetHoldState(true);
+                    bStepping = true;
+                    break;
+                case 63:
+                    SetHoldState(true);
+                    bStepping = true;
+                    break;
+                case 65:
+                    SetHoldState(true);
+                    bStepping = true;
+                    break;
+                case 66:
+                    SetHoldState(true);
+                    bStepping = true;
+                    break;
+                case 87:
+                    SetHoldState(true);
+                    bStepping = true;
+                    break;
+                case 88:
+                    SetHoldState(true);
+                    bStepping = true;
+                    break;
             }
         }
 
@@ -1492,498 +1492,498 @@ public:
                     switch (step)
                     {
                         //Preparation
-                    case 0:
-                        me->setActive(true);
-                        UpdateWorldState(me->GetMap(), WORLD_STATE_MANHUNT_COUNTDOWN_A, 1);
-                        Talk(WRYNN_SAY_PREP_1);
-                        JumpToNextStep(10 * IN_MILLISECONDS);
-                        break;
-                    case 1:
-                        Talk(WRYNN_SAY_PREP_2);
-                        JumpToNextStep(10 * IN_MILLISECONDS);
-                        break;
-                    case 2:
-                        Talk(WRYNN_SAY_PREP_3);
-                        JumpToNextStep(20 * IN_MILLISECONDS);
-                        break;
-                    case 3:
-                        Talk(WRYNN_SAY_PREP_4);
-                        JumpToNextStep(20 * IN_MILLISECONDS);
-                        break;
-                    case 4:
-                        UpdateWorldState(me->GetMap(), WORLD_STATE_MANHUNT_COUNTDOWN_A, 0);
-                        UpdateWorldState(me->GetMap(), WORLD_STATE_MANHUNT_STARTS_A, 1);
-                        Talk(WRYNN_SAY_PREP_5);
-                        JumpToNextStep(10 * IN_MILLISECONDS);
-                        break;
-                    case 5:
-                        if (Player* player = GetPlayerForEscort())
-                            player->CastSpell(player, SPELL_WRYNN_BUFF);
-                        JumpToNextStep(3 * IN_MILLISECONDS);
-                        break;
-                    case 6:
-                        Talk(WRYNN_SAY_PREP_6);
-                        JumpToNextStep(1 * IN_MILLISECONDS);
-                        break;
-                    case 7:
-                        SetEscortPaused(false);
-                        JumpToNextStep(1.5 * IN_MILLISECONDS);
-                        break;
-                    case 8:
-                        if (Creature* jaina = ObjectAccessor::GetCreature(*me, jainaGUID))
-                        {
-                            jaina->GetMotionMaster()->MovePath(NPC_JAINA * 10, false);
-                            jaina->setActive(true);
-                        }
-                        bStepping = false;
-                        JumpToNextStep(0);
-                        break;
-                        //Sewers
-                    case 9:
-                        Talk(WRYNN_SAY_SEWERS_1);
-                        SpawnWave(0);
-                        SpawnWave(1);
-                        SpawnWave(2);
-                        SpawnWave(3);
-                        JumpToNextStep(9500);
-                        break;
-                    case 10:
-                        if (Creature* jaina = ObjectAccessor::GetCreature(*me, jainaGUID))
-                            jaina->AI()->Talk(JAINA_SAY_SEWERS_1);
-                        JumpToNextStep(2 * IN_MILLISECONDS);
-                        break;
-                    case 11:
-                        if (Creature* jaina = ObjectAccessor::GetCreature(*me, jainaGUID))
-                            jaina->AI()->DoCast(SPELL_JAINA_BUFF);
-                        JumpToNextStep(1 * IN_MILLISECONDS);
-                        break;
-                    case 12:
-                        SetEscortPaused(false);
-                        UpdateWorldState(me->GetMap(), WORLD_STATE_MANHUNT_STARTS_A, 0);
-                        UpdateWorldState(me->GetMap(), WORLD_STATE_SEWERS_FIGHT_A, 1);
-                        JumpToNextStep(1 * IN_MILLISECONDS);
-                        break;
-                    case 13:
-                        if (Creature* jaina = ObjectAccessor::GetCreature(*me, jainaGUID))
-                        {
-                            jaina->GetMotionMaster()->MoveFollow(me, 5, PET_FOLLOW_ANGLE);
-                            jaina->SetReactState(REACT_AGGRESSIVE);
-                            jaina->setFaction(FACTION_ESCORT_N_NEUTRAL_ACTIVE);
-                        }
-                        bStepping = false;
-                        JumpToNextStep(0);
-                        break;
-                    case 14:
-                        Talk(WRYNN_SAY_SEWERS_2);
-                        JumpToNextStep(3.5 * IN_MILLISECONDS);
-                        break;
-                    case 15:
-                        SpawnWave(4);
-                        JumpToNextStep(15 * IN_MILLISECONDS);
-                        break;
-                    case 16:
-                        SpawnWave(5);
-                        JumpToNextStep(15 * IN_MILLISECONDS);
-                        break;
-                    case 17:
-                        SpawnWave(4);
-                        JumpToNextStep(15 * IN_MILLISECONDS);
-                        break;
-                    case 18:
-                        SpawnWave(4);
-                        JumpToNextStep(15 * IN_MILLISECONDS);
-                        break;
-                    case 19:
-                        SpawnWave(5);
-                        JumpToNextStep(15 * IN_MILLISECONDS);
-                        break;
-                    case 20:
-                        SpawnWave(6);
-                        bStepping = false;
-                        JumpToNextStep(0);
-                        break;
-                    case 21:
-                        Talk(WRYNN_SAY_SEWERS_3);
-                        SpawnWave(7);
-                        JumpToNextStep(10 * IN_MILLISECONDS);
-                        break;
-                    case 22:
-                        Talk(WRYNN_SAY_SEWERS_4);
-                        SetRun(false);
-                        if (Creature* jaina = ObjectAccessor::GetCreature(*me, jainaGUID))
-                        {
-                            jaina->GetMotionMaster()->Clear();
-                            jaina->GetMotionMaster()->MoveFollow(me, 1, 0);
-                        }
-                        JumpToNextStep(5 * IN_MILLISECONDS);
-                        break;
-                    case 23:
-                        bStepping = false;
-                        SetEscortPaused(false);
-                        JumpToNextStep(0);
-                        break;
-                        //Apothecarium
-                    case 24:
-                        if (Creature* jaina = ObjectAccessor::GetCreature(*me, jainaGUID))
-                            jaina->AI()->Talk(JAINA_SAY_APO_1);
-                        JumpToNextStep(10 * IN_MILLISECONDS);
-                        break;
-                    case 25:
-                        SetEscortPaused(false);
-                        bStepping = false;
-                        JumpToNextStep(0);
-                        break;
-                    case 26:
-                        me->SetStandState(UNIT_STAND_STATE_KNEEL);
-                        me->SetTarget(khanokGUID);
-                        JumpToNextStep(1 * IN_MILLISECONDS);
-                        break;
-                    case 27:
-                        Talk(WRYNN_SAY_APO_1);
-                        JumpToNextStep(12 * IN_MILLISECONDS);
-                        break;
-                    case 28:
-                        Talk(WRYNN_SAY_APO_2);
-                        JumpToNextStep(10 * IN_MILLISECONDS);
-                        break;
-                    case 29:
-                        Talk(WRYNN_SAY_APO_3);
-                        JumpToNextStep(1.5 * IN_MILLISECONDS);
-                        break;
-                    case 30:
-                        UpdateWorldState(me->GetMap(), WORLD_STATE_APOTHECARIUM_FIGHT_A, 1);
-                        if (Creature* putress = ObjectAccessor::GetCreature(*me, putressGUID))
-                            putress->AI()->Talk(PUTRESS_SAY_1);
-                        if (Player* player = GetPlayerForEscort())
-                            player->PlayDirectSound(SOUND_PUTRESS, player);
-                        SpawnWave(9);
-                        JumpToNextStep(3 * IN_MILLISECONDS);
-                        break;
-                    case 31:
-                        SetRun(true);
-                        if (Creature* jaina = ObjectAccessor::GetCreature(*me, jainaGUID))
-                            jaina->GetMotionMaster()->MoveFollow(me, 1, 0);
-                        SetEscortPaused(false);
-                        bStepping = false;
-                        JumpToNextStep(0);
-                        break;
-                    case 32:
-                        Talk(WRYNN_SAY_APO_4);
-                        SpawnWave(10);
-                        JumpToNextStep(0.35 * IN_MILLISECONDS);
-                        break;
-                    case 33:
-                        SpawnWave(10);
-                        JumpToNextStep(0.35 * IN_MILLISECONDS);
-                        break;
-                    case 34:
-                        SpawnWave(10);
-                        JumpToNextStep(0.35 * IN_MILLISECONDS);
-                        break;
-                    case 35:
-                        SpawnWave(10);
-                        JumpToNextStep(0.35 * IN_MILLISECONDS);
-                        break;
-                    case 36:
-                        SpawnWave(10);
-                        JumpToNextStep(0.35 * IN_MILLISECONDS);
-                        break;
-                    case 37:
-                        SpawnWave(10);
-                        JumpToNextStep(0.35 * IN_MILLISECONDS);
-                        break;
-                    case 38:
-                        SpawnWave(10);
-                        JumpToNextStep(0.35 * IN_MILLISECONDS);
-                        break;
-                    case 39:
-                        SpawnWave(10);
-                        JumpToNextStep(0.35 * IN_MILLISECONDS);
-                        break;
-                    case 40:
-                        SpawnWave(10);
-                        JumpToNextStep(0.35 * IN_MILLISECONDS);
-                        break;
-                    case 41:
-                        SpawnWave(10);
-                        JumpToNextStep(0.35 * IN_MILLISECONDS);
-                        break;
-                    case 42:
-                        SpawnWave(10);
-                        JumpToNextStep(0.35 * IN_MILLISECONDS);
-                        break;
-                    case 43:
-                        SetEscortPaused(false);
-                        bStepping = false;
-                        JumpToNextStep(0);
-                        break;
-                    case 44:
-                        Talk(WRYNN_SAY_APO_5);
-                        if (Creature* jaina = ObjectAccessor::GetCreature(*me, jainaGUID))
-                        {
-                            jaina->GetMotionMaster()->Clear();
-                            jaina->GetMotionMaster()->MovePoint(0, AllianceWP[7].x, AllianceWP[7].y, AllianceWP[7].z, false);
-                        }
-                        JumpToNextStep(5 * IN_MILLISECONDS);
-                        break;
-                    case 45:
-                        SetEscortPaused(false);
-                        bStepping = false;
-                        JumpToNextStep(0);
-                        break;
-                    case 46:
-                        Talk(WRYNN_SAY_APO_6);
-                        JumpToNextStep(4 * IN_MILLISECONDS);
-                        break;
-                    case 47:
-                        if (Creature* putress = ObjectAccessor::GetCreature(*me, putressGUID))
-                            putress->AI()->Talk(PUTRESS_SAY_3);
-                        SpawnWave(11);
-                        JumpToNextStep(7.5 * IN_MILLISECONDS);
-                        break;
-                    case 48:
-                        if (Creature* putress = ObjectAccessor::GetCreature(*me, putressGUID))
-                            putress->AI()->Talk(PUTRESS_SAY_4);
-                        JumpToNextStep(7.5 * IN_MILLISECONDS);
-                        break;
-                    case 49:
-                        if (Creature* putress = ObjectAccessor::GetCreature(*me, putressGUID))
-                            putress->AI()->Talk(PUTRESS_SAY_5);
-                        SpawnWave(11);
-                        JumpToNextStep(7.5 * IN_MILLISECONDS);
-                        break;
-                    case 50:
-                        if (Creature* putress = ObjectAccessor::GetCreature(*me, putressGUID))
-                            putress->AI()->Talk(PUTRESS_SAY_6);
-                        JumpToNextStep(10 * IN_MILLISECONDS);
-                        break;
-                    case 51:
-                        if (Creature* putress = ObjectAccessor::GetCreature(*me, putressGUID))
-                            putress->AI()->Talk(PUTRESS_SAY_7);
-                        SpawnWave(11);
-                        JumpToNextStep(7.5 * IN_MILLISECONDS);
-                        break;
-                    case 52:
-                        if (Creature* putress = ObjectAccessor::GetCreature(*me, putressGUID))
-                        {
-                            putress->AI()->Talk(PUTRESS_SAY_8);
-                            putress->AI()->DoCast(SPELL_BLIGHT_OVERLOAD);
-                        }
-                        JumpToNextStep(0.5 * IN_MILLISECONDS);
-                        break;
-                    case 53:
-                        if (Creature* putress = ObjectAccessor::GetCreature(*me, putressGUID))
-                        {
-                            putress->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
-                            putress->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
-                            putress->AddThreat(me, 100.0f);
-                            me->AddThreat(putress, 100.0f);
-                            putress->RemoveAura(SPELL_PUTRESS_CASTING_STATE);
-                        }
-                        bStepping = false;
-                        JumpToNextStep(0);
-                        break;
-                    case 54:
-                        Talk(WRYNN_SAY_APO_7);
-                        SetRun(false);
-                        JumpToNextStep(4 * IN_MILLISECONDS);
-                        break;
-                    case 55:
-                        if (Creature* putress = ObjectAccessor::GetCreature(*me, putressGUID))
-                            me->SetTarget(putressGUID);
-                        Talk(WRYNN_SAY_APO_8);
-                        JumpToNextStep(4 * IN_MILLISECONDS);
-                        break;
-                    case 56:
-                        Talk(WRYNN_SAY_APO_9);
-                        me->RemoveStandFlags(UNIT_STAND_STATE_KNEEL);
-                        me->SetStandFlags(UNIT_STAND_STATE_STAND);
-                        SetEscortPaused(false);
-                        bStepping = false;
-                        JumpToNextStep(0);
-                        break;
-                    case 57:
-                        JumpToNextStep(4 * IN_MILLISECONDS);
-                        break;
-                    case 58:
-                        Talk(WRYNN_SAY_APO_10);
-                        JumpToNextStep(7.5 * IN_MILLISECONDS);
-                        break;
-                    case 59:
-                        Talk(WRYNN_SAY_APO_11);
-                        JumpToNextStep(7.5 * IN_MILLISECONDS);
-                        break;
-                    case 60:
-                        Talk(WRYNN_SAY_APO_12);
-                        SpawnWave(12); // thrall sylvanas horde soldiers
-                        JumpToNextStep(10 * IN_MILLISECONDS);
-                        break;
-                    case 61:
-                        if (Creature* thrall = ObjectAccessor::GetCreature(*me, thrallGUID))
-                            thrall->AI()->Talk(THRALL_SAY_THRONE_A_1);
-                        if (Player* player = GetPlayerForEscort())
-                            player->PlayDirectSound(SOUND_THRALL_1, player);
-                        JumpToNextStep(3 * IN_MILLISECONDS);
-                        break;
-                    case 62:
-                        if (Creature* thrall = ObjectAccessor::GetCreature(*me, thrallGUID))
-                            thrall->AI()->Talk(THRALL_SAY_THRONE_A_2);
-                        if (Player* player = GetPlayerForEscort())
-                            player->PlayDirectSound(SOUND_THRALL_2, player);
-                        JumpToNextStep(5 * IN_MILLISECONDS);
-                        break;
-                    case 63:
-                        Talk(WRYNN_SAY_THRONE_1);
-                        JumpToNextStep(3 * IN_MILLISECONDS);
-                        break;
-                    case 64:
-                        Talk(WRYNN_SAY_THRONE_2);
-                        JumpToNextStep(1.5 * IN_MILLISECONDS);
-                        break;
-                    case 65:
-                        SetRun(true);
-                        SetEscortPaused(false);
-                        JumpToNextStep(0.25 * IN_MILLISECONDS);
-                        break;
-                    case 66:
-                        if (Creature* jaina = ObjectAccessor::GetCreature(*me, jainaGUID))
-                            jaina->AI()->Talk(JAINA_SAY_THRONE_1);
-                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
-                        bStepping = false;
-                        JumpToNextStep(0);
-                        break;
-                    case 67:
-                        Talk(WRYNN_SAY_THRONE_3);
-                        JumpToNextStep(10 * IN_MILLISECONDS);
-                        break;
-                    case 68:
-                        Talk(WRYNN_SAY_THRONE_4);
-                        if (Creature* jaina = ObjectAccessor::GetCreature(*me, jainaGUID))
-                        {
-                            jaina->GetMotionMaster()->MovePoint(0, AllianceWP[8].x, AllianceWP[8].y, AllianceWP[8].z);
-                            jaina->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
-                            jaina->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
-                        }
-                        SetEscortPaused(false);
-                        bStepping = false;
-                        JumpToNextStep(0);
-                        break;
-                    case 69:
-                        Talk(WRYNN_SAY_THRONE_5);
-                        SpawnWave(13); //alliance soldiers
-                        JumpToNextStep(15 * IN_MILLISECONDS);
-                        break;
-                    case 70:
-                        Talk(WRYNN_SAY_THRONE_6);
-                        JumpToNextStep(15 * IN_MILLISECONDS);
-                        break;
-                    case 71:
-                        Talk(WRYNN_SAY_THRONE_7);
-                        JumpToNextStep(16.5 * IN_MILLISECONDS);
-                        break;
-                    case 72:
-                        Talk(WRYNN_SAY_THRONE_8);
-                        JumpToNextStep(6 * IN_MILLISECONDS);
-                        break;
-                    case 73:
-                        Talk(WRYNN_SAY_THRONE_9);
-                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
-                        if (Creature* thrall = ObjectAccessor::GetCreature(*me, thrallGUID))
-                        {
-                            thrall->SetReactState(REACT_AGGRESSIVE);
-                            thrall->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
-                            thrall->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
-                            thrall->AddThreat(me, 100.0f);
-                            me->AddThreat(thrall, 100.0f);
-                            thrall->AI()->AttackStart(me);
-                        }
-                        if (Creature* sylvanas = ObjectAccessor::GetCreature(*me, sylvanasGUID))
-                        {
-                            sylvanas->SetReactState(REACT_AGGRESSIVE);
-                            sylvanas->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
-                            sylvanas->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
-                            sylvanas->AddThreat(me, 100.0f);
-                            sylvanas->AI()->AttackStart(me);
-                            me->AddThreat(sylvanas, 100.0f);
-                        }
-                        for (uint8 i = 0; i < HORDE_FORCE_MAXCOUNT; ++i)
-                        {
-                            if (Creature* temp = ObjectAccessor::GetCreature(*me, hordeForcesGUID[i]))
+                        case 0:
+                            me->setActive(true);
+                            UpdateWorldState(me->GetMap(), WORLD_STATE_MANHUNT_COUNTDOWN_A, 1);
+                            Talk(WRYNN_SAY_PREP_1);
+                            JumpToNextStep(10 * IN_MILLISECONDS);
+                            break;
+                        case 1:
+                            Talk(WRYNN_SAY_PREP_2);
+                            JumpToNextStep(10 * IN_MILLISECONDS);
+                            break;
+                        case 2:
+                            Talk(WRYNN_SAY_PREP_3);
+                            JumpToNextStep(20 * IN_MILLISECONDS);
+                            break;
+                        case 3:
+                            Talk(WRYNN_SAY_PREP_4);
+                            JumpToNextStep(20 * IN_MILLISECONDS);
+                            break;
+                        case 4:
+                            UpdateWorldState(me->GetMap(), WORLD_STATE_MANHUNT_COUNTDOWN_A, 0);
+                            UpdateWorldState(me->GetMap(), WORLD_STATE_MANHUNT_STARTS_A, 1);
+                            Talk(WRYNN_SAY_PREP_5);
+                            JumpToNextStep(10 * IN_MILLISECONDS);
+                            break;
+                        case 5:
+                            if (Player* player = GetPlayerForEscort())
+                                player->CastSpell(player, SPELL_WRYNN_BUFF);
+                            JumpToNextStep(3 * IN_MILLISECONDS);
+                            break;
+                        case 6:
+                            Talk(WRYNN_SAY_PREP_6);
+                            JumpToNextStep(1 * IN_MILLISECONDS);
+                            break;
+                        case 7:
+                            SetEscortPaused(false);
+                            JumpToNextStep(1.5 * IN_MILLISECONDS);
+                            break;
+                        case 8:
+                            if (Creature* jaina = ObjectAccessor::GetCreature(*me, jainaGUID))
                             {
-                                temp->SetReactState(REACT_AGGRESSIVE);
-                                temp->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
-                                temp->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                                jaina->GetMotionMaster()->MovePath(NPC_JAINA * 10, false);
+                                jaina->setActive(true);
                             }
-                        }
-                        for (uint8 i = 0; i < ALLIANCE_FORCE_MAXCOUNT; ++i)
-                        {
-                            if (Creature* temp = ObjectAccessor::GetCreature(*me, allianceForcesGUID[i]))
+                            bStepping = false;
+                            JumpToNextStep(0);
+                            break;
+                            //Sewers
+                        case 9:
+                            Talk(WRYNN_SAY_SEWERS_1);
+                            SpawnWave(0);
+                            SpawnWave(1);
+                            SpawnWave(2);
+                            SpawnWave(3);
+                            JumpToNextStep(9500);
+                            break;
+                        case 10:
+                            if (Creature* jaina = ObjectAccessor::GetCreature(*me, jainaGUID))
+                                jaina->AI()->Talk(JAINA_SAY_SEWERS_1);
+                            JumpToNextStep(2 * IN_MILLISECONDS);
+                            break;
+                        case 11:
+                            if (Creature* jaina = ObjectAccessor::GetCreature(*me, jainaGUID))
+                                jaina->AI()->DoCast(SPELL_JAINA_BUFF);
+                            JumpToNextStep(1 * IN_MILLISECONDS);
+                            break;
+                        case 12:
+                            SetEscortPaused(false);
+                            UpdateWorldState(me->GetMap(), WORLD_STATE_MANHUNT_STARTS_A, 0);
+                            UpdateWorldState(me->GetMap(), WORLD_STATE_SEWERS_FIGHT_A, 1);
+                            JumpToNextStep(1 * IN_MILLISECONDS);
+                            break;
+                        case 13:
+                            if (Creature* jaina = ObjectAccessor::GetCreature(*me, jainaGUID))
                             {
-                                if (Creature* temp2 = ObjectAccessor::GetCreature(*me, hordeForcesGUID[i]))
+                                jaina->GetMotionMaster()->MoveFollow(me, 5, PET_FOLLOW_ANGLE);
+                                jaina->SetReactState(REACT_AGGRESSIVE);
+                                jaina->setFaction(FACTION_ESCORT_N_NEUTRAL_ACTIVE);
+                            }
+                            bStepping = false;
+                            JumpToNextStep(0);
+                            break;
+                        case 14:
+                            Talk(WRYNN_SAY_SEWERS_2);
+                            JumpToNextStep(3.5 * IN_MILLISECONDS);
+                            break;
+                        case 15:
+                            SpawnWave(4);
+                            JumpToNextStep(15 * IN_MILLISECONDS);
+                            break;
+                        case 16:
+                            SpawnWave(5);
+                            JumpToNextStep(15 * IN_MILLISECONDS);
+                            break;
+                        case 17:
+                            SpawnWave(4);
+                            JumpToNextStep(15 * IN_MILLISECONDS);
+                            break;
+                        case 18:
+                            SpawnWave(4);
+                            JumpToNextStep(15 * IN_MILLISECONDS);
+                            break;
+                        case 19:
+                            SpawnWave(5);
+                            JumpToNextStep(15 * IN_MILLISECONDS);
+                            break;
+                        case 20:
+                            SpawnWave(6);
+                            bStepping = false;
+                            JumpToNextStep(0);
+                            break;
+                        case 21:
+                            Talk(WRYNN_SAY_SEWERS_3);
+                            SpawnWave(7);
+                            JumpToNextStep(10 * IN_MILLISECONDS);
+                            break;
+                        case 22:
+                            Talk(WRYNN_SAY_SEWERS_4);
+                            SetRun(false);
+                            if (Creature* jaina = ObjectAccessor::GetCreature(*me, jainaGUID))
+                            {
+                                jaina->GetMotionMaster()->Clear();
+                                jaina->GetMotionMaster()->MoveFollow(me, 1, 0);
+                            }
+                            JumpToNextStep(5 * IN_MILLISECONDS);
+                            break;
+                        case 23:
+                            bStepping = false;
+                            SetEscortPaused(false);
+                            JumpToNextStep(0);
+                            break;
+                            //Apothecarium
+                        case 24:
+                            if (Creature* jaina = ObjectAccessor::GetCreature(*me, jainaGUID))
+                                jaina->AI()->Talk(JAINA_SAY_APO_1);
+                            JumpToNextStep(10 * IN_MILLISECONDS);
+                            break;
+                        case 25:
+                            SetEscortPaused(false);
+                            bStepping = false;
+                            JumpToNextStep(0);
+                            break;
+                        case 26:
+                            me->SetStandState(UNIT_STAND_STATE_KNEEL);
+                            me->SetTarget(khanokGUID);
+                            JumpToNextStep(1 * IN_MILLISECONDS);
+                            break;
+                        case 27:
+                            Talk(WRYNN_SAY_APO_1);
+                            JumpToNextStep(12 * IN_MILLISECONDS);
+                            break;
+                        case 28:
+                            Talk(WRYNN_SAY_APO_2);
+                            JumpToNextStep(10 * IN_MILLISECONDS);
+                            break;
+                        case 29:
+                            Talk(WRYNN_SAY_APO_3);
+                            JumpToNextStep(1.5 * IN_MILLISECONDS);
+                            break;
+                        case 30:
+                            UpdateWorldState(me->GetMap(), WORLD_STATE_APOTHECARIUM_FIGHT_A, 1);
+                            if (Creature* putress = ObjectAccessor::GetCreature(*me, putressGUID))
+                                putress->AI()->Talk(PUTRESS_SAY_1);
+                            if (Player* player = GetPlayerForEscort())
+                                player->PlayDirectSound(SOUND_PUTRESS, player);
+                            SpawnWave(9);
+                            JumpToNextStep(3 * IN_MILLISECONDS);
+                            break;
+                        case 31:
+                            SetRun(true);
+                            if (Creature* jaina = ObjectAccessor::GetCreature(*me, jainaGUID))
+                                jaina->GetMotionMaster()->MoveFollow(me, 1, 0);
+                            SetEscortPaused(false);
+                            bStepping = false;
+                            JumpToNextStep(0);
+                            break;
+                        case 32:
+                            Talk(WRYNN_SAY_APO_4);
+                            SpawnWave(10);
+                            JumpToNextStep(0.35 * IN_MILLISECONDS);
+                            break;
+                        case 33:
+                            SpawnWave(10);
+                            JumpToNextStep(0.35 * IN_MILLISECONDS);
+                            break;
+                        case 34:
+                            SpawnWave(10);
+                            JumpToNextStep(0.35 * IN_MILLISECONDS);
+                            break;
+                        case 35:
+                            SpawnWave(10);
+                            JumpToNextStep(0.35 * IN_MILLISECONDS);
+                            break;
+                        case 36:
+                            SpawnWave(10);
+                            JumpToNextStep(0.35 * IN_MILLISECONDS);
+                            break;
+                        case 37:
+                            SpawnWave(10);
+                            JumpToNextStep(0.35 * IN_MILLISECONDS);
+                            break;
+                        case 38:
+                            SpawnWave(10);
+                            JumpToNextStep(0.35 * IN_MILLISECONDS);
+                            break;
+                        case 39:
+                            SpawnWave(10);
+                            JumpToNextStep(0.35 * IN_MILLISECONDS);
+                            break;
+                        case 40:
+                            SpawnWave(10);
+                            JumpToNextStep(0.35 * IN_MILLISECONDS);
+                            break;
+                        case 41:
+                            SpawnWave(10);
+                            JumpToNextStep(0.35 * IN_MILLISECONDS);
+                            break;
+                        case 42:
+                            SpawnWave(10);
+                            JumpToNextStep(0.35 * IN_MILLISECONDS);
+                            break;
+                        case 43:
+                            SetEscortPaused(false);
+                            bStepping = false;
+                            JumpToNextStep(0);
+                            break;
+                        case 44:
+                            Talk(WRYNN_SAY_APO_5);
+                            if (Creature* jaina = ObjectAccessor::GetCreature(*me, jainaGUID))
+                            {
+                                jaina->GetMotionMaster()->Clear();
+                                jaina->GetMotionMaster()->MovePoint(0, AllianceWP[7].x, AllianceWP[7].y, AllianceWP[7].z, false);
+                            }
+                            JumpToNextStep(5 * IN_MILLISECONDS);
+                            break;
+                        case 45:
+                            SetEscortPaused(false);
+                            bStepping = false;
+                            JumpToNextStep(0);
+                            break;
+                        case 46:
+                            Talk(WRYNN_SAY_APO_6);
+                            JumpToNextStep(4 * IN_MILLISECONDS);
+                            break;
+                        case 47:
+                            if (Creature* putress = ObjectAccessor::GetCreature(*me, putressGUID))
+                                putress->AI()->Talk(PUTRESS_SAY_3);
+                            SpawnWave(11);
+                            JumpToNextStep(7.5 * IN_MILLISECONDS);
+                            break;
+                        case 48:
+                            if (Creature* putress = ObjectAccessor::GetCreature(*me, putressGUID))
+                                putress->AI()->Talk(PUTRESS_SAY_4);
+                            JumpToNextStep(7.5 * IN_MILLISECONDS);
+                            break;
+                        case 49:
+                            if (Creature* putress = ObjectAccessor::GetCreature(*me, putressGUID))
+                                putress->AI()->Talk(PUTRESS_SAY_5);
+                            SpawnWave(11);
+                            JumpToNextStep(7.5 * IN_MILLISECONDS);
+                            break;
+                        case 50:
+                            if (Creature* putress = ObjectAccessor::GetCreature(*me, putressGUID))
+                                putress->AI()->Talk(PUTRESS_SAY_6);
+                            JumpToNextStep(10 * IN_MILLISECONDS);
+                            break;
+                        case 51:
+                            if (Creature* putress = ObjectAccessor::GetCreature(*me, putressGUID))
+                                putress->AI()->Talk(PUTRESS_SAY_7);
+                            SpawnWave(11);
+                            JumpToNextStep(7.5 * IN_MILLISECONDS);
+                            break;
+                        case 52:
+                            if (Creature* putress = ObjectAccessor::GetCreature(*me, putressGUID))
+                            {
+                                putress->AI()->Talk(PUTRESS_SAY_8);
+                                putress->AI()->DoCast(SPELL_BLIGHT_OVERLOAD);
+                            }
+                            JumpToNextStep(0.5 * IN_MILLISECONDS);
+                            break;
+                        case 53:
+                            if (Creature* putress = ObjectAccessor::GetCreature(*me, putressGUID))
+                            {
+                                putress->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+                                putress->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                                putress->AddThreat(me, 100.0f);
+                                me->AddThreat(putress, 100.0f);
+                                putress->RemoveAura(SPELL_PUTRESS_CASTING_STATE);
+                            }
+                            bStepping = false;
+                            JumpToNextStep(0);
+                            break;
+                        case 54:
+                            Talk(WRYNN_SAY_APO_7);
+                            SetRun(false);
+                            JumpToNextStep(4 * IN_MILLISECONDS);
+                            break;
+                        case 55:
+                            if (ObjectAccessor::GetCreature(*me, putressGUID))
+                                me->SetTarget(putressGUID);
+                            Talk(WRYNN_SAY_APO_8);
+                            JumpToNextStep(4 * IN_MILLISECONDS);
+                            break;
+                        case 56:
+                            Talk(WRYNN_SAY_APO_9);
+                            me->RemoveStandFlags(UNIT_STAND_STATE_KNEEL);
+                            me->SetStandFlags(UNIT_STAND_STATE_STAND);
+                            SetEscortPaused(false);
+                            bStepping = false;
+                            JumpToNextStep(0);
+                            break;
+                        case 57:
+                            JumpToNextStep(4 * IN_MILLISECONDS);
+                            break;
+                        case 58:
+                            Talk(WRYNN_SAY_APO_10);
+                            JumpToNextStep(7.5 * IN_MILLISECONDS);
+                            break;
+                        case 59:
+                            Talk(WRYNN_SAY_APO_11);
+                            JumpToNextStep(7.5 * IN_MILLISECONDS);
+                            break;
+                        case 60:
+                            Talk(WRYNN_SAY_APO_12);
+                            SpawnWave(12); // thrall sylvanas horde soldiers
+                            JumpToNextStep(10 * IN_MILLISECONDS);
+                            break;
+                        case 61:
+                            if (Creature* thrall = ObjectAccessor::GetCreature(*me, thrallGUID))
+                                thrall->AI()->Talk(THRALL_SAY_THRONE_A_1);
+                            if (Player* player = GetPlayerForEscort())
+                                player->PlayDirectSound(SOUND_THRALL_1, player);
+                            JumpToNextStep(3 * IN_MILLISECONDS);
+                            break;
+                        case 62:
+                            if (Creature* thrall = ObjectAccessor::GetCreature(*me, thrallGUID))
+                                thrall->AI()->Talk(THRALL_SAY_THRONE_A_2);
+                            if (Player* player = GetPlayerForEscort())
+                                player->PlayDirectSound(SOUND_THRALL_2, player);
+                            JumpToNextStep(5 * IN_MILLISECONDS);
+                            break;
+                        case 63:
+                            Talk(WRYNN_SAY_THRONE_1);
+                            JumpToNextStep(3 * IN_MILLISECONDS);
+                            break;
+                        case 64:
+                            Talk(WRYNN_SAY_THRONE_2);
+                            JumpToNextStep(1.5 * IN_MILLISECONDS);
+                            break;
+                        case 65:
+                            SetRun(true);
+                            SetEscortPaused(false);
+                            JumpToNextStep(0.25 * IN_MILLISECONDS);
+                            break;
+                        case 66:
+                            if (Creature* jaina = ObjectAccessor::GetCreature(*me, jainaGUID))
+                                jaina->AI()->Talk(JAINA_SAY_THRONE_1);
+                            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+                            bStepping = false;
+                            JumpToNextStep(0);
+                            break;
+                        case 67:
+                            Talk(WRYNN_SAY_THRONE_3);
+                            JumpToNextStep(10 * IN_MILLISECONDS);
+                            break;
+                        case 68:
+                            Talk(WRYNN_SAY_THRONE_4);
+                            if (Creature* jaina = ObjectAccessor::GetCreature(*me, jainaGUID))
+                            {
+                                jaina->GetMotionMaster()->MovePoint(0, AllianceWP[8].x, AllianceWP[8].y, AllianceWP[8].z);
+                                jaina->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+                                jaina->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                            }
+                            SetEscortPaused(false);
+                            bStepping = false;
+                            JumpToNextStep(0);
+                            break;
+                        case 69:
+                            Talk(WRYNN_SAY_THRONE_5);
+                            SpawnWave(13); //alliance soldiers
+                            JumpToNextStep(15 * IN_MILLISECONDS);
+                            break;
+                        case 70:
+                            Talk(WRYNN_SAY_THRONE_6);
+                            JumpToNextStep(15 * IN_MILLISECONDS);
+                            break;
+                        case 71:
+                            Talk(WRYNN_SAY_THRONE_7);
+                            JumpToNextStep(16.5 * IN_MILLISECONDS);
+                            break;
+                        case 72:
+                            Talk(WRYNN_SAY_THRONE_8);
+                            JumpToNextStep(6 * IN_MILLISECONDS);
+                            break;
+                        case 73:
+                            Talk(WRYNN_SAY_THRONE_9);
+                            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
+                            if (Creature* thrall = ObjectAccessor::GetCreature(*me, thrallGUID))
+                            {
+                                thrall->SetReactState(REACT_AGGRESSIVE);
+                                thrall->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+                                thrall->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                                thrall->AddThreat(me, 100.0f);
+                                me->AddThreat(thrall, 100.0f);
+                                thrall->AI()->AttackStart(me);
+                            }
+                            if (Creature* sylvanas = ObjectAccessor::GetCreature(*me, sylvanasGUID))
+                            {
+                                sylvanas->SetReactState(REACT_AGGRESSIVE);
+                                sylvanas->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+                                sylvanas->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                                sylvanas->AddThreat(me, 100.0f);
+                                sylvanas->AI()->AttackStart(me);
+                                me->AddThreat(sylvanas, 100.0f);
+                            }
+                            for (uint8 i = 0; i < HORDE_FORCE_MAXCOUNT; ++i)
+                            {
+                                if (Creature* temp = ObjectAccessor::GetCreature(*me, hordeForcesGUID[i]))
                                 {
                                     temp->SetReactState(REACT_AGGRESSIVE);
-                                    temp2->SetReactState(REACT_AGGRESSIVE);
-                                    temp->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
-                                    temp2->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
-                                    temp->AddThreat(temp2, 100.0f);
-                                    temp->AI()->AttackStart(temp2);
-                                    temp2->AddThreat(temp, 100.0f);
+                                    temp->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+                                    temp->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
                                 }
                             }
-                        }
-                        JumpToNextStep(6 * IN_MILLISECONDS);
-                        break;
-                    case 74:
-                        if (Creature* jaina = ObjectAccessor::GetCreature(*me, jainaGUID))
-                        {
-                            jaina->GetMotionMaster()->MovePoint(0, AllianceWP[9].x, AllianceWP[9].y, AllianceWP[9].z);
-                            jaina->AI()->Talk(JAINA_SAY_THRONE_2);
-                        }
-                        JumpToNextStep(8 * IN_MILLISECONDS);
-                        break;
-                    case 75:
-                        if (Creature* jaina = ObjectAccessor::GetCreature(*me, jainaGUID))
-                        {
-                            jaina->AI()->DoCastAOE(SPELL_DEEPFREEZE);
-                            jaina->AI()->Talk(JAINA_SAY_THRONE_3);
-                        }
-                        JumpToNextStep(5 * IN_MILLISECONDS);
-                        break;
-                    case 76:
-                        std::list<Creature*> HelperList;
-                        me->GetCreatureListWithEntryInGrid(HelperList, NPC_SW_SOLDIER, 100.0f);
-                        me->GetCreatureListWithEntryInGrid(HelperList, NPC_HORDE_SOLDIER, 100.0f);
-                        me->GetCreatureListWithEntryInGrid(HelperList, NPC_JAINA, 100.0f);
-                        me->GetCreatureListWithEntryInGrid(HelperList, NPC_SYLVANAS, 100.0f);
-                        me->GetCreatureListWithEntryInGrid(HelperList, NPC_THRALL, 100.0f);
-                        if (!HelperList.empty())
-                            for (std::list<Creature*>::iterator itr = HelperList.begin(); itr != HelperList.end(); itr++)
-                                (*itr)->DespawnOrUnsummon();
-                        if (Map *map = me->GetMap())
-                        {
-                            Map::PlayerList const &PlayerList = map->GetPlayers();
-                            for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+                            for (uint8 i = 0; i < ALLIANCE_FORCE_MAXCOUNT; ++i)
                             {
-                                if (Player *player = i->GetSource())
+                                if (Creature* temp = ObjectAccessor::GetCreature(*me, allianceForcesGUID[i]))
                                 {
-                                    if (me->IsInRange(player, 0.0f, 50.0f))
+                                    if (Creature* temp2 = ObjectAccessor::GetCreature(*me, hordeForcesGUID[i]))
                                     {
-                                        if (player->GetTeamId() == TEAM_ALLIANCE)
+                                        temp->SetReactState(REACT_AGGRESSIVE);
+                                        temp2->SetReactState(REACT_AGGRESSIVE);
+                                        temp->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
+                                        temp2->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
+                                        temp->AddThreat(temp2, 100.0f);
+                                        temp->AI()->AttackStart(temp2);
+                                        temp2->AddThreat(temp, 100.0f);
+                                    }
+                                }
+                            }
+                            JumpToNextStep(6 * IN_MILLISECONDS);
+                            break;
+                        case 74:
+                            if (Creature* jaina = ObjectAccessor::GetCreature(*me, jainaGUID))
+                            {
+                                jaina->GetMotionMaster()->MovePoint(0, AllianceWP[9].x, AllianceWP[9].y, AllianceWP[9].z);
+                                jaina->AI()->Talk(JAINA_SAY_THRONE_2);
+                            }
+                            JumpToNextStep(8 * IN_MILLISECONDS);
+                            break;
+                        case 75:
+                            if (Creature* jaina = ObjectAccessor::GetCreature(*me, jainaGUID))
+                            {
+                                jaina->AI()->DoCastAOE(SPELL_DEEPFREEZE);
+                                jaina->AI()->Talk(JAINA_SAY_THRONE_3);
+                            }
+                            JumpToNextStep(5 * IN_MILLISECONDS);
+                            break;
+                        case 76:
+                            std::list<Creature*> HelperList;
+                            me->GetCreatureListWithEntryInGrid(HelperList, NPC_SW_SOLDIER, 100.0f);
+                            me->GetCreatureListWithEntryInGrid(HelperList, NPC_HORDE_SOLDIER, 100.0f);
+                            me->GetCreatureListWithEntryInGrid(HelperList, NPC_JAINA, 100.0f);
+                            me->GetCreatureListWithEntryInGrid(HelperList, NPC_SYLVANAS, 100.0f);
+                            me->GetCreatureListWithEntryInGrid(HelperList, NPC_THRALL, 100.0f);
+                            if (!HelperList.empty())
+                                for (std::list<Creature*>::iterator itr = HelperList.begin(); itr != HelperList.end(); itr++)
+                                    (*itr)->DespawnOrUnsummon();
+                            if (Map *map = me->GetMap())
+                            {
+                                Map::PlayerList const &PlayerList = map->GetPlayers();
+                                for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+                                {
+                                    if (Player *player = i->GetSource())
+                                    {
+                                        if (me->IsInRange(player, 0.0f, 50.0f))
                                         {
-                                            player->RemoveAura(SPELL_WRYNN_BUFF);
-                                            player->RemoveAura(SPELL_JAINA_BUFF);
-                                            player->CompleteQuest(QUEST_BATTLE_A);
-                                            player->NearTeleportTo(-8445.213867f, 337.384277f, 121.746056f, 5.401534f, false);
+                                            if (player->GetTeamId() == TEAM_ALLIANCE)
+                                            {
+                                                player->RemoveAura(SPELL_WRYNN_BUFF);
+                                                player->RemoveAura(SPELL_JAINA_BUFF);
+                                                player->CompleteQuest(QUEST_BATTLE_A);
+                                                player->NearTeleportTo(-8445.213867f, 337.384277f, 121.746056f, 5.401534f, false);
+                                            }
                                         }
                                     }
                                 }
                             }
-                        }
-                        UpdateWorldState(me->GetMap(), WORLD_STATE_MANHUNT_STARTS_A, 0);
-                        UpdateWorldState(me->GetMap(), WORLD_STATE_SEWERS_DONE_A, 0);
-                        UpdateWorldState(me->GetMap(), WORLD_STATE_APOTHECARIUM_DONE_A, 0);
-                        me->DespawnOrUnsummon();
-                        break;
+                            UpdateWorldState(me->GetMap(), WORLD_STATE_MANHUNT_STARTS_A, 0);
+                            UpdateWorldState(me->GetMap(), WORLD_STATE_SEWERS_DONE_A, 0);
+                            UpdateWorldState(me->GetMap(), WORLD_STATE_APOTHECARIUM_DONE_A, 0);
+                            me->DespawnOrUnsummon();
+                            break;
                     }
                 }
                 else phaseTimer -= diff;
@@ -2001,27 +2001,27 @@ public:
             {
                 switch (eventId)
                 {
-                case EVENT_WHIRLWIND:
-                    DoCast(me, SPELL_WHIRLWIND);
-                    _events.ScheduleEvent(EVENT_WHIRLWIND, 20 * IN_MILLISECONDS);
-                    break;
-                case EVENT_HEROIC_LEAP:
-                    DoCastVictim(SPELL_HEROIC_LEAP);
-                    _events.ScheduleEvent(EVENT_HEROIC_LEAP, urand(15, 30) * IN_MILLISECONDS);
-                    break;
-                case EVENT_AGGRO_JAINA:
-                    if (me->GetVictim())
-                        if (Creature* jaina = ObjectAccessor::GetCreature(*me, jainaGUID))
-                            jaina->AI()->AttackStart(me->GetVictim()); DoCast(me, SPELL_THUNDER);
-                    _events.ScheduleEvent(EVENT_AGGRO_JAINA, 2 * IN_MILLISECONDS);
-                    break;
-                case EVENT_WRYNN_BUFF:
-                    if (Player* player = GetPlayerForEscort())
-                        player->CastSpell(player, SPELL_WRYNN_BUFF);
-                    _events.ScheduleEvent(EVENT_WRYNN_BUFF, 10 * IN_MILLISECONDS);
-                    break;
-                default:
-                    break;
+                    case EVENT_WHIRLWIND:
+                        DoCast(me, SPELL_WHIRLWIND);
+                        _events.ScheduleEvent(EVENT_WHIRLWIND, 20 * IN_MILLISECONDS);
+                        break;
+                    case EVENT_HEROIC_LEAP:
+                        DoCastVictim(SPELL_HEROIC_LEAP);
+                        _events.ScheduleEvent(EVENT_HEROIC_LEAP, urand(15, 30) * IN_MILLISECONDS);
+                        break;
+                    case EVENT_AGGRO_JAINA:
+                        if (me->GetVictim())
+                            if (Creature* jaina = ObjectAccessor::GetCreature(*me, jainaGUID))
+                                jaina->AI()->AttackStart(me->GetVictim()); DoCast(me, SPELL_THUNDER);
+                        _events.ScheduleEvent(EVENT_AGGRO_JAINA, 2 * IN_MILLISECONDS);
+                        break;
+                    case EVENT_WRYNN_BUFF:
+                        if (Player* player = GetPlayerForEscort())
+                            player->CastSpell(player, SPELL_WRYNN_BUFF);
+                        _events.ScheduleEvent(EVENT_WRYNN_BUFF, 10 * IN_MILLISECONDS);
+                        break;
+                    default:
+                        break;
                 }
             }
 
@@ -2076,21 +2076,21 @@ public:
             {
                 switch (eventId)
                 {
-                case EVENT_FIREBALL:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
-                        DoCast(target, SPELL_FIREBALL);
-                    _events.ScheduleEvent(EVENT_FIREBALL, 3 * IN_MILLISECONDS);
-                    break;
-                case EVENT_BLIZZARD:
-                    DoCast(SPELL_BLIZZARD);
-                    _events.ScheduleEvent(EVENT_BLIZZARD, 15 * IN_MILLISECONDS);
-                    break;
-                case EVENT_ELEMENTAL:
-                    DoCast(SPELL_ELEMENTALS);
-                    _events.ScheduleEvent(EVENT_ELEMENTAL, 90 * IN_MILLISECONDS);
-                    break;
-                default:
-                    break;
+                    case EVENT_FIREBALL:
+                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                            DoCast(target, SPELL_FIREBALL);
+                        _events.ScheduleEvent(EVENT_FIREBALL, 3 * IN_MILLISECONDS);
+                        break;
+                    case EVENT_BLIZZARD:
+                        DoCast(SPELL_BLIZZARD);
+                        _events.ScheduleEvent(EVENT_BLIZZARD, 15 * IN_MILLISECONDS);
+                        break;
+                    case EVENT_ELEMENTAL:
+                        DoCast(SPELL_ELEMENTALS);
+                        _events.ScheduleEvent(EVENT_ELEMENTAL, 90 * IN_MILLISECONDS);
+                        break;
+                    default:
+                        break;
                 }
             }
 
@@ -2147,17 +2147,17 @@ public:
             {
                 switch (eventId)
                 {
-                case EVENT_INFEST:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0, true))
-                        DoCast(target, SPELL_INGEST);
-                    _events.ScheduleEvent(EVENT_INFEST, 20 * IN_MILLISECONDS);
-                    break;
-                case EVENT_BLIGHT_BREATH:
-                    DoCast(SPELL_BLIGHT_BREATH);
-                    _events.ScheduleEvent(EVENT_BLIGHT_BREATH, 15 * IN_MILLISECONDS);
-                    break;
-                default:
-                    break;
+                    case EVENT_INFEST:
+                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0, true))
+                            DoCast(target, SPELL_INGEST);
+                        _events.ScheduleEvent(EVENT_INFEST, 20 * IN_MILLISECONDS);
+                        break;
+                    case EVENT_BLIGHT_BREATH:
+                        DoCast(SPELL_BLIGHT_BREATH);
+                        _events.ScheduleEvent(EVENT_BLIGHT_BREATH, 15 * IN_MILLISECONDS);
+                        break;
+                    default:
+                        break;
                 }
             }
 
@@ -2270,23 +2270,23 @@ public:
         player->PlayerTalkClass->ClearMenus();
         switch (action)
         {
-        case GOSSIP_ACTION_INFO_DEF + 1:
-        {
-            player->CLOSE_GOSSIP_MENU();
-            if (auto thrall_ai = CAST_AI(npc_thrall_bfu::npc_thrall_bfuAI, creature->AI()))
+            case GOSSIP_ACTION_INFO_DEF + 1:
             {
-                if (Creature* sylvannas = GetClosestCreatureWithEntry(creature, NPC_SYLVANAS, 50.0f))
+                player->CLOSE_GOSSIP_MENU();
+                if (auto thrall_ai = CAST_AI(npc_thrall_bfu::npc_thrall_bfuAI, creature->AI()))
                 {
-                    thrall_ai->sylvanasfollowGUID = sylvannas->GetGUID();
-                    thrall_ai->Start(true, true, player->GetGUID());
-                    thrall_ai->SetDespawnAtEnd(false);
-                    thrall_ai->SetDespawnAtFar(false);
+                    if (Creature* sylvannas = GetClosestCreatureWithEntry(creature, NPC_SYLVANAS, 50.0f))
+                    {
+                        thrall_ai->sylvanasfollowGUID = sylvannas->GetGUID();
+                        thrall_ai->Start(true, true, player->GetGUID());
+                        thrall_ai->SetDespawnAtEnd(false);
+                        thrall_ai->SetDespawnAtFar(false);
+                    }
+                    else
+                        thrall_ai->sylvanasfollowGUID = 0;
                 }
-                else
-                    thrall_ai->sylvanasfollowGUID = 0;
+                break;
             }
-            break;
-        }
         }
         return true;
     }
@@ -2396,51 +2396,51 @@ public:
         {
             switch (summoned->GetEntry())
             {
-            case NPC_BLIGHT_ABBERATION:
-                summoned->AI()->AttackStart(me);
-                break;
-            case NPC_WARSONG_BATTLEGUARD:
-                summoned->ApplySpellImmune(0, IMMUNITY_ID, SPELL_SYLVANAS_BUFF, true);
-                summoned->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY2H);
-                break;
-            case NPC_VARIMATHRAS_PORTAL:
-                summoned->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                summoned->ApplySpellImmune(0, IMMUNITY_ID, SPELL_THRALL_BUFF, true);
-                summoned->ApplySpellImmune(0, IMMUNITY_ID, SPELL_SYLVANAS_BUFF, true);
-                break;
-            case NPC_CAVE_DUMMY:
-                summoned->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                summoned->ApplySpellImmune(0, IMMUNITY_ID, SPELL_THRALL_BUFF, true);
-                summoned->ApplySpellImmune(0, IMMUNITY_ID, SPELL_SYLVANAS_BUFF, true);
-                summoned->AddAura(SPELL_CYCLONE_FALL, summoned);
-                break;
-            case NPC_TREACHEROUS_GUARDIAN_H:
-            case NPC_DOCTOR_H:
-            case NPC_CHEMIST_H:
-                summoned->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
-                summoned->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK_DEST, true);
-                summoned->ApplySpellImmune(0, IMMUNITY_ID, SPELL_THRALL_BUFF, true);
-                summoned->ApplySpellImmune(0, IMMUNITY_ID, SPELL_SYLVANAS_BUFF, true);
-                if (!EnableAttack)
-                    summoned->setFaction(FACTION_FRIENDLY_TO_ALL);
-                summoned->AddThreat(me, 100.0f);
-                me->AddThreat(summoned, 100.0f);
-                summoned->AI()->AttackStart(me);
-                break;
-            case NPC_LEGION_INVADER:
-            case NPC_LEGION_DREADWHISPER:
-            case NPC_FELGUARD_MORADEUR:
-            case NPC_DREADLORD:
-            case NPC_BETRAYER_H:
-            case NPC_FELBEAST_H:
-                summoned->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
-                summoned->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK_DEST, true);
-                summoned->AddThreat(me, 100.0f);
-                me->AddThreat(summoned, 100.0f);
-                summoned->AI()->AttackStart(me);
-                break;
-            default:
-                break;
+                case NPC_BLIGHT_ABBERATION:
+                    summoned->AI()->AttackStart(me);
+                    break;
+                case NPC_WARSONG_BATTLEGUARD:
+                    summoned->ApplySpellImmune(0, IMMUNITY_ID, SPELL_SYLVANAS_BUFF, true);
+                    summoned->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY2H);
+                    break;
+                case NPC_VARIMATHRAS_PORTAL:
+                    summoned->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    summoned->ApplySpellImmune(0, IMMUNITY_ID, SPELL_THRALL_BUFF, true);
+                    summoned->ApplySpellImmune(0, IMMUNITY_ID, SPELL_SYLVANAS_BUFF, true);
+                    break;
+                case NPC_CAVE_DUMMY:
+                    summoned->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    summoned->ApplySpellImmune(0, IMMUNITY_ID, SPELL_THRALL_BUFF, true);
+                    summoned->ApplySpellImmune(0, IMMUNITY_ID, SPELL_SYLVANAS_BUFF, true);
+                    summoned->AddAura(SPELL_CYCLONE_FALL, summoned);
+                    break;
+                case NPC_TREACHEROUS_GUARDIAN_H:
+                case NPC_DOCTOR_H:
+                case NPC_CHEMIST_H:
+                    summoned->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
+                    summoned->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK_DEST, true);
+                    summoned->ApplySpellImmune(0, IMMUNITY_ID, SPELL_THRALL_BUFF, true);
+                    summoned->ApplySpellImmune(0, IMMUNITY_ID, SPELL_SYLVANAS_BUFF, true);
+                    if (!EnableAttack)
+                        summoned->setFaction(FACTION_FRIENDLY_TO_ALL);
+                    summoned->AddThreat(me, 100.0f);
+                    me->AddThreat(summoned, 100.0f);
+                    summoned->AI()->AttackStart(me);
+                    break;
+                case NPC_LEGION_INVADER:
+                case NPC_LEGION_DREADWHISPER:
+                case NPC_FELGUARD_MORADEUR:
+                case NPC_DREADLORD:
+                case NPC_BETRAYER_H:
+                case NPC_FELBEAST_H:
+                    summoned->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
+                    summoned->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK_DEST, true);
+                    summoned->AddThreat(me, 100.0f);
+                    me->AddThreat(summoned, 100.0f);
+                    summoned->AI()->AttackStart(me);
+                    break;
+                default:
+                    break;
             }
         }
 
@@ -2448,49 +2448,49 @@ public:
         {
             switch (summon->GetEntry())
             {
-            case NPC_BLIGHT_ABBERATION:
-                UpdateWorldState(me->GetMap(), WORLD_STATE_COURTYARD_FIGHT_H, 0);
-                UpdateWorldState(me->GetMap(), WORLD_STATE_COURTYARD_DONE_H, 1);
-                bStepping = true;
-                break;
-            case NPC_KHANOK:
-            {
-                UpdateWorldState(me->GetMap(), WORLD_STATE_INNER_SANKTUM_FIGHT_H, 0);
-                UpdateWorldState(me->GetMap(), WORLD_STATE_INNER_SANKTUM_DONE_H, 1);
-                FollowThrall();
-                SetEscortPaused(false);
-                std::list<Creature*> SanktumList;
-                me->GetCreatureListWithEntryInGrid(SanktumList, NPC_FELGUARD_MORADEUR, 1000.0f);
-                me->GetCreatureListWithEntryInGrid(SanktumList, NPC_DREADLORD, 1000.0f);
-                me->GetCreatureListWithEntryInGrid(SanktumList, NPC_TREACHEROUS_GUARDIAN_H, 1000.0f);
-                me->GetCreatureListWithEntryInGrid(SanktumList, NPC_DOCTOR_H, 1000.0f);
-                me->GetCreatureListWithEntryInGrid(SanktumList, NPC_CHEMIST_H, 1000.0f);
-                me->GetCreatureListWithEntryInGrid(SanktumList, NPC_BETRAYER_H, 1000.0f);
-                me->GetCreatureListWithEntryInGrid(SanktumList, NPC_FELBEAST_H, 1000.0f);
-                me->GetCreatureListWithEntryInGrid(SanktumList, NPC_DOOMGUARD_PILLARGER, 1000.0f);
-                if (!SanktumList.empty())
-                    for (std::list<Creature*>::iterator itr = SanktumList.begin(); itr != SanktumList.end(); itr++)
-                        (*itr)->DespawnOrUnsummon();
-                break;
-            }
-            case NPC_VARIMATHRAS:
-            {
-                UpdateWorldState(me->GetMap(), WORLD_STATE_ROYAL_QUARTER_FIGHT_H, 0);
-                UpdateWorldState(me->GetMap(), WORLD_STATE_ROYAL_QUARTER_DONE_H, 1);
-                std::list<Creature*> ThroneList;
-                me->GetCreatureListWithEntryInGrid(ThroneList, NPC_LEGION_OVERLORD, 1000.0f);
-                me->GetCreatureListWithEntryInGrid(ThroneList, NPC_LEGION_INVADER, 1000.0f);
-                me->GetCreatureListWithEntryInGrid(ThroneList, NPC_LEGION_DREADWHISPER, 1000.0f);
-                me->GetCreatureListWithEntryInGrid(ThroneList, NPC_VARIMATHRAS_PORTAL, 1000.0f);
-                if (!ThroneList.empty())
-                    for (std::list<Creature*>::iterator itr = ThroneList.begin(); itr != ThroneList.end(); itr++)
-                        (*itr)->DespawnOrUnsummon();
-                SetEscortPaused(false);
-                SetRun(false);
-                break;
-            }
-            default:
-                break;
+                case NPC_BLIGHT_ABBERATION:
+                    UpdateWorldState(me->GetMap(), WORLD_STATE_COURTYARD_FIGHT_H, 0);
+                    UpdateWorldState(me->GetMap(), WORLD_STATE_COURTYARD_DONE_H, 1);
+                    bStepping = true;
+                    break;
+                case NPC_KHANOK:
+                {
+                    UpdateWorldState(me->GetMap(), WORLD_STATE_INNER_SANKTUM_FIGHT_H, 0);
+                    UpdateWorldState(me->GetMap(), WORLD_STATE_INNER_SANKTUM_DONE_H, 1);
+                    FollowThrall();
+                    SetEscortPaused(false);
+                    std::list<Creature*> SanktumList;
+                    me->GetCreatureListWithEntryInGrid(SanktumList, NPC_FELGUARD_MORADEUR, 1000.0f);
+                    me->GetCreatureListWithEntryInGrid(SanktumList, NPC_DREADLORD, 1000.0f);
+                    me->GetCreatureListWithEntryInGrid(SanktumList, NPC_TREACHEROUS_GUARDIAN_H, 1000.0f);
+                    me->GetCreatureListWithEntryInGrid(SanktumList, NPC_DOCTOR_H, 1000.0f);
+                    me->GetCreatureListWithEntryInGrid(SanktumList, NPC_CHEMIST_H, 1000.0f);
+                    me->GetCreatureListWithEntryInGrid(SanktumList, NPC_BETRAYER_H, 1000.0f);
+                    me->GetCreatureListWithEntryInGrid(SanktumList, NPC_FELBEAST_H, 1000.0f);
+                    me->GetCreatureListWithEntryInGrid(SanktumList, NPC_DOOMGUARD_PILLARGER, 1000.0f);
+                    if (!SanktumList.empty())
+                        for (std::list<Creature*>::iterator itr = SanktumList.begin(); itr != SanktumList.end(); itr++)
+                            (*itr)->DespawnOrUnsummon();
+                    break;
+                }
+                case NPC_VARIMATHRAS:
+                {
+                    UpdateWorldState(me->GetMap(), WORLD_STATE_ROYAL_QUARTER_FIGHT_H, 0);
+                    UpdateWorldState(me->GetMap(), WORLD_STATE_ROYAL_QUARTER_DONE_H, 1);
+                    std::list<Creature*> ThroneList;
+                    me->GetCreatureListWithEntryInGrid(ThroneList, NPC_LEGION_OVERLORD, 1000.0f);
+                    me->GetCreatureListWithEntryInGrid(ThroneList, NPC_LEGION_INVADER, 1000.0f);
+                    me->GetCreatureListWithEntryInGrid(ThroneList, NPC_LEGION_DREADWHISPER, 1000.0f);
+                    me->GetCreatureListWithEntryInGrid(ThroneList, NPC_VARIMATHRAS_PORTAL, 1000.0f);
+                    if (!ThroneList.empty())
+                        for (std::list<Creature*>::iterator itr = ThroneList.begin(); itr != ThroneList.end(); itr++)
+                            (*itr)->DespawnOrUnsummon();
+                    SetEscortPaused(false);
+                    SetRun(false);
+                    break;
+                }
+                default:
+                    break;
             }
         }
 
@@ -2544,266 +2544,266 @@ public:
         {
             switch (waveId)
             {
-            case 0: // Vortex
-                if (Creature* whirlwind1 = me->SummonCreature(NPC_VORTEX, ThrallSpawn[0].x, ThrallSpawn[0].y, ThrallSpawn[0].z, ThrallSpawn[0].o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 30 * IN_MILLISECONDS))
-                    whirlwind1->GetMotionMaster()->MovePath(NPC_WHIRLWIND * 10, false);
-                if (Creature* whirlwind2 = me->SummonCreature(NPC_VORTEX, ThrallSpawn[0].x, ThrallSpawn[0].y, ThrallSpawn[0].z, ThrallSpawn[0].o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 30 * IN_MILLISECONDS))
-                    whirlwind2->GetMotionMaster()->MovePath(NPC_WHIRLWIND * 100, false);
-                break;
-            case 1:
-                // BATTLING_COURTYARD Initial Spawn
-                for (uint8 i = 0; i < 3; ++i)
-                    me->SummonCreature(NPC_DOCTOR_H, ThrallSpawn[i + 1].x, ThrallSpawn[i + 1].y, ThrallSpawn[i + 1].z, ThrallSpawn[i + 1].o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 300 * IN_MILLISECONDS);
-                for (uint8 i = 0; i < 9; ++i)
-                    me->SummonCreature(NPC_CHEMIST_H, ThrallSpawn[i + 4].x, ThrallSpawn[i + 4].y, ThrallSpawn[i + 4].z, ThrallSpawn[i + 4].o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 300 * IN_MILLISECONDS);
-                for (uint8 i = 0; i < 6; ++i)
-                    me->SummonCreature(NPC_TREACHEROUS_GUARDIAN_H, ThrallSpawn[i + 13].x, ThrallSpawn[i + 13].y, ThrallSpawn[i + 14].z, ThrallSpawn[i + 14].o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 300 * IN_MILLISECONDS);
-                for (uint8 i = 0; i < 4; ++i)
-                    me->SummonCreature(NPC_BLIGHT_SLINGER, ThrallSpawn[i + 19].x, ThrallSpawn[i + 19].y, ThrallSpawn[i + 19].z, ThrallSpawn[i + 19].o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 900 * IN_MILLISECONDS);
-                break;
-            case 2:
-                // Valimathras
-                if (Unit* temp = me->SummonCreature(NPC_VARIMATHRAS, ThrallSpawn[23].x, ThrallSpawn[23].y, ThrallSpawn[23].z, ThrallSpawn[23].o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 900 * IN_MILLISECONDS))
-                {
-                    ValimathrasGUID = temp->GetGUID();
-                    temp->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
-                }
-                break;
-            case 3:
-                if (Unit* temp = me->SummonCreature(NPC_VARIMATHRAS_PORTAL, ThrallSpawn[24].x, ThrallSpawn[24].y, ThrallSpawn[24].z, ThrallSpawn[24].o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 900 * IN_MILLISECONDS))
-                    ValimathrasPortalGUID = temp->GetGUID();
-                break;
-            case 4:
-                // COURTYARD_FIGHT Spawns
-                for (uint8 i = 0; i < WAVE_COURTYARD_FIGHT; ++i)
-                {
-                    switch (urand(0, 2))
+                case 0: // Vortex
+                    if (Creature* whirlwind1 = me->SummonCreature(NPC_VORTEX, ThrallSpawn[0].x, ThrallSpawn[0].y, ThrallSpawn[0].z, ThrallSpawn[0].o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 30 * IN_MILLISECONDS))
+                        whirlwind1->GetMotionMaster()->MovePath(NPC_WHIRLWIND * 10, false);
+                    if (Creature* whirlwind2 = me->SummonCreature(NPC_VORTEX, ThrallSpawn[0].x, ThrallSpawn[0].y, ThrallSpawn[0].z, ThrallSpawn[0].o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 30 * IN_MILLISECONDS))
+                        whirlwind2->GetMotionMaster()->MovePath(NPC_WHIRLWIND * 100, false);
+                    break;
+                case 1:
+                    // BATTLING_COURTYARD Initial Spawn
+                    for (uint8 i = 0; i < 3; ++i)
+                        me->SummonCreature(NPC_DOCTOR_H, ThrallSpawn[i + 1].x, ThrallSpawn[i + 1].y, ThrallSpawn[i + 1].z, ThrallSpawn[i + 1].o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 300 * IN_MILLISECONDS);
+                    for (uint8 i = 0; i < 9; ++i)
+                        me->SummonCreature(NPC_CHEMIST_H, ThrallSpawn[i + 4].x, ThrallSpawn[i + 4].y, ThrallSpawn[i + 4].z, ThrallSpawn[i + 4].o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 300 * IN_MILLISECONDS);
+                    for (uint8 i = 0; i < 6; ++i)
+                        me->SummonCreature(NPC_TREACHEROUS_GUARDIAN_H, ThrallSpawn[i + 13].x, ThrallSpawn[i + 13].y, ThrallSpawn[i + 14].z, ThrallSpawn[i + 14].o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 300 * IN_MILLISECONDS);
+                    for (uint8 i = 0; i < 4; ++i)
+                        me->SummonCreature(NPC_BLIGHT_SLINGER, ThrallSpawn[i + 19].x, ThrallSpawn[i + 19].y, ThrallSpawn[i + 19].z, ThrallSpawn[i + 19].o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 900 * IN_MILLISECONDS);
+                    break;
+                case 2:
+                    // Valimathras
+                    if (Unit* temp = me->SummonCreature(NPC_VARIMATHRAS, ThrallSpawn[23].x, ThrallSpawn[23].y, ThrallSpawn[23].z, ThrallSpawn[23].o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 900 * IN_MILLISECONDS))
                     {
-                    case 0:
-                        me->SummonCreature(NPC_TREACHEROUS_GUARDIAN_H, ThrallSpawn[25].x + rand32() % 5, ThrallSpawn[25].y + rand32() % 5, ThrallSpawn[25].z, TEMPSUMMON_DEAD_DESPAWN);
-                        break;
-                    case 1:
-                        me->SummonCreature(NPC_DOCTOR_H, ThrallSpawn[26].x + rand32() % 5, ThrallSpawn[26].y + rand32() % 5, ThrallSpawn[26].z, TEMPSUMMON_DEAD_DESPAWN);
-                        break;
-                    case 2:
-                        me->SummonCreature(NPC_CHEMIST_H, ThrallSpawn[27].x + rand32() % 5, ThrallSpawn[27].y + rand32() % 5, ThrallSpawn[27].z, TEMPSUMMON_DEAD_DESPAWN);
-                        break;
+                        ValimathrasGUID = temp->GetGUID();
+                        temp->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
                     }
-                }
-                break;
-            case 5:
-                // Bossspawn 1
-                if (Creature* temp = me->SummonCreature(NPC_BLIGHT_ABBERATION, ThrallSpawn[28].x, ThrallSpawn[28].y, ThrallSpawn[28].z, ThrallSpawn[28].o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 900 * IN_MILLISECONDS))
-                {
-                    temp->GetMotionMaster()->MoveJump(ThrallSpawn[62].x, ThrallSpawn[62].y, ThrallSpawn[62].z, 10.0f, 20.0f, 0);
-                    temp->AddThreat(me, 100.0f);
-                    me->AddThreat(temp, 100.0f);
-                    temp->AI()->AttackStart(me);
-                }
-                break;
-            case 6:
-                // COURTYARD_DONE Spawn
-                if (Unit* temp = me->SummonCreature(NPC_WARSONG_BATTLEGUARD, ThrallSpawn[29].x, ThrallSpawn[29].y, ThrallSpawn[29].z, ThrallSpawn[29].o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 300 * IN_MILLISECONDS))
-                    temp->GetMotionMaster()->MovePoint(0, ThrallSpawn[30].x, ThrallSpawn[30].y, ThrallSpawn[30].z);
-                if (Unit* temp = me->SummonCreature(NPC_WARSONG_BATTLEGUARD, ThrallSpawn[31].x, ThrallSpawn[31].y, ThrallSpawn[31].z, ThrallSpawn[31].o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 300 * IN_MILLISECONDS))
-                    temp->GetMotionMaster()->MovePoint(0, ThrallSpawn[32].x, ThrallSpawn[32].y, ThrallSpawn[32].z);
-                if (Unit* temp = me->SummonCreature(NPC_WARSONG_BATTLEGUARD, ThrallSpawn[33].x, ThrallSpawn[33].y, ThrallSpawn[33].z, ThrallSpawn[33].o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 300 * IN_MILLISECONDS))
-                    temp->GetMotionMaster()->MovePoint(0, ThrallSpawn[34].x, ThrallSpawn[34].y, ThrallSpawn[34].z);
-                if (Unit* temp = me->SummonCreature(NPC_WARSONG_BATTLEGUARD, ThrallSpawn[35].x, ThrallSpawn[35].y, ThrallSpawn[35].z, ThrallSpawn[35].o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 300 * IN_MILLISECONDS))
-                    temp->GetMotionMaster()->MovePoint(0, ThrallSpawn[36].x, ThrallSpawn[36].y, ThrallSpawn[36].z);
-                for (uint8 i = 0; i < 2; ++i)
-                    me->SummonCreature(NPC_WARSONG_BATTLEGUARD, ThrallSpawn[i + 44].x, ThrallSpawn[i + 44].y, ThrallSpawn[i + 44].z, ThrallSpawn[i + 44].o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 300 * IN_MILLISECONDS);
-                break;
-            case 7:
-                for (uint8 i = 0; i < 9; ++i)
-                    me->SummonCreature(NPC_CAVE_DUMMY, ThrallSpawn[i + 46].x, ThrallSpawn[i + 46].y, ThrallSpawn[i + 46].z, ThrallSpawn[i + 46].o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 600 * IN_MILLISECONDS);
-                break;
-            case 8:
-                for (uint8 i = 0; i < 2; ++i)
-                    me->SummonCreature(NPC_WARSONG_BATTLEGUARD, ThrallSpawn[i + 57].x, ThrallSpawn[i + 57].y, ThrallSpawn[i + 57].z, ThrallSpawn[i + 57].o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 300 * IN_MILLISECONDS);
-                break;
-            case 9:
-                // Top of Undercity - Attacktrashpack
-                for (uint8 i = 0; i < 3; ++i)
-                {
-                    switch (urand(0, 2))
+                    break;
+                case 3:
+                    if (Unit* temp = me->SummonCreature(NPC_VARIMATHRAS_PORTAL, ThrallSpawn[24].x, ThrallSpawn[24].y, ThrallSpawn[24].z, ThrallSpawn[24].o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 900 * IN_MILLISECONDS))
+                        ValimathrasPortalGUID = temp->GetGUID();
+                    break;
+                case 4:
+                    // COURTYARD_FIGHT Spawns
+                    for (uint8 i = 0; i < WAVE_COURTYARD_FIGHT; ++i)
                     {
-                    case 0:
-                        me->SummonCreature(NPC_TREACHEROUS_GUARDIAN_H, ThrallSpawn[59].x + rand32() % 2, ThrallSpawn[59].y + rand32() % 2, ThrallSpawn[59].z, TEMPSUMMON_DEAD_DESPAWN);
-                        break;
-                    case 1:
-                        me->SummonCreature(NPC_DOCTOR_H, ThrallSpawn[59].x + rand32() % 2, ThrallSpawn[59].y + rand32() % 2, ThrallSpawn[59].z, TEMPSUMMON_DEAD_DESPAWN);
-                        break;
-                    case 2:
-                        me->SummonCreature(NPC_CHEMIST_H, ThrallSpawn[59].x + rand32() % 2, ThrallSpawn[59].y + rand32() % 2, ThrallSpawn[59].z, TEMPSUMMON_DEAD_DESPAWN);
-                        break;
+                        switch (urand(0, 2))
+                        {
+                        case 0:
+                            me->SummonCreature(NPC_TREACHEROUS_GUARDIAN_H, ThrallSpawn[25].x + rand32() % 5, ThrallSpawn[25].y + rand32() % 5, ThrallSpawn[25].z, TEMPSUMMON_DEAD_DESPAWN);
+                            break;
+                        case 1:
+                            me->SummonCreature(NPC_DOCTOR_H, ThrallSpawn[26].x + rand32() % 5, ThrallSpawn[26].y + rand32() % 5, ThrallSpawn[26].z, TEMPSUMMON_DEAD_DESPAWN);
+                            break;
+                        case 2:
+                            me->SummonCreature(NPC_CHEMIST_H, ThrallSpawn[27].x + rand32() % 5, ThrallSpawn[27].y + rand32() % 5, ThrallSpawn[27].z, TEMPSUMMON_DEAD_DESPAWN);
+                            break;
+                        }
                     }
-                }
-                break;
-            case 10:
-                // Top of Undercity - Attacktrashpack
-                for (uint8 i = 0; i < 3; ++i)
-                {
-                    switch (urand(0, 1))
+                    break;
+                case 5:
+                    // Bossspawn 1
+                    if (Creature* temp = me->SummonCreature(NPC_BLIGHT_ABBERATION, ThrallSpawn[28].x, ThrallSpawn[28].y, ThrallSpawn[28].z, ThrallSpawn[28].o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 900 * IN_MILLISECONDS))
                     {
-                    case 0:
-                        me->SummonCreature(NPC_TREACHEROUS_GUARDIAN_H, ThrallSpawn[60].x + rand32() % 5, ThrallSpawn[60].y + rand32() % 5, ThrallSpawn[60].z, TEMPSUMMON_DEAD_DESPAWN);
-                        break;
-                    case 1:
-                        me->SummonCreature(NPC_FELGUARD_MORADEUR, ThrallSpawn[60].x + rand32() % 5, ThrallSpawn[60].y + rand32() % 5, ThrallSpawn[60].z, TEMPSUMMON_DEAD_DESPAWN);
-                        break;
+                        temp->GetMotionMaster()->MoveJump(ThrallSpawn[62].x, ThrallSpawn[62].y, ThrallSpawn[62].z, 10.0f, 20.0f, 0);
+                        temp->AddThreat(me, 100.0f);
+                        me->AddThreat(temp, 100.0f);
+                        temp->AI()->AttackStart(me);
                     }
-                }
-                break;
-            case 11:
-                // Bottom of Undercity - Attacktrashpack
-                for (uint8 i = 0; i < 3; ++i)
-                {
-                    switch (urand(0, 1))
+                    break;
+                case 6:
+                    // COURTYARD_DONE Spawn
+                    if (Unit* temp = me->SummonCreature(NPC_WARSONG_BATTLEGUARD, ThrallSpawn[29].x, ThrallSpawn[29].y, ThrallSpawn[29].z, ThrallSpawn[29].o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 300 * IN_MILLISECONDS))
+                        temp->GetMotionMaster()->MovePoint(0, ThrallSpawn[30].x, ThrallSpawn[30].y, ThrallSpawn[30].z);
+                    if (Unit* temp = me->SummonCreature(NPC_WARSONG_BATTLEGUARD, ThrallSpawn[31].x, ThrallSpawn[31].y, ThrallSpawn[31].z, ThrallSpawn[31].o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 300 * IN_MILLISECONDS))
+                        temp->GetMotionMaster()->MovePoint(0, ThrallSpawn[32].x, ThrallSpawn[32].y, ThrallSpawn[32].z);
+                    if (Unit* temp = me->SummonCreature(NPC_WARSONG_BATTLEGUARD, ThrallSpawn[33].x, ThrallSpawn[33].y, ThrallSpawn[33].z, ThrallSpawn[33].o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 300 * IN_MILLISECONDS))
+                        temp->GetMotionMaster()->MovePoint(0, ThrallSpawn[34].x, ThrallSpawn[34].y, ThrallSpawn[34].z);
+                    if (Unit* temp = me->SummonCreature(NPC_WARSONG_BATTLEGUARD, ThrallSpawn[35].x, ThrallSpawn[35].y, ThrallSpawn[35].z, ThrallSpawn[35].o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 300 * IN_MILLISECONDS))
+                        temp->GetMotionMaster()->MovePoint(0, ThrallSpawn[36].x, ThrallSpawn[36].y, ThrallSpawn[36].z);
+                    for (uint8 i = 0; i < 2; ++i)
+                        me->SummonCreature(NPC_WARSONG_BATTLEGUARD, ThrallSpawn[i + 44].x, ThrallSpawn[i + 44].y, ThrallSpawn[i + 44].z, ThrallSpawn[i + 44].o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 300 * IN_MILLISECONDS);
+                    break;
+                case 7:
+                    for (uint8 i = 0; i < 9; ++i)
+                        me->SummonCreature(NPC_CAVE_DUMMY, ThrallSpawn[i + 46].x, ThrallSpawn[i + 46].y, ThrallSpawn[i + 46].z, ThrallSpawn[i + 46].o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 600 * IN_MILLISECONDS);
+                    break;
+                case 8:
+                    for (uint8 i = 0; i < 2; ++i)
+                        me->SummonCreature(NPC_WARSONG_BATTLEGUARD, ThrallSpawn[i + 57].x, ThrallSpawn[i + 57].y, ThrallSpawn[i + 57].z, ThrallSpawn[i + 57].o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 300 * IN_MILLISECONDS);
+                    break;
+                case 9:
+                    // Top of Undercity - Attacktrashpack
+                    for (uint8 i = 0; i < 3; ++i)
                     {
-                    case 0:
-                        me->SummonCreature(NPC_FELGUARD_MORADEUR, ThrallSpawn[61].x + rand32() % 5, ThrallSpawn[61].y + rand32() % 5, ThrallSpawn[61].z, TEMPSUMMON_DEAD_DESPAWN);
-                        break;
-                    case 1:
-                        me->SummonCreature(NPC_DREADLORD, ThrallSpawn[61].x + rand32() % 5, ThrallSpawn[61].y + rand32() % 5, ThrallSpawn[61].z, TEMPSUMMON_DEAD_DESPAWN);
-                        break;
+                        switch (urand(0, 2))
+                        {
+                        case 0:
+                            me->SummonCreature(NPC_TREACHEROUS_GUARDIAN_H, ThrallSpawn[59].x + rand32() % 2, ThrallSpawn[59].y + rand32() % 2, ThrallSpawn[59].z, TEMPSUMMON_DEAD_DESPAWN);
+                            break;
+                        case 1:
+                            me->SummonCreature(NPC_DOCTOR_H, ThrallSpawn[59].x + rand32() % 2, ThrallSpawn[59].y + rand32() % 2, ThrallSpawn[59].z, TEMPSUMMON_DEAD_DESPAWN);
+                            break;
+                        case 2:
+                            me->SummonCreature(NPC_CHEMIST_H, ThrallSpawn[59].x + rand32() % 2, ThrallSpawn[59].y + rand32() % 2, ThrallSpawn[59].z, TEMPSUMMON_DEAD_DESPAWN);
+                            break;
+                        }
                     }
-                }
-                break;
-            case 12:
-                // Valimathras 2
-                if (Unit* temp = me->SummonCreature(NPC_VARIMATHRAS, ThrallSpawn[63].x, ThrallSpawn[63].y, ThrallSpawn[63].z, ThrallSpawn[63].o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 300 * IN_MILLISECONDS))
-                {
-                    ValimathrasGUID = temp->GetGUID();
-                    temp->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
-                }
-                break;
-            case 13:
-                if (Unit* temp = me->SummonCreature(NPC_VARIMATHRAS_PORTAL, ThrallSpawn[64].x, ThrallSpawn[64].y, ThrallSpawn[64].z, ThrallSpawn[64].o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 900 * IN_MILLISECONDS))
-                    ValimathrasPortalGUID = temp->GetGUID();
-                break;
-                // NPC_KHANOK - Inner Sunktum Spawn Left                        
-            case 14:
-                for (uint8 i = 0; i < 4; ++i)
-                {
-                    switch (urand(0, 6))
+                    break;
+                case 10:
+                    // Top of Undercity - Attacktrashpack
+                    for (uint8 i = 0; i < 3; ++i)
                     {
-                    case 0:
-                        me->SummonCreature(NPC_FELGUARD_MORADEUR, ThrallSpawn[65].x + rand32() % 5, ThrallSpawn[65].y + rand32() % 5, ThrallSpawn[65].z, TEMPSUMMON_DEAD_DESPAWN);
-                        break;
-                    case 1:
-                        me->SummonCreature(NPC_DREADLORD, ThrallSpawn[65].x + rand32() % 5, ThrallSpawn[65].y + rand32() % 5, ThrallSpawn[65].z, TEMPSUMMON_DEAD_DESPAWN);
-                        break;
-                    case 2:
-                        me->SummonCreature(NPC_TREACHEROUS_GUARDIAN_H, ThrallSpawn[65].x + rand32() % 5, ThrallSpawn[65].y + rand32() % 5, ThrallSpawn[65].z, TEMPSUMMON_DEAD_DESPAWN);
-                        break;
-                    case 3:
-                        me->SummonCreature(NPC_DOCTOR_H, ThrallSpawn[65].x + rand32() % 5, ThrallSpawn[65].y + rand32() % 5, ThrallSpawn[65].z, TEMPSUMMON_DEAD_DESPAWN);
-                        break;
-                    case 4:
-                        me->SummonCreature(NPC_CHEMIST_H, ThrallSpawn[65].x + rand32() % 5, ThrallSpawn[65].y + rand32() % 5, ThrallSpawn[65].z, TEMPSUMMON_DEAD_DESPAWN);
-                        break;
-                    case 5:
-                        me->SummonCreature(NPC_BETRAYER_H, ThrallSpawn[65].x + rand32() % 5, ThrallSpawn[65].y + rand32() % 5, ThrallSpawn[65].z, TEMPSUMMON_DEAD_DESPAWN);
-                        break;
-                    case 6:
-                        me->SummonCreature(NPC_FELBEAST_H, ThrallSpawn[65].x + rand32() % 5, ThrallSpawn[65].y + rand32() % 5, ThrallSpawn[65].z, TEMPSUMMON_DEAD_DESPAWN);
-                        break;
+                        switch (urand(0, 1))
+                        {
+                        case 0:
+                            me->SummonCreature(NPC_TREACHEROUS_GUARDIAN_H, ThrallSpawn[60].x + rand32() % 5, ThrallSpawn[60].y + rand32() % 5, ThrallSpawn[60].z, TEMPSUMMON_DEAD_DESPAWN);
+                            break;
+                        case 1:
+                            me->SummonCreature(NPC_FELGUARD_MORADEUR, ThrallSpawn[60].x + rand32() % 5, ThrallSpawn[60].y + rand32() % 5, ThrallSpawn[60].z, TEMPSUMMON_DEAD_DESPAWN);
+                            break;
+                        }
                     }
-                }
-                break;
-                // NPC_KHANOK - Inner Sunktum Spawn Right
-            case 15:
-                for (uint8 i = 0; i < 4; ++i)
-                {
-                    switch (urand(0, 6))
+                    break;
+                case 11:
+                    // Bottom of Undercity - Attacktrashpack
+                    for (uint8 i = 0; i < 3; ++i)
                     {
-                    case 0:
-                        me->SummonCreature(NPC_FELGUARD_MORADEUR, ThrallSpawn[66].x + rand32() % 5, ThrallSpawn[66].y + rand32() % 5, ThrallSpawn[66].z, TEMPSUMMON_DEAD_DESPAWN);
-                        break;
-                    case 1:
-                        me->SummonCreature(NPC_DREADLORD, ThrallSpawn[66].x + rand32() % 5, ThrallSpawn[66].y + rand32() % 5, ThrallSpawn[66].z, TEMPSUMMON_DEAD_DESPAWN);
-                        break;
-                    case 2:
-                        me->SummonCreature(NPC_TREACHEROUS_GUARDIAN_H, ThrallSpawn[66].x + rand32() % 5, ThrallSpawn[66].y + rand32() % 5, ThrallSpawn[66].z, TEMPSUMMON_DEAD_DESPAWN);
-                        break;
-                    case 3:
-                        me->SummonCreature(NPC_DOCTOR_H, ThrallSpawn[66].x + rand32() % 5, ThrallSpawn[66].y + rand32() % 5, ThrallSpawn[66].z, TEMPSUMMON_DEAD_DESPAWN);
-                        break;
-                    case 4:
-                        me->SummonCreature(NPC_CHEMIST_H, ThrallSpawn[66].x + rand32() % 5, ThrallSpawn[66].y + rand32() % 5, ThrallSpawn[66].z, TEMPSUMMON_DEAD_DESPAWN);
-                        break;
-                    case 5:
-                        me->SummonCreature(NPC_BETRAYER_H, ThrallSpawn[66].x + rand32() % 5, ThrallSpawn[66].y + rand32() % 5, ThrallSpawn[66].z, TEMPSUMMON_DEAD_DESPAWN);
-                        break;
-                    case 6:
-                        me->SummonCreature(NPC_FELBEAST_H, ThrallSpawn[66].x + rand32() % 5, ThrallSpawn[66].y + rand32() % 5, ThrallSpawn[66].z, TEMPSUMMON_DEAD_DESPAWN);
-                        break;
+                        switch (urand(0, 1))
+                        {
+                        case 0:
+                            me->SummonCreature(NPC_FELGUARD_MORADEUR, ThrallSpawn[61].x + rand32() % 5, ThrallSpawn[61].y + rand32() % 5, ThrallSpawn[61].z, TEMPSUMMON_DEAD_DESPAWN);
+                            break;
+                        case 1:
+                            me->SummonCreature(NPC_DREADLORD, ThrallSpawn[61].x + rand32() % 5, ThrallSpawn[61].y + rand32() % 5, ThrallSpawn[61].z, TEMPSUMMON_DEAD_DESPAWN);
+                            break;
+                        }
                     }
-                }
-                break;
-                // NPC_KHANOK - Inner Sunktum Spawn Top
-            case 16:
-                me->SummonCreature(NPC_DOOMGUARD_PILLARGER, ThrallSpawn[67].x + rand32() % 15, ThrallSpawn[67].y + rand32() % 15, ThrallSpawn[67].z + rand32() % 5, TEMPSUMMON_DEAD_DESPAWN);
-                break;
-                // NPC_KHANOK - Inner Sunktum Spawn Middle
-            case 17:
-                me->SummonCreature(NPC_KHANOK, ThrallSpawn[68].x, ThrallSpawn[68].y, ThrallSpawn[68].z, TEMPSUMMON_DEAD_DESPAWN);
-                break;
-            case 18:
-                if (Creature* temp = me->SummonCreature(NPC_WARSONG_BATTLEGUARD, ThrallSpawn[69].x, ThrallSpawn[69].y, ThrallSpawn[69].z, ThrallSpawn[69].o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 240 * IN_MILLISECONDS))
-                {
-                    temp->AI()->Talk(SAY_FOR_THE_HORDE);
-                    temp->GetMotionMaster()->MovePath(NPC_WARSONG_BATTLEGUARD * 100, false);
-                }
-                break;
-                // Valimathras Room Preparation
-            case 19:
-                for (uint8 i = 0; i < 3; ++i)
-                    me->SummonGameObject(GO_BLOCKED_PASSAGE, ThrallSpawn[i + 70].x, ThrallSpawn[i + 70].y, ThrallSpawn[70].z, ThrallSpawn[i + 70].o, 0.0f, 0.0f, 0.0f, 0.0f, 120 * IN_MILLISECONDS);
-                // Valimathras BossSpawn
-                if (Creature* temp = me->SummonCreature(NPC_VARIMATHRAS, ThrallSpawn[73].x, ThrallSpawn[73].y, ThrallSpawn[73].z, ThrallSpawn[73].o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 1200 * IN_MILLISECONDS))
-                {
-                    ValimathrasGUID = temp->GetGUID();
-                    temp->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
-                    temp->CastSpell(me, SPELL_AURA_OF_VARIMATHRAS);
-                    temp->CastSpell(me, SPELL_OPENING_LEGION_PORTALS);
-                    temp->AI()->Talk(SAY_CLOSE_DOOR);
-                }
-                for (uint8 i = 0; i < 6; ++i)
-                {
-                    if (Unit* temp = me->SummonCreature(NPC_VARIMATHRAS_PORTAL, ThrallSpawn[i + 74].x, ThrallSpawn[i + 74].y, ThrallSpawn[i + 74].z, TEMPSUMMON_MANUAL_DESPAWN))
-                        temp->CastSpell(me, SPELL_VALIMATHRAS_PORTAL);
-                }
-                break;
-            case 20:
-                for (uint8 i = 0; i < 3; ++i)
-                {
-                    switch (urand(0, 1))
+                    break;
+                case 12:
+                    // Valimathras 2
+                    if (Unit* temp = me->SummonCreature(NPC_VARIMATHRAS, ThrallSpawn[63].x, ThrallSpawn[63].y, ThrallSpawn[63].z, ThrallSpawn[63].o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 300 * IN_MILLISECONDS))
                     {
-                    case 0:
-                        me->SummonCreature(NPC_LEGION_INVADER, ThrallSpawn[80].x + rand32() % 5, ThrallSpawn[80].y + rand32() % 5, ThrallSpawn[80].z, TEMPSUMMON_DEAD_DESPAWN);
-                        break;
-                    case 1:
-                        me->SummonCreature(NPC_LEGION_DREADWHISPER, ThrallSpawn[81].x + rand32() % 5, ThrallSpawn[81].y + rand32() % 5, ThrallSpawn[81].z, TEMPSUMMON_DEAD_DESPAWN);
-                        break;
+                        ValimathrasGUID = temp->GetGUID();
+                        temp->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
                     }
-                }
-                break;
-            case 21:
-                for (uint8 i = 0; i < 3; ++i)
-                {
-                    switch (urand(0, 1))
+                    break;
+                case 13:
+                    if (Unit* temp = me->SummonCreature(NPC_VARIMATHRAS_PORTAL, ThrallSpawn[64].x, ThrallSpawn[64].y, ThrallSpawn[64].z, ThrallSpawn[64].o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 900 * IN_MILLISECONDS))
+                        ValimathrasPortalGUID = temp->GetGUID();
+                    break;
+                    // NPC_KHANOK - Inner Sunktum Spawn Left                        
+                case 14:
+                    for (uint8 i = 0; i < 4; ++i)
                     {
-                    case 0:
-                        me->SummonCreature(NPC_LEGION_INVADER, ThrallSpawn[81].x + rand32() % 5, ThrallSpawn[81].y + rand32() % 5, ThrallSpawn[81].z, TEMPSUMMON_DEAD_DESPAWN);
-                        break;
-                    case 1:
-                        me->SummonCreature(NPC_LEGION_DREADWHISPER, ThrallSpawn[80].x + rand32() % 5, ThrallSpawn[80].y + rand32() % 5, ThrallSpawn[80].z, TEMPSUMMON_DEAD_DESPAWN);
-                        break;
+                        switch (urand(0, 6))
+                        {
+                        case 0:
+                            me->SummonCreature(NPC_FELGUARD_MORADEUR, ThrallSpawn[65].x + rand32() % 5, ThrallSpawn[65].y + rand32() % 5, ThrallSpawn[65].z, TEMPSUMMON_DEAD_DESPAWN);
+                            break;
+                        case 1:
+                            me->SummonCreature(NPC_DREADLORD, ThrallSpawn[65].x + rand32() % 5, ThrallSpawn[65].y + rand32() % 5, ThrallSpawn[65].z, TEMPSUMMON_DEAD_DESPAWN);
+                            break;
+                        case 2:
+                            me->SummonCreature(NPC_TREACHEROUS_GUARDIAN_H, ThrallSpawn[65].x + rand32() % 5, ThrallSpawn[65].y + rand32() % 5, ThrallSpawn[65].z, TEMPSUMMON_DEAD_DESPAWN);
+                            break;
+                        case 3:
+                            me->SummonCreature(NPC_DOCTOR_H, ThrallSpawn[65].x + rand32() % 5, ThrallSpawn[65].y + rand32() % 5, ThrallSpawn[65].z, TEMPSUMMON_DEAD_DESPAWN);
+                            break;
+                        case 4:
+                            me->SummonCreature(NPC_CHEMIST_H, ThrallSpawn[65].x + rand32() % 5, ThrallSpawn[65].y + rand32() % 5, ThrallSpawn[65].z, TEMPSUMMON_DEAD_DESPAWN);
+                            break;
+                        case 5:
+                            me->SummonCreature(NPC_BETRAYER_H, ThrallSpawn[65].x + rand32() % 5, ThrallSpawn[65].y + rand32() % 5, ThrallSpawn[65].z, TEMPSUMMON_DEAD_DESPAWN);
+                            break;
+                        case 6:
+                            me->SummonCreature(NPC_FELBEAST_H, ThrallSpawn[65].x + rand32() % 5, ThrallSpawn[65].y + rand32() % 5, ThrallSpawn[65].z, TEMPSUMMON_DEAD_DESPAWN);
+                            break;
+                        }
                     }
-                }
-                break;
+                    break;
+                    // NPC_KHANOK - Inner Sunktum Spawn Right
+                case 15:
+                    for (uint8 i = 0; i < 4; ++i)
+                    {
+                        switch (urand(0, 6))
+                        {
+                        case 0:
+                            me->SummonCreature(NPC_FELGUARD_MORADEUR, ThrallSpawn[66].x + rand32() % 5, ThrallSpawn[66].y + rand32() % 5, ThrallSpawn[66].z, TEMPSUMMON_DEAD_DESPAWN);
+                            break;
+                        case 1:
+                            me->SummonCreature(NPC_DREADLORD, ThrallSpawn[66].x + rand32() % 5, ThrallSpawn[66].y + rand32() % 5, ThrallSpawn[66].z, TEMPSUMMON_DEAD_DESPAWN);
+                            break;
+                        case 2:
+                            me->SummonCreature(NPC_TREACHEROUS_GUARDIAN_H, ThrallSpawn[66].x + rand32() % 5, ThrallSpawn[66].y + rand32() % 5, ThrallSpawn[66].z, TEMPSUMMON_DEAD_DESPAWN);
+                            break;
+                        case 3:
+                            me->SummonCreature(NPC_DOCTOR_H, ThrallSpawn[66].x + rand32() % 5, ThrallSpawn[66].y + rand32() % 5, ThrallSpawn[66].z, TEMPSUMMON_DEAD_DESPAWN);
+                            break;
+                        case 4:
+                            me->SummonCreature(NPC_CHEMIST_H, ThrallSpawn[66].x + rand32() % 5, ThrallSpawn[66].y + rand32() % 5, ThrallSpawn[66].z, TEMPSUMMON_DEAD_DESPAWN);
+                            break;
+                        case 5:
+                            me->SummonCreature(NPC_BETRAYER_H, ThrallSpawn[66].x + rand32() % 5, ThrallSpawn[66].y + rand32() % 5, ThrallSpawn[66].z, TEMPSUMMON_DEAD_DESPAWN);
+                            break;
+                        case 6:
+                            me->SummonCreature(NPC_FELBEAST_H, ThrallSpawn[66].x + rand32() % 5, ThrallSpawn[66].y + rand32() % 5, ThrallSpawn[66].z, TEMPSUMMON_DEAD_DESPAWN);
+                            break;
+                        }
+                    }
+                    break;
+                    // NPC_KHANOK - Inner Sunktum Spawn Top
+                case 16:
+                    me->SummonCreature(NPC_DOOMGUARD_PILLARGER, ThrallSpawn[67].x + rand32() % 15, ThrallSpawn[67].y + rand32() % 15, ThrallSpawn[67].z + rand32() % 5, TEMPSUMMON_DEAD_DESPAWN);
+                    break;
+                    // NPC_KHANOK - Inner Sunktum Spawn Middle
+                case 17:
+                    me->SummonCreature(NPC_KHANOK, ThrallSpawn[68].x, ThrallSpawn[68].y, ThrallSpawn[68].z, TEMPSUMMON_DEAD_DESPAWN);
+                    break;
+                case 18:
+                    if (Creature* temp = me->SummonCreature(NPC_WARSONG_BATTLEGUARD, ThrallSpawn[69].x, ThrallSpawn[69].y, ThrallSpawn[69].z, ThrallSpawn[69].o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 240 * IN_MILLISECONDS))
+                    {
+                        temp->AI()->Talk(SAY_FOR_THE_HORDE);
+                        temp->GetMotionMaster()->MovePath(NPC_WARSONG_BATTLEGUARD * 100, false);
+                    }
+                    break;
+                    // Valimathras Room Preparation
+                case 19:
+                    for (uint8 i = 0; i < 3; ++i)
+                        me->SummonGameObject(GO_BLOCKED_PASSAGE, ThrallSpawn[i + 70].x, ThrallSpawn[i + 70].y, ThrallSpawn[70].z, ThrallSpawn[i + 70].o, 0.0f, 0.0f, 0.0f, 0.0f, 120 * IN_MILLISECONDS);
+                    // Valimathras BossSpawn
+                    if (Creature* temp = me->SummonCreature(NPC_VARIMATHRAS, ThrallSpawn[73].x, ThrallSpawn[73].y, ThrallSpawn[73].z, ThrallSpawn[73].o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 1200 * IN_MILLISECONDS))
+                    {
+                        ValimathrasGUID = temp->GetGUID();
+                        temp->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
+                        temp->CastSpell(me, SPELL_AURA_OF_VARIMATHRAS);
+                        temp->CastSpell(me, SPELL_OPENING_LEGION_PORTALS);
+                        temp->AI()->Talk(SAY_CLOSE_DOOR);
+                    }
+                    for (uint8 i = 0; i < 6; ++i)
+                    {
+                        if (Unit* temp = me->SummonCreature(NPC_VARIMATHRAS_PORTAL, ThrallSpawn[i + 74].x, ThrallSpawn[i + 74].y, ThrallSpawn[i + 74].z, TEMPSUMMON_MANUAL_DESPAWN))
+                            temp->CastSpell(me, SPELL_VALIMATHRAS_PORTAL);
+                    }
+                    break;
+                case 20:
+                    for (uint8 i = 0; i < 3; ++i)
+                    {
+                        switch (urand(0, 1))
+                        {
+                        case 0:
+                            me->SummonCreature(NPC_LEGION_INVADER, ThrallSpawn[80].x + rand32() % 5, ThrallSpawn[80].y + rand32() % 5, ThrallSpawn[80].z, TEMPSUMMON_DEAD_DESPAWN);
+                            break;
+                        case 1:
+                            me->SummonCreature(NPC_LEGION_DREADWHISPER, ThrallSpawn[81].x + rand32() % 5, ThrallSpawn[81].y + rand32() % 5, ThrallSpawn[81].z, TEMPSUMMON_DEAD_DESPAWN);
+                            break;
+                        }
+                    }
+                    break;
+                case 21:
+                    for (uint8 i = 0; i < 3; ++i)
+                    {
+                        switch (urand(0, 1))
+                        {
+                        case 0:
+                            me->SummonCreature(NPC_LEGION_INVADER, ThrallSpawn[81].x + rand32() % 5, ThrallSpawn[81].y + rand32() % 5, ThrallSpawn[81].z, TEMPSUMMON_DEAD_DESPAWN);
+                            break;
+                        case 1:
+                            me->SummonCreature(NPC_LEGION_DREADWHISPER, ThrallSpawn[80].x + rand32() % 5, ThrallSpawn[80].y + rand32() % 5, ThrallSpawn[80].z, TEMPSUMMON_DEAD_DESPAWN);
+                            break;
+                        }
+                    }
+                    break;
             }
         }
 
@@ -2811,85 +2811,85 @@ public:
         {
             switch (waypointId)
             {
-            case 1:
-                SetHoldState(true);
-                bStepping = true;
-                break;
-            case 2:
-                SetHoldState(true);
-                bStepping = true;
-                break;
-            case 11:
-                SetHoldState(true);
-                bStepping = true;
-                break;
-            case 13:
-                SetHoldState(true);
-                bStepping = true;
-                break;
-            case 14:
-                SetHoldState(true);
-                bStepping = true;
-                break;
-            case 34:
-                SetHoldState(true);
-                bStepping = true;
-                break;
-            case 36:
-                Talk(THRALL_SAY_SANCTUM_1);
-                UpdateWorldState(me->GetMap(), WORLD_STATE_INNER_SANKTUM_FIGHT_H, 1);
-                break;
-            case 46:
-                SetHoldState(true);
-                bStepping = true;
-                break;
-            case 57:
-                SetHoldState(true);
-                bStepping = true;
-                break;
-            case 61:
-                SetHoldState(true);
-                bStepping = true;
-                break;
-            case 65:
-                SetHoldState(true);
-                bStepping = true;
-                break;
-            case 66:
-                SetHoldState(true);
-                bStepping = true;
-                break;
-            case 75:
-                SetHoldState(true);
-                bStepping = true;
-                break;
-            case 81:
-                SetHoldState(true);
-                bStepping = true;
-                break;
-            case 104:
-                SetHoldState(true);
-                bStepping = true;
-                break;
-            case 109:
-                SetHoldState(true);
-                bStepping = true;
-                break;
-            case 113:
-                SetHoldState(true);
-                bStepping = true;
-                break;
-            case 117:
-                SetHoldState(true);
-                bStepping = true;
-                break;
-            case 118:
-                Talk(THRALL_SAY_THRONE_8);
-                break;
-            case 120:
-                SetHoldState(true);
-                bStepping = true;
-                break;
+                case 1:
+                    SetHoldState(true);
+                    bStepping = true;
+                    break;
+                case 2:
+                    SetHoldState(true);
+                    bStepping = true;
+                    break;
+                case 11:
+                    SetHoldState(true);
+                    bStepping = true;
+                    break;
+                case 13:
+                    SetHoldState(true);
+                    bStepping = true;
+                    break;
+                case 14:
+                    SetHoldState(true);
+                    bStepping = true;
+                    break;
+                case 34:
+                    SetHoldState(true);
+                    bStepping = true;
+                    break;
+                case 36:
+                    Talk(THRALL_SAY_SANCTUM_1);
+                    UpdateWorldState(me->GetMap(), WORLD_STATE_INNER_SANKTUM_FIGHT_H, 1);
+                    break;
+                case 46:
+                    SetHoldState(true);
+                    bStepping = true;
+                    break;
+                case 57:
+                    SetHoldState(true);
+                    bStepping = true;
+                    break;
+                case 61:
+                    SetHoldState(true);
+                    bStepping = true;
+                    break;
+                case 65:
+                    SetHoldState(true);
+                    bStepping = true;
+                    break;
+                case 66:
+                    SetHoldState(true);
+                    bStepping = true;
+                    break;
+                case 75:
+                    SetHoldState(true);
+                    bStepping = true;
+                    break;
+                case 81:
+                    SetHoldState(true);
+                    bStepping = true;
+                    break;
+                case 104:
+                    SetHoldState(true);
+                    bStepping = true;
+                    break;
+                case 109:
+                    SetHoldState(true);
+                    bStepping = true;
+                    break;
+                case 113:
+                    SetHoldState(true);
+                    bStepping = true;
+                    break;
+                case 117:
+                    SetHoldState(true);
+                    bStepping = true;
+                    break;
+                case 118:
+                    Talk(THRALL_SAY_THRONE_8);
+                    break;
+                case 120:
+                    SetHoldState(true);
+                    bStepping = true;
+                    break;
             }
         }
 
@@ -2909,959 +2909,959 @@ public:
                     switch (step)
                     {
                         //Preparation
-                    case 0:
-                        me->setActive(true);
-                        JumpToNextStep(3 * IN_MILLISECONDS);
-                        break;
-                    case 1:
-                        UpdateWorldState(me->GetMap(), WORLD_STATE_BATTLE_COUNTDOWN_H, 1);
-                        Talk(THRALL_SAY_PREP_1);
-                        JumpToNextStep(6 * IN_MILLISECONDS);
-                        break;
-                    case 2:
-                        Talk(THRALL_SAY_PREP_2);
-                        JumpToNextStep(14 * IN_MILLISECONDS);
-                        break;
-                    case 3:
-                        if (Creature* guard = me->FindNearestCreature(NPC_HORDE_GUARD, 100.0f))
-                            guard->AI()->Talk(SAY_BURN_UC);
-                        JumpToNextStep(19 * IN_MILLISECONDS);
-                        break;
-                    case 4:
-                        if (Creature* guard = me->FindNearestCreature(NPC_HORDE_GUARD, 100.0f))
-                            guard->AI()->Talk(SAY_PUTRESS_ANGER);
-                        JumpToNextStep(25 * IN_MILLISECONDS);
-                        break;
-                    case 5:
-                        Talk(THRALL_SAY_PREP_3);
-                        JumpToNextStep(14 * IN_MILLISECONDS);
-                        break;
-                    case 6:
-                        Talk(THRALL_SAY_PREP_4);
-                        JumpToNextStep(14 * IN_MILLISECONDS);
-                        break;
-                    case 7:
-                        Talk(THRALL_SAY_PREP_5);
-                        JumpToNextStep(10 * IN_MILLISECONDS);
-                        break;
-                    case 8:
-                        Talk(THRALL_SAY_PREP_6);
-                        JumpToNextStep(15 * IN_MILLISECONDS);
-                        break;
-                    case 9:
-                        Talk(THRALL_SAY_PREP_7);
-                        JumpToNextStep(6 * IN_MILLISECONDS);
-                        break;
-                    case 10:
-                        if (Player* player = GetPlayerForEscort())
-                            player->CastSpell(player, SPELL_THRALL_BUFF);
-                        JumpToNextStep(10 * IN_MILLISECONDS);
-                        break;
-                        // Start Event
-                    case 11:
-                        UpdateWorldState(me->GetMap(), WORLD_STATE_BATTLE_COUNTDOWN_H, 0);
-                        UpdateWorldState(me->GetMap(), WORLD_STATE_BATTLE_START_H, 1);
-                        Talk(THRALL_SAY_PREP_8);
-                        SetEscortPaused(false);
-                        bStepping = false;
-                        JumpToNextStep(0);
-                        SetRun(true);
-                        if (Creature* sylvanas = ObjectAccessor::GetCreature(*me, sylvanasfollowGUID))
-                        {
-                            sylvanas->GetMotionMaster()->MovePath(NPC_SYLVANAS * 100, false);
-                            sylvanas->setActive(true);
-                        }
-                        break;
-                    case 12:
-                        me->Dismount();
-                        JumpToNextStep(1 * IN_MILLISECONDS);
-                        break;
-                    case 13:
-                        if (Creature* sylvanas = ObjectAccessor::GetCreature(*me, sylvanasfollowGUID))
-                            sylvanas->Dismount();
-                        JumpToNextStep(3 * IN_MILLISECONDS);
-                        break;
-                    case 14:
-                        Talk(THRALL_SAY_COURTYARD_1);
-                        JumpToNextStep(4 * IN_MILLISECONDS);
-                        break;
-                    case 15:
-                        me->CastSpell(me, SPELL_CALL_OF_AIR);
-                        SpawnWave(0);
-                        JumpToNextStep(5 * IN_MILLISECONDS);
-                        break;
-                    case 16:
-                    {
-                        std::list<Creature*> PlagueList;
-                        me->GetCreatureListWithEntryInGrid(PlagueList, NPC_PLAGUE_TRIGGER, 50.0f);
-                        if (!PlagueList.empty())
-                            for (std::list<Creature*>::iterator itr = PlagueList.begin(); itr != PlagueList.end(); itr++)
-                                (*itr)->DespawnOrUnsummon();
-                        SetEscortPaused(false);
-                        SetRun(false);
-                        if (Creature* sylvanas = ObjectAccessor::GetCreature(*me, sylvanasfollowGUID))
-                            sylvanas->GetMotionMaster()->MovePath(NPC_SYLVANAS * 1000, false);
-                        JumpToNextStep(3 * IN_MILLISECONDS);
-                        break;
-                    }
-                    case 17:
-                        bStepping = false;
-                        JumpToNextStep(0);
-                        break;
-                    case 18:
-                        SpawnWave(1);
-                        Talk(THRALL_SAY_COURTYARD_2);
-                        JumpToNextStep(6 * IN_MILLISECONDS);
-                        break;
-                    case 19:
-                    {
-                        SpawnWave(2);
-                        JumpToNextStep(3 * IN_MILLISECONDS);
-                        break;
-                    }
-                    case 20:
-                        if (Creature* valimathras = ObjectAccessor::GetCreature(*me, ValimathrasGUID))
-                            valimathras->AI()->Talk(SAY_VALIMATHRAS_INTRO_0);
-                        JumpToNextStep(5 * IN_MILLISECONDS);
-                        break;
-                    case 21:
-                        if (Creature* valimathras = ObjectAccessor::GetCreature(*me, ValimathrasGUID))
-                            valimathras->AI()->Talk(SAY_VALIMATHRAS_INTRO_1);
-                        JumpToNextStep(9 * IN_MILLISECONDS);
-                        break;
-                    case 22:
-                        if (Creature* valimathras = ObjectAccessor::GetCreature(*me, ValimathrasGUID))
-                            valimathras->AI()->Talk(SAY_VALIMATHRAS_INTRO_2);
-                        JumpToNextStep(7 * IN_MILLISECONDS);
-                        break;
-                    case 23:
-                        SpawnWave(3);
-                        JumpToNextStep(1 * IN_MILLISECONDS);
-                        break;
-                    case 24:
-                        if (Creature* valimathrasportal = ObjectAccessor::GetCreature(*me, ValimathrasPortalGUID))
-                            valimathrasportal->CastSpell(valimathrasportal, SPELL_VALIMATHRAS_PORTAL);
-                        JumpToNextStep(12 * IN_MILLISECONDS);
-                        break;
-                    case 25:
-                        if (Creature* valimathras = ObjectAccessor::GetCreature(*me, ValimathrasGUID))
-                        {
-                            valimathras->GetMotionMaster()->MovePoint(0, 1804.559f, 235.504f, 62.753f);
-                            valimathras->DespawnOrUnsummon(3 * IN_MILLISECONDS);
-                        }
-                        if (Creature* valimathrasportal = ObjectAccessor::GetCreature(*me, ValimathrasPortalGUID))
-                            valimathrasportal->DespawnOrUnsummon(6 * IN_MILLISECONDS);
-                        JumpToNextStep(1 * IN_MILLISECONDS);
-                        break;
-                    case 26:
-                    {
-                        Talk(THRALL_SAY_COURTYARD_3);
-                        me->CastSpell(me, SPELL_TIDAL_WAVE_SUMMON);
-                        std::list<Creature*> HelperList;
-                        me->GetCreatureListWithEntryInGrid(HelperList, NPC_SLINGER_TRIGGER, 1000.0f);
-                        if (!HelperList.empty())
-                            for (std::list<Creature*>::iterator itr = HelperList.begin(); itr != HelperList.end(); itr++)
-                                (*itr)->DespawnOrUnsummon();
-                        JumpToNextStep(5 * IN_MILLISECONDS);
-                        break;
-                    }
-                    // Start COURTYARD_FIGHT
-                    case 27:
-                        FollowThrall();
-                        SetEscortPaused(false);
-                        bStepping = false;
-                        SetRun(true);
-                        Talk(THRALL_SAY_COURTYARD_4);
-                        UpdateWorldState(me->GetMap(), WORLD_STATE_BATTLE_START_H, 0);
-                        UpdateWorldState(me->GetMap(), WORLD_STATE_COURTYARD_FIGHT_H, 1);
-                        JumpToNextStep(0);
-                        break;
-                    case 28:
-                    {
-                        EnableAttack = true;
-                        DoCast(me, SPELL_HEROIC_VANGUARD, true);
-                        std::list<Creature*> HostileEndList;
-                        me->GetCreatureListWithEntryInGrid(HostileEndList, NPC_TREACHEROUS_GUARDIAN_H, 1000.0f);
-                        me->GetCreatureListWithEntryInGrid(HostileEndList, NPC_DOCTOR_H, 1000.0f);
-                        me->GetCreatureListWithEntryInGrid(HostileEndList, NPC_CHEMIST_H, 1000.0f);
-                        if (!HostileEndList.empty())
-                            for (std::list<Creature*>::iterator itr = HostileEndList.begin(); itr != HostileEndList.end(); itr++)
-                                (*itr)->setFaction(FACTION_HOSTILE);
-                        SpawnWave(4);
-                        JumpToNextStep(10 * IN_MILLISECONDS);
-                        break;
-                    }
-                    case 29:
-                        SpawnWave(4);
-                        JumpToNextStep(10 * IN_MILLISECONDS);
-                        break;
-                    case 30:
-                        SpawnWave(4);
-                        JumpToNextStep(10 * IN_MILLISECONDS);
-                        break;
-                    case 31:
-                        SpawnWave(4);
-                        JumpToNextStep(10 * IN_MILLISECONDS);
-                        break;
-                    case 32:
-                        SpawnWave(4);
-                        JumpToNextStep(10 * IN_MILLISECONDS);
-                        break;
-                    case 33:
-                        SpawnWave(4);
-                        JumpToNextStep(10 * IN_MILLISECONDS);
-                        break;
-                    case 34:
-                        SpawnWave(4);
-                        JumpToNextStep(10 * IN_MILLISECONDS);
-                        break;
-                    case 35:
-                        SpawnWave(4);
-                        JumpToNextStep(10 * IN_MILLISECONDS);
-                        break;
-                    case 36:
-                        SpawnWave(4);
-                        JumpToNextStep(10 * IN_MILLISECONDS);
-                        break;
-                    case 37:
-                        SpawnWave(4);
-                        JumpToNextStep(10 * IN_MILLISECONDS);
-                        break;
-                    case 38:
-                        SpawnWave(4);
-                        JumpToNextStep(10 * IN_MILLISECONDS);
-                        break;
-                    case 39:
-                        SpawnWave(4);
-                        JumpToNextStep(10 * IN_MILLISECONDS);
-                        break;
-                    case 40:
-                        SpawnWave(4);
-                        JumpToNextStep(10 * IN_MILLISECONDS);
-                        break;
-                    case 41:
-                        SpawnWave(4);
-                        JumpToNextStep(10 * IN_MILLISECONDS);
-                        break;
-                    case 42:
-                        SpawnWave(4);
-                        JumpToNextStep(10 * IN_MILLISECONDS);
-                        break;
-                    case 43:
-                        SpawnWave(4);
-                        JumpToNextStep(10 * IN_MILLISECONDS);
-                        break;
-                    case 44:
-                        SpawnWave(4);
-                        JumpToNextStep(2 * IN_MILLISECONDS);
-                        break;
-                    case 45:
-                        SpawnWave(5);
-                        bStepping = false;
-                        JumpToNextStep(0 * IN_MILLISECONDS);
-                        break;
-                        // End COURTYARD_FIGHT
-                    case 46:
-                    {
-                        FollowThrall();
-                        std::list<Creature*> HostileList;
-                        me->GetCreatureListWithEntryInGrid(HostileList, NPC_TREACHEROUS_GUARDIAN_H, 1000.0f);
-                        me->GetCreatureListWithEntryInGrid(HostileList, NPC_DOCTOR_H, 1000.0f);
-                        me->GetCreatureListWithEntryInGrid(HostileList, NPC_CHEMIST_H, 1000.0f);
-                        me->GetCreatureListWithEntryInGrid(HostileList, NPC_BLIGHT_SLINGER, 1000.0f);
-                        if (!HostileList.empty())
-                            for (std::list<Creature*>::iterator itr = HostileList.begin(); itr != HostileList.end(); itr++)
-                                (*itr)->DespawnOrUnsummon();
-                        for (uint8 i = 0; i < 7; ++i)
-                            me->SummonGameObject(GO_HORDE_BANNER, ThrallSpawn[i + 37].x, ThrallSpawn[i + 37].y, ThrallSpawn[i + 37].z, ThrallSpawn[i + 37].o, 0.0f, 0.0f, 0.0f, 0.0f, 120 * IN_MILLISECONDS);
-                        SpawnWave(6);
-                        SetEscortPaused(false);
-                        bStepping = false;
-                        SetRun(false);
-                        JumpToNextStep(0 * IN_MILLISECONDS);
-                        break;
-                    }
-                    case 47:
-                        Talk(THRALL_SAY_COURTYARD_5);
-                        JumpToNextStep(5 * IN_MILLISECONDS);
-                        break;
-                    case 48:
-                        SetEscortPaused(false);
-                        bStepping = false;
-                        JumpToNextStep(0 * IN_MILLISECONDS);
-                        break;
-                        // Elevator Event
-                    case 49:
-                        Talk(THRALL_SAY_ELEVATOR_1);
-                        JumpToNextStep(10 * IN_MILLISECONDS);
-                        break;
-                    case 50:
-                        if (Creature* sylvanas = ObjectAccessor::GetCreature(*me, sylvanasfollowGUID))
-                            sylvanas->AI()->Talk(SYLVANAS_SAY_ELEVATOR_1);
-                        JumpToNextStep(3 * IN_MILLISECONDS);
-                        break;
-                    case 51:
-                        Talk(THRALL_SAY_ELEVATOR_2);
-                        DoCast(me, SPELL_CALL_OF_AIR);
-                        SpawnWave(7);
-                        JumpToNextStep(16 * IN_MILLISECONDS);
-                        break;
-                    case 52:
-                        Talk(THRALL_SAY_ELEVATOR_3);
-                        JumpToNextStep(4 * IN_MILLISECONDS);
-                        break;
-                    case 53:
-                        SpawnWave(8);
-                        me->GetMotionMaster()->MoveJump(ThrallSpawn[55].x, ThrallSpawn[55].y, ThrallSpawn[55].z, 40.0f, 40.0f, 0);
-                        if (Creature* sylvanas = ObjectAccessor::GetCreature(*me, sylvanasfollowGUID))
-                            sylvanas->GetMotionMaster()->MoveJump(ThrallSpawn[56].x, ThrallSpawn[56].y, ThrallSpawn[56].z, 40.0f, 40.0f, 0);
-                        JumpToNextStep(4 * IN_MILLISECONDS);
-                        break;
-                    case 54:
-                        FollowThrall();
-                        SetEscortPaused(false);
-                        bStepping = false;
-                        SetRun(false);
-                        JumpToNextStep(0 * IN_MILLISECONDS);
-                        break;
-                        // Top of Undercity Discussion
-                    case 55:
-                        if (Creature* sylvanas = ObjectAccessor::GetCreature(*me, sylvanasfollowGUID))
-                            sylvanas->AI()->Talk(SYLVANAS_SAY_SANCTUM_1);
-                        JumpToNextStep(5 * IN_MILLISECONDS);
-                        break;
-                    case 56:
-                        if (Creature* sylvanas = ObjectAccessor::GetCreature(*me, sylvanasfollowGUID))
-                            sylvanas->AI()->Talk(SYLVANAS_SAY_SANCTUM_2);
-                        JumpToNextStep(8 * IN_MILLISECONDS);
-                        break;
-                    case 57:
-                        Talk(THRALL_SAY_SANCTUM_2);
-                        JumpToNextStep(5 * IN_MILLISECONDS);
-                        break;
-                    case 58:
-                        if (Creature* sylvanas = ObjectAccessor::GetCreature(*me, sylvanasfollowGUID))
-                            sylvanas->AI()->Talk(SYLVANAS_SAY_SANCTUM_3);
-                        JumpToNextStep(5 * IN_MILLISECONDS);
-                        break;
-                        // Top of Undercity - Fight
-                    case 59:
-                        SpawnWave(9);
-                        JumpToNextStep(5 * IN_MILLISECONDS);
-                        break;
-                    case 60:
-                        SpawnWave(9);
-                        JumpToNextStep(5 * IN_MILLISECONDS);
-                        break;
-                    case 61:
-                        SpawnWave(9);
-                        JumpToNextStep(10 * IN_MILLISECONDS);
-                        break;
-                    case 62:
-                        FollowThrall();
-                        SetEscortPaused(false);
-                        bStepping = false;
-                        SetRun(false);
-                        JumpToNextStep(0 * IN_MILLISECONDS);
-                        break;
-                    case 63:
-                        JumpToNextStep(3 * IN_MILLISECONDS);
-                        break;
-                    case 64:
-                        SpawnWave(10);
-                        JumpToNextStep(5 * IN_MILLISECONDS);
-                        break;
-                    case 65:
-                        SpawnWave(10);
-                        JumpToNextStep(10 * IN_MILLISECONDS);
-                        break;
-                    case 66:
-                        FollowThrall();
-                        SetEscortPaused(false);
-                        bStepping = false;
-                        SetRun(false);
-                        JumpToNextStep(0 * IN_MILLISECONDS);
-                        break;
-                    case 67:
-                        SpawnWave(11);
-                        JumpToNextStep(6 * IN_MILLISECONDS);
-                        break;
-                    case 68:
-                        SpawnWave(11);
-                        JumpToNextStep(10 * IN_MILLISECONDS);
-                        break;
-                    case 69:
-                        FollowThrall();
-                        SetEscortPaused(false);
-                        bStepping = false;
-                        SetRun(false);
-                        JumpToNextStep(0 * IN_MILLISECONDS);
-                        break;
-                        // KHANOK - Valimathtas Intro
-                    case 70:
-                        JumpToNextStep(10 * IN_MILLISECONDS);
-                        break;
-                    case 71:
-                        if (Creature* sylvanas = ObjectAccessor::GetCreature(*me, sylvanasfollowGUID))
-                            sylvanas->AI()->Talk(SYLVANAS_SAY_SANCTUM_4);
-                        SpawnWave(12);
-                        JumpToNextStep(5 * IN_MILLISECONDS);
-                        break;
-                    case 72:
-                        if (Creature* valimathras = ObjectAccessor::GetCreature(*me, ValimathrasGUID))
-                            valimathras->AI()->Talk(SAY_VALIMATHRAS_INNER_SANKTUM_0);
-                        JumpToNextStep(5 * IN_MILLISECONDS);
-                        break;
-                    case 73:
-                        if (Creature* valimathras = ObjectAccessor::GetCreature(*me, ValimathrasGUID))
-                            valimathras->AI()->Talk(SAY_VALIMATHRAS_INNER_SANKTUM_1);
-                        SpawnWave(13);
-                        JumpToNextStep(2 * IN_MILLISECONDS);
-                        break;
-                    case 74:
-                        if (Creature* valimathrasportal = ObjectAccessor::GetCreature(*me, ValimathrasPortalGUID))
-                            valimathrasportal->CastSpell(valimathrasportal, SPELL_VALIMATHRAS_PORTAL);
-                        JumpToNextStep(4 * IN_MILLISECONDS);
-                        break;
-                    case 75:
-                        if (Creature* valimathras = ObjectAccessor::GetCreature(*me, ValimathrasGUID))
-                        {
-                            valimathras->GetMotionMaster()->MovePoint(0, 1596.642f, 429.811f, -46.3429f);
-                            valimathras->DespawnOrUnsummon(3 * IN_MILLISECONDS);
-                        }
-                        if (Creature* valimathrasportal = ObjectAccessor::GetCreature(*me, ValimathrasPortalGUID))
-                            valimathrasportal->DespawnOrUnsummon(3 * IN_MILLISECONDS);
-                        JumpToNextStep(2 * IN_MILLISECONDS);
-                        break;
-                        // KHANOK - Trashspawn
-                    case 76:
-                        SpawnWave(14);
-                        JumpToNextStep(8 * IN_MILLISECONDS);
-                        break;
-                    case 77:
-                        SpawnWave(15);
-                        JumpToNextStep(8 * IN_MILLISECONDS);
-                        break;
-                    case 78:
-                        SpawnWave(16);
-                        JumpToNextStep(8 * IN_MILLISECONDS);
-                        break;
-                    case 79:
-                        SpawnWave(14);
-                        JumpToNextStep(8 * IN_MILLISECONDS);
-                        break;
-                    case 80:
-                        SpawnWave(15);
-                        JumpToNextStep(8 * IN_MILLISECONDS);
-                        break;
-                    case 81:
-                        SpawnWave(16);
-                        JumpToNextStep(8 * IN_MILLISECONDS);
-                        break;
-                    case 82:
-                        SpawnWave(14);
-                        JumpToNextStep(8 * IN_MILLISECONDS);
-                        break;
-                    case 83:
-                        SpawnWave(15);
-                        JumpToNextStep(8 * IN_MILLISECONDS);
-                        break;
-                    case 84:
-                        SpawnWave(16);
-                        JumpToNextStep(8 * IN_MILLISECONDS);
-                        break;
-                    case 85:
-                        SpawnWave(14);
-                        JumpToNextStep(8 * IN_MILLISECONDS);
-                        break;
-                    case 86:
-                        SpawnWave(15);
-                        JumpToNextStep(8 * IN_MILLISECONDS);
-                        break;
-                    case 87:
-                        SpawnWave(16);
-                        JumpToNextStep(8 * IN_MILLISECONDS);
-                        break;
-                    case 88:
-                        SpawnWave(14);
-                        JumpToNextStep(8 * IN_MILLISECONDS);
-                        break;
-                    case 89:
-                        SpawnWave(15);
-                        JumpToNextStep(8 * IN_MILLISECONDS);
-                        break;
-                    case 90:
-                        SpawnWave(16);
-                        JumpToNextStep(8 * IN_MILLISECONDS);
-                        break;
-                    case 91:
-                        SpawnWave(14);
-                        JumpToNextStep(8 * IN_MILLISECONDS);
-                        break;
-                    case 92:
-                        SpawnWave(15);
-                        JumpToNextStep(8 * IN_MILLISECONDS);
-                        break;
-                    case 93:
-                        SpawnWave(16);
-                        JumpToNextStep(8 * IN_MILLISECONDS);
-                        break;
-                    case 94:
-                        // Spawn Boss 2 KHANOK  
-                        SpawnWave(17);
-                        JumpToNextStep(10 * IN_MILLISECONDS);
-                        break;
-                    case 95:
-                        SpawnWave(14);
-                        JumpToNextStep(5 * IN_MILLISECONDS);
-                        break;
-                    case 96:
-                        SpawnWave(15);
-                        JumpToNextStep(5 * IN_MILLISECONDS);
-                        break;
-                    case 97:
-                        SpawnWave(16);
-                        JumpToNextStep(0 * IN_MILLISECONDS);
-                        bStepping = false;
-                        break;
-                    case 98:
-                        // KHANOK - Won
-                        Talk(THRALL_SAY_SANCTUM_3);
-                        JumpToNextStep(7 * IN_MILLISECONDS);
-                        break;
-                    case 99:
-                        SpawnWave(18);
-                        JumpToNextStep(0.35 * IN_MILLISECONDS);
-                        break;
-                    case 100:
-                        SpawnWave(18);
-                        JumpToNextStep(0.35 * IN_MILLISECONDS);
-                        break;
-                    case 101:
-                        SpawnWave(18);
-                        JumpToNextStep(0.35 * IN_MILLISECONDS);
-                        break;
-                    case 102:
-                        SpawnWave(18);
-                        JumpToNextStep(0.35 * IN_MILLISECONDS);
-                        break;
-                    case 103:
-                        SpawnWave(18);
-                        JumpToNextStep(0.35 * IN_MILLISECONDS);
-                        break;
-                    case 104:
-                        SpawnWave(18);
-                        JumpToNextStep(0.35 * IN_MILLISECONDS);
-                        break;
-                    case 105:
-                        SpawnWave(18);
-                        JumpToNextStep(0.35 * IN_MILLISECONDS);
-                        break;
-                    case 106:
-                        SpawnWave(18);
-                        JumpToNextStep(0.35 * IN_MILLISECONDS);
-                        break;
-                    case 107:
-                        SpawnWave(18);
-                        JumpToNextStep(3 * IN_MILLISECONDS);
-                        break;
-                    case 108:
-                        Talk(THRALL_SAY_SANCTUM_4);
-                        FollowThrall();
-                        SetEscortPaused(false);
-                        bStepping = false;
-                        SetRun(false);
-                        JumpToNextStep(0 * IN_MILLISECONDS);
-                        break;
-                    case 109:
-                        if (Creature* sylvanas = ObjectAccessor::GetCreature(*me, sylvanasfollowGUID))
-                            sylvanas->AI()->Talk(SYLVANAS_SAY_SANCTUM_5);
-                        JumpToNextStep(8 * IN_MILLISECONDS);
-                        break;
-                    case 110:
-                        SpawnWave(19);
-                        JumpToNextStep(5 * IN_MILLISECONDS);
-                        break;
-                    case 111:
-                        FollowThrall();
-                        SetEscortPaused(false);
-                        bStepping = false;
-                        SetRun(true);
-                        JumpToNextStep(0 * IN_MILLISECONDS);
-                        break;
-                    case 112:
-                        JumpToNextStep(3 * IN_MILLISECONDS);
-                        break;
-                    case 113:
-                        Talk(THRALL_SAY_SANCTUM_5);
-                        JumpToNextStep(12 * IN_MILLISECONDS);
-                        break;
-                    case 114:
-                        Talk(THRALL_SAY_SANCTUM_6);
-                        DoCast(me, SPELL_CALL_OF_EARTH);
-                        JumpToNextStep(6 * IN_MILLISECONDS);
-                        break;
-                    case 115:
-                    {
-                        std::list<GameObject*> SaronitList;
-                        GetGameObjectListWithEntryInGrid(SaronitList, me, GO_BLOCKED_PASSAGE, 80.0f);
-                        for (std::list<GameObject*>::const_iterator itr = SaronitList.begin(); itr != SaronitList.end(); ++itr)
-                            if (GameObject* saronit = (*itr))
-                                saronit->UseDoorOrButton();
-                        JumpToNextStep(5 * IN_MILLISECONDS);
-                        break;
-                    }
-                    case 116:
-                        Talk(THRALL_SAY_SANCTUM_7);
-                        UpdateWorldState(me->GetMap(), WORLD_STATE_ROYAL_QUARTER_FIGHT_H, 1);
-                        FollowThrall();
-                        SetEscortPaused(false);
-                        bStepping = false;
-                        JumpToNextStep(0 * IN_MILLISECONDS);
-                        break;
-                        // Valimathras Intro
-                    case 117:
-                        Talk(THRALL_SAY_THRONE_1);
-                        JumpToNextStep(5 * IN_MILLISECONDS);
-                        break;
-                    case 118:
-                        if (Creature* valimathras = ObjectAccessor::GetCreature(*me, ValimathrasGUID))
-                        {
-                            valimathras->AI()->Talk(SAY_THRONE_1);
-                            valimathras->CastSpell(me, SPELL_OPENING_LEGION_PORTALS);
-                        }
-                        JumpToNextStep(3 * IN_MILLISECONDS);
-                        break;
-                    case 119:
-                        SpawnWave(20);
-                        JumpToNextStep(10 * IN_MILLISECONDS);
-                        break;
-                    case 120:
-                        SpawnWave(21);
-                        JumpToNextStep(10 * IN_MILLISECONDS);
-                        break;
-                    case 121:
-                        ActivateValimathrasPortal();
-                        if (Creature* valimathras = ObjectAccessor::GetCreature(*me, ValimathrasGUID))
-                            valimathras->AI()->Talk(SAY_THRONE_2);
-                        JumpToNextStep(10 * IN_MILLISECONDS);
-                        break;
-                    case 122:
-                        SpawnWave(20);
-                        JumpToNextStep(10 * IN_MILLISECONDS);
-                        break;
-                    case 123:
-                        SpawnWave(21);
-                        JumpToNextStep(10 * IN_MILLISECONDS);
-                        break;
-                    case 124:
-                        ActivateValimathrasPortal();
-                        if (Creature* valimathras = ObjectAccessor::GetCreature(*me, ValimathrasGUID))
-                            valimathras->AI()->Talk(SAY_THRONE_3);
-                        JumpToNextStep(10 * IN_MILLISECONDS);
-                        break;
-                    case 125:
-                        SpawnWave(20);
-                        JumpToNextStep(10 * IN_MILLISECONDS);
-                        break;
-                    case 126:
-                        SpawnWave(21);
-                        JumpToNextStep(10 * IN_MILLISECONDS);
-                        break;
-                    case 127:
-                        ActivateValimathrasPortal();
-                        if (Creature* valimathras = ObjectAccessor::GetCreature(*me, ValimathrasGUID))
-                            valimathras->AI()->Talk(SAY_THRONE_4);
-                        JumpToNextStep(10 * IN_MILLISECONDS);
-                        break;
-                    case 128:
-                        SpawnWave(20);
-                        JumpToNextStep(10 * IN_MILLISECONDS);
-                        break;
-                    case 129:
-                        SpawnWave(21);
-                        JumpToNextStep(10 * IN_MILLISECONDS);
-                        break;
-                    case 130:
-                        ActivateValimathrasPortal();
-                        if (Creature* valimathras = ObjectAccessor::GetCreature(*me, ValimathrasGUID))
-                            valimathras->AI()->Talk(SAY_THRONE_5);
-                        JumpToNextStep(10 * IN_MILLISECONDS);
-                        break;
-                    case 131:
-                        SpawnWave(20);
-                        JumpToNextStep(10 * IN_MILLISECONDS);
-                        break;
-                    case 132:
-                        SpawnWave(21);
-                        JumpToNextStep(10 * IN_MILLISECONDS);
-                        break;
-                    case 133:
-                        ActivateValimathrasPortal();
-                        if (Creature* valimathras = ObjectAccessor::GetCreature(*me, ValimathrasGUID))
-                            valimathras->AI()->Talk(SAY_THRONE_6);
-                        JumpToNextStep(10 * IN_MILLISECONDS);
-                        break;
-                    case 134:
-                        SpawnWave(20);
-                        JumpToNextStep(10 * IN_MILLISECONDS);
-                        break;
-                    case 135:
-                        SpawnWave(21);
-                        JumpToNextStep(10 * IN_MILLISECONDS);
-                        break;
-                    case 136:
-                        ActivateValimathrasPortal();
-                        JumpToNextStep(5 * IN_MILLISECONDS);
-                        break;
-                        // Valimathras Fight
-                    case 137:
-                        if (Creature* valimathras = ObjectAccessor::GetCreature(*me, ValimathrasGUID))
-                        {
-                            valimathras->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
-                            valimathras->RemoveAura(SPELL_AURA_OF_VARIMATHRAS);
-                            valimathras->RemoveAura(SPELL_OPENING_LEGION_PORTALS);
-                            valimathras->AI()->Talk(SAY_VALIMATHRAS_ATTACK);
-                            valimathras->AddThreat(me, 100.0f);
-                            me->AddThreat(valimathras, 100.0f);
-                            valimathras->AI()->AttackStart(me);
-                        }
-                        bStepping = false;
-                        JumpToNextStep(0 * IN_MILLISECONDS);
-                        break;
-                        // Valimathras Won
-                    case 138:
-                        Talk(THRALL_SAY_THRONE_2);
-                        JumpToNextStep(5 * IN_MILLISECONDS);
-                        break;
-                    case 139:
-                        Talk(THRALL_SAY_THRONE_3);
-                        JumpToNextStep(2 * IN_MILLISECONDS);
-                        break;
-                    case 140:
-                        SetEscortPaused(false);
-                        bStepping = false;
-                        JumpToNextStep(0 * IN_MILLISECONDS);
-                        break;
-                    case 141:
-                        JumpToNextStep(8 * IN_MILLISECONDS);
-                        break;
-                    case 142:
-                        if (Creature* sylvanas = ObjectAccessor::GetCreature(*me, sylvanasfollowGUID))
-                            me->SetFacingToObject(sylvanas);
-                        Talk(THRALL_SAY_THRONE_4);
-                        JumpToNextStep(3 * IN_MILLISECONDS);
-                        break;
-                    case 143:
-                        if (Creature* sylvanas = ObjectAccessor::GetCreature(*me, sylvanasfollowGUID))
-                            sylvanas->CastSpell(sylvanas, SPELL_LEAP_TO_PLATFORM);
-                        JumpToNextStep(10 * IN_MILLISECONDS);
-                        break;
-                    case 144:
-                        if (Creature* sylvanas = ObjectAccessor::GetCreature(*me, sylvanasfollowGUID))
-                        {
-                            sylvanas->AI()->Talk(SYLVANAS_SAY_THRONE_1);
-                            me->SetFacingToObject(sylvanas);
-                            me->HandleEmoteCommand(EMOTE_ONESHOT_SALUTE);
-                        }
-                        JumpToNextStep(3 * IN_MILLISECONDS);
-                        break;
-                    case 145:
-                        Talk(THRALL_SAY_THRONE_5);
-                        FollowThrall();
-                        SetEscortPaused(false);
-                        bStepping = false;
-                        JumpToNextStep(0 * IN_MILLISECONDS);
-                        break;
-                    case 146:
-                        Talk(THRALL_SAY_THRONE_6);
-                        JumpToNextStep(3 * IN_MILLISECONDS);
-                        break;
-                    case 147:
-                        for (uint8 i = 0; i < ALLIANCE_FORCE_MAXCOUNT; ++i)
-                        {
-                            if (Creature* temp = me->SummonCreature(NPC_SW_SOLDIER, AllianceSpawn[i + 25].x, AllianceSpawn[i + 25].y, AllianceSpawn[i + 25].z, AllianceSpawn[i + 25].o, TEMPSUMMON_MANUAL_DESPAWN))
+                        case 0:
+                            me->setActive(true);
+                            JumpToNextStep(3 * IN_MILLISECONDS);
+                            break;
+                        case 1:
+                            UpdateWorldState(me->GetMap(), WORLD_STATE_BATTLE_COUNTDOWN_H, 1);
+                            Talk(THRALL_SAY_PREP_1);
+                            JumpToNextStep(6 * IN_MILLISECONDS);
+                            break;
+                        case 2:
+                            Talk(THRALL_SAY_PREP_2);
+                            JumpToNextStep(14 * IN_MILLISECONDS);
+                            break;
+                        case 3:
+                            if (Creature* guard = me->FindNearestCreature(NPC_HORDE_GUARD, 100.0f))
+                                guard->AI()->Talk(SAY_BURN_UC);
+                            JumpToNextStep(19 * IN_MILLISECONDS);
+                            break;
+                        case 4:
+                            if (Creature* guard = me->FindNearestCreature(NPC_HORDE_GUARD, 100.0f))
+                                guard->AI()->Talk(SAY_PUTRESS_ANGER);
+                            JumpToNextStep(25 * IN_MILLISECONDS);
+                            break;
+                        case 5:
+                            Talk(THRALL_SAY_PREP_3);
+                            JumpToNextStep(14 * IN_MILLISECONDS);
+                            break;
+                        case 6:
+                            Talk(THRALL_SAY_PREP_4);
+                            JumpToNextStep(14 * IN_MILLISECONDS);
+                            break;
+                        case 7:
+                            Talk(THRALL_SAY_PREP_5);
+                            JumpToNextStep(10 * IN_MILLISECONDS);
+                            break;
+                        case 8:
+                            Talk(THRALL_SAY_PREP_6);
+                            JumpToNextStep(15 * IN_MILLISECONDS);
+                            break;
+                        case 9:
+                            Talk(THRALL_SAY_PREP_7);
+                            JumpToNextStep(6 * IN_MILLISECONDS);
+                            break;
+                        case 10:
+                            if (Player* player = GetPlayerForEscort())
+                                player->CastSpell(player, SPELL_THRALL_BUFF);
+                            JumpToNextStep(10 * IN_MILLISECONDS);
+                            break;
+                            // Start Event
+                        case 11:
+                            UpdateWorldState(me->GetMap(), WORLD_STATE_BATTLE_COUNTDOWN_H, 0);
+                            UpdateWorldState(me->GetMap(), WORLD_STATE_BATTLE_START_H, 1);
+                            Talk(THRALL_SAY_PREP_8);
+                            SetEscortPaused(false);
+                            bStepping = false;
+                            JumpToNextStep(0);
+                            SetRun(true);
+                            if (Creature* sylvanas = ObjectAccessor::GetCreature(*me, sylvanasfollowGUID))
                             {
-                                allianceForcesGUID[i] = temp->GetGUID();
-                                temp->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
-                                temp->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
-                                temp->ApplySpellImmune(0, IMMUNITY_ID, SPELL_SYLVANAS_BUFF, true);
-                                temp->SetReactState(REACT_PASSIVE);
-                                temp->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY2H);
+                                sylvanas->GetMotionMaster()->MovePath(NPC_SYLVANAS * 100, false);
+                                sylvanas->setActive(true);
                             }
-                        }
-                        if (Creature* wrynn = me->SummonCreature(NPC_WRYNN, 1308.862f, 381.809f, -66.044243f, TEMPSUMMON_MANUAL_DESPAWN))
+                            break;
+                        case 12:
+                            me->Dismount();
+                            JumpToNextStep(1 * IN_MILLISECONDS);
+                            break;
+                        case 13:
+                            if (Creature* sylvanas = ObjectAccessor::GetCreature(*me, sylvanasfollowGUID))
+                                sylvanas->Dismount();
+                            JumpToNextStep(3 * IN_MILLISECONDS);
+                            break;
+                        case 14:
+                            Talk(THRALL_SAY_COURTYARD_1);
+                            JumpToNextStep(4 * IN_MILLISECONDS);
+                            break;
+                        case 15:
+                            me->CastSpell(me, SPELL_CALL_OF_AIR);
+                            SpawnWave(0);
+                            JumpToNextStep(5 * IN_MILLISECONDS);
+                            break;
+                        case 16:
                         {
-                            WrynnGUID = wrynn->GetGUID();
-                            wrynn->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
-                            wrynn->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
-                            wrynn->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY2H);
-                            wrynn->SetReactState(REACT_PASSIVE);
-                            wrynn->GetMotionMaster()->MovePoint(0, 1302.543f, 359.472f, -67.295f, true);
+                            std::list<Creature*> PlagueList;
+                            me->GetCreatureListWithEntryInGrid(PlagueList, NPC_PLAGUE_TRIGGER, 50.0f);
+                            if (!PlagueList.empty())
+                                for (std::list<Creature*>::iterator itr = PlagueList.begin(); itr != PlagueList.end(); itr++)
+                                    (*itr)->DespawnOrUnsummon();
+                            SetEscortPaused(false);
+                            SetRun(false);
+                            if (Creature* sylvanas = ObjectAccessor::GetCreature(*me, sylvanasfollowGUID))
+                                sylvanas->GetMotionMaster()->MovePath(NPC_SYLVANAS * 1000, false);
+                            JumpToNextStep(3 * IN_MILLISECONDS);
+                            break;
                         }
-                        if (Creature* jaina = me->SummonCreature(NPC_JAINA, 1308.862f, 381.809f, -66.044243f, TEMPSUMMON_MANUAL_DESPAWN))
+                        case 17:
+                            bStepping = false;
+                            JumpToNextStep(0);
+                            break;
+                        case 18:
+                            SpawnWave(1);
+                            Talk(THRALL_SAY_COURTYARD_2);
+                            JumpToNextStep(6 * IN_MILLISECONDS);
+                            break;
+                        case 19:
                         {
-                            JainaGUID = jaina->GetGUID();
-                            jaina->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
-                            jaina->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
-                            jaina->SetReactState(REACT_PASSIVE);
+                            SpawnWave(2);
+                            JumpToNextStep(3 * IN_MILLISECONDS);
+                            break;
                         }
-                        JumpToNextStep(6 * IN_MILLISECONDS);
-                        break;
-                        // Wrynn Intro
-                    case 148:
-                        if (Creature* wrynn = ObjectAccessor::GetCreature(*me, WrynnGUID))
-                            wrynn->AI()->Talk(WRYNN_SAY_THRONE_5);
-                        JumpToNextStep(15 * IN_MILLISECONDS);
-                        break;
-                    case 149:
-                        if (Creature* wrynn = ObjectAccessor::GetCreature(*me, WrynnGUID))
-                            wrynn->AI()->Talk(WRYNN_SAY_THRONE_6);
-                        JumpToNextStep(15 * IN_MILLISECONDS);
-                        break;
-                    case 150:
-                        if (Creature* wrynn = ObjectAccessor::GetCreature(*me, WrynnGUID))
-                            wrynn->AI()->Talk(WRYNN_SAY_THRONE_7);
-                        JumpToNextStep(16.5 * IN_MILLISECONDS);
-                        break;
-                    case 151:
-                        if (Creature* wrynn = ObjectAccessor::GetCreature(*me, WrynnGUID))
-                            wrynn->AI()->Talk(WRYNN_SAY_THRONE_8);
-                        JumpToNextStep(6 * IN_MILLISECONDS);
-                        break;
-                        // Wrynn Fight
-                    case 152:
-                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
-                        if (Creature* wrynn = ObjectAccessor::GetCreature(*me, WrynnGUID))
-                        {
-                            wrynn->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
-                            wrynn->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
-                            wrynn->SetReactState(REACT_AGGRESSIVE);
-                            wrynn->AddThreat(me, 100.0f);
-                            me->AddThreat(wrynn, 100.0f);
-                            wrynn->AI()->AttackStart(me);
-                        }
-
-                        for (uint8 i = 0; i < ALLIANCE_FORCE_MAXCOUNT; ++i)
-                        {
-                            if (Creature* temp = ObjectAccessor::GetCreature(*me, allianceForcesGUID[i]))
+                        case 20:
+                            if (Creature* valimathras = ObjectAccessor::GetCreature(*me, ValimathrasGUID))
+                                valimathras->AI()->Talk(SAY_VALIMATHRAS_INTRO_0);
+                            JumpToNextStep(5 * IN_MILLISECONDS);
+                            break;
+                        case 21:
+                            if (Creature* valimathras = ObjectAccessor::GetCreature(*me, ValimathrasGUID))
+                                valimathras->AI()->Talk(SAY_VALIMATHRAS_INTRO_1);
+                            JumpToNextStep(9 * IN_MILLISECONDS);
+                            break;
+                        case 22:
+                            if (Creature* valimathras = ObjectAccessor::GetCreature(*me, ValimathrasGUID))
+                                valimathras->AI()->Talk(SAY_VALIMATHRAS_INTRO_2);
+                            JumpToNextStep(7 * IN_MILLISECONDS);
+                            break;
+                        case 23:
+                            SpawnWave(3);
+                            JumpToNextStep(1 * IN_MILLISECONDS);
+                            break;
+                        case 24:
+                            if (Creature* valimathrasportal = ObjectAccessor::GetCreature(*me, ValimathrasPortalGUID))
+                                valimathrasportal->CastSpell(valimathrasportal, SPELL_VALIMATHRAS_PORTAL);
+                            JumpToNextStep(12 * IN_MILLISECONDS);
+                            break;
+                        case 25:
+                            if (Creature* valimathras = ObjectAccessor::GetCreature(*me, ValimathrasGUID))
                             {
-                                temp->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
-                                temp->SetReactState(REACT_AGGRESSIVE);
-                                temp->AddThreat(me, 100.0f);
-                                temp->AI()->AttackStart(me);
+                                valimathras->GetMotionMaster()->MovePoint(0, 1804.559f, 235.504f, 62.753f);
+                                valimathras->DespawnOrUnsummon(3 * IN_MILLISECONDS);
                             }
-                        }
-                        JumpToNextStep(6 * IN_MILLISECONDS);
-                        break;
-                    case 153:
-                        if (Creature* jaina = ObjectAccessor::GetCreature(*me, JainaGUID))
+                            if (Creature* valimathrasportal = ObjectAccessor::GetCreature(*me, ValimathrasPortalGUID))
+                                valimathrasportal->DespawnOrUnsummon(6 * IN_MILLISECONDS);
+                            JumpToNextStep(1 * IN_MILLISECONDS);
+                            break;
+                        case 26:
                         {
-                            jaina->GetMotionMaster()->MovePoint(0, AllianceWP[9].x, AllianceWP[9].y, AllianceWP[9].z);
-                            jaina->AI()->Talk(JAINA_SAY_THRONE_2);
+                            Talk(THRALL_SAY_COURTYARD_3);
+                            me->CastSpell(me, SPELL_TIDAL_WAVE_SUMMON);
+                            std::list<Creature*> HelperList;
+                            me->GetCreatureListWithEntryInGrid(HelperList, NPC_SLINGER_TRIGGER, 1000.0f);
+                            if (!HelperList.empty())
+                                for (std::list<Creature*>::iterator itr = HelperList.begin(); itr != HelperList.end(); itr++)
+                                    (*itr)->DespawnOrUnsummon();
+                            JumpToNextStep(5 * IN_MILLISECONDS);
+                            break;
                         }
-                        JumpToNextStep(8 * IN_MILLISECONDS);
-                        break;
-                    case 154:
-                        if (Creature* jaina = ObjectAccessor::GetCreature(*me, JainaGUID))
+                        // Start COURTYARD_FIGHT
+                        case 27:
+                            FollowThrall();
+                            SetEscortPaused(false);
+                            bStepping = false;
+                            SetRun(true);
+                            Talk(THRALL_SAY_COURTYARD_4);
+                            UpdateWorldState(me->GetMap(), WORLD_STATE_BATTLE_START_H, 0);
+                            UpdateWorldState(me->GetMap(), WORLD_STATE_COURTYARD_FIGHT_H, 1);
+                            JumpToNextStep(0);
+                            break;
+                        case 28:
                         {
-                            jaina->AI()->DoCastAOE(SPELL_DEEPFREEZE);
-                            jaina->AI()->Talk(JAINA_SAY_THRONE_3);
+                            EnableAttack = true;
+                            DoCast(me, SPELL_HEROIC_VANGUARD, true);
+                            std::list<Creature*> HostileEndList;
+                            me->GetCreatureListWithEntryInGrid(HostileEndList, NPC_TREACHEROUS_GUARDIAN_H, 1000.0f);
+                            me->GetCreatureListWithEntryInGrid(HostileEndList, NPC_DOCTOR_H, 1000.0f);
+                            me->GetCreatureListWithEntryInGrid(HostileEndList, NPC_CHEMIST_H, 1000.0f);
+                            if (!HostileEndList.empty())
+                                for (std::list<Creature*>::iterator itr = HostileEndList.begin(); itr != HostileEndList.end(); itr++)
+                                    (*itr)->setFaction(FACTION_HOSTILE);
+                            SpawnWave(4);
+                            JumpToNextStep(10 * IN_MILLISECONDS);
+                            break;
                         }
-                        JumpToNextStep(5 * IN_MILLISECONDS);
-                        break;
-                    case 155:
-                    {
-                        std::list<Creature*> HelperList;
-                        me->GetCreatureListWithEntryInGrid(HelperList, NPC_SW_SOLDIER, 100.0f);
-                        me->GetCreatureListWithEntryInGrid(HelperList, NPC_JAINA, 100.0f);
-                        me->GetCreatureListWithEntryInGrid(HelperList, NPC_WRYNN, 100.0f);
-                        if (!HelperList.empty())
-                            for (std::list<Creature*>::iterator itr = HelperList.begin(); itr != HelperList.end(); itr++)
-                                (*itr)->DespawnOrUnsummon();
-                        JumpToNextStep(8 * IN_MILLISECONDS);
-                        break;
-                    }
-                    case 156:
-                        Talk(THRALL_SAY_THRONE_7);
-                        SetEscortPaused(false);
-                        bStepping = false;
-                        JumpToNextStep(0 * IN_MILLISECONDS);
-                        break;
-                    case 157:
-                        Talk(THRALL_SAY_THRONE_9);
-                        me->SetStandState(UNIT_STAND_STATE_SIT);
-                        JumpToNextStep(3 * IN_MILLISECONDS);
-                        break;
-                        // Ending
-                    case 158:
-                        if (Creature* saurfang = me->SummonCreature(NPC_OVERLORD_SAURFANG, 1297.574f, 347.154f, -65.027f, TEMPSUMMON_MANUAL_DESPAWN))
+                        case 29:
+                            SpawnWave(4);
+                            JumpToNextStep(10 * IN_MILLISECONDS);
+                            break;
+                        case 30:
+                            SpawnWave(4);
+                            JumpToNextStep(10 * IN_MILLISECONDS);
+                            break;
+                        case 31:
+                            SpawnWave(4);
+                            JumpToNextStep(10 * IN_MILLISECONDS);
+                            break;
+                        case 32:
+                            SpawnWave(4);
+                            JumpToNextStep(10 * IN_MILLISECONDS);
+                            break;
+                        case 33:
+                            SpawnWave(4);
+                            JumpToNextStep(10 * IN_MILLISECONDS);
+                            break;
+                        case 34:
+                            SpawnWave(4);
+                            JumpToNextStep(10 * IN_MILLISECONDS);
+                            break;
+                        case 35:
+                            SpawnWave(4);
+                            JumpToNextStep(10 * IN_MILLISECONDS);
+                            break;
+                        case 36:
+                            SpawnWave(4);
+                            JumpToNextStep(10 * IN_MILLISECONDS);
+                            break;
+                        case 37:
+                            SpawnWave(4);
+                            JumpToNextStep(10 * IN_MILLISECONDS);
+                            break;
+                        case 38:
+                            SpawnWave(4);
+                            JumpToNextStep(10 * IN_MILLISECONDS);
+                            break;
+                        case 39:
+                            SpawnWave(4);
+                            JumpToNextStep(10 * IN_MILLISECONDS);
+                            break;
+                        case 40:
+                            SpawnWave(4);
+                            JumpToNextStep(10 * IN_MILLISECONDS);
+                            break;
+                        case 41:
+                            SpawnWave(4);
+                            JumpToNextStep(10 * IN_MILLISECONDS);
+                            break;
+                        case 42:
+                            SpawnWave(4);
+                            JumpToNextStep(10 * IN_MILLISECONDS);
+                            break;
+                        case 43:
+                            SpawnWave(4);
+                            JumpToNextStep(10 * IN_MILLISECONDS);
+                            break;
+                        case 44:
+                            SpawnWave(4);
+                            JumpToNextStep(2 * IN_MILLISECONDS);
+                            break;
+                        case 45:
+                            SpawnWave(5);
+                            bStepping = false;
+                            JumpToNextStep(0 * IN_MILLISECONDS);
+                            break;
+                            // End COURTYARD_FIGHT
+                        case 46:
                         {
-                            SaurfangGUID = saurfang->GetGUID();
-                            saurfang->SetWalk(true);
-                            saurfang->GetMotionMaster()->MovePoint(0, 1300.862f, 353.670f, -66.187f, true);
+                            FollowThrall();
+                            std::list<Creature*> HostileList;
+                            me->GetCreatureListWithEntryInGrid(HostileList, NPC_TREACHEROUS_GUARDIAN_H, 1000.0f);
+                            me->GetCreatureListWithEntryInGrid(HostileList, NPC_DOCTOR_H, 1000.0f);
+                            me->GetCreatureListWithEntryInGrid(HostileList, NPC_CHEMIST_H, 1000.0f);
+                            me->GetCreatureListWithEntryInGrid(HostileList, NPC_BLIGHT_SLINGER, 1000.0f);
+                            if (!HostileList.empty())
+                                for (std::list<Creature*>::iterator itr = HostileList.begin(); itr != HostileList.end(); itr++)
+                                    (*itr)->DespawnOrUnsummon();
+                            for (uint8 i = 0; i < 7; ++i)
+                                me->SummonGameObject(GO_HORDE_BANNER, ThrallSpawn[i + 37].x, ThrallSpawn[i + 37].y, ThrallSpawn[i + 37].z, ThrallSpawn[i + 37].o, 0.0f, 0.0f, 0.0f, 0.0f, 120 * IN_MILLISECONDS);
+                            SpawnWave(6);
+                            SetEscortPaused(false);
+                            bStepping = false;
+                            SetRun(false);
+                            JumpToNextStep(0 * IN_MILLISECONDS);
+                            break;
                         }
-                        JumpToNextStep(7 * IN_MILLISECONDS);
-                        break;
-                    case 159:
-                        if (Creature* saurfang = ObjectAccessor::GetCreature(*me, SaurfangGUID))
-                        {
-                            saurfang->AI()->Talk(SAY_SAURFANG_ARRIVAL_1);
-                            saurfang->SetStandState(UNIT_STAND_STATE_SIT);
-                        }
-                        JumpToNextStep(6 * IN_MILLISECONDS);
-                        break;
-                    case 160:
-                        if (Creature* saurfang = ObjectAccessor::GetCreature(*me, SaurfangGUID))
-                            saurfang->AI()->Talk(SAY_SAURFANG_ARRIVAL_2);
-                        JumpToNextStep(6 * IN_MILLISECONDS);
-                        break;
-                    case 161:
-                        if (Creature* saurfang = ObjectAccessor::GetCreature(*me, SaurfangGUID))
-                            saurfang->AI()->Talk(SAY_SAURFANG_ARRIVAL_3);
-                        if (Map *map = me->GetMap())
-                        {
-                            Map::PlayerList const &PlayerList = map->GetPlayers();
-                            for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+                        case 47:
+                            Talk(THRALL_SAY_COURTYARD_5);
+                            JumpToNextStep(5 * IN_MILLISECONDS);
+                            break;
+                        case 48:
+                            SetEscortPaused(false);
+                            bStepping = false;
+                            JumpToNextStep(0 * IN_MILLISECONDS);
+                            break;
+                            // Elevator Event
+                        case 49:
+                            Talk(THRALL_SAY_ELEVATOR_1);
+                            JumpToNextStep(10 * IN_MILLISECONDS);
+                            break;
+                        case 50:
+                            if (Creature* sylvanas = ObjectAccessor::GetCreature(*me, sylvanasfollowGUID))
+                                sylvanas->AI()->Talk(SYLVANAS_SAY_ELEVATOR_1);
+                            JumpToNextStep(3 * IN_MILLISECONDS);
+                            break;
+                        case 51:
+                            Talk(THRALL_SAY_ELEVATOR_2);
+                            DoCast(me, SPELL_CALL_OF_AIR);
+                            SpawnWave(7);
+                            JumpToNextStep(16 * IN_MILLISECONDS);
+                            break;
+                        case 52:
+                            Talk(THRALL_SAY_ELEVATOR_3);
+                            JumpToNextStep(4 * IN_MILLISECONDS);
+                            break;
+                        case 53:
+                            SpawnWave(8);
+                            me->GetMotionMaster()->MoveJump(ThrallSpawn[55].x, ThrallSpawn[55].y, ThrallSpawn[55].z, 40.0f, 40.0f, 0);
+                            if (Creature* sylvanas = ObjectAccessor::GetCreature(*me, sylvanasfollowGUID))
+                                sylvanas->GetMotionMaster()->MoveJump(ThrallSpawn[56].x, ThrallSpawn[56].y, ThrallSpawn[56].z, 40.0f, 40.0f, 0);
+                            JumpToNextStep(4 * IN_MILLISECONDS);
+                            break;
+                        case 54:
+                            FollowThrall();
+                            SetEscortPaused(false);
+                            bStepping = false;
+                            SetRun(false);
+                            JumpToNextStep(0 * IN_MILLISECONDS);
+                            break;
+                            // Top of Undercity Discussion
+                        case 55:
+                            if (Creature* sylvanas = ObjectAccessor::GetCreature(*me, sylvanasfollowGUID))
+                                sylvanas->AI()->Talk(SYLVANAS_SAY_SANCTUM_1);
+                            JumpToNextStep(5 * IN_MILLISECONDS);
+                            break;
+                        case 56:
+                            if (Creature* sylvanas = ObjectAccessor::GetCreature(*me, sylvanasfollowGUID))
+                                sylvanas->AI()->Talk(SYLVANAS_SAY_SANCTUM_2);
+                            JumpToNextStep(8 * IN_MILLISECONDS);
+                            break;
+                        case 57:
+                            Talk(THRALL_SAY_SANCTUM_2);
+                            JumpToNextStep(5 * IN_MILLISECONDS);
+                            break;
+                        case 58:
+                            if (Creature* sylvanas = ObjectAccessor::GetCreature(*me, sylvanasfollowGUID))
+                                sylvanas->AI()->Talk(SYLVANAS_SAY_SANCTUM_3);
+                            JumpToNextStep(5 * IN_MILLISECONDS);
+                            break;
+                            // Top of Undercity - Fight
+                        case 59:
+                            SpawnWave(9);
+                            JumpToNextStep(5 * IN_MILLISECONDS);
+                            break;
+                        case 60:
+                            SpawnWave(9);
+                            JumpToNextStep(5 * IN_MILLISECONDS);
+                            break;
+                        case 61:
+                            SpawnWave(9);
+                            JumpToNextStep(10 * IN_MILLISECONDS);
+                            break;
+                        case 62:
+                            FollowThrall();
+                            SetEscortPaused(false);
+                            bStepping = false;
+                            SetRun(false);
+                            JumpToNextStep(0 * IN_MILLISECONDS);
+                            break;
+                        case 63:
+                            JumpToNextStep(3 * IN_MILLISECONDS);
+                            break;
+                        case 64:
+                            SpawnWave(10);
+                            JumpToNextStep(5 * IN_MILLISECONDS);
+                            break;
+                        case 65:
+                            SpawnWave(10);
+                            JumpToNextStep(10 * IN_MILLISECONDS);
+                            break;
+                        case 66:
+                            FollowThrall();
+                            SetEscortPaused(false);
+                            bStepping = false;
+                            SetRun(false);
+                            JumpToNextStep(0 * IN_MILLISECONDS);
+                            break;
+                        case 67:
+                            SpawnWave(11);
+                            JumpToNextStep(6 * IN_MILLISECONDS);
+                            break;
+                        case 68:
+                            SpawnWave(11);
+                            JumpToNextStep(10 * IN_MILLISECONDS);
+                            break;
+                        case 69:
+                            FollowThrall();
+                            SetEscortPaused(false);
+                            bStepping = false;
+                            SetRun(false);
+                            JumpToNextStep(0 * IN_MILLISECONDS);
+                            break;
+                            // KHANOK - Valimathtas Intro
+                        case 70:
+                            JumpToNextStep(10 * IN_MILLISECONDS);
+                            break;
+                        case 71:
+                            if (Creature* sylvanas = ObjectAccessor::GetCreature(*me, sylvanasfollowGUID))
+                                sylvanas->AI()->Talk(SYLVANAS_SAY_SANCTUM_4);
+                            SpawnWave(12);
+                            JumpToNextStep(5 * IN_MILLISECONDS);
+                            break;
+                        case 72:
+                            if (Creature* valimathras = ObjectAccessor::GetCreature(*me, ValimathrasGUID))
+                                valimathras->AI()->Talk(SAY_VALIMATHRAS_INNER_SANKTUM_0);
+                            JumpToNextStep(5 * IN_MILLISECONDS);
+                            break;
+                        case 73:
+                            if (Creature* valimathras = ObjectAccessor::GetCreature(*me, ValimathrasGUID))
+                                valimathras->AI()->Talk(SAY_VALIMATHRAS_INNER_SANKTUM_1);
+                            SpawnWave(13);
+                            JumpToNextStep(2 * IN_MILLISECONDS);
+                            break;
+                        case 74:
+                            if (Creature* valimathrasportal = ObjectAccessor::GetCreature(*me, ValimathrasPortalGUID))
+                                valimathrasportal->CastSpell(valimathrasportal, SPELL_VALIMATHRAS_PORTAL);
+                            JumpToNextStep(4 * IN_MILLISECONDS);
+                            break;
+                        case 75:
+                            if (Creature* valimathras = ObjectAccessor::GetCreature(*me, ValimathrasGUID))
                             {
-                                if (Player *player = i->GetSource())
+                                valimathras->GetMotionMaster()->MovePoint(0, 1596.642f, 429.811f, -46.3429f);
+                                valimathras->DespawnOrUnsummon(3 * IN_MILLISECONDS);
+                            }
+                            if (Creature* valimathrasportal = ObjectAccessor::GetCreature(*me, ValimathrasPortalGUID))
+                                valimathrasportal->DespawnOrUnsummon(3 * IN_MILLISECONDS);
+                            JumpToNextStep(2 * IN_MILLISECONDS);
+                            break;
+                            // KHANOK - Trashspawn
+                        case 76:
+                            SpawnWave(14);
+                            JumpToNextStep(8 * IN_MILLISECONDS);
+                            break;
+                        case 77:
+                            SpawnWave(15);
+                            JumpToNextStep(8 * IN_MILLISECONDS);
+                            break;
+                        case 78:
+                            SpawnWave(16);
+                            JumpToNextStep(8 * IN_MILLISECONDS);
+                            break;
+                        case 79:
+                            SpawnWave(14);
+                            JumpToNextStep(8 * IN_MILLISECONDS);
+                            break;
+                        case 80:
+                            SpawnWave(15);
+                            JumpToNextStep(8 * IN_MILLISECONDS);
+                            break;
+                        case 81:
+                            SpawnWave(16);
+                            JumpToNextStep(8 * IN_MILLISECONDS);
+                            break;
+                        case 82:
+                            SpawnWave(14);
+                            JumpToNextStep(8 * IN_MILLISECONDS);
+                            break;
+                        case 83:
+                            SpawnWave(15);
+                            JumpToNextStep(8 * IN_MILLISECONDS);
+                            break;
+                        case 84:
+                            SpawnWave(16);
+                            JumpToNextStep(8 * IN_MILLISECONDS);
+                            break;
+                        case 85:
+                            SpawnWave(14);
+                            JumpToNextStep(8 * IN_MILLISECONDS);
+                            break;
+                        case 86:
+                            SpawnWave(15);
+                            JumpToNextStep(8 * IN_MILLISECONDS);
+                            break;
+                        case 87:
+                            SpawnWave(16);
+                            JumpToNextStep(8 * IN_MILLISECONDS);
+                            break;
+                        case 88:
+                            SpawnWave(14);
+                            JumpToNextStep(8 * IN_MILLISECONDS);
+                            break;
+                        case 89:
+                            SpawnWave(15);
+                            JumpToNextStep(8 * IN_MILLISECONDS);
+                            break;
+                        case 90:
+                            SpawnWave(16);
+                            JumpToNextStep(8 * IN_MILLISECONDS);
+                            break;
+                        case 91:
+                            SpawnWave(14);
+                            JumpToNextStep(8 * IN_MILLISECONDS);
+                            break;
+                        case 92:
+                            SpawnWave(15);
+                            JumpToNextStep(8 * IN_MILLISECONDS);
+                            break;
+                        case 93:
+                            SpawnWave(16);
+                            JumpToNextStep(8 * IN_MILLISECONDS);
+                            break;
+                        case 94:
+                            // Spawn Boss 2 KHANOK  
+                            SpawnWave(17);
+                            JumpToNextStep(10 * IN_MILLISECONDS);
+                            break;
+                        case 95:
+                            SpawnWave(14);
+                            JumpToNextStep(5 * IN_MILLISECONDS);
+                            break;
+                        case 96:
+                            SpawnWave(15);
+                            JumpToNextStep(5 * IN_MILLISECONDS);
+                            break;
+                        case 97:
+                            SpawnWave(16);
+                            JumpToNextStep(0 * IN_MILLISECONDS);
+                            bStepping = false;
+                            break;
+                        case 98:
+                            // KHANOK - Won
+                            Talk(THRALL_SAY_SANCTUM_3);
+                            JumpToNextStep(7 * IN_MILLISECONDS);
+                            break;
+                        case 99:
+                            SpawnWave(18);
+                            JumpToNextStep(0.35 * IN_MILLISECONDS);
+                            break;
+                        case 100:
+                            SpawnWave(18);
+                            JumpToNextStep(0.35 * IN_MILLISECONDS);
+                            break;
+                        case 101:
+                            SpawnWave(18);
+                            JumpToNextStep(0.35 * IN_MILLISECONDS);
+                            break;
+                        case 102:
+                            SpawnWave(18);
+                            JumpToNextStep(0.35 * IN_MILLISECONDS);
+                            break;
+                        case 103:
+                            SpawnWave(18);
+                            JumpToNextStep(0.35 * IN_MILLISECONDS);
+                            break;
+                        case 104:
+                            SpawnWave(18);
+                            JumpToNextStep(0.35 * IN_MILLISECONDS);
+                            break;
+                        case 105:
+                            SpawnWave(18);
+                            JumpToNextStep(0.35 * IN_MILLISECONDS);
+                            break;
+                        case 106:
+                            SpawnWave(18);
+                            JumpToNextStep(0.35 * IN_MILLISECONDS);
+                            break;
+                        case 107:
+                            SpawnWave(18);
+                            JumpToNextStep(3 * IN_MILLISECONDS);
+                            break;
+                        case 108:
+                            Talk(THRALL_SAY_SANCTUM_4);
+                            FollowThrall();
+                            SetEscortPaused(false);
+                            bStepping = false;
+                            SetRun(false);
+                            JumpToNextStep(0 * IN_MILLISECONDS);
+                            break;
+                        case 109:
+                            if (Creature* sylvanas = ObjectAccessor::GetCreature(*me, sylvanasfollowGUID))
+                                sylvanas->AI()->Talk(SYLVANAS_SAY_SANCTUM_5);
+                            JumpToNextStep(8 * IN_MILLISECONDS);
+                            break;
+                        case 110:
+                            SpawnWave(19);
+                            JumpToNextStep(5 * IN_MILLISECONDS);
+                            break;
+                        case 111:
+                            FollowThrall();
+                            SetEscortPaused(false);
+                            bStepping = false;
+                            SetRun(true);
+                            JumpToNextStep(0 * IN_MILLISECONDS);
+                            break;
+                        case 112:
+                            JumpToNextStep(3 * IN_MILLISECONDS);
+                            break;
+                        case 113:
+                            Talk(THRALL_SAY_SANCTUM_5);
+                            JumpToNextStep(12 * IN_MILLISECONDS);
+                            break;
+                        case 114:
+                            Talk(THRALL_SAY_SANCTUM_6);
+                            DoCast(me, SPELL_CALL_OF_EARTH);
+                            JumpToNextStep(6 * IN_MILLISECONDS);
+                            break;
+                        case 115:
+                        {
+                            std::list<GameObject*> SaronitList;
+                            GetGameObjectListWithEntryInGrid(SaronitList, me, GO_BLOCKED_PASSAGE, 80.0f);
+                            for (std::list<GameObject*>::const_iterator itr = SaronitList.begin(); itr != SaronitList.end(); ++itr)
+                                if (GameObject* saronit = (*itr))
+                                    saronit->UseDoorOrButton();
+                            JumpToNextStep(5 * IN_MILLISECONDS);
+                            break;
+                        }
+                        case 116:
+                            Talk(THRALL_SAY_SANCTUM_7);
+                            UpdateWorldState(me->GetMap(), WORLD_STATE_ROYAL_QUARTER_FIGHT_H, 1);
+                            FollowThrall();
+                            SetEscortPaused(false);
+                            bStepping = false;
+                            JumpToNextStep(0 * IN_MILLISECONDS);
+                            break;
+                            // Valimathras Intro
+                        case 117:
+                            Talk(THRALL_SAY_THRONE_1);
+                            JumpToNextStep(5 * IN_MILLISECONDS);
+                            break;
+                        case 118:
+                            if (Creature* valimathras = ObjectAccessor::GetCreature(*me, ValimathrasGUID))
+                            {
+                                valimathras->AI()->Talk(SAY_THRONE_1);
+                                valimathras->CastSpell(me, SPELL_OPENING_LEGION_PORTALS);
+                            }
+                            JumpToNextStep(3 * IN_MILLISECONDS);
+                            break;
+                        case 119:
+                            SpawnWave(20);
+                            JumpToNextStep(10 * IN_MILLISECONDS);
+                            break;
+                        case 120:
+                            SpawnWave(21);
+                            JumpToNextStep(10 * IN_MILLISECONDS);
+                            break;
+                        case 121:
+                            ActivateValimathrasPortal();
+                            if (Creature* valimathras = ObjectAccessor::GetCreature(*me, ValimathrasGUID))
+                                valimathras->AI()->Talk(SAY_THRONE_2);
+                            JumpToNextStep(10 * IN_MILLISECONDS);
+                            break;
+                        case 122:
+                            SpawnWave(20);
+                            JumpToNextStep(10 * IN_MILLISECONDS);
+                            break;
+                        case 123:
+                            SpawnWave(21);
+                            JumpToNextStep(10 * IN_MILLISECONDS);
+                            break;
+                        case 124:
+                            ActivateValimathrasPortal();
+                            if (Creature* valimathras = ObjectAccessor::GetCreature(*me, ValimathrasGUID))
+                                valimathras->AI()->Talk(SAY_THRONE_3);
+                            JumpToNextStep(10 * IN_MILLISECONDS);
+                            break;
+                        case 125:
+                            SpawnWave(20);
+                            JumpToNextStep(10 * IN_MILLISECONDS);
+                            break;
+                        case 126:
+                            SpawnWave(21);
+                            JumpToNextStep(10 * IN_MILLISECONDS);
+                            break;
+                        case 127:
+                            ActivateValimathrasPortal();
+                            if (Creature* valimathras = ObjectAccessor::GetCreature(*me, ValimathrasGUID))
+                                valimathras->AI()->Talk(SAY_THRONE_4);
+                            JumpToNextStep(10 * IN_MILLISECONDS);
+                            break;
+                        case 128:
+                            SpawnWave(20);
+                            JumpToNextStep(10 * IN_MILLISECONDS);
+                            break;
+                        case 129:
+                            SpawnWave(21);
+                            JumpToNextStep(10 * IN_MILLISECONDS);
+                            break;
+                        case 130:
+                            ActivateValimathrasPortal();
+                            if (Creature* valimathras = ObjectAccessor::GetCreature(*me, ValimathrasGUID))
+                                valimathras->AI()->Talk(SAY_THRONE_5);
+                            JumpToNextStep(10 * IN_MILLISECONDS);
+                            break;
+                        case 131:
+                            SpawnWave(20);
+                            JumpToNextStep(10 * IN_MILLISECONDS);
+                            break;
+                        case 132:
+                            SpawnWave(21);
+                            JumpToNextStep(10 * IN_MILLISECONDS);
+                            break;
+                        case 133:
+                            ActivateValimathrasPortal();
+                            if (Creature* valimathras = ObjectAccessor::GetCreature(*me, ValimathrasGUID))
+                                valimathras->AI()->Talk(SAY_THRONE_6);
+                            JumpToNextStep(10 * IN_MILLISECONDS);
+                            break;
+                        case 134:
+                            SpawnWave(20);
+                            JumpToNextStep(10 * IN_MILLISECONDS);
+                            break;
+                        case 135:
+                            SpawnWave(21);
+                            JumpToNextStep(10 * IN_MILLISECONDS);
+                            break;
+                        case 136:
+                            ActivateValimathrasPortal();
+                            JumpToNextStep(5 * IN_MILLISECONDS);
+                            break;
+                            // Valimathras Fight
+                        case 137:
+                            if (Creature* valimathras = ObjectAccessor::GetCreature(*me, ValimathrasGUID))
+                            {
+                                valimathras->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
+                                valimathras->RemoveAura(SPELL_AURA_OF_VARIMATHRAS);
+                                valimathras->RemoveAura(SPELL_OPENING_LEGION_PORTALS);
+                                valimathras->AI()->Talk(SAY_VALIMATHRAS_ATTACK);
+                                valimathras->AddThreat(me, 100.0f);
+                                me->AddThreat(valimathras, 100.0f);
+                                valimathras->AI()->AttackStart(me);
+                            }
+                            bStepping = false;
+                            JumpToNextStep(0 * IN_MILLISECONDS);
+                            break;
+                            // Valimathras Won
+                        case 138:
+                            Talk(THRALL_SAY_THRONE_2);
+                            JumpToNextStep(5 * IN_MILLISECONDS);
+                            break;
+                        case 139:
+                            Talk(THRALL_SAY_THRONE_3);
+                            JumpToNextStep(2 * IN_MILLISECONDS);
+                            break;
+                        case 140:
+                            SetEscortPaused(false);
+                            bStepping = false;
+                            JumpToNextStep(0 * IN_MILLISECONDS);
+                            break;
+                        case 141:
+                            JumpToNextStep(8 * IN_MILLISECONDS);
+                            break;
+                        case 142:
+                            if (Creature* sylvanas = ObjectAccessor::GetCreature(*me, sylvanasfollowGUID))
+                                me->SetFacingToObject(sylvanas);
+                            Talk(THRALL_SAY_THRONE_4);
+                            JumpToNextStep(3 * IN_MILLISECONDS);
+                            break;
+                        case 143:
+                            if (Creature* sylvanas = ObjectAccessor::GetCreature(*me, sylvanasfollowGUID))
+                                sylvanas->CastSpell(sylvanas, SPELL_LEAP_TO_PLATFORM);
+                            JumpToNextStep(10 * IN_MILLISECONDS);
+                            break;
+                        case 144:
+                            if (Creature* sylvanas = ObjectAccessor::GetCreature(*me, sylvanasfollowGUID))
+                            {
+                                sylvanas->AI()->Talk(SYLVANAS_SAY_THRONE_1);
+                                me->SetFacingToObject(sylvanas);
+                                me->HandleEmoteCommand(EMOTE_ONESHOT_SALUTE);
+                            }
+                            JumpToNextStep(3 * IN_MILLISECONDS);
+                            break;
+                        case 145:
+                            Talk(THRALL_SAY_THRONE_5);
+                            FollowThrall();
+                            SetEscortPaused(false);
+                            bStepping = false;
+                            JumpToNextStep(0 * IN_MILLISECONDS);
+                            break;
+                        case 146:
+                            Talk(THRALL_SAY_THRONE_6);
+                            JumpToNextStep(3 * IN_MILLISECONDS);
+                            break;
+                        case 147:
+                            for (uint8 i = 0; i < ALLIANCE_FORCE_MAXCOUNT; ++i)
+                            {
+                                if (Creature* temp = me->SummonCreature(NPC_SW_SOLDIER, AllianceSpawn[i + 25].x, AllianceSpawn[i + 25].y, AllianceSpawn[i + 25].z, AllianceSpawn[i + 25].o, TEMPSUMMON_MANUAL_DESPAWN))
                                 {
-                                    if (me->IsInRange(player, 0.0f, 50.0f))
+                                    allianceForcesGUID[i] = temp->GetGUID();
+                                    temp->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+                                    temp->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                                    temp->ApplySpellImmune(0, IMMUNITY_ID, SPELL_SYLVANAS_BUFF, true);
+                                    temp->SetReactState(REACT_PASSIVE);
+                                    temp->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY2H);
+                                }
+                            }
+                            if (Creature* wrynn = me->SummonCreature(NPC_WRYNN, 1308.862f, 381.809f, -66.044243f, TEMPSUMMON_MANUAL_DESPAWN))
+                            {
+                                WrynnGUID = wrynn->GetGUID();
+                                wrynn->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+                                wrynn->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                                wrynn->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY2H);
+                                wrynn->SetReactState(REACT_PASSIVE);
+                                wrynn->GetMotionMaster()->MovePoint(0, 1302.543f, 359.472f, -67.295f, true);
+                            }
+                            if (Creature* jaina = me->SummonCreature(NPC_JAINA, 1308.862f, 381.809f, -66.044243f, TEMPSUMMON_MANUAL_DESPAWN))
+                            {
+                                JainaGUID = jaina->GetGUID();
+                                jaina->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+                                jaina->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                                jaina->SetReactState(REACT_PASSIVE);
+                            }
+                            JumpToNextStep(6 * IN_MILLISECONDS);
+                            break;
+                            // Wrynn Intro
+                        case 148:
+                            if (Creature* wrynn = ObjectAccessor::GetCreature(*me, WrynnGUID))
+                                wrynn->AI()->Talk(WRYNN_SAY_THRONE_5);
+                            JumpToNextStep(15 * IN_MILLISECONDS);
+                            break;
+                        case 149:
+                            if (Creature* wrynn = ObjectAccessor::GetCreature(*me, WrynnGUID))
+                                wrynn->AI()->Talk(WRYNN_SAY_THRONE_6);
+                            JumpToNextStep(15 * IN_MILLISECONDS);
+                            break;
+                        case 150:
+                            if (Creature* wrynn = ObjectAccessor::GetCreature(*me, WrynnGUID))
+                                wrynn->AI()->Talk(WRYNN_SAY_THRONE_7);
+                            JumpToNextStep(16.5 * IN_MILLISECONDS);
+                            break;
+                        case 151:
+                            if (Creature* wrynn = ObjectAccessor::GetCreature(*me, WrynnGUID))
+                                wrynn->AI()->Talk(WRYNN_SAY_THRONE_8);
+                            JumpToNextStep(6 * IN_MILLISECONDS);
+                            break;
+                            // Wrynn Fight
+                        case 152:
+                            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
+                            if (Creature* wrynn = ObjectAccessor::GetCreature(*me, WrynnGUID))
+                            {
+                                wrynn->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
+                                wrynn->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                                wrynn->SetReactState(REACT_AGGRESSIVE);
+                                wrynn->AddThreat(me, 100.0f);
+                                me->AddThreat(wrynn, 100.0f);
+                                wrynn->AI()->AttackStart(me);
+                            }
+
+                            for (uint8 i = 0; i < ALLIANCE_FORCE_MAXCOUNT; ++i)
+                            {
+                                if (Creature* temp = ObjectAccessor::GetCreature(*me, allianceForcesGUID[i]))
+                                {
+                                    temp->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
+                                    temp->SetReactState(REACT_AGGRESSIVE);
+                                    temp->AddThreat(me, 100.0f);
+                                    temp->AI()->AttackStart(me);
+                                }
+                            }
+                            JumpToNextStep(6 * IN_MILLISECONDS);
+                            break;
+                        case 153:
+                            if (Creature* jaina = ObjectAccessor::GetCreature(*me, JainaGUID))
+                            {
+                                jaina->GetMotionMaster()->MovePoint(0, AllianceWP[9].x, AllianceWP[9].y, AllianceWP[9].z);
+                                jaina->AI()->Talk(JAINA_SAY_THRONE_2);
+                            }
+                            JumpToNextStep(8 * IN_MILLISECONDS);
+                            break;
+                        case 154:
+                            if (Creature* jaina = ObjectAccessor::GetCreature(*me, JainaGUID))
+                            {
+                                jaina->AI()->DoCastAOE(SPELL_DEEPFREEZE);
+                                jaina->AI()->Talk(JAINA_SAY_THRONE_3);
+                            }
+                            JumpToNextStep(5 * IN_MILLISECONDS);
+                            break;
+                        case 155:
+                        {
+                            std::list<Creature*> HelperList;
+                            me->GetCreatureListWithEntryInGrid(HelperList, NPC_SW_SOLDIER, 100.0f);
+                            me->GetCreatureListWithEntryInGrid(HelperList, NPC_JAINA, 100.0f);
+                            me->GetCreatureListWithEntryInGrid(HelperList, NPC_WRYNN, 100.0f);
+                            if (!HelperList.empty())
+                                for (std::list<Creature*>::iterator itr = HelperList.begin(); itr != HelperList.end(); itr++)
+                                    (*itr)->DespawnOrUnsummon();
+                            JumpToNextStep(8 * IN_MILLISECONDS);
+                            break;
+                        }
+                        case 156:
+                            Talk(THRALL_SAY_THRONE_7);
+                            SetEscortPaused(false);
+                            bStepping = false;
+                            JumpToNextStep(0 * IN_MILLISECONDS);
+                            break;
+                        case 157:
+                            Talk(THRALL_SAY_THRONE_9);
+                            me->SetStandState(UNIT_STAND_STATE_SIT);
+                            JumpToNextStep(3 * IN_MILLISECONDS);
+                            break;
+                            // Ending
+                        case 158:
+                            if (Creature* saurfang = me->SummonCreature(NPC_OVERLORD_SAURFANG, 1297.574f, 347.154f, -65.027f, TEMPSUMMON_MANUAL_DESPAWN))
+                            {
+                                SaurfangGUID = saurfang->GetGUID();
+                                saurfang->SetWalk(true);
+                                saurfang->GetMotionMaster()->MovePoint(0, 1300.862f, 353.670f, -66.187f, true);
+                            }
+                            JumpToNextStep(7 * IN_MILLISECONDS);
+                            break;
+                        case 159:
+                            if (Creature* saurfang = ObjectAccessor::GetCreature(*me, SaurfangGUID))
+                            {
+                                saurfang->AI()->Talk(SAY_SAURFANG_ARRIVAL_1);
+                                saurfang->SetStandState(UNIT_STAND_STATE_SIT);
+                            }
+                            JumpToNextStep(6 * IN_MILLISECONDS);
+                            break;
+                        case 160:
+                            if (Creature* saurfang = ObjectAccessor::GetCreature(*me, SaurfangGUID))
+                                saurfang->AI()->Talk(SAY_SAURFANG_ARRIVAL_2);
+                            JumpToNextStep(6 * IN_MILLISECONDS);
+                            break;
+                        case 161:
+                            if (Creature* saurfang = ObjectAccessor::GetCreature(*me, SaurfangGUID))
+                                saurfang->AI()->Talk(SAY_SAURFANG_ARRIVAL_3);
+                            if (Map *map = me->GetMap())
+                            {
+                                Map::PlayerList const &PlayerList = map->GetPlayers();
+                                for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+                                {
+                                    if (Player *player = i->GetSource())
                                     {
-                                        if (player->GetTeamId() == TEAM_HORDE)
+                                        if (me->IsInRange(player, 0.0f, 50.0f))
                                         {
-                                            player->RemoveAura(SPELL_SYLVANAS_BUFF);
-                                            player->RemoveAura(SPELL_THRALL_BUFF);
-                                            player->CompleteQuest(QUEST_BATTLE_H);
-                                            player->CastSpell(player, SPELL_PHASING_HORDE);
+                                            if (player->GetTeamId() == TEAM_HORDE)
+                                            {
+                                                player->RemoveAura(SPELL_SYLVANAS_BUFF);
+                                                player->RemoveAura(SPELL_THRALL_BUFF);
+                                                player->CompleteQuest(QUEST_BATTLE_H);
+                                                player->CastSpell(player, SPELL_PHASING_HORDE);
+                                            }
                                         }
                                     }
                                 }
                             }
-                        }
-                        JumpToNextStep(5 * IN_MILLISECONDS);
-                        break;
-                    case 162:
-                        Talk(THRALL_SAY_THRONE_10);
-                        JumpToNextStep(5 * IN_MILLISECONDS);
-                        break;
-                    case 163:
-                        me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-                        me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
-                        Talk(THRALL_SAY_THRONE_11);
-                        UpdateWorldState(me->GetMap(), WORLD_STATE_ROYAL_QUARTER_FIGHT_H, 0);
-                        UpdateWorldState(me->GetMap(), WORLD_STATE_INNER_SANKTUM_FIGHT_H, 0);
-                        UpdateWorldState(me->GetMap(), WORLD_STATE_COURTYARD_FIGHT_H, 0);
-                        std::list<Creature*> HelperList;
-                        me->GetCreatureListWithEntryInGrid(HelperList, NPC_SYLVANAS, 100.0f);
-                        me->GetCreatureListWithEntryInGrid(HelperList, NPC_OVERLORD_SAURFANG, 100.0f);
-                        if (!HelperList.empty())
-                            for (std::list<Creature*>::iterator itr = HelperList.begin(); itr != HelperList.end(); itr++)
-                                (*itr)->DespawnOrUnsummon(120 * IN_MILLISECONDS);
-                        me->DespawnOrUnsummon(120 * IN_MILLISECONDS);
-                        bStepping = false;
-                        JumpToNextStep(0 * IN_MILLISECONDS);
-                        break;
+                            JumpToNextStep(5 * IN_MILLISECONDS);
+                            break;
+                        case 162:
+                            Talk(THRALL_SAY_THRONE_10);
+                            JumpToNextStep(5 * IN_MILLISECONDS);
+                            break;
+                        case 163:
+                            me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                            me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+                            Talk(THRALL_SAY_THRONE_11);
+                            UpdateWorldState(me->GetMap(), WORLD_STATE_ROYAL_QUARTER_FIGHT_H, 0);
+                            UpdateWorldState(me->GetMap(), WORLD_STATE_INNER_SANKTUM_FIGHT_H, 0);
+                            UpdateWorldState(me->GetMap(), WORLD_STATE_COURTYARD_FIGHT_H, 0);
+                            std::list<Creature*> HelperList;
+                            me->GetCreatureListWithEntryInGrid(HelperList, NPC_SYLVANAS, 100.0f);
+                            me->GetCreatureListWithEntryInGrid(HelperList, NPC_OVERLORD_SAURFANG, 100.0f);
+                            if (!HelperList.empty())
+                                for (std::list<Creature*>::iterator itr = HelperList.begin(); itr != HelperList.end(); itr++)
+                                    (*itr)->DespawnOrUnsummon(120 * IN_MILLISECONDS);
+                            me->DespawnOrUnsummon(120 * IN_MILLISECONDS);
+                            bStepping = false;
+                            JumpToNextStep(0 * IN_MILLISECONDS);
+                            break;
                     }
                 }
                 else phaseTimer -= diff;
@@ -3879,31 +3879,31 @@ public:
             {
                 switch (eventId)
                 {
-                case EVENT_CHAIN_LIGHTNING:
-                    DoCastVictim(SPELL_CHAIN_LIGHTNING);
-                    _events.ScheduleEvent(EVENT_CHAIN_LIGHTNING, urand(5, 8) * IN_MILLISECONDS);
-                    break;
-                case EVENT_LAVA_BURST:
-                    DoCastVictim(SPELL_LAVA_BURST);
-                    _events.ScheduleEvent(EVENT_LAVA_BURST, urand(3, 5) * IN_MILLISECONDS);
-                    break;
-                case EVENT_THUNDER:
-                    DoCast(me, SPELL_THUNDER);
-                    _events.ScheduleEvent(EVENT_THUNDER, 15 * IN_MILLISECONDS);
-                    break;
-                case EVENT_AGGRO_SYLVANAS:
-                    if (me->GetVictim())
-                        if (Creature* sylvanas = ObjectAccessor::GetCreature(*me, sylvanasfollowGUID))
-                            sylvanas->AI()->AttackStart(me->GetVictim());
-                    _events.ScheduleEvent(EVENT_AGGRO_SYLVANAS, 2 * IN_MILLISECONDS);
-                    break;
-                case EVENT_THRALL_BUFF:
-                    if (Player* player = GetPlayerForEscort())
-                        player->CastSpell(player, SPELL_THRALL_BUFF);
-                    _events.ScheduleEvent(EVENT_THRALL_BUFF, 10 * IN_MILLISECONDS);
-                    break;
-                default:
-                    break;
+                    case EVENT_CHAIN_LIGHTNING:
+                        DoCastVictim(SPELL_CHAIN_LIGHTNING);
+                        _events.ScheduleEvent(EVENT_CHAIN_LIGHTNING, urand(5, 8) * IN_MILLISECONDS);
+                        break;
+                    case EVENT_LAVA_BURST:
+                        DoCastVictim(SPELL_LAVA_BURST);
+                        _events.ScheduleEvent(EVENT_LAVA_BURST, urand(3, 5) * IN_MILLISECONDS);
+                        break;
+                    case EVENT_THUNDER:
+                        DoCast(me, SPELL_THUNDER);
+                        _events.ScheduleEvent(EVENT_THUNDER, 15 * IN_MILLISECONDS);
+                        break;
+                    case EVENT_AGGRO_SYLVANAS:
+                        if (me->GetVictim())
+                            if (Creature* sylvanas = ObjectAccessor::GetCreature(*me, sylvanasfollowGUID))
+                                sylvanas->AI()->AttackStart(me->GetVictim());
+                        _events.ScheduleEvent(EVENT_AGGRO_SYLVANAS, 2 * IN_MILLISECONDS);
+                        break;
+                    case EVENT_THRALL_BUFF:
+                        if (Player* player = GetPlayerForEscort())
+                            player->CastSpell(player, SPELL_THRALL_BUFF);
+                        _events.ScheduleEvent(EVENT_THRALL_BUFF, 10 * IN_MILLISECONDS);
+                        break;
+                    default:
+                        break;
                 }
             }
 
@@ -3971,34 +3971,34 @@ public:
             {
                 switch (eventId)
                 {
-                case EVENT_SUMMON_SKELETON:
-                    DoCast(me, SPELL_SUMMON_SKELETON);
-                    _events.ScheduleEvent(EVENT_SUMMON_SKELETON, urand(20, 30) * IN_MILLISECONDS);
-                    break;
-                case EVENT_BLACK_ARROW:
-                    if (Unit* victim = me->GetVictim())
-                        DoCast(victim, SPELL_BLACK_ARROW);
-                    _events.ScheduleEvent(EVENT_BLACK_ARROW, urand(6, 9) * IN_MILLISECONDS);
-                    break;
-                case EVENT_SHOOT:
-                    if (Unit* victim = me->GetVictim())
-                        DoCast(victim, SPELL_SHOT);
-                    _events.ScheduleEvent(EVENT_SHOOT, urand(5, 10) * IN_MILLISECONDS);
-                    break;
-                case EVENT_MULTI_SHOT:
-                    if (Unit* victim = me->GetVictim())
-                        DoCast(victim, SPELL_MULTI_SHOT);
-                    _events.ScheduleEvent(EVENT_MULTI_SHOT, urand(10, 13) * IN_MILLISECONDS);
-                    break;
-                case EVENT_SHRIEK_OF_HIGHBORN:
-                    DoCastVictim(SPELL_SHRIEK_OF_HIGHBORN);
-                    _events.ScheduleEvent(EVENT_SHRIEK_OF_HIGHBORN, 3 * IN_MILLISECONDS);
-                    break;
-                case EVENT_SYLVANAS_BUFF:
-                    DoCast(me, SPELL_SYLVANAS_BUFF, true);
-                    break;
-                default:
-                    break;
+                    case EVENT_SUMMON_SKELETON:
+                        DoCast(me, SPELL_SUMMON_SKELETON);
+                        _events.ScheduleEvent(EVENT_SUMMON_SKELETON, urand(20, 30) * IN_MILLISECONDS);
+                        break;
+                    case EVENT_BLACK_ARROW:
+                        if (Unit* victim = me->GetVictim())
+                            DoCast(victim, SPELL_BLACK_ARROW);
+                        _events.ScheduleEvent(EVENT_BLACK_ARROW, urand(6, 9) * IN_MILLISECONDS);
+                        break;
+                    case EVENT_SHOOT:
+                        if (Unit* victim = me->GetVictim())
+                            DoCast(victim, SPELL_SHOT);
+                        _events.ScheduleEvent(EVENT_SHOOT, urand(5, 10) * IN_MILLISECONDS);
+                        break;
+                    case EVENT_MULTI_SHOT:
+                        if (Unit* victim = me->GetVictim())
+                            DoCast(victim, SPELL_MULTI_SHOT);
+                        _events.ScheduleEvent(EVENT_MULTI_SHOT, urand(10, 13) * IN_MILLISECONDS);
+                        break;
+                    case EVENT_SHRIEK_OF_HIGHBORN:
+                        DoCastVictim(SPELL_SHRIEK_OF_HIGHBORN);
+                        _events.ScheduleEvent(EVENT_SHRIEK_OF_HIGHBORN, 3 * IN_MILLISECONDS);
+                        break;
+                    case EVENT_SYLVANAS_BUFF:
+                        DoCast(me, SPELL_SYLVANAS_BUFF, true);
+                        break;
+                    default:
+                        break;
                 }
             }
 

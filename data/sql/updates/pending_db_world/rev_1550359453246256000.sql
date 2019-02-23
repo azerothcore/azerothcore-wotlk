@@ -47,17 +47,10 @@ UPDATE `creature_template` SET HealthModifier=915.547520661157 WHERE entry=32483
 UPDATE `creature_template` SET InhabitType=4, minlevel=74, maxlevel=75 WHERE entry=@ALLIANCEPLANE;
 UPDATE `creature_template` SET minlevel=75, maxlevel=76 WHERE entry=@SWSOLDIER;
 
-UPDATE `creature_template` SET unit_flags=0, minlevel=74, maxlevel=76 WHERE entry=@PLAGUEDFELBEAST;
-UPDATE `creature_template` SET unit_flags=0, minlevel=74, maxlevel=76 WHERE entry=@GUARDIAN;
-UPDATE `creature_template` SET unit_flags=0, minlevel=74, maxlevel=76 WHERE entry=@DREADLORD;
-UPDATE `creature_template` SET unit_flags=0, minlevel=74, maxlevel=76 WHERE entry=@BLIGHTDOCTOR;
-UPDATE `creature_template` SET unit_flags=0, minlevel=74, maxlevel=76 WHERE entry=@COLLABORATOR;
-UPDATE `creature_template` SET unit_flags=0, minlevel=74, maxlevel=76 WHERE entry=@BETRAYER;
-UPDATE `creature_template` SET unit_flags=0, minlevel=74, maxlevel=76 WHERE entry=@CHEMIST;
+UPDATE `creature_template` SET unit_flags=0, minlevel=74, maxlevel=76 WHERE entry IN (@PLAGUEDFELBEAST,@GUARDIAN,@DREADLORD,@BLIGHTDOCTOR,@COLLABORATOR,@BETRAYER,@CHEMIST);
 UPDATE `creature_template` SET unit_flags=256 WHERE entry=@WRYNN;
-UPDATE `creature_template` SET unit_flags=unit_flags|512 WHERE entry=@JAINA;
+UPDATE `creature_template` SET unit_flags=unit_flags|512, faction=2142 WHERE entry=@JAINA;
 UPDATE `creature_template` SET type_flags=type_flags|4096 WHERE entry IN(@WRYNN, @JAINA);
-UPDATE `creature_template` SET faction=2142 WHERE entry=@JAINA;
 UPDATE `creature_template` SET minlevel=80, maxlevel=80 WHERE entry IN(@BROLL, @VALEERA, @WRYNN, @JAINA);
 UPDATE `creature_template` SET unit_flags=32768 WHERE entry=@BLIGHTWORM;
 UPDATE `creature_template` SET minlevel=83, maxlevel=83 WHERE entry IN(@BLIGHTWORM, @PUTRESS);
@@ -383,31 +376,29 @@ INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type
 SET @CGUID := 3109796;
 SET @OGUID := 2134393;
 -- Templateadjustements
-UPDATE `creature_template` SET `minlevel`=80, `maxlevel`=80 WHERE  `entry` IN (31739, 31652);
-UPDATE `creature_template` SET `minlevel`=80, `maxlevel`=80, `faction`=14, `flags_extra`=130, `unit_flags`=256 WHERE  `entry` IN (31576, 31577,31811);
+UPDATE `creature_template` SET `minlevel`=80, `maxlevel`=80 WHERE  `entry` IN (31739, 31652,32315);
+UPDATE `creature_template` SET `minlevel`=80, `maxlevel`=80, `faction`=14, `flags_extra`=130, `unit_flags`=256 WHERE `entry` IN (31576, 31577,31811);
 UPDATE `creature_template` SET `InhabitType`=4 WHERE  `entry` IN (31811, 32200, 32159, 31814, 32277);
-UPDATE `creature_template` SET `minlevel`=80, `maxlevel`=80, `faction`=35, `flags_extra`=2, `unit_flags`=256 WHERE  `entry` IN (31688);
-UPDATE `creature_template` SET `minlevel`=80, `maxlevel`=80 WHERE `entry`=32315;
+UPDATE `creature_template` SET `minlevel`=80, `maxlevel`=80, `faction`=35, `flags_extra`=2, `unit_flags`=256 WHERE `entry` IN (31688);
 UPDATE `creature_template` SET `speed_walk`=0.8, `speed_run`=1 WHERE  `entry`=31782;
 -- attackable creatures
 -- boss
-UPDATE `creature_template` SET `minlevel`=80, `maxlevel`=80, `faction`=14, `flags_extra`=0 WHERE  `entry` IN (31565, 31844, 32511, 32271);
+UPDATE `creature_template` SET `minlevel`=80, `maxlevel`=80, `faction`=14, `flags_extra`=0 WHERE `entry` IN (31565, 31844, 32511, 32271);
 -- 74 -76
-UPDATE `creature_template` SET `minlevel`=74, `maxlevel`=76, `faction`=14, `flags_extra`=0 WHERE  `entry` IN (32270, 32269, 31528, 31526, 31532, 31516, 31482, 32393, 32391, 31529, 31528, 32159);
+UPDATE `creature_template` SET `minlevel`=74, `maxlevel`=76, `faction`=14, `flags_extra`=0 WHERE `entry` IN (32270, 32269, 31528, 31526, 31532, 31516, 31482, 32393, 32391, 31529, 31528, 32159);
 -- special unitflags
 UPDATE `creature_template` SET `unit_flags`=0 WHERE  `entry` IN (32393, 32391, 31529, 31528, 32159, 31528, 32511, 32269, 32270);
 -- creature_addons
--- voljin mount
-DELETE FROM `creature_addon` WHERE `guid` IN (3109787);
-INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`auras`) VALUES 
-(3109787,0,14339,0,1,0, '');
+
 -- guards
-DELETE FROM `creature_addon` WHERE `guid` IN (3109792,3109793,3109794,3109795);
+DELETE FROM `creature_addon` WHERE `guid` IN (3109792,3109793,3109794,3109795,3109787);
 INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`auras`) VALUES 
 (3109792,0,0,0,1,27, ''),
 (3109793,0,0,0,1,27, ''),
 (3109794,0,0,0,1,27, ''),
-(3109795,0,0,0,1,27, '');
+(3109795,0,0,0,1,27, ''),
+-- voljin mount
+(3109787,0,14339,0,1,0, '');
 
 DELETE FROM `creature_template_addon` WHERE `entry`=31576;
 INSERT INTO `creature_template_addon` (`entry`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`auras`) VALUES 
@@ -933,13 +924,10 @@ INSERT INTO `script_waypoint` (`entry`, `pointid`, `location_x`, `location_y`, `
 (32518, 120, 1305.80, 353.217, -66.768, 0, 'Thrall Bfu');
 
 -- waypoint sylvanas - Spawnpoints till UC Gates
-DELETE FROM `waypoint_data` WHERE `id`=3236500;
+DELETE FROM `waypoint_data` WHERE `id` IN (3236500,32365000,316880,3168800,3173900);
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES 
-(3236500, 1, 1888.12, 239.214, 57.5389, 0, 0, 1, 0, 100, 0);
-
+(3236500, 1, 1888.12, 239.214, 57.5389, 0, 0, 1, 0, 100, 0),
 -- waypoint sylvanas - UC Gates till Valimathras Intro
-DELETE FROM `waypoint_data` WHERE `id`=32365000;
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES 
 (32365000, 1, 1878.07, 236.147, 59.9309, 0, 0, 0, 0, 100, 0),
 (32365000, 2, 1873.99, 236.114, 62.2753, 0, 0, 0, 0, 100, 0),
 (32365000, 3, 1867.68, 236.064, 62.2753, 0, 0, 0, 0, 100, 0),
@@ -950,11 +938,8 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (32365000, 8, 1853.99, 230.695, 62.2753, 0, 0, 0, 0, 100, 0),
 (32365000, 9, 1853.99, 230.695, 62.2753, 0, 0, 0, 0, 100, 0),
 (32365000, 10, 1853.87, 236.354, 62.2753, 0, 0, 0, 0, 100, 0),
-(32365000, 11, 1848.71, 236.182, 62.2753, 0, 0, 0, 0, 100, 0);
-
+(32365000, 11, 1848.71, 236.182, 62.2753, 0, 0, 0, 0, 100, 0),
 -- waypoint whirlwind spawn 1 - Spawnpoint till Valimathras Intro
-DELETE FROM `waypoint_data` WHERE `id`=316880;
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES 
 (316880, 1, 1880, 237.824, 59.4729, 0, 0, 0, 0, 100, 0),
 (316880, 2, 1874.53, 238.094, 62.2751, 0, 0, 0, 0, 100, 0),
 (316880, 3, 1864.51, 238.45, 62.2751, 0, 0, 0, 0, 100, 0),
@@ -967,11 +952,8 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (316880, 10, 1846.6, 237.699, 62.2751, 0, 0, 0, 0, 100, 0),
 (316880, 11, 1843.31, 236.508, 62.2751, 0, 0, 0, 0, 100, 0),
 (316880, 12, 1834.2, 233.346, 59.9925, 0, 0, 0, 0, 100, 0),
-(316880, 13, 1834.2, 233.346, 59.9925, 0, 0, 0, 0, 100, 0);
-
+(316880, 13, 1834.2, 233.346, 59.9925, 0, 0, 0, 0, 100, 0),
 -- waypoint whirlwind spawn 2 - Spawnpoint till Valimathras Intro
-DELETE FROM `waypoint_data` WHERE `id`=3168800;
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES 
 (3168800, 1, 1877.77, 238.831, 60.0011, 0, 0, 0, 0, 100, 0),
 (3168800, 2, 1871.82, 238.985, 62.2751, 0, 0, 0, 0, 100, 0),
 (3168800, 3, 1866.11, 239.132, 62.2751, 0, 0, 0, 0, 100, 0),
@@ -981,19 +963,8 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (3168800, 7, 1854.02, 241.464, 62.2751, 0, 0, 0, 0, 100, 0),
 (3168800, 8, 1850.92, 240.056, 62.2751, 0, 0, 0, 0, 100, 0),
 (3168800, 9, 1840.91, 239.836, 61.73, 0, 0, 0, 0, 100, 0),
-(3168800, 10, 1832.81, 243.255, 59.9357, 0, 0, 0, 0, 100, 0);
-
-DELETE FROM `waypoints` WHERE `entry`=3215900;
-INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `point_comment`) VALUES 
-(3215900, 1, 1582.04, 408.649, -33.0274, 'Doomguard Pillager'),
-(3215900, 2, 1591.27, 382.782, -36.0157, 'Doomguard Pillager'),
-(3215900, 3, 1626.62, 401.262, -41.3528, 'Doomguard Pillager'),
-(3215900, 4, 1596.45, 409.824, -46.6646, 'Doomguard Pillager'),
-(3215900, 5, 1612.5, 391.512, -55.0201, 'Doomguard Pillager'),
-(3215900, 6, 1583.25, 383.358, -62.2586, 'Doomguard Pillager');
-
-DELETE FROM `waypoint_data` WHERE `id`=3173900;
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES 
+(3168800, 10, 1832.81, 243.255, 59.9357, 0, 0, 0, 0, 100, 0),
+-- Doomguard Pillager
 (3173900, 1, 1574.43, 374.9, -62.1772, 0, 0, 1, 0, 100, 0),
 (3173900, 2, 1552.25, 369.544, -62.1821, 0, 0, 1, 0, 100, 0),
 (3173900, 3, 1542.96, 367.098, -62.1829, 0, 0, 1, 0, 100, 0),
@@ -1034,29 +1005,32 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (3173900, 38, 1773.21, 223.721, -62.1764, 0, 0, 1, 0, 100, 0),
 (3173900, 39, 1768.56, 191.049, -61.6204, 0, 0, 1, 0, 100, 0);
 
+
+DELETE FROM `waypoints` WHERE `entry`=3215900;
+INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `point_comment`) VALUES 
+(3215900, 1, 1582.04, 408.649, -33.0274, 'Doomguard Pillager'),
+(3215900, 2, 1591.27, 382.782, -36.0157, 'Doomguard Pillager'),
+(3215900, 3, 1626.62, 401.262, -41.3528, 'Doomguard Pillager'),
+(3215900, 4, 1596.45, 409.824, -46.6646, 'Doomguard Pillager'),
+(3215900, 5, 1612.5, 391.512, -55.0201, 'Doomguard Pillager'),
+(3215900, 6, 1583.25, 383.358, -62.2586, 'Doomguard Pillager');
+
 -- creature texts
-DELETE FROM `creature_text` WHERE `CreatureID`=31739;
+DELETE FROM `creature_text` WHERE `CreatureID` IN (31739,31844,32511);
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `comment`) VALUES 
 (31739, 0, 0, 'We''ll burn it to the ground before giving it to you!', 14, 0, 100, 0, 0, 0, 32330, 'Horde Guard BfU'),
 (31739, 1, 0, 'That wretch Putress won''t get away with this!', 12, 0, 100, 0, 0, 0, 32266, 'Horde Guard BfU'),
-(31739, 2, 0, 'For the Horde!', 14, 0, 100, 0, 0, 0, 4921, 'Horde Guard BfU');
-
-DELETE FROM `creature_text` WHERE `CreatureID`=31844;
-INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `comment`) VALUES 
-(31844, 0, 0, 'YAAAAAAAARGGGGHHHHH!!!!', 14, 0, 100, 0, 0, 0, 32437, 'Blight Aberration');
-
-DELETE FROM `creature_text` WHERE `CreatureID`=32511;
-INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `comment`) VALUES 
+(31739, 2, 0, 'For the Horde!', 14, 0, 100, 0, 0, 0, 4921, 'Horde Guard BfU'),
+(31844, 0, 0, 'YAAAAAAAARGGGGHHHHH!!!!', 14, 0, 100, 0, 0, 0, 32437, 'Blight Aberration'),
 (32511, 0, 0, 'No hope for you!', 11, 0, 100, 0, 0, 0, 32545, 'Khanok');
 
 DELETE FROM `creature_text` WHERE `CreatureID`=32277 AND `GroupID`=5;
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `comment`) VALUES 
 (32277, 5, 0, 'YOU HAVE FAILED ME, VARIMATHRAS!', 14, 0, 100, 0, 0, 0, 32618, 'A distant voice');
 
-UPDATE `creature_questender` SET `id`=32518 WHERE  `id`=31650 AND `quest`=13267;
+UPDATE `creature_questender` SET `id`=32518 WHERE `id`=31650 AND `quest`=13267;
 UPDATE `creature_text` SET `emote`=1 WHERE  `CreatureID` IN (32401, 32402, 32518, 32365, 31565);
-UPDATE `creature_template` SET `mechanic_immune_mask`=8388624 WHERE  `entry`=31565; -- kahnok 
-UPDATE `creature_template` SET `mechanic_immune_mask`=8388624 WHERE  `entry`=31530; -- varimathras
+UPDATE `creature_template` SET `mechanic_immune_mask`=8388624 WHERE  `entry` IN (31565,31530); -- kahnok & varimathras
 UPDATE `creature_template` SET `exp`=2 WHERE  `entry` IN (32365, 32402); -- sylvanas hp
 UPDATE `creature_template` SET `HealthModifier`=500 WHERE  `entry`=32365;
 UPDATE `creature_model_info` SET `BoundingRadius`=10, `CombatReach`=10 WHERE  `DisplayID` IN (27755, 27992, 27788, 27611); -- hitbox von (31844, 32511, 32483, 31530);
@@ -1067,8 +1041,8 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`,`SourceGroup`,`SourceEntry`,
 UPDATE `gameobject_template_addon` SET `flags`=`flags`|0x00000800 WHERE `entry` IN (20656, 20655, 20657);
 
 DELETE FROM `spell_script_names` WHERE `ScriptName` = 'spell_undercity_buffs';
-INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES (60964, 'spell_undercity_buffs');
-INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES (64670, 'spell_undercity_buffs');
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES (60964, 'spell_undercity_buffs'),
+(64670, 'spell_undercity_buffs');
 
 -- CREATURE_FLAG_EXTRA_IGNORE_PATHFINDING 
 UPDATE `creature_template` SET `flags_extra`=`flags_extra`|0x20000000, `InhabitType`=3 WHERE `entry` IN (32401,32391,32390,32395,32394,32392,32397,32396,32387,32510,31739,32519);
