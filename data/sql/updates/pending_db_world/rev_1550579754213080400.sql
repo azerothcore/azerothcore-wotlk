@@ -1,5 +1,5 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1550579754213080400');
-UPDATE `creature_template` SET `speed_walk` = 1, `speed_run` = 1 WHERE `entry` IN (27755, 27756, 27692);
+UPDATE `creature_template` SET `speed_walk` = 1.20000004768372, `speed_run` = 1 WHERE `entry` IN (27755, 27756, 27692);
 UPDATE `creature_template` SET `ScriptName` = 'npc_centrifuge_construct' WHERE `entry` = 27641;
 
 -- Spells of the dragons
