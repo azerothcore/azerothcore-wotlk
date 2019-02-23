@@ -287,7 +287,7 @@ public:
                                     if (spell)
                                         me->CastSpell(summoner, spell, true);
                                     me->SetCanFly(true);
-                                    me->SetSpeed(MOVE_FLIGHT, me->GetSpeedRate(MOVE_RUN), true);
+                                    me->SetSpeedRate(MOVE_FLIGHT, 1.0f);
                                 }
                             }
                     }
