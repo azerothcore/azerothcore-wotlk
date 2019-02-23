@@ -24,11 +24,11 @@ You have to follow these steps (**respecting the order**):
 
 2) Launch one instance of the [AzerothCore Dockerized Database](https://github.com/azerothcore/azerothcore-wotlk/tree/master/docker/database)
 
-3) Create an image of the [AzerothCore Dockerized Build](https://github.com/azerothcore/azerothcore-wotlk/tree/master/docker/build)
+3) Build AzerothCore using [AzerothCore Dockerized Build](https://github.com/azerothcore/azerothcore-wotlk/tree/master/docker/build)
 
 4) Launch one instance of the [AzerothCore Dockerized Authserver](https://github.com/azerothcore/azerothcore-wotlk/tree/master/docker/authserver)
 
-5)  Launch one instance of the [AzerothCore Dockerized Worldserver](https://github.com/azerothcore/azerothcore-wotlk/tree/master/docker/worldserver)
+5) Launch one instance of the [AzerothCore Dockerized Worldserver](https://github.com/azerothcore/azerothcore-wotlk/tree/master/docker/worldserver)
 
 
 ### Memory usage
