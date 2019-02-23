@@ -89,7 +89,7 @@ class npc_lady_sylvanas_windrunner : public CreatureScript
 public:
     npc_lady_sylvanas_windrunner() : CreatureScript("npc_lady_sylvanas_windrunner") { }
 
-    bool OnQuestReward(Player* player, Creature* creature, const Quest *_Quest, uint32 /*slot*/)
+    bool OnQuestReward(Player* player, Creature* creature, const Quest *_Quest, uint32 /*slot*/) override
     {
         if (_Quest->GetQuestId() == QUEST_JOURNEY_TO_UNDERCITY)
             creature->AI()->SetGUID(player->GetGUID(), GUID_EVENT_INVOKER);
@@ -103,7 +103,7 @@ public:
         {
         }
 
-        void Reset()
+        void Reset() override
         {
             LamentEvent = false;
             targetGUID = 0;
@@ -111,7 +111,7 @@ public:
             _events.Reset();
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             _events.ScheduleEvent(EVENT_FADE, 30000);
             _events.ScheduleEvent(EVENT_SUMMON_SKELETON, 20000);
@@ -120,7 +120,7 @@ public:
             _events.ScheduleEvent(EVENT_MULTI_SHOT, 10000);
         }
 
-        void SetGUID(uint64 guid, int32 type)
+        void SetGUID(uint64 guid, int32 type) override
         {
             if (type == GUID_EVENT_INVOKER)
             {
@@ -138,7 +138,7 @@ public:
             }
         }
 
-        void JustSummoned(Creature* summoned)
+        void JustSummoned(Creature* summoned) override
         {
             if (summoned->GetEntry() == NPC_HIGHBORNE_BUNNY)
             {
@@ -149,7 +149,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim() && !LamentEvent)
                 return;
@@ -227,7 +227,7 @@ public:
         uint64 playerGUID;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_lady_sylvanas_windrunnerAI(creature);
     }
@@ -256,7 +256,7 @@ public:
         bool EventMove;
         bool EventCast;
 
-        void Reset()
+        void Reset() override
         {
             EventMoveTimer = 10000;
             EventCastTimer = 17500;
@@ -264,9 +264,9 @@ public:
             EventCast = true;
         }
 
-        void EnterCombat(Unit* /*who*/) { }
+        void EnterCombat(Unit* /*who*/) override { }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (EventMove)
             {
@@ -2893,7 +2893,7 @@ public:
             }
         }
 
-        bool CanAIAttack(Unit const* victim) const
+        bool CanAIAttack(Unit const* victim) const override
         {
             return victim->GetEntry() != NPC_BLIGHT_SLINGER;
         }
@@ -3952,7 +3952,7 @@ public:
             me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_INCREASE_SPEED, true);
         }
 
-        bool CanAIAttack(Unit const* victim) const
+        bool CanAIAttack(Unit const* victim) const override
         {
             return victim->GetEntry() != NPC_BLIGHT_SLINGER;
         }
