@@ -8,7 +8,7 @@ If you just want to install the whole AzerothCore quickly using Docker Compose, 
 
 - You need to have [Docker](https://docs.docker.com/install/) installed in your system. You can install it on any operating system.
 
-- You need to first build the [AzerothCore Build Image](https://github.com/azerothcore/azerothcore-wotlk/tree/master/docker/build).
+- You need to first build AzerothCore using the [AzerothCore Dockerized Build](https://github.com/azerothcore/azerothcore-wotlk/tree/master/docker/build).
 
 - If you haven't created a docker network yet, create it by simply using `docker network create ac-network`.
 
@@ -31,6 +31,7 @@ Replace `/path/to/your/data` with the path of where your data folder is.
 ```
 docker run --name ac-worldserver \
     --mount type=bind,source=/path/to/your/data,target=/azeroth-server/data \
+    --mount type=bind,source="$(pwd)"/docker/worldserver/bin/,target=/azeroth-server/bin \
     --mount type=bind,source="$(pwd)"/docker/worldserver/etc/,target=/azeroth-server/etc \
     --mount type=bind,source="$(pwd)"/docker/worldserver/logs/,target=/azeroth-server/logs \
     -p 127.0.0.1:8085:8085 \
