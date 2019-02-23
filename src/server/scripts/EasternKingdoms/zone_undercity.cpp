@@ -2304,7 +2304,7 @@ public:
         return true;
     }
 
-    bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32 /*item*/) override
+    bool OnQuestReward(Player* player, Creature* /*creature*/, Quest const* quest, uint32 /*item*/) override
     {
         if (quest->GetQuestId() == QUEST_BATTLE_H)
         {
