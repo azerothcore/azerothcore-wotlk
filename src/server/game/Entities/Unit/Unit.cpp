@@ -696,6 +696,10 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
         // Signal to pets that their owner was attacked
         Pet* pet = victim->ToPlayer()->GetPet();
 
+        if (victim->GetTypeId() == TYPEID_PLAYER)
+            if (victim->ToPlayer()->GetCommandStatus(CHEAT_GOD))
+                return 0;
+
         if (pet && pet->IsAlive())
             pet->AI()->OwnerAttackedBy(attacker);
     }
