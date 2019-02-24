@@ -99,7 +99,7 @@ function import() {
                 echo "DROP PROCEDURE IF EXISTS \`updateDb\`;" >> "$newFile";
             fi;
 
-            COMMIT_HASH="$COMMIT_HASH $(git log --diff-filter=A "$entry" | grep "^commit " | sed -e 's/commit //')"
+            COMMIT_HASH="$COMMIT_HASH $(git log --diff-filter=A "$entry" | grep "^commit " | sort -u | sed -e 's/commit //')"
             rm $entry;
 
             oldDate=$dateToday
