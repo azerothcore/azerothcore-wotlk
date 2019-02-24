@@ -1033,7 +1033,8 @@ UPDATE `creature_text` SET `emote`=1 WHERE  `CreatureID` IN (32401, 32402, 32518
 UPDATE `creature_template` SET `mechanic_immune_mask`=8388624 WHERE  `entry` IN (31565,31530); -- kahnok & varimathras
 UPDATE `creature_template` SET `exp`=2 WHERE  `entry` IN (32365, 32402); -- sylvanas hp
 UPDATE `creature_template` SET `HealthModifier`=500 WHERE  `entry`=32365;
-UPDATE `creature_model_info` SET `BoundingRadius`=10, `CombatReach`=10 WHERE  `DisplayID` IN (27755, 27992, 27788, 27611); -- hitbox von (31844, 32511, 32483, 31530);
+UPDATE `creature_model_info` SET `BoundingRadius`=10, `CombatReach`=10 WHERE  `DisplayID` IN (27755, 27992, 27788); -- hitbox von (31844, 32511, 32483);
+UPDATE `creature_model_info` SET `BoundingRadius`=2, `CombatReach`=2 WHERE  `DisplayID` = 27611; -- Putress
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId`=3 AND `SourceGroup`=1637 AND `SourceEntry`=34486;
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`,`SourceGroup`,`SourceEntry`,`SourceId`,`ElseGroup`,`ConditionTypeOrReference`,`ConditionTarget`,`ConditionValue1`,`ConditionValue2`,`ConditionValue3`,`ErrorTextId`,`ScriptName`,`Comment`, `NegativeCondition`) VALUES
 (3,1637,34486,0,0,1,0,60815,0,0,0,"","Do not show loot if we have aura 60815 for undercity fight", 1);
