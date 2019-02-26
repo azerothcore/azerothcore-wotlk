@@ -195,7 +195,7 @@ class UnitAI
         // predicate shall extend std::unary_function<Unit*, bool>
         template <class PREDICATE> Unit* SelectTarget(SelectAggroTarget targetType, uint32 position, PREDICATE const& predicate)
         {
-            if (targetType == SELECT_TARGET_FARTHEST_RANDOM)
+            if (targetType == SELECT_TARGET_FARTHEST_RANDOM && position != 0)
                 --position;
 
             ThreatContainer::StorageType const& threatlist = me->getThreatManager().getThreatList();
