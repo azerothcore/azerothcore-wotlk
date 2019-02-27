@@ -5,7 +5,6 @@
  */
 
 #include "ScriptMgr.h"
-#include "ScriptPCH.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "Vehicle.h"
@@ -17,6 +16,7 @@
 #include "SpellInfo.h"
 #include "CreatureTextMgr.h"
 #include "PetAI.h"
+#include "SpellScript.h"
 
 // Ours
 enum eyeOfAcherus

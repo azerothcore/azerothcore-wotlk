@@ -912,6 +912,8 @@ Player::Player(WorldSession* session): Unit(true), m_mover(this)
 
     SetPendingBind(0, 0);
 
+    _activeCheats = CHEAT_NONE;
+
     m_achievementMgr = new AchievementMgr(this);
     m_reputationMgr = new ReputationMgr(this);
 
@@ -1210,6 +1212,8 @@ bool Player::Create(uint32 guidlow, CharacterCreateInfo* createInfo)
         }
     }
     // all item positions resolved
+
+    CheckAllAchievementCriteria();
 
     return true;
 }
@@ -4027,10 +4031,13 @@ void Player::learnSpell(uint32 spellId)
     uint32 firstRankSpellId = sSpellMgr->GetFirstSpellInChain(spellId);
     bool thisSpec = GetTalentSpellCost(firstRankSpellId) > 0 || sSpellMgr->IsAdditionalTalentSpell(firstRankSpellId);
     bool added = addSpell(spellId, thisSpec ? GetActiveSpecMask() : SPEC_MASK_ALL, true);
-    if (added && IsInWorld())
+    if (added)
     {
+        sScriptMgr->OnPlayerLearnSpell(this, spellId);
+
         // pussywizard: a system message "you have learnt spell X (rank Y)"
-        SendLearnPacket(spellId, true);
+        if (IsInWorld())
+            SendLearnPacket(spellId, true);
     }
 
     // pussywizard: rank stuff at the end!
@@ -4194,7 +4201,10 @@ void Player::removeSpell(uint32 spellId, uint8 removeSpecMask, bool onlyTemporar
 
     // pussywizard: remove from spell book (can't be replaced by previous rank, because such spells can't be unlearnt)
     if (!onlyTemporary || ((!spellInfo->HasAttribute(SpellAttr0(SPELL_ATTR0_PASSIVE | SPELL_ATTR0_HIDDEN_CLIENTSIDE)) || !spellInfo->HasAnyAura()) && !spellInfo->HasEffect(SPELL_EFFECT_LEARN_SPELL)))
+    {
+        sScriptMgr->OnPlayerForgotSpell(this, spellId);
         SendLearnPacket(spellId, false);
+    }
 }
 
 bool Player::Has310Flyer(bool checkAllSpells, uint32 excludeSpellId)
@@ -9011,6 +9021,8 @@ void Player::SendLoot(uint64 guid, LootType loot_type)
                 if (groupRules && !go->loot.empty())
                     group->UpdateLooterGuid(go);
             }
+            if (GameObjectTemplateAddon const* addon = go->GetTemplateAddon())
+                loot->generateMoneyLoot(addon->mingold, addon->maxgold);
 
             if (loot_type == LOOT_FISHING)
                 go->getFishLoot(loot, this);
@@ -15983,6 +15995,8 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
     // Xinef: area auras may change on quest completion!
     UpdateZoneDependentAuras(GetZoneId());
     UpdateAreaDependentAuras(GetAreaId());
+    
+    sScriptMgr->OnPlayerCompleteQuest(this, quest);
 }
 
 void Player::FailQuest(uint32 questId)

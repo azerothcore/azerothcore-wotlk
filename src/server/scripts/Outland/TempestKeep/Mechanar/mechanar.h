@@ -5,7 +5,10 @@
 #ifndef DEF_MECHANAR_H
 #define DEF_MECHANAR_H
 
-#include "ScriptPCH.h"
+#include "SpellScript.h"
+#include "SpellAuraEffects.h"
+#include "Player.h"
+#include "CreatureAI.h"
 
 enum DataTypes
 {

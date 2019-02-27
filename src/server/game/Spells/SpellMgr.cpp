@@ -4468,6 +4468,12 @@ void SpellMgr::LoadDbcDataCorrections()
         case 37852:
             spellInfo->AttributesEx5 |= SPELL_ATTR5_USABLE_WHILE_STUNNED;
             break;
+                
+        // Karazhan
+        // Amplify Damage
+        case 39095:
+            spellInfo->MaxAffectedTargets = 1;
+            break;
 
         // Magisters' Terrace
         // Energy Feedback
@@ -5839,6 +5845,17 @@ void SpellMgr::LoadDbcDataCorrections()
         // Meteor Strike
         case 74637:
             spellInfo->speed = 0;
+            break;
+        //Blazing Aura
+        case 75885:
+        case 75886:
+            spellInfo->AttributesEx4 &= ~SPELL_ATTR4_IGNORE_RESISTANCES;
+            break;
+        //Meteor Strike
+        case 75952:
+        //Combustion Periodic
+        case 74629:
+            spellInfo->AttributesEx4 &= ~SPELL_ATTR4_IGNORE_RESISTANCES;
             break;
 
 

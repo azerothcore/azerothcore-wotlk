@@ -12,8 +12,8 @@ SDCategory: Coilfang Resevoir, Underbog
 EndScriptData */
 
 #include "ScriptMgr.h"
-#include "ScriptPCH.h"
 #include "ScriptedCreature.h"
+#include "SpellScript.h"
 
 enum eBlackStalker
 {

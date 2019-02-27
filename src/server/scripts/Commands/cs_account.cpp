@@ -347,6 +347,7 @@ public:
         if (!AccountMgr::CheckPassword(handler->GetSession()->GetAccountId(), std::string(oldPassword)))
         {
             handler->SendSysMessage(LANG_COMMAND_WRONGOLDPASSWORD);
+            sScriptMgr->OnFailedPasswordChange(handler->GetSession()->GetAccountId());
             handler->SetSentErrorMessage(true);
             return false;
         }
@@ -354,6 +355,7 @@ public:
         if (strcmp(newPassword, passwordConfirmation) != 0)
         {
             handler->SendSysMessage(LANG_NEW_PASSWORDS_NOT_MATCH);
+            sScriptMgr->OnFailedPasswordChange(handler->GetSession()->GetAccountId());
             handler->SetSentErrorMessage(true);
             return false;
         }
@@ -363,9 +365,11 @@ public:
         {
         case AOR_OK:
             handler->SendSysMessage(LANG_COMMAND_PASSWORD);
+            sScriptMgr->OnPasswordChange(handler->GetSession()->GetAccountId());
             break;
         case AOR_PASS_TOO_LONG:
             handler->SendSysMessage(LANG_PASSWORD_TOO_LONG);
+            sScriptMgr->OnFailedPasswordChange(handler->GetSession()->GetAccountId());
             handler->SetSentErrorMessage(true);
             return false;
         default:

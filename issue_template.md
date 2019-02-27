@@ -2,7 +2,7 @@
 
 <!-- This template is for problem reports, for feature suggestion etc... feel free to edit it.
  If this is a crash report, upload the crashlog on https://gist.github.com/
- For issues containing a fix, please create a Pull Request following this tutorial: https://github.com/azerothcore/azerothcore-wotlk/wiki/Contribute#how-to-create-a-pull-request -->
+ For issues containing a fix, please create a Pull Request following this tutorial: http://www.azerothcore.org/wiki/Contribute#how-to-create-a-pull-request -->
 
 
 <!-- WRITE A RELEVANT TITLE -->
@@ -80,7 +80,7 @@ Find the commit hash (unique identifier) by running "git log" on your own clone 
 <!-- ------------------------- THE END ------------------------------
 Thank you for your contribution.
 If you use AzerothCore regularly, we really NEED your help to:
- - TEST our fixes ( https://github.com/azerothcore/azerothcore-wotlk/wiki/Contribute#how-to-test-a-pull-request )
+ - TEST our fixes ( http://www.azerothcore.org/wiki/Contribute#how-to-test-a-pull-request )
  - Report issues
  - Improve the documentation/wiki
 With your help the project can evolve much quicker!

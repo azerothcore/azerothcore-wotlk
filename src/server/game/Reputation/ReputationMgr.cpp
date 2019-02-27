@@ -271,7 +271,6 @@ void ReputationMgr::Initialize()
 
 bool ReputationMgr::SetReputation(FactionEntry const* factionEntry, int32 standing, bool incremental, bool spillOverOnly)
 {
-    sScriptMgr->OnPlayerReputationChange(_player, factionEntry->ID, standing, incremental);
     bool res = false;
     // if spillover definition exists in DB, override DBC
     if (const RepSpilloverTemplate* repTemplate = sObjectMgr->GetRepSpilloverTemplate(factionEntry->ID))
@@ -375,6 +374,11 @@ bool ReputationMgr::SetOneFactionReputation(FactionEntry const* factionEntry, in
 
         if (new_rank > old_rank)
             _sendFactionIncreased = true;
+
+        sScriptMgr->OnPlayerReputationChange(_player, factionEntry->ID, standing, incremental);
+
+        if (new_rank != old_rank)
+            sScriptMgr->OnPlayerReputationRankChange(_player, factionEntry->ID, new_rank, old_rank, _sendFactionIncreased);
 
         UpdateRankCounters(old_rank, new_rank);
 

@@ -1,6 +1,3 @@
-# TODO: remove this line after we fully support mysql 5.7
-mysql -u root -p$MYSQL_ROOT_PASSWORD -e "SET GLOBAL sql_mode = '';"
-
 # TODO: remove this line after we squash our DB updates
 mysql -u root -p$MYSQL_ROOT_PASSWORD -e "SET GLOBAL max_allowed_packet=128*1024*1024;"
 
@@ -21,13 +18,13 @@ mysql -u root -p$MYSQL_ROOT_PASSWORD acore_world < /sql/world_base.sql
 
 
 echo "Importing auth updates..."
-mysql -u root -p$MYSQL_ROOT_PASSWORD acore_auth < /sql/auth_update.sql
+mysql -u root -p$MYSQL_ROOT_PASSWORD acore_auth < /sql/auth_updates.sql
 
 echo "Importing characters updates..."
-mysql -u root -p$MYSQL_ROOT_PASSWORD acore_characters < /sql/characters_update.sql
+mysql -u root -p$MYSQL_ROOT_PASSWORD acore_characters < /sql/characters_updates.sql
 
 echo "Importing world updates..."
-mysql -u root -p$MYSQL_ROOT_PASSWORD acore_world < /sql/world_update.sql
+mysql -u root -p$MYSQL_ROOT_PASSWORD acore_world < /sql/world_updates.sql
 
 
 echo "Importing auth custom (if any)..."

@@ -3,9 +3,9 @@
 */
 
 #include "ScriptMgr.h"
-#include "ScriptPCH.h"
 #include "ScriptedCreature.h"
 #include "shattered_halls.h"
+#include "Player.h"
 
 enum eGrandWarlockNethekurse
 {
