@@ -794,7 +794,7 @@ class boss_flame_leviathan_defense_turret : public CreatureScript
             bool _setHealth;
             void DamageTaken(Unit* who, uint32 &damage, DamageEffectType, SpellSchoolMask) override
             {
-                if (!who || !CanAIAttack(who))
+                if (!CanAIAttack(who))
                 {
                     _setHealth = true;
                     damage = 0;
@@ -816,7 +816,7 @@ class boss_flame_leviathan_defense_turret : public CreatureScript
 
             bool CanAIAttack(Unit const* who) const override
             {
-                if (who->GetTypeId() != TYPEID_PLAYER || !who->GetVehicle() || who->GetVehicleBase()->GetEntry() != NPC_SEAT)
+                if (!who || who->GetTypeId() != TYPEID_PLAYER || !who->GetVehicle() || who->GetVehicleBase()->GetEntry() != NPC_SEAT)
                     return false;
                 return true;
             }
