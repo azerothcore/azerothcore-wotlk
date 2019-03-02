@@ -13,9 +13,12 @@
 #include "BattlegroundQueue.h"
 #include "CreatureAIImpl.h"
 #include <ace/Singleton.h>
+#include <unordered_map>
 
 typedef std::map<uint32, Battleground*> BattlegroundContainer;
 typedef UNORDERED_MAP<uint32, BattlegroundTypeId> BattleMastersMap;
+typedef Battleground*(*bgRef)(Battleground*);
+
 
 #define BATTLEGROUND_ARENA_POINT_DISTRIBUTION_DAY 86400 // how many seconds in day
 
@@ -132,6 +135,11 @@ class BattlegroundMgr
 
         const BattlegroundContainer& GetBattlegroundList() { return m_Battlegrounds; } // pussywizard
         RandomBattlegroundSystem RandomSystem; // pussywizard
+
+        static std::unordered_map<int, BattlegroundQueueTypeId> bgToQueue; // BattlegroundTypeId -> BattlegroundQueueTypeId
+        static std::unordered_map<int, BattlegroundTypeId> queueToBg; // BattlegroundQueueTypeId -> BattlegroundTypeId
+        static std::unordered_map<int, Battleground*> bgtypeToBattleground; // BattlegroundTypeId -> Battleground*
+        static std::unordered_map<int, bgRef> bgTypeToTemplate; // BattlegroundTypeId -> bgRef
 
     private:
         bool CreateBattleground(CreateBattlegroundData& data);
