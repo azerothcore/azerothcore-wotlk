@@ -1,11 +1,10 @@
 #!/usr/bin/env bash
 
+set -e
+
 CUR_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-PATH_MODULES="$CUR_PATH/modules/"
-[ ! -d $PATH_MODULES/drassil/joiner ] && git clone https://github.com/drassil/joiner $PATH_MODULES/drassil/joiner -b master
-source "$PATH_MODULES/drassil/joiner/joiner.sh"
+
+source "$CUR_PATH/apps/installer/includes/includes.sh"
 
 
-if [[ $1 == "dev" ]]; then
-    git submodule update --init "$CUR_PATH/data/doc"
-fi
+

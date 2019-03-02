@@ -4,15 +4,26 @@
 
 conf/*
 !conf/*.dist
+apps/drassil/*
+env/dist/*
+env/user/*
 modules/*
-
-!modules/drassil
-modules/drassil/joiner
-!modules/hw-core
-!modules/acore
-!modules/worldengine
-
+!modules/*.md
+!modules/*.sh
 build*/
+var/*
+docker/build/cache
+docker/authserver/bin
+docker/worldserver/bin
+docker/authserver/etc/authserver.conf
+docker/worldserver/etc/worldserver.conf
+docker/authserver/logs/
+docker/worldserver/logs/
+docker/worldserver/data/
+!docker/build
+.env
+
+!.gitkeep
 
 #
 #Generic
@@ -36,7 +47,7 @@ CMakeLists.txt.user
 *.LOCAL.*
 
 #
-# IDE & other softwares
+# IDE & other software
 #
 /.settings/
 /.externalToolBuilders/*
@@ -46,6 +57,8 @@ nbproject/
 *.kate-swp
 .browse.VC*
 .vscode
+.idea
+cmake-build-debug/*
 
 #
 # Eclipse

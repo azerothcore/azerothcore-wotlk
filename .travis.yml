@@ -1,37 +1,41 @@
 sudo: required
-dist: trusty # (14.04)
-# xenial (16.04) is not supported yet
+dist: xenial # (16.04)
+# bionic (18.04) is not yet available in travis
 
 language: cpp
-compiler:
-  - clang
+
+cache: ccache
+
+addons:
+  apt:
+    update: true
+
+services:
+  - mysql
 
 git:
   depth: 1
 
+env:
+  - TRAVIS_BUILD_ID="1"
+  - TRAVIS_BUILD_ID="2"
+
 before_install:
-  - sudo apt-get -y install build-essential libtool make cmake cmake-data openssl
-  - sudo apt-get -y install libssl-dev libmysqlclient-dev libmysql++-dev libreadline6-dev zlib1g-dev libbz2-dev libace-dev
-  - git config user.email "travis@build.bot" && git config user.name "Travis CI"
-  - git tag -a -m "Travis build" init
+  - git config user.email "azerothcorebot@gmail.com" && git config user.name "AzerothCoreBot"
+  - if [ "$TRAVIS_BUILD_ID" = "1" ] && [ "$TRAVIS_PULL_REQUEST" = "false" ]; then cd bin/; fi
+  # import pending sql
+  - if [ "$TRAVIS_BUILD_ID" = "1" ] && [ "$TRAVIS_PULL_REQUEST" = "false" ] && [ "$TRAVIS_BRANCH" = "master" ]; then source acore-db-pendings; fi
+  - if [ "$TRAVIS_BUILD_ID" = "1" ] && [ "$TRAVIS_PULL_REQUEST" = "false" ]; then cd ..; fi
+  # push changes to git if any
+  - if [ "$TRAVIS_BUILD_ID" = "1" ] && [ "$TRAVIS_PULL_REQUEST" = "false" ]; then git fetch --unshallow; fi
+  - if [ "$TRAVIS_BUILD_ID" = "1" ] && [ "$TRAVIS_PULL_REQUEST" = "false" ]; then git checkout $TRAVIS_BRANCH; fi
+  - if [ "$TRAVIS_BUILD_ID" = "1" ] && [ "$TRAVIS_PULL_REQUEST" = "false" ] && [[ -n "$GITHUB_API_KEY" ]]; then git add -A . && git diff --cached --quiet || git commit -am "Import pending SQL update file..." -m "Referenced commit(s):$COMMIT_HASH" && git push https://$GITHUB_API_KEY@github.com/$TRAVIS_REPO_SLUG.git $TRAVIS_BRANCH; fi
+  # sync staging with master
+  - if [ "$TRAVIS_BUILD_ID" = "1" ] && [ "$TRAVIS_PULL_REQUEST" = "false" ] && [ "$TRAVIS_BRANCH" = "master" ] && [[ -n "$GITHUB_API_KEY" ]]; then git fetch origin staging:staging && git checkout staging && git merge --no-edit master && git push https://$GITHUB_API_KEY@github.com/$TRAVIS_REPO_SLUG.git staging; git checkout master; fi
+  - source ./apps/ci/ci-before_install.sh
 
 install:
-  - mysql -uroot -e 'create database test_mysql;'
-  # bin directory already exists in the repo and therefore is not created here
-  - cd bin
-  - cmake ../ -DWITH_WARNINGS=1 -DWITH_COREDEBUG=0 -DUSE_COREPCH=1 -DUSE_SCRIPTPCH=1 -DTOOLS=0 -DSCRIPTS=1 -DSERVERS=1 -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=check_install
-  - cd ..
+  - source ./apps/ci/ci-install.sh
 
 script:
-  - $CXX --version
-  - mysql -uroot < data/sql/create/create_mysql.sql
-  - cat data/sql/base/db_auth/*.sql | mysql -uacore -pacore auth
-  - cat data/sql/base/db_characters/*.sql | mysql -uacore -pacore characters
-  - cat data/sql/base/db_world/*.sql | mysql -uacore -pacore world
-  - cat data/sql/updates/db_auth/*.sql | mysql -uacore -pacore auth
-  - cat data/sql/updates/db_characters/*.sql | mysql -uacore -pacore characters
-  - cat data/sql/updates/db_world/*.sql | mysql -uacore -pacore world
-  - mysql -uroot < data/sql/create/drop_mysql.sql
-  - cd bin
-  - make -j 8 -k && make install
-  - cd check_install/bin
+  - source ./apps/ci/ci-script.sh

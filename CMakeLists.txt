@@ -28,13 +28,13 @@ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH 1)
 set(AC_PATH_ROOT "${CMAKE_SOURCE_DIR}")
 
 # set macro-directory
-set(CMAKE_MODULE_PATH "${AC_PATH_ROOT}/modules/worldengine/nucleus/src/cmake/macros")
+set(CMAKE_MODULE_PATH "${AC_PATH_ROOT}/src/cmake/macros")
 
 include(CheckCXXSourceRuns)
 include(CheckIncludeFiles)
 
 # some utils for cmake
-include(modules/drassil/cmake-utils/utils.cmake)
+include(deps/drassil/cmake-utils/utils.cmake)
 
 include(src/cmake/ac_macros.cmake)
 
@@ -42,9 +42,30 @@ include(src/cmake/ac_macros.cmake)
 include(conf/config.cmake.dist)
 
 # load custom configurations for cmake if exists
-if(EXISTS "conf/config.cmake")
+if(EXISTS "${CMAKE_SOURCE_DIR}/conf/config.cmake")
   include(conf/config.cmake)
 endif()
+
+#
+# Loading dyn modules
+#
+
+# add modules and dependencies
+CU_SUBDIRLIST(sub_DIRS  "${CMAKE_SOURCE_DIR}/modules" FALSE FALSE)
+FOREACH(subdir ${sub_DIRS})
+
+    get_filename_component(MODULENAME ${subdir} NAME)
+
+    if (";${DISABLED_AC_MODULES};" MATCHES ";${MODULENAME};")
+       continue()
+    endif()
+
+    STRING(REGEX REPLACE "^${CMAKE_SOURCE_DIR}/" "" subdir_rel ${subdir})
+    if(EXISTS "${subdir}/CMakeLists.txt")
+        message("Loading module: ${subdir_rel}")
+        add_subdirectory("${subdir_rel}")
+    endif()
+ENDFOREACH()
 
 CU_RUN_HOOK("AFTER_LOAD_CONF")
 
@@ -60,6 +81,7 @@ if( NOPCH )
 endif()
 
 include(CheckPlatform)
+include(GroupSources)
 
 # basic packagesearching and setup (further support will be needed, this is a preliminary release!)
 set(OPENSSL_EXPECTED_VERSION 1.0.0)
@@ -97,38 +119,16 @@ include(src/cmake/showoptions.cmake)
 # Loading framework
 #
 
-add_subdirectory(modules/worldengine/deps)
+add_subdirectory(deps)
 
 if( SERVERS OR TOOLS)
-  add_subdirectory(modules/worldengine/nucleus)
-  add_subdirectory(modules/worldengine/lib-collision)
-  add_subdirectory(modules/acore/game-framework)
+  add_subdirectory(src/common)
 endif()
 
 if( TOOLS )
-  add_subdirectory(modules/acore/extractors)
+  add_subdirectory(src/tools)
 endif()
 
-#
-# Loading dyn modules
-#
-
-# add modules and dependencies
-CU_SUBDIRLIST(sub_DIRS  "${CMAKE_SOURCE_DIR}/modules" FALSE FALSE)
-FOREACH(subdir ${sub_DIRS})
-
-    get_filename_component(MODULENAME ${subdir} NAME)
-
-    if (";${DISABLED_AC_MODULES};" MATCHES ";${MODULENAME};")
-       continue()
-    endif()
-
-    STRING(REGEX REPLACE "^${CMAKE_SOURCE_DIR}/" "" subdir_rel ${subdir})
-    if(EXISTS "${subdir}/CMakeLists.txt")
-        message("Loading module: ${subdir_rel}")
-        add_subdirectory("${subdir_rel}")
-    endif()
-ENDFOREACH()
 
 #
 # Loading application sources
