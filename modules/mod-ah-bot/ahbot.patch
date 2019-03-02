@@ -1,0 +1,214 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 32edeb3458..35385f2271 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -46,6 +46,27 @@ if(EXISTS "conf/config.cmake")
+   include(conf/config.cmake)
+ endif()
+ 
++#
++# Loading dyn modules
++#
++
++# add modules and dependencies
++CU_SUBDIRLIST(sub_DIRS  "${CMAKE_SOURCE_DIR}/modules" FALSE FALSE)
++FOREACH(subdir ${sub_DIRS})
++
++    get_filename_component(MODULENAME ${subdir} NAME)
++
++    if (";${DISABLED_AC_MODULES};" MATCHES ";${MODULENAME};")
++       continue()
++    endif()
++
++    STRING(REGEX REPLACE "^${CMAKE_SOURCE_DIR}/" "" subdir_rel ${subdir})
++    if(EXISTS "${subdir}/CMakeLists.txt")
++        message("Loading module: ${subdir_rel}")
++        add_subdirectory("${subdir_rel}")
++    endif()
++ENDFOREACH()
++
+ CU_RUN_HOOK("AFTER_LOAD_CONF")
+ 
+ # build in Release-mode by default if not explicitly set
+@@ -107,26 +128,6 @@ if( TOOLS )
+   add_subdirectory(src/tools)
+ endif()
+ 
+-#
+-# Loading dyn modules
+-#
+-
+-# add modules and dependencies
+-CU_SUBDIRLIST(sub_DIRS  "${CMAKE_SOURCE_DIR}/modules" FALSE FALSE)
+-FOREACH(subdir ${sub_DIRS})
+-
+-    get_filename_component(MODULENAME ${subdir} NAME)
+-
+-    if (";${DISABLED_AC_MODULES};" MATCHES ";${MODULENAME};")
+-       continue()
+-    endif()
+-
+-    STRING(REGEX REPLACE "^${CMAKE_SOURCE_DIR}/" "" subdir_rel ${subdir})
+-    if(EXISTS "${subdir}/CMakeLists.txt")
+-        message("Loading module: ${subdir_rel}")
+-        add_subdirectory("${subdir_rel}")
+-    endif()
+-ENDFOREACH()
+ 
+ #
+ # Loading application sources
+diff --git a/src/server/game/AuctionHouse/AuctionHouseMgr.cpp b/src/server/game/AuctionHouse/AuctionHouseMgr.cpp
+index 4aba5703b2..5c9a332016 100644
+--- a/src/server/game/AuctionHouse/AuctionHouseMgr.cpp
++++ b/src/server/game/AuctionHouse/AuctionHouseMgr.cpp
+@@ -21,6 +21,9 @@
+ #include <vector>
+ #include "AvgDiffTracker.h"
+ #include "AsyncAuctionListing.h"
++#ifdef MOD_AH_BOT
++#include "AuctionHouseBot.h"
++#endif
+ 
+ enum eAuctionHouse
+ {
+@@ -139,8 +142,11 @@ void AuctionHouseMgr::SendAuctionSuccessfulMail(AuctionEntry* auction, SQLTransa
+     if (owner || owner_accId)
+     {
+         uint32 profit = auction->bid + auction->deposit - auction->GetAuctionCut();
+-
++#ifdef MOD_AH_BOT
++        if (owner && owner->GetGUIDLow() != auctionbot->GetAHBplayerGUID())
++#else
+         if (owner)
++#endif
+         {
+             owner->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_GOLD_EARNED_BY_AUCTIONS, profit);
+             owner->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_AUCTION_SOLD, auction->bid);
+@@ -183,7 +189,11 @@ void AuctionHouseMgr::SendAuctionExpiredMail(AuctionEntry* auction, SQLTransacti
+     // owner exist
+     if (owner || owner_accId)
+     {
++#ifdef MOD_AH_BOT
++        if (owner && owner->GetGUIDLow() != auctionbot->GetAHBplayerGUID())
++#else
+         if (owner)
++#endif
+             owner->GetSession()->SendAuctionOwnerNotification(auction);
+ 
+         MailDraft(auction->BuildAuctionMailSubject(AUCTION_EXPIRED), AuctionEntry::BuildAuctionMailBody(0, 0, auction->buyout, auction->deposit, 0))
+@@ -207,6 +217,11 @@ void AuctionHouseMgr::SendAuctionOutbiddedMail(AuctionEntry* auction, uint32 new
+     // old bidder exist
+     if (oldBidder || oldBidder_accId)
+     {
++#ifdef MOD_AH_BOT
++        if (oldBidder && !newBidder)
++            oldBidder->GetSession()->SendAuctionBidderNotification(auction->GetHouseId(), auction->Id, auctionbot->GetAHBplayerGUID(), newPrice, auction->GetAuctionOutBid(), auction->item_template);
++#endif // MOD_AH_BOT
++
+         if (oldBidder && newBidder)
+             oldBidder->GetSession()->SendAuctionBidderNotification(auction->GetHouseId(), auction->Id, newBidder->GetGUID(), newPrice, auction->GetAuctionOutBid(), auction->item_template);
+ 
+@@ -407,10 +422,16 @@ void AuctionHouseObject::AddAuction(AuctionEntry* auction)
+ 
+     AuctionsMap[auction->Id] = auction;
+     sScriptMgr->OnAuctionAdd(this, auction);
++#ifdef MOD_AH_BOT
++    auctionbot->IncrementItemCounts(auction);
++#endif
+ }
+ 
+ bool AuctionHouseObject::RemoveAuction(AuctionEntry* auction)
+ {
++#ifdef MOD_AH_BOT
++    auctionbot->DecrementItemCounts(auction, auction->item_template);
++#endif
+     bool wasInMap = AuctionsMap.erase(auction->Id) ? true : false;
+ 
+     sScriptMgr->OnAuctionRemove(this, auction);
+diff --git a/src/server/game/Mails/Mail.cpp b/src/server/game/Mails/Mail.cpp
+index ef72cbfe2c..2f57ac9687 100644
+--- a/src/server/game/Mails/Mail.cpp
++++ b/src/server/game/Mails/Mail.cpp
+@@ -15,6 +15,9 @@
+ #include "Item.h"
+ #include "AuctionHouseMgr.h"
+ #include "CalendarMgr.h"
++#ifdef MOD_AH_BOT
++#include "AuctionHouseBot.h"
++#endif
+ 
+ MailSender::MailSender(Object* sender, MailStationery stationery) : m_stationery(stationery)
+ {
+@@ -168,6 +171,15 @@ void MailDraft::SendMailTo(SQLTransaction& trans, MailReceiver const& receiver,
+ 
+     uint32 mailId = sObjectMgr->GenerateMailID();
+ 
++#ifdef MOD_AH_BOT
++    if (receiver.GetPlayerGUIDLow() == auctionbot->GetAHBplayerGUID())
++    {
++        if (sender.GetMailMessageType() == MAIL_AUCTION)        // auction mail with items
++            deleteIncludedItems(trans, true);
++        return;
++    }
++#endif
++
+     time_t deliver_time = time(NULL) + deliver_delay;
+ 
+     //expire time if COD 3 days, if no COD 30 days, if auction sale pending 1 hour
+diff --git a/src/server/game/World/World.cpp b/src/server/game/World/World.cpp
+index 01b1fe0acb..38b0e5fc90 100644
+--- a/src/server/game/World/World.cpp
++++ b/src/server/game/World/World.cpp
+@@ -76,6 +76,9 @@
+ #include "AsyncAuctionListing.h"
+ #include "SavingSystem.h"
+ #include <VMapManager2.h>
++#ifdef MOD_AH_BOT
++#include "AuctionHouseBot.h"
++#endif
+ 
+ ACE_Atomic_Op<ACE_Thread_Mutex, bool> World::m_stopEvent = false;
+ uint8 World::m_ExitCode = SHUTDOWN_EXIT_CODE;
+@@ -1635,6 +1638,20 @@ void World::SetInitialWorldSettings()
+     sLog->outString("Loading Completed Achievements...");
+     sAchievementMgr->LoadCompletedAchievements();
+ 
++#ifdef MOD_AH_BOT
++    std::string conf_path = _CONF_DIR;
++    std::string cfg_file = conf_path + "/mod_ahbot.conf";
++#ifdef WIN32
++    cfg_file = "mod_ahbot.conf";
++#endif
++    std::string cfg_def_file = cfg_file + ".dist";
++    sConfigMgr->LoadMore(cfg_def_file.c_str());
++    sConfigMgr->LoadMore(cfg_file.c_str());
++
++    // Initialize AHBot settings before deleting expired auctions due to AHBot hooks
++    auctionbot->InitializeConfiguration();
++#endif
++
+     ///- Load dynamic data tables from the database
+     sLog->outString("Loading Item Auctions...");
+     sAuctionMgr->LoadAuctionItems();
+@@ -1871,6 +1888,11 @@ void World::SetInitialWorldSettings()
+     mgr = ChannelMgr::forTeam(TEAM_HORDE);
+     mgr->LoadChannels();
+ 
++#ifdef MOD_AH_BOT
++    sLog->outString("Initialize AuctionHouseBot...");
++    auctionbot->Initialize();
++#endif
++
+     uint32 startupDuration = GetMSTimeDiffToNow(startupBegin);
+     sLog->outString();
+     sLog->outError("WORLD: World initialized in %u minutes %u seconds", (startupDuration / 60000), ((startupDuration % 60000) / 1000));
+@@ -2031,6 +2053,9 @@ void World::Update(uint32 diff)
+         // pussywizard: handle auctions when the timer has passed
+         if (m_timers[WUPDATE_AUCTIONS].Passed())
+         {
++#ifdef MOD_AH_BOT
++            auctionbot->Update();
++#endif
+             m_timers[WUPDATE_AUCTIONS].Reset();
+ 
+             // pussywizard: handle expired auctions, auctions expired when realm was offline are also handled here (not during loading when many required things aren't loaded yet)
