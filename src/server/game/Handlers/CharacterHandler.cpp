@@ -768,7 +768,7 @@ void WorldSession::HandlePlayerLoginOpcode(WorldPacket & recvData)
     if (!IsLegitCharacterForAccount(GUID_LOPART(playerGuid)))
     {
         sLog->outError("Account (%u) can't login with that character (%u).", GetAccountId(), GUID_LOPART(playerGuid));
-        KickPlayer("T");
+        KickPlayer("Account can't login with this character");
         return;
     }
     
