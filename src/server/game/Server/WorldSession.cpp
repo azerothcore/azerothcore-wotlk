@@ -611,8 +611,9 @@ void WorldSession::LogoutPlayer(bool save)
 }
 
 /// Kick a player out of the World
-void WorldSession::KickPlayer(bool setKicked)
+void WorldSession::KickPlayer(std::string const& reason, bool setKicked)
 {
+    sLog->outDebug(LOG_FILTER_KICK_PLAYER, "Player kicked because of: %s", reason.c_str());
     if (m_Socket)
         m_Socket->CloseSocket();
 
