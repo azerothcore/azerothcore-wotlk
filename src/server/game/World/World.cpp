@@ -78,6 +78,9 @@
 #include "ServerMotd.h"
 #include "GameGraveyard.h"
 #include <VMapManager2.h>
+#ifdef MOD_AH_BOT
+#include "AuctionHouseBot.h"
+#endif
 #ifdef ELUNA
 #include "LuaEngine.h"
 #endif
@@ -1709,6 +1712,20 @@ void World::SetInitialWorldSettings()
     sLog->outString("Loading Completed Achievements...");
     sAchievementMgr->LoadCompletedAchievements();
 
+#ifdef MOD_AH_BOT
+    std::string conf_path = _CONF_DIR;
+    std::string cfg_file = conf_path + "/mod_ahbot.conf";
+#ifdef WIN32
+    cfg_file = "mod_ahbot.conf";
+#endif
+    std::string cfg_def_file = cfg_file + ".dist";
+    sConfigMgr->LoadMore(cfg_def_file.c_str());
+    sConfigMgr->LoadMore(cfg_file.c_str());
+
+    // Initialize AHBot settings before deleting expired auctions due to AHBot hooks
+    auctionbot->InitializeConfiguration();
+#endif
+
     ///- Load dynamic data tables from the database
     sLog->outString("Loading Item Auctions...");
     sAuctionMgr->LoadAuctionItems();
@@ -1941,6 +1958,10 @@ void World::SetInitialWorldSettings()
     mgr->LoadChannels();
     mgr = ChannelMgr::forTeam(TEAM_HORDE);
     mgr->LoadChannels();
+#ifdef MOD_AH_BOT
+    sLog->outString("Initialize AuctionHouseBot...");
+    auctionbot->Initialize();
+#endif
 
 #ifdef ELUNA
     ///- Run eluna scripts.
@@ -2114,6 +2135,10 @@ void World::Update(uint32 diff)
         // pussywizard: handle auctions when the timer has passed
         if (m_timers[WUPDATE_AUCTIONS].Passed())
         {
+			#ifdef MOD_AH_BOT
+            auctionbot->Update();
+#endif
+
             m_timers[WUPDATE_AUCTIONS].Reset();
 
             // pussywizard: handle expired auctions, auctions expired when realm was offline are also handled here (not during loading when many required things aren't loaded yet)
