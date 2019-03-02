@@ -1713,15 +1713,7 @@ void World::SetInitialWorldSettings()
     sAchievementMgr->LoadCompletedAchievements();
 
 #ifdef MOD_AH_BOT
-    std::string conf_path = _CONF_DIR;
-    std::string cfg_file = conf_path + "/mod_ahbot.conf";
-#ifdef WIN32
-    cfg_file = "mod_ahbot.conf";
-#endif
-    std::string cfg_def_file = cfg_file + ".dist";
-    sConfigMgr->LoadMore(cfg_def_file.c_str());
-    sConfigMgr->LoadMore(cfg_file.c_str());
-
+    
     // Initialize AHBot settings before deleting expired auctions due to AHBot hooks
     auctionbot->InitializeConfiguration();
 #endif
