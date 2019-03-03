@@ -121,7 +121,9 @@ bool WorldSocket::IsClosed(void) const
 
 void WorldSocket::CloseSocket(std::string const& reason)
 {
-    sLog->outDebug(LOG_FILTER_CLOSE_SOCKET, "Socket closed because of: %s", reason.c_str());
+    if (!reason.empty())
+        sLog->outDebug(LOG_FILTER_CLOSE_SOCKET, "Socket closed because of: %s", reason.c_str());
+
     {
         ACE_GUARD (LockType, Guard, m_OutBufferLock);
 
