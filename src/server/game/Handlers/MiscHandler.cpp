@@ -1136,14 +1136,6 @@ void WorldSession::HandleNextCinematicCamera(WorldPacket & /*recv_data*/)
 #endif
 }
 
-void WorldSession::HandleMoveTimeSkippedOpcode(WorldPacket & recv_data)
-{
-    uint64 guid;
-    uint32 time_skipped;
-    recv_data.readPackGUID(guid);
-    recv_data >> time_skipped;
-}
-
 void WorldSession::HandleFeatherFallAck(WorldPacket &recv_data)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
