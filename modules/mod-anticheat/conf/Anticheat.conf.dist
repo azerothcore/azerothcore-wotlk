@@ -1,0 +1,84 @@
+[worldserver]
+#
+###################################################################################################
+
+###################################################################################################
+#   ANTICHEAT MODULE
+#
+#     Anticheat.Enable
+#       Description: Enables or disables the Anticheat System functionality
+#       Default:     1 - (Enabled)
+#                    0 - (Disabled)
+
+Anticheat.Enabled = 1
+
+#     Anticheat.EnabledOnGmAccounts
+#       Description: Enables detection for GM accounts
+#       Default:    0 - (Disabled)
+#                   1 - (Enabled)
+
+Anticheat.EnabledOnGmAccounts = 0
+
+#     Anticheat.ReportsForIngameWarnings
+#       Description: How many reports the player must have to notify to GameMasters ingame when he generates a new report.
+#       Default:     70
+
+Anticheat.ReportsForIngameWarnings = 70
+
+#     Anticheat.MaxReportsForDailyReport
+#       Description: How many reports must the player have to make a report that it is in DB for a day (not only during the player's session).
+#       Default:     70
+
+Anticheat.MaxReportsForDailyReport = 70
+
+#     Anticheat.LoginMessage
+#       Description: Enable login message "This server is running an Anticheat module."
+#       Default: 1 
+
+Anticheat.LoginMessage = 0
+
+#     Anticheat.WriteLog
+#       Description: Enable writing to log when a player is detected using hacks
+#       Default:    0 - (Disabled)
+#                   1 - (Enabled)
+
+Anticheat.WriteLog = 0
+
+#     Anticheat.SaveReportsTime
+#       Description: Set the time between each report save in seconds
+#       Default:    60 - (seconds)
+
+Anticheat.SaveReportsTime = 60
+
+#     Anticheat.Detect
+#       Description: It represents which detections are enabled (ClimbHack disabled by default).
+#       Default:    1 - (Enabled)
+#                   0 - (Disabled)
+
+Anticheat.DetectFlyHack = 1
+Anticheat.DetectWaterWalkHack = 1
+Anticheat.DetectJumpHack = 1
+Anticheat.DetectTelePlaneHack = 1
+Anticheat.DetectSpeedHack = 1
+Anticheat.DetectClimbHack = 0
+
+#     Anticheat.StricterFlyHackCheck
+#       Description: Checks moveflag ascending (may give false positives)
+#       Default:    0 - (Disabled)
+#                   1 - (Enabled)
+
+Anticheat.StricterFlyHackCheck = 0
+
+#     Anticheat.KickPlayerFlyHack
+#       Description: Kick option for first detect on flyhack (may give false positives)
+#       Default:    0 - (Disabled)
+#                   1 - (Enabled)
+
+Anticheat.KickPlayerFlyHack = 0
+
+#     Anticheat.KickPlayerWaterWalkHack
+#       Description: Kick option for first detect on waterwalkhack (may give false positives)
+#       Default:    0 - (Disabled)
+#                   1 - (Enabled)
+
+Anticheat.KickPlayerWaterWalkHack = 0

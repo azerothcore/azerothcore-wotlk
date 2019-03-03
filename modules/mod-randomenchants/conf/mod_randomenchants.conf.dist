@@ -1,0 +1,66 @@
+[worldserver]
+###################################################################################################
+#     ____    __                                         ____                           
+#    /\  _`\ /\ \__                  __                 /\  _`\                         
+#    \ \,\L\_\ \ ,_\  __  __     __ /\_\     __      ___\ \ \/\_\    ___   _ __    __   
+#     \/_\__ \\ \ \/ /\ \/\ \  /'_ `\/\ \  /'__`\  /' _ `\ \ \/_/_  / __`\/\`'__\/'__`\ 
+#       /\ \L\ \ \ \_\ \ \_\ \/\ \L\ \ \ \/\ \L\.\_/\ \/\ \ \ \L\ \/\ \L\ \ \ \//\  __/ 
+#       \ `\____\ \__\\/`____ \ \____ \ \_\ \__/.\_\ \_\ \_\ \____/\ \____/\ \_\\ \____\
+#        \/_____/\/__/ `/___/> \/___L\ \/_/\/__/\/_/\/_/\/_/\/___/  \/___/  \/_/ \/____/
+#                         /\___/ /\____/                                                
+#                         \/__/  \_/__/          http://stygianthebest.github.io                   
+###################################################################################################
+#   RANDOM ENCHANTMENTS
+###################################################################################################
+
+#
+#     RandomEnchants.Enabled
+#        1: Enable, 0: Disable the module
+#        Default:     1
+RandomEnchants.Enabled = 1
+
+#
+#     RandomEnchants.Announce
+#        Announce a message on login for this module
+#        Default:     1
+RandomEnchants.Announce = 1
+
+#
+#     RandomEnchants.OnLoginMessage
+#        Message to display on login(Only applies if AnnounceOnLogin is enabled)
+#        Default:    "This server is running a RandomEnchants Module."
+RandomEnchants.OnLoginMessage="This server is running a RandomEnchants Module."
+
+#
+#     RandomEnchants.OnLoot
+#        Chance at random enchant on looting an item
+#        Default:     1
+RandomEnchants.OnLoot = 1
+
+#
+#     RandomEnchants.OnCreate
+#        Chance at random enchant on creating an item via profession
+#        Default:     1
+RandomEnchants.OnCreate = 1
+
+#
+#     RandomEnchants.OnQuestReward
+#        Chance at random enchant on obtaining item from quest reward
+#        Default:     1
+RandomEnchants.OnQuestReward = 1
+
+#
+#     RandomEnchants.Chance
+#        The percent chance an item has to be imbued with an enchantment.
+#		 Set these numbers higher for less drops.
+#        Default: 70, 65, 60 
+RandomEnchants.Chance1 = 70
+RandomEnchants.Chance2 = 65
+RandomEnchants.Chance3 = 60
+
+#
+#     RandomEnchants.MinimumQuality
+#        Only enchant items of a certain quality.
+#        Default:     High: 5, Low: 0
+RandomEnchants.HighQuality = 4
+RandomEnchants.LowQuality = 3

@@ -1,0 +1,57 @@
+[worldserver]
+###################################################################################################
+#     ____    __                                         ____                           
+#    /\  _`\ /\ \__                  __                 /\  _`\                         
+#    \ \,\L\_\ \ ,_\  __  __     __ /\_\     __      ___\ \ \/\_\    ___   _ __    __   
+#     \/_\__ \\ \ \/ /\ \/\ \  /'_ `\/\ \  /'__`\  /' _ `\ \ \/_/_  / __`\/\`'__\/'__`\ 
+#       /\ \L\ \ \ \_\ \ \_\ \/\ \L\ \ \ \/\ \L\.\_/\ \/\ \ \ \L\ \/\ \L\ \ \ \//\  __/ 
+#       \ `\____\ \__\\/`____ \ \____ \ \_\ \__/.\_\ \_\ \_\ \____/\ \____/\ \_\\ \____\
+#        \/_____/\/__/ `/___/> \/___L\ \/_/\/__/\/_/\/_/\/_/\/___/  \/___/  \/_/ \/____/
+#                         /\___/ /\____/                                                
+#                         \/__/  \_/__/          http://stygianthebest.github.io                                         
+###################################################################################################
+#	MONEY FOR KILLS
+###################################################################################################
+
+# Enable the module? (default: 1)
+MFK.Enable = 1
+
+# Announce the module when the player logs in? (default: 1)
+MFK.Announce = 1
+
+# Only allow the player with the killing blow to claim the bounty?
+# Default: 0 (All players receive the bounty)
+MFK.KillingBlowOnly = 0
+
+# Award bounty to party members far away from the group?
+# Default: 0 (Only award players near the group)
+MFK.MoneyForNothing = 0
+
+# Award loot on low level players
+# Default: 10 (No loot for killing players lower than this level)
+MFK.MinPVPLevel = 10
+
+# Award bounty on low level mobs
+# Default: 0 (No bounty for mobs lower than the player's level)
+MFK.LowLevelBounty = 0
+
+# How much gold does a Player take from the victim's corpse on a PVP kill?
+# Default: 5 (5% of the victim's gold)
+MFK.PVP.CorpseLootPercent = 5
+
+# Loot Examples:
+# Player and Creature kills are expressed in Copper and calculated as ((CreatureLevel * Multiplier) / 3)
+# Boss kills are expressed in Copper and calculated as ((CreatureLevel * Multiplier) * 100)
+#
+# Using a kill multiplier of 15.
+# MOB LEVEL 80: 400 copper per kill
+# MOB LEVEL 50: 250 copper per kill
+# MOB Level 10: 50 copper per kill
+
+# NOTE: There are many dungeon bosses per dungeon, so set accordingly! 
+# NOTE: A value of 0 will disable the payment type
+
+MFK.Kill.Multiplier = 15
+MFK.PVP.Multiplier = 25
+MFK.DungeonBoss.Multiplier = 5
+MFK.WorldBoss.Multiplier = 75

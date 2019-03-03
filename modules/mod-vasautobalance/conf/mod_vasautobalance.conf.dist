@@ -1,0 +1,220 @@
+[worldserver]
+###################################################################################################
+#     ____    __                                         ____                           
+#    /\  _`\ /\ \__                  __                 /\  _`\                         
+#    \ \,\L\_\ \ ,_\  __  __     __ /\_\     __      ___\ \ \/\_\    ___   _ __    __   
+#     \/_\__ \\ \ \/ /\ \/\ \  /'_ `\/\ \  /'__`\  /' _ `\ \ \/_/_  / __`\/\`'__\/'__`\ 
+#       /\ \L\ \ \ \_\ \ \_\ \/\ \L\ \ \ \/\ \L\.\_/\ \/\ \ \ \L\ \/\ \L\ \ \ \//\  __/ 
+#       \ `\____\ \__\\/`____ \ \____ \ \_\ \__/.\_\ \_\ \_\ \____/\ \____/\ \_\\ \____\
+#        \/_____/\/__/ `/___/> \/___L\ \/_/\/__/\/_/\/_/\/_/\/___/  \/___/  \/_/ \/____/
+#                         /\___/ /\____/                                                
+#                         \/__/  \_/__/          http://stygianthebest.github.io                                         
+###################################################################################################
+
+#
+# VAS AUTOBALANCE OPTIONS
+#
+#     VASAutoBalance.enable
+#        Enable/Disable Autobalance system
+#        Default:     1 (1 = ON, 0 = OFF)
+
+VASAutoBalance.enable=1
+
+#
+# VAS AUTOBALANCE OPTIONS
+#
+#     VASAutoBalance.enable
+#        Enable/Disable Autobalance system
+#        Default:     1 (1 = ON, 0 = OFF)
+
+VASAutoBalance.announce=1
+
+#     VASAutoBalance.InflectionPoint
+#        Adjust value of Hyperbolic Tangent function where
+#        the curve of scaling must change. An higher value means higher difficulty.
+#
+#        Example: with 0.5, a creature of raid (40) will have half of its life with 20 players in
+#                 with 0.3, the same creature will have half of its life with 12 players in
+#
+#        Default:     0.5
+
+VASAutoBalance.InflectionPoint=0.5
+
+#     VASAutoBalance.numPlayer
+#        Set Server to level of solo mode.
+#        Set to 0 to Disable VAS-SOLO Mod.
+#        Example: VAS.AutoBalance.XPlayer = 1 will set everything for a 1 player game.
+#        Default:     1
+
+VASAutoBalance.numPlayer=1.0
+
+#
+#     VASAutoBalance.levelScaling
+#        Check the max level of players in map and scale creature based on it
+#        0 = Disabled
+#        1 = Enabled only in dungeons
+#        2 = Always enabled
+#        Default:     1
+
+VASAutoBalance.levelScaling=1
+
+#
+#     VASAutoBalance.levelHigherOffset
+#     VASAutoBalance.levelLowerOffset
+#        Level Offsets between creatures will not be scaled by level.
+#        You can even use it to disable scaling from lower to higher levelScaling
+#        setting levelLowerOffset to 80 (max wotlk level) for example.
+#        default: 3 (higher), 0 (lower) 
+
+VASAutoBalance.levelHigherOffset = 3
+VASAutoBalance.levelLowerOffset  = 0
+
+#
+#     VASAutoBalance.levelUseDbValuesWhenExists
+#        When enabled with levelScaling, the creature will use its default database values
+#        instead of level scaling formula when player/party level has correspondance with 
+#        creature_template minlevel/maxlevel.
+#
+#        Default:     0 (1 = ON, 0 = OFF)
+
+VASAutoBalance.levelUseDbValuesWhenExists = 0
+
+#
+#     VASAutoBalance.LevelEndGameBoost
+#        End game creatures have an exponential (not linear) regression
+#        that is not correctly handled by db values. Keep this enabled
+#        to have stats as near possible to the official ones.
+#
+#        Default:     1 (1 = ON, 0 = OFF)
+
+VASAutoBalance.LevelEndGameBoost = 1
+
+#
+#     VASAutoBalance.Instances
+#        Set instances to Auto chance XPlayer depending on players in it.
+#        Default:     1 (1 = ON, 0 = OFF)
+
+VASAutoBalance.Instances=1
+#
+#     VASAutoBalance.DungeonsOnly
+#        Only apply scaling changes to dungeons and raids
+#        Default:     1 (1 = ON, 0 = OFF)
+VASAutoBalance.DungeonsOnly=1
+
+#
+#     VASAutoBalance.DebugLevel
+#        0 = None
+#        1 = Errors Only
+#        2 = Errors and Basic Information
+#        3 = All VAS Info
+#        Default:     2
+
+VASAutoBalance.DebugLevel=2
+
+#
+#     VAS.AutoBalance.PlayerChangeNotify
+#        Set Auto Notifications to all players in Instance that player count has changed.
+#        Default:     1 (1 = ON, 0 = OFF)
+
+VASAutoBalance.PlayerChangeNotify=1
+
+#
+#     VASAutoBalance.MinHPModifier
+#        Minimum Modifier setting for Health Modification
+#        Default:     0.01
+
+VASAutoBalance.MinHPModifier=0.01
+
+#
+#     VASAutoBalance.MinDamageModifier
+#        Minimum Modifier setting for Damage Modification
+#        Default:     0.01
+
+VASAutoBalance.MinDamageModifier=0.01
+
+
+#
+#     VASAutoBalance.rate.*
+#        You can tune all rates increasing/decreasing difficulty in a linear way
+#        Note that global rate will increase all other rates. For example:
+#        global = 2.0 , damage = 1.5  -> it means that damage will be 3.0
+#        Default:     1.0
+
+VASAutoBalance.rate.global = 1.0
+VASAutoBalance.rate.health = 1.0
+VASAutoBalance.rate.mana   = 1.0
+VASAutoBalance.rate.armor  = 1.0
+VASAutoBalance.rate.damage = 1.0
+
+#
+#     VASAutoBalance.playerCountDifficultyOffset
+#        Offset of players inside an instance
+#        Default:     0
+
+VASAutoBalance.playerCountDifficultyOffset=0
+
+#
+#     VASAutoBalance.ForcedIDXX
+#        Sets MobIDs for the group they belong to.
+#        All 5 Man Mobs should go in VAS.AutoBalance.5.Name
+#        All 10 Man Mobs should go in VAS.AutoBalance.10.Name etc.
+
+VASAutoBalance.ForcedID40="11583,16441,30057,13020,15589,14435,18192,14889,14888,14887,14890,15302,15818,15742,15741,15740,18338"
+VASAutoBalance.ForcedID25="22997,21966,21965,21964,21806,21215,21845,19728,12397,17711,18256,18192,"
+VASAutoBalance.ForcedID20=""
+VASAutoBalance.ForcedID10="15689,15550,16152,17521,17225,16028,29324,31099"
+VASAutoBalance.ForcedID5="8317,15203,15204,15205,15305,6109,26801,30508,26799,30495,26803,30497,27859,27249"
+VASAutoBalance.ForcedID2=""
+
+#
+#     VASAutoBalance.DisabledID
+#        Disable scaling on specific creatures
+#
+
+VASAutoBalance.DisabledID=""
+
+##########################
+#
+# REWARD SYSTEM (experimental)
+#
+##########################
+
+
+#
+#   VASAutoBalance.reward.enable
+#       This is an experimental feature to reward a player that kill a boss when
+#       a pre-wotlk dungeon/raid is completed with creature levelling enabled.
+#       This is an idea to boost old contents even if you're end-game player.
+#
+#       Default:     0 (1 = ON, 0 = OFF)
+
+VASAutoBalance.reward.enable = 0
+
+
+#
+#   VASAutoBalance.reward.raidToken
+#   VASAutoBalance.reward.dungeonToken
+#
+#
+#       Default: 
+#           raidToken -> emblem of frost (49426)
+#           dungeonToken -> emblem of triumph (47241)
+
+VASAutoBalance.reward.raidToken    = 49426
+VASAutoBalance.reward.dungeonToken = 47241
+
+#
+#   VASAutoBalance.reward.MinPlayerReward
+#       This conf option checks how many players are in the same 
+#       map before allowing the reward to be carried out
+#       if MinPlayerReward is set to two and player is soloing this conf doesn't reward then.
+#		this will give more a challenge to players for low level instances.
+#
+#       Default:     1
+
+VASAutoBalance.reward.MinPlayerReward = 1
+
+
+###################################################################################################
+#	END OF LINE
+###################################################################################################

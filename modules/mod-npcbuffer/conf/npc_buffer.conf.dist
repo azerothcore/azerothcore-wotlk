@@ -1,0 +1,53 @@
+[worldserver]
+###################################################################################################
+#     ____    __                                         ____                           
+#    /\  _`\ /\ \__                  __                 /\  _`\                         
+#    \ \,\L\_\ \ ,_\  __  __     __ /\_\     __      ___\ \ \/\_\    ___   _ __    __   
+#     \/_\__ \\ \ \/ /\ \/\ \  /'_ `\/\ \  /'__`\  /' _ `\ \ \/_/_  / __`\/\`'__\/'__`\ 
+#       /\ \L\ \ \ \_\ \ \_\ \/\ \L\ \ \ \/\ \L\.\_/\ \/\ \ \ \L\ \/\ \L\ \ \ \//\  __/ 
+#       \ `\____\ \__\\/`____ \ \____ \ \_\ \__/.\_\ \_\ \_\ \____/\ \____/\ \_\\ \____\
+#        \/_____/\/__/ `/___/> \/___L\ \/_/\/__/\/_/\/_/\/_/\/___/  \/___/  \/_/ \/____/
+#                         /\___/ /\____/                                                
+#                         \/__/  \_/__/          http://stygianthebest.github.io                                         
+###################################################################################################
+#	BUFFER NPC
+###################################################################################################
+
+# Announce the module when the player logs in? (Default: 1)
+BufferNPC.Announce = 1
+
+# Cure Resurrection Sickness? (Default: 1)
+Buff.CureRes = 1
+
+# Limit buffs by level (Default: 1, Disabled: 0)
+Buff.ByLevel = 1
+
+# Buff Defaults (Leave blank to disable a buff)
+# This function is not active if Buff.ByLevel = 1
+# 1. Prayer of Fortitude (48162)
+# 2. Greater Blessing of Kings (43223)
+# 3. Mark of the Wild (48469)
+# 4. Prayer of Spirit (48074)
+# 5. Prayer of Shadow Protection (48170)
+# 6. Arcane Intellect (36880)
+# ----------------------------------------------
+# Fun Stuff
+# 48612 (Dalron the Controller)
+Buff.Spells = "48162;43223;48469;48074;48170;36880;"
+
+# How many phrases does the buffer speak? (Default: 10)
+Buff.NumPhrases = 10
+
+# Buffer Phrases - Add your own!
+Buff.M1 = "Koiter's spirit stands watch looking out over the Barrens. Have you visted the shrine yet %s?"
+Buff.M2 = "The king's bones are still there. Everlasting in the dust. The weapons are there too.. if you know where to look %s."
+Buff.M3 = "She never shook the stars from the swirling cosmos, but she loved good tauren and rode good kodos."
+Buff.M4 = "Oh %s, how I miss those days in the wastes.. watching the sun set over Nagrand."
+Buff.M5 = "Ahh.. long time no see %s, how goes it on the war front old friend?"
+Buff.M6 = "You're buffed, you're the stuff, and the elven females can't get enuff!"
+Buff.M7 = "You'll find the statue off the shores of Azshara %s. It lies in ruin and is guarded by a large dragon."
+Buff.M8 = "To crush your enemies, see them driven before %s, and hear the lamentations of their women!"
+Buff.M9 = "Aye.. %s. Rumor has it there are two slaves in the cages of Blackrock Depths. Perhaps they can tell you more."
+Buff.M10 = "Indeed.. %s. The dwarves keep many secrets about that which lies beyond the deep recesses of their kingdoms."
+Buff.M11 = "A little bit of this.. a dab of that.. ahh.. there we go %s."
+

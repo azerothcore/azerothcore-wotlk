@@ -1,0 +1,22 @@
+[worldserver]
+
+#
+#    RewardSystemEnable
+#        Description: Enable the reward system
+#        Default:     1  - (Enabled)
+#                     0  - (Disabled)
+RewardSystemEnable = 1
+
+#
+#    RewardTime
+#        Description: Time in hours to reward the player
+#        Default:     1  - (Enabled)
+#                     
+RewardTime = 1
+
+#
+#    MaxRoll
+#        Description: Max roll the player will do
+#        Default:     1000  - (Enabled)
+#                     
+MaxRoll = 1000

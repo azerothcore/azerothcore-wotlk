@@ -1,0 +1,7 @@
+CU_SET_PATH("CMAKE_MOD_NPCLOREMASTER_DIR" "${CMAKE_CURRENT_LIST_DIR}")
+
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/src/npc_loremaster.cpp")
+
+AC_ADD_SCRIPT_LOADER("NPCLoremaster" "${CMAKE_CURRENT_LIST_DIR}/src/loader_loremaster.h")
+
+CU_ADD_HOOK(AFTER_WORLDSERVER_CMAKE "${CMAKE_CURRENT_LIST_DIR}/src/cmake/after_ws_install.cmake")

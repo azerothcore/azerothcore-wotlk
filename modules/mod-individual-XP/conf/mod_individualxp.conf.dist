@@ -1,0 +1,38 @@
+[worldserver]
+###################################################################################################
+#     ____    __                                         ____                           
+#    /\  _`\ /\ \__                  __                 /\  _`\                         
+#    \ \,\L\_\ \ ,_\  __  __     __ /\_\     __      ___\ \ \/\_\    ___   _ __    __   
+#     \/_\__ \\ \ \/ /\ \/\ \  /'_ `\/\ \  /'__`\  /' _ `\ \ \/_/_  / __`\/\`'__\/'__`\ 
+#       /\ \L\ \ \ \_\ \ \_\ \/\ \L\ \ \ \/\ \L\.\_/\ \/\ \ \ \L\ \/\ \L\ \ \ \//\  __/ 
+#       \ `\____\ \__\\/`____ \ \____ \ \_\ \__/.\_\ \_\ \_\ \____/\ \____/\ \_\\ \____\
+#        \/_____/\/__/ `/___/> \/___L\ \/_/\/__/\/_/\/_/\/_/\/___/  \/___/  \/_/ \/____/
+#                         /\___/ /\____/                                                
+#                         \/__/  \_/__/          http://stygianthebest.github.io                                         
+###################################################################################################
+#  INDIVIDUAL XP
+###################################################################################################
+
+#    IndividualXp.Enabled 
+#        Description: Enable or Disable the IndividualXP Module.
+#        Default:     IndividualXp.Enabled   = 1
+#
+IndividualXp.Enabled = 1
+
+#
+#    IndividualXp.Announce 
+#        Description: Announce the IndividualXP Module at logon.
+#        Default:     IndividualXp.Announce   = 1
+#
+IndividualXp.Announce = 1
+
+#    MaxXPRate 
+#        Description: This is the max amount a player can set their xp to.
+#        Default:     Default  = 1
+#
+MaxXPRate = 1
+
+#    DefaultXPRate
+#        Description: This is the default rate players start with.
+#        Default:     Default  = 1
+DefaultXPRate = 1

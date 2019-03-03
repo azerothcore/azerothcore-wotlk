@@ -1,0 +1,63 @@
+[worldserver]
+
+################################################################################################################
+#
+#    PremiumAccount
+#        Description: Enable PremiumAccount for players
+#        Default:     1  - (Enabled)
+#                     0  - (Disabled)
+PremiumAccount = 1
+
+#    Morph
+#        Description: Enable Morph & demorph option for players
+#        Default:     1  - (Enabled)
+#                     0  - (Disabled)
+Morph = 1
+
+#    Mount
+#        Description: Allow Players to use mount
+#        Default:     1  - (Enabled)
+#                     0  - (Disabled)
+Mount = 1
+
+#    Class Trainers
+#        Description: Allows players to spawn class trainers
+#        Default:     1  - (Enabled)
+#                     0  - (Disabled)
+Trainers = 1
+
+#################################################################################################################
+#    PlayerInteraction
+#        Description: This enables the submenu for the below
+#        Default:     1  - (Enabled)
+#                     0  - (Disabled)
+PlayerInteraction = 1
+#
+#    Bank
+#        Description: Allow Players to use mobile bank
+#        Default:     1  - (Enabled)
+#                     0  - (Disabled)
+Bank = 1
+#
+#    Auction
+#        Description: Allow Players to use mobile Auction
+#        Default:     1  - (Enabled)
+#                     0  - (Disabled)
+Auction = 1
+#    Vendor
+#        Description: Allow Players to use vendor
+#        Default:     1  - (Enabled)
+#                     0  - (Disabled)
+Vendor = 1
+#
+#    Mail Box
+#        Description: Allow Players Access ingame Mail
+#        Default:     1  - (Enabled)
+#                     0  - (Disabled)
+MailBox = 1
+
+##################################################################################################################
+#   Premium.NpcDuration
+#       Description: Time (in seconds) before despawn of summoned NPC
+#       Default:    60 - (Seconds)
+Premium.NpcDuration = 60

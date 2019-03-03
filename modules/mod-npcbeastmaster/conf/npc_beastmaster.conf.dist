@@ -1,0 +1,51 @@
+[worldserver]
+###################################################################################################
+#     ____    __                                         ____                           
+#    /\  _`\ /\ \__                  __                 /\  _`\                         
+#    \ \,\L\_\ \ ,_\  __  __     __ /\_\     __      ___\ \ \/\_\    ___   _ __    __   
+#     \/_\__ \\ \ \/ /\ \/\ \  /'_ `\/\ \  /'__`\  /' _ `\ \ \/_/_  / __`\/\`'__\/'__`\ 
+#       /\ \L\ \ \ \_\ \ \_\ \/\ \L\ \ \ \/\ \L\.\_/\ \/\ \ \ \L\ \/\ \L\ \ \ \//\  __/ 
+#       \ `\____\ \__\\/`____ \ \____ \ \_\ \__/.\_\ \_\ \_\ \____/\ \____/\ \_\\ \____\
+#        \/_____/\/__/ `/___/> \/___L\ \/_/\/__/\/_/\/_/\/_/\/___/  \/___/  \/_/ \/____/
+#                         /\___/ /\____/                                                
+#                         \/__/  \_/__/          http://stygianthebest.github.io                                         
+###################################################################################################
+#	BEASTMASTER NPC
+###################################################################################################
+
+# Announce the module when the player logs in?
+BeastMaster.Announce = 1
+
+# Is the core Pet.cpp modified? (default: 0)
+BeastMaster.CorePatch = 1
+
+# Required level to adopt beasts. (default: 10, 0 = disable)
+BeastMaster.MinLevel = 10
+
+# Enable only for the Hunter class? (default: 0)
+BeastMaster.HunterOnly = 0
+
+# Hunters are required to have beast mastery to adopt exotic pets. (default: 0)
+BeastMaster.TalentRequired = 0
+
+# Allow adoption of exotic beasts (Spirit Beast) without Beast Mastery talent. (default: 1)
+BeastMaster.AdoptExotic = 1
+
+# Beast's are always happy! (default: 1)
+BeastMaster.KeepBeastHappy = 1
+
+# Make your beasts larger or smaller when spawned (default: 1.00)
+BeastMaster.BeastScale = 1.00
+
+# Define the beasts you'd like to use below. They will be sorted alphabetically
+# in the game menu. The default model I chose for each pet below is that of a rare 
+# creature of the same type.
+
+# Normal Beasts
+BeastMaster.Beasts="Bat (Shadikith The Glider),10357,Bear (Ursollok),12037,Boar (Armored),29996,Cat (ShadowClaw),2175,Carrion Bird (Zaricotl),2931,Crab (Crusty),18241,Crocolisk(Izod Green),1417,Dragonhawk (Bloodfalcon),18155,Gorilla (King Mukla),1559,Hound (Darkhound),29452,Hyena (Snort the Heckler),5829,Moth (Aspatha the Broodmother),25498,Nether Ray (Count Ungula),18285,Owl (Olm the Wise),14343,Raptor (Lar'korwi),9684,Ravager (Rip-Blade),22123,Scorpid (Krellak),14476,Serpent (Emperor Cobra),28011,Spider (Krethis the Shadowspinner),12433,Spore Bat (Sporewing),18280,Tallstrider (Green/Purple),22807,Turtle (Cranky Benj),14223,Warp Stalker (Gezzarak the Huntress),23163,Wasp (Blacksting),18283,Wind Serpent (Azzere the Skyblade),5834,Wolf (Ghostpaw Alpha),3825,Worg (Oil-Stained),24128"
+
+# Rare Beasts
+BeastMaster.RareBeasts="Bird (Aotona),32481,Tallstrider (Mazzranache),3068,Wolf Core Hound (The Kurken),17447,Chimaera (Nuramoc),20932,Core Hound (Molten Lava),33502,Devilsaur (King Krush),32485,Rhino (Wooly Matriarch),25487,Silithid (Clutchmother Zavas),6582,Jormungar Worm (Rattlebore),30422"
+
+# Exotic Beasts
+BeastMaster.ExoticBeasts="Arcturis (Spirit Bear),38453,Gondria (Spirit Tiger),33776,Loque'nahak (Spirit Leopard),32517,Skoll (Spirit Worg),35189"

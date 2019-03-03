@@ -1,0 +1,52 @@
+[worldserver]
+###################################################################################################
+#     ____    __                                         ____                           
+#    /\  _`\ /\ \__                  __                 /\  _`\                         
+#    \ \,\L\_\ \ ,_\  __  __     __ /\_\     __      ___\ \ \/\_\    ___   _ __    __   
+#     \/_\__ \\ \ \/ /\ \/\ \  /'_ `\/\ \  /'__`\  /' _ `\ \ \/_/_  / __`\/\`'__\/'__`\ 
+#       /\ \L\ \ \ \_\ \ \_\ \/\ \L\ \ \ \/\ \L\.\_/\ \/\ \ \ \L\ \/\ \L\ \ \ \//\  __/ 
+#       \ `\____\ \__\\/`____ \ \____ \ \_\ \__/.\_\ \_\ \_\ \____/\ \____/\ \_\\ \____\
+#        \/_____/\/__/ `/___/> \/___L\ \/_/\/__/\/_/\/_/\/_/\/___/  \/___/  \/_/ \/____/
+#                         /\___/ /\____/                                                
+#                         \/__/  \_/__/          http://stygianthebest.github.io                                         
+###################################################################################################
+#   CUSTOM LOGIN
+###################################################################################################
+
+# Enable the module? (default: 1)
+Login.Enable = 1
+
+# Announce the module when the player logs in? (default: 1)
+Login.Announce = 1
+
+# Inform when players enter and exit the game (default: 1)
+Login.PlayerAnnounce = 1
+
+# New characters start with BoA items? (default: 1)
+Login.BoA = 1
+
+# Which items should we give the player? (default: 1)
+# I prefer the ring and a trinket for new players.
+Login.BoA.Ring = 1
+Login.BoA.Bags = 1
+Login.BoA.Shoulders = 0
+Login.BoA.Shoulders2 = 0
+Login.BoA.Chest = 0
+Login.BoA.Chest2 = 0
+Login.BoA.Trinket = 1
+Login.BoA.Trinket2 = 0
+Login.BoA.Weapon = 0
+Login.BoA.Weapon2 = 0
+Login.BoA.Weapon3 = 0
+
+# New characters start with additional weapon skills? (default: 1)
+Login.Skills = 1
+
+# New characters start with special abilities? (default: 0)
+Login.SpecialAbility = 0
+
+# New characters start with Exalted reputation for main city factions? (default: 1)
+Login.Reputation = 1
+
+
+

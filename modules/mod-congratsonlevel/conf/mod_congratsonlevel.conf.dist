@@ -1,0 +1,90 @@
+[worldserver]
+###################################################################################################
+#     ____    __                                         ____                           
+#    /\  _`\ /\ \__                  __                 /\  _`\                         
+#    \ \,\L\_\ \ ,_\  __  __     __ /\_\     __      ___\ \ \/\_\    ___   _ __    __   
+#     \/_\__ \\ \ \/ /\ \/\ \  /'_ `\/\ \  /'__`\  /' _ `\ \ \/_/_  / __`\/\`'__\/'__`\ 
+#       /\ \L\ \ \ \_\ \ \_\ \/\ \L\ \ \ \/\ \L\.\_/\ \/\ \ \ \L\ \/\ \L\ \ \ \//\  __/ 
+#       \ `\____\ \__\\/`____ \ \____ \ \_\ \__/.\_\ \_\ \_\ \____/\ \____/\ \_\\ \____\
+#        \/_____/\/__/ `/___/> \/___L\ \/_/\/__/\/_/\/_/\/_/\/___/  \/___/  \/_/ \/____/
+#                         /\___/ /\____/                                                
+#                         \/__/  \_/__/          http://stygianthebest.github.io                                         
+###################################################################################################
+#	CONGRATS ON LEVEL-UP
+###################################################################################################
+
+# Enable the module? (1: true | 0: false)
+Congrats.Enable = 1
+
+# Announce the module when the player logs in?
+Congrats.Announce = 1
+
+# Set what the player receives at each level
+# M: Gold 
+# S: SpellID to be cast on the player
+# 1: First ItemID to be given to the player
+# 2: Second ItemID to be given to the player
+
+# Level 10
+# 1 Gold / Blessing of Kings
+# Red Rose / TCG: Foam Sword Rack
+Congrats.L10M = 1
+Congrats.L10S = 20217
+Congrats.L101 = 3419
+Congrats.L102 = 45062
+
+# Level 20
+# 10 Gold / Power Word Fortitude
+# Rag Doll / TCG: Flag of Ownership
+Congrats.L20M = 2
+Congrats.L20S = 48161
+Congrats.L201 = 5433
+Congrats.L202 = 38578
+
+# Level 30
+# 15 Gold / Mark of the Wild
+# Sleeveless T-Shirt / TCG: Ogre Pinata 
+Congrats.L30M = 3
+Congrats.L30S = 48469
+Congrats.L301 = 18231
+Congrats.L302 = 46780
+
+# Level 40
+# 20 Gold / Blessing of Kings
+# Shadow Circuit / TCG: Carved Ogre Idol 
+Congrats.L40M = 4
+Congrats.L40S = 20217
+Congrats.L401 = 31945
+Congrats.L402 = 49704
+
+# Level 50
+# 25 Gold / Power Word Fortutude
+# Blood of the Mountain / TCG: Imp in a Ball
+Congrats.L50M = 5
+Congrats.L50S = 48161
+Congrats.L501 = 11382
+Congrats.L502 = 32542
+
+# Level 60
+# 30 Gold / Mark of the Wild
+# Direbrew's Remote / TCG: Goblin Gumbo Kettle
+Congrats.L60M = 6
+Congrats.L60S = 48469
+Congrats.L601 = 37863
+Congrats.L602 = 33219
+
+# Level 70
+# 35 Gold / Power Word Fortitude
+# Cuergo's Gold / TCG: Instant Statue Pedestal
+Congrats.L70M = 7
+Congrats.L70S = 48161
+Congrats.L701 = 9360
+Congrats.L702 = 54212
+
+# Level 80
+# 100 Gold / Blessing of Kings
+# Cuergo's Gold with Worm / Haunted Momento
+Congrats.L80M = 8
+Congrats.L80S = 20217
+Congrats.L801 = 9361
+Congrats.L802 = 40110

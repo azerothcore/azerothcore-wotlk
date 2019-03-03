@@ -1,0 +1,28 @@
+[worldserver]
+###################################################################################################
+#	LEVEL UP ITEM
+###################################################################################################
+#
+# This module was downloaded from the AzerothCore module catalog. It has been modified and packaged
+# for use with the StygianCore repack (http://stygianthebest.github.io).
+#
+
+#    Enable the module
+#        Default:     Enabled  = 1
+#                     Disabled = 0
+LevelItem.Enable = 1
+
+
+#    Announce the module
+#        Default:     Enabled  = 1
+#                     Disabled = 0
+LevelItem.Announce = 1
+
+
+#
+#    Set item's max level
+#        Description: Max level the Item can be used up to
+#        Default:     Enabled = 80
+#                     
+
+LevelItem.MaxItemLevel = 80
