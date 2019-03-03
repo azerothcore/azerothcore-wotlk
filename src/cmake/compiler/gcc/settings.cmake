@@ -7,14 +7,14 @@ if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS GCC_EXPECTED_VERSION)
   message(FATAL_ERROR "GCC: This project requires version ${GCC_EXPECTED_VERSION} to build but found ${CMAKE_CXX_COMPILER_VERSION}")
 endif()
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-message(STATUS "GCC: Enabled c++11 support")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
+message(STATUS "GCC: Enabled c++17 support")
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu99")
 message(STATUS "GCC: Enabled C99 support")
 
 if(PLATFORM EQUAL 32)
-  # Required on 32-bit systems to enable SSE2 (standard on x64)
+  # Required on 32-bit systems to enable SSE2 (standard on x64)<
   set(SSE_FLAGS "-msse2 -mfpmath=sse")
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${SSE_FLAGS}")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SSE_FLAGS}")
