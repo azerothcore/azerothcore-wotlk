@@ -1,0 +1,23 @@
+[worldserver]
+
+###################################################################################################
+#	GAMBLER NPC
+###################################################################################################
+
+# Announce the module when the player logs in?
+
+GamblerNPC.Announce = 1
+
+# Gambling amounts in gold the player can choose from.
+# The random win/loss works well, but larger amounts can be abused.
+# Defaults: 1, 2, 3, 4, 5
+
+Gambler.Amount1 = 1
+Gambler.Amount2 = 2
+Gambler.Amount3 = 3
+Gambler.Amount4 = 4
+Gambler.Amount5 = 5
+
+# Jackpot Amount In Gold (If 100 rolled in the first 10 bets)
+
+Gambler.Jackpot = 50
