@@ -254,7 +254,7 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
         
         /// If necessary, kick the player because the client didn't send anything for too long
         /// (or they've been idling in character select)
-        if (IsConnectionIdle())
+        if (sWorld->getBoolConfig(CONFIG_CLOSE_IDLE_CONNECTIONS) && IsConnectionIdle())
             m_Socket->CloseSocket();
     }
 
