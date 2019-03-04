@@ -459,6 +459,16 @@ void World::LoadConfigSettings(bool reload)
     }
 
     LoadModuleConfigSettings();
+
+#ifdef ELUNA
+    ///- Initialize Lua Engine
+    if (!reload)
+    {
+        sLog->outString("Initialize Eluna Lua Engine...");
+        Eluna::Initialize();
+    }
+#endif
+
     sScriptMgr->OnBeforeConfigLoad(reload);
 
     // Reload log levels and filters
@@ -682,6 +692,7 @@ void World::LoadConfigSettings(bool reload)
     else
         m_int_configs[CONFIG_PORT_WORLD] = sConfigMgr->GetIntDefault("WorldServerPort", 8085);
 
+    m_bool_configs[CONFIG_CLOSE_IDLE_CONNECTIONS] = sConfigMgr->GetBoolDefault("CloseIdleConnections", true);
     m_int_configs[CONFIG_SOCKET_TIMEOUTTIME] = sConfigMgr->GetIntDefault("SocketTimeOutTime", 900000);
     m_int_configs[CONFIG_SOCKET_TIMEOUTTIME_ACTIVE] = sConfigMgr->GetIntDefault("SocketTimeOutTimeActive", 60000);
     m_int_configs[CONFIG_SESSION_ADD_DELAY] = sConfigMgr->GetIntDefault("SessionAddDelay", 10000);
@@ -1333,21 +1344,6 @@ void World::SetInitialWorldSettings()
     {
         vmmgr2->GetLiquidFlagsPtr = &GetLiquidFlags;
     }
-
-#ifdef ELUNA
-    ///- Initialize Lua Engine
-    sLog->outString("Initialize Eluna Lua Engine...");
-
-    std::string conf_path = _CONF_DIR;
-    std::string cfg_file = conf_path + "/mod_LuaEngine.conf";
-#ifdef WIN32
-    cfg_file = "mod_LuaEngine.conf";
-#endif
-    std::string cfg_def_file = cfg_file + ".dist";
-    sConfigMgr->LoadMore(cfg_def_file.c_str());
-    sConfigMgr->LoadMore(cfg_file.c_str());
-    Eluna::Initialize();
-#endif
 
     ///- Initialize config settings
     LoadConfigSettings();
