@@ -5,22 +5,19 @@
 *   text=auto eol=lf
 
 # Text
-*.conf
-*.conf.dist
-*.txt
-*.md
-*.cmake
+*.conf text
+*.conf.dist text
+*.cmake text
 
-# Bash
+## Scripts
 *.sh text
+*.fish text
+*.lua text
 
-# Lua if lua module?
-*.lua
+## SQL
+*.sql text
 
-# SQL
-*.sql
-
-# C++
+## C++
 *.c text
 *.cc text
 *.cxx text
@@ -46,17 +43,63 @@
 *.rtf	 diff=astextplain
 *.RTF	 diff=astextplain
 
+## DOCUMENTATION
+*.markdown   text
+*.md         text
+*.mdwn       text
+*.mdown      text
+*.mkd        text
+*.mkdn       text
+*.mdtxt      text
+*.mdtext     text
+*.txt        text
+AUTHORS      text
+CHANGELOG    text
+CHANGES      text
+CONTRIBUTING text
+COPYING      text
+copyright    text
+*COPYRIGHT*  text
+INSTALL      text
+license      text
+LICENSE      text
+NEWS         text
+readme       text
+*README*     text
+TODO         text
 
-# Graphics
-*.png binary
-*.jpg binary
+## GRAPHICS
+*.ai   binary
+*.bmp  binary
+*.eps  binary
+*.gif  binary
+*.ico  binary
+*.jng  binary
+*.jp2  binary
+*.jpg  binary
 *.jpeg binary
-*.gif binary
-*.tif binary
+*.jpx  binary
+*.jxr  binary
+*.pdf  binary
+*.png  binary
+*.psb  binary
+*.psd  binary
+*.svg  text
+*.svgz binary
+*.tif  binary
 *.tiff binary
-*.ico binary
-# SVG treated as an asset (binary) by default. If you want to treat it as text,
-# comment-out the following line and uncomment the line after.
-*.svg binary
-#*.svg text
-*.eps binary
+*.wbmp binary
+*.webp binary
+
+
+## ARCHIVES
+*.7z  binary
+*.gz  binary
+*.jar binary
+*.rar binary
+*.tar binary
+*.zip binary
+
+## EXECUTABLES
+*.exe binary
+*.pyc binary
