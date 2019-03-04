@@ -2316,9 +2316,9 @@ MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(const Unit* victim, WeaponAttackTy
             if (victim->IsNonMeleeSpellCast(false, false, true) || victim->HasUnitState(UNIT_STATE_CONTROLLED))
                 tmp = 0;
 
-            if (tmp > 0                                         // check if unit _can_ parry
+            if ((tmp > 0                                         // check if unit _can_ parry
                 && (tmp -= skillBonus) > 0
-                && roll < (sum += tmp))
+                && roll < (sum += tmp)) || (victim->HasAura(19263))) // deterrence
             {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
                 sLog->outStaticDebug ("RollMeleeOutcomeAgainst: PARRY <%d, %d)", sum-tmp, sum);
