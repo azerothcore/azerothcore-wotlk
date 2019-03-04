@@ -5,7 +5,7 @@
 #ifndef DEF_MAGTHERIDONS_LAIR_H
 #define DEF_MAGTHERIDONS_LAIR_H
 
-#include "ScriptPCH.h"
+#include "SpellScript.h"
 
 enum DataTypes
 {

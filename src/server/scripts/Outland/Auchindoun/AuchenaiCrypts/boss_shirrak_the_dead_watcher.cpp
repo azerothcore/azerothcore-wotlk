@@ -3,9 +3,10 @@
 */
 
 #include "ScriptMgr.h"
-#include "ScriptPCH.h"
 #include "ScriptedCreature.h"
 #include "Player.h"
+#include "SpellScript.h"
+#include "SpellAuras.h"
 
 enum eShirrak
 {

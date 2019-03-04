@@ -1110,7 +1110,31 @@ bool WorldObject::_IsWithinDist(WorldObject const* obj, float dist2compare, bool
     return distsq < maxdist * maxdist;
 }
 
-bool WorldObject::IsWithinLOSInMap(const WorldObject* obj) const
+Position WorldObject::GetHitSpherePointFor(Position const& dest) const
+{
+    G3D::Vector3 vThis(GetPositionX(), GetPositionY(), GetPositionZ());
+    G3D::Vector3 vObj(dest.GetPositionX(), dest.GetPositionY(), dest.GetPositionZ());
+    G3D::Vector3 contactPoint = vThis + (vObj - vThis).directionOrZero() * std::min(dest.GetExactDist(this), GetObjectSize());
+
+    return Position(contactPoint.x, contactPoint.y, contactPoint.z, GetAngle(contactPoint.x, contactPoint.y));
+}
+
+bool WorldObject::IsWithinLOS(float ox, float oy, float oz, LineOfSightChecks checks) const
+{ 
+    if (IsInWorld())
+    {
+        float x, y, z;
+        if (GetTypeId() == TYPEID_PLAYER)
+            GetPosition(x, y, z);
+        else
+            GetHitSpherePointFor({ ox, oy, oz }, x, y, z);
+
+        return GetMap()->isInLineOfSight(x, y, z + 2.0f, ox, oy, oz + 2.0f, GetPhaseMask(), checks);
+    }
+    return true;
+}
+
+bool WorldObject::IsWithinLOSInMap(const WorldObject* obj, LineOfSightChecks checks) const
 {
     if (!IsInMap(obj))
         return false;
@@ -1121,36 +1145,7 @@ bool WorldObject::IsWithinLOSInMap(const WorldObject* obj) const
     else
         obj->GetHitSpherePointFor(GetPosition(), x, y, z);
 
-    return IsWithinLOS(x, y, z);
-}
-
-bool WorldObject::IsWithinLOS(float ox, float oy, float oz) const
-{ 
-    /*float x, y, z;
-    GetPosition(x, y, z);
-    VMAP::IVMapManager* vMapManager = VMAP::VMapFactory::createOrGetVMapManager();
-    return vMapManager->isInLineOfSight(GetMapId(), x, y, z+2.0f, ox, oy, oz+2.0f);*/
-    if (IsInWorld())
-    {
-        float x, y, z;
-        if (GetTypeId() == TYPEID_PLAYER)
-            GetPosition(x, y, z);
-        else
-            GetHitSpherePointFor({ ox, oy, oz }, x, y, z);
-
-        return GetMap()->isInLineOfSight(x, y, z + 2.0f, ox, oy, oz + 2.0f, GetPhaseMask());
-    }
-
-    return true;
-}
-
-Position WorldObject::GetHitSpherePointFor(Position const& dest) const
-{
-    G3D::Vector3 vThis(GetPositionX(), GetPositionY(), GetPositionZ());
-    G3D::Vector3 vObj(dest.GetPositionX(), dest.GetPositionY(), dest.GetPositionZ());
-    G3D::Vector3 contactPoint = vThis + (vObj - vThis).directionOrZero() * std::min(dest.GetExactDist(this), GetObjectSize());
-
-    return Position(contactPoint.x, contactPoint.y, contactPoint.z, GetAngle(contactPoint.x, contactPoint.y));
+    return IsWithinLOS(x, y, z, checks);
 }
 
 void WorldObject::GetHitSpherePointFor(Position const& dest, float& x, float& y, float& z) const
@@ -1849,8 +1844,17 @@ namespace Trinity
                 : i_object(obj), i_msgtype(msgtype), i_textId(textId), i_language(Language(language)), i_target(target) { }
             void operator()(WorldPacket& data, LocaleConstant loc_idx)
             {
-                char const* text = sObjectMgr->GetTrinityString(i_textId, loc_idx);
-                ChatHandler::BuildChatPacket(data, i_msgtype, i_language, i_object, i_target, text, 0, "", loc_idx);
+                if (BroadcastText const* broadcastText = sObjectMgr->GetBroadcastText(i_textId))
+                {
+                    uint8 gender = GENDER_MALE;
+                    if (Unit const* unit = i_object->ToUnit())
+                        gender = unit->getGender();
+
+                    std::string text = broadcastText->GetText(loc_idx, gender);
+                    ChatHandler::BuildChatPacket(data, i_msgtype, i_language, i_object, i_target, text, 0, "", loc_idx);
+                }
+                else
+                    sLog->outError("MonsterChatBuilder: `broadcast_text` id %i missing", i_textId);
             }
 
         private:
@@ -1975,10 +1979,17 @@ void WorldObject::MonsterWhisper(int32 textId, Player const* target, bool IsBoss
     if (!target)
         return;
 
+    uint8 gender = GENDER_MALE;
+    if (Unit const* unit = ToUnit())
+        gender = unit->getGender();
+
     LocaleConstant loc_idx = target->GetSession()->GetSessionDbLocaleIndex();
-    char const* text = sObjectMgr->GetTrinityString(textId, loc_idx);
+
+    BroadcastText const* broadcastText = sObjectMgr->GetBroadcastText(textId);
+    std::string text = broadcastText->GetText(loc_idx, gender);
+
     WorldPacket data;
-    ChatHandler::BuildChatPacket(data, IsBossWhisper ? CHAT_MSG_RAID_BOSS_WHISPER : CHAT_MSG_MONSTER_WHISPER, LANG_UNIVERSAL, this, target, text, 0, "", loc_idx);
+    ChatHandler::BuildChatPacket(data, IsBossWhisper ? CHAT_MSG_RAID_BOSS_WHISPER : CHAT_MSG_MONSTER_WHISPER, LANG_UNIVERSAL, this, target, text.c_str(), 0, "", loc_idx);
 
     target->GetSession()->SendPacket(&data);
 }

@@ -202,7 +202,7 @@ public:
         void MoveInLineOfSight(Unit* who)
         {
             if (!activated && who->GetTypeId() == TYPEID_PLAYER)
-                if (me->GetExactDist2d(who) <= 25.0f && me->GetMap()->isInLineOfSight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()+5.0f, who->GetPositionX(), who->GetPositionY(), who->GetPositionZ()+5.0f, 2))
+                if (me->GetExactDist2d(who) <= 25.0f && me->GetMap()->isInLineOfSight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()+5.0f, who->GetPositionX(), who->GetPositionY(), who->GetPositionZ()+5.0f, 2, LINEOFSIGHT_ALL_CHECKS))
                 {
                     activated = true;
                     me->RemoveAura(64615);

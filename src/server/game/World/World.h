@@ -162,8 +162,11 @@ enum WorldBoolConfigs
     CONFIG_ENABLE_CONTINENT_TRANSPORT,
     CONFIG_ENABLE_CONTINENT_TRANSPORT_PRELOADING,
     CONFIG_MINIGOB_MANABONK,
+    CONFIG_IP_BASED_ACTION_LOGGING,
     CONFIG_CALCULATE_CREATURE_ZONE_AREA_DATA,
     CONFIG_CALCULATE_GAMEOBJECT_ZONE_AREA_DATA,
+    CONFIG_CHECK_GOBJECT_LOS,
+    CONFIG_CLOSE_IDLE_CONNECTIONS,
     BOOL_CONFIG_VALUE_COUNT
 };
 
@@ -611,11 +614,6 @@ class World
         /// Allow/Disallow object movements
         void SetAllowMovement(bool allow) { m_allowMovement = allow; }
 
-        /// Set a new Message of the Day
-        void SetMotd(std::string const& motd);
-        /// Get the current Message of the Day
-        const char* GetMotd() const;
-
         /// Set the string for new characters (first login)
         void SetNewCharString(std::string const& str) { m_newCharString = str; }
         /// Get the string for new characters (first login)
@@ -654,9 +652,9 @@ class World
         void LoadConfigSettings(bool reload = false);
         void LoadModuleConfigSettings();
 
-        void SendWorldText(int32 string_id, ...);
+        void SendWorldText(uint32 string_id, ...);
         void SendGlobalText(const char* text, WorldSession* self);
-        void SendGMText(int32 string_id, ...);
+        void SendGMText(uint32 string_id, ...);
         void SendGlobalMessage(WorldPacket* packet, WorldSession* self = 0, TeamId teamId = TEAM_NEUTRAL);
         void SendGlobalGMMessage(WorldPacket* packet, WorldSession* self = 0, TeamId teamId = TEAM_NEUTRAL);
         bool SendZoneMessage(uint32 zone, WorldPacket* packet, WorldSession* self = 0, TeamId teamId = TEAM_NEUTRAL);
@@ -849,7 +847,6 @@ class World
         uint32 m_availableDbcLocaleMask;                       // by loaded DBC
         void DetectDBCLang();
         bool m_allowMovement;
-        std::string m_motd;
         std::string m_dataPath;
 
         // for max speed access

@@ -5,7 +5,7 @@
 #ifndef DEF_TOC_H
 #define DEF_TOC_H
 
-#include "ScriptPCH.h"
+#include "CombatAI.h"
 
 enum eData
 {

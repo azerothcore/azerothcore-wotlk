@@ -75,6 +75,7 @@
 #include "WhoListCache.h"
 #include "AsyncAuctionListing.h"
 #include "SavingSystem.h"
+#include "ServerMotd.h"
 #include "GameGraveyard.h"
 #include <VMapManager2.h>
 #ifdef ELUNA
@@ -187,18 +188,6 @@ void World::SetClosed(bool val)
 
     // Invert the value, for simplicity for scripters.
     sScriptMgr->OnOpenStateChange(!val);
-}
-
-void World::SetMotd(const std::string& motd)
-{
-    m_motd = motd;
-
-    sScriptMgr->OnMotdChange(m_motd);
-}
-
-const char* World::GetMotd() const
-{
-    return m_motd.c_str();
 }
 
 /// Find a session by its id
@@ -467,6 +456,16 @@ void World::LoadConfigSettings(bool reload)
     }
 
     LoadModuleConfigSettings();
+
+#ifdef ELUNA
+    ///- Initialize Lua Engine
+    if (!reload)
+    {
+        sLog->outString("Initialize Eluna Lua Engine...");
+        Eluna::Initialize();
+    }
+#endif
+
     sScriptMgr->OnBeforeConfigLoad(reload);
 
     // Reload log levels and filters
@@ -477,7 +476,7 @@ void World::LoadConfigSettings(bool reload)
     ///- Read the player limit and the Message of the day from the config file
     if (!reload)
         SetPlayerAmountLimit(sConfigMgr->GetIntDefault("PlayerLimit", 100));
-    SetMotd(sConfigMgr->GetStringDefault("Motd", "Welcome to an AzerothCore server") + "\n|cffFF4A2DT"+"his serv"+"er run"+"s on Aze"+"roth"+"Core|r |cff3CE7FFwww.azer"+"othcor"+"e.org|r");
+    Motd::SetMotd(sConfigMgr->GetStringDefault("Motd", "Welcome to an AzerothCore server"));
 
     ///- Read ticket system setting from the config file
     m_bool_configs[CONFIG_ALLOW_TICKETS] = sConfigMgr->GetBoolDefault("AllowTickets", true);
@@ -690,6 +689,7 @@ void World::LoadConfigSettings(bool reload)
     else
         m_int_configs[CONFIG_PORT_WORLD] = sConfigMgr->GetIntDefault("WorldServerPort", 8085);
 
+    m_bool_configs[CONFIG_CLOSE_IDLE_CONNECTIONS] = sConfigMgr->GetBoolDefault("CloseIdleConnections", true);
     m_int_configs[CONFIG_SOCKET_TIMEOUTTIME] = sConfigMgr->GetIntDefault("SocketTimeOutTime", 900000);
     m_int_configs[CONFIG_SOCKET_TIMEOUTTIME_ACTIVE] = sConfigMgr->GetIntDefault("SocketTimeOutTimeActive", 60000);
     m_int_configs[CONFIG_SESSION_ADD_DELAY] = sConfigMgr->GetIntDefault("SessionAddDelay", 10000);
@@ -1305,8 +1305,16 @@ void World::LoadConfigSettings(bool reload)
     m_bool_configs[CONFIG_MINIGOB_MANABONK] = sConfigMgr->GetBoolDefault("Minigob.Manabonk.Enable", true);
 
     m_bool_configs[CONFIG_ENABLE_CONTINENT_TRANSPORT] = sConfigMgr->GetBoolDefault("IsContinentTransport.Enabled", true);
-    m_bool_configs[CONFIG_ENABLE_CONTINENT_TRANSPORT_PRELOADING] = sConfigMgr->GetBoolDefault("IsPreloadedContinentTransport.Enabled", false);
+    m_bool_configs[CONFIG_ENABLE_CONTINENT_TRANSPORT_PRELOADING] = sConfigMgr->GetBoolDefault("IsPreloadedContinentTransport.Enabled", false);    
+  
+    m_bool_configs[CONFIG_IP_BASED_ACTION_LOGGING] = sConfigMgr->GetBoolDefault("Allow.IP.Based.Action.Logging", false);
 
+    // Whether to use LoS from game objects
+    m_bool_configs[CONFIG_CHECK_GOBJECT_LOS] = sConfigMgr->GetBoolDefault("CheckGameObjectLoS", true);
+
+    m_bool_configs[CONFIG_CALCULATE_CREATURE_ZONE_AREA_DATA] = sConfigMgr->GetBoolDefault("Calculate.Creature.Zone.Area.Data", false);
+    m_bool_configs[CONFIG_CALCULATE_GAMEOBJECT_ZONE_AREA_DATA] = sConfigMgr->GetBoolDefault("Calculate.Gameoject.Zone.Area.Data", false);
+  
     //packet spoof punishment
     m_int_configs[CONFIG_PACKET_SPOOF_POLICY] = sConfigMgr->GetIntDefault("PacketSpoof.Policy", (uint32)WorldSession::DosProtection::Policy::POLICY_KICK);
     m_int_configs[CONFIG_PACKET_SPOOF_BANMODE] = sConfigMgr->GetIntDefault("PacketSpoof.BanMode", (uint32)BAN_ACCOUNT);
@@ -1314,9 +1322,6 @@ void World::LoadConfigSettings(bool reload)
         m_int_configs[CONFIG_PACKET_SPOOF_BANMODE] = BAN_ACCOUNT;
 
     m_int_configs[CONFIG_PACKET_SPOOF_BANDURATION] = sConfigMgr->GetIntDefault("PacketSpoof.BanDuration", 86400);
-
-    m_bool_configs[CONFIG_CALCULATE_CREATURE_ZONE_AREA_DATA] = sConfigMgr->GetBoolDefault("Calculate.Creature.Zone.Area.Data", false);
-    m_bool_configs[CONFIG_CALCULATE_GAMEOBJECT_ZONE_AREA_DATA] = sConfigMgr->GetBoolDefault("Calculate.Gameoject.Zone.Area.Data", false);
 
     // call ScriptMgr if we're reloading the configuration
     sScriptMgr->OnAfterConfigLoad(reload);
@@ -1345,21 +1350,6 @@ void World::SetInitialWorldSettings()
         vmmgr2->GetLiquidFlagsPtr = &GetLiquidFlags;
     }
 
-#ifdef ELUNA
-    ///- Initialize Lua Engine
-    sLog->outString("Initialize Eluna Lua Engine...");
-
-    std::string conf_path = _CONF_DIR;
-    std::string cfg_file = conf_path + "/mod_LuaEngine.conf";
-#ifdef WIN32
-    cfg_file = "mod_LuaEngine.conf";
-#endif
-    std::string cfg_def_file = cfg_file + ".dist";
-    sConfigMgr->LoadMore(cfg_def_file.c_str());
-    sConfigMgr->LoadMore(cfg_file.c_str());
-    Eluna::Initialize();
-#endif
-
     ///- Initialize config settings
     LoadConfigSettings();
 
@@ -1369,18 +1359,21 @@ void World::SetInitialWorldSettings()
     ///- Init highest guids before any table loading to prevent using not initialized guids in some code.
     sObjectMgr->SetHighestGuids();
 
-    ///- Check the existence of the map files for all races' startup areas.
-    if (!MapManager::ExistMapAndVMap(0, -6240.32f, 331.033f)
-        || !MapManager::ExistMapAndVMap(0, -8949.95f, -132.493f)
-        || !MapManager::ExistMapAndVMap(1, -618.518f, -4251.67f)
-        || !MapManager::ExistMapAndVMap(0, 1676.35f, 1677.45f)
-        || !MapManager::ExistMapAndVMap(1, 10311.3f, 832.463f)
-        || !MapManager::ExistMapAndVMap(1, -2917.58f, -257.98f)
-        || (m_int_configs[CONFIG_EXPANSION] && (
-            !MapManager::ExistMapAndVMap(530, 10349.6f, -6357.29f) ||
-            !MapManager::ExistMapAndVMap(530, -3961.64f, -13931.2f))))
+    if (!sConfigMgr->isDryRun())
     {
-        exit(1);
+        ///- Check the existence of the map files for all starting areas.
+        if (!MapManager::ExistMapAndVMap(0, -6240.32f, 331.033f)
+            || !MapManager::ExistMapAndVMap(0, -8949.95f, -132.493f)
+            || !MapManager::ExistMapAndVMap(1, -618.518f, -4251.67f)
+            || !MapManager::ExistMapAndVMap(0, 1676.35f, 1677.45f)
+            || !MapManager::ExistMapAndVMap(1, 10311.3f, 832.463f)
+            || !MapManager::ExistMapAndVMap(1, -2917.58f, -257.98f)
+            || (m_int_configs[CONFIG_EXPANSION] && (
+                !MapManager::ExistMapAndVMap(530, 10349.6f, -6357.29f) ||
+                !MapManager::ExistMapAndVMap(530, -3961.64f, -13931.2f))))
+        {
+            exit(1);
+        }
     }
 
     ///- Initialize pool manager
@@ -1471,6 +1464,8 @@ void World::SetInitialWorldSettings()
     sObjectMgr->LoadItemLocales();
     sObjectMgr->LoadItemSetNameLocales();
     sObjectMgr->LoadQuestLocales();
+    sObjectMgr->LoadQuestOfferRewardLocale();
+    sObjectMgr->LoadQuestRequestItemsLocale();
     sObjectMgr->LoadNpcTextLocales();
     sObjectMgr->LoadPageTextLocales();
     sObjectMgr->LoadGossipMenuItemsLocales();
@@ -1485,6 +1480,9 @@ void World::SetInitialWorldSettings()
 
     sLog->outString("Loading Game Object Templates...");         // must be after LoadPageTexts
     sObjectMgr->LoadGameObjectTemplate();
+
+    sLog->outString("Loading Game Object template addons...");
+    sObjectMgr->LoadGameObjectTemplateAddons();
 
     sLog->outString("Loading Transport templates...");
     sTransportMgr->LoadTransportTemplates();
@@ -1813,10 +1811,7 @@ void World::SetInitialWorldSettings()
     sObjectMgr->LoadSpellScripts();                              // must be after load Creature/Gameobject(Template/Data)
     sObjectMgr->LoadEventScripts();                              // must be after load Creature/Gameobject(Template/Data)
     sObjectMgr->LoadWaypointScripts();
-
-    sLog->outString("Loading Scripts text locales...");      // must be after Load*Scripts calls
-    sObjectMgr->LoadDbScriptStrings();
-
+    
     sLog->outString("Loading spell script names...");
     sObjectMgr->LoadSpellScriptNames();
 
@@ -1968,6 +1963,11 @@ void World::SetInitialWorldSettings()
     {
         sLog->outString("Enabling database logging...");
         sLog->SetLogDB(true);
+    }
+
+    if (sConfigMgr->isDryRun()) {
+        sLog->outString("AzerothCore dry run completed, terminating.");
+        exit(0);
     }
 }
 
@@ -2290,7 +2290,7 @@ namespace Trinity
     {
         public:
             typedef std::vector<WorldPacket*> WorldPacketList;
-            explicit WorldWorldTextBuilder(int32 textId, va_list* args = NULL) : i_textId(textId), i_args(args) {}
+            explicit WorldWorldTextBuilder(uint32 textId, va_list* args = NULL) : i_textId(textId), i_args(args) {}
             void operator()(WorldPacketList& data_list, LocaleConstant loc_idx)
             {
                 char const* text = sObjectMgr->GetTrinityString(i_textId, loc_idx);
@@ -2324,13 +2324,13 @@ namespace Trinity
             }
 
 
-            int32 i_textId;
+            uint32 i_textId;
             va_list* i_args;
     };
 }                                                           // namespace Trinity
 
 /// Send a System Message to all players (except self if mentioned)
-void World::SendWorldText(int32 string_id, ...)
+void World::SendWorldText(uint32 string_id, ...)
 {
     va_list ap;
     va_start(ap, string_id);
@@ -2349,7 +2349,7 @@ void World::SendWorldText(int32 string_id, ...)
 }
 
 /// Send a System Message to all GMs (except self if mentioned)
-void World::SendGMText(int32 string_id, ...)
+void World::SendGMText(uint32 string_id, ...)
 {
     va_list ap;
     va_start(ap, string_id);

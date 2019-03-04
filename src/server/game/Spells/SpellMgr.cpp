@@ -3884,6 +3884,10 @@ void SpellMgr::LoadDbcDataCorrections()
         case 55268:
             spellInfo->AttributesEx3 |= SPELL_ATTR3_BLOCKABLE_SPELL;
             break;
+        // Death Knight T10 Tank 2p Bonus
+        case 70650:
+            spellInfo->EffectApplyAuraName[0] = SPELL_AURA_ADD_PCT_MODIFIER;
+            break;
 
 
 
@@ -4463,6 +4467,12 @@ void SpellMgr::LoadDbcDataCorrections()
         // Watery Grave Explosion
         case 37852:
             spellInfo->AttributesEx5 |= SPELL_ATTR5_USABLE_WHILE_STUNNED;
+            break;
+                
+        // Karazhan
+        // Amplify Damage
+        case 39095:
+            spellInfo->MaxAffectedTargets = 1;
             break;
 
         // Magisters' Terrace
@@ -5717,6 +5727,7 @@ void SpellMgr::LoadDbcDataCorrections()
         case 69030: // Val'kyr Target Search
             spellInfo->EffectRadiusIndex[0] = EFFECT_RADIUS_200_YARDS;   // 200yd
             spellInfo->EffectRadiusIndex[1] = EFFECT_RADIUS_200_YARDS;   // 200yd
+            spellInfo->Attributes |= SPELL_ATTR0_UNAFFECTED_BY_INVULNERABILITY;
             break;
         case 73654: // Harvest Souls
         case 74295: // Harvest Souls
@@ -5835,6 +5846,17 @@ void SpellMgr::LoadDbcDataCorrections()
         case 74637:
             spellInfo->speed = 0;
             break;
+        //Blazing Aura
+        case 75885:
+        case 75886:
+            spellInfo->AttributesEx4 &= ~SPELL_ATTR4_IGNORE_RESISTANCES;
+            break;
+        //Meteor Strike
+        case 75952:
+        //Combustion Periodic
+        case 74629:
+            spellInfo->AttributesEx4 &= ~SPELL_ATTR4_IGNORE_RESISTANCES;
+            break;
 
 
         // ///////////////////////////////////////////
@@ -5845,6 +5867,7 @@ void SpellMgr::LoadDbcDataCorrections()
             spellInfo->Effect[1] = SPELL_EFFECT_DUMMY;
             spellInfo->EffectRadiusIndex[1] = spellInfo->EffectRadiusIndex[0];
             spellInfo->EffectImplicitTargetA[1] = TARGET_UNIT_DEST_AREA_ENTRY;
+			spellInfo->AttributesEx4 &= ~SPELL_ATTR4_CAN_CAST_WHILE_CASTING;
             break;
         // Still At It (12644)
         case 51931:
@@ -6027,6 +6050,13 @@ void SpellMgr::LoadDbcDataCorrections()
         //Crushing the Crown
         case 71024:
             spellInfo->EffectImplicitTargetA[0] = TARGET_DEST_DYNOBJ_NONE;
+            break;
+        // Battle for the Undercity
+        case 59892: // Cyclone fall
+            spellInfo->Effect[EFFECT_0] = SPELL_EFFECT_APPLY_AREA_AURA_FRIEND;
+            spellInfo->EffectRadiusIndex[0] = EFFECT_RADIUS_10_YARDS;
+            spellInfo->AttributesEx &= ~SPELL_ATTR0_CANT_CANCEL;
+            spellInfo->AttributesEx3 |= SPELL_ATTR3_ONLY_TARGET_PLAYERS;
             break;
 
         // ///////////////////////////////////////////

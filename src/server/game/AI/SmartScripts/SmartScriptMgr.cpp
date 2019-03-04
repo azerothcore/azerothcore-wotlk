@@ -183,23 +183,25 @@ void SmartAIMgr::LoadSmartAIFromDB()
         temp.event.raw.param2 = fields[9].GetUInt32();
         temp.event.raw.param3 = fields[10].GetUInt32();
         temp.event.raw.param4 = fields[11].GetUInt32();
+        temp.event.raw.param5 = fields[12].GetUInt32();
 
-        temp.action.type = (SMART_ACTION)fields[12].GetUInt8();
-        temp.action.raw.param1 = fields[13].GetUInt32();
-        temp.action.raw.param2 = fields[14].GetUInt32();
-        temp.action.raw.param3 = fields[15].GetUInt32();
-        temp.action.raw.param4 = fields[16].GetUInt32();
-        temp.action.raw.param5 = fields[17].GetUInt32();
-        temp.action.raw.param6 = fields[18].GetUInt32();
+        temp.action.type = (SMART_ACTION)fields[13].GetUInt8();
+        temp.action.raw.param1 = fields[14].GetUInt32();
+        temp.action.raw.param2 = fields[15].GetUInt32();
+        temp.action.raw.param3 = fields[16].GetUInt32();
+        temp.action.raw.param4 = fields[17].GetUInt32();
+        temp.action.raw.param5 = fields[18].GetUInt32();
+        temp.action.raw.param6 = fields[19].GetUInt32();
 
-        temp.target.type = (SMARTAI_TARGETS)fields[19].GetUInt8();
-        temp.target.raw.param1 = fields[20].GetUInt32();
-        temp.target.raw.param2 = fields[21].GetUInt32();
-        temp.target.raw.param3 = fields[22].GetUInt32();
-        temp.target.x = fields[23].GetFloat();
-        temp.target.y = fields[24].GetFloat();
-        temp.target.z = fields[25].GetFloat();
-        temp.target.o = fields[26].GetFloat();
+        temp.target.type = (SMARTAI_TARGETS)fields[20].GetUInt8();
+        temp.target.raw.param1 = fields[21].GetUInt32();
+        temp.target.raw.param2 = fields[22].GetUInt32();
+        temp.target.raw.param3 = fields[23].GetUInt32();
+        temp.target.raw.param4 = fields[24].GetUInt32();
+        temp.target.x = fields[25].GetFloat();
+        temp.target.y = fields[26].GetFloat();
+        temp.target.z = fields[27].GetFloat();
+        temp.target.o = fields[28].GetFloat();
 
         //check target
         if (!IsTargetValid(temp))
@@ -351,9 +353,46 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
         sLog->outErrorDb("SmartAIMgr: EntryOrGuid %d, event type %u can not be used for Script type %u", e.entryOrGuid, e.GetEventType(), e.GetScriptType());
         return false;
     }
-    if (e.action.type <= 0 || e.action.type >= SMART_ACTION_END)
+    if (e.action.type <= 0
+        || (e.action.type >= SMART_ACTION_TC_END && e.action.type <= SMART_ACTION_AC_START)
+        || e.action.type >= SMART_ACTION_AC_END)
     {
-        sLog->outErrorDb("SmartAIMgr: EntryOrGuid %d using event(%u) has invalid action type (%u), skipped.", e.entryOrGuid, e.event_id, e.GetActionType());
+        sLog->outErrorDb("SmartAIMgr: EntryOrGuid %d using event(%u) has an invalid action type (%u), skipped.", e.entryOrGuid, e.event_id, e.GetActionType());
+        return false;
+    }
+    switch (e.action.type)
+    {
+        case SMART_ACTION_RESERVED_16:
+        case SMART_ACTION_PLAY_ANIMKIT:
+        case SMART_ACTION_SCENE_PLAY:
+        case SMART_ACTION_SCENE_CANCEL:
+            sLog->outErrorDb("SmartAIMgr: EntryOrGuid %d using event(%u) has an action type that is not supported on 3.3.5a (%u), skipped.",
+                             e.entryOrGuid, e.event_id, e.GetActionType());
+            return false;
+        case SMART_ACTION_SET_CORPSE_DELAY:
+        case SMART_ACTION_DISABLE_EVADE:
+        case SMART_ACTION_GO_SET_GO_STATE:
+        case SMART_ACTION_SET_CAN_FLY:
+        case SMART_ACTION_REMOVE_AURAS_BY_TYPE:
+        case SMART_ACTION_REMOVE_MOVEMENT:
+        case SMART_ACTION_SPAWN_SPAWNGROUP:
+        case SMART_ACTION_DESPAWN_SPAWNGROUP:
+        case SMART_ACTION_RESPAWN_BY_SPAWNID:
+            sLog->outErrorDb("SmartAIMgr: EntryOrGuid %d using event(%u) has an action type that is not yet supported on AzerothCore (%u), skipped.",
+                             e.entryOrGuid, e.event_id, e.GetActionType());
+            return false;
+        default:
+            break;
+    }
+    if (e.target.type < 0 || e.target.type >= SMART_TARGET_END)
+    {
+        sLog->outErrorDb("SmartAIMgr: EntryOrGuid %d using event(%u) has an invalid target type (%u), skipped.",
+                e.entryOrGuid, e.event_id, e.GetTargetType());
+        return false;
+    }
+    if (e.target.type == SMART_TARGET_LOOT_RECIPIENTS || e.target.type == SMART_TARGET_VEHICLE_PASSENGER) {
+        sLog->outErrorDb("SmartAIMgr: EntryOrGuid %d using event(%u) has a target type that is not yet supported on AzerothCore (%u), skipped.",
+                e.entryOrGuid, e.event_id, e.GetTargetType());
         return false;
     }
     if (e.event.event_phase_mask > SMART_EVENT_PHASE_ALL)
@@ -741,13 +780,26 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
             if (!IsSoundValid(e, e.action.sound.sound))
                 return false;
             break;
+        case SMART_ACTION_RANDOM_SOUND:
+            if (e.action.randomSound.sound1 && !IsSoundValid(e, e.action.randomSound.sound1))
+                return false;
+
+            if (e.action.randomSound.sound2 && !IsSoundValid(e, e.action.randomSound.sound2))
+                return false;
+
+            if (e.action.randomSound.sound3 && !IsSoundValid(e, e.action.randomSound.sound3))
+                return false;
+
+            if (e.action.randomSound.sound4 && !IsSoundValid(e, e.action.randomSound.sound4))
+                return false;
+            break;
         case SMART_ACTION_SET_EMOTE_STATE:
         case SMART_ACTION_PLAY_EMOTE:
             if (!IsEmoteValid(e, e.action.emote.emote))
                 return false;
             break;
         case SMART_ACTION_FAIL_QUEST:
-        case SMART_ACTION_ADD_QUEST:
+        case SMART_ACTION_OFFER_QUEST:
             if (!e.action.quest.quest || !IsQuestValid(e, e.action.quest.quest))
                 return false;
             break;
