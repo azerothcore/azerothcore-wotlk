@@ -3214,4 +3214,23 @@ Calculate.Creature.Zone.Area.Data = 0
 Calculate.Gameoject.Zone.Area.Data = 0
 
 #
+
+###############################################################################
+#
+#    DatabaseUpdater.Enabled
+#        Enables automatic sql updating from sql/updates.
+#        Default: 0
+#        Values:  1 - on, 0 - off
+#
+#    DatabaseUpdater.PathToUpdates
+#        The path to src/updates/world, if not set updater won't work.
+#        The path may be absolute, or relative to directory core runs in.
+#        Default: ""
+#        Example: (unix) "/home/azerothcore/azerothcore-wotlk/data/sql/updates"
+#                 (win)  "C:\azerothcore\azerothcore-wotlk\data\sql\updates"
+#
+###############################################################################
+
+DatabaseUpdater.Enabled = 0
+DatabaseUpdater.PathToUpdates = ""
 ###################################################################################################

@@ -20,6 +20,13 @@
 #include "QueryHolder.h"
 #include "AdhocStatement.h"
 
+#include "CompilerDefs.h"
+#include <iostream>
+#include <fstream>
+#if PLATFORM == PLATFORM_UNIX
+#include <sys/file.h>
+#endif
+
 #define MIN_MYSQL_SERVER_VERSION 50100u
 #define MIN_MYSQL_CLIENT_VERSION 50100u
 
@@ -467,6 +474,102 @@ class DatabaseWorkerPool
         char const* GetDatabaseName() const
         {
             return _connectionInfo.database.c_str();
+        }
+
+        bool ExecuteFile(char const* file)
+        {
+            T* t = GetFreeConnection();
+
+            auto handle = t->GetHandle();
+            if (!handle)
+                return false;
+
+            if (mysql_set_server_option(handle, MYSQL_OPTION_MULTI_STATEMENTS_ON))
+            {
+                sLog->outErrorDb("Cannot turn multi-statements on: %s", mysql_error(handle));
+                return false;
+            }
+
+            mysql_autocommit(handle, 0);
+            if (mysql_real_query(handle, "START TRANSACTION", sizeof("START TRANSACTION") - 1))
+            {
+                sLog->outErrorDb("Couldn't start transaction for db update file %s", file);
+                return false;
+            }
+
+            bool in_trasaction = true;
+            bool success = false;
+
+            if (FILE* fp = ACE_OS::fopen(file, "rb"))
+            {
+#if PLATFORM == PLATFORM_UNIX
+                flock(fileno(fp), LOCK_SH);
+#endif
+                //------
+
+                struct stat info;
+                fstat(fileno(fp), &info);
+
+                // if less than 1MB allocate on stack, else on heap
+                char* contents = (info.st_size > 1024 * 1024) ? new char[info.st_size] : (char*)alloca(info.st_size);
+
+                if (ACE_OS::fread(contents, info.st_size, 1, fp) == 1)
+                {
+                    if (mysql_real_query(handle, contents, info.st_size))
+                    {
+                        sLog->outErrorDb("Cannot execute file %s, size: %lu: %s", file, info.st_size, mysql_error(handle));
+                    }
+                    else
+                    {
+                        do
+                        {
+                            if (mysql_field_count(handle))
+                                if (MYSQL_RES* result = mysql_use_result(handle))
+                                    mysql_free_result(result);
+                        } while (0 == mysql_next_result(handle));
+
+                        //check whether the last mysql_next_result ended with an error
+                        if (*mysql_error(handle))
+                        {
+                            success = false;
+                            sLog->outErrorDb("Cannot execute file %s, size: %lu: %s", file, info.st_size, mysql_error(handle));
+                            if (mysql_rollback(handle))
+                                sLog->outErrorDb("ExecuteFile(): Rollback ended with an error.");
+                            else
+                                in_trasaction = false;
+                        }
+                        else
+                        {
+                            if (mysql_commit(handle))
+                                sLog->outErrorDb("mysql_commit() failed. Update %s will not be applied.", file);
+                            else
+                                in_trasaction = false;
+                            success = true;
+                        }
+                    }
+                }
+                else
+                {
+                    sLog->outErrorDb("Couldn't read file %s, size: %lu", file, info.st_size);
+                    return false;
+                }
+
+                // if allocated on heap, free memory
+                if (info.st_size > 1024 * 1024)
+                    delete[] contents;
+
+                //------
+#if PLATFORM == PLATFORM_UNIX
+                flock(fileno(fp), LOCK_UN);
+#endif
+                ACE_OS::fclose(fp);
+            }
+
+            mysql_set_server_option(handle, MYSQL_OPTION_MULTI_STATEMENTS_OFF);
+            mysql_autocommit(handle, 1);
+            if (in_trasaction)
+                mysql_rollback(handle);
+            return success;
         }
 
     private:

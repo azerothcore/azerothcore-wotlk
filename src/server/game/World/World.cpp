@@ -78,6 +78,7 @@
 #include "ServerMotd.h"
 #include "GameGraveyard.h"
 #include <VMapManager2.h>
+#include <ACE/Dirent.h>
 #ifdef ELUNA
 #include "LuaEngine.h"
 #endif
@@ -1315,8 +1316,227 @@ void World::LoadConfigSettings(bool reload)
     m_bool_configs[CONFIG_CALCULATE_CREATURE_ZONE_AREA_DATA] = sConfigMgr->GetBoolDefault("Calculate.Creature.Zone.Area.Data", false);
     m_bool_configs[CONFIG_CALCULATE_GAMEOBJECT_ZONE_AREA_DATA] = sConfigMgr->GetBoolDefault("Calculate.Gameoject.Zone.Area.Data", false);
 
+    m_bool_configs[CONFIG_SQLUPDATER] = sConfigMgr->GetBoolDefault("DatabaseUpdater.Enabled", false);
+    m_SQLUpdatesPath = sConfigMgr->GetStringDefault("DatabaseUpdater.PathToUpdates", "");
+    if (!m_SQLUpdatesPath.size() || (*m_SQLUpdatesPath.rbegin() != '\\' && *m_SQLUpdatesPath.rbegin() != '/' ))
+#if PLATFORM == PLATFORM_WINDOWS
+        m_SQLUpdatesPath += '\\';
+#else
+        m_SQLUpdatesPath += '/';
+#endif
+
     // call ScriptMgr if we're reloading the configuration
     sScriptMgr->OnAfterConfigLoad(reload);
+}
+
+void World::LoadSQLUpdates()
+{
+    // directory path
+    std::string path;
+    // label used for console output
+    std::stringstream label;
+    // files from path
+    std::vector<std::string> files;
+
+    // iterate all three databases
+    for (uint32 i = 0; i < 3; i++)
+    {
+        switch (i)
+        {
+            case DB_AUTH:
+            {
+                // clear from previous iterations
+                files.clear();
+                // refresh paths
+                path = m_SQLUpdatesPath;
+                path += "db_auth";
+                QueryResult result = LoginDatabase.Query("SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_auth' AND ORDINAL_POSITION = 3");
+                if (!result)
+                {
+                    sLog->outErrorDb("SQLUpdater: Couldn't find any revision.");
+                    break;
+                }
+                DB_Revision currentRev(result->Fetch()[0].GetString());
+                
+                char cwd[PATH_MAX];
+                // record current directory
+                ACE_OS::getcwd(cwd, PATH_MAX);
+                if (-1 == ACE_OS::chdir(path.c_str()))
+                    sLog->outCrash("Can't change directory to %s: %s", path.c_str(), strerror(errno));
+
+                // get files in sql/updates/(path)/ directory
+                if (ACE_DIR* dir = ACE_OS::opendir(path.c_str()))
+                {
+                    while (ACE_DIRENT* entry = ACE_OS::readdir(dir))
+                        // make sure the file is an .sql one
+                        if (!strcmp(entry->d_name + strlen(entry->d_name) - 4, ".sql"))
+                            files.push_back(entry->d_name);
+
+                    ACE_OS::closedir(dir);
+                }
+                else
+                    sLog->outCrash("Can't open %s: %s", path.c_str(), strerror(errno));
+
+                // sort our files in ascending order
+                std::sort(files.begin(), files.end());
+
+                for (size_t j = 0; j < files.size(); ++j)
+                {
+                    char rev[PATH_MAX];
+                    int k = sscanf(files[j].c_str(), "%s.sql", &rev);
+                    if (k != 1 || currentRev >= DB_Revision(std::string(rev)))
+                        continue;
+
+                    label.str("");
+                    label << "Applying " << files[j].c_str() << " (" << (j + 1) << '/' << files.size() << ')';
+                    sLog->outString(label.str().c_str());
+
+                    if (LoginDatabase.ExecuteFile(files[j].c_str()))
+                    {
+                        LoginDatabase.EscapeString(files[j]);
+                        sLog->outString("File %s applied successfully.", files[j].c_str());
+                    }
+                    else
+                        sLog->outCrash("Failed to apply %s. See db_errors.log for more details.", files[j].c_str());
+                }
+
+
+                // return to original working directory
+                if (-1 == ACE_OS::chdir(cwd))
+                    sLog->outCrash("Can't change directory to %s: %s", cwd, strerror(errno));
+
+                break;
+            }
+            case DB_CHAR:
+            {
+                // clear from previous iterations
+                files.clear();
+                // refresh paths
+                path = m_SQLUpdatesPath;
+                path += "db_characters";
+                QueryResult result = CharacterDatabase.Query("SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_characters' AND ORDINAL_POSITION = 3");
+                if (!result)
+                {
+                    sLog->outErrorDb("SQLUpdater: Couldn't find any revision.");
+                    break;
+                }
+                DB_Revision currentRev(result->Fetch()[0].GetString());
+
+                char cwd[PATH_MAX];
+                // record current directory
+                ACE_OS::getcwd(cwd, PATH_MAX);
+                if (-1 == ACE_OS::chdir(path.c_str()))
+                    sLog->outCrash("Can't change directory to %s: %s", path.c_str(), strerror(errno));
+
+                // get files in sql/updates/(path)/ directory
+                if (ACE_DIR* dir = ACE_OS::opendir(path.c_str()))
+                {
+                    while (ACE_DIRENT* entry = ACE_OS::readdir(dir))
+                        // make sure the file is an .sql one
+                        if (!strcmp(entry->d_name + strlen(entry->d_name) - 4, ".sql"))
+                            files.push_back(entry->d_name);
+
+                    ACE_OS::closedir(dir);
+                }
+                else
+                    sLog->outCrash("Can't open %s: %s", path.c_str(), strerror(errno));
+
+                // sort our files in ascending order
+                std::sort(files.begin(), files.end());
+
+                for (size_t j = 0; j < files.size(); ++j)
+                {
+                    char rev[PATH_MAX];
+                    int k = sscanf(files[j].c_str(), "%s.sql", &rev);
+                    if (k != 1 || currentRev >= DB_Revision(std::string(rev)))
+                        continue;
+
+                    label.str("");
+                    label << "Applying " << files[j].c_str() << " (" << (j + 1) << '/' << files.size() << ')';
+                    sLog->outString(label.str().c_str());
+
+                    if (CharacterDatabase.ExecuteFile(files[j].c_str()))
+                    {
+                        CharacterDatabase.EscapeString(files[j]);
+                        sLog->outString("File %s applied successfully.", files[j].c_str());
+                    }
+                    else
+                        sLog->outCrash("Failed to apply %s. See db_errors.log for more details.", files[j].c_str());
+                }
+
+
+                // return to original working directory
+                if (-1 == ACE_OS::chdir(cwd))
+                    sLog->outCrash("Can't change directory to %s: %s", cwd, strerror(errno));
+
+                break;
+            }
+            case DB_WORLD:
+            {
+                // clear from previous iterations
+                files.clear();
+                // refresh paths
+                path = m_SQLUpdatesPath;
+                path += "db_world";
+                QueryResult result = WorldDatabase.Query("SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND ORDINAL_POSITION = 3");
+                if (!result)
+                {
+                    sLog->outErrorDb("SQLUpdater: Couldn't find any revision.");
+                    break;
+                }
+                DB_Revision currentRev(result->Fetch()[0].GetString());
+
+                char cwd[PATH_MAX];
+                // record current directory
+                ACE_OS::getcwd(cwd, PATH_MAX);
+                if (-1 == ACE_OS::chdir(path.c_str()))
+                    sLog->outCrash("Can't change directory to %s: %s", path.c_str(), strerror(errno));
+
+                // get files in sql/updates/(path)/ directory
+                if (ACE_DIR* dir = ACE_OS::opendir(path.c_str()))
+                {
+                    while (ACE_DIRENT* entry = ACE_OS::readdir(dir))
+                        // make sure the file is an .sql one
+                        if (!strcmp(entry->d_name + strlen(entry->d_name) - 4, ".sql"))
+                            files.push_back(entry->d_name);
+
+                    ACE_OS::closedir(dir);
+                }
+                else
+                    sLog->outCrash("Can't open %s: %s", path.c_str(), strerror(errno));
+
+                // sort our files in ascending order
+                std::sort(files.begin(), files.end());
+
+                for (size_t j = 0; j < files.size(); ++j)
+                {
+                    char rev[PATH_MAX];
+                    int k = sscanf(files[j].c_str(), "%s.sql", &rev);
+                    if (k != 1 || currentRev >= DB_Revision(std::string(rev)))
+                        continue;
+
+                    label.str("");
+                    label << "Applying " << files[j].c_str() << " (" << (j + 1) << '/' << files.size() << ')';
+                    sLog->outString(label.str().c_str());
+
+                    if (WorldDatabase.ExecuteFile(files[j].c_str()))
+                    {
+                        WorldDatabase.EscapeString(files[j]);
+                        sLog->outString("File %s applied successfully.", files[j].c_str());
+                    }
+                    else
+                        sLog->outCrash("Failed to apply %s. See db_errors.log for more details.", files[j].c_str());
+                }
+
+
+                // return to original working directory
+                if (-1 == ACE_OS::chdir(cwd))
+                    sLog->outCrash("Can't change directory to %s: %s", cwd, strerror(errno));
+
+                break;
+            }
+        }
+    }
 }
 
 extern void LoadGameObjectModelList();
@@ -1350,6 +1570,12 @@ void World::SetInitialWorldSettings()
 
     ///- Init highest guids before any table loading to prevent using not initialized guids in some code.
     sObjectMgr->SetHighestGuids();
+
+    if (m_bool_configs[CONFIG_SQLUPDATER])
+    {
+        sLog->outString("Applying SQL Updates...");
+        LoadSQLUpdates();
+    }
 
     if (!sConfigMgr->isDryRun())
     {
