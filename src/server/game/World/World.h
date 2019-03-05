@@ -554,7 +554,7 @@ class DB_Revision
         {
             size_t pos = 0;
             std::vector<uint32> v;
-            while (pos = revString.find('_') != std::string::npos)
+            while ((pos = revString.find('_')) != std::string::npos)
             {
                 std::string ss = revString.substr(0, pos);
                 v.push_back(std::atoi(ss.c_str()));
