@@ -1737,7 +1737,7 @@ void Player::Update(uint32 p_time)
     if (!IsPositionValid()) // pussywizard: will crash below at eg. GetZoneAndAreaId
     {
         sLog->outMisc("Player::Update - invalid position (%.1f, %.1f, %.1f)! Map: %u, MapId: %u, GUID: %u", GetPositionX(), GetPositionY(), GetPositionZ(), (FindMap() ? FindMap()->GetId() : 0), GetMapId(), GetGUIDLow());
-        GetSession()->KickPlayer();
+        GetSession()->KickPlayer("Invalid position");
         return;
     }
 

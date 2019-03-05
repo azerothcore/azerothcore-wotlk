@@ -687,7 +687,7 @@ public:
         {
             characterGuid = player->GetGUID();
             accountId = player->GetSession()->GetAccountId();
-            player->GetSession()->KickPlayer();
+            player->GetSession()->KickPlayer("HandleCharacterEraseCommand");
         }
         else
         {

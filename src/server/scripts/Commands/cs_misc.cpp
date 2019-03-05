@@ -1134,7 +1134,7 @@ public:
         else
             handler->PSendSysMessage(LANG_COMMAND_KICKMESSAGE, playerName.c_str());
 
-        target->GetSession()->KickPlayer();
+        target->GetSession()->KickPlayer("HandleKickPlayerCommand");
 
         return true;
     }

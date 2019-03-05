@@ -311,7 +311,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
                 //    GetPlayer()->GetGUIDLow(), msg.c_str());
 
                 if (sWorld->getIntConfig(CONFIG_CHAT_STRICT_LINK_CHECKING_KICK))
-                    KickPlayer();
+                    KickPlayer("CONFIG_CHAT_STRICT_LINK_CHECKING_KICK");
 
                 return;
             }
