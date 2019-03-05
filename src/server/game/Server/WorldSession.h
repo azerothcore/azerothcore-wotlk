@@ -247,7 +247,7 @@ class WorldSession
         }
 
         void LogoutPlayer(bool save);
-        void KickPlayer(bool setKicked = true);
+        void KickPlayer(std::string const& reason, bool setKicked = true);
 
         void QueuePacket(WorldPacket* new_packet);
         bool Update(uint32 diff, PacketFilter& updater);
