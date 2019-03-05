@@ -167,6 +167,7 @@ enum WorldBoolConfigs
     CONFIG_CALCULATE_GAMEOBJECT_ZONE_AREA_DATA,
     CONFIG_CHECK_GOBJECT_LOS,
     CONFIG_CLOSE_IDLE_CONNECTIONS,
+    CONFIG_SQLUPDATER,
     BOOL_CONFIG_VALUE_COUNT
 };
 
@@ -545,6 +546,95 @@ struct PetitionData
 {
 };
 
+class DB_Revision
+{
+    public:
+        // Format YYYY_MM_DD_XX Year/Month/Day/Counter
+        DB_Revision(std::string revString)
+        {
+            size_t pos = 0;
+            std::vector<uint32> v;
+            while (pos = revString.find('_') != std::string::npos)
+            {
+                std::string ss = revString.substr(0, pos);
+                v.push_back(std::atoi(ss.c_str()));
+                revString.erase(0, pos + 1);
+            }
+            year = v[0];
+            month = v[1];
+            day = v[2];
+            count = std::atoi(revString.c_str());
+        }
+
+        bool operator<(DB_Revision rev)
+        {
+            if (this->year < rev.year)
+                return true;
+            else if (this->year == rev.year)
+            {
+                if (this->month < rev.month)
+                    return true;
+                else if (this->month == rev.month)
+                {
+                    if (this->day < rev.day)
+                        return true;
+                    else if (this->day == rev.day)
+                    {
+                        if (this->count < rev.count)
+                            return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        bool operator==(DB_Revision rev)
+        {
+            if (this->year == rev.year && this->month == rev.month && this->day == rev.day && this->count == rev.count)
+                return true;
+            return false;
+        }
+
+        bool operator>(DB_Revision rev)
+        {
+            if (this->year > rev.year)
+                return true;
+            else if (this->year == rev.year)
+            {
+                if (this->month > rev.month)
+                    return true;
+                else if (this->month == rev.month)
+                {
+                    if (this->day > rev.day)
+                        return true;
+                    else if (this->day == rev.day)
+                    {
+                        if (this->count > rev.count)
+                            return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        bool operator>=(DB_Revision rev)
+        {
+            if (*this > rev || *this == rev)
+                return true;
+            return false;
+        }
+
+        bool operator<=(DB_Revision rev)
+        {
+            if (*this < rev || *this == rev)
+                return true;
+            return false;
+        }
+
+    protected:
+        uint32 year, month, day, count;
+};
+
 /// The World
 class World
 {
@@ -772,6 +862,7 @@ class World
         char const* GetDBVersion() const { return m_DBVersion.c_str(); }
 
         void LoadAutobroadcasts();
+        void LoadSQLUpdates();
         
         void UpdateAreaDependentAuras();
 
@@ -875,6 +966,15 @@ class World
 
         // used versions
         std::string m_DBVersion;
+
+        // SQL Updater
+        enum DatabaseUpdater
+        {
+            DB_AUTH  = 0,
+            DB_CHAR  = 1,
+            DB_WORLD = 2
+        };
+        std::string m_SQLUpdatesPath;
 
         typedef std::map<uint8, std::string> AutobroadcastsMap;
         AutobroadcastsMap m_Autobroadcasts;
