@@ -3709,7 +3709,7 @@ void SafeUnitPointer::UnitDeleted()
             if (ptr)
                 sLog->outMisc("SafeUnitPointer::UnitDeleted (A2)");
 
-            p->GetSession()->KickPlayer();
+            p->GetSession()->KickPlayer("Unit deleted");
         }
     }
     else if (ptr)
