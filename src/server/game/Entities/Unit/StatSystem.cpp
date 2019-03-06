@@ -741,7 +741,7 @@ void Player::UpdateParryPercentage()
         value = std::max(diminishing + nondiminishing, 0.0f);
     }
 
-    SetStatFloatValue(PLAYER_PARRY_PERCENTAGE, value);
+    SetStatFloatValue(PLAYER_PARRY_PERCENTAGE, m_realParry);
 }
 
 void Player::UpdateDodgePercentage()
