@@ -50,7 +50,7 @@ void WorldSession::HandleMoveWorldportAckOpcode()
     // possible errors in the coordinate validity check
     if (!MapManager::IsValidMapCoord(loc))
     {
-        KickPlayer();
+        KickPlayer("!MapManager::IsValidMapCoord(loc)");
         return;
     }
 
@@ -119,7 +119,7 @@ void WorldSession::HandleMoveWorldportAckOpcode()
     Cell cell(pair);
     if (!GridCoord(cell.GridX(), cell.GridY()).IsCoordValid())
     {
-        KickPlayer();
+        KickPlayer("!GridCoord(cell.GridX(), cell.GridY()).IsCoordValid()");
         return;
     }
     newMap->LoadGrid(GetPlayer()->GetPositionX(), GetPlayer()->GetPositionY());
@@ -167,7 +167,7 @@ void WorldSession::HandleMoveWorldportAckOpcode()
     Cell cell2(pair2);
     if (!GridCoord(cell2.GridX(), cell2.GridY()).IsCoordValid())
     {
-        KickPlayer();
+        KickPlayer("!GridCoord(cell2.GridX(), cell2.GridY()).IsCoordValid()");
         return;
     }
     newMap->LoadGrid(GetPlayer()->GetPositionX(), GetPlayer()->GetPositionY());
@@ -577,7 +577,7 @@ void WorldSession::HandleForceSpeedChangeAck(WorldPacket &recvData)
         {
             sLog->outBasic("Player %s from account id %u kicked for incorrect speed (must be %f instead %f)",
                 _player->GetName().c_str(), GetAccountId(), _player->GetSpeed(move_type), newspeed);
-            KickPlayer();
+            KickPlayer("Incorrect speed");
         }
     }
 }
