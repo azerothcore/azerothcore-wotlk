@@ -1410,9 +1410,9 @@ void World::LoadSQLUpdates()
                 // return to original working directory
                 try
                 {
-                    std::experimental::filesystem::current_path(cwd);
+                    fs::current_path(cwd);
                 }
-                catch (std::experimental::filesystem::filesystem_error &error)
+                catch (fs::filesystem_error &error)
                 {
                     sLog->outCrash("Can't change directory to %s: %s", cwd, error.what());
                 }
@@ -1484,9 +1484,9 @@ void World::LoadSQLUpdates()
                 // return to original working directory
                 try
                 {
-                    std::experimental::filesystem::current_path(cwd);
+                    fs::current_path(cwd);
                 }
-                catch (std::experimental::filesystem::filesystem_error &error)
+                catch (fs::filesystem_error &error)
                 {
                     sLog->outCrash("Can't change directory to %s: %s", cwd, error.what());
                 }
@@ -1558,9 +1558,9 @@ void World::LoadSQLUpdates()
                 // return to original working directory
                 try
                 {
-                    std::experimental::filesystem::current_path(cwd);
+                    fs::current_path(cwd);
                 }
-                catch (std::experimental::filesystem::filesystem_error &error)
+                catch (fs::filesystem_error &error)
                 {
                     sLog->outCrash("Can't change directory to %s: %s", cwd, error.what());
                 }

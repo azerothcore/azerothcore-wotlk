@@ -23,9 +23,6 @@
 #include "CompilerDefs.h"
 #include <iostream>
 #include <fstream>
-#if PLATFORM == PLATFORM_UNIX
-#include <sys/file.h>
-#endif
 #include <filesystem>
 
 namespace fs = std::experimental::filesystem;
