@@ -26,6 +26,9 @@
 #if PLATFORM == PLATFORM_UNIX
 #include <sys/file.h>
 #endif
+#include <filesystem>
+
+namespace fs = std::experimental::filesystem;
 
 #define MIN_MYSQL_SERVER_VERSION 50100u
 #define MIN_MYSQL_CLIENT_VERSION 50100u
@@ -500,24 +503,18 @@ class DatabaseWorkerPool
             bool in_trasaction = true;
             bool success = false;
 
-            if (FILE* fp = ACE_OS::fopen(file, "rb"))
+            std::ifstream fp { fs::path(file), std::ios::binary | std::ios::in };
+            const auto fileSize = fs::file_size(file);
+            if (fp.is_open())
             {
-#if PLATFORM == PLATFORM_UNIX
-                flock(fileno(fp), LOCK_SH);
-#endif
-                //------
+                std::string buffer(fileSize, ' ');
+                fp.read(&buffer[0], fileSize);
 
-                struct stat info;
-                fstat(fileno(fp), &info);
-
-                // if less than 1MB allocate on stack, else on heap
-                char* contents = (info.st_size > 1024 * 1024) ? new char[info.st_size] : (char*)alloca(info.st_size);
-
-                if (ACE_OS::fread(contents, info.st_size, 1, fp) == 1)
+                if (buffer.size() > 0)
                 {
-                    if (mysql_real_query(handle, contents, info.st_size))
+                    if (mysql_real_query(handle, buffer.data(), fileSize))
                     {
-                        sLog->outErrorDb("Cannot execute file %s, size: %lu: %s", file, info.st_size, mysql_error(handle));
+                        sLog->outErrorDb("Cannot execute file %s, size: %lu: %s", file, fileSize, mysql_error(handle));
                     }
                     else
                     {
@@ -532,7 +529,7 @@ class DatabaseWorkerPool
                         if (*mysql_error(handle))
                         {
                             success = false;
-                            sLog->outErrorDb("Cannot execute file %s, size: %lu: %s", file, info.st_size, mysql_error(handle));
+                            sLog->outErrorDb("Cannot execute file %s, size: %lu: %s", file, fileSize, mysql_error(handle));
                             if (mysql_rollback(handle))
                                 sLog->outErrorDb("ExecuteFile(): Rollback ended with an error.");
                             else
@@ -550,19 +547,10 @@ class DatabaseWorkerPool
                 }
                 else
                 {
-                    sLog->outErrorDb("Couldn't read file %s, size: %lu", file, info.st_size);
+                    sLog->outErrorDb("Couldn't read file %s, size: %lu", file, fileSize);
                     return false;
                 }
-
-                // if allocated on heap, free memory
-                if (info.st_size > 1024 * 1024)
-                    delete[] contents;
-
-                //------
-#if PLATFORM == PLATFORM_UNIX
-                flock(fileno(fp), LOCK_UN);
-#endif
-                ACE_OS::fclose(fp);
+                fp.close();
             }
 
             mysql_set_server_option(handle, MYSQL_OPTION_MULTI_STATEMENTS_OFF);

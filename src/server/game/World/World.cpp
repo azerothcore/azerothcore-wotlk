@@ -78,10 +78,12 @@
 #include "ServerMotd.h"
 #include "GameGraveyard.h"
 #include <VMapManager2.h>
-#include <ACE/Dirent.h>
+#include <filesystem>
 #ifdef ELUNA
 #include "LuaEngine.h"
 #endif
+
+namespace fs = std::experimental::filesystem;
 
 ACE_Atomic_Op<ACE_Thread_Mutex, bool> World::m_stopEvent = false;
 uint8 World::m_ExitCode = SHUTDOWN_EXIT_CODE;
@@ -1332,7 +1334,7 @@ void World::LoadConfigSettings(bool reload)
 void World::LoadSQLUpdates()
 {
     // directory path
-    std::string path;
+    fs::path path;
     // label used for console output
     std::stringstream label;
     // files from path
@@ -1348,34 +1350,38 @@ void World::LoadSQLUpdates()
                 // clear from previous iterations
                 files.clear();
                 // refresh paths
-                path = m_SQLUpdatesPath;
+                path = fs::path(m_SQLUpdatesPath);
                 path += "db_auth";
+                if (!fs::exists(path))
+                {
+                    sLog->outCrash("SQLUpdater: Path %s doesn't exist.", path.c_str());
+                    break;
+                }
+
                 QueryResult result = LoginDatabase.Query("SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_auth' AND ORDINAL_POSITION = 3");
                 if (!result)
                 {
                     sLog->outErrorDb("SQLUpdater: Couldn't find any revision.");
                     break;
                 }
+
                 DB_Revision currentRev(result->Fetch()[0].GetString());
-                
-                char cwd[PATH_MAX];
+
                 // record current directory
-                ACE_OS::getcwd(cwd, PATH_MAX);
-                if (-1 == ACE_OS::chdir(path.c_str()))
-                    sLog->outCrash("Can't change directory to %s: %s", path.c_str(), strerror(errno));
-
-                // get files in sql/updates/(path)/ directory
-                if (ACE_DIR* dir = ACE_OS::opendir(path.c_str()))
+                fs::path cwd = fs::current_path();
+                try
                 {
-                    while (ACE_DIRENT* entry = ACE_OS::readdir(dir))
-                        // make sure the file is an .sql one
-                        if (!strcmp(entry->d_name + strlen(entry->d_name) - 4, ".sql"))
-                            files.push_back(entry->d_name);
-
-                    ACE_OS::closedir(dir);
+                    fs::current_path(path);
                 }
-                else
-                    sLog->outCrash("Can't open %s: %s", path.c_str(), strerror(errno));
+                catch (fs::filesystem_error &error)
+                {
+                    sLog->outCrash("Can't change directory to %s: %s", cwd, error.what());
+                }
+                // get files in sql/updates/(path)/ directory
+                for (auto const &file : fs::directory_iterator(path))
+                    if (fs::is_regular_file(file.status()) && file.path().extension() == ".sql")
+                        files.push_back(file.path().filename().generic_string());
+
 
                 // sort our files in ascending order
                 std::sort(files.begin(), files.end());
@@ -1402,8 +1408,14 @@ void World::LoadSQLUpdates()
 
 
                 // return to original working directory
-                if (-1 == ACE_OS::chdir(cwd))
-                    sLog->outCrash("Can't change directory to %s: %s", cwd, strerror(errno));
+                try
+                {
+                    std::experimental::filesystem::current_path(cwd);
+                }
+                catch (std::experimental::filesystem::filesystem_error &error)
+                {
+                    sLog->outCrash("Can't change directory to %s: %s", cwd, error.what());
+                }
 
                 break;
             }
@@ -1412,34 +1424,38 @@ void World::LoadSQLUpdates()
                 // clear from previous iterations
                 files.clear();
                 // refresh paths
-                path = m_SQLUpdatesPath;
+                path = fs::path(m_SQLUpdatesPath);
                 path += "db_characters";
-                QueryResult result = CharacterDatabase.Query("SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_characters' AND ORDINAL_POSITION = 3");
+                if (!fs::exists(path))
+                {
+                    sLog->outCrash("SQLUpdater: Path %s doesn't exist.", path.c_str());
+                    break;
+                }
+
+                QueryResult result = WorldDatabase.Query("SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_characters' AND ORDINAL_POSITION = 3");
                 if (!result)
                 {
                     sLog->outErrorDb("SQLUpdater: Couldn't find any revision.");
                     break;
                 }
+
                 DB_Revision currentRev(result->Fetch()[0].GetString());
 
-                char cwd[PATH_MAX];
                 // record current directory
-                ACE_OS::getcwd(cwd, PATH_MAX);
-                if (-1 == ACE_OS::chdir(path.c_str()))
-                    sLog->outCrash("Can't change directory to %s: %s", path.c_str(), strerror(errno));
-
-                // get files in sql/updates/(path)/ directory
-                if (ACE_DIR* dir = ACE_OS::opendir(path.c_str()))
+                fs::path cwd = fs::current_path();
+                try
                 {
-                    while (ACE_DIRENT* entry = ACE_OS::readdir(dir))
-                        // make sure the file is an .sql one
-                        if (!strcmp(entry->d_name + strlen(entry->d_name) - 4, ".sql"))
-                            files.push_back(entry->d_name);
-
-                    ACE_OS::closedir(dir);
+                    fs::current_path(path);
                 }
-                else
-                    sLog->outCrash("Can't open %s: %s", path.c_str(), strerror(errno));
+                catch (fs::filesystem_error &error)
+                {
+                    sLog->outCrash("Can't change directory to %s: %s", cwd, error.what());
+                }
+                // get files in sql/updates/(path)/ directory
+                for (auto const &file : fs::directory_iterator(path))
+                    if (fs::is_regular_file(file.status()) && file.path().extension() == ".sql")
+                        files.push_back(file.path().filename().generic_string());
+
 
                 // sort our files in ascending order
                 std::sort(files.begin(), files.end());
@@ -1466,8 +1482,14 @@ void World::LoadSQLUpdates()
 
 
                 // return to original working directory
-                if (-1 == ACE_OS::chdir(cwd))
-                    sLog->outCrash("Can't change directory to %s: %s", cwd, strerror(errno));
+                try
+                {
+                    std::experimental::filesystem::current_path(cwd);
+                }
+                catch (std::experimental::filesystem::filesystem_error &error)
+                {
+                    sLog->outCrash("Can't change directory to %s: %s", cwd, error.what());
+                }
 
                 break;
             }
@@ -1476,34 +1498,38 @@ void World::LoadSQLUpdates()
                 // clear from previous iterations
                 files.clear();
                 // refresh paths
-                path = m_SQLUpdatesPath;
+                path = fs::path(m_SQLUpdatesPath);
                 path += "db_world";
+                if (!fs::exists(path))
+                {
+                    sLog->outCrash("SQLUpdater: Path %s doesn't exist.", path.c_str());
+                    break;
+                }
+
                 QueryResult result = WorldDatabase.Query("SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND ORDINAL_POSITION = 3");
                 if (!result)
                 {
                     sLog->outErrorDb("SQLUpdater: Couldn't find any revision.");
                     break;
                 }
+
                 DB_Revision currentRev(result->Fetch()[0].GetString());
 
-                char cwd[PATH_MAX];
                 // record current directory
-                ACE_OS::getcwd(cwd, PATH_MAX);
-                if (-1 == ACE_OS::chdir(path.c_str()))
-                    sLog->outCrash("Can't change directory to %s: %s", path.c_str(), strerror(errno));
-
-                // get files in sql/updates/(path)/ directory
-                if (ACE_DIR* dir = ACE_OS::opendir(path.c_str()))
+                fs::path cwd = fs::current_path();
+                try
                 {
-                    while (ACE_DIRENT* entry = ACE_OS::readdir(dir))
-                        // make sure the file is an .sql one
-                        if (!strcmp(entry->d_name + strlen(entry->d_name) - 4, ".sql"))
-                            files.push_back(entry->d_name);
-
-                    ACE_OS::closedir(dir);
+                    fs::current_path(path);
                 }
-                else
-                    sLog->outCrash("Can't open %s: %s", path.c_str(), strerror(errno));
+                catch (fs::filesystem_error &error)
+                {
+                    sLog->outCrash("Can't change directory to %s: %s", cwd, error.what());
+                }
+                // get files in sql/updates/(path)/ directory
+                for (auto const &file : fs::directory_iterator(path))
+                    if (fs::is_regular_file(file.status()) && file.path().extension() == ".sql")
+                        files.push_back(file.path().filename().generic_string());
+
 
                 // sort our files in ascending order
                 std::sort(files.begin(), files.end());
@@ -1530,11 +1556,19 @@ void World::LoadSQLUpdates()
 
 
                 // return to original working directory
-                if (-1 == ACE_OS::chdir(cwd))
-                    sLog->outCrash("Can't change directory to %s: %s", cwd, strerror(errno));
+                try
+                {
+                    std::experimental::filesystem::current_path(cwd);
+                }
+                catch (std::experimental::filesystem::filesystem_error &error)
+                {
+                    sLog->outCrash("Can't change directory to %s: %s", cwd, error.what());
+                }
 
                 break;
             }
+            default:
+                break;
         }
     }
 }
