@@ -1432,7 +1432,7 @@ void World::LoadSQLUpdates()
                     break;
                 }
 
-                QueryResult result = WorldDatabase.Query("SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_characters' AND ORDINAL_POSITION = 3");
+                QueryResult result = CharacterDatabase.Query("SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_characters' AND ORDINAL_POSITION = 3");
                 if (!result)
                 {
                     sLog->outErrorDb("SQLUpdater: Couldn't find any revision.");
