@@ -21,6 +21,9 @@ namespace AccountMgr
         if (utf8length(username) > MAX_ACCOUNT_STR)
             return AOR_NAME_TOO_LONG;                           // username's too long
 
+        if (utf8length(password) > MAX_PASS_STR)
+            return AccountOpResult::AOR_PASS_TOO_LONG;          // password's too long
+
         normalizeString(username);
         normalizeString(password);
 
