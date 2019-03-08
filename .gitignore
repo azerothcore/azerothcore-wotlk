@@ -1,0 +1,93 @@
+#
+# AzerothCore
+#
+
+conf/*
+!conf/*.dist
+apps/drassil/*
+env/dist/*
+env/user/*
+modules/*
+!modules/*.md
+!modules/*.sh
+build*/
+var/*
+docker/build/cache
+docker/authserver/bin
+docker/worldserver/bin
+docker/authserver/etc/authserver.conf
+docker/authserver/etc/authserver.conf.dist
+docker/worldserver/etc/worldserver.conf
+docker/worldserver/etc/worldserver.conf.dist
+docker/authserver/logs/
+docker/worldserver/logs/
+docker/worldserver/data/
+!docker/build
+.env
+
+!.gitkeep
+
+#
+#Generic
+#
+
+.directory
+.mailmap
+*.orig
+*.rej
+*~
+.hg/
+*.kdev*
+.DS_Store
+CMakeLists.txt.user
+*.bak
+*.patch
+*.diff
+*.REMOTE.*
+*.BACKUP.*
+*.BASE.*
+*.LOCAL.*
+
+#
+# IDE & other software
+#
+/.settings/
+/.externalToolBuilders/*
+# exclude in all levels
+nbproject/
+.sync.ffs_db
+*.kate-swp
+.browse.VC*
+.vscode
+.idea
+cmake-build-debug/*
+
+#
+# Eclipse
+#
+*.pydevproject
+.metadata
+.gradle
+tmp/
+*.tmp
+*.swp
+*~.nib
+local.properties
+.settings/
+.loadpath
+.project
+.cproject
+
+
+# ==================
+#
+#  CUSTOM
+#
+#  put below your custom ignore rules
+#  for example , if you want to include a
+#  module directly in repositoryyou can do:
+#
+#  !modules/yourmodule
+#
+# ==================
+
