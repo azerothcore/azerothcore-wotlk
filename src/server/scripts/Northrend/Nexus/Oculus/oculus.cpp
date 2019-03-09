@@ -3,6 +3,9 @@
 */
 
 #include "ScriptMgr.h"
+#include "InstanceScript.h"
+#include "MotionMaster.h"
+#include "ObjectAccessor.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "oculus.h"
@@ -10,24 +13,34 @@
 #include "CombatAI.h"
 #include "Player.h"
 #include "SpellInfo.h"
+#include "SpellAuraEffects.h"
+#include "SpellScript.h"
 
-enum Spells
+enum Drakes
 {
-    // Centrifuge Constructs
-    SPELL_EMPOWERING_BLOWS                      = 50044,
-    H_SPELL_EMPOWERING_BLOWS                    = 59213,
+    SPELL_RIDE_RUBY_DRAKE_QUE               = 49463,
+    SPELL_RIDE_AMBER_DRAKE_QUE              = 49459,
+    SPELL_RIDE_EMERALD_DRAKE_QUE            = 49427,
 
-    SPELL_AMBER_SHOCK_CHARGE                    = 49836,
-    SPELL_RUBY_EVASIVE_CHARGES                  = 50241,
+    // Centrifuge Constructs
+    SPELL_EMPOWERING_BLOWS                  = 50044,
+    H_SPELL_EMPOWERING_BLOWS                = 59213,
+
+    SPELL_AMBER_SHOCK_CHARGE                = 49836,
+    SPELL_RUBY_EVASIVE_CHARGES              = 50241,
 
     // Common Drake
-    SPELL_DRAKE_FLAG_VISUAL                     = 53797,
-    SPELL_SOAR_TRIGGER                          = 50325,
-    SPELL_SOAR_BUFF                             = 50024,
-    SPELL_SCALE_STATS                           = 66667,
+    SPELL_DRAKE_FLAG_VISUAL                 = 53797,
+    SPELL_SOAR_TRIGGER                      = 50325,
+    SPELL_SOAR_BUFF                         = 50024,
+    SPELL_SCALE_STATS                       = 66667,
     // Ruby Drake
-    SPELL_RUBY_EVASIVE_AURA                     = 50248,
-    SPELL_RUBY_EVASIVE_MANEUVERS                = 50240
+    SPELL_RUBY_EVASIVE_AURA                 = 50248,
+    SPELL_RUBY_EVASIVE_MANEUVERS            = 50240,
+
+    // Misc
+    POINT_LAND                              = 2,
+    POINT_TAKE_OFF                          = 3
 };
 
 enum DrakeGiverTexts
@@ -53,7 +66,6 @@ enum DrakeGiverTexts
 #define GOSSIP_ITEM_ETERNOS2        "What abilities do Amber Drakes have?"
 
 #define HAS_ESSENCE(a) ((a)->HasItemCount(ITEM_EMERALD_ESSENCE) || (a)->HasItemCount(ITEM_AMBER_ESSENCE) || (a)->HasItemCount(ITEM_RUBY_ESSENCE))
-
 
 class npc_oculus_drakegiver : public CreatureScript
 {
@@ -203,27 +215,59 @@ public:
         bool JustSummoned;
         uint16 despawnTimer;
 
-        void PassengerBoarded(Unit*  /*who*/, int8  /*seatid*/, bool add)
+        void IsSummonedBy(Unit* summoner)
         {
+            if (m_pInstance->GetBossState(DATA_EREGOS) == IN_PROGRESS)
+                if (Creature* eregos = me->FindNearestCreature(NPC_EREGOS, 450.0f, true))
+                    eregos->DespawnOrUnsummon(); // On retail this kills abusive call of drake during engaged Eregos
+
+            me->SetFacingToObject(summoner);
+
+            switch (me->GetEntry())
+            {
+            case NPC_RUBY_DRAKE:
+                me->CastSpell(summoner, SPELL_RIDE_RUBY_DRAKE_QUE);
+                break;
+            case NPC_EMERALD_DRAKE:
+                me->CastSpell(summoner, SPELL_RIDE_EMERALD_DRAKE_QUE);
+                break;
+            case NPC_AMBER_DRAKE:
+                me->CastSpell(summoner, SPELL_RIDE_AMBER_DRAKE_QUE);
+                break;
+            default:
+                return;
+            }
+
+            Position pos = summoner->GetPosition();
+            me->GetMotionMaster()->MovePoint(POINT_LAND, pos);
+        }
+
+        void MovementInform(uint32 type, uint32 id)
+        {
+            if (type == POINT_MOTION_TYPE && id == POINT_LAND)
+                me->SetDisableGravity(false); // Needed this for proper animation after spawn, the summon in air fall to ground bug leave no other option for now, if this isn't used the drake will only walk on move.
+        }
+
+        void PassengerBoarded(Unit* passenger, int8 /*seatid*/, bool add)
+        {
+            if (passenger->GetTypeId() != TYPEID_PLAYER)
+                return;
+
             if (add)
             {
-                me->SetDisableGravity(false);
-                me->SendMovementFlagUpdate();
                 despawnTimer = 0;
             }
             else
             {
-                me->SetHomePosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation());
-                me->DisappearAndDie();
-                me->DespawnOrUnsummon(1);
+                me->DespawnOrUnsummon(2050);
+                me->SetOrientation(2.5f);
+                me->SetSpeedRate(MOVE_FLIGHT, 1.0f);
+                Position pos = me->GetPosition();
+                Position offset = { 10.0f, 10.0f, 12.0f, 0.0f };
+                pos.RelocateOffset(offset);
+                me->SetDisableGravity(true);
+                me->GetMotionMaster()->MovePoint(POINT_TAKE_OFF, pos);
             }
-        }
-
-        void JustDied(Unit*  /*killer*/)
-        {
-            me->SetHomePosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation());
-            me->DisappearAndDie();
-            me->DespawnOrUnsummon(1);
         }
 
         void SpellHitTarget(Unit* target, SpellInfo const* spell)
@@ -233,11 +277,8 @@ public:
                 {
                     if( target && target->IsAlive() && !target->CanFly() && target->IsHostileTo(me) && !spell->IsTargetingArea())
                     {
-                        me->SetHomePosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation());
                         if( Unit* charmer = me->GetCharmer() )
                             Unit::Kill(charmer, charmer, false);
-                        me->DisappearAndDie();
-                        me->DespawnOrUnsummon(1);
                     }
                     break;
                 }
@@ -286,16 +327,19 @@ public:
                                     //summoner->EnterVehicle(me);
                                     if (spell)
                                         me->CastSpell(summoner, spell, true);
-                                    me->SetCanFly(true);
                                     me->SetSpeedRate(MOVE_FLIGHT, 1.0f);
                                 }
                             }
                     }
                     else
                     {
-                        me->SetHomePosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation());
-                        me->DisappearAndDie();
-                        me->DespawnOrUnsummon(1);
+                        me->DespawnOrUnsummon(2050);
+                        me->SetOrientation(2.5f);
+                        Position pos = me->GetPosition();
+                        Position offset = { 10.0f, 10.0f, 12.0f, 0.0f };
+                        pos.RelocateOffset(offset);
+                        me->SetDisableGravity(true);
+                        me->GetMotionMaster()->MovePoint(POINT_TAKE_OFF, pos);
                         return;
                     }
                 }
@@ -305,10 +349,11 @@ public:
             {
                 if (despawnTimer >= 5000)
                 {
-                    despawnTimer = 0;
-                    me->SetHomePosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation());
-                    me->DisappearAndDie();
-                    me->DespawnOrUnsummon(1);
+                    me->DespawnOrUnsummon(2050);
+                    me->SetOrientation(2.5f);
+                    Position pos = me->GetPosition();
+                    Position offset = { 10.0f, 10.0f, 12.0f, 0.0f };
+                    pos.RelocateOffset(offset);
                     return;
                 }
                 else
@@ -330,7 +375,7 @@ public:
         npc_centrifuge_constructAI(Creature *creature) : ScriptedAI(creature) {}
 
         void Reset() {}
-        
+
         void EnterCombat(Unit* /*who*/)
         {
             DoCast(IsHeroic() ? H_SPELL_EMPOWERING_BLOWS : SPELL_EMPOWERING_BLOWS);
