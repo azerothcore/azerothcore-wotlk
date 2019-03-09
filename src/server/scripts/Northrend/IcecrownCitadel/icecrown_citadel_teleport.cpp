@@ -1,5 +1,5 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-AGPL
+ * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
 #include "ScriptedGossip.h"
@@ -64,7 +64,7 @@ class at_frozen_throne_teleport : public AreaTriggerScript
     public:
         at_frozen_throne_teleport() : AreaTriggerScript("at_frozen_throne_teleport") { }
 
-        bool OnTrigger(Player* player, AreaTriggerEntry const* /*areaTrigger*/)
+        bool OnTrigger(Player* player, AreaTrigger const* /*areaTrigger*/)
         {
             if (player->IsInCombat())
             {

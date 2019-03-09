@@ -1,5 +1,5 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-AGPL
+ * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
 #include "ScriptMgr.h"
@@ -175,7 +175,7 @@ class instance_steam_vault : public InstanceMapScript
                 OUT_SAVE_INST_DATA;
 
                 std::ostringstream stream;
-                stream << "S V " << m_auiEncounter[0] << ' ' << m_auiEncounter[1] << ' ' << m_auiEncounter[2] << ' ' << m_auiEncounter[3];
+                stream << "S V " << m_auiEncounter[0] << ' ' << m_auiEncounter[1] << ' ' << m_auiEncounter[2];
 
                 OUT_SAVE_INST_DATA_COMPLETE;
                 return stream.str();

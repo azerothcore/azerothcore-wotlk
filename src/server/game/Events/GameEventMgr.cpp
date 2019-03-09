@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -18,7 +18,10 @@
 #include "UnitAI.h"
 #include "GameObjectAI.h"
 #include "Transport.h"
-
+#include "ScriptMgr.h"
+#ifdef ELUNA
+#include "LuaEngine.h"
+#endif
 #include <time.h>
 
 bool GameEventMgr::CheckOneGameEvent(uint16 entry) const
@@ -125,6 +128,10 @@ bool GameEventMgr::StartEvent(uint16 event_id, bool overwrite)
             if (data.end <= data.start)
                 data.end = data.start + data.length;
         }
+
+        if (IsActiveEvent(event_id))
+            sScriptMgr->OnGameEventStart(event_id);
+
         return false;
     }
     else
@@ -147,6 +154,9 @@ bool GameEventMgr::StartEvent(uint16 event_id, bool overwrite)
         // or to scedule another update where the next event will be started
         if (overwrite && conditions_met)
             sWorld->ForceGameEventUpdate();
+
+        if (IsActiveEvent(event_id))
+            sScriptMgr->OnGameEventStart(event_id);
 
         return conditions_met;
     }
@@ -190,14 +200,17 @@ void GameEventMgr::StopEvent(uint16 event_id, bool overwrite)
             CharacterDatabase.CommitTransaction(trans);
         }
     }
+
+    if (!IsActiveEvent(event_id))
+        sScriptMgr->OnGameEventStop(event_id);
 }
 
 void GameEventMgr::LoadFromDB()
 {
     {
         uint32 oldMSTime = getMSTime();
-                                                //       1           2                           3                         4          5       6        7             8            9
-        QueryResult result = WorldDatabase.Query("SELECT eventEntry, UNIX_TIMESTAMP(start_time), UNIX_TIMESTAMP(end_time), occurence, length, holiday, holidayStage, description, world_event FROM game_event");
+                                                //       1           2                           3                         4          5       6        7             8            9            10
+        QueryResult result = WorldDatabase.Query("SELECT eventEntry, UNIX_TIMESTAMP(start_time), UNIX_TIMESTAMP(end_time), occurence, length, holiday, holidayStage, description, world_event, announce FROM game_event");
         if (!result)
         {
             mGameEvent.clear();
@@ -230,6 +243,7 @@ void GameEventMgr::LoadFromDB()
             pGameEvent.holidayStage = fields[6].GetUInt8();
             pGameEvent.description  = fields[7].GetString();
             pGameEvent.state        = (GameEventState)(fields[8].GetUInt8());
+            pGameEvent.announce     = fields[9].GetUInt8();
             pGameEvent.nextstart    = 0;
 
             ++count;
@@ -1176,14 +1190,9 @@ void GameEventMgr::UnApplyEvent(uint16 event_id)
 
 void GameEventMgr::ApplyNewEvent(uint16 event_id)
 {
-    switch (sWorld->getIntConfig(CONFIG_EVENT_ANNOUNCE))
-    {
-        case 0:                                             // disable
-            break;
-        case 1:                                             // announce events
-            sWorld->SendWorldText(LANG_EVENTMESSAGE, mGameEvent[event_id].description.c_str());
-            break;
-    }
+    uint8 announce = mGameEvent[event_id].announce;
+    if (announce == 1 || (announce == 2 && sWorld->getIntConfig(CONFIG_EVENT_ANNOUNCE)))
+        sWorld->SendWorldText(LANG_EVENTMESSAGE, mGameEvent[event_id].description.c_str());
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDetail("GameEvent %u \"%s\" started.", event_id, mGameEvent[event_id].description.c_str());

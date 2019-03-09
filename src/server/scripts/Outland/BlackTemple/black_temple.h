@@ -1,11 +1,16 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-AGPL
+ * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
  */
 
 #ifndef BLACK_TEMPLE_H_
 #define BLACK_TEMPLE_H_
 
-#include "ScriptPCH.h"
+#include "Player.h"
+#include "ScriptedGossip.h"
+#include "SpellScript.h"
+#include "SpellAuraEffects.h"
+#include "PassiveAI.h"
+#include "GridNotifiers.h"
 
 enum DataTypes
 {

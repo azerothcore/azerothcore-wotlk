@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -11,6 +11,8 @@
 #include "blackrock_depths.h"
 #include "Player.h"
 #include "WorldSession.h"
+
+uint32 braziersUsed = 0;
 
 //go_shadowforge_brazier
 class go_shadowforge_brazier : public GameObjectScript
@@ -27,10 +29,23 @@ public:
             else
                 instance->SetData(TYPE_LYCEUM, IN_PROGRESS);
             // If used brazier open linked doors (North or South)
-            if (go->GetGUID() == instance->GetData64(DATA_SF_BRAZIER_N))
-                instance->HandleGameObject(instance->GetData64(DATA_GOLEM_DOOR_N), true);
-            else if (go->GetGUID() == instance->GetData64(DATA_SF_BRAZIER_S))
-                instance->HandleGameObject(instance->GetData64(DATA_GOLEM_DOOR_S), true);
+            if (go->GetGUID() == instance->GetData64(DATA_SF_BRAZIER_N)) {
+                if (braziersUsed == 0) {
+                    braziersUsed = 1;
+                }else if(braziersUsed == 2){
+                    instance->HandleGameObject(instance->GetData64(DATA_GOLEM_DOOR_N), true);
+                    instance->HandleGameObject(instance->GetData64(DATA_GOLEM_DOOR_S), true);
+                    braziersUsed = 0;
+                }
+            }else if (go->GetGUID() == instance->GetData64(DATA_SF_BRAZIER_S)) {
+                if (braziersUsed == 0) {
+                    braziersUsed = 2;
+                }else if (braziersUsed == 1) {
+                    instance->HandleGameObject(instance->GetData64(DATA_GOLEM_DOOR_N), true);
+                    instance->HandleGameObject(instance->GetData64(DATA_GOLEM_DOOR_S), true);
+                    braziersUsed = 0;
+                }
+            }
         }
         return false;
     }
@@ -76,7 +91,7 @@ class at_ring_of_law : public AreaTriggerScript
 public:
     at_ring_of_law() : AreaTriggerScript("at_ring_of_law") { }
 
-    bool OnTrigger(Player* player, const AreaTriggerEntry* /*at*/)
+    bool OnTrigger(Player* player, const AreaTrigger* /*at*/)
     {
         if (InstanceScript* instance = player->GetInstanceScript())
         {

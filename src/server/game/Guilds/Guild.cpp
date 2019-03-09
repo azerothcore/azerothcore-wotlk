@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -1161,7 +1161,7 @@ bool Guild::Create(Player* pLeader, std::string const& name)
     m_info = "";
     m_motd = "No message set.";
     m_bankMoney = 0;
-    m_createdDate = ::time(NULL);
+    m_createdDate = sWorld->GetGameTime();
     _CreateLogHolders();
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
@@ -1418,11 +1418,8 @@ void Guild::HandleSetBankTabInfo(WorldSession* session, uint8 tabId, std::string
         return;
     }
 
-    char aux[2];
-    sprintf(aux, "%u", tabId);
-
     tab->SetInfo(name, icon);
-    _BroadcastEvent(GE_BANK_TAB_UPDATED, 0, aux, name.c_str(), icon.c_str());
+    _BroadcastEvent(GE_BANK_TAB_UPDATED, 0, std::to_string(tabId).c_str(), name.c_str(), icon.c_str());
 }
 
 void Guild::HandleSetMemberNote(WorldSession* session, std::string const& name, std::string const& note, bool isPublic)
@@ -1459,9 +1456,7 @@ void Guild::HandleSetRankInfo(WorldSession* session, uint8 rankId, std::string c
         for (GuildBankRightsAndSlotsVec::const_iterator itr = rightsAndSlots.begin(); itr != rightsAndSlots.end(); ++itr)
             _SetRankBankTabRightsAndSlots(rankId, *itr);
 
-        char aux[2];
-        sprintf(aux, "%u", rankId);
-        _BroadcastEvent(GE_RANK_UPDATED, 0, aux, name.c_str());
+        _BroadcastEvent(GE_RANK_UPDATED, 0, std::to_string(rankId).c_str(), name.c_str());
     }
 }
 
@@ -1686,11 +1681,7 @@ void Guild::HandleAddNewRank(WorldSession* session, std::string const& name)
     // Only leader can add new rank
     if (_IsLeader(session->GetPlayer()))
         if (_CreateRank(name, GR_RIGHT_GCHATLISTEN | GR_RIGHT_GCHATSPEAK))
-        {
-            char aux[2];
-            sprintf(aux, "%u", size);
-            _BroadcastEvent(GE_RANK_UPDATED, 0, aux, name.c_str());
-        }
+            _BroadcastEvent(GE_RANK_UPDATED, 0, std::to_string(size).c_str(), name.c_str());
 }
 
 void Guild::HandleRemoveLowestRank(WorldSession* session)

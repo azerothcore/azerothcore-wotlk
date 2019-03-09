@@ -1,5 +1,5 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-AGPL
+ * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
 #include "ScriptMgr.h"
@@ -196,8 +196,8 @@ public:
             if (!killer)
                 return;
 
-            if (me->GetEntry() == NPC_HEALTHY_MUSHROOM)
-                me->CastSpell(me, SPELL_HEALTHY_MUSHROOM_POTENT_FUNGUS, true);
+            if (me->GetEntry() == NPC_HEALTHY_MUSHROOM && !killer->HasAura(SPELL_MINI))
+                DoCast(killer, SPELL_HEALTHY_MUSHROOM_POTENT_FUNGUS);
         }
 
         void EnterCombat(Unit* /*who*/) {}

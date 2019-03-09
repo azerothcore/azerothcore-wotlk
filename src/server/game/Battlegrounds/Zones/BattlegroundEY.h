@@ -1,5 +1,5 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-AGPL
+ * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: http://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
 #ifndef __BATTLEGROUNDEY_H
@@ -336,7 +336,7 @@ class BattlegroundEY : public Battleground
         void HandleBuffUse(uint64 buff_guid);
         void HandleAreaTrigger(Player* player, uint32 trigger);
         void HandleKillPlayer(Player* player, Player* killer);
-        WorldSafeLocsEntry const* GetClosestGraveyard(Player* player);
+        GraveyardStruct const* GetClosestGraveyard(Player* player);
         bool SetupBattleground();
         void Init();
         void EndBattleground(TeamId winnerTeamId);

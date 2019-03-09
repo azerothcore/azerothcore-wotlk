@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -561,20 +561,6 @@ struct AreaPOIEntry
     //uint32 val2;          //53
 };
 
-struct AreaTriggerEntry
-{
-    uint32  id;                                             // 0        m_ID
-    uint32  mapid;                                          // 1        m_ContinentID
-    float   x;                                              // 2        m_x
-    float   y;                                              // 3        m_y
-    float   z;                                              // 4        m_z
-    float   radius;                                         // 5        m_radius
-    float   box_x;                                          // 6        m_box_length
-    float   box_y;                                          // 7        m_box_width
-    float   box_z;                                          // 8        m_box_heigh
-    float   box_orientation;                                // 9        m_box_yaw
-};
-
 struct AuctionHouseEntry
 {
     uint32    houseId;                                      // 0 index
@@ -660,7 +646,7 @@ struct ChrClassesEntry
                                                             // 1, unused
     uint32  powerType;                                      // 2
                                                             // 3-4, unused
-    //char*       name[16];                                 // 5-20 unused
+    char*       name[16];                                 // 5-20 unused
                                                             // 21 string flag, unused
     //char*       nameFemale[16];                           // 21-36 unused, if different from base (male) case
                                                             // 37 string flag, unused
@@ -2056,17 +2042,6 @@ struct WorldMapOverlayEntry
                                                             // 6-7 always 0, possible part of areatableID[]
     //char* internal_name                                   // 8
                                                             // 9-16 some ints
-};
-
-struct WorldSafeLocsEntry
-{
-    uint32    ID;                                           // 0
-    uint32    map_id;                                       // 1
-    float     x;                                            // 2
-    float     y;                                            // 3
-    float     z;                                            // 4
-    //char*   name[16]                                      // 5-20 name, unused
-                                                            // 21 name flags, unused
 };
 
 /*

@@ -1,11 +1,9 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-AGPL
+ * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
 #ifndef DEF_OBSIDIAN_SANCTUM_H
 #define DEF_OBSIDIAN_SANCTUM_H
-
-#include "ScriptPCH.h"
 
 enum Data
 {
@@ -43,7 +41,7 @@ enum Data
 
     // Spells
     SPELL_TWILIGHT_SHIFT            = 57620,
-    SPELL_TWILIGHT_TORMENT_SARTHARION = 58853,
+    SPELL_TWILIGHT_TORMENT_SARTHARION = 58835,
 };
 
 #endif

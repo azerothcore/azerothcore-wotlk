@@ -1,5 +1,5 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-AGPL
+ * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
 #include "ScriptMgr.h"
@@ -202,7 +202,7 @@ public:
         void MoveInLineOfSight(Unit* who)
         {
             if (!activated && who->GetTypeId() == TYPEID_PLAYER)
-                if (me->GetExactDist2d(who) <= 25.0f && me->GetMap()->isInLineOfSight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()+5.0f, who->GetPositionX(), who->GetPositionY(), who->GetPositionZ()+5.0f, 2))
+                if (me->GetExactDist2d(who) <= 25.0f && me->GetMap()->isInLineOfSight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()+5.0f, who->GetPositionX(), who->GetPositionY(), who->GetPositionZ()+5.0f, 2, LINEOFSIGHT_ALL_CHECKS))
                 {
                     activated = true;
                     me->RemoveAura(64615);
@@ -465,7 +465,7 @@ class AreaTrigger_at_celestial_planetarium_enterance : public AreaTriggerScript
         {
         }
 
-        bool OnTrigger(Player* player, AreaTriggerEntry const* /*trigger*/)
+        bool OnTrigger(Player* player, AreaTrigger const* /*trigger*/)
         {
             if (player->IsAlive())
                 if (uint32 questId = (player->GetMap()->Is25ManRaid() ? 13816 : 13607 /*QUEST_CELESTIAL_PLANETARIUM*/))

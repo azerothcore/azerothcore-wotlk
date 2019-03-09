@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -853,7 +853,7 @@ class at_bring_your_orphan_to : public AreaTriggerScript
     public:
         at_bring_your_orphan_to() : AreaTriggerScript("at_bring_your_orphan_to") { }
 
-        bool OnTrigger(Player* player, AreaTriggerEntry const* trigger)
+        bool OnTrigger(Player* player, AreaTrigger const* trigger)
         {
             if (player->isDead() || !player->HasAura(SPELL_ORPHAN_OUT))
                 return false;
@@ -861,7 +861,7 @@ class at_bring_your_orphan_to : public AreaTriggerScript
             uint32 questId = 0;
             uint32 orphanId = 0;
 
-            switch (trigger->id)
+            switch (trigger->entry)
             {
                 case AT_DOWN_AT_THE_DOCKS:
                     questId = QUEST_DOWN_AT_THE_DOCKS;

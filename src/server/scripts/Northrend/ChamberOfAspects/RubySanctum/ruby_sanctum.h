@@ -1,17 +1,17 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-AGPL
+ * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
 #ifndef RUBY_SANCTUM_H_
 #define RUBY_SANCTUM_H_
 
-#include "ScriptPCH.h"
-
+#include "Player.h"
 #include "SpellScript.h"
 #include "Map.h"
 #include "Creature.h"
 #include "GameObjectAI.h"
-
+#include "PassiveAI.h"
+#include "Opcodes.h"
 
 enum DataTypes
 {

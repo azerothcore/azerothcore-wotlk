@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -17,6 +17,7 @@
 #include "Util.h"
 #include "World.h"
 #include "SHA1.h"
+#include "ServerMotd.h"
 
 RASocket::RASocket()
 {
@@ -349,7 +350,7 @@ int RASocket::svc(void)
     }
 
     // send motd
-    if (send(std::string(sWorld->GetMotd()) + "\r\n") == -1)
+    if (send(std::string(Motd::GetMotd()) + "\r\n") == -1)
         return -1;
 
     for (;;)

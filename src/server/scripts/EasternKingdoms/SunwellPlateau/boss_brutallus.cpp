@@ -1,9 +1,8 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-AGPL
+ * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
 #include "ScriptMgr.h"
-#include "ScriptPCH.h"
 #include "ScriptedCreature.h"
 #include "sunwell_plateau.h"
 
@@ -512,7 +511,7 @@ class AreaTrigger_at_sunwell_madrigosa : public AreaTriggerScript
 
         AreaTrigger_at_sunwell_madrigosa() : AreaTriggerScript("at_sunwell_madrigosa") {}
 
-        bool OnTrigger(Player* player, AreaTriggerEntry const* /*trigger*/)
+        bool OnTrigger(Player* player, AreaTrigger const* /*trigger*/)
         {
             if (InstanceScript* instance = player->GetInstanceScript())
                 if (instance->GetBossState(DATA_MADRIGOSA) != DONE)

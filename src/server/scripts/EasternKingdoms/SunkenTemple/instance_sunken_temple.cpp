@@ -1,13 +1,13 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-AGPL
+ * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
 #include "ScriptMgr.h"
-#include "ScriptPCH.h"
 #include "InstanceScript.h"
 #include "sunken_temple.h"
 #include "Player.h"
 #include "CreatureAI.h"
+#include "SpellScript.h"
 
 class instance_sunken_temple : public InstanceMapScript
 {
@@ -203,7 +203,7 @@ class at_malfurion_stormrage : public AreaTriggerScript
     public:
         at_malfurion_stormrage() : AreaTriggerScript("at_malfurion_stormrage") { }
 
-        bool OnTrigger(Player* player, const AreaTriggerEntry* /*at*/)
+        bool OnTrigger(Player* player, const AreaTrigger* /*at*/)
         {
             if (player->GetInstanceScript() && !player->FindNearestCreature(NPC_MALFURION_STORMRAGE, 15.0f) &&
                 player->GetQuestStatus(QUEST_THE_CHARGE_OF_DRAGONFLIGHTS) == QUEST_STATUS_REWARDED && player->GetQuestStatus(QUEST_ERANIKUS_TYRANT_OF_DREAMS) != QUEST_STATUS_REWARDED)

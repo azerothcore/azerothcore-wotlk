@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -694,8 +694,8 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
     SetModifierValue(UNIT_MOD_ARMOR, BASE_VALUE, float(petlevel*50));
 
     uint32 attackTime = BASE_ATTACK_TIME;
-    if (m_owner->getClass() != CLASS_HUNTER && cinfo->baseattacktime >= 1000)
-        attackTime = cinfo->baseattacktime;
+    if (m_owner->getClass() != CLASS_HUNTER && cinfo->BaseAttackTime >= 1000)
+        attackTime = cinfo->BaseAttackTime;
 
     SetAttackTime(BASE_ATTACK, attackTime);
     SetAttackTime(OFF_ATTACK, attackTime);

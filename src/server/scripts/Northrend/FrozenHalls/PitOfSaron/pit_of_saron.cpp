@@ -1,5 +1,5 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-AGPL
+ * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
 #include "ScriptMgr.h"
@@ -1556,7 +1556,7 @@ class at_tyrannus_event_starter : public AreaTriggerScript
     public:
         at_tyrannus_event_starter() : AreaTriggerScript("at_tyrannus_event_starter") { }
 
-        bool OnTrigger(Player* player, const AreaTriggerEntry* /*at*/)
+        bool OnTrigger(Player* player, const AreaTrigger* /*at*/)
         {
             InstanceScript* inst = player->GetInstanceScript();
             if (!inst)

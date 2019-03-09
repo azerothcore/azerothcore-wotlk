@@ -1,5 +1,5 @@
-/*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-AGPL
+﻿/*
+ * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
 #include "ScriptMgr.h"
@@ -28,7 +28,7 @@ class instance_deadmines : public InstanceMapScript
                 {
                     case GO_FACTORY_DOOR:
                         if (_encounters[TYPE_RHAHK_ZOR] == DONE)
-                            HandleGameObject(0, true, gameobject);
+                            gameobject->SetGoState(GO_STATE_ACTIVE);
                         break;
                     case GO_IRON_CLAD_DOOR:
                         if (_encounters[TYPE_CANNON] == DONE)

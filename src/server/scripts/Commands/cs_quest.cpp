@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -224,6 +224,18 @@ public:
         int32 ReqOrRewMoney = quest->GetRewOrReqMoney();
         if (ReqOrRewMoney < 0)
             player->ModifyMoney(-ReqOrRewMoney);
+
+        // check if Quest Tracker is enabled
+        if (sWorld->getBoolConfig(CONFIG_QUEST_ENABLE_QUEST_TRACKER))
+        {
+            // prepare Quest Tracker datas
+            PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_QUEST_TRACK_GM_COMPLETE);
+            stmt->setUInt32(0, quest->GetQuestId());
+            stmt->setUInt32(1, player->GetGUIDLow());
+
+            // add to Quest Tracker
+            CharacterDatabase.Execute(stmt);
+        }
 
         player->CompleteQuest(entry);
         return true;

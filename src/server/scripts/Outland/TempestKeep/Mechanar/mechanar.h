@@ -1,11 +1,14 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-AGPL
+ * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
 #ifndef DEF_MECHANAR_H
 #define DEF_MECHANAR_H
 
-#include "ScriptPCH.h"
+#include "SpellScript.h"
+#include "SpellAuraEffects.h"
+#include "Player.h"
+#include "CreatureAI.h"
 
 enum DataTypes
 {

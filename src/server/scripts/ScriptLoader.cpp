@@ -1,11 +1,12 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
 #include "ScriptLoader.h"
 #include "ScriptMgr.h"
+#include "World.h"
 
 // spells
 void AddSC_deathknight_spell_scripts();
@@ -31,6 +32,7 @@ void AddSC_ban_commandscript();
 void AddSC_bf_commandscript();
 void AddSC_cast_commandscript();
 void AddSC_character_commandscript();
+void AddSC_cheat_commandscript();
 void AddSC_debug_commandscript();
 void AddSC_disable_commandscript();
 void AddSC_event_commandscript();
@@ -72,6 +74,7 @@ void AddSC_npc_innkeeper();
 void AddSC_npcs_special();
 void AddSC_npc_taxi();
 void AddSC_achievement_scripts();
+void AddSC_action_ip_logger();
 
 //events
 void AddSC_event_brewfest_scripts();
@@ -201,7 +204,6 @@ void AddSC_instance_zulgurub();
 //void AddSC_alterac_mountains();
 void AddSC_arathi_highlands();
 void AddSC_blasted_lands();
-void AddSC_burning_steppes();
 void AddSC_duskwood();
 void AddSC_eastern_plaguelands();
 void AddSC_eversong_woods();
@@ -466,8 +468,10 @@ void AddSC_wintergrasp();
 
 //outland
 void AddSC_boss_exarch_maladaar();           //Auchindoun Auchenai Crypts
+void AddSC_instance_auchenai_crypts();
 void AddSC_boss_shirrak_the_dead_watcher();
 void AddSC_boss_nexusprince_shaffar();       //Auchindoun Mana Tombs
+void AddSC_instance_mana_tombs();
 void AddSC_boss_talon_king_ikiss();          //Auchindoun Sekketh Halls
 void AddSC_instance_sethekk_halls();
 void AddSC_instance_shadow_labyrinth();      //Auchindoun Shadow Labyrinth
@@ -497,7 +501,9 @@ void AddSC_boss_mekgineer_steamrigger();
 void AddSC_boss_warlord_kalithresh();
 void AddSC_instance_steam_vault();
 void AddSC_boss_the_black_stalker();         //CR Underbog
+void AddSC_instance_the_underbog();
 void AddSC_boss_ahune();
+void AddSC_instance_the_slave_pens();
 void AddSC_boss_gruul();                     //Gruul's Lair
 void AddSC_boss_high_king_maulgar();
 void AddSC_instance_gruuls_lair();
@@ -572,6 +578,7 @@ void AddSC_outdoorpvp_gh();
 // player
 void AddSC_chat_log();
 void AddSC_character_creation();
+void AddSC_action_ip_logger();
 
 #endif
 
@@ -602,6 +609,7 @@ void AddCommandScripts()
     AddSC_bf_commandscript();
     AddSC_cast_commandscript();
     AddSC_character_commandscript();
+    AddSC_cheat_commandscript();
     AddSC_debug_commandscript();
     AddSC_disable_commandscript();
     AddSC_event_commandscript();
@@ -644,8 +652,9 @@ void AddWorldScripts()
     AddSC_npcs_special();
     AddSC_npc_taxi();
     AddSC_achievement_scripts();
-    AddSC_chat_log();
+    AddSC_chat_log(); // location: scripts\World\chat_log.cpp
     AddSC_character_creation();
+    AddSC_action_ip_logger(); // location: scripts\World\action_ip_logger.cpp
 #endif
 }
 
@@ -783,7 +792,6 @@ void AddEasternKingdomsScripts()
     //AddSC_alterac_mountains();
     AddSC_arathi_highlands();
     AddSC_blasted_lands();
-    AddSC_burning_steppes();
     AddSC_duskwood();
     AddSC_eastern_plaguelands();
     AddSC_eversong_woods();
@@ -893,8 +901,10 @@ void AddOutlandScripts()
 {
 #ifdef SCRIPTS
     AddSC_boss_exarch_maladaar();           //Auchindoun Auchenai Crypts
+    AddSC_instance_auchenai_crypts();
     AddSC_boss_shirrak_the_dead_watcher();
     AddSC_boss_nexusprince_shaffar();       //Auchindoun Mana Tombs
+    AddSC_instance_mana_tombs();
     AddSC_boss_talon_king_ikiss();          //Auchindoun Sekketh Halls
     AddSC_instance_sethekk_halls();
     AddSC_instance_shadow_labyrinth();      //Auchindoun Shadow Labyrinth
@@ -924,7 +934,9 @@ void AddOutlandScripts()
     AddSC_boss_warlord_kalithresh();
     AddSC_instance_steam_vault();
     AddSC_boss_the_black_stalker();         //CR Underbog
+    AddSC_instance_the_underbog();
     AddSC_boss_ahune();
+    AddSC_instance_the_slave_pens();
     AddSC_boss_gruul();                     //Gruul's Lair
     AddSC_boss_high_king_maulgar();
     AddSC_instance_gruuls_lair();

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -12,6 +12,7 @@
 #include "WorldPacket.h"
 #include "Language.h"
 #include "World.h"
+#include "GameGraveyard.h"
 
 OutdoorPvPNA::OutdoorPvPNA()
 {
@@ -120,7 +121,7 @@ void OPvPCapturePointNA::DeSpawnGOs()
 void OPvPCapturePointNA::FactionTakeOver(TeamId teamId)
 {
     if (m_ControllingFaction != TEAM_NEUTRAL)
-        sObjectMgr->RemoveGraveyardLink(NA_HALAA_GRAVEYARD, NA_HALAA_GRAVEYARD_ZONE, m_ControllingFaction, false);
+        sGraveyard->RemoveGraveyardLink(NA_HALAA_GRAVEYARD, NA_HALAA_GRAVEYARD_ZONE, m_ControllingFaction, false);
     if (m_ControllingFaction == TEAM_ALLIANCE)
         sWorld->SendZoneText(NA_HALAA_GRAVEYARD_ZONE, sObjectMgr->GetTrinityStringForDBCLocale(LANG_OPVP_NA_LOSE_A));
     else if (m_ControllingFaction == TEAM_HORDE)
@@ -128,7 +129,7 @@ void OPvPCapturePointNA::FactionTakeOver(TeamId teamId)
 
     m_ControllingFaction = teamId;
     if (m_ControllingFaction != TEAM_NEUTRAL)
-        sObjectMgr->AddGraveyardLink(NA_HALAA_GRAVEYARD, NA_HALAA_GRAVEYARD_ZONE, m_ControllingFaction, false);
+        sGraveyard->AddGraveyardLink(NA_HALAA_GRAVEYARD, NA_HALAA_GRAVEYARD_ZONE, m_ControllingFaction, false);
     DeSpawnGOs();
     DeSpawnNPCs();
     SpawnGOsForTeam(teamId);

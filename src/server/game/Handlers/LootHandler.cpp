@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -20,6 +20,10 @@
 #include "WorldPacket.h"
 #include "WorldSession.h"
 #include "ObjectMgr.h"
+
+#ifdef ELUNA
+#include "LuaEngine.h"
+#endif
 
 void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket& recvData)
 {
@@ -200,12 +204,14 @@ void WorldSession::HandleLootMoneyOpcode(WorldPacket & /*recvData*/)
             data << uint8(1);   // "You loot..."
             SendPacket(&data);
         }
-
+#ifdef ELUNA
+        sEluna->OnLootMoney(player, loot->gold);
+#endif
         loot->gold = 0;
 
         // Delete the money loot record from the DB
         if (loot->containerId > 0)
-            sLootItemStorage->RemoveStoredLootMoney(loot->containerId);
+            sLootItemStorage->RemoveStoredLootMoney(loot->containerId, loot);
 
         // Delete container if empty
         if (loot->isLooted() && IS_ITEM_GUID(guid))
@@ -492,6 +498,10 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recvData)
     Item* newitem = target->StoreNewItem(dest, item.itemid, true, item.randomPropertyId, looters);
     target->SendNewItem(newitem, uint32(item.count), false, false, true);
     target->UpdateLootAchievements(&item, loot);
+
+#ifdef ELUNA
+    sEluna->OnLootItem(target, newitem, item.count, lootguid);
+#endif
 
     // mark as looted
     item.count=0;

@@ -147,6 +147,7 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/src/server/game/Loot
   ${CMAKE_SOURCE_DIR}/src/server/game/Mails
   ${CMAKE_SOURCE_DIR}/src/server/game/Miscellaneous
+  ${CMAKE_SOURCE_DIR}/src/server/game/Motd
   ${CMAKE_SOURCE_DIR}/src/server/game/Maps
   ${CMAKE_SOURCE_DIR}/src/server/game/Movement
   ${CMAKE_SOURCE_DIR}/src/server/game/Movement/MovementGenerators
@@ -179,6 +180,9 @@ include_directories(
   ${ACE_INCLUDE_DIR}
   ${MYSQL_INCLUDE_DIR}
 )
+
+# Group sources
+GroupSources(${CMAKE_CURRENT_SOURCE_DIR})
 
 add_library(scripts STATIC
   ${scripts_STAT_SRCS}

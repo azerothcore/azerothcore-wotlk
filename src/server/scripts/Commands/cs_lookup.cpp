@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -43,21 +43,22 @@ public:
 
         static std::vector<ChatCommand> lookupCommandTable =
         {
-            { "area",           SEC_MODERATOR,      true,  &HandleLookupAreaCommand,            "" },
-            { "creature",       SEC_MODERATOR,      true,  &HandleLookupCreatureCommand,        "" },
-            { "event",          SEC_MODERATOR,      true,  &HandleLookupEventCommand,           "" },
-            { "faction",        SEC_MODERATOR,      true,  &HandleLookupFactionCommand,         "" },
-            { "item",           SEC_MODERATOR,      true,  &HandleLookupItemCommand,            "" },
-            { "itemset",        SEC_MODERATOR,      true,  &HandleLookupItemSetCommand,         "" },
-            { "object",         SEC_MODERATOR,      true,  &HandleLookupObjectCommand,          "" },
-            { "quest",          SEC_MODERATOR,      true,  &HandleLookupQuestCommand,           "" },
-            { "player",         SEC_GAMEMASTER,     true,  nullptr,                                "", lookupPlayerCommandTable },
-            { "skill",          SEC_MODERATOR,      true,  &HandleLookupSkillCommand,           "" },
-            { "spell",          SEC_MODERATOR,      true,  nullptr,                                "", lookupSpellCommandTable },
-            { "taxinode",       SEC_MODERATOR,      true,  &HandleLookupTaxiNodeCommand,        "" },
-            { "tele",           SEC_MODERATOR,      true,  &HandleLookupTeleCommand,            "" },
-            { "title",          SEC_MODERATOR,      true,  &HandleLookupTitleCommand,           "" },
-            { "map",            SEC_MODERATOR,      true,  &HandleLookupMapCommand,             "" }
+            { "area",           SEC_MODERATOR,      true,  &HandleLookupAreaCommand,        "" },
+            { "creature",       SEC_MODERATOR,      true,  &HandleLookupCreatureCommand,    "" },
+            { "event",          SEC_MODERATOR,      true,  &HandleLookupEventCommand,       "" },
+            { "faction",        SEC_MODERATOR,      true,  &HandleLookupFactionCommand,     "" },
+            { "item",           SEC_MODERATOR,      true,  &HandleLookupItemCommand,        "" },
+            { "itemset",        SEC_MODERATOR,      true,  &HandleLookupItemSetCommand,     "" },
+            { "object",         SEC_MODERATOR,      true,  &HandleLookupObjectCommand,      "" },
+            { "gobject",        SEC_MODERATOR,      true,  &HandleLookupObjectCommand,      "" },
+            { "quest",          SEC_MODERATOR,      true,  &HandleLookupQuestCommand,       "" },
+            { "skill",          SEC_MODERATOR,      true,  &HandleLookupSkillCommand,       "" },
+            { "taxinode",       SEC_MODERATOR,      true,  &HandleLookupTaxiNodeCommand,    "" },
+            { "tele",           SEC_MODERATOR,      true,  &HandleLookupTeleCommand,        "" },
+            { "title",          SEC_MODERATOR,      true,  &HandleLookupTitleCommand,       "" },
+            { "map",            SEC_MODERATOR,      true,  &HandleLookupMapCommand,         "" },
+            { "player",         SEC_GAMEMASTER,     true,  nullptr, "", lookupPlayerCommandTable },
+            { "spell",          SEC_MODERATOR,      true,  nullptr, "", lookupSpellCommandTable }
         };
 
         static std::vector<ChatCommand> commandTable =

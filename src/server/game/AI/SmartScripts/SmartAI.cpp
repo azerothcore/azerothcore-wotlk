@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -674,7 +674,14 @@ void SmartAI::MoveInLineOfSight(Unit* who)
         return;
 
     if (me->CanStartAttack(who))
+    {
+        if (me->HasUnitState(UNIT_STATE_DISTRACTED))
+        {
+            me->ClearUnitState(UNIT_STATE_DISTRACTED);
+            me->GetMotionMaster()->Clear();
+        }
         AttackStart(who);
+    }
 }
 
 bool SmartAI::CanAIAttack(const Unit* /*who*/) const
@@ -1174,17 +1181,17 @@ class SmartTrigger : public AreaTriggerScript
 
         SmartTrigger() : AreaTriggerScript("SmartTrigger") {}
 
-        bool OnTrigger(Player* player, AreaTriggerEntry const* trigger)
+        bool OnTrigger(Player* player, AreaTrigger const* trigger)
         {
             if (!player->IsAlive())
                 return false;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            sLog->outDebug(LOG_FILTER_DATABASE_AI, "AreaTrigger %u is using SmartTrigger script", trigger->id);
+            sLog->outDebug(LOG_FILTER_DATABASE_AI, "AreaTrigger %u is using SmartTrigger script", trigger->entry);
 #endif
             SmartScript script;
             script.OnInitialize(NULL, trigger);
-            script.ProcessEventsFor(SMART_EVENT_AREATRIGGER_ONTRIGGER, player, trigger->id);
+            script.ProcessEventsFor(SMART_EVENT_AREATRIGGER_ONTRIGGER, player, trigger->entry);
             return true;
         }
 };

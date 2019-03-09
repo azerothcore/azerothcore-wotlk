@@ -1,5 +1,5 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-AGPL
+ * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
 #include "ObjectMgr.h"
@@ -450,7 +450,7 @@ class at_baltharus_plateau : public AreaTriggerScript
     public:
         at_baltharus_plateau() : AreaTriggerScript("at_baltharus_plateau") { }
 
-        bool OnTrigger(Player* player, AreaTriggerEntry const* /*areaTrigger*/)
+        bool OnTrigger(Player* player, AreaTrigger const* /*areaTrigger*/)
         {
             if (InstanceScript* instance = player->GetInstanceScript())
             {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -26,6 +26,7 @@
 #include "DynamicTree.h"
 #include "GameObjectModel.h"
 #include "Log.h"
+#include "DataMap.h"
 
 #include <bitset>
 #include <list>
@@ -139,6 +140,14 @@ struct LiquidData
     uint32 entry;
     float  level;
     float  depth_level;
+};
+
+enum LineOfSightChecks
+{
+    LINEOFSIGHT_CHECK_VMAP      = 0x1, // check static floor layout data
+    LINEOFSIGHT_CHECK_GOBJECT   = 0x2, // check dynamic game object data
+
+    LINEOFSIGHT_ALL_CHECKS      = (LINEOFSIGHT_CHECK_VMAP | LINEOFSIGHT_CHECK_GOBJECT)
 };
 
 class GridMap
@@ -447,7 +456,7 @@ class Map : public GridRefManager<NGridType>
 
         float GetWaterOrGroundLevel(float x, float y, float z, float* ground = NULL, bool swim = false, float maxSearchDist = 50.0f) const;
         float GetHeight(uint32 phasemask, float x, float y, float z, bool vmap = true, float maxSearchDist = DEFAULT_HEIGHT_SEARCH) const;
-        bool isInLineOfSight(float x1, float y1, float z1, float x2, float y2, float z2, uint32 phasemask) const;
+        bool isInLineOfSight(float x1, float y1, float z1, float x2, float y2, float z2, uint32 phasemask, LineOfSightChecks checks) const;
         void Balance() { _dynamicTree.balance(); }
         void RemoveGameObjectModel(const GameObjectModel& model) { _dynamicTree.remove(model); }
         void InsertGameObjectModel(const GameObjectModel& model) { _dynamicTree.insert(model); }
@@ -505,6 +514,8 @@ class Map : public GridRefManager<NGridType>
         bool AllTransportsEmpty() const; // pussywizard
         void AllTransportsRemovePassengers(); // pussywizard
         TransportsContainer const& GetAllTransports() const { return _transports; }
+
+        DataMap CustomData;
 
     private:
         void LoadMapAndVMap(int gx, int gy);

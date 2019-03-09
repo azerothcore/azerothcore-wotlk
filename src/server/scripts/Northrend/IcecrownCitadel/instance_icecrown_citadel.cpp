@@ -1,5 +1,5 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-AGPL
+ * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
 #include "ObjectMgr.h"
@@ -157,6 +157,7 @@ class instance_icecrown_citadel : public InstanceMapScript
                 LoadDoorData(doorData);
                 TeamIdInInstance = TEAM_NEUTRAL;
                 HeroicAttempts = MaxHeroicAttempts;
+                LadyDeathwhisperGUID = 0;
                 LadyDeathwisperElevatorGUID = 0;
                 GunshipGUID = 0;
                 EnemyGunshipGUID = 0;
@@ -343,6 +344,9 @@ class instance_icecrown_citadel : public InstanceMapScript
                             instance->SummonCreature(NPC_UTHER_THE_LIGHTBRINGER_QUEST, UtherSpawnPos);
                             instance->SummonCreature(NPC_LADY_SYLVANAS_WINDRUNNER_QUEST, SylvanasSpawnPos);
                         }
+                        break;
+                    case NPC_LADY_DEATHWHISPER:
+                        LadyDeathwhisperGUID = creature->GetGUID();
                         break;
                     case NPC_DEATHBRINGER_SAURFANG:
                         DeathbringerSaurfangGUID = creature->GetGUID();
@@ -925,6 +929,8 @@ class instance_icecrown_citadel : public InstanceMapScript
             {
                 switch (type)
                 {
+                    case DATA_LADY_DEATHWHISPER:
+                        return LadyDeathwhisperGUID;
                     case DATA_ICECROWN_GUNSHIP_BATTLE:
                         return GunshipGUID;
                     case DATA_ENEMY_GUNSHIP:
@@ -1825,6 +1831,7 @@ class instance_icecrown_citadel : public InstanceMapScript
             uint64 ScourgeTransporterFirstGUID;
 
             EventMap Events;
+            uint64 LadyDeathwhisperGUID;
             uint64 LadyDeathwisperElevatorGUID;
             uint64 GunshipGUID;
             uint64 EnemyGunshipGUID;

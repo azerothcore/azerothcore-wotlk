@@ -16,6 +16,7 @@ set(scripts_STAT_SRCS
   Commands/cs_bf.cpp
   Commands/cs_cast.cpp
   Commands/cs_character.cpp
+  Commands/cs_cheat.cpp
   Commands/cs_debug.cpp
   Commands/cs_disable.cpp
   Commands/cs_event.cpp
@@ -37,8 +38,8 @@ set(scripts_STAT_SRCS
   Commands/cs_quest.cpp
   Commands/cs_reload.cpp
   Commands/cs_reset.cpp
-  Commands/cs_tele.cpp
   Commands/cs_server.cpp
+  Commands/cs_tele.cpp
   Commands/cs_ticket.cpp
   Commands/cs_titles.cpp
   Commands/cs_wp.cpp

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -66,8 +66,6 @@ enum CreatureFlagsExtra
 
 #define MAX_CREATURE_QUEST_ITEMS 6
 
-#define MAX_EQUIPMENT_ITEMS 3
-
 // from `creature_template` table
 struct CreatureTemplate
 {
@@ -95,9 +93,9 @@ struct CreatureTemplate
     float   maxdmg;
     uint32  dmgschool;
     uint32  attackpower;
-    float   dmg_multiplier;
-    uint32  baseattacktime;
-    uint32  rangeattacktime;
+    float   DamageModifier;
+    uint32  BaseAttackTime;
+    uint32  RangeAttackTime;
     uint32  unit_class;                                     // enum Classes. Note only 4 classes are known for creatures.
     uint32  unit_flags;                                     // enum UnitFlags mask values
     uint32  unit_flags2;                                    // enum UnitFlags2 mask values
@@ -233,6 +231,8 @@ struct PointOfInterestLocale
 {
     StringVector IconName;
 };
+
+#define MAX_EQUIPMENT_ITEMS 3
 
 struct EquipmentInfo
 {
@@ -596,6 +596,7 @@ class Creature : public Unit, public GridObject<Creature>, public MovableMapObje
 
         bool CanStartAttack(Unit const* u) const;
         float GetAggroRange(Unit const* target) const;
+        float GetAttackDistance(Unit const* player) const;
 
         void SendAIReaction(AiReaction reactionType);
 

@@ -1,4 +1,4 @@
-/* Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2 This program is free software; you can redistribute it and/or modify
+/* Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2 This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
@@ -28,6 +28,8 @@
 #include "CombatAI.h"
 #include "Player.h"
 #include "PoolMgr.h"
+#include "GameGraveyard.h"
+#include "World.h"
 
 #define GOSSIP_HELLO_DEMO1  "Build catapult."
 #define GOSSIP_HELLO_DEMO2  "Build demolisher."
@@ -226,8 +228,8 @@ class npc_wg_spirit_guide : public CreatureScript
                 GraveyardVect gy = wintergrasp->GetGraveyardVector();
                 for (uint8 i = 0; i < gy.size(); i++)
                     if (action - GOSSIP_ACTION_INFO_DEF == i && gy[i]->GetControlTeamId() == player->GetTeamId())
-                        if (WorldSafeLocsEntry const* safeLoc = sWorldSafeLocsStore.LookupEntry(gy[i]->GetGraveyardId()))
-                            player->TeleportTo(safeLoc->map_id, safeLoc->x, safeLoc->y, safeLoc->z, 0);
+                        if (GraveyardStruct const* safeLoc = sGraveyard->GetGraveyard(gy[i]->GetGraveyardId()))
+                            player->TeleportTo(safeLoc->Map, safeLoc->x, safeLoc->y, safeLoc->z, 0);
             }
             return true;
         }
@@ -274,6 +276,9 @@ class npc_wg_queue : public CreatureScript
 
         bool OnGossipHello(Player* player, Creature* creature)
         {
+            if (!sWorld->getBoolConfig(CONFIG_MINIGOB_MANABONK))
+                return false;
+
             if (creature->IsQuestGiver())
                 player->PrepareQuestMenu(creature->GetGUID());
 
@@ -336,6 +341,9 @@ class npc_wg_queue : public CreatureScript
 
             void UpdateAI(uint32 diff)
             {
+                if (CONFIG_WINTERGRASP_ENABLE == false)
+                    return;
+
                 ScriptedAI::UpdateAI(diff);
 
                 events.Update(diff);

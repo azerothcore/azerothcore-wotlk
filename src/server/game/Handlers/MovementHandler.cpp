@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -24,6 +24,7 @@
 #include "Chat.h"
 #include "BattlegroundMgr.h"
 #include "ScriptMgr.h"
+#include "GameGraveyard.h"
 
 #define MOVEMENT_PACKET_TIME_DELAY 0
 
@@ -49,7 +50,7 @@ void WorldSession::HandleMoveWorldportAckOpcode()
     // possible errors in the coordinate validity check
     if (!MapManager::IsValidMapCoord(loc))
     {
-        KickPlayer();
+        KickPlayer("!MapManager::IsValidMapCoord(loc)");
         return;
     }
 
@@ -118,7 +119,7 @@ void WorldSession::HandleMoveWorldportAckOpcode()
     Cell cell(pair);
     if (!GridCoord(cell.GridX(), cell.GridY()).IsCoordValid())
     {
-        KickPlayer();
+        KickPlayer("!GridCoord(cell.GridX(), cell.GridY()).IsCoordValid()");
         return;
     }
     newMap->LoadGrid(GetPlayer()->GetPositionX(), GetPlayer()->GetPositionY());
@@ -166,7 +167,7 @@ void WorldSession::HandleMoveWorldportAckOpcode()
     Cell cell2(pair2);
     if (!GridCoord(cell2.GridX(), cell2.GridY()).IsCoordValid())
     {
-        KickPlayer();
+        KickPlayer("!GridCoord(cell2.GridX(), cell2.GridY()).IsCoordValid()");
         return;
     }
     newMap->LoadGrid(GetPlayer()->GetPositionX(), GetPlayer()->GetPositionY());
@@ -487,11 +488,12 @@ void WorldSession::HandleMovementOpcodes(WorldPacket & recvData)
                 }
                 else if (!plrMover->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_IS_OUT_OF_BOUNDS))
                 {
-                    WorldSafeLocsEntry const* grave = sObjectMgr->GetClosestGraveyard(plrMover->GetPositionX(), plrMover->GetPositionY(), plrMover->GetPositionZ(), plrMover->GetMapId(), plrMover->GetTeamId());
-
-                    if ( grave)
-                        plrMover->TeleportTo(grave->map_id, grave->x, grave->y, grave->z, plrMover->GetOrientation());
-                    plrMover->Relocate(grave->x, grave->y, grave->z, plrMover->GetOrientation());
+                    GraveyardStruct const* grave = sGraveyard->GetClosestGraveyard(plrMover->GetPositionX(), plrMover->GetPositionY(), plrMover->GetPositionZ(), plrMover->GetMapId(), plrMover->GetTeamId());
+                    if (grave)
+                    {
+                        plrMover->TeleportTo(grave->Map, grave->x, grave->y, grave->z, plrMover->GetOrientation());
+                        plrMover->Relocate(grave->x, grave->y, grave->z, plrMover->GetOrientation());
+                    }
                 }
 
                 plrMover->StopMovingOnCurrentPos(); // pussywizard: moving corpse can't release spirit
@@ -575,7 +577,7 @@ void WorldSession::HandleForceSpeedChangeAck(WorldPacket &recvData)
         {
             sLog->outBasic("Player %s from account id %u kicked for incorrect speed (must be %f instead %f)",
                 _player->GetName().c_str(), GetAccountId(), _player->GetSpeed(move_type), newspeed);
-            KickPlayer();
+            KickPlayer("Incorrect speed");
         }
     }
 }
@@ -722,4 +724,38 @@ void WorldSession::HandleSummonResponseOpcode(WorldPacket& recvData)
     }
     _player->SetSummonAsSpectator(false);
     _player->SummonIfPossible(agree, summoner_guid);
+}
+
+void WorldSession::HandleMoveTimeSkippedOpcode(WorldPacket& recvData)
+{
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Recvd CMSG_MOVE_TIME_SKIPPED");
+#endif
+    
+    uint64 guid;
+    uint32 timeSkipped;
+    recvData.readPackGUID(guid);
+    recvData >> timeSkipped;
+
+    Unit* mover = GetPlayer()->m_mover;
+
+    if (!mover)
+    {
+        sLog->outError("WorldSession::HandleMoveTimeSkippedOpcode wrong mover state from the unit moved by the player [" UI64FMTD "]", GetPlayer()->GetGUID());
+        return;
+    }
+
+    // prevent tampered movement data
+    if (guid != mover->GetGUID())
+    {
+        sLog->outError("WorldSession::HandleMoveTimeSkippedOpcode wrong guid from the unit moved by the player [" UI64FMTD "]", GetPlayer()->GetGUID());
+        return;
+    }
+
+    mover->m_movementInfo.time += timeSkipped;
+
+    WorldPacket data(MSG_MOVE_TIME_SKIPPED, recvData.size());
+    data.appendPackGUID(guid);
+    data << timeSkipped;
+    GetPlayer()->SendMessageToSet(&data, false);
 }

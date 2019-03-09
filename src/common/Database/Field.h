@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 
- *
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -60,6 +59,13 @@ class Field
                 return *reinterpret_cast<int8*>(data.value);
             return static_cast<int8>(atol((char*)data.value));
         }
+
+#ifdef ELUNA
+        enum_field_types GetType() const
+        {
+            return data.type;
+        }
+#endif
 
         uint16 GetUInt16() const
         {

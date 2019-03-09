@@ -1,5 +1,5 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-AGPL
+ * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: http://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
 #ifndef __BATTLEGROUNDWS_H
@@ -176,7 +176,7 @@ class BattlegroundWS : public Battleground
         bool SetupBattleground();
         void Init();
         void EndBattleground(TeamId winnerTeamId);
-        WorldSafeLocsEntry const* GetClosestGraveyard(Player* player);
+        GraveyardStruct const* GetClosestGraveyard(Player* player);
 
         void UpdateFlagState(TeamId teamId, uint32 value);
         void UpdatePlayerScore(Player* player, uint32 type, uint32 value, bool doAddHonor = true);

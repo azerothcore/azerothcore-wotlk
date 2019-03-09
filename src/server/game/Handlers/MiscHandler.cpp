@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -43,6 +43,9 @@
 #include "AccountMgr.h"
 #include "Spell.h"
 #include "WhoListCache.h"
+#ifdef ELUNA
+#include "LuaEngine.h"
+#endif
 
 void WorldSession::HandleRepopRequestOpcode(WorldPacket & recv_data)
 {
@@ -70,6 +73,10 @@ void WorldSession::HandleRepopRequestOpcode(WorldPacket & recv_data)
 #endif
         GetPlayer()->KillPlayer();
     }
+
+#ifdef ELUNA
+    sEluna->OnRepop(GetPlayer());
+#endif
 
     //this is spirit release confirm?
     GetPlayer()->RemovePet(NULL, PET_SAVE_NOT_IN_SLOT, true);
@@ -886,7 +893,7 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket& recv_data)
         return;
     }
 
-    AreaTriggerEntry const* atEntry = sAreaTriggerStore.LookupEntry(triggerId);
+    AreaTrigger const* atEntry = sObjectMgr->GetAreaTrigger(triggerId);
     if (!atEntry)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
@@ -900,7 +907,7 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket& recv_data)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         sLog->outDebug(LOG_FILTER_NETWORKIO, "HandleAreaTriggerOpcode: Player '%s' (GUID: %u) too far (trigger map: %u player map: %u), ignore Area Trigger ID: %u",
-            player->GetName().c_str(), atEntry->mapid, player->GetMapId(), player->GetGUIDLow(), triggerId);
+            player->GetName().c_str(), atEntry->map, player->GetMapId(), player->GetGUIDLow(), triggerId);
 #endif
         return;
     }
@@ -919,7 +926,7 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket& recv_data)
     if (sObjectMgr->IsTavernAreaTrigger(triggerId))
     {
         // set resting flag we are in the inn
-        player->SetRestState(atEntry->id);
+        player->SetRestState(atEntry->entry);
 
         if (sWorld->IsFFAPvPRealm())
             player->RemoveByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
@@ -938,7 +945,7 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket& recv_data)
         if (pvp->HandleAreaTrigger(_player, triggerId))
             return;
 
-    AreaTrigger const* at = sObjectMgr->GetAreaTrigger(triggerId);
+    AreaTriggerTeleport const* at = sObjectMgr->GetAreaTriggerTeleport(triggerId);
     if (!at)
         return;
 
@@ -1127,14 +1134,6 @@ void WorldSession::HandleNextCinematicCamera(WorldPacket & /*recv_data*/)
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_NEXT_CINEMATIC_CAMERA");
 #endif
-}
-
-void WorldSession::HandleMoveTimeSkippedOpcode(WorldPacket & recv_data)
-{
-    uint64 guid;
-    uint32 time_skipped;
-    recv_data.readPackGUID(guid);
-    recv_data >> time_skipped;
 }
 
 void WorldSession::HandleFeatherFallAck(WorldPacket &recv_data)
@@ -1700,7 +1699,7 @@ void WorldSession::HandleSetRaidDifficultyOpcode(WorldPacket & recv_data)
                 p->SetMap(homeMap0);
                 p->Relocate(0.0f, 0.0f, 0.0f, 0.0f);
                 if (!p->TeleportTo(571, 5790.20f, 2071.36f, 636.07f, 3.60f))
-                    p->GetSession()->KickPlayer();
+                    p->GetSession()->KickPlayer("HandleSetRaidDifficultyOpcode 1");
             }
 
             bool anyoneInside = false;
@@ -1737,7 +1736,7 @@ void WorldSession::HandleSetRaidDifficultyOpcode(WorldPacket & recv_data)
             {
                 itr->first->SetRaidDifficulty(Difficulty(mode)); // needed for teleport not to fail
                 if (!itr->first->TeleportTo(*(foundMaps.begin()), itr->second.GetPositionX(), itr->second.GetPositionY(), itr->second.GetPositionZ(), itr->second.GetOrientation()))
-                    itr->first->GetSession()->KickPlayer();
+                    itr->first->GetSession()->KickPlayer("HandleSetRaidDifficultyOpcode 2");
             }
         }
     }

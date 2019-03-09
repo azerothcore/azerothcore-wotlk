@@ -6,8 +6,8 @@ function comp_clean() {
 
   cd $BUILDPATH
 
-  make -f Makefile clean
-  make clean
+  make -f Makefile clean || true
+  make clean || true
   find -iname '*cmake*' -not -name CMakeLists.txt -exec rm -rf {} \+
 
   cd $CWD
@@ -28,7 +28,12 @@ function comp_configure() {
   #-DSCRIPTS_NORTHREND=$CSCRIPTS -DSCRIPTS_OUTDOORPVP=$CSCRIPTS -DSCRIPTS_OUTLAND=$CSCRIPTS -DSCRIPTS_PET=$CSCRIPTS -DSCRIPTS_SPELLS=$CSCRIPTS -DSCRIPTS_WORLD=$CSCRIPTS \
   #-DAC_WITH_UNIT_TEST=$CAC_UNIT_TEST -DAC_WITH_PLUGINS=$CAC_PLG \
 
-  cmake $SRCPATH -DCMAKE_INSTALL_PREFIX=$BINPATH -DCONF_DIR=$CONFDIR -DSERVERS=$CSERVERS \
+  local DCONF=""
+  if [ ! -z "$CONFDIR" ]; then
+    DCONF="-DCONF_DIR=$CONFDIR"
+  fi
+
+  cmake $SRCPATH -DCMAKE_INSTALL_PREFIX=$BINPATH $DCONF -DSERVERS=$CSERVERS \
   -DSCRIPTS=$CSCRIPTS \
   -DTOOLS=$CTOOLS -DUSE_SCRIPTPCH=$CSCRIPTPCH -DUSE_COREPCH=$CCOREPCH -DWITH_COREDEBUG=$CDEBUG  -DCMAKE_BUILD_TYPE=$CTYPE -DWITH_WARNINGS=$CWARNINGS \
   -DCMAKE_C_COMPILER=$CCOMPILERC -DCMAKE_CXX_COMPILER=$CCOMPILERCXX "-DDISABLED_AC_MODULES=$CDISABLED_AC_MODULES" $CCUSTOMOPTIONS
@@ -39,7 +44,7 @@ function comp_configure() {
 }
 
 
-function comp_build() {
+function comp_compile() {
   [ $MTHREADS == 0 ] && MTHREADS=`grep -c ^processor /proc/cpuinfo` && MTHREADS=$(($MTHREADS + 2))
 
   echo "Using $MTHREADS threads"
@@ -54,4 +59,14 @@ function comp_build() {
   cd $CWD
 
   runHooks "ON_AFTER_BUILD"
+}
+
+function comp_build() {
+  comp_configure
+  comp_compile
+}
+
+function comp_all() {
+    comp_clean
+    comp_build
 }

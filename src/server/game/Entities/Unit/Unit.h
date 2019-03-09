@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -938,7 +938,6 @@ private:
     uint32 _spellPhaseMask;
     uint32 _hitMask;
     uint32 _cooldown;
-    Spell* _spell;
     DamageInfo* _damageInfo;
     HealInfo* _healInfo;
     SpellInfo const* const _triggeredByAuraSpell;
@@ -1687,6 +1686,8 @@ class Unit : public WorldObject
         bool IsInFlight()  const { return HasUnitState(UNIT_STATE_IN_FLIGHT); }
 
         bool IsInCombat() const { return HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IN_COMBAT); }
+        bool IsInCombatWith(Unit const* who) const;
+
         bool IsPetInCombat() const { return HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PET_IN_COMBAT); }
         void CombatStart(Unit* target, bool initialAggro = true);
         void CombatStartOnCast(Unit* target, bool initialAggro = true, uint32 duration = 0);
@@ -2559,6 +2560,7 @@ class Unit : public WorldObject
         bool m_duringRemoveFromWorld; // lock made to not add stuff after begining removing from world
 
         uint32 _oldFactionId;           ///< faction before charm
+        bool m_petCatchUp;
 };
 
 namespace Trinity

@@ -1,5 +1,5 @@
 /*
- * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-AGPL
+ * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
 #include "ScriptMgr.h"
@@ -103,7 +103,8 @@ class boss_gruul : public CreatureScript
                     case EVENT_CAVE_IN:
                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
                             me->CastSpell(target, SPELL_CAVE_IN, false);
-                        _caveInTimer -= 1500;
+                        if (_caveInTimer >= 4000)
+                            _caveInTimer -= 1500;
                         events.ScheduleEvent(EVENT_CAVE_IN, _caveInTimer);
                         break;
                     case EVENT_REVERBERATION:

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -88,7 +88,7 @@ class WorldSocket : public WorldHandler
         bool IsClosed (void) const;
 
         /// Close the socket.
-        void CloseSocket (void);
+        void CloseSocket(std::string const& reason);
 
         /// Get address of connected peer.
         const std::string& GetRemoteAddress (void) const;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -271,7 +271,6 @@ void ReputationMgr::Initialize()
 
 bool ReputationMgr::SetReputation(FactionEntry const* factionEntry, int32 standing, bool incremental, bool spillOverOnly)
 {
-    sScriptMgr->OnPlayerReputationChange(_player, factionEntry->ID, standing, incremental);
     bool res = false;
     // if spillover definition exists in DB, override DBC
     if (const RepSpilloverTemplate* repTemplate = sObjectMgr->GetRepSpilloverTemplate(factionEntry->ID))
@@ -375,6 +374,11 @@ bool ReputationMgr::SetOneFactionReputation(FactionEntry const* factionEntry, in
 
         if (new_rank > old_rank)
             _sendFactionIncreased = true;
+
+        sScriptMgr->OnPlayerReputationChange(_player, factionEntry->ID, standing, incremental);
+
+        if (new_rank != old_rank)
+            sScriptMgr->OnPlayerReputationRankChange(_player, factionEntry->ID, new_rank, old_rank, _sendFactionIncreased);
 
         UpdateRankCounters(old_rank, new_rank);
 

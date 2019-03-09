@@ -1,5 +1,5 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-AGPL
+ * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
 #include "ObjectMgr.h"
@@ -173,15 +173,15 @@ public:
     bool operator()(WorldObject* object) const
     {
         if (!object)
-            return true;
+            return false;
         if (Player* p = object->ToPlayer())
         {
             if (p == _source->GetVictim() || p->GetExactDist(_source) >= 45.0f)
-                return true;
+                return false;
 
-            return false;
+            return true;
         }
-        return true;
+        return false;
     }
 private:
     Creature const* _source;

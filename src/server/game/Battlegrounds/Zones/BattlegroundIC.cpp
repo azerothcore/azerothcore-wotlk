@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -15,6 +15,7 @@
 #include "Transport.h"
 #include "WorldSession.h"
 #include "ScriptedCreature.h"
+#include "GameGraveyard.h"
 
 BattlegroundIC::BattlegroundIC()
 {
@@ -950,7 +951,7 @@ void BattlegroundIC::EventPlayerDamagedGO(Player* /*player*/, GameObject* /*go*/
 
 }
 
-WorldSafeLocsEntry const* BattlegroundIC::GetClosestGraveyard(Player* player)
+GraveyardStruct const* BattlegroundIC::GetClosestGraveyard(Player* player)
 {
     // Is there any occupied node for this team?
     std::vector<uint8> nodes;
@@ -958,7 +959,7 @@ WorldSafeLocsEntry const* BattlegroundIC::GetClosestGraveyard(Player* player)
         if (nodePoint[i].faction == player->GetTeamId() && !nodePoint[i].needChange) // xinef: controlled by faction and not contested!
             nodes.push_back(i);
 
-    WorldSafeLocsEntry const* good_entry = NULL;
+    GraveyardStruct const* good_entry = NULL;
     // If so, select the closest node to place ghost on
     if (!nodes.empty())
     {
@@ -968,7 +969,7 @@ WorldSafeLocsEntry const* BattlegroundIC::GetClosestGraveyard(Player* player)
         float mindist = 999999.0f;
         for (uint8 i = 0; i < nodes.size(); ++i)
         {
-            WorldSafeLocsEntry const*entry = sWorldSafeLocsStore.LookupEntry(BG_IC_GraveyardIds[nodes[i]]);
+            GraveyardStruct const*entry = sGraveyard->GetGraveyard(BG_IC_GraveyardIds[nodes[i]]);
             if (!entry)
                 continue;
             float dist = (entry->x - plr_x)*(entry->x - plr_x)+(entry->y - plr_y)*(entry->y - plr_y);
@@ -982,7 +983,7 @@ WorldSafeLocsEntry const* BattlegroundIC::GetClosestGraveyard(Player* player)
     }
     // If not, place ghost on starting location
     if (!good_entry)
-        good_entry = sWorldSafeLocsStore.LookupEntry(BG_IC_GraveyardIds[player->GetTeamId()+MAX_NODE_TYPES]);
+        good_entry = sGraveyard->GetGraveyard(BG_IC_GraveyardIds[player->GetTeamId()+MAX_NODE_TYPES]);
 
     return good_entry;
 }

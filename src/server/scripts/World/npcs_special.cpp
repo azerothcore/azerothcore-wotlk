@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -757,12 +757,12 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_chicken_cluckAI(creature);
     }
 
-    bool OnQuestAccept(Player* /*player*/, Creature* creature, Quest const* quest)
+    bool OnQuestAccept(Player* /*player*/, Creature* creature, Quest const* quest) override
     {
         if (quest->GetQuestId() == QUEST_CLUCK)
             CAST_AI(npc_chicken_cluck::npc_chicken_cluckAI, creature->AI())->Reset();
@@ -770,7 +770,7 @@ public:
         return true;
     }
 
-    bool OnQuestComplete(Player* /*player*/, Creature* creature, Quest const* quest)
+    bool OnQuestComplete(Player* /*player*/, Creature* creature, Quest const* quest) override
     {
         if (quest->GetQuestId() == QUEST_CLUCK)
             CAST_AI(npc_chicken_cluck::npc_chicken_cluckAI, creature->AI())->Reset();

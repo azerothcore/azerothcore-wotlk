@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -9,11 +9,12 @@
  * Scriptnames of files in this file should be prefixed with "npc_pet_mag_".
  */
 
+#include "Player.h"
 #include "ScriptMgr.h"
-#include "ScriptPCH.h"
 #include "ScriptedCreature.h"
 #include "CombatAI.h"
 #include "Pet.h"
+#include "SpellAuras.h"
 
 enum MageSpells
 {
@@ -53,6 +54,7 @@ class npc_pet_mage_mirror_image : public CreatureScript
             uint32 selectionTimer;
             uint64 _ebonGargoyleGUID;
             uint32 checktarget;
+            uint32 dist = urand(1, 5);
 
             void InitializeAI()
             {
@@ -80,8 +82,12 @@ class npc_pet_mage_mirror_image : public CreatureScript
                 }
 
                 ((Minion*)me)->SetFollowAngle(angle);
-                me->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST, me->GetFollowAngle(), MOTION_SLOT_ACTIVE);
-                me->SetReactState(REACT_PASSIVE);
+                if (owner->IsInCombat())
+                    me->NearTeleportTo(me->GetPositionX() + cos(angle)*dist, me->GetPositionY() + sin(angle)*dist, me->GetPositionZ(), me->GetOrientation(), false, false, false, false);
+                else
+                    me->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST, me->GetFollowAngle(), MOTION_SLOT_ACTIVE);
+
+                me->SetReactState(REACT_DEFENSIVE);
 
                 // Xinef: Inherit Master's Threat List (not yet implemented)
                 //owner->CastSpell((Unit*)NULL, SPELL_MAGE_MASTERS_THREAT_LIST, true);
@@ -149,26 +155,19 @@ class npc_pet_mage_mirror_image : public CreatureScript
                 if (owner && owner->GetTypeId() == TYPEID_PLAYER)
                 {
                     Unit* selection = owner->ToPlayer()->GetSelectedUnit();
-                    if (selection && selection != me->GetVictim())
-                    {
-                        // target has cc, search target without cc!
-                        if (selection->HasBreakableByDamageCrowdControlAura() || !me->IsValidAttackTarget(selection))
-                        {
-                            EnterEvadeMode();
-                            return;
-                        }
 
+                    if (selection)
+                    {
                         me->getThreatManager().resetAllAggro();
                         me->AddThreat(selection, 1000000.0f);
 
                         if (owner->IsInCombat())
                             AttackStart(selection);
-
                     }
-                }
 
-                if (!me->GetVictim() || !me->GetVictim()->IsAlive())
-                    return;
+                    if (!owner->IsInCombat() && !me->GetVictim())
+                        EnterEvadeMode();
+                }
             }
 
             void Reset()
@@ -190,21 +189,15 @@ class npc_pet_mage_mirror_image : public CreatureScript
                 }
 
                 checktarget += diff;
+
                 if (checktarget >= 1000)
                 {
                     if (me->GetVictim()->HasBreakableByDamageCrowdControlAura() || !me->GetVictim()->IsAlive())
                     {
                         MySelectNextTarget();
-                        me->InterruptNonMeleeSpells(true); // Stop casting if target is C or not Alive.
+                        me->InterruptNonMeleeSpells(true); // Stop casting if target is CC or not Alive.
                         return;
                     }
-                }
-
-                selectionTimer += diff;
-                if (selectionTimer >= 1000)
-                {
-                    MySelectNextTarget();
-                    selectionTimer = 0;
                 }
 
                 if (me->HasUnitState(UNIT_STATE_CASTING))

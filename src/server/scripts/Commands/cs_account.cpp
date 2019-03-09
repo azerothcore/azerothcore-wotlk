@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -111,6 +111,10 @@ public:
             break;
         case AOR_NAME_TOO_LONG:
             handler->SendSysMessage(LANG_ACCOUNT_TOO_LONG);
+            handler->SetSentErrorMessage(true);
+            return false;
+        case AOR_PASS_TOO_LONG:
+            handler->SendSysMessage(LANG_ACCOUNT_PASS_TOO_LONG);
             handler->SetSentErrorMessage(true);
             return false;
         case AOR_NAME_ALREDY_EXIST:
@@ -347,6 +351,7 @@ public:
         if (!AccountMgr::CheckPassword(handler->GetSession()->GetAccountId(), std::string(oldPassword)))
         {
             handler->SendSysMessage(LANG_COMMAND_WRONGOLDPASSWORD);
+            sScriptMgr->OnFailedPasswordChange(handler->GetSession()->GetAccountId());
             handler->SetSentErrorMessage(true);
             return false;
         }
@@ -354,6 +359,7 @@ public:
         if (strcmp(newPassword, passwordConfirmation) != 0)
         {
             handler->SendSysMessage(LANG_NEW_PASSWORDS_NOT_MATCH);
+            sScriptMgr->OnFailedPasswordChange(handler->GetSession()->GetAccountId());
             handler->SetSentErrorMessage(true);
             return false;
         }
@@ -363,9 +369,11 @@ public:
         {
         case AOR_OK:
             handler->SendSysMessage(LANG_COMMAND_PASSWORD);
+            sScriptMgr->OnPasswordChange(handler->GetSession()->GetAccountId());
             break;
         case AOR_PASS_TOO_LONG:
             handler->SendSysMessage(LANG_PASSWORD_TOO_LONG);
+            sScriptMgr->OnFailedPasswordChange(handler->GetSession()->GetAccountId());
             handler->SetSentErrorMessage(true);
             return false;
         default:

@@ -1,5 +1,5 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-AGPL
+ * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
 #include "ObjectMgr.h"
@@ -1696,7 +1696,7 @@ class spell_blood_council_summon_shadow_resonance : public SpellScriptLoader
                     {
                         float destX = summoner->GetPositionX()+cos(angle + a*M_PI)*i*10.0f;
                         float destY = summoner->GetPositionY()+sin(angle + a*M_PI)*i*10.0f;
-                        if (summoner->GetMap()->isInLineOfSight(summoner->GetPositionX(), summoner->GetPositionY(), summoner->GetPositionZ()+10.0f, destX, destY, summoner->GetPositionZ()+10.0f, summoner->GetPhaseMask()) && destX > 4585.0f && destY > 2716.0f && destY < 2822.0f)
+                        if (summoner->GetMap()->isInLineOfSight(summoner->GetPositionX(), summoner->GetPositionY(), summoner->GetPositionZ()+10.0f, destX, destY, summoner->GetPositionZ()+10.0f, summoner->GetPhaseMask(), LINEOFSIGHT_ALL_CHECKS) && destX > 4585.0f && destY > 2716.0f && destY < 2822.0f)
                         {
                             float destZ = summoner->GetMap()->GetHeight(summoner->GetPhaseMask(), destX, destY, summoner->GetPositionZ()+10.0f);
                             if (fabs(destZ-summoner->GetPositionZ()) < 10.0f) // valid z found

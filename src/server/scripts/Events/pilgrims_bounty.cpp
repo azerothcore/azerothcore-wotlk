@@ -1,13 +1,13 @@
 // Scripted by Xinef
 
 #include "ScriptMgr.h"
-#include "ScriptPCH.h"
 #include "ScriptedCreature.h"
 #include "SpellAuraEffects.h"
 #include "CombatAI.h"
 #include "SpellScript.h"
 #include "Player.h"
 #include "Vehicle.h"
+#include "PassiveAI.h"
 
 ///////////////////////////////////////
 ////// TABLE EVENT

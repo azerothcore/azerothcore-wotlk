@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -15,6 +15,7 @@
 #include "SpellAuras.h"
 #include "GameEventMgr.h"
 #include "WorldSession.h"
+#include "GameGraveyard.h"
 
 BattlegroundAV::BattlegroundAV()
 {
@@ -1174,23 +1175,23 @@ void BattlegroundAV::SendMineWorldStates(uint32 mine)
     UpdateWorldState(BG_AV_MineWorldStates[mine][owner], 1);
 }
 
-WorldSafeLocsEntry const* BattlegroundAV::GetClosestGraveyard(Player* player)
+GraveyardStruct const* BattlegroundAV::GetClosestGraveyard(Player* player)
 {
-    WorldSafeLocsEntry const* pGraveyard = NULL;
-    WorldSafeLocsEntry const* entry = NULL;
+    GraveyardStruct const* pGraveyard = NULL;
+    GraveyardStruct const* entry = NULL;
     float dist = 0;
     float minDist = 0;
     float x, y;
 
     player->GetPosition(x, y);
 
-    pGraveyard = sWorldSafeLocsStore.LookupEntry(BG_AV_GraveyardIds[player->GetTeamId()+7]);
+    pGraveyard = sGraveyard->GetGraveyard(BG_AV_GraveyardIds[player->GetTeamId()+7]);
     minDist = (pGraveyard->x - x)*(pGraveyard->x - x)+(pGraveyard->y - y)*(pGraveyard->y - y);
 
     for (uint8 i = BG_AV_NODES_FIRSTAID_STATION; i <= BG_AV_NODES_FROSTWOLF_HUT; ++i)
         if (m_Nodes[i].OwnerId == player->GetTeamId() && m_Nodes[i].State == POINT_CONTROLED)
         {
-            entry = sWorldSafeLocsStore.LookupEntry(BG_AV_GraveyardIds[i]);
+            entry = sGraveyard->GetGraveyard(BG_AV_GraveyardIds[i]);
             if (entry)
             {
                 dist = (entry->x - x)*(entry->x - x)+(entry->y - y)*(entry->y - y);

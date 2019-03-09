@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -24,6 +24,9 @@
 #include "VMapFactory.h"
 #include "LFGMgr.h"
 #include "Chat.h"
+#ifdef ELUNA
+#include "LuaEngine.h"
+#endif
 
 union u_map_magic
 {
@@ -815,8 +818,8 @@ void Map::RemovePlayerFromMap(Player* player, bool remove)
 
     if (remove)
     {
-        DeleteFromWorld(player);
         sScriptMgr->OnPlayerLeaveMap(this, player);
+        DeleteFromWorld(player);
     }
 }
 
@@ -2161,10 +2164,15 @@ float Map::GetWaterLevel(float x, float y) const
         return 0;
 }
 
-bool Map::isInLineOfSight(float x1, float y1, float z1, float x2, float y2, float z2, uint32 phasemask) const
-{ 
-    return VMAP::VMapFactory::createOrGetVMapManager()->isInLineOfSight(GetId(), x1, y1, z1, x2, y2, z2)
-        && _dynamicTree.isInLineOfSight(x1, y1, z1, x2, y2, z2, phasemask);
+bool Map::isInLineOfSight(float x1, float y1, float z1, float x2, float y2, float z2, uint32 phasemask, LineOfSightChecks checks) const
+{
+    if ((checks & LINEOFSIGHT_CHECK_VMAP) && !VMAP::VMapFactory::createOrGetVMapManager()->isInLineOfSight(GetId(), x1, y1, z1, x2, y2, z2))
+        return false;
+    
+    if (sWorld->getBoolConfig(CONFIG_CHECK_GOBJECT_LOS) && (checks & LINEOFSIGHT_CHECK_GOBJECT)
+      && !_dynamicTree.isInLineOfSight(x1, y1, z1, x2, y2, z2, phasemask))
+        return false;
+    return true;
 }
 
 bool Map::getObjectHitPos(uint32 phasemask, float x1, float y1, float z1, float x2, float y2, float z2, float& rx, float& ry, float& rz, float modifyDist)
@@ -2695,18 +2703,35 @@ void InstanceMap::CreateInstanceScript(bool load, std::string data, uint32 compl
 { 
     if (instance_script != NULL)
         return;
+#ifdef ELUNA
+    bool isElunaAI = false;
+    instance_script = sEluna->GetInstanceData(this);
+    if (instance_script)
+        isElunaAI = true;
 
-    InstanceTemplate const* mInstance = sObjectMgr->GetInstanceTemplate(GetId());
-    if (mInstance)
+    // if Eluna AI was fetched succesfully we should not call CreateInstanceData nor set the unused scriptID
+    if (!isElunaAI)
     {
-        i_script_id = mInstance->ScriptId;
-        instance_script = sScriptMgr->CreateInstanceScript(this);
+#endif
+        InstanceTemplate const* mInstance = sObjectMgr->GetInstanceTemplate(GetId());
+        if (mInstance)
+        {
+            i_script_id = mInstance->ScriptId;
+            instance_script = sScriptMgr->CreateInstanceScript(this);
+        }
+#ifdef ELUNA
     }
+#endif
 
     if (!instance_script)
         return;
 
-    instance_script->Initialize();
+#ifdef ELUNA
+    // use mangos behavior if we are dealing with Eluna AI
+    // initialize should then be called only if load is false
+    if (!isElunaAI || !load)
+#endif
+        instance_script->Initialize();
 
     if (load)
     {
@@ -3090,6 +3115,7 @@ void Map::UpdateEncounterState(EncounterCreditType type, uint32 creditEntry, Uni
         return;
 
     uint32 dungeonId = 0;
+    bool updated = false;
 
     for (DungeonEncounterList::const_iterator itr = encounters->begin(); itr != encounters->end(); ++itr)
     {
@@ -3097,8 +3123,12 @@ void Map::UpdateEncounterState(EncounterCreditType type, uint32 creditEntry, Uni
         if (encounter->creditType == type && encounter->creditEntry == creditEntry)
         {
             if (source)
-                if (InstanceScript* instanceScript = source->GetInstanceScript())
+                if (InstanceScript* instanceScript = source->GetInstanceScript()) {
+                    uint32 prevMask = instanceScript->GetCompletedEncounterMask();
                     instanceScript->SetCompletedEncountersMask((1 << encounter->dbcEntry->encounterIndex)|instanceScript->GetCompletedEncounterMask(), true);
+                    if (prevMask != instanceScript->GetCompletedEncounterMask())
+                        updated = true;
+                }
 
             if (encounter->lastEncounterDungeon)
             {
@@ -3110,6 +3140,8 @@ void Map::UpdateEncounterState(EncounterCreditType type, uint32 creditEntry, Uni
 
     // pussywizard:
     LogEncounterFinished(type, creditEntry);
+    
+    sScriptMgr->OnAfterUpdateEncounterState(this, type, creditEntry, source, difficulty_fixed, encounters, dungeonId, updated);
 
     if (dungeonId)
     {

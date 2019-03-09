@@ -42,9 +42,30 @@ include(src/cmake/ac_macros.cmake)
 include(conf/config.cmake.dist)
 
 # load custom configurations for cmake if exists
-if(EXISTS "conf/config.cmake")
+if(EXISTS "${CMAKE_SOURCE_DIR}/conf/config.cmake")
   include(conf/config.cmake)
 endif()
+
+#
+# Loading dyn modules
+#
+
+# add modules and dependencies
+CU_SUBDIRLIST(sub_DIRS  "${CMAKE_SOURCE_DIR}/modules" FALSE FALSE)
+FOREACH(subdir ${sub_DIRS})
+
+    get_filename_component(MODULENAME ${subdir} NAME)
+
+    if (";${DISABLED_AC_MODULES};" MATCHES ";${MODULENAME};")
+       continue()
+    endif()
+
+    STRING(REGEX REPLACE "^${CMAKE_SOURCE_DIR}/" "" subdir_rel ${subdir})
+    if(EXISTS "${subdir}/CMakeLists.txt")
+        message("Loading module: ${subdir_rel}")
+        add_subdirectory("${subdir_rel}")
+    endif()
+ENDFOREACH()
 
 CU_RUN_HOOK("AFTER_LOAD_CONF")
 
@@ -60,6 +81,7 @@ if( NOPCH )
 endif()
 
 include(CheckPlatform)
+include(GroupSources)
 
 # basic packagesearching and setup (further support will be needed, this is a preliminary release!)
 set(OPENSSL_EXPECTED_VERSION 1.0.0)
@@ -107,26 +129,6 @@ if( TOOLS )
   add_subdirectory(src/tools)
 endif()
 
-#
-# Loading dyn modules
-#
-
-# add modules and dependencies
-CU_SUBDIRLIST(sub_DIRS  "${CMAKE_SOURCE_DIR}/modules" FALSE FALSE)
-FOREACH(subdir ${sub_DIRS})
-
-    get_filename_component(MODULENAME ${subdir} NAME)
-
-    if (";${DISABLED_AC_MODULES};" MATCHES ";${MODULENAME};")
-       continue()
-    endif()
-
-    STRING(REGEX REPLACE "^${CMAKE_SOURCE_DIR}/" "" subdir_rel ${subdir})
-    if(EXISTS "${subdir}/CMakeLists.txt")
-        message("Loading module: ${subdir_rel}")
-        add_subdirectory("${subdir_rel}")
-    endif()
-ENDFOREACH()
 
 #
 # Loading application sources

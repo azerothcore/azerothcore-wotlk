@@ -27,12 +27,12 @@
     set(JEM_MADFREE_DEF "#undef")
   endif()
 
-# Create the header, so we can use it
-configure_file(
-  "${CMAKE_SOURCE_DIR}/deps/jemalloc/jemalloc_defs.h.in.cmake"
-  "${BUILDDIR}/jemalloc_defs.h"
-  @ONLY
-)
+  # Create the header, so we can use it
+  configure_file(
+    "${CMAKE_SOURCE_DIR}/deps/jemalloc/jemalloc_internal_defs.h.in.cmake"
+    "${BUILDDIR}/jemalloc_internal_defs.h"
+    @ONLY
+  )
 
   # Done, let's continue
   set(jemalloc_STAT_SRC

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -15,6 +15,7 @@
 #include "RealmList.h"
 #include "AuthSocket.h"
 #include "AuthCodes.h"
+#include "TOTP.h"
 #include "SHA1.h"
 #include "openssl/crypto.h"
 
@@ -532,6 +533,12 @@ bool AuthSocket::_HandleLogonChallenge()
                     pkt.append(s.AsByteArray().get(), s.GetNumBytes());   // 32 bytes
                     pkt.append(unk3.AsByteArray(16).get(), 16);
                     uint8 securityFlags = 0;
+					
+					// Check if token is used
+                    _tokenKey = fields[8].GetString();
+                    if (!_tokenKey.empty())
+                        securityFlags = 4;
+					
                     pkt << uint8(securityFlags);            // security flags (0x0...0x04)
 
                     if (securityFlags & 0x01)               // PIN input
@@ -704,6 +711,25 @@ bool AuthSocket::_HandleLogonProof()
         sha.UpdateBigNumbers(&A, &M, &K, NULL);
         sha.Finalize();
 
+		// Check auth token
+        if ((lp.securityFlags & 0x04) || !_tokenKey.empty())
+        {
+            uint8 size;
+            socket().recv((char*)&size, 1);
+            char* token = new char[size + 1];
+            token[size] = '\0';
+            socket().recv(token, size);
+            unsigned int validToken = TOTP::GenerateToken(_tokenKey.c_str());
+            unsigned int incomingToken = atoi(token);
+            delete[] token;
+            if (validToken != incomingToken)
+            {
+                char data[] = { AUTH_LOGON_PROOF, WOW_FAIL_UNKNOWN_ACCOUNT, 3, 0 };
+                socket().send(data, sizeof(data));
+                return false;
+            }
+        }
+		
         if (_expversion & POST_BC_EXP_FLAG)                 // 2.x and 3.x clients
         {
             sAuthLogonProof_S proof;
@@ -734,14 +760,26 @@ bool AuthSocket::_HandleLogonProof()
         socket().send(data, sizeof(data));
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "'%s:%d' [AuthChallenge] account %s tried to login with invalid password!", socket().getRemoteAddress().c_str(), socket().getRemotePort(), _login.c_str ());
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "'%s:%d' [AuthChallenge] account %s tried to login with invalid password!", socket().getRemoteAddress().c_str(), socket().getRemotePort(), _login.c_str());
 #endif
 
         uint32 MaxWrongPassCount = sConfigMgr->GetIntDefault("WrongPass.MaxCount", 0);
+
+        // We can not include the failed account login hook. However, this is a workaround to still log this.
+        if (sConfigMgr->GetBoolDefault("WrongPass.Logging", false))
+        {
+            PreparedStatement* logstmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_FALP_IP_LOGGING);
+            logstmt->setString(0, _login);
+            logstmt->setString(1, socket().getRemoteAddress());
+            logstmt->setString(2, "Logged on failed AccountLogin due wrong password");
+
+            LoginDatabase.Execute(logstmt);
+        }
+
         if (MaxWrongPassCount > 0)
         {
             //Increment number of failed logins by one and if it reaches the limit temporarily ban that account or IP
-            PreparedStatement *stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_FAILEDLOGINS);
+            PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_FAILEDLOGINS);
             stmt->setString(0, _login);
             LoginDatabase.Execute(stmt);
 

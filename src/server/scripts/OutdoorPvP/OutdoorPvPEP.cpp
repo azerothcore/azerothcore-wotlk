@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -16,6 +16,7 @@
 #include "Language.h"
 #include "World.h"
 #include "GossipDef.h"
+#include "GameGraveyard.h"
 
 OPvPCapturePointEP_EWT::OPvPCapturePointEP_EWT(OutdoorPvP* pvp)
 : OPvPCapturePoint(pvp), m_TowerState(EP_TS_N), m_UnitsSummonedSideId(TEAM_NEUTRAL)
@@ -419,8 +420,8 @@ void OPvPCapturePointEP_CGT::LinkGraveyard(TeamId teamId)
 {
     if (m_GraveyardSide != teamId)
     {
-        sObjectMgr->RemoveGraveyardLink(EP_GraveYardId, EP_GraveYardZone, m_GraveyardSide, false);
-        sObjectMgr->AddGraveyardLink(EP_GraveYardId, EP_GraveYardZone, teamId, false);
+        sGraveyard->RemoveGraveyardLink(EP_GraveYardId, EP_GraveYardZone, m_GraveyardSide, false);
+        sGraveyard->AddGraveyardLink(EP_GraveYardId, EP_GraveYardZone, teamId, false);
         m_GraveyardSide = teamId;
     }
 }

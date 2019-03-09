@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -10,7 +10,6 @@
  */
 
 #include "ScriptMgr.h"
-#include "ScriptPCH.h"
 #include "ScriptedCreature.h"
 
 enum HunterSpells
@@ -110,7 +109,7 @@ class npc_pet_hunter_snake_trap : public CreatureScript
                     me->SetMaxHealth(health);
                     //Add delta to make them not all hit the same time
                     uint32 delta = urand(0, 700);
-                    me->SetAttackTime(BASE_ATTACK, Info->baseattacktime + delta);
+                    me->SetAttackTime(BASE_ATTACK, Info->BaseAttackTime + delta);
                     me->SetStatFloatValue(UNIT_FIELD_RANGED_ATTACK_POWER , float(Info->attackpower));
                     me->CastSpell(me, SPELL_HUNTER_DEADLY_POISON_PASSIVE, true);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -143,7 +143,7 @@ bool OutdoorPvPSI::HandleDropFlag(Player* player, uint32 spellId)
         {
         case TEAM_ALLIANCE:
             {
-                AreaTriggerEntry const* atEntry = sAreaTriggerStore.LookupEntry(SI_AREATRIGGER_A);
+            AreaTrigger const* atEntry = sObjectMgr->GetAreaTrigger(SI_AREATRIGGER_A);
                 if (atEntry)
                 {
                     // 5.0f is safe-distance
@@ -177,7 +177,7 @@ bool OutdoorPvPSI::HandleDropFlag(Player* player, uint32 spellId)
             break;
         case TEAM_HORDE:
             {
-                AreaTriggerEntry const* atEntry = sAreaTriggerStore.LookupEntry(SI_AREATRIGGER_H);
+            AreaTrigger const* atEntry = sObjectMgr->GetAreaTrigger(SI_AREATRIGGER_H);
                 if (atEntry)
                 {
                     // 5.0f is safe-distance

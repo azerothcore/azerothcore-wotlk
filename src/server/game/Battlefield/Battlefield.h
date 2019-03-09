@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -285,7 +285,7 @@ class Battlefield : public ZoneScript
 
         // Graveyard methods
         // Find which graveyard the player must be teleported to to be resurrected by spiritguide
-        WorldSafeLocsEntry const * GetClosestGraveyard(Player* player);
+        GraveyardStruct const * GetClosestGraveyard(Player* player);
 
         virtual void AddPlayerToResurrectQueue(uint64 npc_guid, uint64 player_guid);
         void RemovePlayerFromResurrectQueue(uint64 player_guid);

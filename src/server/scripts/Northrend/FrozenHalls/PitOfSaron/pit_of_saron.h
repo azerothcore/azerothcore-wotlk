@@ -1,11 +1,11 @@
 /*
- * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-AGPL
+ * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
 #ifndef DEF_PIT_OF_SARON_H
 #define DEF_PIT_OF_SARON_H
 
-#include "ScriptPCH.h"
+#include "Chat.h"
 
 enum DataTypes
 {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -70,9 +70,13 @@ bool MotionTransport::CreateMoTrans(uint32 guidlow, uint32 entry, uint32 mapid, 
     _triggeredArrivalEvent = false;
     _triggeredDepartureEvent = false;
 
+    if (GameObjectTemplateAddon const* addon = GetTemplateAddon())
+    {
+        SetUInt32Value(GAMEOBJECT_FACTION, addon->faction);
+        SetUInt32Value(GAMEOBJECT_FLAGS, addon->flags);
+    }
+
     SetObjectScale(goinfo->size);
-    SetUInt32Value(GAMEOBJECT_FACTION, goinfo->faction);
-    SetUInt32Value(GAMEOBJECT_FLAGS, goinfo->flags);
     SetPathProgress(0);
     SetPeriod(tInfo->pathTime);
     SetEntry(goinfo->entry);
@@ -696,8 +700,11 @@ bool StaticTransport::Create(uint32 guidlow, uint32 name_id, Map* map, uint32 ph
 
     SetObjectScale(goinfo->size);
 
-    SetUInt32Value(GAMEOBJECT_FACTION, goinfo->faction);
-    SetUInt32Value(GAMEOBJECT_FLAGS, goinfo->flags);
+    if (GameObjectTemplateAddon const* addon = GetTemplateAddon())
+    {
+        SetUInt32Value(GAMEOBJECT_FACTION, addon->faction);
+        SetUInt32Value(GAMEOBJECT_FLAGS, addon->flags);
+    }
 
     SetEntry(goinfo->entry);
     SetName(goinfo->name);

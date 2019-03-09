@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -98,7 +98,7 @@ void Warden::Update()
             if (maxClientResponseDelay > 0)
             {
                 if (_clientResponseTimer > maxClientResponseDelay * IN_MILLISECONDS)
-                    _session->KickPlayer();
+                    _session->KickPlayer("clientResponseTimer > maxClientResponseDelay");
                 else
                     _clientResponseTimer += diff;
             }
@@ -218,7 +218,7 @@ std::string Warden::Penalty(WardenCheck* check /*= NULL*/, uint16 checkFailed /*
         return "None";
         break;
     case WARDEN_ACTION_KICK:
-        _session->KickPlayer();
+        _session->KickPlayer("WARDEN_ACTION_KICK");
         return "Kick";
         break;
     case WARDEN_ACTION_BAN:

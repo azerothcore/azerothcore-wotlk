@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -18,6 +18,7 @@ EndScriptData */
 #include "Chat.h"
 #include "Language.h"
 #include "Player.h"
+#include "GameGraveyard.h"
 
 class go_commandscript : public CommandScript
 {
@@ -32,6 +33,7 @@ public:
             { "graveyard",      SEC_MODERATOR,      false, &HandleGoGraveyardCommand,         "" },
             { "grid",           SEC_MODERATOR,      false, &HandleGoGridCommand,              "" },
             { "object",         SEC_MODERATOR,      false, &HandleGoObjectCommand,            "" },
+            { "gobject",        SEC_MODERATOR,      false, &HandleGoObjectCommand,            "" },
             { "taxinode",       SEC_MODERATOR,      false, &HandleGoTaxinodeCommand,          "" },
             { "trigger",        SEC_MODERATOR,      false, &HandleGoTriggerCommand,           "" },
             { "zonexy",         SEC_MODERATOR,      false, &HandleGoZoneXYCommand,            "" },
@@ -170,7 +172,7 @@ public:
         if (!graveyardId)
             return false;
 
-        WorldSafeLocsEntry const* gy = sWorldSafeLocsStore.LookupEntry(graveyardId);
+        GraveyardStruct const* gy = sGraveyard->GetGraveyard(graveyardId);
         if (!gy)
         {
             handler->PSendSysMessage(LANG_COMMAND_GRAVEYARDNOEXIST, graveyardId);
@@ -178,9 +180,9 @@ public:
             return false;
         }
 
-        if (!MapManager::IsValidMapCoord(gy->map_id, gy->x, gy->y, gy->z))
+        if (!MapManager::IsValidMapCoord(gy->Map, gy->x, gy->y, gy->z))
         {
-            handler->PSendSysMessage(LANG_INVALID_TARGET_COORD, gy->x, gy->y, gy->map_id);
+            handler->PSendSysMessage(LANG_INVALID_TARGET_COORD, gy->x, gy->y, gy->Map);
             handler->SetSentErrorMessage(true);
             return false;
         }
@@ -195,7 +197,7 @@ public:
         else
             player->SaveRecallPosition();
 
-        player->TeleportTo(gy->map_id, gy->x, gy->y, gy->z, player->GetOrientation());
+        player->TeleportTo(gy->Map, gy->x, gy->y, gy->z, player->GetOrientation());
         return true;
     }
 
@@ -362,7 +364,7 @@ public:
         if (!areaTriggerId)
             return false;
 
-        AreaTriggerEntry const* at = sAreaTriggerStore.LookupEntry(areaTriggerId);
+        AreaTrigger const* at = sObjectMgr->GetAreaTrigger(areaTriggerId);
         if (!at)
         {
             handler->PSendSysMessage(LANG_COMMAND_GOAREATRNOTFOUND, areaTriggerId);
@@ -370,9 +372,9 @@ public:
             return false;
         }
 
-        if (!MapManager::IsValidMapCoord(at->mapid, at->x, at->y, at->z))
+        if (!MapManager::IsValidMapCoord(at->map, at->x, at->y, at->z))
         {
-            handler->PSendSysMessage(LANG_INVALID_TARGET_COORD, at->x, at->y, at->mapid);
+            handler->PSendSysMessage(LANG_INVALID_TARGET_COORD, at->x, at->y, at->map);
             handler->SetSentErrorMessage(true);
             return false;
         }
@@ -387,7 +389,7 @@ public:
         else
             player->SaveRecallPosition();
 
-        player->TeleportTo(at->mapid, at->x, at->y, at->z, player->GetOrientation());
+        player->TeleportTo(at->map, at->x, at->y, at->z, player->GetOrientation());
         return true;
     }
 

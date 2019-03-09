@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -15,7 +15,6 @@ EndScriptData */
 EndContentData */
 
 #include "ScriptMgr.h"
-#include "ScriptPCH.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "ScriptedEscortAI.h"
@@ -23,6 +22,11 @@ EndContentData */
 #include "Player.h"
 #include "Vehicle.h"
 #include "CreatureTextMgr.h"
+#include "PassiveAI.h"
+#include "CombatAI.h"
+#include "SpellAuras.h"
+#include "Chat.h"
+#include "CellImpl.h"
 
 // Ours
 /********
@@ -1033,7 +1037,7 @@ class at_q24545_frostmourne_cavern : public AreaTriggerScript
     public:
         at_q24545_frostmourne_cavern() : AreaTriggerScript("at_q24545_frostmourne_cavern") { }
 
-        bool OnTrigger(Player* player, AreaTriggerEntry const* /*areaTrigger*/)
+        bool OnTrigger(Player* player, AreaTrigger const* /*areaTrigger*/)
         {
             if (player->GetPhaseMask() & 2)
                 if (Creature* c = player->FindNearestCreature(NPC_SAC_LICH_KING, 60.0f, true))

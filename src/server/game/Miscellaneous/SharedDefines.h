@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -3431,18 +3431,18 @@ enum DuelCompleteType
 // handle the queue types and bg types separately to enable joining queue for different sized arenas at the same time
 enum BattlegroundQueueTypeId
 {
-    BATTLEGROUND_QUEUE_NONE     = 0,
-    BATTLEGROUND_QUEUE_AV       = 1,
-    BATTLEGROUND_QUEUE_WS       = 2,
-    BATTLEGROUND_QUEUE_AB       = 3,
-    BATTLEGROUND_QUEUE_EY       = 4,
-    BATTLEGROUND_QUEUE_SA       = 5,
-    BATTLEGROUND_QUEUE_IC       = 6,
-    BATTLEGROUND_QUEUE_RB       = 7,
-    BATTLEGROUND_QUEUE_2v2      = 8,
-    BATTLEGROUND_QUEUE_3v3      = 9,
-    BATTLEGROUND_QUEUE_5v5      = 10,
-    MAX_BATTLEGROUND_QUEUE_TYPES
+    BATTLEGROUND_QUEUE_NONE      = 0,
+    BATTLEGROUND_QUEUE_AV        = 1,
+    BATTLEGROUND_QUEUE_WS        = 2,
+    BATTLEGROUND_QUEUE_AB        = 3,
+    BATTLEGROUND_QUEUE_EY        = 4,
+    BATTLEGROUND_QUEUE_SA        = 5,
+    BATTLEGROUND_QUEUE_IC        = 6,
+    BATTLEGROUND_QUEUE_RB        = 7,
+    BATTLEGROUND_QUEUE_2v2       = 8,
+    BATTLEGROUND_QUEUE_3v3       = 9,
+    BATTLEGROUND_QUEUE_5v5       = 10,
+    MAX_BATTLEGROUND_QUEUE_TYPES = 20,
 };
 
 enum GroupJoinBattlegroundResult
@@ -3531,7 +3531,7 @@ enum PartyResult
 };
 
 #define MMAP_MAGIC 0x4d4d4150   // 'MMAP'
-#define MMAP_VERSION 8
+#define MMAP_VERSION 9
 
 struct MmapTileHeader
 {

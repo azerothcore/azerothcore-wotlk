@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -290,7 +290,17 @@ void InstanceSaveManager::LoadResetTimes()
             SetResetTimeFor(mapid, difficulty, t);
             CharacterDatabase.DirectPExecute("INSERT INTO instance_reset VALUES ('%u', '%u', '%u')", mapid, difficulty, (uint32)t);
         }
-        SetExtendedResetTimeFor(mapid, difficulty, t + period);
+
+        if (t < now)
+        {
+            // assume that expired instances have already been cleaned
+            // calculate the next reset time
+            t = (t * DAY) / DAY;
+            t += ((today - t) / period + 1) * period + diff;
+            CharacterDatabase.DirectPExecute("UPDATE instance_reset SET resettime = '%u' WHERE mapid = '%u' AND difficulty = '%u'", (uint32)t, mapid, difficulty);
+        }
+
+        SetExtendedResetTimeFor(mapid, difficulty, t);
 
         // schedule the global reset/warning
         uint8 type;

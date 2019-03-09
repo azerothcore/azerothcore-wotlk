@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -147,8 +147,7 @@ public:
                     break;
                 case GO_EMBERSEER_IN:
                     go_emberseerin = go->GetGUID();
-                    if (GetBossState(DATA_DRAGONSPIRE_ROOM) == DONE)
-                        HandleGameObject(0, true, go);
+                    HandleGameObject(0, GetBossState(DATA_DRAGONSPIRE_ROOM) == DONE, go);
                     break;
                 case GO_DOORS:
                     go_doors = go->GetGUID();
@@ -506,6 +505,8 @@ public:
                     HandleGameObject(0, true, door1);
                 if (GameObject* door2 = instance->GetGameObject(go_doors))
                     HandleGameObject(0, true, door2);
+                if (GameObject* door3 = instance->GetGameObject(go_emberseerin))
+                    HandleGameObject(0, true, door3);
             }
         }
 
@@ -597,7 +598,7 @@ class at_dragonspire_hall : public AreaTriggerScript
 public:
     at_dragonspire_hall() : AreaTriggerScript("at_dragonspire_hall") { }
 
-    bool OnTrigger(Player* player, const AreaTriggerEntry* /*at*/)
+    bool OnTrigger(Player* player, const AreaTrigger* /*at*/)
     {
         if (player && player->IsAlive())
         {
@@ -621,7 +622,7 @@ class at_blackrock_stadium : public AreaTriggerScript
 public:
     at_blackrock_stadium() : AreaTriggerScript("at_blackrock_stadium") { }
 
-    bool OnTrigger(Player* player, const AreaTriggerEntry* /*at*/)
+    bool OnTrigger(Player* player, const AreaTrigger* /*at*/)
     {
         if (player && player->IsAlive())
         {
@@ -629,7 +630,14 @@ public:
             if (!instance)
                 return false;
 
-            if (Creature* rend = player->FindNearestCreature(NPC_WARCHIEF_REND_BLACKHAND, 50.0f))
+            Creature* rend;
+            if (instance->GetBossState(DATA_WARCHIEF_REND_BLACKHAND) == NOT_STARTED)
+            {
+                if ((rend = player->FindNearestCreature(NPC_WARCHIEF_REND_BLACKHAND, 100.0f, false)))
+                    rend->Respawn(true);
+            }
+
+            if ((rend = player->FindNearestCreature(NPC_WARCHIEF_REND_BLACKHAND, 100.0f)))
             {
                 rend->AI()->SetData(AREATRIGGER, AREATRIGGER_BLACKROCK_STADIUM);
                 return true;

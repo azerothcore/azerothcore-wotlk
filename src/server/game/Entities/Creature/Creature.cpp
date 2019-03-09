@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -41,6 +41,10 @@
 #include "WorldPacket.h"
 
 #include "Transport.h"
+
+#ifdef ELUNA
+#include "LuaEngine.h"
+#endif
 
 TrainerSpell const* TrainerSpellData::Find(uint32 spell_id) const
 {
@@ -211,6 +215,9 @@ void Creature::AddToWorld()
         AIM_Initialize();
         if (IsVehicle())
             GetVehicleKit()->Install();
+#ifdef ELUNA
+        sEluna->OnAddToWorld(this);
+#endif
     }
 }
 
@@ -218,6 +225,9 @@ void Creature::RemoveFromWorld()
 { 
     if (IsInWorld())
     {
+#ifdef ELUNA
+        sEluna->OnRemoveFromWorld(this);
+#endif
         if (GetZoneScript())
             GetZoneScript()->OnCreatureRemove(this);
         if (m_formation)
@@ -418,9 +428,9 @@ bool Creature::UpdateEntry(uint32 Entry, const CreatureData* data, bool changele
 
     SetUInt32Value(UNIT_DYNAMIC_FLAGS, dynamicflags);
 
-    SetAttackTime(BASE_ATTACK,   cInfo->baseattacktime);
-    SetAttackTime(OFF_ATTACK,    cInfo->baseattacktime);
-    SetAttackTime(RANGED_ATTACK, cInfo->rangeattacktime);
+    SetAttackTime(BASE_ATTACK,   cInfo->BaseAttackTime);
+    SetAttackTime(OFF_ATTACK,    cInfo->BaseAttackTime);
+    SetAttackTime(RANGED_ATTACK, cInfo->RangeAttackTime);
 
     SelectLevel(changelevel);
 
@@ -565,6 +575,12 @@ void Creature::Update(uint32 diff)
 
                 // xinef: update combat state, if npc is not in combat - return to spawn correctly by calling EnterEvadeMode
                 SelectVictim();
+            }
+
+            Unit* owner = GetCharmerOrOwner();
+            if (IsCharmed() && !IsWithinDistInMap(owner, GetMap()->GetVisibilityRange()))
+            {
+                RemoveCharmAuras();
             }
 
             if (!IsInEvadeMode() && IsAIEnabled)
@@ -1171,6 +1187,8 @@ void Creature::SelectLevel(bool changelevel)
 
     SetModifierValue(UNIT_MOD_ATTACK_POWER, BASE_VALUE, cInfo->attackpower);
     SetModifierValue(UNIT_MOD_ATTACK_POWER_RANGED, BASE_VALUE, cInfo->rangedattackpower);
+
+    sScriptMgr->Creature_SelectLevel(cInfo, this);
 }
 
 float Creature::_GetHealthMod(int32 Rank)
@@ -2699,6 +2717,10 @@ float Creature::GetAggroRange(Unit const* target) const
     // Determines the aggro range for creatures
     // Based on data from wowwiki due to lack of 3.3.5a data
 
+    float aggroRate = sWorld->getRate(RATE_CREATURE_AGGRO);
+    if (aggroRate == 0)
+        return 0.0f;
+
     uint32 targetLevel = target->getLevelForTarget(this);
     uint32 myLevel = getLevelForTarget(target);
     int32 levelDiff = int32(targetLevel) - int32(myLevel);
@@ -2729,7 +2751,7 @@ float Creature::GetAggroRange(Unit const* target) const
     if (aggroRadius < minRange)
         aggroRadius = minRange;
 
-    return aggroRadius;
+    return (aggroRadius * aggroRate);
 }
 
 void Creature::SetObjectScale(float scale)
@@ -2792,4 +2814,46 @@ void Creature::ReleaseFocus(Spell const* focusSpell)
 
     if (focusSpell->GetSpellInfo()->HasAttribute(SPELL_ATTR5_DONT_TURN_DURING_CAST))
         ClearUnitState(UNIT_STATE_ROTATING);
+}
+
+float Creature::GetAttackDistance(Unit const* player) const
+{
+    float aggroRate = sWorld->getRate(RATE_CREATURE_AGGRO);
+
+    if (aggroRate == 0)
+        return 0.0f;
+
+    if (!player)
+        return 0.0f;
+
+    uint32 playerLevel = player->getLevelForTarget(this);
+    uint32 creatureLevel = getLevelForTarget(player);
+
+    int32 levelDiff = static_cast<int32>(playerLevel) - static_cast<int32>(creatureLevel);
+
+    // "The maximum Aggro Radius has a cap of 25 levels under. Example: A level 30 char has the same Aggro Radius of a level 5 char on a level 60 mob."
+    if (levelDiff < -25)
+        levelDiff = -25;
+
+    // "The aggro radius of a mob having the same level as the player is roughly 20 yards"
+    float retDistance = 20.0f;
+
+    // "Aggro Radius varies with level difference at a rate of roughly 1 yard/level"
+    // radius grow if playlevel < creaturelevel
+    retDistance -= static_cast<float>(levelDiff);
+
+    if (creatureLevel + 5 <= sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
+    {
+        // detect range auras
+        retDistance += static_cast<float>( GetTotalAuraModifier(SPELL_AURA_MOD_DETECT_RANGE) );
+
+        // detected range auras
+        retDistance += static_cast<float>( player->GetTotalAuraModifier(SPELL_AURA_MOD_DETECTED_RANGE) );
+    }
+
+    // "Minimum Aggro Radius for a mob seems to be combat range (5 yards)"
+    if (retDistance < 5.0f)
+        retDistance = 5.0f;
+
+    return (retDistance*aggroRate);
 }

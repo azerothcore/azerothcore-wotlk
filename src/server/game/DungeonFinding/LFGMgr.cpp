@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -224,7 +224,7 @@ void LFGMgr::LoadLFGDungeons(bool reload /* = false */)
         // No teleport coords in database, load from areatriggers
         if (dungeon.type != LFG_TYPE_RANDOM && dungeon.x == 0.0f && dungeon.y == 0.0f && dungeon.z == 0.0f)
         {
-            AreaTrigger const* at = sObjectMgr->GetMapEntranceTrigger(dungeon.map);
+            AreaTriggerTeleport const* at = sObjectMgr->GetMapEntranceTrigger(dungeon.map);
             if (!at)
             {
                 sLog->outError("LFGMgr::LoadLFGDungeons: Failed to load dungeon %s, cant find areatrigger for map %u", dungeon.name.c_str(), dungeon.map);
@@ -391,6 +391,8 @@ void LFGMgr::InitializeLockedDungeons(Player* player, uint8 level /* = 0 */)
             lockData = LFG_LOCKSTATUS_INSUFFICIENT_EXPANSION;
         else if (DisableMgr::IsDisabledFor(DISABLE_TYPE_MAP, dungeon->map, player))
             lockData = LFG_LOCKSTATUS_RAID_LOCKED;
+        else if (DisableMgr::IsDisabledFor(DISABLE_TYPE_LFG_MAP, dungeon->map, player))
+            lockData = LFG_LOCKSTATUS_RAID_LOCKED;
         else if (dungeon->difficulty > DUNGEON_DIFFICULTY_NORMAL && (!mapEntry || !mapEntry->IsRaid()) && sInstanceSaveMgr->PlayerIsPermBoundToInstance(player->GetGUIDLow(), dungeon->map, Difficulty(dungeon->difficulty)))
             lockData = LFG_LOCKSTATUS_RAID_LOCKED;
         else if (dungeon->minlevel > level)
@@ -495,10 +497,11 @@ void LFGMgr::JoinLfg(Player* player, uint8 roles, LfgDungeonSet& dungeons, const
         case LFG_STATE_PROPOSAL: // if joining again during proposal
             joinData.result = LFG_JOIN_INTERNAL_ERROR;
             break;
-        case LFG_STATE_FINISHED_DUNGEON:
+        /*case LFG_STATE_FINISHED_DUNGEON:
             if (grp && grp->isLFGGroup())
                 joinData.result = LFG_JOIN_PARTY_NOT_MEET_REQS;
             break;
+        */
         default:
             break;
     }

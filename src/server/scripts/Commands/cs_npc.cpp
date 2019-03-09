@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -30,7 +30,7 @@ struct NpcFlagText
 
 #define NPCFLAG_COUNT   24
 
-const NpcFlagText npcFlagTexts[NPCFLAG_COUNT] =
+NpcFlagText const npcFlagTexts[NPCFLAG_COUNT] =
 {
     { UNIT_NPC_FLAG_AUCTIONEER,         LANG_NPCINFO_AUCTIONEER         },
     { UNIT_NPC_FLAG_BANKER,             LANG_NPCINFO_BANKER             },
@@ -56,6 +56,50 @@ const NpcFlagText npcFlagTexts[NPCFLAG_COUNT] =
     { UNIT_NPC_FLAG_VENDOR_FOOD,        LANG_NPCINFO_VENDOR_FOOD        },
     { UNIT_NPC_FLAG_VENDOR_POISON,      LANG_NPCINFO_VENDOR_POISON      },
     { UNIT_NPC_FLAG_VENDOR_REAGENT,     LANG_NPCINFO_VENDOR_REAGENT     }
+};
+
+struct MechanicImmune
+{
+    uint32 flag;
+    char const* text;
+};
+
+#define MAX_MECHANIC    32
+
+MechanicImmune const mechanicImmunes[MAX_MECHANIC] =
+{
+    { MECHANIC_NONE             , "MECHANIC_NONE"               },
+    { MECHANIC_CHARM            , "MECHANIC_CHARM"              },
+    { MECHANIC_DISORIENTED      , "MECHANIC_DISORIENTED"        },
+    { MECHANIC_DISARM           , "MECHANIC_DISARM"             },
+    { MECHANIC_DISTRACT         , "MECHANIC_DISTRACT"           },
+    { MECHANIC_FEAR             , "MECHANIC_FEAR"               },
+    { MECHANIC_GRIP             , "MECHANIC_GRIP"               },
+    { MECHANIC_ROOT             , "MECHANIC_ROOT"               },
+    { MECHANIC_SLOW_ATTACK      , "MECHANIC_SLOW_ATTACK"        },
+    { MECHANIC_SILENCE          , "MECHANIC_SILENCE"            },
+    { MECHANIC_SLEEP            , "MECHANIC_SLEEP"              },
+    { MECHANIC_SNARE            , "MECHANIC_SNARE"              },
+    { MECHANIC_STUN             , "MECHANIC_STUN"               },
+    { MECHANIC_FREEZE           , "MECHANIC_FREEZE"             },
+    { MECHANIC_KNOCKOUT         , "MECHANIC_KNOCKOUT"           },
+    { MECHANIC_BLEED            , "MECHANIC_BLEED"              },
+    { MECHANIC_BANDAGE          , "MECHANIC_BANDAGE"            },
+    { MECHANIC_POLYMORPH        , "MECHANIC_POLYMORPH"          },
+    { MECHANIC_BANISH           , "MECHANIC_BANISH"             },
+    { MECHANIC_SHIELD           , "MECHANIC_SHIELD"             },
+    { MECHANIC_SHACKLE          , "MECHANIC_SHACKLE"            },
+    { MECHANIC_MOUNT            , "MECHANIC_MOUNT"              },
+    { MECHANIC_INFECTED         , "MECHANIC_INFECTED"           },
+    { MECHANIC_TURN             , "MECHANIC_TURN"               },
+    { MECHANIC_HORROR           , "MECHANIC_HORROR"             },
+    { MECHANIC_INVULNERABILITY  , "MECHANIC_INVULNERABILITY"    },
+    { MECHANIC_INTERRUPT        , "MECHANIC_INTERRUPT"          },
+    { MECHANIC_DAZE             , "MECHANIC_DAZE"               },
+    { MECHANIC_DISCOVERY        , "MECHANIC_DISCOVERY"          },
+    { MECHANIC_IMMUNE_SHIELD    , "MECHANIC_IMMUNE_SHIELD"      },
+    { MECHANIC_SAPPED           , "MECHANIC_SAPPED"             },
+    { MECHANIC_ENRAGED          , "MECHANIC_ENRAGED"            },
 };
 
 class npc_commandscript : public CommandScript
@@ -86,11 +130,19 @@ public:
             { "stop",           SEC_GAMEMASTER,     false, &HandleNpcUnFollowCommand,          "" },
             { "",               SEC_GAMEMASTER,     false, &HandleNpcFollowCommand,            "" }
         };
+
+        static std::vector<ChatCommand> npcFactionCommandTable =
+        {
+            { "permanent",      SEC_ADMINISTRATOR,  false, &HandleNpcSetFactionIdCommand,      "" },
+            { "temp",           SEC_ADMINISTRATOR,  false, &HandleNpcSetFactionTempIdCommand,  "" },
+            { "original",       SEC_ADMINISTRATOR,  false, &HandleNpcSetOriginalFaction,       "" }
+        };
+
         static std::vector<ChatCommand> npcSetCommandTable =
         {
             { "allowmove",      SEC_ADMINISTRATOR,  false, &HandleNpcSetAllowMovementCommand,  "" },
             { "entry",          SEC_ADMINISTRATOR,  false, &HandleNpcSetEntryCommand,          "" },
-            { "factionid",      SEC_ADMINISTRATOR,  false, &HandleNpcSetFactionIdCommand,      "" },
+            { "faction",        SEC_ADMINISTRATOR,  false, nullptr,                            "", npcFactionCommandTable},
             { "flag",           SEC_ADMINISTRATOR,  false, &HandleNpcSetFlagCommand,           "" },
             { "level",          SEC_ADMINISTRATOR,  false, &HandleNpcSetLevelCommand,          "" },
             { "link",           SEC_ADMINISTRATOR,  false, &HandleNpcSetLinkCommand,           "" },
@@ -524,6 +576,46 @@ public:
         return true;
     }
 
+    //set tempfaction for creature
+    static bool HandleNpcSetFactionTempIdCommand(ChatHandler* handler, const char* args)
+    {
+        Player* me = handler->GetSession()->GetPlayer();
+        Unit* SelectedCreature = me->GetSelectedUnit();
+
+        if (!SelectedCreature)
+            return false;
+
+        Creature* creature = SelectedCreature->ToCreature();
+
+        if (!creature)
+            return false;
+
+        if (!*args)
+            return false;
+
+        uint32 tempfaction = (uint32)atoi((char*)args);
+
+        creature->setFaction(tempfaction);
+        return true;
+    }
+
+    //set orginal faction for npc
+    static bool HandleNpcSetOriginalFaction(ChatHandler* handler, const char* /*args*/)
+    {
+        Player* me = handler->GetSession()->GetPlayer();
+        Creature* creature = me->GetSelectedUnit()->ToCreature();
+
+        if (!me)
+            return false;
+
+        if (!creature)
+            return false;
+
+        creature->RestoreFaction();
+
+        return true;
+    }
+
     //set npcflag of creature
     static bool HandleNpcSetFlagCommand(ChatHandler* handler, const char* args)
     {
@@ -619,12 +711,13 @@ public:
             return false;
         }
 
+        CreatureTemplate const* cInfo = target->GetCreatureTemplate();
         uint32 faction = target->getFaction();
         uint32 npcflags = target->GetUInt32Value(UNIT_NPC_FLAGS);
+        uint32 mechanicImmuneMask = cInfo->MechanicImmuneMask;
         uint32 displayid = target->GetDisplayId();
         uint32 nativeid = target->GetNativeDisplayId();
         uint32 Entry = target->GetEntry();
-        CreatureTemplate const* cInfo = target->GetCreatureTemplate();
 
         int64 curRespawnDelay = target->GetRespawnTimeEx()-time(nullptr);
         if (curRespawnDelay < 0)
@@ -648,6 +741,11 @@ public:
         for (uint8 i = 0; i < NPCFLAG_COUNT; i++)
             if (npcflags & npcFlagTexts[i].flag)
                 handler->PSendSysMessage(npcFlagTexts[i].text, npcFlagTexts[i].flag);
+        
+        handler->PSendSysMessage(LANG_NPCINFO_MECHANIC_IMMUNE, mechanicImmuneMask);
+        for (uint8 i = 1; i < MAX_MECHANIC; ++i)
+            if (mechanicImmuneMask & (1 << (mechanicImmunes[i].flag - 1)))
+                handler->PSendSysMessage(mechanicImmunes[i].text, mechanicImmunes[i].flag);
 
         return true;
     }

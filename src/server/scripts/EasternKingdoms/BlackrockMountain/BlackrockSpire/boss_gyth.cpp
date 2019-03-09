@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -51,7 +51,8 @@ public:
             SummonedRend = false;
             if (instance->GetBossState(DATA_GYTH) == IN_PROGRESS)
             {
-                instance->SetBossState(DATA_GYTH, DONE);
+                instance->SetBossState(DATA_GYTH, NOT_STARTED);
+                summons.DespawnAll();
                 me->DespawnOrUnsummon();
             }
         }
@@ -83,10 +84,16 @@ public:
             }
         }
 
+        void JustSummoned(Creature* summon)
+        {
+            summons.Summon(summon);
+            summon->AI()->AttackStart(me->SelectVictim());
+        }
+
         void UpdateAI(uint32 diff)
         {
 
-            if (!SummonedRend && HealthBelowPct(5))
+            if (!SummonedRend && HealthBelowPct(25))
             {
                 DoCast(me, SPELL_SUMMON_REND);
                 me->RemoveAura(SPELL_REND_MOUNTS);

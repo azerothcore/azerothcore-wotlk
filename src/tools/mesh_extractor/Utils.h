@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 
- *
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -341,7 +340,7 @@ public:
 };
 
 #define MMAP_MAGIC 0x4d4d4150   // 'MMAP'
-#define MMAP_VERSION 8
+#define MMAP_VERSION 9
 
 struct MmapTileHeader
 {

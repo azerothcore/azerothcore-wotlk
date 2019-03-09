@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: http://github.com/azerothcore/azerothcore-wotlk/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -24,6 +24,10 @@
 #include "World.h"
 #include "Transport.h"
 #include "AccountMgr.h"
+
+#ifdef ELUNA
+#include "LuaEngine.h"
+#endif
 
 GameObject::GameObject() : WorldObject(false), MovableMapObject(),
     m_model(NULL), m_goValue(), m_AI(NULL)
@@ -147,6 +151,9 @@ void GameObject::AddToWorld()
         EnableCollision(GetGoState() == GO_STATE_READY || IsTransport()); // pussywizard: this startOpen is unneeded here, collision depends entirely on GOState
 
         WorldObject::AddToWorld();
+#ifdef ELUNA
+        sEluna->OnAddToWorld(this);
+#endif
     }
 }
 
@@ -155,6 +162,9 @@ void GameObject::RemoveFromWorld()
     ///- Remove the gameobject from the accessor
     if (IsInWorld())
     {
+#ifdef ELUNA
+        sEluna->OnRemoveFromWorld(this);
+#endif
         if (m_zoneScript)
             m_zoneScript->OnGameObjectRemove(this);
 
@@ -252,19 +262,36 @@ bool GameObject::Create(uint32 guidlow, uint32 name_id, Map* map, uint32 phaseMa
     }
 
     GameObjectAddon const* addon = sObjectMgr->GetGameObjectAddon(guidlow);
-    // xinef: hackfix - but make it possible to use original WorldRotation (using special gameobject addon data) 
-    // pussywizard: temporarily calculate WorldRotation from orientation, do so until values in db are correct
-    if (addon && addon->invisibilityType == INVISIBILITY_GENERAL && addon->InvisibilityValue == 0)
-        SetWorldRotation(rotation);
-    else
-        SetWorldRotationAngles(NormalizeOrientation(GetOrientation()), 0.0f, 0.0f);
+
+    // hackfix for the hackfix down below
+    switch (goinfo->entry)
+    {
+        // excluded ids from the hackfix below
+        // used switch since there should be more
+        case 181233: // maexxna portal effect
+        case 181575: // maexxna portal
+            SetWorldRotation(rotation);
+            break;
+        default:
+            // xinef: hackfix - but make it possible to use original WorldRotation (using special gameobject addon data) 
+            // pussywizard: temporarily calculate WorldRotation from orientation, do so until values in db are correct
+            if (addon && addon->invisibilityType == INVISIBILITY_GENERAL && addon->InvisibilityValue == 0)
+                SetWorldRotation(rotation);
+            else
+                SetWorldRotationAngles(NormalizeOrientation(GetOrientation()), 0.0f, 0.0f);
+            break;
+    }
+
     // pussywizard: no PathRotation for normal gameobjects
     SetTransportPathRotation(0.0f, 0.0f, 0.0f, 1.0f);
 
     SetObjectScale(goinfo->size);
 
-    SetUInt32Value(GAMEOBJECT_FACTION, goinfo->faction);
-    SetUInt32Value(GAMEOBJECT_FLAGS, goinfo->flags);
+    if (GameObjectTemplateAddon const* addon = GetTemplateAddon())
+    {
+        SetUInt32Value(GAMEOBJECT_FACTION, addon->faction);
+        SetUInt32Value(GAMEOBJECT_FLAGS, addon->flags);
+    }
 
     SetEntry(goinfo->entry);
 
@@ -328,7 +355,10 @@ bool GameObject::Create(uint32 guidlow, uint32 name_id, Map* map, uint32 phaseMa
 }
 
 void GameObject::Update(uint32 diff)
-{ 
+{
+#ifdef ELUNA
+    sEluna->UpdateAI(this, diff);
+#endif
     if (AI())
         AI()->UpdateAI(diff);
     else if (!AIM_Initialize())
@@ -661,8 +691,9 @@ void GameObject::Update(uint32 diff)
                 //any return here in case battleground traps
                 // Xinef: Do not return here for summoned gos that should be deleted few lines below
                 // Xinef: Battleground objects are treated as spawned by default
-                if ((GetGOInfo()->flags & GO_FLAG_NODESPAWN) && isSpawnedByDefault())
-                    return;
+                if (GameObjectTemplateAddon const* addon = GetTemplateAddon())
+                    if ((addon->flags & GO_FLAG_NODESPAWN) && isSpawnedByDefault())
+                        return;
             }
 
             loot.clear();
@@ -683,7 +714,8 @@ void GameObject::Update(uint32 diff)
             {
                 SendObjectDeSpawnAnim(GetGUID());
                 //reset flags
-                SetUInt32Value(GAMEOBJECT_FLAGS, GetGOInfo()->flags);
+                if (GameObjectTemplateAddon const* addon = GetTemplateAddon())
+                    SetUInt32Value(GAMEOBJECT_FLAGS, addon->flags);
             }
 
             if (!m_respawnDelayTime)
@@ -707,6 +739,11 @@ void GameObject::Update(uint32 diff)
         }
     }
     sScriptMgr->OnGameObjectUpdate(this, diff);
+}
+
+GameObjectTemplateAddon const* GameObject::GetTemplateAddon() const
+{
+    return sObjectMgr->GetGameObjectTemplateAddon(GetGOInfo()->entry);
 }
 
 void GameObject::Refresh()
@@ -733,7 +770,9 @@ void GameObject::Delete()
     SendObjectDeSpawnAnim(GetGUID());
 
     SetGoState(GO_STATE_READY);
-    SetUInt32Value(GAMEOBJECT_FLAGS, GetGOInfo()->flags);
+
+    if (GameObjectTemplateAddon const* addon = GetTemplateAddon())
+        SetUInt32Value(GAMEOBJECT_FLAGS, addon->flags);
 
     // Xinef: if ritual gameobject is removed, clear anim spells
     if (GetGOInfo()->type == GAMEOBJECT_TYPE_SUMMONING_RITUAL)
@@ -1222,9 +1261,14 @@ void GameObject::Use(Unit* user)
     Unit* spellCaster = user;
     uint32 spellId = 0;
     bool triggered = false;
+    bool tmpfish = false;
 
     if (Player* playerUser = user->ToPlayer())
     {
+#ifdef ELUNA
+        if (sEluna->OnGossipHello(playerUser, this))
+            return;
+#endif
         if (sScriptMgr->OnGossipHello(playerUser, this))
             return;
 
@@ -1430,7 +1474,8 @@ void GameObject::Use(Unit* user)
             // cast this spell later if provided
             spellId = info->goober.spellId;
             spellCaster = user;
-
+            tmpfish = true;
+            
             break;
         }
         case GAMEOBJECT_TYPE_CAMERA:                        //13
@@ -1518,6 +1563,8 @@ void GameObject::Use(Unit* user)
                     }
                     else // else: junk
                         player->SendLoot(GetGUID(), LOOT_FISHING_JUNK);
+                        
+                    tmpfish = true;
                     break;
                 }
                 case GO_JUST_DEACTIVATED:                   // nothing to do, will be deleted at next update
@@ -1532,7 +1579,10 @@ void GameObject::Use(Unit* user)
                 }
             }
 
-            player->InterruptSpell(CURRENT_CHANNELED_SPELL, true, true, true);
+            if(tmpfish)
+                player->FinishSpell(CURRENT_CHANNELED_SPELL, true);
+            else
+                player->InterruptSpell(CURRENT_CHANNELED_SPELL, true, true, true);
             return;
         }
 
@@ -1840,7 +1890,7 @@ void GameObject::CastSpell(Unit* target, uint32 spellId)
     else
     {
         // xinef: set faction of gameobject, if no faction - assume hostile
-        trigger->setFaction(GetGOInfo()->faction ? GetGOInfo()->faction : 14);
+        trigger->setFaction(GetTemplateAddon() && GetTemplateAddon()->faction ? GetTemplateAddon()->faction : 14);
         // Set owner guid for target if no owner availble - needed by trigger auras
         // - trigger gets despawned and there's no caster avalible (see AuraEffect::TriggerSpell())
         // xinef: set proper orientation, fixes cast against stealthed targets
@@ -2036,6 +2086,9 @@ void GameObject::SetDestructibleState(GameObjectDestructibleState state, Player*
             break;
         case GO_DESTRUCTIBLE_DAMAGED:
         {
+#ifdef ELUNA
+            sEluna->OnDamaged(this, eventInvoker);
+#endif
             EventInform(m_goInfo->building.damagedEvent);
             sScriptMgr->OnGameObjectDamaged(this, eventInvoker);
             if (BattlegroundMap* bgMap = GetMap()->ToBattlegroundMap())
@@ -2064,6 +2117,9 @@ void GameObject::SetDestructibleState(GameObjectDestructibleState state, Player*
         }
         case GO_DESTRUCTIBLE_DESTROYED:
         {
+#ifdef ELUNA
+            sEluna->OnDestroyed(this, eventInvoker);
+#endif
             sScriptMgr->OnGameObjectDestroyed(this, eventInvoker);
             EventInform(m_goInfo->building.destroyedEvent);
             if (BattlegroundMap* bgMap = GetMap()->ToBattlegroundMap())
@@ -2118,6 +2174,9 @@ void GameObject::SetDestructibleState(GameObjectDestructibleState state, Player*
 void GameObject::SetLootState(LootState state, Unit* unit)
 { 
     m_lootState = state;
+#ifdef ELUNA
+    sEluna->OnLootStateChanged(this, state);
+#endif
     AI()->OnStateChanged(state, unit);
     sScriptMgr->OnGameObjectLootStateChanged(this, state, unit);
     // pussywizard: lootState has nothing to do with collision, it depends entirely on GOState. Loot state is for timed close/open door and respawning, which then sets GOState
@@ -2140,6 +2199,9 @@ void GameObject::SetLootState(LootState state, Unit* unit)
 void GameObject::SetGoState(GOState state)
 { 
     SetByteValue(GAMEOBJECT_BYTES_1, 0, state);
+#ifdef ELUNA
+    sEluna->OnGameObjectStateChanged(this, state);
+#endif
     sScriptMgr->OnGameObjectStateChanged(this, state);
     if (m_model)
     {
