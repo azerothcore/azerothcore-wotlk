@@ -456,7 +456,7 @@ public:
             cInfo->faction            = fields[16].GetUInt16();
             cInfo->npcflag            = fields[17].GetUInt32();
             cInfo->speed_walk         = fields[18].GetFloat();
-            cInfo->speed_run          = fields[29].GetFloat();
+            cInfo->speed_run          = fields[19].GetFloat();
             cInfo->scale              = fields[20].GetFloat();
             cInfo->rank               = fields[21].GetUInt8();
             cInfo->mindmg             = fields[22].GetFloat();
