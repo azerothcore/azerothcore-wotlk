@@ -1666,7 +1666,9 @@ void Spell::DoCreateItem(uint8 /*effIndex*/, uint32 itemId)
 
     Player* player = unitTarget->ToPlayer();
 
-    ItemTemplate const* pProto = sObjectMgr->GetItemTemplate(itemId);
+    uint32 newitemid = itemId;
+
+    ItemTemplate const* pProto = sObjectMgr->GetItemTemplate(newitemid);
     if (!pProto)
     {
         player->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, NULL, NULL);
@@ -1703,30 +1705,46 @@ void Spell::DoCreateItem(uint8 /*effIndex*/, uint32 itemId)
     if (addNumber > pProto->GetMaxStackSize())
         addNumber = pProto->GetMaxStackSize();
 
+    /* == gem perfection handling == */
+
+    // the chance of getting a perfect result
+    float perfectCreateChance = 0.0f;
+
+    // the resulting perfect item if successful
+    uint32 perfectItemType = itemId;
+
+    // get perfection capability and chance
+    if (CanCreatePerfectItem(player, m_spellInfo->Id, perfectCreateChance, perfectItemType))
+        if (roll_chance_f(perfectCreateChance)) // if the roll succeeds...
+            newitemid = perfectItemType;        // the perfect item replaces the regular one
+
+    /* == gem perfection handling over == */
+
+
+    /* == profession specialization handling == */
+
+
     // init items_count to 1, since 1 item will be created regardless of specialization
     int32 itemsCount = 1;
     float additionalCreateChance = 0.0f;
-    int32 newMaxOrEntry = 0;
+    int32 additionalMaxNum = 0;
     // get the chance and maximum number for creating extra items
-    if (canCreateExtraItems(player, m_spellInfo->Id, additionalCreateChance, newMaxOrEntry))
+    if (canCreateExtraItems(player, m_spellInfo->Id, additionalCreateChance, additionalMaxNum))
     {
-        if (newMaxOrEntry > 0)
-        {
-            // roll with this chance till we roll not to create or we create the max num
-            while (roll_chance_f(additionalCreateChance) && itemsCount <= newMaxOrEntry)
-                ++itemsCount;
-        }
-        else if (roll_chance_f(additionalCreateChance))   // if the roll succeeds...
-            itemId = uint32(-newMaxOrEntry);        // the perfect item replaces the regular one
+        // roll with this chance till we roll not to create or we create the max num
+        while (roll_chance_f(additionalCreateChance) && itemsCount <= additionalMaxNum)
+            ++itemsCount;
     }
 
     // really will be created more items
     addNumber *= itemsCount;
 
+    /* == profession specialization handling over == */
+
     // can the player store the new item?
     ItemPosCountVec dest;
     uint32 no_space = 0;
-    InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, addNumber, &no_space);
+    InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, newitemid, addNumber, &no_space);
     if (msg != EQUIP_ERR_OK)
     {
         // convert to possible store amount
@@ -1735,7 +1753,7 @@ void Spell::DoCreateItem(uint8 /*effIndex*/, uint32 itemId)
         else
         {
             // if not created by another reason from full inventory or unique items amount limitation
-            player->SendEquipError(msg, NULL, NULL, itemId);
+            player->SendEquipError(msg, NULL, NULL, newitemid);
             return;
         }
     }
@@ -1743,7 +1761,7 @@ void Spell::DoCreateItem(uint8 /*effIndex*/, uint32 itemId)
     if (addNumber)
     {
         // create the new item and store it
-        Item* pItem = player->StoreNewItem(dest, itemId, true, Item::GenerateItemRandomPropertyId(itemId));
+        Item* pItem = player->StoreNewItem(dest, newitemid, true, Item::GenerateItemRandomPropertyId(newitemid));
 
         // was it successful? return error if not
         if (!pItem)
@@ -1753,7 +1771,7 @@ void Spell::DoCreateItem(uint8 /*effIndex*/, uint32 itemId)
         }
 
         // set the "Crafted by ..." property of the item
-        if (pItem->GetTemplate()->Class != ITEM_CLASS_CONSUMABLE && pItem->GetTemplate()->Class != ITEM_CLASS_QUEST && itemId != 6265 && itemId != 6948)
+        if (pItem->GetTemplate()->Class != ITEM_CLASS_CONSUMABLE && pItem->GetTemplate()->Class != ITEM_CLASS_QUEST && newitemid != 6265 && newitemid != 6948)
             pItem->SetUInt32Value(ITEM_FIELD_CREATOR, player->GetGUIDLow());
 
         // send info to the client
