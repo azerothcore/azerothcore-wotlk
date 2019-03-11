@@ -821,6 +821,7 @@ class spell_sha_fire_nova : public SpellScriptLoader
             SpellCastResult CheckFireTotem()
             {
                 // fire totem
+                Unit* caster = GetCaster();
                 if (Creature* totem = caster->GetMap()->GetCreature(caster->m_SummonSlot[1]))
                 {
                     if (!caster->IsWithinDistInMap(totem, caster->GetSpellMaxRangeForTarget(totem, GetSpellInfo())))
