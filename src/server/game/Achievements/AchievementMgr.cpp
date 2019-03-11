@@ -5,6 +5,7 @@
  */
 
 #include "AchievementMgr.h"
+#include "AccountMgr.h"
 #include "ArenaTeam.h"
 #include "ArenaTeamMgr.h"
 #include "BattlegroundAB.h"
@@ -2190,7 +2191,7 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
                     }
     }
 
-    if (achievement->flags & (ACHIEVEMENT_FLAG_REALM_FIRST_REACH | ACHIEVEMENT_FLAG_REALM_FIRST_KILL))
+    if (achievement->flags & (ACHIEVEMENT_FLAG_REALM_FIRST_REACH | ACHIEVEMENT_FLAG_REALM_FIRST_KILL) && AccountMgr::IsPlayerAccount(m_player->GetSession()->GetSecurity()))
         sAchievementMgr->SetRealmCompleted(achievement);
 
     UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_ACHIEVEMENT, achievement->ID);

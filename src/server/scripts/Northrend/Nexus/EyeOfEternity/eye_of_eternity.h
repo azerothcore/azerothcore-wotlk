@@ -5,7 +5,7 @@
 #ifndef DEF_EYE_OF_ETERNITY_H
 #define DEF_EYE_OF_ETERNITY_H
 
-#include "ScriptPCH.h"
+#include "Chat.h"
 
 enum Objects
 {

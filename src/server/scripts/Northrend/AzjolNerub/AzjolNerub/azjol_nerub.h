@@ -5,7 +5,9 @@
 #ifndef DEF_AZJOL_NERUB_H
 #define DEF_AZJOL_NERUB_H
 
-#include "ScriptPCH.h"
+#include "SpellScript.h"
+#include "SpellAuras.h"
+#include "SpellAuraEffects.h"
 
 enum ANData
 {

@@ -7,7 +7,6 @@
 #ifndef OUTDOOR_PVP_ZM_
 #define OUTDOOR_PVP_ZM_
 
-#include "ScriptPCH.h"
 #include "Language.h"
 #include "OutdoorPvP.h"
 

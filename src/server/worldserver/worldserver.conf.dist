@@ -213,6 +213,15 @@ MaxOverspeedPings = 2
 GridUnload = 1
 
 #
+#    CloseIdleConnections
+#        Description: Automatically close idle connections.
+#                     SocketTimeOutTime and SocketTimeOutTimeActive determine when a connection is considered as idle.
+#        Default:     1 - (enable, Automatically close idle connections)
+#                     0 - (disable, Do not close idle connections)
+
+CloseIdleConnections = 1
+
+#
 #    SocketTimeOutTime
 #        Description: Time (in milliseconds) after which a connection being idle on the character
 #                     selection screen is disconnected.
@@ -317,6 +326,15 @@ vmap.enableIndoorCheck = 1
 #                     0 - (Disabled, Less position precision but less CPU usage)
 
 DetectPosCollision = 1
+
+#
+#    CheckGameObjectLoS
+#        Description: Include dynamic game objects (doors, chests etc.) in line of sight checks.
+#                     This increases CPU usage somewhat.
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled, may break some boss encounters)
+
+CheckGameObjectLoS = 1
 
 #
 #    TargetPosRecalculateRange
@@ -482,6 +500,7 @@ LogFileLevel = 0
 #             2097152 - Anything related to guilds
 #             4194304 - Anything related to transports
 #             8388608 - Anything related to Warden anti cheat
+#            67108864 - Whenever KickPlayer() or CloseSocket() are called
 #
 #                       Simply add the values together to create a bitmask.
 #                       For more info see enum DebugLogFilters in Log.h

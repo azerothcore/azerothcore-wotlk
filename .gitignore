@@ -12,8 +12,13 @@ modules/*
 !modules/*.sh
 build*/
 var/*
+docker/build/cache
+docker/authserver/bin
+docker/worldserver/bin
 docker/authserver/etc/authserver.conf
+docker/authserver/etc/authserver.conf.dist
 docker/worldserver/etc/worldserver.conf
+docker/worldserver/etc/worldserver.conf.dist
 docker/authserver/logs/
 docker/worldserver/logs/
 docker/worldserver/data/

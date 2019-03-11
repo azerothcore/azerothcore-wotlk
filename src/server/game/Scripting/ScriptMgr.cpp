@@ -60,6 +60,7 @@ template class ScriptRegistry<MovementHandlerScript>;
 template class ScriptRegistry<BGScript>;
 template class ScriptRegistry<SpellSC>;
 template class ScriptRegistry<AccountScript>;
+template class ScriptRegistry<GameEventScript>;
 
 #include "ScriptMgrMacros.h"
 
@@ -213,6 +214,7 @@ void ScriptMgr::Unload()
     SCR_CLEAR(ModuleScript);
     SCR_CLEAR(BGScript);
     SCR_CLEAR(SpellSC);
+    SCR_CLEAR(GameEventScript);
 
     #undef SCR_CLEAR
 }
@@ -1464,6 +1466,21 @@ void ScriptMgr::OnPlayerReputationChange(Player* player, uint32 factionID, int32
     FOREACH_SCRIPT(PlayerScript)->OnReputationChange(player, factionID, standing, incremental);
 }
 
+void ScriptMgr::OnPlayerReputationRankChange(Player* player, uint32 factionID, ReputationRank newRank, ReputationRank oldRank, bool increased)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnReputationRankChange(player, factionID, newRank, oldRank, increased);
+}
+
+void ScriptMgr::OnPlayerLearnSpell(Player* player, uint32 spellID)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnLearnSpell(player, spellID);
+}
+
+void ScriptMgr::OnPlayerForgotSpell(Player* player, uint32 spellID)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnForgotSpell(player, spellID);
+}
+
 void ScriptMgr::OnPlayerDuelRequest(Player* target, Player* challenger)
 {
 #ifdef ELUNA
@@ -2043,6 +2060,22 @@ void ScriptMgr::OnCalcMaxDuration(Aura const* aura, int32& maxDuration)
     FOREACH_SCRIPT(SpellSC)->OnCalcMaxDuration(aura, maxDuration);
 }
 
+void ScriptMgr::OnGameEventStart(uint16 EventID)
+{
+#ifdef ELUNA
+    sEluna->OnGameEventStart(EventID);
+#endif
+    FOREACH_SCRIPT(GameEventScript)->OnStart(EventID);
+}
+
+void ScriptMgr::OnGameEventStop(uint16 EventID)
+{
+#ifdef ELUNA
+    sEluna->OnGameEventStop(EventID);
+#endif
+    FOREACH_SCRIPT(GameEventScript)->OnStop(EventID);
+}
+
 AllMapScript::AllMapScript(const char* name)
     : ScriptObject(name)
 {
@@ -2240,5 +2273,11 @@ ModuleScript::ModuleScript(const char* name)
     : ScriptObject(name)
 {
     ScriptRegistry<ModuleScript>::AddScript(this);
+}
+
+GameEventScript::GameEventScript(const char* name)
+    : ScriptObject(name)
+{
+    ScriptRegistry<GameEventScript>::AddScript(this);
 }
 

@@ -2191,7 +2191,7 @@ void Spell::SearchChainTargets(std::list<WorldObject*>& targets, uint32 chainTar
                 if (Unit* unit = (*itr)->ToUnit())
                 {
                     uint32 deficit = unit->GetMaxHealth() - unit->GetHealth();
-                    if ((deficit > maxHPDeficit || foundItr == tempTargets.end()) && target->IsWithinDist(unit, jumpRadius) && target->IsWithinLOSInMap(unit))
+                    if ((deficit > maxHPDeficit || foundItr == tempTargets.end()) && target->IsWithinDist(unit, jumpRadius) && target->IsWithinLOSInMap(unit, LINEOFSIGHT_ALL_CHECKS))
                     {
                         foundItr = itr;
                         maxHPDeficit = deficit;
@@ -2206,10 +2206,10 @@ void Spell::SearchChainTargets(std::list<WorldObject*>& targets, uint32 chainTar
             {
                 if (foundItr == tempTargets.end())
                 {
-                    if ((!isBouncingFar || target->IsWithinDist(*itr, jumpRadius)) && target->IsWithinLOSInMap(*itr))
+                    if ((!isBouncingFar || target->IsWithinDist(*itr, jumpRadius)) && target->IsWithinLOSInMap(*itr, LINEOFSIGHT_ALL_CHECKS))
                         foundItr = itr;
                 }
-                else if (target->GetDistanceOrder(*itr, *foundItr) && target->IsWithinLOSInMap(*itr))
+                else if (target->GetDistanceOrder(*itr, *foundItr) && target->IsWithinLOSInMap(*itr, LINEOFSIGHT_ALL_CHECKS))
                     foundItr = itr;
             }
         }
@@ -3414,6 +3414,10 @@ void Spell::prepare(SpellCastTargets const* targets, AuraEffect const* triggered
     // calculate cast time (calculated after first CheckCast check to prevent charge counting for first CheckCast fail)
     m_casttime = (_triggeredCastFlags & TRIGGERED_CAST_DIRECTLY) ? 0 : m_spellInfo->CalcCastTime(m_caster, this);
 
+    if (m_caster->GetTypeId() == TYPEID_PLAYER)
+        if (m_caster->ToPlayer()->GetCommandStatus(CHEAT_CASTTIME))
+            m_casttime = 0;
+
     // don't allow channeled spells / spells with cast time to be casted while moving
     // (even if they are interrupted on moving, spells with almost immediate effect get to have their effect processed before movement interrupter kicks in)
     if ((m_spellInfo->IsChanneled() || m_casttime) && m_caster->GetTypeId() == TYPEID_PLAYER && m_caster->isMoving() && m_spellInfo->InterruptFlags & SPELL_INTERRUPT_FLAG_MOVEMENT && !IsTriggered())
@@ -3831,6 +3835,10 @@ void Spell::_cast(bool skipCheck)
         if (m_caster->GetTypeId() == TYPEID_PLAYER || (m_caster->IsPet() && m_caster->IsControlledByPlayer()))
             if (GetDelayMoment() > 0 && !m_caster->IsFriendlyTo(target) && !m_spellInfo->HasAura(SPELL_AURA_BIND_SIGHT) && (!m_spellInfo->IsPositive() || m_spellInfo->HasEffect(SPELL_EFFECT_DISPEL)))
                 m_caster->CombatStartOnCast(target, !m_spellInfo->HasAttribute(SPELL_ATTR3_NO_INITIAL_AGGRO), GetDelayMoment() + 500); // xinef: increase this time so we dont leave and enter combat in a moment
+
+    if (m_caster->GetTypeId() == TYPEID_PLAYER)
+        if (m_caster->ToPlayer()->GetCommandStatus(CHEAT_COOLDOWN))
+            m_caster->ToPlayer()->RemoveSpellCooldown(m_spellInfo->Id, true);
 
     SetExecutedCurrently(false);
 }
@@ -4951,6 +4959,11 @@ void Spell::TakePower()
     if (m_CastItem || m_triggeredByAuraSpell)
         return;
 
+    //Don't take power if the spell is cast while .cheat power is enabled.
+    if (m_caster->GetTypeId() == TYPEID_PLAYER)
+        if (m_caster->ToPlayer()->GetCommandStatus(CHEAT_POWER))
+            return;
+
     Powers powerType = Powers(m_spellInfo->PowerType);
     bool hit = true;
     if (m_caster->GetTypeId() == TYPEID_PLAYER)
@@ -5518,7 +5531,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                 return SPELL_FAILED_NOT_INFRONT;
 
             if (m_caster->GetEntry() != WORLD_TRIGGER) // Ignore LOS for gameobjects casts (wrongly casted by a trigger)
-                if ((!m_caster->IsTotem() || !m_spellInfo->IsPositive()) && !m_spellInfo->HasAttribute(SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS) && !m_spellInfo->HasAttribute(SPELL_ATTR5_SKIP_CHECKCAST_LOS_CHECK) && !m_caster->IsWithinLOSInMap(target) && !(m_spellFlags & SPELL_FLAG_REDIRECTED))
+                if ((!m_caster->IsTotem() || !m_spellInfo->IsPositive()) && !m_spellInfo->HasAttribute(SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS) && !m_spellInfo->HasAttribute(SPELL_ATTR5_SKIP_CHECKCAST_LOS_CHECK) && !m_caster->IsWithinLOSInMap(target, LINEOFSIGHT_ALL_CHECKS) && !(m_spellFlags & SPELL_FLAG_REDIRECTED))
                     return SPELL_FAILED_LINE_OF_SIGHT;
         }
     }
@@ -5529,7 +5542,7 @@ SpellCastResult Spell::CheckCast(bool strict)
         float x, y, z;
         m_targets.GetDstPos()->GetPosition(x, y, z);
 
-        if ((!m_caster->IsTotem() || !m_spellInfo->IsPositive()) && !m_spellInfo->HasAttribute(SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS) && !m_spellInfo->HasAttribute(SPELL_ATTR5_SKIP_CHECKCAST_LOS_CHECK) && !m_caster->IsWithinLOS(x, y, z))
+        if ((!m_caster->IsTotem() || !m_spellInfo->IsPositive()) && !m_spellInfo->HasAttribute(SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS) && !m_spellInfo->HasAttribute(SPELL_ATTR5_SKIP_CHECKCAST_LOS_CHECK) && !m_caster->IsWithinLOS(x, y, z, LINEOFSIGHT_ALL_CHECKS))
             return SPELL_FAILED_LINE_OF_SIGHT;
     }
 
@@ -5708,7 +5721,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                     if (!target || !pet || pet->isDead() || target->isDead())
                         return SPELL_FAILED_BAD_TARGETS;
                     
-                    if (!pet->IsWithinLOSInMap(target))
+                    if (!pet->IsWithinLOSInMap(target, LINEOFSIGHT_ALL_CHECKS))
                         return SPELL_FAILED_LINE_OF_SIGHT;
                 }
                 break;
@@ -7418,7 +7431,7 @@ bool Spell::CheckEffectTarget(Unit const* target, uint32 eff) const
             z = m_targets.GetDstPos()->GetPositionZ();
         }
 
-        if ((!m_caster->IsTotem() || !m_spellInfo->IsPositive()) && !target->IsWithinLOS(x, y, z))
+        if ((!m_caster->IsTotem() || !m_spellInfo->IsPositive()) && !target->IsWithinLOS(x, y, z, LINEOFSIGHT_ALL_CHECKS))
             return false;
 
         return true;
@@ -7430,7 +7443,7 @@ bool Spell::CheckEffectTarget(Unit const* target, uint32 eff) const
     {
         case SPELL_EFFECT_RESURRECT_NEW:
             // player far away, maybe his corpse near?
-            if (target != m_caster && !target->IsWithinLOSInMap(m_caster))
+            if (target != m_caster && !target->IsWithinLOSInMap(m_caster, LINEOFSIGHT_ALL_CHECKS))
             {
                 if (!m_targets.GetCorpseTargetGUID())
                     return false;
@@ -7442,7 +7455,7 @@ bool Spell::CheckEffectTarget(Unit const* target, uint32 eff) const
                 if (target->GetGUID() != corpse->GetOwnerGUID())
                     return false;
 
-                if (!corpse->IsWithinLOSInMap(m_caster) && !(m_spellFlags & SPELL_FLAG_REDIRECTED))
+                if (!corpse->IsWithinLOSInMap(m_caster, LINEOFSIGHT_ALL_CHECKS) && !(m_spellFlags & SPELL_FLAG_REDIRECTED))
                     return false;
             }
             break;
@@ -7450,7 +7463,7 @@ bool Spell::CheckEffectTarget(Unit const* target, uint32 eff) const
             {
                 if (!m_targets.GetCorpseTargetGUID())
                 {
-                    if (target->IsWithinLOSInMap(m_caster) && target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE))
+                    if (target->IsWithinLOSInMap(m_caster, LINEOFSIGHT_ALL_CHECKS) && target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE))
                         return true;
 
                     return false;
@@ -7466,7 +7479,7 @@ bool Spell::CheckEffectTarget(Unit const* target, uint32 eff) const
                 if (!corpse->HasFlag(CORPSE_FIELD_FLAGS, CORPSE_FLAG_LOOTABLE))
                     return false;
 
-                if (!corpse->IsWithinLOSInMap(m_caster))
+                if (!corpse->IsWithinLOSInMap(m_caster, LINEOFSIGHT_ALL_CHECKS))
                     return false;
             }
             break;
@@ -7503,7 +7516,7 @@ bool Spell::CheckEffectTarget(Unit const* target, uint32 eff) const
                     z = m_targets.GetDstPos()->GetPositionZ();
                 }
 
-                if (!target->IsInMap(caster) || !target->IsWithinLOS(x, y, z))
+                if (!target->IsInMap(caster) || !target->IsWithinLOS(x, y, z, LINEOFSIGHT_ALL_CHECKS))
                     return false;
             }
             break;
@@ -8299,6 +8312,10 @@ void Spell::TriggerGlobalCooldown()
         else
             return;
     }
+
+    if (m_caster->GetTypeId() == TYPEID_PLAYER)
+        if (m_caster->ToPlayer()->GetCommandStatus(CHEAT_COOLDOWN))
+            return;
 
     // Global cooldown can't leave range 1..1.5 secs
     // There are some spells (mostly not casted directly by player) that have < 1 sec and > 1.5 sec global cooldowns

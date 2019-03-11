@@ -231,7 +231,7 @@ bool World::KickSession(uint32 id)
         if (itr->second->PlayerLoading())
             return false;
 
-        itr->second->KickPlayer(false);
+        itr->second->KickPlayer("KickSession", false);
     }
 
     return true;
@@ -248,9 +248,9 @@ void World::AddSession_(WorldSession* s)
 
     // kick existing session with same account (if any)
     // if character on old session is being loaded, then return
-    if (!KickSession (s->GetAccountId()))
+    if (!KickSession(s->GetAccountId()))
     {
-        s->KickPlayer();
+        s->KickPlayer("kick existing session with same account");
         delete s; // session not added yet in session list, so not listed in queue
         return;
     }
@@ -456,6 +456,16 @@ void World::LoadConfigSettings(bool reload)
     }
 
     LoadModuleConfigSettings();
+
+#ifdef ELUNA
+    ///- Initialize Lua Engine
+    if (!reload)
+    {
+        sLog->outString("Initialize Eluna Lua Engine...");
+        Eluna::Initialize();
+    }
+#endif
+
     sScriptMgr->OnBeforeConfigLoad(reload);
 
     // Reload log levels and filters
@@ -679,6 +689,7 @@ void World::LoadConfigSettings(bool reload)
     else
         m_int_configs[CONFIG_PORT_WORLD] = sConfigMgr->GetIntDefault("WorldServerPort", 8085);
 
+    m_bool_configs[CONFIG_CLOSE_IDLE_CONNECTIONS] = sConfigMgr->GetBoolDefault("CloseIdleConnections", true);
     m_int_configs[CONFIG_SOCKET_TIMEOUTTIME] = sConfigMgr->GetIntDefault("SocketTimeOutTime", 900000);
     m_int_configs[CONFIG_SOCKET_TIMEOUTTIME_ACTIVE] = sConfigMgr->GetIntDefault("SocketTimeOutTimeActive", 60000);
     m_int_configs[CONFIG_SESSION_ADD_DELAY] = sConfigMgr->GetIntDefault("SessionAddDelay", 10000);
@@ -1297,7 +1308,10 @@ void World::LoadConfigSettings(bool reload)
     m_bool_configs[CONFIG_ENABLE_CONTINENT_TRANSPORT_PRELOADING] = sConfigMgr->GetBoolDefault("IsPreloadedContinentTransport.Enabled", false);
 
     m_bool_configs[CONFIG_IP_BASED_ACTION_LOGGING] = sConfigMgr->GetBoolDefault("Allow.IP.Based.Action.Logging", false);
-  
+
+    // Whether to use LoS from game objects
+    m_bool_configs[CONFIG_CHECK_GOBJECT_LOS] = sConfigMgr->GetBoolDefault("CheckGameObjectLoS", true);
+
     m_bool_configs[CONFIG_CALCULATE_CREATURE_ZONE_AREA_DATA] = sConfigMgr->GetBoolDefault("Calculate.Creature.Zone.Area.Data", false);
     m_bool_configs[CONFIG_CALCULATE_GAMEOBJECT_ZONE_AREA_DATA] = sConfigMgr->GetBoolDefault("Calculate.Gameoject.Zone.Area.Data", false);
 
@@ -1327,21 +1341,6 @@ void World::SetInitialWorldSettings()
     {
         vmmgr2->GetLiquidFlagsPtr = &GetLiquidFlags;
     }
-
-#ifdef ELUNA
-    ///- Initialize Lua Engine
-    sLog->outString("Initialize Eluna Lua Engine...");
-
-    std::string conf_path = _CONF_DIR;
-    std::string cfg_file = conf_path + "/mod_LuaEngine.conf";
-#ifdef WIN32
-    cfg_file = "mod_LuaEngine.conf";
-#endif
-    std::string cfg_def_file = cfg_file + ".dist";
-    sConfigMgr->LoadMore(cfg_def_file.c_str());
-    sConfigMgr->LoadMore(cfg_file.c_str());
-    Eluna::Initialize();
-#endif
 
     ///- Initialize config settings
     LoadConfigSettings();
@@ -2419,11 +2418,11 @@ void World::KickAll()
 
     // session not removed at kick and will removed in next update tick
     for (SessionMap::const_iterator itr = m_sessions.begin(); itr != m_sessions.end(); ++itr)
-        itr->second->KickPlayer();
+        itr->second->KickPlayer("KickAll sessions");
 
     // pussywizard: kick offline sessions
     for (SessionMap::const_iterator itr = m_offlineSessions.begin(); itr != m_offlineSessions.end(); ++itr)
-        itr->second->KickPlayer();
+        itr->second->KickPlayer("KickAll offline sessions");
 }
 
 /// Kick (and save) all players with security level less `sec`
@@ -2432,7 +2431,7 @@ void World::KickAllLess(AccountTypes sec)
     // session not removed at kick and will removed in next update tick
     for (SessionMap::const_iterator itr = m_sessions.begin(); itr != m_sessions.end(); ++itr)
         if (itr->second->GetSecurity() < sec)
-            itr->second->KickPlayer();
+            itr->second->KickPlayer("KickAllLess");
 }
 
 /// Ban an account or ban an IP address, duration will be parsed using TimeStringToSecs if it is positive, otherwise permban
@@ -2512,10 +2511,10 @@ BanReturn World::BanAccount(BanMode mode, std::string const& nameOrIP, std::stri
 
         if (WorldSession* sess = FindSession(account))
             if (sess->GetPlayerName() != author)
-                sess->KickPlayer();
+                sess->KickPlayer("FindSession(account)->GetPlayerName() != author");
         if (WorldSession* sess = FindOfflineSession(account))
             if (sess->GetPlayerName() != author)
-                sess->KickPlayer();
+                sess->KickPlayer("FindOfflineSession(account)->GetPlayerName() != author");
     } while (resultAccounts->NextRow());
 
     LoginDatabase.CommitTransaction(trans);
@@ -2583,7 +2582,7 @@ BanReturn World::BanCharacter(std::string const& name, std::string const& durati
     CharacterDatabase.Execute(stmt);
 
     if (pBanned)
-        pBanned->GetSession()->KickPlayer();
+        pBanned->GetSession()->KickPlayer("Ban");
 
     return BAN_SUCCESS;
 }

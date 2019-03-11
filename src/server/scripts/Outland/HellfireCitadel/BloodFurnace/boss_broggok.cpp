@@ -3,8 +3,9 @@
 */
 
 #include "ScriptMgr.h"
-#include "ScriptPCH.h"
 #include "ScriptedCreature.h"
+#include "SpellScript.h"
+#include "SpellAuraEffects.h"
 #include "blood_furnace.h"
 
 enum eEnums

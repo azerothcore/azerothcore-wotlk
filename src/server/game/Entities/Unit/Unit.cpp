@@ -141,9 +141,9 @@ void DamageInfo::BlockDamage(uint32 amount)
     m_damage -= amount;
 }
 
-ProcEventInfo::ProcEventInfo(Unit* actor, Unit* actionTarget, Unit* procTarget, uint32 typeMask, uint32 spellTypeMask, uint32 spellPhaseMask, uint32 hitMask, Spell* spell, DamageInfo* damageInfo, HealInfo* healInfo, SpellInfo const* triggeredByAuraSpell)
+ProcEventInfo::ProcEventInfo(Unit* actor, Unit* actionTarget, Unit* procTarget, uint32 typeMask, uint32 spellTypeMask, uint32 spellPhaseMask, uint32 hitMask, Spell* /*spell*/, DamageInfo* damageInfo, HealInfo* healInfo, SpellInfo const* triggeredByAuraSpell)
 :_actor(actor), _actionTarget(actionTarget), _procTarget(procTarget), _typeMask(typeMask), _spellTypeMask(spellTypeMask), _spellPhaseMask(spellPhaseMask),
-_hitMask(hitMask), _spell(spell), _damageInfo(damageInfo), _healInfo(healInfo), _triggeredByAuraSpell(triggeredByAuraSpell)
+_hitMask(hitMask), _damageInfo(damageInfo), _healInfo(healInfo), _triggeredByAuraSpell(triggeredByAuraSpell)
 {
 }
 
@@ -695,6 +695,10 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
     {
         // Signal to pets that their owner was attacked
         Pet* pet = victim->ToPlayer()->GetPet();
+
+        if (victim->GetTypeId() == TYPEID_PLAYER)
+            if (victim->ToPlayer()->GetCommandStatus(CHEAT_GOD))
+                return 0;
 
         if (pet && pet->IsAlive())
             pet->AI()->OwnerAttackedBy(attacker);
@@ -3705,7 +3709,7 @@ void SafeUnitPointer::UnitDeleted()
             if (ptr)
                 sLog->outMisc("SafeUnitPointer::UnitDeleted (A2)");
 
-            p->GetSession()->KickPlayer();
+            p->GetSession()->KickPlayer("Unit deleted");
         }
     }
     else if (ptr)

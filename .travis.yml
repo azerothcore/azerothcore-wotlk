@@ -3,8 +3,8 @@ dist: xenial # (16.04)
 # bionic (18.04) is not yet available in travis
 
 language: cpp
-compiler:
-  - clang
+
+cache: ccache
 
 addons:
   apt:
@@ -16,35 +16,26 @@ services:
 git:
   depth: 1
 
+env:
+  - TRAVIS_BUILD_ID="1"
+  - TRAVIS_BUILD_ID="2"
+
 before_install:
   - git config user.email "azerothcorebot@gmail.com" && git config user.name "AzerothCoreBot"
-  - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then cd bin/; fi
+  - if [ "$TRAVIS_BUILD_ID" = "1" ] && [ "$TRAVIS_PULL_REQUEST" = "false" ]; then cd bin/; fi
   # import pending sql
-  - if [ "$TRAVIS_PULL_REQUEST" = "false" ] && [ "$TRAVIS_BRANCH" = "master" ]; then bash acore-db-pendings; fi
-  - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then cd ..; fi
+  - if [ "$TRAVIS_BUILD_ID" = "1" ] && [ "$TRAVIS_PULL_REQUEST" = "false" ] && [ "$TRAVIS_BRANCH" = "master" ]; then source acore-db-pendings; fi
+  - if [ "$TRAVIS_BUILD_ID" = "1" ] && [ "$TRAVIS_PULL_REQUEST" = "false" ]; then cd ..; fi
   # push changes to git if any
-  - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then git fetch --unshallow; fi
-  - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then git checkout $TRAVIS_BRANCH; fi
-  - if [ "$TRAVIS_PULL_REQUEST" = "false" ] && [[ -n "$GITHUB_API_KEY" ]]; then git add -A . && git diff --cached --quiet || git commit -am "Import pending SQL update file" && git push https://$GITHUB_API_KEY@github.com/$TRAVIS_REPO_SLUG.git $TRAVIS_BRANCH; fi
+  - if [ "$TRAVIS_BUILD_ID" = "1" ] && [ "$TRAVIS_PULL_REQUEST" = "false" ]; then git fetch --unshallow; fi
+  - if [ "$TRAVIS_BUILD_ID" = "1" ] && [ "$TRAVIS_PULL_REQUEST" = "false" ]; then git checkout $TRAVIS_BRANCH; fi
+  - if [ "$TRAVIS_BUILD_ID" = "1" ] && [ "$TRAVIS_PULL_REQUEST" = "false" ] && [[ -n "$GITHUB_API_KEY" ]]; then git add -A . && git diff --cached --quiet || git commit -am "Import pending SQL update file..." -m "Referenced commit(s):$COMMIT_HASH" && git push https://$GITHUB_API_KEY@github.com/$TRAVIS_REPO_SLUG.git $TRAVIS_BRANCH; fi
   # sync staging with master
-  - if [ "$TRAVIS_PULL_REQUEST" = "false" ] && [ "$TRAVIS_BRANCH" = "master" ] && [[ -n "$GITHUB_API_KEY" ]]; then git fetch origin staging:staging && git checkout staging && git merge --no-edit master && git push https://$GITHUB_API_KEY@github.com/$TRAVIS_REPO_SLUG.git staging; git checkout master; fi
+  - if [ "$TRAVIS_BUILD_ID" = "1" ] && [ "$TRAVIS_PULL_REQUEST" = "false" ] && [ "$TRAVIS_BRANCH" = "master" ] && [[ -n "$GITHUB_API_KEY" ]]; then git fetch origin staging:staging && git checkout staging && git merge --no-edit master && git push https://$GITHUB_API_KEY@github.com/$TRAVIS_REPO_SLUG.git staging; git checkout master; fi
+  - source ./apps/ci/ci-before_install.sh
 
 install:
-  # install OS deps (apt-get)
-  - bash ./acore.sh "install-deps"
-  # create config file
-  - echo "CCUSTOMOPTIONS='-DWITH_WARNINGS=1 -DWITH_COREDEBUG=1 -DUSE_COREPCH=0 -DUSE_SCRIPTPCH=0 -DTOOLS=1 -DSCRIPTS=1 -DSERVERS=1 -DWITH_PERFTOOLS=1 -DENABLE_EXTRA_LOGS=1 -DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_FLAGS=\"-Werror\" -DCMAKE_CXX_FLAGS=\"-Werror\"';" >> conf/config.sh
-  - echo "DB_CHARACTERS_CONF=\"MYSQL_USER='root'; MYSQL_PASS=''; MYSQL_HOST='127.0.0.1';\"" >> conf/config.sh
-  - echo "DB_AUTH_CONF=\"MYSQL_USER='root'; MYSQL_PASS=''; MYSQL_HOST='127.0.0.1';\"" >> conf/config.sh
-  - echo "DB_WORLD_CONF=\"MYSQL_USER='root'; MYSQL_PASS=''; MYSQL_HOST='127.0.0.1';\"" >> conf/config.sh  
-  # create and import mysql
-  - mysql -e "SET GLOBAL sql_mode = '';" # this is necessary because of mysql 5.7
-  - bash ./acore.sh "db-assembler" "import-all"
+  - source ./apps/ci/ci-install.sh
 
 script:
-  # compile
-  - bash ./acore.sh "compiler" "all"
-  - git clone --depth=1 --branch=master --single-branch https://github.com/ac-data/ac-data.git /home/travis/build/azerothcore/azerothcore-wotlk/env/dist/data
-  - cp ./data/travis/worldserver.conf ./env/dist/etc/worldserver.conf
-  - ./env/dist/bin/worldserver --dry-run
-  - ./apps/ci-error-check.sh
+  - source ./apps/ci/ci-script.sh
