@@ -194,8 +194,7 @@ public:
 
         std::string msg = [&] {
             std::string const assignedName = ticket->GetAssignedToName();
-            return ticket->FormatMessageString(*handler, nullptr,
-                assignedName.empty() ? nullptr : assignedName.c_str(), nullptr, nullptr, nullptr);
+            return ticket->FormatMessageString(*handler, assignedName.empty() ? nullptr : assignedName.c_str(), nullptr, nullptr, nullptr);
         }();
         msg += handler->PGetParseString(LANG_COMMAND_TICKETLISTADDCOMMENT, player ? player->GetName().c_str() : "Console", comment);
         handler->SendGlobalGMSysMessage(msg.c_str());
