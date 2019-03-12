@@ -245,17 +245,50 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
     }
     case SMART_ACTION_SOUND:
     {
-        ObjectList* targets = GetTargets(e, unit);
+        ObjectList* targets = NULL;
+
+        if (e.action.sound.playMusic > 1)
+        {
+            if (me && me->FindMap())
+            {
+                Map::PlayerList const &players = me->GetMap()->GetPlayers();
+                targets = new ObjectList();
+
+                if (!players.isEmpty())
+                {
+                    for (Map::PlayerList::const_iterator i = players.begin(); i != players.end(); ++i)
+                        if (Player* player = i->GetSource())
+                        {
+                            if (player->GetZoneId() == me->GetZoneId())
+                            {
+                                if (e.action.sound.playMusic > 2)
+                                {
+                                    if (player->GetAreaId() == me->GetAreaId())
+                                        targets->push_back(player);
+                                }
+                                else
+                                    targets->push_back(player);
+                            }
+                        }
+                }
+            }
+        }
+        else
+            targets = GetTargets(e, unit);
+
         if (targets)
         {
             for (ObjectList::const_iterator itr = targets->begin(); itr != targets->end(); ++itr)
             {
                 if (IsUnit(*itr))
                 {
-                    (*itr)->SendPlaySound(e.action.sound.sound, e.action.sound.onlySelf > 0);
+                    if (e.action.sound.playMusic > 0)
+                        (*itr)->SendPlayMusic(e.action.sound.sound, e.action.sound.onlySelf > 0);
+                    else
+                        (*itr)->SendPlaySound(e.action.sound.sound, e.action.sound.onlySelf > 0);
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                    sLog->outDebug(LOG_FILTER_DATABASE_AI, "SmartScript::ProcessAction:: SMART_ACTION_SOUND: target: %s (GuidLow: %u), sound: %u, onlyself: %u",
-                        (*itr)->GetName().c_str(), (*itr)->GetGUIDLow(), e.action.sound.sound, e.action.sound.onlySelf);
+                    sLog->outDebug(LOG_FILTER_DATABASE_AI, "SmartScript::ProcessAction:: SMART_ACTION_SOUND: target: %s (GuidLow: %u), sound: %u, onlySelf: %u, playMusic: %u",
+                        (*itr)->GetName().c_str(), (*itr)->GetGUIDLow(), e.action.sound.sound, e.action.sound.onlySelf, e.action.sound.playMusic);
 #endif
                 }
             }

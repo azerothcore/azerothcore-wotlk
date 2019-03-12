@@ -920,6 +920,7 @@ class WorldObject : public Object, public WorldLocation
 
         // Low Level Packets
         void SendPlaySound(uint32 Sound, bool OnlySelf);
+        void SendPlayMusic(uint32 Music, bool OnlySelf);
 
         virtual void SetMap(Map* map);
         virtual void ResetMap();
