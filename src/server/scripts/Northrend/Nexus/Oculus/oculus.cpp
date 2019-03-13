@@ -34,6 +34,7 @@ enum Drakes
     SPELL_SOAR_TRIGGER                      = 50325,
     SPELL_SOAR_BUFF                         = 50024,
     SPELL_SCALE_STATS                       = 66667,
+    
     // Ruby Drake
     SPELL_RUBY_EVASIVE_AURA                 = 50248,
     SPELL_RUBY_EVASIVE_MANEUVERS            = 50240,
@@ -315,19 +316,6 @@ public:
                                                 break;
                                         }
                                     }
-
-                                    uint32 spell = 0;
-                                    switch (me->GetEntry())
-                                    {
-                                        case 27692: spell = 49427; break;
-                                        case 27755: spell = 49459; break;
-                                        case 27756: spell = 49463; break;
-                                    }
-
-                                    //summoner->EnterVehicle(me);
-                                    if (spell)
-                                        me->CastSpell(summoner, spell, true);
-                                    me->SetSpeedRate(MOVE_FLIGHT, 1.0f);
                                 }
                             }
                     }
@@ -335,6 +323,7 @@ public:
                     {
                         me->DespawnOrUnsummon(2050);
                         me->SetOrientation(2.5f);
+                        me->SetSpeedRate(MOVE_FLIGHT, 1.0f);
                         Position pos = me->GetPosition();
                         Position offset = { 10.0f, 10.0f, 12.0f, 0.0f };
                         pos.RelocateOffset(offset);
