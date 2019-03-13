@@ -6230,6 +6230,10 @@ void SpellMgr::LoadDbcDataCorrections()
             spellInfo->EffectImplicitTargetA[EFFECT_1] = TARGET_UNIT_TARGET_ANY;
             spellInfo->EffectImplicitTargetA[EFFECT_2] = TARGET_UNIT_TARGET_ANY;
             break;
+        // Protection of Elune
+        case 38528:
+            spellInfo->EffectRadiusIndex[1] = 100; // 100 yard range
+            break;
         }
 
         switch (spellInfo->SpellFamilyName)
