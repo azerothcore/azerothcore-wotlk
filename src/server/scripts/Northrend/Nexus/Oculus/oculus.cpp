@@ -34,7 +34,6 @@ enum Drakes
     SPELL_SOAR_TRIGGER                      = 50325,
     SPELL_SOAR_BUFF                         = 50024,
     SPELL_SCALE_STATS                       = 66667,
-    
     // Ruby Drake
     SPELL_RUBY_EVASIVE_AURA                 = 50248,
     SPELL_RUBY_EVASIVE_MANEUVERS            = 50240,
@@ -298,23 +297,19 @@ public:
                         if( me->GetVehicleKit() && me->IsSummon() )
                             if( !me->GetVehicleKit()->GetPassenger(0) )
                             {
-                                TempSummon* ts = (TempSummon*)me;
-                                if( Unit* summoner = ts->GetSummoner() )
+                                if( m_pInstance->GetData(DATA_UROM) == DONE )
                                 {
-                                    if( m_pInstance->GetData(DATA_UROM) == DONE )
+                                    switch( me->GetEntry() )
                                     {
-                                        switch( me->GetEntry() )
-                                        {
-                                            case 27692:
-                                                me->m_spells[5] = 50344;
-                                                break;
-                                            case 27755:
-                                                me->m_spells[5] = 49592;
-                                                break;
-                                            case 27756:
-                                                me->m_spells[5] = 50253;
-                                                break;
-                                        }
+                                        case 27692:
+                                            me->m_spells[5] = 50344;
+                                            break;
+                                        case 27755:
+                                            me->m_spells[5] = 49592;
+                                            break;
+                                        case 27756:
+                                            me->m_spells[5] = 50253;
+                                            break;
                                     }
                                 }
                             }
