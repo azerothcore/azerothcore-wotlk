@@ -16,13 +16,9 @@ services:
 git:
   depth: 1
 
-env:
-  - TRAVIS_BUILD_ID="1"
-  - TRAVIS_BUILD_ID="2"
-
 stages:
   - prepare_cache
-  - test
+  - run
 
 jobs:
   include:
@@ -46,7 +42,7 @@ jobs:
       script:
         - source ./apps/ci/ci-compile.sh
 
-    - stage: test
+    - stage: run
       env: TRAVIS_BUILD_ID="1"
       before_install:
         - source ./apps/ci/ci-before_install.sh
@@ -66,7 +62,7 @@ jobs:
       script:
         - source ./apps/ci/ci-compile.sh
 
-    - stage: test
+    - stage: run
       env: TRAVIS_BUILD_ID="2"
       before_install:
         - source ./apps/ci/ci-before_install.sh
