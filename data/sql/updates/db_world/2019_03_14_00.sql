@@ -1,3 +1,19 @@
+-- DB update 2019_03_07_00 -> 2019_03_14_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2019_03_07_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2019_03_07_00 2019_03_14_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1552517697995597395'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1552517697995597395');
 
 DELETE FROM `creature_text` WHERE `CreatureID` = 28948;
@@ -19,3 +35,12 @@ VALUES
 (28948,12,0,'Stay for as long as you like, $N. Glory in the fruits of your labor!',12,0,100,1,0,0,29438,0,'Malmortis text'),
 (28948,13,0,'Your service has been invaluable in fulfilling the master''s plan. May you forever grow in power....',12,0,100,1,0,0,29439,0,'Malmortis text'),
 (28948,14,0,'Farewell.',12,0,100,1,0,0,29440,0,'Malmortis text');
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
