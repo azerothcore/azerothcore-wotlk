@@ -68,7 +68,5 @@ jobs:
         - source ./apps/ci/ci-before_install.sh
       install:
         - source ./apps/ci/ci-install.sh ON
-        - source ./apps/ci/ci-import-db.sh
       script:
         - source ./apps/ci/ci-compile.sh
-        - source ./apps/ci/ci-worldserver-dry-run.sh
