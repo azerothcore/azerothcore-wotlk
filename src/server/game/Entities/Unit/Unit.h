@@ -2436,6 +2436,8 @@ class Unit : public WorldObject
         // Movement info
         Movement::MoveSpline * movespline;
 
+        float GetCollisionHeight() const override;
+        
     protected:
         explicit Unit (bool isWorldObject);
 
