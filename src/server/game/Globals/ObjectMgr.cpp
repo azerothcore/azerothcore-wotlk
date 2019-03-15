@@ -11,7 +11,6 @@
 #include "Chat.h"
 #include "Common.h"
 #include "DatabaseEnv.h"
-#include "GameTime.h"
 #include "DisableMgr.h"
 #include "GameEventMgr.h"
 #include "GossipDef.h"
@@ -1024,7 +1023,7 @@ void ObjectMgr::LoadCreatureAddons()
 
 void ObjectMgr::LoadGameObjectAddons()
 {
-    uint32 oldMSTime = GameTime::GetGameTimeMS();
+    uint32 oldMSTime = getMSTime();
 
     //                                               0     1                 2
     QueryResult result = WorldDatabase.Query("SELECT guid, invisibilityType, invisibilityValue FROM gameobject_addon");
@@ -5507,7 +5506,7 @@ void ObjectMgr::ReturnOrDeleteOldMails(bool serverUp)
 {
     uint32 oldMSTime = getMSTime();
 
-    time_t curTime = GameTime::GetGameTime();
+    time_t curTime = time(NULL);
 
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_EXPIRED_MAIL);
     stmt->setUInt32(0, curTime);
@@ -7794,6 +7793,21 @@ void ObjectMgr::LoadFishingBaseSkillLevel()
     while (result->NextRow());
 
     sLog->outString(">> Loaded %u areas for fishing base skill level in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    sLog->outString();
+}
+
+void ObjectMgr::ChangeFishingBaseSkillLevel(uint32 entry, int32 skill)
+{
+    AreaTableEntry const* fArea = sAreaTableStore.LookupEntry(entry);
+    if (!fArea)
+    {
+        sLog->outErrorDb("AreaId %u defined in `skill_fishing_base_level` does not exist", entry);
+        return;
+    }
+    
+    _fishingBaseForAreaStore[entry] = skill;
+
+    sLog->outString(">> Fishing base skill level of area %u changed to %u", entry, skill);
     sLog->outString();
 }
 

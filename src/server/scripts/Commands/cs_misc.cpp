@@ -22,7 +22,6 @@
 #include "WeatherMgr.h"
 #include "ace/INET_Addr.h"
 #include "Player.h"
-#include "GameTime.h"
 #include "Pet.h"
 #include "LFG.h"
 #include "GroupMgr.h"
@@ -81,7 +80,6 @@ public:
             { "saveall",            SEC_GAMEMASTER,         true,  &HandleSaveAllCommand,               "" },
             { "kick",               SEC_GAMEMASTER,         true,  &HandleKickPlayerCommand,            "" },
             { "unstuck",            SEC_GAMEMASTER,         true,  &HandleUnstuckCommand,               "" },
-            { "taxicheat",          SEC_GAMEMASTER,         false, &HandleTaxiCheatCommand,             "" },
             { "linkgrave",          SEC_ADMINISTRATOR,      false, &HandleLinkGraveCommand,             "" },
             { "neargrave",          SEC_GAMEMASTER,         false, &HandleNearGraveCommand,             "" },
             { "explorecheat",       SEC_ADMINISTRATOR,      false, &HandleExploreCheatCommand,          "" },
@@ -106,7 +104,6 @@ public:
             { "combatstop",         SEC_GAMEMASTER,         true,  &HandleCombatStopCommand,            "" },
             { "flusharenapoints",   SEC_ADMINISTRATOR,      false, &HandleFlushArenaPointsCommand,      "" },
             { "repairitems",        SEC_GAMEMASTER,         true,  &HandleRepairitemsCommand,           "" },
-            { "waterwalk",          SEC_GAMEMASTER,         false, &HandleWaterwalkCommand,             "" },
             { "freeze",             SEC_GAMEMASTER,         false, &HandleFreezeCommand,                "" },
             { "unfreeze",           SEC_GAMEMASTER,         false, &HandleUnFreezeCommand,              "" },
             { "group",              SEC_GAMEMASTER,         false, nullptr,                             "", groupCommandTable },
@@ -1137,7 +1134,7 @@ public:
         else
             handler->PSendSysMessage(LANG_COMMAND_KICKMESSAGE, playerName.c_str());
 
-        target->GetSession()->KickPlayer();
+        target->GetSession()->KickPlayer("HandleKickPlayerCommand");
 
         return true;
     }
@@ -1201,49 +1198,6 @@ public:
         //Not a supported argument
         return false;
 
-    }
-    // Enable on\off all taxi paths
-    static bool HandleTaxiCheatCommand(ChatHandler* handler, char const* args)
-    {
-        if (!*args)
-        {
-            handler->SendSysMessage(LANG_USE_BOL);
-            handler->SetSentErrorMessage(true);
-            return false;
-        }
-
-        std::string argStr = (char*)args;
-
-        Player* chr = handler->getSelectedPlayer();
-
-        if (!chr)
-            chr = handler->GetSession()->GetPlayer();
-        else if (handler->HasLowerSecurity(chr, 0)) // check online security
-            return false;
-
-        if (argStr == "on")
-        {
-            chr->SetTaxiCheater(true);
-            handler->PSendSysMessage(LANG_YOU_GIVE_TAXIS, handler->GetNameLink(chr).c_str());
-            if (handler->needReportToTarget(chr))
-                ChatHandler(chr->GetSession()).PSendSysMessage(LANG_YOURS_TAXIS_ADDED, handler->GetNameLink().c_str());
-            return true;
-        }
-
-        if (argStr == "off")
-        {
-            chr->SetTaxiCheater(false);
-            handler->PSendSysMessage(LANG_YOU_REMOVE_TAXIS, handler->GetNameLink(chr).c_str());
-            if (handler->needReportToTarget(chr))
-                ChatHandler(chr->GetSession()).PSendSysMessage(LANG_YOURS_TAXIS_REMOVED, handler->GetNameLink().c_str());
-
-            return true;
-        }
-
-        handler->SendSysMessage(LANG_USE_BOL);
-        handler->SetSentErrorMessage(true);
-
-        return false;
     }
 
     static bool HandleLinkGraveCommand(ChatHandler* handler, char const* args)
@@ -1393,9 +1347,9 @@ public:
         for (uint8 i = 0; i < PLAYER_EXPLORED_ZONES_SIZE; ++i)
         {
             if (flag != 0)
-                handler->GetSession()->GetPlayer()->SetFlag(PLAYER_EXPLORED_ZONES_1+i, 0xFFFFFFFF);
+                handler->GetSession()->GetPlayer()->SetFlag(PLAYER_EXPLORED_ZONES_1 + i, 0xFFFFFFFF);
             else
-                handler->GetSession()->GetPlayer()->SetFlag(PLAYER_EXPLORED_ZONES_1+i, 0);
+                handler->GetSession()->GetPlayer()->SetFlag(PLAYER_EXPLORED_ZONES_1 + i, 0);
         }
 
         return true;
@@ -1998,11 +1952,11 @@ public:
 		
         // Output III. LANG_PINFO_BANNED if ban exists and is applied
         if (banTime >= 0)
-            handler->PSendSysMessage(LANG_PINFO_BANNED, banType.c_str(), banReason.c_str(), banTime > 0 ? secsToTimeString(banTime - GameTime::GetGameTime(), true).c_str() : handler->GetTrinityString(LANG_PERMANENTLY), bannedBy.c_str());
+            handler->PSendSysMessage(LANG_PINFO_BANNED, banType.c_str(), banReason.c_str(), banTime > 0 ? secsToTimeString(banTime - time(nullptr), true).c_str() : handler->GetTrinityString(LANG_PERMANENTLY), bannedBy.c_str());
 		
         // Output IV. LANG_PINFO_MUTED if mute is applied
         if (muteTime > 0)
-            handler->PSendSysMessage(LANG_PINFO_MUTED, muteReason.c_str(), secsToTimeString(muteTime - GameTime::GetGameTime(), true).c_str(), muteBy.c_str());
+            handler->PSendSysMessage(LANG_PINFO_MUTED, muteReason.c_str(), secsToTimeString(muteTime - time(nullptr), true).c_str(), muteBy.c_str());
 
         // Output V. LANG_PINFO_ACC_ACCOUNT
         handler->PSendSysMessage(LANG_PINFO_ACC_ACCOUNT, userName.c_str(), accId, security);
@@ -2241,7 +2195,7 @@ public:
         if (target)
         {
             // Target is online, mute will be in effect right away.
-            int64 muteTime = GameTime::GetGameTime() + notSpeakTime * MINUTE;
+            int64 muteTime = time(nullptr) + notSpeakTime * MINUTE;
             target->GetSession()->m_muteTime = muteTime;
             stmt->setInt64(0, muteTime);
             ChatHandler(target->GetSession()).PSendSysMessage(LANG_YOUR_CHAT_DISABLED, notSpeakTime, muteBy.c_str(), muteReasonStr.c_str());
@@ -2606,39 +2560,6 @@ public:
         if (handler->needReportToTarget(target))
             ChatHandler(target->GetSession()).PSendSysMessage(LANG_YOUR_ITEMS_REPAIRED, handler->GetNameLink().c_str());
 
-        return true;
-    }
-
-    static bool HandleWaterwalkCommand(ChatHandler* handler, char const* args)
-    {
-        if (!*args)
-            return false;
-
-        Player* player = handler->getSelectedPlayer();
-        if (!player)
-        {
-            handler->PSendSysMessage(LANG_NO_CHAR_SELECTED);
-            handler->SetSentErrorMessage(true);
-            return false;
-        }
-
-        // check online security
-        if (handler->HasLowerSecurity(player, 0))
-            return false;
-
-        if (strncmp(args, "on", 3) == 0)
-            player->SetMovement(MOVE_WATER_WALK);               // ON
-        else if (strncmp(args, "off", 4) == 0)
-            player->SetMovement(MOVE_LAND_WALK);                // OFF
-        else
-        {
-            handler->SendSysMessage(LANG_USE_BOL);
-            return false;
-        }
-
-        handler->PSendSysMessage(LANG_YOU_SET_WATERWALK, args, handler->GetNameLink(player).c_str());
-        if (handler->needReportToTarget(player))
-            ChatHandler(player->GetSession()).PSendSysMessage(LANG_YOUR_WATERWALK_SET, args, handler->GetNameLink().c_str());
         return true;
     }
 

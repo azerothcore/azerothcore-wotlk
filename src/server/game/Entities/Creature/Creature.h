@@ -370,7 +370,8 @@ struct VendorItemData
 
 struct VendorItemCount
 {
-    VendorItemCount(uint32 _item, uint32 _count);
+    explicit VendorItemCount(uint32 _item, uint32 _count)
+        : itemId(_item), count(_count), lastIncrementTime(time(NULL)) {}
 
     uint32 itemId;
     uint32 count;
@@ -572,8 +573,8 @@ class Creature : public Unit, public GridObject<Creature>, public MovableMapObje
         Group* GetLootRecipientGroup() const;
         bool hasLootRecipient() const { return m_lootRecipient || m_lootRecipientGroup; }
         bool isTappedBy(Player const* player) const;                          // return true if the creature is tapped by the player or a member of his party.
-        bool CanGeneratePickPocketLoot() const;
-        void SetPickPocketLootTime();
+        bool CanGeneratePickPocketLoot() const { return lootPickPocketRestoreTime == 0 || lootPickPocketRestoreTime < time(NULL); }
+        void SetPickPocketLootTime() { lootPickPocketRestoreTime = time(NULL) + MINUTE + GetCorpseDelay() + GetRespawnTime(); }
         void ResetPickPocketLootTime() { lootPickPocketRestoreTime = 0; }
 
         void SetLootRecipient (Unit* unit, bool withGroup = true);
@@ -626,7 +627,7 @@ class Creature : public Unit, public GridObject<Creature>, public MovableMapObje
 
         time_t const& GetRespawnTime() const { return m_respawnTime; }
         time_t GetRespawnTimeEx() const;
-        void SetRespawnTime(uint32 respawn);
+        void SetRespawnTime(uint32 respawn) { m_respawnTime = respawn ? time(NULL) + respawn : 0; }
         void Respawn(bool force = false);
         void SaveRespawnTime();
 

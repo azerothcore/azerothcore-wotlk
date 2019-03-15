@@ -13,7 +13,6 @@
 #include <openssl/md5.h>
 #include <openssl/sha.h>
 #include "World.h"
-#include "GameTime.h"
 #include "Player.h"
 #include "Util.h"
 #include "Warden.h"
@@ -89,7 +88,7 @@ void Warden::Update()
 {
     if (_initialized)
     {
-        uint32 currentTimestamp = GameTime::GetGameTimeMS();
+        uint32 currentTimestamp = World::GetGameTimeMS();
         uint32 diff = getMSTimeDiff(_previousTimestamp, currentTimestamp);
         _previousTimestamp = currentTimestamp;
 
@@ -99,7 +98,7 @@ void Warden::Update()
             if (maxClientResponseDelay > 0)
             {
                 if (_clientResponseTimer > maxClientResponseDelay * IN_MILLISECONDS)
-                    _session->KickPlayer();
+                    _session->KickPlayer("clientResponseTimer > maxClientResponseDelay");
                 else
                     _clientResponseTimer += diff;
             }
@@ -219,7 +218,7 @@ std::string Warden::Penalty(WardenCheck* check /*= NULL*/, uint16 checkFailed /*
         return "None";
         break;
     case WARDEN_ACTION_KICK:
-        _session->KickPlayer();
+        _session->KickPlayer("WARDEN_ACTION_KICK");
         return "Kick";
         break;
     case WARDEN_ACTION_BAN:

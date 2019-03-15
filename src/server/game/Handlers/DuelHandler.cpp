@@ -7,7 +7,6 @@
 #include "Common.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
-#include "GameTime.h"
 #include "Log.h"
 #include "Opcodes.h"
 #include "UpdateData.h"
@@ -36,7 +35,7 @@ void WorldSession::HandleDuelAcceptedOpcode(WorldPacket& recvPacket)
     sLog->outStaticDebug("Player 2 is: %u (%s)", plTarget->GetGUIDLow(), plTarget->GetName().c_str());
 #endif
 
-    time_t now = GameTime::GetGameTime();
+    time_t now = time(NULL);
     player->duel->startTimer = now;
     plTarget->duel->startTimer = now;
 

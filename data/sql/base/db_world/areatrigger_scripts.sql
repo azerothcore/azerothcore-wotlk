@@ -18,6 +18,7 @@ CREATE TABLE `areatrigger_scripts`
 LOCK TABLES `areatrigger_scripts` WRITE;
 /*!40000 ALTER TABLE `areatrigger_scripts` DISABLE KEYS */;
 INSERT INTO `areatrigger_scripts` VALUES 
+(302,'at_sentry_point'),
 (962,'SmartTrigger'),
 (1447,'SmartTrigger'),
 (1526,'at_ring_of_law'),
@@ -130,6 +131,7 @@ INSERT INTO `areatrigger_scripts` VALUES
 (5704,'SmartTrigger'),
 (5705,'SmartTrigger'),
 (5706,'SmartTrigger'),
+(5709,'at_lady_deathwhisper_entrance'),
 (5718,'at_frozen_throne_teleport'),
 (5729,'at_icc_start_blood_quickening'),
 (5867,'at_baltharus_plateau');

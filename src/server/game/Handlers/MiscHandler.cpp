@@ -15,7 +15,6 @@
 #include "World.h"
 #include "ObjectMgr.h"
 #include "GuildMgr.h"
-#include "GameTime.h"
 #include "WorldSession.h"
 #include "BigNumber.h"
 #include "SHA1.h"
@@ -219,7 +218,7 @@ void WorldSession::HandleWhoOpcode(WorldPacket& recvData)
 {
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Recvd CMSG_WHO Message");
 
-    time_t now = GameTime::GetGameTime();
+    time_t now = time(NULL);
     if (now < timeWhoCommandAllowed)
         return;
     timeWhoCommandAllowed = now + 3;
@@ -467,7 +466,7 @@ void WorldSession::HandleLogoutRequestOpcode(WorldPacket & /*recv_data*/)
         GetPlayer()->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
     }
 
-    LogoutRequest(GameTime::GetGameTime());
+    LogoutRequest(time(NULL));
 }
 
 void WorldSession::HandlePlayerLogoutOpcode(WorldPacket & /*recv_data*/)
@@ -818,7 +817,7 @@ void WorldSession::HandleReclaimCorpseOpcode(WorldPacket &recv_data)
         return;
 
     // prevent resurrect before 30-sec delay after body release not finished
-    if (time_t(corpse->GetGhostTime() + _player->GetCorpseReclaimDelay(corpse->GetType() == CORPSE_RESURRECTABLE_PVP)) > time_t(GameTime::GetGameTime()))
+    if (time_t(corpse->GetGhostTime() + _player->GetCorpseReclaimDelay(corpse->GetType() == CORPSE_RESURRECTABLE_PVP)) > time_t(time(NULL)))
         return;
 
     if (!corpse->IsWithinDistInMap(_player, CORPSE_RECLAIM_RADIUS, true))
@@ -1135,14 +1134,6 @@ void WorldSession::HandleNextCinematicCamera(WorldPacket & /*recv_data*/)
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_NEXT_CINEMATIC_CAMERA");
 #endif
-}
-
-void WorldSession::HandleMoveTimeSkippedOpcode(WorldPacket & recv_data)
-{
-    uint64 guid;
-    uint32 time_skipped;
-    recv_data.readPackGUID(guid);
-    recv_data >> time_skipped;
 }
 
 void WorldSession::HandleFeatherFallAck(WorldPacket &recv_data)
@@ -1525,7 +1516,7 @@ void WorldSession::HandleTimeSyncResp(WorldPacket & recv_data)
 {
     uint32 counter, clientTicks;
     recv_data >> counter >> clientTicks;
-    //uint32 ourTicks = clientTicks + (GameTime::GetGameTimeMS() - _player->m_timeSyncServer);
+    //uint32 ourTicks = clientTicks + (World::GetGameTimeMS() - _player->m_timeSyncServer);
     _player->m_timeSyncClient = clientTicks;
 }
 
@@ -1708,7 +1699,7 @@ void WorldSession::HandleSetRaidDifficultyOpcode(WorldPacket & recv_data)
                 p->SetMap(homeMap0);
                 p->Relocate(0.0f, 0.0f, 0.0f, 0.0f);
                 if (!p->TeleportTo(571, 5790.20f, 2071.36f, 636.07f, 3.60f))
-                    p->GetSession()->KickPlayer();
+                    p->GetSession()->KickPlayer("HandleSetRaidDifficultyOpcode 1");
             }
 
             bool anyoneInside = false;
@@ -1745,7 +1736,7 @@ void WorldSession::HandleSetRaidDifficultyOpcode(WorldPacket & recv_data)
             {
                 itr->first->SetRaidDifficulty(Difficulty(mode)); // needed for teleport not to fail
                 if (!itr->first->TeleportTo(*(foundMaps.begin()), itr->second.GetPositionX(), itr->second.GetPositionY(), itr->second.GetPositionZ(), itr->second.GetOrientation()))
-                    itr->first->GetSession()->KickPlayer();
+                    itr->first->GetSession()->KickPlayer("HandleSetRaidDifficultyOpcode 2");
             }
         }
     }
@@ -1859,7 +1850,7 @@ void WorldSession::HandleWorldStateUITimerUpdate(WorldPacket& /*recv_data*/)
 #endif
 
     WorldPacket data(SMSG_WORLD_STATE_UI_TIMER_UPDATE, 4);
-    data << uint32(GameTime::GetGameTime());
+    data << uint32(time(NULL));
     SendPacket(&data);
 }
 

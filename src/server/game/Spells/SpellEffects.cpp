@@ -21,7 +21,6 @@
 #include "SpellAuras.h"
 #include "SpellAuraEffects.h"
 #include "Group.h"
-#include "GameTime.h"
 #include "UpdateData.h"
 #include "MapManager.h"
 #include "ObjectAccessor.h"
@@ -276,6 +275,10 @@ void Spell::EffectInstaKill(SpellEffIndex /*effIndex*/)
 
     if (!unitTarget || !unitTarget->IsAlive() || unitTarget->HasAura(27827)) // Spirit of redemption doesn't make you death, but can cause infinite loops
         return;
+
+    if (unitTarget->GetTypeId() == TYPEID_PLAYER)
+        if (unitTarget->ToPlayer()->GetCommandStatus(CHEAT_GOD))
+            return;
 
     if (m_caster == unitTarget)                              // prevent interrupt message
         finish();
@@ -703,7 +706,7 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                 case 17731:
                 case 69294:
                 {
-                    if( !gameObjTarget || gameObjTarget->GetRespawnTime() > GameTime::GetGameTime() )
+                    if( !gameObjTarget || gameObjTarget->GetRespawnTime() > time(NULL) )
                         return;
 
                     gameObjTarget->SetRespawnTime(10);
@@ -4211,7 +4214,7 @@ void Spell::EffectSanctuary(SpellEffIndex /*effIndex*/)
     }
 
     // Xinef: Set last sanctuary time
-    unitTarget->m_lastSanctuaryTime = GameTime::GetGameTimeMS();
+    unitTarget->m_lastSanctuaryTime = World::GetGameTimeMS();
 
     // Vanish allows to remove all threat and cast regular stealth so other spells can be used
     if (m_caster->GetTypeId() == TYPEID_PLAYER
@@ -4943,7 +4946,7 @@ void Spell::EffectCharge(SpellEffIndex /*effIndex*/)
 
         // charge changes fall time
         if( m_caster->GetTypeId() == TYPEID_PLAYER )
-            m_caster->ToPlayer()->SetFallInformation(GameTime::GetGameTime(), m_caster->GetPositionZ());
+            m_caster->ToPlayer()->SetFallInformation(time(NULL), m_caster->GetPositionZ());
 
         if (m_pathFinder)
         {
@@ -5064,7 +5067,7 @@ void Spell::EffectLeapBack(SpellEffIndex effIndex)
 
     // xinef: changes fall time
     if (m_caster->GetTypeId() == TYPEID_PLAYER)
-        m_caster->ToPlayer()->SetFallInformation(GameTime::GetGameTime(), m_caster->GetPositionZ());
+        m_caster->ToPlayer()->SetFallInformation(time(NULL), m_caster->GetPositionZ());
 }
 
 void Spell::EffectQuestClear(SpellEffIndex effIndex)

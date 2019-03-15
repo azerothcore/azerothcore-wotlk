@@ -8,7 +8,6 @@
 #include "SpellScript.h"
 #include "SpellAuraEffects.h"
 #include "Spell.h"
-#include "GameTime.h"
 #include "Vehicle.h"
 #include "Unit.h"
 #include "Cell.h"
@@ -687,9 +686,9 @@ class boss_the_lich_king : public CreatureScript
 
             void KilledUnit(Unit* victim)
             {
-                if (victim->GetTypeId() == TYPEID_PLAYER && !me->IsInEvadeMode() && _phase != PHASE_OUTRO && _lastTalkTimeKill+5 < GameTime::GetGameTime())
+                if (victim->GetTypeId() == TYPEID_PLAYER && !me->IsInEvadeMode() && _phase != PHASE_OUTRO && _lastTalkTimeKill+5 < time(NULL))
                 {
-                    _lastTalkTimeKill = GameTime::GetGameTime();
+                    _lastTalkTimeKill = time(NULL);
                     Talk(SAY_LK_KILL);
                 }
             }
@@ -718,7 +717,7 @@ class boss_the_lich_king : public CreatureScript
                                 events.RescheduleEvent(EVENT_START_ATTACK, 1000);
                             EntryCheckPredicate pred(NPC_STRANGULATE_VEHICLE);
                             summons.DoAction(ACTION_TELEPORT_BACK, pred);
-                            if (!IsHeroic() && _phase != PHASE_OUTRO && me->IsInCombat() && _lastTalkTimeBuff+5 <= GameTime::GetGameTime())
+                            if (!IsHeroic() && _phase != PHASE_OUTRO && me->IsInCombat() && _lastTalkTimeBuff+5 <= time(NULL))
                                 Talk(SAY_LK_FROSTMOURNE_ESCAPE);
                         }
                         break;
@@ -875,9 +874,9 @@ class boss_the_lich_king : public CreatureScript
 
             void SpellHit(Unit* /*caster*/, SpellInfo const* spell)
             {
-                if (spell->Id == HARVESTED_SOUL_BUFF && me->IsInCombat() && !IsHeroic() && _phase != PHASE_OUTRO && _lastTalkTimeBuff+5 <= GameTime::GetGameTime())
+                if (spell->Id == HARVESTED_SOUL_BUFF && me->IsInCombat() && !IsHeroic() && _phase != PHASE_OUTRO && _lastTalkTimeBuff+5 <= time(NULL))
                 {
-                    _lastTalkTimeBuff = GameTime::GetGameTime();
+                    _lastTalkTimeBuff = time(NULL);
                     Talk(SAY_LK_FROSTMOURNE_KILL);
                 }
             }

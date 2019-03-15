@@ -50,7 +50,7 @@ void WorldSession::HandleMoveWorldportAckOpcode()
     // possible errors in the coordinate validity check
     if (!MapManager::IsValidMapCoord(loc))
     {
-        KickPlayer();
+        KickPlayer("!MapManager::IsValidMapCoord(loc)");
         return;
     }
 
@@ -119,7 +119,7 @@ void WorldSession::HandleMoveWorldportAckOpcode()
     Cell cell(pair);
     if (!GridCoord(cell.GridX(), cell.GridY()).IsCoordValid())
     {
-        KickPlayer();
+        KickPlayer("!GridCoord(cell.GridX(), cell.GridY()).IsCoordValid()");
         return;
     }
     newMap->LoadGrid(GetPlayer()->GetPositionX(), GetPlayer()->GetPositionY());
@@ -152,7 +152,7 @@ void WorldSession::HandleMoveWorldportAckOpcode()
             _player->SetIsSpectator(false);
 
         GetPlayer()->SetPendingSpectatorForBG(0);
-        timeWhoCommandAllowed = GameTime::GetGameTime() + sWorld->GetNextWhoListUpdateDelaySecs() + 1; // after exiting arena Subscribe will scan for a player and cached data says he is still in arena, so disallow until next update
+        timeWhoCommandAllowed = time(NULL) + sWorld->GetNextWhoListUpdateDelaySecs() + 1; // after exiting arena Subscribe will scan for a player and cached data says he is still in arena, so disallow until next update
 
         if (uint32 inviteInstanceId = _player->GetPendingSpectatorInviteInstanceId())
         {
@@ -167,7 +167,7 @@ void WorldSession::HandleMoveWorldportAckOpcode()
     Cell cell2(pair2);
     if (!GridCoord(cell2.GridX(), cell2.GridY()).IsCoordValid())
     {
-        KickPlayer();
+        KickPlayer("!GridCoord(cell2.GridX(), cell2.GridY()).IsCoordValid()");
         return;
     }
     newMap->LoadGrid(GetPlayer()->GetPositionX(), GetPlayer()->GetPositionY());
@@ -193,7 +193,7 @@ void WorldSession::HandleMoveWorldportAckOpcode()
             if (mapDiff->resetTime)
                 if (time_t timeReset = sInstanceSaveMgr->GetResetTimeFor(mEntry->MapID, diff))
                 {
-                    uint32 timeleft = uint32(timeReset - GameTime::GetGameTime());
+                    uint32 timeleft = uint32(timeReset - time(NULL));
                     GetPlayer()->SendInstanceResetWarning(mEntry->MapID, diff, timeleft, true);
                 }
         allowMount = mInstance->AllowMount;
@@ -408,7 +408,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket & recvData)
     if (mover->GetGUID() != _player->GetGUID())
         movementInfo.flags &= ~MOVEMENTFLAG_WALKING;
 
-    uint32 mstime = GameTime::GetGameTimeMS();
+    uint32 mstime = World::GetGameTimeMS();
     /*----------------------*/
     if(m_clientTimeDelay == 0)
         m_clientTimeDelay = mstime > movementInfo.time ? std::min(mstime - movementInfo.time, (uint32)100) : 0;
@@ -577,7 +577,7 @@ void WorldSession::HandleForceSpeedChangeAck(WorldPacket &recvData)
         {
             sLog->outBasic("Player %s from account id %u kicked for incorrect speed (must be %f instead %f)",
                 _player->GetName().c_str(), GetAccountId(), _player->GetSpeed(move_type), newspeed);
-            KickPlayer();
+            KickPlayer("Incorrect speed");
         }
     }
 }
@@ -724,4 +724,38 @@ void WorldSession::HandleSummonResponseOpcode(WorldPacket& recvData)
     }
     _player->SetSummonAsSpectator(false);
     _player->SummonIfPossible(agree, summoner_guid);
+}
+
+void WorldSession::HandleMoveTimeSkippedOpcode(WorldPacket& recvData)
+{
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Recvd CMSG_MOVE_TIME_SKIPPED");
+#endif
+    
+    uint64 guid;
+    uint32 timeSkipped;
+    recvData.readPackGUID(guid);
+    recvData >> timeSkipped;
+
+    Unit* mover = GetPlayer()->m_mover;
+
+    if (!mover)
+    {
+        sLog->outError("WorldSession::HandleMoveTimeSkippedOpcode wrong mover state from the unit moved by the player [" UI64FMTD "]", GetPlayer()->GetGUID());
+        return;
+    }
+
+    // prevent tampered movement data
+    if (guid != mover->GetGUID())
+    {
+        sLog->outError("WorldSession::HandleMoveTimeSkippedOpcode wrong guid from the unit moved by the player [" UI64FMTD "]", GetPlayer()->GetGUID());
+        return;
+    }
+
+    mover->m_movementInfo.time += timeSkipped;
+
+    WorldPacket data(MSG_MOVE_TIME_SKIPPED, recvData.size());
+    data.appendPackGUID(guid);
+    data << timeSkipped;
+    GetPlayer()->SendMessageToSet(&data, false);
 }

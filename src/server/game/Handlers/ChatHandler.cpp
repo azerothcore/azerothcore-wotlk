@@ -136,31 +136,50 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
             case CHAT_MSG_RAID:
             case CHAT_MSG_GUILD:
             case CHAT_MSG_BATTLEGROUND:
-            case CHAT_MSG_WHISPER:
-                // check if addon messages are disabled
-                if (!sWorld->getBoolConfig(CONFIG_ADDON_CHANNEL))
-                {
-                    recvData.rfinish();
-                    return;
-                }
+	            // check if addon messages are disabled
+	            if (!sWorld->getBoolConfig(CONFIG_ADDON_CHANNEL))
+		        {
+			        recvData.rfinish();
+			        return;
+		        }
 
-                if (sWorld->getBoolConfig(CONFIG_CHATLOG_ADDON))
-                {
-                    std::string to, msg;
-                    recvData >> to >> msg;
-                    Player* receiver = ObjectAccessor::FindPlayerByName(to, false); 
+	            if (sWorld->getBoolConfig(CONFIG_CHATLOG_ADDON))
+		        {
+			        std::string msg;
+			        recvData >> msg;
 
                     if (msg.empty())
                         return;
 
-                    sScriptMgr->OnPlayerChat(sender, type, lang, msg, receiver);
+                    sScriptMgr->OnPlayerChat(sender, type, lang, msg);
 #ifdef ELUNA
-                    if (!sEluna->OnChat(sender, type, lang, msg, receiver))
+                    if (!sEluna->OnChat(sender, type, lang, msg))
                         return;
 #endif
                 }
 
-                break;
+		        break;
+            case CHAT_MSG_WHISPER:
+	            // check if addon messages are disabled
+	            if (!sWorld->getBoolConfig(CONFIG_ADDON_CHANNEL))
+	            {
+		            recvData.rfinish();
+		            return;
+	            }
+
+	            if (sWorld->getBoolConfig(CONFIG_CHATLOG_ADDON))
+	            {
+		            std::string to, msg;
+		            recvData >> to >> msg;
+		            Player* receiver = ObjectAccessor::FindPlayerByName(to, false);
+
+		            if (msg.empty())
+			            return;
+
+		            sScriptMgr->OnPlayerChat(sender, type, lang, msg, receiver);
+	            }
+
+	            break;
             default:
                 sLog->outError("Player %s (GUID: %u) sent a chatmessage with an invalid language/message type combination", 
                                                      GetPlayer()->GetName().c_str(), GetPlayer()->GetGUIDLow());
@@ -279,7 +298,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
 
         if (!_player->CanSpeak())
         {
-            std::string timeStr = secsToTimeString(m_muteTime - GameTime::GetGameTime());
+            std::string timeStr = secsToTimeString(m_muteTime - time(NULL));
             SendNotification(GetTrinityString(LANG_WAIT_BEFORE_SPEAKING), timeStr.c_str());
             return;
         }
@@ -292,7 +311,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
                 //    GetPlayer()->GetGUIDLow(), msg.c_str());
 
                 if (sWorld->getIntConfig(CONFIG_CHAT_STRICT_LINK_CHECKING_KICK))
-                    KickPlayer();
+                    KickPlayer("CONFIG_CHAT_STRICT_LINK_CHECKING_KICK");
 
                 return;
             }
@@ -666,7 +685,7 @@ void WorldSession::HandleTextEmoteOpcode(WorldPacket & recvData)
 
     if (!GetPlayer()->CanSpeak())
     {
-        std::string timeStr = secsToTimeString(m_muteTime - GameTime::GetGameTime());
+        std::string timeStr = secsToTimeString(m_muteTime - time(NULL));
         SendNotification(GetTrinityString(LANG_WAIT_BEFORE_SPEAKING), timeStr.c_str());
         return;
     }

@@ -5,7 +5,6 @@
 #include "ObjectMgr.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
-#include "GameTime.h"
 #include "GridNotifiers.h"
 #include "icecrown_citadel.h"
 #include "Player.h"
@@ -949,7 +948,7 @@ class spell_sindragosa_unchained_magic : public SpellScriptLoader
                 if (!spellInfo)
                     return false;
 
-                uint32 currMSTime = GameTime::GetGameTimeMS();
+                uint32 currMSTime = World::GetGameTimeMS();
                 std::map<uint32, uint32>::iterator itr = _lastMSTimeForSpell.find(spellInfo->Id);
                 if (itr != _lastMSTimeForSpell.end())
                 {
