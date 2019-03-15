@@ -1015,6 +1015,9 @@ class WorldObject : public Object, public WorldLocation
         virtual float GetStationaryZ() const { return GetPositionZ(); }
         virtual float GetStationaryO() const { return GetOrientation(); }
 
+        virtual float GetCollisionHeight() const { return 0.0f; }
+        float GetMidsectionHeight() const { return GetCollisionHeight() / 2.0f; }
+        
     protected:
         std::string m_name;
         bool m_isActive;
