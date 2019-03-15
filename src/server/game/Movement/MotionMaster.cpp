@@ -7,7 +7,6 @@
 #include "MotionMaster.h"
 #include "CreatureAISelector.h"
 #include "Creature.h"
-#include "GameTime.h"
 
 #include "ConfusedMovementGenerator.h"
 #include "FleeingMovementGenerator.h"
@@ -485,7 +484,9 @@ void MotionMaster::MoveJumpTo(float angle, float speedXY, float speedZ)
 
     float moveTimeHalf = speedZ / Movement::gravity;
     float dist = 2 * moveTimeHalf * speedXY;
-    _owner->GetClosePoint(x, y, z, _owner->GetCombatReach(), dist, angle);
+    _owner->GetNearPoint2D(x, y, dist, _owner->GetOrientation() + angle);
+    z = _owner->GetPositionZ() + _owner->GetMidsectionHeight();
+    _owner->UpdateAllowedPositionZ(x, y, z);
     MoveJump(x, y, z, speedXY, speedZ);
 }
 
@@ -536,7 +537,7 @@ void MotionMaster::MoveFall(uint32 id /*=0*/, bool addFlagForNPC)
     {
         _owner->AddUnitMovementFlag(MOVEMENTFLAG_FALLING);
         _owner->m_movementInfo.SetFallTime(0);
-        _owner->ToPlayer()->SetFallInformation(GameTime::GetGameTime(), _owner->GetPositionZ());
+        _owner->ToPlayer()->SetFallInformation(time(NULL), _owner->GetPositionZ());
     }
     else if (_owner->GetTypeId() == TYPEID_UNIT && addFlagForNPC) // pussywizard
     {
