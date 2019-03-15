@@ -1135,9 +1135,12 @@ bool WorldObject::IsWithinLOSInMap(const WorldObject* obj, LineOfSightChecks che
 
     float x, y, z;
     if (obj->GetTypeId() == TYPEID_PLAYER)
+    {
         obj->GetPosition(x, y, z);
+        z += GetMidsectionHeight();
+    }
     else
-        obj->GetHitSpherePointFor(GetPosition(), x, y, z);
+        obj->GetHitSpherePointFor({ GetPositionX(), GetPositionY(), GetPositionZ() + GetMidsectionHeight() }, x, y, z);
 
     return IsWithinLOS(x, y, z, checks);
 }
