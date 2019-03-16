@@ -677,7 +677,8 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
 {
     if (victim->IsImmunedToDamage(spellProto))
     {
-        SendSpellDamageImmune(victim, spellProto->Id);
+        if (attacker)
+            attacker->SendSpellDamageImmune(victim, spellProto->Id);
         return 0;
     }
 
