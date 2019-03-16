@@ -1304,17 +1304,32 @@ bool SpellInfo::CanDispelAura(SpellInfo const* aura) const
     if (aura->HasAttribute(SPELL_ATTR0_UNAFFECTED_BY_INVULNERABILITY) && aura->SpellFamilyName == SPELLFAMILY_GENERIC)
         return false;
 
-    // These spells (like Mass Dispel) can dispell all auras
-    if (HasAttribute(SPELL_ATTR0_UNAFFECTED_BY_INVULNERABILITY))
+    // These auras (Cyclone for example) are not dispelable
+    if (aura->HasAttribute(SPELL_ATTR1_UNAFFECTED_BY_SCHOOL_IMMUNE))
+        return false;
+
+    // Divine Shield etc can dispel auras if they don't ignore school immunity
+    if (HasAttribute(SPELL_ATTR1_DISPEL_AURAS_ON_IMMUNITY) && !aura->IsDeathPersistent())
         return true;
 
     // These auras (like Divine Shield) can't be dispelled
     if (aura->HasAttribute(SPELL_ATTR0_UNAFFECTED_BY_INVULNERABILITY))
         return false;
 
-    // These auras (Cyclone for example) are not dispelable
-    if (aura->HasAttribute(SPELL_ATTR1_UNAFFECTED_BY_SCHOOL_IMMUNE))
-        return false;
+    // These spells (like Mass Dispel) can dispell all auras
+    if ((aura->HasAttribute(SPELL_ATTR1_UNAFFECTED_BY_SCHOOL_IMMUNE) && aura->Mechanic != MECHANIC_NONE)
+        || aura->HasAttribute(SPELL_ATTR2_UNAFFECTED_BY_AURA_SCHOOL_IMMUNE))
+        return true;
+    
+    // these spells (Cyclone for example) can pierce all...
+    if (HasAttribute(SPELL_ATTR1_UNAFFECTED_BY_SCHOOL_IMMUNE) || HasAttribute(SPELL_ATTR2_UNAFFECTED_BY_AURA_SCHOOL_IMMUNE))
+    {
+        // ...but not these (Divine shield, Ice block, Cyclone and Banish for example)
+        if (aura->Mechanic != MECHANIC_IMMUNE_SHIELD &&
+               aura->Mechanic != MECHANIC_INVULNERABILITY &&
+               (aura->Mechanic != MECHANIC_BANISH || (IsRankOf(aura) && aura->Dispel != DISPEL_NONE))) // Banish shouldn't be immune to itself, but Cyclone should
+            return true;
+    }
 
     return true;
 }

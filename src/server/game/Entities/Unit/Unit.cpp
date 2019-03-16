@@ -675,6 +675,12 @@ void Unit::DealDamageMods(Unit const* victim, uint32 &damage, uint32* absorb)
 
 uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage const* cleanDamage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask, SpellInfo const* spellProto, bool durabilityLoss, bool  /*allowGM*/)
 {
+    if (victim->IsImmunedToDamage(spellProto))
+    {
+        SendSpellDamageImmune(victim, spellProto->Id);
+        return 0;
+    }
+
     // Xinef: initialize damage done for rage calculations
     // Xinef: its rare to modify damage in hooks, however training dummy's sets damage to 0
     uint32 rage_damage = damage + ((cleanDamage != NULL) ? cleanDamage->absorbed_damage : 0);
@@ -2884,7 +2890,7 @@ SpellMissInfo Unit::SpellHitResult(Unit* victim, SpellInfo const* spell, bool Ca
     }
 
     //must be cheked here
-    if (spellInfo->HasAttribute(SPELL_ATTR3_IGNORE_HIT_RESULT))
+    if (spell->HasAttribute(SPELL_ATTR3_IGNORE_HIT_RESULT))
         return SPELL_MISS_NONE;
 
     // Check for immune
@@ -11690,6 +11696,9 @@ bool Unit::IsImmunedToDamage(SpellSchoolMask meleeSchoolMask) const
 
 bool Unit::IsImmunedToDamage(SpellInfo const* spellInfo) const
 {
+    if (!spellInfo)
+        return false;
+        
     if (spellInfo->HasAttribute(SPELL_ATTR0_UNAFFECTED_BY_INVULNERABILITY) && !HasAuraType(SPELL_AURA_SPIRIT_OF_REDEMPTION))
         return false;
 
@@ -11808,7 +11817,7 @@ bool Unit::IsImmunedToSpell(SpellInfo const* spellInfo)
     if (immuneToAllEffects) //Return immune only if the target is immune to all spell effects.
         return true;
 
-    if (!spellInfo->HasAttribute(SPELL_ATTR1_UNAFFECTED_BY_SCHOOL_IMMUNE) && !spellInfo->HasAttribute(SPELL_ATTR2_UNAFFECTED_BY_AURA_SCHOOL_IMMUNE) && !spellInfo->HasAttribute(SPELL_ATTR1_DISPEL_AURAS_ON_IMMUNITY))
+    if (spellInfo->Id != 42292 && spellInfo->Id != 59752 && spellInfo->Id != 19574 && spellInfo->Id != 34471)
     {
         SpellImmuneList const& schoolList = m_spellImmune[IMMUNITY_SCHOOL];
         for (SpellImmuneList::const_iterator itr = schoolList.begin(); itr != schoolList.end(); ++itr)
@@ -11820,7 +11829,6 @@ bool Unit::IsImmunedToSpell(SpellInfo const* spellInfo)
                 return true;
         }
     }
-
     return false;
 }
 
