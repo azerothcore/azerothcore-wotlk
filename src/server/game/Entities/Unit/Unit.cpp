@@ -12403,7 +12403,7 @@ void Unit::Dismount()
 
 float Unit::GetCollisionHeight() const
 {
-    float scaleMod = GetObjectScale(); // 99% sure about this
+    float scaleMod = GetFloatValue(OBJECT_FIELD_SCALE_X); // 99% sure about this
 
     if (IsMounted())
     {
