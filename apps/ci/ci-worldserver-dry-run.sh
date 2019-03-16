@@ -2,12 +2,6 @@
 
 set -e
 
-echo "compile core"
-export CCACHE_CPP2=true
-ccache -s
-timeout 2700 bash ./acore.sh "compiler" "all"
-ccache -s
-
 if [ "$TRAVIS_BUILD_ID" = "1" ]
 then
   echo "start worldserver dry-run"
