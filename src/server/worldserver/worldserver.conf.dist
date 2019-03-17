@@ -3022,7 +3022,7 @@ ShowKickInWorld = 0
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 
-ShowBanInWorld = 1
+ShowBanInWorld = 0
 
 #
 #     RecordUpdateTimeDiffInterval
