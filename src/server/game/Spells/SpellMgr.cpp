@@ -5630,7 +5630,7 @@ void SpellMgr::LoadDbcDataCorrections()
         case 69846: // Frost Bomb
             spellInfo->speed = 0.0f;    // This spell's summon happens instantly
             break;
-        case 70106: //Chilled to the Bone
+        case 70106: // Chilled to the Bone
             spellInfo->AttributesEx3 |= SPELL_ATTR3_NO_DONE_BONUS;
             spellInfo->AttributesEx6 |= SPELL_ATTR6_LIMIT_PCT_DAMAGE_MODS;
             break;
