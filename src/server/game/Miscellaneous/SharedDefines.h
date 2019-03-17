@@ -485,7 +485,7 @@ enum SpellAttr6
     SPELL_ATTR6_IGNORE_CASTER_AURAS              = 0x00000004, //  2
     SPELL_ATTR6_ASSIST_IGNORE_IMMUNE_FLAG        = 0x00000008, //  3 skips checking UNIT_FLAG_IMMUNE_TO_PC and UNIT_FLAG_IMMUNE_TO_NPC flags on assist
     SPELL_ATTR6_UNK4                             = 0x00000010, //  4
-    SPELL_ATTR6_DONT_CONSUME_CHARGES             = 0x00000020, //  5 xinef: dont consume proc charges
+    SPELL_ATTR6_DONT_CONSUME_PROC_CHARGES        = 0x00000020, //  5 dont consume proc charges
     SPELL_ATTR6_USE_SPELL_CAST_EVENT             = 0x00000040, //  6 Auras with this attribute trigger SPELL_CAST combat log event instead of SPELL_AURA_START (clientside attribute)
     SPELL_ATTR6_UNK7                             = 0x00000080, //  7
     SPELL_ATTR6_CANT_TARGET_CROWD_CONTROLLED     = 0x00000100, //  8
