@@ -15327,7 +15327,7 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
         // Remove charge (aura can be removed by triggers)
         // xinef: take into account attribute6 of proc spell
         if (prepare && useCharges && takeCharges)
-            if (!procSpell || isVictim || !procSpell->HasAttribute(SPELL_ATTR6_DONT_CONSUME_CHARGES))
+            if (!procSpell || isVictim || !procSpell->HasAttribute(SPELL_ATTR6_DONT_CONSUME_PROC_CHARGES))
                 i->aura->DropCharge();
 
         i->aura->CallScriptAfterProcHandlers(aurApp, eventInfo);
