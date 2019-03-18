@@ -842,6 +842,14 @@ VALUES
 (180760,1,-1425.996,7276.042,25.80751,''),
 (180760,2,-1423.213,7277.938,25.67705,'');
 
+DELETE FROM `broadcast_text` WHERE `ID` = 94157;
+INSERT INTO `broadcast_text` (`ID`,`Language`,`MaleText`,`FemaleText`,`EmoteID0`,`EmoteID1`,`EmoteID2`,`EmoteDelay0`,`EmoteDelay1`,`EmoteDelay2`,`SoundId`,`Unk1`,`Unk2`,`VerifiedBuild`) VALUES (94157,0,'We all live in the world of Azeroth.','',0,0,0,0,0,0,0,0,0,0);
+UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` IN (11943,2307,37072,11940,11941,17804,19064,32743);
+DELETE FROM `creature_text` WHERE `CreatureID` IN (11943,2307,37072,11940,11941,17804,19064,32743);
+INSERT INTO `creature_text` (`CreatureID`,`GroupID`,`ID`,`Text`,`Type`,`Language`,`Probability`,`Emote`,`Duration`,`Sound`,`BroadcastTextId`,`TextRange`,`comment`) VALUES (11943,0,0,'',15,0,100,0,0,0,94157,0,''),(2307,0,0,'',15,0,100,0,0,0,94157,0,''),(37072,0,0,'',15,0,100,0,0,0,94157,0,''),(11940,0,0,'',15,0,100,0,0,0,94157,0,''),(11941,0,0,'',15,0,100,0,0,0,94157,0,''),(17804,0,0,'',15,0,100,0,0,0,94157,0,''),(19064,0,0,'',15,0,100,0,0,0,94157,0,''),(32743,0,0,'',15,0,100,0,0,0,94157,0,'');
+DELETE FROM `smart_scripts` WHERE `source_type` = 0 AND `entryorguid` IN (11943,2307,37072,11940,11941,17804,19064,32743);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES (11943, 0, 0, 0, 22, 0, 100, 0, 95, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, ''),(2307, 0, 0, 0, 22, 0, 100, 0, 95, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, ''),(37072, 0, 0, 0, 22, 0, 100, 0, 95, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, ''),(11940, 0, 0, 0, 22, 0, 100, 0, 95, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, ''),(11941, 0, 0, 0, 22, 0, 100, 0, 95, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, ''),(17804, 0, 0, 0, 22, 0, 100, 0, 95, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, ''),(19064, 0, 0, 0, 22, 0, 100, 0, 95, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, ''),(32743, 0, 0, 0, 22, 0, 100, 0, 95, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, '');
+
 SET @POINT := 0;
 DELETE FROM `waypoints` WHERE `entry` = 1827530;
 INSERT INTO `waypoints`
