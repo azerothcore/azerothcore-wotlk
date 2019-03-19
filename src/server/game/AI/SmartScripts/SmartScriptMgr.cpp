@@ -793,6 +793,23 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
             if (e.action.randomSound.sound4 && !IsSoundValid(e, e.action.randomSound.sound4))
                 return false;
             break;
+        case SMART_ACTION_MUSIC:
+            if (!IsSoundValid(e, e.action.music.sound))
+                return false;
+            break;
+        case SMART_ACTION_RANDOM_MUSIC:
+            if (e.action.randomMusic.sound1 && !IsSoundValid(e, e.action.randomMusic.sound1))
+                return false;
+
+            if (e.action.randomMusic.sound2 && !IsSoundValid(e, e.action.randomMusic.sound2))
+                return false;
+
+            if (e.action.randomMusic.sound3 && !IsSoundValid(e, e.action.randomMusic.sound3))
+                return false;
+
+            if (e.action.randomMusic.sound4 && !IsSoundValid(e, e.action.randomMusic.sound4))
+                return false;
+            break;
         case SMART_ACTION_SET_EMOTE_STATE:
         case SMART_ACTION_PLAY_EMOTE:
             if (!IsEmoteValid(e, e.action.emote.emote))
