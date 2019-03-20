@@ -234,7 +234,7 @@ bool World::KickSession(uint32 id)
         if (itr->second->PlayerLoading())
             return false;
 
-        itr->second->KickPlayer(false);
+        itr->second->KickPlayer("KickSession", false);
     }
 
     return true;
@@ -251,9 +251,9 @@ void World::AddSession_(WorldSession* s)
 
     // kick existing session with same account (if any)
     // if character on old session is being loaded, then return
-    if (!KickSession (s->GetAccountId()))
+    if (!KickSession(s->GetAccountId()))
     {
-        s->KickPlayer();
+        s->KickPlayer("kick existing session with same account");
         delete s; // session not added yet in session list, so not listed in queue
         return;
     }
@@ -1317,6 +1317,9 @@ void World::LoadConfigSettings(bool reload)
 
     m_bool_configs[CONFIG_CALCULATE_CREATURE_ZONE_AREA_DATA] = sConfigMgr->GetBoolDefault("Calculate.Creature.Zone.Area.Data", false);
     m_bool_configs[CONFIG_CALCULATE_GAMEOBJECT_ZONE_AREA_DATA] = sConfigMgr->GetBoolDefault("Calculate.Gameoject.Zone.Area.Data", false);
+
+    // Player can join LFG anywhere
+    m_bool_configs[CONFIG_LFG_LOCATION_ALL] = sConfigMgr->GetBoolDefault("LFG.Location.All", false);
 
     // call ScriptMgr if we're reloading the configuration
     sScriptMgr->OnAfterConfigLoad(reload);
@@ -2435,11 +2438,11 @@ void World::KickAll()
 
     // session not removed at kick and will removed in next update tick
     for (SessionMap::const_iterator itr = m_sessions.begin(); itr != m_sessions.end(); ++itr)
-        itr->second->KickPlayer();
+        itr->second->KickPlayer("KickAll sessions");
 
     // pussywizard: kick offline sessions
     for (SessionMap::const_iterator itr = m_offlineSessions.begin(); itr != m_offlineSessions.end(); ++itr)
-        itr->second->KickPlayer();
+        itr->second->KickPlayer("KickAll offline sessions");
 }
 
 /// Kick (and save) all players with security level less `sec`
@@ -2448,7 +2451,7 @@ void World::KickAllLess(AccountTypes sec)
     // session not removed at kick and will removed in next update tick
     for (SessionMap::const_iterator itr = m_sessions.begin(); itr != m_sessions.end(); ++itr)
         if (itr->second->GetSecurity() < sec)
-            itr->second->KickPlayer();
+            itr->second->KickPlayer("KickAllLess");
 }
 
 /// Ban an account or ban an IP address, duration will be parsed using TimeStringToSecs if it is positive, otherwise permban
@@ -2528,10 +2531,10 @@ BanReturn World::BanAccount(BanMode mode, std::string const& nameOrIP, std::stri
 
         if (WorldSession* sess = FindSession(account))
             if (sess->GetPlayerName() != author)
-                sess->KickPlayer();
+                sess->KickPlayer("FindSession(account)->GetPlayerName() != author");
         if (WorldSession* sess = FindOfflineSession(account))
             if (sess->GetPlayerName() != author)
-                sess->KickPlayer();
+                sess->KickPlayer("FindOfflineSession(account)->GetPlayerName() != author");
     } while (resultAccounts->NextRow());
 
     LoginDatabase.CommitTransaction(trans);
@@ -2599,7 +2602,7 @@ BanReturn World::BanCharacter(std::string const& name, std::string const& durati
     CharacterDatabase.Execute(stmt);
 
     if (pBanned)
-        pBanned->GetSession()->KickPlayer();
+        pBanned->GetSession()->KickPlayer("Ban");
 
     return BAN_SUCCESS;
 }

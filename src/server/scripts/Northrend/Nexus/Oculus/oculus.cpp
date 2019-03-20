@@ -3,6 +3,9 @@
 */
 
 #include "ScriptMgr.h"
+#include "InstanceScript.h"
+#include "MotionMaster.h"
+#include "ObjectAccessor.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "oculus.h"
@@ -10,6 +13,35 @@
 #include "CombatAI.h"
 #include "Player.h"
 #include "SpellInfo.h"
+#include "SpellAuraEffects.h"
+#include "SpellScript.h"
+
+enum Drakes
+{
+    SPELL_RIDE_RUBY_DRAKE_QUE               = 49463,
+    SPELL_RIDE_AMBER_DRAKE_QUE              = 49459,
+    SPELL_RIDE_EMERALD_DRAKE_QUE            = 49427,
+
+    // Centrifuge Constructs
+    SPELL_EMPOWERING_BLOWS                  = 50044,
+    H_SPELL_EMPOWERING_BLOWS                = 59213,
+
+    SPELL_AMBER_SHOCK_CHARGE                = 49836,
+    SPELL_RUBY_EVASIVE_CHARGES              = 50241,
+
+    // Common Drake
+    SPELL_DRAKE_FLAG_VISUAL                 = 53797,
+    SPELL_SOAR_TRIGGER                      = 50325,
+    SPELL_SOAR_BUFF                         = 50024,
+    SPELL_SCALE_STATS                       = 66667,
+    // Ruby Drake
+    SPELL_RUBY_EVASIVE_AURA                 = 50248,
+    SPELL_RUBY_EVASIVE_MANEUVERS            = 50240,
+
+    // Misc
+    POINT_LAND                              = 2,
+    POINT_TAKE_OFF                          = 3
+};
 
 enum DrakeGiverTexts
 {
@@ -34,7 +66,6 @@ enum DrakeGiverTexts
 #define GOSSIP_ITEM_ETERNOS2        "What abilities do Amber Drakes have?"
 
 #define HAS_ESSENCE(a) ((a)->HasItemCount(ITEM_EMERALD_ESSENCE) || (a)->HasItemCount(ITEM_AMBER_ESSENCE) || (a)->HasItemCount(ITEM_RUBY_ESSENCE))
-
 
 class npc_oculus_drakegiver : public CreatureScript
 {
@@ -184,27 +215,59 @@ public:
         bool JustSummoned;
         uint16 despawnTimer;
 
-        void PassengerBoarded(Unit*  /*who*/, int8  /*seatid*/, bool add)
+        void IsSummonedBy(Unit* summoner)
         {
+            if (m_pInstance->GetBossState(DATA_EREGOS) == IN_PROGRESS)
+                if (Creature* eregos = me->FindNearestCreature(NPC_EREGOS, 450.0f, true))
+                    eregos->DespawnOrUnsummon(); // On retail this kills abusive call of drake during engaged Eregos
+
+            me->SetFacingToObject(summoner);
+
+            switch (me->GetEntry())
+            {
+            case NPC_RUBY_DRAKE:
+                me->CastSpell(summoner, SPELL_RIDE_RUBY_DRAKE_QUE);
+                break;
+            case NPC_EMERALD_DRAKE:
+                me->CastSpell(summoner, SPELL_RIDE_EMERALD_DRAKE_QUE);
+                break;
+            case NPC_AMBER_DRAKE:
+                me->CastSpell(summoner, SPELL_RIDE_AMBER_DRAKE_QUE);
+                break;
+            default:
+                return;
+            }
+
+            Position pos = summoner->GetPosition();
+            me->GetMotionMaster()->MovePoint(POINT_LAND, pos);
+        }
+
+        void MovementInform(uint32 type, uint32 id)
+        {
+            if (type == POINT_MOTION_TYPE && id == POINT_LAND)
+                me->SetDisableGravity(false); // Needed this for proper animation after spawn, the summon in air fall to ground bug leave no other option for now, if this isn't used the drake will only walk on move.
+        }
+
+        void PassengerBoarded(Unit* passenger, int8 /*seatid*/, bool add)
+        {
+            if (passenger->GetTypeId() != TYPEID_PLAYER)
+                return;
+
             if (add)
             {
-                me->SetDisableGravity(false);
-                me->SendMovementFlagUpdate();
                 despawnTimer = 0;
             }
             else
             {
-                me->SetHomePosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation());
-                me->DisappearAndDie();
-                me->DespawnOrUnsummon(1);
+                me->DespawnOrUnsummon(2050);
+                me->SetOrientation(2.5f);
+                me->SetSpeedRate(MOVE_FLIGHT, 1.0f);
+                Position pos = me->GetPosition();
+                Position offset = { 10.0f, 10.0f, 12.0f, 0.0f };
+                pos.RelocateOffset(offset);
+                me->SetDisableGravity(true);
+                me->GetMotionMaster()->MovePoint(POINT_TAKE_OFF, pos);
             }
-        }
-
-        void JustDied(Unit*  /*killer*/)
-        {
-            me->SetHomePosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation());
-            me->DisappearAndDie();
-            me->DespawnOrUnsummon(1);
         }
 
         void SpellHitTarget(Unit* target, SpellInfo const* spell)
@@ -214,11 +277,8 @@ public:
                 {
                     if( target && target->IsAlive() && !target->CanFly() && target->IsHostileTo(me) && !spell->IsTargetingArea())
                     {
-                        me->SetHomePosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation());
                         if( Unit* charmer = me->GetCharmer() )
                             Unit::Kill(charmer, charmer, false);
-                        me->DisappearAndDie();
-                        me->DespawnOrUnsummon(1);
                     }
                     break;
                 }
@@ -237,46 +297,33 @@ public:
                         if( me->GetVehicleKit() && me->IsSummon() )
                             if( !me->GetVehicleKit()->GetPassenger(0) )
                             {
-                                TempSummon* ts = (TempSummon*)me;
-                                if( Unit* summoner = ts->GetSummoner() )
+                                if( m_pInstance->GetData(DATA_UROM) == DONE )
                                 {
-                                    if( m_pInstance->GetData(DATA_UROM) == DONE )
+                                    switch( me->GetEntry() )
                                     {
-                                        switch( me->GetEntry() )
-                                        {
-                                            case 27692:
-                                                me->m_spells[5] = 50344;
-                                                break;
-                                            case 27755:
-                                                me->m_spells[5] = 49592;
-                                                break;
-                                            case 27756:
-                                                me->m_spells[5] = 50253;
-                                                break;
-                                        }
+                                        case 27692:
+                                            me->m_spells[5] = 50344;
+                                            break;
+                                        case 27755:
+                                            me->m_spells[5] = 49592;
+                                            break;
+                                        case 27756:
+                                            me->m_spells[5] = 50253;
+                                            break;
                                     }
-
-                                    uint32 spell = 0;
-                                    switch (me->GetEntry())
-                                    {
-                                        case 27692: spell = 49427; break;
-                                        case 27755: spell = 49459; break;
-                                        case 27756: spell = 49463; break;
-                                    }
-
-                                    //summoner->EnterVehicle(me);
-                                    if (spell)
-                                        me->CastSpell(summoner, spell, true);
-                                    me->SetCanFly(true);
-                                    me->SetSpeed(MOVE_FLIGHT, me->GetSpeedRate(MOVE_RUN), true);
                                 }
                             }
                     }
                     else
                     {
-                        me->SetHomePosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation());
-                        me->DisappearAndDie();
-                        me->DespawnOrUnsummon(1);
+                        me->DespawnOrUnsummon(2050);
+                        me->SetOrientation(2.5f);
+                        me->SetSpeedRate(MOVE_FLIGHT, 1.0f);
+                        Position pos = me->GetPosition();
+                        Position offset = { 10.0f, 10.0f, 12.0f, 0.0f };
+                        pos.RelocateOffset(offset);
+                        me->SetDisableGravity(true);
+                        me->GetMotionMaster()->MovePoint(POINT_TAKE_OFF, pos);
                         return;
                     }
                 }
@@ -286,10 +333,11 @@ public:
             {
                 if (despawnTimer >= 5000)
                 {
-                    despawnTimer = 0;
-                    me->SetHomePosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation());
-                    me->DisappearAndDie();
-                    me->DespawnOrUnsummon(1);
+                    me->DespawnOrUnsummon(2050);
+                    me->SetOrientation(2.5f);
+                    Position pos = me->GetPosition();
+                    Position offset = { 10.0f, 10.0f, 12.0f, 0.0f };
+                    pos.RelocateOffset(offset);
                     return;
                 }
                 else
@@ -301,10 +349,44 @@ public:
     };
 };
 
-enum oculusSpells
+class npc_centrifuge_construct : public CreatureScript
 {
-    SPELL_AMBER_SHOCK_CHARGE            = 49836,
-    SPELL_RUBY_EVASIVE_CHARGES          = 50241,
+public:
+    npc_centrifuge_construct() : CreatureScript("npc_centrifuge_construct") { }
+
+    struct npc_centrifuge_constructAI : public ScriptedAI
+    {
+        npc_centrifuge_constructAI(Creature *creature) : ScriptedAI(creature) {}
+
+        void Reset() {}
+
+        void EnterCombat(Unit* /*who*/)
+        {
+            DoCast(IsHeroic() ? H_SPELL_EMPOWERING_BLOWS : SPELL_EMPOWERING_BLOWS);
+        }
+
+        void UpdateAI(uint32 /*diff*/)
+        {
+            if (!UpdateVictim())
+                return;
+
+            DoMeleeAttackIfReady();
+        }
+
+        void DamageTaken(Unit* attacker, uint32& /*damage*/, DamageEffectType, SpellSchoolMask)
+        {
+            if (attacker)
+            {
+                Unit* player = attacker->GetCharmer();
+                if (player && !player->IsInCombat())
+                    player->SetInCombatWith(me);
+            }
+        }
+    };
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_centrifuge_constructAI(creature);
+    }
 };
 
 // 49838 - Stop Time
@@ -586,11 +668,213 @@ class spell_oculus_ride_ruby_emerald_amber_drake_que : public SpellScriptLoader
         }
 };
 
+class spell_oculus_evasive_charges : public SpellScriptLoader
+{
+    public:
+        spell_oculus_evasive_charges() : SpellScriptLoader("spell_oculus_evasive_charges") { }
+
+        class spell_oculus_evasive_chargesAuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_oculus_evasive_chargesAuraScript);
+
+            void HandleOnEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+            {
+                if (Unit* caster = GetCaster())
+                    caster->ModifyAuraState(AURA_STATE_UNKNOWN22, true);
+            }
+
+            void HandleOnEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+            {
+                if (Unit* caster = GetCaster())
+                {
+                    caster->RemoveAurasDueToSpell(SPELL_RUBY_EVASIVE_MANEUVERS);
+                    caster->ModifyAuraState(AURA_STATE_UNKNOWN22, false);
+                }
+            }
+
+            void Register()
+            {
+                OnEffectApply += AuraEffectApplyFn(spell_oculus_evasive_chargesAuraScript::HandleOnEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
+                OnEffectRemove += AuraEffectRemoveFn(spell_oculus_evasive_chargesAuraScript::HandleOnEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+            }
+        };
+
+        AuraScript* GetAuraScript() const
+        {
+            return new spell_oculus_evasive_chargesAuraScript();
+        }
+};
+
+class spell_oculus_soar : public SpellScriptLoader
+{
+    public:
+        spell_oculus_soar() : SpellScriptLoader("spell_oculus_soar") { }
+
+        class spell_oculus_soarAuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_oculus_soarAuraScript);
+			
+            void HandleEffectPeriodic(AuraEffect const* /*aurEff*/)
+            {
+                Unit* caster = GetCaster();
+
+                if (!caster)
+                    return;
+
+                if (!caster->getAttackers().empty())
+                {
+                    if (caster->HasAura(SPELL_SOAR_BUFF))
+                        caster->RemoveAurasDueToSpell(SPELL_SOAR_BUFF);
+
+                    PreventDefaultAction();
+                    return;
+                }
+
+                if (!caster->HasAura(SPELL_SOAR_BUFF))
+                    caster->CastSpell(caster, SPELL_SOAR_BUFF, true);
+
+                // We handle the health regen here, normal heal regen isn't working....
+                if (caster->GetHealth() < caster->GetMaxHealth())
+                    caster->SetHealth(caster->GetHealth() + (uint32)((double)caster->GetMaxHealth()*0.2));
+            }
+
+            void HandleOnEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+            {
+                Unit* caster = GetCaster();
+
+                if (!caster)
+                    return;
+
+                if (!caster->HasAura(SPELL_SOAR_BUFF))
+                    caster->CastSpell(caster, SPELL_SOAR_BUFF, true);
+            }
+
+            void Register()
+            {
+                OnEffectPeriodic += AuraEffectPeriodicFn(spell_oculus_soarAuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+                OnEffectApply += AuraEffectApplyFn(spell_oculus_soarAuraScript::HandleOnEffectApply, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
+            }
+        };
+
+        AuraScript* GetAuraScript() const
+        {
+            return new spell_oculus_soarAuraScript();
+        }
+};
+
+class spell_oculus_rider_aura : public SpellScriptLoader
+{
+    public:
+        spell_oculus_rider_aura() : SpellScriptLoader("spell_oculus_rider_aura") { }
+
+        class spell_oculus_rider_auraAuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_oculus_rider_auraAuraScript);
+
+            uint64 _drakeGUID;
+
+            void HandleOnEffectApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+            {
+                Unit* caster = GetCaster();
+                Creature* drake = caster->GetVehicleCreatureBase();
+
+                if (!drake || !caster)
+                    return;
+
+                switch (aurEff->GetEffIndex())
+                {
+                case EFFECT_1:
+                    _drakeGUID = drake->GetGUID();
+                    caster->AddAura(SPELL_DRAKE_FLAG_VISUAL, caster);
+                    caster->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    caster->RemoveAurasByType(SPELL_AURA_MOD_SHAPESHIFT);
+                    drake->CastSpell(drake, SPELL_SOAR_TRIGGER);
+                    if (drake->GetEntry() == NPC_RUBY_DRAKE)
+                        drake->CastSpell(drake, SPELL_RUBY_EVASIVE_AURA);
+                    break;
+                case EFFECT_2:
+                    caster->AddAura(SPELL_SCALE_STATS, drake);
+                    PreventDefaultAction();
+                    break;
+                }
+            }
+
+            void HandleOnEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+            {
+                Unit* caster = GetCaster();
+
+                if (!caster)
+                    return;
+
+                Creature* drake = ObjectAccessor::GetCreature(*caster, _drakeGUID);
+
+                if (drake)
+                {
+                    drake->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
+                    drake->RemoveAurasDueToSpell(GetId());
+                    drake->RemoveAurasDueToSpell(SPELL_SOAR_TRIGGER);
+                    drake->RemoveAurasDueToSpell(SPELL_RUBY_EVASIVE_AURA);
+                }
+                caster->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                caster->RemoveAurasDueToSpell(SPELL_DRAKE_FLAG_VISUAL);
+            }
+
+            void Register()
+            {
+                OnEffectApply += AuraEffectApplyFn(spell_oculus_rider_auraAuraScript::HandleOnEffectApply, EFFECT_1, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
+                OnEffectApply += AuraEffectApplyFn(spell_oculus_rider_auraAuraScript::HandleOnEffectApply, EFFECT_2, SPELL_AURA_LINKED, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
+                OnEffectRemove += AuraEffectRemoveFn(spell_oculus_rider_auraAuraScript::HandleOnEffectRemove, EFFECT_1, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
+            }
+        };
+
+        AuraScript* GetAuraScript() const
+        {
+            return new spell_oculus_rider_auraAuraScript();
+        }
+};
+
+class spell_oculus_drake_flag : public SpellScriptLoader
+{
+    public:
+        spell_oculus_drake_flag() : SpellScriptLoader("spell_oculus_drake_flag") { }
+
+        class spell_oculus_drake_flagAuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_oculus_drake_flagAuraScript);
+
+            void HandleOnEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+            {
+                Unit* caster = GetCaster();
+
+                if (!caster)
+                    return;
+
+                Creature* drake = caster->GetVehicleCreatureBase();
+
+                if (!drake)
+                {
+                    caster->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    caster->RemoveAurasDueToSpell(SPELL_DRAKE_FLAG_VISUAL);
+                }
+            }
+
+            void Register()
+            {
+                OnEffectApply += AuraEffectApplyFn(spell_oculus_drake_flagAuraScript::HandleOnEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
+            }
+        };
+
+        AuraScript* GetAuraScript() const
+        {
+            return new spell_oculus_drake_flagAuraScript();
+        }
+};
 
 void AddSC_oculus()
 {
     new npc_oculus_drakegiver();
     new npc_oculus_drake();
+    new npc_centrifuge_construct();
 
     new spell_oculus_stop_time();
     new spell_oculus_evasive_maneuvers();
@@ -600,4 +884,8 @@ void AddSC_oculus()
     new spell_oculus_dream_funnel();
     new spell_oculus_call_ruby_emerald_amber_drake();
     new spell_oculus_ride_ruby_emerald_amber_drake_que();
+    new spell_oculus_evasive_charges();
+    new spell_oculus_soar();
+    new spell_oculus_rider_aura();
+    new spell_oculus_drake_flag();
 }

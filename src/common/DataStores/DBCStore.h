@@ -13,6 +13,7 @@
 #include "DatabaseWorkerPool.h"
 #include "Implementation/WorldDatabase.h"
 #include "DatabaseEnv.h"
+#include <unordered_map>
 
 struct SqlDbc
 {
