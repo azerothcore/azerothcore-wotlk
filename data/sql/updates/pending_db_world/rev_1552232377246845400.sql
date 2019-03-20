@@ -22,7 +22,7 @@ CREATE TABLE `skill_perfect_item_template` (
 	PRIMARY KEY (`spellId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Crafting Perfection System';
 
-LOCK TABLES `skill_perfect_item_template` WRITE;
+START TRANSACTION;
 
 INSERT INTO `skill_perfect_item_template` (`spellId`, `requiredSpecialization`, `perfectCreateChance`, `perfectItemType`)
 VALUES
@@ -104,4 +104,4 @@ VALUES
 (53860,55534,20,41460), -- Shifting
 (53859,55534,20,41461), -- Sovereign
 (53861,55534,20,41462); -- Tenuous
-UNLOCK TABLES;
+COMMIT;
