@@ -143,6 +143,9 @@ enum Misc
 
     DATA_TWILIGHT_DAMAGE_TAKEN  = 1,
     DATA_MATERIAL_DAMAGE_TAKEN  = 2,
+    DATA_STACKS_DISPELLED       = 3,
+    DATA_FIGHT_PHASE            = 4,
+    DATA_EVADE_METHOD           = 5,
 
     SEAT_NORTH                  = 0,
     SEAT_SOUTH                  = 1,
@@ -1464,6 +1467,63 @@ public:
     }
 };
 
+class npc_living_ember : public CreatureScript
+{
+public:
+    npc_living_ember() : CreatureScript("npc_living_ember") { }
+
+    struct npc_living_emberAI : public ScriptedAI
+    {
+        npc_living_emberAI(Creature* creature) : ScriptedAI(creature) { }
+
+        void Reset()
+        {
+            _hasEnraged = false;
+        }
+
+        void EnterCombat(Unit* /*who*/)
+        {
+            _enrageTimer = 20000;
+            _hasEnraged = false;
+        }
+
+        void IsSummonedBy(Unit* /*summoner*/)
+        {
+            if (InstanceScript* instance = me->GetInstanceScript())
+                if (Creature* controller = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_HALION_CONTROLLER)))
+                    controller->AI()->JustSummoned(me);
+        }
+
+        void JustDied(Unit* /*killer*/)
+        {
+            me->DespawnOrUnsummon(1);
+        }
+
+        void UpdateAI(uint32 diff)
+        {
+            if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
+                return;
+
+            if (!_hasEnraged && _enrageTimer <= diff)
+            {
+                _hasEnraged = true;
+                DoCast(me, SPELL_BERSERK);
+            }
+            else _enrageTimer -= diff;
+
+            DoMeleeAttackIfReady();
+        }
+
+    private:
+        uint32 _enrageTimer;
+        bool _hasEnraged;
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return GetInstanceAI<npc_living_emberAI>(creature);
+    }
+};
 
 void AddSC_boss_halion()
 {
@@ -1472,6 +1532,7 @@ void AddSC_boss_halion()
     new npc_halion_controller();
     new npc_orb_carrier();
     new npc_living_inferno();
+    new npc_living_ember();
 
     new spell_halion_meteor_strike_targeting();
     new spell_halion_meteor_strike_marker();
