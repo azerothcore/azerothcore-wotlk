@@ -3214,5 +3214,13 @@ Calculate.Creature.Zone.Area.Data = 0
 
 Calculate.Gameoject.Zone.Area.Data = 0
 
+#    LFG SETTINGS
+#
+#     Includes satellite to search for work elsewhere LFG
+#        Default: 0 - Disable  
+#                 1 - Enable  
+
+LFG.Location.All = 0
+
 #
 ###################################################################################################

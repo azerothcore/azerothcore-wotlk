@@ -1315,6 +1315,9 @@ void World::LoadConfigSettings(bool reload)
     m_bool_configs[CONFIG_CALCULATE_CREATURE_ZONE_AREA_DATA] = sConfigMgr->GetBoolDefault("Calculate.Creature.Zone.Area.Data", false);
     m_bool_configs[CONFIG_CALCULATE_GAMEOBJECT_ZONE_AREA_DATA] = sConfigMgr->GetBoolDefault("Calculate.Gameoject.Zone.Area.Data", false);
 
+    // Player can join LFG anywhere
+    m_bool_configs[CONFIG_LFG_LOCATION_ALL] = sConfigMgr->GetBoolDefault("LFG.Location.All", false);
+
     // call ScriptMgr if we're reloading the configuration
     sScriptMgr->OnAfterConfigLoad(reload);
 }
@@ -1688,6 +1691,9 @@ void World::SetInitialWorldSettings()
 
     sLog->outString("Loading Skill Extra Item Table...");
     LoadSkillExtraItemTable();
+
+    sLog->outString("Loading Skill Perfection Data Table...");
+    LoadSkillPerfectItemTable();
 
     sLog->outString("Loading Skill Fishing base level requirements...");
     sObjectMgr->LoadFishingBaseSkillLevel();
