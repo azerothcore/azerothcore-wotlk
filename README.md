@@ -1,6 +1,10 @@
 # ![logo](https://raw.githubusercontent.com/azerothcore/azerothcore.github.io/master/images/logo-github.png) AzerothCore
 
 [![Master Build Status](https://travis-ci.org/azerothcore/azerothcore-wotlk.svg)](https://travis-ci.org/azerothcore/azerothcore-wotlk)
+<a href="https://scan.coverity.com/projects/azerothcore-azerothcore-wotlk">
+  <img alt="Coverity Scan Build Status"
+       src="https://scan.coverity.com/projects/13814/badge.svg"/>
+</a>
 [![Bountysource](https://www.bountysource.com/badge/tracker?tracker_id=40032087)](https://www.bountysource.com/teams/azerothcore/bounties)
 [![StackOverflow](http://img.shields.io/badge/stackoverflow-azerothcore-blue.svg)]( https://stackoverflow.com/questions/tagged/azerothcore?sort=newest)
 
