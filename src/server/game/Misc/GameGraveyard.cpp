@@ -290,11 +290,11 @@ void Graveyard::LoadGraveyardZones()
     GraveyardStore.clear(); // need for reload case
 
     //                                                0       1         2
-    QueryResult result = WorldDatabase.Query("SELECT id, ghost_zone, faction FROM game_graveyard_zone");
+    QueryResult result = WorldDatabase.Query("SELECT ID, GhostZone, Faction FROM graveyard_zone");
 
     if (!result)
     {
-        sLog->outString(">> Loaded 0 graveyard-zone links. DB table `game_graveyard_zone` is empty.");
+        sLog->outString(">> Loaded 0 graveyard-zone links. DB table `graveyard_zone` is empty.");
         sLog->outString();
         return;
     }
@@ -315,31 +315,31 @@ void Graveyard::LoadGraveyardZones()
         GraveyardStruct const* entry = sGraveyard->GetGraveyard(safeLocId);
         if (!entry)
         {
-            sLog->outErrorDb("Table `game_graveyard_zone` has a record for not existing `game_graveyard` table %u, skipped.", safeLocId);
+            sLog->outErrorDb("Table `graveyard_zone` has a record for not existing `game_graveyard` table %u, skipped.", safeLocId);
             continue;
         }
 
         AreaTableEntry const* areaEntry = sAreaTableStore.LookupEntry(zoneId);
         if (!areaEntry)
         {
-            sLog->outErrorDb("Table `game_graveyard_zone` has a record for not existing zone id (%u), skipped.", zoneId);
+            sLog->outErrorDb("Table `graveyard_zone` has a record for not existing zone id (%u), skipped.", zoneId);
             continue;
         }
 
         if (areaEntry->zone != 0)
         {
-            sLog->outErrorDb("Table `game_graveyard_zone` has a record for subzone id (%u) instead of zone, skipped.", zoneId);
+            sLog->outErrorDb("Table `graveyard_zone` has a record for subzone id (%u) instead of zone, skipped.", zoneId);
             continue;
         }
 
         if (team != 0 && team != HORDE && team != ALLIANCE)
         {
-            sLog->outErrorDb("Table `game_graveyard_zone` has a record for non player faction (%u), skipped.", team);
+            sLog->outErrorDb("Table `graveyard_zone` has a record for non player faction (%u), skipped.", team);
             continue;
         }
 
         if (!AddGraveyardLink(safeLocId, zoneId, teamId, false))
-            sLog->outErrorDb("Table `game_graveyard_zone` has a duplicate record for Graveyard (ID: %u) and Zone (ID: %u), skipped.", safeLocId, zoneId);
+            sLog->outErrorDb("Table `graveyard_zone` has a duplicate record for Graveyard (ID: %u) and Zone (ID: %u), skipped.", safeLocId, zoneId);
 
     } while (result->NextRow());
 
