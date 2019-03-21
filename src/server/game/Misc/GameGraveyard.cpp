@@ -97,7 +97,7 @@ GraveyardStruct const* Graveyard::GetClosestGraveyard(float x, float y, float z,
     // not need to check validity of map object; MapId _MUST_ be valid here
     if (range.first == range.second && !map->IsBattlegroundOrArena())
     {
-        sLog->outErrorDb("Table `game_graveyard_zone` incomplete: Zone %u Team %u does not have a linked graveyard.", zoneId, teamId);
+        sLog->outErrorDb("Table `graveyard_zone` incomplete: Zone %u Team %u does not have a linked graveyard.", zoneId, teamId);
         return GetDefaultGraveyard(teamId);
     }
 
@@ -122,7 +122,7 @@ GraveyardStruct const* Graveyard::GetClosestGraveyard(float x, float y, float z,
         GraveyardStruct const* entry = sGraveyard->GetGraveyard(data.safeLocId);
         if (!entry)
         {
-            sLog->outErrorDb("Table `game_graveyard_zone` has record for not existing `game_graveyard` table %u, skipped.", data.safeLocId);
+            sLog->outErrorDb("Table `graveyard_zone` has record for not existing `game_graveyard` table %u, skipped.", data.safeLocId);
             continue;
         }
 
@@ -239,7 +239,7 @@ void Graveyard::RemoveGraveyardLink(uint32 id, uint32 zoneId, TeamId teamId, boo
     GraveyardMapBoundsNonConst range = GraveyardStore.equal_range(zoneId);
     if (range.first == range.second)
     {
-        sLog->outError("Table `game_graveyard_zone` incomplete: Zone %u Team %u does not have a linked graveyard.", zoneId, teamId);
+        sLog->outError("Table `graveyard_zone` incomplete: Zone %u Team %u does not have a linked graveyard.", zoneId, teamId);
         return;
     }
 
