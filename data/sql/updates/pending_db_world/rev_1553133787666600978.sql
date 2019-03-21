@@ -6,6 +6,9 @@ ALTER TABLE `graveyard_zone` CHANGE `ghost_zone` `GhostZone` MEDIUMINT(8) UNSIGN
 ALTER TABLE `graveyard_zone` CHANGE `faction` `Faction` SMALLINT(5) UNSIGNED NOT NULL DEFAULT '0';
 ALTER TABLE `graveyard_zone` ADD COLUMN `Comment` TEXT AFTER `Faction`;
 
+DELETE FROM command WHERE name = 'reload game_graveyard_zone';
+INSERT INTO command(name, security, help) VALUES ('reload graveyard_zone', 3, 'Syntax: .reload graveyard_zone');
+
 UPDATE `graveyard_zone` SET `Comment`='Redridge Mountains - Redridge Mountains' WHERE `ID`=2;
 UPDATE `graveyard_zone` SET `Comment`='Duskwood, Darkshire - Duskwood' WHERE `ID`=3;
 UPDATE `graveyard_zone` SET `Comment`='Westfall, Sentinel Hill GY - Westfall' WHERE `ID`=4;
