@@ -1,10 +1,12 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1553120573757251500');
 
 -- NPC "Emerald Skytalon" entering/leaving combat and doesn't fly down to attack player (Fix)
-REPLACE INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `VerifiedBuild`) VALUES (105757, 27244, 571, 0, 0, 1, 1, 24453, 0, 2801.95, 7.25871, 4.26567, 4.96257, 300, 0, 0, 9940, 0, 0, 0, 0, 0, 0);
+DELETE FROM `creature` WHERE `guid` = 105757;
+INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES(105757, 27244, 571, 0, 0, 1, 1, 24453, 0, 2801.95, 7.25871, 4.26567, 4.96257, 300, 0, 0, 9940, 0, 0, 0, 0, 0, '', 0);
 
 -- NPC "Geirrvif" flying too high. The players cant interact with NPC (Fix)
-REPLACE INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `VerifiedBuild`) VALUES (123494, 31135, 571, 0, 0, 1, 1, 27074, 0, 8216.64, 3516.06, 624.996, 3.57661, 300, 0, 0, 12600, 0, 0, 0, 0, 0, 0);
+DELETE FROM `creature` WHERE `guid`= 123494;
+INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES(123494, 31135, 571, 0, 0, 1, 1, 27074, 0, 8216.64, 3516.06, 624.996, 3.57661, 300, 0, 0, 12600, 0, 0, 0, 0, 0, '', 0);
 
 -- The Wastewander Rogue should be in stealth while patroling there (Fix)
 SET @ENTRY := 5615;
