@@ -4168,12 +4168,14 @@ void SmartScript::FillScript(SmartAIEventList e, WorldObject* obj, AreaTrigger c
 {
     if (e.empty())
     {
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         if (obj)
             sLog->outDebug(LOG_FILTER_DATABASE_AI, "SmartScript: EventMap for Entry %u is empty but is using SmartScript.", obj->GetEntry());
 
         if (at)
             sLog->outDebug(LOG_FILTER_DATABASE_AI, "SmartScript: EventMap for AreaTrigger %u is empty but is using SmartScript.", at->entry);
-        return;
+#endif
+        return (void)at;
     }
     for (SmartAIEventList::iterator i = e.begin(); i != e.end(); ++i)
     {
