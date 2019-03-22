@@ -1,3 +1,19 @@
+-- DB update 2019_03_22_01 -> 2019_03_22_02
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2019_03_22_01';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2019_03_22_01 2019_03_22_02 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1553120573757251500'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1553120573757251500');
 
 -- NPC "Emerald Skytalon" entering/leaving combat and doesn't fly down to attack player (Fix)
@@ -27,3 +43,12 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (@ENTRY, 0, 3, 0, 2, 0, 100, 0, 0, 75, 15000, 20000, 11, 17173, 1, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, "When health between 0% and 75% (check every 15000 - 20000 ms) - Self: Cast spell Drain Life (17173) on Victim. Sunfury Nethermancer - On Aggro - Cast 'Shadow Bolt' (No Repeat)"),
 (@ENTRY, 0, 4, 0, 2, 0, 100, 1, 0, 15, 0, 0, 25, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "When health between 0% and 15% (check every 0 - 0 ms) - Self: Flee for assist. Sunfury Nethermancer - On Aggro - Increment Phase By 1 (No Repeat)"),
 (@ENTRY, 0, 5, 0, 1, 0, 50, 0, 10000, 20000, 15000, 30000, 11, 34397, 0, 0, 0, 0, 0, 19, 19421, 30, 0, 0, 0, 0, 0, "When out of combat and timer at the begining between 10000 and 20000 ms (and later repeats every 15000 and 30000 ms) (50% chance) - Self: Cast spell Red Beam (34397) on Closest alive creature Netherstorm Crystal Target (19421) in 30 yards. 20248 - Ooc - Cast Red Beam");
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
