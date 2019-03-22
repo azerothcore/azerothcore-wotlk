@@ -1,3 +1,19 @@
+-- DB update 2019_03_22_02 -> 2019_03_22_03
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2019_03_22_02';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2019_03_22_02 2019_03_22_03 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1553133787666600978'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1553133787666600978');
 
 RENAME TABLE `game_graveyard_zone` TO `graveyard_zone`;
@@ -592,3 +608,12 @@ UPDATE `graveyard_zone` SET `Comment`='Loch Modan, The Loch - Loch Modan' WHERE 
 UPDATE `graveyard_zone` SET `Comment`='Wintergrasp, Fortress Graveyard (Indoors) - Vault of Archavon' WHERE `ID`=1474;
 UPDATE `graveyard_zone` SET `Comment`='Icecrown, Argent Tournament GY' WHERE `ID`=1478;
 UPDATE `graveyard_zone` SET `Comment`='Icecrown Glacier, Citadel GY' WHERE `ID`=1682;
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
