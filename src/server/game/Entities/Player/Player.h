@@ -2631,6 +2631,7 @@ class Player : public Unit, public GridObject<Player>
 
         uint32 m_AreaID;
         uint32 m_regenTimerCount;
+        uint32 m_foodEmoteTimerCount;
         float m_powerFraction[MAX_POWERS];
         uint32 m_contestedPvPTimer;
 
