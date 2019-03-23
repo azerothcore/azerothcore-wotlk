@@ -17508,7 +17508,7 @@ void Unit::SendPlaySpellImpact(uint64 guid, uint32 id)
     WorldPacket data(SMSG_PLAY_SPELL_IMPACT, 8 + 4);
     data << uint64(guid); // target
     data << uint32(id); // SpellVisualKit.dbc index
-    SendMessageToSet(&data, false);
+    SendMessageToSet(&data, true);
 }
 
 void Unit::ApplyResilience(Unit const* victim, float* crit, int32* damage, bool isCrit, CombatRating type)
