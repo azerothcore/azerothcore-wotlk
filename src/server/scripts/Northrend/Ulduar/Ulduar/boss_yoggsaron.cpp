@@ -218,7 +218,7 @@ enum YoggSaronSounds
     SARA_P1_CAST2                       = 15774,
     SARA_P1_KILL1                       = 15778,
     SARA_P1_KILL2                       = 15779,
-    
+
     SARA_P2_START                       = 15754,
     SARA_P2_CAST1                       = 15776,
     SARA_P2_CAST2                       = 15777,
@@ -403,7 +403,7 @@ public:
             me->SetVisible(true);
             me->SetDisplayId(me->GetNativeDisplayId());
             me->SetDisableGravity(true);
-            EnableSara(false);  
+            EnableSara(false);
             SpawnClouds();
 
             _initFight = 1;
@@ -558,7 +558,7 @@ public:
                 me->PlayDirectSound(_secondPhase ? SARA_P2_CAST1 : SARA_P1_CAST2);
             }
         }
-        
+
         void KilledUnit(Unit* who)
         {
             if (who->GetTypeId() != TYPEID_PLAYER)
@@ -611,7 +611,7 @@ public:
 
                 EntryCheckPredicate pred3(NPC_THORIM_KEEPER);
                 summons.DoAction(ACTION_THORIM_START_STORM, pred3);
-                
+
                 if (!(_keepersGUID[0] && _keepersGUID[1] && _keepersGUID[2] && _keepersGUID[3]) && me->GetMap()->Is25ManRaid())
                     summons.DoAction(ACTION_YOGG_SARON_HARD_MODE, pred2);
 
@@ -724,7 +724,7 @@ public:
                 else if (_p2TalkTimer >= 44500 && _p2TalkTimer < 60000)
                 {
                     me->MonsterYell("Cower before my true form.", LANG_UNIVERSAL, 0);
-                    _p2TalkTimer = 60000;           
+                    _p2TalkTimer = 60000;
                 }
                 else if (_p2TalkTimer >= 64000)
                 {
@@ -772,7 +772,7 @@ public:
                     EntryCheckPredicate pred(NPC_YOGG_SARON);
                     summons.DoAction(ACTION_YOGG_SARON_APPEAR, pred);
                     events.RescheduleEvent(EVENT_SARA_P2_SPAWN_START_TENTACLES, 500, 0, EVENT_PHASE_TWO);
-                    
+
                     // Spawn Brain!
                     me->SummonCreature(NPC_BRAIN_OF_YOGG_SARON, 1981.3f, -25.43f, 265);
                     break;
@@ -838,8 +838,8 @@ public:
                     events.ScheduleEvent(EVENT_SARA_P2_MALADY, 7000, 0, EVENT_PHASE_TWO);
                     events.ScheduleEvent(EVENT_SARA_P2_PSYCHOSIS, 3000, 0, EVENT_PHASE_TWO);
                     events.ScheduleEvent(EVENT_SARA_P2_DEATH_RAY, 15000, 0, EVENT_PHASE_TWO);
-                    events.ScheduleEvent(EVENT_SARA_P2_SUMMON_T1, 50000+urand(0,10000), 0, EVENT_PHASE_TWO); 
-                    events.ScheduleEvent(EVENT_SARA_P2_SUMMON_T2, 15000+urand(0,5000) , 0, EVENT_PHASE_TWO); 
+                    events.ScheduleEvent(EVENT_SARA_P2_SUMMON_T1, 50000+urand(0,10000), 0, EVENT_PHASE_TWO);
+                    events.ScheduleEvent(EVENT_SARA_P2_SUMMON_T2, 15000+urand(0,5000) , 0, EVENT_PHASE_TWO);
                     events.ScheduleEvent(EVENT_SARA_P2_SUMMON_T3, 30000+urand(0,10000), 0, EVENT_PHASE_TWO);
                     events.ScheduleEvent(EVENT_SARA_P2_BRAIN_LINK, 0, 0, EVENT_PHASE_TWO);
                     events.ScheduleEvent(EVENT_SARA_P2_OPEN_PORTALS, 60000, 0, EVENT_PHASE_TWO);
@@ -1012,7 +1012,7 @@ public:
             _usedInsane = false;
             summons.DespawnAll();
             events.Reset();
-                        
+
             uint8 _count = 4;
             me->SetLootMode(31); // 1 + 2 + 4 + 8 + 16, remove with watchers addition
             if (m_pInstance)
@@ -1048,13 +1048,13 @@ public:
         {
             summons.DespawnAll();
             events.Reset();
-            
+
             me->MonsterYell("Your fate is sealed. The end of days is finally upon you and ALL who inhabit this miserable little seedling. Uulwi ifis halahs gag erh'ongg w'ssh.", LANG_UNIVERSAL, 0);
             me->PlayDirectSound(YS_P3_DEATH);
 
             if (m_pInstance)
             {
-                m_pInstance->SetData(TYPE_YOGGSARON, DONE); 
+                m_pInstance->SetData(TYPE_YOGGSARON, DONE);
                 if (Creature* sara = ObjectAccessor::GetCreature(*me, m_pInstance->GetData64(NPC_SARA)))
                     sara->AI()->DoAction(ACTION_YOGG_SARON_DEATH);
                 if (GameObject* go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(GO_YOGG_SARON_DOORS)))
@@ -1250,7 +1250,7 @@ public:
 
             me->SummonCreature(NPC_LAUGHING_SKULL, 2133.09f, 15.341f, 239.72f, 4.0724f);
             me->SummonCreature(NPC_LAUGHING_SKULL, 2065.83f, 12.3772f, 239.792f, 5.49789f);
-            
+
             // Aspects
             me->SummonCreature(NPC_ALEXTRASZA, 2091.92f, -25.8f, 242.647f, 0);
             me->SummonCreature(NPC_YSERA, 2116, -25.8f, 242.647f, 3.14f);
@@ -1435,7 +1435,7 @@ public:
                 {
                     me->CastSpell(me, SPELL_DEATH_RAY_DAMAGE_VISUAL, true);
                     me->CastSpell(me, SPELL_DEATH_RAY_DAMAGE, true);
-                    
+
                     _startTimer = 0;
                     me->SetSpeed(MOVE_WALK, 2);
                     me->SetSpeed(MOVE_RUN, 2);
@@ -1697,7 +1697,7 @@ class boss_yoggsaron_descend_portal : public CreatureScript
 public:
     boss_yoggsaron_descend_portal() : CreatureScript("boss_yoggsaron_descend_portal") { }
 
-    bool OnGossipHello(Player* player, Creature* creature)
+    bool OnGossipHello(Player* player, Creature* creature) override
     {
         if (!creature->GetUInt32Value(UNIT_NPC_FLAGS))
             return true;
@@ -1707,7 +1707,7 @@ public:
             case ACTION_ILLUSION_ICECROWN:  player->CastSpell(player, SPELL_TELEPORT_TO_ICECROWN, true); break;
             case ACTION_ILLUSION_STORMWIND: player->CastSpell(player, SPELL_TELEPORT_TO_STORMWIND, true); break;
         }
-        
+
         creature->SetUInt32Value(UNIT_NPC_FLAGS, 0);
         creature->DespawnOrUnsummon(1000);
         return true;
@@ -2546,7 +2546,7 @@ class spell_yogg_saron_empowered : public SpellScriptLoader
             {
                 Unit* target = GetUnitOwner();
                 uint8 stack = std::min(uint8(target->GetHealthPct()/10), (uint8)9);
-                
+
                 if (!stack)
                 {
                     target->RemoveAura(SPELL_EMPOWERED);
@@ -2892,10 +2892,10 @@ class achievement_yogg_saron_darkness : public AchievementCriteriaScript
             if (player->GetInstanceScript())
                 if (Creature* sara = ObjectAccessor::GetCreature(*player, player->GetInstanceScript()->GetData64(NPC_SARA)))
                     return sara->GetAI()->GetData(DATA_GET_KEEPERS_COUNT) <= _keepersCount;
-            
+
             return false;
         }
-        
+
     private:
         uint32 const _keepersCount;
 };
@@ -2913,10 +2913,10 @@ class achievement_yogg_saron_he_waits_dreaming : public AchievementCriteriaScrip
             if (player->GetInstanceScript())
                 if (Creature* sara = ObjectAccessor::GetCreature(*player, player->GetInstanceScript()->GetData64(NPC_BRAIN_OF_YOGG_SARON)))
                     return sara->GetAI()->GetData(DATA_GET_CURRENT_ILLUSION) == _requiredIllusion;
-            
+
             return false;
         }
-        
+
     private:
         uint8 const _requiredIllusion;
 };
@@ -2947,7 +2947,7 @@ void AddSC_boss_yoggsaron()
     new boss_yoggsaron_keeper();
     new boss_yoggsaron_descend_portal();
     new boss_yoggsaron_influence_tentacle();
-    new boss_yoggsaron_immortal_guardian(); 
+    new boss_yoggsaron_immortal_guardian();
     new boss_yoggsaron_lich_king();
     new boss_yoggsaron_llane();
     new boss_yoggsaron_neltharion();

@@ -68,7 +68,7 @@ class npc_captain_saeed : public CreatureScript
             EventMap events;
             bool started, fight;
 
-            void Reset()
+            void Reset() override
             {
                 if (!summons.empty())
                 {
@@ -87,7 +87,7 @@ class npc_captain_saeed : public CreatureScript
                 me->RestoreFaction();
             }
 
-            void MoveInLineOfSight(Unit* who)
+            void MoveInLineOfSight(Unit* who) override
             {
                 if (Player* player = GetPlayerForEscort())
                     if (me->GetDistance(who) < 10.0f && !me->GetVictim())
@@ -100,7 +100,7 @@ class npc_captain_saeed : public CreatureScript
                 npc_escortAI::MoveInLineOfSight(who);
             }
 
-            void SetGUID(uint64 playerGUID, int32 type)
+            void SetGUID(uint64 playerGUID, int32 type) override
             {
                 if (type == DATA_START_ENCOUNTER)
                 {
@@ -137,7 +137,7 @@ class npc_captain_saeed : public CreatureScript
                 }
             }
 
-            void EnterEvadeMode()
+            void EnterEvadeMode() override
             {
                 if (fight)
                     SetEscortPaused(false);
@@ -146,7 +146,7 @@ class npc_captain_saeed : public CreatureScript
                 npc_escortAI::EnterEvadeMode();
             }
 
-            void SummonsAction(Unit* who)
+            void SummonsAction(Unit* who) override
             {
                 float i = 0;
                 for (std::list<uint64>::iterator itr = summons.begin(); itr != summons.end(); ++itr, i += 1.0f)
@@ -165,7 +165,7 @@ class npc_captain_saeed : public CreatureScript
                     }
             }
 
-            void WaypointReached(uint32 i)
+            void WaypointReached(uint32 i) override
             {
                 Player* player = GetPlayerForEscort();
                 if (!player)
@@ -188,12 +188,12 @@ class npc_captain_saeed : public CreatureScript
                 }
             }
 
-            void EnterCombat(Unit* who)
+            void EnterCombat(Unit* who) override
             {
                 SummonsAction(who);
             }
 
-            void JustDied(Unit* /*killer*/)
+            void JustDied(Unit* /*killer*/) override
             {
                 Player* player = GetPlayerForEscort();
                 if (player)
@@ -202,12 +202,12 @@ class npc_captain_saeed : public CreatureScript
                 summons.DespawnAll();
             }
 
-            void CorpseRemoved(uint32&)
+            void CorpseRemoved(uint32&) override
             {
                 summons.DespawnAll();
             }
 
-            uint32 GetData(uint32 data) const
+            uint32 GetData(uint32 data) const override
             {
                 if (data == 1)
                     return (uint32)started;
@@ -215,7 +215,7 @@ class npc_captain_saeed : public CreatureScript
                 return 0;
             }
 
-            void UpdateAI(uint32 diff)
+            void UpdateAI(uint32 diff) override
             {
                 npc_escortAI::UpdateAI(diff);
 
@@ -248,10 +248,9 @@ class npc_captain_saeed : public CreatureScript
             }
         };
 
-
-        bool OnGossipSelect(Player* player, Creature* creature, uint32 /*uiSender*/, uint32 uiAction)
+        bool OnGossipSelect(Player* player, Creature* creature, uint32 /*uiSender*/, uint32 uiAction) override
         {
-            player->PlayerTalkClass->ClearMenus();
+            ClearGossipMenuFor(player);
             if (uiAction == GOSSIP_ACTION_INFO_DEF+1)
             {
                 creature->AI()->SetGUID(player->GetGUID(), DATA_START_ENCOUNTER);
@@ -262,11 +261,11 @@ class npc_captain_saeed : public CreatureScript
                 creature->AI()->SetGUID(player->GetGUID(), DATA_START_FIGHT);
             }
 
-            player->CLOSE_GOSSIP_MENU();
+            CloseGossipMenuFor(player);
             return true;
         }
 
-        bool OnGossipHello(Player* player, Creature* creature)
+        bool OnGossipHello(Player* player, Creature* creature) override
         {
             if (creature->IsQuestGiver())
                 player->PrepareQuestMenu(creature->GetGUID());
@@ -274,12 +273,12 @@ class npc_captain_saeed : public CreatureScript
             if (player->GetQuestStatus(QUEST_DIMENSIUS_DEVOURING) == QUEST_STATUS_INCOMPLETE)
             {
                 if (!creature->AI()->GetData(1))
-                    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Let's move out.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
+                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Let's move out.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
                 else
-                    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Let's start the battle.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+2);
+                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Let's start the battle.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+2);
             }
 
-            player->SEND_GOSSIP_MENU(player->GetGossipTextId(creature), creature->GetGUID());
+            SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
 
             return true;
         }
@@ -603,27 +602,27 @@ public:
     //if (quest->GetQuestId() == QUEST_DIMENSIUS)
         //creature->AI()->Talk(WHISPER_DABIRI, player);
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action)
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
     {
-        player->PlayerTalkClass->ClearMenus();
+        ClearGossipMenuFor(player);
         if (action == GOSSIP_ACTION_INFO_DEF+1)
         {
             creature->CastSpell(player, SPELL_PHASE_DISTRUPTOR, false);
-            player->CLOSE_GOSSIP_MENU();
+            CloseGossipMenuFor(player);
         }
 
         return true;
     }
 
-    bool OnGossipHello(Player* player, Creature* creature)
+    bool OnGossipHello(Player* player, Creature* creature) override
     {
         if (creature->IsQuestGiver())
             player->PrepareQuestMenu(creature->GetGUID());
 
         if (player->GetQuestStatus(QUEST_ON_NETHERY_WINGS) == QUEST_STATUS_INCOMPLETE && !player->HasItemCount(29778))
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
 
-        player->SEND_GOSSIP_MENU(player->GetGossipTextId(creature), creature->GetGUID());
+        SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
 
         return true;
     }

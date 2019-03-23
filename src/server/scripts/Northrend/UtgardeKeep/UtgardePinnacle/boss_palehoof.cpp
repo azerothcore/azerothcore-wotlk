@@ -118,7 +118,7 @@ public:
         uint8 Counter;
         uint8 RandomUnfreeze[4];
 
-        void Reset() 
+        void Reset()
         {
             for (uint8 i = 0; i < 4; ++i)
             {
@@ -137,7 +137,7 @@ public:
                 }
                 while (!good);
             }
-            
+
             events.Reset();
             summons.DoAction(ACTION_DESPAWN_ADDS);
             summons.DespawnAll();
@@ -306,7 +306,7 @@ public:
                     break;
                 }
             }
-        
+
             DoMeleeAttackIfReady();
         }
 
@@ -352,7 +352,7 @@ public:
         EventMap events;
         SummonList summons;
 
-        void Reset() 
+        void Reset()
         {
             summons.DespawnAll();
             events.Reset();
@@ -444,9 +444,9 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit*  /*pKiller*/) 
+        void JustDied(Unit*  /*pKiller*/)
         {
-            if (m_pInstance) 
+            if (m_pInstance)
             {
                 if (Creature *palehoof = ObjectAccessor::GetCreature(*me, m_pInstance->GetData64(DATA_GORTOK_PALEHOOF)))
                     palehoof->AI()->DoAction(ACTION_MINIBOSS_DIED);
@@ -479,7 +479,7 @@ public:
         InstanceScript *m_pInstance;
         EventMap events;
 
-        void Reset() 
+        void Reset()
         {
             events.Reset();
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE);
@@ -554,9 +554,9 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit*  /*pKiller*/) 
+        void JustDied(Unit*  /*pKiller*/)
         {
-            if (m_pInstance) 
+            if (m_pInstance)
             {
                 if (Creature *palehoof = ObjectAccessor::GetCreature(*me, m_pInstance->GetData64(DATA_GORTOK_PALEHOOF)))
                     palehoof->AI()->DoAction(ACTION_MINIBOSS_DIED);
@@ -581,7 +581,7 @@ public:
 
     struct npc_ravenous_furbolgAI : public ScriptedAI
     {
-        npc_ravenous_furbolgAI(Creature* pCreature) : ScriptedAI(pCreature) 
+        npc_ravenous_furbolgAI(Creature* pCreature) : ScriptedAI(pCreature)
         {
             m_pInstance = pCreature->GetInstanceScript();
         }
@@ -589,7 +589,7 @@ public:
         InstanceScript *m_pInstance;
         EventMap events;
 
-        void Reset() 
+        void Reset()
         {
             events.Reset();
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE);
@@ -662,9 +662,9 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit*  /*pKiller*/) 
+        void JustDied(Unit*  /*pKiller*/)
         {
-            if (m_pInstance) 
+            if (m_pInstance)
             {
                 if (Creature *palehoof = ObjectAccessor::GetCreature(*me, m_pInstance->GetData64(DATA_GORTOK_PALEHOOF)))
                     palehoof->AI()->DoAction(ACTION_MINIBOSS_DIED);
@@ -689,7 +689,7 @@ public:
 
     struct npc_frenzied_worgenAI : public ScriptedAI
     {
-        npc_frenzied_worgenAI(Creature* pCreature) : ScriptedAI(pCreature) 
+        npc_frenzied_worgenAI(Creature* pCreature) : ScriptedAI(pCreature)
         {
             m_pInstance = pCreature->GetInstanceScript();
         }
@@ -697,7 +697,7 @@ public:
         InstanceScript *m_pInstance;
         EventMap events;
 
-        void Reset() 
+        void Reset()
         {
             events.Reset();
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE);
@@ -770,9 +770,9 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit*  /*pKiller*/) 
+        void JustDied(Unit*  /*pKiller*/)
         {
-            if (m_pInstance) 
+            if (m_pInstance)
             {
                 if (Creature *palehoof = ObjectAccessor::GetCreature(*me, m_pInstance->GetData64(DATA_GORTOK_PALEHOOF)))
                     palehoof->AI()->DoAction(ACTION_MINIBOSS_DIED);
@@ -782,20 +782,20 @@ public:
 };
 
 class go_palehoof_sphere : public GameObjectScript
-{ 
-public: 
-    go_palehoof_sphere() : GameObjectScript("go_palehoof_sphere") { } 
+{
+public:
+    go_palehoof_sphere() : GameObjectScript("go_palehoof_sphere") { }
 
-    bool OnGossipHello(Player * /*pPlayer*/, GameObject *pGO)
+    bool OnGossipHello(Player * /*pPlayer*/, GameObject *go) override
     {
-        InstanceScript *pInstance = pGO->GetInstanceScript();
+        InstanceScript *pInstance = go->GetInstanceScript();
 
-        Creature *pPalehoof = ObjectAccessor::GetCreature(*pGO, pInstance ? pInstance->GetData64(DATA_GORTOK_PALEHOOF) : 0);
+        Creature *pPalehoof = ObjectAccessor::GetCreature(*go, pInstance ? pInstance->GetData64(DATA_GORTOK_PALEHOOF) : 0);
         if (pPalehoof && pPalehoof->IsAlive())
         {
             // maybe these are hacks :(
-            pGO->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
-            pGO->SetGoState(GO_STATE_ACTIVE);
+            go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+            go->SetGoState(GO_STATE_ACTIVE);
 
             pPalehoof->AI()->DoAction(ACTION_START_EVENT);
         }
