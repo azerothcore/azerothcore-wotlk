@@ -232,7 +232,7 @@ public:
         bool startWarning;
         bool finishWarning;
 
-        uint32 GetData(uint32 type) const
+        uint32 GetData(uint32 type) const override
         {
             if (type == DATA_ANGLER_FINISHED)
                 return (uint32)finished;
