@@ -194,7 +194,7 @@ public:
             }
         }
 
-        void Talk(uint32 count) override
+        void Talk(uint32 count)
         {
             int32 text = 0;
 
