@@ -1836,7 +1836,6 @@ public:
     {
         npc_pet_trainerAI(Creature* creature) : ScriptedAI(creature) { }
 
-
         void sGossipSelect(Player* player, uint32 menuId, uint32 gossipListId) override
         {
             if (menuId == PET_UNLEARN && gossipListId == YES_PLEASE_DO)
