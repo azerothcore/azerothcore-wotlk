@@ -787,7 +787,7 @@ public:
         return true;
     }
 
-    void SendActionMenu(Player* player, GameObject* /*go*/, uint32 action) override
+    void SendActionMenu(Player* player, GameObject* /*go*/, uint32 action)
     {
         switch (action)
         {
