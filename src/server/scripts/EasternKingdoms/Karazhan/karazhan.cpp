@@ -149,7 +149,7 @@ public:
             m_uiEventId = instance->GetData(DATA_OPERA_PERFORMANCE);
         }
 
-        void StartEvent() override
+        void StartEvent()
         {
             instance->SetBossState(DATA_OPERA_PERFORMANCE, IN_PROGRESS);
 
