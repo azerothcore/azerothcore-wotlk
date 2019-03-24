@@ -7,19 +7,19 @@
 #ifndef LOCKEDQUEUE_H
 #define LOCKEDQUEUE_H
 
-#include <ace/Guard_T.h>
-#include <ace/Thread_Mutex.h>
 #include <deque>
 #include <assert.h>
+#include <mutex>
 #include "Debugging/Errors.h"
+#include "Policies/Lock.h"
 
-namespace ACE_Based
+namespace ACORE
 {
-    template <class T, class LockType, typename StorageType=std::deque<T> >
+    template <class T, typename StorageType=std::deque<T> >
         class LockedQueue
     {
         //! Lock access to the queue.
-        LockType _lock;
+        std::mutex _lock;
 
         //! Storage backing the queue.
         StorageType _queue;
@@ -56,8 +56,7 @@ namespace ACE_Based
             //! Gets the next result in the queue, if any.
             bool next(T& result)
             {
-               // ACE_Guard<LockType> g(this->_lock);
-                ACE_GUARD_RETURN (LockType, g, this->_lock, false);
+                GUARD_RETURN(_lock, false);
 
                 if (_queue.empty())
                     return false;
@@ -73,7 +72,7 @@ namespace ACE_Based
             template<class Checker>
             bool next(T& result, Checker& check)
             {
-                ACE_Guard<LockType> g(this->_lock);
+                std::lock_guard<decltype(_lock)> g(_lock);
 
                 if (_queue.empty())
                     return false;
@@ -112,33 +111,33 @@ namespace ACE_Based
             //! Checks if the queue is cancelled.
             bool cancelled()
             {
-                ACE_Guard<LockType> g(this->_lock);
+                std::lock_guard<decltype(_lock)> g(_lock);
                 return _canceled;
             }
 
             //! Locks the queue for access.
             void lock()
             {
-                this->_lock.acquire();
+                _lock.lock();
             }
 
             //! Unlocks the queue.
             void unlock()
             {
-                this->_lock.release();
+                _lock.unlock();
             }
 
             ///! Calls pop_front of the queue
             void pop_front()
             {
-                ACE_GUARD (LockType, g, this->_lock);
+                std::lock_guard<decltype(_lock)> g(_lock);
                 _queue.pop_front();
             }
 
             ///! Checks if we're empty or not with locks held
             bool empty()
             {
-                ACE_GUARD_RETURN (LockType, g, this->_lock, false);
+                GUARD_RETURN(_lock, false);
                 return _queue.empty();
             }
     };

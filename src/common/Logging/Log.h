@@ -8,6 +8,8 @@
 #define AZEROTHCORE_LOG_H
 
 #include "Common.h"
+#include <mutex>
+#include "Policies/Singleton.h"
 #include <ace/Task.h>
 #include <ace/Singleton.h>
 
@@ -96,7 +98,7 @@ const int Colors = int(WHITE)+1;
 
 class Log
 {
-    friend class ACE_Singleton<Log, ACE_Thread_Mutex>;
+    friend class ACE_Singleton<Log, std::mutex>;
 
     private:
         Log();
@@ -194,7 +196,7 @@ class Log
         DebugLogFilters m_DebugLogMask;
 };
 
-#define sLog ACE_Singleton<Log, ACE_Thread_Mutex>::instance()
+#define sLog ACE_Singleton<Log, std::mutex>::instance()
 
 #endif
 

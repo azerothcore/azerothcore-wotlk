@@ -14,7 +14,6 @@
 #include "Common.h"
 #include "Timer.h"
 #include <ace/Singleton.h>
-#include <ace/Atomic_Op.h>
 #include "SharedDefines.h"
 #include "QueryResult.h"
 #include "Callback.h"
@@ -22,6 +21,7 @@
 #include <map>
 #include <set>
 #include <list>
+#include <atomic>
 
 class Object;
 class WorldPacket;
@@ -805,7 +805,7 @@ class World
         void ResetRandomBG();
         void ResetGuildCap();
     private:
-        static ACE_Atomic_Op<ACE_Thread_Mutex, bool> m_stopEvent;
+        static std::atomic_bool m_stopEvent;
         static uint8 m_ExitCode;
         uint32 m_ShutdownTimer;
         uint32 m_ShutdownMask;
@@ -858,7 +858,7 @@ class World
         std::string _realmName;
 
         // CLI command holder to be thread safe
-        ACE_Based::LockedQueue<CliCommandHolder*, ACE_Thread_Mutex> cliCmdQueue;
+        ACORE::LockedQueue<CliCommandHolder*, std::mutex> cliCmdQueue;
 
         // next daily quests and random bg reset time
         time_t m_NextDailyQuestReset;
@@ -872,7 +872,7 @@ class World
 
         // sessions that are added async
         void AddSession_(WorldSession* s);
-        ACE_Based::LockedQueue<WorldSession*, ACE_Thread_Mutex> addSessQueue;
+        ACORE::LockedQueue<WorldSession*, std::mutex> addSessQueue;
 
         // used versions
         std::string m_DBVersion;
