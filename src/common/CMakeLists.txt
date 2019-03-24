@@ -74,7 +74,6 @@ include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/Threading
   ${CMAKE_CURRENT_SOURCE_DIR}/Utilities
   ${CMAKE_SOURCE_DIR}/src/server/game/Entities/Object
-  ${ACE_INCLUDE_DIR}
   ${MYSQL_INCLUDE_DIR}
   ${OPENSSL_INCLUDE_DIR}
 )
@@ -85,10 +84,6 @@ GroupSources(${CMAKE_CURRENT_SOURCE_DIR})
 add_library(shared STATIC
   ${shared_STAT_SRCS}
   ${shared_STAT_PCH_SRC}
-)
-
-target_link_libraries(shared
-  ${ACE_LIBRARY}
 )
 
 # Generate precompiled header

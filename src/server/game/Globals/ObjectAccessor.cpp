@@ -208,7 +208,7 @@ void ObjectAccessor::SaveAllPlayers()
 
 Corpse* ObjectAccessor::GetCorpseForPlayerGUID(uint64 guid)
 {
-    TRINITY_READ_GUARD(ACE_RW_Thread_Mutex, i_corpseLock);
+    TRINITY_READ_GUARD(std::mutex, i_corpseLock);
 
     Player2CorpsesMapType::iterator iter = i_player2corpse.find(guid);
     if (iter == i_player2corpse.end())
@@ -225,7 +225,7 @@ void ObjectAccessor::RemoveCorpse(Corpse* corpse, bool final)
 
     if (!final)
     {
-        TRINITY_WRITE_GUARD(ACE_RW_Thread_Mutex, i_corpseLock);
+        TRINITY_WRITE_GUARD(std::mutex, i_corpseLock);
         Player2CorpsesMapType::iterator iter = i_player2corpse.find(corpse->GetOwnerGUID());
         if (iter == i_player2corpse.end())
             return;
@@ -252,7 +252,7 @@ void ObjectAccessor::RemoveCorpse(Corpse* corpse, bool final)
 
     // Critical section
     {
-        TRINITY_WRITE_GUARD(ACE_RW_Thread_Mutex, i_corpseLock);
+        TRINITY_WRITE_GUARD(std::mutex, i_corpseLock);
 
         // build mapid*cellid -> guid_set map
         CellCoord cellCoord = Trinity::ComputeCellCoord(corpse->GetPositionX(), corpse->GetPositionY());
@@ -268,7 +268,7 @@ void ObjectAccessor::AddCorpse(Corpse* corpse)
 
     // Critical section
     {
-        TRINITY_WRITE_GUARD(ACE_RW_Thread_Mutex, i_corpseLock);
+        TRINITY_WRITE_GUARD(std::mutex, i_corpseLock);
 
         ASSERT(i_player2corpse.find(corpse->GetOwnerGUID()) == i_player2corpse.end());
         i_player2corpse[corpse->GetOwnerGUID()] = corpse;
@@ -281,7 +281,7 @@ void ObjectAccessor::AddCorpse(Corpse* corpse)
 
 void ObjectAccessor::AddCorpsesToGrid(GridCoord const& gridpair, GridType& grid, Map* map)
 {
-    TRINITY_READ_GUARD(ACE_RW_Thread_Mutex, i_corpseLock);
+    TRINITY_READ_GUARD(std::mutex, i_corpseLock);
 
     for (Player2CorpsesMapType::iterator iter = i_player2corpse.begin(); iter != i_player2corpse.end(); ++iter)
     {
@@ -369,7 +369,7 @@ Corpse* ObjectAccessor::ConvertCorpseForPlayer(uint64 player_guid, bool insignia
         }
 
         // pussywizard: for deleting bones
-        TRINITY_WRITE_GUARD(ACE_RW_Thread_Mutex, i_corpseLock);
+        TRINITY_WRITE_GUARD(std::mutex, i_corpseLock);
         i_playerBones.push_back(bones->GetGUID());
     }
 
@@ -396,7 +396,7 @@ void ObjectAccessor::RemoveOldCorpses()
 
     // pussywizard: for deleting bones
     std::list<uint64>::iterator next2;
-    TRINITY_WRITE_GUARD(ACE_RW_Thread_Mutex, i_corpseLock);
+    TRINITY_WRITE_GUARD(std::mutex, i_corpseLock);
     for (std::list<uint64>::iterator itr = i_playerBones.begin(); itr != i_playerBones.end(); itr = next2)
     {
         next2 = itr;

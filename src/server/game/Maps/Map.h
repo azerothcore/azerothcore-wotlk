@@ -330,7 +330,7 @@ class Map : public GridRefManager<NGridType>
         Map const* GetParent() const { return m_parentMap; }
 
         // pussywizard: movemaps, mmaps
-        ACE_RW_Thread_Mutex& GetMMapLock() const { return *(const_cast<ACE_RW_Thread_Mutex*>(&MMapLock)); }
+        std::mutex& GetMMapLock() const { return *(const_cast<std::mutex*>(&MMapLock)); }
         // pussywizard:
         UNORDERED_SET<Object*> i_objectsToUpdate;
         void BuildAndSendUpdateForObjects(); // definition in ObjectAccessor.cpp, below ObjectAccessor::Update, because it does the same for a map
@@ -561,7 +561,7 @@ class Map : public GridRefManager<NGridType>
 
         std::mutex Lock;
         std::mutex GridLock;
-        ACE_RW_Thread_Mutex MMapLock;
+        std::mutex MMapLock;
 
         MapEntry const* i_mapEntry;
         uint8 i_spawnMode;
