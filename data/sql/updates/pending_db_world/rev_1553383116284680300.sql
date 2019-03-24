@@ -60,6 +60,7 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES (20547900, 8, -816.032, -584.642, 15.1528, 0, 0, 0, 0, 100, 0);
 
 -- Guard 3
+DELETE FROM `creature` WHERE `guid` =2054758;
 INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES (2054758, 2386, 0, 0, 0, 1, 1, 0, 1, -851.274, -514.767, 12.3157, 4.75353, 300, 0, 0, 2310, 0, 2, 0, 0, 0, '', 0);
 
 INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `auras`) VALUES (2054758, 20547580, 0, 0, 0, 0, NULL);
