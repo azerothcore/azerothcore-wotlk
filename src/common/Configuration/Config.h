@@ -55,7 +55,7 @@ private:
     bool GetValueHelper(const char* name, ACE_TString &result);
     bool LoadData(char const* file);
 
-    typedef ACE_Thread_Mutex LockType;
+    typedef std::mutex LockType;
     typedef ACE_Guard<LockType> GuardType;
 
     std::vector<std::string> _confFiles;

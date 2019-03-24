@@ -91,14 +91,14 @@ class InstanceSave
         std::string m_instanceData;
         uint32 m_completedEncounterMask;
 
-        ACE_Thread_Mutex _lock;
+        std::mutex _lock;
 };
 
 typedef UNORDERED_MAP<uint32 /*PAIR32(map, difficulty)*/, time_t /*resetTime*/> ResetTimeByMapDifficultyMap;
 
 class InstanceSaveManager
 {
-    friend class ACE_Singleton<InstanceSaveManager, ACE_Thread_Mutex>;
+    friend class ACE_Singleton<InstanceSaveManager, std::mutex>;
     friend class InstanceSave;
 
     private:
@@ -189,5 +189,5 @@ class InstanceSaveManager
         ResetTimeQueue m_resetTimeQueue;
 };
 
-#define sInstanceSaveMgr ACE_Singleton<InstanceSaveManager, ACE_Thread_Mutex>::instance()
+#define sInstanceSaveMgr ACE_Singleton<InstanceSaveManager, std::mutex>::instance()
 #endif

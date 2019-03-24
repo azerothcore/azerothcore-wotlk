@@ -89,7 +89,7 @@ typedef std::map<uint32, TransportAnimation> TransportAnimationContainer;
 
 class TransportMgr
 {
-        friend class ACE_Singleton<TransportMgr, ACE_Thread_Mutex>;
+        friend class ACE_Singleton<TransportMgr, std::mutex>;
         friend void LoadDBCStores(std::string const&);
 
     public:
@@ -148,6 +148,6 @@ class TransportMgr
         TransportAnimationContainer _transportAnimations;
 };
 
-#define sTransportMgr ACE_Singleton<TransportMgr, ACE_Thread_Mutex>::instance()
+#define sTransportMgr ACE_Singleton<TransportMgr, std::mutex>::instance()
 
 #endif // TRANSPORTMGR_H

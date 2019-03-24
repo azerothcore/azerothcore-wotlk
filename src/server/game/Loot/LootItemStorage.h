@@ -30,7 +30,7 @@ typedef UNORDERED_MAP<uint32, StoredLootItemList> LootItemContainer;
 
 class LootItemStorage
 {
-    friend class ACE_Singleton<LootItemStorage, ACE_Thread_Mutex>;
+    friend class ACE_Singleton<LootItemStorage, std::mutex>;
 
     private:
         LootItemStorage();
@@ -51,5 +51,5 @@ class LootItemStorage
         LootItemContainer lootItemStore;
 };
 
-#define sLootItemStorage ACE_Singleton<LootItemStorage, ACE_Thread_Mutex>::instance()
+#define sLootItemStorage ACE_Singleton<LootItemStorage, std::mutex>::instance()
 #endif

@@ -7,7 +7,7 @@
 
 DelayExecutor* DelayExecutor::instance()
 {
-    return ACE_Singleton<DelayExecutor, ACE_Thread_Mutex>::instance();
+    return ACE_Singleton<DelayExecutor, std::mutex>::instance();
 }
 
 DelayExecutor::DelayExecutor()

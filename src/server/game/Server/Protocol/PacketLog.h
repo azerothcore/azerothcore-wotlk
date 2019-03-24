@@ -20,7 +20,7 @@ class WorldPacket;
 
 class PacketLog
 {
-    friend class ACE_Singleton<PacketLog, ACE_Thread_Mutex>;
+    friend class ACE_Singleton<PacketLog, std::mutex>;
 
     private:
         PacketLog();
@@ -35,5 +35,5 @@ class PacketLog
         FILE* _file;
 };
 
-#define sPacketLog ACE_Singleton<PacketLog, ACE_Thread_Mutex>::instance()
+#define sPacketLog ACE_Singleton<PacketLog, std::mutex>::instance()
 #endif

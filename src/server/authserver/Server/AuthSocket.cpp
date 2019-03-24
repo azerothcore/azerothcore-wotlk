@@ -300,7 +300,7 @@ void AuthSocket::_SetVSFields(const std::string& rI)
 
 std::map<std::string, uint32> LastLoginAttemptTimeForIP;
 uint32 LastLoginAttemptCleanTime = 0;
-ACE_Thread_Mutex LastLoginAttemptMutex;
+std::mutex LastLoginAttemptMutex;
 
 // Logon Challenge command handler
 bool AuthSocket::_HandleLogonChallenge()
@@ -316,7 +316,7 @@ bool AuthSocket::_HandleLogonChallenge()
 
     // pussywizard: logon flood protection:
     {
-        TRINITY_GUARD(ACE_Thread_Mutex, LastLoginAttemptMutex);
+        TRINITY_GUARD(std::mutex, LastLoginAttemptMutex);
         std::string ipaddr = socket().getRemoteAddress();
         uint32 currTime = time(NULL);
         std::map<std::string, uint32>::iterator itr = LastLoginAttemptTimeForIP.find(ipaddr);

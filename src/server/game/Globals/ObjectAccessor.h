@@ -230,7 +230,7 @@ class ObjectAccessor
         //non-static functions
         void AddUpdateObject(Object* obj)
         {
-            TRINITY_GUARD(ACE_Thread_Mutex, i_objectLock);
+            TRINITY_GUARD(std::mutex, i_objectLock);
             if (obj->GetTypeId() < TYPEID_UNIT) // these are not in map: TYPEID_OBJECT, TYPEID_ITEM, TYPEID_CONTAINER
                 i_objects.insert(obj);
             else
@@ -239,7 +239,7 @@ class ObjectAccessor
 
         void RemoveUpdateObject(Object* obj)
         {
-            TRINITY_GUARD(ACE_Thread_Mutex, i_objectLock);
+            TRINITY_GUARD(std::mutex, i_objectLock);
             if (obj->GetTypeId() < TYPEID_UNIT) // these are not in map: TYPEID_OBJECT, TYPEID_ITEM, TYPEID_CONTAINER
                 i_objects.erase(obj);
             else
@@ -274,10 +274,10 @@ class ObjectAccessor
         Player2CorpsesMapType i_player2corpse;
         std::list<uint64> i_playerBones;
 
-        ACE_Thread_Mutex i_objectLock;
+        std::mutex i_objectLock;
         ACE_RW_Thread_Mutex i_corpseLock;
         std::list<DelayedCorpseAction> i_delayedCorpseActions;
-        mutable ACE_Thread_Mutex DelayedCorpseLock;
+        mutable std::mutex DelayedCorpseLock;
 };
 
 #define sObjectAccessor ACE_Singleton<ObjectAccessor, ACE_Null_Mutex>::instance()

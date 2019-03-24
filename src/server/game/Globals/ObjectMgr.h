@@ -1332,19 +1332,19 @@ class ObjectMgr
         uint32 _auctionId; // pussywizard: accessed by a single thread
         uint64 _equipmentSetGuid; // pussywizard: accessed by a single thread
         uint32 _itemTextId; // pussywizard: unused? xD
-        uint32 _mailId; ACE_Thread_Mutex _mailIdMutex;
-        uint32 _hiPetNumber; ACE_Thread_Mutex _hiPetNumberMutex;
+        uint32 _mailId; std::mutex _mailIdMutex;
+        uint32 _hiPetNumber; std::mutex _hiPetNumberMutex;
 
         // first free low guid for selected guid type
         uint32 _hiCharGuid; // pussywizard: accessed by a single thread
-        uint32 _hiCreatureGuid; ACE_Thread_Mutex _hiCreatureGuidMutex;
-        uint32 _hiPetGuid; ACE_Thread_Mutex _hiPetGuidMutex;
-        uint32 _hiVehicleGuid; ACE_Thread_Mutex _hiVehicleGuidMutex;
-        uint32 _hiItemGuid; ACE_Thread_Mutex _hiItemGuidMutex;
-        uint32 _hiGoGuid; ACE_Thread_Mutex _hiGoGuidMutex;
-        uint32 _hiDoGuid; ACE_Thread_Mutex _hiDoGuidMutex;
-        uint32 _hiCorpseGuid; ACE_Thread_Mutex _hiCorpseGuidMutex;
-        uint32 _hiMoTransGuid; ACE_Thread_Mutex _hiMoTransGuidMutex;
+        uint32 _hiCreatureGuid; std::mutex _hiCreatureGuidMutex;
+        uint32 _hiPetGuid; std::mutex _hiPetGuidMutex;
+        uint32 _hiVehicleGuid; std::mutex _hiVehicleGuidMutex;
+        uint32 _hiItemGuid; std::mutex _hiItemGuidMutex;
+        uint32 _hiGoGuid; std::mutex _hiGoGuidMutex;
+        uint32 _hiDoGuid; std::mutex _hiDoGuidMutex;
+        uint32 _hiCorpseGuid; std::mutex _hiCorpseGuidMutex;
+        uint32 _hiMoTransGuid; std::mutex _hiMoTransGuidMutex;
 
         QuestMap _questTemplates;
         std::vector<Quest*> _questTemplatesFast; // pussywizard

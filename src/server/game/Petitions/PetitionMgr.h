@@ -29,7 +29,7 @@ typedef std::map<uint32, Petition> PetitionContainer;
 
 class PetitionMgr
 {
-    friend class ACE_Singleton<PetitionMgr, ACE_Thread_Mutex>;
+    friend class ACE_Singleton<PetitionMgr, std::mutex>;
 
     private:
         PetitionMgr();
@@ -59,5 +59,5 @@ class PetitionMgr
         SignatureContainer SignatureStore;
 };
 
-#define sPetitionMgr ACE_Singleton<PetitionMgr, ACE_Thread_Mutex>::instance()
+#define sPetitionMgr ACE_Singleton<PetitionMgr, std::mutex>::instance()
 #endif

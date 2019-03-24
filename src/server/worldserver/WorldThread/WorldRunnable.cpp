@@ -97,10 +97,10 @@ void AuctionListingRunnable::run()
 
             if (AsyncAuctionListingMgr::GetTempList().size() || AsyncAuctionListingMgr::GetList().size())
             {
-                TRINITY_GUARD(ACE_Thread_Mutex, AsyncAuctionListingMgr::GetLock());
+                TRINITY_GUARD(std::mutex, AsyncAuctionListingMgr::GetLock());
 
                 {
-                    TRINITY_GUARD(ACE_Thread_Mutex, AsyncAuctionListingMgr::GetTempLock());
+                    TRINITY_GUARD(std::mutex, AsyncAuctionListingMgr::GetTempLock());
                     for (std::list<AuctionListItemsDelayEvent>::iterator itr = AsyncAuctionListingMgr::GetTempList().begin(); itr != AsyncAuctionListingMgr::GetTempList().end(); ++itr)
                         AsyncAuctionListingMgr::GetList().push_back( (*itr) );
                     AsyncAuctionListingMgr::GetTempList().clear();

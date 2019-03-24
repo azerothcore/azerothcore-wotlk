@@ -35,7 +35,7 @@ public:
 protected:
     void InitializeDBC();
 private:
-    ACE_Thread_Mutex mutex;
+    std::mutex mutex;
 };
 
 extern MPQManager* MPQHandler;

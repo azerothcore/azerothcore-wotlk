@@ -81,7 +81,7 @@ class WorldSocket : public WorldHandler
         friend class WorldSocketMgr;
 
         /// Mutex type used for various synchronizations.
-        typedef ACE_Thread_Mutex LockType;
+        typedef std::mutex LockType;
         typedef ACE_Guard<LockType> GuardType;
 
         /// Check if socket is closed.

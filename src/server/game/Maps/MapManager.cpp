@@ -63,7 +63,7 @@ Map* MapManager::CreateBaseMap(uint32 id)
 
     if (map == NULL)
     {
-        TRINITY_GUARD(ACE_Thread_Mutex, Lock);
+        TRINITY_GUARD(std::mutex, Lock);
 
         map = FindBaseMap(id);
         if (map == NULL) // pussywizard: check again after acquiring mutex

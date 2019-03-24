@@ -22,7 +22,7 @@ struct TransportCreatureProto;
 
 class MapManager
 {
-    friend class ACE_Singleton<MapManager, ACE_Thread_Mutex>;
+    friend class ACE_Singleton<MapManager, std::mutex>;
 
     public:
         Map* CreateBaseMap(uint32 mapId);
@@ -131,7 +131,7 @@ class MapManager
         MapManager(const MapManager &);
         MapManager& operator=(const MapManager &);
 
-        ACE_Thread_Mutex Lock;
+        std::mutex Lock;
         MapMapType i_maps;
         IntervalTimer i_timer[4]; // continents, bgs/arenas, instances, total from the beginning
         uint8 mapUpdateStep;
@@ -140,5 +140,5 @@ class MapManager
         uint32 _nextInstanceId;
         MapUpdater m_updater;
 };
-#define sMapMgr ACE_Singleton<MapManager, ACE_Thread_Mutex>::instance()
+#define sMapMgr ACE_Singleton<MapManager, std::mutex>::instance()
 #endif

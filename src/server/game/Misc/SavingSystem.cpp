@@ -5,7 +5,7 @@ uint32 SavingSystemMgr::m_savingCurrentValue = 0;
 uint32 SavingSystemMgr::m_savingMaxValueAssigned = 0;
 uint32 SavingSystemMgr::m_savingDiffSum = 0;
 std::list<uint32> SavingSystemMgr::m_savingSkipList;
-ACE_Thread_Mutex SavingSystemMgr::_savingLock;
+std::mutex SavingSystemMgr::_savingLock;
 
 void SavingSystemMgr::Update(uint32 diff)
 {

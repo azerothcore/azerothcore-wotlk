@@ -105,7 +105,7 @@ int MapUpdater::deactivate()
 
 int MapUpdater::wait()
 {
-    TRINITY_GUARD(ACE_Thread_Mutex, m_mutex);
+    TRINITY_GUARD(std::mutex, m_mutex);
 
     while (pending_requests > 0)
         m_condition.wait();
@@ -115,7 +115,7 @@ int MapUpdater::wait()
 
 int MapUpdater::schedule_update(Map& map, ACE_UINT32 diff, ACE_UINT32 s_diff)
 {
-    TRINITY_GUARD(ACE_Thread_Mutex, m_mutex);
+    TRINITY_GUARD(std::mutex, m_mutex);
 
     ++pending_requests;
 
@@ -132,7 +132,7 @@ int MapUpdater::schedule_update(Map& map, ACE_UINT32 diff, ACE_UINT32 s_diff)
 
 int MapUpdater::schedule_lfg_update(ACE_UINT32 diff)
 {
-    TRINITY_GUARD(ACE_Thread_Mutex, m_mutex);
+    TRINITY_GUARD(std::mutex, m_mutex);
 
     ++pending_requests;
 
@@ -154,7 +154,7 @@ bool MapUpdater::activated()
 
 void MapUpdater::update_finished()
 {
-    TRINITY_GUARD(ACE_Thread_Mutex, m_mutex);
+    TRINITY_GUARD(std::mutex, m_mutex);
 
     if (pending_requests == 0)
     {

@@ -559,8 +559,8 @@ class Map : public GridRefManager<NGridType>
 
     protected:
 
-        ACE_Thread_Mutex Lock;
-        ACE_Thread_Mutex GridLock;
+        std::mutex Lock;
+        std::mutex GridLock;
         ACE_RW_Thread_Mutex MMapLock;
 
         MapEntry const* i_mapEntry;
