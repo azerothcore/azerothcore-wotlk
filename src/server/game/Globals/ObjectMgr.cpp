@@ -4607,8 +4607,8 @@ void ObjectMgr::LoadQuestLocales()
         AddLocaleString(fields[2].GetString(), locale, data.Title);
         AddLocaleString(fields[3].GetString(), locale, data.Details);
         AddLocaleString(fields[4].GetString(), locale, data.Objectives);
-        AddLocaleString(fields[7].GetString(), locale, data.AreaDescription);
-        AddLocaleString(fields[8].GetString(), locale, data.CompletedText);
+        AddLocaleString(fields[5].GetString(), locale, data.AreaDescription);
+        AddLocaleString(fields[6].GetString(), locale, data.CompletedText);
 
         for (uint8 i = 0; i < 4; ++i)
             AddLocaleString(fields[i + 7].GetString(), locale, data.ObjectiveText[i]);
