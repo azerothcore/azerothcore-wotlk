@@ -240,7 +240,7 @@ public:
         bool TalkEvent;
         uint32 SpeechCount, SpeechPause;
 
-        void DespawnHeads() override
+        void DespawnHeads()
         {
             Creature *cr;
             if ((cr = GetAbedneum())) cr->DespawnOrUnsummon();
