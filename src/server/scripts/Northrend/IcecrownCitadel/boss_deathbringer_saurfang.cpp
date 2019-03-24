@@ -777,14 +777,14 @@ class npc_muradin_bronzebeard_icc : public CreatureScript
                 _instance = me->GetInstanceScript();
             }
 
-            void Reset()
+            void Reset() override
             {
                 _events.Reset();
                 me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
                 me->SetReactState(REACT_PASSIVE);
             }
 
-            void DoAction(int32 action)
+            void DoAction(int32 action) override
             {
                 switch (action)
                 {
@@ -862,7 +862,7 @@ class npc_muradin_bronzebeard_icc : public CreatureScript
                 }
             }
 
-            void SpellHit(Unit* /*caster*/, SpellInfo const* spell)
+            void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
             {
                 if (spell->Id == SPELL_GRIP_OF_AGONY)
                 {
@@ -871,7 +871,7 @@ class npc_muradin_bronzebeard_icc : public CreatureScript
                 }
             }
 
-            void MovementInform(uint32 type, uint32 id)
+            void MovementInform(uint32 type, uint32 id) override
             {
                 if (type == POINT_MOTION_TYPE)
                 {
@@ -891,7 +891,7 @@ class npc_muradin_bronzebeard_icc : public CreatureScript
                 }
             }
 
-            void UpdateAI(uint32 diff)
+            void UpdateAI(uint32 diff) override
             {
                 _events.Update(diff);
                 switch (_events.ExecuteEvent())
@@ -973,7 +973,7 @@ class npc_muradin_bronzebeard_icc : public CreatureScript
             return true;
         }
 
-        CreatureAI* GetAI(Creature* creature) const
+        CreatureAI* GetAI(Creature* creature) const override
         {
             return GetIcecrownCitadelAI<npc_muradin_bronzebeard_iccAI>(creature);
         }
