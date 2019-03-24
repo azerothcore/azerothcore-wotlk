@@ -570,7 +570,7 @@ class npc_wg_quest_giver : public CreatureScript
             return true;
         }
 
-        uint32 GetDialogStatus(Player* player, Creature* creature)
+        uint32 GetDialogStatus(Player* player, Creature* creature) override
         {
             QuestRelationBounds qr = sObjectMgr->GetCreatureQuestRelationBounds(creature->GetEntry());
             QuestRelationBounds qir = sObjectMgr->GetCreatureQuestInvolvedRelationBounds(creature->GetEntry());

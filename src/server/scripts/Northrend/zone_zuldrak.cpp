@@ -42,20 +42,20 @@ public:
 
             std::map<uint64, uint32> questList;
 
-            void ClearPlayerOnTask(uint64 guid) override
+            void ClearPlayerOnTask(uint64 guid)
             {
                 std::map<uint64, uint32>::iterator itr = questList.find(guid);
                 if (itr != questList.end())
                     questList.erase(itr);
             }
 
-            bool IsPlayerOnTask(uint64 guid) override
+            bool IsPlayerOnTask(uint64 guid)
             {
                 std::map<uint64, uint32>::const_iterator itr = questList.find(guid);
                 return itr != questList.end();
             }
 
-            void RightClickCauldron(uint64 guid) override
+            void RightClickCauldron(uint64 guid)
             {
                 if (questList.empty())
                     return;
