@@ -268,7 +268,7 @@ public:
                     activate ? go->SendCustomAnim(0) : go->SetGoState(GO_STATE_READY);
         }
 
-        void ResetEvent() override
+        void ResetEvent()
         {
             if (GameObject *tribunal = ObjectAccessor::GetGameObject(*me, pInstance->GetData64(GO_TRIBUNAL_CONSOLE)))
                 tribunal->SetGoState(GO_STATE_READY);
@@ -567,6 +567,7 @@ public:
                 }
             }
         }
+        
         void SummonCreatures(uint32 entry, uint8 count)
         {
             for (int i = 0; i < count; ++i)
