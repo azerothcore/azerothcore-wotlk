@@ -38,6 +38,7 @@ INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `p
 DELETE FROM `creature_addon` WHERE `guid` =2054762;
 INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `auras`) VALUES (2054762, 20547620, 0, 0, 0, 0, NULL);
 
+DELETE FROM `waypoint_data` WHERE `id` =20547620;
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES (20547620, 5, -820.391, -533.587, 15.0998, 0, 0, 0, 0, 100, 0);
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES (20547620, 4, -811.54, -537.426, 15.5707, 0, 0, 0, 0, 100, 0);
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES (20547620, 3, -812.723, -542.349, 15.7681, 0, 0, 0, 0, 100, 0);
@@ -52,6 +53,7 @@ INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `p
 DELETE FROM `creature_addon` WHERE `guid` =2054790;
 INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `auras`) VALUES (2054790, 20547900, 0, 0, 0, 0, NULL);
 
+DELETE FROM `waypoint_data` WHERE `id` =20547900;
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES (20547900, 1, -811.639, -584.494, 15.1499, 0, 0, 0, 0, 100, 0);
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES (20547900, 2, -800.046, -581.489, 15.2147, 0, 0, 0, 0, 100, 0);
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES (20547900, 3, -800.833, -572.892, 15.257, 0, 0, 0, 0, 100, 0);
@@ -68,6 +70,7 @@ INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `p
 DELETE FROM `creature_addon` WHERE `guid` =2054758;
 INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `auras`) VALUES (2054758, 20547580, 0, 0, 0, 0, NULL);
 
+DELETE FROM `waypoint_data` WHERE `id` =20547580;
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES (20547580, 9, -859.389, -518.092, 11.0379, 0, 0, 0, 0, 100, 0);
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES (20547580, 8, -858.511, -524.652, 10.5177, 0, 0, 0, 0, 100, 0);
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES (20547580, 7, -852.398, -526.75, 10.4794, 0, 0, 0, 0, 100, 0);
