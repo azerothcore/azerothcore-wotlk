@@ -20,9 +20,9 @@ namespace ACORE
     template
     <
         typename T,
-        class ThreadingModel = AcORE::SingleThreaded<T>,
-        class CreatePolicy = AcORE::OperatorNew<T>,
-        class LifeTimePolicy = AcORE::ObjectLifeTime<T>
+        class ThreadingModel = ACORE::SingleThreaded<T>,
+        class CreatePolicy = ACORE::OperatorNew<T>,
+        class LifeTimePolicy = ACORE::ObjectLifeTime<T>
         >
     class Singleton
     {
