@@ -53,12 +53,7 @@ enum saeed
 class npc_captain_saeed : public CreatureScript
 {
     public:
-        npc_captain_saeed() : CreatureScript("npc_captain_saeed") { }
-
-        CreatureAI* GetAI(Creature* creature) const
-        {
-            return new npc_captain_saeedAI(creature);
-        }
+        npc_captain_saeed() : CreatureScript("npc_captain_saeed") { }        
 
         struct npc_captain_saeedAI : public npc_escortAI
         {
@@ -281,6 +276,11 @@ class npc_captain_saeed : public CreatureScript
             SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
 
             return true;
+        }
+
+        CreatureAI* GetAI(Creature* creature) const override
+        {
+            return new npc_captain_saeedAI(creature);
         }
 };
 
