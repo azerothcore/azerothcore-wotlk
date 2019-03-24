@@ -13,20 +13,19 @@
 #ifndef __WORLDSOCKETMGR_H
 #define __WORLDSOCKETMGR_H
 
-#include <ace/Basic_Types.h>
-#include <ace/Singleton.h>
-#include <ace/Thread_Mutex.h>
+
 
 class WorldSocket;
 class ReactorRunnable;
-class ACE_Event_Handler;
 
 /// Manages all sockets connected to peers and network threads
 class WorldSocketMgr
 {
 public:
     friend class WorldSocket;
-    friend class ACE_Singleton<WorldSocketMgr, std::mutex>;
+
+    WorldSocketMgr();
+    virtual ~WorldSocketMgr();
 
     /// Start network, listen at address:port .
     int StartNetwork(ACE_UINT16 port, const char* address);
@@ -43,9 +42,6 @@ private:
     int StartReactiveIO(ACE_UINT16 port, const char* address);
 
 private:
-    WorldSocketMgr();
-    virtual ~WorldSocketMgr();
-
     ReactorRunnable* m_NetThreads;
     size_t m_NetThreadsCount;
 
@@ -56,7 +52,7 @@ private:
     class WorldSocketAcceptor* m_Acceptor;
 };
 
-#define sWorldSocketMgr ACE_Singleton<WorldSocketMgr, std::mutex>::instance()
+#define sWorldSocketMgr ACORE::Singleton<WorldSocketMgr>::instance()
 
 #endif
 /// @}

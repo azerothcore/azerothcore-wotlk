@@ -10,8 +10,6 @@
 #include "Common.h"
 #include <mutex>
 #include "Policies/Singleton.h"
-#include <ace/Task.h>
-#include <ace/Singleton.h>
 
 class WorldPacket;
 
@@ -98,7 +96,7 @@ const int Colors = int(WHITE)+1;
 
 class Log
 {
-    friend class ACE_Singleton<Log, std::mutex>;
+    friend class ACORE::OperatorNew<Log>;
 
     private:
         Log();
@@ -196,7 +194,7 @@ class Log
         DebugLogFilters m_DebugLogMask;
 };
 
-#define sLog ACE_Singleton<Log, std::mutex>::instance()
+#define sLog ACORE::Singleton<Log>::instance()
 
 #endif
 

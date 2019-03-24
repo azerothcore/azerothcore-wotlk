@@ -14,7 +14,7 @@ typedef void (* Destroyer)(void);
 
 namespace ACORE
 {
-    void ACORE_DLL_SPEC at_exit(void (*func)());
+    void at_exit(void (*func)());
 
     template<class T>
     class ObjectLifeTime

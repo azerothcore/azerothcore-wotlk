@@ -7,12 +7,13 @@
 #ifndef TRINITY_DEFINE_H
 #define TRINITY_DEFINE_H
 
+#include "CompilerDefs.h"
+
 #include <cstdint>
 #include <cstddef>
 #include <sys/types.h>
-#include <ace/Basic_Types.h>
-#include <ace/ACE_export.h>
-#include <ace/Default_Constants.h>
+#include <cinttypes>
+#include <climits>
 
 #include "CompilerDefs.h"
 
@@ -66,13 +67,13 @@
 #  define ATTR_DEPRECATED
 #endif //COMPILER == COMPILER_GNU
 
-#define UI64FMTD ACE_UINT64_FORMAT_SPECIFIER
-#define UI64LIT(N) ACE_UINT64_LITERAL(N)
+#define UI64FMTD "%" PRIu64
+#define UI64LIT(N) UINT64_C(N)
 
-#define SI64FMTD ACE_INT64_FORMAT_SPECIFIER
-#define SI64LIT(N) ACE_INT64_LITERAL(N)
+#define SI64FMTD "%" PRId64
+#define SI64LIT(N) INT64_C(N)
 
-#define SIZEFMTD ACE_SIZE_T_FORMAT_SPECIFIER
+#define SZFMTD "%" PRIuPTR
 
 #define UNUSED(x) (void)(x)
 
