@@ -283,7 +283,7 @@ public:
             TalkEvent = false;
         }
 
-        void WaypointReached(uint32 id);
+        void WaypointReached(uint32 id) override;
         void InitializeEvent();
 
         Creature* GetAbedneum() { return ObjectAccessor::GetCreature(*me, AbedneumGUID); }
