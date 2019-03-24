@@ -1373,7 +1373,7 @@ public:
                         events.ScheduleEvent(EVENT_REINSTALL_ROCKETS, 3000);
                         events.ScheduleEvent(EVENT_SPELL_ROCKET_STRIKE, 16000);
                         events.ScheduleEvent(EVENT_HAND_PULSE, 1);
-                        //events.ScheduleEvent(EVENT_SPELL_SPINNING_UP, 30000);
+                        events.ScheduleEvent(EVENT_SPELL_SPINNING_UP, 30000);
                         if (Creature* c = GetMimiron())
                             if (c->AI()->GetData(1))
                                 events.ScheduleEvent(EVENT_FROST_BOMB, 1000);
@@ -2275,6 +2275,34 @@ public:
     }
 };
 
+// 63414 - Spinning Up
+class spell_mimiron_spinning_up : public SpellScriptLoader
+{
+    public:
+        spell_mimiron_spinning_up() : SpellScriptLoader("spell_mimiron_spinning_up") { }
+
+        class spell_mimiron_spinning_up_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_mimiron_spinning_up_SpellScript);
+
+            void OnHit(SpellEffIndex /*effIndex*/)
+            {
+                if (GetHitUnit() != GetCaster())
+                    GetCaster()->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, GetHitUnit()->GetGUID());
+            }
+
+            void Register() override
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_mimiron_spinning_up_SpellScript::OnHit, EFFECT_0, SPELL_EFFECT_APPLY_AURA);
+            }
+        };
+
+        SpellScript* GetSpellScript() const override
+        {
+            return new spell_mimiron_spinning_up_SpellScript();
+        }
+};
+
 class go_ulduar_do_not_push_this_button : public GameObjectScript
 { 
 public: 
@@ -2611,6 +2639,7 @@ void AddSC_boss_mimiron()
     new npc_ulduar_bot_summon_trigger();
     new spell_mimiron_rapid_burst();
     new spell_mimiron_p3wx2_laser_barrage();
+    new spell_mimiron_spinning_up();
     new go_ulduar_do_not_push_this_button();
     new npc_ulduar_flames_initial();
     new npc_ulduar_flames_spread();
