@@ -70,6 +70,7 @@ include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/Dynamic
   ${CMAKE_CURRENT_SOURCE_DIR}/Logging
   ${CMAKE_CURRENT_SOURCE_DIR}/Packets
+  ${CMAKE_CURRENT_SOURCE_DIR}/Policies
   ${CMAKE_CURRENT_SOURCE_DIR}/Threading
   ${CMAKE_CURRENT_SOURCE_DIR}/Utilities
   ${CMAKE_SOURCE_DIR}/src/server/game/Entities/Object
