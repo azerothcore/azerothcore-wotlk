@@ -258,16 +258,16 @@ public:
         uint32 m_uiNormFaction;
         uint32 LightningBolt_Timer;
 
-        void Reset()
+        void Reset() override
         {
             LightningBolt_Timer = 2000;
             if (me->getFaction() != m_uiNormFaction)
                 me->setFaction(m_uiNormFaction);
         }
 
-        void EnterCombat(Unit* /*who*/) { }
+        void EnterCombat(Unit* /*who*/) override { }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -282,7 +282,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_cooshcooshAI(creature);
     }

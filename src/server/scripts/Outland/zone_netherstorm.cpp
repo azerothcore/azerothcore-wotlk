@@ -146,7 +146,7 @@ class npc_captain_saeed : public CreatureScript
                 npc_escortAI::EnterEvadeMode();
             }
 
-            void SummonsAction(Unit* who) override
+            void SummonsAction(Unit* who)
             {
                 float i = 0;
                 for (std::list<uint64>::iterator itr = summons.begin(); itr != summons.end(); ++itr, i += 1.0f)
