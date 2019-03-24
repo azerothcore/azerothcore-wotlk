@@ -12,7 +12,6 @@ file(GLOB_RECURSE mmap_gen_sources *.cpp *.h)
 
 set(mmap_gen_Includes
   ${CMAKE_BINARY_DIR}
-  ${ACE_INCLUDE_DIR}
   ${MYSQL_INCLUDE_DIR}
   ${OPENSSL_INCLUDE_DIR}
   ${CMAKE_SOURCE_DIR}/deps/libmpq
@@ -125,7 +124,6 @@ target_link_libraries(mmaps_generator
   g3dlib
   Recast
   Detour
-  ${ACE_LIBRARY}
   ${MYSQL_LIBRARY}
   ${OPENSSL_LIBRARIES}
   ${BZIP2_LIBRARIES}

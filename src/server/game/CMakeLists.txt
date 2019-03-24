@@ -211,7 +211,6 @@ include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/Misc
   ${CMAKE_SOURCE_DIR}/src/server/scripts/
   ${CMAKE_SOURCE_DIR}/src/server/scripts/PrecompiledHeaders
-  ${ACE_INCLUDE_DIR}
   ${MYSQL_INCLUDE_DIR}
   ${OPENSSL_INCLUDE_DIR}
 )

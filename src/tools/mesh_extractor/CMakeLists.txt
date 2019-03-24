@@ -18,7 +18,6 @@ set(include_Base
   ${CMAKE_SOURCE_DIR}/deps/recastnavigation/Detour
   ${CMAKE_SOURCE_DIR}/deps/libmpq
   ${CMAKE_SOURCE_DIR}/deps/g3dlite/include
-  ${ACE_INCLUDE_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
@@ -40,7 +39,6 @@ target_link_libraries(MeshExtractor
   Detour
   ${BZIP2_LIBRARIES}
   ${ZLIB_LIBRARIES}
-  ${ACE_LIBRARY}
 )
 
 if( UNIX )
