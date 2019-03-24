@@ -34,11 +34,7 @@ void FleeingMovementGenerator<T>::_setTargetLocation(T* owner)
         return;
 
     // Add LOS check for target point
-    bool isInLOS = VMAP::VMapFactory::createOrGetVMapManager()->isInLineOfSight(owner->GetMapId(),
-        owner->GetPositionX(),
-        owner->GetPositionY(),
-        owner->GetPositionZ() + 2.0f,
-        x, y, z + 2.0f);
+    bool isInLOS = owner->IsWithinLOS(destination.GetPositionX(), destination.GetPositionY(), destination.GetPositionZ())
 
     if (!isInLOS)
     {

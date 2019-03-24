@@ -1733,7 +1733,7 @@ uint8 GridMap::getTerrainType(float x, float y) const
 }
 
 // Get water state on map
-inline ZLiquidStatus GridMap::getLiquidStatus(float x, float y, float z, uint8 ReqLiquidType, LiquidData* data)
+inline ZLiquidStatus GridMap::getLiquidStatus(float x, float y, float z, uint8 ReqLiquidType, LiquidData* data, float collisionHeight)
 {
     // Check water type (if no water return)
     if (!_liquidType && !_liquidFlags)
@@ -1803,7 +1803,7 @@ inline ZLiquidStatus GridMap::getLiquidStatus(float x, float y, float z, uint8 R
     float ground_level = getHeight(x, y);
 
     // Check water level and ground level
-    if (liquid_level < ground_level || z < ground_level - 2)
+    if (liquid_level < ground_level || z < ground_level)
         return LIQUID_MAP_NO_WATER;
 
     // All ok in water -> store data
@@ -1818,7 +1818,7 @@ inline ZLiquidStatus GridMap::getLiquidStatus(float x, float y, float z, uint8 R
     // For speed check as int values
     float delta = liquid_level - z;
 
-    if (delta > 2.0f)                   // Under water
+    if (delta > collisionHeight)        // Under water
         return LIQUID_MAP_UNDER_WATER;
     if (delta > 0.0f)                   // In water
         return LIQUID_MAP_IN_WATER;
@@ -1840,18 +1840,18 @@ GridMap* Map::GetGrid(float x, float y)
     return GridMaps[gx][gy];
 }
 
-float Map::GetWaterOrGroundLevel(float x, float y, float z, float* ground /*= NULL*/, bool /*swim = false*/, float maxSearchDist /*= 50.0f*/) const
+float Map::GetWaterOrGroundLevel(float x, float y, float z, float* ground /*= NULL*/, bool /*swim = false*/, float maxSearchDist /*= 50.0f*/, float collisionHeight /*= DEFAULT_COLLISION_HEIGHT*/) const
 { 
     if (const_cast<Map*>(this)->GetGrid(x, y))
     {
         // we need ground level (including grid height version) for proper return water level in point
-        float ground_z = GetHeight(PHASEMASK_NORMAL, x, y, z, true, maxSearchDist);
+        float ground_z = GetHeight(PHASEMASK_NORMAL, x, y, z + collisionHeight, true, maxSearchDist);
         if (ground)
             *ground = ground_z;
 
         LiquidData liquid_status;
 
-        ZLiquidStatus res = getLiquidStatus(x, y, ground_z, MAP_ALL_LIQUIDS, &liquid_status);
+        ZLiquidStatus res = getLiquidStatus(x, y, ground_z, MAP_ALL_LIQUIDS, &liquid_status, collisionHeight);
         return res ? liquid_status.level : ground_z;
     }
 
@@ -1892,8 +1892,7 @@ float Map::GetHeight(float x, float y, float z, bool checkVMap /*= true*/, float
     if (GridMap* gmap = const_cast<Map*>(this)->GetGrid(x, y))
     {
         float gridHeight = gmap->getHeight(x, y);
-        // look from a bit higher pos to find the floor, ignore under surface case
-        if (z + 2.0f > gridHeight)
+        if (z > gridHeight)
             mapHeight = gridHeight;
     }
 
@@ -1902,7 +1901,7 @@ float Map::GetHeight(float x, float y, float z, bool checkVMap /*= true*/, float
     {
         VMAP::IVMapManager* vmgr = VMAP::VMapFactory::createOrGetVMapManager();
         //if (vmgr->isHeightCalcEnabled()) // pussywizard: optimization
-            vmapHeight = vmgr->getHeight(GetId(), x, y, z + 2.0f, maxSearchDist);   // look from a bit higher pos to find the floor
+            vmapHeight = vmgr->getHeight(GetId(), x, y, z, maxSearchDist);
     }
 
     // mapHeight set for any above raw ground Z or <= INVALID_HEIGHT
@@ -1991,8 +1990,7 @@ bool Map::GetAreaInfo(float x, float y, float z, uint32 &flags, int32 &adtId, in
         if (GridMap* gmap = const_cast<Map*>(this)->GetGrid(x, y))
         {
             float _mapheight = gmap->getHeight(x, y);
-            // z + 2.0f condition taken from GetHeight(), not sure if it's such a great choice...
-            if (z + 2.0f > _mapheight &&  _mapheight > vmap_z)
+            if (z > _mapheight &&  _mapheight > vmap_z)
                 return false;
         }
         return true;
@@ -2070,7 +2068,7 @@ uint8 Map::GetTerrainType(float x, float y) const
         return 0;
 }
 
-ZLiquidStatus Map::getLiquidStatus(float x, float y, float z, uint8 ReqLiquidType, LiquidData* data) const
+ZLiquidStatus Map::getLiquidStatus(float x, float y, float z, uint8 ReqLiquidType, LiquidData* data, float collisionHeight) const
 { 
     ZLiquidStatus result = LIQUID_MAP_NO_WATER;
     VMAP::IVMapManager* vmgr = VMAP::VMapFactory::createOrGetVMapManager();
@@ -2126,7 +2124,7 @@ ZLiquidStatus Map::getLiquidStatus(float x, float y, float z, uint8 ReqLiquidTyp
             float delta = liquid_level - z;
 
             // Get position delta
-            if (delta > 2.0f)                   // Under water
+            if (delta > collisionHeight)        // Under water
                 return LIQUID_MAP_UNDER_WATER;
             if (delta > 0.0f)                   // In water
                 return LIQUID_MAP_IN_WATER;
@@ -2139,7 +2137,7 @@ ZLiquidStatus Map::getLiquidStatus(float x, float y, float z, uint8 ReqLiquidTyp
     if (GridMap* gmap = const_cast<Map*>(this)->GetGrid(x, y))
     {
         LiquidData map_data;
-        ZLiquidStatus map_result = gmap->getLiquidStatus(x, y, z, ReqLiquidType, &map_data);
+        ZLiquidStatus map_result = gmap->getLiquidStatus(x, y, z, ReqLiquidType, &map_data, collisionHeight);
         // Not override LIQUID_MAP_ABOVE_WATER with LIQUID_MAP_NO_WATER:
         if (map_result != LIQUID_MAP_NO_WATER && (map_data.level > ground_level))
         {

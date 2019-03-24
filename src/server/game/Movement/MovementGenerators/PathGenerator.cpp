@@ -227,8 +227,8 @@ void PathGenerator::BuildPolyPath(G3D::Vector3 const& startPos, G3D::Vector3 con
         }
         if (sourceCanSwim)
         {
-            if ((startPoly == INVALID_POLYREF && LIQUID_MAP_NO_WATER == _sourceUnit->GetBaseMap()->getLiquidStatus(startPos.x, startPos.y, startPos.z, MAP_ALL_LIQUIDS, NULL)) ||
-                (endPoly == INVALID_POLYREF && LIQUID_MAP_NO_WATER == _sourceUnit->GetBaseMap()->getLiquidStatus(endPos.x, endPos.y, endPos.z, MAP_ALL_LIQUIDS, NULL)))
+            if ((startPoly == INVALID_POLYREF && LIQUID_MAP_NO_WATER == _sourceUnit->GetBaseMap()->getLiquidStatus(startPos.x, startPos.y, startPos.z, MAP_ALL_LIQUIDS, nullptr, _sourceUnit->GetCollisionHeight())) ||
+                (endPoly == INVALID_POLYREF && LIQUID_MAP_NO_WATER == _sourceUnit->GetBaseMap()->getLiquidStatus(endPos.x, endPos.y, endPos.z, MAP_ALL_LIQUIDS, nullptr, _sourceUnit->GetCollisionHeight())))
                 {
                     _type = PATHFIND_NOPATH;
                     return;
@@ -253,7 +253,7 @@ void PathGenerator::BuildPolyPath(G3D::Vector3 const& startPos, G3D::Vector3 con
         }
         if (sourceCanSwim)
         {
-            if (LIQUID_MAP_NO_WATER == _sourceUnit->GetBaseMap()->getLiquidStatus(startPos.x, startPos.y, startPos.z, MAP_ALL_LIQUIDS, NULL))
+            if (LIQUID_MAP_NO_WATER == _sourceUnit->GetBaseMap()->getLiquidStatus(startPos.x, startPos.y, startPos.z, MAP_ALL_LIQUIDS, nullptr, _sourceUnit->GetCollisionHeight()))
             {
                 if (distToStartPoly > MAX_FIXABLE_Z_ERROR)
                 {
@@ -264,7 +264,7 @@ void PathGenerator::BuildPolyPath(G3D::Vector3 const& startPos, G3D::Vector3 con
 
                 if (farFromEndPoly)
                 {
-                    if (LIQUID_MAP_NO_WATER == _sourceUnit->GetBaseMap()->getLiquidStatus(endPos.x, endPos.y, endPos.z, MAP_ALL_LIQUIDS, NULL))
+                    if (LIQUID_MAP_NO_WATER == _sourceUnit->GetBaseMap()->getLiquidStatus(endPos.x, endPos.y, endPos.z, MAP_ALL_LIQUIDS, nullptr, _sourceUnit->GetCollisionHeight()))
                     {
                         BuildShortcut();
                         _type = PATHFIND_NOPATH;
@@ -272,7 +272,7 @@ void PathGenerator::BuildPolyPath(G3D::Vector3 const& startPos, G3D::Vector3 con
                     }
                 }
             }
-            else if (LIQUID_MAP_NO_WATER == _sourceUnit->GetBaseMap()->getLiquidStatus(endPos.x, endPos.y, endPos.z, MAP_ALL_LIQUIDS, NULL))
+            else if (LIQUID_MAP_NO_WATER == _sourceUnit->GetBaseMap()->getLiquidStatus(endPos.x, endPos.y, endPos.z, MAP_ALL_LIQUIDS, nullptr, _sourceUnit->GetCollisionHeight()))
             {
                 if (farFromEndPoly)
                 {
@@ -308,7 +308,7 @@ void PathGenerator::BuildPolyPath(G3D::Vector3 const& startPos, G3D::Vector3 con
             _type = PathType(PATHFIND_NORMAL | PATHFIND_NOT_USING_PATH);
             return;
         }
-        if (LIQUID_MAP_NO_WATER == _sourceUnit->GetBaseMap()->getLiquidStatus(endPos.x, endPos.y, endPos.z, MAP_ALL_LIQUIDS, NULL))
+        if (LIQUID_MAP_NO_WATER == _sourceUnit->GetBaseMap()->getLiquidStatus(endPos.x, endPos.y, endPos.z, MAP_ALL_LIQUIDS, nullptr, _sourceUnit->GetCollisionHeight()))
         {
             if (!sourceCanWalk)
             {
@@ -327,7 +327,7 @@ void PathGenerator::BuildPolyPath(G3D::Vector3 const& startPos, G3D::Vector3 con
             }
 
             // if both points are in water
-            if (LIQUID_MAP_NO_WATER != _sourceUnit->GetBaseMap()->getLiquidStatus(startPos.x, startPos.y, startPos.z, MAP_ALL_LIQUIDS, NULL))
+            if (LIQUID_MAP_NO_WATER != _sourceUnit->GetBaseMap()->getLiquidStatus(startPos.x, startPos.y, startPos.z, MAP_ALL_LIQUIDS, nullptr, _sourceUnit->GetCollisionHeight()))
             {
                 BuildShortcut();
                 _type = PathType(PATHFIND_NORMAL | PATHFIND_NOT_USING_PATH);
@@ -528,7 +528,7 @@ void PathGenerator::BuildPolyPath(G3D::Vector3 const& startPos, G3D::Vector3 con
         for (; i < size; ++i)
             if (_pathPoints[i].z >= _sourceUnit->GetPositionZ()+0.1f)
                 break;
-        if (i && i != size && LIQUID_MAP_NO_WATER != _sourceUnit->GetBaseMap()->getLiquidStatus(_pathPoints[i-1].x, _pathPoints[i-1].y, _pathPoints[i-1].z, MAP_ALL_LIQUIDS, NULL))
+        if (i && i != size && LIQUID_MAP_NO_WATER != _sourceUnit->GetBaseMap()->getLiquidStatus(_pathPoints[i-1].x, _pathPoints[i-1].y, _pathPoints[i-1].z, MAP_ALL_LIQUIDS, nullptr, _sourceUnit->GetCollisionHeight()))
             for (uint32 j=0; j<i; ++j)
                 _pathPoints[j].z = _sourceUnit->GetPositionZ();
     }
@@ -754,7 +754,7 @@ void PathGenerator::UpdateFilter()
 NavTerrain PathGenerator::GetNavTerrain(float x, float y, float z)
 {
     LiquidData data;
-    ZLiquidStatus liquidStatus = _sourceUnit->GetBaseMap()->getLiquidStatus(x, y, z, MAP_ALL_LIQUIDS, &data);
+    ZLiquidStatus liquidStatus = _sourceUnit->GetBaseMap()->getLiquidStatus(x, y, z, MAP_ALL_LIQUIDS, &data, _sourceUnit->GetCollisionHeight());
     if (liquidStatus == LIQUID_MAP_NO_WATER)
         return NAV_GROUND;
 

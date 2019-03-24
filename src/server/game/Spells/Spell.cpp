@@ -1326,10 +1326,10 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
             //m_caster->GetClosePoint(x, y, z, DEFAULT_PLAYER_BOUNDING_RADIUS, dis, angle); this contains extra code that breaks fishing
             m_caster->GetNearPoint(m_caster, x, y, z, DEFAULT_PLAYER_BOUNDING_RADIUS, dis, m_caster->GetOrientation() + angle);
 
-            float ground = m_caster->GetMap()->GetHeight(m_caster->GetPhaseMask(), x, y, z, true, 120.0f);
+            float ground = m_caster->GetMapHeight(x, y, z);
             float liquidLevel = VMAP_INVALID_HEIGHT_VALUE;
             LiquidData liquidData;
-            if (m_caster->GetMap()->getLiquidStatus(x, y, z, MAP_ALL_LIQUIDS, &liquidData))
+            if (m_caster->GetMap()->getLiquidStatus(x, y, z, MAP_ALL_LIQUIDS, &liquidData, m_caster->GetCollisionHeight()))
                 liquidLevel = liquidData.level;
 
              if (liquidLevel <= ground) // When there is no liquid Map::GetWaterOrGroundLevel returns ground level
