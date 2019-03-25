@@ -1151,7 +1151,7 @@ bool WorldObject::IsWithinLOSInMap(const WorldObject* obj, LineOfSightChecks che
         z += GetCollisionHeight();
     }
     else
-        GetHitSpherePointFor({ obj->GetPositionX(), obj->GetPositionY(), obj->GetPositionZ() + obj->GetCollisionHeight()
+        GetHitSpherePointFor({ obj->GetPositionX(), obj->GetPositionY(), obj->GetPositionZ() + obj->GetCollisionHeight();
 
     return GetMap()->isInLineOfSight(x, y, z, ox, oy, oz, GetPhaseMask(), checks, ignoreFlags);
 
