@@ -23,7 +23,7 @@ MTHREADS=$(expr $(grep -c ^processor /proc/cpuinfo) + 2)
 CWARNINGS=ON
 CDEBUG=OFF
 CTYPE=Release
-CSCRIPTS=ON
+CSCRIPTS=$1
 CSERVERS=ON
 CTOOLS=ON
 CSCRIPTPCH=OFF
@@ -36,9 +36,3 @@ DB_AUTH_NAME=auth_$DB_RND_NAME
 DB_CHARACTERS_NAME=characters_$DB_RND_NAME
 DB_WORLD_NAME=world_$DB_RND_NAME
 CONFIG_SH
-
-if [ "$TRAVIS_BUILD_ID" = "1" ]
-then
-  echo "import DB"
-  bash ./acore.sh "db-assembler" "import-all"
-fi

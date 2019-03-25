@@ -18,7 +18,7 @@
 #include "Player.h"
 #include "Opcodes.h"
 
-enum LeviathanSpells 
+enum LeviathanSpells
 {
     // Leviathan basic
     SPELL_PURSUED                   = 62374,
@@ -514,19 +514,19 @@ void boss_flame_leviathan::boss_flame_leviathanAI::ActivateTowers()
             me->AddLootMode(1<<_towersCount);
             switch (i)
             {
-                case EVENT_TOWER_OF_LIFE_DESTROYED: 
+                case EVENT_TOWER_OF_LIFE_DESTROYED:
                     me->AddAura(SPELL_TOWER_OF_LIFE, me);
                     events.RescheduleEvent(EVENT_FREYA, 30000);
                     break;
-                case EVENT_TOWER_OF_STORM_DESTROYED: 
+                case EVENT_TOWER_OF_STORM_DESTROYED:
                     me->AddAura(SPELL_TOWER_OF_STORMS, me);
                     events.RescheduleEvent(EVENT_THORIMS_HAMMER, 60000);
                     break;
-                case EVENT_TOWER_OF_FROST_DESTROYED: 
+                case EVENT_TOWER_OF_FROST_DESTROYED:
                     me->AddAura(SPELL_TOWER_OF_FROST, me);
                     events.RescheduleEvent(EVENT_HODIRS_FURY, 20000);
                     break;
-                case EVENT_TOWER_OF_FLAMES_DESTROYED: 
+                case EVENT_TOWER_OF_FLAMES_DESTROYED:
                     me->AddAura(SPELL_TOWER_OF_FLAMES, me);
                     events.RescheduleEvent(EVENT_MIMIRONS_INFERNO, 42000);
                     break;
@@ -895,7 +895,7 @@ public:
     struct npc_freya_wardAI : public NullCreatureAI
     {
         npc_freya_wardAI(Creature *c) : NullCreatureAI(c), summons(c)
-        { 
+        {
         }
 
         SummonList summons;
@@ -975,7 +975,7 @@ public:
     struct npc_hodirs_furyAI : public NullCreatureAI
     {
         npc_hodirs_furyAI(Creature *c) : NullCreatureAI(c)
-        { 
+        {
         }
 
         uint32 _timeToHit;
@@ -1035,7 +1035,7 @@ public:
                     _switchTargetTimer = 0;
                 }
                 else
-                    _switchTargetTimer = 25000;     
+                    _switchTargetTimer = 25000;
             }
         }
     };
@@ -1117,7 +1117,7 @@ public:
     struct npc_thorims_hammerAI : public NullCreatureAI
     {
         npc_thorims_hammerAI(Creature *c) : NullCreatureAI(c)
-        { 
+        {
         }
 
         uint32 _beamTimer;
@@ -1216,9 +1216,9 @@ public:
     bool OnGossipHello(Player* player, Creature* creature) override
     {
         if (creature->GetInstanceScript() && creature->GetInstanceScript()->GetData(TYPE_LEVIATHAN) == NOT_STARTED && !creature->AI()->GetData(DATA_EVENT_STARTED))
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Activate secondary defensive systems.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Activate secondary defensive systems.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
 
-        player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
+        SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
         return true;
     }
 
@@ -1228,15 +1228,15 @@ public:
         {
             case GOSSIP_ACTION_INFO_DEF+1:
                 creature->MonsterSay("Activating secondary defensive systems will result in the extermination of unauthorized life forms via orbital emplacements. You are an unauthorized life form.", LANG_UNIVERSAL, 0);
-                player->PlayerTalkClass->ClearMenus();
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Confirmed.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+2);
-                player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
+                ClearGossipMenuFor(player);
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Confirmed.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+2);
+                SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF+2:
                 creature->MonsterSay("Security override permitted. Secondary defensive systems activated. Backup deactivation for secondary systems can be accessed via individual generators located on the concourse. ", LANG_UNIVERSAL, 0);
                 creature->AI()->DoAction(ACTION_START_NORGANNON_EVENT);
 
-                player->CLOSE_GOSSIP_MENU();
+                CloseGossipMenuFor(player);
         }
         return true;
     }
@@ -1427,7 +1427,7 @@ public:
         void Say(std::string text, bool self)
         {
             WorldPacket data;
-            
+
             if (self)
                 ChatHandler::BuildChatPacket(data, CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, me, nullptr, text);
             else if (Creature* c = ObjectAccessor::GetCreature(*me, _pentarusGUID))
@@ -1524,9 +1524,9 @@ public:
     {
         npc_brann_radioAI(Creature* c) : NullCreatureAI(c)
         {
-            _lock = (me->GetInstanceScript() && me->GetInstanceScript()->GetData(TYPE_LEVIATHAN) > NOT_STARTED); 
+            _lock = (me->GetInstanceScript() && me->GetInstanceScript()->GetData(TYPE_LEVIATHAN) > NOT_STARTED);
             _helpLock = _lock;
-        } 
+        }
 
         bool _lock;
         bool _helpLock;
@@ -1549,7 +1549,7 @@ public:
             {
                 if (who->GetTypeId() != TYPEID_PLAYER && !who->IsVehicle())
                     return;
-            
+
                 // ENGAGE
                 if (!_helpLock && me->GetDistance2d(-508.898f, -32.9631f) < 5.0f)
                 {
@@ -1637,7 +1637,7 @@ public:
 
     struct npc_storm_beacon_spawnAI : public NullCreatureAI
     {
-        npc_storm_beacon_spawnAI(Creature* c) : NullCreatureAI(c) 
+        npc_storm_beacon_spawnAI(Creature* c) : NullCreatureAI(c)
         {
             _amount = 0;
             _checkTimer = 0;
@@ -1678,7 +1678,7 @@ public:
 
     struct boss_flame_leviathan_safety_containerAI : public NullCreatureAI
     {
-        boss_flame_leviathan_safety_containerAI(Creature *c) : NullCreatureAI(c) 
+        boss_flame_leviathan_safety_containerAI(Creature *c) : NullCreatureAI(c)
         {
             _allowTimer = 0;
         }
@@ -1694,7 +1694,7 @@ public:
                     liquid->CastSpell(liquid, SPELL_LIQUID_PYRITE, true);
                     liquid->CastSpell(liquid, SPELL_DUST_CLOUD_IMPACT, true);
                 }
-                
+
                 me->DespawnOrUnsummon(1);
             }
         }
@@ -1726,8 +1726,8 @@ public:
 
     struct npc_mechanoliftAI : public NullCreatureAI
     {
-        npc_mechanoliftAI(Creature *c) : NullCreatureAI(c) 
-        { 
+        npc_mechanoliftAI(Creature *c) : NullCreatureAI(c)
+        {
             me->SetSpeed(MOVE_RUN, rand_norm()+0.5f);
         }
 
@@ -2341,7 +2341,7 @@ class achievement_flame_leviathan_towers : public AchievementCriteriaScript
         {
             return target && _towerCount <= target->GetAI()->GetData(DATA_GET_TOWER_COUNT);
         }
-        
+
     private:
         uint32 const _towerCount;
 };
@@ -2375,7 +2375,7 @@ class achievement_flame_leviathan_garage : public AchievementCriteriaScript
                     return true;
             return false;
         }
-        
+
     private:
         uint32 const _entry1;
         uint32 const _entry2;

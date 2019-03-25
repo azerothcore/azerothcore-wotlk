@@ -586,8 +586,10 @@ enum SMART_ACTION
     SMART_ACTION_NO_ENVIRONMENT_UPDATE              = 213,
     SMART_ACTION_ZONE_UNDER_ATTACK                  = 214,
     SMART_ACTION_LOAD_GRID                          = 215,
+    SMART_ACTION_MUSIC                              = 216,    // SoundId, onlySelf, type
+    SMART_ACTION_RANDOM_MUSIC                       = 217,    // SoundId1, SoundId2, SoundId3, SoundId4, onlySelf, type
 
-    SMART_ACTION_AC_END                             = 216,    // placeholder
+    SMART_ACTION_AC_END                             = 218,    // placeholder
 };
 
 struct SmartAction
@@ -628,6 +630,23 @@ struct SmartAction
             uint32 sound4;
             uint32 onlySelf;
         } randomSound;
+
+        struct
+        {
+            uint32 sound;
+            uint32 onlySelf;
+            uint32 type;
+        } music;
+
+        struct
+        {
+            uint32 sound1;
+            uint32 sound2;
+            uint32 sound3;
+            uint32 sound4;
+            uint32 onlySelf;
+            uint32 type;
+        } randomMusic;
 
         struct
         {
@@ -1545,7 +1564,7 @@ struct SmartScriptHolder
 
 };
 
-typedef UNORDERED_MAP<uint32, WayPoint*> WPPath;
+typedef std::unordered_map<uint32, WayPoint*> WPPath;
 
 typedef std::list<WorldObject*> ObjectList;
 typedef std::list<uint64> GuidList;
@@ -1599,7 +1618,7 @@ public:
         delete m_guidList;
     }
 };
-typedef UNORDERED_MAP<uint32, ObjectGuidList*> ObjectListMap;
+typedef std::unordered_map<uint32, ObjectGuidList*> ObjectListMap;
 
 class SmartWaypointMgr
 {
@@ -1618,7 +1637,7 @@ class SmartWaypointMgr
         }
 
     private:
-        UNORDERED_MAP<uint32, WPPath*> waypoint_map;
+        std::unordered_map<uint32, WPPath*> waypoint_map;
 };
 
 // all events for a single entry
@@ -1626,7 +1645,7 @@ typedef std::vector<SmartScriptHolder> SmartAIEventList;
 typedef std::list<SmartScriptHolder> SmartAIEventStoredList;
 
 // all events for all entries / guids
-typedef UNORDERED_MAP<int32, SmartAIEventList> SmartAIEventMap;
+typedef std::unordered_map<int32, SmartAIEventList> SmartAIEventMap;
 
 class SmartAIMgr
 {

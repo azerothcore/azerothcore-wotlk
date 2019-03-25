@@ -3016,6 +3016,15 @@ Guild.AllowMultipleGuildMaster = 0
 ShowKickInWorld = 0
 
 #
+#     ShowBanInWorld
+#        Description: Determines whether a message is broadcasted to the entire server when a
+#                     player gets banned.
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+
+ShowBanInWorld = 0
+
+#
 #     RecordUpdateTimeDiffInterval
 #        Description: Time (in milliseconds) update time diff is written to the log file.
 #                     Update diff can be used as a performance indicator. Diff < 300: good
@@ -3213,6 +3222,14 @@ Calculate.Creature.Zone.Area.Data = 0
 #        Default:     0  - (Do not show)
 
 Calculate.Gameoject.Zone.Area.Data = 0
+
+#    LFG SETTINGS
+#
+#     Includes satellite to search for work elsewhere LFG
+#        Default: 0 - Disable  
+#                 1 - Enable  
+
+LFG.Location.All = 0
 
 #
 ###################################################################################################

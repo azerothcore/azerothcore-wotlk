@@ -821,13 +821,18 @@ class spell_sha_fire_nova : public SpellScriptLoader
             SpellCastResult CheckFireTotem()
             {
                 // fire totem
-                if (!GetCaster()->m_SummonSlot[1])
+                Unit* caster = GetCaster();
+                if (Creature* totem = caster->GetMap()->GetCreature(caster->m_SummonSlot[1]))
+                {
+                    if (!caster->IsWithinDistInMap(totem, caster->GetSpellMaxRangeForTarget(totem, GetSpellInfo())))
+                        return SPELL_FAILED_OUT_OF_RANGE;
+                    return SPELL_CAST_OK;
+                }
+                else
                 {
                     SetCustomCastResultMessage(SPELL_CUSTOM_ERROR_MUST_HAVE_FIRE_TOTEM);
                     return SPELL_FAILED_CUSTOM_ERROR;
                 }
-
-                return SPELL_CAST_OK;
             }
 
             void HandleDummy(SpellEffIndex /*effIndex*/)

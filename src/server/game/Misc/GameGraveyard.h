@@ -32,7 +32,7 @@ class Graveyard
 
 public:
 
-    typedef UNORDERED_MAP<uint32, GraveyardStruct> GraveyardContainer;    
+    typedef std::unordered_map<uint32, GraveyardStruct> GraveyardContainer;    
 
     GraveyardStruct const* GetGraveyard(uint32 ID) const;
     GraveyardStruct const* GetGraveyard(const std::string& name) const;
