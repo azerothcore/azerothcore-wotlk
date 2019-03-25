@@ -276,42 +276,43 @@ enum CorkiData
 class go_corkis_prison : public GameObjectScript
 {
 public:
-  go_corkis_prison() : GameObjectScript("go_corkis_prison") { }
+    go_corkis_prison() : GameObjectScript("go_corkis_prison") { }
 
-  bool OnGossipHello(Player* player, GameObject* go)
-  {
-      go->SetGoState(GO_STATE_READY);
-      if (go->GetEntry() == GO_CORKIS_PRISON)
-      {
-          if (Creature* corki = go->FindNearestCreature(NPC_CORKI, 25, true))
-          {
-              corki->GetMotionMaster()->MovePoint(1, go->GetPositionX()+5, go->GetPositionY(), go->GetPositionZ());
-              if (player)
-                  player->KilledMonsterCredit(NPC_CORKI_CREDIT_1, 0);
-          }
-      }
+    bool OnGossipHello(Player* player, GameObject* go) override
+    {
+        go->SetGoState(GO_STATE_READY);
+        if (go->GetEntry() == GO_CORKIS_PRISON)
+        {
+            if (Creature* corki = go->FindNearestCreature(NPC_CORKI, 25, true))
+            {
+                corki->GetMotionMaster()->MovePoint(1, go->GetPositionX()+5, go->GetPositionY(), go->GetPositionZ());
+                if (player)
+                    player->KilledMonsterCredit(NPC_CORKI_CREDIT_1, 0);
+            }
+        }
 
-      if (go->GetEntry() == GO_CORKIS_PRISON_2)
-      {
-          if (Creature* corki = go->FindNearestCreature(NPC_CORKI_2, 25, true))
-          {
-              corki->GetMotionMaster()->MovePoint(1, go->GetPositionX()-5, go->GetPositionY(), go->GetPositionZ());
-              if (player)
-                  player->KilledMonsterCredit(NPC_CORKI_2, 0);
-          }
-      }
+        if (go->GetEntry() == GO_CORKIS_PRISON_2)
+        {
+            if (Creature* corki = go->FindNearestCreature(NPC_CORKI_2, 25, true))
+            {
+                corki->GetMotionMaster()->MovePoint(1, go->GetPositionX()-5, go->GetPositionY(), go->GetPositionZ());
+                if (player)
+                    player->KilledMonsterCredit(NPC_CORKI_2, 0);
+            }
+        }
 
-      if (go->GetEntry() == GO_CORKIS_PRISON_3)
-      {
-          if (Creature* corki = go->FindNearestCreature(NPC_CORKI_3, 25, true))
-          {
-              corki->GetMotionMaster()->MovePoint(1, go->GetPositionX()+4, go->GetPositionY(), go->GetPositionZ());
-              if (player)
-                  player->KilledMonsterCredit(NPC_CORKI_CREDIT_3, 0);
-          }
-      }
-      return true;
-  }
+        if (go->GetEntry() == GO_CORKIS_PRISON_3)
+        {
+            if (Creature* corki = go->FindNearestCreature(NPC_CORKI_3, 25, true))
+            {
+                corki->GetMotionMaster()->MovePoint(1, go->GetPositionX()+4, go->GetPositionY(), go->GetPositionZ());
+                if (player)
+                    player->KilledMonsterCredit(NPC_CORKI_CREDIT_3, 0);
+            }
+        }
+
+        return true;
+    }
 };
 
 class npc_corki : public CreatureScript
@@ -567,24 +568,26 @@ enum FindingTheSurvivorsData
 
 class go_warmaul_prison : public GameObjectScript
 {
-    public:
-        go_warmaul_prison() : GameObjectScript("go_warmaul_prison") { }
+public:
+    go_warmaul_prison() : GameObjectScript("go_warmaul_prison") { }
 
-        bool OnGossipHello(Player* player, GameObject* go)
+    bool OnGossipHello(Player* player, GameObject* go) override
+    {
+        go->UseDoorOrButton();
+        
+        if (player->GetQuestStatus(QUEST_FINDING_THE_SURVIVORS) != QUEST_STATUS_INCOMPLETE)
+            return false;
+
+        if (Creature* prisoner = go->FindNearestCreature(NPC_MAGHAR_PRISONER, 5.0f))
         {
-            go->UseDoorOrButton();
-            if (player->GetQuestStatus(QUEST_FINDING_THE_SURVIVORS) != QUEST_STATUS_INCOMPLETE)
-                return false;
+            player->KilledMonsterCredit(NPC_MAGHAR_PRISONER, 0);
 
-            if (Creature* prisoner = go->FindNearestCreature(NPC_MAGHAR_PRISONER, 5.0f))
-            {
-                player->KilledMonsterCredit(NPC_MAGHAR_PRISONER, 0);
-
-                prisoner->AI()->Talk(SAY_FREE, player);
-                prisoner->DespawnOrUnsummon(6000);
-            }
-            return true;
+            prisoner->AI()->Talk(SAY_FREE, player);
+            prisoner->DespawnOrUnsummon(6000);
         }
+
+        return true;
+    }
 };
 
 void AddSC_nagrand()
