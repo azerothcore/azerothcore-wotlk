@@ -161,7 +161,7 @@ namespace AccountMgr
         if (utf8length(newPassword) > MAX_ACCOUNT_STR)
         {
             sScriptMgr->OnFailedEmailChange(accountId);
-            return AOR_PASS_TOO_LONG;                           // password's too long
+            return AOR_PASS_TOO_LONG;
         }
 
         normalizeString(username);
