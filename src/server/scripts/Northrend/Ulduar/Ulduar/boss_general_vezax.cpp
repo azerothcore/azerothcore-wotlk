@@ -10,6 +10,7 @@
 #include "PassiveAI.h"
 #include "Player.h"
 #include "WorldSession.h"
+#include "BanManager.h"
 
 enum VezaxSpellData
 {
@@ -682,7 +683,7 @@ public:
             {
                 std::string accountName;
                 AccountMgr::GetName(plr->GetSession()->GetAccountId(), accountName);
-                sWorld->BanAccount(BAN_ACCOUNT, accountName, "0s", "Tele hack", "Server");
+                sBan->BanAccount(accountName, "0s", "Tele hack", "Server");
                 return true;
             }
 

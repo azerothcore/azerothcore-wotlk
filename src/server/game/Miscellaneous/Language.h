@@ -1290,6 +1290,7 @@ enum TrinityStrings
     LANG_BAN_CHARACTER_YOUPERMBANNEDMESSAGE_WORLD = 11005,
     LANG_BAN_ACCOUNT_YOUBANNEDMESSAGE_WORLD       = 11006,
     LANG_BAN_ACCOUNT_YOUPERMBANNEDMESSAGE_WORLD   = 11007,
+    
 
     LANG_NPCINFO_INHABIT_TYPE                     = 11008,
     LANG_NPCINFO_FLAGS_EXTRA                      = 11009,
@@ -1301,6 +1302,10 @@ enum TrinityStrings
     LANG_INSTANCE_BIND_MISMATCH                   = 11014,
     LANG_CREATURE_NOT_AI_ENABLED                  = 11015,
     LANG_SELECT_PLAYER_OR_PET                     = 11016,
+
+    // Continue show Ban in world (ip)
+    LANG_BAN_IP_YOUBANNEDMESSAGE_WORLD       	    = 11017,	
+    LANG_BAN_IP_YOUPERMBANNEDMESSAGE_WORLD   	    = 11018,
 
     LANG_MUTED_PLAYER                             = 30000, // Mute for player 2 hour
 };
