@@ -4166,6 +4166,8 @@ void SmartScript::OnUpdate(uint32 const diff)
 
 void SmartScript::FillScript(SmartAIEventList e, WorldObject* obj, AreaTrigger const* at)
 {
+    (void)at; // ensure that the variable is referenced even if extra logs are disabled in order to pass compiler checks
+    
     if (e.empty())
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
@@ -4175,7 +4177,7 @@ void SmartScript::FillScript(SmartAIEventList e, WorldObject* obj, AreaTrigger c
         if (at)
             sLog->outDebug(LOG_FILTER_DATABASE_AI, "SmartScript: EventMap for AreaTrigger %u is empty but is using SmartScript.", at->entry);
 #endif
-        return (void)at;
+        return;
     }
     for (SmartAIEventList::iterator i = e.begin(); i != e.end(); ++i)
     {
