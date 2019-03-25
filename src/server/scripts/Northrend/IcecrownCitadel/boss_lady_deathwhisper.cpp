@@ -419,7 +419,7 @@ class boss_lady_deathwhisper : public CreatureScript
                         break;
                     case EVENT_SPELL_FROSTBOLT_VOLLEY:
                         me->CastSpell((Unit*)nullptr, SPELL_FROSTBOLT_VOLLEY, false);
-                        events.RepeatEvent(20000);
+                        events.RepeatEvent(urand(13000,15000));
                         break;
                     case EVENT_SPELL_TOUCH_OF_INSIGNIFICANCE:
                         me->CastSpell(me->GetVictim(), SPELL_TOUCH_OF_INSIGNIFICANCE, false);
@@ -629,7 +629,7 @@ class boss_lady_deathwhisper : public CreatureScript
                 if (!cultist)
                     return;
 
-                if (true /*RAND(0, 1)*/)
+                if (RAND(0, 1))
                     me->CastSpell(cultist, SPELL_DARK_MARTYRDOM_T);
                 else
                 {
