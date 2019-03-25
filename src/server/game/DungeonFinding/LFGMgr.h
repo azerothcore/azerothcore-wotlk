@@ -232,7 +232,7 @@ typedef std::map<uint64, LfgProposalPlayer> LfgProposalPlayerContainer;
 typedef std::map<uint64, LfgPlayerBoot> LfgPlayerBootContainer;
 typedef std::map<uint64, LfgGroupData> LfgGroupDataContainer;
 typedef std::map<uint64, LfgPlayerData> LfgPlayerDataContainer;
-typedef UNORDERED_MAP<uint32, LFGDungeonData> LFGDungeonContainer;
+typedef std::unordered_map<uint32, LFGDungeonData> LFGDungeonContainer;
 
 // Data needed by SMSG_LFG_JOIN_RESULT
 struct LfgJoinResultData
@@ -386,15 +386,15 @@ class LFGMgr
         ~LFGMgr();
 
         // pussywizard: RAIDBROWSER
-        typedef UNORDERED_MAP<uint32 /*playerGuidLow*/, RBEntryInfo> RBEntryInfoMap;
-        typedef UNORDERED_MAP<uint32 /*dungeonId*/, RBEntryInfoMap> RBStoreMap;
+        typedef std::unordered_map<uint32 /*playerGuidLow*/, RBEntryInfo> RBEntryInfoMap;
+        typedef std::unordered_map<uint32 /*dungeonId*/, RBEntryInfoMap> RBStoreMap;
         RBStoreMap RaidBrowserStore[2]; // for 2 factions
-        typedef UNORDERED_MAP<uint32 /*playerGuidLow*/, uint32 /*dungeonId*/> RBSearchersMap;
+        typedef std::unordered_map<uint32 /*playerGuidLow*/, uint32 /*dungeonId*/> RBSearchersMap;
         RBSearchersMap RBSearchersStore[2]; // for 2 factions
-        typedef UNORDERED_MAP<uint32 /*dungeonId*/, WorldPacket> RBCacheMap;
+        typedef std::unordered_map<uint32 /*dungeonId*/, WorldPacket> RBCacheMap;
         RBCacheMap RBCacheStore[2]; // for 2 factions
-        typedef UNORDERED_MAP<uint32 /*guidLow*/, RBInternalInfo> RBInternalInfoMap;
-        typedef UNORDERED_MAP<uint32 /*dungeonId*/, RBInternalInfoMap> RBInternalInfoMapMap;
+        typedef std::unordered_map<uint32 /*guidLow*/, RBInternalInfo> RBInternalInfoMap;
+        typedef std::unordered_map<uint32 /*dungeonId*/, RBInternalInfoMap> RBInternalInfoMapMap;
         RBInternalInfoMapMap RBInternalInfoStorePrev[2]; // for 2 factions
         RBInternalInfoMapMap RBInternalInfoStoreCurr[2]; // for 2 factions
         typedef std::set<uint32 /*dungeonId*/> RBUsedDungeonsSet; // needs to be ordered
