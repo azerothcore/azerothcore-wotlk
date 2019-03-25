@@ -318,46 +318,46 @@ class go_ahune_ice_stone : public GameObjectScript
 public: 
     go_ahune_ice_stone() : GameObjectScript("go_ahune_ice_stone") { } 
 
-    bool OnGossipHello(Player *pPlayer, GameObject *pGO)
+    bool OnGossipHello(Player* player, GameObject* go) override
     {
-        if (!pPlayer || !pGO)
+        if (!player || !go)
             return true;
-        if (!pPlayer->HasItemCount(ITEM_MAGMA_TOTEM))
+        if (!player->HasItemCount(ITEM_MAGMA_TOTEM))
             return true;
-        if (pGO->FindNearestCreature(NPC_AHUNE, 200.0f, true))
+        if (go->FindNearestCreature(NPC_AHUNE, 200.0f, true))
             return true;
 
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Disturb the stone and summon Lord Ahune.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1337);
-        pPlayer->SEND_GOSSIP_MENU(GOSSIP_TEXT_ID, pGO->GetGUID());
+        AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Disturb the stone and summon Lord Ahune.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1337);
+        SendGossipMenuFor(player, GOSSIP_TEXT_ID, go->GetGUID());
         return true;
     }
 
-    bool OnGossipSelect(Player *pPlayer, GameObject *pGO, uint32 /*sender*/, uint32 action)
+    bool OnGossipSelect(Player* player, GameObject* go, uint32 /*sender*/, uint32 action) override
     {
-        if (!pPlayer || !pGO)
+        if (!player || !go)
             return true;
         if (action != GOSSIP_ACTION_INFO_DEF+1337)
             return true;
-        if (!pPlayer->HasItemCount(ITEM_MAGMA_TOTEM))
+        if (!player->HasItemCount(ITEM_MAGMA_TOTEM))
             return true;
-        if (pGO->FindNearestCreature(NPC_AHUNE, 200.0f, true))
+        if (go->FindNearestCreature(NPC_AHUNE, 200.0f, true))
             return true;
 
-        if (Creature* c = pGO->SummonCreature(NPC_AHUNE, AhuneSummonPos, TEMPSUMMON_MANUAL_DESPAWN))
+        if (Creature* c = go->SummonCreature(NPC_AHUNE, AhuneSummonPos, TEMPSUMMON_MANUAL_DESPAWN))
         {
-            pPlayer->DestroyItemCount(ITEM_MAGMA_TOTEM, 1, true, false);
-            pPlayer->AreaExploredOrEventHappens(QUEST_SUMMON_AHUNE); // auto rewarded
+            player->DestroyItemCount(ITEM_MAGMA_TOTEM, 1, true, false);
+            player->AreaExploredOrEventHappens(QUEST_SUMMON_AHUNE); // auto rewarded
 
             c->SetVisible(false);
             c->SetDisplayId(AHUNE_DEFAULT_MODEL);
             c->SetFloatValue(UNIT_FIELD_COMBATREACH, 18.0f);
-            CAST_AI(boss_ahune::boss_ahuneAI, c->AI())->InvokerGUID = pPlayer->GetGUID();
-            if (Creature* bunny = pGO->SummonCreature(NPC_AHUNE_SUMMON_LOC_BUNNY, AhuneSummonPos, TEMPSUMMON_TIMED_DESPAWN, 12000))
-                if (Creature* crystal_trigger = pGO->SummonCreature(WORLD_TRIGGER, pGO->GetPositionX(), pGO->GetPositionY(), 5.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 12000))
+            CAST_AI(boss_ahune::boss_ahuneAI, c->AI())->InvokerGUID = player->GetGUID();
+            if (Creature* bunny = go->SummonCreature(NPC_AHUNE_SUMMON_LOC_BUNNY, AhuneSummonPos, TEMPSUMMON_TIMED_DESPAWN, 12000))
+                if (Creature* crystal_trigger = go->SummonCreature(WORLD_TRIGGER, go->GetPositionX(), go->GetPositionY(), 5.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 12000))
                     crystal_trigger->CastSpell(bunny, SPELL_STARTING_BEAM, false);
         }
 
-        pPlayer->CLOSE_GOSSIP_MENU();
+        CloseGossipMenuFor(player);
         return true;
     }
 };

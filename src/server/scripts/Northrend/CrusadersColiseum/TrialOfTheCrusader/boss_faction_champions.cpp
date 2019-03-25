@@ -2436,17 +2436,17 @@ class go_toc_champions_cache : public GameObjectScript
 public:
     go_toc_champions_cache() : GameObjectScript("go_toc_champions_cache") { }
 
-    bool OnGossipHello(Player* plr, GameObject* go)
+    bool OnGossipHello(Player* player, GameObject* go) override
     {
-        if (plr->IsGameMaster())
+        if (player->IsGameMaster())
             return false;
 
         if (!go->loot.items.size())
             return false;
 
-        for( std::vector<LootItem>::iterator itr = go->loot.items.begin(); itr != go->loot.items.end(); ++itr )
+        for(std::vector<LootItem>::iterator itr = go->loot.items.begin(); itr != go->loot.items.end(); ++itr)
             if( ItemTemplate const *iProto = sObjectMgr->GetItemTemplate((*itr).itemid) )
-                if( ((iProto->Flags2 & ITEM_FLAGS_EXTRA_HORDE_ONLY) && plr->GetTeamId() != TEAM_HORDE) || ((iProto->Flags2 & ITEM_FLAGS_EXTRA_ALLIANCE_ONLY) && plr->GetTeamId() != TEAM_ALLIANCE) )
+                if( ((iProto->Flags2 & ITEM_FLAGS_EXTRA_HORDE_ONLY) && player->GetTeamId() != TEAM_HORDE) || ((iProto->Flags2 & ITEM_FLAGS_EXTRA_ALLIANCE_ONLY) && player->GetTeamId() != TEAM_ALLIANCE) )
                     if (!((*itr).is_looted))
                     {
                         (*itr).count = 0;

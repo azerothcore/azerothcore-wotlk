@@ -247,15 +247,15 @@ class go_the_pearl_of_the_depths : public GameObjectScript
 public:
     go_the_pearl_of_the_depths() : GameObjectScript("go_the_pearl_of_the_depths") { }
 
-    bool OnGossipHello(Player* pPlayer, GameObject* pGo)
+    bool OnGossipHello(Player* player, GameObject* go) override
     {
-        if( !pPlayer || !pGo )
+        if(!player || !go)
             return true;
 
-        Creature* t = pPlayer->FindNearestCreature(NPC_CONVERSING_WITH_THE_DEPTHS_TRIGGER, 10.0f, true);
-        if( t && t->AI() && CAST_AI(npc_conversing_with_the_depths_trigger::npc_conversing_with_the_depths_triggerAI, t->AI()) )
-            if( !CAST_AI(npc_conversing_with_the_depths_trigger::npc_conversing_with_the_depths_triggerAI, t->AI())->running )
-                CAST_AI(npc_conversing_with_the_depths_trigger::npc_conversing_with_the_depths_triggerAI, t->AI())->Start(pPlayer->GetGUID());
+        Creature* t = player->FindNearestCreature(NPC_CONVERSING_WITH_THE_DEPTHS_TRIGGER, 10.0f, true);
+        if(t && t->AI() && CAST_AI(npc_conversing_with_the_depths_trigger::npc_conversing_with_the_depths_triggerAI, t->AI()))
+            if(!CAST_AI(npc_conversing_with_the_depths_trigger::npc_conversing_with_the_depths_triggerAI, t->AI())->running)
+                CAST_AI(npc_conversing_with_the_depths_trigger::npc_conversing_with_the_depths_triggerAI, t->AI())->Start(player->GetGUID());
 
         return true;
     }
@@ -343,7 +343,7 @@ public:
         {
             return NPC_INFINITE_ASSAILANT+urand(0,2);
         }
-        
+
         void UpdateAI(uint32 diff)
         {
             events.Update(diff);
@@ -462,15 +462,15 @@ public:
     struct npc_future_youAI : public ScriptedAI
     {
         npc_future_youAI(Creature* c) : ScriptedAI(c) {}
-        
-        void EnterEvadeMode() 
+
+        void EnterEvadeMode()
         {
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IN_COMBAT);
             me->ClearUnitState(UNIT_STATE_EVADE);
         }
 
-        void Reset() 
-        { 
+        void Reset()
+        {
             if (me->ToTempSummon() && me->ToTempSummon()->GetSummoner())
                 me->setFaction(me->ToTempSummon()->GetSummoner()->getFaction());
         }

@@ -30,7 +30,7 @@ enum Says
     SAY_PHASE201                                = 10,
     SAY_PHASE203                                = 11,
     SAY_PHASE205                                = 12,
-    SAY_PHASE208                                = 13,    
+    SAY_PHASE208                                = 13,
     SAY_PHASE209                                = 14,
     SAY_PHASE210                                = 15,
 
@@ -83,7 +83,7 @@ enum Says
     SAY_PHASE117                                = 1,
 
     //Cityman
-    SAY_PHASE202                                = 0,  
+    SAY_PHASE202                                = 0,
 
     //Crazyman
     SAY_PHASE204                                = 0,
@@ -278,7 +278,7 @@ class npc_arthas : public CreatureScript
 public:
     npc_arthas() : CreatureScript("npc_arthas") { }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action)
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
     {
         if (creature->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP))
         {
@@ -287,35 +287,35 @@ public:
                 case GOSSIP_ACTION_INFO_DEF+1:
                     creature->AI()->DoAction(ACTION_START_CITY);
                     creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-                    player->CLOSE_GOSSIP_MENU();
+                    CloseGossipMenuFor(player);
                     break;
                 case GOSSIP_ACTION_INFO_DEF+2:
-                    player->PlayerTalkClass->ClearMenus();
-                    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_ARTHAS_3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+3);
-                    player->SEND_GOSSIP_MENU(GOSSIP_MENU_ARTHAS_3, creature->GetGUID());
+                    ClearGossipMenuFor(player);
+                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_ARTHAS_3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+3);
+                    SendGossipMenuFor(player, GOSSIP_MENU_ARTHAS_3, creature->GetGUID());
                     break;
                 case GOSSIP_ACTION_INFO_DEF+3:
                     // Start Town Hall part
                     creature->AI()->DoAction(ACTION_START_TOWN_HALL);
                     creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-                    player->CLOSE_GOSSIP_MENU();
+                    CloseGossipMenuFor(player);
                     break;
                 case GOSSIP_ACTION_INFO_DEF+4:
                     // After killing epoch
                     creature->AI()->DoAction(ACTION_START_SECRET_PASSAGE);
                     creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
                     creature->SetTarget(0);
-                    player->CLOSE_GOSSIP_MENU();
+                    CloseGossipMenuFor(player);
                     break;
                 case GOSSIP_ACTION_INFO_DEF+5:
                     creature->AI()->DoAction(ACTION_START_LAST_CITY);
                     creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-                    player->CLOSE_GOSSIP_MENU();
+                    CloseGossipMenuFor(player);
                     break;
                 case GOSSIP_ACTION_INFO_DEF+6:
                     creature->AI()->DoAction(ACTION_START_MALGANIS);
                     creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-                    player->CLOSE_GOSSIP_MENU();
+                    CloseGossipMenuFor(player);
                     break;
             }
         }
@@ -323,7 +323,7 @@ public:
         return true;
     }
 
-    bool OnGossipHello(Player* player, Creature* creature)
+    bool OnGossipHello(Player* player, Creature* creature) override
     {
         InstanceScript* pInstance = creature->GetInstanceScript();
         if (!pInstance)
@@ -332,30 +332,30 @@ public:
         switch (pInstance->GetData(DATA_ARTHAS_EVENT))
         {
             case COS_PROGRESS_FINISHED_INTRO:
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_ARTHAS_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
-                player->SEND_GOSSIP_MENU(GOSSIP_MENU_ARTHAS_1, creature->GetGUID());
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_ARTHAS_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
+                SendGossipMenuFor(player, GOSSIP_MENU_ARTHAS_1, creature->GetGUID());
                 break;
             case COS_PROGRESS_REACHED_TOWN_HALL:
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_ARTHAS_2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+2);
-                player->SEND_GOSSIP_MENU(GOSSIP_MENU_ARTHAS_2, creature->GetGUID());
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_ARTHAS_2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+2);
+                SendGossipMenuFor(player, GOSSIP_MENU_ARTHAS_2, creature->GetGUID());
                 break;
             case COS_PROGRESS_KILLED_EPOCH:
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_ARTHAS_4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+4);
-                player->SEND_GOSSIP_MENU(GOSSIP_MENU_ARTHAS_4, creature->GetGUID());
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_ARTHAS_4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+4);
+                SendGossipMenuFor(player, GOSSIP_MENU_ARTHAS_4, creature->GetGUID());
                 break;
             case COS_PROGRESS_LAST_CITY:
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_ARTHAS_5, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+5);
-                player->SEND_GOSSIP_MENU(GOSSIP_MENU_ARTHAS_5, creature->GetGUID());
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_ARTHAS_5, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+5);
+                SendGossipMenuFor(player, GOSSIP_MENU_ARTHAS_5, creature->GetGUID());
                 break;
             case COS_PROGRESS_BEFORE_MALGANIS:
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_ARTHAS_6, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+6);
-                player->SEND_GOSSIP_MENU(GOSSIP_MENU_ARTHAS_6, creature->GetGUID());
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_ARTHAS_6, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+6);
+                SendGossipMenuFor(player, GOSSIP_MENU_ARTHAS_6, creature->GetGUID());
                 break;
         }
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_arthasAI(creature);
     }
@@ -380,31 +380,31 @@ public:
         void ScheduleNextEvent(uint32 currentEvent, uint32 time);
         void SummonNextWave();
         void ReorderInstance(uint32 data);
-        void EnterCombat(Unit* /*who*/);
+        void EnterCombat(Unit* /*who*/) override ;
         void SendNextWave(uint32 entry);
         void SpawnTimeRift();
 
-        void JustDied(Unit*)
+        void JustDied(Unit*) override
         {
             RemoveEscortState(STATE_ESCORT_ESCORTING);
             if (pInstance)
                 pInstance->SetData(DATA_ARTHAS_REPOSITION, 2);
         }
 
-        void JustSummoned(Creature* cr)
+        void JustSummoned(Creature* cr) override
         {
             summons.Summon(cr);
         }
 
-        void SummonedCreatureDespawn(Creature* cr) { summons.Despawn(cr); }
+        void SummonedCreatureDespawn(Creature* cr) override { summons.Despawn(cr); }
 
-        void SummonedCreatureDies(Creature* cr, Unit*)
+        void SummonedCreatureDies(Creature* cr, Unit*) override
         {
             if (pInstance && pInstance->GetData(DATA_ARTHAS_EVENT) > COS_PROGRESS_FINISHED_INTRO && pInstance->GetData(DATA_ARTHAS_EVENT) < COS_PROGRESS_REACHED_TOWN_HALL)
                 SendNextWave(cr->GetEntry());
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (param == ACTION_START_EVENT)
             {
@@ -482,7 +482,7 @@ public:
             }
         }
 
-        void Reset()
+        void Reset() override
         {
             actionEvents.Reset();
             combatEvents.Reset();
@@ -503,7 +503,7 @@ public:
             }
         }
 
-        void WaypointReached(uint32 uiPointId)
+        void WaypointReached(uint32 uiPointId) override
         {
             switch(uiPointId)
             {
@@ -652,7 +652,7 @@ public:
              }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             npc_escortAI::UpdateAI(diff);
 
@@ -673,7 +673,7 @@ public:
                         for (int i = 0; i < 3; ++i)
                             if (Creature *horse = me->SummonCreature(NPC_HORSE_ESCORT, EventPos[EVENT_SRC_HORSE1+i], TEMPSUMMON_DEAD_DESPAWN, 180000))
                                 horse->GetMotionMaster()->MovePoint(0, EventPos[EVENT_DST_HORSE1+i], false);
-                        
+
                         ScheduleNextEvent(currentEvent, 4000);
                         break;
                     case EVENT_ACTION_PHASE1+1:
@@ -691,7 +691,7 @@ public:
                     case EVENT_ACTION_PHASE1+3:
                         if (Creature* uther = GetEventNpc(NPC_UTHER))
                             uther->AI()->Talk(SAY_PHASE102);
-                        
+
                         ScheduleNextEvent(currentEvent, 8000);
                         break;
                     case EVENT_ACTION_PHASE1+4:
@@ -711,7 +711,7 @@ public:
                     case EVENT_ACTION_PHASE1+6:
                         if (Creature* uther = GetEventNpc(NPC_UTHER))
                             uther->AI()->Talk(SAY_PHASE105);
-                        
+
                         ScheduleNextEvent(currentEvent, 1000);
                         break;
                     case EVENT_ACTION_PHASE1+7:
@@ -721,7 +721,7 @@ public:
                     case EVENT_ACTION_PHASE1+8:
                         if (Creature* uther = GetEventNpc(NPC_UTHER))
                             uther->AI()->Talk(SAY_PHASE107);
-                        
+
                         ScheduleNextEvent(currentEvent, 6000);
                         break;
                     case EVENT_ACTION_PHASE1+9:
@@ -731,7 +731,7 @@ public:
                     case EVENT_ACTION_PHASE1+10:
                         if (Creature* uther = GetEventNpc(NPC_UTHER))
                             uther->AI()->Talk(SAY_PHASE109);
-                        
+
                         ScheduleNextEvent(currentEvent, 8000);
                         break;
                     case EVENT_ACTION_PHASE1+11:
@@ -741,7 +741,7 @@ public:
                     case EVENT_ACTION_PHASE1+12:
                         if (Creature* uther = GetEventNpc(NPC_UTHER))
                             uther->AI()->Talk(SAY_PHASE111);
-                        
+
                         ScheduleNextEvent(currentEvent, 4000);
                         break;
                     case EVENT_ACTION_PHASE1+13:
@@ -751,7 +751,7 @@ public:
                     case EVENT_ACTION_PHASE1+14:
                         if (Creature* jaina = GetEventNpc(NPC_JAINA))
                             jaina->AI()->Talk(SAY_PHASE113);
-                        
+
                         ScheduleNextEvent(currentEvent, 2500);
                         break;
                     case EVENT_ACTION_PHASE1+15:
@@ -761,7 +761,7 @@ public:
                     case EVENT_ACTION_PHASE1+16:
                         if (Creature* uther = GetEventNpc(NPC_UTHER))
                             uther->AI()->Talk(SAY_PHASE115);
-                        
+
                         ScheduleNextEvent(currentEvent, 4000);
                         break;
                     case EVENT_ACTION_PHASE1+17:
@@ -881,7 +881,7 @@ public:
                     case EVENT_ACTION_PHASE2+5:
                         if (Creature* malganis = GetEventNpc(NPC_MAL_GANIS))
                             malganis->AI()->Talk(SAY_PHASE207);
-                        
+
                         ScheduleNextEvent(currentEvent, 15000);
                         break;
                     case EVENT_ACTION_PHASE2+6:
@@ -908,7 +908,7 @@ public:
                     case EVENT_ACTION_PHASE2+8:
                         if (pInstance)
                             pInstance->SetData(DATA_START_WAVES, 1);
-                        
+
                         SummonNextWave();
                         actionEvents.PopEvent();
                         break;
@@ -1130,7 +1130,7 @@ public:
                         Talk(SAY_PHASE503);
                         SetEscortPaused(false);
                         eventInRun = false;
-                        ScheduleNextEvent(currentEvent, 5000);                      
+                        ScheduleNextEvent(currentEvent, 5000);
                         break;
                     case EVENT_ACTION_PHASE5+2:
                         me->SetFacingTo(5.28f);
@@ -1140,7 +1140,7 @@ public:
                             pInstance->SetData(DATA_ARTHAS_EVENT, COS_PROGRESS_FINISHED);
                             if (GameObject* go = pInstance->instance->GetGameObject(pInstance->GetData64(DATA_EXIT_GATE)))
                                 go->SetGoState(GO_STATE_ACTIVE);
-                            
+
                             if (!me->GetMap()->GetPlayers().isEmpty())
                                 if (Player* player = me->GetMap()->GetPlayers().getFirst()->GetSource())
                                     player->SummonGameObject(DUNGEON_MODE(GO_MALGANIS_CHEST_N, GO_MALGANIS_CHEST_H), 2288.35f, 1498.73f, 128.414f, -0.994837f, 0, 0, 0, 0, 0);
@@ -1174,18 +1174,18 @@ public:
                 case EVENT_COMBAT_HEALTH_CHECK:
                     if (HealthBelowPct(40))
                         me->CastSpell(me, SPELL_ARTHAS_HOLY_LIGHT, false);
-                    
+
                     combatEvents.RepeatEvent(1000);
                     break;
-            }         
+            }
 
             DoMeleeAttackIfReady();
         }
     };
 };
 
-Creature* npc_arthas::npc_arthasAI::GetEventNpc(uint32 entry) 
-{ 
+Creature* npc_arthas::npc_arthasAI::GetEventNpc(uint32 entry)
+{
     for (SummonList::iterator i = summons.begin(); i != summons.end();)
     {
         Creature* summon = ObjectAccessor::GetCreature(*me, *i);
@@ -1217,7 +1217,7 @@ void npc_arthas::npc_arthasAI::SummonNextWave()
     uint32 tableId = waveGroupId;
     if (tableId > 4)
         tableId--;
-    
+
     for (uint32 i = 0; i < ENCOUNTER_WAVES_MAX_SPAWNS; ++i)
         me->SummonCreature(/*entry*/(uint32)WavesLocations[tableId][i][0], WavesLocations[tableId][i][1], WavesLocations[tableId][i][2], WavesLocations[tableId][i][3], WavesLocations[tableId][i][4]);
 }
@@ -1248,7 +1248,7 @@ void npc_arthas::npc_arthasAI::ReorderInstance(uint32 data)
         case COS_PROGRESS_KILLED_SALRAMM:
             SetNextWaypoint(12, false);
             me->SetReactState(REACT_DEFENSIVE);
-            
+
             if (data == COS_PROGRESS_FINISHED_CITY_INTRO)
             {
                 eventInRun = true;
@@ -1400,7 +1400,7 @@ class npc_cos_chromie_start : public CreatureScript
     public:
         npc_cos_chromie_start() : CreatureScript("npc_cos_chromie_start") { }
 
-        bool OnQuestAccept(Player* , Creature* creature, const Quest* pQuest)
+        bool OnQuestAccept(Player* , Creature* creature, const Quest* pQuest) override
         {
             if (pQuest->GetQuestId() == QUEST_DISPELLING_ILLUSIONS)
                 if (InstanceScript* pInstance = creature->GetInstanceScript())
@@ -1409,7 +1409,7 @@ class npc_cos_chromie_start : public CreatureScript
             return true;
         }
 
-        bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32  /*action*/)
+        bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32  /*action*/) override
         {
             // final menu id, show crates if hidden and add item if missing
             if (player->PlayerTalkClass->GetGossipMenu().GetMenuId() == 9595)
@@ -1447,7 +1447,7 @@ class npc_cos_chromie_middle : public CreatureScript
     public:
         npc_cos_chromie_middle() : CreatureScript("npc_cos_chromie_middle") { }
 
-        bool OnQuestAccept(Player* , Creature* creature, const Quest* pQuest)
+        bool OnQuestAccept(Player* , Creature* creature, const Quest* pQuest) override
         {
             if (pQuest->GetQuestId() == QUEST_A_ROYAL_ESCORT)
                 if (InstanceScript* pInstance = creature->GetInstanceScript())
@@ -1457,7 +1457,7 @@ class npc_cos_chromie_middle : public CreatureScript
             return true;
         }
 
-        bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32  /*action*/)
+        bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32  /*action*/) override
         {
             if (!creature->GetInstanceScript() || creature->GetInstanceScript()->GetData(DATA_ARTHAS_EVENT) != COS_PROGRESS_CRATES_FOUND)
                 return true;
@@ -1469,7 +1469,7 @@ class npc_cos_chromie_middle : public CreatureScript
             return false;
         }
 
-        bool OnGossipHello(Player* player, Creature* creature)
+        bool OnGossipHello(Player* player, Creature* creature) override
         {
             if (creature->IsQuestGiver())
             {
@@ -1479,7 +1479,7 @@ class npc_cos_chromie_middle : public CreatureScript
 
             if (!creature->GetInstanceScript() || creature->GetInstanceScript()->GetData(DATA_ARTHAS_EVENT) != COS_PROGRESS_CRATES_FOUND)
                 return true;
-            
+
             return false;
         }
 };
@@ -1504,7 +1504,7 @@ class npc_cos_stratholme_citizien : public CreatureScript
             InstanceScript* pInstance;
             uint32 allowTimer;
 
-            void Reset() 
+            void Reset()
             {
                 me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
                 locked = false;
@@ -1598,7 +1598,7 @@ class npc_cos_stratholme_citizien : public CreatureScript
         {
             return new npc_cos_stratholme_citizienAI(creature);
         }
-};   
+};
 
 void AddSC_culling_of_stratholme()
 {
