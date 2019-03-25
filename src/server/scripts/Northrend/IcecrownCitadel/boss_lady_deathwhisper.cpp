@@ -268,12 +268,12 @@ class boss_lady_deathwhisper : public CreatureScript
                 events.Reset();
                 events.SetPhase(PHASE_ONE);
                 events.ScheduleEvent(EVENT_BERSERK, 600000);
-                events.ScheduleEvent(EVENT_SPELL_DEATH_AND_DECAY, 17000);
+                events.ScheduleEvent(EVENT_SPELL_DEATH_AND_DECAY, 10000);
                 if (GetDifficulty() != RAID_DIFFICULTY_10MAN_NORMAL)
                     events.ScheduleEvent(EVENT_SPELL_DOMINATE_MIND_25, 27000);
                 events.ScheduleEvent(EVENT_SPELL_SHADOW_BOLT, 2000, 0, PHASE_ONE);
                 events.ScheduleEvent(EVENT_SUMMON_WAVE_P1, 5000, 0, PHASE_ONE);
-                events.ScheduleEvent(EVENT_EMPOWER_CULTIST, 15000, 0, PHASE_ONE);
+                events.ScheduleEvent(EVENT_EMPOWER_CULTIST, urand(20000,30000), 0, PHASE_ONE);
 
                 Talk(SAY_AGGRO);
                 me->RemoveAurasDueToSpell(SPELL_SHADOW_CHANNELING);
@@ -303,10 +303,10 @@ class boss_lady_deathwhisper : public CreatureScript
                     me->SetPower(POWER_MANA, 0);
                     me->RemoveAurasDueToSpell(SPELL_MANA_BARRIER);
                     events.SetPhase(PHASE_TWO);
-                    events.ScheduleEvent(EVENT_SPELL_FROSTBOLT, 12000, 0, PHASE_TWO);
-                    events.ScheduleEvent(EVENT_SPELL_FROSTBOLT_VOLLEY, 20000, 0, PHASE_TWO);
+                    events.ScheduleEvent(EVENT_SPELL_FROSTBOLT, urand(10000,12000), 0, PHASE_TWO);
+                    events.ScheduleEvent(EVENT_SPELL_FROSTBOLT_VOLLEY, urand(19000,21000), 0, PHASE_TWO);
                     events.ScheduleEvent(EVENT_SPELL_TOUCH_OF_INSIGNIFICANCE, urand(6000, 9000), 0, PHASE_TWO);
-                    events.ScheduleEvent(EVENT_SPELL_SUMMON_SHADE, 12000, 0, PHASE_TWO);
+                    events.ScheduleEvent(EVENT_SPELL_SUMMON_SHADE, urand(12000,15000), 0, PHASE_TWO);
                     if (IsHeroic())
                     {
                         me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TAUNT, true);
@@ -403,7 +403,7 @@ class boss_lady_deathwhisper : public CreatureScript
                     case EVENT_SPELL_SHADOW_BOLT:
                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
                             me->CastSpell(target, SPELL_SHADOW_BOLT, false);
-                        events.RepeatEvent(urand(2450, 3600));
+                        events.RepeatEvent(2100);
                         break;
                     case EVENT_SUMMON_WAVE_P1:
                         SummonWaveP1();
@@ -411,7 +411,7 @@ class boss_lady_deathwhisper : public CreatureScript
                         break;
                     case EVENT_EMPOWER_CULTIST:
                         EmpowerCultist();
-                        events.RepeatEvent(25000);
+                        events.RepeatEvent(urand(18000,25000));
                         break;
                     case EVENT_SPELL_FROSTBOLT:
                         me->CastSpell(me->GetVictim(), SPELL_FROSTBOLT, false);
@@ -705,11 +705,11 @@ public:
                     me->GetMotionMaster()->MovementExpired();
                     me->GetMotionMaster()->MoveIdle();
                     me->StopMoving();
-                    Reset();
-                    me->UpdateEntry(NPC_REANIMATED_FANATIC);
                     me->CastSpell(me, SPELL_PERMANENT_FEIGN_DEATH);
                     me->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
                     me->SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
+                    Reset();
+                    me->UpdateEntry(NPC_REANIMATED_FANATIC);
                     me->CastSpell(me, SPELL_CLEAR_ALL_DEBUFFS, true);
                     me->CastSpell(me, SPELL_FULL_HEAL, true);
                     me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED | UNIT_FLAG_UNK_29 | UNIT_FLAG_NOT_SELECTABLE);
@@ -818,11 +818,11 @@ public:
                     me->GetMotionMaster()->MovementExpired();
                     me->GetMotionMaster()->MoveIdle();
                     me->StopMoving();
-                    Reset();
-                    me->UpdateEntry(NPC_REANIMATED_ADHERENT);
                     me->CastSpell(me, SPELL_PERMANENT_FEIGN_DEATH);
                     me->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
                     me->SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
+                    Reset();
+                    me->UpdateEntry(NPC_REANIMATED_ADHERENT);
                     me->CastSpell(me, SPELL_CLEAR_ALL_DEBUFFS, true);
                     me->CastSpell(me, SPELL_FULL_HEAL, true);
                     me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED | UNIT_FLAG_UNK_29 | UNIT_FLAG_NOT_SELECTABLE);
