@@ -5,8 +5,6 @@
 #ifndef DEF_ONYXIAS_LAIR_H
 #define DEF_ONYXIAS_LAIR_H
 
-#include "ScriptPCH.h"
-
 enum eInstanceData
 {
     DATA_ONYXIA                 = 0,

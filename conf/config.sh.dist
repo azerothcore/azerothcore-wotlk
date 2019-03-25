@@ -41,7 +41,7 @@ CSCRIPTS=ON
 # compile server
 CSERVERS=ON
 # compile tools
-CTOOLS=ON
+CTOOLS=OFF
 # use precompiled headers ( fatest compilation but not optimized if you change headers often )
 CSCRIPTPCH=ON
 CCOREPCH=ON
@@ -86,12 +86,12 @@ BACKUP_FOLDER="$AC_PATH_ROOT/env/dist/sql/backup/"
 #######
 
 # FULL DB
-DB_CHARACTERS_PATHS=(
-    $SRCPATH"/data/sql/base/db_characters"
-)
-
 DB_AUTH_PATHS=(
     $SRCPATH"/data/sql/base/db_auth/"
+)
+
+DB_CHARACTERS_PATHS=(
+    $SRCPATH"/data/sql/base/db_characters"
 )
 
 DB_WORLD_PATHS=(
@@ -99,14 +99,14 @@ DB_WORLD_PATHS=(
 )
 
 # UPDATES
-DB_CHARACTERS_UPDATES_PATHS=(
-    $SRCPATH"/data/sql/updates/db_characters/"
-    $SRCPATH"/data/sql/updates/pending_db_characters/"
-)
-
 DB_AUTH_UPDATES_PATHS=(
     $SRCPATH"/data/sql/updates/db_auth/"
     $SRCPATH"/data/sql/updates/pending_db_auth/"
+)
+
+DB_CHARACTERS_UPDATES_PATHS=(
+    $SRCPATH"/data/sql/updates/db_characters/"
+    $SRCPATH"/data/sql/updates/pending_db_characters/"
 )
 
 DB_WORLD_UPDATES_PATHS=(
@@ -115,12 +115,12 @@ DB_WORLD_UPDATES_PATHS=(
 )
 
 # CUSTOM
-DB_CHARACTERS_CUSTOM_PATHS=(
-    $SRCPATH"/data/sql/custom/db_characters/"
-)
-
 DB_AUTH_CUSTOM_PATHS=(
     $SRCPATH"/data/sql/custom/db_auth/"
+)
+
+DB_CHARACTERS_CUSTOM_PATHS=(
+    $SRCPATH"/data/sql/custom/db_characters/"
 )
 
 DB_WORLD_CUSTOM_PATHS=(
@@ -149,25 +149,24 @@ DB_SKIP_BASE_IMPORT_IF_EXISTS=true
 DB_MYSQL_EXEC="mysql"
 DB_MYSQL_DUMP_EXEC="mysqldump"
 
-DB_CHARACTERS_CONF="MYSQL_USER='acore'; \
-                    MYSQL_PASS='acore'; \
-                    MYSQL_HOST='127.0.0.1';\
-                    "
 
 DB_AUTH_CONF="MYSQL_USER='acore'; \
                     MYSQL_PASS='acore'; \
                     MYSQL_HOST='127.0.0.1';\
                     "
 
+DB_CHARACTERS_CONF="MYSQL_USER='acore'; \
+                    MYSQL_PASS='acore'; \
+                    MYSQL_HOST='127.0.0.1';\
+                    "
 
 DB_WORLD_CONF="MYSQL_USER='acore'; \
                     MYSQL_PASS='acore'; \
                     MYSQL_HOST='127.0.0.1';\
                     "
 
+DB_AUTH_NAME="acore_auth"
 
 DB_CHARACTERS_NAME="acore_characters"
-
-DB_AUTH_NAME="acore_auth"
 
 DB_WORLD_NAME="acore_world"

@@ -6,6 +6,7 @@
 
 #include "ScriptLoader.h"
 #include "ScriptMgr.h"
+#include "World.h"
 
 // spells
 void AddSC_deathknight_spell_scripts();
@@ -31,6 +32,7 @@ void AddSC_ban_commandscript();
 void AddSC_bf_commandscript();
 void AddSC_cast_commandscript();
 void AddSC_character_commandscript();
+void AddSC_cheat_commandscript();
 void AddSC_debug_commandscript();
 void AddSC_disable_commandscript();
 void AddSC_event_commandscript();
@@ -54,7 +56,6 @@ void AddSC_reload_commandscript();
 void AddSC_reset_commandscript();
 void AddSC_server_commandscript();
 void AddSC_spectator_commandscript();
-void AddSC_spy_scripts();
 void AddSC_tele_commandscript();
 void AddSC_ticket_commandscript();
 void AddSC_titles_commandscript();
@@ -73,6 +74,7 @@ void AddSC_npc_innkeeper();
 void AddSC_npcs_special();
 void AddSC_npc_taxi();
 void AddSC_achievement_scripts();
+void AddSC_action_ip_logger();
 
 //events
 void AddSC_event_brewfest_scripts();
@@ -202,7 +204,6 @@ void AddSC_instance_zulgurub();
 //void AddSC_alterac_mountains();
 void AddSC_arathi_highlands();
 void AddSC_blasted_lands();
-void AddSC_burning_steppes();
 void AddSC_duskwood();
 void AddSC_eastern_plaguelands();
 void AddSC_eversong_woods();
@@ -577,6 +578,7 @@ void AddSC_outdoorpvp_gh();
 // player
 void AddSC_chat_log();
 void AddSC_character_creation();
+void AddSC_action_ip_logger();
 
 #endif
 
@@ -607,6 +609,7 @@ void AddCommandScripts()
     AddSC_bf_commandscript();
     AddSC_cast_commandscript();
     AddSC_character_commandscript();
+    AddSC_cheat_commandscript();
     AddSC_debug_commandscript();
     AddSC_disable_commandscript();
     AddSC_event_commandscript();
@@ -649,8 +652,9 @@ void AddWorldScripts()
     AddSC_npcs_special();
     AddSC_npc_taxi();
     AddSC_achievement_scripts();
-    AddSC_chat_log();
+    AddSC_chat_log(); // location: scripts\World\chat_log.cpp
     AddSC_character_creation();
+    AddSC_action_ip_logger(); // location: scripts\World\action_ip_logger.cpp
 #endif
 }
 
@@ -788,7 +792,6 @@ void AddEasternKingdomsScripts()
     //AddSC_alterac_mountains();
     AddSC_arathi_highlands();
     AddSC_blasted_lands();
-    AddSC_burning_steppes();
     AddSC_duskwood();
     AddSC_eastern_plaguelands();
     AddSC_eversong_woods();

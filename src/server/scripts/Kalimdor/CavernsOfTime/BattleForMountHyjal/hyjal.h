@@ -7,7 +7,7 @@
 #ifndef DEF_HYJAL_H
 #define DEF_HYJAL_H
 
-#include "ScriptPCH.h"
+#include "GridNotifiers.h"
 
 #define ERROR_INST_DATA     "TSCR: Instance data not set properly for Mount Hyjal. Encounters will be buggy."
 

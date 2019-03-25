@@ -1136,14 +1136,6 @@ void WorldSession::HandleNextCinematicCamera(WorldPacket & /*recv_data*/)
 #endif
 }
 
-void WorldSession::HandleMoveTimeSkippedOpcode(WorldPacket & recv_data)
-{
-    uint64 guid;
-    uint32 time_skipped;
-    recv_data.readPackGUID(guid);
-    recv_data >> time_skipped;
-}
-
 void WorldSession::HandleFeatherFallAck(WorldPacket &recv_data)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
@@ -1707,7 +1699,7 @@ void WorldSession::HandleSetRaidDifficultyOpcode(WorldPacket & recv_data)
                 p->SetMap(homeMap0);
                 p->Relocate(0.0f, 0.0f, 0.0f, 0.0f);
                 if (!p->TeleportTo(571, 5790.20f, 2071.36f, 636.07f, 3.60f))
-                    p->GetSession()->KickPlayer();
+                    p->GetSession()->KickPlayer("HandleSetRaidDifficultyOpcode 1");
             }
 
             bool anyoneInside = false;
@@ -1744,7 +1736,7 @@ void WorldSession::HandleSetRaidDifficultyOpcode(WorldPacket & recv_data)
             {
                 itr->first->SetRaidDifficulty(Difficulty(mode)); // needed for teleport not to fail
                 if (!itr->first->TeleportTo(*(foundMaps.begin()), itr->second.GetPositionX(), itr->second.GetPositionY(), itr->second.GetPositionZ(), itr->second.GetOrientation()))
-                    itr->first->GetSession()->KickPlayer();
+                    itr->first->GetSession()->KickPlayer("HandleSetRaidDifficultyOpcode 2");
             }
         }
     }

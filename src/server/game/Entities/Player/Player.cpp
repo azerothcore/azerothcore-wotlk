@@ -709,6 +709,7 @@ Player::Player(WorldSession* session): Unit(true), m_mover(this)
 
     m_regenTimer = 0;
     m_regenTimerCount = 0;
+    m_foodEmoteTimerCount = 0;
     m_weaponChangeTimer = 0;
 
     m_zoneUpdateId = uint32(-1);
@@ -911,6 +912,8 @@ Player::Player(WorldSession* session): Unit(true), m_mover(this)
     m_SeasonalQuestChanged = false;
 
     SetPendingBind(0, 0);
+
+    _activeCheats = CHEAT_NONE;
 
     m_achievementMgr = new AchievementMgr(this);
     m_reputationMgr = new ReputationMgr(this);
@@ -1210,6 +1213,8 @@ bool Player::Create(uint32 guidlow, CharacterCreateInfo* createInfo)
         }
     }
     // all item positions resolved
+
+    CheckAllAchievementCriteria();
 
     return true;
 }
@@ -1733,7 +1738,7 @@ void Player::Update(uint32 p_time)
     if (!IsPositionValid()) // pussywizard: will crash below at eg. GetZoneAndAreaId
     {
         sLog->outMisc("Player::Update - invalid position (%.1f, %.1f, %.1f)! Map: %u, MapId: %u, GUID: %u", GetPositionX(), GetPositionY(), GetPositionZ(), (FindMap() ? FindMap()->GetId() : 0), GetMapId(), GetGUIDLow());
-        GetSession()->KickPlayer();
+        GetSession()->KickPlayer("Invalid position");
         return;
     }
 
@@ -2575,6 +2580,7 @@ void Player::RegenerateAll()
     //    return;
 
     m_regenTimerCount += m_regenTimer;
+    m_foodEmoteTimerCount += m_regenTimer;
 
     Regenerate(POWER_ENERGY);
 
@@ -2619,6 +2625,37 @@ void Player::RegenerateAll()
     }
 
     m_regenTimer = 0;
+    
+    // Handles the emotes for drinking and eating.
+    // According to sniffs there is a background timer going on that repeats independed from the time window where the aura applies.
+    // That's why we dont need to reset the timer on apply. In sniffs I have seen that the first call for the spell visual is totally random, then after
+    // 5 seconds over and over again which confirms my theory that we have a independed timer.
+    if (m_foodEmoteTimerCount >= 5000)
+    {
+        std::vector<AuraEffect*> auraList;
+        AuraEffectList const& ModRegenAuras = GetAuraEffectsByType(SPELL_AURA_MOD_REGEN);
+        AuraEffectList const& ModPowerRegenAuras = GetAuraEffectsByType(SPELL_AURA_MOD_POWER_REGEN);
+
+        auraList.reserve(ModRegenAuras.size() + ModPowerRegenAuras.size());
+        auraList.insert(auraList.end(), ModRegenAuras.begin(), ModRegenAuras.end());
+        auraList.insert(auraList.end(), ModPowerRegenAuras.begin(), ModPowerRegenAuras.end());
+
+        for (auto itr = auraList.begin(); itr != auraList.end(); ++itr)
+        {
+            // Food emote comes above drinking emote if we have to decide (mage regen food for example)
+            if ((*itr)->GetBase()->HasEffectType(SPELL_AURA_MOD_REGEN) && (*itr)->GetSpellInfo()->AuraInterruptFlags & AURA_INTERRUPT_FLAG_NOT_SEATED)
+            {
+                SendPlaySpellVisual(SPELL_VISUAL_KIT_FOOD);
+                break;
+            }
+            else if ((*itr)->GetBase()->HasEffectType(SPELL_AURA_MOD_POWER_REGEN) && (*itr)->GetSpellInfo()->AuraInterruptFlags & AURA_INTERRUPT_FLAG_NOT_SEATED)
+            {
+                SendPlaySpellVisual(SPELL_VISUAL_KIT_DRINK);
+                break;
+            }
+        }
+        m_foodEmoteTimerCount -= 5000;
+    }
 }
 
 void Player::Regenerate(Powers power)
@@ -4027,10 +4064,13 @@ void Player::learnSpell(uint32 spellId)
     uint32 firstRankSpellId = sSpellMgr->GetFirstSpellInChain(spellId);
     bool thisSpec = GetTalentSpellCost(firstRankSpellId) > 0 || sSpellMgr->IsAdditionalTalentSpell(firstRankSpellId);
     bool added = addSpell(spellId, thisSpec ? GetActiveSpecMask() : SPEC_MASK_ALL, true);
-    if (added && IsInWorld())
+    if (added)
     {
+        sScriptMgr->OnPlayerLearnSpell(this, spellId);
+
         // pussywizard: a system message "you have learnt spell X (rank Y)"
-        SendLearnPacket(spellId, true);
+        if (IsInWorld())
+            SendLearnPacket(spellId, true);
     }
 
     // pussywizard: rank stuff at the end!
@@ -4194,7 +4234,10 @@ void Player::removeSpell(uint32 spellId, uint8 removeSpecMask, bool onlyTemporar
 
     // pussywizard: remove from spell book (can't be replaced by previous rank, because such spells can't be unlearnt)
     if (!onlyTemporary || ((!spellInfo->HasAttribute(SpellAttr0(SPELL_ATTR0_PASSIVE | SPELL_ATTR0_HIDDEN_CLIENTSIDE)) || !spellInfo->HasAnyAura()) && !spellInfo->HasEffect(SPELL_EFFECT_LEARN_SPELL)))
+    {
+        sScriptMgr->OnPlayerForgotSpell(this, spellId);
         SendLearnPacket(spellId, false);
+    }
 }
 
 bool Player::Has310Flyer(bool checkAllSpells, uint32 excludeSpellId)
@@ -4715,7 +4758,7 @@ void Player::DeleteFromDB(uint64 playerguid, uint32 accountId, bool updateRealmC
     // close player ticket if any
     GmTicket* ticket = sTicketMgr->GetTicketByPlayer(playerguid);
     if (ticket)
-        ticket->SetClosedBy(playerguid);
+        sTicketMgr->CloseTicket(ticket->GetId(), playerguid);
 
     // remove from group
     if (uint32 groupId = GetGroupIdFromStorage(guid))
@@ -5605,7 +5648,11 @@ void Player::RepopAtGraveyard()
 }
 
 bool Player::CanJoinConstantChannelInZone(ChatChannelsEntry const* channel, AreaTableEntry const* zone)
-{ 
+{
+    // Player can join LFG anywhere  
+    if (channel->flags & CHANNEL_DBC_FLAG_LFG && sWorld->getBoolConfig(CONFIG_LFG_LOCATION_ALL))
+        return true;
+
     if (channel->flags & CHANNEL_DBC_FLAG_ZONE_DEP && zone->flags & AREA_FLAG_ARENA_INSTANCE)
         return false;
 
@@ -9011,6 +9058,8 @@ void Player::SendLoot(uint64 guid, LootType loot_type)
                 if (groupRules && !go->loot.empty())
                     group->UpdateLooterGuid(go);
             }
+            if (GameObjectTemplateAddon const* addon = go->GetTemplateAddon())
+                loot->generateMoneyLoot(addon->mingold, addon->maxgold);
 
             if (loot_type == LOOT_FISHING)
                 go->getFishLoot(loot, this);
@@ -15983,6 +16032,8 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
     // Xinef: area auras may change on quest completion!
     UpdateZoneDependentAuras(GetZoneId());
     UpdateAreaDependentAuras(GetAreaId());
+    
+    sScriptMgr->OnPlayerCompleteQuest(this, quest);
 }
 
 void Player::FailQuest(uint32 questId)

@@ -213,6 +213,15 @@ MaxOverspeedPings = 2
 GridUnload = 1
 
 #
+#    CloseIdleConnections
+#        Description: Automatically close idle connections.
+#                     SocketTimeOutTime and SocketTimeOutTimeActive determine when a connection is considered as idle.
+#        Default:     1 - (enable, Automatically close idle connections)
+#                     0 - (disable, Do not close idle connections)
+
+CloseIdleConnections = 1
+
+#
 #    SocketTimeOutTime
 #        Description: Time (in milliseconds) after which a connection being idle on the character
 #                     selection screen is disconnected.
@@ -491,6 +500,7 @@ LogFileLevel = 0
 #             2097152 - Anything related to guilds
 #             4194304 - Anything related to transports
 #             8388608 - Anything related to Warden anti cheat
+#            67108864 - Whenever KickPlayer() or CloseSocket() are called
 #
 #                       Simply add the values together to create a bitmask.
 #                       For more info see enum DebugLogFilters in Log.h
@@ -3006,6 +3016,15 @@ Guild.AllowMultipleGuildMaster = 0
 ShowKickInWorld = 0
 
 #
+#     ShowBanInWorld
+#        Description: Determines whether a message is broadcasted to the entire server when a
+#                     player gets banned.
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+
+ShowBanInWorld = 0
+
+#
 #     RecordUpdateTimeDiffInterval
 #        Description: Time (in milliseconds) update time diff is written to the log file.
 #                     Update diff can be used as a performance indicator. Diff < 300: good
@@ -3183,6 +3202,14 @@ MoveMaps.Enable = 1
 Minigob.Manabonk.Enable = 1
 
 #
+
+#    Allow.IP.Based.Action.Logging
+#        Description: Logs actions, e.g. account login and logout to name a few, based on IP of current session.
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+ 
+Allow.IP.Based.Action.Logging = 0
+
 #     Calculate.Creature.Zone.Area.Data
 #        Description: Calculate at loading creature zoneId / areaId and save in creature table (WARNING: SLOW WORLD SERVER STARTUP)
 #        Default:     0  - (Do not show)
@@ -3195,6 +3222,14 @@ Calculate.Creature.Zone.Area.Data = 0
 #        Default:     0  - (Do not show)
 
 Calculate.Gameoject.Zone.Area.Data = 0
+
+#    LFG SETTINGS
+#
+#     Includes satellite to search for work elsewhere LFG
+#        Default: 0 - Disable  
+#                 1 - Enable  
+
+LFG.Location.All = 0
 
 #
 ###################################################################################################

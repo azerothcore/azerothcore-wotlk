@@ -231,7 +231,7 @@ bool World::KickSession(uint32 id)
         if (itr->second->PlayerLoading())
             return false;
 
-        itr->second->KickPlayer(false);
+        itr->second->KickPlayer("KickSession", false);
     }
 
     return true;
@@ -248,9 +248,9 @@ void World::AddSession_(WorldSession* s)
 
     // kick existing session with same account (if any)
     // if character on old session is being loaded, then return
-    if (!KickSession (s->GetAccountId()))
+    if (!KickSession(s->GetAccountId()))
     {
-        s->KickPlayer();
+        s->KickPlayer("kick existing session with same account");
         delete s; // session not added yet in session list, so not listed in queue
         return;
     }
@@ -456,6 +456,16 @@ void World::LoadConfigSettings(bool reload)
     }
 
     LoadModuleConfigSettings();
+
+#ifdef ELUNA
+    ///- Initialize Lua Engine
+    if (!reload)
+    {
+        sLog->outString("Initialize Eluna Lua Engine...");
+        Eluna::Initialize();
+    }
+#endif
+
     sScriptMgr->OnBeforeConfigLoad(reload);
 
     // Reload log levels and filters
@@ -679,6 +689,7 @@ void World::LoadConfigSettings(bool reload)
     else
         m_int_configs[CONFIG_PORT_WORLD] = sConfigMgr->GetIntDefault("WorldServerPort", 8085);
 
+    m_bool_configs[CONFIG_CLOSE_IDLE_CONNECTIONS] = sConfigMgr->GetBoolDefault("CloseIdleConnections", true);
     m_int_configs[CONFIG_SOCKET_TIMEOUTTIME] = sConfigMgr->GetIntDefault("SocketTimeOutTime", 900000);
     m_int_configs[CONFIG_SOCKET_TIMEOUTTIME_ACTIVE] = sConfigMgr->GetIntDefault("SocketTimeOutTimeActive", 60000);
     m_int_configs[CONFIG_SESSION_ADD_DELAY] = sConfigMgr->GetIntDefault("SessionAddDelay", 10000);
@@ -1231,6 +1242,7 @@ void World::LoadConfigSettings(bool reload)
 
     m_bool_configs[CONFIG_NO_RESET_TALENT_COST] = sConfigMgr->GetBoolDefault("NoResetTalentsCost", false);
     m_bool_configs[CONFIG_SHOW_KICK_IN_WORLD] = sConfigMgr->GetBoolDefault("ShowKickInWorld", false);
+    m_bool_configs[CONFIG_SHOW_BAN_IN_WORLD] = sConfigMgr->GetBoolDefault("ShowBanInWorld", false);
     m_int_configs[CONFIG_INTERVAL_LOG_UPDATE] = sConfigMgr->GetIntDefault("RecordUpdateTimeDiffInterval", 60000);
     m_int_configs[CONFIG_MIN_LOG_UPDATE] = sConfigMgr->GetIntDefault("MinRecordUpdateTimeDiff", 100);
     m_int_configs[CONFIG_NUMTHREADS] = sConfigMgr->GetIntDefault("MapUpdate.Threads", 1);
@@ -1296,11 +1308,16 @@ void World::LoadConfigSettings(bool reload)
     m_bool_configs[CONFIG_ENABLE_CONTINENT_TRANSPORT] = sConfigMgr->GetBoolDefault("IsContinentTransport.Enabled", true);
     m_bool_configs[CONFIG_ENABLE_CONTINENT_TRANSPORT_PRELOADING] = sConfigMgr->GetBoolDefault("IsPreloadedContinentTransport.Enabled", false);
 
+    m_bool_configs[CONFIG_IP_BASED_ACTION_LOGGING] = sConfigMgr->GetBoolDefault("Allow.IP.Based.Action.Logging", false);
+
     // Whether to use LoS from game objects
     m_bool_configs[CONFIG_CHECK_GOBJECT_LOS] = sConfigMgr->GetBoolDefault("CheckGameObjectLoS", true);
 
     m_bool_configs[CONFIG_CALCULATE_CREATURE_ZONE_AREA_DATA] = sConfigMgr->GetBoolDefault("Calculate.Creature.Zone.Area.Data", false);
     m_bool_configs[CONFIG_CALCULATE_GAMEOBJECT_ZONE_AREA_DATA] = sConfigMgr->GetBoolDefault("Calculate.Gameoject.Zone.Area.Data", false);
+
+    // Player can join LFG anywhere
+    m_bool_configs[CONFIG_LFG_LOCATION_ALL] = sConfigMgr->GetBoolDefault("LFG.Location.All", false);
 
     // call ScriptMgr if we're reloading the configuration
     sScriptMgr->OnAfterConfigLoad(reload);
@@ -1329,21 +1346,6 @@ void World::SetInitialWorldSettings()
         vmmgr2->GetLiquidFlagsPtr = &GetLiquidFlags;
     }
 
-#ifdef ELUNA
-    ///- Initialize Lua Engine
-    sLog->outString("Initialize Eluna Lua Engine...");
-
-    std::string conf_path = _CONF_DIR;
-    std::string cfg_file = conf_path + "/mod_LuaEngine.conf";
-#ifdef WIN32
-    cfg_file = "mod_LuaEngine.conf";
-#endif
-    std::string cfg_def_file = cfg_file + ".dist";
-    sConfigMgr->LoadMore(cfg_def_file.c_str());
-    sConfigMgr->LoadMore(cfg_file.c_str());
-    Eluna::Initialize();
-#endif
-
     ///- Initialize config settings
     LoadConfigSettings();
 
@@ -1353,18 +1355,21 @@ void World::SetInitialWorldSettings()
     ///- Init highest guids before any table loading to prevent using not initialized guids in some code.
     sObjectMgr->SetHighestGuids();
 
-    ///- Check the existence of the map files for all races' startup areas.
-    if (!MapManager::ExistMapAndVMap(0, -6240.32f, 331.033f)
-        || !MapManager::ExistMapAndVMap(0, -8949.95f, -132.493f)
-        || !MapManager::ExistMapAndVMap(1, -618.518f, -4251.67f)
-        || !MapManager::ExistMapAndVMap(0, 1676.35f, 1677.45f)
-        || !MapManager::ExistMapAndVMap(1, 10311.3f, 832.463f)
-        || !MapManager::ExistMapAndVMap(1, -2917.58f, -257.98f)
-        || (m_int_configs[CONFIG_EXPANSION] && (
-            !MapManager::ExistMapAndVMap(530, 10349.6f, -6357.29f) ||
-            !MapManager::ExistMapAndVMap(530, -3961.64f, -13931.2f))))
+    if (!sConfigMgr->isDryRun())
     {
-        exit(1);
+        ///- Check the existence of the map files for all starting areas.
+        if (!MapManager::ExistMapAndVMap(0, -6240.32f, 331.033f)
+            || !MapManager::ExistMapAndVMap(0, -8949.95f, -132.493f)
+            || !MapManager::ExistMapAndVMap(1, -618.518f, -4251.67f)
+            || !MapManager::ExistMapAndVMap(0, 1676.35f, 1677.45f)
+            || !MapManager::ExistMapAndVMap(1, 10311.3f, 832.463f)
+            || !MapManager::ExistMapAndVMap(1, -2917.58f, -257.98f)
+            || (m_int_configs[CONFIG_EXPANSION] && (
+                !MapManager::ExistMapAndVMap(530, 10349.6f, -6357.29f) ||
+                !MapManager::ExistMapAndVMap(530, -3961.64f, -13931.2f))))
+        {
+            exit(1);
+        }
     }
 
     ///- Initialize pool manager
@@ -1471,6 +1476,9 @@ void World::SetInitialWorldSettings()
 
     sLog->outString("Loading Game Object Templates...");         // must be after LoadPageTexts
     sObjectMgr->LoadGameObjectTemplate();
+
+    sLog->outString("Loading Game Object template addons...");
+    sObjectMgr->LoadGameObjectTemplateAddons();
 
     sLog->outString("Loading Transport templates...");
     sTransportMgr->LoadTransportTemplates();
@@ -1684,6 +1692,9 @@ void World::SetInitialWorldSettings()
 
     sLog->outString("Loading Skill Extra Item Table...");
     LoadSkillExtraItemTable();
+
+    sLog->outString("Loading Skill Perfection Data Table...");
+    LoadSkillPerfectItemTable();
 
     sLog->outString("Loading Skill Fishing base level requirements...");
     sObjectMgr->LoadFishingBaseSkillLevel();
@@ -1951,6 +1962,11 @@ void World::SetInitialWorldSettings()
     {
         sLog->outString("Enabling database logging...");
         sLog->SetLogDB(true);
+    }
+
+    if (sConfigMgr->isDryRun()) {
+        sLog->outString("AzerothCore dry run completed, terminating.");
+        exit(0);
     }
 }
 
@@ -2409,11 +2425,11 @@ void World::KickAll()
 
     // session not removed at kick and will removed in next update tick
     for (SessionMap::const_iterator itr = m_sessions.begin(); itr != m_sessions.end(); ++itr)
-        itr->second->KickPlayer();
+        itr->second->KickPlayer("KickAll sessions");
 
     // pussywizard: kick offline sessions
     for (SessionMap::const_iterator itr = m_offlineSessions.begin(); itr != m_offlineSessions.end(); ++itr)
-        itr->second->KickPlayer();
+        itr->second->KickPlayer("KickAll offline sessions");
 }
 
 /// Kick (and save) all players with security level less `sec`
@@ -2422,181 +2438,7 @@ void World::KickAllLess(AccountTypes sec)
     // session not removed at kick and will removed in next update tick
     for (SessionMap::const_iterator itr = m_sessions.begin(); itr != m_sessions.end(); ++itr)
         if (itr->second->GetSecurity() < sec)
-            itr->second->KickPlayer();
-}
-
-/// Ban an account or ban an IP address, duration will be parsed using TimeStringToSecs if it is positive, otherwise permban
-BanReturn World::BanAccount(BanMode mode, std::string const& nameOrIP, std::string const& duration, std::string const& reason, std::string const& author)
-{
-    uint32 duration_secs = TimeStringToSecs(duration);
-    PreparedQueryResult resultAccounts = PreparedQueryResult(NULL); //used for kicking
-    PreparedStatement* stmt = NULL;
-
-    ///- Update the database with ban information
-    switch (mode)
-    {
-        case BAN_IP:
-            // No SQL injection with prepared statements
-            stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_BY_IP);
-            stmt->setString(0, nameOrIP);
-            resultAccounts = LoginDatabase.Query(stmt);
-            stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_IP_BANNED);
-            stmt->setString(0, nameOrIP);
-            stmt->setUInt32(1, duration_secs);
-            stmt->setString(2, author);
-            stmt->setString(3, reason);
-            LoginDatabase.Execute(stmt);
-            break;
-        case BAN_ACCOUNT:
-            // No SQL injection with prepared statements
-            stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_ID_BY_NAME);
-            stmt->setString(0, nameOrIP);
-            resultAccounts = LoginDatabase.Query(stmt);
-            break;
-        case BAN_CHARACTER:
-            // No SQL injection with prepared statements
-            stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_ACCOUNT_BY_NAME);
-            stmt->setString(0, nameOrIP);
-            resultAccounts = CharacterDatabase.Query(stmt);
-            break;
-        default:
-            return BAN_SYNTAX_ERROR;
-    }
-
-    if (!resultAccounts)
-    {
-        if (mode == BAN_IP)
-            return BAN_SUCCESS;                             // ip correctly banned but nobody affected (yet)
-        else
-            return BAN_NOTFOUND;                            // Nobody to ban
-    }
-
-    ///- Disconnect all affected players (for IP it can be several)
-    SQLTransaction trans = LoginDatabase.BeginTransaction();
-    do
-    {
-        Field* fieldsAccount = resultAccounts->Fetch();
-        uint32 account = fieldsAccount[0].GetUInt32();
-
-        if (mode != BAN_IP)
-        {
-            // pussywizard: check existing ban to prevent overriding by a shorter one! >_>
-            PreparedStatement* stmtx = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_BANNED);
-            stmtx->setUInt32(0, account);
-            PreparedQueryResult banresultx = LoginDatabase.Query(stmtx);
-            if (banresultx && ((*banresultx)[0].GetUInt32() == (*banresultx)[1].GetUInt32() || ((*banresultx)[1].GetUInt32() > time(NULL)+duration_secs && duration_secs)))
-                return BAN_LONGER_EXISTS;
-
-            // make sure there is only one active ban
-            stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_NOT_BANNED);
-            stmt->setUInt32(0, account);
-            trans->Append(stmt);
-            // No SQL injection with prepared statements
-            stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_ACCOUNT_BANNED);
-            stmt->setUInt32(0, account);
-            stmt->setUInt32(1, duration_secs);
-            stmt->setString(2, author);
-            stmt->setString(3, reason);
-            trans->Append(stmt);
-        }
-
-        if (WorldSession* sess = FindSession(account))
-            if (sess->GetPlayerName() != author)
-                sess->KickPlayer();
-        if (WorldSession* sess = FindOfflineSession(account))
-            if (sess->GetPlayerName() != author)
-                sess->KickPlayer();
-    } while (resultAccounts->NextRow());
-
-    LoginDatabase.CommitTransaction(trans);
-
-    return BAN_SUCCESS;
-}
-
-/// Remove a ban from an account or IP address
-bool World::RemoveBanAccount(BanMode mode, std::string const& nameOrIP)
-{
-    PreparedStatement* stmt = NULL;
-    if (mode == BAN_IP)
-    {
-        stmt = LoginDatabase.GetPreparedStatement(LOGIN_DEL_IP_NOT_BANNED);
-        stmt->setString(0, nameOrIP);
-        LoginDatabase.Execute(stmt);
-    }
-    else
-    {
-        uint32 account = 0;
-        if (mode == BAN_ACCOUNT)
-            account = AccountMgr::GetId(nameOrIP);
-        else if (mode == BAN_CHARACTER)
-            account = sObjectMgr->GetPlayerAccountIdByPlayerName(nameOrIP);
-
-        if (!account)
-            return false;
-
-        //NO SQL injection as account is uint32
-        stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_NOT_BANNED);
-        stmt->setUInt32(0, account);
-        LoginDatabase.Execute(stmt);
-    }
-    return true;
-}
-
-/// Ban an account or ban an IP address, duration will be parsed using TimeStringToSecs if it is positive, otherwise permban
-BanReturn World::BanCharacter(std::string const& name, std::string const& duration, std::string const& reason, std::string const& author)
-{
-    Player* pBanned = ObjectAccessor::FindPlayerByName(name, false);
-    uint32 guid = 0;
-
-    uint32 duration_secs = TimeStringToSecs(duration);
-
-    /// Pick a player to ban if not online
-    if (!pBanned)
-    {
-        guid = sWorld->GetGlobalPlayerGUID(name);
-        if (!guid)
-            return BAN_NOTFOUND;
-    }
-    else
-        guid = pBanned->GetGUIDLow();
-
-    // make sure there is only one active ban
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHARACTER_BAN);
-    stmt->setUInt32(0, guid);
-    CharacterDatabase.Execute(stmt);
-
-    stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHARACTER_BAN);
-    stmt->setUInt32(0, guid);
-    stmt->setUInt32(1, duration_secs);
-    stmt->setString(2, author);
-    stmt->setString(3, reason);
-    CharacterDatabase.Execute(stmt);
-
-    if (pBanned)
-        pBanned->GetSession()->KickPlayer();
-
-    return BAN_SUCCESS;
-}
-
-/// Remove a ban from a character
-bool World::RemoveBanCharacter(std::string const& name)
-{
-    Player* pBanned = ObjectAccessor::FindPlayerByName(name, false);
-    uint32 guid = 0;
-
-    /// Pick a player to ban if not online
-    if (!pBanned)
-        guid = sWorld->GetGlobalPlayerGUID(name);
-    else
-        guid = pBanned->GetGUIDLow();
-
-    if (!guid)
-        return false;
-
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHARACTER_BAN);
-    stmt->setUInt32(0, guid);
-    CharacterDatabase.Execute(stmt);
-    return true;
+            itr->second->KickPlayer("KickAllLess");
 }
 
 /// Update the game time

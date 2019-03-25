@@ -1,7 +1,7 @@
 #ifndef DEF_PINNACLE_H
 #define DEF_PINNACLE_H
 
-#include "ScriptPCH.h"
+#include "Opcodes.h"
 
 enum Data
 {

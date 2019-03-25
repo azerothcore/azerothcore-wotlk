@@ -9,9 +9,9 @@ DROP TABLE IF EXISTS `gossip_menu`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `gossip_menu` 
 (
-  `entry` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `text_id` mediumint(8) unsigned NOT NULL DEFAULT '0',
-  PRIMARY KEY (`entry`,`text_id`)
+  `MenuID` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `TextID` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`MenuID`,`TextID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -185,6 +185,8 @@ INSERT INTO `gossip_menu` VALUES
 (820,1371),
 (840,1391),
 (840,1451),
+(841,1392),
+(842,1411),
 (880,1452),
 (881,1456),
 (882,1455),
@@ -1635,6 +1637,11 @@ INSERT INTO `gossip_menu` VALUES
 (5755,6939),
 (5756,6940),
 (5763,6948),
+(5764,6949),
+(5765,6950),
+(5766,6951),
+(5767,6952),
+(5768,6953),
 (5779,6954),
 (5780,6955),
 (5781,6956),

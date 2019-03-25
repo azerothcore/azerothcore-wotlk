@@ -1,6 +1,6 @@
 <!-- First of all, THANK YOU for your contribution.
  Please fill this template unless your PR is very simple/straightforward.
- Do not forget to have a look at our Pull Request tutorial: https://github.com/azerothcore/azerothcore-wotlk/wiki/Contribute#how-to-create-a-pull-request
+ Do not forget to have a look at our Pull Request tutorial: http://www.azerothcore.org/wiki/Contribute#how-to-create-a-pull-request
 -->
 
 

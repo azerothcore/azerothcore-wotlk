@@ -1108,6 +1108,7 @@ Position WorldObject::GetHitSpherePointFor(Position const& dest) const
     G3D::Vector3 vObj(dest.GetPositionX(), dest.GetPositionY(), dest.GetPositionZ());
     G3D::Vector3 contactPoint = vThis + (vObj - vThis).directionOrZero() * std::min(dest.GetExactDist(this), GetCombatReach());
 
+
     return Position(contactPoint.x, contactPoint.y, contactPoint.z, GetAngle(contactPoint.x, contactPoint.y));
 }
 
@@ -1125,6 +1126,7 @@ bool WorldObject::IsWithinLOS(float ox, float oy, float oz, LineOfSightChecks ch
         else
             GetHitSpherePointFor({ ox, oy, oz }, x, y, z);
 
+
         return GetMap()->isInLineOfSight(x, y, z, ox, oy, oz, GetPhaseMask(), checks);
     }
     return true;
@@ -1132,7 +1134,6 @@ bool WorldObject::IsWithinLOS(float ox, float oy, float oz, LineOfSightChecks ch
 
 bool WorldObject::IsWithinLOSInMap(const WorldObject* obj, LineOfSightChecks checks) const
 {
-
     if (!IsInMap(obj))
         return false;
 
@@ -1155,6 +1156,7 @@ bool WorldObject::IsWithinLOSInMap(const WorldObject* obj, LineOfSightChecks che
         GetHitSpherePointFor({ obj->GetPositionX(), obj->GetPositionY(), obj->GetPositionZ() + obj->GetCollisionHeight()
 
     return GetMap()->isInLineOfSight(x, y, z, ox, oy, oz, GetPhaseMask(), checks, ignoreFlags);
+
 }
 
 void WorldObject::GetHitSpherePointFor(Position const& dest, float& x, float& y, float& z) const
@@ -1833,6 +1835,16 @@ void WorldObject::SendPlaySound(uint32 Sound, bool OnlySelf)
 { 
     WorldPacket data(SMSG_PLAY_SOUND, 4);
     data << Sound;
+    if (OnlySelf && GetTypeId() == TYPEID_PLAYER)
+        this->ToPlayer()->GetSession()->SendPacket(&data);
+    else
+        SendMessageToSet(&data, true); // ToSelf ignored in this case
+}
+
+void WorldObject::SendPlayMusic(uint32 Music, bool OnlySelf)
+{
+    WorldPacket data(SMSG_PLAY_MUSIC, 4);
+    data << Music;
     if (OnlySelf && GetTypeId() == TYPEID_PLAYER)
         this->ToPlayer()->GetSession()->SendPacket(&data);
     else

@@ -7,8 +7,6 @@
 #ifndef DEF_ZULAMAN_H
 #define DEF_ZULAMAN_H
 
-#include "ScriptPCH.h"
-
 enum DataTypes
 {
     DATA_GONGEVENT                      = 0,

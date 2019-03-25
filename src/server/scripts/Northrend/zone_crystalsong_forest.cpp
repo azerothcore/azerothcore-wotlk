@@ -13,12 +13,12 @@ SDCategory: CrystalsongForest
 Script Data End */
 
 #include "ScriptMgr.h"
-#include "ScriptPCH.h"
 #include "ScriptedCreature.h"
 #include "Player.h"
 #include "SmartScriptMgr.h"
 #include "Transport.h"
 #include "Vehicle.h"
+#include "PassiveAI.h"
 
 enum ePreparationsForWar
 {

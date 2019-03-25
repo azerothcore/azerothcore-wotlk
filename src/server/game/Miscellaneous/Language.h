@@ -876,8 +876,9 @@ enum TrinityStrings
     LANG_SQLDRIVER_QUERY_LOGGING_ENABLED  = 1027,
     LANG_SQLDRIVER_QUERY_LOGGING_DISABLED = 1028,
     // 1029-1030 used in other client versions
-
     // Room for more level 4              1031-1099 not used
+    LANG_ACCOUNT_PASS_TOO_LONG            = 1031,
+
 
     // Level 3 (continue)
     LANG_ACCOUNT_SETADDON               = 1100,
@@ -1146,19 +1147,7 @@ enum TrinityStrings
     LANG_COMMAND_MUTEHISTORY_EMPTY      = 5060,
     LANG_COMMAND_MUTEHISTORY_OUTPUT     = 5061,
 
-    // Spy command
-    LANG_COMMAND_SPY_FOLLOWING           = 5062,
-    LANG_COMMAND_SPY_UNFOLLOW            = 5063,
-    LANG_COMMAND_SPY_ALREADY_FOLLOWED_BY = 5064,
-    LANG_COMMAND_SPY_FOLLOWING_GROUP     = 5065,
-    LANG_COMMAND_SPY_UNFOLLOW_GROUP      = 5066,
-    LANG_COMMAND_SPY_NOT_FOLLOWING_GROUP = 5067,
-    LANG_COMMAND_SPY_CLEARED             = 5068,
-    LANG_COMMAND_SPY_LIST                = 5069,
-    LANG_COMMAND_SPY_WHISPERS_PLAYER     = 5070,
-    LANG_COMMAND_SPY_TELLS_GROUP         = 5071,
-
-    // Room for more Trinity strings      5072-9999
+    // Room for more Trinity strings    5062-9999
 
     // Level requirement notifications
     LANG_SAY_REQ                        = 6604,
@@ -1301,6 +1290,7 @@ enum TrinityStrings
     LANG_BAN_CHARACTER_YOUPERMBANNEDMESSAGE_WORLD = 11005,
     LANG_BAN_ACCOUNT_YOUBANNEDMESSAGE_WORLD       = 11006,
     LANG_BAN_ACCOUNT_YOUPERMBANNEDMESSAGE_WORLD   = 11007,
+    
 
     LANG_NPCINFO_INHABIT_TYPE                     = 11008,
     LANG_NPCINFO_FLAGS_EXTRA                      = 11009,
@@ -1312,6 +1302,10 @@ enum TrinityStrings
     LANG_INSTANCE_BIND_MISMATCH                   = 11014,
     LANG_CREATURE_NOT_AI_ENABLED                  = 11015,
     LANG_SELECT_PLAYER_OR_PET                     = 11016,
+
+    // Continue show Ban in world (ip)
+    LANG_BAN_IP_YOUBANNEDMESSAGE_WORLD       	    = 11017,	
+    LANG_BAN_IP_YOUPERMBANNEDMESSAGE_WORLD   	    = 11018,
 
     LANG_MUTED_PLAYER                             = 30000, // Mute for player 2 hour
 };

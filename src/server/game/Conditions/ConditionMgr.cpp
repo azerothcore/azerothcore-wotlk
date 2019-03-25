@@ -1242,6 +1242,13 @@ bool ConditionMgr::isSourceTypeValid(Condition* cond)
 
     switch (cond->SourceType)
     {
+        case CONDITION_SOURCE_TYPE_TERRAIN_SWAP:
+        case CONDITION_SOURCE_TYPE_PHASE:
+        case CONDITION_SOURCE_TYPE_GRAVEYARD:
+        {
+            sLog->outErrorDb("ConditionSourceType %u in `condition` table is not supported on 3.3.5a, ignoring.", uint32(cond->SourceType));
+            return false;
+        }
         case CONDITION_SOURCE_TYPE_CREATURE_LOOT_TEMPLATE:
         {
             if (!LootTemplates_Creature.HaveLootFor(cond->SourceGroup))
@@ -1577,11 +1584,6 @@ bool ConditionMgr::isSourceTypeValid(Condition* cond)
             }
             break;
         }
-        case CONDITION_SOURCE_TYPE_PHASE_DEFINITION:
-        {
-            sLog->outError("CONDITION_SOURCE_TYPE_PHASE_DEFINITION:: is only for 4.3.4 branch, skipped");
-            return false;
-        }
         case CONDITION_SOURCE_TYPE_GOSSIP_MENU:
         case CONDITION_SOURCE_TYPE_GOSSIP_MENU_OPTION:
         case CONDITION_SOURCE_TYPE_SMART_EVENT:
@@ -1594,10 +1596,33 @@ bool ConditionMgr::isSourceTypeValid(Condition* cond)
 }
 bool ConditionMgr::isConditionTypeValid(Condition* cond)
 {
-    if (cond->ConditionType == CONDITION_NONE || cond->ConditionType >= CONDITION_MAX)
+    if (cond->ConditionType == CONDITION_NONE
+        || (cond->ConditionType >= CONDITION_TC_END && cond->ConditionType <= CONDITION_AC_START)
+        || (cond->ConditionType >= CONDITION_AC_END)
+        )
     {
-        sLog->outErrorDb("Invalid ConditionType %u at SourceEntry %u in `condition` table, ignoring.", uint32(cond->ConditionType), cond->SourceEntry);
+        sLog->outErrorDb("SourceEntry %u in `condition` table has an invalid ConditionType (%u), ignoring.",
+                         cond->SourceEntry, uint32(cond->ConditionType));
         return false;
+    }
+    switch (cond->ConditionType) {
+        case CONDITION_TERRAIN_SWAP:
+        case CONDITION_QUEST_OBJECTIVE_COMPLETE:
+        case CONDITION_DIFFICULTY_ID:
+            sLog->outErrorDb("SourceEntry %u in `condition` table has a ConditionType that is not supported on 3.3.5a (%u), ignoring.",
+                             cond->SourceEntry, uint32(cond->ConditionType));
+            return false;
+        case CONDITION_STAND_STATE:
+        case CONDITION_DAILY_QUEST_DONE:
+        case CONDITION_CHARMED:
+        case CONDITION_PET_TYPE:
+        case CONDITION_TAXI:
+        case CONDITION_QUESTSTATE:
+            sLog->outErrorDb("SourceEntry %u in `condition` table has a ConditionType that is not yet supported on AzerothCore (%u), ignoring.",
+                             cond->SourceEntry, uint32(cond->ConditionType));
+            return false;
+        default:
+            break;
     }
 
     if (cond->ConditionTarget >= cond->GetMaxAvailableConditionTargets())

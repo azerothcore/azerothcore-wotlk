@@ -1801,8 +1801,8 @@ void LoadLootTemplates_Mail()
     uint32 count = LootTemplates_Mail.LoadAndCollectLootIds(lootIdSet);
 
     // remove real entries and check existence loot
-    for (uint32 i = 1; i < sAreaTableStore.GetNumRows(); ++i)
-        if (sAreaTableStore.LookupEntry(i))
+    for (uint32 i = 1; i < sMailTemplateStore.GetNumRows(); ++i)
+        if (sMailTemplateStore.LookupEntry(i))
             if (lootIdSet.find(i) != lootIdSet.end())
                 lootIdSet.erase(i);
 

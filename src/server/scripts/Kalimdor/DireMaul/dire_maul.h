@@ -5,7 +5,7 @@
 #ifndef DEF_DIRE_MAUL_H
 #define DEF_DIRE_MAUL_H
 
-#include "ScriptPCH.h"
+#include "UnitAI.h"
 
 enum DataTypes
 {

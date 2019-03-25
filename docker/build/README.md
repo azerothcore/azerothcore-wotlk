@@ -1,15 +1,35 @@
 # AzerothCore Dockerized Build
 
-The AzerothCore Build Dockerfile is not meant to create containers, it is a stage that both the [authserver](https://github.com/azerothcore/azerothcore-wotlk/tree/master/docker/authserver) and the [worldserver](https://github.com/azerothcore/azerothcore-wotlk/tree/master/docker/worldserver) docker images will use.
+The AzerothCore Build Dockerfile will create a container that will run the AC build.
 
-Note: every time you update your AzerothCore sources, you **must** build again this image and the authserver & worldserver images to get the new version on your docker containers.
+When this container runs, it will compile AC and generate:
 
-*For more information about Docker multi-stage builds, refer to the [docker multi-stage builds doc](https://docs.docker.com/develop/develop-images/multistage-build/).*
+- the build cache in the `docker/build/cache` directory
+- the `worldserver` executable file in `docker/worldserver/bin`
+- the `authserver` executable file in `docker/authserver/bin`
 
-# Usage
+The executable files will be used by the [authserver](https://github.com/azerothcore/azerothcore-wotlk/tree/master/docker/authserver) and the [worldserver](https://github.com/azerothcore/azerothcore-wotlk/tree/master/docker/worldserver) docker containers.
 
-To build the container image you have to be in the **main** folder of your local AzerothCore sources directory.
+Note: every time you update your AzerothCore sources, you **must** run again the build container and restart your `worldserver` and `authserver` containers.
+
+## Usage
+
+To build the container image you have to be in the **main** folder of your local AzerothCore sources directory and run:
 
 ```
-docker build -t azerothcore/build -f docker/build/Dockerfile .
+docker build -t acbuild -f docker/build/Dockerfile .
 ```
+
+Then you can launch the container to rebuild AC using:
+
+```
+docker run \
+    -v /$(pwd)/docker/build/cache:/azerothcore/build \
+    -v /$(pwd)/docker/worldserver/bin:/binworldserver \
+    -v /$(pwd)/docker/authserver/bin:/binauthserver \
+    acbuild
+```
+
+### Clearing the cache
+
+To clear the build cache, delete all files contained under the `docker/build/cache` directory.

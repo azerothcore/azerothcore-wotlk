@@ -516,8 +516,10 @@ bool MySQLConnection::_HandleMySQLErrno(uint32 errNo)
     {
         case CR_SERVER_GONE_ERROR:
         case CR_SERVER_LOST:
-        case CR_INVALID_CONN_HANDLE:
         case CR_SERVER_LOST_EXTENDED:
+#if !defined MARIADB
+        case CR_INVALID_CONN_HANDLE:
+#endif
         {
             m_reconnecting = true;
             uint64 oldThreadId = mysql_thread_id(GetHandle());

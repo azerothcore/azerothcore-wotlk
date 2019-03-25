@@ -5,8 +5,6 @@
 #ifndef DEF_SCHOLOMANCE_H
 #define DEF_SCHOLOMANCE_H
 
-#include "ScriptPCH.h"
-
 enum DataTypes
 {
     DATA_KIRTONOS_THE_HERALD            = 0,

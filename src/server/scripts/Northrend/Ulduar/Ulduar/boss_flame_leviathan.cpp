@@ -108,25 +108,28 @@ enum Events
     EVENT_POSITION_CHECK,
 };
 
+enum Texts
+{
+    FLAME_LEVIATHAN_SAY_AGGRO = 0,
+    FLAME_LEVIATHAN_SAY_SLAY,
+    FLAME_LEVIATHAN_SAY_DEATH,
+    FLAME_LEVIATHAN_SAY_PURSUE,
+    FLAME_LEVIATHAN_SAY_HARDMODE,
+    FLAME_LEVIATHAN_SAY_TOWER_NONE,
+    FLAME_LEVIATHAN_SAY_TOWER_FROST,
+    FLAME_LEVIATHAN_SAY_TOWER_FLAME,
+    FLAME_LEVIATHAN_SAY_TOWER_NATURE,
+    FLAME_LEVIATHAN_SAY_TOWER_STORM,
+    FLAME_LEVIATHAN_SAY_PLAYER_RIDING,
+    FLAME_LEVIATHAN_SAY_OVERLOAD,
+    FLAME_LEVIATHAN_EMOTE_PURSUE,
+    FLAME_LEVIATHAN_EMOTE_OVERLOAD,
+    FLAME_LEVIATHAN_EMOTE_REPAIR
+
+};
+
 enum Sounds
 {
-    LV_SOUND_AGGRO                  = 15506,
-    LV_SOUND_TARGET1                = 15507,
-    LV_SOUND_TARGET2                = 15508,
-    LV_SOUND_TARGET3                = 15509,
-    LV_SOUND_HARD_MODE              = 15510,
-    LV_SOUND_TOWER_0                = 15511,
-    LV_SOUND_TOWER_1                = 15512,
-    LV_SOUND_TOWER_2                = 15513,
-    LV_SOUND_TOWER_3                = 15514,
-    LV_SOUND_TOWER_4                = 15515,
-    LV_SOUND_PLAYER_RIDE            = 15516,
-    LV_SOUND_OVERLOAD1              = 15517,
-    LV_SOUND_OVERLOAD2              = 15518,
-    LV_SOUND_OVERLOAD3              = 15519,
-    LV_SOUND_DIE                    = 15520,
-    LV_SOUND_SLY                    = 15521,
-
     RSOUND_L0                       = 15807,
     RSOUND_L1                       = 15804,
     RSOUND_L2                       = 15805,
@@ -165,9 +168,8 @@ enum Misc
     ACTION_START_BRANN_EVENT        = 3,
     ACTION_DESPAWN_ADDS             = 4,
     ACTION_DELAY_CANNON             = 5,
+    ACTION_DESTROYED_TURRET         = 6
 };
-
-#define LV_SAY_PLAYER_RIDE  = "Unauthorized entity attempting circuit overload. Activating anti-personnel countermeasures."
 
 ///////////////////////////////////////////
 //
@@ -180,7 +182,7 @@ class boss_flame_leviathan : public CreatureScript
 public:
     boss_flame_leviathan() : CreatureScript("boss_flame_leviathan") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_flame_leviathanAI (pCreature);
     }
@@ -202,6 +204,7 @@ public:
         uint32 _speakTimer;
         uint8 _towersCount;
         bool _shutdown;
+        uint32 _destroyedTurretCount;
 
         // Custom
         void BindPlayers();
@@ -210,11 +213,10 @@ public:
         void TurnGates(bool _start, bool _death);
         void TurnHealStations(bool _apply);
         void ScheduleEvents();
-        void SayPursue();
         void SummonTowerHelpers(uint8 towerId);
 
         // Original
-        void JustReachedHome()
+        void JustReachedHome() override
         {
             // For achievement
             if (m_pInstance)
@@ -222,19 +224,20 @@ public:
             me->setActive(false);
         }
 
-        void MoveInLineOfSight(Unit*) {}
-        void JustSummoned(Creature* cr)
+        void MoveInLineOfSight(Unit*) override {}
+        void JustSummoned(Creature* cr)  override
         {
             if (cr->GetEntry() != NPC_FLAME_LEVIATHAN_TURRET && cr->GetEntry() != NPC_SEAT)
                 summons.Summon(cr);
         }
 
-        void SummonedCreatureDespawn(Creature* cr) { summons.Despawn(cr); }
-        void SpellHit(Unit* caster, const SpellInfo* spellInfo);
-        void JustDied(Unit*);
-        void KilledUnit(Unit* who);
+        void SummonedCreatureDespawn(Creature* cr) override { summons.Despawn(cr); }
+        void SpellHit(Unit* caster, const SpellInfo* spellInfo) override;
+        void JustDied(Unit*) override;
+        void KilledUnit(Unit* who) override;
+        void SpellHitTarget(Unit* target, SpellInfo const* spell) override;
 
-        void AttackStart(Unit* who)
+        void AttackStart(Unit* who) override
         {
             if (Unit* veh = who->GetVehicleBase())
                 ScriptedAI::AttackStart(veh);
@@ -242,11 +245,10 @@ public:
                 ScriptedAI::AttackStart(who);
         }
 
-        void EnterCombat(Unit*)
+        void EnterCombat(Unit*) override
         {
             ScheduleEvents();
-            me->MonsterYell("Hostile entities detected. Threat assessment protocol active. Primary target engaged. Time minus thirty seconds to re-evaluation.", LANG_UNIVERSAL, 0);
-            me->PlayDirectSound(LV_SOUND_AGGRO);
+            Talk(FLAME_LEVIATHAN_SAY_AGGRO);
 
             me->setActive(true);
             me->SetHomePosition(322.4f, -14.3f, 409.8f, 3.23f);
@@ -260,7 +262,7 @@ public:
             me->SetInCombatWithZone();
         }
 
-        void InitializeAI()
+        void InitializeAI() override
         {
             if (m_pInstance && m_pInstance->GetData(TYPE_LEVIATHAN) == SPECIAL)
             {
@@ -272,7 +274,7 @@ public:
             ScriptedAI::InitializeAI();
         }
 
-        void Reset()
+        void Reset() override
         {
             // Special immunity case
             me->CastSpell(me, SPELL_INVIS_AND_STEALTH_DETECT, true);
@@ -286,6 +288,7 @@ public:
             _startTimer = 1;
             _speakTimer = 0;
             _towersCount = 0;
+            _destroyedTurretCount = 0;
 
             if (m_pInstance)
             {
@@ -306,7 +309,7 @@ public:
             TurnHealStations(true);
         }
 
-        uint32 GetData(uint32 param) const
+        uint32 GetData(uint32 param) const override
         {
             if (param == DATA_GET_TOWER_COUNT)
                 return _towersCount;
@@ -316,7 +319,7 @@ public:
             return 0;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             // THIS IS USED ONLY FOR FIRST ENGAGE!
             if (_startTimer)
@@ -392,7 +395,7 @@ public:
                     events.RepeatEvent(5000);
                     break;
                 case EVENT_PURSUE:
-                    SayPursue();
+                    Talk(FLAME_LEVIATHAN_SAY_PURSUE);
                     me->CastSpell(me, SPELL_PURSUED, false);
                     events.RescheduleEvent(EVENT_PURSUE, 31000);
                     return;
@@ -417,15 +420,9 @@ public:
                     return;
                 case EVENT_SOUND_BEGINNING:
                     if (_towersCount)
-                    {
-                        me->MonsterYell("Orbital countermeasures enabled.", LANG_UNIVERSAL, 0);
-                        me->PlayDirectSound(LV_SOUND_HARD_MODE);
-                    }
+                        Talk(FLAME_LEVIATHAN_SAY_HARDMODE);
                     else
-                    {
-                        me->MonsterYell("Alert! Static defense system failure. Orbital countermeasures disabled.", LANG_UNIVERSAL, 0);
-                        me->PlayDirectSound(LV_SOUND_TOWER_0);
-                    }
+                        Talk(FLAME_LEVIATHAN_SAY_TOWER_NONE);
                     events.PopEvent();
                     return;
                 case EVENT_REINSTALL:
@@ -440,29 +437,25 @@ public:
                     SummonTowerHelpers(TOWER_OF_STORMS);
                     events.RepeatEvent(60000+rand()%60000);
                     me->MonsterTextEmote("Flame Leviathan activates Thorim's Hammer.", 0, true);
-                    me->MonsterYell("'Thorim's Hammer' online. Acquiring target.", LANG_UNIVERSAL, 0);
-                    me->PlayDirectSound(LV_SOUND_TOWER_4);
+                    Talk(FLAME_LEVIATHAN_SAY_TOWER_STORM);
                     return;
                 case EVENT_FREYA:
                     SummonTowerHelpers(TOWER_OF_LIFE);
                     events.PopEvent();
                     me->MonsterTextEmote("Flame Leviathan activates Freya's Ward.", 0, true);
-                    me->MonsterYell("'Freya's Ward' online. Acquiring target.", LANG_UNIVERSAL, 0);
-                    me->PlayDirectSound(LV_SOUND_TOWER_3);
+                    Talk(FLAME_LEVIATHAN_SAY_TOWER_NATURE);
                     return;
                 case EVENT_MIMIRONS_INFERNO:
                     SummonTowerHelpers(TOWER_OF_FLAMES);
                     events.PopEvent();
                     me->MonsterTextEmote("Flame Leviathan activates Mimiron's Inferno.", 0, true);
-                    me->MonsterYell("'Mimiron's Inferno' online. Acquiring target.", LANG_UNIVERSAL, 0);
-                    me->PlayDirectSound(LV_SOUND_TOWER_2);
+                    Talk(FLAME_LEVIATHAN_SAY_TOWER_FLAME);
                     return;
                 case EVENT_HODIRS_FURY:
                     SummonTowerHelpers(TOWER_OF_FROST);
                     events.PopEvent();
                     me->MonsterTextEmote("Flame Leviathan activates Hodir's Fury.", 0, true);
-                    me->MonsterYell("'Hodir's Fury' online. Acquiring target.", LANG_UNIVERSAL, 0);
-                    me->PlayDirectSound(LV_SOUND_TOWER_1);
+                    Talk(FLAME_LEVIATHAN_SAY_TOWER_FROST);
                     return;
             }
 
@@ -472,6 +465,20 @@ public:
                 {
                     me->CastSpell(me->GetVictim(), SPELL_BATTERING_RAM, false);
                     me->resetAttackTimer();
+                }
+            }
+        }
+
+        void DoAction(int32 action) override
+        {
+            if (action == ACTION_DESTROYED_TURRET)
+            {
+                ++_destroyedTurretCount;
+
+                if (_destroyedTurretCount == RAID_MODE<uint32>(2, 4))
+                {
+                    _destroyedTurretCount = 0;
+                    me->CastSpell(me,SPELL_SYSTEMS_SHUTDOWN,true);
                 }
             }
         }
@@ -488,7 +495,7 @@ void boss_flame_leviathan::boss_flame_leviathanAI::RadioSay(const char* text, ui
     if (Creature *r = me->SummonCreature(NPC_BRANN_RADIO, me->GetPositionX()-150, me->GetPositionY(), me->GetPositionZ(), me->GetOrientation(), TEMPSUMMON_TIMED_DESPAWN, 5000))
     {
         WorldPacket data;
-        ChatHandler::BuildChatPacket(data, CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, r, NULL, text);
+        ChatHandler::BuildChatPacket(data, CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, r, nullptr, text);
         r->SendMessageToSetInRange(&data, 200, true);
         r->PlayDirectSound(soundId);
     }
@@ -536,7 +543,7 @@ void boss_flame_leviathan::boss_flame_leviathanAI::TurnGates(bool _start, bool _
     if (_start)
     {
         // first one is ALWAYS turned on, unless leviathan is beaten
-        GameObject* go = NULL;
+        GameObject* go = nullptr;
         if ((go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(DATA_LIGHTNING_WALL2))))
             go->SetGoState(GO_STATE_READY);
 
@@ -546,7 +553,7 @@ void boss_flame_leviathan::boss_flame_leviathanAI::TurnGates(bool _start, bool _
     }
     else
     {
-        GameObject* go = NULL;
+        GameObject* go = nullptr;
         if (_death)
             if ((go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(DATA_LIGHTNING_WALL1))))
                 go->SetGoState(GO_STATE_ACTIVE);
@@ -569,7 +576,7 @@ void boss_flame_leviathan::boss_flame_leviathanAI::TurnHealStations(bool _apply)
     if (!m_pInstance)
         return;
 
-    GameObject* go = NULL;
+    GameObject* go = nullptr;
     if (_apply)
     {
         if ((go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(DATA_REPAIR_STATION1))))
@@ -598,52 +605,15 @@ void boss_flame_leviathan::boss_flame_leviathanAI::ScheduleEvents()
     events.RescheduleEvent(EVENT_PURSUE, 0);
 }
 
-void boss_flame_leviathan::boss_flame_leviathanAI::SayPursue()
-{
-    if (urand(0,1))
-        return;
-
-    switch (urand(0,2))
-    {
-        case 0:
-            me->MonsterYell("Threat re-evaluated. Target assessment complete. Changing course.", LANG_UNIVERSAL, 0);
-            me->PlayDirectSound(LV_SOUND_TARGET1);
-            break;
-        case 1:
-            me->MonsterYell("Pursuit objective modified. Changing course.", LANG_UNIVERSAL, 0);
-            me->PlayDirectSound(LV_SOUND_TARGET2);
-            break;
-        case 2:
-            me->MonsterYell("Hostile entity stratagem predicted. Rerouting battle function. Changing course.", LANG_UNIVERSAL, 0);
-            me->PlayDirectSound(LV_SOUND_TARGET3);
-            break;
-    }
-}
-
 void boss_flame_leviathan::boss_flame_leviathanAI::SpellHit(Unit*  /*caster*/, const SpellInfo* spellInfo)
 {
     if (spellInfo->Id == SPELL_SYSTEMS_SHUTDOWN)
     {
         _shutdown = true; // ACHIEVEMENT
 
-        me->MonsterTextEmote("Flame Leviathan's circuits overloaded.", 0, true);
-        me->MonsterTextEmote("Automatic repair sequence initiated.", 0, true);
-
-        switch (urand(0,2))
-        {
-        case 0:
-            me->MonsterYell("System malfunction. Diverting power to support systems.", LANG_UNIVERSAL, 0);
-            me->PlayDirectSound(LV_SOUND_OVERLOAD1);
-            break;
-        case 1:
-            me->MonsterYell("Combat matrix overload. Powering do-o-o-own...", LANG_UNIVERSAL, 0);
-            me->PlayDirectSound(LV_SOUND_OVERLOAD2);
-            break;
-        case 2:
-            me->MonsterYell("System restart required. Deactivating weapon systems.", LANG_UNIVERSAL, 0);
-            me->PlayDirectSound(LV_SOUND_OVERLOAD3);
-            break;
-        }
+        Talk(FLAME_LEVIATHAN_EMOTE_OVERLOAD);
+        Talk(FLAME_LEVIATHAN_EMOTE_REPAIR);
+        Talk(FLAME_LEVIATHAN_SAY_OVERLOAD);
 
         events.DelayEvents(20 * IN_MILLISECONDS + 1);
         events.ScheduleEvent(EVENT_REINSTALL, 20*IN_MILLISECONDS);
@@ -664,8 +634,7 @@ void boss_flame_leviathan::boss_flame_leviathanAI::JustDied(Unit*)
         m_pInstance->SetData(DATA_VEHICLE_SPAWN, VEHICLE_POS_NONE);
     }
 
-    me->MonsterYell("Total systems failure. Defense protocols breached. Leviathan Unit shutting down.", LANG_UNIVERSAL, 0);
-    me->PlayDirectSound(LV_SOUND_DIE);
+    Talk(FLAME_LEVIATHAN_SAY_DEATH);
 
     TurnGates(false, true);
     BindPlayers();
@@ -675,6 +644,9 @@ void boss_flame_leviathan::boss_flame_leviathanAI::KilledUnit(Unit* who)
 {
     if (who == me->GetVictim())
         events.RescheduleEvent(EVENT_PURSUE, 0);
+
+    if (who->GetTypeId() == TYPEID_PLAYER)
+        Talk(FLAME_LEVIATHAN_SAY_SLAY);
 }
 
 void boss_flame_leviathan::boss_flame_leviathanAI::SummonTowerHelpers(uint8 towerId)
@@ -707,12 +679,27 @@ void boss_flame_leviathan::boss_flame_leviathanAI::SummonTowerHelpers(uint8 towe
     }
 }
 
+void boss_flame_leviathan::boss_flame_leviathanAI::SpellHitTarget(Unit* target, SpellInfo const* spell)
+{
+    if (spell->Id != SPELL_PURSUED)
+        return;
+
+    for (SeatMap::const_iterator itr = target->GetVehicleKit()->Seats.begin(); itr != target->GetVehicleKit()->Seats.end(); ++itr)
+    {
+        if (Player* passenger = ObjectAccessor::GetPlayer(*me, itr->second.Passenger.Guid))
+        {
+            Talk(FLAME_LEVIATHAN_EMOTE_PURSUE, passenger);
+            return;
+        }
+    }
+}
+
 class boss_flame_leviathan_seat : public CreatureScript
 {
 public:
     boss_flame_leviathan_seat() : CreatureScript("boss_flame_leviathan_seat") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_flame_leviathan_seatAI (pCreature);
     }
@@ -728,17 +715,17 @@ public:
         Vehicle* vehicle;
         uint32 _despawnTimer;
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             vehicle->InstallAllAccessories(false);
         }
 
-        void Reset()
+        void Reset() override
         {
             _despawnTimer = !me->GetMap()->Is25ManRaid();
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (_despawnTimer)
             {
@@ -755,9 +742,9 @@ public:
             VehicleAI::UpdateAI(diff);
         }
 
-        void AttackStart(Unit*) { }
+        void AttackStart(Unit*) override { }
 
-        void PassengerBoarded(Unit* who, int8 seatId, bool apply)
+        void PassengerBoarded(Unit* who, int8 seatId, bool apply) override
         {
             if (who->GetTypeId() != TYPEID_PLAYER || !me->GetVehicle())
                 return;
@@ -774,6 +761,8 @@ public:
                     {
                         turret->SetUInt32Value(UNIT_FIELD_FLAGS, 0);
                         turret->GetAI()->AttackStart(who);
+                        if (Creature* leviathan = me->GetVehicleCreatureBase())
+                            leviathan->AI()->Talk(FLAME_LEVIATHAN_SAY_PLAYER_RIDING);
                     }
                     else
                     {
@@ -797,19 +786,22 @@ class boss_flame_leviathan_defense_turret : public CreatureScript
             boss_flame_leviathan_defense_turretAI(Creature* creature) : TurretAI(creature)
             {
                 _setHealth = false;
+                _instance = creature->GetInstanceScript();
             }
 
+            InstanceScript* _instance;
+
             bool _setHealth;
-            void DamageTaken(Unit* who, uint32 &damage, DamageEffectType, SpellSchoolMask)
+            void DamageTaken(Unit* who, uint32 &damage, DamageEffectType, SpellSchoolMask) override
             {
-                if (!who || !CanAIAttack(who))
+                if (!CanAIAttack(who))
                 {
                     _setHealth = true;
                     damage = 0;
                 }
             }
 
-            void JustDied(Unit* who)
+            void JustDied(Unit* who) override
             {
                 if (Player* killer = who->ToPlayer())
                     killer->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_GET_KILLING_BLOWS, 1, 0, me);
@@ -817,16 +809,19 @@ class boss_flame_leviathan_defense_turret : public CreatureScript
                 if (Vehicle* vehicle = me->GetVehicle())
                     if (Unit* device = vehicle->GetPassenger(SEAT_DEVICE))
                         device->SetUInt32Value(UNIT_FIELD_FLAGS, 0); // unselectable
+
+                if (Creature* leviathan = ObjectAccessor::GetCreature(*me, _instance->GetData64(TYPE_LEVIATHAN)))
+                    leviathan->AI()->DoAction(ACTION_DESTROYED_TURRET);
             }
 
-            bool CanAIAttack(Unit const* who) const
+            bool CanAIAttack(Unit const* who) const override
             {
-                if (who->GetTypeId() != TYPEID_PLAYER || !who->GetVehicle() || who->GetVehicleBase()->GetEntry() != NPC_SEAT)
+                if (!who || who->GetTypeId() != TYPEID_PLAYER || !who->GetVehicle() || who->GetVehicleBase()->GetEntry() != NPC_SEAT)
                     return false;
                 return true;
             }
 
-            void UpdateAI(uint32 diff)
+            void UpdateAI(uint32 diff) override
             {
                 if (_setHealth)
                 {
@@ -836,9 +831,16 @@ class boss_flame_leviathan_defense_turret : public CreatureScript
 
                 TurretAI::UpdateAI(diff);
             }
+
+            void KilledUnit(Unit* who) override
+            {
+                if (Player* plr = who->ToPlayer()) // make sure that there's no death player on the seat.
+                    if (plr->GetVehicle())
+                        plr->ExitVehicle();
+            }
         };
 
-        CreatureAI* GetAI(Creature* creature) const
+        CreatureAI* GetAI(Creature* creature) const override
         {
             return new boss_flame_leviathan_defense_turretAI(creature);
         }
@@ -855,7 +857,7 @@ class boss_flame_leviathan_overload_device : public CreatureScript
             {
             }
 
-            void OnSpellClick(Unit* /*clicker*/, bool& result)
+            void OnSpellClick(Unit* /*clicker*/, bool& result) override
             {
                 if (!result)
                     return;
@@ -874,7 +876,7 @@ class boss_flame_leviathan_overload_device : public CreatureScript
             }
         };
 
-        CreatureAI* GetAI(Creature* creature) const
+        CreatureAI* GetAI(Creature* creature) const override
         {
             return new boss_flame_leviathan_overload_deviceAI(creature);
         }
@@ -885,7 +887,7 @@ class npc_freya_ward : public CreatureScript
 public:
     npc_freya_ward() : CreatureScript("npc_freya_ward") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_freya_wardAI (pCreature);
     }
@@ -900,7 +902,7 @@ public:
         uint32 _castTimer;
         bool _summoned;
 
-        void Reset()
+        void Reset() override
         {
             _summoned = false;
             _castTimer = 25000;
@@ -913,15 +915,15 @@ public:
                 }
         }
 
-        void JustSummoned(Creature* cr)
+        void JustSummoned(Creature* cr) override
         {
             _summoned = true;
             summons.Summon(cr);
         }
 
-        void SummonedCreatureDespawn(Creature* cr) { summons.Despawn(cr); }
+        void SummonedCreatureDespawn(Creature* cr) override { summons.Despawn(cr); }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (_summoned)
             {
@@ -952,7 +954,7 @@ public:
             }
         }
         
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (param == ACTION_DESPAWN_ADDS)
                 summons.DespawnAll();
@@ -965,7 +967,7 @@ class npc_hodirs_fury : public CreatureScript
 public:
     npc_hodirs_fury() : CreatureScript("npc_hodirs_fury") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_hodirs_furyAI (pCreature);
     }
@@ -979,7 +981,7 @@ public:
         uint32 _timeToHit;
         uint32 _switchTargetTimer;
 
-        void Reset()
+        void Reset() override
         {
             _timeToHit = 0;
             _switchTargetTimer = 30000;
@@ -992,7 +994,7 @@ public:
             }
         }
 
-        void MovementInform(uint32 type, uint32  /*param*/)
+        void MovementInform(uint32 type, uint32  /*param*/) override
         {
             if (type == FOLLOW_MOTION_TYPE && !_timeToHit)
             {
@@ -1002,7 +1004,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (_timeToHit)
             {
@@ -1021,7 +1023,7 @@ public:
             _switchTargetTimer += diff;
             if (_switchTargetTimer >= 30000)
             {
-                if(Unit* target = me->SelectNearbyTarget(NULL, 200.0f))
+                if(Unit* target = me->SelectNearbyTarget(nullptr, 200.0f))
                 {
                     if (target->GetVehicleBase() && target->GetVehicleBase()->GetEntry() == NPC_SEAT)
                     {
@@ -1044,7 +1046,7 @@ class npc_mimirons_inferno : public CreatureScript
 public:
     npc_mimirons_inferno() : CreatureScript("npc_mimirons_inferno") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_mimirons_infernoAI(creature);
     }
@@ -1060,21 +1062,21 @@ public:
         uint32 _spellTimer;
         uint32 _recastTimer;
 
-        void AttackStart(Unit*) { }
-        void MoveInLineOfSight(Unit*) { }
-        void WaypointReached(uint32 /*waypointId*/) { }
+        void AttackStart(Unit*) override { }
+        void MoveInLineOfSight(Unit*) override { }
+        void WaypointReached(uint32 /*waypointId*/) override { }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (param == ACTION_DESPAWN_ADDS)
                 summons.DespawnAll();
         }
 
-        void Reset()
+        void Reset() override
         {
             summons.DespawnAll();
             _spellTimer = 0;
-            Start(false, false, 0, NULL, false, true);
+            Start(false, false, 0, nullptr, false, true);
             if (Aura* aur = me->AddAura(SPELL_FREYA_DUMMY_YELLOW, me))
             {
                 aur->SetMaxDuration(-1);
@@ -1082,10 +1084,10 @@ public:
             }
         }
 
-        void JustSummoned(Creature* cr) { summons.Summon(cr); }
-        void SummonedCreatureDespawn(Creature* cr) { summons.Despawn(cr); }
+        void JustSummoned(Creature* cr) override { summons.Summon(cr); }
+        void SummonedCreatureDespawn(Creature* cr)  override { summons.Despawn(cr); }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             npc_escortAI::UpdateAI(diff);
 
@@ -1107,7 +1109,7 @@ class npc_thorims_hammer : public CreatureScript
 public:
     npc_thorims_hammer() : CreatureScript("npc_thorims_hammer") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_thorims_hammerAI (pCreature);
     }
@@ -1122,7 +1124,7 @@ public:
         uint32 _finishTime;
         uint32 _removeTimer;
 
-        void Reset()
+        void Reset() override
         {
             _finishTime = 5000+rand()%15000;
             _beamTimer = 1;
@@ -1130,7 +1132,7 @@ public:
             me->CastSpell(me, SPELL_FREYA_DUMMY_BLUE, true);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (_beamTimer)
             {
@@ -1163,7 +1165,7 @@ class npc_pool_of_tar : public CreatureScript
 public:
     npc_pool_of_tar() : CreatureScript("npc_pool_of_tar") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_pool_of_tarAI (pCreature);
     }
@@ -1174,12 +1176,12 @@ public:
         {
         }
 
-        void DamageTaken(Unit*, uint32 &damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32 &damage, DamageEffectType, SpellSchoolMask) override
         {
             damage = 0;
         }
 
-        void SpellHit(Unit*  /*caster*/, const SpellInfo* spellInfo)
+        void SpellHit(Unit*  /*caster*/, const SpellInfo* spellInfo) override
         {
             if (spellInfo->SchoolMask & SPELL_SCHOOL_MASK_FIRE && !me->HasAura(SPELL_BLAZE))
                 me->CastSpell(me, SPELL_BLAZE, true);
@@ -1187,12 +1189,31 @@ public:
     };
 };
 
+enum ScriptedTextNorgannonDellorah
+{
+    DELLORAH_SAY_1 = 0,
+    DELLORAH_SAY_2 = 1,
+    DELLORAH_SAY_3 = 2,
+    DELLORAH_SAY_4 = 3,
+    DELLORAH_SAY_5 = 4,
+    DELLORAH_SAY_6 = 5,
+    DELLORAH_SAY_7 = 6,
+
+    NORGANNON_SAY_1 = 0,
+    NORGANNON_SAY_2 = 1,
+    NORGANNON_SAY_3 = 2,
+    NORGANNON_SAY_4 = 3,
+    NORGANNON_SAY_5 = 4,
+
+    RHYDIAN_EMOTE = 0,
+};
+
 class npc_lore_keeper_of_norgannon_ulduar : public CreatureScript
 {
 public:
     npc_lore_keeper_of_norgannon_ulduar() : CreatureScript("npc_lore_keeper_of_norgannon_ulduar") { }
 
-    bool OnGossipHello(Player* player, Creature* creature)
+    bool OnGossipHello(Player* player, Creature* creature) override
     {
         if (creature->GetInstanceScript() && creature->GetInstanceScript()->GetData(TYPE_LEVIATHAN) == NOT_STARTED && !creature->AI()->GetData(DATA_EVENT_STARTED))
             player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Activate secondary defensive systems.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
@@ -1201,7 +1222,7 @@ public:
         return true;
     }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32  /*uiSender*/, uint32 uiAction)
+    bool OnGossipSelect(Player* player, Creature* creature, uint32  /*uiSender*/, uint32 uiAction) override
     {
         switch (uiAction)
         {
@@ -1220,7 +1241,7 @@ public:
         return true;
     }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_lore_keeper_of_norgannon_ulduarAI (pCreature);
     }
@@ -1236,21 +1257,21 @@ public:
         bool _running;
         int32 _checkTimer;
         uint8 _step;
-        uint64 _dellorahGUID;
+        Creature* _dellorah;
 
-        uint32 GetData(uint32 param) const
+        uint32 GetData(uint32 param) const override
         {
             if (param == DATA_EVENT_STARTED)
                 return _eventStarted;
             return 0;
         }
 
-        void Reset()
+        void Reset() override
         {
             _running = false;
             _checkTimer = 0;
             _step = 0;
-            _dellorahGUID = 0;
+            _dellorah = me->FindNearestCreature(NPC_HIGH_EXPLORER_DELLORAH, 20.0f, true);
             me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
         }
 
@@ -1260,15 +1281,7 @@ public:
             _checkTimer = time;
         }
 
-        void Say(std::string text, bool self)
-        {
-            if (self)
-                me->MonsterSay(text.c_str(), LANG_UNIVERSAL, 0);
-            else if (Creature* c = ObjectAccessor::GetCreature(*me, _dellorahGUID))
-                c->MonsterSay(text.c_str(), LANG_UNIVERSAL, 0);
-        }
-
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (_running)
             {
@@ -1285,56 +1298,56 @@ public:
                             NextStep(14000);
                             break;
                         case 1:
-                            Say("I heard a story or two of a Lore Keeper in Uldaman that fit your description. Do you serve a similar purpose?", false);
+                            _dellorah->AI()->Talk(DELLORAH_SAY_1);
                             NextStep(10000);
                             break;
                         case 2:
-                            Say("I was constructed to serve as a repository for essential information regarding this complex. My primary functions include communicating the status of the frontal defense systems and assessing the status of the entity that this complex was built to imprison.", true);
+                            Talk(NORGANNON_SAY_1);
                             NextStep(14000);
                             break;
                         case 3:
-                            Say("Frontal defense systems? Is there something I should let Brann know before he has anyone attempt to enter the complex?", false);
+                            _dellorah->AI()->Talk(DELLORAH_SAY_2);
                             NextStep(11000);
                             break;
                         case 4:
-                            Say("Access to the interior of the complex is currently restricted. Primary defensive emplacements are active. Secondary systems are currently non-active.", true);
+                            Talk(NORGANNON_SAY_2);
                             NextStep(12000);
                             break;
                         case 5:
-                            Say("Can you detail the nature of these defense systems?", false);
+                            _dellorah->AI()->Talk(DELLORAH_SAY_3);
                             NextStep(8000);
                             break;
                         case 6:
-                            Say("Compromise of complex detected, security override enabled - query permitted.", true);
+                            Talk(NORGANNON_SAY_3);
                             NextStep(7000);
                             break;
                         case 7:
-                            Say("Primary defensive emplacements consist of iron constructs and Storm Beacons, which will generate additional constructs as necessary. Secondary systems consist of orbital defense emplacements.", true);
+                            Talk(NORGANNON_SAY_4);
                             NextStep(11000);
                             break;
                         case 8:
-                            Say("Got it. At least we don't have to deal with those orbital emplacements.", false);
+                            _dellorah->AI()->Talk(DELLORAH_SAY_4);
                             NextStep(7000);
                             break;
                         case 9:
-                            Say("Rhydian, make sure you let Brann and Archmage Pentarus know about those defenses immediately.", false);
+                            _dellorah->AI()->Talk(DELLORAH_SAY_5);
                             NextStep(7000);
                             break;
                         case 10:
                             if (Creature* c = me->FindNearestCreature(NPC_ARCHMAGE_RHYDIAN, 15.0f))
                             {
-                                c->MonsterTextEmote("Archmage Rhydian Nods.", 0, false);
+                                c->AI()->Talk(RHYDIAN_EMOTE);
                                 c->GetMotionMaster()->MovePoint(0, -720.6f, -61.7f, 429.84f);
                             }
-                            Say("And you mentioned an imprisoned entity? What is the nature of this entity and what is its status?", false);
+                            _dellorah->AI()->Talk(DELLORAH_SAY_6);
                             NextStep(6000);
                             break;
                         case 11:
-                            Say("Entity designate: Yogg-Saron. Security has been compromised. Prison operational status unknown. Unable to contact Watchers for notification purposes.", true);
+                            Talk(NORGANNON_SAY_5);
                             NextStep(9000);
                             break;
                         case 12:
-                            Say("Yogg-Saron is here? It sounds like we really will have our hands full then.", false);
+                            _dellorah->AI()->Talk(DELLORAH_SAY_7);
                             
                             if (Creature* c = me->FindNearestCreature(NPC_START_BRANN_BRONZEBEARD, 110.0f, true) )
                                 c->AI()->DoAction(ACTION_START_NORGANNON_BRANN);
@@ -1342,13 +1355,12 @@ public:
                             _running = false;
                             _checkTimer = 0;
                             _step = 0;
-                            _dellorahGUID = 0;
                             return;
                     }
             }
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (_eventStarted)
                 return;
@@ -1356,7 +1368,7 @@ public:
             if (param == ACTION_START_NORGANNON_EVENT)
             {
                 if (Creature* cr = me->FindNearestCreature(NPC_HIGH_EXPLORER_DELLORAH, 20.0f, true))
-                    _dellorahGUID = cr->GetGUID();
+                    _dellorah = cr;
 
                 _eventStarted = true;
                 _running = true;
@@ -1371,14 +1383,14 @@ class npc_brann_ulduar : public CreatureScript
 public:
     npc_brann_ulduar() : CreatureScript("npc_brann_ulduar") { }
 
-    bool OnGossipHello(Player*  /*player*/, Creature* creature)
+    bool OnGossipHello(Player*  /*player*/, Creature* creature) override
     {
         if (creature->GetInstanceScript() && creature->GetInstanceScript()->GetData(TYPE_LEVIATHAN) == NOT_STARTED && !creature->AI()->GetData(DATA_EVENT_STARTED))
             creature->AI()->DoAction(ACTION_START_BRANN_EVENT);
         return true;
     }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_brann_ulduarAI (pCreature);
     }
@@ -1397,7 +1409,7 @@ public:
         uint8 _step;
         uint64 _pentarusGUID;
 
-        void Reset()
+        void Reset() override
         {
             _running = false;
             _checkTimer = 0;
@@ -1417,14 +1429,14 @@ public:
             WorldPacket data;
             
             if (self)
-                ChatHandler::BuildChatPacket(data, CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, me, NULL, text);
+                ChatHandler::BuildChatPacket(data, CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, me, nullptr, text);
             else if (Creature* c = ObjectAccessor::GetCreature(*me, _pentarusGUID))
-                ChatHandler::BuildChatPacket(data, CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, c, NULL, text);
+                ChatHandler::BuildChatPacket(data, CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, c, nullptr, text);
 
             me->SendMessageToSetInRange(&data, 100.0f, true);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (_running)
             {
@@ -1471,7 +1483,7 @@ public:
             }
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (_eventStarted)
                 return;
@@ -1481,10 +1493,10 @@ public:
                 // deactivate towers, easy mode
                 if (param != ACTION_START_NORGANNON_BRANN)
                 {
-                    me->GetInstanceScript()->ProcessEvent(NULL, EVENT_TOWER_OF_STORM_DESTROYED);
-                    me->GetInstanceScript()->ProcessEvent(NULL, EVENT_TOWER_OF_FROST_DESTROYED);
-                    me->GetInstanceScript()->ProcessEvent(NULL, EVENT_TOWER_OF_FLAMES_DESTROYED);
-                    me->GetInstanceScript()->ProcessEvent(NULL, EVENT_TOWER_OF_LIFE_DESTROYED);
+                    me->GetInstanceScript()->ProcessEvent(nullptr, EVENT_TOWER_OF_STORM_DESTROYED);
+                    me->GetInstanceScript()->ProcessEvent(nullptr, EVENT_TOWER_OF_FROST_DESTROYED);
+                    me->GetInstanceScript()->ProcessEvent(nullptr, EVENT_TOWER_OF_FLAMES_DESTROYED);
+                    me->GetInstanceScript()->ProcessEvent(nullptr, EVENT_TOWER_OF_LIFE_DESTROYED);
                 }
             }
 
@@ -1503,7 +1515,7 @@ class npc_brann_radio : public CreatureScript
 public:
     npc_brann_radio() : CreatureScript("npc_brann_radio") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_brann_radioAI (pCreature);
     }
@@ -1519,7 +1531,7 @@ public:
         bool _lock;
         bool _helpLock;
 
-        void Reset()
+        void Reset() override
         {
             me->SetReactState(REACT_AGGRESSIVE);
         }
@@ -1527,11 +1539,11 @@ public:
         void Say(const char* text)
         {
             WorldPacket data;
-            ChatHandler::BuildChatPacket(data, CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, me, NULL, text);
+            ChatHandler::BuildChatPacket(data, CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, me, nullptr, text);
             me->SendMessageToSetInRange(&data, 100.0f, true);
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if (!_lock)
             {
@@ -1618,7 +1630,7 @@ class npc_storm_beacon_spawn : public CreatureScript
 public:
     npc_storm_beacon_spawn() : CreatureScript("npc_storm_beacon_spawn") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_storm_beacon_spawnAI (pCreature);
     }
@@ -1634,7 +1646,7 @@ public:
         uint8 _amount;
         uint32 _checkTimer;
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (_amount < 40)
             {
@@ -1642,7 +1654,7 @@ public:
                 if (_checkTimer >= 4000)
                 {
                     _checkTimer = 0;
-                    if (Unit* target = me->SelectNearbyTarget(NULL, 80.0f))
+                    if (Unit* target = me->SelectNearbyTarget(nullptr, 80.0f))
                     {
                         ++_amount;
                         if (Creature* cr = me->SummonCreature(NPC_DEFENDER_GENERATED, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()+4, me->GetOrientation(), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 900000))
@@ -1659,7 +1671,7 @@ class boss_flame_leviathan_safety_container : public CreatureScript
 public:
     boss_flame_leviathan_safety_container() : CreatureScript("boss_flame_leviathan_safety_container") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_flame_leviathan_safety_containerAI (pCreature);
     }
@@ -1673,7 +1685,7 @@ public:
 
         uint32 _allowTimer;
 
-        void MovementInform(uint32  /*type*/, uint32 id)
+        void MovementInform(uint32  /*type*/, uint32 id) override
         {
             if (id == me->GetEntry())
             {
@@ -1687,7 +1699,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             _allowTimer += diff;
             if (_allowTimer >= 5000 && !me->GetVehicle() && me->GetMotionMaster()->GetCurrentMovementGeneratorType() != POINT_MOTION_TYPE)
@@ -1707,7 +1719,7 @@ class npc_mechanolift : public CreatureScript
 public:
     npc_mechanolift() : CreatureScript("npc_mechanolift") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_mechanoliftAI (pCreature);
     }
@@ -1722,13 +1734,13 @@ public:
         int32 _startTimer;
         uint32 _evadeTimer;
 
-        void Reset()
+        void Reset() override
         {
             _startTimer = urand(1,5000);
             _evadeTimer = 0;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (_startTimer)
             {
@@ -1755,7 +1767,7 @@ class go_ulduar_tower : public GameObjectScript
     public:
         go_ulduar_tower() : GameObjectScript("go_ulduar_tower") { }
 
-        void OnDestroyed(GameObject* go, Player* /*player*/)
+        void OnDestroyed(GameObject* go, Player* /*player*/) override
         {
             Creature* trigger = go->FindNearestCreature(NPC_ULDUAR_GAUNTLET_GENERATOR, 15.0f, true);
             if (trigger)
@@ -1795,14 +1807,14 @@ class spell_load_into_catapult : public SpellScriptLoader
                 owner->RemoveAurasDueToSpell(SPELL_PASSENGER_LOADED);
             }
 
-            void Register()
+            void Register() override
             {
                 OnEffectApply += AuraEffectApplyFn(spell_load_into_catapult_AuraScript::OnApply, EFFECT_0, SPELL_AURA_CONTROL_VEHICLE, AURA_EFFECT_HANDLE_REAL);
                 OnEffectRemove += AuraEffectRemoveFn(spell_load_into_catapult_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_CONTROL_VEHICLE, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
             }
         };
 
-        AuraScript* GetAuraScript() const
+        AuraScript* GetAuraScript() const override
         {
             return new spell_load_into_catapult_AuraScript();
         }
@@ -1840,7 +1852,7 @@ class spell_auto_repair : public SpellScriptLoader
                 if (!vehicle)
                     return;
 
-                Player* driver = vehicle->GetPassenger(0) ? vehicle->GetPassenger(0)->ToPlayer() : NULL;
+                Player* driver = vehicle->GetPassenger(0) ? vehicle->GetPassenger(0)->ToPlayer() : nullptr;
                 if (!driver)
                     return;
 
@@ -1854,14 +1866,14 @@ class spell_auto_repair : public SpellScriptLoader
                     instance->SetData(DATA_UNBROKEN_ACHIEVEMENT, 0);
             }
 
-            void Register()
+            void Register() override
             {
                 OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_auto_repair_SpellScript::FilterTargets, EFFECT_ALL, TARGET_UNIT_DEST_AREA_ENTRY);
                 OnEffectHitTarget += SpellEffectFn(spell_auto_repair_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
             }
         };
 
-        SpellScript* GetSpellScript() const
+        SpellScript* GetSpellScript() const override
         {
             return new spell_auto_repair_SpellScript();
         }
@@ -1898,14 +1910,14 @@ class spell_systems_shutdown : public SpellScriptLoader
                 owner->SetControlled(false, UNIT_STATE_STUNNED);
             }
 
-            void Register()
+            void Register() override
             {
                 OnEffectApply += AuraEffectApplyFn(spell_systems_shutdown_AuraScript::OnApply, EFFECT_0, SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN, AURA_EFFECT_HANDLE_REAL);
                 OnEffectRemove += AuraEffectRemoveFn(spell_systems_shutdown_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN, AURA_EFFECT_HANDLE_REAL);
             }
         };
 
-        AuraScript* GetAuraScript() const
+        AuraScript* GetAuraScript() const override
         {
             return new spell_systems_shutdown_AuraScript();
         }
@@ -1919,7 +1931,7 @@ class FlameLeviathanPursuedTargetSelector
     };
 
     public:
-        explicit FlameLeviathanPursuedTargetSelector(Unit* unit) : _me(unit) {};
+        explicit FlameLeviathanPursuedTargetSelector() {};
 
         bool operator()(WorldObject* target) const
         {
@@ -1949,9 +1961,6 @@ class FlameLeviathanPursuedTargetSelector
 
             return !playerFound;
         }
-
-    private:
-        Unit const* _me;
 };
 
 class spell_pursue : public SpellScriptLoader
@@ -1965,7 +1974,7 @@ class spell_pursue : public SpellScriptLoader
 
             void FilterTargets(std::list<WorldObject*>& targets)
             {
-                targets.remove_if(FlameLeviathanPursuedTargetSelector(GetCaster()));
+                targets.remove_if(FlameLeviathanPursuedTargetSelector());
                 if (targets.empty())
                 {
                     if (Creature* caster = GetCaster()->ToCreature())
@@ -1992,23 +2001,16 @@ class spell_pursue : public SpellScriptLoader
                 caster->getThreatManager().resetAllAggro();
                 caster->GetAI()->AttackStart(target);    // Chase target
                 caster->AddThreat(target, 10000000.0f);
-                if (target->GetVehicleKit())
-                    for (SeatMap::const_iterator itr = target->GetVehicleKit()->Seats.begin(); itr != target->GetVehicleKit()->Seats.end(); ++itr)
-                        if (IS_PLAYER_GUID(itr->second.Passenger.Guid))
-                        {
-                            caster->MonsterTextEmote("Flame Leviathan pursues $N.", ObjectAccessor::GetPlayer(*caster, itr->second.Passenger.Guid), true);
-                            return;
-                        }
             }
 
-            void Register()
+            void Register() override
             {
                 OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_pursue_SpellScript::FilterTargets, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ENEMY);
                 OnEffectHitTarget += SpellEffectFn(spell_pursue_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_APPLY_AURA);
             }
         };
 
-        SpellScript* GetSpellScript() const
+        SpellScript* GetSpellScript() const override
         {
             return new spell_pursue_SpellScript();
         }
@@ -2031,11 +2033,11 @@ class spell_vehicle_throw_passenger : public SpellScriptLoader
                     {
                         // use 99 because it is 3d search
                         std::list<WorldObject*> targetList;
-                        Trinity::WorldObjectSpellAreaTargetCheck check(99, GetExplTargetDest(), GetCaster(), GetCaster(), GetSpellInfo(), TARGET_CHECK_DEFAULT, NULL);
+                        Trinity::WorldObjectSpellAreaTargetCheck check(99, GetExplTargetDest(), GetCaster(), GetCaster(), GetSpellInfo(), TARGET_CHECK_DEFAULT, nullptr);
                         Trinity::WorldObjectListSearcher<Trinity::WorldObjectSpellAreaTargetCheck> searcher(GetCaster(), targetList, check);
                         GetCaster()->GetMap()->VisitAll(GetCaster()->m_positionX, GetCaster()->m_positionY, 99, searcher);
                         float minDist = 99 * 99;
-                        Unit* target = NULL;
+                        Unit* target = nullptr;
                         for (std::list<WorldObject*>::iterator itr = targetList.begin(); itr != targetList.end(); ++itr)
                         {
                             if (Unit* unit = (*itr)->ToUnit())
@@ -2068,13 +2070,13 @@ class spell_vehicle_throw_passenger : public SpellScriptLoader
                     }
             }
 
-            void Register()
+            void Register() override
             {
                 AfterCast += SpellCastFn(spell_vehicle_throw_passenger_SpellScript::HandleScript);
             }
         };
 
-        SpellScript* GetSpellScript() const
+        SpellScript* GetSpellScript() const override
         {
             return new spell_vehicle_throw_passenger_SpellScript();
         }
@@ -2091,16 +2093,16 @@ class spell_tar_blaze : public SpellScriptLoader
 
             void OnPeriodic(AuraEffect const* aurEff)
             {
-                GetUnitOwner()->CastSpell((Unit*)NULL, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true);
+                GetUnitOwner()->CastSpell((Unit*)nullptr, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true);
             }
 
-            void Register()
+            void Register() override
             {
                 OnEffectPeriodic += AuraEffectPeriodicFn(spell_tar_blaze_AuraScript::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
             }
         };
 
-        AuraScript* GetAuraScript() const
+        AuraScript* GetAuraScript() const override
         {
             return new spell_tar_blaze_AuraScript();
         }
@@ -2134,13 +2136,13 @@ class spell_vehicle_grab_pyrite : public SpellScriptLoader
                     }
             }
 
-            void Register()
+            void Register() override
             {
                 OnEffectHitTarget += SpellEffectFn(spell_vehicle_grab_pyrite_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
             }
         };
 
-        SpellScript* GetSpellScript() const
+        SpellScript* GetSpellScript() const override
         {
             return new spell_vehicle_grab_pyrite_SpellScript();
         }
@@ -2165,13 +2167,13 @@ class spell_vehicle_circuit_overload : public SpellScriptLoader
                     }
             }
 
-            void Register()
+            void Register() override
             {
                 OnEffectPeriodic += AuraEffectPeriodicFn(spell_vehicle_circuit_overload_AuraScript::OnPeriodic, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY);
             }
         };
 
-        AuraScript* GetAuraScript() const
+        AuraScript* GetAuraScript() const override
         {
             return new spell_vehicle_circuit_overload_AuraScript();
         }
@@ -2190,13 +2192,13 @@ class spell_orbital_supports : public SpellScriptLoader
             {
                 return target->GetEntry() == NPC_LEVIATHAN;
             }
-            void Register()
+            void Register() override
             {
                 DoCheckAreaTarget += AuraCheckAreaTargetFn(spell_orbital_supports_AuraScript::CheckAreaTarget);
             }
         };
 
-        AuraScript* GetAuraScript() const
+        AuraScript* GetAuraScript() const override
         {
             return new spell_orbital_supports_AuraScript();
         }
@@ -2229,13 +2231,13 @@ class spell_thorims_hammer : public SpellScriptLoader
                 }
             }
 
-            void Register()
+            void Register() override
             {
                 OnEffectHitTarget += SpellEffectFn(spell_thorims_hammer_SpellScript::RecalculateDamage, EFFECT_ALL, SPELL_EFFECT_SCHOOL_DAMAGE);
             }
         };
 
-        SpellScript* GetSpellScript() const
+        SpellScript* GetSpellScript() const override
         {
             return new spell_thorims_hammer_SpellScript();
         }
@@ -2252,7 +2254,7 @@ class spell_shield_generator : public SpellScriptLoader
 
             uint32 absorbPct;
 
-            bool Load()
+            bool Load() override
             {
                 absorbPct = GetSpellInfo()->Effects[EFFECT_0].CalcValue(GetCaster());
                 return true;
@@ -2269,14 +2271,14 @@ class spell_shield_generator : public SpellScriptLoader
                 absorbAmount = CalculatePct(dmgInfo.GetDamage(), absorbPct);
             }
 
-            void Register()
+            void Register() override
             {
                  DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_shield_generator_AuraScript::CalculateAmount, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB);
                  OnEffectAbsorb += AuraEffectAbsorbFn(spell_shield_generator_AuraScript::Absorb, EFFECT_0);
             }
         };
 
-        AuraScript* GetAuraScript() const
+        AuraScript* GetAuraScript() const override
         {
             return new spell_shield_generator_AuraScript();
         }
@@ -2315,13 +2317,13 @@ class spell_demolisher_ride_vehicle : public SpellScriptLoader
                 return SPELL_CAST_OK;
             }
 
-            void Register()
+            void Register() override
             {
                 OnCheckCast += SpellCheckCastFn(spell_demolisher_ride_vehicle_SpellScript::CheckCast);
             }
         };
 
-        SpellScript* GetSpellScript() const
+        SpellScript* GetSpellScript() const override
         {
             return new spell_demolisher_ride_vehicle_SpellScript();
         }
@@ -2335,7 +2337,7 @@ class achievement_flame_leviathan_towers : public AchievementCriteriaScript
         {
         }
 
-        bool OnCheck(Player*  /*player*/, Unit* target /*Flame Leviathan*/)
+        bool OnCheck(Player*  /*player*/, Unit* target /*Flame Leviathan*/) override
         {
             return target && _towerCount <= target->GetAI()->GetData(DATA_GET_TOWER_COUNT);
         }
@@ -2349,7 +2351,7 @@ class achievement_flame_leviathan_shutout : public AchievementCriteriaScript
     public:
         achievement_flame_leviathan_shutout() : AchievementCriteriaScript("achievement_flame_leviathan_shutout") {}
 
-        bool OnCheck(Player*  /*player*/, Unit* target /*Flame Leviathan*/)
+        bool OnCheck(Player*  /*player*/, Unit* target /*Flame Leviathan*/) override
         {
             if (target)
                 if (target->GetAI()->GetData(DATA_GET_SHUTDOWN))
@@ -2366,7 +2368,7 @@ class achievement_flame_leviathan_garage : public AchievementCriteriaScript
         {
         }
 
-        bool OnCheck(Player* player, Unit*)
+        bool OnCheck(Player* player, Unit*) override
         {
             if (Vehicle* vehicle = player->GetVehicle())
                 if (vehicle->GetCreatureEntry() == _entry1 || vehicle->GetCreatureEntry() == _entry2)
@@ -2384,7 +2386,7 @@ class achievement_flame_leviathan_unbroken : public AchievementCriteriaScript
     public:
         achievement_flame_leviathan_unbroken() : AchievementCriteriaScript("achievement_flame_leviathan_unbroken") {}
 
-        bool OnCheck(Player* player, Unit*)
+        bool OnCheck(Player* player, Unit*) override
         {
             if (player->GetInstanceScript())
                 if (player->GetInstanceScript()->GetData(DATA_UNBROKEN_ACHIEVEMENT))

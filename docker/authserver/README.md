@@ -2,7 +2,7 @@
 
 This provides a way to manually build and launch a container with the AzerothCore authserver running inside it.
 
-If you just want to install the whole AzerothCore quickly using Docker Compose, we recommend [this guide](https://github.com/azerothcore/azerothcore-wotlk/wiki/install-with-Docker).
+If you just want to install the whole AzerothCore quickly using Docker Compose, we recommend [this guide](http://www.azerothcore.org/wiki/install-with-Docker).
 
 ## Requirements
 
@@ -28,6 +28,7 @@ docker build -t azerothcore/authserver -f docker/authserver/Dockerfile docker/au
 
 ```
 docker run --name ac-authserver \
+    --mount type=bind,source="$(pwd)"/docker/authserver/bin/,target=/azeroth-server/bin \
     --mount type=bind,source="$(pwd)"/docker/authserver/etc/,target=/azeroth-server/etc \
     --mount type=bind,source="$(pwd)"/docker/authserver/logs/,target=/azeroth-server/logs \
     -p 127.0.0.1:3724:3724 \

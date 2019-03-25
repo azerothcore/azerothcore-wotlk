@@ -144,7 +144,7 @@ WorldSession::~WorldSession()
     /// - If have unclosed socket, close it
     if (m_Socket)
     {
-        m_Socket->CloseSocket();
+        m_Socket->CloseSocket("WorldSession destructor");
         m_Socket->RemoveReference();
         m_Socket = NULL;
     }
@@ -236,7 +236,7 @@ void WorldSession::SendPacket(WorldPacket const* packet)
 #endif
 
     if (m_Socket->SendPacket(*packet) == -1)
-        m_Socket->CloseSocket();
+        m_Socket->CloseSocket("m_Socket->SendPacket(*packet) == -1");
 }
 
 /// Add an incoming packet to the queue
@@ -254,8 +254,8 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
         
         /// If necessary, kick the player because the client didn't send anything for too long
         /// (or they've been idling in character select)
-        if (IsConnectionIdle())
-            m_Socket->CloseSocket();
+        if (sWorld->getBoolConfig(CONFIG_CLOSE_IDLE_CONNECTIONS) && IsConnectionIdle())
+            m_Socket->CloseSocket("Client didn't send anything for too long");
     }
 
     HandleTeleportTimeout(updater.ProcessLogout());
@@ -611,10 +611,10 @@ void WorldSession::LogoutPlayer(bool save)
 }
 
 /// Kick a player out of the World
-void WorldSession::KickPlayer(bool setKicked)
+void WorldSession::KickPlayer(std::string const& reason, bool setKicked)
 {
     if (m_Socket)
-        m_Socket->CloseSocket();
+        m_Socket->CloseSocket(reason);
 
     if (setKicked)
         SetKicked(true); // pussywizard: the session won't be left ingame for 60 seconds and to also kick offline session
@@ -804,15 +804,12 @@ void WorldSession::SaveTutorialsData(SQLTransaction &trans)
     if (!m_TutorialsChanged)
         return;
 
-    bool hasTutorials = false;
-    for (uint8 i = 0; i < MAX_ACCOUNT_TUTORIAL_VALUES; ++i)
-        if (m_Tutorials[i] != 0)
-        {
-            hasTutorials = true;
-            break;
-        }
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_HAS_TUTORIALS);
+    stmt->setUInt32(0, GetAccountId());
+    bool hasTutorials = bool(CharacterDatabase.Query(stmt));
 
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(hasTutorials ? CHAR_UPD_TUTORIALS : CHAR_INS_TUTORIALS);
+    stmt = CharacterDatabase.GetPreparedStatement(hasTutorials ? CHAR_UPD_TUTORIALS : CHAR_INS_TUTORIALS);
+
     for (uint8 i = 0; i < MAX_ACCOUNT_TUTORIAL_VALUES; ++i)
         stmt->setUInt32(i, m_Tutorials[i]);
     stmt->setUInt32(MAX_ACCOUNT_TUTORIAL_VALUES, GetAccountId());

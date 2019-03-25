@@ -586,8 +586,10 @@ enum SMART_ACTION
     SMART_ACTION_NO_ENVIRONMENT_UPDATE              = 213,
     SMART_ACTION_ZONE_UNDER_ATTACK                  = 214,
     SMART_ACTION_LOAD_GRID                          = 215,
+    SMART_ACTION_MUSIC                              = 216,    // SoundId, onlySelf, type
+    SMART_ACTION_RANDOM_MUSIC                       = 217,    // SoundId1, SoundId2, SoundId3, SoundId4, onlySelf, type
 
-    SMART_ACTION_AC_END                             = 216,    // placeholder
+    SMART_ACTION_AC_END                             = 218,    // placeholder
 };
 
 struct SmartAction
@@ -628,6 +630,23 @@ struct SmartAction
             uint32 sound4;
             uint32 onlySelf;
         } randomSound;
+
+        struct
+        {
+            uint32 sound;
+            uint32 onlySelf;
+            uint32 type;
+        } music;
+
+        struct
+        {
+            uint32 sound1;
+            uint32 sound2;
+            uint32 sound3;
+            uint32 sound4;
+            uint32 onlySelf;
+            uint32 type;
+        } randomMusic;
 
         struct
         {
@@ -1216,22 +1235,11 @@ enum SMARTAI_TARGETS
     SMART_TARGET_THREAT_LIST                    = 24,   // All units on creature's threat list, maxdist, playerOnly
     SMART_TARGET_CLOSEST_ENEMY                  = 25,   // maxDist, playerOnly
     SMART_TARGET_CLOSEST_FRIENDLY               = 26,   // maxDist, playerOnly
-    // RESERVED                                 = 27,
-    // RESERVED                                 = 28,
-    // RESERVED                                 = 29,
-    // RESERVED                                 = 30,
-    // RESERVED                                 = 31,
-    // RESERVED                                 = 32,
-    // RESERVED                                 = 33,
-    // RESERVED                                 = 34,
-    // RESERVED                                 = 35,
-    // RESERVED                                 = 36,
-    // RESERVED                                 = 37,
-    // RESERVED                                 = 38,
-    // RESERVED                                 = 39,
-    SMART_TARGET_FARTHEST                       = 40,
+    SMART_TARGET_LOOT_RECIPIENTS                = 27,   // TODO: NOT SUPPORTED YET
+    SMART_TARGET_FARTHEST                       = 28,   // maxDist, playerOnly, isInLos
+    SMART_TARGET_VEHICLE_PASSENGER              = 29,   // TODO: NOT SUPPORTED YET
 
-    SMART_TARGET_END                            = 41
+    SMART_TARGET_END                            = 30
 };
 
 struct SmartTarget

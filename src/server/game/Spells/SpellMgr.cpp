@@ -4468,6 +4468,12 @@ void SpellMgr::LoadDbcDataCorrections()
         case 37852:
             spellInfo->AttributesEx5 |= SPELL_ATTR5_USABLE_WHILE_STUNNED;
             break;
+                
+        // Karazhan
+        // Amplify Damage
+        case 39095:
+            spellInfo->MaxAffectedTargets = 1;
+            break;
 
         // Magisters' Terrace
         // Energy Feedback
@@ -5840,6 +5846,17 @@ void SpellMgr::LoadDbcDataCorrections()
         case 74637:
             spellInfo->speed = 0;
             break;
+        //Blazing Aura
+        case 75885:
+        case 75886:
+            spellInfo->AttributesEx4 &= ~SPELL_ATTR4_IGNORE_RESISTANCES;
+            break;
+        //Meteor Strike
+        case 75952:
+        //Combustion Periodic
+        case 74629:
+            spellInfo->AttributesEx4 &= ~SPELL_ATTR4_IGNORE_RESISTANCES;
+            break;
 
 
         // ///////////////////////////////////////////
@@ -6033,6 +6050,13 @@ void SpellMgr::LoadDbcDataCorrections()
         //Crushing the Crown
         case 71024:
             spellInfo->EffectImplicitTargetA[0] = TARGET_DEST_DYNOBJ_NONE;
+            break;
+        // Battle for the Undercity
+        case 59892: // Cyclone fall
+            spellInfo->Effect[EFFECT_0] = SPELL_EFFECT_APPLY_AREA_AURA_FRIEND;
+            spellInfo->EffectRadiusIndex[0] = EFFECT_RADIUS_10_YARDS;
+            spellInfo->AttributesEx &= ~SPELL_ATTR0_CANT_CANCEL;
+            spellInfo->AttributesEx3 |= SPELL_ATTR3_ONLY_TARGET_PLAYERS;
             break;
 
         // ///////////////////////////////////////////

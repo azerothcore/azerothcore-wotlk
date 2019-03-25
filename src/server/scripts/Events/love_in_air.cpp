@@ -1,7 +1,6 @@
 // Scripted by Xinef
 
 #include "ScriptMgr.h"
-#include "ScriptPCH.h"
 #include "ScriptedCreature.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
@@ -10,6 +9,7 @@
 #include "SpellScript.h"
 #include "LFGMgr.h"
 #include "Group.h"
+#include "PassiveAI.h"
 
 ///////////////////////////////////////
 ////// GOS

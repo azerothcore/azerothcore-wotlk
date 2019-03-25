@@ -5,7 +5,8 @@
 #ifndef DEF_THEBLACKMORASS_H
 #define DEF_THEBLACKMORASS_H
 
-#include "ScriptPCH.h"
+#include "SpellScript.h"
+#include "PassiveAI.h"
 
 enum DataTypes
 {

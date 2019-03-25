@@ -17,12 +17,14 @@ quest_a_pawn_on_the_eternal_pawn
 EndContentData */
 
 #include "ScriptMgr.h"
-#include "ScriptPCH.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "Group.h"
 #include "Player.h"
 #include "AccountMgr.h"
+#include "SpellInfo.h"
+#include "Spell.h"
+#include "BanManager.h"
 
 /*###
 ## npcs_rutgar_and_frankal
@@ -1262,7 +1264,7 @@ class go_wind_stone : public GameObjectScript
                 {
                     std::string accountName;
                     AccountMgr::GetName(player->GetSession()->GetAccountId(), accountName);
-                    sWorld->BanAccount(BAN_ACCOUNT, accountName, "0s", "Wind Stone exploit", "Server");
+                    sBan->BanAccount(accountName, "0s", "Wind Stone exploit", "Server");
                 }
                 return;
             }

@@ -5,7 +5,9 @@
 #ifndef DEF_OCULUS_H
 #define DEF_OCULUS_H
 
-#include "ScriptPCH.h"
+#include "SpellScript.h"
+#include "SpellAuras.h"
+#include "SpellAuraEffects.h"
 
 enum Data
 {

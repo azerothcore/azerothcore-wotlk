@@ -11,8 +11,8 @@ SDComment: SDComment: Timers may incorrect
 SDCategory: Karazhan
 EndScriptData */
 
+#include "Player.h"
 #include "ScriptMgr.h"
-#include "ScriptPCH.h"
 #include "ScriptedCreature.h"
 #include "karazhan.h"
 

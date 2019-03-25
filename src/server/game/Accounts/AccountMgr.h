@@ -21,6 +21,7 @@ enum AccountOpResult
 };
 
 #define MAX_ACCOUNT_STR 20
+#define MAX_PASS_STR 16
 
 namespace AccountMgr
 {

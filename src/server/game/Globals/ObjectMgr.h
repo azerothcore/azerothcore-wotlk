@@ -715,6 +715,7 @@ class ObjectMgr
         int LoadReferenceVendor(int32 vendor, int32 item_id, std::set<uint32> *skip_vendors);
 
         void LoadGameObjectTemplate();
+        void LoadGameObjectTemplateAddons();
         void AddGameobjectInfo(GameObjectTemplate* goinfo);
 
         CreatureTemplate const* GetCreatureTemplate(uint32 entry);
@@ -726,6 +727,7 @@ class ObjectMgr
         EquipmentInfo const* GetEquipmentInfo(uint32 entry, int8& id);
         CreatureAddon const* GetCreatureAddon(uint32 lowguid);
         GameObjectAddon const* GetGameObjectAddon(uint32 lowguid);
+        GameObjectTemplateAddon const* GetGameObjectTemplateAddon(uint32 entry) const;
         CreatureAddon const* GetCreatureTemplateAddon(uint32 entry);
         ItemTemplate const* GetItemTemplate(uint32 entry);
         ItemTemplateContainer const* GetItemTemplateStore() const { return &_itemTemplateStore; }
@@ -1011,6 +1013,7 @@ class ObjectMgr
         void LoadPetNumber();
         void LoadCorpses();
         void LoadFishingBaseSkillLevel();
+        void ChangeFishingBaseSkillLevel(uint32 entry, int32 skill);
 
         void LoadReputationRewardRate();
         void LoadReputationOnKill();
@@ -1447,6 +1450,7 @@ class ObjectMgr
         GameObjectDataContainer _gameObjectDataStore;
         GameObjectLocaleContainer _gameObjectLocaleStore;
         GameObjectTemplateContainer _gameObjectTemplateStore;
+        GameObjectTemplateAddonContainer _gameObjectTemplateAddonStore;
         /// Stores temp summon data grouped by summoner's entry, summoner's type and group id
         TempSummonDataContainer _tempSummonDataStore;
 

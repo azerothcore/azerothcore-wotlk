@@ -11,6 +11,7 @@
  * Scriptnames of files in this file should be prefixed with "spell_gen_"
  */
 
+#include <array>
 #include "ScriptMgr.h"
 #include "Battlefield.h"
 #include "BattlefieldMgr.h"

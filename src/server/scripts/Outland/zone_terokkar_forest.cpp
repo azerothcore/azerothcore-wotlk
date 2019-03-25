@@ -22,7 +22,6 @@ npc_slim
 EndContentData */
 
 #include "ScriptMgr.h"
-#include "ScriptPCH.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "ScriptedEscortAI.h"
@@ -30,6 +29,7 @@ EndContentData */
 #include "Group.h"
 #include "Player.h"
 #include "WorldSession.h"
+#include "SpellAuras.h"
 
 // Ours
 enum fumping

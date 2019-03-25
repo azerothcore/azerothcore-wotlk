@@ -247,7 +247,8 @@ class WorldSession
         }
 
         void LogoutPlayer(bool save);
-        void KickPlayer(bool setKicked = true);
+        void KickPlayer(bool setKicked = true) { return this->KickPlayer("Unknown reason", setKicked); }
+        void KickPlayer(std::string const& reason, bool setKicked = true);
 
         void QueuePacket(WorldPacket* new_packet);
         bool Update(uint32 diff, PacketFilter& updater);
@@ -965,6 +966,7 @@ class WorldSession
         Player* _player;
         WorldSocket* m_Socket;
         std::string m_Address;
+        // std::string m_LAddress;                             // Last Attempted Remote Adress - we can not set attempted ip for a non-existing session!
 
         AccountTypes _security;
         bool _skipQueue;

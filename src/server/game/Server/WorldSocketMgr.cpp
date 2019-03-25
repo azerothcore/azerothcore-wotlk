@@ -169,7 +169,7 @@ class ReactorRunnable : protected ACE_Task_Base
                         t = i;
                         ++i;
 
-                        (*t)->CloseSocket();
+                        (*t)->CloseSocket("svc()");
 
                         sScriptMgr->OnSocketClose((*t), false);
 
