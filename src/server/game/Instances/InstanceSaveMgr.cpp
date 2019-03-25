@@ -20,7 +20,6 @@
 #include "ObjectMgr.h"
 #include "World.h"
 #include "Group.h"
-#include "GameTime.h"
 #include "InstanceScript.h"
 #include "ScriptMgr.h"
 
@@ -78,7 +77,7 @@ InstanceSave* InstanceSaveManager::AddInstanceSave(uint32 mapId, uint32 instance
     }
     else
     {
-        resetTime = GameTime::GetGameTime() + 3*DAY; // normals expire after 3 days even if someone is still bound to them, cleared on startup
+        resetTime = time(NULL) + 3*DAY; // normals expire after 3 days even if someone is still bound to them, cleared on startup
         extendedResetTime = 0;
     }
     InstanceSave* save = new InstanceSave(mapId, instanceId, difficulty, resetTime, extendedResetTime);
@@ -240,7 +239,7 @@ void InstanceSaveManager::LoadInstances()
 
 void InstanceSaveManager::LoadResetTimes()
 {
-    time_t now = GameTime::GetGameTime();
+    time_t now = time(NULL);
     time_t today = (now / DAY) * DAY;
 
     // load the global respawn times for raid/heroic instances
@@ -401,7 +400,7 @@ void InstanceSaveManager::ScheduleReset(time_t time, InstResetEvent event)
 
 void InstanceSaveManager::Update()
 {
-    time_t now = GameTime::GetGameTime();
+    time_t now = time(NULL);
     time_t t;
     bool resetOccurred = false;
 
@@ -500,7 +499,7 @@ void InstanceSaveManager::_ResetOrWarnAll(uint32 mapid, Difficulty difficulty, b
     if (!mapEntry->Instanceable())
         return;
 
-    time_t now = GameTime::GetGameTime();
+    time_t now = time(NULL);
 
     if (!warn)
     {

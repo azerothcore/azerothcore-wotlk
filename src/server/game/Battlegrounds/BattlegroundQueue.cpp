@@ -8,7 +8,6 @@
 #include "ArenaTeamMgr.h"
 #include "BattlegroundMgr.h"
 #include "BattlegroundQueue.h"
-#include "GameTime.h"
 #include "Chat.h"
 #include "Group.h"
 #include "Log.h"
@@ -125,7 +124,7 @@ GroupQueueInfo* BattlegroundQueue::AddGroup(Player* leader, Group* grp, PvPDiffi
     ginfo->ArenaTeamId               = arenateamid;
     ginfo->IsRated                   = isRated;
     ginfo->IsInvitedToBGInstanceGUID = 0;
-    ginfo->JoinTime                  = GameTime::GetGameTimeMS();
+    ginfo->JoinTime                  = World::GetGameTimeMS();
     ginfo->RemoveInviteTime          = 0;
     ginfo->teamId                    = leader->GetTeamId();
     ginfo->ArenaTeamRating           = ArenaRating;
@@ -211,7 +210,7 @@ GroupQueueInfo* BattlegroundQueue::AddGroup(Player* leader, Group* grp, PvPDiffi
 
 void BattlegroundQueue::PlayerInvitedToBGUpdateAverageWaitTime(GroupQueueInfo* ginfo)
 {
-    uint32 timeInQueue = std::max<uint32>(1, getMSTimeDiff(ginfo->JoinTime, GameTime::GetGameTimeMS()));
+    uint32 timeInQueue = std::max<uint32>(1, getMSTimeDiff(ginfo->JoinTime, World::GetGameTimeMS()));
 
     // team_index: bg alliance - TEAM_ALLIANCE, bg horde - TEAM_HORDE, arena skirmish - TEAM_ALLIANCE, arena rated - TEAM_HORDE
     uint8 team_index;
@@ -539,7 +538,7 @@ bool BattlegroundQueue::CheckPremadeMatch(BattlegroundBracketId bracket_id, uint
     // this happens if timer has expired or group size lowered
 
     uint32 premade_time = sWorld->getIntConfig(CONFIG_BATTLEGROUND_PREMADE_GROUP_WAIT_FOR_MATCH);
-    uint32 time_before = GameTime::GetGameTimeMS() >= premade_time ? GameTime::GetGameTimeMS() - premade_time : 0;
+    uint32 time_before = World::GetGameTimeMS() >= premade_time ? World::GetGameTimeMS() - premade_time : 0;
 
     for (uint32 i = 0; i < BG_TEAMS_COUNT; i++)
         if (!m_QueuedGroups[bracket_id][BG_QUEUE_PREMADE_ALLIANCE + i].empty())
@@ -790,7 +789,7 @@ void BattlegroundQueue::BattlegroundQueueUpdate(BattlegroundBracketId bracket_id
     {
         // pussywizard: everything inside this section is mine, do NOT destroy!
 
-        const uint32 currMSTime = GameTime::GetGameTimeMS();
+        const uint32 currMSTime = World::GetGameTimeMS();
         const uint32 discardTime = sBattlegroundMgr->GetRatingDiscardTimer();
         const uint32 maxDefaultRatingDifference = (MaxPlayersPerTeam > 2 ? 300 : 200);
         const uint32 maxCountedMMR = 2500;

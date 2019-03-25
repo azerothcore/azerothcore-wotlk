@@ -7,7 +7,6 @@
 #include "Common.h"
 #include "Language.h"
 #include "DatabaseEnv.h"
-#include "GameTime.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
 #include "Opcodes.h"
@@ -73,8 +72,8 @@ void WorldSession::HandleQueryTimeOpcode(WorldPacket & /*recvData*/)
 void WorldSession::SendQueryTimeResponse()
 {
     WorldPacket data(SMSG_QUERY_TIME_RESPONSE, 4+4);
-    data << uint32(GameTime::GetGameTime());
-    data << uint32(sWorld->GetNextDailyQuestsResetTime() - GameTime::GetGameTime());
+    data << uint32(time(NULL));
+    data << uint32(sWorld->GetNextDailyQuestsResetTime() - time(NULL));
     SendPacket(&data);
 }
 

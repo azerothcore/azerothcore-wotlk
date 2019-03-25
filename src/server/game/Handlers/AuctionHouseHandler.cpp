@@ -13,7 +13,6 @@
 #include "AuctionHouseMgr.h"
 #include "Log.h"
 #include "Language.h"
-#include "GameTime.h"
 #include "Opcodes.h"
 #include "UpdateMask.h"
 #include "Util.h"
@@ -279,7 +278,7 @@ void WorldSession::HandleAuctionSellItem(WorldPacket & recvData)
             AH->bidder = 0;
             AH->bid = 0;
             AH->buyout = buyout;
-            AH->expire_time = GameTime::GetGameTime() + auctionTime;
+            AH->expire_time = time(NULL) + auctionTime;
             AH->deposit = deposit;
             AH->auctionHouseEntry = auctionHouseEntry;
 
@@ -321,7 +320,7 @@ void WorldSession::HandleAuctionSellItem(WorldPacket & recvData)
             AH->bidder = 0;
             AH->bid = 0;
             AH->buyout = buyout;
-            AH->expire_time = GameTime::GetGameTime() + auctionTime;
+            AH->expire_time = time(NULL) + auctionTime;
             AH->deposit = deposit;
             AH->auctionHouseEntry = auctionHouseEntry;
 
@@ -649,7 +648,7 @@ void WorldSession::HandleAuctionListOwnerItems(WorldPacket & recvData)
 {
     // pussywizard:
     const uint32 delay = 4500;
-    const uint32 now = GameTime::GetGameTimeMS();
+    const uint32 now = World::GetGameTimeMS();
     if (_lastAuctionListOwnerItemsMSTime > now) // list is pending
         return;
     uint32 diff = getMSTimeDiff(_lastAuctionListOwnerItemsMSTime, now);
@@ -666,7 +665,7 @@ void WorldSession::HandleAuctionListOwnerItemsEvent(WorldPacket & recvData)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_AUCTION_LIST_OWNER_ITEMS");
 #endif
 
-    _lastAuctionListOwnerItemsMSTime = GameTime::GetGameTimeMS(); // pussywizard
+    _lastAuctionListOwnerItemsMSTime = World::GetGameTimeMS(); // pussywizard
 
     uint32 listfrom;
     uint64 guid;
@@ -741,7 +740,7 @@ void WorldSession::HandleAuctionListItems(WorldPacket & recvData)
 
     // pussywizard:
     const uint32 delay = 2000;
-    const uint32 now = GameTime::GetGameTimeMS();
+    const uint32 now = World::GetGameTimeMS();
     uint32 diff = getMSTimeDiff(_lastAuctionListItemsMSTime, now);
     if (diff > delay)
         diff = delay;

@@ -13,7 +13,6 @@
 #include "Chat.h"
 #include "Common.h"
 #include "DatabaseEnv.h"
-#include "GameTime.h"
 #include "Group.h"
 #include "Guild.h"
 #include "GuildMgr.h"
@@ -110,7 +109,7 @@ bool LoginQueryHolder::Initialize()
 
     stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHARACTER_MAILCOUNT);
     stmt->setUInt32(0, lowGuid);
-    stmt->setUInt64(1, uint64(GameTime::GetGameTime()));
+    stmt->setUInt64(1, uint64(time(NULL)));
     res &= SetPreparedQuery(PLAYER_LOGIN_QUERY_LOAD_MAIL_COUNT, stmt);
 
     stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHARACTER_MAILDATE);
@@ -992,7 +991,7 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder* holder)
     stmt->setUInt32(1, GetAccountId());
     LoginDatabase.Execute(stmt);
 
-    pCurrChar->SetInGameTime(GameTime::GetGameTimeMS());
+    pCurrChar->SetInGameTime(World::GetGameTimeMS());
 
     // announce group about member online (must be after add to player list to receive announce to self)
     if (Group* group = pCurrChar->GetGroup())
@@ -1007,7 +1006,7 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder* holder)
         if (mapDiff->resetTime)
             if (time_t timeReset = sInstanceSaveMgr->GetResetTimeFor(pCurrChar->GetMap()->GetId(), pCurrChar->GetMap()->GetDifficulty()))
             {
-                uint32 timeleft = uint32(timeReset - GameTime::GetGameTime());
+                uint32 timeleft = uint32(timeReset - time(NULL));
                 pCurrChar->SendInstanceResetWarning(pCurrChar->GetMap()->GetId(), pCurrChar->GetMap()->GetDifficulty(), timeleft, true);
             }
 
@@ -1253,7 +1252,7 @@ void WorldSession::HandlePlayerLoginToCharInWorld(Player* pCurrChar)
     uint32 currZone, currArea;
     pCurrChar->GetZoneAndAreaId(currZone, currArea, false);
     pCurrChar->SendInitWorldStates(currZone, currArea);
-    pCurrChar->SetInGameTime(GameTime::GetGameTimeMS());
+    pCurrChar->SetInGameTime(World::GetGameTimeMS());
 
     // Xinef: we need to resend all spell mods
     for (uint16 Opcode = SMSG_SET_FLAT_SPELL_MODIFIER; Opcode <= SMSG_SET_PCT_SPELL_MODIFIER; ++Opcode) // PCT = FLAT+1
@@ -1298,7 +1297,7 @@ void WorldSession::HandlePlayerLoginToCharInWorld(Player* pCurrChar)
         if (mapDiff->resetTime)
             if (time_t timeReset = sInstanceSaveMgr->GetResetTimeFor(pCurrChar->GetMap()->GetId(), pCurrChar->GetMap()->GetDifficulty()))
             {
-                uint32 timeleft = uint32(timeReset - GameTime::GetGameTime());
+                uint32 timeleft = uint32(timeReset - time(NULL));
                 GetPlayer()->SendInstanceResetWarning(pCurrChar->GetMap()->GetId(), pCurrChar->GetMap()->GetDifficulty(), timeleft, true);
             }
 

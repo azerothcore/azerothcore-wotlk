@@ -10,7 +10,6 @@
 #include "Creature.h"
 #include "Language.h"
 #include "Object.h"
-#include "GameTime.h"
 #include "Player.h"
 #include "Util.h"
 #include "WorldSession.h"
@@ -57,7 +56,7 @@ void BattlegroundEY::PostUpdateImpl(uint32 diff)
                         AddPoints(TEAM_ALLIANCE, BG_EY_TickPoints[_ownedPointsCount[TEAM_ALLIANCE] - 1]);
                     if (_ownedPointsCount[TEAM_HORDE] > 0)
                         AddPoints(TEAM_HORDE, BG_EY_TickPoints[_ownedPointsCount[TEAM_HORDE] - 1]);
-                    _bgEvents.ScheduleEvent(BG_EY_EVENT_ADD_POINTS, BG_EY_FPOINTS_TICK_TIME - (GameTime::GetGameTimeMS() % BG_EY_FPOINTS_TICK_TIME));
+                    _bgEvents.ScheduleEvent(BG_EY_EVENT_ADD_POINTS, BG_EY_FPOINTS_TICK_TIME - (World::GetGameTimeMS() % BG_EY_FPOINTS_TICK_TIME));
                     break;
                 case BG_EY_EVENT_FLAG_ON_GROUND:
                     RespawnFlagAfterDrop();
@@ -67,7 +66,7 @@ void BattlegroundEY::PostUpdateImpl(uint32 diff)
                     break;
                 case BG_EY_EVENT_CHECK_CPOINTS:
                     UpdatePointsState();
-                    _bgEvents.ScheduleEvent(BG_EY_EVENT_CHECK_CPOINTS, BG_EY_FPOINTS_CHECK_TIME - (GameTime::GetGameTimeMS() % BG_EY_FPOINTS_CHECK_TIME));
+                    _bgEvents.ScheduleEvent(BG_EY_EVENT_CHECK_CPOINTS, BG_EY_FPOINTS_CHECK_TIME - (World::GetGameTimeMS() % BG_EY_FPOINTS_CHECK_TIME));
                     break;
             }
     }

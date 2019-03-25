@@ -7,7 +7,6 @@
 #include "Common.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
-#include "GameTime.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
 
@@ -26,7 +25,7 @@ void WorldSession::SendBfInvitePlayerToWar(uint32 BattleId, uint32 ZoneId, uint3
     WorldPacket data(SMSG_BATTLEFIELD_MGR_ENTRY_INVITE, 12);
     data << uint32(BattleId);
     data << uint32(ZoneId);
-    data << uint32((GameTime::GetGameTime() + p_time));
+    data << uint32((time(NULL) + p_time));
 
     //Sending the packet to player
     SendPacket(&data);

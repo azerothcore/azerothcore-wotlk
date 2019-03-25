@@ -8,13 +8,9 @@
 #include "QueryResult.h"
 #include "Log.h"
 #include "Player.h"
-#include "GameTime.h"
 #include "GuildMgr.h"
 #include "ObjectAccessor.h"
 #include "Opcodes.h"
-
-CalendarInvite::CalendarInvite() : _inviteId(1), _eventId(0), _invitee(), _senderGUID(), _statusTime(GameTime::GetGameTime()),
-_status(CALENDAR_STATUS_INVITED), _rank(CALENDAR_RANK_PLAYER), _text("") { }
 
 CalendarInvite::~CalendarInvite()
 {

@@ -10,7 +10,6 @@
 
 #include "BattlefieldWG.h"
 #include "ObjectMgr.h"
-#include "GameTime.h"
 #include "Opcodes.h"
 #include "Player.h"
 #include "SpellAuras.h"
@@ -889,7 +888,7 @@ void BattlefieldWG::FillInitialWorldStates(WorldPacket& data)
     data << uint32(BATTLEFIELD_WG_WORLD_STATE_SHOW_WORLDSTATE) << uint32(IsWarTime() ? 1 : 0);
 
     for (uint32 i = 0; i < 2; ++i)
-        data << ClockWorldState[i] << uint32(GameTime::GetGameTime() + (m_Timer / 1000));
+        data << ClockWorldState[i] << uint32(time(NULL) + (m_Timer / 1000));
 
     data << uint32(BATTLEFIELD_WG_WORLD_STATE_VEHICLE_H) << uint32(GetData(BATTLEFIELD_WG_DATA_VEHICLE_H));
     data << uint32(BATTLEFIELD_WG_WORLD_STATE_MAX_VEHICLE_H) << GetData(BATTLEFIELD_WG_DATA_MAX_VEHICLE_H);

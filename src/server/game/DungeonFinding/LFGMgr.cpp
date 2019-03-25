@@ -9,7 +9,6 @@
 #include "DBCStores.h"
 #include "DisableMgr.h"
 #include "ObjectMgr.h"
-#include "GameTime.h"
 #include "SocialMgr.h"
 #include "Language.h"
 #include "LFGMgr.h"
@@ -261,7 +260,7 @@ void LFGMgr::Update(uint32 tdiff, uint8 task)
 
     if (task == 0)
     {
-        time_t currTime = GameTime::GetGameTime();
+        time_t currTime = time(NULL);
 
         // Remove obsolete role checks
         for (LfgRoleCheckContainer::iterator it = RoleChecksStore.begin(); it != RoleChecksStore.end();)
@@ -651,7 +650,7 @@ void LFGMgr::JoinLfg(Player* player, uint8 roles, LfgDungeonSet& dungeons, const
         // Create new rolecheck
         LfgRoleCheck& roleCheck = RoleChecksStore[gguid];
         roleCheck.roles.clear(); // pussywizard: NEW rolecheck, not old one with trash data >_>
-        roleCheck.cancelTime = time_t(GameTime::GetGameTime()) + LFG_TIME_ROLECHECK;
+        roleCheck.cancelTime = time_t(time(NULL)) + LFG_TIME_ROLECHECK;
         roleCheck.state = LFG_ROLECHECK_INITIALITING;
         roleCheck.leader = guid;
         roleCheck.dungeons = dungeons;
@@ -689,7 +688,7 @@ void LFGMgr::JoinLfg(Player* player, uint8 roles, LfgDungeonSet& dungeons, const
         LfgRolesMap rolesMap;
         rolesMap[guid] = roles;
         LFGQueue& queue = GetQueue(guid);
-        queue.AddQueueData(guid, GameTime::GetGameTime(), dungeons, rolesMap);
+        queue.AddQueueData(guid, time(NULL), dungeons, rolesMap);
 
         if (!isContinue)
         {
@@ -888,7 +887,7 @@ void LFGMgr::UpdateRaidBrowser(uint32 diff)
             m_raidBrowserUpdateTimer[team] = 0;
     }
 
-    if (getMSTimeDiff(GameTime::GetGameTimeMS(), getMSTime()) > (70*7)/5) // prevent lagging
+    if (getMSTimeDiff(World::GetGameTimeMS(), getMSTime()) > (70*7)/5) // prevent lagging
         return;
 
     uint64 guid, groupGuid, instanceGuid;
@@ -1356,7 +1355,7 @@ void LFGMgr::UpdateRoleCheck(uint64 gguid, uint64 guid /* = 0 */, uint8 roles /*
     {
         SetState(gguid, LFG_STATE_QUEUED);
         LFGQueue& queue = GetQueue(gguid);
-        queue.AddQueueData(gguid, time_t(GameTime::GetGameTime()), roleCheck.dungeons, roleCheck.roles);
+        queue.AddQueueData(gguid, time_t(time(NULL)), roleCheck.dungeons, roleCheck.roles);
         RoleChecksStore.erase(itRoleCheck);
     }
     else if (roleCheck.state != LFG_ROLECHECK_INITIALITING)
@@ -1633,7 +1632,7 @@ void LFGMgr::UpdateProposal(uint32 proposalId, uint64 guid, bool accept)
 
     bool sendUpdate = proposal.state != LFG_PROPOSAL_SUCCESS;
     proposal.state = LFG_PROPOSAL_SUCCESS;
-    time_t joinTime = GameTime::GetGameTime();
+    time_t joinTime = time(NULL);
 
     LFGQueue& queue = GetQueue(guid);
     LfgUpdateData updateData = LfgUpdateData(LFG_UPDATETYPE_GROUP_FOUND);
@@ -1819,7 +1818,7 @@ void LFGMgr::InitBoot(uint64 gguid, uint64 kicker, uint64 victim, std::string co
 
     LfgPlayerBoot& boot = BootsStore[gguid];
     boot.inProgress = true;
-    boot.cancelTime = time_t(GameTime::GetGameTime()) + LFG_TIME_BOOT;
+    boot.cancelTime = time_t(time(NULL)) + LFG_TIME_BOOT;
     boot.reason = reason;
     boot.victim = victim;
 

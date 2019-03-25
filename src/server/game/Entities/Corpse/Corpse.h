@@ -54,7 +54,7 @@ class Corpse : public WorldObject, public GridObject<Corpse>
         uint64 GetOwnerGUID() const { return GetUInt64Value(CORPSE_FIELD_OWNER); }
 
         time_t const& GetGhostTime() const { return m_time; }
-        void ResetGhostTime();
+        void ResetGhostTime() { m_time = time(NULL); }
         CorpseType GetType() const { return m_type; }
 
         GridCoord const& GetGridCoord() const { return _gridCoord; }

@@ -15,8 +15,6 @@ EndScriptData */
 #include "Config.h"
 #include "Language.h"
 #include "ObjectAccessor.h"
-#include "GameTime.h"
-#include "UpdateTime.h"
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "GitRevision.h"
@@ -98,8 +96,8 @@ public:
         uint32 activeSessionCount = sWorld->GetActiveSessionCount();
         uint32 queuedSessionCount = sWorld->GetQueuedSessionCount();
         uint32 connPeak = sWorld->GetMaxActiveSessionCount();
-        std::string uptime = secsToTimeString(GameTime::GetUptime());
-        uint32 updateTime = sWorldUpdateTime.GetLastUpdateTime();
+        std::string uptime = secsToTimeString(sWorld->GetUptime()).append(".");
+        uint32 updateTime = sWorld->GetUpdateTime();
         uint32 avgUpdateTime = avgDiffTracker.getAverage();
 
         handler->PSendSysMessage("%s", GitRevision::GetFullVersion());
@@ -357,7 +355,7 @@ public:
         if (newTime < 0)
             return false;
 
-        sWorldUpdateTime.SetRecordUpdateTimeInterval(newTime);
+        sWorld->SetRecordDiffInterval(newTime);
         printf("Record diff every %u ms\n", newTime);
 
         return true;
