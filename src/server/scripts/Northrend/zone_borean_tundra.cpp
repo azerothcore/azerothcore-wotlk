@@ -314,7 +314,7 @@ enum Iruk
 	PC_TEXT_THIS_YOUNG_TUSKARR              = 12585,
 
     QUEST_SPIRITS_WATCH_OVER_US             = 11961,
-	
+
     SPELL_CREATE_TOTEM_OF_ISSLIRUK          = 46816
 };
 
