@@ -1,3 +1,19 @@
+-- DB update 2019_03_25_00 -> 2019_03_25_01
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2019_03_25_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2019_03_25_00 2019_03_25_01 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1553383116284680300'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1553383116284680300');
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 2435;
@@ -64,3 +80,12 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (20547580, 3, -852.599, -541.857, 10.5971, 0, 0, 0, 0, 100, 0),
 (20547580, 2, -856.708, -542.947, 10.352, 0, 0, 0, 0, 100, 0),
 (20547580, 1, -860.698, -518.619, 10.9982, 0, 0, 0, 0, 100, 0);
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
