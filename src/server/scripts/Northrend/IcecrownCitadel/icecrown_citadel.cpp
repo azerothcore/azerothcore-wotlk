@@ -1826,7 +1826,7 @@ class npc_alchemist_adrianna : public CreatureScript
     public:
         npc_alchemist_adrianna() : CreatureScript("npc_alchemist_adrianna") { }
 
-        bool OnGossipHello(Player* player, Creature* creature)
+        bool OnGossipHello(Player* player, Creature* creature) override
         {
             if (InstanceScript* instance = creature->GetInstanceScript())
                 if (instance->GetBossState(DATA_ROTFACE) == DONE && instance->GetBossState(DATA_FESTERGUT) == DONE && !creature->FindCurrentSpellBySpellId(SPELL_HARVEST_BLIGHT_SPECIMEN) && !creature->FindCurrentSpellBySpellId(SPELL_HARVEST_BLIGHT_SPECIMEN25))
@@ -2569,7 +2569,7 @@ public:
                 return;
 
             events.Update(diff);
-            
+
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
@@ -2634,7 +2634,7 @@ public:
                 return;
 
             events.Update(diff);
-            
+
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
@@ -2689,7 +2689,7 @@ public:
                 return;
 
             events.Update(diff);
-            
+
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
@@ -2751,7 +2751,7 @@ public:
                 return;
 
             events.Update(diff);
-            
+
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
@@ -2870,7 +2870,7 @@ public:
                 return;
 
             events.Update(diff);
-            
+
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
@@ -2916,7 +2916,7 @@ public:
 SeveredEssenceSpellInfo sesi_spells[] =
 {
     {CLASS_SHAMAN, 71938, 5000, 1, 0.0f},
-    {CLASS_PALADIN, 57767, 8000, 2, 30.0f}, 
+    {CLASS_PALADIN, 57767, 8000, 2, 30.0f},
     {CLASS_WARLOCK, 71937, 10000, 1, 0.0f},
     {CLASS_DEATH_KNIGHT, 49576, 15000, 1, 30.0f},
     {CLASS_ROGUE, 71933, 8000, 1, 0.0f},
@@ -2993,7 +2993,7 @@ public:
                 return;
 
             events.Update(diff);
-            
+
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
@@ -3092,7 +3092,7 @@ public:
                 return;
 
             events.Update(diff);
-            
+
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
@@ -3241,7 +3241,7 @@ public:
                 return;
 
             events.Update(diff);
-            
+
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
@@ -3273,13 +3273,13 @@ class npc_icc_buff_switcher : public CreatureScript
 public:
     npc_icc_buff_switcher() : CreatureScript("npc_icc_buff_switcher") { }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32  /*sender*/, uint32  /*action*/)
+    bool OnGossipSelect(Player* player, Creature* creature, uint32  /*sender*/, uint32  /*action*/) override
     {
         if ((creature->GetEntry() == NPC_GARROSH_HELLSCREAM && player->PlayerTalkClass->GetGossipMenu().GetMenuId() == 11206) || (creature->GetEntry() == NPC_KING_VARIAN_WRYNN && player->PlayerTalkClass->GetGossipMenu().GetMenuId() == 11204))
         {
             if (!player->GetGroup() || !player->GetGroup()->isRaidGroup() || !player->GetGroup()->IsLeader(player->GetGUID()))
             {
-                player->CLOSE_GOSSIP_MENU();
+                CloseGossipMenuFor(player);
                 ChatHandler(player->GetSession()).PSendSysMessage("Only the raid leader can turn off the buff.");
                 return true;
             }
@@ -3288,7 +3288,7 @@ public:
                     inst->SetData(DATA_BUFF_AVAILABLE, 0);
             if (creature->GetEntry() == NPC_GARROSH_HELLSCREAM)
             {
-                player->CLOSE_GOSSIP_MENU();
+                CloseGossipMenuFor(player);
                 return true;
             }
         }
@@ -3382,7 +3382,7 @@ public:
                 return;
 
             events.Update(diff);
-            
+
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
@@ -3571,7 +3571,7 @@ class npc_icc_gauntlet_controller : public CreatureScript
                         {
                             if (me->GetDistance(itr->GetSource()) > 100.0f || !itr->GetSource()->IsAlive() || itr->GetSource()->IsGameMaster())
                                 continue;
-                            
+
                             events.ScheduleEvent(EVENT_CHECK_FIGHT, 1000);
                             return;
                         }
@@ -3673,7 +3673,7 @@ class npc_icc_putricades_trap : public CreatureScript
                         {
                             if (me->GetDistance(itr->GetSource()) > 100.0f || !itr->GetSource()->IsAlive() || itr->GetSource()->IsGameMaster())
                                 continue;
-                            
+
                             events.ScheduleEvent(EVENT_CHECK_FIGHT, 1000);
                             return;
                         }
@@ -3726,7 +3726,7 @@ class at_icc_putricide_trap : public AreaTriggerScript
         at_icc_putricide_trap() : AreaTriggerScript("at_icc_putricide_trap") { }
 
         bool OnTrigger(Player* player, AreaTrigger const* /*areaTrigger*/)
-        {           
+        {
             if (InstanceScript* instance = player->GetInstanceScript())
                 if (instance->GetData(DATA_PUTRICIDE_TRAP_STATE) == NOT_STARTED && !player->IsGameMaster())
                     if (Creature* trap = ObjectAccessor::GetCreature(*player, instance->GetData64(NPC_PUTRICADES_TRAP)))
