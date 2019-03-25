@@ -335,6 +335,7 @@ public:
     bool OnGossipSelect(Player* player, Creature* /*creature*/, uint32 /*sender*/, uint32 action)
     {
         player->PlayerTalkClass->ClearMenus();
+        
         if (action == GOSSIP_ACTION_INFO_DEF + 1)
         {
 			player->CastSpell(player, SPELL_CREATE_TOTEM_OF_ISSLIRUK, true);
