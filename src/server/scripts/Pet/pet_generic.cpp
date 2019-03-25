@@ -102,7 +102,7 @@ public:
     {
         uint64 ownerGUID;
         EventMap events;
-        npc_pet_gen_soul_trader_beaconAI(Creature *c) : ScriptedAI(c) 
+        npc_pet_gen_soul_trader_beaconAI(Creature *c) : ScriptedAI(c)
         {
             events.Reset();
             events.ScheduleEvent(EVENT_INITIAL_TALK, 0);
@@ -164,7 +164,7 @@ enum eArgentPony
     SPELL_AURA_SHOP_S               = 67377,
     SPELL_AURA_BANK_S               = 67368,
     SPELL_AURA_TIRED_S              = 67401,
-    
+
     SPELL_AURA_BANK_G               = 68849,
     SPELL_AURA_POSTMAN_G            = 68850,
     SPELL_AURA_SHOP_G               = 68851,
@@ -214,7 +214,7 @@ public:
 
     struct npc_pet_gen_argent_pony_bridleAI : public ScriptedAI
     {
-        npc_pet_gen_argent_pony_bridleAI(Creature *c) : ScriptedAI(c) 
+        npc_pet_gen_argent_pony_bridleAI(Creature *c) : ScriptedAI(c)
         {
             _state = ARGENT_PONY_STATE_NONE;
             _init = false;
@@ -223,7 +223,7 @@ public:
             memset(_banners, 0, sizeof(_banners));
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             if (Unit* owner = me->GetCharmerOrOwner())
             {
@@ -232,7 +232,7 @@ public:
             }
         }
 
-        void Reset()
+        void Reset() override
         {
             if (_init)
                 return;
@@ -292,7 +292,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             _mountTimer += diff;
             if (_mountTimer > 5000)
@@ -310,15 +310,15 @@ public:
             }
         }
 
-        uint32 GetData(uint32 param) const
+        uint32 GetData(uint32 param) const override
         {
             if (param == 0)
                 return _state;
-            
+
             return _banners[param];
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (param > 60000)
             {
@@ -330,7 +330,7 @@ public:
 
             _state = param;
         }
-        
+
         private:
             bool _init;
             uint8 _state;
@@ -339,7 +339,7 @@ public:
             uint32 _lastAura;
     };
 
-    bool OnGossipHello(Player* player, Creature* creature)
+    bool OnGossipHello(Player* player, Creature* creature) override
     {
         if (player->GetGUID() != creature->GetOwnerGUID())
             return true;
@@ -348,24 +348,24 @@ public:
         {
             uint8 _state = creature->AI()->GetData(0 /*GET_DATA_STATE*/);
             if (_state == ARGENT_PONY_STATE_ENCH || _state == ARGENT_PONY_STATE_VENDOR)
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_VENDOR, "Visit a trader.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
+                AddGossipItemFor(player, GOSSIP_ICON_VENDOR, "Visit a trader.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
             if (_state == ARGENT_PONY_STATE_ENCH || _state == ARGENT_PONY_STATE_BANK)
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Visit a bank.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_BANK);
+                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, "Visit a bank.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_BANK);
             if (_state == ARGENT_PONY_STATE_ENCH || _state == ARGENT_PONY_STATE_MAILBOX)
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Visit a mailbox.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_MAILBOX);
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Visit a mailbox.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_MAILBOX);
         }
 
         for (uint8 i = RACE_HUMAN; i < MAX_RACES; ++i)
             if (creature->AI()->GetData(i) == uint32(true))
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, argentBanners[i].text, GOSSIP_SENDER_MAIN, argentBanners[i].spell);
-        
-        player->SEND_GOSSIP_MENU(player->GetGossipTextId(creature), creature->GetGUID());
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, argentBanners[i].text, GOSSIP_SENDER_MAIN, argentBanners[i].spell);
+
+        SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
         return true;
     }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*uiSender*/, uint32 action)
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*uiSender*/, uint32 action) override
     {
-        player->CLOSE_GOSSIP_MENU();
+        CloseGossipMenuFor(player);
         uint32 spellId = 0;
         switch (action)
         {
@@ -408,7 +408,7 @@ public:
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_pet_gen_argent_pony_bridleAI (creature);
     }
@@ -433,7 +433,7 @@ public:
 
     struct npc_pet_gen_target_following_bombAI : public NullCreatureAI
     {
-        npc_pet_gen_target_following_bombAI(Creature *c) : NullCreatureAI(c) 
+        npc_pet_gen_target_following_bombAI(Creature *c) : NullCreatureAI(c)
         {
             checkTimer = 0;
             bombSpellId = 0;
@@ -488,7 +488,7 @@ public:
 
     struct npc_pet_gen_gnomish_flame_turretAI : public ScriptedAI
     {
-        npc_pet_gen_gnomish_flame_turretAI(Creature *c) : ScriptedAI(c) 
+        npc_pet_gen_gnomish_flame_turretAI(Creature *c) : ScriptedAI(c)
         {
             checkTimer = 0;
         }

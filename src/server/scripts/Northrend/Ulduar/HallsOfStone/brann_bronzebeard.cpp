@@ -116,7 +116,7 @@ static Yells Conversation[]=
     {14253, "So that was the problem? Now I'm makin' progress...", NPC_BRANN, 195000},
     {13767, "Critical threat index. Void analysis diverted. Initiating sanitization protocol.", NPC_ABEDNEUM, 205000},
     {14254, "Hang on! Nobody's gonna' be sanitized as long as I have a say in it!", NPC_BRANN, 215000},
-    {14255, "Ha! The old magic fingers finally won through! Now let's get down to--", NPC_BRANN, 295000}, 
+    {14255, "Ha! The old magic fingers finally won through! Now let's get down to--", NPC_BRANN, 295000},
     {13768, "Alert: security fail-safes deactivated. Beginning memory purge and... ", NPC_ABEDNEUM, 303000},
     //The fight is completed at this point.
     {14256, "Purge? No no no no no.. where did I-- Aha, this should do the trick...", NPC_BRANN, 310000},
@@ -150,81 +150,81 @@ class brann_bronzebeard : public CreatureScript
 public:
     brann_bronzebeard() : CreatureScript("brann_bronzebeard") { }
 
-    bool OnGossipHello(Player *player, Creature *pCreature)
+    bool OnGossipHello(Player* player, Creature* creature) override
     {
-        InstanceScript* pInstance = (pCreature->GetInstanceScript());
+        InstanceScript* pInstance = (creature->GetInstanceScript());
 
-        player->TalkedToCreature(pCreature->GetEntry(), pCreature->GetGUID());
-        player->PrepareGossipMenu(pCreature, 0, true);
+        player->TalkedToCreature(creature->GetEntry(), creature->GetGUID());
+        player->PrepareGossipMenu(creature, 0, true);
         if (pInstance)
         {
             uint32 brann = pInstance->GetData(BRANN_BRONZEBEARD);
             switch (brann)
             {
             case 1:
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
                 break;
             case 2:
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+2);
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+2);
                 break;
             case 3:
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+3);
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+3);
                 break;
             case 4:
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+4);
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+4);
                 break;
             case 5:
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
                 break;
             default: break;
             }
 
         }
-        player->SEND_GOSSIP_MENU(TEXT_ID_START, pCreature->GetGUID());
+        SendGossipMenuFor(player, TEXT_ID_START, creature->GetGUID());
         return true;
     }
 
-    bool OnGossipSelect(Player *player, Creature *pCreature, uint32  /*sender*/, uint32 action )
+    bool OnGossipSelect(Player *player, Creature *creature, uint32  /*sender*/, uint32 action) override
     {
         if (action)
         {
             switch (action)
             {
             case GOSSIP_ACTION_INFO_DEF+1:
-                pCreature->AI()->DoAction(ACTION_START_EVENT);
-                player->CLOSE_GOSSIP_MENU();
+                creature->AI()->DoAction(ACTION_START_EVENT);
+                CloseGossipMenuFor(player);
                 break;
             case GOSSIP_ACTION_INFO_DEF+2:
-                pCreature->AI()->DoAction(ACTION_START_TRIBUNAL);
-                player->CLOSE_GOSSIP_MENU();
+                creature->AI()->DoAction(ACTION_START_TRIBUNAL);
+                CloseGossipMenuFor(player);
                 break;
             case GOSSIP_ACTION_INFO_DEF+3:
-                pCreature->AI()->DoAction(ACTION_GO_TO_SJONNIR);
-                player->CLOSE_GOSSIP_MENU();
+                creature->AI()->DoAction(ACTION_GO_TO_SJONNIR);
+                CloseGossipMenuFor(player);
                 break;
             case GOSSIP_ACTION_INFO_DEF+4:
-                pCreature->AI()->DoAction(ACTION_WIPE_START);
-                player->CLOSE_GOSSIP_MENU();
+                creature->AI()->DoAction(ACTION_WIPE_START);
+                CloseGossipMenuFor(player);
                 break;
             case GOSSIP_ACTION_INFO_DEF+5:
-                pCreature->AI()->DoAction(ACTION_OPEN_DOOR);
-                player->CLOSE_GOSSIP_MENU();
+                creature->AI()->DoAction(ACTION_OPEN_DOOR);
+                CloseGossipMenuFor(player);
                 break;
             }
         }
         return true;
     }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new brann_bronzebeardAI (pCreature);
+        return new brann_bronzebeardAI (creature);
     }
 
     struct brann_bronzebeardAI : public npc_escortAI
     {
 
         brann_bronzebeardAI(Creature *c) : npc_escortAI(c), summons(me)
-        {   
+        {
             AbedneumGUID = MarnakGUID = KaddrakGUID = 0;
             pInstance = c->GetInstanceScript();
         }
@@ -245,7 +245,7 @@ public:
             Creature *cr;
             if ((cr = GetAbedneum())) cr->DespawnOrUnsummon();
             if ((cr = GetMarnak())) cr->DespawnOrUnsummon();
-            if ((cr = GetKaddrak())) cr->DespawnOrUnsummon(); 
+            if ((cr = GetKaddrak())) cr->DespawnOrUnsummon();
             SwitchHeadVisaul(0x7, false);
         }
 
@@ -283,21 +283,21 @@ public:
             TalkEvent = false;
         }
 
-        void WaypointReached(uint32 id);
+        void WaypointReached(uint32 id) override;
         void InitializeEvent();
 
         Creature* GetAbedneum() { return ObjectAccessor::GetCreature(*me, AbedneumGUID); }
         Creature* GetMarnak() { return ObjectAccessor::GetCreature(*me, MarnakGUID); }
         Creature* GetKaddrak() { return ObjectAccessor::GetCreature(*me, KaddrakGUID); }
 
-        void MoveInLineOfSight(Unit*  /*pWho*/) { }
-        void DamageTaken(Unit*, uint32 &damage, DamageEffectType, SpellSchoolMask)
-        { 
+        void MoveInLineOfSight(Unit*  /*pWho*/) override { }
+        void DamageTaken(Unit*, uint32 &damage, DamageEffectType, SpellSchoolMask) override
+        {
             if (damage && pInstance)
                 pInstance->SetData(DATA_BRANN_ACHIEVEMENT, false);
         }
-        
-        void Reset() 
+
+        void Reset() override
         {
             RemoveEscortState(0x7); // all states
             SetDespawnAtFar(false);
@@ -312,13 +312,13 @@ public:
             {
                 pInstance->SetData(BRANN_BRONZEBEARD, 1);
                 pInstance->SetData(DATA_BRANN_ACHIEVEMENT, true);
-                
+
                 if (pInstance->GetData(BOSS_TRIBUNAL_OF_AGES) == DONE)
                     pInstance->SetData(BRANN_BRONZEBEARD, (pInstance->GetData(BOSS_SJONNIR) == DONE) ? 5 : 4);
             }
         }
 
-        void DoAction(int32 action)
+        void DoAction(int32 action) override
         {
             switch (action)
             {
@@ -334,7 +334,7 @@ public:
                                 me->setFaction(i->GetSource()->getFaction());
                                 break;
                             }
-                    
+
                     SetEscortPaused(false);
                     InitializeEvent();
                     me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
@@ -378,7 +378,7 @@ public:
             }
         }
 
-        void JustSummoned(Creature* cr)
+        void JustSummoned(Creature* cr) override
         {
             if (cr->GetEntry() == NPC_ABEDNEUM || cr->GetEntry() == NPC_KADDRAK || cr->GetEntry() == NPC_MARNAK)
                 cr->SetCanFly(true);
@@ -386,7 +386,7 @@ public:
                 summons.Summon(cr);
         }
 
-        void UpdateEscortAI(uint32 diff)
+        void UpdateEscortAI(uint32 diff) override
         {
             events.Update(diff);
             switch (events.GetEvent())
@@ -499,7 +499,7 @@ public:
                     }
 
                     me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
-                    
+
 
                     // Spawn Chest and quest credit
                     if (Player *plr = SelectTargetFromPlayerList(200.0f))
@@ -513,7 +513,7 @@ public:
 
                         plr->GroupEventHappens(QUEST_HALLS_OF_STONE, me);
                     }
-                    
+
                     events.ScheduleEvent(EVENT_GO_TO_SJONNIR, 279000);
                     break;
                 }
@@ -530,7 +530,7 @@ public:
                 case EVENT_END:
                 {
                     events.Reset();
-                    if (pInstance) 
+                    if (pInstance)
                         pInstance->SetData(BRANN_BRONZEBEARD, 6);
 
                     me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
@@ -560,13 +560,14 @@ public:
                         cs->PlayDirectSound(Conversation[SpeechCount].sound);
                     }
 
-                    if (SpeechCount < 38) 
+                    if (SpeechCount < 38)
                         SpeechPause = Conversation[SpeechCount++].timer;
                     else
                         TalkEvent = false;
                 }
             }
         }
+        
         void SummonCreatures(uint32 entry, uint8 count)
         {
             for (int i = 0; i < count; ++i)
@@ -581,12 +582,12 @@ public:
             }
         }
 
-        void JustDied(Unit*  /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             ResetEvent();
             if(pInstance)
             {
-                if (pInstance->GetData(BOSS_TRIBUNAL_OF_AGES) != DONE) 
+                if (pInstance->GetData(BOSS_TRIBUNAL_OF_AGES) != DONE)
                     pInstance->SetData(BOSS_TRIBUNAL_OF_AGES, NOT_STARTED);
             }
         }
@@ -632,10 +633,10 @@ void brann_bronzebeard::brann_bronzebeardAI::WaypointReached(uint32 id)
     switch (id)
     {
         // Stop before stairs and ask to start
-        case 9: 
+        case 9:
             SetEscortPaused(true);
             me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
-            if (pInstance) 
+            if (pInstance)
                 pInstance->SetData(BRANN_BRONZEBEARD, 2);
 
             break;
@@ -681,9 +682,9 @@ class dark_rune_protectors : public CreatureScript
 public:
     dark_rune_protectors() : CreatureScript("dark_rune_protectors") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return new dark_rune_protectorsAI (pCreature);
+        return new dark_rune_protectorsAI (creature);
     }
 
     struct dark_rune_protectorsAI : public ScriptedAI
@@ -691,7 +692,7 @@ public:
         dark_rune_protectorsAI(Creature *c) : ScriptedAI(c) { }
 
         EventMap events;
-        void Reset() 
+        void Reset()
         {
             events.Reset();
         }
@@ -705,7 +706,7 @@ public:
         void UpdateAI(uint32 diff)
         {
             if (!UpdateVictim())
-                return;     
+                return;
 
             events.Update(diff);
             if (me->HasUnitState(UNIT_STATE_CASTING))
@@ -739,9 +740,9 @@ class dark_rune_stormcaller : public CreatureScript
 public:
     dark_rune_stormcaller() : CreatureScript("dark_rune_stormcaller") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return new dark_rune_stormcallerAI (pCreature);
+        return new dark_rune_stormcallerAI (creature);
     }
 
     struct dark_rune_stormcallerAI : public ScriptedAI
@@ -749,7 +750,7 @@ public:
         dark_rune_stormcallerAI(Creature *c) : ScriptedAI(c) { }
 
         EventMap events;
-        void Reset() 
+        void Reset()
         {
             events.Reset();
         }
@@ -795,20 +796,20 @@ class iron_golem_custodian : public CreatureScript
 public:
     iron_golem_custodian() : CreatureScript("iron_golem_custodian") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return new iron_golem_custodianAI (pCreature);
+        return new iron_golem_custodianAI (creature);
     }
 
     struct iron_golem_custodianAI : public ScriptedAI
     {
         iron_golem_custodianAI(Creature *c) : ScriptedAI(c) { }
         EventMap events;
-        void Reset() 
+        void Reset()
         {
             events.Reset();
         }
-        
+
         void EnterCombat(Unit *)
         {
             events.ScheduleEvent(EVENT_IGC_CRUSH, 6000);
