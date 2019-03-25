@@ -629,7 +629,7 @@ class boss_lady_deathwhisper : public CreatureScript
                 if (!cultist)
                     return;
 
-                if (RAND(0, 1))
+                if (true /*RAND(0, 1)*/)
                     me->CastSpell(cultist, SPELL_DARK_MARTYRDOM_T);
                 else
                 {
@@ -695,6 +695,9 @@ public:
                     me->InterruptNonMeleeSpells(true);
                     ApplyMechanicImmune(me, true);
                     me->AttackStop();
+                    me->GetMotionMaster()->MovementExpired();
+                    me->GetMotionMaster()->MoveIdle();
+                    me->StopMoving();
                     me->CastSpell(me, SPELL_DARK_MARTYRDOM_FANATIC, false);
                     break;
                 case SPELL_DARK_MARTYRDOM_FANATIC:
@@ -702,18 +705,7 @@ public:
                 case SPELL_DARK_MARTYRDOM_FANATIC_25N:
                 case SPELL_DARK_MARTYRDOM_FANATIC_25H:
                     ApplyMechanicImmune(me, false);
-                    me->GetMotionMaster()->MovementExpired();
-                    me->GetMotionMaster()->MoveIdle();
-                    me->StopMoving();
-                    me->CastSpell(me, SPELL_PERMANENT_FEIGN_DEATH);
-                    me->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
-                    me->SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
-                    Reset();
-                    me->UpdateEntry(NPC_REANIMATED_FANATIC);
-                    me->CastSpell(me, SPELL_CLEAR_ALL_DEBUFFS, true);
-                    me->CastSpell(me, SPELL_FULL_HEAL, true);
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED | UNIT_FLAG_UNK_29 | UNIT_FLAG_NOT_SELECTABLE);
-                    events.ScheduleEvent(EVENT_CULTIST_DARK_MARTYRDOM_REVIVE, 6000);
+                    events.ScheduleEvent(EVENT_SPELL_CULTIST_DARK_MARTYRDOM, 5); // Visual purposes only.
                     break;
             }
         }
@@ -750,6 +742,7 @@ public:
                     me->RemoveAurasDueToSpell(SPELL_PERMANENT_FEIGN_DEATH);
                     me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
                     me->RemoveFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
+                    me->UpdateEntry(NPC_REANIMATED_FANATIC);
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED | UNIT_FLAG_UNK_29 | UNIT_FLAG_NOT_SELECTABLE);
                     me->SetReactState(REACT_AGGRESSIVE);
                     DoZoneInCombat(me);
@@ -758,6 +751,16 @@ public:
                     if (Creature* ladyDeathwhisper = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_LADY_DEATHWHISPER)))
                         ladyDeathwhisper->AI()->Talk(SAY_ANIMATE_DEAD);
                     events.PopEvent();
+                    break;
+                case EVENT_SPELL_CULTIST_DARK_MARTYRDOM:
+                    me->CastSpell(me, SPELL_PERMANENT_FEIGN_DEATH, true);
+                    me->CastSpell(me, SPELL_CLEAR_ALL_DEBUFFS, true);
+                    me->CastSpell(me, SPELL_FULL_HEAL, true);
+                    me->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
+                    me->SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
+                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED | UNIT_FLAG_UNK_29 | UNIT_FLAG_NOT_SELECTABLE);
+                    Reset();
+                    events.ScheduleEvent(EVENT_CULTIST_DARK_MARTYRDOM_REVIVE, 6000);
                     break;
             }
 
@@ -808,6 +811,9 @@ public:
                     me->InterruptNonMeleeSpells(true);
                     ApplyMechanicImmune(me, true);
                     me->AttackStop();
+                    me->GetMotionMaster()->MovementExpired();
+                    me->GetMotionMaster()->MoveIdle();
+                    me->StopMoving();
                     me->CastSpell(me, SPELL_DARK_MARTYRDOM_ADHERENT, false);
                     break;
                 case SPELL_DARK_MARTYRDOM_ADHERENT:
@@ -815,18 +821,7 @@ public:
                 case SPELL_DARK_MARTYRDOM_ADHERENT_25N:
                 case SPELL_DARK_MARTYRDOM_ADHERENT_25H:
                     ApplyMechanicImmune(me,false);
-                    me->GetMotionMaster()->MovementExpired();
-                    me->GetMotionMaster()->MoveIdle();
-                    me->StopMoving();
-                    me->CastSpell(me, SPELL_PERMANENT_FEIGN_DEATH);
-                    me->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
-                    me->SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
-                    Reset();
-                    me->UpdateEntry(NPC_REANIMATED_ADHERENT);
-                    me->CastSpell(me, SPELL_CLEAR_ALL_DEBUFFS, true);
-                    me->CastSpell(me, SPELL_FULL_HEAL, true);
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED | UNIT_FLAG_UNK_29 | UNIT_FLAG_NOT_SELECTABLE);
-                    events.ScheduleEvent(EVENT_CULTIST_DARK_MARTYRDOM_REVIVE, 6000);
+                    events.ScheduleEvent(EVENT_SPELL_CULTIST_DARK_MARTYRDOM, 5); // Visual purposes only.
                     break;
             }
         }
@@ -871,6 +866,7 @@ public:
                     me->RemoveAurasDueToSpell(SPELL_PERMANENT_FEIGN_DEATH);
                     me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
                     me->RemoveFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
+                    me->UpdateEntry(NPC_REANIMATED_ADHERENT);
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED | UNIT_FLAG_UNK_29 | UNIT_FLAG_NOT_SELECTABLE);
                     me->SetReactState(REACT_AGGRESSIVE);
                     DoZoneInCombat(me);
@@ -879,6 +875,16 @@ public:
                     if (Creature* ladyDeathwhisper = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_LADY_DEATHWHISPER)))
                         ladyDeathwhisper->AI()->Talk(SAY_ANIMATE_DEAD);
                     events.PopEvent();
+                    break;
+                case EVENT_SPELL_CULTIST_DARK_MARTYRDOM:
+                    me->CastSpell(me, SPELL_PERMANENT_FEIGN_DEATH, true);
+                    me->CastSpell(me, SPELL_CLEAR_ALL_DEBUFFS, true);
+                    me->CastSpell(me, SPELL_FULL_HEAL, true);
+                    me->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
+                    me->SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
+                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED | UNIT_FLAG_UNK_29 | UNIT_FLAG_NOT_SELECTABLE);
+                    Reset();
+                    events.ScheduleEvent(EVENT_CULTIST_DARK_MARTYRDOM_REVIVE, 6000);
                     break;
             }
 
