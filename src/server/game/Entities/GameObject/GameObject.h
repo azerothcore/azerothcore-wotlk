@@ -541,8 +541,8 @@ struct GameObjectTemplateAddon
 };
 
 // Benchmarked: Faster than std::map (insert/find)
-typedef UNORDERED_MAP<uint32, GameObjectTemplate> GameObjectTemplateContainer;
-typedef UNORDERED_MAP<uint32, GameObjectTemplateAddon> GameObjectTemplateAddonContainer;
+typedef std::unordered_map<uint32, GameObjectTemplate> GameObjectTemplateContainer;
+typedef std::unordered_map<uint32, GameObjectTemplateAddon> GameObjectTemplateAddonContainer;
 
 class OPvPCapturePoint;
 struct TransportAnimation;
@@ -586,7 +586,7 @@ struct GameObjectAddon
     uint32 InvisibilityValue;
 };
 
-typedef UNORDERED_MAP<uint32, GameObjectAddon> GameObjectAddonContainer;
+typedef std::unordered_map<uint32, GameObjectAddon> GameObjectAddonContainer;
 
 // client side GO show states
 enum GOState

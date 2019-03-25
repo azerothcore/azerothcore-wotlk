@@ -26,7 +26,7 @@ struct StoredLootItem
 };
 
 typedef std::list<StoredLootItem> StoredLootItemList;
-typedef UNORDERED_MAP<uint32, StoredLootItemList> LootItemContainer;
+typedef std::unordered_map<uint32, StoredLootItemList> LootItemContainer;
 
 class LootItemStorage
 {
