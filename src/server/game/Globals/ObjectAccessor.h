@@ -8,15 +8,12 @@
 #define TRINITY_OBJECTACCESSOR_H
 
 #include "Define.h"
-#include <ace/Singleton.h>
-#include <ace/Thread_Mutex.h>
-#include "UnorderedMap.h"
-
 #include "UpdateData.h"
-
 #include "GridDefines.h"
 #include "Object.h"
-
+#include <ace/Singleton.h>
+#include <ace/Thread_Mutex.h>
+#include <unordered_map>
 #include <set>
 
 class Creature;
@@ -37,7 +34,7 @@ class HashMapHolder
 {
     public:
 
-        typedef UNORDERED_MAP<uint64, T*> MapType;
+        typedef std::unordered_map<uint64, T*> MapType;
         typedef ACE_RW_Thread_Mutex LockType;
 
         static void Insert(T* o)
@@ -74,7 +71,7 @@ class HashMapHolder
 
 /// Define the static members of HashMapHolder
 
-template <class T> UNORDERED_MAP< uint64, T* > HashMapHolder<T>::m_objectMap;
+template <class T> std::unordered_map< uint64, T* > HashMapHolder<T>::m_objectMap;
 template <class T> typename HashMapHolder<T>::LockType HashMapHolder<T>::i_lock;
 
 // pussywizard:
@@ -267,10 +264,10 @@ class ObjectAccessor
         static void _buildPacket(Player*, Object*, UpdateDataMapType&);
         void _update();
 
-        typedef UNORDERED_MAP<uint64, Corpse*> Player2CorpsesMapType;
-        typedef UNORDERED_MAP<Player*, UpdateData>::value_type UpdateDataValueType;
+        typedef std::unordered_map<uint64, Corpse*> Player2CorpsesMapType;
+        typedef std::unordered_map<Player*, UpdateData>::value_type UpdateDataValueType;
 
-        UNORDERED_SET<Object*> i_objects;
+        std::unordered_set<Object*> i_objects;
         Player2CorpsesMapType i_player2corpse;
         std::list<uint64> i_playerBones;
 
