@@ -434,14 +434,14 @@ void WorldSession::HandleQuestPOIQuery(WorldPacket& recvData)
     }
 
     // Read quest ids and add the in a unordered_set so we don't send POIs for the same quest multiple times
-    UNORDERED_SET<uint32> questIds;
+    std::unordered_set<uint32> questIds;
     for (uint32 i = 0; i < count; ++i)
         questIds.insert(recvData.read<uint32>()); // quest id
 
     WorldPacket data(SMSG_QUEST_POI_QUERY_RESPONSE, 4 + (4 + 4)*questIds.size());
     data << uint32(questIds.size()); // count
 
-    for (UNORDERED_SET<uint32>::const_iterator itr = questIds.begin(); itr != questIds.end(); ++itr)
+    for (std::unordered_set<uint32>::const_iterator itr = questIds.begin(); itr != questIds.end(); ++itr)
     {
         uint32 questId = *itr;
         bool questOk = false;
