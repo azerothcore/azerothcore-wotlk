@@ -1,3 +1,19 @@
+-- DB update 2019_03_26_00 -> 2019_03_26_01
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2019_03_26_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2019_03_26_00 2019_03_26_01 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1553536152748153223'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1553536152748153223');
 
 -- Cleanup the complete phasing/auras for all quests related to the Battle for the Undercity
@@ -291,3 +307,12 @@ VALUES
 (3236300,9,25,0,0,0,100,0,3000,3000,0,0,0,1,7,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Thrall - On Script - Say Line 7'),
 (3236300,9,26,0,0,0,100,0,1000,1000,0,0,0,24,0,0,0,0,0,0,11,31419,50,0,0,0,0,0,0,'Thrall - On Script - Enter Evade Target (Sylvanas)'),
 (3236300,9,27,0,0,0,100,0,41000,41000,0,0,0,48,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Thrall - On Script - Set Active Off');
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
