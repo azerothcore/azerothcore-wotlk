@@ -311,7 +311,7 @@ enum Iruk
 {
 	GOSSIP_MENU_ID_NPC_IRUK                 = 9280,
 	GOSSIP_OPTION_SEARCH_CORPSE             = 0,
-	PC_TEXT_THIS_YOUNG_TUSKARR              = 12585,
+	NPC_TEXT_THIS_YOUNG_TUSKARR             = 12585,
 
     QUEST_SPIRITS_WATCH_OVER_US             = 11961,
 
