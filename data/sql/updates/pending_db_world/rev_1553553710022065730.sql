@@ -18,7 +18,7 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, 
 (29740, 20919, 47, 0, 0, 1, 1, 2000.85, 1533.93, 80.3971, 4.919, 0, 0, 0.630419, -0.776255, 300, 0, 1, '', 0),
 (29741, 20919, 47, 0, 0, 1, 1, 1991.49, 1608.53, 81.1601, 1.1004, 0, 0, 0.522858, 0.85242, 300, 0, 1, '', 0);
 
-UPDATE smart_scripts SET action_param1 = 1, comment = "Snufflenose Gopher - Script - Set Deffensive" WHERE entryorguid = 478100 AND id = 4
+UPDATE smart_scripts SET action_param1 = 1, comment = "Snufflenose Gopher - Script - Set Deffensive" WHERE entryorguid = 478100 AND id = 4;
 
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 17 AND `SourceEntry` = 6918;
 INSERT INTO `conditions` VALUES (17, 0, 6918, 0, 0, 29, 0, 4781, 5, 0, 1, 0, 0, '', 'Blueleaf Tubers: Only spawn one Snufflenose Gopher');
