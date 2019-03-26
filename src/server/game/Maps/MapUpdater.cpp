@@ -42,12 +42,12 @@ class MapUpdateRequest : public ACE_Method_Request
 
         Map& m_map;
         MapUpdater& m_updater;
-        ACE_UINT32 m_diff;
-        ACE_UINT32 s_diff;
+        uint32 m_diff;
+        uint32 s_diff;
 
     public:
 
-        MapUpdateRequest(Map& m, MapUpdater& u, ACE_UINT32 d, ACE_UINT32 sd)
+        MapUpdateRequest(Map& m, MapUpdater& u, uint32 d, uint32 sd)
             : m_map(m), m_updater(u), m_diff(d), s_diff(sd)
         {
         }
@@ -65,10 +65,10 @@ class LFGUpdateRequest : public ACE_Method_Request
     private:
 
         MapUpdater& m_updater;
-        ACE_UINT32 m_diff;
+        uint32 m_diff;
 
     public:
-        LFGUpdateRequest(MapUpdater& u, ACE_UINT32 d) : m_updater(u), m_diff(d) {}
+        LFGUpdateRequest(MapUpdater& u, uint32 d) : m_updater(u), m_diff(d) {}
 
         virtual int call()
         {
@@ -113,7 +113,7 @@ int MapUpdater::wait()
     return 0;
 }
 
-int MapUpdater::schedule_update(Map& map, ACE_UINT32 diff, ACE_UINT32 s_diff)
+int MapUpdater::schedule_update(Map& map, uint32 diff, uint32 s_diff)
 {
     TRINITY_GUARD(ACE_Thread_Mutex, m_mutex);
 
@@ -130,7 +130,7 @@ int MapUpdater::schedule_update(Map& map, ACE_UINT32 diff, ACE_UINT32 s_diff)
     return 0;
 }
 
-int MapUpdater::schedule_lfg_update(ACE_UINT32 diff)
+int MapUpdater::schedule_lfg_update(uint32 diff)
 {
     TRINITY_GUARD(ACE_Thread_Mutex, m_mutex);
 

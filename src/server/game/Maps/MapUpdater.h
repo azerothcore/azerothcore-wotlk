@@ -19,8 +19,8 @@ class MapUpdater
         friend class MapUpdateRequest;
         friend class LFGUpdateRequest;
 
-        int schedule_update(Map& map, ACE_UINT32 diff, ACE_UINT32 s_diff);
-        int schedule_lfg_update(ACE_UINT32 diff);
+        int schedule_update(Map& map, uint32 diff, uint32 s_diff);
+        int schedule_lfg_update(uint32 diff);
 
         int wait();
 
