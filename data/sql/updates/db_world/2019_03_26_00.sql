@@ -1,3 +1,19 @@
+-- DB update 2019_03_25_01 -> 2019_03_26_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2019_03_25_01';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2019_03_25_01 2019_03_26_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1553553710022065730'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1553553710022065730');
 
 DELETE FROM `gameobject` WHERE `guid` IN (29727, 29728, 29729, 29730, 29731, 29732, 29733, 29734, 29735, 29736, 29737, 29738, 29739, 29740, 29741);
@@ -22,3 +38,12 @@ UPDATE smart_scripts SET action_param1 = 1, comment = "Snufflenose Gopher - Scri
 
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 17 AND `SourceEntry` = 6918;
 INSERT INTO `conditions` VALUES (17, 0, 6918, 0, 0, 29, 0, 4781, 5, 0, 1, 0, 0, '', 'Blueleaf Tubers: Only spawn one Snufflenose Gopher');
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
