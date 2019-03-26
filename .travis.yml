@@ -14,7 +14,7 @@ services:
   - mysql
 
 git:
-  depth: 1
+  depth: 10
 
 stages:
   - prepare_cache

@@ -252,8 +252,8 @@ struct CalendarEvent
         std::string _description;
 };
 typedef std::vector<CalendarInvite*> CalendarInviteStore;
-typedef UNORDERED_SET<CalendarEvent*> CalendarEventStore;
-typedef UNORDERED_MAP<uint64 /* eventId */, CalendarInviteStore > CalendarEventInviteStore;
+typedef std::unordered_set<CalendarEvent*> CalendarEventStore;
+typedef std::unordered_map<uint64 /* eventId */, CalendarInviteStore > CalendarEventInviteStore;
 
 class CalendarMgr
 {

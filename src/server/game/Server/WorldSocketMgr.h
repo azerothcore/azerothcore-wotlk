@@ -13,6 +13,7 @@
 #ifndef __WORLDSOCKETMGR_H
 #define __WORLDSOCKETMGR_H
 
+#include "Common.h"
 #include <ace/Basic_Types.h>
 #include <ace/Singleton.h>
 #include <ace/Thread_Mutex.h>
@@ -29,7 +30,7 @@ public:
     friend class ACE_Singleton<WorldSocketMgr, ACE_Thread_Mutex>;
 
     /// Start network, listen at address:port .
-    int StartNetwork(ACE_UINT16 port, const char* address);
+    int StartNetwork(uint16 port, const char* address);
 
     /// Stops all network threads, It will wait for all running threads .
     void StopNetwork();
@@ -40,7 +41,7 @@ public:
 private:
     int OnSocketOpen(WorldSocket* sock);
 
-    int StartReactiveIO(ACE_UINT16 port, const char* address);
+    int StartReactiveIO(uint16 port, const char* address);
 
 private:
     WorldSocketMgr();

@@ -308,9 +308,9 @@ class Channel
             }
         }
 
-        typedef UNORDERED_MAP<uint64, PlayerInfo> PlayerContainer;
-        typedef UNORDERED_MAP<uint32, uint32> BannedContainer;
-        typedef UNORDERED_SET<Player*> PlayersWatchingContainer;
+        typedef std::unordered_map<uint64, PlayerInfo> PlayerContainer;
+        typedef std::unordered_map<uint32, uint32> BannedContainer;
+        typedef std::unordered_set<Player*> PlayersWatchingContainer;
 
         bool _announce;
         bool _ownership;

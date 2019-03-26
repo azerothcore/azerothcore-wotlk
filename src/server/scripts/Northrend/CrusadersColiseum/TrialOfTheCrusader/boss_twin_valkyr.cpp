@@ -556,7 +556,7 @@ class npc_essence_of_twin : public CreatureScript
 public:
     npc_essence_of_twin() : CreatureScript("npc_essence_of_twin") { }
 
-    bool OnGossipHello(Player* player, Creature* creature)
+    bool OnGossipHello(Player* player, Creature* creature) override
     {
         switch( creature->GetEntry() )
         {
@@ -655,7 +655,7 @@ public:
             default:
                 break;
         }
-        player->CLOSE_GOSSIP_MENU();
+        CloseGossipMenuFor(player);
         return true;
     }
 };

@@ -184,7 +184,7 @@ class boss_the_lurker_below : public CreatureScript
                             }
                 }
 
-                if (target)         
+                if (target)
                     me->AttackerStateUpdate(target);
                 else if ((target = SelectTarget(SELECT_TARGET_RANDOM, 0)))
                     me->CastSpell(target, SPELL_WATER_BOLT, false);
@@ -199,7 +199,7 @@ class go_strange_pool : public GameObjectScript
     public:
         go_strange_pool() : GameObjectScript("go_strange_pool") { }
 
-        bool OnGossipHello(Player* player, GameObject* go)
+        bool OnGossipHello(Player* player, GameObject* go) override
         {
             if (InstanceScript* instance = go->GetInstanceScript())
                 if (roll_chance_i(instance->GetBossState(DATA_THE_LURKER_BELOW) != DONE ? 25 : 0) && !instance->IsEncounterInProgress())
