@@ -646,100 +646,100 @@ class npc_fairbanks : public CreatureScript
 public:
     npc_fairbanks() : CreatureScript("npc_fairbanks") { }
 
-    bool OnGossipHello(Player* plr, Creature* npc)
+    bool OnGossipHello(Player* player, Creature* creature) override
     {
-        plr->ADD_GOSSIP_ITEM(0, "Curse? What's going on here, Fairbanks?", GOSSIP_SENDER_MAIN, 1);
-        plr->SEND_GOSSIP_MENU(100100, npc->GetGUID());
+        AddGossipItemFor(player, 0, "Curse? What's going on here, Fairbanks?", GOSSIP_SENDER_MAIN, 1);
+        SendGossipMenuFor(player, 100100, creature->GetGUID());
         return true;
     }
 
-    bool OnGossipSelect(Player* plr, Creature* npc, uint32  /*Sender*/, uint32 uiAction)
+    bool OnGossipSelect(Player* player, Creature* creature, uint32  /*Sender*/, uint32 uiAction) override
     {
-        plr->PlayerTalkClass->ClearMenus();
+        ClearGossipMenuFor(player);
 
         switch (uiAction)
         {
         case 1:
-            npc->HandleEmoteCommand(1);
-            plr->ADD_GOSSIP_ITEM(0, "Mograine?", GOSSIP_SENDER_MAIN, 2);
-            plr->SEND_GOSSIP_MENU(100101, npc->GetGUID());
+            creature->HandleEmoteCommand(1);
+            AddGossipItemFor(player, 0, "Mograine?", GOSSIP_SENDER_MAIN, 2);
+            SendGossipMenuFor(player, 100101, creature->GetGUID());
             return true;
         case 2:
-            npc->HandleEmoteCommand(1);
-            plr->ADD_GOSSIP_ITEM(0, "What do you mean?", GOSSIP_SENDER_MAIN, 3);
-            plr->SEND_GOSSIP_MENU(100102, npc->GetGUID());
+            creature->HandleEmoteCommand(1);
+            AddGossipItemFor(player, 0, "What do you mean?", GOSSIP_SENDER_MAIN, 3);
+            SendGossipMenuFor(player, 100102, creature->GetGUID());
             return true;
         case 3:
-            npc->HandleEmoteCommand(1);
-            plr->ADD_GOSSIP_ITEM(0, "I still do not fully understand.", GOSSIP_SENDER_MAIN, 4);
-            plr->SEND_GOSSIP_MENU(100103, npc->GetGUID());
+            creature->HandleEmoteCommand(1);
+            AddGossipItemFor(player, 0, "I still do not fully understand.", GOSSIP_SENDER_MAIN, 4);
+            SendGossipMenuFor(player, 100103, creature->GetGUID());
             return true;
         case 4:
-            npc->HandleEmoteCommand(1);
-            plr->ADD_GOSSIP_ITEM(0, "Incredible story. So how did he die?", GOSSIP_SENDER_MAIN, 5);
-            plr->SEND_GOSSIP_MENU(100104, npc->GetGUID());
+            creature->HandleEmoteCommand(1);
+            AddGossipItemFor(player, 0, "Incredible story. So how did he die?", GOSSIP_SENDER_MAIN, 5);
+            SendGossipMenuFor(player, 100104, creature->GetGUID());
             return true;
         case 5:
-            npc->HandleEmoteCommand(1);
-            plr->ADD_GOSSIP_ITEM(0, "You mean...", GOSSIP_SENDER_MAIN, 6);
-            plr->SEND_GOSSIP_MENU(100105, npc->GetGUID());
+            creature->HandleEmoteCommand(1);
+            AddGossipItemFor(player, 0, "You mean...", GOSSIP_SENDER_MAIN, 6);
+            SendGossipMenuFor(player, 100105, creature->GetGUID());
             return true;
         case 6:
-            npc->HandleEmoteCommand(1);
-            plr->ADD_GOSSIP_ITEM(0, "How do you know all of this?", GOSSIP_SENDER_MAIN, 7);
-            plr->SEND_GOSSIP_MENU(100106, npc->GetGUID());
+            creature->HandleEmoteCommand(1);
+            AddGossipItemFor(player, 0, "How do you know all of this?", GOSSIP_SENDER_MAIN, 7);
+            SendGossipMenuFor(player, 100106, creature->GetGUID());
             return true;
         case 7:
-            npc->HandleEmoteCommand(1);
-            plr->ADD_GOSSIP_ITEM(0, "A thousand? For one man?", GOSSIP_SENDER_MAIN, 8);
-            plr->SEND_GOSSIP_MENU(100107, npc->GetGUID());
+            creature->HandleEmoteCommand(1);
+            AddGossipItemFor(player, 0, "A thousand? For one man?", GOSSIP_SENDER_MAIN, 8);
+            SendGossipMenuFor(player, 100107, creature->GetGUID());
             return true;
         case 8:
-            npc->HandleEmoteCommand(5);
-            plr->ADD_GOSSIP_ITEM(0, "Yet? Yet what?", GOSSIP_SENDER_MAIN, 9);
-            plr->SEND_GOSSIP_MENU(100108, npc->GetGUID());
+            creature->HandleEmoteCommand(5);
+            AddGossipItemFor(player, 0, "Yet? Yet what?", GOSSIP_SENDER_MAIN, 9);
+            SendGossipMenuFor(player, 100108, creature->GetGUID());
             return true;
         case 9:
-            npc->HandleEmoteCommand(1);
-            plr->ADD_GOSSIP_ITEM(0, "And did he?", GOSSIP_SENDER_MAIN, 10);
-            plr->SEND_GOSSIP_MENU(100109, npc->GetGUID());
+            creature->HandleEmoteCommand(1);
+            AddGossipItemFor(player, 0, "And did he?", GOSSIP_SENDER_MAIN, 10);
+            SendGossipMenuFor(player, 100109, creature->GetGUID());
             return true;
         case 10:
-            npc->HandleEmoteCommand(274);
-            plr->ADD_GOSSIP_ITEM(0, "Continue please, Fairbanks.", GOSSIP_SENDER_MAIN, 11);
-            plr->SEND_GOSSIP_MENU(100110, npc->GetGUID());
+            creature->HandleEmoteCommand(274);
+            AddGossipItemFor(player, 0, "Continue please, Fairbanks.", GOSSIP_SENDER_MAIN, 11);
+            SendGossipMenuFor(player, 100110, creature->GetGUID());
             return true;
         case 11:
-            npc->HandleEmoteCommand(1);
-            plr->ADD_GOSSIP_ITEM(0, "You mean...", GOSSIP_SENDER_MAIN, 12);
-            plr->SEND_GOSSIP_MENU(100111, npc->GetGUID());
+            creature->HandleEmoteCommand(1);
+            AddGossipItemFor(player, 0, "You mean...", GOSSIP_SENDER_MAIN, 12);
+            SendGossipMenuFor(player, 100111, creature->GetGUID());
             return true;
         case 12:
-            npc->HandleEmoteCommand(1);
-            plr->ADD_GOSSIP_ITEM(0, "You were right, Fairbanks. That is tragic.", GOSSIP_SENDER_MAIN, 13);
-            plr->SEND_GOSSIP_MENU(100112, npc->GetGUID());
+            creature->HandleEmoteCommand(1);
+            AddGossipItemFor(player, 0, "You were right, Fairbanks. That is tragic.", GOSSIP_SENDER_MAIN, 13);
+            SendGossipMenuFor(player, 100112, creature->GetGUID());
             return true;
         case 13:
-            npc->HandleEmoteCommand(1);
-            plr->ADD_GOSSIP_ITEM(0, "And you did...", GOSSIP_SENDER_MAIN, 14);
-            plr->SEND_GOSSIP_MENU(100113, npc->GetGUID());
+            creature->HandleEmoteCommand(1);
+            AddGossipItemFor(player, 0, "And you did...", GOSSIP_SENDER_MAIN, 14);
+            SendGossipMenuFor(player, 100113, creature->GetGUID());
             return true;
         case 14:
-            npc->HandleEmoteCommand(1);
-            plr->ADD_GOSSIP_ITEM(0, "You tell an incredible tale, Fairbanks. What of the blade? Is it beyond redemption?", GOSSIP_SENDER_MAIN, 15);
-            plr->SEND_GOSSIP_MENU(100114, npc->GetGUID());
+            creature->HandleEmoteCommand(1);
+            AddGossipItemFor(player, 0, "You tell an incredible tale, Fairbanks. What of the blade? Is it beyond redemption?", GOSSIP_SENDER_MAIN, 15);
+            SendGossipMenuFor(player, 100114, creature->GetGUID());
             return true;
         case 15:
-            npc->HandleEmoteCommand(1);
-            plr->ADD_GOSSIP_ITEM(0, "But his son is dead.", GOSSIP_SENDER_MAIN, 16);
-            plr->SEND_GOSSIP_MENU(100115, npc->GetGUID());
+            creature->HandleEmoteCommand(1);
+            AddGossipItemFor(player, 0, "But his son is dead.", GOSSIP_SENDER_MAIN, 16);
+            SendGossipMenuFor(player, 100115, creature->GetGUID());
             return true;
         case 16:
-            plr->SEND_GOSSIP_MENU(100116, npc->GetGUID());
+            SendGossipMenuFor(player, 100116, creature->GetGUID());
             // todo: we need to play these 3 emote in sequence, we play only the last one right now.
-            npc->HandleEmoteCommand(274);
-            npc->HandleEmoteCommand(1);
-            npc->HandleEmoteCommand(397);
+            creature->HandleEmoteCommand(274);
+            creature->HandleEmoteCommand(1);
+            creature->HandleEmoteCommand(397);
             return true;
         }
 
@@ -750,12 +750,12 @@ public:
     {
         npc_fairbanksAI(Creature* creature) : SmartAI(creature) { }
 
-        void Reset()
+        void Reset() override
         {
             SayAshbringer = false;
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if (who && who->GetDistance2d(me) < 2.0f)
                 if (Player* player = who->ToPlayer())
@@ -776,7 +776,7 @@ public:
         bool SayAshbringer = false;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_fairbanksAI(creature);
     }
