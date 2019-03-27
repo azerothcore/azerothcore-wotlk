@@ -545,7 +545,7 @@ class boss_lady_deathwhisper : public CreatureScript
                 if (action != ACTION_START_INTRO)
                     return;
 
-                if (!_introDone)
+                if (!_introDone && !me->IsInCombat())
                 {
                     _introDone = true;
                     Talk(SAY_INTRO_1);
