@@ -1194,7 +1194,7 @@ struct BfWGGameObjectBuilding
                 if (GameObject* go = m_WG->GetRelic())
                     go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
                 else
-                    sLog->outError("BattlefieldWG: Relic not found.");
+                    sLog.outError("BattlefieldWG: Relic not found.");
                 break;
             case BATTLEFIELD_WG_OBJECTTYPE_DOOR:
             case BATTLEFIELD_WG_OBJECTTYPE_WALL:

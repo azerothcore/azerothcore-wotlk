@@ -132,10 +132,10 @@ extern int main(int argc, char** argv)
         printf("Verify that the file exists and has \'[worldserver]' written in the top of the file!\n");
     }
 
-    sLog->outString("Using configuration file %s.", cfg_file);
+    sLog.outString("Using configuration file %s.", cfg_file);
 
-    sLog->outString("Using SSL version: %s (library: %s)", OPENSSL_VERSION_TEXT, SSLeay_version(SSLEAY_VERSION));
-    sLog->outString("Using ACE version: %s", ACE_VERSION);
+    sLog.outString("Using SSL version: %s (library: %s)", OPENSSL_VERSION_TEXT, SSLeay_version(SSLEAY_VERSION));
+    sLog.outString("Using ACE version: %s", ACE_VERSION);
 
     ///- and run the 'Master'
     /// @todo Why do we need this 'Master'? Can't all of this be in the Main as for Realmd?

@@ -159,7 +159,7 @@ void MapUpdater::update_finished()
     if (pending_requests == 0)
     {
         ACE_ERROR((LM_ERROR, ACE_TEXT("(%t)\n"), ACE_TEXT("MapUpdater::update_finished BUG, report to devs")));
-        sLog->outMisc("WOOT! pending_requests == 0 before decrement!");
+        sLog.outMisc("WOOT! pending_requests == 0 before decrement!");
         m_condition.broadcast();
         return;
     }

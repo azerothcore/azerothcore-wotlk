@@ -25,8 +25,8 @@ void LootItemStorage::LoadStorageFromDB()
     PreparedQueryResult result = CharacterDatabase.Query(stmt);
     if (!result)
     {
-        sLog->outString(">>  Loaded 0 stored items!");
-        sLog->outString();
+        sLog.outString(">>  Loaded 0 stored items!");
+        sLog.outString();
         return;
     }
 
@@ -41,8 +41,8 @@ void LootItemStorage::LoadStorageFromDB()
         ++count;
     } while (result->NextRow());
 
-    sLog->outString(">> Loaded %d stored items in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    sLog->outString();
+    sLog.outString(">> Loaded %d stored items in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    sLog.outString();
 }
 
 void LootItemStorage::RemoveEntryFromDB(uint32 containerId, uint32 itemid, uint32 count)
@@ -61,7 +61,7 @@ void LootItemStorage::AddNewStoredLoot(Loot* loot, Player* /*player*/)
 {
     if (lootItemStore.find(loot->containerId) != lootItemStore.end())
     {
-        sLog->outMisc("LootItemStorage::AddNewStoredLoot (A1) - %u!", loot->containerId);
+        sLog.outMisc("LootItemStorage::AddNewStoredLoot (A1) - %u!", loot->containerId);
         return;
     }
 

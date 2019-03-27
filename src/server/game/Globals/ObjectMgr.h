@@ -894,13 +894,13 @@ class ObjectMgr
         void LoadQuests();
         void LoadQuestStartersAndEnders()
         {
-            sLog->outString("Loading GO Start Quest Data...");
+            sLog.outString("Loading GO Start Quest Data...");
             LoadGameobjectQuestStarters();
-            sLog->outString("Loading GO End Quest Data...");
+            sLog.outString("Loading GO End Quest Data...");
             LoadGameobjectQuestEnders();
-            sLog->outString("Loading Creature Start Quest Data...");
+            sLog.outString("Loading Creature Start Quest Data...");
             LoadCreatureQuestStarters();
-            sLog->outString("Loading Creature End Quest Data...");
+            sLog.outString("Loading Creature End Quest Data...");
             LoadCreatureQuestEnders();
         }
         void LoadGameobjectQuestStarters();

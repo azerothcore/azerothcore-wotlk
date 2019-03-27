@@ -17,7 +17,7 @@ void CharacterDatabaseCleaner::CleanDatabase()
     if (!sWorld->getBoolConfig(CONFIG_CLEAN_CHARACTER_DB))
         return;
 
-    sLog->outString("Cleaning character database...");
+    sLog.outString("Cleaning character database...");
 
     uint32 oldMSTime = getMSTime();
 
@@ -51,8 +51,8 @@ void CharacterDatabaseCleaner::CleanDatabase()
 
     sWorld->SetCleaningFlags(flags);
 
-    sLog->outString(">> Cleaned character database in %u ms", GetMSTimeDiffToNow(oldMSTime));
-    sLog->outString();
+    sLog.outString(">> Cleaned character database in %u ms", GetMSTimeDiffToNow(oldMSTime));
+    sLog.outString();
 }
 
 void CharacterDatabaseCleaner::CheckUnique(const char* column, const char* table, bool (*check)(uint32))
@@ -60,7 +60,7 @@ void CharacterDatabaseCleaner::CheckUnique(const char* column, const char* table
     QueryResult result = CharacterDatabase.PQuery("SELECT DISTINCT %s FROM %s", column, table);
     if (!result)
     {
-        sLog->outString("Table %s is empty.", table);
+        sLog.outString("Table %s is empty.", table);
         return;
     }
 

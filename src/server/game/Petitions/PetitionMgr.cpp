@@ -25,8 +25,8 @@ void PetitionMgr::LoadPetitions()
     QueryResult result = CharacterDatabase.Query("SELECT ownerguid, petitionguid, name, type FROM petition");
     if (!result)
     {
-        sLog->outString(">>  Loaded 0 Petitions!");
-        sLog->outString();
+        sLog.outString(">>  Loaded 0 Petitions!");
+        sLog.outString();
         return;
     }
 
@@ -38,8 +38,8 @@ void PetitionMgr::LoadPetitions()
         ++count;
     } while (result->NextRow());
 
-    sLog->outString(">> Loaded %d Petitions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    sLog->outString();
+    sLog.outString(">> Loaded %d Petitions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    sLog.outString();
 }
 
 void PetitionMgr::LoadSignatures()
@@ -50,8 +50,8 @@ void PetitionMgr::LoadSignatures()
     QueryResult result = CharacterDatabase.Query("SELECT petitionguid, playerguid, player_account FROM petition_sign");
     if (!result)
     {
-        sLog->outString(">>  Loaded 0 Petition signs!");
-        sLog->outString();
+        sLog.outString(">>  Loaded 0 Petition signs!");
+        sLog.outString();
         return;
     }
 
@@ -63,8 +63,8 @@ void PetitionMgr::LoadSignatures()
         ++count;
     } while (result->NextRow());
 
-    sLog->outString(">> Loaded %d Petition signs in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    sLog->outString();
+    sLog.outString(">> Loaded %d Petition signs in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    sLog.outString();
 }
 
 void PetitionMgr::AddPetition(uint32 petitionId, uint32 ownerGuid, std::string const& name, uint8 type)

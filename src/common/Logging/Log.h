@@ -194,7 +194,7 @@ class Log
         DebugLogFilters m_DebugLogMask;
 };
 
-#define sLog ACORE::Singleton<Log>::instance()
+#define sLog ACORE::Singleton<Log>::Instance()
 
 #endif
 
