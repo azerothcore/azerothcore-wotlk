@@ -205,7 +205,7 @@ GroupQueueInfo* BattlegroundQueue::AddGroup(Player* leader, Group* grp, PvPDiffi
             else
             {
                 sWorld->SendWorldText(LANG_BG_QUEUE_ANNOUNCE_WORLD, bgName, q_min_level, q_max_level,
-                    qAlliance + qHorde, MinPlayers);
+                    qAlliance + qHorde, MinPlayers * 2);
             }
 
             }
