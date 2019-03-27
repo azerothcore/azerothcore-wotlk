@@ -375,98 +375,6 @@ public:
     };
 };
 
-// npc_kharan_mighthammer
-enum KharamQuests
-{
-    QUEST_4001                          = 4001,
-    QUEST_4342                          = 4342
-};
-
-#define GOSSIP_ITEM_KHARAN_1    "I need to know where the princess are, Kharan!"
-#define GOSSIP_ITEM_KHARAN_2    "All is not lost, Kharan!"
-#define GOSSIP_ITEM_KHARAN_3    "Gor'shak is my friend, you can trust me."
-#define GOSSIP_ITEM_KHARAN_4    "Not enough, you need to tell me more."
-#define GOSSIP_ITEM_KHARAN_5    "So what happened?"
-#define GOSSIP_ITEM_KHARAN_6    "Continue..."
-#define GOSSIP_ITEM_KHARAN_7    "So you suspect that someone on the inside was involved? That they were tipped off?"
-#define GOSSIP_ITEM_KHARAN_8    "Continue with your story please."
-#define GOSSIP_ITEM_KHARAN_9    "Indeed."
-#define GOSSIP_ITEM_KHARAN_10   "The door is open, Kharan. You are a free man."
-
-class npc_kharan_mighthammer : public CreatureScript
-{
-public:
-    npc_kharan_mighthammer() : CreatureScript("npc_kharan_mighthammer") { }
-
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
-    {
-        ClearGossipMenuFor(player);
-        switch (action)
-        {
-            case GOSSIP_ACTION_INFO_DEF+1:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_KHARAN_3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+2);
-                SendGossipMenuFor(player, 2475, creature->GetGUID());
-                break;
-            case GOSSIP_ACTION_INFO_DEF+2:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_KHARAN_4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+3);
-                SendGossipMenuFor(player, 2476, creature->GetGUID());
-                break;
-
-            case GOSSIP_ACTION_INFO_DEF+3:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_KHARAN_5, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+4);
-                SendGossipMenuFor(player, 2477, creature->GetGUID());
-                break;
-            case GOSSIP_ACTION_INFO_DEF+4:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_KHARAN_6, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+5);
-                SendGossipMenuFor(player, 2478, creature->GetGUID());
-                break;
-            case GOSSIP_ACTION_INFO_DEF+5:
-                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_KHARAN_7, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+6);
-                SendGossipMenuFor(player, 2479, creature->GetGUID());
-                break;
-            case GOSSIP_ACTION_INFO_DEF+6:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_KHARAN_8, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+7);
-                SendGossipMenuFor(player, 2480, creature->GetGUID());
-                break;
-            case GOSSIP_ACTION_INFO_DEF+7:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_KHARAN_9, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+8);
-                SendGossipMenuFor(player, 2481, creature->GetGUID());
-                break;
-            case GOSSIP_ACTION_INFO_DEF+8:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_KHARAN_10, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+9);
-                SendGossipMenuFor(player, 2482, creature->GetGUID());
-                break;
-            case GOSSIP_ACTION_INFO_DEF+9:
-                CloseGossipMenuFor(player);
-                if (player->GetTeamId() == TEAM_HORDE)
-                    player->AreaExploredOrEventHappens(QUEST_4001);
-                else
-                    player->AreaExploredOrEventHappens(QUEST_4342);
-                break;
-        }
-        return true;
-    }
-
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        if (creature->IsQuestGiver())
-            player->PrepareQuestMenu(creature->GetGUID());
-
-        if (player->GetQuestStatus(QUEST_4001) == QUEST_STATUS_INCOMPLETE)
-             AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_KHARAN_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
-
-        if (player->GetQuestStatus(4342) == QUEST_STATUS_INCOMPLETE)
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_KHARAN_2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+3);
-
-        if (player->GetTeamId() == TEAM_HORDE)
-            SendGossipMenuFor(player, 2473, creature->GetGUID());
-        else
-            SendGossipMenuFor(player, 2474, creature->GetGUID());
-
-        return true;
-    }
-};
-
 // npc_lokhtos_darkbargainer
 enum LokhtosItems
 {
@@ -483,9 +391,6 @@ enum LokhtosSpells
 {
     SPELL_CREATE_THORIUM_BROTHERHOOD_CONTRACT_DND          = 23059
 };
-
-#define GOSSIP_ITEM_SHOW_ACCESS     "Show me what I have access to, Lothos."
-#define GOSSIP_ITEM_GET_CONTRACT    "Get Thorium Brotherhood Contract"
 
 class npc_lokhtos_darkbargainer : public CreatureScript
 {
@@ -512,13 +417,14 @@ public:
             player->PrepareQuestMenu(creature->GetGUID());
 
         if (creature->IsVendor() && player->GetReputationRank(59) >= REP_FRIENDLY)
-              AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GOSSIP_ITEM_SHOW_ACCESS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
+            AddGossipItemFor(player, 4781, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
+        
 
         if (player->GetQuestRewardStatus(QUEST_A_BINDING_CONTRACT) != 1 &&
             !player->HasItemCount(ITEM_THRORIUM_BROTHERHOOD_CONTRACT, 1, true) &&
             player->HasItemCount(ITEM_SULFURON_INGOT))
         {
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_GET_CONTRACT, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            AddGossipItemFor(player, 4781, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
         }
 
         if (player->GetReputationRank(59) < REP_FRIENDLY)
@@ -1300,7 +1206,6 @@ void AddSC_blackrock_depths()
     new at_ring_of_law();
     new npc_grimstone();
     new npc_phalanx();
-    new npc_kharan_mighthammer();
     new npc_lokhtos_darkbargainer();
     new npc_rocknot();
     // Fix us

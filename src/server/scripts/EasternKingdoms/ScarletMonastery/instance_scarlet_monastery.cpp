@@ -48,7 +48,7 @@ class instance_scarlet_monastery : public InstanceMapScript
 public:
     instance_scarlet_monastery() : InstanceMapScript("instance_scarlet_monastery", 189) { }
 
-    InstanceScript* GetInstanceScript(InstanceMap* map) const
+    InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {
         return new instance_scarlet_monastery_InstanceMapScript(map);
     }
@@ -185,12 +185,12 @@ public:
     {
         npc_scarlet_guardAI(Creature* creature) : SmartAI(creature) { }
 
-        void Reset()
+        void Reset() override
         {
             SayAshbringer = false;
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if (who && who->GetDistance2d(me) < 12.0f)
             {
@@ -216,7 +216,7 @@ public:
         bool SayAshbringer = false;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_scarlet_guardAI(creature);
     }
@@ -363,7 +363,7 @@ public:
                         me->SetSheath(SHEATH_STATE_UNARMED);
                         me->SetStandState(UNIT_STAND_STATE_KNEEL);
                         me->SetFacingToObject(player);
-                        me->MonsterYell("Bow down! Kneel before the Ashbringer! A new dawn approaches, brothers and sisters! Our message will be delivered to the filth of this world through the chosen one!", LANG_UNIVERSAL, player);
+                        me->MonsterYell(12389, LANG_UNIVERSAL, player);
                         SayAshbringer = true;
                     }
 
@@ -493,7 +493,7 @@ public:
         InstanceScript* instance;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_mograineAI(creature);
     }
@@ -635,7 +635,7 @@ public:
         EventMap events;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_high_inquisitor_whitemaneAI(creature);
     }
