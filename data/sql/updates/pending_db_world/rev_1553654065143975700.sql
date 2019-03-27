@@ -1,7 +1,5 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1553654065143975700');
-/* Reminder: Moved Kharan Mighthammer to DB
 
-*/
 -- NPC ID 9021 Kharan Mighthammer, Quest ID 4001 'What Is Going On?' and 4342 'Kharan's Tale'
 SET @Kharan := 9021;
 
