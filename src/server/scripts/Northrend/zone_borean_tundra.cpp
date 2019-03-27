@@ -307,13 +307,15 @@ public:
 ## npc_iruk
 ######*/
 
-#define GOSSIP_ITEM_I  "<Search corpse for Issliruk's Totem.>"
-
 enum Iruk
 {
+    GOSSIP_MENU_ID_NPC_IRUK                 = 9280,
+    GOSSIP_OPTION_SEARCH_CORPSE             = 0,
+    NPC_TEXT_THIS_YOUNG_TUSKARR             = 12585,
+
     QUEST_SPIRITS_WATCH_OVER_US             = 11961,
-    SPELL_CREATURE_TOTEM_OF_ISSLIRUK        = 46816,
-    GOSSIP_TEXT_I                           = 12585
+
+    SPELL_CREATE_TOTEM_OF_ISSLIRUK          = 46816
 };
 
 class npc_iruk : public CreatureScript
@@ -324,23 +326,23 @@ public:
     bool OnGossipHello(Player* player, Creature* creature) override
     {
         if (player->GetQuestStatus(QUEST_SPIRITS_WATCH_OVER_US) == QUEST_STATUS_INCOMPLETE)
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_I, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
+            AddGossipItemFor(player, GOSSIP_MENU_ID_NPC_IRUK, GOSSIP_OPTION_SEARCH_CORPSE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+        
+        SendGossipMenuFor(player, NPC_TEXT_THIS_YOUNG_TUSKARR, creature->GetGUID());
 
-        SendGossipMenuFor(player, GOSSIP_TEXT_I, creature);
         return true;
     }
 
     bool OnGossipSelect(Player* player, Creature* /*creature*/, uint32 /*sender*/, uint32 action) override
     {
         ClearGossipMenuFor(player);
-        switch (action)
+        
+        if (action == GOSSIP_ACTION_INFO_DEF + 1)
         {
-            case GOSSIP_ACTION_INFO_DEF+1:
-                player->CastSpell(player, SPELL_CREATURE_TOTEM_OF_ISSLIRUK, true);
-                CloseGossipMenuFor(player);
-                break;
-
+            player->CastSpell(player, SPELL_CREATE_TOTEM_OF_ISSLIRUK, true);
+            CloseGossipMenuFor(player);
         }
+        
         return true;
     }
 };
