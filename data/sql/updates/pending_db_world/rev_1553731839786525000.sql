@@ -1,11 +1,9 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1553731839786525000');
 
-DELETE FROM `creature` WHERE `guid`=3110330;
+DELETE FROM `creature` WHERE `guid` IN (3110330, 35237);
 INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES 
-(3110330, 7750, 0, 0, 0, 1, 2, 0, 1, -10630.2, -2988.19, 28.8757, 4.93301, 300, 0, 0, 3399, 0, 0, 0, 0, 0, '', 0);
-
-DELETE FROM `creature` WHERE `guid`=35237;
-INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES (35237, 7572, 0, 0, 0, 1, 1, 0, 1, -10632.3, -3009.37, 29.2653, 6.19592, 300, 0, 0, 4121, 0, 0, 0, 0, 0, '', 0);
+(3110330, 7750, 0, 0, 0, 1, 2, 0, 1, -10630.2, -2988.19, 28.8757, 4.93301, 300, 0, 0, 3399, 0, 0, 0, 0, 0, '', 0),
+(35237, 7572, 0, 0, 0, 1, 1, 0, 1, -10632.3, -3009.37, 29.2653, 6.19592, 300, 0, 0, 4121, 0, 0, 0, 0, 0, '', 0);
 
 DELETE FROM `conditions` WHERE  `SourceTypeOrReferenceId`=15 AND `SourceGroup`=840 AND `SourceEntry`=2 AND `SourceId`=0 AND `ElseGroup`=1 AND `ConditionTypeOrReference`=29 AND `ConditionTarget`=0 AND `ConditionValue1`=7750 AND `ConditionValue2`=40 AND `ConditionValue3`=0;
 
