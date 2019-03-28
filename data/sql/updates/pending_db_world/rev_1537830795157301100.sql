@@ -1,4 +1,5 @@
 INSERT INTO version_db_world (`sql_rev`) VALUES ('1537830795157301100');
+
 -- Shattered Sun Marksman SAI
 SET @ENTRY := 24938;
 UPDATE `creature_template` SET `AIName`="SmartAI" WHERE `entry`=@ENTRY;
