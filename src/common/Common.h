@@ -70,6 +70,7 @@
 #include <list>
 #include <string>
 #include <map>
+#include <mutex>
 #include <queue>
 #include <sstream>
 #include <fstream>
@@ -78,11 +79,9 @@
 
 #include "Threading/LockedQueue.h"
 #include "Threading/Threading.h"
+#include "Policies/Singleton.h"
 
 #include <ace/Basic_Types.h>
-#include <ace/Guard_T.h>
-#include <ace/RW_Thread_Mutex.h>
-#include <ace/Thread_Mutex.h>
 #include <ace/OS_NS_time.h>
 #include <ace/Stack_Trace.h>
 
@@ -197,19 +196,19 @@ typedef std::vector<std::string> StringVector;
 #define MAX_QUERY_LEN 32*1024
 
 #define TRINITY_GUARD(MUTEX, LOCK) \
-  ACE_Guard< MUTEX > TRINITY_GUARD_OBJECT (LOCK); \
+  std::lock_guard< MUTEX > TRINITY_GUARD_OBJECT (LOCK); \
     if (TRINITY_GUARD_OBJECT.locked() == 0) ASSERT(false);
 
 //! For proper implementation of multiple-read, single-write pattern, use
 //! ACE_RW_Mutex as underlying @MUTEX
 # define TRINITY_WRITE_GUARD(MUTEX, LOCK) \
-  ACE_Write_Guard< MUTEX > TRINITY_GUARD_OBJECT (LOCK); \
+  std::lock_guard< MUTEX > TRINITY_GUARD_OBJECT (LOCK); \
     if (TRINITY_GUARD_OBJECT.locked() == 0) ASSERT(false);
 
 //! For proper implementation of multiple-read, single-write pattern, use
 //! ACE_RW_Mutex as underlying @MUTEX
 # define TRINITY_READ_GUARD(MUTEX, LOCK) \
-  ACE_Read_Guard< MUTEX > TRINITY_GUARD_OBJECT (LOCK); \
+  std::lock_guard< MUTEX > TRINITY_GUARD_OBJECT (LOCK); \
     if (TRINITY_GUARD_OBJECT.locked() == 0) ASSERT(false);
 
 #endif

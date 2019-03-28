@@ -10,16 +10,15 @@
 #include <string>
 #include <list>
 #include <vector>
-#include <ace/Singleton.h>
 #include <ace/Configuration_Import_Export.h>
-#include <ace/Thread_Mutex.h>
 #include <AutoPtr.h>
+#include <mutex>
 
 typedef Trinity::AutoPtr<ACE_Configuration_Heap, ACE_Null_Mutex> Config;
 
 class ConfigMgr
 {
-    friend class ACE_Singleton<ConfigMgr, ACE_Null_Mutex>;
+    friend class ACORE::OperatorNew<ConfigMgr>;
     friend class ConfigLoader;
 
     ConfigMgr() { }
@@ -56,7 +55,7 @@ private:
     bool LoadData(char const* file);
 
     typedef std::mutex LockType;
-    typedef ACE_Guard<LockType> GuardType;
+    typedef std::lock_guard<LockType> GuardType;
 
     std::vector<std::string> _confFiles;
     Config _config;
@@ -66,6 +65,6 @@ private:
     ConfigMgr& operator=(ConfigMgr const&);
 };
 
-#define sConfigMgr ACE_Singleton<ConfigMgr, ACE_Null_Mutex>::instance()
+#define sConfigMgr ACORE::Singleton<ConfigMgr>::Instance()
 
 #endif

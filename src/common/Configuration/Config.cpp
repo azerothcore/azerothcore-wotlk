@@ -4,6 +4,12 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
+#include "Policies/Singleton.h"
+#include <mutex>
+#include <unordered_map>
+#include <string>
+#include <fstream>
+
 #include "Config.h"
 #include "Errors.h"
 #include "Log.h"
