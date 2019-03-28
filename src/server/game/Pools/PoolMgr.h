@@ -29,7 +29,7 @@ class Pool                                                  // for Pool of Pool 
 {
 };
 
-typedef UNORDERED_SET<uint32> ActivePoolObjects;
+typedef std::unordered_set<uint32> ActivePoolObjects;
 typedef std::map<uint32, uint32> ActivePoolPools;
 
 class ActivePoolData

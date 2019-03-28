@@ -156,7 +156,7 @@ public:
                 {
                     if (IsHeroic())
                         m_pInstance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_TIMED_LODI_DODI);
-                    
+
                     m_pInstance->SetData(DATA_SKADI_THE_RUTHLESS, IN_PROGRESS);
                 }
 
@@ -168,7 +168,7 @@ public:
 
         void DoAction(int32 param)
         {
-            
+
             if (param == ACTION_PHASE2)
             {
                 SecondPhase = true;
@@ -306,7 +306,7 @@ public:
                 AchievementHitCount++;
                 if (AchievementHitCount >= 3 && m_pInstance)
                     m_pInstance->SetData(DATA_SKADI_ACHIEVEMENT, true);
-                    
+
             }
         }
 
@@ -333,7 +333,7 @@ public:
                     cr->CastSpell(cr, cr->GetMap()->IsHeroic() ? SPELL_FLAME_BREATH_H : SPELL_FLAME_BREATH_N, true);
                 if ((cr = me->SummonCreature(NPC_BREATH_TRIGGER, 471.0f, -484.7f, 105, 0, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 30000)))
                     cr->CastSpell(cr, cr->GetMap()->IsHeroic() ? SPELL_FLAME_BREATH_H : SPELL_FLAME_BREATH_N, true);
-                
+
                 for (uint8 j = 0; j < 7; j++)
                     if ((cr = me->SummonCreature(NPC_BREATH_TRIGGER, 477.0f, -507.0f+(j*3), 105.0f, 0, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 30000)))
                         cr->CastSpell(cr, cr->GetMap()->IsHeroic() ? SPELL_FLAME_BREATH_H : SPELL_FLAME_BREATH_N, true);
@@ -351,7 +351,7 @@ public:
                 break;
             case 2:
             case 3:
-                if (m_pInstance) 
+                if (m_pInstance)
                     m_pInstance->SetData(SKADI_IN_RANGE, 1);
 
                 me->MonsterTextEmote(EMOTE_IN_RANGE, 0, true);
@@ -408,7 +408,7 @@ public:
 
                 return;
             }
-            
+
             RemoveSkadi(true);
         }
 
@@ -460,7 +460,7 @@ public:
                         me->CastSpell(me, SPELL_FLAME_VISUAL, false);
                     }
 
-                    if (m_pInstance) 
+                    if (m_pInstance)
                         m_pInstance->SetData(SKADI_IN_RANGE, 0);
 
                     currentPos = targetPoint;
@@ -486,13 +486,13 @@ public:
 };
 
 class go_harpoon_canon : public GameObjectScript
-{ 
-public: 
-    go_harpoon_canon() : GameObjectScript("go_harpoon_canon") { } 
+{
+public:
+    go_harpoon_canon() : GameObjectScript("go_harpoon_canon") { }
 
-    bool OnGossipHello(Player* pPlayer, GameObject* pGO)
+    bool OnGossipHello(Player* pPlayer, GameObject* go) override
     {
-        InstanceScript *m_pInstance = pGO->GetInstanceScript();
+        InstanceScript *m_pInstance = go->GetInstanceScript();
         if (m_pInstance && m_pInstance->GetData(DATA_SKADI_THE_RUTHLESS) == IN_PROGRESS)
             if (m_pInstance->GetData(SKADI_IN_RANGE) == 1)
             {
@@ -509,7 +509,7 @@ public:
 
                     grauf->AI()->DoAction(ACTION_MYGIRL_ACHIEVEMENT);
                 }
-                pGO->CastSpell((Unit*)NULL, SPELL_LAUNCH_HARPOON);
+                go->CastSpell((Unit*)NULL, SPELL_LAUNCH_HARPOON);
             }
 
         return true;

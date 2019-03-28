@@ -410,7 +410,7 @@ class go_gong_of_bethekk : public GameObjectScript
 {
     public: go_gong_of_bethekk() : GameObjectScript("go_gong_of_bethekk") { }
 
-        bool OnGossipHello(Player* /*player*/, GameObject* go)
+        bool OnGossipHello(Player* /*player*/, GameObject* go) override
         {
             if (go->GetInstanceScript())
             {
@@ -418,6 +418,7 @@ class go_gong_of_bethekk : public GameObjectScript
                 go->SendCustomAnim(0);
                 go->SummonCreature(NPC_ARLOKK, PosSummonArlokk[0], TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 600000);
             }
+            
             return true;
         }
 };

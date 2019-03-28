@@ -286,7 +286,7 @@ const Position LightOfDawnPos[] =
     {2270.99f, -5278.00f, 81.89f, 0}            // 15 Tirion Fordring loc4
 };
 
-const Position LightOfDawnFightPos[] = 
+const Position LightOfDawnFightPos[] =
 {
     {2279.68f, -5256.75f, 79.79f, 4.8f},
     {2280.40f, -5276.56f, 82.11f, 4.8f},
@@ -322,30 +322,30 @@ class npc_highlord_darion_mograine : public CreatureScript
 public:
     npc_highlord_darion_mograine() : CreatureScript("npc_highlord_darion_mograine") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_highlord_darion_mograineAI(creature);
     }
 
-    bool OnGossipHello(Player* player, Creature* creature)
+    bool OnGossipHello(Player* player, Creature* creature) override
     {
         if (creature->IsQuestGiver())
             player->PrepareQuestMenu(creature->GetGUID());
 
         if (player->GetQuestStatus(12801) == QUEST_STATUS_INCOMPLETE && !creature->AI()->GetData(WORLD_STATE_SOLDIERS_ENABLE))
-            player->ADD_GOSSIP_ITEM(0, "I am ready, Highlord. Let the siege of Light's Hope begin!", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
+            AddGossipItemFor(player, 0, "I am ready, Highlord. Let the siege of Light's Hope begin!", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
 
-        player->SEND_GOSSIP_MENU(player->GetGossipTextId(creature), creature->GetGUID());
+        SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
 
         return true;
     }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action)
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
     {
         if (action == GOSSIP_ACTION_INFO_DEF+1)
         {
-            player->PlayerTalkClass->ClearMenus();
-            player->CLOSE_GOSSIP_MENU();
+            ClearGossipMenuFor(player);
+            CloseGossipMenuFor(player);
             creature->AI()->DoAction(ACTION_START_EVENT);
         }
         return true;
@@ -667,7 +667,7 @@ public:
                     summons.DespawnEntry(NPC_ACHERUS_GHOUL);
                     summons.DespawnEntry(NPC_WARRIOR_OF_THE_FROZEN_WASTES);
                     summons.DespawnEntry(NPC_FLESH_BEHEMOTH);
-                    summons.DespawnEntry(NPC_DEFENDER_OF_THE_LIGHT);                    
+                    summons.DespawnEntry(NPC_DEFENDER_OF_THE_LIGHT);
 
                     if (Creature* orbaz = GetEntryFromSummons(NPC_ORBAZ_BLOODBANE))
                     {

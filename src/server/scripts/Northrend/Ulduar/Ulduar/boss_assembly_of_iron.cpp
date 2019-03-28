@@ -34,7 +34,7 @@ enum AssemblySpells
     SPELL_RUNE_OF_DEATH_10          = 62269,
     SPELL_RUNE_OF_DEATH_25          = 63490,
     SPELL_RUNE_OF_SUMMONING         = 62273,
-    SPELL_RUNE_OF_SUMMONING_VISUAL  = 62019,
+    SPELL_RUNE_OF_SUMMONING_SUMMON  = 62020,
     SPELL_LIGHTNING_BLAST_10        = 62054,
     SPELL_LIGHTNING_BLAST_25        = 63491,
     CREATURE_LIGHTNING_ELEMENTAL    = 32958,
@@ -94,36 +94,31 @@ enum eEnums
     EVENT_ENRAGE                = 30,
 };
 
-enum AOISounds
+enum AssemblyYells
 {
-    // molgeim
-    SOUND_MOLGEIM_AGGRO         = 15657,
-    SOUND_MOLGEIM_SLAY1         = 15658,
-    SOUND_MOLGEIM_SLAY2         = 15659,
-    SOUND_MOLGEIM_POWER         = 15660,
-    SOUND_MOLGEIM_SUMMON        = 15661,
-    SOUND_MOLGEIM_DEATH1        = 15662,
-    SOUND_MOLGEIM_DEATH2        = 15663,
-    SOUND_MOLGEIM_BERSERK       = 15664,
+    SAY_STEELBREAKER_AGGRO                      = 0,
+    SAY_STEELBREAKER_SLAY                       = 1,
+    SAY_STEELBREAKER_POWER                      = 2,
+    SAY_STEELBREAKER_DEATH                      = 3,
+    SAY_STEELBREAKER_ENCOUNTER_DEFEATED         = 4,
+    SAY_STEELBREAKER_BERSERK                    = 5,
 
-    // steelbreaker
-    SOUND_SB_AGGRO              = 15674,
-    SOUND_SB_SLAY1              = 15675,
-    SOUND_SB_SLAY2              = 15676,
-    SOUND_SB_POWER              = 15677,
-    SOUND_SB_DEATH1             = 15678,
-    SOUND_SB_DEATH2             = 15679,
-    SOUND_SB_BERSERK            = 15680,
+    SAY_MOLGEIM_AGGRO                           = 0,
+    SAY_MOLGEIM_SLAY                            = 1,
+    SAY_MOLGEIM_RUNE_DEATH                      = 2,
+    SAY_MOLGEIM_SUMMON                          = 3,
+    SAY_MOLGEIM_DEATH                           = 4,
+    SAY_MOLGEIM_ENCOUNTER_DEFEATED              = 5,
+    SAY_MOLGEIM_BERSERK                         = 6,
 
-    // brundir
-    SOUND_BRUNDIR_AGGRO         = 15684,
-    SOUND_BRUNDIR_SLAY1         = 15685,
-    SOUND_BRUNDIR_SLAY2         = 15686,
-    SOUND_BRUNDIR_POWER         = 15687,
-    SOUND_BRUNDIR_FLIGHT        = 15688,
-    SOUND_BRUNDIR_DEATH1        = 15689,
-    SOUND_BRUNDIR_DEATH2        = 15690,
-    SOUND_BRUNDIR_BERSERK       = 15691,
+    SAY_BRUNDIR_AGGRO                           = 0,
+    SAY_BRUNDIR_SLAY                            = 1,
+    SAY_BRUNDIR_SPECIAL                         = 2,
+    SAY_BRUNDIR_FLIGHT                          = 3,
+    SAY_BRUNDIR_DEATH                           = 4,
+    SAY_BRUNDIR_ENCOUNTER_DEFEATED              = 5,
+    SAY_BRUNDIR_BERSERK                         = 6,
+    EMOTE_BRUNDIR_OVERLOAD                      = 7
 };
 
 enum Misc
@@ -190,7 +185,7 @@ class boss_steelbreaker : public CreatureScript
 public:
     boss_steelbreaker() : CreatureScript("boss_steelbreaker") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_steelbreakerAI (pCreature);
     }
@@ -206,7 +201,7 @@ public:
         InstanceScript* pInstance;
         uint8 _phase;
 
-        void Reset()
+        void Reset() override
         {
             me->SetLootMode(0);
             RespawnAssemblyOfIron(pInstance, me);
@@ -217,13 +212,13 @@ public:
                 pInstance->SetData(TYPE_ASSEMBLY, NOT_STARTED);
         }
 
-        void JustReachedHome()
+        void JustReachedHome() override
         {
             me->setActive(false);
             me->RemoveAllAuras();
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             if (pInstance)
                 pInstance->SetData(TYPE_ASSEMBLY, IN_PROGRESS);
@@ -242,16 +237,13 @@ public:
                 switch (boss->GetEntry())
                 {
                 case NPC_STEELBREAKER:
-                    boss->MonsterYell("You will not defeat the Assembly of Iron so easily, invaders!", LANG_UNIVERSAL, 0);
-                    boss->PlayDirectSound(SOUND_SB_AGGRO);
+                    boss->AI()->Talk(SAY_STEELBREAKER_AGGRO);
                     break;
                 case NPC_MOLGEIM:
-                    boss->MonsterYell("Nothing short of total decimation will suffice.", LANG_UNIVERSAL, 0);
-                    boss->PlayDirectSound(SOUND_MOLGEIM_AGGRO);
+                    boss->AI()->Talk(SAY_MOLGEIM_AGGRO);
                     break;
                 case NPC_BRUNDIR:
-                    boss->MonsterYell("Whether the world's greatest gnats or the world's greatest heroes, you're still only mortal!", LANG_UNIVERSAL, 0);
-                    boss->PlayDirectSound(SOUND_BRUNDIR_AGGRO);
+                    boss->AI()->Talk(SAY_BRUNDIR_AGGRO);
                     break;
                 }
             }
@@ -284,7 +276,7 @@ public:
             }
         }
 
-        void JustDied(Unit*  /*Killer*/)
+        void JustDied(Unit*  /*Killer*/) override
         {
             if (!pInstance)
                 return;
@@ -293,58 +285,40 @@ public:
             {
                 pInstance->SetData(TYPE_ASSEMBLY, DONE);
                 me->CastSpell(me, 65195, true); // credit
+                Talk(SAY_STEELBREAKER_ENCOUNTER_DEFEATED);
             }
             else
             {
                 RestoreAssemblyHealth(pInstance->GetData64(DATA_BRUNDIR), pInstance->GetData64(DATA_MOLGEIM), me);
                 me->CastSpell(me, SPELL_SUPERCHARGE, true);
-            }
-            
-            if (urand(0,1))
-            {
-                me->MonsterYell("My death only serves to hasten your demise.", LANG_UNIVERSAL, 0);
-                me->PlayDirectSound(SOUND_SB_DEATH1);
-            }
-            else
-            {
-                me->MonsterYell("Impossible!", LANG_UNIVERSAL, 0);
-                me->PlayDirectSound(SOUND_SB_DEATH2);
+                Talk(SAY_STEELBREAKER_DEATH);
             }
         }
 
-        void KilledUnit(Unit* who)
+        void KilledUnit(Unit* who) override
         {
             if (_phase == 3)
                 me->CastSpell(me, SPELL_ELECTRICAL_CHARGE, true);
 
-            if (who->GetTypeId() != TYPEID_PLAYER || urand(0,2))
+            if (who->GetTypeId() != TYPEID_PLAYER)
                 return;
 
-            if (urand(0,1))
-            {
-                me->MonsterYell("So fragile and weak!", LANG_UNIVERSAL, 0);
-                me->PlayDirectSound(SOUND_SB_SLAY1);
-            }
-            else
-            {
-                me->MonsterYell("Flesh... such a hindrance.", LANG_UNIVERSAL, 0);
-                me->PlayDirectSound(SOUND_SB_SLAY2);
-            }
+            Talk(SAY_STEELBREAKER_SLAY);
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (param == ACTION_ADD_CHARGE)
                 me->CastSpell(me, SPELL_ELECTRICAL_CHARGE, true);
         }
 
-        void SpellHit(Unit*  /*caster*/, const SpellInfo* spellInfo)
+        void SpellHit(Unit*  /*caster*/, const SpellInfo* spellInfo) override
         {
             if (spellInfo->Id == SPELL_SUPERCHARGE)
                 UpdatePhase();
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -357,23 +331,21 @@ public:
             {
                 case EVENT_FUSION_PUNCH:
                     me->CastSpell(me->GetVictim(), SPELL_FUSION_PUNCH, false);
-                    events.RepeatEvent(15000 + rand()%5000);
+                    events.RepeatEvent(urand(15000,20000));
                     break;
                 case EVENT_STATIC_DISRUPTION:
                     if (Unit *pTarget = SelectTarget(SELECT_TARGET_FARTHEST, 0, 0, true))
                         me->CastSpell(pTarget, SPELL_STATIC_DISRUPTION, false);
 
-                    events.RepeatEvent(20000 + rand()%20000);
+                    events.RepeatEvent(urand(20000,40000));
                     break;
                 case EVENT_OVERWHELMING_POWER:
-                    me->MonsterYell("You seek the secrets of Ulduar? Then take them!", LANG_UNIVERSAL, 0);
-                    me->PlayDirectSound(SOUND_SB_POWER);
+                    Talk(SAY_STEELBREAKER_POWER);
                     me->CastSpell(me->GetVictim(), SPELL_OVERWHELMING_POWER, true);
                     events.RepeatEvent(RAID_MODE(61000, 36000));
                     break;
                 case EVENT_ENRAGE:
-                    me->MonsterYell("This meeting of the Assembly of Iron is adjourned!", LANG_UNIVERSAL, 0);
-                    me->PlayDirectSound(SOUND_SB_BERSERK);
+                    Talk(SAY_STEELBREAKER_BERSERK);
                     me->CastSpell(me, SPELL_BERSERK, true);
                     events.PopEvent();
                     break;
@@ -389,7 +361,7 @@ class CastRunesEvent : public BasicEvent
     public:
         CastRunesEvent(Creature& owner) : BasicEvent(), _owner(owner) { }
 
-        bool Execute(uint64 /*eventTime*/, uint32 /*diff*/)
+        bool Execute(uint64 /*eventTime*/, uint32 /*diff*/) override
         {
             if (!_owner.IsInCombat())
                 _owner.CastSpell(&_owner, SPELL_RUNE_OF_POWER_OOC_CHANNEL, true);
@@ -405,7 +377,7 @@ class boss_runemaster_molgeim : public CreatureScript
 public:
     boss_runemaster_molgeim() : CreatureScript("boss_runemaster_molgeim") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_runemaster_molgeimAI (pCreature);
     }
@@ -422,7 +394,7 @@ public:
         EventMap events;
         uint8 _phase;
 
-        void Reset()
+        void Reset() override
         {
             me->SetLootMode(0);
             RespawnAssemblyOfIron(pInstance, me);
@@ -437,13 +409,13 @@ public:
             me->m_Events.AddEvent(new CastRunesEvent(*me), me->m_Events.CalculateTime(8000));
         }
 
-        void JustReachedHome()
+        void JustReachedHome() override
         {
             me->setActive(false);
             me->RemoveAllAuras();
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             me->InterruptNonMeleeSpells(false);
             me->setActive(true);
@@ -478,12 +450,12 @@ public:
                     break;
                 case 3:
                     me->ResetLootMode();
-                    events.RescheduleEvent(EVENT_RUNE_OF_SUMMONING, 20000+rand()%10000);
+                    events.RescheduleEvent(EVENT_RUNE_OF_SUMMONING, urand(20000,30000));
                     break;
             }
         }
 
-        void JustDied(Unit*  /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             if (!pInstance)
                 return;
@@ -492,49 +464,31 @@ public:
             {
                 pInstance->SetData(TYPE_ASSEMBLY, DONE);
                 me->CastSpell(me, 65195, true); // credit
+                Talk(SAY_MOLGEIM_ENCOUNTER_DEFEATED);
             }
             else
             {
                 RestoreAssemblyHealth(pInstance->GetData64(DATA_STEELBREAKER), pInstance->GetData64(DATA_BRUNDIR), me);
                 me->CastSpell(me, SPELL_SUPERCHARGE, true);
-            }
-
-            if (urand(0,1))
-            {
-                me->MonsterYell("The legacy of storms shall not be undone.", LANG_UNIVERSAL, 0);
-                me->PlayDirectSound(SOUND_MOLGEIM_DEATH1);
-            }
-            else
-            {
-                me->MonsterYell("What have you gained from my defeat? You are no less doomed, mortals!", LANG_UNIVERSAL, 0);
-                me->PlayDirectSound(SOUND_MOLGEIM_DEATH2);
+                Talk(SAY_MOLGEIM_DEATH);
             }
         }
 
-        void KilledUnit(Unit *who)
+        void KilledUnit(Unit* who) override
         {
-            if (who->GetTypeId() != TYPEID_PLAYER || urand(0,2))
+            if (who->GetTypeId() != TYPEID_PLAYER)
                 return;
 
-            if (urand(0,1))
-            {
-                me->MonsterYell("The world suffers yet another insignificant loss.", LANG_UNIVERSAL, 0);
-                me->PlayDirectSound(SOUND_MOLGEIM_SLAY1);
-            }
-            else
-            {
-                me->MonsterYell("Death is the price of your arrogance.", LANG_UNIVERSAL, 0);
-                me->PlayDirectSound(SOUND_MOLGEIM_SLAY2);
-            }
+            Talk(SAY_MOLGEIM_SLAY);
         }
 
-        void SpellHit(Unit*  /*caster*/, const SpellInfo* spellInfo)
+        void SpellHit(Unit*  /*caster*/, const SpellInfo* spellInfo) override
         {
             if (spellInfo->Id == SPELL_SUPERCHARGE)
                 UpdatePhase();
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -557,28 +511,24 @@ public:
                 }
                 case EVENT_SHIELD_OF_RUNES:
                     me->CastSpell(me, SPELL_SHIELD_OF_RUNES, false);
-                    events.RescheduleEvent(EVENT_SHIELD_OF_RUNES, 27000+ rand()%7000);
+                    events.RescheduleEvent(EVENT_SHIELD_OF_RUNES, urand(27000,34000));
                     break;
                 case EVENT_RUNE_OF_DEATH:
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
                         me->CastSpell(target, SPELL_RUNE_OF_DEATH, true);
 
-                    me->MonsterYell("Decipher this!", LANG_UNIVERSAL, 0);
-                    me->PlayDirectSound(SOUND_MOLGEIM_POWER);
-                    events.RepeatEvent(30000+ rand()%10000);
+                    Talk(SAY_MOLGEIM_RUNE_DEATH);
+                    events.RepeatEvent(urand(30000,40000));
                     break;
                 case EVENT_RUNE_OF_SUMMONING:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
-                        me->SummonCreature(CREATURE_RUNE_OF_SUMMONING, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 11000);
-
-                    me->MonsterYell("Face the lightning surge!", LANG_UNIVERSAL, 0);
-                    me->PlayDirectSound(SOUND_MOLGEIM_SUMMON);
-                    events.RepeatEvent(20000+rand()%10000);
+                    Talk(SAY_MOLGEIM_SUMMON);
+                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                        me->CastSpell(target,SPELL_RUNE_OF_SUMMONING);
+                    events.RepeatEvent(urand(30000,45000));
                     break;
                 case EVENT_ENRAGE:
                     me->CastSpell(me, SPELL_BERSERK, true);
-                    me->MonsterYell("This meeting of the Assembly of Iron is adjourned!", LANG_UNIVERSAL, 0);
-                    me->PlayDirectSound(SOUND_MOLGEIM_BERSERK);
+                    Talk(SAY_MOLGEIM_BERSERK);
                     events.PopEvent();
                     break;
             }
@@ -593,7 +543,7 @@ class npc_assembly_lightning : public CreatureScript
 public:
     npc_assembly_lightning() : CreatureScript("npc_assembly_lightning") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_assembly_lightningAI (pCreature);
     }
@@ -605,15 +555,15 @@ public:
             _boomed = false;
         }
 
-        void MoveInLineOfSight(Unit*) {}
-        void AttackStart(Unit*) {}
-        void UpdateAI(uint32) {}
-        void EnterEvadeMode() {}
-        void OnCharmed(bool /*apply*/) {}
+        void MoveInLineOfSight(Unit*) override {}
+        void AttackStart(Unit*) override {}
+        void UpdateAI(uint32) override {}
+        void EnterEvadeMode() override {}
+        void OnCharmed(bool /*apply*/) override {}
 
         bool _boomed;
 
-        void Reset()
+        void Reset() override
         {
             if (Player* target = SelectTargetFromPlayerList(150))
                 me->GetMotionMaster()->MoveFollow(target, 0.0f, 0.0f);
@@ -621,7 +571,7 @@ public:
                 me->DespawnOrUnsummon(1);
         }
 
-        void MovementInform(uint32 type, uint32  /*id*/)
+        void MovementInform(uint32 type, uint32  /*id*/) override
         {
             if (type == FOLLOW_MOTION_TYPE && !_boomed)
             {
@@ -638,7 +588,7 @@ class boss_stormcaller_brundir : public CreatureScript
 public:
     boss_stormcaller_brundir() : CreatureScript("boss_stormcaller_brundir") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_stormcaller_brundirAI (pCreature);
     }
@@ -659,7 +609,7 @@ public:
 
         bool _stunnedAchievement;
 
-        void Reset()
+        void Reset() override
         {
             me->SetLootMode(0);
             RespawnAssemblyOfIron(pInstance, me);
@@ -667,7 +617,7 @@ public:
             _channelTimer = 0;
             _phase = 0;
             _flyPhase = false;
-            _flyTarget = NULL;
+            _flyTarget = nullptr;
             _stunnedAchievement = true;
 
             events.Reset();
@@ -681,13 +631,13 @@ public:
                 pInstance->SetData(TYPE_ASSEMBLY, NOT_STARTED);
         }
 
-        void JustReachedHome()
+        void JustReachedHome() override
         {
             me->setActive(false);
             me->RemoveAllAuras();
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             me->InterruptNonMeleeSpells(false);
             me->setActive(true);
@@ -714,21 +664,21 @@ public:
             switch (_phase)
             {
                 case 1:
-                    events.RescheduleEvent(EVENT_CHAIN_LIGHTNING, 9000+ rand()%8000);
-                    events.RescheduleEvent(EVENT_OVERLOAD, 25000+ rand()%15000);
+                    events.RescheduleEvent(EVENT_CHAIN_LIGHTNING, urand(9000,17000));
+                    events.RescheduleEvent(EVENT_OVERLOAD, urand(25000,40000));
                     break;
                 case 2:
-                    events.RescheduleEvent(EVENT_LIGHTNING_WHIRL, 20000+ rand()%20000);
+                    events.RescheduleEvent(EVENT_LIGHTNING_WHIRL, urand(20000,40000));
                     break;
                 case 3:
                     me->ResetLootMode();
                     me->CastSpell(me, SPELL_STORMSHIELD, true);
-                    events.RescheduleEvent(EVENT_LIGHTNING_TENDRILS, 15000+ rand()%1000);
+                    events.RescheduleEvent(EVENT_LIGHTNING_TENDRILS, urand(15000,16000));
                     break;
             }
         }
 
-        void JustDied(Unit*  /*Killer*/)
+        void JustDied(Unit*  /*Killer*/) override
         {
             if (!pInstance)
                 return;
@@ -737,55 +687,37 @@ public:
             {
                 pInstance->SetData(TYPE_ASSEMBLY, DONE);
                 me->CastSpell(me, 65195, true); // credit
+                Talk(SAY_BRUNDIR_ENCOUNTER_DEFEATED);
             }
             else
             {
                 RestoreAssemblyHealth(pInstance->GetData64(DATA_STEELBREAKER), pInstance->GetData64(DATA_MOLGEIM), me);
                 me->CastSpell(me, SPELL_SUPERCHARGE, true);
-            }
-
-            if (urand(0,1))
-            {
-                me->MonsterYell("The power of the storm lives on...", LANG_UNIVERSAL, 0);
-                me->PlayDirectSound(SOUND_BRUNDIR_DEATH1);
-            }
-            else
-            {
-                me->MonsterYell("You rush headlong into the maw of madness!", LANG_UNIVERSAL, 0);
-                me->PlayDirectSound(SOUND_BRUNDIR_DEATH2);
+                Talk(SAY_BRUNDIR_DEATH);
             }
         }
 
-        void KilledUnit(Unit *who)
+        void KilledUnit(Unit* who) override
         {
             if (who->GetTypeId() != TYPEID_PLAYER || urand(0,2))
                 return;
 
-            if (urand(0,1))
-            {
-                me->MonsterYell("A merciful kill!", LANG_UNIVERSAL, 0);
-                me->PlayDirectSound(SOUND_BRUNDIR_SLAY1);
-            }
-            else
-            {
-                me->MonsterYell("HAH!", LANG_UNIVERSAL, 0);
-                me->PlayDirectSound(SOUND_BRUNDIR_SLAY2);
-            }
+            Talk(SAY_BRUNDIR_SLAY);
         }
 
-        void SpellHit(Unit*  /*caster*/, const SpellInfo* spellInfo)
+        void SpellHit(Unit*  /*caster*/, const SpellInfo* spellInfo) override
         {
             if (spellInfo->Id == SPELL_SUPERCHARGE)
                 UpdatePhase();
         }
 
-        void SpellHitTarget(Unit*  /*target*/, const SpellInfo* spellInfo)
+        void SpellHitTarget(Unit*  /*target*/, const SpellInfo* spellInfo) override
         {
             if (spellInfo->Id == SPELL_CHAIN_LIGHTNING || spellInfo->Id == uint32(RAID_MODE(61916, 63482))) // Lightning Whirl triggered
                 _stunnedAchievement = false;
         }
 
-        uint32 GetData(uint32 param) const
+        uint32 GetData(uint32 param) const override
         {
             if (param == DATA_BRUNDIR)
                 return _stunnedAchievement;
@@ -793,13 +725,13 @@ public:
             return 0;
         }
 
-        void MovementInform(uint32 type, uint32 point)
+        void MovementInform(uint32 type, uint32 point) override
         {
             if (type == POINT_MOTION_TYPE && point == POINT_CHANNEL_STEELBREAKER)
                 me->CastSpell(me, SPELL_LIGHTNING_CHANNEL_PRE, true);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!me->IsInCombat() && me->GetReactState() == REACT_AGGRESSIVE)
             {
@@ -836,7 +768,7 @@ public:
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
                         me->CastSpell(target, SPELL_CHAIN_LIGHTNING, false);
 
-                    events.RepeatEvent(9000+ rand()%8000);
+                    events.RepeatEvent(urand(9000,17000));
                     break;
                 case EVENT_IMMUNE:
                     me->ApplySpellImmune(1, IMMUNITY_EFFECT, SPELL_EFFECT_INTERRUPT_CAST, false);
@@ -844,23 +776,22 @@ public:
                     break;
                 case EVENT_OVERLOAD:
                     me->ApplySpellImmune(1, IMMUNITY_EFFECT, SPELL_EFFECT_INTERRUPT_CAST, true);
+                    Talk(EMOTE_BRUNDIR_OVERLOAD);
                     me->CastSpell(me, SPELL_OVERLOAD, true);
-                    events.RescheduleEvent(EVENT_OVERLOAD, 25000+ rand()%15000);
+                    events.RescheduleEvent(EVENT_OVERLOAD, urand(25000,40000));
                     events.RescheduleEvent(EVENT_IMMUNE, 5999);
                     break;
                 case EVENT_LIGHTNING_WHIRL:
-                    me->MonsterYell("Stand still and stare into the light!", LANG_UNIVERSAL, 0);
-                    me->PlayDirectSound(SOUND_BRUNDIR_POWER);
+                    Talk(SAY_BRUNDIR_SPECIAL);
                     me->CastSpell(me, SPELL_LIGHTNING_WHIRL, true);
-                    events.RepeatEvent(10000+ rand()%15000);
+                    events.RepeatEvent(urand(10000,25000));
                     break;
                 case EVENT_LIGHTNING_TENDRILS:
                 {
                     // Reschedule old
                     events.RepeatEvent(35000);
                     events.DelayEvents(18000);
-                    me->MonsterYell("Let the storm clouds rise and rain down death from above!", LANG_UNIVERSAL, 0);
-                    me->PlayDirectSound(SOUND_BRUNDIR_FLIGHT);
+                    Talk(SAY_BRUNDIR_FLIGHT);
                     
                     _flyPhase = true;
                     _flyTarget = me->GetVictim();
@@ -898,7 +829,7 @@ public:
                         me->Attack(_flyTarget, false);
 
                     me->SetRegeneratingHealth(true);
-                    _flyTarget = NULL;
+                    _flyTarget = nullptr;
                     me->RemoveAura(SPELL_LIGHTNING_TENDRILS);
                     me->RemoveAura(61883);
                     DoResetThreat();
@@ -906,8 +837,7 @@ public:
                     me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_INTERRUPT_CAST, false);
                     break;
                 case EVENT_ENRAGE:
-                    me->MonsterYell("This meeting of the Assembly of Iron is adjourned!", LANG_UNIVERSAL, 0);
-                    me->PlayDirectSound(SOUND_BRUNDIR_BERSERK);
+                    Talk(SAY_BRUNDIR_BERSERK);
                     me->CastSpell(me, SPELL_BERSERK, true);
                     events.PopEvent();
                     break;
@@ -935,13 +865,13 @@ class spell_shield_of_runes : public SpellScriptLoader
                         owner->CastSpell(owner, SPELL_SHIELD_OF_RUNES_BUFF, false);
             }
 
-            void Register()
+            void Register() override
             {
                  AfterEffectRemove += AuraEffectRemoveFn(spell_shield_of_runes_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB, AURA_EFFECT_HANDLE_REAL);
             }
         };
 
-        AuraScript* GetAuraScript() const
+        AuraScript* GetAuraScript() const override
         {
             return new spell_shield_of_runes_AuraScript();
         }
@@ -963,13 +893,13 @@ class spell_assembly_meltdown : public SpellScriptLoader
                         Steelbreaker->AI()->DoAction(ACTION_ADD_CHARGE);
             }
 
-            void Register()
+            void Register() override
             {
                 OnEffectHitTarget += SpellEffectFn(spell_assembly_meltdown_SpellScript::HandleInstaKill, EFFECT_1, SPELL_EFFECT_INSTAKILL);
             }
         };
 
-        SpellScript* GetSpellScript() const
+        SpellScript* GetSpellScript() const override
         {
             return new spell_assembly_meltdown_SpellScript();
         }
@@ -986,18 +916,25 @@ class spell_assembly_rune_of_summoning : public SpellScriptLoader
 
             void OnPeriodic(AuraEffect const* aurEff)
             {
-                if (Unit* caster = GetCaster())
-                    if (aurEff->GetTickNumber() % 2 == 0)
-                        caster->SummonCreature(CREATURE_LIGHTNING_ELEMENTAL, caster->GetPositionX(), caster->GetPositionY(), caster->GetPositionZ(), 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2000);
+                PreventDefaultAction();
+                if (aurEff->GetTickNumber() % 2 == 0)
+                    GetTarget()->CastSpell(GetTarget(), SPELL_RUNE_OF_SUMMONING_SUMMON, true, nullptr, aurEff, GetTarget()->IsSummon() ? GetTarget()->ToTempSummon()->GetSummonerGUID() : 0);
             }
 
-            void Register()
+            void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+            {
+                if (TempSummon* summ = GetTarget()->ToTempSummon())
+                    summ->DespawnOrUnsummon(1);
+            }
+
+            void Register() override
             {
                 OnEffectPeriodic += AuraEffectPeriodicFn(spell_assembly_rune_of_summoning_AuraScript::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
+                OnEffectRemove += AuraEffectRemoveFn(spell_assembly_rune_of_summoning_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
             }
         };
 
-        AuraScript* GetAuraScript() const
+        AuraScript* GetAuraScript() const override
         {
             return new spell_assembly_rune_of_summoning_AuraScript();
         }
@@ -1011,7 +948,7 @@ class achievement_assembly_of_iron : public AchievementCriteriaScript
         {
         }
 
-        bool OnCheck(Player*  /*player*/, Unit* target)
+        bool OnCheck(Player*  /*player*/, Unit* target) override
         {
             return target && target->GetAuraCount(SPELL_SUPERCHARGE) >= 2 && (!_targetEntry || target->GetEntry() == _targetEntry);
         }
@@ -1025,7 +962,7 @@ class achievement_cant_do_that_while_stunned : public AchievementCriteriaScript
     public:
         achievement_cant_do_that_while_stunned() : AchievementCriteriaScript("achievement_cant_do_that_while_stunned") {}
 
-        bool OnCheck(Player*  /*player*/, Unit* target)
+        bool OnCheck(Player*  /*player*/, Unit* target) override
         {
             bool allow = target && target->GetAuraCount(SPELL_SUPERCHARGE) >= 2;
             if (!allow)

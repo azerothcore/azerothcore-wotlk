@@ -98,7 +98,7 @@ enum SMART_EVENT
     SMART_EVENT_EVADE                    = 7,       // NONE
     SMART_EVENT_SPELLHIT                 = 8,       // SpellID, School, CooldownMin, CooldownMax
     SMART_EVENT_RANGE                    = 9,       // MinDist, MaxDist, RepeatMin, RepeatMax
-    SMART_EVENT_OOC_LOS                  = 10,      // NoHostile, MaxRnage, CooldownMin, CooldownMax
+    SMART_EVENT_OOC_LOS                  = 10,      // NoHostile, MaxRnage, CooldownMin, CooldownMax, PlayerOnly
     SMART_EVENT_RESPAWN                  = 11,      // type, MapId, ZoneId
     SMART_EVENT_TARGET_HEALTH_PCT        = 12,      // HPMin%, HPMax%, RepeatMin, RepeatMax
     SMART_EVENT_VICTIM_CASTING           = 13,      // RepeatMin, RepeatMax, spellid
@@ -114,7 +114,7 @@ enum SMART_EVENT
     SMART_EVENT_HAS_AURA                 = 23,      // Param1 = SpellID, Param2 = Stack amount, Param3/4 RepeatMin, RepeatMax
     SMART_EVENT_TARGET_BUFFED            = 24,      // Param1 = SpellID, Param2 = Stack amount, Param3/4 RepeatMin, RepeatMax
     SMART_EVENT_RESET                    = 25,      // Called after combat, when the creature respawn and spawn.
-    SMART_EVENT_IC_LOS                   = 26,      // NoHostile, MaxRnage, CooldownMin, CooldownMax
+    SMART_EVENT_IC_LOS                   = 26,      // NoHostile, MaxRnage, CooldownMin, CooldownMax, PlayerOnly
     SMART_EVENT_PASSENGER_BOARDED        = 27,      // CooldownMin, CooldownMax
     SMART_EVENT_PASSENGER_REMOVED        = 28,      // CooldownMin, CooldownMax
     SMART_EVENT_CHARMED                  = 29,      // NONE
@@ -208,6 +208,7 @@ struct SmartEvent
             uint32 maxDist;
             uint32 cooldownMin;
             uint32 cooldownMax;
+            uint32 playerOnly;
         } los;
 
         struct
@@ -1564,7 +1565,7 @@ struct SmartScriptHolder
 
 };
 
-typedef UNORDERED_MAP<uint32, WayPoint*> WPPath;
+typedef std::unordered_map<uint32, WayPoint*> WPPath;
 
 typedef std::list<WorldObject*> ObjectList;
 typedef std::list<uint64> GuidList;
@@ -1618,7 +1619,7 @@ public:
         delete m_guidList;
     }
 };
-typedef UNORDERED_MAP<uint32, ObjectGuidList*> ObjectListMap;
+typedef std::unordered_map<uint32, ObjectGuidList*> ObjectListMap;
 
 class SmartWaypointMgr
 {
@@ -1637,7 +1638,7 @@ class SmartWaypointMgr
         }
 
     private:
-        UNORDERED_MAP<uint32, WPPath*> waypoint_map;
+        std::unordered_map<uint32, WPPath*> waypoint_map;
 };
 
 // all events for a single entry
@@ -1645,7 +1646,7 @@ typedef std::vector<SmartScriptHolder> SmartAIEventList;
 typedef std::list<SmartScriptHolder> SmartAIEventStoredList;
 
 // all events for all entries / guids
-typedef UNORDERED_MAP<int32, SmartAIEventList> SmartAIEventMap;
+typedef std::unordered_map<int32, SmartAIEventList> SmartAIEventMap;
 
 class SmartAIMgr
 {

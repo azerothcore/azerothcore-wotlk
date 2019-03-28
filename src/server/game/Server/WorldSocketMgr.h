@@ -13,8 +13,6 @@
 #ifndef __WORLDSOCKETMGR_H
 #define __WORLDSOCKETMGR_H
 
-
-
 class WorldSocket;
 class ReactorRunnable;
 
@@ -28,7 +26,7 @@ public:
     virtual ~WorldSocketMgr();
 
     /// Start network, listen at address:port .
-    int StartNetwork(ACE_UINT16 port, const char* address);
+    int StartNetwork(uint16 port, const char* address);
 
     /// Stops all network threads, It will wait for all running threads .
     void StopNetwork();
@@ -39,7 +37,7 @@ public:
 private:
     int OnSocketOpen(WorldSocket* sock);
 
-    int StartReactiveIO(ACE_UINT16 port, const char* address);
+    int StartReactiveIO(uint16 port, const char* address);
 
 private:
     ReactorRunnable* m_NetThreads;

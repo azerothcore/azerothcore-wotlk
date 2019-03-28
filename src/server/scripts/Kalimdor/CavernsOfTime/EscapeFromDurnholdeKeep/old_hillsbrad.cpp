@@ -122,7 +122,7 @@ enum Events
     EVENT_SET_FACING            = 9,
     EVENT_KILL_ARMORER          = 10,
     EVENT_TALK_KILL_ARMORER     = 11,
-    
+
     EVENT_DRESSING_KNEEL        = 20,
     EVENT_DRESSING_ARMOR        = 21,
     EVENT_DRESSING_STAND        = 22,
@@ -182,12 +182,12 @@ class npc_thrall_old_hillsbrad : public CreatureScript
 public:
     npc_thrall_old_hillsbrad() : CreatureScript("npc_thrall_old_hillsbrad") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<npc_thrall_old_hillsbradAI>(creature);
     }
 
-    bool OnGossipHello(Player* player, Creature* creature)
+    bool OnGossipHello(Player* player, Creature* creature) override
     {
         InstanceScript* instance = creature->GetInstanceScript();
         if (!instance)
@@ -206,15 +206,15 @@ public:
         return true;
     }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32  /*sender*/, uint32  /*action*/)
+    bool OnGossipSelect(Player* player, Creature* creature, uint32  /*sender*/, uint32  /*action*/) override
     {
         GossipMenuItemData const* gossipMenuItemData = player->PlayerTalkClass->GetGossipMenu().GetItemData(0);
         InstanceScript* instance = creature->GetInstanceScript();
         if (!instance || (gossipMenuItemData && gossipMenuItemData->GossipActionMenuId != 0))
             return false;
 
-        player->PlayerTalkClass->ClearMenus();
-        player->CLOSE_GOSSIP_MENU();
+        ClearGossipMenuFor(player);
+        CloseGossipMenuFor(player);
 
         creature->AI()->DoAction(instance->GetData(DATA_ESCORT_PROGRESS));
         creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP|UNIT_NPC_FLAG_QUESTGIVER);
@@ -228,7 +228,7 @@ public:
             instance = creature->GetInstanceScript();
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             switch (param)
             {
@@ -267,7 +267,7 @@ public:
             }
         }
 
-        void WaypointStart(uint32 waypointId)
+        void WaypointStart(uint32 waypointId) override
         {
             switch (waypointId)
             {
@@ -277,7 +277,7 @@ public:
             }
         }
 
-        void WaypointReached(uint32 waypointId)
+        void WaypointReached(uint32 waypointId) override
         {
             switch (waypointId)
             {
@@ -420,7 +420,7 @@ public:
             me->SetSpeed(MOVE_RUN, SPEED_RUNNING);
         }
 
-        void MovementInform(uint32 type, uint32 point)
+        void MovementInform(uint32 type, uint32 point) override
         {
             npc_escortAI::MovementInform(type, point);
             if (type == POINT_MOTION_TYPE && point == 0xFFFFFF /*POINT_LAST_POINT*/)
@@ -432,7 +432,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit*)
+        void EnterCombat(Unit*) override
         {
             combatEvents.Reset();
             combatEvents.ScheduleEvent(EVENT_CHECK_HEALTH, 500);
@@ -449,7 +449,7 @@ public:
             }
         }
 
-        void Reset()
+        void Reset() override
         {
             _mounted = false;
             events.Reset();
@@ -458,28 +458,29 @@ public:
 
             me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP|UNIT_NPC_FLAG_QUESTGIVER);
             instance->SetData(DATA_THRALL_REPOSITION, 1);
-                
+
             uint32 data = instance->GetData(DATA_ESCORT_PROGRESS);
             if (data >= ENCOUNTER_PROGRESS_THRALL_ARMORED)
                 ReorderInstance(data);
         }
 
-        void KilledUnit(Unit*)
+        void KilledUnit(Unit*) override
         {
             Talk(SAY_RANDOM_KILL);
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             if (summon->GetEntry() == NPC_INFINITE_SLAYER || summon->GetEntry() == NPC_INFINITE_SABOTEUR || summon->GetEntry() == NPC_INFINITE_DEFILER)
                 summon->GetMotionMaster()->MovePoint(10, 2634.25f, 672.01f, 54.445f);
 
             summons.Summon(summon);
         }
-        void SummonedCreatureDespawn(Creature* summon) { summons.Despawn(summon); }
-        void SummonedCreatureDies(Creature* summon, Unit*) { summons.Despawn(summon); }
 
-        void JustDied(Unit* killer)
+        void SummonedCreatureDespawn(Creature* summon) override { summons.Despawn(summon); }
+        void SummonedCreatureDies(Creature* summon, Unit*) override { summons.Despawn(summon); }
+
+        void JustDied(Unit* killer) override
         {
             if (killer == me)
                 return;
@@ -494,7 +495,7 @@ public:
                 me->SetRespawnTime(DAY);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             npc_escortAI::UpdateAI(diff);
 
@@ -760,7 +761,7 @@ public:
             }
         }
 
-        void UpdateEscortAI(uint32 diff)
+        void UpdateEscortAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -794,7 +795,7 @@ public:
             Start(true, true);
             SetEscortPaused(true);
             SetDespawnAtEnd(false);
-            
+
             me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP|UNIT_NPC_FLAG_QUESTGIVER);
 
             if (data < ENCOUNTER_PROGRESS_THRALL_ARMORED)
@@ -826,7 +827,7 @@ public:
                     SetNextWaypoint(61, false);
                     break;
                 case ENCOUNTER_PROGRESS_TARETHA_MEET:
-                    SetNextWaypoint(95, false);                    
+                    SetNextWaypoint(95, false);
                     if (Creature* Taretha = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_TARETHA_GUID)))
                         Taretha->SetStandState(UNIT_STAND_STATE_STAND);
                     break;
@@ -848,12 +849,12 @@ class npc_taretha : public CreatureScript
 public:
     npc_taretha() : CreatureScript("npc_taretha") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<npc_tarethaAI>(creature);
     }
 
-    bool OnGossipHello(Player*  /*player*/, Creature*  /*creature*/)
+    bool OnGossipHello(Player*  /*player*/, Creature*  /*creature*/) override
     {
         return true;
     }
@@ -867,14 +868,14 @@ public:
 
         InstanceScript* instance;
 
-        void DoAction(int32  /*param*/)
+        void DoAction(int32 /*param*/) override
         {
             me->SetStandState(UNIT_STAND_STATE_STAND);
             me->RemoveAllAuras();
             Start(false, true);
         }
 
-        void WaypointReached(uint32 waypointId)
+        void WaypointReached(uint32 waypointId) override
         {
             if (waypointId == 7)
             {
@@ -888,14 +889,14 @@ public:
                 me->SetVisible(false);
         }
 
-        void Reset()
+        void Reset() override
         {
             me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
             me->CastSpell(me, SPELL_SHADOW_PRISON, true);
         }
 
-        void AttackStart(Unit*) { }
-        void MoveInLineOfSight(Unit*) { }
+        void AttackStart(Unit*) override { } 
+        void MoveInLineOfSight(Unit*) override { }
     };
 
 };

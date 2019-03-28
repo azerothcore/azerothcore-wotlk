@@ -2508,9 +2508,9 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 if (e.action.sendGossipMenu.gossipMenuId)
                     player->PrepareGossipMenu(GetBaseObject(), e.action.sendGossipMenu.gossipMenuId, true);
                 else
-                    player->PlayerTalkClass->ClearMenus();
+                    ClearGossipMenuFor(player);
 
-                player->SEND_GOSSIP_MENU(e.action.sendGossipMenu.gossipNpcTextId, GetBaseObject()->GetGUID());
+                SendGossipMenuFor(player, e.action.sendGossipMenu.gossipNpcTextId, GetBaseObject()->GetGUID());
             }
 
         delete targets;
@@ -3794,6 +3794,8 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
             if ((e.event.los.noHostile && !me->IsHostileTo(unit)) ||
                 (!e.event.los.noHostile && me->IsHostileTo(unit)))
             {
+                if (e.event.los.playerOnly && unit->GetTypeId() != TYPEID_PLAYER)
+                    return;
                 RecalcTimer(e, e.event.los.cooldownMin, e.event.los.cooldownMax);
                 ProcessAction(e, unit);
             }
@@ -3814,6 +3816,8 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
             if ((e.event.los.noHostile && !me->IsHostileTo(unit)) ||
                 (!e.event.los.noHostile && me->IsHostileTo(unit)))
             {
+                if (e.event.los.playerOnly && unit->GetTypeId() != TYPEID_PLAYER)
+                    return;
                 RecalcTimer(e, e.event.los.cooldownMin, e.event.los.cooldownMax);
                 ProcessAction(e, unit);
             }
