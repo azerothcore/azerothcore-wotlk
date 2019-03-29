@@ -204,21 +204,21 @@ GroupQueueInfo* BattlegroundQueue::AddGroup(Player * leader, Group * grp, PvPDif
                 if (!(*itr)->IsInvitedToBGInstanceGUID)
                     qHorde += (*itr)->Players.size();
 
-            // Show queue status to player only (when joining queue)
-            if (sWorld->getBoolConfig(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_PLAYERONLY))
+            // Show queue status to player only (when joining battleground queue or Arena and arena world announcer is disabled)
+            if (sWorld->getBoolConfig(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_PLAYERONLY) || (bgt->isArena() && !sWorld->getBoolConfig(CONFIG_ARENA_QUEUE_ANNOUNCER_ENABLE)))
             {
                 ChatHandler(leader->GetSession()).PSendSysMessage(LANG_BG_QUEUE_ANNOUNCE_SELF, bgName, q_min_level, q_max_level,
                     qAlliance, (MinPlayers > qAlliance) ? MinPlayers - qAlliance : (uint32)0, qHorde, (MinPlayers > qHorde) ? MinPlayers - qHorde : (uint32)0);
             }
-            // System message
-            else
+            // Show queue status to server (when joining battleground queue)
+            else if (!bgt->isArena())
             {
-                if (BGSpamProtection[leader->GetGUID()].last_queue == 0 && !bgt->isArena()) {
+                if (BGSpamProtection[leader->GetGUID()].last_queue == 0) {
                     BGSpamProtection[leader->GetGUID()].last_queue = sWorld->GetGameTime();
                     sWorld->SendWorldText(LANG_BG_QUEUE_ANNOUNCE_WORLD, bgName, q_min_level, q_max_level,
                         qAlliance + qHorde, MaxPlayers);
                 }
-                else if (sWorld->GetGameTime() - BGSpamProtection[leader->GetGUID()].last_queue >= 30 && !bgt->isArena()) {
+                else if (sWorld->GetGameTime() - BGSpamProtection[leader->GetGUID()].last_queue >= 30) {
                     BGSpamProtection[leader->GetGUID()].last_queue = 0;
                     sWorld->SendWorldText(LANG_BG_QUEUE_ANNOUNCE_WORLD, bgName, q_min_level, q_max_level,
                         qAlliance + qHorde, MaxPlayers);
