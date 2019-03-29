@@ -213,12 +213,14 @@ GroupQueueInfo* BattlegroundQueue::AddGroup(Player * leader, Group * grp, PvPDif
             // Show queue status to server (when joining battleground queue)
             else if (!bgt->isArena())
             {
-                if (BGSpamProtection[leader->GetGUID()].last_queue == 0) {
+                if (BGSpamProtection[leader->GetGUID()].last_queue == 0)
+                {
                     BGSpamProtection[leader->GetGUID()].last_queue = sWorld->GetGameTime();
                     sWorld->SendWorldText(LANG_BG_QUEUE_ANNOUNCE_WORLD, bgName, q_min_level, q_max_level,
                         qAlliance + qHorde, MaxPlayers);
                 }
-                else if (sWorld->GetGameTime() - BGSpamProtection[leader->GetGUID()].last_queue >= 30) {
+                else if (sWorld->GetGameTime() - BGSpamProtection[leader->GetGUID()].last_queue >= 30)
+                {
                     BGSpamProtection[leader->GetGUID()].last_queue = 0;
                     sWorld->SendWorldText(LANG_BG_QUEUE_ANNOUNCE_WORLD, bgName, q_min_level, q_max_level,
                         qAlliance + qHorde, MaxPlayers);
