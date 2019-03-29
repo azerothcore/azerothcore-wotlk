@@ -91,7 +91,7 @@ class MySQLConnection
         {
             /// Tries to acquire lock. If lock is acquired by another thread
             /// the calling parent will just try another connection
-            return m_Mutex.try_lock() != -1;
+            return m_Mutex.try_lock();
         }
 
         void Unlock()
