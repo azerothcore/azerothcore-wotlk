@@ -1,3 +1,19 @@
+-- DB update 2019_03_28_00 -> 2019_03_30_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2019_03_28_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2019_03_28_00 2019_03_30_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1553731839786525000'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1553731839786525000');
 
 DELETE FROM `creature` WHERE `guid` IN (3110330, 35237);
@@ -26,3 +42,12 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (@ENTRY, 0, 3, 0, 61, 0, 100, 0, 0, 0, 0, 0, 72, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 'On link - Action invoker: Close gossip // Fallen Hero of the Horde - On Gossip Option 1 Selected - Close Gossip'),
 (@ENTRY, 0, 4, 0, 19, 0, 100, 0, 2702, 0, 0, 0, 44, 3, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 'When player accepts quest 2702 - Action invoker: Set phase id to 3 // '),
 (@ENTRY, 0, 5, 0, 62, 0, 100, 0, 840, 2, 0, 0, 44, 3, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 'On gossip action 2 from menu 840 selected - Action invoker: Set phase id to 3 // ');
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
