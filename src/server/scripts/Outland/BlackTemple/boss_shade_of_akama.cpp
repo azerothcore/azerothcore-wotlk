@@ -411,7 +411,7 @@ class npc_akama_shade : public CreatureScript
             {
                 if (action == 0)
                 {
-                    player->CLOSE_GOSSIP_MENU();
+                    CloseGossipMenuFor(player);
                     me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
                     events2.ScheduleEvent(EVENT_AKAMA_START_ENCOUNTER, 0);
                 }

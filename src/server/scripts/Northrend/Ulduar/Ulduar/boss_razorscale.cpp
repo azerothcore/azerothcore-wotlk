@@ -457,7 +457,7 @@ public:
                         me->RemoveAura(SPELL_CHAIN_4);
                     }
                     me->CastSpell(me, SPELL_WINGBUFFET, true);
-                    
+
                     if( (me->GetHealth()*100) / me->GetMaxHealth() < 50 ) // start phase 3
                     {
                         me->SetControlled(false, UNIT_STATE_ROOT);
@@ -583,7 +583,7 @@ class npc_ulduar_expedition_commander : public CreatureScript
     public:
         npc_ulduar_expedition_commander() : CreatureScript("npc_ulduar_expedition_commander") { }
 
-        bool OnGossipHello(Player* player, Creature* creature)
+        bool OnGossipHello(Player* player, Creature* creature) override
         {
             if (!player || !creature)
                 return true;
@@ -599,12 +599,12 @@ class npc_ulduar_expedition_commander : public CreatureScript
             if (!razorscale || razorscale->IsInCombat())
                 return true;
 
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, TEXT_GOSSIP_ACTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
-            player->PlayerTalkClass->SendGossipMenu(40100, creature->GetGUID());
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, TEXT_GOSSIP_ACTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
+            SendGossipMenuFor(player, 40100, creature);
             return true;
         }
 
-        bool OnGossipSelect(Player* player, Creature* creature, uint32  /*uiSender*/, uint32 uiAction)
+        bool OnGossipSelect(Player* player, Creature* creature, uint32  /*uiSender*/, uint32 uiAction) override
         {
             if (!player || !creature)
                 return true;
@@ -636,7 +636,7 @@ class npc_ulduar_expedition_commander : public CreatureScript
             return true;
         }
 
-        CreatureAI* GetAI(Creature* creature) const
+        CreatureAI* GetAI(Creature* creature) const override
         {
             return GetInstanceAI<npc_ulduar_expedition_commanderAI>(creature);
         }
@@ -650,7 +650,7 @@ class npc_ulduar_expedition_commander : public CreatureScript
                 me->SetReactState(REACT_AGGRESSIVE);
             }
 
-            void MoveInLineOfSight(Unit* who)
+            void MoveInLineOfSight(Unit* who) override
             {
                 if (_introSpoken)
                     return;
@@ -687,7 +687,7 @@ public:
 
         InstanceScript* pInstance;
         uint8 repairPoints;
-        
+
         void Reset()
         {
             repairPoints = 0;
@@ -877,11 +877,11 @@ public:
 };
 
 class go_ulduar_working_harpoon : public GameObjectScript
-{ 
-public: 
-    go_ulduar_working_harpoon() : GameObjectScript("go_ulduar_working_harpoon") { } 
+{
+public:
+    go_ulduar_working_harpoon() : GameObjectScript("go_ulduar_working_harpoon") { }
 
-    bool OnGossipHello(Player* user, GameObject* go)
+    bool OnGossipHello(Player* user, GameObject* go) override
     {
         if( !user || !go )
             return true;
@@ -926,7 +926,7 @@ public:
         if( uint64 g = pInstance->GetData64(npc) )
             if( Creature* hfs = ObjectAccessor::GetCreature(*go, g) )
                 hfs->AI()->SetData(3, spell);
-        
+
         go->SetLootState(GO_JUST_DEACTIVATED);
         return true;
     }

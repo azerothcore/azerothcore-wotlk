@@ -793,7 +793,7 @@ class npc_akama_illidan : public CreatureScript
 
             void sGossipSelect(Player* player, uint32 /*sender*/, uint32  /*action*/)
             {
-                player->CLOSE_GOSSIP_MENU();
+                CloseGossipMenuFor(player);
                 me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
                 me->setActive(true);
 

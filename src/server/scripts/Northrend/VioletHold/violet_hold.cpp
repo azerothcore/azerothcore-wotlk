@@ -20,9 +20,9 @@ class go_vh_activation_crystal : public GameObjectScript
 public:
     go_vh_activation_crystal() : GameObjectScript("go_vh_activation_crystal") { }
 
-    bool OnGossipHello(Player*  /*pPlayer*/, GameObject* pGo)
+    bool OnGossipHello(Player*  /*player*/, GameObject* go) override
     {
-        if (InstanceScript* pInstance = pGo->GetInstanceScript())
+        if (InstanceScript* pInstance = go->GetInstanceScript())
             pInstance->SetData(DATA_ACTIVATE_DEFENSE_SYSTEM, 1);
         return true;
     }
@@ -41,42 +41,43 @@ class npc_vh_sinclari : public CreatureScript
 public:
     npc_vh_sinclari() : CreatureScript("npc_vh_sinclari") { }
 
-    bool OnGossipHello(Player* pPlayer, Creature* pCreature)
+    bool OnGossipHello(Player* player, Creature* creature) override
     {
-        if (InstanceScript* pInstance = pCreature->GetInstanceScript())
+        if (InstanceScript* pInstance = creature->GetInstanceScript())
             switch (pInstance->GetData(DATA_ENCOUNTER_STATUS))
             {
                 case NOT_STARTED:
-                    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+2);
-                    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_START_EVENT, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
-                    pPlayer->SEND_GOSSIP_MENU(13853, pCreature->GetGUID());
+                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+2);
+                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_START_EVENT, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
+                    SendGossipMenuFor(player, 13853, creature->GetGUID());
                     break;
                 case IN_PROGRESS:
-                    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_I_WANT_IN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+3);
-                    pPlayer->SEND_GOSSIP_MENU(13853, pCreature->GetGUID());
+                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_I_WANT_IN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+3);
+                    SendGossipMenuFor(player, 13853, creature->GetGUID());
                     break;
                 default: // DONE or invalid
-                    pPlayer->SEND_GOSSIP_MENU(13910, pCreature->GetGUID());
+                    SendGossipMenuFor(player, 13910, creature->GetGUID());
             }
         return true;
     }
 
-    bool OnGossipSelect(Player* pPlayer, Creature* pCreature, uint32 /*uiSender*/, uint32 uiAction)
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*uiSender*/, uint32 uiAction) override
     {
-        pPlayer->PlayerTalkClass->ClearMenus();
+        ClearGossipMenuFor(player);
+
         switch(uiAction)
         {
             case GOSSIP_ACTION_INFO_DEF+1:
-                pPlayer->CLOSE_GOSSIP_MENU();
-                if (InstanceScript *pInstance = pCreature->GetInstanceScript())
+                CloseGossipMenuFor(player);
+                if (InstanceScript *pInstance = creature->GetInstanceScript())
                     pInstance->SetData(DATA_START_INSTANCE, 1);
                 break;
             case GOSSIP_ACTION_INFO_DEF+2:
-                pPlayer->SEND_GOSSIP_MENU(13854, pCreature->GetGUID());
+                SendGossipMenuFor(player, 13854, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF+3:
-                pPlayer->NearTeleportTo(playerTeleportPosition.GetPositionX(), playerTeleportPosition.GetPositionY(), playerTeleportPosition.GetPositionZ(), playerTeleportPosition.GetOrientation(), true);
-                pPlayer->CLOSE_GOSSIP_MENU();
+                player->NearTeleportTo(playerTeleportPosition.GetPositionX(), playerTeleportPosition.GetPositionY(), playerTeleportPosition.GetPositionZ(), playerTeleportPosition.GetOrientation(), true);
+                CloseGossipMenuFor(player);
                 break;
         }
         return true;
@@ -101,9 +102,9 @@ class npc_vh_teleportation_portal : public CreatureScript
 public:
     npc_vh_teleportation_portal() : CreatureScript("npc_vh_teleportation_portal") { }
 
-    CreatureAI* GetAI(Creature *pCreature) const
+    CreatureAI* GetAI(Creature *creature) const
     {
-        return new npc_vh_teleportation_portalAI(pCreature);
+        return new npc_vh_teleportation_portalAI(creature);
     }
 
     struct npc_vh_teleportation_portalAI : public NullCreatureAI
@@ -390,7 +391,7 @@ struct violet_hold_trashAI : public npc_escortAI
 ***********/
 
 enum AzureInvaderSpells
-{   
+{
     SPELL_CLEAVE = 15496,
     SPELL_IMPALE_N = 58459,
     SPELL_IMPALE_H = 59256,
@@ -470,9 +471,9 @@ class npc_azure_invader : public CreatureScript
 public:
     npc_azure_invader() : CreatureScript("npc_azure_invader") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_azure_invaderAI (pCreature);
+        return new npc_azure_invaderAI (creature);
     }
 
     struct npc_azure_invaderAI : public violet_hold_trashAI
@@ -543,9 +544,9 @@ class npc_azure_binder : public CreatureScript
 public:
     npc_azure_binder() : CreatureScript("npc_azure_binder") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_azure_binderAI (pCreature);
+        return new npc_azure_binderAI (creature);
     }
 
     struct npc_azure_binderAI : public violet_hold_trashAI
@@ -616,9 +617,9 @@ class npc_azure_mage_slayer : public CreatureScript
 public:
     npc_azure_mage_slayer() : CreatureScript("npc_azure_mage_slayer") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_azure_mage_slayerAI (pCreature);
+        return new npc_azure_mage_slayerAI (creature);
     }
 
     struct npc_azure_mage_slayerAI : public violet_hold_trashAI
@@ -671,9 +672,9 @@ class npc_azure_raider : public CreatureScript
 public:
     npc_azure_raider() : CreatureScript("npc_azure_raider") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_azure_raiderAI (pCreature);
+        return new npc_azure_raiderAI (creature);
     }
 
     struct npc_azure_raiderAI : public violet_hold_trashAI
@@ -718,9 +719,9 @@ class npc_azure_stalker : public CreatureScript
 public:
     npc_azure_stalker() : CreatureScript("npc_azure_stalker") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_azure_stalkerAI (pCreature);
+        return new npc_azure_stalkerAI (creature);
     }
 
     struct npc_azure_stalkerAI : public violet_hold_trashAI
@@ -779,9 +780,9 @@ class npc_azure_spellbreaker : public CreatureScript
 public:
     npc_azure_spellbreaker() : CreatureScript("npc_azure_spellbreaker") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_azure_spellbreakerAI (pCreature);
+        return new npc_azure_spellbreakerAI (creature);
     }
 
     struct npc_azure_spellbreakerAI : public violet_hold_trashAI
@@ -854,9 +855,9 @@ class npc_azure_captain : public CreatureScript
 public:
     npc_azure_captain() : CreatureScript("npc_azure_captain") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_azure_captainAI (pCreature);
+        return new npc_azure_captainAI (creature);
     }
 
     struct  npc_azure_captainAI : public violet_hold_trashAI
@@ -901,9 +902,9 @@ class npc_azure_sorceror : public CreatureScript
 public:
     npc_azure_sorceror() : CreatureScript("npc_azure_sorceror") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_azure_sorcerorAI (pCreature);
+        return new npc_azure_sorcerorAI (creature);
     }
 
     struct  npc_azure_sorcerorAI : public violet_hold_trashAI
@@ -964,9 +965,9 @@ class npc_azure_saboteur : public CreatureScript
 public:
     npc_azure_saboteur() : CreatureScript("npc_azure_saboteur") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* creature) const
     {
-        return new npc_azure_saboteurAI (pCreature);
+        return new npc_azure_saboteurAI (creature);
     }
 
     struct npc_azure_saboteurAI : public npc_escortAI
@@ -1145,11 +1146,12 @@ class go_violet_hold_gate_lever : public GameObjectScript
 public:
     go_violet_hold_gate_lever() : GameObjectScript("go_violet_hold_gate_lever") { }
 
-    bool OnGossipHello(Player* plr, GameObject* go)
+    bool OnGossipHello(Player* player, GameObject* go) override
     {
         if (GameObject* gate = go->GetMap()->GetGameObject(MAKE_NEW_GUID(61606, 193019, HIGHGUID_GAMEOBJECT)))
             if (gate->getLootState() == GO_READY)
-                gate->UseDoorOrButton(0, false, plr);
+                gate->UseDoorOrButton(0, false, player);
+
         return false;
     }
 };

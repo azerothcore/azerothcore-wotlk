@@ -246,6 +246,12 @@ enum SpellCategory
     SPELL_CATEGORY_DRINK            = 59,
 };
 
+enum SpellVisualKit
+{
+    SPELL_VISUAL_KIT_FOOD           = 406,
+    SPELL_VISUAL_KIT_DRINK          = 438
+};
+
 const uint32 ItemQualityColors[MAX_ITEM_QUALITY] =
 {
     0xff9d9d9d,        //GREY
@@ -3269,23 +3275,6 @@ enum ResponseCodes
     CHAR_NAME_RUSSIAN_CONSECUTIVE_SILENT_CHARACTERS        = 0x65,
     CHAR_NAME_RUSSIAN_SILENT_CHARACTER_AT_BEGINNING_OR_END = 0x66,
     CHAR_NAME_DECLENSION_DOESNT_MATCH_BASE_NAME            = 0x67
-};
-
-/// Ban function modes
-enum BanMode
-{
-    BAN_ACCOUNT,
-    BAN_CHARACTER,
-    BAN_IP
-};
-
-/// Ban function return codes
-enum BanReturn
-{
-    BAN_SUCCESS,
-    BAN_SYNTAX_ERROR,
-    BAN_NOTFOUND,
-    BAN_LONGER_EXISTS
 };
 
 // indexes of BattlemasterList.dbc

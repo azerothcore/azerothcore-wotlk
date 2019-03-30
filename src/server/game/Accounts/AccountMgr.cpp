@@ -22,7 +22,7 @@ namespace AccountMgr
             return AOR_NAME_TOO_LONG;                           // username's too long
 
         if (utf8length(password) > MAX_PASS_STR)
-            return AccountOpResult::AOR_PASS_TOO_LONG;          // password's too long
+            return AOR_PASS_TOO_LONG;                           // password's too long
 
         normalizeString(username);
         normalizeString(password);
@@ -131,8 +131,8 @@ namespace AccountMgr
         if (utf8length(newUsername) > MAX_ACCOUNT_STR)
             return AOR_NAME_TOO_LONG;
 
-        if (utf8length(newPassword) > MAX_ACCOUNT_STR)
-            return AOR_PASS_TOO_LONG;
+        if (utf8length(newPassword) > MAX_PASS_STR)
+            return AOR_PASS_TOO_LONG;                           // password's too long
 
         normalizeString(newUsername);
         normalizeString(newPassword);
@@ -158,10 +158,10 @@ namespace AccountMgr
             return AOR_NAME_NOT_EXIST;                          // account doesn't exist
         }
 
-        if (utf8length(newPassword) > MAX_ACCOUNT_STR)
+        if (utf8length(newPassword) > MAX_PASS_STR)
         {
             sScriptMgr->OnFailedEmailChange(accountId);
-            return AOR_PASS_TOO_LONG;
+            return AOR_PASS_TOO_LONG;                           // password's too long
         }
 
         normalizeString(username);

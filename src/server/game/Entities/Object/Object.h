@@ -117,8 +117,8 @@ class Transport;
 class StaticTransport;
 class MotionTransport;
 
-typedef UNORDERED_MAP<Player*, UpdateData> UpdateDataMapType;
-typedef UNORDERED_SET<uint32> UpdatePlayerSet;
+typedef std::unordered_map<Player*, UpdateData> UpdateDataMapType;
+typedef std::unordered_set<uint32> UpdatePlayerSet;
 
 class Object
 {
@@ -920,6 +920,7 @@ class WorldObject : public Object, public WorldLocation
 
         // Low Level Packets
         void SendPlaySound(uint32 Sound, bool OnlySelf);
+        void SendPlayMusic(uint32 Music, bool OnlySelf);
 
         virtual void SetMap(Map* map);
         virtual void ResetMap();
