@@ -50,6 +50,7 @@ enum NXData
     DATA_DANCE_FAIL                 = 118,
     DATA_IMMORTAL_FAIL              = 119,
     DATA_KELTHUZAD_GATE             = 120,
+    DATA_HAD_THADDIUS_GREET         = 121,
 };
 
 enum NXGOs
@@ -82,6 +83,9 @@ enum NXGOs
     GO_THADDIUS_PORTAL              = 181576, //Thadius portal
     GO_MAEXXNA_PORTAL               = 181575, //Maexxna portal
     GO_HORSEMAN_PORTAL              = 181578, //Four Horseman portal
+
+    GO_CONS_NOX_TESLA_STALAGG       = 268049,
+    GO_CONS_NOX_TESLA_FEUGEN        = 268050
 };
 
 enum NXNPCs
@@ -117,7 +121,11 @@ enum NXMisc
     SPELL_FROGGER_EXPLODE           = 28433,
 
     // Actions
-    ACTION_SAPPHIRON_BIRTH          = 1
+    ACTION_SAPPHIRON_BIRTH          = 1,
+
+    // Sounds
+    // Background screams in instance if Thaddius still alive, four of them from 8873 to 8876
+    SOUND_SCREAM                    = 8873
 };
 
 enum NXSays

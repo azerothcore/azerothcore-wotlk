@@ -72,7 +72,7 @@ class boss_sapphiron : public CreatureScript
 public:
     boss_sapphiron() : CreatureScript("boss_sapphiron") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_sapphironAI (pCreature);
     }
@@ -91,7 +91,7 @@ public:
         std::list<uint64> blockList;
         uint64 currentTarget;
 
-        void InitializeAI()
+        void InitializeAI() override
         {
             me->SummonGameObject(GO_SAPPHIRON_BIRTH, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0, 0, 0, 0, 0, 0);
             me->SetVisible(false);
@@ -111,7 +111,7 @@ public:
             return true;
         }
 
-        void Reset()
+        void Reset() override
         {
             BossAI::Reset();
             if (me->IsVisible())
@@ -145,7 +145,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit * who)
+        void EnterCombat(Unit * who) override
         {
             BossAI::EnterCombat(who);
             EnterCombatSelfFunction();
@@ -160,25 +160,25 @@ public:
             events.ScheduleEvent(EVENT_HUNDRED_CLUB, 5000);
         }
 
-        void JustDied(Unit*  killer)
+        void JustDied(Unit*  killer) override
         {
             BossAI::JustDied(killer);
             me->CastSpell(me, SPELL_SAPPHIRON_DIES, true);
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (param == ACTION_SAPPHIRON_BIRTH)
                 spawnTimer = 1;
         }
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 type, uint32 id) override
         {
             if (type == POINT_MOTION_TYPE && id == POINT_CENTER)
                 events.ScheduleEvent(EVENT_FLIGHT_LIFTOFF, 500);
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spellInfo)
+        void SpellHitTarget(Unit* target, const SpellInfo* spellInfo) override
         {
             if (spellInfo->Id == SPELL_ICEBOLT_CAST)
             {
@@ -203,13 +203,13 @@ public:
             return true;
         }
 
-        void KilledUnit(Unit* who)
+        void KilledUnit(Unit* who) override
         {
             if (who->GetTypeId() == TYPEID_PLAYER && pInstance)
                 pInstance->SetData(DATA_IMMORTAL_FAIL, 0);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (spawnTimer)
             {
@@ -416,13 +416,13 @@ class spell_sapphiron_frost_explosion : public SpellScriptLoader
                      targets.push_back(*itr);
             }
 
-            void Register()
+            void Register() override
             {
                 OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_sapphiron_frost_explosion_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_DEST_AREA_ENEMY);
             }
         };
 
-        SpellScript* GetSpellScript() const
+        SpellScript* GetSpellScript() const override
         {
             return new spell_sapphiron_frost_explosion_SpellScript();
         }

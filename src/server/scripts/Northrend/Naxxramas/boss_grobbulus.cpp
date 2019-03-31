@@ -21,6 +21,11 @@ enum Spells
     SPELL_BOMBARD_SLIME                     = 28280, // Spawn slime when hit by slime spray
 };
 
+enum Emotes
+{
+    EMOTE_SLIME = 0
+};
+
 enum Events
 {
     EVENT_SPELL_BERSERK                     = 1,
@@ -40,7 +45,7 @@ class boss_grobbulus : public CreatureScript
 public:
     boss_grobbulus() : CreatureScript("boss_grobbulus") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_grobbulusAI (pCreature);
     }
@@ -57,7 +62,7 @@ public:
         InstanceScript* pInstance;
         uint32 dropSludgeTimer;
 
-        void Reset()
+        void Reset() override
         {
             BossAI::Reset();
             events.Reset();
@@ -65,7 +70,7 @@ public:
             dropSludgeTimer = 0;
         }
 
-        void EnterCombat(Unit * who)
+        void EnterCombat(Unit * who) override
         {
             BossAI::EnterCombat(who);
             me->SetInCombatWithZone();
@@ -75,13 +80,13 @@ public:
             events.ScheduleEvent(EVENT_SPELL_BERSERK, RAID_MODE(12*MINUTE*IN_MILLISECONDS, 9*MINUTE*IN_MILLISECONDS));
         }
 
-        void SpellHitTarget(Unit *target, const SpellInfo* spellInfo)
+        void SpellHitTarget(Unit *target, const SpellInfo* spellInfo) override
         {
             if (spellInfo->Id == RAID_MODE(SPELL_SLIME_SPRAY_10, SPELL_SLIME_SPRAY_25) && target->GetTypeId() == TYPEID_PLAYER)
                 me->SummonCreature(NPC_FALLOUT_SLIME, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ());
         }
 
-        void JustSummoned(Creature* cr)
+        void JustSummoned(Creature* cr) override
         {
             if (cr->GetEntry() == NPC_FALLOUT_SLIME)
                 cr->SetInCombatWithZone();
@@ -89,21 +94,21 @@ public:
             summons.Summon(cr);
         }
 
-        void SummonedCreatureDespawn(Creature* summon){ summons.Despawn(summon); }
+        void SummonedCreatureDespawn(Creature* summon) override { summons.Despawn(summon); }
 
-        void JustDied(Unit*  killer)
+        void JustDied(Unit*  killer) override
         {
             BossAI::JustDied(killer);
             summons.DespawnAll();
         }
 
-        void KilledUnit(Unit* who)
+        void KilledUnit(Unit* who) override
         {
             if (who->GetTypeId() == TYPEID_PLAYER && pInstance)
                 pInstance->SetData(DATA_IMMORTAL_FAIL, 0);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             // Some nice visuals
             dropSludgeTimer += diff;
@@ -133,7 +138,7 @@ public:
                     events.PopEvent();
                     break;
                 case EVENT_SPELL_SLIME_SPRAY:
-                    me->MonsterTextEmote("Grobbulus sprays slime across the room!", 0, true);
+                    Talk(EMOTE_SLIME);
                     me->CastSpell(me->GetVictim(), RAID_MODE(SPELL_SLIME_SPRAY_10, SPELL_SLIME_SPRAY_25), false);
                     events.RepeatEvent(20000);
                     break;
@@ -155,7 +160,7 @@ class boss_grobbulus_poison_cloud : public CreatureScript
 public:
     boss_grobbulus_poison_cloud() : CreatureScript("boss_grobbulus_poison_cloud") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_grobbulus_poison_cloudAI(pCreature);
     }
@@ -169,7 +174,7 @@ public:
         uint32 sizeTimer;
         uint32 auraVisualTimer;
 
-        void Reset()
+        void Reset() override
         {
             sizeTimer = 0;
             auraVisualTimer = 1;
@@ -177,13 +182,13 @@ public:
             me->setFaction(21); // Grobbulus one    
         }
 
-        void KilledUnit(Unit* who)
+        void KilledUnit(Unit* who) override
         {
             if (who->GetTypeId() == TYPEID_PLAYER && me->GetInstanceScript())
                 me->GetInstanceScript()->SetData(DATA_IMMORTAL_FAIL, 0);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             // this has to be delayed to be visible :/
             if (auraVisualTimer)
@@ -225,13 +230,13 @@ class spell_grobbulus_poison : public SpellScriptLoader
                      targets.push_back(*itr);
             }
 
-            void Register()
+            void Register() override
             {
                 OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_grobbulus_poison_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
             }
         };
 
-        SpellScript* GetSpellScript() const
+        SpellScript* GetSpellScript() const override
         {
             return new spell_grobbulus_poison_SpellScript();
         }

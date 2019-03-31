@@ -172,7 +172,7 @@ class boss_gothik : public CreatureScript
 public:
     boss_gothik() : CreatureScript("boss_gothik") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_gothikAI (pCreature);
     }
@@ -202,7 +202,7 @@ public:
             return true;
         }
 
-        void Reset()
+        void Reset() override
         {
             BossAI::Reset();
             events.Reset();
@@ -224,7 +224,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit * who)
+        void EnterCombat(Unit * who) override
         {
             BossAI::EnterCombat(who);
             me->SetInCombatWithZone();
@@ -244,7 +244,7 @@ public:
             }
         }
 
-        void JustSummoned(Creature *summon)
+        void JustSummoned(Creature *summon) override
         {
             if (gateOpened)
                 summon->AI()->DoAction(ACTION_GATE_OPEN);
@@ -253,9 +253,9 @@ public:
             summon->SetInCombatWithZone();
         }
 
-        void SummonedCreatureDespawn(Creature* cr) { summons.Despawn(cr); }
+        void SummonedCreatureDespawn(Creature* cr) override { summons.Despawn(cr); }
 
-        void KilledUnit(Unit* who)
+        void KilledUnit(Unit* who) override
         {
             if (who->GetTypeId() != TYPEID_PLAYER)
                 return;
@@ -267,7 +267,7 @@ public:
                 pInstance->SetData(DATA_IMMORTAL_FAIL, 0);
         }
 
-        void JustDied(Unit*  killer)
+        void JustDied(Unit*  killer) override
         {
             BossAI::JustDied(killer);
             Talk(SAY_DEATH);
@@ -335,7 +335,7 @@ public:
             return false;
         }
 
-        void SpellHit(Unit * /*caster*/, const SpellInfo* spellInfo)
+        void SpellHit(Unit * /*caster*/, const SpellInfo* spellInfo) override
         {
             uint8 pos = urand(0,4);
             switch (spellInfo->Id)
@@ -355,13 +355,13 @@ public:
             me->HandleEmoteCommand(EMOTE_ONESHOT_SPELL_CAST);
         }
 
-        void DamageTaken(Unit*, uint32 &damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32 &damage, DamageEffectType, SpellSchoolMask) override
         {
             if (!secondPhase)
                 damage = 0;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!IsInRoom())
                 return;
@@ -459,7 +459,7 @@ class npc_boss_gothik_minion : public CreatureScript
 public:
     npc_boss_gothik_minion() : CreatureScript("npc_boss_gothik_minion") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_boss_gothik_minionAI (pCreature);
     }
@@ -477,10 +477,10 @@ public:
         bool gateOpened;
 
         bool IsOnSameSide(Unit const* who) const { return livingSide == IN_LIVE_SIDE(who); }
-        bool CanAIAttack(Unit const* target) const { return gateOpened || IsOnSameSide(target); }
+        bool CanAIAttack(Unit const* target) const override { return gateOpened || IsOnSameSide(target); }
 
-        void Reset() { events.Reset(); }
-        void EnterCombat(Unit*  /*who*/)
+        void Reset() override { events.Reset(); }
+        void EnterCombat(Unit*  /*who*/) override
         {
             me->SetInCombatWithZone();
 
@@ -516,19 +516,19 @@ public:
                     break;
             }
         }
-        void DamageTaken(Unit* attacker, uint32 &damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit* attacker, uint32 &damage, DamageEffectType, SpellSchoolMask) override
         {
             if (!attacker || (!gateOpened && !IsOnSameSide(attacker)))
                 damage = 0;
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (param == ACTION_GATE_OPEN)
                 gateOpened = true;
         }
 
-        void JustDied(Unit *)
+        void JustDied(Unit *) override
         {
             switch (me->GetEntry())
             {
@@ -544,13 +544,13 @@ public:
             }
         }
 
-        void KilledUnit(Unit* who)
+        void KilledUnit(Unit* who) override
         {
             if (who->GetTypeId() == TYPEID_PLAYER && me->GetInstanceScript())
                 me->GetInstanceScript()->SetData(DATA_IMMORTAL_FAIL, 0);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
 
@@ -650,13 +650,13 @@ class spell_gothik_shadow_bolt_volley : public SpellScriptLoader
                 targets.remove_if(Trinity::UnitAuraCheck(false, SPELL_SHADOW_MARK));
             }
 
-            void Register()
+            void Register() override
             {
                 OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_gothik_shadow_bolt_volley_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
             }
         };
 
-        SpellScript* GetSpellScript() const
+        SpellScript* GetSpellScript() const override
         {
             return new spell_gothik_shadow_bolt_volley_SpellScript();
         }

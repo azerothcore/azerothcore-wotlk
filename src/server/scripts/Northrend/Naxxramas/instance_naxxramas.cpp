@@ -40,7 +40,7 @@ class instance_naxxramas : public InstanceMapScript
 public:
     instance_naxxramas() : InstanceMapScript("instance_naxxramas", 533) { }
 
-    InstanceScript* GetInstanceScript(InstanceMap* pMap) const
+    InstanceScript* GetInstanceScript(InstanceMap* pMap) const override
     {
         return new instance_naxxramas_InstanceMapScript(pMap);
     }
@@ -90,6 +90,8 @@ public:
             _horsemanKilled = 0;
             _speakTimer = 0;
             _horsemanTimer = 0;
+            _screamTimer = 2 * MINUTE * IN_MILLISECONDS;
+            _hadThaddiusGreet = false;
 
             // Achievements
             abominationsKilled = 0;
@@ -143,6 +145,8 @@ public:
         uint8 _horsemanKilled;
         uint32 _speakTimer;
         uint32 _horsemanTimer;
+        uint32 _screamTimer;
+        bool _hadThaddiusGreet;
 
         // Achievements
         uint8 abominationsKilled;
@@ -163,7 +167,7 @@ public:
                 for (std::set<GameObject*>::iterator itr = HeiganEruption[i].begin(); itr != HeiganEruption[i].end(); ++itr)
                 {
                     (*itr)->SendCustomAnim((*itr)->GetGoAnimProgress());
-                    (*itr)->CastSpell(NULL, SPELL_ERUPTION);
+                    (*itr)->CastSpell(nullptr, SPELL_ERUPTION);
                 }
             }
         }
@@ -428,7 +432,19 @@ public:
                 case DATA_HEIGAN_ERUPTION:
                     HeiganEruptSections(data);
                     return;
+                case DATA_HAD_THADDIUS_GREET:
+                    _hadThaddiusGreet = (data == 1);
             }
+        }
+
+        uint32 GetData(uint32 id) const override
+        {
+            switch (id)
+            {
+                case DATA_HAD_THADDIUS_GREET:
+                    return _hadThaddiusGreet ? 1 : 0;
+            }
+            return 0;
         }
         
         bool SetBossState(uint32 bossId, EncounterState state) override
@@ -658,6 +674,17 @@ public:
                 }
             }
 
+            if (_screamTimer && GetBossState(BOSS_THADDIUS) != DONE)
+            {
+                if (_screamTimer <= diff)
+                {
+                    instance->PlayDirectSoundToMap(SOUND_SCREAM + urand(0, 3));
+                    _screamTimer = (2 * MINUTE + urand(0, 30)) * IN_MILLISECONDS;
+                }
+                else
+                    _screamTimer -= diff;
+            }
+
             // And They would all
             if (_horsemanTimer)
                 _horsemanTimer += diff;
@@ -751,7 +778,7 @@ class boss_naxxramas_misc : public CreatureScript
 public:
     boss_naxxramas_misc() : CreatureScript("boss_naxxramas_misc") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_naxxramas_miscAI (pCreature);
     }
@@ -765,7 +792,7 @@ public:
 
         uint32 timer;
 
-        void JustDied(Unit* )
+        void JustDied(Unit* ) override
         {
             if (me->GetEntry() == NPC_MR_BIGGLESWORTH && me->GetInstanceScript())
             {
@@ -777,7 +804,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (me->GetEntry() == NPC_NAXXRAMAS_TRIGGER)
             {
@@ -794,7 +821,7 @@ public:
             }
             else if (me->GetEntry() == NPC_LIVING_POISON)
             {
-                Unit* target = NULL;
+                Unit* target = nullptr;
                 Trinity::AnyUnfriendlyUnitInObjectRangeCheck u_check(me, me, 0.5f);
                 Trinity::UnitLastSearcher<Trinity::AnyUnfriendlyUnitInObjectRangeCheck> searcher(me, target, u_check);
                 me->VisitNearbyObject(1.5f, searcher);

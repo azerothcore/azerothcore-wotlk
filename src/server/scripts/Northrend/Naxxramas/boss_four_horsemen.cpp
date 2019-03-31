@@ -116,7 +116,7 @@ class boss_four_horsemen : public CreatureScript
 public:
     boss_four_horsemen() : CreatureScript("boss_four_horsemen") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_four_horsemenAI (pCreature);
     }
@@ -172,7 +172,7 @@ public:
             return true;
         }
 
-        void Reset()
+        void Reset() override
         {
             BossAI::Reset();
             me->SetPosition(me->GetHomePosition());
@@ -194,7 +194,7 @@ public:
             }
         }
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 type, uint32 id) override
         {
             if (type != POINT_MOTION_TYPE)
                 return;
@@ -223,7 +223,7 @@ public:
             currentWaypoint = id+1;
         }
 
-        void AttackStart(Unit* who)
+        void AttackStart(Unit* who) override
         {
             if (movementPhase == MOVE_PHASE_FINISHED)
             {
@@ -234,7 +234,7 @@ public:
             }
         }
 
-        void KilledUnit(Unit* who)
+        void KilledUnit(Unit* who) override
         {
             if (who->GetTypeId() != TYPEID_PLAYER)
                 return;
@@ -246,7 +246,7 @@ public:
                 pInstance->SetData(DATA_IMMORTAL_FAIL, 0);
         }
 
-        void JustDied(Unit*  killer)
+        void JustDied(Unit*  killer) override
         {
             BossAI::JustDied(killer);
             if (pInstance)
@@ -261,7 +261,7 @@ public:
             Talk(SAY_DEATH);
         }
 
-        void EnterCombat(Unit * who)
+        void EnterCombat(Unit * who) override
         {
             BossAI::EnterCombat(who);
             if (movementPhase == MOVE_PHASE_NONE)
@@ -275,7 +275,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (movementPhase == MOVE_PHASE_STARTED && currentWaypoint)
             {

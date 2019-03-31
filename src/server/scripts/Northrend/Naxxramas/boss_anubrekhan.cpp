@@ -44,7 +44,7 @@ class boss_anubrekhan : public CreatureScript
 public:
     boss_anubrekhan() : CreatureScript("boss_anubrekhan") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_anubrekhanAI (pCreature);
     }
@@ -71,7 +71,7 @@ public:
             }
         }
 
-        void Reset()
+        void Reset() override
         {
             BossAI::Reset();
             events.Reset();
@@ -85,7 +85,7 @@ public:
             }
         }
 
-        void JustSummoned(Creature* cr)
+        void JustSummoned(Creature* cr) override
         {
             if (me->IsInCombat())
                 cr->SetInCombatWithZone();
@@ -99,15 +99,15 @@ public:
             summons.Summon(cr);
         }
 
-        void SummonedCreatureDies(Creature* cr, Unit*)
+        void SummonedCreatureDies(Creature* cr, Unit*) override
         {
             if (cr->GetEntry() == NPC_CRYPT_GUARD)
-                cr->CastSpell(cr, SPELL_SUMMON_CORPSE_SCRABS_10, true, NULL, NULL, me->GetGUID());
+                cr->CastSpell(cr, SPELL_SUMMON_CORPSE_SCRABS_10, true, nullptr, nullptr, me->GetGUID());
         }
 
-        void SummonedCreatureDespawn(Creature* cr) { summons.Despawn(cr); }
+        void SummonedCreatureDespawn(Creature* cr) override { summons.Despawn(cr); }
 
-        void JustDied(Unit*  killer)
+        void JustDied(Unit*  killer) override
         {
             BossAI::JustDied(killer);
             summons.DespawnAll();
@@ -117,7 +117,7 @@ public:
             }
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit* victim) override
         {
             if (victim->GetTypeId() != TYPEID_PLAYER)
                 return;
@@ -126,13 +126,13 @@ public:
                 Talk(SAY_SLAY);
 
             //Force the player to spawn corpse scarabs via spell
-            victim->CastSpell(victim, SPELL_SUMMON_CORPSE_SCRABS_5, true, NULL, NULL, me->GetGUID());
+            victim->CastSpell(victim, SPELL_SUMMON_CORPSE_SCRABS_5, true, nullptr, nullptr, me->GetGUID());
 
             if (pInstance)
                 pInstance->SetData(DATA_IMMORTAL_FAIL, 0);
         }
 
-        void EnterCombat(Unit * who)
+        void EnterCombat(Unit * who) override
         {
             BossAI::EnterCombat(who);
             me->CallForHelp(30.0f); // catch helpers
@@ -151,7 +151,7 @@ public:
                 SummonCryptGuards();
         }
 
-        void MoveInLineOfSight(Unit *who)
+        void MoveInLineOfSight(Unit *who) override
         {
             if (!sayGreet && who->GetTypeId() == TYPEID_PLAYER)
             {
@@ -162,7 +162,7 @@ public:
             ScriptedAI::MoveInLineOfSight(who);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;

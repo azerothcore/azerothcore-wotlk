@@ -37,7 +37,7 @@ class boss_loatheb : public CreatureScript
 public:
     boss_loatheb() : CreatureScript("boss_loatheb") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_loathebAI (pCreature);
     }
@@ -52,7 +52,7 @@ public:
         InstanceScript* pInstance;
         EventMap events;
 
-        void Reset()
+        void Reset() override
         {
             BossAI::Reset();
             events.Reset();
@@ -63,21 +63,21 @@ public:
             }
         }
 
-        void JustSummoned(Creature* cr) { cr->SetInCombatWithZone(); }
+        void JustSummoned(Creature* cr) override { cr->SetInCombatWithZone(); }
 
-        void SummonedCreatureDies(Creature*  /*cr*/, Unit*)
+        void SummonedCreatureDies(Creature*  /*cr*/, Unit*) override
         {
             if (pInstance)
                 pInstance->SetData(DATA_SPORE_KILLED, 0);
         }
 
-        void KilledUnit(Unit* who)
+        void KilledUnit(Unit* who) override
         {
             if (who->GetTypeId() == TYPEID_PLAYER && pInstance)
                 pInstance->SetData(DATA_IMMORTAL_FAIL, 0);
         }
 
-        void EnterCombat(Unit * who)
+        void EnterCombat(Unit * who) override
         {
             BossAI::EnterCombat(who);
             if (pInstance)
@@ -93,7 +93,7 @@ public:
             events.ScheduleEvent(EVENT_SPELL_BERSERK, 720000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -151,14 +151,14 @@ class spell_loatheb_necrotic_aura_warning : public SpellScriptLoader
                     target->AI()->Talk(SAY_NECROTIC_AURA_REMOVED);
             }
 
-            void Register()
+            void Register() override
             {
                 AfterEffectApply += AuraEffectApplyFn(spell_loatheb_necrotic_aura_warning_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
                 AfterEffectRemove += AuraEffectRemoveFn(spell_loatheb_necrotic_aura_warning_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
             }
         };
 
-        AuraScript* GetAuraScript() const
+        AuraScript* GetAuraScript() const override
         {
             return new spell_loatheb_necrotic_aura_warning_AuraScript();
         }
