@@ -1,4 +1,4 @@
-# Copyright (C)
+# Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU AGPL3 v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 #
 # This file is free software; as a special exception the author gives
 # unlimited permission to copy and/or distribute it, with or without
@@ -7,7 +7,6 @@
 # This program is distributed in the hope that it will be useful, but
 # WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-
 
 set(g3dlib_STAT_SRCS
   source/AABox.cpp
@@ -54,19 +53,21 @@ set(g3dlib_STAT_SRCS
   source/Vector4.cpp
 )
 
-if(WIN32)
-  include_directories(
-    ${CMAKE_CURRENT_SOURCE_DIR}/include
-    ${CMAKE_SOURCE_DIR}/deps/zlib
-  )
-else()
-  include_directories(
-    ${CMAKE_CURRENT_SOURCE_DIR}/include
-  )
-endif()
-
 add_library(g3dlib STATIC ${g3dlib_STAT_SRCS})
 
+# Group sources
+GroupSources(${CMAKE_CURRENT_SOURCE_DIR})
+
+target_include_directories(g3dlib
+  PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/include)
+
 target_link_libraries(g3dlib
-  ${ZLIB_LIBRARIES}
-)
+  PUBLIC
+    zlib
+    threads)
+
+set_target_properties(g3dlib
+  PROPERTIES
+    FOLDER
+      "deps")

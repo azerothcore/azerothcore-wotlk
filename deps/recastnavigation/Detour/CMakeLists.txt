@@ -1,4 +1,5 @@
 # Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
+# Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU AGPL3 v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 #
 # This file is free software; as a special exception the author gives
 # unlimited permission to copy and/or distribute it, with or without
@@ -30,6 +31,9 @@ target_include_directories(Detour
   PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/Include)
 
+# Group sources
+GroupSources(${CMAKE_CURRENT_SOURCE_DIR})
+
 target_link_libraries(Detour
   PUBLIC
     zlib)
@@ -37,4 +41,4 @@ target_link_libraries(Detour
 set_target_properties(Detour
     PROPERTIES
       FOLDER
-        "dep")
+        "deps")

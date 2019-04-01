@@ -9,17 +9,6 @@
 # WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-include_directories(
-  ${CMAKE_SOURCE_DIR}/deps/g3dlite/include
-  ${CMAKE_SOURCE_DIR}/src/common
-  ${CMAKE_SOURCE_DIR}/src/common/Debugging
-  ${CMAKE_SOURCE_DIR}/src/common/Collision/
-  ${CMAKE_SOURCE_DIR}/src/common/Collision/Maps
-  ${CMAKE_SOURCE_DIR}/src/common/Collision/Models
-  ${ACE_INCLUDE_DIR}
-  ${ZLIB_INCLUDE_DIR}
-)
-
 add_executable(vmap4assembler VMapAssembler.cpp)
 
 if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
@@ -27,10 +16,16 @@ if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
 endif()
 
 target_link_libraries(vmap4assembler
-  collision
-  g3dlib
-  ${ZLIB_LIBRARIES}
-)
+  shared
+  zlib)
+
+# Group sources
+GroupSources(${CMAKE_CURRENT_SOURCE_DIR})  
+
+set_target_properties(vmap4assembler
+  PROPERTIES
+    FOLDER
+      "tools")
 
 if( UNIX )
   install(TARGETS vmap4assembler DESTINATION bin)
