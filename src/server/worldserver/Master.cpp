@@ -471,7 +471,7 @@ bool Master::_StartDB()
 
     ///- Get the realm Id from the configuration file
     realmID = sConfigMgr->GetIntDefault("RealmID", 0);
-    if (!realmID) // pussywizard: above 8 spoils 8-bit online mask for the accounts
+    if (!realmID)
     {
         sLog->outError("Realm ID not defined in configuration file");
         return false;
