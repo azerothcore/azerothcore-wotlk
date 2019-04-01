@@ -19,7 +19,6 @@ git:
 stages:
   - prepare_cache
   - run
-  - run_modules
 
 jobs:
   include:
@@ -40,21 +39,11 @@ jobs:
           - source ./apps/ci/ci-before_install.sh
       install:
         - source ./apps/ci/ci-install.sh OFF
+        - source ./apps/ci/ci-install-modules.sh
       script:
         - source ./apps/ci/ci-compile.sh
 
     - stage: run
-      env: TRAVIS_BUILD_ID="1"
-      before_install:
-        - source ./apps/ci/ci-before_install.sh
-      install:
-        - source ./apps/ci/ci-install.sh ON
-        - source ./apps/ci/ci-import-db.sh
-      script:
-        - source ./apps/ci/ci-compile.sh
-        - source ./apps/ci/ci-worldserver-dry-run.sh
-
-    - stage: run_modules
       env: TRAVIS_BUILD_ID="1"
       before_install:
         - source ./apps/ci/ci-before_install.sh
@@ -72,19 +61,11 @@ jobs:
           - source ./apps/ci/ci-before_install.sh
       install:
         - source ./apps/ci/ci-install.sh OFF
+        - source ./apps/ci/ci-install-modules.sh
       script:
         - source ./apps/ci/ci-compile.sh
 
     - stage: run
-      env: TRAVIS_BUILD_ID="2"
-      before_install:
-        - source ./apps/ci/ci-before_install.sh
-      install:
-        - source ./apps/ci/ci-install.sh ON
-      script:
-        - source ./apps/ci/ci-compile.sh
-
-    - stage: run_modules
       env: TRAVIS_BUILD_ID="2"
       before_install:
         - source ./apps/ci/ci-before_install.sh
