@@ -15,7 +15,7 @@ INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type
 (@ENTRY,9,0,0,0,0,100,0,1000,1000,0,0,83,2,0,0,0,0,0,1,0,0,0,0,0,0,0,'Field Marshal Afrasiabi - On Script - Remove Npc Flag Questgiver'),
 (@ENTRY,9,1,0,0,0,100,0,5000,5000,0,0,1,0,8000,0,0,0,0,12,1,0,0,0,0,0,0,'Field Marshal Afrasiabi - On Script - Say Line 0'),
 (@ENTRY,9,2,0,0,0,100,0,8000,8000,0,0,1,1,10000,0,0,0,0,12,1,0,0,0,0,0,0,'Field Marshal Afrasiabi - On Script - Say Line 1'),
-(@ENTRY,9,3,0,0,0,100,0,3000,3000,0,0,50,179882,21600,0,0,0,0,8,0,0,0,-8925.57,496.042,103.767,2.42801,'Field Marshal Afrasiabi - On Script - Summon Gameobject'The Severed Head of Nefarian''),
+(@ENTRY,9,3,0,0,0,100,0,3000,3000,0,0,50,179882,21600,0,0,0,0,8,0,0,0,-8925.57,496.042,103.767,2.42801,"Field Marshal Afrasiabi - On Script - 'Summon Gameobject'The Severed Head of Nefarian"),
 (@ENTRY,9,4,0,0,0,100,0,6000,6000,0,0,11,22888,0,0,0,0,0,1,0,0,0,0,0,0,0,'Field Marshal Afrasiabi - On Script - Cast 'Rallying Cry of the Dragonslayer''),
 (@ENTRY,9,5,0,0,0,100,0,1000,1000,0,0,82,2,0,0,0,0,0,1,0,0,0,0,0,0,0,'Field Marshal Afrasiabi - On Script - Add Npc Flag Questgiver');
 
