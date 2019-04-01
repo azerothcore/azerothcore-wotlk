@@ -9,39 +9,35 @@
 # WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-file(GLOB_RECURSE meshExtract_Sources *.cpp *.h)
-
-set(include_Base
-  ${CMAKE_BINARY_DIR}
-  ${CMAKE_SOURCE_DIR}/src/common
-  ${CMAKE_SOURCE_DIR}/deps/recastnavigation/Recast
-  ${CMAKE_SOURCE_DIR}/deps/recastnavigation/Detour
-  ${CMAKE_SOURCE_DIR}/deps/libmpq
-  ${CMAKE_SOURCE_DIR}/deps/g3dlite/include
-  ${ACE_INCLUDE_DIR}
+CollectSourceFiles(
   ${CMAKE_CURRENT_SOURCE_DIR}
-)
+  PRIVATE_SOURCES)
 
-if( WIN32 )
-  set(include_Base
-    ${include_Base}
-    ${CMAKE_SOURCE_DIR}/deps/libmpq/win
-    )
-endif()
-
-include_directories(${include_Base})
-
-add_executable(MeshExtractor ${meshExtract_Sources})
+add_executable(MeshExtractor ${PRIVATE_SOURCES})
 
 target_link_libraries(MeshExtractor
-  g3dlib
-  mpq
-  Recast
-  Detour
-  ${BZIP2_LIBRARIES}
-  ${ZLIB_LIBRARIES}
-  ${ACE_LIBRARY}
-)
+  PUBLIC
+    shared
+    Recast
+    mpq)
+
+# Group sources
+GroupSources(${CMAKE_CURRENT_SOURCE_DIR})
+
+CollectIncludeDirectories(
+  ${CMAKE_CURRENT_SOURCE_DIR}
+  PUBLIC_INCLUDES)
+
+target_include_directories(MeshExtractor
+  PUBLIC
+    ${PUBLIC_INCLUDES}
+  PRIVATE
+    ${CMAKE_CURRENT_BINARY_DIR})
+
+set_target_properties(MeshExtractor
+  PROPERTIES
+    FOLDER
+      "tools")
 
 if( UNIX )
   install(TARGETS MeshExtractor DESTINATION bin)

@@ -8,6 +8,10 @@ bzip2 (a freely available, patent free, high-quality data compressor)
   http://www.bzip.org/
   Version: 1.0.6
 
+cotire (CMake module to speed up builds)
+  https://github.com/sakra/cotire
+  Version: 1.8.0 391bf6b7609e14f5976bd5247b68d63cbf8d4d12
+
 G3D (a commercial-grade C++ 3D engine available as Open Source (BSD License)
   http://g3d.sourceforge.net/
   Version: 8.01-Release
@@ -15,10 +19,18 @@ G3D (a commercial-grade C++ 3D engine available as Open Source (BSD License)
 jemalloc (a general-purpose scalable concurrent malloc-implementation)
   http://www.canonware.com/jemalloc/
   Version: 5.0.1
-  
+
 libMPQ (a library for reading MPQ files)
   https://libmpq.org/
   Version: 1.0.4
+
+libreadline (command line editing library)
+  https://cnswww.cns.cwru.edu/php/chet/readline/rltop.html
+  Version: external
+
+OpenSSL (general-purpose cryptography library)
+  https://www.openssl.org/
+  Version: external
 
 MySQL (the world's most popular open source database software)
   http://www.mysql.com/
