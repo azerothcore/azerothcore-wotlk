@@ -86,6 +86,8 @@ include(CheckPlatform)
 include(GroupSources)
 include(AutoCollect)
 
+CU_RUN_HOOK("AFTER_LOAD_CMAKE_MODULES")
+
 # basic packagesearching and setup (further support will be needed, this is a preliminary release!)
 set(ACE_EXPECTED_VERSION 6.0.3)
 
