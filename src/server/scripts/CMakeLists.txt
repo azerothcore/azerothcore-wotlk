@@ -81,9 +81,7 @@ add_library(scripts-interface INTERFACE)
 
 CollectIncludeDirectories(
   ${CMAKE_CURRENT_SOURCE_DIR}
-  PUBLIC_INCLUDES
-  # Exclude
-  ${CMAKE_CURRENT_SOURCE_DIR}/PrecompiledHeaders)
+  PUBLIC_INCLUDES)
 
 target_include_directories(scripts-interface
   INTERFACE
