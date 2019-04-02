@@ -8,4 +8,4 @@ git clone --depth=1 --branch=master https://github.com/azerothcore/mod-vas-autob
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-transmog.git modules/mod-transmog
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-npc-beastmaster.git modules/mod-npc-beastmaster
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-duel-reset.git modules/mod-duel-reset
-#git clone --depth=1 --branch=master https://github.com/azerothcore/mod-premium modules/mod-premium
+git clone --depth=1 --branch=master https://github.com/azerothcore/mod-premium modules/mod-premium
