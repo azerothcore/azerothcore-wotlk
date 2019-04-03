@@ -12,6 +12,77 @@
 
 set( MYSQL_FOUND 0 )
 
+if(WIN32)
+  # read environment variables and change \ to /
+  SET(PROGRAM_FILES_32 $ENV{ProgramFiles})
+  if (${PROGRAM_FILES_32})
+    STRING(REPLACE "\\\\" "/" PROGRAM_FILES_32 ${PROGRAM_FILES_32})
+  endif(${PROGRAM_FILES_32})
+
+  SET(PROGRAM_FILES_64 $ENV{ProgramW6432})
+  if (${PROGRAM_FILES_64})
+     STRING(REPLACE "\\\\" "/" PROGRAM_FILES_64 ${PROGRAM_FILES_64})
+  endif(${PROGRAM_FILES_64})
+endif(WIN32)
+
+# Find MariaDB for Windows
+if (WIN32)
+  # Set know versions MariaDB
+  set(_MARIADB_KNOWN_VERSIONS "MariaDB 10.4" "MariaDB 10.3" "MariaDB 10.2" "MariaDB 10.1")
+
+  # Set default oprions
+  set(MARIADB_FOUND_LIB 0)
+  set(MARIADB_FOUND_INCLUDE 0)
+  set(MARIADB_FOUND_EXECUTABLE 0)
+  set(MARIADB_FOUND 0)
+
+  macro(FindLibMariaDB MariaDBVersion)
+  # Find include
+  find_path(MYSQL_INCLUDE_DIR
+    NAMES
+      mysql.h
+    PATHS
+      ${MYSQL_ADD_INCLUDE_PATH}
+      "${PROGRAM_FILES_64}/${MariaDBVersion}/include/mysql"
+      "${PROGRAM_FILES_32}/${MariaDBVersion}/include/mysql"
+    DOC
+      "Specify the directory containing mysql.h."
+  )
+
+  if(MYSQL_INCLUDE_DIR)
+    set(MARIADB_FOUND_INCLUDE 1)
+  endif()
+
+  find_library(MYSQL_LIBRARY
+    NAMES
+      libmariadb
+    PATHS
+      ${MYSQL_ADD_LIBRARIES_PATH}
+      "${PROGRAM_FILES_64}/${MariaDBVersion}/lib"
+      "${PROGRAM_FILES_64}/${MariaDBVersion}/lib/opt"
+      "${PROGRAM_FILES_32}/${MariaDBVersion}/lib"
+      "${PROGRAM_FILES_32}/${MariaDBVersion}/lib/opt"
+      "$ENV{ProgramFiles}/${MariaDBVersion}/lib/opt"
+      "$ENV{SystemDrive}/${MariaDBVersion}/lib/opt"
+    DOC
+      "Specify the location of the mysql library here."
+  )
+
+  if(MYSQL_LIBRARY)
+    set(MARIADB_FOUND_LIB 1)
+  endif()
+  if (MYSQL_LIBRARY AND MYSQL_INCLUDE_DIR)
+    set(MARIADB_FOUND 1)
+  endif()
+  endmacro(FindLibMariaDB)
+
+  foreach(version ${_MARIADB_KNOWN_VERSIONS})
+    if (NOT MARIADB_FOUND)
+      FindLibMariaDB(${version})
+    endif()
+  endforeach()
+endif()
+
 if( UNIX )
   set(MYSQL_CONFIG_PREFER_PATH "$ENV{MYSQL_HOME}/bin" CACHE FILEPATH
     "preferred path to MySQL (mysql_config)"
