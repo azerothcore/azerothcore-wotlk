@@ -82,6 +82,7 @@ enum Events
     EVENT_THADDIUS_SPELL_BERSERK        = 12,
     EVENT_THADDIUS_POLARITY_SHIFT       = 13,
     EVENT_THADDIUS_START_2              = 14,
+    EVENT_ACTIVATE_BALL_LIGHTNING       = 15
 };
 
 enum Misc
@@ -104,9 +105,10 @@ public:
 
     struct boss_thaddiusAI : public BossAI
     {
-        boss_thaddiusAI(Creature *c) : BossAI(c, BOSS_THADDIUS), summons(me)
+        boss_thaddiusAI(Creature *c) : BossAI(c, BOSS_THADDIUS), summons(me), ballLightningEnabled(false)
         {
             pInstance = me->GetInstanceScript();
+            SetCombatMovement(false);
         }
 
         InstanceScript* pInstance;
@@ -115,6 +117,7 @@ public:
         uint32 summonTimer;
         uint32 reviveTimer;
         uint32 resetTimer;
+        bool ballLightningEnabled;
 
         void StartEvent()
         {
@@ -151,6 +154,7 @@ public:
             reviveTimer = 0;
             resetTimer = 1;
             me->SetPosition(me->GetHomePosition());
+            ballLightningEnabled = false;
 
             me->SummonCreature(NPC_STALAGG, 3450.45f, -2931.42f, 312.091f, 5.49779f);
             me->SummonCreature(NPC_FEUGEN, 3508.14f, -2988.65f, 312.092f, 2.37365f);
@@ -160,6 +164,7 @@ public:
                 cr->InterruptNonMeleeSpells(true);
                 cr->CastSpell(cr, SPELL_FEUGEN_CHAIN, false);
                 cr->SetDisableGravity(true);
+                cr->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
             }
             if (Creature* cr = me->SummonCreature(NPC_TESLA_COIL, 3487.04f, -2911.68f, 318.75f, 0.0f))
             {
@@ -167,6 +172,7 @@ public:
                 cr->InterruptNonMeleeSpells(true);
                 cr->CastSpell(cr, SPELL_STALAGG_CHAIN, false);
                 cr->SetDisableGravity(true);
+                cr->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
             }
         }
 
@@ -269,6 +275,7 @@ public:
                     events.ScheduleEvent(EVENT_THADDIUS_SPELL_CHAIN_LIGHTNING, 14000);
                     events.ScheduleEvent(EVENT_THADDIUS_SPELL_BERSERK, 360000);
                     events.ScheduleEvent(EVENT_THADDIUS_POLARITY_SHIFT, 30000);
+                    events.ScheduleEvent(EVENT_ACTIVATE_BALL_LIGHTNING, 5000);
                     return;
                 case EVENT_THADDIUS_SPELL_BERSERK:
                     me->CastSpell(me, SPELL_BERSERK, true);
@@ -282,15 +289,17 @@ public:
                     me->CastSpell(me, SPELL_POLARITY_SHIFT, false);
                     events.RepeatEvent(30000);
                     break;
+                case EVENT_ACTIVATE_BALL_LIGHTNING:
+                    ballLightningEnabled = true;
+                    break;
             }
 
-            if (me->isAttackReady())
-            {
-                if (!me->IsWithinMeleeRange(me->GetVictim()))
-                    me->CastSpell(me->GetVictim(), SPELL_BALL_LIGHTNING, false);
-                else
-                    DoMeleeAttackIfReady();
-            }
+            if (me->IsWithinMeleeRange(me->GetVictim()))
+                DoMeleeAttackIfReady();
+            else
+                if (ballLightningEnabled)
+                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
+                        DoCast(target, SPELL_BALL_LIGHTNING);
         }
     };
 };
@@ -330,7 +339,11 @@ public:
             events.Reset();
             me->SetControlled(false, UNIT_STATE_STUNNED);
             if (Creature* cr = me->FindNearestCreature(NPC_TESLA_COIL, 150.0f))
+            {
                 cr->CastSpell(cr, me->GetEntry() == NPC_STALAGG ? SPELL_STALAGG_CHAIN : SPELL_FEUGEN_CHAIN, false);
+                cr->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                myCoil = cr->GetGUID();
+            }
         }
 
         void EnterEvadeMode() override
@@ -488,17 +501,19 @@ public:
                                 overload = true;
                                 cr->AI()->Talk(EMOTE_TESLA_LINK_BREAKS);
                                 me->RemoveAurasDueToSpell(me->GetEntry() == NPC_STALAGG ? SPELL_STALAGG_CHAIN : SPELL_FEUGEN_CHAIN);
+                                cr->InterruptNonMeleeSpells(true);
                             }
-                            cr->InterruptNonMeleeSpells(true);
                             if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 1000.f, true))
-                                cr->CastSpell(target, SPELL_TESLA_SHOCK, true); // fixme: I don't wanna cast that spell cross-platform D:<
+                            {
+                                cr->CastStop(SPELL_TESLA_SHOCK);
+                                cr->CastSpell(target, SPELL_TESLA_SHOCK, true);
+                            }
                             events.RepeatEvent(1500);
                             break;
                         }
                         else
                         {
                             overload = false;
-                            cr->CastStop();
                             cr->CastSpell(cr, me->GetEntry() == NPC_STALAGG ? SPELL_STALAGG_CHAIN : SPELL_FEUGEN_CHAIN, false);
                         }
                     }
@@ -618,6 +633,27 @@ class spell_thaddius_polarity_shift : public SpellScriptLoader
         }
 };
 
+class npc_tesla : public CreatureScript
+{
+public:
+    npc_tesla() : CreatureScript("npc_tesla") { }
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return GetInstanceAI<npc_teslaAI>(creature);
+    }
+
+    struct npc_teslaAI : public ScriptedAI
+    {
+    public:
+        npc_teslaAI(Creature* creature) : ScriptedAI(creature) { }
+        void EnterEvadeMode() override { } // never stop casting due to evade
+        void UpdateAI(uint32 /*diff*/) override { } // never do anything unless told
+        void EnterCombat(Unit* /*who*/) override { }
+        void DamageTaken(Unit* /*who*/, uint32& damage, DamageEffectType, SpellSchoolMask) override { damage = 0; } // no, you can't kill it
+    };
+};
+
 class at_thaddius_entrance : public AreaTriggerScript
 {
     public:
@@ -641,6 +677,7 @@ void AddSC_boss_thaddius()
 {
     new boss_thaddius();
     new boss_thaddius_summon();
+    new npc_tesla();
 
     new spell_thaddius_pos_neg_charge();
     new spell_thaddius_polarity_shift();
