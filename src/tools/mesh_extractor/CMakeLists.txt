@@ -17,7 +17,7 @@ add_executable(MeshExtractor ${PRIVATE_SOURCES})
 
 target_link_libraries(MeshExtractor
   PUBLIC
-    shared
+    common
     Recast
     mpq)
 

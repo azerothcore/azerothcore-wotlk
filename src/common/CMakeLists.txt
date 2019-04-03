@@ -15,7 +15,7 @@ CollectSourceFiles(
   ${CMAKE_CURRENT_SOURCE_DIR}/Debugging
   ${CMAKE_CURRENT_SOURCE_DIR}/PrecompiledHeaders)
 
-# Manually set sources for Debugging directory as we don't want to include WheatyExceptionReport in shared project
+# Manually set sources for Debugging directory as we don't want to include WheatyExceptionReport in common project
 # It needs to be included both in authserver and worldserver for the static global variable to be properly initialized
 # and to handle crash logs on windows
 list(APPEND PRIVATE_SOURCES
@@ -23,13 +23,13 @@ list(APPEND PRIVATE_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/Debugging/Errors.h)
 
 if (USE_COREPCH)
-  set(PRIVATE_PCH_HEADER PrecompiledHeaders/sharedPCH.h)
+  set(PRIVATE_PCH_HEADER PrecompiledHeaders/commonPCH.h)
 endif()
 
 # Group sources
 GroupSources(${CMAKE_CURRENT_SOURCE_DIR})
 
-add_library(shared
+add_library(common
   ${PRIVATE_SOURCES}
 )
 
@@ -39,7 +39,7 @@ CollectIncludeDirectories(
   # Exclude
   ${CMAKE_CURRENT_SOURCE_DIR}/PrecompiledHeaders)
 
-target_include_directories(shared
+target_include_directories(common
   PUBLIC
     # Provide the binary dir for all child targets
     ${CMAKE_BINARY_DIR}
@@ -47,7 +47,7 @@ target_include_directories(shared
   PRIVATE
     ${CMAKE_CURRENT_BINARY_DIR})
 
-target_link_libraries(shared
+target_link_libraries(common
   PRIVATE
     game-interface
   PUBLIC
@@ -61,12 +61,12 @@ target_link_libraries(shared
     threads
     jemalloc)
 
-set_target_properties(shared
+set_target_properties(common
   PROPERTIES
     FOLDER
       "server")
 
 # Generate precompiled header
 if (USE_COREPCH)
-  add_cxx_pch(shared ${PRIVATE_PCH_HEADER})
+  add_cxx_pch(common ${PRIVATE_PCH_HEADER})
 endif ()

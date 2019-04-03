@@ -16,7 +16,7 @@ CollectSourceFiles(
 add_executable(mapextractor
   ${PRIVATE_SOURCES}
 )
- 
+
 target_include_directories(mapextractor
   PUBLIC
     ${CMAKE_SOURCE_DIR}
@@ -24,7 +24,7 @@ target_include_directories(mapextractor
 
 target_link_libraries(mapextractor
   PUBLIC
-    shared
+    common
     mpq)
 
 CollectIncludeDirectories(
