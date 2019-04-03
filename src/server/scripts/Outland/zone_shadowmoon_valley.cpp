@@ -614,6 +614,9 @@ public:
 
         void UpdateAI(uint32 diff)
         {
+			if (!UpdateVictim())
+				return;
+			
             if (PoisonTimer)
             {
                 if (PoisonTimer <= diff)
@@ -628,6 +631,8 @@ public:
                     Unit::DealDamage(me, me, me->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
                 } else PoisonTimer -= diff;
             }
+			
+			DoMeleeAttackIfReady();
         }
     };
 };
