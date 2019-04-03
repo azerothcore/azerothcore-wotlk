@@ -6,7 +6,7 @@ INSERT INTO `creature_text` VALUES
 (15931, 0, 0, '%s sprays slime across the room!', 16, 0, 100, 0, 0, 0, 32318, 1, 'Grobbulus - slime'),
 (15954, 8, 0, '%s blinks away!', 41, 0, 100, 0, 0, 0, 32978, 3, 'Noth EMOTE_BLINK');
 
-UPDATE `creature_template` SET `AIName` = '', `ScriptName` = 'npc_tesla', `dynamicflags` = 0 WHERE entry = 16218;
+UPDATE `creature_template` SET `AIName` = '', `ScriptName` = 'npc_tesla', `dynamicflags` = 0 WHERE `entry` = 16218;
 
 -- trigger when entering thaddius' room
 DELETE FROM `areatrigger_scripts` WHERE `entry`=4113;
