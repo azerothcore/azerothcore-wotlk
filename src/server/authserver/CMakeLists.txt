@@ -44,7 +44,7 @@ endif()
 
 target_link_libraries(authserver
   PUBLIC
-    shared
+    common
 )
 
 CollectIncludeDirectories(

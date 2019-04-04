@@ -16,11 +16,11 @@ if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
 endif()
 
 target_link_libraries(vmap4assembler
-  shared
+  common
   zlib)
 
 # Group sources
-GroupSources(${CMAKE_CURRENT_SOURCE_DIR})  
+GroupSources(${CMAKE_CURRENT_SOURCE_DIR})
 
 set_target_properties(vmap4assembler
   PROPERTIES
