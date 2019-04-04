@@ -476,6 +476,16 @@ bool Master::_StartDB()
         sLog->outError("Realm ID not defined in configuration file");
         return false;
     }
+    else if (realmID > 256)
+    {
+        /*
+         * Due to the client only being able to read a realmID
+         * with a size of uint8 we can "only" store up to 255 realms
+         * anything further the client will behave anormaly
+        */
+        sLog->outError("Realm ID must range from 1 to 255");
+        return false;
+    }
     sLog->outString("Realm running as realm ID %d", realmID);
 
     ///- Initialize the DB logging system
