@@ -600,7 +600,7 @@ public:
             PlayerGUID = 0;
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* /*who*/)
         {
             events.ScheduleEvent(EVENT_KICK, urand(5000, 10000));
             events.ScheduleEvent(EVENT_SUNDER, urand(5000, 10000));
@@ -677,7 +677,7 @@ public:
                 events.RepeatEvent(urand(5000, 10000));
                 break;
             case EVENT_SUNDER:
-                DoCast(me->GetVictim(), SPELL_SUNDER, false);
+                DoCastVictim(SPELL_SUNDER);
                 events.RepeatEvent(urand(5000, 10000));
                 break;
             }
