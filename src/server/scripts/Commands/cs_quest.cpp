@@ -67,7 +67,7 @@ public:
 		
 		if (player->IsActiveQuest(entry))
         {
-            handler->PSendSysMessage("You are already on that quest!");
+            handler->PSendSysMessage("This quest is already active!");
             return false;
         }
 
