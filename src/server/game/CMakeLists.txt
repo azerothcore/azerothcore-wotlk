@@ -40,7 +40,8 @@ target_link_libraries(game-interface
     shared)
 
 add_library(game STATIC
-  ${PRIVATE_SOURCES})
+  ${PRIVATE_SOURCES}
+  ${ElunaLuaEngineFiles})
 
 add_dependencies(game revision.h)
 
