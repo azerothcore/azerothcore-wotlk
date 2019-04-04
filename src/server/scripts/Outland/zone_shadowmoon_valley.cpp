@@ -557,6 +557,11 @@ public:
 # npc_dragonmaw_peon
 #####*/
 
+enum eDragonmawPeon {
+    SPELL_KICK         = 34802,
+    SPELL_SUNDER_ARMOR = 15572
+};
+
 class npc_dragonmaw_peon : public CreatureScript
 {
 public:
@@ -574,9 +579,11 @@ public:
         uint64 PlayerGUID;
         bool Tapped;
         uint32 PoisonTimer;
+        uint32 KickTimer, SunderArmorTimer;
 
         void Reset()
         {
+            SetCombatMovement(true);
             PlayerGUID = 0;
             Tapped = false;
             PoisonTimer = 0;
@@ -609,14 +616,12 @@ public:
             {
                 me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_EAT);
                 PoisonTimer = 15000;
+                SetCombatMovement(false);
             }
         }
 
         void UpdateAI(uint32 diff)
         {
-			if (!UpdateVictim())
-				return;
-			
             if (PoisonTimer)
             {
                 if (PoisonTimer <= diff)
@@ -630,9 +635,26 @@ public:
                     PoisonTimer = 0;
                     Unit::DealDamage(me, me, me->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
                 } else PoisonTimer -= diff;
+
+                return;
             }
-			
-			DoMeleeAttackIfReady();
+
+            if (!UpdateVictim())
+                return;
+            
+            if (KickTimer <= diff)
+            {
+                DoCastVictim(SPELL_KICK, false);
+                    KickTimer = 15000;
+            } else KickTimer -= diff;
+
+            if (SunderArmorTimer <= diff)
+            {
+                DoCastVictim(SPELL_SUNDER_ARMOR, false);
+                    SunderArmorTimer = 8000;
+            } else SunderArmorTimer -= diff;
+
+            DoMeleeAttackIfReady();
         }
     };
 };
