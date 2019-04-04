@@ -507,7 +507,7 @@ void Master::ClearOnlineAccounts()
 {
     // Reset online status for all accounts with characters on the current realm
     // pussywizard: tc query would set online=0 even if logged in on another realm >_>
-    LoginDatabase.DirectPExecute("UPDATE account SET online = online & ~(1<<(%u-1)) WHERE online & (1<<(%u-1))", realmID, realmID);
+    LoginDatabase.DirectPExecute("UPDATE account SET online = 0 WHERE online = %u", realmID);
 
     // Reset online status for all characters
     CharacterDatabase.DirectExecute("UPDATE characters SET online = 0 WHERE online <> 0");
