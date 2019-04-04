@@ -6298,7 +6298,7 @@ void SpellMgr::LoadDbcDataCorrections()
     properties->Type = SUMMON_TYPE_TOTEM;
     properties = const_cast<SummonPropertiesEntry*>(sSummonPropertiesStore.LookupEntry(647)); // 52893
     properties->Type = SUMMON_TYPE_TOTEM;
-    if (properties = const_cast<SummonPropertiesEntry*>(sSummonPropertiesStore.LookupEntry(628))) // Hungry Plaguehound
+    if (properties = (const_cast<SummonPropertiesEntry*>(sSummonPropertiesStore.LookupEntry(628)))) // Hungry Plaguehound
         properties->Category = SUMMON_CATEGORY_PET;
 
     // Correct Pet Size
