@@ -16,7 +16,7 @@ add_executable(mmaps_generator ${PRIVATE_SOURCES})
 
 target_link_libraries(mmaps_generator
   PUBLIC
-    shared
+    common
     Recast
     mpq)
 

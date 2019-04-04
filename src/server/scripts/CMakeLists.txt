@@ -91,7 +91,7 @@ target_include_directories(scripts-interface
 
 target_link_libraries(scripts-interface
   INTERFACE
-    shared)
+    common)
 
 add_library(scripts STATIC
   ${scripts_STAT_SRCS}
