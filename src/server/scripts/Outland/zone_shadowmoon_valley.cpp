@@ -557,7 +557,8 @@ public:
 # npc_dragonmaw_peon
 #####*/
 
-enum eDragonmawPeon {
+enum eDragonmawPeon 
+{
     SPELL_KICK         = 34802,
     SPELL_SUNDER_ARMOR = 15572
 };
