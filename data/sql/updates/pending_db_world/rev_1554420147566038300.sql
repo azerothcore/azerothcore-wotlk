@@ -2,7 +2,7 @@ INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1554420147566038300');
 
 -- Gelkis Windchaser SAI
 SET @ENTRY := 4649;
-UPDATE `creature_template` SET `AIName`="SmartAI" WHERE `entry`=@ENTRY;
+UPDATE `creature_template` SET `AIName`='SmartAI' WHERE `entry`=@ENTRY;
 DELETE FROM `smart_scripts` WHERE `entryorguid`=@ENTRY AND `source_type`=0;
 INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES
 (@ENTRY,0,0,0,0,0,100,0,500,1000,3000,4500,11,9532,32,0,0,0,0,2,0,0,0,0,0,0,0,'Gelkis Windchaser - In Combat - Cast \'Lightning Bolt\''),
@@ -11,7 +11,7 @@ INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type
 
 -- Gelkis Stamper SAI
 SET @ENTRY := 4648;
-UPDATE `creature_template` SET `AIName`="SmartAI" WHERE `entry`=@ENTRY;
+UPDATE `creature_template` SET `AIName`='SmartAI' WHERE `entry`=@ENTRY;
 DELETE FROM `smart_scripts` WHERE `entryorguid`=@ENTRY AND `source_type`=0;
 INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES
 (@ENTRY,0,0,0,9,0,100,0,10,1,3500,5000,11,5568,0,0,0,0,0,2,0,0,0,0,0,0,0,'Gelkis Stamper - Within 10-1 Range - Cast \'Trample\''),
@@ -19,7 +19,7 @@ INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type
 
 -- Gelkis Scout SAI
 SET @ENTRY := 4647;
-UPDATE `creature_template` SET `AIName`="SmartAI" WHERE `entry`=@ENTRY;
+UPDATE `creature_template` SET `AIName`='SmartAI' WHERE `entry`=@ENTRY;
 DELETE FROM `smart_scripts` WHERE `entryorguid`=@ENTRY AND `source_type`=0;
 INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES
 (@ENTRY,0,0,0,9,0,100,0,5,30,2000,2500,11,6660,32,0,0,0,0,2,0,0,0,0,0,0,0,'Gelkis Scout - Within 5-30 Range - Cast \'Shoot\''),
@@ -27,21 +27,21 @@ INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type
 
 -- Gelkis Outrunner SAI
 SET @ENTRY := 4646;
-UPDATE `creature_template` SET `AIName`="SmartAI" WHERE `entry`=@ENTRY;
+UPDATE `creature_template` SET `AIName`='SmartAI' WHERE `entry`=@ENTRY;
 DELETE FROM `smart_scripts` WHERE `entryorguid`=@ENTRY AND `source_type`=0;
 INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES
 (@ENTRY,0,0,0,2,0,100,1,1,10,0,0,25,0,0,0,0,0,0,1,0,0,0,0,0,0,0,'Gelkis Outrunner - Between 1-10% Health - Flee For Assist (No Repeat)');
 
 -- Gelkis Mauler SAI
 SET @ENTRY := 4652;
-UPDATE `creature_template` SET `AIName`="SmartAI" WHERE `entry`=@ENTRY;
+UPDATE `creature_template` SET `AIName`='SmartAI' WHERE `entry`=@ENTRY;
 DELETE FROM `smart_scripts` WHERE `entryorguid`=@ENTRY AND `source_type`=0;
 INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES
 (@ENTRY,0,0,0,2,0,100,1,1,10,0,0,25,0,0,0,0,0,0,1,0,0,0,0,0,0,0,'Gelkis Mauler - Between 1-10% Health - Flee For Assist (No Repeat)');
 
 -- Gelkis Earthcaller SAI
 SET @ENTRY := 4651;
-UPDATE `creature_template` SET `AIName`="SmartAI" WHERE `entry`=@ENTRY;
+UPDATE `creature_template` SET `AIName`='SmartAI' WHERE `entry`=@ENTRY;
 DELETE FROM `smart_scripts` WHERE `entryorguid`=@ENTRY AND `source_type`=0;
 INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES
 (@ENTRY,0,0,0,0,0,100,0,0,1000,3000,3500,11,20815,32,0,0,0,0,2,0,0,0,0,0,0,0,'Gelkis Earthcaller - In Combat - Cast \'Fireball\''),
@@ -49,7 +49,7 @@ INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type
 
 -- Gelkis Marauder SAI
 SET @ENTRY := 4653;
-UPDATE `creature_template` SET `AIName`="SmartAI" WHERE `entry`=@ENTRY;
+UPDATE `creature_template` SET `AIName`='SmartAI' WHERE `entry`=@ENTRY;
 DELETE FROM `smart_scripts` WHERE `entryorguid`=@ENTRY AND `source_type`=0;
 INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES
 (@ENTRY,0,0,0,1,0,100,0,1000,2000,5000,5000,11,7366,32,0,0,0,0,1,0,0,0,0,0,0,0,'Gelkis Marauder - Out of Combat - Cast \'Berserker Stance\''),
@@ -58,7 +58,7 @@ INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type
 
 -- Magram Marauder SAI
 SET @ENTRY := 4644;
-UPDATE `creature_template` SET `AIName`="SmartAI" WHERE `entry`=@ENTRY;
+UPDATE `creature_template` SET `AIName`='SmartAI' WHERE `entry`=@ENTRY;
 DELETE FROM `smart_scripts` WHERE `entryorguid`=@ENTRY AND `source_type`=0;
 INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES
 (@ENTRY,0,0,0,1,0,100,0,1000,2000,5000,5000,11,7366,32,0,0,0,0,1,0,0,0,0,0,0,0,'Magram Marauder - Out of Combat - Cast \'Berserker Stance\''),
@@ -67,28 +67,28 @@ INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type
 
 -- Magram Mauler SAI
 SET @ENTRY := 4645;
-UPDATE `creature_template` SET `AIName`="SmartAI" WHERE `entry`=@ENTRY;
+UPDATE `creature_template` SET `AIName`='SmartAI' WHERE `entry`=@ENTRY;
 DELETE FROM `smart_scripts` WHERE `entryorguid`=@ENTRY AND `source_type`=0;
 INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES
 (@ENTRY,0,0,0,2,0,100,1,1,10,0,0,25,0,0,0,0,0,0,1,0,0,0,0,0,0,0,'Magram Mauler - Between 1-10% Health - Flee For Assist (No Repeat)');
 
 -- Magram Outrunner SAI
 SET @ENTRY := 4639;
-UPDATE `creature_template` SET `AIName`="SmartAI" WHERE `entry`=@ENTRY;
+UPDATE `creature_template` SET `AIName`='SmartAI' WHERE `entry`=@ENTRY;
 DELETE FROM `smart_scripts` WHERE `entryorguid`=@ENTRY AND `source_type`=0;
 INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES
 (@ENTRY,0,0,0,2,0,100,1,1,10,0,0,25,0,0,0,0,0,0,1,0,0,0,0,0,0,0,'Magram Outrunner - Between 1-10% Health - Flee For Assist (No Repeat)');
 
 -- Magram Pack Runner SAI
 SET @ENTRY := 4643;
-UPDATE `creature_template` SET `AIName`="SmartAI" WHERE `entry`=@ENTRY;
+UPDATE `creature_template` SET `AIName`='SmartAI' WHERE `entry`=@ENTRY;
 DELETE FROM `smart_scripts` WHERE `entryorguid`=@ENTRY AND `source_type`=0;
 INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES
 (@ENTRY,0,0,0,2,0,100,1,1,10,0,0,25,0,0,0,0,0,0,1,0,0,0,0,0,0,0,'Magram Pack Runner - Between 1-10% Health - Flee For Assist (No Repeat)');
 
 -- Magram Scout SAI
 SET @ENTRY := 4638;
-UPDATE `creature_template` SET `AIName`="SmartAI" WHERE `entry`=@ENTRY;
+UPDATE `creature_template` SET `AIName`='SmartAI' WHERE `entry`=@ENTRY;
 DELETE FROM `smart_scripts` WHERE `entryorguid`=@ENTRY AND `source_type`=0;
 INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES
 (@ENTRY,0,0,0,9,0,100,0,5,30,2000,2500,11,6660,32,0,0,0,0,2,0,0,0,0,0,0,0,'Magram Scout - Within 5-30 Range - Cast \'Shoot\''),
@@ -96,7 +96,7 @@ INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type
 
 -- Magram Stormer SAI
 SET @ENTRY := 4642;
-UPDATE `creature_template` SET `AIName`="SmartAI" WHERE `entry`=@ENTRY;
+UPDATE `creature_template` SET `AIName`='SmartAI' WHERE `entry`=@ENTRY;
 DELETE FROM `smart_scripts` WHERE `entryorguid`=@ENTRY AND `source_type`=0;
 INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES
 (@ENTRY,0,0,0,1,0,100,0,0,2000,5000,5000,11,8788,32,0,0,0,0,1,0,0,0,0,0,0,0,'Magram Stormer - Out of Combat - Cast \'Lightning Shield\''),
@@ -106,7 +106,7 @@ INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type
 
 -- Magram Windchaser SAI
 SET @ENTRY := 4641;
-UPDATE `creature_template` SET `AIName`="SmartAI" WHERE `entry`=@ENTRY;
+UPDATE `creature_template` SET `AIName`='SmartAI' WHERE `entry`=@ENTRY;
 DELETE FROM `smart_scripts` WHERE `entryorguid`=@ENTRY AND `source_type`=0;
 INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES
 (@ENTRY,0,0,0,0,0,100,0,500,1000,3000,4500,11,9532,32,0,0,0,0,2,0,0,0,0,0,0,0,'Magram Windchaser - In Combat - Cast \'Lightning Bolt\''),
@@ -115,7 +115,7 @@ INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type
 
 -- Magram Wrangler SAI
 SET @ENTRY := 4640;
-UPDATE `creature_template` SET `AIName`="SmartAI" WHERE `entry`=@ENTRY;
+UPDATE `creature_template` SET `AIName`='SmartAI' WHERE `entry`=@ENTRY;
 DELETE FROM `smart_scripts` WHERE `entryorguid`=@ENTRY AND `source_type`=0;
 INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES
 (@ENTRY,0,0,0,0,0,100,0,1000,4500,15000,20000,11,6533,32,0,0,0,0,2,0,0,0,0,0,0,0,'Magram Wrangler - In Combat - Cast \'Net\''),
