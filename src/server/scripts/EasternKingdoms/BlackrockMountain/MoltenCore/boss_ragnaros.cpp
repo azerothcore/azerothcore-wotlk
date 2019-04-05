@@ -79,12 +79,12 @@ class boss_ragnaros : public CreatureScript
             void Reset()
             {
                 BossAI::Reset();
+                me->SetHomePosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.8f);
                 _emergeTimer = 90000;
                 _hasYelledMagmaBurst = false;
                 _hasSubmergedOnce = false;
                 _isBanished = false;
                 me->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
-                me->SetOrientation(0.8f);
             }
 
             void EnterCombat(Unit* victim)
@@ -150,6 +150,7 @@ class boss_ragnaros : public CreatureScript
                             me->SetReactState(REACT_AGGRESSIVE);
                             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                             _introState = 2;
+                            me->SetHomePosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 4.0f);
                             break;
                         default:
                             break;
