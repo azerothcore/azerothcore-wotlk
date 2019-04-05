@@ -76,6 +76,9 @@ class boss_ragnaros : public CreatureScript
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
             }
 
+            float const originalCombatOrientation = 0.8f;
+            float const hammerOrientationAfterDeath = 4.0f;
+
             void Reset()
             {
                 BossAI::Reset();
@@ -84,12 +87,13 @@ class boss_ragnaros : public CreatureScript
                 _hasSubmergedOnce = false;
                 _isBanished = false;
                 me->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
-                me->SetOrientation(0.8f);
+                me->SetOrientation(originalCombatOrientation);
             }
 
             void EnterCombat(Unit* victim)
             {
                 BossAI::EnterCombat(victim);
+                me->SetOrientation(hammerOrientationAfterDeath);
                 events.ScheduleEvent(EVENT_ERUPTION, 15000);
                 events.ScheduleEvent(EVENT_WRATH_OF_RAGNAROS, 30000);
                 events.ScheduleEvent(EVENT_HAND_OF_RAGNAROS, 25000);
