@@ -18,7 +18,7 @@ INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type
 (@ENTRY,9,3,0,0,0,100,0,3000,3000,0,0,50,179882,21600,0,0,0,0,8,0,0,0,-8925.57,496.042,103.767,2.42801,'Field Marshal Afrasiabi - On Script - Summon Gameobject The Severed Head of Nefarian'),
 (@ENTRY,9,4,0,0,0,100,0,6000,6000,0,0,11,22888,0,0,0,0,0,1,0,0,0,0,0,0,0,'Field Marshal Afrasiabi - On Script - Cast Rallying Cry of the Dragonslayer'),
 (@ENTRY,9,5,0,0,0,100,0,1000,1000,0,0,82,2,0,0,0,0,0,1,0,0,0,0,0,0,0,'Field Marshal Afrasiabi - On Script - Add Npc Flag Questgiver'),
-(@ENTRY,9,6,0,1,0,100,0,30000,30000,0,0,41,10000,0,0,0,0,0,14,0,179882,0,0,0,0,0,'Field Marshal Afrasiabi - Despawn In 10000 ms');
+(@ENTRY,9,6,0,1,0,100,0,30000,30000,0,0,41,7200000,0,0,0,0,0,14,0,179882,0,0,0,0,0,'Field Marshal Afrasiabi - Despawn In 10000 ms');
 
 DELETE FROM `creature_text` WHERE `creatureid` IN (14721);
 INSERT INTO `creature_text` (`creatureid`, `groupid`, `id`, `text`, `type`, `language`, `probability`, `emote`, `duration`, `sound`, `comment`, `BroadcastTextId`) VALUES 
