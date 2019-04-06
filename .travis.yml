@@ -39,6 +39,7 @@ jobs:
           - source ./apps/ci/ci-before_install.sh
       install:
         - source ./apps/ci/ci-install.sh OFF
+        - source ./apps/ci/ci-install-modules.sh
       script:
         - source ./apps/ci/ci-compile.sh
 
@@ -48,6 +49,7 @@ jobs:
         - source ./apps/ci/ci-before_install.sh
       install:
         - source ./apps/ci/ci-install.sh ON
+        - source ./apps/ci/ci-install-modules.sh
         - source ./apps/ci/ci-import-db.sh
       script:
         - source ./apps/ci/ci-compile.sh
@@ -59,6 +61,7 @@ jobs:
           - source ./apps/ci/ci-before_install.sh
       install:
         - source ./apps/ci/ci-install.sh OFF
+        - source ./apps/ci/ci-install-modules.sh
       script:
         - source ./apps/ci/ci-compile.sh
 
@@ -68,5 +71,6 @@ jobs:
         - source ./apps/ci/ci-before_install.sh
       install:
         - source ./apps/ci/ci-install.sh ON
+        - source ./apps/ci/ci-install-modules.sh
       script:
         - source ./apps/ci/ci-compile.sh
