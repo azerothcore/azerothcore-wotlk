@@ -39,55 +39,64 @@ enum ScriptTexts
 enum Spells
 {
     // Lady Deathwhisper
-    SPELL_SHADOW_CHANNELING         = 43897, // during intro
-    SPELL_MANA_BARRIER              = 70842,
-    SPELL_DEATH_AND_DECAY           = 71001,
-    SPELL_DOMINATE_MIND_25          = 71289,
-    SPELL_SHADOW_BOLT               = 71254,
-    SPELL_DARK_MARTYRDOM_T          = 70897,
-    SPELL_DARK_TRANSFORMATION_T     = 70895,
-    SPELL_DARK_EMPOWERMENT_T        = 70896,
-    SPELL_FROSTBOLT                 = 71420,
-    SPELL_FROSTBOLT_VOLLEY          = 72905,
-    SPELL_TOUCH_OF_INSIGNIFICANCE   = 71204,
-    SPELL_SUMMON_SHADE              = 71363,
+    SPELL_SHADOW_CHANNELING           = 43897, // during intro
+    SPELL_MANA_BARRIER                = 70842,
+    SPELL_DEATH_AND_DECAY             = 71001,
+    SPELL_DOMINATE_MIND_25            = 71289,
+    SPELL_SHADOW_BOLT                 = 71254,
+    SPELL_DARK_MARTYRDOM_T            = 70897,
+    SPELL_DARK_TRANSFORMATION_T       = 70895,
+    SPELL_DARK_EMPOWERMENT_T          = 70896,
+    SPELL_FROSTBOLT                   = 71420,
+    SPELL_FROSTBOLT_VOLLEY            = 72905,
+    SPELL_TOUCH_OF_INSIGNIFICANCE     = 71204,
+    SPELL_SUMMON_SHADE                = 71363,
 
     // Fanatics
-    SPELL_NECROTIC_STRIKE           = 70659,
-    SPELL_SHADOW_CLEAVE             = 70670,
-    SPELL_VAMPIRIC_MIGHT            = 70674,
-    SPELL_DARK_MARTYRDOM_FANATIC    = 71236,
-    SPELL_FANATIC_S_DETERMINATION   = 71235,
-    SPELL_DARK_TRANSFORMATION       = 70900,
+    SPELL_NECROTIC_STRIKE             = 70659,
+    SPELL_SHADOW_CLEAVE               = 70670,
+    SPELL_VAMPIRIC_MIGHT              = 70674,
+    SPELL_DARK_MARTYRDOM_FANATIC      = 71236,
+    SPELL_DARK_MARTYRDOM_FANATIC_25N  = 72495,
+    SPELL_DARK_MARTYRDOM_FANATIC_10H  = 72496,
+    SPELL_DARK_MARTYRDOM_FANATIC_25H  = 72497,
+    SPELL_FANATIC_S_DETERMINATION     = 71235,
+    SPELL_DARK_TRANSFORMATION         = 70900,
 
     //  Adherents
-    SPELL_FROST_FEVER               = 67767,
-    SPELL_DEATHCHILL_BOLT           = 70594,
-    SPELL_DEATHCHILL_BLAST          = 70906,
-    SPELL_CURSE_OF_TORPOR           = 71237,
-    SPELL_SHORUD_OF_THE_OCCULT      = 70768,
-    SPELL_DARK_MARTYRDOM_ADHERENT   = 70903,
-    SPELL_ADHERENT_S_DETERMINATION  = 71234,
-    SPELL_DARK_EMPOWERMENT          = 70901,
+    SPELL_FROST_FEVER                 = 67767,
+    SPELL_DEATHCHILL_BOLT             = 70594,
+    SPELL_DEATHCHILL_BLAST            = 70906,
+    SPELL_CURSE_OF_TORPOR             = 71237,
+    SPELL_SHORUD_OF_THE_OCCULT        = 70768,
+    SPELL_DARK_MARTYRDOM_ADHERENT     = 70903,
+    SPELL_DARK_MARTYRDOM_ADHERENT_25N = 72498,
+    SPELL_DARK_MARTYRDOM_ADHERENT_10H = 72499,
+    SPELL_DARK_MARTYRDOM_ADHERENT_25H = 72500,
+    SPELL_ADHERENT_S_DETERMINATION    = 71234,
+    SPELL_DARK_EMPOWERMENT            = 70901,
 
     // Vengeful Shade
-    SPELL_VENGEFUL_BLAST_PASSIVE    = 71494,
-    SPELL_VENGEFUL_BLAST_10N        = 71544,
-    SPELL_VENGEFUL_BLAST_25N        = 72010,
-    SPELL_VENGEFUL_BLAST_10H        = 72011,
-    SPELL_VENGEFUL_BLAST_25H        = 72012,
+    SPELL_VENGEFUL_BLAST_PASSIVE      = 71494,
+    SPELL_VENGEFUL_BLAST_10N          = 71544,
+    SPELL_VENGEFUL_BLAST_25N          = 72010,
+    SPELL_VENGEFUL_BLAST_10H          = 72011,
+    SPELL_VENGEFUL_BLAST_25H          = 72012,
 
     // Darnavan
-    SPELL_BLADESTORM                = 65947,
-    SPELL_CHARGE                    = 65927,
-    SPELL_INTIMIDATING_SHOUT        = 65930,
-    SPELL_MORTAL_STRIKE             = 65926,
-    SPELL_SHATTERING_THROW          = 65940,
-    SPELL_SUNDER_ARMOR              = 65936,
+    SPELL_BLADESTORM                  = 65947,
+    SPELL_CHARGE                      = 65927,
+    SPELL_INTIMIDATING_SHOUT          = 65930,
+    SPELL_MORTAL_STRIKE               = 65926,
+    SPELL_SHATTERING_THROW            = 65940,
+    SPELL_SUNDER_ARMOR                = 65936,
 
     // misc
-    SPELL_FULL_HOUSE                = 72827, // achievement
-    SPELL_TELEPORT_VISUAL           = 52096, // used by adds
+    SPELL_FULL_HOUSE                  = 72827, // achievement
+    SPELL_TELEPORT_VISUAL             = 52096, // used by adds
+    SPELL_CLEAR_ALL_DEBUFFS           = 34098,
+    SPELL_FULL_HEAL                   = 17683,
+    SPELL_PERMANENT_FEIGN_DEATH       = 70628,
 };
 
 enum EventTypes
@@ -107,7 +116,6 @@ enum EventTypes
     // Phase 1:
     EVENT_SPELL_SHADOW_BOLT,
     EVENT_SUMMON_WAVE_P1,
-    EVENT_REANIMATE_CULTIST,
     EVENT_EMPOWER_CULTIST,
 
     // Phase 2:
@@ -119,7 +127,7 @@ enum EventTypes
 
     // Shared adds events:
     EVENT_SPELL_CULTIST_DARK_MARTYRDOM,
-    EVENT_CULTIST_DARK_MARTYRDOM_SELF_KILL,
+    EVENT_CULTIST_DARK_MARTYRDOM_REVIVE,
 
     // Cult Fanatic:
     EVENT_SPELL_FANATIC_NECROTIC_STRIKE,
@@ -130,7 +138,7 @@ enum EventTypes
     EVENT_SPELL_ADHERENT_FROST_FEVER,
     EVENT_SPELL_ADHERENT_DEATHCHILL,
     EVENT_SPELL_ADHERENT_CURSE_OF_TORPOR,
-    EVENT_SPELL_ADHERENT_SHORUD_OF_THE_OCCULT,
+    EVENT_SPELL_ADHERENT_SHROUD_OF_THE_OCCULT,
 
     // Darnavan:
     EVENT_DARNAVAN_BLADESTORM,
@@ -189,7 +197,7 @@ class DaranavanMoveEvent : public BasicEvent
     public:
         DaranavanMoveEvent(Creature& darnavan) : _darnavan(darnavan) { }
 
-        bool Execute(uint64 /*time*/, uint32 /*diff*/)
+        bool Execute(uint64 /*time*/, uint32 /*diff*/) override
         {
             _darnavan.GetMotionMaster()->MovePoint(POINT_DESPAWN, SummonPositions[6]);
             return true;
@@ -199,6 +207,21 @@ class DaranavanMoveEvent : public BasicEvent
         Creature& _darnavan;
 };
 
+void ApplyMechanicImmune(Creature* c, bool apply)
+{
+    c->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FEAR, apply);
+    c->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_INTERRUPT, apply);
+    c->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_KNOCKOUT, apply);
+    c->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_SILENCE, apply);
+    c->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_STUN, apply);
+    c->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_DISORIENTED, apply);
+    c->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_POLYMORPH, apply);
+    c->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_SLEEP, apply);
+    c->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FREEZE, apply);
+    c->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_HORROR, apply);
+    c->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_CHARM, apply);
+}
+
 class boss_lady_deathwhisper : public CreatureScript
 {
     public:
@@ -206,30 +229,29 @@ class boss_lady_deathwhisper : public CreatureScript
 
         struct boss_lady_deathwhisperAI : public BossAI
         {
-            boss_lady_deathwhisperAI(Creature* creature) : BossAI(creature, DATA_LADY_DEATHWHISPER), _introDone(false), _darnavanGUID(0)
-            {
-            }
+            boss_lady_deathwhisperAI(Creature* creature) : BossAI(creature, DATA_LADY_DEATHWHISPER), _introDone(false), _darnavanGUID(0) { }
 
-            void Reset()
+            void Reset() override
             {
                 if (Creature* darnavan = ObjectAccessor::GetCreature(*me, _darnavanGUID))
                     darnavan->DespawnOrUnsummon();
                 _darnavanGUID = 0;
                 _waveCounter = 0;
-                _reanimationQueue.clear();
                 _Reset();
                 me->SetPower(POWER_MANA, me->GetMaxPower(POWER_MANA));
                 events.SetPhase(PHASE_ONE);
                 me->CastSpell(me, SPELL_SHADOW_CHANNELING, false);
+                me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TAUNT, false);
+                me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_ATTACK_ME, false);
             }
 
-            void AttackStart(Unit* victim)
+            void AttackStart(Unit* victim) override
             {
                 if (victim && me->Attack(victim, true) && !(events.GetPhaseMask() & PHASE_ONE_MASK))
                     me->GetMotionMaster()->MoveChase(victim);
             }
 
-            void EnterCombat(Unit* who)
+            void EnterCombat(Unit* who) override
             {
                 if (!instance->CheckRequiredBosses(DATA_LADY_DEATHWHISPER, who->ToPlayer()))
                 {
@@ -246,10 +268,10 @@ class boss_lady_deathwhisper : public CreatureScript
                 events.ScheduleEvent(EVENT_BERSERK, 600000);
                 events.ScheduleEvent(EVENT_SPELL_DEATH_AND_DECAY, 10000);
                 if (GetDifficulty() != RAID_DIFFICULTY_10MAN_NORMAL)
-                    events.ScheduleEvent(EVENT_SPELL_DOMINATE_MIND_25, 27000);
-                events.ScheduleEvent(EVENT_SPELL_SHADOW_BOLT, urand(5500, 6000), 0, PHASE_ONE);
+                    events.ScheduleEvent(EVENT_SPELL_DOMINATE_MIND_25, 30000);
+                events.ScheduleEvent(EVENT_SPELL_SHADOW_BOLT, 2000, 0, PHASE_ONE);
                 events.ScheduleEvent(EVENT_SUMMON_WAVE_P1, 5000, 0, PHASE_ONE);
-                events.ScheduleEvent(EVENT_EMPOWER_CULTIST, urand(20000, 30000), 0, PHASE_ONE);
+                events.ScheduleEvent(EVENT_EMPOWER_CULTIST, urand(20000,30000), 0, PHASE_ONE);
 
                 Talk(SAY_AGGRO);
                 me->RemoveAurasDueToSpell(SPELL_SHADOW_CHANNELING);
@@ -258,7 +280,7 @@ class boss_lady_deathwhisper : public CreatureScript
                 instance->SetBossState(DATA_LADY_DEATHWHISPER, IN_PROGRESS);
             }
 
-            void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask)
+            void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
             {
                 if (events.GetPhaseMask() & PHASE_ONE_MASK && damage >= me->GetPower(POWER_MANA))
                 {
@@ -279,16 +301,20 @@ class boss_lady_deathwhisper : public CreatureScript
                     me->SetPower(POWER_MANA, 0);
                     me->RemoveAurasDueToSpell(SPELL_MANA_BARRIER);
                     events.SetPhase(PHASE_TWO);
-                    events.ScheduleEvent(EVENT_SPELL_FROSTBOLT, urand(10000, 12000), 0, PHASE_TWO);
-                    events.ScheduleEvent(EVENT_SPELL_FROSTBOLT_VOLLEY, urand(19000, 21000), 0, PHASE_TWO);
+                    events.ScheduleEvent(EVENT_SPELL_FROSTBOLT, urand(10000,12000), 0, PHASE_TWO);
+                    events.ScheduleEvent(EVENT_SPELL_FROSTBOLT_VOLLEY, urand(19000,21000), 0, PHASE_TWO);
                     events.ScheduleEvent(EVENT_SPELL_TOUCH_OF_INSIGNIFICANCE, urand(6000, 9000), 0, PHASE_TWO);
-                    events.ScheduleEvent(EVENT_SPELL_SUMMON_SHADE, urand(12000, 15000), 0, PHASE_TWO);
+                    events.ScheduleEvent(EVENT_SPELL_SUMMON_SHADE, urand(12000,15000), 0, PHASE_TWO);
                     if (IsHeroic())
+                    {
+                        me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TAUNT, true);
+                        me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_ATTACK_ME, true);
                         events.ScheduleEvent(EVENT_SUMMON_WAVE_P2, 45000, 0, PHASE_TWO);
+                    }
                 }
             }
 
-            void UpdateAI(uint32 diff)
+            void UpdateAI(uint32 diff) override
             {
                 if ((!UpdateVictim() && !(events.GetPhaseMask() & PHASE_INTRO_MASK)) || !CheckInRoom())
                     return;
@@ -375,31 +401,27 @@ class boss_lady_deathwhisper : public CreatureScript
                     case EVENT_SPELL_SHADOW_BOLT:
                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
                             me->CastSpell(target, SPELL_SHADOW_BOLT, false);
-                        events.RepeatEvent(urand(5000, 8000));
+                        events.RepeatEvent(2100);
                         break;
                     case EVENT_SUMMON_WAVE_P1:
                         SummonWaveP1();
                         events.RepeatEvent(IsHeroic() ? 45000 : 60000);
                         break;
-                    case EVENT_REANIMATE_CULTIST:
-                        ReanimateCultist();
-                        events.PopEvent();
-                        break;
                     case EVENT_EMPOWER_CULTIST:
                         EmpowerCultist();
-                        events.RepeatEvent(urand(18000, 25000));
+                        events.RepeatEvent(urand(18000,25000));
                         break;
                     case EVENT_SPELL_FROSTBOLT:
                         me->CastSpell(me->GetVictim(), SPELL_FROSTBOLT, false);
-                        events.RepeatEvent(urand(10000, 11000));
+                        events.RepeatEvent(12000);
                         break;
                     case EVENT_SPELL_FROSTBOLT_VOLLEY:
-                        me->CastSpell((Unit*)NULL, SPELL_FROSTBOLT_VOLLEY, false);
-                        events.RepeatEvent(urand(13000, 15000));
+                        me->CastSpell((Unit*)nullptr, SPELL_FROSTBOLT_VOLLEY, false);
+                        events.RepeatEvent(urand(13000,15000));
                         break;
                     case EVENT_SPELL_TOUCH_OF_INSIGNIFICANCE:
                         me->CastSpell(me->GetVictim(), SPELL_TOUCH_OF_INSIGNIFICANCE, false);
-                        events.RepeatEvent(urand(9000, 13000));
+                        events.RepeatEvent(urand(6000, 9000));
                         break;
                     case EVENT_SUMMON_WAVE_P2:
                         SummonWaveP2();
@@ -419,7 +441,7 @@ class boss_lady_deathwhisper : public CreatureScript
                                 for (std::list<Unit*>::iterator itr = targets.begin(); itr != targets.end(); ++itr)
                                     me->CastSpell(*itr, SPELL_SUMMON_SHADE, true);
                         }
-                        events.RepeatEvent(urand(18000, 23000));
+                        events.RepeatEvent(12000);
                         break;
                 }
 
@@ -429,14 +451,14 @@ class boss_lady_deathwhisper : public CreatureScript
                 DoMeleeAttackIfReady();
             }
 
-            void JustSummoned(Creature* summon)
+            void JustSummoned(Creature* summon) override
             {
                 if (summon->GetEntry() == NPC_DARNAVAN)
                     _darnavanGUID = summon->GetGUID();
                 else
                     summons.Summon(summon);
 
-                Unit* target = NULL;
+                Unit* target = nullptr;
                 if (summon->GetEntry() == NPC_VENGEFUL_SHADE)
                 {
                     float minrange = 250.0f;
@@ -460,12 +482,12 @@ class boss_lady_deathwhisper : public CreatureScript
                 summon->AI()->AttackStart(target);
             }
 
-            void SummonedCreatureDespawn(Creature* summon)
+            void SummonedCreatureDespawn(Creature* summon) override
             {
                 summons.Despawn(summon);
             }
 
-            void JustDied(Unit* killer)
+            void JustDied(Unit* killer) override
             {
                 Talk(SAY_DEATH);
 
@@ -496,7 +518,7 @@ class boss_lady_deathwhisper : public CreatureScript
                         {
                             if (Group* group = owner->GetGroup())
                             {
-                                for (GroupReference* itr = group->GetFirstMember(); itr != NULL; itr = itr->next())
+                                for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
                                     if (Player* member = itr->GetSource())
                                         if (member->IsInMap(owner))
                                             member->KilledMonsterCredit(NPC_DARNAVAN_CREDIT, 0);
@@ -510,18 +532,18 @@ class boss_lady_deathwhisper : public CreatureScript
                 _JustDied();
             }
 
-            void KilledUnit(Unit* victim)
+            void KilledUnit(Unit* victim) override
             {
                 if (victim->GetTypeId() == TYPEID_PLAYER)
                     Talk(SAY_KILL);
             }
 
-            void DoAction(int32 action)
+            void DoAction(int32 action) override
             {
                 if (action != ACTION_START_INTRO)
                     return;
 
-                if (!_introDone)
+                if (!_introDone && !me->IsInCombat())
                 {
                     _introDone = true;
                     Talk(SAY_INTRO_1);
@@ -585,30 +607,6 @@ class boss_lady_deathwhisper : public CreatureScript
                     }
             }
 
-            void SetGUID(uint64 guid, int32)
-            {
-                if (events.GetPhaseMask() & PHASE_ONE_MASK)
-                {
-                    _reanimationQueue.push_back(guid);
-                    events.ScheduleEvent(EVENT_REANIMATE_CULTIST, 3000, 0, PHASE_ONE);
-                }
-            }
-
-            void ReanimateCultist()
-            {
-                if (_reanimationQueue.empty())
-                    return;
-
-                uint64 cultistGUID = _reanimationQueue.front();
-                Creature* cultist = ObjectAccessor::GetCreature(*me, cultistGUID);
-                _reanimationQueue.pop_front();
-                if (!cultist)
-                    return;
-
-                Talk(SAY_ANIMATE_DEAD);
-                me->CastSpell(cultist, SPELL_DARK_MARTYRDOM_T, true);
-            }
-
             void EmpowerCultist()
             {
                 if (summons.empty())
@@ -625,40 +623,35 @@ class boss_lady_deathwhisper : public CreatureScript
                     return;
 
                 // select random cultist
-                if (Creature* cultist = Trinity::Containers::SelectRandomContainerElement(temp))
+                Creature* cultist = Trinity::Containers::SelectRandomContainerElement(temp);
+                if (!cultist)
+                    return;
+
+                if (RAND(0, 1))
+                    me->CastSpell(cultist, SPELL_DARK_MARTYRDOM_T);
+                else
                 {
                     me->CastSpell(cultist, cultist->GetEntry() == NPC_CULT_FANATIC ? SPELL_DARK_TRANSFORMATION_T : SPELL_DARK_EMPOWERMENT_T, true);
                     Talk(uint8(cultist->GetEntry() == NPC_CULT_FANATIC ? SAY_DARK_TRANSFORMATION : SAY_DARK_EMPOWERMENT));
                 }
             }
 
-            void SpellHitTarget(Unit* target, SpellInfo const* spell)
+            void SpellHitTarget(Unit* target, SpellInfo const* spell) override
             {
-                if (spell->Id == SPELL_DARK_MARTYRDOM_T)
-                {
-                    if (target->GetEntry() == NPC_CULT_FANATIC)
-                        me->SummonCreature(NPC_REANIMATED_FANATIC, *target, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
-                    else
-                        me->SummonCreature(NPC_REANIMATED_ADHERENT, *target, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
-
-                    if (TempSummon* summon = target->ToTempSummon())
-                        summon->UnSummon();
-                }
-                else if (spell->Id == SPELL_DOMINATE_MIND_25)
+                if (spell->Id == SPELL_DOMINATE_MIND_25)
                 {
                     const int32 val = 100;
-                    target->CastCustomSpell(target, 73261, &val, NULL, NULL, true); // scale aura, +100% size
+                    target->CastCustomSpell(target, 73261, &val, nullptr, nullptr, true); // scale aura, +100% size
                 }
             }
 
         private:
             bool _introDone;
             uint64 _darnavanGUID;
-            std::deque<uint64> _reanimationQueue;
             uint32 _waveCounter;
         };
 
-        CreatureAI* GetAI(Creature* creature) const
+        CreatureAI* GetAI(Creature* creature) const override
         {
             return GetIcecrownCitadelAI<boss_lady_deathwhisperAI>(creature);
         }
@@ -666,242 +659,283 @@ class boss_lady_deathwhisper : public CreatureScript
 
 class npc_cult_fanatic : public CreatureScript
 {
-public:
-    npc_cult_fanatic() : CreatureScript("npc_cult_fanatic") { }
+    public:
+        npc_cult_fanatic() : CreatureScript("npc_cult_fanatic") { }
 
-    struct npc_cult_fanaticAI : public ScriptedAI
-    {
-        npc_cult_fanaticAI(Creature* creature) : ScriptedAI(creature) {}
-
-        EventMap events;
-
-        void Reset()
+        struct npc_cult_fanaticAI : public ScriptedAI
         {
-            events.Reset();
-            events.ScheduleEvent(EVENT_SPELL_FANATIC_NECROTIC_STRIKE, urand(10000, 12000));
-            events.ScheduleEvent(EVENT_SPELL_FANATIC_SHADOW_CLEAVE, urand(14000, 16000));
-            events.ScheduleEvent(EVENT_SPELL_FANATIC_VAMPIRIC_MIGHT, urand(20000, 27000));
-            if (me->GetEntry() == NPC_CULT_FANATIC)
-                events.ScheduleEvent(EVENT_SPELL_CULTIST_DARK_MARTYRDOM, urand(15000, 32000));
-        }
+            npc_cult_fanaticAI(Creature* creature) : ScriptedAI(creature), _instance(creature->GetInstanceScript()) {}
 
-        void SpellHit(Unit* /*caster*/, SpellInfo const* spell)
-        {
-            if (spell->Id == SPELL_DARK_TRANSFORMATION)
-                me->UpdateEntry(NPC_DEFORMED_FANATIC);
-            else if (spell->Id == SPELL_DARK_TRANSFORMATION_T)
+            EventMap events;
+            InstanceScript* _instance;
+
+            void Reset() override
             {
-                events.CancelEvent(EVENT_SPELL_CULTIST_DARK_MARTYRDOM);
-                me->InterruptNonMeleeSpells(true);
-                me->CastSpell(me, SPELL_DARK_TRANSFORMATION, false);
-            }
-        }
-
-        void DoAction(int32 a)
-        {
-            if (a == -1)
-            {
-                me->SetControlled(true, UNIT_STATE_STUNNED);
-                me->SetReactState(REACT_PASSIVE);
-                me->GetMotionMaster()->MoveIdle();
-                me->StopMoving();
                 events.Reset();
-                events.ScheduleEvent(EVENT_CULTIST_DARK_MARTYRDOM_SELF_KILL, 500);
+                events.ScheduleEvent(EVENT_SPELL_FANATIC_NECROTIC_STRIKE, urand(10000, 12000));
+                events.ScheduleEvent(EVENT_SPELL_FANATIC_SHADOW_CLEAVE, urand(14000, 16000));
+                events.ScheduleEvent(EVENT_SPELL_FANATIC_VAMPIRIC_MIGHT, urand(20000, 27000));
             }
-        }
 
-        void EnterCombat(Unit*  /*who*/) { DoZoneInCombat(); }
-
-        void UpdateAI(uint32 diff)
-        {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (events.GetEvent())
+            void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
             {
-                case 0:
-                    break;
-                case EVENT_SPELL_FANATIC_NECROTIC_STRIKE:
-                    me->CastSpell(me->GetVictim(), SPELL_NECROTIC_STRIKE, false);
-                    events.RepeatEvent(urand(11000, 13000));
-                    break;
-                case EVENT_SPELL_FANATIC_SHADOW_CLEAVE:
-                    me->CastSpell(me->GetVictim(), SPELL_SHADOW_CLEAVE, false);
-                    events.RepeatEvent(urand(9500, 11000));
-                    break;
-                case EVENT_SPELL_FANATIC_VAMPIRIC_MIGHT:
-                    me->CastSpell(me, SPELL_VAMPIRIC_MIGHT, false);
-                    events.RepeatEvent(urand(20000, 27000));
-                    break;
-                case EVENT_SPELL_CULTIST_DARK_MARTYRDOM:
-                    me->CastSpell(me, SPELL_DARK_MARTYRDOM_FANATIC, false);
-                    events.RepeatEvent(urand(16000, 21000));
-                    break;
-                case EVENT_CULTIST_DARK_MARTYRDOM_SELF_KILL:
-                    Unit::Kill(me, me);
-                    events.PopEvent();
-                    break;
+                switch (spell->Id)
+                {
+                    case SPELL_DARK_TRANSFORMATION:
+                        me->UpdateEntry(NPC_DEFORMED_FANATIC);
+                        break;
+                    case SPELL_DARK_TRANSFORMATION_T:
+                        me->InterruptNonMeleeSpells(true);
+                        me->CastSpell(me, SPELL_DARK_TRANSFORMATION, false);
+                        break;
+                    case SPELL_DARK_MARTYRDOM_T:
+                        me->SetReactState(REACT_PASSIVE);
+                        me->InterruptNonMeleeSpells(true);
+                        ApplyMechanicImmune(me, true);
+                        me->AttackStop();
+                        me->GetMotionMaster()->MovementExpired();
+                        me->GetMotionMaster()->MoveIdle();
+                        me->StopMoving();
+                        me->CastSpell(me, SPELL_DARK_MARTYRDOM_FANATIC, false);
+                        break;
+                    case SPELL_DARK_MARTYRDOM_FANATIC:
+                    case SPELL_DARK_MARTYRDOM_FANATIC_10H:
+                    case SPELL_DARK_MARTYRDOM_FANATIC_25N:
+                    case SPELL_DARK_MARTYRDOM_FANATIC_25H:
+                        ApplyMechanicImmune(me, false);
+                        events.ScheduleEvent(EVENT_SPELL_CULTIST_DARK_MARTYRDOM, 5); // Visual purposes only.
+                        break;
+                }
             }
 
-            DoMeleeAttackIfReady();
-        }
-    };
+            void EnterCombat(Unit*  /*who*/) override { DoZoneInCombat(); }
 
-    CreatureAI* GetAI(Creature* creature) const
-    {
-        return GetIcecrownCitadelAI<npc_cult_fanaticAI>(creature);
-    }
+            void UpdateAI(uint32 diff) override
+            {
+                if (!UpdateVictim())
+                    return;
+
+                events.Update(diff);
+
+                if (me->HasUnitState(UNIT_STATE_CASTING))
+                    return;
+
+                switch (events.GetEvent())
+                {
+                    case EVENT_SPELL_FANATIC_NECROTIC_STRIKE:
+                        me->CastSpell(me->GetVictim(), SPELL_NECROTIC_STRIKE, false);
+                        events.RepeatEvent(urand(11000, 13000));
+                        break;
+                    case EVENT_SPELL_FANATIC_SHADOW_CLEAVE:
+                        me->CastSpell(me->GetVictim(), SPELL_SHADOW_CLEAVE, false);
+                        events.RepeatEvent(urand(9500, 11000));
+                        break;
+                    case EVENT_SPELL_FANATIC_VAMPIRIC_MIGHT:
+                        me->CastSpell(me, SPELL_VAMPIRIC_MIGHT, false);
+                        events.RepeatEvent(urand(20000, 27000));
+                        break;
+                    case EVENT_CULTIST_DARK_MARTYRDOM_REVIVE:
+                        me->RemoveAurasDueToSpell(SPELL_PERMANENT_FEIGN_DEATH);
+                        me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
+                        me->RemoveFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
+                        me->UpdateEntry(NPC_REANIMATED_FANATIC);
+                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED | UNIT_FLAG_UNK_29 | UNIT_FLAG_NOT_SELECTABLE);
+                        me->SetReactState(REACT_AGGRESSIVE);
+                        DoZoneInCombat(me);
+                        me->CastSpell(me, SPELL_FANATIC_S_DETERMINATION);
+
+                        if (Creature* ladyDeathwhisper = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_LADY_DEATHWHISPER)))
+                            ladyDeathwhisper->AI()->Talk(SAY_ANIMATE_DEAD);
+                        events.PopEvent();
+                        break;
+                    case EVENT_SPELL_CULTIST_DARK_MARTYRDOM:
+                        me->CastSpell(me, SPELL_PERMANENT_FEIGN_DEATH, true);
+                        me->CastSpell(me, SPELL_CLEAR_ALL_DEBUFFS, true);
+                        me->CastSpell(me, SPELL_FULL_HEAL, true);
+                        me->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
+                        me->SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
+                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED | UNIT_FLAG_UNK_29 | UNIT_FLAG_NOT_SELECTABLE);
+                        Reset();
+                        events.ScheduleEvent(EVENT_CULTIST_DARK_MARTYRDOM_REVIVE, 6000);
+                        break;
+                    default:
+                        break;
+                }
+
+                DoMeleeAttackIfReady();
+            }
+        };
+
+        CreatureAI* GetAI(Creature* creature) const override
+        {
+            return GetIcecrownCitadelAI<npc_cult_fanaticAI>(creature);
+        }
 };
 
 class npc_cult_adherent : public CreatureScript
 {
-public:
-    npc_cult_adherent() : CreatureScript("npc_cult_adherent") { }
+    public:
+        npc_cult_adherent() : CreatureScript("npc_cult_adherent") { }
 
-    struct npc_cult_adherentAI : public ScriptedAI
-    {
-        npc_cult_adherentAI(Creature* creature) : ScriptedAI(creature) {}
-
-        EventMap events;
-
-        void Reset()
+        struct npc_cult_adherentAI : public ScriptedAI
         {
-            events.Reset();
-            events.ScheduleEvent(EVENT_SPELL_ADHERENT_FROST_FEVER, urand(10000, 12000));
-            events.ScheduleEvent(EVENT_SPELL_ADHERENT_DEATHCHILL, urand(14000, 16000));
-            events.ScheduleEvent(EVENT_SPELL_ADHERENT_CURSE_OF_TORPOR, urand(14000, 16000));
-            events.ScheduleEvent(EVENT_SPELL_ADHERENT_SHORUD_OF_THE_OCCULT, urand(32000, 39000));
-            if (me->GetEntry() == NPC_CULT_ADHERENT)
-                events.ScheduleEvent(EVENT_SPELL_CULTIST_DARK_MARTYRDOM, urand(15000, 32000));
-        }
+            npc_cult_adherentAI(Creature* creature) : ScriptedAI(creature), _instance(creature->GetInstanceScript()) {}
 
-        void SpellHit(Unit* /*caster*/, SpellInfo const* spell)
-        {
-            if (spell->Id == SPELL_DARK_EMPOWERMENT)
-                me->UpdateEntry(NPC_EMPOWERED_ADHERENT);
-            else if (spell->Id == SPELL_DARK_EMPOWERMENT_T)
+            EventMap events;
+            InstanceScript* _instance;
+
+            void Reset() override
             {
-                events.CancelEvent(EVENT_SPELL_CULTIST_DARK_MARTYRDOM);
-                me->InterruptNonMeleeSpells(true);
-                me->CastSpell(me, SPELL_DARK_EMPOWERMENT, false);
-            }
-        }
-
-        void DoAction(int32 a)
-        {
-            if (a == -1)
-            {
-                me->SetControlled(true, UNIT_STATE_STUNNED);
-                me->SetReactState(REACT_PASSIVE);
-                me->GetMotionMaster()->MovementExpired();
-                me->GetMotionMaster()->MoveIdle();
-                me->StopMoving();
                 events.Reset();
-                events.ScheduleEvent(EVENT_CULTIST_DARK_MARTYRDOM_SELF_KILL, 500);
+                events.ScheduleEvent(EVENT_SPELL_ADHERENT_FROST_FEVER, urand(10000, 12000));
+                events.ScheduleEvent(EVENT_SPELL_ADHERENT_DEATHCHILL, urand(14000, 16000));
+                events.ScheduleEvent(EVENT_SPELL_ADHERENT_CURSE_OF_TORPOR, urand(14000, 16000));
+                events.ScheduleEvent(EVENT_SPELL_ADHERENT_SHROUD_OF_THE_OCCULT, urand(32000, 39000));
             }
-        }
 
-        void EnterCombat(Unit*  /*who*/) { DoZoneInCombat(); }
-
-        void UpdateAI(uint32 diff)
-        {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (events.GetEvent())
+            void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
             {
-                case 0:
-                    break;
-                case EVENT_SPELL_ADHERENT_FROST_FEVER:
-                    me->CastSpell(me->GetVictim(), SPELL_FROST_FEVER, false);
-                    events.RepeatEvent(urand(9000, 13000));
-                    break;
-                case EVENT_SPELL_ADHERENT_DEATHCHILL:
-                    if (me->GetEntry() == NPC_EMPOWERED_ADHERENT)
-                        me->CastSpell(me->GetVictim(), SPELL_DEATHCHILL_BLAST, false);
-                    else
-                        me->CastSpell(me->GetVictim(), SPELL_DEATHCHILL_BOLT, false);
-                    events.RepeatEvent(urand(9000, 13000));
-                    break;
-                case EVENT_SPELL_ADHERENT_CURSE_OF_TORPOR:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1))
-                        me->CastSpell(target, SPELL_CURSE_OF_TORPOR, false);
-                    events.RepeatEvent(urand(9000, 13000));
-                    break;
-                case EVENT_SPELL_ADHERENT_SHORUD_OF_THE_OCCULT:
-                    me->CastSpell(me, SPELL_SHORUD_OF_THE_OCCULT, false);
-                    events.RepeatEvent(urand(27000, 32000));
-                    break;
-                case EVENT_SPELL_CULTIST_DARK_MARTYRDOM:
-                    me->CastSpell(me, SPELL_DARK_MARTYRDOM_ADHERENT, false);
-                    events.RepeatEvent(urand(16000, 21000));
-                    break;
-                case EVENT_CULTIST_DARK_MARTYRDOM_SELF_KILL:
-                    Unit::Kill(me, me);
-                    events.PopEvent();
-                    break;
+                switch (spell->Id)
+                {
+                    case SPELL_DARK_EMPOWERMENT:
+                        me->UpdateEntry(NPC_EMPOWERED_ADHERENT);
+                        break;
+                    case SPELL_DARK_EMPOWERMENT_T:
+                        me->InterruptNonMeleeSpells(true);
+                        me->CastSpell(me, SPELL_DARK_EMPOWERMENT, false);
+                        break;
+                    case SPELL_DARK_MARTYRDOM_T:
+                        me->SetReactState(REACT_PASSIVE);
+                        me->InterruptNonMeleeSpells(true);
+                        ApplyMechanicImmune(me, true);
+                        me->AttackStop();
+                        me->GetMotionMaster()->MovementExpired();
+                        me->GetMotionMaster()->MoveIdle();
+                        me->StopMoving();
+                        me->CastSpell(me, SPELL_DARK_MARTYRDOM_ADHERENT, false);
+                        break;
+                    case SPELL_DARK_MARTYRDOM_ADHERENT:
+                    case SPELL_DARK_MARTYRDOM_ADHERENT_10H:
+                    case SPELL_DARK_MARTYRDOM_ADHERENT_25N:
+                    case SPELL_DARK_MARTYRDOM_ADHERENT_25H:
+                        ApplyMechanicImmune(me, false);
+                        events.ScheduleEvent(EVENT_SPELL_CULTIST_DARK_MARTYRDOM, 5); // Visual purposes only.
+                        break;
+                }
             }
 
-            DoMeleeAttackIfReady();
-        }
-    };
+            void EnterCombat(Unit*  /*who*/) override { DoZoneInCombat(); }
 
-    CreatureAI* GetAI(Creature* creature) const
-    {
-        return GetIcecrownCitadelAI<npc_cult_adherentAI>(creature);
-    }
+            void UpdateAI(uint32 diff) override
+            {
+                if (!UpdateVictim())
+                    return;
+
+                events.Update(diff);
+
+                if (me->HasUnitState(UNIT_STATE_CASTING))
+                    return;
+
+                switch (events.GetEvent())
+                {
+                    case EVENT_SPELL_ADHERENT_FROST_FEVER:
+                        me->CastSpell(me->GetVictim(), SPELL_FROST_FEVER, false);
+                        events.RepeatEvent(urand(9000, 13000));
+                        break;
+                    case EVENT_SPELL_ADHERENT_DEATHCHILL:
+                        if (me->GetEntry() == NPC_EMPOWERED_ADHERENT)
+                            me->CastSpell(me->GetVictim(), SPELL_DEATHCHILL_BLAST, false);
+                        else
+                            me->CastSpell(me->GetVictim(), SPELL_DEATHCHILL_BOLT, false);
+                        events.RepeatEvent(urand(9000, 13000));
+                        break;
+                    case EVENT_SPELL_ADHERENT_CURSE_OF_TORPOR:
+                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1))
+                            me->CastSpell(target, SPELL_CURSE_OF_TORPOR, false);
+                        events.RepeatEvent(urand(9000, 13000));
+                        break;
+                    case EVENT_SPELL_ADHERENT_SHROUD_OF_THE_OCCULT:
+                        me->CastSpell(me, SPELL_SHORUD_OF_THE_OCCULT, false);
+                        events.RepeatEvent(urand(27000, 32000));
+                        break;
+                    case EVENT_CULTIST_DARK_MARTYRDOM_REVIVE:
+                        me->RemoveAurasDueToSpell(SPELL_PERMANENT_FEIGN_DEATH);
+                        me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
+                        me->RemoveFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
+                        me->UpdateEntry(NPC_REANIMATED_ADHERENT);
+                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED | UNIT_FLAG_UNK_29 | UNIT_FLAG_NOT_SELECTABLE);
+                        me->SetReactState(REACT_AGGRESSIVE);
+                        DoZoneInCombat(me);
+                        me->CastSpell(me, SPELL_ADHERENT_S_DETERMINATION);
+
+                        if (Creature* ladyDeathwhisper = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_LADY_DEATHWHISPER)))
+                            ladyDeathwhisper->AI()->Talk(SAY_ANIMATE_DEAD);
+                        events.PopEvent();
+                        break;
+                    case EVENT_SPELL_CULTIST_DARK_MARTYRDOM:
+                        me->CastSpell(me, SPELL_PERMANENT_FEIGN_DEATH, true);
+                        me->CastSpell(me, SPELL_CLEAR_ALL_DEBUFFS, true);
+                        me->CastSpell(me, SPELL_FULL_HEAL, true);
+                        me->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
+                        me->SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
+                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED | UNIT_FLAG_UNK_29 | UNIT_FLAG_NOT_SELECTABLE);
+                        Reset();
+                        events.ScheduleEvent(EVENT_CULTIST_DARK_MARTYRDOM_REVIVE, 6000);
+                        break;
+                    default:
+                        break;
+                }
+
+                DoMeleeAttackIfReady();
+            }
+        };
+
+        CreatureAI* GetAI(Creature* creature) const override
+        {
+            return GetIcecrownCitadelAI<npc_cult_adherentAI>(creature);
+        }
 };
 
 class npc_vengeful_shade : public CreatureScript
 {
-public:
-    npc_vengeful_shade() : CreatureScript("npc_vengeful_shade") { }
+    public:
+        npc_vengeful_shade() : CreatureScript("npc_vengeful_shade") { }
 
-    struct npc_vengeful_shadeAI : public ScriptedAI
-    {
-        npc_vengeful_shadeAI(Creature* creature) : ScriptedAI(creature)
+        struct npc_vengeful_shadeAI : public ScriptedAI
         {
-            me->SetControlled(true, UNIT_STATE_ROOT);
-            unroot_timer = 500;
-            targetGUID = 0;
-        }
-
-        uint16 unroot_timer;
-        uint64 targetGUID;
-
-        void Reset()
-        {
-            me->setAttackTimer(BASE_ATTACK, 2000);
-            me->AddAura(SPELL_VENGEFUL_BLAST_PASSIVE, me);
-        }
-
-        void AttackStart(Unit* who)
-        {
-            if (!who)
-                return;
-            ScriptedAI::AttackStart(who);
-            if (!targetGUID)
+            npc_vengeful_shadeAI(Creature* creature) : ScriptedAI(creature)
             {
-                me->getThreatManager().resetAllAggro();
-                me->AddThreat(who, 1000000.0f);
-                targetGUID = who->GetGUID();
+                me->SetControlled(true, UNIT_STATE_ROOT);
+                unroot_timer = 500;
+                targetGUID = 0;
             }
-        }
 
-        void SpellHitTarget(Unit* /*target*/, SpellInfo const* spell)
-        {
-            switch (spell->Id)
+            uint16 unroot_timer;
+            uint64 targetGUID;
+
+            void Reset() override
             {
+                me->setAttackTimer(BASE_ATTACK, 2000);
+                me->AddAura(SPELL_VENGEFUL_BLAST_PASSIVE, me);
+            }
+
+            void AttackStart(Unit* who) override
+            {
+                if (!who)
+                    return;
+                ScriptedAI::AttackStart(who);
+                if (!targetGUID)
+                {
+                    me->getThreatManager().resetAllAggro();
+                    me->AddThreat(who, 1000000.0f);
+                    targetGUID = who->GetGUID();
+                }
+            }
+
+            void SpellHitTarget(Unit* /*target*/, SpellInfo const* spell) override
+            {
+                switch (spell->Id)
+                {
                 case SPELL_VENGEFUL_BLAST_10N:
                 case SPELL_VENGEFUL_BLAST_25N:
                 case SPELL_VENGEFUL_BLAST_10H:
@@ -913,166 +947,166 @@ public:
                     break;
                 default:
                     break;
-            }
-        }
-
-        void UpdateAI(uint32 diff)
-        {
-            if (unroot_timer)
-            {
-                if (unroot_timer <= diff)
-                {
-                    me->SetControlled(false, UNIT_STATE_ROOT);
-                    me->SetInCombatWithZone();
-                    unroot_timer = 0;
                 }
-                else
+            }
+
+            void UpdateAI(uint32 diff) override
+            {
+                if (unroot_timer)
                 {
-                    unroot_timer -= diff;
+                    if (unroot_timer <= diff)
+                    {
+                        me->SetControlled(false, UNIT_STATE_ROOT);
+                        me->SetInCombatWithZone();
+                        unroot_timer = 0;
+                    }
+                    else
+                    {
+                        unroot_timer -= diff;
+                        return;
+                    }
+                }
+
+                UpdateVictim();
+
+                if (!me->GetVictim() || me->GetVictim()->GetGUID() != targetGUID)
+                {
+                    me->DespawnOrUnsummon(1);
                     return;
                 }
+
+                DoMeleeAttackIfReady();
             }
 
-            UpdateVictim();
+            void MoveInLineOfSight(Unit*  /*who*/) override {}
+            void EnterEvadeMode() override {}
+        };
 
-            if (!me->GetVictim() || me->GetVictim()->GetGUID() != targetGUID)
-            {
-                me->DespawnOrUnsummon(1);
-                return;
-            }
-
-            DoMeleeAttackIfReady();
+        CreatureAI* GetAI(Creature* creature) const override
+        {
+            return GetIcecrownCitadelAI<npc_vengeful_shadeAI>(creature);
         }
-
-        void MoveInLineOfSight(Unit*  /*who*/) {}
-        void EnterEvadeMode() {}
-    };
-
-    CreatureAI* GetAI(Creature* creature) const
-    {
-        return GetIcecrownCitadelAI<npc_vengeful_shadeAI>(creature);
-    }
 };
 
 class npc_darnavan : public CreatureScript
 {
-public:
-    npc_darnavan() : CreatureScript("npc_darnavan") { }
+    public:
+        npc_darnavan() : CreatureScript("npc_darnavan") { }
 
-    struct npc_darnavanAI : public ScriptedAI
-    {
-        npc_darnavanAI(Creature* creature) : ScriptedAI(creature) {}
-
-        EventMap events;
-        bool _canCharge;
-        bool _canShatter;
-
-        void Reset()
+        struct npc_darnavanAI : public ScriptedAI
         {
-            events.Reset();
-            events.ScheduleEvent(EVENT_DARNAVAN_BLADESTORM, 10000);
-            events.ScheduleEvent(EVENT_DARNAVAN_INTIMIDATING_SHOUT, urand(20000, 25000));
-            events.ScheduleEvent(EVENT_DARNAVAN_MORTAL_STRIKE, urand(25000, 30000));
-            events.ScheduleEvent(EVENT_DARNAVAN_SUNDER_ARMOR, urand(5000, 8000));
-            _canCharge = true;
-            _canShatter = true;
-        }
+            npc_darnavanAI(Creature* creature) : ScriptedAI(creature) {}
 
-        void JustDied(Unit* killer)
-        {
-            events.Reset();
-            if (Player* owner = killer->GetCharmerOrOwnerPlayerOrPlayerItself())
+            EventMap events;
+            bool _canCharge;
+            bool _canShatter;
+
+            void Reset() override
             {
-                if (Group* group = owner->GetGroup())
+                events.Reset();
+                events.ScheduleEvent(EVENT_DARNAVAN_BLADESTORM, 10000);
+                events.ScheduleEvent(EVENT_DARNAVAN_INTIMIDATING_SHOUT, urand(20000, 25000));
+                events.ScheduleEvent(EVENT_DARNAVAN_MORTAL_STRIKE, urand(25000, 30000));
+                events.ScheduleEvent(EVENT_DARNAVAN_SUNDER_ARMOR, urand(5000, 8000));
+                _canCharge = true;
+                _canShatter = true;
+            }
+
+            void JustDied(Unit* killer) override
+            {
+                events.Reset();
+                if (Player* owner = killer->GetCharmerOrOwnerPlayerOrPlayerItself())
                 {
-                    for (GroupReference* itr = group->GetFirstMember(); itr != NULL; itr = itr->next())
-                        if (Player* member = itr->GetSource())
-                            if (member->IsInMap(owner))
-                                member->FailQuest(QUEST_DEPROGRAMMING);
+                    if (Group* group = owner->GetGroup())
+                    {
+                        for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
+                            if (Player* member = itr->GetSource())
+                                if (member->IsInMap(owner))
+                                    member->FailQuest(QUEST_DEPROGRAMMING);
+                    }
+                    else
+                        owner->FailQuest(QUEST_DEPROGRAMMING);
                 }
-                else
-                    owner->FailQuest(QUEST_DEPROGRAMMING);
             }
-        }
 
-        void MovementInform(uint32 type, uint32 id)
-        {
-            if (type != POINT_MOTION_TYPE || id != POINT_DESPAWN)
-                return;
-
-            me->DespawnOrUnsummon();
-        }
-
-        void EnterCombat(Unit* /*victim*/)
-        {
-            DoZoneInCombat();
-            Talk(SAY_DARNAVAN_AGGRO);
-        }
-
-        void UpdateAI(uint32 diff)
-        {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            if (_canShatter && me->GetVictim() && me->GetVictim()->IsImmunedToDamageOrSchool(SPELL_SCHOOL_MASK_NORMAL))
+            void MovementInform(uint32 type, uint32 id) override
             {
-                me->CastSpell(me->GetVictim(), SPELL_SHATTERING_THROW, false);
-                _canShatter = false;
-                events.ScheduleEvent(EVENT_DARNAVAN_SHATTERING_THROW, 30000);
-                return;
+                if (type != POINT_MOTION_TYPE || id != POINT_DESPAWN)
+                    return;
+
+                me->DespawnOrUnsummon();
             }
 
-            if (_canCharge && !me->IsWithinMeleeRange(me->GetVictim()))
+            void EnterCombat(Unit* /*victim*/) override
             {
-                me->CastSpell(me->GetVictim(), SPELL_CHARGE, false);
-                _canCharge = false;
-                events.ScheduleEvent(EVENT_DARNAVAN_CHARGE, 20000);
-                return;
+                DoZoneInCombat();
+                Talk(SAY_DARNAVAN_AGGRO);
             }
 
-            switch (events.GetEvent())
+            void UpdateAI(uint32 diff) override
             {
-                case 0:
-                    break;
-                case EVENT_DARNAVAN_BLADESTORM:
-                    me->CastSpell((Unit*)NULL, SPELL_BLADESTORM, false);
-                    events.RepeatEvent(urand(90000, 100000));
-                    break;
-                case EVENT_DARNAVAN_CHARGE:
-                    _canCharge = true;
-                    events.PopEvent();
-                    break;
-                case EVENT_DARNAVAN_INTIMIDATING_SHOUT:
-                    me->CastSpell((Unit*)NULL, SPELL_INTIMIDATING_SHOUT, false);
-                    events.RepeatEvent(urand(90000, 120000));
-                    break;
-                case EVENT_DARNAVAN_MORTAL_STRIKE:
-                    me->CastSpell(me->GetVictim(), SPELL_MORTAL_STRIKE, false);
-                    events.RepeatEvent(urand(15000, 30000));
-                    break;
-                case EVENT_DARNAVAN_SHATTERING_THROW:
-                    _canShatter = true;
-                    events.PopEvent();
-                    break;
-                case EVENT_DARNAVAN_SUNDER_ARMOR:
-                    me->CastSpell(me->GetVictim(), SPELL_SUNDER_ARMOR, false);
-                    events.RepeatEvent(urand(3000, 7000));
-                    break;
-            }
+                if (!UpdateVictim())
+                    return;
 
-            DoMeleeAttackIfReady();
+                events.Update(diff);
+
+                if (me->HasUnitState(UNIT_STATE_CASTING))
+                    return;
+
+                if (_canShatter && me->GetVictim() && me->GetVictim()->IsImmunedToDamageOrSchool(SPELL_SCHOOL_MASK_NORMAL))
+                {
+                    me->CastSpell(me->GetVictim(), SPELL_SHATTERING_THROW, false);
+                    _canShatter = false;
+                    events.ScheduleEvent(EVENT_DARNAVAN_SHATTERING_THROW, 30000);
+                    return;
+                }
+
+                if (_canCharge && !me->IsWithinMeleeRange(me->GetVictim()))
+                {
+                    me->CastSpell(me->GetVictim(), SPELL_CHARGE, false);
+                    _canCharge = false;
+                    events.ScheduleEvent(EVENT_DARNAVAN_CHARGE, 20000);
+                    return;
+                }
+
+                switch (events.GetEvent())
+                {
+                    case EVENT_DARNAVAN_BLADESTORM:
+                        me->CastSpell((Unit*)nullptr, SPELL_BLADESTORM, false);
+                        events.RepeatEvent(urand(90000, 100000));
+                        break;
+                    case EVENT_DARNAVAN_CHARGE:
+                        _canCharge = true;
+                        events.PopEvent();
+                        break;
+                    case EVENT_DARNAVAN_INTIMIDATING_SHOUT:
+                        me->CastSpell((Unit*)nullptr, SPELL_INTIMIDATING_SHOUT, false);
+                        events.RepeatEvent(urand(90000, 120000));
+                        break;
+                    case EVENT_DARNAVAN_MORTAL_STRIKE:
+                        me->CastSpell(me->GetVictim(), SPELL_MORTAL_STRIKE, false);
+                        events.RepeatEvent(urand(15000, 30000));
+                        break;
+                    case EVENT_DARNAVAN_SHATTERING_THROW:
+                        _canShatter = true;
+                        events.PopEvent();
+                        break;
+                    case EVENT_DARNAVAN_SUNDER_ARMOR:
+                        me->CastSpell(me->GetVictim(), SPELL_SUNDER_ARMOR, false);
+                        events.RepeatEvent(urand(3000, 7000));
+                        break;
+                    default:
+                        break;
+                }
+
+                DoMeleeAttackIfReady();
+            }
+        };
+
+        CreatureAI* GetAI(Creature* creature) const override
+        {
+            return GetIcecrownCitadelAI<npc_darnavanAI>(creature);
         }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const
-    {
-        return GetIcecrownCitadelAI<npc_darnavanAI>(creature);
-    }
 };
 
 class spell_deathwhisper_mana_barrier : public SpellScriptLoader
@@ -1095,64 +1129,32 @@ class spell_deathwhisper_mana_barrier : public SpellScriptLoader
                 }
             }
 
-            void Register()
+            void Register() override
             {
                 OnEffectPeriodic += AuraEffectPeriodicFn(spell_deathwhisper_mana_barrier_AuraScript::HandlePeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
             }
         };
 
-        AuraScript* GetAuraScript() const
+        AuraScript* GetAuraScript() const override
         {
             return new spell_deathwhisper_mana_barrier_AuraScript();
         }
 };
 
-class spell_cultist_dark_martyrdom : public SpellScriptLoader
-{
-public:
-    spell_cultist_dark_martyrdom() : SpellScriptLoader("spell_cultist_dark_martyrdom") { }
-
-    class spell_cultist_dark_martyrdom_SpellScript : public SpellScript
-    {
-        PrepareSpellScript(spell_cultist_dark_martyrdom_SpellScript);
-
-        void HandleEffect(SpellEffIndex /*effIndex*/)
-        {
-            if (GetCaster()->ToTempSummon())
-                if (Unit* owner = GetCaster()->ToTempSummon()->GetSummoner())
-                    owner->GetAI()->SetGUID(GetCaster()->GetGUID());
-
-            if (Creature* caster = GetCaster()->ToCreature())
-                caster->AI()->DoAction(-1);
-            GetCaster()->SetDisplayId(GetCaster()->GetEntry() == NPC_CULT_FANATIC ? 30968 : 30966);
-        }
-
-        void Register()
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_cultist_dark_martyrdom_SpellScript::HandleEffect, EFFECT_2, SPELL_EFFECT_FORCE_DESELECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const
-    {
-        return new spell_cultist_dark_martyrdom_SpellScript();
-    }
-};
-
 class at_lady_deathwhisper_entrance : public AreaTriggerScript
 {
-public:
-    at_lady_deathwhisper_entrance() : AreaTriggerScript("at_lady_deathwhisper_entrance") { }
+    public:
+        at_lady_deathwhisper_entrance() : AreaTriggerScript("at_lady_deathwhisper_entrance") { }
 
-    bool OnTrigger(Player* player, AreaTrigger const* /*areaTrigger*/)
-    {
-        if (InstanceScript* instance = player->GetInstanceScript())
-            if (instance->GetBossState(DATA_LADY_DEATHWHISPER) != DONE)
-                if (!player->IsGameMaster())
-                    if (Creature* ladyDeathwhisper = ObjectAccessor::GetCreature(*player, instance->GetData64(DATA_LADY_DEATHWHISPER)))
-                        ladyDeathwhisper->AI()->DoAction(ACTION_START_INTRO);
-        return true;
-    }
+        bool OnTrigger(Player* player, AreaTrigger const* /*areaTrigger*/) override
+        {
+            if (InstanceScript* instance = player->GetInstanceScript())
+                if (instance->GetBossState(DATA_LADY_DEATHWHISPER) != DONE)
+                    if (!player->IsGameMaster())
+                        if (Creature* ladyDeathwhisper = ObjectAccessor::GetCreature(*player, instance->GetData64(DATA_LADY_DEATHWHISPER)))
+                            ladyDeathwhisper->AI()->DoAction(ACTION_START_INTRO);
+            return true;
+        }
 };
 
 void AddSC_boss_lady_deathwhisper()
@@ -1163,6 +1165,5 @@ void AddSC_boss_lady_deathwhisper()
     new npc_vengeful_shade();
     new npc_darnavan();
     new spell_deathwhisper_mana_barrier();
-    new spell_cultist_dark_martyrdom();
     new at_lady_deathwhisper_entrance();
 }
