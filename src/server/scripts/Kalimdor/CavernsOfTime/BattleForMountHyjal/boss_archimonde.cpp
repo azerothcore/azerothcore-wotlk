@@ -675,7 +675,7 @@ class spell_red_sky_effect : public SpellScriptLoader
                     PreventHitDamage();
             }
 
-            void Register() override
+            void Register()
             {
                 OnEffectHitTarget += SpellEffectFn(spell_red_sky_effect_SpellScript::HandleHit, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
             }
@@ -704,7 +704,7 @@ public:
                 GetHitUnit()->RemoveAurasByType(SPELL_AURA_EFFECT_IMMUNITY);
         }
 
-        void Register() override
+        void Register()
         {
             OnEffectHitTarget += SpellEffectFn(spell_finger_of_death_SpellScript::HandleHit, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
         }
@@ -733,7 +733,7 @@ public:
                 GetHitUnit()->RemoveAurasByType(SPELL_AURA_EFFECT_IMMUNITY);
         }
 
-        void Register() override
+        void Register()
         {
             OnEffectHitTarget += SpellEffectFn(spell_hand_of_death_SpellScript::HandleHit, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
         }
