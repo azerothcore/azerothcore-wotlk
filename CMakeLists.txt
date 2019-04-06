@@ -1,4 +1,4 @@
-# Copyright (C)
+# Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU AGPL3 v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 #
 # This file is free software; as a special exception the author gives
 # unlimited permission to copy and/or distribute it, with or without
@@ -28,7 +28,9 @@ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH 1)
 set(AC_PATH_ROOT "${CMAKE_SOURCE_DIR}")
 
 # set macro-directory
-set(CMAKE_MODULE_PATH "${AC_PATH_ROOT}/src/cmake/macros")
+list(APPEND CMAKE_MODULE_PATH
+  "${CMAKE_SOURCE_DIR}/src/cmake/macros"
+  "${CMAKE_SOURCE_DIR}/deps/cotire/CMake")
 
 include(CheckCXXSourceRuns)
 include(CheckIncludeFiles)
@@ -82,26 +84,19 @@ endif()
 
 include(CheckPlatform)
 include(GroupSources)
+include(AutoCollect)
+
+CU_RUN_HOOK("AFTER_LOAD_CMAKE_MODULES")
 
 # basic packagesearching and setup (further support will be needed, this is a preliminary release!)
-set(OPENSSL_EXPECTED_VERSION 1.0.0)
 set(ACE_EXPECTED_VERSION 6.0.3)
 
 find_package(PCHSupport)
 find_package(ACE REQUIRED)
-find_package(OpenSSL REQUIRED)
-find_package(Threads REQUIRED)
 find_package(MySQL REQUIRED)
 
-if( UNIX )
-  find_package(Readline)
-  find_package(ZLIB)
-  find_package(BZip2)
-
-  if ( WITH_PERFTOOLS )
-    find_package(Gperftools)
-  endif()
-
+if(UNIX AND WITH_PERFTOOLS)
+  find_package(Gperftools)
 endif()
 
 if(NOT WITHOUT_GIT)
@@ -113,7 +108,6 @@ include(src/cmake/genrev.cmake)
 
 # print out the results before continuing
 include(src/cmake/showoptions.cmake)
-
 
 #
 # Loading framework
@@ -128,7 +122,6 @@ endif()
 if( TOOLS )
   add_subdirectory(src/tools)
 endif()
-
 
 #
 # Loading application sources
