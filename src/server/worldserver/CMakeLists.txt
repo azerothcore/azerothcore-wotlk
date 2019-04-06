@@ -139,6 +139,12 @@ target_link_libraries(worldserver
     readline
     ${GPERFTOOLS_LIBRARIES})
 
+if (NOT DISABLED_ALL_MODULES AND MODULES_EXIST)
+target_link_libraries(worldserver
+  PUBLIC
+    modules)
+endif()
+
 set_target_properties(worldserver
   PROPERTIES
     FOLDER

@@ -10,6 +10,8 @@ env/user/*
 modules/*
 !modules/*.md
 !modules/*.sh
+!modules/LoadingModules.cmake
+!modules/CMakeLists.txt
 build*/
 var/*
 docker/build/cache

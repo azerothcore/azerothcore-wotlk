@@ -48,26 +48,10 @@ if(EXISTS "${CMAKE_SOURCE_DIR}/conf/config.cmake")
   include(conf/config.cmake)
 endif()
 
-#
-# Loading dyn modules
-#
-
-# add modules and dependencies
-CU_SUBDIRLIST(sub_DIRS  "${CMAKE_SOURCE_DIR}/modules" FALSE FALSE)
-FOREACH(subdir ${sub_DIRS})
-
-    get_filename_component(MODULENAME ${subdir} NAME)
-
-    if (";${DISABLED_AC_MODULES};" MATCHES ";${MODULENAME};")
-       continue()
-    endif()
-
-    STRING(REGEX REPLACE "^${CMAKE_SOURCE_DIR}/" "" subdir_rel ${subdir})
-    if(EXISTS "${subdir}/CMakeLists.txt")
-        message("Loading module: ${subdir_rel}")
-        add_subdirectory("${subdir_rel}")
-    endif()
-ENDFOREACH()
+# Load modules
+if (NOT DISABLED_ALL_MODULES)
+  include(modules/LoadingModules.cmake)
+endif()
 
 CU_RUN_HOOK("AFTER_LOAD_CONF")
 
@@ -131,5 +115,9 @@ CU_RUN_HOOK("BEFORE_SRC_LOAD")
 
 # add core sources
 add_subdirectory(src)
+
+if (NOT DISABLED_ALL_MODULES AND MODULES_EXIST)
+  add_subdirectory(modules)
+endif()
 
 CU_RUN_HOOK("AFTER_SRC_LOAD")
