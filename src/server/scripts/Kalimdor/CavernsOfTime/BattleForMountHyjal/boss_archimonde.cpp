@@ -17,6 +17,7 @@
 #include "SpellAuras.h"
 #include "hyjal_trash.h"
 #include "Player.h"
+#include "SpellScript.h"
 
 enum Texts
 {
@@ -675,7 +676,7 @@ class spell_red_sky_effect : public SpellScriptLoader
                     PreventHitDamage();
             }
 
-            void Register()
+            void Register() override
             {
                 OnEffectHitTarget += SpellEffectFn(spell_red_sky_effect_SpellScript::HandleHit, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
             }
@@ -704,7 +705,7 @@ public:
                 GetHitUnit()->RemoveAurasByType(SPELL_AURA_EFFECT_IMMUNITY);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_finger_of_death_SpellScript::HandleHit, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
         }
@@ -733,7 +734,7 @@ public:
                 GetHitUnit()->RemoveAurasByType(SPELL_AURA_EFFECT_IMMUNITY);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_hand_of_death_SpellScript::HandleHit, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
         }
