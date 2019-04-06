@@ -476,7 +476,7 @@ bool Master::_StartDB()
         sLog->outError("Realm ID not defined in configuration file");
         return false;
     }
-    else if (realmID > 256)
+    else if (realmID > 255)
     {
         /*
          * Due to the client only being able to read a realmID
