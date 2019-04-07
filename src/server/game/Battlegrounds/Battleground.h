@@ -486,7 +486,7 @@ class Battleground
         void UpdateWorldState(uint32 Field, uint32 Value);
         void UpdateWorldStateForPlayer(uint32 Field, uint32 Value, Player* player);
 
-    virtual void EndBattleground(TeamId winnerTeamId);
+        virtual void EndBattleground(TeamId winnerTeamId);
         void BlockMovement(Player* player);
 
         void SendWarningToAll(uint32 entry, ...);
