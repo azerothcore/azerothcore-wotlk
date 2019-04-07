@@ -145,7 +145,7 @@ else()
   message("* Show source tree                : No (For UNIX default)")
 endif()
 
-if(DISABLE_MODULES)
+if(DISABLED_ALL_MODULES)
   message("* Disable all modules             : Yes")
 else()
   message("* Disable all modules             : No (default)")

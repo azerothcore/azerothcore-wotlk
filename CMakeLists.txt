@@ -49,9 +49,7 @@ if(EXISTS "${CMAKE_SOURCE_DIR}/conf/config.cmake")
 endif()
 
 # Load modules
-if (NOT DISABLED_ALL_MODULES)
-  include(modules/LoadingModules.cmake)
-endif()
+include(modules/LoadingModules.cmake)
 
 CU_RUN_HOOK("AFTER_LOAD_CONF")
 
@@ -116,7 +114,7 @@ CU_RUN_HOOK("BEFORE_SRC_LOAD")
 # add core sources
 add_subdirectory(src)
 
-if (NOT DISABLED_ALL_MODULES AND MODULES_EXIST)
+if (MODULES_EXIST)
   add_subdirectory(modules)
 endif()
 
