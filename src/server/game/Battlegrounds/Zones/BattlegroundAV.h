@@ -1588,7 +1588,7 @@ class BattlegroundAV : public Battleground
         void HandleQuestComplete(uint32 questid, Player* player);
         bool PlayerCanDoMineQuest(int32 GOId, TeamId teamId);
 
-    void EndBattleground(TeamId winnerTeamId) override;
+        void EndBattleground(TeamId winnerTeamId) override;
 
         GraveyardStruct const* GetClosestGraveyard(Player* player) override;
 
