@@ -1,4 +1,4 @@
-# Copyright (C)
+# Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU AGPL3 v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 #
 # This file is free software; as a special exception the author gives
 # unlimited permission to copy and/or distribute it, with or without
@@ -8,27 +8,32 @@
 # WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-file(GLOB sources_mpq libmpq/*.c libmpq/*.h)
+file(GLOB sources libmpq/*.c libmpq/*.h)
 
-set(mpq_STAT_SRCS
-  ${sources_mpq}
-)
-
-if( UNIX )
-  include_directories(
-    ${CMAKE_CURRENT_SOURCE_DIR}
-    ${CMAKE_SOURCE_DIR}/deps/zlib
-    ${CMAKE_SOURCE_DIR}/deps/bzip2
-  )
-elseif( WIN32 )
-  include_directories(
-    ${CMAKE_CURRENT_SOURCE_DIR}
-    ${CMAKE_CURRENT_SOURCE_DIR}/win
-    ${CMAKE_SOURCE_DIR}/deps/zlib
-    ${CMAKE_SOURCE_DIR}/deps/bzip2
-  )
-endif()
-
-add_library(mpq STATIC ${mpq_STAT_SRCS})
+add_library(mpq STATIC ${sources})
 
 set_target_properties(mpq PROPERTIES LINKER_LANGUAGE CXX)
+
+if(WIN32)
+  set(WIN_EXTRA_INCLUDE ${CMAKE_CURRENT_SOURCE_DIR}/win)
+endif()
+
+# Group sources
+GroupSources(${CMAKE_CURRENT_SOURCE_DIR})
+
+target_include_directories(mpq
+  PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${WIN_EXTRA_INCLUDE}
+    ${CMAKE_SOURCE_DIR}/deps/zlib
+    ${CMAKE_SOURCE_DIR}/deps/bzip2)
+
+target_link_libraries(mpq
+  PUBLIC
+    zlib
+    bzip2)
+
+set_target_properties(mpq
+  PROPERTIES
+    FOLDER
+      "deps")

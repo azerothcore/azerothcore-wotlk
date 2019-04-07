@@ -1,4 +1,4 @@
-# Copyright (C) 
+# Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU AGPL3 v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 #
 # This file is free software; as a special exception the author gives
 # unlimited permission to copy and/or distribute it, with or without
@@ -8,4 +8,15 @@
 # WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-add_subdirectory(ace)
+if(CMAKE_SYSTEM_NAME MATCHES "Windows")
+  add_subdirectory(ace)
+else()
+  add_library(ace SHARED IMPORTED GLOBAL)
+
+  set_target_properties(ace
+    PROPERTIES
+      IMPORTED_LOCATION
+        "${ACE_LIBRARY}"
+      INTERFACE_INCLUDE_DIRECTORIES
+        "${ACE_INCLUDE_DIR}")
+endif()

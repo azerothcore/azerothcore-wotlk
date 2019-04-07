@@ -362,7 +362,7 @@ public:
 
     struct npc_costumed_orphan_matronAI : public ScriptedAI
     {
-        npc_costumed_orphan_matronAI(Creature *c) : ScriptedAI(c) 
+        npc_costumed_orphan_matronAI(Creature *c) : ScriptedAI(c)
         {
         }
 
@@ -370,7 +370,7 @@ public:
         bool allowQuest;
         uint64 horseGUID;
 
-        void Reset()
+        void Reset() override
         {
             eventStarted = 0;
             allowQuest = false;
@@ -402,7 +402,7 @@ public:
             }
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (param == ACTION_START_EVENT)
             {
@@ -420,7 +420,7 @@ public:
             }
         }
 
-        uint32 GetData(uint32 param) const
+        uint32 GetData(uint32 param) const override
         {
             if (param == DATA_ALLOW_START)
                 return allowQuest;
@@ -428,7 +428,7 @@ public:
             return 0;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (eventStarted)
             {
@@ -442,7 +442,7 @@ public:
         }
     };
 
-    bool OnGossipHello(Player* player, Creature* creature)
+    bool OnGossipHello(Player* player, Creature* creature) override
     {
         QuestRelationBounds pObjectQR = sObjectMgr->GetCreatureQuestRelationBounds(creature->GetEntry());
         QuestRelationBounds pObjectQIR = sObjectMgr->GetCreatureQuestInvolvedRelationBounds(creature->GetEntry());
@@ -494,7 +494,7 @@ public:
         return true;
     }
 
-    bool OnQuestAccept(Player*  /*player*/, Creature* creature, Quest const* quest)
+    bool OnQuestAccept(Player*  /*player*/, Creature* creature, Quest const* quest) override
     {
         if ((quest->GetQuestId() == QUEST_LET_THE_FIRES_COME_A || quest->GetQuestId() == QUEST_LET_THE_FIRES_COME_H) && !creature->AI()->GetData(DATA_ALLOW_START))
             creature->AI()->DoAction(ACTION_START_EVENT);
@@ -502,7 +502,7 @@ public:
         return true;
     }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_costumed_orphan_matronAI (pCreature);
     }
@@ -921,7 +921,7 @@ class boss_headless_horseman : public CreatureScript
                 for (std::list<Creature*>::iterator itr = unitList.begin(); itr != unitList.end(); ++itr)
                     (*itr)->ToCreature()->DespawnOrUnsummon(500);
 
-                
+
                 Map::PlayerList const& players = me->GetMap()->GetPlayers();
                 if (!players.isEmpty() && players.begin()->GetSource() && players.begin()->GetSource()->GetGroup())
                     sLFGMgr->FinishDungeon(players.begin()->GetSource()->GetGroup()->GetGUID(), 285, me->FindMap());
@@ -962,7 +962,7 @@ class boss_headless_horseman : public CreatureScript
                     events.CancelEvent(EVENT_HORSEMAN_CONFLAGRATION);
                     events.CancelEvent(EVENT_SUMMON_PUMPKIN);
                     me->MonsterYell("Here's my body, fit and pure! Now, your blackened souls I'll cure!", LANG_UNIVERSAL, 0);
-                    
+
                     if (phase == 1)
                         events.ScheduleEvent(EVENT_HORSEMAN_CONFLAGRATION, 6000);
                     else if (phase == 2)
@@ -980,7 +980,7 @@ class boss_headless_horseman : public CreatureScript
                     {
                         me->SetUInt32Value(UNIT_FIELD_FLAGS, 0);
                         me->StopMoving();
-                        
+
                         me->SetInCombatWithZone();
                         inFight = true;
                         events.ScheduleEvent(EVENT_HORSEMAN_FOLLOW, 500);
@@ -1036,7 +1036,7 @@ class boss_headless_horseman : public CreatureScript
                 phase = 0;
                 inFight = false;
                 health = 0;
-                
+
                 me->SetDisableGravity(true);
                 me->SetSpeed(MOVE_WALK, 5.0f, true);
             }
@@ -1253,7 +1253,7 @@ class boss_headless_horseman_head : public CreatureScript
                     damage = 0;
                     me->RemoveAllAuras();
                     me->CastSpell(me, SPELL_HEAD_DAMAGED_INFO, true);
-                    me->CastSpell(me, SPELL_THROW_HEAD_BACK, true); 
+                    me->CastSpell(me, SPELL_THROW_HEAD_BACK, true);
                     if (Unit* owner = GetOwner())
                         owner->RemoveAura(SPELL_HORSEMAN_IMMUNITY);
                 }
@@ -1377,7 +1377,7 @@ void AddSC_event_hallows_end_scripts()
     new spell_hallows_end_put_costume("spell_hallows_end_leper_costume", SPELL_LEPER_GNOME_COSTUME_MALE, SPELL_LEPER_GNOME_COSTUME_FEMALE);
     new spell_hallows_end_put_costume("spell_hallows_end_ghost_costume", SPELL_GHOST_COSTUME_MALE, SPELL_GHOST_COSTUME_FEMALE);
     new spell_hallows_end_put_costume("spell_hallows_end_ninja_costume", SPELL_NINJA_COSTUME_MALE, SPELL_NINJA_COSTUME_FEMALE);
-    
+
     // Quests
     new npc_hallows_end_train_fire();
 

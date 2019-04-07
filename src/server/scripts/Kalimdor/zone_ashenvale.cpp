@@ -304,24 +304,24 @@ public:
 
 class go_naga_brazier : public GameObjectScript
 {
-    public:
-        go_naga_brazier() : GameObjectScript("go_naga_brazier") { }
+public:
+    go_naga_brazier() : GameObjectScript("go_naga_brazier") { }
 
-        bool OnGossipHello(Player* /*player*/, GameObject* go)
+    bool OnGossipHello(Player* /*player*/, GameObject* go) override
+    {
+        if (Creature* creature = GetClosestCreatureWithEntry(go, NPC_MUGLASH, INTERACTION_DISTANCE*2))
         {
-            if (Creature* creature = GetClosestCreatureWithEntry(go, NPC_MUGLASH, INTERACTION_DISTANCE*2))
+            if (npc_muglash::npc_muglashAI* pEscortAI = CAST_AI(npc_muglash::npc_muglashAI, creature->AI()))
             {
-                if (npc_muglash::npc_muglashAI* pEscortAI = CAST_AI(npc_muglash::npc_muglashAI, creature->AI()))
-                {
-                    creature->AI()->Talk(SAY_MUG_BRAZIER_WAIT);
+                creature->AI()->Talk(SAY_MUG_BRAZIER_WAIT);
 
-                    pEscortAI->_isBrazierExtinguished = true;
-                    return false;
-                }
+                pEscortAI->_isBrazierExtinguished = true;
+                return false;
             }
-
-            return true;
         }
+
+        return true;
+    }
 };
 
 void AddSC_ashenvale()

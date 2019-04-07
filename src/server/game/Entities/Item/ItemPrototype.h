@@ -154,7 +154,7 @@ enum ItemFieldFlags
     ITEM_FLAG_UNK9          = 0x00004000, // ?
     ITEM_FLAG_UNK10         = 0x00008000, // ?
     ITEM_FLAG_UNK11         = 0x00010000, // ?
-    ITEM_FLAG_UNK12         = 0x00020000, // ?
+    ITEM_FLAG_NO_CREATOR    = 0x00020000,
     ITEM_FLAG_UNK13         = 0x00040000, // ?
     ITEM_FLAG_UNK14         = 0x00080000, // ?
     ITEM_FLAG_UNK15         = 0x00100000, // ?
@@ -659,6 +659,15 @@ struct ItemTemplate
     WorldPacket queryData; // pussywizard
 
     // helpers
+    bool HasSignature() const
+    {
+        return GetMaxStackSize() == 1 &&
+        Class != ITEM_CLASS_CONSUMABLE &&
+        Class != ITEM_CLASS_QUEST &&
+        (Flags & ITEM_FLAG_NO_CREATOR) == 0 &&
+        ItemId != 6948; /*Hearthstone*/
+    }
+
     bool CanChangeEquipStateInCombat() const
     {
         switch (InventoryType)
@@ -778,7 +787,7 @@ struct ItemTemplate
 };
 
 // Benchmarked: Faster than std::map (insert/find)
-typedef UNORDERED_MAP<uint32, ItemTemplate> ItemTemplateContainer;
+typedef std::unordered_map<uint32, ItemTemplate> ItemTemplateContainer;
 
 struct ItemLocale
 {

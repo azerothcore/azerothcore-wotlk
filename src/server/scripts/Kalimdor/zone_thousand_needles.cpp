@@ -282,30 +282,30 @@ class npc_plucky : public CreatureScript
 public:
     npc_plucky() : CreatureScript("npc_plucky") { }
 
-    bool OnGossipSelect(Player* player, Creature* /*creature*/, uint32 /*sender*/, uint32 action)
+    bool OnGossipSelect(Player* player, Creature* /*creature*/, uint32 /*sender*/, uint32 action) override
     {
-        player->PlayerTalkClass->ClearMenus();
+        ClearGossipMenuFor(player);
         switch (action)
         {
             case GOSSIP_ACTION_INFO_DEF+1:
-                player->CLOSE_GOSSIP_MENU();
+                CloseGossipMenuFor(player);
                 player->CompleteQuest(QUEST_SCOOP);
             break;
         }
         return true;
     }
 
-    bool OnGossipHello(Player* player, Creature* creature)
+    bool OnGossipHello(Player* player, Creature* creature) override
     {
         if (player->GetQuestStatus(QUEST_SCOOP) == QUEST_STATUS_INCOMPLETE)
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_P, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_P, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
 
-        player->SEND_GOSSIP_MENU(738, creature->GetGUID());
+        SendGossipMenuFor(player, 738, creature->GetGUID());
 
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_pluckyAI(creature);
     }
@@ -317,7 +317,7 @@ public:
         uint32 NormFaction;
         uint32 ResetTimer;
 
-        void Reset()
+        void Reset() override
         {
             ResetTimer = 120000;
 
@@ -330,7 +330,7 @@ public:
             DoCast(me, SPELL_PLUCKY_CHICKEN, false);
         }
 
-        void ReceiveEmote(Player* player, uint32 TextEmote)
+        void ReceiveEmote(Player* player, uint32 TextEmote) override
         {
             if (player->GetQuestStatus(QUEST_SCOOP) == QUEST_STATUS_INCOMPLETE)
             {
@@ -356,7 +356,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 Diff)
+        void UpdateAI(uint32 Diff) override
         {
             if (me->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP))
             {
@@ -392,7 +392,7 @@ class go_panther_cage : public GameObjectScript
 public:
     go_panther_cage() : GameObjectScript("go_panther_cage") { }
 
-    bool OnGossipHello(Player* player, GameObject* go)
+    bool OnGossipHello(Player* player, GameObject* go) override
     {
         go->UseDoorOrButton();
         if (player->GetQuestStatus(5151) == QUEST_STATUS_INCOMPLETE)

@@ -31,7 +31,7 @@ enum ThorimSpells
     SPELL_LIGHTNING_CHARGE_BUFF             = 62279,
     SPELL_LIGHTNING_PILLAR_P2               = 62976,
     SPELL_LIGHTNING_ORB_CHARGER             = 62278,
-    
+
     // SIF
     SPELL_TOUCH_OF_DOMINION                 = 62507,
     SPELL_SIF_TRANSFORM                     = 64778,
@@ -328,7 +328,7 @@ public:
         bool _hardMode;
         bool _isHitAllowed;
         bool _isAlly;
-        uint8 _trashCounter;        
+        uint8 _trashCounter;
 
         InstanceScript* m_pInstance;
         EventMap events;
@@ -371,10 +371,10 @@ public:
             me->SummonCreature(_isAlly ? NPC_CAPTURED_MERCENARY_SOLDIER_ALLY : NPC_CAPTURED_MERCENARY_SOLDIER_HORDE, 2127.24f, -251.309f, 419.793f, 5.89921f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
             me->SummonCreature(_isAlly ? NPC_CAPTURED_MERCENARY_SOLDIER_ALLY : NPC_CAPTURED_MERCENARY_SOLDIER_HORDE, 2120.1f, -258.99f, 419.764f, 6.24828f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
             me->SummonCreature(_isAlly ? NPC_CAPTURED_MERCENARY_SOLDIER_ALLY : NPC_CAPTURED_MERCENARY_SOLDIER_HORDE, 2123.32f, -254.771f, 419.789f, 6.17846f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
-            
+
             // Captured Mercenary Captain 32908
             me->SummonCreature(_isAlly ? NPC_CAPTURED_MERCENARY_CAPTAIN_ALLY : NPC_CAPTURED_MERCENARY_CAPTAIN_HORDE, 2131.31f, -259.182f, 419.974f, 5.91667f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
-            
+
             // Dark Rune Acolyte (arena) 32886
             me->SummonCreature(NPC_DARK_RUNE_ACOLYTE_I, 2129.09f, -277.142f, 419.756f, 1.22173f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
 
@@ -395,7 +395,7 @@ public:
 
             // Runic Colossus 32872
             me->SummonCreature(NPC_RUNIC_COLOSSUS, 2227.5f, -396.179f, 412.176f, 1.79769f);
-            
+
             // Ancient Rune Giant 32873
             me->SummonCreature(NPC_ANCIENT_RUNE_GIANT, 2134.57f, -440.318f, 438.331f, 0.226893f);
 
@@ -540,7 +540,7 @@ public:
                 {
                     if (m_pInstance)
                         m_pInstance->DoUpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET, 64980 /*SIFFED ACHIEVEMENT*/);
-                    
+
                     _hardMode = true;
                     EntryCheckPredicate pred(NPC_SIF);
                     summons.DoAction(ACTION_SIF_JOIN_FIGHT, pred);
@@ -567,7 +567,7 @@ public:
 
                     me->MonsterYell("Stay your arms! I yield!", LANG_UNIVERSAL, 0);
                     me->PlayDirectSound(SOUND_DEFEATED);
-                    
+
                     events.SetPhase(EVENT_PHASE_OUTRO);
                     events.ScheduleEvent(EVENT_THORIM_OUTRO1, 2000, 0, EVENT_PHASE_OUTRO);
 
@@ -950,7 +950,7 @@ public:
     struct boss_thorim_lightning_orbAI : public npc_escortAI
     {
         boss_thorim_lightning_orbAI(Creature* pCreature) : npc_escortAI(pCreature)
-        { 
+        {
             InitWaypoint();
             Reset();
             Start(false, true, 0);
@@ -1036,7 +1036,7 @@ public:
     struct boss_thorim_sif_blizzardAI : public npc_escortAI
     {
         boss_thorim_sif_blizzardAI(Creature* pCreature) : npc_escortAI(pCreature)
-        { 
+        {
             InitWaypoint();
             Reset();
             Start(false, true, 0);
@@ -1088,8 +1088,8 @@ public:
 
         uint32 _resetTimer;
 
-        void Reset() 
-        { 
+        void Reset()
+        {
             _resetTimer = 0;
             me->SetControlled(true, UNIT_STATE_STUNNED);
             me->SetDisableGravity(true);
@@ -1242,7 +1242,7 @@ public:
                 case EVENT_CM_SOLDIER_S:
                     if (me->GetDistance(me->GetVictim()) > 8)
                         me->CastSpell(me->GetVictim(), SPELL_SHOOT, false);
-                    
+
                     events.RepeatEvent(1500);
                     break;
                 case EVENT_CM_CAPTAIN_D:
@@ -1310,7 +1310,7 @@ public:
                 events.ScheduleEvent(EVENT_IH_GUARD_CLEAVE, 6000);
                 events.ScheduleEvent(EVENT_IH_GUARD_HAMSTRING, 9000);
                 events.ScheduleEvent(EVENT_IH_GUARD_SHIELD_SMASH, 15000);
-                
+
                 if (Creature* runeGiant = me->FindNearestCreature(NPC_ANCIENT_RUNE_GIANT, 200.0f))
                     runeGiant->AI()->DoAction(ACTION_IRON_HONOR_DIED);
             }
@@ -1476,7 +1476,7 @@ public:
                     _nextTriggerPos += 16.0f;
                     if (_nextTriggerPos > -260.0f)
                         events.PopEvent();
-                    else 
+                    else
                         events.RescheduleEvent(EVENT_RC_RUNIC_SMASH_TRIGGER, 500);
 
                     RunRunicSmash(true);
@@ -1744,16 +1744,16 @@ public:
 };
 
 class go_thorim_lever : public GameObjectScript
-{ 
-public: 
-    go_thorim_lever() : GameObjectScript("go_thorim_lever") { } 
+{
+public:
+    go_thorim_lever() : GameObjectScript("go_thorim_lever") { }
 
-    bool OnGossipHello(Player* pPlayer, GameObject* pGo)
+    bool OnGossipHello(Player* pPlayer, GameObject* go) override
     {
         if (GameObject *g = pPlayer->FindNearestGameObject(GO_ARENA_LEVER_GATE, 50))
             g->UseDoorOrButton();
 
-        pGo->UseDoorOrButton();
+        go->UseDoorOrButton();
         return true;
     }
 };
@@ -1824,7 +1824,7 @@ class achievement_thorim_stand_in_the_lightning : public AchievementCriteriaScri
             if (InstanceScript* instance = player->GetInstanceScript())
                 if (Creature* cr = ObjectAccessor::GetCreature(*player, instance->GetData64(TYPE_THORIM)))
                     return cr->AI()->GetData(DATA_HIT_BY_LIGHTNING);
-                        
+
             return false;
         }
 };
@@ -1839,7 +1839,7 @@ class achievement_thorim_lose_your_illusion : public AchievementCriteriaScript
             if (InstanceScript* instance = player->GetInstanceScript())
                 if (Creature* cr = ObjectAccessor::GetCreature(*player, instance->GetData64(TYPE_THORIM)))
                     return cr->AI()->GetData(DATA_LOSE_YOUR_ILLUSION);
-                        
+
             return false;
         }
 };
@@ -1862,7 +1862,7 @@ void AddSC_boss_thorim()
     // Mini bosses
     new boss_thorim_runic_colossus();
     new boss_thorim_ancient_rune_giant();
-    
+
     // GOs
     new go_thorim_lever();
 
