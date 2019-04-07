@@ -782,7 +782,7 @@ void BattlegroundAV::PopulateNode(BG_AV_Nodes node)
 
     if (node >= BG_AV_NODES_MAX)//fail safe
         return;
-    Creature* trigger = GetBGCreature(node + 302);//0-302 other creatures
+    Creature* trigger = GetBgMap()->GetCreature(BgCreatures[node + 302]);//0-302 other creatures
     if (!trigger)
     {
        trigger = AddCreature(WORLD_TRIGGER,
