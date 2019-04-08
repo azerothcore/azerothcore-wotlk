@@ -54,11 +54,6 @@ class npc_deahts_door_wrap_gate : public CreatureScript
 public:
     npc_deahts_door_wrap_gate() : CreatureScript("npc_deahts_door_wrap_gate") { }
 
-    CreatureAI* GetAI(Creature* creature) const
-    {
-        return new npc_deahts_door_wrap_gateAI(creature);
-    }
-
     struct npc_deahts_door_wrap_gateAI : public ScriptedAI
     {
         npc_deahts_door_wrap_gateAI(Creature* creature) : ScriptedAI(creature) { }
@@ -106,13 +101,11 @@ public:
                 {
                     if (Player* player = ObjectAccessor::GetPlayer(*me, PlayerGUID))
                     {
-                        if (Creature* bunny = GetClosestCreatureWithEntry(me, NPC_SOUTH_GATE, 200.0f))
+                        if (GetClosestCreatureWithEntry(me, NPC_SOUTH_GATE, 200.0f))
                             player->KilledMonsterCredit(NPC_SOUTH_GATE_CREDIT, TRIGGERED_NONE);
-                        else
-                        {
-                            if (Creature* bunny = GetClosestCreatureWithEntry(me, NPC_NORTH_GATE, 200.0f))
-                                player->KilledMonsterCredit(NPC_NORTH_GATE_CREDIT, TRIGGERED_NONE);
-                        }
+                        
+                        else if (GetClosestCreatureWithEntry(me, NPC_NORTH_GATE, 200.0f))
+                            player->KilledMonsterCredit(NPC_NORTH_GATE_CREDIT, TRIGGERED_NONE);
                         // complete quest part
                         if (Creature* bunny = GetClosestCreatureWithEntry(me, NPC_EXPLOSION_BUNNY, 200.0f))
                             bunny->CastSpell(nullptr, SPELL_EXPLOSION, TRIGGERED_NONE);
@@ -130,12 +123,10 @@ public:
         {
             if (summoned->GetEntry() == NPC_FEL_IMP)
                 summoned->CastSpell(summoned, SPELL_IMP_AURA, true);
-            else
-            {
-                if (summoned->GetEntry() == NPC_HOUND)
-                    summoned->CastSpell(summoned, SPELL_HOUND_AURA, true);
-            }
-
+            
+            else if (summoned->GetEntry() == NPC_HOUND)
+                summoned->CastSpell(summoned, SPELL_HOUND_AURA, true);
+            
             summoned->UpdateGroundPositionZ(x, y, z);
 
             if (Creature* cannon = ObjectAccessor::GetCreature(*me, CannonGUID))
@@ -165,6 +156,11 @@ public:
             }
         }
     };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return new npc_deahts_door_wrap_gateAI(creature);
+    }
 };
 
 class spell_npc22275_crystal_prison : public SpellScriptLoader
