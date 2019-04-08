@@ -4286,7 +4286,6 @@ void AuraEffect::HandleAuraModParryPercent(AuraApplication const* aurApp, uint8 
         return;
     
     target->ToPlayer()->SetCanParry(true);
-    target->ToPlayer()->UpdateParryPercentage();
 }
 
 void AuraEffect::HandleAuraModDodgePercent(AuraApplication const* aurApp, uint8 mode, bool /*apply*/) const
