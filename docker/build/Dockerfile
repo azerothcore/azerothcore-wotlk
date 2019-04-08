@@ -8,6 +8,7 @@ ADD .git /azerothcore/.git
 ADD deps /azerothcore/deps
 ADD conf/config.cmake.dist /azerothcore/conf/config.cmake.dist
 ADD src /azerothcore/src
+ADD modules /azerothcore/modules
 ADD CMakeLists.txt /azerothcore/CMakeLists.txt
 
 ENTRYPOINT  cd azerothcore/build && \
