@@ -981,6 +981,7 @@ public:
             memset(generatorGUID, 0, sizeof(generatorGUID));
             memset(allianceForcesGUID, 0, sizeof(allianceForcesGUID));
             memset(hordeForcesGUID, 0, sizeof(hordeForcesGUID));
+            allianceGuardsGUID.clear();
         }
 
         bool bStepping;
@@ -1001,6 +1002,7 @@ public:
         uint64 generatorGUID[GENERATOR_MAXCOUNT];
         uint64 allianceForcesGUID[ALLIANCE_FORCE_MAXCOUNT];
         uint64 hordeForcesGUID[HORDE_FORCE_MAXCOUNT];
+        std::vector<uint64> allianceGuardsGUID;
 
         EventMap _events;
 
@@ -1069,6 +1071,12 @@ public:
                         temp->DespawnOrUnsummon();
                     }
                 }
+
+                for (std::vector<uint64>::const_iterator i = allianceGuardsGUID.begin(); i != allianceGuardsGUID.end(); ++i)
+                    if (Creature* temp = ObjectAccessor::GetCreature(*me, *i))
+                        temp->DespawnOrUnsummon();
+
+                allianceGuardsGUID.clear();
 
                 for (uint8 i = 0; i < HORDE_FORCE_MAXCOUNT; ++i)
                 {
@@ -1326,13 +1334,25 @@ public:
                     break;
                 case 7:
                     if (Unit* temp = me->SummonCreature(NPC_SW_SOLDIER, AllianceSpawn[8].x, AllianceSpawn[8].y, AllianceSpawn[8].z, 0, TEMPSUMMON_TIMED_DESPAWN, 90000))
+                    {
+                        allianceGuardsGUID.push_back(temp->GetGUID());
                         temp->GetMotionMaster()->MovePath(NPC_SW_SOLDIER * 10, false);
+                    }
                     if (Unit* temp = me->SummonCreature(NPC_SW_SOLDIER, AllianceSpawn[8].x, AllianceSpawn[8].y, AllianceSpawn[8].z, 0, TEMPSUMMON_TIMED_DESPAWN, 90000))
+                    {
+                        allianceGuardsGUID.push_back(temp->GetGUID());
                         temp->GetMotionMaster()->MovePath((NPC_SW_SOLDIER * 10) + 1, false);
+                    }
                     if (Unit* temp = me->SummonCreature(NPC_SW_SOLDIER, AllianceSpawn[8].x, AllianceSpawn[8].y, AllianceSpawn[8].z, 0, TEMPSUMMON_TIMED_DESPAWN, 90000))
+                    {
+                        allianceGuardsGUID.push_back(temp->GetGUID());
                         temp->GetMotionMaster()->MovePath((NPC_SW_SOLDIER * 10) + 2, false);
+                    }
                     if (Unit* temp = me->SummonCreature(NPC_SW_SOLDIER, AllianceSpawn[8].x, AllianceSpawn[8].y, AllianceSpawn[8].z, 0, TEMPSUMMON_TIMED_DESPAWN, 90000))
+                    {
+                        allianceGuardsGUID.push_back(temp->GetGUID());
                         temp->GetMotionMaster()->MovePath((NPC_SW_SOLDIER * 10) + 3, false);
+                    }
                     break;
                 case 8:
                     break;
@@ -2328,6 +2348,7 @@ public:
         npc_thrall_bfuAI(Creature* creature) : npc_escortAI(creature)
         {
             memset(allianceForcesGUID, 0, sizeof(allianceForcesGUID));
+            hordeGuardsGUID.clear();
         }
 
         bool bStepping;
@@ -2343,6 +2364,7 @@ public:
         uint64 WrynnGUID;
         uint64 JainaGUID;
         uint64 SaurfangGUID;
+        std::vector<uint64> hordeGuardsGUID;
 
         EventMap _events;
 
@@ -2350,6 +2372,7 @@ public:
         {
             if (!HasEscortState(STATE_ESCORT_ESCORTING))
             {
+                me->SetStandState(UNIT_STAND_STATE_STAND);
                 me->Mount(MODEL_WHITE_WULF);
                 me->SetCorpseDelay(1);
                 me->SetRespawnTime(1);
@@ -2396,6 +2419,12 @@ public:
                     saurfang->DespawnOrUnsummon();
                     SaurfangGUID = 0;
                 }
+
+                for (std::vector<uint64>::const_iterator i = hordeGuardsGUID.begin(); i != hordeGuardsGUID.end(); ++i)
+                    if (Creature* temp = ObjectAccessor::GetCreature(*me, *i))
+                        temp->DespawnOrUnsummon();
+
+                hordeGuardsGUID.clear();
             }
         }
 
@@ -2534,7 +2563,7 @@ public:
                 sylvanas->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
                 sylvanas->SetReactState(REACT_AGGRESSIVE);
                 sylvanas->setFaction(FACTION_ESCORT_N_NEUTRAL_ACTIVE);
-                sylvanas->GetMotionMaster()->MoveFollow(me, 1, 0);
+                sylvanas->GetMotionMaster()->MoveFollow(me, 1, M_PI * 0.1f);
             }
         }
 
@@ -2611,15 +2640,28 @@ public:
                 case 6:
                     // COURTYARD_DONE Spawn
                     if (Unit* temp = me->SummonCreature(NPC_WARSONG_BATTLEGUARD, ThrallSpawn[29].x, ThrallSpawn[29].y, ThrallSpawn[29].z, ThrallSpawn[29].o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 300 * IN_MILLISECONDS))
+                    {
+                        hordeGuardsGUID.push_back(temp->GetGUID());
                         temp->GetMotionMaster()->MovePoint(0, ThrallSpawn[30].x, ThrallSpawn[30].y, ThrallSpawn[30].z);
+                    }
                     if (Unit* temp = me->SummonCreature(NPC_WARSONG_BATTLEGUARD, ThrallSpawn[31].x, ThrallSpawn[31].y, ThrallSpawn[31].z, ThrallSpawn[31].o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 300 * IN_MILLISECONDS))
+                    {
+                        hordeGuardsGUID.push_back(temp->GetGUID());
                         temp->GetMotionMaster()->MovePoint(0, ThrallSpawn[32].x, ThrallSpawn[32].y, ThrallSpawn[32].z);
+                    }
                     if (Unit* temp = me->SummonCreature(NPC_WARSONG_BATTLEGUARD, ThrallSpawn[33].x, ThrallSpawn[33].y, ThrallSpawn[33].z, ThrallSpawn[33].o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 300 * IN_MILLISECONDS))
+                    {
+                        hordeGuardsGUID.push_back(temp->GetGUID());
                         temp->GetMotionMaster()->MovePoint(0, ThrallSpawn[34].x, ThrallSpawn[34].y, ThrallSpawn[34].z);
+                    }
                     if (Unit* temp = me->SummonCreature(NPC_WARSONG_BATTLEGUARD, ThrallSpawn[35].x, ThrallSpawn[35].y, ThrallSpawn[35].z, ThrallSpawn[35].o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 300 * IN_MILLISECONDS))
+                    {
+                        hordeGuardsGUID.push_back(temp->GetGUID());
                         temp->GetMotionMaster()->MovePoint(0, ThrallSpawn[36].x, ThrallSpawn[36].y, ThrallSpawn[36].z);
+                    }
                     for (uint8 i = 0; i < 2; ++i)
-                        me->SummonCreature(NPC_WARSONG_BATTLEGUARD, ThrallSpawn[i + 44].x, ThrallSpawn[i + 44].y, ThrallSpawn[i + 44].z, ThrallSpawn[i + 44].o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 300 * IN_MILLISECONDS);
+                        if (Unit* temp = me->SummonCreature(NPC_WARSONG_BATTLEGUARD, ThrallSpawn[i + 44].x, ThrallSpawn[i + 44].y, ThrallSpawn[i + 44].z, ThrallSpawn[i + 44].o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 300 * IN_MILLISECONDS))
+                            hordeGuardsGUID.push_back(temp->GetGUID());
                     break;
                 case 7:
                     for (uint8 i = 0; i < 9; ++i)
@@ -2627,7 +2669,8 @@ public:
                     break;
                 case 8:
                     for (uint8 i = 0; i < 2; ++i)
-                        me->SummonCreature(NPC_WARSONG_BATTLEGUARD, ThrallSpawn[i + 57].x, ThrallSpawn[i + 57].y, ThrallSpawn[i + 57].z, ThrallSpawn[i + 57].o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 300 * IN_MILLISECONDS);
+                        if (Unit* temp = me->SummonCreature(NPC_WARSONG_BATTLEGUARD, ThrallSpawn[i + 57].x, ThrallSpawn[i + 57].y, ThrallSpawn[i + 57].z, ThrallSpawn[i + 57].o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 300 * IN_MILLISECONDS))
+                            hordeGuardsGUID.push_back(temp->GetGUID());
                     break;
                 case 9:
                     // Top of Undercity - Attacktrashpack
@@ -2760,6 +2803,7 @@ public:
                 case 18:
                     if (Creature* temp = me->SummonCreature(NPC_WARSONG_BATTLEGUARD, ThrallSpawn[69].x, ThrallSpawn[69].y, ThrallSpawn[69].z, ThrallSpawn[69].o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 240 * IN_MILLISECONDS))
                     {
+                        hordeGuardsGUID.push_back(temp->GetGUID());
                         temp->AI()->Talk(SAY_FOR_THE_HORDE);
                         temp->GetMotionMaster()->MovePath(NPC_WARSONG_BATTLEGUARD * 100, false);
                     }
@@ -3661,7 +3705,10 @@ public:
                             break;
                         case 143:
                             if (Creature* sylvanas = ObjectAccessor::GetCreature(*me, sylvanasfollowGUID))
+                            {
+                                sylvanas->GetMotionMaster()->MovePoint(0, 1289.48f, 314.33f, -57.32f, true);
                                 sylvanas->CastSpell(sylvanas, SPELL_LEAP_TO_PLATFORM);
+                            }
                             JumpToNextStep(10 * IN_MILLISECONDS);
                             break;
                         case 144:
@@ -3669,6 +3716,7 @@ public:
                             {
                                 sylvanas->AI()->Talk(SYLVANAS_SAY_THRONE_1);
                                 me->SetFacingToObject(sylvanas);
+                                sylvanas->SetFacingToObject(me);
                                 me->HandleEmoteCommand(EMOTE_ONESHOT_SALUTE);
                             }
                             JumpToNextStep(3 * IN_MILLISECONDS);
@@ -3941,6 +3989,11 @@ public:
         }
 
         void InitializeAI() override
+        {
+            me->Mount(MODEL_SKELETON_MOUNT);
+        }
+
+        void JustRespawned() override
         {
             me->Mount(MODEL_SKELETON_MOUNT);
         }

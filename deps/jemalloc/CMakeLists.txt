@@ -1,4 +1,5 @@
 # Copyright (C) 2008-2017 TrinityCore <http://www.trinitycore.org/>
+# Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU AGPL3 v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 #
 # This file is free software; as a special exception the author gives
 # unlimited permission to copy and/or distribute it, with or without
@@ -8,19 +9,20 @@
 # WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
+if(CMAKE_SYSTEM_NAME MATCHES "Linux" AND SERVERS AND NOT NOJEM)
   # We need to generate the jemalloc_def.h header based on platform-specific settings
   CHECK_SYMBOL_EXISTS(MADV_FREE "sys/mman.h" HAVE_MADV_FREE)
-  
+
   if (PLATFORM EQUAL 32)
     set(JEM_SIZEDEF 2)
     set(JEM_TLSMODEL)
-	set(JEM_VADDRBITS 32)
+    set(JEM_VADDRBITS 32)
   else()
     set(JEM_SIZEDEF 3)
     set(JEM_TLSMODEL "__attribute__\(\(tls_model\(\"initial-exec\"\)\)\)")
-	set(JEM_VADDRBITS 48)
+    set(JEM_VADDRBITS 48)
   endif()
-  
+
   if (HAVE_MADV_FREE)
     set(JEM_MADFREE_DEF "#define")
   else()
@@ -67,20 +69,35 @@
     ${CMAKE_CURRENT_SOURCE_DIR}/src/witness.c
   )
 
-include_directories(
-  ${BUILDDIR}/
-  ${CMAKE_CURRENT_SOURCE_DIR}/include
-)
+  add_library(jemalloc STATIC 
+    ${jemalloc_STAT_SRC})
 
-add_definitions(-D_GNU_SOURCE -D_REENTRANT)
+  target_include_directories(jemalloc
+    PRIVATE
+      ${BUILDDIR}
+      ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-add_library(jemalloc STATIC ${jemalloc_STAT_SRC})
-
-target_link_libraries(jemalloc
+  target_compile_definitions(jemalloc
     PUBLIC
-	  ${CMAKE_DL_LIBS})
-      
-set_target_properties(jemalloc
+      -DNO_BUFFERPOOL
+    PRIVATE
+      -D_GNU_SOURCE
+      -D_REENTRAN)
+
+  target_link_libraries(jemalloc
+    PUBLIC
+      threads
+      ${CMAKE_DL_LIBS})
+
+  set_target_properties(jemalloc
     PROPERTIES
       FOLDER
         "deps")
+else()
+  # Provide a dummy target for jemalloc which is used when jemalloc
+  # is disabled or not supported.
+  add_library(jemalloc INTERFACE)
+  # target_link_libraries(jemalloc
+  #   INTERFACE
+  #     valgrind)
+endif()

@@ -92,7 +92,7 @@ public:
 
         SpellScriptsBounds bounds = sObjectMgr->GetSpellScriptsBounds(spell);
         uint32 spellDifficultyId = sSpellMgr->GetSpellDifficultyId(spell);
-        if (handler->GetSession()->GetSecurity() < SEC_CONSOLE && (bounds.first != bounds.second || spellDifficultyId))
+        if (handler->GetSession()->GetSecurity() < SEC_ADMINISTRATOR && (bounds.first != bounds.second || spellDifficultyId))
         {
             handler->PSendSysMessage("Spell %u cannot be learnt using a command!", spell);
             handler->SetSentErrorMessage(true);
