@@ -61,7 +61,7 @@ public:
 
     struct npc_deahts_door_wrap_gateAI : public ScriptedAI
     {
-        npc_deahts_door_wrap_gateAI(Creature *c) : ScriptedAI(c) { }
+        npc_deahts_door_wrap_gateAI(Creature *creature) : ScriptedAI(creature) { }
 
         bool PartyTime;
 
