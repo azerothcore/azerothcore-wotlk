@@ -33,12 +33,20 @@ EndContentData */
 enum deathsDoorWrapGate
 {
     SPELL_ARTILLERY_ON_THE_WRAP_GATE            = 39221,
-    SPELL_ANTI_DEMON_FLAME_THROWER              = 39222,
+    SPELL_IMP_AURA                              = 39227,
+    SPELL_HOUND_AURA                            = 39275,
+    SPELL_EXPLOSION                             = 30934,
+
+    NPC_EXPLOSION_BUNNY                         = 22502,
+    NPC_FEL_IMP                                 = 22474,
+    NPC_HOUND                                   = 22500,
     NPC_NORTH_GATE                              = 22471,
     NPC_SOUTH_GATE                              = 22472,
     NPC_NORTH_GATE_CREDIT                       = 22503,
     NPC_SOUTH_GATE_CREDIT                       = 22504,
 
+    GO_FIRE                                     = 185317,
+    GO_BIG_FIRE                                 = 185319
 };
 
 class npc_deahts_door_wrap_gate : public CreatureScript
@@ -53,52 +61,107 @@ public:
 
     struct npc_deahts_door_wrap_gateAI : public ScriptedAI
     {
-        npc_deahts_door_wrap_gateAI(Creature *c) : ScriptedAI(c)
+        npc_deahts_door_wrap_gateAI(Creature *c) : ScriptedAI(c) { }
+
+        bool PartyTime;
+
+        uint64 PlayerGUID;
+        uint64 CannonGUID;
+        uint32 PartyTimer;
+        uint8 count;
+        float x, y, z, o;
+
+        void Reset()
         {
+            PartyTime = false;
+            PlayerGUID = 0;
+            CannonGUID = 0;
+            PartyTimer = 0;
+            count = 0;
+            o = me->GetOrientation();
+            me->GetPosition(x, y, z);
+            x = x + 1.0f;
         }
 
-        uint8 count;
-        uint32 timer;
-        void Reset() { count = 0; timer = 0;}
-        void SpellHit(Unit* caster, SpellInfo const* spellInfo)
+        void SpellHit(Unit* caster, SpellInfo const* spell)
         {
-            if (spellInfo->Id == SPELL_ARTILLERY_ON_THE_WRAP_GATE)
+            if (spell->Id == SPELL_ARTILLERY_ON_THE_WRAP_GATE)
             {
-                Player* plr = caster->GetCharmerOrOwnerPlayerOrPlayerItself();
-                if (!plr)
-                    return;
-
-                timer = 1;
                 count++;
+
+                if (count >= 1)
+                {
+                    if (Player* player = caster->GetCharmerOrOwnerPlayerOrPlayerItself())
+                        PlayerGUID = player->GetGUID();
+
+                    CannonGUID = caster->GetGUID();
+                    PartyTime = true;
+                    PartyTimer = 3000;
+                }
+
+                if (count >= 3)
+                    me->SummonGameObject(GO_FIRE, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 130);
 
                 if (count >= 6)
                 {
-                    if (me->GetEntry() == NPC_SOUTH_GATE)
-                        plr->KilledMonsterCredit(NPC_SOUTH_GATE_CREDIT, 0);
-                    else
-                        plr->KilledMonsterCredit(NPC_NORTH_GATE_CREDIT, 0);
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, PlayerGUID))
+                    {
+                        if (Creature* bunny = GetClosestCreatureWithEntry(me, NPC_SOUTH_GATE, 200.0f))
+                            player->KilledMonsterCredit(NPC_SOUTH_GATE_CREDIT, TRIGGERED_NONE);
+                        else
+                        {
+                            if (Creature* bunny = GetClosestCreatureWithEntry(me, NPC_NORTH_GATE, 200.0f))
+                                player->KilledMonsterCredit(NPC_NORTH_GATE_CREDIT, TRIGGERED_NONE);
+                        }
+                        // complete quest part
+                        if (Creature* bunny = GetClosestCreatureWithEntry(me, NPC_EXPLOSION_BUNNY, 200.0f))
+                            bunny->CastSpell(nullptr, SPELL_EXPLOSION, TRIGGERED_NONE);
+                    }
 
+                    me->SummonGameObject(GO_BIG_FIRE, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 60);
                     Reset();
                 }
             }
+
+            return;
+        }
+
+        void JustSummoned(Creature* summoned)
+        {
+            if (summoned->GetEntry() == NPC_FEL_IMP)
+                summoned->CastSpell(summoned, SPELL_IMP_AURA, true);
+            else
+            {
+                if (summoned->GetEntry() == NPC_HOUND)
+                    summoned->CastSpell(summoned, SPELL_HOUND_AURA, true);
+            }
+
+            summoned->UpdateGroundPositionZ(x, y, z);
+
+            if (Creature* cannon = ObjectAccessor::GetCreature(*me, CannonGUID))
+                summoned->AI()->AttackStart(cannon);
         }
 
         void UpdateAI(uint32 diff)
         {
-            if (timer)
+            if (PartyTime)
             {
-                timer += diff;
-                if (timer < 10000 || (timer >= 20000 && timer < 30000))
+                if (PartyTimer <= diff)
                 {
-                    for (uint8 i = 0; i < 3; ++i)
-                        if (Creature* cr = me->SummonCreature((roll_chance_i(50) ? 22474 : 22500), me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000))
-                            if (Unit* target = cr->SelectNearbyTarget(NULL, 50.0f))
-                                cr->AI()->AttackStart(target);
+                    if (Creature* cannon = ObjectAccessor::GetCreature(*me, CannonGUID))
+                    {
+                        if (cannon->isDead())
+                            Reset();
+                    }
 
-                    timer += 10000;
-                    if (timer >= 30000)
-                        timer = 0;
+                    if (roll_chance_i(20))
+                        me->SummonCreature(NPC_HOUND, x, y, z, o, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 10000);
+                    else
+                        me->SummonCreature(NPC_FEL_IMP, x, y, z, o, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 10000);
+
+                    PartyTimer = 3000;
                 }
+                else PartyTimer -= diff;
             }
         }
     };
