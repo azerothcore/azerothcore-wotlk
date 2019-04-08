@@ -11,6 +11,7 @@ enum Says
     SAY_AGGRO           = 0,
     SAY_GREET           = 1,
     SAY_SLAY            = 2,
+    EMOTE_LOCUST        = 3
 };
 
 enum Spells
@@ -180,6 +181,7 @@ public:
                     break;
                 case EVENT_SPELL_LOCUST_SWARM:
                 {
+                    Talk(EMOTE_LOCUST);
                     me->CastSpell(me, RAID_MODE(SPELL_LOCUST_SWARM_10, SPELL_LOCUST_SWARM_25), false);
                     Position pos;
                     me->GetNearPosition(pos, 10.0f, rand_norm() * 2 * M_PI);

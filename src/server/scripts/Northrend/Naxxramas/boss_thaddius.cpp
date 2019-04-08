@@ -291,6 +291,7 @@ public:
                     break;
                 case EVENT_ACTIVATE_BALL_LIGHTNING:
                     ballLightningEnabled = true;
+                    events.PopEvent();
                     break;
             }
 
