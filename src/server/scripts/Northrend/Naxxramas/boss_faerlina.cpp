@@ -97,7 +97,7 @@ public:
             Talk(SAY_AGGRO);
             events.ScheduleEvent(EVENT_SPELL_POISON_BOLT, urand(12000,15000));
             events.ScheduleEvent(EVENT_SPELL_RAIN_OF_FIRE, urand(6000,18000));
-            events.ScheduleEvent(EVENT_SPELL_FRENZY, 60000, 1);
+            events.ScheduleEvent(EVENT_SPELL_FRENZY, urand(60000,80000), 1);
             events.SetPhase(1);
         }
 
