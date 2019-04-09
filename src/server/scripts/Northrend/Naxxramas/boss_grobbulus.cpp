@@ -35,6 +35,8 @@ enum Misc
     NPC_SEWAGE_SLIME                        = 16375,
 };
 
+int const StichedGiantEntry = 16025;
+
 class boss_grobbulus : public CreatureScript
 {
 public:
@@ -68,11 +70,23 @@ public:
         void EnterCombat(Unit * who)
         {
             BossAI::EnterCombat(who);
+            PullChamberAdds();
             me->SetInCombatWithZone();
             events.ScheduleEvent(EVENT_SPELL_POISON_CLOUD, 15000);
             events.ScheduleEvent(EVENT_SPELL_MUTATING_INJECTION, 20000);
             events.ScheduleEvent(EVENT_SPELL_SLIME_SPRAY, 10000);
             events.ScheduleEvent(EVENT_SPELL_BERSERK, RAID_MODE(12*MINUTE*IN_MILLISECONDS, 9*MINUTE*IN_MILLISECONDS));
+        }
+
+        void PullChamberAdds()
+        {
+            std::list<Creature*> StichedGiants;
+            me->GetCreaturesWithEntryInRange(StichedGiants, 300.0f, StichedGiantEntry);
+            for (std::list<Creature*>::const_iterator itr = StichedGiants.begin(); itr != StichedGiants.end(); ++itr)
+            {
+                if ((*itr)->GetGUID())
+                    (*itr)->ToCreature()->AI()->AttackStart(me->GetVictim());
+            }
         }
 
         void SpellHitTarget(Unit *target, const SpellInfo* spellInfo)
