@@ -66,7 +66,7 @@ public:
         uint8 count;
         float x, y, z, o;
 
-        void Reset()
+        void Reset() override
         {
             PartyTime = false;
             PlayerGUID = 0;
@@ -119,7 +119,7 @@ public:
             return;
         }
 
-        void JustSummoned(Creature* summoned)
+        void JustSummoned(Creature* summoned) override
         {
             if (summoned->GetEntry() == NPC_FEL_IMP)
                 summoned->CastSpell(summoned, SPELL_IMP_AURA, true);
@@ -133,7 +133,7 @@ public:
                 summoned->AI()->AttackStart(cannon);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (PartyTime)
             {
@@ -157,7 +157,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_deahts_door_wrap_gateAI(creature);
     }
