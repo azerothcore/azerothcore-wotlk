@@ -37,6 +37,15 @@ enum Misc
     ACHIEV_TIMED_START_EVENT        = 10286,
 };
 
+// These are the Creature entries
+int const CreatureEntriesToPullOnAggro [] = { 16017, 16018, 16020, 16021, 16022 };
+
+// Due to current Pathfinding system being in unstable, I have to filter
+// which GUID I will pull to avoid creatures clipping through textures
+int const CreatureGUIDS[] = { 97736, 97718, 97747, 128068, 128069, 128078, 128079,
+                                128080, 128082, 128083, 128085, 128086, 128089, 128090,
+                                128091, 128093, 128094, 128095, 128096, 128100, 128101, 128102 };
+
 class boss_patchwerk : public CreatureScript
 {
 public:
@@ -81,11 +90,30 @@ public:
             Talk(SAY_DEATH);
         }
 
+        // If any of the adds on his chamber are alive, pull them
+        void PullChamberAdds()
+        {
+            for (int entry : CreatureEntriesToPullOnAggro)
+            {
+                std::list<Creature*> creatures;
+                me->GetCreaturesWithEntryInRange(creatures, 1000.0f, entry);
+                for (std::list<Creature*>::const_iterator itr = creatures.begin(); itr != creatures.end(); ++itr)
+                {
+                    Unit* unit = ObjectAccessor::GetUnit((*me), (*itr)->GetGUID());
+                    for (int GUID : CreatureGUIDS)
+                    {
+                        if (unit->GetGUID() == GUID) // Once the Pathfinding gets fixed, remove this check
+                            unit->GetAI()->AttackStart(me->GetVictim());
+                    }
+                }
+            }
+        }
+
         void EnterCombat(Unit * who)
         {
             BossAI::EnterCombat(who);
             Talk(SAY_AGGRO);
-            
+            PullChamberAdds();
             me->SetInCombatWithZone();
             events.ScheduleEvent(EVENT_SPELL_HATEFUL_STRIKE, 1200);
             events.ScheduleEvent(EVENT_SPELL_BERSERK, 360000);
