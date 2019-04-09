@@ -78,7 +78,7 @@ public:
             x = x + 1.0f;
         }
 
-        void SpellHit(Unit* caster, SpellInfo const* spell)
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
         {
             if (spell->Id == SPELL_ARTILLERY_ON_THE_WRAP_GATE)
             {
