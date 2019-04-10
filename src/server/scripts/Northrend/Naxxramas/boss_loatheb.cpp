@@ -23,6 +23,7 @@ enum Events
     EVENT_SPELL_DEATHBLOOM                      = 2,
     EVENT_SPELL_INEVITABLE_DOOM                 = 3,
     EVENT_SPELL_BERSERK                         = 4,
+    EVENT_SUMMON_SPORE                          = 5,
 };
 
 enum Texts
@@ -44,26 +45,33 @@ public:
 
     struct boss_loathebAI : public BossAI
     {
-        boss_loathebAI(Creature *c) : BossAI(c, BOSS_LOATHEB)
+        boss_loathebAI(Creature *c) : BossAI(c, BOSS_LOATHEB), summons(me)
         {
             pInstance = me->GetInstanceScript();
         }
 
         InstanceScript* pInstance;
         EventMap events;
+        SummonList summons;
 
         void Reset()
         {
             BossAI::Reset();
             events.Reset();
+            summons.DespawnAll();
             if (pInstance)
             {
+                pInstance->SetData(BOSS_LOATHEB, NOT_STARTED);
                 if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_LOATHEB_GATE)))
                     go->SetGoState(GO_STATE_ACTIVE);
             }
         }
 
-        void JustSummoned(Creature* cr) { cr->SetInCombatWithZone(); }
+        void JustSummoned(Creature* cr)
+        {
+            cr->SetInCombatWithZone();
+            summons.Summon(cr);
+        }
 
         void SummonedCreatureDies(Creature*  /*cr*/, Unit*)
         {
@@ -77,25 +85,34 @@ public:
                 pInstance->SetData(DATA_IMMORTAL_FAIL, 0);
         }
 
-        void EnterCombat(Unit * who)
+        void EnterCombat(Unit* who)
         {
             BossAI::EnterCombat(who);
             if (pInstance)
             {
+                pInstance->SetData(BOSS_LOATHEB, IN_PROGRESS);
                 if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_LOATHEB_GATE)))
                     go->SetGoState(GO_STATE_READY);
             }
 
             me->SetInCombatWithZone();
-            events.ScheduleEvent(EVENT_SPELL_NECROTIC_AURA, 0);
-            events.ScheduleEvent(EVENT_SPELL_DEATHBLOOM, 25000);
+            events.ScheduleEvent(EVENT_SPELL_NECROTIC_AURA, 10000);
+            events.ScheduleEvent(EVENT_SPELL_DEATHBLOOM, 6000);
+            events.ScheduleEvent(EVENT_SUMMON_SPORE, 12000);
             events.ScheduleEvent(EVENT_SPELL_INEVITABLE_DOOM, 120000);
             events.ScheduleEvent(EVENT_SPELL_BERSERK, 720000);
         }
 
+        void JustDied(Unit* Killer)
+        {
+            if (pInstance)
+                pInstance->SetData(BOSS_LOATHEB, DONE);
+            summons.DespawnAll();
+        }
+
         void UpdateAI(uint32 diff)
         {
-            if (!UpdateVictim())
+            if (!UpdateVictim() || !IsInRoom())
                 return;
 
             events.Update(diff);
@@ -104,12 +121,15 @@ public:
 
             switch (events.GetEvent())
             {
+                case EVENT_SUMMON_SPORE:
+                    me->CastSpell(me, SPELL_SUMMON_SPORE, true);
+                    events.RepeatEvent(35000);
+                    break;
                 case EVENT_SPELL_NECROTIC_AURA:
                     me->CastSpell(me, SPELL_NECROTIC_AURA, true);
                     events.RepeatEvent(20000);
                     break;
                 case EVENT_SPELL_DEATHBLOOM:
-                    me->CastSpell(me, SPELL_SUMMON_SPORE, true);
                     me->CastSpell(me, RAID_MODE(SPELL_DEATHBLOOM_10, SPELL_DEATHBLOOM_25), false);
                     events.RepeatEvent(30000);
                     break;
@@ -124,6 +144,16 @@ public:
             }
 
             DoMeleeAttackIfReady();
+        }
+
+        bool IsInRoom()
+        {
+            if (me->GetExactDist(2909.0f, -3997.4f, 274.187f) > 50.0f)
+            {
+                EnterEvadeMode();
+                return false;
+            }
+            return true;
         }
     };
 };
