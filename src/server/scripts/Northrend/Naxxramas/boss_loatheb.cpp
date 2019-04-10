@@ -56,7 +56,7 @@ public:
         SummonList summons;
         Position p = me->GetHomePosition();
 
-        void Reset()
+        void Reset() override
         {
             BossAI::Reset();
             events.Reset();
@@ -69,25 +69,25 @@ public:
             }
         }
 
-        void JustSummoned(Creature* cr)
+        void JustSummoned(Creature* cr) override
         {
             cr->SetInCombatWithZone();
             summons.Summon(cr);
         }
 
-        void SummonedCreatureDies(Creature*  /*cr*/, Unit*)
+        void SummonedCreatureDies(Creature*  /*cr*/, Unit*) override
         {
             if (pInstance)
                 pInstance->SetData(DATA_SPORE_KILLED, 0);
         }
 
-        void KilledUnit(Unit* who)
+        void KilledUnit(Unit* who) override
         {
             if (who->GetTypeId() == TYPEID_PLAYER && pInstance)
                 pInstance->SetData(DATA_IMMORTAL_FAIL, 0);
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             BossAI::EnterCombat(who);
             if (pInstance)
@@ -105,14 +105,14 @@ public:
             events.ScheduleEvent(EVENT_SPELL_BERSERK, 720000);
         }
 
-        void JustDied(Unit* Killer)
+        void JustDied(Unit* /*killer*/) override
         {
             if (pInstance)
                 pInstance->SetData(BOSS_LOATHEB, DONE);
             summons.DespawnAll();
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim() || !IsInRoom())
                 return;
