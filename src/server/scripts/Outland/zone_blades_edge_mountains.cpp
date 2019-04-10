@@ -59,7 +59,6 @@ public:
         npc_deahts_door_wrap_gateAI(Creature* creature) : ScriptedAI(creature) { }
 
         bool PartyTime;
-
         uint64 PlayerGUID;
         uint64 CannonGUID;
         uint32 PartyTimer;
