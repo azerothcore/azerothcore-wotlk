@@ -86,6 +86,7 @@ public:
         void MoveInLineOfSight(Unit *who) override
         {
             if (!me->GetVictim() || me->GetVictim()->GetEntry() != NPC_ZOMBIE_CHOW)
+            {
                 if (who->GetEntry() == NPC_ZOMBIE_CHOW && me->IsWithinDistInMap(who, 6.5f))
                 {
                     SetGazeOn(who);
@@ -93,6 +94,7 @@ public:
                 }
                 else
                     ScriptedAI::MoveInLineOfSight(who);
+            }
         }
 
         void EnterCombat(Unit * who) override
