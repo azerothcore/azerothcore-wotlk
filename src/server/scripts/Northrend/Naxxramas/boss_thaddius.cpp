@@ -108,7 +108,6 @@ public:
         boss_thaddiusAI(Creature *c) : BossAI(c, BOSS_THADDIUS), summons(me), ballLightningEnabled(false)
         {
             pInstance = me->GetInstanceScript();
-            SetCombatMovement(false);
         }
 
         InstanceScript* pInstance;
