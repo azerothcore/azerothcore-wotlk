@@ -141,7 +141,7 @@ public:
                 {
                     if (Creature* cannon = ObjectAccessor::GetCreature(*me, CannonGUID))
                     {
-                        if (cannon->isDead())
+                        if (!cannon || !cannon->GetCharmerOrOwner())
                             Reset();
                     }
 
@@ -160,6 +160,37 @@ public:
     CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_deahts_door_wrap_gateAI(creature);
+    }
+};
+
+class npc_deahts_fel_cannon : public CreatureScript
+{
+public:
+    npc_deahts_fel_cannon() : CreatureScript("npc_deahts_fel_cannon") { }
+
+    struct npc_deahts_fel_cannonAI : public ScriptedAI
+    {
+        npc_deahts_fel_cannonAI(Creature* creature) : ScriptedAI(creature) { }
+ 
+        void Reset() override
+        {
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_1);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
+        }  
+
+        void UpdateAI(uint32 /*diff*/) override
+        {
+            if (me->IsNonMeleeSpellCast(false))
+                return
+
+                me->CombatStop();
+                me->AttackStop();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_deahts_fel_cannonAI(creature);
     }
 };
 
@@ -1102,7 +1133,7 @@ void AddSC_blades_edge_mountains()
     // Ours
     new npc_deahts_door_wrap_gate();
     new spell_npc22275_crystal_prison();
-
+    new npc_deahts_fel_cannon();
     // Theirs
     new npc_nether_drake();
     new npc_daranelle();
