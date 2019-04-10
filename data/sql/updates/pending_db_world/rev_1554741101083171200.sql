@@ -1,6 +1,6 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1554741101083171200');
 
-UPDATE `creature_template` SET `unit_flags` =4 WHERE `entry` =22443;
+UPDATE `creature_template` SET `unit_flags` =0 WHERE `entry` =22443;
 
 DELETE FROM `creature` WHERE `id` =22443;
 INSERT INTO `creature` (`guid`,`id`,`map`,`zoneId`,`areaId`,`spawnMask`,`phaseMask`,`modelid`,`equipment_id`,`position_x`,`position_y`,`position_z`,`orientation`,`spawntimesecs`,`spawndist`,`currentwaypoint`,`curhealth`,`curmana`,`MovementType`,`npcflag`,`unit_flags`,`dynamicflags`,`ScriptName`,`VerifiedBuild`) VALUES
