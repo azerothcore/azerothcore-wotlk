@@ -75,6 +75,8 @@ public:
             _thaddiusPortalGUID = 0;
 
             // NPCs
+            PatchwerkRoomTrash.clear();
+            _patchwerkGUID = 0;
             _thaddiusGUID = 0;
             _stalaggGUID = 0;
             _feugenGUID = 0;
@@ -130,6 +132,8 @@ public:
         uint64 _thaddiusPortalGUID;
 
         // NPCs
+        std::list<uint64> PatchwerkRoomTrash;
+        uint64 _patchwerkGUID;
         uint64 _thaddiusGUID;
         uint64 _stalaggGUID;
         uint64 _feugenGUID;
@@ -186,6 +190,29 @@ public:
         {
             switch(creature->GetEntry())
             {
+                case NPC_PATCHWERK:
+                    _patchwerkGUID = creature->GetGUID();
+                    return;
+                case NPC_PATCHWORK_GOLEM:
+                    PatchwerkRoomTrash.push_back(creature->GetGUID());
+                    return;
+                case NPC_BILE_RETCHER:
+                    if (creature->GetPositionY() > -3258.0f) // we want only those inside the room, not before
+                        PatchwerkRoomTrash.push_back(creature->GetGUID());
+                    return;
+                case NPC_SLUDGE_BELCHER:
+                    if (creature->GetPositionY() > -3258.0f) // we want only those inside the room, not before
+                        PatchwerkRoomTrash.push_back(creature->GetGUID());
+                    return;
+                case NPC_MAD_SCIENTIST:
+                    PatchwerkRoomTrash.push_back(creature->GetGUID());
+                    return;
+                case NPC_LIVING_MONSTROSITY:
+                    PatchwerkRoomTrash.push_back(creature->GetGUID());
+                    return;
+                case NPC_SURGICAL_ASSIST:
+                    PatchwerkRoomTrash.push_back(creature->GetGUID());
+                    return;
                 case NPC_THADDIUS:
                     _thaddiusGUID = creature->GetGUID();
                     return;
@@ -449,6 +476,20 @@ public:
         
         bool SetBossState(uint32 bossId, EncounterState state) override
         {
+            // pull all the trash if not killed
+            if (bossId == BOSS_PATCHWERK && state == IN_PROGRESS)
+            {
+                if (Creature* patch = instance->GetCreature(_patchwerkGUID))
+                {
+                    for (auto &itr : PatchwerkRoomTrash)
+                    {
+                        Creature* trash = ObjectAccessor::GetCreature(*patch, itr);
+                        if (trash && trash->IsAlive() && !trash->IsInCombat())
+                            trash->AI()->AttackStart(patch->GetVictim());
+                    }
+                }
+            }
+
             // Horseman handling
             if (bossId == BOSS_HORSEMAN)
             {

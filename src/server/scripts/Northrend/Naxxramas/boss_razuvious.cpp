@@ -6,26 +6,13 @@
 #include "ScriptedCreature.h"
 #include "naxxramas.h"
 
-enum Sounds
-{
-    SOUND_AGGRO_1                   = 8852,
-    SOUND_AGGRO_2                   = 8853,
-    SOUND_AGGRO_3                   = 8854,
-    SOUND_SLAY                      = 8861,
-    SOUND_COMMAND_1                 = 8855,
-    SOUND_COMMAND_2                 = 8856,
-    SOUND_COMMAND_3                 = 8858,
-    SOUND_COMMAND_4                 = 8859,
-    SOUND_COMMAND_5                 = 8861,
-    SOUND_DEATH                     = 8860,
-};
-
 enum Says
 {
     SAY_AGGRO   = 0,
     SAY_SLAY    = 1,
     SAY_TAUNTED = 2,
-    SAY_DEATH   = 3
+    SAY_DEATH   = 3,
+    SAY_SHOUT   = 4
 };
 
 enum Spells
@@ -155,6 +142,7 @@ public:
                     events.RepeatEvent(30000);
                     break;
                 case EVENT_SPELL_DISRUPTING_SHOUT:
+                    Talk(SAY_SHOUT);
                     me->CastSpell(me, RAID_MODE(SPELL_DISRUPTING_SHOUT_10, SPELL_DISRUPTING_SHOUT_25), false);
                     events.RepeatEvent(25000);
                     break;

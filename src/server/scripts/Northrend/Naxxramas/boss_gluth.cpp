@@ -76,7 +76,7 @@ public:
         void Reset() override
         {
             BossAI::Reset();
-            me->ApplySpellImmune(29306, IMMUNITY_ID, 29306, true);
+            me->ApplySpellImmune(SPELL_INFECTED_WOUND, IMMUNITY_ID, SPELL_INFECTED_WOUND, true);
             events.Reset();
             summons.DespawnAll();
             gazeTarget = 0;
@@ -85,13 +85,14 @@ public:
 
         void MoveInLineOfSight(Unit *who) override
         {
-            if ((!me->GetVictim() || me->GetVictim()->GetEntry() != NPC_ZOMBIE_CHOW) && who->GetEntry() == NPC_ZOMBIE_CHOW && me->IsWithinDistInMap(who, 6.5f))
-            {
-                SetGazeOn(who);
-                Talk(EMOTE_SPOTS_ONE);
-            }
-            else
-                ScriptedAI::MoveInLineOfSight(who);
+            if (!me->GetVictim() || me->GetVictim()->GetEntry() != NPC_ZOMBIE_CHOW)
+                if (who->GetEntry() == NPC_ZOMBIE_CHOW && me->IsWithinDistInMap(who, 6.5f))
+                {
+                    SetGazeOn(who);
+                    Talk(EMOTE_SPOTS_ONE);
+                }
+                else
+                    ScriptedAI::MoveInLineOfSight(who);
         }
 
         void EnterCombat(Unit * who) override
