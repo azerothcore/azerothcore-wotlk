@@ -76,10 +76,9 @@ class boss_ragnaros : public CreatureScript
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
             }
 
-            void Reset()
+            void Reset() override
             {
                 BossAI::Reset();
-                me->SetHomePosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.8f);
                 _emergeTimer = 90000;
                 _hasYelledMagmaBurst = false;
                 _hasSubmergedOnce = false;
@@ -87,7 +86,10 @@ class boss_ragnaros : public CreatureScript
                 me->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
             }
 
-            void EnterCombat(Unit* victim)
+            // Make Sulfuras fall in his correct position
+            void JustDied(Unit* /*killer*/) override { me->SetFacingTo(DEATH_ORIENTATION); }
+
+            void EnterCombat(Unit* victim) override
             {
                 BossAI::EnterCombat(victim);
                 events.ScheduleEvent(EVENT_ERUPTION, 15000);
@@ -99,19 +101,19 @@ class boss_ragnaros : public CreatureScript
                 events.ScheduleEvent(EVENT_SUBMERGE, 180000);
             }
 
-            void KilledUnit(Unit* /*victim*/)
+            void KilledUnit(Unit* /*victim*/) override
             {
                 if (urand(0, 99) < 25)
                     Talk(SAY_KILL);
             }
 
-            void AttackStart(Unit* target)
+            void AttackStart(Unit* target) override
             {
                 if (target && me->Attack(target, true))
                     DoStartNoMovement(target);
             }
 
-            void UpdateAI(uint32 diff)
+            void UpdateAI(uint32 diff) override
             {
                 if (_introState != 2)
                 {
@@ -150,7 +152,6 @@ class boss_ragnaros : public CreatureScript
                             me->SetReactState(REACT_AGGRESSIVE);
                             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                             _introState = 2;
-                            me->SetHomePosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 4.0f);
                             break;
                         default:
                             break;
@@ -170,18 +171,14 @@ class boss_ragnaros : public CreatureScript
                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
                             AttackStart(target);
                         instance->SetData(DATA_RAGNAROS_ADDS, 0);
-
-                        //DoCast(me, SPELL_RAGEMERGE); //"phase spells" didnt worked correctly so Ive commented them and wrote solution witch doesnt need core support
                         _isBanished = false;
                     }
                     else if (_isBanished)
                     {
                         _emergeTimer -= diff;
-                        //Do nothing while banished
                         return;
                     }
 
-                    //Return since we have no target
                     if (!UpdateVictim())
                         return;
 
@@ -221,7 +218,6 @@ class boss_ragnaros : public CreatureScript
                                     DoCastVictim(SPELL_MAGMA_BLAST);
                                     if (!_hasYelledMagmaBurst)
                                     {
-                                        //Say our dialog
                                         Talk(SAY_MAGMABURST);
                                         _hasYelledMagmaBurst = true;
                                     }
@@ -232,15 +228,11 @@ class boss_ragnaros : public CreatureScript
                             {
                                 if (!_isBanished)
                                 {
-                                    //Creature spawning and ragnaros becomming unattackable
-                                    //is not very well supported in the core //no it really isnt
-                                    //so added normaly spawning and banish workaround and attack again after 90 secs.
+                                    // TODO: There is a spell to summon him
                                     me->AttackStop();
                                     DoResetThreat();
                                     me->SetReactState(REACT_PASSIVE);
                                     me->InterruptNonMeleeSpells(false);
-                                    //Root self
-                                    //DoCast(me, 23973);
                                     me->setFaction(35);
                                     me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                                     me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_SUBMERGED);
@@ -259,7 +251,6 @@ class boss_ragnaros : public CreatureScript
 
                                         _hasSubmergedOnce = true;
                                         _isBanished = true;
-                                        //DoCast(me, SPELL_RAGSUBMERGE);
                                         _emergeTimer = 90000;
 
                                     }
@@ -273,7 +264,6 @@ class boss_ragnaros : public CreatureScript
                                                     summoned->AI()->AttackStart(target);
 
                                         _isBanished = true;
-                                        //DoCast(me, SPELL_RAGSUBMERGE);
                                         _emergeTimer = 90000;
                                     }
                                 }
@@ -290,6 +280,7 @@ class boss_ragnaros : public CreatureScript
             }
 
         private:
+            float const DEATH_ORIENTATION = 4.0f;
             uint32 _emergeTimer;
             uint8 _introState;
             bool _hasYelledMagmaBurst;
@@ -308,19 +299,16 @@ class npc_son_of_flame : public CreatureScript
     public:
         npc_son_of_flame() : CreatureScript("npc_SonOfFlame") { }
 
-        struct npc_son_of_flameAI : public ScriptedAI //didnt work correctly in EAI for me...
+        struct npc_son_of_flameAI : public ScriptedAI
         {
             npc_son_of_flameAI(Creature* creature) : ScriptedAI(creature)
             {
                 instance = me->GetInstanceScript();
             }
 
-            void JustDied(Unit* /*killer*/)
-            {
-                instance->SetData(DATA_RAGNAROS_ADDS, 1);
-            }
+            void JustDied(Unit* /*killer*/) override { instance->SetData(DATA_RAGNAROS_ADDS, 1); }
 
-            void UpdateAI(uint32 /*diff*/)
+            void UpdateAI(uint32 /*diff*/) override
             {
                 if (!UpdateVictim())
                     return;
