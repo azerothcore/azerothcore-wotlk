@@ -48,14 +48,13 @@ public:
         boss_loathebAI(Creature *c) : BossAI(c, BOSS_LOATHEB), summons(me)
         {
             pInstance = me->GetInstanceScript();
+            me->SetHomePosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation());
         }
 
         InstanceScript* pInstance;
         EventMap events;
         SummonList summons;
-        float const HOME_X_COORD = 2909.0f;
-        float const HOME_Y_COORD = -3997.4f;
-        float const HOME_Z_COORD = 274.187f;
+        Position p = me->GetHomePosition();
 
         void Reset()
         {
@@ -152,7 +151,9 @@ public:
         bool IsInRoom()
         {
             // Calculates the distance between his home position to the gate
-            if (me->GetExactDist(HOME_X_COORD, HOME_Y_COORD, HOME_Z_COORD) > 50.0f)
+            if (me->GetExactDist(me->GetHomePosition().GetPositionX(),
+                me->GetHomePosition().GetPositionY(),
+                me->GetHomePosition().GetPositionZ()) > 50.0f)
             {
                 EnterEvadeMode();
                 return false;
