@@ -54,7 +54,6 @@ public:
         InstanceScript* pInstance;
         EventMap events;
         SummonList summons;
-        Position p = me->GetHomePosition();
 
         void Reset() override
         {
