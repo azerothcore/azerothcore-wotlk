@@ -56,25 +56,26 @@ public:
 
     struct npc_deahts_door_wrap_gateAI : public ScriptedAI
     {
-        npc_deahts_door_wrap_gateAI(Creature* creature) : ScriptedAI(creature), PartyTime(nullptr) { }
+        npc_deahts_door_wrap_gateAI(Creature* creature) : ScriptedAI(creature), PartyTime(false) { }
 
         bool PartyTime;
         uint64 PlayerGUID;
         uint64 CannonGUID;
         uint32 PartyTimer;
         uint8 count;
-        float x, y, z, o;
-
+        
         void Reset() override
+        {
+            Initialize();
+        }
+
+        void Initialize()
         {
             PartyTime = false;
             PlayerGUID = 0;
             CannonGUID = 0;
             PartyTimer = 0;
             count = 0;
-            o = me->GetOrientation();
-            me->GetPosition(x, y, z);
-            x = x + 1.0f;
         }
 
         void SpellHit(Unit* caster, SpellInfo const* spell) override
@@ -124,8 +125,6 @@ public:
             else if (summoned->GetEntry() == NPC_HOUND)
                 summoned->CastSpell(summoned, SPELL_HOUND_AURA, true);
 
-            summoned->UpdateGroundPositionZ(x, y, z);
-
             if (Creature* cannon = ObjectAccessor::GetCreature(*me, CannonGUID))
                 summoned->AI()->AttackStart(cannon);
         }
@@ -143,9 +142,9 @@ public:
                     }
 
                     if (roll_chance_i(20))
-                        me->SummonCreature(NPC_HOUND, x, y, z, o, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 10000);
+                        me->SummonCreature(NPC_HOUND, 0, 0, 0, 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 10000);
                     else
-                        me->SummonCreature(NPC_FEL_IMP, x, y, z, o, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 10000);
+                        me->SummonCreature(NPC_FEL_IMP, 0, 0, 0, 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 10000);
 
                     PartyTimer = 3000;
                 }
