@@ -78,6 +78,11 @@
 #include "ServerMotd.h"
 #include "GameGraveyard.h"
 #include <VMapManager2.h>
+// playerbot mod
+#include "../../modules/bot/playerbot/playerbot.h"
+#include "../../modules/bot/playerbot/PlayerbotAIConfig.h"
+#include "../../modules/bot/playerbot/RandomPlayerbotMgr.h"
+// end playerbot insert
 #ifdef ELUNA
 #include "LuaEngine.h"
 #endif
@@ -1945,8 +1950,10 @@ void World::SetInitialWorldSettings()
     mgr->LoadChannels();
     mgr = ChannelMgr::forTeam(TEAM_HORDE);
     mgr->LoadChannels();
-
-#ifdef ELUNA
+    // playerbot mod
+    sPlayerbotAIConfig.Initialize();
+    // end playerbot insert
+    #ifdef ELUNA
     ///- Run eluna scripts.
     // in multithread foreach: run scripts
     sEluna->RunScripts();
@@ -2107,7 +2114,11 @@ void World::Update(uint32 diff)
 
     if (m_gameTime > m_NextGuildReset)
         ResetGuildCap();
-
+    // playerbot mod
+	sRandomPlayerbotMgr.UpdateAI(diff);
+    sRandomPlayerbotMgr.UpdateSessions(diff);
+    // end playerbot insert
+    
     // pussywizard:
     // acquire mutex now, this is kind of waiting for listing thread to finish it's work (since it can't process next packet)
     // so we don't have to do it in every packet that modifies auctions
@@ -2496,7 +2507,9 @@ void World::ShutdownServ(uint32 time, uint32 options, uint8 exitcode)
         m_ShutdownTimer = time;
         ShutdownMsg(true);
     }
-
+        // playerbot mod
+        sRandomPlayerbotMgr.LogoutAllBots();
+        // end playerbot insert
     sScriptMgr->OnShutdownInitiate(ShutdownExitCode(exitcode), ShutdownMask(options));
 }
 
