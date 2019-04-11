@@ -56,7 +56,7 @@ public:
 
     struct npc_deahts_door_wrap_gateAI : public ScriptedAI
     {
-        npc_deahts_door_wrap_gateAI(Creature* creature) : ScriptedAI(creature) { }
+        npc_deahts_door_wrap_gateAI(Creature* creature) : ScriptedAI(creature), PartyTime(nullptr) { }
 
         bool PartyTime;
         uint64 PlayerGUID;
@@ -83,7 +83,7 @@ public:
             {
                 count++;
 
-                if (count >= 1)
+                if (count)
                 {
                     if (Player* player = caster->GetCharmerOrOwnerPlayerOrPlayerItself())
                         PlayerGUID = player->GetGUID();
@@ -102,7 +102,6 @@ public:
                     {
                         if (GetClosestCreatureWithEntry(me, NPC_SOUTH_GATE, 200.0f))
                             player->KilledMonsterCredit(NPC_SOUTH_GATE_CREDIT, TRIGGERED_NONE);
-                        
                         else if (GetClosestCreatureWithEntry(me, NPC_NORTH_GATE, 200.0f))
                             player->KilledMonsterCredit(NPC_NORTH_GATE_CREDIT, TRIGGERED_NONE);
                         // complete quest part
@@ -122,10 +121,9 @@ public:
         {
             if (summoned->GetEntry() == NPC_FEL_IMP)
                 summoned->CastSpell(summoned, SPELL_IMP_AURA, true);
-            
             else if (summoned->GetEntry() == NPC_HOUND)
                 summoned->CastSpell(summoned, SPELL_HOUND_AURA, true);
-            
+
             summoned->UpdateGroundPositionZ(x, y, z);
 
             if (Creature* cannon = ObjectAccessor::GetCreature(*me, CannonGUID))
@@ -183,6 +181,7 @@ public:
                 return
 
                 me->CombatStop();
+            else
                 me->AttackStop();
         }
     };
