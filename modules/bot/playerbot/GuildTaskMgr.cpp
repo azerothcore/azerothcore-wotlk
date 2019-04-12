@@ -7,7 +7,7 @@
 #include "DatabaseEnv.h"
 #include "Mail.h"
 #include "PlayerbotAI.h"
-
+#include "Common.h"
 #include "RandomItemMgr.h"
 
 char * strstri (const char* str1, const char* str2);
@@ -49,7 +49,7 @@ void GuildTaskMgr::Update(Player* player, Player* guildMaster)
         return;
     }
 
-        sLog->outDetail("%s: guild task update for player %s", guild->GetName(), player->GetName());
+        sLog->outDetail("%s: guild task update for player %s", guild->GetName().c_str(), player->GetName());
 
     uint32 owner = (uint32)player->GetGUID();
 
