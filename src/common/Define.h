@@ -6,7 +6,7 @@
 
 #ifndef TRINITY_DEFINE_H
 #define TRINITY_DEFINE_H
-
+#include <stdint.h>
 #include <cstdint>
 #include <cstddef>
 #include <sys/types.h>
