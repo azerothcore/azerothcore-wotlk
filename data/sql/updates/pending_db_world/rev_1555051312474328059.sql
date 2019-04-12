@@ -4,7 +4,7 @@ INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1555051312474328059');
 UPDATE `creature` SET `spawntimesecs` = 1 WHERE `id` IN (18972,18970,18950,18986,18948,18965,18949,18971);
 
 -- increase the random time interval when the defenders leave their portal, so they won't run all at once when spawning the first time
-UPDATE `smart_scripts` SET `action_param3` = 9500 WHERE `source_type` = 0 AND `id` = 0 AND `entryorguid` IN (18972,18970,18950,18986,18948,18965);
+UPDATE `smart_scripts` SET `action_param3` = 6500 WHERE `source_type` = 0 AND `id` = 0 AND `entryorguid` IN (18972,18970,18950,18986,18948,18965);
 
 -- stop combat right before starting wapoint movement in order to prevent error messages in the log
 DELETE FROM `smart_scripts` WHERE `id` IN (2,12) AND `source_type` = 0 AND `entryorguid` IN (18972,18970,18950,18986,18948,18965);
