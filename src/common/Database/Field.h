@@ -9,7 +9,7 @@
 
 #include "Common.h"
 #include "Log.h"
-
+#include "DatabaseEnv.h"
 #include <mysql.h>
 
 class Field
