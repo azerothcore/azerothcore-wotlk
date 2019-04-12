@@ -71,10 +71,10 @@ int AiFactory::GetPlayerSpecTab(Player* player)
         if (!talentInfo)
             continue;
 
-        //uint32 const* talentTabIds = GetTalentTabPages(player->getClass());
-        //if (talentInfo->TalentTab == talentTabIds[0]) c0++;
-        //if (talentInfo->TalentTab == talentTabIds[1]) c1++;
-        //if (talentInfo->TalentTab == talentTabIds[2]) c2++;
+        uint32 const* talentTabIds = GetTalentTabPages(player->getClass());
+        if (talentInfo->TalentTab == talentTabIds[0]) c0++;
+        if (talentInfo->TalentTab == talentTabIds[1]) c1++;
+        if (talentInfo->TalentTab == talentTabIds[2]) c2++;
     }
 
     if (c0 >= c1 && c0 >= c2)

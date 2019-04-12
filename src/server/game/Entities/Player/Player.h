@@ -1135,7 +1135,7 @@ class Player : public Unit, public GridObject<Player>
         bool Create(uint32 guidlow, CharacterCreateInfo* createInfo);
         
 	// playerbot mod
-	//bool CreateBot(uint32 guidlow, BotCharacterCreateInfo* createInfo);
+	bool CreateBot(uint32 guidlow, BotCharacterCreateInfo* createInfo);
         //end playerbot insert
         
 	void Update(uint32 time);
