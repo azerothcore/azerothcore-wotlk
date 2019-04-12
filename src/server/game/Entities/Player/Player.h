@@ -6,7 +6,7 @@
 
 #ifndef _PLAYER_H
 #define _PLAYER_H
-
+#include "Common.h"
 #include "DBCStores.h"
 #include "GroupReference.h"
 #include "MapReference.h"
