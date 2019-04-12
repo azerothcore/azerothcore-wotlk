@@ -25,6 +25,9 @@
 #include "ObjectMgr.h"
 #include "World.h"
 #include "GroupMgr.h"
+// playerbot mod
+#include "Player.h"
+// end playerbot insert
 
 namespace lfg
 {
@@ -400,6 +403,21 @@ LfgCompatibility LFGQueue::CheckCompatibility(Lfg5Guids const& checkWith, const 
         ++foundCount;
         return LFG_COMPATIBLES_WITH_LESS_PLAYERS;
     }
+    // playerbot mod
+            bool nonBotFound = false;
+            for (uint8 i = 0; i < 5 && check.guid[i]; ++i)
+            {
+                    uint64 guid = check.guid[i];
+                    Player *player = ObjectAccessor::FindPlayer(guid);
+                    if (IS_GROUP_GUID(guid) || (player && !player->GetPlayerbotAI()))
+                    {
+                            nonBotFound = true;
+                            break;
+                    }
+            }
+            if (!nonBotFound)
+    return LFG_INCOMPATIBLES_HAS_IGNORES;
+            // end playerbot insert
 
     uint64 gguid = check.front();
     proposal.queues = strGuids;
