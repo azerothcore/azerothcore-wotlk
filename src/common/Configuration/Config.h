@@ -65,8 +65,8 @@ private:
     Config _config;
     LockType _configLock;
 
-    ConfigMgr(ConfigMgr const&);
-    ConfigMgr& operator=(ConfigMgr const&);
+    //ConfigMgr(ConfigMgr const&);
+    //ConfigMgr& operator=(ConfigMgr const&);
 };
 
 #define sConfigMgr ACE_Singleton<ConfigMgr, ACE_Null_Mutex>::instance()
