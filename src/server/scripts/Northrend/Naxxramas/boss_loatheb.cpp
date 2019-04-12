@@ -149,7 +149,7 @@ public:
 
         bool IsInRoom()
         {
-            // Calculates the distance between his home position to the gate
+            // Calculate the distance between his home position to the gate
             if (me->GetExactDist(me->GetHomePosition().GetPositionX(),
                 me->GetHomePosition().GetPositionY(),
                 me->GetHomePosition().GetPositionZ()) > 50.0f)
