@@ -7,7 +7,7 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#include <string>
+#include <string.h>
 #include <list>
 #include <vector>
 #include <ace/Singleton.h>
@@ -17,7 +17,7 @@
 
 typedef Trinity::AutoPtr<ACE_Configuration_Heap, ACE_Null_Mutex> Config;
 
-class ConfigMgr
+class ConfigMgr;
 {
 public:
         ConfigMgr() = default;
