@@ -19,11 +19,14 @@ typedef Trinity::AutoPtr<ACE_Configuration_Heap, ACE_Null_Mutex> Config;
 
 class ConfigMgr
 {
-    friend class ACE_Singleton<ConfigMgr, ACE_Null_Mutex>;
-    friend class ConfigLoader;
+public:
+        ConfigMgr() = default;
+        ConfigMgr(ConfigMgr const&) = delete;
+        ConfigMgr& operator=(ConfigMgr const&) = delete;
+        ~ConfigMgr() = default;
 
-    ConfigMgr() { }
-    ~ConfigMgr() { }
+        friend class ACE_Singleton<ConfigMgr, ACE_Null_Mutex>;
+        friend class ConfigLoader;
 
 public:
     /// Method used only for loading main configuration files (authserver.conf and worldserver.conf)
