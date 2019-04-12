@@ -19,7 +19,7 @@ class GuildTaskMgr
 
         void Update(Player* owner, Player* guildMaster);
 
-	public:
+        public:
         static bool HandleConsoleCommand(ChatHandler* handler, char const* args);
         bool IsGuildTaskItem(uint32 itemId, uint32 guildId);
         void CheckItemTask(uint32 itemId, uint32 obtained, Player* owner, Player* bot, bool byMail = false);

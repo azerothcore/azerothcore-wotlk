@@ -12,7 +12,7 @@ file(GLOB_RECURSE sources_playerbot playerbot/*.cpp playerbot/*.h)
 file(GLOB_RECURSE sources_pch pch/*.cpp pch/*.h)
 
 set(bot_STAT_SRCS
-  ${bot_STAT_SRCS}  
+  ${bot_STAT_SRCS}
   ${sources_playerbot}
   ${sources_pch}
 )

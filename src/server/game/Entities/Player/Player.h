@@ -20,7 +20,6 @@
 #include "Battleground.h"
 #include "WorldSession.h"
 #include "ObjectMgr.h"
-
 #include <string>
 #include <vector>
 
@@ -43,10 +42,12 @@ class PlayerMenu;
 class PlayerSocial;
 class SpellCastTargets;
 class UpdateMask;
+
 // Playerbot mod
 class PlayerbotAI;
 class PlayerbotMgr;
 // end playerbot insert
+
 typedef std::deque<Mail*> PlayerMails;
 
 #define PLAYER_MAX_SKILLS           127
@@ -1132,10 +1133,12 @@ class Player : public Unit, public GridObject<Player>
         time_t GetSummonExpireTimer() const { return m_summon_expire; }
 
         bool Create(uint32 guidlow, CharacterCreateInfo* createInfo);
-        // playerbot mod
+        
+	// playerbot mod
         bool CreateBot(uint32 guidlow, BotCharacterCreateInfo* createInfo);
         //end playerbot insert
-        void Update(uint32 time);
+        
+	void Update(uint32 time);
 
         static bool BuildEnumData(PreparedQueryResult result, WorldPacket* data);
 
@@ -2538,7 +2541,8 @@ class Player : public Unit, public GridObject<Player>
         bool SetHover(bool enable, bool packetOnly = false);
 
         bool CanFly() const { return m_movementInfo.HasMovementFlag(MOVEMENTFLAG_CAN_FLY); }
-        // Playerbot mod:
+        
+	// Playerbot mod:
         // A Player can either have a playerbotMgr (to manage its bots), or have playerbotAI (if it is a bot), or
         // neither. Code that enables bots must create the playerbotMgr and set it using SetPlayerbotMgr.
         EquipmentSets& GetEquipmentSets() { return m_EquipmentSets; }
@@ -2550,7 +2554,8 @@ class Player : public Unit, public GridObject<Player>
         PlayerTalentMap& GetTalentMap(uint8 spec) { return m_talents; }
         bool MinimalLoadFromDB(QueryResult result, uint32 guid);
         // end playerbot insert
-        //! Return collision height sent to client
+        
+	//! Return collision height sent to client
         float GetCollisionHeight(bool mounted)
         {
             if (mounted)

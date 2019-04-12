@@ -77,10 +77,12 @@
 #include "TicketMgr.h"
 #include "ScriptMgr.h"
 #include "GameGraveyard.h"
+
 // Playerbot mod:
 #include "../../modules/bot/playerbot/playerbot.h"
 #include "../../modules/bot/playerbot/GuildTaskMgr.h"
 // end playerbot insert
+
 #ifdef ELUNA
 #include "LuaEngine.h"
 #endif
@@ -1498,6 +1500,7 @@ bool Player::CreateBot(uint32 guidlow, BotCharacterCreateInfo* createInfo)
     return true;
 }
 // end playerbot insert
+
 bool Player::StoreNewItemInBestSlots(uint32 titem_id, uint32 titem_amount)
 { 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
