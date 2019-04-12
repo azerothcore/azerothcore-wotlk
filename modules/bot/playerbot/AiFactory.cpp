@@ -1,4 +1,5 @@
 #include "../pchdef.h"
+#include "Common.h"
 #include "playerbot.h"
 #include "AiFactory.h"
 #include "strategy/Engine.h"
@@ -16,8 +17,6 @@
 #include "../Entities/Player/Player.h"
 #include "PlayerbotAIConfig.h"
 #include "RandomPlayerbotMgr.h"
-
-using namespace std;
 
 AiObjectContext* AiFactory::createAiObjectContext(Player* player, PlayerbotAI* ai)
 {
