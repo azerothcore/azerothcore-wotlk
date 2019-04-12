@@ -17,6 +17,7 @@
 #include "PlayerbotAIConfig.h"
 #include "RandomPlayerbotMgr.h"
 
+using namespace std;
 
 AiObjectContext* AiFactory::createAiObjectContext(Player* player, PlayerbotAI* ai)
 {
