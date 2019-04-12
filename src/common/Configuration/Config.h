@@ -17,7 +17,7 @@
 
 typedef Trinity::AutoPtr<ACE_Configuration_Heap, ACE_Null_Mutex> Config;
 
-class ConfigMgr;
+class ConfigMgr
 {
 public:
         ConfigMgr() = default;
