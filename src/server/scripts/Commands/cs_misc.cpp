@@ -28,6 +28,10 @@
 #include "BattlegroundMgr.h"
 #include "MapManager.h"
 #include "GameGraveyard.h"
+// playerbot mod
+#include "../../modules/bot/playerbot/playerbot.h"
+#include "../../modules/bot/playerbot/GuildTaskMgr.h"
+// end playerbot
 
 class misc_commandscript : public CommandScript
 {
@@ -113,7 +117,12 @@ public:
             { "unbindsight",        SEC_ADMINISTRATOR,      false, HandleUnbindSightCommand,            "" },
             { "playall",            SEC_GAMEMASTER,         false, HandlePlayAllCommand,                "" },
             { "skirmish",           SEC_ADMINISTRATOR,      false, HandleSkirmishCommand,               "" },
-            { "mailbox",            SEC_MODERATOR,          false, &HandleMailBoxCommand,               "" }
+            { "mailbox",            SEC_MODERATOR,          false, &HandleMailBoxCommand,               "" },
+            // playerbot mod
+            { "rndbot",		    SEC_GAMEMASTER,         true,  &RandomPlayerbotMgr::HandlePlayerbotConsoleCommand,     "" },
+            { "bot",	            SEC_PLAYER,		    false, &PlayerbotMgr::HandlePlayerbotMgrCommand,               "" },
+            { "gtask",		    SEC_GAMEMASTER,         true,  &GuildTaskMgr::HandleConsoleCommand,           "" }
+            // end playerbot insert
         };
         return commandTable;
     }

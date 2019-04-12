@@ -77,7 +77,10 @@
 #include "TicketMgr.h"
 #include "ScriptMgr.h"
 #include "GameGraveyard.h"
-
+// Playerbot mod:
+#include "../../modules/bot/playerbot/playerbot.h"
+#include "../../modules/bot/playerbot/GuildTaskMgr.h"
+// end playerbot insert
 #ifdef ELUNA
 #include "LuaEngine.h"
 #endif
@@ -933,6 +936,10 @@ Player::Player(WorldSession* session): Unit(true), m_mover(this)
         m_charmAISpells[i] = 0;
 
     m_applyResilience = true;
+    // playerbot mod
+        m_playerbotAI = NULL;
+        m_playerbotMgr = NULL;
+    //end playerbot insert
 }
 
 Player::~Player()
@@ -1219,6 +1226,278 @@ bool Player::Create(uint32 guidlow, CharacterCreateInfo* createInfo)
     return true;
 }
 
+// playerbot mod
+bool Player::CreateBot(uint32 guidlow, BotCharacterCreateInfo* createInfo)
+{
+    //FIXME: outfitId not used in player creating
+    // TODO: need more checks against packet modifications
+    // should check that skin, face, hair* are valid via DBC per race/class
+    // also do it in Player::BuildEnumData, Player::LoadFromDB
+
+    Object::_Create(guidlow, 0, HIGHGUID_PLAYER);
+
+    m_name = createInfo->Name;
+
+    PlayerInfo const* info = sObjectMgr->GetPlayerInfo(createInfo->Race, createInfo->Class);
+    if (!info)
+    {
+        sLog->outError("Player::Create: Possible hacking-attempt: Account %u tried creating a character named '%s' with an invalid race/class pair (%u/%u) - refusing to do so.",
+                GetSession()->GetAccountId(), m_name.c_str(), createInfo->Race, createInfo->Class);
+        return false;
+    }
+
+    for (uint8 i = 0; i < PLAYER_SLOTS_COUNT; i++)
+        m_items[i] = NULL;
+
+    Relocate(info->positionX, info->positionY, info->positionZ, info->orientation);
+
+    ChrClassesEntry const* cEntry = sChrClassesStore.LookupEntry(createInfo->Class);
+    if (!cEntry)
+    {
+        sLog->outError("Player::Create: Possible hacking-attempt: Account %u tried creating a character named '%s' with an invalid character class (%u) - refusing to do so (wrong DBC-files?)",
+                GetSession()->GetAccountId(), m_name.c_str(), createInfo->Class);
+        return false;
+    }
+
+    SetMap(sMapMgr->CreateMap(info->mapId, this));
+
+    uint8 powertype = cEntry->powerType;
+
+    SetObjectScale(1.0f);
+
+    m_realRace = createInfo->Race; // set real race flag
+    m_race = createInfo->Race; // set real race flag
+
+    setFactionForRace(createInfo->Race);
+
+    if (!IsValidGender(createInfo->Gender))
+    {
+        sLog->outError("Player::Create: Possible hacking-attempt: Account %u tried creating a character named '%s' with an invalid gender (%hu) - refusing to do so",
+                GetSession()->GetAccountId(), m_name.c_str(), createInfo->Gender);
+        return false;
+    }
+
+    uint32 RaceClassGender = (createInfo->Race) | (createInfo->Class << 8) | (createInfo->Gender << 16);
+
+    SetUInt32Value(UNIT_FIELD_BYTES_0, (RaceClassGender | (powertype << 24)));
+    InitDisplayIds();
+    if (sWorld->getIntConfig(CONFIG_GAME_TYPE) == REALM_TYPE_PVP || sWorld->getIntConfig(CONFIG_GAME_TYPE) == REALM_TYPE_RPPVP)
+    {
+        SetByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_PVP);
+        SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
+    }
+    SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_REGENERATE_POWER);
+    SetFloatValue(UNIT_MOD_CAST_SPEED, 1.0f);               // fix cast time showed in spell tooltip on client
+    SetFloatValue(UNIT_FIELD_HOVERHEIGHT, 1.0f);            // default for players in 3.0.3
+
+                                                            // -1 is default value
+    SetInt32Value(PLAYER_FIELD_WATCHED_FACTION_INDEX, uint32(-1));
+
+    SetUInt32Value(PLAYER_BYTES, (createInfo->Skin | (createInfo->Face << 8) | (createInfo->HairStyle << 16) | (createInfo->HairColor << 24)));
+    SetUInt32Value(PLAYER_BYTES_2, (createInfo->FacialHair |
+                                   (0x00 << 8) |
+                                   (0x00 << 16) |
+                                   (((GetSession()->IsARecruiter() || GetSession()->GetRecruiterId() != 0) ? REST_STATE_RAF_LINKED : REST_STATE_NOT_RAF_LINKED) << 24)));
+    SetByteValue(PLAYER_BYTES_3, 0, createInfo->Gender);
+    SetByteValue(PLAYER_BYTES_3, 3, 0);                     // BattlefieldArenaFaction (0 or 1)
+
+    SetUInt32Value(PLAYER_GUILDID, 0);
+    SetUInt32Value(PLAYER_GUILDRANK, 0);
+    SetUInt32Value(PLAYER_GUILD_TIMESTAMP, 0);
+
+    for (int i = 0; i < KNOWN_TITLES_SIZE; ++i)
+        SetUInt64Value(PLAYER__FIELD_KNOWN_TITLES + i, 0);  // 0=disabled
+    SetUInt32Value(PLAYER_CHOSEN_TITLE, 0);
+
+    SetUInt32Value(PLAYER_FIELD_KILLS, 0);
+    SetUInt32Value(PLAYER_FIELD_LIFETIME_HONORABLE_KILLS, 0);
+    SetUInt32Value(PLAYER_FIELD_TODAY_CONTRIBUTION, 0);
+    SetUInt32Value(PLAYER_FIELD_YESTERDAY_CONTRIBUTION, 0);
+
+    // set starting level
+    uint32 start_level = getClass() != CLASS_DEATH_KNIGHT
+        ? sWorld->getIntConfig(CONFIG_START_PLAYER_LEVEL)
+        : sWorld->getIntConfig(CONFIG_START_HEROIC_PLAYER_LEVEL);
+
+    if (!AccountMgr::IsPlayerAccount(GetSession()->GetSecurity()))
+    {
+        uint32 gm_level = sWorld->getIntConfig(CONFIG_START_GM_LEVEL);
+        if (gm_level > start_level)
+            start_level = gm_level;
+    }
+
+    SetUInt32Value(UNIT_FIELD_LEVEL, start_level);
+
+    InitRunes();
+
+    SetUInt32Value(PLAYER_FIELD_COINAGE, sWorld->getIntConfig(CONFIG_START_PLAYER_MONEY));
+    SetHonorPoints(sWorld->getIntConfig(CONFIG_START_HONOR_POINTS));
+    SetArenaPoints(sWorld->getIntConfig(CONFIG_START_ARENA_POINTS));
+
+    // start with every map explored
+    if (sWorld->getBoolConfig(CONFIG_START_ALL_EXPLORED))
+    {
+        for (uint8 i=0; i<PLAYER_EXPLORED_ZONES_SIZE; i++)
+            SetFlag(PLAYER_EXPLORED_ZONES_1+i, 0xFFFFFFFF);
+    }
+
+    //Reputations if "StartAllReputation" is enabled, -- TODO: Fix this in a better way
+    if (sWorld->getBoolConfig(CONFIG_START_ALL_REP))
+    {
+        GetReputationMgr().SetReputation(sFactionStore.LookupEntry(942), 42999);
+        GetReputationMgr().SetReputation(sFactionStore.LookupEntry(935), 42999);
+        GetReputationMgr().SetReputation(sFactionStore.LookupEntry(936), 42999);
+        GetReputationMgr().SetReputation(sFactionStore.LookupEntry(1011), 42999);
+        GetReputationMgr().SetReputation(sFactionStore.LookupEntry(970), 42999);
+        GetReputationMgr().SetReputation(sFactionStore.LookupEntry(967), 42999);
+        GetReputationMgr().SetReputation(sFactionStore.LookupEntry(989), 42999);
+        GetReputationMgr().SetReputation(sFactionStore.LookupEntry(932), 42999);
+        GetReputationMgr().SetReputation(sFactionStore.LookupEntry(934), 42999);
+        GetReputationMgr().SetReputation(sFactionStore.LookupEntry(1038), 42999);
+        GetReputationMgr().SetReputation(sFactionStore.LookupEntry(1077), 42999);
+
+        // Factions depending on team, like cities and some more stuff
+        switch (GetTeamId(true))
+        {
+        case TEAM_ALLIANCE:
+            GetReputationMgr().SetReputation(sFactionStore.LookupEntry(72), 42999);
+            GetReputationMgr().SetReputation(sFactionStore.LookupEntry(47), 42999);
+            GetReputationMgr().SetReputation(sFactionStore.LookupEntry(69), 42999);
+            GetReputationMgr().SetReputation(sFactionStore.LookupEntry(930), 42999);
+            GetReputationMgr().SetReputation(sFactionStore.LookupEntry(730), 42999);
+            GetReputationMgr().SetReputation(sFactionStore.LookupEntry(978), 42999);
+            GetReputationMgr().SetReputation(sFactionStore.LookupEntry(54), 42999);
+            GetReputationMgr().SetReputation(sFactionStore.LookupEntry(946), 42999);
+            break;
+        case TEAM_HORDE:
+            GetReputationMgr().SetReputation(sFactionStore.LookupEntry(76), 42999);
+            GetReputationMgr().SetReputation(sFactionStore.LookupEntry(68), 42999);
+            GetReputationMgr().SetReputation(sFactionStore.LookupEntry(81), 42999);
+            GetReputationMgr().SetReputation(sFactionStore.LookupEntry(911), 42999);
+            GetReputationMgr().SetReputation(sFactionStore.LookupEntry(729), 42999);
+            GetReputationMgr().SetReputation(sFactionStore.LookupEntry(941), 42999);
+            GetReputationMgr().SetReputation(sFactionStore.LookupEntry(530), 42999);
+            GetReputationMgr().SetReputation(sFactionStore.LookupEntry(947), 42999);
+            break;
+        default:
+            break;
+        }
+    }
+
+    // Played time
+    m_Last_tick = time(NULL);
+    m_Played_time[PLAYED_TIME_TOTAL] = 0;
+    m_Played_time[PLAYED_TIME_LEVEL] = 0;
+
+    // base stats and related field values
+    InitStatsForLevel();
+    InitTaxiNodesForLevel();
+    InitGlyphsForLevel();
+    InitTalentForLevel();
+    InitPrimaryProfessions();                               // to max set before any spell added
+
+    // apply original stats mods before spell loading or item equipment that call before equip _RemoveStatsMods()
+    UpdateMaxHealth();                                      // Update max Health (for add bonus from stamina)
+    SetFullHealth();
+    if (getPowerType() == POWER_MANA)
+    {
+        UpdateMaxPower(POWER_MANA);                         // Update max Mana (for add bonus from intellect)
+        SetPower(POWER_MANA, GetMaxPower(POWER_MANA));
+    }
+
+    if (getPowerType() == POWER_RUNIC_POWER)
+    {
+        SetPower(POWER_RUNE, 8);
+        SetMaxPower(POWER_RUNE, 8);
+        SetPower(POWER_RUNIC_POWER, 0);
+        SetMaxPower(POWER_RUNIC_POWER, 1000);
+    }
+
+    // original spells
+    learnDefaultSpells();
+
+    // original action bar
+    for (PlayerCreateInfoActions::const_iterator action_itr = info->action.begin(); action_itr != info->action.end(); ++action_itr)
+        addActionButton(action_itr->button, action_itr->action, action_itr->type);
+
+    // original items
+    if (CharStartOutfitEntry const* oEntry = GetCharStartOutfitEntry(createInfo->Race, createInfo->Class, createInfo->Gender))
+    {
+        for (int j = 0; j < MAX_OUTFIT_ITEMS; ++j)
+        {
+            if (oEntry->ItemId[j] <= 0)
+                continue;
+
+            uint32 itemId = oEntry->ItemId[j];
+
+            // just skip, reported in ObjectMgr::LoadItemTemplates
+            ItemTemplate const* iProto = sObjectMgr->GetItemTemplate(itemId);
+            if (!iProto)
+                continue;
+
+            // BuyCount by default
+            uint32 count = iProto->BuyCount;
+
+            // special amount for food/drink
+            if (iProto->Class == ITEM_CLASS_CONSUMABLE && iProto->SubClass == ITEM_SUBCLASS_FOOD)
+            {
+                switch (iProto->Spells[0].SpellCategory)
+                {
+                    case SPELL_CATEGORY_FOOD:                                // food
+                        count = getClass() == CLASS_DEATH_KNIGHT ? 10 : 4;
+                        break;
+                    case SPELL_CATEGORY_DRINK:                                // drink
+                        count = 2;
+                        break;
+                }
+                if (iProto->GetMaxStackSize() < count)
+                    count = iProto->GetMaxStackSize();
+            }
+            StoreNewItemInBestSlots(itemId, count);
+        }
+    }
+
+    for (PlayerCreateInfoItems::const_iterator item_id_itr = info->item.begin(); item_id_itr != info->item.end(); ++item_id_itr)
+        StoreNewItemInBestSlots(item_id_itr->item_id, item_id_itr->item_amount);
+
+    // bags and main-hand weapon must equipped at this moment
+    // now second pass for not equipped (offhand weapon/shield if it attempt equipped before main-hand weapon)
+    // or ammo not equipped in special bag
+    for (uint8 i = INVENTORY_SLOT_ITEM_START; i < INVENTORY_SLOT_ITEM_END; i++)
+    {
+        if (Item* pItem = GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+        {
+            uint16 eDest;
+            // equip offhand weapon/shield if it attempt equipped before main-hand weapon
+            InventoryResult msg = CanEquipItem(NULL_SLOT, eDest, pItem, false);
+            if (msg == EQUIP_ERR_OK)
+            {
+                RemoveItem(INVENTORY_SLOT_BAG_0, i, true);
+                EquipItem(eDest, pItem, true);
+            }
+            // move other items to more appropriate slots (ammo not equipped in special bag)
+            else
+            {
+                ItemPosCountVec sDest;
+                msg = CanStoreItem(NULL_BAG, NULL_SLOT, sDest, pItem, false);
+                if (msg == EQUIP_ERR_OK)
+                {
+                    RemoveItem(INVENTORY_SLOT_BAG_0, i, true);
+                    pItem = StoreItem(sDest, pItem, true);
+                }
+
+                // if  this is ammo then use it
+                msg = CanUseAmmo(pItem->GetEntry());
+                if (msg == EQUIP_ERR_OK)
+                    SetAmmo(pItem->GetEntry());
+            }
+        }
+    }
+    // all item positions resolved
+
+    return true;
+}
+// end playerbot insert
 bool Player::StoreNewItemInBestSlots(uint32 titem_id, uint32 titem_amount)
 { 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
@@ -1898,6 +2177,11 @@ void Player::Update(uint32 p_time)
         m_delayed_unit_relocation_timer = 0;
         RemoveFromNotify(NOTIFY_VISIBILITY_CHANGED);
     }
+    // Playerbot mod
+            if (m_playerbotAI)
+                    m_playerbotAI->UpdateAI(p_time);
+            if (m_playerbotMgr)
+                    m_playerbotMgr->UpdateAI(p_time);
 }
 
 void Player::setDeathState(DeathState s, bool /*despawn = false*/)
@@ -24077,6 +24361,9 @@ bool Player::GetsRecruitAFriendBonus(bool forXP)
 void Player::RewardPlayerAndGroupAtKill(Unit* victim, bool isBattleGround)
 { 
     KillRewarder(this, victim, isBattleGround).Reward();
+    // playerbot mod
+    sGuildTaskMgr.CheckKillTask(this, victim);
+    //end playerbot insert
 }
 
 void Player::RewardPlayerAndGroupAtEvent(uint32 creature_id, WorldObject* pRewardSource)
