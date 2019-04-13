@@ -33,6 +33,7 @@ INSERT INTO `creature_text` VALUES
 (15936,2,3,'Hungry worms will feast on your rotting flesh.',14,0,100,0,0,8834,13050,0,'heigan SAY_TAUNT4'),
 (15936,6,0,'The end is upon you.',14,0,100,0,0,8833,13049,0,'heigan SAY_DANCE');
 
+UPDATE `creature_text` SET `BroadcastTextId` = 12984 WHERE `CreatureID` = 15990 AND `GroupID` = 16;
 
 UPDATE `creature_template` SET `AIName` = '', `ScriptName` = 'npc_tesla', `dynamicflags` = 0 WHERE `entry` = 16218;
 
