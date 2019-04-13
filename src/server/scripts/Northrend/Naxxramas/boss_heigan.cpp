@@ -14,7 +14,8 @@ enum Says
     SAY_TAUNT                   = 2,
     SAY_DEATH                   = 3,
     EMOTE_DANCE                 = 4,
-    EMOTE_DANCE_END             = 5
+    EMOTE_DANCE_END             = 5,
+    SAY_DANCE                   = 6
 };
 
 enum Spells
@@ -83,8 +84,7 @@ public:
             if (who->GetTypeId() != TYPEID_PLAYER)
                 return;
 
-            if (!urand(0,3))
-                Talk(SAY_SLAY);
+            Talk(SAY_SLAY);
 
             if (pInstance)
                 pInstance->SetData(DATA_IMMORTAL_FAIL, 0);
@@ -125,6 +125,7 @@ public:
             else // if (phase == PHASE_FAST_DANCE)
             {
                 Talk(EMOTE_DANCE);
+                Talk(SAY_DANCE);
                 // teleport
                 float x, y, z, o;
                 me->GetHomePosition(x, y, z, o);
@@ -195,7 +196,7 @@ public:
                         moveRight ? currentSection++ : currentSection--;
                     }
 
-                    if (currentPhase == PHASE_SLOW_DANCE && !urand(0,3))
+                    if (currentPhase == PHASE_SLOW_DANCE)
                         Talk(SAY_TAUNT);
 
                     events.RepeatEvent(currentPhase == PHASE_SLOW_DANCE ? 10000 : 4000);

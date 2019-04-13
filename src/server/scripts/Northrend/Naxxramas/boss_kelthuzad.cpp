@@ -17,7 +17,7 @@ enum Yells
     SAY_CHAIN                                              = 10,
     SAY_FROST_BLAST                                        = 11,
     SAY_REQUEST_AID                                        = 12, //start of phase 3
-    SAY_ANSWER_REQUEST                                     = 13, //lich king answer
+    SAY_ANSWER_REQUEST                                     = 3, //lich king answer
     SAY_SUMMON_MINIONS                                     = 14, //start of phase 1
     SAY_SPECIAL                                            = 15,
 
@@ -199,8 +199,7 @@ public:
             if (who->GetTypeId() != TYPEID_PLAYER)
                 return;
 
-            if (!urand(0,3))
-                Talk(SAY_SLAY);
+            Talk(SAY_SLAY);
 
             if (pInstance)
                 pInstance->SetData(DATA_IMMORTAL_FAIL, 0);
@@ -352,8 +351,7 @@ public:
                     if (Unit *target = SelectTarget(SELECT_TARGET_RANDOM, RAID_MODE(1,0), 0, true))
                         me->CastSpell(target, SPELL_FROST_BLAST, false);
                     
-                    if (!urand(0,2))
-                        Talk(SAY_FROST_BLAST);
+                    Talk(SAY_FROST_BLAST);
                     events.RepeatEvent(45000);
                     break;
                 case EVENT_SPELL_CHAINS:
@@ -361,8 +359,7 @@ public:
                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 200, true, -SPELL_CHAINS_OF_KELTHUZAD))
                             me->CastSpell(target, SPELL_CHAINS_OF_KELTHUZAD, true);
 
-                    if (!urand(0,2))
-                        Talk(SAY_CHAIN);
+                    Talk(SAY_CHAIN);
                     events.RepeatEvent(50000);
                     break;
                 case EVENT_SPELL_DETONATE_MANA:
@@ -382,8 +379,7 @@ public:
                         std::vector<Unit*>::iterator itr = unitList.begin();
                         advance(itr, urand(0, unitList.size()-1));
                         me->CastSpell(*itr, SPELL_DETONATE_MANA, false);
-                        if (!urand(0,2))
-                            Talk(SAY_SPECIAL);
+                        Talk(SAY_SPECIAL);
                     }
 
                     events.RepeatEvent(30000);
@@ -410,9 +406,11 @@ public:
                     events.PopEvent();
                     break;
                 case EVENT_SUMMON_GUARDIAN_OF_ICECROWN:
-                    me->MonsterTextEmote("A Guardian of Icecrown enter the fight!", 0, true);
                     if (Creature* cr = me->SummonCreature(NPC_GUARDIAN_OF_ICECROWN, SummonPositions[RAND(0, 1, 3, 4)]))
+                    {
+                        cr->AI()->Talk(EMOTE_GUARDIAN_APPEAR);
                         cr->AI()->AttackStart(me->GetVictim());
+                    }
 
                     events.PopEvent();
                     break;
@@ -507,10 +505,7 @@ public:
                 events.ScheduleEvent(EVENT_MINION_SPELL_MORTAL_WOUND, 5000);
             }
             else if (me->GetEntry() == NPC_GUARDIAN_OF_ICECROWN)
-            {
-                Talk(EMOTE_GUARDIAN_APPEAR);
                 events.ScheduleEvent(EVENT_MINION_SPELL_BLOOD_TAP, 15000);
-            }
         }
 
         void KilledUnit(Unit* who) override

@@ -14,7 +14,8 @@ enum Yells
     SAY_SLAY             = 2,
     SAY_DEATH            = 3,
     EMOTE_WIDOWS_EMBRACE = 4,
-    EMOTE_FRENZY         = 5
+    EMOTE_FRENZY         = 5,
+    SAY_FRENZY           = 6
 };
 
 enum Spells
@@ -154,6 +155,7 @@ public:
                 case EVENT_SPELL_FRENZY:
                     if (!me->HasAura(RAID_MODE(SPELL_FRENZY_10, SPELL_FRENZY_25)))
                     {
+                        Talk(SAY_FRENZY);
                         Talk(EMOTE_FRENZY);
                         me->CastSpell(me, RAID_MODE(SPELL_FRENZY_10, SPELL_FRENZY_25), true);
                         events.RepeatEvent(60000);

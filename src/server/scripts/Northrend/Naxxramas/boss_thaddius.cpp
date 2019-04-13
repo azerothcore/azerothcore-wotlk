@@ -180,8 +180,7 @@ public:
             if (who->GetTypeId() != TYPEID_PLAYER)
                 return;
 
-            if (!urand(0,3))
-                Talk(SAY_SLAY);
+            Talk(SAY_SLAY);
 
             if (pInstance)
                 pInstance->SetData(DATA_IMMORTAL_FAIL, 0);

@@ -94,6 +94,7 @@ public:
             _horsemanTimer = 0;
             _screamTimer = 2 * MINUTE * IN_MILLISECONDS;
             _hadThaddiusGreet = false;
+            _currentWingTaunt = SAY_FIRST_WING_TAUNT;
 
             // Achievements
             abominationsKilled = 0;
@@ -103,6 +104,7 @@ public:
             sapphironAchievement = true;
             heiganAchievement = true;
             immortalAchievement = 1;
+
         }
 
         std::set<GameObject*> HeiganEruption[4];
@@ -151,6 +153,8 @@ public:
         uint32 _horsemanTimer;
         uint32 _screamTimer;
         bool _hadThaddiusGreet;
+        EventMap events;
+        uint8 _currentWingTaunt;
 
         // Achievements
         uint8 abominationsKilled;
@@ -626,6 +630,7 @@ public:
                             go->SetGoState(GO_STATE_ACTIVE);
                         if (GameObject* go = instance->GetGameObject(_loathebPortalGUID))
                             go->SetPhaseMask(1, true);
+                        events.ScheduleEvent(EVENT_KELTHUZAD_WING_TAUNT, 6000);
                         break;
                     case BOSS_ANUB:
                         if (GameObject* go = instance->GetGameObject(_anubGateGUID))
@@ -644,6 +649,7 @@ public:
                             go->SetGoState(GO_STATE_ACTIVE);
                         if (GameObject* go = instance->GetGameObject(_maexxnaPortalGUID))
                             go->SetPhaseMask(1, true);
+                        events.ScheduleEvent(EVENT_KELTHUZAD_WING_TAUNT, 6000);
                         break;
                     case BOSS_GOTHIK:
                         if (GameObject* go = instance->GetGameObject(_gothikEnterGateGUID))
@@ -660,10 +666,12 @@ public:
                     case BOSS_THADDIUS:
                         if (GameObject* go = instance->GetGameObject(_thaddiusPortalGUID))
                             go->SetPhaseMask(1, true);
+                        events.ScheduleEvent(EVENT_KELTHUZAD_WING_TAUNT, 6000);
                         break;
                     case BOSS_HORSEMAN:
                         if (GameObject* go = instance->GetGameObject(_horsemanPortalGUID))
                             go->SetPhaseMask(1, true);
+                        events.ScheduleEvent(EVENT_KELTHUZAD_WING_TAUNT, 6000);
                         break;
                 }
             }
@@ -715,6 +723,10 @@ public:
                 }
             }
 
+            // And They would all
+            if (_horsemanTimer)
+                _horsemanTimer += diff;
+
             if (_screamTimer && GetBossState(BOSS_THADDIUS) != DONE)
             {
                 if (_screamTimer <= diff)
@@ -726,9 +738,18 @@ public:
                     _screamTimer -= diff;
             }
 
-            // And They would all
-            if (_horsemanTimer)
-                _horsemanTimer += diff;
+            events.Update(diff);
+            switch (events.ExecuteEvent())
+            {
+                case EVENT_KELTHUZAD_WING_TAUNT:
+                    // Loads Kel'Thuzad's grid. We need this as he must be active in order for his texts to work.
+                    instance->LoadGrid(3749.67f, -5114.06f);
+                    if (Creature* kelthuzad = instance->GetCreature(_kelthuzadGUID))
+                        kelthuzad->AI()->Talk(_currentWingTaunt);
+                    ++_currentWingTaunt;
+                    events.PopEvent();
+                    break;
+            }
         }
 
         uint64 GetData64(uint32 id) const override

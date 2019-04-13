@@ -11,10 +11,16 @@
 
 enum Yells
 {
-    SAY_SPEECH                  = 0,
-    SAY_KILL                    = 1,
-    SAY_DEATH                   = 2,
-    SAY_TELEPORT                = 3
+    SAY_INTRO_1                 = 0,
+    SAY_INTRO_2                 = 1,
+    SAY_INTRO_3                 = 2,
+    SAY_INTRO_4                 = 3,
+    SAY_PHASE_TWO               = 4,
+    SAY_DEATH                   = 5,
+    SAY_KILL                    = 6,
+
+    EMOTE_PHASE_TWO             = 7,
+    EMOTE_GATE_OPENED           = 8
 };
 
 enum Spells
@@ -94,7 +100,11 @@ enum Events
     EVENT_SPELL_UNHOLY_FRENZY       = 19,
 
     // HORSE
-    EVENT_SPELL_STOMP               = 20
+    EVENT_SPELL_STOMP               = 20,
+
+    EVENT_INTRO_2                   = 21,
+    EVENT_INTRO_3                   = 22,
+    EVENT_INTRO_4                   = 23,
 };
 
 const uint32 gothikWaves[24][2] =
@@ -228,7 +238,10 @@ public:
         {
             BossAI::EnterCombat(who);
             me->SetInCombatWithZone();
-            Talk(SAY_SPEECH);
+            Talk(SAY_INTRO_1);
+            events.ScheduleEvent(EVENT_INTRO_2, 4000);
+            events.ScheduleEvent(EVENT_INTRO_3, 9000);
+            events.ScheduleEvent(EVENT_INTRO_4, 14000);
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE|UNIT_FLAG_DISABLE_MOVE);
             me->NearTeleportTo(PosPlatform.GetPositionX(), PosPlatform.GetPositionY(), PosPlatform.GetPositionZ(), PosPlatform.GetOrientation());
             
@@ -260,8 +273,7 @@ public:
             if (who->GetTypeId() != TYPEID_PLAYER)
                 return;
 
-            if (!urand(0,3))
-                Talk(SAY_KILL);
+            Talk(SAY_KILL);
 
             if (pInstance)
                 pInstance->SetData(DATA_IMMORTAL_FAIL, 0);
@@ -375,6 +387,18 @@ public:
 
             switch (events.GetEvent())
             {
+                case EVENT_INTRO_2:
+                    Talk(SAY_INTRO_2);
+                    events.PopEvent();
+                    break;
+                case EVENT_INTRO_3:
+                    Talk(SAY_INTRO_3);
+                    events.PopEvent();
+                    break;
+                case EVENT_INTRO_4:
+                    Talk(SAY_INTRO_4);
+                    events.PopEvent();
+                    break;
                 case EVENT_SPELL_SHADOW_BOLT:
                     me->CastSpell(me->GetVictim(), RAID_MODE(SPELL_SHADOW_BOLT_10, SPELL_SHADOW_BOLT_25), false);
                     events.RepeatEvent(2000);
@@ -419,7 +443,8 @@ public:
                     else
                     {
                         secondPhase = true;
-                        Talk(SAY_TELEPORT);
+                        Talk(SAY_PHASE_TWO);
+                        Talk(EMOTE_PHASE_TWO);
                         me->NearTeleportTo(PosGroundLivingSide.GetPositionX(), PosGroundLivingSide.GetPositionY(), PosGroundLivingSide.GetPositionZ(), PosGroundLivingSide.GetOrientation());
                         me->SetReactState(REACT_AGGRESSIVE);
                         me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE|UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_DISABLE_MOVE);
@@ -444,6 +469,7 @@ public:
                         summons.DoAction(ACTION_GATE_OPEN);
                         summons.DoZoneInCombat();
                         gateOpened = true;
+                        Talk(EMOTE_GATE_OPENED);
                     }
                     events.PopEvent();
                     break;

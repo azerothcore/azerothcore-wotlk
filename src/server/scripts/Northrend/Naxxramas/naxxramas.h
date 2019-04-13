@@ -145,7 +145,14 @@ enum NXSays
     SAY_SAPP_DIALOG4_LICH           = 2,
     SAY_SAPP_DIALOG5                = 4,
     SAY_SAPP_DIALOG6                = 20,
-    SAY_CAT_DIED                    = 0
+    SAY_CAT_DIED                    = 5,
+    SAY_FIRST_WING_TAUNT            = 16
+};
+
+enum NXEvents
+{
+    EVENT_THADDIUS_SCREAMS = 0,
+    EVENT_KELTHUZAD_WING_TAUNT
 };
 
 #endif

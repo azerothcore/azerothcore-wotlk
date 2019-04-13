@@ -123,8 +123,7 @@ public:
             if (victim->GetTypeId() != TYPEID_PLAYER)
                 return;
 
-            if (!urand(0,3))
-                Talk(SAY_SLAY);
+            Talk(SAY_SLAY);
 
             //Force the player to spawn corpse scarabs via spell
             victim->CastSpell(victim, SPELL_SUMMON_CORPSE_SCRABS_5, true, nullptr, nullptr, me->GetGUID());

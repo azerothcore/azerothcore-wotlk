@@ -239,8 +239,7 @@ public:
             if (who->GetTypeId() != TYPEID_PLAYER)
                 return;
 
-            if (!urand(0,4))
-                Talk(SAY_SLAY);
+            Talk(SAY_SLAY);
 
             if (pInstance)
                 pInstance->SetData(DATA_IMMORTAL_FAIL, 0);
@@ -305,8 +304,7 @@ public:
                     events.PopEvent();
                     return;
                 case EVENT_SPELL_PRIMARY:
-                    if (!urand(0,10))
-                        Talk(SAY_TAUNT);
+                    Talk(SAY_TAUNT);
 
                     me->CastSpell(me->GetVictim(), RAID_MODE(TABLE_SPELL_PRIMARY_10[horsemanId], TABLE_SPELL_PRIMARY_25[horsemanId]), false);
                     events.RepeatEvent(15000);
@@ -376,13 +374,13 @@ class spell_four_horsemen_mark : public SpellScriptLoader
                 }
             }
 
-            void Register()
+            void Register() override
             {
                 AfterEffectApply += AuraEffectApplyFn(spell_four_horsemen_mark_AuraScript::OnApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
             }
         };
 
-        AuraScript* GetAuraScript() const
+        AuraScript* GetAuraScript() const override
         {
             return new spell_four_horsemen_mark_AuraScript();
         }
