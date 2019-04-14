@@ -50,6 +50,7 @@ target_include_directories(worldserver
     ${CMAKE_SOURCE_DIR}/src/server/game/AI/ScriptedAI
     ${CMAKE_SOURCE_DIR}/src/server/game/AI/SmartScripts
     ${CMAKE_SOURCE_DIR}/src/server/game/AuctionHouse
+    ${CMAKE_SOURCE_DIR}/src/server/game/AuctionHouse/AuctionHouseBot
     ${CMAKE_SOURCE_DIR}/src/server/game/Battlefield
     ${CMAKE_SOURCE_DIR}/src/server/game/Battlefield/Zones
     ${CMAKE_SOURCE_DIR}/src/server/game/Battlegrounds
@@ -116,6 +117,7 @@ target_include_directories(worldserver
     ${CMAKE_SOURCE_DIR}/src/server/authserver/Realms)
     ${CMAKE_SOURCE_DIR}/modules/bot
     ${CMAKE_SOURCE_DIR}/modules/bot/pch
+    ${CMAKE_SOURCE_DIR}/modules/bot/ahbot
     ${CMAKE_SOURCE_DIR}/modules/bot/playerbot
     ${CMAKE_SOURCE_DIR}/modules/bot/playerbot/strategy
     ${CMAKE_SOURCE_DIR}/modules/bot/playerbot/strategy/actions
