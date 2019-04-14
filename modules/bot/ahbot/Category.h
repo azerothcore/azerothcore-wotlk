@@ -5,7 +5,8 @@
 #include "PricingStrategy.h"
 //#include "../../game/Entities/Item/ItemTemplate.h"
 #include "../../game/Entities/Item/ItemPrototype.h"
-
+typedef uint32_t uint32;
+typedef uint32_t int32;
 using namespace std;
 
 namespace ahbot
