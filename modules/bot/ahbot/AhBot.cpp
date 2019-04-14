@@ -13,6 +13,9 @@
 #include "../playerbot/PlayerbotAIConfig.h"
 #include "../playerbot/playerbot.h"
 
+typedef uint32_t uint32;
+typedef uint32_t int32;
+
 using namespace ahbot;
 
 bool Player::MinimalLoadFromDB( QueryResult result, uint32 guid )
