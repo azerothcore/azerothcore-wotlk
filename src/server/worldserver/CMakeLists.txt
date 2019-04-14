@@ -114,7 +114,7 @@ target_include_directories(worldserver
     ${CMAKE_SOURCE_DIR}/src/server/game/Misc
     ${CMAKE_SOURCE_DIR}/src/server/scripts/PrecompiledHeaders
     ${CMAKE_SOURCE_DIR}/src/server/authserver/Server
-    ${CMAKE_SOURCE_DIR}/src/server/authserver/Realms)
+    ${CMAKE_SOURCE_DIR}/src/server/authserver/Realms
     ${CMAKE_SOURCE_DIR}/modules/bot
     ${CMAKE_SOURCE_DIR}/modules/bot/pch
     ${CMAKE_SOURCE_DIR}/modules/bot/ahbot
@@ -135,6 +135,7 @@ target_include_directories(worldserver
     ${CMAKE_SOURCE_DIR}/modules/bot/playerbot/strategy/values/formations
     ${CMAKE_SOURCE_DIR}/modules/bot/playerbot/strategy/warlock
     ${CMAKE_SOURCE_DIR}/modules/bot/playerbot/strategy/warrior
+    )
     
 if( NOT WIN32 )
   set_target_properties(worldserver PROPERTIES
