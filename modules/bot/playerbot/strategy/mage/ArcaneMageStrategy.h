@@ -12,7 +12,7 @@ namespace BotAI
     public:
         virtual void InitTriggers(std::list<TriggerNode*> &triggers);
         virtual string getName() { return "arcane"; }
-        virtual NextAction** getDefaultActions();
+		virtual NextAction** getDefaultActions();
     };
 	class ArcaneMageAoeStrategy : public CombatStrategy
 	{

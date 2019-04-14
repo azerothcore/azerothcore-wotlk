@@ -12,18 +12,9 @@ class GenericRogueNonCombatStrategyActionNodeFactory : public NamedObjectFactory
 public:
 	GenericRogueNonCombatStrategyActionNodeFactory()
 	{
-		
-		creators["stealth"] = &stealth;
+
 	}
-private:
-	static ActionNode* stealth(PlayerbotAI* ai)
-	{
-		return new ActionNode("stealth",
-			/*P*/ NULL,
-			/*A*/ NULL,
-			/*C*/ NULL);
-	}
-	
+
 };
 
 
@@ -34,7 +25,7 @@ GenericRogueNonCombatStrategy::GenericRogueNonCombatStrategy(PlayerbotAI* ai) : 
 /*
 void GenericRogueNonCombatStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 {
-    NonCombatStrategy::InitTriggers(triggers);
-        
+NonCombatStrategy::InitTriggers(triggers);
+
 }
 */

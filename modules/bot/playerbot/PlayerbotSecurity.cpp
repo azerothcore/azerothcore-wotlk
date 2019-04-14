@@ -13,14 +13,8 @@ PlayerbotSecurity::PlayerbotSecurity(Player* const bot) : bot(bot)
 
 PlayerbotSecurityLevel PlayerbotSecurity::LevelFor(Player* from, DenyReason* reason, bool ignoreGroup)
 {
-	if (from->GetSession()->GetSecurity() >= SEC_GAMEMASTER)
+	if (from->GetSession()->GetSecurity() >= SEC_PLAYER) // SEC_GAMEMASTER) thesawolf
 		return PLAYERBOT_SECURITY_ALLOW_ALL;
-
-	if (from->GetPlayerbotAI())
-	{
-		if (reason) *reason = PLAYERBOT_DENY_IS_BOT;
-		return PLAYERBOT_SECURITY_DENY_ALL;
-	}
 
 	if (bot->GetPlayerbotAI()->IsOpposing(from))
 	{
@@ -47,7 +41,9 @@ PlayerbotSecurityLevel PlayerbotSecurity::LevelFor(Player* from, DenyReason* rea
 			}
 		}
 
-		if ((int)bot->getLevel() - (int)from->getLevel() > 5)
+		int InvLevel = sPlayerbotAIConfig.InvLevel;
+		
+		if ((int)bot->getLevel() - (int)from->getLevel() > InvLevel)
 		{
 			if (reason) *reason = PLAYERBOT_DENY_LOW_LEVEL;
 			return PLAYERBOT_SECURITY_TALK;
@@ -62,13 +58,13 @@ PlayerbotSecurityLevel PlayerbotSecurity::LevelFor(Player* from, DenyReason* rea
 			}
 		}
 
-		int botGS = (int)bot->GetPlayerbotAI()->GetEquipGearScore(bot, false, false);
+		/*int botGS = (int)bot->GetPlayerbotAI()->GetEquipGearScore(bot, false, false);
 		int fromGS = (int)bot->GetPlayerbotAI()->GetEquipGearScore(from, false, false);
 		if (botGS && bot->getLevel() > 15 && (100 * (botGS - fromGS) / botGS) >= 20)
 		{
 			if (reason) *reason = PLAYERBOT_DENY_GEARSCORE;
 			return PLAYERBOT_SECURITY_TALK;
-		}
+		}*/
 
 		if (bot->isDead())
 		{
@@ -114,7 +110,7 @@ bool PlayerbotSecurity::CheckLevelFor(PlayerbotSecurityLevel level, bool silent,
 		return false;
 
 	Player* master = bot->GetPlayerbotAI()->GetMaster();
-	if (master && bot->GetPlayerbotAI() && bot->GetPlayerbotAI()->IsOpposing(master) && master->GetSession()->GetSecurity() < SEC_GAMEMASTER)
+	if (master && bot->GetPlayerbotAI() && bot->GetPlayerbotAI()->IsOpposing(master) && master->GetSession()->GetSecurity() < SEC_PLAYER) // SEC_GAMEMASTER) thesawolf
 		return false;
 
 	ostringstream out;
@@ -161,7 +157,7 @@ bool PlayerbotSecurity::CheckLevelFor(PlayerbotSecurityLevel level, bool silent,
 			uint32 area = bot->GetAreaId();
 			if (area)
 			{
-				const AreaTableEntry* entry = sAreaStore.LookupEntry(area);
+				const AreaTableEntry* entry = sAreaTableStore.LookupEntry(area);
 				if (entry)
 				{
 					out << " |cffffffff(|cffff0000" << entry->area_name[0] << "|cffffffff)";

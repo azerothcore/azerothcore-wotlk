@@ -82,6 +82,8 @@ void FleeManager::calculatePossibleDestinations(list<FleePoint*> &points)
             calculateDistanceToCreatures(point);
 			if (point->isReasonable())
 				points.push_back(point);
+            else
+                delete point;
         }
 	}
 }

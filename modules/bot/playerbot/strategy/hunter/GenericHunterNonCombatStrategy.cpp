@@ -44,9 +44,9 @@ void GenericHunterNonCombatStrategy::InitTriggers(std::list<TriggerNode*> &trigg
         "trueshot aura",
         NextAction::array(0, new NextAction("trueshot aura", 2.0f), NULL)));
 
-    triggers.push_back(new TriggerNode(
+    /*triggers.push_back(new TriggerNode(
         "no pet",
-        NextAction::array(0, new NextAction("call pet", 60.0f), NULL)));
+        NextAction::array(0, new NextAction("call pet", 60.0f), NULL)));*/
 
     triggers.push_back(new TriggerNode(
         "hunters pet dead",

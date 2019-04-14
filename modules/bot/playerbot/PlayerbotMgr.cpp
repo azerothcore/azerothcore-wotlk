@@ -78,12 +78,12 @@ string PlayerbotHolder::LockPlayerBot(uint64 guid) //thesawolf - for gearlocking
         QueryResult gresults = CharacterDatabase.PQuery("SELECT * FROM ai_playerbot_locks WHERE name_id = '%u'", guid);
         if (gresults)
         {
-            CharacterDatabase.PExecute("DELETE FROM ai_playerbot_locks WHERE name_id = '%u'", guid);
+            CharacterDatabase.PExecute("DELETE FROM ai_playerbot_locks WHERE name_id = '%u'", guid);    
             return "Gearlock: OFF";
-        }
-        else
+        } 
+        else 
         {
-            CharacterDatabase.PExecute("INSERT INTO ai_playerbot_locks (name_id, gearlock) VALUES ('%u', 1)", guid);
+            CharacterDatabase.PExecute("INSERT INTO ai_playerbot_locks (name_id, gearlock) VALUES ('%u', 1)", guid);          
             return "Gearlock: ON";
         }
     }
@@ -111,14 +111,14 @@ void PlayerbotHolder::OnBotLogin(Player * const bot)
 		if (master->GetGroup() &&
 			!master->GetGroup()->IsLeader(masterGuid))
 			master->GetGroup()->ChangeLeader(masterGuid);
-	//thesawolf - check for alt account playerbot
-	uint32 botAccount = bot->GetSession()->GetAccountId();
-	uint32 masterGacct = master->GetSession()->GetAccountId();
-	if (masterGacct != botAccount)
-	{
-	    //thesawolf - faction change - still flags opposing for pvp.. but non-KOS
-	    bot->setFaction(master->getFaction());
-
+        //thesawolf - check for alt account playerbot
+        uint32 botAccount = bot->GetSession()->GetAccountId();
+        uint32 masterGacct = master->GetSession()->GetAccountId();
+        if (masterGacct != botAccount)
+        {        
+            //thesawolf - faction change - still flags opposing for pvp.. but non-KOS
+            bot->setFaction(master->getFaction());
+       
             //thesawolf - autoset to master level
             uint32 level = master->getLevel();
             uint32 blevel = bot->getLevel();
@@ -132,7 +132,7 @@ void PlayerbotHolder::OnBotLogin(Player * const bot)
                 ldiff = level - blevel;
 
             if (ldiff > 3)
-                skipit = 0;
+                skipit = 0;        
             bot->SetLevel(level);
 
             //thesawolf - lets freshen things up a bit
@@ -150,12 +150,12 @@ void PlayerbotHolder::OnBotLogin(Player * const bot)
             factory.InitMounts();
             factory.UpdateTradeSkills(); // skills step2, needs to update
             bot->SaveToDB(false, true);
-
+    
             if (skipit == 0)
             {
                 factory.InitEquipment(true);
-                factory.InitBags();
-                factory.InitSecondEquipmentSet();
+                factory.InitBags();        
+                factory.InitSecondEquipmentSet();        
             }
 
             factory.InitAmmo();
@@ -163,24 +163,24 @@ void PlayerbotHolder::OnBotLogin(Player * const bot)
             factory.InitPotions();
             // factory.InitInventory();  // lets not lose gear stored by a packmule
             factory.InitGlyphs();
-            factory.InitGuild();
+            factory.InitGuild(); 
             factory.InitPet();
-
+        
             bot->SetMoney(urand(level * 10000, level * 5 * 10000));
-
+        
             //thesawolf - refill hp/sp since level resets can leave a vacuum
             bot->SetHealth(bot->GetMaxHealth());
             bot->SetPower(POWER_MANA, bot->GetMaxPower(POWER_MANA));
 
             bot->SaveToDB(false, true);
           }
-
+    
           //thesawolf - autosummon to master
           bot->TeleportTo(master->GetMapId(), master->GetPositionX(), master->GetPositionY(), master->GetPositionZ(), master->GetOrientation());
           //with pizazz
           bot->CastSpell(bot, 52096, true);
           bot->HandleEmoteCommand(EMOTE_ONESHOT_WAVE);
-        }
+	}
 
 	Group *group = bot->GetGroup();
 	if (group)
@@ -264,10 +264,10 @@ string PlayerbotHolder::ProcessBotCommand(string cmd, uint64 guid, bool admin, u
     {
         if (!ObjectAccessor::FindPlayer(guid))
             return "player is offline";
-
+        
         if (!GetPlayerBot(guid))
             return "not your bot";
-
+        
         return(LockPlayerBot(guid));
     }
 
@@ -287,79 +287,79 @@ string PlayerbotHolder::ProcessBotCommand(string cmd, uint64 guid, bool admin, u
 		{
 			if (cmd == "init=white" || cmd == "init=common")
 			{
-		if (botAcct = masterGacct)
-		{
-		    PlayerbotFactory factory(bot, master->getLevel(), ITEM_QUALITY_NORMAL);
-		    factory.CleanRandomize();
-		    return "ok";
-		}
-		else
-		    return "ERROR: You cannot use INIT on an ALT!";
+                if (botAcct = masterGacct)
+                {            
+                    PlayerbotFactory factory(bot, master->getLevel(), ITEM_QUALITY_NORMAL);
+                    factory.CleanRandomize();
+                    return "ok";
+                }
+                else
+                    return "ERROR: You cannot use INIT on an ALT!";
 			}
 			else if (cmd == "init=green" || cmd == "init=uncommon")
 			{
-		if (botAcct = masterGacct)
-		{
-		    PlayerbotFactory factory(bot, master->getLevel(), ITEM_QUALITY_UNCOMMON);
-		    factory.CleanRandomize();
-		    return "ok";
-		}
-		else
-		    return "ERROR: You cannot use INIT on an ALT!";
+                if (botAcct = masterGacct)
+                {            
+                    PlayerbotFactory factory(bot, master->getLevel(), ITEM_QUALITY_UNCOMMON);
+                    factory.CleanRandomize();
+                    return "ok";
+                }
+                else
+                    return "ERROR: You cannot use INIT on an ALT!";
 			}
 			else if (cmd == "init=blue" || cmd == "init=rare")
 			{
-		if (botAcct = masterGacct)
-		{
-		    PlayerbotFactory factory(bot, master->getLevel(), ITEM_QUALITY_RARE);
-		    factory.CleanRandomize();
-		    return "ok";
-		}
-		else
-		    return "ERROR: You cannot use INIT on an ALT!";
+                if (botAcct = masterGacct)
+                {            
+                    PlayerbotFactory factory(bot, master->getLevel(), ITEM_QUALITY_RARE);
+                    factory.CleanRandomize();
+                    return "ok";
+                }
+                else
+                    return "ERROR: You cannot use INIT on an ALT!";
 			}
 			else if (cmd == "init=epic" || cmd == "init=purple")
 			{
-		if (botAcct = masterGacct)
-		{
-		    PlayerbotFactory factory(bot, master->getLevel(), ITEM_QUALITY_EPIC);
-		    factory.CleanRandomize();
-		    return "ok";
-		}
-		else
-		    return "ERROR: You cannot use INIT on an ALT!";
-	    }
-	    else if (cmd == "init")
-	    {
-		if (botAcct = masterGacct)
-		{
-		    return "Specify quality level to init to.. ie. init=blue"; //thesawolf - give some instructions
-		}
-		else
-		    return "ERROR: You cannot use INIT on an ALT!";
+                if (botAcct = masterGacct)
+                {            
+                    PlayerbotFactory factory(bot, master->getLevel(), ITEM_QUALITY_EPIC);
+                    factory.CleanRandomize();
+                    return "ok";
+                }
+                else
+                    return "ERROR: You cannot use INIT on an ALT!";
+            }
+            else if (cmd == "init")
+            {
+                if (botAcct = masterGacct)
+                {            
+                    return "Specify quality level to init to.. ie. init=blue"; //thesawolf - give some instructions
+                }
+                else
+                    return "ERROR: You cannot use INIT on an ALT!";
 			}
 		}
 
 		if (cmd == "update")
 		{
-	    if (botAcct = masterGacct)
-	    {
-		PlayerbotFactory factory(bot, bot->getLevel());
-		factory.Refresh();
-		return "ok";
-	    }
-	    else
-		return "ERROR: You cannot use UPDATE on an ALT!";
+            if (botAcct = masterGacct)
+            {    
+                PlayerbotFactory factory(bot, bot->getLevel());
+                factory.Refresh();
+                return "ok";
+            }
+            else 
+                return "ERROR: You cannot use UPDATE on an ALT!";
 		}
 		else if (cmd == "random")
 		{
-	   if (botAcct != masterGacct)
-	    {
-		sRandomPlayerbotMgr.Randomize(bot);
-		return "ok";
-	    }
-	    else
-		return "ERROR: You cannot use RANDOM on an ALT!";
+           if (botAcct != masterGacct)
+            { 
+                sRandomPlayerbotMgr.Randomize(bot);
+                return "ok";
+            }
+            else
+                return "ERROR: You cannot use RANDOM on an ALT!";
 		}
 	}
 
@@ -421,30 +421,30 @@ list<string> PlayerbotHolder::HandlePlayerbotCommand(char const* args, Player* m
 	//thesawolf - display lookup legend
 	if ((cmd) && (!charname))
 	{
-	std::string cmdStr = cmd;
-	if (cmdStr == "lookup" || cmdStr == "LOOKUP")
-	{
-	    messages.push_back("Classes Available:");
-	    messages.push_back("|TInterface\\icons\\INV_Sword_27.png:25:25:0:-1|t Warrior");
-	    messages.push_back("|TInterface\\icons\\INV_Hammer_01.png:25:25:0:-1|t Paladin");
-	    messages.push_back("|TInterface\\icons\\INV_Weapon_Bow_07.png:25:25:0:-1|t Hunter");
-	    messages.push_back("|TInterface\\icons\\INV_ThrowingKnife_04.png:25:25:0:-1|t Rogue");
-	    messages.push_back("|TInterface\\icons\\INV_Staff_30.png:25:25:0:-1|t Priest");
-	    messages.push_back("|TInterface\\icons\\inv_jewelry_talisman_04.png:25:25:0:-1|t Shaman");
-	    messages.push_back("|TInterface\\icons\\INV_staff_30.png:25:25:0:-1|t Mage");
-	    messages.push_back("|TInterface\\icons\\INV_staff_30.png:25:25:0:-1|t Warlock");
-	    messages.push_back("|TInterface\\icons\\Ability_Druid_Maul.png:25:25:0:-1|t Druid");
-	    messages.push_back("(Usage: .bot lookup CLASS)");
-	    return messages;
-	}
+        std::string cmdStr = cmd;
+        if (cmdStr == "lookup" || cmdStr == "LOOKUP")
+        {
+            messages.push_back("Classes Available:");
+            messages.push_back("|TInterface\\icons\\INV_Sword_27.png:25:25:0:-1|t Warrior");
+            messages.push_back("|TInterface\\icons\\INV_Hammer_01.png:25:25:0:-1|t Paladin");
+            messages.push_back("|TInterface\\icons\\INV_Weapon_Bow_07.png:25:25:0:-1|t Hunter");
+            messages.push_back("|TInterface\\icons\\INV_ThrowingKnife_04.png:25:25:0:-1|t Rogue");
+            messages.push_back("|TInterface\\icons\\INV_Staff_30.png:25:25:0:-1|t Priest");
+            messages.push_back("|TInterface\\icons\\inv_jewelry_talisman_04.png:25:25:0:-1|t Shaman");
+            messages.push_back("|TInterface\\icons\\INV_staff_30.png:25:25:0:-1|t Mage");
+            messages.push_back("|TInterface\\icons\\INV_staff_30.png:25:25:0:-1|t Warlock");
+            messages.push_back("|TInterface\\icons\\Ability_Druid_Maul.png:25:25:0:-1|t Druid");
+            messages.push_back("(Usage: .bot lookup CLASS)");
+            return messages;
+        }
     }
     else if (!cmd || !charname)
     {
         messages.push_back("Usage: .bot add / remove PLAYERNAME");
         messages.push_back("       .bot lookup [CLASS] (without to see list of classes)");
         messages.push_back("       .bot update / random / init=[QUALITY]");
-                return messages;
-        }
+		return messages;
+	}
 
 	if (!strcmp(cmd, "list"))
 	{
@@ -452,7 +452,7 @@ list<string> PlayerbotHolder::HandlePlayerbotCommand(char const* args, Player* m
 		return messages;
 	}
 
-        //thesawolf - without this null check, tc was crashing because of the null to string conversion
+	//thesawolf - without this null check, tc was crashing because of the null to string conversion
     if (charname == NULL)
     {
         messages.push_back("ERROR: No bot was specified. Try again.");
@@ -485,7 +485,7 @@ list<string> PlayerbotHolder::HandlePlayerbotCommand(char const* args, Player* m
         {
             claz = 2;
             icon = "|TInterface\\icons\\INV_Hammer_01.png:25:25:0:-1|t ";
-        }
+        }                
         else if (charnameStr == "hunter" || charnameStr == "Hunter" || charnameStr == "HUNTER")
         {
             claz = 3;
@@ -495,27 +495,27 @@ list<string> PlayerbotHolder::HandlePlayerbotCommand(char const* args, Player* m
         {
             claz = 4;
             icon = "|TInterface\\icons\\INV_ThrowingKnife_04.png:25:25:0:-1|t ";
-        }
+        }                
         else if (charnameStr == "priest" || charnameStr == "Priest" || charnameStr == "PRIEST")
         {
             claz = 5;
             icon = "|TInterface\\icons\\INV_Staff_30.png:25:25:0:-1|t ";
-        }
+        }                
         else if (charnameStr == "shaman" || charnameStr == "Shaman" || charnameStr == "SHAMAN")
         {
             claz = 7;
             icon = "|TInterface\\icons\\inv_jewelry_talisman_04.png:25:25:0:-1|t ";
-        }
+        }                
         else if (charnameStr == "mage" || charnameStr == "Mage" || charnameStr == "MAGE")
         {
             claz = 8;
             icon = "|TInterface\\icons\\INV_staff_30.png:25:25:0:-1|t ";
-        }
+        }                
         else if (charnameStr == "warlock" || charnameStr == "Warlock" || charnameStr == "WARLOCK")
         {
             claz = 9;
             icon = "|TInterface\\icons\\INV_staff_30.png:25:25:0:-1|t ";
-        }
+        }                
         else if (charnameStr == "druid" || charnameStr == "Druid" || charnameStr == "DRUID")
         {
             claz = 11;
@@ -568,10 +568,10 @@ list<string> PlayerbotHolder::HandlePlayerbotCommand(char const* args, Player* m
                     cOnline = "|cffff0000Not Available|r";
                 string bList = icon + "|TInterface\\icons\\Achievement_Character_" + cRace + "_" + cGender + ".png:25:25:0:-1|t " + bName + " - " + cRace + " " + cGender + " [" + cOnline + "]";
                 messages.push_back(bList);
-
+                
             } while (lresults->NextRow());
         }
-        else
+        else 
         {
             messages.push_back("Error: Listing class bots. Try again.");
             messages.push_back("Usage: .bot lookup (to see list of classes)");
@@ -606,14 +606,14 @@ list<string> PlayerbotHolder::HandlePlayerbotCommand(char const* args, Player* m
 	}
 
     if (charnameStr == "!" && master && master->GetSession()->GetSecurity() > SEC_PLAYER) // SEC_GAMEMASTER) thesawolf
-        {
-                for (PlayerBotMap::const_iterator i = GetPlayerBotsBegin(); i != GetPlayerBotsEnd(); ++i)
-                {
-                        Player* bot = i->second;
-                        if (bot && bot->IsInWorld())
-                                bots.insert(bot->GetName());
-                }
-        }
+	{
+		for (PlayerBotMap::const_iterator i = GetPlayerBotsBegin(); i != GetPlayerBotsEnd(); ++i)
+		{
+			Player* bot = i->second;
+			if (bot && bot->IsInWorld())
+				bots.insert(bot->GetName());
+		}
+	}
 
 	vector<string> chars = split(charnameStr, ',');
 	for (vector<string>::iterator i = chars.begin(); i != chars.end(); i++)
@@ -655,7 +655,7 @@ list<string> PlayerbotHolder::HandlePlayerbotCommand(char const* args, Player* m
 		else if (master && member != master->GetGUID())
 		{
 			out << ProcessBotCommand(cmdStr, member,
-		master->GetSession()->GetSecurity() >= SEC_PLAYER, //SEC_GAMEMASTER, thesawolf
+                master->GetSession()->GetSecurity() >= SEC_PLAYER, //SEC_GAMEMASTER, thesawolf
 				master->GetSession()->GetAccountId(),
 				master->GetGuildId());
 		}

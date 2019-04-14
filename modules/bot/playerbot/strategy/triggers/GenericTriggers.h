@@ -568,7 +568,7 @@ namespace BotAI
 	class RandomBotUpdateTrigger : public RandomTrigger
 	{
 	public:
-		RandomBotUpdateTrigger(PlayerbotAI* ai) : RandomTrigger(ai, 15) {}
+		RandomBotUpdateTrigger(PlayerbotAI* ai) : RandomTrigger(ai, 30) {}
 		
 	public:
 		virtual bool IsActive()
@@ -576,6 +576,17 @@ namespace BotAI
 			return RandomTrigger::IsActive() && AI_VALUE(bool, "random bot update");
 		}
 	};
+    class NoNonBotPlayersAroundTrigger : public Trigger
+    {
+    public:
+        NoNonBotPlayersAroundTrigger(PlayerbotAI* ai) : Trigger(ai, "no non bot players around", 5) {}
+
+    public:
+        virtual bool IsActive()
+        {
+			return AI_VALUE(list<uint64>, "nearest non bot players").empty();
+        }
+    };
 }
 
 #include "RangeTriggers.h"

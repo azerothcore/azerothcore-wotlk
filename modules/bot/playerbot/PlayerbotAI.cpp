@@ -51,7 +51,7 @@ void PacketHandlingHelper::Handle(ExternalEventHelper &helper)
 
 void PacketHandlingHelper::AddPacket(const WorldPacket& packet)
 {
-        if (handlers.find(packet.GetOpcode()) != handlers.end())
+	if (handlers.find(packet.GetOpcode()) != handlers.end())
         queue.push(WorldPacket(packet));
 }
 
@@ -66,9 +66,9 @@ PlayerbotAI::PlayerbotAI() : PlayerbotAIBase(), bot(NULL), aiObjectContext(NULL)
 PlayerbotAI::PlayerbotAI(Player* bot) :
     PlayerbotAIBase(), chatHelper(this), chatFilter(this), security(bot), master(NULL)
 {
-        this->bot = bot;
+	this->bot = bot;
 
-        accountId = sObjectMgr->GetPlayerAccountIdByGUID(bot->GetGUID());
+	accountId = sObjectMgr->GetPlayerAccountIdByGUID(bot->GetGUID());
 
     aiObjectContext = AiFactory::createAiObjectContext(bot, this);
 
@@ -110,8 +110,8 @@ PlayerbotAI::PlayerbotAI(Player* bot) :
     botOutgoingPacketHandlers.AddHandler(SMSG_DUEL_REQUESTED, "duel requested");
     botOutgoingPacketHandlers.AddHandler(SMSG_LFG_ROLE_CHOSEN, "lfg role check");
     botOutgoingPacketHandlers.AddHandler(SMSG_LFG_PROPOSAL_UPDATE, "lfg proposal");
-        botOutgoingPacketHandlers.AddHandler(SMSG_BATTLEFIELD_STATUS, "bg status");
-        botOutgoingPacketHandlers.AddHandler(SMSG_INVENTORY_CHANGE_FAILURE, "inventory change failure");
+	botOutgoingPacketHandlers.AddHandler(SMSG_BATTLEFIELD_STATUS, "bg status");
+	botOutgoingPacketHandlers.AddHandler(SMSG_INVENTORY_CHANGE_FAILURE, "inventory change failure");
 
     masterOutgoingPacketHandlers.AddHandler(SMSG_PARTY_COMMAND_RESULT, "party command");
     masterOutgoingPacketHandlers.AddHandler(MSG_RAID_READY_CHECK, "ready check");
@@ -166,7 +166,7 @@ void PlayerbotAI::UpdateAIInternal(uint32 elapsed)
     masterIncomingPacketHandlers.Handle(helper);
     masterOutgoingPacketHandlers.Handle(helper);
 
-        DoNextAction();
+	DoNextAction();
 }
 
 void PlayerbotAI::HandleTeleportAck()
@@ -451,21 +451,21 @@ void PlayerbotAI::DoNextAction()
         ChangeEngine(BOT_STATE_NON_COMBAT);
 
     Group *group = bot->GetGroup();
-        if (!master && group &&!bot->InBattleground())
-        {
-                for (GroupReference *gref = group->GetFirstMember(); gref; gref = gref->next())
-                {
-                        Player* member = gref->GetSource();
-                        PlayerbotAI* ai = bot->GetPlayerbotAI();
-                        if (member && member->IsInWorld() && !member->GetPlayerbotAI() && (!master || master->GetPlayerbotAI()))
-                        {
-                                ai->SetMaster(member);
-                                ai->ResetStrategies();
-                                ai->TellMaster("Hello");
-                                break;
-                        }
-                }
-        }
+	if (!master && group &&!bot->InBattleground())
+	{
+		for (GroupReference *gref = group->GetFirstMember(); gref; gref = gref->next())
+		{
+			Player* member = gref->GetSource();
+			PlayerbotAI* ai = bot->GetPlayerbotAI();
+			if (member && member->IsInWorld() && !member->GetPlayerbotAI() && (!master || master->GetPlayerbotAI()))
+			{
+				ai->SetMaster(member);
+				ai->ResetStrategies();
+				ai->TellMaster("Hello");
+				break;
+			}
+		}
+	}
 }
 
 void PlayerbotAI::ReInitCurrentEngine()
@@ -980,7 +980,7 @@ void PlayerbotAI::ResetStrategies()
     AiFactory::AddDefaultCombatStrategies(bot, this, engines[BOT_STATE_COMBAT]);
     AiFactory::AddDefaultNonCombatStrategies(bot, this, engines[BOT_STATE_NON_COMBAT]);
     AiFactory::AddDefaultDeadStrategies(bot, this, engines[BOT_STATE_DEAD]);
-        //sPlayerbotDbStore.Load(this);
+	//sPlayerbotDbStore.Load(this);
 }
 
 bool PlayerbotAI::IsRanged(Player* player)
@@ -1128,7 +1128,7 @@ bool PlayerbotAI::TellMasterNoFacing(string text, PlayerbotSecurityLevel securit
             (bot->GetMapId() != master->GetMapId() || bot->GetDistance(master) > sPlayerbotAIConfig.whisperDistance))
         return false;
 
-        bot->Whisper(text, LANG_UNIVERSAL, master->GetGUID());
+	bot->Whisper(text, LANG_UNIVERSAL, master->GetGUID());
     return true;
 }
 
@@ -1278,8 +1278,8 @@ bool PlayerbotAI::CanCastSpell(uint32 spellid, Unit* target, bool checkHasSpell)
     spell->m_targets.SetItemTarget(spell->m_CastItem);
     SpellCastResult result = spell->CheckCast(false);
     delete spell;
-        if (oldSel)
-                bot->SetSelection(oldSel->GetGUID());
+	if (oldSel)
+		bot->SetSelection(oldSel->GetGUID());
 
     switch (result)
     {
@@ -1358,8 +1358,8 @@ bool PlayerbotAI::CastSpell(uint32 spellId, Unit* target)
     if (pSpellInfo->Targets & TARGET_FLAG_SOURCE_LOCATION ||
             pSpellInfo->Targets & TARGET_FLAG_DEST_LOCATION)
     {
-                Position destPosition;
-                target->GetPosition(&destPosition);
+		Position destPosition;
+		target->GetPosition(&destPosition);
         targets.SetDst(destPosition);
     }
     else
@@ -1411,10 +1411,10 @@ bool PlayerbotAI::CastSpell(uint32 spellId, Unit* target)
         SetNextCheckDelay(sPlayerbotAIConfig.globalCoolDown);
         return false;
     }
-        if (spell->GetCastTime()>0)
-                bot->GetMotionMaster()->MovementExpired();
-        spell->prepare(&targets);
-        WaitForSpellCast(spell);
+	if (spell->GetCastTime()>0)
+		bot->GetMotionMaster()->MovementExpired();
+	spell->prepare(&targets);
+	WaitForSpellCast(spell);
 
 	if (oldSel)
 		bot->SetSelection(oldSel->GetGUID());
@@ -1516,7 +1516,7 @@ bool PlayerbotAI::HasAuraToDispel(Unit* target, uint32 dispelType)
         for (Unit::AuraEffectList::const_iterator itr = auras.begin(); itr != auras.end(); ++itr)
         {
             const AuraEffect *const aura = *itr;
-                        const SpellInfo* entry = aura->GetSpellInfo();
+			const SpellInfo* entry = aura->GetSpellInfo();
             uint32 spellId = entry->Id;
 
             bool isPositiveSpell = entry->IsPositive();

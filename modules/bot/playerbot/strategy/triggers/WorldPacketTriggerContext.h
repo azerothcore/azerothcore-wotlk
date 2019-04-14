@@ -45,6 +45,7 @@ namespace BotAI
 			creators["bg status"] = &WorldPacketTriggerContext::bg_status;
 			creators["guild invite"] = &WorldPacketTriggerContext::guild_invite;
             creators["lfg teleport"] = &WorldPacketTriggerContext::lfg_teleport;
+			creators["inventory change failure"] = &WorldPacketTriggerContext::inventory_change_failure;
         }
 
     private:
@@ -84,5 +85,6 @@ namespace BotAI
         static Trigger* quest_share(PlayerbotAI* ai) { return new WorldPacketTrigger(ai, "quest share"); }
         static Trigger* loot_roll(PlayerbotAI* ai) { return new WorldPacketTrigger(ai, "loot roll"); }
         static Trigger* taxi(PlayerbotAI* ai) { return new WorldPacketTrigger(ai, "activate taxi"); }
+		static Trigger* inventory_change_failure(PlayerbotAI* ai) { return new WorldPacketTrigger(ai, "inventory change failure"); }
     };
 };

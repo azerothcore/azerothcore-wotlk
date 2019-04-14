@@ -16,7 +16,7 @@ namespace BotAI
             if (!movement.lastAreaTrigger)
                 return false;
 
-            AreaTriggerEntry const* atEntry = sAreaTriggerStore.LookupEntry(movement.lastAreaTrigger);
+			AreaTrigger const* atEntry = sObjectMgr->GetAreaTrigger(movement.lastAreaTrigger);
             if(!atEntry)
                 return false;
 
@@ -28,9 +28,9 @@ namespace BotAI
         }
 
     private:
-        bool IsPointInAreaTriggerZone(AreaTriggerEntry const* atEntry, uint32 mapid, float x, float y, float z, float delta)
+        bool IsPointInAreaTriggerZone(AreaTrigger const* atEntry, uint32 mapid, float x, float y, float z, float delta)
         {
-            if (mapid != atEntry->mapid)
+            if (mapid != atEntry->map)
                 return false;
 
             if (atEntry->radius > 0)
@@ -48,7 +48,7 @@ namespace BotAI
                 // is-in-cube check and we have to calculate only one point instead of 4
 
                 // 2PI = 360, keep in mind that ingame orientation is counter-clockwise
-                double rotation = 2 * M_PI - atEntry->box_orientation;
+                double rotation = 2 * M_PI - atEntry->orientation;
                 double sinVal = sin(rotation);
                 double cosVal = cos(rotation);
 
@@ -62,9 +62,9 @@ namespace BotAI
                 float dz = z - atEntry->z;
                 float dx = rotPlayerX - atEntry->x;
                 float dy = rotPlayerY - atEntry->y;
-                if ((fabs(dx) > atEntry->box_x / 2 + delta) ||
-                        (fabs(dy) > atEntry->box_y / 2 + delta) ||
-                        (fabs(dz) > atEntry->box_z / 2 + delta))
+                if ((fabs(dx) > atEntry->length / 2 + delta) ||
+                        (fabs(dy) > atEntry->length / 2 + delta) ||
+                        (fabs(dz) > atEntry->length / 2 + delta))
                 {
                     return false;
                 }

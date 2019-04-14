@@ -22,6 +22,9 @@ public:
     void AddPlayerBot(uint64 guid, uint32 masterAccountId);
     void LogoutPlayerBot(uint64 guid);
     Player* GetPlayerBot (uint64 guid) const;
+
+	string LockPlayerBot(uint64 guid);//thesawolf - gearlock for bots
+
     PlayerBotMap::const_iterator GetPlayerBotsBegin() const { return playerBots.begin(); }
     PlayerBotMap::const_iterator GetPlayerBotsEnd()   const { return playerBots.end();   }
 
@@ -53,6 +56,7 @@ public:
     void HandleMasterIncomingPacket(const WorldPacket& packet);
     void HandleMasterOutgoingPacket(const WorldPacket& packet);
     void HandleCommand(uint32 type, const string& text);
+	void OnPlayerLogin(Player* player);
 
     virtual void UpdateAIInternal(uint32 elapsed);
 

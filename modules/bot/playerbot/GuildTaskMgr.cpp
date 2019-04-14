@@ -7,7 +7,7 @@
 #include "DatabaseEnv.h"
 #include "Mail.h"
 #include "PlayerbotAI.h"
-#include "Common.h"
+
 #include "RandomItemMgr.h"
 
 char * strstri (const char* str1, const char* str2);
@@ -39,7 +39,7 @@ void GuildTaskMgr::Update(Player* player, Player* guildMaster)
     if (!player->IsFriendlyTo(guildMaster))
         return;
 
-        Guild *guild = sGuildMgr->GetGuildById(guildMaster->GetGuildId());
+	Guild *guild = sGuildMgr->GetGuildById(guildMaster->GetGuildId());
     DenyReason reason = PLAYERBOT_DENY_NONE;
     PlayerbotSecurityLevel secLevel = guildMaster->GetPlayerbotAI()->GetSecurity()->LevelFor(player, &reason);
     if (secLevel == PLAYERBOT_SECURITY_DENY_ALL || (secLevel == PLAYERBOT_SECURITY_TALK && reason != PLAYERBOT_DENY_FAR))
@@ -49,7 +49,7 @@ void GuildTaskMgr::Update(Player* player, Player* guildMaster)
         return;
     }
 
-        sLog->outDetail("%s: guild task update for player %s", guild->GetName().c_str(), player->GetName().c_str());
+	sLog->outDetail("%s: guild task update for player %s", guild->GetName(), player->GetName());
 
     uint32 owner = (uint32)player->GetGUID();
 

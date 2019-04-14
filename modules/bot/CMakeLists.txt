@@ -8,11 +8,13 @@
 # WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
+file(GLOB_RECURSE sources_ahbot ahbot/*.cpp ahbot/*.h)
 file(GLOB_RECURSE sources_playerbot playerbot/*.cpp playerbot/*.h)
 file(GLOB_RECURSE sources_pch pch/*.cpp pch/*.h)
 
 set(bot_STAT_SRCS
-  ${bot_STAT_SRCS}
+  ${bot_STAT_SRCS}  
+  ${sources_ahbot}
   ${sources_playerbot}
   ${sources_pch}
 )
@@ -182,31 +184,13 @@ if( WIN32 )
     add_custom_command(TARGET bot
       POST_BUILD
       COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/playerbot/aiplayerbot.conf.dist ${CMAKE_BINARY_DIR}/bin/$(ConfigurationName)/
-
+      COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/ahbot/ahbot.conf.dist ${CMAKE_BINARY_DIR}/bin/$(ConfigurationName)/
     )
   elseif ( MINGW )
     add_custom_command(TARGET bot
       POST_BUILD
       COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/playerbot/aiplayerbot.conf.dist ${CMAKE_BINARY_DIR}/bin/
-
+      COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/ahbot/ahbot.conf.dist ${CMAKE_BINARY_DIR}/bin/$(ConfigurationName)/
     )
   endif()
-endif()
-# Generate PCH
-if(PCH)
- if (ADD_CXX_PCH)
-    ADD_CXX_PCH(Bots ${bots_PCH})
- elseif (MSVC)
-    set(PCHBaseName "pchdef")
-    set(PrecompiledBinary "${CMAKE_CURRENT_SOURCE_DIR}/botpch.pch")
-    set(PrecompiledHeader "${CMAKE_CURRENT_SOURCE_DIR}/botpch.h")
-    set(PrecompiledSource "${CMAKE_CURRENT_SOURCE_DIR}/botpch.cpp")
-    set_target_properties(${LIBRARY_NAME} PROPERTIES COMPILE_FLAGS " /Yu\"${PrecompiledHeader}\" /FI\"${PrecompiledHeader}\" /Fp\"${PrecompiledBinary}\" /bigobj")
-    set_source_files_properties(${PrecompiledSource} PROPERTIES COMPILE_FLAGS "/Yc\"${PrecompiledHeader}\" /Fp\"${PrecompiledBinary}\"")
-    set_target_properties(${LIBRARY_NAME} PROPERTIES PROJECT_LABEL "Bots")
-  elseif(NOT MINGW)
-    # TODO: Resolve issues with order of includes before enabling Cotire for MinGW builds
-    cotire(${LIBRARY_NAME})
-  endif()
-  include_directories(${CMAKE_CURRENT_BINARY_DIR})
 endif()

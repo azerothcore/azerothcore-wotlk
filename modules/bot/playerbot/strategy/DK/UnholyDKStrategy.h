@@ -14,6 +14,7 @@ namespace BotAI
         virtual void InitTriggers(std::list<TriggerNode*> &triggers);
         virtual string getName() { return "unholy"; }
 		virtual NextAction** getDefaultActions();
+		virtual int GetType() { return STRATEGY_TYPE_COMBAT | STRATEGY_TYPE_DPS | STRATEGY_TYPE_MELEE; }
     };
 
     class UnholyDKAoeStrategy : public CombatStrategy

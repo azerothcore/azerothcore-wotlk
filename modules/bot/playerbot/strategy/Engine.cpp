@@ -116,7 +116,7 @@ void Engine::Init()
 
 bool Engine::DoNextAction(Unit* unit, int depth)
 {
-    LogAction("--- AI Tick ---");
+    //LogAction("--- AI Tick ---");
     if (sPlayerbotAIConfig.logValuesPerTick)
         LogValues();
 
@@ -142,7 +142,7 @@ bool Engine::DoNextAction(Unit* unit, int depth)
 
             if (!action)
             {
-                LogAction("A:%s - UNKNOWN", actionNode->getName().c_str());
+                //LogAction("A:%s - UNKNOWN", actionNode->getName().c_str());
             }
             else if (action->isUseful())
             {
@@ -152,7 +152,7 @@ bool Engine::DoNextAction(Unit* unit, int depth)
                     relevance *= multiplier->GetValue(action);
                     if (!relevance)
                     {
-                        LogAction("Multiplier %s made action %s useless", multiplier->getName().c_str(), action->getName().c_str());
+                        //LogAction("Multiplier %s made action %s useless", multiplier->getName().c_str(), action->getName().c_str());
                         break;
                     }
                 }
@@ -161,7 +161,7 @@ bool Engine::DoNextAction(Unit* unit, int depth)
                 {
                     if (!skipPrerequisites)
                     {
-                        LogAction("A:%s - PREREQ", action->getName().c_str());
+                        //LogAction("A:%s - PREREQ", action->getName().c_str());
                         if (MultiplyAndPush(actionNode->getPrerequisites(), relevance + 0.02, false, event, "prereq"))
                         {
                             PushAgain(actionNode, relevance + 0.01, event);
@@ -173,7 +173,7 @@ bool Engine::DoNextAction(Unit* unit, int depth)
 
                     if (actionExecuted)
                     {
-                        LogAction("A:%s - OK", action->getName().c_str());
+                        //LogAction("A:%s - OK", action->getName().c_str());
                         MultiplyAndPush(actionNode->getContinuers(), 0, false, event, "cont");
                         lastRelevance = relevance;
                         delete actionNode;
@@ -181,20 +181,20 @@ bool Engine::DoNextAction(Unit* unit, int depth)
                     }
                     else
                     {
-                        LogAction("A:%s - FAILED", action->getName().c_str());
+                        //LogAction("A:%s - FAILED", action->getName().c_str());
                         MultiplyAndPush(actionNode->getAlternatives(), relevance + 0.03, false, event, "alt");
                     }
                 }
                 else
                 {
-                    LogAction("A:%s - IMPOSSIBLE", action->getName().c_str());
+                    //LogAction("A:%s - IMPOSSIBLE", action->getName().c_str());
                     MultiplyAndPush(actionNode->getAlternatives(), relevance + 0.03, false, event, "alt");
                 }
             }
             else
             {
                 lastRelevance = relevance;
-                LogAction("A:%s - USELESS", action->getName().c_str());
+                //LogAction("A:%s - USELESS", action->getName().c_str());
             }
             delete actionNode;
         }
@@ -220,11 +220,11 @@ bool Engine::DoNextAction(Unit* unit, int depth)
 	} while (basket);
 
     if (time(0) - currentTime > 1) {
-        LogAction("too long execution");
+        //LogAction("too long execution");
     }
 
     if (!actionExecuted)
-        LogAction("no actions executed");
+        //LogAction("no actions executed");
 
     return actionExecuted;
 }
@@ -265,7 +265,7 @@ bool Engine::MultiplyAndPush(NextAction** actions, float forceRelevance, bool sk
 
                 if (k > 0)
                 {
-                    LogAction("PUSH:%s - %f (%s)", action->getName().c_str(), k, pushType);
+                    //LogAction("PUSH:%s - %f (%s)", action->getName().c_str(), k, pushType);
                     queue.Push(new ActionBasket(action, k, skipPrerequisites, event));
                     pushed = true;
                 }
@@ -330,7 +330,7 @@ void Engine::addStrategy(string name)
         for (set<string>::iterator i = siblings.begin(); i != siblings.end(); i++)
             removeStrategy(*i);
 
-        LogAction("S:+%s", strategy->getName().c_str());
+        //LogAction("S:+%s", strategy->getName().c_str());
         strategies[strategy->getName()] = strategy;
     }
     Init();
@@ -361,7 +361,7 @@ bool Engine::removeStrategy(string name)
     if (i == strategies.end())
         return false;
 
-    LogAction("S:-%s", name.c_str());
+    //LogAction("S:-%s", name.c_str());
     strategies.erase(i);
     Init();
     return true;
@@ -408,7 +408,7 @@ void Engine::ProcessTriggers()
             if (!event)
                 continue;
 
-            LogAction("T:%s", trigger->getName().c_str());
+            //LogAction("T:%s", trigger->getName().c_str());
             MultiplyAndPush(node->getHandlers(), 0.0f, false, event, "trigger");
         }
     }
@@ -442,6 +442,16 @@ string Engine::ListStrategies()
         s.append(", ");
     }
     return s.substr(0, s.length() - 2);
+}
+
+list<string> Engine::GetStrategies()
+{
+    list<string> result;
+    for (map<string, Strategy*>::iterator i = strategies.begin(); i != strategies.end(); i++)
+    {
+        result.push_back(i->first);
+    }
+    return result;
 }
 
 void Engine::PushAgain(ActionNode* actionNode, float relevance, Event event)

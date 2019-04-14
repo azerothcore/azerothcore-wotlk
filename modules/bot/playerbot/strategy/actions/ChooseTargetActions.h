@@ -32,6 +32,7 @@ namespace BotAI
         }
         virtual bool isUseful() {
             return GetTarget() &&
+				!AI_VALUE(list<uint64>, "nearest non bot players").empty() &&
                 (AI_VALUE2(uint8, "health", "self target") > sPlayerbotAIConfig.mediumHealth &&
                 (!AI_VALUE2(uint8, "mana", "self target") || AI_VALUE2(uint8, "mana", "self target") > sPlayerbotAIConfig.mediumMana)) || AI_VALUE2(bool, "combat", "self target");
         }

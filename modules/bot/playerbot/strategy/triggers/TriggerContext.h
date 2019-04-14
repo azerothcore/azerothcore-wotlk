@@ -96,6 +96,7 @@ namespace BotAI
             creators["invalid target"] = &TriggerContext::invalid_target;
             creators["lfg proposal active"] = &TriggerContext::lfg_proposal_active;
 			creators["random bot update"] = &TriggerContext::random_bot_update_trigger;
+			creators["no non bot players around"] = &TriggerContext::no_non_bot_players_around;
         }
 
     private:
@@ -146,8 +147,8 @@ namespace BotAI
 		static Trigger* player_is_in_battleground(PlayerbotAI *ai) { return new PlayerIsInBattleground(ai); }
 		static Trigger* player_is_in_battleground_no_flag(PlayerbotAI *ai) { return new PlayerIsInBattlegroundWithoutFlag(ai); }
 		static Trigger* Random(PlayerbotAI* ai) { return new RandomTrigger(ai); }
-        static Trigger* seldom(PlayerbotAI* ai) { return new SeldomTrigger(ai); }
-        static Trigger* often(PlayerbotAI* ai) { return new OftenTrigger(ai); }
+		static Trigger* seldom(PlayerbotAI* ai) { return new RandomTrigger(ai); }
+        static Trigger* often(PlayerbotAI* ai) { return new RandomTrigger(ai); }
         static Trigger* EnemyOutOfMelee(PlayerbotAI* ai) { return new EnemyOutOfMeleeTrigger(ai); }
         static Trigger* EnemyOutOfSpell(PlayerbotAI* ai) { return new EnemyOutOfSpellRangeTrigger(ai); }
         static Trigger* enemy_too_close_for_spell(PlayerbotAI* ai) { return new EnemyTooCloseForSpellTrigger(ai); }
@@ -165,6 +166,6 @@ namespace BotAI
         static Trigger* no_pet(PlayerbotAI* ai) { return new NoPetTrigger(ai); }
         static Trigger* has_attackers(PlayerbotAI* ai) { return new HasAttackersTrigger(ai); }
 		static Trigger* random_bot_update_trigger(PlayerbotAI* ai) { return new RandomBotUpdateTrigger(ai); }
-
+		static Trigger* no_non_bot_players_around(PlayerbotAI* ai) { return new NoNonBotPlayersAroundTrigger(ai); }
     };
 };

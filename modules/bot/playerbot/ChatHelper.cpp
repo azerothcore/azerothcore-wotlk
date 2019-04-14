@@ -136,6 +136,11 @@ ChatHelper::ChatHelper(PlayerbotAI* ai) : PlayerbotAIAware(ai)
     specs[CLASS_WARRIOR][1] = "fury";
     specs[CLASS_WARRIOR][2] = "protection";
 
+	classes[CLASS_DEATH_KNIGHT] = "dk";
+	specs[CLASS_DEATH_KNIGHT][0] = "blood";
+	specs[CLASS_DEATH_KNIGHT][1] = "frost";
+	specs[CLASS_DEATH_KNIGHT][2] = "unholy";
+
     races[RACE_BLOODELF] = "Blood Elf";
     races[RACE_DRAENEI] = "Draenei";
     races[RACE_DWARF] = "Dwarf";
@@ -153,7 +158,7 @@ string ChatHelper::formatMoney(uint32 copper)
     ostringstream out;
 	if (!copper)
 	{
-		out << "0|TInterface\\AddOns\\AtlasLoot\\Images\\bronze:0|t";
+		out << "0";
 		return out.str();
 	}
 
@@ -163,11 +168,11 @@ string ChatHelper::formatMoney(uint32 copper)
     copper -= (silver * 100);
     out << " ";
     if (gold > 0)
-        out << gold <<  "|TInterface\\AddOns\\AtlasLoot\\Images\\gold:0|t ";
+        out << gold <<  "g ";
     if (silver > 0 && gold < 50)
-        out << silver <<  "|TInterface\\AddOns\\AtlasLoot\\Images\\silver:0|t ";
+        out << silver <<  "s ";
 	if (copper > 0 && gold < 10)
-		out << copper <<  "|TInterface\\AddOns\\AtlasLoot\\Images\\bronze:0|t";
+		out << copper <<  "c";
 
     return out.str();
 }
@@ -425,10 +430,10 @@ string ChatHelper::formatClass(Player* player, int spec)
         if (!talentInfo)
             continue;
 
-        //uint32 const* talentTabIds = GetTalentTabPages(player->getClass());
-        //if (talentInfo->TalentTab == talentTabIds[0]) c0++;
-        //if (talentInfo->TalentTab == talentTabIds[1]) c1++;
-        //if (talentInfo->TalentTab == talentTabIds[2]) c2++;
+        uint32 const* talentTabIds = GetTalentTabPages(player->getClass());
+        if (talentInfo->TalentTab == talentTabIds[0]) c0++;
+        if (talentInfo->TalentTab == talentTabIds[1]) c1++;
+        if (talentInfo->TalentTab == talentTabIds[2]) c2++;
     }
 
     out << (c0 ? "|h|cff00ff00" : "") << c0 << "|h|cffffffff/";

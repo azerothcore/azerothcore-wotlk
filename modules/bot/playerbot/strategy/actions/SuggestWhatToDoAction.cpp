@@ -2,16 +2,17 @@
 #include "../../playerbot.h"
 #include "SuggestWhatToDoAction.h"
 #include "../../PlayerbotAIConfig.h"
+#include "ChannelMgr.h"
+#include "MapManager.h"
 
 using namespace BotAI;
 
-SuggestWhatToDoAction::SuggestWhatToDoAction(PlayerbotAI* ai) : InventoryAction(ai, "suggest what to do"), suggested(false)
+SuggestWhatToDoAction::SuggestWhatToDoAction(PlayerbotAI* ai, string name) : InventoryAction(ai, name)
 {
     suggestions.push_back(&SuggestWhatToDoAction::instance);
     suggestions.push_back(&SuggestWhatToDoAction::specificQuest);
     suggestions.push_back(&SuggestWhatToDoAction::newQuest);
     suggestions.push_back(&SuggestWhatToDoAction::grindMaterials);
-    suggestions.push_back(&SuggestWhatToDoAction::trade);
     suggestions.push_back(&SuggestWhatToDoAction::grindReputation);
     suggestions.push_back(&SuggestWhatToDoAction::nothing);
     suggestions.push_back(&SuggestWhatToDoAction::relax);
@@ -20,19 +21,13 @@ SuggestWhatToDoAction::SuggestWhatToDoAction(PlayerbotAI* ai) : InventoryAction(
 
 bool SuggestWhatToDoAction::Execute(Event event)
 {
-    if (suggested)
-    {
-        trade();
-        return true;
-    }
-
-    if (bot->GetInstanceId() || suggested)
+	if (!sRandomPlayerbotMgr.IsRandomBot(bot) || bot->GetGroup() || bot->GetInstanceId())
         return false;
 
     int index = rand() % suggestions.size();
     (this->*suggestions[index])();
 
-    return suggested = true;
+	return true;
 }
 
 void SuggestWhatToDoAction::instance()
@@ -60,8 +55,6 @@ void SuggestWhatToDoAction::instance()
         case 5:
             spam("Have group quests? Invite me!");
             break;
-        default:
-            spam("Hey, why not join Dungeon Finder?");
         }
     }
 }
@@ -128,23 +121,28 @@ void SuggestWhatToDoAction::grindMaterials()
 void SuggestWhatToDoAction::grindReputation()
 {
     if (bot->getLevel() > 15)
-        ai->TellMasterNoFacing("I think we should do something to improve our reputation", PLAYERBOT_SECURITY_ALLOW_ALL);
+		spam("I think we should do something to improve our reputation");
 }
 
 void SuggestWhatToDoAction::nothing()
 {
-    ai->TellMasterNoFacing("I don't want to do anything", PLAYERBOT_SECURITY_ALLOW_ALL);
+	spam("I don't want to do anything. Help me find something interesting");
 }
 
 void SuggestWhatToDoAction::relax()
 {
-    ai->TellMasterNoFacing("It is so boring... We could relax a bit", PLAYERBOT_SECURITY_ALLOW_ALL);
+	spam("It is so boring... We could relax a bit");
 }
 
 void SuggestWhatToDoAction::achievement()
 {
     if (bot->getLevel() > 15)
         spam("I would like to get some achievement. Would you like to join me?");
+}
+
+void SuggestWhatToDoAction::spam(string msg, uint32 channelId)
+{
+
 }
 
 class FindTradeItemsVisitor : public IterateItemsVisitor
@@ -179,11 +177,12 @@ private:
 };
 
 
-void SuggestWhatToDoAction::trade()
+SuggestTradeAction::SuggestTradeAction(PlayerbotAI* ai) : SuggestWhatToDoAction(ai, "suggest trade")
 {
-    if (!sRandomPlayerbotMgr.IsRandomBot(bot))
-        return;
+}
 
+bool SuggestTradeAction::Execute(Event event)
+{
     uint32 quality = urand(0, 100);
     if (quality > 90)
         quality = ITEM_QUALITY_EPIC;
@@ -222,33 +221,17 @@ void SuggestWhatToDoAction::trade()
     }
 
     if (!item || !count)
-        return;
+		return false;
 
     ItemTemplate const* proto = sObjectMgr->GetItemTemplate(item);
     if (!proto)
-        return;
+		return false;
 
     uint32 price = proto->SellPrice * sRandomPlayerbotMgr.GetSellMultiplier(bot) * count;
     if (!price)
-        return;
+		return false;
 
-    ostringstream out; out << "Selling " << chat->formatItem(proto, count) << " for " << chat->formatMoney(price);
-    spam(out.str());
-}
-
-void SuggestWhatToDoAction::spam(string msg)
-{
-    Player* player = sRandomPlayerbotMgr.GetRandomPlayer();
-    if (!player || !player->IsInWorld())
-        return;
-
-    if (!ai->GetSecurity()->CheckLevelFor(PLAYERBOT_SECURITY_TALK, true, player))
-        return;
-
-    if (sPlayerbotAIConfig.whisperDistance && !bot->GetGroup() && sRandomPlayerbotMgr.IsRandomBot(bot) &&
-            player->GetSession()->GetSecurity() < SEC_GAMEMASTER &&
-            (bot->GetMapId() != player->GetMapId() || bot->GetDistance(player) > sPlayerbotAIConfig.whisperDistance))
-        return;
-
-	bot->Whisper(msg, LANG_UNIVERSAL, player->GetGUID());
+    /*ostringstream out; out << "Selling " << chat->formatItem(proto, count) << " for " << chat->formatMoney(price);
+    spam(out.str(), 2);
+    return false;*/
 }

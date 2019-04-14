@@ -12,6 +12,10 @@
 #include "Define.h"
 #include "Util.h"
 #include "SharedDefines.h"
+#include "stdint-gcc.h"
+
+typedef uint32_t uint32;
+typedef uint32_t int32;
 
 // Structures using to access raw DBC data and required packing to portability
 

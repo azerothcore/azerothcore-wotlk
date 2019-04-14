@@ -110,16 +110,16 @@ public:
 	virtual void UpdateAIInternal(uint32 elapsed);
 	string HandleRemoteCommand(string command);
     void HandleCommand(uint32 type, const string& text, Player& fromPlayer);
-        void HandleBotOutgoingPacket(const WorldPacket& packet);
+	void HandleBotOutgoingPacket(const WorldPacket& packet);
     void HandleMasterIncomingPacket(const WorldPacket& packet);
     void HandleMasterOutgoingPacket(const WorldPacket& packet);
-        void HandleTeleportAck();
+	void HandleTeleportAck();
     void ChangeEngine(BotState type);
     void DoNextAction();
     void DoSpecificAction(string name);
     void ChangeStrategy(string name, BotState type);
-        void ClearStrategies(BotState type);
-        list<string> GetStrategies(BotState type);
+	void ClearStrategies(BotState type);
+	list<string> GetStrategies(BotState type);
     bool ContainsStrategy(StrategyType type);
     bool HasStrategy(string name, BotState type);
     void ResetStrategies();
@@ -164,7 +164,7 @@ private:
     void _fillGearScoreData(Player *player, Item* item, std::vector<uint32>* gearScore, uint32& twoHandScore);
 
 public:
-        Player* GetBot() { return bot; }
+	Player* GetBot() { return bot; }
     Player* GetMaster() { return master; }
     void SetMaster(Player* master) { this->master = master; }
     AiObjectContext* GetAiObjectContext() { return aiObjectContext; }
@@ -182,10 +182,11 @@ protected:
     Engine* engines[BOT_STATE_MAX];
     BotState currentState;
     ChatHelper chatHelper;
-        queue<ChatCommandHolder> chatCommands;
+	queue<ChatCommandHolder> chatCommands;
     PacketHandlingHelper botOutgoingPacketHandlers;
     PacketHandlingHelper masterIncomingPacketHandlers;
     PacketHandlingHelper masterOutgoingPacketHandlers;
     CompositeChatFilter chatFilter;
     PlayerbotSecurity security;
 };
+

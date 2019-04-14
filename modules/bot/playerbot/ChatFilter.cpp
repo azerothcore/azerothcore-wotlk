@@ -65,7 +65,7 @@ public:
             return message;
         }
 
-                int level = atoi(message.substr(message.find("@") + 1, message.find(" ")).c_str());
+		int level = atoi(message.substr(message.find("@") + 1, message.find(" ")).c_str());
         if (bot->getLevel() == level)
             return ChatFilter::Filter(message);
 
@@ -254,3 +254,4 @@ string CompositeChatFilter::Filter(string message)
 
     return message;
 }
+
