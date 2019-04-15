@@ -558,21 +558,24 @@ public:
 #####*/
 enum DragonmawPeon
 {
+    SAY_1                      = 0,
+    SAY_POISONED_1             = 1,
 
-    SAY_1 = 0,
-    SAY_POISONED_1 = 1,
+    SPELL_POISON               = 40468,
+    SPELL_KICK                 = 15610,
+    SPELL_SUNDER               = 15572,
+    SPELL_VOMIT                = 43327,
 
-    SPELL_POISON = 40468,
-    SPELL_KICK = 15610,
-    SPELL_SUNDER = 15572,
-    SPELL_VOMIT = 43327,
+    EVENT_KICK                 = 1,
+    EVENT_SUNDER               = 2,
+    EVENT_CHECK_POISON         = 3,
+    EVENT_WALK_TO_MUTTON       = 4,
+    EVENT_POISONED             = 5,
+    EVENT_KILL                 = 6,
 
-    EVENT_KICK = 1,
-    EVENT_SUNDER = 2,
-    EVENT_CHECK_POISON = 3,
-    EVENT_WALK_TO_MUTTON = 4,
-    EVENT_POISONED = 5,
-    EVENT_KILL = 6
+    DELICIOUS_MUTTON           = 185893,
+    QUEST_A_SLOW_DEATH         = 11020,
+    DRAGONMAW_PEON_KILL_CREDIT = 23209
 };
 
 class npc_dragonmaw_peon : public CreatureScript
@@ -580,7 +583,7 @@ class npc_dragonmaw_peon : public CreatureScript
 public:
     npc_dragonmaw_peon() : CreatureScript("npc_dragonmaw_peon") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_dragonmaw_peonAI(creature);
     }
@@ -590,25 +593,23 @@ public:
         npc_dragonmaw_peonAI(Creature* creature) : ScriptedAI(creature) { }
 
         EventMap events;
-        EventMap events2;
         uint64 PlayerGUID;
         bool Tapped;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
-            events2.Reset();
             PlayerGUID = 0;
             Tapped = false;
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             events.ScheduleEvent(EVENT_KICK, urand(5000, 10000));
             events.ScheduleEvent(EVENT_SUNDER, urand(5000, 10000));
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spell)
+        void SpellHit(Unit* caster, const SpellInfo* spell) override
         {
             if (!caster)
                 return;
@@ -620,18 +621,18 @@ public:
                 Tapped = true;
                 caster->GetClosePoint(x, y, z, me->GetObjectSize());
                 Talk(SAY_1);
-                events2.ScheduleEvent(EVENT_WALK_TO_MUTTON, 0);
+                events.ScheduleEvent(EVENT_WALK_TO_MUTTON, 0);
             }
         }
 
-        void MovementInform(uint32 /*type*/, uint32 id)
+        void MovementInform(uint32 /*type*/, uint32 id) override
         {
             if (id == 1)
             {
-                if (GameObject* food = me->FindNearestGameObject(185893, 5.0f))
+                if (GameObject* food = me->FindNearestGameObject(DELICIOUS_MUTTON, 5.0f))
                     me->SetFacingToObject(food);
                 me->HandleEmoteCommand(EMOTE_ONESHOT_EAT);
-                events2.ScheduleEvent(EVENT_POISONED, 5000);
+                events.ScheduleEvent(EVENT_POISONED, 5000);
             }
         }
 
@@ -640,21 +641,19 @@ public:
             if (PlayerGUID)
             {
                 Player* player = ObjectAccessor::GetPlayer(*me, PlayerGUID);
-                if (player && player->GetQuestStatus(11020) == QUEST_STATUS_INCOMPLETE)
-                    player->KilledMonsterCredit(23209, 0);
+                if (player && player->GetQuestStatus(QUEST_A_SLOW_DEATH) == QUEST_STATUS_INCOMPLETE)
+                    player->KilledMonsterCredit(DRAGONMAW_PEON_KILL_CREDIT, 0);
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
-            events2.Update(diff);
 
             if (!UpdateVictim())
             {
-                switch (events2.ExecuteEvent())
+                switch (events.ExecuteEvent())
                 {
-
                 case EVENT_WALK_TO_MUTTON:
                     me->SetWalk(true);
                     me->GetMotionMaster()->MovePoint(1, x, y, z, true);
@@ -662,13 +661,13 @@ public:
                     me->HandleEmoteCommand(EMOTE_ONESHOT_CHEER);
                     break;
                 case EVENT_POISONED:
-                    if (GameObject* food = me->FindNearestGameObject(185893, 5.0f))
+                    if (GameObject* food = me->FindNearestGameObject(DELICIOUS_MUTTON, 5.0f))
                         food->RemoveFromWorld();
                     if (roll_chance_i(20))
                         Talk(SAY_POISONED_1);
                     CreditPlayer();
                     me->CastSpell(me, SPELL_VOMIT);
-                    events2.ScheduleEvent(EVENT_KILL, 5000);
+                    events.ScheduleEvent(EVENT_KILL, 5000);
                     break;
                 case EVENT_KILL:
                     Unit::DealDamage(me, me, me->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
@@ -679,7 +678,6 @@ public:
 
             switch (events.ExecuteEvent())
             {
-
             case EVENT_KICK:
                 if (me->GetVictim()->HasUnitState(SPELL_STATE_CASTING))
                     DoCastVictim(SPELL_KICK);
