@@ -148,7 +148,7 @@ World::~World()
     }
 
     CliCommandHolder* command = NULL;
-    while (cliCmdQueue.next(command))
+    while (m_cliCommandQueueLock.next(command))
         delete command;
 
     VMAP::VMapFactory::clear();
@@ -239,7 +239,9 @@ bool World::KickSession(uint32 id)
 
 void World::AddSession(WorldSession* s)
 {
-    addSessQueue.add(s);
+    std::lock_guard<std::mutex> guard(m_sessionAddQueueLock);
+
+    m_sessionAddQueue.push_back(s);
 }
 
 void World::AddSession_(WorldSession* s)
@@ -2563,9 +2565,11 @@ void World::SendServerMessage(ServerMessageType type, const char *text, Player* 
 
 void World::UpdateSessions(uint32 diff)
 {
+    std::lock_guard<std::mutex> guard(m_sessionAddQueueLock);
+
     ///- Add new sessions
     WorldSession* sess = NULL;
-    while (addSessQueue.next(sess))
+    while (m_sessionAddQueue.next(sess))
         AddSession_ (sess);
 
     ///- Then send an update signal to remaining ones
@@ -2631,10 +2635,12 @@ void World::UpdateSessions(uint32 diff)
 // This handles the issued and queued CLI commands
 void World::ProcessCliCommands()
 {
+    std::lock_guard<std::mutex> guard(m_cliCommandQueueLock);
+
     CliCommandHolder::Print* zprint = NULL;
     void* callbackArg = NULL;
     CliCommandHolder* command = NULL;
-    while (cliCmdQueue.next(command))
+    while (m_cliCommandQueueLock.next(command))
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         sLog->outDetail("CLI command under processing...");

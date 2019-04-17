@@ -136,6 +136,7 @@ WorldSession::WorldSession(uint32 id, WorldSocket* sock, AccountTypes sec, uint8
 WorldSession::~WorldSession()
 {
     LoginDatabase.PExecute("UPDATE account SET totaltime = %u WHERE id = %u", GetTotalTime(), GetAccountId());
+    std::lock_guard<std::mutex> guard(m_recvQueueLock);
 
     ///- unload player if not unloaded
     if (_player)
@@ -157,7 +158,7 @@ WorldSession::~WorldSession()
 
     ///- empty incoming packet queue
     WorldPacket* packet = NULL;
-    while (_recvQueue.next(packet))
+    while (m_recvQueue.next(packet))
         delete packet;
 
     if (GetShouldSetOfflineInDB())
@@ -240,14 +241,18 @@ void WorldSession::SendPacket(WorldPacket const* packet)
 }
 
 /// Add an incoming packet to the queue
-void WorldSession::QueuePacket(WorldPacket* new_packet)
+void WorldSession::QueuePacket(std::unique_ptr<WorldPacket> new_packet)
 {
-    _recvQueue.add(new_packet);
+    std::lock_guard<std::mutex> guard(m_recvQueueLock);
+    m_recvQueue.push_back(std::move(new_packet));
 }
 
 /// Update the WorldSession (triggered by World update)
 bool WorldSession::Update(uint32 diff, PacketFilter& updater)
 {
+
+    std::lock_guard<std::mutex> guard(m_recvQueueLock);
+
     if (updater.ProcessLogout())
     {
         UpdateTimeOutTime(diff);
@@ -267,7 +272,7 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
     WorldPacket* firstDelayedPacket = NULL;
     uint32 processedPackets = 0;
 
-    while (m_Socket && !m_Socket->IsClosed() && !_recvQueue.empty() && _recvQueue.peek(true) != firstDelayedPacket && _recvQueue.next(packet, updater))
+    while (m_Socket && !m_Socket->IsClosed() && !m_recvQueue.empty() && m_recvQueue.peek(true) != firstDelayedPacket && m_recvQueue.next(packet, updater))
     {
         if (packet->GetOpcode() < NUM_MSG_TYPES)
         {

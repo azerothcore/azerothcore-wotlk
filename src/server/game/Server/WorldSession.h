@@ -994,12 +994,14 @@ class WorldSession
         AddonsList m_addonsList;
         uint32 recruiterId;
         bool isRecruiter;
-        ACE_Based::LockedQueue<WorldPacket*, ACE_Thread_Mutex> _recvQueue;
         uint64 m_currentBankerGUID;
         time_t timeWhoCommandAllowed;
         uint32 _offlineTime;
         bool _kicked;
         bool _shouldSetOfflineInDB;
+
+        std::mutex m_recvQueueLock;
+        std::deque<std::unique_ptr<WorldPacket>> m_recvQueue;
 };
 #endif
 /// @}

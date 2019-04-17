@@ -856,7 +856,8 @@ class World
         std::string _realmName;
 
         // CLI command holder to be thread safe
-        ACE_Based::LockedQueue<CliCommandHolder*, ACE_Thread_Mutex> cliCmdQueue;
+        std::mutex m_cliCommandQueueLock;
+        std::deque<const CliCommandHolder*> m_cliCommandQueue;
 
         // next daily quests and random bg reset time
         time_t m_NextDailyQuestReset;
@@ -870,7 +871,9 @@ class World
 
         // sessions that are added async
         void AddSession_(WorldSession* s);
-        ACE_Based::LockedQueue<WorldSession*, ACE_Thread_Mutex> addSessQueue;
+
+        std::mutex m_sessionAddQueueLock;
+        std::deque<WorldSession*> m_sessionAddQueue;
 
         // used versions
         std::string m_DBVersion;
