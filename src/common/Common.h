@@ -128,8 +128,6 @@ using namespace std;
 
 inline float finiteAlways(float f) { return isfinite(f) ? f : 0.0f; }
 
-inline bool myisfinite(float f) { return isfinite(f) && !isnan(f); }
-
 #define atol(a) strtoul( a, NULL, 10)
 
 #define STRINGIZE(a) #a
