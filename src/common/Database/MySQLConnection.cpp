@@ -517,7 +517,7 @@ bool MySQLConnection::_HandleMySQLErrno(uint32 errNo)
         case CR_SERVER_GONE_ERROR:
         case CR_SERVER_LOST:
         case CR_SERVER_LOST_EXTENDED:
-#if !defined MARIADB
+#if !(MARIADB_VERSION_ID >= 100200)
         case CR_INVALID_CONN_HANDLE:
 #endif
         {
