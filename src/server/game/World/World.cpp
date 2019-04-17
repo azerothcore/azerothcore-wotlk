@@ -1982,19 +1982,19 @@ void World::DetectDBCLang()
 {
     uint8 m_lang_confid = sConfigMgr->GetIntDefault("DBC.Locale", 255);
 
-    if (m_lang_confid != 255 && m_lang_confid >= TOTAL_LOCALES)
+    if (m_lang_confid != 255 && m_lang_confid >= MAX_LOCALE)
     {
-        sLog->outError("Incorrect DBC.Locale! Must be >= 0 and < %d (set to 0)", TOTAL_LOCALES);
+        sLog->outError("Incorrect DBC.Locale! Must be >= 0 and < %d (set to 0)", MAX_LOCALE);
         m_lang_confid = LOCALE_enUS;
     }
 
     ChrRacesEntry const* race = sChrRacesStore.LookupEntry(1);
     std::string availableLocalsStr;
 
-    uint8 default_locale = TOTAL_LOCALES;
-    for (uint8 i = default_locale -1; i < TOTAL_LOCALES; --i)  // -1 will be 255 due to uint8
+    uint32 default_locale = MAX_LOCALE;
+    for (int i = MAX_LOCALE - 1; i >= 0; --i)
     {
-        if (race->name[i][0] != '\0')                     // check by race names
+        if (strlen(race->name[i]) > 0)                      // check by race names
         {
             default_locale = i;
             m_availableDbcLocaleMask |= (1 << i);
@@ -2003,13 +2003,13 @@ void World::DetectDBCLang()
         }
     }
 
-    if (default_locale != m_lang_confid && m_lang_confid < TOTAL_LOCALES &&
-        (m_availableDbcLocaleMask & (1 << m_lang_confid)))
+    if (default_locale != m_lang_confid && m_lang_confid < MAX_LOCALE &&
+            (m_availableDbcLocaleMask & (1 << m_lang_confid)))
     {
         default_locale = m_lang_confid;
     }
-        
-    if (default_locale >= TOTAL_LOCALES)
+
+    if (default_locale >= MAX_LOCALE)
     {
         sLog->outError("Unable to determine your DBC Locale! (corrupt DBC?)");
         exit(1);
@@ -2646,9 +2646,7 @@ void World::UpdateSessions(uint32 diff)
 void World::ProcessCliCommands()
 {
     std::lock_guard<std::mutex> guard(m_cliCommandQueueLock);
-
-    void* callbackArg = nullptr;
-    CliCommandHolder* command = nullptr;
+    
     while (!m_cliCommandQueue.empty())
     {
         auto const command = m_cliCommandQueue.front();
@@ -2658,7 +2656,6 @@ void World::ProcessCliCommands()
         sLog->outDetail("CLI command under processing...");
 #endif
 
-        callbackArg = m_callbackArg;
         CliHandler handler(command->m_callbackArg, command->m_print);
         handler.ParseCommands(&command->m_command[0]);
 

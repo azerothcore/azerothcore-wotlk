@@ -135,12 +135,11 @@ class ChatHandler
 class CliHandler : public ChatHandler
 {
     private:
-        void* m_callbackArg;
         typedef std::function<void(const char*)> Print;
         Print m_print;
 
     public:
-        CliHandler(void* callbackArg, Print zprint) : m_callbackArg(callbackArg), m_print(std::move(zprint)) {}
+        CliHandler(Print zprint) : m_print(std::move(zprint)) {}
 
         // overwrite functions
         char const* GetTrinityString(uint32 entry) const override;

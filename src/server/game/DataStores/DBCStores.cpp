@@ -210,7 +210,7 @@ inline void LoadDBC(uint32& availableDbcLocales, StoreProblemList& errors, DBCSt
 
     if (storage.Load(dbcFilename.c_str(), sql))
     {
-        for (uint8 i = 0; i < TOTAL_LOCALES; ++i)
+        for (uint8 i = 0; i < MAX_LOCALE; ++i)
         {
             if (!(availableDbcLocales & (1 << i)))
                 continue;

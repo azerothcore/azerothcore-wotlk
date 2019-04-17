@@ -852,9 +852,11 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
         LoginDatabase.Execute(stmt);
     }
 
-    locale = LocaleConstant (fields[7].GetUInt8());
-    if (locale >= TOTAL_LOCALES)
+    uint8 tempLoc = LocaleConstant (fields[7].GetUInt8());
+    if (tempLoc >= static_cast<uint8>(MAX_LOCALE))
         locale = LOCALE_enUS;
+    else
+        locale = LocaleConstant(tempLoc);
 
     uint32 recruiter = fields[8].GetUInt32();
     std::string os = fields[9].GetString();

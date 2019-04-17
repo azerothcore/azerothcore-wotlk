@@ -155,7 +155,7 @@ enum AccountTypes
 
 enum LocaleConstant
 {
-    LOCALE_enUS = 0,
+    LOCALE_enUS = 0,                                        // also enGB
     LOCALE_koKR = 1,
     LOCALE_frFR = 2,
     LOCALE_deDE = 3,
@@ -166,15 +166,33 @@ enum LocaleConstant
     LOCALE_ruRU = 8
 };
 
-const uint8 TOTAL_LOCALES = 9;
-#define DEFAULT_LOCALE LOCALE_enUS
+#define MAX_LOCALE 9
 
-#define MAX_LOCALES 8
-#define MAX_ACCOUNT_TUTORIAL_VALUES 8
-
-extern char const* localeNames[TOTAL_LOCALES];
+#define DEFAULT_LOCALE LOCALE_enUS //omg shity stuff 
 
 LocaleConstant GetLocaleByName(const std::string& name);
+
+extern char const* localeNames[MAX_LOCALE];
+
+#define MAX_ACCOUNT_TUTORIAL_VALUES 8
+
+struct LocaleNameStr
+{
+    char const* name;
+    LocaleConstant locale;
+};
+
+// used for iterate all names including alternative
+extern LocaleNameStr const fullLocaleNameList[];
+
+// operator new[] based version of strdup() function! Release memory by using operator delete[] !
+inline char* acore_strdup(const char* source)
+{
+    char* dest = new char[strlen(source) + 1];
+    strcpy(dest, source);
+    return dest;
+}
+
 void CleanStringForMysqlQuery(std::string& str);
 
 typedef std::vector<std::string> StringVector;

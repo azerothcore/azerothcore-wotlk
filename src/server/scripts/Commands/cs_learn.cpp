@@ -405,7 +405,7 @@ public:
             if (!Utf8FitTo(name, namePart))
             {
                 locale = 0;
-                for (; locale < TOTAL_LOCALES; ++locale)
+                for (; locale < MAX_LOCALE; ++locale)
                 {
                     if (locale == handler->GetSessionDbcLocale())
                         continue;
@@ -419,7 +419,7 @@ public:
                 }
             }
 
-            if (locale < TOTAL_LOCALES)
+            if (locale < MAX_LOCALE)
             {
                 targetSkillInfo = skillInfo;
                 break;

@@ -7731,7 +7731,7 @@ bool ObjectMgr::LoadTrinityStrings()
 
         data.Content.resize(DEFAULT_LOCALE + 1);
 
-        for (uint8 i = 0; i < TOTAL_LOCALES; ++i)
+        for (uint8 i = 0; i < MAX_LOCALE; ++i)
             AddLocaleString(fields[i + 1].GetString(), LocaleConstant(i), data.Content);
 
     } while (result->NextRow());

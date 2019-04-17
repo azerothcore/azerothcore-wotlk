@@ -193,7 +193,7 @@ bool ItemChatLink::ValidateName(char* buffer, const char* context)
     if (!res)
     {
         ItemLocale const* il = sObjectMgr->GetItemLocale(_item->ItemId);
-        for (uint8 index = LOCALE_koKR; index < TOTAL_LOCALES; ++index)
+        for (uint8 index = LOCALE_koKR; index < MAX_LOCALE; ++index)
         {
             if (FormatName(index, il, suffixStrings) == buffer)
             {
@@ -326,7 +326,7 @@ bool SpellChatLink::ValidateName(char* buffer, const char* context)
             return false;
         }
 
-        for (uint8 i = 0; i < TOTAL_LOCALES; ++i)
+        for (uint8 i = 0; i < MAX_LOCALE; ++i)
         {
             uint32 skillLineNameLength = strlen(skillLine->name[i]);
             if (skillLineNameLength > 0 && strncmp(skillLine->name[i], buffer, skillLineNameLength) == 0)
@@ -341,7 +341,7 @@ bool SpellChatLink::ValidateName(char* buffer, const char* context)
     }
 
     bool res = false;
-    for (uint8 i = 0; i < TOTAL_LOCALES; ++i)
+    for (uint8 i = 0; i < MAX_LOCALE; ++i)
         if (*_spell->SpellName[i] && strcmp(_spell->SpellName[i], buffer) == 0)
         {
             res = true;
@@ -413,7 +413,7 @@ bool AchievementChatLink::ValidateName(char* buffer, const char* context)
     ChatLink::ValidateName(buffer, context);
 
     bool res = false;
-    for (uint8 i = 0; i < TOTAL_LOCALES; ++i)
+    for (uint8 i = 0; i < MAX_LOCALE; ++i)
         if (*_achievement->name[i] && strcmp(_achievement->name[i], buffer) == 0)
         {
             res = true;

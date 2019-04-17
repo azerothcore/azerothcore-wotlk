@@ -100,7 +100,7 @@ public:
                 if (!Utf8FitTo(name, wNamePart))
                 {
                     locale = 0;
-                    for (; locale < TOTAL_LOCALES; ++locale)
+                    for (; locale < MAX_LOCALE; ++locale)
                     {
                         if (locale == handler->GetSessionDbcLocale())
                             continue;
@@ -114,7 +114,7 @@ public:
                     }
                 }
 
-                if (locale < TOTAL_LOCALES)
+                if (locale < MAX_LOCALE)
                 {
                     if (maxResults && count++ == maxResults)
                     {
@@ -312,7 +312,7 @@ public:
                 if (!Utf8FitTo(name, wNamePart))
                 {
                     locale = 0;
-                    for (; locale < TOTAL_LOCALES; ++locale)
+                    for (; locale < MAX_LOCALE; ++locale)
                     {
                         if (locale == handler->GetSessionDbcLocale())
                             continue;
@@ -326,7 +326,7 @@ public:
                     }
                 }
 
-                if (locale < TOTAL_LOCALES)
+                if (locale < MAX_LOCALE)
                 {
                     if (maxResults && count++ == maxResults)
                     {
@@ -492,7 +492,7 @@ public:
                 if (!Utf8FitTo(name, wNamePart))
                 {
                     locale = 0;
-                    for (; locale < TOTAL_LOCALES; ++locale)
+                    for (; locale < MAX_LOCALE; ++locale)
                     {
                         if (locale == handler->GetSessionDbcLocale())
                             continue;
@@ -506,7 +506,7 @@ public:
                     }
                 }
 
-                if (locale < TOTAL_LOCALES)
+                if (locale < MAX_LOCALE)
                 {
                     if (maxResults && count++ == maxResults)
                     {
@@ -719,7 +719,7 @@ public:
                 if (!Utf8FitTo(name, wNamePart))
                 {
                     locale = 0;
-                    for (; locale < TOTAL_LOCALES; ++locale)
+                    for (; locale < MAX_LOCALE; ++locale)
                     {
                         if (locale == handler->GetSessionDbcLocale())
                             continue;
@@ -733,7 +733,7 @@ public:
                     }
                 }
 
-                if (locale < TOTAL_LOCALES)
+                if (locale < MAX_LOCALE)
                 {
                     if (maxResults && count++ == maxResults)
                     {
@@ -807,7 +807,7 @@ public:
                 if (!Utf8FitTo(name, wNamePart))
                 {
                     locale = 0;
-                    for (; locale < TOTAL_LOCALES; ++locale)
+                    for (; locale < MAX_LOCALE; ++locale)
                     {
                         if (locale == handler->GetSessionDbcLocale())
                             continue;
@@ -821,7 +821,7 @@ public:
                     }
                 }
 
-                if (locale < TOTAL_LOCALES)
+                if (locale < MAX_LOCALE)
                 {
                     if (maxResults && count++ == maxResults)
                     {
@@ -909,7 +909,7 @@ public:
                 return true;
             }
 
-            if (locale < TOTAL_LOCALES)
+            if (locale < MAX_LOCALE)
             {
                 if (maxResults && count++ == maxResults)
                 {
@@ -1004,7 +1004,7 @@ public:
                 if (!Utf8FitTo(name, wNamePart))
                 {
                     locale = 0;
-                    for (; locale < TOTAL_LOCALES; ++locale)
+                    for (; locale < MAX_LOCALE; ++locale)
                     {
                         if (locale == handler->GetSessionDbcLocale())
                             continue;
@@ -1018,7 +1018,7 @@ public:
                     }
                 }
 
-                if (locale < TOTAL_LOCALES)
+                if (locale < MAX_LOCALE)
                 {
                     if (maxResults && count++ == maxResults)
                     {
@@ -1141,7 +1141,7 @@ public:
                 if (!Utf8FitTo(name, wNamePart))
                 {
                     locale = 0;
-                    for (; locale < TOTAL_LOCALES; ++locale)
+                    for (; locale < MAX_LOCALE; ++locale)
                     {
                         if (locale == handler->GetSessionDbcLocale())
                             continue;
@@ -1155,7 +1155,7 @@ public:
                     }
                 }
 
-                if (locale < TOTAL_LOCALES)
+                if (locale < MAX_LOCALE)
                 {
                     if (maxResults && counter == maxResults)
                     {
@@ -1214,7 +1214,7 @@ public:
                 if (name.empty())
                     continue;
 
-                if (Utf8FitTo(name, wNamePart) && locale < TOTAL_LOCALES)
+                if (Utf8FitTo(name, wNamePart) && locale < MAX_LOCALE)
                 {
                     if (maxResults && counter == maxResults)
                     {

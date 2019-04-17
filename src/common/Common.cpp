@@ -6,23 +6,40 @@
 
 #include "Common.h"
 
-char const* localeNames[TOTAL_LOCALES] = {
-  "enUS",
-  "koKR",
-  "frFR",
-  "deDE",
-  "zhCN",
-  "zhTW",
-  "esES",
-  "esMX",
-  "ruRU"
+char const* localeNames[MAX_LOCALE] =
+{
+    "enUS",                                                 // also enGB
+    "koKR",
+    "frFR",
+    "deDE",
+    "zhCN",
+    "zhTW",
+    "esES",
+    "esMX",
+    "ruRU"
+};
+
+// used for search by name or iterate all names
+LocaleNameStr const fullLocaleNameList[] =
+{
+    { "enUS", LOCALE_enUS },
+    { "enGB", LOCALE_enUS },
+    { "koKR", LOCALE_koKR },
+    { "frFR", LOCALE_frFR },
+    { "deDE", LOCALE_deDE },
+    { "zhCN", LOCALE_zhCN },
+    { "zhTW", LOCALE_zhTW },
+    { "esES", LOCALE_esES },
+    { "esMX", LOCALE_esMX },
+    { "ruRU", LOCALE_ruRU },
+    { nullptr,   LOCALE_enUS }
 };
 
 LocaleConstant GetLocaleByName(const std::string& name)
 {
-    for (uint32 i = 0; i < TOTAL_LOCALES; ++i)
-        if (name==localeNames[i])
-            return LocaleConstant(i);
+    for (LocaleNameStr const* itr = &fullLocaleNameList[0]; itr->name; ++itr)
+        if (name == itr->name)
+            return itr->locale;
 
     return LOCALE_enUS;                                     // including enGB case
 }
