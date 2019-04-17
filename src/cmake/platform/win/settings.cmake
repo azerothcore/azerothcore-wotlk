@@ -2,8 +2,8 @@
 option(USE_MYSQL_SOURCES "Use included MySQL-sources to build libraries" 0)
 
 # Package overloads
-set(BZIP2_LIBRARIES "bzip2")
-set(ZLIB_LIBRARIES "zlib")
+set(ACE_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/deps/acelite)
+set(ACE_LIBRARY "ace")
 
 if( USE_MYSQL_SOURCES )
   set(MYSQL_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/deps/mysqllite/include)
