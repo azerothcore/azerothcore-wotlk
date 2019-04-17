@@ -759,11 +759,6 @@ public:
                             summons.Summon(cr);
                             cr->SetPhaseMask(16, true);
                         }
-                        if ((cr = me->SummonCreature(NPC_TWILIGHT_WHELP, EggsPos[isSartharion ? i+6 : i].GetPositionX(), EggsPos[isSartharion ? i+6 : i].GetPositionY(), EggsPos[isSartharion ? i+6 : i].GetPositionZ(), EggsPos[isSartharion ? i+6 : i].GetOrientation(), TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 60000)))
-                        {
-                            summons.Summon(cr);
-                            cr->SetPhaseMask(16, true);
-                        }
                     }
 
                     events.ScheduleEvent(EVENT_MINIBOSS_HATCH_EGGS, 25000);
