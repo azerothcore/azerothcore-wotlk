@@ -31,7 +31,7 @@
 #include "SpellAuraEffects.h"
 #include "Chat.h"
 #include "Vehicle.h"
-
+#include "SharedDefines.h"
 
 // Ours
 class spell_gen_model_visible : public SpellScriptLoader
@@ -4914,9 +4914,49 @@ class spell_gen_eject_passenger : public SpellScriptLoader
         }
 };
 
+class spell_activate_talent : public SpellScriptLoader
+{
+public:
+    spell_activate_talent() : SpellScriptLoader("spell_activate_talent") { }
+
+    class spell_activate_talent_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_activate_talent_SpellScript);
+
+        SpellCastResult CanSwapTalents ()
+        {
+            if (Player* target = GetCaster()->ToPlayer())
+            {
+                if (target->getClass() == CLASS_HUNTER)
+                {
+                    if (Pet* pet = target->GetPet())
+                    {
+                        if (pet->GetCreatureTemplate()->type_flags == 65536 && !target->HasTalent(53270, GetSpellInfo()->Effects[EFFECT_0].BasePoints))
+                            return SPELL_FAILED_CUSTOM_ERROR;
+                        return SPELL_CAST_OK;
+                    }
+                    return SPELL_CAST_OK;
+                }
+               return SPELL_CAST_OK;
+            }
+        }
+
+        void Register()
+        {
+            OnCheckCast += SpellCheckCastFn(spell_activate_talent_SpellScript::CanSwapTalents);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_activate_talent_SpellScript();
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     // ours:
+    new spell_activate_talent();
     new spell_gen_model_visible();
     new spell_the_flag_of_ownership();
     new spell_gen_have_item_auras();
