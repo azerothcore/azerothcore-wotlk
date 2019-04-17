@@ -134,9 +134,13 @@ class ChatHandler
 
 class CliHandler : public ChatHandler
 {
+    private:
+        void* m_callbackArg;
+        typedef std::function<void(const char*)> Print;
+        Print m_print;
+
     public:
-        typedef void Print(void*, char const*);
-        explicit CliHandler(void* callbackArg, Print* zprint) : m_callbackArg(callbackArg), m_print(zprint) {}
+        CliHandler(void* callbackArg, Print zprint) : m_callbackArg(callbackArg), m_print(std::move(zprint)) {}
 
         // overwrite functions
         char const* GetTrinityString(uint32 entry) const override;
@@ -146,10 +150,6 @@ class CliHandler : public ChatHandler
         bool needReportToTarget(Player* chr) const override;
         LocaleConstant GetSessionDbcLocale() const override;
         int GetSessionDbLocaleIndex() const override;
-
-    private:
-        void* m_callbackArg;
-        Print* m_print;
 };
 
 #endif

@@ -150,9 +150,11 @@ World::~World()
         m_offlineSessions.erase(m_offlineSessions.begin());
     }
 
-    CliCommandHolder* command = NULL;
-    while (m_cliCommandQueueLock.next(command))
-        delete command;
+    for (auto const cliCommand : m_cliCommandQueue)
+        delete cliCommand;
+
+    for (auto const session : m_sessionAddQueue)
+        delete session;
 
     VMAP::VMapFactory::clear();
     MMAP::MMapFactory::clear();
@@ -2571,9 +2573,14 @@ void World::UpdateSessions(uint32 diff)
     std::lock_guard<std::mutex> guard(m_sessionAddQueueLock);
 
     ///- Add new sessions
-    WorldSession* sess = NULL;
-    while (m_sessionAddQueue.next(sess))
-        AddSession_ (sess);
+    {
+        std::lock_guard<std::mutex> guard(m_sessionAddQueueLock);
+
+        for (auto const& session : m_sessionAddQueue)
+            AddSession_(session);
+
+        m_sessionAddQueue.clear();
+    }
 
     ///- Then send an update signal to remaining ones
     for (SessionMap::iterator itr = m_sessions.begin(), next; itr != m_sessions.end(); itr = next)
@@ -2640,20 +2647,24 @@ void World::ProcessCliCommands()
 {
     std::lock_guard<std::mutex> guard(m_cliCommandQueueLock);
 
-    CliCommandHolder::Print* zprint = NULL;
-    void* callbackArg = NULL;
-    CliCommandHolder* command = NULL;
-    while (m_cliCommandQueueLock.next(command))
+    void* callbackArg = nullptr;
+    CliCommandHolder* command = nullptr;
+    while (!m_cliCommandQueue.empty())
     {
+        auto const command = m_cliCommandQueue.front();
+        m_cliCommandQueue.pop_front();
+
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         sLog->outDetail("CLI command under processing...");
 #endif
-        zprint = command->m_print;
-        callbackArg = command->m_callbackArg;
-        CliHandler handler(callbackArg, zprint);
-        handler.ParseCommands(command->m_command);
+
+        callbackArg = m_callbackArg;
+        CliHandler handler(command->m_callbackArg, command->m_print);
+        handler.ParseCommands(&command->m_command[0]);
+
         if (command->m_commandFinished)
-            command->m_commandFinished(callbackArg, !handler.HasSentErrorMessage());
+            command->m_commandFinished(!handler.HasSentErrorMessage());
+
         delete command;
     }
 }

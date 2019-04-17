@@ -496,24 +496,19 @@ enum WorldStates
 /// Storage class for commands issued for delayed execution
 struct CliCommandHolder
 {
-    typedef void Print(void*, const char*);
-    typedef void CommandFinished(void*, bool success);
+    typedef std::function<void(const char*)> Print;
+    typedef std::function<void(bool)> CommandFinished;
 
     void* m_callbackArg;
-    char *m_command;
-    Print* m_print;
+    std::vector<char> m_command;
+    Print m_print;
+    CommandFinished m_commandFinished;
 
-    CommandFinished* m_commandFinished;
-
-    CliCommandHolder(void* callbackArg, const char *command, Print* zprint, CommandFinished* commandFinished)
-        : m_callbackArg(callbackArg), m_print(zprint), m_commandFinished(commandFinished)
+    CliCommandHolder(void* callbackArg, const char* command, Print print, CommandFinished commandFinished)
+        : m_callbackArg(callbackArg), m_command(strlen(command) + 1), m_print(std::move(print)), m_commandFinished(std::move(commandFinished))
     {
-        size_t len = strlen(command)+1;
-        m_command = new char[len];
-        memcpy(m_command, command, len);
+         memcpy(&m_command[0], command, m_command.size() - 1);
     }
-
-    ~CliCommandHolder() { delete[] m_command; }
 };
 
 typedef std::unordered_map<uint32, WorldSession*> SessionMap;
