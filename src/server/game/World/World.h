@@ -22,6 +22,11 @@
 #include <map>
 #include <set>
 #include <list>
+#include <deque>
+#include <mutex>
+#include <functional>
+#include <utility>
+#include <vector>
 
 class Object;
 class WorldPacket;

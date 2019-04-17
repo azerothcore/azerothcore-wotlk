@@ -39,6 +39,10 @@
 #include "LuaEngine.h"
 #endif
 
+#include <mutex>
+#include <deque>
+#include <cstdarg>
+
 namespace {
 
 std::string const DefaultPlayerName = "<none>";

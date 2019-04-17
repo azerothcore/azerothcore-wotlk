@@ -20,6 +20,10 @@
 #include "GossipDef.h"
 #include "Cryptography/BigNumber.h"
 
+#include <deque>
+#include <mutex>
+#include <memory>
+
 class Creature;
 class GameObject;
 class InstanceSave;
