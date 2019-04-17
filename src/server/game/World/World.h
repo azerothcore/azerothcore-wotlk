@@ -763,7 +763,7 @@ class World
         void DeleteGlobalPlayerData(uint32 guid, std::string const& name);
 
         void ProcessCliCommands();
-        void QueueCliCommand(CliCommandHolder* commandHolder) { cliCmdQueue.add(commandHolder); }
+        void QueueCliCommand(CliCommandHolder* commandHolder) { std::lock_guard<std::mutex> guard(m_cliCommandQueueLock); m_cliCommandQueue.push_back(commandHolder); }
 
         void ForceGameEventUpdate();
 

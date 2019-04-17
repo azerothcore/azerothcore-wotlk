@@ -195,6 +195,7 @@ class WorldSession
         bool PlayerLoading() const { return m_playerLoading; }
         bool PlayerLogout() const { return m_playerLogout; }
         bool PlayerLogoutWithSave() const { return m_playerLogout && m_playerSave; }
+        bool PlayerRecentlyLoggedOut() const { return m_playerRecentlyLogout; }
 
         void ReadAddonsInfo(WorldPacket& data);
         void SendAddonsInfo();
@@ -968,7 +969,7 @@ class WorldSession
 
         uint32 m_GUIDLow;
         Player* _player;
-        WorldSocket* m_Socket;
+        std::shared_ptr<WorldSocket> m_Socket;
         std::string m_Address;
         // std::string m_LAddress;                             // Last Attempted Remote Adress - we can not set attempted ip for a non-existing session!
 
@@ -987,6 +988,7 @@ class WorldSession
         bool m_inQueue;                                     // session wait in auth.queue
         bool m_playerLoading;                               // code processed in LoginPlayer
         bool m_playerLogout;                                // code processed in LogoutPlayer
+        bool m_playerRecentlyLogout;
         bool m_playerSave;
         LocaleConstant m_sessionDbcLocale;
         LocaleConstant m_sessionDbLocaleIndex;

@@ -107,6 +107,7 @@ WorldSession::WorldSession(uint32 id, WorldSocket* sock, AccountTypes sec, uint8
     m_inQueue(false),
     m_playerLoading(false),
     m_playerLogout(false),
+    m_playerRecentlyLogout(false),
     m_playerSave(false),
     m_sessionDbcLocale(sWorld->GetDefaultDbcLocale()),
     m_sessionDbLocaleIndex(locale),
@@ -151,19 +152,18 @@ WorldSession::~WorldSession()
     {
         m_Socket->CloseSocket("WorldSession destructor");
         m_Socket->RemoveReference();
-        m_Socket = NULL;
+        m_Socket = nullptr;
     }
 
     if (_warden)
     {
         delete _warden;
-        _warden = NULL;
+        _warden = nullptr;
     }
 
     ///- empty incoming packet queue
-    WorldPacket* packet = NULL;
-    while (m_recvQueue.next(packet))
-        delete packet;
+    WorldPacket* packet = nullptr;
+    m_recvQueue.erase(packet);
 
     if (GetShouldSetOfflineInDB())
         LoginDatabase.PExecute("UPDATE account SET online = %u WHERE id = %u;", realmID, GetAccountId());     // One-time query
@@ -270,14 +270,18 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
     HandleTeleportTimeout(updater.ProcessLogout());
 
     uint32 _startMSTime = getMSTime();
-    WorldPacket* packet = NULL;
-    WorldPacket* movementPacket = NULL;
-    bool deletePacket = true;
-    WorldPacket* firstDelayedPacket = NULL;
+    WorldPacket* packet = nullptr;
+    WorldPacket* movementPacket = nullptr;
+    bool deletePacket = nullptr;
+    std::vector<WorldPacket*> requeuePackets;
+    WorldPacket* firstDelayedPacket = nullptr;
     uint32 processedPackets = 0;
 
-    while (m_Socket && !m_Socket->IsClosed() && !m_recvQueue.empty() && m_recvQueue.peek(true) != firstDelayedPacket && m_recvQueue.next(packet, updater))
+    while (m_Socket && !m_Socket->IsClosed() && !m_recvQueue.empty())
     {
+        auto const packet = std::move(m_recvQueue.front());
+        m_recvQueue.pop_front();
+
         if (packet->GetOpcode() < NUM_MSG_TYPES)
         {
             OpcodeHandler &opHandle = opcodeTable[packet->GetOpcode()];
@@ -288,7 +292,14 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
                     case STATUS_LOGGEDIN:
                         if (!_player)
                         {
-                            // pussywizard: such packets were sent to do something for a character that has already logged out, skip them
+                            // skip STATUS_LOGGEDIN opcode unexpected errors if player logout sometime ago - this can be network lag delayed packets
+                            //! If player didn't log out a while ago, it means packets are being sent while the server does not recognize
+                            //! the client to be in world yet. We will re-add the packets to the bottom of the queue and process them later.
+                            if (!m_playerRecentlyLogout)
+                            {
+                                requeuePackets.push_back(packet);
+                                deletePacket = false;
+                            }
                         }
                         else if (!_player->IsInWorld())
                         {
