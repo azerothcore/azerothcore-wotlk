@@ -32,6 +32,7 @@
 #include "Chat.h"
 #include "Vehicle.h"
 #include "SharedDefines.h"
+#include "WorldSession.h"
 
 // Ours
 class spell_gen_model_visible : public SpellScriptLoader
@@ -4914,6 +4915,11 @@ class spell_gen_eject_passenger : public SpellScriptLoader
         }
 };
 
+enum StableErrors
+{
+    STABLE_ERR_EXOTIC = 0x06
+};
+
 class spell_activate_talent : public SpellScriptLoader
 {
 public:
@@ -4931,14 +4937,17 @@ public:
                 {
                     if (Pet* pet = target->GetPet())
                     {
-                        if (pet->GetCreatureTemplate()->type_flags == 65536 && !target->HasTalent(53270, GetSpellInfo()->Effects[EFFECT_0].BasePoints))
-                            return SPELL_FAILED_CUSTOM_ERROR;
+                        uint32 exoticpet = pet->GetCreatureTemplate()->type_flags;
+                        if (exoticpet |= 65536 && !target->HasTalent(2139, GetSpellInfo()->Effects[EFFECT_0].BasePoints))
+                            return SPELL_FAILED_ALREADY_HAVE_CHARM;
                         return SPELL_CAST_OK;
                     }
                     return SPELL_CAST_OK;
                 }
                return SPELL_CAST_OK;
             }
+
+            return SPELL_FAILED_SUCCESS;
         }
 
         void Register()
