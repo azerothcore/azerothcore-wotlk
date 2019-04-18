@@ -1,3 +1,19 @@
+-- DB update 2019_04_16_00 -> 2019_04_18_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2019_04_16_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2019_04_16_00 2019_04_18_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1555051312474328059'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1555051312474328059');
 
 -- reduce the spawn time of the Horde / Alliance defenders
@@ -40,3 +56,12 @@ VALUES
 (-68744,0,8,9,61,0,100,0,0,0,0,0,0,12,18944,3,600000,0,0,0,8,0,0,0,0,-271.232,1105.23,41.6668,5.0713,'Infernal Relay (Hellfire) - Linked - Summon Fel Soldier (18944)'),
 (-68744,0,9,0,61,0,100,0,0,0,0,0,0,12,18944,3,600000,0,0,0,8,0,0,0,0,-231.023,1106.31,41.6668,4.43121,'Infernal Relay (Hellfire) - Linked - Summon Fel Soldier (18944)');
 
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
