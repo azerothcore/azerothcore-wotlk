@@ -556,13 +556,34 @@ public:
 /*#####
 # npc_dragonmaw_peon
 #####*/
+enum DragonmawPeon
+{
+    SAY_1                      = 0,
+    SAY_POISONED_1             = 1,
+
+    SPELL_POISON               = 40468,
+    SPELL_KICK                 = 15610,
+    SPELL_SUNDER               = 15572,
+    SPELL_VOMIT                = 43327,
+
+    EVENT_KICK                 = 1,
+    EVENT_SUNDER               = 2,
+    EVENT_CHECK_POISON         = 3,
+    EVENT_WALK_TO_MUTTON       = 4,
+    EVENT_POISONED             = 5,
+    EVENT_KILL                 = 6,
+
+    DELICIOUS_MUTTON           = 185893,
+    QUEST_A_SLOW_DEATH         = 11020,
+    DRAGONMAW_PEON_KILL_CREDIT = 23209
+};
 
 class npc_dragonmaw_peon : public CreatureScript
 {
 public:
     npc_dragonmaw_peon() : CreatureScript("npc_dragonmaw_peon") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_dragonmaw_peonAI(creature);
     }
@@ -571,64 +592,107 @@ public:
     {
         npc_dragonmaw_peonAI(Creature* creature) : ScriptedAI(creature) { }
 
+        EventMap events;
         uint64 PlayerGUID;
         bool Tapped;
-        uint32 PoisonTimer;
 
-        void Reset()
+        void Reset() override
         {
+            events.Reset();
             PlayerGUID = 0;
             Tapped = false;
-            PoisonTimer = 0;
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spell)
+        void EnterCombat(Unit* /*who*/) override
+        {
+            events.ScheduleEvent(EVENT_KICK, urand(5000, 10000));
+            events.ScheduleEvent(EVENT_SUNDER, urand(5000, 10000));
+        }
+
+        void SpellHit(Unit* caster, const SpellInfo* spell) override
         {
             if (!caster)
                 return;
 
-            if (caster->GetTypeId() == TYPEID_PLAYER && spell->Id == 40468 && !Tapped)
-            {
-                PlayerGUID = caster->GetGUID();
+            PlayerGUID = caster->GetGUID();
 
+            if (caster->GetTypeId() == TYPEID_PLAYER && spell->Id == SPELL_POISON && !Tapped)
+            {
                 Tapped = true;
-                float x, y, z;
                 caster->GetClosePoint(x, y, z, me->GetObjectSize());
-
-                me->SetWalk(false);
-                me->GetMotionMaster()->MovePoint(1, x, y, z);
+                Talk(SAY_1);
+                events.ScheduleEvent(EVENT_WALK_TO_MUTTON, 0);
             }
         }
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 /*type*/, uint32 id) override
         {
-            if (type != POINT_MOTION_TYPE)
-                return;
-
-            if (id)
+            if (id == 1)
             {
-                me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_EAT);
-                PoisonTimer = 15000;
+                if (GameObject* food = me->FindNearestGameObject(DELICIOUS_MUTTON, 5.0f))
+                    me->SetFacingToObject(food);
+                me->HandleEmoteCommand(EMOTE_ONESHOT_EAT);
+                events.ScheduleEvent(EVENT_POISONED, 5000);
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void CreditPlayer()
         {
-            if (PoisonTimer)
+            if (PlayerGUID)
             {
-                if (PoisonTimer <= diff)
+                Player* player = ObjectAccessor::GetPlayer(*me, PlayerGUID);
+                if (player && player->GetQuestStatus(QUEST_A_SLOW_DEATH) == QUEST_STATUS_INCOMPLETE)
+                    player->KilledMonsterCredit(DRAGONMAW_PEON_KILL_CREDIT, 0);
+            }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            events.Update(diff);
+
+            if (!UpdateVictim())
+            {
+                switch (events.ExecuteEvent())
                 {
-                    if (PlayerGUID)
-                    {
-                        Player* player = ObjectAccessor::GetPlayer(*me, PlayerGUID);
-                        if (player && player->GetQuestStatus(11020) == QUEST_STATUS_INCOMPLETE)
-                            player->KilledMonsterCredit(23209, 0);
-                    }
-                    PoisonTimer = 0;
+                case EVENT_WALK_TO_MUTTON:
+                    me->SetWalk(true);
+                    me->GetMotionMaster()->MovePoint(1, x, y, z, true);
+                    me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_NONE);
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_CHEER);
+                    break;
+                case EVENT_POISONED:
+                    if (GameObject* food = me->FindNearestGameObject(DELICIOUS_MUTTON, 5.0f))
+                        food->RemoveFromWorld();
+                    if (roll_chance_i(20))
+                        Talk(SAY_POISONED_1);
+                    CreditPlayer();
+                    me->CastSpell(me, SPELL_VOMIT);
+                    events.ScheduleEvent(EVENT_KILL, 5000);
+                    break;
+                case EVENT_KILL:
                     Unit::DealDamage(me, me, me->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
-                } else PoisonTimer -= diff;
+                    break;
+                }
+                return;
             }
+
+            switch (events.ExecuteEvent())
+            {
+            case EVENT_KICK:
+                if (me->GetVictim()->HasUnitState(SPELL_STATE_CASTING))
+                    DoCastVictim(SPELL_KICK);
+                events.RepeatEvent(urand(5000, 10000));
+                break;
+            case EVENT_SUNDER:
+                DoCastVictim(SPELL_SUNDER);
+                events.RepeatEvent(urand(5000, 10000));
+                break;
+            }
+
+            DoMeleeAttackIfReady();
         }
+    private:
+        float x, y, z;
     };
 };
 
@@ -1753,3 +1817,4 @@ void AddSC_shadowmoon_valley()
     new npc_enraged_spirit();
     new npc_shadowmoon_tuber_node();
 }
+
