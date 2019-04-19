@@ -4945,7 +4945,7 @@ public:
                     {
                         uint32 exoticpet = pet->GetCreatureTemplate()->type_flags;
                         if (exoticpet >= 65536 && !BeastMasteryTalent)
-                            return SPELL_FAILED_NO_PET;
+                            return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
                         return SPELL_CAST_OK;
                     }
                     else if (petTypeFlags) // Pet is dismissed

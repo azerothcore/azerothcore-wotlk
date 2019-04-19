@@ -1730,24 +1730,20 @@ bool Pet::isPetDismissed(Player* owner)
     */
     QueryResult result, FlagResult;
 
-    printf("\nBeforeQuery\n");
     // Look for dismissed current selected pet
     result = CharacterDatabase.PQuery("SELECT entry FROM character_pet WHERE OWNER = '%u' AND slot = 100;", owner->GetGUIDLow());
-    printf("\nafterQuery\n");
+
     // Didn't find a pet in dismissed state
     if (!result)
         return false;
 
-    printf("\ngonna fetch\n");
     // Find the pet entry
     Field* fields = result->Fetch();
     uint32 entry = fields[0].GetUInt32();
 
-    printf("\nfetched\n");
     if (!entry)
         return false;
 
-    printf("\nDismissed: %u\n", entry);
     return true;
 }
 
