@@ -26,11 +26,6 @@ enum Misc
     DATA_SKILLPOINT_MIN                           = 230
 };
 
-#define GOSSIP_ITEM_TEACH_1 "Teach me the art of smelting dark iron"
-#define GOSSIP_ITEM_TEACH_2 "Continue..."
-#define GOSSIP_ITEM_TEACH_3 "[PH] Continue..."
-#define GOSSIP_ITEM_TRIBUTE "I want to pay tribute"
-
 class boss_gloomrel : public CreatureScript
 {
 public:
@@ -42,7 +37,7 @@ public:
         switch (action)
         {
             case GOSSIP_ACTION_INFO_DEF+1:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_TEACH_2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 11);
+                AddGossipItemFor(player, 1828, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 11);
                 SendGossipMenuFor(player, 2606, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF+11:
@@ -50,7 +45,7 @@ public:
                 player->CastSpell(player, SPELL_LEARN_SMELT, false);
                 break;
             case GOSSIP_ACTION_INFO_DEF+2:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_TEACH_3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 22);
+                AddGossipItemFor(player, 1828, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 22);
                 SendGossipMenuFor(player, 2604, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF+22:
@@ -68,10 +63,10 @@ public:
     bool OnGossipHello(Player* player, Creature* creature) override
     {
         if (player->GetQuestRewardStatus(QUEST_SPECTRAL_CHALICE) == 1 && player->GetSkillValue(SKILL_MINING) >= DATA_SKILLPOINT_MIN && !player->HasSpell(SPELL_SMELT_DARK_IRON))
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_TEACH_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            AddGossipItemFor(player, 1945, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
 
         if (player->GetQuestRewardStatus(QUEST_SPECTRAL_CHALICE) == 0 && player->GetSkillValue(SKILL_MINING) >= DATA_SKILLPOINT_MIN)
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_TRIBUTE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+            AddGossipItemFor(player, 1945, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
 
         SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
         return true;
@@ -87,9 +82,6 @@ enum DoomrelSpells
     SPELL_SUMMON_VOIDWALKERS                               = 15092
 };
 
-#define GOSSIP_ITEM_CHALLENGE   "Your bondage is at an end, Doom'rel. I challenge you!"
-#define GOSSIP_SELECT_DOOMREL   "[PH] Continue..."
-
 class boss_doomrel : public CreatureScript
 {
 public:
@@ -101,7 +93,7 @@ public:
         switch (action)
         {
             case GOSSIP_ACTION_INFO_DEF+1:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_SELECT_DOOMREL, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                AddGossipItemFor(player, 1828, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
                 SendGossipMenuFor(player, 2605, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF+2:
@@ -120,7 +112,7 @@ public:
 
     bool OnGossipHello(Player* player, Creature* creature) override
     {
-        AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_CHALLENGE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+        AddGossipItemFor(player, 1947, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
         SendGossipMenuFor(player, 2601, creature->GetGUID());
 
         return true;
@@ -176,7 +168,7 @@ public:
             me->LoadCreaturesAddon(true);
             if (me->IsAlive())
                 me->GetMotionMaster()->MoveTargetedHome();
-            me->SetLootRecipient(NULL);
+            me->SetLootRecipient(nullptr);
             instance->SetData64(DATA_EVENSTARTER, 0);
         }
 
