@@ -1702,6 +1702,7 @@ class Player : public Unit, public GridObject<Player>
         void _removeTalentAurasAndSpells(uint32 spellId);
         void _addTalentAurasAndSpells(uint32 spellId);
         bool HasTalent(uint32 spell_id, uint8 spec) const;
+        bool HasTalentOnTree(uint32 spell_id, uint8 spec) const;
 
         uint32 CalculateTalentsPoints() const;
 

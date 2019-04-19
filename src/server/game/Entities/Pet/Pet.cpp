@@ -1720,6 +1720,31 @@ bool Pet::resetTalents()
     return true;
 }
 
+uint32 Pet::GetActivePetTypeFlags(Player* owner)
+{
+    QueryResult result, FlagResult;
+    result = CharacterDatabase.PQuery("SELECT entry FROM character_pet WHERE OWNER = '%u' AND slot = 100;", owner->GetGUIDLow());
+
+    if (!result)
+        return 0;
+
+    // Find the pet entry
+    Field* fields = result->Fetch();
+    uint32 entry = fields[0].GetUInt32();
+
+    // Find the creature_template with the entry of our active pet
+    FlagResult = WorldDatabase.PQuery("SELECT type_flags FROM creature_template WHERE entry = '%u';", entry);
+
+    if (!FlagResult)
+        return 0;
+
+    // Find the type_flags
+    fields = FlagResult->Fetch();
+    uint32 type_flags = fields[0].GetUInt32();
+
+    return type_flags;
+}
+
 void Pet::resetTalentsForAllPetsOf(Player* owner, Pet* online_pet /*= NULL*/)
 {
     // not need after this call

@@ -32,7 +32,6 @@
 #include "Chat.h"
 #include "Vehicle.h"
 #include "SharedDefines.h"
-#include "WorldSession.h"
 
 // Ours
 class spell_gen_model_visible : public SpellScriptLoader
@@ -4931,16 +4930,27 @@ public:
 
         SpellCastResult CanSwapTalents ()
         {
-            if (Player* target = GetCaster()->ToPlayer())
+            if (Player* player = GetCaster()->ToPlayer())
             {
-                if (target->getClass() == CLASS_HUNTER)
+                int DesiredTree = GetSpellInfo()->Effects[EFFECT_0].BasePoints;
+                bool BeastMasteryTalent = player->HasTalentOnTree(53270, DesiredTree);
+
+                if (player->getClass() == CLASS_HUNTER)
                 {
-                    if (Pet* pet = target->GetPet())
+                    Pet* pet = player->GetPet();
+                    uint32 petTypeFlags = pet->GetActivePetTypeFlags(player);
+                    if (pet) // Pet is active
                     {
                         uint32 exoticpet = pet->GetCreatureTemplate()->type_flags;
-                        if (exoticpet |= 65536 && !target->HasTalent(2139, GetSpellInfo()->Effects[EFFECT_0].BasePoints))
-                            return SPELL_FAILED_ALREADY_HAVE_CHARM;
+                        if (exoticpet >= 65536 && !BeastMasteryTalent)
+                            return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
                         return SPELL_CAST_OK;
+                    }
+                    else if (petTypeFlags) // Pet is dismissed
+                    {
+                        printf("\nEXOTIC PET: %u\n", petTypeFlags);
+                        if (petTypeFlags >= 65536 && !BeastMasteryTalent)
+                            return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
                     }
                     return SPELL_CAST_OK;
                 }
