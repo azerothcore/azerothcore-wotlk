@@ -23,6 +23,7 @@ enum HunterSpells
 {
     // Ours
     SPELL_HUNTER_WYVERN_STING_DOT                   = 24131,
+    SPELL_TAME_BEAST                                = 1515,
 
     // Theirs
     SPELL_HUNTER_ASPECT_OF_THE_BEAST                = 13161,
@@ -52,6 +53,47 @@ enum HunterSpells
 };
 
 // Ours
+class spell_tame_beast : public SpellScriptLoader
+{
+public:
+    spell_tame_beast() : SpellScriptLoader("spell_tame_beast") { }
+
+    class spell_tame_beast_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_tame_beast_SpellScript);
+
+        SpellCastResult CanTameBeast()
+        {
+            if (Player* player = GetCaster()->ToPlayer())
+            {
+                if (player->getClass() == CLASS_HUNTER)
+                {
+                    Pet* pet = player->GetPet();
+
+                    if (pet->isPetDismissed(player)) // Pet is dismissed, can't tame
+                            return SPELL_FAILED_ALREADY_HAVE_SUMMON;
+
+                    return SPELL_CAST_OK;
+                }
+
+                return SPELL_CAST_OK;
+            }
+
+            return SPELL_CAST_OK;
+        }
+
+        void Register()
+        {
+            OnCheckCast += SpellCheckCastFn(spell_tame_beast_SpellScript::CanTameBeast);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_tame_beast_SpellScript();
+    }
+};
+
 class spell_hun_check_pet_los : public SpellScriptLoader
 {
     public:
@@ -1175,6 +1217,7 @@ class spell_hun_viper_attack_speed : public SpellScriptLoader
 void AddSC_hunter_spell_scripts()
 {
     // Ours
+    new spell_tame_beast();
     new spell_hun_check_pet_los();
     new spell_hun_cower();
     new spell_hun_wyvern_sting();

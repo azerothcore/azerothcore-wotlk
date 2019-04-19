@@ -1720,9 +1720,48 @@ bool Pet::resetTalents()
     return true;
 }
 
+bool Pet::isPetDismissed(Player* owner)
+{
+    /*
+     * TO DO: Query with asyncronous states.
+     * Since I couldn't figure it out yet, this will do for now.
+     * Check slot = 100 means the pet is dismissed. If someone ever
+     * Changes the slot flag, they will break this validation.
+    */
+    QueryResult result, FlagResult;
+
+    printf("\nBeforeQuery\n");
+    // Look for dismissed current selected pet
+    result = CharacterDatabase.PQuery("SELECT entry FROM character_pet WHERE OWNER = '%u' AND slot = 100;", owner->GetGUIDLow());
+    printf("\nafterQuery\n");
+    // Didn't find a pet in dismissed state
+    if (!result)
+        return false;
+
+    printf("\ngonna fetch\n");
+    // Find the pet entry
+    Field* fields = result->Fetch();
+    uint32 entry = fields[0].GetUInt32();
+
+    printf("\nfetched\n");
+    if (!entry)
+        return false;
+
+    printf("\nDismissed: %u\n", entry);
+    return true;
+}
+
 uint32 Pet::GetActivePetTypeFlags(Player* owner)
 {
+    /*
+     * TO DO: Query with asyncronous states.
+     * Since I couldn't figure it out yet, this will do for now.
+     * Check slot = 100 means the pet is dismissed. If someone ever
+     * Changes the slot flag, they will break this validation.
+    */
     QueryResult result, FlagResult;
+
+    // Look for dismissed current selected pet
     result = CharacterDatabase.PQuery("SELECT entry FROM character_pet WHERE OWNER = '%u' AND slot = 100;", owner->GetGUIDLow());
 
     if (!result)
@@ -1732,7 +1771,7 @@ uint32 Pet::GetActivePetTypeFlags(Player* owner)
     Field* fields = result->Fetch();
     uint32 entry = fields[0].GetUInt32();
 
-    // Find the creature_template with the entry of our active pet
+    // Find the creature_template with the entry of our active dismissed pet
     FlagResult = WorldDatabase.PQuery("SELECT type_flags FROM creature_template WHERE entry = '%u';", entry);
 
     if (!FlagResult)
@@ -1742,6 +1781,7 @@ uint32 Pet::GetActivePetTypeFlags(Player* owner)
     fields = FlagResult->Fetch();
     uint32 type_flags = fields[0].GetUInt32();
 
+    // If it is an exotic pet, the flags will be atleast >= 65536
     return type_flags;
 }
 

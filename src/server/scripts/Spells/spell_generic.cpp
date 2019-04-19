@@ -4914,11 +4914,6 @@ class spell_gen_eject_passenger : public SpellScriptLoader
         }
 };
 
-enum StableErrors
-{
-    STABLE_ERR_EXOTIC = 0x06
-};
-
 class spell_activate_talent : public SpellScriptLoader
 {
 public:
@@ -4928,6 +4923,13 @@ public:
     {
         PrepareSpellScript(spell_activate_talent_SpellScript);
 
+        /*
+         * This script is for either Active primary talents and
+         * activate secondary talents.
+         * There was an issue with Hunter swaping talents with and
+         * without dismissed Exotic pets. Now we check if there's an
+         * exotic pet active and if the dismissed pet is exotic aswell.
+        */
         SpellCastResult CanSwapTalents ()
         {
             if (Player* player = GetCaster()->ToPlayer())
@@ -4943,7 +4945,7 @@ public:
                     {
                         uint32 exoticpet = pet->GetCreatureTemplate()->type_flags;
                         if (exoticpet >= 65536 && !BeastMasteryTalent)
-                            return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
+                            return SPELL_FAILED_NO_PET;
                         return SPELL_CAST_OK;
                     }
                     else if (petTypeFlags) // Pet is dismissed

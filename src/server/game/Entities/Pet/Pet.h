@@ -135,6 +135,7 @@ class Pet : public Guardian
         void InitPetCreateSpells();
 
         bool resetTalents();
+        bool Pet::isPetDismissed(Player* owner);
         uint32 GetActivePetTypeFlags(Player* owner);
         static void resetTalentsForAllPetsOf(Player* owner, Pet* online_pet = NULL);
         void InitTalentForLevel();
