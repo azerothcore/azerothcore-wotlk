@@ -333,8 +333,8 @@ public:
             player->PrepareQuestMenu(creature->GetGUID());
 
         if (player->GetQuestStatus(12801) == QUEST_STATUS_INCOMPLETE && !creature->AI()->GetData(WORLD_STATE_SOLDIERS_ENABLE))
-            AddGossipItemFor(player, 0, "I am ready, Highlord. Let the siege of Light's Hope begin!", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
-
+            AddGossipItemFor(player, 9795, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+        
         SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
 
         return true;
@@ -369,7 +369,7 @@ public:
         uint8 battleStarted;
         bool resetExecuted;
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (param == ACTION_START_EVENT && !startTimeRemaining && events.Empty())
             {
@@ -399,7 +399,7 @@ public:
             }
         }
 
-        uint32 GetData(uint32 type) const
+        uint32 GetData(uint32 type) const override
         {
             switch (type)
             {
@@ -433,14 +433,14 @@ public:
             SendUpdateWorldState(WORLD_STATE_EVENT_BEGIN_ENABLE, GetData(WORLD_STATE_EVENT_BEGIN_ENABLE));
         }
 
-        void JustSummoned(Creature* cr)
+        void JustSummoned(Creature* cr) override
         {
             summons.Summon(cr);
 
             if (me->IsInCombat() && cr->GetEntry() != NPC_HIGHLORD_TIRION_FORDRING && battleStarted == ENCOUNTER_STATE_FIGHT)
             {
                 Position pos = LightOfDawnFightPos[urand(0, 9)];
-                if (Unit* target = cr->SelectNearbyTarget(NULL, 10.0f))
+                if (Unit* target = cr->SelectNearbyTarget(nullptr, 10.0f))
                     if (target->GetTypeId() == TYPEID_UNIT)
                         target->GetMotionMaster()->MoveCharge(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), me->GetSpeed(MOVE_RUN));
                 cr->GetMotionMaster()->MoveCharge(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), me->GetSpeed(MOVE_RUN));
@@ -455,7 +455,7 @@ public:
             }
         }
 
-        void SummonedCreatureDies(Creature* creature, Unit*)
+        void SummonedCreatureDies(Creature* creature, Unit*) override
         {
             // Refill Armies and update counters
             if (battleStarted != ENCOUNTER_STATE_FIGHT)
@@ -477,7 +477,7 @@ public:
             }
         }
 
-        void JustDied(Unit*)
+        void JustDied(Unit*) override
         {
             summons.DespawnAll();
             me->SetCorpseDelay(3*60);
@@ -504,7 +504,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit*)
+        void EnterCombat(Unit*) override
         {
             if (battleStarted != ENCOUNTER_STATE_FIGHT)
                 return;
@@ -516,7 +516,7 @@ public:
             events.RescheduleEvent(EVENT_SPELL_TALK, 10000);
         }
 
-        void Reset()
+        void Reset() override
         {
             if (resetExecuted)
                 return;
@@ -525,7 +525,7 @@ public:
             JustRespawned();
         }
 
-        void JustRespawned()
+        void JustRespawned() override
         {
             events.Reset();
             summons.DespawnAll();
@@ -552,10 +552,10 @@ public:
                 if (Creature* summon = ObjectAccessor::GetCreature(*me, *itr))
                     if (summon->GetEntry() == entry)
                         return summon;
-            return NULL;
+            return nullptr;
         }
 
-        void MovementInform(uint32 type, uint32 point)
+        void MovementInform(uint32 type, uint32 point) override
         {
             if (type == POINT_MOTION_TYPE && point == 2)
             {
@@ -585,7 +585,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
             uint32 eventId = events.ExecuteEvent();
@@ -1185,14 +1185,14 @@ class spell_chapter5_light_of_dawn_aura : public SpellScriptLoader
                 GetUnitOwner()->GetMotionMaster()->MoveFall();
             }
 
-            void Register()
+            void Register() override
             {
                 OnEffectApply += AuraEffectApplyFn(spell_chapter5_light_of_dawn_aura_AuraScript::OnApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
                 OnEffectRemove += AuraEffectRemoveFn(spell_chapter5_light_of_dawn_aura_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
             }
         };
 
-        AuraScript* GetAuraScript() const
+        AuraScript* GetAuraScript() const override
         {
             return new spell_chapter5_light_of_dawn_aura_AuraScript();
         }
@@ -1214,13 +1214,13 @@ class spell_chapter5_rebuke : public SpellScriptLoader
                     unitTarget->KnockbackFrom(2282.86f, -5263.45f, 40.0f, 8.0f);
             }
 
-            void Register()
+            void Register() override
             {
                 OnEffectLaunchTarget += SpellEffectFn(spell_chapter5_rebuke_SpellScript::HandleLeapBack, EFFECT_0, SPELL_EFFECT_LEAP_BACK);
             }
         };
 
-        SpellScript* GetSpellScript() const
+        SpellScript* GetSpellScript() const override
         {
             return new spell_chapter5_rebuke_SpellScript();
         }
