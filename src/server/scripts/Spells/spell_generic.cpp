@@ -4948,7 +4948,6 @@ public:
                     }
                     else if (petTypeFlags) // Pet is dismissed
                     {
-                        printf("\nEXOTIC PET: %u\n", petTypeFlags);
                         if (petTypeFlags >= 65536 && !BeastMasteryTalent)
                             return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
                     }
