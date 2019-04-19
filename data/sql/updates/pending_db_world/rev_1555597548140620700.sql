@@ -46,7 +46,6 @@ INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type
 (@ENTRY,9,5,0,0,0,100,0,17000,17000,0,0,1,1,10000,0,0,0,0,12,1,0,0,0,0,0,0,'Overlord Runthak - On Script - Say Line 1'),
 (@ENTRY,9,6,0,0,0,100,0,3000,3000,0,0,50,179881,21600,0,0,0,0,8,0,0,0,1540.28,-4422.19,7.0051,5.22833,'Overlord Runthak - On Script - Summon Gameobject The Severed Head of Nefarian'),
 (@ENTRY,9,7,0,0,0,100,0,5000,5000,0,0,9,0,0,0,0,0,0,20,179881,100,0,0,0,0,0,'Overlord Runthak - On Script - Activate Gameobject'),
-(@ENTRY,9,7,8,0,0,100,0,5000,5000,0,0,9,0,0,0,0,0,0,20,179881,100,0,0,0,0,0,'Overlord Runthak - On Script - Activate Gameobject'),
 (@ENTRY,9,8,0,0,0,100,0,5000,5000,0,0,11,22888,0,0,0,0,0,1,0,0,0,0,0,0,0,'Overlord Runthak - On Script - Cast Rallying Cry of the Dragonslayer'),
 (@ENTRY,9,9,0,0,0,100,0,10000,10000,0,0,69,0,0,0,0,0,0,8,0,0,0,1568,-4405.87,8.13371,0.3434,'Overlord Runthak - On Script - Move To Position'),
 (@ENTRY,9,10,0,0,0,100,0,15000,15000,0,0,66,0,0,0,0,0,0,8,0,0,0,0,0,0,3.31613,'Overlord Runthak - On Script - Set Orientation 3,31613'),
