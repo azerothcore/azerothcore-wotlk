@@ -1,3 +1,19 @@
+-- DB update 2019_04_18_03 -> 2019_04_19_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2019_04_18_03';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2019_04_18_03 2019_04_19_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1553654065143975700'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1553654065143975700');
 
 -- NPC ID 9021 Kharan Mighthammer, Quest ID 4001 'What Is Going On?' and 4342 'Kharan's Tale'
@@ -81,3 +97,12 @@ INSERT INTO `broadcast_text` (`ID`,`Language`,`MaleText`,`FemaleText`) VALUES
 (@ID, 0, 'Teach me the art of smelting dark iron','Teach me the art of smelting dark iron'),
 (@ID+1, 0, 'I want to pay tribute','I want to pay tribute'),
 (@ID+2, 0, 'Get Thorium Brotherhood Contract', 'Get Thorium Brotherhood Contract');
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
