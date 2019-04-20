@@ -27,9 +27,12 @@ enum CreatureIds
 {
     NPC_RAZORGORE               = 12435,
     NPC_BLACKWING_DRAGON        = 12422,
+    NPC_BLACKWING_MAGE          = 12420,
     NPC_BLACKWING_TASKMASTER    = 12458,
     NPC_BLACKWING_LEGIONAIRE    = 12416,
     NPC_BLACKWING_WARLOCK       = 12459,
+    NPC_BLACKWING_GUARDSMAN     = 14456,
+    NPC_GRETHOK_THE_CONTROLLER  = 12557,
     NPC_VAELASTRAZ              = 13020,
     NPC_BROODLORD               = 12017,
     NPC_FIRENAW                 = 11983,
@@ -38,6 +41,17 @@ enum CreatureIds
     NPC_CHROMAGGUS              = 14020,
     NPC_VICTOR_NEFARIUS         = 10162,
     NPC_NEFARIAN                = 11583
+};
+
+enum GameObjects
+{
+    GO_RAZORGORE_EGG = 177807,
+    GO_PORTICULIS    = 176964,
+};
+
+enum MISCSPELLS
+{
+    ORB_OF_DOMINATION_LASER = 45537,
 };
 
 enum BWLData64
@@ -55,9 +69,8 @@ enum BWLData64
 
 enum BWLEvents
 {
-    EVENT_RAZOR_SPAWN       = 1,
+    EVENT_RESPAWN_NEFARIUS  = 1,
     EVENT_RAZOR_PHASE_TWO   = 2,
-    EVENT_RESPAWN_NEFARIUS  = 3
 };
 
 enum BWLMisc

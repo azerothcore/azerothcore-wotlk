@@ -75,7 +75,7 @@ enum Paths
     NEFARIUS_PATH_3            = 1379672
 };
 
-enum GameObjects
+enum GOBS
 {
     GO_PORTCULLIS_ACTIVE       = 164726,
     GO_PORTCULLIS_TOBOSSROOMS  = 175186
