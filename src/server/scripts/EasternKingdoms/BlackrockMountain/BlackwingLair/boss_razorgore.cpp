@@ -18,6 +18,11 @@ enum Say
     SAY_DEATH               = 3,
 };
 
+enum GrethokTalk
+{
+    SAY_GRETHOK_DEATH = 0,
+};
+
 enum Spells
 {
     SPELL_MINDCONTROL       = 42013,
@@ -27,7 +32,12 @@ enum Spells
     SPELL_CLEAVE            = 22540,
     SPELL_WARSTOMP          = 24375,
     SPELL_FIREBALLVOLLEY    = 22425,
-    SPELL_CONFLAGRATION     = 23023
+    SPELL_CONFLAGRATION     = 23023,
+
+    SPELL_GRETHOK_GREATER_POLYMORPH = 22274,
+    SPELL_GRETHOK_DOMINATE_MIND     = 14515,
+    SPELL_GRETHOK_SLOW              = 13747,
+    SPELL_GRETHOK_ARCANE_MISSILES   = 22273,
 };
 
 enum Summons
@@ -48,6 +58,10 @@ enum EVENTS
     EVENT_FIREBALL          = 3,
     EVENT_CONFLAGRATION     = 4,
     EVENT_RAZOR_SPAWN       = 5,
+    EVENT_GRETHOK_SPELL_GP  = 6,
+    EVENT_GRETHOK_SPELL_DM  = 7,
+    EVENT_GRETHOK_SPELL_S   = 8,
+    EVENT_GRETHOK_SPELL_AM  = 9,
 };
 
 Position const SummonPosition[8] =
@@ -172,6 +186,73 @@ public:
     }
 };
 
+class boss_grethok : public CreatureScript
+{
+public:
+    boss_grethok() : CreatureScript("boss_grethok") { }
+
+    struct boss_grethokAI : public BossAI
+    {
+        boss_grethokAI(Creature* creature) : BossAI(creature, NPC_RAZORGORE) { }
+
+        EventMap events;
+
+        void Reset() override
+        {
+            instance->SetBossState(DATA_RAZORGORE_THE_UNTAMED, NOT_STARTED);
+            me->HandleEmoteCommand(EMOTE_STATE_SPELL_CHANNEL_DIRECTED);
+        }
+
+        void JustDied(Unit* /*killer*/) override
+        {
+            Talk(SAY_GRETHOK_DEATH);
+        }
+
+        void EnterCombat(Unit * who) override
+        {
+            instance->SetBossState(DATA_RAZORGORE_THE_UNTAMED, IN_PROGRESS);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (!UpdateVictim())
+                return;
+
+            events.Update(diff);
+
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+                return;
+
+            switch (events.ExecuteEvent())
+            {
+                case EVENT_GRETHOK_SPELL_AM:
+                    DoCastVictim(SPELL_GRETHOK_ARCANE_MISSILES);
+                    events.ScheduleEvent(EVENT_GRETHOK_SPELL_AM, urand(12500, 14000));
+                    break;
+                case EVENT_GRETHOK_SPELL_S:
+                    DoCastVictim(SPELL_GRETHOK_SLOW);
+                    events.ScheduleEvent(EVENT_GRETHOK_SPELL_S, urand(20000, 21000));
+                    break;
+                case EVENT_GRETHOK_SPELL_DM:
+                    DoCastVictim(SPELL_GRETHOK_DOMINATE_MIND);
+                    events.ScheduleEvent(EVENT_GRETHOK_SPELL_DM, urand(20000, 21000));
+                    break;
+                case EVENT_GRETHOK_SPELL_GP:
+                    DoCastVictim(SPELL_GRETHOK_GREATER_POLYMORPH);
+                    events.ScheduleEvent(EVENT_GRETHOK_SPELL_GP, urand(5000, 10000));
+                    break;
+            }
+
+            DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return GetInstanceAI<boss_grethokAI>(creature);
+    }
+};
+
 class go_orb_of_domination : public GameObjectScript
 {
 public:
@@ -219,6 +300,7 @@ class spell_egg_event : public SpellScriptLoader
 
 void AddSC_boss_razorgore()
 {
+    new boss_grethok();
     new boss_razorgore();
     new go_orb_of_domination();
     new spell_egg_event();
