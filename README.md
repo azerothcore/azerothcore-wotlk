@@ -8,7 +8,8 @@
 </a>
 [![Bountysource](https://www.bountysource.com/badge/tracker?tracker_id=40032087)](https://www.bountysource.com/teams/azerothcore/bounties)
 [![StackOverflow](http://img.shields.io/badge/stackoverflow-azerothcore-blue.svg)]( https://stackoverflow.com/questions/tagged/azerothcore?sort=newest)
-
+[![Backers on Open Collective](https://opencollective.com/keira3/backers/badge.svg)](#backers)
+[![Sponsors on Open Collective](https://opencollective.com/keira3/sponsors/badge.svg)](#sponsors) 
 
 ## Introduction
 
@@ -49,6 +50,36 @@ This project is brought to you thanks to:
 - The [SunwellCore developers xinef and pussywizard](http://www.azerothcore.org/pages/sunwell.pl/)
 - All the [TrinityCore developers and contributors](https://github.com/TrinityCore/TrinityCore/blob/3.3.5/THANKS)
 - All the [MaNGOS, ScriptDev2 and UDB developers and contributors](https://github.com/cmangos/mangos-wotlk/blob/master/AUTHORS.md)
+
+## Contributors
+
+This project exists thanks to all the people who contribute. 
+<a href="https://github.com/azerothcore/azerothcore-wotlk/graphs/contributors"><img src="https://opencollective.com/keira3/contributors.svg?width=890&button=false" /></a>
+
+
+## Backers
+
+Thank you to all our backers! 🙏 [[Become a backer](https://opencollective.com/keira3#backer)]
+
+<a href="https://opencollective.com/keira3#backers" target="_blank"><img src="https://opencollective.com/keira3/backers.svg?width=890"></a>
+
+
+## Sponsors
+
+Support this project by becoming a sponsor. Your logo will show up here with a link to your website. [[Become a sponsor](https://opencollective.com/keira3#sponsor)]
+
+<a href="https://opencollective.com/keira3/sponsor/0/website" target="_blank"><img src="https://opencollective.com/keira3/sponsor/0/avatar.svg"></a>
+<a href="https://opencollective.com/keira3/sponsor/1/website" target="_blank"><img src="https://opencollective.com/keira3/sponsor/1/avatar.svg"></a>
+<a href="https://opencollective.com/keira3/sponsor/2/website" target="_blank"><img src="https://opencollective.com/keira3/sponsor/2/avatar.svg"></a>
+<a href="https://opencollective.com/keira3/sponsor/3/website" target="_blank"><img src="https://opencollective.com/keira3/sponsor/3/avatar.svg"></a>
+<a href="https://opencollective.com/keira3/sponsor/4/website" target="_blank"><img src="https://opencollective.com/keira3/sponsor/4/avatar.svg"></a>
+<a href="https://opencollective.com/keira3/sponsor/5/website" target="_blank"><img src="https://opencollective.com/keira3/sponsor/5/avatar.svg"></a>
+<a href="https://opencollective.com/keira3/sponsor/6/website" target="_blank"><img src="https://opencollective.com/keira3/sponsor/6/avatar.svg"></a>
+<a href="https://opencollective.com/keira3/sponsor/7/website" target="_blank"><img src="https://opencollective.com/keira3/sponsor/7/avatar.svg"></a>
+<a href="https://opencollective.com/keira3/sponsor/8/website" target="_blank"><img src="https://opencollective.com/keira3/sponsor/8/avatar.svg"></a>
+<a href="https://opencollective.com/keira3/sponsor/9/website" target="_blank"><img src="https://opencollective.com/keira3/sponsor/9/avatar.svg"></a>
+
+
 
 ## License
 
