@@ -56,13 +56,11 @@ This project is brought to you thanks to:
 This project exists thanks to all the people who contribute. 
 <a href="https://github.com/azerothcore/azerothcore-wotlk/graphs/contributors"><img src="https://opencollective.com/keira3/contributors.svg?width=890&button=false" /></a>
 
-
 ## Backers
 
 Thank you to all our backers! 🙏 [[Become a backer](https://opencollective.com/keira3#backer)]
 
 <a href="https://opencollective.com/keira3#backers" target="_blank"><img src="https://opencollective.com/keira3/backers.svg?width=890"></a>
-
 
 ## Sponsors
 
@@ -79,8 +77,6 @@ Support this project by becoming a sponsor. Your logo will show up here with a l
 <a href="https://opencollective.com/keira3/sponsor/8/website" target="_blank"><img src="https://opencollective.com/keira3/sponsor/8/avatar.svg"></a>
 <a href="https://opencollective.com/keira3/sponsor/9/website" target="_blank"><img src="https://opencollective.com/keira3/sponsor/9/avatar.svg"></a>
 
-
-
 ## License
 
 - The new AzerothCore source components are released under the [GNU AGPL v3](https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3)
@@ -89,7 +85,6 @@ Support this project by becoming a sponsor. Your logo will show up here with a l
 ## Links
 
 - [Website](https://azerothcore.github.io/)
-
 
 ## Sponsors
 
