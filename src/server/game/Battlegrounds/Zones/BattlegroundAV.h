@@ -994,7 +994,7 @@ const float BG_AV_CreaturePos[AV_CPLACE_MAX][4] =
     {-1297.5f, -266.767f, 114.15f, 3.31044f},      //frostwolf_wtower
     {-57.7891f, -286.597f, 15.6479f, 6.02139f},    //AV_NPC_A_CAPTAIN balinda
     {722.43f, -10.9982f, 50.7046f, 3.42085f},      //AV_NPC_A_BOSS vanndar
-    {-545.23f, -165.35f, 57.7886f, 3.01145f},      //AV_NPC_H_CAPTAIN galvangar
+    {-545.23f, -165.35f, 57.7886f, 5.88342f},      //AV_NPC_H_CAPTAIN galvangar
     {-1370.9f, -219.793f, 98.4258f, 5.04381f}      //AV_NPC_H_BOSS drek thar
 };
 
@@ -1177,7 +1177,7 @@ const float BG_AV_StaticCreaturePos[AV_STATICCPLACE_MAX][5] =
     {428.091f, -122.731f, 3.40332f, 6.05901f, 14 }, //11678 - Snowblind Ambusher
     {235.05f, 85.5705f, 18.3079f, -0.914255f, 14 }, //11678 - Snowblind Ambusher
     {-1553.04f, -344.342f, 64.4163f, 6.09933f, 15 }, //11839 - Wildpaw Brute
-    {-545.23f, -165.35f, 57.7886f, 3.01145f, 16 }, //11947 - Captain Galvangar
+    {-545.23f, -165.35f, 57.7886f, 5.88342f, 16 }, //11947 - Captain Galvangar
     {722.43f, -10.9982f, 50.7046f, 3.42085f, 17 }, //11948 - Vanndar Stormpike
     {-57.7891f, -286.597f, 15.6479f, 6.02139f, 18 }, //11949 - Captain Balinda Stonehearth
     {930.498f, -520.755f, 93.7334f, 1.8326f, 19 }, //11997 - Stormpike Herald
