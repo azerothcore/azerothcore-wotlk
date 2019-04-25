@@ -8272,6 +8272,11 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
                     CastDelayedSpellWithPeriodicAmount(this, trigger_spell_id, SPELL_AURA_PERIODIC_HEAL, basepoints0);
                     return true;
                 }
+                // Greater Heal Refund - Gain 100 mana , when target is full HP
+                if (auraSpellInfo->Id == 37594)
+                {
+                  trigger_spell_id = 37595;
+                }
                 break;
             }
             case SPELLFAMILY_DRUID:
