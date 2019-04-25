@@ -8354,6 +8354,13 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
             {
                 switch (auraSpellInfo->Id)
                 {
+                    // Healing Discount: Each healing spell you cast has a 2% chance to make your next heal cast within 15 sec cost 450 less mana.
+                    case 37705:
+                    {
+                        trigger_spell_id = 37706;
+                        target = this;
+                        break;
+                    }
                     // Soul Preserver
                     case 60510:
                     {
