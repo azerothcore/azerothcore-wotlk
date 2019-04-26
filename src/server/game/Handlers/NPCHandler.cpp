@@ -581,6 +581,30 @@ void WorldSession::SendStablePetCallback(PreparedQueryResult result, uint64 guid
         data << uint8(1);                                   // 1 = current, 2/3 = in stable (any from 4, 5, ... create problems with proper show)
         ++num;
     }
+    else if (pet->isPetDismissed(_player))
+    {
+        // Pet is in dismissed state, need information
+
+        QueryResult result;
+
+        // Select data from dismissed pet
+        result = CharacterDatabase.PQuery("SELECT id, entry, level, name FROM character_pet WHERE OWNER = '%u' AND slot = 100;", _player->GetGUIDLow());
+
+        // Didn't find a pet in dismissed state
+        if (!result)
+            return;
+
+        // Find the pet entry
+        Field* fields = result->Fetch();
+        string pet_name = fields[3].GetString();
+
+        data << uint32(fields[0].GetUInt32());
+        data << uint32(fields[1].GetUInt32());
+        data << uint32(fields[2].GetUInt32());
+        data << pet_name;
+        data << uint8(1);
+        ++num;
+    }
 
     if (result)
     {
@@ -660,6 +684,8 @@ void WorldSession::HandleStablePetCallback(PreparedQueryResult result)
         return;
 
     uint8 freeSlot = 1;
+    uint8 freeSlotForDismissed = 1;
+
     if (result)
     {
         do
@@ -678,11 +704,22 @@ void WorldSession::HandleStablePetCallback(PreparedQueryResult result)
         while (result->NextRow());
     }
 
+    // Pointer to look for dismissed
+    Pet* dismissed = _player->GetPetDismissedPet();
+
     WorldPacket data(SMSG_STABLE_RESULT, 1);
     if (freeSlot > 0 && freeSlot <= GetPlayer()->m_stableSlots)
     {
-        _player->RemovePet(_player->GetPet(), PetSaveMode(freeSlot));
-        SendStableResult(STABLE_SUCCESS_STABLE);
+        if (dismissed->isPetDismissed(_player))
+        {
+            _player->RemovePet(dismissed, PetSaveMode(freeSlot));
+            SendStableResult(STABLE_SUCCESS_STABLE);
+        }
+        else
+        {
+            _player->RemovePet(_player->GetPet(), PetSaveMode(freeSlot));
+            SendStableResult(STABLE_SUCCESS_STABLE);
+        }
     }
     else
         SendStableResult(STABLE_ERR_STABLE);

@@ -20775,6 +20775,25 @@ Pet* Player::GetPet() const
     return NULL;
 }
 
+Pet* Player::GetPetDismissedPet() const
+{
+    if (uint64 pet_guid = GetPetGUID())
+    {
+        if (!IS_PET_GUID(pet_guid))
+            return NULL;
+
+        printf("\nPetGUID: %u\n", pet_guid);
+        Pet* pet = ObjectAccessor::GetPet(*this, pet_guid);
+
+        if (!pet)
+            return NULL;
+
+        return pet;
+    }
+
+    return NULL;
+}
+
 void Player::RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent)
 {
     if (!pet)
