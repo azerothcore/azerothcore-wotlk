@@ -199,8 +199,10 @@ public:
 
         void Reset() override
         {
-            instance->SetBossState(DATA_RAZORGORE_THE_UNTAMED, NOT_STARTED);
+            instance->SetBossState(BOSS_RAZORGORE, NOT_STARTED);
             me->HandleEmoteCommand(EMOTE_STATE_SPELL_CHANNEL_DIRECTED);
+            if (GameObject* portcullis = me->FindNearestGameObject(GO_PORTICULIS, 100.0f))
+                portcullis->SetGoState(GO_STATE_ACTIVE);
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -210,7 +212,15 @@ public:
 
         void EnterCombat(Unit * who) override
         {
-            instance->SetBossState(DATA_RAZORGORE_THE_UNTAMED, IN_PROGRESS);
+            if (GameObject* portcullis = me->FindNearestGameObject(GO_PORTICULIS, 100.0f))
+                portcullis->SetGoState(GO_STATE_READY);
+            instance->SetBossState(BOSS_RAZORGORE, IN_PROGRESS);
+
+            // Spell events:
+            events.ScheduleEvent(EVENT_GRETHOK_SPELL_AM, urand(12500, 14000));
+            events.ScheduleEvent(EVENT_GRETHOK_SPELL_S, urand(20000, 21000));
+            events.ScheduleEvent(EVENT_GRETHOK_SPELL_DM, urand(20000, 21000));
+            events.ScheduleEvent(EVENT_GRETHOK_SPELL_GP, urand(5000, 10000));
         }
 
         void UpdateAI(uint32 diff) override
@@ -238,7 +248,8 @@ public:
                     events.ScheduleEvent(EVENT_GRETHOK_SPELL_DM, urand(20000, 21000));
                     break;
                 case EVENT_GRETHOK_SPELL_GP:
-                    DoCastVictim(SPELL_GRETHOK_GREATER_POLYMORPH);
+                    Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0);
+                    DoCast(target, SPELL_GRETHOK_GREATER_POLYMORPH);
                     events.ScheduleEvent(EVENT_GRETHOK_SPELL_GP, urand(5000, 10000));
                     break;
             }

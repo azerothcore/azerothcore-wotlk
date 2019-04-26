@@ -74,6 +74,9 @@ public:
                     break;
                 case NPC_BLACKWING_DRAGON:
                 case NPC_BLACKWING_GUARDSMAN:
+                case NPC_BLACKWING_MAGE:
+                case NPC_BLACKWING_LEGIONAIRE:
+                case NPC_BLACKWING_WARLOCK:
                     RazorgoreTrash.push_back(creature->GetGUID());
                     break;
                 case NPC_VAELASTRAZ:
@@ -172,7 +175,6 @@ public:
                             {
                                 if (razorgore && razorgore->IsAlive() && !razorgore->IsInCombat())
                                     razorgore->AI()->AttackStart(grethok->GetVictim());
-                                HandleGameObject(PorticulisGUID, false);
                             }
                         }
                     }
