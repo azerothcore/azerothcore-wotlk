@@ -1,18 +1,5 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1556033308686302400');
 
--- Creating a new SmartAI script for [Creature] ENTRY 17701 (name: Lord Xiz)
-
--- Table creature_template
-UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 17701;
-
--- Table smart_scripts
-DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 17701);
-INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(17701, 0, 0, 0, 0, 0, 100, 0, 2000, 2000, 32000, 32000, 11, 13318, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Lord Xiz - In Combat - Cast \'13318\'');
-DELETE FROM `creature_equip_template` WHERE `CreatureID`=17701 AND `ID`=1;
-INSERT INTO `creature_equip_template` (`CreatureID`, `ID`, `ItemID1`, `ItemID2`, `ItemID3`, `VerifiedBuild`) VALUES (17701, 1, 14882, 0, 0, 0);
-
-
 -- Creating a new SmartAI script for [Creature] ENTRY 17333 (name: Wrathscale Screamer)
 
 -- Table creature_template
@@ -65,7 +52,7 @@ UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 17343;
 -- Table smart_scripts
 DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 17343);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(17343, 0, 0, 0, 0, 0, 100, 0, 1800, 1800, 8600, 8600, 11, 31286, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Thistle Lasher - In Combat - Cast \'31286\'');
+(17343, 0, 0, 0, 0, 0, 100, 0, 1800, 1800, 8600, 8600, 11, 34644, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Thistle Lasher - In Combat - Cast \'31286\'');
 
 -- Creating a new SmartAI script for [Creature] ENTRY 17352 (name: Corrupted Treant)
 
@@ -155,7 +142,8 @@ DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 17608);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (17608, 0, 0, 0, 4, 0, 100, 0, 0, 0, 0, 0, 11, 31734, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Sunhawk Pyromancer - On Aggro - Cast \'31734\''),
 (17608, 0, 1, 0, 0, 0, 100, 0, 1500, 1500, 25700, 25700, 11, 11962, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Sunhawk Pyromancer - In Combat - Cast \'11962\''),
-(17608, 0, 2, 0, 0, 0, 100, 0, 5200, 5200, 9900, 9900, 11, 9053, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Sunhawk Pyromancer - In Combat - Cast \'9053\'');
+(17608, 0, 2, 0, 0, 0, 100, 0, 5200, 5200, 9900, 9900, 11, 9053, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Sunhawk Pyromancer - In Combat - Cast \'9053\''),
+(17608, 0, 3, 0, 0, 0, 100, 0, 21200, 21200, 49000, 49900, 11, 17174, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Sunhawk Pyromancer - In Combat - Cast \'17174\'');
 
 
 -- Creating a new SmartAI script for [Creature] ENTRY 17607 (name: Sunhawk Defender)
@@ -168,7 +156,8 @@ DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 17607);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (17607, 0, 0, 0, 4, 0, 100, 0, 0, 0, 0, 0, 11, 31734, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Sunhawk Defender - On Aggro - Cast \'31734\''),
 (17607, 0, 1, 0, 0, 0, 100, 0, 3200, 3200, 15400, 15400, 11, 15284, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Sunhawk Defender - In Combat - Cast \'15284\''),
-(17607, 0, 2, 0, 0, 0, 100, 0, 8600, 8600, 34200, 34200, 11, 31737, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Sunhawk Defender - In Combat - Cast \'31737\'');
+(17607, 0, 2, 0, 0, 0, 100, 0, 8600, 8600, 34200, 34200, 11, 31737, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Sunhawk Defender - In Combat - Cast \'31737\''),
+(17607, 0, 3, 0, 0, 0, 100, 0, 12700, 12700, 58200, 58200, 11, 31737, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Sunhawk Defender - In Combat - Cast \'31737\'');
 
 
 -- Creating a new SmartAI script for [Creature] ENTRY 17610 (name: Sunhawk Agent)
@@ -179,9 +168,10 @@ UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 17610;
 -- Table smart_scripts
 DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 17610);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(17610, 0, 0, 0, 4, 0, 100, 0, 0, 0, 0, 0, 11, 31734, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Sunhawk Agent - On Aggro - Cast \'31734\''),
-(17610, 0, 1, 0, 0, 0, 100, 0, 1700, 1700, 8900, 8900, 11, 14873, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Sunhawk Agent - In Combat - Cast \'14873\''),
-(17610, 0, 2, 0, 0, 0, 100, 0, 12400, 12400, 38600, 38600, 11, 15691, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Sunhawk Agent - In Combat - Cast \'15691\'');
+(17610, 0, 0, 0, 11, 0, 100, 0, 0, 0, 0, 0, 11, 5916, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Sunhawk Agent - On Respawn - Cast \'5916\''),
+(17610, 0, 1, 0, 0, 0, 100, 0, 2500, 2500, 8900, 8900, 11, 14873, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Sunhawk Agent - In Combat - Cast \'14873\''),
+(17610, 0, 2, 0, 0, 0, 100, 0, 12850, 12850, 35700, 35700, 11, 7159, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Sunhawk Agent - In Combat - Cast \'7159\''),
+(17610, 0, 3, 0, 0, 0, 100, 0, 15000, 15000, 87000, 87000, 11, 15691, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Sunhawk Agent - In Combat - Cast \'15691\'');
 
 
 -- Creating a new SmartAI script for [Creature] ENTRY 17609 (name: Sunhawk Saboteur)
@@ -195,28 +185,6 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (17609, 0, 0, 0, 4, 0, 100, 0, 0, 0, 0, 0, 11, 31734, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Sunhawk Saboteur - On Aggro - Cast \'31734\''),
 (17609, 0, 1, 0, 0, 0, 100, 0, 1000, 1000, 6200, 6200, 11, 6660, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Sunhawk Saboteur - In Combat - Cast \'6660\''),
 (17609, 0, 2, 0, 0, 0, 100, 0, 11750, 11750, 32400, 32400, 11, 14443, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Sunhawk Saboteur - In Combat - Cast \'14443\'');
-
-
--- Creating a new SmartAI script for [Creature] ENTRY 17322 (name: Infected Wildkin)
-
--- Table creature_template
-UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 17322;
-
--- Table smart_scripts
-DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 17322);
-INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(17322, 0, 0, 0, 0, 0, 100, 0, 1500, 1500, 3200, 3200, 11, 31282, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Infected Wildkin - In Combat - Cast \'31282\'');
-
-
--- Creating a new SmartAI script for [Creature] ENTRY 17588 (name: Veridian Whelp)
-
--- Table creature_template
-UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 17588;
-
--- Table smart_scripts
-DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 17588);
-INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(17588, 0, 0, 0, 0, 0, 100, 0, 7500, 7500, 28500, 28500, 11, 31292, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Veridian Whelp - In Combat - Cast \'31292\'');
 
 
 -- Creating a new SmartAI script for [Creature] ENTRY 17713 (name: Bloodcursed Naga)
