@@ -1,3 +1,19 @@
+-- DB update 2019_04_22_00 -> 2019_04_26_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2019_04_22_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2019_04_22_00 2019_04_26_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1555795494372087220'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1555795494372087220');
 
 DELETE FROM `smart_scripts` WHERE `source_type` = 0 AND `entryorguid` = 26379;
@@ -111,3 +127,12 @@ VALUES
 (-102341,0,6,0,40,0,100,0,1,0,0,0,0,67,1,2000,2000,0,0,0,1,0,0,0,0,0,0,0,0,'Taunka Soldier - On reached WP1 - Create Timed Event ID 1'),
 (-102341,0,7,8,59,0,100,0,1,0,0,0,0,66,0,0,0,0,0,0,19,26810,0,0,0,0,0,0,0,'Taunka Soldier - On Timed Event ID 1 - Set Orientation'),
 (-102341,0,8,0,61,0,100,0,0,0,0,0,0,90,8,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Taunka Soldier - Linked - Set ''UNIT_STAND_STATE_KNEEL''');
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
