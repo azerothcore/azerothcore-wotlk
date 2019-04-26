@@ -1,5 +1,8 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1556033308686302400');
 
+DELETE FROM `creature_equip_template` WHERE `CreatureID`=17701 AND `ID`=1;
+INSERT INTO `creature_equip_template` (`CreatureID`, `ID`, `ItemID1`, `ItemID2`, `ItemID3`, `VerifiedBuild`) VALUES (17701, 1, 14882, 0, 0, 0);
+
 -- Creating a new SmartAI script for [Creature] ENTRY 17333 (name: Wrathscale Screamer)
 
 -- Table creature_template
