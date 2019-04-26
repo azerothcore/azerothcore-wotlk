@@ -8,7 +8,7 @@ UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 1998;
 -- Table smart_scripts
 DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 1998);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(1998, 0, 0, 0, 0, 0, 100, 0, 2300, 2300, 17600, 17600, 11, 744, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Webwood Lurker - In Combat - Cast \'744\'');
+(1998, 0, 0, 0, 0, 0, 100, 0, 2300, 2300, 17600, 17600, 11, 744, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Webwood Lurker - In Combat - Cast \'744\'');
 
 -- Creating a new SmartAI script for [Creature] ENTRY 2008 (name: Gnarlpine Warrior)
 
@@ -18,7 +18,7 @@ UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 2008;
 -- Table smart_scripts
 DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 2008);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(2008, 0, 0, 0, 0, 0, 100, 0, 3300, 3300, 15800, 15800, 11, 11976, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Gnarlpine Warrior - In Combat - Cast \'11976\'');
+(2008, 0, 0, 0, 0, 0, 100, 0, 3300, 3300, 15800, 15800, 11, 11976, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Gnarlpine Warrior - In Combat - Cast \'11976\'');
 
 
 -- Creating a new SmartAI script for [Creature] ENTRY 2025 (name: Timberling Bark Ripper)
@@ -40,8 +40,7 @@ UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 1999;
 -- Table smart_scripts
 DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 1999);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(1999, 0, 0, 0, 0, 0, 100, 0, 3100, 3100, 18200, 18200, 11, 744, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Webwood Venomfang - In Combat - Cast \'744\'');
-
+(1999, 0, 0, 0, 0, 0, 100, 0, 3100, 3100, 18200, 18200, 11, 744, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Webwood Venomfang - In Combat - Cast \'744\'');
 
 -- Creating a new SmartAI script for [Creature] ENTRY 2001 (name: Giant Webwood Spider)
 
@@ -52,5 +51,5 @@ UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 2001;
 DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 2001);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (2001, 0, 0, 0, 4, 0, 100, 0, 0, 0, 0, 0, 11, 6751, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Giant Webwood Spider - On Aggro - Cast \'6751\''),
-(2001, 0, 1, 0, 0, 0, 100, 0, 6000, 6000, 12800, 12800, 11, 744, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Giant Webwood Spider - In Combat - Cast \'744\''),
-(2001, 0, 2, 0, 0, 0, 100, 0, 7500, 7500, 15000, 15000, 11, 745, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Giant Webwood Spider - In Combat - Cast \'745\'');
+(2001, 0, 1, 0, 0, 0, 100, 0, 6000, 6000, 12800, 12800, 11, 744, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Giant Webwood Spider - In Combat - Cast \'744\''),
+(2001, 0, 2, 0, 0, 0, 100, 0, 7500, 7500, 15000, 15000, 11, 745, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Giant Webwood Spider - In Combat - Cast \'745\'');
