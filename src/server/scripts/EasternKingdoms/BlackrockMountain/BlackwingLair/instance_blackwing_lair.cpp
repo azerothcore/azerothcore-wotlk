@@ -112,6 +112,7 @@ public:
             {
                 case GO_PORTICULIS:
                     PorticulisGUID = go->GetGUID();
+                    go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
                     break;
                 case 177807: // Egg
                     if (GetBossState(BOSS_FIREMAW) == DONE)
@@ -162,25 +163,9 @@ public:
                 case BOSS_RAZORGORE:
                     if (state == DONE)
                     {
-                        HandleGameObject(RazorgoreDoorGUID, true); // Open the door after encounter complete
                         for (std::list<uint64>::const_iterator itr = EggList.begin(); itr != EggList.end(); ++itr)
                             if (GameObject* egg = instance->GetGameObject((*itr)))
                                 egg->SetPhaseMask(2, true);
-                    }
-                    else if (state == IN_PROGRESS)
-                    {
-                        if (Creature* grethok = instance->GetCreature(GrethokGUID))
-                        {
-                            if (Creature* razorgore = instance->GetCreature(RazorgoreTheUntamedGUID))
-                            {
-                                if (razorgore && razorgore->IsAlive() && !razorgore->IsInCombat())
-                                    razorgore->AI()->AttackStart(grethok->GetVictim());
-                            }
-                        }
-                    }
-                    else if (state == NOT_STARTED)
-                    {
-                        HandleGameObject(PorticulisGUID, false);
                     }
                     // SetData(DATA_EGG_EVENT, NOT_STARTED);
                     break;

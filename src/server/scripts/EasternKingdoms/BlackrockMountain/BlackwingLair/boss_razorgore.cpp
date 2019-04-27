@@ -25,10 +25,10 @@ enum GrethokTalk
 
 enum Spells
 {
-    SPELL_MINDCONTROL       = 42013,
+    SPELL_MINDCONTROL       = 23014,
     SPELL_CHANNEL           = 45537,
     SPELL_EGG_DESTROY       = 19873,
-
+    SPELL_VISUALCHANNEL     = 23014,
     SPELL_CLEAVE            = 22540,
     SPELL_WARSTOMP          = 24375,
     SPELL_FIREBALLVOLLEY    = 22425,
@@ -87,20 +87,30 @@ public:
     {
         boss_razorgoreAI(Creature* creature) : BossAI(creature, BOSS_RAZORGORE) , summons(me) { }
 
-        void Reset()
+        void Reset() override
         {
             _Reset();
             summons.DespawnAll();
             secondPhase = false;
             instance->SetData(DATA_EGG_EVENT, NOT_STARTED);
+            max_health = me->GetMaxHealth();
+            creaturesSummoned = NULL;
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             _JustDied();
             Talk(SAY_DEATH);
 
             instance->SetData(DATA_EGG_EVENT, NOT_STARTED);
+
+            if (GameObject* portcullis = me->FindNearestGameObject(GO_PORTICULIS, 100.0f))
+                portcullis->SetGoState(GO_STATE_ACTIVE);
+
+            instance->SetBossState(BOSS_RAZORGORE, DONE);
+
+            // Clear int space
+            creaturesSummoned = NULL;
         }
 
         void DoChangePhase()
@@ -116,19 +126,27 @@ public:
             me->SetHealth(me->GetMaxHealth());
         }
 
-        void DoAction(int32 action)
+        void DoAction(int32 action) override
         {
             if (action == ACTION_PHASE_TWO)
                 DoChangePhase();
         }
 
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if (!secondPhase)
+            {
                 damage = 0;
+                me->SetHealth(max_health);
+            }
         }
 
-        void UpdateAI(uint32 diff)
+        void EnterCombat(Unit* /*who*/) override
+        {
+            events.ScheduleEvent(EVENT_RAZOR_SPAWN, urand(12, 17)*IN_MILLISECONDS);
+        }
+
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -144,11 +162,18 @@ public:
                 {
                     case EVENT_RAZOR_SPAWN:
                         for (uint8 i = urand(2, 5); i > 0; --i)
-                            if (Creature* cr = me->SummonCreature(Entry[urand(0, 4)], SummonPosition[urand(0, 7)]))
+                        {
+                            if (creaturesSummoned < 41)
                             {
-                                cr->SetInCombatWithZone();
-                                summons.Summon(cr);
+                                if (Creature* cr = me->SummonCreature(Entry[urand(0, 4)], SummonPosition[urand(0, 7)]))
+                                {
+                                    cr->SetInCombatWithZone();
+                                    summons.Summon(cr);
+                                }
+                                ++creaturesSummoned;
                             }
+                            
+                        }
                         events.ScheduleEvent(EVENT_RAZOR_SPAWN, urand(12, 17)*IN_MILLISECONDS);
                         break;
                     case EVENT_CLEAVE:
@@ -176,7 +201,9 @@ public:
         }
 
     private:
+        uint32 max_health;
         bool secondPhase;
+        int creaturesSummoned;
         SummonList summons;
     };
 
@@ -199,19 +226,25 @@ public:
 
         void Reset() override
         {
+            me->CastSpell(me, SPELL_VISUALCHANNEL);
             instance->SetBossState(BOSS_RAZORGORE, NOT_STARTED);
             me->HandleEmoteCommand(EMOTE_STATE_SPELL_CHANNEL_DIRECTED);
-            if (GameObject* portcullis = me->FindNearestGameObject(GO_PORTICULIS, 100.0f))
-                portcullis->SetGoState(GO_STATE_ACTIVE);
-        }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            Talk(SAY_GRETHOK_DEATH);
         }
 
         void EnterCombat(Unit * who) override
         {
+            // Intruders...
+            Talk(SAY_GRETHOK_DEATH);
+
+            // Make Razorgore engage combat
+            Creature* razorgore = me->FindNearestCreature(NPC_RAZORGORE, 200.0f, true);
+            if (razorgore)
+            {
+                razorgore->SetInCombatWith(who);
+                razorgore->AI()->AttackStart(who);
+            }
+
+            // Close the entrace gate
             if (GameObject* portcullis = me->FindNearestGameObject(GO_PORTICULIS, 100.0f))
                 portcullis->SetGoState(GO_STATE_READY);
             instance->SetBossState(BOSS_RAZORGORE, IN_PROGRESS);

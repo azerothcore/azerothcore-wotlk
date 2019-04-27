@@ -4371,6 +4371,12 @@ void SpellMgr::LoadDbcDataCorrections()
             spellInfo->EffectRealPointsPerLevel[EFFECT_0] = 5.0f;
             break;
 
+        // Blackwing lair
+        // Razorgore possess
+        case 23014:
+            spellInfo->DurationIndex = 90;
+            spellInfo->EffectApplyAuraName[0] = SPELL_AURA_MOD_CHARM;
+            break;
 
         //////////////////////////////////////////
         ////////// TBC Instances
