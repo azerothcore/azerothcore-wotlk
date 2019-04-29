@@ -85,7 +85,7 @@ public:
 
     struct boss_razorgoreAI : public BossAI
     {
-        boss_razorgoreAI(Creature* creature) : BossAI(creature, BOSS_RAZORGORE) , summons(me) { }
+        boss_razorgoreAI(Creature* creature) : BossAI(creature, BOSS_RAZORGORE) , summons(me), creaturesSummoned(NULL) { }
 
         void Reset() override
         {
