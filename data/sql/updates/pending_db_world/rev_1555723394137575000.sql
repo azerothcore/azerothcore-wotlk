@@ -9,3 +9,6 @@ UPDATE `creature_template` SET `AIName`='', `ScriptName`='boss_grethok' WHERE  `
 
 -- Change Razorgore's faction
 UPDATE `creature_template` SET `faction`='103' WHERE  `entry`=12435;
+
+-- Rotate the Orb of Domination to the right position
+UPDATE `gameobject` SET `orientation`='5.343413' WHERE  `guid`=67867;

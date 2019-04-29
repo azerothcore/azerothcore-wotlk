@@ -163,7 +163,7 @@ public:
                 case BOSS_RAZORGORE:
                     if (state == DONE)
                     {
-                        for (std::list<uint64>::const_iterator itr = EggList.begin(); itr != EggList.end(); ++itr)
+                        for (auto itr = EggList.begin(); itr != EggList.end(); ++itr)
                             if (GameObject* egg = instance->GetGameObject((*itr)))
                                 egg->SetPhaseMask(2, true);
                     }

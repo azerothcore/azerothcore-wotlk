@@ -16,6 +16,7 @@ enum Say
     SAY_EGGS_BROKEN2        = 1,
     SAY_EGGS_BROKEN3        = 2,
     SAY_DEATH               = 3,
+    SAY_WIPE                = 4,
 };
 
 enum GrethokTalk
@@ -33,6 +34,9 @@ enum Spells
     SPELL_WARSTOMP          = 24375,
     SPELL_FIREBALLVOLLEY    = 22425,
     SPELL_CONFLAGRATION     = 23023,
+    SPELL_WARMING_FLAMES    = 23040,
+    SPELL_ARCANE_EXPLOSION  = 63660,
+    SPELL_MIND_EXHAUSTION   = 23958,
 
     SPELL_GRETHOK_GREATER_POLYMORPH = 22274,
     SPELL_GRETHOK_DOMINATE_MIND     = 14515,
@@ -47,7 +51,7 @@ enum Summons
     NPC_WARRIOR             = 12416,
     NPC_MAGE                = 12420,
     NPC_WARLOCK             = 12459,
-
+    NPC_ORB_TRIGGER         = 14422,
     GO_EGG                  = 177807
 };
 
@@ -85,7 +89,8 @@ public:
 
     struct boss_razorgoreAI : public BossAI
     {
-        boss_razorgoreAI(Creature* creature) : BossAI(creature, BOSS_RAZORGORE) , secondPhase(false), creaturesSummoned(0), summons(me) { }
+        boss_razorgoreAI(Creature* creature) : BossAI(creature, BOSS_RAZORGORE) ,
+        secondPhase(false), creaturesSummoned(0), summons(me) { }
 
         void Reset() override
         {
@@ -95,22 +100,34 @@ public:
             instance->SetData(DATA_EGG_EVENT, NOT_STARTED);
             max_health = me->GetMaxHealth();
             creaturesSummoned = 0;
+
+            // In case Grethok isn't alive, open the door
+            if (GameObject* portcullis = me->FindNearestGameObject(GO_PORTICULIS, 200.0f))
+                portcullis->SetGoState(GO_STATE_ACTIVE);
         }
 
         void JustDied(Unit* /*killer*/) override
         {
-            _JustDied();
-            Talk(SAY_DEATH);
+            if (secondPhase)
+            {
+                me->CastSpell(me, SPELL_ARCANE_EXPLOSION);
+                Talk(SAY_WIPE);
+            }
+            else
+            {
+                _JustDied();
+                Talk(SAY_DEATH);
 
-            instance->SetData(DATA_EGG_EVENT, NOT_STARTED);
+                instance->SetData(DATA_EGG_EVENT, NOT_STARTED);
 
-            if (GameObject* portcullis = me->FindNearestGameObject(GO_PORTICULIS, 100.0f))
-                portcullis->SetGoState(GO_STATE_ACTIVE);
+                if (GameObject* portcullis = me->FindNearestGameObject(GO_PORTICULIS, 200.0f))
+                    portcullis->SetGoState(GO_STATE_ACTIVE);
 
-            instance->SetBossState(BOSS_RAZORGORE, DONE);
+                instance->SetBossState(BOSS_RAZORGORE, DONE);
 
-            // Clear int space
-            creaturesSummoned = 0;
+                // Clear int space
+                creaturesSummoned = 0;
+            }
         }
 
         void DoChangePhase()
@@ -123,22 +140,13 @@ public:
 
             secondPhase = true;
             me->RemoveAllAuras();
-            me->SetHealth(me->GetMaxHealth());
+            me->CastSpell(me, SPELL_WARMING_FLAMES);
         }
 
         void DoAction(int32 action) override
         {
             if (action == ACTION_PHASE_TWO)
                 DoChangePhase();
-        }
-
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
-        {
-            if (!secondPhase)
-            {
-                damage = 0;
-                me->SetHealth(max_health);
-            }
         }
 
         void EnterCombat(Unit* /*who*/) override
@@ -226,9 +234,10 @@ public:
 
         void Reset() override
         {
-            me->CastSpell(me, SPELL_VISUALCHANNEL);
+            Unit* orb_trigger = me->FindNearestCreature(NPC_ORB_TRIGGER, 20.0f, true);
+            me->CastSpell(orb_trigger, SPELL_VISUALCHANNEL);
             instance->SetBossState(BOSS_RAZORGORE, NOT_STARTED);
-            me->HandleEmoteCommand(EMOTE_STATE_SPELL_CHANNEL_DIRECTED);
+            me->CastSpell(me, SPELL_CHANNEL);
         }
 
         void EnterCombat(Unit * who) override
@@ -310,6 +319,7 @@ public:
                 {
                     razor->Attack(player, true);
                     player->CastSpell(razor, SPELL_MINDCONTROL);
+                    player->CastSpell(player, SPELL_MIND_EXHAUSTION);
                 }
         return true;
     }
@@ -324,6 +334,12 @@ class spell_egg_event : public SpellScriptLoader
         {
             PrepareSpellScript(spell_egg_eventSpellScript);
 
+            void HandleScript(SpellEffIndex effIndex)
+            {
+                PreventHitDefaultEffect(effIndex);
+                if (Unit* target = GetHitUnit());
+            }
+
             void HandleOnHit()
             {
                 if (InstanceScript* instance = GetCaster()->GetInstanceScript())
@@ -333,6 +349,7 @@ class spell_egg_event : public SpellScriptLoader
             void Register()
             {
                 OnHit += SpellHitFn(spell_egg_eventSpellScript::HandleOnHit);
+                OnEffectHitTarget += SpellEffectFn(spell_egg_eventSpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
             }
         };
 
