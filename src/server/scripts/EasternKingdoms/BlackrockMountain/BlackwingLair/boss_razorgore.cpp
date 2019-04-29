@@ -110,7 +110,7 @@ public:
             instance->SetBossState(BOSS_RAZORGORE, DONE);
 
             // Clear int space
-            creaturesSummoned = NULL;
+            creaturesSummoned = 0;
         }
 
         void DoChangePhase()
