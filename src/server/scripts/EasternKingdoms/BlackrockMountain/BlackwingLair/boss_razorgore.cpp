@@ -94,7 +94,7 @@ public:
             secondPhase = false;
             instance->SetData(DATA_EGG_EVENT, NOT_STARTED);
             max_health = me->GetMaxHealth();
-            creaturesSummoned = NULL;
+            creaturesSummoned = 0;
         }
 
         void JustDied(Unit* /*killer*/) override
