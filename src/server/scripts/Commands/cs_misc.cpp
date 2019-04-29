@@ -1836,12 +1836,12 @@ public:
             // Query informations from the DB
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_PINFO);
             stmt->setUInt32(0, GUID_LOPART(targetGuid));
-            PreparedQueryResult result = CharacterDatabase.Query(stmt);
+            PreparedQueryResult charInfoResult = CharacterDatabase.Query(stmt);
 
-            if (!result)
+            if (!charInfoResult)
                 return false;
 
-            Field* fields      = result->Fetch();
+            Field* fields      = charInfoResult->Fetch();
             totalPlayerTime    = fields[0].GetUInt32();
             level              = fields[1].GetUInt8();
             money              = fields[2].GetUInt32();
@@ -1864,11 +1864,11 @@ public:
         stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_PINFO);
         stmt->setInt32(0, int32(realmID));
         stmt->setUInt32(1, accId);
-        PreparedQueryResult result = LoginDatabase.Query(stmt);
+        PreparedQueryResult accInfoResult = LoginDatabase.Query(stmt);
 
-        if (result)
+        if (accInfoResult)
         {
-            Field* fields = result->Fetch();
+            Field* fields = accInfoResult->Fetch();
             userName      = fields[0].GetString();
             security      = fields[1].GetUInt8();
 
@@ -1924,55 +1924,55 @@ public:
         std::string nameLink = handler->playerLink(targetName);
 
         // Returns banType, banTime, bannedBy, banreason
-        PreparedStatement* stmt2 = LoginDatabase.GetPreparedStatement(LOGIN_SEL_PINFO_BANS);
-        stmt2->setUInt32(0, accId);
-        PreparedQueryResult result2 = LoginDatabase.Query(stmt2);
-        if (!result2)
+        PreparedStatement* banQuery = LoginDatabase.GetPreparedStatement(LOGIN_SEL_PINFO_BANS);
+        banQuery->setUInt32(0, accId);
+        PreparedQueryResult accBannedResult = LoginDatabase.Query(banQuery);
+        if (!accBannedResult)
         {
             banType = handler->GetTrinityString(LANG_CHARACTER);
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PINFO_BANS);
             stmt->setUInt32(0, GUID_LOPART(targetGuid));
-            result2 = CharacterDatabase.Query(stmt);
+            accBannedResult = CharacterDatabase.Query(stmt);
         }
 
-        if (result2)
+        if (accBannedResult)
         {
-            Field* fields = result2->Fetch();
+            Field* fields = accBannedResult->Fetch();
             banTime       = int64(fields[1].GetUInt64() ? 0 : fields[0].GetUInt32());
             bannedBy      = fields[2].GetString();
             banReason     = fields[3].GetString();
         }
 
         // Can be used to query data from World database
-        stmt2 = WorldDatabase.GetPreparedStatement(WORLD_SEL_REQ_XP);
-        stmt2->setUInt8(0, level);
-        PreparedQueryResult result3 = WorldDatabase.Query(stmt2);
+        PreparedStatement* xpQuery = WorldDatabase.GetPreparedStatement(WORLD_SEL_REQ_XP);
+        xpQuery->setUInt8(0, level);
+        PreparedQueryResult xpResult = WorldDatabase.Query(xpQuery);
 
-        if (result3)
+        if (xpResult)
         {
-            Field* fields = result3->Fetch();
+            Field* fields = xpResult->Fetch();
             xptotal       = fields[0].GetUInt32();
         }
 
         // Can be used to query data from Characters database
-        stmt2 = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PINFO_XP);
-        stmt2->setUInt32(0, lowguid);
-        PreparedQueryResult result4 = CharacterDatabase.Query(stmt2);
+        PreparedStatement* charXpQuery = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PINFO_XP);
+        charXpQuery->setUInt32(0, lowguid);
+        PreparedQueryResult charXpResult = CharacterDatabase.Query(charXpQuery);
 
-        if (result4)
+        if (charXpResult)
         {
-            Field* fields = result4->Fetch();
+            Field* fields = charXpResult->Fetch();
             xp            = fields[0].GetUInt32();
             uint32 gguid  = fields[1].GetUInt32();
 
             if (gguid != 0)
             {
-                PreparedStatement* stmt3 = CharacterDatabase.GetPreparedStatement(CHAR_SEL_GUILD_MEMBER_EXTENDED);
-                stmt3->setUInt32(0, lowguid);
-                PreparedQueryResult result5 = CharacterDatabase.Query(stmt3);
-                if (result5)
+                PreparedStatement* guildQuery = CharacterDatabase.GetPreparedStatement(CHAR_SEL_GUILD_MEMBER_EXTENDED);
+                guildQuery->setUInt32(0, lowguid);
+                PreparedQueryResult guildInfoResult = CharacterDatabase.Query(guildQuery);
+                if (guildInfoResult)
                 {
-                    Field* fields  = result5->Fetch();
+                    Field* fields  = guildInfoResult->Fetch();
                     guildId        = fields[0].GetUInt32();
                     guildName      = fields[1].GetString();
                     guildRank      = fields[2].GetString();
@@ -2143,12 +2143,12 @@ public:
 
         // Mail Data - an own query, because it may or may not be useful.
         // SQL: "SELECT SUM(CASE WHEN (checked & 1) THEN 1 ELSE 0 END) AS 'readmail', COUNT(*) AS 'totalmail' FROM mail WHERE `receiver` = ?"
-        PreparedStatement* stmt4 = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PINFO_MAILS);
-        stmt4->setUInt32(0, GUID_LOPART(targetGuid));
-        PreparedQueryResult result6 = CharacterDatabase.Query(stmt4);
-        if (result6)
+        PreparedStatement* mailQuery = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PINFO_MAILS);
+        mailQuery->setUInt32(0, GUID_LOPART(targetGuid));
+        PreparedQueryResult mailInfoResult = CharacterDatabase.Query(mailQuery);
+        if (mailInfoResult)
         {
-            Field* fields         = result6->Fetch();
+            Field* fields         = mailInfoResult->Fetch();
             uint32 readmail       = uint32(fields[0].GetDouble());
             uint32 totalmail      = uint32(fields[1].GetUInt64());
 
