@@ -24,6 +24,7 @@ public:
             { "waterwalk",      SEC_GAMEMASTER,     false, &HandleWaterwalkCheatCommand,       "" },
             { "status",         SEC_GAMEMASTER,     false, &HandleCheatStatusCommand,          "" },
             { "taxi",           SEC_GAMEMASTER,     false, &HandleTaxiCheatCommand,            "" },
+            { "explore",        SEC_GAMEMASTER,     false, &HandleExploreCheatCommand,         "" },
 
         };
 
@@ -221,6 +222,46 @@ public:
         handler->SetSentErrorMessage(true);
 
         return false;
+    }
+
+
+    static bool HandleExploreCheatCommand(ChatHandler* handler, const char *args)
+    {
+        if (!*args)
+            return false;
+
+        int flag = atoi((char*)args);
+
+        Player* chr = handler->getSelectedPlayer();
+        if (!chr)
+        {
+            handler->SendSysMessage(LANG_NO_CHAR_SELECTED);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (flag != 0)
+        {
+            handler->PSendSysMessage(LANG_YOU_SET_EXPLORE_ALL, handler->GetNameLink(chr).c_str());
+            if (handler->needReportToTarget(chr))
+                ChatHandler(chr->GetSession()).PSendSysMessage(LANG_YOURS_EXPLORE_SET_ALL, handler->GetNameLink().c_str());
+        }
+        else
+        {
+            handler->PSendSysMessage(LANG_YOU_SET_EXPLORE_NOTHING, handler->GetNameLink(chr).c_str());
+            if (handler->needReportToTarget(chr))
+                ChatHandler(chr->GetSession()).PSendSysMessage(LANG_YOURS_EXPLORE_SET_NOTHING, handler->GetNameLink().c_str());
+        }
+
+        for (uint8 i = 0; i < PLAYER_EXPLORED_ZONES_SIZE; ++i)
+        {
+            if (flag != 0)
+                handler->GetSession()->GetPlayer()->SetFlag(PLAYER_EXPLORED_ZONES_1 + i, 0xFFFFFFFF);
+            else
+                handler->GetSession()->GetPlayer()->SetFlag(PLAYER_EXPLORED_ZONES_1 + i, 0);
+        }
+
+        return true;
     }
 };
 
