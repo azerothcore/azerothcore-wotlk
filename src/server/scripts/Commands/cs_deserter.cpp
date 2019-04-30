@@ -21,7 +21,7 @@ EndScriptData */
     BG_SPELL_DESERTER = 26013
 };
 
- class deserter_commandscript : public CommandScript
+class deserter_commandscript : public CommandScript
 {
 public:
     deserter_commandscript() : CommandScript("deserter_commandscript") { }
