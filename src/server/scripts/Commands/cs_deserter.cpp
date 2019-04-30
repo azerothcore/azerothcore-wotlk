@@ -4,13 +4,6 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-/* ScriptData
-Name: gobject_commandscript
-%Complete: 100
-Comment: All gobject related commands
-Category: commandscripts
-EndScriptData */
-
 #include "Chat.h"
 #include "Player.h"
 #include "Language.h"
