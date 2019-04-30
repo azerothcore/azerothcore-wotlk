@@ -98,7 +98,7 @@ public:
          return true;
     }
 
-    static bool HandleDeserterRemove(ChatHandler* handler, char const* args, bool isInstance)
+    static bool HandleDeserterRemove(ChatHandler* handler, char const* /*args*/, bool isInstance)
     {
         Player* targetPlayer = handler->getSelectedPlayer();
         if (!targetPlayer)
