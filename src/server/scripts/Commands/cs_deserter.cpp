@@ -14,6 +14,7 @@ EndScriptData */
 #include "Chat.h"
 #include "Player.h"
 #include "Language.h"
+#include "ScriptMgr.h"
 
  enum Spells
 {
