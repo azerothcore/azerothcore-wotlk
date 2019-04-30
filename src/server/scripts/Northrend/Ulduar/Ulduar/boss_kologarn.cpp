@@ -396,7 +396,7 @@ public:
                     }
 
                     me->CastSpell(me->GetVictim(), SPELL_STONE_SHOUT, false);
-                    events.RepeatEvent(2000);
+                    events.ScheduleEvent(EVENT_STONE_SHOUT, 2000);
                     break;
                 case EVENT_SMASH:
                     if (_left && _right)
@@ -405,7 +405,7 @@ public:
                         me->CastSpell(me->GetVictim(), SPELL_ONEARMED_OVERHEAD_SMASH, false);
                     
                     events.DelayEvents(1000);
-                    events.RepeatEvent(14000);
+                    events.ScheduleEvent(EVENT_SMASH, 14000);
                     return;
                 case EVENT_SWEEP:
                     if (_left)
@@ -418,10 +418,10 @@ public:
                     }
 
                     events.DelayEvents(1000);
-                    events.RepeatEvent(17000);
+                    events.ScheduleEvent(EVENT_SWEEP, 17000);
                     return;
                 case EVENT_GRIP:
-                    events.RepeatEvent(25000);
+                    events.ScheduleEvent(EVENT_GRIP, 25000);
                     if (!_right)
                         break;
 
@@ -431,10 +431,10 @@ public:
                     return;
                 case EVENT_FOCUSED_EYEBEAM:
                 {
-                    events.RepeatEvent(13000+rand()%5000);
+                    events.ScheduleEvent(EVENT_FOCUSED_EYEBEAM, 13000+rand()%5000);
                     Unit* target = NULL;
                     Map::PlayerList const& pList = me->GetMap()->GetPlayers();
-                    for(Map::PlayerList::const_iterator itr = pList.begin(); itr != pList.end(); ++itr)
+                    for(auto itr = pList.begin(); itr != pList.end(); ++itr)
                     {
                         if (itr->GetSource()->GetPositionZ() < 420)
                             continue;
