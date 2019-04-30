@@ -15,6 +15,7 @@ EndScriptData */
 #include "Player.h"
 #include "Language.h"
 #include "ScriptMgr.h"
+#include "SpellAuras.h"
 #include "SpellAuraEffects.h"
 
  enum Spells
