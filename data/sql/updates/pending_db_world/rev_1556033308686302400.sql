@@ -160,10 +160,9 @@ UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 17607;
 -- Table smart_scripts
 DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 17607);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(17607, 0, 0, 0, 4, 0, 100, 0, 0, 0, 0, 0, 11, 31734, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Sunhawk Defender - On Aggro - Cast \'31734\''),
+(17607, 0, 0, 0, 26, 0, 100, 1, 0, 10, 0, 1, 11, 31734, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Sunhawk Pyromancer - In Combat LOS 10 yards - Cast \'31734\' (No Repeat)'),
 (17607, 0, 1, 0, 0, 0, 100, 0, 3200, 3200, 15400, 15400, 11, 15284, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Sunhawk Defender - In Combat - Cast \'15284\''),
-(17607, 0, 2, 0, 0, 0, 100, 0, 8600, 8600, 34200, 34200, 11, 31737, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Sunhawk Defender - In Combat - Cast \'31737\''),
-(17607, 0, 3, 0, 0, 0, 100, 0, 12700, 12700, 58200, 58200, 11, 31737, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Sunhawk Defender - In Combat - Cast \'31737\'');
+(17607, 0, 2, 0, 0, 0, 100, 0, 8600, 8600, 34200, 34200, 11, 31737, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Sunhawk Defender - In Combat - Cast \'31737\'');
 
 
 -- Creating a new SmartAI script for [Creature] ENTRY 17610 (name: Sunhawk Agent)
