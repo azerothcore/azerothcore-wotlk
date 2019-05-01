@@ -187,9 +187,11 @@ UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 17609;
 -- Table smart_scripts
 DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 17609);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(17609, 0, 0, 0, 4, 0, 100, 0, 0, 0, 0, 0, 11, 31734, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Sunhawk Saboteur - On Aggro - Cast \'31734\''),
+(17609, 0, 0, 0, 26, 0, 100, 1, 0, 10, 0, 1, 11, 31734, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Sunhawk Pyromancer - In Combat LOS 10 yards - Cast \'31734\' (No Repeat)'),
 (17609, 0, 1, 0, 0, 0, 100, 0, 1000, 1000, 6200, 6200, 11, 6660, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Sunhawk Saboteur - In Combat - Cast \'6660\''),
-(17609, 0, 2, 0, 0, 0, 100, 0, 11750, 11750, 32400, 32400, 11, 14443, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Sunhawk Saboteur - In Combat - Cast \'14443\'');
+(17609, 0, 2, 0, 0, 0, 100, 0, 11750, 11750, 32400, 32400, 11, 14443, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Sunhawk Saboteur - In Combat - Cast \'14443\''),
+(17609, 0, 3, 0, 9, 0, 100, 0, 4, 30, 1, 1, 79, 15, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Sunhawk Saboteur - Within 4-30 Range - Set Ranged Movement'),
+(17609, 0, 4, 0, 9, 0, 100, 0, 0, 4, 1, 1, 79, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Sunhawk Saboteur - Within 0-4 Range - Set Ranged Movement');
 
 
 -- Creating a new SmartAI script for [Creature] ENTRY 17713 (name: Bloodcursed Naga)
