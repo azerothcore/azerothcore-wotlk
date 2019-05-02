@@ -131,3 +131,9 @@ VALUES
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 15 AND `SourceGroup` = 8886;
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`,`SourceGroup`,`SourceEntry`,`SourceId`,`ElseGroup`,`ConditionTypeOrReference`,`ConditionTarget`,`ConditionValue1`,`ConditionValue2`,`ConditionValue3`,`NegativeCondition`,`ErrorType`,`ErrorTextId`,`ScriptName`,`Comment`) VALUES
 (15,8886,0,0,0,2,0,33336,1,0,1,0,0,'','Westguard Sergeant - Loan Spyglass - Show gossip option only if ''Sergeant''s Spyglass'' not in inventory');
+
+-- Enable "Winterhoof Emblem" to also dismiss the Winterhoof Brave:
+DELETE FROM `spell_script_names` WHERE `spell_id` = 43102;
+INSERT INTO `spell_script_names` (`spell_id`,`ScriptName`)
+VALUES
+(43102,'spell_item_summon_or_dismiss');
