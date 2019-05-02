@@ -337,7 +337,7 @@ class spell_egg_event : public SpellScriptLoader
             void HandleScript(SpellEffIndex effIndex)
             {
                 PreventHitDefaultEffect(effIndex);
-                if (Unit* target = GetHitUnit());
+                // if (Unit* target = GetHitUnit());
             }
 
             void HandleOnHit()
