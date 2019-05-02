@@ -1,3 +1,19 @@
+-- DB update 2019_05_01_00 -> 2019_05_02_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2019_05_01_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2019_05_01_00 2019_05_02_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1555998926077008658'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1555998926077008658');
 
 -- Cleanup phasing after quest "Return To Angrathar" is rewarded
@@ -48,3 +64,12 @@ VALUES
 (31313,0,2,0,1,0,100,0,0,3000,1000,3000,0,87,3131005,3131006,3131007,3131008,0,0,1,0,0,0,0,0,0,0,0,'Fleeing Alliance Soldier - OOC - Run Random Script'),
 (31313,0,3,0,1,0,100,0,1000,2000,3000,6000,0,46,10,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Fleeing Alliance Soldier - OOC - Move Forward'),
 (31313,0,4,0,1,0,100,0,12000,24000,12000,24000,0,24,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Fleeing Alliance Soldier - OOC - Evade');
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
