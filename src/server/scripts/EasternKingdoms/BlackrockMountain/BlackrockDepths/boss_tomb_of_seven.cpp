@@ -81,7 +81,7 @@ enum DoomrelSpells
     SPELL_DEMONARMOR                                       = 13787,
     SPELL_SUMMON_VOIDWALKERS                               = 15092
 };
-enum DoomrelSpells
+enum DoomrelEvents
 {
     EVENT_SPELL_SHADOWBOLTVOLLEY    = 1,
     EVENT_SPELL_IMMOLATE            = 2,
