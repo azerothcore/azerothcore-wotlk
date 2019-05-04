@@ -163,6 +163,7 @@ public:
             _events.ScheduleEvent(EVENT_SPELL_IMMOLATE, 18000);
             _events.ScheduleEvent(EVENT_SPELL_CURSEOFWEAKNESS, 5000);
             _events.ScheduleEvent(EVENT_SPELL_DEMONARMOR, 16000);
+            _events.ScheduleEvent(EVENT_SPELL_SUMMON_VOIDWALKERS, 1000);
         }
 
         void EnterEvadeMode() override
@@ -210,7 +211,7 @@ public:
                     DoCast(me, SPELL_DEMONARMOR);
                     _events.ScheduleEvent(EVENT_SPELL_DEMONARMOR, 300000);
                     break;
-                case EVENT_SPELL_SUMMONVOIDWALKERS:
+                case EVENT_SPELL_SUMMON_VOIDWALKERS:
                     if (!Voidwalkers && HealthBelowPct(51))
                     {
                         DoCastVictim(SPELL_SUMMON_VOIDWALKERS, true);
