@@ -441,8 +441,8 @@ public:
                 if (TombTimer <= diff)
                 {
                     TombTimer = TIMER_TOMBOFTHESEVEN;
-                    ++TombEventCounter;
                     TombOfSevenEvent();
+                    ++TombEventCounter;
                     // Check Killed bosses
                     for (uint8 i = 0; i < 7; ++i)
                     {
