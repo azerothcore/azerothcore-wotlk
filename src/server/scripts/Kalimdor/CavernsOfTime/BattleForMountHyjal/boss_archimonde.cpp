@@ -281,8 +281,8 @@ public:
             instance->SetData(DATA_ARCHIMONDEEVENT, NOT_STARTED);
 
             DoomfireSpiritGUID = 0;
-            damageTaken = 0;
             WorldTreeGUID = 0;
+            WispCount = 0;
             Enraged = false;
             BelowTenPercent = false;
             HasProtected = false;
@@ -388,6 +388,17 @@ public:
 
             instance->SetData(DATA_ARCHIMONDEEVENT, DONE);
             instance->DoUpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE, me->GetEntry(), 1, me);
+
+            // Reset scheduled events
+            events.CancelEvent(EVENT_SPELL_FEAR);
+            events.CancelEvent(EVENT_SPELL_AIR_BURST);
+            events.CancelEvent(EVENT_SPELL_GRIP_OF_THE_LEGION);
+            events.CancelEvent(EVENT_SPELL_UNLEASH_SOUL_CHARGES);
+            events.CancelEvent(EVENT_SPELL_DOOMFIRE);
+            events.CancelEvent(EVENT_SPELL_FINGER_OF_DEATH);
+            events.CancelEvent(EVENT_SPELL_HAND_OF_DEATH);
+            events.CancelEvent(EVENT_SPELL_PROTECTION_OF_ELUNE);
+            events.CancelEvent(EVENT_ENRAGE);
         }
 
         bool CanUseFingerOfDeath()
@@ -560,7 +571,12 @@ public:
             }
 
             if (!UpdateVictim())
+            {
+                // If you're testing keep these, else comment or remove
+                me->setFaction(1720);
+                me->SetVisible(true);
                 return;
+            }
 
             if (me->HealthBelowPct(10) && !BelowTenPercent)
                 events.ScheduleEvent(EVENT_BELOW_10_PERCENT_HP, 0);
