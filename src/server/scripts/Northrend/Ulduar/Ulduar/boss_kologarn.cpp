@@ -88,6 +88,7 @@ enum KologarnEvents
     EVENT_RESTORE_ARM_RIGHT             = 5,
     EVENT_FOCUSED_EYEBEAM               = 6,
     EVENT_STONE_SHOUT                   = 7,
+    EVENT_PREPARE_BREATH                = 8, // Kologarn can't cast breath on pull
 };
 
 enum KologarnNPCs
@@ -136,7 +137,7 @@ public:
     struct boss_kologarnAI : public ScriptedAI
     {
         boss_kologarnAI(Creature* pCreature) : ScriptedAI(pCreature), vehicle(me->GetVehicleKit()),
-            _left(0), _right(0), summons(me)
+            _left(0), _right(0), summons(me), breathReady(false)
         {
             m_pInstance = me->GetInstanceScript();
             assert(vehicle);
@@ -150,10 +151,10 @@ public:
         EventMap events;
         SummonList summons;
 
-        bool _looksAchievement;
+        bool _looksAchievement, breathReady;
         uint8 _rubbleAchievement;
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if (who->GetTypeId() == TYPEID_PLAYER && me->GetExactDist2d(who) < 45.0f && me->getStandState() == UNIT_STAND_STATE_SUBMERGED)
             {
@@ -168,7 +169,7 @@ public:
                 ScriptedAI::MoveInLineOfSight(who);
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             if (!_EnterEvadeMode())
                 return;
@@ -212,7 +213,7 @@ public:
             }
         }
 
-        void Reset()
+        void Reset() override
         {
             _rubbleAchievement = 0;
             _looksAchievement = true;
@@ -229,9 +230,16 @@ public:
 
             AttachLeftArm();
             AttachRightArm();
+
+            // Reset breath on pull
+            breathReady = false;
+
+            // Open the door inside Kologarn chamber
+            if (GameObject* door = me->FindNearestGameObject(GO_KOLOGARN_DOORS, 100.0f))
+                door->SetGoState(GO_STATE_ACTIVE);
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (param == DATA_KOLOGARN_LOOKS_ACHIEV)
                 _looksAchievement = false;
@@ -245,7 +253,7 @@ public:
             }
         }
 
-        uint32 GetData(uint32 param) const
+        uint32 GetData(uint32 param) const override
         {
             if (param == DATA_KOLOGARN_LOOKS_ACHIEV)
                 return _looksAchievement;
@@ -257,18 +265,18 @@ public:
             return 0;
         }
 
-        void AttackStart(Unit* who)
+        void AttackStart(Unit* who) override
         {
             me->Attack(who, true);
         }
 
-        void JustSummoned(Creature* cr)
+        void JustSummoned(Creature* cr) override
         {
             if (cr->GetEntry() != NPC_LEFT_ARM && cr->GetEntry() != NPC_RIGHT_ARM)
                 summons.Summon(cr);
         }
 
-        void JustDied(Unit*)
+        void JustDied(Unit*) override
         {
             summons.DespawnAll();
             me->StopMoving();
@@ -293,7 +301,7 @@ public:
                 arm->DespawnOrUnsummon(3000); // visual
         }
 
-        void KilledUnit(Unit*)
+        void KilledUnit(Unit*) override
         {
             if (!urand(0,2))
                 return;
@@ -301,7 +309,7 @@ public:
             Talk(SAY_SLAY);
         }
 
-        void PassengerBoarded(Unit* who, int8  /*seatId*/, bool apply)
+        void PassengerBoarded(Unit* who, int8  /*seatId*/, bool apply) override
         {
             if (!me->IsAlive())
                 return;
@@ -334,7 +342,7 @@ public:
             }
         }
 
-        void DamageTaken(Unit* who, uint32& damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit* who, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if (who && who->GetEntry() == me->GetEntry() && me->GetHealth())
             {
@@ -343,22 +351,27 @@ public:
             }
         }
 
-        void EnterCombat(Unit*  /*who*/)
+        void EnterCombat(Unit*  /*who*/) override
         {
             if (m_pInstance)
                 m_pInstance->SetData(TYPE_KOLOGARN, IN_PROGRESS);
 
-            events.RescheduleEvent(EVENT_SMASH, 8000);
-            events.RescheduleEvent(EVENT_SWEEP, 17000);
-            events.RescheduleEvent(EVENT_GRIP, 15000);
-            events.RescheduleEvent(EVENT_FOCUSED_EYEBEAM, 25000);
+            events.ScheduleEvent(EVENT_SMASH, 8000);
+            events.ScheduleEvent(EVENT_SWEEP, 17000);
+            events.ScheduleEvent(EVENT_GRIP, 15000);
+            events.ScheduleEvent(EVENT_FOCUSED_EYEBEAM, 25000);
+            events.ScheduleEvent(EVENT_PREPARE_BREATH, 3000);
             //events.ScheduleEvent(EVENT_ENRAGE, x); no info
             
             Talk(SAY_AGGRO);
             me->setActive(true);
+
+            // Close the door inside Kologarn chamber
+            if (GameObject* door = me->FindNearestGameObject(GO_KOLOGARN_DOORS, 100.0f))
+                door->SetGoState(GO_STATE_READY);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
             {
@@ -370,8 +383,11 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
+                case EVENT_PREPARE_BREATH:
+                    breathReady = true;
+                    break;
                 case EVENT_STONE_SHOUT:
                     if (_left || _right)
                     {
@@ -380,7 +396,7 @@ public:
                     }
 
                     me->CastSpell(me->GetVictim(), SPELL_STONE_SHOUT, false);
-                    events.RepeatEvent(2000);
+                    events.ScheduleEvent(EVENT_STONE_SHOUT, 2000);
                     break;
                 case EVENT_SMASH:
                     if (_left && _right)
@@ -389,7 +405,7 @@ public:
                         me->CastSpell(me->GetVictim(), SPELL_ONEARMED_OVERHEAD_SMASH, false);
                     
                     events.DelayEvents(1000);
-                    events.RepeatEvent(14000);
+                    events.ScheduleEvent(EVENT_SMASH, 14000);
                     return;
                 case EVENT_SWEEP:
                     if (_left)
@@ -402,10 +418,10 @@ public:
                     }
 
                     events.DelayEvents(1000);
-                    events.RepeatEvent(17000);
+                    events.ScheduleEvent(EVENT_SWEEP, 17000);
                     return;
                 case EVENT_GRIP:
-                    events.RepeatEvent(25000);
+                    events.ScheduleEvent(EVENT_GRIP, 25000);
                     if (!_right)
                         break;
 
@@ -415,10 +431,10 @@ public:
                     return;
                 case EVENT_FOCUSED_EYEBEAM:
                 {
-                    events.RepeatEvent(13000+rand()%5000);
+                    events.ScheduleEvent(EVENT_FOCUSED_EYEBEAM, 13000+rand()%5000);
                     Unit* target = NULL;
                     Map::PlayerList const& pList = me->GetMap()->GetPlayers();
-                    for(Map::PlayerList::const_iterator itr = pList.begin(); itr != pList.end(); ++itr)
+                    for(auto itr = pList.begin(); itr != pList.end(); ++itr)
                     {
                         if (itr->GetSource()->GetPositionZ() < 420)
                             continue;
@@ -474,7 +490,8 @@ public:
                     return;
                 }
 
-                me->CastSpell(me->GetVictim(), SPELL_PETRIFYING_BREATH, false);
+                if (breathReady)
+                    me->CastSpell(me->GetVictim(), SPELL_PETRIFYING_BREATH, false);
                 me->resetAttackTimer();
             }
         }
