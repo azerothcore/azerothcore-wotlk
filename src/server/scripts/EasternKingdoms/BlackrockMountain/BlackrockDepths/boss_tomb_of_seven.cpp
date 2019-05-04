@@ -188,6 +188,8 @@ public:
             if (!UpdateVictim())
                 return;
 
+            _events.Update(diff);
+            
             switch(_events.ExecuteEvent())
             {
                 case EVENT_SPELL_SHADOWBOLTVOLLEY:
