@@ -106,10 +106,8 @@ public:
                 break;
             case GOSSIP_ACTION_INFO_DEF+2:
                 CloseGossipMenuFor(player);
-                //start event here
-                creature->setFaction(FACTION_HOSTILE);
-                creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
-                creature->AI()->AttackStart(player);
+
+                // Start encounter
                 InstanceScript* instance = creature->GetInstanceScript();
                 if (instance)
                     instance->SetData64(DATA_EVENSTARTER, player->GetGUID());
