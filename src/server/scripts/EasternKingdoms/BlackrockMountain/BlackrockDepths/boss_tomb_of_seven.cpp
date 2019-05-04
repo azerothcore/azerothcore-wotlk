@@ -159,7 +159,7 @@ public:
 
         void EnterCombat(Unit* /*who*/) override
         {
-            _events.ScheduleEvent(EVENT_SPELL_SHADOWVOLLEY, 10000);
+            _events.ScheduleEvent(EVENT_SPELL_SHADOWBOLTVOLLEY, 10000);
             _events.ScheduleEvent(EVENT_SPELL_IMMOLATE, 18000);
             _events.ScheduleEvent(EVENT_SPELL_CURSEOFWEAKNESS, 5000);
             _events.ScheduleEvent(EVENT_SPELL_DEMONARMOR, 16000);
