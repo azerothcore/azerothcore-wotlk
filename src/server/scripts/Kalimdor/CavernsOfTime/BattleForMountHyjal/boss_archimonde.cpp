@@ -21,66 +21,66 @@
 
 enum Texts
 {
-    SAY_AGGRO = 1,
-    SAY_DOOMFIRE = 2,
-    SAY_AIR_BURST = 3,
-    SAY_SLAY = 4,
-    SAY_ENRAGE = 5,
-    SAY_DEATH = 6,
+    SAY_AGGRO       = 1,
+    SAY_DOOMFIRE    = 2,
+    SAY_AIR_BURST   = 3,
+    SAY_SLAY        = 4,
+    SAY_ENRAGE      = 5,
+    SAY_DEATH       = 6,
     SAY_SOUL_CHARGE = 7,
 };
 
 enum Spells
 {
-    SPELL_DENOUEMENT_WISP = 32124,
-    SPELL_ANCIENT_SPARK = 39349,
-    SPELL_PROTECTION_OF_ELUNE = 38528,
+    SPELL_DENOUEMENT_WISP       = 32124,
+    SPELL_ANCIENT_SPARK         = 39349,
+    SPELL_PROTECTION_OF_ELUNE   = 38528,
 
-    SPELL_DRAIN_WORLD_TREE = 39140,
-    SPELL_DRAIN_WORLD_TREE_2 = 39141,
+    SPELL_DRAIN_WORLD_TREE      = 39140,
+    SPELL_DRAIN_WORLD_TREE_2    = 39141,
 
-    SPELL_FINGER_OF_DEATH = 31984,
-    SPELL_RED_SKY_EFFECT = 32111,
-    SPELL_HAND_OF_DEATH = 35354,
-    SPELL_AIR_BURST = 32014,
-    SPELL_GRIP_OF_THE_LEGION = 31972,
-    SPELL_DOOMFIRE_STRIKE = 31903,    //summons two creatures
-    SPELL_DOOMFIRE_SPAWN = 32074,
-    SPELL_DOOMFIRE = 31945,
-    SPELL_SOUL_CHARGE_YELLOW = 32045,
-    SPELL_SOUL_CHARGE_GREEN = 32051,
-    SPELL_SOUL_CHARGE_RED = 32052,
-    SPELL_UNLEASH_SOUL_YELLOW = 32054,
-    SPELL_UNLEASH_SOUL_GREEN = 32057,
-    SPELL_UNLEASH_SOUL_RED = 32053,
-    SPELL_FEAR = 31970,
+    SPELL_FINGER_OF_DEATH       = 31984,
+    SPELL_RED_SKY_EFFECT        = 32111,
+    SPELL_HAND_OF_DEATH         = 35354,
+    SPELL_AIR_BURST             = 32014,
+    SPELL_GRIP_OF_THE_LEGION    = 31972,
+    SPELL_DOOMFIRE_STRIKE       = 31903,    //summons two creatures
+    SPELL_DOOMFIRE_SPAWN        = 32074,
+    SPELL_DOOMFIRE              = 31945,
+    SPELL_SOUL_CHARGE_YELLOW    = 32045,
+    SPELL_SOUL_CHARGE_GREEN     = 32051,
+    SPELL_SOUL_CHARGE_RED       = 32052,
+    SPELL_UNLEASH_SOUL_YELLOW   = 32054,
+    SPELL_UNLEASH_SOUL_GREEN    = 32057,
+    SPELL_UNLEASH_SOUL_RED      = 32053,
+    SPELL_FEAR                  = 31970,
 };
 
 enum Summons
 {
-    CREATURE_DOOMFIRE = 18095,
-    CREATURE_DOOMFIRE_SPIRIT = 18104,
-    CREATURE_ANCIENT_WISP = 17946,
-    CREATURE_CHANNEL_TARGET = 22418,
+    CREATURE_DOOMFIRE           = 18095,
+    CREATURE_DOOMFIRE_SPIRIT    = 18104,
+    CREATURE_ANCIENT_WISP       = 17946,
+    CREATURE_CHANNEL_TARGET     = 22418,
 };
 
 enum Events
 {
-    EVENT_DRAIN_WORLD_TREE = 1,
-    EVENT_SPELL_FEAR = 2,
-    EVENT_SPELL_AIR_BURST = 3,
-    EVENT_SPELL_GRIP_OF_THE_LEGION = 4,
-    EVENT_SPELL_UNLEASH_SOUL_CHARGES = 5,
-    EVENT_SPELL_DOOMFIRE = 6,
-    EVENT_SPELL_FINGER_OF_DEATH = 7,
-    EVENT_SPELL_HAND_OF_DEATH = 8,
-    EVENT_SPELL_PROTECTION_OF_ELUNE = 9,
-    EVENT_ENRAGE = 10,
-    EVENT_CHECK_WORLD_TREE_DISTANCE = 11,    // Enrage if too close to the tree
-    EVENT_BELOW_10_PERCENT_HP = 12,
-    EVENT_SUMMON_WISPS = 13,
-    EVENT_TOO_CLOSE_TO_WORLD_TREE = 14,
-    EVENT_ENRAGE_ROOT = 15,
+    EVENT_DRAIN_WORLD_TREE              = 1,
+    EVENT_SPELL_FEAR                    = 2,
+    EVENT_SPELL_AIR_BURST               = 3,
+    EVENT_SPELL_GRIP_OF_THE_LEGION      = 4,
+    EVENT_SPELL_UNLEASH_SOUL_CHARGES    = 5,
+    EVENT_SPELL_DOOMFIRE                = 6,
+    EVENT_SPELL_FINGER_OF_DEATH         = 7,
+    EVENT_SPELL_HAND_OF_DEATH           = 8,
+    EVENT_SPELL_PROTECTION_OF_ELUNE     = 9,
+    EVENT_ENRAGE                        = 10,
+    EVENT_CHECK_WORLD_TREE_DISTANCE     = 11,    // Enrage if too close to the tree
+    EVENT_BELOW_10_PERCENT_HP           = 12,
+    EVENT_SUMMON_WISPS                  = 13,
+    EVENT_TOO_CLOSE_TO_WORLD_TREE       = 14,
+    EVENT_ENRAGE_ROOT                   = 15,
     EVENT_SPELL_FINGER_OF_DEATH_PHASE_4 = 16
 };
 
@@ -289,8 +289,7 @@ public:
             IsChanneling = false;
 
             // Reset player's immunity to Spells
-            std::list<Unit*>::iterator it;
-            for (it = targets.begin(); it != targets.end(); ++it)
+            for (auto it = targets.begin(); it != targets.end(); ++it)
             {
                 Unit* affected_unit = ObjectAccessor::GetUnit(*me, (*it)->GetGUID());
 
@@ -324,7 +323,7 @@ public:
 
             uint32 i = 0;
 
-            for (std::list<Unit*>::const_iterator iter = targets.begin(); iter != targets.end(); ++iter, ++i)
+            for (auto iter = targets.begin(); iter != targets.end(); ++iter, ++i)
                 if (Unit* target = *iter)
                 {
                     target->AddAura(SPELL_PROTECTION_OF_ELUNE, target);
@@ -593,7 +592,7 @@ public:
                     events.ScheduleEvent(EVENT_ENRAGE, 0);
                     events.ScheduleEvent(EVENT_ENRAGE_ROOT, 0);
                     events.ScheduleEvent(EVENT_SUMMON_WISPS, 1000);
-                    events.ScheduleEvent(EVENT_SPELL_HAND_OF_DEATH, 1000);
+                    events.ScheduleEvent(EVENT_SPELL_HAND_OF_DEATH, 1500);
                     events.ScheduleEvent(EVENT_SPELL_FINGER_OF_DEATH, 2500);
                     break;
                 case EVENT_SUMMON_WISPS:
@@ -605,7 +604,7 @@ public:
                     }
                     DoSpawnCreature(CREATURE_ANCIENT_WISP, float(rand() % 40), float(rand() % 40), 0, 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
                     ++WispCount;
-                    events.RepeatEvent(1500);
+                    events.ScheduleEvent(EVENT_SUMMON_WISPS, 1500);
                     break;
                 case EVENT_SPELL_HAND_OF_DEATH:
                     DoCastVictim(SPELL_RED_SKY_EFFECT);
