@@ -1,3 +1,19 @@
+-- DB update 2019_05_04_00 -> 2019_05_04_01
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2019_05_04_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2019_05_04_00 2019_05_04_01 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1556033550219221000'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1556033550219221000');
 
 -- Creating a new SmartAI script for [Creature] ENTRY 1998 (name: Webwood Lurker)
@@ -53,3 +69,12 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (2001, 0, 0, 0, 11, 0, 100, 0, 0, 0, 0, 0, 11, 6752, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Giant Webwood Spider - On Respawn - Cast \'6752\''),
 (2001, 0, 1, 0, 0, 0, 100, 0, 6000, 6000, 12800, 12800, 11, 744, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Giant Webwood Spider - In Combat - Cast \'744\''),
 (2001, 0, 2, 0, 0, 0, 100, 0, 7500, 7500, 15000, 15000, 11, 745, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Giant Webwood Spider - In Combat - Cast \'745\'');
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
