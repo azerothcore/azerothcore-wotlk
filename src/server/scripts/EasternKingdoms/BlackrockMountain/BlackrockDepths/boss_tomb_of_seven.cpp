@@ -189,9 +189,9 @@ public:
 
             switch(_events.ExecuteEvent())
             {
-                case EVENT_SPELL_SHADOWVOLLEY:
+                case EVENT_SPELL_SHADOWBOLTVOLLEY:
                     DoCastVictim(SPELL_SHADOWBOLTVOLLEY);
-                    _events.ScheduleEvent(EVENT_SPELL_SHADOWVOLLEY, 12000);
+                    _events.ScheduleEvent(EVENT_SPELL_SHADOWBOLTVOLLEY, 12000);
                     break;
                 case EVENT_SPELL_IMMOLATE:
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
