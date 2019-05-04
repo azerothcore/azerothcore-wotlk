@@ -852,10 +852,15 @@ public:
 ## npc_jungle_punch_target
 #####*/
 
-#define SAY_OFFER     "Care to try Grimbooze Thunderbrew's new jungle punch?"
-
 enum JunglePunch
 {
+    SAY_OFFER                           = 28558,
+    ITEM_TANKARD                        = 2705,
+
+    NPC_HEMET                           = 27986,
+    NPC_HADRIUS                         = 28047,
+
+    SPELL_KNOCKDOWN                     = 42963,
     SPELL_OFFER                         = 51962,
     QUEST_TASTE_TEST                    = 12645,
 
@@ -977,8 +982,25 @@ public:
 
             if (sayTimer < diff)
             {
+                if (sayStep == 2)
+                {
+                    me->SetSheath(SHEATH_STATE_MELEE);
+                    SetEquipmentSlots(false, ITEM_TANKARD, EQUIP_UNEQUIP, EQUIP_UNEQUIP);
+                }
+                else if (sayStep == 3)
+                {
+                    if (me->GetEntry() == NPC_HEMET)
+                        me->SetSheath(SHEATH_STATE_RANGED);
+                    else if (me->GetEntry() == NPC_HADRIUS)
+                    {
+                        me->SetSheath(SHEATH_STATE_UNARMED);
+                        me->CastSpell(me,SPELL_KNOCKDOWN,false);
+                    }
+                    SetEquipmentSlots(true);
+                }
+
                 Talk(SAY_HEMET_HADRIUS_TAMARA_1 + sayStep - 1);
-                sayTimer = 3000;
+                sayTimer = 6000;
                 sayStep++;
 
                 if (sayStep > 3) // end
@@ -1014,7 +1036,7 @@ public:
                     continue;
 
                 player->KilledMonsterCredit(me->GetEntry(), 0);
-                player->Say(SAY_OFFER, LANG_UNIVERSAL);
+                player->MonsterSay(SAY_OFFER, LANG_UNIVERSAL, me);
                 sayStep = 1;
                 break;
             }
