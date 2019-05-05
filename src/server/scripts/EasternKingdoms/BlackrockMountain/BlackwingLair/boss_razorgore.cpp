@@ -95,19 +95,30 @@ public:
         void Reset() override
         {
             _Reset();
+            
+            // Despawn summoned NPCs
             summons.DespawnAll();
+            creaturesSummoned = 0;
+            
+            // Encounter not started
             secondPhase = false;
             instance->SetData(DATA_EGG_EVENT, NOT_STARTED);
             max_health = me->GetMaxHealth();
-            creaturesSummoned = 0;
 
             // In case Grethok isn't alive, open the door
             if (GameObject* portcullis = me->FindNearestGameObject(GO_PORTICULIS, 200.0f))
                 portcullis->SetGoState(GO_STATE_ACTIVE);
+            
+            // TODO: Reset Grethok and his friends
         }
 
         void JustDied(Unit* /*killer*/) override
         {
+            /* 
+             * Because he is dead, he can't cast spells
+             * TODO: When he dies, add a trigger that will
+             *       cast the explosion spell for him instead
+            */
             if (secondPhase)
             {
                 me->CastSpell(me, SPELL_ARCANE_EXPLOSION);
@@ -180,7 +191,6 @@ public:
                                 }
                                 ++creaturesSummoned;
                             }
-                            
                         }
                         events.ScheduleEvent(EVENT_RAZOR_SPAWN, urand(12, 17)*IN_MILLISECONDS);
                         break;
