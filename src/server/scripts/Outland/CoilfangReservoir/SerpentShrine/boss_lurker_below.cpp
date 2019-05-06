@@ -68,6 +68,8 @@ class boss_the_lurker_below : public CreatureScript
                 me->SetStandState(UNIT_STAND_STATE_SUBMERGED);
                 me->SetVisible(false);
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                // Reset summons
+                summons.DespawnAll();
             }
 
             void JustSummoned(Creature* summon)
@@ -79,7 +81,14 @@ class boss_the_lurker_below : public CreatureScript
             void DoAction(int32 param)
             {
                 if (param == ACTION_START_EVENT)
+                {
+                    me->setAttackTimer(BASE_ATTACK, 6000);
+                    me->SetVisible(true);
+                    me->UpdateObjectVisibility(true);
+                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    me->SetStandState(UNIT_STAND_STATE_STAND);
                     me->SetInCombatWithZone();
+                }
             }
 
             void JustDied(Unit* killer)
@@ -95,21 +104,10 @@ class boss_the_lurker_below : public CreatureScript
 
             void EnterCombat(Unit* who)
             {
-                BossAI::EnterCombat(who);
-                me->setAttackTimer(BASE_ATTACK, 6000);
-                me->SetVisible(true);
-                me->UpdateObjectVisibility(true);
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                me->SetStandState(UNIT_STAND_STATE_STAND);
-
                 events.ScheduleEvent(EVENT_SPELL_WHIRL, 18000);
                 events.ScheduleEvent(EVENT_SPELL_SPOUT, 45000);
                 events.ScheduleEvent(EVENT_SPELL_GEYSER, 10000);
                 events.ScheduleEvent(EVENT_PHASE_2, 125000);
-            }
-
-            void MoveInLineOfSight(Unit*  /*who*/)
-            {
             }
 
             void UpdateAI(uint32 diff)
