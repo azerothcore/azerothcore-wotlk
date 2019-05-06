@@ -12,6 +12,17 @@ enum Spells
     SPELL_FIREBLAST                                        = 15573
 };
 
+enum AmbassadorEvents
+{
+    EVENT_SPELL_FIREBLAST   = 0,
+    EVENT_SUMMON_SPIRITS    = 1,
+};
+
+const Position SummonPositions[7] =
+{
+    // TODO: Must look for the runes position
+};
+
 class boss_ambassador_flamelash : public CreatureScript
 {
 public:
@@ -26,46 +37,53 @@ public:
     {
         boss_ambassador_flamelashAI(Creature* creature) : ScriptedAI(creature) { }
 
-        uint32 FireBlast_Timer;
-        uint32 Spirit_Timer;
+        EventMap _events;
+        SummonList summons;
+        
+        void JustSummoned(Creature* cr) override { summons.Summon(cr); }
 
-        void Reset()
+        void Reset() override
         {
-            FireBlast_Timer = 2000;
-            Spirit_Timer = 24000;
+            events.Reset();
+            summons.DespawnAll();
         }
 
-        void EnterCombat(Unit* /*who*/) { }
+        void EnterCombat(Unit* /*who*/) override
+        { 
+            _events.ScheduleEvent(EVENT_SPELL_FIREBLAST, 2000);
+            
+            // Spawn 7 Embers initially, then 12s after they die
+            for (int i = 0; i < 7; ++i)
+                _events.ScheduleEvent(EVENT_SUMMON_SPIRITS, 4000);
+        }
 
         void SummonSpirits(Unit* victim)
         {
             if (Creature* Spirit = DoSpawnCreature(9178, float(irand(-9, 9)), float(irand(-9, 9)), 0, 0, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 60000))
                 Spirit->AI()->AttackStart(victim);
+                // TODO: Remove attack victim and make it path to Ambassador
+                // suiciding and giving him a buff that increase size and damage
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             //Return since we have no target
             if (!UpdateVictim())
                 return;
+                
+            _events.Update(diff);
 
-            //FireBlast_Timer
-            if (FireBlast_Timer <= diff)
+            switch(_events.ExecuteEvent())
             {
-                DoCastVictim(SPELL_FIREBLAST);
-                FireBlast_Timer = 7000;
-            } else FireBlast_Timer -= diff;
-
-            //Spirit_Timer
-            if (Spirit_Timer <= diff)
-            {
-                SummonSpirits(me->GetVictim());
-                SummonSpirits(me->GetVictim());
-                SummonSpirits(me->GetVictim());
-                SummonSpirits(me->GetVictim());
-
-                Spirit_Timer = 30000;
-            } else Spirit_Timer -= diff;
+                case EVENT_SPELL_FIREBLAST:
+                    DoCastVictim(SPELL_FIREBLAST);
+                    _events.ScheduleEvent(EVENT_SPELL_FIREBLAST, 7000);
+                    break;
+                case EVENT_SUMMON_SPIRITS:
+                    SummonSpirits(me->GetVictim());
+                    _events.ScheduleEvent(EVENT_SUMMON_SPIRITS, 12000);
+                    break;
+            }
 
             DoMeleeAttackIfReady();
         }
