@@ -4468,7 +4468,7 @@ void SpellMgr::LoadDbcDataCorrections()
         case 37852:
             spellInfo->AttributesEx5 |= SPELL_ATTR5_USABLE_WHILE_STUNNED;
             break;
-                
+
         // Karazhan
         // Amplify Damage
         case 39095:
@@ -5627,6 +5627,11 @@ void SpellMgr::LoadDbcDataCorrections()
             spellInfo->EffectImplicitTargetA[1] = TARGET_DEST_CASTER_BACK;
             spellInfo->EffectImplicitTargetB[1] = TARGET_UNIT_DEST_AREA_ENEMY;
             break;
+        case 69845: // Sindragosa Frost bomb (hack!)
+        case 71053:
+        case 71054:
+        case 71055:
+            spellInfo->EffectRadiusIndex[0] = EFFECT_RADIUS_50000_YARDS;   // 50000yd
         case 69846: // Frost Bomb
             spellInfo->speed = 0.0f;    // This spell's summon happens instantly
             break;
