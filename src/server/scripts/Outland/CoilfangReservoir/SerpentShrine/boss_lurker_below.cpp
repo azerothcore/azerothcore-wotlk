@@ -62,7 +62,7 @@ class boss_the_lurker_below : public CreatureScript
             {
             }
 
-            void Reset()
+            void Reset() override
             {
                 BossAI::Reset();
                 me->SetStandState(UNIT_STAND_STATE_SUBMERGED);
@@ -72,13 +72,13 @@ class boss_the_lurker_below : public CreatureScript
                 summons.DespawnAll();
             }
 
-            void JustSummoned(Creature* summon)
+            void JustSummoned(Creature* summon) override
             {
                 summon->SetInCombatWithZone();
                 summons.Summon(summon);
             }
 
-            void DoAction(int32 param)
+            void DoAction(int32 param) override
             {
                 if (param == ACTION_START_EVENT)
                 {
@@ -91,18 +91,18 @@ class boss_the_lurker_below : public CreatureScript
                 }
             }
 
-            void JustDied(Unit* killer)
+            void JustDied(Unit* killer) override
             {
                 BossAI::JustDied(killer);
             }
 
-            void AttackStart(Unit* who)
+            void AttackStart(Unit* who) override
             {
                 if (who && me->GetReactState() == REACT_AGGRESSIVE)
                     me->Attack(who, true);
             }
 
-            void EnterCombat(Unit* who)
+            void EnterCombat(Unit* /*who*/) override
             {
                 events.ScheduleEvent(EVENT_SPELL_WHIRL, 18000);
                 events.ScheduleEvent(EVENT_SPELL_SPOUT, 45000);
@@ -110,7 +110,7 @@ class boss_the_lurker_below : public CreatureScript
                 events.ScheduleEvent(EVENT_PHASE_2, 125000);
             }
 
-            void UpdateAI(uint32 diff)
+            void UpdateAI(uint32 diff) override
             {
                 if (!UpdateVictim())
                     return;
