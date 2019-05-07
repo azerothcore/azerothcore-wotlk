@@ -571,12 +571,7 @@ public:
             }
 
             if (!UpdateVictim())
-            {
-                // If you're testing keep these, else comment or remove
-                me->setFaction(1720);
-                me->SetVisible(true);
                 return;
-            }
 
             if (me->HealthBelowPct(10) && !BelowTenPercent)
                 events.ScheduleEvent(EVENT_BELOW_10_PERCENT_HP, 0);
