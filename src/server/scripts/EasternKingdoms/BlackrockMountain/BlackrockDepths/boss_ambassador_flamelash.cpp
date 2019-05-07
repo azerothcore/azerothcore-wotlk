@@ -104,7 +104,7 @@ public:
             summons.DespawnAll();
         }
 
-        void SummonSpirits(Unit* victim)
+        void SummonSpirits()
         {
             int randomPosition = urand(0, 6);
 
@@ -138,7 +138,7 @@ public:
                     _events.ScheduleEvent(EVENT_SPELL_FIREBLAST, 7000);
                     break;
                 case EVENT_SUMMON_SPIRITS:
-                    SummonSpirits(me->GetVictim());
+                    SummonSpirits();
                     break;
             }
 
