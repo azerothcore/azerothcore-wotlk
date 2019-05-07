@@ -14,6 +14,22 @@ enum FactionIds
     FACTION_FRIEND             = 35
 };
 
+enum AmbassadorFlamelashRunes
+{
+    GO_DWARFRUNE_A01 = 170578,
+    GO_DWARFRUNE_B01 = 170579,
+    GO_DWARFRUNE_C01 = 170580,
+    GO_DWARFRUNE_D01 = 170581,
+    GO_DWARFRUNE_E01 = 170582,
+    GO_DWARFRUNE_F01 = 170583,
+    GO_DWARFRUNE_G01 = 170584,
+};
+
+enum BRDBosses
+{
+    BOSS_AMBASSADOR_FLAMELASH = 0,
+};
+
 enum DataTypes
 {
     TYPE_RING_OF_LAW        = 1,
@@ -48,7 +64,7 @@ enum DataTypes
     DATA_SF_BRAZIER_S       = 26,
     DATA_MOIRA              = 27,
 
-    DATA_OPEN_COFFER_DOORS  = 30,
+    DATA_OPEN_COFFER_DOORS  = 30
 };
 
 #endif

@@ -6,21 +6,32 @@
 
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "blackrock_depths.h"
 
 enum Spells
 {
-    SPELL_FIREBLAST                                        = 15573
+    SPELL_FIREBLAST         = 15573,
+    SPELL_BURNING_SPIRIT    = 14744,
 };
 
 enum AmbassadorEvents
 {
-    EVENT_SPELL_FIREBLAST   = 0,
-    EVENT_SUMMON_SPIRITS    = 1,
+    EVENT_SPELL_FIREBLAST   = 1,
+    EVENT_SUMMON_SPIRITS    = 2,
 };
+
+const uint32 NPC_FIRE_SPIRIT = 9178;
+const uint32 NPC_AMBASSADOR_FLAMELASHER = 9156;
 
 const Position SummonPositions[7] =
 {
-    // TODO: Must look for the runes position
+    {1028.786987f, -224.787186f, -61.840500f, 3.617599f},
+    {1045.144775f, -241.108292f, -61.967422f, 3.617599f},
+    {1028.852905f, -257.484222f, -61.981380f, 3.617599f},
+    {1012.461060f, -273.803406f, -61.994171f, 3.617599f},
+    { 995.503052f, -257.563751f, -62.013153f, 3.617599f},
+    { 979.358704f, -240.535309f, -61.983044f, 3.617599f},
+    {1012.252747f, -206.696487f, -61.980618f, 3.617599f},
 };
 
 class boss_ambassador_flamelash : public CreatureScript
@@ -30,15 +41,18 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new boss_ambassador_flamelashAI(creature);
+        return GetInstanceAI<boss_ambassador_flamelashAI>(creature);
     }
 
-    struct boss_ambassador_flamelashAI : public ScriptedAI
+    struct boss_ambassador_flamelashAI : public BossAI
     {
-        boss_ambassador_flamelashAI(Creature* creature) : ScriptedAI(creature), summons(me) { }
+        boss_ambassador_flamelashAI(Creature* creature) : BossAI(creature, BOSS_AMBASSADOR_FLAMELASH), summons(me) { }
 
         EventMap _events;
         SummonList summons;
+
+        // Record which rune is supposed to spawn the next Spirit
+        int rune = 0;
         
         void JustSummoned(Creature* cr) override { summons.Summon(cr); }
 
@@ -46,23 +60,55 @@ public:
         {
             _events.Reset();
             summons.DespawnAll();
+            rune = 0;
+            TurnRunes(false);
+        }
+
+        void TurnRunes(bool mode)
+        {
+            // Active makes the runes burn, ready turns them off
+            GOState state = mode ? GO_STATE_ACTIVE : GO_STATE_READY;
+
+            if (GameObject* dwarfRune = me->FindNearestGameObject(GO_DWARFRUNE_A01, 200.0f))
+                dwarfRune->SetGoState(state);
+            if (GameObject* dwarfRune = me->FindNearestGameObject(GO_DWARFRUNE_B01, 200.0f))
+                dwarfRune->SetGoState(state);
+            if (GameObject* dwarfRune = me->FindNearestGameObject(GO_DWARFRUNE_C01, 200.0f))
+                dwarfRune->SetGoState(state);
+            if (GameObject* dwarfRune = me->FindNearestGameObject(GO_DWARFRUNE_D01, 200.0f))
+                dwarfRune->SetGoState(state);
+            if (GameObject* dwarfRune = me->FindNearestGameObject(GO_DWARFRUNE_E01, 200.0f))
+                dwarfRune->SetGoState(state);
+            if (GameObject* dwarfRune = me->FindNearestGameObject(GO_DWARFRUNE_F01, 200.0f))
+                dwarfRune->SetGoState(state);
+            if (GameObject* dwarfRune = me->FindNearestGameObject(GO_DWARFRUNE_G01, 200.0f))
+                dwarfRune->SetGoState(state);
         }
 
         void EnterCombat(Unit* /*who*/) override
         { 
             _events.ScheduleEvent(EVENT_SPELL_FIREBLAST, 2000);
             
-            // Spawn 7 Embers initially, then 12s after they die
+            // Spawn 7 Embers initially
             for (int i = 0; i < 7; ++i)
                 _events.ScheduleEvent(EVENT_SUMMON_SPIRITS, 4000);
+
+            // Activate the runes (Start burning)
+            TurnRunes(true);
         }
+
+        void JustDied(Unit* /*killer*/) override { TurnRunes(false); }
 
         void SummonSpirits(Unit* victim)
         {
-            if (Creature* Spirit = DoSpawnCreature(9178, float(irand(-9, 9)), float(irand(-9, 9)), 0, 0, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 60000))
-                Spirit->AI()->AttackStart(victim);
-                // TODO: Remove attack victim and make it path to Ambassador
-                // suiciding and giving him a buff that increase size and damage
+            // Restart the rune order when we have spawned Spirits on all runes
+            if (rune > 6)
+                rune = 0;
+
+            // Make the Spirits get close to Ambassador
+            if (Creature* Spirit = me->SummonCreature(NPC_FIRE_SPIRIT, SummonPositions[rune], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 60000))
+                Spirit->GetMotionMaster()->MoveChase(me);
+            ++rune;
         }
 
         void UpdateAI(uint32 diff) override
@@ -73,6 +119,16 @@ public:
                 
             _events.Update(diff);
 
+            // Whenever a fire spirit gets in meele range of the boss,
+            // kill the NPC and make Ambassador cast Burning Spirit on himself
+            Creature* spawn = me->FindNearestCreature(NPC_FIRE_SPIRIT, 3.0f, true);
+            if (spawn)
+            {
+                me->CastSpell(me, SPELL_BURNING_SPIRIT);
+                me->Kill(me, spawn);
+                _events.ScheduleEvent(EVENT_SUMMON_SPIRITS, urand(12, 14)*IN_MILLISECONDS);
+            }
+                
             switch(_events.ExecuteEvent())
             {
                 case EVENT_SPELL_FIREBLAST:
@@ -81,7 +137,6 @@ public:
                     break;
                 case EVENT_SUMMON_SPIRITS:
                     SummonSpirits(me->GetVictim());
-                    _events.ScheduleEvent(EVENT_SUMMON_SPIRITS, 12000);
                     break;
             }
 
@@ -90,7 +145,36 @@ public:
     };
 };
 
+class npc_burning_spirit : public CreatureScript
+{
+public:
+    npc_burning_spirit() : CreatureScript("npc_burning_spirit") { }
+
+    CreatureAI* GetAI(Creature* creature) const
+    {
+        return GetInstanceAI<npc_burning_spiritAI>(creature);
+    }
+
+    struct npc_burning_spiritAI : public CreatureAI
+    {
+        npc_burning_spiritAI(Creature* creature) : CreatureAI(creature) { }
+
+        void UpdateAI(uint32 /*diff*/) override
+        {
+            Creature* boss = me->FindNearestCreature(NPC_AMBASSADOR_FLAMELASHER, 5000.0f, true);
+            if (boss)
+            {
+                me->GetMotionMaster()->MoveChase(boss);
+            }
+
+            //Return since we have no target
+            if (!UpdateVictim())
+                return;
+        }
+    };
+};
 void AddSC_boss_ambassador_flamelash()
 {
     new boss_ambassador_flamelash();
+    new npc_burning_spirit();
 }
