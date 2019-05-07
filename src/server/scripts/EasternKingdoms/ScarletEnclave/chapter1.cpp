@@ -195,7 +195,7 @@ public:
                 return true;
 
             if (!creature->AI()->GetData(player->GetGUIDLow()))
-                AddGossipItemFor(player, 9465, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
+                AddGossipItemFor(player, 9765, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
 
             SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
         }
