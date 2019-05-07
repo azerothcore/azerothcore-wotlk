@@ -751,7 +751,7 @@ bool AuctionEntry::LoadFromFieldList(Field* fields)
     //  acts as a wrapper to fill out an AuctionEntry struct from a field list
 
     Id = fields[0].GetUInt32();
-    auctioneer = fields[1].GetUInt32();
+    houseId = fields[1].GetUInt8();
     item_guidlow = fields[2].GetUInt32();
     item_template = fields[3].GetUInt32();
     itemCount = fields[4].GetUInt32();
