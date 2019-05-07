@@ -35,7 +35,7 @@ public:
 
     struct boss_ambassador_flamelashAI : public ScriptedAI
     {
-        boss_ambassador_flamelashAI(Creature* creature) : ScriptedAI(creature), summons(nullptr) { }
+        boss_ambassador_flamelashAI(Creature* creature) : ScriptedAI(creature), summons(me) { }
 
         EventMap _events;
         SummonList summons;
@@ -44,7 +44,7 @@ public:
 
         void Reset() override
         {
-            events.Reset();
+            _events.Reset();
             summons.DespawnAll();
         }
 
