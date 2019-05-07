@@ -1048,6 +1048,7 @@ struct SmartAction
             uint32 pointId;
             uint32 transport;
             uint32 controlled;
+            uint32 ContactDistance;
         } MoveToPos;
 
         struct
