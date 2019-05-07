@@ -16,6 +16,7 @@ enum Spells
 
 enum AmbassadorEvents
 {
+    AGGRO_TEXT              = 0,
     EVENT_SPELL_FIREBLAST   = 1,
     EVENT_SUMMON_SPIRITS    = 2,
 };
@@ -50,9 +51,7 @@ public:
 
         EventMap _events;
         SummonList summons;
-
-        // Record which rune is supposed to spawn the next Spirit
-        int rune = 0;
+        int runes[4];
         
         void JustSummoned(Creature* cr) override { summons.Summon(cr); }
 
@@ -60,7 +59,6 @@ public:
         {
             _events.Reset();
             summons.DespawnAll();
-            rune = 0;
             TurnRunes(false);
         }
 
@@ -90,25 +88,29 @@ public:
             _events.ScheduleEvent(EVENT_SPELL_FIREBLAST, 2000);
             
             // Spawn 7 Embers initially
-            for (int i = 0; i < 7; ++i)
+            for (int i = 0; i < 4; ++i)
                 _events.ScheduleEvent(EVENT_SUMMON_SPIRITS, 4000);
 
             // Activate the runes (Start burning)
             TurnRunes(true);
+
+            Talk(AGGRO_TEXT);
         }
 
-        void JustDied(Unit* /*killer*/) override { TurnRunes(false); }
+        void JustDied(Unit* /*killer*/) override
+        {
+            TurnRunes(false);
+            _events.Reset();
+            summons.DespawnAll();
+        }
 
         void SummonSpirits(Unit* victim)
         {
-            // Restart the rune order when we have spawned Spirits on all runes
-            if (rune > 6)
-                rune = 0;
+            int randomPosition = urand(0, 6);
 
             // Make the Spirits get close to Ambassador
-            if (Creature* Spirit = me->SummonCreature(NPC_FIRE_SPIRIT, SummonPositions[rune], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 60000))
+            if (Creature* Spirit = me->SummonCreature(NPC_FIRE_SPIRIT, SummonPositions[randomPosition], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 60000))
                 Spirit->GetMotionMaster()->MoveChase(me);
-            ++rune;
         }
 
         void UpdateAI(uint32 diff) override
@@ -121,7 +123,7 @@ public:
 
             // Whenever a fire spirit gets in meele range of the boss,
             // kill the NPC and make Ambassador cast Burning Spirit on himself
-            Creature* spawn = me->FindNearestCreature(NPC_FIRE_SPIRIT, 3.0f, true);
+            Creature* spawn = me->FindNearestCreature(NPC_FIRE_SPIRIT, 1.0f, true);
             if (spawn)
             {
                 me->CastSpell(me, SPELL_BURNING_SPIRIT);
