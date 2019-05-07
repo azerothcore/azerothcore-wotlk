@@ -4932,16 +4932,26 @@ public:
         */
         SpellCastResult CanSwapTalents ()
         {
+            // Only players can cast this spell
             if (Player* player = GetCaster()->ToPlayer())
             {
-                int DesiredTree = GetSpellInfo()->Effects[EFFECT_0].BasePoints;
-                bool BeastMasteryTalent = player->HasTalentOnTree(53270, DesiredTree);
-
+                // Only do this if we are a Hunter
                 if (player->getClass() == CLASS_HUNTER)
-                {
+                {                
+                    // This spell Basepoints value is 1 for Primary or 2 for Secondary talents
+                    int DesiredTree = GetSpellInfo()->Effects[EFFECT_0].BasePoints;
+
+                    // Query the Database for Beast Mastery talent on the tree that we want to swap to
+                    bool BeastMasteryTalent = player->HasTalentOnTree(53270, DesiredTree);
+                    
+                    // Do we have an active pet?
                     Pet* pet = player->GetPet();
+                    
+                    // Is our pet dismissed?
                     uint32 petTypeFlags = pet->GetActivePetTypeFlags(player);
-                    if (pet) // Pet is active
+                    
+                    // Pet is active
+                    if (pet)
                     {
                         uint32 exoticpet = pet->GetCreatureTemplate()->type_flags;
                         if (exoticpet >= 65536 && !BeastMasteryTalent)
@@ -4950,8 +4960,13 @@ public:
                     }
                     else if (petTypeFlags) // Pet is dismissed
                     {
+                        // Pet is at least exotic and hunter doesn't have Beast Mastery
                         if (petTypeFlags >= 65536 && !BeastMasteryTalent)
                             return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
+                        
+                        // TODO: The OPCode above isn't the right one but can't 
+                        // find one that says something like:
+                        // "Stable your exotic pet before swapping talents"
                     }
                     return SPELL_CAST_OK;
                 }
