@@ -764,25 +764,9 @@ bool AuctionEntry::LoadFromFieldList(Field* fields)
     deposit = fields[11].GetUInt32();
 
     auctionHouseEntry = AuctionHouseMgr::GetAuctionHouseEntryFromHouse(houseId);
-    if (!auctioneerData)
-    {
-        sLog->outError("AuctionEntry::LoadFromFieldList() - Auction %u has not a existing auctioneer (GUID : %u)", Id, auctioneer);
-        return false;
-    }
-
-    CreatureTemplate const* auctioneerInfo = sObjectMgr->GetCreatureTemplate(auctioneerData->id);
-    if (!auctioneerInfo)
-    {
-        sLog->outError("AuctionEntry::LoadFromFieldList() - Auction %u has not a existing auctioneer (GUID : %u Entry: %u)", Id, auctioneer, auctioneerData->id);
-        return false;
-    }
-
-    factionTemplateId = auctioneerInfo->faction;
-    auctionHouseEntry = AuctionHouseMgr::GetAuctionHouseEntry(factionTemplateId);
-
     if (!auctionHouseEntry)
     {
-        sLog->outError("AuctionEntry::LoadFromFieldList() - Auction %u has auctioneer (GUID : %u Entry: %u) with wrong faction %u", Id, auctioneer, auctioneerData->id, factionTemplateId);
+        sLog->outError("Auction %u has invalid house id %u", Id, houseId);
         return false;
     }
 
