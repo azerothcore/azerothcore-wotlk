@@ -53,6 +53,10 @@ enum HunterSpells
 };
 
 // Ours
+/* There was a bug that made the Hunter be able to tame
+ * pets if our current pet was dismissed. This means that
+ * our dismissed pet would get replaced by the new one.
+*/
 class spell_tame_beast : public SpellScriptLoader
 {
 public:
@@ -64,12 +68,16 @@ public:
 
         SpellCastResult CanTameBeast()
         {
+            // Only players can cast this spell
             if (Player* player = GetCaster()->ToPlayer())
             {
+                // Only Hunters can cast this spell
                 if (player->getClass() == CLASS_HUNTER)
                 {
+                    // We need a Pet pointer in order to search for dismissed pet
                     Pet* pet = player->GetPet();
-
+                    
+                    // A query searches for the player's current pet with state 100 (Dismissed)
                     if (pet->isPetDismissed(player)) // Pet is dismissed, can't tame
                             return SPELL_FAILED_ALREADY_HAVE_SUMMON;
 
