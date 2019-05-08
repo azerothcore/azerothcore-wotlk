@@ -968,7 +968,7 @@ WorldObject::WorldObject(bool isWorldObject) : WorldLocation(),
 #ifdef ELUNA
 elunaEvents(NULL),
 #endif
-LastUsedScriptID(0), m_name(""), m_isActive(false), m_isWorldObject(isWorldObject), m_zoneScript(NULL),
+LastUsedScriptID(0), m_name(""), m_isActive(false), m_isVisibilityDistanceOverride(false), m_isWorldObject(isWorldObject), m_zoneScript(NULL),
 m_transport(NULL), m_currMap(NULL), m_InstanceId(0),
 m_phaseMask(PHASEMASK_NORMAL), m_notifyflags(0), m_executed_notifies(0)
 {
@@ -1037,6 +1037,14 @@ void WorldObject::setActive(bool on)
         else if (GetTypeId() == TYPEID_GAMEOBJECT)
             map->RemoveFromActive((GameObject*)this);
     }
+}
+
+void WorldObject::SetVisibilityDistanceOverride(bool isVisibilityDistanceOverride)
+{
+    if (GetTypeId() == TYPEID_PLAYER)
+        return;
+
+    m_isVisibilityDistanceOverride = isVisibilityDistanceOverride;
 }
 
 void WorldObject::CleanupsBeforeDelete(bool /*finalCleanup*/)
@@ -1515,7 +1523,14 @@ float WorldObject::GetVisibilityRange() const
     if (isActiveObject() && !ToPlayer())
         return MAX_VISIBILITY_DISTANCE;
     else if (GetTypeId() == TYPEID_GAMEOBJECT)
-        return IsInWintergrasp() ? VISIBILITY_DIST_WINTERGRASP+VISIBILITY_INC_FOR_GOBJECTS : GetMap()->GetVisibilityRange()+VISIBILITY_INC_FOR_GOBJECTS;
+    {
+        if (IsInWintergrasp())
+            return VISIBILITY_DIST_WINTERGRASP+VISIBILITY_INC_FOR_GOBJECTS;
+        else if (IsVisibilityOverridden())
+            return MAX_VISIBILITY_DISTANCE;
+        else
+            return GetMap()->GetVisibilityRange()+VISIBILITY_INC_FOR_GOBJECTS;
+    }
     else
         return IsInWintergrasp() ? VISIBILITY_DIST_WINTERGRASP : GetMap()->GetVisibilityRange();
 }
@@ -1531,7 +1546,14 @@ float WorldObject::GetSightRange(const WorldObject* target) const
                 if (target->isActiveObject() && !target->ToPlayer())
                     return MAX_VISIBILITY_DISTANCE;
                 else if (target->GetTypeId() == TYPEID_GAMEOBJECT)
-                    return IsInWintergrasp() && target->IsInWintergrasp() ? VISIBILITY_DIST_WINTERGRASP+VISIBILITY_INC_FOR_GOBJECTS : GetMap()->GetVisibilityRange()+VISIBILITY_INC_FOR_GOBJECTS;
+                {
+                    if (IsInWintergrasp() && target->IsInWintergrasp())
+                        return VISIBILITY_DIST_WINTERGRASP+VISIBILITY_INC_FOR_GOBJECTS;
+                    else if (target->IsVisibilityOverridden())
+                        return MAX_VISIBILITY_DISTANCE;
+                    else
+                        return GetMap()->GetVisibilityRange()+VISIBILITY_INC_FOR_GOBJECTS;
+                }
 
                 return IsInWintergrasp() && target->IsInWintergrasp() ? VISIBILITY_DIST_WINTERGRASP : GetMap()->GetVisibilityRange();
             }
