@@ -53,7 +53,6 @@ public:
 
         EventMap _events;
         SummonList summons;
-        int runes[4];
         
         void JustSummoned(Creature* cr) override { summons.Summon(cr); }
 
