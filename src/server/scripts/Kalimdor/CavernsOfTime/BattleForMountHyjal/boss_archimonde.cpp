@@ -637,7 +637,7 @@ public:
                     break;
                 case EVENT_SPELL_AIR_BURST:
                     Talk(SAY_AIR_BURST);
-                    DoCast(SelectTarget(SELECT_TARGET_RANDOM, 1), SPELL_AIR_BURST); // Not on tank
+                    DoCast(SelectTarget(SELECT_TARGET_RANDOM, 0), SPELL_AIR_BURST);
                     events.ScheduleEvent(EVENT_SPELL_AIR_BURST, urand(25000, 40000));
                     break;
                 case EVENT_SPELL_FEAR:
