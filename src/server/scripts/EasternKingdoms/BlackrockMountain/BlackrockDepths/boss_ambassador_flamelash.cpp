@@ -35,7 +35,7 @@ const Position SummonPositions[7] =
     {1012.252747f, -206.696487f, -61.980618f, 3.617599f},
 };
 
-vector<uint16> gobjectDwarfRunesEntry { 170578, 170579, 170580, 170581, 170582, 170583, 170584 }; 
+vector<int> gobjectDwarfRunesEntry { 170578, 170579, 170580, 170581, 170582, 170583, 170584 }; 
 
 class boss_ambassador_flamelash : public CreatureScript
 {
@@ -69,7 +69,7 @@ public:
             // Active makes the runes burn, ready turns them off
             GOState state = mode ? GO_STATE_ACTIVE : GO_STATE_READY;
             
-            for (uint16 RuneEntry : gobjectDwarfRunesEntry)
+            for (int RuneEntry : gobjectDwarfRunesEntry)
                 if (GameObject* dwarfRune = me->FindNearestGameObject(RuneEntry, 200.0f))
                     dwarfRune->SetGoState(state);
         }
