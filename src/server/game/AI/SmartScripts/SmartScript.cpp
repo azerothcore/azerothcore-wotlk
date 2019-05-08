@@ -1888,7 +1888,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
 
             me->GetMotionMaster()->MovePoint(e.action.MoveToPos.pointId, dest.x, dest.y, dest.z, true, true, e.action.MoveToPos.controlled ? MOTION_SLOT_CONTROLLED : MOTION_SLOT_ACTIVE);
         }
-        else
+        else // Xinef: we can use dest.x, dest.y, dest.z to make offset
         {
             float x, y, z;
             target->GetPosition(x, y, z);
