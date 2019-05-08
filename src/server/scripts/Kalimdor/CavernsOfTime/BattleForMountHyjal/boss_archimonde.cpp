@@ -407,33 +407,29 @@ public:
             {
                 // First we check if our current victim is in melee range or not.
                 Unit* victim = me->GetVictim();
-                if (victim && me->IsWithinDistInMap(victim, me->GetAggroRange(victim)))
+                if (victim && me->IsWithinMeleeRange(victim))
                     return false;
 
                 ThreatContainer::StorageType const &threatlist = me->getThreatManager().getThreatList();
                 if (threatlist.empty())
                     return false;
 
-                ThreatContainer::StorageType::const_iterator itr = threatlist.begin();
+                auto itr = threatlist.begin();
                 for (; itr != threatlist.end(); ++itr)
                 {
                     Unit* unit = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid());
-                    if (unit && unit->IsAlive() && unit->IsCharmedOwnedByPlayerOrPlayer())
+                    if (unit && unit->IsAlive() && me->IsWithinMeleeRange(unit))
                         targets.push_back(unit);
                 }
 
+                /* Previous check searched for targets in meele range and
+                 * added it to targets list. If there are no targets in meele
+                 * ranged return true, which makes Archimonde cast Finger of Death.
+                */
                 if (targets.empty())
+                    return true;
+                else
                     return false;
-
-                targets.sort(Trinity::ObjectDistanceOrderPred(me));
-                Unit* target = targets.front();
-                if (target)
-                {
-                    if (!me->IsWithinDistInMap(target, me->GetAggroRange(target)))
-                        return true;                                // Cast Finger of Death
-                    else                                            // This target is closest, he is our new tank
-                        me->AddThreat(target, me->getThreatManager().getThreat(me->GetVictim()));
-                }
             }
             return false;
         }
