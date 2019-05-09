@@ -54,7 +54,6 @@ public:
         EventMap _events;
         SummonList summons;
         vector<int> validPosition;
-        int randomPosition = 0;
         bool foundValidPosition = false;
 
         void JustSummoned(Creature* cr) override { summons.Summon(cr); }
@@ -64,7 +63,6 @@ public:
             _events.Reset();
             summons.DespawnAll();
             TurnRunes(false);
-            randomPosition = 0;
             foundValidPosition = false;
             validPosition.clear();
         }
@@ -120,7 +118,7 @@ public:
                     validPosition.clear();
 
                 // The random ranges from the position 0 to the position 6
-                randomPosition = urand(0, 6);
+                int randomPosition = urand(0, 6);
 
                 // When we have an empty vector we can use any random position generated.
                 if (validPosition.empty())
