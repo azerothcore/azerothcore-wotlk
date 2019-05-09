@@ -154,8 +154,6 @@ public:
 
         void SummonSpirits()
         {
-            int randomPosition = urand(0, 6);
-
             // Make the Spirits get close to Ambassador
             if (Creature* Spirit = me->SummonCreature(NPC_FIRE_SPIRIT, SummonPositions[getValidRandomPosition()], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 60000))
                 Spirit->GetMotionMaster()->MoveChase(me);
