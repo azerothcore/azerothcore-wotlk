@@ -54,7 +54,7 @@ public:
         EventMap _events;
         SummonList summons;
         vector<int> validPosition;
-        int randomPosition = NULL;
+        int randomPosition = 0;
         bool foundValidPosition = false;
 
         void JustSummoned(Creature* cr) override { summons.Summon(cr); }
@@ -64,7 +64,7 @@ public:
             _events.Reset();
             summons.DespawnAll();
             TurnRunes(false);
-            randomPosition = NULL;
+            randomPosition = 0;
             foundValidPosition = false;
             validPosition.clear();
         }
