@@ -109,6 +109,7 @@ public:
 
             // Searching a new position so reset this bool check
             foundValidPosition = false;
+            int randomPosition;
 
             while (!foundValidPosition)
             {
@@ -118,7 +119,7 @@ public:
                     validPosition.clear();
 
                 // The random ranges from the position 0 to the position 6
-                int randomPosition = urand(0, 6);
+                randomPosition = urand(0, 6);
 
                 // When we have an empty vector we can use any random position generated.
                 if (validPosition.empty())
