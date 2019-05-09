@@ -407,7 +407,7 @@ public:
             if (me->IsAlive())
             {
                 /* Reset the list before checking for new targets
-                /* else we will be using old targets that could have
+                 * else we will be using old targets that could have
                  * been distant but are no longer.*/
                 fingerOfDeathTargets.clear();
 
