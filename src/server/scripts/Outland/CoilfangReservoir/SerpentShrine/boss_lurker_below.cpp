@@ -58,18 +58,22 @@ class boss_the_lurker_below : public CreatureScript
 
         struct boss_the_lurker_belowAI : public BossAI
         {
-            boss_the_lurker_belowAI(Creature* creature) : BossAI(creature, DATA_THE_LURKER_BELOW)
-            {
-            }
-
+            boss_the_lurker_belowAI(Creature* creature) : BossAI(creature, DATA_THE_LURKER_BELOW) { }
+            
+            bool encounterStarted = false;
+                        
             void Reset() override
             {
                 BossAI::Reset();
                 me->SetStandState(UNIT_STAND_STATE_SUBMERGED);
                 me->SetVisible(false);
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                
                 // Reset summons
                 summons.DespawnAll();
+                
+                // Have to fish him again to start encounter
+                encounterStarted = false;
             }
 
             void JustSummoned(Creature* summon) override
@@ -82,6 +86,7 @@ class boss_the_lurker_below : public CreatureScript
             {
                 if (param == ACTION_START_EVENT)
                 {
+                    encounterStarted = true;
                     me->setAttackTimer(BASE_ATTACK, 6000);
                     me->SetVisible(true);
                     me->UpdateObjectVisibility(true);
@@ -112,10 +117,11 @@ class boss_the_lurker_below : public CreatureScript
 
             void UpdateAI(uint32 diff) override
             {
-                if (!UpdateVictim())
+                if (!UpdateVictim() && !encounterStarted)
                     return;
 
                 events.Update(diff);
+
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
 
