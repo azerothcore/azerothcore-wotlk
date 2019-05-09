@@ -4204,7 +4204,7 @@ void Player::removeSpell(uint32 spellId, uint8 removeSpecMask, bool onlyTemporar
                 continue;
 
             // pussywizard: don't understand why whole skill is removed when just single spell from it is removed
-            if (_spell_idx->second->AutolearnType == SKILL_LINE_ABILITY_LEARNED_ON_SKILL_LEARN && pSkill->categoryId != SKILL_CATEGORY_CLASS || // pussywizard: don't unlearn class skills
+            if ((_spell_idx->second->AutolearnType == SKILL_LINE_ABILITY_LEARNED_ON_SKILL_LEARN && pSkill->categoryId != SKILL_CATEGORY_CLASS)  || // pussywizard: don't unlearn class skills
                 ((pSkill->id == SKILL_LOCKPICKING || pSkill->id == SKILL_RUNEFORGING) && _spell_idx->second->max_value == 0))
             {
                 // not reset skills for professions and racial abilities
