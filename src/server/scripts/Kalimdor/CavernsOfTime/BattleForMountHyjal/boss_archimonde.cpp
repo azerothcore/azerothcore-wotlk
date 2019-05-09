@@ -274,7 +274,8 @@ public:
         bool HasProtected;
         bool IsChanneling;
 
-        std::list<Unit*> targets;
+        std::list<Unit*> fingerOfDeathTargets;
+        std::list<Unit*> spellEffectTargets;
 
         void Reset()
         {
@@ -289,7 +290,7 @@ public:
             IsChanneling = false;
 
             // Reset player's immunity to Spells
-            for (auto it = targets.begin(); it != targets.end(); ++it)
+            for (auto it = spellEffectTargets.begin(); it != spellEffectTargets.end(); ++it)
             {
                 Unit* affected_unit = ObjectAccessor::GetUnit(*me, (*it)->GetGUID());
 
@@ -298,6 +299,8 @@ public:
                 affected_unit->ApplySpellImmune(0, IMMUNITY_ID, SPELL_HAND_OF_DEATH, false);
             }
 
+            spellEffectTargets.clear();
+            fingerOfDeathTargets.clear();
             events.ScheduleEvent(EVENT_DRAIN_WORLD_TREE, 0);
         }
 
@@ -319,11 +322,9 @@ public:
 
             if (Unit* target = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid()))
                 if (target->IsAlive() && target->GetTypeId() == TYPEID_PLAYER)
-                    targets.push_back(target);
+                    spellEffectTargets.push_back(target);
 
-            uint32 i = 0;
-
-            for (auto iter = targets.begin(); iter != targets.end(); ++iter, ++i)
+            for (auto iter = spellEffectTargets.begin(); iter != spellEffectTargets.end(); ++iter)
                 if (Unit* target = *iter)
                 {
                     target->AddAura(SPELL_PROTECTION_OF_ELUNE, target);
@@ -405,6 +406,11 @@ public:
         {
             if (me->IsAlive())
             {
+                /* Reset the list before checking for new targets
+                /* else we will be using old targets that could have
+                 * been distant but are no longer.*/
+                fingerOfDeathTargets.clear();
+
                 // First we check if our current victim is in melee range or not.
                 Unit* victim = me->GetVictim();
                 if (victim && me->IsWithinMeleeRange(victim))
@@ -419,14 +425,14 @@ public:
                 {
                     Unit* unit = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid());
                     if (unit && unit->IsAlive() && me->IsWithinMeleeRange(unit))
-                        targets.push_back(unit);
+                        fingerOfDeathTargets.push_back(unit);
                 }
 
                 /* Previous check searched for targets in meele range and
                  * added it to targets list. If there are no targets in meele
-                 * ranged return true, which makes Archimonde cast Finger of Death.
+                 * range return true, which makes Archimonde cast Finger of Death.
                 */
-                return targets.empty();
+                return fingerOfDeathTargets.empty();
             }
             return false;
         }
