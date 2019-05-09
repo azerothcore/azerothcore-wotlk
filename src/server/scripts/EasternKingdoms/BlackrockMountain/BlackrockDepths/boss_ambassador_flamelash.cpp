@@ -53,7 +53,10 @@ public:
 
         EventMap _events;
         SummonList summons;
-        
+        vector<int> validPosition;
+        int randomPosition = NULL;
+        bool foundValidPosition = false;
+
         void JustSummoned(Creature* cr) override { summons.Summon(cr); }
 
         void Reset() override
@@ -61,6 +64,9 @@ public:
             _events.Reset();
             summons.DespawnAll();
             TurnRunes(false);
+            randomPosition = NULL;
+            foundValidPosition = false;
+            validPosition.clear();
         }
 
         void TurnRunes(bool mode)
@@ -93,13 +99,66 @@ public:
             _events.Reset();
             summons.DespawnAll();
         }
+        
+        int getValidRandomPosition()
+        {
+            /* Generate a random position which 
+             * have not been used in 4 summonings.
+             * Since we are calling the event whenever the Spirit
+             * dies and not all at the time, we need to save at
+             * least 4 positions until reseting the vector
+            */
+
+            // Searching a new position so reset this bool check
+            foundValidPosition = false;
+
+            while (!foundValidPosition)
+            {
+                /* When we have summoned 4 creatures, reset the vector
+                 * so we can summon new spirits in other positions.*/
+                if (validPosition.size() == 4)
+                    validPosition.clear();
+
+                // The random ranges from the position 0 to the position 6
+                randomPosition = urand(0, 6);
+
+                // When we have an empty vector we can use any random position generated.
+                if (validPosition.empty())
+                    foundValidPosition = true;
+
+                /* This check is done to avoid running the vector
+                 * when it is empty. Because if it is empty, then any
+                 * position can be used to summon Spirits.
+                 */
+                if (!foundValidPosition)
+                {
+                    // Check every position inside the vector
+                    for (int pos : validPosition)
+                    {
+                        // If the random is different, we found a temporary true,
+                        // until we find one that is equal, which means it has been used.
+                        if (pos != randomPosition)
+                            foundValidPosition = true;
+                        else
+                        {
+                            foundValidPosition = false;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            // We found a valid position. Save it and return it to summon.
+            validPosition.emplace_back(randomPosition);
+            return randomPosition;
+        }
 
         void SummonSpirits()
         {
             int randomPosition = urand(0, 6);
 
             // Make the Spirits get close to Ambassador
-            if (Creature* Spirit = me->SummonCreature(NPC_FIRE_SPIRIT, SummonPositions[randomPosition], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 60000))
+            if (Creature* Spirit = me->SummonCreature(NPC_FIRE_SPIRIT, SummonPositions[getValidRandomPosition()], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 60000))
                 Spirit->GetMotionMaster()->MoveChase(me);
         }
 
