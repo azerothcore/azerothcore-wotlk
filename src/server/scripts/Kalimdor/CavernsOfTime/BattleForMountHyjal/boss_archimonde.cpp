@@ -426,10 +426,7 @@ public:
                  * added it to targets list. If there are no targets in meele
                  * ranged return true, which makes Archimonde cast Finger of Death.
                 */
-                if (targets.empty())
-                    return true;
-                else
-                    return false;
+                return targets.empty();
             }
             return false;
         }
