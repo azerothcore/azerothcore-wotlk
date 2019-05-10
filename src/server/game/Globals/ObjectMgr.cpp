@@ -3863,7 +3863,7 @@ void ObjectMgr::LoadQuests()
         "RewardFactionID1, RewardFactionValue1, RewardFactionOverride1, RewardFactionID2, RewardFactionValue2, RewardFactionOverride2, RewardFactionID3, RewardFactionValue3, RewardFactionOverride3, RewardFactionID4, RewardFactionValue4, RewardFactionOverride4, RewardFactionID5, RewardFactionValue5,  RewardFactionOverride5,"
         //   62        63      64        65
         "POIContinent, POIx, POIy, POIPriority, "
-        //   66          67               68           69                    70 
+        //   66          67               68           69                    70
         "LogTitle, LogDescription, QuestDescription, AreaDescription, QuestCompletionLog, "
         //      71                72                73                74                   75                     76                    77                      78
         "RequiredNpcOrGo1, RequiredNpcOrGo2, RequiredNpcOrGo3, RequiredNpcOrGo4, RequiredNpcOrGoCount1, RequiredNpcOrGoCount2, RequiredNpcOrGoCount3, RequiredNpcOrGoCount4, "
@@ -5416,7 +5416,7 @@ void ObjectMgr::LoadGossipText()
 
     do
     {
-        
+
         cic = 0;
 
         Field* fields = result->Fetch();
@@ -7804,7 +7804,7 @@ void ObjectMgr::ChangeFishingBaseSkillLevel(uint32 entry, int32 skill)
         sLog->outErrorDb("AreaId %u defined in `skill_fishing_base_level` does not exist", entry);
         return;
     }
-    
+
     _fishingBaseForAreaStore[entry] = skill;
 
     sLog->outString(">> Fishing base skill level of area %u changed to %u", entry, skill);
@@ -8359,7 +8359,7 @@ void ObjectMgr::LoadGossipMenuItems()
     _gossipMenuItemsStore.clear();
 
     QueryResult result = WorldDatabase.Query(
-    //      0       1         2           3           4                      5           6              7             8            9         10        11       12  
+    //      0       1         2           3           4                      5           6              7             8            9         10        11       12
     "SELECT MenuID, OptionID, OptionIcon, OptionText, OptionBroadcastTextID, OptionType, OptionNpcFlag, ActionMenuID, ActionPoiID, BoxCoded, BoxMoney, BoxText, BoxBroadcastTextID "
     "FROM gossip_menu_option ORDER BY MenuID, OptionID");
 

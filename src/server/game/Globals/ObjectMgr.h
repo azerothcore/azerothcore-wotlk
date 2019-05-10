@@ -813,7 +813,7 @@ class ObjectMgr
             return _tavernAreaTriggerStore.find(Trigger_ID) != _tavernAreaTriggerStore.end();
         }
 
-        GossipText const* GetGossipText(uint32 Text_ID) const;       
+        GossipText const* GetGossipText(uint32 Text_ID) const;
 
         AreaTrigger const* GetAreaTrigger(uint32 trigger) const
         {
@@ -1114,7 +1114,7 @@ class ObjectMgr
             TempSummonDataContainer::const_iterator itr = _tempSummonDataStore.find(TempSummonGroupKey(summonerId, summonerType, group));
             if (itr != _tempSummonDataStore.end())
                 return &itr->second;
-                   
+
             return NULL;
         }
 
@@ -1214,7 +1214,7 @@ class ObjectMgr
         }
         GameObjectData& NewGOData(uint32 guid) { return _gameObjectDataStore[guid]; }
         void DeleteGOData(uint32 guid);
-       
+
 	    TrinityString const* GetTrinityString(uint32 entry) const
         {
             TrinityStringContainer::const_iterator itr = _trinityStringStore.find(entry);
