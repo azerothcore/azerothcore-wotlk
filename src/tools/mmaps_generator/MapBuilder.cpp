@@ -90,7 +90,7 @@ namespace MMAP
     void MapBuilder::discoverTiles()
     {
         std::vector<std::string> files;
-        uint32 mapID, tileX, tileY, tileID, count, fsize = 0;
+        uint32 mapID, tileX, tileY, tileID, count = 0, fsize = 0;
         char filter[12];
 
         printf("Discovering maps... ");
