@@ -6198,7 +6198,12 @@ void ObjectMgr::SetHighestGuids()
 
     result = WorldDatabase.Query("SELECT MAX(guid) FROM creature");
     if (result)
+    {
         _hiCreatureGuid = (*result)[0].GetUInt32()+1;
+        _hiCreatureRecycledGuid = _hiCreatureGuid;
+        _hiCreatureRecycledGuidMax = _hiCreatureRecycledGuid + 10000;
+        _hiCreatureGuid = _hiCreatureRecycledGuidMax + 1;
+    }
 
     result = CharacterDatabase.Query("SELECT MAX(guid) FROM item_instance");
     if (result)
@@ -6212,7 +6217,12 @@ void ObjectMgr::SetHighestGuids()
 
     result = WorldDatabase.Query("SELECT MAX(guid) FROM gameobject");
     if (result)
+    {
         _hiGoGuid = (*result)[0].GetUInt32()+1;
+        _hiGoRecycledGuid = _hiGoGuid;
+        _hiGoRecycledGuidMax = _hiGoRecycledGuid + 1;
+        _hiGoGuid = _hiGoRecycledGuidMax + 1;
+    }
 
     result = WorldDatabase.Query("SELECT MAX(guid) FROM transports");
     if (result)
@@ -6339,6 +6349,31 @@ uint32 ObjectMgr::GenerateLowGuid(HighGuid guidhigh)
             ASSERT(false && "ObjectMgr::GenerateLowGuid - Unknown HIGHGUID type");
             return 0;
     }
+}
+
+uint32 ObjectMgr::GenerateRecycledLowGuid(HighGuid guidHigh)
+{
+    switch (guidHigh)
+    {
+        case HIGHGUID_UNIT:
+        {
+            ASSERT(_hiCreatureRecycledGuid < 0x00FFFFFE && "Creature recycled guid overflow!");
+            if (_hiCreatureRecycledGuid < _hiCreatureRecycledGuidMax)
+                return _hiCreatureRecycledGuid++;
+            break;
+        }
+        case HIGHGUID_GAMEOBJECT:
+        {
+            ASSERT(_hiGoRecycledGuid < 0x00FFFFFE && "Gameobject recycled guid overflow!");
+            if (_hiGoRecycledGuid < _hiGoRecycledGuidMax)
+                return _hiGoRecycledGuid++;
+            break;
+        }
+        default: // No es manejado por el reciclador
+            break;
+    }
+
+    return GenerateLowGuid(guidHigh);
 }
 
 void ObjectMgr::LoadGameObjectLocales()
