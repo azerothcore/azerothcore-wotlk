@@ -210,7 +210,7 @@ RealmsStateUpdateDelay = 20
 
 #
 #    WrongPass.MaxCount
-#        Description: Number of login attemps with wrong password before the account or IP will be
+#        Description: Number of login attempts with wrong password before the account or IP will be
 #                     banned.
 #        Default:     0  - (Disabled)
 #                     1+ - (Enabled)
