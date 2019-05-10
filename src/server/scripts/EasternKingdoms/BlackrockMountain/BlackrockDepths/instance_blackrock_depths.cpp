@@ -155,13 +155,13 @@ public:
             case NPC_EMPEROR: EmperorGUID = creature->GetGUID(); break;
             case NPC_PHALANX: PhalanxGUID = creature->GetGUID(); break;
             case NPC_MOIRA: MoiraGUID = creature->GetGUID(); break;
-            case NPC_DOOMREL: TombBossGUIDs[0] = creature->GetGUID(); break;
-            case NPC_DOPEREL: TombBossGUIDs[1] = creature->GetGUID(); break;
-            case NPC_HATEREL: TombBossGUIDs[2] = creature->GetGUID(); break;
-            case NPC_VILEREL: TombBossGUIDs[3] = creature->GetGUID(); break;
-            case NPC_SEETHREL: TombBossGUIDs[4] = creature->GetGUID(); break;
-            case NPC_GLOOMREL: TombBossGUIDs[5] = creature->GetGUID(); break;
-            case NPC_ANGERREL: TombBossGUIDs[6] = creature->GetGUID(); break;
+            case NPC_ANGERREL:  TombBossGUIDs[0] = creature->GetGUID(); break;
+            case NPC_SEETHREL:  TombBossGUIDs[1] = creature->GetGUID(); break;
+            case NPC_DOPEREL:   TombBossGUIDs[2] = creature->GetGUID(); break;
+            case NPC_GLOOMREL:  TombBossGUIDs[3] = creature->GetGUID(); break;
+            case NPC_VILEREL:   TombBossGUIDs[4] = creature->GetGUID(); break;
+            case NPC_HATEREL:   TombBossGUIDs[5] = creature->GetGUID(); break;
+            case NPC_DOOMREL:   TombBossGUIDs[6] = creature->GetGUID(); break;
             case NPC_MAGMUS:
                 MagmusGUID = creature->GetGUID();
                 if (!creature->IsAlive())
@@ -441,8 +441,8 @@ public:
                 if (TombTimer <= diff)
                 {
                     TombTimer = TIMER_TOMBOFTHESEVEN;
-                    ++TombEventCounter;
                     TombOfSevenEvent();
+                    ++TombEventCounter;
                     // Check Killed bosses
                     for (uint8 i = 0; i < 7; ++i)
                     {
