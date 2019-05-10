@@ -168,14 +168,14 @@ public:
     }
 };
 
-class npc_deahts_fel_cannon : public CreatureScript
+class npc_deaths_fel_cannon : public CreatureScript
 {
 public:
-    npc_deahts_fel_cannon() : CreatureScript("npc_deahts_fel_cannon") { }
+    npc_deaths_fel_cannon() : CreatureScript("npc_deaths_fel_cannon") { }
 
-    struct npc_deahts_fel_cannonAI : public ScriptedAI
+    struct npc_deaths_fel_cannonAI : public ScriptedAI
     {
-        npc_deahts_fel_cannonAI(Creature* creature) : ScriptedAI(creature) { }
+        npc_deaths_fel_cannonAI(Creature* creature) : ScriptedAI(creature) { }
 
         void Reset() override
         {
@@ -200,7 +200,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_deahts_fel_cannonAI(creature);
+        return new npc_deaths_fel_cannonAI(creature);
     }
 };
 
@@ -1142,7 +1142,7 @@ void AddSC_blades_edge_mountains()
 {
     // Ours
     new npc_deaths_door_fell_cannon_target_bunny();
-    new npc_deahts_fel_cannon();
+    new npc_deaths_fel_cannon();
     new spell_npc22275_crystal_prison();
     // Theirs
     new npc_nether_drake();

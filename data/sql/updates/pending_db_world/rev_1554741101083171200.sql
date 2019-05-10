@@ -3,7 +3,7 @@ INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1554741101083171200');
 UPDATE `creature_template` SET `unit_flags` = 4 WHERE `entry` = 22443;
 UPDATE `creature_template` SET `flags_extra`= 2 WHERE `entry` IN (22471,22472);
 UPDATE `creature_template` SET `InhabitType` = '3' WHERE `entry` = 22500;
-UPDATE `creature_template` SET `ScriptName` = 'npc_deahts_fel_cannon' WHERE `entry` = 22443;
+UPDATE `creature_template` SET `ScriptName` = 'npc_deaths_fel_cannon' WHERE `entry` = 22443;
 UPDATE `creature_template` SET `ScriptName` = 'npc_deaths_door_fell_cannon_target_bunny' WHERE `entry` = 22495;
 UPDATE `creature_template` SET `ScriptName` = '' WHERE `entry` = 22472;
 UPDATE `creature_template` SET `ScriptName` = '' WHERE `entry` = 22471;
