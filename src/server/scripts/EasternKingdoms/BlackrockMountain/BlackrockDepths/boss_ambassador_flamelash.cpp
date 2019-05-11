@@ -10,7 +10,8 @@
 
 enum Spells
 {
-    SPELL_FIREBLAST         = 15573,
+    // Old fireblast value 15573
+    SPELL_FIREBLAST         = 13342,
     SPELL_BURNING_SPIRIT    = 14744,
 };
 
@@ -58,6 +59,16 @@ public:
 
         void JustSummoned(Creature* cr) override { summons.Summon(cr); }
 
+        void DoAction(int32 param) override
+        {
+            switch (param)
+            {
+                case EVENT_SUMMON_SPIRITS:
+                    _events.ScheduleEvent(EVENT_SUMMON_SPIRITS, urand(12, 14)*IN_MILLISECONDS);
+                    break;
+            }
+        }
+
         void Reset() override
         {
             _events.Reset();
@@ -80,7 +91,7 @@ public:
         void EnterCombat(Unit* /*who*/) override
         { 
             _events.ScheduleEvent(EVENT_SPELL_FIREBLAST, 2000);
-            
+
             // Spawn 7 Embers initially
             for (int i = 0; i < 4; ++i)
                 _events.ScheduleEvent(EVENT_SUMMON_SPIRITS, 4000);
@@ -174,7 +185,6 @@ public:
             {
                 me->CastSpell(me, SPELL_BURNING_SPIRIT);
                 me->Kill(me, spawn);
-                _events.ScheduleEvent(EVENT_SUMMON_SPIRITS, urand(12, 14)*IN_MILLISECONDS);
             }
                 
             switch(_events.ExecuteEvent())
@@ -207,17 +217,23 @@ public:
     {
         npc_burning_spiritAI(Creature* creature) : CreatureAI(creature) { }
 
+        void JustDied(Unit* /*killer*/) override
+        {
+            if (Creature* boss = me->FindNearestCreature(NPC_AMBASSADOR_FLAMELASHER, 5000.0f, true))
+                boss->AI()->DoAction(EVENT_SUMMON_SPIRITS);
+        }
+
         void UpdateAI(uint32 /*diff*/) override
         {
-            Creature* boss = me->FindNearestCreature(NPC_AMBASSADOR_FLAMELASHER, 5000.0f, true);
-            if (boss)
-            {
-                me->GetMotionMaster()->MoveChase(boss);
-            }
-
             //Return since we have no target
             if (!UpdateVictim())
+            {
+                if (Creature* boss = me->FindNearestCreature(NPC_AMBASSADOR_FLAMELASHER, 5000.0f, true);)
+                    me->GetMotionMaster()->MoveChase(boss);
                 return;
+            }
+
+            DoMeleeAttackIfReady();
         }
     };
 };
