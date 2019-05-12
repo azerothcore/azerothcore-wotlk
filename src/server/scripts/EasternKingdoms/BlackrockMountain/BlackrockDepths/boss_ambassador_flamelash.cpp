@@ -228,7 +228,7 @@ public:
             //Return since we have no target
             if (!UpdateVictim())
             {
-                if (Creature* boss = me->FindNearestCreature(NPC_AMBASSADOR_FLAMELASHER, 5000.0f, true);)
+                if (Creature* boss = me->FindNearestCreature(NPC_AMBASSADOR_FLAMELASHER, 5000.0f, true))
                     me->GetMotionMaster()->MoveChase(boss);
                 return;
             }
