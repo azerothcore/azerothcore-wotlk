@@ -183,7 +183,7 @@ public:
             // kill the NPC and make Ambassador cast Burning Spirit on himself
             if (Creature* fireSpirit = me->FindNearestCreature(NPC_FIRE_SPIRIT, 1.0f, true))
             {
-                if (!fireSpirit->isInCombat())
+                if (!fireSpirit->IsInCombat())
                 {
                     me->CastSpell(me, SPELL_BURNING_SPIRIT);
                     me->Kill(me, fireSpirit);
