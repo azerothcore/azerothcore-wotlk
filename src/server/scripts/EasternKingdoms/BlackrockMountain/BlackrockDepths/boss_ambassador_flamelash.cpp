@@ -20,6 +20,7 @@ enum AmbassadorEvents
     AGGRO_TEXT              = 0,
     EVENT_SPELL_FIREBLAST   = 1,
     EVENT_SUMMON_SPIRITS    = 2,
+    EVENT_CHASE_AMBASSADOR  = 3,
 };
 
 const uint32 NPC_FIRE_SPIRIT = 9178;
@@ -90,11 +91,11 @@ public:
 
         void EnterCombat(Unit* /*who*/) override
         { 
-            _events.ScheduleEvent(EVENT_SPELL_FIREBLAST, 2000);
+            _events.ScheduleEvent(EVENT_SPELL_FIREBLAST, 2 * IN_MILLISECONDS);
 
             // Spawn 7 Embers initially
             for (int i = 0; i < 4; ++i)
-                _events.ScheduleEvent(EVENT_SUMMON_SPIRITS, 4000);
+                _events.ScheduleEvent(EVENT_SUMMON_SPIRITS, 4 * IN_MILLISECONDS);
 
             // Activate the runes (Start burning)
             TurnRunes(true);
@@ -180,18 +181,20 @@ public:
 
             // Whenever a fire spirit gets in meele range of the boss,
             // kill the NPC and make Ambassador cast Burning Spirit on himself
-            Creature* spawn = me->FindNearestCreature(NPC_FIRE_SPIRIT, 1.0f, true);
-            if (spawn)
+            if (Creature* fireSpirit = me->FindNearestCreature(NPC_FIRE_SPIRIT, 1.0f, true))
             {
-                me->CastSpell(me, SPELL_BURNING_SPIRIT);
-                me->Kill(me, spawn);
+                if (!fireSpirit->isInCombat())
+                {
+                    me->CastSpell(me, SPELL_BURNING_SPIRIT);
+                    me->Kill(me, fireSpirit);
+                }
             }
                 
             switch(_events.ExecuteEvent())
             {
                 case EVENT_SPELL_FIREBLAST:
                     DoCastVictim(SPELL_FIREBLAST);
-                    _events.ScheduleEvent(EVENT_SPELL_FIREBLAST, 7000);
+                    _events.ScheduleEvent(EVENT_SPELL_FIREBLAST, 7 * IN_MILLISECONDS);
                     break;
                 case EVENT_SUMMON_SPIRITS:
                     SummonSpirits();
@@ -217,26 +220,60 @@ public:
     {
         npc_burning_spiritAI(Creature* creature) : CreatureAI(creature) { }
 
+        EventMap _events;
+
         void JustDied(Unit* /*killer*/) override
         {
             if (Creature* boss = me->FindNearestCreature(NPC_AMBASSADOR_FLAMELASHER, 5000.0f, true))
                 boss->AI()->DoAction(EVENT_SUMMON_SPIRITS);
+                
+            _events.Reset();
         }
 
-        void UpdateAI(uint32 /*diff*/) override
+        void EnterCombat(Unit* /*who*/) override
+        { 
+            // TODO: Swap this with an execute event
+            _events.ScheduleEvent(EVENT_CHASE_AMBASSADOR, 1);
+
+            // If spirits get in combat and can't summon, keep summining new spirits
+            _events.ScheduleEvent(EVENT_SUMMON_SPIRITS, 12 * IN_MILLISECONDS);
+        }
+
+        void UpdateAI(uint32 diff) override
         {
-            //Return since we have no target
             if (!UpdateVictim())
             {
-                if (Creature* boss = me->FindNearestCreature(NPC_AMBASSADOR_FLAMELASHER, 5000.0f, true))
-                    me->GetMotionMaster()->MoveChase(boss);
+                switch(_events.ExecuteEvent())
+                {
+                    case EVENT_CHASE_AMBASSADOR:
+                        if (Creature* boss = me->FindNearestCreature(NPC_AMBASSADOR_FLAMELASHER, 5000.0f, true))
+                        {
+                            me->GetMotionMaster()->MoveChase(boss);   
+                            _events.ScheduleEvent(EVENT_CHASE_AMBASSADOR, 0.5f * IN_MILLISECONDS);
+                        }
+                        break;
+                }
                 return;
+            }
+
+            _events.Update(diff);
+
+            switch(_events.ExecuteEvent())
+            {
+                // Don't need to repeat this events because, once new spirits are summoned
+                // those new spirits will summon new spirits. If we repeated we would have
+                // an inmense number of spirits summoned if they were not all killed
+                case EVENT_SUMMON_SPIRITS:
+                    if (Creature* boss = me->FindNearestCreature(NPC_AMBASSADOR_FLAMELASHER, 5000.0f, true))
+                        boss->AI()->DoAction(EVENT_SUMMON_SPIRITS);
+                    break;
             }
 
             DoMeleeAttackIfReady();
         }
     };
 };
+
 void AddSC_boss_ambassador_flamelash()
 {
     new boss_ambassador_flamelash();
