@@ -166,9 +166,10 @@ public:
 
         void SummonSpirits()
         {
-            // Make the Spirits get close to Ambassador
+            // Make the Spirits chase Ambassador Flamelash
             if (Creature* Spirit = me->SummonCreature(NPC_FIRE_SPIRIT, SummonPositions[getValidRandomPosition()], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 60000))
-                Spirit->GetMotionMaster()->MoveChase(me);
+                Spirit->AI()->DoAction(EVENT_CHASE_AMBASSADOR);
+            _events.ScheduleEvent(EVENT_SUMMON_SPIRITS, urand(12, 14) * IN_MILLISECONDS);
         }
 
         void UpdateAI(uint32 diff) override
@@ -221,7 +222,6 @@ public:
         npc_burning_spiritAI(Creature* creature) : CreatureAI(creature) { }
 
         EventMap _events;
-        bool summonedNewSpirit = false;
 
         void Reset() override
         {
@@ -229,24 +229,15 @@ public:
             _events.ScheduleEvent(EVENT_CHASE_AMBASSADOR, 1);
         }
 
-        void makeAmbassadorSummonOtherMe()
+        void DoAction(int32 param) override
         {
-            // Avoid summoning extra elemental spirit after EVENT_SUMMON_SPIRITS and then dying
-            if (!summonedNewSpirit)
-                    if (Creature* boss = me->FindNearestCreature(NPC_AMBASSADOR_FLAMELASHER, 5000.0f, true))
-                        boss->AI()->DoAction(EVENT_SUMMON_SPIRITS);
-        }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            makeAmbassadorSummonOtherMe();
-            _events.Reset();
-        }
-
-        void EnterCombat(Unit* /*who*/) override
-        {
-            // If spirits get in combat and can't summon, keep summining new spirits
-            _events.ScheduleEvent(EVENT_SUMMON_SPIRITS, 12 * IN_MILLISECONDS);
+            switch (param)
+            {
+                case EVENT_CHASE_AMBASSADOR:
+                    // TODO: Swap this with an execute event
+                    _events.ScheduleEvent(EVENT_CHASE_AMBASSADOR, 0.1f * IN_MILLISECONDS);
+                    break;
+            }
         }
 
         void UpdateAI(uint32 diff) override
@@ -258,9 +249,6 @@ public:
                 // Don't need to repeat this events because, once new spirits are summoned
                 // those new spirits will summon new spirits. If we repeated we would have
                 // an inmense number of spirits summoned if they were not all killed
-                case EVENT_SUMMON_SPIRITS:
-                    makeAmbassadorSummonOtherMe();
-                    break;
                 case EVENT_CHASE_AMBASSADOR:
                     if (!UpdateVictim())
                     {
