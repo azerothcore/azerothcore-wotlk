@@ -21,6 +21,7 @@ enum AmbassadorEvents
     EVENT_SPELL_FIREBLAST   = 1,
     EVENT_SUMMON_SPIRITS    = 2,
     EVENT_CHASE_AMBASSADOR  = 3,
+    EVENT_KILL_SPIRIT       = 4,
 };
 
 const uint32 NPC_FIRE_SPIRIT = 9178;
@@ -54,7 +55,11 @@ public:
         boss_ambassador_flamelashAI(Creature* creature) : BossAI(creature, BOSS_AMBASSADOR_FLAMELASH), summons(me) { }
 
         EventMap _events;
+
+        // This will help reseting the boss
         SummonList summons;
+
+        // This will allow to find a valid position to spawn them
         vector<int> validPosition;
         bool foundValidPosition = false;
 
@@ -180,17 +185,6 @@ public:
                 
             _events.Update(diff);
 
-            // Whenever a fire spirit gets in meele range of the boss,
-            // kill the NPC and make Ambassador cast Burning Spirit on himself
-            if (Creature* fireSpirit = me->FindNearestCreature(NPC_FIRE_SPIRIT, 1.0f, true))
-            {
-                if (!fireSpirit->IsInCombat())
-                {
-                    me->CastSpell(me, SPELL_BURNING_SPIRIT);
-                    me->Kill(me, fireSpirit);
-                }
-            }
-                
             switch(_events.ExecuteEvent())
             {
                 case EVENT_SPELL_FIREBLAST:
@@ -254,7 +248,14 @@ public:
                     {
                         if (Creature* boss = me->FindNearestCreature(NPC_AMBASSADOR_FLAMELASHER, 5000.0f, true))
                         {
-                            me->GetMotionMaster()->MoveChase(boss);   
+                            if (me->GetDistance(boss->GetPosition()) <= 5.0f)
+                            {
+                                boss->CastSpell(boss, SPELL_BURNING_SPIRIT);
+                                boss->Kill(boss, me);
+                            }
+
+                            if (me->IsAlive())
+                                me->GetMotionMaster()->MoveChase(boss);
                             _events.ScheduleEvent(EVENT_CHASE_AMBASSADOR, 0.5f * IN_MILLISECONDS);
                         }
                     }
