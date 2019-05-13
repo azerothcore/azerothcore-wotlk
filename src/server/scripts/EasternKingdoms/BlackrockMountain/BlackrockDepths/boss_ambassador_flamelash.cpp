@@ -221,41 +221,36 @@ public:
         npc_burning_spiritAI(Creature* creature) : CreatureAI(creature) { }
 
         EventMap _events;
+        bool summonedNewSpirit = false;
+
+        void Reset() override
+        {
+            // TODO: Swap this with an execute event
+            _events.ScheduleEvent(EVENT_CHASE_AMBASSADOR, 1);
+        }
+
+        void makeAmbassadorSummonOtherMe()
+        {
+            // Avoid summoning extra elemental spirit after EVENT_SUMMON_SPIRITS and then dying
+            if (!summonedNewSpirit)
+                    if (Creature* boss = me->FindNearestCreature(NPC_AMBASSADOR_FLAMELASHER, 5000.0f, true))
+                        boss->AI()->DoAction(EVENT_SUMMON_SPIRITS);
+        }
 
         void JustDied(Unit* /*killer*/) override
         {
-            if (Creature* boss = me->FindNearestCreature(NPC_AMBASSADOR_FLAMELASHER, 5000.0f, true))
-                boss->AI()->DoAction(EVENT_SUMMON_SPIRITS);
-                
+            makeAmbassadorSummonOtherMe();
             _events.Reset();
         }
 
         void EnterCombat(Unit* /*who*/) override
-        { 
-            // TODO: Swap this with an execute event
-            _events.ScheduleEvent(EVENT_CHASE_AMBASSADOR, 1);
-
+        {
             // If spirits get in combat and can't summon, keep summining new spirits
             _events.ScheduleEvent(EVENT_SUMMON_SPIRITS, 12 * IN_MILLISECONDS);
         }
 
         void UpdateAI(uint32 diff) override
         {
-            if (!UpdateVictim())
-            {
-                switch(_events.ExecuteEvent())
-                {
-                    case EVENT_CHASE_AMBASSADOR:
-                        if (Creature* boss = me->FindNearestCreature(NPC_AMBASSADOR_FLAMELASHER, 5000.0f, true))
-                        {
-                            me->GetMotionMaster()->MoveChase(boss);   
-                            _events.ScheduleEvent(EVENT_CHASE_AMBASSADOR, 0.5f * IN_MILLISECONDS);
-                        }
-                        break;
-                }
-                return;
-            }
-
             _events.Update(diff);
 
             switch(_events.ExecuteEvent())
@@ -264,8 +259,19 @@ public:
                 // those new spirits will summon new spirits. If we repeated we would have
                 // an inmense number of spirits summoned if they were not all killed
                 case EVENT_SUMMON_SPIRITS:
-                    if (Creature* boss = me->FindNearestCreature(NPC_AMBASSADOR_FLAMELASHER, 5000.0f, true))
-                        boss->AI()->DoAction(EVENT_SUMMON_SPIRITS);
+                    makeAmbassadorSummonOtherMe();
+                    break;
+                case EVENT_CHASE_AMBASSADOR:
+                    if (!UpdateVictim())
+                    {
+                        if (Creature* boss = me->FindNearestCreature(NPC_AMBASSADOR_FLAMELASHER, 5000.0f, true))
+                        {
+                            me->GetMotionMaster()->MoveChase(boss);   
+                            _events.ScheduleEvent(EVENT_CHASE_AMBASSADOR, 0.5f * IN_MILLISECONDS);
+                        }
+                    }
+                    else
+                        _events.ScheduleEvent(EVENT_CHASE_AMBASSADOR, 0.5f * IN_MILLISECONDS);
                     break;
             }
 
