@@ -680,7 +680,6 @@ public:
 
             DoMeleeAttackIfReady();
         }
-        void WaypointReached(uint32 /*waypointId*/) { }
     };
 };
 
