@@ -255,7 +255,7 @@ public:
 
     struct boss_archimondeAI : public hyjal_trashAI
     {
-        boss_archimondeAI(Creature* creature) : hyjal_trashAI(creature)
+        boss_archimondeAI(Creature* creature) : hyjal_trashAI(creature), summons(me)
         {
             instance = creature->GetInstanceScript();
         }
@@ -268,6 +268,7 @@ public:
 
         uint8 SoulChargeCount;
         uint8 WispCount;
+        SummonList summons;
 
         bool Enraged;
         bool BelowTenPercent;
@@ -277,7 +278,7 @@ public:
         std::list<Unit*> fingerOfDeathTargets;
         std::list<Unit*> spellEffectTargets;
 
-        void Reset()
+        void Reset() override
         {
             instance->SetData(DATA_ARCHIMONDEEVENT, NOT_STARTED);
 
@@ -301,6 +302,7 @@ public:
 
             spellEffectTargets.clear();
             fingerOfDeathTargets.clear();
+            summons.DespawnAll();
             events.ScheduleEvent(EVENT_DRAIN_WORLD_TREE, 0);
         }
 
@@ -335,7 +337,7 @@ public:
                 }
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             me->InterruptSpell(CURRENT_CHANNELED_SPELL);
             Talk(SAY_AGGRO);
@@ -349,7 +351,7 @@ public:
             events.ScheduleEvent(EVENT_SPELL_FINGER_OF_DEATH, 1000);
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit* victim) override
         {
             Talk(SAY_SLAY);
 
@@ -382,7 +384,7 @@ public:
             ++SoulChargeCount;
         }
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit* killer) override
         {
             hyjal_trashAI::JustDied(killer);
             Talk(SAY_DEATH);
@@ -400,10 +402,18 @@ public:
             events.CancelEvent(EVENT_SPELL_HAND_OF_DEATH);
             events.CancelEvent(EVENT_SPELL_PROTECTION_OF_ELUNE);
             events.CancelEvent(EVENT_ENRAGE);
+
+            spellEffectTargets.clear();
+            fingerOfDeathTargets.clear();
+            summons.DespawnAll();
         }
 
         bool CanUseFingerOfDeath()
         {
+            // Cast finger of death below 10% health
+            if (BelowTenPercent)
+                return true;
+
             if (me->IsAlive())
             {
                 /* Reset the list before checking for new targets
@@ -437,8 +447,9 @@ public:
             return false;
         }
 
-        void JustSummoned(Creature* summoned)
+        void JustSummoned(Creature* summoned) override
         {
+            summons.Summon(summoned);
             if (summoned->GetEntry() == CREATURE_ANCIENT_WISP)
                 summoned->AI()->AttackStart(me);
             else
@@ -524,7 +535,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
 
@@ -570,6 +581,9 @@ public:
             }
 
             if (!UpdateVictim())
+                return;
+
+            if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
             if (me->HealthBelowPct(10) && !BelowTenPercent)
