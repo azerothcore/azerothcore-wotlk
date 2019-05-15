@@ -255,7 +255,7 @@ public:
 
     struct boss_archimondeAI : public hyjal_trashAI
     {
-        boss_archimondeAI(Creature* creature) : hyjal_trashAI(creature), summons(me)
+        boss_archimondeAI(Creature* creature) : hyjal_trashAI(creature)
         {
             instance = creature->GetInstanceScript();
         }
