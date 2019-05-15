@@ -258,6 +258,7 @@ public:
         boss_archimondeAI(Creature* creature) : hyjal_trashAI(creature)
         {
             instance = creature->GetInstanceScript();
+            summons = new SummonList;
         }
 
         InstanceScript* instance;
