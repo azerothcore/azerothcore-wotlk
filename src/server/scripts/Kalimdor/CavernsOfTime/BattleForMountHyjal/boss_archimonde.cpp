@@ -255,10 +255,9 @@ public:
 
     struct boss_archimondeAI : public hyjal_trashAI
     {
-        boss_archimondeAI(Creature* creature) : hyjal_trashAI(creature)
+        boss_archimondeAI(Creature* creature) : hyjal_trashAI(creature), summons(creature)
         {
             instance = creature->GetInstanceScript();
-            summons = new SummonList;
         }
 
         InstanceScript* instance;
