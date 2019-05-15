@@ -14,6 +14,11 @@ enum FactionIds
     FACTION_FRIEND             = 35
 };
 
+enum BRDBosses
+{
+    BOSS_AMBASSADOR_FLAMELASH = 0,
+};
+
 enum DataTypes
 {
     TYPE_RING_OF_LAW        = 1,
@@ -48,7 +53,7 @@ enum DataTypes
     DATA_SF_BRAZIER_S       = 26,
     DATA_MOIRA              = 27,
 
-    DATA_OPEN_COFFER_DOORS  = 30,
+    DATA_OPEN_COFFER_DOORS  = 30
 };
 
 #endif
