@@ -419,37 +419,124 @@ public:
 # npc_ishanah
 ######*/
 
+enum Ishanah
+{
+	// ISHANAH SPELL EVENTS
+	EVENT_SPELL_GREATER_HEAL		= 2,
+	EVENT_SPELL_ISHANAH_HOLY_SMITE	= 3,
+	EVENT_SPELL_POWER_WORD_SHIELD	= 4,
+	EVENT_JUST_SPAWNED				= 5, // Start waypath
+	EVENT_SOCRETHAR_DEAD			= 33,
+	EVENT_ISHANAH_SAY_1				= 18, // Make kaylaan bow
+	SOCRETHAR						= 20132,
+	KAYLAAN_THE_LOST				= 20794,
+
+	// ISHANAH SPELLS
+	GREATER_HEAL					= 35096,
+	HOLY_SMITE_ISHANAH				= 15238,
+	POWER_WORLD_SHIELD				= 22187
+};
+
 #define ISANAH_GOSSIP_1 "Who are the Sha'tar?"
 #define ISANAH_GOSSIP_2 "Isn't Shattrath a draenei city? Why do you allow others here?"
 
 class npc_ishanah : public CreatureScript
 {
-public:
-    npc_ishanah() : CreatureScript("npc_ishanah") { }
+	public:
+		npc_ishanah() : CreatureScript("npc_ishanah") { }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
-    {
-        ClearGossipMenuFor(player);
-        if (action == GOSSIP_ACTION_INFO_DEF+1)
-            SendGossipMenuFor(player, 9458, creature->GetGUID());
-        else if (action == GOSSIP_ACTION_INFO_DEF+2)
-            SendGossipMenuFor(player, 9459, creature->GetGUID());
+		bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action)
+		{
+			player->PlayerTalkClass->ClearMenus();
+			if (action == GOSSIP_ACTION_INFO_DEF+1)
+				player->SEND_GOSSIP_MENU(9458, creature->GetGUID());
+			else if (action == GOSSIP_ACTION_INFO_DEF+2)
+				player->SEND_GOSSIP_MENU(9459, creature->GetGUID());
 
-        return true;
-    }
+			return true;
+		}
 
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        if (creature->IsQuestGiver())
-            player->PrepareQuestMenu(creature->GetGUID());
+		bool OnGossipHello(Player* player, Creature* creature)
+		{
+			if (creature->IsQuestGiver())
+				player->PrepareQuestMenu(creature->GetGUID());
 
-        AddGossipItemFor(player, GOSSIP_ICON_CHAT, ISANAH_GOSSIP_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
-        AddGossipItemFor(player, GOSSIP_ICON_CHAT, ISANAH_GOSSIP_2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+2);
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, ISANAH_GOSSIP_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
+			player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, ISANAH_GOSSIP_2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+2);
 
-        SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
+			player->SEND_GOSSIP_MENU(player->GetGossipTextId(creature), creature->GetGUID());
 
-        return true;
-    }
+			return true;
+		}
+
+		struct ishanahAI : public ScriptedAI
+		{
+			ishanahAI(Creature* creature) : ScriptedAI(creature) { }
+
+			EventMap _events;
+
+			void DoAction(int32 param)
+			{
+				switch (param)
+				{
+					case EVENT_SOCRETHAR_DEAD:
+						me->SetFlag(UNIT_FIELD_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+						break;
+				}
+			}
+
+			void EnterCombat(Unit* who) override
+			{
+				AttackStart(who);
+				_events.ScheduleEvent(EVENT_SPELL_ISHANAH_HOLY_SMITE, 1000);
+			}
+
+			void MovementInform(uint32 type, uint32 point)
+			{
+				if (type != POINT_MOTION_TYPE)
+				{
+					if (point == 2)
+					{
+						if (Creature* kaylaan = me->FindNearestCreature(KAYLAAN_THE_LOST, 30.0f, true))
+						{
+							kaylaan->AI()->Talk(5); /* Teacher... */
+							kaylaan->SetOrientation(me->GetPositionX());
+							if (Creature* socrethar = me->FindNearestCreature(SOCRETHAR, 30.0f, true))
+							{
+								socrethar->AI()->DoAction(EVENT_ISHANAH_SAY_1);
+								socrethar->SetOrientation(me->GetPositionX());
+							}
+						}
+					}
+				}
+			}
+
+			void UpdateAI(uint32 diff) override
+			{
+				_events.Update(diff);
+
+				if (!me->GetVictim())
+					return;
+
+				if (me->HasUnitState(UNIT_STATE_CASTING))
+					return;
+
+				switch (uint32 eventId = _events.ExecuteEvent())
+				{
+				case EVENT_SPELL_ISHANAH_HOLY_SMITE:
+					me->CastSpell(me->GetVictim(), HOLY_SMITE_ISHANAH, false);
+					_events.ScheduleEvent(EVENT_SPELL_ISHANAH_HOLY_SMITE, 2500);
+					break;
+				}
+
+				DoMeleeAttackIfReady();
+			}
+		};
+
+		CreatureAI* GetAI(Creature* creature) const
+		{
+			return new ishanahAI(creature);
+		}
 };
 
 void AddSC_shattrath_city()
