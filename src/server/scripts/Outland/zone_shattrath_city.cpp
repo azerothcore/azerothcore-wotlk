@@ -475,7 +475,7 @@ class npc_ishanah : public CreatureScript
 
 			EventMap _events;
 
-			void DoAction(int32 param)
+			void DoAction(int32 param) override
 			{
 				switch (param)
 				{
@@ -491,7 +491,7 @@ class npc_ishanah : public CreatureScript
 				_events.ScheduleEvent(EVENT_SPELL_ISHANAH_HOLY_SMITE, 1000);
 			}
 
-			void MovementInform(uint32 type, uint32 point)
+			void MovementInform(uint32 type, uint32 point) override
 			{
 				if (type != POINT_MOTION_TYPE)
 				{
