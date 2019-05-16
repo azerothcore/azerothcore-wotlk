@@ -13,7 +13,7 @@
 
 uint32 const EncounterCount     = 5;
 
-enum BRDBosses
+enum HyjalBosses
 {
     BOSS_ARCHIMONDE = 0,
 };
