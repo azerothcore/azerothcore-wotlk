@@ -384,7 +384,7 @@ public:
             ++SoulChargeCount;
         }
 
-        void JustDied(Unit* killer) override
+        void JustDied(Unit* /*killer*/) override
         {
             Talk(SAY_DEATH);
 
