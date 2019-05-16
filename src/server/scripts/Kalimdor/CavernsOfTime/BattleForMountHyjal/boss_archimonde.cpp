@@ -253,9 +253,9 @@ public:
         return GetInstanceAI<boss_archimondeAI>(creature);
     }
 
-    struct boss_archimondeAI : public hyjal_trashAI
+    struct boss_archimondeAI : public BossAI
     {
-        boss_archimondeAI(Creature* creature) : hyjal_trashAI(creature), summons(creature)
+        boss_archimondeAI(Creature* creature) : BossAI(creature, BOSS_ARCHIMONDE), summons(me)
         {
             instance = creature->GetInstanceScript();
         }
@@ -434,7 +434,7 @@ public:
                 for (; itr != threatlist.end(); ++itr)
                 {
                     Unit* unit = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid());
-                    if (unit && unit->IsAlive() && me->GetDistance(unit->GetPosition()) > 5.0f)
+                    if (unit && unit->IsAlive() && me->IsWithinMeleeRange(unit))
                         fingerOfDeathTargets.push_back(unit);
                 }
 
