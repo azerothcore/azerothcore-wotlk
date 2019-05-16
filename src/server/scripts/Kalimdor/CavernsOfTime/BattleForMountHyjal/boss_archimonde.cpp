@@ -256,7 +256,7 @@ public:
     struct boss_archimondeAI : public BossAI
     {
         boss_archimondeAI(Creature* creature) : BossAI(creature, BOSS_ARCHIMONDE), summons(me),
-        IsChanneling(false), HasProtected(false), BelowTenPercent(false), Enraged(false)
+        Enraged(false), BelowTenPercent(false), HasProtected(false), IsChanneling(false)
         {
             instance = creature->GetInstanceScript();
         }
