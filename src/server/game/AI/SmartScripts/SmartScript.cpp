@@ -1888,9 +1888,14 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
 
             me->GetMotionMaster()->MovePoint(e.action.MoveToPos.pointId, dest.x, dest.y, dest.z, true, true, e.action.MoveToPos.controlled ? MOTION_SLOT_CONTROLLED : MOTION_SLOT_ACTIVE);
         }
-        else // Xinef: we can use dest.x, dest.y, dest.z to make offset :)
-            me->GetMotionMaster()->MovePoint(e.action.MoveToPos.pointId, target->GetPositionX() + e.target.x, target->GetPositionY() + e.target.y, target->GetPositionZ() + e.target.z, true, true, e.action.MoveToPos.controlled ? MOTION_SLOT_CONTROLLED : MOTION_SLOT_ACTIVE);
-
+        else // Xinef: we can use dest.x, dest.y, dest.z to make offset
+        {
+            float x, y, z;
+            target->GetPosition(x, y, z);
+            if (e.action.MoveToPos.ContactDistance > 0)
+                target->GetContactPoint(me, x, y, z, e.action.MoveToPos.ContactDistance);
+            me->GetMotionMaster()->MovePoint(e.action.MoveToPos.pointId, x + e.target.x, y + e.target.y, z + e.target.z, e.action.MoveToPos.controlled ? MOTION_SLOT_CONTROLLED : MOTION_SLOT_ACTIVE);
+        }
         break;
     }
     case SMART_ACTION_MOVE_TO_POS_TARGET:
