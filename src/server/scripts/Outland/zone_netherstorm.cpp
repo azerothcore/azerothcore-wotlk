@@ -374,7 +374,7 @@ class anchorite_karja : public CreatureScript
 
             EventMap _events;
 
-            void DoAction(int32 param)	
+            void DoAction(int32 param) override
             {
                 if (param == EVENT_KARJA_WALK)
                 {
@@ -389,14 +389,14 @@ class anchorite_karja : public CreatureScript
                 }
             }
 
-            void Reset()
+            void Reset() override
             {
                 me->GetMotionMaster()->MoveTargetedHome();
                 me->CombatStop();
                 me->ClearInCombat();
             }
 
-            void MovementInform(uint32 type, uint32 point)
+            void MovementInform(uint32 type, uint32 point) override
             {
                 if (type != POINT_MOTION_TYPE)
                     if (point == 11)
@@ -453,7 +453,7 @@ class exarch_orelis : public CreatureScript
 
             EventMap _events;
 
-            void DoAction(int32 param)
+            void DoAction(int32 param) override
             {
                 if (param == EVENT_ORELIS_WALK)
                 {
@@ -468,7 +468,7 @@ class exarch_orelis : public CreatureScript
                 }
             }
 
-            void Reset()
+            void Reset() override
             {
                 _events.Reset();
                 me->GetMotionMaster()->MoveTargetedHome();
@@ -491,7 +491,7 @@ class exarch_orelis : public CreatureScript
                         me->SetHomePosition(me->GetPosition());
             }
 
-            void EnterCombat(Unit* /*who*/)
+            void EnterCombat(Unit* /*who*/) override
             {
                 _events.ScheduleEvent(EVENT_SPELL_DEMORALIZING_SHOUT, 1000);
                 _events.ScheduleEvent(EVENT_SPELL_HEROIC_STRIKE, urand(2500, 4000));
@@ -580,7 +580,7 @@ class socrethar : public CreatureScript
                 return false; // When he doesn't find anyone
             }
 
-            void Reset()
+            void Reset() override
             {
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE);
                 me->SetReactState(REACT_PASSIVE);
@@ -591,7 +591,7 @@ class socrethar : public CreatureScript
                 ishanah = NULL;
             }
 
-            void DoAction(int32 param)
+            void DoAction(int32 param) override
             {
                 switch (param)
                 {
@@ -619,7 +619,7 @@ class socrethar : public CreatureScript
                 }
             }
 
-            void JustDied(Unit*  killer)	
+            void JustDied(Unit*  killer) override
             {	
                 Player* player = killer->ToPlayer();
 
@@ -645,7 +645,7 @@ class socrethar : public CreatureScript
                     karja->GetAI()->DoAction(RESET_DEATHBLOW_EVENT);
             }
 
-            void EnterCombat(Unit* /*who*/) 	
+            void EnterCombat(Unit* /*who*/) override
             {
                 combatEvents.ScheduleEvent(EVENT_SPELL_ANTI_MAGIC_SHIELD, 9000);
                 combatEvents.ScheduleEvent(EVENT_SPELL_BACKLASH, 4000);
@@ -654,9 +654,9 @@ class socrethar : public CreatureScript
                 combatEvents.ScheduleEvent(EVENT_SPELL_NETHER_PROTECTION, 1);
             }
 
-            void JustSummoned(Creature* cr) { _summons.Summon(cr); }
+            void JustSummoned(Creature* cr) override { _summons.Summon(cr); }
 
-            void UpdateAI(uint32 diff) 	
+            void UpdateAI(uint32 diff) override
             {
                 if (DeathblowToTheLegionRunning)
                 {
@@ -893,13 +893,13 @@ class kaylaan_the_lost : public CreatureScript
             bool second_waypath_done = false;	
             bool adyen_dead = false, karja_dead = false, orelis_dead = false;	
 
-            void EnterCombat(Unit* /*who*/)	
+            void EnterCombat(Unit* /*who*/)	override
             {	
                 _events.ScheduleEvent(EVENT_SPELL_BURNING_LIGHT, 2000);	
                 _events.ScheduleEvent(EVENT_SPELL_CONSECRATION, 3000);	
             }	
 
-            void Reset()	
+            void Reset() override
             {	
                 me->GetMotionMaster()->MoveTargetedHome();	
                 me->CombatStop();	
@@ -925,7 +925,7 @@ class kaylaan_the_lost : public CreatureScript
                 }
             }
 
-            void KilledUnit(Unit* victim)	
+            void KilledUnit(Unit* victim) override
             {	
                 switch (victim->GetEntry())	
                 {	
@@ -944,7 +944,7 @@ class kaylaan_the_lost : public CreatureScript
                     ResetDeathblowEvent(true);	
             }	
 
-            void DoAction(int32 param)	
+            void DoAction(int32 param) override
             {	
                 switch (param)	
                 {	
@@ -954,7 +954,7 @@ class kaylaan_the_lost : public CreatureScript
                 }	
             }
 
-            void MovementInform(uint32 type, uint32 point)	
+            void MovementInform(uint32 type, uint32 point) override
             {	
                 if (type != POINT_MOTION_TYPE)	
                 {	
@@ -987,7 +987,7 @@ class kaylaan_the_lost : public CreatureScript
                 }	
             }	
 
-            void UpdateAI(uint32 diff)	
+            void UpdateAI(uint32 diff) override
             {	
                 _events.Update(diff);	
 
