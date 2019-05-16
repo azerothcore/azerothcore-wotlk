@@ -18,7 +18,7 @@ DELETE FROM `creature_equip_template` WHERE `CreatureID`=50001 AND `ID`=1;
 INSERT INTO `creature_equip_template` (`CreatureID`, `ID`, `ItemID1`, `ItemID2`, `ItemID3`, `VerifiedBuild`) VALUES (50001, 1, 14873, 0, 0, 18019);
 
 # Karja 'anchorite_karja'
-UPDATE `creature_template` SET `ScriptName`='exarch_orelis' WHERE `entry`=50001;
+UPDATE `creature_template` SET `ScriptName`='anchorite_karja' WHERE `entry`=50001;
 DELETE FROM `creature_equip_template` WHERE `CreatureID`=50002 AND `ID`=1;
 INSERT INTO `creature_equip_template` (`CreatureID`, `ID`, `ItemID1`, `ItemID2`, `ItemID3`, `VerifiedBuild`) VALUES (50002, 1, 28488, 0, 0, 18019);
 
@@ -29,10 +29,10 @@ DELETE FROM `creature` WHERE `id`=50004;
 INSERT INTO `creature` (`id`, `map`, `modelid`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES ('50004', '530', '17881', '4802.629883', '3775.419922', '210.529999', '5.490000');
 
 # Socrethar 'socrethar'
-UPDATE `creature_template` SET `ScriptName`='exarch_orelis' WHERE `entry`=20132;
+UPDATE `creature_template` SET `ScriptName`='socrethar' WHERE `entry`=20132;
 
 # Ishanah 'npc_ishanah'
-UPDATE `creature_template` SET `ScriptName`='exarch_orelis' WHERE `entry`=18538;
+UPDATE `creature_template` SET `ScriptName`='npc_ishanah' WHERE `entry`=18538;
 
 # Orelis gossip text
 DELETE FROM `gossip_menu` WHERE `entry`=61021 AND `text_id`=61021;
