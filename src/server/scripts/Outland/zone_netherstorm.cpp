@@ -816,7 +816,7 @@ class socrethar : public CreatureScript
                             me->CastSpell(kaylaan, WRATH_OF_SOCRETHAR);
                             _actionEvents.ScheduleEvent(EVENT_KAYLAAN_DIES, 1500);
                             break;
-                        case EVENT_KAYLAAN_DIES	
+                        case EVENT_KAYLAAN_DIES:
                             me->Kill(me, kaylaan);
                             _actionEvents.ScheduleEvent(EVENT_FINAL_FIGHT, 3000);
                             break;
