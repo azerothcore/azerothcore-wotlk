@@ -3373,7 +3373,7 @@ void ObjectMgr::LoadPlayerInfo()
 
         if (!result)
         {
-            sLog->outErrorDb(">> Loaded 0 player create skills. DB table `playercreateinfo_skills` is empty.");
+            sLog->outString(">> Loaded 0 player create skills. DB table `playercreateinfo_skills` is empty.");
             sLog->outString();
         }
         else
