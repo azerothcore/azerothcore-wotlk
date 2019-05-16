@@ -386,8 +386,7 @@ public:
 
         void JustDied(Unit* killer) override
         {
-            hyjal_trashAI::JustDied(killer);
-            Talk(SAY_DEATH);
+            Talk(SAY_DEATH);hyjal_trashAI::JustDied(killer);
 
             instance->SetData(DATA_ARCHIMONDEEVENT, DONE);
             instance->DoUpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE, me->GetEntry(), 1, me);
