@@ -4312,16 +4312,18 @@ void SpellMgr::LoadDbcDataCorrections()
             break;
         // Wintergrasp spells
         case 51422: // Cannon (Tower Cannon)
-            spellInfo->EffectRadiusIndex[EFFECT_0] = 13; // 10yd
+            spellInfo->EffectRadiusIndex[EFFECT_0] = 20; // Radius: 20 yards
             break;
         case 57610: // Cannon (Siege Turret)
-            spellInfo->EffectRadiusIndex[EFFECT_0] = 13; // 10yd
+            spellInfo->EffectRadiusIndex[EFFECT_0] = 20; // Radius: 20 yards
+            spellInfo->EffectRadiusIndex[EFFECT_1] = 10; // Radius: 10 yards
             break;
         case 50999: // Boulder (Demolisher)
-            spellInfo->EffectRadiusIndex[EFFECT_0] = 13; // 10yd
+            spellInfo->EffectRadiusIndex[EFFECT_0] = 20; // Radius: 20 yards
+            spellInfo->EffectRadiusIndex[EFFECT_1] = 3; // Radius: 3 yards
             break;
         case 50990: // Flame Breath (Catapult)
-            spellInfo->EffectRadiusIndex[EFFECT_0] = 19; // 18yd
+            spellInfo->EffectRadiusIndex[EFFECT_0] = 30; // Radius: 30 yards
             break;
 
         /////////////////////////////////
