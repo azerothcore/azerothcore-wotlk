@@ -1,6 +1,6 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1558177528536551500');
 
--- Pathing for Guardian Lasher Entry: 33430 (3 Entry in creature table)
+-- Pathing for Guardian Lasher Entry: 33430
 SET @NPC := 136608;
 SET @PATH := @NPC * 10;
 UPDATE `creature` SET `spawndist`=0,`MovementType`=2,`position_x`=2409.214,`position_y`=39.68574,`position_z`=430.8202 WHERE `guid`=@NPC;
