@@ -261,16 +261,18 @@ class adyen_the_lightbringer : public CreatureScript
 
         struct adyen_the_lightbringerAI : public ScriptedAI
         {
-            adyen_the_lightbringerAI(Creature* creature) : ScriptedAI(creature) { }
+            adyen_the_lightbringerAI(Creature* creature) : ScriptedAI(creature), event_started(false) { }
 
             EventMap _events;
             uint32  eventTimer, eventPhase;
+            bool event_started = false;
 
             void DoAction(int32 param)
             {
                 if (param == EVENT_START_PLAYER_READY)
                 {
                     me->GetMotionMaster()->MovePath(610210, false);
+                    event_started = true;
                 }
                 else if (param == RESET_DEATHBLOW_EVENT)
                 {
@@ -283,7 +285,10 @@ class adyen_the_lightbringer : public CreatureScript
 
             void Reset()
             {
-                me->GetMotionMaster()->MoveTargetedHome();
+                if (event_started)
+                    me->GetMotionMaster()->ReinitializeMovement();
+                else
+                    me->GetMotionMaster()->MoveTargetedHome();
                 me->CombatStop();
                 me->ClearInCombat();
             }
