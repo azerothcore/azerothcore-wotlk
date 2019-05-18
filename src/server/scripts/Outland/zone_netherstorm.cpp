@@ -216,7 +216,7 @@ class deathblow_to_the_legion_trigger : public CreatureScript
             {
                 if (who->GetTypeId() == TYPEID_PLAYER && who->IsAlive())
                 {
-                    if (!_summons.HasEntry(ADYEN_THE_LIGHTBRINGER))
+                    if (!_summons.HasEntry(ADYEN_THE_LIGHTBRINGER) && me->FindNearestCreature(SOCRETHAR, 500.0f, true))
                     {
                         me->SummonCreature(ADYEN_THE_LIGHTBRINGER, AdyenSpawnPosition, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 300000);
                         me->SummonCreature(EXARCH_ORELIS, OrelisSpawnPosition, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 300000);
@@ -384,6 +384,8 @@ class anchorite_karja : public CreatureScript
                 if (param == EVENT_KARJA_WALK)
                 {
                     me->GetMotionMaster()->MovePath(500020, false);
+                    me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                    me->AI()->DoAction(EVENT_START_PLAYER_READY);
                 }
                 else if (param == RESET_DEATHBLOW_EVENT)
                 {
@@ -463,6 +465,8 @@ class exarch_orelis : public CreatureScript
                 if (param == EVENT_ORELIS_WALK)
                 {
                     me->GetMotionMaster()->MovePath(500010, false);
+                    me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                    me->AI()->DoAction(EVENT_START_PLAYER_READY);
                 }
                 else if (param == RESET_DEATHBLOW_EVENT)
                 {
@@ -546,7 +550,8 @@ class socrethar : public CreatureScript
 
         struct socretharAI : public ScriptedAI
         {
-            socretharAI(Creature* creature) : ScriptedAI(creature), _summons(me) { }
+            socretharAI(Creature* creature) : ScriptedAI(creature), _summons(me),
+            adyen(nullptr), orelis(nullptr), karja(nullptr), kaylaan(nullptr), ishanah(nullptr) { }
 
             EventMap _actionEvents, combatEvents;
             bool DeathblowToTheLegionRunning = false;
@@ -590,10 +595,10 @@ class socrethar : public CreatureScript
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE);
                 me->SetReactState(REACT_PASSIVE);
                 me->setFaction(1786);
-                adyen   = NULL;
-                orelis  = NULL;
-                karja   = NULL;
-                ishanah = NULL;
+                adyen   = nullptr;
+                orelis  = nullptr;
+                karja   = nullptr;
+                ishanah = nullptr;
             }
 
             void DoAction(int32 param) override
@@ -635,7 +640,8 @@ class socrethar : public CreatureScript
                     player->CompleteQuest(DEATHBLOW_TO_THE_LEGION);
 
                 ishanah->AI()->DoAction(EVENT_SOCRETHAR_DEAD);
-                ishanah->SetFlag(UNIT_FIELD_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+                ishanah->SetFlag(UNIT_FIELD_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                ishanah->DespawnOrUnsummon(60 * IN_MILLISECONDS);
 
                 // Adyen might have died, get his pointer again	
                 if (GetCreature(ADYEN_THE_LIGHTBRINGER))
@@ -725,7 +731,7 @@ class socrethar : public CreatureScript
                             GetCreature(EXARCH_ORELIS); // define orelis pointer
                             GetCreature(ANCHORITE_KARJA); // define karja pointer
                             kaylaan->setFaction(EXODAR_ENEMY_FACTION);
-                            kaylaan->AI()->EnterCombat(adyen);
+                            kaylaan->AI()->AttackStart(adyen);
                             adyen->AI()->DoAction(EVENT_SHEDULE_EVENTS);
                             break;
                         case EVENT_END_ALDOR_FIGHT:
@@ -768,7 +774,7 @@ class socrethar : public CreatureScript
                             if (Creature* summonIshanah = me->SummonCreature(ISHANAH_HIGH_PRIESTESS, IshanahSpawnPosition, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 180000))
                             {
                                 summonIshanah->GetMotionMaster()->MovePath(500050, false);
-                                summonIshanah->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+                                summonIshanah->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
                             }
                             break;
                         case EVENT_ISHANAH_SAY_1:
@@ -826,10 +832,12 @@ class socrethar : public CreatureScript
                             _actionEvents.ScheduleEvent(EVENT_FINAL_FIGHT, 3000);
                             break;
                         case EVENT_FINAL_FIGHT:
+                            // Prepare Socrethar for encounter
                             me->setFaction(EXODAR_ENEMY_FACTION);
-                            ishanah->setFaction(EXODAR_FACTION);
                             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE);
                             me->SetReactState(REACT_AGGRESSIVE);
+
+                            // Engage combat with Socrethar
                             if (GetCreature(ADYEN_THE_LIGHTBRINGER))
                                 adyen->AI()->EnterCombat(me);
                             if (GetCreature(EXARCH_ORELIS))
