@@ -1,3 +1,19 @@
+-- DB update 2019_05_20_00 -> 2019_05_20_01
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2019_05_20_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2019_05_20_00 2019_05_20_01 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1557952462090372016'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1557952462090372016');
 
 DELETE FROM `smart_scripts` WHERE `entryorguid` = 25765 AND `source_type` = 0;
@@ -10,3 +26,12 @@ VALUES
 (25765,0,4,0,61,0,100,0,0,0,0,0,0,59,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Fizzcrank Bomber - Linked - Set Run On'),
 (25765,0,5,6,40,0,100,0,74,25765,0,0,0,11,47460,3,0,0,0,0,11,26817,5,0,0,0,0,0,0,'Fizzcrank Bomber - On Waypoint 74 Reached - Cast \'Fizzcrank Pilot - Gett Off Plane\''),
 (25765,0,6,0,61,0,100,0,0,0,0,0,0,41,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Fizzcrank Bomber - Linked - Despawn Instant');
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
