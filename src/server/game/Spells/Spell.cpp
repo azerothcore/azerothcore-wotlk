@@ -2837,14 +2837,20 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
         }
     }
 
-    if (missInfo != SPELL_MISS_EVADE && !m_caster->IsFriendlyTo(effectUnit) && !m_spellInfo->HasAura(SPELL_AURA_BIND_SIGHT) && (!m_spellInfo->IsPositive() || m_spellInfo->HasEffect(SPELL_EFFECT_DISPEL)))
+    if (m_caster)
     {
-        m_caster->CombatStart(effectUnit, !m_spellInfo->HasAttribute(SPELL_ATTR3_NO_INITIAL_AGGRO));
+        if (missInfo != SPELL_MISS_EVADE && !m_caster->IsFriendlyTo(effectUnit) && (!m_spellInfo->IsPositive() || m_spellInfo->HasEffect(SPELL_EFFECT_DISPEL)))
+        {
+        m_caster->CombatStart(effectUnit, !(m_spellInfo->AttributesEx3& SPELL_ATTR3_NO_INITIAL_AGGRO));
 
-        if (m_spellInfo->HasAttribute(SPELL_ATTR0_CU_AURA_CC))
+        if (m_spellInfo->AttributesCu & SPELL_ATTR0_CU_AURA_CC)
             if (!effectUnit->IsStandState())
                 effectUnit->SetStandState(UNIT_STAND_STATE_STAND);
+        }
     }
+
+    if (missInfo != SPELL_MISS_EVADE && effectUnit != m_caster && m_caster->IsFriendlyTo(effectUnit) && m_spellInfo->IsPositive() && effectUnit->IsInCombat())
+        m_caster->SetInCombatWith(effectUnit);
 
     if (spellHitTarget)
     {
