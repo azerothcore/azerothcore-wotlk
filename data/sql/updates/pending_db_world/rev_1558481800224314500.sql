@@ -47,28 +47,11 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (30945, 0, 11, 0, 52, 0, 100, 0, 4, 30945, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Vardmadra - On Text 4 Over - Despawn Instant'),
 (30945, 0, 12, 0, 38, 0, 100, 0, 2, 2, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Vardmadra - On Data Set 2 2 - Despawn Instant');
 
--- Table creature_template
-UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 20214; 
-
 -- Arakkoa Egg
-DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 20214);
-INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(20214, 0, 0, 0, 11, 0, 100, 0, 0, 0, 0, 0, 11, 35788, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Arakkoa Egg - On Respawn - Cast \'35788\''),
-(20214, 0, 1, 0, 0, 0, 100, 1, 2500, 2500, 0, 0, 11, 35788, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Arakkoa Egg - In Combat - Cast \'35788\' (No Repeat)');
-
--- Table creature_template
-UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 2044; 
+UPDATE `smart_scripts` SET `link` = 0 WHERE `entryorguid` = 20214 AND `source_type` = 0;
 
 -- Forlorn Spirit
-DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 2044);
-INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(2044, 0, 0, 1, 11, 0, 100, 1, 0, 0, 0, 0, 1, 0, 3, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Forlorn Spirit - On Respawn - Say Line 0 (No Repeat)'),
-(2044, 0, 1, 0, 61, 0, 100, 1, 0, 0, 0, 0, 69, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, -10961.770508, 1566.371094, 45.618156, 4.3444406, 'Forlorn Spirit - On Respawn - Move To Position (No Repeat)'),
-(2044, 0, 2, 3, 1, 0, 100, 1, 2500, 2500, 0, 0, 1, 2, 3, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Forlorn Spirit - Out of Combat - Say Line 2 (No Repeat)'),
-(2044, 0, 3, 4, 61, 0, 100, 1, 0, 0, 0, 0, 1, 1, 3, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Forlorn Spirit - Out of Combat - Say Line 1 (No Repeat)'),
-(2044, 0, 4, 0, 61, 0, 100, 1, 0, 0, 0, 0, 2, 16, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Forlorn Spirit - Out of Combat - Set Faction 16 (No Repeat)'),
-(2044, 0, 5, 0, 0, 0, 100, 1, 2000, 2000, 2000, 2000, 11, 3105, 32, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Forlorn Spirit - In Combat - Cast \'3105\' (No Repeat)'),
-(2044, 0, 6, 0, 0, 0, 100, 1, 5500, 5500, 0, 0, 11, 118, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Forlorn Spirit - In Combat - Cast \'118\' (No Repeat)');
+UPDATE `smart_scripts` SET `link` = 0 WHERE `entryorguid` = 2044 AND `source_type` = 0 AND `id` = 0;
 
 DELETE FROM `creature_text` WHERE `CreatureID`=2044 AND `GroupID` IN (0,1,2) AND `ID`=0;
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES 
