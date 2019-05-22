@@ -52,9 +52,3 @@ UPDATE `smart_scripts` SET `link` = 0 WHERE `entryorguid` = 20214 AND `source_ty
 
 -- Forlorn Spirit
 UPDATE `smart_scripts` SET `link` = 0 WHERE `entryorguid` = 2044 AND `source_type` = 0 AND `id` = 0;
-
-DELETE FROM `creature_text` WHERE `CreatureID`=2044 AND `GroupID` IN (0,1,2) AND `ID`=0;
-INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES 
-(2044, 0, 0, 'Who is this mere $r that meddles with that which is past?  May the legend of Stalvan die along with you!', 12, 0, 100, 0, 0, 0, 504, 0, 'Forlorn Spirit'),
-(2044, 1, 0, 'Let the legend of Stalvan rest!', 12, 0, 100, 0, 0, 0, 503, 0, 'Forlorn Spirit'),
-(2044, 2, 0, 'Toil not in matters of the past, $n!', 12, 0, 100, 0, 0, 0, 0, 0, 'Forlorn Spirit');
