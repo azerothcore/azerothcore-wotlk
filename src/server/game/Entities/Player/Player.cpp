@@ -1710,7 +1710,7 @@ void Player::Update(uint32 p_time)
 
     if (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING))
     {
-        if (now > m_Last_tick && _restTime > 0)      // freeze update
+        if (now > m_Last_tick && _restTime > 0)             // freeze update
         {
             time_t currTime = time(NULL);
             time_t timeDiff = currTime - _restTime;
