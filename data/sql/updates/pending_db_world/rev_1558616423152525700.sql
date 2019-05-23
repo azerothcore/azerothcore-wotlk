@@ -23,4 +23,4 @@ UPDATE creature_template SET AIName="SmartAI" WHERE entry=10374;
 INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES 
 (10374,0,0,0,0,0,100,2,10000,20000,30000,30000,11,16103,0,0,0,0,0,5,0,0,0,0.0,0.0,0.0,0.0,"Spire Spider - In Combat - Cast 'Summon Spire Spiderling'"),
 (10374,0,1,0,0,0,100,2,15000,15000,15000,15000,11,16104,0,0,0,0,0,2,0,0,0,0.0,0.0,0.0,0.0,"Spire Spider - In Combat - Cast 'Crystallize'"),
-(10374,0,2,0,1,0,100,0,0,0,0,0,89,20,0,0,0,0,0,1,0,0,0,0.0,0.0,0.0,0.0,"Spire Spide - Out of Combat - Random move");
+(10374,0,2,0,1,0,100,0,0,0,0,0,89,20,0,0,0,0,0,1,0,0,0,0.0,0.0,0.0,0.0,"Spire Spider - Out of Combat - Random move");
