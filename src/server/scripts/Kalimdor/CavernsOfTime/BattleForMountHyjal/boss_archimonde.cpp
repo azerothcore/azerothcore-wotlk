@@ -4,12 +4,12 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-/* ScriptData
-SDName: Boss_Archimonde
-SD%Complete: 85
-SDComment: Doomfires not completely offlike due to core limitations for random moving. Tyrande and second phase not fully implemented.
-SDCategory: Caverns of Time, Mount Hyjal
-EndScriptData */
+ /* ScriptData
+ SDName: Boss_Archimonde
+ SD%Complete: 85
+ SDComment: Doomfires not completely offlike due to core limitations for random moving. Tyrande and second phase not fully implemented.
+ SDCategory: Caverns of Time, Mount Hyjal
+ EndScriptData */
 
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
@@ -17,6 +17,7 @@ EndScriptData */
 #include "SpellAuras.h"
 #include "hyjal_trash.h"
 #include "Player.h"
+#include "SpellScript.h"
 
 enum Texts
 {
@@ -39,6 +40,7 @@ enum Spells
     SPELL_DRAIN_WORLD_TREE_2    = 39141,
 
     SPELL_FINGER_OF_DEATH       = 31984,
+    SPELL_RED_SKY_EFFECT        = 32111,
     SPELL_HAND_OF_DEATH         = 35354,
     SPELL_AIR_BURST             = 32014,
     SPELL_GRIP_OF_THE_LEGION    = 31972,
@@ -56,13 +58,33 @@ enum Spells
 
 enum Summons
 {
-    CREATURE_DOOMFIRE               = 18095,
-    CREATURE_DOOMFIRE_SPIRIT        = 18104,
-    CREATURE_ANCIENT_WISP           = 17946,
-    CREATURE_CHANNEL_TARGET         = 22418,
+    CREATURE_DOOMFIRE           = 18095,
+    CREATURE_DOOMFIRE_SPIRIT    = 18104,
+    CREATURE_ANCIENT_WISP       = 17946,
+    CREATURE_CHANNEL_TARGET     = 22418,
 };
 
-Position const NordrassilLoc = {5503.713f, -3523.436f, 1608.781f, 0.0f};
+enum Events
+{
+    EVENT_DRAIN_WORLD_TREE              = 1,
+    EVENT_SPELL_FEAR                    = 2,
+    EVENT_SPELL_AIR_BURST               = 3,
+    EVENT_SPELL_GRIP_OF_THE_LEGION      = 4,
+    EVENT_SPELL_UNLEASH_SOUL_CHARGES    = 5,
+    EVENT_SPELL_DOOMFIRE                = 6,
+    EVENT_SPELL_FINGER_OF_DEATH         = 7,
+    EVENT_SPELL_HAND_OF_DEATH           = 8,
+    EVENT_SPELL_PROTECTION_OF_ELUNE     = 9,
+    EVENT_ENRAGE                        = 10,
+    EVENT_CHECK_WORLD_TREE_DISTANCE     = 11,    // Enrage if too close to the tree
+    EVENT_BELOW_10_PERCENT_HP           = 12,
+    EVENT_SUMMON_WISPS                  = 13,
+    EVENT_TOO_CLOSE_TO_WORLD_TREE       = 14,
+    EVENT_ENRAGE_ROOT                   = 15,
+    EVENT_SPELL_FINGER_OF_DEATH_PHASE_4 = 16
+};
+
+Position const NordrassilLoc = { 5503.713f, -3523.436f, 1608.781f, 0.0f };
 
 class npc_ancient_wisp : public CreatureScript
 {
@@ -114,7 +136,8 @@ public:
                         DoCast(Archimonde, SPELL_ANCIENT_SPARK);
                 }
                 CheckTimer = 1000;
-            } else CheckTimer -= diff;
+            }
+            else CheckTimer -= diff;
         }
     };
 };
@@ -206,7 +229,8 @@ public:
                 }
 
                 ChangeTargetTimer = 5000;
-            } else ChangeTargetTimer -= diff;
+            }
+            else ChangeTargetTimer -= diff;
         }
     };
 };
@@ -229,75 +253,106 @@ public:
         return GetInstanceAI<boss_archimondeAI>(creature);
     }
 
-    struct boss_archimondeAI : public hyjal_trashAI
+    struct boss_archimondeAI : public BossAI
     {
-        boss_archimondeAI(Creature* creature) : hyjal_trashAI(creature)
+        boss_archimondeAI(Creature* creature) : BossAI(creature, BOSS_ARCHIMONDE), summons(me),
+        Enraged(false), BelowTenPercent(false), HasProtected(false), IsChanneling(false)
         {
             instance = creature->GetInstanceScript();
         }
 
         InstanceScript* instance;
+        EventMap events;
 
         uint64 DoomfireSpiritGUID;
         uint64 WorldTreeGUID;
 
-        uint32 DrainNordrassilTimer;
-        uint32 FearTimer;
-        uint32 AirBurstTimer;
-        uint32 GripOfTheLegionTimer;
-        uint32 DoomfireTimer;
-        uint32 SoulChargeTimer;
         uint8 SoulChargeCount;
-        uint32 MeleeRangeCheckTimer;
-        uint32 HandOfDeathTimer;
-        uint32 SummonWispTimer;
         uint8 WispCount;
-        uint32 EnrageTimer;
-        uint32 CheckDistanceTimer;
+        SummonList summons;
 
         bool Enraged;
         bool BelowTenPercent;
         bool HasProtected;
         bool IsChanneling;
 
-        void Reset()
+        std::list<Unit*> fingerOfDeathTargets;
+        std::list<Unit*> spellEffectTargets;
+
+        void Reset() override
         {
             instance->SetData(DATA_ARCHIMONDEEVENT, NOT_STARTED);
 
             DoomfireSpiritGUID = 0;
-            damageTaken = 0;
             WorldTreeGUID = 0;
-
-            DrainNordrassilTimer = 0;
-            FearTimer = 42000;
-            AirBurstTimer = 30000;
-            GripOfTheLegionTimer = urand(5000, 25000);
-            DoomfireTimer = 20000;
-            SoulChargeTimer = urand(2000, 30000);
-            SoulChargeCount = 0;
-            MeleeRangeCheckTimer = 15000;
-            HandOfDeathTimer = 2000;
-            WispCount = 0;                                      // When ~30 wisps are summoned, Archimonde dies
-            EnrageTimer = 600000;                               // 10 minutes
-            CheckDistanceTimer = 30000;                         // This checks if he's too close to the World Tree (75 yards from a point on the tree), if true then he will enrage
-            SummonWispTimer = 0;
-
+            WispCount = 0;
             Enraged = false;
             BelowTenPercent = false;
             HasProtected = false;
             IsChanneling = false;
+
+            // Reset player's immunity to Spells
+            for (auto it = spellEffectTargets.begin(); it != spellEffectTargets.end(); ++it)
+            {
+                Unit* affected_unit = ObjectAccessor::GetUnit(*me, (*it)->GetGUID());
+
+                // Remove Immunity against Hand of death
+                affected_unit->ApplySpellImmune(SPELL_HAND_OF_DEATH, IMMUNITY_ID, SPELL_HAND_OF_DEATH, false);
+                affected_unit->ApplySpellImmune(0, IMMUNITY_ID, SPELL_HAND_OF_DEATH, false);
+            }
+
+            spellEffectTargets.clear();
+            fingerOfDeathTargets.clear();
+            summons.DespawnAll();
+            events.ScheduleEvent(EVENT_DRAIN_WORLD_TREE, 0);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void DoCastProtection()
+        {
+            // lets get spell info
+            const SpellInfo* info = sSpellMgr->GetSpellInfo(SPELL_PROTECTION_OF_ELUNE);
+
+            if (!info)
+                return;
+
+            // Now lets get archimode threat list
+            ThreatContainer::StorageType const &t_list = me->getThreatManager().getThreatList();
+
+            if (t_list.empty())
+                return;
+
+            ThreatContainer::StorageType::const_iterator itr = t_list.begin();
+
+            if (Unit* target = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid()))
+                if (target->IsAlive() && target->GetTypeId() == TYPEID_PLAYER)
+                    spellEffectTargets.push_back(target);
+
+            for (auto iter = spellEffectTargets.begin(); iter != spellEffectTargets.end(); ++iter)
+                if (Unit* target = *iter)
+                {
+                    target->AddAura(SPELL_PROTECTION_OF_ELUNE, target);
+
+                    // Immunity against Hand of death
+                    target->ApplySpellImmune(SPELL_HAND_OF_DEATH, IMMUNITY_ID, SPELL_HAND_OF_DEATH, true);
+                    target->ApplySpellImmune(0, IMMUNITY_ID, SPELL_HAND_OF_DEATH, true);
+                }
+        }
+
+        void EnterCombat(Unit* /*who*/) override
         {
             me->InterruptSpell(CURRENT_CHANNELED_SPELL);
             Talk(SAY_AGGRO);
             DoZoneInCombat();
 
             instance->SetData(DATA_ARCHIMONDEEVENT, IN_PROGRESS);
+            events.ScheduleEvent(EVENT_SPELL_AIR_BURST, urand(25000, 35000));
+            events.ScheduleEvent(EVENT_SPELL_DOOMFIRE, urand(10000, 20000));
+            events.ScheduleEvent(EVENT_SPELL_FEAR, 42000);
+            events.ScheduleEvent(EVENT_SPELL_GRIP_OF_THE_LEGION, 2000);
+            events.ScheduleEvent(EVENT_SPELL_FINGER_OF_DEATH, 1000);
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit* victim) override
         {
             Talk(SAY_SLAY);
 
@@ -326,56 +381,75 @@ public:
                     break;
             }
 
-            SoulChargeTimer = urand(2000, 30000);
+            events.ScheduleEvent(EVENT_SPELL_UNLEASH_SOUL_CHARGES, urand(2000, 10000));
             ++SoulChargeCount;
         }
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit* /*killer*/) override
         {
-            hyjal_trashAI::JustDied(killer);
             Talk(SAY_DEATH);
 
             instance->SetData(DATA_ARCHIMONDEEVENT, DONE);
-            instance->DoUpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE, me->GetEntry(), 1, me);        }
+            instance->DoUpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE, me->GetEntry(), 1, me);
+
+            // Reset scheduled events
+            events.CancelEvent(EVENT_SPELL_FEAR);
+            events.CancelEvent(EVENT_SPELL_AIR_BURST);
+            events.CancelEvent(EVENT_SPELL_GRIP_OF_THE_LEGION);
+            events.CancelEvent(EVENT_SPELL_UNLEASH_SOUL_CHARGES);
+            events.CancelEvent(EVENT_SPELL_DOOMFIRE);
+            events.CancelEvent(EVENT_SPELL_FINGER_OF_DEATH);
+            events.CancelEvent(EVENT_SPELL_HAND_OF_DEATH);
+            events.CancelEvent(EVENT_SPELL_PROTECTION_OF_ELUNE);
+            events.CancelEvent(EVENT_ENRAGE);
+
+            spellEffectTargets.clear();
+            fingerOfDeathTargets.clear();
+            summons.DespawnAll();
+        }
 
         bool CanUseFingerOfDeath()
         {
-            // First we check if our current victim is in melee range or not.
-            Unit* victim = me->GetVictim();
-            if (victim && me->IsWithinDistInMap(victim, me->GetAggroRange(victim)))
-                return false;
+            // Cast finger of death below 10% health
+            if (BelowTenPercent)
+                return true;
 
-            ThreatContainer::StorageType const &threatlist = me->getThreatManager().getThreatList();
-            if (threatlist.empty())
-                return false;
-
-            std::list<Unit*> targets;
-            ThreatContainer::StorageType::const_iterator itr = threatlist.begin();
-            for (; itr != threatlist.end(); ++itr)
+            if (me->IsAlive())
             {
-                Unit* unit = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid());
-                if (unit && unit->IsAlive())
-                    targets.push_back(unit);
+                /* Reset the list before checking for new targets
+                 * else we will be using old targets that could have
+                 * been distant but are no longer.*/
+                fingerOfDeathTargets.clear();
+
+                // First we check if our current victim is in melee range or not.
+                Unit* victim = me->GetVictim();
+                if (victim && me->IsWithinMeleeRange(victim))
+                    return false;
+
+                ThreatContainer::StorageType const &threatlist = me->getThreatManager().getThreatList();
+                if (threatlist.empty())
+                    return false;
+
+                auto itr = threatlist.begin();
+                for (; itr != threatlist.end(); ++itr)
+                {
+                    Unit* unit = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid());
+                    if (unit && unit->IsAlive() && me->IsWithinMeleeRange(unit))
+                        fingerOfDeathTargets.push_back(unit);
+                }
+
+                /* Previous check searched for targets in meele range and
+                 * added it to targets list. If there are no targets in meele
+                 * range return true, which makes Archimonde cast Finger of Death.
+                */
+                return fingerOfDeathTargets.empty();
             }
-
-            if (targets.empty())
-                return false;
-
-            targets.sort(Trinity::ObjectDistanceOrderPred(me));
-            Unit* target = targets.front();
-            if (target)
-            {
-                if (!me->IsWithinDistInMap(target, me->GetAggroRange(target)))
-                    return true;                                // Cast Finger of Death
-                else                                            // This target is closest, he is our new tank
-                    me->AddThreat(target, me->getThreatManager().getThreat(me->GetVictim()));
-            }
-
             return false;
         }
 
-        void JustSummoned(Creature* summoned)
+        void JustSummoned(Creature* summoned) override
         {
+            summons.Summon(summoned);
             if (summoned->GetEntry() == CREATURE_ANCIENT_WISP)
                 summoned->AI()->AttackStart(me);
             else
@@ -403,23 +477,37 @@ public:
             }
         }
 
+        void DoCastDoomfire()
+        {
+            // Three doomfire can be up at the same time
+            Talk(SAY_DOOMFIRE);
+            Unit* temp = SelectTarget(SELECT_TARGET_RANDOM, 1);
+            if (!temp)
+                temp = me->GetVictim();
+
+            //replace with spell cast 31903 once implicitTarget 73 implemented
+            SummonDoomfire(temp);
+        }
+
         //this is code doing close to what the summoning spell would do (spell 31903)
         void SummonDoomfire(Unit* target)
         {
-            me->SummonCreature(CREATURE_DOOMFIRE_SPIRIT,
-                target->GetPositionX()+15.0f, target->GetPositionY()+15.0f, target->GetPositionZ(), 0,
+            Unit* doomfire1 = me->SummonCreature(CREATURE_DOOMFIRE_SPIRIT,
+                target->GetPositionX() + 15.0f, target->GetPositionY() + 15.0f, target->GetPositionZ(), 0,
                 TEMPSUMMON_TIMED_DESPAWN, 27000);
 
-            me->SummonCreature(CREATURE_DOOMFIRE,
-                target->GetPositionX()-15.0f, target->GetPositionY()-15.0f, target->GetPositionZ(), 0,
+            Unit* doomfire2 = me->SummonCreature(CREATURE_DOOMFIRE,
+                target->GetPositionX() - 15.0f, target->GetPositionY() - 15.0f, target->GetPositionZ(), 0,
                 TEMPSUMMON_TIMED_DESPAWN, 27000);
+
+            doomfire1->SetVisible(false);
+            doomfire2->SetVisible(false);
         }
 
         void UnleashSoulCharge()
         {
             me->InterruptNonMeleeSpells(false);
 
-            bool HasCast = false;
             uint32 chargeSpell = 0;
             uint32 unleashSpell = 0;
 
@@ -443,16 +531,15 @@ public:
             {
                 me->RemoveAuraFromStack(chargeSpell);
                 DoCastVictim(unleashSpell);
-                HasCast = true;
                 SoulChargeCount--;
             }
-
-            if (HasCast)
-                SoulChargeTimer = urand(2000, 30000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
+            events.Update(diff);
+
+            // Event for draining the tree
             if (!me->IsInCombat())
             {
                 // Do not let the raid skip straight to Archimonde. Visible and hostile ONLY if Azagalor is finished.
@@ -461,60 +548,52 @@ public:
                     me->SetVisible(false);
                     me->setFaction(35);
                 }
-                else if ((instance->GetData(DATA_AZGALOREVENT) >= DONE) && (!me->IsVisible() || (me->getFaction() == 35)))
+                
+                if ((instance->GetData(DATA_AZGALOREVENT) >= DONE) && (!me->IsVisible() || (me->getFaction() == 35)))
                 {
                     me->setFaction(1720);
                     me->SetVisible(true);
                 }
 
-                if (DrainNordrassilTimer <= diff)
+                switch (events.ExecuteEvent())
                 {
-                    if (!IsChanneling)
-                    {
-                        Creature* temp = me->SummonCreature(CREATURE_CHANNEL_TARGET, NordrassilLoc, TEMPSUMMON_TIMED_DESPAWN, 1200000);
+                    case EVENT_DRAIN_WORLD_TREE:
+                        if (!IsChanneling)
+                        {
+                            Creature* temp = me->SummonCreature(CREATURE_CHANNEL_TARGET, NordrassilLoc, TEMPSUMMON_TIMED_DESPAWN, 1200000);
 
-                        if (temp)
-                            WorldTreeGUID = temp->GetGUID();
+                            if (temp)
+                                WorldTreeGUID = temp->GetGUID();
+
+                            if (Unit* Nordrassil = ObjectAccessor::GetUnit(*me, WorldTreeGUID))
+                            {
+                                Nordrassil->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                                Nordrassil->SetDisplayId(11686);
+                                DoCast(Nordrassil, SPELL_DRAIN_WORLD_TREE);
+                                IsChanneling = true;
+                            }
+                        }
 
                         if (Unit* Nordrassil = ObjectAccessor::GetUnit(*me, WorldTreeGUID))
-                        {
-                            Nordrassil->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                            Nordrassil->SetDisplayId(11686);
-                            DoCast(Nordrassil, SPELL_DRAIN_WORLD_TREE);
-                            IsChanneling = true;
-                        }
-                    }
-
-                    if (Unit* Nordrassil = ObjectAccessor::GetUnit(*me, WorldTreeGUID))
-                    {
-                        Nordrassil->CastSpell(me, SPELL_DRAIN_WORLD_TREE_2, true);
-                        DrainNordrassilTimer = 1000;
-                    }
-                } else DrainNordrassilTimer -= diff;
+                            Nordrassil->CastSpell(me, SPELL_DRAIN_WORLD_TREE_2, true);
+                        break;
+                }
             }
 
             if (!UpdateVictim())
                 return;
 
-            if (me->HealthBelowPct(10) && !BelowTenPercent && !Enraged)
-                BelowTenPercent = true;
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+                return;
 
-            if (!Enraged)
+            if (me->HealthBelowPct(10) && !BelowTenPercent)
+                events.ScheduleEvent(EVENT_BELOW_10_PERCENT_HP, 0);
+
+            switch (events.ExecuteEvent())
             {
-                if (EnrageTimer <= diff)
+                case EVENT_CHECK_WORLD_TREE_DISTANCE:
                 {
-                    if (HealthAbovePct(10))
-                    {
-                        me->GetMotionMaster()->Clear(false);
-                        me->GetMotionMaster()->MoveIdle();
-                        Enraged = true;
-                        Talk(SAY_ENRAGE);
-                    }
-                } else EnrageTimer -= diff;
-
-                if (CheckDistanceTimer <= diff)
-                {
-                    // To simplify the check, we simply summon a Creature in the location and then check how far we are from the creature
+                    // If Archimonde is too close to the world tree this will ENRAGE him
                     Creature* Check = me->SummonCreature(CREATURE_CHANNEL_TARGET, NordrassilLoc, TEMPSUMMON_TIMED_DESPAWN, 2000);
                     if (Check)
                     {
@@ -522,109 +601,178 @@ public:
 
                         if (me->IsWithinDistInMap(Check, 75))
                         {
-                            me->GetMotionMaster()->Clear(false);
-                            me->GetMotionMaster()->MoveIdle();
-                            Enraged = true;
-                            Talk(SAY_ENRAGE);
+                            events.ScheduleEvent(EVENT_TOO_CLOSE_TO_WORLD_TREE, 0);
+                            break;
                         }
                     }
-                    CheckDistanceTimer = 5000;
-                } else CheckDistanceTimer -= diff;
-            }
-
-            if (BelowTenPercent)
-            {
-                if (!HasProtected)
-                {
+                    events.RepeatEvent(5000);
+                    break;
+                }
+                case EVENT_BELOW_10_PERCENT_HP:
+                    DoCastProtection();     // Protection of Elune against Finger and Hand of Death
+                    BelowTenPercent = true;
                     me->GetMotionMaster()->Clear(false);
                     me->GetMotionMaster()->MoveIdle();
-
-                    //all members of raid must get this buff
-                    DoCastVictim(SPELL_PROTECTION_OF_ELUNE, true);
-                    HasProtected = true;
-                    Enraged = true;
-                }
-
-                if (SummonWispTimer <= diff)
-                {
-                    DoSpawnCreature(CREATURE_ANCIENT_WISP, float(rand()%40), float(rand()%40), 0, 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
-                    SummonWispTimer = 1500;
+                    events.ScheduleEvent(EVENT_ENRAGE, 0);
+                    events.ScheduleEvent(EVENT_ENRAGE_ROOT, 0);
+                    events.ScheduleEvent(EVENT_SUMMON_WISPS, 1000);
+                    events.ScheduleEvent(EVENT_SPELL_HAND_OF_DEATH, 1500);
+                    events.ScheduleEvent(EVENT_SPELL_FINGER_OF_DEATH, 2500);
+                    break;
+                case EVENT_SUMMON_WISPS:
+                    // If there are more than 30 Wisps then kill Archimonde
+                    if (WispCount >= 30)
+                    {
+                        Unit::DealDamage(me, me, me->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
+                        return;     // Finish the encounter and no more event repeat
+                    }
+                    DoSpawnCreature(CREATURE_ANCIENT_WISP, float(rand() % 40), float(rand() % 40), 0, 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
                     ++WispCount;
-                } else SummonWispTimer -= diff;
-
-                if (WispCount >= 30)
-                    Unit::DealDamage(me, me, me->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
-            }
-
-            if (Enraged)
-            {
-                if (HandOfDeathTimer <= diff)
-                {
+                    events.ScheduleEvent(EVENT_SUMMON_WISPS, 1500);
+                    break;
+                case EVENT_SPELL_HAND_OF_DEATH:
+                    DoCastVictim(SPELL_RED_SKY_EFFECT);
                     DoCastVictim(SPELL_HAND_OF_DEATH);
-                    HandOfDeathTimer = 2000;
-                } else HandOfDeathTimer -= diff;
-                return;                                         // Don't do anything after this point.
-            }
-
-            if (SoulChargeCount)
-            {
-                if (SoulChargeTimer <= diff)
+                    events.ScheduleEvent(EVENT_SPELL_HAND_OF_DEATH, 3000);
+                    break;
+                case EVENT_SPELL_FINGER_OF_DEATH:
+                    if (CanUseFingerOfDeath())
+                    {
+                        Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0);
+                        DoCast(target, SPELL_FINGER_OF_DEATH);
+                        DoCastVictim(SPELL_RED_SKY_EFFECT);
+                    }
+                    events.ScheduleEvent(EVENT_SPELL_FINGER_OF_DEATH, 3500);
+                    break;
+                case EVENT_SPELL_GRIP_OF_THE_LEGION:
+                    DoCast(SelectTarget(SELECT_TARGET_RANDOM, 0), SPELL_GRIP_OF_THE_LEGION);
+                    events.ScheduleEvent(EVENT_SPELL_GRIP_OF_THE_LEGION, urand(5000, 25000));
+                    break;
+                case EVENT_SPELL_AIR_BURST:
+                    Talk(SAY_AIR_BURST);
+                    DoCast(SelectTarget(SELECT_TARGET_RANDOM, 0), SPELL_AIR_BURST);
+                    events.ScheduleEvent(EVENT_SPELL_AIR_BURST, urand(25000, 40000));
+                    break;
+                case EVENT_SPELL_FEAR:
+                    DoCastVictim(SPELL_FEAR);
+                    events.ScheduleEvent(EVENT_SPELL_FEAR, 42000);
+                    break;
+                case EVENT_SPELL_DOOMFIRE:
+                    DoCastDoomfire();
+                    events.ScheduleEvent(EVENT_SPELL_DOOMFIRE, 20000);
+                    break;
+                case EVENT_SPELL_UNLEASH_SOUL_CHARGES:
                     UnleashSoulCharge();
-                else SoulChargeTimer -= diff;
+                    break;
+                case EVENT_ENRAGE:
+                    Talk(SAY_ENRAGE);
+                    break;
+                case EVENT_TOO_CLOSE_TO_WORLD_TREE:
+                    // People dragged the boss near the check and now wipe
+                    events.ScheduleEvent(EVENT_ENRAGE, 0);
+                    events.ScheduleEvent(EVENT_SPELL_HAND_OF_DEATH, 1000);
+                    break;
+                case EVENT_ENRAGE_ROOT:
+                    me->GetMotionMaster()->Clear(false);
+                    me->GetMotionMaster()->MoveIdle();
+                    break;
             }
-
-            if (GripOfTheLegionTimer <= diff)
-            {
-                DoCast(SelectTarget(SELECT_TARGET_RANDOM, 0), SPELL_GRIP_OF_THE_LEGION);
-                GripOfTheLegionTimer = urand(5000, 25000);
-            } else GripOfTheLegionTimer -= diff;
-
-            if (AirBurstTimer <= diff)
-            {
-                Talk(SAY_AIR_BURST);
-                DoCast(SelectTarget(SELECT_TARGET_RANDOM, 1), SPELL_AIR_BURST);//not on tank
-                AirBurstTimer = urand(25000, 40000);
-            } else AirBurstTimer -= diff;
-
-            if (FearTimer <= diff)
-            {
-                DoCastVictim(SPELL_FEAR);
-                FearTimer = 42000;
-            } else FearTimer -= diff;
-
-            if (DoomfireTimer <= diff)
-            {
-                Talk(SAY_DOOMFIRE);
-                Unit* temp = SelectTarget(SELECT_TARGET_RANDOM, 1);
-                if (!temp)
-                    temp = me->GetVictim();
-
-                //replace with spell cast 31903 once implicitTarget 73 implemented
-                SummonDoomfire(temp);
-
-                //supposedly three doomfire can be up at the same time
-                DoomfireTimer = 20000;
-            } else DoomfireTimer -= diff;
-
-            if (MeleeRangeCheckTimer <= diff)
-            {
-                if (CanUseFingerOfDeath())
-                {
-                    DoCast(SelectTarget(SELECT_TARGET_RANDOM, 0), SPELL_FINGER_OF_DEATH);
-                    MeleeRangeCheckTimer = 1000;
-                }
-
-                MeleeRangeCheckTimer = 5000;
-            } else MeleeRangeCheckTimer -= diff;
 
             DoMeleeAttackIfReady();
         }
-        void WaypointReached(uint32 /*waypointId*/) { }
     };
+};
+
+class spell_red_sky_effect : public SpellScriptLoader
+{
+    public:
+        spell_red_sky_effect() : SpellScriptLoader("spell_red_sky_effect") { }
+
+        class spell_red_sky_effect_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_red_sky_effect_SpellScript);
+
+            void HandleHit(SpellEffIndex /*effIndex*/)
+            {
+                if (GetHitUnit())
+                    PreventHitDamage();
+            }
+
+            void Register() override
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_red_sky_effect_SpellScript::HandleHit, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_red_sky_effect_SpellScript();
+        }
+};
+
+class spell_finger_of_death : public SpellScriptLoader
+{
+public:
+    spell_finger_of_death() : SpellScriptLoader("spell_finger_of_death") { }
+
+    class spell_finger_of_death_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_finger_of_death_SpellScript);
+
+        void HandleHit(SpellEffIndex /*effIndex*/)
+        {
+            if (GetHitUnit() && GetHitUnit()->GetAura(SPELL_PROTECTION_OF_ELUNE))
+                PreventHitDamage();
+            else
+                GetHitUnit()->RemoveAurasByType(SPELL_AURA_EFFECT_IMMUNITY);
+        }
+
+        void Register() override
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_finger_of_death_SpellScript::HandleHit, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_finger_of_death_SpellScript();
+    }
+};
+
+class spell_hand_of_death : public SpellScriptLoader
+{
+public:
+    spell_hand_of_death() : SpellScriptLoader("spell_hand_of_death") { }
+
+    class spell_hand_of_death_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_hand_of_death_SpellScript);
+
+        void HandleHit(SpellEffIndex /*effIndex*/)
+        {
+            if (GetHitUnit() && GetHitUnit()->GetAura(SPELL_PROTECTION_OF_ELUNE))
+                PreventHitDamage();
+            else
+                GetHitUnit()->RemoveAurasByType(SPELL_AURA_EFFECT_IMMUNITY);
+        }
+
+        void Register() override
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_hand_of_death_SpellScript::HandleHit, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_hand_of_death_SpellScript();
+    }
 };
 
 void AddSC_boss_archimonde()
 {
+    new spell_red_sky_effect();
+    new spell_hand_of_death();
+    new spell_finger_of_death();
     new boss_archimonde();
     new npc_doomfire();
     new npc_doomfire_targetting();
