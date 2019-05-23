@@ -13,6 +13,11 @@
 
 uint32 const EncounterCount     = 5;
 
+enum HyjalBosses
+{
+    BOSS_ARCHIMONDE = 0,
+};
+
 enum DataTypes
 {
     DATA_ANETHERON              = 1,
