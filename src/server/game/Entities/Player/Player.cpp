@@ -16808,23 +16808,23 @@ QuestGiverStatus Player::GetQuestDialogStatus(Object* questgiver)
             if (CanSeeStartQuest(quest))
             {
                 if (SatisfyQuestLevel(quest, false)) {
-                    bool bLowLevel = (getLevel() > (GetQuestLevel(quest) + sWorld->getIntConfig(CONFIG_QUEST_LOW_LEVEL_HIDE_DIFF)));
+                    bool isLowLevel = (getLevel() > (GetQuestLevel(quest) + sWorld->getIntConfig(CONFIG_QUEST_LOW_LEVEL_HIDE_DIFF)));
 
                     if (quest->IsAutoComplete()) {
-                        if (bLowLevel)
+                        if (isLowLevel)
                             result2 = DIALOG_STATUS_LOW_LEVEL_REWARD_REP;
                         else
                             result2 = DIALOG_STATUS_REWARD_REP;
                     }
                     else {
                         if (quest->IsDaily()) {
-                            if (bLowLevel)
+                            if (isLowLevel)
                                 result2 = DIALOG_STATUS_LOW_LEVEL_AVAILABLE_REP;
                             else
                                 result2 = DIALOG_STATUS_AVAILABLE_REP;
                         }
                         else {
-                            if (bLowLevel)
+                            if (isLowLevel)
                                 result2 = DIALOG_STATUS_LOW_LEVEL_AVAILABLE;
                             else
                                 result2 = DIALOG_STATUS_AVAILABLE;
