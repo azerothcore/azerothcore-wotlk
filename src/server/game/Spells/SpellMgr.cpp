@@ -4481,7 +4481,17 @@ void SpellMgr::LoadDbcDataCorrections()
             spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_CHANGE_MAP;
             break;
 
-
+        /*
+            Raid: Battle for Mount Hyjal
+            Boss: Archimonde
+        */
+        case 31984: // Spell doesn't need to ignore invulnerabilities
+        case 35354:
+            spellInfo->Attributes = SPELL_ATTR0_ABILITY;
+            break;
+        case 32111: // We only need the animation, no damage
+            spellInfo->CastingTimeIndex = 0;
+            break;
 
         //////////////////////////////////////////
         ////////// Vault of Archavon (VOA)
