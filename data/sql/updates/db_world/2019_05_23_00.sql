@@ -1,3 +1,19 @@
+-- DB update 2019_05_22_00 -> 2019_05_23_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2019_05_22_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2019_05_22_00 2019_05_23_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1558178374227706700'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1558178374227706700');
 
 -- Pathing for Drakkari Gutripper Entry: 26641 (Two creatures with movement "2" in creature table)
@@ -51,3 +67,12 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 (@PATH,15,-476.5032,-655.2579,28.59204,0,0,0,100,0),
 (@PATH,16,-479.5138,-655.1417,28.592,0,0,0,100,0),
 (@PATH,17,-483.2729,-654.9966,28.59017,0,0,0,100,0);
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
