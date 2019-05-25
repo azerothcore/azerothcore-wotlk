@@ -26,4 +26,3 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (17964, 0, 4, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Wastewalker Worker - On Data Set - Say Line 0'),
 (17964, 0, 5, 0, 38, 0, 100, 0, 2, 2, 0, 0, 0, 49, 0, 0, 0, 0, 0, 0, 21, 30, 0, 0, 0, 0, 0, 0, 0, 'Wastewalker Worker - On Data Set - Attack Start'),
 (17964, 0, 6, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 27, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Coilfang Slavehandler Death Damage Stop to Player');
-\ No newline at end of file
