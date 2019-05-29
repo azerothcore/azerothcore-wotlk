@@ -15,7 +15,7 @@ INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type
 (@ENTRY,@SOURCETYPE,3,4,61,0,100,0,0,0,0,0,49,0,0,0,0,0,0,12,1,0,0,0.0,0.0,0.0,0.0,"Warlord Zol'Maz - On Text 1 Over - Start Attacking"),
 (@ENTRY,@SOURCETYPE,4,0,61,0,100,0,0,0,0,0,9,0,0,0,0,0,0,14,57571,190784,1,0.0,0.0,0.0,0.0,"Warlord Zol'Maz - On Text 1 Over - Activate Gameobject"),
 (@ENTRY,@SOURCETYPE,5,0,6,0,100,0,0,0,0,0,32,0,0,0,0,0,0,14,57571,190784,1,0.0,0.0,0.0,0.0,"Warlord Zol'Maz - On Just Died - Reset Gameobject"),
-(@ENTRY,@SOURCETYPE,6,0,25,0,100,0,0,0,0,0,18,768,0,0,0,0,0,1,0,0,0,0.0,0.0,0.0,0.0,"Warlord Zol'Maz - On Reset - Set Unit Flags"),
+(@ENTRY,@SOURCETYPE,6,7,25,0,100,0,0,0,0,0,18,768,0,0,0,0,0,1,0,0,0,0.0,0.0,0.0,0.0,"Warlord Zol'Maz - On Reset - Set Unit Flags"),
 (@ENTRY,@SOURCETYPE,7,0,25,0,100,0,0,0,0,0,18,1,0,0,0,0,0,1,0,0,0,0.0,0.0,0.0,0.0,"Warlord Zol'Maz - On Reached Home - Set Gameobject State"),
 (@ENTRY,@SOURCETYPE,10,0,9,0,100,0,8,25,0,0,11,32323,0,0,0,0,0,2,0,0,0,0.0,0.0,0.0,0.0,"Warlord Zol'Maz - Within Range 8-25yd - Cast Charge"),
 (@ENTRY,@SOURCETYPE,11,12,2,0,100,1,0,20,0,0,11,8599,0,0,0,0,0,1,0,0,0,0.0,0.0,0.0,0.0,"Warlord Zol'Maz - Between 0-20% Health - Cast Enrage"),
