@@ -13,7 +13,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (17963, 0, 6, 7, 61, 0, 100, 0, 0, 0, 0, 0, 0, 41, 5000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Wastewalker Slave - On Data Set - Despawn'),
 (17963, 0, 7, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Wastewalker Slave - On Data Set - Say Line 0'),
 (17963, 0, 8, 0, 38, 0, 100, 0, 2, 2, 0, 0, 0, 49, 0, 0, 0, 0, 0, 0, 21, 30, 0, 0, 0, 0, 0, 0, 0, 'Wastewalker Slave - On Data Set - Attack Start'),
-(17963, 0, 9, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 27, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Coilfang Slavehandler Death Damage Stop to Player');
+(17963, 0, 9, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 27, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Wastewalker Slave - On Data Set - Stop Combat');
 
 -- Wastewalker Worker SAI (17964)
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 17964; 
