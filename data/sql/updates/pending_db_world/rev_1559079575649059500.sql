@@ -13,7 +13,7 @@ INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type
 (@ENTRY,@SOURCETYPE,1,2,52,0,100,0,1,28902,0,0,1,2,0,0,0,0,0,12,1,0,0,0.0,0.0,0.0,0.0,"Warlord Zol'Maz - On Text 1 Over - Say Line 2"),
 (@ENTRY,@SOURCETYPE,2,3,61,0,100,0,0,0,0,0,19,768,0,0,0,0,0,1,0,0,0,0.0,0.0,0.0,0.0,"Warlord Zol'Maz - On Text 1 Over - Remove Unit Flags"),
 (@ENTRY,@SOURCETYPE,3,4,61,0,100,0,0,0,0,0,49,0,0,0,0,0,0,12,1,0,0,0.0,0.0,0.0,0.0,"Warlord Zol'Maz - On Text 1 Over - Start Attacking"),
-(@ENTRY,@SOURCETYPE,4,0,61,0,100,0,0,0,0,0,9,0,0,0,0,0,0,14,57571,190784,1,0.0,0.0,0.0,0.0,"Warlord Zol'Maz - On Text 1 Over - Set Gameobject State"),
+(@ENTRY,@SOURCETYPE,4,0,61,0,100,0,0,0,0,0,9,0,0,0,0,0,0,14,57571,190784,1,0.0,0.0,0.0,0.0,"Warlord Zol'Maz - On Text 1 Over - Activate Gameobject"),
 (@ENTRY,@SOURCETYPE,5,0,61,0,100,0,0,0,0,0,32,1,0,0,0,0,0,14,57571,190784,1,0.0,0.0,0.0,0.0,"Warlord Zol'Maz - On Just Died - Set Gameobject State"),
 (@ENTRY,@SOURCETYPE,6,0,25,0,100,0,0,0,0,0,18,768,0,0,0,0,0,1,0,0,0,0.0,0.0,0.0,0.0,"Warlord Zol'Maz - On Reset - Set Unit Flags"),
 (@ENTRY,@SOURCETYPE,7,0,25,0,100,0,0,0,0,0,18,1,0,0,0,0,0,1,0,0,0,0.0,0.0,0.0,0.0,"Warlord Zol'Maz - On Reached Home - Set Gameobject State"),
