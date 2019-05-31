@@ -20,7 +20,8 @@ VALUES
 (29375,0,2,3,61,0,100,0,0,0,0,0,0,11,55528,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Stormforged Iron Giant - Linked - Cast ''Summon Earthen'''),
 (29375,0,3,4,61,0,100,0,0,0,0,0,0,11,55528,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Stormforged Iron Giant - Linked - Cast ''Summon Earthen'''),
 (29375,0,4,5,61,0,100,0,0,0,0,0,0,11,55528,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Stormforged Iron Giant - Linked - Cast ''Summon Earthen'''),
-(29375,0,5,0,61,0,100,0,0,0,0,0,0,11,55528,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Stormforged Iron Giant - Linked - Cast ''Summon Earthen''');
+(29375,0,5,0,61,0,100,0,0,0,0,0,0,11,55528,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Stormforged Iron Giant - Linked - Cast ''Summon Earthen'''),
+(29375,0,6,0,0,0,100,0,1000,1000,5000,5000,0,123,5000,0,0,0,0,0,11,29927,10,0,0,0,0,0,0,'Stormforged Iron Giant - In Combat - Add Threat (Earthen Ironbane)');
 
 -- Fjorn
 DELETE FROM `smart_scripts` WHERE `source_type` = 0 AND `entryorguid` = 29503;
@@ -32,7 +33,8 @@ VALUES
 (29503,0,3,4,61,0,100,0,0,0,0,0,0,11,55528,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Fjorn - Linked - Cast ''Summon Earthen'''),
 (29503,0,4,5,61,0,100,0,0,0,0,0,0,11,55528,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Fjorn - Linked - Cast ''Summon Earthen'''),
 (29503,0,5,6,61,0,100,0,0,0,0,0,0,11,55528,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Fjorn - Linked - Cast ''Summon Earthen'''),
-(29503,0,6,0,61,0,100,0,0,0,0,0,0,11,55528,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Fjorn - Linked - Cast ''Summon Earthen''');
+(29503,0,6,0,61,0,100,0,0,0,0,0,0,11,55528,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Fjorn - Linked - Cast ''Summon Earthen'''),
+(29503,0,7,0,0,0,100,0,1000,1000,5000,5000,0,123,5000,0,0,0,0,0,11,29927,10,0,0,0,0,0,0,'Fjorn - In Combat - Add Threat (Earthen Ironbane)');
 
 -- Earthen Ironbane
 DELETE FROM `smart_scripts` WHERE `source_type` = 0 AND `entryorguid` = 29927;
