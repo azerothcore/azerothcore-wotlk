@@ -1422,20 +1422,20 @@ public:
                 uint32 spell_id = 0;
                 switch (unitTarget->getClass())
                 {
-                case CLASS_DRUID:
-                    spell_id = SPELL_DRUID_ITEM_HEALING_TRANCE;
-                    break;
-                case CLASS_PALADIN:
-                    spell_id = SPELL_PALADIN_ITEM_HEALING_TRANCE;
-                    break;
-                case CLASS_PRIEST:
-                    spell_id = SPELL_PRIEST_ITEM_HEALING_TRANCE;
-                    break;
-                case CLASS_SHAMAN:
-                    spell_id = SPELL_SHAMAN_ITEM_HEALING_TRANCE;
-                    break;
-                default:
-                    return; // ignore for non-healing classes
+                    case CLASS_DRUID:
+                        spell_id = SPELL_DRUID_ITEM_HEALING_TRANCE;
+                        break;
+                    case CLASS_PALADIN:
+                        spell_id = SPELL_PALADIN_ITEM_HEALING_TRANCE;
+                        break;
+                    case CLASS_PRIEST:
+                        spell_id = SPELL_PRIEST_ITEM_HEALING_TRANCE;
+                        break;
+                    case CLASS_SHAMAN:
+                        spell_id = SPELL_SHAMAN_ITEM_HEALING_TRANCE;
+                        break;
+                    default:
+                        return; // ignore for non-healing classes
                 }
 
                 unitTarget->CastSpell(unitTarget, spell_id, true, NULL, aurEff);
