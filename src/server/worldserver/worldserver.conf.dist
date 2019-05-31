@@ -1974,6 +1974,15 @@ ChatLevelReq.Whisper = 1
 ChatLevelReq.Say = 1
 
 #
+#    PartyLevelReq
+#        Description: Minimum level at which players can invite to group, even if they aren't on
+#                     the invite friends list. (Players who are on that friend list can always
+#                     invite despite having lower level)
+#        Default:     1
+
+PartyLevelReq = 1
+
+#
 #    AllowPlayerCommands
 #        Description: Allow players to use commands.
 #        Default:     1 - (Enabled)
