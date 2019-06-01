@@ -1,23 +1,6 @@
 -- DB update 2019_05_31_00 -> 2019_06_01_00
-DROP PROCEDURE IF EXISTS `updateDb`;
-DELIMITER //
-CREATE PROCEDURE updateDb ()
-proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
-SELECT COUNT(*) INTO @COLEXISTS
-FROM information_schema.COLUMNS
-WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2019_05_31_00';
-IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
-START TRANSACTION;
-ALTER TABLE version_db_world CHANGE COLUMN 2019_05_31_00 2019_06_01_00 bit;
-SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1558652406081124000'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
---
--- START UPDATING QUERIES
---
-
-INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1558652406081124000');
 
 -- Define helper functions
-
 DROP FUNCTION IF EXISTS InsertStrangeOreNode;
 
 DELIMITER $$
@@ -35,6 +18,24 @@ BEGIN
 END $$
 
 DELIMITER ;
+
+-- Begin update
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2019_05_31_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2019_05_31_00 2019_06_01_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1558652406081124000'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
+INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1558652406081124000');
 
 -- Remove old Strange Ore nodes
 
@@ -73,10 +74,6 @@ SET @rc := InsertStrangeOreNode(3906.27, -870.06, 122.12, 1.14);
 SET @rc := InsertStrangeOreNode(4001.21, -967.61, 104.52, 4.52);
 SET @rc := InsertStrangeOreNode(4000.94, -938.04, 105.72, 6.05);
 
--- Clean up helper functions
-
-DROP FUNCTION IF EXISTS InsertStrangeOreNode;
-
 
 --
 -- END UPDATING QUERIES
@@ -86,3 +83,6 @@ END //
 DELIMITER ;
 CALL updateDb();
 DROP PROCEDURE IF EXISTS `updateDb`;
+
+-- Clean up helper functions
+DROP FUNCTION IF EXISTS InsertStrangeOreNode;
