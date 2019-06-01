@@ -1,20 +1,4 @@
 -- DB update 2019_06_01_00 -> 2019_06_01_01
-DROP PROCEDURE IF EXISTS `updateDb`;
-DELIMITER //
-CREATE PROCEDURE updateDb ()
-proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
-SELECT COUNT(*) INTO @COLEXISTS
-FROM information_schema.COLUMNS
-WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2019_06_01_00';
-IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
-START TRANSACTION;
-ALTER TABLE version_db_world CHANGE COLUMN 2019_06_01_00 2019_06_01_01 bit;
-SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1558652459650339300'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
---
--- START UPDATING QUERIES
---
-
-INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1558652459650339300');
 
 -- Define helper functions
 
@@ -30,7 +14,7 @@ CREATE FUNCTION InsertLoiteringMiner(modelid integer, position_x double, positio
 RETURNS decimal
 DETERMINISTIC
 BEGIN
-	
+
 	INSERT INTO `creature`(`id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES
 	(27401, 571, 0, 0, 1, 1, modelid, 1, position_x, position_y, position_z, orientation, 300, 3, 0, 1, 0, 1, 0, 0, 0, '', 0);
 
@@ -45,7 +29,7 @@ CREATE FUNCTION InsertMiningMiner(modelid integer, position_x double, position_y
 RETURNS decimal
 DETERMINISTIC
 BEGIN
-	
+
 	INSERT INTO `creature`(`id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES
 	(27401, 571, 0, 0, 1, 1, modelid, 1, position_x, position_y, position_z, orientation, 300, 0, 0, 1, 0, 0, 0, 0, 0, '', 0);
 
@@ -63,7 +47,7 @@ CREATE FUNCTION InsertLookoutDefender(modelid integer, position_x double, positi
 RETURNS decimal
 DETERMINISTIC
 BEGIN
-	
+
 	INSERT INTO `creature`(`id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES
 	(27284, 571, 0, 0, 1, 1, modelid, 1, position_x, position_y, position_z, orientation, 300, 2, 0, 1, 0, 1, 0, 0, 0, '', 0);
 
@@ -78,7 +62,7 @@ CREATE FUNCTION InsertPatrollingDefender(modelid integer, position_x double, pos
 RETURNS decimal
 DETERMINISTIC
 BEGIN
-	
+
 	INSERT INTO `creature`(`id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES
 	(27284, 571, 0, 0, 1, 1, modelid, 1, position_x, position_y, position_z, orientation, 300, 2, 1, 1, 0, 2, 0, 0, 0, '', 0);
 
@@ -117,6 +101,25 @@ BEGIN
 END $$
 
 DELIMITER ;
+
+-- Begin update
+
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2019_06_01_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2019_06_01_00 2019_06_01_01 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1558652459650339300'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
+INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1558652459650339300');
 
 -- Remove old Risen Wintergarde Defender and Miner data
 
@@ -207,15 +210,6 @@ SET @NEW_ID := InsertPatrollingDefenderWaypoint(@NEW_PATHID, 0, 3936.30, -870.95
 SET @NEW_ID := InsertPatrollingDefenderWaypoint(@NEW_PATHID, 0, 3922.05, -872.61, 105.45, 0);
 SET @NEW_ID := InsertPatrollingDefenderWaypoint(@NEW_PATHID, 0, 3904.82, -871.95, 108.41, 0);
 
--- Clean up helper functions
-
-DROP FUNCTION IF EXISTS InsertLoiteringMiner;
-DROP FUNCTION IF EXISTS InsertMiningMiner;
-DROP FUNCTION IF EXISTS InsertLookoutDefender;
-DROP FUNCTION IF EXISTS InsertPatrollingDefender;
-DROP FUNCTION IF EXISTS InsertPatrollingDefenderWaypoint;
-
-
 --
 -- END UPDATING QUERIES
 --
@@ -224,3 +218,11 @@ END //
 DELIMITER ;
 CALL updateDb();
 DROP PROCEDURE IF EXISTS `updateDb`;
+
+-- Clean up helper functions
+
+DROP FUNCTION IF EXISTS InsertLoiteringMiner;
+DROP FUNCTION IF EXISTS InsertMiningMiner;
+DROP FUNCTION IF EXISTS InsertLookoutDefender;
+DROP FUNCTION IF EXISTS InsertPatrollingDefender;
+DROP FUNCTION IF EXISTS InsertPatrollingDefenderWaypoint;

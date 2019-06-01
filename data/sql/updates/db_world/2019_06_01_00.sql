@@ -1,5 +1,6 @@
--- Define helper functions
+-- DB update 2019_05_31_00 -> 2019_06_01_00
 
+-- Define helper functions
 DROP FUNCTION IF EXISTS InsertStrangeOreNode;
 
 DELIMITER $$
@@ -18,7 +19,7 @@ END $$
 
 DELIMITER ;
 
--- DB update 2019_05_31_00 -> 2019_06_01_00
+-- Begin update
 DROP PROCEDURE IF EXISTS `updateDb`;
 DELIMITER //
 CREATE PROCEDURE updateDb ()
