@@ -2318,14 +2318,6 @@ void LFGMgr::SetSelectedDungeons(uint64 guid, LfgDungeonSet const& dungeons)
     PlayersStore[guid].SetSelectedDungeons(dungeons);
 }
 
-void LFGMgr::SetLockedDungeons(uint64 guid, LfgLockMap const& lock)
-{
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_LFG, "LFGMgr::SetLockedDungeons: [" UI64FMTD "]", guid);
-#endif
-    PlayersStore[guid].SetLockedDungeons(lock);
-}
-
 void LFGMgr::DecreaseKicksLeft(uint64 guid)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
