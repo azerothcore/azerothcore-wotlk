@@ -37,7 +37,7 @@ class npc_eye_of_acherus : public CreatureScript
 public:
     npc_eye_of_acherus() : CreatureScript("npc_eye_of_acherus") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_eye_of_acherusAI(creature);
     }
@@ -48,7 +48,7 @@ public:
 
         EventMap events;
 
-        void InitializeAI()
+        void InitializeAI() override
         {
             events.Reset();
             events.ScheduleEvent(EVENT_REMOVE_CONTROL, 500);
@@ -58,7 +58,7 @@ public:
             me->CastSpell(me, SPELL_EYE_OF_ACHERUS_VISUAL, true);
         }
 
-        void MovementInform(uint32 type, uint32 point)
+        void MovementInform(uint32 type, uint32 point) override
         {
             if (type == ESCORT_MOTION_TYPE || point !=0)
                 events.ScheduleEvent(EVENT_REGAIN_CONTROL, 1000);
@@ -72,13 +72,13 @@ public:
             player->GetSession()->SendPacket(&data);
         }
 
-        void JustSummoned(Creature* creature)
+        void JustSummoned(Creature* creature) override
         {
             if (Unit* target = creature->SelectNearbyTarget())
                 creature->AI()->AttackStart(target);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
             switch (events.ExecuteEvent())
@@ -127,19 +127,17 @@ class spell_q12641_death_comes_from_on_high_summon_ghouls : public SpellScriptLo
                     GetCaster()->CastSpell(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 54522, true);
             }
 
-            void Register()
+            void Register() override
             {
                 OnEffectHitTarget += SpellEffectFn(spell_q12641_death_comes_from_on_high_summon_ghouls_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
             }
         };
 
-        SpellScript* GetSpellScript() const
+        SpellScript* GetSpellScript() const override
         {
             return new spell_q12641_death_comes_from_on_high_summon_ghouls_SpellScript();
         }
 };
-
-#define GOSSIP_ACCEPT_DUEL      "I challenge you, death knight!"
 
 enum deathsChallenge
 {
@@ -197,7 +195,7 @@ public:
                 return true;
 
             if (!creature->AI()->GetData(player->GetGUIDLow()))
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ACCEPT_DUEL, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
+                AddGossipItemFor(player, 9765, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
 
             SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
         }
@@ -385,13 +383,13 @@ class spell_item_gift_of_the_harvester : public SpellScriptLoader
                 return SPELL_CAST_OK;
             }
 
-            void Register()
+            void Register() override
             {
                 OnCheckCast += SpellCheckCastFn(spell_item_gift_of_the_harvester_SpellScript::CheckRequirement);
             }
         };
 
-        SpellScript* GetSpellScript() const
+        SpellScript* GetSpellScript() const override
         {
             return new spell_item_gift_of_the_harvester_SpellScript();
         }
@@ -412,13 +410,13 @@ class spell_q12698_the_gift_that_keeps_on_giving : public SpellScriptLoader
                     GetOriginalCaster()->CastSpell(GetHitUnit(), urand(0, 1) ? GetEffectValue() : SPELL_SUMMON_SCARLET_GHOST, true);
             }
 
-            void Register()
+            void Register() override
             {
                 OnEffectHitTarget += SpellEffectFn(spell_q12698_the_gift_that_keeps_on_giving_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
             }
         };
 
-        SpellScript* GetSpellScript() const
+        SpellScript* GetSpellScript() const override
         {
             return new spell_q12698_the_gift_that_keeps_on_giving_SpellScript();
         }
@@ -429,7 +427,7 @@ class npc_scarlet_ghoul : public CreatureScript
 public:
     npc_scarlet_ghoul() : CreatureScript("npc_scarlet_ghoul") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_scarlet_ghoulAI(creature);
     }
@@ -443,7 +441,7 @@ public:
         EventMap events;
         uint64 gothikGUID;
 
-        void InitializeAI()
+        void InitializeAI() override
         {
             gothikGUID = 0;
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
@@ -454,20 +452,20 @@ public:
             events.ScheduleEvent(EVENT_GHOUL_RESTORE_STATE, 3500);
         }
 
-        void OwnerAttackedBy(Unit* attacker)
+        void OwnerAttackedBy(Unit* attacker) override
         {
             if (!me->IsInCombat() && me->GetReactState() == REACT_DEFENSIVE)
                 AttackStart(attacker);
         }
 
-        void SetGUID(uint64 guid, int32)
+        void SetGUID(uint64 guid, int32) override
         {
             gothikGUID = guid;
             events.ScheduleEvent(EVENT_GHOUL_MOVE_TO_PIT, 3000);
             me->GetMotionMaster()->Clear(false);
         }
 
-        void MovementInform(uint32 type, uint32 point)
+        void MovementInform(uint32 type, uint32 point) override
         {
             if (type == POINT_MOTION_TYPE && point == 1)
             {
@@ -476,7 +474,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
             switch (events.GetEvent())
@@ -522,7 +520,7 @@ class npc_dkc1_gothik : public CreatureScript
 public:
     npc_dkc1_gothik() : CreatureScript("npc_dkc1_gothik") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_dkc1_gothikAI(creature);
     }
@@ -533,7 +531,7 @@ public:
 
         int32 spoken;
 
-        void DoAction(int32 action)
+        void DoAction(int32 action) override
         {
             if (action == SAY_GOTHIK_PIT && spoken <= 0)
             {
@@ -542,7 +540,7 @@ public:
             }
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             ScriptedAI::MoveInLineOfSight(who);
 
@@ -559,7 +557,7 @@ public:
                     }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (spoken > 0)
                 spoken -= diff;
@@ -574,7 +572,7 @@ class npc_scarlet_cannon : public CreatureScript
 public:
     npc_scarlet_cannon() : CreatureScript("npc_scarlet_cannon") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_scarlet_cannonAI(creature);
     }
@@ -584,12 +582,12 @@ public:
         npc_scarlet_cannonAI(Creature* creature) : VehicleAI(creature) { summonAttackers = 0; }
 
         uint32 summonAttackers;
-        void PassengerBoarded(Unit* /*passenger*/, int8 /*seatId*/, bool apply)
+        void PassengerBoarded(Unit* /*passenger*/, int8 /*seatId*/, bool apply) override
         {
             summonAttackers = apply ? 8000 : 0;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             VehicleAI::UpdateAI(diff);
 
@@ -679,7 +677,7 @@ class npc_unworthy_initiate : public CreatureScript
 public:
     npc_unworthy_initiate() : CreatureScript("npc_unworthy_initiate") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_unworthy_initiateAI(creature);
     }
@@ -701,7 +699,7 @@ public:
 
         EventMap events;
 
-        void Reset()
+        void Reset() override
         {
             anchorGUID = 0;
             phase = PHASE_CHAINED;
@@ -712,7 +710,7 @@ public:
             me->LoadEquipment(0, true);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             events.ScheduleEvent(EVENT_ICY_TOUCH, 1000, GCD_CAST);
             events.ScheduleEvent(EVENT_PLAGUE_STRIKE, 3000, GCD_CAST);
@@ -720,7 +718,7 @@ public:
             events.ScheduleEvent(EVENT_DEATH_COIL, 5000, GCD_CAST);
         }
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 type, uint32 id) override
         {
             if (type != POINT_MOTION_TYPE)
                 return;
@@ -754,7 +752,7 @@ public:
             Talk(SAY_EVENT_START, target);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             switch (phase)
             {
@@ -769,13 +767,13 @@ public:
                     }
 
                     float dist = 99.0f;
-                    GameObject* prison = NULL;
+                    GameObject* prison = nullptr;
 
                     for (uint8 i = 0; i < 12; ++i)
                     {
-                        if (GameObject* temp_prison = me->FindNearestGameObject(acherus_soul_prison[i], 30))
+                        if (GameObject* temp_prison = me->FindNearestGameObject(acherus_soul_prison[i], 100))
                         {
-                            if (me->IsWithinDist(temp_prison, dist, false))
+                            if (temp_prison && me->IsWithinDist(temp_prison, dist, false))
                             {
                                 dist = me->GetDistance2d(temp_prison);
                                 prison = temp_prison;
@@ -865,7 +863,7 @@ class npc_unworthy_initiate_anchor : public CreatureScript
 public:
     npc_unworthy_initiate_anchor() : CreatureScript("npc_unworthy_initiate_anchor") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_unworthy_initiate_anchorAI(creature);
     }
@@ -876,13 +874,13 @@ public:
 
         uint64 prisonerGUID;
 
-        void SetGUID(uint64 guid, int32 /*id*/)
+        void SetGUID(uint64 guid, int32 /*id*/) override
         {
             if (!prisonerGUID)
                 prisonerGUID = guid;
         }
 
-        uint64 GetGUID(int32 /*id*/) const
+        uint64 GetGUID(int32 /*id*/) const override
         {
             return prisonerGUID;
         }
@@ -921,7 +919,7 @@ class npc_scarlet_miner_cart : public CreatureScript
 public:
     npc_scarlet_miner_cart() : CreatureScript("npc_scarlet_miner_cart") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_scarlet_miner_cartAI(creature);
     }
@@ -937,12 +935,12 @@ public:
 
         uint64 minerGUID;
 
-        void SetGUID(uint64 guid, int32 /*id*/)
+        void SetGUID(uint64 guid, int32 /*id*/) override
         {
             minerGUID = guid;
         }
 
-        void DoAction(int32 /*param*/)
+        void DoAction(int32 /*param*/) override
         {
             if (Creature* miner = ObjectAccessor::GetCreature(*me, minerGUID))
             {
@@ -958,7 +956,7 @@ public:
             }
         }
 
-        void PassengerBoarded(Unit* who, int8 /*seatId*/, bool apply)
+        void PassengerBoarded(Unit* who, int8 /*seatId*/, bool apply) override
         {
             who->SetVisible(!apply);
             if (!apply)
@@ -984,7 +982,7 @@ class npc_scarlet_miner : public CreatureScript
 public:
     npc_scarlet_miner() : CreatureScript("npc_scarlet_miner") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_scarlet_minerAI(creature);
     }
@@ -1000,7 +998,7 @@ public:
         uint32 IntroPhase;
         uint64 carGUID;
 
-        void Reset()
+        void Reset() override
         {
             carGUID = 0;
             IntroTimer = 0;
@@ -1048,7 +1046,7 @@ public:
             SetDespawnAtFar(false);
         }
 
-        void WaypointReached(uint32 waypointId)
+        void WaypointReached(uint32 waypointId) override
         {
             switch (waypointId)
             {
@@ -1080,7 +1078,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (IntroPhase)
             {

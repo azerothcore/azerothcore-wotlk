@@ -41,7 +41,6 @@ enum Spells
 };
 
 #define GOSSIP_HELLO 4995
-#define GOSSIP_SELECT "Tell me more."
 
 enum Events
 {
@@ -182,7 +181,7 @@ class boss_majordomo : public CreatureScript
 
         bool OnGossipHello(Player* player, Creature* creature) override
         {
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_SELECT, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
+            AddGossipItemFor(player, 4093, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
             SendGossipMenuFor(player, GOSSIP_HELLO, creature->GetGUID());
             return true;
         }

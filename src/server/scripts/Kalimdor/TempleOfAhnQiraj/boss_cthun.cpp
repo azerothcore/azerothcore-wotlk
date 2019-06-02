@@ -296,7 +296,7 @@ public:
                         {
                             //Face our target
                             DarkGlareAngle = me->GetAngle(target);
-                            DarkGlareTickTimer = 1000;
+                            DarkGlareTickTimer = 4000;
                             DarkGlareTick = 0;
                             ClockWise = RAND(true, false);
                         }
