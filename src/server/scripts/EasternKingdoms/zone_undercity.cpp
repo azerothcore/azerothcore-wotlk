@@ -125,7 +125,7 @@ public:
             if (type == GUID_EVENT_INVOKER)
             {
                 Talk(EMOTE_LAMENT);
-                DoPlaySoundToSet(me, SOUND_CREDIT);
+                DoPlayMusic(SOUND_CREDIT, true);
                 DoCast(me, SPELL_SYLVANAS_CAST, false);
                 playerGUID = guid;
                 LamentEvent = true;
