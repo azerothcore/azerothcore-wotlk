@@ -52,11 +52,6 @@ void LfgPlayerData::RestoreState()
     m_State = m_OldState;
 }
 
-void LfgPlayerData::SetLockedDungeons(LfgLockMap const& lockStatus)
-{
-    m_LockedDungeons = lockStatus;
-}
-
 void LfgPlayerData::SetTeam(TeamId teamId)
 {
     m_TeamId = teamId;
@@ -100,11 +95,6 @@ LfgState LfgPlayerData::GetState() const
 LfgState LfgPlayerData::GetOldState() const
 {
     return m_OldState;
-}
-
-const LfgLockMap& LfgPlayerData::GetLockedDungeons() const
-{
-    return m_LockedDungeons;
 }
 
 TeamId LfgPlayerData::GetTeam() const

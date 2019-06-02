@@ -25,7 +25,6 @@ class LfgPlayerData
         // General
         void SetState(LfgState state);
         void RestoreState();
-        void SetLockedDungeons(LfgLockMap const& lock);
         void SetTeam(TeamId teamId);
         void SetGroup(uint64 group);
         void SetRandomPlayersCount(uint8 count);
@@ -38,7 +37,6 @@ class LfgPlayerData
         // General
         LfgState GetState() const;
         LfgState GetOldState() const;
-        LfgLockMap const& GetLockedDungeons() const;
         TeamId GetTeam() const;
         uint64 GetGroup() const;
         uint8 GetRandomPlayersCount() const;
@@ -56,7 +54,6 @@ class LfgPlayerData
         LfgState m_OldState;                               ///< Old State - Used to restore state after failed Rolecheck/Proposal
         bool m_canOverrideRBState;                         ///< pussywizard
         // Player
-        LfgLockMap m_LockedDungeons;                       ///< Dungeons player can't do and reason
         TeamId m_TeamId;                                   ///< Player team - determines the queue to join
         uint64 m_Group;                                    ///< Original group of player when joined LFG
         uint8 m_randomPlayers;                             ///< Xinef: Amount of random players you raid with
