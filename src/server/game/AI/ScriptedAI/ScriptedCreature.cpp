@@ -228,7 +228,7 @@ void ScriptedAI::DoPlayMusic(uint32 soundId, bool zone)
                         }
                         else
                             targets->push_back(player);
-                   }
+                    }
                 }
         }
     }
