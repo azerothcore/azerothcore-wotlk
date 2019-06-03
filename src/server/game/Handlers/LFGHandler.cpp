@@ -268,7 +268,6 @@ void WorldSession::HandleLfgPartyLockInfoRequestOpcode(WorldPacket&  /*recvData*
         if (pguid == guid)
             continue;
 
-        sLFGMgr->InitializeLockedDungeons(plrg); // pussywizard
         lockMap[pguid] = sLFGMgr->GetLockedDungeons(pguid);
     }
 
