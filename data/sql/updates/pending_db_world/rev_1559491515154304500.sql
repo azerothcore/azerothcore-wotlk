@@ -3,10 +3,6 @@ INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1559491515154304500');
 SET @SWIFTSPEAR := 30395;
 SET @GOSSIP :=9906;
 
-DELETE FROM `gossip_menu_option` WHERE `menuid`=@GOSSIP AND `optionid`=0;
-INSERT INTO `gossip_menu_option` (`menuid`,`optionid`,`optionicon`,`optiontext`,`optiontype`,`optionnpcflag`,`actionmenuid`,`actionpoiid`,`boxcoded`,`boxmoney`,`boxtext`) VALUES
-(@GOSSIP,0,0,'I am sorry to disturb your rest, chieftain, but your brother''s spirit may be in danger. Would you tell me what you remember of him?',1,1,0,0,0,0,'');
-
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId`=15 AND `SourceGroup`=@GOSSIP AND `SourceEntry`=0;
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`,`SourceGroup`,`SourceEntry`,`SourceId`,`ElseGroup`,`ConditionTypeOrReference`,`ConditionTarget`,`ConditionValue1`,`ConditionValue2`,`ConditionValue3`,`NegativeCondition`,`ErrorTextId`,`ScriptName`,`Comment`) VALUES
 (15,@GOSSIP,0,0,0,9,0,13037,0,0,0,0,'','Show gossip option only if player has quest Memories of Stormhoof');
@@ -30,13 +26,3 @@ INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type
 (@SWIFTSPEAR*100,9,8,0,0,0,100,0,3600,3600,0,0,5,25,0,0,0,0,0,1,0,0,0,0,0,0,0, 'Chieftain Swiftspear script - Play emote'),
 (@SWIFTSPEAR*100,9,9,0,0,0,100,0,2700,2700,0,0,82,1,0,0,0,0,0,1,0,0,0,0,0,0,0, 'Chieftain Swiftspear script - Add npcflag gossip'),
 (@SWIFTSPEAR*100,9,10,0,0,0,100,0,0,0,0,0,33,30381,0,0,0,0,0,7,0,0,0,0,0,0,0, 'Chieftain Swiftspear script - Quest credit');
-
-DELETE FROM `creature_text` WHERE `creatureid`=@SWIFTSPEAR;
-INSERT INTO `creature_text` (`creatureid`,`groupid`,`id`,`text`,`type`,`language`,`probability`,`emote`,`duration`,`sound`,`comment`) VALUES
-(@SWIFTSPEAR,0,0,'My brother, Stormhoof, was a far greater warrior than I. While I trained to be the chieftain of our clan, he prepared for a larger quest.',12,0,100,1,0,0,'Chieftain Swiftspear'),
-(@SWIFTSPEAR,1,0,'How could he be in danger? All he wanted was to give us power over the elements that made life harsh for us here.',12,0,100,1,0,0,'Chieftain Swiftspear'),
-(@SWIFTSPEAR,2,0,'He sought an artifact... a horn, I think. He left the village on a long journey in search of it.',12,0,100,6,0,0,'Chieftain Swiftspear'),
-(@SWIFTSPEAR,3,0,'I know that a terrible enemy pursued him after he won the horn, but I... I don''t recall... what happened... next.',12,0,100,5,0,0,'Chieftain Swiftspear'),
-(@SWIFTSPEAR,4,0,'It is as though my memories are shrouded in mist. I cannot even recall what became of my brother. Is this how you mean that he is in danger?',12,0,100,274,0,0,'Chieftain Swiftspear'),
-(@SWIFTSPEAR,5,0,'The disturbances in the tomb, they must be involved. Look around you, $N. Do you see them?',12,0,100,25,0,0,'Chieftain Swiftspear'),
-(@SWIFTSPEAR,6,0,'Yes, they are at fault, but I am powerless to stop them. Will you warn the people of Tunka''lo, stranger, that their past and their ancestors are in danger?',12,0,100,1,0,0,'Chieftain Swiftspear');
