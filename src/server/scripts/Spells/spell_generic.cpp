@@ -4374,7 +4374,10 @@ enum Mounts
 
     // Big Blizzard Bear
     SPELL_BIG_BLIZZARD_BEAR_60          = 58997,
-    SPELL_BIG_BLIZZARD_BEAR_100         = 58999
+    SPELL_BIG_BLIZZARD_BEAR_100         = 58999,
+    SPELL_BIG_BLIZZARD_BEAR_150         = 58999,
+    SPELL_BIG_BLIZZARD_BEAR_280         = 58999,
+    SPELL_BIG_BLIZZARD_BEAR_310         = 58999
 };
 
 class spell_gen_mount : public SpellScriptLoader
@@ -4935,7 +4938,7 @@ void AddSC_generic_spell_scripts()
     new spell_gen_disabled_above_63();
     new spell_gen_black_magic_enchant();
     new spell_gen_area_aura_select_players();
-    new spell_gen_mount("spell_big_blizzard_bear", 0, SPELL_BIG_BLIZZARD_BEAR_60, SPELL_BIG_BLIZZARD_BEAR_100, 0, 0);
+    new spell_gen_mount("spell_big_blizzard_bear", 0, SPELL_BIG_BLIZZARD_BEAR_60, SPELL_BIG_BLIZZARD_BEAR_100, SPELL_BIG_BLIZZARD_BEAR_150, SPELL_BIG_BLIZZARD_BEAR_280, SPELL_BIG_BLIZZARD_BEAR_310);
     new spell_gen_select_target_count("spell_gen_select_target_count_15_1", TARGET_UNIT_SRC_AREA_ENEMY, 1);
     new spell_gen_select_target_count("spell_gen_select_target_count_15_2", TARGET_UNIT_SRC_AREA_ENEMY, 2);
     new spell_gen_select_target_count("spell_gen_select_target_count_15_5", TARGET_UNIT_SRC_AREA_ENEMY, 5);
