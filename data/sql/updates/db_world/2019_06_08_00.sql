@@ -1,3 +1,19 @@
+-- DB update 2019_06_06_01 -> 2019_06_08_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2019_06_06_01';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2019_06_06_01 2019_06_08_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1559220494373180355'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1559220494373180355');
 
 -- fix Ice Totem
@@ -67,3 +83,12 @@ VALUES
 (1806902,9,1,0,0,0,100,0,0,0,0,0,0,22,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Mogor - On Script - Set Phase 0'),
 (1806902,9,2,0,0,0,100,0,0,0,0,0,0,41,0,0,0,0,0,0,11,12141,50,0,0,0,0,0,0,'Mogor - On Script - Force Despawn ''Ice Totem'''),
 (1806902,9,3,0,0,0,100,0,0,0,0,0,0,78,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Mogor - On Script - Script Reset');
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
