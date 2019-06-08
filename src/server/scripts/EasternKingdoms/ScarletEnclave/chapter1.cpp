@@ -771,9 +771,9 @@ public:
 
                     for (uint8 i = 0; i < 12; ++i)
                     {
-                        if (GameObject* temp_prison = me->FindNearestGameObject(acherus_soul_prison[i], 30))
+                        if (GameObject* temp_prison = me->FindNearestGameObject(acherus_soul_prison[i], 100))
                         {
-                            if (me->IsWithinDist(temp_prison, dist, false))
+                            if (temp_prison && me->IsWithinDist(temp_prison, dist, false))
                             {
                                 dist = me->GetDistance2d(temp_prison);
                                 prison = temp_prison;

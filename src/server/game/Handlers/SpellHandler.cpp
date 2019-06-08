@@ -586,7 +586,7 @@ void WorldSession::HandleSelfResOpcode(WorldPacket & /*recvData*/)
         SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(_player->GetUInt32Value(PLAYER_SELF_RES_SPELL));
         if (spellInfo)
         {
-            _player->CastSpell(_player, spellInfo, true, 0);
+            _player->CastSpell(_player, spellInfo, false, 0);
             _player->AddSpellAndCategoryCooldowns(spellInfo, 0);
         }
 
