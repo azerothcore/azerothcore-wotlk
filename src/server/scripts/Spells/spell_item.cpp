@@ -2517,11 +2517,17 @@ class spell_item_shadowmourne : public SpellScriptLoader
                     }
                 }
             }
+			
+			void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+			{
+				GetTarget()->RemoveAurasDueToSpell(SPELL_SHADOWMOURNE_SOUL_FRAGMENT);
+			}
 
             void Register()
             {
                 DoCheckProc += AuraCheckProcFn(spell_item_shadowmourne_AuraScript::CheckProc);
                 OnEffectProc += AuraEffectProcFn(spell_item_shadowmourne_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+				AfterEffectRemove += AuraEffectRemoveFn(spell_item_shadowmourne_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
             }
         };
 

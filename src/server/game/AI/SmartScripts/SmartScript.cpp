@@ -1888,9 +1888,14 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
 
             me->GetMotionMaster()->MovePoint(e.action.MoveToPos.pointId, dest.x, dest.y, dest.z, true, true, e.action.MoveToPos.controlled ? MOTION_SLOT_CONTROLLED : MOTION_SLOT_ACTIVE);
         }
-        else // Xinef: we can use dest.x, dest.y, dest.z to make offset :)
-            me->GetMotionMaster()->MovePoint(e.action.MoveToPos.pointId, target->GetPositionX() + e.target.x, target->GetPositionY() + e.target.y, target->GetPositionZ() + e.target.z, true, true, e.action.MoveToPos.controlled ? MOTION_SLOT_CONTROLLED : MOTION_SLOT_ACTIVE);
-
+        else // Xinef: we can use dest.x, dest.y, dest.z to make offset
+        {
+            float x, y, z;
+            target->GetPosition(x, y, z);
+            if (e.action.MoveToPos.ContactDistance > 0)
+                target->GetContactPoint(me, x, y, z, e.action.MoveToPos.ContactDistance);
+            me->GetMotionMaster()->MovePoint(e.action.MoveToPos.pointId, x + e.target.x, y + e.target.y, z + e.target.z, e.action.MoveToPos.controlled ? MOTION_SLOT_CONTROLLED : MOTION_SLOT_ACTIVE);
+        }
         break;
     }
     case SMART_ACTION_MOVE_TO_POS_TARGET:
@@ -4295,6 +4300,8 @@ void SmartScript::OnUpdate(uint32 const diff)
 
 void SmartScript::FillScript(SmartAIEventList e, WorldObject* obj, AreaTrigger const* at)
 {
+    (void)at; // ensure that the variable is referenced even if extra logs are disabled in order to pass compiler checks
+    
     if (e.empty())
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
@@ -4326,10 +4333,6 @@ void SmartScript::FillScript(SmartAIEventList e, WorldObject* obj, AreaTrigger c
         }
         mEvents.push_back((*i));//NOTE: 'world(0)' events still get processed in ANY instance mode
     }
-    if (mEvents.empty() && obj)
-        sLog->outErrorDb("SmartScript: Entry %u has events but no events added to list because of instance flags.", obj->GetEntry());
-    if (mEvents.empty() && at)
-        sLog->outErrorDb("SmartScript: AreaTrigger %u has events but no events added to list because of instance flags. NOTE: triggers can not handle any instance flags.", at->entry);
 }
 
 void SmartScript::GetScript()

@@ -830,7 +830,7 @@ ChatLogs.BattleGround = 0
 #                     4  - (NORMAL)
 #                     6  - (RP)
 #                     8  - (RPPVP)
-#                     16 - (FFA_PVP, Free for all pvp mode like arena PvP in all zones except rest
+#                     16 - (FFA_PVP, Free for all PvP mode like arena PvP in all zones except rest
 #                          activated places and sanctuaries)
 
 GameType = 0
@@ -1260,7 +1260,7 @@ Instance.UnloadDelay = 1800000
 
 #
 #    Quests.EnableQuestTracker
-#        Description: Store datas in the database about quest completion and abandonment to help finding out bugged quests.
+#        Description: Store data in the database about quest completion and abandonment to help finding bugged quests.
 #        Default:     0  - (Disabled)
 #                     1  - (Enabled)
 
@@ -1520,7 +1520,7 @@ IsPreloadedContinentTransport.Enabled = 0
 # WARDEN SETTINGS
 #
 #    Warden.Enabled
-#        Description: Enable Warden anticheat system.
+#        Description: Enable Warden anti-cheat system.
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 
@@ -1786,7 +1786,7 @@ Rate.Corpse.Decay.Looted = 0.5
 #    Rate.Creature.Elite.RARE.Damage
 #    Rate.Creature.Elite.RAREELITE.Damage
 #    Rate.Creature.Elite.WORLDBOSS.Damage
-#        Description: Mulitplier for creature melee damage.
+#        Description: Multiplier for creature melee damage.
 #        Default:     1 - (Rate.Creature.Normal.Damage)
 #                     1 - (Rate.Creature.Elite.Elite.Damage)
 #                     1 - (Rate.Creature.Elite.RARE.Damage)
@@ -1806,7 +1806,7 @@ Rate.Creature.Elite.WORLDBOSS.Damage = 1
 #    Rate.Creature.Elite.RARE.SpellDamage
 #    Rate.Creature.Elite.RAREELITE.SpellDamage
 #    Rate.Creature.Elite.WORLDBOSS.SpellDamage
-#        Description: Mulitplier for creature spell damage.
+#        Description: Multiplier for creature spell damage.
 #        Default:     1 - (Rate.Creature.Normal.SpellDamage)
 #                     1 - (Rate.Creature.Elite.Elite.SpellDamage)
 #                     1 - (Rate.Creature.Elite.RARE.SpellDamage)
@@ -1825,7 +1825,7 @@ Rate.Creature.Elite.WORLDBOSS.SpellDamage = 1
 #    Rate.Creature.Elite.RARE.HP
 #    Rate.Creature.Elite.RAREELITE.HP
 #    Rate.Creature.Elite.WORLDBOSS.HP
-#        Description: Mulitplier for creature health.
+#        Description: Multiplier for creature health.
 #        Default:     1 - (Rate.Creature.Normal.HP)
 #                     1 - (Rate.Creature.Elite.Elite.HP)
 #                     1 - (Rate.Creature.Elite.RARE.HP)
@@ -1878,7 +1878,7 @@ ChatFakeMessagePreventing = 0
 
 #
 #    ChatStrictLinkChecking.Severity
-#        Description: Check chat messages for ingame links to spells, items, quests, etc.
+#        Description: Check chat messages for in-game links to spells, items, quests, etc.
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled, Check if only valid pipe commands are used, Prevents posting
 #                         pictures.)
@@ -1972,6 +1972,15 @@ ChatLevelReq.Whisper = 1
 #        Default:     1
 
 ChatLevelReq.Say = 1
+
+#
+#    PartyLevelReq
+#        Description: Minimum level at which players can invite to group, even if they aren't on
+#                     the invite friends list. (Players who are on that friend list can always
+#                     invite despite having lower level)
+#        Default:     1
+
+PartyLevelReq = 1
 
 #
 #    AllowPlayerCommands
@@ -2316,8 +2325,8 @@ Rate.Honor = 1
 Rate.ArenaPoints = 1
 
 #
-#    Rate.Mining.Amount
-#        Description: Rate for minimum/maximum times a deposit can be used.
+#    Rate.Talent
+#        Description: Talent point rate.
 #        Default:     1
 
 Rate.Talent = 1
@@ -3008,7 +3017,7 @@ Guild.AllowMultipleGuildMaster = 0
 
 #
 #     ShowKickInWorld
-#        Description: Determines whether a message is broadcasted to the entire server when a
+#        Description: Determines whether a message is broadcast to the entire server when a
 #                     player gets kicked
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
@@ -3017,7 +3026,7 @@ ShowKickInWorld = 0
 
 #
 #     ShowBanInWorld
-#        Description: Determines whether a message is broadcasted to the entire server when a
+#        Description: Determines whether a message is broadcast to the entire server when a
 #                     player gets banned.
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)

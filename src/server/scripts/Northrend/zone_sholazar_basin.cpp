@@ -522,43 +522,6 @@ public:
     }
 };
 
-enum Q12915MendingFences
-{
-    SPELL_SUMMON_EARTHEN            = 55528
-};
-
-class spell_q12915_mending_fences : public SpellScriptLoader
-{
-    public:
-        spell_q12915_mending_fences() : SpellScriptLoader("spell_q12915_mending_fences") { }
-
-        class spell_q12915_mending_fences_SpellScript : public SpellScript
-        {
-            PrepareSpellScript(spell_q12915_mending_fences_SpellScript);
-
-            void HandleDummy(SpellEffIndex /*effIndex*/)
-            {
-                Unit* target = GetHitUnit();
-                if (!target)
-                    return;
-
-                for (uint8 i = 0; i < 4; ++i)
-                    GetCaster()->CastSpell(GetCaster(), SPELL_SUMMON_EARTHEN, true);
-            }
-
-            void Register()
-            {
-                OnEffectHitTarget += SpellEffectFn(spell_q12915_mending_fences_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_q12915_mending_fences_SpellScript();
-        };
-};
-
-
 
 // Theirs
 /*######
@@ -852,10 +815,15 @@ public:
 ## npc_jungle_punch_target
 #####*/
 
-#define SAY_OFFER     "Care to try Grimbooze Thunderbrew's new jungle punch?"
-
 enum JunglePunch
 {
+    SAY_OFFER                           = 28558,
+    ITEM_TANKARD                        = 2705,
+
+    NPC_HEMET                           = 27986,
+    NPC_HADRIUS                         = 28047,
+
+    SPELL_KNOCKDOWN                     = 42963,
     SPELL_OFFER                         = 51962,
     QUEST_TASTE_TEST                    = 12645,
 
@@ -977,8 +945,25 @@ public:
 
             if (sayTimer < diff)
             {
+                if (sayStep == 2)
+                {
+                    me->SetSheath(SHEATH_STATE_MELEE);
+                    SetEquipmentSlots(false, ITEM_TANKARD, EQUIP_UNEQUIP, EQUIP_UNEQUIP);
+                }
+                else if (sayStep == 3)
+                {
+                    if (me->GetEntry() == NPC_HEMET)
+                        me->SetSheath(SHEATH_STATE_RANGED);
+                    else if (me->GetEntry() == NPC_HADRIUS)
+                    {
+                        me->SetSheath(SHEATH_STATE_UNARMED);
+                        me->CastSpell(me,SPELL_KNOCKDOWN,false);
+                    }
+                    SetEquipmentSlots(true);
+                }
+
                 Talk(SAY_HEMET_HADRIUS_TAMARA_1 + sayStep - 1);
-                sayTimer = 3000;
+                sayTimer = 6000;
                 sayStep++;
 
                 if (sayStep > 3) // end
@@ -1014,7 +999,7 @@ public:
                     continue;
 
                 player->KilledMonsterCredit(me->GetEntry(), 0);
-                player->Say(SAY_OFFER, LANG_UNIVERSAL);
+                player->MonsterSay(SAY_OFFER, LANG_UNIVERSAL, me);
                 sayStep = 1;
                 break;
             }
@@ -1501,7 +1486,6 @@ void AddSC_sholazar_basin()
     new npc_mcmanus();
     new go_pressure_valve();
     new go_brazier();
-    new spell_q12915_mending_fences();
 
     // Theirs
     new npc_vekjik();

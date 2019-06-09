@@ -687,9 +687,9 @@ enum TrinityStrings
     LANG_PLAYER_DND_DEFAULT             = 709,
     LANG_PLAYER_AFK_DEFAULT             = 710,
 
-    LANG_BG_QUEUE_ANNOUNCE_STANDARD     = 711,
-    LANG_BG_QUEUE_ANNOUNCE_80_SPECIFIC  = 712,
-    LANG_BG_QUEUE_ANNOUNCE_80_RANDOM    = 713,
+    LANG_BG_QUEUE_ANNOUNCE_SELF         = 711,
+    LANG_BG_QUEUE_ANNOUNCE_WORLD        = 712,
+//                                      = 713, not used
 //                                      = 714, see LANG_PINFO_MAP_ONLINE
     LANG_YOUR_BG_LEVEL_REQ_ERROR        = 715,
 //                                      = 716, see LANG_PINFO_MAP_OFFLINE

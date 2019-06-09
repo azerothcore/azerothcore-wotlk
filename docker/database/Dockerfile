@@ -1,4 +1,4 @@
-FROM alpine:latest as builder
+FROM alpine:3.9 as builder
 
 # install bash
 RUN apk add --no-cache bash
@@ -21,4 +21,4 @@ COPY --from=builder /azerothcore/env/dist/sql /sql
 
 # adding the "generate-databases.sh" to the directory "/docker-entrypoint-initdb.d"
 # because all scripts included in that directory will automatically be executed when the docker container starts
-ADD docker/database/generate-databases.sh /docker-entrypoint-initdb.d
+COPY docker/database/generate-databases.sh /docker-entrypoint-initdb.d
