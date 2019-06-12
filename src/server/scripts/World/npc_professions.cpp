@@ -734,7 +734,7 @@ public:
                                                                 //unknown textID (TALK_AXE_LEARN)
                     SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
                     break;
-                    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_LEARN_SWORD,  GOSSIP_SENDER_CHECK, action);
+                case N_TRAINER_SWORD:
                     AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_LEARN_SWORD,  GOSSIP_SENDER_CHECK, action);
                                                                 //unknown textID (TALK_SWORD_LEARN)
                     SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
