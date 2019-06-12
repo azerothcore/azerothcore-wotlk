@@ -146,6 +146,8 @@ enum Events
     EVENT_SARTHARION_CALL_TENEBRON              = 30,
     EVENT_SARTHARION_CALL_SHADRON               = 31,
     EVENT_SARTHARION_CALL_VESPERON              = 32,
+
+    EVENT_SARTHARION_BOUNDARY                   = 33
 };
 
 const Position portalPos[4] = 
@@ -353,6 +355,7 @@ public:
             events.ScheduleEvent(EVENT_SARTHARION_LAVA_STRIKE, 5000);
             events.ScheduleEvent(EVENT_SARTHARION_HEALTH_CHECK, 10000);
             events.ScheduleEvent(EVENT_SARTHARION_BERSERK, 900000);
+            events.ScheduleEvent(EVENT_SARTHARION_BOUNDARY, 1000);
 
             StoreDragons();
             me->CallForHelp(500.0f);
@@ -422,6 +425,12 @@ public:
             // Special events which needs to be fired immidiately
             switch(events.GetEvent())
             {
+                case EVENT_SARTHARION_BOUNDARY:
+                    if (me->GetPositionX() < 3218.86f || me->GetPositionX() > 3275.69f || me->GetPositionY() < 484.68f || me->GetPositionY() > 572.4f) // https://github.com/TrinityCore/TrinityCore/blob/3.3.5/src/server/scripts/Northrend/ChamberOfAspects/ObsidianSanctum/instance_obsidian_sanctum.cpp#L31
+                        EnterEvadeMode();
+
+                    events.RepeatEvent(1000);
+                break;
                 case EVENT_SARTHARION_SUMMON_LAVA:
                     if (!urand(0,3))
                         Talk(SAY_SARTHARION_SPECIAL);
