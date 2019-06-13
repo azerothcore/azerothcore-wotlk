@@ -6671,18 +6671,6 @@ uint32 Spell::GetCCDelay(SpellInfo const* _spell)
         // DK - Pet - Gnaw (ghoul's stun)
         if (_spell->Id == 47481)
             return delayForStuns;
-
-
-        /* --- Other spells --- */
-        // Custom - Paladin Ret
-        if (_spell->Id == 100012)
-            return delayForSilences;
-        // Custom - Shaman Ele
-        if (_spell->Id == 100034)
-            return delayForStuns;
-        // Custom - DK Frost
-        if (_spell->Id == 100025)
-            return delayForRoots;
         break;
     }
 
