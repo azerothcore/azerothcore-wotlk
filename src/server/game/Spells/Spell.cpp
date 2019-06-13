@@ -2403,13 +2403,11 @@ void Spell::AddUnitTarget(Unit* target, uint32 effectMask, bool checkIfValid /*=
             m_delayMoment = targetInfo.timeDelay;
     }
     else
-        targetInfo.timeDelay = 0LL;
-
-     {
-         targetInfo.timeDelay = GetCCDelay(m_spellInfo);
-         if (m_delayMoment == 0 || m_delayMoment > targetInfo.timeDelay)
-             m_delayMoment = targetInfo.timeDelay;
-     }
+    {
+        targetInfo.timeDelay = GetCCDelay(m_spellInfo);
+        if (m_delayMoment == 0 || m_delayMoment > targetInfo.timeDelay)
+            m_delayMoment = targetInfo.timeDelay;
+    }
 
     // If target reflect spell back to caster
     if (targetInfo.missCondition == SPELL_MISS_REFLECT)
