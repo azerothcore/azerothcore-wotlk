@@ -668,6 +668,10 @@ public:
 
             if (isSartharion || (pInstance && pInstance->GetData(BOSS_SARTHARION_EVENT) == DONE))
                 me->SetLootMode(0);
+
+            if (isSartharion)
+                if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO, 1, 500, true))
+                    me->AI()->AttackStart(target);
         }
 
         void JustDied(Unit* )
@@ -919,6 +923,10 @@ public:
 
             if (isSartharion || (pInstance && pInstance->GetData(BOSS_SARTHARION_EVENT) == DONE))
                 me->SetLootMode(0);
+
+            if (isSartharion)
+                if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO, 1, 500, true))
+                    me->AI()->AttackStart(target);
         }
 
         void JustDied(Unit* )
@@ -1149,6 +1157,10 @@ public:
 
             if (isSartharion || (pInstance && pInstance->GetData(BOSS_SARTHARION_EVENT) == DONE))
                 me->SetLootMode(0);
+
+            if (isSartharion)
+                if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO, 1, 500, true))
+                    me->AI()->AttackStart(target);
         }
 
         void JustDied(Unit* )
