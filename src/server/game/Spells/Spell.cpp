@@ -6398,19 +6398,6 @@ SpellCastResult Spell::CheckPetCast(Unit* target)
 
 uint32 Spell::GetCCDelay(SpellInfo const* _spell)
 {
-    // CCDelay for spell with auras
-    uint8 CCDArraySize = 7;
-    AuraType auraWithCCD[] =
-    {
-        SPELL_AURA_MOD_STUN,
-        SPELL_AURA_MOD_CONFUSE,
-        SPELL_AURA_MOD_FEAR,
-        SPELL_AURA_MOD_SILENCE,
-        SPELL_AURA_MOD_DISARM,
-        SPELL_AURA_MOD_ROOT,
-        SPELL_AURA_MOD_POSSESS
-    };
-
     const uint32 delayForRoots         = 70;
     const uint32 delayForStuns         = 130;
     const uint32 delayForDisarms       = 70;
@@ -6418,265 +6405,196 @@ uint32 Spell::GetCCDelay(SpellInfo const* _spell)
     const uint32 delayForFears         = 130;
     const uint32 delayForHorrors       = 130;
     const uint32 delayForOpenerStuns   = 100;
-    const uint32 delayForScatters      = 130;
     const uint32 delayForBanishes      = 130;
     const uint32 delayForSilences      = 130;
     const uint32 delayForInstantSpells = 100;
 
-    switch (_spell->SpellFamilyName)
+    // CCDelay for spell with auras
+    uint8 CCDArraySize = 7;
+    AuraType auraWithCCD[] =
     {
-    case SPELLFAMILY_WARRIOR:
-        // Charge
-        if (_spell->Id == 11578)
+        SPELL_AURA_MOD_STUN,     // 130
+        SPELL_AURA_MOD_CONFUSE,  // 130
+        SPELL_AURA_MOD_FEAR,     // 130
+        SPELL_AURA_MOD_SILENCE,  // 130
+        SPELL_AURA_MOD_DISARM,   // 70
+        SPELL_AURA_MOD_ROOT,     // 70
+        SPELL_AURA_MOD_POSSESS   // 130
+    };
+
+    uint32 auraCCDelay[] =
+    {
+        130,
+        130,
+        130,
+        130,
+        70,
+        70,
+        130
+    };
+
+    // Cases for specific race/class spells
+    switch (_spell->Id)
+    {
+        case 11578: // Warrior - Charge
+        case 7922:
+        case 1833: // Rogue - CheapShot
+        case 9005: // Druid - Pounce
+        case 9823:
+        case 9827:
+        case 27006:
+        case 49803:
             return delayForOpenerStuns;
-        if (_spell->Id == 7922)
-            return delayForOpenerStuns;
-        // Intercept
-        if (_spell->Id == 20252)
+        case 20252: // Warrior - Intercept
+        case 20253: // Warrior - Intercept
+        case 65929: // Warrior - Charge triggered
+        case 12809: // Warrior - Concussion Blow
+        case 46968: // Warrior - Shockwave
+        case 853: // Paladin - Hammer of Justice
+        case 5588:
+        case 5589:
+        case 10308:
+        case 20170: // Paladin - Seal of justice stun proc
+        case 24394: // Hunter - Pet - Intimidation
+        case 408: // Rogue - Kidney Shot
+        case 8643:
+        case 64044: // Priest - Psychic Horror
+        case 47481: // DK - Pet - Gnaw (ghoul's stun)
+        case 58861: // Shaman - Feral bash
+        case 44572: // Mage - Deep Freeze
+        case 12355: // Mage - Talent - Impact
+        case 47996: // Warlock - Pet - Felguard's intercept
+        case 47995: // Warlock - Pet - Felguard intercept trigg.
+        case 60995: // Warlock - Demon charge 
+        case 54785:
+        case 30283: // Warlock - Shadowfury
+        case 30413:
+        case 30414:
+        case 47846:
+        case 47847:
+        case 5211: // Druid - Bash
+        case 6798:
+        case 8983:
+        case 22570: // Druid - Maim
+        case 49802:
+        case 46026: // War Stomp - Tauren's racial
             return delayForStuns;
-        if (_spell->Id == 20253)
-            return delayForStuns;
-        // Charge triggered
-        if (_spell->Id == 65929)
-            return delayForStuns;
-        // Concussion Blow
-        if (_spell->Id == 12809)
-            return delayForStuns;
-        // Shockwave
-        if (_spell->Id == 46968)
-            return delayForStuns;
-        // Intimidating Shout
-        if (_spell->Id == 5246)
+        case 5246: // Warrior - Intimidating Shout
+        case 20511:
+        case 10326: // Paladin - Turn Evil
+        case 1513: // Hunter - Scare beast
+        case 14326:
+        case 14327:
+        case 10890: // Priest - Psychic Scream
+        case 10888:
+        case 8124:
+        case 8122:
+        case 5782: // Warlock - Fear
+        case 6213:
+        case 6215:
+        case 5484: // Warlock - Howl of Terror
+        case 17928:
             return delayForFears;
-        if (_spell->Id == 20511)
-            return delayForFears;
-        // Disarm
-        if (_spell->Id == 676)
+        case 676: // Warrior - Disarm
+        case 51722: // Rogue - Dismantle
             return delayForDisarms;
-        // Talent - Gag order proc
-        if (_spell->Id == 18498)
+        case 18498: // Warrior - Talent - Gag order proc
+        case 63529: // Paladin - Talent - Shield of the Templar proc
+        case 34490: // Hunter - Silencing shot
+        case 18425: // Rogue - Talent - Silenced - Improved Kick
+        case 1330: // Rogue - Garote silence
+        case 15487: // Priest - Silence
+        case 47476: // DK - Strangulate
+        case 18469: // Mage - Talent - Improved Counter spell silence
+        case 24259: // Warlock - Pet - Spell Lock - Silenced
             return delayForSilences;
-        break;
-
-    case SPELLFAMILY_PALADIN:
-        // Talent - Shield of the Templar proc
-        if (_spell->Id == 63529)
-            return delayForSilences;
-        // Hammer of Justice
-        if (_spell->Id == 853 || _spell->Id == 5588 || _spell->Id == 5589 || _spell->Id == 10308)
-            return delayForStuns;
-        // Seal of justice stun proc
-        if (_spell->Id == 20170)
-            return delayForStuns;
-        // Repentance
-        if (_spell->Id == 20066)
+        case 20066: // Paladin - Repentance
+        case 19503: // Hunter - Scatter Shot
+        case 19386: // Hunter - Wyvern Sting
+        case 24132:
+        case 24133:
+        case 27068:
+        case 49011:
+        case 49012:
+        case 2094: // Rogue - Blind
+        case 1776: // Rogue - Gouge
+        case 6770: // Rogue - Sap
+        case 2070:
+        case 11297:
+        case 51724:
+        case 10955: // Priest - Shackle Undead
+        case 9485:
+        case 9484:
+        case 49203: // DK - Hungering Cold
+        case 51514: // Shaman - Hex
+        case 42950: // Mage - Dragon Breath
+        case 42949:
+        case 33043:
+        case 33042:
+        case 33041:
+        case 31661:
+        case 12826: // Mage - Polymorph
+        case 12825:
+        case 12824:
+        case 118:
+        case 6358: // Warlock - Pet - Succubus - Seduction
+        case 2637: // Druid - Hibernate 
+        case 18657:
+        case 18658:
             return delayForDisorients;
-        // Turn Evil
-        if (_spell->Id == 10326)
-            return delayForFears;
-        break;
-
-    case SPELLFAMILY_HUNTER: // TODO all pet's cc 
-        // Traps
-        if (_spell->SpellFamilyFlags[0] & 0x8 ||      // Frozen trap
-            _spell->Id == 57879 ||                    // Snake Trap
-            _spell->SpellFamilyFlags[2] & 0x00024000) // Explosive and Immolation Trap
-            return 0;
-        // Entrapment
-        if (_spell->SpellIconID == 20)
-            return 0;
-        // Scatter Shot
-        if (_spell->Id == 19503)
-            return delayForScatters;
-        // Wyvern Sting
-        if (_spell->Id == 19386 || _spell->Id == 24132 || _spell->Id == 24133 || _spell->Id == 27068 || _spell->Id == 49011 || _spell->Id == 49012)
-            return delayForDisorients;        
-        // Scare beast
-        if (_spell->Id == 1513 || _spell->Id == 14326 || _spell->Id == 14327)
-            return delayForFears;
-        // Silencing shot
-        if (_spell->Id == 34490)
-            return delayForSilences;
-        break;
-
-    case SPELLFAMILY_ROGUE:
-        // Shadowstep
-        if (_spell->Id == 36554)
+        case 36554: // Rogue - Shadowstep
+        case 49576: // DK - Death Grip
+        case 45334: // Druid - Feral charge - Bear
+        case 49376: // Druid - Feral charge - Cat
             return delayForInstantSpells;
-        // Blind
-        if (_spell->Id == 2094)
-            return delayForDisorients;
-        // CheapShot
-        if (_spell->Id == 1833)
-            return delayForOpenerStuns;
-        // Gouge
-        if (_spell->Id == 1776)
-            return delayForDisorients;
-        // Kidney Shot
-        if (_spell->Id == 408 || _spell->Id == 8643)
-            return delayForStuns;
-        // Sap
-        if (_spell->Id == 6770 || _spell->Id == 2070 || _spell->Id == 11297 || _spell->Id == 51724)
-            return delayForDisorients;
-        // Dismantle
-        if (_spell->Id == 51722)
-            return delayForDisarms;
-        // Talent - Silenced - Improved Kick
-        if (_spell->Id == 18425)
-            return delayForSilences;
-        break;
-
-    case SPELLFAMILY_PRIEST:
-        // Mind Control
-        if (_spell->Id == 605)
-            return 0;
-        // Psychic Scream
-        if (_spell->Id == 10890 || _spell->Id == 10888 || _spell->Id == 8124 || _spell->Id == 8122)
-            return delayForFears;
-        // Psychic Horror
-        if (_spell->Id == 64044)
+        case 6789: // Warlock - DeathCoil
+        case 17925:
+        case 17926:
+        case 27223:
+        case 47859:
+        case 47860:
             return delayForHorrors;
-        // Shackle Undead
-        if (_spell->Id == 10955 || _spell->Id == 9485 || _spell->Id == 9484)
-            return delayForDisorients;
-        // Silence
-        if (_spell->Id == 15487)
-            return delayForSilences;
-        break;
-
-    case SPELLFAMILY_DEATHKNIGHT:
-        // Strangulate
-        if (_spell->Id == 47476)
-            return delayForSilences;
-        // Death Grip
-        if (_spell->Id == 49576)
-            return delayForInstantSpells;
-        // Hungering Cold
-        if (_spell->Id == 49203)
-            return delayForDisorients;        
-        break;
-
-    case SPELLFAMILY_SHAMAN:
-        // Hex
-        if (_spell->Id == 51514)
-            return delayForDisorients;
-        // Feral bash
-        if (_spell->Id == 58861)
-            return delayForStuns;
-        // Talent - Earth's Grasp root
-        if (_spell->Id == 64695)
+        case 23694: // Warrior - Improved Hamstring
+        case 64695: // Shaman - Talent - Earth's Grasp root
+        case 12494: // Mage - Talent - Frostbite
+        case 122: // Mage - Frostnova
+        case 865:
+        case 6131:
+        case 10230:
+        case 27088:
+        case 42917:
+        case 33395: // Mage - Pet - Freeze
+        case 339: // Druid - Entangling roots
+        case 1062:
+        case 5195:
+        case 5196:
+        case 9852:
+        case 9853:
+        case 26989:
+        case 53308:
             return delayForRoots;
-        break;
-
-    case SPELLFAMILY_MAGE:
-        // Deep Freeze
-        if (_spell->Id == 44572)
-            return delayForStuns;
-        // Dragon Breath
-        if (_spell->Id == 42950 || _spell->Id == 42949 || _spell->Id == 33043 || _spell->Id == 33042 || _spell->Id == 33041 || _spell->Id == 31661)
-            return delayForDisorients;
-        // Polymorph
-        if (_spell->Id == 12826 || _spell->Id == 12825 || _spell->Id == 12824 || _spell->Id == 118)
-            return delayForDisorients;
-        // Talent - Improved Counter spell silence
-        if (_spell->Id == 18469)
-            return delayForSilences;
-        // Talent - Frostbite
-        if (_spell->Id == 12494)
-            return delayForRoots;
-        // Frostnova
-        if (_spell->Id == 122 || _spell->Id == 865 || _spell->Id == 6131 || _spell->Id == 10230 || _spell->Id == 27088 || _spell->Id == 42917)
-            return delayForRoots;
-        // Pet - Freeze
-        if (_spell->Id == 33395)
-            return delayForRoots;
-            break;
-
-    case SPELLFAMILY_WARLOCK:
-        // Pet - Succubus - Seduction
-        if (_spell->Id == 6358)
+        case 710: // Warlock - Banish
+        case 18647:
+        case 33786: // Druid - Cyclone
             return delayForBanishes;
-        // Banish
-        if (_spell->Id == 710 || _spell->Id == 18647)
-            return delayForBanishes;
-        // DeathCoil
-        if (_spell->Id == 6789 || _spell->Id == 17925 || _spell->Id == 17926 || _spell->Id == 27223 || _spell->Id == 47859 || _spell->Id == 47860)
-            return delayForHorrors;
-        // Pet - Felguard's intercept
-        if (_spell->Id == 47996)
-            return delayForStuns;
-        // Fear
-        if (_spell->Id == 5782 || _spell->Id == 6213 || _spell->Id == 6215)
-            return delayForFears;
-        // Howl of Terror
-        if (_spell->Id == 5484 || _spell->Id == 17928)
-            return delayForFears;
-        // Shadowfury
-        if (_spell->Id == 30283 || _spell->Id == 30413 || _spell->Id == 30414 || _spell->Id == 47846 || _spell->Id == 47847)
-            return delayForStuns;
-        // Pet - Spell Lock - Silenced
-        if (_spell->Id == 24259)
-            return delayForSilences;
-        break;
+        case 605: // Priest - Mind Control
+            return 0;
 
-    case SPELLFAMILY_DRUID:
-        // Bash
-        if (_spell->Id == 5211 || _spell->Id == 6798 || _spell->Id == 8983)
-            return delayForStuns;
-        // Cyclone
-        if (_spell->Id == 33786)
-            return delayForBanishes;
-        // Hibernate 
-        if (_spell->Id == 2637 || _spell->Id == 18657 || _spell->Id == 18658)
-            return delayForDisorients;
-        // Feral charge - Bear
-        if (_spell->Id == 45334)
-            return delayForInstantSpells;
-        // Feral charge - Cat
-        if (_spell->Id == 49376)
-            return delayForInstantSpells;
-        // Maim
-        if (_spell->Id == 22570 || _spell->Id == 49802)
-            return delayForStuns;
-        // Pounce
-        if (_spell->Id == 9005 || _spell->Id == 9823 || _spell->Id == 9827 || _spell->Id == 27006 || _spell->Id == 49803)
-            return delayForOpenerStuns;
-        // Entangling roots
-        if (_spell->Id == 339 || _spell->Id == 1062 || _spell->Id == 5195 || _spell->Id == 5196 || _spell->Id == 9852 || _spell->Id == 9853 || _spell->Id == 26989 || _spell->Id == 53308)
-            return delayForRoots;
-        break;
+        default:
+            // Case for Hunter Traps
+            if (_spell->SpellFamilyName == SPELLFAMILY_HUNTER
+                && (_spell->SpellFamilyFlags[0] & 0x8            // Frozen trap
+                    || _spell->Id == 57879                       // Snake Trap
+                    || _spell->SpellFamilyFlags[2] & 0x00024000  // Explosive and Immolation Trap
+                    || _spell->SpellIconID == 20))               // Entrapment
+                return 0;
 
-    case SPELLFAMILY_GENERIC:
-        // Warrior - Improved Hamstring
-        if (_spell->Id == 23694)
-            return delayForRoots;
-        // Rogue - Garote silence
-        if (_spell->Id == 1330)
-            return delayForSilences;
-        // War Stomp - Tauren's racial
-        if (_spell->Id == 46026)
-            return delayForStuns;
-        // Mage - Talent - Impact
-        if (_spell->Id == 12355)
-            return delayForStuns;
-        // Warlock - Demon charge 
-        if (_spell->Id == 60995 || _spell->Id == 54785)
-            return delayForStuns;
-        // Warlock - Pet - Felguard intercept trigg.
-        if (_spell->Id == 47995)
-            return delayForStuns;
-        // Hunter - Pet - Intimidation
-        if (_spell->Id == 24394)
-            return delayForStuns;
-        // DK - Pet - Gnaw (ghoul's stun)
-        if (_spell->Id == 47481)
-            return delayForStuns;
+            // Other spells with mechanics
+            for (uint8 i = 0; i < CCDArraySize; ++i)
+                if (_spell->HasAura(auraWithCCD[i]))
+                    return auraCCDelay[i];            
         break;
     }
-
-    for (uint8 i = 0; i < CCDArraySize; ++i)
-        if (_spell->HasAura(auraWithCCD[i]))
-            return delayForInstantSpells;
 
     return 0;
 }
