@@ -6636,7 +6636,7 @@ uint32 Spell::GetCCDelay(SpellInfo const* _spell)
         if (_spell->Id == 49376)
             return delayForInstantSpells;
         // Maim
-        if (_spell->Id == 22570 || 49802)
+        if (_spell->Id == 22570 || _spell->Id == 49802)
             return delayForStuns;
         // Pounce
         if (_spell->Id == 9005 || _spell->Id == 9823 || _spell->Id == 9827 || _spell->Id == 27006 || _spell->Id == 49803)
