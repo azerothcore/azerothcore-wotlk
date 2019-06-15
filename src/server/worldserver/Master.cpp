@@ -393,7 +393,7 @@ bool Master::_StartDB()
 {
     MySQL::Library_Init();
 
-    sLog->SetLogDB(false);
+    // sLog->SetLogDB(false);
     std::string dbstring;
     uint8 async_threads, synch_threads;
 
@@ -489,7 +489,7 @@ bool Master::_StartDB()
     sLog->outString("Realm running as realm ID %d", realmID);
 
     ///- Initialize the DB logging system
-    sLog->SetRealmID(realmID);
+    // sLog->SetRealmID(realmID);
 
     ///- Clean the database before starting
     ClearOnlineAccounts();

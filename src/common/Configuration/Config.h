@@ -39,7 +39,7 @@ public:
 
     bool Reload();
 
-    std::string GetStringDefault(const char* name, const std::string& def, bool logUnused = true);
+    std::string GetStringDefault(std::string name, const std::string& def, bool logUnused = true);
     bool GetBoolDefault(const char* name, bool def, bool logUnused = true);
     int GetIntDefault(const char* name, int def, bool logUnused = true);
     float GetFloatDefault(const char* name, float def, bool logUnused = true);

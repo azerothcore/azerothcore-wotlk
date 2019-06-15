@@ -121,10 +121,13 @@ extern int main(int argc, char** argv)
     std::string cfg_def_file=_TRINITY_CORE_CONFIG;
     cfg_def_file += ".dist";
 
-    if (!sConfigMgr->LoadInitial(cfg_def_file.c_str())) {
+    if (!sConfigMgr->LoadInitial(cfg_def_file.c_str())) 
+    {
         printf("ERROR: Invalid or missing default configuration file : %s\n", cfg_def_file.c_str());
         return 1;
     }
+
+    sLog->Initialize();
 
     if (!sConfigMgr->LoadMore(cfg_file))
     {
@@ -133,7 +136,6 @@ extern int main(int argc, char** argv)
     }
 
     sLog->outString("Using configuration file %s.", cfg_file);
-
     sLog->outString("Using SSL version: %s (library: %s)", OPENSSL_VERSION_TEXT, SSLeay_version(SSLEAY_VERSION));
     sLog->outString("Using ACE version: %s", ACE_VERSION);
 

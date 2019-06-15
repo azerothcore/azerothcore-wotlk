@@ -64,7 +64,7 @@ void WorldRunnable::run()
         #endif
     }
 
-    sLog->SetLogDB(false);
+    // sLog->SetLogDB(false);
 
     sScriptMgr->OnShutdown();
 

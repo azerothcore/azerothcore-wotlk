@@ -84,16 +84,17 @@ bool ConfigMgr::LoadData(char const* file)
     return false;
 }
 
-std::string ConfigMgr::GetStringDefault(const char* name, const std::string &def, bool logUnused /*= true*/)
+std::string ConfigMgr::GetStringDefault(std::string name, const std::string &def, bool logUnused /*= true*/)
 {
     ACE_TString val;
 
-    if (GetValueHelper(name, val))
+    if (GetValueHelper(name.c_str(), val))
         return val.c_str();
     else
     {
         if (logUnused)
-            sLog->outError("-> Not found option '%s'. The default value is used (%s)", name, def.c_str());
+            sLog->outError("-> Not found option '%s'. The default value is used (%s)", name.c_str(), def.c_str());
+        
         return def;
     }
 }

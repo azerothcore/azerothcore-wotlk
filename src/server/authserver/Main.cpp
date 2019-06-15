@@ -95,10 +95,13 @@ extern int main(int argc, char** argv)
     std::string cfg_def_file=_TRINITY_REALM_CONFIG;
     cfg_def_file += ".dist";
 
-    if (!sConfigMgr->LoadInitial(cfg_def_file.c_str())) {
+    if (!sConfigMgr->LoadInitial(cfg_def_file.c_str())) 
+    {
         printf("ERROR: Invalid or missing default configuration file : %s\n", cfg_def_file.c_str());
         return 1;
     }
+
+    sLog->Initialize();
 
     if (!sConfigMgr->LoadMore(configFile))
     {
@@ -153,9 +156,9 @@ extern int main(int argc, char** argv)
     if (!StartDB())
         return 1;
 
-    // Initialize the log database
-    sLog->SetLogDB(false);
-    sLog->SetRealmID(0);                                               // ensure we've set realm to 0 (authserver realmid)
+    // // Initialize the log database
+    // sLog->SetLogDB(false);
+    // sLog->SetRealmID(0);                                               // ensure we've set realm to 0 (authserver realmid)
 
     // Get the list of realms for the server
     sRealmList->Initialize(sConfigMgr->GetIntDefault("RealmsStateUpdateDelay", 20));
@@ -266,11 +269,11 @@ extern int main(int argc, char** argv)
     uint32 loopCounter = 0;
 
     // possibly enable db logging; avoid massive startup spam by doing it here.
-    if (sConfigMgr->GetBoolDefault("EnableLogDB", false))
-    {
-        sLog->outString("Enabling database logging...");
-        sLog->SetLogDB(true);
-    }
+    // if (sConfigMgr->GetBoolDefault("EnableLogDB", false))
+    // {
+    //     sLog->outString("Enabling database logging...");
+    //     sLog->SetLogDB(true);
+    // }
 
     // Wait for termination signal
     while (!stopEvent)
