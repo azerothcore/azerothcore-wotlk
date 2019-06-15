@@ -101,7 +101,7 @@ char const* Log::EncodeToUTF8(const char* str, ...)
 
 char const* Log::EncodeVUTF8(const char* str, va_list* ap)
 {
-#if TRINITY_PLATFORM == TRINITY_PLATFORM_WINDOWS
+#if PLATFORM == PLATFORM_WINDOWS
     char temp_buf[32 * 1024];
     wchar_t wtemp_buf[32 * 1024];
 
@@ -593,7 +593,7 @@ ColorTypes Log::GetColorForLevel(LogLevel Level)
 
 void Log::SetColor(bool stdout_stream, ColorTypes color)
 {
-#if WARHEAD_PLATFORM == WARHEAD_PLATFORM_WINDOWS
+#if PLATFORM == PLATFORM_WINDOWS
     static WORD WinColorFG[COLOR_TYPE_END] =
     {
         0,                                                                                                  // BLACK
@@ -661,7 +661,7 @@ void Log::SetColor(bool stdout_stream, ColorTypes color)
 
 void Log::ResetColor(bool stdout_stream)
 {
-#if WARHEAD_PLATFORM == WARHEAD_PLATFORM_WINDOWS
+#if PLATFORM == PLATFORM_WINDOWS
     HANDLE hConsole = GetStdHandle(stdout_stream ? STD_OUTPUT_HANDLE : STD_ERROR_HANDLE);
     SetConsoleTextAttribute(hConsole, FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED);
 #else
