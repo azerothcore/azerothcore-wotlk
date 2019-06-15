@@ -56,10 +56,12 @@ target_link_libraries(common
     g3dlib
     Detour
     sfmt
+    fmt
     utf8cpp
     openssl
     threads
-    jemalloc)
+    jemalloc
+    Poco)
 
 set_target_properties(common
   PROPERTIES
