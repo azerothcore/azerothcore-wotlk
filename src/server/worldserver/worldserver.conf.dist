@@ -3242,3 +3242,149 @@ LFG.Location.All = 0
 
 #
 ###################################################################################################
+
+###################################################################################################
+# LOGGING SYSTEM SETTINGS
+#
+#  Log channel config values: Given an channel "name"
+#    Log.Channel.name
+#        Description: Defines 'where to log'
+#        Format:      Type,Times,Pattern,Optional1,Optional2,Optional3,Optional4
+#                       
+#                     Type
+#                       1 - (Console)
+#                       2 - (File)
+#                              
+#                    Times (all types)
+#                       utc: Rotation strategy is based on UTC time (default).
+#                       local: Rotation strategy is based on local time.
+#
+#                    Pattern (all type)
+#                       %s - message source
+#                       %t - message text
+#                       %l - message priority level (1 .. 7)
+#                       %p - message priority (Fatal, Critical, Error, Warning, Notice, Information, Debug, Trace)
+#                       %q - abbreviated message priority (F, C, E, W, N, I, D, T)
+#                       %P - message process identifier
+#                       %T - message thread name
+#                       %I - message thread identifier (numeric)
+#                       %O - message thread OS identifier (numeric)
+#                       %N - node or host name
+#                       %U - message source file path (empty string if not set)
+#                       %u - message source line number (0 if not set)
+#                       %w - message date/time abbreviated weekday (Mon, Tue, ...)
+#                       %W - message date/time full weekday (Monday, Tuesday, ...)
+#                       %b - message date/time abbreviated month (Jan, Feb, ...)
+#                       %B - message date/time full month (January, February, ...)
+#                       %d - message date/time zero-padded day of month (01 .. 31)
+#                       %e - message date/time day of month (1 .. 31)
+#                       %f - message date/time space-padded day of month ( 1 .. 31)
+#                       %m - message date/time zero-padded month (01 .. 12)
+#                       %n - message date/time month (1 .. 12)
+#                       %o - message date/time space-padded month ( 1 .. 12)
+#                       %y - message date/time year without century (70)
+#                       %Y - message date/time year with century (1970)
+#                       %H - message date/time hour (00 .. 23)
+#                       %h - message date/time hour (00 .. 12)
+#                       %a - message date/time am/pm
+#                       %A - message date/time AM/PM
+#                       %M - message date/time minute (00 .. 59)
+#                       %S - message date/time second (00 .. 59)
+#                       %i - message date/time millisecond (000 .. 999)
+#                       %c - message date/time centisecond (0 .. 9)
+#                       %F - message date/time fractional seconds/microseconds (000000 - 999999)
+#                       %z - time zone differential in ISO 8601 format (Z or +NN.NN)
+#                       %Z - time zone differential in RFC format (GMT or +NNNN)
+#                       %L - convert time to local time (must be specified before any date/time specifier; does not itself output anything)
+#                       %E - epoch time (UTC, seconds since midnight, January 1, 1970)
+#                       %v[width] - the message source (%s) but text length is padded/cropped to 'width'
+#                       %[name] - the value of the message parameter with the given name
+#                       %% - percent sign
+#                           Example for file "%Y-%m-%d %H:%M:%S %t" 
+#                           Example for console "%t"
+#
+#                    Optional1 - Colors (is type Console)
+#                       Format: "fatal critical error warning notice info debug trace"
+#                       0 - BLACK
+#                       1 - RED
+#                       2 - GREEN
+#                       3 - BROWN
+#                       4 - BLUE
+#                       5 - MAGENTA
+#                       6 - CYAN
+#                       7 - GREY
+#                       8 - YELLOW
+#                       9 - LRED
+#                       10 - LGREEN
+#                       11 - LBLUE
+#                       12 - LMAGENTA
+#                       13 - LCYAN
+#                       14 - WHITE
+#                         Example: "9 1 1 3 3 13 12 5"
+#
+#                     Optional1 - File name (is type file)
+#                       Example: "Auth.log"
+#
+#                     Optional2 - Rotate on open (is type File)
+#                       true: The log file is rotated (and archived) when the channel is opened.
+#                       false: Log messages will be appended to an existing log file, if it exists (unless other conditions for a rotation are met). This is the default.
+#
+#                     Optional3 - Rotation (is type File)
+#                       never: no log rotation
+#                       [day,][hh]:mm: the file is rotated on specified day/time day - day is specified as long or short day name (Monday|Mon, Tuesday|Tue, ... ); day can be omitted, in which case log is rotated every day hh - valid hour range is 00-23; hour can be omitted, in which case log is rotated every hour mm - valid minute range is 00-59; minute must be specified
+#                       daily: the file is rotated daily
+#                       weekly: the file is rotated every seven days
+#                       monthly: the file is rotated every 30 days
+#                       <n> minutes: the file is rotated every <n> minutes, where <n> is an integer greater than zero.
+#                       <n> hours: the file is rotated every <n> hours, where <n> is an integer greater than zero.
+#                       <n> days: the file is rotated every <n> days, where <n> is an integer greater than zero.
+#                       <n> weeks: the file is rotated every <n> weeks, where <n> is an integer greater than zero.
+#                       <n> months: the file is rotated every <n> months, where <n> is an integer greater than zero and a month has 30 days.
+#                       <n>: the file is rotated when its size exceeds <n> bytes.
+#                       <n> K: the file is rotated when its size exceeds <n> Kilobytes.
+#                       <n> M: the file is rotated when its size exceeds <n> Megabytes.
+#                           Example: "daily"
+#
+#                     Optional4 - Archive (is type File)
+#                       number: A number, starting with 0, is appended to the name of archived log files. 
+#                               The newest archived log file always has the number 0. 
+#                               For example, if the log file is named "access.log", and it fulfils the criteria for rotation, the file is renamed to "access.log.0". 
+#                               If a file named "access.log.0" already exists, it is renamed to "access.log.1", and so on.
+#                       timestamp: A timestamp is appended to the log file name. 
+#                                  For example, if the log file is named "access.log", and it fulfils the criteria for rotation, the file is renamed to "access.log.20050802110300".
+#
+
+# LogChannel.Console = 1,"local","%t","9 1 1 3 3 13 12 5"
+# LogChannel.Server = 2,"local","%Y-%m-%d %H:%M:%S %t","Server.log","","daily"
+# LogChannel.GM = 2,"local","%Y-%m-%d %H:%M:%S %t","gm_%s.log","","daily"
+# LogChannel.DB = 2,"local","%Y-%m-%d %H:%M:%S %t","DB.log","","daily"
+
+LogChannel.Console = 1,local,%t,9 1 1 3 3 13 12 5
+LogChannel.Server = 2,local,%Y-%m-%d %H:%M:%S %t,Server.log,false,daily
+LogChannel.GM = 2,local,%Y-%m-%d %H:%M:%S %t,gm_%s.log,false,daily
+LogChannel.DB = 2,local,%Y-%m-%d %H:%M:%S %t,DB.log,false,daily
+
+#  Logger config values: Given a logger "name"
+#    Logger.name
+#        Description: Defines 'What to log'
+#        Format:      LogLevel,Channel
+#
+#                     LogLevel
+#                         0 - (Disabled)
+#                         1 - (Fatal)
+#                         2 - (Critical)
+#						  3 - (Error)
+#                         4 - (Warning)
+#                         5 - (Notice)
+#                         6 - (Info)
+#                         7 - (Debug)
+#						  8 - (Trace)
+#
+#                     Channel List: List of file channels linked to logger
+#                     (Using spaces as separator).
+#
+
+Logger.root = 6,Server
+Logger.commands.gm = 6,GM
+# Logger.sql.sql = 6,DB
+###################################################################################################
