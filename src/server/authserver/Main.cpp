@@ -101,16 +101,13 @@ extern int main(int argc, char** argv)
         return 1;
     }
 
-    sLog->Initialize();
-
     if (!sConfigMgr->LoadMore(configFile))
     {
         printf("WARNING: Invalid or missing configuration file : %s\n", configFile);
         printf("Verify that the file exists and has \'[authserver]\' written in the top of the file!\n");
     }
 
-    sLog->outString("%s (authserver)", GitRevision::GetFullVersion());
-    sLog->outString("<Ctrl-C> to stop.\n");
+    sLog->Initialize();
 
     sLog->outString("   █████╗ ███████╗███████╗██████╗  ██████╗ ████████╗██╗  ██╗");           
     sLog->outString("  ██╔══██╗╚══███╔╝██╔════╝██╔══██╗██╔═══██╗╚══██╔══╝██║  ██║");           

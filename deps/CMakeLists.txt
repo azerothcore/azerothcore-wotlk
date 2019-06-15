@@ -24,6 +24,8 @@ endif()
 
 add_subdirectory(threads)
 add_subdirectory(acelite)
+add_subdirectory(fmt)
+add_subdirectory(poco)
 
 if(SERVERS OR TOOLS)
   add_subdirectory(zlib)

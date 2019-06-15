@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2019 TrinityCore <https://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -16,28 +16,30 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __STRING_FORMAT_H__
-#define __STRING_FORMAT_H__
+#ifndef _STRING_FORMAT_H
+#define _STRING_FORMAT_H
 
-#include <memory>
-#include <iostream>
-#include <string>
-#include <cstdio>
+#include "fmt/printf.h"
 
-namespace Trinity
+namespace ACORE
 {
     /// Default TC string format function.
-    template<typename... Args>
-    inline std::string StringFormat(const std::string& format, Args const&... args)
+    template<typename Format, typename... Args>
+    inline std::string StringFormat(Format&& fmt, Args&&... args)
     {
-        size_t size = std::snprintf(nullptr, 0, format.c_str(), args ...) + 1; // Extra space for '\0'
-        unique_ptr<char[]> buf(new char[size]);
-        std::snprintf(buf.get(), size, format.c_str(), args ...);
-        return std::string(buf.get(), buf.get() + size - 1); // We don
+        try
+        {
+            return fmt::sprintf(std::forward<Format>(fmt), std::forward<Args>(args)...);
+        }
+        catch (const fmt::FormatError& formatError)
+        {
+            std::string error = "An error occurred formatting string \"" + std::string(fmt) + "\" : " + std::string(formatError.what());
+            return error;
+        }
     }
 
     /// Returns true if the given char pointer is null.
-    inline bool IsFormatEmptyOrNull(const char* fmt)
+    inline bool IsFormatEmptyOrNull(char const* fmt)
     {
         return fmt == nullptr;
     }
@@ -49,4 +51,4 @@ namespace Trinity
     }
 }
 
-#endif
+#endif // _STRING_FORMAT_H
