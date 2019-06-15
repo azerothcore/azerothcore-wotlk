@@ -62,7 +62,7 @@ void PetAI::_stopAttack()
     if (!me->IsAlive())
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outStaticDebug("Creature stoped attacking cuz his dead [guid=%u]", me->GetGUIDLow());
+        LOG_DEBUG("root", "Creature stoped attacking cuz his dead [guid=%u]", me->GetGUIDLow());
 #endif
         me->GetMotionMaster()->Clear();
         me->GetMotionMaster()->MoveIdle();
@@ -123,7 +123,7 @@ void PetAI::UpdateAI(uint32 diff)
         if (_needToStop())
         {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            sLog->outStaticDebug("Pet AI stopped attacking [guid=%u]", me->GetGUIDLow());
+            LOG_DEBUG("root", "Pet AI stopped attacking [guid=%u]", me->GetGUIDLow());
 #endif
             _stopAttack();
             return;
@@ -637,7 +637,7 @@ bool PetAI::CanAttack(Unit* target, const SpellInfo* spellInfo)
     // pussywizard: ZOMG! TEMP!
     if (!me->GetCharmInfo())
     {
-        sLog->outMisc("PetAI::CanAttack (A1) - %u, %u", me->GetEntry(), GUID_LOPART(me->GetOwnerGUID()));
+        LOG_INFO("root", "PetAI::CanAttack (A1) - %u, %u", me->GetEntry(), GUID_LOPART(me->GetOwnerGUID()));
         return false;
     }
 

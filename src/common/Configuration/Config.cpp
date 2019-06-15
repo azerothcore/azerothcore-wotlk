@@ -93,7 +93,7 @@ std::string ConfigMgr::GetStringDefault(std::string name, const std::string &def
     else
     {
         if (logUnused)
-            sLog->outError("-> Not found option '%s'. The default value is used (%s)", name.c_str(), def.c_str());
+            LOG_ERROR("root", "-> Not found option '%s'. The default value is used (%s)", name.c_str(), def.c_str());
         
         return def;
     }
@@ -106,7 +106,7 @@ bool ConfigMgr::GetBoolDefault(const char* name, bool def, bool logUnused /*= tr
     if (!GetValueHelper(name, val))
     {
         if (logUnused)
-            def ? sLog->outError("-> Not found option '%s'. The default value is used (Yes)", name) : sLog->outError("-> Not found option '%s'. The default value is used (No)", name);
+            def ? LOG_ERROR("root", "-> Not found option '%s'. The default value is used (Yes)", name) : LOG_ERROR("root", "-> Not found option '%s'. The default value is used (No)", name);
         return def;
     }
 
@@ -123,7 +123,7 @@ int ConfigMgr::GetIntDefault(const char* name, int def, bool logUnused /*= true*
     else
     {
         if (logUnused)
-            sLog->outError("-> Not found option '%s'. The default value is used (%i)", name, def);
+            LOG_ERROR("root", "-> Not found option '%s'. The default value is used (%i)", name, def);
         return def;
     }
 }
@@ -137,7 +137,7 @@ float ConfigMgr::GetFloatDefault(const char* name, float def, bool logUnused /*=
     else
     {
         if (logUnused)
-            sLog->outError("-> Not found option '%s'. The default value is used (%f)", name, def);
+            LOG_ERROR("root", "-> Not found option '%s'. The default value is used (%f)", name, def);
         return def;
     }
 }

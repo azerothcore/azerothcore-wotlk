@@ -127,8 +127,6 @@ extern int main(int argc, char** argv)
         return 1;
     }
 
-    sLog->Initialize();
-
     if (!sConfigMgr->LoadMore(cfg_file))
     {
         printf("WARNING: Invalid or missing configuration file : %s\n", cfg_file);
@@ -137,7 +135,9 @@ extern int main(int argc, char** argv)
 
     sLog->Initialize();
 
-    sLog->outString("Using ACE version: %s", ACE_VERSION);
+    LOG_INFO("root", "Using configuration file %s.", cfg_file);
+    LOG_INFO("root", "Using SSL version: %s (library: %s)", OPENSSL_VERSION_TEXT, SSLeay_version(SSLEAY_VERSION));
+    LOG_INFO("root", "Using ACE version: %s", ACE_VERSION);
 
     ///- and run the 'Master'
     /// @todo Why do we need this 'Master'? Can't all of this be in the Main as for Realmd?

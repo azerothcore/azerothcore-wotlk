@@ -65,7 +65,7 @@ public:
 /// Print out the usage string for this program on the console.
 void usage(const char* prog)
 {
-    sLog->outString("Usage: \n %s [<options>]\n"
+    LOG_INFO("root", "Usage: \n %s [<options>]\n"
         "    -c config_file           use config_file as configuration file\n\r",
         prog);
 }
@@ -109,24 +109,27 @@ extern int main(int argc, char** argv)
 
     sLog->Initialize();
 
-    sLog->outString("   █████╗ ███████╗███████╗██████╗  ██████╗ ████████╗██╗  ██╗");           
-    sLog->outString("  ██╔══██╗╚══███╔╝██╔════╝██╔══██╗██╔═══██╗╚══██╔══╝██║  ██║");           
-    sLog->outString("  ███████║  ███╔╝ █████╗  ██████╔╝██║   ██║   ██║   ███████║");           
-    sLog->outString("  ██╔══██║ ███╔╝  ██╔══╝  ██╔══██╗██║   ██║   ██║   ██╔══██║");           
-    sLog->outString("  ██║  ██║███████╗███████╗██║  ██║╚██████╔╝   ██║   ██║  ██║");           
-    sLog->outString("  ╚═╝  ╚═╝╚══════╝╚══════╝╚═╝  ╚═╝ ╚═════╝    ╚═╝   ╚═╝  ╚═╝");
-    sLog->outString("                                ██████╗ ██████╗ ██████╗ ███████╗");
-    sLog->outString("                                ██╔════╝██╔═══██╗██╔══██╗██╔═══╝");
-    sLog->outString("                                ██║     ██║   ██║██████╔╝█████╗");  
-    sLog->outString("                                ██║     ██║   ██║██╔══██╗██╔══╝");  
-    sLog->outString("                                ╚██████╗╚██████╔╝██║  ██║███████╗");
-    sLog->outString("                                 ╚═════╝ ╚═════╝ ╚═╝  ╚═╝╚══════╝\n");
+    LOG_INFO("root", "%s (authserver)", GitRevision::GetFullVersion());
+    LOG_INFO("root", "<Ctrl-C> to stop.\n");
 
-    sLog->outString("  	  AzerothCore 3.3.5a  -  www.azerothcore.org\n");
+    LOG_INFO("root", "   █████╗ ███████╗███████╗██████╗  ██████╗ ████████╗██╗  ██╗");           
+    LOG_INFO("root", "  ██╔══██╗╚══███╔╝██╔════╝██╔══██╗██╔═══██╗╚══██╔══╝██║  ██║");           
+    LOG_INFO("root", "  ███████║  ███╔╝ █████╗  ██████╔╝██║   ██║   ██║   ███████║");           
+    LOG_INFO("root", "  ██╔══██║ ███╔╝  ██╔══╝  ██╔══██╗██║   ██║   ██║   ██╔══██║");           
+    LOG_INFO("root", "  ██║  ██║███████╗███████╗██║  ██║╚██████╔╝   ██║   ██║  ██║");           
+    LOG_INFO("root", "  ╚═╝  ╚═╝╚══════╝╚══════╝╚═╝  ╚═╝ ╚═════╝    ╚═╝   ╚═╝  ╚═╝");
+    LOG_INFO("root", "                                ██████╗ ██████╗ ██████╗ ███████╗");
+    LOG_INFO("root", "                                ██╔════╝██╔═══██╗██╔══██╗██╔═══╝");
+    LOG_INFO("root", "                                ██║     ██║   ██║██████╔╝█████╗");  
+    LOG_INFO("root", "                                ██║     ██║   ██║██╔══██╗██╔══╝");  
+    LOG_INFO("root", "                                ╚██████╗╚██████╔╝██║  ██║███████╗");
+    LOG_INFO("root", "                                 ╚═════╝ ╚═════╝ ╚═╝  ╚═╝╚══════╝\n");
 
-    sLog->outString("Using configuration file %s.", configFile);
+    LOG_INFO("root", "  	  AzerothCore 3.3.5a  -  www.azerothcore.org\n");
 
-    sLog->outDetail("%s (Library: %s)", OPENSSL_VERSION_TEXT, SSLeay_version(SSLEAY_VERSION));
+    LOG_INFO("root", "Using configuration file %s.", configFile);
+
+    LOG_DEBUG("root", "%s (Library: %s)", OPENSSL_VERSION_TEXT, SSLeay_version(SSLEAY_VERSION));
 
 #if defined (ACE_HAS_EVENT_POLL) || defined (ACE_HAS_DEV_POLL)
     ACE_Reactor::instance(new ACE_Reactor(new ACE_Dev_Poll_Reactor(ACE::max_handles(), 1), 1), true);
@@ -134,17 +137,17 @@ extern int main(int argc, char** argv)
     ACE_Reactor::instance(new ACE_Reactor(new ACE_TP_Reactor(), true), true);
 #endif
 
-    sLog->outBasic("Max allowed open files is %d", ACE::max_handles());
+    LOG_DEBUG("root", "Max allowed open files is %d", ACE::max_handles());
 
     // authserver PID file creation
     std::string pidFile = sConfigMgr->GetStringDefault("PidFile", "");
     if (!pidFile.empty())
     {
         if (uint32 pid = CreatePIDFile(pidFile))
-            sLog->outError("Daemon PID: %u\n", pid);
+            LOG_ERROR("root", "Daemon PID: %u\n", pid);
         else
         {
-            sLog->outError("Cannot create PID file %s.\n", pidFile.c_str());
+            LOG_ERROR("root", "Cannot create PID file %s.\n", pidFile.c_str());
             return 1;
         }
     }
@@ -161,7 +164,7 @@ extern int main(int argc, char** argv)
     sRealmList->Initialize(sConfigMgr->GetIntDefault("RealmsStateUpdateDelay", 20));
     if (sRealmList->size() == 0)
     {
-        sLog->outError("No valid realms specified.");
+        LOG_ERROR("root", "No valid realms specified.");
         return 1;
     }
 
@@ -171,7 +174,7 @@ extern int main(int argc, char** argv)
     int32 rmport = sConfigMgr->GetIntDefault("RealmServerPort", 3724);
     if (rmport < 0 || rmport > 0xFFFF)
     {
-        sLog->outError("Specified port out of allowed range (1-65535)");
+        LOG_ERROR("root", "Specified port out of allowed range (1-65535)");
         return 1;
     }
 
@@ -181,7 +184,7 @@ extern int main(int argc, char** argv)
 
     if (acceptor.open(bind_addr, ACE_Reactor::instance(), ACE_NONBLOCK) == -1)
     {
-        sLog->outError("Auth server can not bind to %s:%d", bind_ip.c_str(), rmport);
+        LOG_ERROR("root", "Auth server can not bind to %s:%d", bind_ip.c_str(), rmport);
         return 1;
     }
 
@@ -213,20 +216,20 @@ extern int main(int argc, char** argv)
             ULONG_PTR currentAffinity = affinity & appAff;
             
             if (!currentAffinity)
-                sLog->outError("server.authserver", "Processors marked in UseProcessors bitmask (hex) %x are not accessible for the authserver. Accessible processors bitmask (hex): %x", affinity, appAff);
+                LOG_ERROR("root", "server.authserver", "Processors marked in UseProcessors bitmask (hex) %x are not accessible for the authserver. Accessible processors bitmask (hex): %x", affinity, appAff);
             else if (SetProcessAffinityMask(hProcess, currentAffinity))
-                sLog->outString("server.authserver", "Using processors (bitmask, hex): %x", currentAffinity);
+                LOG_INFO("root", "server.authserver", "Using processors (bitmask, hex): %x", currentAffinity);
             else
-                sLog->outError("server.authserver", "Can't set used processors (hex): %x", currentAffinity);
+                LOG_ERROR("root", "server.authserver", "Can't set used processors (hex): %x", currentAffinity);
         }
     }
     
     if (highPriority)
     {
         if (SetPriorityClass(hProcess, HIGH_PRIORITY_CLASS))
-            sLog->outString("server.authserver", "authserver process priority class set to HIGH");
+            LOG_INFO("root", "server.authserver", "authserver process priority class set to HIGH");
         else
-            sLog->outError("server.authserver", "Can't set authserver process priority class.");
+            LOG_ERROR("root", "server.authserver", "Can't set authserver process priority class.");
     }
     
 #else // Linux
@@ -241,21 +244,21 @@ extern int main(int argc, char** argv)
                 CPU_SET(i, &mask);
 
         if (sched_setaffinity(0, sizeof(mask), &mask))
-            sLog->outError("Can't set used processors (hex): %x, error: %s", affinity, strerror(errno));
+            LOG_ERROR("root", "Can't set used processors (hex): %x, error: %s", affinity, strerror(errno));
         else
         {
             CPU_ZERO(&mask);
             sched_getaffinity(0, sizeof(mask), &mask);
-            sLog->outString("Using processors (bitmask, hex): %lx", *(__cpu_mask*)(&mask));
+            LOG_INFO("root", "Using processors (bitmask, hex): %lx", *(__cpu_mask*)(&mask));
         }
     }
 
     if (highPriority)
     {
         if (setpriority(PRIO_PROCESS, 0, PROCESS_HIGH_PRIORITY))
-            sLog->outError("Can't set authserver process priority class, error: %s", strerror(errno));
+            LOG_ERROR("root", "Can't set authserver process priority class, error: %s", strerror(errno));
         else
-            sLog->outString("authserver process priority class set to %i", getpriority(PRIO_PROCESS, 0));
+            LOG_INFO("root", "authserver process priority class set to %i", getpriority(PRIO_PROCESS, 0));
     }
     
 #endif
@@ -268,7 +271,7 @@ extern int main(int argc, char** argv)
     // possibly enable db logging; avoid massive startup spam by doing it here.
     // if (sConfigMgr->GetBoolDefault("EnableLogDB", false))
     // {
-    //     sLog->outString("Enabling database logging...");
+    //     LOG_INFO("root", "Enabling database logging...");
     //     sLog->SetLogDB(true);
     // }
 
@@ -284,7 +287,7 @@ extern int main(int argc, char** argv)
         if ((++loopCounter) == numLoops)
         {
             loopCounter = 0;
-            sLog->outDetail("Ping MySQL to keep connection alive");
+            LOG_DEBUG("root", "Ping MySQL to keep connection alive");
             LoginDatabase.KeepAlive();
         }
     }
@@ -292,7 +295,7 @@ extern int main(int argc, char** argv)
     // Close the Database Pool and library
     StopDB();
 
-    sLog->outString("Halting process...");
+    LOG_INFO("root", "Halting process...");
     return 0;
 }
 
@@ -304,32 +307,32 @@ bool StartDB()
     std::string dbstring = sConfigMgr->GetStringDefault("LoginDatabaseInfo", "");
     if (dbstring.empty())
     {
-        sLog->outError("Database not specified");
+        LOG_ERROR("root", "Database not specified");
         return false;
     }
 
     int32 worker_threads = sConfigMgr->GetIntDefault("LoginDatabase.WorkerThreads", 1);
     if (worker_threads < 1 || worker_threads > 32)
     {
-        sLog->outError("Improper value specified for LoginDatabase.WorkerThreads, defaulting to 1.");
+        LOG_ERROR("root", "Improper value specified for LoginDatabase.WorkerThreads, defaulting to 1.");
         worker_threads = 1;
     }
 
     int32 synch_threads = sConfigMgr->GetIntDefault("LoginDatabase.SynchThreads", 1);
     if (synch_threads < 1 || synch_threads > 32)
     {
-        sLog->outError("Improper value specified for LoginDatabase.SynchThreads, defaulting to 1.");
+        LOG_ERROR("root", "Improper value specified for LoginDatabase.SynchThreads, defaulting to 1.");
         synch_threads = 1;
     }
 
     // NOTE: While authserver is singlethreaded you should keep synch_threads == 1. Increasing it is just silly since only 1 will be used ever.
     if (!LoginDatabase.Open(dbstring.c_str(), uint8(worker_threads), uint8(synch_threads)))
     {
-        sLog->outError("Cannot connect to database");
+        LOG_ERROR("root", "Cannot connect to database");
         return false;
     }
 
-    sLog->outString("Started auth database connection pool.");
+    LOG_INFO("root", "Started auth database connection pool.");
     return true;
 }
 

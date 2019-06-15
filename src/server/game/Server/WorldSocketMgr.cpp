@@ -144,7 +144,7 @@ class ReactorRunnable : protected ACE_Task_Base
         virtual int svc()
         {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            sLog->outStaticDebug ("Network Thread Starting");
+            LOG_DEBUG("root", "Network Thread Starting");
 #endif
 
             ACE_ASSERT (m_Reactor);
@@ -183,7 +183,7 @@ class ReactorRunnable : protected ACE_Task_Base
             }
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            sLog->outStaticDebug ("Network Thread exits");
+            LOG_DEBUG("root", "Network Thread exits");
 #endif
 
             return 0;
@@ -228,7 +228,7 @@ WorldSocketMgr::StartReactiveIO (uint16 port, const char* address)
 
     if (num_threads <= 0)
     {
-        sLog->outError("Network.Threads is wrong in your config file");
+        LOG_ERROR("root", "Network.Threads is wrong in your config file");
         return -1;
     }
 
@@ -236,7 +236,7 @@ WorldSocketMgr::StartReactiveIO (uint16 port, const char* address)
 
     m_NetThreads = new ReactorRunnable[m_NetThreadsCount];
 
-    sLog->outBasic ("Max allowed socket connections %d", ACE::max_handles());
+    LOG_DEBUG("root", "Max allowed socket connections %d", ACE::max_handles());
 
     // -1 means use default
     m_SockOutKBuff = sConfigMgr->GetIntDefault ("Network.OutKBuff", -1);
@@ -245,7 +245,7 @@ WorldSocketMgr::StartReactiveIO (uint16 port, const char* address)
 
     if (m_SockOutUBuff <= 0)
     {
-        sLog->outError("Network.OutUBuff is wrong in your config file");
+        LOG_ERROR("root", "Network.OutUBuff is wrong in your config file");
         return -1;
     }
 
@@ -255,7 +255,7 @@ WorldSocketMgr::StartReactiveIO (uint16 port, const char* address)
 
     if (m_Acceptor->open(listen_addr, m_NetThreads[0].GetReactor(), ACE_NONBLOCK) == -1)
     {
-        sLog->outError("Failed to open acceptor, check if the port is free");
+        LOG_ERROR("root", "Failed to open acceptor, check if the port is free");
         return -1;
     }
 
@@ -268,7 +268,7 @@ WorldSocketMgr::StartReactiveIO (uint16 port, const char* address)
 int
 WorldSocketMgr::StartNetwork (uint16 port, const char* address)
 {
-    if (!sLog->IsOutDebug())
+    // if (!sLog->IsOutDebug())
         ACE_Log_Msg::instance()->priority_mask (LM_ERROR, ACE_Log_Msg::PROCESS);
 
     if (StartReactiveIO(port, address) == -1)
@@ -319,7 +319,7 @@ WorldSocketMgr::OnSocketOpen (WorldSocket* sock)
             (void*) & m_SockOutKBuff,
             sizeof (int)) == -1 && errno != ENOTSUP)
         {
-            sLog->outError("WorldSocketMgr::OnSocketOpen set_option SO_SNDBUF");
+            LOG_ERROR("root", "WorldSocketMgr::OnSocketOpen set_option SO_SNDBUF");
             return -1;
         }
     }
@@ -334,7 +334,7 @@ WorldSocketMgr::OnSocketOpen (WorldSocket* sock)
             (void*)&ndoption,
             sizeof (int)) == -1)
         {
-            sLog->outError("WorldSocketMgr::OnSocketOpen: peer().set_option TCP_NODELAY errno = %s", ACE_OS::strerror (errno));
+            LOG_ERROR("root", "WorldSocketMgr::OnSocketOpen: peer().set_option TCP_NODELAY errno = %s", ACE_OS::strerror (errno));
             return -1;
         }
     }

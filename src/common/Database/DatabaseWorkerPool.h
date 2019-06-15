@@ -58,7 +58,7 @@ class DatabaseWorkerPool
             bool res = true;
             _connectionInfo = MySQLConnectionInfo(infoString);
 
-            sLog->outSQLDriver("Opening DatabasePool '%s'. Asynchronous connections: %u, synchronous connections: %u.",
+            LOG_INFO("root", "Opening DatabasePool '%s'. Asynchronous connections: %u, synchronous connections: %u.",
                 GetDatabaseName(), async_threads, synch_threads);
 
             //! Open asynchronous connections (delayed operations)
@@ -84,17 +84,17 @@ class DatabaseWorkerPool
             }
 
             if (res)
-                sLog->outSQLDriver("DatabasePool '%s' opened successfully. %u total connections running.", GetDatabaseName(),
+                LOG_INFO("root", "DatabasePool '%s' opened successfully. %u total connections running.", GetDatabaseName(),
                     (_connectionCount[IDX_SYNCH] + _connectionCount[IDX_ASYNC]));
             else
-                sLog->outError("DatabasePool %s NOT opened. There were errors opening the MySQL connections. Check your SQLDriverLogFile "
+                LOG_ERROR("root", "DatabasePool %s NOT opened. There were errors opening the MySQL connections. Check your SQLDriverLogFile "
                     "for specific errors.", GetDatabaseName());
             return res;
         }
 
         void Close()
         {
-            sLog->outSQLDriver("Closing down DatabasePool '%s'.", GetDatabaseName());
+            LOG_INFO("root", "Closing down DatabasePool '%s'.", GetDatabaseName());
 
             //! Shuts down delaythreads for this connection pool by underlying deactivate().
             //! The next dequeue attempt in the worker thread tasks will result in an error,
@@ -110,7 +110,7 @@ class DatabaseWorkerPool
                 t->Close();         //! Closes the actualy MySQL connection.
             }
 
-            sLog->outSQLDriver("Asynchronous connections on DatabasePool '%s' terminated. Proceeding with synchronous connections.",
+            LOG_INFO("root", "Asynchronous connections on DatabasePool '%s' terminated. Proceeding with synchronous connections.",
                 GetDatabaseName());
 
             //! Shut down the synchronous connections
@@ -124,7 +124,7 @@ class DatabaseWorkerPool
             delete _queue;
             delete _mqueue;
 
-            sLog->outSQLDriver("All connections on DatabasePool '%s' closed.", GetDatabaseName());
+            LOG_INFO("root", "All connections on DatabasePool '%s' closed.", GetDatabaseName());
         }
 
         /**
@@ -357,10 +357,10 @@ class DatabaseWorkerPool
             switch (transaction->GetSize())
             {
                 case 0:
-                    sLog->outSQLDriver("Transaction contains 0 queries. Not executing.");
+                    LOG_INFO("root", "Transaction contains 0 queries. Not executing.");
                     return;
                 case 1:
-                    sLog->outSQLDriver("Warning: Transaction only holds 1 query, consider removing Transaction context in code.");
+                    LOG_INFO("root", "Warning: Transaction only holds 1 query, consider removing Transaction context in code.");
                     break;
                 default:
                     break;

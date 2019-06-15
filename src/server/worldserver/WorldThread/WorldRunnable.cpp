@@ -87,7 +87,7 @@ void WorldRunnable::run()
 
 void AuctionListingRunnable::run()
 {
-    sLog->outString("Starting up Auction House Listing thread...");
+    LOG_INFO("root", "Starting up Auction House Listing thread...");
     while (!World::IsStopped())
     {
         if (AsyncAuctionListingMgr::IsAuctionListingAllowed())
@@ -125,5 +125,5 @@ void AuctionListingRunnable::run()
         }
         ACORE::Thread::Sleep(1);
     }
-    sLog->outString("Auction House Listing thread exiting without problems.");
+    LOG_INFO("root", "Auction House Listing thread exiting without problems.");
 }

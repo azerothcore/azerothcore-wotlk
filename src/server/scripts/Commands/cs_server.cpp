@@ -323,7 +323,7 @@ public:
         if (!newLevel)
             return false;
 
-        sLog->SetLogFileLevel(newLevel);
+        // sLog->SetLogFileLevel(newLevel);
         return true;
     }
 
@@ -337,7 +337,7 @@ public:
         if (!newLevel)
             return false;
 
-        sLog->SetLogLevel(newLevel);
+        // sLog->SetLogLevel(newLevel);
         return true;
     }
 
@@ -364,12 +364,13 @@ public:
     // toggle sql driver query logging
     static bool HandleServerToggleQueryLogging(ChatHandler* handler, char const* /*args*/)
     {
-        sLog->SetSQLDriverQueryLogging(!sLog->GetSQLDriverQueryLogging());
+        // sLog->SetSQLDriverQueryLogging(!sLog->GetSQLDriverQueryLogging());
 
-        if (sLog->GetSQLDriverQueryLogging())
-            handler->PSendSysMessage(LANG_SQLDRIVER_QUERY_LOGGING_ENABLED);
-        else
-            handler->PSendSysMessage(LANG_SQLDRIVER_QUERY_LOGGING_DISABLED);
+        // if (sLog->GetSQLDriverQueryLogging())
+        //     handler->PSendSysMessage(LANG_SQLDRIVER_QUERY_LOGGING_ENABLED);
+        // else
+        //     handler->PSendSysMessage(LANG_SQLDRIVER_QUERY_LOGGING_DISABLED);
+        
         return true;
     }
 };

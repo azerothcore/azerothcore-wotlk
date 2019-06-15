@@ -65,5 +65,5 @@ void ByteBuffer::hexlike(bool outString) const
     }
     o << " ";
 
-    sLog->outString("%s", o.str().c_str());
+    LOG_INFO("root", "%s", o.str().c_str());
 }
