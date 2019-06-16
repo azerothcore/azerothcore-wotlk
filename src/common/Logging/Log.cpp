@@ -106,6 +106,7 @@ char const* Log::EncodeVUTF8(const char* str, va_list* ap)
     wchar_t wtemp_buf[32 * 1024];
 
     size_t temp_len = vsnprintf(temp_buf, 32 * 1024, str, *ap);
+
     //vsnprintf returns -1 if the buffer is too small
     if (temp_len == size_t(-1))
         temp_len = 32 * 1024 - 1;
@@ -117,6 +118,7 @@ char const* Log::EncodeVUTF8(const char* str, va_list* ap)
 
     return temp_buf;
 #else
+    (void)*ap;
     return str;
 #endif
 }
@@ -450,7 +452,7 @@ void Log::_writeCommand(std::string const message, std::string const accountid)
         // Get filename
         std::string DynamicFileName = GetDynamicFileName(GMChannelName, accountid);
 
-        // Configuration pattern channel        
+        // Configuration pattern channel
         AutoPtr<PatternFormatter> _pattern(new PatternFormatter);
 
         try
@@ -501,7 +503,6 @@ void Log::_writeCommand(std::string const message, std::string const accountid)
         {
             Logger::create(LOGGER_GM_DYNAMIC, SplitShannel);
             outMessage(LOGGER_GM_DYNAMIC, LOG_LEVEL_INFO, message);
-            //_Write(LOGGER_GM_DYNAMIC, LOG_LEVEL_INFO, message);
             Logger::destroy(LOGGER_GM_DYNAMIC);
         }
         catch (const std::exception& e)
