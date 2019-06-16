@@ -1,3 +1,19 @@
+-- DB update 2019_06_15_00 -> 2019_06_16_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2019_06_15_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2019_06_15_00 2019_06_16_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1559857922897245970'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1559857922897245970');
 
 DELETE FROM `creature` WHERE `guid` IN (201212,201213,201214);
@@ -33,3 +49,12 @@ VALUES
 (28083,0,7,8,61,0,100,0,0,0,0,0,0,18,33554434,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Serfex the Reaver - Linked - Set Flags Not Attackable & Not Selectable'),
 (28083,0,8,0,61,0,100,0,0,0,0,0,0,90,9,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Serfex the Reaver - Linked - Set ''UNIT_STAND_STATE_SUBMERGED'''),
 (28083,0,9,0,6,0,100,0,0,0,0,0,0,45,1,2,0,0,0,0,9,28215,0,50,0,0,0,0,0,'Serfex the Reaver - On Just Died - Set Data 1 2');
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
