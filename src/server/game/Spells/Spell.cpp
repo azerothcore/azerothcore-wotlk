@@ -6578,17 +6578,15 @@ uint32 Spell::GetCCDelay(SpellInfo const* _spell)
         case 33786: // Druid - Cyclone
             return delayForBanishes;
         case 605: // Priest - Mind Control
+        case 19185: // Entrapment
+        case 64803:
+        case 64804:
+        case 3355: // Freezing trap
+        case 14308:
+        case 14309:
             return 0;
 
         default:
-            // Case for Hunter Traps
-            if (_spell->SpellFamilyName == SPELLFAMILY_HUNTER
-                && (_spell->SpellFamilyFlags[0] & 0x8            // Frozen trap
-                    || _spell->Id == 57879                       // Snake Trap
-                    || _spell->SpellFamilyFlags[2] & 0x00024000  // Explosive and Immolation Trap
-                    || _spell->SpellIconID == 20))               // Entrapment
-                return 0;
-
             // Other spells with mechanics
             for (uint8 i = 0; i < CCDArraySize; ++i)
                 if (_spell->HasAura(auraWithCCD[i]))
