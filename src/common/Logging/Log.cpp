@@ -144,7 +144,7 @@ void Log::_Write(std::string const& filter, LogLevel const level, std::string co
 
     Logger& logger = Logger::get(_filter);
 
-    std::string _msg = EncodeToUTF8("%s", message.c_str());
+    std::string _msg = message; //EncodeToUTF8("%s", message.c_str());
 
     try
     {

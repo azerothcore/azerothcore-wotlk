@@ -129,7 +129,9 @@ extern int main(int argc, char** argv)
 
     LOG_INFO("root", "Using configuration file %s.", configFile);
 
-    LOG_DEBUG("root", "%s (Library: %s)", OPENSSL_VERSION_TEXT, SSLeay_version(SSLEAY_VERSION));
+    LOG_INFO("root", "%s (Library: %s)\n", OPENSSL_VERSION_TEXT, SSLeay_version(SSLEAY_VERSION));
+
+    LOG_INFO("root", "ТЕСТ\n");
 
 #if defined (ACE_HAS_EVENT_POLL) || defined (ACE_HAS_DEV_POLL)
     ACE_Reactor::instance(new ACE_Reactor(new ACE_Dev_Poll_Reactor(ACE::max_handles(), 1), 1), true);
