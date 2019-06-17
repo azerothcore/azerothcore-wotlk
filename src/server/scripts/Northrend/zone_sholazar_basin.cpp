@@ -522,43 +522,6 @@ public:
     }
 };
 
-enum Q12915MendingFences
-{
-    SPELL_SUMMON_EARTHEN            = 55528
-};
-
-class spell_q12915_mending_fences : public SpellScriptLoader
-{
-    public:
-        spell_q12915_mending_fences() : SpellScriptLoader("spell_q12915_mending_fences") { }
-
-        class spell_q12915_mending_fences_SpellScript : public SpellScript
-        {
-            PrepareSpellScript(spell_q12915_mending_fences_SpellScript);
-
-            void HandleDummy(SpellEffIndex /*effIndex*/)
-            {
-                Unit* target = GetHitUnit();
-                if (!target)
-                    return;
-
-                for (uint8 i = 0; i < 4; ++i)
-                    GetCaster()->CastSpell(GetCaster(), SPELL_SUMMON_EARTHEN, true);
-            }
-
-            void Register()
-            {
-                OnEffectHitTarget += SpellEffectFn(spell_q12915_mending_fences_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_q12915_mending_fences_SpellScript();
-        };
-};
-
-
 
 // Theirs
 /*######
@@ -1523,7 +1486,6 @@ void AddSC_sholazar_basin()
     new npc_mcmanus();
     new go_pressure_valve();
     new go_brazier();
-    new spell_q12915_mending_fences();
 
     // Theirs
     new npc_vekjik();
