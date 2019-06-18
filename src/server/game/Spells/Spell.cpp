@@ -1028,6 +1028,11 @@ void Spell::SelectImplicitChannelTargets(SpellEffIndex effIndex, SpellImplicitTa
                 if (target)
                     m_targets.SetDst(*target);
             }
+            else if (Spell* channeledSpell = m_originalCaster->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
+            {
+                if (channeledSpell->m_targets.GetUnitTarget())
+                    m_targets.SetDst(*channeledSpell->m_targets.GetUnitTarget());
+            }
             else //if (!m_targets.HasDst())
             {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
