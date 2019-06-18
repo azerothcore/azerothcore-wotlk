@@ -105,8 +105,6 @@ bool Log::ShouldLog(std::string const& type, LogLevel level) const
 
 void Log::_Write(std::string const& filter, LogLevel const level, std::string const& message)
 {
-    bool stdout_stream = (level != LOG_LEVEL_ERROR || level != LOG_LEVEL_FATAL || level != LOG_LEVEL_CRITICAL);
-
     std::string _filter = filter;
 
     if (!Logger::has(_filter))
@@ -114,35 +112,33 @@ void Log::_Write(std::string const& filter, LogLevel const level, std::string co
 
     Logger& logger = Logger::get(_filter);
 
-    std::string _msg = message; //EncodeToUTF8("%s", message.c_str());
-
     try
     {
         switch (level)
         {
         case LOG_LEVEL_FATAL:
-            logger.fatal(_msg);
+            logger.fatal(message);
             break;
         case LOG_LEVEL_CRITICAL:
-            logger.critical(_msg);
+            logger.critical(message);
             break;
         case LOG_LEVEL_ERROR:
-            logger.error(_msg);
+            logger.error(message);
             break;
         case LOG_LEVEL_WARNING:
-            logger.warning(_msg);
+            logger.warning(message);
             break;
         case LOG_LEVEL_NOTICE:
-            logger.notice(_msg);
+            logger.notice(message);
             break;
         case LOG_LEVEL_INFO:
-            logger.information(_msg);
+            logger.information(message);
             break;
         case LOG_LEVEL_DEBUG:
-            logger.debug(_msg);
+            logger.debug(message);
             break;
         case LOG_LEVEL_TRACE:
-            logger.trace(_msg);
+            logger.trace(message);
             break;
         default:
             break;
