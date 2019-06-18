@@ -2,7 +2,7 @@ INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1557386928880976400');
 
 DROP TABLE IF EXISTS `playercreateinfo_spell`;
 
- DROP TABLE IF EXISTS `playercreateinfo_skills`;
+DROP TABLE IF EXISTS `playercreateinfo_skills`;
 CREATE TABLE `playercreateinfo_skills` (
   `raceMask` int(10) unsigned NOT NULL,
   `classMask` int(10) unsigned NOT NULL,
@@ -12,7 +12,7 @@ CREATE TABLE `playercreateinfo_skills` (
   PRIMARY KEY (`raceMask`,`classMask`,`skill`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
- INSERT INTO `playercreateinfo_skills` VALUES
+INSERT INTO `playercreateinfo_skills` VALUES
 (0,0,95,0,'Defense'),
 (0,0,162,0,'Unarmed'),
 (0,0,183,0,'GENERIC (DND)'),
