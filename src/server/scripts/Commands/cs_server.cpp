@@ -362,7 +362,7 @@ public:
     }
 
     // toggle sql driver query logging
-    static bool HandleServerToggleQueryLogging(ChatHandler* handler, char const* /*args*/)
+    static bool HandleServerToggleQueryLogging(ChatHandler* /*handler*/, char const* /*args*/)
     {
         // sLog->SetSQLDriverQueryLogging(!sLog->GetSQLDriverQueryLogging());
 
