@@ -3244,7 +3244,8 @@ LFG.Location.All = 0
 ###################################################################################################
 
 ###################################################################################################
-# LOGGING SYSTEM SETTINGS
+#
+#  LOGGING SYSTEM SETTINGS
 #
 #  Log channel config values: Given an channel "name"
 #    Log.Channel.name
@@ -3305,22 +3306,23 @@ LFG.Location.All = 0
 #
 #                    Optional1 - Colors (is type Console)
 #                       Format: "fatal critical error warning notice info debug trace"
-#                       0 - BLACK
-#                       1 - RED
-#                       2 - GREEN
-#                       3 - BROWN
-#                       4 - BLUE
-#                       5 - MAGENTA
-#                       6 - CYAN
-#                       7 - GREY
-#                       8 - YELLOW
-#                       9 - LRED
-#                       10 - LGREEN
-#                       11 - LBLUE
-#                       12 - LMAGENTA
-#                       13 - LCYAN
-#                       14 - WHITE
-#                         Example: "9 1 1 3 3 13 12 5"
+#                       black
+#                       red
+#                       green
+#                       brown
+#                       blue
+#                       magenta
+#                       cyan
+#                       gray
+#                       darkGray
+#                       lightRed
+#                       lightGreen
+#                       yellow
+#                       lightBlue
+#                       lightMagenta
+#                       lightCyan
+#                       white
+#                         Example: "lightRed lightRed red brown magenta cyan lightMagenta green"
 #
 #                     Optional1 - File name (is type file)
 #                       Example: "Auth.log"
@@ -3359,7 +3361,7 @@ LFG.Location.All = 0
 # LogChannel.GM = 2,"local","%Y-%m-%d %H:%M:%S %t","gm_%s.log","","daily"
 # LogChannel.DB = 2,"local","%Y-%m-%d %H:%M:%S %t","DB.log","","daily"
 
-LogChannel.Console = 1,local,%t,9 1 1 3 3 13 12 5
+LogChannel.Console = 1,local,%t,lightRed lightRed red brown magenta cyan lightMagenta green
 LogChannel.Server = 2,local,%Y-%m-%d %H:%M:%S %t,Server.log,false,daily
 LogChannel.GM = 2,local,%Y-%m-%d %H:%M:%S %t,gm_%s.log,false,daily
 LogChannel.DB = 2,local,%Y-%m-%d %H:%M:%S %t,DB.log,false,daily
