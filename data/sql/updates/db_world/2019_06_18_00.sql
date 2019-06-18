@@ -1,3 +1,19 @@
+-- DB update 2019_06_17_00 -> 2019_06_18_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2019_06_17_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2019_06_17_00 2019_06_18_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1560039329024344786'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1560039329024344786');
 
 UPDATE `smart_scripts` SET `target_param2` = 15 WHERE `entryorguid` IN (28214,28215,28216) AND `action_type` = 11 AND `action_param1` = 51959 AND `target_type` = 19;
@@ -31,3 +47,12 @@ VALUES
 (2816101,9,0,0,0,0,100,0,0,0,0,0,0,85,51037,2,0,0,0,0,7,0,0,0,0,0,0,0,0,'Chicken Escapee - On Script - Invoker Cast ''Capture Chicken Escapee'''),
 (2816101,9,1,0,0,0,100,0,0,0,0,0,0,101,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Chicken Escapee - On Script - Reset Home Position'),
 (2816101,9,2,0,0,0,100,0,0,0,0,0,0,41,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Chicken Escapee - On Script - Despawn');
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
