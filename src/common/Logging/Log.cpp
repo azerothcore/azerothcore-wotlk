@@ -30,7 +30,7 @@
 
 #if PLATFORM == PLATFORM_WINDOWS
 #include "Poco/WindowsConsoleChannel.h"
-#elif
+#else
 #include "Poco/ConsoleChannel.h"
 #endif
 
