@@ -86,16 +86,7 @@ private:
     void ReadChannelsFromConfig();
     void LoadFromConfig();
 
-    // For console logger
-    void SetColor(bool stdout_stream, ColorTypes color);
-    void ResetColor(bool stdout_stream);
-    void InitColorsForConsoleLogger(std::string ListColors);
-    bool IsColored() { return _Colored; }
-    ColorTypes GetColorForLevel(LogLevel Level);
-    bool _Colored;
-    ColorTypes _Colors[LOG_LEVEL_MAX];
     std::string _consoleChannel;
-
     void InitLogsDir();
     std::string m_logsDir;
 
@@ -103,8 +94,6 @@ private:
     ChannelMapConsole _ChannelMapConsole;
 
     std::string GetPositionOptions(std::string Options, uint8 Position);
-    char const* EncodeToUTF8(const char* str, ...);
-    char const* EncodeVUTF8(const char* str, va_list* ap);
 
     // Const loggers name
     std::string const LOGGER_ROOT = "root";
@@ -139,7 +128,7 @@ private:
 
 // Notice - 5
 #define LOG_NOTICE(filterType__, ...)  \
-    LOG_EXCEPTION_FREE(filterType__, LOG_LEVEL_WARNING, __VA_ARGS__)
+    LOG_EXCEPTION_FREE(filterType__, LOG_LEVEL_NOTICE, __VA_ARGS__)
 
 // Info - 6
 #define LOG_INFO(filterType__, ...)  \

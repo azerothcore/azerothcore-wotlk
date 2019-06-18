@@ -19,7 +19,6 @@
 #include "Log.h"
 #include "Config.h"
 #include "Util.h"
-#include "Poco/ConsoleChannel.h"
 #include "Poco/FormattingChannel.h"
 #include "Poco/PatternFormatter.h"
 #include "Poco/SplitterChannel.h"
@@ -28,6 +27,12 @@
 #include "Poco/AutoPtr.h"
 #include "Poco/Path.h"
 #include <sstream>
+
+#if PLATFORM == PLATFORM_WINDOWS
+#include "Poco/WindowsConsoleChannel.h"
+#elif
+#include "Poco/ConsoleChannel.h"
+#endif
 
 using namespace Poco;
 
@@ -56,14 +61,13 @@ void Log::InitLogsDir()
 {
     m_logsDir = sConfigMgr->GetStringDefault("LogsDir", "");
 
-    if (!m_logsDir.empty())
-        if ((m_logsDir.at(m_logsDir.length() - 1) != '/') && (m_logsDir.at(m_logsDir.length() - 1) != '\\'))
-            m_logsDir.push_back('/');
+    if (!m_logsDir.empty() && ((m_logsDir.at(m_logsDir.length() - 1) != '/') && (m_logsDir.at(m_logsDir.length() - 1) != '\\')))
+        m_logsDir.push_back('/');
 
     Path path(m_logsDir);
-
-    if (!path.isDirectory())
-        m_logsDir = "";
+    path.makeDirectory();
+    
+    //m_logsDir = "";
 }
 
 void Log::ReadLoggersFromConfig()
@@ -87,40 +91,6 @@ std::string Log::GetPositionOptions(std::string Options, uint8 Position)
         return "";
 
     return tokens[Position];
-}
-
-char const* Log::EncodeToUTF8(const char* str, ...)
-{
-    va_list ap;
-    va_start(ap, str);
-    char const* _msg = EncodeVUTF8(str, &ap);
-    va_end(ap);
-
-    return _msg;
-}
-
-char const* Log::EncodeVUTF8(const char* str, va_list* ap)
-{
-#if PLATFORM == PLATFORM_WINDOWS
-    char temp_buf[32 * 1024];
-    wchar_t wtemp_buf[32 * 1024];
-
-    size_t temp_len = vsnprintf(temp_buf, 32 * 1024, str, *ap);
-
-    //vsnprintf returns -1 if the buffer is too small
-    if (temp_len == size_t(-1))
-        temp_len = 32 * 1024 - 1;
-
-    size_t wtemp_len = 32 * 1024 - 1;
-    Utf8toWStr(temp_buf, temp_len, wtemp_buf, wtemp_len);
-
-    CharToOemBuffW(&wtemp_buf[0], &temp_buf[0], uint32(wtemp_len + 1));
-
-    return temp_buf;
-#else
-    (void)*ap;
-    return str;
-#endif
 }
 
 bool Log::ShouldLog(std::string const& type, LogLevel level) const
@@ -148,9 +118,6 @@ void Log::_Write(std::string const& filter, LogLevel const level, std::string co
 
     try
     {
-        if (IsColored())
-            SetColor(stdout_stream, GetColorForLevel(level));
-
         switch (level)
         {
         case LOG_LEVEL_FATAL:
@@ -180,9 +147,6 @@ void Log::_Write(std::string const& filter, LogLevel const level, std::string co
         default:
             break;
         }
-
-        if (IsColored())
-            ResetColor(stdout_stream);
     }
     catch (const std::exception& e)
     {
@@ -373,10 +337,39 @@ void Log::CreateChannelsFromConfig(std::string const& LogChannelName)
     if (ChannelType == CHANNEL_OPTIONS_TYPE_CONSOLE)
     {
         // Configuration console channel
-        AutoPtr<ConsoleChannel> _channel(new ConsoleChannel);
+#if PLATFORM == PLATFORM_WINDOWS
+        AutoPtr<WindowsColorConsoleChannel> _channel(new WindowsColorConsoleChannel);
+#else
+        AutoPtr<ColorConsoleChannel> _channel(new ColorConsoleChannel);
+#endif
 
         // Init Colors
-        InitColorsForConsoleLogger(GetPositionOptions(options, CHANNEL_OPTIONS_OPTION_1));
+        if (!GetPositionOptions(options, CHANNEL_OPTIONS_OPTION_1).empty())
+        {
+            Tokenizer tokens(GetPositionOptions(options, CHANNEL_OPTIONS_OPTION_1), ' ');
+            if (tokens.size() == 8)
+            {
+                try
+                {
+                    _channel->setProperty("fatalColor", tokens[0]);
+                    _channel->setProperty("criticalColor", tokens[1]);
+                    _channel->setProperty("errorColor", tokens[2]);
+                    _channel->setProperty("warningColor", tokens[3]);
+                    _channel->setProperty("noticeColor", tokens[4]);
+                    _channel->setProperty("informationColor", tokens[5]);
+                    _channel->setProperty("debugColor", tokens[6]);
+                    _channel->setProperty("traceColor", tokens[7]);
+                }
+                catch (const std::exception& e)
+                {
+                    printf("%s\n\n", e.what());
+                }
+            }
+            else
+                _channel->setProperty("enableColors", "false");
+        }
+        else
+            _channel->setProperty("enableColors", "false");
 
         if (_consoleChannel.empty())
         {
@@ -541,9 +534,9 @@ void Log::outCommand(std::string&& message, std::string&& AccountID)
 
 void Log::outError(std::string&& message)
 {
-    sLog->SetColor(false, ColorTypes::RED);
+    //sLog->SetColor(false, ColorTypes::RED)
     printf("%s\n", message.c_str());
-    sLog->ResetColor(false);
+    //sLog->ResetColor(false);
 }
 
 void Log::outCharDump(std::string const& str, uint32 accountId, uint64 guid, std::string const& name)
@@ -553,120 +546,3 @@ void Log::outCharDump(std::string const& str, uint32 accountId, uint64 guid, std
 
     _Write(LOGGER_PLAYER_DUMP, LOG_LEVEL_INFO, ACORE::StringFormat("== START DUMP ==\n(Account: %u. Guid: %u. Name: %s)\n%s\n== END DUMP ==\n", accountId, guid, name, str));
 }
-
-// Color console
-void Log::InitColorsForConsoleLogger(std::string ListColors)
-{
-    if (ListColors.empty())
-    {
-        _Colored = false;
-        return;
-    }
-
-    int color[LOG_LEVEL_MAX];
-
-    std::istringstream ss(ListColors);
-
-    for (uint8 i = 1; i < LOG_LEVEL_MAX; ++i)
-    {
-        ss >> color[i];
-
-        if (!ss)
-            return;
-
-        if (color[i] < 0 || color[i] >= COLOR_TYPE_END)
-            return;
-    }
-
-    for (uint8 i = 0; i < LOG_LEVEL_MAX; ++i)
-        _Colors[i] = ColorTypes(color[i]);
-
-    _Colored = true;
-}
-
-ColorTypes Log::GetColorForLevel(LogLevel Level)
-{
-    if (_Colored)
-        return _Colors[Level];
-
-    return ColorTypes::WHITE;
-}
-
-void Log::SetColor(bool stdout_stream, ColorTypes color)
-{
-#if PLATFORM == PLATFORM_WINDOWS
-    static WORD WinColorFG[COLOR_TYPE_END] =
-    {
-        0,                                                                                                  // BLACK
-        FOREGROUND_RED,                                                                                     // RED
-        FOREGROUND_GREEN,                                                                                   // GREEN
-        FOREGROUND_RED      | FOREGROUND_GREEN,                                                             // BROWN
-        FOREGROUND_BLUE,                                                                                    // BLUE
-        FOREGROUND_RED      | FOREGROUND_BLUE,                                                              // MAGENTA
-        FOREGROUND_GREEN    | FOREGROUND_BLUE,                                                              // CYAN
-        FOREGROUND_RED      | FOREGROUND_GREEN      | FOREGROUND_BLUE,                                      // WHITE
-        FOREGROUND_RED      | FOREGROUND_GREEN      | FOREGROUND_INTENSITY,                                 // YELLOW
-        FOREGROUND_RED      | FOREGROUND_INTENSITY,                                                         // RED_BOLD
-        FOREGROUND_GREEN    | FOREGROUND_INTENSITY,                                                         // GREEN_BOLD
-        FOREGROUND_BLUE     | FOREGROUND_INTENSITY,                                                         // BLUE_BOLD
-        FOREGROUND_RED      | FOREGROUND_BLUE       | FOREGROUND_INTENSITY,                                 // MAGENTA_BOLD
-        FOREGROUND_GREEN    | FOREGROUND_BLUE       | FOREGROUND_INTENSITY,                                 // CYAN_BOLD
-        FOREGROUND_RED      | FOREGROUND_GREEN      | FOREGROUND_BLUE           | FOREGROUND_INTENSITY      // WHITE_BOLD
-    };
-
-    HANDLE hConsole = GetStdHandle(stdout_stream ? STD_OUTPUT_HANDLE : STD_ERROR_HANDLE);
-    SetConsoleTextAttribute(hConsole, WinColorFG[color]);
-#else
-    enum ANSITextAttr
-    {
-        TA_NORMAL = 0,
-        TA_BOLD = 1,
-        TA_BLINK = 5,
-        TA_REVERSE = 7
-    };
-
-    enum ANSIFgTextAttr
-    {
-        FG_BLACK = 30, FG_RED, FG_GREEN, FG_BROWN, FG_BLUE,
-        FG_MAGENTA, FG_CYAN, FG_WHITE, FG_YELLOW
-    };
-
-    enum ANSIBgTextAttr
-    {
-        BG_BLACK = 40, BG_RED, BG_GREEN, BG_BROWN, BG_BLUE,
-        BG_MAGENTA, BG_CYAN, BG_WHITE
-    };
-
-    static uint8 UnixColorFG[COLOR_TYPE_END] =
-    {
-        FG_BLACK,                                           // BLACK
-        FG_RED,                                             // RED
-        FG_GREEN,                                           // GREEN
-        FG_BROWN,                                           // BROWN
-        FG_BLUE,                                            // BLUE
-        FG_MAGENTA,                                         // MAGENTA
-        FG_CYAN,                                            // CYAN
-        FG_WHITE,                                           // WHITE
-        FG_YELLOW,                                          // YELLOW
-        FG_RED,                                             // LRED
-        FG_GREEN,                                           // LGREEN
-        FG_BLUE,                                            // LBLUE
-        FG_MAGENTA,                                         // LMAGENTA
-        FG_CYAN,                                            // LCYAN
-        FG_WHITE                                            // LWHITE
-    };
-
-    fprintf((stdout_stream ? stdout : stderr), "\x1b[%d%sm", UnixColorFG[color], (color >= YELLOW && color < COLOR_TYPE_END ? ";1" : ""));
-#endif
-}
-
-void Log::ResetColor(bool stdout_stream)
-{
-#if PLATFORM == PLATFORM_WINDOWS
-    HANDLE hConsole = GetStdHandle(stdout_stream ? STD_OUTPUT_HANDLE : STD_ERROR_HANDLE);
-    SetConsoleTextAttribute(hConsole, FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED);
-#else
-    fprintf(( stdout_stream ? stdout : stderr ), "\x1b[0m");
-#endif
-}
-// End color console

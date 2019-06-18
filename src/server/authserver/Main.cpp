@@ -131,7 +131,16 @@ extern int main(int argc, char** argv)
 
     LOG_INFO("root", "%s (Library: %s)\n", OPENSSL_VERSION_TEXT, SSLeay_version(SSLEAY_VERSION));
 
+    LOG_FATAL("root", "ТЕСТ\n");
+    LOG_CRIT("root", "ТЕСТ\n");
+    LOG_ERROR("root", "ТЕСТ\n");
+
+    LOG_WARN("root", "ТЕСТ\n");
+    LOG_NOTICE("root", "ТЕСТ\n");
+
     LOG_INFO("root", "ТЕСТ\n");
+    LOG_DEBUG("root", "ТЕСТ\n");
+    LOG_TRACE("root", "ТЕСТ\n");
 
 #if defined (ACE_HAS_EVENT_POLL) || defined (ACE_HAS_DEV_POLL)
     ACE_Reactor::instance(new ACE_Reactor(new ACE_Dev_Poll_Reactor(ACE::max_handles(), 1), 1), true);
