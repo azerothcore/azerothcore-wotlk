@@ -241,10 +241,10 @@ void Log::ClearnAllChannels()
 std::string Log::GetChannelFromLogger(std::string LoggerName)
 {
     std::string LoggerOption = sConfigMgr->GetStringDefault(PREFIX_LOGGER + LoggerName, "6,Server");
-
+    
     Tokenizer tokens(LoggerOption, ',');
 
-    if (tokens.size() >= 1)
+    if (tokens.size())
         return tokens[1];
 
     return "";
@@ -430,36 +430,38 @@ void Log::CreateChannelsFromConfig(std::string const& LogChannelName)
         }
 
         std::string FileName = GetPositionOptions(options, CHANNEL_OPTIONS_OPTION_1);
+
+        // If dynamic file name - no need create file channel
+        if (FileName.find("%s") != std::string::npos)
+            return;
+
         std::string RotateOnOpen = GetPositionOptions(options, CHANNEL_OPTIONS_OPTION_2);
         std::string Rotation = GetPositionOptions(options, CHANNEL_OPTIONS_OPTION_3);
         std::string Archive = GetPositionOptions(options, CHANNEL_OPTIONS_OPTION_4);
 
-        if (FileName.find("%s") == std::string::npos)
+        // Configuration file channel
+        AutoPtr<FileChannel> _channel(new FileChannel);
+
+        try
         {
-            // Configuration file channel
-            AutoPtr<FileChannel> _channel(new FileChannel);
+            _channel->setProperty("path", m_logsDir + FileName);
+            _channel->setProperty("times", Times);
 
-            try
-            {
-                _channel->setProperty("path", m_logsDir + FileName);
-                _channel->setProperty("times", Times);
+            if (!RotateOnOpen.empty())
+                _channel->setProperty("rotateOnOpen", RotateOnOpen);
 
-                if (!RotateOnOpen.empty())
-                    _channel->setProperty("rotateOnOpen", RotateOnOpen);
+            if (!Rotation.empty())
+                _channel->setProperty("rotation", Rotation);
 
-                if (!Rotation.empty())
-                    _channel->setProperty("rotation", Rotation);
-
-                if (!Archive.empty())
-                    _channel->setProperty("archive", Archive);
-            }
-            catch (const std::exception& e)
-            {
-                SYS_LOG_ERROR("%s\n", e.what());
-            }
-
-            AddFileChannel(ChannelName, new FormattingChannel(_pattern, _channel));
+            if (!Archive.empty())
+                _channel->setProperty("archive", Archive);
         }
+        catch (const std::exception& e)
+        {
+            SYS_LOG_ERROR("%s\n", e.what());
+        }
+
+        AddFileChannel(ChannelName, new FormattingChannel(_pattern, _channel));
     }
 }
 
@@ -551,7 +553,7 @@ void Log::_writeCommand(std::string const message, std::string const accountid)
         }
         catch (const std::exception& e)
         {
-            SYS_LOG_ERROR("%s\n", e.what());
+            SYS_LOG_ERROR("Log::_writeCommand - %s\n", e.what());
         }
 
         // Configuration file channel
@@ -573,7 +575,7 @@ void Log::_writeCommand(std::string const message, std::string const accountid)
         }
         catch (const std::exception& e)
         {
-            SYS_LOG_ERROR("%s\n", e.what());
+            SYS_LOG_ERROR("Log::_writeCommand - %s\n", e.what());
         }
 
         AutoPtr<SplitterChannel> SplitShannel(new SplitterChannel);
@@ -585,18 +587,18 @@ void Log::_writeCommand(std::string const message, std::string const accountid)
         }
         catch (const std::exception& e)
         {
-            SYS_LOG_ERROR("%s\n", e.what());
+            SYS_LOG_ERROR("Log::_writeCommand - %s\n", e.what());
         }
 
         try
         {
             Logger::create(LOGGER_GM_DYNAMIC, SplitShannel);
-            outMessage(LOGGER_GM_DYNAMIC, LOG_LEVEL_INFO, message);
+            Logger::get(LOGGER_GM_DYNAMIC).information(message);
             Logger::destroy(LOGGER_GM_DYNAMIC);
         }
         catch (const std::exception& e)
         {
-            SYS_LOG_ERROR("%s", e.what());
+            SYS_LOG_ERROR("Log::_writeCommand - %s\n", e.what());
         }
     }
     else
@@ -607,7 +609,7 @@ void Log::_writeCommand(std::string const message, std::string const accountid)
         }
         catch (const std::exception& e)
         {
-            SYS_LOG_ERROR("%s", e.what());
+            SYS_LOG_ERROR("Log::_writeCommand - %s", e.what());
         }
     }
 }
@@ -620,7 +622,7 @@ void Log::outMessage(std::string const& filter, LogLevel const level, std::strin
     _Write(filter, level, message);
 }
 
-void Log::outCommand(std::string&& message, std::string&& AccountID)
+void Log::outCommand(std::string&& AccountID, std::string&& message)
 {
     if (!ShouldLog(LOGGER_GM, LOG_LEVEL_INFO))
         return;
