@@ -300,7 +300,16 @@ void Log::CreateLoggerFromConfig(std::string const& ConfigLoggerName)
         return;
     }
 
-    CreateLogger(LoggerName, level, GetPositionOptions(options, LOGGER_OPTIONS_CHANNEL_NAME));
+    std::string FileChannel = GetPositionOptions(options, LOGGER_OPTIONS_CHANNEL_NAME);
+
+    // Check file channel
+    if (!GetFileChannel(FileChannel))
+    {
+        SYS_LOG_ERROR("Log::CreateLoggerFromConfig - Not found file channel '%s'", FileChannel.c_str());
+        return;
+    }
+
+    CreateLogger(LoggerName, level, FileChannel);
 }
 
 void Log::CreateChannelsFromConfig(std::string const& LogChannelName)
