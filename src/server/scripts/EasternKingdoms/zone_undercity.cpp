@@ -1006,6 +1006,24 @@ public:
 
         EventMap _events;
 
+        void EnterEvadeMode() override
+        {
+            me->DeleteThreatList();
+            me->CombatStop(true);
+            me->SetLootRecipient(NULL);
+
+            if (HasEscortState(STATE_ESCORT_ESCORTING))
+            {
+                AddEscortState(STATE_ESCORT_RETURNING);
+                ReturnToLastPoint();
+            }
+            else
+            {
+                me->GetMotionMaster()->MoveTargetedHome();
+                Reset();
+            }
+        }
+
         void Reset() override
         {
             if (!HasEscortState(STATE_ESCORT_ESCORTING))
@@ -1541,8 +1559,7 @@ public:
                             JumpToNextStep(10 * IN_MILLISECONDS);
                             break;
                         case 5:
-                            if (Player* player = GetPlayerForEscort())
-                                player->CastSpell(player, SPELL_WRYNN_BUFF);
+                            DoCast(me, SPELL_WRYNN_BUFF);
                             JumpToNextStep(3 * IN_MILLISECONDS);
                             break;
                         case 6:
@@ -2040,8 +2057,7 @@ public:
                         _events.ScheduleEvent(EVENT_AGGRO_JAINA, 2 * IN_MILLISECONDS);
                         break;
                     case EVENT_WRYNN_BUFF:
-                        if (Player* player = GetPlayerForEscort())
-                            player->CastSpell(player, SPELL_WRYNN_BUFF);
+                        DoCast(me, SPELL_WRYNN_BUFF);
                         _events.ScheduleEvent(EVENT_WRYNN_BUFF, 10 * IN_MILLISECONDS);
                         break;
                     default:
@@ -2238,44 +2254,6 @@ public:
     }
 };
 
-class spell_undercity_buffs : public SpellScriptLoader
-{
-public:
-    spell_undercity_buffs() : SpellScriptLoader("spell_undercity_buffs") { }
-
-    class spell_undercity_buffs_AuraScript : public AuraScript
-    {
-        PrepareAuraScript(spell_undercity_buffs_AuraScript);
-
-        // Add Update for Areacheck
-        void CalcPeriodic(AuraEffect const* /*effect*/, bool& isPeriodic, int32& amplitude)
-        {
-            isPeriodic = true;
-            amplitude = 5 * IN_MILLISECONDS;
-        }
-
-        void Update(AuraEffect* /*effect*/)
-        {
-            if (Player* owner = GetUnitOwner()->ToPlayer())
-            {
-                if (owner->GetZoneId() != ZONE_TIRISFAL && owner->GetZoneId() != ZONE_UNDERCITY)
-                    owner->RemoveAura(GetSpellInfo()->Id);
-            }
-        }
-
-        void Register()
-        {
-            DoEffectCalcPeriodic += AuraEffectCalcPeriodicFn(spell_undercity_buffs_AuraScript::CalcPeriodic, EFFECT_0, SPELL_AURA_MOD_DAMAGE_PERCENT_DONE);
-            OnEffectUpdatePeriodic += AuraEffectUpdatePeriodicFn(spell_undercity_buffs_AuraScript::Update, EFFECT_0, SPELL_AURA_MOD_DAMAGE_PERCENT_DONE);
-        }
-    };
-
-    AuraScript* GetAuraScript() const
-    {
-        return new spell_undercity_buffs_AuraScript();
-    }
-};
-
 /*######
 ## HORDE
 #######*/
@@ -2367,6 +2345,25 @@ public:
         std::vector<uint64> hordeGuardsGUID;
 
         EventMap _events;
+
+        void EnterEvadeMode() override
+        {
+            me->RemoveAura(SPELL_HEROIC_VANGUARD);
+            me->DeleteThreatList();
+            me->CombatStop(true);
+            me->SetLootRecipient(NULL);
+
+            if (HasEscortState(STATE_ESCORT_ESCORTING))
+            {
+                AddEscortState(STATE_ESCORT_RETURNING);
+                ReturnToLastPoint();
+            }
+            else
+            {
+                me->GetMotionMaster()->MoveTargetedHome();
+                Reset();
+            }
+        }
 
         void Reset() override
         {
@@ -3004,8 +3001,7 @@ public:
                             JumpToNextStep(6 * IN_MILLISECONDS);
                             break;
                         case 10:
-                            if (Player* player = GetPlayerForEscort())
-                                player->CastSpell(player, SPELL_THRALL_BUFF);
+                            DoCast(me, SPELL_THRALL_BUFF);
                             JumpToNextStep(10 * IN_MILLISECONDS);
                             break;
                             // Start Event
@@ -3953,8 +3949,7 @@ public:
                         _events.ScheduleEvent(EVENT_AGGRO_SYLVANAS, 2 * IN_MILLISECONDS);
                         break;
                     case EVENT_THRALL_BUFF:
-                        if (Player* player = GetPlayerForEscort())
-                            player->CastSpell(player, SPELL_THRALL_BUFF);
+                        DoCast(me, SPELL_THRALL_BUFF);
                         _events.ScheduleEvent(EVENT_THRALL_BUFF, 10 * IN_MILLISECONDS);
                         break;
                     default:
@@ -4091,5 +4086,4 @@ void AddSC_undercity()
     new npc_lady_sylvanas_windrunner_bfu();
     new boss_blight_worm();
     new spell_blight_worm_ingest();
-    new spell_undercity_buffs();
 }
