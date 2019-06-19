@@ -1252,8 +1252,8 @@ void World::LoadConfigSettings(bool reload)
     m_int_configs[CONFIG_NUMTHREADS] = sConfigMgr->GetIntDefault("MapUpdate.Threads", 1);
     m_int_configs[CONFIG_MAX_RESULTS_LOOKUP_COMMANDS] = sConfigMgr->GetIntDefault("Command.LookupMaxResults", 0);
 
-    // chat logging
-    m_bool_configs[CONFIG_CHATLOG_CHANNEL] = sConfigMgr->GetBoolDefault("ChatLogs.Channel", false);
+    // chat logging need delete
+    /*m_bool_configs[CONFIG_CHATLOG_CHANNEL] = sConfigMgr->GetBoolDefault("ChatLogs.Channel", false);
     m_bool_configs[CONFIG_CHATLOG_WHISPER] = sConfigMgr->GetBoolDefault("ChatLogs.Whisper", false);
     m_bool_configs[CONFIG_CHATLOG_SYSCHAN] = sConfigMgr->GetBoolDefault("ChatLogs.SysChan", false);
     m_bool_configs[CONFIG_CHATLOG_PARTY] = sConfigMgr->GetBoolDefault("ChatLogs.Party", false);
@@ -1261,7 +1261,7 @@ void World::LoadConfigSettings(bool reload)
     m_bool_configs[CONFIG_CHATLOG_GUILD] = sConfigMgr->GetBoolDefault("ChatLogs.Guild", false);
     m_bool_configs[CONFIG_CHATLOG_PUBLIC] = sConfigMgr->GetBoolDefault("ChatLogs.Public", false);
     m_bool_configs[CONFIG_CHATLOG_ADDON] = sConfigMgr->GetBoolDefault("ChatLogs.Addon", false);
-    m_bool_configs[CONFIG_CHATLOG_BGROUND] = sConfigMgr->GetBoolDefault("ChatLogs.BattleGround", false);
+    m_bool_configs[CONFIG_CHATLOG_BGROUND] = sConfigMgr->GetBoolDefault("ChatLogs.BattleGround", false);*/
 
     // Warden
     m_bool_configs[CONFIG_WARDEN_ENABLED]              = sConfigMgr->GetBoolDefault("Warden.Enabled", false);
@@ -1957,18 +1957,19 @@ void World::SetInitialWorldSettings()
 #endif
     
     uint32 startupDuration = GetMSTimeDiffToNow(startupBegin);
-    LOG_INFO("root", "\n");
+    LOG_INFO("root", "");
     LOG_ERROR("root", "WORLD: World initialized in %u minutes %u seconds", (startupDuration / 60000), ((startupDuration % 60000) / 1000));
-    LOG_INFO("root", "\n");
+    LOG_INFO("root", "");
 
     // possibly enable db logging; avoid massive startup spam by doing it here.
-    // if (sConfigMgr->GetBoolDefault("EnableLogDB", false))
-    // {
-    //     LOG_INFO("root", "Enabling database logging...");
-    //     sLog->SetLogDB(true);
-    // }
+    if (sConfigMgr->GetBoolDefault("EnableLogDB", false))
+    {
+        LOG_INFO("root", "Enabling database logging...");
+        sLog->SetRealmID(realmID);
+    }
 
-    if (sConfigMgr->isDryRun()) {
+    if (sConfigMgr->isDryRun())
+    {
         LOG_INFO("root", "AzerothCore dry run completed, terminating.");
         exit(0);
     }

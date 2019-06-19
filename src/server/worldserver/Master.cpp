@@ -98,7 +98,7 @@ public:
             }
             else if (getMSTimeDiff(_lastChange, curtime) > _delayTime)
             {
-                LOG_INFO("root", "World Thread hangs, kicking out server!");
+                LOG_CRIT("root", "World Thread hangs, kicking out server!");
                 ASSERT(false);
             }
 
@@ -487,14 +487,7 @@ bool Master::_StartDB()
     }
 
     LOG_INFO("root", "Realm running as realm ID %d", realmID);
-
-    ///- Initialize the DB logging system
-    if (sConfigMgr->GetBoolDefault("EnableLogDB", false))
-    {
-        LOG_INFO("root", "Enabling database logging...");
-        sLog->SetRealmID(realmID);
-    }
-
+    
     ///- Clean the database before starting
     ClearOnlineAccounts();
 
