@@ -424,21 +424,21 @@ void World::LoadModuleConfigSettings()
         // Load .conf.dist config
         if (!sConfigMgr->LoadMore(cfg_def_file.c_str()))
         {
-            LOG_INFO("root", "\n");
+            LOG_ERROR("root", "\n");
             LOG_ERROR("root", "Module config: Invalid or missing configuration dist file : %s", cfg_def_file.c_str());
             LOG_ERROR("root", "Module config: Verify that the file exists and has \'[worldserver]' written in the top of the file!");
             LOG_ERROR("root", "Module config: Use default settings!");
-            LOG_INFO("root", "\n");
+            LOG_ERROR("root", "\n");
         }
 
         // Load .conf config
         if (!sConfigMgr->LoadMore(cfg_file.c_str()))
         {
-            LOG_INFO("root", "\n");
+            LOG_ERROR("root", "\n");
             LOG_ERROR("root", "Module config: Invalid or missing configuration file : %s", cfg_file.c_str());
             LOG_ERROR("root", "Module config: Verify that the file exists and has \'[worldserver]' written in the top of the file!");
             LOG_ERROR("root", "Module config: Use default settings!");
-            LOG_INFO("root", "\n");
+            LOG_ERROR("root", "\n");
         }
     }
 }

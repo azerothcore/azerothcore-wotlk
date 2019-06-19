@@ -148,7 +148,7 @@ extern int main(int argc, char** argv)
     if (!pidFile.empty())
     {
         if (uint32 pid = CreatePIDFile(pidFile))
-            LOG_ERROR("root", "Daemon PID: %u\n", pid);
+            LOG_INFO("root", "Daemon PID: %u\n", pid);
         else
         {
             LOG_ERROR("root", "Cannot create PID file %s.\n", pidFile.c_str());
