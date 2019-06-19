@@ -27,7 +27,7 @@
 #include "Poco/AutoPtr.h"
 #include "Poco/Path.h"
 #include <sstream>
-#include <filesystem>
+#include <experimental/filesystem>
 
 #if PLATFORM == PLATFORM_WINDOWS
 #include "Poco/WindowsConsoleChannel.h"
