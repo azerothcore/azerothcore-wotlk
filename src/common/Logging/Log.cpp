@@ -27,6 +27,7 @@
 #include "Poco/AutoPtr.h"
 #include "Poco/Path.h"
 #include <sstream>
+#include <filesystem>
 
 #if PLATFORM == PLATFORM_WINDOWS
 #include "Poco/WindowsConsoleChannel.h"
@@ -131,8 +132,13 @@ void Log::InitLogsDir()
 {
     m_logsDir = sConfigMgr->GetStringDefault("LogsDir", "");
 
-    if (!m_logsDir.empty() && ((m_logsDir.at(m_logsDir.length() - 1) != '/') && (m_logsDir.at(m_logsDir.length() - 1) != '\\')))
-        m_logsDir.push_back('/');
+    if (!m_logsDir.empty())
+        if ((m_logsDir.at(m_logsDir.length() - 1) != '/') && (m_logsDir.at(m_logsDir.length() - 1) != '\\'))
+            m_logsDir.push_back('/');
+
+    std::experimental::filesystem::path LogsPath(m_logsDir);
+    if (!std::experimental::filesystem::is_directory(LogsPath))
+        m_logsDir = "";
 }
 
 void Log::ReadLoggersFromConfig()
