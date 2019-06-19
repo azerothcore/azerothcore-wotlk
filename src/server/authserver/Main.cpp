@@ -114,7 +114,8 @@ extern int main(int argc, char** argv)
     sLog->Initialize();
 
     LOG_INFO("server.loading", "%s (authserver)", GitRevision::GetFullVersion());
-    LOG_INFO("server.loading", "<Ctrl-C> to stop.\n");
+    LOG_INFO("server.loading", "<Ctrl-C> to stop.");
+    LOG_INFO("server.loading", "\n");
     LOG_INFO("server.loading", " █████╗ ███████╗███████╗██████╗  ██████╗ ████████╗██╗  ██╗");           
     LOG_INFO("server.loading", "██╔══██╗╚══███╔╝██╔════╝██╔══██╗██╔═══██╗╚══██╔══╝██║  ██║");           
     LOG_INFO("server.loading", "███████║  ███╔╝ █████╗  ██████╔╝██║   ██║   ██║   ███████║");           
@@ -126,10 +127,13 @@ extern int main(int argc, char** argv)
     LOG_INFO("server.loading", "                              ██║     ██║   ██║██████╔╝█████╗");  
     LOG_INFO("server.loading", "                              ██║     ██║   ██║██╔══██╗██╔══╝");  
     LOG_INFO("server.loading", "                              ╚██████╗╚██████╔╝██║  ██║███████╗");
-    LOG_INFO("server.loading", "                               ╚═════╝ ╚═════╝ ╚═╝  ╚═╝╚══════╝\n");
-    LOG_INFO("server.loading", "	  AzerothCore 3.3.5a  -  www.azerothcore.org\n");
+    LOG_INFO("server.loading", "                               ╚═════╝ ╚═════╝ ╚═╝  ╚═╝╚══════╝");
+    LOG_INFO("server.loading", "\n");
+    LOG_INFO("server.loading", "	  AzerothCore 3.3.5a  -  www.azerothcore.org");
+    LOG_INFO("server.loading", "\n");
     LOG_INFO("server.loading", "Using configuration file %s.", configFile);
-    LOG_INFO("server.loading", "%s (Library: %s)\n", OPENSSL_VERSION_TEXT, SSLeay_version(SSLEAY_VERSION));
+    LOG_INFO("server.loading", "%s (Library: %s)", OPENSSL_VERSION_TEXT, SSLeay_version(SSLEAY_VERSION));
+    LOG_INFO("server.loading", "\n");
     
 #if defined (ACE_HAS_EVENT_POLL) || defined (ACE_HAS_DEV_POLL)
     ACE_Reactor::instance(new ACE_Reactor(new ACE_Dev_Poll_Reactor(ACE::max_handles(), 1), 1), true);

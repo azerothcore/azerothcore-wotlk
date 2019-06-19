@@ -60,12 +60,12 @@ void LoadRandomEnchantmentsTable()
         } while (result->NextRow());
 
         LOG_INFO("root", ">> Loaded %u Item Enchantment definitions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-        // LOG_INFO("root", );
+        LOG_INFO("root", "\n");
     }
     else
     {
         LOG_ERROR("root", ">> Loaded 0 Item Enchantment definitions. DB table `item_enchantment_template` is empty.");
-        // LOG_INFO("root", );
+        LOG_INFO("root", "\n");
     }
 }
 

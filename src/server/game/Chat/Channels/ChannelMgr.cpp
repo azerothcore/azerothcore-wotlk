@@ -41,7 +41,7 @@ void ChannelMgr::LoadChannels()
     if (!result)
     {
         LOG_INFO("root", ">> Loaded 0 channels for %s", _teamId == TEAM_ALLIANCE ? "Alliance" : "Horde");
-        // LOG_INFO("root", );
+        LOG_INFO("root", "\n");
         return;
     }
 
@@ -80,7 +80,7 @@ void ChannelMgr::LoadChannels()
     while (result->NextRow());
 
     LOG_INFO("root", ">> Loaded %u channels for %s in %ums", count, _teamId == TEAM_ALLIANCE ? "Alliance" : "Horde", GetMSTimeDiffToNow(oldMSTime));
-    // LOG_INFO("root", );
+    LOG_INFO("root", "\n");
 }
 
 Channel* ChannelMgr::GetJoinChannel(std::string const& name, uint32 channelId)
@@ -137,7 +137,7 @@ void ChannelMgr::LoadChannelRights()
     QueryResult result = CharacterDatabase.Query("SELECT name, flags, speakdelay, joinmessage, delaymessage, moderators FROM channels_rights");
     if (!result)
     {
-        // LOG_INFO("root", );
+        LOG_INFO("root", "\n");
         LOG_INFO("root", ">>  Loaded 0 Channel Rights!");
         return;
     }
@@ -165,7 +165,7 @@ void ChannelMgr::LoadChannelRights()
     } while (result->NextRow());
 
     LOG_INFO("root", ">> Loaded %d Channel Rights in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    // LOG_INFO("root", );
+    LOG_INFO("root", "\n");
 }
 
 const ChannelRights& ChannelMgr::GetChannelRightsFor(const std::string& name)

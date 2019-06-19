@@ -618,7 +618,7 @@ void LoadDBCStores(const std::string& dataPath)
     }
 
     LOG_INFO("root", ">> Initialized %d data stores in %u ms", DBCFileCount, GetMSTimeDiffToNow(oldMSTime));
-    // LOG_INFO("root", );
+    LOG_INFO("root", "\n");
 }
 
 SimpleFactionsList const* GetFactionTeamList(uint32 faction)

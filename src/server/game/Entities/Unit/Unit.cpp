@@ -18689,17 +18689,17 @@ void Unit::OutDebugInfo() const
     // sLog->outStringInLine("Summon Slot: ");
     // for (uint32 i = 0; i < MAX_SUMMON_SLOT; ++i)
     //     sLog->outStringInLine(UI64FMTD", ", m_SummonSlot[i]);
-    // LOG_INFO("root", );
+    LOG_INFO("root", "\n");
 
     // sLog->outStringInLine("Controlled List: ");
     // for (ControlSet::const_iterator itr = m_Controlled.begin(); itr != m_Controlled.end(); ++itr)
     //     sLog->outStringInLine(UI64FMTD", ", (*itr)->GetGUID());
-    // LOG_INFO("root", );
+    LOG_INFO("root", "\n");
 
     // sLog->outStringInLine("Aura List: ");
     // for (AuraApplicationMap::const_iterator itr = m_appliedAuras.begin(); itr != m_appliedAuras.end(); ++itr)
     //     sLog->outStringInLine("%u, ", itr->first);
-    // LOG_INFO("root", );
+    LOG_INFO("root", "\n");
 
     if (IsVehicle())
     {
@@ -18707,7 +18707,7 @@ void Unit::OutDebugInfo() const
         // for (SeatMap::iterator itr = GetVehicleKit()->Seats.begin(); itr != GetVehicleKit()->Seats.end(); ++itr)
         //     if (Unit* passenger = ObjectAccessor::GetUnit(*GetVehicleBase(), itr->second.Passenger.Guid))
         //         sLog->outStringInLine(UI64FMTD", ", passenger->GetGUID());
-        // LOG_INFO("root", );
+        LOG_INFO("root", "\n");
     }
 
     if (GetVehicle())

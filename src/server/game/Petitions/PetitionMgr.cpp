@@ -26,7 +26,7 @@ void PetitionMgr::LoadPetitions()
     if (!result)
     {
         LOG_INFO("root", ">>  Loaded 0 Petitions!");
-        // LOG_INFO("root", );
+        LOG_INFO("root", "\n");
         return;
     }
 
@@ -39,7 +39,7 @@ void PetitionMgr::LoadPetitions()
     } while (result->NextRow());
 
     LOG_INFO("root", ">> Loaded %d Petitions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    // LOG_INFO("root", );
+    LOG_INFO("root", "\n");
 }
 
 void PetitionMgr::LoadSignatures()
@@ -51,7 +51,7 @@ void PetitionMgr::LoadSignatures()
     if (!result)
     {
         LOG_INFO("root", ">>  Loaded 0 Petition signs!");
-        // LOG_INFO("root", );
+        LOG_INFO("root", "\n");
         return;
     }
 
@@ -64,7 +64,7 @@ void PetitionMgr::LoadSignatures()
     } while (result->NextRow());
 
     LOG_INFO("root", ">> Loaded %d Petition signs in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    // LOG_INFO("root", );
+    LOG_INFO("root", "\n");
 }
 
 void PetitionMgr::AddPetition(uint32 petitionId, uint32 ownerGuid, std::string const& name, uint8 type)

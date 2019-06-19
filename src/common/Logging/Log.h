@@ -83,7 +83,7 @@ private:
     void CreateLoggerFromConfig(std::string const& ConfigLoggerName);
     void CreateChannelsFromConfig(std::string const& LogChannelName);
     void ReadLoggersFromConfig();
-    void ReadChannelsFromConfig();    
+    void ReadChannelsFromConfig();
 
     void InitLogsDir();
 

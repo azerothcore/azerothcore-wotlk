@@ -247,7 +247,7 @@ void ScriptMgr::LoadDatabase()
     CheckIfScriptsInDatabaseExist();
 
     LOG_INFO("root", ">> Loaded %u C++ scripts in %u ms", GetScriptCount(), GetMSTimeDiffToNow(oldMSTime));
-    // LOG_INFO("root", );
+    LOG_INFO("root", "\n");
 }
 
 struct TSpellSummary

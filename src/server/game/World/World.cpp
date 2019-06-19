@@ -424,21 +424,21 @@ void World::LoadModuleConfigSettings()
         // Load .conf.dist config
         if (!sConfigMgr->LoadMore(cfg_def_file.c_str()))
         {
-            // LOG_INFO("root", );
+            LOG_INFO("root", "\n");
             LOG_ERROR("root", "Module config: Invalid or missing configuration dist file : %s", cfg_def_file.c_str());
             LOG_ERROR("root", "Module config: Verify that the file exists and has \'[worldserver]' written in the top of the file!");
             LOG_ERROR("root", "Module config: Use default settings!");
-            // LOG_INFO("root", );
+            LOG_INFO("root", "\n");
         }
 
         // Load .conf config
         if (!sConfigMgr->LoadMore(cfg_file.c_str()))
         {
-            // LOG_INFO("root", );
+            LOG_INFO("root", "\n");
             LOG_ERROR("root", "Module config: Invalid or missing configuration file : %s", cfg_file.c_str());
             LOG_ERROR("root", "Module config: Verify that the file exists and has \'[worldserver]' written in the top of the file!");
             LOG_ERROR("root", "Module config: Use default settings!");
-            // LOG_INFO("root", );
+            LOG_INFO("root", "\n");
         }
     }
 }
@@ -1383,7 +1383,7 @@ void World::SetInitialWorldSettings()
     sGameEventMgr->Initialize();
 
     ///- Loading strings. Getting no records means core load has to be canceled because no error message can be output.
-    // LOG_INFO("root", );
+    LOG_INFO("root", "\n");
     LOG_INFO("root", "Loading Trinity strings...");
     if (!sObjectMgr->LoadTrinityStrings())
         exit(1);                                            // Error message displayed in function already
@@ -1473,7 +1473,7 @@ void World::SetInitialWorldSettings()
 
     sObjectMgr->SetDBCLocaleIndex(GetDefaultDbcLocale());        // Get once for all the locale index of DBC language (console/broadcasts)
     LOG_INFO("root", ">> Localization strings loaded in %u ms", GetMSTimeDiffToNow(oldMSTime));
-    // LOG_INFO("root", );
+    LOG_INFO("root", "\n");
 
     LOG_INFO("root", "Loading Page Texts...");
     sObjectMgr->LoadPageTexts();
@@ -1957,9 +1957,9 @@ void World::SetInitialWorldSettings()
 #endif
     
     uint32 startupDuration = GetMSTimeDiffToNow(startupBegin);
-    // LOG_INFO("root", );
+    LOG_INFO("root", "\n");
     LOG_ERROR("root", "WORLD: World initialized in %u minutes %u seconds", (startupDuration / 60000), ((startupDuration % 60000) / 1000));
-    // LOG_INFO("root", );
+    LOG_INFO("root", "\n");
 
     // possibly enable db logging; avoid massive startup spam by doing it here.
     // if (sConfigMgr->GetBoolDefault("EnableLogDB", false))
@@ -2014,7 +2014,7 @@ void World::DetectDBCLang()
     m_defaultDbcLocale = LocaleConstant(default_locale);
 
     LOG_INFO("root", "Using %s DBC Locale as default. All available DBC locales: %s", localeNames[GetDefaultDbcLocale()], availableLocalsStr.empty() ? "<none>" : availableLocalsStr.c_str());
-    // LOG_INFO("root", );
+    LOG_INFO("root", "\n");
 }
 
 void World::LoadAutobroadcasts()
@@ -2980,7 +2980,7 @@ void World::LoadWorldStates()
     if (!result)
     {
         LOG_INFO("root", ">> Loaded 0 world states. DB table `worldstates` is empty!");
-        // LOG_INFO("root", );
+        LOG_INFO("root", "\n");
         return;
     }
 
@@ -2995,7 +2995,7 @@ void World::LoadWorldStates()
     while (result->NextRow());
 
     LOG_INFO("root", ">> Loaded %u world states in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    // LOG_INFO("root", );
+    LOG_INFO("root", "\n");
 }
 
 // Setting a worldstate will save it to DB
@@ -3103,7 +3103,7 @@ void World::LoadGlobalPlayerDataStore()
     while (result->NextRow());
 
     LOG_INFO("root", ">> Loaded %d Players data in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    // LOG_INFO("root", );
+    LOG_INFO("root", "\n");
 }
 
 void World::AddGlobalPlayerData(uint32 guid, uint32 accountId, std::string const& name, uint8 gender, uint8 race, uint8 playerClass, uint8 level, uint16 mailCount, uint32 guildId)

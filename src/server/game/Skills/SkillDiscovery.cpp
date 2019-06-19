@@ -44,7 +44,7 @@ void LoadSkillDiscoveryTable()
     if (!result)
     {
         LOG_ERROR("root", ">> Loaded 0 skill discovery definitions. DB table `skill_discovery_template` is empty.");
-        // LOG_INFO("root", );
+        LOG_INFO("root", "\n");
         return;
     }
 
@@ -142,7 +142,7 @@ void LoadSkillDiscoveryTable()
     }
 
     LOG_INFO("root", ">> Loaded %u skill discovery definitions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    // LOG_INFO("root", );
+    LOG_INFO("root", "\n");
 }
 
 uint32 GetExplicitDiscoverySpell(uint32 spellId, Player* player)

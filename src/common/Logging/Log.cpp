@@ -514,7 +514,7 @@ void Log::_Write(std::string const& filter, LogLevel const level, std::string co
     }
     catch (const std::exception& e)
     {
-        SYS_LOG_ERROR("%s", e.what());
+        SYS_LOG_ERROR("Log::_Write - %s", e.what());
     }
 }
 

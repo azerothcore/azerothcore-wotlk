@@ -94,7 +94,7 @@ void ArenaTeamMgr::LoadArenaTeams()
     if (!result)
     {
         LOG_INFO("root", ">> Loaded 0 arena teams. DB table `arena_team` is empty!");
-        // LOG_INFO("root", );
+        LOG_INFO("root", "\n");
         return;
     }
 
@@ -125,7 +125,7 @@ void ArenaTeamMgr::LoadArenaTeams()
     while (result->NextRow());
 
     LOG_INFO("root", ">> Loaded %u arena teams in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    // LOG_INFO("root", );
+    LOG_INFO("root", "\n");
 }
 
 void ArenaTeamMgr::DistributeArenaPoints()

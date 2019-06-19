@@ -1091,7 +1091,7 @@ void ConditionMgr::LoadConditions(bool isReload)
     while (result->NextRow());
 
     LOG_INFO("root", ">> Loaded %u conditions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    // LOG_INFO("root", );
+    LOG_INFO("root", "\n");
 }
 
 bool ConditionMgr::addToLootTemplate(Condition* cond, LootTemplate* loot)

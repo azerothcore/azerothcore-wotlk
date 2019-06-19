@@ -215,7 +215,7 @@ void GameEventMgr::LoadFromDB()
         {
             mGameEvent.clear();
             LOG_ERROR("root", ">> Loaded 0 game events. DB table `game_event` is empty.");
-            // LOG_INFO("root", );
+            LOG_INFO("root", "\n");
             return;
         }
 
@@ -269,7 +269,7 @@ void GameEventMgr::LoadFromDB()
         while (result->NextRow());
 
         LOG_INFO("root", ">> Loaded %u game events in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-        // LOG_INFO("root", );
+        LOG_INFO("root", "\n");
     }
 
     LOG_INFO("root", "Loading Game Event Saves Data...");
@@ -282,7 +282,7 @@ void GameEventMgr::LoadFromDB()
         if (!result)
         {
             LOG_INFO("root", ">> Loaded 0 game event saves in game events. DB table `game_event_save` is empty.");
-            // LOG_INFO("root", );
+            LOG_INFO("root", "\n");
         }
         else
         {
@@ -315,7 +315,7 @@ void GameEventMgr::LoadFromDB()
             while (result->NextRow());
 
             LOG_INFO("root", ">> Loaded %u game event saves in game events in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-            // LOG_INFO("root", );
+            LOG_INFO("root", "\n");
         }
     }
 
@@ -328,7 +328,7 @@ void GameEventMgr::LoadFromDB()
         if (!result)
         {
             LOG_INFO("root", ">> Loaded 0 game event prerequisites in game events. DB table `game_event_prerequisite` is empty.");
-            // LOG_INFO("root", );
+            LOG_INFO("root", "\n");
         }
         else
         {
@@ -366,7 +366,7 @@ void GameEventMgr::LoadFromDB()
             while (result->NextRow());
 
             LOG_INFO("root", ">> Loaded %u game event prerequisites in game events in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-            // LOG_INFO("root", );
+            LOG_INFO("root", "\n");
         }
     }
 
@@ -381,7 +381,7 @@ void GameEventMgr::LoadFromDB()
         if (!result)
         {
             LOG_INFO("root", ">> Loaded 0 creatures in game events. DB table `game_event_creature` is empty");
-            // LOG_INFO("root", );
+            LOG_INFO("root", "\n");
         }
         else
         {
@@ -409,7 +409,7 @@ void GameEventMgr::LoadFromDB()
             while (result->NextRow());
 
             LOG_INFO("root", ">> Loaded %u creatures in game events in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-            // LOG_INFO("root", );
+            LOG_INFO("root", "\n");
         }
     }
 
@@ -424,7 +424,7 @@ void GameEventMgr::LoadFromDB()
         if (!result)
         {
             LOG_INFO("root", ">> Loaded 0 gameobjects in game events. DB table `game_event_gameobject` is empty.");
-            // LOG_INFO("root", );
+            LOG_INFO("root", "\n");
         }
         else
         {
@@ -452,7 +452,7 @@ void GameEventMgr::LoadFromDB()
             while (result->NextRow());
 
             LOG_INFO("root", ">> Loaded %u gameobjects in game events in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-            // LOG_INFO("root", );
+            LOG_INFO("root", "\n");
         }
     }
 
@@ -467,7 +467,7 @@ void GameEventMgr::LoadFromDB()
         if (!result)
         {
             LOG_INFO("root", ">> Loaded 0 model/equipment changes in game events. DB table `game_event_model_equip` is empty.");
-            // LOG_INFO("root", );
+            LOG_INFO("root", "\n");
         }
         else
         {
@@ -511,7 +511,7 @@ void GameEventMgr::LoadFromDB()
             while (result->NextRow());
 
             LOG_INFO("root", ">> Loaded %u model/equipment changes in game events in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-            // LOG_INFO("root", );
+            LOG_INFO("root", "\n");
         }
     }
 
@@ -525,7 +525,7 @@ void GameEventMgr::LoadFromDB()
         if (!result)
         {
             LOG_INFO("root", ">> Loaded 0 quests additions in game events. DB table `game_event_creature_quest` is empty.");
-            // LOG_INFO("root", );
+            LOG_INFO("root", "\n");
         }
         else
         {
@@ -552,7 +552,7 @@ void GameEventMgr::LoadFromDB()
             while (result->NextRow());
 
             LOG_INFO("root", ">> Loaded %u quests additions in game events in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-            // LOG_INFO("root", );
+            LOG_INFO("root", "\n");
         }
     }
 
@@ -566,7 +566,7 @@ void GameEventMgr::LoadFromDB()
         if (!result)
         {
             LOG_INFO("root", ">> Loaded 0 go quests additions in game events. DB table `game_event_gameobject_quest` is empty.");
-            // LOG_INFO("root", );
+            LOG_INFO("root", "\n");
         }
         else
         {
@@ -593,7 +593,7 @@ void GameEventMgr::LoadFromDB()
             while (result->NextRow());
 
             LOG_INFO("root", ">> Loaded %u quests additions in game events in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-            // LOG_INFO("root", );
+            LOG_INFO("root", "\n");
         }
     }
 
@@ -607,7 +607,7 @@ void GameEventMgr::LoadFromDB()
         if (!result)
         {
             LOG_INFO("root", ">> Loaded 0 quest event conditions in game events. DB table `game_event_quest_condition` is empty.");
-            // LOG_INFO("root", );
+            LOG_INFO("root", "\n");
         }
         else
         {
@@ -636,7 +636,7 @@ void GameEventMgr::LoadFromDB()
             while (result->NextRow());
 
             LOG_INFO("root", ">> Loaded %u quest event conditions in game events in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-            // LOG_INFO("root", );
+            LOG_INFO("root", "\n");
         }
     }
 
@@ -650,7 +650,7 @@ void GameEventMgr::LoadFromDB()
         if (!result)
         {
             LOG_INFO("root", ">> Loaded 0 conditions in game events. DB table `game_event_condition` is empty.");
-            // LOG_INFO("root", );
+            LOG_INFO("root", "\n");
         }
         else
         {
@@ -678,7 +678,7 @@ void GameEventMgr::LoadFromDB()
             while (result->NextRow());
 
             LOG_INFO("root", ">> Loaded %u conditions in game events in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-            // LOG_INFO("root", );
+            LOG_INFO("root", "\n");
         }
     }
 
@@ -692,7 +692,7 @@ void GameEventMgr::LoadFromDB()
         if (!result)
         {
             LOG_INFO("root", ">> Loaded 0 condition saves in game events. DB table `game_event_condition_save` is empty.");
-            // LOG_INFO("root", );
+            LOG_INFO("root", "\n");
         }
         else
         {
@@ -726,7 +726,7 @@ void GameEventMgr::LoadFromDB()
             while (result->NextRow());
 
             LOG_INFO("root", ">> Loaded %u condition saves in game events in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-            // LOG_INFO("root", );
+            LOG_INFO("root", "\n");
         }
     }
 
@@ -740,7 +740,7 @@ void GameEventMgr::LoadFromDB()
         if (!result)
         {
             LOG_INFO("root", ">> Loaded 0 npcflags in game events. DB table `game_event_npcflag` is empty.");
-            // LOG_INFO("root", );
+            LOG_INFO("root", "\n");
         }
         else
         {
@@ -766,7 +766,7 @@ void GameEventMgr::LoadFromDB()
             while (result->NextRow());
 
             LOG_INFO("root", ">> Loaded %u npcflags in game events in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-            // LOG_INFO("root", );
+            LOG_INFO("root", "\n");
         }
     }
 
@@ -780,7 +780,7 @@ void GameEventMgr::LoadFromDB()
         if (!result)
         {
             LOG_INFO("root", ">> Loaded 0 seasonal quests additions in game events. DB table `game_event_seasonal_questrelation` is empty.");
-            // LOG_INFO("root", );
+            LOG_INFO("root", "\n");
         }
         else
         {
@@ -812,7 +812,7 @@ void GameEventMgr::LoadFromDB()
             while (result->NextRow());
 
             LOG_INFO("root", ">> Loaded %u quests additions in game events in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-            // LOG_INFO("root", );
+            LOG_INFO("root", "\n");
         }
     }
 
@@ -826,7 +826,7 @@ void GameEventMgr::LoadFromDB()
         if (!result)
         {
             LOG_INFO("root", ">> Loaded 0 vendor additions in game events. DB table `game_event_npc_vendor` is empty.");
-            // LOG_INFO("root", );
+            LOG_INFO("root", "\n");
         }
         else
         {
@@ -878,7 +878,7 @@ void GameEventMgr::LoadFromDB()
             while (result->NextRow());
 
             LOG_INFO("root", ">> Loaded %u vendor additions in game events in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-            // LOG_INFO("root", );
+            LOG_INFO("root", "\n");
         }
     }
 
@@ -892,7 +892,7 @@ void GameEventMgr::LoadFromDB()
         if (!result)
         {
             LOG_INFO("root", ">> Loaded 0 battleground holidays in game events. DB table `game_event_battleground_holiday` is empty.");
-            // LOG_INFO("root", );
+            LOG_INFO("root", "\n");
         }
         else
         {
@@ -916,7 +916,7 @@ void GameEventMgr::LoadFromDB()
             while (result->NextRow());
 
             LOG_INFO("root", ">> Loaded %u battleground holidays in game events in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-            // LOG_INFO("root", );
+            LOG_INFO("root", "\n");
         }
     }
 
@@ -931,7 +931,7 @@ void GameEventMgr::LoadFromDB()
         if (!result)
         {
             LOG_INFO("root", ">> Loaded 0 pools for game events. DB table `game_event_pool` is empty.");
-            // LOG_INFO("root", );
+            LOG_INFO("root", "\n");
         }
         else
         {
@@ -965,7 +965,7 @@ void GameEventMgr::LoadFromDB()
             while (result->NextRow());
 
             LOG_INFO("root", ">> Loaded %u pools for game events in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-            // LOG_INFO("root", );
+            LOG_INFO("root", "\n");
         }
     }
 }
@@ -1081,7 +1081,7 @@ void GameEventMgr::StartArenaSeason()
 
     StartEvent(eventId, true);
     LOG_INFO("root", "Arena Season %u started...", season);
-    // LOG_INFO("root", );
+    LOG_INFO("root", "\n");
 }
 
 uint32 GameEventMgr::Update()                               // return the next event delay in ms

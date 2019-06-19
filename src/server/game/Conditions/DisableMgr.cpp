@@ -50,7 +50,7 @@ void LoadDisables()
     if (!result)
     {
         LOG_INFO("root", ">> Loaded 0 disables. DB table `disables` is empty!");
-        // LOG_INFO("root", );
+        LOG_INFO("root", "\n");
         return;
     }
 
@@ -236,7 +236,7 @@ void LoadDisables()
     while (result->NextRow());
 
     LOG_INFO("root", ">> Loaded %u disables in %u ms", total_count, GetMSTimeDiffToNow(oldMSTime));
-    // LOG_INFO("root", );
+    LOG_INFO("root", "\n");
 }
 
 void CheckQuestDisables()
@@ -247,7 +247,7 @@ void CheckQuestDisables()
     if (!count)
     {
         LOG_INFO("root", ">> Checked 0 quest disables.");
-        // LOG_INFO("root", );
+        LOG_INFO("root", "\n");
         return;
     }
 
@@ -267,7 +267,7 @@ void CheckQuestDisables()
     }
 
     LOG_INFO("root", ">> Checked %u quest disables in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    // LOG_INFO("root", );
+    LOG_INFO("root", "\n");
 }
 
 bool IsDisabledFor(DisableType type, uint32 entry, Unit const* unit, uint8 flags)

@@ -28,14 +28,14 @@ void BattlefieldMgr::InitBattlefield()
     // respawn, init variables
     if (!pBf->SetupBattlefield())
     {
-        // LOG_INFO("root", );
+        LOG_INFO("root", "\n");
         LOG_INFO("root", "Battlefield : Wintergrasp init failed.");
         delete pBf;
     }
     else
     {
         m_BattlefieldSet.push_back(pBf);
-        // LOG_INFO("root", );
+        LOG_INFO("root", "\n");
         LOG_INFO("root", "Battlefield : Wintergrasp successfully initiated.");
     }
 

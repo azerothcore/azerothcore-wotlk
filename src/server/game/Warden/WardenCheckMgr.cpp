@@ -32,7 +32,7 @@ void WardenCheckMgr::LoadWardenChecks()
     if (!sWorld->getBoolConfig(CONFIG_WARDEN_ENABLED))
     {
         LOG_INFO("root", ">> Warden disabled, loading checks skipped.");
-        // LOG_INFO("root", );
+        LOG_INFO("root", "\n");
         return;
     }
 
@@ -41,7 +41,7 @@ void WardenCheckMgr::LoadWardenChecks()
     if (!result)
     {
         LOG_INFO("root", ">> Loaded 0 Warden checks. DB table `warden_checks` is empty!");
-        // LOG_INFO("root", );
+        LOG_INFO("root", "\n");
         return;
     }
 
@@ -134,7 +134,7 @@ void WardenCheckMgr::LoadWardenChecks()
     while (result->NextRow());
 
     LOG_INFO("root", ">> Loaded %u warden checks.", count);
-    // LOG_INFO("root", );
+    LOG_INFO("root", "\n");
 }
 
 void WardenCheckMgr::LoadWardenOverrides()
@@ -143,7 +143,7 @@ void WardenCheckMgr::LoadWardenOverrides()
     if (!sWorld->getBoolConfig(CONFIG_WARDEN_ENABLED))
     {
         LOG_INFO("root", ">> Warden disabled, loading check overrides skipped.");
-        // LOG_INFO("root", );
+        LOG_INFO("root", "\n");
         return;
     }
 
@@ -153,7 +153,7 @@ void WardenCheckMgr::LoadWardenOverrides()
     if (!result)
     {
         LOG_INFO("root", ">> Loaded 0 Warden action overrides. DB table `warden_action` is empty!");
-        // LOG_INFO("root", );
+        LOG_INFO("root", "\n");
         return;
     }
 
@@ -183,7 +183,7 @@ void WardenCheckMgr::LoadWardenOverrides()
     while (result->NextRow());
 
     LOG_INFO("root", ">> Loaded %u warden action overrides.", count);
-    // LOG_INFO("root", );
+    LOG_INFO("root", "\n");
 }
 
 WardenCheck* WardenCheckMgr::GetWardenDataById(uint16 Id)

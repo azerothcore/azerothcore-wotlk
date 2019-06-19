@@ -815,7 +815,7 @@ void BattlegroundMgr::LoadBattleMastersEntry()
     if (!result)
     {
         LOG_INFO("root", ">> Loaded 0 battlemaster entries. DB table `battlemaster_entry` is empty!");
-        // LOG_INFO("root", );
+        LOG_INFO("root", "\n");
         return;
     }
 
@@ -853,7 +853,7 @@ void BattlegroundMgr::LoadBattleMastersEntry()
     CheckBattleMasters();
 
     LOG_INFO("root", ">> Loaded %u battlemaster entries in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    // LOG_INFO("root", );
+    LOG_INFO("root", "\n");
 }
 
 void BattlegroundMgr::CheckBattleMasters()

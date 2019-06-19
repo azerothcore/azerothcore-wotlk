@@ -80,7 +80,7 @@ void FormationMgr::LoadCreatureFormations()
     if (!result)
     {
         LOG_ERROR("root", ">>  Loaded 0 creatures in formations. DB table `creature_formations` is empty!");
-        // LOG_INFO("root", );
+        LOG_INFO("root", "\n");
         return;
     }
 
@@ -134,7 +134,7 @@ void FormationMgr::LoadCreatureFormations()
     while (result->NextRow());
 
     LOG_INFO("root", ">> Loaded %u creatures in formations in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    // LOG_INFO("root", );
+    LOG_INFO("root", "\n");
 }
 
 void CreatureGroup::AddMember(Creature* member)

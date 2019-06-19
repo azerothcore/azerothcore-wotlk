@@ -33,7 +33,7 @@ void SystemMgr::LoadScriptWaypoints()
     if (!result)
     {
         LOG_INFO("root", ">> Loaded 0 Script Waypoints. DB table `script_waypoint` is empty.");
-        // LOG_INFO("root", );
+        LOG_INFO("root", "\n");
         return;
     }
 
@@ -69,5 +69,5 @@ void SystemMgr::LoadScriptWaypoints()
     while (result->NextRow());
 
     LOG_INFO("root", ">> Loaded %u Script Waypoint nodes in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    // LOG_INFO("root", );
+    LOG_INFO("root", "\n");
 }
