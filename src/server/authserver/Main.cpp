@@ -133,7 +133,6 @@ extern int main(int argc, char** argv)
     LOG_INFO("server.loading", "\n");
     LOG_INFO("server.loading", "Using configuration file %s.", configFile);
     LOG_INFO("server.loading", "%s (Library: %s)", OPENSSL_VERSION_TEXT, SSLeay_version(SSLEAY_VERSION));
-    LOG_INFO("server.loading", "\n");
     
 #if defined (ACE_HAS_EVENT_POLL) || defined (ACE_HAS_DEV_POLL)
     ACE_Reactor::instance(new ACE_Reactor(new ACE_Dev_Poll_Reactor(ACE::max_handles(), 1), 1), true);
@@ -273,11 +272,11 @@ extern int main(int argc, char** argv)
     uint32 loopCounter = 0;
 
     // possibly enable db logging; avoid massive startup spam by doing it here.
-    // if (sConfigMgr->GetBoolDefault("EnableLogDB", false))
-    // {
-    //     LOG_INFO("root", "Enabling database logging...");
-    //     sLog->SetLogDB(true);
-    // }
+    if (sConfigMgr->GetBoolDefault("EnableLogDB", false))
+    {
+        LOG_INFO("root", "Enabling database logging...");
+        sLog->SetRealmID(0);
+    }
 
     // Wait for termination signal
     while (!stopEvent)
@@ -291,7 +290,7 @@ extern int main(int argc, char** argv)
         if ((++loopCounter) == numLoops)
         {
             loopCounter = 0;
-            LOG_DEBUG("root", "Ping MySQL to keep connection alive");
+            LOG_WARN("root", "Ping MySQL to keep connection alive");
             LoginDatabase.KeepAlive();
         }
     }

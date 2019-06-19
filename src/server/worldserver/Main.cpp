@@ -11,11 +11,9 @@
 #include <openssl/opensslv.h>
 #include <openssl/crypto.h>
 #include <ace/Version.h>
-
 #include "Common.h"
-#include "Database/DatabaseEnv.h"
-#include "Configuration/Config.h"
-
+#include "DatabaseEnv.h"
+#include "Config.h"
 #include "Log.h"
 #include "Master.h"
 

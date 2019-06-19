@@ -19,6 +19,7 @@
 #include "Log.h"
 #include "Config.h"
 #include "Util.h"
+#include "DatabaseEnv.h"
 #include "Poco/FormattingChannel.h"
 #include "Poco/PatternFormatter.h"
 #include "Poco/SplitterChannel.h"
@@ -465,6 +466,12 @@ void Log::CreateChannelsFromConfig(std::string const& LogChannelName)
     }
 }
 
+void Log::SetRealmID(uint32 RealmID)
+{
+    m_enableLogDB = true;
+    m_realmID = RealmID;
+}
+
 void Log::_Write(std::string const& filter, LogLevel const level, std::string const& message)
 {
     std::string _filter = filter;
@@ -614,12 +621,24 @@ void Log::_writeCommand(std::string const message, std::string const accountid)
     }
 }
 
+void Log::_writeDB(std::string const& filter, LogLevel const level, std::string const& message)
+{
+    std::string new_message(message);
+    LoginDatabase.EscapeString(new_message);
+
+    LoginDatabase.PExecute("INSERT INTO logs (Time, Filter, RealmID, LogLevel, Message) VALUES (" UI64FMTD ", '%s', %u, %u, '%s')",
+        uint64(time(nullptr)), filter.c_str(), m_realmID, (uint8)level, new_message.c_str());
+}
+
 void Log::outMessage(std::string const& filter, LogLevel const level, std::string&& message)
 {
     if (!ShouldLog(filter, level))
         return;
 
     _Write(filter, level, message);
+
+    if (m_enableLogDB && !message.empty())
+        _writeDB(filter, level, message);
 }
 
 void Log::outCommand(std::string&& AccountID, std::string&& message)

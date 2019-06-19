@@ -485,10 +485,15 @@ bool Master::_StartDB()
         LOG_ERROR("root", "Realm ID must range from 1 to 255");
         return false;
     }
+
     LOG_INFO("root", "Realm running as realm ID %d", realmID);
 
     ///- Initialize the DB logging system
-    // sLog->SetRealmID(realmID);
+    if (sConfigMgr->GetBoolDefault("EnableLogDB", false))
+    {
+        LOG_INFO("root", "Enabling database logging...");
+        sLog->SetRealmID(realmID);
+    }
 
     ///- Clean the database before starting
     ClearOnlineAccounts();

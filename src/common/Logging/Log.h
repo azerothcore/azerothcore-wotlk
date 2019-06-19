@@ -37,6 +37,7 @@ public:
     void Initialize();
     void LoadFromConfig();
     void InitSystemLogger();
+    void SetRealmID(uint32 RealmID);
 
     bool ShouldLog(std::string const& type, LogLevel level) const;
     std::string const& GetLogsDir() const { return m_logsDir; }
@@ -73,6 +74,7 @@ private:
 
     void _Write(std::string const& filter, LogLevel const level, std::string const& message);
     void _writeCommand(std::string const message, std::string const accountid);
+    void _writeDB(std::string const& filter, LogLevel const level, std::string const& message);
 
     void outMessage(std::string const& filter, LogLevel const level, std::string&& message);
     void outCommand(std::string&& AccountID, std::string&& message);
@@ -93,7 +95,7 @@ private:
     ChannelMapFiles _ChannelMapFiles;
     ChannelMapConsole _ChannelMapConsole;
 
-    std::string m_logsDir;
+    std::string m_logsDir;    
 
     // Const loggers name
     std::string const LOGGER_ROOT = "root";
@@ -108,6 +110,10 @@ private:
 
     // Console channel
     std::string CONSOLE_CHANNEL = "";
+
+    // DB logging
+    bool m_enableLogDB = false;
+    uint32 m_realmID = 0;
 };
 
 #define sLog Log::instance()
