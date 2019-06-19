@@ -26,12 +26,11 @@
 #include "Poco/FileChannel.h"
 #include "Poco/Logger.h"
 #include "Poco/AutoPtr.h"
-#include "Poco/Path.h"
 #include <sstream>
-#include <experimental/filesystem>
 
-#if PLATFORM == PLATFORM_WINDOWS
+#ifdef POCO_OS_FAMILY_WINDOWS
 #include "Poco/WindowsConsoleChannel.h"
+#include <filesystem>
 #else
 #include "Poco/ConsoleChannel.h"
 #endif
@@ -137,9 +136,11 @@ void Log::InitLogsDir()
         if ((m_logsDir.at(m_logsDir.length() - 1) != '/') && (m_logsDir.at(m_logsDir.length() - 1) != '\\'))
             m_logsDir.push_back('/');
 
+#ifdef POCO_OS_FAMILY_WINDOWS
     std::experimental::filesystem::path LogsPath(m_logsDir);
     if (!std::experimental::filesystem::is_directory(LogsPath))
         m_logsDir = "";
+#endif
 }
 
 void Log::ReadLoggersFromConfig()
