@@ -453,6 +453,8 @@ void World::LoadConfigSettings(bool reload)
             LOG_ERROR("root", "World settings reload fail: can't read settings.");
             return;
         }
+
+        sLog->LoadFromConfig();
     }
 
     LoadModuleConfigSettings();

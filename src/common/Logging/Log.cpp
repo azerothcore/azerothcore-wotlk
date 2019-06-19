@@ -49,12 +49,82 @@ void Log::Initialize()
 
 void Log::LoadFromConfig()
 {
+    // Clear all loggers
     Logger::shutdown();
 
+    InitSystemLogger();
     ClearnAllChannels();
     InitLogsDir();
     ReadChannelsFromConfig();
     ReadLoggersFromConfig();
+}
+
+void Log::InitSystemLogger()
+{
+    // Start console channel
+    AutoPtr<PatternFormatter> _ConsolePattern(new PatternFormatter);
+
+    try
+    {
+        _ConsolePattern->setProperty("pattern", "%t");
+        _ConsolePattern->setProperty("times", "local");
+    }
+    catch (const std::exception& e)
+    {
+        printf("Log::InitSystemLogger - %s\n", e.what());
+    }
+
+#if PLATFORM == PLATFORM_WINDOWS
+    AutoPtr<WindowsColorConsoleChannel> _ConsoleChannel(new WindowsColorConsoleChannel);
+#else
+    AutoPtr<ColorConsoleChannel> _ConsoleChannel(new ColorConsoleChannel);
+#endif
+
+    // Start file channel
+    AutoPtr<FileChannel> _FileChannel(new FileChannel);
+
+    try
+    {
+        _FileChannel->setProperty("path", "System.log");
+        _FileChannel->setProperty("times", "local");
+    }
+    catch (const std::exception& e)
+    {
+        printf("Log::InitSystemLogger - %s\n", e.what());
+    }
+
+    AutoPtr<PatternFormatter> _FilePattern(new PatternFormatter);
+
+    try
+    {
+        _FilePattern->setProperty("pattern", "%Y-%m-%d %H:%M:%S %t");
+        _FilePattern->setProperty("times", "local");
+    }
+    catch (const std::exception& e)
+    {
+        printf("Log::InitSystemLogger - %s\n", e.what());
+    }
+
+    AutoPtr<SplitterChannel> _split(new SplitterChannel);
+
+    try
+    {
+        _split->addChannel(new FormattingChannel(_ConsolePattern, _ConsoleChannel));
+        _split->addChannel(new FormattingChannel(_FilePattern, _FileChannel));
+    }
+    catch (const std::exception& e)
+    {
+        printf("Log::InitSystemLogger - %s\n", e.what());
+    }
+
+    try
+    {
+        Logger::create(LOGGER_SYSTEM, _split, 6);
+    }
+    catch (const std::exception& e)
+    {
+        printf("Log::InitSystemLogger - %s\n", e.what());
+    }
 }
 
 void Log::InitLogsDir()
@@ -63,24 +133,34 @@ void Log::InitLogsDir()
 
     if (!m_logsDir.empty() && ((m_logsDir.at(m_logsDir.length() - 1) != '/') && (m_logsDir.at(m_logsDir.length() - 1) != '\\')))
         m_logsDir.push_back('/');
-
-    Path path(m_logsDir);
-    path.makeDirectory();
-    
-    //m_logsDir = "";
 }
 
 void Log::ReadLoggersFromConfig()
 {
     std::list<std::string> keys = sConfigMgr->GetKeysByString(PREFIX_LOGGER);
-    for (std::string const& loggerName : keys)
+    if (!keys.size())
+    {
+        SYS_LOG_ERROR("Log::ReadLoggersFromConfig - Not found loggers, change config file!");
+        return;
+    }
+
+    for (auto const& loggerName : keys)
         CreateLoggerFromConfig(loggerName);
+
+    if (!Logger::has(LOGGER_ROOT))
+        SYS_LOG_ERROR("Log::ReadLoggersFromConfig - Logger '%s' not found!\nPlease change config file", LOGGER_ROOT.c_str());
 }
 
 void Log::ReadChannelsFromConfig()
 {
     std::list<std::string> keys = sConfigMgr->GetKeysByString(PREFIX_CHANNEL);
-    for (std::string const& channelName : keys)
+    if (!keys.size())
+    {
+        SYS_LOG_ERROR("Log::ReadChannelsFromConfig - Not found channels, change config file!");
+        return;
+    }
+
+    for (auto const& channelName : keys)
         CreateChannelsFromConfig(channelName);
 }
 
@@ -97,57 +177,10 @@ bool Log::ShouldLog(std::string const& type, LogLevel level) const
 {
     std::string _filter = type;
 
-    if (!Logger::has(_filter))
+    if (!Logger::has(type))
         _filter = LOGGER_ROOT;
 
     return Logger::get(_filter).getLevel() >= level;
-}
-
-void Log::_Write(std::string const& filter, LogLevel const level, std::string const& message)
-{
-    std::string _filter = filter;
-
-    if (!Logger::has(_filter))
-        _filter = LOGGER_ROOT;
-
-    Logger& logger = Logger::get(_filter);
-
-    try
-    {
-        switch (level)
-        {
-        case LOG_LEVEL_FATAL:
-            logger.fatal(message);
-            break;
-        case LOG_LEVEL_CRITICAL:
-            logger.critical(message);
-            break;
-        case LOG_LEVEL_ERROR:
-            logger.error(message);
-            break;
-        case LOG_LEVEL_WARNING:
-            logger.warning(message);
-            break;
-        case LOG_LEVEL_NOTICE:
-            logger.notice(message);
-            break;
-        case LOG_LEVEL_INFO:
-            logger.information(message);
-            break;
-        case LOG_LEVEL_DEBUG:
-            logger.debug(message);
-            break;
-        case LOG_LEVEL_TRACE:
-            logger.trace(message);
-            break;
-        default:
-            break;
-        }
-    }
-    catch (const std::exception& e)
-    {
-        outError("%s", e.what());
-    }
 }
 
 std::string Log::GetDynamicFileName(std::string ChannelName, std::string Arg)
@@ -171,8 +204,8 @@ FormattingChannel* Log::GetFileChannel(std::string ChannelName)
 
 FormattingChannel* Log::GetConsoleChannel()
 {
-    if (_ChannelMapConsole.count(_consoleChannel))
-        return _ChannelMapConsole[_consoleChannel];
+    if (_ChannelMapConsole.count(CONSOLE_CHANNEL))
+        return _ChannelMapConsole[CONSOLE_CHANNEL];
 
     return nullptr;
 }
@@ -228,7 +261,7 @@ void Log::CreateLogger(std::string Name, LogLevel level, std::string FileChannel
     }
     catch (const std::exception& e)
     {
-        outError("%s", e.what());
+        SYS_LOG_ERROR("Log::CreateLogger - %s", e.what());
     }
 }
 
@@ -242,7 +275,7 @@ void Log::CreateLoggerFromConfig(std::string const& ConfigLoggerName)
 
     if (options.empty())
     {
-        outError("Log::CreateLoggerFromConfig: Missing config option Logger.%s\n", LoggerName.c_str());
+        SYS_LOG_ERROR("Log::CreateLoggerFromConfig: Missing config option Logger.%s\n", LoggerName.c_str());
         return;
     }
 
@@ -250,20 +283,18 @@ void Log::CreateLoggerFromConfig(std::string const& ConfigLoggerName)
 
     if (!tokens.size() || tokens.size() > LOGGER_OPTIONS_CHANNEL_NAME + 1)
     {
-        outError("Bad config for Logger (%s)", LoggerName.c_str());
+        SYS_LOG_ERROR("Bad config options for Logger (%s)", LoggerName.c_str());
         return;
     }
 
     LogLevel level = LogLevel(atoi(GetPositionOptions(options, LOGGER_OPTIONS_LOG_LEVEL).c_str()));
     if (level >= LOG_LEVEL_MAX)
     {
-        outError("Log::CreateLoggerFromConfig: Wrong Log Level for logger %s", LoggerName.c_str());
+        SYS_LOG_ERROR("Log::CreateLoggerFromConfig: Wrong Log Level for logger %s", LoggerName.c_str());
         return;
     }
 
-    std::string FileChannelName = GetPositionOptions(options, LOGGER_OPTIONS_CHANNEL_NAME);
-
-    CreateLogger(LoggerName, level, FileChannelName);
+    CreateLogger(LoggerName, level, GetPositionOptions(options, LOGGER_OPTIONS_CHANNEL_NAME));
 }
 
 void Log::CreateChannelsFromConfig(std::string const& LogChannelName)
@@ -276,7 +307,7 @@ void Log::CreateChannelsFromConfig(std::string const& LogChannelName)
     
     if (options.empty())
     {
-        outError("Log::CreateLoggerFromConfig: Missing config option LogChannel.%s", ChannelName.c_str());
+        SYS_LOG_ERROR("Log::CreateLoggerFromConfig: Missing config option LogChannel.%s", ChannelName.c_str());
         return;
     }
 
@@ -285,35 +316,35 @@ void Log::CreateChannelsFromConfig(std::string const& LogChannelName)
     if (tokens.size() < CHANNEL_OPTIONS_PATTERN + 1)
     {
         //fprintf(stderr, "Log::CreateLoggerFromConfig: Wrong config option Logger.%s=%s\n", LoggerName.c_str(), options.c_str());
-        outError("Log::CreateLoggerFromConfig: Wrong config option (< CHANNEL_OPTIONS_PATTERN) LogChannel.%s=%s\n", ChannelName.c_str(), options.c_str());
+        SYS_LOG_ERROR("Log::CreateLoggerFromConfig: Wrong config option (< CHANNEL_OPTIONS_PATTERN) LogChannel.%s=%s\n", ChannelName.c_str(), options.c_str());
         return;
     }
 
     if (tokens.size() > CHANNEL_OPTIONS_OPTION_4 + 1)
     {
         //fprintf(stderr, "Log::CreateLoggerFromConfig: Wrong config option Logger.%s=%s\n", LoggerName.c_str(), options.c_str());
-        outError("Log::CreateLoggerFromConfig: Wrong config option (> CHANNEL_OPTIONS_OPTION_4) LogChannel.%s=%s\n", ChannelName.c_str(), options.c_str());
+        SYS_LOG_ERROR("Log::CreateLoggerFromConfig: Wrong config option (> CHANNEL_OPTIONS_OPTION_4) LogChannel.%s=%s\n", ChannelName.c_str(), options.c_str());
         return;
     }
 
     uint8 ChannelType = atoi(GetPositionOptions(options, CHANNEL_OPTIONS_TYPE).c_str());
     if (ChannelType > CHANNEL_OPTIONS_TYPE_FILE)
     {
-        outError("Log::CreateLoggerFromConfig: Wrong channel type for LogChannel.%s\n", ChannelName.c_str());
+        SYS_LOG_ERROR("Log::CreateLoggerFromConfig: Wrong channel type for LogChannel.%s\n", ChannelName.c_str());
         return;
     }
 
     std::string Times = GetPositionOptions(options, CHANNEL_OPTIONS_TIMES);
     if (Times.empty())
     {
-        outError("Log::CreateLoggerFromConfig: Empty times for LogChannel.%s", ChannelName.c_str());
+        SYS_LOG_ERROR("Log::CreateLoggerFromConfig: Empty times for LogChannel.%s", ChannelName.c_str());
         return;
     }
     
     std::string Pattern = GetPositionOptions(options, CHANNEL_OPTIONS_PATTERN);
     if (Pattern.empty())
     {
-        outError("Log::CreateLoggerFromConfig: Empty pattern for LogChannel.%s", ChannelName.c_str());
+        SYS_LOG_ERROR("Log::CreateLoggerFromConfig: Empty pattern for LogChannel.%s", ChannelName.c_str());
         return;
     }
 
@@ -327,7 +358,7 @@ void Log::CreateChannelsFromConfig(std::string const& LogChannelName)
     }
     catch (const std::exception& e)
     {
-        outError("%s\n", e.what());
+        SYS_LOG_ERROR("%s\n", e.what());
     }
 
     if (ChannelType == CHANNEL_OPTIONS_TYPE_CONSOLE)
@@ -338,7 +369,6 @@ void Log::CreateChannelsFromConfig(std::string const& LogChannelName)
 #else
         AutoPtr<ColorConsoleChannel> _channel(new ColorConsoleChannel);
 #endif
-
         // Init Colors
         if (!GetPositionOptions(options, CHANNEL_OPTIONS_OPTION_1).empty())
         {
@@ -367,18 +397,20 @@ void Log::CreateChannelsFromConfig(std::string const& LogChannelName)
         else
             _channel->setProperty("enableColors", "false");
 
-        if (_consoleChannel.empty())
+        if (!CONSOLE_CHANNEL.empty())
         {
-            _consoleChannel = ChannelName;
-
-            AddConsoleChannel(ChannelName, new FormattingChannel(_pattern, _channel));
+            SYS_LOG_ERROR("CONSOLE_CHANNEL no empty!");
+            return;
         }
+
+        CONSOLE_CHANNEL = ChannelName;
+        AddConsoleChannel(ChannelName, new FormattingChannel(_pattern, _channel));
     }
     else if (ChannelType == CHANNEL_OPTIONS_TYPE_FILE)
     {
         if (tokens.size() < CHANNEL_OPTIONS_OPTION_1 + 1)
         {
-            outError("Bad file name for LogChannel.%s", ChannelName.c_str());
+            SYS_LOG_ERROR("Bad file name for LogChannel.%s", ChannelName.c_str());
             return;
         }
 
@@ -408,11 +440,64 @@ void Log::CreateChannelsFromConfig(std::string const& LogChannelName)
             }
             catch (const std::exception& e)
             {
-                outError("%s\n", e.what());
+                SYS_LOG_ERROR("%s\n", e.what());
             }
 
             AddFileChannel(ChannelName, new FormattingChannel(_pattern, _channel));
         }
+    }
+}
+
+void Log::_Write(std::string const& filter, LogLevel const level, std::string const& message)
+{
+    std::string _filter = filter;
+
+    if (!Logger::has(_filter))
+        _filter = LOGGER_ROOT;
+
+    if (!Logger::has(_filter))
+    {
+        SYS_LOG_ERROR("Log::_Write - Logger '%s' not found!", LOGGER_ROOT.c_str());
+        return;
+    }
+
+    Logger& logger = Logger::get(_filter);
+
+    try
+    {
+        switch (level)
+        {
+        case LOG_LEVEL_FATAL:
+            logger.fatal(message);
+            break;
+        case LOG_LEVEL_CRITICAL:
+            logger.critical(message);
+            break;
+        case LOG_LEVEL_ERROR:
+            logger.error(message);
+            break;
+        case LOG_LEVEL_WARNING:
+            logger.warning(message);
+            break;
+        case LOG_LEVEL_NOTICE:
+            logger.notice(message);
+            break;
+        case LOG_LEVEL_INFO:
+            logger.information(message);
+            break;
+        case LOG_LEVEL_DEBUG:
+            logger.debug(message);
+            break;
+        case LOG_LEVEL_TRACE:
+            logger.trace(message);
+            break;
+        default:
+            break;
+        }
+    }
+    catch (const std::exception& e)
+    {
+        SYS_LOG_ERROR("%s", e.what());
     }
 }
 
@@ -451,7 +536,7 @@ void Log::_writeCommand(std::string const message, std::string const accountid)
         }
         catch (const std::exception& e)
         {
-            outError("%s\n", e.what());
+            SYS_LOG_ERROR("%s\n", e.what());
         }
 
         // Configuration file channel
@@ -473,7 +558,7 @@ void Log::_writeCommand(std::string const message, std::string const accountid)
         }
         catch (const std::exception& e)
         {
-            outError("%s\n", e.what());
+            SYS_LOG_ERROR("%s\n", e.what());
         }
 
         AutoPtr<SplitterChannel> SplitShannel(new SplitterChannel);
@@ -485,7 +570,7 @@ void Log::_writeCommand(std::string const message, std::string const accountid)
         }
         catch (const std::exception& e)
         {
-            outError("%s\n", e.what());
+            SYS_LOG_ERROR("%s\n", e.what());
         }
 
         try
@@ -496,7 +581,7 @@ void Log::_writeCommand(std::string const message, std::string const accountid)
         }
         catch (const std::exception& e)
         {
-            outError("%s", e.what());
+            SYS_LOG_ERROR("%s", e.what());
         }
     }
     else
@@ -507,7 +592,7 @@ void Log::_writeCommand(std::string const message, std::string const accountid)
         }
         catch (const std::exception& e)
         {
-            outError("%s", e.what());
+            SYS_LOG_ERROR("%s", e.what());
         }
     }
 }
@@ -528,11 +613,28 @@ void Log::outCommand(std::string&& message, std::string&& AccountID)
     _writeCommand(message, AccountID);
 }
 
-void Log::outError(std::string&& message)
+void Log::outSys(LogLevel level, std::string&& message)
 {
-    //sLog->SetColor(false, ColorTypes::RED)
-    printf("%s\n", message.c_str());
-    //sLog->ResetColor(false);
+    try
+    {
+        Logger& logger = Logger::get(LOGGER_SYSTEM);
+
+        switch (level)
+        {
+        case LOG_LEVEL_ERROR:
+            logger.error(message);
+            break;
+        case LOG_LEVEL_INFO:
+            logger.information(message);
+            break;
+        default:
+            break;
+        }
+    }
+    catch (const std::exception& e)
+    {
+        printf("Log::outSys - %s", e.what());
+    }
 }
 
 void Log::outCharDump(std::string const& str, uint32 accountId, uint64 guid, std::string const& name)

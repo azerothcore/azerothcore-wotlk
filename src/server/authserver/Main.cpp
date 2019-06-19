@@ -73,6 +73,9 @@ void usage(const char* prog)
 /// Launch the auth server
 extern int main(int argc, char** argv)
 {
+    // Init system logging
+    sLog->InitSystemLogger();
+
     // Command line parsing to get the configuration file name
     char const* configFile = _TRINITY_REALM_CONFIG;
     int count = 1;
@@ -82,7 +85,7 @@ extern int main(int argc, char** argv)
         {
             if (++count >= argc)
             {
-                printf("Runtime-Error: -c option requires an input argument\n");
+                SYS_LOG_ERROR("Runtime-Error: -c option requires an input argument\n");
                 usage(argv[0]);
                 return 1;
             }
@@ -97,51 +100,37 @@ extern int main(int argc, char** argv)
 
     if (!sConfigMgr->LoadInitial(cfg_def_file.c_str())) 
     {
-        printf("ERROR: Invalid or missing default configuration file : %s\n", cfg_def_file.c_str());
+        SYS_LOG_ERROR("Invalid or missing default configuration file : %s\n", cfg_def_file.c_str());
         return 1;
     }
 
     if (!sConfigMgr->LoadMore(configFile))
     {
-        printf("WARNING: Invalid or missing configuration file : %s\n", configFile);
-        printf("Verify that the file exists and has \'[authserver]\' written in the top of the file!\n");
+        SYS_LOG_ERROR("WARNING: Invalid or missing configuration file : %s\n", configFile);
+        SYS_LOG_ERROR("Verify that the file exists and has \'[authserver]\' written in the top of the file!\n");
     }
 
+    // Init all logs
     sLog->Initialize();
 
-    LOG_INFO("root", "%s (authserver)", GitRevision::GetFullVersion());
-    LOG_INFO("root", "<Ctrl-C> to stop.\n");
-
-    LOG_INFO("root", "   █████╗ ███████╗███████╗██████╗  ██████╗ ████████╗██╗  ██╗");           
-    LOG_INFO("root", "  ██╔══██╗╚══███╔╝██╔════╝██╔══██╗██╔═══██╗╚══██╔══╝██║  ██║");           
-    LOG_INFO("root", "  ███████║  ███╔╝ █████╗  ██████╔╝██║   ██║   ██║   ███████║");           
-    LOG_INFO("root", "  ██╔══██║ ███╔╝  ██╔══╝  ██╔══██╗██║   ██║   ██║   ██╔══██║");           
-    LOG_INFO("root", "  ██║  ██║███████╗███████╗██║  ██║╚██████╔╝   ██║   ██║  ██║");           
-    LOG_INFO("root", "  ╚═╝  ╚═╝╚══════╝╚══════╝╚═╝  ╚═╝ ╚═════╝    ╚═╝   ╚═╝  ╚═╝");
-    LOG_INFO("root", "                                ██████╗ ██████╗ ██████╗ ███████╗");
-    LOG_INFO("root", "                                ██╔════╝██╔═══██╗██╔══██╗██╔═══╝");
-    LOG_INFO("root", "                                ██║     ██║   ██║██████╔╝█████╗");  
-    LOG_INFO("root", "                                ██║     ██║   ██║██╔══██╗██╔══╝");  
-    LOG_INFO("root", "                                ╚██████╗╚██████╔╝██║  ██║███████╗");
-    LOG_INFO("root", "                                 ╚═════╝ ╚═════╝ ╚═╝  ╚═╝╚══════╝\n");
-
-    LOG_INFO("root", "  	  AzerothCore 3.3.5a  -  www.azerothcore.org\n");
-
-    LOG_INFO("root", "Using configuration file %s.", configFile);
-
-    LOG_INFO("root", "%s (Library: %s)\n", OPENSSL_VERSION_TEXT, SSLeay_version(SSLEAY_VERSION));
-
-    LOG_FATAL("root", "ТЕСТ\n");
-    LOG_CRIT("root", "ТЕСТ\n");
-    LOG_ERROR("root", "ТЕСТ\n");
-
-    LOG_WARN("root", "ТЕСТ\n");
-    LOG_NOTICE("root", "ТЕСТ\n");
-
-    LOG_INFO("root", "ТЕСТ\n");
-    LOG_DEBUG("root", "ТЕСТ\n");
-    LOG_TRACE("root", "ТЕСТ\n");
-
+    LOG_INFO("server.loading", "%s (authserver)", GitRevision::GetFullVersion());
+    LOG_INFO("server.loading", "<Ctrl-C> to stop.\n");
+    LOG_INFO("server.loading", " █████╗ ███████╗███████╗██████╗  ██████╗ ████████╗██╗  ██╗");           
+    LOG_INFO("server.loading", "██╔══██╗╚══███╔╝██╔════╝██╔══██╗██╔═══██╗╚══██╔══╝██║  ██║");           
+    LOG_INFO("server.loading", "███████║  ███╔╝ █████╗  ██████╔╝██║   ██║   ██║   ███████║");           
+    LOG_INFO("server.loading", "██╔══██║ ███╔╝  ██╔══╝  ██╔══██╗██║   ██║   ██║   ██╔══██║");           
+    LOG_INFO("server.loading", "██║  ██║███████╗███████╗██║  ██║╚██████╔╝   ██║   ██║  ██║");           
+    LOG_INFO("server.loading", "╚═╝  ╚═╝╚══════╝╚══════╝╚═╝  ╚═╝ ╚═════╝    ╚═╝   ╚═╝  ╚═╝");
+    LOG_INFO("server.loading", "                              ██████╗ ██████╗ ██████╗ ███████╗");
+    LOG_INFO("server.loading", "                              ██╔════╝██╔═══██╗██╔══██╗██╔═══╝");
+    LOG_INFO("server.loading", "                              ██║     ██║   ██║██████╔╝█████╗");  
+    LOG_INFO("server.loading", "                              ██║     ██║   ██║██╔══██╗██╔══╝");  
+    LOG_INFO("server.loading", "                              ╚██████╗╚██████╔╝██║  ██║███████╗");
+    LOG_INFO("server.loading", "                               ╚═════╝ ╚═════╝ ╚═╝  ╚═╝╚══════╝\n");
+    LOG_INFO("server.loading", "	  AzerothCore 3.3.5a  -  www.azerothcore.org\n");
+    LOG_INFO("server.loading", "Using configuration file %s.", configFile);
+    LOG_INFO("server.loading", "%s (Library: %s)\n", OPENSSL_VERSION_TEXT, SSLeay_version(SSLEAY_VERSION));
+    
 #if defined (ACE_HAS_EVENT_POLL) || defined (ACE_HAS_DEV_POLL)
     ACE_Reactor::instance(new ACE_Reactor(new ACE_Dev_Poll_Reactor(ACE::max_handles(), 1), 1), true);
 #else

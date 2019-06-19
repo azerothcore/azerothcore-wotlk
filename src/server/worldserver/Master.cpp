@@ -199,7 +199,6 @@ int Master::Run()
     auctionLising_thread.setPriority(ACORE::Priority_High);
 
 #if defined(_WIN32) || defined(__linux__)
-    
 
     ///- Handle affinity for multiple processors and process priority
     uint32 affinity = sConfigMgr->GetIntDefault("UseProcessors", 0);
