@@ -351,7 +351,7 @@ public:
             me->GetMotionMaster()->Clear();
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (bCanEat || bIsEating)
             {
