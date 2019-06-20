@@ -25,8 +25,8 @@ void PetitionMgr::LoadPetitions()
     QueryResult result = CharacterDatabase.Query("SELECT ownerguid, petitionguid, name, type FROM petition");
     if (!result)
     {
-        LOG_INFO("root", ">>  Loaded 0 Petitions!");
-        LOG_INFO("root", "\n");
+        LOG_INFO("server", ">>  Loaded 0 Petitions!");
+        LOG_INFO("server", "");
         return;
     }
 
@@ -38,8 +38,8 @@ void PetitionMgr::LoadPetitions()
         ++count;
     } while (result->NextRow());
 
-    LOG_INFO("root", ">> Loaded %d Petitions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("root", "\n");
+    LOG_INFO("server", ">> Loaded %d Petitions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server", "");
 }
 
 void PetitionMgr::LoadSignatures()
@@ -50,8 +50,8 @@ void PetitionMgr::LoadSignatures()
     QueryResult result = CharacterDatabase.Query("SELECT petitionguid, playerguid, player_account FROM petition_sign");
     if (!result)
     {
-        LOG_INFO("root", ">>  Loaded 0 Petition signs!");
-        LOG_INFO("root", "\n");
+        LOG_INFO("server", ">>  Loaded 0 Petition signs!");
+        LOG_INFO("server", "");
         return;
     }
 
@@ -63,8 +63,8 @@ void PetitionMgr::LoadSignatures()
         ++count;
     } while (result->NextRow());
 
-    LOG_INFO("root", ">> Loaded %d Petition signs in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("root", "\n");
+    LOG_INFO("server", ">> Loaded %d Petition signs in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server", "");
 }
 
 void PetitionMgr::AddPetition(uint32 petitionId, uint32 ownerGuid, std::string const& name, uint8 type)

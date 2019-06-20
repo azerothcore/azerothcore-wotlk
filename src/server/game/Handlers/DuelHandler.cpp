@@ -29,10 +29,10 @@ void WorldSession::HandleDuelAcceptedOpcode(WorldPacket& recvPacket)
     if (player == player->duel->initiator || !plTarget || player == plTarget || player->duel->startTime != 0 || plTarget->duel->startTime != 0)
         return;
 
-    //LOG_DEBUG("root", "WORLD: Received CMSG_DUEL_ACCEPTED");
+    //LOG_DEBUG("server", "WORLD: Received CMSG_DUEL_ACCEPTED");
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "Player 1 is: %u (%s)", player->GetGUIDLow(), player->GetName().c_str());
-    LOG_DEBUG("root", "Player 2 is: %u (%s)", plTarget->GetGUIDLow(), plTarget->GetName().c_str());
+    LOG_DEBUG("server", "Player 1 is: %u (%s)", player->GetGUIDLow(), player->GetName().c_str());
+    LOG_DEBUG("server", "Player 2 is: %u (%s)", plTarget->GetGUIDLow(), plTarget->GetName().c_str());
 #endif
 
     time_t now = time(NULL);
@@ -46,7 +46,7 @@ void WorldSession::HandleDuelAcceptedOpcode(WorldPacket& recvPacket)
 void WorldSession::HandleDuelCancelledOpcode(WorldPacket& recvPacket)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "WORLD: Received CMSG_DUEL_CANCELLED");
+    LOG_DEBUG("server", "WORLD: Received CMSG_DUEL_CANCELLED");
 #endif
     uint64 guid;
     recvPacket >> guid;

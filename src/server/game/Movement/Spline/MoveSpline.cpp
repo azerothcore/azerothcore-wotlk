@@ -135,7 +135,7 @@ void MoveSpline::init_spline(const MoveSplineInitArgs& args)
     // TODO: what to do in such cases? problem is in input data (all points are at same coords)
     if (spline.length() < minimal_duration)
     {
-        //LOG_ERROR("root", "MoveSpline::init_spline: zero length spline, wrong input data?"); // ZOMG! temp comment to avoid console spam from transports
+        //LOG_ERROR("server", "MoveSpline::init_spline: zero length spline, wrong input data?"); // ZOMG! temp comment to avoid console spam from transports
         spline.set_length(spline.last(), spline.isCyclic() ? 1000 : 1);
     }
     point_Idx = spline.first();
@@ -189,7 +189,7 @@ bool MoveSplineInitArgs::Validate(Unit* unit) const
 #define CHECK(exp) \
     if (!(exp))\
     {\
-        LOG_ERROR("root", "MoveSplineInitArgs::Validate: expression '%s' failed for GUID: %u Entry: %u", #exp, unit->GetTypeId() == TYPEID_PLAYER ? unit->GetGUIDLow() : unit->ToCreature()->GetDBTableGUIDLow(), unit->GetEntry());\
+        LOG_ERROR("server", "MoveSplineInitArgs::Validate: expression '%s' failed for GUID: %u Entry: %u", #exp, unit->GetTypeId() == TYPEID_PLAYER ? unit->GetGUIDLow() : unit->ToCreature()->GetDBTableGUIDLow(), unit->GetEntry());\
         return false;\
     }
     CHECK(path.size() > 1);
@@ -216,7 +216,7 @@ bool MoveSplineInitArgs::_checkPathBounds() const
             offset = path[i] - middle;
             if (fabs(offset.x) >= MAX_OFFSET || fabs(offset.y) >= MAX_OFFSET || fabs(offset.z) >= MAX_OFFSET)
             {
-                LOG_ERROR("root", "MoveSplineInitArgs::_checkPathBounds check failed");
+                LOG_ERROR("server", "MoveSplineInitArgs::_checkPathBounds check failed");
                 return false;
             }
         }

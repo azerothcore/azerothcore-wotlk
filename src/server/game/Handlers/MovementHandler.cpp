@@ -31,7 +31,7 @@
 void WorldSession::HandleMoveWorldportAckOpcode(WorldPacket & /*recvData*/)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "WORLD: got MSG_MOVE_WORLDPORT_ACK.");
+    LOG_DEBUG("server", "WORLD: got MSG_MOVE_WORLDPORT_ACK.");
 #endif
     HandleMoveWorldportAckOpcode();
 }
@@ -61,7 +61,7 @@ void WorldSession::HandleMoveWorldportAckOpcode()
     Map* oldMap = GetPlayer()->GetMap();
     if (GetPlayer()->IsInWorld())
     {
-        LOG_ERROR("root", "Player (Name %s) is still in world when teleported from map %u to new map %u", GetPlayer()->GetName().c_str(), oldMap->GetId(), loc.GetMapId());
+        LOG_ERROR("server", "Player (Name %s) is still in world when teleported from map %u to new map %u", GetPlayer()->GetName().c_str(), oldMap->GetId(), loc.GetMapId());
         oldMap->RemovePlayerFromMap(GetPlayer(), false);
     }
 
@@ -80,7 +80,7 @@ void WorldSession::HandleMoveWorldportAckOpcode()
     // while the player is in transit, for example the map may get full
     if (!newMap || !newMap->CanEnter(GetPlayer(), false))
     {
-        LOG_ERROR("root", "Map %d could not be created for player %d, porting player to homebind", loc.GetMapId(), GetPlayer()->GetGUIDLow());
+        LOG_ERROR("server", "Map %d could not be created for player %d, porting player to homebind", loc.GetMapId(), GetPlayer()->GetGUIDLow());
         GetPlayer()->TeleportTo(GetPlayer()->m_homebindMapId, GetPlayer()->m_homebindX, GetPlayer()->m_homebindY, GetPlayer()->m_homebindZ, GetPlayer()->GetOrientation());
         return;
     }
@@ -93,7 +93,7 @@ void WorldSession::HandleMoveWorldportAckOpcode()
     GetPlayer()->SendInitialPacketsBeforeAddToMap();
     if (!GetPlayer()->GetMap()->AddPlayerToMap(GetPlayer()))
     {
-        LOG_ERROR("root", "WORLD: failed to teleport player %s (%d) to map %d because of unknown reason!", GetPlayer()->GetName().c_str(), GetPlayer()->GetGUIDLow(), loc.GetMapId());
+        LOG_ERROR("server", "WORLD: failed to teleport player %s (%d) to map %d because of unknown reason!", GetPlayer()->GetName().c_str(), GetPlayer()->GetGUIDLow(), loc.GetMapId());
         GetPlayer()->ResetMap();
         GetPlayer()->SetMap(oldMap);
         GetPlayer()->TeleportTo(GetPlayer()->m_homebindMapId, GetPlayer()->m_homebindX, GetPlayer()->m_homebindY, GetPlayer()->m_homebindZ, GetPlayer()->GetOrientation());
@@ -226,7 +226,7 @@ void WorldSession::HandleMoveWorldportAckOpcode()
 void WorldSession::HandleMoveTeleportAck(WorldPacket& recvData)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "MSG_MOVE_TELEPORT_ACK");
+    LOG_DEBUG("server", "MSG_MOVE_TELEPORT_ACK");
 #endif
     uint64 guid;
 
@@ -235,10 +235,10 @@ void WorldSession::HandleMoveTeleportAck(WorldPacket& recvData)
     uint32 flags, time;
     recvData >> flags >> time; // unused
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "Guid " UI64FMTD, guid);
+    LOG_DEBUG("server", "Guid " UI64FMTD, guid);
 #endif
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "Flags %u, time %u", flags, time/IN_MILLISECONDS);
+    LOG_DEBUG("server", "Flags %u, time %u", flags, time/IN_MILLISECONDS);
 #endif
 
     Player* plMover = _player->m_mover->ToPlayer();
@@ -505,7 +505,7 @@ void WorldSession::HandleForceSpeedChangeAck(WorldPacket &recvData)
 {
     uint32 opcode = recvData.GetOpcode();
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "WORLD: Recvd %s (%u, 0x%X) opcode", LookupOpcodeName(opcode), opcode, opcode);
+    LOG_DEBUG("server", "WORLD: Recvd %s (%u, 0x%X) opcode", LookupOpcodeName(opcode), opcode, opcode);
 #endif
 
     /* extract packet */
@@ -552,7 +552,7 @@ void WorldSession::HandleForceSpeedChangeAck(WorldPacket &recvData)
         case CMSG_FORCE_FLIGHT_BACK_SPEED_CHANGE_ACK:   move_type = MOVE_FLIGHT_BACK;   force_move_type = MOVE_FLIGHT_BACK; break;
         case CMSG_FORCE_PITCH_RATE_CHANGE_ACK:          move_type = MOVE_PITCH_RATE;    force_move_type = MOVE_PITCH_RATE;  break;
         default:
-            LOG_ERROR("root", "WorldSession::HandleForceSpeedChangeAck: Unknown move type opcode: %u", opcode);
+            LOG_ERROR("server", "WorldSession::HandleForceSpeedChangeAck: Unknown move type opcode: %u", opcode);
             return;
     }
 
@@ -569,13 +569,13 @@ void WorldSession::HandleForceSpeedChangeAck(WorldPacket &recvData)
     {
         if (_player->GetSpeed(move_type) > newspeed)         // must be greater - just correct
         {
-            LOG_ERROR("root", "%sSpeedChange player %s is NOT correct (must be %f instead %f), force set to correct value",
+            LOG_ERROR("server", "%sSpeedChange player %s is NOT correct (must be %f instead %f), force set to correct value",
                 move_type_name[move_type], _player->GetName().c_str(), _player->GetSpeed(move_type), newspeed);
             _player->SetSpeed(move_type, _player->GetSpeedRate(move_type), true);
         }
         else                                                // must be lesser - cheating
         {
-            LOG_DEBUG("root", "Player %s from account id %u kicked for incorrect speed (must be %f instead %f)",
+            LOG_DEBUG("server", "Player %s from account id %u kicked for incorrect speed (must be %f instead %f)",
                 _player->GetName().c_str(), GetAccountId(), _player->GetSpeed(move_type), newspeed);
             KickPlayer("Incorrect speed");
         }
@@ -585,7 +585,7 @@ void WorldSession::HandleForceSpeedChangeAck(WorldPacket &recvData)
 void WorldSession::HandleSetActiveMoverOpcode(WorldPacket &recvData)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "WORLD: Recvd CMSG_SET_ACTIVE_MOVER");
+    LOG_DEBUG("server", "WORLD: Recvd CMSG_SET_ACTIVE_MOVER");
 #endif
 
     uint64 guid;
@@ -594,14 +594,14 @@ void WorldSession::HandleSetActiveMoverOpcode(WorldPacket &recvData)
     if (GetPlayer()->IsInWorld() && _player->m_mover && _player->m_mover->IsInWorld())
     {
         if (_player->m_mover->GetGUID() != guid)
-            LOG_ERROR("root", "HandleSetActiveMoverOpcode: incorrect mover guid: mover is " UI64FMTD " (%s - Entry: %u) and should be " UI64FMTD, guid, GetLogNameForGuid(guid), GUID_ENPART(guid), _player->m_mover->GetGUID());
+            LOG_ERROR("server", "HandleSetActiveMoverOpcode: incorrect mover guid: mover is " UI64FMTD " (%s - Entry: %u) and should be " UI64FMTD, guid, GetLogNameForGuid(guid), GUID_ENPART(guid), _player->m_mover->GetGUID());
     }
 }
 
 void WorldSession::HandleMoveNotActiveMover(WorldPacket &recvData)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "WORLD: Recvd CMSG_MOVE_NOT_ACTIVE_MOVER");
+    LOG_DEBUG("server", "WORLD: Recvd CMSG_MOVE_NOT_ACTIVE_MOVER");
 #endif
 
     uint64 old_mover_guid;
@@ -632,7 +632,7 @@ void WorldSession::HandleMountSpecialAnimOpcode(WorldPacket& /*recvData*/)
 void WorldSession::HandleMoveKnockBackAck(WorldPacket & recvData)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "CMSG_MOVE_KNOCK_BACK_ACK");
+    LOG_DEBUG("server", "CMSG_MOVE_KNOCK_BACK_ACK");
 #endif
 
     uint64 guid;
@@ -669,7 +669,7 @@ void WorldSession::HandleMoveKnockBackAck(WorldPacket & recvData)
 void WorldSession::HandleMoveHoverAck(WorldPacket& recvData)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "CMSG_MOVE_HOVER_ACK");
+    LOG_DEBUG("server", "CMSG_MOVE_HOVER_ACK");
 #endif
 
     uint64 guid;                                            // guid - unused
@@ -687,7 +687,7 @@ void WorldSession::HandleMoveHoverAck(WorldPacket& recvData)
 void WorldSession::HandleMoveWaterWalkAck(WorldPacket& recvData)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "CMSG_MOVE_WATER_WALK_ACK");
+    LOG_DEBUG("server", "CMSG_MOVE_WATER_WALK_ACK");
 #endif
 
     uint64 guid;                                            // guid - unused
@@ -729,7 +729,7 @@ void WorldSession::HandleSummonResponseOpcode(WorldPacket& recvData)
 void WorldSession::HandleMoveTimeSkippedOpcode(WorldPacket& recvData)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "WORLD: Recvd CMSG_MOVE_TIME_SKIPPED");
+    LOG_DEBUG("server", "WORLD: Recvd CMSG_MOVE_TIME_SKIPPED");
 #endif
     
     uint64 guid;
@@ -741,14 +741,14 @@ void WorldSession::HandleMoveTimeSkippedOpcode(WorldPacket& recvData)
 
     if (!mover)
     {
-        LOG_ERROR("root", "WorldSession::HandleMoveTimeSkippedOpcode wrong mover state from the unit moved by the player [" UI64FMTD "]", GetPlayer()->GetGUID());
+        LOG_ERROR("server", "WorldSession::HandleMoveTimeSkippedOpcode wrong mover state from the unit moved by the player [" UI64FMTD "]", GetPlayer()->GetGUID());
         return;
     }
 
     // prevent tampered movement data
     if (guid != mover->GetGUID())
     {
-        LOG_ERROR("root", "WorldSession::HandleMoveTimeSkippedOpcode wrong guid from the unit moved by the player [" UI64FMTD "]", GetPlayer()->GetGUID());
+        LOG_ERROR("server", "WorldSession::HandleMoveTimeSkippedOpcode wrong guid from the unit moved by the player [" UI64FMTD "]", GetPlayer()->GetGUID());
         return;
     }
 

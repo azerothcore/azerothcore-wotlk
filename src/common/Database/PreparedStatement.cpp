@@ -70,7 +70,7 @@ void PreparedStatement::BindParameters()
     }
     #ifdef _DEBUG
     if (i < m_stmt->m_paramCount)
-        LOG_INFO("root", "[WARNING]: BindParameters() for statement %u did not bind all allocated parameters", m_index);
+        LOG_WARN("sql.sql", "[WARNING]: BindParameters() for statement %u did not bind all allocated parameters", m_index);
     #endif
 }
 
@@ -233,7 +233,7 @@ void MySQLPreparedStatement::ClearParameters()
 
 static bool ParamenterIndexAssertFail(uint32 stmtIndex, uint8 index, uint32 paramCount)
 {
-    LOG_ERROR("root", "Attempted to bind parameter %u%s on a PreparedStatement %u (statement has only %u parameters)", uint32(index) + 1, (index == 1 ? "st" : (index == 2 ? "nd" : (index == 3 ? "rd" : "nd"))), stmtIndex, paramCount);
+    LOG_ERROR("sql.sql", "Attempted to bind parameter %u%s on a PreparedStatement %u (statement has only %u parameters)", uint32(index) + 1, (index == 1 ? "st" : (index == 2 ? "nd" : (index == 3 ? "rd" : "nd"))), stmtIndex, paramCount);
     return false;
 }
 
@@ -243,7 +243,7 @@ bool MySQLPreparedStatement::CheckValidIndex(uint8 index)
     ASSERT(index < m_paramCount || ParamenterIndexAssertFail(m_stmt->m_index, index, m_paramCount));
 
     if (m_paramsSet[index])
-        LOG_INFO("root", "[WARNING] Prepared Statement (id: %u) trying to bind value on already bound index (%u).", m_stmt->m_index, index);
+        LOG_WARN("sql.sql", "[WARNING] Prepared Statement (id: %u) trying to bind value on already bound index (%u).", m_stmt->m_index, index);
     return true;
 }
 

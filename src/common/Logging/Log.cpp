@@ -156,7 +156,7 @@ void Log::ReadLoggersFromConfig()
         CreateLoggerFromConfig(loggerName);
 
     if (!Logger::has(LOGGER_ROOT))
-        SYS_LOG_ERROR("Log::ReadLoggersFromConfig - Logger '%s' not found!\nPlease change config file", LOGGER_ROOT.c_str());
+        SYS_LOG_ERROR("Log::ReadLoggersFromConfig - Logger '%s' not found!\nPlease change or add 'Logger.%s' option in config file!\n", LOGGER_ROOT.c_str(), LOGGER_ROOT.c_str());
 }
 
 void Log::ReadChannelsFromConfig()
@@ -181,14 +181,31 @@ std::string Log::GetPositionOptions(std::string Options, uint8 Position)
     return tokens[Position];
 }
 
+std::string Log::GetLoggerByType(std::string const& type) const
+{
+    if (Logger::has(type))
+        return type;
+
+    if (type == LOGGER_UNKNOWN)
+        return LOGGER_UNKNOWN;
+
+    std::string parentLogger = LOGGER_UNKNOWN;
+    size_t found = type.find_last_of('.');
+
+    if (found != std::string::npos)
+        parentLogger = type.substr(0, found);
+
+    return GetLoggerByType(parentLogger);
+}
+
 bool Log::ShouldLog(std::string const& type, LogLevel level) const
 {
     std::string _filter = type;
 
-    if (!Logger::has(type))
-        _filter = LOGGER_ROOT;
-
-    return Logger::get(_filter).getLevel() >= level;
+    if (GetLoggerByType(type) == LOGGER_UNKNOWN)
+        return false;
+    
+    return Logger::get(type).getLevel() >= level;
 }
 
 std::string Log::GetDynamicFileName(std::string ChannelName, std::string Arg)
@@ -281,6 +298,16 @@ void Log::CreateLoggerFromConfig(std::string const& ConfigLoggerName)
     std::string options = sConfigMgr->GetStringDefault(ConfigLoggerName, "");
     std::string LoggerName = ConfigLoggerName.substr(PREFIX_LOGGER.length());
 
+    if (LoggerName == LOGGER_UNKNOWN || LoggerName == LOGGER_SYSTEM || LoggerName == LOGGER_GM_DYNAMIC)
+    {
+        SYS_LOG_ERROR("Log::CreateLoggerFromConfig: Is is forbidden to use logger name %s\n", LoggerName.c_str());
+        return;
+    }
+
+    // Check dymamic GM logger
+    if (LoggerName == LOGGER_GM && !GetFileChannel(GetChannelFromLogger(LOGGER_GM)))
+        return;
+
     if (options.empty())
     {
         SYS_LOG_ERROR("Log::CreateLoggerFromConfig: Missing config option Logger.%s\n", LoggerName.c_str());
@@ -288,7 +315,6 @@ void Log::CreateLoggerFromConfig(std::string const& ConfigLoggerName)
     }
 
     Tokenizer tokens(options, ',');
-
     if (!tokens.size() || tokens.size() > LOGGER_OPTIONS_CHANNEL_NAME + 1)
     {
         SYS_LOG_ERROR("Bad config options for Logger (%s)", LoggerName.c_str());
@@ -329,17 +355,14 @@ void Log::CreateChannelsFromConfig(std::string const& LogChannelName)
     }
 
     Tokenizer tokens(options, ',');
-
     if (tokens.size() < CHANNEL_OPTIONS_PATTERN + 1)
     {
-        //fprintf(stderr, "Log::CreateLoggerFromConfig: Wrong config option Logger.%s=%s\n", LoggerName.c_str(), options.c_str());
         SYS_LOG_ERROR("Log::CreateLoggerFromConfig: Wrong config option (< CHANNEL_OPTIONS_PATTERN) LogChannel.%s=%s\n", ChannelName.c_str(), options.c_str());
         return;
     }
 
     if (tokens.size() > CHANNEL_OPTIONS_OPTION_4 + 1)
     {
-        //fprintf(stderr, "Log::CreateLoggerFromConfig: Wrong config option Logger.%s=%s\n", LoggerName.c_str(), options.c_str());
         SYS_LOG_ERROR("Log::CreateLoggerFromConfig: Wrong config option (> CHANNEL_OPTIONS_OPTION_4) LogChannel.%s=%s\n", ChannelName.c_str(), options.c_str());
         return;
     }
@@ -475,18 +498,13 @@ void Log::SetRealmID(uint32 RealmID)
 
 void Log::_Write(std::string const& filter, LogLevel const level, std::string const& message)
 {
-    std::string _filter = filter;
-
-    if (!Logger::has(_filter))
-        _filter = LOGGER_ROOT;
-
-    if (!Logger::has(_filter))
+    if (!Logger::has(filter))
     {
         SYS_LOG_ERROR("Log::_Write - Logger '%s' not found!", LOGGER_ROOT.c_str());
         return;
     }
 
-    Logger& logger = Logger::get(_filter);
+    Logger& logger = Logger::get(filter);
 
     try
     {
@@ -670,7 +688,7 @@ void Log::outSys(LogLevel level, std::string&& message)
     }
     catch (const std::exception& e)
     {
-        printf("Log::outSys - %s", e.what());
+        printf("Log::outSys - %s\n", e.what());
     }
 }
 

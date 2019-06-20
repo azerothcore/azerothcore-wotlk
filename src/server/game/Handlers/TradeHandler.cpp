@@ -59,7 +59,7 @@ void WorldSession::SendTradeStatus(TradeStatus status)
 void WorldSession::HandleIgnoreTradeOpcode(WorldPacket& /*recvPacket*/)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "WORLD: Ignore Trade %u", _player->GetGUIDLow());
+    LOG_DEBUG("server", "WORLD: Ignore Trade %u", _player->GetGUIDLow());
 #endif
     // recvPacket.print_storage();
 }
@@ -67,7 +67,7 @@ void WorldSession::HandleIgnoreTradeOpcode(WorldPacket& /*recvPacket*/)
 void WorldSession::HandleBusyTradeOpcode(WorldPacket& /*recvPacket*/)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "WORLD: Busy Trade %u", _player->GetGUIDLow());
+    LOG_DEBUG("server", "WORLD: Busy Trade %u", _player->GetGUIDLow());
 #endif
     // recvPacket.print_storage();
 }
@@ -144,7 +144,7 @@ void WorldSession::moveItems(Item* myItems[], Item* hisItems[])
             {
                 // logging
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                LOG_DEBUG("root", "partner storing: %u", myItems[i]->GetGUIDLow());
+                LOG_DEBUG("server", "partner storing: %u", myItems[i]->GetGUIDLow());
 #endif
 
                 // adjust time (depends on /played)
@@ -157,7 +157,7 @@ void WorldSession::moveItems(Item* myItems[], Item* hisItems[])
             {
                 // logging
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                LOG_DEBUG("root", "player storing: %u", hisItems[i]->GetGUIDLow());
+                LOG_DEBUG("server", "player storing: %u", hisItems[i]->GetGUIDLow());
 #endif
 
                 // adjust time (depends on /played)
@@ -174,21 +174,21 @@ void WorldSession::moveItems(Item* myItems[], Item* hisItems[])
             if (myItems[i])
             {
                 if (!traderCanTrade)
-                    LOG_ERROR("root", "trader can't store item: %u", myItems[i]->GetGUIDLow());
+                    LOG_ERROR("server", "trader can't store item: %u", myItems[i]->GetGUIDLow());
                 if (_player->CanStoreItem(NULL_BAG, NULL_SLOT, playerDst, myItems[i], false) == EQUIP_ERR_OK)
                     _player->MoveItemToInventory(playerDst, myItems[i], true, true);
                 else
-                    LOG_ERROR("root", "player can't take item back: %u", myItems[i]->GetGUIDLow());
+                    LOG_ERROR("server", "player can't take item back: %u", myItems[i]->GetGUIDLow());
             }
             // return the already removed items to the original owner
             if (hisItems[i])
             {
                 if (!playerCanTrade)
-                    LOG_ERROR("root", "player can't store item: %u", hisItems[i]->GetGUIDLow());
+                    LOG_ERROR("server", "player can't store item: %u", hisItems[i]->GetGUIDLow());
                 if (trader->CanStoreItem(NULL_BAG, NULL_SLOT, traderDst, hisItems[i], false) == EQUIP_ERR_OK)
                     trader->MoveItemToInventory(traderDst, hisItems[i], true, true);
                 else
-                    LOG_ERROR("root", "trader can't take item back: %u", hisItems[i]->GetGUIDLow());
+                    LOG_ERROR("server", "trader can't take item back: %u", hisItems[i]->GetGUIDLow());
             }
         }
     }
@@ -207,7 +207,7 @@ static void setAcceptTradeMode(TradeData* myTrade, TradeData* hisTrade, Item* *m
         if (Item* item = myTrade->GetItem(TradeSlots(i)))
         {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            LOG_DEBUG("root", "player trade item %u bag: %u slot: %u", item->GetGUIDLow(), item->GetBagSlot(), item->GetSlot());
+            LOG_DEBUG("server", "player trade item %u bag: %u slot: %u", item->GetGUIDLow(), item->GetBagSlot(), item->GetSlot());
 #endif
             //Can return NULL
             myItems[i] = item;
@@ -217,7 +217,7 @@ static void setAcceptTradeMode(TradeData* myTrade, TradeData* hisTrade, Item* *m
         if (Item* item = hisTrade->GetItem(TradeSlots(i)))
         {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            LOG_DEBUG("root", "partner trade item %u bag: %u slot: %u", item->GetGUIDLow(), item->GetBagSlot(), item->GetSlot());
+            LOG_DEBUG("server", "partner trade item %u bag: %u slot: %u", item->GetGUIDLow(), item->GetBagSlot(), item->GetSlot());
 #endif
             hisItems[i] = item;
             hisItems[i]->SetInTrade();

@@ -2977,10 +2977,11 @@ LogChannel.Server = 2,local,%Y-%m-%d %H:%M:%S %t,Server.log,false,daily
 LogChannel.GM = 2,local,%Y-%m-%d %H:%M:%S %t,gm_%s.log,false,daily
 LogChannel.DB = 2,local,%Y-%m-%d %H:%M:%S %t,DB.log,false,daily
 
+#
 #  Logger config values: Given a logger "name"
 #    Logger.name
 #        Description: Defines 'What to log'
-#        Format:      LogLevel,Channel
+#        Format:      LogLevel,LogChannel
 #
 #                     LogLevel
 #                         0 - (Disabled)
@@ -2993,11 +2994,70 @@ LogChannel.DB = 2,local,%Y-%m-%d %H:%M:%S %t,DB.log,false,daily
 #                         7 - (Debug)
 #						  8 - (Trace)
 #
-#                     Channel List: List of file channels linked to logger
+#                     File channel: file channel linked to logger
 #                     (Using spaces as separator).
 #
 
 Logger.root = 6,Server
+Logger.server = 6,Server
 Logger.commands.gm = 6,GM
-Logger.sql.sql = 6,DB
+Logger.sql = 5,DB
+Logger.mmaps= 6,Server
+
+#Logger.achievement=6,Server
+#Logger.addon=6,Server
+#Logger.ahbot=6,Server
+#Logger.auctionHouse=6,Server
+#Logger.bg.arena=6,Server
+#Logger.bg.battlefield=6,Server
+#Logger.bg.battleground=6,Server
+#Logger.bg.reportpvpafk=6,Server
+#Logger.chat.log=6,Server
+#Logger.calendar=6,Server
+#Logger.chat.system=6,Server
+#Logger.cheat=6,Server
+#Logger.commands.ra=6,Server
+#Logger.condition=6,Server
+#Logger.entities.faction=6,Server
+#Logger.entities.gameobject=6,Server
+#Logger.entities.pet=6,Server
+#Logger.entities.player=6,Server
+#Logger.entities.player.character=6,Server
+#Logger.entities.player.dump=6,Server
+#Logger.entities.player.items=6,Server
+#Logger.entities.player.loading=6,Server
+#Logger.entities.player.skills=6,Server
+#Logger.entities.transport=6,Server
+#Logger.entities.unit=6,Server
+#Logger.entities.unit.ai=6,Server
+#Logger.entities.vehicle=6,Server
+#Logger.gameevent=6,Server
+#Logger.guild=6,Server
+#Logger.lfg=6,Server
+#Logger.loot=6,Server
+#Logger.maps.script=6,Server
+#Logger.maps=6,Server
+#Logger.misc=6,Server
+#Logger.mmaps.tiles=6,Server
+#Logger.movement.flightpath=6,Server
+#Logger.movement.motionmaster=6,Server
+#Logger.movement.splinechain=6,Server
+#Logger.network=6,Server
+#Logger.network.opcode=6,Server
+#Logger.network.soap=6,Server
+#Logger.outdoorpvp=6,Server
+#Logger.pool=6,Server
+#Logger.rbac=6,Server
+#Logger.scripts=6,Server
+#Logger.scripts.ai=6,Server
+#Logger.scripts.ai.escortai=6,Server
+#Logger.scripts.ai.followerai=6,Server
+#Logger.scripts.ai.petai=6,Server
+#Logger.scripts.ai.sai=6,Server
+#Logger.server.authserver=6,Server
+#Logger.spells=6,Server
+#Logger.spells.aura.effect=6,Server
+#Logger.sql.dev=6,Server
+#Logger.sql.driver=6,Server
+#Logger.warden=6,Server
 ###################################################################################################

@@ -321,7 +321,7 @@ template<class TMap> class MapScript : public UpdatableScript<TMap>
             _mapEntry = sMapStore.LookupEntry(_mapId);
 
             if (!_mapEntry)
-                LOG_ERROR("root", "Invalid MapScript for %u; no such map ID.", _mapId);
+                LOG_ERROR("server", "Invalid MapScript for %u; no such map ID.", _mapId);
         }
 
         // Gets the MapEntry structure associated with this script. Can return NULL.
@@ -363,7 +363,7 @@ class WorldMapScript : public ScriptObject, public MapScript<Map>
             checkMap();
 
             if (GetEntry() && !GetEntry()->IsWorldMap())
-                LOG_ERROR("root", "WorldMapScript for map %u is invalid.", GetEntry()->MapID);
+                LOG_ERROR("server", "WorldMapScript for map %u is invalid.", GetEntry()->MapID);
         }
 };
 
@@ -381,7 +381,7 @@ class InstanceMapScript : public ScriptObject, public MapScript<InstanceMap>
             checkMap();
 
             if (GetEntry() && !GetEntry()->IsDungeon())
-                LOG_ERROR("root", "InstanceMapScript for map %u is invalid.", GetEntry()->MapID);
+                LOG_ERROR("server", "InstanceMapScript for map %u is invalid.", GetEntry()->MapID);
         }
 
         // Gets an InstanceScript object for this instance.
@@ -402,7 +402,7 @@ class BattlegroundMapScript : public ScriptObject, public MapScript<Battleground
             checkMap();
 
             if (GetEntry() && !GetEntry()->IsBattleground())
-                LOG_ERROR("root", "BattlegroundMapScript for map %u is invalid.", GetEntry()->MapID);
+                LOG_ERROR("server", "BattlegroundMapScript for map %u is invalid.", GetEntry()->MapID);
         }
 };
 
@@ -1574,7 +1574,7 @@ class ScriptRegistry
                         else
                         {
                             // If the script is already assigned -> delete it!
-                            LOG_ERROR("root", "Script '%s' already assigned with the same script name, so the script can't work.",
+                            LOG_ERROR("server", "Script '%s' already assigned with the same script name, so the script can't work.",
                                 script->GetName().c_str());
 
                             ASSERT(false); // Error that should be fixed ASAP.
@@ -1584,7 +1584,7 @@ class ScriptRegistry
                     {
                         // The script uses a script name from database, but isn't assigned to anything.
                         if (script->GetName().find("Smart") == std::string::npos)
-                            LOG_ERROR("root", "Script named '%s' does not have a script name assigned in database.",
+                            LOG_ERROR("server", "Script named '%s' does not have a script name assigned in database.",
                                 script->GetName().c_str());
                     }
                 } else {
@@ -1615,7 +1615,7 @@ class ScriptRegistry
             {
                 if (it->second == script)
                 {
-                    LOG_ERROR("root", "Script '%s' has same memory pointer as '%s'.",
+                    LOG_ERROR("server", "Script '%s' has same memory pointer as '%s'.",
                         script->GetName().c_str(), it->second->GetName().c_str());
 
                     return false;

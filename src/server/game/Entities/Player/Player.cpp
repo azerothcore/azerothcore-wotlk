@@ -971,10 +971,10 @@ Player::~Player()
 
     if (!m_isInSharedVisionOf.empty())
     {
-        LOG_INFO("root", "Player::~Player (A1)");
+        LOG_INFO("server", "Player::~Player (A1)");
         do
         {
-            LOG_INFO("root", "Player::~Player (A2)");
+            LOG_INFO("server", "Player::~Player (A2)");
             Unit* u = *(m_isInSharedVisionOf.begin());
             u->RemovePlayerFromVision(this);
         } while (!m_isInSharedVisionOf.empty());
@@ -1003,7 +1003,7 @@ bool Player::Create(uint32 guidlow, CharacterCreateInfo* createInfo)
     PlayerInfo const* info = sObjectMgr->GetPlayerInfo(createInfo->Race, createInfo->Class);
     if (!info)
     {
-        LOG_ERROR("root", "Player::Create: Possible hacking-attempt: Account %u tried creating a character named '%s' with an invalid race/class pair (%u/%u) - refusing to do so.",
+        LOG_ERROR("server", "Player::Create: Possible hacking-attempt: Account %u tried creating a character named '%s' with an invalid race/class pair (%u/%u) - refusing to do so.",
                 GetSession()->GetAccountId(), m_name.c_str(), createInfo->Race, createInfo->Class);
         return false;
     }
@@ -1016,7 +1016,7 @@ bool Player::Create(uint32 guidlow, CharacterCreateInfo* createInfo)
     ChrClassesEntry const* cEntry = sChrClassesStore.LookupEntry(createInfo->Class);
     if (!cEntry)
     {
-        LOG_ERROR("root", "Player::Create: Possible hacking-attempt: Account %u tried creating a character named '%s' with an invalid character class (%u) - refusing to do so (wrong DBC-files?)",
+        LOG_ERROR("server", "Player::Create: Possible hacking-attempt: Account %u tried creating a character named '%s' with an invalid character class (%u) - refusing to do so (wrong DBC-files?)",
                 GetSession()->GetAccountId(), m_name.c_str(), createInfo->Class);
         return false;
     }
@@ -1034,7 +1034,7 @@ bool Player::Create(uint32 guidlow, CharacterCreateInfo* createInfo)
 
     if (!IsValidGender(createInfo->Gender))
     {
-        LOG_ERROR("root", "Player::Create: Possible hacking-attempt: Account %u tried creating a character named '%s' with an invalid gender (%u) - refusing to do so",
+        LOG_ERROR("server", "Player::Create: Possible hacking-attempt: Account %u tried creating a character named '%s' with an invalid gender (%u) - refusing to do so",
                 GetSession()->GetAccountId(), m_name.c_str(), createInfo->Gender);
         return false;
     }
@@ -1222,7 +1222,7 @@ bool Player::Create(uint32 guidlow, CharacterCreateInfo* createInfo)
 bool Player::StoreNewItemInBestSlots(uint32 titem_id, uint32 titem_amount)
 { 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "STORAGE: Creating initial item, itemId = %u, count = %u", titem_id, titem_amount);
+    LOG_DEBUG("server", "STORAGE: Creating initial item, itemId = %u, count = %u", titem_id, titem_amount);
 #endif
 
     // attempt equip by one
@@ -1252,7 +1252,7 @@ bool Player::StoreNewItemInBestSlots(uint32 titem_id, uint32 titem_amount)
     }
 
     // item can't be added
-    LOG_ERROR("root", "STORAGE: Can't equip or store initial item %u for race %u class %u, error msg = %u", titem_id, getRace(true), getClass(), msg);
+    LOG_ERROR("server", "STORAGE: Can't equip or store initial item %u for race %u class %u, error msg = %u", titem_id, getRace(true), getClass(), msg);
     return false;
 }
 
@@ -1320,7 +1320,7 @@ uint32 Player::EnvironmentalDamage(EnviromentalDamage type, uint32 damage)
         if (type == DAMAGE_FALL)                               // DealDamage not apply item durability loss at self damage
         {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            LOG_DEBUG("root", "We are fall to death, loosing 10 percents durability");
+            LOG_DEBUG("server", "We are fall to death, loosing 10 percents durability");
 #endif
             DurabilityLossAll(0.10f, false);
             // durability lost message
@@ -1737,7 +1737,7 @@ void Player::Update(uint32 p_time)
 
     if (!IsPositionValid()) // pussywizard: will crash below at eg. GetZoneAndAreaId
     {
-        LOG_INFO("root", "Player::Update - invalid position (%.1f, %.1f, %.1f)! Map: %u, MapId: %u, GUID: %u", GetPositionX(), GetPositionY(), GetPositionZ(), (FindMap() ? FindMap()->GetId() : 0), GetMapId(), GetGUIDLow());
+        LOG_INFO("server", "Player::Update - invalid position (%.1f, %.1f, %.1f)! Map: %u, MapId: %u, GUID: %u", GetPositionX(), GetPositionY(), GetPositionZ(), (FindMap() ? FindMap()->GetId() : 0), GetMapId(), GetGUIDLow());
         GetSession()->KickPlayer("Invalid position");
         return;
     }
@@ -1910,7 +1910,7 @@ void Player::setDeathState(DeathState s, bool /*despawn = false*/)
     {
         if (!cur)
         {
-            LOG_ERROR("root", "setDeathState: attempt to kill a dead player %s(%d)", GetName().c_str(), GetGUIDLow());
+            LOG_ERROR("server", "setDeathState: attempt to kill a dead player %s(%d)", GetName().c_str(), GetGUIDLow());
             return;
         }
 
@@ -1993,12 +1993,12 @@ bool Player::BuildEnumData(PreparedQueryResult result, WorldPacket* data)
     PlayerInfo const* info = sObjectMgr->GetPlayerInfo(plrRace, plrClass);
     if (!info)
     {
-        LOG_ERROR("root", "Player %u has incorrect race/class pair. Don't build enum.", guid);
+        LOG_ERROR("server", "Player %u has incorrect race/class pair. Don't build enum.", guid);
         return false;
     }
     else if (!IsValidGender(gender))
     {
-        LOG_ERROR("root", "Player (%u) has incorrect gender (%u), don't build enum.", guid, gender);
+        LOG_ERROR("server", "Player (%u) has incorrect gender (%u), don't build enum.", guid, gender);
         return false;
     }
 
@@ -2168,14 +2168,14 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
 {
     if (!MapManager::IsValidMapCoord(mapid, x, y, z, orientation))
     {
-        LOG_ERROR("root", "TeleportTo: invalid map (%d) or invalid coordinates (X: %f, Y: %f, Z: %f, O: %f) given when teleporting player (GUID: %u, name: %s, map: %d, X: %f, Y: %f, Z: %f, O: %f).",
+        LOG_ERROR("server", "TeleportTo: invalid map (%d) or invalid coordinates (X: %f, Y: %f, Z: %f, O: %f) given when teleporting player (GUID: %u, name: %s, map: %d, X: %f, Y: %f, Z: %f, O: %f).",
             mapid, x, y, z, orientation, GetGUIDLow(), GetName().c_str(), GetMapId(), GetPositionX(), GetPositionY(), GetPositionZ(), GetOrientation());
         return false;
     }
 
     if (AccountMgr::IsPlayerAccount(GetSession()->GetSecurity()) && DisableMgr::IsDisabledFor(DISABLE_TYPE_MAP, mapid, this))
     {
-        LOG_ERROR("root", "Player (GUID: %u, name: %s) tried to enter a forbidden map %u", GetGUIDLow(), GetName().c_str(), mapid);
+        LOG_ERROR("server", "Player (GUID: %u, name: %s) tried to enter a forbidden map %u", GetGUIDLow(), GetName().c_str(), mapid);
         SendTransferAborted(mapid, TRANSFER_ABORT_MAP_NOT_ALLOWED);
         return false;
     }
@@ -2200,7 +2200,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
     if (GetSession()->Expansion() < mEntry->Expansion())
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("root", "Player %s using client without required expansion tried teleport to non accessible map %u", GetName().c_str(), mapid);
+        LOG_DEBUG("server", "Player %s using client without required expansion tried teleport to non accessible map %u", GetName().c_str(), mapid);
 #endif
 
         if (GetTransport())
@@ -2218,7 +2218,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
     }
     else
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("root", "Player %s is being teleported to map %u", GetName().c_str(), mapid);
+        LOG_DEBUG("server", "Player %s is being teleported to map %u", GetName().c_str(), mapid);
 #endif
 
     // xinef: do this here in case teleport failed in above checks
@@ -2568,7 +2568,7 @@ void Player::RemoveFromWorld()
     {
         if (WorldObject* viewpoint = GetViewpoint())
         {
-            LOG_FATAL("root", "Player %s has viewpoint %u %u when removed from world", GetName().c_str(), viewpoint->GetEntry(), viewpoint->GetTypeId());
+            LOG_FATAL("server", "Player %s has viewpoint %u %u when removed from world", GetName().c_str(), viewpoint->GetEntry(), viewpoint->GetTypeId());
             SetViewpoint(viewpoint, false);
         }
     }
@@ -2930,7 +2930,7 @@ GameObject* Player::GetGameObjectIfCanInteractWith(uint64 guid, GameobjectTypes 
                 return go;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            LOG_DEBUG("root", "IsGameObjectOfTypeInRange: GameObject '%s' [GUID: %u] is too far away from player %s [GUID: %u] to be used by him (distance=%f, maximal 10 is allowed)", go->GetGOInfo()->name.c_str(), go->GetGUIDLow(), GetName().c_str(), GetGUIDLow(), go->GetDistance(this));
+            LOG_DEBUG("server", "IsGameObjectOfTypeInRange: GameObject '%s' [GUID: %u] is too far away from player %s [GUID: %u] to be used by him (distance=%f, maximal 10 is allowed)", go->GetGOInfo()->name.c_str(), go->GetGUIDLow(), GetName().c_str(), GetGUIDLow(), go->GetDistance(this));
 #endif
         }
     }
@@ -3715,7 +3715,7 @@ bool Player::addTalent(uint32 spellId, uint8 addSpecMask, uint8 oldTalentRank)
     // xinef: error case, trying to add already present talent with present mask
     /*else
     {
-        LOG_ERROR("root", "Player (%u) tries to learn talent %u with covered specMask (curr: %u, add: %u)", GetGUIDLow(), spellId, itr->second->specMask, addSpecMask);
+        LOG_ERROR("server", "Player (%u) tries to learn talent %u with covered specMask (curr: %u, add: %u)", GetGUIDLow(), spellId, itr->second->specMask, addSpecMask);
     }*/
     
     return false;
@@ -3886,7 +3886,7 @@ bool Player::_addSpell(uint32 spellId, uint8 addSpecMask, bool temporary)
             {
                 if (spellInfo->Effects[i].Effect != SPELL_EFFECT_LEARN_SPELL)
                 {
-                    LOG_INFO("root", "TRYING TO LEARN SPELL WITH EFFECT LEARN: %u, PLAYER: %u", spellId, GetGUIDLow());
+                    LOG_INFO("server", "TRYING TO LEARN SPELL WITH EFFECT LEARN: %u, PLAYER: %u", spellId, GetGUIDLow());
                     return false;
                     //ASSERT(false);
                 }
@@ -3938,7 +3938,7 @@ bool Player::_addSpell(uint32 spellId, uint8 addSpecMask, bool temporary)
     // xinef: do not add spells with effect learn spell
     if (spellInfo->HasEffect(SPELL_EFFECT_LEARN_SPELL))
     {
-        LOG_INFO("root", "TRYING TO LEARN SPELL WITH EFFECT LEARN 2: %u, PLAYER: %u", spellId, GetGUIDLow());
+        LOG_INFO("server", "TRYING TO LEARN SPELL WITH EFFECT LEARN 2: %u, PLAYER: %u", spellId, GetGUIDLow());
         m_spells.erase(spellInfo->Id); // mem leak, but should never happen
         return false;
         //ASSERT(false);
@@ -4057,7 +4057,7 @@ void Player::learnSpell(uint32 spellId)
     // Xinef: don't allow to learn active spell once more
     if (HasActiveSpell(spellId))
     {
-        LOG_ERROR("root", "Player (%u) tries to learn already active spell: %u", GetGUIDLow(), spellId);
+        LOG_ERROR("server", "Player (%u) tries to learn already active spell: %u", GetGUIDLow(), spellId);
         return;
     }
 
@@ -4361,7 +4361,7 @@ void Player::_LoadSpellCooldowns(PreparedQueryResult result)
 
             if (!sSpellMgr->GetSpellInfo(spell_id))
             {
-                LOG_ERROR("root", "Player %u has unknown spell %u in `character_spell_cooldown`, skipping.", GetGUIDLow(), spell_id);
+                LOG_ERROR("server", "Player %u has unknown spell %u in `character_spell_cooldown`, skipping.", GetGUIDLow(), spell_id);
                 continue;
             }
 
@@ -4372,7 +4372,7 @@ void Player::_LoadSpellCooldowns(PreparedQueryResult result)
             AddSpellCooldown(spell_id, item_id, (db_time-curTime)*IN_MILLISECONDS, needSend);
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            LOG_DEBUG("root", "Player (GUID: %u) spell %u, item %u cooldown loaded (%u secs).", GetGUIDLow(), spell_id, item_id, uint32(db_time-curTime));
+            LOG_DEBUG("server", "Player (GUID: %u) spell %u, item %u cooldown loaded (%u secs).", GetGUIDLow(), spell_id, item_id, uint32(db_time-curTime));
 #endif
         }
         while (result->NextRow());
@@ -5062,7 +5062,7 @@ void Player::DeleteFromDB(uint64 playerguid, uint32 accountId, bool updateRealmC
             break;
         }
         default:
-            LOG_ERROR("root", "Player::DeleteFromDB: Unsupported delete method: %u.", charDelete_method);
+            LOG_ERROR("server", "Player::DeleteFromDB: Unsupported delete method: %u.", charDelete_method);
             return;
     }
 
@@ -5087,7 +5087,7 @@ void Player::DeleteOldCharacters()
  */
 void Player::DeleteOldCharacters(uint32 keepDays)
 {
-    LOG_INFO("root", "Player::DeleteOldChars: Deleting all characters which have been deleted %u days before...", keepDays);
+    LOG_INFO("server", "Player::DeleteOldChars: Deleting all characters which have been deleted %u days before...", keepDays);
 
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_OLD_CHARS);
     stmt->setUInt32(0, uint32(time(NULL) - time_t(keepDays * DAY)));
@@ -5095,7 +5095,7 @@ void Player::DeleteOldCharacters(uint32 keepDays)
 
     if (result)
     {
-         LOG_INFO("root", "Player::DeleteOldChars: Found " UI64FMTD " character(s) to delete", result->GetRowCount());
+         LOG_INFO("server", "Player::DeleteOldChars: Found " UI64FMTD " character(s) to delete", result->GetRowCount());
          do
          {
             Field* fields = result->Fetch();
@@ -5115,7 +5115,7 @@ void Player::SetMovement(PlayerMovementType pType)
         case MOVE_WATER_WALK: data.Initialize(SMSG_MOVE_WATER_WALK,   GetPackGUID().size()+4); break;
         case MOVE_LAND_WALK:  data.Initialize(SMSG_MOVE_LAND_WALK,    GetPackGUID().size()+4); break;
         default:
-            LOG_ERROR("root", "Player::SetMovement: Unsupported move type (%d), data not sent to client.", pType);
+            LOG_ERROR("server", "Player::SetMovement: Unsupported move type (%d), data not sent to client.", pType);
             return;
     }
     data.append(GetPackGUID());
@@ -5144,7 +5144,7 @@ void Player::BuildPlayerRepop()
     // the player cannot have a corpse already, only bones which are not returned by GetCorpse
     if (GetCorpse())
     {
-        LOG_ERROR("root", "BuildPlayerRepop: player %s(%d) already has a corpse", GetName().c_str(), GetGUIDLow());
+        LOG_ERROR("server", "BuildPlayerRepop: player %s(%d) already has a corpse", GetName().c_str(), GetGUIDLow());
         return;
     }
 
@@ -5153,7 +5153,7 @@ void Player::BuildPlayerRepop()
     Corpse* corpse = GetCorpse();
     if (!corpse)
     {
-        LOG_ERROR("root", "Error creating corpse for Player %s [%u]", GetName().c_str(), GetGUIDLow());
+        LOG_ERROR("server", "Error creating corpse for Player %s [%u]", GetName().c_str(), GetGUIDLow());
         return;
     }
     GetMap()->AddToMap(corpse);
@@ -5535,7 +5535,7 @@ uint32 Player::DurabilityRepair(uint16 pos, bool cost, float discountMod, bool g
             DurabilityCostsEntry const* dcost = sDurabilityCostsStore.LookupEntry(ditemProto->ItemLevel);
             if (!dcost)
             {
-                LOG_ERROR("root", "RepairDurability: Wrong item lvl %u", ditemProto->ItemLevel);
+                LOG_ERROR("server", "RepairDurability: Wrong item lvl %u", ditemProto->ItemLevel);
                 return TotalCost;
             }
 
@@ -5543,7 +5543,7 @@ uint32 Player::DurabilityRepair(uint16 pos, bool cost, float discountMod, bool g
             DurabilityQualityEntry const* dQualitymodEntry = sDurabilityQualityStore.LookupEntry(dQualitymodEntryId);
             if (!dQualitymodEntry)
             {
-                LOG_ERROR("root", "RepairDurability: Wrong dQualityModEntry %u", dQualitymodEntryId);
+                LOG_ERROR("server", "RepairDurability: Wrong dQualityModEntry %u", dQualitymodEntryId);
                 return TotalCost;
             }
 
@@ -5560,7 +5560,7 @@ uint32 Player::DurabilityRepair(uint16 pos, bool cost, float discountMod, bool g
                 if (GetGuildId() == 0)
                 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                    LOG_DEBUG("root", "You are not member of a guild");
+                    LOG_DEBUG("server", "You are not member of a guild");
 #endif
                     return TotalCost;
                 }
@@ -5577,7 +5577,7 @@ uint32 Player::DurabilityRepair(uint16 pos, bool cost, float discountMod, bool g
             else if (!HasEnoughMoney(costs))
             {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                LOG_DEBUG("root", "You do not have enough money");
+                LOG_DEBUG("server", "You do not have enough money");
 #endif
                 return TotalCost;
             }
@@ -5787,7 +5787,7 @@ void Player::HandleBaseModValue(BaseModGroup modGroup, BaseModType modType, floa
 { 
     if (modGroup >= BASEMOD_END)
     {
-        LOG_ERROR("root", "ERROR in HandleBaseModValue(): non existed BaseModGroup!");
+        LOG_ERROR("server", "ERROR in HandleBaseModValue(): non existed BaseModGroup!");
         return;
     }
 
@@ -5818,7 +5818,7 @@ float Player::GetBaseModValue(BaseModGroup modGroup, BaseModType modType) const
 { 
     if (modGroup >= BASEMOD_END)
     {
-        LOG_ERROR("root", "trial to access non existed BaseModGroup!");
+        LOG_ERROR("server", "trial to access non existed BaseModGroup!");
         return 0.0f;
     }
 
@@ -5832,7 +5832,7 @@ float Player::GetTotalBaseModValue(BaseModGroup modGroup) const
 { 
     if (modGroup >= BASEMOD_END)
     {
-        LOG_ERROR("root", "wrong BaseModGroup in GetTotalBaseModValue()!");
+        LOG_ERROR("server", "wrong BaseModGroup in GetTotalBaseModValue()!");
         return 0.0f;
     }
 
@@ -6209,7 +6209,7 @@ inline int SkillGainChance(uint32 SkillValue, uint32 GrayLevel, uint32 GreenLeve
 bool Player::UpdateCraftSkill(uint32 spellid)
 { 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "UpdateCraftSkill spellid %d", spellid);
+    LOG_DEBUG("server", "UpdateCraftSkill spellid %d", spellid);
 #endif
 
     SkillLineAbilityMapBounds bounds = sSpellMgr->GetSkillLineAbilityMapBounds(spellid);
@@ -6243,7 +6243,7 @@ bool Player::UpdateCraftSkill(uint32 spellid)
 bool Player::UpdateGatherSkill(uint32 SkillId, uint32 SkillValue, uint32 RedLevel, uint32 Multiplicator)
 { 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "UpdateGatherSkill(SkillId %d SkillLevel %d RedLevel %d)", SkillId, SkillValue, RedLevel);
+    LOG_DEBUG("server", "UpdateGatherSkill(SkillId %d SkillLevel %d RedLevel %d)", SkillId, SkillValue, RedLevel);
 #endif
 
     uint32 gathering_skill_gain = sWorld->getIntConfig(CONFIG_SKILL_GAIN_GATHERING);
@@ -6273,7 +6273,7 @@ bool Player::UpdateGatherSkill(uint32 SkillId, uint32 SkillValue, uint32 RedLeve
 bool Player::UpdateFishingSkill()
 { 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "UpdateFishingSkill");
+    LOG_DEBUG("server", "UpdateFishingSkill");
 #endif
 
     uint32 SkillValue = GetPureSkillValue(SKILL_FISHING);
@@ -6294,7 +6294,7 @@ static const size_t bonusSkillLevelsSize = sizeof(bonusSkillLevels) / sizeof(uin
 bool Player::UpdateSkillPro(uint16 SkillId, int32 Chance, uint32 step)
 { 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "UpdateSkillPro(SkillId %d, Chance %3.1f%%)", SkillId, Chance / 10.0f);
+    LOG_DEBUG("server", "UpdateSkillPro(SkillId %d, Chance %3.1f%%)", SkillId, Chance / 10.0f);
 #endif
     if (!SkillId)
         return false;
@@ -6302,7 +6302,7 @@ bool Player::UpdateSkillPro(uint16 SkillId, int32 Chance, uint32 step)
     if (Chance <= 0)                                         // speedup in 0 chance case
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("root", "Player::UpdateSkillPro Chance=%3.1f%% missed", Chance / 10.0f);
+        LOG_DEBUG("server", "Player::UpdateSkillPro Chance=%3.1f%% missed", Chance / 10.0f);
 #endif
         return false;
     }
@@ -6344,13 +6344,13 @@ bool Player::UpdateSkillPro(uint16 SkillId, int32 Chance, uint32 step)
         UpdateSkillEnchantments(SkillId, SkillValue, new_value);
         UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_REACH_SKILL_LEVEL, SkillId);
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("root", "Player::UpdateSkillPro Chance=%3.1f%% taken", Chance / 10.0f);
+        LOG_DEBUG("server", "Player::UpdateSkillPro Chance=%3.1f%% taken", Chance / 10.0f);
 #endif
         return true;
     }
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "Player::UpdateSkillPro Chance=%3.1f%% missed", Chance / 10.0f);
+    LOG_DEBUG("server", "Player::UpdateSkillPro Chance=%3.1f%% missed", Chance / 10.0f);
 #endif
     return false;
 }
@@ -6570,7 +6570,7 @@ void Player::SetSkill(uint16 id, uint16 step, uint16 newVal, uint16 maxVal)
             SkillLineEntry const* pSkill = sSkillLineStore.LookupEntry(id);
             if (!pSkill)
             {
-                LOG_ERROR("root", "Skill not found in SkillLineStore: skill #%u", id);
+                LOG_ERROR("server", "Skill not found in SkillLineStore: skill #%u", id);
                 return;
             }
 
@@ -6731,7 +6731,7 @@ int16 Player::GetSkillTempBonusValue(uint32 skill) const
 void Player::SendActionButtons(uint32 state) const
 { 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "Sending Action Buttons for '%u' spec '%u'", GetGUIDLow(), m_activeSpec);
+    LOG_DEBUG("server", "Sending Action Buttons for '%u' spec '%u'", GetGUIDLow(), m_activeSpec);
 #endif
 
     WorldPacket data(SMSG_ACTION_BUTTONS, 1+(MAX_ACTION_BUTTONS*4));
@@ -6756,7 +6756,7 @@ void Player::SendActionButtons(uint32 state) const
 
     GetSession()->SendPacket(&data);
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "Action Buttons for '%u' spec '%u' Sent", GetGUIDLow(), m_activeSpec);
+    LOG_DEBUG("server", "Action Buttons for '%u' spec '%u' Sent", GetGUIDLow(), m_activeSpec);
 #endif
 }
 
@@ -6764,13 +6764,13 @@ bool Player::IsActionButtonDataValid(uint8 button, uint32 action, uint8 type)
 { 
     if (button >= MAX_ACTION_BUTTONS)
     {
-        LOG_ERROR("root", "Action %u not added into button %u for player %s: button must be < %u", action, button, GetName().c_str(), MAX_ACTION_BUTTONS);
+        LOG_ERROR("server", "Action %u not added into button %u for player %s: button must be < %u", action, button, GetName().c_str(), MAX_ACTION_BUTTONS);
         return false;
     }
 
     if (action >= MAX_ACTION_BUTTON_ACTION_VALUE)
     {
-        LOG_ERROR("root", "Action %u not added into button %u for player %s: action must be < %u", action, button, GetName().c_str(), MAX_ACTION_BUTTON_ACTION_VALUE);
+        LOG_ERROR("server", "Action %u not added into button %u for player %s: action must be < %u", action, button, GetName().c_str(), MAX_ACTION_BUTTON_ACTION_VALUE);
         return false;
     }
 
@@ -6779,14 +6779,14 @@ bool Player::IsActionButtonDataValid(uint8 button, uint32 action, uint8 type)
         case ACTION_BUTTON_SPELL:
             if (!sSpellMgr->GetSpellInfo(action))
             {
-                LOG_ERROR("root", "Spell action %u not added into button %u for player %s: spell not exist", action, button, GetName().c_str());
+                LOG_ERROR("server", "Spell action %u not added into button %u for player %s: spell not exist", action, button, GetName().c_str());
                 return false;
             }
 
             if (!HasSpell(action))
             {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                LOG_DEBUG("root", "Player::IsActionButtonDataValid Spell action %u not added into button %u for player %s: player don't known this spell", action, button, GetName().c_str());
+                LOG_DEBUG("server", "Player::IsActionButtonDataValid Spell action %u not added into button %u for player %s: player don't known this spell", action, button, GetName().c_str());
 #endif
                 return false;
             }
@@ -6794,7 +6794,7 @@ bool Player::IsActionButtonDataValid(uint8 button, uint32 action, uint8 type)
         case ACTION_BUTTON_ITEM:
             if (!sObjectMgr->GetItemTemplate(action))
             {
-                LOG_ERROR("root", "Item action %u not added into button %u for player %s: item not exist", action, button, GetName().c_str());
+                LOG_ERROR("server", "Item action %u not added into button %u for player %s: item not exist", action, button, GetName().c_str());
                 return false;
             }
             break;
@@ -6817,7 +6817,7 @@ ActionButton* Player::addActionButton(uint8 button, uint32 action, uint8 type)
     ab.SetActionAndType(action, ActionButtonType(type));
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "Player '%u' Added Action '%u' (type %u) to Button '%u'", GetGUIDLow(), action, type, button);
+    LOG_DEBUG("server", "Player '%u' Added Action '%u' (type %u) to Button '%u'", GetGUIDLow(), action, type, button);
 #endif
     return &ab;
 }
@@ -6834,7 +6834,7 @@ void Player::removeActionButton(uint8 button)
         buttonItr->second.uState = ACTIONBUTTON_DELETED;    // saved, will deleted at next save
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "Action Button '%u' Removed from Player '%u'", button, GetGUIDLow());
+    LOG_DEBUG("server", "Action Button '%u' Removed from Player '%u'", button, GetGUIDLow());
 #endif
 }
 
@@ -6934,7 +6934,7 @@ void Player::CheckAreaExploreAndOutdoor()
 
     if (!areaEntry)
     {
-     LOG_ERROR("root", "Player '%s' (%u) discovered unknown area (x: %f y: %f z: %f map: %u)",
+     LOG_ERROR("server", "Player '%s' (%u) discovered unknown area (x: %f y: %f z: %f map: %u)",
             GetName().c_str(), GetGUIDLow(), GetPositionX(), GetPositionY(), GetPositionZ(), GetMapId());
         return;
     }
@@ -6944,7 +6944,7 @@ void Player::CheckAreaExploreAndOutdoor()
     if (offset >= PLAYER_EXPLORED_ZONES_SIZE)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_ERROR("root", "Wrong area flag %u in map data for (X: %f Y: %f) point to field PLAYER_EXPLORED_ZONES_1 + %u ( %u must be < %u ).", areaEntry->flags, GetPositionX(), GetPositionY(), offset, offset, PLAYER_EXPLORED_ZONES_SIZE);
+        LOG_ERROR("server", "Wrong area flag %u in map data for (X: %f Y: %f) point to field PLAYER_EXPLORED_ZONES_1 + %u ( %u must be < %u ).", areaEntry->flags, GetPositionX(), GetPositionY(), offset, offset, PLAYER_EXPLORED_ZONES_SIZE);
 #endif
         return;
     }
@@ -6991,7 +6991,7 @@ void Player::CheckAreaExploreAndOutdoor()
                 SendExplorationExperience(areaId, XP);
             }
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            LOG_DEBUG("root", "Player %u discovered a new area: %u", GetGUIDLow(), areaId);
+            LOG_DEBUG("server", "Player %u discovered a new area: %u", GetGUIDLow(), areaId);
 #endif
         }
     }
@@ -7006,10 +7006,10 @@ TeamId Player::TeamIdForRace(uint8 race)
             case 1: return TEAM_HORDE;
             case 7: return TEAM_ALLIANCE;
         }
-        LOG_ERROR("root", "Race (%u) has wrong teamid (%u) in DBC: wrong DBC files?", uint32(race), rEntry->TeamID);
+        LOG_ERROR("server", "Race (%u) has wrong teamid (%u) in DBC: wrong DBC files?", uint32(race), rEntry->TeamID);
     }
     else
-        LOG_ERROR("root", "Race (%u) not found in DBC: wrong DBC files?", uint32(race));
+        LOG_ERROR("server", "Race (%u) not found in DBC: wrong DBC files?", uint32(race));
 
     return TEAM_ALLIANCE;
 }
@@ -7796,7 +7796,7 @@ void Player::DuelComplete(DuelCompleteType type)
         return;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "Duel Complete %s %s", GetName().c_str(), duel->opponent->GetName().c_str());
+    LOG_DEBUG("server", "Duel Complete %s %s", GetName().c_str(), duel->opponent->GetName().c_str());
 #endif
 
     WorldPacket data(SMSG_DUEL_COMPLETE, (1));
@@ -7921,7 +7921,7 @@ void Player::_ApplyItemMods(Item* item, uint8 slot, bool apply)
         return;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "applying mods for item %u ", item->GetGUIDLow());
+    LOG_DEBUG("server", "applying mods for item %u ", item->GetGUIDLow());
 #endif
 
     uint8 attacktype = Player::GetAttackBySlot(slot);
@@ -7941,7 +7941,7 @@ void Player::_ApplyItemMods(Item* item, uint8 slot, bool apply)
     ApplyEnchantment(item, apply);
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "_ApplyItemMods complete.");
+    LOG_DEBUG("server", "_ApplyItemMods complete.");
 #endif
 }
 
@@ -8422,7 +8422,7 @@ void Player::ApplyEquipSpell(SpellInfo const* spellInfo, Item* item, bool apply,
         }
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("root", "WORLD: cast %s Equip spellId - %i", (item ? "item" : "itemset"), spellInfo->Id);
+        LOG_DEBUG("server", "WORLD: cast %s Equip spellId - %i", (item ? "item" : "itemset"), spellInfo->Id);
 #endif
 
         CastSpell(this, spellInfo, true, item);
@@ -8543,7 +8543,7 @@ void Player::CastItemCombatSpell(Unit* target, WeaponAttackType attType, uint32 
             SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellData.SpellId);
             if (!spellInfo)
             {
-                LOG_ERROR("root", "WORLD: unknown Item spellid %i", spellData.SpellId);
+                LOG_ERROR("server", "WORLD: unknown Item spellid %i", spellData.SpellId);
                 continue;
             }
 
@@ -8601,7 +8601,7 @@ void Player::CastItemCombatSpell(Unit* target, WeaponAttackType attType, uint32 
             SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(pEnchant->spellid[s]);
             if (!spellInfo)
             {
-                LOG_ERROR("root", "Player::CastItemCombatSpell(GUID: %u, name: %s, enchant: %i): unknown spell %i is casted, ignoring...",
+                LOG_ERROR("server", "Player::CastItemCombatSpell(GUID: %u, name: %s, enchant: %i): unknown spell %i is casted, ignoring...",
                     GetGUIDLow(), GetName().c_str(), pEnchant->ID, pEnchant->spellid[s]);
                 continue;
             }
@@ -8658,7 +8658,7 @@ void Player::CastItemUseSpell(Item* item, SpellCastTargets const& targets, uint8
         SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(learn_spell_id);
         if (!spellInfo)
         {
-            LOG_ERROR("root", "Player::CastItemUseSpell: Item (Entry: %u) in have wrong spell id %u, ignoring ", proto->ItemId, learn_spell_id);
+            LOG_ERROR("server", "Player::CastItemUseSpell: Item (Entry: %u) in have wrong spell id %u, ignoring ", proto->ItemId, learn_spell_id);
             SendEquipError(EQUIP_ERR_NONE, item, NULL);
             return;
         }
@@ -8691,7 +8691,7 @@ void Player::CastItemUseSpell(Item* item, SpellCastTargets const& targets, uint8
         SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellData.SpellId);
         if (!spellInfo)
         {
-            LOG_ERROR("root", "Player::CastItemUseSpell: Item (Entry: %u) in have wrong spell id %u, ignoring", proto->ItemId, spellData.SpellId);
+            LOG_ERROR("server", "Player::CastItemUseSpell: Item (Entry: %u) in have wrong spell id %u, ignoring", proto->ItemId, spellData.SpellId);
             continue;
         }
 
@@ -8736,7 +8736,7 @@ void Player::CastItemUseSpell(Item* item, SpellCastTargets const& targets, uint8
             SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(pEnchant->spellid[s]);
             if (!spellInfo)
             {
-                LOG_ERROR("root", "Player::CastItemUseSpell Enchant %i, cast unknown spell %i", pEnchant->ID, pEnchant->spellid[s]);
+                LOG_ERROR("server", "Player::CastItemUseSpell Enchant %i, cast unknown spell %i", pEnchant->ID, pEnchant->spellid[s]);
                 continue;
             }
 
@@ -8775,7 +8775,7 @@ void Player::CastItemUseSpell(Item* item, SpellCastTargets const& targets, uint8
 void Player::_RemoveAllItemMods()
 { 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "_RemoveAllItemMods start.");
+    LOG_DEBUG("server", "_RemoveAllItemMods start.");
 #endif
 
     for (uint8 i = 0; i < INVENTORY_SLOT_BAG_END; ++i)
@@ -8820,14 +8820,14 @@ void Player::_RemoveAllItemMods()
     }
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "_RemoveAllItemMods complete.");
+    LOG_DEBUG("server", "_RemoveAllItemMods complete.");
 #endif
 }
 
 void Player::_ApplyAllItemMods()
 { 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "_ApplyAllItemMods start.");
+    LOG_DEBUG("server", "_ApplyAllItemMods start.");
 #endif
 
     for (uint8 i = 0; i < INVENTORY_SLOT_BAG_END; ++i)
@@ -8873,7 +8873,7 @@ void Player::_ApplyAllItemMods()
     }
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "_ApplyAllItemMods complete.");
+    LOG_DEBUG("server", "_ApplyAllItemMods complete.");
 #endif
 }
 
@@ -9000,12 +9000,12 @@ void Player::SendLoot(uint64 guid, LootType loot_type)
     PermissionTypes permission = ALL_PERMISSION;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "Player::SendLoot");
+    LOG_DEBUG("server", "Player::SendLoot");
 #endif
     if (IS_GAMEOBJECT_GUID(guid))
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("root", "IS_GAMEOBJECT_GUID(guid)");
+        LOG_DEBUG("server", "IS_GAMEOBJECT_GUID(guid)");
 #endif
         GameObject* go = GetMap()->GetGameObject(guid);
 
@@ -9408,7 +9408,7 @@ void Player::SendInitWorldStates(uint32 zoneid, uint32 areaid)
     Battlefield* bf = sBattlefieldMgr->GetBattlefieldToZoneId(zoneid);
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "Sending SMSG_INIT_WORLD_STATES to Map: %u, Zone: %u", mapid, zoneid);
+    LOG_DEBUG("server", "Sending SMSG_INIT_WORLD_STATES to Map: %u, Zone: %u", mapid, zoneid);
 #endif
 
     WorldPacket data(SMSG_INIT_WORLD_STATES, (4+4+4+2+(12*8)));
@@ -10075,7 +10075,7 @@ uint32 Player::GetXPRestBonus(uint32 xp)
     SetRestBonus(GetRestBonus() - rested_bonus);
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "Player gain %u xp (+ %u Rested Bonus). Rested points=%f", xp+rested_bonus, rested_bonus, GetRestBonus());
+    LOG_DEBUG("server", "Player gain %u xp (+ %u Rested Bonus). Rested points=%f", xp+rested_bonus, rested_bonus, GetRestBonus());
 #endif
     return rested_bonus;
 }
@@ -10108,7 +10108,7 @@ void Player::ResetPetTalents()
     CharmInfo* charmInfo = pet->GetCharmInfo();
     if (!charmInfo)
     {
-        LOG_ERROR("root", "Object (GUID: %u TypeId: %u) is considered pet-like but doesn't have a charminfo!", pet->GetGUIDLow(), pet->GetTypeId());
+        LOG_ERROR("server", "Object (GUID: %u TypeId: %u) is considered pet-like but doesn't have a charminfo!", pet->GetGUIDLow(), pet->GetTypeId());
         return;
     }
     pet->resetTalents();
@@ -11148,7 +11148,7 @@ InventoryResult Player::CanStoreItem_InInventorySlots(uint8 slot_begin, uint8 sl
 InventoryResult Player::CanStoreItem(uint8 bag, uint8 slot, ItemPosCountVec &dest, uint32 entry, uint32 count, Item* pItem, bool swap, uint32* no_space_count) const
 { 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "STORAGE: CanStoreItem bag = %u, slot = %u, item = %u, count = %u", bag, slot, entry, count);
+    LOG_DEBUG("server", "STORAGE: CanStoreItem bag = %u, slot = %u, item = %u, count = %u", bag, slot, entry, count);
 #endif
 
     ItemTemplate const* pProto = sObjectMgr->GetItemTemplate(entry);
@@ -11640,7 +11640,7 @@ InventoryResult Player::CanStoreItems(Item** pItems, int count) const
             continue;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("root", "STORAGE: CanStoreItems %i. item = %u, count = %u", k + 1, pItem->GetEntry(), pItem->GetCount());
+        LOG_DEBUG("server", "STORAGE: CanStoreItems %i. item = %u, count = %u", k + 1, pItem->GetEntry(), pItem->GetCount());
 #endif
         ItemTemplate const* pProto = pItem->GetTemplate();
 
@@ -11859,7 +11859,7 @@ InventoryResult Player::CanEquipItem(uint8 slot, uint16 &dest, Item* pItem, bool
     if (pItem)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("root", "STORAGE: CanEquipItem slot = %u, item = %u, count = %u", slot, pItem->GetEntry(), pItem->GetCount());
+        LOG_DEBUG("server", "STORAGE: CanEquipItem slot = %u, item = %u, count = %u", slot, pItem->GetEntry(), pItem->GetCount());
 #endif
         ItemTemplate const* pProto = pItem->GetTemplate();
         if (pProto)
@@ -12036,7 +12036,7 @@ InventoryResult Player::CanUnequipItem(uint16 pos, bool swap) const
         return EQUIP_ERR_OK;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "STORAGE: CanUnequipItem slot = %u, item = %u, count = %u", pos, pItem->GetEntry(), pItem->GetCount());
+    LOG_DEBUG("server", "STORAGE: CanUnequipItem slot = %u, item = %u, count = %u", pos, pItem->GetEntry(), pItem->GetCount());
 #endif
 
     ItemTemplate const* pProto = pItem->GetTemplate();
@@ -12078,7 +12078,7 @@ InventoryResult Player::CanBankItem(uint8 bag, uint8 slot, ItemPosCountVec &dest
     uint32 count = pItem->GetCount();
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "STORAGE: CanBankItem bag = %u, slot = %u, item = %u, count = %u", bag, slot, pItem->GetEntry(), pItem->GetCount());
+    LOG_DEBUG("server", "STORAGE: CanBankItem bag = %u, slot = %u, item = %u, count = %u", bag, slot, pItem->GetEntry(), pItem->GetCount());
 #endif
     ItemTemplate const* pProto = pItem->GetTemplate();
     if (!pProto)
@@ -12095,7 +12095,7 @@ InventoryResult Player::CanBankItem(uint8 bag, uint8 slot, ItemPosCountVec &dest
     uint8 pItemslot = pItem->GetSlot();
     if (pItemslot >= CURRENCYTOKEN_SLOT_START && pItemslot < CURRENCYTOKEN_SLOT_END)
     {
-        LOG_ERROR("root", "Possible hacking attempt: Player %s [guid: %u] tried to move token [guid: %u, entry: %u] out of the currency bag!",
+        LOG_ERROR("server", "Possible hacking attempt: Player %s [guid: %u] tried to move token [guid: %u, entry: %u] out of the currency bag!",
                 GetName().c_str(), GetGUIDLow(), pItem->GetGUIDLow(), pProto->ItemId);
         return EQUIP_ERR_ITEMS_CANT_BE_SWAPPED;
     }
@@ -12264,7 +12264,7 @@ InventoryResult Player::CanUseItem(Item* pItem, bool not_loading) const
     if (pItem)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("root", "STORAGE: CanUseItem item = %u", pItem->GetEntry());
+        LOG_DEBUG("server", "STORAGE: CanUseItem item = %u", pItem->GetEntry());
 #endif
 
         if (!IsAlive() && not_loading)
@@ -12443,7 +12443,7 @@ InventoryResult Player::CanRollForItemInLFG(ItemTemplate const* proto, WorldObje
 InventoryResult Player::CanUseAmmo(uint32 item) const
 { 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "STORAGE: CanUseAmmo item = %u", item);
+    LOG_DEBUG("server", "STORAGE: CanUseAmmo item = %u", item);
 #endif
     if (!IsAlive())
         return EQUIP_ERR_YOU_ARE_DEAD;
@@ -12602,7 +12602,7 @@ Item* Player::_StoreItem(uint16 pos, Item* pItem, uint32 count, bool clone, bool
     uint8 slot = pos & 255;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "STORAGE: StoreItem bag = %u, slot = %u, item = %u, count = %u, guid = %u", bag, slot, pItem->GetEntry(), count, pItem->GetGUIDLow());
+    LOG_DEBUG("server", "STORAGE: StoreItem bag = %u, slot = %u, item = %u, count = %u, guid = %u", bag, slot, pItem->GetEntry(), count, pItem->GetGUIDLow());
 #endif
 
     Item* pItem2 = GetItemByPos(bag, slot);
@@ -12740,7 +12740,7 @@ Item* Player::EquipItem(uint16 pos, Item* pItem, bool update)
                 SpellInfo const* spellProto = sSpellMgr->GetSpellInfo(cooldownSpell);
 
                 if (!spellProto)
-                    LOG_ERROR("root", "Weapon switch cooldown spell %u couldn't be found in Spell.dbc", cooldownSpell);
+                    LOG_ERROR("server", "Weapon switch cooldown spell %u couldn't be found in Spell.dbc", cooldownSpell);
                 else
                 {
                     m_weaponChangeTimer = spellProto->StartRecoveryTime;
@@ -12876,7 +12876,7 @@ void Player::VisualizeItem(uint8 slot, Item* pItem)
         pItem->SetBinding(true);
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "STORAGE: EquipItem slot = %u, item = %u", slot, pItem->GetEntry());
+    LOG_DEBUG("server", "STORAGE: EquipItem slot = %u, item = %u", slot, pItem->GetEntry());
 #endif
 
     m_items[slot] = pItem;
@@ -12903,7 +12903,7 @@ void Player::RemoveItem(uint8 bag, uint8 slot, bool update, bool swap)
     if (pItem)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("root", "STORAGE: RemoveItem bag = %u, slot = %u, item = %u", bag, slot, pItem->GetEntry());
+        LOG_DEBUG("server", "STORAGE: RemoveItem bag = %u, slot = %u, item = %u", bag, slot, pItem->GetEntry());
 #endif
 
         RemoveEnchantmentDurations(pItem);
@@ -13029,7 +13029,7 @@ void Player::DestroyItem(uint8 bag, uint8 slot, bool update)
     if (pItem)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("root", "STORAGE: DestroyItem bag = %u, slot = %u, item = %u", bag, slot, pItem->GetEntry());
+        LOG_DEBUG("server", "STORAGE: DestroyItem bag = %u, slot = %u, item = %u", bag, slot, pItem->GetEntry());
 #endif
         // Also remove all contained items if the item is a bag.
         // This if () prevents item saving crashes if the condition for a bag to be empty before being destroyed was bypassed somehow.
@@ -13128,7 +13128,7 @@ void Player::DestroyItem(uint8 bag, uint8 slot, bool update)
 void Player::DestroyItemCount(uint32 itemEntry, uint32 count, bool update, bool unequip_check)
 { 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "STORAGE: DestroyItemCount item = %u, count = %u", itemEntry, count);
+    LOG_DEBUG("server", "STORAGE: DestroyItemCount item = %u, count = %u", itemEntry, count);
 #endif
     uint32 remcount = 0;
 
@@ -13321,7 +13321,7 @@ void Player::DestroyItemCount(uint32 itemEntry, uint32 count, bool update, bool 
 void Player::DestroyZoneLimitedItem(bool update, uint32 new_zone)
 { 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "STORAGE: DestroyZoneLimitedItem in map %u and area %u", GetMapId(), new_zone);
+    LOG_DEBUG("server", "STORAGE: DestroyZoneLimitedItem in map %u and area %u", GetMapId(), new_zone);
 #endif
 
     // in inventory
@@ -13355,7 +13355,7 @@ void Player::DestroyConjuredItems(bool update)
     // used when entering arena
     // destroys all conjured items
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "STORAGE: DestroyConjuredItems");
+    LOG_DEBUG("server", "STORAGE: DestroyConjuredItems");
 #endif
 
     // in inventory
@@ -13413,7 +13413,7 @@ void Player::DestroyItemCount(Item* pItem, uint32 &count, bool update)
         return;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "STORAGE: DestroyItemCount item (GUID: %u, Entry: %u) count = %u", pItem->GetGUIDLow(), pItem->GetEntry(), count);
+    LOG_DEBUG("server", "STORAGE: DestroyItemCount item (GUID: %u, Entry: %u) count = %u", pItem->GetGUIDLow(), pItem->GetEntry(), count);
 #endif
 
     if (pItem->GetCount() <= count)
@@ -13478,7 +13478,7 @@ void Player::SplitItem(uint16 src, uint16 dst, uint32 count)
     }
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "STORAGE: SplitItem bag = %u, slot = %u, item = %u, count = %u", dstbag, dstslot, pSrcItem->GetEntry(), count);
+    LOG_DEBUG("server", "STORAGE: SplitItem bag = %u, slot = %u, item = %u, count = %u", dstbag, dstslot, pSrcItem->GetEntry(), count);
 #endif
     Item* pNewItem = pSrcItem->CloneItem(count, this);
     if (!pNewItem)
@@ -13565,7 +13565,7 @@ void Player::SwapItem(uint16 src, uint16 dst)
         return;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "STORAGE: SwapItem bag = %u, slot = %u, item = %u", dstbag, dstslot, pSrcItem->GetEntry());
+    LOG_DEBUG("server", "STORAGE: SwapItem bag = %u, slot = %u, item = %u", dstbag, dstslot, pSrcItem->GetEntry());
 #endif
 
     if (!IsAlive())
@@ -13958,7 +13958,7 @@ void Player::AddItemToBuyBackSlot(Item* pItem)
 
         RemoveItemFromBuyBackSlot(slot, true);
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("root", "STORAGE: AddItemToBuyBackSlot item = %u, slot = %u", pItem->GetEntry(), slot);
+        LOG_DEBUG("server", "STORAGE: AddItemToBuyBackSlot item = %u, slot = %u", pItem->GetEntry(), slot);
 #endif
 
         m_items[slot] = pItem;
@@ -13982,7 +13982,7 @@ void Player::AddItemToBuyBackSlot(Item* pItem)
 Item* Player::GetItemFromBuyBackSlot(uint32 slot)
 { 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "STORAGE: GetItemFromBuyBackSlot slot = %u", slot);
+    LOG_DEBUG("server", "STORAGE: GetItemFromBuyBackSlot slot = %u", slot);
 #endif
     if (slot >= BUYBACK_SLOT_START && slot < BUYBACK_SLOT_END)
         return m_items[slot];
@@ -13992,7 +13992,7 @@ Item* Player::GetItemFromBuyBackSlot(uint32 slot)
 void Player::RemoveItemFromBuyBackSlot(uint32 slot, bool del)
 { 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "STORAGE: RemoveItemFromBuyBackSlot slot = %u", slot);
+    LOG_DEBUG("server", "STORAGE: RemoveItemFromBuyBackSlot slot = %u", slot);
 #endif
     if (slot >= BUYBACK_SLOT_START && slot < BUYBACK_SLOT_END)
     {
@@ -14020,7 +14020,7 @@ void Player::RemoveItemFromBuyBackSlot(uint32 slot, bool del)
 void Player::SendEquipError(InventoryResult msg, Item* pItem, Item* pItem2, uint32 itemid)
 { 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "WORLD: Sent SMSG_INVENTORY_CHANGE_FAILURE (%u)", msg);
+    LOG_DEBUG("server", "WORLD: Sent SMSG_INVENTORY_CHANGE_FAILURE (%u)", msg);
 #endif
     WorldPacket data(SMSG_INVENTORY_CHANGE_FAILURE, (msg == EQUIP_ERR_CANT_EQUIP_LEVEL_I ? 22 : 18));
     data << uint8(msg);
@@ -14065,7 +14065,7 @@ void Player::SendEquipError(InventoryResult msg, Item* pItem, Item* pItem2, uint
 void Player::SendBuyError(BuyResult msg, Creature* creature, uint32 item, uint32 param)
 { 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "WORLD: Sent SMSG_BUY_FAILED");
+    LOG_DEBUG("server", "WORLD: Sent SMSG_BUY_FAILED");
 #endif
     WorldPacket data(SMSG_BUY_FAILED, (8+4+4+1));
     data << uint64(creature ? creature->GetGUID() : 0);
@@ -14079,7 +14079,7 @@ void Player::SendBuyError(BuyResult msg, Creature* creature, uint32 item, uint32
 void Player::SendSellError(SellResult msg, Creature* creature, uint64 guid, uint32 param)
 { 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "WORLD: Sent SMSG_SELL_ITEM");
+    LOG_DEBUG("server", "WORLD: Sent SMSG_SELL_ITEM");
 #endif
     WorldPacket data(SMSG_SELL_ITEM, (8+8+(param?4:0)+1));  // last check 2.0.10
     data << uint64(creature ? creature->GetGUID() : 0);
@@ -14153,7 +14153,7 @@ void Player::UpdateItemDuration(uint32 time, bool realtimeonly)
         return;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "Player::UpdateItemDuration(%u, %u)", time, realtimeonly);
+    LOG_DEBUG("server", "Player::UpdateItemDuration(%u, %u)", time, realtimeonly);
 #endif
 
     for (ItemDurationList::const_iterator itr = m_itemDuration.begin(); itr != m_itemDuration.end();)
@@ -14438,53 +14438,53 @@ void Player::ApplyEnchantment(Item* item, EnchantmentSlot slot, bool apply, bool
                     }
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                    LOG_DEBUG("root", "Adding %u to stat nb %u", enchant_amount, enchant_spell_id);
+                    LOG_DEBUG("server", "Adding %u to stat nb %u", enchant_amount, enchant_spell_id);
 #endif
                     switch (enchant_spell_id)
                     {
                         case ITEM_MOD_MANA:
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                            LOG_DEBUG("root", "+ %u MANA", enchant_amount);
+                            LOG_DEBUG("server", "+ %u MANA", enchant_amount);
 #endif
                             HandleStatModifier(UNIT_MOD_MANA, BASE_VALUE, float(enchant_amount), apply);
                             break;
                         case ITEM_MOD_HEALTH:
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                            LOG_DEBUG("root", "+ %u HEALTH", enchant_amount);
+                            LOG_DEBUG("server", "+ %u HEALTH", enchant_amount);
 #endif
                             HandleStatModifier(UNIT_MOD_HEALTH, BASE_VALUE, float(enchant_amount), apply);
                             break;
                         case ITEM_MOD_AGILITY:
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                            LOG_DEBUG("root", "+ %u AGILITY", enchant_amount);
+                            LOG_DEBUG("server", "+ %u AGILITY", enchant_amount);
 #endif
                             HandleStatModifier(UNIT_MOD_STAT_AGILITY, TOTAL_VALUE, float(enchant_amount), apply);
                             ApplyStatBuffMod(STAT_AGILITY, (float)enchant_amount, apply);
                             break;
                         case ITEM_MOD_STRENGTH:
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                            LOG_DEBUG("root", "+ %u STRENGTH", enchant_amount);
+                            LOG_DEBUG("server", "+ %u STRENGTH", enchant_amount);
 #endif
                             HandleStatModifier(UNIT_MOD_STAT_STRENGTH, TOTAL_VALUE, float(enchant_amount), apply);
                             ApplyStatBuffMod(STAT_STRENGTH, (float)enchant_amount, apply);
                             break;
                         case ITEM_MOD_INTELLECT:
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                            LOG_DEBUG("root", "+ %u INTELLECT", enchant_amount);
+                            LOG_DEBUG("server", "+ %u INTELLECT", enchant_amount);
 #endif
                             HandleStatModifier(UNIT_MOD_STAT_INTELLECT, TOTAL_VALUE, float(enchant_amount), apply);
                             ApplyStatBuffMod(STAT_INTELLECT, (float)enchant_amount, apply);
                             break;
                         case ITEM_MOD_SPIRIT:
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                            LOG_DEBUG("root", "+ %u SPIRIT", enchant_amount);
+                            LOG_DEBUG("server", "+ %u SPIRIT", enchant_amount);
 #endif
                             HandleStatModifier(UNIT_MOD_STAT_SPIRIT, TOTAL_VALUE, float(enchant_amount), apply);
                             ApplyStatBuffMod(STAT_SPIRIT, (float)enchant_amount, apply);
                             break;
                         case ITEM_MOD_STAMINA:
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                            LOG_DEBUG("root", "+ %u STAMINA", enchant_amount);
+                            LOG_DEBUG("server", "+ %u STAMINA", enchant_amount);
 #endif
                             HandleStatModifier(UNIT_MOD_STAT_STAMINA, TOTAL_VALUE, float(enchant_amount), apply);
                             ApplyStatBuffMod(STAT_STAMINA, (float)enchant_amount, apply);
@@ -14492,61 +14492,61 @@ void Player::ApplyEnchantment(Item* item, EnchantmentSlot slot, bool apply, bool
                         case ITEM_MOD_DEFENSE_SKILL_RATING:
                             ApplyRatingMod(CR_DEFENSE_SKILL, enchant_amount, apply);
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                            LOG_DEBUG("root", "+ %u DEFENCE", enchant_amount);
+                            LOG_DEBUG("server", "+ %u DEFENCE", enchant_amount);
 #endif
                             break;
                         case  ITEM_MOD_DODGE_RATING:
                             ApplyRatingMod(CR_DODGE, enchant_amount, apply);
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                            LOG_DEBUG("root", "+ %u DODGE", enchant_amount);
+                            LOG_DEBUG("server", "+ %u DODGE", enchant_amount);
 #endif
                             break;
                         case ITEM_MOD_PARRY_RATING:
                             ApplyRatingMod(CR_PARRY, enchant_amount, apply);
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                            LOG_DEBUG("root", "+ %u PARRY", enchant_amount);
+                            LOG_DEBUG("server", "+ %u PARRY", enchant_amount);
 #endif
                             break;
                         case ITEM_MOD_BLOCK_RATING:
                             ApplyRatingMod(CR_BLOCK, enchant_amount, apply);
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                            LOG_DEBUG("root", "+ %u SHIELD_BLOCK", enchant_amount);
+                            LOG_DEBUG("server", "+ %u SHIELD_BLOCK", enchant_amount);
 #endif
                             break;
                         case ITEM_MOD_HIT_MELEE_RATING:
                             ApplyRatingMod(CR_HIT_MELEE, enchant_amount, apply);
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                            LOG_DEBUG("root", "+ %u MELEE_HIT", enchant_amount);
+                            LOG_DEBUG("server", "+ %u MELEE_HIT", enchant_amount);
 #endif
                             break;
                         case ITEM_MOD_HIT_RANGED_RATING:
                             ApplyRatingMod(CR_HIT_RANGED, enchant_amount, apply);
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                            LOG_DEBUG("root", "+ %u RANGED_HIT", enchant_amount);
+                            LOG_DEBUG("server", "+ %u RANGED_HIT", enchant_amount);
 #endif
                             break;
                         case ITEM_MOD_HIT_SPELL_RATING:
                             ApplyRatingMod(CR_HIT_SPELL, enchant_amount, apply);
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                            LOG_DEBUG("root", "+ %u SPELL_HIT", enchant_amount);
+                            LOG_DEBUG("server", "+ %u SPELL_HIT", enchant_amount);
 #endif
                             break;
                         case ITEM_MOD_CRIT_MELEE_RATING:
                             ApplyRatingMod(CR_CRIT_MELEE, enchant_amount, apply);
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                            LOG_DEBUG("root", "+ %u MELEE_CRIT", enchant_amount);
+                            LOG_DEBUG("server", "+ %u MELEE_CRIT", enchant_amount);
 #endif
                             break;
                         case ITEM_MOD_CRIT_RANGED_RATING:
                             ApplyRatingMod(CR_CRIT_RANGED, enchant_amount, apply);
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                            LOG_DEBUG("root", "+ %u RANGED_CRIT", enchant_amount);
+                            LOG_DEBUG("server", "+ %u RANGED_CRIT", enchant_amount);
 #endif
                             break;
                         case ITEM_MOD_CRIT_SPELL_RATING:
                             ApplyRatingMod(CR_CRIT_SPELL, enchant_amount, apply);
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                            LOG_DEBUG("root", "+ %u SPELL_CRIT", enchant_amount);
+                            LOG_DEBUG("server", "+ %u SPELL_CRIT", enchant_amount);
 #endif
                             break;
 //                        Values from ITEM_STAT_MELEE_HA_RATING to ITEM_MOD_HASTE_RANGED_RATING are never used
@@ -14583,7 +14583,7 @@ void Player::ApplyEnchantment(Item* item, EnchantmentSlot slot, bool apply, bool
                             ApplyRatingMod(CR_HIT_RANGED, enchant_amount, apply);
                             ApplyRatingMod(CR_HIT_SPELL, enchant_amount, apply);
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                            LOG_DEBUG("root", "+ %u HIT", enchant_amount);
+                            LOG_DEBUG("server", "+ %u HIT", enchant_amount);
 #endif
                             break;
                         case ITEM_MOD_CRIT_RATING:
@@ -14591,7 +14591,7 @@ void Player::ApplyEnchantment(Item* item, EnchantmentSlot slot, bool apply, bool
                             ApplyRatingMod(CR_CRIT_RANGED, enchant_amount, apply);
                             ApplyRatingMod(CR_CRIT_SPELL, enchant_amount, apply);
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                            LOG_DEBUG("root", "+ %u CRITICAL", enchant_amount);
+                            LOG_DEBUG("server", "+ %u CRITICAL", enchant_amount);
 #endif
                             break;
 //                        Values ITEM_MOD_HIT_TAKEN_RATING and ITEM_MOD_CRIT_TAKEN_RATING are never used in Enchantment
@@ -14610,7 +14610,7 @@ void Player::ApplyEnchantment(Item* item, EnchantmentSlot slot, bool apply, bool
                             ApplyRatingMod(CR_CRIT_TAKEN_RANGED, enchant_amount, apply);
                             ApplyRatingMod(CR_CRIT_TAKEN_SPELL, enchant_amount, apply);
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                            LOG_DEBUG("root", "+ %u RESILIENCE", enchant_amount);
+                            LOG_DEBUG("server", "+ %u RESILIENCE", enchant_amount);
 #endif
                             break;
                         case ITEM_MOD_HASTE_RATING:
@@ -14618,68 +14618,68 @@ void Player::ApplyEnchantment(Item* item, EnchantmentSlot slot, bool apply, bool
                             ApplyRatingMod(CR_HASTE_RANGED, enchant_amount, apply);
                             ApplyRatingMod(CR_HASTE_SPELL, enchant_amount, apply);
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                            LOG_DEBUG("root", "+ %u HASTE", enchant_amount);
+                            LOG_DEBUG("server", "+ %u HASTE", enchant_amount);
 #endif
                             break;
                         case ITEM_MOD_EXPERTISE_RATING:
                             ApplyRatingMod(CR_EXPERTISE, enchant_amount, apply);
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                            LOG_DEBUG("root", "+ %u EXPERTISE", enchant_amount);
+                            LOG_DEBUG("server", "+ %u EXPERTISE", enchant_amount);
 #endif
                             break;
                         case ITEM_MOD_ATTACK_POWER:
                             HandleStatModifier(UNIT_MOD_ATTACK_POWER, TOTAL_VALUE, float(enchant_amount), apply);
                             HandleStatModifier(UNIT_MOD_ATTACK_POWER_RANGED, TOTAL_VALUE, float(enchant_amount), apply);
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                            LOG_DEBUG("root", "+ %u ATTACK_POWER", enchant_amount);
+                            LOG_DEBUG("server", "+ %u ATTACK_POWER", enchant_amount);
 #endif
                             break;
                         case ITEM_MOD_RANGED_ATTACK_POWER:
                             HandleStatModifier(UNIT_MOD_ATTACK_POWER_RANGED, TOTAL_VALUE, float(enchant_amount), apply);
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                            LOG_DEBUG("root", "+ %u RANGED_ATTACK_POWER", enchant_amount);
+                            LOG_DEBUG("server", "+ %u RANGED_ATTACK_POWER", enchant_amount);
 #endif
                             break;
 //                        case ITEM_MOD_FERAL_ATTACK_POWER:
 //                            ApplyFeralAPBonus(enchant_amount, apply);
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-//                            LOG_DEBUG("root", "+ %u FERAL_ATTACK_POWER", enchant_amount);
+//                            LOG_DEBUG("server", "+ %u FERAL_ATTACK_POWER", enchant_amount);
 #endif
 //                            break;
                         case ITEM_MOD_MANA_REGENERATION:
                             ApplyManaRegenBonus(enchant_amount, apply);
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                            LOG_DEBUG("root", "+ %u MANA_REGENERATION", enchant_amount);
+                            LOG_DEBUG("server", "+ %u MANA_REGENERATION", enchant_amount);
 #endif
                             break;
                         case ITEM_MOD_ARMOR_PENETRATION_RATING:
                             ApplyRatingMod(CR_ARMOR_PENETRATION, enchant_amount, apply);
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                            LOG_DEBUG("root", "+ %u ARMOR PENETRATION", enchant_amount);
+                            LOG_DEBUG("server", "+ %u ARMOR PENETRATION", enchant_amount);
 #endif
                             break;
                         case ITEM_MOD_SPELL_POWER:
                             ApplySpellPowerBonus(enchant_amount, apply);
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                            LOG_DEBUG("root", "+ %u SPELL_POWER", enchant_amount);
+                            LOG_DEBUG("server", "+ %u SPELL_POWER", enchant_amount);
 #endif
                             break;
                         case ITEM_MOD_HEALTH_REGEN:
                             ApplyHealthRegenBonus(enchant_amount, apply);
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                            LOG_DEBUG("root", "+ %u HEALTH_REGENERATION", enchant_amount);
+                            LOG_DEBUG("server", "+ %u HEALTH_REGENERATION", enchant_amount);
 #endif
                             break;
                         case ITEM_MOD_SPELL_PENETRATION:
                             ApplySpellPenetrationBonus(enchant_amount, apply);
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                            LOG_DEBUG("root", "+ %u SPELL_PENETRATION", enchant_amount);
+                            LOG_DEBUG("server", "+ %u SPELL_PENETRATION", enchant_amount);
 #endif
                             break;
                         case ITEM_MOD_BLOCK_VALUE:
                             HandleBaseModValue(SHIELD_BLOCK_VALUE, FLAT_MOD, float(enchant_amount), apply);
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                            LOG_DEBUG("root", "+ %u BLOCK_VALUE", enchant_amount);
+                            LOG_DEBUG("server", "+ %u BLOCK_VALUE", enchant_amount);
 #endif
                             break;
                         case ITEM_MOD_SPELL_HEALING_DONE:   // deprecated
@@ -14714,7 +14714,7 @@ void Player::ApplyEnchantment(Item* item, EnchantmentSlot slot, bool apply, bool
                     // nothing do..
                     break;
                 default:
-                    LOG_ERROR("root", "Unknown item enchantment (id = %d) display type: %d", enchant_id, enchant_display_type);
+                    LOG_ERROR("server", "Unknown item enchantment (id = %d) display type: %d", enchant_id, enchant_display_type);
                     break;
             }                                               /*switch (enchant_display_type)*/
         }                                                   /*for*/
@@ -14885,7 +14885,7 @@ void Player::PrepareGossipMenu(WorldObject* source, uint32 menuId /*= 0*/, bool 
                     VendorItemData const* vendorItems = creature->GetVendorItems();
                     if (!vendorItems || vendorItems->Empty())
                     {
-                        LOG_ERROR("root", "Creature %u (Entry: %u) have UNIT_NPC_FLAG_VENDOR but have empty trading item list.", creature->GetGUIDLow(), creature->GetEntry());
+                        LOG_ERROR("server", "Creature %u (Entry: %u) have UNIT_NPC_FLAG_VENDOR but have empty trading item list.", creature->GetGUIDLow(), creature->GetEntry());
                         canTalk = false;
                     }
                     break;
@@ -14932,7 +14932,7 @@ void Player::PrepareGossipMenu(WorldObject* source, uint32 menuId /*= 0*/, bool 
                         canTalk = false;
                     break;
                 default:
-                    LOG_ERROR("root", "Creature entry %u has unknown gossip option %u for menu %u", creature->GetEntry(), itr->second.OptionType, itr->second.MenuID);
+                    LOG_ERROR("server", "Creature entry %u has unknown gossip option %u for menu %u", creature->GetEntry(), itr->second.OptionType, itr->second.MenuID);
                     canTalk = false;
                     break;
             }
@@ -15045,7 +15045,7 @@ void Player::OnGossipSelect(WorldObject* source, uint32 gossipListId, uint32 men
     {
         if (gossipOptionId > GOSSIP_OPTION_QUESTGIVER)
         {
-            LOG_ERROR("root", "Player guid %u request invalid gossip option for GameObject entry %u", GetGUIDLow(), source->GetEntry());
+            LOG_ERROR("server", "Player guid %u request invalid gossip option for GameObject entry %u", GetGUIDLow(), source->GetEntry());
             return;
         }
     }
@@ -15150,7 +15150,7 @@ void Player::OnGossipSelect(WorldObject* source, uint32 gossipListId, uint32 men
 
             if (bgTypeId == BATTLEGROUND_TYPE_NONE)
             {
-                LOG_ERROR("root", "a user (guid %u) requested battlegroundlist from a npc who is no battlemaster", GetGUIDLow());
+                LOG_ERROR("server", "a user (guid %u) requested battlegroundlist from a npc who is no battlemaster", GetGUIDLow());
                 return;
             }
 
@@ -16146,7 +16146,7 @@ bool Player::SatisfyQuestLog(bool msg)
         WorldPacket data(SMSG_QUESTLOG_FULL, 0);
         GetSession()->SendPacket(&data);
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("root", "WORLD: Sent SMSG_QUESTLOG_FULL");
+        LOG_DEBUG("server", "WORLD: Sent SMSG_QUESTLOG_FULL");
 #endif
     }
     return false;
@@ -16320,7 +16320,7 @@ bool Player::SatisfyQuestConditions(Quest const* qInfo, bool msg)
         if (msg)
             SendCanTakeQuestResponse(INVALIDREASON_DONT_HAVE_REQ);
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("root", "Player::SatisfyQuestConditions: conditions not met for quest %u", qInfo->GetQuestId());
+        LOG_DEBUG("server", "Player::SatisfyQuestConditions: conditions not met for quest %u", qInfo->GetQuestId());
 #endif
         return false;
     }
@@ -17399,7 +17399,7 @@ void Player::SendQuestComplete(uint32 quest_id)
         data << uint32(quest_id);
         GetSession()->SendPacket(&data);
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("root", "WORLD: Sent SMSG_QUESTUPDATE_COMPLETE quest = %u", quest_id);
+        LOG_DEBUG("server", "WORLD: Sent SMSG_QUESTUPDATE_COMPLETE quest = %u", quest_id);
 #endif
     }
 }
@@ -17408,7 +17408,7 @@ void Player::SendQuestReward(Quest const* quest, uint32 XP)
 { 
     uint32 questid = quest->GetQuestId();
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "WORLD: Sent SMSG_QUESTGIVER_QUEST_COMPLETE quest = %u", questid);
+    LOG_DEBUG("server", "WORLD: Sent SMSG_QUESTGIVER_QUEST_COMPLETE quest = %u", questid);
 #endif
     sGameEventMgr->HandleQuestComplete(questid);
     WorldPacket data(SMSG_QUESTGIVER_QUEST_COMPLETE, (4+4+4+4+4));
@@ -17440,7 +17440,7 @@ void Player::SendQuestFailed(uint32 questId, InventoryResult reason)
         data << uint32(reason);                             // failed reason (valid reasons: 4, 16, 50, 17, 74, other values show default message)
         GetSession()->SendPacket(&data);
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("root", "WORLD: Sent SMSG_QUESTGIVER_QUEST_FAILED");
+        LOG_DEBUG("server", "WORLD: Sent SMSG_QUESTGIVER_QUEST_FAILED");
 #endif
     }
 }
@@ -17453,7 +17453,7 @@ void Player::SendQuestTimerFailed(uint32 quest_id)
         data << uint32(quest_id);
         GetSession()->SendPacket(&data);
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("root", "WORLD: Sent SMSG_QUESTUPDATE_FAILEDTIMER");
+        LOG_DEBUG("server", "WORLD: Sent SMSG_QUESTUPDATE_FAILEDTIMER");
 #endif
     }
 }
@@ -17464,7 +17464,7 @@ void Player::SendCanTakeQuestResponse(uint32 msg) const
     data << uint32(msg);
     GetSession()->SendPacket(&data);
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "WORLD: Sent SMSG_QUESTGIVER_QUEST_INVALID");
+    LOG_DEBUG("server", "WORLD: Sent SMSG_QUESTGIVER_QUEST_INVALID");
 #endif
 }
 
@@ -17487,7 +17487,7 @@ void Player::SendQuestConfirmAccept(const Quest* quest, Player* pReceiver)
         pReceiver->GetSession()->SendPacket(&data);
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("root", "WORLD: Sent SMSG_QUEST_CONFIRM_ACCEPT");
+        LOG_DEBUG("server", "WORLD: Sent SMSG_QUEST_CONFIRM_ACCEPT");
 #endif
     }
 }
@@ -17501,7 +17501,7 @@ void Player::SendPushToPartyResponse(Player* player, uint8 msg)
         data << uint8(msg);                                 // valid values: 0-8
         GetSession()->SendPacket(&data);
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("root", "WORLD: Sent MSG_QUEST_PUSH_RESULT");
+        LOG_DEBUG("server", "WORLD: Sent MSG_QUEST_PUSH_RESULT");
 #endif
     }
 }
@@ -17510,7 +17510,7 @@ void Player::SendQuestUpdateAddItem(Quest const* /*quest*/, uint32 /*item_idx*/,
 { 
     WorldPacket data(SMSG_QUESTUPDATE_ADD_ITEM, 0);
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "WORLD: Sent SMSG_QUESTUPDATE_ADD_ITEM");
+    LOG_DEBUG("server", "WORLD: Sent SMSG_QUESTUPDATE_ADD_ITEM");
 #endif
     //data << quest->RequiredItemId[item_idx];
     //data << count;
@@ -17528,7 +17528,7 @@ void Player::SendQuestUpdateAddCreatureOrGo(Quest const* quest, uint64 guid, uin
 
     WorldPacket data(SMSG_QUESTUPDATE_ADD_KILL, (4*4+8));
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "WORLD: Sent SMSG_QUESTUPDATE_ADD_KILL");
+    LOG_DEBUG("server", "WORLD: Sent SMSG_QUESTUPDATE_ADD_KILL");
 #endif
     data << uint32(quest->GetQuestId());
     data << uint32(entry);
@@ -17548,7 +17548,7 @@ void Player::SendQuestUpdateAddPlayer(Quest const* quest, uint16 old_count, uint
 
     WorldPacket data(SMSG_QUESTUPDATE_ADD_PVP_KILL, (3*4));
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "WORLD: Sent SMSG_QUESTUPDATE_ADD_PVP_KILL");
+    LOG_DEBUG("server", "WORLD: Sent SMSG_QUESTUPDATE_ADD_PVP_KILL");
 #endif
     data << uint32(quest->GetQuestId());
     data << uint32(old_count + add_count);
@@ -17761,7 +17761,7 @@ bool Player::LoadFromDB(uint32 guid, SQLQueryHolder *holder)
 
     if (!result)
     {
-        LOG_ERROR("root", "Player (GUID: %u) not found in table `characters`, can't load. ", guid);
+        LOG_ERROR("server", "Player (GUID: %u) not found in table `characters`, can't load. ", guid);
         return false;
     }
 
@@ -17773,13 +17773,13 @@ bool Player::LoadFromDB(uint32 guid, SQLQueryHolder *holder)
     // player should be able to load/delete character only with correct account!
     if (dbAccountId != GetSession()->GetAccountId())
     {
-        LOG_ERROR("root", "Player (GUID: %u) loading from wrong account (is: %u, should be: %u)", guid, GetSession()->GetAccountId(), dbAccountId);
+        LOG_ERROR("server", "Player (GUID: %u) loading from wrong account (is: %u, should be: %u)", guid, GetSession()->GetAccountId(), dbAccountId);
         return false;
     }
 
     if (holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_BANNED))
     {
-        LOG_ERROR("root", "Player (GUID: %u) is banned, can't load.", guid);
+        LOG_ERROR("server", "Player (GUID: %u) is banned, can't load.", guid);
         return false;
     }
 
@@ -17804,7 +17804,7 @@ bool Player::LoadFromDB(uint32 guid, SQLQueryHolder *holder)
     uint8 Gender = fields[5].GetUInt8();
     if (!IsValidGender(Gender))
     {
-        LOG_ERROR("root", "Player (GUID: %u) has wrong gender (%u), can't be loaded.", guid, Gender);
+        LOG_ERROR("server", "Player (GUID: %u) has wrong gender (%u), can't be loaded.", guid, Gender);
         return false;
     }
 
@@ -17867,7 +17867,7 @@ bool Player::LoadFromDB(uint32 guid, SQLQueryHolder *holder)
     }
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "Load Basic value of player %s is: ", m_name.c_str());
+    LOG_DEBUG("server", "Load Basic value of player %s is: ", m_name.c_str());
 #endif
     outDebugValues();
 
@@ -17944,7 +17944,7 @@ bool Player::LoadFromDB(uint32 guid, SQLQueryHolder *holder)
 
     if (!mapEntry || !IsPositionValid())
     {
-        LOG_ERROR("root", "Player (guidlow %d) have invalid coordinates (MapId: %u X: %f Y: %f Z: %f O: %f). Teleport to default race/class locations.", guid, mapId, GetPositionX(), GetPositionY(), GetPositionZ(), GetOrientation());
+        LOG_ERROR("server", "Player (guidlow %d) have invalid coordinates (MapId: %u X: %f Y: %f Z: %f O: %f). Teleport to default race/class locations.", guid, mapId, GetPositionX(), GetPositionY(), GetPositionZ(), GetOrientation());
         RelocateToHomebind();
     }
     // Player was saved in Arena or Bg
@@ -18050,7 +18050,7 @@ bool Player::LoadFromDB(uint32 guid, SQLQueryHolder *holder)
         if (GetSession()->Expansion() < mapEntry->Expansion())
         {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            LOG_DEBUG("root", "Player %s using client without required expansion tried login at non accessible map %u", GetName().c_str(), mapId);
+            LOG_DEBUG("server", "Player %s using client without required expansion tried login at non accessible map %u", GetName().c_str(), mapId);
 #endif
             RelocateToHomebind();
         }
@@ -18084,13 +18084,13 @@ bool Player::LoadFromDB(uint32 guid, SQLQueryHolder *holder)
         AreaTriggerTeleport const* at = sObjectMgr->GetGoBackTrigger(mapId);
         if (at)
         {
-            LOG_ERROR("root", "Player (guidlow %d) is teleported to gobacktrigger (Map: %u X: %f Y: %f Z: %f O: %f).", guid, mapId, GetPositionX(), GetPositionY(), GetPositionZ(), GetOrientation());
+            LOG_ERROR("server", "Player (guidlow %d) is teleported to gobacktrigger (Map: %u X: %f Y: %f Z: %f O: %f).", guid, mapId, GetPositionX(), GetPositionY(), GetPositionZ(), GetOrientation());
             Relocate(at->target_X, at->target_Y, at->target_Z, GetOrientation());
             mapId = at->target_mapId;
         }
         else
         {
-            LOG_ERROR("root", "Player (guidlow %d) is teleported to home (Map: %u X: %f Y: %f Z: %f O: %f).", guid, mapId, GetPositionX(), GetPositionY(), GetPositionZ(), GetOrientation());
+            LOG_ERROR("server", "Player (guidlow %d) is teleported to home (Map: %u X: %f Y: %f Z: %f O: %f).", guid, mapId, GetPositionX(), GetPositionY(), GetPositionZ(), GetOrientation());
             RelocateToHomebind();
         }
 
@@ -18100,11 +18100,11 @@ bool Player::LoadFromDB(uint32 guid, SQLQueryHolder *holder)
             PlayerInfo const* info = sObjectMgr->GetPlayerInfo(getRace(true), getClass());
             mapId = info->mapId;
             Relocate(info->positionX, info->positionY, info->positionZ, 0.0f);
-            LOG_ERROR("root", "Player (guidlow %d) have invalid coordinates (X: %f Y: %f Z: %f O: %f). Teleport to default race/class locations.", guid, GetPositionX(), GetPositionY(), GetPositionZ(), GetOrientation());
+            LOG_ERROR("server", "Player (guidlow %d) have invalid coordinates (X: %f Y: %f Z: %f O: %f). Teleport to default race/class locations.", guid, GetPositionX(), GetPositionY(), GetPositionZ(), GetOrientation());
             map = sMapMgr->CreateMap(mapId, this);
             if (!map)
             {
-                LOG_ERROR("root", "Player (guidlow %d) has invalid default map coordinates (X: %f Y: %f Z: %f O: %f). or instance couldn't be created", guid, GetPositionX(), GetPositionY(), GetPositionZ(), GetOrientation());
+                LOG_ERROR("server", "Player (guidlow %d) has invalid default map coordinates (X: %f Y: %f Z: %f O: %f). or instance couldn't be created", guid, GetPositionX(), GetPositionY(), GetPositionZ(), GetOrientation());
                 return false;
             }
         }
@@ -18143,7 +18143,7 @@ bool Player::LoadFromDB(uint32 guid, SQLQueryHolder *holder)
     m_stableSlots = fields[37].GetUInt8();
     if (m_stableSlots > MAX_PET_STABLES)
     {
-        LOG_ERROR("root", "Player can have not more %u stable slots, but have in DB %u", MAX_PET_STABLES, uint32(m_stableSlots));
+        LOG_ERROR("server", "Player can have not more %u stable slots, but have in DB %u", MAX_PET_STABLES, uint32(m_stableSlots));
         m_stableSlots = MAX_PET_STABLES;
     }
 
@@ -18151,7 +18151,7 @@ bool Player::LoadFromDB(uint32 guid, SQLQueryHolder *holder)
 
     if (HasAtLoginFlag(AT_LOGIN_RENAME))
     {
-        LOG_ERROR("root", "Player (GUID: %u) tried to login while forced to rename, can't load.'", GetGUIDLow());
+        LOG_ERROR("server", "Player (GUID: %u) tried to login while forced to rename, can't load.'", GetGUIDLow());
         return false;
     }
 
@@ -18308,7 +18308,7 @@ bool Player::LoadFromDB(uint32 guid, SQLQueryHolder *holder)
     }
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "The value of player %s after load item and aura is: ", m_name.c_str());
+    LOG_DEBUG("server", "The value of player %s after load item and aura is: ", m_name.c_str());
 #endif
     outDebugValues();
 
@@ -18475,7 +18475,7 @@ void Player::_LoadActions(PreparedQueryResult result)
             else
             {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                LOG_ERROR("root", "ActionButton loading problem, will be deleted from db...");
+                LOG_ERROR("server", "ActionButton loading problem, will be deleted from db...");
 #endif
 
                 // Will deleted in DB at next save (it can create data until save but marked as deleted)
@@ -18488,7 +18488,7 @@ void Player::_LoadActions(PreparedQueryResult result)
 void Player::_LoadAuras(PreparedQueryResult result, uint32 timediff)
 { 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "Loading auras for player %u", GetGUIDLow());
+    LOG_DEBUG("server", "Loading auras for player %u", GetGUIDLow());
 #endif
 
     /*                                                     0           1      2           3                4           5        6        7        8             9             10
@@ -18522,7 +18522,7 @@ void Player::_LoadAuras(PreparedQueryResult result, uint32 timediff)
             SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellid);
             if (!spellInfo)
             {
-                LOG_ERROR("root", "Unknown aura (spellid %u), ignore.", spellid);
+                LOG_ERROR("server", "Unknown aura (spellid %u), ignore.", spellid);
                 continue;
             }
 
@@ -18564,7 +18564,7 @@ void Player::_LoadAuras(PreparedQueryResult result, uint32 timediff)
                 aura->SetLoadedState(maxduration, remaintime, remaincharges, stackcount, recalculatemask, &damage[0]);
                 aura->ApplyForTargets();
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                LOG_DEBUG("root", "Added aura spellid %u, effectmask %u", spellInfo->Id, effmask);
+                LOG_DEBUG("server", "Added aura spellid %u, effectmask %u", spellInfo->Id, effmask);
 #endif
             }
         }
@@ -18590,13 +18590,13 @@ void Player::_LoadGlyphAuras()
                         continue;
                     }
                     else
-                        LOG_ERROR("root", "Player %s has glyph with typeflags %u in slot with typeflags %u, removing.", m_name.c_str(), glyphEntry->TypeFlags, glyphSlotEntry->TypeFlags);
+                        LOG_ERROR("server", "Player %s has glyph with typeflags %u in slot with typeflags %u, removing.", m_name.c_str(), glyphEntry->TypeFlags, glyphSlotEntry->TypeFlags);
                 }
                 else
-                    LOG_ERROR("root", "Player %s has not existing glyph slot entry %u on index %u", m_name.c_str(), GetGlyphSlot(i), i);
+                    LOG_ERROR("server", "Player %s has not existing glyph slot entry %u on index %u", m_name.c_str(), GetGlyphSlot(i), i);
             }
             else
-                LOG_ERROR("root", "Player %s has not existing glyph entry %u on index %u", m_name.c_str(), glyph, i);
+                LOG_ERROR("server", "Player %s has not existing glyph entry %u on index %u", m_name.c_str(), glyph, i);
 
             // On any error remove glyph
             SetGlyph(i, 0, true);
@@ -18706,7 +18706,7 @@ void Player::_LoadInventory(PreparedQueryResult result, uint32 timeDiff)
                     }
                     else
                     {
-                        LOG_ERROR("root", "Player::_LoadInventory: player (GUID: %u, name: '%s') has item (GUID: %u, entry: %u) which doesnt have a valid bag (Bag GUID: %u, slot: %u). Possible cheat?",
+                        LOG_ERROR("server", "Player::_LoadInventory: player (GUID: %u, name: '%s') has item (GUID: %u, entry: %u) which doesnt have a valid bag (Bag GUID: %u, slot: %u). Possible cheat?",
                             GetGUIDLow(), GetName().c_str(), item->GetGUIDLow(), item->GetEntry(), bagGuid, slot);
                         item->DeleteFromInventoryDB(trans);
                         delete item;
@@ -18720,7 +18720,7 @@ void Player::_LoadInventory(PreparedQueryResult result, uint32 timeDiff)
                     item->SetState(ITEM_UNCHANGED, this);
                 else
                 {
-                    LOG_ERROR("root", "Player::_LoadInventory: player (GUID: %u, name: '%s') has item (GUID: %u, entry: %u) which can't be loaded into inventory (Bag GUID: %u, slot: %u) by reason %u. Item will be sent by mail.",
+                    LOG_ERROR("server", "Player::_LoadInventory: player (GUID: %u, name: '%s') has item (GUID: %u, entry: %u) which can't be loaded into inventory (Bag GUID: %u, slot: %u) by reason %u. Item will be sent by mail.",
                         GetGUIDLow(), GetName().c_str(), item->GetGUIDLow(), item->GetEntry(), bagGuid, slot, err);
                     item->DeleteFromInventoryDB(trans);
                     problematicItems.push_back(item);
@@ -18766,7 +18766,7 @@ Item* Player::_LoadItem(SQLTransaction& trans, uint32 zoneId, uint32 timeDiff, F
             if (IsAlive() && item->IsLimitedToAnotherMapOrZone(GetMapId(), zoneId))
             {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                LOG_DEBUG("root", "Player::_LoadInventory: player (GUID: %u, name: '%s', map: %u) has item (GUID: %u, entry: %u) limited to another map (%u). Deleting item.",
+                LOG_DEBUG("server", "Player::_LoadInventory: player (GUID: %u, name: '%s', map: %u) has item (GUID: %u, entry: %u) limited to another map (%u). Deleting item.",
                     GetGUIDLow(), GetName().c_str(), GetMapId(), item->GetGUIDLow(), item->GetEntry(), zoneId);
 #endif
                 remove = true;
@@ -18775,7 +18775,7 @@ Item* Player::_LoadItem(SQLTransaction& trans, uint32 zoneId, uint32 timeDiff, F
             else if (timeDiff > 15 * MINUTE && proto->Flags & ITEM_PROTO_FLAG_CONJURED)
             {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                LOG_DEBUG("root", "Player::_LoadInventory: player (GUID: %u, name: '%s', diff: %u) has conjured item (GUID: %u, entry: %u) with expired lifetime (15 minutes). Deleting item.",
+                LOG_DEBUG("server", "Player::_LoadInventory: player (GUID: %u, name: '%s', diff: %u) has conjured item (GUID: %u, entry: %u) with expired lifetime (15 minutes). Deleting item.",
                     GetGUIDLow(), GetName().c_str(), timeDiff, item->GetGUIDLow(), item->GetEntry());
 #endif
                 remove = true;
@@ -18785,7 +18785,7 @@ Item* Player::_LoadItem(SQLTransaction& trans, uint32 zoneId, uint32 timeDiff, F
                 if (item->GetPlayedTime() > (2 * HOUR))
                 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                    LOG_DEBUG("root", "Player::_LoadInventory: player (GUID: %u, name: '%s') has item (GUID: %u, entry: %u) with expired refund time (%u). Deleting refund data and removing refundable flag.",
+                    LOG_DEBUG("server", "Player::_LoadInventory: player (GUID: %u, name: '%s') has item (GUID: %u, entry: %u) with expired refund time (%u). Deleting refund data and removing refundable flag.",
                         GetGUIDLow(), GetName().c_str(), item->GetGUIDLow(), item->GetEntry(), item->GetPlayedTime());
 #endif
                     stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ITEM_REFUND_INSTANCE);
@@ -18810,7 +18810,7 @@ Item* Player::_LoadItem(SQLTransaction& trans, uint32 zoneId, uint32 timeDiff, F
                     else
                     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                        LOG_DEBUG("root", "Player::_LoadInventory: player (GUID: %u, name: '%s') has item (GUID: %u, entry: %u) with refundable flags, but without data in item_refund_instance. Removing flag.",
+                        LOG_DEBUG("server", "Player::_LoadInventory: player (GUID: %u, name: '%s') has item (GUID: %u, entry: %u) with refundable flags, but without data in item_refund_instance. Removing flag.",
                             GetGUIDLow(), GetName().c_str(), item->GetGUIDLow(), item->GetEntry());
 #endif
                         item->RemoveFlag(ITEM_FIELD_FLAGS, ITEM_FLAG_REFUNDABLE);
@@ -18840,7 +18840,7 @@ Item* Player::_LoadItem(SQLTransaction& trans, uint32 zoneId, uint32 timeDiff, F
                 else
                 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                    LOG_DEBUG("root", "Player::_LoadInventory: player (GUID: %u, name: '%s') has item (GUID: %u, entry: %u) with ITEM_FLAG_BOP_TRADEABLE flag, but without data in item_soulbound_trade_data. Removing flag.",
+                    LOG_DEBUG("server", "Player::_LoadInventory: player (GUID: %u, name: '%s') has item (GUID: %u, entry: %u) with ITEM_FLAG_BOP_TRADEABLE flag, but without data in item_soulbound_trade_data. Removing flag.",
                         GetGUIDLow(), GetName().c_str(), item->GetGUIDLow(), item->GetEntry());
 #endif
                     item->RemoveFlag(ITEM_FIELD_FLAGS, ITEM_FLAG_BOP_TRADEABLE);
@@ -18863,7 +18863,7 @@ Item* Player::_LoadItem(SQLTransaction& trans, uint32 zoneId, uint32 timeDiff, F
         }
         else
         {
-            LOG_ERROR("root", "Player::_LoadInventory: player (GUID: %u, name: '%s') has broken item (GUID: %u, entry: %u) in inventory. Deleting item.",
+            LOG_ERROR("server", "Player::_LoadInventory: player (GUID: %u, name: '%s') has broken item (GUID: %u, entry: %u) in inventory. Deleting item.",
                 GetGUIDLow(), GetName().c_str(), itemGuid, itemEntry);
             remove = true;
         }
@@ -18878,7 +18878,7 @@ Item* Player::_LoadItem(SQLTransaction& trans, uint32 zoneId, uint32 timeDiff, F
     }
     else
     {
-        LOG_ERROR("root", "Player::_LoadInventory: player (GUID: %u, name: '%s') has unknown item (entry: %u) in inventory. Deleting item.",
+        LOG_ERROR("server", "Player::_LoadInventory: player (GUID: %u, name: '%s') has unknown item (entry: %u) in inventory. Deleting item.",
             GetGUIDLow(), GetName().c_str(), itemEntry);
         Item::DeleteFromInventoryDB(trans, itemGuid);
         Item::DeleteFromDB(trans, itemGuid);
@@ -18909,7 +18909,7 @@ void Player::_LoadMailedItems(Mail* mail)
 
         if (!proto)
         {
-            LOG_ERROR("root", "Player %u has unknown item_template (ProtoType) in mailed items(GUID: %u template: %u) in mail (%u), deleted.", GetGUIDLow(), itemGuid, itemTemplate, mail->messageID);
+            LOG_ERROR("server", "Player %u has unknown item_template (ProtoType) in mailed items(GUID: %u template: %u) in mail (%u), deleted.", GetGUIDLow(), itemGuid, itemTemplate, mail->messageID);
 
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_INVALID_MAIL_ITEM);
             stmt->setUInt32(0, itemGuid);
@@ -18925,7 +18925,7 @@ void Player::_LoadMailedItems(Mail* mail)
 
         if (!item->LoadFromDB(itemGuid, MAKE_NEW_GUID(fields[13].GetUInt32(), 0, HIGHGUID_PLAYER), fields, itemTemplate))
         {
-            LOG_ERROR("root", "Player::_LoadMailedItems - Item in mail (%u) doesn't exist !!!! - item guid: %u, deleted from mail", mail->messageID, itemGuid);
+            LOG_ERROR("server", "Player::_LoadMailedItems - Item in mail (%u) doesn't exist !!!! - item guid: %u, deleted from mail", mail->messageID, itemGuid);
 
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_MAIL_ITEM);
             stmt->setUInt32(0, itemGuid);
@@ -18991,7 +18991,7 @@ void Player::_LoadMailAsynch(PreparedQueryResult result)
 
                 if (m->mailTemplateId && !sMailTemplateStore.LookupEntry(m->mailTemplateId))
                 {
-                    LOG_ERROR("root", "Player::_LoadMail - Mail (%u) have not existed MailTemplateId (%u), remove at load", m->messageID, m->mailTemplateId);
+                    LOG_ERROR("server", "Player::_LoadMail - Mail (%u) have not existed MailTemplateId (%u), remove at load", m->messageID, m->mailTemplateId);
                     m->mailTemplateId = 0;
                 }
 
@@ -19009,7 +19009,7 @@ void Player::_LoadMailAsynch(PreparedQueryResult result)
 
                 if (!proto)
                 {
-                    LOG_ERROR("root", "Player %u has unknown item_template (ProtoType) in mailed items(GUID: %u template: %u) in mail (%u), deleted.", GetGUIDLow(), itemGuid, itemTemplate, m->messageID);
+                    LOG_ERROR("server", "Player %u has unknown item_template (ProtoType) in mailed items(GUID: %u template: %u) in mail (%u), deleted.", GetGUIDLow(), itemGuid, itemTemplate, m->messageID);
 
                     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_INVALID_MAIL_ITEM);
                     stmt->setUInt32(0, itemGuid);
@@ -19025,7 +19025,7 @@ void Player::_LoadMailAsynch(PreparedQueryResult result)
 
                 if (!item->LoadFromDB(itemGuid, MAKE_NEW_GUID(fields[13].GetUInt32(), 0, HIGHGUID_PLAYER), fields, itemTemplate))
                 {
-                    LOG_ERROR("root", "Player::_LoadMailedItems - Item in mail (%u) doesn't exist !!!! - item guid: %u, deleted from mail", m->messageID, itemGuid);
+                    LOG_ERROR("server", "Player::_LoadMailedItems - Item in mail (%u) doesn't exist !!!! - item guid: %u, deleted from mail", m->messageID, itemGuid);
 
                     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_MAIL_ITEM);
                     stmt->setUInt32(0, itemGuid);
@@ -19084,7 +19084,7 @@ void Player::_LoadMail()
 
             if (m->mailTemplateId && !sMailTemplateStore.LookupEntry(m->mailTemplateId))
             {
-                LOG_ERROR("root", "Player::_LoadMail - Mail (%u) have not existed MailTemplateId (%u), remove at load", m->messageID, m->mailTemplateId);
+                LOG_ERROR("server", "Player::_LoadMail - Mail (%u) have not existed MailTemplateId (%u), remove at load", m->messageID, m->mailTemplateId);
                 m->mailTemplateId = 0;
             }
 
@@ -19139,7 +19139,7 @@ void Player::_LoadQuestStatus(PreparedQueryResult result)
                 else
                 {
                     questStatusData.Status = QUEST_STATUS_INCOMPLETE;
-                    LOG_ERROR("root", "Player %s (GUID: %u) has invalid quest %d status (%u), replaced by QUEST_STATUS_INCOMPLETE(3).",
+                    LOG_ERROR("server", "Player %s (GUID: %u) has invalid quest %d status (%u), replaced by QUEST_STATUS_INCOMPLETE(3).",
                         GetName().c_str(), GetGUIDLow(), quest_id, qstatus);
                 }
 
@@ -19188,7 +19188,7 @@ void Player::_LoadQuestStatus(PreparedQueryResult result)
                 }
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                LOG_DEBUG("root", "Quest status is {%u} for quest {%u} for player (GUID: %u)", questStatusData.Status, quest_id, GetGUIDLow());
+                LOG_DEBUG("server", "Quest status is {%u} for quest {%u} for player (GUID: %u)", questStatusData.Status, quest_id, GetGUIDLow());
 #endif
             }
         }
@@ -19264,7 +19264,7 @@ void Player::_LoadDailyQuestStatus(PreparedQueryResult result)
 
             if (quest_daily_idx >= PLAYER_MAX_DAILY_QUESTS)  // max amount with exist data in query
             {
-                LOG_ERROR("root", "Player (GUID: %u) have more 25 daily quest records in `charcter_queststatus_daily`", GetGUIDLow());
+                LOG_ERROR("server", "Player (GUID: %u) have more 25 daily quest records in `charcter_queststatus_daily`", GetGUIDLow());
                 break;
             }
 
@@ -19281,7 +19281,7 @@ void Player::_LoadDailyQuestStatus(PreparedQueryResult result)
             ++quest_daily_idx;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            LOG_DEBUG("root", "Daily quest (%u) cooldown for player (GUID: %u)", quest_id, GetGUIDLow());
+            LOG_DEBUG("server", "Daily quest (%u) cooldown for player (GUID: %u)", quest_id, GetGUIDLow());
 #endif
         }
         while (result->NextRow());
@@ -19306,7 +19306,7 @@ void Player::_LoadWeeklyQuestStatus(PreparedQueryResult result)
 
             m_weeklyquests.insert(quest_id);
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            LOG_DEBUG("root", "Weekly quest {%u} cooldown for player (GUID: %u)", quest_id, GetGUIDLow());
+            LOG_DEBUG("server", "Weekly quest {%u} cooldown for player (GUID: %u)", quest_id, GetGUIDLow());
 #endif
         }
         while (result->NextRow());
@@ -19332,7 +19332,7 @@ void Player::_LoadSeasonalQuestStatus(PreparedQueryResult result)
 
             m_seasonalquests[event_id].insert(quest_id);
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            LOG_DEBUG("root", "Seasonal quest {%u} cooldown for player (GUID: %u)", quest_id, GetGUIDLow());
+            LOG_DEBUG("server", "Seasonal quest {%u} cooldown for player (GUID: %u)", quest_id, GetGUIDLow());
 #endif
         }
         while (result->NextRow());
@@ -19356,7 +19356,7 @@ void Player::_LoadMonthlyQuestStatus(PreparedQueryResult result)
                 continue;
 
             m_monthlyquests.insert(quest_id);
-            LOG_DEBUG("root", "Monthly quest {%u} cooldown for player (GUID: %u)", quest_id, GetGUIDLow());
+            LOG_DEBUG("server", "Monthly quest {%u} cooldown for player (GUID: %u)", quest_id, GetGUIDLow());
         }
         while (result->NextRow());
     }
@@ -19601,7 +19601,7 @@ bool Player::_LoadHomeBind(PreparedQueryResult result)
     PlayerInfo const* info = sObjectMgr->GetPlayerInfo(getRace(true), getClass());
     if (!info)
     {
-        LOG_ERROR("root", "Player (Name %s) has incorrect race/class pair. Can't be loaded.", GetName().c_str());
+        LOG_ERROR("server", "Player (Name %s) has incorrect race/class pair. Can't be loaded.", GetName().c_str());
         return false;
     }
 
@@ -19650,7 +19650,7 @@ bool Player::_LoadHomeBind(PreparedQueryResult result)
     }
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "Setting player home position - mapid: %u, areaid: %u, X: %f, Y: %f, Z: %f",
+    LOG_DEBUG("server", "Setting player home position - mapid: %u, areaid: %u, X: %f, Y: %f, Z: %f",
         m_homebindMapId, m_homebindAreaId, m_homebindX, m_homebindY, m_homebindZ);
 #endif
     return true;
@@ -19677,7 +19677,7 @@ void Player::SaveToDB(bool create, bool logout)
     UpdateHonorFields();
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "The value of player %s at save: ", m_name.c_str());
+    LOG_DEBUG("server", "The value of player %s at save: ", m_name.c_str());
 #endif
     outDebugValues();
 
@@ -19906,7 +19906,7 @@ void Player::_SaveInventory(SQLTransaction& trans)
         }
         else
         {
-            LOG_ERROR("root", "Can't find item guid %u but is in refundable storage for player %u ! Removing.", *itr, GetGUIDLow());
+            LOG_ERROR("server", "Can't find item guid %u but is in refundable storage for player %u ! Removing.", *itr, GetGUIDLow());
             m_refundableItems.erase(itr);
         }
     }
@@ -19937,7 +19937,7 @@ void Player::_SaveInventory(SQLTransaction& trans)
                 uint32 bagTestGUID = 0;
                 if (Item* test2 = GetItemByPos(INVENTORY_SLOT_BAG_0, item->GetBagSlot()))
                     bagTestGUID = test2->GetGUIDLow();
-                LOG_ERROR("root", "Player(GUID: %u Name: %s)::_SaveInventory - the bag(%u) and slot(%u) values for the item with guid %u (state %d) are incorrect, the player doesn't have an item at that position!", lowGuid, GetName().c_str(), item->GetBagSlot(), item->GetSlot(), item->GetGUIDLow(), (int32)item->GetState());
+                LOG_ERROR("server", "Player(GUID: %u Name: %s)::_SaveInventory - the bag(%u) and slot(%u) values for the item with guid %u (state %d) are incorrect, the player doesn't have an item at that position!", lowGuid, GetName().c_str(), item->GetBagSlot(), item->GetSlot(), item->GetGUIDLow(), (int32)item->GetState());
                 // according to the test that was just performed nothing should be in this slot, delete
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_INVENTORY_BY_BAG_SLOT);
                 stmt->setUInt32(0, bagTestGUID);
@@ -19957,7 +19957,7 @@ void Player::_SaveInventory(SQLTransaction& trans)
             }
             else if (test != item)
             {
-                LOG_ERROR("root", "Player(GUID: %u Name: %s)::_SaveInventory - the bag(%u) and slot(%u) values for the item with guid %u are incorrect, the item with guid %u is there instead!", lowGuid, GetName().c_str(), item->GetBagSlot(), item->GetSlot(), item->GetGUIDLow(), test->GetGUIDLow());
+                LOG_ERROR("server", "Player(GUID: %u Name: %s)::_SaveInventory - the bag(%u) and slot(%u) values for the item with guid %u are incorrect, the item with guid %u is there instead!", lowGuid, GetName().c_str(), item->GetBagSlot(), item->GetSlot(), item->GetGUIDLow(), test->GetGUIDLow());
                 // save all changes to the item...
                 if (item->GetState() != ITEM_NEW) // only for existing items, no dupes
                     item->SaveToDB(trans);
@@ -20391,18 +20391,18 @@ void Player::outDebugValues() const
     //     return;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "HP is: \t\t\t%u\t\tMP is: \t\t\t%u", GetMaxHealth(), GetMaxPower(POWER_MANA));
-    LOG_DEBUG("root", "AGILITY is: \t\t%f\t\tSTRENGTH is: \t\t%f", GetStat(STAT_AGILITY), GetStat(STAT_STRENGTH));
-    LOG_DEBUG("root", "INTELLECT is: \t\t%f\t\tSPIRIT is: \t\t%f", GetStat(STAT_INTELLECT), GetStat(STAT_SPIRIT));
-    LOG_DEBUG("root", "STAMINA is: \t\t%f", GetStat(STAT_STAMINA));
-    LOG_DEBUG("root", "Armor is: \t\t%u\t\tBlock is: \t\t%f", GetArmor(), GetFloatValue(PLAYER_BLOCK_PERCENTAGE));
-    LOG_DEBUG("root", "HolyRes is: \t\t%u\t\tFireRes is: \t\t%u", GetResistance(SPELL_SCHOOL_HOLY), GetResistance(SPELL_SCHOOL_FIRE));
-    LOG_DEBUG("root", "NatureRes is: \t\t%u\t\tFrostRes is: \t\t%u", GetResistance(SPELL_SCHOOL_NATURE), GetResistance(SPELL_SCHOOL_FROST));
-    LOG_DEBUG("root", "ShadowRes is: \t\t%u\t\tArcaneRes is: \t\t%u", GetResistance(SPELL_SCHOOL_SHADOW), GetResistance(SPELL_SCHOOL_ARCANE));
-    LOG_DEBUG("root", "MIN_DAMAGE is: \t\t%f\tMAX_DAMAGE is: \t\t%f", GetFloatValue(UNIT_FIELD_MINDAMAGE), GetFloatValue(UNIT_FIELD_MAXDAMAGE));
-    LOG_DEBUG("root", "MIN_OFFHAND_DAMAGE is: \t%f\tMAX_OFFHAND_DAMAGE is: \t%f", GetFloatValue(UNIT_FIELD_MINOFFHANDDAMAGE), GetFloatValue(UNIT_FIELD_MAXOFFHANDDAMAGE));
-    LOG_DEBUG("root", "MIN_RANGED_DAMAGE is: \t%f\tMAX_RANGED_DAMAGE is: \t%f", GetFloatValue(UNIT_FIELD_MINRANGEDDAMAGE), GetFloatValue(UNIT_FIELD_MAXRANGEDDAMAGE));
-    LOG_DEBUG("root", "ATTACK_TIME is: \t%u\t\tRANGE_ATTACK_TIME is: \t%u", GetAttackTime(BASE_ATTACK), GetAttackTime(RANGED_ATTACK));
+    LOG_DEBUG("server", "HP is: \t\t\t%u\t\tMP is: \t\t\t%u", GetMaxHealth(), GetMaxPower(POWER_MANA));
+    LOG_DEBUG("server", "AGILITY is: \t\t%f\t\tSTRENGTH is: \t\t%f", GetStat(STAT_AGILITY), GetStat(STAT_STRENGTH));
+    LOG_DEBUG("server", "INTELLECT is: \t\t%f\t\tSPIRIT is: \t\t%f", GetStat(STAT_INTELLECT), GetStat(STAT_SPIRIT));
+    LOG_DEBUG("server", "STAMINA is: \t\t%f", GetStat(STAT_STAMINA));
+    LOG_DEBUG("server", "Armor is: \t\t%u\t\tBlock is: \t\t%f", GetArmor(), GetFloatValue(PLAYER_BLOCK_PERCENTAGE));
+    LOG_DEBUG("server", "HolyRes is: \t\t%u\t\tFireRes is: \t\t%u", GetResistance(SPELL_SCHOOL_HOLY), GetResistance(SPELL_SCHOOL_FIRE));
+    LOG_DEBUG("server", "NatureRes is: \t\t%u\t\tFrostRes is: \t\t%u", GetResistance(SPELL_SCHOOL_NATURE), GetResistance(SPELL_SCHOOL_FROST));
+    LOG_DEBUG("server", "ShadowRes is: \t\t%u\t\tArcaneRes is: \t\t%u", GetResistance(SPELL_SCHOOL_SHADOW), GetResistance(SPELL_SCHOOL_ARCANE));
+    LOG_DEBUG("server", "MIN_DAMAGE is: \t\t%f\tMAX_DAMAGE is: \t\t%f", GetFloatValue(UNIT_FIELD_MINDAMAGE), GetFloatValue(UNIT_FIELD_MAXDAMAGE));
+    LOG_DEBUG("server", "MIN_OFFHAND_DAMAGE is: \t%f\tMAX_OFFHAND_DAMAGE is: \t%f", GetFloatValue(UNIT_FIELD_MINOFFHANDDAMAGE), GetFloatValue(UNIT_FIELD_MAXOFFHANDDAMAGE));
+    LOG_DEBUG("server", "MIN_RANGED_DAMAGE is: \t%f\tMAX_RANGED_DAMAGE is: \t%f", GetFloatValue(UNIT_FIELD_MINRANGEDDAMAGE), GetFloatValue(UNIT_FIELD_MAXRANGEDDAMAGE));
+    LOG_DEBUG("server", "ATTACK_TIME is: \t%u\t\tRANGE_ATTACK_TIME is: \t%u", GetAttackTime(BASE_ATTACK), GetAttackTime(RANGED_ATTACK));
 #endif
 }
 
@@ -20773,7 +20773,7 @@ Pet* Player::GetPet() const
             return pet;
 
         //there may be a guardian in slot
-        //LOG_ERROR("root", "Player::GetPet: Pet %u not exist.", GUID_LOPART(pet_guid));
+        //LOG_ERROR("server", "Player::GetPet: Pet %u not exist.", GUID_LOPART(pet_guid));
         //const_cast<Player*>(this)->SetPetGUID(0);
     }
 
@@ -20792,7 +20792,7 @@ void Player::RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent)
             mode = PET_SAVE_NOT_IN_SLOT;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("root", "RemovePet %u, %u, %u", pet->GetEntry(), mode, returnreagent);
+        LOG_DEBUG("server", "RemovePet %u, %u, %u", pet->GetEntry(), mode, returnreagent);
 #endif
         if (pet->m_removed)
             return;
@@ -20872,10 +20872,10 @@ void Player::StopCastingCharm()
 
     if (GetCharmGUID())
     {
-        LOG_FATAL("root", "Player %s (GUID: " UI64FMTD " is not able to uncharm unit (GUID: " UI64FMTD " Entry: %u, Type: %u)", GetName().c_str(), GetGUID(), GetCharmGUID(), charm->GetEntry(), charm->GetTypeId());
+        LOG_FATAL("server", "Player %s (GUID: " UI64FMTD " is not able to uncharm unit (GUID: " UI64FMTD " Entry: %u, Type: %u)", GetName().c_str(), GetGUID(), GetCharmGUID(), charm->GetEntry(), charm->GetTypeId());
         if (charm->GetCharmerGUID())
         {
-            LOG_FATAL("root", "Charmed unit has charmer guid " UI64FMTD, charm->GetCharmerGUID());
+            LOG_FATAL("server", "Charmed unit has charmer guid " UI64FMTD, charm->GetCharmerGUID());
             ASSERT(false);
         }
         else
@@ -20972,7 +20972,7 @@ void Player::PetSpellInitialize()
         return;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "Pet Spells Groups");
+    LOG_DEBUG("server", "Pet Spells Groups");
 #endif
 
     CharmInfo* charmInfo = pet->GetCharmInfo();
@@ -21037,7 +21037,7 @@ void Player::PossessSpellInitialize()
 
     if (!charmInfo)
     {
-        LOG_ERROR("root", "Player::PossessSpellInitialize(): charm (" UI64FMTD ") has no charminfo!", charm->GetGUID());
+        LOG_ERROR("server", "Player::PossessSpellInitialize(): charm (" UI64FMTD ") has no charminfo!", charm->GetGUID());
         return;
     }
 
@@ -21086,7 +21086,7 @@ void Player::VehicleSpellInitialize()
         if (!sConditionMgr->IsObjectMeetToConditions(this, vehicle, conditions))
         {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            LOG_DEBUG("root", "VehicleSpellInitialize: conditions not met for Vehicle entry %u spell %u", vehicle->ToCreature()->GetEntry(), spellId);
+            LOG_DEBUG("server", "VehicleSpellInitialize: conditions not met for Vehicle entry %u spell %u", vehicle->ToCreature()->GetEntry(), spellId);
 #endif
             data << uint16(0) << uint8(0) << uint8(i+8);
             continue;
@@ -21129,7 +21129,7 @@ void Player::CharmSpellInitialize()
     CharmInfo* charmInfo = charm->GetCharmInfo();
     if (!charmInfo)
     {
-        LOG_ERROR("root", "Player::CharmSpellInitialize(): the player's charm (" UI64FMTD ") has no charminfo!", charm->GetGUID());
+        LOG_ERROR("server", "Player::CharmSpellInitialize(): the player's charm (" UI64FMTD ") has no charminfo!", charm->GetGUID());
         return;
     }
 
@@ -21236,7 +21236,7 @@ class MageSpellModPred
 void Player::AddSpellMod(SpellModifier* mod, bool apply)
 { 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "Player::AddSpellMod %d", mod->spellId);
+    LOG_DEBUG("server", "Player::AddSpellMod %d", mod->spellId);
 #endif
     uint16 Opcode = (mod->type == SPELLMOD_FLAT) ? SMSG_SET_FLAT_SPELL_MODIFIER : SMSG_SET_PCT_SPELL_MODIFIER;
 
@@ -21427,17 +21427,17 @@ void Player::SetSpellModTakingSpell(Spell* spell, bool apply)
 { 
     if (apply && m_spellModTakingSpell != NULL)
     {
-        LOG_INFO("root", "Player::SetSpellModTakingSpell (A1) - %u, %u", spell->m_spellInfo->Id, m_spellModTakingSpell->m_spellInfo->Id);
+        LOG_INFO("server", "Player::SetSpellModTakingSpell (A1) - %u, %u", spell->m_spellInfo->Id, m_spellModTakingSpell->m_spellInfo->Id);
         return;
         //ASSERT(m_spellModTakingSpell == NULL);
     }
     else if (!apply)
     {
         if (!m_spellModTakingSpell)
-            LOG_INFO("root", "Player::SetSpellModTakingSpell (B1) - %u", spell->m_spellInfo->Id);
+            LOG_INFO("server", "Player::SetSpellModTakingSpell (B1) - %u", spell->m_spellInfo->Id);
         else if (m_spellModTakingSpell != spell)
         {
-            LOG_INFO("root", "Player::SetSpellModTakingSpell (C1) - %u, %u", spell->m_spellInfo->Id, m_spellModTakingSpell->m_spellInfo->Id);
+            LOG_INFO("server", "Player::SetSpellModTakingSpell (C1) - %u, %u", spell->m_spellInfo->Id, m_spellModTakingSpell->m_spellInfo->Id);
             return;
         }
         //ASSERT(m_spellModTakingSpell && m_spellModTakingSpell == spell);
@@ -21799,7 +21799,7 @@ void Player::ContinueTaxiFlight()
         return;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "WORLD: Restart character %u taxi flight", GetGUIDLow());
+    LOG_DEBUG("server", "WORLD: Restart character %u taxi flight", GetGUIDLow());
 #endif
 
     uint32 mountDisplayId = sObjectMgr->GetTaxiMountDisplayId(sourceNode, GetTeamId(true), true);
@@ -21934,7 +21934,7 @@ void Player::InitDisplayIds()
     PlayerInfo const* info = sObjectMgr->GetPlayerInfo(getRace(true), getClass());
     if (!info)
     {
-        LOG_ERROR("root", "Player %u has incorrect race/class pair. Can't init display ids.", GetGUIDLow());
+        LOG_ERROR("server", "Player %u has incorrect race/class pair. Can't init display ids.", GetGUIDLow());
         return;
     }
 
@@ -21950,7 +21950,7 @@ void Player::InitDisplayIds()
             SetNativeDisplayId(info->displayId_m);
             break;
         default:
-            LOG_ERROR("root", "Invalid gender %u for player", gender);
+            LOG_ERROR("server", "Invalid gender %u for player", gender);
             return;
     }
 }
@@ -22056,7 +22056,7 @@ bool Player::BuyItemFromVendorSlot(uint64 vendorguid, uint32 vendorslot, uint32 
     if (!creature)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("root", "WORLD: BuyItemFromVendor - Unit (GUID: %u) not found or you can't interact with him.", uint32(GUID_LOPART(vendorguid)));
+        LOG_DEBUG("server", "WORLD: BuyItemFromVendor - Unit (GUID: %u) not found or you can't interact with him.", uint32(GUID_LOPART(vendorguid)));
 #endif
         SendBuyError(BUY_ERR_DISTANCE_TOO_FAR, NULL, item, 0);
         return false;
@@ -22112,7 +22112,7 @@ bool Player::BuyItemFromVendorSlot(uint64 vendorguid, uint32 vendorslot, uint32 
         ItemExtendedCostEntry const* iece = sItemExtendedCostStore.LookupEntry(crItem->ExtendedCost);
         if (!iece)
         {
-            LOG_ERROR("root", "Item %u have wrong ExtendedCost field value %u", pProto->ItemId, crItem->ExtendedCost);
+            LOG_ERROR("server", "Item %u have wrong ExtendedCost field value %u", pProto->ItemId, crItem->ExtendedCost);
             return false;
         }
 
@@ -22155,7 +22155,7 @@ bool Player::BuyItemFromVendorSlot(uint64 vendorguid, uint32 vendorslot, uint32 
         uint32 maxCount = MAX_MONEY_AMOUNT / pProto->BuyPrice;
         if ((uint32)count > maxCount)
         {
-            LOG_ERROR("root", "Player %s tried to buy %u item id %u, causing overflow", GetName().c_str(), (uint32)count, pProto->ItemId);
+            LOG_ERROR("server", "Player %s tried to buy %u item id %u, causing overflow", GetName().c_str(), (uint32)count, pProto->ItemId);
             count = (uint8)maxCount;
         }
         price = pProto->BuyPrice * count; //it should not exceed MAX_MONEY_AMOUNT
@@ -22250,7 +22250,7 @@ void Player::UpdateHomebindTime(uint32 time)
         data << uint32(1);
         GetSession()->SendPacket(&data);
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("root", "PLAYER: Player '%s' (GUID: %u) will be teleported to homebind in 60 seconds", GetName().c_str(), GetGUIDLow());
+        LOG_DEBUG("server", "PLAYER: Player '%s' (GUID: %u) will be teleported to homebind in 60 seconds", GetName().c_str(), GetGUIDLow());
 #endif
     }
 }
@@ -22567,7 +22567,7 @@ bool Player::EnchantmentFitsRequirements(uint32 enchantmentcondition, int8 slot)
     }
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "Checking Condition %u, there are %u Meta Gems, %u Red Gems, %u Yellow Gems and %u Blue Gems, Activate:%s", enchantmentcondition, curcount[0], curcount[1], curcount[2], curcount[3], activate ? "yes" : "no");
+    LOG_DEBUG("server", "Checking Condition %u, there are %u Meta Gems, %u Red Gems, %u Yellow Gems and %u Blue Gems, Activate:%s", enchantmentcondition, curcount[0], curcount[1], curcount[2], curcount[3], activate ? "yes" : "no");
 #endif
 
     return activate;
@@ -23926,7 +23926,7 @@ bool Player::HasItemFitToSpellRequirements(SpellInfo const* spellInfo, Item cons
             break;
         }
         default:
-            LOG_ERROR("root", "HasItemFitToSpellRequirements: Not handled spell requirement for item class %u", spellInfo->EquippedItemClass);
+            LOG_ERROR("server", "HasItemFitToSpellRequirements: Not handled spell requirement for item class %u", spellInfo->EquippedItemClass);
             break;
     }
 
@@ -24003,7 +24003,7 @@ uint32 Player::GetResurrectionSpellId()
                 case 27239: spell_id = 27240; break;        // rank 6
                 case 47883: spell_id = 47882; break;        // rank 7
                 default:
-                    LOG_ERROR("root", "Unhandled spell %u: S.Resurrection", (*itr)->GetId());
+                    LOG_ERROR("server", "Unhandled spell %u: S.Resurrection", (*itr)->GetId());
                     continue;
             }
 
@@ -24233,14 +24233,14 @@ void Player::SetMover(Unit* target)
 { 
     if (this != target && target->m_movedByPlayer && target->m_movedByPlayer != target && target->m_movedByPlayer != this)
     {
-        LOG_INFO("root", "Player::SetMover (A1) - %u, %u, %u, %u, %u, %u, %u, %u", GetGUIDLow(), GetMapId(), GetInstanceId(), FindMap()->GetId(), IsInWorld() ? 1 : 0, IsDuringRemoveFromWorld() ? 1 : 0, IsBeingTeleported() ? 1 : 0, isBeingLoaded() ? 1 : 0);
-        LOG_INFO("root", "Player::SetMover (A2) - %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u", target->GetTypeId(), target->GetEntry(), target->GetUnitTypeMask(), target->GetGUIDLow(), target->GetMapId(), target->GetInstanceId(), target->FindMap()->GetId(), target->IsInWorld() ? 1 : 0, target->IsDuringRemoveFromWorld() ? 1 : 0, (target->ToPlayer() && target->ToPlayer()->IsBeingTeleported() ? 1 : 0), target->isBeingLoaded() ? 1 : 0);
-        LOG_INFO("root", "Player::SetMover (A3) - %u, %u, %u, %u, %u, %u, %u, %u", target->m_movedByPlayer->GetGUIDLow(), target->m_movedByPlayer->GetMapId(), target->m_movedByPlayer->GetInstanceId(), target->m_movedByPlayer->FindMap()->GetId(), target->m_movedByPlayer->IsInWorld() ? 1 : 0, target->m_movedByPlayer->IsDuringRemoveFromWorld() ? 1 : 0, target->m_movedByPlayer->ToPlayer()->IsBeingTeleported() ? 1 : 0, target->m_movedByPlayer->isBeingLoaded() ? 1 : 0);
+        LOG_INFO("server", "Player::SetMover (A1) - %u, %u, %u, %u, %u, %u, %u, %u", GetGUIDLow(), GetMapId(), GetInstanceId(), FindMap()->GetId(), IsInWorld() ? 1 : 0, IsDuringRemoveFromWorld() ? 1 : 0, IsBeingTeleported() ? 1 : 0, isBeingLoaded() ? 1 : 0);
+        LOG_INFO("server", "Player::SetMover (A2) - %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u", target->GetTypeId(), target->GetEntry(), target->GetUnitTypeMask(), target->GetGUIDLow(), target->GetMapId(), target->GetInstanceId(), target->FindMap()->GetId(), target->IsInWorld() ? 1 : 0, target->IsDuringRemoveFromWorld() ? 1 : 0, (target->ToPlayer() && target->ToPlayer()->IsBeingTeleported() ? 1 : 0), target->isBeingLoaded() ? 1 : 0);
+        LOG_INFO("server", "Player::SetMover (A3) - %u, %u, %u, %u, %u, %u, %u, %u", target->m_movedByPlayer->GetGUIDLow(), target->m_movedByPlayer->GetMapId(), target->m_movedByPlayer->GetInstanceId(), target->m_movedByPlayer->FindMap()->GetId(), target->m_movedByPlayer->IsInWorld() ? 1 : 0, target->m_movedByPlayer->IsDuringRemoveFromWorld() ? 1 : 0, target->m_movedByPlayer->ToPlayer()->IsBeingTeleported() ? 1 : 0, target->m_movedByPlayer->isBeingLoaded() ? 1 : 0);
     }
     if (this != target && (!target->IsInWorld() || target->IsDuringRemoveFromWorld() || GetMapId() != target->GetMapId() || GetInstanceId() != target->GetInstanceId()))
     {
-        LOG_INFO("root", "Player::SetMover (B1) - %u, %u, %u, %u, %u, %u, %u, %u", GetGUIDLow(), GetMapId(), GetInstanceId(), FindMap()->GetId(), IsInWorld() ? 1 : 0, IsDuringRemoveFromWorld() ? 1 : 0, IsBeingTeleported() ? 1 : 0, isBeingLoaded() ? 1 : 0);
-        LOG_INFO("root", "Player::SetMover (B2) - %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u", target->GetTypeId(), target->GetEntry(), target->GetUnitTypeMask(), target->GetGUIDLow(), target->GetMapId(), target->GetInstanceId(), target->FindMap()->GetId(), target->IsInWorld() ? 1 : 0, target->IsDuringRemoveFromWorld() ? 1 : 0, (target->ToPlayer() && target->ToPlayer()->IsBeingTeleported() ? 1 : 0), target->isBeingLoaded() ? 1 : 0);
+        LOG_INFO("server", "Player::SetMover (B1) - %u, %u, %u, %u, %u, %u, %u, %u", GetGUIDLow(), GetMapId(), GetInstanceId(), FindMap()->GetId(), IsInWorld() ? 1 : 0, IsDuringRemoveFromWorld() ? 1 : 0, IsBeingTeleported() ? 1 : 0, isBeingLoaded() ? 1 : 0);
+        LOG_INFO("server", "Player::SetMover (B2) - %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u", target->GetTypeId(), target->GetEntry(), target->GetUnitTypeMask(), target->GetGUIDLow(), target->GetMapId(), target->GetInstanceId(), target->FindMap()->GetId(), target->IsInWorld() ? 1 : 0, target->IsDuringRemoveFromWorld() ? 1 : 0, (target->ToPlayer() && target->ToPlayer()->IsBeingTeleported() ? 1 : 0), target->isBeingLoaded() ? 1 : 0);
     }
     m_mover->m_movedByPlayer = NULL;
     m_mover = target;
@@ -24491,7 +24491,7 @@ void Player::SetBattlegroundOrBattlefieldRaid(Group *group, int8 subgroup)
     //we must move references from m_group to m_originalGroup
     if (GetGroup() && (GetGroup()->isBGGroup() || GetGroup()->isBFGroup()))
     {
-        LOG_INFO("root", "Player::SetBattlegroundOrBattlefieldRaid - current group is %s group!", (GetGroup()->isBGGroup() ? "BG" : "BF"));
+        LOG_INFO("server", "Player::SetBattlegroundOrBattlefieldRaid - current group is %s group!", (GetGroup()->isBGGroup() ? "BG" : "BF"));
         //ASSERT(false); // pussywizard: origanal group can never be bf/bg group
     }
 
@@ -24664,12 +24664,12 @@ void Player::SetViewpoint(WorldObject* target, bool apply)
             return;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("root", "Player::CreateViewpoint: Player %s create seer %u (TypeId: %u).", GetName().c_str(), target->GetEntry(), target->GetTypeId());
+        LOG_DEBUG("server", "Player::CreateViewpoint: Player %s create seer %u (TypeId: %u).", GetName().c_str(), target->GetEntry(), target->GetTypeId());
 #endif
 
         if (!AddUInt64Value(PLAYER_FARSIGHT, target->GetGUID()))
         {
-            LOG_FATAL("root", "Player::CreateViewpoint: Player %s cannot add new viewpoint!", GetName().c_str());
+            LOG_FATAL("server", "Player::CreateViewpoint: Player %s cannot add new viewpoint!", GetName().c_str());
             return;
         }
 
@@ -24685,7 +24685,7 @@ void Player::SetViewpoint(WorldObject* target, bool apply)
         m_seer = this;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("root", "Player::CreateViewpoint: Player %s remove seer", GetName().c_str());
+        LOG_DEBUG("server", "Player::CreateViewpoint: Player %s remove seer", GetName().c_str());
 #endif
 
         if (target->isType(TYPEMASK_UNIT) && !GetVehicle())
@@ -24693,7 +24693,7 @@ void Player::SetViewpoint(WorldObject* target, bool apply)
 
         if (!RemoveUInt64Value(PLAYER_FARSIGHT, target->GetGUID()))
         {
-            LOG_FATAL("root", "Player::CreateViewpoint: Player %s cannot remove current viewpoint!", GetName().c_str());
+            LOG_FATAL("server", "Player::CreateViewpoint: Player %s cannot remove current viewpoint!", GetName().c_str());
             return;
         }
 
@@ -25315,7 +25315,7 @@ void Player::_LoadSkills(PreparedQueryResult result)
             SkillLineEntry const* pSkill = sSkillLineStore.LookupEntry(skill);
             if (!pSkill)
             {
-                LOG_ERROR("root", "Character %u has skill %u that does not exist.", GetGUIDLow(), skill);
+                LOG_ERROR("server", "Character %u has skill %u that does not exist.", GetGUIDLow(), skill);
                 continue;
             }
 
@@ -25333,7 +25333,7 @@ void Player::_LoadSkills(PreparedQueryResult result)
             }
             if (value == 0)
             {
-                LOG_ERROR("root", "Character %u has skill %u with value 0. Will be deleted.", GetGUIDLow(), skill);
+                LOG_ERROR("server", "Character %u has skill %u with value 0. Will be deleted.", GetGUIDLow(), skill);
 
                 PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHARACTER_SKILL);
 
@@ -25362,7 +25362,7 @@ void Player::_LoadSkills(PreparedQueryResult result)
 
             if (count >= PLAYER_MAX_SKILLS)                      // client limit
             {
-                LOG_ERROR("root", "Character %u has more than %u skills.", GetGUIDLow(), PLAYER_MAX_SKILLS);
+                LOG_ERROR("server", "Character %u has more than %u skills.", GetGUIDLow(), PLAYER_MAX_SKILLS);
                 break;
             }
         }
@@ -25488,7 +25488,7 @@ void Player::HandleFall(MovementInfo const& movementInfo)
 { 
     // calculate total z distance of the fall
     float z_diff = m_lastFallZ - movementInfo.pos.GetPositionZ();
-    //LOG_DEBUG("root", "zDiff = %f", z_diff);
+    //LOG_DEBUG("server", "zDiff = %f", z_diff);
 
     //Players with low fall distance, Feather Fall or physical immunity (charges used) are ignored
     // 14.57 can be calculated by resolving damageperc formula below to 0
@@ -25524,7 +25524,7 @@ void Player::HandleFall(MovementInfo const& movementInfo)
 
             //Z given by moveinfo, LastZ, FallTime, WaterZ, MapZ, Damage, Safefall reduction
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            LOG_DEBUG("root", "FALLDAMAGE mZ=%f z=%f fallTime=%u damage=%u SF=%d", movementInfo.pos.GetPositionZ(), GetPositionZ(), movementInfo.fallTime, damage, safe_fall);
+            LOG_DEBUG("server", "FALLDAMAGE mZ=%f z=%f fallTime=%u damage=%u SF=%d", movementInfo.pos.GetPositionZ(), GetPositionZ(), movementInfo.fallTime, damage, safe_fall);
 #endif
         }
 
@@ -25817,7 +25817,7 @@ void Player::LearnPetTalent(uint64 petGuid, uint32 talentId, uint32 talentRank)
     uint32 spellid = talentInfo->RankID[talentRank];
     if (spellid == 0)
     {
-        LOG_ERROR("root", "Talent.dbc have for talent: %u Rank: %u spell id = 0", talentId, talentRank);
+        LOG_ERROR("server", "Talent.dbc have for talent: %u Rank: %u spell id = 0", talentId, talentRank);
         return;
     }
 
@@ -25828,7 +25828,7 @@ void Player::LearnPetTalent(uint64 petGuid, uint32 talentId, uint32 talentRank)
     // learn! (other talent ranks will unlearned at learning)
     pet->learnSpell(spellid);
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "PetTalentID: %u Rank: %u Spell: %u\n", talentId, talentRank, spellid);
+    LOG_DEBUG("server", "PetTalentID: %u Rank: %u Spell: %u\n", talentId, talentRank, spellid);
 #endif
 
     // update free talent points
@@ -26129,7 +26129,7 @@ void Player::SetEquipmentSet(uint32 index, EquipmentSet eqset)
 
         if (!found)                                          // something wrong...
         {
-            LOG_ERROR("root", "Player %s tried to save equipment set " UI64FMTD " (index %u), but that equipment set not found!", GetName().c_str(), eqset.Guid, index);
+            LOG_ERROR("server", "Player %s tried to save equipment set " UI64FMTD " (index %u), but that equipment set not found!", GetName().c_str(), eqset.Guid, index);
             return;
         }
     }
@@ -27119,7 +27119,7 @@ void Player::SendRefundInfo(Item* item)
     if (!item->HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAG_REFUNDABLE))
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("root", "Item refund: item not refundable!");
+        LOG_DEBUG("server", "Item refund: item not refundable!");
 #endif
         return;
     }
@@ -27127,7 +27127,7 @@ void Player::SendRefundInfo(Item* item)
     if (GetGUIDLow() != item->GetRefundRecipient()) // Formerly refundable item got traded
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("root", "Item refund: item was traded!");
+        LOG_DEBUG("server", "Item refund: item was traded!");
 #endif
         item->SetNotRefundable(this);
         return;
@@ -27137,7 +27137,7 @@ void Player::SendRefundInfo(Item* item)
     if (!iece)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("root", "Item refund: cannot find extendedcost data.");
+        LOG_DEBUG("server", "Item refund: cannot find extendedcost data.");
 #endif
         return;
     }
@@ -27185,7 +27185,7 @@ void Player::RefundItem(Item* item)
     if (!item->HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAG_REFUNDABLE))
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("root", "Item refund: item not refundable!");
+        LOG_DEBUG("server", "Item refund: item not refundable!");
 #endif
         return;
     }
@@ -27203,7 +27203,7 @@ void Player::RefundItem(Item* item)
     if (GetGUIDLow() != item->GetRefundRecipient()) // Formerly refundable item got traded
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("root", "Item refund: item was traded!");
+        LOG_DEBUG("server", "Item refund: item was traded!");
 #endif
         item->SetNotRefundable(this);
         return;
@@ -27213,7 +27213,7 @@ void Player::RefundItem(Item* item)
     if (!iece)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("root", "Item refund: cannot find extendedcost data.");
+        LOG_DEBUG("server", "Item refund: cannot find extendedcost data.");
 #endif
         return;
     }

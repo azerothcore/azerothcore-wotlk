@@ -71,6 +71,7 @@ private:
     FormattingChannel* GetFileChannel(std::string ChannelName);
     FormattingChannel* GetConsoleChannel();
     void ClearnAllChannels();
+    std::string GetLoggerByType(std::string const& type) const;
 
     void _Write(std::string const& filter, LogLevel const level, std::string const& message);
     void _writeCommand(std::string const message, std::string const accountid);
@@ -103,6 +104,7 @@ private:
     std::string const LOGGER_GM_DYNAMIC = "commands.gm.dynamic";
     std::string const LOGGER_PLAYER_DUMP = "entities.player.dump";
     std::string const LOGGER_SYSTEM = "system";
+    std::string const LOGGER_UNKNOWN = "_unk";
 
     // Prefix's
     std::string const PREFIX_LOGGER = "Logger.";

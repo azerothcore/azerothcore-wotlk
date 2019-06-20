@@ -28,7 +28,7 @@
 void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket& recvData)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "WORLD: CMSG_AUTOSTORE_LOOT_ITEM");
+    LOG_DEBUG("server", "WORLD: CMSG_AUTOSTORE_LOOT_ITEM");
 #endif
     Player* player = GetPlayer();
     uint64 lguid = player->GetLootGUID();
@@ -100,7 +100,7 @@ void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket& recvData)
 void WorldSession::HandleLootMoneyOpcode(WorldPacket & /*recvData*/)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "WORLD: CMSG_LOOT_MONEY");
+    LOG_DEBUG("server", "WORLD: CMSG_LOOT_MONEY");
 #endif
 
     Player* player = GetPlayer();
@@ -222,7 +222,7 @@ void WorldSession::HandleLootMoneyOpcode(WorldPacket & /*recvData*/)
 void WorldSession::HandleLootOpcode(WorldPacket& recvData)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "WORLD: CMSG_LOOT");
+    LOG_DEBUG("server", "WORLD: CMSG_LOOT");
 #endif
 
     uint64 guid;
@@ -242,7 +242,7 @@ void WorldSession::HandleLootOpcode(WorldPacket& recvData)
 void WorldSession::HandleLootReleaseOpcode(WorldPacket& recvData)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "WORLD: CMSG_LOOT_RELEASE");
+    LOG_DEBUG("server", "WORLD: CMSG_LOOT_RELEASE");
 #endif
 
     // cheaters can modify lguid to prevent correct apply loot release code and re-loot
@@ -303,7 +303,7 @@ void WorldSession::DoLootRelease(uint64 lguid)
                 if (go->GetGoType() == GAMEOBJECT_TYPE_CHEST && go->GetGOInfo()->chest.eventId)
                 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                    LOG_DEBUG("root", "Chest ScriptStart id %u for GO %u", go->GetGOInfo()->chest.eventId, go->GetDBTableGUIDLow());
+                    LOG_DEBUG("server", "Chest ScriptStart id %u for GO %u", go->GetGOInfo()->chest.eventId, go->GetDBTableGUIDLow());
 #endif
                     player->GetMap()->ScriptsStart(sEventScripts, go->GetGOInfo()->chest.eventId, player, go);
                 }
@@ -426,7 +426,7 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recvData)
     }
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "WorldSession::HandleLootMasterGiveOpcode (CMSG_LOOT_MASTER_GIVE, 0x02A3) Target = [%s].", target->GetName().c_str());
+    LOG_DEBUG("server", "WorldSession::HandleLootMasterGiveOpcode (CMSG_LOOT_MASTER_GIVE, 0x02A3) Target = [%s].", target->GetName().c_str());
 #endif
 
     if (_player->GetLootGUID() != lootguid)
@@ -438,7 +438,7 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recvData)
     if (!_player->IsInRaidWith(target))
     {
         _player->SendLootError(lootguid, LOOT_ERROR_MASTER_OTHER);
-        //LOG_DEBUG("root", "MasterLootItem: Player %s tried to give an item to ineligible player %s !", GetPlayer()->GetName().c_str(), target->GetName().c_str());
+        //LOG_DEBUG("server", "MasterLootItem: Player %s tried to give an item to ineligible player %s !", GetPlayer()->GetName().c_str(), target->GetName().c_str());
         return;
     }
 
@@ -467,7 +467,7 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recvData)
     if (slotid >= loot->items.size() + loot->quest_items.size())
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("root", "MasterLootItem: Player %s might be using a hack! (slot %d, size %lu)", GetPlayer()->GetName().c_str(), slotid, (unsigned long)loot->items.size());
+        LOG_DEBUG("server", "MasterLootItem: Player %s might be using a hack! (slot %d, size %lu)", GetPlayer()->GetName().c_str(), slotid, (unsigned long)loot->items.size());
 #endif
         return;
     }

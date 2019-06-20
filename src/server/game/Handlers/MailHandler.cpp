@@ -22,7 +22,7 @@ bool WorldSession::CanOpenMailBox(uint64 guid)
 {
     if (guid == _player->GetGUID())
     {
-        LOG_ERROR("root", "%s attempt open mailbox in cheating way.", _player->GetName().c_str());
+        LOG_ERROR("server", "%s attempt open mailbox in cheating way.", _player->GetName().c_str());
         return false;
     }
     else if (IS_GAMEOBJECT_GUID(guid))
@@ -102,14 +102,14 @@ void WorldSession::HandleSendMail(WorldPacket & recvData)
     if (!rc)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("root", "Player %u is sending mail to %s (GUID: not existed!) with subject %s and body %s includes %u items, %u copper and %u COD copper with unk1 = %u, unk2 = %u", player->GetGUIDLow(), receiver.c_str(), subject.c_str(), body.c_str(), items_count, money, COD, unk1, unk2);
+        LOG_DEBUG("server", "Player %u is sending mail to %s (GUID: not existed!) with subject %s and body %s includes %u items, %u copper and %u COD copper with unk1 = %u, unk2 = %u", player->GetGUIDLow(), receiver.c_str(), subject.c_str(), body.c_str(), items_count, money, COD, unk1, unk2);
 #endif
         player->SendMailResult(0, MAIL_SEND, MAIL_ERR_RECIPIENT_NOT_FOUND);
         return;
     }
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "Player %u is sending mail to %s (GUID: %u) with subject %s and body %s includes %u items, %u copper and %u COD copper with unk1 = %u, unk2 = %u", player->GetGUIDLow(), receiver.c_str(), GUID_LOPART(rc), subject.c_str(), body.c_str(), items_count, money, COD, unk1, unk2);
+    LOG_DEBUG("server", "Player %u is sending mail to %s (GUID: %u) with subject %s and body %s includes %u items, %u copper and %u COD copper with unk1 = %u, unk2 = %u", player->GetGUIDLow(), receiver.c_str(), GUID_LOPART(rc), subject.c_str(), body.c_str(), items_count, money, COD, unk1, unk2);
 #endif
 
     if (player->GetGUID() == rc)
@@ -722,7 +722,7 @@ void WorldSession::HandleMailCreateTextItem(WorldPacket & recvData)
     bodyItem->SetFlag(ITEM_FIELD_FLAGS, ITEM_FLAG_MAIL_TEXT_MASK);
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "HandleMailCreateTextItem mailid=%u", mailId);
+    LOG_DEBUG("server", "HandleMailCreateTextItem mailid=%u", mailId);
 #endif
 
     ItemPosCountVec dest;

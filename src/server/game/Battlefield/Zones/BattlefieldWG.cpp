@@ -221,7 +221,7 @@ void BattlefieldWG::OnBattleStart()
         m_titansRelic = go->GetGUID();
     }
     else
-        LOG_ERROR("root", "WG: Failed to spawn titan relic.");
+        LOG_ERROR("server", "WG: Failed to spawn titan relic.");
 
 
     // Update tower visibility and update faction
@@ -511,7 +511,7 @@ uint8 BattlefieldWG::GetSpiritGraveyardId(uint32 areaId) const
         case AREA_THE_CHILLED_QUAGMIRE:
             return BATTLEFIELD_WG_GY_HORDE;
         default:
-            LOG_ERROR("root", "BattlefieldWG::GetSpiritGraveyardId: Unexpected Area Id %u", areaId);
+            LOG_ERROR("server", "BattlefieldWG::GetSpiritGraveyardId: Unexpected Area Id %u", areaId);
             break;
     }
 

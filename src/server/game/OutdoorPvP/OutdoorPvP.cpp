@@ -106,14 +106,14 @@ bool OPvPCapturePoint::AddCreature(uint32 type, uint32 entry, uint32 map, float 
 bool OPvPCapturePoint::SetCapturePointData(uint32 entry, uint32 map, float x, float y, float z, float o, float rotation0, float rotation1, float rotation2, float rotation3)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "Creating capture point %u", entry);
+    LOG_DEBUG("server", "Creating capture point %u", entry);
 #endif
 
     // check info existence
     GameObjectTemplate const* goinfo = sObjectMgr->GetGameObjectTemplate(entry);
     if (!goinfo || goinfo->type != GAMEOBJECT_TYPE_CAPTURE_POINT)
     {
-        LOG_ERROR("root", "OutdoorPvP: GO %u is not capture point!", entry);
+        LOG_ERROR("server", "OutdoorPvP: GO %u is not capture point!", entry);
         return false;
     }
 
@@ -135,7 +135,7 @@ bool OPvPCapturePoint::DelCreature(uint32 type)
     if (!m_Creatures[type])
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("root", "opvp creature type %u was already deleted", type);
+        LOG_DEBUG("server", "opvp creature type %u was already deleted", type);
 #endif
         return false;
     }
@@ -148,7 +148,7 @@ bool OPvPCapturePoint::DelCreature(uint32 type)
         return false;
     }
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "deleting opvp creature type %u", type);
+    LOG_DEBUG("server", "deleting opvp creature type %u", type);
 #endif
     uint32 guid = cr->GetDBTableGUIDLow();
     // Don't save respawn time
@@ -248,7 +248,7 @@ void OutdoorPvP::HandlePlayerLeaveZone(Player* player, uint32 /*zone*/)
         SendRemoveWorldStates(player);
     m_players[player->GetTeamId()].erase(player->GetGUID());
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "Player %s left an outdoorpvp zone", player->GetName().c_str());
+    LOG_DEBUG("server", "Player %s left an outdoorpvp zone", player->GetName().c_str());
 #endif
 }
 
@@ -379,7 +379,7 @@ bool OPvPCapturePoint::Update(uint32 diff)
 
     if (m_OldState != m_State)
     {
-        //LOG_ERROR("root", "%u->%u", m_OldState, m_State);
+        //LOG_ERROR("server", "%u->%u", m_OldState, m_State);
         if (oldTeam != m_team)
             ChangeTeam(oldTeam);
         ChangeState();

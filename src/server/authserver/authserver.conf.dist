@@ -297,7 +297,7 @@ LogChannel.Auth = 2,local,%Y-%m-%d %H:%M:%S %t,Auth.log,false,daily
 #  Logger config values: Given a logger "name"
 #    Logger.name
 #        Description: Defines 'What to log'
-#        Format:      LogLevel,AppenderList
+#        Format:      LogLevel,LogChannel
 #
 #                     LogLevel
 #                         0 - (Disabled)
@@ -310,11 +310,13 @@ LogChannel.Auth = 2,local,%Y-%m-%d %H:%M:%S %t,Auth.log,false,daily
 #                         7 - (Debug)
 #						  8 - (Trace)
 #
-#                     Channel List: List of file channels linked to logger
+#                     File channel: file channel linked to logger
 #                     (Using spaces as separator).
 #
 
 Logger.root = 6,Auth
+Logger.server = 6,Auth
+Logger.sql = 4,Auth
 
 #
 ###################################################################################################

@@ -181,13 +181,13 @@ InstanceMap* MapInstanced::CreateInstance(uint32 InstanceId, InstanceSave* save,
     const MapEntry* entry = sMapStore.LookupEntry(GetId());
     if (!entry)
     {
-        LOG_ERROR("root", "CreateInstance: no entry for map %d", GetId());
+        LOG_ERROR("server", "CreateInstance: no entry for map %d", GetId());
         ASSERT(false);
     }
     const InstanceTemplate* iTemplate = sObjectMgr->GetInstanceTemplate(GetId());
     if (!iTemplate)
     {
-        LOG_ERROR("root", "CreateInstance: no instance template for map %d", GetId());
+        LOG_ERROR("server", "CreateInstance: no instance template for map %d", GetId());
         ASSERT(false);
     }
 
@@ -195,7 +195,7 @@ InstanceMap* MapInstanced::CreateInstance(uint32 InstanceId, InstanceSave* save,
     GetDownscaledMapDifficultyData(GetId(), difficulty);
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "MapInstanced::CreateInstance: %s map instance %d for %d created with difficulty %s", save?"":"new ", InstanceId, GetId(), difficulty?"heroic":"normal");
+    LOG_DEBUG("server", "MapInstanced::CreateInstance: %s map instance %d for %d created with difficulty %s", save?"":"new ", InstanceId, GetId(), difficulty?"heroic":"normal");
 #endif
 
     InstanceMap* map = new InstanceMap(GetId(), InstanceId, difficulty, this);
@@ -221,7 +221,7 @@ BattlegroundMap* MapInstanced::CreateBattleground(uint32 InstanceId, Battlegroun
     TRINITY_GUARD(ACE_Thread_Mutex, Lock);
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "MapInstanced::CreateBattleground: map bg %d for %d created.", InstanceId, GetId());
+    LOG_DEBUG("server", "MapInstanced::CreateBattleground: map bg %d for %d created.", InstanceId, GetId());
 #endif
 
     PvPDifficultyEntry const* bracketEntry = GetBattlegroundBracketByLevel(bg->GetMapId(), bg->GetMinLevel());

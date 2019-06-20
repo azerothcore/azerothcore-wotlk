@@ -39,7 +39,7 @@ MailSender::MailSender(Object* sender, MailStationery stationery) : m_stationery
         default:
             m_messageType = MAIL_NORMAL;
             m_senderId = 0;                                 // will show mail from not existed player
-            LOG_ERROR("root", "MailSender::MailSender - Mail have unexpected sender typeid (%u)", sender->GetTypeId());
+            LOG_ERROR("server", "MailSender::MailSender - Mail have unexpected sender typeid (%u)", sender->GetTypeId());
             break;
     }
 }

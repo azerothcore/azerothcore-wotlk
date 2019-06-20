@@ -161,7 +161,7 @@ void BattlegroundDS::HandleKillPlayer(Player* player, Player* killer)
 
     if (!killer)
     {
-        LOG_ERROR("root", "BattlegroundDS: Killer player not found");
+        LOG_ERROR("server", "BattlegroundDS: Killer player not found");
         return;
     }
 
@@ -247,7 +247,7 @@ bool BattlegroundDS::SetupBattleground()
         || !AddObject(BG_DS_OBJECT_READY_MARKER_1, ARENA_READY_MARKER_ENTRY, 1229.44f, 759.35f, 17.89f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 300)
         || !AddObject(BG_DS_OBJECT_READY_MARKER_2, ARENA_READY_MARKER_ENTRY, 1352.90f, 822.77f, 17.96f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 300))
     {
-        LOG_ERROR("root", "BatteGroundDS: Failed to spawn some object!");
+        LOG_ERROR("server", "BatteGroundDS: Failed to spawn some object!");
         return false;
     }
 

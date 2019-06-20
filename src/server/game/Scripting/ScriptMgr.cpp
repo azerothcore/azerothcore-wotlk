@@ -88,7 +88,7 @@ class ScriptRegistry
             {
                 if (it->second == script)
                 {
-                    LOG_ERROR("root", "Script '%s' has same memory pointer as '%s'.",
+                    LOG_ERROR("server", "Script '%s' has same memory pointer as '%s'.",
                         script->GetName().c_str(), it->second->GetName().c_str());
 
                     return;
@@ -124,7 +124,7 @@ class ScriptRegistry
                     else
                     {
                         // If the script is already assigned -> delete it!
-                        LOG_ERROR("root", "Script '%s' already assigned with the same script name, so the script can't work.",
+                        LOG_ERROR("server", "Script '%s' already assigned with the same script name, so the script can't work.",
                             script->GetName().c_str());
 
                         ASSERT(false); // Error that should be fixed ASAP.
@@ -134,7 +134,7 @@ class ScriptRegistry
                 {
                     // The script uses a script name from database, but isn't assigned to anything.
                     if (script->GetName().find("example") == std::string::npos && script->GetName().find("Smart") == std::string::npos)
-                        LOG_ERROR("root", "Script named '%s' does not have a script name assigned in database.",
+                        LOG_ERROR("server", "Script named '%s' does not have a script name assigned in database.",
                             script->GetName().c_str());
                 }
             }
@@ -175,7 +175,7 @@ ScriptMgr::~ScriptMgr()
 void ScriptMgr::Initialize()
 {
     AddScripts();
-    LOG_INFO("root", "Loading C++ scripts");
+    LOG_INFO("server", "Loading C++ scripts");
 }
 
 void ScriptMgr::Unload()
@@ -246,8 +246,8 @@ void ScriptMgr::LoadDatabase()
 
     CheckIfScriptsInDatabaseExist();
 
-    LOG_INFO("root", ">> Loaded %u C++ scripts in %u ms", GetScriptCount(), GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("root", "\n");
+    LOG_INFO("server", ">> Loaded %u C++ scripts in %u ms", GetScriptCount(), GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server", "");
 }
 
 struct TSpellSummary
@@ -288,7 +288,7 @@ void ScriptMgr::CheckIfScriptsInDatabaseExist()
                 !ScriptRegistry<BGScript>::GetScriptById(sid) &&
                 !ScriptRegistry<SpellSC>::GetScriptById(sid) &&
                 !ScriptRegistry<GroupScript>::GetScriptById(sid))
-                LOG_ERROR("root", "Script named '%s' is assigned in database, but has no code!", (*itr).c_str());
+                LOG_ERROR("server", "Script named '%s' is assigned in database, but has no code!", (*itr).c_str());
         }
 }
 

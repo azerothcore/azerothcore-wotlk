@@ -104,7 +104,7 @@ public:
             handler->PSendSysMessage(LANG_ACCOUNT_CREATED, accountName);
             if (handler->GetSession())
             {
-                LOG_DEBUG("root", "Account: %d (IP: %s) Character:[%s] (GUID: %u) Change Password.",
+                LOG_DEBUG("server", "Account: %d (IP: %s) Character:[%s] (GUID: %u) Change Password.",
                     handler->GetSession()->GetAccountId(), handler->GetSession()->GetRemoteAddress().c_str(),
                     handler->GetSession()->GetPlayer()->GetName().c_str(), handler->GetSession()->GetPlayer()->GetGUIDLow());
             }
@@ -272,7 +272,7 @@ public:
                 else
                 {
                     handler->PSendSysMessage("[IP2NATION] Table empty");
-                    ;//LOG_DEBUG("root", "[IP2NATION] Table empty");
+                    ;//LOG_DEBUG("server", "[IP2NATION] Table empty");
                 }
             }
             else if (param == "off")

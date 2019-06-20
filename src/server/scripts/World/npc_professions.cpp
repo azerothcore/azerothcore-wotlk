@@ -276,7 +276,7 @@ bool EquippedOk(Player* player, uint32 spellId)
             {
                 //player has item equipped that require specialty. Not allow to unlearn, player has to unequip first
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                LOG_DEBUG("root", "TSCR: player attempt to unlearn spell %u, but item %u is equipped.", reqSpell, item->GetEntry());
+                LOG_DEBUG("server", "TSCR: player attempt to unlearn spell %u, but item %u is equipped.", reqSpell, item->GetEntry());
 #endif
                 return false;
             }

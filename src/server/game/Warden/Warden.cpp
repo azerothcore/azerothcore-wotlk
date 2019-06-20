@@ -38,7 +38,7 @@ Warden::~Warden()
 void Warden::SendModuleToClient()
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "Send module to client");
+    LOG_DEBUG("server", "Send module to client");
 #endif
 
     // Create packet structure
@@ -66,7 +66,7 @@ void Warden::SendModuleToClient()
 void Warden::RequestModule()
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "Request module");
+    LOG_DEBUG("server", "Request module");
 #endif
 
     // Create packet structure
@@ -131,14 +131,14 @@ bool Warden::IsValidCheckSum(uint32 checksum, const uint8* data, const uint16 le
     if (checksum != newChecksum)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("root", "CHECKSUM IS NOT VALID");
+        LOG_DEBUG("server", "CHECKSUM IS NOT VALID");
 #endif
         return false;
     }
     else
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("root", "CHECKSUM IS VALID");
+        LOG_DEBUG("server", "CHECKSUM IS VALID");
 #endif
         return true;
     }
@@ -247,7 +247,7 @@ void WorldSession::HandleWardenDataOpcode(WorldPacket& recvData)
     uint8 opcode;
     recvData >> opcode;
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "Got packet, opcode %02X, size %u", opcode, uint32(recvData.size()));
+    LOG_DEBUG("server", "Got packet, opcode %02X, size %u", opcode, uint32(recvData.size()));
 #endif
     recvData.hexlike();
 
@@ -264,7 +264,7 @@ void WorldSession::HandleWardenDataOpcode(WorldPacket& recvData)
             break;
         case WARDEN_CMSG_MEM_CHECKS_RESULT:
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            LOG_DEBUG("root", "NYI WARDEN_CMSG_MEM_CHECKS_RESULT received!");
+            LOG_DEBUG("server", "NYI WARDEN_CMSG_MEM_CHECKS_RESULT received!");
 #endif
             break;
         case WARDEN_CMSG_HASH_RESULT:
@@ -273,12 +273,12 @@ void WorldSession::HandleWardenDataOpcode(WorldPacket& recvData)
             break;
         case WARDEN_CMSG_MODULE_FAILED:
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            LOG_DEBUG("root", "NYI WARDEN_CMSG_MODULE_FAILED received!");
+            LOG_DEBUG("server", "NYI WARDEN_CMSG_MODULE_FAILED received!");
 #endif
             break;
         default:
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            LOG_DEBUG("root", "Got unknown warden opcode %02X of size %u.", opcode, uint32(recvData.size() - 1));
+            LOG_DEBUG("server", "Got unknown warden opcode %02X of size %u.", opcode, uint32(recvData.size() - 1));
 #endif
             break;
     }

@@ -117,7 +117,7 @@ namespace Trinity
                     nBaseExp = 580;
                     break;
                 default:
-                    LOG_ERROR("root", "BaseGain: Unsupported content level %u", content);
+                    LOG_ERROR("server", "BaseGain: Unsupported content level %u", content);
                     nBaseExp = 45;
                     break;
             }

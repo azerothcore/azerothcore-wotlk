@@ -156,7 +156,7 @@ bool MapManager::CanPlayerEnter(uint32 mapid, Player* player, bool loginCheck)
             // TODO: this is not a good place to send the message
             player->GetSession()->SendAreaTriggerMessage(player->GetSession()->GetTrinityString(LANG_INSTANCE_RAID_GROUP_ONLY), mapName);
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            LOG_DEBUG("root", "MAP: Player '%s' must be in a raid group to enter instance '%s'", player->GetName().c_str(), mapName);
+            LOG_DEBUG("server", "MAP: Player '%s' must be in a raid group to enter instance '%s'", player->GetName().c_str(), mapName);
 #endif
             return false;
         }
@@ -191,19 +191,19 @@ bool MapManager::CanPlayerEnter(uint32 mapid, Player* player, bool loginCheck)
                 WorldPacket data(SMSG_CORPSE_NOT_IN_INSTANCE, 0);
                 player->GetSession()->SendPacket(&data);
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                LOG_DEBUG("root", "MAP: Player '%s' does not have a corpse in instance '%s' and cannot enter.", player->GetName().c_str(), mapName);
+                LOG_DEBUG("server", "MAP: Player '%s' does not have a corpse in instance '%s' and cannot enter.", player->GetName().c_str(), mapName);
 #endif
                 return false;
             }
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            LOG_DEBUG("root", "MAP: Player '%s' has corpse in instance '%s' and can enter.", player->GetName().c_str(), mapName);
+            LOG_DEBUG("server", "MAP: Player '%s' has corpse in instance '%s' and can enter.", player->GetName().c_str(), mapName);
 #endif
             player->ResurrectPlayer(0.5f, false);
             player->SpawnCorpseBones();
         }
         else {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            LOG_DEBUG("root", "Map::CanPlayerEnter - player '%s' is dead but does not have a corpse!", player->GetName().c_str());
+            LOG_DEBUG("server", "Map::CanPlayerEnter - player '%s' is dead but does not have a corpse!", player->GetName().c_str());
 #endif
         }
     }
@@ -407,7 +407,7 @@ uint32 MapManager::GenerateInstanceId()
 
     if (_nextInstanceId == 0xFFFFFFFF)
     {
-        LOG_ERROR("root", "Instance ID overflow!! Can't continue, shutting down server. ");
+        LOG_ERROR("server", "Instance ID overflow!! Can't continue, shutting down server. ");
         World::StopNow(ERROR_EXIT_CODE);
     }
 

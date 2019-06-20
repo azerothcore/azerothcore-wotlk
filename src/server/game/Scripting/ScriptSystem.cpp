@@ -25,15 +25,15 @@ void SystemMgr::LoadScriptWaypoints()
     if (result)
         uiCreatureCount = result->GetRowCount();
 
-    LOG_INFO("root", "TSCR: Loading Script Waypoints for " UI64FMTD " creature(s)...", uiCreatureCount);
+    LOG_INFO("server", "TSCR: Loading Script Waypoints for " UI64FMTD " creature(s)...", uiCreatureCount);
 
     //                                     0       1         2           3           4           5
     result = WorldDatabase.Query("SELECT entry, pointid, location_x, location_y, location_z, waittime FROM script_waypoint ORDER BY pointid");
 
     if (!result)
     {
-        LOG_INFO("root", ">> Loaded 0 Script Waypoints. DB table `script_waypoint` is empty.");
-        LOG_INFO("root", "\n");
+        LOG_INFO("server", ">> Loaded 0 Script Waypoints. DB table `script_waypoint` is empty.");
+        LOG_INFO("server", "");
         return;
     }
 
@@ -56,18 +56,18 @@ void SystemMgr::LoadScriptWaypoints()
 
         if (!pCInfo)
         {
-            LOG_ERROR("root", "TSCR: DB table script_waypoint has waypoint for non-existant creature entry %u", temp.uiCreatureEntry);
+            LOG_ERROR("server", "TSCR: DB table script_waypoint has waypoint for non-existant creature entry %u", temp.uiCreatureEntry);
             continue;
         }
 
         if (!pCInfo->ScriptID)
-            LOG_ERROR("root", "TSCR: DB table script_waypoint has waypoint for creature entry %u, but creature does not have ScriptName defined and then useless.", temp.uiCreatureEntry);
+            LOG_ERROR("server", "TSCR: DB table script_waypoint has waypoint for creature entry %u, but creature does not have ScriptName defined and then useless.", temp.uiCreatureEntry);
 
         m_mPointMoveMap[uiEntry].push_back(temp);
         ++count;
     }
     while (result->NextRow());
 
-    LOG_INFO("root", ">> Loaded %u Script Waypoint nodes in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("root", "\n");
+    LOG_INFO("server", ">> Loaded %u Script Waypoint nodes in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server", "");
 }

@@ -99,7 +99,7 @@ WayPoint* SmartAI::GetNextWayPoint()
     {
         mLastWP = (*itr).second;
         if (mLastWP->id != mCurrentWPID)
-            LOG_ERROR("root", "SmartAI::GetNextWayPoint: Got not expected waypoint id %u, expected %u", mLastWP->id, mCurrentWPID);
+            LOG_ERROR("server", "SmartAI::GetNextWayPoint: Got not expected waypoint id %u, expected %u", mLastWP->id, mCurrentWPID);
 
         return (*itr).second;
     }
@@ -173,7 +173,7 @@ void SmartAI::StartPath(bool run, uint32 path, bool repeat, Unit* invoker)
 {
     if (me->IsInCombat())// no wp movement in combat
     {
-        LOG_ERROR("root", "SmartAI::StartPath: Creature entry %u wanted to start waypoint movement while in combat, ignoring.", me->GetEntry());
+        LOG_ERROR("server", "SmartAI::StartPath: Creature entry %u wanted to start waypoint movement while in combat, ignoring.", me->GetEntry());
         return;
     }
 
@@ -232,7 +232,7 @@ void SmartAI::PausePath(uint32 delay, bool forced)
 
     if (HasEscortState(SMART_ESCORT_PAUSED))
     {
-        LOG_ERROR("root", "SmartAI::StartPath: Creature entry %u wanted to pause waypoint movement while already paused, ignoring.", me->GetEntry());
+        LOG_ERROR("server", "SmartAI::StartPath: Creature entry %u wanted to pause waypoint movement while already paused, ignoring.", me->GetEntry());
         return;
     }
 
@@ -1104,7 +1104,7 @@ void SmartGameObjectAI::Reset()
 bool SmartGameObjectAI::GossipHello(Player* player, bool reportUse)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "SmartGameObjectAI::GossipHello");
+    LOG_DEBUG("server", "SmartGameObjectAI::GossipHello");
 #endif
     GetScript()->ProcessEventsFor(SMART_EVENT_GOSSIP_HELLO, player, (uint32)reportUse, 0, false, NULL, go);
     return false;
@@ -1187,7 +1187,7 @@ class SmartTrigger : public AreaTriggerScript
                 return false;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            LOG_DEBUG("root", "AreaTrigger %u is using SmartTrigger script", trigger->entry);
+            LOG_DEBUG("server", "AreaTrigger %u is using SmartTrigger script", trigger->entry);
 #endif
             SmartScript script;
             script.OnInitialize(NULL, trigger);

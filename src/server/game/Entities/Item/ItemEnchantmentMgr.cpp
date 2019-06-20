@@ -59,13 +59,13 @@ void LoadRandomEnchantmentsTable()
             ++count;
         } while (result->NextRow());
 
-        LOG_INFO("root", ">> Loaded %u Item Enchantment definitions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-        LOG_INFO("root", "\n");
+        LOG_INFO("server", ">> Loaded %u Item Enchantment definitions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+        LOG_INFO("server", "");
     }
     else
     {
-        LOG_ERROR("root", ">> Loaded 0 Item Enchantment definitions. DB table `item_enchantment_template` is empty.");
-        LOG_INFO("root", "\n");
+        LOG_ERROR("server", ">> Loaded 0 Item Enchantment definitions. DB table `item_enchantment_template` is empty.");
+        LOG_INFO("server", "");
     }
 }
 
@@ -80,7 +80,7 @@ uint32 GetItemEnchantMod(int32 entry)
     EnchantmentStore::const_iterator tab = RandomItemEnch.find(entry);
     if (tab == RandomItemEnch.end())
     {
-        LOG_ERROR("root", "Item RandomProperty / RandomSuffix id #%u used in `item_template` but it does not have records in `item_enchantment_template` table.", entry);
+        LOG_ERROR("server", "Item RandomProperty / RandomSuffix id #%u used in `item_template` but it does not have records in `item_enchantment_template` table.", entry);
         return 0;
     }
 

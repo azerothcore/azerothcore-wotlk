@@ -12,12 +12,12 @@
 BattlefieldMgr::BattlefieldMgr()
 {
     m_UpdateTimer = 0;
-    //LOG_DEBUG("root", "Instantiating BattlefieldMgr");
+    //LOG_DEBUG("server", "Instantiating BattlefieldMgr");
 }
 
 BattlefieldMgr::~BattlefieldMgr()
 {
-    //LOG_DEBUG("root", "Deleting BattlefieldMgr");
+    //LOG_DEBUG("server", "Deleting BattlefieldMgr");
     for (BattlefieldSet::iterator itr = m_BattlefieldSet.begin(); itr != m_BattlefieldSet.end(); ++itr)
         delete *itr;
 }
@@ -28,15 +28,15 @@ void BattlefieldMgr::InitBattlefield()
     // respawn, init variables
     if (!pBf->SetupBattlefield())
     {
-        LOG_INFO("root", "\n");
-        LOG_INFO("root", "Battlefield : Wintergrasp init failed.");
+        LOG_INFO("server", "");
+        LOG_INFO("server", "Battlefield : Wintergrasp init failed.");
         delete pBf;
     }
     else
     {
         m_BattlefieldSet.push_back(pBf);
-        LOG_INFO("root", "\n");
-        LOG_INFO("root", "Battlefield : Wintergrasp successfully initiated.");
+        LOG_INFO("server", "");
+        LOG_INFO("server", "Battlefield : Wintergrasp successfully initiated.");
     }
 
     /* For Cataclysm: Tol Barad
@@ -45,7 +45,7 @@ void BattlefieldMgr::InitBattlefield()
        if(!pBf->SetupBattlefield())
        {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-       LOG_DEBUG("root", "Battlefield : Tol Barad init failed.");
+       LOG_DEBUG("server", "Battlefield : Tol Barad init failed.");
 #endif
        delete pBf;
        }
@@ -53,7 +53,7 @@ void BattlefieldMgr::InitBattlefield()
        {
        m_BattlefieldSet.push_back(pBf);
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-       LOG_DEBUG("root", "Battlefield : Tol Barad successfully initiated.");
+       LOG_DEBUG("server", "Battlefield : Tol Barad successfully initiated.");
 #endif
        } */
 }
@@ -74,7 +74,7 @@ void BattlefieldMgr::HandlePlayerEnterZone(Player * player, uint32 zoneid)
 
     itr->second->HandlePlayerEnterZone(player, zoneid);
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "Player %u entered outdoorpvp id %u", player->GetGUIDLow(), itr->second->GetTypeId());
+    LOG_DEBUG("server", "Player %u entered outdoorpvp id %u", player->GetGUIDLow(), itr->second->GetTypeId());
 #endif
 }
 
@@ -89,7 +89,7 @@ void BattlefieldMgr::HandlePlayerLeaveZone(Player * player, uint32 zoneid)
         return;
     itr->second->HandlePlayerLeaveZone(player, zoneid);
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "Player %u left outdoorpvp id %u", player->GetGUIDLow(), itr->second->GetTypeId());
+    LOG_DEBUG("server", "Player %u left outdoorpvp id %u", player->GetGUIDLow(), itr->second->GetTypeId());
 #endif
 }
 

@@ -74,7 +74,7 @@ void LoadGameObjectModelList()
 
     fclose(model_list_file);
     LOG_INFO("root", ">> Loaded %u GameObject models in %u ms", uint32(model_list.size()), GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("root", "\n");
+    LOG_INFO("root", "");
 }
 
 GameObjectModel::~GameObjectModel()

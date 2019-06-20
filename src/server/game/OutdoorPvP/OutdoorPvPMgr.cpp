@@ -13,12 +13,12 @@
 OutdoorPvPMgr::OutdoorPvPMgr()
 {
     m_UpdateTimer = 0;
-    //LOG_DEBUG("root", "Instantiating OutdoorPvPMgr");
+    //LOG_DEBUG("server", "Instantiating OutdoorPvPMgr");
 }
 
 void OutdoorPvPMgr::Die()
 {
-    //LOG_DEBUG("root", "Deleting OutdoorPvPMgr");
+    //LOG_DEBUG("server", "Deleting OutdoorPvPMgr");
     for (OutdoorPvPSet::iterator itr = m_OutdoorPvPSet.begin(); itr != m_OutdoorPvPSet.end(); ++itr)
         delete *itr;
 
@@ -35,8 +35,8 @@ void OutdoorPvPMgr::InitOutdoorPvP()
 
     if (!result)
     {
-        LOG_ERROR("root", ">> Loaded 0 outdoor PvP definitions. DB table `outdoorpvp_template` is empty.");
-        LOG_INFO("root", "\n");
+        LOG_ERROR("server", ">> Loaded 0 outdoor PvP definitions. DB table `outdoorpvp_template` is empty.");
+        LOG_INFO("server", "");
         return;
     }
 
@@ -54,7 +54,7 @@ void OutdoorPvPMgr::InitOutdoorPvP()
 
         if (typeId >= MAX_OUTDOORPVP_TYPES)
         {
-            LOG_ERROR("root", "Invalid OutdoorPvPTypes value %u in outdoorpvp_template; skipped.", typeId);
+            LOG_ERROR("server", "Invalid OutdoorPvPTypes value %u in outdoorpvp_template; skipped.", typeId);
             continue;
         }
 
@@ -74,20 +74,20 @@ void OutdoorPvPMgr::InitOutdoorPvP()
         OutdoorPvPDataMap::iterator iter = m_OutdoorPvPDatas.find(OutdoorPvPTypes(i));
         if (iter == m_OutdoorPvPDatas.end())
         {
-            LOG_ERROR("root", "Could not initialize OutdoorPvP object for type ID %u; no entry in database.", uint32(i));
+            LOG_ERROR("server", "Could not initialize OutdoorPvP object for type ID %u; no entry in database.", uint32(i));
             continue;
         }
 
         pvp = sScriptMgr->CreateOutdoorPvP(iter->second);
         if (!pvp)
         {
-            LOG_ERROR("root", "Could not initialize OutdoorPvP object for type ID %u; got NULL pointer from script.", uint32(i));
+            LOG_ERROR("server", "Could not initialize OutdoorPvP object for type ID %u; got NULL pointer from script.", uint32(i));
             continue;
         }
 
         if (!pvp->SetupOutdoorPvP())
         {
-            LOG_ERROR("root", "Could not initialize OutdoorPvP object for type ID %u; SetupOutdoorPvP failed.", uint32(i));
+            LOG_ERROR("server", "Could not initialize OutdoorPvP object for type ID %u; SetupOutdoorPvP failed.", uint32(i));
             delete pvp;
             continue;
         }
@@ -95,8 +95,8 @@ void OutdoorPvPMgr::InitOutdoorPvP()
         m_OutdoorPvPSet.push_back(pvp);
     }
 
-    LOG_INFO("root", ">> Loaded %u outdoor PvP definitions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("root", "\n");
+    LOG_INFO("server", ">> Loaded %u outdoor PvP definitions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server", "");
 }
 
 void OutdoorPvPMgr::AddZone(uint32 zoneid, OutdoorPvP* handle)
@@ -117,7 +117,7 @@ void OutdoorPvPMgr::HandlePlayerEnterZone(Player* player, uint32 zoneid)
 
     itr->second->HandlePlayerEnterZone(player, zoneid);
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "Player %u entered outdoorpvp id %u", player->GetGUIDLow(), itr->second->GetTypeId());
+    LOG_DEBUG("server", "Player %u entered outdoorpvp id %u", player->GetGUIDLow(), itr->second->GetTypeId());
 #endif
 }
 
@@ -135,7 +135,7 @@ void OutdoorPvPMgr::HandlePlayerLeaveZone(Player* player, uint32 zoneid)
 
     itr->second->HandlePlayerLeaveZone(player, zoneid);
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "Player %u left outdoorpvp id %u", player->GetGUIDLow(), itr->second->GetTypeId());
+    LOG_DEBUG("server", "Player %u left outdoorpvp id %u", player->GetGUIDLow(), itr->second->GetTypeId());
 #endif
 }
 

@@ -165,7 +165,7 @@ void npc_escortAI::EnterEvadeMode()
         AddEscortState(STATE_ESCORT_RETURNING);
         ReturnToLastPoint();
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("root", "TSCR: EscortAI has left combat and is now returning to last point");
+        LOG_DEBUG("server", "TSCR: EscortAI has left combat and is now returning to last point");
 #endif
     }
     else
@@ -293,7 +293,7 @@ void npc_escortAI::MovementInform(uint32 moveType, uint32 pointId)
         if (pointId == POINT_LAST_POINT)
         {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            LOG_DEBUG("root", "TSCR: EscortAI has returned to original position before combat");
+            LOG_DEBUG("server", "TSCR: EscortAI has returned to original position before combat");
 #endif
 
             me->SetWalk(!m_bIsRunning);
@@ -305,7 +305,7 @@ void npc_escortAI::MovementInform(uint32 moveType, uint32 pointId)
         else if (pointId == POINT_HOME)
         {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            LOG_DEBUG("root", "TSCR: EscortAI has returned to original home location and will continue from beginning of waypoint list.");
+            LOG_DEBUG("server", "TSCR: EscortAI has returned to original home location and will continue from beginning of waypoint list.");
 #endif
 
             CurrentWP = WaypointList.begin();
@@ -394,14 +394,14 @@ void npc_escortAI::SetRun(bool on)
         if (!m_bIsRunning)
             me->SetWalk(false);
         else
-            LOG_DEBUG("root", "TSCR: EscortAI attempt to set run mode, but is already running.");
+            LOG_DEBUG("server", "TSCR: EscortAI attempt to set run mode, but is already running.");
     }
     else
     {
         if (m_bIsRunning)
             me->SetWalk(true);
         else
-            LOG_DEBUG("root", "TSCR: EscortAI attempt to set walk mode, but is already walking.");
+            LOG_DEBUG("server", "TSCR: EscortAI attempt to set walk mode, but is already walking.");
     }
 
     m_bIsRunning = on;
@@ -412,13 +412,13 @@ void npc_escortAI::Start(bool isActiveAttacker /* = true*/, bool run /* = false 
 {
     if (me->GetVictim())
     {
-        LOG_ERROR("root", "TSCR ERROR: EscortAI (script: %s, creature entry: %u) attempts to Start while in combat", me->GetScriptName().c_str(), me->GetEntry());
+        LOG_ERROR("server", "TSCR ERROR: EscortAI (script: %s, creature entry: %u) attempts to Start while in combat", me->GetScriptName().c_str(), me->GetEntry());
         return;
     }
 
     if (HasEscortState(STATE_ESCORT_ESCORTING))
     {
-        LOG_ERROR("root", "TSCR: EscortAI (script: %s, creature entry: %u) attempts to Start while already escorting", me->GetScriptName().c_str(), me->GetEntry());
+        LOG_ERROR("server", "TSCR: EscortAI (script: %s, creature entry: %u) attempts to Start while already escorting", me->GetScriptName().c_str(), me->GetEntry());
         return;
     }
 
@@ -431,7 +431,7 @@ void npc_escortAI::Start(bool isActiveAttacker /* = true*/, bool run /* = false 
 
     if (WaypointList.empty())
     {
-        LOG_ERROR("root", "TSCR: EscortAI (script: %s, creature entry: %u) starts with 0 waypoints (possible missing entry in script_waypoint. Quest: %u).",
+        LOG_ERROR("server", "TSCR: EscortAI (script: %s, creature entry: %u) starts with 0 waypoints (possible missing entry in script_waypoint. Quest: %u).",
             me->GetScriptName().c_str(), me->GetEntry(), quest ? quest->GetQuestId() : 0);
         return;
     }
@@ -448,7 +448,7 @@ void npc_escortAI::Start(bool isActiveAttacker /* = true*/, bool run /* = false 
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     if (m_bCanReturnToStart && m_bCanInstantRespawn)
-        LOG_DEBUG("root", "TSCR: EscortAI is set to return home after waypoint end and instant respawn at waypoint end. Creature will never despawn.");
+        LOG_DEBUG("server", "TSCR: EscortAI is set to return home after waypoint end and instant respawn at waypoint end. Creature will never despawn.");
 #endif
 
     if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == WAYPOINT_MOTION_TYPE)
@@ -456,7 +456,7 @@ void npc_escortAI::Start(bool isActiveAttacker /* = true*/, bool run /* = false 
         me->GetMotionMaster()->MovementExpired();
         me->GetMotionMaster()->MoveIdle();
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("root", "TSCR: EscortAI start with WAYPOINT_MOTION_TYPE, changed to MoveIdle.");
+        LOG_DEBUG("server", "TSCR: EscortAI start with WAYPOINT_MOTION_TYPE, changed to MoveIdle.");
 #endif
     }
 
@@ -469,7 +469,7 @@ void npc_escortAI::Start(bool isActiveAttacker /* = true*/, bool run /* = false 
     }
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("root", "TSCR: EscortAI started with " UI64FMTD " waypoints. ActiveAttacker = %d, Run = %d, PlayerGUID = " UI64FMTD "", uint64(WaypointList.size()), m_bIsActiveAttacker, m_bIsRunning, m_uiPlayerGUID);
+    LOG_DEBUG("server", "TSCR: EscortAI started with " UI64FMTD " waypoints. ActiveAttacker = %d, Run = %d, PlayerGUID = " UI64FMTD "", uint64(WaypointList.size()), m_bIsActiveAttacker, m_bIsRunning, m_uiPlayerGUID);
 #endif
 
     CurrentWP = WaypointList.begin();

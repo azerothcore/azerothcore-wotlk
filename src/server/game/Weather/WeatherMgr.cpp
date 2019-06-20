@@ -84,8 +84,8 @@ void LoadWeatherData()
 
     if (!result)
     {
-        LOG_ERROR("root", ">> Loaded 0 weather definitions. DB table `game_weather` is empty.");
-        LOG_INFO("root", "\n");
+        LOG_ERROR("server", ">> Loaded 0 weather definitions. DB table `game_weather` is empty.");
+        LOG_INFO("server", "");
         return;
     }
 
@@ -106,19 +106,19 @@ void LoadWeatherData()
             if (wzc.data[season].rainChance > 100)
             {
                 wzc.data[season].rainChance = 25;
-                LOG_ERROR("root", "Weather for zone %u season %u has wrong rain chance > 100%%", zone_id, season);
+                LOG_ERROR("server", "Weather for zone %u season %u has wrong rain chance > 100%%", zone_id, season);
             }
 
             if (wzc.data[season].snowChance > 100)
             {
                 wzc.data[season].snowChance = 25;
-                LOG_ERROR("root", "Weather for zone %u season %u has wrong snow chance > 100%%", zone_id, season);
+                LOG_ERROR("server", "Weather for zone %u season %u has wrong snow chance > 100%%", zone_id, season);
             }
 
             if (wzc.data[season].stormChance > 100)
             {
                 wzc.data[season].stormChance = 25;
-                LOG_ERROR("root", "Weather for zone %u season %u has wrong storm chance > 100%%", zone_id, season);
+                LOG_ERROR("server", "Weather for zone %u season %u has wrong storm chance > 100%%", zone_id, season);
             }
         }
 
@@ -128,8 +128,8 @@ void LoadWeatherData()
     }
     while (result->NextRow());
 
-    LOG_INFO("root", ">> Loaded %u weather definitions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("root", "\n");
+    LOG_INFO("server", ">> Loaded %u weather definitions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server", "");
 }
 
 void SendFineWeatherUpdateToPlayer(Player* player)
