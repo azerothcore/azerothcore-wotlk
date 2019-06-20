@@ -346,6 +346,11 @@ public:
             }
         }
 
+        void JustReachedHome() override
+        {
+            me->GetMotionMaster()->Clear();
+        }
+
         void UpdateAI(uint32 diff)
         {
             if (bCanEat || bIsEating)
@@ -383,7 +388,7 @@ public:
                         }
 
                         Reset();
-                        me->GetMotionMaster()->Clear();
+                        me->GetMotionMaster()->MoveTargetedHome();
                     }
                 }
                 else
