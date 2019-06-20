@@ -310,7 +310,7 @@ public:
         uint32 EatTimer;
         uint32 CastTimer;
 
-        void Reset()
+        void Reset() override
         {
             uiPlayerGUID = 0;
 
