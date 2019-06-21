@@ -2975,7 +2975,7 @@ LFG.Location.All = 0
 LogChannel.Console = 1,local,%t,lightRed lightRed red brown magenta cyan lightMagenta green
 LogChannel.Server = 2,local,%Y-%m-%d %H:%M:%S %t,Server.log,false,daily
 LogChannel.GM = 2,local,%Y-%m-%d %H:%M:%S %t,gm_%s.log,false,daily
-LogChannel.DB = 2,local,%Y-%m-%d %H:%M:%S %t,DB.log,false,daily
+LogChannel.DBErrors = 2,local,%Y-%m-%d %H:%M:%S %t,DBErrors.log,false,daily
 
 #
 #  Logger config values: Given a logger "name"
@@ -3001,7 +3001,7 @@ LogChannel.DB = 2,local,%Y-%m-%d %H:%M:%S %t,DB.log,false,daily
 Logger.root = 6,Server
 Logger.server = 6,Server
 Logger.commands.gm = 6,GM
-Logger.sql = 5,DB
+Logger.sql = 4,DBErrors
 Logger.mmaps= 6,Server
 
 #Logger.achievement=6,Server
