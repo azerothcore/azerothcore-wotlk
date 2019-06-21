@@ -27,6 +27,46 @@
 #include <vector>
 #include "Poco/FormattingChannel.h"
 
+enum LogLevel
+{
+    LOG_LEVEL_DISABLED,
+    LOG_LEVEL_FATAL,
+    LOG_LEVEL_CRITICAL,
+    LOG_LEVEL_ERROR,
+    LOG_LEVEL_WARNING,
+    LOG_LEVEL_NOTICE,
+    LOG_LEVEL_INFO,
+    LOG_LEVEL_DEBUG,
+    LOG_LEVEL_TRACE,
+
+    LOG_LEVEL_MAX
+};
+
+// For create LogChannel
+enum ChannelOptions
+{
+    CHANNEL_OPTIONS_TYPE,
+    CHANNEL_OPTIONS_TIMES,
+    CHANNEL_OPTIONS_PATTERN,
+    CHANNEL_OPTIONS_OPTION_1,
+    CHANNEL_OPTIONS_OPTION_2,
+    CHANNEL_OPTIONS_OPTION_3,
+    CHANNEL_OPTIONS_OPTION_4
+};
+
+enum ChannelOptionsType
+{
+    CHANNEL_OPTIONS_TYPE_CONSOLE = 1,
+    CHANNEL_OPTIONS_TYPE_FILE
+};
+
+// For create Logger
+enum LoggerOptions
+{
+    LOGGER_OPTIONS_LOG_LEVEL,
+    LOGGER_OPTIONS_CHANNEL_NAME
+};
+
 using Poco::FormattingChannel;
 
 class Log
@@ -57,10 +97,52 @@ public:
     }
 
     template<typename Format, typename... Args>
-    inline void outSys(LogLevel const level, Format&& fmt, Args&& ... args)
+    void outSys(LogLevel const level, Format&& fmt, Args&& ... args)
     {
         outSys(level, ACORE::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...));
     }
+
+    // Support old func. Need delete later!
+    template<typename Format, typename... Args>
+    inline void outString(Format&& fmt, Args&& ... args)
+    {
+        outMessage(LOGGER_MODULE, LOG_LEVEL_INFO, ACORE::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...));
+    }
+    
+    inline void outString()
+    {
+        outMessage(LOGGER_MODULE, LOG_LEVEL_INFO, "");
+    }
+
+    template<typename Format, typename... Args>
+    inline void outError(Format&& fmt, Args&& ... args)
+    {
+        outMessage(LOGGER_MODULE, LOG_LEVEL_ERROR, ACORE::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...));
+    }
+
+    template<typename Format, typename... Args>
+    inline void outErrorDb(Format&& fmt, Args&& ... args)
+    {
+        outMessage("sql.sql", LOG_LEVEL_ERROR, ACORE::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...));
+    }
+
+    // template<typename Format, typename... Args>
+    // inline void outBasic(Format&& fmt, Args&& ... args)
+    // {
+    //     outMessage(LOGGER_MODULE, LOG_LEVEL_INFO, ACORE::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...));
+    // }
+
+    // template<typename Format, typename... Args>
+    // inline void outDetail(Format&& fmt, Args&& ... args)
+    // {
+    //     outMessage(LOGGER_MODULE, LOG_LEVEL_INFO, ACORE::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...));
+    // }
+
+    // template<typename Format, typename... Args>
+    // inline void outSQLDev(Format&& fmt, Args&& ... args)
+    // {
+    //     outMessage("sql.dev", LOG_LEVEL_INFO, ACORE::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...));
+    // }
 
 private:
     typedef std::unordered_map<std::string, FormattingChannel*> ChannelMapFiles;
@@ -103,6 +185,9 @@ private:
     std::string const LOGGER_GM = "commands.gm";
     std::string const LOGGER_GM_DYNAMIC = "commands.gm.dynamic";
     std::string const LOGGER_PLAYER_DUMP = "entities.player.dump";
+    std::string const LOGGER_MODULE = "module";
+    
+    // Const logger used in system only
     std::string const LOGGER_SYSTEM = "system";
     std::string const LOGGER_UNKNOWN = "_unk";
 

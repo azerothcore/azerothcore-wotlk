@@ -141,7 +141,7 @@ int Master::Run()
             LOG_INFO("root", "Daemon PID: %u\n", pid);
         else
         {
-            LOG_INFO("root", "Cannot create PID file %s.\n", pidFile.c_str());
+            LOG_ERROR("root", "Cannot create PID file %s.\n", pidFile.c_str());
             return 1;
         }
     }

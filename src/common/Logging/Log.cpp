@@ -200,8 +200,6 @@ std::string Log::GetLoggerByType(std::string const& type) const
 
 bool Log::ShouldLog(std::string const& type, LogLevel level) const
 {
-    std::string _filter = type;
-
     if (GetLoggerByType(type) == LOGGER_UNKNOWN)
         return false;
     
@@ -240,6 +238,8 @@ void Log::AddConsoleChannel(std::string ChannelName, FormattingChannel* channel)
     if (_ChannelMapConsole.count(ChannelName))
         return;
 
+    CONSOLE_CHANNEL = ChannelName;
+
     _ChannelMapConsole[ChannelName] = channel;
 }
 
@@ -264,7 +264,7 @@ std::string Log::GetChannelFromLogger(std::string LoggerName)
     Tokenizer tokens(LoggerOption, ',');
 
     if (tokens.size())
-        return tokens[1];
+        return tokens[LOGGER_OPTIONS_CHANNEL_NAME];
 
     return "";
 }
@@ -317,7 +317,7 @@ void Log::CreateLoggerFromConfig(std::string const& ConfigLoggerName)
     Tokenizer tokens(options, ',');
     if (!tokens.size() || tokens.size() > LOGGER_OPTIONS_CHANNEL_NAME + 1)
     {
-        SYS_LOG_ERROR("Bad config options for Logger (%s)", LoggerName.c_str());
+        SYS_LOG_ERROR("Log::CreateLoggerFromConfig: Bad config options for Logger (%s)", LoggerName.c_str());
         return;
     }
 
@@ -398,7 +398,7 @@ void Log::CreateChannelsFromConfig(std::string const& LogChannelName)
     }
     catch (const std::exception& e)
     {
-        SYS_LOG_ERROR("%s\n", e.what());
+        SYS_LOG_ERROR("Log::CreateLoggerFromConfig: %s\n", e.what());
     }
 
     if (ChannelType == CHANNEL_OPTIONS_TYPE_CONSOLE)
@@ -428,7 +428,7 @@ void Log::CreateChannelsFromConfig(std::string const& LogChannelName)
                 }
                 catch (const std::exception& e)
                 {
-                    printf("%s\n\n", e.what());
+                    printf("Log::CreateLoggerFromConfig: %s\n\n", e.what());
                 }
             }
             else
@@ -439,11 +439,10 @@ void Log::CreateChannelsFromConfig(std::string const& LogChannelName)
 
         if (!CONSOLE_CHANNEL.empty())
         {
-            SYS_LOG_ERROR("CONSOLE_CHANNEL no empty!");
+            SYS_LOG_ERROR("Log::CreateLoggerFromConfig: CONSOLE_CHANNEL is no empty!");
             return;
         }
-
-        CONSOLE_CHANNEL = ChannelName;
+        
         AddConsoleChannel(ChannelName, new FormattingChannel(_pattern, _channel));
     }
     else if (ChannelType == CHANNEL_OPTIONS_TYPE_FILE)
