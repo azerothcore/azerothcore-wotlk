@@ -26,30 +26,34 @@ public:
     {
         static std::vector<ChatCommand> accountSetCommandTable =
         {
-            { "addon", SEC_GAMEMASTER, true, &HandleAccountSetAddonCommand, "" },
-            { "gmlevel", SEC_CONSOLE, true, &HandleAccountSetGmLevelCommand, "" },
-            { "password", SEC_CONSOLE, true, &HandleAccountSetPasswordCommand, "" }
+            { "addon",      SEC_GAMEMASTER, true, &HandleAccountSetAddonCommand,    "" },
+            { "gmlevel",    SEC_CONSOLE,    true, &HandleAccountSetGmLevelCommand,  "" },
+            { "password",   SEC_CONSOLE,    true, &HandleAccountSetPasswordCommand, "" }
         };
+
         static std::vector<ChatCommand> accountLockCommandTable
         {
-            { "country", SEC_PLAYER, true, &HandleAccountLockCountryCommand, "" },
-            { "ip", SEC_PLAYER, true, &HandleAccountLockIpCommand, "" }
+            { "country",    SEC_PLAYER,     true, &HandleAccountLockCountryCommand, "" },
+            { "ip",         SEC_PLAYER,     true, &HandleAccountLockIpCommand,      "" }
         };
+
         static std::vector<ChatCommand> accountCommandTable =
         {
-            { "addon", SEC_MODERATOR, false, &HandleAccountAddonCommand, "" },
-            { "create", SEC_CONSOLE, true, &HandleAccountCreateCommand, "" },
-            { "delete", SEC_CONSOLE, true, &HandleAccountDeleteCommand, "" },
-            { "onlinelist", SEC_CONSOLE, true, &HandleAccountOnlineListCommand, "" },
-            { "lock", SEC_PLAYER, false, nullptr, "", accountLockCommandTable },
-            { "set", SEC_ADMINISTRATOR, true, nullptr, "", accountSetCommandTable },
-            { "password", SEC_PLAYER, false, &HandleAccountPasswordCommand, "" },
-            { "", SEC_PLAYER, false, &HandleAccountCommand, "" }
+            { "",           SEC_PLAYER,     false, &HandleAccountCommand,            "" },
+            { "addon",      SEC_MODERATOR,  false, &HandleAccountAddonCommand,       "" },
+            { "create",     SEC_CONSOLE,    true,  &HandleAccountCreateCommand,      "" },
+            { "delete",     SEC_CONSOLE,    true,  &HandleAccountDeleteCommand,      "" },
+            { "onlinelist", SEC_CONSOLE,    true,  &HandleAccountOnlineListCommand,  "" },            
+            { "password",   SEC_PLAYER,     false, &HandleAccountPasswordCommand,    "" },            
+            { "lock",       SEC_PLAYER,     false, nullptr,     "", accountLockCommandTable },
+            { "set",        SEC_ADMINISTRATOR, true, nullptr,   "", accountSetCommandTable },
         };
+
         static std::vector<ChatCommand> commandTable =
         {
-            { "account", SEC_PLAYER, true, nullptr, "", accountCommandTable }
+            { "account",    SEC_PLAYER,     true,   nullptr,    "", accountCommandTable }
         };
+
         return commandTable;
     }
 
@@ -104,7 +108,7 @@ public:
             handler->PSendSysMessage(LANG_ACCOUNT_CREATED, accountName);
             if (handler->GetSession())
             {
-                LOG_DEBUG("server", "Account: %d (IP: %s) Character:[%s] (GUID: %u) Change Password.",
+                LOG_DEBUG("entities.player.character", "Account: %d (IP: %s) Character:[%s] (GUID: %u) Change Password.",
                     handler->GetSession()->GetAccountId(), handler->GetSession()->GetRemoteAddress().c_str(),
                     handler->GetSession()->GetPlayer()->GetName().c_str(), handler->GetSession()->GetPlayer()->GetGUIDLow());
             }
@@ -272,7 +276,7 @@ public:
                 else
                 {
                     handler->PSendSysMessage("[IP2NATION] Table empty");
-                    ;//LOG_DEBUG("server", "[IP2NATION] Table empty");
+                    LOG_DEBUG("entities.player.character", "[IP2NATION] Table empty");
                 }
             }
             else if (param == "off")
