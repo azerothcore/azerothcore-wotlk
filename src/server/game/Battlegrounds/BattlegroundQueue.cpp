@@ -197,7 +197,6 @@ GroupQueueInfo* BattlegroundQueue::AddGroup(Player * leader, Group * grp, PvPDif
 			{
 				char const* bgName = bgt->GetName();
                 uint32 MinPlayers = bgt->GetMinPlayersPerTeam();
-                uint32 MaxPlayers = MinPlayers * 2;
 				uint32 q_min_level = std::min(bracketEntry->minLevel, (uint32)80);
 				uint32 q_max_level = std::min(bracketEntry->maxLevel, (uint32)80);
 				uint32 qPlayers = 0;
