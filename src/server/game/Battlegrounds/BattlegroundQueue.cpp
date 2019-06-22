@@ -195,12 +195,12 @@ GroupQueueInfo* BattlegroundQueue::AddGroup(Player * leader, Group * grp, PvPDif
         {
 			if (sWorld->getBoolConfig(BATTLEGROUND_CROSSFACTION_ENABLED)) 
 			{
+				char const* bgName = bgt->GetName();
                 uint32 MinPlayers = bgt->GetMinPlayersPerTeam();
                 uint32 MaxPlayers = MinPlayers * 2;
-				char const* bgName = bgt->GetName();
-				uint32 qPlayers = 0;
 				uint32 q_min_level = std::min(bracketEntry->minLevel, (uint32)80);
 				uint32 q_max_level = std::min(bracketEntry->maxLevel, (uint32)80);
+				uint32 qPlayers = 0;
 				for (GroupsQueueType::const_iterator itr = m_QueuedGroups[bracketId][BG_QUEUE_CROSSFACTION].begin(); itr != m_QueuedGroups[bracketId][BG_QUEUE_CROSSFACTION].end(); ++itr)
 					if (!(*itr)->IsInvitedToBGInstanceGUID)
 					qPlayers += (*itr)->Players.size();
