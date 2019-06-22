@@ -39,9 +39,7 @@ void GuardAI::EnterEvadeMode()
         return;
     }
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("server", "Guard entry: %u enters evade mode.", me->GetEntry());
-#endif
+    LOG_TRACE("scripts.ai", "Guard entry: %u enters evade mode.", me->GetEntry());
 
     me->RemoveAllAuras();
     me->DeleteThreatList();

@@ -411,14 +411,14 @@ bool BattlegroundWS::SetupBattleground()
     for (uint32 i = BG_WS_OBJECT_DOOR_A_1; i < BG_WS_OBJECT_MAX; ++i)
         if (BgObjects[i] == 0)
         {
-            LOG_ERROR("server", "BatteGroundWS: Failed to spawn some object Battleground not created!");
+            LOG_ERROR("bg.battleground", "BatteGroundWS: Failed to spawn some object Battleground not created!");
             return false;
         }
 
     for (uint32 i = WS_SPIRIT_MAIN_ALLIANCE; i < BG_CREATURES_MAX_WS; ++i)
         if (BgCreatures[i] == 0)
         {
-            LOG_ERROR("server", "BatteGroundWS: Failed to spawn spirit guides Battleground not created!");
+            LOG_ERROR("bg.battleground", "BatteGroundWS: Failed to spawn spirit guides Battleground not created!");
             return false;
         }
 

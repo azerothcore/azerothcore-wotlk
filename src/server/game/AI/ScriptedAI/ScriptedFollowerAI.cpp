@@ -148,9 +148,7 @@ void FollowerAI::EnterEvadeMode()
 
     if (HasFollowState(STATE_FOLLOW_INPROGRESS))
     {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("server", "TSCR: FollowerAI left combat, returning to CombatStartPosition.");
-#endif
+        LOG_DEBUG("scripts.ai.followerai", "TSCR: FollowerAI left combat, returning to CombatStartPosition.");
 
         if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == CHASE_MOTION_TYPE)
         {
@@ -176,9 +174,7 @@ void FollowerAI::UpdateAI(uint32 uiDiff)
         {
             if (HasFollowState(STATE_FOLLOW_COMPLETE) && !HasFollowState(STATE_FOLLOW_POSTEVENT))
             {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                LOG_DEBUG("server", "TSCR: FollowerAI is set completed, despawns.");
-#endif
+                LOG_DEBUG("scripts.ai.followerai", "TSCR: FollowerAI is set completed, despawns.");
                 me->DespawnOrUnsummon();
                 return;
             }
@@ -189,9 +185,7 @@ void FollowerAI::UpdateAI(uint32 uiDiff)
             {
                 if (HasFollowState(STATE_FOLLOW_RETURNING))
                 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                    LOG_DEBUG("server", "TSCR: FollowerAI is returning to leader.");
-#endif
+                    LOG_DEBUG("scripts.ai.followerai", "TSCR: FollowerAI is returning to leader.");
 
                     RemoveFollowState(STATE_FOLLOW_RETURNING);
                     me->GetMotionMaster()->MoveFollow(player, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
@@ -220,9 +214,7 @@ void FollowerAI::UpdateAI(uint32 uiDiff)
 
             if (bIsMaxRangeExceeded)
             {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                LOG_DEBUG("server", "TSCR: FollowerAI failed because player/group was to far away or not found");
-#endif
+                LOG_DEBUG("scripts.ai.followerai", "TSCR: FollowerAI failed because player/group was to far away or not found");
                 me->DespawnOrUnsummon();
                 return;
             }
@@ -265,15 +257,13 @@ void FollowerAI::StartFollow(Player* player, uint32 factionForFollower, const Qu
 {
     if (me->GetVictim())
     {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("server", "TSCR: FollowerAI attempt to StartFollow while in combat.");
-#endif
+        LOG_DEBUG("scripts.ai.followerai", "TSCR: FollowerAI attempt to StartFollow while in combat.");
         return;
     }
 
     if (HasFollowState(STATE_FOLLOW_INPROGRESS))
     {
-        LOG_ERROR("server", "TSCR: FollowerAI attempt to StartFollow while already following.");
+        LOG_ERROR("scripts.ai.followerai", "TSCR: FollowerAI attempt to StartFollow while already following.");
         return;
     }
 
@@ -289,20 +279,15 @@ void FollowerAI::StartFollow(Player* player, uint32 factionForFollower, const Qu
     {
         me->GetMotionMaster()->Clear();
         me->GetMotionMaster()->MoveIdle();
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("server", "TSCR: FollowerAI start with WAYPOINT_MOTION_TYPE, set to MoveIdle.");
-#endif
+        
+        LOG_DEBUG("scripts.ai.followerai", "TSCR: FollowerAI start with WAYPOINT_MOTION_TYPE, set to MoveIdle.");
     }
 
     me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
-
     AddFollowState(STATE_FOLLOW_INPROGRESS);
-
     me->GetMotionMaster()->MoveFollow(player, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("server", "TSCR: FollowerAI start follow %s (GUID " UI64FMTD ")", player->GetName().c_str(), m_uiLeaderGUID);
-#endif
+    LOG_DEBUG("scripts.ai.followerai", "TSCR: FollowerAI start follow %s (GUID " UI64FMTD ")", player->GetName().c_str(), m_uiLeaderGUID);
 }
 
 Player* FollowerAI::GetLeaderForFollower()
@@ -321,9 +306,7 @@ Player* FollowerAI::GetLeaderForFollower()
 
                     if (member && me->IsWithinDistInMap(member, MAX_PLAYER_DISTANCE) && member->IsAlive())
                     {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                        LOG_DEBUG("server", "TSCR: FollowerAI GetLeader changed and returned new leader.");
-#endif
+                        LOG_DEBUG("scripts.ai.followerai", "TSCR: FollowerAI GetLeader changed and returned new leader.");
                         m_uiLeaderGUID = member->GetGUID();
                         return member;
                     }
@@ -332,10 +315,8 @@ Player* FollowerAI::GetLeaderForFollower()
         }
     }
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("server", "TSCR: FollowerAI GetLeader can not find suitable leader.");
-#endif
-    return NULL;
+    LOG_DEBUG("scripts.ai.followerai", "TSCR: FollowerAI GetLeader can not find suitable leader.");
+    return nullptr;
 }
 
 void FollowerAI::SetFollowComplete(bool bWithEndEvent)

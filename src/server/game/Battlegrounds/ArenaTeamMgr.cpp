@@ -93,7 +93,7 @@ void ArenaTeamMgr::LoadArenaTeams()
 
     if (!result)
     {
-        LOG_INFO("server", ">> Loaded 0 arena teams. DB table `arena_team` is empty!");
+        LOG_INFO("server.loading", ">> Loaded 0 arena teams. DB table `arena_team` is empty!");
         LOG_INFO("server.loading", "");
         return;
     }
@@ -124,7 +124,7 @@ void ArenaTeamMgr::LoadArenaTeams()
     }
     while (result->NextRow());
 
-    LOG_INFO("server", ">> Loaded %u arena teams in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", ">> Loaded %u arena teams in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", "");
 }
 

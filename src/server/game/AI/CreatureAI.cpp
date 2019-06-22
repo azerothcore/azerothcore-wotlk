@@ -42,7 +42,7 @@ void CreatureAI::DoZoneInCombat(Creature* creature /*= NULL*/, float maxRangeToN
     Map* map = creature->GetMap();
     if (!map->IsDungeon())                                  //use IsDungeon instead of Instanceable, in case battlegrounds will be instantiated
     {
-        LOG_ERROR("server", "DoZoneInCombat call for map that isn't an instance (creature entry = %d)", creature->GetTypeId() == TYPEID_UNIT ? creature->ToCreature()->GetEntry() : 0);
+        LOG_ERROR("scripts.ai", "DoZoneInCombat call for map that isn't an instance (creature entry = %d)", creature->GetTypeId() == TYPEID_UNIT ? creature->ToCreature()->GetEntry() : 0);
         return;
     }
 
@@ -66,7 +66,7 @@ void CreatureAI::DoZoneInCombat(Creature* creature /*= NULL*/, float maxRangeToN
 
     if (!creature->HasReactState(REACT_PASSIVE) && !creature->GetVictim())
     {
-        LOG_ERROR("server", "DoZoneInCombat called for creature that has empty threat list (creature entry = %u)", creature->GetEntry());
+        LOG_ERROR("scripts.ai", "DoZoneInCombat called for creature that has empty threat list (creature entry = %u)", creature->GetEntry());
         return;
     }
 
@@ -153,7 +153,7 @@ void CreatureAI::EnterEvadeMode()
         return;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("server", "Creature %u enters evade mode.", me->GetEntry());
+    LOG_DEBUG("scripts.ai", "Creature %u enters evade mode.", me->GetEntry());
 #endif
 
     if (!me->GetVehicle()) // otherwise me will be in evade mode forever

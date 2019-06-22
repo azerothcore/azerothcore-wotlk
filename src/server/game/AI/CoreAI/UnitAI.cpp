@@ -125,8 +125,8 @@ void UnitAI::DoCastToAllHostilePlayers(uint32 spellid, bool triggered)
 
 void UnitAI::DoCast(uint32 spellId)
 {
-    Unit* target = NULL;
-    //LOG_ERROR("server", "aggre %u %u", spellId, (uint32)AISpellInfo[spellId].target);
+    Unit* target = nullptr;
+    
     switch (AISpellInfo[spellId].target)
     {
         default:

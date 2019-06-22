@@ -90,7 +90,7 @@ void WorldSession::HandleBfQueueInviteResponse(WorldPacket & recvData)
     uint8 Accepted;
 
     recvData >> BattleId >> Accepted;
-    //LOG_ERROR("server", "HandleQueueInviteResponse: BattleID:%u Accepted:%u", BattleId, Accepted);
+    //LOG_ERROR("bg.battlefield", "HandleQueueInviteResponse: BattleID:%u Accepted:%u", BattleId, Accepted);
     Battlefield* Bf = sBattlefieldMgr->GetBattlefieldByBattleId(BattleId);
     if (!Bf)
         return;
@@ -108,7 +108,7 @@ void WorldSession::HandleBfEntryInviteResponse(WorldPacket & recvData)
     uint8 Accepted;
 
     recvData >> BattleId >> Accepted;
-    //LOG_ERROR("server", "HandleBattlefieldInviteResponse: BattleID:%u Accepted:%u", BattleId, Accepted);
+    //LOG_ERROR("bg.battlefield", "HandleBattlefieldInviteResponse: BattleID:%u Accepted:%u", BattleId, Accepted);
     Battlefield* Bf = sBattlefieldMgr->GetBattlefieldByBattleId(BattleId);
     if (!Bf)
         return;
@@ -130,7 +130,7 @@ void WorldSession::HandleBfExitRequest(WorldPacket & recvData)
     uint32 BattleId;
 
     recvData >> BattleId;
-    //LOG_ERROR("server", "HandleBfExitRequest: BattleID:%u ", BattleId);
+    //LOG_ERROR("bg.battlefield", "HandleBfExitRequest: BattleID:%u ", BattleId);
     Battlefield* Bf = sBattlefieldMgr->GetBattlefieldByBattleId(BattleId);
     if (!Bf)
         return;
