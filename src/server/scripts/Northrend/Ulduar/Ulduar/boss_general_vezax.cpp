@@ -683,7 +683,7 @@ public:
             {
                 std::string accountName;
                 AccountMgr::GetName(plr->GetSession()->GetAccountId(), accountName);
-                sBan->BanAccount(accountName, "0s", "Tele hack", "Server");
+                sBan->BanAccount(accountName, "0s", "Tele hack", "server");
                 return true;
             }
 

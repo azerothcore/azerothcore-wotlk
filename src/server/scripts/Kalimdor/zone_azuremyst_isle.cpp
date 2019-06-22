@@ -514,8 +514,8 @@ public:
                         (*itr)->Respawn();
                 }
             }
-            //else
-            //    TC_LOG_ERROR("scripts", "SD2 ERROR: FlagList is empty!");
+            else
+                LOG_ERROR("scripts", "SD2 ERROR: FlagList is empty!");
         }
 
         void UpdateAI(uint32 diff)

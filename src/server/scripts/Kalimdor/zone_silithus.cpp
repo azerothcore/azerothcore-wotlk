@@ -1264,7 +1264,7 @@ class go_wind_stone : public GameObjectScript
                 {
                     std::string accountName;
                     AccountMgr::GetName(player->GetSession()->GetAccountId(), accountName);
-                    sBan->BanAccount(accountName, "0s", "Wind Stone exploit", "Server");
+                    sBan->BanAccount(accountName, "0s", "Wind Stone exploit", "scripts");
                 }
                 return;
             }

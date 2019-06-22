@@ -68,8 +68,8 @@ class instance_sunwell_plateau : public InstanceMapScript
                             return player;
                     }
                 }
-                //else
-                //    TC_LOG_DEBUG("scripts", "Instance Sunwell Plateau: GetPlayerInMap, but PlayerList is empty!");
+                else
+                    LOG_DEBUG("scripts", "Instance Sunwell Plateau: GetPlayerInMap, but PlayerList is empty!");
 
                 return NULL;
             }

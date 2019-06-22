@@ -228,9 +228,7 @@ public:
 
         void PrepareEncounter()
         {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            LOG_DEBUG("server", "TSCR: Barnes Opera Event - Introduction complete - preparing encounter %d", m_uiEventId);
-#endif
+            LOG_DEBUG("scripts", "TSCR: Barnes Opera Event - Introduction complete - preparing encounter %d", m_uiEventId);
             uint8 index = 0;
             uint8 count = 0;
 

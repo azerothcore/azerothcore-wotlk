@@ -415,9 +415,7 @@ public:
                 return true;
             }
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            LOG_DEBUG("server", "TSCR: npc_commander_dawnforge event already in progress, need to wait.");
-#endif
+            LOG_DEBUG("scripts", "TSCR: npc_commander_dawnforge event already in progress, need to wait.");
             return false;
         }
 

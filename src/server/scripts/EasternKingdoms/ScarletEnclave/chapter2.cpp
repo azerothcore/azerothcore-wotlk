@@ -241,9 +241,7 @@ public:
             {
                 AddEscortState(STATE_ESCORT_RETURNING);
                 ReturnToLastPoint();
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                LOG_DEBUG("server", "TSCR: EscortAI has left combat and is now returning to last point");
-#endif
+                LOG_DEBUG("scripts", "TSCR: EscortAI has left combat and is now returning to last point");
             }
             else
             {

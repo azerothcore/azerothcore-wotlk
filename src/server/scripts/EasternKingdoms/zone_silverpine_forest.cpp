@@ -245,7 +245,7 @@ public:
 
         void UpdateAI(uint32 diff)
         {
-            //TC_LOG_INFO("scripts", "DEBUG: p(%i) k(%i) d(%u) W(%i)", Phase, KillCount, diff, WaitTimer);
+            LOG_DEBUG("scripts", "DEBUG: p(%i) k(%i) d(%u) W(%i)", Phase, KillCount, diff, WaitTimer);
 
             if (!QuestInProgress)
                 return;

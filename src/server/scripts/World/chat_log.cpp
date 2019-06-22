@@ -117,8 +117,7 @@ public:
                          channel->HasFlag(CHANNEL_FLAG_LFG));
 
         if (isSystem)
-            LOG_DEBUG("server", "[SYSCHAN] Player %s tells channel %s: %s",
-                player->GetName().c_str(), channel->GetName().c_str(), msg.c_str());
+            LOG_DEBUG("scripts", "[SYSCHAN] Player %s tells channel %s: %s", player->GetName().c_str(), channel->GetName().c_str(), msg.c_str());
         else
         {
             std::string channelName = channel ? channel->GetName() : "<unknown>";
