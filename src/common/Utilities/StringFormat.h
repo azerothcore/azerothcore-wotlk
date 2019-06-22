@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2019 TrinityCore <https://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
@@ -23,7 +24,7 @@
 
 namespace ACORE
 {
-    /// Default TC string format function.
+    /// Default AzerothCore string format function.
     template<typename Format, typename... Args>
     inline std::string StringFormat(Format&& fmt, Args&&... args)
     {

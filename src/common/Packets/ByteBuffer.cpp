@@ -37,7 +37,7 @@ ByteBufferSourceException::ByteBufferSourceException(size_t pos, size_t size,
 
 void ByteBuffer::hexlike(bool outString) const
 {
-    if (!outString)
+    if (!outString || !sLog->ShouldLog("network", LOG_LEVEL_TRACE))
         return;
 
     uint32 j = 1, k = 1;
@@ -65,5 +65,5 @@ void ByteBuffer::hexlike(bool outString) const
     }
     o << " ";
 
-    LOG_INFO("root", "%s", o.str().c_str());
+    LOG_TRACE("network", "%s", o.str().c_str());
 }
