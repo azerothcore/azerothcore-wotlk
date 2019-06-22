@@ -5,6 +5,7 @@
 #include "Chat.h"
 #include "BattlegroundQueue.h"
 #include "World.h"
+#include "Opcodes.h"
 
 /*####################################################################################
 ###############################CROSSFACTION BATTLEGROUNDS#############################
