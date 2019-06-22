@@ -3242,3 +3242,13 @@ LFG.Location.All = 0
 
 #
 ###################################################################################################
+#
+# CROSSFACTION BG CONFIG
+#
+#    Battleground.Crossfaction.Enabled = 1 - Mixed battleground enabled.
+#    Battleground.Crossfaction.Enabled = 0 - Mixed battleground disabled.
+
+Battleground.Crossfaction.Enabled = 1
+
+#
+###################################################################################################

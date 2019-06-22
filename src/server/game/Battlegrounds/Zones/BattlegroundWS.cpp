@@ -164,16 +164,16 @@ void BattlegroundWS::EventPlayerCapturedFlag(Player* player)
         player->RemoveAurasDueToSpell(BG_WS_SPELL_WARSONG_FLAG);
         PlaySoundToAll(BG_WS_SOUND_FLAG_CAPTURED_ALLIANCE);
         SendMessageToAll(LANG_BG_WS_CAPTURED_HF, CHAT_MSG_BG_SYSTEM_ALLIANCE, player);
-        RewardReputationToTeam(890, _reputationCapture, TEAM_ALLIANCE);
     }
     else
     {
         player->RemoveAurasDueToSpell(BG_WS_SPELL_SILVERWING_FLAG);
         PlaySoundToAll(BG_WS_SOUND_FLAG_CAPTURED_HORDE);
         SendMessageToAll(LANG_BG_WS_CAPTURED_AF, CHAT_MSG_BG_SYSTEM_HORDE, player);
-        RewardReputationToTeam(889, _reputationCapture, TEAM_HORDE);
     }
-
+	
+	RewardReputationToTeam(890, 889, _reputationCapture, player->GetTeamId());
+    
     SpawnBGObject(BG_WS_OBJECT_H_FLAG, BG_WS_FLAG_RESPAWN_TIME);
     SpawnBGObject(BG_WS_OBJECT_A_FLAG, BG_WS_FLAG_RESPAWN_TIME);
 

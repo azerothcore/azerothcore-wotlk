@@ -374,7 +374,11 @@ class Battleground
         uint32 GetScriptId() const          { return ScriptId; }
         uint32 GetBonusHonorFromKill(uint32 kills) const;
 
-        // Set methods:
+		uint32 GetAlliancePlayersCount() const          { return m_AlliancePlayersCount; }
+        uint32 GetHordePlayersCount() const             { return m_HordePlayersCount; }
+		bool GetSwitchTeam() const        { return m_SwitchTeam; }
+        
+		// Set methods:
         void SetName(char const* Name)      { m_Name = Name; }
         void SetBgTypeID(BattlegroundTypeId TypeID) { m_RealTypeID = TypeID; }
         void SetInstanceID(uint32 InstanceID) { m_InstanceID = InstanceID; }
@@ -390,13 +394,19 @@ class Battleground
         void SetWinner(TeamId winner)        { m_WinnerId = winner; }
         void SetScriptId(uint32 scriptId)   { ScriptId = scriptId; }
 
+		void setSwitchTeam(bool switchTeam)             { m_SwitchTeam = switchTeam; }
+
         void ModifyStartDelayTime(int32 diff) { m_StartDelayTime -= diff; }
         void SetStartDelayTime(int32 Time)    { m_StartDelayTime = Time; }
 
         void SetMaxPlayersPerTeam(uint32 MaxPlayers) { m_MaxPlayersPerTeam = MaxPlayers; }
         void SetMinPlayersPerTeam(uint32 MinPlayers) { m_MinPlayersPerTeam = MinPlayers; }
 
-        void DecreaseInvitedCount(TeamId teamId)    { ASSERT(m_BgInvitedPlayers[teamId] > 0); --m_BgInvitedPlayers[teamId]; }
+		void DecreaseInvitedCount(TeamId teamId)    
+        {
+            if (m_BgInvitedPlayers[teamId] > 0)
+			--m_BgInvitedPlayers[teamId]; 
+        }
         void IncreaseInvitedCount(TeamId teamId)    { ++m_BgInvitedPlayers[teamId]; }
         uint32 GetInvitedCount(TeamId teamId) const { return m_BgInvitedPlayers[teamId]; }
 
@@ -480,7 +490,7 @@ class Battleground
         void CastSpellOnTeam(uint32 spellId, TeamId teamId);
         void RemoveAuraOnTeam(uint32 spellId, TeamId teamId);
         void RewardHonorToTeam(uint32 honor, TeamId teamId);
-        void RewardReputationToTeam(uint32 factionId, uint32 reputation, TeamId teamId);
+        void RewardReputationToTeam(uint32 a_faction_id, uint32 h_faction_id, uint32 Reputation, uint32 TeamID);
         uint32 GetRealRepFactionForPlayer(uint32 factionId, Player* player);
 
         void UpdateWorldState(uint32 Field, uint32 Value);
@@ -748,5 +758,9 @@ class Battleground
         float m_TeamStartLocO[BG_TEAMS_COUNT];
         float m_StartMaxDist;
         uint32 ScriptId;
+	public:
+		uint32 m_AlliancePlayersCount;
+		uint32 m_HordePlayersCount;
+		bool m_SwitchTeam;
 };
 #endif

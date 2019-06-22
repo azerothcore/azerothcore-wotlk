@@ -1094,6 +1094,43 @@ class Player : public Unit, public GridObject<Player>
     public:
         explicit Player(WorldSession* session);
         ~Player();
+		
+		private:
+            bool m_ForgetBGPlayers;
+            bool m_ForgetInListPlayers;
+            uint8 m_FakeRace;
+            uint8 m_RealRace;
+            uint32 m_FakeMorph;
+           public:
+				TeamId m_team;
+				TeamId mFake_team;
+				uint8 m_PvPsouls;
+				uint8 PvPsouls_Rank();
+				void Reset_PvPsouls();
+                typedef std::vector<uint64> FakePlayers;
+                void SendChatMessage(const char *format, ...);
+                void FitPlayerInTeam(bool action, Battleground* pBattleGround = NULL);          // void FitPlayerInTeam(bool action, Battleground* bg = NULL);
+                void DoForgetPlayersInList();
+                void DoForgetPlayersInBG(Battleground* pBattleGround);                                          // void DoForgetPlayersInBG(Battleground* bg);
+                uint8 getCFSRace() const { return m_RealRace; }
+                void SetCFSRace() { m_RealRace = GetByteValue(UNIT_FIELD_BYTES_0, 0); }; // SHOULD ONLY BE CALLED ON LOGIN
+                void SetFakeRace(); // SHOULD ONLY BE CALLED ON LOGIN
+                void SetFakeRaceAndMorph(); // SHOULD ONLY BE CALLED ON LOGIN
+                uint32 GetFakeMorph() { return m_FakeMorph; };
+                uint8 getFRace() const { return m_FakeRace; }
+                void SetForgetBGPlayers(bool value) { m_ForgetBGPlayers = value; }
+                bool ShouldForgetBGPlayers() { return m_ForgetBGPlayers; }
+                void SetForgetInListPlayers(bool value) { m_ForgetInListPlayers = value; }
+                bool ShouldForgetInListPlayers() { return m_ForgetInListPlayers; }
+                bool SendBattleGroundChat(uint32 msgtype, std::string message);
+                void MorphFit(bool value);
+                bool IsPlayingNative() const { return GetTeamId() == m_team; }
+                TeamId GetCFSTeamId() const { return m_team; }
+				TeamId GetTeamId() const { return mFake_team != TEAM_NEUTRAL ? mFake_team : (m_bgData.bgTeamId && GetBattleground() ? m_bgData.bgTeamId : m_team); }
+				TeamId GetBgTeamId() const { return m_bgData.bgTeamId != TEAM_NEUTRAL ? m_bgData.bgTeamId : GetTeamId(); }
+                bool SendRealNameQuery();
+                FakePlayers m_FakePlayers;
+				void SetBGTeamId(TeamId team) { m_bgData.bgTeamId = team; }
 
         void CleanupsBeforeDelete(bool finalCleanup = true);
 
@@ -1162,7 +1199,7 @@ class Player : public Unit, public GridObject<Player>
         PlayerSocial *GetSocial() { return m_social; }
 
         PlayerTaxi m_taxi;
-        void InitTaxiNodesForLevel() { m_taxi.InitTaxiNodesForLevel(getRace(), getClass(), getLevel()); }
+        void InitTaxiNodesForLevel() { m_taxi.InitTaxiNodesForLevel(getCFSRace(), getClass(), getLevel()); }
         bool ActivateTaxiPathTo(std::vector<uint32> const& nodes, Creature* npc = NULL, uint32 spellid = 1);
         bool ActivateTaxiPathTo(uint32 taxi_path_id, uint32 spellid = 1);
         void CleanupAfterTaxiFlight();
@@ -2081,7 +2118,7 @@ class Player : public Unit, public GridObject<Player>
         void CheckAreaExploreAndOutdoor(void);
 
         static TeamId TeamIdForRace(uint8 race);
-        TeamId GetTeamId(bool original = false) const { return original ? TeamIdForRace(getRace(true)) : m_team; };
+        //TeamId GetTeamId(bool original = false) const { return original ? TeamIdForRace(getRace(true)) : m_team; };
         void setFactionForRace(uint8 race);
         void setTeamId(TeamId teamid) { m_team = teamid; };
 
@@ -2273,7 +2310,7 @@ class Player : public Unit, public GridObject<Player>
                 }
         }
 
-        TeamId GetBgTeamId() const { return m_bgData.bgTeamId != TEAM_NEUTRAL ? m_bgData.bgTeamId : GetTeamId(); }
+        //TeamId GetBgTeamId() const { return m_bgData.bgTeamId != TEAM_NEUTRAL ? m_bgData.bgTeamId : GetTeamId(); }
 
         void LeaveBattleground(Battleground* bg = NULL);
         bool CanJoinToBattleground() const;
@@ -2738,7 +2775,7 @@ class Player : public Unit, public GridObject<Player>
         void outDebugValues() const;
         uint64 m_lootGuid;
 
-        TeamId m_team;
+        //TeamId m_team;
         uint32 m_nextSave; // pussywizard
         uint16 m_additionalSaveTimer; // pussywizard
         uint8 m_additionalSaveMask; // pussywizard

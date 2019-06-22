@@ -1514,6 +1514,18 @@ void WorldSession::HandleSetTitleOpcode(WorldPacket & recv_data)
 
 void WorldSession::HandleTimeSyncResp(WorldPacket & recv_data)
 {
+	Battleground* bg = _player->GetBattleground();
+    if (bg) {
+        if (_player->ShouldForgetBGPlayers() && bg) {
+            _player->DoForgetPlayersInBG(bg);
+            _player->SetForgetBGPlayers(false);
+        }
+    }
+    else if (_player->ShouldForgetInListPlayers()) {
+        _player->DoForgetPlayersInList();
+        _player->SetForgetInListPlayers(false);
+    }
+
     uint32 counter, clientTicks;
     recv_data >> counter >> clientTicks;
     //uint32 ourTicks = clientTicks + (World::GetGameTimeMS() - _player->m_timeSyncServer);

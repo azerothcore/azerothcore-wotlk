@@ -23,6 +23,7 @@
 #include "DisableMgr.h"
 #include "Group.h"
 #include "ScriptMgr.h"
+#include "Cfbg/Cfbg.h"
 
 void WorldSession::HandleBattlemasterHelloOpcode(WorldPacket & recvData)
 {
@@ -294,14 +295,20 @@ void WorldSession::HandleBattlegroundPlayerPositionsOpcode(WorldPacket& /*recvDa
     data << flagCarrierCount;
     if (allianceFlagCarrier)
     {
-        data << uint64(allianceFlagCarrier->GetGUID());
+        if (allianceFlagCarrier->SendRealNameQuery())
+            data << uint64(allianceFlagCarrier->GetGUID() + LIMIT_UINT32);
+        else
+            data << uint64(allianceFlagCarrier->GetGUID());
         data << float(allianceFlagCarrier->GetPositionX());
         data << float(allianceFlagCarrier->GetPositionY());
     }
 
     if (hordeFlagCarrier)
     {
-        data << uint64(hordeFlagCarrier->GetGUID());
+        if (hordeFlagCarrier->SendRealNameQuery())
+            data << uint64(hordeFlagCarrier->GetGUID() + LIMIT_UINT32);
+        else
+            data << uint64(hordeFlagCarrier->GetGUID());
         data << float(hordeFlagCarrier->GetPositionX());
         data << float(hordeFlagCarrier->GetPositionY());
     }
@@ -449,7 +456,7 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket &recvData)
                     }
 
                 // send status packet
-                sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, bg, queueSlot, STATUS_IN_PROGRESS, 0, bg->GetStartTime(), bg->GetArenaType(), teamId);
+                sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, bg, queueSlot, STATUS_IN_PROGRESS, 0, bg->GetStartTime(), bg->GetArenaType(), _player->GetBgTeamId());
                 SendPacket(&data);
 
                 _player->SetBattlegroundId(bg->GetInstanceID(), bg->GetBgTypeID(), queueSlot, true, bgTypeId == BATTLEGROUND_RB, teamId);
