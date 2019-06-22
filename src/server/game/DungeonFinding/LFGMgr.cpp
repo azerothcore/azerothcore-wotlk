@@ -145,7 +145,7 @@ void LFGMgr::LoadRewards()
     while (result->NextRow());
 
     LOG_INFO("server", ">> Loaded %u lfg dungeon rewards in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", "");
+    LOG_INFO("server.loading", "");
 }
 
 LFGDungeonData const* LFGMgr::GetLFGDungeon(uint32 id)

@@ -234,7 +234,7 @@ void InstanceSaveManager::LoadInstances()
     LoadCharacterBinds();
 
     LOG_INFO("server", ">> Loaded instances and binds in %u ms", GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", "");
+    LOG_INFO("server.loading", "");
 }
 
 void InstanceSaveManager::LoadResetTimes()

@@ -40,7 +40,7 @@ void SmartWaypointMgr::LoadFromDB()
     if (!result)
     {
         LOG_INFO("server", ">> Loaded 0 SmartAI Waypoint Paths. DB table `waypoints` is empty.");
-        LOG_INFO("server", "");
+        LOG_INFO("server.loading", "");
         return;
     }
 
@@ -78,7 +78,7 @@ void SmartWaypointMgr::LoadFromDB()
     while (result->NextRow());
 
     LOG_INFO("server", ">> Loaded %u SmartAI waypoint paths (total %u waypoints) in %u ms", count, total, GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", "");
+    LOG_INFO("server.loading", "");
 }
 
 SmartWaypointMgr::~SmartWaypointMgr()
@@ -105,7 +105,7 @@ void SmartAIMgr::LoadSmartAIFromDB()
     if (!result)
     {
         LOG_INFO("server", ">> Loaded 0 SmartAI scripts. DB table `smart_scripts` is empty.");
-        LOG_INFO("server", "");
+        LOG_INFO("server.loading", "");
         return;
     }
 
@@ -261,7 +261,7 @@ void SmartAIMgr::LoadSmartAIFromDB()
     while (result->NextRow());
 
     LOG_INFO("server", ">> Loaded %u SmartAI scripts in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", "");
+    LOG_INFO("server.loading", "");
 }
 
 bool SmartAIMgr::IsTargetValid(SmartScriptHolder const& e)

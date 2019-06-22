@@ -49,7 +49,7 @@ void LoadSkillPerfectItemTable()
     if (!result)
     {
         LOG_ERROR("server", ">> Loaded 0 spell perfection definitions. DB table `skill_perfect_item_template` is empty.");
-        LOG_INFO("server", "");
+        LOG_INFO("server.loading", "");
         return;
     }
 
@@ -98,7 +98,7 @@ void LoadSkillPerfectItemTable()
     } while (result->NextRow());
 
     LOG_INFO("server", ">> Loaded %u spell perfection definitions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", "");
+    LOG_INFO("server.loading", "");
 }
 
 struct SkillExtraItemEntry
@@ -135,7 +135,7 @@ void LoadSkillExtraItemTable()
     if (!result)
     {
         LOG_ERROR("server", ">> Loaded 0 spell specialization definitions. DB table `skill_extra_item_template` is empty.");
-        LOG_INFO("server", "");
+        LOG_INFO("server.loading", "");
         return;
     }
 
@@ -185,7 +185,7 @@ void LoadSkillExtraItemTable()
     while (result->NextRow());
 
     LOG_INFO("server", ">> Loaded %u spell specialization definitions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", "");
+    LOG_INFO("server.loading", "");
 }
 
 bool CanCreatePerfectItem(Player* player, uint32 spellId, float &perfectCreateChance, uint32 &perfectItemType)

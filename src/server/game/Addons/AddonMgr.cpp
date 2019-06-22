@@ -34,7 +34,7 @@ void LoadFromDB()
     if (!result)
     {
         LOG_INFO("server", ">> Loaded 0 known addons. DB table `addons` is empty!");
-        LOG_INFO("server", "");
+        LOG_INFO("server.loading", "");
         return;
     }
 
@@ -82,7 +82,7 @@ void LoadFromDB()
         } while (result->NextRow());
 
         LOG_INFO("server", ">> Loaded %u banned addons in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-        LOG_INFO("server", "");
+        LOG_INFO("server.loading", "");
     }
 }
 

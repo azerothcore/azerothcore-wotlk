@@ -1372,7 +1372,7 @@ void World::SetInitialWorldSettings()
     sGameEventMgr->Initialize();
 
     ///- Loading strings. Getting no records means core load has to be canceled because no error message can be output.
-    LOG_INFO("server", "");
+    LOG_INFO("server.loading", "");
     LOG_INFO("server", "Loading Trinity strings...");
     if (!sObjectMgr->LoadTrinityStrings())
         exit(1);                                            // Error message displayed in function already
@@ -1462,7 +1462,7 @@ void World::SetInitialWorldSettings()
 
     sObjectMgr->SetDBCLocaleIndex(GetDefaultDbcLocale());        // Get once for all the locale index of DBC language (console/broadcasts)
     LOG_INFO("server", ">> Localization strings loaded in %u ms", GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", "");
+    LOG_INFO("server.loading", "");
 
     LOG_INFO("server", "Loading Page Texts...");
     sObjectMgr->LoadPageTexts();
@@ -1946,9 +1946,9 @@ void World::SetInitialWorldSettings()
 #endif
     
     uint32 startupDuration = GetMSTimeDiffToNow(startupBegin);
-    LOG_INFO("server", "");
+    LOG_INFO("server.loading", "");
     LOG_INFO("server", "WORLD: World initialized in %u minutes %u seconds", (startupDuration / 60000), ((startupDuration % 60000) / 1000));
-    LOG_INFO("server", "");
+    LOG_INFO("server.loading", "");
 
     // possibly enable db logging; avoid massive startup spam by doing it here.
     if (sConfigMgr->GetBoolDefault("EnableLogDB", false))
@@ -2004,7 +2004,7 @@ void World::DetectDBCLang()
     m_defaultDbcLocale = LocaleConstant(default_locale);
 
     LOG_INFO("server", "Using %s DBC Locale as default. All available DBC locales: %s", localeNames[GetDefaultDbcLocale()], availableLocalsStr.empty() ? "<none>" : availableLocalsStr.c_str());
-    LOG_INFO("server", "");
+    LOG_INFO("server.loading", "");
 }
 
 void World::LoadAutobroadcasts()
@@ -2970,7 +2970,7 @@ void World::LoadWorldStates()
     if (!result)
     {
         LOG_INFO("server", ">> Loaded 0 world states. DB table `worldstates` is empty!");
-        LOG_INFO("server", "");
+        LOG_INFO("server.loading", "");
         return;
     }
 
@@ -2985,7 +2985,7 @@ void World::LoadWorldStates()
     while (result->NextRow());
 
     LOG_INFO("server", ">> Loaded %u world states in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", "");
+    LOG_INFO("server.loading", "");
 }
 
 // Setting a worldstate will save it to DB
@@ -3093,7 +3093,7 @@ void World::LoadGlobalPlayerDataStore()
     while (result->NextRow());
 
     LOG_INFO("server", ">> Loaded %d Players data in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", "");
+    LOG_INFO("server.loading", "");
 }
 
 void World::AddGlobalPlayerData(uint32 guid, uint32 accountId, std::string const& name, uint8 gender, uint8 race, uint8 playerClass, uint8 level, uint16 mailCount, uint32 guildId)

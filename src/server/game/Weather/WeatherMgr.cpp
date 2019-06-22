@@ -85,7 +85,7 @@ void LoadWeatherData()
     if (!result)
     {
         LOG_ERROR("server", ">> Loaded 0 weather definitions. DB table `game_weather` is empty.");
-        LOG_INFO("server", "");
+        LOG_INFO("server.loading", "");
         return;
     }
 
@@ -129,7 +129,7 @@ void LoadWeatherData()
     while (result->NextRow());
 
     LOG_INFO("server", ">> Loaded %u weather definitions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", "");
+    LOG_INFO("server.loading", "");
 }
 
 void SendFineWeatherUpdateToPlayer(Player* player)

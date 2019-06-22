@@ -26,7 +26,7 @@ void PetitionMgr::LoadPetitions()
     if (!result)
     {
         LOG_INFO("server", ">>  Loaded 0 Petitions!");
-        LOG_INFO("server", "");
+        LOG_INFO("server.loading", "");
         return;
     }
 
@@ -39,7 +39,7 @@ void PetitionMgr::LoadPetitions()
     } while (result->NextRow());
 
     LOG_INFO("server", ">> Loaded %d Petitions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", "");
+    LOG_INFO("server.loading", "");
 }
 
 void PetitionMgr::LoadSignatures()
@@ -51,7 +51,7 @@ void PetitionMgr::LoadSignatures()
     if (!result)
     {
         LOG_INFO("server", ">>  Loaded 0 Petition signs!");
-        LOG_INFO("server", "");
+        LOG_INFO("server.loading", "");
         return;
     }
 
@@ -64,7 +64,7 @@ void PetitionMgr::LoadSignatures()
     } while (result->NextRow());
 
     LOG_INFO("server", ">> Loaded %d Petition signs in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", "");
+    LOG_INFO("server.loading", "");
 }
 
 void PetitionMgr::AddPetition(uint32 petitionId, uint32 ownerGuid, std::string const& name, uint8 type)

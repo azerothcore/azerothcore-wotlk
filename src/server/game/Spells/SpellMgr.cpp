@@ -1259,7 +1259,7 @@ void SpellMgr::LoadSpellRanks()
     if (!result)
     {
         LOG_INFO("server", ">> Loaded 0 spell rank records. DB table `spell_ranks` is empty.");
-        LOG_INFO("server", "");
+        LOG_INFO("server.loading", "");
         return;
     }
 
@@ -1355,7 +1355,7 @@ void SpellMgr::LoadSpellRanks()
     } while (!finished);
 
     LOG_INFO("server", ">> Loaded %u spell rank records in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", "");
+    LOG_INFO("server.loading", "");
 }
 
 void SpellMgr::LoadSpellRequired()
@@ -1371,7 +1371,7 @@ void SpellMgr::LoadSpellRequired()
     if (!result)
     {
         LOG_INFO("server", ">> Loaded 0 spell required records. DB table `spell_required` is empty.");
-        LOG_INFO("server", "");
+        LOG_INFO("server.loading", "");
         return;
     }
 
@@ -1421,7 +1421,7 @@ void SpellMgr::LoadSpellRequired()
     } while (result->NextRow());
 
     LOG_INFO("server", ">> Loaded %u spell required records in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", "");
+    LOG_INFO("server.loading", "");
 }
 
 void SpellMgr::LoadSpellLearnSkills()
@@ -1459,7 +1459,7 @@ void SpellMgr::LoadSpellLearnSkills()
     }
 
     LOG_INFO("server", ">> Loaded %u Spell Learn Skills from DBC in %u ms", dbc_count, GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", "");
+    LOG_INFO("server.loading", "");
 }
 
 void SpellMgr::LoadSpellTargetPositions()
@@ -1474,7 +1474,7 @@ void SpellMgr::LoadSpellTargetPositions()
     if (!result)
     {
         LOG_INFO("server", ">> Loaded 0 spell target coordinates. DB table `spell_target_position` is empty.");
-        LOG_INFO("server", "");
+        LOG_INFO("server.loading", "");
         return;
     }
 
@@ -1567,7 +1567,7 @@ void SpellMgr::LoadSpellTargetPositions()
     }*/
 
     LOG_INFO("server", ">> Loaded %u spell teleport coordinates in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", "");
+    LOG_INFO("server.loading", "");
 }
 
 void SpellMgr::LoadSpellGroups()
@@ -1581,7 +1581,7 @@ void SpellMgr::LoadSpellGroups()
     if (!result)
     {
         LOG_INFO("server", ">> Loaded 0 spell group definitions. DB table `spell_group` is empty.");
-        LOG_INFO("server", "");
+        LOG_INFO("server.loading", "");
         return;
     }
 
@@ -1628,7 +1628,7 @@ void SpellMgr::LoadSpellGroups()
 
 
     LOG_INFO("server", ">> Loaded %u spell group definitions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", "");
+    LOG_INFO("server.loading", "");
 }
 
 void SpellMgr::LoadSpellGroupStackRules()
@@ -1642,7 +1642,7 @@ void SpellMgr::LoadSpellGroupStackRules()
     if (!result)
     {
         LOG_INFO("server", ">> Loaded 0 spell group stack rules. DB table `spell_group_stack_rules` is empty.");
-        LOG_INFO("server", "");
+        LOG_INFO("server.loading", "");
         return;
     }
 
@@ -1680,7 +1680,7 @@ void SpellMgr::LoadSpellGroupStackRules()
     } while (result->NextRow());
 
     LOG_INFO("server", ">> Loaded %u spell group stack rules in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", "");
+    LOG_INFO("server.loading", "");
 }
 
 void SpellMgr::LoadSpellProcEvents()
@@ -1781,7 +1781,7 @@ void SpellMgr::LoadSpellProcs()
     if (!result)
     {
         LOG_INFO("server", ">> Loaded 0 spell proc conditions and data. DB table `spell_proc` is empty.");
-        LOG_INFO("server", "");
+        LOG_INFO("server.loading", "");
         return;
     }
 
@@ -1906,7 +1906,7 @@ void SpellMgr::LoadSpellProcs()
     while (result->NextRow());
 
     LOG_INFO("server", ">> Loaded %u spell proc conditions and data in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", "");
+    LOG_INFO("server.loading", "");
 }
 
 void SpellMgr::LoadSpellBonusess()
@@ -1920,7 +1920,7 @@ void SpellMgr::LoadSpellBonusess()
     if (!result)
     {
         LOG_INFO("server", ">> Loaded 0 spell bonus data. DB table `spell_bonus_data` is empty.");
-        LOG_INFO("server", "");
+        LOG_INFO("server.loading", "");
         return;
     }
 
@@ -1947,7 +1947,7 @@ void SpellMgr::LoadSpellBonusess()
     } while (result->NextRow());
 
     LOG_INFO("server", ">> Loaded %u extra spell bonus data in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", "");
+    LOG_INFO("server.loading", "");
 }
 
 void SpellMgr::LoadSpellThreats()
@@ -1961,7 +1961,7 @@ void SpellMgr::LoadSpellThreats()
     if (!result)
     {
         LOG_INFO("server", ">> Loaded 0 aggro generating spells. DB table `spell_threat` is empty.");
-        LOG_INFO("server", "");
+        LOG_INFO("server.loading", "");
         return;
     }
 
@@ -1988,7 +1988,7 @@ void SpellMgr::LoadSpellThreats()
     } while (result->NextRow());
 
     LOG_INFO("server", ">> Loaded %u SpellThreatEntries in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", "");
+    LOG_INFO("server.loading", "");
 }
 
 void SpellMgr::LoadSpellMixology()
@@ -2002,7 +2002,7 @@ void SpellMgr::LoadSpellMixology()
     if (!result)
     {
         LOG_INFO("server", ">> Loaded 0 mixology bonuses. DB table `spell_mixology` is empty.");
-        LOG_INFO("server", "");
+        LOG_INFO("server.loading", "");
         return;
     }
 
@@ -2024,7 +2024,7 @@ void SpellMgr::LoadSpellMixology()
     } while (result->NextRow());
 
     LOG_INFO("server", ">> Loaded %u Mixology bonuses in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", "");
+    LOG_INFO("server.loading", "");
 }
 
 void SpellMgr::LoadSkillLineAbilityMap()
@@ -2046,7 +2046,7 @@ void SpellMgr::LoadSkillLineAbilityMap()
     }
 
     LOG_INFO("server", ">> Loaded %u SkillLineAbility MultiMap Data in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", "");
+    LOG_INFO("server.loading", "");
 }
 
 void SpellMgr::LoadSpellPetAuras()
@@ -2060,7 +2060,7 @@ void SpellMgr::LoadSpellPetAuras()
     if (!result)
     {
         LOG_INFO("server", ">> Loaded 0 spell pet auras. DB table `spell_pet_auras` is empty.");
-        LOG_INFO("server", "");
+        LOG_INFO("server.loading", "");
         return;
     }
 
@@ -2108,7 +2108,7 @@ void SpellMgr::LoadSpellPetAuras()
     } while (result->NextRow());
 
     LOG_INFO("server", ">> Loaded %u spell pet auras in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", "");
+    LOG_INFO("server.loading", "");
 }
 
 // Fill custom data about enchancments
@@ -2150,7 +2150,7 @@ void SpellMgr::LoadEnchantCustomAttr()
     }
 
     LOG_INFO("server", ">> Loaded %u custom enchant attributes in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", "");
+    LOG_INFO("server.loading", "");
 }
 
 void SpellMgr::LoadSpellEnchantProcData()
@@ -2164,7 +2164,7 @@ void SpellMgr::LoadSpellEnchantProcData()
     if (!result)
     {
         LOG_INFO("server", ">> Loaded 0 spell enchant proc event conditions. DB table `spell_enchant_proc_data` is empty.");
-        LOG_INFO("server", "");
+        LOG_INFO("server.loading", "");
         return;
     }
 
@@ -2194,7 +2194,7 @@ void SpellMgr::LoadSpellEnchantProcData()
     } while (result->NextRow());
 
     LOG_INFO("server", ">> Loaded %u enchant proc data definitions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", "");
+    LOG_INFO("server.loading", "");
 }
 
 void SpellMgr::LoadSpellLinked()
@@ -2208,7 +2208,7 @@ void SpellMgr::LoadSpellLinked()
     if (!result)
     {
         LOG_INFO("server", ">> Loaded 0 linked spells. DB table `spell_linked_spell` is empty.");
-        LOG_INFO("server", "");
+        LOG_INFO("server.loading", "");
         return;
     }
 
@@ -2247,7 +2247,7 @@ void SpellMgr::LoadSpellLinked()
     } while (result->NextRow());
 
     LOG_INFO("server", ">> Loaded %u linked spells in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", "");
+    LOG_INFO("server.loading", "");
 }
 
 void SpellMgr::LoadPetLevelupSpellMap()
@@ -2304,7 +2304,7 @@ void SpellMgr::LoadPetLevelupSpellMap()
     }
 
     LOG_INFO("server", ">> Loaded %u pet levelup and default spells for %u families in %u ms", count, family_count, GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", "");
+    LOG_INFO("server.loading", "");
 }
 
 bool LoadPetDefaultSpells_helper(CreatureTemplate const* cInfo, PetDefaultSpellsEntry& petDefSpells)
@@ -2389,7 +2389,7 @@ void SpellMgr::LoadPetDefaultSpells()
     }
 
     LOG_INFO("server", ">> Loaded addition spells for %u pet spell data entries in %u ms", countData, GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", "");
+    LOG_INFO("server.loading", "");
 
     LOG_INFO("server", "Loading summonable creature templates...");
     oldMSTime = getMSTime();
@@ -2433,7 +2433,7 @@ void SpellMgr::LoadPetDefaultSpells()
     }
 
     LOG_INFO("server", ">> Loaded %u summonable creature templates in %u ms", countCreature, GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", "");
+    LOG_INFO("server.loading", "");
 }
 
 void SpellMgr::LoadSpellAreas()
@@ -2451,7 +2451,7 @@ void SpellMgr::LoadSpellAreas()
     if (!result)
     {
         LOG_INFO("server", ">> Loaded 0 spell area requirements. DB table `spell_area` is empty.");
-        LOG_INFO("server", "");
+        LOG_INFO("server.loading", "");
         return;
     }
 
@@ -2622,7 +2622,7 @@ void SpellMgr::LoadSpellAreas()
     } while (result->NextRow());
 
     LOG_INFO("server", ">> Loaded %u spell area requirements in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", "");
+    LOG_INFO("server.loading", "");
 }
 
 void SpellMgr::LoadSpellInfoStore()
@@ -2639,7 +2639,7 @@ void SpellMgr::LoadSpellInfoStore()
     }
 
     LOG_INFO("server", ">> Loaded spell custom attributes in %u ms", GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", "");
+    LOG_INFO("server.loading", "");
 }
 
 void SpellMgr::UnloadSpellInfoStore()
@@ -2676,7 +2676,7 @@ void SpellMgr::LoadSpellSpecificAndAuraState()
     }
 
     LOG_INFO("server", ">> Loaded spell specific and aura state in %u ms", GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", "");
+    LOG_INFO("server.loading", "");
 }
 
 void SpellMgr::LoadSpellCustomAttr()
@@ -3204,7 +3204,7 @@ void SpellMgr::LoadSpellCustomAttr()
     CreatureAI::FillAISpellInfo();
 
     LOG_INFO("server", ">> Loaded spell custom attributes in %u ms", GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", "");
+    LOG_INFO("server.loading", "");
 }
 
 void SpellMgr::LoadDbcDataCorrections()
@@ -6387,5 +6387,5 @@ void SpellMgr::LoadDbcDataCorrections()
     key->Type[2] = LOCK_KEY_NONE;
 
     LOG_INFO("server", ">> Loading spell dbc data corrections  in %u ms", GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", "");
+    LOG_INFO("server.loading", "");
 }

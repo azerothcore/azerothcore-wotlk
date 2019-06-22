@@ -36,7 +36,7 @@ void OutdoorPvPMgr::InitOutdoorPvP()
     if (!result)
     {
         LOG_ERROR("server", ">> Loaded 0 outdoor PvP definitions. DB table `outdoorpvp_template` is empty.");
-        LOG_INFO("server", "");
+        LOG_INFO("server.loading", "");
         return;
     }
 
@@ -96,7 +96,7 @@ void OutdoorPvPMgr::InitOutdoorPvP()
     }
 
     LOG_INFO("server", ">> Loaded %u outdoor PvP definitions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", "");
+    LOG_INFO("server.loading", "");
 }
 
 void OutdoorPvPMgr::AddZone(uint32 zoneid, OutdoorPvP* handle)
