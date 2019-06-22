@@ -20,7 +20,6 @@
 #define _LOG_H
 
 #include "Common.h"
-#include "LogCommon.h"
 #include "StringFormat.h"
 #include <memory>
 #include <unordered_map>
