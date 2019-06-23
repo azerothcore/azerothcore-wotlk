@@ -86,12 +86,18 @@ public:
     template<typename Format, typename... Args>
     inline void outMessage(std::string const& filter, LogLevel const level, Format&& fmt, Args&& ... args)
     {
+        if (!ShouldLog(filter, level))
+            return;
+
         outMessage(filter, level, ACORE::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...));
     }
 
     template<typename Format, typename... Args>
     void outCommand(uint32 account, Format&& fmt, Args&& ... args)
     {
+        if (!ShouldLog(LOGGER_GM, LOG_LEVEL_INFO))
+            return;
+
         outCommand(std::to_string(account), ACORE::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...));
     }
 

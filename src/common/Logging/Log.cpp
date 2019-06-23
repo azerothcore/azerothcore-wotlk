@@ -661,9 +661,6 @@ void Log::outMessage(std::string const& filter, LogLevel const level, std::strin
 
 void Log::outCommand(std::string&& AccountID, std::string&& message)
 {
-    if (!ShouldLog(LOGGER_GM, LOG_LEVEL_INFO))
-        return;
-
     _writeCommand(message, AccountID);
 }
 
