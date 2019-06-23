@@ -3,7 +3,7 @@ INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1561242305351726648');
 DELETE FROM `creature_template_addon` WHERE `entry` = 11327;
 INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `auras`)
 VALUES
-(11327,0,0,0,0,0,'19226'); -- Zergling aura
+(11327,0,0,0,0,0,'19226'); -- Zergling aura (attack emote every 20 seconds)
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 11327;
 DELETE FROM `smart_scripts` WHERE `entryorguid` IN (1132700,1132701) AND `source_type` = 9;
