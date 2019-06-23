@@ -292,10 +292,12 @@ bool BattlegroundQueue::FillXPlayersToBG(BattlegroundBracketId bracket_id, Battl
 			}
 
 			diff = abs(valiFree - vhordeFree);
-			bool moreAli = valiFree < vhordeFree;
-
+			
 			if (diff > 0)
+            {
+                bool moreAli = valiFree < vhordeFree;
 				ginfo->teamId = moreAli ? TEAM_ALLIANCE : TEAM_HORDE;
+            }
 			
 			if (start) {
 				if (bg->GetSwitchTeam()) {
