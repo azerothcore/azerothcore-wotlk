@@ -49,7 +49,7 @@ BattlegroundQueue::~BattlegroundQueue()
     m_QueuedPlayers.clear();
     for (int i = 0; i < MAX_BATTLEGROUND_BRACKETS; ++i)
     {
-        for (uint32 j = 0; j < BG_QUEUE_GROUP_TYPES_COUNT; ++j)
+        for (uint32 j = 0; j < BG_QUEUE_MAX; ++j)
         {
             for (GroupsQueueType::iterator itr = m_QueuedGroups[i][j].begin(); itr != m_QueuedGroups[i][j].end(); ++itr)
                 delete (*itr);
@@ -839,7 +839,7 @@ void BattlegroundQueue::BattlegroundQueueUpdate(BattlegroundBracketId bracket_id
                 uint32 MMR1 = std::min((*itr)->ArenaMatchmakerRating, maxCountedMMR);
 
                 GroupsQueueType::iterator oponentItr;
-                uint8 oponentQueue = BG_QUEUE_GROUP_TYPES_COUNT;
+                uint8 oponentQueue = BG_QUEUE_MAX;
                 uint32 minOponentMMRDiff = 0xffffffff;
                 uint8 oponentValid = 0;
 
@@ -905,7 +905,7 @@ void BattlegroundQueue::BattlegroundQueueUpdate(BattlegroundBracketId bracket_id
                         break;
                 }
 
-                if (oponentQueue != BG_QUEUE_GROUP_TYPES_COUNT)
+                if (oponentQueue != BG_QUEUE_MAX)
                 {
                     if (oponentValid)
                     {

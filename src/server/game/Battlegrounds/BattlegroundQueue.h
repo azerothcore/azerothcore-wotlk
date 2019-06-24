@@ -40,12 +40,13 @@ struct GroupQueueInfo                                       // stores informatio
 
 enum BattlegroundQueueGroupTypes
 {
-    BG_QUEUE_PREMADE_ALLIANCE   = 0,
-    BG_QUEUE_PREMADE_HORDE      = 1,
-    BG_QUEUE_NORMAL_ALLIANCE    = 2,
-    BG_QUEUE_NORMAL_HORDE       = 3
+    BG_QUEUE_PREMADE_ALLIANCE,
+    BG_QUEUE_PREMADE_HORDE,
+    BG_QUEUE_NORMAL_ALLIANCE,
+    BG_QUEUE_NORMAL_HORDE,
+
+    BG_QUEUE_MAX
 };
-#define BG_QUEUE_GROUP_TYPES_COUNT 4
 
 class Battleground;
 class BattlegroundQueue
@@ -88,7 +89,7 @@ class BattlegroundQueue
              BG_QUEUE_NORMAL_ALLIANCE   is used for normal (or small) alliance groups or non-rated arena matches
              BG_QUEUE_NORMAL_HORDE      is used for normal (or small) horde groups or non-rated arena matches
         */
-        GroupsQueueType m_QueuedGroups[MAX_BATTLEGROUND_BRACKETS][BG_QUEUE_GROUP_TYPES_COUNT];
+        GroupsQueueType m_QueuedGroups[MAX_BATTLEGROUND_BRACKETS][BG_QUEUE_MAX];
 
         // class to select and invite groups to bg
         class SelectionPool
