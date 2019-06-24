@@ -1,7 +1,5 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1561387934007172065');
 
--- trigger Travis
-
 -- Use SpellScript to summon the correct "Argent Knight" (Horde/Alliance) for "Argent War Horn"
 DELETE FROM `spell_script_names` WHERE `spell_id` = 54307;
 INSERT INTO `spell_script_names` (`spell_id`,`ScriptName`) VALUES (54307,'spell_item_summon_argent_knight');
