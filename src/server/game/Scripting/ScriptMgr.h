@@ -1110,6 +1110,12 @@ public:
 
     // Add Player in Battlegroud
     virtual void OnBattlegroundAddPlayer(Battleground* /*bg*/, Player* /*player*/) { }
+
+    // Before added player in Battlegroud
+    virtual void OnBattlegroundBeforeAddPlayer(Battleground* /*bg*/, Player* /*player*/) { }
+
+    // Remove player at leave BG
+    virtual void OnBattlegroundRemovePlayerAtLeave(Battleground* /*bg*/, Player* /*player*/) { }
 };
 
 class SpellSC : public ScriptObject
@@ -1480,6 +1486,8 @@ class ScriptMgr
         void OnBattlegroundEndReward(Battleground* bg, Player* player, TeamId winnerTeamId);
         void OnBattlegroundUpdate(Battleground* bg, uint32 diff);
         void OnBattlegroundAddPlayer(Battleground* bg, Player* player);
+        void OnBattlegroundBeforeAddPlayer(Battleground* bg, Player* player);
+        void OnBattlegroundRemovePlayerAtLeave(Battleground* bg, Player* player);
 
     public: /* SpellSC */ 
  

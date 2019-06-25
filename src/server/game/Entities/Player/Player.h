@@ -2217,6 +2217,8 @@ class Player : public Unit, public GridObject<Player>
         uint32 GetCurrentBattlegroundQueueSlot() const { return m_bgData.bgQueueSlot; }
         bool IsInvitedForBattlegroundInstance() const { return m_bgData.isInvited; }
         bool IsCurrentBattlegroundRandom() const { return m_bgData.bgIsRandom; }
+        BGData& GetBGData() { return m_bgData; }
+        void SetBGData(BGData& bgdata) { m_bgData = bgdata; }
         Battleground* GetBattleground(bool create = false) const;
 
         bool InBattlegroundQueue() const
