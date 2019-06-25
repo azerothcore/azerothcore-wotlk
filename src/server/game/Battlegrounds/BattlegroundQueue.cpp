@@ -409,6 +409,8 @@ bool BattlegroundQueue::GetPlayerGroupInfoData(uint64 guid, GroupQueueInfo * gin
 // this function is filling pools given free slots on both sides, result is ballanced
 void BattlegroundQueue::FillPlayersToBG(Battleground* bg, const int32 aliFree, const int32 hordeFree, BattlegroundBracketId bracket_id)
 {
+    UNUSED(bg);
+
     // clear selection pools
     m_SelectionPools[TEAM_ALLIANCE].Init();
     m_SelectionPools[TEAM_HORDE].Init();
@@ -465,6 +467,8 @@ void BattlegroundQueue::FillPlayersToBG(Battleground* bg, const int32 aliFree, c
 
 void BattlegroundQueue::FillPlayersToBGWithSpecific(Battleground* bg, const int32 aliFree, const int32 hordeFree, BattlegroundBracketId thisBracketId, BattlegroundQueue * specificQueue, BattlegroundBracketId specificBracketId)
 {
+    UNUSED(bg);
+
     // clear selection pools
     m_SelectionPools[TEAM_ALLIANCE].Init();
     m_SelectionPools[TEAM_HORDE].Init();
