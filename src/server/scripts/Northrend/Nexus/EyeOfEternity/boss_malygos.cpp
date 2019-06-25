@@ -489,7 +489,8 @@ public:
                                             WorldPacket data(SMSG_SPLINE_MOVE_UNROOT, 8);
                                             data.append(pPlayer->GetPackGUID());
                                             pPlayer->SendMessageToSet(&data, true);
-
+                                            pPlayer->SetUnderACKmount();
+                                            pPlayer->SetSkipOnePacketForASH(true);
                                             pPlayer->SetUInt64Value(PLAYER_FARSIGHT, vp->GetGUID());
                                             c->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                                         }
@@ -684,6 +685,9 @@ public:
                             for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
                                 if (Player *pPlayer = i->GetSource())
                                 {
+                                    pPlayer->SetUnderACKmount();
+                                    pPlayer->SetSkipOnePacketForASH(true);
+
                                     if (!pPlayer->IsAlive() || pPlayer->IsGameMaster())
                                         continue;
 
@@ -862,7 +866,9 @@ public:
                 plr->MonsterMoveWithSpeed(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), speed);
                 plr->RemoveAura(SPELL_FREEZE_ANIM);
                 plr->SetDisableGravity(false, true);
-                plr->SetUInt64Value(PLAYER_FARSIGHT, 0);;
+                plr->SetUInt64Value(PLAYER_FARSIGHT, 0);
+                plr->SetUnderACKmount();
+                plr->SetSkipOnePacketForASH(true);
             }
         }
 

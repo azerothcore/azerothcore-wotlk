@@ -95,6 +95,7 @@
 #define SKILL_TEMP_BONUS(x)    int16(PAIR32_LOPART(x))
 #define SKILL_PERM_BONUS(x)    int16(PAIR32_HIPART(x))
 #define MAKE_SKILL_BONUS(t, p) MAKE_PAIR32(t, p)
+#define DEFAULT_PLAYER_BOUNDING_RADIUS      0.388999998569489f     // player size, also currently used (correctly?) for any non Unit world objects
 
 enum CharacterFlags
 {
@@ -769,7 +770,16 @@ Player::Player(WorldSession* session): Unit(true), m_mover(this)
     m_drunkTimer = 0;
     m_deathTimer = 0;
     m_deathExpireTime = 0;
-
+    m_flyhackTimer = 0;
+    if (sWorld->getBoolConfig(CONFIG_ANTICHEAT_FLYHACK_ENABLED))
+        m_flyhackTimer = sWorld->getIntConfig(CONFIG_ANTICHEAT_FLYHACK_TIMER);
+    m_mountTimer = 0;
+    m_rootUpdTimer = 0;
+    m_ACKmounted = false;
+    m_rootUpd = false;
+    m_skipOnePacketForASH = true;
+    m_isjumping = false;
+    m_canfly = false;
     m_swingErrorMsg = 0;
 
     for (uint8 j = 0; j < PLAYER_MAX_BATTLEGROUND_QUEUES; ++j)
@@ -900,6 +910,9 @@ Player::Player(WorldSession* session): Unit(true), m_mover(this)
     m_timeSyncClient = 0;
     m_timeSyncServer = 0;
 
+    lastMoveClientTimestamp = 0;
+    lastMoveServerTimestamp = 0;
+
     for (uint8 i = 0; i < MAX_POWERS; ++i)
         m_powerFraction[i] = 0;
 
@@ -933,6 +946,7 @@ Player::Player(WorldSession* session): Unit(true), m_mover(this)
         m_charmAISpells[i] = 0;
 
     m_applyResilience = true;
+    //m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_FLYING | MOVEMENTFLAG_DISABLE_GRAVITY); only for experimental mode
 }
 
 Player::~Player()
@@ -1767,6 +1781,41 @@ void Player::Update(uint32 p_time)
             m_zoneUpdateTimer -= p_time;
     }
 
+    if (m_flyhackTimer > 0)
+    {
+        if (p_time >= m_flyhackTimer)
+        {
+            if (!CheckOnFlyHack() && sWorld->getBoolConfig(CONFIG_AFH_KICK_ENABLED))
+                GetSession()->KickPlayer();
+
+            m_flyhackTimer = sWorld->getIntConfig(CONFIG_ANTICHEAT_FLYHACK_TIMER);
+        }
+        else
+            m_flyhackTimer -= p_time;
+    }
+
+    if (m_ACKmounted && m_mountTimer > 0)
+    {
+        if (p_time >= m_mountTimer)
+        {
+            m_mountTimer = 0;
+            m_ACKmounted = false;
+        }
+        else
+            m_mountTimer -= p_time;
+    }
+
+    if (m_rootUpd && m_rootUpdTimer > 0)
+    {
+        if (p_time >= m_rootUpdTimer)
+        {
+            m_rootUpdTimer = 0;
+            m_rootUpd = false;
+        }
+        else
+            m_rootUpdTimer -= p_time;
+    }
+
     if (m_timeSyncTimer > 0)
     {
         if (p_time >= m_timeSyncTimer)
@@ -2184,7 +2233,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
     Pet* pet = GetPet();
 
     MapEntry const* mEntry = sMapStore.LookupEntry(mapid);
-
+    SetSkipOnePacketForASH(true); // for except kick by antispeedhack
     // don't let enter battlegrounds without assigned battleground id (for example through areatrigger)...
     if (!InBattleground() && mEntry->IsBattlegroundOrArena())
         return false;
@@ -27465,22 +27514,25 @@ bool Player::SetDisableGravity(bool disable, bool packetOnly /*= false*/)
 
 bool Player::SetCanFly(bool apply, bool packetOnly /*= false*/)
 {
-    if (!packetOnly && !Unit::SetCanFly(apply))
-        return false;
-
     if (!apply)
         SetFallInformation(time(NULL), GetPositionZ());
 
+    SetCanFlybyServer(apply);
     WorldPacket data(apply ? SMSG_MOVE_SET_CAN_FLY : SMSG_MOVE_UNSET_CAN_FLY, 12);
     data.append(GetPackGUID());
     data << uint32(0);          //! movement counter
     SendDirectMessage(&data);
 
-    data.Initialize(MSG_MOVE_UPDATE_CAN_FLY, 64);
-    data.append(GetPackGUID());
-    BuildMovementPacket(&data);
-    SendMessageToSet(&data, false);
-    return true;
+    if (packetOnly || Unit::SetCanFly(apply))
+    {
+        data.Initialize(MSG_MOVE_UPDATE_CAN_FLY, 64);
+        data.append(GetPackGUID());
+        BuildMovementPacket(&data);
+        SendMessageToSet(&data, false);
+        return true;
+    }
+    else
+        return false;
 }
 
 bool Player::SetHover(bool apply, bool packetOnly /*= false*/)
@@ -27552,4 +27604,226 @@ void Player::SummonPet(uint32 entry, float x, float y, float z, float ang, PetTy
 
     AsynchPetSummon* asynchPetInfo = new AsynchPetSummon(entry, pos, petType, duration, createdBySpell, casterGUID);
     Pet::LoadPetFromDB(this, asynchLoadType, entry, 0, false, asynchPetInfo);
+}
+
+void Player::SetUnderACKmount()
+{
+    m_mountTimer = 3000;
+    m_ACKmounted = true;
+}
+
+void Player::SetRootACKUpd(uint32 delay)
+{
+    m_rootUpdTimer = 1500 + delay;
+    m_rootUpd = true;
+}
+
+bool Player::CheckOnFlyHack()
+{
+    if (IsCanFlybyServer())
+        return true;
+
+    if (ToUnit()->IsFalling() || IsFalling())
+        return true;
+
+    if (m_mover != this)
+        return true;
+
+    if (GetMapId() == 616 || GetMapId() == 649)
+        return true;
+
+    if (IsFlying() && !CanFly()) // kick flyhacks
+    {
+        sLog->outString("Player::CheckOnFlyHack :  FlyHack Detected for Account id : %u, Player %s", GetSession()->GetAccountId(), GetName().c_str());
+        sLog->outString("Player::========================================================");
+        sLog->outString("Player IsFlying but CanFly is false");
+
+        sWorld->SendGMText(LANG_GM_ANNOUNCE_AFH_CANFLYWRONG, GetName().c_str());
+        return false;
+    }
+
+    if (IsFlying() || IsLevitating() || IsInFlight())
+        return true;    
+
+    if (GetTransport() || GetVehicle() || GetVehicleKit())
+        return true;
+
+    if (HasAuraType(SPELL_AURA_CONTROL_VEHICLE))
+        return true;
+
+    if (HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT))
+        return true;
+
+    if (HasUnitState(UNIT_STATE_IGNORE_ANTISPEEDHACK))
+        return true;
+
+    if (UnderACKmount())
+        return true;
+
+    if (IsSkipOnePacketForASH())
+        return true;
+
+    Position npos;
+    GetPosition(&npos);
+    float pz = npos.GetPositionZ();
+    if (!IsInWater() && HasUnitMovementFlag(MOVEMENTFLAG_SWIMMING))
+    {
+        float waterlevel = GetBaseMap()->GetWaterLevel(npos.GetPositionX(), npos.GetPositionY()); // water walking
+        if (waterlevel && (pz - waterlevel) <= GetCollisionHeight(IsMounted()))
+            return true;
+
+        sLog->outString("Player::CheckOnFlyHack :  FlyHack Detected for Account id : %u, Player %s", GetSession()->GetAccountId(), GetName().c_str());
+        sLog->outString("Player::========================================================");
+        sLog->outString("Player::CheckOnFlyHack :  Player has a MOVEMENTFLAG_SWIMMING, but not in water");
+
+        sWorld->SendGMText(LANG_GM_ANNOUNCE_AFK_SWIMMING, GetName().c_str());
+        return false;
+    }
+    else
+    {
+        float z = GetMap()->GetHeight(GetPhaseMask(), npos.GetPositionX(), npos.GetPositionY(), pz + GetCollisionHeight(IsMounted()) + 0.5f, true, 50.0f); // smart flyhacks -> SimpleFly
+        float diff = pz - z;
+        if (diff > 6.8f) // better calculate the second time for false situations, but not call GetHoverOffset everytime (economy resource)
+        {
+            float waterlevel = GetBaseMap()->GetWaterLevel(npos.GetPositionX(), npos.GetPositionY()); // water walking
+            if (waterlevel && waterlevel + GetCollisionHeight(IsMounted()) > pz)
+                return true;
+
+            float cx, cy, cz;
+            GetClosePoint(cx, cy, cz, DEFAULT_PLAYER_BOUNDING_RADIUS, 6.0f, 0, nullptr, false, 3.0f); // first check
+            if (pz - cz > 6.8f)
+            {
+                GetMap()->getObjectHitPos(GetPhaseMask(), GetPositionX(), GetPositionY(), GetPositionZ() + GetCollisionHeight(IsMounted()), cx, cy, cz + GetCollisionHeight(IsMounted()), cx, cy, cz, -GetCollisionHeight(IsMounted()));
+                if (pz - cz > 6.8f)
+                {
+                    sLog->outString("Player::CheckOnFlyHack :  FlyHack Detected for Account id : %u, Player %s", GetSession()->GetAccountId(), GetName().c_str());
+                    sLog->outString("Player::========================================================");
+                    sLog->outString("Player::CheckOnFlyHack :  playerZ = %f", pz);
+                    sLog->outString("Player::CheckOnFlyHack :  normalZ = %f", z);
+                    sLog->outString("Player::CheckOnFlyHack :  checkz = %f", cz);
+                    sWorld->SendGMText(LANG_GM_ANNOUNCE_AFH, GetName().c_str());
+                    return false;
+                }
+            }
+        }
+    }
+
+    return true;
+}
+
+void Player::UpdateMovementInfo(MovementInfo const& movementInfo)
+{
+    SetLastMoveClientTimestamp(movementInfo.time);
+    SetLastMoveServerTimestamp(getMSTime());
+}
+
+bool Player::CheckMovementInfo(MovementInfo const& movementInfo, bool jump)
+{
+    if (!sWorld->getBoolConfig(CONFIG_ANTICHEAT_SPEEDHACK_ENABLED))
+        return true;
+
+    uint32 ctime = GetLastMoveClientTimestamp();
+    if (ctime)
+    {
+        if (ToUnit()->IsFalling() || IsInFlight())
+            return true;
+
+        if (GetTransport() || GetVehicle() || GetVehicleKit())
+            return true;
+
+        if (HasAuraType(SPELL_AURA_CONTROL_VEHICLE))
+            return true;
+
+        if (HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT))
+            return true;
+
+        if (UnderACKmount())
+            return true;
+
+        if (IsSkipOnePacketForASH())
+        {
+            SetSkipOnePacketForASH(false);
+            return true;
+        }
+
+        Position npos = movementInfo.pos;
+        if (sWorld->getBoolConfig(CONFIG_ANTICHEAT_IGNORE_CONTROL_MOVEMENT_ENABLED))
+        {
+            if (HasUnitState(UNIT_STATE_NOT_MOVE) && !UnderACKRootUpd())
+            {
+                bool unrestricted = npos.GetPositionX() != GetPositionX() || npos.GetPositionY() != GetPositionY();
+                if (unrestricted)
+                {
+                    sLog->outString("CheckMovementInfo :  Ignore controll Hack detected for Account id : %u, Player %s", GetSession()->GetAccountId(), GetName().c_str());
+                    sWorld->SendGMText(LANG_GM_ANNOUNCE_MOVE_UNDER_CONTROL, GetSession()->GetAccountId(), GetName().c_str());
+                    return false;
+                }
+            }
+        }
+
+        if (HasUnitState(UNIT_STATE_IGNORE_ANTISPEEDHACK))
+            return true;
+
+        float distance, movetime, speed, difftime, normaldistance, delay, delaysentrecieve, x, y;
+        distance = npos.GetExactDist2d(this);
+
+        if (!jump && !CanFly() && !isSwimming())
+        {
+            float diffz = fabs(movementInfo.pos.GetPositionZ() - GetPositionZ());
+            float tanangle = distance / diffz;
+
+            if (movementInfo.pos.GetPositionZ() > GetPositionZ() &&
+                diffz > 1.87f &&
+                tanangle < 0.57735026919f) // 30 degrees
+            {
+                sLog->outString("CheckMovementInfo :  Climb-Hack detected for Account id : %u, Player %s, diffZ = %f, distance = %f, angle = %f ", GetSession()->GetAccountId(), GetName().c_str(), diffz, distance, tanangle);
+                sWorld->SendGMText(LANG_GM_ANNOUNCE_WALLCLIMB, GetName().c_str(), diffz, distance, tanangle);
+                return false;
+            }
+        }
+
+        uint32 oldstime = GetLastMoveServerTimestamp();
+        uint32 stime = getMSTime();
+        uint32 ping, latency;
+        movetime = movementInfo.time;
+        latency = GetSession()->GetLatency();
+        ping = std::max(uint32(60), latency);
+
+        speed = GetSpeed(MOVE_RUN);
+        if (isSwimming())
+            speed = GetSpeed(MOVE_SWIM);
+        if (IsFlying() || this->CanFly())
+            speed = GetSpeed(MOVE_FLIGHT);
+
+        delaysentrecieve = (ctime - oldstime) / 10000000000;
+        delay = fabsf(movetime - stime) / 10000000000 + delaysentrecieve;
+        difftime = (movetime - ctime + ping) * 0.001f + delay;
+        normaldistance = speed * difftime; // if movetime faked and lower, difftime should be with "-"
+
+        if (distance < normaldistance)
+            return true;
+
+        GetPosition(x, y);
+
+        sLog->outString("CheckMovementInfo :  SpeedHack Detected for Account id : %u, Player %s", GetSession()->GetAccountId(), GetName().c_str());
+        sLog->outString("========================================================");
+        sLog->outString("CheckMovementInfo :  oldX = %f", x);
+        sLog->outString("CheckMovementInfo :  oldY = %f", y);
+        sLog->outString("CheckMovementInfo :  newX = %f", npos.GetPositionX());
+        sLog->outString("CheckMovementInfo :  newY = %f", npos.GetPositionY());
+        sLog->outString("CheckMovementInfo :  packetdistance = %f", distance);
+        sLog->outString("CheckMovementInfo :  available distance = %f", normaldistance);
+        sLog->outString("CheckMovementInfo :  movetime = %f", movetime);
+        sLog->outString("CheckMovementInfo :  delay sent ptk - recieve pkt (previous) = %f", delaysentrecieve);
+        sLog->outString("CheckMovementInfo :  FullDelay = %f", delay);
+        sLog->outString("CheckMovementInfo :  difftime = %f", difftime);
+        sLog->outString("CheckMovementInfo :  latency = %u", latency);
+        sLog->outString("CheckMovementInfo :  ping = %u", ping);
+
+        sWorld->SendGMText(LANG_GM_ANNOUNCE_ASH, GetName().c_str(), normaldistance, distance);
+    }
+    else
+        return true;
+
+    return false;
 }

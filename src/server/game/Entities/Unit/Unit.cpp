@@ -12298,6 +12298,7 @@ void Unit::Mount(uint32 mount, uint32 VehicleId, uint32 creatureEntry)
 
     if (Player* player = ToPlayer())
     {
+        player->SetUnderACKmount();
         // mount as a vehicle
         if (VehicleId)
         {
@@ -12386,6 +12387,8 @@ void Unit::Dismount()
     // (it could probably happen when logging in after a previous crash)
     if (Player* player = ToPlayer())
     {
+        player->SetUnderACKmount();
+
         if (Pet* pPet = player->GetPet())
         {
             if (pPet->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED) && !pPet->HasUnitState(UNIT_STATE_STUNNED))
@@ -16699,6 +16702,13 @@ void Unit::SetControlled(bool apply, UnitState state)
             default:
                 break;
         }
+
+        if (GetTypeId() == TYPEID_PLAYER)
+        {
+            uint32 pinginthismoment = fabs(ToPlayer()->GetLastMoveClientTimestamp() - ToPlayer()->GetLastMoveServerTimestamp()) / 1000000;
+            ToPlayer()->SetRootACKUpd(pinginthismoment);
+            //TC_LOG_INFO("anticheat", "Latency = %u", pinginthismoment);
+        }
     }
     else
     {
@@ -16778,7 +16788,10 @@ void Unit::SetStunned(bool apply)
         if (GetTypeId() != TYPEID_PLAYER)
             StopMoving();
         else
+        {
             SetStandState(UNIT_STAND_STATE_STAND);
+            ToPlayer()->SetSkipOnePacketForASH(true);
+        }
 
         CastStop();
     }
@@ -16833,6 +16846,7 @@ void Unit::SetRooted(bool apply)
             data.append(GetPackGUID());
             data << m_rootTimes;
             SendMessageToSet(&data, true);
+            ToPlayer()->SetSkipOnePacketForASH(true);
         }
         else
         {
@@ -16889,6 +16903,8 @@ void Unit::SetFeared(bool apply)
         if (!caster)
             caster = getAttackerForHelper();
         GetMotionMaster()->MoveFleeing(caster, fearAuras.empty() ? sWorld->getIntConfig(CONFIG_CREATURE_FAMILY_FLEE_DELAY) : 0);             // caster == NULL processed in MoveFleeing
+        if (ToPlayer())
+            ToPlayer()->SetSkipOnePacketForASH(true);
     }
     else
     {
@@ -16921,6 +16937,8 @@ void Unit::SetConfused(bool apply)
     {
         SetTarget(0);
         GetMotionMaster()->MoveConfused();
+        if (ToPlayer())
+            ToPlayer()->SetSkipOnePacketForASH(true);
     }
     else
     {
@@ -17242,6 +17260,9 @@ void Unit::RemoveCharmedBy(Unit* charmer)
                 break;
         }
     }
+
+    if (Player* player = ToPlayer())
+        player->SetUnderACKmount();
 
     // xinef: restore threat
     for (CharmThreatMap::const_iterator itr = _charmThreatInfo.begin(); itr != _charmThreatInfo.end(); ++itr)
@@ -17739,6 +17760,7 @@ void Unit::KnockbackFrom(float x, float y, float speedXY, float speedZ)
 
         if (player->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) || player->HasAuraType(SPELL_AURA_FLY))
             player->SetCanFly(true, true);
+        player->SetSkipOnePacketForASH(true);
     }
 }
 
@@ -18173,6 +18195,11 @@ bool Unit::HandleSpellClick(Unit* clicker, int8 seatId)
 void Unit::EnterVehicle(Unit* base, int8 seatId)
 {
     CastCustomSpell(VEHICLE_SPELL_RIDE_HARDCODED, SPELLVALUE_BASE_POINT0, seatId+1, base, TRIGGERED_IGNORE_CASTER_MOUNTED_OR_ON_VEHICLE);
+    if (Player* player = ToPlayer())
+    {
+        player->SetUnderACKmount();
+        player->SetSkipOnePacketForASH(true);
+    }
 }
 
 void Unit::EnterVehicleUnattackable(Unit *base, int8 seatId)
@@ -18217,6 +18244,8 @@ void Unit::_EnterVehicle(Vehicle* vehicle, int8 seatId, AuraApplication const* a
         if (vehicle->GetBase()->GetTypeId() == TYPEID_PLAYER && player->IsInCombat())
             return;
 
+        player->SetUnderACKmount();
+        player->SetSkipOnePacketForASH(true);
         InterruptNonMeleeSpells(false);
         player->StopCastingCharm();
         player->StopCastingBindSight();
@@ -18280,6 +18309,11 @@ void Unit::ExitVehicle(Position const* /*exitPosition*/)
     //! init spline movement based on those coordinates in unapply handlers, and
     //! relocate exiting passengers based on Unit::moveSpline data. Either way,
     //! Coming Soon(TM)
+    if (Player* player = ToPlayer())
+    {
+        player->SetUnderACKmount();
+        player->SetSkipOnePacketForASH(true);
+    }
 }
 
 bool VehicleDespawnEvent::Execute(uint64  /*e_time*/, uint32  /*p_time*/)
@@ -18335,7 +18369,11 @@ void Unit::_ExitVehicle(Position const* exitPosition)
     AddUnitState(UNIT_STATE_MOVE);
 
     if (player)
+    {
         player->SetFallInformation(time(NULL), GetPositionZ());
+        player->SetUnderACKmount();
+        player->SetSkipOnePacketForASH(true);
+    }
     else if (HasUnitMovementFlag(MOVEMENTFLAG_ROOT))
     {
         WorldPacket data(SMSG_SPLINE_MOVE_UNROOT, 8);

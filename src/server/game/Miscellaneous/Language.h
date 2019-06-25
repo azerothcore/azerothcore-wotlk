@@ -843,7 +843,8 @@ enum TrinityStrings
     //                                  = 879, see LANG_PINFO_CHR_REGMAILS
     LANG_ACCOUNT_SEC_TYPE               = 880,
     LANG_RBAC_EMAIL_REQUIRED            = 881,
-    // Room for in-game strings           882-999 not used
+    LANG_PINFO_CHR_FLY_MODE             = 882,
+    // Room for in-game strings           883-999 not used
 
     // Level 4 (CLI only commands)
     LANG_COMMAND_EXIT                   = 1000,
@@ -1165,7 +1166,16 @@ enum TrinityStrings
     LANG_GM_NOTIFY                       = 6614,
     LANG_GM_ANNOUNCE_COLOR               = 6615,
 
-    LANG_GM_SILENCE                      = 6616,              // "Silence is ON for %s" - Spell 1852
+    LANG_GM_SILENCE                     = 6616,  // "Silence is ON for %s" - Spell 1852
+    LANG_GM_ANNOUNCE_ASH                = 6617,  // AntiSpeedHack
+    LANG_GM_ANNOUNCE_AFH_CANFLYWRONG    = 6618,  // AntiFlyHack - flying without canfly 
+    LANG_GM_ANNOUNCE_AFK_SWIMMING       = 6619,  // AntiFlyHack - flying swimming not in water
+    LANG_GM_ANNOUNCE_AFH                = 6620,  // AntiFlyHack
+    LANG_GM_ANNOUNCE_DOUBLE_JUMP        = 6621,  // Double jump (client can't sent second packet of jump (only hack))
+    LANG_GM_ANNOUNCE_JUMPER_FAKE        = 6622,  // Gagarin and others can set falling flag and move up as jump
+    LANG_GM_ANNOUNCE_JUMPER_FLYING      = 6623,  // Hitchhiker's Hack and others can set fly unrestricted flag
+    LANG_GM_ANNOUNCE_WALLCLIMB          = 6624,  // WallClimb
+    LANG_GM_ANNOUNCE_MOVE_UNDER_CONTROL = 6625,  // Movement under Controll (not restricted)
 
     LANG_WORLD_CLOSED                    = 7523,
     LANG_WORLD_OPENED                    = 7524,

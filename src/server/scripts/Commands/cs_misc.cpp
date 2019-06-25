@@ -2127,6 +2127,12 @@ public:
         else
             handler->PSendSysMessage(LANG_PINFO_CHR_MAP, map->name[locale], zoneName);
 
+        if (target)
+        {
+            std::string _canfly = target->IsCanFlybyServer() ? handler->GetTrinityString(LANG_YES) : handler->GetTrinityString(LANG_NO);
+            handler->PSendSysMessage(LANG_PINFO_CHR_FLY_MODE, _canfly.c_str());
+        }
+
         // Output XVII. - XVIX. if they are not empty
         if (!guildName.empty())
         {
