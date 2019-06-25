@@ -45,7 +45,7 @@ public:
 
     struct boss_loathebAI : public BossAI
     {
-        boss_loathebAI(Creature *c) : BossAI(c, BOSS_LOATHEB), summons(me)
+        explicit boss_loathebAI(Creature *c) : BossAI(c, BOSS_LOATHEB), summons(me)
         {
             pInstance = me->GetInstanceScript();
             me->SetHomePosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation());

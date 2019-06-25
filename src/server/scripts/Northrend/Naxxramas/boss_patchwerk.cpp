@@ -49,7 +49,7 @@ public:
 
     struct boss_patchwerkAI : public BossAI
     {
-        boss_patchwerkAI(Creature *c) : BossAI(c, BOSS_PATCHWERK) 
+        explicit boss_patchwerkAI(Creature *c) : BossAI(c, BOSS_PATCHWERK)
         {
             pInstance = me->GetInstanceScript();
         }
@@ -116,7 +116,7 @@ public:
                     Unit* finalTarget = nullptr;
                     uint8 counter = 0;
                     
-                    ThreatContainer::StorageType::const_iterator i = me->getThreatManager().getThreatList().begin();
+                    auto i = me->getThreatManager().getThreatList().begin();
                     for (; i != me->getThreatManager().getThreatList().end(); ++i, ++counter)
                     {
                         // Gather all units with melee range
@@ -130,15 +130,16 @@ public:
                     }
 
                     counter = 0;
-                    for (std::list<Unit*>::const_iterator i = meleeRangeTargets.begin(); i != meleeRangeTargets.end(); ++i, ++counter)
+                    list<Unit *, std::allocator<Unit *>>::iterator itr;
+                    for (itr = meleeRangeTargets.begin(); itr != meleeRangeTargets.end(); ++itr, ++counter)
                     {
                         // if there is only one target available
                         if (meleeRangeTargets.size() == 1)
-                            finalTarget = (*i);
+                            finalTarget = (*itr);
                         else if (counter > 0) // skip first target
                         {
-                            if (!finalTarget || (*i)->GetHealth() > finalTarget->GetHealth())
-                                finalTarget = (*i);
+                            if (!finalTarget || (*itr)->GetHealth() > finalTarget->GetHealth())
+                                finalTarget = (*itr);
 
                             // third loop
                             if (counter >= 2)
