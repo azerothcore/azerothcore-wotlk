@@ -62,7 +62,7 @@ void RandomMovementGenerator<Creature>::_setRandomLocation(Creature* creature)
         }
 
         float ground = INVALID_HEIGHT;
-        float levelZ = map->GetWaterOrGroundLevel(x, y, z+4.0f, &ground);
+        float levelZ = map->GetWaterOrGroundLevel(creature->GetPhaseMask(), x, y, z+4.0f, &ground);
         float newZ = INVALID_HEIGHT;
 
         // flying creature

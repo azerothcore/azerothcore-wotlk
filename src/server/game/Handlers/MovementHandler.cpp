@@ -8,6 +8,7 @@
 #include "WorldPacket.h"
 #include "WorldSession.h"
 #include "Opcodes.h"
+#include "Language.h"
 #include "Log.h"
 #include "Corpse.h"
 #include "Player.h"
@@ -331,6 +332,11 @@ void WorldSession::HandleMovementOpcodes(WorldPacket & recvData)
 
     if (!movementInfo.pos.IsPositionValid())
     {
+        if (plrMover)
+        {
+            plrMover->SetSkipOnePacketForASH(true);
+            plrMover->UpdateMovementInfo(movementInfo);
+        }
         recvData.rfinish();                     // prevent warnings spam
         return;
     }
@@ -346,6 +352,11 @@ void WorldSession::HandleMovementOpcodes(WorldPacket & recvData)
         if (movementInfo.transport.pos.GetPositionX() > 75.0f || movementInfo.transport.pos.GetPositionY() > 75.0f || movementInfo.transport.pos.GetPositionZ() > 75.0f ||
             movementInfo.transport.pos.GetPositionX() < -75.0f || movementInfo.transport.pos.GetPositionY() < -75.0f || movementInfo.transport.pos.GetPositionZ() < -75.0f)
         {
+            if (plrMover)
+            {
+                plrMover->SetSkipOnePacketForASH(true);
+                plrMover->UpdateMovementInfo(movementInfo);
+            }
             recvData.rfinish();                   // prevent warnings spam
             return;
         }
@@ -353,6 +364,11 @@ void WorldSession::HandleMovementOpcodes(WorldPacket & recvData)
         if (!Trinity::IsValidMapCoord(movementInfo.pos.GetPositionX() + movementInfo.transport.pos.GetPositionX(), movementInfo.pos.GetPositionY() + movementInfo.transport.pos.GetPositionY(),
             movementInfo.pos.GetPositionZ() + movementInfo.transport.pos.GetPositionZ(), movementInfo.pos.GetOrientation() + movementInfo.transport.pos.GetOrientation()))
         {
+            if (plrMover)
+            {
+                plrMover->SetSkipOnePacketForASH(true);
+                plrMover->UpdateMovementInfo(movementInfo);
+            }
             recvData.rfinish();                   // prevent warnings spam
             return;
         }
@@ -370,6 +386,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket & recvData)
             }
             else if (plrMover->GetTransport()->GetGUID() != movementInfo.transport.guid)
             {
+                plrMover->SetSkipOnePacketForASH(true);
                 bool foundNewTransport = false;
                 plrMover->m_transport->RemovePassenger(plrMover);
                 if (Transport* transport = plrMover->GetMap()->GetTransport(movementInfo.transport.guid))
@@ -392,6 +409,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket & recvData)
     }
     else if (plrMover && plrMover->GetTransport()) // if we were on a transport, leave
     {
+        plrMover->SetUnderACKmount(); // just for safe
         plrMover->m_transport->RemovePassenger(plrMover);
         plrMover->m_transport = NULL;
         movementInfo.transport.Reset();
@@ -418,7 +436,14 @@ void WorldSession::HandleMovementOpcodes(WorldPacket & recvData)
     {
         // Xinef: skip moving packets
         if (movementInfo.HasMovementFlag(MOVEMENTFLAG_MASK_MOVING))
+        {
+            if (plrMover)
+            {
+                plrMover->SetSkipOnePacketForASH(true);
+                plrMover->UpdateMovementInfo(movementInfo);
+            }
             return;
+        }
         movementInfo.pos.Relocate(mover->GetPositionX(), mover->GetPositionY(), mover->GetPositionZ());
 
         if (mover->GetTypeId() == TYPEID_UNIT)
@@ -429,7 +454,65 @@ void WorldSession::HandleMovementOpcodes(WorldPacket & recvData)
         }
     }
 
+    bool jumpopcode = false;
+    if (opcode == MSG_MOVE_JUMP)
+    {
+        jumpopcode = true;
+        if (plrMover && mover->IsFalling())
+        {
+            sLog->outString("MovementHandler::DOUBLE_JUMP by Account id : %u, Player %s", plrMover->GetSession()->GetAccountId(), plrMover->GetName().c_str());
+            sWorld->SendGMText(LANG_GM_ANNOUNCE_DOUBLE_JUMP, plrMover->GetName().c_str());
+            if (sWorld->getBoolConfig(CONFIG_ANTICHEAT_DOUBLEJUMP_ENABLED))
+            {
+                plrMover->GetSession()->KickPlayer();
+                return;
+            }
+        }
+    }
+
+    if (sWorld->getBoolConfig(CONFIG_ANTICHEAT_FAKEJUMPER_ENABLED) && plrMover && mover->IsFalling() && movementInfo.pos.GetPositionZ() > mover->GetPositionZ())
+    {
+        if (!plrMover->IsJumpingbyOpcode())
+        {
+            plrMover->SetJumpingbyOpcode(true);
+            plrMover->SetUnderACKmount();
+        }
+        else if (!plrMover->UnderACKmount() && !plrMover->IsFlying() && !(movementInfo.flags & MOVEMENTFLAG_ONTRANSPORT))
+        {
+            // fake jumper -> for example gagarin air mode with falling flag (like player jumping), but client can't sent a new coords when falling
+            sLog->outString("MovementHandler::Fake_Jumper by Account id : %u, Player %s", plrMover->GetSession()->GetAccountId(), plrMover->GetName().c_str());
+            sWorld->SendGMText(LANG_GM_ANNOUNCE_JUMPER_FAKE, plrMover->GetName().c_str());
+            if (sWorld->getBoolConfig(CONFIG_FAKEJUMPER_KICK_ENABLED))
+            {
+                plrMover->GetSession()->KickPlayer();
+                return;
+            }
+        }
+        else
+            plrMover->SetJumpingbyOpcode(false);
+    }
+
+    if (sWorld->getBoolConfig(CONFIG_ANTICHEAT_FAKEFLYINGMODE_ENABLED) && plrMover && !plrMover->IsCanFlybyServer() && !plrMover->UnderACKmount() && movementInfo.HasMovementFlag(MOVEMENTFLAG_MASK_MOVING_FLY) && !plrMover->IsInWater())
+    {
+        sLog->outString("MovementHandler::Fake_flying mode (using MOVEMENTFLAG_FLYING flag doesn't restricted) by Account id : %u, Player %s", plrMover->GetSession()->GetAccountId(), plrMover->GetName().c_str());
+        sWorld->SendGMText(LANG_GM_ANNOUNCE_JUMPER_FLYING, plrMover->GetName().c_str());
+        if (sWorld->getBoolConfig(CONFIG_FAKEFLYINGMODE_KICK_ENABLED))
+        {
+            plrMover->GetSession()->KickPlayer();
+            return;
+        }
+    }
+
+    /* start SpeedHack Detection */
+    if (plrMover && !plrMover->CheckMovementInfo(movementInfo, jumpopcode) && sWorld->getBoolConfig(CONFIG_ASH_KICK_ENABLED))
+    {
+        plrMover->GetSession()->KickPlayer();
+        return;
+    }
+
     /* process position-change */
+    if (plrMover)
+        plrMover->UpdateMovementInfo(movementInfo);
     WorldPacket data(opcode, recvData.size());
     //movementInfo.time = movementInfo.time + m_clientTimeDelay + MOVEMENT_PACKET_TIME_DELAY;
     movementInfo.time = mstime; // pussywizard: set to time of relocation (server time), constant addition may smoothen movement clientside, but client sees target on different position than the real serverside position
@@ -462,11 +545,17 @@ void WorldSession::HandleMovementOpcodes(WorldPacket & recvData)
     // fall damage generation (ignore in flight case that can be triggered also at lags in moment teleportation to another map).
     // Xinef: moved it here, previously StopMoving function called when player died relocated him to last saved coordinates (which were in air)
     if (opcode == MSG_MOVE_FALL_LAND && plrMover && !plrMover->IsInFlight() && (!plrMover->GetTransport() || plrMover->GetTransport()->IsStaticTransport()))
+    {
         plrMover->HandleFall(movementInfo);
+        plrMover->SetJumpingbyOpcode(false);
+    }
     // Xinef: interrupt parachutes upon falling or landing in water
     if (opcode == MSG_MOVE_FALL_LAND || opcode == MSG_MOVE_START_SWIM)
+    {
         mover->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_LANDING); // Parachutes
-
+        if (plrMover)
+            plrMover->SetJumpingbyOpcode(false);
+    }
 
     if (plrMover)                                            // nothing is charmed, or player charmed
     {
@@ -556,6 +645,7 @@ void WorldSession::HandleForceSpeedChangeAck(WorldPacket &recvData)
             return;
     }
 
+    _player->SetUnderACKmount();
     // skip all forced speed changes except last and unexpected
     // in run/mounted case used one ACK and it must be skipped.m_forced_speed_changes[MOVE_RUN} store both.
     if (_player->m_forced_speed_changes[force_move_type] > 0)
