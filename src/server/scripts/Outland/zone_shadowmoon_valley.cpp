@@ -310,7 +310,7 @@ public:
         uint32 EatTimer;
         uint32 CastTimer;
 
-        void Reset()
+        void Reset() override
         {
             uiPlayerGUID = 0;
 
@@ -321,7 +321,7 @@ public:
             CastTimer = 5000;
         }
 
-        void SpellHit(Unit* pCaster, SpellInfo const* spell)
+        void SpellHit(Unit* pCaster, SpellInfo const* spell) override
         {
             if (bCanEat || bIsEating)
                 return;
@@ -333,7 +333,7 @@ public:
             }
         }
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 type, uint32 id) override
         {
             if (type != POINT_MOTION_TYPE)
                 return;
@@ -346,7 +346,12 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void JustReachedHome() override
+        {
+            me->GetMotionMaster()->Clear();
+        }
+
+        void UpdateAI(uint32 diff) override
         {
             if (bCanEat || bIsEating)
             {
@@ -383,7 +388,7 @@ public:
                         }
 
                         Reset();
-                        me->GetMotionMaster()->Clear();
+                        me->GetMotionMaster()->MoveTargetedHome();
                     }
                 }
                 else
