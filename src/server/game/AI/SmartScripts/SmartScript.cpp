@@ -190,7 +190,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
 
         if (!sCreatureTextMgr->TextExist(talker->GetEntry(), uint8(e.action.talk.textGroupID)))
         {
-            sLog->outErrorDb("SmartScript::ProcessAction: SMART_ACTION_TALK: Entry %d SourceType %u Event %u using non-existent Text id %u for talker %u, ignored.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.action.talk.textGroupID,talker->GetEntry());
+            sLog->outErrorDb("SmartScript::ProcessAction: SMART_ACTION_TALK: EntryOrGuid %d SourceType %u EventType %u TargetType %u using non-existent Text id %u for talker %u, ignored.", e.entryOrGuid, e.GetScriptType(), e.GetEventType(), e.GetTargetType(), e.action.talk.textGroupID,talker->GetEntry());
             break;
         }
 
