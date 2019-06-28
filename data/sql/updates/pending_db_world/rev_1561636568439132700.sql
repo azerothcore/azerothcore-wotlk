@@ -31,5 +31,8 @@ UPDATE `creature_template` SET AIName="SmartAI" WHERE entry=@ENTRY LIMIT 1;
 INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES 
 (@ENTRY,@SOURCETYPE,0,0,14,0,100,0,200,40,18000,21000,11,1058,0,0,0,0,0,7,0,0,0,0.0,0.0,0.0,0.0,'Blackwood Ursa - Friendly At 200 Health - Cast Rejuvenation');
 
- -- "Scarlet Peasant" and "Citizen of Havenshire" have to use target "self" for their "talk" actions
- UPDATE `smart_scripts` SET `target_type` = 1 WHERE `action_type` = 1 AND `target_type` = 7 AND `source_type` = 0 AND `entryorguid` IN (28576,28577,28557);
+-- "Scarlet Peasant" and "Citizen of Havenshire" have to use target "self" for their "talk" actions
+UPDATE `smart_scripts` SET `target_type` = 1 WHERE `action_type` = 1 AND `target_type` = 7 AND `source_type` = 0 AND `entryorguid` IN (28576,28577,28557);
+
+-- "Scarlet Medic" has to use target "self" for the "talk" action
+UPDATE `smart_scripts` SET `target_type` = 1 WHERE `action_type` = 1 AND `target_type` = 2 AND `source_type` = 0 AND `entryorguid` = 28608;
