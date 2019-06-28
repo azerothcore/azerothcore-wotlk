@@ -11,10 +11,16 @@
 
 enum Yells
 {
-    SAY_SPEECH                  = 0,
-    SAY_KILL                    = 1,
-    SAY_DEATH                   = 2,
-    SAY_TELEPORT                = 3
+    SAY_INTRO_1                 = 0,
+    SAY_INTRO_2                 = 1,
+    SAY_INTRO_3                 = 2,
+    SAY_INTRO_4                 = 3,
+    SAY_PHASE_TWO               = 4,
+    SAY_DEATH                   = 5,
+    SAY_KILL                    = 6,
+
+    EMOTE_PHASE_TWO             = 7,
+    EMOTE_GATE_OPENED           = 8
 };
 
 enum Spells
@@ -94,7 +100,11 @@ enum Events
     EVENT_SPELL_UNHOLY_FRENZY       = 19,
 
     // HORSE
-    EVENT_SPELL_STOMP               = 20
+    EVENT_SPELL_STOMP               = 20,
+
+    EVENT_INTRO_2                   = 21,
+    EVENT_INTRO_3                   = 22,
+    EVENT_INTRO_4                   = 23,
 };
 
 const uint32 gothikWaves[24][2] =
@@ -172,7 +182,7 @@ class boss_gothik : public CreatureScript
 public:
     boss_gothik() : CreatureScript("boss_gothik") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_gothikAI (pCreature);
     }
@@ -202,7 +212,7 @@ public:
             return true;
         }
 
-        void Reset()
+        void Reset() override
         {
             BossAI::Reset();
             events.Reset();
@@ -224,11 +234,14 @@ public:
             }
         }
 
-        void EnterCombat(Unit * who)
+        void EnterCombat(Unit * who) override
         {
             BossAI::EnterCombat(who);
             me->SetInCombatWithZone();
-            Talk(SAY_SPEECH);
+            Talk(SAY_INTRO_1);
+            events.ScheduleEvent(EVENT_INTRO_2, 4000);
+            events.ScheduleEvent(EVENT_INTRO_3, 9000);
+            events.ScheduleEvent(EVENT_INTRO_4, 14000);
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE|UNIT_FLAG_DISABLE_MOVE);
             me->NearTeleportTo(PosPlatform.GetPositionX(), PosPlatform.GetPositionY(), PosPlatform.GetPositionZ(), PosPlatform.GetOrientation());
             
@@ -244,7 +257,7 @@ public:
             }
         }
 
-        void JustSummoned(Creature *summon)
+        void JustSummoned(Creature *summon) override
         {
             if (gateOpened)
                 summon->AI()->DoAction(ACTION_GATE_OPEN);
@@ -253,21 +266,20 @@ public:
             summon->SetInCombatWithZone();
         }
 
-        void SummonedCreatureDespawn(Creature* cr) { summons.Despawn(cr); }
+        void SummonedCreatureDespawn(Creature* cr) override { summons.Despawn(cr); }
 
-        void KilledUnit(Unit* who)
+        void KilledUnit(Unit* who) override
         {
             if (who->GetTypeId() != TYPEID_PLAYER)
                 return;
 
-            if (!urand(0,3))
-                Talk(SAY_KILL);
+            Talk(SAY_KILL);
 
             if (pInstance)
                 pInstance->SetData(DATA_IMMORTAL_FAIL, 0);
         }
 
-        void JustDied(Unit*  killer)
+        void JustDied(Unit*  killer) override
         {
             BossAI::JustDied(killer);
             Talk(SAY_DEATH);
@@ -335,7 +347,7 @@ public:
             return false;
         }
 
-        void SpellHit(Unit * /*caster*/, const SpellInfo* spellInfo)
+        void SpellHit(Unit * /*caster*/, const SpellInfo* spellInfo) override
         {
             uint8 pos = urand(0,4);
             switch (spellInfo->Id)
@@ -355,13 +367,13 @@ public:
             me->HandleEmoteCommand(EMOTE_ONESHOT_SPELL_CAST);
         }
 
-        void DamageTaken(Unit*, uint32 &damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32 &damage, DamageEffectType, SpellSchoolMask) override
         {
             if (!secondPhase)
                 damage = 0;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!IsInRoom())
                 return;
@@ -375,6 +387,18 @@ public:
 
             switch (events.GetEvent())
             {
+                case EVENT_INTRO_2:
+                    Talk(SAY_INTRO_2);
+                    events.PopEvent();
+                    break;
+                case EVENT_INTRO_3:
+                    Talk(SAY_INTRO_3);
+                    events.PopEvent();
+                    break;
+                case EVENT_INTRO_4:
+                    Talk(SAY_INTRO_4);
+                    events.PopEvent();
+                    break;
                 case EVENT_SPELL_SHADOW_BOLT:
                     me->CastSpell(me->GetVictim(), RAID_MODE(SPELL_SHADOW_BOLT_10, SPELL_SHADOW_BOLT_25), false);
                     events.RepeatEvent(2000);
@@ -419,7 +443,8 @@ public:
                     else
                     {
                         secondPhase = true;
-                        Talk(SAY_TELEPORT);
+                        Talk(SAY_PHASE_TWO);
+                        Talk(EMOTE_PHASE_TWO);
                         me->NearTeleportTo(PosGroundLivingSide.GetPositionX(), PosGroundLivingSide.GetPositionY(), PosGroundLivingSide.GetPositionZ(), PosGroundLivingSide.GetOrientation());
                         me->SetReactState(REACT_AGGRESSIVE);
                         me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE|UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_DISABLE_MOVE);
@@ -444,6 +469,7 @@ public:
                         summons.DoAction(ACTION_GATE_OPEN);
                         summons.DoZoneInCombat();
                         gateOpened = true;
+                        Talk(EMOTE_GATE_OPENED);
                     }
                     events.PopEvent();
                     break;
@@ -459,7 +485,7 @@ class npc_boss_gothik_minion : public CreatureScript
 public:
     npc_boss_gothik_minion() : CreatureScript("npc_boss_gothik_minion") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_boss_gothik_minionAI (pCreature);
     }
@@ -477,10 +503,10 @@ public:
         bool gateOpened;
 
         bool IsOnSameSide(Unit const* who) const { return livingSide == IN_LIVE_SIDE(who); }
-        bool CanAIAttack(Unit const* target) const { return gateOpened || IsOnSameSide(target); }
+        bool CanAIAttack(Unit const* target) const override { return gateOpened || IsOnSameSide(target); }
 
-        void Reset() { events.Reset(); }
-        void EnterCombat(Unit*  /*who*/)
+        void Reset() override { events.Reset(); }
+        void EnterCombat(Unit*  /*who*/) override
         {
             me->SetInCombatWithZone();
 
@@ -516,19 +542,19 @@ public:
                     break;
             }
         }
-        void DamageTaken(Unit* attacker, uint32 &damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit* attacker, uint32 &damage, DamageEffectType, SpellSchoolMask) override
         {
             if (!attacker || (!gateOpened && !IsOnSameSide(attacker)))
                 damage = 0;
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (param == ACTION_GATE_OPEN)
                 gateOpened = true;
         }
 
-        void JustDied(Unit *)
+        void JustDied(Unit *) override
         {
             switch (me->GetEntry())
             {
@@ -544,13 +570,13 @@ public:
             }
         }
 
-        void KilledUnit(Unit* who)
+        void KilledUnit(Unit* who) override
         {
             if (who->GetTypeId() == TYPEID_PLAYER && me->GetInstanceScript())
                 me->GetInstanceScript()->SetData(DATA_IMMORTAL_FAIL, 0);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
 
@@ -650,13 +676,13 @@ class spell_gothik_shadow_bolt_volley : public SpellScriptLoader
                 targets.remove_if(Trinity::UnitAuraCheck(false, SPELL_SHADOW_MARK));
             }
 
-            void Register()
+            void Register() override
             {
                 OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_gothik_shadow_bolt_volley_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
             }
         };
 
-        SpellScript* GetSpellScript() const
+        SpellScript* GetSpellScript() const override
         {
             return new spell_gothik_shadow_bolt_volley_SpellScript();
         }

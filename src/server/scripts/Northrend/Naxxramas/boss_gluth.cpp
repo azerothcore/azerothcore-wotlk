@@ -35,6 +35,15 @@ enum Misc
     NPC_ZOMBIE_CHOW                     = 16360,
 };
 
+enum Emotes
+{
+    EMOTE_SPOTS_ONE   = 0,
+    EMOTE_DECIMATE    = 1,
+    EMOTE_ENRAGE      = 2,
+    EMOTE_DEVOURS_ALL = 3,
+    EMOTE_BERSERK     = 4
+};
+
 const Position zombiePos[3] =
 {
     {3267.9f, -3172.1f, 297.42f, 0.94f},
@@ -47,7 +56,7 @@ class boss_gluth : public CreatureScript
 public:
     boss_gluth() : CreatureScript("boss_gluth") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_gluthAI (pCreature);
     }
@@ -64,28 +73,31 @@ public:
         InstanceScript* pInstance;
         uint64 gazeTarget;
         
-        void Reset()
+        void Reset() override
         {
             BossAI::Reset();
-            me->ApplySpellImmune(29306, IMMUNITY_ID, 29306, true);
+            me->ApplySpellImmune(SPELL_INFECTED_WOUND, IMMUNITY_ID, SPELL_INFECTED_WOUND, true);
             events.Reset();
             summons.DespawnAll();
             gazeTarget = 0;
             me->SetReactState(REACT_AGGRESSIVE);
         }
 
-        void MoveInLineOfSight(Unit *who)
+        void MoveInLineOfSight(Unit *who) override
         {
-            if ((!me->GetVictim() || me->GetVictim()->GetEntry() != NPC_ZOMBIE_CHOW) && who->GetEntry() == NPC_ZOMBIE_CHOW && me->IsWithinDistInMap(who, 6.5f))
+            if (!me->GetVictim() || me->GetVictim()->GetEntry() != NPC_ZOMBIE_CHOW)
             {
-                SetGazeOn(who);
-                me->MonsterTextEmote("%s spots a nearby zombie to devour!", 0, false);
+                if (who->GetEntry() == NPC_ZOMBIE_CHOW && me->IsWithinDistInMap(who, 6.5f))
+                {
+                    SetGazeOn(who);
+                    Talk(EMOTE_SPOTS_ONE);
+                }
+                else
+                    ScriptedAI::MoveInLineOfSight(who);
             }
-            else
-                ScriptedAI::MoveInLineOfSight(who);
         }
 
-        void EnterCombat(Unit * who)
+        void EnterCombat(Unit * who) override
         {
             BossAI::EnterCombat(who);
             me->SetInCombatWithZone();
@@ -97,7 +109,7 @@ public:
             events.ScheduleEvent(EVENT_CAN_EAT_ZOMBIE, 1000);
         }
 
-        void JustSummoned(Creature *summon)
+        void JustSummoned(Creature *summon) override
         {
             if (summon->GetEntry() == NPC_ZOMBIE_CHOW)
                 summon->AI()->AttackStart(me);
@@ -105,9 +117,9 @@ public:
             summons.Summon(summon);
         }
 
-        void SummonedCreatureDies(Creature* cr, Unit*) { summons.Despawn(cr); }
+        void SummonedCreatureDies(Creature* cr, Unit*) override { summons.Despawn(cr); }
 
-        void KilledUnit(Unit* who)
+        void KilledUnit(Unit* who) override
         {
             if (me->IsAlive() && who->GetEntry() == NPC_ZOMBIE_CHOW)
                 me->ModifyHealth(int32(me->GetMaxHealth()*0.05f));
@@ -116,7 +128,7 @@ public:
                 pInstance->SetData(DATA_IMMORTAL_FAIL, 0);
         }
 
-        void JustDied(Unit*  killer)
+        void JustDied(Unit*  killer) override
         {
             BossAI::JustDied(killer);
             summons.DespawnAll();
@@ -143,7 +155,7 @@ public:
             return false;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictimWithGaze() && !SelectPlayerInRoom())
                 return;
@@ -159,7 +171,7 @@ public:
                     events.PopEvent();
                     break;
                 case EVENT_SPELL_ENRAGE:
-                    me->MonsterTextEmote("Gluth becomes enraged!", 0, true);
+                    Talk(EMOTE_ENRAGE);
                     me->CastSpell(me, RAID_MODE(SPELL_ENRAGE_10, SPELL_ENRAGE_25), true);
                     events.RepeatEvent(30000);
                     break;
@@ -168,7 +180,7 @@ public:
                     events.RepeatEvent(10000);
                     break;
                 case EVENT_SPELL_DECIMATE:
-                    me->MonsterTextEmote("Gluth decimates all nearby flesh!", 0, true);
+                    Talk(EMOTE_DECIMATE);
                     me->CastSpell(me, RAID_MODE(SPELL_DECIMATE_10, SPELL_DECIMATE_25), false);
                     events.RepeatEvent(105000);
                     break;
@@ -195,7 +207,7 @@ public:
                     if (me->GetVictim()->GetEntry() == NPC_ZOMBIE_CHOW && me->IsWithinMeleeRange(me->GetVictim()))
                     {
                         me->CastCustomSpell(SPELL_CHOW_SEARCHER, SPELLVALUE_RADIUS_MOD, 20000, me, true);
-                        me->MonsterTextEmote("%s devour all nearby zombies!", 0, false);
+                        Talk(EMOTE_DEVOURS_ALL);
                         return; // leave it to skip DoMeleeAttackIfReady
                     }
                     break;
@@ -236,13 +248,13 @@ class spell_gluth_decimate : public SpellScriptLoader
                 }
             }
 
-            void Register()
+            void Register() override
             {
                 OnEffectHitTarget += SpellEffectFn(spell_gluth_decimate_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
             }
         };
 
-        SpellScript* GetSpellScript() const
+        SpellScript* GetSpellScript() const override
         {
             return new spell_gluth_decimate_SpellScript();
         }
