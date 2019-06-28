@@ -3252,6 +3252,21 @@ void Map::SendZoneDynamicInfo(Player* player)
     }
 }
 
+void Map::PlayDirectSoundToMap(uint32 soundId, uint32 zoneId)
+{
+    Map::PlayerList const& players = GetPlayers();
+    if (!players.isEmpty())
+    {
+        WorldPacket data(SMSG_PLAY_SOUND, 4);
+        data << uint32(soundId);
+
+        for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+            if (Player* player = itr->GetSource())
+                if (!zoneId || player->GetZoneId() == zoneId)
+                    player->SendDirectMessage(&data);
+    }
+}
+
 void Map::SetZoneMusic(uint32 zoneId, uint32 musicId)
 { 
     if (_zoneDynamicInfo.find(zoneId) == _zoneDynamicInfo.end())

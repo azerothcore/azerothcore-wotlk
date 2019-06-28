@@ -40,7 +40,7 @@ class instance_naxxramas : public InstanceMapScript
 public:
     instance_naxxramas() : InstanceMapScript("instance_naxxramas", 533) { }
 
-    InstanceScript* GetInstanceScript(InstanceMap* pMap) const
+    InstanceScript* GetInstanceScript(InstanceMap* pMap) const override
     {
         return new instance_naxxramas_InstanceMapScript(pMap);
     }
@@ -75,6 +75,8 @@ public:
             _thaddiusPortalGUID = 0;
 
             // NPCs
+            PatchwerkRoomTrash.clear();
+            _patchwerkGUID = 0;
             _thaddiusGUID = 0;
             _stalaggGUID = 0;
             _feugenGUID = 0;
@@ -90,6 +92,9 @@ public:
             _horsemanKilled = 0;
             _speakTimer = 0;
             _horsemanTimer = 0;
+            _screamTimer = 2 * MINUTE * IN_MILLISECONDS;
+            _hadThaddiusGreet = false;
+            _currentWingTaunt = SAY_FIRST_WING_TAUNT;
 
             // Achievements
             abominationsKilled = 0;
@@ -99,6 +104,7 @@ public:
             sapphironAchievement = true;
             heiganAchievement = true;
             immortalAchievement = 1;
+
         }
 
         std::set<GameObject*> HeiganEruption[4];
@@ -128,6 +134,8 @@ public:
         uint64 _thaddiusPortalGUID;
 
         // NPCs
+        std::list<uint64> PatchwerkRoomTrash;
+        uint64 _patchwerkGUID;
         uint64 _thaddiusGUID;
         uint64 _stalaggGUID;
         uint64 _feugenGUID;
@@ -143,6 +151,10 @@ public:
         uint8 _horsemanKilled;
         uint32 _speakTimer;
         uint32 _horsemanTimer;
+        uint32 _screamTimer;
+        bool _hadThaddiusGreet;
+        EventMap events;
+        uint8 _currentWingTaunt;
 
         // Achievements
         uint8 abominationsKilled;
@@ -163,7 +175,7 @@ public:
                 for (std::set<GameObject*>::iterator itr = HeiganEruption[i].begin(); itr != HeiganEruption[i].end(); ++itr)
                 {
                     (*itr)->SendCustomAnim((*itr)->GetGoAnimProgress());
-                    (*itr)->CastSpell(NULL, SPELL_ERUPTION);
+                    (*itr)->CastSpell(nullptr, SPELL_ERUPTION);
                 }
             }
         }
@@ -182,6 +194,29 @@ public:
         {
             switch(creature->GetEntry())
             {
+                case NPC_PATCHWERK:
+                    _patchwerkGUID = creature->GetGUID();
+                    return;
+                case NPC_PATCHWORK_GOLEM:
+                    PatchwerkRoomTrash.push_back(creature->GetGUID());
+                    return;
+                case NPC_BILE_RETCHER:
+                    if (creature->GetPositionY() > -3258.0f) // we want only those inside the room, not before
+                        PatchwerkRoomTrash.push_back(creature->GetGUID());
+                    return;
+                case NPC_SLUDGE_BELCHER:
+                    if (creature->GetPositionY() > -3258.0f) // we want only those inside the room, not before
+                        PatchwerkRoomTrash.push_back(creature->GetGUID());
+                    return;
+                case NPC_MAD_SCIENTIST:
+                    PatchwerkRoomTrash.push_back(creature->GetGUID());
+                    return;
+                case NPC_LIVING_MONSTROSITY:
+                    PatchwerkRoomTrash.push_back(creature->GetGUID());
+                    return;
+                case NPC_SURGICAL_ASSIST:
+                    PatchwerkRoomTrash.push_back(creature->GetGUID());
+                    return;
                 case NPC_THADDIUS:
                     _thaddiusGUID = creature->GetGUID();
                     return;
@@ -428,11 +463,37 @@ public:
                 case DATA_HEIGAN_ERUPTION:
                     HeiganEruptSections(data);
                     return;
+                case DATA_HAD_THADDIUS_GREET:
+                    _hadThaddiusGreet = (data == 1);
             }
+        }
+
+        uint32 GetData(uint32 id) const override
+        {
+            switch (id)
+            {
+                case DATA_HAD_THADDIUS_GREET:
+                    return _hadThaddiusGreet ? 1 : 0;
+            }
+            return 0;
         }
         
         bool SetBossState(uint32 bossId, EncounterState state) override
         {
+            // pull all the trash if not killed
+            if (bossId == BOSS_PATCHWERK && state == IN_PROGRESS)
+            {
+                if (Creature* patch = instance->GetCreature(_patchwerkGUID))
+                {
+                    for (auto &itr : PatchwerkRoomTrash)
+                    {
+                        Creature* trash = ObjectAccessor::GetCreature(*patch, itr);
+                        if (trash && trash->IsAlive() && !trash->IsInCombat())
+                            trash->AI()->AttackStart(patch->GetVictim());
+                    }
+                }
+            }
+
             // Horseman handling
             if (bossId == BOSS_HORSEMAN)
             {
@@ -569,6 +630,7 @@ public:
                             go->SetGoState(GO_STATE_ACTIVE);
                         if (GameObject* go = instance->GetGameObject(_loathebPortalGUID))
                             go->SetPhaseMask(1, true);
+                        events.ScheduleEvent(EVENT_KELTHUZAD_WING_TAUNT, 6000);
                         break;
                     case BOSS_ANUB:
                         if (GameObject* go = instance->GetGameObject(_anubGateGUID))
@@ -587,6 +649,7 @@ public:
                             go->SetGoState(GO_STATE_ACTIVE);
                         if (GameObject* go = instance->GetGameObject(_maexxnaPortalGUID))
                             go->SetPhaseMask(1, true);
+                        events.ScheduleEvent(EVENT_KELTHUZAD_WING_TAUNT, 6000);
                         break;
                     case BOSS_GOTHIK:
                         if (GameObject* go = instance->GetGameObject(_gothikEnterGateGUID))
@@ -603,10 +666,12 @@ public:
                     case BOSS_THADDIUS:
                         if (GameObject* go = instance->GetGameObject(_thaddiusPortalGUID))
                             go->SetPhaseMask(1, true);
+                        events.ScheduleEvent(EVENT_KELTHUZAD_WING_TAUNT, 6000);
                         break;
                     case BOSS_HORSEMAN:
                         if (GameObject* go = instance->GetGameObject(_horsemanPortalGUID))
                             go->SetPhaseMask(1, true);
+                        events.ScheduleEvent(EVENT_KELTHUZAD_WING_TAUNT, 6000);
                         break;
                 }
             }
@@ -661,6 +726,30 @@ public:
             // And They would all
             if (_horsemanTimer)
                 _horsemanTimer += diff;
+
+            if (_screamTimer && GetBossState(BOSS_THADDIUS) != DONE)
+            {
+                if (_screamTimer <= diff)
+                {
+                    instance->PlayDirectSoundToMap(SOUND_SCREAM + urand(0, 3));
+                    _screamTimer = (2 * MINUTE + urand(0, 30)) * IN_MILLISECONDS;
+                }
+                else
+                    _screamTimer -= diff;
+            }
+
+            events.Update(diff);
+            switch (events.ExecuteEvent())
+            {
+                case EVENT_KELTHUZAD_WING_TAUNT:
+                    // Loads Kel'Thuzad's grid. We need this as he must be active in order for his texts to work.
+                    instance->LoadGrid(3749.67f, -5114.06f);
+                    if (Creature* kelthuzad = instance->GetCreature(_kelthuzadGUID))
+                        kelthuzad->AI()->Talk(_currentWingTaunt);
+                    ++_currentWingTaunt;
+                    events.PopEvent();
+                    break;
+            }
         }
 
         uint64 GetData64(uint32 id) const override
@@ -751,7 +840,7 @@ class boss_naxxramas_misc : public CreatureScript
 public:
     boss_naxxramas_misc() : CreatureScript("boss_naxxramas_misc") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_naxxramas_miscAI (pCreature);
     }
@@ -765,7 +854,7 @@ public:
 
         uint32 timer;
 
-        void JustDied(Unit* )
+        void JustDied(Unit* ) override
         {
             if (me->GetEntry() == NPC_MR_BIGGLESWORTH && me->GetInstanceScript())
             {
@@ -777,7 +866,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (me->GetEntry() == NPC_NAXXRAMAS_TRIGGER)
             {
@@ -794,7 +883,7 @@ public:
             }
             else if (me->GetEntry() == NPC_LIVING_POISON)
             {
-                Unit* target = NULL;
+                Unit* target = nullptr;
                 Trinity::AnyUnfriendlyUnitInObjectRangeCheck u_check(me, me, 0.5f);
                 Trinity::UnitLastSearcher<Trinity::AnyUnfriendlyUnitInObjectRangeCheck> searcher(me, target, u_check);
                 me->VisitNearbyObject(1.5f, searcher);

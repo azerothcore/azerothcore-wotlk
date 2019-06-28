@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
@@ -30,6 +30,13 @@ enum Events
     EVENT_SUMMON_SPIDERLINGS            = 6,
 };
 
+enum Emotes
+{
+    EMOTE_SPIDERS   = 0,
+    EMOTE_WEB_WRAP  = 1,
+    EMOTE_WEB_SPRAY = 2
+};
+
 enum Misc
 {
     NPC_WEB_WRAP                        = 16486,
@@ -48,7 +55,7 @@ class boss_maexxna : public CreatureScript
 public:
     boss_maexxna() : CreatureScript("boss_maexxna") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_maexxnaAI (pCreature);
     }
@@ -75,7 +82,7 @@ public:
             return true;
         }
 
-        void Reset()
+        void Reset() override
         {
             BossAI::Reset();
             events.Reset();
@@ -89,7 +96,7 @@ public:
         
         }
 
-        void EnterCombat(Unit * who)
+        void EnterCombat(Unit * who) override
         {
             BossAI::EnterCombat(who);
             me->SetInCombatWithZone();
@@ -107,7 +114,7 @@ public:
             }
         }
 
-        void JustSummoned(Creature* cr)
+        void JustSummoned(Creature* cr) override
         {
             if (cr->GetEntry() == NPC_MAEXXNA_SPIDERLING)
             {
@@ -119,13 +126,13 @@ public:
             summons.Summon(cr);
         }
 
-        void KilledUnit(Unit* who)
+        void KilledUnit(Unit* who) override
         {
             if (who->GetTypeId() == TYPEID_PLAYER && pInstance)
                 pInstance->SetData(DATA_IMMORTAL_FAIL, 0);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!IsInRoom())
                 return;
@@ -140,7 +147,7 @@ public:
             switch (events.GetEvent())
             {
                 case EVENT_SPELL_WEB_SPRAY:
-                    me->MonsterTextEmote("%s sprays strands of web everywhere!", 0, true);
+                    Talk(EMOTE_WEB_SPRAY);
                     me->CastSpell(me, RAID_MODE(SPELL_WEB_SPRAY_10, SPELL_WEB_SPRAY_25), true);
                     events.RepeatEvent(40000);
                     break;
@@ -153,7 +160,7 @@ public:
                     events.RepeatEvent(30000);
                     break;
                 case EVENT_SUMMON_SPIDERLINGS:
-                    me->MonsterTextEmote("Spiderlings appear on the web!", 0, true);
+                    Talk(EMOTE_SPIDERS);
                     for (uint8 i = 0; i < 8; ++i)
                         me->SummonCreature(NPC_MAEXXNA_SPIDERLING, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation());
                     events.RepeatEvent(40000);
@@ -169,7 +176,7 @@ public:
                     events.RepeatEvent(1000);
                     break;
                 case EVENT_WEB_WRAP:
-                    me->MonsterTextEmote("%s spins her web into a cocoon!", 0, true);
+                    Talk(EMOTE_WEB_WRAP);
                     for (uint8 i = 0; i < RAID_MODE(1,2); ++i)
                         if (Unit *target = SelectTarget(SELECT_TARGET_RANDOM, 1, 0, true, -SPELL_WEB_WRAP))
                         {
@@ -197,7 +204,7 @@ class boss_maexxna_webwrap : public CreatureScript
 public:
     boss_maexxna_webwrap() : CreatureScript("boss_maexxna_webwrap") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_maexxna_webwrapAI (pCreature);
     }
@@ -207,15 +214,15 @@ public:
         boss_maexxna_webwrapAI(Creature *c) : NullCreatureAI(c), victimGUID(0) {}
 
         uint64 victimGUID;
-        void SetGUID(uint64 guid, int32  /*param*/)
+        void SetGUID(uint64 guid, int32  /*param*/) override
         {
             victimGUID = guid;
             if (me->m_spells[0] && victimGUID)
                 if (Unit *victim = ObjectAccessor::GetUnit(*me, victimGUID))
-                    victim->CastSpell(victim, me->m_spells[0], true, NULL, NULL, me->GetGUID());
+                    victim->CastSpell(victim, me->m_spells[0], true, nullptr, nullptr, me->GetGUID());
         }
 
-        void JustDied(Unit * /*killer*/)
+        void JustDied(Unit * /*killer*/) override
         {
             if (me->m_spells[0] && victimGUID)
                 if (Unit *victim = ObjectAccessor::GetUnit(*me, victimGUID))

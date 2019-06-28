@@ -12,7 +12,10 @@ enum Says
     SAY_AGGRO                   = 0,
     SAY_SLAY                    = 1,
     SAY_TAUNT                   = 2,
-    SAY_DEATH                   = 3
+    SAY_DEATH                   = 3,
+    EMOTE_DANCE                 = 4,
+    EMOTE_DANCE_END             = 5,
+    SAY_DANCE                   = 6
 };
 
 enum Spells
@@ -43,7 +46,7 @@ class boss_heigan : public CreatureScript
 public:
     boss_heigan() : CreatureScript("boss_heigan") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_heiganAI (pCreature);
     }
@@ -61,7 +64,7 @@ public:
         uint8 currentSection;
         bool moveRight;
 
-        void Reset()
+        void Reset() override
         {
             BossAI::Reset();
             events.Reset();
@@ -76,25 +79,24 @@ public:
             }
         }
 
-        void KilledUnit(Unit* who)
+        void KilledUnit(Unit* who) override
         {
             if (who->GetTypeId() != TYPEID_PLAYER)
                 return;
 
-            if (!urand(0,3))
-                Talk(SAY_SLAY);
+            Talk(SAY_SLAY);
 
             if (pInstance)
                 pInstance->SetData(DATA_IMMORTAL_FAIL, 0);
         }
 
-        void JustDied(Unit*  killer)
+        void JustDied(Unit*  killer) override
         {
             BossAI::JustDied(killer);
             Talk(SAY_DEATH);
         }
 
-        void EnterCombat(Unit * who)
+        void EnterCombat(Unit * who) override
         {
             BossAI::EnterCombat(who);
             me->SetInCombatWithZone();
@@ -122,7 +124,8 @@ public:
             }
             else // if (phase == PHASE_FAST_DANCE)
             {
-                me->MonsterTextEmote("%s teleports and begins to channel a spell!", 0, true);
+                Talk(EMOTE_DANCE);
+                Talk(SAY_DANCE);
                 // teleport
                 float x, y, z, o;
                 me->GetHomePosition(x, y, z, o);
@@ -147,7 +150,7 @@ public:
             return true;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!IsInRoom(me))
                 return;
@@ -170,7 +173,15 @@ public:
                     events.RepeatEvent(20000);
                     break;
                 case EVENT_SWITCH_PHASE:
-                    StartFightPhase(currentPhase == PHASE_SLOW_DANCE ? PHASE_FAST_DANCE : PHASE_SLOW_DANCE);
+                    if (currentPhase == PHASE_SLOW_DANCE)
+                    {
+                        StartFightPhase(PHASE_FAST_DANCE);
+                    }
+                    else
+                    {
+                        StartFightPhase(PHASE_SLOW_DANCE);
+                        Talk(EMOTE_DANCE_END); // we put this here to avoid play the emote on aggro.
+                    }
                     // no pop, there is reset in start fight
                     break;
                 case EVENT_ERUPT_SECTION:
@@ -185,7 +196,7 @@ public:
                         moveRight ? currentSection++ : currentSection--;
                     }
 
-                    if (currentPhase == PHASE_SLOW_DANCE && !urand(0,3))
+                    if (currentPhase == PHASE_SLOW_DANCE)
                         Talk(SAY_TAUNT);
 
                     events.RepeatEvent(currentPhase == PHASE_SLOW_DANCE ? 10000 : 4000);
