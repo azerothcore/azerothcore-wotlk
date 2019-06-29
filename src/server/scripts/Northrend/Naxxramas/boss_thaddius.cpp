@@ -334,7 +334,7 @@ public:
             pullTimer = 0;
             visualTimer = 1;
             overload = false;
-            
+
             events.Reset();
             me->SetControlled(false, UNIT_STATE_STUNNED);
             if (Creature* cr = me->FindNearestCreature(NPC_TESLA_COIL, 150.0f))

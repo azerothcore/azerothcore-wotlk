@@ -2055,6 +2055,16 @@ void ScriptMgr::OnBattlegroundAddPlayer(Battleground* bg, Player* player)
     FOREACH_SCRIPT(BGScript)->OnBattlegroundAddPlayer(bg, player);
 }
 
+void ScriptMgr::OnBattlegroundBeforeAddPlayer(Battleground* bg, Player* player)
+{
+    FOREACH_SCRIPT(BGScript)->OnBattlegroundBeforeAddPlayer(bg, player);
+}
+
+void ScriptMgr::OnBattlegroundRemovePlayerAtLeave(Battleground* bg, Player* player)
+{
+    FOREACH_SCRIPT(BGScript)->OnBattlegroundRemovePlayerAtLeave(bg, player);
+}
+
 // SpellSC
 void ScriptMgr::OnCalcMaxDuration(Aura const* aura, int32& maxDuration)
 {

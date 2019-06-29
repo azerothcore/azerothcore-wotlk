@@ -4,6 +4,11 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
+#ifdef ELUNA
+#include "LuaEngine.h"
+#include "ElunaUtility.h"
+#endif
+
 #include "Common.h"
 #include "DatabaseEnv.h"
 #include "WorldPacket.h"
@@ -1022,6 +1027,11 @@ void Spell::SelectImplicitChannelTargets(SpellEffIndex effIndex, SpellImplicitTa
                 CallScriptObjectTargetSelectHandlers(target, effIndex, targetType);
                 if (target)
                     m_targets.SetDst(*target);
+            }
+            else if (Spell* channeledSpell = m_originalCaster->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
+            {
+                if (channeledSpell->m_targets.GetUnitTarget())
+                    m_targets.SetDst(*channeledSpell->m_targets.GetUnitTarget());
             }
             else //if (!m_targets.HasDst())
             {
@@ -3653,7 +3663,9 @@ void Spell::_cast(bool skipCheck)
     {
         // now that we've done the basic check, now run the scripts
         // should be done before the spell is actually executed
-        //sScriptMgr->OnPlayerSpellCast(playerCaster, this, skipCheck); // pussywizard: optimization
+#ifdef ELUNA
+        sEluna->OnSpellCast(playerCaster, this, skipCheck);
+#endif
 
         // As of 3.0.2 pets begin attacking their owner's target immediately
         // Let any pets know we've attacked something. Check DmgClass for harmful spells only

@@ -479,7 +479,7 @@ public:
 
             return 0;
         }
-        
+
         bool SetBossState(uint32 bossId, EncounterState state) override
         {
             // pull all the trash if not killed
@@ -795,7 +795,6 @@ public:
                 default:
                     return 0;
             }
-            return 0;
         }
 
         std::string GetSaveData() override
