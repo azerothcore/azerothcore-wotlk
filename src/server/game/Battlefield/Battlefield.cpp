@@ -400,7 +400,7 @@ void Battlefield::AskToLeaveQueue(Player* player)
 void Battlefield::PlayerAskToLeave(Player* player)
 {
     // Player leaving Wintergrasp, teleport to Dalaran.
-    player->TeleportTo(571, 5804.1499f, 624.7710f, 647.7670f, 1.6400f);
+    player->CastSpell(player, 8690, true);
 }
 
 // Called in WorldSession::HandleBfEntryInviteResponse
