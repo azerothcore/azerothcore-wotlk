@@ -399,7 +399,7 @@ void Battlefield::AskToLeaveQueue(Player* player)
 // Called in WorldSession::HandleHearthAndResurrect
 void Battlefield::PlayerAskToLeave(Player* player)
 {
-    // Player leaving Wintergrasp, teleport to Dalaran.
+    // Player leaving Wintergrasp, trigger Hearthstone spell.
     player->CastSpell(player, 8690, true);
 }
 
