@@ -158,11 +158,8 @@ extern int main(int argc, char** argv)
     // Initialize the database connection
     if (!StartDB())
         return 1;
-
-    // // Initialize the log database
-    // sLog->SetLogDB(false);
-    // sLog->SetRealmID(0);                                               // ensure we've set realm to 0 (authserver realmid)
-
+    
+    
     // Get the list of realms for the server
     sRealmList->Initialize(sConfigMgr->GetIntDefault("RealmsStateUpdateDelay", 20));
     if (sRealmList->size() == 0)
