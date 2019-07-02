@@ -1,15 +1,14 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1554741101083171200');
 
 UPDATE `creature_template` SET `unit_flags` = 4 WHERE `entry` = 22443;
-UPDATE `creature_template` SET `flags_extra`= 2 WHERE `entry` IN (22471,22472);
+UPDATE `creature_template` SET `flags_extra`= 2 WHERE `entry` IN (22471, 22472);
 UPDATE `creature_template` SET `InhabitType` = '3' WHERE `entry` = 22500;
 UPDATE `creature_template` SET `ScriptName` = 'npc_deaths_fel_cannon' WHERE `entry` = 22443;
 UPDATE `creature_template` SET `ScriptName` = 'npc_deaths_door_fell_cannon_target_bunny' WHERE `entry` = 22495;
-UPDATE `creature_template` SET `ScriptName` = '' WHERE `entry` = 22472;
-UPDATE `creature_template` SET `ScriptName` = '' WHERE `entry` = 22471;
+UPDATE `creature_template` SET `ScriptName` = '' WHERE `entry` IN (22471, 22472);
 
-DELETE FROM `conditions` WHERE  `SourceTypeOrReferenceId`=13 AND `SourceGroup`=1 AND `SourceEntry`=39221 AND `SourceId`=0 AND `ElseGroup`=0 AND `ConditionTypeOrReference`=31 AND `ConditionTarget`=0 AND `ConditionValue1`=3 AND `ConditionValue2`=22471 AND `ConditionValue3`=0;
-DELETE FROM `conditions` WHERE  `SourceTypeOrReferenceId`=13 AND `SourceGroup`=1 AND `SourceEntry`=39221 AND `SourceId`=0 AND `ElseGroup`=1 AND `ConditionTypeOrReference`=31 AND `ConditionTarget`=0 AND `ConditionValue1`=3 AND `ConditionValue2`=22472 AND `ConditionValue3`=0;
+DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId`=13 AND `SourceGroup`=1 AND `SourceEntry`=39221 AND `SourceId`=0 AND `ElseGroup`=0 AND `ConditionTypeOrReference`=31 AND `ConditionTarget`=0 AND `ConditionValue1`=3 AND `ConditionValue2`=22471 AND `ConditionValue3`=0;
+DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId`=13 AND `SourceGroup`=1 AND `SourceEntry`=39221 AND `SourceId`=0 AND `ElseGroup`=1 AND `ConditionTypeOrReference`=31 AND `ConditionTarget`=0 AND `ConditionValue1`=3 AND `ConditionValue2`=22472 AND `ConditionValue3`=0;
 
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId`=13 AND `SourceGroup`=1 AND `SourceEntry`=39221 AND `SourceId`=0 AND `ElseGroup`=0 AND `ConditionTypeOrReference`=31 AND `ConditionTarget`=0 AND `ConditionValue1`=3 AND `ConditionValue2`=22495 AND `ConditionValue3`=0;
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES (13, 1, 39221, 0, 0, 31, 0, 3, 22495, 0, 0, 0, 0, '', 'Target Death\'s Door Fel Cannon Target Bunny');
