@@ -1386,6 +1386,49 @@ class spell_item_direbrew_remote : public SpellScriptLoader
         }
 };
 
+enum eArgentKnight
+{
+    SPELL_SUMMON_ARGENT_KNIGHT_ALLIANCE = 54296
+};
+
+class spell_item_summon_argent_knight :  public SpellScriptLoader
+{
+    public:
+        spell_item_summon_argent_knight() : SpellScriptLoader("spell_item_summon_argent_knight") { }
+
+        class spell_item_summon_argent_knight_SpellScript : public SpellScript
+        {
+            PrepareSpellScript(spell_item_summon_argent_knight_SpellScript);
+
+            void HandleOnEffectHit(SpellEffIndex effIndex)
+            {
+                if (Unit* caster = GetCaster())
+                {
+                    if (caster->GetTypeId() == TYPEID_PLAYER)
+                    {
+                        // summoning the "Argent Knight (Horde)" is default for spell 54307;
+                        if (caster->ToPlayer()->GetTeamId() == TEAM_ALLIANCE)
+                        {
+                            // prevent default summoning and summon "Argent Knight (Alliance)" instead
+                            PreventHitDefaultEffect(effIndex);
+                            caster->CastSpell(caster, SPELL_SUMMON_ARGENT_KNIGHT_ALLIANCE, true);
+                        }
+                    }
+                }
+            }
+
+            void Register()
+            {
+                OnEffectHit += SpellEffectFn(spell_item_summon_argent_knight_SpellScript::HandleOnEffectHit, EFFECT_0, SPELL_EFFECT_SUMMON);
+            }
+        };
+
+        SpellScript* GetSpellScript() const
+        {
+            return new spell_item_summon_argent_knight_SpellScript();
+        }
+};
+
 
 // Theirs
 // Generic script for handling item dummy effects which trigger another spell.
@@ -3960,6 +4003,7 @@ void AddSC_item_spell_scripts()
     new spell_item_summon_or_dismiss();
     new spell_item_draenic_pale_ale();
     new spell_item_direbrew_remote();
+    new spell_item_summon_argent_knight();
 
     // Theirs
     // 23074 Arcanite Dragonling
