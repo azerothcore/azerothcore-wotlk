@@ -10,6 +10,7 @@
 #include "SpellAuras.h"
 #include "PassiveAI.h"
 #include "Player.h"
+#include "MapManager.h"
 
 enum HodirSpellData
 {
@@ -415,7 +416,7 @@ public:
                         me->PlayDirectSound(SOUND_HODIR_FLASH_FREEZE, 0);
                         SmallIcicles(false);
                         events.RepeatEvent(55000 + urand(0,10000));
-                        events.ScheduleEvent(EVENT_SMALL_ICICLES_ENABLE, 12000);
+                        ((InstanceMap*)sMapMgr->FindMap(me->GetMapId(), me->GetInstanceId()))->GetMaxPlayers() > 15 ? events.ScheduleEvent(EVENT_SMALL_ICICLES_ENABLE, 12000) : events.ScheduleEvent(EVENT_SMALL_ICICLES_ENABLE, 24000);
                         events.ScheduleEvent(EVENT_FROZEN_BLOWS, 15000);
                         events.RescheduleEvent(EVENT_FREEZE, 20000);
                     }
