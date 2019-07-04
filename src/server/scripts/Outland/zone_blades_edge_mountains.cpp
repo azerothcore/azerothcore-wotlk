@@ -88,7 +88,7 @@ public:
             {
                 count++;
 
-                if (count)
+                if (count == 1)
                 {
                     if (Player* player = caster->GetCharmerOrOwnerPlayerOrPlayerItself())
                         PlayerGUID = player->GetGUID();
@@ -101,7 +101,7 @@ public:
                 if (count >= 3)
                     me->SummonGameObject(GO_FIRE, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 130);
 
-                if (count >= 6)
+                if (count > 6)
                 {
                     if (Player* player = ObjectAccessor::GetPlayer(*me, PlayerGUID))
                     {
@@ -111,7 +111,9 @@ public:
                             player->KilledMonsterCredit(NPC_NORTH_GATE_CREDIT, TRIGGERED_NONE);
                         // complete quest part
                         if (Creature* bunny = GetClosestCreatureWithEntry(me, NPC_EXPLOSION_BUNNY, 200.0f))
-                            bunny->CastSpell(nullptr, SPELL_EXPLOSION, TRIGGERED_NONE);
+                            bunny->CastSpell(nullptr, SPELL_EXPLOSION, TRIGGERED_NONE);  
+                        if (Creature* cannon = ObjectAccessor::GetCreature(*me, CannonGUID))
+                            cannon->DespawnOrUnsummon(5000);
                     }
 
                     me->SummonGameObject(GO_BIG_FIRE, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 60);
