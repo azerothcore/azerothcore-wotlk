@@ -321,6 +321,7 @@ class Battlefield : public ZoneScript
         void PlayerAcceptInviteToWar(Player* player);
         uint32 GetBattleId() { return m_BattleId; }
         void AskToLeaveQueue(Player* player);
+        void PlayerAskToLeave(Player* player);
 
         //virtual void DoCompleteOrIncrementAchievement(uint32 /*achievement*/, Player* /*player*/, uint8 /*incrementNumber = 1*/) {};
 
