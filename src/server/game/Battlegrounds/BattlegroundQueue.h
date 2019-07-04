@@ -70,8 +70,8 @@ class BattlegroundQueue
         bool GetPlayerGroupInfoData(uint64 guid, GroupQueueInfo* ginfo);
         void PlayerInvitedToBGUpdateAverageWaitTime(GroupQueueInfo* ginfo);
         uint32 GetAverageQueueWaitTime(GroupQueueInfo* ginfo) const;
-        uint32 GetPlayesCountInGroupsQueue(BattlegroundBracketId bracketId, BattlegroundQueueGroupTypes bgqueue);
-        bool IsEmptyAllQueue(BattlegroundBracketId bracket_id);
+        uint32 GetPlayersCountInGroupsQueue(BattlegroundBracketId bracketId, BattlegroundQueueGroupTypes bgqueue);
+        bool IsAllQueuesEmpty(BattlegroundBracketId bracket_id);
 
         void SetBgTypeIdAndArenaType(BattlegroundTypeId b, uint8 a) { m_bgTypeId = b; m_arenaType = ArenaType(a); } // pussywizard
         void AddEvent(BasicEvent* Event, uint64 e_time);

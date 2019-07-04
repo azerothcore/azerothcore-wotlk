@@ -677,7 +677,7 @@ typedef std::set<Battleground*, BgEmptinessComp> BattlegroundNeedSet;
 void BattlegroundQueue::BattlegroundQueueUpdate(BattlegroundBracketId bracket_id, uint8 actionMask, bool isRated, uint32 arenaRatedTeamId)
 {
     // if no players in queue - do nothing
-    if (IsEmptyAllQueue(bracket_id))
+    if (IsAllQueuesEmpty(bracket_id))
         return;
 
     Battleground* bg_template = sBattlegroundMgr->GetBattlegroundTemplate(m_bgTypeId);
@@ -955,26 +955,26 @@ void BattlegroundQueue::BattlegroundQueueUpdate(BattlegroundBracketId bracket_id
     }
 }
 
-uint32 BattlegroundQueue::GetPlayesCountInGroupsQueue(BattlegroundBracketId bracketId, BattlegroundQueueGroupTypes bgqueue)
+uint32 BattlegroundQueue::GetPlayersCountInGroupsQueue(BattlegroundBracketId bracketId, BattlegroundQueueGroupTypes bgqueue)
 {
-    uint32 PlayesCount = 0;
+    uint32 playersCount = 0;
 
-    for (auto itr : m_QueuedGroups[bracketId][bgqueue])
-        if (!itr->IsInvitedToBGInstanceGUID)
-            PlayesCount += (uint32)itr->Players.size();
+    auto queuedGroups = m_QueuedGroups[bracketId][bgqueue]
+    if (!queuedGroups->IsInvitedToBGInstanceGUID)
+        playersCount += static_cast<uint32>(itr->Players.size());
 
-    return PlayesCount;
+    return playersCount;
 }
 
-bool BattlegroundQueue::IsEmptyAllQueue(BattlegroundBracketId bracket_id)
+bool BattlegroundQueue::IsAllQueuesEmpty(BattlegroundBracketId bracket_id)
 {
-    uint32 QueueEmptyCount = 0;
+    uint32 queueEmptyCount = 0;
 
     for (uint8 i = 0; i < BG_QUEUE_MAX; i++)
         if (m_QueuedGroups[bracket_id][i].empty())
-            QueueEmptyCount++;
+            queueEmptyCount++;
 
-    if (QueueEmptyCount == BG_QUEUE_MAX)
+    if (queueEmptyCount == BG_QUEUE_MAX)
         return true;
 
     return false;
