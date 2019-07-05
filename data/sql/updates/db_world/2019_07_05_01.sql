@@ -1,3 +1,19 @@
+-- DB update 2019_07_05_00 -> 2019_07_05_01
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2019_07_05_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2019_07_05_00 2019_07_05_01 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1554741101083171200'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1554741101083171200');
 
 UPDATE `creature_template` SET `unit_flags` = 4 WHERE `entry` = 22443;
@@ -28,3 +44,12 @@ VALUES
 (22474,0,0,1,9,0,100,0,0,1,0,0,0,11,60081,2,0,0,0,0,2,0,0,0,0,0,0,0,0,'Unstable Fel-Imp - On Victim In Range (0 Yards) - Cast ''Cosmetic - Explosion'''),
 (22474,0,1,0,61,0,100,0,0,0,0,0,0,67,1,500,500,0,0,0,1,0,0,0,0,0,0,0,0,'Unstable Fel-Imp - Linked - Create Timed Event ID 1'),
 (22474,0,2,0,59,0,100,0,1,0,0,0,0,11,39266,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Unstable Fel-Imp - On Timed Event ID 1 - Cast ''Unstable Explosion''');
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
