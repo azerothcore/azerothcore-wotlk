@@ -19,79 +19,79 @@
 
 enum NPCs
 {
-    NPC_DARK_RUNE_PROTECTOR = 27983,
-    NPC_DARK_RUNE_STORMCALLER = 27984,
-    NPC_IRON_GOLEM_CUSTODIAN = 27985,
-    NPC_DARK_MATTER_TRIGGER = 28237,
-    NPC_SEARING_GAZE_TRIGGER = 28265,
+    NPC_DARK_RUNE_PROTECTOR         = 27983,
+    NPC_DARK_RUNE_STORMCALLER       = 27984,
+    NPC_IRON_GOLEM_CUSTODIAN        = 27985,
+    NPC_DARK_MATTER_TRIGGER         = 28237,
+    NPC_SEARING_GAZE_TRIGGER        = 28265,
 };
 
 enum Misc
 {
     // BRANN EVENT
-    SPELL_GLARE_OF_THE_TRIBUNAL = 50988,
-    SPELL_GLARE_OF_THE_TRIBUNAL_H = 59870,
-    SPELL_DARK_MATTER_VISUAL = 51001,
-    SPELL_DARK_MATTER = 51012,
-    SPELL_DARK_MATTER_H = 59868,
-    SPELL_SEARING_GAZE = 51136,
-    SPELL_SEARING_GAZE_H = 59867,
+    SPELL_GLARE_OF_THE_TRIBUNAL     = 50988,
+    SPELL_GLARE_OF_THE_TRIBUNAL_H   = 59870,
+    SPELL_DARK_MATTER_VISUAL        = 51001,
+    SPELL_DARK_MATTER               = 51012,
+    SPELL_DARK_MATTER_H             = 59868,
+    SPELL_SEARING_GAZE              = 51136,
+    SPELL_SEARING_GAZE_H            = 59867,
 
     // DARK RUNE PROTECTOR
-    SPELL_DRP_CHARGE = 22120,
-    SPELL_DRP_CLEAVE = 42724,
+    SPELL_DRP_CHARGE                = 22120,
+    SPELL_DRP_CLEAVE                = 42724,
 
     // DARK RUNE STORMCALLER
-    SPELL_DRS_LIGHTING_BOLT = 12167,
-    SPELL_DRS_LIGHTING_BOLT_H = 59863,
-    SPELL_DRS_SHADOW_WORD_PAIN = 15654,
-    SPELL_DRS_SHADOW_WORD_PAIN_H = 59864,
+    SPELL_DRS_LIGHTING_BOLT         = 12167,
+    SPELL_DRS_LIGHTING_BOLT_H       = 59863,
+    SPELL_DRS_SHADOW_WORD_PAIN      = 15654,
+    SPELL_DRS_SHADOW_WORD_PAIN_H    = 59864,
 
     // IRON GOLEM CUSTODIAN
-    SPELL_IGC_CRUSH_ARMOR = 33661,
-    SPELL_IGC_GROUND_SMASH = 12734,
-    SPELL_IGC_GROUND_SMASH_H = 59865,
+    SPELL_IGC_CRUSH_ARMOR           = 33661,
+    SPELL_IGC_GROUND_SMASH          = 12734,
+    SPELL_IGC_GROUND_SMASH_H        = 59865,
 
     // ACTIONS
-    ACTION_START_EVENT = 0,
-    ACTION_START_TRIBUNAL = 1,
-    ACTION_GO_TO_SJONNIR = 2,
-    ACTION_START_SJONNIR_FIGHT = 3,
-    ACTION_SJONNIR_DEAD = 4,
-    ACTION_ENTEREVADEMODE = 5,
-    ACTION_WIPE_START = 6,
-    ACTION_OPEN_DOOR = 7,
+    ACTION_START_EVENT              = 0,
+    ACTION_START_TRIBUNAL           = 1,
+    ACTION_GO_TO_SJONNIR            = 2,
+    ACTION_START_SJONNIR_FIGHT      = 3,
+    ACTION_SJONNIR_DEAD             = 4,
+    ACTION_ENTEREVADEMODE           = 5,
+    ACTION_WIPE_START               = 6,
+    ACTION_OPEN_DOOR                = 7,
 
     // QUESTS
-    QUEST_HALLS_OF_STONE = 13207,
+    QUEST_HALLS_OF_STONE            = 13207,
 };
 
 enum events
 {
     // BRANN
-    EVENT_KADDRAK_HEAD = 1,
-    EVENT_MARNAK_HEAD = 2,
-    EVENT_ABEDNEUM_HEAD = 3,
-    EVENT_SUMMON_MONSTERS = 4,
-    EVENT_TRIBUNAL_END = 5,
-    EVENT_GO_TO_SJONNIR = 6,
-    EVENT_END = 7,
-    EVENT_KADDRAK_VISUAL = 8,
-    EVENT_MARNAK_VISUAL = 9,
-    EVENT_ABEDNEUM_VISUAL = 10,
-    EVENT_KADDRAK_SWITCH_EYE = 11,
+    EVENT_KADDRAK_HEAD          = 1,
+    EVENT_MARNAK_HEAD           = 2,
+    EVENT_ABEDNEUM_HEAD         = 3,
+    EVENT_SUMMON_MONSTERS       = 4,
+    EVENT_TRIBUNAL_END          = 5,
+    EVENT_GO_TO_SJONNIR         = 6,
+    EVENT_END                   = 7,
+    EVENT_KADDRAK_VISUAL        = 8,
+    EVENT_MARNAK_VISUAL         = 9,
+    EVENT_ABEDNEUM_VISUAL       = 10,
+    EVENT_KADDRAK_SWITCH_EYE    = 11,
 
     // DARK RUNE PROTECTOR
-    EVENT_DRP_CHARGE = 15,
-    EVENT_DRP_CLEAVE = 16,
+    EVENT_DRP_CHARGE            = 15,
+    EVENT_DRP_CLEAVE            = 16,
 
     // DARK RUNE STORMCALLER
-    EVENT_DRS_LIGHTNING_BOLD = 20,
-    EVENT_DRS_SHADOW_WORD_PAIN = 21,
+    EVENT_DRS_LIGHTNING_BOLD    = 20,
+    EVENT_DRS_SHADOW_WORD_PAIN  = 21,
 
     // IRON GOLEM CUSTODIAN
-    EVENT_IGC_CRUSH = 30,
-    EVENT_IGC_GROUND_SMASH = 31,
+    EVENT_IGC_CRUSH             = 30,
+    EVENT_IGC_GROUND_SMASH      = 31,
 };
 
 struct Yells
@@ -101,7 +101,7 @@ struct Yells
     uint32 creature, timer;
 };
 
-static Yells Conversation[] =
+static Yells Conversation[]=
 {
     {14259, "Time to get some answers! Let's get this show on the road!", NPC_BRANN, 0},
     {14247, "Take a moment and relish this with me. Soon... all will be revealed. Okay then, let's do this!", NPC_BRANN, 5000},
@@ -162,16 +162,16 @@ public:
             switch (brann)
             {
             case 1:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
                 break;
             case 2:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+2);
                 break;
             case 3:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+3);
                 break;
             case 4:
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+4);
                 break;
             case 5:
                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
@@ -190,23 +190,23 @@ public:
         {
             switch (action)
             {
-            case GOSSIP_ACTION_INFO_DEF + 1:
+            case GOSSIP_ACTION_INFO_DEF+1:
                 creature->AI()->DoAction(ACTION_START_EVENT);
                 CloseGossipMenuFor(player);
                 break;
-            case GOSSIP_ACTION_INFO_DEF + 2:
+            case GOSSIP_ACTION_INFO_DEF+2:
                 creature->AI()->DoAction(ACTION_START_TRIBUNAL);
                 CloseGossipMenuFor(player);
                 break;
-            case GOSSIP_ACTION_INFO_DEF + 3:
+            case GOSSIP_ACTION_INFO_DEF+3:
                 creature->AI()->DoAction(ACTION_GO_TO_SJONNIR);
                 CloseGossipMenuFor(player);
                 break;
-            case GOSSIP_ACTION_INFO_DEF + 4:
+            case GOSSIP_ACTION_INFO_DEF+4:
                 creature->AI()->DoAction(ACTION_WIPE_START);
                 CloseGossipMenuFor(player);
                 break;
-            case GOSSIP_ACTION_INFO_DEF + 5:
+            case GOSSIP_ACTION_INFO_DEF+5:
                 creature->AI()->DoAction(ACTION_OPEN_DOOR);
                 CloseGossipMenuFor(player);
                 break;
@@ -217,7 +217,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new brann_bronzebeardAI(creature);
+        return new brann_bronzebeardAI (creature);
     }
 
     struct brann_bronzebeardAI : public npc_escortAI
@@ -308,7 +308,7 @@ public:
             me->SetReactState(REACT_PASSIVE);
             me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
 
-            if (pInstance)
+            if(pInstance)
             {
                 pInstance->SetData(BRANN_BRONZEBEARD, 1);
                 pInstance->SetData(DATA_BRANN_ACHIEVEMENT, true);
@@ -322,59 +322,59 @@ public:
         {
             switch (action)
             {
-            case ACTION_START_EVENT:
-                Start(false, true, 0, 0, true, false);
-                break;
-            case ACTION_START_TRIBUNAL:
-            {
-                Map::PlayerList const &PlayerList = me->GetMap()->GetPlayers();
-                if (!PlayerList.isEmpty())
-                    for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-                    {
-                        me->setFaction(i->GetSource()->getFaction());
-                        break;
-                    }
+                case ACTION_START_EVENT:
+                    Start(false, true, 0, 0, true, false);
+                    break;
+                case ACTION_START_TRIBUNAL:
+                {
+                    Map::PlayerList const &PlayerList = me->GetMap()->GetPlayers();
+                        if (!PlayerList.isEmpty())
+                            for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+                            {
+                                me->setFaction(i->GetSource()->getFaction());
+                                break;
+                            }
 
-                SetEscortPaused(false);
-                InitializeEvent();
-                me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
-                break;
-            }
-            case ACTION_GO_TO_SJONNIR:
-                SetEscortPaused(false);
-                ResetEvent();
-                me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
-                break;
-            case ACTION_START_SJONNIR_FIGHT:
-                me->setFaction(35);
-                me->MonsterYell("Don't worry! Ol' Brann's got yer back! Keep that metal monstrosity busy, and I'll see if I can't sweet talk this machine into helping ye!", LANG_UNIVERSAL, 0);
-                me->PlayDirectSound(14274);
-                SetEscortPaused(false);
-                break;
-            case ACTION_SJONNIR_DEAD:
-                me->MonsterYell("Loken? That's downright bothersome... We might've neutralized the iron dwarves, but I'd lay odds there's another machine somewhere else churnin' out a whole mess o' these iron vrykul!", LANG_UNIVERSAL, 0);
-                me->PlayDirectSound(14278);
-                events.ScheduleEvent(EVENT_END, 14000);
-                break;
-            case ACTION_ENTEREVADEMODE:
-                RemoveEscortState(0x7); // all states
-                me->SetHomePosition(1077.41f, 474.16f, 207.8f, 2.70526f);
-                me->UpdatePosition(1077.41f, 474.16f, 207.9f, 2.70526f, true);
-                me->StopMovingOnCurrentPos();
-                Reset();
-                break;
-            case ACTION_WIPE_START:
-                Start(false, true, 0, 0, true, false);
-                SetNextWaypoint(20, false);
-                ResetEvent();
-                me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
-                break;
-            case ACTION_OPEN_DOOR:
-                if (GameObject *door = ObjectAccessor::GetGameObject(*me, pInstance->GetData64(GO_SJONNIR_DOOR)))
-                    door->SetGoState(GO_STATE_ACTIVE);
-                SetEscortPaused(false);
-                me->RemoveAura(58506);
-                break;
+                    SetEscortPaused(false);
+                    InitializeEvent();
+                    me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
+                    break;
+                }
+                case ACTION_GO_TO_SJONNIR:
+                    SetEscortPaused(false);
+                    ResetEvent();
+                    me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
+                    break;
+                case ACTION_START_SJONNIR_FIGHT:
+                    me->setFaction(35);
+                    me->MonsterYell("Don't worry! Ol' Brann's got yer back! Keep that metal monstrosity busy, and I'll see if I can't sweet talk this machine into helping ye!", LANG_UNIVERSAL, 0);
+                    me->PlayDirectSound(14274);
+                    SetEscortPaused(false);
+                    break;
+                case ACTION_SJONNIR_DEAD:
+                    me->MonsterYell("Loken? That's downright bothersome... We might've neutralized the iron dwarves, but I'd lay odds there's another machine somewhere else churnin' out a whole mess o' these iron vrykul!", LANG_UNIVERSAL, 0);
+                    me->PlayDirectSound(14278);
+                    events.ScheduleEvent(EVENT_END, 14000);
+                    break;
+                case ACTION_ENTEREVADEMODE:
+                    RemoveEscortState(0x7); // all states
+                    me->SetHomePosition(1077.41f, 474.16f, 207.8f, 2.70526f);
+                    me->UpdatePosition(1077.41f, 474.16f, 207.9f, 2.70526f, true);
+                    me->StopMovingOnCurrentPos();
+                    Reset();
+                    break;
+                case ACTION_WIPE_START:
+                    Start(false, true, 0, 0, true, false);
+                    SetNextWaypoint(20, false);
+                    ResetEvent();
+                    me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
+                    break;
+                case ACTION_OPEN_DOOR:
+                    if (GameObject *door = ObjectAccessor::GetGameObject(*me, pInstance->GetData64(GO_SJONNIR_DOOR)))
+                        door->SetGoState(GO_STATE_ACTIVE);
+                    SetEscortPaused(false);
+                    me->RemoveAura(58506);
+                    break;
             }
         }
 
@@ -391,153 +391,153 @@ public:
             events.Update(diff);
             switch (events.GetEvent())
             {
-            case EVENT_KADDRAK_VISUAL:
-            {
-                SwitchHeadVisaul(0x1, true);
-                events.PopEvent();
-                break;
-            }
-            case EVENT_MARNAK_VISUAL:
-            {
-                SwitchHeadVisaul(0x2, true);
-                events.PopEvent();
-                break;
-            }
-            case EVENT_ABEDNEUM_VISUAL:
-            {
-                SwitchHeadVisaul(0x4, true);
-                events.PopEvent();
-                break;
-            }
-            case EVENT_KADDRAK_HEAD: // First
-            {
-                if (Creature *kaddrak = GetKaddrak())
+                case EVENT_KADDRAK_VISUAL:
                 {
-                    if (Player *plr = SelectTargetFromPlayerList(100.0f))
-                        kaddrak->CastSpell(plr, DUNGEON_MODE(SPELL_GLARE_OF_THE_TRIBUNAL, SPELL_GLARE_OF_THE_TRIBUNAL_H), true);
+                    SwitchHeadVisaul(0x1, true);
+                    events.PopEvent();
+                    break;
                 }
-
-                events.RescheduleEvent(EVENT_KADDRAK_SWITCH_EYE, 1500);
-                events.RepeatEvent(2000 + urand(0, 2000));
-                break;
-            }
-            case EVENT_KADDRAK_SWITCH_EYE:
-            {
-                if (Creature *kaddrak = GetKaddrak())
+                case EVENT_MARNAK_VISUAL:
                 {
-                    if (urand(0, 1))
-                        kaddrak->UpdatePosition(927.9f, 330.9f, 219.4f, 2.4f, true);
-                    else
-                        kaddrak->UpdatePosition(923.7f, 326.9f, 219.5f, 2.1f, true);
-
-                    kaddrak->StopMovingOnCurrentPos();
+                    SwitchHeadVisaul(0x2, true);
+                    events.PopEvent();
+                    break;
                 }
-
-                events.PopEvent();
-                break;
-            }
-            case EVENT_MARNAK_HEAD: // Second
-            {
-                if (Creature *marnak = GetMarnak())
+                case EVENT_ABEDNEUM_VISUAL:
                 {
-                    if (Creature *cr = me->SummonCreature(NPC_DARK_MATTER_TRIGGER, marnak->GetPositionX(), marnak->GetPositionY(), marnak->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 7000))
+                    SwitchHeadVisaul(0x4, true);
+                    events.PopEvent();
+                    break;
+                }
+                case EVENT_KADDRAK_HEAD: // First
+                {
+                    if (Creature *kaddrak = GetKaddrak())
                     {
-                        cr->CastSpell(cr, SPELL_DARK_MATTER_VISUAL, true);
                         if (Player *plr = SelectTargetFromPlayerList(100.0f))
+                            kaddrak->CastSpell(plr, DUNGEON_MODE(SPELL_GLARE_OF_THE_TRIBUNAL, SPELL_GLARE_OF_THE_TRIBUNAL_H), true);
+                    }
+
+                    events.RescheduleEvent(EVENT_KADDRAK_SWITCH_EYE, 1500);
+                    events.RepeatEvent(2000+urand(0,2000));
+                    break;
+                }
+                case EVENT_KADDRAK_SWITCH_EYE:
+                {
+                    if (Creature *kaddrak = GetKaddrak())
+                    {
+                        if (urand(0,1))
+                            kaddrak->UpdatePosition(927.9f, 330.9f, 219.4f, 2.4f, true);
+                        else
+                            kaddrak->UpdatePosition(923.7f, 326.9f, 219.5f, 2.1f, true);
+
+                        kaddrak->StopMovingOnCurrentPos();
+                    }
+
+                    events.PopEvent();
+                    break;
+                }
+                case EVENT_MARNAK_HEAD: // Second
+                {
+                    if (Creature *marnak = GetMarnak())
+                    {
+                        if (Creature *cr = me->SummonCreature(NPC_DARK_MATTER_TRIGGER, marnak->GetPositionX(), marnak->GetPositionY(), marnak->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 7000))
                         {
-                            float speed = me->GetDistance(plr->GetPositionX(), plr->GetPositionY(), plr->GetPositionZ()) / (4000.0f * 0.001f);
-                            cr->MonsterMoveWithSpeed(plr->GetPositionX(), plr->GetPositionY(), plr->GetPositionZ(), speed);
+                            cr->CastSpell(cr, SPELL_DARK_MATTER_VISUAL, true);
+                            if (Player *plr = SelectTargetFromPlayerList(100.0f))
+                            {
+                                float speed = me->GetDistance(plr->GetPositionX(), plr->GetPositionY(), plr->GetPositionZ()) / (4000.0f * 0.001f);
+                                cr->MonsterMoveWithSpeed(plr->GetPositionX(), plr->GetPositionY(), plr->GetPositionZ(), speed);
+                            }
                         }
                     }
+                    events.RepeatEvent(20000);
+                    break;
                 }
-                events.RepeatEvent(20000);
-                break;
-            }
-            case EVENT_ABEDNEUM_HEAD: // Third
-            {
-                if (GetAbedneum())
+                case EVENT_ABEDNEUM_HEAD: // Third
                 {
-                    Player *plr = SelectTargetFromPlayerList(100.0f);
-                    if (!plr)
-                        break;
-
-                    if (Creature *cr = me->SummonCreature(NPC_SEARING_GAZE_TRIGGER, plr->GetPositionX(), plr->GetPositionY(), plr->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 10000))
+                    if (GetAbedneum())
                     {
-                        // summon another abedneum to create double beam, despawn just after trigger despawn
-                        me->SummonCreature(NPC_ABEDNEUM, 897.0f, 326.9f, 223.5f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 12000);
-                        cr->CastSpell(cr, DUNGEON_MODE(SPELL_SEARING_GAZE, SPELL_SEARING_GAZE_H), true);
+                        Player *plr = SelectTargetFromPlayerList(100.0f);
+                        if (!plr)
+                            break;
+
+                        if (Creature *cr = me->SummonCreature(NPC_SEARING_GAZE_TRIGGER, plr->GetPositionX(), plr->GetPositionY(), plr->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 10000))
+                        {
+                            // summon another abedneum to create double beam, despawn just after trigger despawn
+                            me->SummonCreature(NPC_ABEDNEUM, 897.0f, 326.9f, 223.5f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 12000);
+                            cr->CastSpell(cr, DUNGEON_MODE(SPELL_SEARING_GAZE, SPELL_SEARING_GAZE_H), true);
+                        }
                     }
+                    events.RepeatEvent(30000);
+                    break;
                 }
-                events.RepeatEvent(30000);
-                break;
-            }
-            case EVENT_SUMMON_MONSTERS:
-            {
-                uint32 Time = 45000 - (2500 * WaveNum);
-                SummonCreatures(NPC_DARK_RUNE_PROTECTOR, 3);
-                if (WaveNum > 2)
-                    SummonCreatures(NPC_DARK_RUNE_STORMCALLER, 2);
-                if (WaveNum > 5)
-                    SummonCreatures(NPC_IRON_GOLEM_CUSTODIAN, 1);
-
-                WaveNum++;
-                events.RepeatEvent(Time);
-                break;
-            }
-            case EVENT_TRIBUNAL_END:
-            {
-                // Has to be here!
-                events.Reset();
-                //DespawnHeads();
-                summons.DespawnAll();
-
-                if (pInstance)
+                case EVENT_SUMMON_MONSTERS:
                 {
-                    pInstance->SetData(BOSS_TRIBUNAL_OF_AGES, DONE);
-                    pInstance->SetData(BRANN_BRONZEBEARD, 3);
-                    me->CastSpell(me, 59046, true); // credit
+                    uint32 Time = 45000 - (2500*WaveNum);
+                    SummonCreatures(NPC_DARK_RUNE_PROTECTOR, 3);
+                    if (WaveNum > 2)
+                        SummonCreatures(NPC_DARK_RUNE_STORMCALLER, 2);
+                    if (WaveNum > 5)
+                        SummonCreatures(NPC_IRON_GOLEM_CUSTODIAN, 1);
+
+                    WaveNum++;
+                    events.RepeatEvent(Time);
+                    break;
                 }
-
-                me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
-
-
-                // Spawn Chest and quest credit
-                if (Player *plr = SelectTargetFromPlayerList(200.0f))
+                case EVENT_TRIBUNAL_END:
                 {
-                    if (GameObject* go = plr->SummonGameObject((IsHeroic() ? GO_TRIBUNAL_CHEST_H : GO_TRIBUNAL_CHEST), 880.406f, 345.164f, 203.706f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0))
+                    // Has to be here!
+                    events.Reset();
+                    //DespawnHeads();
+                    summons.DespawnAll();
+
+                    if (pInstance)
                     {
-                        plr->RemoveGameObject(go, false);
-                        go->SetLootMode(1);
-                        go->SetUInt32Value(GAMEOBJECT_FLAGS, 0);
+                        pInstance->SetData(BOSS_TRIBUNAL_OF_AGES, DONE);
+                        pInstance->SetData(BRANN_BRONZEBEARD, 3);
+                        me->CastSpell(me, 59046, true); // credit
                     }
 
-                    plr->GroupEventHappens(QUEST_HALLS_OF_STONE, me);
+                    me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+
+
+                    // Spawn Chest and quest credit
+                    if (Player *plr = SelectTargetFromPlayerList(200.0f))
+                    {
+                        if (GameObject* go = plr->SummonGameObject((IsHeroic() ? GO_TRIBUNAL_CHEST_H : GO_TRIBUNAL_CHEST), 880.406f, 345.164f, 203.706f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0))
+                        {
+                            plr->RemoveGameObject(go, false);
+                            go->SetLootMode(1);
+                            go->SetUInt32Value(GAMEOBJECT_FLAGS, 0);
+                        }
+
+                        plr->GroupEventHappens(QUEST_HALLS_OF_STONE, me);
+                    }
+
+                    events.ScheduleEvent(EVENT_GO_TO_SJONNIR, 279000);
+                    break;
                 }
+                case EVENT_GO_TO_SJONNIR:
+                {
 
-                events.ScheduleEvent(EVENT_GO_TO_SJONNIR, 279000);
-                break;
-            }
-            case EVENT_GO_TO_SJONNIR:
-            {
+                    if (GameObject *door = ObjectAccessor::GetGameObject(*me, pInstance->GetData64(GO_SJONNIR_DOOR)))
+                        door->SetGoState(GO_STATE_ACTIVE);
+                    SetEscortPaused(false);
+                    ResetEvent();
+                    me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
+                    break;
+                }
+                case EVENT_END:
+                {
+                    events.Reset();
+                    if (pInstance)
+                        pInstance->SetData(BRANN_BRONZEBEARD, 6);
 
-                if (GameObject *door = ObjectAccessor::GetGameObject(*me, pInstance->GetData64(GO_SJONNIR_DOOR)))
-                    door->SetGoState(GO_STATE_ACTIVE);
-                SetEscortPaused(false);
-                ResetEvent();
-                me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
-                break;
-            }
-            case EVENT_END:
-            {
-                events.Reset();
-                if (pInstance)
-                    pInstance->SetData(BRANN_BRONZEBEARD, 6);
-
-                me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
-                me->MonsterYell("I'll use the forge to make batches o' earthen to stand guard... But our greatest challenge still remains: find and stop Loken!", LANG_UNIVERSAL, 0);
-                me->PlayDirectSound(14279);
-                break;
-            }
+                    me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+                    me->MonsterYell("I'll use the forge to make batches o' earthen to stand guard... But our greatest challenge still remains: find and stop Loken!", LANG_UNIVERSAL, 0);
+                    me->PlayDirectSound(14279);
+                    break;
+                }
             }
 
             if (TalkEvent)
@@ -548,10 +548,10 @@ public:
                     Creature* cs = NULL;
                     switch (Conversation[SpeechCount].creature)
                     {
-                    case NPC_BRANN:     cs = me; break;
-                    case NPC_ABEDNEUM:  cs = GetAbedneum(); break;
-                    case NPC_KADDRAK:   cs = GetKaddrak(); break;
-                    case NPC_MARNAK:    cs = GetMarnak(); break;
+                        case NPC_BRANN:     cs = me; break;
+                        case NPC_ABEDNEUM:  cs = GetAbedneum(); break;
+                        case NPC_KADDRAK:   cs = GetKaddrak(); break;
+                        case NPC_MARNAK:    cs = GetMarnak(); break;
                     }
 
                     if (cs)
@@ -567,13 +567,13 @@ public:
                 }
             }
         }
-
+        
         void SummonCreatures(uint32 entry, uint8 count)
         {
             for (int i = 0; i < count; ++i)
             {
-                Creature* cr = me->SummonCreature(entry, 946.5971f + urand(0, 6), 383.5330f + urand(0, 6), 205.9943f, 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000);
-                if (cr)
+                Creature* cr = me->SummonCreature(entry, 946.5971f+urand(0,6), 383.5330f+urand(0,6), 205.9943f, 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN,20000);
+                if(cr)
                 {
                     cr->AI()->AttackStart(me);
                     cr->AddThreat(me, 100.0f);
@@ -585,7 +585,7 @@ public:
         void JustDied(Unit* /*killer*/) override
         {
             ResetEvent();
-            if (pInstance)
+            if(pInstance)
             {
                 if (Creature *brann = ObjectAccessor::GetCreature(*me, pInstance->GetData64(NPC_BRANN)))
                 {
@@ -593,7 +593,6 @@ public:
                     brann->Respawn();
                     brann->AI()->DoAction(5);
                 }
-
                 if (pInstance->GetData(BOSS_TRIBUNAL_OF_AGES) != DONE)
                     pInstance->SetData(BOSS_TRIBUNAL_OF_AGES, NOT_STARTED);
             }
@@ -640,47 +639,47 @@ void brann_bronzebeard::brann_bronzebeardAI::WaypointReached(uint32 id)
     switch (id)
     {
         // Stop before stairs and ask to start
-    case 9:
-        SetEscortPaused(true);
-        me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
-        if (pInstance)
-            pInstance->SetData(BRANN_BRONZEBEARD, 2);
-
-        break;
-        // In front of Console
-    case 11:
-        SetEscortPaused(true);
-        if (pInstance)
-        {
-            pInstance->SetData(BOSS_TRIBUNAL_OF_AGES, IN_PROGRESS);
-            if (GameObject *tribunal = ObjectAccessor::GetGameObject(*me, pInstance->GetData64(GO_TRIBUNAL_CONSOLE)))
-                tribunal->SetGoState(GO_STATE_ACTIVE);
-        }
-        break;
-        // Before Sjonnir's door
-    case 27:
-        SetEscortPaused(true);
-        if (pInstance)
-        {
-            pInstance->SetData(BRANN_BRONZEBEARD, 5);
+        case 9:
+            SetEscortPaused(true);
             me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
-            if (Creature *cr = ObjectAccessor::GetCreature(*me, pInstance->GetData64(NPC_SJONNIR)))
-                cr->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-            me->SetOrientation(3.132660f);
-            DoCast(me, 58506, false);
-        }
-        break;
-    case 28:
-        SetEscortPaused(true);
-        break;
-    case 29:
-        SetEscortPaused(true);
-        me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_USE_STANDING);
-        if (pInstance)
-            if (GameObject *console = ObjectAccessor::GetGameObject(*me, pInstance->GetData64(GO_SJONNIR_CONSOLE)))
-                console->SetGoState(GO_STATE_ACTIVE);
+            if (pInstance)
+                pInstance->SetData(BRANN_BRONZEBEARD, 2);
 
-        break;
+            break;
+        // In front of Console
+        case 11:
+            SetEscortPaused(true);
+            if(pInstance)
+            {
+                pInstance->SetData(BOSS_TRIBUNAL_OF_AGES, IN_PROGRESS);
+                if (GameObject *tribunal = ObjectAccessor::GetGameObject(*me, pInstance->GetData64(GO_TRIBUNAL_CONSOLE)))
+                    tribunal->SetGoState(GO_STATE_ACTIVE);
+            }
+            break;
+        // Before Sjonnir's door
+        case 27:
+            SetEscortPaused(true);
+            if(pInstance)
+            {
+                pInstance->SetData(BRANN_BRONZEBEARD, 5);
+                me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+                if (Creature *cr = ObjectAccessor::GetCreature(*me, pInstance->GetData64(NPC_SJONNIR)))
+                    cr->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                me->SetOrientation(3.132660f);
+                DoCast(me, 58506, false);
+            }
+            break;
+        case 28:
+            SetEscortPaused(true);
+            break;
+        case 29:
+            SetEscortPaused(true);
+            me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_USE_STANDING);
+            if (pInstance)
+                if (GameObject *console = ObjectAccessor::GetGameObject(*me, pInstance->GetData64(GO_SJONNIR_CONSOLE)))
+                    console->SetGoState(GO_STATE_ACTIVE);
+
+            break;
     }
 }
 
@@ -691,7 +690,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new dark_rune_protectorsAI(creature);
+        return new dark_rune_protectorsAI (creature);
     }
 
     struct dark_rune_protectorsAI : public ScriptedAI
@@ -721,20 +720,20 @@ public:
 
             switch (events.GetEvent())
             {
-            case EVENT_DRP_CHARGE:
-            {
-                if (Unit *tgt = SelectTarget(SELECT_TARGET_RANDOM, 0))
-                    me->CastSpell(tgt, SPELL_DRP_CHARGE, false);
+                case EVENT_DRP_CHARGE:
+                {
+                    if (Unit *tgt = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                        me->CastSpell(tgt, SPELL_DRP_CHARGE, false);
 
-                events.RepeatEvent(10000);
-                break;
-            }
-            case EVENT_DRP_CLEAVE:
-            {
-                me->CastSpell(me->GetVictim(), SPELL_DRP_CLEAVE, false);
-                events.RepeatEvent(7000);
-                break;
-            }
+                    events.RepeatEvent(10000);
+                    break;
+                }
+                case EVENT_DRP_CLEAVE:
+                {
+                    me->CastSpell(me->GetVictim(), SPELL_DRP_CLEAVE, false);
+                    events.RepeatEvent(7000);
+                    break;
+                }
             }
 
             DoMeleeAttackIfReady();
@@ -749,7 +748,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new dark_rune_stormcallerAI(creature);
+        return new dark_rune_stormcallerAI (creature);
     }
 
     struct dark_rune_stormcallerAI : public ScriptedAI
@@ -779,18 +778,18 @@ public:
 
             switch (events.GetEvent())
             {
-            case EVENT_DRS_LIGHTNING_BOLD:
-            {
-                me->CastSpell(me->GetVictim(), IsHeroic() ? SPELL_DRS_LIGHTING_BOLT_H : SPELL_DRS_LIGHTING_BOLT, false);
-                events.RepeatEvent(5000);
-                break;
-            }
-            case EVENT_DRS_SHADOW_WORD_PAIN:
-            {
-                me->CastSpell(me->GetVictim(), IsHeroic() ? SPELL_DRS_SHADOW_WORD_PAIN_H : SPELL_DRS_SHADOW_WORD_PAIN, false);
-                events.RepeatEvent(12000);
-                break;
-            }
+                case EVENT_DRS_LIGHTNING_BOLD:
+                {
+                    me->CastSpell(me->GetVictim(), IsHeroic() ? SPELL_DRS_LIGHTING_BOLT_H : SPELL_DRS_LIGHTING_BOLT, false);
+                    events.RepeatEvent(5000);
+                    break;
+                }
+                case EVENT_DRS_SHADOW_WORD_PAIN:
+                {
+                    me->CastSpell(me->GetVictim(), IsHeroic() ? SPELL_DRS_SHADOW_WORD_PAIN_H : SPELL_DRS_SHADOW_WORD_PAIN, false);
+                    events.RepeatEvent(12000);
+                    break;
+                }
             }
 
             DoMeleeAttackIfReady();
@@ -805,7 +804,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const
     {
-        return new iron_golem_custodianAI(creature);
+        return new iron_golem_custodianAI (creature);
     }
 
     struct iron_golem_custodianAI : public ScriptedAI
@@ -833,18 +832,18 @@ public:
 
             switch (events.GetEvent())
             {
-            case EVENT_IGC_CRUSH:
-            {
-                me->CastSpell(me->GetVictim(), SPELL_IGC_CRUSH_ARMOR, false);
-                events.RepeatEvent(6000);
-                break;
-            }
-            case EVENT_IGC_GROUND_SMASH:
-            {
-                me->CastSpell(me->GetVictim(), IsHeroic() ? SPELL_IGC_GROUND_SMASH_H : SPELL_IGC_GROUND_SMASH, false);
-                events.RepeatEvent(5000);
-                break;
-            }
+                case EVENT_IGC_CRUSH:
+                {
+                    me->CastSpell(me->GetVictim(), SPELL_IGC_CRUSH_ARMOR, false);
+                    events.RepeatEvent(6000);
+                    break;
+                }
+                case EVENT_IGC_GROUND_SMASH:
+                {
+                    me->CastSpell(me->GetVictim(), IsHeroic() ? SPELL_IGC_GROUND_SMASH_H : SPELL_IGC_GROUND_SMASH, false);
+                    events.RepeatEvent(5000);
+                    break;
+                }
             }
 
             DoMeleeAttackIfReady();
@@ -854,29 +853,29 @@ public:
 
 class spell_hos_dark_matter : public SpellScriptLoader
 {
-public:
-    spell_hos_dark_matter() : SpellScriptLoader("spell_hos_dark_matter") { }
+    public:
+        spell_hos_dark_matter() : SpellScriptLoader("spell_hos_dark_matter") { }
 
-    class spell_hos_dark_matter_AuraScript : public AuraScript
-    {
-        PrepareAuraScript(spell_hos_dark_matter_AuraScript);
-
-        void HandleEffectRemove(AuraEffect const * /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        class spell_hos_dark_matter_AuraScript : public AuraScript
         {
-            if (Unit *caster = GetCaster())
-                caster->CastSpell(caster, caster->GetMap()->IsHeroic() ? SPELL_DARK_MATTER_H : SPELL_DARK_MATTER, true);
-        }
+            PrepareAuraScript(spell_hos_dark_matter_AuraScript);
 
-        void Register()
+            void HandleEffectRemove(AuraEffect const * /*aurEff*/, AuraEffectHandleModes /*mode*/)
+            {
+                if (Unit *caster = GetCaster())
+                    caster->CastSpell(caster, caster->GetMap()->IsHeroic() ? SPELL_DARK_MATTER_H : SPELL_DARK_MATTER, true);
+            }
+
+            void Register()
+            {
+                OnEffectRemove += AuraEffectRemoveFn(spell_hos_dark_matter_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+            }
+        };
+
+        AuraScript *GetAuraScript() const
         {
-            OnEffectRemove += AuraEffectRemoveFn(spell_hos_dark_matter_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+            return new spell_hos_dark_matter_AuraScript();
         }
-    };
-
-    AuraScript *GetAuraScript() const
-    {
-        return new spell_hos_dark_matter_AuraScript();
-    }
 };
 
 void AddSC_brann_bronzebeard()
