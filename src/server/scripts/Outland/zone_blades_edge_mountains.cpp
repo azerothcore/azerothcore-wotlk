@@ -30,78 +30,180 @@ EndContentData */
 #include "SpellAuraEffects.h"
 
 // Ours
-enum deathsDoorWrapGate
+enum deathsdoorfell
 {
     SPELL_ARTILLERY_ON_THE_WRAP_GATE            = 39221,
-    SPELL_ANTI_DEMON_FLAME_THROWER              = 39222,
+    SPELL_IMP_AURA                              = 39227,
+    SPELL_HOUND_AURA                            = 39275,
+    SPELL_EXPLOSION                             = 30934,
+
+    NPC_DEATHS_DOOR_FEL_CANNON_TARGET_BUNNY     = 22495,
+    NPC_DEATHS_DOOR_FEL_CANNON                  = 22443,
+    NPC_EXPLOSION_BUNNY                         = 22502,
+    NPC_FEL_IMP                                 = 22474,
+    NPC_HOUND                                   = 22500,
     NPC_NORTH_GATE                              = 22471,
     NPC_SOUTH_GATE                              = 22472,
     NPC_NORTH_GATE_CREDIT                       = 22503,
     NPC_SOUTH_GATE_CREDIT                       = 22504,
 
+    GO_FIRE                                     = 185317,
+    GO_BIG_FIRE                                 = 185319,
+
+    EVENT_PARTY_TIMER                           = 1
 };
 
-class npc_deahts_door_wrap_gate : public CreatureScript
+class npc_deaths_door_fell_cannon_target_bunny : public CreatureScript
 {
 public:
-    npc_deahts_door_wrap_gate() : CreatureScript("npc_deahts_door_wrap_gate") { }
+    npc_deaths_door_fell_cannon_target_bunny() : CreatureScript("npc_deaths_door_fell_cannon_target_bunny") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    struct npc_deaths_door_fell_cannon_target_bunnyAI : public ScriptedAI
     {
-        return new npc_deahts_door_wrap_gateAI(creature);
-    }
+        npc_deaths_door_fell_cannon_target_bunnyAI(Creature* creature) : ScriptedAI(creature), PartyTime(false) { }
 
-    struct npc_deahts_door_wrap_gateAI : public ScriptedAI
-    {
-        npc_deahts_door_wrap_gateAI(Creature *c) : ScriptedAI(c)
+        EventMap events;
+        bool PartyTime;
+        uint64 PlayerGUID;
+        uint64 CannonGUID;
+        uint8 count;
+        
+        void Reset() override
         {
+            Initialize();
+            events.Reset();
         }
 
-        uint8 count;
-        uint32 timer;
-        void Reset() { count = 0; timer = 0;}
-        void SpellHit(Unit* caster, SpellInfo const* spellInfo)
+        void Initialize()
         {
-            if (spellInfo->Id == SPELL_ARTILLERY_ON_THE_WRAP_GATE)
-            {
-                Player* plr = caster->GetCharmerOrOwnerPlayerOrPlayerItself();
-                if (!plr)
-                    return;
+            PartyTime = false;
+            PlayerGUID = 0;
+            CannonGUID = 0;
+            count = 0;
+        }
 
-                timer = 1;
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
+        {
+            if (spell->Id == SPELL_ARTILLERY_ON_THE_WRAP_GATE)
+            {
                 count++;
 
-                if (count >= 6)
+                if (count == 1)
                 {
-                    if (me->GetEntry() == NPC_SOUTH_GATE)
-                        plr->KilledMonsterCredit(NPC_SOUTH_GATE_CREDIT, 0);
-                    else
-                        plr->KilledMonsterCredit(NPC_NORTH_GATE_CREDIT, 0);
+                    if (Player* player = caster->GetCharmerOrOwnerPlayerOrPlayerItself())
+                        PlayerGUID = player->GetGUID();
 
+                    CannonGUID = caster->GetGUID();
+                    PartyTime = true;
+                    events.ScheduleEvent(EVENT_PARTY_TIMER, 3000);
+                }
+
+                if (count >= 3)
+                    me->SummonGameObject(GO_FIRE, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 130);
+
+                if (count > 6)
+                {
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, PlayerGUID))
+                    {
+                        if (GetClosestCreatureWithEntry(me, NPC_SOUTH_GATE, 200.0f))
+                            player->KilledMonsterCredit(NPC_SOUTH_GATE_CREDIT, TRIGGERED_NONE);
+                        else if (GetClosestCreatureWithEntry(me, NPC_NORTH_GATE, 200.0f))
+                            player->KilledMonsterCredit(NPC_NORTH_GATE_CREDIT, TRIGGERED_NONE);
+                        // complete quest part
+                        if (Creature* bunny = GetClosestCreatureWithEntry(me, NPC_EXPLOSION_BUNNY, 200.0f))
+                            bunny->CastSpell(nullptr, SPELL_EXPLOSION, TRIGGERED_NONE);  
+                        if (Creature* cannon = ObjectAccessor::GetCreature(*me, CannonGUID))
+                            cannon->DespawnOrUnsummon(5000);
+                    }
+
+                    me->SummonGameObject(GO_BIG_FIRE, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 60);
                     Reset();
                 }
             }
+
+            return;
         }
 
-        void UpdateAI(uint32 diff)
+        void JustSummoned(Creature* summoned) override
         {
-            if (timer)
-            {
-                timer += diff;
-                if (timer < 10000 || (timer >= 20000 && timer < 30000))
-                {
-                    for (uint8 i = 0; i < 3; ++i)
-                        if (Creature* cr = me->SummonCreature((roll_chance_i(50) ? 22474 : 22500), me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000))
-                            if (Unit* target = cr->SelectNearbyTarget(NULL, 50.0f))
-                                cr->AI()->AttackStart(target);
+            if (summoned->GetEntry() == NPC_FEL_IMP)
+                summoned->CastSpell(summoned, SPELL_IMP_AURA, true);
+            else if (summoned->GetEntry() == NPC_HOUND)
+                summoned->CastSpell(summoned, SPELL_HOUND_AURA, true);
 
-                    timer += 10000;
-                    if (timer >= 30000)
-                        timer = 0;
+            if (Creature* Target = GetClosestCreatureWithEntry(me, NPC_DEATHS_DOOR_FEL_CANNON, 200.0f))
+            {
+                Target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_1); // attack the cannon
+                summoned->AI()->AttackStart(Target);
+            }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            events.Update(diff);
+
+            if (PartyTime)
+            {
+                if (Creature* cannon = ObjectAccessor::GetCreature(*me, CannonGUID))
+                {
+                    if (!cannon || !cannon->GetCharmerOrOwnerGUID())
+                        Reset();
+                }
+
+                switch (events.ExecuteEvent())
+                {
+                    case EVENT_PARTY_TIMER:
+                        if (roll_chance_i(20))
+                            me->SummonCreature(NPC_HOUND, 0, 0, 0, 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 10000);
+                        else 
+                            me->SummonCreature(NPC_FEL_IMP, 0, 0, 0, 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 10000);
+                            events.ScheduleEvent(EVENT_PARTY_TIMER, 3000);
+                        break;
                 }
             }
         }
     };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_deaths_door_fell_cannon_target_bunnyAI(creature);
+    }
+};
+
+class npc_deaths_fel_cannon : public CreatureScript
+{
+public:
+    npc_deaths_fel_cannon() : CreatureScript("npc_deaths_fel_cannon") { }
+
+    struct npc_deaths_fel_cannonAI : public ScriptedAI
+    {
+        npc_deaths_fel_cannonAI(Creature* creature) : ScriptedAI(creature) { }
+
+        void Reset() override
+        {
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_NOT_ATTACKABLE_1);
+        }
+
+        void UpdateAI(uint32 /*diff*/) override
+        {
+            if (me->IsNonMeleeSpellCast(false))
+                return;
+            
+            if (Creature* Target = GetClosestCreatureWithEntry(me, NPC_DEATHS_DOOR_FEL_CANNON_TARGET_BUNNY, 200.0f))
+            {
+                me->SetFacingToObject(Target);
+                me->TauntFadeOut(Target);
+                me->CombatStop(); // force
+            }
+            
+            Reset();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_deaths_fel_cannonAI(creature);
+    }
 };
 
 class spell_npc22275_crystal_prison : public SpellScriptLoader
@@ -1041,9 +1143,9 @@ class spell_oscillating_field : public SpellScriptLoader
 void AddSC_blades_edge_mountains()
 {
     // Ours
-    new npc_deahts_door_wrap_gate();
+    new npc_deaths_door_fell_cannon_target_bunny();
+    new npc_deaths_fel_cannon();
     new spell_npc22275_crystal_prison();
-
     // Theirs
     new npc_nether_drake();
     new npc_daranelle();
