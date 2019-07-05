@@ -194,8 +194,8 @@ GroupQueueInfo* BattlegroundQueue::AddGroup(Player * leader, Group * grp, PvPDif
             uint32 MaxPlayers = MinPlayers * 2;
             uint32 q_min_level = std::min(bracketEntry->minLevel, (uint32)80);
             uint32 q_max_level = std::min(bracketEntry->maxLevel, (uint32)80);
-            uint32 qHorde = GetPlayesCountInGroupsQueue(bracketId, BG_QUEUE_NORMAL_HORDE);
-            uint32 qAlliance = GetPlayesCountInGroupsQueue(bracketId, BG_QUEUE_NORMAL_ALLIANCE);            
+            uint32 qHorde = GetPlayersCountInGroupsQueue(bracketId, BG_QUEUE_NORMAL_HORDE);
+            uint32 qAlliance = GetPlayersCountInGroupsQueue(bracketId, BG_QUEUE_NORMAL_ALLIANCE);            
 
             // Show queue status to player only (when joining battleground queue or Arena and arena world announcer is disabled)
             if (sWorld->getBoolConfig(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_PLAYERONLY) || (bgt->isArena() && !sWorld->getBoolConfig(CONFIG_ARENA_QUEUE_ANNOUNCER_ENABLE)))
@@ -959,10 +959,10 @@ uint32 BattlegroundQueue::GetPlayersCountInGroupsQueue(BattlegroundBracketId bra
 {
     uint32 playersCount = 0;
 
-    auto queuedGroups = m_QueuedGroups[bracketId][bgqueue]
-    if (!queuedGroups->IsInvitedToBGInstanceGUID)
+    for (auto const& itr : m_QueuedGroups[bracketId][bgqueue])
+    if (!itr->IsInvitedToBGInstanceGUID)
         playersCount += static_cast<uint32>(itr->Players.size());
-
+    
     return playersCount;
 }
 
