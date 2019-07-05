@@ -157,7 +157,6 @@ public:
 
         void JustDied(Unit*  killer) override
         {
-			me->NearTeleportTo(nothPosition.GetPositionX(), nothPosition.GetPositionY(), nothPosition.GetPositionZ(), nothPosition.GetOrientation(), true);
             BossAI::JustDied(killer);
             Talk(SAY_DEATH);
         }
