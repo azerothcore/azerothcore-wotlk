@@ -1,3 +1,5 @@
+INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1562236589279335600');
+
 DELETE FROM `game_event_gameobject` WHERE `guid` IN (78033,78066,78105,78106,78107,78109,78111,78113,78117,78120);
 INSERT INTO `game_event_gameobject` (`eventEntry`, `guid`)
 VALUES
