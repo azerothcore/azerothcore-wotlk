@@ -682,17 +682,15 @@ public:
         {
             if (!pInstance)
                 return;
-
+             me->NearTeleportTo(me->GetPositionX(), me->GetPositionY(), 427.5, me->GetOrientation());
             if (IsEncounterComplete(pInstance, me))
             {
-                me->NearTeleportTo(me->GetPositionX(), me->GetPositionY(), 427.5, me->GetOrientation());
                 pInstance->SetData(TYPE_ASSEMBLY, DONE);
                 me->CastSpell(me, 65195, true); // credit
                 Talk(SAY_BRUNDIR_ENCOUNTER_DEFEATED);
             }
             else
             {
-                me->NearTeleportTo(me->GetPositionX(), me->GetPositionY(), 427.5, me->GetOrientation());
                 RestoreAssemblyHealth(pInstance->GetData64(DATA_STEELBREAKER), pInstance->GetData64(DATA_MOLGEIM), me);
                 me->CastSpell(me, SPELL_SUPERCHARGE, true);
                 Talk(SAY_BRUNDIR_DEATH);
