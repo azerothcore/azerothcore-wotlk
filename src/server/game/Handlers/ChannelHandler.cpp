@@ -6,9 +6,9 @@
 
 #include "ObjectMgr.h"                                      // for normalizePlayerName
 #include "ChannelMgr.h"
+#include "Chat.h"
 #include "Player.h"
 
-#include <utf8.h>
 #include <cctype>
 
 void WorldSession::HandleJoinChannel(WorldPacket& recvPacket)
@@ -41,18 +41,7 @@ void WorldSession::HandleJoinChannel(WorldPacket& recvPacket)
 
     }
 
-    if (!utf8::is_valid(channelName.begin(), channelName.end()))
-    {
-        //sLog->outDebug(LOG_FILTER_CHATSYS, "CMSG_JOIN_CHANNEL Player %s tried to create a channel with an invalid UTF8 sequence - blocked", GetPlayer()->GetGUID().ToString().c_str());
-       if (sWorld->getIntConfig(CONFIG_CHAT_STRICT_LINK_CHECKING_KICK))
-           KickPlayer("CONFIG_CHAT_STRICT_LINK_CHECKING_KICK");
-        return;
-    }
-
-
-    // pussywizard: restrict allowed characters in channel name to avoid |0 and possibly other exploits
-    //if (!ObjectMgr::IsValidChannelName(channelName))
-    if (channelName.find("|") != std::string::npos || channelName.size() >= 100)
+    if (!ChatHandler(this).isValidChatMessage(channelName.c_str()))
         return;
 
     if (ChannelMgr* cMgr = ChannelMgr::forTeam(GetPlayer()->GetTeamId()))
@@ -73,6 +62,9 @@ void WorldSession::HandleLeaveChannel(WorldPacket& recvPacket)
         GetPlayerInfo().c_str(), channelName.c_str(), channelId);
 #endif
     if (channelName.empty() && !channelId)
+        return;
+
+    if (!ChatHandler(this).isValidChatMessage(channelName.c_str()))
         return;
 
     AreaTableEntry const* zone = sAreaTableStore.LookupEntry(GetPlayer()->GetZoneId());
@@ -102,6 +94,10 @@ void WorldSession::HandleChannelList(WorldPacket& recvPacket)
         recvPacket.GetOpcode() == CMSG_CHANNEL_DISPLAY_LIST ? "CMSG_CHANNEL_DISPLAY_LIST" : "CMSG_CHANNEL_LIST",
         GetPlayerInfo().c_str(), channelName.c_str());
 #endif
+
+    if (!ChatHandler(this).isValidChatMessage(channelName.c_str()))
+        return;
+
     if (ChannelMgr* cMgr = ChannelMgr::forTeam(GetPlayer()->GetTeamId()))
         if (Channel* channel = cMgr->GetChannel(channelName, GetPlayer()))
             channel->List(GetPlayer());
@@ -233,6 +229,9 @@ void WorldSession::HandleChannelInvite(WorldPacket& recvPacket)
         GetPlayerInfo().c_str(), channelName.c_str(), targetName.c_str());
 #endif
     if (!normalizePlayerName(targetName))
+        return;
+
+    if (!ChatHandler(this).isValidChatMessage(channelName.c_str()))
         return;
 
     if (ChannelMgr* cMgr = ChannelMgr::forTeam(GetPlayer()->GetTeamId()))
