@@ -69,7 +69,7 @@ void WorldSession::HandleLeaveChannel(WorldPacket& recvPacket)
     recvPacket >> channelId >> channelName;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_CHATSYS, "CMSG_LEAVE_CHANNEL %s Channel: %s, unk1: %u",
+    sLog->outDebug(LOG_FILTER_CHATSYS, "CMSG_LEAVE_CHANNEL %s Channel: %s, channelId: %u",
         GetPlayerInfo().c_str(), channelName.c_str(), channelId);
 #endif
     if (channelName.empty() && !channelId)
