@@ -6369,7 +6369,7 @@ uint32 ObjectMgr::GenerateRecycledLowGuid(HighGuid guidHigh)
                 return _hiGoRecycledGuid++;
             break;
         }
-        default: // No es manejado por el reciclador
+        default: // Default case is not handled by the recycler
             break;
     }
 
