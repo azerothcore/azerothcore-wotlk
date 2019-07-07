@@ -32,6 +32,29 @@
 #include "LuaEngine.h"
 #endif
 
+bool WorldSession::processChatmessageFurtherAfterSecurityChecks(std::string& msg, uint32 lang)
+{
+    if (lang != LANG_ADDON)
+    {
+        // strip invisible characters for non-addon messages
+        if (sWorld->getBoolConfig(CONFIG_CHAT_FAKE_MESSAGE_PREVENTING))
+            stripLineInvisibleChars(msg);
+
+        if (sWorld->getIntConfig(CONFIG_CHAT_STRICT_LINK_CHECKING_SEVERITY) && AccountMgr::IsPlayerAccount(GetSecurity())
+                && !ChatHandler(this).isValidChatMessage(msg.c_str()))
+        {
+            sLog->outError("Player %s (GUID: %u) sent a chatmessage with an invalid link: %s", GetPlayer()->GetName(),
+                    GetPlayer()->GetGUIDLow(), msg.c_str());
+
+            if (sWorld->getIntConfig(CONFIG_CHAT_STRICT_LINK_CHECKING_KICK))
+                KickPlayer();
+            return false;
+        }
+    }
+
+    return true;
+}
+
 void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
 {
     uint32 type;
@@ -303,36 +326,12 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
             return;
         }
 
-        if (lang != LANG_ADDON)
-        {
-            if (sWorld->getIntConfig(CONFIG_CHAT_STRICT_LINK_CHECKING_SEVERITY) && !ChatHandler(this).isValidChatMessage(msg.c_str()))
-            {
-                //sLog->outError("Player %s (GUID: %u) sent a chatmessage with an invalid link: %s", GetPlayer()->GetName().c_str(),
-                //    GetPlayer()->GetGUIDLow(), msg.c_str());
+        if (!processChatmessageFurtherAfterSecurityChecks(msg, lang))
+            return;
 
-                if (sWorld->getIntConfig(CONFIG_CHAT_STRICT_LINK_CHECKING_KICK))
-                    KickPlayer("CONFIG_CHAT_STRICT_LINK_CHECKING_KICK");
-
-                return;
-            }
-        }
+        if (msg.empty())
+            return;
     }
-
-    // exploit
-    size_t found1 = msg.find("|Hquest");
-    if (found1 != std::string::npos)
-    {
-        size_t found2 = msg.find(":", found1+8);
-        size_t found3 = msg.find("|", found1+8);
-        if (found3 != std::string::npos)
-        {
-            if (found2 == std::string::npos)
-                return;
-            if (found2 > found3)
-                return;
-        }
-    }
-
 
     switch (type)
     {
