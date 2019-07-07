@@ -39,6 +39,8 @@ void WorldSession::HandleJoinChannel(WorldPacket& recvPacket)
         data << uint8(CHAT_INVALID_NAME_NOTICE) << channelName;
         SendPacket(&data);
 
+    }
+
     if (!utf8::is_valid(channelName.begin(), channelName.end()))
     {
         //sLog->outDebug(LOG_FILTER_CHATSYS, "CMSG_JOIN_CHANNEL Player %s tried to create a channel with an invalid UTF8 sequence - blocked", GetPlayer()->GetGUID().ToString().c_str());
