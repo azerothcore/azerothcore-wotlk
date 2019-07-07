@@ -8,6 +8,7 @@
 #include "ChannelMgr.h"
 #include "Player.h"
 
+#include <utf8.h>
 #include <cctype>
 
 void WorldSession::HandleJoinChannel(WorldPacket& recvPacket)
