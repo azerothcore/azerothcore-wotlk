@@ -21,22 +21,31 @@ void WorldSession::HandleJoinChannel(WorldPacket& recvPacket)
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_CHATSYS, "CMSG_JOIN_CHANNEL %s Channel: %u, unk1: %u, unk2: %u, channel: %s, password: %s", GetPlayerInfo().c_str(), channelId, unknown1, unknown2, channelName.c_str(), password.c_str());
 #endif
+
+    AreaTableEntry const* zone = sAreaTableStore.LookupEntry(GetPlayer()->GetZoneId());
     if (channelId)
     {
         ChatChannelsEntry const* channel = sChatChannelsStore.LookupEntry(channelId);
         if (!channel)
             return;
-
-        AreaTableEntry const* zone = sAreaTableStore.LookupEntry(GetPlayer()->GetZoneId());
         if (!zone || !GetPlayer()->CanJoinConstantChannelInZone(channel, zone))
             return;
     }
 
-    if (channelName.empty())
-        return;
+    if (channelName.empty() || isdigit((unsigned char)channelName[0]))
+    {
+        WorldPacket data(SMSG_CHANNEL_NOTIFY, 1 + channelName.size());
+        data << uint8(CHAT_INVALID_NAME_NOTICE) << channelName;
+        SendPacket(&data);
 
-    if (isdigit(channelName[0]))
+    if (!utf8::is_valid(channelName.begin(), channelName.end()))
+    {
+        //sLog->outDebug(LOG_FILTER_CHATSYS, "CMSG_JOIN_CHANNEL Player %s tried to create a channel with an invalid UTF8 sequence - blocked", GetPlayer()->GetGUID().ToString().c_str());
+       if (sWorld->getIntConfig(CONFIG_CHAT_STRICT_LINK_CHECKING_KICK))
+           KickPlayer("CONFIG_CHAT_STRICT_LINK_CHECKING_KICK");
         return;
+    }
+
 
     // pussywizard: restrict allowed characters in channel name to avoid |0 and possibly other exploits
     //if (!ObjectMgr::IsValidChannelName(channelName))
@@ -52,16 +61,26 @@ void WorldSession::HandleJoinChannel(WorldPacket& recvPacket)
 
 void WorldSession::HandleLeaveChannel(WorldPacket& recvPacket)
 {
-    uint32 unk;
+    uint32 channelId;
     std::string channelName;
-    recvPacket >> unk >> channelName;
+    recvPacket >> channelId >> channelName;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_CHATSYS, "CMSG_LEAVE_CHANNEL %s Channel: %s, unk1: %u",
-        GetPlayerInfo().c_str(), channelName.c_str(), unk);
+        GetPlayerInfo().c_str(), channelName.c_str(), channelId);
 #endif
-    if (channelName.empty())
+    if (channelName.empty() && !channelId)
         return;
+
+    AreaTableEntry const* zone = sAreaTableStore.LookupEntry(GetPlayer()->GetZoneId());
+    if (channelId)
+    {
+        ChatChannelsEntry const* channel = sChatChannelsStore.LookupEntry(channelId);
+        if (!channel)
+            return;
+        if (!zone || !GetPlayer()->CanJoinConstantChannelInZone(channel, zone))
+            return;
+    }
 
     if (ChannelMgr* cMgr = ChannelMgr::forTeam(GetPlayer()->GetTeamId()))
     {
