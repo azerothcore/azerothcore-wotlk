@@ -1,3 +1,19 @@
+-- DB update 2019_07_08_00 -> 2019_07_09_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2019_07_08_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2019_07_08_00 2019_07_09_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1561636568439132700'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1561636568439132700');
 
 -- "Caverndeep Burrower" and "Caverndeep Reaver" used wrong group id "1" for their creature text ("0" is correct)
@@ -21,3 +37,12 @@ UPDATE `smart_scripts` SET `target_type` = 1 WHERE `action_type` = 1 AND `target
 
 -- "Scarlet Medic" has to use target "self" for the "talk" action
 UPDATE `smart_scripts` SET `target_type` = 1 WHERE `action_type` = 1 AND `target_type` = 2 AND `source_type` = 0 AND `entryorguid` = 28608;
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
