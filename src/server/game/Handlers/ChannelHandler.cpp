@@ -9,7 +9,7 @@
 #include "Player.h"
 
 #include <cctype>
-#include <utf8.h>
+#include "utf8.h"
 
 void WorldSession::HandleJoinChannel(WorldPacket& recvPacket)
 {
