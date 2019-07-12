@@ -1,5 +1,5 @@
 -- Strings for ASH + AFH allerts
-DELETE FROM `trinity_string` where `entry` IN (882, 6617, 6618, 6619, 6620, 6621, 6622, 6623, 6624, 6625);
+DELETE FROM `trinity_string` where `entry` IN ('882', '6617', '6618', '6619', '6620', '6621', '6622', '6623', '6624', '6625');
 INSERT INTO `trinity_string` (`entry`, `content_default`) VALUES
 ('882', '│ CanFly ?: %s'),
 ('6617', 'AntiCheat: SpeedHack Detected for %s, normal distance for this time and speed = %f, distance from packet = %f'),
