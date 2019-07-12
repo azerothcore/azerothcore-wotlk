@@ -71,7 +71,7 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 -- Karja waypath
 DELETE FROM `waypoint_data` WHERE `id` = 500020;
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES
-(500010, 0, 4808.67, 3776.1, 210.545, 0.185895, 0, 0, 0, 100, 0),
+(500020, 0, 4808.67, 3776.1, 210.545, 0.185895, 0, 0, 0, 100, 0),
 (500020, 1, 4808.06, 3770.48, 210.535, 5.71456, 0, 0, 0, 100, 0),
 (500020, 2, 4816.65, 3772.83, 210.533, 6.09434, 0, 0, 0, 100, 0),
 (500020, 3, 4834.06, 3775.74, 207.883, 0.27454, 0, 0, 0, 100, 0),
