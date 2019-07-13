@@ -126,7 +126,7 @@ WorldSession::WorldSession(uint32 id, WorldSocket* sock, AccountTypes sec, uint8
         m_Address = sock->GetRemoteAddress();
         sock->AddReference();
         ResetTimeOutTime(false);
-        LoginDatabase.PExecute("UPDATE account SET online = %u WHERE id = %u;", realmID, GetAccountId());
+        LoginDatabase.PExecute("UPDATE account SET online = 1 WHERE id = %u;", GetAccountId());
     }
 
     InitializeQueryCallbackParameters();
@@ -161,7 +161,7 @@ WorldSession::~WorldSession()
         delete packet;
 
     if (GetShouldSetOfflineInDB())
-        LoginDatabase.PExecute("UPDATE account SET online = %u WHERE id = %u;", realmID, GetAccountId());     // One-time query
+        LoginDatabase.PExecute("UPDATE account SET online = 0 WHERE id = %u;", GetAccountId());     // One-time query
 }
 
 std::string const & WorldSession::GetPlayerName() const
