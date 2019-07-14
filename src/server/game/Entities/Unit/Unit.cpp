@@ -16707,7 +16707,6 @@ void Unit::SetControlled(bool apply, UnitState state)
         {
             uint32 pinginthismoment = fabs(ToPlayer()->GetLastMoveClientTimestamp() - ToPlayer()->GetLastMoveServerTimestamp()) / 1000000;
             ToPlayer()->SetRootACKUpd(pinginthismoment);
-            //TC_LOG_INFO("anticheat", "Latency = %u", pinginthismoment);
         }
     }
     else

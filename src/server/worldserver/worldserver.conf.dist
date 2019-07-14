@@ -3302,11 +3302,14 @@ AntiCheats.FakeFlyingmode.Enabled = 1
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 
-AntiCheats.IgnoreControlMovement.Enabled = 0
+AntiCheats.IgnoreControlMovement.Enabled = 1
+
+#
+###################################################################################################
 
 ###################################################################################################
 # Sanctions - Kicks
-#    
+#
 #    AntiCheats.FlyHack.Kick.Enabled
 #        Description: Enable AntiCheat.FlyHack Kick when detected
 #        Default:     1 - (Enabled)
@@ -3335,11 +3338,15 @@ AntiCheats.FakeJumper.Kick.Enabled = 1
 
 AntiCheats.FakeFlyingmode.Kick.Enabled = 1
 
+#
+###################################################################################################
+
 ###################################################################################################
 #    AntiCheats.FlyHackTimer
 #        Description: Timer for AntiCheat FlyHack check
-#        Default:     3000 - 1 check in 1 second
+#        Default:     3000 - 1 check in 3 second (for big projects better (1500ppl +) set 5000 (5 sec) or more)
 
 AntiCheats.FlyHackTimer = 3000
 
+#
 ###################################################################################################

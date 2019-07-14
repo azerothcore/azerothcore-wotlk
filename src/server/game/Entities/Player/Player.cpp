@@ -946,7 +946,6 @@ Player::Player(WorldSession* session): Unit(true), m_mover(this)
         m_charmAISpells[i] = 0;
 
     m_applyResilience = true;
-    //m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_FLYING | MOVEMENTFLAG_DISABLE_GRAVITY); only for experimental mode
 }
 
 Player::~Player()

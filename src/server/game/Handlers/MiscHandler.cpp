@@ -1785,7 +1785,6 @@ void WorldSession::HandleMoveSetCanFlyAckOpcode(WorldPacket & recv_data)
     uint64 guid;                                            // guid - unused
     recv_data.readPackGUID(guid);
 
-    // pussywizard: typical check for incomming movement packets
     if (!_player)
     {
         recv_data.rfinish(); // prevent warnings spam
