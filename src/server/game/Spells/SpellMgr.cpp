@@ -4325,14 +4325,6 @@ void SpellMgr::LoadDbcDataCorrections()
         case 50990: // Flame Breath (Catapult)
             spellInfo->EffectRadiusIndex[EFFECT_0] = 30; // Radius: 30 yards
             break;
-         //This spells should interrupts npc spell casting(SPELL_ATTR7_INTERRUPT_ONLY_NONPLAYER)
-         case 47476: // Deathknight - Strangulate
-         case 15487: // Priest - Silence
-         case 5211:  // Druid - Bash  - R1
-         case 6798:  // Druid - Bash  - R2
-         case 8983:  // Druid - Bash  - R3
-            spellInfo->AttributesEx7 |= SPELL_ATTR7_INTERRUPT_ONLY_NONPLAYER;
-            break;
 
         /////////////////////////////////
         ///// Generic NPC Spells

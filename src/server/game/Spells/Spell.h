@@ -234,11 +234,14 @@ struct ChannelTargetData
     SpellDestination spellDst;
 };
 
+<<<<<<< HEAD
 /* Interrupts non-player spellcasting (works through immunity)
  * Ex: Spells like Arcane Torrent-BF racial, Hammer of Justice-Paladin, Maim-Druid.... should interrupt non-player spellcasting
  */ 
 #define SPELL_INTERRUPT_NONPLAYER 32747
 
+=======
+>>>>>>> parent of 5e21ad54... Core/Spells: Implement SPELL_ATTR7_INTERRUPT_ONLY_NONPLAYER
 class Spell
 {
     friend void Unit::SetCurrentCastedSpell(Spell* pSpell);
