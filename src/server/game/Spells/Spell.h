@@ -234,10 +234,7 @@ struct ChannelTargetData
     SpellDestination spellDst;
 };
 
-/* Interrupts non-player spellcasting (works through immunity)
- * Ex: Spells like Arcane Torrent-BF racial, Hammer of Justice-Paladin, Maim-Druid.... should interrupt non-player spellcasting
- */ 
-#define SPELL_INTERRUPT_NONPLAYER 32747
+static const uint32 SPELL_INTERRUPT_NONPLAYER = 32747;
 
 class Spell
 {
