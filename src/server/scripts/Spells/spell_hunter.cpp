@@ -1121,7 +1121,7 @@ class spell_hun_tame_beast : public SpellScriptLoader
                         return SPELL_FAILED_DONT_REPORT;
                     }
                     
-                    if (caster->GetPetGUID() || player->GetTemporaryUnsummonedPetNumber() || player->isPetDismissed() || player->GetCharmGUID())
+                    if (caster->GetPetGUID() || player->GetTemporaryUnsummonedPetNumber() || player->IsPetDismissed() || player->GetCharmGUID())
                     {
                         player->SendTameFailure(PET_TAME_ANOTHER_SUMMON_ACTIVE);
                         return SPELL_FAILED_DONT_REPORT;
