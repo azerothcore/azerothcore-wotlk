@@ -486,6 +486,7 @@ public:
 
                                             pPlayer->SetUnitMovementFlags(MOVEMENTFLAG_NONE);
                                             pPlayer->SetDisableGravity(true, true);
+                                            pPlayer->SetCanFlybyServer(true);
                                             WorldPacket data(SMSG_SPLINE_MOVE_UNROOT, 8);
                                             data.append(pPlayer->GetPackGUID());
                                             pPlayer->SendMessageToSet(&data, true);
@@ -866,6 +867,7 @@ public:
                 plr->MonsterMoveWithSpeed(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), speed);
                 plr->RemoveAura(SPELL_FREEZE_ANIM);
                 plr->SetDisableGravity(false, true);
+                plr->SetCanFlybyServer(false);
                 plr->SetUInt64Value(PLAYER_FARSIGHT, 0);
                 plr->SetUnderACKmount();
                 plr->SetSkipOnePacketForASH(true);
@@ -905,6 +907,9 @@ public:
                     {
                         bUpdatedFlying = true;
                         plr->SetDisableGravity(true, true);
+                        plr->SetCanFlybyServer(true);
+                        plr->SetSkipOnePacketForASH(true);
+                        plr->SetUnderACKmount();
                     }
 
                     plr->SendMonsterMove(me->GetPositionX()+dist*cos(arcangle), me->GetPositionY()+dist*sin(arcangle), me->GetPositionZ(), VORTEX_DEFAULT_DIFF*2, SPLINEFLAG_FLYING);
