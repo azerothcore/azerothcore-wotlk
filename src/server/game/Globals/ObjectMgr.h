@@ -813,7 +813,7 @@ class ObjectMgr
             return _tavernAreaTriggerStore.find(Trigger_ID) != _tavernAreaTriggerStore.end();
         }
 
-        GossipText const* GetGossipText(uint32 Text_ID) const;       
+        GossipText const* GetGossipText(uint32 Text_ID) const;
 
         AreaTrigger const* GetAreaTrigger(uint32 trigger) const
         {
@@ -1057,6 +1057,7 @@ class ObjectMgr
 
         void SetHighestGuids();
         uint32 GenerateLowGuid(HighGuid guidhigh);
+        uint32 GenerateRecycledLowGuid(HighGuid guidHigh);
         uint32 GenerateAuctionID();
         uint64 GenerateEquipmentSetGuid();
         uint32 GenerateMailID();
@@ -1114,7 +1115,7 @@ class ObjectMgr
             TempSummonDataContainer::const_iterator itr = _tempSummonDataStore.find(TempSummonGroupKey(summonerId, summonerType, group));
             if (itr != _tempSummonDataStore.end())
                 return &itr->second;
-                   
+
             return NULL;
         }
 
@@ -1214,7 +1215,7 @@ class ObjectMgr
         }
         GameObjectData& NewGOData(uint32 guid) { return _gameObjectDataStore[guid]; }
         void DeleteGOData(uint32 guid);
-       
+
 	    TrinityString const* GetTrinityString(uint32 entry) const
         {
             TrinityStringContainer::const_iterator itr = _trinityStringStore.find(entry);
@@ -1353,6 +1354,11 @@ class ObjectMgr
         uint32 _hiDoGuid; ACE_Thread_Mutex _hiDoGuidMutex;
         uint32 _hiCorpseGuid; ACE_Thread_Mutex _hiCorpseGuidMutex;
         uint32 _hiMoTransGuid; ACE_Thread_Mutex _hiMoTransGuidMutex;
+
+        uint32 _hiCreatureRecycledGuidMax;
+        uint32 _hiCreatureRecycledGuid;
+        uint32 _hiGoRecycledGuidMax;
+        uint32 _hiGoRecycledGuid;
 
         QuestMap _questTemplates;
         std::vector<Quest*> _questTemplatesFast; // pussywizard

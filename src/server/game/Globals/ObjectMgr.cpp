@@ -3863,7 +3863,7 @@ void ObjectMgr::LoadQuests()
         "RewardFactionID1, RewardFactionValue1, RewardFactionOverride1, RewardFactionID2, RewardFactionValue2, RewardFactionOverride2, RewardFactionID3, RewardFactionValue3, RewardFactionOverride3, RewardFactionID4, RewardFactionValue4, RewardFactionOverride4, RewardFactionID5, RewardFactionValue5,  RewardFactionOverride5,"
         //   62        63      64        65
         "POIContinent, POIx, POIy, POIPriority, "
-        //   66          67               68           69                    70 
+        //   66          67               68           69                    70
         "LogTitle, LogDescription, QuestDescription, AreaDescription, QuestCompletionLog, "
         //      71                72                73                74                   75                     76                    77                      78
         "RequiredNpcOrGo1, RequiredNpcOrGo2, RequiredNpcOrGo3, RequiredNpcOrGo4, RequiredNpcOrGoCount1, RequiredNpcOrGoCount2, RequiredNpcOrGoCount3, RequiredNpcOrGoCount4, "
@@ -5416,7 +5416,7 @@ void ObjectMgr::LoadGossipText()
 
     do
     {
-        
+
         cic = 0;
 
         Field* fields = result->Fetch();
@@ -6198,7 +6198,12 @@ void ObjectMgr::SetHighestGuids()
 
     result = WorldDatabase.Query("SELECT MAX(guid) FROM creature");
     if (result)
+    {
         _hiCreatureGuid = (*result)[0].GetUInt32()+1;
+        _hiCreatureRecycledGuid = _hiCreatureGuid;
+        _hiCreatureRecycledGuidMax = _hiCreatureRecycledGuid + 10000;
+        _hiCreatureGuid = _hiCreatureRecycledGuidMax + 1;
+    }
 
     result = CharacterDatabase.Query("SELECT MAX(guid) FROM item_instance");
     if (result)
@@ -6212,7 +6217,12 @@ void ObjectMgr::SetHighestGuids()
 
     result = WorldDatabase.Query("SELECT MAX(guid) FROM gameobject");
     if (result)
+    {
         _hiGoGuid = (*result)[0].GetUInt32()+1;
+        _hiGoRecycledGuid = _hiGoGuid;
+        _hiGoRecycledGuidMax = _hiGoRecycledGuid + 1;
+        _hiGoGuid = _hiGoRecycledGuidMax + 1;
+    }
 
     result = WorldDatabase.Query("SELECT MAX(guid) FROM transports");
     if (result)
@@ -6339,6 +6349,31 @@ uint32 ObjectMgr::GenerateLowGuid(HighGuid guidhigh)
             ASSERT(false && "ObjectMgr::GenerateLowGuid - Unknown HIGHGUID type");
             return 0;
     }
+}
+
+uint32 ObjectMgr::GenerateRecycledLowGuid(HighGuid guidHigh)
+{
+    switch (guidHigh)
+    {
+        case HIGHGUID_UNIT:
+        {
+            ASSERT(_hiCreatureRecycledGuid < 0x00FFFFFE && "Creature recycled guid overflow!");
+            if (_hiCreatureRecycledGuid < _hiCreatureRecycledGuidMax)
+                return _hiCreatureRecycledGuid++;
+            break;
+        }
+        case HIGHGUID_GAMEOBJECT:
+        {
+            ASSERT(_hiGoRecycledGuid < 0x00FFFFFE && "Gameobject recycled guid overflow!");
+            if (_hiGoRecycledGuid < _hiGoRecycledGuidMax)
+                return _hiGoRecycledGuid++;
+            break;
+        }
+        default: // Default case is not handled by the recycler
+            break;
+    }
+
+    return GenerateLowGuid(guidHigh);
 }
 
 void ObjectMgr::LoadGameObjectLocales()
@@ -7804,7 +7839,7 @@ void ObjectMgr::ChangeFishingBaseSkillLevel(uint32 entry, int32 skill)
         sLog->outErrorDb("AreaId %u defined in `skill_fishing_base_level` does not exist", entry);
         return;
     }
-    
+
     _fishingBaseForAreaStore[entry] = skill;
 
     sLog->outString(">> Fishing base skill level of area %u changed to %u", entry, skill);
@@ -8359,7 +8394,7 @@ void ObjectMgr::LoadGossipMenuItems()
     _gossipMenuItemsStore.clear();
 
     QueryResult result = WorldDatabase.Query(
-    //      0       1         2           3           4                      5           6              7             8            9         10        11       12  
+    //      0       1         2           3           4                      5           6              7             8            9         10        11       12
     "SELECT MenuID, OptionID, OptionIcon, OptionText, OptionBroadcastTextID, OptionType, OptionNpcFlag, ActionMenuID, ActionPoiID, BoxCoded, BoxMoney, BoxText, BoxBroadcastTextID "
     "FROM gossip_menu_option ORDER BY MenuID, OptionID");
 
