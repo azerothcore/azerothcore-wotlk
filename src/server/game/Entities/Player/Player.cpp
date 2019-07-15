@@ -27553,3 +27553,26 @@ void Player::SummonPet(uint32 entry, float x, float y, float z, float ang, PetTy
     AsynchPetSummon* asynchPetInfo = new AsynchPetSummon(entry, pos, petType, duration, createdBySpell, casterGUID);
     Pet::LoadPetFromDB(this, asynchLoadType, entry, 0, false, asynchPetInfo);
 }
+
+bool Player::IsPetDismissed()
+{
+    /*
+    * Check PET_SAVE_NOT_IN_SLOT means the pet is dismissed. If someone ever
+    * Changes the slot flag, they will break this validation.
+    */
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_PET_BY_ENTRY_AND_SLOT);
+    stmt->setUInt32(0, GetGUIDLow());
+    stmt->setUInt8(1, uint8(PET_SAVE_NOT_IN_SLOT));
+
+    if (PreparedQueryResult result = CharacterDatabase.AsyncQuery(stmt))
+        return true;
+
+    return false;
+}
+
+void Player::SendTameFailure(uint8 result)
+{
+    WorldPacket data(SMSG_PET_TAME_FAILURE, 1);
+    data << uint8(result);
+    SendDirectMessage(&data);
+}
