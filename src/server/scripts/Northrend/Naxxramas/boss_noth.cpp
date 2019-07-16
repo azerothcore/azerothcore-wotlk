@@ -73,7 +73,7 @@ public:
 
     struct boss_nothAI : public BossAI
     {
-        boss_nothAI(Creature *c) : BossAI(c, BOSS_NOTH), summons(me)
+        explicit boss_nothAI(Creature *c) : BossAI(c, BOSS_NOTH), summons(me)
         {
             pInstance = me->GetInstanceScript();
         }

@@ -123,7 +123,7 @@ public:
 
     struct boss_four_horsemenAI : public BossAI
     {
-        boss_four_horsemenAI(Creature *c) : BossAI(c, BOSS_HORSEMAN)
+        explicit boss_four_horsemenAI(Creature *c) : BossAI(c, BOSS_HORSEMAN)
         {
             pInstance = me->GetInstanceScript();
             switch (me->GetEntry())
@@ -145,8 +145,8 @@ public:
 
         EventMap events;
         InstanceScript* pInstance;
-        uint8 currentWaypoint;
-        uint8 movementPhase;
+        uint8 currentWaypoint{};
+        uint8 movementPhase{};
         uint8 horsemanId;
 
         void MoveToCorner()
