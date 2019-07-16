@@ -105,7 +105,7 @@ public:
 
     struct boss_thaddiusAI : public BossAI
     {
-        boss_thaddiusAI(Creature *c) : BossAI(c, BOSS_THADDIUS), summons(me), ballLightningEnabled(false)
+        explicit boss_thaddiusAI(Creature *c) : BossAI(c, BOSS_THADDIUS), summons(me), ballLightningEnabled(false)
         {
             pInstance = me->GetInstanceScript();
         }
@@ -113,9 +113,9 @@ public:
         InstanceScript* pInstance;
         EventMap events;
         SummonList summons;
-        uint32 summonTimer;
-        uint32 reviveTimer;
-        uint32 resetTimer;
+        uint32 summonTimer{};
+        uint32 reviveTimer{};
+        uint32 resetTimer{};
         bool ballLightningEnabled;
 
         void StartEvent()
@@ -315,7 +315,7 @@ public:
 
     struct boss_thaddius_summonAI : public ScriptedAI
     {
-        boss_thaddius_summonAI(Creature *c) : ScriptedAI(c) 
+        explicit boss_thaddius_summonAI(Creature *c) : ScriptedAI(c)
         {
            pInstance = me->GetInstanceScript();
            overload = false;
@@ -324,8 +324,8 @@ public:
 
         InstanceScript* pInstance;
         EventMap events;
-        uint32 pullTimer;
-        uint32 visualTimer;
+        uint32 pullTimer{};
+        uint32 visualTimer{};
         bool overload;
         uint64 myCoil;
 
@@ -334,7 +334,7 @@ public:
             pullTimer = 0;
             visualTimer = 1;
             overload = false;
-            
+
             events.Reset();
             me->SetControlled(false, UNIT_STATE_STUNNED);
             if (Creature* cr = me->FindNearestCreature(NPC_TESLA_COIL, 150.0f))
@@ -538,9 +538,9 @@ class spell_thaddius_pos_neg_charge : public SpellScriptLoader
             void HandleTargets(std::list<WorldObject*>& targets)
             {
                 uint8 count = 0;
-                for (std::list<WorldObject*>::iterator ihit = targets.begin(); ihit != targets.end(); ++ihit)
-                    if ((*ihit)->GetGUID() != GetCaster()->GetGUID())
-                        if (Player* target = (*ihit)->ToPlayer())
+                for (auto & ihit : targets)
+                    if (ihit->GetGUID() != GetCaster()->GetGUID())
+                        if (Player* target = ihit->ToPlayer())
                             if (target->HasAura(GetTriggeringSpell()->Id))
                                 ++count;
 

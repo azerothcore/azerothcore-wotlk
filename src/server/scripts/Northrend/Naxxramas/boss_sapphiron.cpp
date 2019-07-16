@@ -79,17 +79,17 @@ public:
 
     struct boss_sapphironAI : public BossAI
     {
-        boss_sapphironAI(Creature* c) : BossAI(c, BOSS_SAPPHIRON)
+        explicit boss_sapphironAI(Creature* c) : BossAI(c, BOSS_SAPPHIRON)
         {
             pInstance = me->GetInstanceScript();
         }
 
         EventMap events;
         InstanceScript* pInstance;
-        uint8 iceboltCount;
-        uint32 spawnTimer;
+        uint8 iceboltCount{};
+        uint32 spawnTimer{};
         std::list<uint64> blockList;
-        uint64 currentTarget;
+        uint64 currentTarget{};
 
         void InitializeAI() override
         {
@@ -129,9 +129,9 @@ public:
             Map::PlayerList const &PlList = me->GetMap()->GetPlayers();
             if (PlList.isEmpty())
                 return;
-            for (Map::PlayerList::const_iterator i = PlList.begin(); i != PlList.end(); ++i)
+            for (const auto & i : PlList)
             {
-                if (Player* player = i->GetSource())
+                if (Player* player = i.GetSource())
                 {
                     if (player->IsGameMaster())
                         continue;
@@ -299,7 +299,7 @@ public:
                             me->SummonGameObject(GO_ICE_BLOCK, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), target->GetOrientation(), 0.0f, 0.0f, 0.0f, 0.0f, 0);
             
                     std::vector<Unit*> targets;
-                    ThreatContainer::StorageType::const_iterator i = me->getThreatManager().getThreatList().begin();
+                    auto i = me->getThreatManager().getThreatList().begin();
                     for (; i != me->getThreatManager().getThreatList().end(); ++i)
                         if ((*i)->getTarget()->GetTypeId() == TYPEID_PLAYER)
                         {
@@ -318,7 +318,7 @@ public:
 
                     if (!targets.empty() && iceboltCount)
                     {
-                        std::vector<Unit*>::iterator itr = targets.begin();
+                        auto itr = targets.begin();
                         advance(itr, urand(0, targets.size()-1));
                         me->CastSpell(*itr, SPELL_ICEBOLT_CAST, false);
                         blockList.push_back((*itr)->GetGUID());
@@ -369,9 +369,9 @@ public:
                 case EVENT_HUNDRED_CLUB:
                 {
                     Map::PlayerList const& pList = me->GetMap()->GetPlayers();
-                    for(Map::PlayerList::const_iterator itr = pList.begin(); itr != pList.end(); ++itr)
+                    for (const auto & itr : pList)
                     {
-                        if (itr->GetSource()->GetResistance(SPELL_SCHOOL_FROST) > 100 && pInstance)
+                        if (itr.GetSource()->GetResistance(SPELL_SCHOOL_FROST) > 100 && pInstance)
                         {
                             events.PopEvent();
                             pInstance->SetData(DATA_HUNDRED_CLUB, 0);
@@ -405,15 +405,15 @@ class spell_sapphiron_frost_explosion : public SpellScriptLoader
                     return;
 
                 std::list<WorldObject*> tmplist;
-                for (std::list<WorldObject*>::iterator itr = targets.begin(); itr != targets.end(); ++itr)
+                for (auto & target : targets)
                 {
-                    if (CAST_AI(boss_sapphiron::boss_sapphironAI, caster->ToCreature()->AI())->IsValidExplosionTarget(*itr))
-                        tmplist.push_back(*itr);
+                    if (CAST_AI(boss_sapphiron::boss_sapphironAI, caster->ToCreature()->AI())->IsValidExplosionTarget(target))
+                        tmplist.push_back(target);
                 }
 
                  targets.clear();
-                 for (std::list<WorldObject*>::iterator itr = tmplist.begin(); itr != tmplist.end(); ++itr)
-                     targets.push_back(*itr);
+                 for (auto & itr : tmplist)
+                     targets.push_back(itr);
             }
 
             void Register() override
