@@ -6,9 +6,11 @@ UPDATE `creature_template` SET `AIName`="SmartAI" WHERE `entry`=@ENTRY;
 DELETE FROM `smart_scripts` WHERE `entryorguid`=@ENTRY AND `source_type`=0;
 INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES
 (@ENTRY,0,0,1,20,0,100,1,9759,0,0,0,1,0,0,0,0,0,0,7,0,0,0,0,0,0,0,'Exarch Admetius - On Quest Ending Their World Finished - Say Line 0 (No Repeat)'),
-(@ENTRY,0,1,0,61,0,100,0,9759,0,0,0,80,1765800,2,0,0,0,0,1,0,0,0,0,0,0,0,'Exarch Admetius - On Quest Ending Their World Finished - Run Script (No Repeat)');
+(@ENTRY,0,1,2,61,0,100,0,0,0,0,0,80,1765800,2,0,0,0,0,1,0,0,0,0,0,0,0,'Exarch Admetius - On Quest Ending Their World Finished - Run Script (No Repeat)'),
+(@ENTRY,0,2,0,61,0,100,0,0,0,0,0,67,1,300000,300000,0,0,0,1,0,0,0,0,0,0,0,'Exarch Admetius - On Quest Ending Their World Finished - Create Timed Event ID 1 (No Repeat)'),
+(@ENTRY,0,3,0,59,0,100,0,1,0,0,0,78,0,0,0,0,0,0,1,0,0,0,0,0,0,0,'Exarch Admetius - On Timed Event ID 1 - Reset Script'); -- Allow starting a new event after the ongoing event is finished
 
- -- Actionlist SAI
+-- Actionlist SAI
 SET @ENTRY := 1765800;
 DELETE FROM `smart_scripts` WHERE `entryorguid`=@ENTRY AND `source_type`=9;
 INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES
@@ -39,3 +41,110 @@ INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type
 (@ENTRY,9,24,0,0,0,100,0,0,0,0,0,12,17311,2,300000,0,0,0,8,0,0,0,-1954.8,-11838.6,55.2527,1.1616,'Exarch Admetius - On Script - Summon Creature Cowlen'),
 (@ENTRY,9,25,0,0,0,100,0,0,0,0,0,12,17649,2,300000,0,0,0,8,0,0,0,-1955.7,-11843.1,54.1458,1.17557,'Exarch Admetius - On Script - Summon Creature Kessel'),
 (@ENTRY,9,26,0,0,0,100,0,0,0,0,0,12,17468,2,300000,0,0,0,8,0,0,0,-1965.8,-11838.7,53.2196,0.792683,'Exarch Admetius - On Script - Summon Creature Prophet Velen');
+
+-- Blade of Argus SAI
+SET @ENTRY := 17659;
+UPDATE `creature_template` SET `AIName`="SmartAI" WHERE `entry`=@ENTRY;
+DELETE FROM `smart_scripts` WHERE `entryorguid`=@ENTRY AND `source_type`=0;
+INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES
+(@ENTRY,0,0,0,54,0,100,0,0,0,0,0,90,8,0,0,0,0,0,1,0,0,0,0,0,0,0,'Blade of Argus - On Just Summoned - Set Flag Standstate Kneel');
+
+-- Diktynna SAI
+SET @ENTRY := 17101;
+UPDATE `creature_template` SET `AIName`="SmartAI" WHERE `entry`=@ENTRY;
+DELETE FROM `smart_scripts` WHERE `entryorguid`=@ENTRY AND `source_type`=0 AND `id` IN (1,2);
+INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES
+(@ENTRY,0,1,0,54,0,100,0,0,0,0,0,22,1,0,0,0,0,0,1,0,0,0,0,0,0,0,'Diktynna - On Just Summoned - Set Event Phase 1'),
+(@ENTRY,0,2,0,1,1,100,0,3000,3000,5000,8000,5,4,0,0,0,0,0,1,0,0,0,0,0,0,0,'Diktynna - Out of Combat - Play Emote 4');
+
+-- Exarch Menelaous SAI
+SET @ENTRY := 17116;
+UPDATE `creature_template` SET `AIName`="SmartAI" WHERE `entry`=@ENTRY;
+DELETE FROM `smart_scripts` WHERE `entryorguid`=@ENTRY AND `source_type`=0 AND `id` IN (1,2);
+INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES
+(@ENTRY,0,1,0,54,0,100,0,0,0,0,0,22,1,0,0,0,0,0,1,0,0,0,0,0,0,0,'Exarch Menelaous - On Just Summoned - Set Event Phase 1'),
+(@ENTRY,0,2,0,1,1,100,0,3000,3000,5000,8000,5,4,0,0,0,0,0,1,0,0,0,0,0,0,0,'Exarch Menelaous - Out of Combat - Play Emote 4');
+
+-- Daedal SAI
+SET @ENTRY := 17215;
+UPDATE `creature_template` SET `AIName`="SmartAI" WHERE `entry`=@ENTRY;
+DELETE FROM `smart_scripts` WHERE `entryorguid`=@ENTRY AND `source_type`=0 AND `id` IN (3,4);
+INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES
+(@ENTRY,0,3,0,54,0,100,0,0,0,0,0,22,1,0,0,0,0,0,1,0,0,0,0,0,0,0,'Daedal - On Just Summoned - Set Event Phase 1'),
+(@ENTRY,0,4,0,1,1,100,0,3000,3000,5000,8000,5,4,0,0,0,0,0,1,0,0,0,0,0,0,0,'Daedal - Out of Combat - Play Emote 4');
+
+-- Acteon SAI
+SET @ENTRY := 17110;
+UPDATE `creature_template` SET `AIName`="SmartAI" WHERE `entry`=@ENTRY;
+DELETE FROM `smart_scripts` WHERE `entryorguid`=@ENTRY AND `source_type`=0;
+INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES
+(@ENTRY,0,0,0,54,0,100,0,0,0,0,0,22,1,0,0,0,0,0,1,0,0,0,0,0,0,0,'Acteon - On Just Summoned - Set Event Phase 1'),
+(@ENTRY,0,1,0,1,1,100,0,3000,3000,5000,8000,5,4,0,0,0,0,0,1,0,0,0,0,0,0,0,'Acteon - Out of Combat - Play Emote 4');
+
+-- Anchorite Fateema SAI
+SET @ENTRY := 17214;
+UPDATE `creature_template` SET `AIName`="SmartAI" WHERE `entry`=@ENTRY;
+DELETE FROM `smart_scripts` WHERE `entryorguid`=@ENTRY AND `source_type`=0 AND `id`=1;
+INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES
+(@ENTRY,0,1,0,54,0,100,0,0,0,0,0,17,10,0,0,0,0,0,1,0,0,0,0,0,0,0,'Anchorite Fateema - On Just Summoned - Emote State 10');
+
+-- Admiral Odesyus SAI
+SET @ENTRY := 17240;
+UPDATE `creature_template` SET `AIName`="SmartAI" WHERE `entry`=@ENTRY;
+DELETE FROM `smart_scripts` WHERE `entryorguid`=@ENTRY AND `source_type`=0 AND `id`=3;
+INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES
+(@ENTRY,0,3,0,54,0,100,0,0,0,0,0,17,10,0,0,0,0,0,1,0,0,0,0,0,0,0,'Admiral Odesyus - On Just Summoned - Emote State 10');
+
+-- Cowlen SAI
+SET @ENTRY := 17311;
+UPDATE `creature_template` SET `AIName`="SmartAI" WHERE `entry`=@ENTRY;
+DELETE FROM `smart_scripts` WHERE `entryorguid`=@ENTRY AND `source_type`=0 AND `id`=2;
+INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES
+(@ENTRY,0,2,0,54,0,100,0,0,0,0,0,17,10,0,0,0,0,0,1,0,0,0,0,0,0,0,'Cowlen - On Just Summoned - Emote State 10');
+
+-- Archaeologist Adamant Ironheart SAI
+SET @ENTRY := 17242;
+UPDATE `creature_template` SET `AIName`="SmartAI" WHERE `entry`=@ENTRY;
+DELETE FROM `smart_scripts` WHERE `entryorguid`=@ENTRY AND `source_type`=0 AND `id`=3;
+INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES
+(@ENTRY,0,3,0,54,0,100,0,0,0,0,0,17,10,0,0,0,0,0,1,0,0,0,0,0,0,0,'Archaeologist Adamant Ironheart - On Just Summoned - Emote State 10');
+
+-- Injured Night Elf Priestess SAI
+SET @ENTRY := 17117;
+UPDATE `creature_template` SET `AIName`="SmartAI" WHERE `entry`=@ENTRY;
+DELETE FROM `smart_scripts` WHERE `entryorguid`=@ENTRY AND `source_type`=0 AND `id` IN (2,3);
+INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES
+(@ENTRY,0,2,3,54,0,100,0,0,0,0,0,91,3,0,0,0,0,0,1,0,0,0,0,0,0,0,'Injured Night Elf Priestess - On Just Summoned - Remove Flag Standstate Sleep'),
+(@ENTRY,0,3,0,61,0,100,0,0,0,0,0,17,10,0,0,0,0,0,1,0,0,0,0,0,0,0,'Injured Night Elf Priestess - On Just Summoned - Emote State 10');
+
+-- "Cookie" McWeaksauce SAI
+SET @ENTRY := 17246;
+UPDATE `creature_template` SET `AIName`="SmartAI" WHERE `entry`=@ENTRY;
+DELETE FROM `smart_scripts` WHERE `entryorguid`=@ENTRY AND `source_type`=0;
+INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES
+(@ENTRY,0,0,0,11,0,100,0,0,0,0,0,22,1,0,0,0,0,0,1,0,0,0,0,0,0,0,'\"Cookie\" McWeaksauce - On Respawn - Set Phase 1'),
+(@ENTRY,0,1,0,1,1,100,0,0,30000,300000,450000,80,1724600,0,0,0,0,0,1,0,0,0,0,0,0,0,'\"Cookie\" McWeaksauce - OOC - Run Script (Phase 1)'),
+(@ENTRY,0,2,0,40,1,100,0,3,17246,0,0,54,60000,0,0,0,0,0,1,0,0,0,0,0,0,0,'\"Cookie\" McWeaksauce - On Reached WP3 - Pause WP (Phase 1)'),
+(@ENTRY,0,3,4,54,0,100,0,0,0,0,0,22,2,0,0,0,0,0,1,0,0,0,0,0,0,0,'\"Cookie\" McWeaksauce - On Just Summoned - Set Phase 2'),
+(@ENTRY,0,4,0,61,2,100,0,0,0,0,0,17,10,0,0,0,0,0,1,0,0,0,0,0,0,0,'\"Cookie\" McWeaksauce - On Just Summoned - Emote State 10 (Phase 2)');
+
+-- Priestess Kyleen Il'dinare SAI
+SET @ENTRY := 17241;
+UPDATE `creature_template` SET `AIName`="SmartAI" WHERE `entry`=@ENTRY;
+DELETE FROM `smart_scripts` WHERE `entryorguid`=@ENTRY AND `source_type`=0 AND `id`=1;
+INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES
+(@ENTRY,0,1,0,54,0,100,0,0,0,0,0,17,10,0,0,0,0,0,1,0,0,0,0,0,0,0,'Priestess Kyleen Il\'dinare - On Just Summoned - Emote State 10');
+
+-- Kessel SAI
+SET @ENTRY := 17649;
+UPDATE `creature_template` SET `AIName`="SmartAI" WHERE `entry`=@ENTRY;
+DELETE FROM `smart_scripts` WHERE `entryorguid`=@ENTRY AND `source_type`=0;
+INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES
+(@ENTRY,0,0,0,54,0,100,0,0,0,0,0,5,10,0,0,0,0,0,1,0,0,0,0,0,0,0,'Kessel - On Just Summoned - Play Emote 10');
+
+-- Prophet Velen SAI
+SET @ENTRY := 17468;
+UPDATE `creature_template` SET `AIName`="SmartAI" WHERE `entry`=@ENTRY;
+DELETE FROM `smart_scripts` WHERE `entryorguid`=@ENTRY AND `source_type`=0;
+INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES
+(@ENTRY,0,0,0,54,0,100,0,0,0,0,0,48,1,0,0,0,0,0,1,0,0,0,0,0,0,0,'Prophet Velen - On Just Summoned - Set Active On'); -- Ensure that all summoned creatures near Velen disappear even when no player is near
