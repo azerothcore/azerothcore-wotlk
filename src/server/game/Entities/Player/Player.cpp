@@ -27572,10 +27572,3 @@ bool Player::IsPetDismissed()
 
     return false;
 }
-
-void Player::SendTameFailure(uint8 result)
-{
-    WorldPacket data(SMSG_PET_TAME_FAILURE, 1);
-    data << uint8(result);
-    SendDirectMessage(&data);
-}

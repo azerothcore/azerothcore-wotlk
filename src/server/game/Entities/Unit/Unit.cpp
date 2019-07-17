@@ -18484,6 +18484,7 @@ void Unit::NearTeleportTo(float x, float y, float z, float orientation, bool cas
     }
 }
 
+//GMKyle: placed here because Player.cpp is overcrowded
 void Unit::SendTameFailure(uint8 result)
 {
     WorldPacket data(SMSG_PET_TAME_FAILURE, 1);

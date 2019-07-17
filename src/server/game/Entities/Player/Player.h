@@ -2408,7 +2408,6 @@ class Player : public Unit, public GridObject<Player>
         bool CanResummonPet(uint32 spellid);
 
         void SendCinematicStart(uint32 CinematicSequenceId);
-        void SendTameFailure(uint8 result);
         void SendMovieStart(uint32 MovieId);
 
         /*********************************************************/
