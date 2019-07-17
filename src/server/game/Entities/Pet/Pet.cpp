@@ -113,7 +113,7 @@ SpellCastResult Pet::TryLoadFromDB(Player* owner, bool current /*= false*/, PetT
     uint32 petentry = fields[1].GetUInt32();
     uint32 savedHealth = fields[10].GetUInt32();
     uint32 summon_spell_id = fields[15].GetUInt32();
-    PetType petType = PetType(fields[16].GetUInt8());
+    auto petType = PetType(fields[16].GetUInt8());
 
     // update for case of current pet "slot = 0"
     if (!petentry)
