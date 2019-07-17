@@ -10,7 +10,6 @@
 #include "SpellAuras.h"
 #include "PassiveAI.h"
 #include "Player.h"
-#include "MapManager.h"
 
 enum HodirSpellData
 {
