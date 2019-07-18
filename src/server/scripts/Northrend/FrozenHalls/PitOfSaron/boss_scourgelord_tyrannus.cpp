@@ -186,6 +186,7 @@ public:
 
         void JustDied(Unit* /*killer*/)
         {
+            me->NearTeleportTo(me->GetPositionX(), me->GetPositionY(), 628.156, me->GetOrientation());
             Talk(SAY_DEATH);
             if (pInstance)
                 pInstance->SetData(DATA_TYRANNUS, DONE);
