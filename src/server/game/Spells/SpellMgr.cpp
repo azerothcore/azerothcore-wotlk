@@ -4533,6 +4533,10 @@ void SpellMgr::LoadDbcDataCorrections()
         case 29125:
             spellInfo->EffectImplicitTargetB[0] = TARGET_UNIT_SRC_AREA_ENTRY;
             break;
+        // Jagged Knife
+        case 55550:
+            spellInfo->Attributes |= SPELL_ATTR0_REQ_AMMO;
+            break;
 
         //////////////////////////////////////////
         ////////// Gundrak
@@ -4540,6 +4544,12 @@ void SpellMgr::LoadDbcDataCorrections()
         // Moorabi - Transformation
         case 55098:
             spellInfo->InterruptFlags |= SPELL_INTERRUPT_FLAG_INTERRUPT;
+            break;
+        case 55521: // Poisoned Spear (Normal)
+        case 58967: // Poisoned Spear (Heroic)
+        case 55348: // Throw (Normal)
+        case 58966: // Throw (Heroic)
+            spellInfo->Attributes |= SPELL_ATTR0_REQ_AMMO;
             break;
 
         //////////////////////////////////////////
