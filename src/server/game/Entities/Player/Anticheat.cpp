@@ -26,7 +26,7 @@ bool Player::CheckOnFlyHack()
     if (m_mover != this)
         return true;
 
-    if (GetMapId() == 616 || GetMapId() == 649)
+    if (sWorld->isMapDisabledForAC(GetMapId()))
         return true;
 
     if (IsFlying() && !CanFly()) // kick flyhacks
@@ -118,6 +118,9 @@ void Player::UpdateMovementInfo(MovementInfo const& movementInfo)
 bool Player::CheckMovementInfo(MovementInfo const& movementInfo, bool jump)
 {
     if (!sWorld->getBoolConfig(CONFIG_ANTICHEAT_SPEEDHACK_ENABLED))
+        return true;
+
+    if (sWorld->isMapDisabledForAC(GetMapId()))
         return true;
 
     uint32 ctime = GetLastMoveClientTimestamp();

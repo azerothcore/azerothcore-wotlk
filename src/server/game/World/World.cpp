@@ -1285,6 +1285,9 @@ void World::LoadConfigSettings(bool reload)
     // Anticheat AFH timer
     m_int_configs[CONFIG_ANTICHEAT_FLYHACK_TIMER] = sConfigMgr->GetIntDefault("AntiCheats.FlyHackTimer", 1000);
 
+    SetACMapExcludes(sConfigMgr->GetStringDefault("AntiCheats.forceExcludeMapsid", ""));
+    sLog->outString("AntiCheats disabled for %u maps", (uint32)excludeACMapsId.size());
+
     // Dungeon finder
     m_int_configs[CONFIG_LFG_OPTIONSMASK] = sConfigMgr->GetIntDefault("DungeonFinder.OptionsMask", 3);
 
@@ -3316,4 +3319,14 @@ uint32 World::GetGlobalPlayerGUID(std::string const& name) const
 
     // Player not found
     return 0;
+}
+
+void World::SetACMapExcludes(const std::string& mapIdExcludes)
+{
+    excludeACMapsId.clear();
+
+    std::stringstream excludeStream(mapIdExcludes);
+    std::string temp;
+    while (std::getline(excludeStream, temp, ','))
+        excludeACMapsId.insert(atoi(temp.c_str()));
 }

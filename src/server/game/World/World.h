@@ -799,6 +799,9 @@ class World
         std::string GetConfigFileList() { return m_configFileList; }
         void SetConfigFileList(std::string list) { m_configFileList = list; }
 
+        void SetACMapExcludes(const std::string& mapIdExcludes);
+        bool isMapDisabledForAC(uint32 mapid) const { return excludeACMapsId.count(mapid); }
+
     protected:
         void _UpdateGameTime();
         // callback for UpdateRealmCharacters
@@ -897,6 +900,7 @@ class World
         ACE_Future_Set<PreparedQueryResult> m_realmCharCallbacks;
 
         std::string m_configFileList;
+        std::unordered_set<uint32> excludeACMapsId;
 };
 
 #define sWorld ACE_Singleton<World, ACE_Null_Mutex>::instance()
