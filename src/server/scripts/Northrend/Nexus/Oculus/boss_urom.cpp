@@ -268,9 +268,9 @@ public:
                     Talk(EMOTE_ARCANE_EXPLOSION);
 					
                     if (me->GetMap()->IsHeroic())
-						DoCastAOE(SPELL_EMPOWERED_ARCANE_EXPLOSION_H);
-					else
-					me->CastSpell(me, SPELL_EMPOWERED_ARCANE_EXPLOSION, false);
+                        DoCastAOE(SPELL_EMPOWERED_ARCANE_EXPLOSION_H);
+                    else
+                    me->CastSpell(me, SPELL_EMPOWERED_ARCANE_EXPLOSION, false);
                     events.RescheduleEvent(EVENT_TELE_BACK, DUNGEON_MODE(9000, 7000));
                 default:
                     break;
@@ -318,9 +318,9 @@ public:
                     break;
                 case EVENT_TIME_BOMB:
                     if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true) )
-						if (me->GetMap()->IsHeroic())
-							DoCast(target, SPELL_TIME_BOMB_H);
-						else
+                        if (me->GetMap()->IsHeroic())
+                            DoCast(target, SPELL_TIME_BOMB_H);
+                        else
                         me->CastSpell(target, SPELL_TIME_BOMB, false);
                     events.RepeatEvent(urand(20000, 25000));
                     break;
