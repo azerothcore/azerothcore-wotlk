@@ -319,9 +319,13 @@ public:
                 case EVENT_TIME_BOMB:
                     if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true) )
                         if (me->GetMap()->IsHeroic())
+                        {
                             DoCast(target, SPELL_TIME_BOMB_H);
+                        }
                         else
-                        me->CastSpell(target, SPELL_TIME_BOMB, false);
+                        {
+                            me->CastSpell(target, SPELL_TIME_BOMB, false);
+                        }
                     events.RepeatEvent(urand(20000, 25000));
                     break;
                 case EVENT_TELEPORT_TO_CENTER:
