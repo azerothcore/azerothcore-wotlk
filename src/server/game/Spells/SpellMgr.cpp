@@ -4612,6 +4612,10 @@ void SpellMgr::LoadDbcDataCorrections()
         case 42796:
             spellInfo->AttributesEx3 |= SPELL_ATTR3_DEATH_PERSISTENT;
             break;
+        case 42772: // Hurl Dagger (Normal)
+        case 59685: // Hurl Dagger (Heroic)
+            spellInfo->Attributes |= SPELL_ATTR0_REQ_AMMO;
+            break;
 
         //////////////////////////////////////////
         ////////// VIOLET HOLD

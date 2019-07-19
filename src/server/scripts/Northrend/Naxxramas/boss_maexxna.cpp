@@ -62,7 +62,7 @@ public:
 
     struct boss_maexxnaAI : public BossAI
     {
-        boss_maexxnaAI(Creature *c) : BossAI(c, BOSS_MAEXXNA), summons(me)
+        explicit boss_maexxnaAI(Creature *c) : BossAI(c, BOSS_MAEXXNA), summons(me)
         {
             pInstance = me->GetInstanceScript();
         }
@@ -211,7 +211,7 @@ public:
 
     struct boss_maexxna_webwrapAI : public NullCreatureAI
     {
-        boss_maexxna_webwrapAI(Creature *c) : NullCreatureAI(c), victimGUID(0) {}
+        explicit boss_maexxna_webwrapAI(Creature *c) : NullCreatureAI(c), victimGUID(0) {}
 
         uint64 victimGUID;
         void SetGUID(uint64 guid, int32  /*param*/) override

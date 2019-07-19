@@ -53,16 +53,16 @@ public:
 
     struct boss_heiganAI : public BossAI
     {
-        boss_heiganAI(Creature *c) : BossAI(c, BOSS_HEIGAN)
+        explicit boss_heiganAI(Creature *c) : BossAI(c, BOSS_HEIGAN)
         {
             pInstance = me->GetInstanceScript();
         }
 
         InstanceScript* pInstance;
         EventMap events;
-        uint8 currentPhase;
-        uint8 currentSection;
-        bool moveRight;
+        uint8 currentPhase{};
+        uint8 currentSection{};
+        bool moveRight{};
 
         void Reset() override
         {
@@ -204,9 +204,9 @@ public:
                 case EVENT_SAFETY_DANCE:
                 {
                     Map::PlayerList const& pList = me->GetMap()->GetPlayers();
-                    for(Map::PlayerList::const_iterator itr = pList.begin(); itr != pList.end(); ++itr)
+                    for(const auto & itr : pList)
                     {
-                        if (IsInRoom(itr->GetSource()) && !itr->GetSource()->IsAlive())
+                        if (IsInRoom(itr.GetSource()) && !itr.GetSource()->IsAlive())
                         {
                             events.PopEvent();
                             pInstance->SetData(DATA_DANCE_FAIL, 0);
