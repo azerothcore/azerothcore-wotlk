@@ -266,7 +266,7 @@ public:
                     Talk(SAY_ARCANE_EXPLOSION);
                     Talk(EMOTE_ARCANE_EXPLOSION);
 
-                    me->CastSpell(me, SPELL_EMPOWERED_ARCANE_EXPLOSION, false);
+                    DoCastAOE(DUNGEON_MODE(SPELL_EMPOWERED_ARCANE_EXPLOSION_N, SPELL_EMPOWERED_ARCANE_EXPLOSION_H));
                     events.RescheduleEvent(EVENT_TELE_BACK, DUNGEON_MODE(9000, 7000));
                 default:
                     break;
@@ -314,7 +314,7 @@ public:
                     break;
                 case EVENT_TIME_BOMB:
                     if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true) )
-                        me->CastSpell(target, SPELL_TIME_BOMB, false);
+                        DoCast(target, DUNGEON_MODE(SPELL_TIME_BOMB_N, SPELL_TIME_BOMB_H));
                     events.RepeatEvent(urand(20000, 25000));
                     break;
                 case EVENT_TELEPORT_TO_CENTER:
