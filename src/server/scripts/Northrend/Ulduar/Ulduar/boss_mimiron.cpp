@@ -1373,7 +1373,7 @@ public:
                         events.ScheduleEvent(EVENT_REINSTALL_ROCKETS, 3000);
                         events.ScheduleEvent(EVENT_SPELL_ROCKET_STRIKE, 16000);
                         events.ScheduleEvent(EVENT_HAND_PULSE, 1);
-                        //events.ScheduleEvent(EVENT_SPELL_SPINNING_UP, 30000);
+                        events.ScheduleEvent(EVENT_SPELL_SPINNING_UP, urand(30000, 35000));
                         if (Creature* c = GetMimiron())
                             if (c->AI()->GetData(1))
                                 events.ScheduleEvent(EVENT_FROST_BOMB, 1000);
@@ -1551,7 +1551,7 @@ public:
                         spinningUpTimer = 1500;
                         me->SetOrientation(angle);
                         me->SetFacingTo(angle);
-                        me->CastSpell(p, SPELL_SPINNING_UP, true);
+                        DoCastAOE(SPELL_SPINNING_UP);
                         events.RescheduleEvent((Phase == 2 ? EVENT_SPELL_RAPID_BURST : EVENT_HAND_PULSE), 14500);
                     }
                     break;
@@ -2190,6 +2190,33 @@ public:
                 timer -= diff;
         }
     };
+};
+
+class spell_mimiron_spinning_up : public SpellScriptLoader
+{
+public:
+    spell_mimiron_spinning_up() : SpellScriptLoader("spell_mimiron_spinning_up") { }
+
+    class spell_mimiron_spinning_up_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_mimiron_spinning_up_SpellScript);
+
+        void OnHit(SpellEffIndex /*effIndex*/)
+        {
+            if (GetHitUnit() != GetCaster())
+                GetCaster()->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, GetHitUnit()->GetGUID());
+        }
+
+        void Register() override
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_mimiron_spinning_up_SpellScript::OnHit, EFFECT_0, SPELL_EFFECT_APPLY_AURA);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_mimiron_spinning_up_SpellScript();
+    }
 };
 
 class spell_mimiron_rapid_burst : public SpellScriptLoader
