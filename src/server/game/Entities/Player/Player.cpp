@@ -20914,7 +20914,7 @@ void Player::Yell(const std::string& text, const uint32 language)
 void Player::TextEmote(const std::string& text, uint32 type)
 {
     std::string _text(text);
-    sScriptMgr->OnPlayerChat(this, CHAT_MSG_EMOTE, LANG_UNIVERSAL, _text); // It was like this b
+    sScriptMgr->OnPlayerChat(this, CHAT_MSG_EMOTE, LANG_UNIVERSAL, _text);
 #ifdef ELUNA
     if (!sEluna->OnChat(this, CHAT_MSG_EMOTE, LANG_UNIVERSAL, _text))
         return;
