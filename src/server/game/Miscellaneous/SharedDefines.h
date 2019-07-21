@@ -3559,4 +3559,10 @@ enum NavTerrain
     // we only have 8 bits
 };
 
+enum emotestate
+{
+    EMOTE_TYPE_UNIVERSAL = 1,
+    EMOTE_TYPE_FACTION_ONLY = 2
+};
+
 #endif
