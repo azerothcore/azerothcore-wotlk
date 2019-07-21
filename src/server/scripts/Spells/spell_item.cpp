@@ -65,11 +65,11 @@ class spell_item_titanium_seal_of_dalaran : public SpellScriptLoader
                 if (Player* player = caster->ToPlayer())
                 {
                     std::string name = player->GetName();
-                    player->TextEmote("casually flips his Titanium Seal of Dalaran");
+                    player->TextEmote("casually flips his Titanium Seal of Dalaran", 1);
                     if (urand(0,1))
-                        player->TextEmote("finds the coin face down for tails!");
+                        player->TextEmote("finds the coin face down for tails!", 1);
                     else
-                        player->TextEmote("catches the coin heads up!");
+                        player->TextEmote("catches the coin heads up!", 1);
                 }
             }
 
@@ -751,7 +751,7 @@ class spell_item_fish_feast : public SpellScriptLoader
             void HandleScriptEffect(SpellEffIndex effIndex)
             {
                 PreventHitDefaultEffect(effIndex);
-                GetCaster()->ToPlayer()->TextEmote("prepares a Fish Feast!");
+                GetCaster()->ToPlayer()->TextEmote("prepares a Fish Feast!", 2);
             }
 
             void Register()
@@ -1059,11 +1059,11 @@ class spell_item_oracle_ablutions : public SpellScriptLoader
                 if (Player* player = caster->ToPlayer())
                 {
                     std::string name = player->GetName();
-                    player->TextEmote("casually flips his Titanium Seal of Dalaran");
+                    player->TextEmote("casually flips his Titanium Seal of Dalaran", 1);
                     if (urand(0,1))
-                        player->TextEmote("finds the coin face down for tails!");
+                        player->TextEmote("finds the coin face down for tails!", 1);
                     else
-                        player->TextEmote("catches the coin heads up!");
+                        player->TextEmote("catches the coin heads up!", 1);
                 }
             }
 

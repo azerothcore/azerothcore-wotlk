@@ -384,7 +384,7 @@ void Map::ScriptsProcess()
                                 break;
                             case CHAT_TYPE_TEXT_EMOTE:
                             case CHAT_TYPE_BOSS_EMOTE:
-                                player->TextEmote(text);
+                                player->TextEmote(text, 2);
                                 break;
                             case CHAT_TYPE_WHISPER:
                             case CHAT_MSG_RAID_BOSS_WHISPER:

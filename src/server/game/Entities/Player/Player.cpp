@@ -20911,16 +20911,28 @@ void Player::Yell(const std::string& text, const uint32 language)
     SendMessageToSetInRange(&data, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_YELL), true);
 }
 
-void Player::TextEmote(const std::string& text)
+void Player::TextEmote(const std::string& text, uint32 type)
 {
     std::string _text(text);
-    sScriptMgr->OnPlayerChat(this, CHAT_MSG_EMOTE, LANG_UNIVERSAL, _text);
+    sScriptMgr->OnPlayerChat(this, CHAT_MSG_EMOTE, LANG_UNIVERSAL, _text); // It was like this b
 #ifdef ELUNA
     if (!sEluna->OnChat(this, CHAT_MSG_EMOTE, LANG_UNIVERSAL, _text))
         return;
 #endif
+
     WorldPacket data;
-    ChatHandler::BuildChatPacket(data, CHAT_MSG_EMOTE, LANG_UNIVERSAL, this, this, _text);
+    switch (type)
+    {
+    case 1: // This will be for normal emotes
+        ChatHandler::BuildChatPacket(data, CHAT_MSG_EMOTE, LANG_UNIVERSAL, this, this, _text);
+        break;
+    case 2: // This wll be for custom.
+        if (this->GetTeamId() == TEAM_ALLIANCE)
+            ChatHandler::BuildChatPacket(data, CHAT_MSG_TEXT_EMOTE, LANG_COMMON, this, this, _text);
+        else
+            ChatHandler::BuildChatPacket(data, CHAT_MSG_TEXT_EMOTE, LANG_ORCISH, this, this, _text);
+        break;
+    }
     SendMessageToSetInRange(&data, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE), true, !sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_CHAT));
 }
 

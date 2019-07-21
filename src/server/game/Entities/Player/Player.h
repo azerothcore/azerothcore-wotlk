@@ -1215,7 +1215,7 @@ class Player : public Unit, public GridObject<Player>
 
         void Say(std::string const& text, const uint32 language);
         void Yell(std::string const& text, const uint32 language);
-        void TextEmote(std::string const& text);
+        void TextEmote(std::string const& text, uint32 Type);
         void Whisper(std::string const& text, const uint32 language, uint64 receiver);
 
         /*********************************************************/
