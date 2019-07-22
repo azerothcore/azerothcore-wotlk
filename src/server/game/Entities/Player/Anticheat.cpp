@@ -138,8 +138,8 @@ bool Player::CheckMovementInfo(MovementInfo const& movementInfo, bool jump)
         if ((movementInfo.GetMovementFlags() & MOVEMENTFLAG_ONTRANSPORT) || HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT))
             return true;
 
-        if (UnderACKmount())
-            return true;
+        //if (UnderACKmount())
+        //    return true;
 
         if (IsSkipOnePacketForASH())
         {
@@ -202,6 +202,8 @@ bool Player::CheckMovementInfo(MovementInfo const& movementInfo, bool jump)
         delay = fabsf(movetime - stime) / 10000000000 + delaysentrecieve;
         difftime = (movetime - ctime + ping) * 0.001f + delay;
         normaldistance = speed * difftime; // if movetime faked and lower, difftime should be with "-"
+        if (UnderACKmount())
+            normaldistance *= 3.0f;
 
         if (distance < normaldistance)
             return true;
