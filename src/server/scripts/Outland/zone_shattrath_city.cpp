@@ -419,6 +419,20 @@ public:
 # npc_ishanah
 ######*/
 
+enum Ishanah
+{
+    // ISHANAH SPELL EVENTS
+    EVENT_SPELL_ISHANAH_HOLY_SMITE = 3,
+    EVENT_SPELL_POWER_WORD_SHIELD  = 4,
+    EVENT_ISHANAH_SAY_1            = 18, // Make kaylaan bow
+    SOCRETHAR                      = 20132,
+    KAYLAAN_THE_LOST               = 20794,
+
+    // ISHANAH SPELLS
+    HOLY_SMITE_ISHANAH             = 15238,
+    POWER_WORLD_SHIELD             = 22187
+};
+
 #define ISANAH_GOSSIP_1 "Who are the Sha'tar?"
 #define ISANAH_GOSSIP_2 "Isn't Shattrath a draenei city? Why do you allow others here?"
 
@@ -449,6 +463,70 @@ public:
         SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
 
         return true;
+    }
+
+    struct ishanahAI : public ScriptedAI
+    {
+        ishanahAI(Creature* creature) : ScriptedAI(creature) { }
+
+        EventMap _events;
+
+        void EnterCombat(Unit* who) override
+        {
+            AttackStart(who);
+            _events.ScheduleEvent(EVENT_SPELL_ISHANAH_HOLY_SMITE, 2000);
+            _events.ScheduleEvent(EVENT_SPELL_POWER_WORD_SHIELD, 1000);
+        }
+
+        void MovementInform(uint32 type, uint32 point) override
+        {
+            if (type != POINT_MOTION_TYPE)
+            {
+                if (point == 2)
+                {
+                    if (Creature* kaylaan = me->FindNearestCreature(KAYLAAN_THE_LOST, 30.0f, true))
+                    {
+                        kaylaan->AI()->Talk(5);
+                        kaylaan->SetOrientation(me->GetPositionX());
+                        if (Creature* socrethar = me->FindNearestCreature(SOCRETHAR, 30.0f, true))
+                        {
+                            socrethar->AI()->DoAction(EVENT_ISHANAH_SAY_1);
+                            socrethar->SetOrientation(me->GetPositionX());
+                        }
+                    }
+                }
+            }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (!me->GetVictim())
+                return;
+
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+                return;
+
+            _events.Update(diff);
+
+            switch (uint32 eventId = _events.ExecuteEvent())
+            {
+                case EVENT_SPELL_ISHANAH_HOLY_SMITE:
+                    me->CastSpell(me->GetVictim(), HOLY_SMITE_ISHANAH, false);
+                    _events.ScheduleEvent(EVENT_SPELL_ISHANAH_HOLY_SMITE, 2500);
+                    break;
+                case EVENT_SPELL_POWER_WORD_SHIELD:
+                    me->CastSpell(me, POWER_WORLD_SHIELD, false);
+                    _events.ScheduleEvent(EVENT_SPELL_POWER_WORD_SHIELD, 30000);
+                    break;
+            }
+
+            DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new ishanahAI(creature);
     }
 };
 
