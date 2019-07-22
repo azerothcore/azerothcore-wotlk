@@ -2326,7 +2326,6 @@ void AuraEffect::HandleFeignDeath(AuraApplication const* aurApp, uint8 mode, boo
     if (Player* targetPlayer = target->ToPlayer())
     {
         targetPlayer->SetUnderACKmount();
-        targetPlayer->SetSkipOnePacketForASH(true);
     }
 
     if (apply)
