@@ -945,6 +945,9 @@ Player::Player(WorldSession* session): Unit(true), m_mover(this)
         m_charmAISpells[i] = 0;
 
     m_applyResilience = true;
+
+    SetLastMoveClientTimestamp(getMSTime());
+    SetLastMoveServerTimestamp(getMSTime());
 }
 
 Player::~Player()
