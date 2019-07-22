@@ -191,6 +191,7 @@ public:
                 pInstance->SetData(DATA_TYRANNUS, DONE);
             if (me->IsSummon())
                 me->ToTempSummon()->SetTempSummonType(TEMPSUMMON_MANUAL_DESPAWN);
+			me->NearTeleportTo(me->GetPositionX(), me->GetPositionY(), float(628.1), me->GetOrientation()); 
         }
 
         void KilledUnit(Unit* who)
