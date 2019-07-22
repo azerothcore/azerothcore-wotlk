@@ -2820,10 +2820,7 @@ void AuraEffect::HandleAuraWaterWalk(AuraApplication const* aurApp, uint8 mode, 
 
     Unit* target = aurApp->GetTarget();
     if (Player* targetPlayer = target->ToPlayer())
-    {
         targetPlayer->SetUnderACKmount();
-        targetPlayer->SetSkipOnePacketForASH(true);
-    }
 
     if (!apply)
     {
@@ -2842,10 +2839,7 @@ void AuraEffect::HandleAuraFeatherFall(AuraApplication const* aurApp, uint8 mode
 
     Unit* target = aurApp->GetTarget();
     if (Player* targetPlayer = target->ToPlayer())
-    {
         targetPlayer->SetUnderACKmount();
-        targetPlayer->SetSkipOnePacketForASH(true);
-    }
 
     if (!apply)
     {
@@ -2868,10 +2862,7 @@ void AuraEffect::HandleAuraHover(AuraApplication const* aurApp, uint8 mode, bool
 
     Unit* target = aurApp->GetTarget();
     if (Player * targetPlayer = target->ToPlayer())
-    {
         targetPlayer->SetUnderACKmount();
-        targetPlayer->SetSkipOnePacketForASH(true);
-    }
 
     if (!apply)
     {
