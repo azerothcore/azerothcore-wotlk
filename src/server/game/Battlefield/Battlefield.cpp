@@ -828,7 +828,7 @@ GameObject* Battlefield::SpawnGameObject(uint32 entry, float x, float y, float z
 
     // Create gameobject
     GameObject* go = sObjectMgr->IsGameObjectStaticTransport(entry) ? new StaticTransport() : new GameObject();
-    if (!go->Create(sObjectMgr->GenerateLowGuid(HIGHGUID_GAMEOBJECT), entry, map, PHASEMASK_NORMAL, x, y, z, o, rot, 100, GO_STATE_READY))
+    if (!go->Create(sObjectMgr->GenerateLowGuid(HIGHGUID_GAMEOBJECT), entry, map, PHASEMASK_NORMAL, x, y, z, o, rot, 255, GO_STATE_READY))
     {
         sLog->outErrorDb("Battlefield::SpawnGameObject: Gameobject template %u not found in database! Battlefield not created!", entry);
         sLog->outError("Battlefield::SpawnGameObject: Cannot create gameobject template %u! Battlefield not created!", entry);

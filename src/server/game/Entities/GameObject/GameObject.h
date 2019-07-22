@@ -595,6 +595,17 @@ struct GameObjectLocale
     StringVector CastBarCaption;
 };
 
+struct QuaternionData
+{
+    float x, y, z, w;
+    QuaternionData() : x(0.0f), y(0.0f), z(0.0f), w(1.0f) { }
+    QuaternionData(float X, float Y, float Z, float W) : x(X), y(Y), z(Z), w(W) { }
+
+    bool isUnit() const;
+    void toEulerAnglesZYX(float& Z, float& Y, float& X) const;
+    static QuaternionData fromEulerAnglesZYX(float Z, float Y, float X);
+};
+
 // `gameobject_addon` table
 struct GameObjectAddon
 {
@@ -669,7 +680,7 @@ class GameObject : public WorldObject, public GridObject<GameObject>, public Mov
         void RemoveFromWorld();
         void CleanupsBeforeDelete(bool finalCleanup = true);
 
-        virtual bool Create(uint32 guidlow, uint32 name_id, Map* map, uint32 phaseMask, float x, float y, float z, float ang, G3D::Quat const& rotation, uint32 animprogress, GOState go_state, uint32 artKit = 0);
+        virtual bool Create(uint32 guidlow, uint32 name_id, Map* map, uint32 phaseMask, Position const& pos, G3D::Quat const& rotation, uint32 animprogress, GOState go_state, uint32 artKit = 0);
         void Update(uint32 p_time);
         GameObjectTemplate const* GetGOInfo() const { return m_goInfo; }
         GameObjectTemplateAddon const* GetTemplateAddon() const;

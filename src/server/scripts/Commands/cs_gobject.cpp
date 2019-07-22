@@ -130,16 +130,12 @@ public:
         }
 
         Player* player = handler->GetSession()->GetPlayer();
-        float x = float(player->GetPositionX());
-        float y = float(player->GetPositionY());
-        float z = float(player->GetPositionZ());
-        float o = float(player->GetOrientation());
         Map* map = player->GetMap();
 
         GameObject* object = sObjectMgr->IsGameObjectStaticTransport(objectInfo->entry) ? new StaticTransport() : new GameObject();
         uint32 guidLow = sObjectMgr->GenerateRecycledLowGuid(HIGHGUID_GAMEOBJECT);
 
-        if (!object->Create(guidLow, objectInfo->entry, map, player->GetPhaseMaskForSpawn(), x, y, z, o, G3D::Quat(), 0, GO_STATE_READY))
+        if (!object->Create(guidLow, objectInfo->entry, map, player->GetPhaseMaskForSpawn(), *player, G3D::Quat(), 255, GO_STATE_READY))
         {
             delete object;
             return false;
@@ -168,7 +164,7 @@ public:
         // TODO: is it really necessary to add both the real and DB table guid here ?
         sObjectMgr->AddGameobjectToGrid(guidLow, sObjectMgr->GetGOData(guidLow));
 
-        handler->PSendSysMessage(LANG_GAMEOBJECT_ADD, objectId, objectInfo->name.c_str(), guidLow, x, y, z);
+        handler->PSendSysMessage(LANG_GAMEOBJECT_ADD, objectId, objectInfo->name.c_str(), guidLow, player->GetPositionX(), player->GetPositionY(), player->GetPositionZ());
         return true;
     }
 
@@ -190,17 +186,11 @@ public:
         if (spawntime)
             spawntm = atoi((char*)spawntime);
 
-        float x = player->GetPositionX();
-        float y = player->GetPositionY();
-        float z = player->GetPositionZ();
-        float ang = player->GetOrientation();
-
-        float rot2 = sin(ang/2);
-        float rot3 = cos(ang/2);
+        G3D::Quat rotation = G3D::Matrix3::fromEulerAnglesZYX(player->GetOrientation(), 0.f, 0.f);
 
         uint32 objectId = atoi(id);
 
-        player->SummonGameObject(objectId, x, y, z, ang, 0, 0, rot2, rot3, spawntm);
+        player->SummonGameObject(objectId, *player, rotation, spawntm);
 
         return true;
     }
@@ -416,6 +406,9 @@ public:
             oz = player->GetOrientation();
         }
 
+        Map* map = object->GetMap();
+
+        object->Relocate(object->GetPositionX(), object->GetPositionY(), object->GetPositionZ());
         object->SetWorldRotationAngles(oz, oy, ox);
         object->DestroyForNearbyPlayers();
         object->UpdateObjectVisibility();

@@ -2272,7 +2272,7 @@ void WorldObject::SetZoneScript()
     }
 }
 
-TempSummon* WorldObject::SummonCreature(uint32 entry, const Position &pos, TempSummonType spwtype, uint32 duration, uint32  /*vehId*/, SummonPropertiesEntry const *properties) const
+TempSummon* WorldObject::SummonCreature(uint32 entry, Position const& pos, TempSummonType spwtype/*= TEMPSUMMON_MANUAL_DESPAWN*/, uint32 duration /*= 0*/, uint32  /*vehId = 0*/, SummonPropertiesEntry const *properties) const
 { 
     if (Map* map = FindMap())
     {
@@ -2283,19 +2283,19 @@ TempSummon* WorldObject::SummonCreature(uint32 entry, const Position &pos, TempS
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
-GameObject* WorldObject::SummonGameObject(uint32 entry, float x, float y, float z, float ang, float rotation0, float rotation1, float rotation2, float rotation3, uint32 respawnTime, bool checkTransport)
+GameObject* WorldObject::SummonGameObject(uint32 entry, Position const& pos, G3D::Quat const& rot, uint32 respawnTime, bool checkTransport)
 { 
     if (!IsInWorld())
-        return NULL;
+        return nullptr;
 
     GameObjectTemplate const* goinfo = sObjectMgr->GetGameObjectTemplate(entry);
     if (!goinfo)
     {
         sLog->outErrorDb("Gameobject template %u not found in database!", entry);
-        return NULL;
+        return nullptr;
     }
 
     Map* map = GetMap();
@@ -2303,7 +2303,7 @@ GameObject* WorldObject::SummonGameObject(uint32 entry, float x, float y, float 
     if (!go->Create(sObjectMgr->GenerateLowGuid(HIGHGUID_GAMEOBJECT), entry, map, GetPhaseMask(), x, y, z, ang, G3D::Quat(rotation0, rotation1, rotation2, rotation3), 100, GO_STATE_READY))
     {
         delete go;
-        return NULL;
+        return nullptr;
     }
 
     go->SetRespawnTime(respawnTime);
@@ -2319,6 +2319,18 @@ GameObject* WorldObject::SummonGameObject(uint32 entry, float x, float y, float 
 
     map->AddToMap(go, checkTransport);
     return go;
+}
+
+GameObject* WorldObject::SummonGameObject(uint32 entry, float x, float y, float z, float ang, G3D::Quat const& rot, uint32 respawnTime, bool checkTransport)
+{
+    if (!x && !y && !z)
+    {
+        GetClosePoint(x, y, z, GetObjectSize());
+        ang = GetOrientation();
+    }
+
+    Position pos(x, y, z, ang);
+    return SummonGameObject(entry, pos, rot, respawnTime);
 }
 
 Creature* WorldObject::SummonTrigger(float x, float y, float z, float ang, uint32 duration, bool setLevel, CreatureAI* (*GetAI)(Creature*))

@@ -29,6 +29,22 @@
 #include "LuaEngine.h"
 #endif
 
+bool QuaternionData::isUnit() const
+{
+    return fabs(x * x + y * y + z * z + w * w - 1.0f) < 1e-5f;
+}
+
+void QuaternionData::toEulerAnglesZYX(float& Z, float& Y, float& X) const
+{
+    G3D::Matrix3(G3D::Quat(x, y, z, w)).toEulerAnglesZYX(Z, Y, X);
+}
+
+QuaternionData QuaternionData::fromEulerAnglesZYX(float Z, float Y, float X)
+{
+    G3D::Quat quat(G3D::Matrix3::fromEulerAnglesZYX(Z, Y, X));
+    return QuaternionData(quat.x, quat.y, quat.z, quat.w);
+}
+
 GameObject::GameObject() : WorldObject(false), MovableMapObject(),
     m_model(NULL), m_goValue(), m_AI(NULL)
 {
@@ -221,16 +237,16 @@ void GameObject::ClearRitualList()
     m_unique_users.clear();
 }
 
-bool GameObject::Create(uint32 guidlow, uint32 name_id, Map* map, uint32 phaseMask, float x, float y, float z, float ang, G3D::Quat const& rotation, uint32 animprogress, GOState go_state, uint32 artKit)
+bool GameObject::Create(uint32 guidlow, uint32 name_id, Map* map, uint32 phaseMask, Position const& pos, G3D::Quat const& rotation, uint32 animprogress, GOState go_state, uint32 artKit /*= 0*/)
 { 
     ASSERT(map);
     SetMap(map);
 
-    Relocate(x, y, z, ang);
-    m_stationaryPosition.Relocate(x, y, z, ang);
+    Relocate(pos);
+    m_stationaryPosition.Relocate(pos);
     if (!IsPositionValid())
     {
-        sLog->outError("Gameobject (GUID: %u Entry: %u) not created. Suggested coordinates isn't valid (X: %f Y: %f)", guidlow, name_id, x, y);
+        sLog->outError("Gameobject (GUID: %u Entry: %u) not created. Suggested coordinates isn't valid (X: %f Y: %f)", guidlow, name_id, pos.GetPositionX(), pos.GetPositionY());
         return false;
     }
 
@@ -247,7 +263,7 @@ bool GameObject::Create(uint32 guidlow, uint32 name_id, Map* map, uint32 phaseMa
     GameObjectTemplate const* goinfo = sObjectMgr->GetGameObjectTemplate(name_id);
     if (!goinfo)
     {
-        sLog->outErrorDb("Gameobject (GUID: %u Entry: %u) not created: non-existing entry in `gameobject_template`. Map: %u (X: %f Y: %f Z: %f)", guidlow, name_id, map->GetId(), x, y, z);
+        sLog->outErrorDb("Gameobject (GUID: %u Entry: %u) not created: non-existing entry in `gameobject_template`. Map: %u (X: %f Y: %f Z: %f)", guidlow, name_id, map->GetId(), pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ());
         return false;
     }
 
@@ -917,10 +933,7 @@ bool GameObject::LoadGameObjectFromDB(uint32 guid, Map* map, bool addToMap)
     uint32 entry = data->id;
     //uint32 map_id = data->mapid;                          // already used before call
     uint32 phaseMask = data->phaseMask;
-    float x = data->posX;
-    float y = data->posY;
-    float z = data->posZ;
-    float ang = data->orientation;
+    Position pos(data->posX, data->posY, data->posZ, data->orientation);
 
     uint32 animprogress = data->animprogress;
     GOState go_state = data->go_state;
@@ -929,7 +942,7 @@ bool GameObject::LoadGameObjectFromDB(uint32 guid, Map* map, bool addToMap)
     m_DBTableGuid = guid;
     if (map->GetInstanceId() != 0) guid = sObjectMgr->GenerateLowGuid(HIGHGUID_GAMEOBJECT);
 
-    if (!Create(guid, entry, map, phaseMask, x, y, z, ang, data->rotation, animprogress, go_state, artKit))
+    if (!Create(guid, entry, map, phaseMask, pos, data->rotation, animprogress, go_state, artKit))
         return false;
 
     if (data->spawntimesecs >= 0)
@@ -948,7 +961,7 @@ bool GameObject::LoadGameObjectFromDB(uint32 guid, Map* map, bool addToMap)
             m_respawnTime = GetMap()->GetGORespawnTime(m_DBTableGuid);
 
             // ready to respawn
-            if (m_respawnTime && m_respawnTime <= time(NULL))
+            if (m_respawnTime && m_respawnTime <= time(nullptr))
             {
                 m_respawnTime = 0;
                 GetMap()->RemoveGORespawnTime(m_DBTableGuid);
