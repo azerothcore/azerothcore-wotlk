@@ -46,9 +46,9 @@ GameObject::GameObject() : WorldObject(false), MovableMapObject(),
     m_usetimes = 0;
     m_spellId = 0;
     m_cooldownTime = 0;
-    m_goInfo = NULL;
+    m_goInfo = nullptr;
     m_ritualOwnerGUIDLow = 0;
-    m_goData = NULL;
+    m_goData = nullptr;
     m_packedRotation = 0;
 
     m_DBTableGuid = 0;
@@ -261,10 +261,11 @@ bool GameObject::Create(uint32 guidlow, uint32 name_id, Map* map, uint32 phaseMa
         return false;
     }
 
+    SetWorldRotation(rotation);
     GameObjectAddon const* addon = sObjectMgr->GetGameObjectAddon(guidlow);
 
     // hackfix for the hackfix down below
-    switch (goinfo->entry)
+    /* switch (goinfo->entry)
     {
         // excluded ids from the hackfix below
         // used switch since there should be more
@@ -280,18 +281,23 @@ bool GameObject::Create(uint32 guidlow, uint32 name_id, Map* map, uint32 phaseMa
             else
                 SetWorldRotationAngles(NormalizeOrientation(GetOrientation()), 0.0f, 0.0f);
             break;
-    }
+    }*/ //what the fuck guys? 
 
-    // pussywizard: no PathRotation for normal gameobjects
-    SetTransportPathRotation(0.0f, 0.0f, 0.0f, 1.0f);
+    // For most of gameobjects is (0, 0, 0, 1) quaternion, there are only some transports with not standard rotation
+    G3D::Quat parentRotation;
+    if (addon)
+        parentRotation = addon->ParentRotation;
+
+    SetParentRotation(parentRotation);
+
+    // pussywizard: no PathRotation for normal gameobjects  -- insane shit
+    //SetTransportPathRotation(0.0f, 0.0f, 0.0f, 1.0f);
 
     SetObjectScale(goinfo->size);
 
-    if (GameObjectTemplateAddon const* addon = GetTemplateAddon())
-    {
-        SetUInt32Value(GAMEOBJECT_FACTION, addon->faction);
-        SetUInt32Value(GAMEOBJECT_FLAGS, addon->flags);
-    }
+    SetUInt32Value(GAMEOBJECT_FACTION, goinfo->faction);
+    SetUInt32Value(GAMEOBJECT_FLAGS, goinfo->flags);
+
 
     SetEntry(goinfo->entry);
 
@@ -339,13 +345,10 @@ bool GameObject::Create(uint32 guidlow, uint32 name_id, Map* map, uint32 phaseMa
             break;
     }
 
-    if (addon)
+    if (addon && gameObjectAddon->InvisibilityValue))
     {
-        if (addon->InvisibilityValue)
-        {
-            m_invisibility.AddFlag(addon->invisibilityType);
-            m_invisibility.AddValue(addon->invisibilityType, addon->InvisibilityValue);
-        }
+        m_invisibility.AddFlag(addon->invisibilityType);
+        m_invisibility.AddValue(addon->invisibilityType, addon->InvisibilityValue);
     }
 
     LastUsedScriptID = GetGOInfo()->ScriptId;
@@ -1990,24 +1993,16 @@ void GameObject::UpdatePackedRotation()
 
 void GameObject::SetWorldRotation(G3D::Quat const& rot)
 {
-    G3D::Quat rotation;
-    // Temporary solution for gameobjects that have no rotation data in DB:
-    if (G3D::fuzzyEq(rot.z, 0.f) && G3D::fuzzyEq(rot.w, 0.f))
-        rotation = G3D::Quat::fromAxisAngleRotation(G3D::Vector3::unitZ(), GetOrientation());
-    else
-        rotation = rot;
-
-    rotation.unitize();
-    m_worldRotation = rotation;
+    m_worldRotation = rot.toUnit();
     UpdatePackedRotation();
 }
 
-void GameObject::SetTransportPathRotation(float qx, float qy, float qz, float qw)
+void GameObject::SetParentRotation(G3D::Quat const& rotation)
 {
-    SetFloatValue(GAMEOBJECT_PARENTROTATION + 0, qx);
-    SetFloatValue(GAMEOBJECT_PARENTROTATION + 1, qy);
-    SetFloatValue(GAMEOBJECT_PARENTROTATION + 2, qz);
-    SetFloatValue(GAMEOBJECT_PARENTROTATION + 3, qw);
+    SetFloatValue(GAMEOBJECT_PARENTROTATION + 0, rotation.x);
+    SetFloatValue(GAMEOBJECT_PARENTROTATION + 1, rotation.y);
+    SetFloatValue(GAMEOBJECT_PARENTROTATION + 2, rotation.z);
+    SetFloatValue(GAMEOBJECT_PARENTROTATION + 3, rotation.w);
 }
 
 void GameObject::SetWorldRotationAngles(float z_rot, float y_rot, float x_rot)

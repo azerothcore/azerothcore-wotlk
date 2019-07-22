@@ -1025,8 +1025,8 @@ void ObjectMgr::LoadGameObjectAddons()
 {
     uint32 oldMSTime = getMSTime();
 
-    //                                               0     1                 2
-    QueryResult result = WorldDatabase.Query("SELECT guid, invisibilityType, invisibilityValue FROM gameobject_addon");
+    //                                               0     1                 2                 3                 4                 5                 6
+    QueryResult result = WorldDatabase.Query("SELECT guid, parent_rotation0, parent_rotation1, parent_rotation2, parent_rotation3, invisibilityType, invisibilityValue FROM gameobject_addon");
 
     if (!result)
     {
@@ -1050,12 +1050,13 @@ void ObjectMgr::LoadGameObjectAddons()
         }
 
         GameObjectAddon& gameObjectAddon = _gameObjectAddonStore[guid];
-        gameObjectAddon.invisibilityType = InvisibilityType(fields[1].GetUInt8());
-        gameObjectAddon.InvisibilityValue = fields[2].GetUInt32();
+        gameObjectAddon.ParentRotation = G3D::Quat(fields[1].GetFloat(), fields[2].GetFloat(), fields[3].GetFloat(), fields[4].GetFloat());
+        gameObjectAddon.invisibilityType = InvisibilityType(fields[5].GetUInt8());
+        gameObjectAddon.InvisibilityValue = fields[6].GetUInt32();
 
         if (gameObjectAddon.invisibilityType >= TOTAL_INVISIBILITY_TYPES)
         {
-            sLog->outErrorDb("GameObject (GUID: %u) has invalid InvisibilityType in `gameobject_addon`", guid);
+            sLog->outErrorDb("GameObject (GUID: %u) has invalid InvisibilityType in `gameobject_addon`, disabled invisibility", guid);
             gameObjectAddon.invisibilityType = INVISIBILITY_GENERAL;
             gameObjectAddon.InvisibilityValue = 0;
         }
@@ -1064,6 +1065,12 @@ void ObjectMgr::LoadGameObjectAddons()
         {
             sLog->outErrorDb("GameObject (GUID: %u) has InvisibilityType set but has no InvisibilityValue in `gameobject_addon`, set to 1", guid);
             gameObjectAddon.InvisibilityValue = 1;
+        }
+
+        if (!gameObjectAddon.ParentRotation.isUnit())
+        {
+            sLog->outErrorDb("GameObject (GUID: %u) has invalid path rotation, set to default", guid);
+            gameObjectAddon.ParentRotation = G3D::Quat();
         }
 
         ++count;

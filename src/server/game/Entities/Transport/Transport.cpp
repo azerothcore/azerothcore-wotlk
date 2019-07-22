@@ -86,11 +86,9 @@ bool MotionTransport::CreateMoTrans(uint32 guidlow, uint32 entry, uint32 mapid, 
     SetGoAnimProgress(animprogress);
     SetName(goinfo->name);
 
-    // pussywizard: no WorldRotation for MotionTransports
-    SetWorldRotation(G3D::Quat());
-    // pussywizard: no PathRotation for MotionTransports
-    SetTransportPathRotation(0.0f, 0.0f, 0.0f, 1.0f);
-
+    SetWorldRotation(0.0f, 0.0f, 0.0f, 1.0f);
+    SetParentRotation(QuaternionData());
+    
     m_model = GameObjectModel::Create(*this);
     return true;
 }

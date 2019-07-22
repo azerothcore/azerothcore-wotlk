@@ -822,18 +822,18 @@ Creature* Battlefield::SpawnCreature(uint32 entry, float x, float y, float z, fl
 GameObject* Battlefield::SpawnGameObject(uint32 entry, float x, float y, float z, float o)
 {
     // Get map object
-    Map* map = sMapMgr->CreateBaseMap(571); // *vomits*
+    Map* map = sMapMgr->CreateBaseMap(m_MapId); // *vomits*
     if (!map)
         return 0;
 
     // Create gameobject
     GameObject* go = sObjectMgr->IsGameObjectStaticTransport(entry) ? new StaticTransport() : new GameObject();
-    if (!go->Create(sObjectMgr->GenerateLowGuid(HIGHGUID_GAMEOBJECT), entry, map, PHASEMASK_NORMAL, x, y, z, o, G3D::Quat(), 100, GO_STATE_READY))
+    if (!go->Create(sObjectMgr->GenerateLowGuid(HIGHGUID_GAMEOBJECT), entry, map, PHASEMASK_NORMAL, x, y, z, o, rot, 100, GO_STATE_READY))
     {
         sLog->outErrorDb("Battlefield::SpawnGameObject: Gameobject template %u not found in database! Battlefield not created!", entry);
         sLog->outError("Battlefield::SpawnGameObject: Cannot create gameobject template %u! Battlefield not created!", entry);
         delete go;
-        return NULL;
+        return nullptr;
     }
 
     // Add to world
