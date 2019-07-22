@@ -2,7 +2,6 @@
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/e61f4ea81de14b289fbf83d2b0da0c35)](https://app.codacy.com/app/FrancescoBorzi/azerothcore-wotlk?utm_source=github.com&utm_medium=referral&utm_content=azerothcore/azerothcore-wotlk&utm_campaign=Badge_Grade_Settings)
 [![Master Build Status](https://travis-ci.org/azerothcore/azerothcore-wotlk.svg)](https://travis-ci.org/azerothcore/azerothcore-wotlk)
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FViste%2FOutlandcore.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2FViste%2FOutlandcore?ref=badge_shield)
 <a href="https://scan.coverity.com/projects/azerothcore-azerothcore-wotlk">
   <img alt="Coverity Scan Build Status"
        src="https://scan.coverity.com/projects/13814/badge.svg"/>
@@ -55,9 +54,6 @@ This project is brought to you thanks to:
 
 - The new AzerothCore source components are released under the [GNU AGPL v3](https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3)
 - The old sources based on MaNGOS/TrinityCore are released under the [GNU GPL v2](https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2)
-
-
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FViste%2FOutlandcore.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2FViste%2FOutlandcore?ref=badge_large)
 
 ## Links
 
