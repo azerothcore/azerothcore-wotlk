@@ -42,13 +42,13 @@ bool Player::CheckOnFlyHack()
     if (IsFlying() || IsLevitating() || IsInFlight())
         return true;
 
-    if (GetTransport() || GetVehicle() || GetVehicleKit())
+    if (GetVehicle() || GetVehicleKit())
         return true;
 
     if (HasAuraType(SPELL_AURA_CONTROL_VEHICLE))
         return true;
 
-    if (HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT))
+    if (GetTransport() || HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT))
         return true;
 
     if (HasUnitState(UNIT_STATE_IGNORE_ANTISPEEDHACK))
@@ -129,17 +129,11 @@ bool Player::CheckMovementInfo(MovementInfo const& movementInfo, bool jump)
         if (ToUnit()->IsFalling() || IsInFlight())
             return true;
 
-        if (GetTransport() || GetVehicle() || GetVehicleKit())
+        if (GetVehicle() || GetVehicleKit())
             return true;
 
         if (HasAuraType(SPELL_AURA_CONTROL_VEHICLE))
             return true;
-
-        if ((movementInfo.GetMovementFlags() & MOVEMENTFLAG_ONTRANSPORT) || HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT))
-            return true;
-
-        //if (UnderACKmount())
-        //    return true;
 
         if (IsSkipOnePacketForASH())
         {
@@ -167,8 +161,9 @@ bool Player::CheckMovementInfo(MovementInfo const& movementInfo, bool jump)
 
         float distance, movetime, speed, difftime, normaldistance, delay, delaysentrecieve, x, y;
         distance = npos.GetExactDist2d(this);
+        bool transportflag = GetTransport() || (movementInfo.GetMovementFlags() & MOVEMENTFLAG_ONTRANSPORT) || HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
 
-        if (!jump && !CanFly() && !isSwimming())
+        if (!jump && !CanFly() && !isSwimming() && !transportflag)
         {
             float diffz = fabs(movementInfo.pos.GetPositionZ() - GetPositionZ());
             float tanangle = distance / diffz;
