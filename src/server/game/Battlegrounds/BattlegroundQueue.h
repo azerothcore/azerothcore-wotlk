@@ -20,6 +20,7 @@ struct GroupQueueInfo                                       // stores informatio
 {
     std::set<uint64> Players;                               // player guid set
     TeamId  teamId;                                         // Player team (TEAM_ALLIANCE/TEAM_HORDE)
+    TeamId  RealTeamID;                                     // Realm player team (TEAM_ALLIANCE/TEAM_HORDE)
     BattlegroundTypeId BgTypeId;                            // battleground type id
     bool    IsRated;                                        // rated
     uint8   ArenaType;                                      // 2v2, 3v3, 5v5 or 0 when BG
@@ -39,12 +40,13 @@ struct GroupQueueInfo                                       // stores informatio
 
 enum BattlegroundQueueGroupTypes
 {
-    BG_QUEUE_PREMADE_ALLIANCE   = 0,
-    BG_QUEUE_PREMADE_HORDE      = 1,
-    BG_QUEUE_NORMAL_ALLIANCE    = 2,
-    BG_QUEUE_NORMAL_HORDE       = 3
+    BG_QUEUE_PREMADE_ALLIANCE,
+    BG_QUEUE_PREMADE_HORDE,
+    BG_QUEUE_NORMAL_ALLIANCE,
+    BG_QUEUE_NORMAL_HORDE,
+
+    BG_QUEUE_MAX
 };
-#define BG_QUEUE_GROUP_TYPES_COUNT 4
 
 class Battleground;
 class BattlegroundQueue
@@ -56,8 +58,8 @@ class BattlegroundQueue
         void BattlegroundQueueUpdate(BattlegroundBracketId bracket_id, uint8 actionMask, bool isRated, uint32 arenaRatedTeamId);
         void UpdateEvents(uint32 diff);
 
-        void FillPlayersToBG(const int32 aliFree, const int32 hordeFree, BattlegroundBracketId bracket_id);
-        void FillPlayersToBGWithSpecific(const int32 aliFree, const int32 hordeFree, BattlegroundBracketId thisBracketId, BattlegroundQueue* specificQueue, BattlegroundBracketId specificBracketId);
+        void FillPlayersToBG(Battleground* bg, const int32 aliFree, const int32 hordeFree, BattlegroundBracketId bracket_id);
+        void FillPlayersToBGWithSpecific(Battleground* bg, const int32 aliFree, const int32 hordeFree, BattlegroundBracketId thisBracketId, BattlegroundQueue* specificQueue, BattlegroundBracketId specificBracketId);
         bool CheckPremadeMatch(BattlegroundBracketId bracket_id, uint32 MinPlayersPerTeam, uint32 MaxPlayersPerTeam);
         bool CheckNormalMatch(Battleground* bgTemplate, BattlegroundBracketId bracket_id, uint32 minPlayers, uint32 maxPlayers);
         bool CheckSkirmishForSameFaction(BattlegroundBracketId bracket_id, uint32 minPlayersPerTeam);
@@ -68,6 +70,8 @@ class BattlegroundQueue
         bool GetPlayerGroupInfoData(uint64 guid, GroupQueueInfo* ginfo);
         void PlayerInvitedToBGUpdateAverageWaitTime(GroupQueueInfo* ginfo);
         uint32 GetAverageQueueWaitTime(GroupQueueInfo* ginfo) const;
+        uint32 GetPlayersCountInGroupsQueue(BattlegroundBracketId bracketId, BattlegroundQueueGroupTypes bgqueue);
+        bool IsAllQueuesEmpty(BattlegroundBracketId bracket_id);
 
         void SetBgTypeIdAndArenaType(BattlegroundTypeId b, uint8 a) { m_bgTypeId = b; m_arenaType = ArenaType(a); } // pussywizard
         void AddEvent(BasicEvent* Event, uint64 e_time);
@@ -87,7 +91,7 @@ class BattlegroundQueue
              BG_QUEUE_NORMAL_ALLIANCE   is used for normal (or small) alliance groups or non-rated arena matches
              BG_QUEUE_NORMAL_HORDE      is used for normal (or small) horde groups or non-rated arena matches
         */
-        GroupsQueueType m_QueuedGroups[MAX_BATTLEGROUND_BRACKETS][BG_QUEUE_GROUP_TYPES_COUNT];
+        GroupsQueueType m_QueuedGroups[MAX_BATTLEGROUND_BRACKETS][BG_QUEUE_MAX];
 
         // class to select and invite groups to bg
         class SelectionPool
