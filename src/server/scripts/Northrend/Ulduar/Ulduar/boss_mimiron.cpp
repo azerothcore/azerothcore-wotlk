@@ -1374,7 +1374,6 @@ public:
                         events.ScheduleEvent(EVENT_SPELL_ROCKET_STRIKE, 16000);
                         events.ScheduleEvent(EVENT_HAND_PULSE, 1);
                         events.ScheduleEvent(EVENT_SPELL_SPINNING_UP, urand(30000, 35000));
-                        me->GetMotionMaster()->MoveRotate(40000, rand()%2 ? ROTATE_DIRECTION_LEFT : ROTATE_DIRECTION_RIGHT);
                         if (Creature* c = GetMimiron())
                             if (c->AI()->GetData(1))
                                 events.ScheduleEvent(EVENT_FROST_BOMB, 1000);
