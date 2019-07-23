@@ -88,7 +88,7 @@ bool Player::CheckOnFlyHack()
                 return true;
 
             float cx, cy, cz;
-            GetClosePoint(cx, cy, cz, DEFAULT_PLAYER_BOUNDING_RADIUS, 6.0f, 0, nullptr, false, 3.0f); // first check
+            GetVoidClosePoint(cx, cy, cz, DEFAULT_PLAYER_BOUNDING_RADIUS, 2.0f, 0, 6.8f); // first check
             if (pz - cz > 6.8f)
             {
                 GetMap()->getObjectHitPos(GetPhaseMask(), GetPositionX(), GetPositionY(), GetPositionZ() + GetCollisionHeight(IsMounted()), cx, cy, cz + GetCollisionHeight(IsMounted()), cx, cy, cz, -GetCollisionHeight(IsMounted()));
