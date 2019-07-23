@@ -2502,7 +2502,7 @@ namespace Trinity
 
 //===================================================================================================
 
-void WorldObject::GetNearPoint2D(WorldObject const* searcher, float& x, float& y, float distance2d, float absAngle) const
+void WorldObject::GetNearPoint2D(float& x, float& y, float distance2d, float absAngle, WorldObject const* searcher) const
 {
     float effectiveReach = GetCombatReach();
 
@@ -2534,7 +2534,7 @@ void WorldObject::GetNearPoint2D(WorldObject const* searcher, float& x, float& y
 
 void WorldObject::GetNearPoint(WorldObject const* searcher, float& x, float& y, float& z, float distance2d, float absAngle, float controlZ) const
 {
-    GetNearPoint2D(searcher, x, y, distance2d, absAngle);
+    GetNearPoint2D(x, y, distance2d, absAngle, searcher);
     z = GetPositionZ();
     (searcher ? searcher : this)->UpdateAllowedPositionZ(x, y, z);
 
@@ -2554,7 +2554,7 @@ void WorldObject::GetNearPoint(WorldObject const* searcher, float& x, float& y, 
     // loop in a circle to look for a point in LoS using small steps
     for (float angle = float(M_PI) / 8; angle < float(M_PI) * 2; angle += float(M_PI) / 8)
     {
-        GetNearPoint2D(searcher, x, y, distance2d, absAngle + angle);
+        GetNearPoint2D(x, y, distance2d, absAngle + angle, searcher);
         z = GetPositionZ();
         (searcher ? searcher : this)->UpdateAllowedPositionZ(x, y, z);
         if (controlZ && fabsf(GetPositionZ() - z) > controlZ)
