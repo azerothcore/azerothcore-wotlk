@@ -2558,7 +2558,7 @@ void WorldObject::GetVoidClosePoint(float& x, float& y, float& z, float size, fl
     GetNearPoint(nullptr, x, y, z, size, distance2d, GetOrientation() + relAngle, controlZ);
 }
 
-bool WorldObject::GetClosePoint(float& x, float& y, float& z, float size, float distance2d, float angle, const WorldObject* forWho, bool force) const
+bool WorldObject::GetClosePoint(float& x, float& y, float& z, float size, float distance2d, float angle, WorldObject const* forWho, bool force) const
 {
     // angle calculated from current orientation
     GetNearPoint(forWho, x, y, z, size, distance2d, GetOrientation() + angle);
@@ -2587,7 +2587,7 @@ bool WorldObject::GetClosePoint(float& x, float& y, float& z, float size, float 
     return true;
 }
 
-void WorldObject::GetContactPoint(const WorldObject* obj, float& x, float& y, float& z, float distance2d) const
+void WorldObject::GetContactPoint(WorldObject const* obj, float& x, float& y, float& z, float distance2d) const
 {
     // angle to face `obj` to `this` using distance includes size of `obj`
     GetNearPoint(obj, x, y, z, obj->GetObjectSize(), distance2d, GetAngle(obj));
@@ -2602,7 +2602,7 @@ void WorldObject::GetContactPoint(const WorldObject* obj, float& x, float& y, fl
 }
 
 
-void WorldObject::GetChargeContactPoint(const WorldObject* obj, float& x, float& y, float& z, float distance2d) const
+void WorldObject::GetChargeContactPoint(WorldObject const* obj, float& x, float& y, float& z, float distance2d) const
 {
     // angle to face `obj` to `this` using distance includes size of `obj`
     GetNearPoint(obj, x, y, z, obj->GetObjectSize(), distance2d, GetAngle(obj));
