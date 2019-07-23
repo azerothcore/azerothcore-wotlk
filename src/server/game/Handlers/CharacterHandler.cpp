@@ -1039,8 +1039,15 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder* holder)
     pCurrChar->LoadCorpse();
 
     // setting Ghost+speed if dead
-    if (pCurrChar->m_deathState == DEAD)
+    if (pCurrChar->m_deathState != ALIVE)
+    {
+        // not blizz like, we must correctly save and load player instead...
+        if (pCurrChar->getRace() == RACE_NIGHTELF)
+            pCurrChar->CastSpell(pCurrChar, 20584, true, 0);// auras SPELL_AURA_INCREASE_SPEED(+speed in wisp form), SPELL_AURA_INCREASE_SWIM_SPEED(+swim speed in wisp form), SPELL_AURA_TRANSFORM (to wisp form)
+        pCurrChar->CastSpell(pCurrChar, 8326, true, 0);     // auras SPELL_AURA_GHOST, SPELL_AURA_INCREASE_SPEED(why?), SPELL_AURA_INCREASE_SWIM_SPEED(why?)
+
         pCurrChar->SetMovement(MOVE_WATER_WALK);
+    }
 
     // Set FFA PvP for non GM in non-rest mode
     if (sWorld->IsFFAPvPRealm() && !pCurrChar->IsGameMaster() && !pCurrChar->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING))
@@ -1141,13 +1148,6 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder* holder)
 
     // Handle Login-Achievements (should be handled after loading)
     _player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_ON_LOGIN, 1);
-
-    // if we're loading a dead player, repop them to the GY after the load is finished
-    if (pCurrChar->getDeathState() == CORPSE)
-    {
-        pCurrChar->BuildPlayerRepop();
-        pCurrChar->RepopAtGraveyard();
-    }
 
     // Xinef: fix vendors falling of player vehicle, due to isBeingLoaded checks
     if (pCurrChar->IsInWorld())
