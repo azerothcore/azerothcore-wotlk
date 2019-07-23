@@ -2605,10 +2605,10 @@ bool WorldObject::GetClosePoint(float& x, float& y, float& z, float size, float 
     return true;
 }
 
-void WorldObject::GetContactPoint(const WorldObject* obj, float &x, float &y, float &z, float distance2d) const
+void WorldObject::GetContactPoint(WorldObject const* obj, float &x, float &y, float &z, float distance2d) const
 { 
     // angle to face `obj` to `this` using distance includes size of `obj`
-    GetNearPoint(obj, x, y, z, obj->GetObjectSize(), distance2d, GetAngle(obj));
+    GetNearPoint(obj, x, y, z, obj->GetObjectSize() + distance2d, GetAngle(obj));
 
     if (fabs(this->GetPositionZ()-z) > 3.0f || !IsWithinLOS(x, y, z))
     {
@@ -2620,10 +2620,10 @@ void WorldObject::GetContactPoint(const WorldObject* obj, float &x, float &y, fl
 }
 
 
-void WorldObject::GetChargeContactPoint(const WorldObject* obj, float &x, float &y, float &z, float distance2d) const
+void WorldObject::GetChargeContactPoint(WorldObject const* obj, float &x, float &y, float &z, float distance2d) const
 { 
     // angle to face `obj` to `this` using distance includes size of `obj`
-    GetNearPoint(obj, x, y, z, obj->GetObjectSize(), distance2d, GetAngle(obj));
+    GetNearPoint(obj, x, y, z, obj->GetObjectSize() + distance2d, GetAngle(obj));
 
     if (fabs(this->GetPositionZ()-z) > 3.0f || !IsWithinLOS(x, y, z))
     {
