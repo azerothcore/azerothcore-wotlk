@@ -2502,41 +2502,23 @@ namespace Trinity
 
 //===================================================================================================
 
-void WorldObject::GetNearPoint2D(float& x, float& y, float distance2d, float absAngle, WorldObject const* searcher) const
+void WorldObject::GetNearPoint2D(float& x, float& y, float distance2d, float absAngle) const
 {
-    float effectiveReach = GetCombatReach();
-
-    if (searcher)
-    {
-        effectiveReach += searcher->GetCombatReach();
-
-        if (this != searcher)
-        {
-            float myHover = 0.0f, searcherHover = 0.0f;
-            // TODO port GetHoverOffset from TC
-            /*if (Unit const* unit = ToUnit())
-                myHover = unit->GetHoverOffset();
-            if (Unit const* searchUnit = searcher->ToUnit())
-                searcherHover = searchUnit->GetHoverOffset();*/
-
-            float hoverDelta = myHover - searcherHover;
-            if (hoverDelta != 0.0f)
-                effectiveReach = std::sqrt(std::max(effectiveReach * effectiveReach - hoverDelta * hoverDelta, 0.0f));
-        }
-    }
-
-    x = GetPositionX() + (effectiveReach + distance2d) * std::cos(absAngle);
-    y = GetPositionY() + (effectiveReach + distance2d) * std::sin(absAngle);
+    x = GetPositionX() + (GetObjectSize() + distance2d) * cos(absAngle);
+    y = GetPositionY() + (GetObjectSize() + distance2d) * sin(absAngle);
 
     Trinity::NormalizeMapCoord(x);
     Trinity::NormalizeMapCoord(y);
 }
 
-void WorldObject::GetNearPoint(WorldObject const* searcher, float& x, float& y, float& z, float distance2d, float absAngle, float controlZ) const
+void WorldObject::GetNearPoint(WorldObject const* searcher, float& x, float& y, float& z, float searcher_size, float distance2d, float absAngle, float controlZ) const
 {
-    GetNearPoint2D(x, y, distance2d, absAngle, searcher);
+    GetNearPoint2D(x, y, distance2d+searcher_size, absAngle);
     z = GetPositionZ();
-    (searcher ? searcher : this)->UpdateAllowedPositionZ(x, y, z);
+    if (searcher)
+        searcher->UpdateAllowedPositionZ(x, y, z);
+    else
+        UpdateAllowedPositionZ(x, y, z);
 
     // if detection disabled, return first point
     if (!sWorld->getBoolConfig(CONFIG_DETECT_POS_COLLISION))
@@ -2554,9 +2536,9 @@ void WorldObject::GetNearPoint(WorldObject const* searcher, float& x, float& y, 
     // loop in a circle to look for a point in LoS using small steps
     for (float angle = float(M_PI) / 8; angle < float(M_PI) * 2; angle += float(M_PI) / 8)
     {
-        GetNearPoint2D(x, y, distance2d, absAngle + angle, searcher);
+        GetNearPoint2D(x, y, distance2d + searcher_size, absAngle + angle);
         z = GetPositionZ();
-        (searcher ? searcher : this)->UpdateAllowedPositionZ(x, y, z);
+        UpdateAllowedPositionZ(x, y, z);
         if (controlZ && fabsf(GetPositionZ() - z) > controlZ)
             continue;
 
@@ -2573,13 +2555,13 @@ void WorldObject::GetNearPoint(WorldObject const* searcher, float& x, float& y, 
 void WorldObject::GetVoidClosePoint(float& x, float& y, float& z, float size, float distance2d /*= 0*/, float relAngle /*= 0*/, float controlZ /*= 0*/) const
 {
     // angle calculated from current orientation
-    GetNearPoint(nullptr, x, y, z, distance2d + size, GetOrientation() + relAngle, controlZ);
+    GetNearPoint(nullptr, x, y, z, size, distance2d, GetOrientation() + relAngle, controlZ);
 }
 
-bool WorldObject::GetClosePoint(float& x, float& y, float& z, float size, float distance2d, float angle, const WorldObject* forWho, bool force, float controlZ) const
+bool WorldObject::GetClosePoint(float& x, float& y, float& z, float size, float distance2d, float angle, const WorldObject* forWho, bool force) const
 {
     // angle calculated from current orientation
-    GetNearPoint(forWho, x, y, z, distance2d + size, GetOrientation() + angle, controlZ);
+    GetNearPoint(forWho, x, y, z, size, distance2d, GetOrientation() + angle);
 
     if (fabs(this->GetPositionZ() - z) > 3.0f || !IsWithinLOS(x, y, z))
     {
@@ -2605,12 +2587,12 @@ bool WorldObject::GetClosePoint(float& x, float& y, float& z, float size, float 
     return true;
 }
 
-void WorldObject::GetContactPoint(WorldObject const* obj, float &x, float &y, float &z, float distance2d) const
-{ 
+void WorldObject::GetContactPoint(const WorldObject* obj, float& x, float& y, float& z, float distance2d) const
+{
     // angle to face `obj` to `this` using distance includes size of `obj`
-    GetNearPoint(obj, x, y, z, obj->GetObjectSize() + distance2d, GetAngle(obj));
+    GetNearPoint(obj, x, y, z, obj->GetObjectSize(), distance2d, GetAngle(obj));
 
-    if (fabs(this->GetPositionZ()-z) > 3.0f || !IsWithinLOS(x, y, z))
+    if (fabs(this->GetPositionZ() - z) > 3.0f || !IsWithinLOS(x, y, z))
     {
         x = this->GetPositionX();
         y = this->GetPositionY();
@@ -2620,12 +2602,12 @@ void WorldObject::GetContactPoint(WorldObject const* obj, float &x, float &y, fl
 }
 
 
-void WorldObject::GetChargeContactPoint(WorldObject const* obj, float &x, float &y, float &z, float distance2d) const
-{ 
+void WorldObject::GetChargeContactPoint(const WorldObject* obj, float& x, float& y, float& z, float distance2d) const
+{
     // angle to face `obj` to `this` using distance includes size of `obj`
-    GetNearPoint(obj, x, y, z, obj->GetObjectSize() + distance2d, GetAngle(obj));
+    GetNearPoint(obj, x, y, z, obj->GetObjectSize(), distance2d, GetAngle(obj));
 
-    if (fabs(this->GetPositionZ()-z) > 3.0f || !IsWithinLOS(x, y, z))
+    if (fabs(this->GetPositionZ() - z) > 3.0f || !IsWithinLOS(x, y, z))
     {
         x = this->GetPositionX();
         y = this->GetPositionY();
