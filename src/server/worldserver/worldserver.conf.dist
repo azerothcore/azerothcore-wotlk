@@ -3260,6 +3260,11 @@ LFG.Location.All = 0
 
 ###################################################################################################
 # MISC ANTI-CHEAT SETTINGS
+
+#        Description: AntiCheats.SafeMode when player udner ACK packet (not handled by core), player will have immune for ASH checks.
+
+AntiCheats.SafeMode.Enabled = 1
+
 #    AntiCheats.FlyHack
 #        Description: Enable AntiCheat.FlyHack
 #        Default:     1 - (Enabled)

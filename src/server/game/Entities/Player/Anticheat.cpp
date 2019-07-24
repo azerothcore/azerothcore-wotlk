@@ -135,6 +135,10 @@ bool Player::CheckMovementInfo(MovementInfo const& movementInfo, bool jump)
         if (HasAuraType(SPELL_AURA_CONTROL_VEHICLE))
             return true;
 
+        if (sWorld->getBoolConfig(CONFIG_ANTICHEAT_SAFEMODE_ENABLED))
+            if (UnderACKmount())
+                return true;
+
         if (IsSkipOnePacketForASH())
         {
             SetSkipOnePacketForASH(false);

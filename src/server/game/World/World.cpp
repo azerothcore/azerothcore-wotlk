@@ -1270,7 +1270,8 @@ void World::LoadConfigSettings(bool reload)
     m_int_configs[CONFIG_WARDEN_CLIENT_FAIL_ACTION]    = sConfigMgr->GetIntDefault("Warden.ClientCheckFailAction", 0);
     m_int_configs[CONFIG_WARDEN_CLIENT_RESPONSE_DELAY] = sConfigMgr->GetIntDefault("Warden.ClientResponseDelay", 600);
 
-    // AntiCheat
+    // AntiCheat    
+    m_bool_configs[CONFIG_ANTICHEAT_SAFEMODE_ENABLED] = sConfigMgr->GetBoolDefault("AntiCheats.SafeMode.Enabled", false);
     m_bool_configs[CONFIG_ANTICHEAT_FLYHACK_ENABLED] = sConfigMgr->GetBoolDefault("AntiCheats.FlyHack.Enabled", false);
     m_bool_configs[CONFIG_ANTICHEAT_SPEEDHACK_ENABLED] = sConfigMgr->GetBoolDefault("AntiCheats.SpeedHack.Enabled", false);
     m_bool_configs[CONFIG_ANTICHEAT_DOUBLEJUMP_ENABLED] = sConfigMgr->GetBoolDefault("AntiCheats.DoubleJump.Enabled", false);
