@@ -273,8 +273,8 @@ public:
                         dragons[i] = cr->GetGUID();
                         dragonsCount++;
                         me->AddLootMode(1 << dragonsCount);
-						
-						cr->SetHealth(cr->GetMaxHealth());
+
+                        cr->SetHealth(cr->GetMaxHealth());
                         switch(DATA_TENEBRON+i)
                         {
                             case DATA_TENEBRON:
