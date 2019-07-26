@@ -434,8 +434,9 @@ void BattlegroundQueue::FillPlayersToBG(Battleground* bg, const int32 aliFree, c
         return;
     case BG_QUEUE_INVITATION_TYPE_BALANCED:
         invDiff = 1;
+        break;
     case BG_QUEUE_INVITATION_TYPE_EVEN:
-        invDiff = 0;
+        break;
     default:
         return;
     }
@@ -515,8 +516,9 @@ void BattlegroundQueue::FillPlayersToBGWithSpecific(Battleground* bg, const int3
         return;
     case BG_QUEUE_INVITATION_TYPE_BALANCED:
         invDiff = 1;
+        break;
     case BG_QUEUE_INVITATION_TYPE_EVEN:
-        invDiff = 0;
+        break;
     default:
         return;
     }
