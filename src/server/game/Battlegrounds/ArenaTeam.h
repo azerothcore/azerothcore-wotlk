@@ -74,6 +74,13 @@ enum ArenaTeamTypes
     ARENA_TEAM_5v5      = 5
 };
 
+enum ArenaSlot
+{
+    ARENA_SLOT_2v2,
+    ARENA_SLOT_3v3,
+    ARENA_SLOT_5v5
+};
+
 struct ArenaTeamMember
 {
     uint64 Guid;
@@ -174,6 +181,10 @@ class ArenaTeam
 
         void FinishWeek();
         void FinishGame(int32 mod, const Map* bgMap);
+
+        // Containers
+        static std::unordered_map<uint32, uint8> ArenaSlotByType; // Slot -> Type
+        static std::unordered_map<uint8, uint8> ArenaReqPlayersForType; // Type -> Players count
 
     protected:
 

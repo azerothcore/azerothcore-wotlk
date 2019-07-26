@@ -6,14 +6,13 @@
 
 #include "ObjectMgr.h"
 #include "WorldPacket.h"
-#include "ArenaTeam.h"
 #include "World.h"
 #include "Group.h"
 #include "ArenaTeamMgr.h"
 #include "Player.h"
 #include "WorldSession.h"
 #include "Opcodes.h"
-#include <Config.h>
+#include "ScriptMgr.h"
 
 ArenaTeam::ArenaTeam()
     : TeamId(0), Type(0), TeamName(), CaptainGuid(0), BackgroundColor(0), EmblemStyle(0), EmblemColor(0),
@@ -578,20 +577,6 @@ void ArenaTeam::MassInviteToEvent(WorldSession* session)
     session->SendPacket(&data);
 }
 
-uint8 ArenaTeam::GetSlotByType(uint32 type)
-{
-    switch (type)
-    {
-        case ARENA_TEAM_2v2: return 0;
-        case ARENA_TEAM_3v3: return 1;
-        case ARENA_TEAM_5v5: return 2;
-        default:
-            break;
-    }
-    sLog->outError("FATAL: Unknown arena team type %u for some arena team", type);
-    return 0xFF;
-}
-
 bool ArenaTeam::IsMember(uint64 guid) const
 {
     for (MemberList::const_iterator itr = Members.begin(); itr != Members.end(); ++itr)
@@ -952,3 +937,41 @@ ArenaTeamMember* ArenaTeam::GetMember(uint64 guid)
 
     return NULL;
 }
+
+uint8 ArenaTeam::GetSlotByType(uint32 type)
+{
+    if (!ArenaSlotByType.count(type))
+    {
+        sLog->outError("FATAL: Unknown arena team type %u for some arena team", type);
+        return 0xFF;
+    }
+
+    return ArenaSlotByType[type];
+}
+
+uint8 ArenaTeam::GetReqPlayersForType(uint32 type)
+{
+    if (!ArenaReqPlayersForType.count(type))
+    {
+        sLog->outError("FATAL: Unknown arena type %u!", type);
+        return 0xFF;
+    }
+
+    return ArenaReqPlayersForType[type];
+}
+
+// init/update unordered_map ArenaSlotByType
+std::unordered_map<uint32, uint8> ArenaTeam::ArenaSlotByType =
+{
+    { ARENA_TEAM_2v2, ARENA_SLOT_2v2},
+    { ARENA_TEAM_3v3, ARENA_SLOT_3v3},
+    { ARENA_TEAM_5v5, ARENA_SLOT_5v5}
+};
+
+// init/update unordered_map ArenaReqPlayersForType
+std::unordered_map<uint8, uint8> ArenaTeam::ArenaReqPlayersForType =
+{
+    { ARENA_TYPE_2v2, 4},
+    { ARENA_TYPE_3v3, 6},
+    { ARENA_TYPE_5v5, 10}
+};
