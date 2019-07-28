@@ -10,7 +10,6 @@
 #include "ArenaTeamMgr.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
-
 #include "ArenaTeam.h"
 #include "BattlegroundMgr.h"
 #include "Battleground.h"
@@ -23,6 +22,10 @@
 #include "DisableMgr.h"
 #include "Group.h"
 #include "ScriptMgr.h"
+
+#ifdef _CFBG
+#include "CFBG.h"
+#endif
 
 void WorldSession::HandleBattlemasterHelloOpcode(WorldPacket & recvData)
 {
@@ -133,6 +136,11 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket & recvData)
 
     // queue result (default ok)
     GroupJoinBattlegroundResult err = GroupJoinBattlegroundResult(bgt->GetBgTypeID());
+
+#ifdef _CFBG
+    if (!sCFBG->IsAllCheckPassed(_player, joinAsGroup, bgt))
+        return;
+#endif
 
     // check if player can queue:
     if (!joinAsGroup)

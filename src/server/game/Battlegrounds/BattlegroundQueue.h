@@ -44,6 +44,9 @@ enum BattlegroundQueueGroupTypes
     BG_QUEUE_PREMADE_HORDE,
     BG_QUEUE_NORMAL_ALLIANCE,
     BG_QUEUE_NORMAL_HORDE,
+#ifdef _CFBG
+    BG_QUEUE_CFBG,
+#endif
 
     BG_QUEUE_MAX
 };
@@ -72,6 +75,7 @@ class BattlegroundQueue
         uint32 GetAverageQueueWaitTime(GroupQueueInfo* ginfo) const;
         uint32 GetPlayersCountInGroupsQueue(BattlegroundBracketId bracketId, BattlegroundQueueGroupTypes bgqueue);
         bool IsAllQueuesEmpty(BattlegroundBracketId bracket_id);
+        void SendMessageQueue(Player* leader, Battleground* bg, PvPDifficultyEntry const* bracketEntry);
 
         void SetBgTypeIdAndArenaType(BattlegroundTypeId b, uint8 a) { m_bgTypeId = b; m_arenaType = ArenaType(a); } // pussywizard
         void AddEvent(BasicEvent* Event, uint64 e_time);

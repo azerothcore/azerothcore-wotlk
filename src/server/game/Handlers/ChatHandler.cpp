@@ -28,8 +28,13 @@
 #include "Util.h"
 #include "ScriptMgr.h"
 #include "AccountMgr.h"
+
 #ifdef ELUNA
 #include "LuaEngine.h"
+#endif
+
+#ifdef _CFBG
+#include "CFBG.h"
 #endif
 
 void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
@@ -97,6 +102,11 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
                 return;
             }
     }
+
+#ifdef _CFBG
+    if (sCFBG->IsEnableSystem() && ((!sender->IsGameMaster() && sender->GetBattleground())))
+        lang = LANG_UNIVERSAL;
+#endif
 
     // prevent talking at unknown language (cheating)
     LanguageDesc const* langDesc = GetLanguageDescByID(lang);

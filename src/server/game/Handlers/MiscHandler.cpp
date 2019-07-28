@@ -43,8 +43,13 @@
 #include "AccountMgr.h"
 #include "Spell.h"
 #include "WhoListCache.h"
+
 #ifdef ELUNA
 #include "LuaEngine.h"
+#endif
+
+#ifdef _CFBG
+#include "CFBG.h"
 #endif
 
 void WorldSession::HandleRepopRequestOpcode(WorldPacket & recv_data)
@@ -1514,6 +1519,10 @@ void WorldSession::HandleSetTitleOpcode(WorldPacket & recv_data)
 
 void WorldSession::HandleTimeSyncResp(WorldPacket & recv_data)
 {
+#ifdef _CFBG
+    sCFBG->UpdateForget(_player);
+#endif
+
     uint32 counter, clientTicks;
     recv_data >> counter >> clientTicks;
     //uint32 ourTicks = clientTicks + (World::GetGameTimeMS() - _player->m_timeSyncServer);
