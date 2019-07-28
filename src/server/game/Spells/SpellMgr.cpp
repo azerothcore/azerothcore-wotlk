@@ -3264,6 +3264,9 @@ void SpellMgr::LoadDbcDataCorrections()
             case 52612: // Summon Skeletons
                 spellInfo->EffectMiscValueB[0] = 64;
                 break;
+            case 16864: // Omen of clarity
+                spellInfo->procFlags |= PROC_FLAG_DONE_SPELL_MELEE_DMG_CLASS;
+                break;
             case 45257: // Using Steam Tonk Controller
             case 45440: // Steam Tonk Controller
             case 60256: // Collect Sample
