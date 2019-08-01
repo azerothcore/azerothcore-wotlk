@@ -32,7 +32,7 @@ Closes
  - Other steps
 
 ***** IMPORTANT: *****
-The people who are going to test PR are not necessarily coders,
+The people who are going to test PRs are not necessarily coders,
 so they might have no idea about what the code changes can affect.
 For this reason the developer should at least explain what aspects 
 of the game can be affected by the changes, especially when doing 
