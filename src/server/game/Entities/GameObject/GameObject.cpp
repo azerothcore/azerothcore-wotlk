@@ -2419,7 +2419,7 @@ void GameObject::BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* t
 
     *data << uint8(updateMask.GetBlockCount());
     updateMask.AppendToPacket(data);
-    data->append(fieldBuffer);
+    *data << fieldBuffer;
 }
 
 void GameObject::GetRespawnPosition(float &x, float &y, float &z, float* ori /* = NULL*/) const

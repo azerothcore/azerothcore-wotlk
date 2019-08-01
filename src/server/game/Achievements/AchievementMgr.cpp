@@ -2279,7 +2279,7 @@ void AchievementMgr::BuildAllDataPacket(WorldPacket* data, bool inspect) const
         {
             *data << uint32(iter->first);
             data->appendPackGUID(iter->second.counter);
-            data->append(GetPlayer()->GetPackGUID());
+            *data << GetPlayer()->GetPackGUID();
             *data << uint32(0);
             data->AppendPackedTime(iter->second.date);
             *data << uint32(0);

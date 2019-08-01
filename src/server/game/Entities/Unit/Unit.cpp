@@ -18426,9 +18426,9 @@ void Unit::BuildMovementPacket(ByteBuffer *data) const
     if (GetUnitMovementFlags() & MOVEMENTFLAG_ONTRANSPORT)
     {
         if (m_vehicle)
-            *data->append(m_vehicle->GetBase()->GetPackGUID();
+            *data << m_vehicle->GetBase()->GetPackGUID();
         else if (GetTransport())
-            *data->append(GetTransport()->GetPackGUID();
+            *data << GetTransport()->GetPackGUID();
         else
             *data << (uint8)0;
 
@@ -19445,7 +19445,7 @@ void Unit::BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* target)
 
     *data << uint8(updateMask.GetBlockCount());
     updateMask.AppendToPacket(data);
-    data->append(fieldBuffer);
+    *data << fieldBuffer;
 }
 
 void Unit::BuildCooldownPacket(WorldPacket& data, uint8 flags, uint32 spellId, uint32 cooldown)
