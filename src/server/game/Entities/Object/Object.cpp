@@ -2070,7 +2070,7 @@ void WorldObject::MonsterWhisper(int32 textId, Player const* target, bool IsBoss
 void Unit::BuildHeartBeatMsg(WorldPacket* data) const
 { 
     data->Initialize(MSG_MOVE_HEARTBEAT, 32);
-    data << GetPackGUID();
+    *data << GetPackGUID();
     BuildMovementPacket(data);
 }
 
