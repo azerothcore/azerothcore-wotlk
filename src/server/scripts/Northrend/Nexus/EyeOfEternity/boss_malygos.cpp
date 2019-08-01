@@ -487,7 +487,7 @@ public:
                                             pPlayer->SetUnitMovementFlags(MOVEMENTFLAG_NONE);
                                             pPlayer->SetDisableGravity(true, true);
                                             WorldPacket data(SMSG_SPLINE_MOVE_UNROOT, 8);
-                                            data.append(pPlayer->GetPackGUID());
+                                            data << pPlayer->GetPackGUID();
                                             pPlayer->SendMessageToSet(&data, true);
 
                                             pPlayer->SetUInt64Value(PLAYER_FARSIGHT, vp->GetGUID());

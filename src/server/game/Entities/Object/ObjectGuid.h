@@ -199,7 +199,7 @@ class PackedGuid
 
         size_t size() const { return m_packedGuid.size(); }
 
-    //private:                                                // fields
+    private:                                                // fields
         ByteBuffer m_packedGuid;
 };
 

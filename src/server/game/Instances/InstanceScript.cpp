@@ -425,7 +425,7 @@ void InstanceScript::SendEncounterUnit(uint32 type, Unit* unit /*= NULL*/, uint8
         case ENCOUNTER_FRAME_ENGAGE:
         case ENCOUNTER_FRAME_DISENGAGE:
         case ENCOUNTER_FRAME_UPDATE_PRIORITY:
-            data.append(unit->GetPackGUID());
+            data << unit->GetPackGUID();
             data << uint8(param1);
             break;
         case ENCOUNTER_FRAME_ADD_TIMER:

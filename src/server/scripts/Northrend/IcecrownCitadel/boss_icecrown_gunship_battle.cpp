@@ -599,7 +599,7 @@ class npc_gunship : public CreatureScript
                             cannon->CastSpell(cannon, SPELL_EJECT_ALL_PASSENGERS, true);
 
                             WorldPacket data(SMSG_PLAYER_VEHICLE_DATA, cannon->GetPackGUID().size() + 4);
-                            data.append(cannon->GetPackGUID());
+                            data << cannon->GetPackGUID();
                             data << uint32(0);
                             cannon->SendMessageToSet(&data, true);
 
@@ -2324,7 +2324,7 @@ class spell_igb_overheat : public SpellScriptLoader
                         if (Player* player = passenger->ToPlayer())
                         {
                             WorldPacket data(SMSG_CLIENT_CONTROL_UPDATE, GetUnitOwner()->GetPackGUID().size() + 1);
-                            data.append(GetUnitOwner()->GetPackGUID());
+                            data << GetUnitOwner()->GetPackGUID();
                             data << uint8(value);
                             player->GetSession()->SendPacket(&data);
                         }

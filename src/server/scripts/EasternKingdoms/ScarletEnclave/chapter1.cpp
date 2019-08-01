@@ -67,7 +67,7 @@ public:
         void SetControl(Player* player, bool on)
         {
             WorldPacket data(SMSG_CLIENT_CONTROL_UPDATE, me->GetPackGUID().size()+1);
-            data.append(me->GetPackGUID());
+            data << me->GetPackGUID();
             data << uint8(on ? 1 : 0);
             player->GetSession()->SendPacket(&data);
         }

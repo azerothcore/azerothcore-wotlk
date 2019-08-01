@@ -186,7 +186,7 @@ void WorldSession::HandleGameObjectQueryOpcode(WorldPacket & recvData)
         data << IconName;                                   // 2.0.3, string. Icon name to use instead of default icon for go's (ex: "Attack" makes sword)
         data << CastBarCaption;                             // 2.0.3, string. Text will appear in Cast Bar when using GO (ex: "Collecting")
         data << info->unk1;                                 // 2.0.3, string
-        data.append(info->raw.data, MAX_GAMEOBJECT_DATA);
+        data << (info->raw.data, MAX_GAMEOBJECT_DATA);
         data << float(info->size);                          // go size
 
         GameObjectQuestItemList const* items = sObjectMgr->GetGameObjectQuestItemList(entry);

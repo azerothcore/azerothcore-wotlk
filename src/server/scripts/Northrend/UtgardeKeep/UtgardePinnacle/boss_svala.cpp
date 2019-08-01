@@ -227,7 +227,7 @@ public:
                 case 30:
                 {
                     WorldPacket data(SMSG_SPLINE_MOVE_SET_HOVER, 9);
-                    data.append(me->GetPackGUID());
+                    data << me->GetPackGUID();
                     me->SendMessageToSet(&data, false);
                     break;
                 }

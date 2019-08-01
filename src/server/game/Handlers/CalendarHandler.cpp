@@ -105,7 +105,7 @@ void WorldSession::HandleCalendarGetCalendar(WorldPacket& /*recvData*/)
     }
 
     data << uint32(boundCounter);
-    data.append(dataBuffer);
+    data << dataBuffer;
 
     // pussywizard
     uint32 relationTime = sWorld->getIntConfig(CONFIG_INSTANCE_RESET_TIME_RELATIVE_TIMESTAMP) + sWorld->getIntConfig(CONFIG_INSTANCE_RESET_TIME_HOUR) * HOUR; // set point in time (default 29.12.2005) + X hours
@@ -137,7 +137,7 @@ void WorldSession::HandleCalendarGetCalendar(WorldPacket& /*recvData*/)
     }
 
     data << uint32(boundCounter);
-    data.append(dataBuffer);
+    data << dataBuffer;
 
     // TODO: Fix this, how we do know how many and what holidays to send?
     data << uint32(sGameEventMgr->modifiedHolidays.size());

@@ -1109,7 +1109,7 @@ void WorldSession::SendAddonsInfo()
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
                 sLog->outDetail("ADDON: CRC (0x%x) for addon %s is wrong (does not match expected 0x%x), sending pubkey", itr->CRC, itr->Name.c_str(), STANDARD_ADDON_CRC);
 #endif
-                data.append(addonPublicKey, sizeof(addonPublicKey));
+                data << (addonPublicKey, sizeof(addonPublicKey));
             }
 
             data << uint32(0);                              // TODO: Find out the meaning of this.
@@ -1131,8 +1131,8 @@ void WorldSession::SendAddonsInfo()
     for (AddonMgr::BannedAddonList::const_iterator itr = bannedAddons->begin(); itr != bannedAddons->end(); ++itr)
     {
 	    data << uint32(itr->Id);
-        data.append(itr->NameMD5, sizeof(itr->NameMD5));
-        data.append(itr->VersionMD5, sizeof(itr->VersionMD5));
+        data << (itr->NameMD5, sizeof(itr->NameMD5));
+        data << (itr->VersionMD5, sizeof(itr->VersionMD5));
         data << uint32(itr->Timestamp);
         data << uint32(1);  // IsBanned
     }

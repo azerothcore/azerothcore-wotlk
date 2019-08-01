@@ -240,8 +240,8 @@ uint8 WorldSession::HandleLoadPetFromDBFirstCallback(PreparedQueryResult result,
     if (summon_spell_id)
     {
         WorldPacket data(SMSG_SPELL_GO, (8+8+4+4+2));
-        data.append(owner->GetPackGUID());
-        data.append(owner->GetPackGUID());
+        data << owner->GetPackGUID();
+        data << owner->GetPackGUID();
         data << uint8(0);
         data << uint32(summon_spell_id);
         data << uint32(256); // CAST_FLAG_UNKNOWN3

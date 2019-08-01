@@ -133,7 +133,7 @@ void GmTicket::SendResponse(WorldSession* session) const
         if (len)
         {
             size_t writeLen = std::min<size_t>(len, 3999);
-            data.append(s, writeLen);
+            data << (s, writeLen);
 
             len -= writeLen;
             s += writeLen;
