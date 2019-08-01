@@ -103,8 +103,9 @@ public:
             events.ScheduleEvent(EVENT_SPELL_BERSERK, 720000);
         }
 
-        void JustDied(Unit* /*killer*/) override
+        void JustDied(Unit* killer) override
         {
+            BossAI::JustDied(killer);
             if (pInstance)
                 pInstance->SetData(BOSS_LOATHEB, DONE);
             summons.DespawnAll();
