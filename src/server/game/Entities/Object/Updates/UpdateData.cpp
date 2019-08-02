@@ -25,7 +25,7 @@ void UpdateData::AddOutOfRangeGUID(uint64 guid)
 
 void UpdateData::AddUpdateBlock(const ByteBuffer &block)
 {
-    m_data << block;
+    m_data.append(block);
     ++m_blockCount;
 }
 
