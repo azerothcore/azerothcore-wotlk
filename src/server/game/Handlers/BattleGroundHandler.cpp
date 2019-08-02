@@ -23,10 +23,6 @@
 #include "Group.h"
 #include "ScriptMgr.h"
 
-#ifdef _CFBG
-#include "CFBG.h"
-#endif
-
 void WorldSession::HandleBattlemasterHelloOpcode(WorldPacket & recvData)
 {
     uint64 guid;
@@ -137,10 +133,13 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket & recvData)
     // queue result (default ok)
     GroupJoinBattlegroundResult err = GroupJoinBattlegroundResult(bgt->GetBgTypeID());
 
-#ifdef _CFBG
-    if (!sCFBG->IsAllCheckPassed(_player, joinAsGroup, bgt))
+    if (!sScriptMgr->CanJoinInBattlegroundQueue(_player, guid, bgTypeId, joinAsGroup, err) && err <= 0)
+    {
+        WorldPacket data;
+        sBattlegroundMgr->BuildGroupJoinedBattlegroundPacket(&data, err);
+        SendPacket(&data);
         return;
-#endif
+    }
 
     // check if player can queue:
     if (!joinAsGroup)

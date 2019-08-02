@@ -48,10 +48,6 @@
 #include "LuaEngine.h"
 #endif
 
-#ifdef _CFBG
-#include "CFBG.h"
-#endif
-
 void WorldSession::HandleRepopRequestOpcode(WorldPacket & recv_data)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
@@ -217,7 +213,6 @@ void WorldSession::HandleGossipSelectOptionOpcode(WorldPacket & recv_data)
         }
     }
 }
-
 
 void WorldSession::HandleWhoOpcode(WorldPacket& recvData)
 {
@@ -1519,10 +1514,6 @@ void WorldSession::HandleSetTitleOpcode(WorldPacket & recv_data)
 
 void WorldSession::HandleTimeSyncResp(WorldPacket & recv_data)
 {
-#ifdef _CFBG
-    sCFBG->UpdateForget(_player);
-#endif
-
     uint32 counter, clientTicks;
     recv_data >> counter >> clientTicks;
     //uint32 ourTicks = clientTicks + (World::GetGameTimeMS() - _player->m_timeSyncServer);

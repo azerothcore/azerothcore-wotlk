@@ -16,18 +16,15 @@
 #include "Player.h"
 #include "ChannelMgr.h"
 #include "Channel.h"
+#include "ScriptMgr.h"
 #include <unordered_map>
-
-#ifdef _CFBG
-#include "CFBG.h"
-#endif
 
 struct BGSpamProtectionS
 {
     uint32 last_queue = 0; // CHAT DISABLED BY DEFAULT
 };
 
-std::unordered_map<uint32, BGSpamProtectionS>BGSpamProtection;
+std::unordered_map<uint32, BGSpamProtectionS> BGSpamProtection;
 
 /*********************************************************/
 /***            BATTLEGROUND QUEUE SYSTEM              ***/
@@ -156,10 +153,7 @@ GroupQueueInfo* BattlegroundQueue::AddGroup(Player * leader, Group * grp, PvPDif
     if (ginfo->teamId == TEAM_HORDE)
         index++;
 
-#ifdef _CFBG
-    if (sCFBG->IsEnableSystem() && !m_arenaType && !isRated)
-        index = BG_QUEUE_CFBG;
-#endif
+    sScriptMgr->OnAddGroup(this, ginfo, index, leader, grp, bracketEntry, isPremade);
 
     // pussywizard: store indices at which GroupQueueInfo is in m_QueuedGroups
     ginfo->_bracketId = bracketId;
@@ -381,12 +375,8 @@ bool BattlegroundQueue::GetPlayerGroupInfoData(uint64 guid, GroupQueueInfo * gin
 // this function is filling pools given free slots on both sides, result is ballanced
 void BattlegroundQueue::FillPlayersToBG(Battleground* bg, const int32 aliFree, const int32 hordeFree, BattlegroundBracketId bracket_id)
 {
-#ifdef _CFBG
-    if (!bg->isArena() && sCFBG->FillPlayersToCFBG(this, bg, aliFree, hordeFree, bracket_id))
+    if (!sScriptMgr->CanFillPlayersToBG(this, bg, aliFree, hordeFree, bracket_id))
         return;
-#else
-    UNUSED(bg);
-#endif
 
     // clear selection pools
     m_SelectionPools[TEAM_ALLIANCE].Init();
@@ -442,14 +432,10 @@ void BattlegroundQueue::FillPlayersToBG(Battleground* bg, const int32 aliFree, c
     }
 }
 
-void BattlegroundQueue::FillPlayersToBGWithSpecific(Battleground* bg, const int32 aliFree, const int32 hordeFree, BattlegroundBracketId thisBracketId, BattlegroundQueue * specificQueue, BattlegroundBracketId specificBracketId)
+void BattlegroundQueue::FillPlayersToBGWithSpecific(Battleground* bg, const int32 aliFree, const int32 hordeFree, BattlegroundBracketId thisBracketId, BattlegroundQueue* specificQueue, BattlegroundBracketId specificBracketId)
 {
-#ifdef _CFBG
-    if (!bg->isArena() && sCFBG->FillPlayersToCFBGWithSpecific(this, bg, aliFree, hordeFree, thisBracketId, specificQueue, specificBracketId))
+    if (!sScriptMgr->CanFillPlayersToBGWithSpecific(this, bg, aliFree, hordeFree, thisBracketId, specificQueue, specificBracketId))
         return;
-#else
-    UNUSED(bg);
-#endif
 
     // clear selection pools
     m_SelectionPools[TEAM_ALLIANCE].Init();
@@ -570,12 +556,11 @@ bool BattlegroundQueue::CheckPremadeMatch(BattlegroundBracketId bracket_id, uint
 // this method tries to create battleground or arena with MinPlayersPerTeam against MinPlayersPerTeam
 bool BattlegroundQueue::CheckNormalMatch(Battleground * bgTemplate, BattlegroundBracketId bracket_id, uint32 minPlayers, uint32 maxPlayers)
 {
-    uint32 BgType = 1;
-#ifdef _CFBG
-    if (sCFBG->IsEnableSystem())
-        BgType = 2;
-#endif
-    minPlayers = minPlayers * BgType;
+    uint32 Coef = 1;
+
+    sScriptMgr->OnCheckNormalMatch(this, Coef, bgTemplate, bracket_id, minPlayers, maxPlayers);
+
+    minPlayers = minPlayers * Coef;
 
     // if current queue is BATTLEGROUND_QUEUE_RB, then we are trying to create bg using players from 2 queues
     if (bgTemplate->GetBgTypeID() == BATTLEGROUND_RB)
@@ -591,7 +576,7 @@ bool BattlegroundQueue::CheckNormalMatch(Battleground * bgTemplate, Battleground
             return false;
 
         // specific queue
-        BattlegroundQueue & specificQueue = sBattlegroundMgr->GetBattlegroundQueue(BattlegroundMgr::BGQueueTypeId(sBattlegroundMgr->RandomSystem.GetCurrentRandomBg(), 0));
+        BattlegroundQueue& specificQueue = sBattlegroundMgr->GetBattlegroundQueue(BattlegroundMgr::BGQueueTypeId(sBattlegroundMgr->RandomSystem.GetCurrentRandomBg(), 0));
 
         FillPlayersToBGWithSpecific(specificTemplate, specificTemplate->GetMaxPlayersPerTeam(), specificTemplate->GetMaxPlayersPerTeam(), bracket_id, &specificQueue, BattlegroundBracketId(specificBracket->bracketId));
 
@@ -599,7 +584,7 @@ bool BattlegroundQueue::CheckNormalMatch(Battleground * bgTemplate, Battleground
         if (sBattlegroundMgr->isTesting() && bgTemplate->isBattleground() && (m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() || m_SelectionPools[TEAM_HORDE].GetPlayerCount()))
             return true;
 
-        return m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() >= std::min<uint32>(specificTemplate->GetMinPlayersPerTeam() * BgType, 15) && m_SelectionPools[TEAM_HORDE].GetPlayerCount() >= std::min<uint32>(specificTemplate->GetMinPlayersPerTeam() * BgType, 15);
+        return m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount() >= std::min<uint32>(specificTemplate->GetMinPlayersPerTeam() * Coef, 15) && m_SelectionPools[TEAM_HORDE].GetPlayerCount() >= std::min<uint32>(specificTemplate->GetMinPlayersPerTeam() * Coef, 15);
     }    
     else // if this is not random bg queue - use players only from this queue
     {
@@ -979,10 +964,8 @@ bool BattlegroundQueue::IsAllQueuesEmpty(BattlegroundBracketId bracket_id)
 
 void BattlegroundQueue::SendMessageQueue(Player* leader, Battleground* bg, PvPDifficultyEntry const* bracketEntry)
 {
-#ifdef _CFBG    
-    if (sCFBG->SendMessageQueue(this, bg, bracketEntry, leader))
+    if (!sScriptMgr->CanSendMessageQueue(this, leader, bg, bracketEntry))
         return;
-#endif
 
     BattlegroundBracketId bracketId = bracketEntry->GetBracketId();
     char const* bgName = bg->GetName();

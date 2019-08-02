@@ -12,7 +12,6 @@
 #include "WorldPacket.h"
 #include "WorldSession.h"
 #include "DatabaseEnv.h"
-
 #include "CellImpl.h"
 #include "Chat.h"
 #include "ChannelMgr.h"
@@ -31,10 +30,6 @@
 
 #ifdef ELUNA
 #include "LuaEngine.h"
-#endif
-
-#ifdef _CFBG
-#include "CFBG.h"
 #endif
 
 void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
@@ -104,7 +99,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
     }
 
 #ifdef _CFBG
-    if (sCFBG->IsEnableSystem() && ((!sender->IsGameMaster() && sender->GetBattleground())))
+    if (sCFBG->IsEnableSystem() && (!sender->IsGameMaster() && sender->GetBattleground()))
         lang = LANG_UNIVERSAL;
 #endif
 
@@ -343,6 +338,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
         }
     }
 
+    sScriptMgr->OnBeforeSendChatMessage(_player, type, lang, msg);
 
     switch (type)
     {
