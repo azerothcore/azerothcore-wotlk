@@ -13,7 +13,7 @@
 -  
 
 
-###### ISSUES ADDRESSED:
+##### ISSUES ADDRESSED:
 <!-- If the issue doesn't exist, describe it and how to reproduce it, please. If the issue already exists, just paste the link to the issue you close, like this: Closes https://github.com/azerothcore/azerothcore-wotlk/issues/967 -->
 
 Closes 
@@ -59,9 +59,9 @@ Master
  The link is on our site http://azerothcore.org/ We set cosmetic ranks for our contributors and may give access to special resources/knowledge to them! -->
  
  
- <!-- Do not remove the instructions below about testing, they will help users to test your PR -->
+<!-- Do not remove the instructions below about testing, they will help users to test your PR -->
  
- ## How to test AzerothCore PRs
+## How to test AzerothCore PRs
  
 When a PR is ready to be tested, it will be marked as **[WAITING TO BE TESTED]**.
 
