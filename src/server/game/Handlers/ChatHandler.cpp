@@ -98,11 +98,6 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
             }
     }
 
-#ifdef _CFBG
-    if (sCFBG->IsEnableSystem() && (!sender->IsGameMaster() && sender->GetBattleground()))
-        lang = LANG_UNIVERSAL;
-#endif
-
     // prevent talking at unknown language (cheating)
     LanguageDesc const* langDesc = GetLanguageDescByID(lang);
     if (!langDesc)
@@ -111,6 +106,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
         recvData.rfinish();
         return;
     }
+    
     if (langDesc->skill_id != 0 && !sender->HasSkill(langDesc->skill_id))
     {
         // also check SPELL_AURA_COMPREHEND_LANGUAGE (client offers option to speak in that language)
