@@ -566,6 +566,9 @@ void WorldSession::LogoutPlayer(bool save)
         {
             _player->GetGroup()->SendUpdate();
             _player->GetGroup()->ResetMaxEnchantingLevel();
+			
+			if (_player->GetMap()->IsDungeon() || _player->GetMap()->IsRaidOrHeroicDungeon())
+				_player->TeleportToEntryPoint();
         }
 
         //! Broadcast a logout message to the player's friends
