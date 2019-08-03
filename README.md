@@ -8,6 +8,7 @@
 </a>
 [![Bountysource](https://www.bountysource.com/badge/tracker?tracker_id=40032087)](https://www.bountysource.com/teams/azerothcore/bounties)
 [![StackOverflow](http://img.shields.io/badge/stackoverflow-azerothcore-blue.svg)]( https://stackoverflow.com/questions/tagged/azerothcore?sort=newest)
+[![Discord](https://img.shields.io/discord/217589275766685707.svg)](https://discord.gg/gXNKCG5)
 
 
 ## Introduction
