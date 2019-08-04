@@ -161,13 +161,25 @@ void WardenMac::HandleHashResult(ByteBuffer &buff)
     //const uint8 validHash[20] = { 0x56, 0x8C, 0x05, 0x4C, 0x78, 0x1A, 0x97, 0x2A, 0x60, 0x37, 0xA2, 0x29, 0x0C, 0x22, 0xB5, 0x25, 0x71, 0xA0, 0x6F, 0x4E };
 
     // Verify key
-    if (memcmp(buff.contents() + 1, sha1.GetDigest(), 20) != 0)
+    // do not optimize key verification for speed, unless you really know what you are doing. 
+    // (you may introduce a timing attack vulnerability, 
+    // see https://github.com/azerothcore/azerothcore-wotlk/issues/2174 )
     {
+        int result=0;
+        const uint8_t *bufstart=(uint8_t*)(buff.contents() + 1);
+        const uint8_t *digest=sha1.GetDigest();
+        for (int i = 0; i < 20; ++i)
+        {
+            result |= bufstart[i] ^ digest[i];
+        }
+        if (result != 0)
+        {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_WARDEN, "Request hash reply: failed");
+            sLog->outDebug(LOG_FILTER_WARDEN, "Request hash reply: failed");
 #endif
-        Penalty();
-        return;
+            Penalty();
+            return;
+        }
     }
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
