@@ -135,8 +135,8 @@ class boss_blood_queen_lana_thel : public CreatureScript
             bool _killMinchar;
             uint64 _tankGUID;
             uint64 _offtankGUID;
-            std::set<uint64> _bloodboltedPlayers;
-            std::set<uint64> _vampires;
+            GuidSet _bloodboltedPlayers;
+            GuidSet _vampires;
             bool bEnteredCombat; // needed for failing an attempt in JustReachedHome()
 
             void Reset()

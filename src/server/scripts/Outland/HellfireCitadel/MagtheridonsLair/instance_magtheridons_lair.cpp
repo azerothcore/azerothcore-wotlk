@@ -120,7 +120,7 @@ class instance_magtheridons_lair : public InstanceMapScript
                 {
                     if (state == IN_PROGRESS)
                     {
-                        for (std::set<uint64>::const_iterator itr = _wardersSet.begin(); itr != _wardersSet.end(); ++itr)
+                        for (GuidSet::const_iterator itr = _wardersSet.begin(); itr != _wardersSet.end(); ++itr)
                             if (Creature* warder = instance->GetCreature(*itr))
                                 if (warder->IsAlive())
                                 {
@@ -130,7 +130,7 @@ class instance_magtheridons_lair : public InstanceMapScript
                     }
                     else
                     {
-                        for (std::set<uint64>::const_iterator itr = _cubesSet.begin(); itr != _cubesSet.end(); ++itr)
+                        for (GuidSet::const_iterator itr = _cubesSet.begin(); itr != _cubesSet.end(); ++itr)
                             if (GameObject* cube = instance->GetGameObject(*itr))
                                 cube->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
 
@@ -151,12 +151,12 @@ class instance_magtheridons_lair : public InstanceMapScript
                                 magtheridon->SetInCombatWithZone();
                         break;
                     case DATA_ACTIVATE_CUBES:
-                        for (std::set<uint64>::const_iterator itr = _cubesSet.begin(); itr != _cubesSet.end(); ++itr)
+                        for (GuidSet::const_iterator itr = _cubesSet.begin(); itr != _cubesSet.end(); ++itr)
                             if (GameObject* cube = instance->GetGameObject(*itr))
                                 cube->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
                         break;
                     case DATA_COLLAPSE:
-                        for (std::set<uint64>::const_iterator itr = _columnSet.begin(); itr != _columnSet.end(); ++itr)
+                        for (GuidSet::const_iterator itr = _columnSet.begin(); itr != _columnSet.end(); ++itr)
                             if (GameObject* column = instance->GetGameObject(*itr))
                                 column->SetGoState(GOState(data));
                         break;
@@ -208,9 +208,9 @@ class instance_magtheridons_lair : public InstanceMapScript
 
         private:
             uint64 _magtheridonGUID;
-            std::set<uint64> _wardersSet;
-            std::set<uint64> _cubesSet;
-            std::set<uint64> _columnSet;
+            GuidSet _wardersSet;
+            GuidSet _cubesSet;
+            GuidSet _columnSet;
 
         };
 

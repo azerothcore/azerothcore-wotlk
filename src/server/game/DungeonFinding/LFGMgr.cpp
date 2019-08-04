@@ -898,7 +898,7 @@ void LFGMgr::UpdateRaidBrowser(uint32 diff)
     uint32 deletedCounter, groupCounter, playerCounter;
     ByteBuffer buffer_deleted, buffer_groups, buffer_players;
     std::string emptyComment;
-    std::set<uint64> deletedGroups, deletedGroupsToErase;
+    GuidSet deletedGroups, deletedGroupsToErase;
     RBInternalInfoMap copy;
 
     for (uint8 team=0; team<2; ++team)
@@ -1081,11 +1081,11 @@ void LFGMgr::UpdateRaidBrowser(uint32 diff)
             }
 
             if (!deletedGroupsToErase.empty())
-                for (std::set<uint64>::const_iterator sitr = deletedGroupsToErase.begin(); sitr != deletedGroupsToErase.end(); ++sitr)
+                for (GuidSet::const_iterator sitr = deletedGroupsToErase.begin(); sitr != deletedGroupsToErase.end(); ++sitr)
                     deletedGroups.erase(*sitr);
 
             if (!deletedGroups.empty())
-                for (std::set<uint64>::const_iterator sitr = deletedGroups.begin(); sitr != deletedGroups.end(); ++sitr)
+                for (GuidSet::const_iterator sitr = deletedGroups.begin(); sitr != deletedGroups.end(); ++sitr)
                 {
                     ++deletedCounter;
                     buffer_deleted << (*sitr);

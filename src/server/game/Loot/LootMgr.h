@@ -373,7 +373,7 @@ struct Loot
         QuestItemList* FillQuestLoot(Player* player);
         QuestItemList* FillNonQuestNonFFAConditionalLoot(Player* player, bool presentAtLooting);
 
-        typedef std::set<uint64> PlayersLootingSet;
+        typedef GuidSet PlayersLootingSet;
         PlayersLootingSet PlayersLooting;
         QuestItemMap PlayerQuestItems;
         QuestItemMap PlayerFFAItems;

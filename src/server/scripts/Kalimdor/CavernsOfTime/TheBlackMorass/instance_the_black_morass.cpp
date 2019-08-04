@@ -33,7 +33,7 @@ public:
     {
         instance_the_black_morass_InstanceMapScript(Map* map) : InstanceScript(map) { }
 
-        std::set<uint64> encounterNPCs;
+        GuidSet encounterNPCs;
         uint32 encounters[MAX_ENCOUNTER];
         uint64 _medivhGUID;
         uint8  _currentRift;
@@ -61,8 +61,8 @@ public:
                 medivh->SetRespawnTime(3);
             }
 
-            std::set<uint64> eCopy = encounterNPCs;
-            for (std::set<uint64>::const_iterator itr = eCopy.begin(); itr != eCopy.end(); ++itr)
+            GuidSet eCopy = encounterNPCs;
+            for (GuidSet::const_iterator itr = eCopy.begin(); itr != eCopy.end(); ++itr)
                 if (Creature* creature = instance->GetCreature(*itr))
                     creature->DespawnOrUnsummon();
         }
@@ -185,8 +185,8 @@ public:
                                 Unit::Kill(medivh, medivh);
 
                                 // Xinef: delete all spawns
-                                std::set<uint64> eCopy = encounterNPCs;
-                                for (std::set<uint64>::iterator itr = eCopy.begin(); itr != eCopy.end(); ++itr)
+                                GuidSet eCopy = encounterNPCs;
+                                for (GuidSet::iterator itr = eCopy.begin(); itr != eCopy.end(); ++itr)
                                     if (Creature* creature = instance->GetCreature(*itr))
                                         creature->DespawnOrUnsummon();
                             }
@@ -229,7 +229,7 @@ public:
         void SummonPortalKeeper()
         {
             Creature* rift = NULL;
-            for (std::set<uint64>::const_iterator itr = encounterNPCs.begin(); itr != encounterNPCs.end(); ++itr)
+            for (GuidSet::const_iterator itr = encounterNPCs.begin(); itr != encounterNPCs.end(); ++itr)
                 if (Creature* summon = instance->GetCreature(*itr))
                     if (summon->GetEntry() == NPC_TIME_RIFT)
                     {

@@ -304,7 +304,7 @@ class spell_black_template_harpooners_mark : public SpellScriptLoader
 
             void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
-                for (std::set<uint64>::const_iterator itr = _turtleSet.begin(); itr != _turtleSet.end(); ++itr)
+                for (GuidSet::const_iterator itr = _turtleSet.begin(); itr != _turtleSet.end(); ++itr)
                     if (Creature* turtle = ObjectAccessor::GetCreature(*GetUnitOwner(), *itr))
                     {
                         turtle->TauntFadeOut(GetUnitOwner());
@@ -319,7 +319,7 @@ class spell_black_template_harpooners_mark : public SpellScriptLoader
             }
 
             private:
-                std::set<uint64> _turtleSet;
+                GuidSet _turtleSet;
         };
 
         AuraScript* GetAuraScript() const

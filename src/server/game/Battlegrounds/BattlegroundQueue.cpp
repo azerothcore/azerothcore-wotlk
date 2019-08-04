@@ -316,7 +316,7 @@ void BattlegroundQueue::RemovePlayer(uint64 guid, bool sentToBg, uint32 playerQu
     }
 
     // remove player from group queue info
-    std::set<uint64>::iterator pitr = groupInfo->Players.find(guid);
+    GuidSet::iterator pitr = groupInfo->Players.find(guid);
     ASSERT(pitr != groupInfo->Players.end());
     if (pitr != groupInfo->Players.end())
         groupInfo->Players.erase(pitr);

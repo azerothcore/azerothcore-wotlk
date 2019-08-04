@@ -72,7 +72,7 @@ class Unit;
 struct GossipMenuItems;
 class OutdoorPvP;
 
-typedef std::set<uint64> PlayerSet;
+typedef GuidSet PlayerSet;
 
 class OPvPCapturePoint
 {

@@ -186,7 +186,7 @@ public:
                     instance->LoadGrid(instancePositions[0].GetPositionX(), instancePositions[0].GetPositionY());
                     instance->LoadGrid(instancePositions[1].GetPositionX(), instancePositions[1].GetPositionY());
 
-                    for (std::set<uint64>::const_iterator itr = _prisonersSet.begin(); itr != _prisonersSet.end(); ++itr)
+                    for (GuidSet::const_iterator itr = _prisonersSet.begin(); itr != _prisonersSet.end(); ++itr)
                         if (Creature* orc = instance->GetCreature(*itr))
                         {
                             uint8 index = orc->GetDistance(instancePositions[0]) < 80.0f ? 0 : 1;
@@ -196,7 +196,7 @@ public:
                             orc->SetStandState(UNIT_STAND_STATE_STAND);
                         }
 
-                    for (std::set<uint64>::const_iterator itr = _initalFlamesSet.begin(); itr != _initalFlamesSet.end(); ++itr)
+                    for (GuidSet::const_iterator itr = _initalFlamesSet.begin(); itr != _initalFlamesSet.end(); ++itr)
                         if (GameObject* gobject = instance->GetGameObject(*itr))
                         {
                             gobject->SetRespawnTime(0);
@@ -218,14 +218,14 @@ public:
                                     player->KilledMonsterCredit(NPC_LODGE_QUEST_TRIGGER, 0);
                     }
 
-                    for (std::set<uint64>::const_iterator itr = _finalFlamesSet.begin(); itr != _finalFlamesSet.end(); ++itr)
+                    for (GuidSet::const_iterator itr = _finalFlamesSet.begin(); itr != _finalFlamesSet.end(); ++itr)
                         if (GameObject* gobject = instance->GetGameObject(*itr))
                         {
                             gobject->SetRespawnTime(0);
                             gobject->UpdateObjectVisibility(true);
                         }
 
-                    for (std::set<uint64>::const_iterator itr = _prisonersSet.begin(); itr != _prisonersSet.end(); ++itr)
+                    for (GuidSet::const_iterator itr = _prisonersSet.begin(); itr != _prisonersSet.end(); ++itr)
                         if (Creature* orc = instance->GetCreature(*itr))
                             if (roll_chance_i(25))
                                 orc->HandleEmoteCommand(EMOTE_ONESHOT_CHEER);
@@ -330,9 +330,9 @@ public:
 
             uint64 _thrallGUID;
             uint64 _tarethaGUID;
-            std::set<uint64> _initalFlamesSet;
-            std::set<uint64> _finalFlamesSet;
-            std::set<uint64> _prisonersSet;
+            GuidSet _initalFlamesSet;
+            GuidSet _finalFlamesSet;
+            GuidSet _prisonersSet;
 
             EventMap _events;
     };

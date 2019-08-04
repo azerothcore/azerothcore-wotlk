@@ -60,7 +60,7 @@ class boss_gal_darah : public CreatureScript
             }
 
             uint8 phaseCounter;
-            std::set<uint64> impaledList;
+            GuidSet impaledList;
 
             void Reset()
             {

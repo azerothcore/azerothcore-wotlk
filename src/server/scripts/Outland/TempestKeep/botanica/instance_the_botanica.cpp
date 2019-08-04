@@ -105,7 +105,7 @@ public:
 
         void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
-            for (std::set<uint64>::const_iterator itr = _falconSet.begin(); itr != _falconSet.end(); ++itr)
+            for (GuidSet::const_iterator itr = _falconSet.begin(); itr != _falconSet.end(); ++itr)
                 if (Creature* falcon = ObjectAccessor::GetCreature(*GetUnitOwner(), *itr))
                 {
                     falcon->TauntFadeOut(GetUnitOwner());
@@ -120,7 +120,7 @@ public:
         }
 
         private:
-            std::set<uint64> _falconSet;
+            GuidSet _falconSet;
     };
 
     AuraScript* GetAuraScript() const

@@ -54,7 +54,7 @@ public:
         uint64 GO_XevozzCellGUID;
         uint64 GO_ZuramatCellGUID;
 
-        std::set<uint64> trashMobs;
+        GuidSet trashMobs;
         uint64 NPC_SinclariGUID;
         uint64 NPC_GuardGUID[4];
         uint64 NPC_PortalGUID;
@@ -585,7 +585,7 @@ public:
             NPC_PortalGUID = 0;
 
             // remove trash
-            for (std::set<uint64>::iterator itr = trashMobs.begin(); itr != trashMobs.end(); ++itr)
+            for (GuidSet::iterator itr = trashMobs.begin(); itr != trashMobs.end(); ++itr)
                 if (Creature* c = instance->GetCreature(*itr))
                     c->DespawnOrUnsummon();
             trashMobs.clear();

@@ -18,7 +18,7 @@
 
 struct GroupQueueInfo                                       // stores information about the group in queue (also used when joined as solo!)
 {
-    std::set<uint64> Players;                               // player guid set
+    GuidSet Players;                               // player guid set
     TeamId  teamId;                                         // Player team (TEAM_ALLIANCE/TEAM_HORDE)
     TeamId  RealTeamID;                                     // Realm player team (TEAM_ALLIANCE/TEAM_HORDE)
     BattlegroundTypeId BgTypeId;                            // battleground type id

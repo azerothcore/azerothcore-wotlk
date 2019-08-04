@@ -21,7 +21,7 @@ class instance_blood_furnace : public InstanceMapScript
             uint64 _doorGUIDs[6];
             uint64 _prisonGUIDs[4];
 
-            std::set<uint64> _prisonersCell[4];
+            GuidSet _prisonersCell[4];
 
             uint8 _prisonerCounter[4];
 
@@ -223,9 +223,9 @@ class instance_blood_furnace : public InstanceMapScript
                 }
             }
 
-            void ResetPrisoners(std::set<uint64> prisoners)
+            void ResetPrisoners(GuidSet prisoners)
             {
-                for (std::set<uint64>::iterator i = prisoners.begin(); i != prisoners.end(); ++i)
+                for (GuidSet::iterator i = prisoners.begin(); i != prisoners.end(); ++i)
                     if (Creature* prisoner = instance->GetCreature(*i))
                         ResetPrisoner(prisoner);
             }
@@ -305,9 +305,9 @@ class instance_blood_furnace : public InstanceMapScript
                 }
             }
 
-            void ActivatePrisoners(std::set<uint64> prisoners)
+            void ActivatePrisoners(GuidSet prisoners)
             {
-                for (std::set<uint64>::iterator i = prisoners.begin(); i != prisoners.end(); ++i)
+                for (GuidSet::iterator i = prisoners.begin(); i != prisoners.end(); ++i)
                     if (Creature* prisoner = instance->GetCreature(*i))
                     {
                         prisoner->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_NON_ATTACKABLE);

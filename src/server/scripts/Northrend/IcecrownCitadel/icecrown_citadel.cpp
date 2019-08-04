@@ -947,7 +947,7 @@ class npc_crok_scourgebane : public CreatureScript
 
         private:
             EventMap _events;
-            std::set<uint64> _aliveTrash;
+            GuidSet _aliveTrash;
             InstanceScript* _instance;
             uint32 _currentWPid;
             uint32 _wipeCheckTimer;
