@@ -5056,7 +5056,7 @@ bool Unit::HasAuraTypeWithValue(AuraType auratype, int32 value) const
     return false;
 }
 
-bool Unit::HasNegativeAuraWithInterruptFlag(uint32 flag, uint64 guid)
+bool Unit::HasNegativeAuraWithInterruptFlag(uint32 flag, ObjectGuid guid)
 {
     if (!(m_interruptMask & flag))
         return false;
@@ -5068,7 +5068,7 @@ bool Unit::HasNegativeAuraWithInterruptFlag(uint32 flag, uint64 guid)
     return false;
 }
 
-bool Unit::HasNegativeAuraWithAttribute(uint32 flag, uint64 guid)
+bool Unit::HasNegativeAuraWithAttribute(uint32 flag, ObjectGuid guid)
 {
     for (AuraApplicationMap::const_iterator iter = m_appliedAuras.begin(); iter != m_appliedAuras.end(); ++iter)
     {
@@ -9168,7 +9168,7 @@ FactionTemplateEntry const* Unit::GetFactionTemplateEntry() const
     FactionTemplateEntry const* entry = sFactionTemplateStore.LookupEntry(getFaction());
     if (!entry)
     {
-        static uint64 guid = 0;                             // prevent repeating spam same faction problem
+        static ObjectGuid guid = 0;                             // prevent repeating spam same faction problem
 
         if (GetGUID() != guid)
         {
@@ -9693,7 +9693,7 @@ Unit* Unit::GetCharmer() const
 
 Player* Unit::GetCharmerOrOwnerPlayerOrPlayerItself() const
 {
-    uint64 guid = GetCharmerOrOwnerGUID();
+    ObjectGuid guid = GetCharmerOrOwnerGUID();
     if (IS_PLAYER_GUID(guid))
         return ObjectAccessor::GetPlayer(*this, guid);
 
@@ -10142,7 +10142,7 @@ Unit* Unit::GetFirstControlled() const
     // Sequence: charmed, pet, other guardians
     Unit* unit = GetCharm();
     if (!unit)
-        if (uint64 guid = GetMinionGUID())
+        if (ObjectGuid guid = GetMinionGUID())
             unit = ObjectAccessor::GetUnit(*this, guid);
 
     return unit;
@@ -12953,7 +12953,7 @@ bool Unit::IsAlwaysVisibleFor(WorldObject const* seer) const
         return true;
 
     // Always seen by owner
-    if (uint64 guid = GetCharmerOrOwnerGUID())
+    if (ObjectGuid guid = GetCharmerOrOwnerGUID())
         if (seer->GetGUID() == guid)
             return true;
 
@@ -15448,7 +15448,7 @@ void Unit::SendPetTalk(uint32 pettalk)
     owner->ToPlayer()->GetSession()->SendPacket(&data);
 }
 
-void Unit::SendPetAIReaction(uint64 guid)
+void Unit::SendPetAIReaction(ObjectGuid guid)
 {
     Unit* owner = GetOwner();
     if (!owner || owner->GetTypeId() != TYPEID_PLAYER)
@@ -15603,7 +15603,7 @@ void Unit::ClearComboPointHolders()
 {
     while (!m_ComboPointHolders.empty())
     {
-        uint32 lowguid = *m_ComboPointHolders.begin();
+        ObjectGuid guid = *m_ComboPointHolders.begin();
 
         Player* player = ObjectAccessor::GetPlayer(*this, MAKE_NEW_GUID(lowguid, 0, HIGHGUID_PLAYER));
         if (player && player->GetComboTarget() == GetGUID())         // recheck for safe
@@ -17506,7 +17506,7 @@ void Unit::SendPlaySpellVisual(uint32 id)
     SendMessageToSet(&data, false);
 }
 
-void Unit::SendPlaySpellImpact(uint64 guid, uint32 id)
+void Unit::SendPlaySpellImpact(ObjectGuid guid, uint32 id)
 {
     WorldPacket data(SMSG_PLAY_SPELL_IMPACT, 8 + 4);
     data << uint64(guid); // target
@@ -19498,7 +19498,7 @@ bool Unit::IsInCombatWith(Unit const* who) const
     if (!who)
         return false;
     // Search in threat list
-    uint64 guid = who->GetGUID();
+    ObjectGuid guid = who->GetGUID();
     for (ThreatContainer::StorageType::const_iterator i = m_ThreatManager.getThreatList().begin(); i != m_ThreatManager.getThreatList().end(); ++i)
     {
         HostileReference* ref = (*i);

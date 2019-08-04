@@ -308,7 +308,7 @@ public:
             events.ScheduleEvent(EVENT_CHECK_DEATH, 8000);
         }
 
-        void SetGUID(uint64 guid, int32)
+        void SetGUID(ObjectGuid guid, int32)
         {
             riftKeeperGUID = guid;
         }

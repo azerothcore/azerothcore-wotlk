@@ -145,7 +145,7 @@ class npc_winterfin_playmate : public CreatureScript
             {
                 timer = 0;
                 phase = 0;
-                playerGUID = 0;
+                ObjectGuid::Empty;
                 orphanGUID = 0;
             }
 
@@ -216,7 +216,7 @@ class npc_winterfin_playmate : public CreatureScript
         private:
             uint32 timer;
             int8 phase;
-            uint64 playerGUID;
+            ObjectGuid playerGUID;
             uint64 orphanGUID;
 
         };
@@ -243,7 +243,7 @@ class npc_snowfall_glade_playmate : public CreatureScript
             {
                 timer = 0;
                 phase = 0;
-                playerGUID = 0;
+                ObjectGuid::Empty;
                 orphanGUID = 0;
             }
 
@@ -314,7 +314,7 @@ class npc_snowfall_glade_playmate : public CreatureScript
         private:
             uint32 timer;
             int8 phase;
-            uint64 playerGUID;
+            ObjectGuid playerGUID;
             uint64 orphanGUID;
         };
 
@@ -343,7 +343,7 @@ class npc_the_biggest_tree : public CreatureScript
             {
                 timer = 1000;
                 phase = 0;
-                playerGUID = 0;
+                ObjectGuid::Empty;
                 orphanGUID = 0;
             }
 
@@ -402,7 +402,7 @@ class npc_the_biggest_tree : public CreatureScript
         private:
             uint32 timer;
             uint8 phase;
-            uint64 playerGUID;
+            ObjectGuid playerGUID;
             uint64 orphanGUID;
 
         };
@@ -429,7 +429,7 @@ class npc_high_oracle_soo_roo : public CreatureScript
             {
                 timer = 0;
                 phase = 0;
-                playerGUID = 0;
+                ObjectGuid::Empty;
                 orphanGUID = 0;
             }
 
@@ -490,7 +490,7 @@ class npc_high_oracle_soo_roo : public CreatureScript
         private:
             uint32 timer;
             int8 phase;
-            uint64 playerGUID;
+            ObjectGuid playerGUID;
             uint64 orphanGUID;
 
         };
@@ -517,7 +517,7 @@ class npc_elder_kekek : public CreatureScript
             {
                 timer = 0;
                 phase = 0;
-                playerGUID = 0;
+                ObjectGuid::Empty;
                 orphanGUID = 0;
             }
 
@@ -577,7 +577,7 @@ class npc_elder_kekek : public CreatureScript
         private:
             uint32 timer;
             int8 phase;
-            uint64 playerGUID;
+            ObjectGuid playerGUID;
             uint64 orphanGUID;
 
         };
@@ -605,7 +605,7 @@ class npc_the_etymidian : public CreatureScript
             {
                 timer = 0;
                 phase = 0;
-                playerGUID = 0;
+                ObjectGuid::Empty;
                 orphanGUID = 0;
             }
 
@@ -673,7 +673,7 @@ class npc_the_etymidian : public CreatureScript
         private:
             uint32 timer;
             int8 phase;
-            uint64 playerGUID;
+            ObjectGuid playerGUID;
             uint64 orphanGUID;
 
         };
@@ -700,7 +700,7 @@ class npc_alexstraza_the_lifebinder : public CreatureScript
             {
                 timer = 0;
                 phase = 0;
-                playerGUID = 0;
+                ObjectGuid::Empty;
                 orphanGUID = 0;
             }
 
@@ -833,7 +833,7 @@ class npc_alexstraza_the_lifebinder : public CreatureScript
             private:
                 int8 phase;
                 uint32 timer;
-                uint64 playerGUID;
+                ObjectGuid playerGUID;
                 uint64 orphanGUID;
 
         };

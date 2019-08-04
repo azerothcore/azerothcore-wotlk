@@ -694,7 +694,7 @@ void WorldSession::HandleTextEmoteOpcode(WorldPacket & recvData)
         return;
 
     uint32 text_emote, emoteNum;
-    uint64 guid;
+    ObjectGuid guid;
 
     recvData >> text_emote;
     recvData >> emoteNum;

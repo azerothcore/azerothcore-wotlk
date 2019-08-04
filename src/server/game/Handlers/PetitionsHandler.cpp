@@ -45,7 +45,7 @@ void WorldSession::HandlePetitionBuyOpcode(WorldPacket & recvData)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "Received opcode CMSG_PETITION_BUY");
 #endif
 
-    uint64 guidNPC;
+    ObjectGuid guidNPC;
     uint32 clientIndex;                                     // 1 for guild and arenaslot+1 for arenas in client
     std::string name;
 
@@ -869,13 +869,13 @@ void WorldSession::HandlePetitionShowListOpcode(WorldPacket & recvData)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "Received CMSG_PETITION_SHOWLIST");
 #endif
 
-    uint64 guid;
+    ObjectGuid guid;
     recvData >> guid;
 
     SendPetitionShowList(guid);
 }
 
-void WorldSession::SendPetitionShowList(uint64 guid)
+void WorldSession::SendPetitionShowList(ObjectGuid guid)
 {
     Creature* creature = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_PETITIONER);
     if (!creature)

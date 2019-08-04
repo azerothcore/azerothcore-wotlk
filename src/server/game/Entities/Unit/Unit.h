@@ -1031,7 +1031,7 @@ struct RedirectThreatInfo
     uint64 GetTargetGUID() const { return _targetGUID; }
     uint32 GetThreatPct() const { return _threatPct; }
 
-    void Set(uint64 guid, uint32 pct)
+    void Set(ObjectGuid guid, uint32 pct)
     {
         _targetGUID = guid;
         _threatPct = pct;
@@ -1221,7 +1221,7 @@ struct CharmInfo
 
         void SetForcedSpell(uint32 id) { _forcedSpellId = id; }
         int32 GetForcedSpell() { return _forcedSpellId; }
-        void SetForcedTargetGUID(uint64 guid) { _forcedTargetGUID = guid; }
+        void SetForcedTargetGUID(ObjectGuid guid) { _forcedTargetGUID = guid; }
         uint64 GetForcedTarget() { return _forcedTargetGUID; }
 
         // Player react states
@@ -1744,7 +1744,7 @@ class Unit : public WorldObject
         Aura* AddAura(SpellInfo const* spellInfo, uint8 effMask, Unit* target);
         void SetAuraStack(uint32 spellId, Unit* target, uint32 stack);
         void SendPlaySpellVisual(uint32 id);
-        void SendPlaySpellImpact(uint64 guid, uint32 id);
+        void SendPlaySpellImpact(ObjectGuid guid, uint32 id);
         void BuildCooldownPacket(WorldPacket& data, uint8 flags, uint32 spellId, uint32 cooldown);
         void BuildCooldownPacket(WorldPacket& data, uint8 flags, PacketCooldowns const& cooldowns);
 
@@ -1817,13 +1817,13 @@ class Unit : public WorldObject
         uint64 GetCreatorGUID() const { return GetUInt64Value(UNIT_FIELD_CREATEDBY); }
         void SetCreatorGUID(uint64 creator) { SetUInt64Value(UNIT_FIELD_CREATEDBY, creator); }
         uint64 GetMinionGUID() const { return GetUInt64Value(UNIT_FIELD_SUMMON); }
-        void SetMinionGUID(uint64 guid) { SetUInt64Value(UNIT_FIELD_SUMMON, guid); }
+        void SetMinionGUID(ObjectGuid guid) { SetUInt64Value(UNIT_FIELD_SUMMON, guid); }
         uint64 GetCharmerGUID() const { return GetUInt64Value(UNIT_FIELD_CHARMEDBY); }
         void SetCharmerGUID(uint64 owner) { SetUInt64Value(UNIT_FIELD_CHARMEDBY, owner); }
         uint64 GetCharmGUID() const { return  GetUInt64Value(UNIT_FIELD_CHARM); }
-        void SetPetGUID(uint64 guid) { m_SummonSlot[SUMMON_SLOT_PET] = guid; }
+        void SetPetGUID(ObjectGuid guid) { m_SummonSlot[SUMMON_SLOT_PET] = guid; }
         uint64 GetPetGUID() const { return m_SummonSlot[SUMMON_SLOT_PET]; }
-        void SetCritterGUID(uint64 guid) { SetUInt64Value(UNIT_FIELD_CRITTER, guid); }
+        void SetCritterGUID(ObjectGuid guid) { SetUInt64Value(UNIT_FIELD_CRITTER, guid); }
         uint64 GetCritterGUID() const { return GetUInt64Value(UNIT_FIELD_CRITTER); }
 
         bool IsControlledByPlayer() const { return m_ControlledByPlayer; }
@@ -1831,7 +1831,7 @@ class Unit : public WorldObject
         uint64 GetCharmerOrOwnerGUID() const { return GetCharmerGUID() ? GetCharmerGUID() : GetOwnerGUID(); }
         uint64 GetCharmerOrOwnerOrOwnGUID() const
         {
-            if (uint64 guid = GetCharmerOrOwnerGUID())
+            if (ObjectGuid guid = GetCharmerOrOwnerGUID())
                 return guid;
             return GetGUID();
         }
@@ -1983,9 +1983,9 @@ class Unit : public WorldObject
         bool HasAuraTypeWithMiscvalue(AuraType auratype, int32 miscvalue) const;
         bool HasAuraTypeWithAffectMask(AuraType auratype, SpellInfo const* affectedSpell) const;
         bool HasAuraTypeWithValue(AuraType auratype, int32 value) const;
-        bool HasNegativeAuraWithInterruptFlag(uint32 flag, uint64 guid = 0);
+        bool HasNegativeAuraWithInterruptFlag(uint32 flag, ObjectGuid guid = 0);
         bool HasVisibleAuraType(AuraType auraType) const;
-        bool HasNegativeAuraWithAttribute(uint32 flag, uint64 guid = 0);
+        bool HasNegativeAuraWithAttribute(uint32 flag, ObjectGuid guid = 0);
         bool HasAuraWithMechanic(uint32 mechanicMask) const;
 
         AuraEffect* IsScriptOverriden(SpellInfo const* spell, int32 script) const;
@@ -2275,14 +2275,14 @@ class Unit : public WorldObject
         void DisableRotate(bool apply);
         void DisableSpline();
 
-        void AddComboPointHolder(uint32 lowguid) { m_ComboPointHolders.insert(lowguid); }
-        void RemoveComboPointHolder(uint32 lowguid) { m_ComboPointHolders.erase(lowguid); }
+        void AddComboPointHolder(ObjectGuid guid) { m_ComboPointHolders.insert(lowguid); }
+        void RemoveComboPointHolder(ObjectGuid guid) { m_ComboPointHolders.erase(lowguid); }
         void ClearComboPointHolders();
 
         ///----------Pet responses methods-----------------
         void SendPetActionFeedback (uint8 msg);
         void SendPetTalk (uint32 pettalk);
-        void SendPetAIReaction(uint64 guid);
+        void SendPetAIReaction(ObjectGuid guid);
         ///----------End of Pet responses methods----------
 
         void propagateSpeedChange() { GetMotionMaster()->propagateSpeedChange(); }
@@ -2320,7 +2320,7 @@ class Unit : public WorldObject
         uint32 GetModelForTotem(PlayerTotemType totemType);
 
         // Redirect Threat
-        void SetRedirectThreat(uint64 guid, uint32 pct) { _redirectThreatInfo.Set(guid, pct); }
+        void SetRedirectThreat(ObjectGuid guid, uint32 pct) { _redirectThreatInfo.Set(guid, pct); }
         void ResetRedirectThreat() { SetRedirectThreat(0, 0); }
         void ModifyRedirectThreat(int32 amount) { _redirectThreatInfo.ModifyThreatPct(amount); }
         uint32 GetRedirectThreatPercent() { return _redirectThreatInfo.GetThreatPct(); }
@@ -2377,7 +2377,7 @@ class Unit : public WorldObject
         // pussywizard:
         // MMaps
         std::map<uint64, MMapTargetData> m_targetsNotAcceptable;
-        bool isTargetNotAcceptableByMMaps(uint64 guid, uint32 currTime, const Position* t = NULL) const { std::map<uint64, MMapTargetData>::const_iterator itr = m_targetsNotAcceptable.find(guid); if (itr != m_targetsNotAcceptable.end() && (itr->second._endTime >= currTime || (t && !itr->second.PosChanged(*this, *t)))) return true; return false; }
+        bool isTargetNotAcceptableByMMaps(ObjectGuid guid, uint32 currTime, const Position* t = NULL) const { std::map<uint64, MMapTargetData>::const_iterator itr = m_targetsNotAcceptable.find(guid); if (itr != m_targetsNotAcceptable.end() && (itr->second._endTime >= currTime || (t && !itr->second.PosChanged(*this, *t)))) return true; return false; }
         uint32 m_mmapNotAcceptableStartTime;
         // Safe mover
         std::set<SafeUnitPointer*> SafeUnitPointerSet;

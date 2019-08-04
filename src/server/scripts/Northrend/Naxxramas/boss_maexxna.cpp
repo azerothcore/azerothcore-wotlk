@@ -214,7 +214,7 @@ public:
         explicit boss_maexxna_webwrapAI(Creature *c) : NullCreatureAI(c), victimGUID(0) {}
 
         uint64 victimGUID;
-        void SetGUID(uint64 guid, int32  /*param*/) override
+        void SetGUID(ObjectGuid guid, int32  /*param*/) override
         {
             victimGUID = guid;
             if (me->m_spells[0] && victimGUID)

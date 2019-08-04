@@ -248,7 +248,7 @@ class boss_hexlord_malacrass : public CreatureScript
             uint64 AddGUID[4];
             uint32 AddEntry[4];
 
-            uint64 PlayerGUID;
+            ObjectGuid playerGUID;
 
             uint32 SpiritBolts_Timer;
             uint32 DrainPower_Timer;

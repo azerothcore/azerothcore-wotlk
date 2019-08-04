@@ -44,7 +44,7 @@ public:
         {
             banishTimer = 5000;
             exileTimer = 8500;
-            playerGUID = 0;
+            ObjectGuid::Empty;
             canTeleport = false;
         }
 
@@ -62,7 +62,7 @@ public:
                         temp->CastSpell(temp, SPELL_EXILE, true);
                         temp->CastSpell(temp, SPELL_BANISH_TELEPORT, true);
                     }
-                    playerGUID = 0;
+                    ObjectGuid::Empty;
                     exileTimer = 8500;
                     canTeleport = false;
                 } else exileTimer -= diff;
@@ -86,7 +86,7 @@ public:
     private:
         uint32 exileTimer;
         uint32 banishTimer;
-        uint64 playerGUID;
+        ObjectGuid playerGUID;
         bool canTeleport;
     };
 
@@ -109,7 +109,7 @@ public:
         {
             banishTimer = 5000;
             exileTimer = 8500;
-            playerGUID = 0;
+            ObjectGuid::Empty;
             canTeleport = false;
         }
 
@@ -127,7 +127,7 @@ public:
                         temp->CastSpell(temp, SPELL_EXILE, true);
                         temp->CastSpell(temp, SPELL_BANISH_TELEPORT, true);
                     }
-                    playerGUID = 0;
+                    ObjectGuid::Empty;
                     exileTimer = 8500;
                     canTeleport = false;
                 } else exileTimer -= diff;
@@ -150,7 +150,7 @@ public:
     private:
         uint32 exileTimer;
         uint32 banishTimer;
-        uint64 playerGUID;
+        ObjectGuid playerGUID;
         bool canTeleport;
     };
 

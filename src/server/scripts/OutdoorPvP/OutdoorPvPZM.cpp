@@ -203,7 +203,7 @@ bool OPvPCapturePointZM_GraveYard::Update(uint32 /*diff*/)
     return retval;
 }
 
-int32 OPvPCapturePointZM_GraveYard::HandleOpenGo(Player* player, uint64 guid)
+int32 OPvPCapturePointZM_GraveYard::HandleOpenGo(Player* player, ObjectGuid guid)
 {
     int32 retval = OPvPCapturePoint::HandleOpenGo(player, guid);
     if (retval >= 0)
@@ -323,7 +323,7 @@ void OPvPCapturePointZM_GraveYard::SetBeaconState(TeamId controlling_factionId)
 
 bool OPvPCapturePointZM_GraveYard::CanTalkTo(Player* player, Creature* c, GossipMenuItems const& /*gso*/)
 {
-    uint64 guid = c->GetGUID();
+    ObjectGuid guid = c->GetGUID();
     std::map<uint64, uint32>::iterator itr = m_CreatureTypes.find(guid);
     if (itr != m_CreatureTypes.end())
     {
@@ -335,7 +335,7 @@ bool OPvPCapturePointZM_GraveYard::CanTalkTo(Player* player, Creature* c, Gossip
     return false;
 }
 
-bool OPvPCapturePointZM_GraveYard::HandleGossipOption(Player* player, uint64 guid, uint32 /*gossipid*/)
+bool OPvPCapturePointZM_GraveYard::HandleGossipOption(Player* player, ObjectGuid guid, uint32 /*gossipid*/)
 {
     std::map<uint64, uint32>::iterator itr = m_CreatureTypes.find(guid);
     if (itr != m_CreatureTypes.end())

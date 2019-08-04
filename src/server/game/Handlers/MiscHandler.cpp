@@ -92,7 +92,7 @@ void WorldSession::HandleGossipSelectOptionOpcode(WorldPacket & recv_data)
 
     uint32 gossipListId;
     uint32 menuId;
-    uint64 guid;
+    ObjectGuid guid;
     std::string code = "";
 
     recv_data >> guid >> menuId >> gossipListId;
@@ -535,7 +535,7 @@ void WorldSession::HandleZoneUpdateOpcode(WorldPacket & recv_data)
 
 void WorldSession::HandleSetSelectionOpcode(WorldPacket & recv_data)
 {
-    uint64 guid;
+    ObjectGuid guid;
     recv_data >> guid;
 
     _player->SetSelection(guid);
@@ -668,7 +668,7 @@ void WorldSession::HandleAddIgnoreOpcode(WorldPacket & recv_data)
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: %s asked to Ignore: '%s'", GetPlayer()->GetName().c_str(), ignoreName.c_str());
 #endif
-    uint32 lowGuid = sWorld->GetGlobalPlayerGUID(ignoreName);
+    ObjectGuid guid = sWorld->GetGlobalPlayerGUID(ignoreName);
     if (!lowGuid)
         return;
 
@@ -757,7 +757,7 @@ void WorldSession::HandleSetContactNotesOpcode(WorldPacket & recv_data)
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_SET_CONTACT_NOTES");
 #endif
-    uint64 guid;
+    ObjectGuid guid;
     std::string note;
     recv_data >> guid >> note;
     _player->GetSocial()->SetFriendNote(GUID_LOPART(guid), note);
@@ -797,7 +797,7 @@ void WorldSession::HandleReclaimCorpseOpcode(WorldPacket &recv_data)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_RECLAIM_CORPSE");
 #endif
 
-    uint64 guid;
+    ObjectGuid guid;
     recv_data >> guid;
 
     if (_player->IsAlive())
@@ -836,7 +836,7 @@ void WorldSession::HandleResurrectResponseOpcode(WorldPacket & recv_data)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_RESURRECT_RESPONSE");
 #endif
 
-    uint64 guid;
+    ObjectGuid guid;
     uint8 status;
     recv_data >> guid;
     recv_data >> status;
@@ -1151,7 +1151,7 @@ void WorldSession::HandleMoveUnRootAck(WorldPacket& recv_data)
     // no used
     recv_data.rfinish();                       // prevent warnings spam
 /*
-    uint64 guid;
+    ObjectGuid guid;
     recv_data >> guid;
 
     // now can skip not our packet
@@ -1179,7 +1179,7 @@ void WorldSession::HandleMoveRootAck(WorldPacket& recv_data)
     // no used
     recv_data.rfinish();                       // prevent warnings spam
 /*
-    uint64 guid;
+    ObjectGuid guid;
     recv_data >> guid;
 
     // now can skip not our packet
@@ -1230,7 +1230,7 @@ void WorldSession::HandlePlayedTime(WorldPacket& recv_data)
 
 void WorldSession::HandleInspectOpcode(WorldPacket& recv_data)
 {
-    uint64 guid;
+    ObjectGuid guid;
     recv_data >> guid;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
@@ -1268,7 +1268,7 @@ void WorldSession::HandleInspectOpcode(WorldPacket& recv_data)
 
 void WorldSession::HandleInspectHonorStatsOpcode(WorldPacket& recv_data)
 {
-    uint64 guid;
+    ObjectGuid guid;
     recv_data >> guid;
 
     Player* player = ObjectAccessor::GetPlayer(*_player, guid);
@@ -1782,7 +1782,7 @@ void WorldSession::HandleMoveSetCanFlyAckOpcode(WorldPacket & recv_data)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_MOVE_SET_CAN_FLY_ACK");
 #endif
 
-    uint64 guid;                                            // guid - unused
+    ObjectGuid guid;                                            // guid - unused
     recv_data.readPackGUID(guid);
 
     // pussywizard: typical check for incomming movement packets
@@ -1832,7 +1832,7 @@ void WorldSession::HandleSetTaxiBenchmarkOpcode(WorldPacket & recv_data)
 
 void WorldSession::HandleQueryInspectAchievements(WorldPacket & recv_data)
 {
-    uint64 guid;
+    ObjectGuid guid;
     recv_data.readPackGUID(guid);
 
     Player* player = ObjectAccessor::GetPlayer(*_player, guid);
@@ -1880,7 +1880,7 @@ void WorldSession::HandleAreaSpiritHealerQueryOpcode(WorldPacket & recv_data)
 
     Battleground* bg = _player->GetBattleground();
 
-    uint64 guid;
+    ObjectGuid guid;
     recv_data >> guid;
 
     Creature* unit = GetPlayer()->GetMap()->GetCreature(guid);
@@ -1905,7 +1905,7 @@ void WorldSession::HandleAreaSpiritHealerQueueOpcode(WorldPacket & recv_data)
 
     Battleground* bg = _player->GetBattleground();
 
-    uint64 guid;
+    ObjectGuid guid;
     recv_data >> guid;
 
     Creature* unit = GetPlayer()->GetMap()->GetCreature(guid);
@@ -1970,7 +1970,7 @@ void WorldSession::HandleUpdateMissileTrajectory(WorldPacket& recvPacket)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_UPDATE_MISSILE_TRAJECTORY");
 #endif
 
-    uint64 guid;
+    ObjectGuid guid;
     uint32 spellId;
     float elevation, speed;
     float curX, curY, curZ;

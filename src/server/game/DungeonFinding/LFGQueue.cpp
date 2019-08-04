@@ -29,7 +29,7 @@
 namespace lfg
 {
 
-void LFGQueue::AddToQueue(uint64 guid, bool failedProposal)
+void LFGQueue::AddToQueue(ObjectGuid guid, bool failedProposal)
 {
     //sLog->outString("ADD AddToQueue: %u, failed proposal: %u", GUID_LOPART(guid), failedProposal ? 1 : 0);
     LfgQueueDataContainer::iterator itQueue = QueueDataStore.find(guid);
@@ -42,7 +42,7 @@ void LFGQueue::AddToQueue(uint64 guid, bool failedProposal)
     AddToNewQueue(guid, failedProposal);
 }
 
-void LFGQueue::RemoveFromQueue(uint64 guid, bool partial)
+void LFGQueue::RemoveFromQueue(ObjectGuid guid, bool partial)
 {
     //sLog->outString("REMOVE RemoveFromQueue: %u, partial: %u", GUID_LOPART(guid), partial ? 1 : 0);
     RemoveFromNewQueue(guid);
@@ -77,7 +77,7 @@ void LFGQueue::RemoveFromQueue(uint64 guid, bool partial)
     }
 }
 
-void LFGQueue::AddToNewQueue(uint64 guid, bool front)
+void LFGQueue::AddToNewQueue(ObjectGuid guid, bool front)
 {
     if (front)
     {
@@ -92,21 +92,21 @@ void LFGQueue::AddToNewQueue(uint64 guid, bool front)
     }
 }
 
-void LFGQueue::RemoveFromNewQueue(uint64 guid)
+void LFGQueue::RemoveFromNewQueue(ObjectGuid guid)
 {
     //sLog->outString("REMOVE RemoveFromNewQueue: %u", GUID_LOPART(guid));
     newToQueueStore.remove(guid);
     restoredAfterProposal.remove(guid);
 }
 
-void LFGQueue::AddQueueData(uint64 guid, time_t joinTime, LfgDungeonSet const& dungeons, LfgRolesMap const& rolesMap)
+void LFGQueue::AddQueueData(ObjectGuid guid, time_t joinTime, LfgDungeonSet const& dungeons, LfgRolesMap const& rolesMap)
 {
     //sLog->outString("JOINED AddQueueData: %u", GUID_LOPART(guid));
     QueueDataStore[guid] = LfgQueueData(joinTime, dungeons, rolesMap);
     AddToQueue(guid);
 }
 
-void LFGQueue::RemoveQueueData(uint64 guid)
+void LFGQueue::RemoveQueueData(ObjectGuid guid)
 {
     //sLog->outString("LEFT RemoveQueueData: %u", GUID_LOPART(guid));
     LfgQueueDataContainer::iterator it = QueueDataStore.find(guid);
@@ -142,7 +142,7 @@ void LFGQueue::UpdateWaitTimeDps(int32 waitTime, uint32 dungeonId)
     wt.time = int32((wt.time * old_number + waitTime) / wt.number);
 }
 
-void LFGQueue::RemoveFromCompatibles(uint64 guid)
+void LFGQueue::RemoveFromCompatibles(ObjectGuid guid)
 {
     //sLog->outString("COMPATIBLES REMOVE for: %u", GUID_LOPART(guid));
     for (LfgCompatibleContainer::iterator it = CompatibleList.begin(); it != CompatibleList.end(); ++it)
@@ -258,7 +258,7 @@ LfgCompatibility LFGQueue::CheckCompatibility(Lfg5Guids const& checkWith, const 
     // Check if more than one LFG group and number of players joining
     uint8 numPlayers = 0;
     uint8 numLfgGroups = 0;
-    uint64 guid;
+    ObjectGuid guid;
     uint64 addToFoundMask = 0;
 
     for (uint8 i=0; i<5 && (guid=check.guid[i]) != 0 && numLfgGroups < 2 && numPlayers <= MAXGROUPSIZE; ++i)
@@ -473,7 +473,7 @@ void LFGQueue::UpdateQueueTimers(uint32 diff)
         {
             if (currTime - itQueue->second.joinTime > 2*HOUR)
             {
-                uint64 guid = itQueue->first;
+                ObjectGuid guid = itQueue->first;
                 QueueDataStore.erase(itQueue++);
                 sLFGMgr->LeaveAllLfgQueues(guid, true);
                 continue;
@@ -543,7 +543,7 @@ void LFGQueue::UpdateQueueTimers(uint32 diff)
     }
 }
 
-time_t LFGQueue::GetJoinTime(uint64 guid)
+time_t LFGQueue::GetJoinTime(ObjectGuid guid)
 {
     return QueueDataStore[guid].joinTime;
 }

@@ -74,7 +74,7 @@ bool ArenaTeam::Create(uint64 captainGuid, uint8 type, std::string const& teamNa
     return true;
 }
 
-bool ArenaTeam::AddMember(uint64 playerGuid)
+bool ArenaTeam::AddMember(ObjectGuid playerGUID)
 {
     std::string playerName;
     uint8 playerClass;
@@ -278,7 +278,7 @@ bool ArenaTeam::SetName(std::string const& name)
     return true;
 }
 
-void ArenaTeam::SetCaptain(uint64 guid)
+void ArenaTeam::SetCaptain(ObjectGuid guid)
 {
     // Disable remove/promote buttons
     Player* oldCaptain = ObjectAccessor::FindPlayerInOrOutOfWorld(GetCaptain());
@@ -307,7 +307,7 @@ void ArenaTeam::SetCaptain(uint64 guid)
     }
 }
 
-void ArenaTeam::DelMember(uint64 guid, bool cleanDb)
+void ArenaTeam::DelMember(ObjectGuid guid, bool cleanDb)
 {
     // Remove member from team
     for (MemberList::iterator itr = Members.begin(); itr != Members.end(); ++itr)
@@ -471,7 +471,7 @@ void ArenaTeam::NotifyStatsChanged()
             SendStats(player->GetSession());
 }
 
-void ArenaTeam::Inspect(WorldSession* session, uint64 guid)
+void ArenaTeam::Inspect(WorldSession* session, ObjectGuid guid)
 {
     ArenaTeamMember* member = GetMember(guid);
     if (!member)
@@ -528,7 +528,7 @@ void ArenaTeam::BroadcastPacket(WorldPacket* packet)
             player->GetSession()->SendPacket(packet);
 }
 
-void ArenaTeam::BroadcastEvent(ArenaTeamEvents event, uint64 guid, uint8 strCount, std::string const& str1, std::string const& str2, std::string const& str3)
+void ArenaTeam::BroadcastEvent(ArenaTeamEvents event, ObjectGuid guid, uint8 strCount, std::string const& str1, std::string const& str2, std::string const& str3)
 {
     WorldPacket data(SMSG_ARENA_TEAM_EVENT, 1+1+1);
     data << uint8(event);
@@ -592,7 +592,7 @@ uint8 ArenaTeam::GetSlotByType(uint32 type)
     return 0xFF;
 }
 
-bool ArenaTeam::IsMember(uint64 guid) const
+bool ArenaTeam::IsMember(ObjectGuid guid) const
 {
     for (MemberList::const_iterator itr = Members.begin(); itr != Members.end(); ++itr)
         if (itr->Guid == guid)
@@ -944,7 +944,7 @@ ArenaTeamMember* ArenaTeam::GetMember(const std::string& name)
     return GetMember(sObjectMgr->GetPlayerGUIDByName(name));
 }
 
-ArenaTeamMember* ArenaTeam::GetMember(uint64 guid)
+ArenaTeamMember* ArenaTeam::GetMember(ObjectGuid guid)
 {
     for (MemberList::iterator itr = Members.begin(); itr != Members.end(); ++itr)
         if (itr->Guid == guid)

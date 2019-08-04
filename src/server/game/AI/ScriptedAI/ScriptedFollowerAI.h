@@ -58,7 +58,7 @@ class FollowerAI : public ScriptedAI
 
         bool AssistPlayerInCombat(Unit* who);
 
-        uint64 m_uiLeaderGUID;
+        ObjectGuid m_uiLeaderGUID;
         uint32 m_uiUpdateFollowTimer;
         uint32 m_uiFollowState;
 

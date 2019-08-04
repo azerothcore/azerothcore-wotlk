@@ -18,7 +18,7 @@
 #include "Item.h"
 #include "AccountMgr.h"
 
-bool WorldSession::CanOpenMailBox(uint64 guid)
+bool WorldSession::CanOpenMailBox(ObjectGuid guid)
 {
     if (guid == _player->GetGUID())
     {

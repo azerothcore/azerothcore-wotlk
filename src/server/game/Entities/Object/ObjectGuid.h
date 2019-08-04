@@ -65,14 +65,14 @@ class ObjectGuid
         static ObjectGuid const Empty;
 
         ObjectGuid() : m_guid(0) {}
-        explicit ObjectGuid(uint64 guid) : m_guid(guid) {}
+        explicit ObjectGuid(ObjectGuid guid) : m_guid(guid) {}
         ObjectGuid(HighGuid hi, uint32 entry, uint32 counter) : m_guid(counter ? uint64(counter) | (uint64(entry) << 24) | (uint64(hi) << 48) : 0) {}
         ObjectGuid(HighGuid hi, uint32 counter) : m_guid(counter ? uint64(counter) | (uint64(hi) << 48) : 0) {}
 
         explicit operator uint64() const { return m_guid; }
         PackedGuidReader ReadAsPacked() { return PackedGuidReader(*this); }
 
-        void Set(uint64 guid) { m_guid = guid; }
+        void Set(ObjectGuid guid) { m_guid = guid; }
         void Clear() { m_guid = 0; }
 
         PackedGuid WriteAsPacked() const;
@@ -194,10 +194,10 @@ class PackedGuid
 
     public:                                                 // constructors
         explicit PackedGuid() : m_packedGuid(PACKED_GUID_MIN_BUFFER_SIZE) { m_packedGuid.appendPackGUID(0); }
-        explicit PackedGuid(uint64 guid) : m_packedGuid(PACKED_GUID_MIN_BUFFER_SIZE) { m_packedGuid.appendPackGUID(guid); }
+        explicit PackedGuid(ObjectGuid guid) : m_packedGuid(PACKED_GUID_MIN_BUFFER_SIZE) { m_packedGuid.appendPackGUID(guid); }
         explicit PackedGuid(ObjectGuid guid) : m_packedGuid(PACKED_GUID_MIN_BUFFER_SIZE) { m_packedGuid.appendPackGUID(guid.GetRawValue()); }
 
-        void Set(uint64 guid) { m_packedGuid.wpos(0); m_packedGuid.appendPackGUID(guid); }
+        void Set(ObjectGuid guid) { m_packedGuid.wpos(0); m_packedGuid.appendPackGUID(guid); }
         void Set(ObjectGuid guid) { m_packedGuid.wpos(0); m_packedGuid.appendPackGUID(guid.GetRawValue()); }
 
         size_t size() const { return m_packedGuid.size(); }

@@ -42,20 +42,20 @@ public:
 
             std::map<uint64, uint32> questList;
 
-            void ClearPlayerOnTask(uint64 guid)
+            void ClearPlayerOnTask(ObjectGuid guid)
             {
                 std::map<uint64, uint32>::iterator itr = questList.find(guid);
                 if (itr != questList.end())
                     questList.erase(itr);
             }
 
-            bool IsPlayerOnTask(uint64 guid)
+            bool IsPlayerOnTask(ObjectGuid guid)
             {
                 std::map<uint64, uint32>::const_iterator itr = questList.find(guid);
                 return itr != questList.end();
             }
 
-            void RightClickCauldron(uint64 guid)
+            void RightClickCauldron(ObjectGuid guid)
             {
                 if (questList.empty())
                     return;
@@ -100,7 +100,7 @@ public:
             }
 
             // Generate a Task and announce it to the player
-            void StartNextTask(uint64 playerGUID, uint32 counter)
+            void StartNextTask(ObjectGuid playerGUID, uint32 counter)
             {
                 if (counter > 6)
                     return;
@@ -377,7 +377,7 @@ public:
 
         EventMap events;
         SummonList summons;
-        uint64 playerGUID;
+        ObjectGuid playerGUID;
         uint64 lichGUID;
 
         void EnterEvadeMode()
@@ -395,7 +395,7 @@ public:
         {
             events.Reset();
             summons.DespawnAll();
-            playerGUID = 0;
+            ObjectGuid::Empty;
             lichGUID = 0;
             me->setFaction(974);
             me->SetVisible(false);
@@ -577,7 +577,7 @@ public:
                     events.PopEvent();
                     break;
                 case EVENT_BETRAYAL_14:
-                    playerGUID = 0;
+                    ObjectGuid::Empty;
                     EnterEvadeMode();
                     break;
 

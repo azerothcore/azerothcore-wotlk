@@ -861,7 +861,7 @@ namespace Trinity
     class CreatureWithDbGUIDCheck
     {
         public:
-            CreatureWithDbGUIDCheck(uint32 lowguid) : i_lowguid(lowguid) {}
+            CreatureWithDbGUIDCheck(ObjectGuid guid) : i_lowguid(lowguid) {}
             bool operator()(Creature* u)
             {
                 return u->GetDBTableGUIDLow() == i_lowguid;
@@ -1384,7 +1384,7 @@ namespace Trinity
     class ObjectGUIDCheck
     {
         public:
-            ObjectGUIDCheck(uint64 GUID, bool equals) : _GUID(GUID), _equals(equals) {}
+            ObjectGUIDCheck(ObjectGuid guid, bool equals) : _GUID(GUID), _equals(equals) {}
             bool operator()(WorldObject const* object)
             {
                 return (object->GetGUID() == _GUID) == _equals;

@@ -704,7 +704,7 @@ class Creature : public Unit, public GridObject<Creature>, public MovableMapObje
         bool m_isTempWorldObject; //true when possessed
 
         // Handling caster facing during spellcast
-        void SetTarget(uint64 guid);
+        void SetTarget(ObjectGuid guid);
         void FocusTarget(Spell const* focusSpell, WorldObject const* target);
         void ReleaseFocus(Spell const* focusSpell);
 
@@ -787,7 +787,7 @@ class AssistDelayEvent : public BasicEvent
         AssistDelayEvent(uint64 victim, Unit& owner) : BasicEvent(), m_victim(victim), m_owner(owner) { }
 
         bool Execute(uint64 e_time, uint32 p_time);
-        void AddAssistant(uint64 guid) { m_assistants.push_back(guid); }
+        void AddAssistant(ObjectGuid guid) { m_assistants.push_back(guid); }
     private:
         AssistDelayEvent();
 

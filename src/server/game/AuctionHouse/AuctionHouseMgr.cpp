@@ -85,7 +85,7 @@ void AuctionHouseMgr::SendAuctionWonMail(AuctionEntry* auction, SQLTransaction& 
     if (!pItem)
         return;
 
-    uint64 bidder_guid = MAKE_NEW_GUID(auction->bidder, 0, HIGHGUID_PLAYER);
+    ObjectGuid bidder_guid (HIGHGUID_PLAYER, auction->bidder);
     uint32 bidder_accId = 0;
     Player* bidder = ObjectAccessor::FindPlayerInOrOutOfWorld(bidder_guid);
     if (bidder)
@@ -120,7 +120,7 @@ void AuctionHouseMgr::SendAuctionWonMail(AuctionEntry* auction, SQLTransaction& 
 
 void AuctionHouseMgr::SendAuctionSalePendingMail(AuctionEntry* auction, SQLTransaction& trans)
 {
-    uint64 owner_guid = MAKE_NEW_GUID(auction->owner, 0, HIGHGUID_PLAYER);
+    ObjectGuid owner_guid(HIGHGUID_PLAYER, auction->owner);
     Player* owner = ObjectAccessor::FindPlayerInOrOutOfWorld(owner_guid);
     uint32 owner_accId = sObjectMgr->GetPlayerAccountIdByGUID(owner_guid);
     // owner exist (online or offline)
@@ -132,7 +132,7 @@ void AuctionHouseMgr::SendAuctionSalePendingMail(AuctionEntry* auction, SQLTrans
 //call this method to send mail to auction owner, when auction is successful, it does not clear ram
 void AuctionHouseMgr::SendAuctionSuccessfulMail(AuctionEntry* auction, SQLTransaction& trans)
 {
-    uint64 owner_guid = MAKE_NEW_GUID(auction->owner, 0, HIGHGUID_PLAYER);
+    ObjectGuid owner_guid(HIGHGUID_PLAYER, auction->owner);
     Player* owner = ObjectAccessor::FindPlayerInOrOutOfWorld(owner_guid);
     uint32 owner_accId = sObjectMgr->GetPlayerAccountIdByGUID(owner_guid);
     // owner exist
@@ -176,7 +176,7 @@ void AuctionHouseMgr::SendAuctionExpiredMail(AuctionEntry* auction, SQLTransacti
     if (!pItem)
         return;
 
-    uint64 owner_guid = MAKE_NEW_GUID(auction->owner, 0, HIGHGUID_PLAYER);
+    ObjectGuid owner_guid(HIGHGUID_PLAYER, auction->owner);
     Player* owner = ObjectAccessor::FindPlayerInOrOutOfWorld(owner_guid);
     uint32 owner_accId = sObjectMgr->GetPlayerAccountIdByGUID(owner_guid);
 
@@ -197,7 +197,7 @@ void AuctionHouseMgr::SendAuctionExpiredMail(AuctionEntry* auction, SQLTransacti
 //this function sends mail to old bidder
 void AuctionHouseMgr::SendAuctionOutbiddedMail(AuctionEntry* auction, uint32 newPrice, Player* newBidder, SQLTransaction& trans)
 {
-    uint64 oldBidder_guid = MAKE_NEW_GUID(auction->bidder, 0, HIGHGUID_PLAYER);
+    ObjectGuid oldBidder_guid(HIGHGUID_PLAYER, auction->bidder);
     Player* oldBidder = ObjectAccessor::FindPlayerInOrOutOfWorld(oldBidder_guid);
 
     uint32 oldBidder_accId = 0;
@@ -219,7 +219,7 @@ void AuctionHouseMgr::SendAuctionOutbiddedMail(AuctionEntry* auction, uint32 new
 //this function sends mail, when auction is cancelled to old bidder
 void AuctionHouseMgr::SendAuctionCancelledToBidderMail(AuctionEntry* auction, SQLTransaction& trans)
 {
-    uint64 bidder_guid = MAKE_NEW_GUID(auction->bidder, 0, HIGHGUID_PLAYER);
+    ObjectGuid bidder_guid(HIGHGUID_PLAYER, auction->bidder);
     Player* bidder = ObjectAccessor::FindPlayerInOrOutOfWorld(bidder_guid);
 
     uint32 bidder_accId = 0;
@@ -275,7 +275,7 @@ void AuctionHouseMgr::LoadAuctionItems()
         }
 
         Item* item = NewItemOrBag(proto);
-        if (!item->LoadFromDB(item_guid, 0, fields, item_template))
+        if (!item->LoadFromDB(item_guid, ObjectGuid::Empty, fields, item_template))
         {
             delete item;
             continue;
@@ -810,11 +810,11 @@ std::string AuctionEntry::BuildAuctionMailSubject(MailAuctionAnswers response) c
     return strm.str();
 }
 
-std::string AuctionEntry::BuildAuctionMailBody(uint32 lowGuid, uint32 bid, uint32 buyout, uint32 deposit, uint32 cut)
+std::string AuctionEntry::BuildAuctionMailBody(ObjectGuid guid, uint32 bid, uint32 buyout, uint32 deposit, uint32 cut)
 {
     std::ostringstream strm;
     strm.width(16);
-    strm << std::right << std::hex << MAKE_NEW_GUID(lowGuid, 0, HIGHGUID_PLAYER);   // HIGHGUID_PLAYER always present, even for empty guids
+    strm << std::right << std::hex << ObjectGuid(HIGHGUID_PLAYER, lowGuid).GetRawValue();   // HIGHGUID_PLAYER always present, even for empty guids
     strm << std::dec << ':' << bid << ':' << buyout;
     strm << ':' << deposit << ':' << cut;
     return strm.str();

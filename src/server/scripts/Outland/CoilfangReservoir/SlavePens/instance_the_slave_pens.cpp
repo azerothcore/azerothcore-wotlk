@@ -85,7 +85,7 @@ public:
             }
         }
 
-        void SetData64(uint32 data, uint64 guid) override
+        void SetData64(uint32 data, ObjectGuid guid) override
         {
             switch (data)
             {

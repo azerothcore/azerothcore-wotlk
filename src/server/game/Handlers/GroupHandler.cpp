@@ -293,7 +293,7 @@ void WorldSession::HandleGroupUninviteGuidOpcode(WorldPacket& recvData)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_GROUP_UNINVITE_GUID");
 #endif
 
-    uint64 guid;
+    ObjectGuid guid;
     std::string reason, name;
     recvData >> guid;
     recvData >> reason;
@@ -378,7 +378,7 @@ void WorldSession::HandleGroupUninviteOpcode(WorldPacket& recvData)
     if (!grp)
         return;
 
-    if (uint64 guid = grp->GetMemberGUID(membername))
+    if (ObjectGuid guid = grp->GetMemberGUID(membername))
     {
         Player::RemoveFromGroup(grp, guid, GROUP_REMOVEMETHOD_KICK, GetPlayer()->GetGUID());
         return;
@@ -399,7 +399,7 @@ void WorldSession::HandleGroupSetLeaderOpcode(WorldPacket& recvData)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_GROUP_SET_LEADER");
 #endif
 
-    uint64 guid;
+    ObjectGuid guid;
     recvData >> guid;
 
     Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(guid);
@@ -480,7 +480,7 @@ void WorldSession::HandleLootMethodOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleLootRoll(WorldPacket& recvData)
 {
-    uint64 guid;
+    ObjectGuid guid;
     uint32 itemSlot;
     uint8  rollType;
     recvData >> guid;                  // guid of the item rolled
@@ -587,7 +587,7 @@ void WorldSession::HandleRaidTargetUpdateOpcode(WorldPacket& recvData)
         if (group->isRaidGroup() && !group->IsLeader(GetPlayer()->GetGUID()) && !group->IsAssistant(GetPlayer()->GetGUID()))
             return;
 
-        uint64 guid;
+        ObjectGuid guid;
         recvData >> guid;
 
         if (IS_PLAYER_GUID(guid))
@@ -652,7 +652,7 @@ void WorldSession::HandleGroupChangeSubGroupOpcode(WorldPacket& recvData)
         return;
 
     Player* movedPlayer = ObjectAccessor::FindPlayerByName(name, false);
-    uint64 guid;
+    ObjectGuid guid;
     if (movedPlayer)
     {
         guid = movedPlayer->GetGUID();
@@ -679,7 +679,7 @@ void WorldSession::HandleGroupAssistantLeaderOpcode(WorldPacket& recvData)
     if (!group->IsLeader(GetPlayer()->GetGUID()))
         return;
 
-    uint64 guid;
+    ObjectGuid guid;
     bool apply;
     recvData >> guid;
     recvData >> apply;
@@ -705,7 +705,7 @@ void WorldSession::HandlePartyAssignmentOpcode(WorldPacket& recvData)
 
     uint8 assignment;
     bool apply;
-    uint64 guid;
+    ObjectGuid guid;
     recvData >> assignment >> apply;
     recvData >> guid;
 
@@ -963,7 +963,7 @@ void WorldSession::BuildPartyMemberStatsChangedPacket(Player* player, WorldPacke
 void WorldSession::HandleRequestPartyMemberStatsOpcode(WorldPacket &recvData)
 {
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_REQUEST_PARTY_MEMBER_STATS");
-    uint64 Guid;
+    ObjectGuid guid;
     recvData >> Guid;
 
     Player* player = HashMapHolder<Player>::Find(Guid);

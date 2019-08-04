@@ -104,7 +104,7 @@ void WorldSession::HandleLootMoneyOpcode(WorldPacket & /*recvData*/)
 #endif
 
     Player* player = GetPlayer();
-    uint64 guid = player->GetLootGUID();
+    ObjectGuid guid = player->GetLootGUID();
     if (!guid)
         return;
 
@@ -225,7 +225,7 @@ void WorldSession::HandleLootOpcode(WorldPacket& recvData)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_LOOT");
 #endif
 
-    uint64 guid;
+    ObjectGuid guid;
     recvData >> guid;
 
     // Check possible cheat
@@ -247,7 +247,7 @@ void WorldSession::HandleLootReleaseOpcode(WorldPacket& recvData)
 
     // cheaters can modify lguid to prevent correct apply loot release code and re-loot
     // use internal stored guid
-    uint64 guid;
+    ObjectGuid guid;
     recvData >> guid;
 
     if (uint64 lguid = GetPlayer()->GetLootGUID())

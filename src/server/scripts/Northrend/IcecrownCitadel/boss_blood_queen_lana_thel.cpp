@@ -519,17 +519,17 @@ class boss_blood_queen_lana_thel : public CreatureScript
                 instance->DoRemoveAurasDueToSpellOnPlayers(PRESENCE_OF_THE_DARKFALLEN);
             }
 
-            bool WasVampire(uint64 guid)
+            bool WasVampire(ObjectGuid guid)
             {
                 return _vampires.count(guid) != 0;
             }
 
-            bool WasBloodbolted(uint64 guid)
+            bool WasBloodbolted(ObjectGuid guid)
             {
                 return _bloodboltedPlayers.count(guid) != 0;
             }
 
-            void SetGUID(uint64 guid, int32 type = 0)
+            void SetGUID(ObjectGuid guid, int32 type = 0)
             {
                 switch (type)
                 {

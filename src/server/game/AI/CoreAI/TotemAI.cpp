@@ -23,7 +23,7 @@ int TotemAI::Permissible(Creature const* creature)
     return PERMIT_BASE_NO;
 }
 
-TotemAI::TotemAI(Creature* c) : CreatureAI(c), i_victimGuid(0)
+TotemAI::TotemAI(Creature* c) : CreatureAI(c), i_victimGuid()
 {
     ASSERT(c->IsTotem());
 }
@@ -88,7 +88,7 @@ void TotemAI::UpdateAI(uint32 /*diff*/)
         me->CastSpell(victim, me->ToTotem()->GetSpell(), false);
     }
     else
-        i_victimGuid = 0;
+        i_victimGuid.Clear();
 }
 
 void TotemAI::AttackStart(Unit* /*victim*/)

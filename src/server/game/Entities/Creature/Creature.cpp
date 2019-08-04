@@ -255,7 +255,7 @@ void Creature::SearchFormation()
     if (IsSummon())
         return;
 
-    uint32 lowguid = GetDBTableGUIDLow();
+    ObjectGuid guid = GetDBTableGUIDLow();
     if (!lowguid)
         return;
 
@@ -2777,7 +2777,7 @@ void Creature::SetDisplayId(uint32 modelId)
     }
 }
 
-void Creature::SetTarget(uint64 guid)
+void Creature::SetTarget(ObjectGuid guid)
 { 
     if (!_focusSpell)
         SetUInt64Value(UNIT_FIELD_TARGET, guid);

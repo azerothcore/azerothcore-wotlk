@@ -26,7 +26,7 @@ void WorldSession::HandleDismissControlledVehicle(WorldPacket &recvData)
         return;
     }
 
-    uint64 guid;
+    ObjectGuid guid;
 
     recvData.readPackGUID(guid);
 
@@ -79,7 +79,7 @@ void WorldSession::HandleChangeSeatsOnControlledVehicle(WorldPacket &recvData)
             break;
         case CMSG_CHANGE_SEATS_ON_CONTROLLED_VEHICLE:
         {
-            uint64 guid;        // current vehicle guid
+            ObjectGuid guid;        // current vehicle guid
             recvData.readPackGUID(guid);
 
             // pussywizard:
@@ -112,7 +112,7 @@ void WorldSession::HandleChangeSeatsOnControlledVehicle(WorldPacket &recvData)
         }
         case CMSG_REQUEST_VEHICLE_SWITCH_SEAT:
         {
-            uint64 guid;        // current vehicle guid
+            ObjectGuid guid;        // current vehicle guid
             recvData.readPackGUID(guid);
 
             int8 seatId;
@@ -134,7 +134,7 @@ void WorldSession::HandleChangeSeatsOnControlledVehicle(WorldPacket &recvData)
 void WorldSession::HandleEnterPlayerVehicle(WorldPacket &data)
 {
     // Read guid
-    uint64 guid;
+    ObjectGuid guid;
     data >> guid;
 
     if (Player* player = ObjectAccessor::GetPlayer(*_player, guid))
@@ -163,7 +163,7 @@ void WorldSession::HandleEjectPassenger(WorldPacket &data)
         return;
     }
 
-    uint64 guid;
+    ObjectGuid guid;
     data >> guid;
 
     if (IS_PLAYER_GUID(guid))

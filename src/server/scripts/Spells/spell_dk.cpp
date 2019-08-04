@@ -2390,7 +2390,7 @@ class spell_dk_scourge_strike : public SpellScriptLoader
         {
             PrepareSpellScript(spell_dk_scourge_strike_SpellScript);
             float multiplier;
-            uint64 guid;
+            ObjectGuid guid;
 
             bool Load()
             {

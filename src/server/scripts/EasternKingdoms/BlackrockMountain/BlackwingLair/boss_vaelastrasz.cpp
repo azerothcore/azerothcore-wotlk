@@ -68,7 +68,7 @@ public:
             _Reset();
 
             me->SetStandState(UNIT_STAND_STATE_DEAD);
-            PlayerGUID = 0;
+            ObjectGuid::Empty;
 
             HasYelled = false;
         }
@@ -214,7 +214,7 @@ public:
         }
 
         private:
-            uint64 PlayerGUID;
+            ObjectGuid playerGUID;
             bool HasYelled;
     };
 

@@ -55,7 +55,7 @@ void WorldSession::HandleTalentWipeConfirmOpcode(WorldPacket & recvData)
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "MSG_TALENT_WIPE_CONFIRM");
 #endif
-    uint64 guid;
+    ObjectGuid guid;
     recvData >> guid;
 
     Creature* unit = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_TRAINER);

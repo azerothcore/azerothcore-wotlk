@@ -859,7 +859,7 @@ void WorldSession::HandleBuyItemOpcode(WorldPacket & recvData)
 
 void WorldSession::HandleListInventoryOpcode(WorldPacket & recvData)
 {
-    uint64 guid;
+    ObjectGuid guid;
 
     recvData >> guid;
 
@@ -1031,7 +1031,7 @@ void WorldSession::HandleBuyBankSlotOpcode(WorldPacket& recvPacket)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_BUY_BANK_SLOT");
 #endif
 
-    uint64 guid;
+    ObjectGuid guid;
     recvPacket >> guid;
 
     if (!CanUseBank(guid))
@@ -1211,7 +1211,7 @@ void WorldSession::SendEnchantmentLog(uint64 target, uint64 caster, uint32 itemI
     GetPlayer()->SendMessageToSet(&data, true);
 }
 
-void WorldSession::SendItemEnchantTimeUpdate(uint64 Playerguid, uint64 Itemguid, uint32 slot, uint32 Duration)
+void WorldSession::SendItemEnchantTimeUpdate(ObjectGuid playerGUID, uint64 Itemguid, uint32 slot, uint32 Duration)
 {
                                                             // last check 2.0.10
     WorldPacket data(SMSG_ITEM_ENCHANT_TIME_UPDATE, (8+4+4+8));
@@ -1599,7 +1599,7 @@ void WorldSession::HandleItemRefundInfoRequest(WorldPacket& recvData)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_ITEM_REFUND_INFO");
 #endif
 
-    uint64 guid;
+    ObjectGuid guid;
     recvData >> guid;                                      // item guid
 
     Item* item = _player->GetItemByGuid(guid);
@@ -1619,7 +1619,7 @@ void WorldSession::HandleItemRefund(WorldPacket &recvData)
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_ITEM_REFUND");
 #endif
-    uint64 guid;
+    ObjectGuid guid;
     recvData >> guid;                                      // item guid
 
     Item* item = _player->GetItemByGuid(guid);

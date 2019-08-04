@@ -21,13 +21,13 @@ void WorldSession::HandleTaxiNodeStatusQueryOpcode(WorldPacket & recvData)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_TAXINODE_STATUS_QUERY");
 #endif
 
-    uint64 guid;
+    ObjectGuid guid;
 
     recvData >> guid;
     SendTaxiStatus(guid);
 }
 
-void WorldSession::SendTaxiStatus(uint64 guid)
+void WorldSession::SendTaxiStatus(ObjectGuid guid)
 {
     // cheating checks
     Creature* unit = GetPlayer()->GetMap()->GetCreature(guid);
@@ -64,7 +64,7 @@ void WorldSession::HandleTaxiQueryAvailableNodes(WorldPacket & recvData)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_TAXIQUERYAVAILABLENODES");
 #endif
 
-    uint64 guid;
+    ObjectGuid guid;
     recvData >> guid;
 
     // cheating checks
@@ -172,7 +172,7 @@ void WorldSession::HandleActivateTaxiExpressOpcode (WorldPacket & recvData)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_ACTIVATETAXIEXPRESS");
 #endif
 
-    uint64 guid;
+    ObjectGuid guid;
     uint32 node_count;
 
     recvData >> guid >> node_count;
@@ -218,7 +218,7 @@ void WorldSession::HandleMoveSplineDoneOpcode(WorldPacket& recvData)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_MOVE_SPLINE_DONE");
 #endif
 
-    uint64 guid; // used only for proper packet read
+    ObjectGuid guid; // used only for proper packet read
     recvData.readPackGUID(guid);
 
     MovementInfo movementInfo;                              // used only for proper packet read
@@ -234,7 +234,7 @@ void WorldSession::HandleActivateTaxiOpcode(WorldPacket & recvData)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_ACTIVATETAXI");
 #endif
 
-    uint64 guid;
+    ObjectGuid guid;
     std::vector<uint32> nodes;
     nodes.resize(2);
 

@@ -1074,7 +1074,7 @@ void ObjectMgr::LoadGameObjectAddons()
     sLog->outString();
 }
 
-GameObjectAddon const* ObjectMgr::GetGameObjectAddon(uint32 lowguid)
+GameObjectAddon const* ObjectMgr::GetGameObjectAddon(ObjectGuid guid)
 {
     GameObjectAddonContainer::const_iterator itr = _gameObjectAddonStore.find(lowguid);
     if (itr != _gameObjectAddonStore.end())
@@ -1083,7 +1083,7 @@ GameObjectAddon const* ObjectMgr::GetGameObjectAddon(uint32 lowguid)
     return NULL;
 }
 
-CreatureAddon const* ObjectMgr::GetCreatureAddon(uint32 lowguid)
+CreatureAddon const* ObjectMgr::GetCreatureAddon(ObjectGuid guid)
 {
     CreatureAddonContainer::const_iterator itr = _creatureAddonStore.find(lowguid);
     if (itr != _creatureAddonStore.end())
@@ -1347,7 +1347,7 @@ void ObjectMgr::LoadLinkedRespawn()
         uint32 linkedGuidLow = fields[1].GetUInt32();
         uint8  linkType = fields[2].GetUInt8();
 
-        uint64 guid = 0, linkedGuid = 0;
+        ObjectGuid guid = 0, linkedGuid = 0;
         bool error = false;
         switch (linkType)
         {
@@ -1516,7 +1516,7 @@ bool ObjectMgr::SetCreatureLinkedRespawn(uint32 guidLow, uint32 linkedGuidLow)
         return false;
 
     const CreatureData* master = GetCreatureData(guidLow);
-    uint64 guid = MAKE_NEW_GUID(guidLow, master->id, HIGHGUID_UNIT);
+    ObjectGuid guid = MAKE_NEW_GUID(guidLow, master->id, HIGHGUID_UNIT);
 
     if (!linkedGuidLow) // we're removing the linking
     {
@@ -2178,7 +2178,7 @@ uint64 ObjectMgr::GetPlayerGUIDByName(std::string const& name) const
     return 0;
 }
 
-bool ObjectMgr::GetPlayerNameByGUID(uint64 guid, std::string &name) const
+bool ObjectMgr::GetPlayerNameByGUID(ObjectGuid guid, std::string &name) const
 {
     // Get data from global storage
     if (GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(GUID_LOPART(guid)))
@@ -2190,7 +2190,7 @@ bool ObjectMgr::GetPlayerNameByGUID(uint64 guid, std::string &name) const
     return false;
 }
 
-TeamId ObjectMgr::GetPlayerTeamIdByGUID(uint64 guid) const
+TeamId ObjectMgr::GetPlayerTeamIdByGUID(ObjectGuid guid) const
 {
     // xinef: Get data from global storage
     if (GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(GUID_LOPART(guid)))
@@ -2199,7 +2199,7 @@ TeamId ObjectMgr::GetPlayerTeamIdByGUID(uint64 guid) const
     return TEAM_NEUTRAL;
 }
 
-uint32 ObjectMgr::GetPlayerAccountIdByGUID(uint64 guid) const
+uint32 ObjectMgr::GetPlayerAccountIdByGUID(ObjectGuid guid) const
 {
     // xinef: Get data from global storage
     if (GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(GUID_LOPART(guid)))
@@ -9114,9 +9114,9 @@ GameObjectTemplate const* ObjectMgr::GetGameObjectTemplate(uint32 entry)
     return NULL;
 }
 
-Player* ObjectMgr::GetPlayerByLowGUID(uint32 lowguid) const
+Player* ObjectMgr::GetPlayerByLowGUID(ObjectGuid guid) const
 {
-    uint64 guid = MAKE_NEW_GUID(lowguid, 0, HIGHGUID_PLAYER);
+    ObjectGuid guid = MAKE_NEW_GUID(lowguid, 0, HIGHGUID_PLAYER);
     return ObjectAccessor::FindPlayer(guid);
 }
 

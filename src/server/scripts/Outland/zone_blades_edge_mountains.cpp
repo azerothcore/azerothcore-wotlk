@@ -64,7 +64,7 @@ public:
 
         EventMap events;
         bool PartyTime;
-        uint64 PlayerGUID;
+        ObjectGuid playerGUID;
         uint64 CannonGUID;
         uint8 count;
         
@@ -77,7 +77,7 @@ public:
         void Initialize()
         {
             PartyTime = false;
-            PlayerGUID = 0;
+            ObjectGuid::Empty;
             CannonGUID = 0;
             count = 0;
         }
@@ -555,7 +555,7 @@ class npc_simon_bunny : public CreatureScript
             uint8 gameLevel;
             uint8 fails;
             uint8 gameTicks;
-            uint64 playerGUID;
+            ObjectGuid playerGUID;
             uint32 clusterIds[SIMON_MAX_COLORS];
             float zCoordCorrection;
             float searchDistance;
@@ -665,7 +665,7 @@ class npc_simon_bunny : public CreatureScript
             }
 
             // Used for getting involved player guid. Parameter id is used for defining if is a large(Monument) or small(Relic) node
-            void SetGUID(uint64 guid, int32 id)
+            void SetGUID(ObjectGuid guid, int32 id)
             {
                 me->SetCanFly(true);
 
@@ -1069,7 +1069,7 @@ public:
     {
         npc_oscillating_frequency_scanner_master_bunnyAI(Creature* creature) : ScriptedAI(creature)
         {
-            playerGuid = 0;
+            ObjectGuid::Empty;
             timer = 500;
         }
 
@@ -1108,7 +1108,7 @@ public:
         }
 
         private:
-            uint64 playerGuid;
+            ObjectGuid playerGUID;
             uint32 timer;
     };
 

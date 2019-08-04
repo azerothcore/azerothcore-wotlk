@@ -1108,7 +1108,7 @@ public:
             return false;
         }
 
-        uint64 guid = target->GetGUID();
+        ObjectGuid guid = target->GetGUID();
 
         uint32 opcode = (uint32)atoi(x);
         if (opcode >= target->GetValuesCount())
@@ -1156,7 +1156,7 @@ public:
             return false;
         }
 
-        uint64 guid = target->GetGUID();
+        ObjectGuid guid = target->GetGUID();
 
         uint32 opcode = (uint32)atoi(x);
         if (opcode >= target->GetValuesCount())

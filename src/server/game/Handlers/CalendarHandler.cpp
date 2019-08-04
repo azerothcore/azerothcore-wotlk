@@ -38,7 +38,7 @@ Copied events should probably have a new owner
 
 void WorldSession::HandleCalendarGetCalendar(WorldPacket& /*recvData*/)
 {
-    uint64 guid = _player->GetGUID();
+    ObjectGuid guid = _player->GetGUID();
     sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_CALENDAR_GET_CALENDAR [" UI64FMTD "]", guid);
 
     time_t currTime = time(NULL);
@@ -209,7 +209,7 @@ void WorldSession::HandleCalendarArenaTeam(WorldPacket& recvData)
 
 void WorldSession::HandleCalendarAddEvent(WorldPacket& recvData)
 {
-    uint64 guid = _player->GetGUID();
+    ObjectGuid guid = _player->GetGUID();
 
     std::string title;
     std::string description;
@@ -298,7 +298,7 @@ void WorldSession::HandleCalendarAddEvent(WorldPacket& recvData)
 
 void WorldSession::HandleCalendarUpdateEvent(WorldPacket& recvData)
 {
-    uint64 guid = _player->GetGUID();
+    ObjectGuid guid = _player->GetGUID();
     time_t oldEventTime;
 
     uint64 eventId;
@@ -354,7 +354,7 @@ void WorldSession::HandleCalendarUpdateEvent(WorldPacket& recvData)
 
 void WorldSession::HandleCalendarRemoveEvent(WorldPacket& recvData)
 {
-    uint64 guid = _player->GetGUID();
+    ObjectGuid guid = _player->GetGUID();
     uint64 eventId;
 
     recvData >> eventId;
@@ -365,7 +365,7 @@ void WorldSession::HandleCalendarRemoveEvent(WorldPacket& recvData)
 
 void WorldSession::HandleCalendarCopyEvent(WorldPacket& recvData)
 {
-    uint64 guid = _player->GetGUID();
+    ObjectGuid guid = _player->GetGUID();
     uint64 eventId;
     uint64 inviteId;
     uint32 eventTime;
@@ -409,7 +409,7 @@ void WorldSession::HandleCalendarEventInvite(WorldPacket& recvData)
 {
     sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_CALENDAR_EVENT_INVITE");
 
-    uint64 playerGuid = _player->GetGUID();
+    ObjectGuid playerGUID = _player->GetGUID();
 
     uint64 eventId;
     uint64 inviteId;
@@ -501,7 +501,7 @@ void WorldSession::HandleCalendarEventInvite(WorldPacket& recvData)
 
 void WorldSession::HandleCalendarEventSignup(WorldPacket& recvData)
 {
-    uint64 guid = _player->GetGUID();
+    ObjectGuid guid = _player->GetGUID();
     uint64 eventId;
     bool tentative;
 
@@ -527,7 +527,7 @@ void WorldSession::HandleCalendarEventSignup(WorldPacket& recvData)
 
 void WorldSession::HandleCalendarEventRsvp(WorldPacket& recvData)
 {
-    uint64 guid = _player->GetGUID();
+    ObjectGuid guid = _player->GetGUID();
     uint64 eventId;
     uint64 inviteId;
     uint32 status;
@@ -564,7 +564,7 @@ void WorldSession::HandleCalendarEventRsvp(WorldPacket& recvData)
 
 void WorldSession::HandleCalendarEventRemoveInvite(WorldPacket& recvData)
 {
-    uint64 guid = _player->GetGUID();
+    ObjectGuid guid = _player->GetGUID();
     uint64 invitee;
     uint64 eventId;
     uint64 ownerInviteId; // isn't it sender's inviteId?
@@ -594,7 +594,7 @@ void WorldSession::HandleCalendarEventRemoveInvite(WorldPacket& recvData)
 
 void WorldSession::HandleCalendarEventStatus(WorldPacket& recvData)
 {
-    uint64 guid = _player->GetGUID();
+    ObjectGuid guid = _player->GetGUID();
     uint64 invitee;
     uint64 eventId;
     uint64 inviteId;
@@ -628,7 +628,7 @@ void WorldSession::HandleCalendarEventStatus(WorldPacket& recvData)
 
 void WorldSession::HandleCalendarEventModeratorStatus(WorldPacket& recvData)
 {
-    uint64 guid = _player->GetGUID();
+    ObjectGuid guid = _player->GetGUID();
     uint64 invitee;
     uint64 eventId;
     uint64 inviteId;
@@ -658,7 +658,7 @@ void WorldSession::HandleCalendarEventModeratorStatus(WorldPacket& recvData)
 
 void WorldSession::HandleCalendarComplain(WorldPacket& recvData)
 {
-    uint64 guid = _player->GetGUID();
+    ObjectGuid guid = _player->GetGUID();
     uint64 eventId;
     uint64 complainGUID;
 
@@ -671,7 +671,7 @@ void WorldSession::HandleCalendarComplain(WorldPacket& recvData)
 
 void WorldSession::HandleCalendarGetNumPending(WorldPacket& /*recvData*/)
 {
-    uint64 guid = _player->GetGUID();
+    ObjectGuid guid = _player->GetGUID();
     uint32 pending = sCalendarMgr->GetPlayerNumPending(guid);
 
     sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_CALENDAR_GET_NUM_PENDING: [" UI64FMTD

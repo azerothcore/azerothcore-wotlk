@@ -49,7 +49,7 @@ class LoginQueryHolder : public SQLQueryHolder
         uint32 m_accountId;
         uint64 m_guid;
     public:
-        LoginQueryHolder(uint32 accountId, uint64 guid)
+        LoginQueryHolder(uint32 accountId, ObjectGuid guid)
             : m_accountId(accountId), m_guid(guid) { }
         uint64 GetGuid() const { return m_guid; }
         uint32 GetAccountId() const { return m_accountId; }
@@ -61,7 +61,7 @@ bool LoginQueryHolder::Initialize()
     SetSize(MAX_PLAYER_LOGIN_QUERY);
 
     bool res = true;
-    uint32 lowGuid = GUID_LOPART(m_guid);
+    ObjectGuid guid = GUID_LOPART(m_guid);
 
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHARACTER);
     stmt->setUInt32(0, lowGuid);
@@ -676,7 +676,7 @@ void WorldSession::HandleCharCreateCallback(PreparedQueryResult result, Characte
 
 void WorldSession::HandleCharDeleteOpcode(WorldPacket& recvData)
 {
-    uint64 guid;
+    ObjectGuid guid;
     recvData >> guid;
     // Initiating
     uint32 initAccountId = GetAccountId();
@@ -762,7 +762,7 @@ void WorldSession::HandlePlayerLoginOpcode(WorldPacket & recvData)
         return;
     }
 
-    uint64 playerGuid = 0;
+    ObjectGuid ObjectGuid::Empty;
     recvData >> playerGuid;
 
     if (!IsLegitCharacterForAccount(GUID_LOPART(playerGuid)))
@@ -873,7 +873,7 @@ void WorldSession::HandlePlayerLoginOpcode(WorldPacket & recvData)
 
 void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder* holder)
 {
-    uint64 playerGuid = holder->GetGuid();
+    ObjectGuid playerGUID = holder->GetGuid();
 
     Player* pCurrChar = new Player(this);
      // for send server info and strings (config)
@@ -1426,7 +1426,7 @@ void WorldSession::HandleShowingCloakOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleCharRenameOpcode(WorldPacket& recvData)
 {
-    uint64 guid;
+    ObjectGuid guid;
     std::string newName;
 
     recvData >> guid;
@@ -1491,7 +1491,7 @@ void WorldSession::HandleChangePlayerNameOpcodeCallBack(PreparedQueryResult resu
     uint32 guidLow      = fields[0].GetUInt32();
     std::string oldName = fields[1].GetString();
 
-    uint64 guid = MAKE_NEW_GUID(guidLow, 0, HIGHGUID_PLAYER);
+    ObjectGuid guid = MAKE_NEW_GUID(guidLow, 0, HIGHGUID_PLAYER);
 
     // pussywizard:
     if (ObjectAccessor::FindPlayerInOrOutOfWorld(guid) || sWorld->FindOfflineSessionForCharacterGUID(guidLow))
@@ -1540,7 +1540,7 @@ void WorldSession::HandleSetPlayerDeclinedNames(WorldPacket& recvData)
     if (!sWorld->getBoolConfig(CONFIG_DECLINED_NAMES_USED))
         return;
 
-    uint64 guid;
+    ObjectGuid guid;
 
     recvData >> guid;
 
@@ -1735,7 +1735,7 @@ void WorldSession::HandleRemoveGlyph(WorldPacket& recvData)
 
 void WorldSession::HandleCharCustomize(WorldPacket& recvData)
 {
-    uint64 guid;
+    ObjectGuid guid;
     std::string newName;
 
     recvData >> guid;
@@ -2033,7 +2033,7 @@ void WorldSession::HandleEquipmentSetUse(WorldPacket &recvData)
 
 void WorldSession::HandleCharFactionOrRaceChange(WorldPacket& recvData)
 {
-    uint64 guid;
+    ObjectGuid guid;
     std::string newname;
     uint8 gender, skin, face, hairStyle, hairColor, facialHair, race;
     recvData >> guid;
@@ -2060,7 +2060,7 @@ void WorldSession::HandleCharFactionOrRaceChange(WorldPacket& recvData)
     recvData >> newname;
     recvData >> gender >> skin >> hairColor >> hairStyle >> facialHair >> face >> race;
 
-    uint32 lowGuid = GUID_LOPART(guid);
+    ObjectGuid guid = GUID_LOPART(guid);
 
     // get the players old (at this moment current) race
     GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(lowGuid);

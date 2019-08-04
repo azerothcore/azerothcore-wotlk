@@ -2012,7 +2012,7 @@ void Spell::EffectEnergizePct(SpellEffIndex effIndex)
     m_caster->EnergizeBySpell(unitTarget, m_spellInfo->Id, gain, power);
 }
 
-void Spell::SendLoot(uint64 guid, LootType loottype)
+void Spell::SendLoot(ObjectGuid guid, LootType loottype)
 {
     Player* player = m_caster->ToPlayer();
     if (!player)
@@ -2095,7 +2095,7 @@ void Spell::EffectOpenLock(SpellEffIndex effIndex)
     Player* player = m_caster->ToPlayer();
 
     uint32 lockId = 0;
-    uint64 guid = 0;
+    ObjectGuid guid = 0;
 
     // Get lockId
     if (gameObjTarget)
@@ -2749,7 +2749,7 @@ void Spell::EffectUntrainTalents(SpellEffIndex /*effIndex*/)
     if (!unitTarget || m_caster->GetTypeId() == TYPEID_PLAYER)
         return;
 
-    if (uint64 guid = m_caster->GetGUID()) // the trainer is the caster
+    if (ObjectGuid guid = m_caster->GetGUID()) // the trainer is the caster
         unitTarget->ToPlayer()->SendTalentWipeConfirm(guid);
 }
 
@@ -4644,7 +4644,7 @@ void Spell::EffectSummonObject(SpellEffIndex effIndex)
         default: return;
     }
 
-    uint64 guid = m_caster->m_ObjectSlot[slot];
+    ObjectGuid guid = m_caster->m_ObjectSlot[slot];
     if (guid != 0)
     {
         GameObject* gameObject = NULL;

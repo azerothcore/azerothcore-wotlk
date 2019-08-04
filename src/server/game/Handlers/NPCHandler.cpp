@@ -39,7 +39,7 @@ enum StableResultCode
 
 void WorldSession::HandleTabardVendorActivateOpcode(WorldPacket & recvData)
 {
-    uint64 guid;
+    ObjectGuid guid;
     recvData >> guid;
 
     Creature* unit = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_TABARDDESIGNER);
@@ -58,7 +58,7 @@ void WorldSession::HandleTabardVendorActivateOpcode(WorldPacket & recvData)
     SendTabardVendorActivate(guid);
 }
 
-void WorldSession::SendTabardVendorActivate(uint64 guid)
+void WorldSession::SendTabardVendorActivate(ObjectGuid guid)
 {
     WorldPacket data(MSG_TABARDVENDOR_ACTIVATE, 8);
     data << guid;
@@ -67,7 +67,7 @@ void WorldSession::SendTabardVendorActivate(uint64 guid)
 
 void WorldSession::HandleBankerActivateOpcode(WorldPacket & recvData)
 {
-    uint64 guid;
+    ObjectGuid guid;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_BANKER_ACTIVATE");
@@ -91,7 +91,7 @@ void WorldSession::HandleBankerActivateOpcode(WorldPacket & recvData)
     SendShowBank(guid);
 }
 
-void WorldSession::SendShowBank(uint64 guid)
+void WorldSession::SendShowBank(ObjectGuid guid)
 {
     WorldPacket data(SMSG_SHOW_BANK, 8);
     data << guid;
@@ -99,7 +99,7 @@ void WorldSession::SendShowBank(uint64 guid)
     SendPacket(&data);
 }
 
-void WorldSession::SendShowMailBox(uint64 guid)
+void WorldSession::SendShowMailBox(ObjectGuid guid)
 {
     WorldPacket data(SMSG_SHOW_MAILBOX, 8);
     data << guid;
@@ -108,19 +108,19 @@ void WorldSession::SendShowMailBox(uint64 guid)
 
 void WorldSession::HandleTrainerListOpcode(WorldPacket & recvData)
 {
-    uint64 guid;
+    ObjectGuid guid;
 
     recvData >> guid;
     SendTrainerList(guid);
 }
 
-void WorldSession::SendTrainerList(uint64 guid)
+void WorldSession::SendTrainerList(ObjectGuid guid)
 {
     std::string str = GetTrinityString(LANG_NPC_TAINER_HELLO);
     SendTrainerList(guid, str);
 }
 
-void WorldSession::SendTrainerList(uint64 guid, const std::string& strTitle)
+void WorldSession::SendTrainerList(ObjectGuid guid, const std::string& strTitle)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: SendTrainerList");
@@ -243,7 +243,7 @@ void WorldSession::SendTrainerList(uint64 guid, const std::string& strTitle)
 
 void WorldSession::HandleTrainerBuySpellOpcode(WorldPacket & recvData)
 {
-    uint64 guid;
+    ObjectGuid guid;
     uint32 spellId = 0;
 
     recvData >> guid >> spellId;
@@ -308,7 +308,7 @@ void WorldSession::HandleGossipHelloOpcode(WorldPacket & recvData)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_GOSSIP_HELLO");
 #endif
 
-    uint64 guid;
+    ObjectGuid guid;
     recvData >> guid;
 
     Creature* unit = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_NONE);
@@ -373,7 +373,7 @@ void WorldSession::HandleGossipHelloOpcode(WorldPacket & recvData)
 
     uint32 option;
     uint32 unk;
-    uint64 guid;
+    ObjectGuid guid;
     std::string code = "";
 
     recvData >> guid >> unk >> option;
@@ -420,7 +420,7 @@ void WorldSession::HandleSpiritHealerActivateOpcode(WorldPacket & recvData)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_SPIRIT_HEALER_ACTIVATE");
 #endif
 
-    uint64 guid;
+    ObjectGuid guid;
 
     recvData >> guid;
 
@@ -537,7 +537,7 @@ void WorldSession::HandleListStabledPetsOpcode(WorldPacket & recvData)
     SendStablePet(npcGUID);
 }
 
-void WorldSession::SendStablePet(uint64 guid)
+void WorldSession::SendStablePet(ObjectGuid guid)
 {
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PET_SLOTS_DETAIL);
 
@@ -549,7 +549,7 @@ void WorldSession::SendStablePet(uint64 guid)
     _sendStabledPetCallback.SetFutureResult(CharacterDatabase.AsyncQuery(stmt));
 }
 
-void WorldSession::SendStablePetCallback(PreparedQueryResult result, uint64 guid)
+void WorldSession::SendStablePetCallback(PreparedQueryResult result, ObjectGuid guid)
 {
     if (!GetPlayer())
         return;

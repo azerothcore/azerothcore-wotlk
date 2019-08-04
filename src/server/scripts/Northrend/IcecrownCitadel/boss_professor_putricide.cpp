@@ -140,7 +140,7 @@ class AbominationDespawner
     public:
         explicit AbominationDespawner(Unit* owner) : _owner(owner) { }
 
-        bool operator()(uint64 guid)
+        bool operator()(ObjectGuid guid)
         {
             if (Unit* summon = ObjectAccessor::GetUnit(*_owner, guid))
             {
@@ -734,7 +734,7 @@ class npc_putricide_oozeAI : public ScriptedAI
 
         uint64 targetGUID;
 
-        void SetGUID(uint64 guid, int32 type)
+        void SetGUID(ObjectGuid guid, int32 type)
         {
             if (type == -1)
                 targetGUID = guid;

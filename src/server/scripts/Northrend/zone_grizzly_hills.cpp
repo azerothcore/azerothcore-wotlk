@@ -574,7 +574,7 @@ public:
         void Reset()
         {
             _despawnTimer = 5000;
-            _playerGUID = 0;
+            _ObjectGuid::Empty;
         }
 
         void MovementInform(uint32, uint32 id)

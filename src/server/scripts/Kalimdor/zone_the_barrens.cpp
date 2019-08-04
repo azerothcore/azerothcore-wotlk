@@ -311,7 +311,7 @@ public:
         uint8 Wave;
         uint32 WaveTimer;
         uint32 ChallengerChecker;
-        uint64 PlayerGUID;
+        ObjectGuid playerGUID;
         uint64 AffrayChallenger[6];
         uint64 BigWill;
 
@@ -323,7 +323,7 @@ public:
             WaveTimer = 600000;
             ChallengerChecker = 0;
             Wave = 0;
-            PlayerGUID = 0;
+            ObjectGuid::Empty;
 
             for (uint8 i = 0; i < 6; ++i)
             {

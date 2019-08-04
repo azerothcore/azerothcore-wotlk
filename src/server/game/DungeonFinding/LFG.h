@@ -102,7 +102,7 @@ typedef std::map<uint64, uint64> LfgGroupsMap;
 class Lfg5Guids
 {
 public:
-    uint64 guid[5];
+    ObjectGuid guid[5];
     LfgRolesMap* roles;
     Lfg5Guids() { memset(&guid, 0, 5*8); roles = NULL; }
     Lfg5Guids(uint64 g) { memset(&guid, 0, 5*8); guid[0] = g; roles = NULL; }

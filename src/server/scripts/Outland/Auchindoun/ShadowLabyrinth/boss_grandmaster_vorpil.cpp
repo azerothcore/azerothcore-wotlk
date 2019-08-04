@@ -217,7 +217,7 @@ public:
         uint32 moveTimer;
         bool sacrificed;
 
-        void SetGUID(uint64 guid, int32)
+        void SetGUID(ObjectGuid guid, int32)
         {
             VorpilGUID = guid;
         }

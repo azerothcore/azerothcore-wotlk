@@ -122,7 +122,7 @@ public:
 
         EventMap events;
         SummonList summons;
-        uint64 playerGUID;
+        ObjectGuid playerGUID;
         uint64 morlenGUID;
 
         void Reset()
@@ -131,7 +131,7 @@ public:
             me->SetRegeneratingHealth(true);
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
             me->SetStandState(UNIT_STAND_STATE_STAND);
-            playerGUID = 0;
+            ObjectGuid::Empty;
             morlenGUID = 0;
             summons.DespawnAll();
             if (Creature* c = me->FindNearestCreature(NPC_THALORIEN_REMAINS, 100.0f, true))
@@ -508,13 +508,13 @@ public:
         npc_grand_magister_rommathAI(Creature *c) : NullCreatureAI(c)
         {
             announced = false;
-            playerGUID = 0;
+            ObjectGuid::Empty;
             me->SetReactState(REACT_AGGRESSIVE);
         }
 
         EventMap events;
         bool announced;
-        uint64 playerGUID;
+        ObjectGuid playerGUID;
 
         void MoveInLineOfSight(Unit* who)
         {

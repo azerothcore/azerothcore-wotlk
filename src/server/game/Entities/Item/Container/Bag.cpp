@@ -213,7 +213,7 @@ uint32 Bag::GetItemCountWithLimitCategory(uint32 limitCategory, Item* skipItem) 
     return count;
 }
 
-uint8 Bag::GetSlotByItemGUID(uint64 guid) const
+uint8 Bag::GetSlotByItemGUID(ObjectGuid guid) const
 {
     for (uint32 i = 0; i < GetBagSize(); ++i)
         if (m_bagslot[i] != 0)

@@ -546,7 +546,7 @@ class spell_love_in_air_periodic_perfumes : public SpellScriptLoader
 
             void PeriodicTick(AuraEffect const* /*aurEff*/)
             {
-                uint64 guid = (GetCaster() ? GetCaster()->GetGUID() : 0);
+                ObjectGuid guid = (GetCaster() ? GetCaster()->GetGUID() : 0);
                 if (Unit* target = GetTarget())
                 {
                     uint32 spellId = (GetId() == SPELL_THROW_COLOGNE ? 68934 : 68927);

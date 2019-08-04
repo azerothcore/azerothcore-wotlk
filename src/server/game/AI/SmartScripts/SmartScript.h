@@ -210,14 +210,14 @@ class SmartScript
                     go = o;
                 }
             }
-            goOrigGUID = 0;
-            meOrigGUID = 0;
+            goOrigGUID.Clear();
+            meOrigGUID.Clear();
         }
 
         //TIMED_ACTIONLIST (script type 9 aka script9)
         void SetScript9(SmartScriptHolder& e, uint32 entry);
         Unit* GetLastInvoker(Unit* invoker = NULL);
-        uint64 mLastInvoker;
+        ObjectGuid mLastInvoker;
         typedef std::unordered_map<uint32, uint32> CounterMap;
         CounterMap mCounterList;
 
@@ -264,9 +264,9 @@ class SmartScript
         SmartAIEventList mTimedActionList;
         bool isProcessingTimedActionList;
         Creature* me;
-        uint64 meOrigGUID;
+        ObjectGuid meOrigGUID;
         GameObject* go;
-        uint64 goOrigGUID;
+        ObjectGuid goOrigGUID;
         AreaTrigger const* trigger;
         SmartScriptType mScriptType;
         uint32 mEventPhase;

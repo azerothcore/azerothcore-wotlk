@@ -80,7 +80,7 @@ struct AuctionEntry
     bool LoadFromDB(Field* fields);
     bool LoadFromFieldList(Field* fields);
     std::string BuildAuctionMailSubject(MailAuctionAnswers response) const;
-    static std::string BuildAuctionMailBody(uint32 lowGuid, uint32 bid, uint32 buyout, uint32 deposit, uint32 cut);
+    static std::string BuildAuctionMailBody(ObjectGuid guid, uint32 bid, uint32 buyout, uint32 deposit, uint32 cut);
 
 };
 

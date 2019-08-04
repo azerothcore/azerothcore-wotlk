@@ -505,7 +505,7 @@ ByteBuffer& operator >> (ByteBuffer& buf, Position::PositionXYZOStreamer const& 
 struct MovementInfo
 {
     // common
-    uint64 guid;
+    ObjectGuid guid;
     uint32 flags;
     uint16 flags2;
     Position pos;
@@ -523,7 +523,7 @@ struct MovementInfo
             time2 = 0;
         }
 
-        uint64 guid;
+        ObjectGuid guid;
         Position pos;
         int8 seat;
         uint32 time;
@@ -841,7 +841,7 @@ class WorldObject : public Object, public WorldLocation
         void PlayDistanceSound(uint32 sound_id, Player* target = NULL);
         void PlayDirectSound(uint32 sound_id, Player* target = NULL);
 
-        void SendObjectDeSpawnAnim(uint64 guid);
+        void SendObjectDeSpawnAnim(ObjectGuid guid);
 
         virtual void SaveRespawnTime() {}
         void AddObjectToRemoveList();

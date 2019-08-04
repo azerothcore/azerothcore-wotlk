@@ -200,11 +200,11 @@ class OPvPCapturePointZM_GraveYard : public OPvPCapturePoint
 
         void UpdateTowerState();
 
-        int32 HandleOpenGo(Player* player, uint64 guid);
+        int32 HandleOpenGo(Player* player, ObjectGuid guid);
 
         void SetBeaconState(TeamId controlling_teamId); // not good atm
 
-        bool HandleGossipOption(Player* player, uint64 guid, uint32 gossipid);
+        bool HandleGossipOption(Player* player, ObjectGuid guid, uint32 gossipid);
 
         bool HandleDropFlag(Player* player, uint32 spellId);
 

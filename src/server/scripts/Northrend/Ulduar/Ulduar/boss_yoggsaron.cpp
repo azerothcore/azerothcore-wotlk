@@ -1581,7 +1581,7 @@ public:
         {
             SetCombatMovement(false);
             _checkTimer = 1;
-            _playerGUID = 0;
+            _ObjectGuid::Empty;
         }
 
         uint32 _checkTimer;
@@ -1870,7 +1870,7 @@ public:
             _checkTimer = time;
         }
 
-        void Say(std::string text, uint64 guid, bool yell, uint32 soundId)
+        void Say(std::string text, ObjectGuid guid, bool yell, uint32 soundId)
         {
             Creature* creature = guid ? ObjectAccessor::GetCreature(*me, guid) : me;
             if (!creature)
@@ -1985,7 +1985,7 @@ public:
             _checkTimer = time;
         }
 
-        void Say(std::string text, uint64 guid, bool yell, uint32 soundId)
+        void Say(std::string text, ObjectGuid guid, bool yell, uint32 soundId)
         {
             Creature* creature = guid ? ObjectAccessor::GetCreature(*me, guid) : me;
             if (!creature)
@@ -2105,7 +2105,7 @@ public:
             _checkTimer = time;
         }
 
-        void Say(std::string text, uint64 guid, bool yell, uint32 soundId)
+        void Say(std::string text, ObjectGuid guid, bool yell, uint32 soundId)
         {
             Creature* creature = guid ? ObjectAccessor::GetCreature(*me, guid) : me;
             if (!creature)

@@ -59,7 +59,7 @@ void LFGPlayerScript::OnLogin(Player* player)
         return;
 
     // Temporal: Trying to determine when group data and LFG data gets desynched
-    uint64 guid = player->GetGUID();
+    ObjectGuid guid = player->GetGUID();
     uint64 gguid = sLFGMgr->GetGroup(guid);
 
     if (Group const* group = player->GetGroup())
@@ -130,7 +130,7 @@ LFGGroupScript::LFGGroupScript() : GroupScript("LFGGroupScript")
 {
 }
 
-void LFGGroupScript::OnAddMember(Group* group, uint64 guid)
+void LFGGroupScript::OnAddMember(Group* group, ObjectGuid guid)
 {
     if (!sLFGMgr->isOptionEnabled(LFG_OPTION_ENABLE_DUNGEON_FINDER | LFG_OPTION_ENABLE_RAID_BROWSER))
         return;
@@ -174,7 +174,7 @@ void LFGGroupScript::OnAddMember(Group* group, uint64 guid)
         sLFGMgr->LeaveLfg(guid);
 }
 
-void LFGGroupScript::OnRemoveMember(Group* group, uint64 guid, RemoveMethod method, uint64 kicker, char const* reason)
+void LFGGroupScript::OnRemoveMember(Group* group, ObjectGuid guid, RemoveMethod method, uint64 kicker, char const* reason)
 {
     // used only with EXTRA_LOGS
     UNUSED(kicker);
@@ -273,7 +273,7 @@ void LFGGroupScript::OnChangeLeader(Group* group, uint64 newLeaderGuid, uint64 o
         sLFGMgr->LeaveLfg(oldLeaderGuid);
 }
 
-void LFGGroupScript::OnInviteMember(Group* group, uint64 guid)
+void LFGGroupScript::OnInviteMember(Group* group, ObjectGuid guid)
 {
     // used only with EXTRA_LOGS
     UNUSED(guid);

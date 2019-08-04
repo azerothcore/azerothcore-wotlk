@@ -2863,7 +2863,7 @@ bool Player::CanInteractWithQuestGiver(Object* questGiver)
     return false;
 }
 
-Creature* Player::GetNPCIfCanInteractWith(uint64 guid, uint32 npcflagmask)
+Creature* Player::GetNPCIfCanInteractWith(ObjectGuid guid, uint32 npcflagmask)
 {
     // unit checks
     if (!guid)
@@ -2920,7 +2920,7 @@ Creature* Player::GetNPCIfCanInteractWith(uint64 guid, uint32 npcflagmask)
     return creature;
 }
 
-GameObject* Player::GetGameObjectIfCanInteractWith(uint64 guid, GameobjectTypes type) const
+GameObject* Player::GetGameObjectIfCanInteractWith(ObjectGuid guid, GameobjectTypes type) const
 { 
     if (GameObject* go = GetMap()->GetGameObject(guid))
     {
@@ -3136,7 +3136,7 @@ void Player::UninviteFromGroup()
     }
 }
 
-void Player::RemoveFromGroup(Group* group, uint64 guid, RemoveMethod method /* = GROUP_REMOVEMETHOD_DEFAULT*/, uint64 kicker /* = 0 */, const char* reason /* = NULL */)
+void Player::RemoveFromGroup(Group* group, ObjectGuid guid, RemoveMethod method /* = GROUP_REMOVEMETHOD_DEFAULT*/, uint64 kicker /* = 0 */, const char* reason /* = NULL */)
 {
     if (group)
     {
@@ -4728,7 +4728,7 @@ TrainerSpellState Player::GetTrainerSpellState(TrainerSpell const* trainer_spell
  * @param updateRealmChars when this flag is set, the amount of characters on that realm will be updated in the realmlist
  * @param deleteFinally    if this flag is set, the config option will be ignored and the character will be permanently removed from the database
  */
-void Player::DeleteFromDB(uint64 playerguid, uint32 accountId, bool updateRealmChars, bool deleteFinally)
+void Player::DeleteFromDB(ObjectGuid playerGUID, uint32 accountId, bool updateRealmChars, bool deleteFinally)
 {
     // for not existed account avoid update realm
     if (accountId == 0)
@@ -7484,7 +7484,7 @@ uint32 Player::GetArenaTeamIdFromStorage(uint32 guid, uint8 slot)
     return 0;
 }
 
-uint32 Player::GetArenaTeamIdFromDB(uint64 guid, uint8 type)
+uint32 Player::GetArenaTeamIdFromDB(ObjectGuid guid, uint8 type)
 {
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_ARENA_TEAM_ID_BY_PLAYER_GUID);
     stmt->setUInt32(0, GUID_LOPART(guid));
@@ -7498,7 +7498,7 @@ uint32 Player::GetArenaTeamIdFromDB(uint64 guid, uint8 type)
     return id;
 }
 
-uint32 Player::GetZoneIdFromDB(uint64 guid)
+uint32 Player::GetZoneIdFromDB(ObjectGuid guid)
 {
     uint32 guidLow = GUID_LOPART(guid);
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_ZONE);
@@ -7544,7 +7544,7 @@ uint32 Player::GetZoneIdFromDB(uint64 guid)
     return zone;
 }
 
-uint32 Player::GetLevelFromStorage(uint64 guid)
+uint32 Player::GetLevelFromStorage(ObjectGuid guid)
 {
     // xinef: Get data from global storage
     if (GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(GUID_LOPART(guid)))
@@ -8984,14 +8984,14 @@ void Player::RemovedInsignia(Player* looterPlr)
     looterPlr->SendLoot(bones->GetGUID(), LOOT_INSIGNIA);
 }
 
-void Player::SendLootRelease(uint64 guid)
+void Player::SendLootRelease(ObjectGuid guid)
 { 
     WorldPacket data(SMSG_LOOT_RELEASE_RESPONSE, (8+1));
     data << uint64(guid) << uint8(1);
     SendDirectMessage(&data);
 }
 
-void Player::SendLoot(uint64 guid, LootType loot_type)
+void Player::SendLoot(ObjectGuid guid, LootType loot_type)
 { 
     if (uint64 lguid = GetLootGUID())
         m_session->DoLootRelease(lguid);
@@ -9368,7 +9368,7 @@ void Player::SendLoot(uint64 guid, LootType loot_type)
         SendLootError(guid, LOOT_ERROR_DIDNT_KILL);
 }
 
-void Player::SendLootError(uint64 guid, LootError error)
+void Player::SendLootError(ObjectGuid guid, LootError error)
 {
     WorldPacket data(SMSG_LOOT_RESPONSE, 10);
     data << uint64(guid);
@@ -10080,14 +10080,14 @@ uint32 Player::GetXPRestBonus(uint32 xp)
     return rested_bonus;
 }
 
-void Player::SetBindPoint(uint64 guid)
+void Player::SetBindPoint(ObjectGuid guid)
 { 
     WorldPacket data(SMSG_BINDER_CONFIRM, 8);
     data << uint64(guid);
     GetSession()->SendPacket(&data);
 }
 
-void Player::SendTalentWipeConfirm(uint64 guid)
+void Player::SendTalentWipeConfirm(ObjectGuid guid)
 { 
     WorldPacket data(MSG_TALENT_WIPE_CONFIRM, (8+4));
     data << uint64(guid);
@@ -10478,7 +10478,7 @@ uint32 Player::GetItemCountWithLimitCategory(uint32 limitCategory, Item* skipIte
     return count;
 }
 
-Item* Player::GetItemByGuid(uint64 guid) const
+Item* Player::GetItemByGuid(ObjectGuid guid) const
 { 
     for (uint8 i = EQUIPMENT_SLOT_START; i < INVENTORY_SLOT_ITEM_END; ++i)
         if (Item* pItem = GetItemByPos(INVENTORY_SLOT_BAG_0, i))
@@ -14076,7 +14076,7 @@ void Player::SendBuyError(BuyResult msg, Creature* creature, uint32 item, uint32
     GetSession()->SendPacket(&data);
 }
 
-void Player::SendSellError(SellResult msg, Creature* creature, uint64 guid, uint32 param)
+void Player::SendSellError(SellResult msg, Creature* creature, ObjectGuid guid, uint32 param)
 { 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Sent SMSG_SELL_ITEM");
@@ -15039,7 +15039,7 @@ void Player::OnGossipSelect(WorldObject* source, uint32 gossipListId, uint32 men
         return;
 
     uint32 gossipOptionId = item->OptionType;
-    uint64 guid = source->GetGUID();
+    ObjectGuid guid = source->GetGUID();
 
     if (source->GetTypeId() == TYPEID_GAMEOBJECT)
     {
@@ -15207,7 +15207,7 @@ uint32 Player::GetDefaultGossipMenuForSource(WorldObject* source)
 /***                    QUEST SYSTEM                   ***/
 /*********************************************************/
 
-void Player::PrepareQuestMenu(uint64 guid)
+void Player::PrepareQuestMenu(ObjectGuid guid)
 {  
     QuestRelationBounds objectQR;
     QuestRelationBounds objectQIR;
@@ -15267,7 +15267,7 @@ void Player::PrepareQuestMenu(uint64 guid)
     }
 }
 
-void Player::SendPreparedQuest(uint64 guid)
+void Player::SendPreparedQuest(ObjectGuid guid)
 { 
     QuestMenu& questMenu = PlayerTalkClass->GetQuestMenu();
     if (questMenu.Empty())
@@ -15358,7 +15358,7 @@ bool Player::IsActiveQuest(uint32 quest_id) const
     return m_QuestStatus.find(quest_id) != m_QuestStatus.end();
 }
 
-Quest const* Player::GetNextQuest(uint64 guid, Quest const* quest)
+Quest const* Player::GetNextQuest(ObjectGuid guid, Quest const* quest)
 { 
     QuestRelationBounds objectQR;
 
@@ -17013,7 +17013,7 @@ void Player::ItemRemovedQuestCheck(uint32 entry, uint32 count)
     UpdateForQuestWorldObjects();
 }
 
-void Player::KilledMonster(CreatureTemplate const* cInfo, uint64 guid)
+void Player::KilledMonster(CreatureTemplate const* cInfo, ObjectGuid guid)
 { 
     ASSERT(cInfo);
 
@@ -17025,7 +17025,7 @@ void Player::KilledMonster(CreatureTemplate const* cInfo, uint64 guid)
             KilledMonsterCredit(cInfo->KillCredit[i], 0);
 }
 
-void Player::KilledMonsterCredit(uint32 entry, uint64 guid)
+void Player::KilledMonsterCredit(uint32 entry, ObjectGuid guid)
 { 
     uint16 addkillcount = 1;
     uint32 real_entry = entry;
@@ -17131,7 +17131,7 @@ void Player::KilledPlayerCredit()
     }
 }
 
-void Player::KillCreditGO(uint32 entry, uint64 guid)
+void Player::KillCreditGO(uint32 entry, ObjectGuid guid)
 { 
     uint16 addCastCount = 1;
     for (uint8 i = 0; i < MAX_QUEST_LOG_SIZE; ++i)
@@ -17187,7 +17187,7 @@ void Player::KillCreditGO(uint32 entry, uint64 guid)
     }
 }
 
-void Player::TalkedToCreature(uint32 entry, uint64 guid)
+void Player::TalkedToCreature(uint32 entry, ObjectGuid guid)
 { 
     uint16 addTalkCount = 1;
     for (uint8 i = 0; i < MAX_QUEST_LOG_SIZE; ++i)
@@ -17517,7 +17517,7 @@ void Player::SendQuestUpdateAddItem(Quest const* /*quest*/, uint32 /*item_idx*/,
     GetSession()->SendPacket(&data);
 }
 
-void Player::SendQuestUpdateAddCreatureOrGo(Quest const* quest, uint64 guid, uint32 creatureOrGO_idx, uint16 old_count, uint16 add_count)
+void Player::SendQuestUpdateAddCreatureOrGo(Quest const* quest, ObjectGuid guid, uint32 creatureOrGO_idx, uint16 old_count, uint16 add_count)
 { 
     ASSERT(old_count + add_count < 65536 && "mob/GO count store in 16 bits 2^16 = 65536 (0..65536)");
 
@@ -17685,7 +17685,7 @@ void Player::_LoadEntryPointData(PreparedQueryResult result)
     m_entryPointData.mountSpell   = fields[6].GetUInt32();
 }
 
-bool Player::LoadPositionFromDB(uint32& mapid, float& x, float& y, float& z, float& o, bool& in_flight, uint64 guid)
+bool Player::LoadPositionFromDB(uint32& mapid, float& x, float& y, float& z, float& o, bool& in_flight, ObjectGuid guid)
 {
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_POSITION);
     stmt->setUInt32(0, GUID_LOPART(guid));
@@ -19919,7 +19919,7 @@ void Player::_SaveInventory(SQLTransaction& trans)
     if (m_itemUpdateQueue.empty())
         return;
 
-    uint32 lowGuid = GetGUIDLow();
+    ObjectGuid guid = GetGUIDLow();
     for (size_t i = 0; i < m_itemUpdateQueue.size(); ++i)
     {
         Item* item = m_itemUpdateQueue[i];
@@ -20455,7 +20455,7 @@ void Player::SendAttackSwingNotInRange()
     GetSession()->SendPacket(&data);
 }
 
-void Player::SavePositionInDB(uint32 mapid, float x, float y, float z, float o, uint32 zone, uint64 guid)
+void Player::SavePositionInDB(uint32 mapid, float x, float y, float z, float o, uint32 zone, ObjectGuid guid)
 {
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHARACTER_POSITION);
 
@@ -20481,7 +20481,7 @@ void Player::SetUInt32ValueInArray(Tokenizer& tokens, uint16 index, uint32 value
     tokens[index] = buf;
 }
 
-void Player::Customize(uint64 guid, uint8 gender, uint8 skin, uint8 face, uint8 hairStyle, uint8 hairColor, uint8 facialHair)
+void Player::Customize(ObjectGuid guid, uint8 gender, uint8 skin, uint8 face, uint8 hairStyle, uint8 hairColor, uint8 facialHair)
 {
     // xinef: zomg! sync query
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GENDER_AND_APPEARANCE);
@@ -20564,7 +20564,7 @@ void Player::SendResetFailedNotify(uint32 mapid)
 }
 
 /// Reset all solo instances and optionally send a message on success for each
-void Player::ResetInstances(uint64 guid, uint8 method, bool isRaid)
+void Player::ResetInstances(ObjectGuid guid, uint8 method, bool isRaid)
 {
     switch (method)
     {
@@ -21454,7 +21454,7 @@ void Player::SendProficiency(ItemClass itemClass, uint32 itemSubclassMask)
     GetSession()->SendPacket(&data);
 }
 
-void Player::RemovePetitionsAndSigns(uint64 guid, uint32 type)
+void Player::RemovePetitionsAndSigns(ObjectGuid guid, uint32 type)
 {
     SignatureContainer* signatureStore = sPetitionMgr->GetSignatureStore();
     uint32 playerGuid = GUID_LOPART(guid);
@@ -21527,7 +21527,7 @@ void Player::RemovePetitionsAndSigns(uint64 guid, uint32 type)
     CharacterDatabase.CommitTransaction(trans);
 }
 
-void Player::LeaveAllArenaTeams(uint64 guid)
+void Player::LeaveAllArenaTeams(ObjectGuid guid)
 {
     // xinef: zomg! sync query
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PLAYER_ARENA_TEAMS);
@@ -22785,7 +22785,7 @@ bool Player::CanAlwaysSee(WorldObject const* obj) const
     if (m_mover == obj)
         return true;
 
-    if (uint64 guid = GetUInt64Value(PLAYER_FARSIGHT))
+    if (ObjectGuid guid = GetUInt64Value(PLAYER_FARSIGHT))
         if (obj->GetGUID() == guid)
             return true;
 
@@ -23043,7 +23043,7 @@ Player* Player::GetSelectedPlayer() const
     return NULL;
 }
 
-void Player::SetSelection(uint64 guid)
+void Player::SetSelection(ObjectGuid guid)
 { 
     SetUInt64Value(UNIT_FIELD_TARGET, guid);
 
@@ -24704,7 +24704,7 @@ void Player::SetViewpoint(WorldObject* target, bool apply)
 
 WorldObject* Player::GetViewpoint() const
 { 
-    if (uint64 guid = GetUInt64Value(PLAYER_FARSIGHT))
+    if (ObjectGuid guid = GetUInt64Value(PLAYER_FARSIGHT))
         return (WorldObject*)ObjectAccessor::GetObjectByTypeMask(*this, guid, TYPEMASK_SEER);
     return NULL;
 }
@@ -27437,7 +27437,7 @@ void Player::_SaveInstanceTimeRestrictions(SQLTransaction& trans)
     }
 }
 
-bool Player::IsInWhisperWhiteList(uint64 guid)
+bool Player::IsInWhisperWhiteList(ObjectGuid guid)
 { 
     for (WhisperListContainer::const_iterator itr = WhisperList.begin(); itr != WhisperList.end(); ++itr)
         if (*itr == guid)

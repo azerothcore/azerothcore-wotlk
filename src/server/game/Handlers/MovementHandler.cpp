@@ -228,7 +228,7 @@ void WorldSession::HandleMoveTeleportAck(WorldPacket& recvData)
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "MSG_MOVE_TELEPORT_ACK");
 #endif
-    uint64 guid;
+    ObjectGuid guid;
 
     recvData.readPackGUID(guid);
 
@@ -315,7 +315,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket & recvData)
     }
 
     /* extract packet */
-    uint64 guid;
+    ObjectGuid guid;
 
     recvData.readPackGUID(guid);
 
@@ -509,7 +509,7 @@ void WorldSession::HandleForceSpeedChangeAck(WorldPacket &recvData)
 #endif
 
     /* extract packet */
-    uint64 guid;
+    ObjectGuid guid;
     uint32 unk1;
     float  newspeed;
 
@@ -588,7 +588,7 @@ void WorldSession::HandleSetActiveMoverOpcode(WorldPacket &recvData)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Recvd CMSG_SET_ACTIVE_MOVER");
 #endif
 
-    uint64 guid;
+    ObjectGuid guid;
     recvData >> guid;
 
     if (GetPlayer()->IsInWorld() && _player->m_mover && _player->m_mover->IsInWorld())
@@ -635,7 +635,7 @@ void WorldSession::HandleMoveKnockBackAck(WorldPacket & recvData)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_MOVE_KNOCK_BACK_ACK");
 #endif
 
-    uint64 guid;
+    ObjectGuid guid;
     recvData.readPackGUID(guid);
 
     // pussywizard: typical check for incomming movement packets
@@ -672,7 +672,7 @@ void WorldSession::HandleMoveHoverAck(WorldPacket& recvData)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_MOVE_HOVER_ACK");
 #endif
 
-    uint64 guid;                                            // guid - unused
+    ObjectGuid guid;                                            // guid - unused
     recvData.readPackGUID(guid);
 
     recvData.read_skip<uint32>();                          // unk
@@ -690,7 +690,7 @@ void WorldSession::HandleMoveWaterWalkAck(WorldPacket& recvData)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_MOVE_WATER_WALK_ACK");
 #endif
 
-    uint64 guid;                                            // guid - unused
+    ObjectGuid guid;                                            // guid - unused
     recvData.readPackGUID(guid);
 
     recvData.read_skip<uint32>();                          // unk
@@ -732,7 +732,7 @@ void WorldSession::HandleMoveTimeSkippedOpcode(WorldPacket& recvData)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Recvd CMSG_MOVE_TIME_SKIPPED");
 #endif
     
-    uint64 guid;
+    ObjectGuid guid;
     uint32 timeSkipped;
     recvData.readPackGUID(guid);
     recvData >> timeSkipped;

@@ -79,7 +79,7 @@ public:
             }
         }
 
-        uint64 playerGUID;
+        ObjectGuid playerGUID;
         EventMap events;
         uint32 changeEntry;
         bool damaged;
@@ -90,7 +90,7 @@ public:
                 me->UpdateEntry(me->GetOriginalEntry());
 
             events.Reset();
-            playerGUID = 0;
+            ObjectGuid::Empty;
             damaged = false;
         }
 

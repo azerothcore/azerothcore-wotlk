@@ -352,7 +352,7 @@ void WorldSession::HandleLoadPetFromDBSecondCallback(LoadPetFromDBQueryHolder* h
 
 void WorldSession::HandleDismissCritter(WorldPacket &recvData)
 {
-    uint64 guid;
+    ObjectGuid guid;
     recvData >> guid;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
@@ -378,9 +378,9 @@ void WorldSession::HandleDismissCritter(WorldPacket &recvData)
 
 void WorldSession::HandlePetAction(WorldPacket & recvData)
 {
-    uint64 guid1;
+    ObjectGuid guid1;
     uint32 data;
-    uint64 guid2;
+    ObjectGuid guid2;
     recvData >> guid1;                                     //pet guid
     recvData >> data;
     recvData >> guid2;                                     //tag guid
@@ -443,7 +443,7 @@ void WorldSession::HandlePetAction(WorldPacket & recvData)
 
 void WorldSession::HandlePetStopAttack(WorldPacket &recvData)
 {
-    uint64 guid;
+    ObjectGuid guid;
     recvData >> guid;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
@@ -471,7 +471,7 @@ void WorldSession::HandlePetStopAttack(WorldPacket &recvData)
     pet->ClearInPetCombat();
 }
 
-void WorldSession::HandlePetActionHelper(Unit* pet, uint64 guid1, uint16 spellid, uint16 flag, uint64 guid2)
+void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint16 spellid, uint16 flag, ObjectGuid guid2)
 {
     CharmInfo* charmInfo = pet->GetCharmInfo();
     if (!charmInfo)
@@ -948,7 +948,7 @@ void WorldSession::SendPetNameQuery(uint64 petguid, uint32 petnumber)
     SendPacket(&data);
 }
 
-bool WorldSession::CheckStableMaster(uint64 guid)
+bool WorldSession::CheckStableMaster(ObjectGuid guid)
 {
     // spell case or GM
     if (guid == GetPlayer()->GetGUID())
@@ -1196,7 +1196,7 @@ void WorldSession::HandlePetRename(WorldPacket & recvData)
 
 void WorldSession::HandlePetAbandon(WorldPacket & recvData)
 {
-    uint64 guid;
+    ObjectGuid guid;
     recvData >> guid;                                      //pet guid
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDetail("HandlePetAbandon. CMSG_PET_ABANDON pet guid is %u", GUID_LOPART(guid));
@@ -1229,7 +1229,7 @@ void WorldSession::HandlePetSpellAutocastOpcode(WorldPacket& recvPacket)
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDetail("CMSG_PET_SPELL_AUTOCAST");
 #endif
-    uint64 guid;
+    ObjectGuid guid;
     uint32 spellid;
     uint8  state;                                           //1 for on, 0 for off
     recvPacket >> guid >> spellid >> state;
@@ -1290,7 +1290,7 @@ void WorldSession::HandlePetCastSpellOpcode(WorldPacket& recvPacket)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_PET_CAST_SPELL");
 #endif
 
-    uint64 guid;
+    ObjectGuid guid;
     uint8  castCount;
     uint32 spellId;
     uint8  castFlags;
@@ -1411,7 +1411,7 @@ void WorldSession::HandlePetLearnTalent(WorldPacket & recvData)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_PET_LEARN_TALENT");
 #endif
 
-    uint64 guid;
+    ObjectGuid guid;
     uint32 talent_id, requested_rank;
     recvData >> guid >> talent_id >> requested_rank;
 
@@ -1425,7 +1425,7 @@ void WorldSession::HandleLearnPreviewTalentsPet(WorldPacket & recvData)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_LEARN_PREVIEW_TALENTS_PET");
 #endif
 
-    uint64 guid;
+    ObjectGuid guid;
     recvData >> guid;
 
     uint32 talentsCount;

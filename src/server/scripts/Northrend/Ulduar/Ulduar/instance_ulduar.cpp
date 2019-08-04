@@ -370,7 +370,7 @@ public:
                 go->SetGoState(state);
         }
 
-        void ShowKeeperGossip(uint8 type, Creature *cr, uint64 guid = 0)
+        void ShowKeeperGossip(uint8 type, Creature *cr, ObjectGuid guid = 0)
         {
             if (!cr)
             {

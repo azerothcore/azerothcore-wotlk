@@ -56,14 +56,14 @@ class npc_kernobee : public CreatureScript
         {
             npc_kernobeeAI(Creature* creature) : PassiveAI(creature)
             {
-                playerGUID = 0;
+                ObjectGuid::Empty;
                 checkTimer = 0;
             }
 
             uint32 checkTimer;
-            uint64 playerGUID;
+            ObjectGuid playerGUID;
 
-            void SetGUID(uint64 guid, int32)
+            void SetGUID(ObjectGuid guid, int32)
             {
                 playerGUID = guid;
             }

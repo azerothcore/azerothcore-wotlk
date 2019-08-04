@@ -40,7 +40,7 @@ class UpdateData
     public:
         UpdateData();
 
-        void AddOutOfRangeGUID(uint64 guid);
+        void AddOutOfRangeGUID(ObjectGuid guid);
         void AddUpdateBlock(const ByteBuffer &block);
         void AddUpdateBlock(const UpdateData &block);
         bool BuildPacket(WorldPacket* packet);

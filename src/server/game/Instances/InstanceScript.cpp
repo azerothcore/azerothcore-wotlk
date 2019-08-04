@@ -36,7 +36,7 @@ void InstanceScript::SaveToDB()
     CharacterDatabase.Execute(stmt);
 }
 
-void InstanceScript::HandleGameObject(uint64 GUID, bool open, GameObject* go)
+void InstanceScript::HandleGameObject(ObjectGuid guid, bool open, GameObject* go)
 {
     if (!go)
         go = instance->GetGameObject(GUID);

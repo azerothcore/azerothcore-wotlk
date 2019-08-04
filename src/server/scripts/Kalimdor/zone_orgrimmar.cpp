@@ -58,7 +58,7 @@ public:
         bool CanEmote;
         uint32 SaluteTimer;
         uint32 ResetTimer;
-        uint64 PlayerGUID;
+        ObjectGuid playerGUID;
 
         void Reset()
         {
@@ -66,7 +66,7 @@ public:
             CanEmote = false;
             SaluteTimer = 6000;
             ResetTimer = 0;
-            PlayerGUID = 0;
+            ObjectGuid::Empty;
         }
 
         void EnterCombat(Unit* /*who*/) { }

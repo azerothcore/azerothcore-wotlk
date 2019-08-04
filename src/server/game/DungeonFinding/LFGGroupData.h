@@ -31,10 +31,10 @@ class LfgGroupData
         // General
         void SetState(LfgState state);
         void RestoreState();
-        void AddPlayer(uint64 guid);
-        uint8 RemovePlayer(uint64 guid);
+        void AddPlayer(ObjectGuid guid);
+        uint8 RemovePlayer(ObjectGuid guid);
         void RemoveAllPlayers();
-        void SetLeader(uint64 guid);
+        void SetLeader(ObjectGuid guid);
 
         // Dungeon
         void SetDungeon(uint32 dungeon);

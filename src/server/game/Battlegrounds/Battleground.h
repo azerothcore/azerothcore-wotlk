@@ -564,7 +564,7 @@ class Battleground
         bool DelCreature(uint32 type);
         bool DelObject(uint32 type);
         bool AddSpiritGuide(uint32 type, float x, float y, float z, float o, TeamId teamId);
-        int32 GetObjectType(uint64 guid);
+        int32 GetObjectType(ObjectGuid guid);
 
         void DoorOpen(uint32 type);
         void DoorClose(uint32 type);
@@ -575,7 +575,7 @@ class Battleground
 
         // since arenas can be AvA or Hvh, we have to get the "temporary" team of a player
         static TeamId GetOtherTeamId(TeamId teamId);
-        bool IsPlayerInBattleground(uint64 guid) const;
+        bool IsPlayerInBattleground(ObjectGuid guid) const;
 
         bool ToBeDeleted() const { return m_SetDeleteThis; }
         //void SetDeleteThis() { m_SetDeleteThis = true; }

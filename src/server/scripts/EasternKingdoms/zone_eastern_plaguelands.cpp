@@ -88,7 +88,7 @@ public:
             _savedCount = 0;
             _deathCount = 0;
             _counter = 0;
-            _playerGUID = 0;
+            _ObjectGuid::Empty;
             events.Reset();
             summons.DespawnAll();
             me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP|UNIT_NPC_FLAG_QUESTGIVER);
@@ -99,7 +99,7 @@ public:
             _faction = faction;
         }
 
-        void SetGUID(uint64 guid, int32)
+        void SetGUID(ObjectGuid guid, int32)
         {
             _playerGUID = guid;
             me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);

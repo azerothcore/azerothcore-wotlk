@@ -55,9 +55,9 @@ namespace Trinity { struct ObjectUpdater; }
 
 struct ScriptAction
 {
-    uint64 sourceGUID;
-    uint64 targetGUID;
-    uint64 ownerGUID;                                       // owner of source if source is item
+    ObjectGuid sourceGUID;
+    ObjectGuid targetGUID;
+    ObjectGuid ownerGUID;                                   // owner of source if source is item
     ScriptInfo const* script;                               // pointer to static script data
 };
 
@@ -437,13 +437,13 @@ class Map : public GridRefManager<NGridType>
         TempSummon* SummonCreature(uint32 entry, Position const& pos, SummonPropertiesEntry const* properties = NULL, uint32 duration = 0, Unit* summoner = NULL, uint32 spellId = 0, uint32 vehId = 0);
         GameObject* SummonGameObject(uint32 entry, float x, float y, float z, float ang, float rotation0, float rotation1, float rotation2, float rotation3, uint32 respawnTime, bool checkTransport = true);
         void SummonCreatureGroup(uint8 group, std::list<TempSummon*>* list = NULL);
-        Player* GetPlayer(uint64 guid);
-        Creature* GetCreature(uint64 guid);
-        GameObject* GetGameObject(uint64 guid);
-        Transport* GetTransport(uint64 guid);
-        DynamicObject* GetDynamicObject(uint64 guid);
-        Pet* GetPet(uint64 guid);
-        Corpse* GetCorpse(uint64 guid);
+        Player* GetPlayer(ObjectGuid guid);
+        Creature* GetCreature(ObjectGuid guid);
+        GameObject* GetGameObject(ObjectGuid guid);
+        Transport* GetTransport(ObjectGuid guid);
+        DynamicObject* GetDynamicObject(ObjectGuid guid);
+        Pet* GetPet(ObjectGuid guid);
+        Corpse* GetCorpse(ObjectGuid guid);
 
         MapInstanced* ToMapInstanced(){ if (Instanceable())  return reinterpret_cast<MapInstanced*>(this); else return NULL;  }
         const MapInstanced* ToMapInstanced() const { if (Instanceable())  return (const MapInstanced*)((MapInstanced*)this); else return NULL;  }
@@ -467,7 +467,7 @@ class Map : public GridRefManager<NGridType>
         /*
             RESPAWN TIMES
         */
-        time_t GetLinkedRespawnTime(uint64 guid) const;
+        time_t GetLinkedRespawnTime(ObjectGuid guid) const;
         time_t GetCreatureRespawnTime(uint32 dbGuid) const
         {
             std::unordered_map<uint32 /*dbGUID*/, time_t>::const_iterator itr = _creatureRespawnTimes.find(dbGuid);

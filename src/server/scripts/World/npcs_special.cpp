@@ -942,7 +942,7 @@ public:
     {
         npc_doctorAI(Creature* creature) : ScriptedAI(creature) { }
 
-        uint64 PlayerGUID;
+        ObjectGuid playerGUID;
 
         uint32 SummonPatientTimer;
         uint32 SummonPatientCount;
@@ -956,7 +956,7 @@ public:
 
         void Reset()
         {
-            PlayerGUID = 0;
+            ObjectGuid::Empty;
 
             SummonPatientTimer = 10000;
             SummonPatientCount = 0;

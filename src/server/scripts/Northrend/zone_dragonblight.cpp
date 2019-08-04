@@ -745,7 +745,7 @@ public:
 
         EventMap events;
         SummonList summons;
-        uint64 playerGUID;
+        ObjectGuid playerGUID;
 
         void CleanAll(bool fromReset = true)
         {
@@ -776,7 +776,7 @@ public:
             events.ScheduleEvent(999, 0);
             events.ScheduleEvent(1, 3000);
             summons.DespawnAll();
-            playerGUID = 0;
+            ObjectGuid::Empty;
 
             CleanAll();
 
@@ -792,7 +792,7 @@ public:
             me->GetMotionMaster()->Clear();
         }
 
-        void SetGUID(uint64 guid, int32  /*id*/)
+        void SetGUID(ObjectGuid guid, int32  /*id*/)
         {
             if (playerGUID || events.GetNextEventTime(998) || events.GetNextEventTime(2))
                 return;
@@ -829,7 +829,7 @@ public:
                     c->CastSpell(c, SPELL_SAC_HOLY_ZONE_AURA, true);
                     if (GameObject* go = me->FindNearestGameObject(GO_SAC_LIGHTS_VENGEANCE_3, 150.0f))
                         go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
-                    playerGUID = 0;
+                    ObjectGuid::Empty;
                     events.RescheduleEvent(2, 60000);
                 }
             }
@@ -1828,7 +1828,7 @@ class npc_torturer_lecraft : public CreatureScript
         {
             npc_torturer_lecraftAI(Creature* creature) : ScriptedAI(creature)
             {
-                _playerGUID = 0;
+                _ObjectGuid::Empty;
             }
 
             void Reset()

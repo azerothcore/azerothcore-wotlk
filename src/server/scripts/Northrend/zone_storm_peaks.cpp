@@ -329,7 +329,7 @@ public:
     {
         npc_wild_wyrmAI(Creature* creature) : ScriptedAI(creature) {}
 
-        uint64 playerGUID;
+        ObjectGuid playerGUID;
         uint32 checkTimer;
         uint32 announceAttackTimer;
         uint32 attackTimer;
@@ -352,7 +352,7 @@ public:
             switching = false;
             startPath = false;
             checkTimer = 0;
-            playerGUID = 0;
+            ObjectGuid::Empty;
             attackTimer = 0;
             announceAttackTimer = 0;
             me->AddUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);

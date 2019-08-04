@@ -789,7 +789,7 @@ void AuraEffect::ApplySpellMod(Unit* target, bool apply)
         case SPELLMOD_EFFECT2:
         case SPELLMOD_EFFECT3:
         {
-            uint64 guid = target->GetGUID();
+            ObjectGuid guid = target->GetGUID();
             Unit::AuraApplicationMap & auras = target->GetAppliedAuras();
             for (Unit::AuraApplicationMap::iterator iter = auras.begin(); iter != auras.end(); ++iter)
             {

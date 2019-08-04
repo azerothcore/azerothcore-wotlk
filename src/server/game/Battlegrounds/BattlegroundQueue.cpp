@@ -275,7 +275,7 @@ uint32 BattlegroundQueue::GetAverageQueueWaitTime(GroupQueueInfo * ginfo) const
 }
 
 //remove player from queue and from group info, if group info is empty then remove it too
-void BattlegroundQueue::RemovePlayer(uint64 guid, bool sentToBg, uint32 playerQueueSlot)
+void BattlegroundQueue::RemovePlayer(ObjectGuid guid, bool sentToBg, uint32 playerQueueSlot)
 {
     // pussywizard: leave queue packet
     if (playerQueueSlot < PLAYER_MAX_BATTLEGROUND_QUEUES)
@@ -388,7 +388,7 @@ bool BattlegroundQueue::IsPlayerInvited(uint64 pl_guid, const uint32 bgInstanceG
     return qItr != m_QueuedPlayers.end() && qItr->second->IsInvitedToBGInstanceGUID == bgInstanceGuid && qItr->second->RemoveInviteTime == removeTime;
 }
 
-bool BattlegroundQueue::GetPlayerGroupInfoData(uint64 guid, GroupQueueInfo * ginfo)
+bool BattlegroundQueue::GetPlayerGroupInfoData(ObjectGuid guid, GroupQueueInfo * ginfo)
 {
     QueuedPlayersMap::const_iterator qItr = m_QueuedPlayers.find(guid);
     if (qItr == m_QueuedPlayers.end())

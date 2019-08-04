@@ -1203,7 +1203,7 @@ void Battleground::AddPlayer(Player* player)
 
     // score struct must be created in inherited class
 
-    uint64 guid = player->GetGUID();
+    ObjectGuid guid = player->GetGUID();
     TeamId teamId = player->GetBgTeamId();
 
     // Add to list/maps
@@ -1280,7 +1280,7 @@ void Battleground::AddOrSetPlayerToCorrectBgGroup(Player* player, TeamId teamId)
         return;
     }
 
-    uint64 playerGuid = player->GetGUID();
+    ObjectGuid playerGUID = player->GetGUID();
     Group* group = GetBgRaid(teamId);
     if (!group)                                      // first player joined
     {
@@ -1835,7 +1835,7 @@ TeamId Battleground::GetOtherTeamId(TeamId teamId)
     return teamId != TEAM_NEUTRAL ? (teamId == TEAM_ALLIANCE ? TEAM_HORDE : TEAM_ALLIANCE) : TEAM_NEUTRAL;
 }
 
-bool Battleground::IsPlayerInBattleground(uint64 guid) const
+bool Battleground::IsPlayerInBattleground(ObjectGuid guid) const
 {
     BattlegroundPlayerMap::const_iterator itr = m_Players.find(guid);
     if (itr != m_Players.end())
@@ -1873,7 +1873,7 @@ void Battleground::SetHoliday(bool is_holiday)
     m_HonorMode = is_holiday ? BG_HOLIDAY : BG_NORMAL;
 }
 
-int32 Battleground::GetObjectType(uint64 guid)
+int32 Battleground::GetObjectType(ObjectGuid guid)
 {
     for (uint32 i = 0; i < BgObjects.size(); ++i)
         if (BgObjects[i] == guid)

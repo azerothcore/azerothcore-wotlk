@@ -129,7 +129,7 @@ class npc_zulaman_hostage : public CreatureScript
             }
 
             bool IsLoot;
-            uint64 PlayerGUID;
+            ObjectGuid playerGUID;
 
             void Reset() override { }
 

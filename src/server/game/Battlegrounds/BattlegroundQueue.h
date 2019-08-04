@@ -64,10 +64,10 @@ class BattlegroundQueue
         bool CheckNormalMatch(Battleground* bgTemplate, BattlegroundBracketId bracket_id, uint32 minPlayers, uint32 maxPlayers);
         bool CheckSkirmishForSameFaction(BattlegroundBracketId bracket_id, uint32 minPlayersPerTeam);
         GroupQueueInfo* AddGroup(Player* leader, Group* group, PvPDifficultyEntry const*  bracketEntry, bool isRated, bool isPremade, uint32 ArenaRating, uint32 MatchmakerRating, uint32 ArenaTeamId);
-        void RemovePlayer(uint64 guid, bool sentToBg, uint32 playerQueueSlot);
+        void RemovePlayer(ObjectGuid guid, bool sentToBg, uint32 playerQueueSlot);
         bool IsPlayerInvitedToRatedArena(uint64 pl_guid);
         bool IsPlayerInvited(uint64 pl_guid, const uint32 bgInstanceGuid, const uint32 removeTime);
-        bool GetPlayerGroupInfoData(uint64 guid, GroupQueueInfo* ginfo);
+        bool GetPlayerGroupInfoData(ObjectGuid guid, GroupQueueInfo* ginfo);
         void PlayerInvitedToBGUpdateAverageWaitTime(GroupQueueInfo* ginfo);
         uint32 GetAverageQueueWaitTime(GroupQueueInfo* ginfo) const;
         uint32 GetPlayersCountInGroupsQueue(BattlegroundBracketId bracketId, BattlegroundQueueGroupTypes bgqueue);

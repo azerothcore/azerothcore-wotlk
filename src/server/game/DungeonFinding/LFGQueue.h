@@ -66,10 +66,10 @@ class LFGQueue
     public:
 
         // Add/Remove from queue
-        void AddToQueue(uint64 guid, bool failedProposal = false);
-        void RemoveFromQueue(uint64 guid, bool partial = false); // xinef: partial remove, dont delete data from list!
-        void AddQueueData(uint64 guid, time_t joinTime, LfgDungeonSet const& dungeons, LfgRolesMap const& rolesMap);
-        void RemoveQueueData(uint64 guid);
+        void AddToQueue(ObjectGuid guid, bool failedProposal = false);
+        void RemoveFromQueue(ObjectGuid guid, bool partial = false); // xinef: partial remove, dont delete data from list!
+        void AddQueueData(ObjectGuid guid, time_t joinTime, LfgDungeonSet const& dungeons, LfgRolesMap const& rolesMap);
+        void RemoveQueueData(ObjectGuid guid);
 
         // Update Timers (when proposal success)
         void UpdateWaitTimeAvg(int32 waitTime, uint32 dungeonId);
@@ -79,7 +79,7 @@ class LFGQueue
 
         // Update Queue timers
         void UpdateQueueTimers(uint32 diff);
-        time_t GetJoinTime(uint64 guid);
+        time_t GetJoinTime(ObjectGuid guid);
 
         // Find new group
         uint8 FindGroups();
@@ -87,10 +87,10 @@ class LFGQueue
     private:
         void SetQueueUpdateData(std::string const& strGuids, LfgRolesMap const& proposalRoles);
 
-        void AddToNewQueue(uint64 guid, bool front);
-        void RemoveFromNewQueue(uint64 guid);
+        void AddToNewQueue(ObjectGuid guid, bool front);
+        void RemoveFromNewQueue(ObjectGuid guid);
 
-        void RemoveFromCompatibles(uint64 guid);
+        void RemoveFromCompatibles(ObjectGuid guid);
         void AddToCompatibles(Lfg5Guids const& key);
 
         uint32 FindBestCompatibleInQueue(LfgQueueDataContainer::iterator itrQueue);

@@ -441,7 +441,7 @@ public:
                     me->SetInCombatWithZone(); // just in case
                     if (pInstance)
                         for( int i=0; i<4; ++i )
-                            if( uint64 guid = pInstance->GetData64(DATA_HARPOON_FIRE_STATE_1 + i) )
+                            if( ObjectGuid guid = pInstance->GetData64(DATA_HARPOON_FIRE_STATE_1 + i) )
                                 if( Creature* hfs = ObjectAccessor::GetCreature(*me, guid) )
                                 {
                                     me->SummonCreature(34188, hfs->GetPositionX(), hfs->GetPositionY(), hfs->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 22000);

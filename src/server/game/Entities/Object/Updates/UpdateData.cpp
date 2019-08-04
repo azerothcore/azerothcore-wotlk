@@ -18,7 +18,7 @@ UpdateData::UpdateData() : m_blockCount(0)
     m_outOfRangeGUIDs.reserve(15);
 }
 
-void UpdateData::AddOutOfRangeGUID(uint64 guid)
+void UpdateData::AddOutOfRangeGUID(ObjectGuid guid)
 {
     m_outOfRangeGUIDs.push_back(guid);
 }

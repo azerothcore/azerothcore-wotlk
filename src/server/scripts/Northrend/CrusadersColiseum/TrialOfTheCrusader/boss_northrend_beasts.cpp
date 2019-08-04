@@ -234,13 +234,13 @@ public:
         InstanceScript* pInstance;
         EventMap events;
         SummonList summons;
-        uint64 PlayerGUID;
+        ObjectGuid playerGUID;
 
         void Reset()
         {
             events.Reset();
             summons.DespawnAll();
-            PlayerGUID = 0;
+            ObjectGuid::Empty;
         }
 
         void EnterCombat(Unit* /*who*/)
@@ -358,7 +358,7 @@ public:
                                         snobold->ToCreature()->DespawnOrUnsummon();
                                 }
                         }
-                        PlayerGUID = 0;
+                        ObjectGuid::Empty;
                         events.PopEvent();
                     }
                     break;

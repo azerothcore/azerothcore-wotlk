@@ -83,10 +83,10 @@ public:
 
     bool IsClosed() const { return  _type != TICKET_TYPE_OPEN; }
     bool IsCompleted() const { return _completed; }
-    bool IsFromPlayer(uint64 guid) const { return guid == _playerGuid; }
+    bool IsFromPlayer(ObjectGuid guid) const { return guid == _playerGuid; }
     bool IsAssigned() const { return _assignedTo != 0; }
-    bool IsAssignedTo(uint64 guid) const { return guid == _assignedTo; }
-    bool IsAssignedNotTo(uint64 guid) const { return IsAssigned() && !IsAssignedTo(guid); }
+    bool IsAssignedTo(ObjectGuid guid) const { return guid == _assignedTo; }
+    bool IsAssignedNotTo(ObjectGuid guid) const { return IsAssigned() && !IsAssignedTo(guid); }
 
     uint32 GetId() const { return _id; }
     Player* GetPlayer() const { return ObjectAccessor::FindPlayerInOrOutOfWorld(_playerGuid); }
@@ -107,7 +107,7 @@ public:
     GMTicketEscalationStatus GetEscalatedStatus() const { return _escalatedStatus; }
 
     void SetEscalatedStatus(GMTicketEscalationStatus escalatedStatus) { _escalatedStatus = escalatedStatus; }
-    void SetAssignedTo(uint64 guid, bool isAdmin)
+    void SetAssignedTo(ObjectGuid guid, bool isAdmin)
     {
         _assignedTo = guid;
         if (isAdmin && _escalatedStatus == TICKET_IN_ESCALATION_QUEUE)
@@ -192,7 +192,7 @@ public:
         return NULL;
     }
 
-    GmTicket* GetTicketByPlayer(uint64 playerGuid)
+    GmTicket* GetTicketByPlayer(ObjectGuid playerGUID)
     {
         for (GmTicketList::const_iterator itr = _ticketList.begin(); itr != _ticketList.end(); ++itr)
             if (itr->second && itr->second->IsFromPlayer(playerGuid) && !itr->second->IsClosed())

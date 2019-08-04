@@ -291,7 +291,7 @@ void WorldSession::HandleOpenWrappedItemCallback(PreparedQueryResult result, uin
 
 void WorldSession::HandleGameObjectUseOpcode(WorldPacket & recvData)
 {
-    uint64 guid;
+    ObjectGuid guid;
     recvData >> guid;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
@@ -314,7 +314,7 @@ void WorldSession::HandleGameObjectUseOpcode(WorldPacket & recvData)
 
 void WorldSession::HandleGameobjectReportUse(WorldPacket& recvPacket)
 {
-    uint64 guid;
+    ObjectGuid guid;
     recvPacket >> guid;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
@@ -488,7 +488,7 @@ void WorldSession::HandleCancelAuraOpcode(WorldPacket& recvPacket)
 
 void WorldSession::HandlePetCancelAuraOpcode(WorldPacket& recvPacket)
 {
-    uint64 guid;
+    ObjectGuid guid;
     uint32 spellId;
 
     recvPacket >> guid;
@@ -596,7 +596,7 @@ void WorldSession::HandleSelfResOpcode(WorldPacket & /*recvData*/)
 
 void WorldSession::HandleSpellClick(WorldPacket& recvData)
 {
-    uint64 guid;
+    ObjectGuid guid;
     recvData >> guid;
 
     // this will get something not in world. crash
@@ -617,7 +617,7 @@ void WorldSession::HandleMirrorImageDataRequest(WorldPacket & recvData)
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_GET_MIRRORIMAGE_DATA");
 #endif
-    uint64 guid;
+    ObjectGuid guid;
     recvData >> guid;
 
     // Get unit for which data is needed by client

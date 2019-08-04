@@ -312,7 +312,7 @@ public:
 
         void Reset() override
         {
-            uiPlayerGUID = 0;
+            uiObjectGuid::Empty;
 
             bCanEat = false;
             bIsEating = false;
@@ -445,12 +445,12 @@ public:
     {
         npc_enslaved_netherwing_drakeAI(Creature* creature) : ScriptedAI(creature)
         {
-            PlayerGUID = 0;
+            ObjectGuid::Empty;
             Tapped = false;
             Reset();
         }
 
-        uint64 PlayerGUID;
+        ObjectGuid playerGUID;
         uint32 FlyTimer;
         bool Tapped;
 
@@ -503,7 +503,7 @@ public:
                     if (player)
                         DoCast(player, SPELL_FORCE_OF_NELTHARAKU, true);
 
-                    PlayerGUID = 0;
+                    ObjectGuid::Empty;
                 }
                 me->SetVisible(false);
                 me->SetDisableGravity(false);
@@ -598,13 +598,13 @@ public:
         npc_dragonmaw_peonAI(Creature* creature) : ScriptedAI(creature) { }
 
         EventMap events;
-        uint64 PlayerGUID;
+        ObjectGuid playerGUID;
         bool Tapped;
 
         void Reset() override
         {
             events.Reset();
-            PlayerGUID = 0;
+            ObjectGuid::Empty;
             Tapped = false;
         }
 
@@ -1248,7 +1248,7 @@ public:
     {
         npc_lord_illidan_stormrageAI(Creature* creature) : ScriptedAI(creature) { }
 
-        uint64 PlayerGUID;
+        ObjectGuid playerGUID;
 
         uint32 WaveTimer;
         uint32 AnnounceTimer;
@@ -1262,7 +1262,7 @@ public:
 
         void Reset()
         {
-            PlayerGUID = 0;
+            ObjectGuid::Empty;
 
             WaveTimer = 10000;
             AnnounceTimer = 7000;

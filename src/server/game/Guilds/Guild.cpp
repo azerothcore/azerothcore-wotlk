@@ -1610,7 +1610,7 @@ void Guild::HandleRemoveMember(WorldSession* session, std::string const& name)
                 SendCommandResult(session, GUILD_COMMAND_REMOVE, ERR_GUILD_RANK_TOO_HIGH_S, name);
             else
             {
-                uint64 guid = member->GetGUID();
+                ObjectGuid guid = member->GetGUID();
                 // After call to DeleteMember pointer to member becomes invalid
                 DeleteMember(guid, false, true);
                 _LogEvent(GUILD_EVENT_LOG_UNINVITE_PLAYER, player->GetGUIDLow(), GUID_LOPART(guid));
@@ -1965,7 +1965,7 @@ void Guild::LoadRankFromDB(Field* fields)
 
 bool Guild::LoadMemberFromDB(Field* fields)
 {
-    uint32 lowguid = fields[1].GetUInt32();
+    ObjectGuid guid = fields[1].GetUInt32();
     Member *member = new Member(m_id, MAKE_NEW_GUID(lowguid, 0, HIGHGUID_PLAYER), fields[2].GetUInt8());
     if (!member->LoadFromDB(fields))
     {
@@ -2199,7 +2199,7 @@ void Guild::MassInviteToEvent(WorldSession* session, uint32 minLevel, uint32 max
 }
 
 // Members handling
-bool Guild::AddMember(uint64 guid, uint8 rankId)
+bool Guild::AddMember(ObjectGuid guid, uint8 rankId)
 {
     Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(guid);
     // Player cannot be in guild
@@ -2215,7 +2215,7 @@ bool Guild::AddMember(uint64 guid, uint8 rankId)
     // This will be prevent attempt to join many guilds and corrupt guild data integrity
     Player::RemovePetitionsAndSigns(guid, GUILD_CHARTER_TYPE);
 
-    uint32 lowguid = GUID_LOPART(guid);
+    ObjectGuid guid = GUID_LOPART(guid);
 
     // If rank was not passed, assign lowest possible rank
     if (rankId == GUILD_RANK_NONE)
@@ -2277,9 +2277,9 @@ bool Guild::AddMember(uint64 guid, uint8 rankId)
     return true;
 }
 
-void Guild::DeleteMember(uint64 guid, bool isDisbanding, bool isKicked, bool canDeleteGuild)
+void Guild::DeleteMember(ObjectGuid guid, bool isDisbanding, bool isKicked, bool canDeleteGuild)
 {
-    uint32 lowguid = GUID_LOPART(guid);
+    ObjectGuid guid = GUID_LOPART(guid);
     Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(guid);
 
     // Guild master can be deleted when loading guild and guid doesn't exist in characters table
@@ -2338,7 +2338,7 @@ void Guild::DeleteMember(uint64 guid, bool isDisbanding, bool isKicked, bool can
         _UpdateAccountsNumber();
 }
 
-bool Guild::ChangeMemberRank(uint64 guid, uint8 newRank)
+bool Guild::ChangeMemberRank(ObjectGuid guid, uint8 newRank)
 {
     if (newRank <= _GetLowestRankId())                    // Validate rank (allow only existing ranks)
         if (Member* member = GetMember(guid))
@@ -2608,7 +2608,7 @@ inline int32 Guild::_GetMemberRemainingMoney(Member const* member) const
     return 0;
 }
 
-inline void Guild::_UpdateMemberWithdrawSlots(SQLTransaction& trans, uint64 guid, uint8 tabId)
+inline void Guild::_UpdateMemberWithdrawSlots(SQLTransaction& trans, ObjectGuid guid, uint8 tabId)
 {
     if (Member* member = GetMember(guid))
     {
@@ -2619,7 +2619,7 @@ inline void Guild::_UpdateMemberWithdrawSlots(SQLTransaction& trans, uint64 guid
     }
 }
 
-inline bool Guild::_MemberHasTabRights(uint64 guid, uint8 tabId, uint32 rights) const
+inline bool Guild::_MemberHasTabRights(ObjectGuid guid, uint8 tabId, uint32 rights) const
 {
     if (const Member* member = GetMember(guid))
     {
@@ -2642,7 +2642,7 @@ inline void Guild::_LogEvent(GuildEventLogTypes eventType, uint32 playerGuid1, u
 }
 
 // Add new bank event log record
-void Guild::_LogBankEvent(SQLTransaction& trans, GuildBankEventLogTypes eventType, uint8 tabId, uint32 lowguid, uint32 itemOrMoney, uint16 itemStackCount, uint8 destTabId)
+void Guild::_LogBankEvent(SQLTransaction& trans, GuildBankEventLogTypes eventType, uint8 tabId, ObjectGuid guid, uint32 itemOrMoney, uint16 itemStackCount, uint8 destTabId)
 {
     if (tabId > GUILD_BANK_MAX_TABS)
         return;
@@ -2783,7 +2783,7 @@ bool Guild::_DoItemsMove(MoveItemData* pSrc, MoveItemData* pDest, bool sendError
 
 void Guild::_SendBankContent(WorldSession* session, uint8 tabId) const
 {
-    uint64 guid = session->GetPlayer()->GetGUID();
+    ObjectGuid guid = session->GetPlayer()->GetGUID();
     if (!_MemberHasTabRights(guid, tabId, GUILD_BANK_RIGHT_VIEW_TAB))
         return;
 
@@ -2832,7 +2832,7 @@ void Guild::_SendBankContentUpdate(uint8 tabId, SlotIds slots) const
     _SendBankList(NULL, tabId, false, &slots);
 }
 
-void Guild::_BroadcastEvent(GuildEvents guildEvent, uint64 guid, const char* param1, const char* param2, const char* param3) const
+void Guild::_BroadcastEvent(GuildEvents guildEvent, ObjectGuid guid, const char* param1, const char* param2, const char* param3) const
 {
     uint8 count = !param3 ? (!param2 ? (!param1 ? 0 : 1) : 2) : 3;
 

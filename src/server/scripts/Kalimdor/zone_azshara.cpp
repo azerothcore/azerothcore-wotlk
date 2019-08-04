@@ -291,7 +291,7 @@ public:
             MustDieTimer = 3000;
             CurrWP = 0;
 
-            PlayerGUID = 0;
+            ObjectGuid::Empty;
 
             MustDie = false;
             Escape = false;
@@ -425,7 +425,7 @@ public:
         }
 
     private:
-        uint64 PlayerGUID;
+        ObjectGuid playerGUID;
         uint32 SpellEscapeTimer;
         uint32 TeleportTimer;
         uint32 CheckTimer;

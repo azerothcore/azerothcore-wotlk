@@ -19,21 +19,21 @@ inline uint32 MAKE_PAIR32(uint16 l, uint16 h);
 inline uint16 PAIR32_HIPART(uint32 x);
 inline uint16 PAIR32_LOPART(uint32 x);
 
-inline bool IS_EMPTY_GUID(uint64 guid);
-inline bool IS_CREATURE_GUID(uint64 guid);
-inline bool IS_PET_GUID(uint64 guid);
-inline bool IS_VEHICLE_GUID(uint64 guid);
-inline bool IS_CRE_OR_VEH_GUID(uint64 guid);
-inline bool IS_CRE_OR_VEH_OR_PET_GUID(uint64 guid);
-inline bool IS_PLAYER_GUID(uint64 guid);
-inline bool IS_UNIT_GUID(uint64 guid);
-inline bool IS_ITEM_GUID(uint64 guid);
-inline bool IS_GAMEOBJECT_GUID(uint64 guid);
-inline bool IS_DYNAMICOBJECT_GUID(uint64 guid);
-inline bool IS_CORPSE_GUID(uint64 guid);
-inline bool IS_TRANSPORT_GUID(uint64 guid);
-inline bool IS_MO_TRANSPORT_GUID(uint64 guid);
-inline bool IS_GROUP_GUID(uint64 guid);
+inline bool IS_EMPTY_GUID(ObjectGuid guid);
+inline bool IS_CREATURE_GUID(ObjectGuid guid);
+inline bool IS_PET_GUID(ObjectGuid guid);
+inline bool IS_VEHICLE_GUID(ObjectGuid guid);
+inline bool IS_CRE_OR_VEH_GUID(ObjectGuid guid);
+inline bool IS_CRE_OR_VEH_OR_PET_GUID(ObjectGuid guid);
+inline bool IS_PLAYER_GUID(ObjectGuid guid);
+inline bool IS_UNIT_GUID(ObjectGuid guid);
+inline bool IS_ITEM_GUID(ObjectGuid guid);
+inline bool IS_GAMEOBJECT_GUID(ObjectGuid guid);
+inline bool IS_DYNAMICOBJECT_GUID(ObjectGuid guid);
+inline bool IS_CORPSE_GUID(ObjectGuid guid);
+inline bool IS_TRANSPORT_GUID(ObjectGuid guid);
+inline bool IS_MO_TRANSPORT_GUID(ObjectGuid guid);
+inline bool IS_GROUP_GUID(ObjectGuid guid);
 
 // l - OBJECT_FIELD_GUID
 // e - OBJECT_FIELD_ENTRY for GO (except GAMEOBJECT_TYPE_MO_TRANSPORT) and creatures or UNIT_FIELD_PETNUMBER for pets
@@ -41,12 +41,12 @@ inline bool IS_GROUP_GUID(uint64 guid);
 inline uint64 MAKE_NEW_GUID(uint32 l, uint32 e, uint32 h);
 
 //#define GUID_HIPART(x)   (uint32)((uint64(x) >> 52)) & 0x0000FFFF)
-inline uint32 GUID_HIPART(uint64 guid);
+inline uint32 GUID_HIPART(ObjectGuid guid);
 inline uint32 GUID_ENPART(uint64 x);
 inline uint32 GUID_LOPART(uint64 x);
 
-inline bool IsGuidHaveEnPart(uint64 guid);
-inline char const* GetLogNameForGuid(uint64 guid);
+inline bool IsGuidHaveEnPart(ObjectGuid guid);
+inline char const* GetLogNameForGuid(ObjectGuid guid);
 
 uint64 MAKE_PAIR64(uint32 l, uint32 h)
 {
@@ -83,77 +83,77 @@ uint16 PAIR32_LOPART(uint32 x)
     return (uint16)(x & 0x0000FFFF);
 }
 
-bool IS_EMPTY_GUID(uint64 guid)
+bool IS_EMPTY_GUID(ObjectGuid guid)
 {
     return guid == 0;
 }
 
-bool IS_CREATURE_GUID(uint64 guid)
+bool IS_CREATURE_GUID(ObjectGuid guid)
 {
     return GUID_HIPART(guid) == HIGHGUID_UNIT;
 }
 
-bool IS_PET_GUID(uint64 guid)
+bool IS_PET_GUID(ObjectGuid guid)
 {
     return GUID_HIPART(guid) == HIGHGUID_PET;
 }
 
-bool IS_VEHICLE_GUID(uint64 guid)
+bool IS_VEHICLE_GUID(ObjectGuid guid)
 {
     return GUID_HIPART(guid) == HIGHGUID_VEHICLE;
 }
 
-bool IS_CRE_OR_VEH_GUID(uint64 guid)
+bool IS_CRE_OR_VEH_GUID(ObjectGuid guid)
 {
     return IS_CREATURE_GUID(guid) || IS_VEHICLE_GUID(guid);
 }
 
-bool IS_CRE_OR_VEH_OR_PET_GUID(uint64 guid)
+bool IS_CRE_OR_VEH_OR_PET_GUID(ObjectGuid guid)
 {
     return IS_CRE_OR_VEH_GUID(guid) || IS_PET_GUID(guid);
 }
 
-bool IS_PLAYER_GUID(uint64 guid)
+bool IS_PLAYER_GUID(ObjectGuid guid)
 {
     return guid != 0 && GUID_HIPART(guid) == HIGHGUID_PLAYER;
 }
 
-bool IS_UNIT_GUID(uint64 guid)
+bool IS_UNIT_GUID(ObjectGuid guid)
 {
     return IS_CRE_OR_VEH_OR_PET_GUID(guid) || IS_PLAYER_GUID(guid);
 }
 
-bool IS_ITEM_GUID(uint64 guid)
+bool IS_ITEM_GUID(ObjectGuid guid)
 {
     return GUID_HIPART(guid) == HIGHGUID_ITEM;
 }
 
-bool IS_GAMEOBJECT_GUID(uint64 guid)
+bool IS_GAMEOBJECT_GUID(ObjectGuid guid)
 {
     return GUID_HIPART(guid) == HIGHGUID_GAMEOBJECT;
 }
 
-bool IS_DYNAMICOBJECT_GUID(uint64 guid)
+bool IS_DYNAMICOBJECT_GUID(ObjectGuid guid)
 {
     return GUID_HIPART(guid) == HIGHGUID_DYNAMICOBJECT;
 }
 
-bool IS_CORPSE_GUID(uint64 guid)
+bool IS_CORPSE_GUID(ObjectGuid guid)
 {
     return GUID_HIPART(guid) == HIGHGUID_CORPSE;
 }
 
-bool IS_TRANSPORT_GUID(uint64 guid)
+bool IS_TRANSPORT_GUID(ObjectGuid guid)
 {
     return GUID_HIPART(guid) == HIGHGUID_TRANSPORT;
 }
 
-bool IS_MO_TRANSPORT_GUID(uint64 guid)
+bool IS_MO_TRANSPORT_GUID(ObjectGuid guid)
 {
     return GUID_HIPART(guid) == HIGHGUID_MO_TRANSPORT;
 }
 
-bool IS_GROUP_GUID(uint64 guid)
+bool IS_GROUP_GUID(ObjectGuid guid)
 {
     return GUID_HIPART(guid) == HIGHGUID_GROUP;
 }
@@ -163,7 +163,7 @@ uint64 MAKE_NEW_GUID(uint32 l, uint32 e, uint32 h)
     return uint64(uint64(l) | (uint64(e) << 24) | (uint64(h) << 48));
 }
 
-uint32 GUID_HIPART(uint64 guid)
+uint32 GUID_HIPART(ObjectGuid guid)
 {
     return (uint32)((uint64(guid) >> 48) & 0x0000FFFF);
 }
@@ -182,7 +182,7 @@ uint32 GUID_LOPART(uint64 x)
             : (uint32)(x & UI64LIT(0x00000000FFFFFFFF));
 }
 
-bool IsGuidHaveEnPart(uint64 guid)
+bool IsGuidHaveEnPart(ObjectGuid guid)
 {
     switch (GUID_HIPART(guid))
     {
@@ -203,7 +203,7 @@ bool IsGuidHaveEnPart(uint64 guid)
     }
 }
 
-char const* GetLogNameForGuid(uint64 guid)
+char const* GetLogNameForGuid(ObjectGuid guid)
 {
     switch (GUID_HIPART(guid))
     {

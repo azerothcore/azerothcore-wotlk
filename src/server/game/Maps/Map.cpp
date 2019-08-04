@@ -2638,10 +2638,10 @@ bool InstanceMap::AddPlayerToMap(Player* player)
             // pussywizard: bind lider also if not yet bound
             if (Group* g = player->GetGroup())
                 if (g->GetLeaderGUID() != player->GetGUID())
-                    if (!sInstanceSaveMgr->PlayerGetBoundInstance(GUID_LOPART(g->GetLeaderGUID()), mapSave->GetMapId(), mapSave->GetDifficulty()))
+                    if (!sInstanceSaveMgr->PlayerGetBoundInstance(g->GetLeaderGUID().GetCounter(), mapSave->GetMapId(), mapSave->GetDifficulty()))
                     {
-                        sInstanceSaveMgr->PlayerCreateBoundInstancesMaps(GUID_LOPART(g->GetLeaderGUID()));
-                        sInstanceSaveMgr->PlayerBindToInstance(GUID_LOPART(g->GetLeaderGUID()), mapSave, false, ObjectAccessor::FindPlayerInOrOutOfWorld(g->GetLeaderGUID()));
+                        sInstanceSaveMgr->PlayerCreateBoundInstancesMaps(g->GetLeaderGUID().GetCounter());
+                        sInstanceSaveMgr->PlayerBindToInstance(g->GetLeaderGUID().GetCounter(), mapSave, false, ObjectAccessor::FindPlayerInOrOutOfWorld(g->GetLeaderGUID()));
                     }
         }
 
@@ -2940,22 +2940,22 @@ void BattlegroundMap::RemoveAllPlayers()
                     player->TeleportTo(player->GetEntryPoint());
 }
 
-Player* Map::GetPlayer(uint64 guid)
+Player* Map::GetPlayer(ObjectGuid guid)
 { 
     return ObjectAccessor::GetObjectInMap(guid, this, (Player*)NULL);
 }
 
-Creature* Map::GetCreature(uint64 guid)
+Creature* Map::GetCreature(ObjectGuid guid)
 { 
     return ObjectAccessor::GetObjectInMap(guid, this, (Creature*)NULL);
 }
 
-GameObject* Map::GetGameObject(uint64 guid)
+GameObject* Map::GetGameObject(ObjectGuid guid)
 { 
     return ObjectAccessor::GetObjectInMap(guid, this, (GameObject*)NULL);
 }
 
-Transport* Map::GetTransport(uint64 guid)
+Transport* Map::GetTransport(ObjectGuid guid)
 { 
     if (GUID_HIPART(guid) != HIGHGUID_MO_TRANSPORT && GUID_HIPART(guid) != HIGHGUID_TRANSPORT)
         return NULL;
@@ -2964,17 +2964,17 @@ Transport* Map::GetTransport(uint64 guid)
     return go ? go->ToTransport() : NULL;
 }
 
-DynamicObject* Map::GetDynamicObject(uint64 guid)
+DynamicObject* Map::GetDynamicObject(ObjectGuid guid)
 { 
     return ObjectAccessor::GetObjectInMap(guid, this, (DynamicObject*)NULL);
 }
 
-Pet* Map::GetPet(uint64 guid)
+Pet* Map::GetPet(ObjectGuid guid)
 { 
     return ObjectAccessor::GetObjectInMap(guid, this, (Pet*)NULL);
 }
 
-Corpse* Map::GetCorpse(uint64 guid)
+Corpse* Map::GetCorpse(ObjectGuid guid)
 { 
     return ObjectAccessor::GetObjectInMap(guid, this, (Corpse*)NULL);
 }
@@ -3203,15 +3203,15 @@ void Map::AllTransportsRemovePassengers()
             (*itr)->RemovePassenger(*((*itr)->GetPassengers().begin()), true);
 }
 
-time_t Map::GetLinkedRespawnTime(uint64 guid) const
+time_t Map::GetLinkedRespawnTime(ObjectGuid guid) const
 {
-    uint64 linkedGuid = sObjectMgr->GetLinkedRespawnGuid(guid);
-    switch (GUID_HIPART(linkedGuid))
+    ObjectGuid linkedGuid = sObjectMgr->GetLinkedRespawnGuid(guid);
+    switch (linkedGuid.GetHigh())
     {
         case HIGHGUID_UNIT:
-            return GetCreatureRespawnTime(GUID_LOPART(linkedGuid));
+            return GetCreatureRespawnTime(linkedGuid.GetCounter());
         case HIGHGUID_GAMEOBJECT:
-            return GetGORespawnTime(GUID_LOPART(linkedGuid));
+            return GetGORespawnTime(linkedGuid.GetCounter());
         default:
             break;
     }

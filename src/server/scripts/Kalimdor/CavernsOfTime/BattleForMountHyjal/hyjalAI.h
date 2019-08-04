@@ -146,7 +146,7 @@ struct hyjalAI : public npc_escortAI
     public:
         InstanceScript* instance;
 
-        uint64 PlayerGUID;
+        ObjectGuid playerGUID;
         uint64 BossGUID[2];
         uint64 VeinGUID[14];
 

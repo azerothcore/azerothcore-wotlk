@@ -52,7 +52,7 @@ BattlegroundIC::~BattlegroundIC()
 {
 }
 
-void BattlegroundIC::DoAction(uint32 action, uint64 guid)
+void BattlegroundIC::DoAction(uint32 action, ObjectGuid guid)
 {
     if (action != ACTION_TELEPORT_PLAYER_TO_TRANSPORT)
         return;

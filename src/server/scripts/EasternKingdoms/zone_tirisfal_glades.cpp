@@ -66,7 +66,7 @@ public:
         {
             m_uiPhase = 0;
             m_uiPhaseTimer = 5000;
-            m_uiPlayerGUID = 0;
+            m_uiObjectGuid::Empty;
 
             me->RestoreFaction();
 

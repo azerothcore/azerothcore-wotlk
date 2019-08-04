@@ -327,7 +327,7 @@ class BattlegroundEY : public Battleground
 
         /* BG Flags */
         uint64 GetFlagPickerGUID(TeamId /*teamId*/ = TEAM_NEUTRAL) const    { return _flagKeeperGUID; }
-        void SetFlagPicker(uint64 guid)     { _flagKeeperGUID = guid; }
+        void SetFlagPicker(ObjectGuid guid)     { _flagKeeperGUID = guid; }
         uint8 GetFlagState() const          { return _flagState; }
         void RespawnFlag();
         void RespawnFlagAfterDrop();
@@ -342,7 +342,7 @@ class BattlegroundEY : public Battleground
         void EndBattleground(TeamId winnerTeamId);
         void UpdatePlayerScore(Player* player, uint32 type, uint32 value, bool doAddHonor = true);
         void FillInitialWorldStates(WorldPacket& data);
-        void SetDroppedFlagGUID(uint64 guid, TeamId /*teamId*/ = TEAM_NEUTRAL)  { _droppedFlagGUID = guid; }
+        void SetDroppedFlagGUID(ObjectGuid guid, TeamId /*teamId*/ = TEAM_NEUTRAL)  { _droppedFlagGUID = guid; }
         uint64 GetDroppedFlagGUID() const { return _droppedFlagGUID; }
 
         /* Battleground Events */

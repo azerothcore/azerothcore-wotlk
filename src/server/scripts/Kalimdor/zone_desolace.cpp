@@ -91,7 +91,7 @@ class npc_cork_gizelton : public CreatureScript
 
             void Initialize()
             {
-                _playerGUID = 0;
+                _ObjectGuid::Empty;
                 _faction = 35;
                 headNorth = true;
                 me->setActive(true);
@@ -130,12 +130,12 @@ class npc_cork_gizelton : public CreatureScript
                         if (me->IsWithinDist(player, 60.0f))
                             return;
 
-                _playerGUID = 0;
+                _ObjectGuid::Empty;
                 _faction = 35;
                 ImmuneFlagSet(false, _faction);
             }
 
-            void SetGUID(uint64 playerGUID, int32 faction)
+            void SetGUID(ObjectGuid playerGUID, int32 faction)
             {
                 _playerGUID = playerGUID;
                 _faction = faction;
@@ -305,7 +305,7 @@ class npc_cork_gizelton : public CreatureScript
                             else
                                 player->FailQuest(QUEST_BODYGUARD_FOR_HIRE);
                         }
-                        _playerGUID = 0;
+                        _ObjectGuid::Empty;
                         CheckPlayer();
                         break;
                     // South -> North - complete
@@ -317,7 +317,7 @@ class npc_cork_gizelton : public CreatureScript
                             else
                                 player->FailQuest(QUEST_GIZELTON_CARAVAN);
                         }
-                        _playerGUID = 0;
+                        _ObjectGuid::Empty;
                         CheckPlayer();
                         break;
                     // North -> South - spawn attackers

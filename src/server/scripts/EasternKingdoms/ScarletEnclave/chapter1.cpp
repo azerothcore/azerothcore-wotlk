@@ -458,7 +458,7 @@ public:
                 AttackStart(attacker);
         }
 
-        void SetGUID(uint64 guid, int32) override
+        void SetGUID(ObjectGuid guid, int32) override
         {
             gothikGUID = guid;
             events.ScheduleEvent(EVENT_GHOUL_MOVE_TO_PIT, 3000);
@@ -691,7 +691,7 @@ public:
                 me->SetCurrentEquipmentId(me->GetOriginalEquipmentId());
         }
 
-        uint64 playerGUID;
+        ObjectGuid playerGUID;
         UnworthyInitiatePhase phase;
         uint32 wait_timer;
         float anchorX, anchorY;
@@ -874,7 +874,7 @@ public:
 
         uint64 prisonerGUID;
 
-        void SetGUID(uint64 guid, int32 /*id*/) override
+        void SetGUID(ObjectGuid guid, int32 /*id*/) override
         {
             if (!prisonerGUID)
                 prisonerGUID = guid;
@@ -935,7 +935,7 @@ public:
 
         uint64 minerGUID;
 
-        void SetGUID(uint64 guid, int32 /*id*/) override
+        void SetGUID(ObjectGuid guid, int32 /*id*/) override
         {
             minerGUID = guid;
         }

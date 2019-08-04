@@ -83,7 +83,7 @@ class BfCapturePoint
         void SendUpdateWorldState(uint32 field, uint32 value);
 
         // Send kill notify to players in the controlling faction
-        void SendObjectiveComplete(uint32 id, uint64 guid);
+        void SendObjectiveComplete(uint32 id, ObjectGuid guid);
 
         // Used when player is activated/inactivated in the area
         virtual bool HandlePlayerEnter(Player* player);
@@ -168,7 +168,7 @@ class BfGraveyard
         void RelocateDeadPlayers();
 
         // Check if this graveyard has a spirit guide
-        bool HasNpc(uint64 guid)
+        bool HasNpc(ObjectGuid guid)
         {
             if (!m_SpiritGuide[0] && !m_SpiritGuide[1])
                 return false;
@@ -182,7 +182,7 @@ class BfGraveyard
         }
 
         // Check if a player is in this graveyard's resurrect queue
-        bool HasPlayer(uint64 guid) const { return m_ResurrectQueue.find(guid) != m_ResurrectQueue.end(); }
+        bool HasPlayer(ObjectGuid guid) const { return m_ResurrectQueue.find(guid) != m_ResurrectQueue.end(); }
 
         // Get the graveyard's ID.
         uint32 GetGraveyardId() const { return m_GraveyardId; }
@@ -250,7 +250,7 @@ class Battlefield : public ZoneScript
          * \brief Kick player from battlefield and teleport him to kick-point location
          * \param guid : guid of player who must be kick
          */
-        void KickPlayerFromBattlefield(uint64 guid);
+        void KickPlayerFromBattlefield(ObjectGuid guid);
 
         /// Called when player (player) enter in zone
         void HandlePlayerEnterZone(Player* player, uint32 zone);
@@ -279,7 +279,7 @@ class Battlefield : public ZoneScript
          */
         Group* GetFreeBfRaid(TeamId TeamId);
         /// Return battlefield group where player is.
-        Group* GetGroupPlayer(uint64 guid, TeamId TeamId);
+        Group* GetGroupPlayer(ObjectGuid guid, TeamId TeamId);
         /// Force player to join a battlefield group
         bool AddOrSetPlayerToCorrectBfGroup(Player* player);
 
@@ -411,7 +411,7 @@ class Battlefield : public ZoneScript
         // CapturePoint system
         void AddCapturePoint(BfCapturePoint* cp, GameObject* go) { m_capturePoints[go->GetEntry()] = cp; }
 
-        BfCapturePoint* GetCapturePoint(uint32 lowguid) const
+        BfCapturePoint* GetCapturePoint(ObjectGuid guid) const
         {
             Battlefield::BfCapturePointMap::const_iterator itr = m_capturePoints.find(lowguid);
             if (itr != m_capturePoints.end())

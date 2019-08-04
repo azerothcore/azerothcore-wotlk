@@ -714,7 +714,7 @@ class npc_ice_tomb : public CreatureScript
             npc_ice_tombAI(Creature* creature) : NullCreatureAI(creature)
             {
                 me->SetReactState(REACT_PASSIVE);
-                _trappedPlayerGUID = 0;
+                _trappedObjectGuid::Empty;
                 _existenceCheckTimer = 1000;
                 _asphyxiationTimer = 22500;
             }
@@ -723,7 +723,7 @@ class npc_ice_tomb : public CreatureScript
             uint32 _existenceCheckTimer;
             uint16 _asphyxiationTimer;
 
-            void SetGUID(uint64 guid, int32 type)
+            void SetGUID(ObjectGuid guid, int32 type)
             {
                 if (type == DATA_TRAPPED_PLAYER)
                     _trappedPlayerGUID = guid;
@@ -741,7 +741,7 @@ class npc_ice_tomb : public CreatureScript
 
                 if (Player* player = ObjectAccessor::GetPlayer(*me, _trappedPlayerGUID))
                 {
-                    _trappedPlayerGUID = 0;
+                    _trappedObjectGuid::Empty;
                     player->RemoveAurasDueToSpell(SPELL_ICE_TOMB_DAMAGE);
                     player->RemoveAurasDueToSpell(SPELL_ASPHYXIATION);
                     player->RemoveAurasDueToSpell(SPELL_ICE_TOMB_UNTARGETABLE);

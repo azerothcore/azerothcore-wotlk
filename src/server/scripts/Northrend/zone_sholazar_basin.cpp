@@ -302,7 +302,7 @@ public:
     {
         bool running;
         bool success;
-        uint64 playerGUID;
+        ObjectGuid playerGUID;
         uint64 thunderbrewGUID;
         int32 tensecstimer;
         int32 timer;
@@ -317,7 +317,7 @@ public:
         {
             running = false;
             success = false;
-            playerGUID = 0;
+            ObjectGuid::Empty;
             thunderbrewGUID = 0;
             tensecstimer = 0;
             timer = 0;
@@ -348,7 +348,7 @@ public:
             Say(MCM_TEXT_START);
         }
 
-        void CheckAction(uint8 a, uint64 guid)
+        void CheckAction(uint8 a, ObjectGuid guid)
         {
             if (guid != playerGUID)
                 return;
@@ -866,7 +866,7 @@ public:
             sayStep = 0;
             timer = 0;
             phase = 0;
-            playerGUID = 0;
+            ObjectGuid::Empty;
             orphanGUID = 0;
         }
 
@@ -1010,7 +1010,7 @@ public:
             uint8 sayStep;
             uint32 timer;
             int8 phase;
-            uint64 playerGUID;
+            ObjectGuid playerGUID;
             uint64 orphanGUID;
     };
 

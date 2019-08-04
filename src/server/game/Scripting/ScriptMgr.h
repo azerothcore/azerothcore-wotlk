@@ -1360,15 +1360,15 @@ class ScriptMgr
         void OnPlayerChat(Player* player, uint32 type, uint32 lang, std::string& msg, Guild* guild);
         void OnPlayerChat(Player* player, uint32 type, uint32 lang, std::string& msg, Channel* channel);
         void OnPlayerEmote(Player* player, uint32 emote);
-        void OnPlayerTextEmote(Player* player, uint32 textEmote, uint32 emoteNum, uint64 guid);
+        void OnPlayerTextEmote(Player* player, uint32 textEmote, uint32 emoteNum, ObjectGuid guid);
         void OnPlayerSpellCast(Player* player, Spell* spell, bool skipCheck);
         void OnPlayerLogin(Player* player);
         void OnPlayerLoadFromDB(Player* player);
         void OnPlayerLogout(Player* player);
         void OnPlayerCreate(Player* player);
         void OnPlayerSave(Player* player);
-        void OnPlayerDelete(uint64 guid, uint32 accountId);
-        void OnPlayerFailedDelete(uint64 guid, uint32 accountId);
+        void OnPlayerDelete(ObjectGuid guid, uint32 accountId);
+        void OnPlayerFailedDelete(ObjectGuid guid, uint32 accountId);
         void OnPlayerBindToInstance(Player* player, Difficulty difficulty, uint32 mapid, bool permanent);
         void OnPlayerUpdateZone(Player* player, uint32 newZone, uint32 newArea);
         void OnPlayerUpdateArea(Player* player, uint32 oldArea, uint32 newArea);
@@ -1427,9 +1427,9 @@ class ScriptMgr
 
     public: /* GroupScript */
 
-        void OnGroupAddMember(Group* group, uint64 guid);
-        void OnGroupInviteMember(Group* group, uint64 guid);
-        void OnGroupRemoveMember(Group* group, uint64 guid, RemoveMethod method, uint64 kicker, const char* reason);
+        void OnGroupAddMember(Group* group, ObjectGuid guid);
+        void OnGroupInviteMember(Group* group, ObjectGuid guid);
+        void OnGroupRemoveMember(Group* group, ObjectGuid guid, RemoveMethod method, uint64 kicker, const char* reason);
         void OnGroupChangeLeader(Group* group, uint64 newLeaderGuid, uint64 oldLeaderGuid);
         void OnGroupDisband(Group* group);
 

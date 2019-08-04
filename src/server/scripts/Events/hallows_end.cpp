@@ -905,7 +905,7 @@ class boss_headless_horseman : public CreatureScript
 
             EventMap events;
             SummonList summons;
-            uint64 playerGUID;
+            ObjectGuid playerGUID;
             uint8 talkCount;
             bool inFight;
             uint8 phase;
@@ -1031,7 +1031,7 @@ class boss_headless_horseman : public CreatureScript
             {
                 events.Reset();
                 summons.DespawnAll();
-                playerGUID = 0;
+                ObjectGuid::Empty;
                 talkCount = 0;
                 phase = 0;
                 inFight = false;

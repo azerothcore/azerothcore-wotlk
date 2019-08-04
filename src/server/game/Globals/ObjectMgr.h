@@ -715,7 +715,7 @@ class ObjectMgr
 
         typedef std::map<uint32, uint32> CharacterConversionMap;
 
-        Player* GetPlayerByLowGUID(uint32 lowguid) const;
+        Player* GetPlayerByLowGUID(ObjectGuid guid) const;
 
         GameObjectTemplate const* GetGameObjectTemplate(uint32 entry);
         bool IsGameObjectStaticTransport(uint32 entry);
@@ -733,8 +733,8 @@ class ObjectMgr
         static uint32 ChooseDisplayId(CreatureTemplate const* cinfo, CreatureData const* data = NULL);
         static void ChooseCreatureFlags(CreatureTemplate const* cinfo, uint32& npcflag, uint32& unit_flags, uint32& dynamicflags, CreatureData const* data = NULL);
         EquipmentInfo const* GetEquipmentInfo(uint32 entry, int8& id);
-        CreatureAddon const* GetCreatureAddon(uint32 lowguid);
-        GameObjectAddon const* GetGameObjectAddon(uint32 lowguid);
+        CreatureAddon const* GetCreatureAddon(ObjectGuid guid);
+        GameObjectAddon const* GetGameObjectAddon(ObjectGuid guid);
         GameObjectTemplateAddon const* GetGameObjectTemplateAddon(uint32 entry) const;
         CreatureAddon const* GetCreatureTemplateAddon(uint32 entry);
         ItemTemplate const* GetItemTemplate(uint32 entry);
@@ -766,9 +766,9 @@ class ObjectMgr
         void GetPlayerLevelInfo(uint32 race, uint32 class_, uint8 level, PlayerLevelInfo* info) const;
 
         uint64 GetPlayerGUIDByName(std::string const& name) const;
-        bool GetPlayerNameByGUID(uint64 guid, std::string &name) const;
-        TeamId GetPlayerTeamIdByGUID(uint64 guid) const;
-        uint32 GetPlayerAccountIdByGUID(uint64 guid) const;
+        bool GetPlayerNameByGUID(ObjectGuid guid, std::string &name) const;
+        TeamId GetPlayerTeamIdByGUID(ObjectGuid guid) const;
+        uint32 GetPlayerAccountIdByGUID(ObjectGuid guid) const;
         uint32 GetPlayerAccountIdByPlayerName(std::string const& name) const;
 
         uint32 GetNearestTaxiNode(float x, float y, float z, uint32 mapid, uint32 teamId);
@@ -1134,7 +1134,7 @@ class ObjectMgr
         }
         CreatureData& NewOrExistCreatureData(uint32 guid) { return _creatureDataStore[guid]; }
         void DeleteCreatureData(uint32 guid);
-        uint64 GetLinkedRespawnGuid(uint64 guid) const
+        uint64 GetLinkedRespawnGuid(ObjectGuid guid) const
         {
             LinkedRespawnContainer::const_iterator itr = _linkedRespawnStore.find(guid);
             if (itr == _linkedRespawnStore.end()) return 0;

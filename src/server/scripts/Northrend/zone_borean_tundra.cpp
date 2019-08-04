@@ -1119,7 +1119,7 @@ public:
             uiEventTimer = 0;
             uiEventPhase = 0;
 
-            uiPlayerGUID = 0;
+            uiObjectGuid::Empty;
 
             DoCast(SPELL_SHROUD_OF_THE_DEATH_CULTIST);
 
@@ -1316,10 +1316,10 @@ public:
         void Reset() override
         {
             _events.Reset();
-            _playerGUID = 0;
+            _ObjectGuid::Empty;
         }
 
-        void SetGUID(uint64 guid, int32 /*action*/) override
+        void SetGUID(ObjectGuid guid, int32 /*action*/) override
         {
             if (_playerGUID)
                 return;
@@ -1349,7 +1349,7 @@ public:
                     case EVENT_TALK:
                         if (Player* player = ObjectAccessor::GetPlayer(*me, _playerGUID))
                             Talk(SAY_BLOODMAGE_LAURITH, player);
-                        _playerGUID = 0;
+                        _ObjectGuid::Empty;
                         _events.ScheduleEvent(EVENT_RESET_ORIENTATION, 5000);
                         break;
                     case EVENT_RESET_ORIENTATION:

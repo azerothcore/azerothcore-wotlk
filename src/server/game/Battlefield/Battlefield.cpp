@@ -308,7 +308,7 @@ void Battlefield::KickAfkPlayers()
                     player->TeleportTo(KickPosition);
 }
 
-void Battlefield::KickPlayerFromBattlefield(uint64 guid)
+void Battlefield::KickPlayerFromBattlefield(ObjectGuid guid)
 {
     if (Player* player = ObjectAccessor::FindPlayer(guid))
     {
@@ -526,7 +526,7 @@ Group* Battlefield::GetFreeBfRaid(TeamId TeamId)
     return NULL;
 }
 
-Group* Battlefield::GetGroupPlayer(uint64 guid, TeamId TeamId)
+Group* Battlefield::GetGroupPlayer(ObjectGuid guid, TeamId TeamId)
 {
     for (GuidSet::const_iterator itr = m_Groups[TeamId].begin(); itr != m_Groups[TeamId].end(); ++itr)
         if (Group* group = sGroupMgr->GetGroupByGUID(*itr))
@@ -617,7 +617,7 @@ GraveyardStruct const * Battlefield::GetClosestGraveyard(Player* player)
     return NULL;
 }
 
-void Battlefield::AddPlayerToResurrectQueue(uint64 npcGuid, uint64 playerGuid)
+void Battlefield::AddPlayerToResurrectQueue(uint64 npcGuid, ObjectGuid playerGUID)
 {
     for (uint8 i = 0; i < m_GraveyardList.size(); i++)
     {
@@ -632,7 +632,7 @@ void Battlefield::AddPlayerToResurrectQueue(uint64 npcGuid, uint64 playerGuid)
     }
 }
 
-void Battlefield::RemovePlayerFromResurrectQueue(uint64 playerGuid)
+void Battlefield::RemovePlayerFromResurrectQueue(ObjectGuid playerGUID)
 {
     for (uint8 i = 0; i < m_GraveyardList.size(); i++)
     {
@@ -694,7 +694,7 @@ float BfGraveyard::GetDistance(Player* player)
     return player->GetDistance2d(safeLoc->x, safeLoc->y);
 }
 
-void BfGraveyard::AddPlayer(uint64 playerGuid)
+void BfGraveyard::AddPlayer(ObjectGuid playerGUID)
 {
     if (!m_ResurrectQueue.count(playerGuid))
     {
@@ -705,7 +705,7 @@ void BfGraveyard::AddPlayer(uint64 playerGuid)
     }
 }
 
-void BfGraveyard::RemovePlayer(uint64 playerGuid)
+void BfGraveyard::RemovePlayer(ObjectGuid playerGUID)
 {
     m_ResurrectQueue.erase(m_ResurrectQueue.find(playerGuid));
 
@@ -1081,7 +1081,7 @@ void BfCapturePoint::SendUpdateWorldState(uint32 field, uint32 value)
                 player->SendUpdateWorldState(field, value);
 }
 
-void BfCapturePoint::SendObjectiveComplete(uint32 id, uint64 guid)
+void BfCapturePoint::SendObjectiveComplete(uint32 id, ObjectGuid guid)
 {
     uint8 team;
     switch (m_State)

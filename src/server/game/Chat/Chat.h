@@ -80,7 +80,7 @@ class ChatHandler
         virtual LocaleConstant GetSessionDbcLocale() const;
         virtual int GetSessionDbLocaleIndex() const;
 
-        bool HasLowerSecurity(Player* target, uint64 guid, bool strong = false);
+        bool HasLowerSecurity(Player* target, ObjectGuid guid, bool strong = false);
         bool HasLowerSecurityAccount(WorldSession* target, uint32 account, bool strong = false);
 
         void SendGlobalGMSysMessage(const char *str);
@@ -110,7 +110,7 @@ class ChatHandler
         std::string GetNameLink(Player* chr) const;
 
         GameObject* GetNearbyGameObject();
-        GameObject* GetObjectGlobalyWithGuidOrNearWithDbGuid(uint32 lowguid, uint32 entry);
+        GameObject* GetObjectGlobalyWithGuidOrNearWithDbGuid(ObjectGuid guid, uint32 entry);
         bool HasSentErrorMessage() const { return sentErrorMessage; }
         void SetSentErrorMessage(bool val){ sentErrorMessage = val; }
         static bool LoadCommandTable() { return load_command_table; }

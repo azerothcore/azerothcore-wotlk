@@ -320,7 +320,7 @@ public:
         char* guidStr = strtok((char*)args, " ");
         char* waitStr = strtok((char*)nullptr, " ");
 
-        uint32 lowGuid = atoi((char*)guidStr);
+        ObjectGuid guid = atoi((char*)guidStr);
 
         Creature* creature = nullptr;
 
@@ -468,7 +468,7 @@ public:
             if (!cId)
                 return false;
 
-            uint32 lowguid = atoi(cId);
+            ObjectGuid guid = atoi(cId);
             if (!lowguid)
                 return false;
 
@@ -800,7 +800,7 @@ public:
     //move selected creature
     static bool HandleNpcMoveCommand(ChatHandler* handler, const char* args)
     {
-        uint32 lowguid = 0;
+        ObjectGuid guid = 0;
 
         Creature* creature = handler->getSelectedCreature();
 
@@ -961,7 +961,7 @@ public:
         if (!guid_str)
             return false;
 
-        uint32 lowguid = 0;
+        ObjectGuid guid = 0;
         Creature* creature = nullptr;
 
         if (dontdel_str)
@@ -1424,7 +1424,7 @@ public:
             return false;
         }
 
-        uint32 lowguid = creature->GetDBTableGUIDLow();
+        ObjectGuid guid = creature->GetDBTableGUIDLow();
         if (creature->GetFormation())
         {
             handler->PSendSysMessage("Selected creature is already member of group %u", creature->GetFormation()->GetId());
@@ -1501,7 +1501,7 @@ public:
         /*if (!*args)
             return false;
 
-        uint64 guid = handler->GetSession()->GetPlayer()->GetSelection();
+        ObjectGuid guid = handler->GetSession()->GetPlayer()->GetSelection();
         if (guid == 0)
         {
             handler->SendSysMessage(LANG_NO_SELECTION);
@@ -1585,7 +1585,7 @@ public:
             }
         }
 
-        uint64 guid;
+        ObjectGuid guid;
         guid = handler->GetSession()->GetPlayer()->GetSelection();
         if (guid == 0)
         {
@@ -1632,7 +1632,7 @@ public:
                 return false;
             }
         }
-        uint64 guid;
+        ObjectGuid guid;
         guid = handler->GetSession()->GetPlayer()->GetSelection();
         if (guid == 0)
         {

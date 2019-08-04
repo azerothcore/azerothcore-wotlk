@@ -217,7 +217,7 @@ public:
                     
     }
 
-    static void HandleCharacterLevel(Player* player, uint64 playerGuid, uint32 oldLevel, uint32 newLevel, ChatHandler* handler)
+    static void HandleCharacterLevel(Player* player, ObjectGuid playerGUID, uint32 oldLevel, uint32 newLevel, ChatHandler* handler)
     {
         if (player)
         {
@@ -902,7 +902,7 @@ public:
         if (!fileStr || !playerStr)
             return false;
 
-        uint64 guid;
+        ObjectGuid guid;
         // character name can't start from number
         if (isNumeric(playerStr))
             guid = MAKE_NEW_GUID(atoi(playerStr), 0, HIGHGUID_PLAYER);

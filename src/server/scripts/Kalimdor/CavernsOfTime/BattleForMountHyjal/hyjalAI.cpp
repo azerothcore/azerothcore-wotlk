@@ -340,7 +340,7 @@ void hyjalAI::Reset()
     IsDummy = false;
     me->setActive(true);
     // GUIDs
-    PlayerGUID = 0;
+    ObjectGuid::Empty;
     BossGUID[0] = 0;
     BossGUID[1] = 0;
 

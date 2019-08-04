@@ -619,7 +619,7 @@ public:
         {
             // I am summoned by another npc (SPELL_EFFECT_FORCE_CAST), inform Anub'arak
             if (InstanceScript* pInstance = me->GetInstanceScript())
-                if (uint64 guid = pInstance->GetData64(TYPE_ANUBARAK))
+                if (ObjectGuid guid = pInstance->GetData64(TYPE_ANUBARAK))
                     if (Creature* anub = pInstance->instance->GetCreature(guid))
                         CAST_AI(boss_anubarak_trial::boss_anubarak_trialAI, anub->AI())->JustSummoned(me);
         }

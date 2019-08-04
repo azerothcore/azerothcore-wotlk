@@ -117,7 +117,7 @@ bool OPvPCapturePoint::SetCapturePointData(uint32 entry, uint32 map, float x, fl
         return false;
     }
 
-    uint32 lowguid = sObjectMgr->AddGOData(entry, map, x, y, z, o, 0, rotation0, rotation1, rotation2, rotation3);
+    ObjectGuid guid = sObjectMgr->AddGOData(entry, map, x, y, z, o, 0, rotation0, rotation1, rotation2, rotation3);
     if (!lowguid)
         return false;
     m_capturePointGUID = MAKE_NEW_GUID(lowguid, entry, HIGHGUID_GAMEOBJECT);
@@ -278,7 +278,7 @@ bool OPvPCapturePoint::Update(uint32 diff)
     {
         for (PlayerSet::iterator itr = m_activePlayers[team].begin(); itr != m_activePlayers[team].end();)
         {
-            uint64 playerGuid = *itr;
+            ObjectGuid playerGUID = *itr;
             ++itr;
 
             if (Player* player = ObjectAccessor::FindPlayer(playerGuid))
@@ -409,7 +409,7 @@ void OPvPCapturePoint::SendUpdateWorldState(uint32 field, uint32 value)
     }
 }
 
-void OPvPCapturePoint::SendObjectiveComplete(uint32 id, uint64 guid)
+void OPvPCapturePoint::SendObjectiveComplete(uint32 id, ObjectGuid guid)
 {
     uint32 team;
     switch (m_State)
@@ -494,7 +494,7 @@ bool OPvPCapturePoint::HandleCustomSpell(Player* player, uint32 /*spellId*/, Gam
     return false;
 }
 
-bool OutdoorPvP::HandleOpenGo(Player* player, uint64 guid)
+bool OutdoorPvP::HandleOpenGo(Player* player, ObjectGuid guid)
 {
     for (OPvPCapturePointMap::iterator itr = m_capturePoints.begin(); itr != m_capturePoints.end(); ++itr)
         if (itr->second->HandleOpenGo(player, guid) >= 0)
@@ -503,7 +503,7 @@ bool OutdoorPvP::HandleOpenGo(Player* player, uint64 guid)
     return false;
 }
 
-bool OutdoorPvP::HandleGossipOption(Player* player, uint64 guid, uint32 id)
+bool OutdoorPvP::HandleGossipOption(Player* player, ObjectGuid guid, uint32 id)
 {
     for (OPvPCapturePointMap::iterator itr = m_capturePoints.begin(); itr != m_capturePoints.end(); ++itr)
         if (itr->second->HandleGossipOption(player, guid, id))
@@ -545,7 +545,7 @@ bool OPvPCapturePoint::HandleDropFlag(Player* /*player*/, uint32 /*id*/)
     return false;
 }
 
-int32 OPvPCapturePoint::HandleOpenGo(Player* /*player*/, uint64 guid)
+int32 OPvPCapturePoint::HandleOpenGo(Player* /*player*/, ObjectGuid guid)
 {
     std::map<uint64, uint32>::iterator itr = m_ObjectTypes.find(guid);
     if (itr != m_ObjectTypes.end())

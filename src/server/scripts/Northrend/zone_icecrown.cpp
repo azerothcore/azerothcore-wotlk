@@ -110,15 +110,15 @@ public:
 
         EventMap events;
         SummonList summons;
-        uint64 playerGUID;
-        uint64 playerGUID2;
+        ObjectGuid playerGUID;
+        ObjectGuid playerGUID2;
         uint32 currentQuest;
 
         void Reset()
         {
             events.Reset();
             summons.DespawnAll();
-            playerGUID = 0;
+            ObjectGuid::Empty;
             currentQuest = 0;
             me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
         }
@@ -161,7 +161,7 @@ public:
             }
         }
 
-        void StartBattle(uint64 guid, uint32 questId)
+        void StartBattle(ObjectGuid guid, uint32 questId)
         {
             events.ScheduleEvent(EVENT_VALHALAS_FIRST, 6000);
             events.ScheduleEvent(EVENT_VALHALAS_CHECK_PLAYER, 30000);
@@ -1742,10 +1742,10 @@ public:
 
         SummonList Summons;
 
-        uint64 guidDalfors;
-        uint64 guidPriest[3];
-        uint64 guidMason[3];
-        uint64 guidHalof;
+        ObjectGuid guidDalfors;
+        ObjectGuid guidPriest[3];
+        ObjectGuid guidMason[3];
+        ObjectGuid guidHalof;
 
         void Reset()
         {

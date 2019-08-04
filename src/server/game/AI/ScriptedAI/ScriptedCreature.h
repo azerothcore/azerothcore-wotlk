@@ -137,7 +137,7 @@ class EntryCheckPredicate
 {
     public:
         EntryCheckPredicate(uint32 entry) : _entry(entry) {}
-        bool operator()(uint64 guid) { return GUID_ENPART(guid) == _entry; }
+        bool operator()(ObjectGuid guid) { return guid.GetEntry() == _entry; }
 
     private:
         uint32 _entry;

@@ -76,7 +76,7 @@ enum ArenaTeamTypes
 
 struct ArenaTeamMember
 {
-    uint64 Guid;
+    ObjectGuid guid;
     std::string Name;
     uint8 Class;
     uint16 WeekGames;
@@ -126,21 +126,21 @@ class ArenaTeam
         uint32 GetRating() const          { return Stats.Rating; }
         uint32 GetAverageMMR(Group* group) const;
 
-        void SetCaptain(uint64 guid);
+        void SetCaptain(ObjectGuid guid);
         bool SetName(std::string const& name);
-        bool AddMember(uint64 playerGuid);
+        bool AddMember(ObjectGuid playerGUID);
 
         // Shouldn't be uint64 ed, because than can reference guid from members on Disband
         // and this method removes given record from list. So invalid reference can happen.
-        void DelMember(uint64 guid, bool cleanDb);
+        void DelMember(ObjectGuid guid, bool cleanDb);
 
         size_t GetMembersSize() const         { return Members.size(); }
         bool   Empty() const                  { return Members.empty(); }
         MemberList::iterator m_membersBegin() { return Members.begin(); }
         MemberList::iterator m_membersEnd()   { return Members.end(); }
-        bool IsMember(uint64 guid) const;
+        bool IsMember(ObjectGuid guid) const;
 
-        ArenaTeamMember* GetMember(uint64 guid);
+        ArenaTeamMember* GetMember(ObjectGuid guid);
         ArenaTeamMember* GetMember(std::string const& name);
 
         bool IsFighting() const;
@@ -151,7 +151,7 @@ class ArenaTeam
         void SaveToDB();
 
         void BroadcastPacket(WorldPacket* packet);
-        void BroadcastEvent(ArenaTeamEvents event, uint64 guid, uint8 strCount, std::string const& str1, std::string const& str2, std::string const& str3);
+        void BroadcastEvent(ArenaTeamEvents event, ObjectGuid guid, uint8 strCount, std::string const& str1, std::string const& str2, std::string const& str3);
         void NotifyStatsChanged();
 
         void MassInviteToEvent(WorldSession* session);
@@ -159,7 +159,7 @@ class ArenaTeam
         void Roster(WorldSession* session);
         void Query(WorldSession* session);
         void SendStats(WorldSession* session);
-        void Inspect(WorldSession* session, uint64 guid);
+        void Inspect(WorldSession* session, ObjectGuid guid);
 
         uint32 GetPoints(uint32 MemberRating);
         int32  GetMatchmakerRatingMod(uint32 ownRating, uint32 opponentRating, bool won);

@@ -259,7 +259,7 @@ class OPvPCapturePointNA : public OPvPCapturePoint
 
         bool HandleCustomSpell(Player* player, uint32 spellId, GameObject* go);
 
-        int32 HandleOpenGo(Player* player, uint64 guid);
+        int32 HandleOpenGo(Player* player, ObjectGuid guid);
 
         uint32 GetAliveGuardsCount();
         TeamId GetControllingFaction() const;

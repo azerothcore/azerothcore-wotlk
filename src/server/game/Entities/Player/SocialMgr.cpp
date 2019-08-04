@@ -17,7 +17,7 @@
 
 PlayerSocial::PlayerSocial()
 {
-    m_playerGUID = 0;
+    m_ObjectGuid::Empty;
 }
 
 PlayerSocial::~PlayerSocial()

@@ -1056,7 +1056,7 @@ bool GameObject::IsAlwaysVisibleFor(WorldObject const* seer) const
         return false;
 
     // Always seen by owner and friendly units
-    if (uint64 guid = GetOwnerGUID())
+    if (ObjectGuid guid = GetOwnerGUID())
     {
         if (seer->GetGUID() == guid)
             return true;
@@ -1227,7 +1227,7 @@ void GameObject::SetGoArtKit(uint8 kit)
         data->artKit = kit;
 }
 
-void GameObject::SetGoArtKit(uint8 artkit, GameObject* go, uint32 lowguid)
+void GameObject::SetGoArtKit(uint8 artkit, GameObject* go, ObjectGuid guid)
 {
     const GameObjectData* data = NULL;
     if (go)

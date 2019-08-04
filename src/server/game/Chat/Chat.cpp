@@ -81,7 +81,7 @@ bool ChatHandler::isAvailable(ChatCommand const& cmd) const
     return m_session->GetSecurity() >= AccountTypes(cmd.SecurityLevel);
 }
 
-bool ChatHandler::HasLowerSecurity(Player* target, uint64 guid, bool strong)
+bool ChatHandler::HasLowerSecurity(Player* target, ObjectGuid guid, bool strong)
 {
     WorldSession* target_session = NULL;
     uint32 target_account = 0;
@@ -305,7 +305,7 @@ bool ChatHandler::ExecuteCommandInTable(std::vector<ChatCommand> const& table, c
             Player* player = m_session->GetPlayer();
             if (!AccountMgr::IsPlayerAccount(m_session->GetSecurity()))
             {
-                uint64 guid = player->GetTarget();
+                ObjectGuid guid = player->GetTarget();
                 uint32 areaId = player->GetAreaId();
                 std::string areaName = "Unknown";
                 std::string zoneName = "Unknown";
@@ -733,7 +733,7 @@ WorldObject* ChatHandler::getSelectedObject()
     if (!m_session)
         return NULL;
 
-    uint64 guid = m_session->GetPlayer()->GetTarget();
+    ObjectGuid guid = m_session->GetPlayer()->GetTarget();
 
     if (guid == 0)
         return GetNearbyGameObject();
@@ -892,7 +892,7 @@ GameObject* ChatHandler::GetNearbyGameObject()
     return obj;
 }
 
-GameObject* ChatHandler::GetObjectGlobalyWithGuidOrNearWithDbGuid(uint32 lowguid, uint32 entry)
+GameObject* ChatHandler::GetObjectGlobalyWithGuidOrNearWithDbGuid(ObjectGuid guid, uint32 entry)
 {
     if (!m_session)
         return NULL;
@@ -1042,14 +1042,14 @@ uint64 ChatHandler::extractGuidFromLink(char* text)
             if (Player* player = ObjectAccessor::FindPlayerByName(name, false))
                 return player->GetGUID();
 
-            if (uint64 guid = sObjectMgr->GetPlayerGUIDByName(name))
+            if (ObjectGuid guid = sObjectMgr->GetPlayerGUIDByName(name))
                 return guid;
 
             return 0;
         }
         case SPELL_LINK_CREATURE:
         {
-            uint32 lowguid = (uint32)atol(idS);
+            ObjectGuid guid = (uint32)atol(idS);
 
             if (CreatureData const* data = sObjectMgr->GetCreatureData(lowguid))
                 return MAKE_NEW_GUID(lowguid, data->id, HIGHGUID_UNIT);
@@ -1058,7 +1058,7 @@ uint64 ChatHandler::extractGuidFromLink(char* text)
         }
         case SPELL_LINK_GAMEOBJECT:
         {
-            uint32 lowguid = (uint32)atol(idS);
+            ObjectGuid guid = (uint32)atol(idS);
 
             if (GameObjectData const* data = sObjectMgr->GetGOData(lowguid))
                 return MAKE_NEW_GUID(lowguid, data->id, HIGHGUID_GAMEOBJECT);
@@ -1104,7 +1104,7 @@ bool ChatHandler::extractPlayerTarget(char* args, Player** player, uint64* playe
             *player = pl;
 
         // if need guid value from DB (in name case for check player existence)
-        uint64 guid = !pl && (player_guid || player_name) ? sObjectMgr->GetPlayerGUIDByName(name) : 0;
+        ObjectGuid guid = !pl && (player_guid || player_name) ? sObjectMgr->GetPlayerGUIDByName(name) : 0;
 
         // if allowed player guid (if no then only online players allowed)
         if (player_guid)

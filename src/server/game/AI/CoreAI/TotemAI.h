@@ -29,7 +29,7 @@ class TotemAI : public CreatureAI
         static int Permissible(Creature const* creature);
 
     private:
-        uint64 i_victimGuid;
+        ObjectGuid i_victimGuid;
 };
 
 class KillMagnetEvent : public BasicEvent

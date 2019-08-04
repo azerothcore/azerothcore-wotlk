@@ -91,20 +91,20 @@ class npc_midsummer_torch_target : public CreatureScript
                 teleTimer = 0;
                 startTimer = 1;
                 posVec.clear();
-                playerGUID = 0;
+                ObjectGuid::Empty;
                 me->CastSpell(me, 43313, true);
                 counter = 0;
                 maxCount = 0;
             }
 
-            uint64 playerGUID;
+            ObjectGuid playerGUID;
             uint32 startTimer;
             uint32 teleTimer;
             std::vector<Position> posVec;
             uint8 counter;
             uint8 maxCount;
 
-            void SetPlayerGUID(uint64 guid, uint8 cnt)
+            void SetPlayerGUID(ObjectGuid guid, uint8 cnt)
             {
                 playerGUID = guid;
                 maxCount = cnt;

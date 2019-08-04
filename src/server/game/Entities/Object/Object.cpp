@@ -132,7 +132,7 @@ void Object::_Create(uint32 guidlow, uint32 entry, HighGuid guidhigh)
 { 
     if (!m_uint32Values) _InitValues();
 
-    uint64 guid = MAKE_NEW_GUID(guidlow, entry, guidhigh);
+    ObjectGuid guid = MAKE_NEW_GUID(guidlow, entry, guidhigh);
     SetUInt64Value(OBJECT_FIELD_GUID, guid);
     SetUInt32Value(OBJECT_FIELD_TYPE, m_objectType);
     m_PackGUID.Set(guid);
@@ -2084,7 +2084,7 @@ void WorldObject::SendMessageToSetInRange(WorldPacket* data, float dist, bool /*
     VisitNearbyWorldObject(dist, notifier);
 }
 
-void WorldObject::SendObjectDeSpawnAnim(uint64 guid)
+void WorldObject::SendObjectDeSpawnAnim(ObjectGuid guid)
 { 
     WorldPacket data(SMSG_GAMEOBJECT_DESPAWN_ANIM, 8);
     data << uint64(guid);
@@ -3023,7 +3023,7 @@ struct WorldObjectChangeAccumulator
         for (DynamicObjectMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
         {
             source = iter->GetSource();
-            uint64 guid = source->GetCasterGUID();
+            ObjectGuid guid = source->GetCasterGUID();
 
             if (IS_PLAYER_GUID(guid))
             {

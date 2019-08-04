@@ -23,7 +23,7 @@
 //void called when player click on auctioneer npc
 void WorldSession::HandleAuctionHelloOpcode(WorldPacket & recvData)
 {
-    uint64 guid;                                            //NPC guid
+    ObjectGuid guid;                                            //NPC guid
     recvData >> guid;
 
     Creature* unit = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_AUCTIONEER);
@@ -43,7 +43,7 @@ void WorldSession::HandleAuctionHelloOpcode(WorldPacket & recvData)
 }
 
 //this void causes that auction window is opened
-void WorldSession::SendAuctionHello(uint64 guid, Creature* unit)
+void WorldSession::SendAuctionHello(ObjectGuid guid, Creature* unit)
 {
     if (GetPlayer()->getLevel() < sWorld->getIntConfig(CONFIG_AUCTION_LEVEL_REQ))
     {
@@ -589,7 +589,7 @@ void WorldSession::HandleAuctionListBidderItems(WorldPacket & recvData)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_AUCTION_LIST_BIDDER_ITEMS");
 #endif
 
-    uint64 guid;                                            //NPC guid
+    ObjectGuid guid;                                            //NPC guid
     uint32 listfrom;                                        //page of auctions
     uint32 outbiddedCount;                                  //count of outbidded auctions
 
@@ -668,7 +668,7 @@ void WorldSession::HandleAuctionListOwnerItemsEvent(WorldPacket & recvData)
     _lastAuctionListOwnerItemsMSTime = World::GetGameTimeMS(); // pussywizard
 
     uint32 listfrom;
-    uint64 guid;
+    ObjectGuid guid;
 
     recvData >> guid;
     recvData >> listfrom;                                  // not used in fact (this list not have page control in client)
@@ -711,7 +711,7 @@ void WorldSession::HandleAuctionListItems(WorldPacket & recvData)
     std::string searchedname;
     uint8 levelmin, levelmax, usable;
     uint32 listfrom, auctionSlotID, auctionMainCategory, auctionSubCategory, quality;
-    uint64 guid;
+    ObjectGuid guid;
 
     recvData >> guid;
     recvData >> listfrom;                                  // start, used for page control listing by 50 elements

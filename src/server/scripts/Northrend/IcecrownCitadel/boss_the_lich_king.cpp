@@ -2620,7 +2620,7 @@ class npc_valkyr_shadowguard : public CreatureScript
                 }
             }
 
-            void SetGUID(uint64 guid, int32 /* = 0*/)
+            void SetGUID(ObjectGuid guid, int32 /* = 0*/)
             {
                 _grabbedPlayer = guid;
             }

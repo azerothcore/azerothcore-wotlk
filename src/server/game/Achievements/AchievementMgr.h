@@ -258,7 +258,7 @@ class AchievementMgr
         ~AchievementMgr();
 
         void Reset();
-        static void DeleteFromDB(uint32 lowguid);
+        static void DeleteFromDB(ObjectGuid lowguid);
         void LoadFromDB(PreparedQueryResult achievementResult, PreparedQueryResult criteriaResult);
         void SaveToDB(SQLTransaction& trans);
         void ResetAchievementCriteria(AchievementCriteriaCondition condition, uint32 value, bool evenIfCriteriaComplete = false);

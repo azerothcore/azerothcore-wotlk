@@ -424,7 +424,7 @@ public:
         uint64 ArygosGUID;
         uint64 CaelestraszGUID;
         uint64 FandralGUID;
-        uint64 PlayerGUID;
+        ObjectGuid playerGUID;
         bool eventEnd;
 
         void Reset()
@@ -436,7 +436,7 @@ public:
             ArygosGUID = 0;
             CaelestraszGUID = 0;
             FandralGUID = 0;
-            PlayerGUID = 0;
+            ObjectGuid::Empty;
             eventEnd = false;
 
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -745,7 +745,7 @@ public:
         npc_qiraj_war_spawnAI(Creature* creature) : ScriptedAI(creature) { }
 
         uint64 MobGUID;
-        uint64 PlayerGUID;
+        ObjectGuid playerGUID;
         uint32 SpellTimer1, SpellTimer2, SpellTimer3, SpellTimer4;
         bool Timers;
         bool hasTarget;
@@ -753,7 +753,7 @@ public:
         void Reset()
         {
             MobGUID = 0;
-            PlayerGUID = 0;
+            ObjectGuid::Empty;
             Timers = false;
             hasTarget = false;
         }
@@ -857,7 +857,7 @@ public:
     {
         npc_anachronos_quest_triggerAI(Creature* creature) : ScriptedAI(creature) { }
 
-        uint64 PlayerGUID;
+        ObjectGuid playerGUID;
 
         uint32 WaveTimer;
         uint32 AnnounceTimer;
@@ -871,7 +871,7 @@ public:
 
         void Reset()
         {
-            PlayerGUID = 0;
+            ObjectGuid::Empty;
 
             WaveTimer = 2000;
             AnnounceTimer = 1000;

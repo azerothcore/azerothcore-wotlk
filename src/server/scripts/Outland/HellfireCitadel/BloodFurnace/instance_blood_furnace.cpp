@@ -274,7 +274,7 @@ class instance_blood_furnace : public InstanceMapScript
                 }
             }
 
-            void PrisonerDied(uint64 guid)
+            void PrisonerDied(ObjectGuid guid)
             {
                 if (_prisonersCell[0].find(guid) != _prisonersCell[0].end() && --_prisonerCounter[0] <= 0)
                     ActivateCell(DATA_PRISON_CELL2);

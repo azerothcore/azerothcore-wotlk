@@ -1126,7 +1126,7 @@ class npc_captain_saeed : public CreatureScript
                 npc_escortAI::MoveInLineOfSight(who);
             }
 
-            void SetGUID(uint64 playerGUID, int32 type) override
+            void SetGUID(ObjectGuid playerGUID, int32 type) override
             {
                 if (type == DATA_START_ENCOUNTER)
                 {
@@ -1364,7 +1364,7 @@ public:
     {
         npc_commander_dawnforgeAI(Creature* creature) : ScriptedAI(creature) { }
 
-        uint64 PlayerGUID;
+        ObjectGuid playerGUID;
         uint64 ardonisGUID;
         uint64 pathaleonGUID;
 
@@ -1375,7 +1375,7 @@ public:
 
         void Reset()
         {
-            PlayerGUID = 0;
+            ObjectGuid::Empty;
             ardonisGUID = 0;
             pathaleonGUID = 0;
 
@@ -1699,7 +1699,7 @@ public:
         bool Drained;
         uint8 WeakPercent;
 
-        uint64 PlayerGUID;
+        ObjectGuid playerGUID;
 
         uint32 ManaBurnTimer;
 
@@ -1710,7 +1710,7 @@ public:
             Drained = false;
             WeakPercent = 25 + (rand() % 16); // 25-40
 
-            PlayerGUID = 0;
+            ObjectGuid::Empty;
 
             ManaBurnTimer = 5000 + (rand() % 3 * 1000); // 5-8 sec cd
 

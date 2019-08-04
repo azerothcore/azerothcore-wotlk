@@ -146,10 +146,10 @@ struct CalendarInvite
         void SetEventId(uint64 eventId) { _eventId = eventId; }
         uint64 GetEventId() const { return _eventId; }
 
-        void SetSenderGUID(uint64 guid) { _senderGUID = guid; }
+        void SetSenderGUID(ObjectGuid guid) { _senderGUID = guid; }
         uint64 GetSenderGUID() const { return _senderGUID; }
 
-        void SetInvitee(uint64 guid) { _invitee = guid; }
+        void SetInvitee(ObjectGuid guid) { _invitee = guid; }
         uint64 GetInviteeGUID() const { return _invitee; }
 
         void SetStatusTime(time_t statusTime) { _statusTime = statusTime; }
@@ -206,7 +206,7 @@ struct CalendarEvent
         void SetEventId(uint64 eventId) { _eventId = eventId; }
         uint64 GetEventId() const { return _eventId; }
 
-        void SetCreatorGUID(uint64 guid) { _creatorGUID = guid; }
+        void SetCreatorGUID(ObjectGuid guid) { _creatorGUID = guid; }
         uint64 GetCreatorGUID() const { return _creatorGUID; }
 
         void SetGuildId(uint32 guildId) { _guildId = guildId; }
@@ -276,19 +276,19 @@ class CalendarMgr
 
         CalendarEvent* GetEvent(uint64 eventId, CalendarEventStore::iterator* it = NULL);
         CalendarEventStore const& GetEvents() const { return _events; }
-        CalendarEventStore GetPlayerEvents(uint64 guid);
+        CalendarEventStore GetPlayerEvents(ObjectGuid guid);
 
         CalendarInvite* GetInvite(uint64 inviteId) const;
         CalendarEventInviteStore const& GetInvites() const { return _invites; }
         CalendarInviteStore const& GetEventInvites(uint64 eventId);
-        CalendarInviteStore GetPlayerInvites(uint64 guid);
+        CalendarInviteStore GetPlayerInvites(ObjectGuid guid);
 
         void FreeEventId(uint64 id);
         uint64 GetFreeEventId();
         void FreeInviteId(uint64 id);
         uint64 GetFreeInviteId();
 
-        uint32 GetPlayerNumPending(uint64 guid);
+        uint32 GetPlayerNumPending(ObjectGuid guid);
 
         void AddEvent(CalendarEvent* calendarEvent, CalendarSendEventType sendType);
         CalendarEventStore::iterator RemoveEvent(uint64 eventId, uint64 remover);
@@ -300,20 +300,20 @@ class CalendarMgr
         void UpdateInvite(CalendarInvite* invite);
         void UpdateInvite(CalendarInvite* invite, SQLTransaction& trans);
 
-        void RemoveAllPlayerEventsAndInvites(uint64 guid);
-        void RemovePlayerGuildEventsAndSignups(uint64 guid, uint32 guildId);
+        void RemoveAllPlayerEventsAndInvites(ObjectGuid guid);
+        void RemovePlayerGuildEventsAndSignups(ObjectGuid guid, uint32 guildId);
 
-        void SendCalendarEvent(uint64 guid, CalendarEvent const& calendarEvent, CalendarSendEventType sendType);
+        void SendCalendarEvent(ObjectGuid guid, CalendarEvent const& calendarEvent, CalendarSendEventType sendType);
         void SendCalendarEventInvite(CalendarInvite const& invite);
         void SendCalendarEventInviteAlert(CalendarEvent const& calendarEvent, CalendarInvite const& invite);
         void SendCalendarEventInviteRemove(CalendarEvent const& calendarEvent, CalendarInvite const& invite, uint32 flags);
-        void SendCalendarEventInviteRemoveAlert(uint64 guid, CalendarEvent const& calendarEvent, CalendarInviteStatus status);
+        void SendCalendarEventInviteRemoveAlert(ObjectGuid guid, CalendarEvent const& calendarEvent, CalendarInviteStatus status);
         void SendCalendarEventUpdateAlert(CalendarEvent const& calendarEvent, time_t oldEventTime);
         void SendCalendarEventStatus(CalendarEvent const& calendarEvent, CalendarInvite const& invite);
         void SendCalendarEventRemovedAlert(CalendarEvent const& calendarEvent);
         void SendCalendarEventModeratorStatusAlert(CalendarEvent const& calendarEvent, CalendarInvite const& invite);
-        void SendCalendarClearPendingAction(uint64 guid);
-        void SendCalendarCommandResult(uint64 guid, CalendarError err, char const* param = NULL);
+        void SendCalendarClearPendingAction(ObjectGuid guid);
+        void SendCalendarCommandResult(ObjectGuid guid, CalendarError err, char const* param = NULL);
 
         void SendPacketToAllEventRelatives(WorldPacket packet, CalendarEvent const& calendarEvent);
 };

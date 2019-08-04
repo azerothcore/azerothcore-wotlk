@@ -185,15 +185,15 @@ class Group
         void   RemoveAllInvites();
         bool   AddLeaderInvite(Player* player);
         bool   AddMember(Player* player);
-        bool   RemoveMember(uint64 guid, const RemoveMethod &method = GROUP_REMOVEMETHOD_DEFAULT, uint64 kicker = 0, const char* reason = NULL);
-        void   ChangeLeader(uint64 guid);
+        bool   RemoveMember(ObjectGuid guid, const RemoveMethod &method = GROUP_REMOVEMETHOD_DEFAULT, uint64 kicker = 0, const char* reason = NULL);
+        void   ChangeLeader(ObjectGuid guid);
         void   SetLootMethod(LootMethod method);
-        void   SetLooterGuid(uint64 guid);
-        void   SetMasterLooterGuid(uint64 guid);
+        void   SetLooterGuid(ObjectGuid guid);
+        void   SetMasterLooterGuid(ObjectGuid guid);
         void   UpdateLooterGuid(WorldObject* pLootedObject, bool ifneed = false);
         void   SetLootThreshold(ItemQualities threshold);
         void   Disband(bool hideDestroy=false);
-        void   SetLfgRoles(uint64 guid, const uint8 roles);
+        void   SetLfgRoles(ObjectGuid guid, const uint8 roles);
 
         // properties accessories
         bool IsFull() const;
@@ -212,16 +212,16 @@ class Group
         ItemQualities GetLootThreshold() const;
 
         // member manipulation methods
-        bool IsMember(uint64 guid) const;
-        bool IsLeader(uint64 guid) const;
+        bool IsMember(ObjectGuid guid) const;
+        bool IsLeader(ObjectGuid guid) const;
         uint64 GetMemberGUID(const std::string& name);
-        bool IsAssistant(uint64 guid) const;
+        bool IsAssistant(ObjectGuid guid) const;
 
-        Player* GetInvited(uint64 guid) const;
+        Player* GetInvited(ObjectGuid guid) const;
         Player* GetInvited(const std::string& name) const;
 
-        bool SameSubGroup(uint64 guid1, uint64 guid2) const;
-        bool SameSubGroup(uint64 guid1, MemberSlot const* slot2) const;
+        bool SameSubGroup(ObjectGuid guid1, ObjectGuid guid2) const;
+        bool SameSubGroup(ObjectGuid guid1, MemberSlot const* slot2) const;
         bool SameSubGroup(Player const* member1, Player const* member2) const;
         bool HasFreeSlotSubGroup(uint8 subgroup) const;
 
@@ -230,7 +230,7 @@ class Group
         GroupReference const* GetFirstMember() const { return m_memberMgr.getFirst(); }
         uint32 GetMembersCount() const { return m_memberSlots.size(); }
 
-        uint8 GetMemberGroup(uint64 guid) const;
+        uint8 GetMemberGroup(ObjectGuid guid) const;
 
         void ConvertToLFG();
         void ConvertToRaid();
@@ -239,9 +239,9 @@ class Group
         void SetBattlefieldGroup(Battlefield* bf);
         GroupJoinBattlegroundResult CanJoinBattlegroundQueue(Battleground const* bgTemplate, BattlegroundQueueTypeId bgQueueTypeId, uint32 MinPlayerCount, uint32 MaxPlayerCount, bool isRated, uint32 arenaSlot);
 
-        void ChangeMembersGroup(uint64 guid, uint8 group);
+        void ChangeMembersGroup(ObjectGuid guid, uint8 group);
         void SetTargetIcon(uint8 id, uint64 whoGuid, uint64 targetGuid);
-        void SetGroupMemberFlag(uint64 guid, bool apply, GroupMemberFlags flag);
+        void SetGroupMemberFlag(ObjectGuid guid, bool apply, GroupMemberFlags flag);
         void RemoveUniqueGroupMemberFlag(GroupMemberFlags flag);
 
         Difficulty GetDifficulty(bool isRaid) const;
@@ -256,7 +256,7 @@ class Group
         //void SendInit(WorldSession* session);
         void SendTargetIconList(WorldSession* session);
         void SendUpdate();
-        void SendUpdateToPlayer(uint64 playerGUID, MemberSlot* slot = NULL);
+        void SendUpdateToPlayer(ObjectGuid playerGUID, MemberSlot* slot = NULL);
         void UpdatePlayerOutOfRange(Player* player);
                                                             // ignore: GUID of player that will be ignored
         void BroadcastPacket(WorldPacket* packet, bool ignorePlayersInBGRaid, int group=-1, uint64 ignore=0);
@@ -277,9 +277,9 @@ class Group
         void GroupLoot(Loot* loot, WorldObject* pLootedObject);
         void NeedBeforeGreed(Loot* loot, WorldObject* pLootedObject);
         void MasterLoot(Loot* loot, WorldObject* pLootedObject);
-        Rolls::iterator GetRoll(uint64 Guid);
+        Rolls::iterator GetRoll(ObjectGuid guid);
         void CountTheRoll(Rolls::iterator roll, Map* allowedMap);
-        bool CountRollVote(uint64 playerGUID, uint64 Guid, uint8 Choise);
+        bool CountRollVote(ObjectGuid playerGUID, ObjectGuid guid, uint8 Choise);
         void EndRoll(Loot* loot, Map* allowedMap);
 
         // related to disenchant rolls
@@ -312,8 +312,8 @@ class Group
         void _cancelHomebindIfInstance(Player* player);
 
         void _initRaidSubGroupsCounter();
-        member_citerator _getMemberCSlot(uint64 Guid) const;
-        member_witerator _getMemberWSlot(uint64 Guid);
+        member_citerator _getMemberCSlot(ObjectGuid guid) const;
+        member_witerator _getMemberWSlot(ObjectGuid guid);
         void SubGroupCounterIncrease(uint8 subgroup);
         void SubGroupCounterDecrease(uint8 subgroup);
         void ToggleGroupMemberFlag(member_witerator slot, uint8 flag, bool apply);

@@ -256,22 +256,22 @@ class WorldSession
         /// Handle the authentication waiting queue (to be completed)
         void SendAuthWaitQue(uint32 position);
 
-        //void SendTestCreatureQueryOpcode(uint32 entry, uint64 guid, uint32 testvalue);
-        void SendNameQueryOpcode(uint64 guid);
+        //void SendTestCreatureQueryOpcode(uint32 entry, ObjectGuid guid, uint32 testvalue);
+        void SendNameQueryOpcode(ObjectGuid guid);
 
-        void SendTrainerList(uint64 guid);
-        void SendTrainerList(uint64 guid, std::string const& strTitle);
-        void SendListInventory(uint64 guid);
-        void SendShowBank(uint64 guid);
-        bool CanOpenMailBox(uint64 guid);
-        void SendShowMailBox(uint64 guid);
-        void SendTabardVendorActivate(uint64 guid);
+        void SendTrainerList(ObjectGuid guid);
+        void SendTrainerList(ObjectGuid guid, std::string const& strTitle);
+        void SendListInventory(ObjectGuid guid);
+        void SendShowBank(ObjectGuid guid);
+        bool CanOpenMailBox(ObjectGuid guid);
+        void SendShowMailBox(ObjectGuid guid);
+        void SendTabardVendorActivate(ObjectGuid guid);
         void SendSpiritResurrect();
         void SendBindPoint(Creature* npc);
 
         void SendAttackStop(Unit const* enemy);
 
-        void SendBattleGroundList(uint64 guid, BattlegroundTypeId bgTypeId = BATTLEGROUND_RB);
+        void SendBattleGroundList(ObjectGuid guid, BattlegroundTypeId bgTypeId = BATTLEGROUND_RB);
 
         void SendTradeStatus(TradeStatus status);
         void SendUpdateTrade(bool trader_data = true);
@@ -283,11 +283,11 @@ class WorldSession
         void HandleClientCastFlags(WorldPacket& recvPacket, uint8 castFlags, SpellCastTargets & targets);
 
         // Pet
-        void SendPetNameQuery(uint64 guid, uint32 petnumber);
-        void SendStablePet(uint64 guid);
-        void SendStablePetCallback(PreparedQueryResult result, uint64 guid);
+        void SendPetNameQuery(ObjectGuid guid, uint32 petnumber);
+        void SendStablePet(ObjectGuid guid);
+        void SendStablePetCallback(PreparedQueryResult result, ObjectGuid guid);
         void SendStableResult(uint8 guid);
-        bool CheckStableMaster(uint64 guid);
+        bool CheckStableMaster(ObjectGuid guid);
 
         // Account Data
         AccountData* GetAccountData(AccountDataType type) { return &m_accountData[type]; }
@@ -311,17 +311,17 @@ class WorldSession
         //used with item_page table
         bool SendItemInfo(uint32 itemid, WorldPacket data);
         //auction
-        void SendAuctionHello(uint64 guid, Creature* unit);
+        void SendAuctionHello(ObjectGuid guid, Creature* unit);
         void SendAuctionCommandResult(uint32 auctionId, uint32 Action, uint32 ErrorCode, uint32 bidError = 0);
         void SendAuctionBidderNotification(uint32 location, uint32 auctionId, uint64 bidder, uint32 bidSum, uint32 diff, uint32 item_template);
         void SendAuctionOwnerNotification(AuctionEntry* auction);
 
         //Item Enchantment
         void SendEnchantmentLog(uint64 target, uint64 caster, uint32 itemId, uint32 enchantId);
-        void SendItemEnchantTimeUpdate(uint64 Playerguid, uint64 Itemguid, uint32 slot, uint32 Duration);
+        void SendItemEnchantTimeUpdate(ObjectGuid playerGUID, uint64 Itemguid, uint32 slot, uint32 Duration);
 
         //Taxi
-        void SendTaxiStatus(uint64 guid);
+        void SendTaxiStatus(ObjectGuid guid);
         void SendTaxiMenu(Creature* unit);
         void SendDoFlight(uint32 mountDisplayId, uint32 path, uint32 pathNode = 0);
         bool SendLearnNewTaxiNode(Creature* unit);
@@ -330,7 +330,7 @@ class WorldSession
         // Guild/Arena Team
         void SendArenaTeamCommandResult(uint32 team_action, std::string const& team, std::string const& player, uint32 error_id = 0);
         void SendNotInArenaTeamPacket(uint8 type);
-        void SendPetitionShowList(uint64 guid);
+        void SendPetitionShowList(ObjectGuid guid);
 
         void BuildPartyMemberStatsChangedPacket(Player* player, WorldPacket* data);
 
@@ -723,7 +723,7 @@ class WorldSession
         //Pet
         void HandlePetAction(WorldPacket& recvData);
         void HandlePetStopAttack(WorldPacket& recvData);
-        void HandlePetActionHelper(Unit* pet, uint64 guid1, uint16 spellid, uint16 flag, uint64 guid2);
+        void HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint16 spellid, uint16 flag, ObjectGuid guid2);
         void HandlePetNameQuery(WorldPacket& recvData);
         void HandlePetSetAction(WorldPacket& recvData);
         void HandlePetAbandon(WorldPacket& recvData);
@@ -797,7 +797,7 @@ class WorldSession
 
         void SendLfgUpdatePlayer(lfg::LfgUpdateData const& updateData);
         void SendLfgUpdateParty(lfg::LfgUpdateData const& updateData);
-        void SendLfgRoleChosen(uint64 guid, uint8 roles);
+        void SendLfgRoleChosen(ObjectGuid guid, uint8 roles);
         void SendLfgRoleCheckUpdate(lfg::LfgRoleCheck const& pRoleCheck);
         void SendLfgLfrList(bool update);
         void SendLfgJoinResult(lfg::LfgJoinResultData const& joinData);
@@ -953,7 +953,7 @@ class WorldSession
         bool CanUseBank(uint64 bankerGUID = 0) const;
 
         // EnumData helpers
-        bool IsLegitCharacterForAccount(uint32 lowGUID)
+        bool IsLegitCharacterForAccount(ObjectGuid guid)
         {
             return _legitCharacters.find(lowGUID) != _legitCharacters.end();
         }

@@ -88,7 +88,7 @@ Group::~Group()
 bool Group::Create(Player* leader)
 {
     uint64 leaderGuid = leader->GetGUID();
-    uint32 lowguid = sGroupMgr->GenerateGroupId();
+    ObjectGuid guid = sGroupMgr->GenerateGroupId();
 
     m_guid = MAKE_NEW_GUID(lowguid, 0, HIGHGUID_GROUP);
     m_leaderGuid = leaderGuid;
@@ -327,7 +327,7 @@ void Group::RemoveAllInvites()
     m_invitees.clear();
 }
 
-Player* Group::GetInvited(uint64 guid) const
+Player* Group::GetInvited(ObjectGuid guid) const
 {
     for (InvitesList::const_iterator itr = m_invitees.begin(); itr != m_invitees.end(); ++itr)
     {
@@ -497,7 +497,7 @@ bool Group::AddMember(Player* player)
     return true;
 }
 
-bool Group::RemoveMember(uint64 guid, const RemoveMethod &method /*= GROUP_REMOVEMETHOD_DEFAULT*/, uint64 kicker /*= 0*/, const char* reason /*= NULL*/)
+bool Group::RemoveMember(ObjectGuid guid, const RemoveMethod &method /*= GROUP_REMOVEMETHOD_DEFAULT*/, uint64 kicker /*= 0*/, const char* reason /*= NULL*/)
 {
     BroadcastGroupUpdate();
 
@@ -1265,7 +1265,7 @@ void Group::MasterLoot(Loot* loot, WorldObject* pLootedObject)
     }
 }
 
-bool Group::CountRollVote(uint64 playerGUID, uint64 Guid, uint8 Choice)
+bool Group::CountRollVote(ObjectGuid playerGUID, ObjectGuid guid, uint8 Choice)
 {
     Rolls::iterator rollI = GetRoll(Guid);
     if (rollI == RollId.end())
@@ -1541,7 +1541,7 @@ void Group::SendUpdate()
         SendUpdateToPlayer(witr->guid, &(*witr));
 }
 
-void Group::SendUpdateToPlayer(uint64 playerGUID, MemberSlot* slot)
+void Group::SendUpdateToPlayer(ObjectGuid playerGUID, MemberSlot* slot)
 {
     Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(playerGUID);
 
@@ -1679,7 +1679,7 @@ bool Group::SameSubGroup(Player const* member1, Player const* member2) const
 }
 
 // Allows setting sub groups both for online or offline members
-void Group::ChangeMembersGroup(uint64 guid, uint8 group)
+void Group::ChangeMembersGroup(ObjectGuid guid, uint8 group)
 {
     // Only raid groups have sub groups
     if (!isRaidGroup())
@@ -2037,12 +2037,12 @@ void Group::SetLootMethod(LootMethod method)
     m_lootMethod = method;
 }
 
-void Group::SetLooterGuid(uint64 guid)
+void Group::SetLooterGuid(ObjectGuid guid)
 {
     m_looterGuid = guid;
 }
 
-void Group::SetMasterLooterGuid(uint64 guid)
+void Group::SetMasterLooterGuid(ObjectGuid guid)
 {
     m_masterLooterGuid = guid;
 }
@@ -2052,7 +2052,7 @@ void Group::SetLootThreshold(ItemQualities threshold)
     m_lootThreshold = threshold;
 }
 
-void Group::SetLfgRoles(uint64 guid, const uint8 roles)
+void Group::SetLfgRoles(ObjectGuid guid, const uint8 roles)
 {
     member_witerator slot = _getMemberWSlot(guid);
     if (slot == m_memberSlots.end())
@@ -2132,12 +2132,12 @@ ItemQualities Group::GetLootThreshold() const
     return m_lootThreshold;
 }
 
-bool Group::IsMember(uint64 guid) const
+bool Group::IsMember(ObjectGuid guid) const
 {
     return _getMemberCSlot(guid) != m_memberSlots.end();
 }
 
-bool Group::IsLeader(uint64 guid) const
+bool Group::IsLeader(ObjectGuid guid) const
 {
     return (GetLeaderGUID() == guid);
 }
@@ -2150,7 +2150,7 @@ uint64 Group::GetMemberGUID(const std::string& name)
     return 0;
 }
 
-bool Group::IsAssistant(uint64 guid) const
+bool Group::IsAssistant(ObjectGuid guid) const
 {
     member_citerator mslot = _getMemberCSlot(guid);
     if (mslot == m_memberSlots.end())
@@ -2158,7 +2158,7 @@ bool Group::IsAssistant(uint64 guid) const
     return mslot->flags & MEMBER_FLAG_ASSISTANT;
 }
 
-bool Group::SameSubGroup(uint64 guid1, uint64 guid2) const
+bool Group::SameSubGroup(ObjectGuid guid1, ObjectGuid guid2) const
 {
     member_citerator mslot2 = _getMemberCSlot(guid2);
     if (mslot2 == m_memberSlots.end())
@@ -2166,7 +2166,7 @@ bool Group::SameSubGroup(uint64 guid1, uint64 guid2) const
     return SameSubGroup(guid1, &*mslot2);
 }
 
-bool Group::SameSubGroup(uint64 guid1, MemberSlot const* slot2) const
+bool Group::SameSubGroup(ObjectGuid guid1, MemberSlot const* slot2) const
 {
     member_citerator mslot1 = _getMemberCSlot(guid1);
     if (mslot1 == m_memberSlots.end() || !slot2)
@@ -2179,7 +2179,7 @@ bool Group::HasFreeSlotSubGroup(uint8 subgroup) const
     return (m_subGroupsCounts && m_subGroupsCounts[subgroup] < MAXGROUPSIZE);
 }
 
-uint8 Group::GetMemberGroup(uint64 guid) const
+uint8 Group::GetMemberGroup(ObjectGuid guid) const
 {
     member_citerator mslot = _getMemberCSlot(guid);
     if (mslot == m_memberSlots.end())
@@ -2197,7 +2197,7 @@ void Group::SetBattlefieldGroup(Battlefield *bg)
     m_bfGroup = bg;
 }
 
-void Group::SetGroupMemberFlag(uint64 guid, bool apply, GroupMemberFlags flag)
+void Group::SetGroupMemberFlag(ObjectGuid guid, bool apply, GroupMemberFlags flag)
 {
     // Assistants, main assistants and main tanks are only available in raid groups
     if (!isRaidGroup())
@@ -2257,7 +2257,7 @@ bool Group::isRollLootActive() const
     return !RollId.empty();
 }
 
-Group::Rolls::iterator Group::GetRoll(uint64 Guid)
+Group::Rolls::iterator Group::GetRoll(ObjectGuid guid)
 {
     Rolls::iterator iter;
     for (iter=RollId.begin(); iter != RollId.end(); ++iter)
@@ -2283,7 +2283,7 @@ void Group::_initRaidSubGroupsCounter()
         ++m_subGroupsCounts[itr->group];
 }
 
-Group::member_citerator Group::_getMemberCSlot(uint64 Guid) const
+Group::member_citerator Group::_getMemberCSlot(ObjectGuid guid) const
 {
     for (member_citerator itr = m_memberSlots.begin(); itr != m_memberSlots.end(); ++itr)
         if (itr->guid == Guid)
@@ -2291,7 +2291,7 @@ Group::member_citerator Group::_getMemberCSlot(uint64 Guid) const
     return m_memberSlots.end();
 }
 
-Group::member_witerator Group::_getMemberWSlot(uint64 Guid)
+Group::member_witerator Group::_getMemberWSlot(ObjectGuid guid)
 {
     for (member_witerator itr = m_memberSlots.begin(); itr != m_memberSlots.end(); ++itr)
         if (itr->guid == Guid)

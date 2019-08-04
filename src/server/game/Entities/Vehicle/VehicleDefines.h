@@ -54,7 +54,7 @@ enum VehicleNPCs
 
 struct PassengerInfo
 {
-    uint64 Guid;
+    ObjectGuid guid;
     bool IsUnselectable;
 
     void Reset()

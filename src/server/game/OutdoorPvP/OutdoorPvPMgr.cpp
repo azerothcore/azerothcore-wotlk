@@ -181,7 +181,7 @@ ZoneScript* OutdoorPvPMgr::GetZoneScript(uint32 zoneId)
         return NULL;
 }
 
-bool OutdoorPvPMgr::HandleOpenGo(Player* player, uint64 guid)
+bool OutdoorPvPMgr::HandleOpenGo(Player* player, ObjectGuid guid)
 {
     TRINITY_GUARD(ACE_Thread_Mutex, _lock); // pussywizard
     for (OutdoorPvPSet::iterator itr = m_OutdoorPvPSet.begin(); itr != m_OutdoorPvPSet.end(); ++itr)
@@ -192,7 +192,7 @@ bool OutdoorPvPMgr::HandleOpenGo(Player* player, uint64 guid)
     return false;
 }
 
-void OutdoorPvPMgr::HandleGossipOption(Player* player, uint64 guid, uint32 gossipid)
+void OutdoorPvPMgr::HandleGossipOption(Player* player, ObjectGuid guid, uint32 gossipid)
 {
     TRINITY_GUARD(ACE_Thread_Mutex, _lock); // pussywizard
     for (OutdoorPvPSet::iterator itr = m_OutdoorPvPSet.begin(); itr != m_OutdoorPvPSet.end(); ++itr)

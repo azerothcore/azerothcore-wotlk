@@ -61,9 +61,6 @@ SmartScript::SmartScript()
     mUseTextTimer = false;
     mTalkerEntry = 0;
     mTemplate = SMARTAI_TEMPLATE_BASIC;
-    meOrigGUID = 0;
-    goOrigGUID = 0;
-    mLastInvoker = 0;
     mScriptType = SMART_SCRIPT_TYPE_CREATURE;
     isProcessingTimedActionList = false;
 
@@ -103,7 +100,7 @@ void SmartScript::OnReset()
         }
     }
     ProcessEventsFor(SMART_EVENT_RESET);
-    mLastInvoker = 0;
+    mLastInvoker.Clear();
     mCounterList.clear();
 
     // Xinef: Fix Combat Movement
@@ -1283,7 +1280,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
         if (!targets)
             break;
 
-        instance->SetData64(e.action.setInstanceData64.field, targets->front()->GetGUID());
+        instance->SetData64(e.action.setInstanceData64.field, targets->front()->GetGUID().GetRawValue());
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         sLog->outDebug(LOG_FILTER_DATABASE_AI, "SmartScript::ProcessAction: SMART_ACTION_SET_INST_DATA64: Field: %u, data: %lu",
             e.action.setInstanceData64.field, targets->front()->GetGUID());
@@ -2050,20 +2047,20 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
         {
             if (IsCreature(*itr))
             {
-                if (!meOrigGUID)
-                    meOrigGUID = me ? me->GetGUID() : 0;
-                if (!goOrigGUID)
-                    goOrigGUID = go ? go->GetGUID() : 0;
+                if (!meOrigGUID && me)
+                    meOrigGUID = me->GetGUID();
+                if (!goOrigGUID && go)
+                    goOrigGUID = go->GetGUID();
                 go = NULL;
                 me = (*itr)->ToCreature();
                 break;
             }
             else if (IsGameObject(*itr))
             {
-                if (!meOrigGUID)
-                    meOrigGUID = me ? me->GetGUID() : 0;
-                if (!goOrigGUID)
-                    goOrigGUID = go ? go->GetGUID() : 0;
+                if (!meOrigGUID && me)
+                    meOrigGUID = me->GetGUID();
+                if (!goOrigGUID && go)
+                    goOrigGUID = go->GetGUID();
                 go = (*itr)->ToGameObject();
                 me = NULL;
                 break;
@@ -4469,7 +4466,7 @@ void SmartScript::SetData(uint32 id, uint32 value)
 {
 }
 
-void SmartScript::SetGUID(uint64 guid, int32 id)
+void SmartScript::SetGUID(ObjectGuid guid, int32 id)
 {
 }
 

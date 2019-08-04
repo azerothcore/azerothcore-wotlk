@@ -370,7 +370,7 @@ public:
         WorldObject* object = nullptr;
         if (*args)
         {
-            uint64 guid = handler->extractGuidFromLink((char*)args);
+            ObjectGuid guid = handler->extractGuidFromLink((char*)args);
             if (guid)
                 object = (WorldObject*)ObjectAccessor::GetObjectByTypeMask(*handler->GetSession()->GetPlayer(), guid, TYPEMASK_UNIT | TYPEMASK_GAMEOBJECT);
 
@@ -935,7 +935,7 @@ public:
 
     static bool HandleGUIDCommand(ChatHandler* handler, char const* /*args*/)
     {
-        uint64 guid = handler->GetSession()->GetPlayer()->GetTarget();
+        ObjectGuid guid = handler->GetSession()->GetPlayer()->GetTarget();
 
         if (guid == 0)
         {
@@ -1041,7 +1041,7 @@ public:
 
         if (*args)
         {
-            uint64 guid = handler->extractGuidFromLink((char*)args);
+            ObjectGuid guid = handler->extractGuidFromLink((char*)args);
             if (guid)
                 obj = (WorldObject*)ObjectAccessor::GetObjectByTypeMask(*handler->GetSession()->GetPlayer(), guid, TYPEMASK_UNIT|TYPEMASK_GAMEOBJECT);
 
@@ -1755,7 +1755,7 @@ public:
 
         // Account data print variables
         std::string userName          = handler->GetTrinityString(LANG_ERROR);
-        uint32 lowguid                = GUID_LOPART(targetGuid);
+        ObjectGuid guid                = GUID_LOPART(targetGuid);
         uint32 accId                  = 0;
         std::string eMail             = handler->GetTrinityString(LANG_ERROR);
         std::string regMail           = handler->GetTrinityString(LANG_ERROR);
@@ -3056,7 +3056,7 @@ public:
         }
         else if (targetName)
         {
-            if (uint64 playerGUID = sWorld->GetGlobalPlayerGUID(name))
+            if (ObjectGuid playerGUID = sWorld->GetGlobalPlayerGUID(name))
             {
                 PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_AURA_FROZEN);
                 stmt->setUInt32(0, GUID_LOPART(playerGUID));
@@ -3074,7 +3074,7 @@ public:
     {
         Player* player = nullptr;
         Group* group = nullptr;
-        uint64 guid = 0;
+        ObjectGuid guid = 0;
         char* nameStr = strtok((char*)args, " ");
 
         if (handler->GetPlayerGroupAndGUIDByName(nameStr, player, group, guid))
@@ -3091,7 +3091,7 @@ public:
     {
         Player* player = nullptr;
         Group* group = nullptr;
-        uint64 guid = 0;
+        ObjectGuid guid = 0;
         char* nameStr = strtok((char*)args, " ");
 
         if (handler->GetPlayerGroupAndGUIDByName(nameStr, player, group, guid))
@@ -3105,7 +3105,7 @@ public:
     {
         Player* player = nullptr;
         Group* group = nullptr;
-        uint64 guid = 0;
+        ObjectGuid guid = 0;
         char* nameStr = strtok((char*)args, " ");
 
         if (handler->GetPlayerGroupAndGUIDByName(nameStr, player, group, guid, true))
@@ -3122,8 +3122,8 @@ public:
 
         Player* playerSource = nullptr;
         Group* groupSource = nullptr;
-        uint64 guidSource = 0;
-        uint64 guidTarget = 0;
+        ObjectGuid guidSource = 0;
+        ObjectGuid guidTarget = 0;
         char* nameplgrStr = strtok((char*)args, " ");
         char* nameplStr = strtok(nullptr, " ");
 
@@ -3173,7 +3173,7 @@ public:
     static bool HandleGroupListCommand(ChatHandler* handler, char const* args)
     {
         Player* playerTarget;
-        uint64 guidTarget = 0;
+        ObjectGuid guidTarget = 0;
         std::string nameTarget;
 
         uint32 parseGUID = MAKE_NEW_GUID(atol((char*)args), 0, HIGHGUID_PLAYER);
