@@ -31,7 +31,7 @@ void UpdateData::AddUpdateBlock(const ByteBuffer &block)
 
 void UpdateData::AddUpdateBlock(const UpdateData &block)
 {
-    m_data << block.m_data;
+    m_data.append(block.m_data);
     m_blockCount += block.m_blockCount;
 }
 
