@@ -8,6 +8,7 @@
 #include "ScriptedCreature.h"
 #include "karazhan.h"
 #include "PassiveAI.h"
+#include "SpellInfo.h"
 
 enum TerestianSays
 {
