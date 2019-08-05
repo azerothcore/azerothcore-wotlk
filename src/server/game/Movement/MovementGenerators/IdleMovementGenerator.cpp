@@ -38,7 +38,7 @@ void RotateMovementGenerator::Initialize(Unit* owner)
 
 bool RotateMovementGenerator::Update(Unit* owner, uint32 diff)
 {
-	if (!owner)
+	if (!owner || !owner->IsInWorld())
         return false;
 	
     float angle = owner->GetOrientation();
@@ -95,7 +95,7 @@ void DistractMovementGenerator::Finalize(Unit* owner)
 
 bool DistractMovementGenerator::Update(Unit* owner, uint32 time_diff)
 {
-    if (!owner || owner->IsInCombat() || time_diff > m_timer)
+    if (!owner || !owner->IsInWorld() || owner->IsInCombat() || time_diff > m_timer)
         return false;
 
     m_timer -= time_diff;

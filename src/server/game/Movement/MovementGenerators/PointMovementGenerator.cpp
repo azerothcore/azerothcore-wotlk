@@ -155,6 +155,9 @@ void AssistanceMovementGenerator::Finalize(Unit* unit)
 
 bool EffectMovementGenerator::Update(Unit* unit, uint32)
 {
+	if(!unit || !owner->IsInWorld())
+		return false;
+	
     return !unit->movespline->Finalized();
 }
 
