@@ -6,24 +6,29 @@
 #include "ScriptedCreature.h"
 #include "karazhan.h"
 
-enum MaidenOfVirtue
+enum Spells 
 {
-    SAY_AGGRO                   = 0,
-    SAY_SLAY                    = 1,
-    SAY_REPENTANCE              = 2,
-    SAY_DEATH                   = 3,
+    SPELL_REPENTANCE    = 29511,
+    SPELL_HOLYFIRE      = 29522,
+    SPELL_HOLYWRATH     = 32445,
+    SPELL_HOLYGROUND    = 29523,
+    SPELL_BERSERK       = 26662
+};
 
-    SPELL_REPENTANCE            = 29511,
-    SPELL_HOLY_FIRE             = 29522,
-    SPELL_HOLY_WRATH            = 32445,
-    SPELL_HOLY_GROUND           = 29523,
-    SPELL_BERSERK               = 26662,
+enum Yells
+{
+    SAY_AGGRO           = 0,
+    SAY_SLAY            = 1,
+    SAY_REPENTANCE      = 2,
+    SAY_DEATH           = 3
+}
 
-    EVENT_SPELL_REPENTANCE      = 1,
-    EVENT_SPELL_HOLY_FIRE       = 2,
-    EVENT_SPELL_HOLY_WRATH      = 3,
-    EVENT_SPELL_ENRAGE          = 4,
-    EVENT_KILL_TALK             = 5
+enum Events
+{
+    EVENT_REPENTANCE    = 1,
+    EVENT_HOLYFIRE      = 2,
+    EVENT_HOLYWRATH     = 3,
+    EVENT_ENRAGE        = 4
 };
 
 class boss_maiden_of_virtue : public CreatureScript
@@ -60,11 +65,11 @@ class boss_maiden_of_virtue : public CreatureScript
                 BossAI::EnterCombat(who);
                 Talk(SAY_AGGRO);
 
-                me->CastSpell(me, SPELL_HOLY_GROUND, true);
-                events.ScheduleEvent(EVENT_SPELL_REPENTANCE, 25000);
-                events.ScheduleEvent(EVENT_SPELL_HOLY_FIRE, 8000);
-                events.ScheduleEvent(EVENT_SPELL_HOLY_WRATH, 15000);
-                events.ScheduleEvent(EVENT_SPELL_ENRAGE, 600000);
+                DoCastSelf(SPELL_HOLYGROUND, true);
+                events.ScheduleEvent(EVENT_REPENTANCE, urand(33000, 45000));
+                events.ScheduleEvent(EVENT_HOLYFIRE, Seconds(8));
+                events.ScheduleEvent(EVENT_HOLYWRATH, urand(15000, 25000));
+                events.ScheduleEvent(EVENT_ENRAGE, 600000);
                 DoZoneInCombat();
             }
 
@@ -77,25 +82,33 @@ class boss_maiden_of_virtue : public CreatureScript
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
 
-                switch (events.ExecuteEvent())
+                while (uint32 eventId = events.ExecuteEvent())
                 {
-                    case EVENT_SPELL_REPENTANCE:
-                        me->CastSpell(me, SPELL_REPENTANCE, true);
-                        events.ScheduleEvent(EVENT_SPELL_REPENTANCE, urand(25000, 35000));
-                        break;
-                    case EVENT_SPELL_HOLY_FIRE:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 40.0f, true))
-                            me->CastSpell(target, SPELL_HOLY_FIRE, true);
-                        events.ScheduleEvent(EVENT_SPELL_HOLY_FIRE, urand(8000, 18000));
-                        break;
-                    case EVENT_SPELL_HOLY_WRATH:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 40.0f, true))
-                            me->CastSpell(target, SPELL_HOLY_WRATH, true);
-                        events.ScheduleEvent(EVENT_SPELL_HOLY_WRATH, urand(20000, 25000));
-                        break;
-                    case EVENT_SPELL_ENRAGE:
-                        me->CastSpell(me, SPELL_BERSERK, true);
-                        break;
+
+                    switch (eventId)
+                    {
+                        case EVENT_REPENTANCE:
+                            DoCastVictim(SPELL_REPENTANCE);
+                            Talk(SAY_REPENTANCE);
+                            events.ScheduleEvent(EVENT_REPENTANCE, 35000);
+                            break;
+                        case EVENT_HOLYFIRE:
+                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f, true))
+                                DoCast(target, SPELL_HOLYFIRE);
+                            events.ScheduleEvent(EVENT_HOLYFIRE, urand(8000, 19000));
+                            break;
+                        case EVENT_HOLYWRATH:
+                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 40.0f, true))
+                                DoCast(target, SPELL_HOLYWRATH);
+                            events.ScheduleEvent(EVENT_HOLYWRATH, urand(15000, 25000));
+                            break;
+                        case EVENT_ENRAGE:
+                            DoCastSelf(SPELL_BERSERK, true);
+                            break;
+                    }
+
+                    if (me->HasUnitState(UNIT_STATE_CASTING))
+                    return;
                 }
 
                 DoMeleeAttackIfReady();
