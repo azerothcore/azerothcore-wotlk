@@ -21,7 +21,7 @@ enum Yells
     SAY_SLAY            = 1,
     SAY_REPENTANCE      = 2,
     SAY_DEATH           = 3
-}
+};
 
 enum Events
 {
@@ -47,11 +47,8 @@ class boss_maiden_of_virtue : public CreatureScript
 
             void KilledUnit(Unit* /*victim*/)
             {
-                if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
-                {
+                if (urand(0, 1) == 0)
                     Talk(SAY_SLAY);
-                    events.ScheduleEvent(EVENT_KILL_TALK, 5000);
-                }
             }
 
             void JustDied(Unit* killer)
