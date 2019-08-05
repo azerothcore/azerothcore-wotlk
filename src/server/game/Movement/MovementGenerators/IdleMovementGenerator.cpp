@@ -38,16 +38,21 @@ void RotateMovementGenerator::Initialize(Unit* owner)
 
 bool RotateMovementGenerator::Update(Unit* owner, uint32 diff)
 {
+	if (!owner)
+        return false;
+	
     float angle = owner->GetOrientation();
     if (m_direction == ROTATE_DIRECTION_LEFT)
     {
         angle += (float)diff * static_cast<float>(M_PI * 2) / m_maxDuration;
-        while (angle >= static_cast<float>(M_PI * 2)) angle -= static_cast<float>(M_PI * 2);
+        while (angle >= static_cast<float>(M_PI * 2))
+			angle -= static_cast<float>(M_PI * 2);
     }
     else
     {
         angle -= (float)diff * static_cast<float>(M_PI * 2) / m_maxDuration;
-        while (angle < 0) angle += static_cast<float>(M_PI * 2);
+        while (angle < 0)
+			angle += static_cast<float>(M_PI * 2);
     }
 
     owner->SetFacingTo(angle);
@@ -90,7 +95,7 @@ void DistractMovementGenerator::Finalize(Unit* owner)
 
 bool DistractMovementGenerator::Update(Unit* owner, uint32 time_diff)
 {
-    if (owner->IsInCombat() || time_diff > m_timer)
+    if (!owner || owner->IsInCombat() || time_diff > m_timer)
         return false;
 
     m_timer -= time_diff;

@@ -205,6 +205,7 @@ class MotionMaster //: private std::stack<MovementGenerator *>
         void Mutate(MovementGenerator *m, MovementSlot slot);                  // use Move* functions instead
 
         void DirectClean(bool reset);
+		void ClearExpireList();
         void DelayedClean();
 
         void DirectExpire(bool reset);

@@ -87,37 +87,16 @@ void MotionMaster::UpdateMotion(uint32 diff)
     _cleanFlag |= MMCF_INUSE;
 
     _cleanFlag |= MMCF_UPDATE;
-    if (!top()->Update(_owner, diff))
-    {
-        _cleanFlag &= ~MMCF_UPDATE;
+
+    bool isMoveGenUpdateSuccess = top()->Update(_owner, diff);
+    _cleanFlag &= ~MMCF_UPDATE;
+
+    if (!isMoveGenUpdateSuccess)
         MovementExpired();
-    }
-    else
-        _cleanFlag &= ~MMCF_UPDATE;
 
     if (_expList)
-    {
-        for (size_t i = 0; i < _expList->size(); ++i)
-        {
-            MovementGenerator* mg = (*_expList)[i];
-            DirectDelete(mg);
-        }
-
-        delete _expList;
-        _expList = NULL;
-
-        if (empty())
-            Initialize();
-        else if (needInitTop())
-            InitTop();
-        else if (_cleanFlag & MMCF_RESET)
-            top()->Reset(_owner);
-
-        _cleanFlag &= ~MMCF_RESET;
-    }
-
-    _cleanFlag &= ~MMCF_INUSE;
-
+        ClearExpireList();
+	
     if (_owner->GetTypeId() == TYPEID_PLAYER)
         _owner->UpdateUnderwaterState(_owner->GetMap(), _owner->GetPositionX(), _owner->GetPositionY(), _owner->GetPositionZ());
     else
@@ -140,6 +119,32 @@ void MotionMaster::DirectClean(bool reset)
         InitTop();
     else if (reset)
         top()->Reset(_owner);
+}
+
+void MotionMaster::ClearExpireList()
+{
+	/* Check _expList if needed
+	if (_expList)
+		return;
+	*/
+	
+    for (size_t i = 0; i < _expList->size(); ++i)
+    {
+        MovementGenerator* mg = (*_expList)[i];
+        DirectDelete(mg);
+    }
+
+    delete _expList;
+    _expList = nullptr;
+
+    if (empty())
+        Initialize();
+    else if (NeedInitTop())
+        InitTop();
+    else if (_cleanFlag & MMCF_RESET)
+        top()->Reset(_owner);
+
+    _cleanFlag &= ~MMCF_RESET;
 }
 
 void MotionMaster::DelayedClean()

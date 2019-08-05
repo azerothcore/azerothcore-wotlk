@@ -397,7 +397,7 @@ void TimedFleeingMovementGenerator::Finalize(Unit* owner)
 
 bool TimedFleeingMovementGenerator::Update(Unit* owner, uint32 time_diff)
 {
-    if (!owner->IsAlive())
+    if (!owner || !owner->IsAlive())
         return false;
 
     if (owner->HasUnitState(UNIT_STATE_ROOT | UNIT_STATE_STUNNED))
