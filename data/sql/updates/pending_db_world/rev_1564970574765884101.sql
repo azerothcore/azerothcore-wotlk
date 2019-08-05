@@ -51,6 +51,10 @@ INSERT INTO `game_event_gameobject` (`eventEntry`, `guid`) VALUES
 (73, 26743),
 (73, 24539); -- Karazhan Bell
 
--- Fix Karazhan opera event game objects 
--- Interaction fix => Disable player interaction with Door and Curtain
-UPDATE `gameobject_template` SET `flags` = 16 WHERE `entry` IN (184278,184279,183932);
+UPDATE `creature_template` SET `unit_flags`=33555200 WHERe `entry`=17265;
+UPDATE `spell_target_position` SET `PositionX`=-11240.5, `PositionY`=-1717.25, `PositionZ`=179.238, `Orientation`=1.32986 WHERE `ID`=30171 AND `EffectIndex`=0;
+UPDATE `spell_target_position` SET `PositionX`=-11251.6, `PositionY`=-1703.42, `PositionZ`=179.238, `Orientation`=6.1522 WHERE `ID`=30179 AND `EffectIndex`=0;
+
+DELETE FROM `spell_target_position` WHERE `ID`=30120;
+INSERT INTO `spell_target_position` (`ID`,`EffectIndex`,`MapID`,`PositionX`,`PositionY`,`PositionZ`,`Orientation`,`VerifiedBuild`) VALUES
+(30120, 0, 532, -11234.2, -1698.46, 179.24, 0.67621, 0)

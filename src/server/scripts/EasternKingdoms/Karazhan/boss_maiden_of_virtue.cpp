@@ -67,7 +67,7 @@ class boss_maiden_of_virtue : public CreatureScript
 
                 DoCastSelf(SPELL_HOLYGROUND, true);
                 events.ScheduleEvent(EVENT_REPENTANCE, urand(33000, 45000));
-                events.ScheduleEvent(EVENT_HOLYFIRE, Seconds(8));
+                events.ScheduleEvent(EVENT_HOLYFIRE, 8000);
                 events.ScheduleEvent(EVENT_HOLYWRATH, urand(15000, 25000));
                 events.ScheduleEvent(EVENT_ENRAGE, 600000);
                 DoZoneInCombat();

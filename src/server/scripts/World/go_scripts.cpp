@@ -1246,7 +1246,7 @@ public:
                 uint8 _rings = (localTm.tm_hour - 1) % 12 + 1;
 
                 for (auto i = 0; i < _rings; ++i)
-                    _events.ScheduleEvent(EVENT_RING_BELL, Seconds(i * 4 + 1));
+                    _events.ScheduleEvent(EVENT_RING_BELL, i * 4000 + 1000);
             }
         }
 
