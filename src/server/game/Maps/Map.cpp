@@ -2166,6 +2166,15 @@ float Map::GetWaterLevel(float x, float y) const
 
 bool Map::isInLineOfSight(float x1, float y1, float z1, float x2, float y2, float z2, uint32 phasemask, LineOfSightChecks checks) const
 {
+	float maxDistX = x2 - x1;
+	float maxDistY = y2 - y1;
+	float maxDistZ = z2 - z1;
+	
+	if (maxDistX == std::numeric_limits<float>::max() || maxDistX == std::numeric_limits<float>::infinity()
+		|| maxDistY == std::numeric_limits<float>::max() || maxDistY == std::numeric_limits<float>::infinity()
+		|| maxDistZ == std::numeric_limits<float>::max() || maxDistZ == std::numeric_limits<float>::infinity())
+            return false;
+			
     if ((checks & LINEOFSIGHT_CHECK_VMAP) && !VMAP::VMapFactory::createOrGetVMapManager()->isInLineOfSight(GetId(), x1, y1, z1, x2, y2, z2))
         return false;
     
