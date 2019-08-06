@@ -32,10 +32,12 @@ void WorldSession::SendNameQueryOpcode(uint64 guid)
         return;
     }
 
+    Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(guid);
+
     data << uint8(0);                               // name known
     data << playerData->name;                       // played name
     data << uint8(0);                               // realm name - only set for cross realm interaction (such as Battlegrounds)
-    data << uint8(playerData->race);
+    data << uint8(player ? player->getRace() : playerData->race);
     data << uint8(playerData->gender);
     data << uint8(playerData->playerClass);
 
