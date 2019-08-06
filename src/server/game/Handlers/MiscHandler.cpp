@@ -43,6 +43,7 @@
 #include "AccountMgr.h"
 #include "Spell.h"
 #include "WhoListCache.h"
+
 #ifdef ELUNA
 #include "LuaEngine.h"
 #endif
@@ -212,7 +213,6 @@ void WorldSession::HandleGossipSelectOptionOpcode(WorldPacket & recv_data)
         }
     }
 }
-
 
 void WorldSession::HandleWhoOpcode(WorldPacket& recvData)
 {

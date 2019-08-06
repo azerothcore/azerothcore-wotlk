@@ -26,6 +26,7 @@ class AuctionHouseObject;
 class AuraScript;
 class Battleground;
 class BattlegroundMap;
+class BattlegroundQueue;
 class Channel;
 class ChatCommand;
 class Creature;
@@ -62,9 +63,9 @@ struct ConditionSourceInfo;
 struct Condition;
 struct ItemTemplate;
 struct OutdoorPvPData;
+struct GroupQueueInfo;
 
 #define VISIBLE_RANGE       166.0f                          //MAX visible range (size of grid)
-
 
 /*
     TODO: Add more script type classes.
@@ -836,6 +837,8 @@ class PlayerScript : public ScriptObject
         // The following methods are called when a player sends a chat message.
         virtual void OnChat(Player* /*player*/, uint32 /*type*/, uint32 /*lang*/, std::string& /*msg*/) { }
 
+        virtual void OnBeforeSendChatMessage(Player* /*player*/, uint32& /*type*/, uint32& /*lang*/, std::string& /*msg*/) { }
+
         virtual void OnChat(Player* /*player*/, uint32 /*type*/, uint32 /*lang*/, std::string& /*msg*/, Player* /*receiver*/) { }
 
         virtual void OnChat(Player* /*player*/, uint32 /*type*/, uint32 /*lang*/, std::string& /*msg*/, Group* /*group*/) { }
@@ -958,6 +961,8 @@ class PlayerScript : public ScriptObject
         virtual void OnBeforeInitTalentForLevel(Player* /*player*/, uint8& /*level*/, uint32& /*talentPointsForLevel*/) { }
 
         virtual void OnFirstLogin(Player* /*player*/) { }
+
+        virtual bool CanJoinInBattlegroundQueue(Player* /*player*/, uint64 /*BattlemasterGuid*/, BattlegroundTypeId /*BGTypeID*/, uint8 /*joinAsGroup*/, GroupJoinBattlegroundResult& /*err*/) { return true; }
 };
 
 class AccountScript : public ScriptObject
@@ -1116,6 +1121,17 @@ public:
 
     // Remove player at leave BG
     virtual void OnBattlegroundRemovePlayerAtLeave(Battleground* /*bg*/, Player* /*player*/) { }
+
+    virtual void OnAddGroup(BattlegroundQueue* /*queue*/, GroupQueueInfo* /*ginfo*/, uint32& /*index*/, Player* /*leader*/, Group* /*grp*/, PvPDifficultyEntry const* /*bracketEntry*/, bool /*isPremade*/) { }
+
+    virtual bool CanFillPlayersToBG(BattlegroundQueue* /*queue*/, Battleground* /*bg*/, const int32 /*aliFree*/, const int32 /*hordeFree*/, BattlegroundBracketId /*bracket_id*/) { return true; }
+
+    virtual bool CanFillPlayersToBGWithSpecific(BattlegroundQueue* /*queue*/, Battleground* /*bg*/, const int32 /*aliFree*/, const int32 /*hordeFree*/,
+        BattlegroundBracketId /*thisBracketId*/, BattlegroundQueue* /*specificQueue*/, BattlegroundBracketId /*specificBracketId*/) { return true; }
+
+    virtual void OnCheckNormalMatch(BattlegroundQueue* /*queue*/, uint32& /*Coef*/, Battleground* /*bgTemplate*/, BattlegroundBracketId /*bracket_id*/, uint32& /*minPlayers*/, uint32& /*maxPlayers*/) { }
+
+    virtual bool CanSendMessageQueue(BattlegroundQueue* /*queue*/, Player* /*leader*/, Battleground* /*bg*/, PvPDifficultyEntry const* /*bracketEntry*/) { return true; }
 };
 
 class SpellSC : public ScriptObject
@@ -1335,7 +1351,6 @@ class ScriptMgr
 
     public: /* PlayerScript */
 
-
         void OnBeforePlayerUpdate(Player* player, uint32 p_time);
         void OnPlayerReleasedGhost(Player* player);
         void OnPVPKill(Player* killer, Player* killed);
@@ -1355,6 +1370,7 @@ class ScriptMgr
         void OnPlayerDuelStart(Player* player1, Player* player2);
         void OnPlayerDuelEnd(Player* winner, Player* loser, DuelCompleteType type);
         void OnPlayerChat(Player* player, uint32 type, uint32 lang, std::string& msg);
+        void OnBeforeSendChatMessage(Player* player, uint32& type, uint32& lang, std::string& msg);
         void OnPlayerChat(Player* player, uint32 type, uint32 lang, std::string& msg, Player* receiver);
         void OnPlayerChat(Player* player, uint32 type, uint32 lang, std::string& msg, Group* group);
         void OnPlayerChat(Player* player, uint32 type, uint32 lang, std::string& msg, Guild* guild);
@@ -1400,6 +1416,7 @@ class ScriptMgr
         void OnBeforeInitTalentForLevel(Player* player, uint8& level, uint32& talentPointsForLevel);
         void OnFirstLogin(Player* player);
         void OnPlayerCompleteQuest(Player* player, Quest const* quest);
+        bool CanJoinInBattlegroundQueue(Player* player, uint64 BattlemasterGuid, BattlegroundTypeId BGTypeID, uint8 joinAsGroup, GroupJoinBattlegroundResult& err);
 
     public: /* AccountScript */
 
@@ -1488,8 +1505,14 @@ class ScriptMgr
         void OnBattlegroundAddPlayer(Battleground* bg, Player* player);
         void OnBattlegroundBeforeAddPlayer(Battleground* bg, Player* player);
         void OnBattlegroundRemovePlayerAtLeave(Battleground* bg, Player* player);
+        void OnAddGroup(BattlegroundQueue* queue, GroupQueueInfo* ginfo, uint32& index, Player* leader, Group* grp, PvPDifficultyEntry const* bracketEntry, bool isPremade);
+        bool CanFillPlayersToBG(BattlegroundQueue* queue, Battleground* bg, const int32 aliFree, const int32 hordeFree, BattlegroundBracketId bracket_id);
+        bool CanFillPlayersToBGWithSpecific(BattlegroundQueue* queue, Battleground* bg, const int32 aliFree, const int32 hordeFree,
+            BattlegroundBracketId thisBracketId, BattlegroundQueue* specificQueue, BattlegroundBracketId specificBracketId);
+        void OnCheckNormalMatch(BattlegroundQueue* queue, uint32& Coef, Battleground* bgTemplate, BattlegroundBracketId bracket_id, uint32& minPlayers, uint32& maxPlayers);
+        bool CanSendMessageQueue(BattlegroundQueue* queue, Player* leader, Battleground* bg, PvPDifficultyEntry const* bracketEntry);
 
-    public: /* SpellSC */ 
+    public: /* SpellSC */
  
         void OnCalcMaxDuration(Aura const* aura, int32& maxDuration);
 
