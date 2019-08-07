@@ -139,7 +139,7 @@ void MotionMaster::ClearExpireList()
 
     if (empty())
         Initialize();
-    else if (NeedInitTop())
+    else if (needInitTop())
         InitTop();
     else if (_cleanFlag & MMCF_RESET)
         top()->Reset(_owner);
