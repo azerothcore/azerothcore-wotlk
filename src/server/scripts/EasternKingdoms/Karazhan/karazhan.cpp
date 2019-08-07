@@ -339,6 +339,7 @@ public:
                 break;
             case GOSSIP_ACTION_INFO_DEF+2:
                 CloseGossipMenuFor(player);
+                pBarnesAI->m_uiEventId = urand(EVENT_OZ, EVENT_RAJ);
                 pBarnesAI->StartEvent();
                 break;
             case GOSSIP_ACTION_INFO_DEF+3:
