@@ -718,6 +718,20 @@ class npc_gunship : public CreatureScript
         }
 };
 
+class IGBHelper final
+{
+public:
+    static void PickUpGoblinRocketPack(Creature* npc)
+    {
+        // Pick Up Goblin Rocket Pack
+        Map::PlayerList const& players = npc->GetMap()->GetPlayers();
+        if (!players.isEmpty())
+            for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+                if (Player * player = itr->GetSource())
+                    player->DestroyItemCount(ITEM_GOBLIN_ROCKET_PACK, 1, true);
+    }
+};
+
 class npc_high_overlord_saurfang_igb : public CreatureScript
 {
     public:
@@ -818,6 +832,7 @@ class npc_high_overlord_saurfang_igb : public CreatureScript
                 }
                 else if (action == ACTION_EXIT_SHIP)
                 {
+                    IGBHelper::PickUpGoblinRocketPack(me);
                     G3D::Vector3 points[SaurfangExitPathSize];
                     for (uint8 i=0; i<SaurfangExitPathSize; ++i)
                     {
@@ -1154,6 +1169,7 @@ class npc_muradin_bronzebeard_igb : public CreatureScript
                 }
                 else if (action == ACTION_EXIT_SHIP)
                 {
+                    IGBHelper::PickUpGoblinRocketPack(me);
                     G3D::Vector3 points[MuradinExitPathSize];
                     for (uint8 i=0; i<MuradinExitPathSize; ++i)
                     {
