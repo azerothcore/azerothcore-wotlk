@@ -410,6 +410,15 @@ class spell_pri_item_greater_heal_refund : public SpellScriptLoader
                     return false;
                 return true;
             }
+            
+            bool CheckProc(ProcEventInfo& eventInfo)
+            {
+                if (HealInfo* healInfo = eventInfo.GetHealInfo())
+                    if (Unit* healTarget = healInfo->GetTarget())
+                        if (eventInfo.GetHitMask() & PROC_EX_NO_OVERHEAL && healTarget->IsFullHealth())
+                            return true;
+                return false;
+            }
 
             void HandleProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
             {
@@ -419,6 +428,7 @@ class spell_pri_item_greater_heal_refund : public SpellScriptLoader
 
             void Register()
             {
+                DoCheckProc += AuraCheckProcFn(spell_pri_item_greater_heal_refund_AuraScript::CheckProc);
                 OnEffectProc += AuraEffectProcFn(spell_pri_item_greater_heal_refund_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
             }
         };

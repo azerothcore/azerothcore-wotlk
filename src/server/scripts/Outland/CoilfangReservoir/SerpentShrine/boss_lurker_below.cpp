@@ -8,12 +8,12 @@
 
 enum Spells
 {
-    SPELL_WATER_BOLT        = 37138,
-    SPELL_WHIRL             = 37660,
-    SPELL_GEYSER            = 37478,
-    SPELL_SPOUT_VISUAL      = 37431,
-    SPELL_SPOUT_PERIODIC    = 37430,
-    SPELL_LURKER_SPAWN_TRIGGER = 54587 // Needed for achievement
+    SPELL_WATER_BOLT            = 37138,
+    SPELL_WHIRL                 = 37660,
+    SPELL_GEYSER                = 37478,
+    SPELL_SPOUT_VISUAL          = 37431,
+    SPELL_SPOUT_PERIODIC        = 37430,
+    SPELL_LURKER_SPAWN_TRIGGER  = 54587 // Needed for achievement
 };
 
 enum Misc
@@ -58,68 +58,68 @@ class boss_the_lurker_below : public CreatureScript
 
         struct boss_the_lurker_belowAI : public BossAI
         {
-            boss_the_lurker_belowAI(Creature* creature) : BossAI(creature, DATA_THE_LURKER_BELOW)
-            {
-            }
+            boss_the_lurker_belowAI(Creature* creature) : BossAI(creature, DATA_THE_LURKER_BELOW) { }
 
-            void Reset()
+            void Reset() override
             {
                 BossAI::Reset();
+                me->SetReactState(REACT_PASSIVE);
                 me->SetStandState(UNIT_STAND_STATE_SUBMERGED);
                 me->SetVisible(false);
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+
+                // Reset summons
+                summons.DespawnAll();
             }
 
-            void JustSummoned(Creature* summon)
+            void JustSummoned(Creature* summon) override
             {
                 summon->SetInCombatWithZone();
                 summons.Summon(summon);
             }
 
-            void DoAction(int32 param)
+            void DoAction(int32 param) override
             {
                 if (param == ACTION_START_EVENT)
+                {
+                    me->SetReactState(REACT_AGGRESSIVE);
+                    me->setAttackTimer(BASE_ATTACK, 6000);
+                    me->SetVisible(true);
+                    me->UpdateObjectVisibility(true);
+                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    me->SetStandState(UNIT_STAND_STATE_STAND);
                     me->SetInCombatWithZone();
+                }
             }
 
-            void JustDied(Unit* killer)
+            void JustDied(Unit* killer) override
             {
                 BossAI::JustDied(killer);
             }
 
-            void AttackStart(Unit* who)
+            void AttackStart(Unit* who) override
             {
                 if (who && me->GetReactState() == REACT_AGGRESSIVE)
                     me->Attack(who, true);
             }
 
-            void EnterCombat(Unit* who)
+            void EnterCombat(Unit* /*who*/) override
             {
-                BossAI::EnterCombat(who);
-                me->setAttackTimer(BASE_ATTACK, 6000);
-                me->SetVisible(true);
-                me->UpdateObjectVisibility(true);
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                me->SetStandState(UNIT_STAND_STATE_STAND);
-
                 events.ScheduleEvent(EVENT_SPELL_WHIRL, 18000);
                 events.ScheduleEvent(EVENT_SPELL_SPOUT, 45000);
                 events.ScheduleEvent(EVENT_SPELL_GEYSER, 10000);
                 events.ScheduleEvent(EVENT_PHASE_2, 125000);
             }
 
-            void MoveInLineOfSight(Unit*  /*who*/)
-            {
-            }
-
-            void UpdateAI(uint32 diff)
+            void UpdateAI(uint32 diff) override
             {
                 if (!UpdateVictim())
                     return;
 
-                events.Update(diff);
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
+
+                events.Update(diff);
 
                 switch (events.ExecuteEvent())
                 {

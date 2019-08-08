@@ -1310,7 +1310,7 @@ class spell_warl_health_funnel : public SpellScriptLoader
         }
 };
 
-// -7235 - Shadow Ward
+// -6229 - Shadow Ward
 class spell_warl_shadow_ward : public SpellScriptLoader
 {
     public:

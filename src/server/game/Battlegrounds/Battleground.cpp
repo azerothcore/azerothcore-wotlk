@@ -1150,6 +1150,8 @@ void Battleground::RemovePlayerAtLeave(Player* player)
 
     // Xinef: remove all criterias on bg leave
     player->ResetAchievementCriteria(ACHIEVEMENT_CRITERIA_CONDITION_BG_MAP, GetMapId(), true);
+
+    sScriptMgr->OnBattlegroundRemovePlayerAtLeave(this, player);
 }
 
 // this method is called when creating bg
@@ -1197,11 +1199,12 @@ void Battleground::AddPlayer(Player* player)
     if (player->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_AFK))
         player->ToggleAFK();
 
+    sScriptMgr->OnBattlegroundBeforeAddPlayer(this, player);
+
     // score struct must be created in inherited class
 
     uint64 guid = player->GetGUID();
     TeamId teamId = player->GetBgTeamId();
-
 
     // Add to list/maps
     m_Players[guid] = player;

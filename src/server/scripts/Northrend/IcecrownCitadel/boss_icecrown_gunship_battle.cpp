@@ -646,6 +646,13 @@ class npc_gunship : public CreatureScript
                                         c->DespawnOrUnsummon(1);
                                 }
                             }
+                            
+                    // Destory Goblin Rocket Pack
+                    Map::PlayerList const &PlayerList = me->GetMap()->GetPlayers();
+                    if (!PlayerList.isEmpty())
+                        for (Map::PlayerList::const_iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr)
+                            if (Player* pPlr = itr->GetSource())
+                                pPlr->DestroyItemCount(49278, 1, true);
                 }
                 else
                 {

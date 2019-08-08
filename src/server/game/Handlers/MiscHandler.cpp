@@ -43,6 +43,7 @@
 #include "AccountMgr.h"
 #include "Spell.h"
 #include "WhoListCache.h"
+
 #ifdef ELUNA
 #include "LuaEngine.h"
 #endif
@@ -212,7 +213,6 @@ void WorldSession::HandleGossipSelectOptionOpcode(WorldPacket & recv_data)
         }
     }
 }
-
 
 void WorldSession::HandleWhoOpcode(WorldPacket& recvData)
 {
@@ -1927,9 +1927,9 @@ void WorldSession::HandleHearthAndResurrect(WorldPacket& /*recv_data*/)
     if (_player->IsInFlight())
         return;
 
-    if(/*Battlefield* bf = */sBattlefieldMgr->GetBattlefieldToZoneId(_player->GetZoneId()))
+    if(Battlefield* bf = sBattlefieldMgr->GetBattlefieldToZoneId(_player->GetZoneId()))
     {
-        // bf->PlayerAskToLeave(_player); FIXME
+        bf->PlayerAskToLeave(_player);
         return;
     }
 

@@ -271,7 +271,11 @@ void BattlegroundWS::EventPlayerClickedOnFlag(Player* player, GameObject* gameOb
         }
         return;
     }
-
+    if (player->IsMounted())
+    {
+        player->Dismount();
+        player->RemoveAurasByType(SPELL_AURA_MOUNTED);
+    }
     // Alliance Flag on ground
     if (GetFlagState(TEAM_ALLIANCE) == BG_WS_FLAG_STATE_ON_GROUND && player->IsWithinDistInMap(gameObject, 10.0f) && gameObject->GetEntry() == BG_OBJECT_A_FLAG_GROUND_WS_ENTRY)
     {
