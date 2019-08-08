@@ -1,4 +1,5 @@
 #
+# Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU AGPL3 v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 # Copyright (C) 2008-2019 TrinityCore <https://www.trinitycore.org/>
 #
 # This file is free software; as a special exception the author gives
@@ -66,15 +67,7 @@ target_include_directories(fmt
   PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR})
 
-# target_compile_definitions(fmt
-#   PUBLIC
-#     -DFMT_USE_OVERRIDE
-#     -DFMT_USE_VARIADIC_TEMPLATES
-#     -DFMT_USE_RVALUE_REFERENCES
-#     -DFMT_USE_DELETED_FUNCTIONS
-#     -DFMT_USE_EXTERN_TEMPLATES)
-
-# set_target_properties(fmt
-#   PROPERTIES
-#     FOLDER
-#       "deps")
+set_target_properties(fmt
+  PROPERTIES
+    FOLDER
+      "deps")
