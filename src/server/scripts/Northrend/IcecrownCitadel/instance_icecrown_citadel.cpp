@@ -1027,6 +1027,16 @@ class instance_icecrown_citadel : public InstanceMapScript
                     if (theLichKing->IsAlive())
                         theLichKing->SetVisible(false);
             }
+            
+            void RemoveBackPack()
+            {
+                Map::PlayerList const& pl = instance->GetPlayers();
+                for (auto itr = pl.begin(); itr != pl.end(); ++itr)
+                    if (Player* p = itr->GetSource())
+                    {
+                        p->DestroyItemCount(49278, 1, true);
+                    }
+            }
 
             bool SetBossState(uint32 type, EncounterState state)
             {
@@ -1050,24 +1060,20 @@ class instance_icecrown_citadel : public InstanceMapScript
                             SpawnGunship();
                         break;
                     case DATA_ICECROWN_GUNSHIP_BATTLE:
-                       if (state == DONE)
+                        if (state == DONE)
                         {
-                            Map::PlayerList const& pl = instance->GetPlayers();
-                            for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
-                                if (Player* p = itr->GetSource())
-                                {
-                                    p->DestroyItemCount(49278, 1, true);
-
-                                    if (GameObject* loot = instance->GetGameObject(GunshipArmoryGUID))
-                                    {
+                            if (GameObject* loot = instance->GetGameObject(GunshipArmoryGUID))
+                            {
+                                Map::PlayerList const& pl = instance->GetPlayers();
+                                for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
+                                    if (Player* p = itr->GetSource())
                                         if (!p->IsGameMaster() && p->GetGroup() && p->GetGroup()->isRaidGroup())
                                         {
                                             loot->SetLootRecipient(p);
                                             break;
                                         }
-                                        loot->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_LOCKED | GO_FLAG_NOT_SELECTABLE | GO_FLAG_NODESPAWN);
-                                    }
-                                }
+                                loot->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_LOCKED | GO_FLAG_NOT_SELECTABLE | GO_FLAG_NODESPAWN);
+                            }
                         }
                         else if (state == FAIL)
                             Events.ScheduleEvent(EVENT_RESPAWN_GUNSHIP, 30000);
@@ -1746,6 +1752,8 @@ class instance_icecrown_citadel : public InstanceMapScript
                             {
                                 transport->setActive(false);
                                 transport->EnableMovement(false);
+                                //After movement is stopped remove the backpack
+                                RemoveBackPack();
                             }
                         if (Creature* captain = source->FindNearestCreature(TeamIdInInstance == TEAM_HORDE ? NPC_IGB_HIGH_OVERLORD_SAURFANG : NPC_IGB_MURADIN_BRONZEBEARD, 200.0f))
                             captain->AI()->DoAction(ACTION_EXIT_SHIP);
