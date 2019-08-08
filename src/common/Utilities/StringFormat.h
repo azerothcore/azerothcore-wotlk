@@ -19,7 +19,7 @@ namespace ACORE
         {
             return fmt::sprintf(std::forward<Format>(fmt), std::forward<Args>(args)...);
         }
-        catch (const fmt::FormatError& formatError)
+        catch (const fmt::format_error& formatError)
         {
             std::string error = "An error occurred formatting string \"" + std::string(fmt) + "\" : " + std::string(formatError.what());
             return error;
