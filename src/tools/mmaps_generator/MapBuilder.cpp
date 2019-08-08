@@ -4,18 +4,16 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "PathCommon.h"
 #include "MapBuilder.h"
-
 #include "MapTree.h"
 #include "ModelInstance.h"
+#include "PathCommon.h"
 
-#include "DetourNavMeshBuilder.h"
-#include "DetourNavMesh.h"
-#include "DetourCommon.h"
+#include <DetourCommon.h>
+#include <DetourNavMesh.h>
+#include <DetourNavMeshBuilder.h>
 
 #include "DisableMgr.h"
-#include <ace/OS_NS_unistd.h>
 
 namespace DisableMgr
 {
