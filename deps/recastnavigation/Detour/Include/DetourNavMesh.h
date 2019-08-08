@@ -25,13 +25,25 @@
 // Undefine (or define in a build cofnig) the following line to use 64bit polyref.
 // Generally not needed, useful for very large worlds.
 // Note: tiles build using 32bit refs are not compatible with 64bit refs!
-//#define DT_POLYREF64 1
+#define DT_POLYREF64 1
 
 #ifdef DT_POLYREF64
 // TODO: figure out a multiplatform version of uint64_t
 // - maybe: https://code.google.com/p/msinttypes/
 // - or: http://www.azillionmonkeys.com/qed/pstdint.h
+#if defined(WIN32) && !defined(__MINGW32__)
+/// Do not rename back to uint64. Otherwise mac complains about typedef redefinition
+typedef unsigned __int64    uint64_d;
+#else
 #include <stdint.h>
+#ifndef uint64_t
+#ifdef __linux__
+#include <linux/types.h>
+#endif
+#endif
+/// Do not rename back to uint64. Otherwise mac complains about typedef redefinition
+typedef uint64_t            uint64_d;
+#endif 
 #endif
 
 // Note: If you want to use 64-bit refs, change the types of both dtPolyRef & dtTileRef.
@@ -40,10 +52,10 @@
 /// A handle to a polygon within a navigation mesh tile.
 /// @ingroup detour
 #ifdef DT_POLYREF64
-static const unsigned int DT_SALT_BITS = 16;
-static const unsigned int DT_TILE_BITS = 28;
-static const unsigned int DT_POLY_BITS = 20;
-typedef uint64_t dtPolyRef;
+static const unsigned int DT_SALT_BITS = 12;
+static const unsigned int DT_TILE_BITS = 21;
+static const unsigned int DT_POLY_BITS = 31;
+typedef uint64_d dtPolyRef;
 #else
 typedef unsigned int dtPolyRef;
 #endif
@@ -51,7 +63,7 @@ typedef unsigned int dtPolyRef;
 /// A handle to a tile within a navigation mesh.
 /// @ingroup detour
 #ifdef DT_POLYREF64
-typedef uint64_t dtTileRef;
+typedef uint64_d dtTileRef;
 #else
 typedef unsigned int dtTileRef;
 #endif
