@@ -646,13 +646,6 @@ class npc_gunship : public CreatureScript
                                         c->DespawnOrUnsummon(1);
                                 }
                             }
-                            
-                    // Destory Goblin Rocket Pack
-                    Map::PlayerList const &PlayerList = me->GetMap()->GetPlayers();
-                    if (!PlayerList.isEmpty())
-                        for (Map::PlayerList::const_iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr)
-                            if (Player* pPlr = itr->GetSource())
-                                pPlr->DestroyItemCount(49278, 1, true);
                 }
                 else
                 {
@@ -723,6 +716,20 @@ class npc_gunship : public CreatureScript
 
             return GetIcecrownCitadelAI<npc_gunshipAI>(creature);
         }
+};
+
+class IGBHelper final
+{
+public:
+    static void PickUpGoblinRocketPack(Creature* npc)
+    {
+        // Pick Up Goblin Rocket Pack
+        Map::PlayerList const& players = npc->GetMap()->GetPlayers();
+        if (!players.isEmpty())
+            for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+                if (Player * player = itr->GetSource())
+                    player->DestroyItemCount(ITEM_GOBLIN_ROCKET_PACK, 1, true);
+    }
 };
 
 class npc_high_overlord_saurfang_igb : public CreatureScript
@@ -825,6 +832,7 @@ class npc_high_overlord_saurfang_igb : public CreatureScript
                 }
                 else if (action == ACTION_EXIT_SHIP)
                 {
+                    IGBHelper::PickUpGoblinRocketPack(me);
                     G3D::Vector3 points[SaurfangExitPathSize];
                     for (uint8 i=0; i<SaurfangExitPathSize; ++i)
                     {
@@ -1161,6 +1169,7 @@ class npc_muradin_bronzebeard_igb : public CreatureScript
                 }
                 else if (action == ACTION_EXIT_SHIP)
                 {
+                    IGBHelper::PickUpGoblinRocketPack(me);
                     G3D::Vector3 points[MuradinExitPathSize];
                     for (uint8 i=0; i<MuradinExitPathSize; ++i)
                     {
