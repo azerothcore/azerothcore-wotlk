@@ -25,7 +25,7 @@
 // Undefine (or define in a build cofnig) the following line to use 64bit polyref.
 // Generally not needed, useful for very large worlds.
 // Note: tiles build using 32bit refs are not compatible with 64bit refs!
-//#define DT_POLYREF64 1
+#define DT_POLYREF64 1
 
 #ifdef DT_POLYREF64
 // TODO: figure out a multiplatform version of uint64_t
