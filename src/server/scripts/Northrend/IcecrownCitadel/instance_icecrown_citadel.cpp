@@ -1030,12 +1030,9 @@ class instance_icecrown_citadel : public InstanceMapScript
             
             void RemoveBackPack()
             {
-                Map::PlayerList const& pl = instance->GetPlayers();
-                for (auto itr = pl.begin(); itr != pl.end(); ++itr)
-                    if (Player* p = itr->GetSource())
-                    {
-                        p->DestroyItemCount(49278, 1, true);
-                    }
+                for (auto itr : instance->GetPlayers())
+                    if (Player* _player = itr.GetSource())
+                        _player->DestroyItemCount(ITEM_GOBLIN_ROCKET_PACK, _player->GetItemCount(ITEM_GOBLIN_ROCKET_PACK), true);
             }
 
             bool SetBossState(uint32 type, EncounterState state)
