@@ -1030,7 +1030,7 @@ class instance_icecrown_citadel : public InstanceMapScript
             
             void RemoveBackPack()
             {
-                for (auto itr : instance->GetPlayers())
+                for (auto const& itr : instance->GetPlayers())
                     if (Player* _player = itr.GetSource())
                         _player->DestroyItemCount(ITEM_GOBLIN_ROCKET_PACK, _player->GetItemCount(ITEM_GOBLIN_ROCKET_PACK), true);
             }
