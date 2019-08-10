@@ -16,6 +16,7 @@
 #include "MapManager.h"
 #include "Transport.h"
 #include "Battleground.h"
+#include "Vehicle.h"
 #include "WaypointMovementGenerator.h"
 #include "InstanceSaveMgr.h"
 #include "ObjectMgr.h"
@@ -326,8 +327,8 @@ void WorldSession::HandleMovementOpcodes(WorldPacket & recvData)
 
     recvData.rfinish();                         // prevent warnings spam
 
-    // pussywizard: typical check for incomming movement packets
-    if (!mover || !mover->IsInWorld() || mover->IsDuringRemoveFromWorld() || guid != mover->GetGUID())
+    // prevent tampered movement data
+    if (guid != mover->GetGUID())
         return;
 
     if (!movementInfo.pos.IsPositionValid())
@@ -341,23 +342,47 @@ void WorldSession::HandleMovementOpcodes(WorldPacket & recvData)
         return;
     }
 
-    if (movementInfo.flags & MOVEMENTFLAG_ONTRANSPORT)
+    if (!mover->movespline->Finalized())
     {
-        // T_POS ON VEHICLES!
-        if (mover->GetVehicle())
-            movementInfo.transport.pos = mover->m_movementInfo.transport.pos;
+        recvData.rfinish();                     // prevent warnings spam
+        return;
+    }
 
-        // transports size limited
-        // (also received at zeppelin leave by some reason with t_* as absolute in continent coordinates, can be safely skipped)
-        if (movementInfo.transport.pos.GetPositionX() > 75.0f || movementInfo.transport.pos.GetPositionY() > 75.0f || movementInfo.transport.pos.GetPositionZ() > 75.0f ||
-            movementInfo.transport.pos.GetPositionX() < -75.0f || movementInfo.transport.pos.GetPositionY() < -75.0f || movementInfo.transport.pos.GetPositionZ() < -75.0f)
+    // Xinef: do not allow to move with UNIT_FLAG_DISABLE_MOVE
+    if (mover->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE))
+    {
+        // Xinef: skip moving packets
+        if (movementInfo.HasMovementFlag(MOVEMENTFLAG_MASK_MOVING))
         {
             if (plrMover)
             {
                 plrMover->SetSkipOnePacketForASH(true);
                 plrMover->UpdateMovementInfo(movementInfo);
             }
-            recvData.rfinish();                   // prevent warnings spam
+            return;
+        }
+        movementInfo.pos.Relocate(mover->GetPositionX(), mover->GetPositionY(), mover->GetPositionZ());
+
+        if (mover->GetTypeId() == TYPEID_UNIT)
+        {
+            movementInfo.transport.guid = mover->m_movementInfo.transport.guid;
+            movementInfo.transport.pos.Relocate(mover->m_movementInfo.transport.pos.GetPositionX(), mover->m_movementInfo.transport.pos.GetPositionY(), mover->m_movementInfo.transport.pos.GetPositionZ());
+            movementInfo.transport.seat = mover->m_movementInfo.transport.seat;
+        }
+    }
+
+    if (movementInfo.HasMovementFlag(MOVEMENTFLAG_ONTRANSPORT))
+    {
+        // We were teleported, skip packets that were broadcast before teleport
+        if (movementInfo.pos.GetExactDist2d(mover) > SIZE_OF_GRIDS)
+        {
+            if (plrMover)
+            {
+                plrMover->SetSkipOnePacketForASH(true);
+                plrMover->UpdateMovementInfo(movementInfo);
+                //TC_LOG_INFO("anticheat", "MovementHandler:: 2 We were teleported, skip packets that were broadcast before teleport");
+            }
+            recvData.rfinish();                 // prevent warnings spam
             return;
         }
 
@@ -405,7 +430,11 @@ void WorldSession::HandleMovementOpcodes(WorldPacket & recvData)
         }
 
         if (!mover->GetTransport() && !mover->GetVehicle())
-            movementInfo.flags &= ~MOVEMENTFLAG_ONTRANSPORT;
+        {
+            GameObject* go = mover->GetMap()->GetGameObject(movementInfo.transport.guid);
+            if (!go || go->GetGoType() != GAMEOBJECT_TYPE_TRANSPORT)
+                movementInfo.RemoveMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
+        }
     }
     else if (plrMover && plrMover->GetTransport()) // if we were on a transport, leave
     {
@@ -415,57 +444,43 @@ void WorldSession::HandleMovementOpcodes(WorldPacket & recvData)
         movementInfo.transport.Reset();
     }
 
+    // fall damage generation (ignore in flight case that can be triggered also at lags in moment teleportation to another map).
+    if (opcode == MSG_MOVE_FALL_LAND && plrMover && !plrMover->IsInFlight())
+    {
+        plrMover->HandleFall(movementInfo);
+        plrMover->SetJumpingbyOpcode(false);
+    }
+
+    // interrupt parachutes upon falling or landing in water
+    if (opcode == MSG_MOVE_FALL_LAND || opcode == MSG_MOVE_START_SWIM)
+    {
+        mover->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_LANDING); // Parachutes
+        if (plrMover)
+            plrMover->SetJumpingbyOpcode(false);
+    }
+
     if (plrMover && ((movementInfo.flags & MOVEMENTFLAG_SWIMMING) != 0) != plrMover->IsInWater())
     {
         // now client not include swimming flag in case jumping under water
         plrMover->SetInWater(!plrMover->IsInWater() || plrMover->GetBaseMap()->IsUnderWater(movementInfo.pos.GetPositionX(), movementInfo.pos.GetPositionY(), movementInfo.pos.GetPositionZ()));
-    }
-    if (plrMover)//Hook for OnPlayerMove
-        sScriptMgr->OnPlayerMove(plrMover, movementInfo, opcode);
-    // Dont allow to turn on walking if charming other player
-    if (mover->GetGUID() != _player->GetGUID())
-        movementInfo.flags &= ~MOVEMENTFLAG_WALKING;
-
-    uint32 mstime = World::GetGameTimeMS();
-    /*----------------------*/
-    if(m_clientTimeDelay == 0)
-        m_clientTimeDelay = mstime > movementInfo.time ? std::min(mstime - movementInfo.time, (uint32)100) : 0;
-
-    // Xinef: do not allow to move with UNIT_FLAG_DISABLE_MOVE
-    if (mover->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE))
-    {
-        // Xinef: skip moving packets
-        if (movementInfo.HasMovementFlag(MOVEMENTFLAG_MASK_MOVING))
-        {
-            if (plrMover)
-            {
-                plrMover->SetSkipOnePacketForASH(true);
-                plrMover->UpdateMovementInfo(movementInfo);
-            }
-            return;
-        }
-        movementInfo.pos.Relocate(mover->GetPositionX(), mover->GetPositionY(), mover->GetPositionZ());
-
-        if (mover->GetTypeId() == TYPEID_UNIT)
-        {
-            movementInfo.transport.guid = mover->m_movementInfo.transport.guid;
-            movementInfo.transport.pos.Relocate(mover->m_movementInfo.transport.pos.GetPositionX(), mover->m_movementInfo.transport.pos.GetPositionY(), mover->m_movementInfo.transport.pos.GetPositionZ());
-            movementInfo.transport.seat = mover->m_movementInfo.transport.seat;
-        }
     }
 
     bool jumpopcode = false;
     if (opcode == MSG_MOVE_JUMP)
     {
         jumpopcode = true;
-        if (plrMover && mover->IsFalling())
+        if (plrMover)
         {
-            sLog->outString("MovementHandler::DOUBLE_JUMP by Account id : %u, Player %s", plrMover->GetSession()->GetAccountId(), plrMover->GetName().c_str());
-            sWorld->SendGMText(LANG_GM_ANNOUNCE_DOUBLE_JUMP, plrMover->GetName().c_str());
-            if (sWorld->getBoolConfig(CONFIG_ANTICHEAT_DOUBLEJUMP_ENABLED))
+            plrMover->SetUnderACKmount();
+            if (mover->IsFalling())
             {
-                plrMover->GetSession()->KickPlayer();
-                return;
+                sLog->outString("MovementHandler::DOUBLE_JUMP by Account id : %u, Player %s", plrMover->GetSession()->GetAccountId(), plrMover->GetName().c_str());
+                sWorld->SendGMText(LANG_GM_ANNOUNCE_DOUBLE_JUMP, plrMover->GetName().c_str());
+                if (sWorld->getBoolConfig(CONFIG_ANTICHEAT_DOUBLEJUMP_ENABLED))
+                {
+                    plrMover->GetSession()->KickPlayer();
+                    return;
+                }
             }
         }
     }
@@ -477,7 +492,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket & recvData)
             plrMover->SetJumpingbyOpcode(true);
             plrMover->SetUnderACKmount();
         }
-        else if (!plrMover->UnderACKmount() && !plrMover->IsFlying() && !(movementInfo.flags & MOVEMENTFLAG_ONTRANSPORT))
+        else if (!plrMover->UnderACKmount() && !plrMover->IsFlying())
         {
             // fake jumper -> for example gagarin air mode with falling flag (like player jumping), but client can't sent a new coords when falling
             sLog->outString("MovementHandler::Fake_Jumper by Account id : %u, Player %s", plrMover->GetSession()->GetAccountId(), plrMover->GetName().c_str());
@@ -488,8 +503,6 @@ void WorldSession::HandleMovementOpcodes(WorldPacket & recvData)
                 return;
             }
         }
-        else
-            plrMover->SetJumpingbyOpcode(false);
     }
 
     if (sWorld->getBoolConfig(CONFIG_ANTICHEAT_FAKEFLYINGMODE_ENABLED) && plrMover && !plrMover->IsCanFlybyServer() && !plrMover->UnderACKmount() && movementInfo.HasMovementFlag(MOVEMENTFLAG_MASK_MOVING_FLY) && !plrMover->IsInWater())
@@ -515,6 +528,10 @@ void WorldSession::HandleMovementOpcodes(WorldPacket & recvData)
         plrMover->UpdateMovementInfo(movementInfo);
     WorldPacket data(opcode, recvData.size());
     //movementInfo.time = movementInfo.time + m_clientTimeDelay + MOVEMENT_PACKET_TIME_DELAY;
+    uint32 mstime = World::GetGameTimeMS();
+    /*----------------------*/
+    if (m_clientTimeDelay == 0)
+        m_clientTimeDelay = mstime > movementInfo.time ? std::min(mstime - movementInfo.time, (uint32)100) : 0;
     movementInfo.time = mstime; // pussywizard: set to time of relocation (server time), constant addition may smoothen movement clientside, but client sees target on different position than the real serverside position
 
     movementInfo.guid = mover->GetGUID();
@@ -523,39 +540,24 @@ void WorldSession::HandleMovementOpcodes(WorldPacket & recvData)
 
     mover->m_movementInfo = movementInfo;
 
-    // this is almost never true (pussywizard: only one packet when entering vehicle), normally use mover->IsVehicle()
-    if (mover->GetVehicle())
+    // Some vehicles allow the passenger to turn by himself
+    if (Vehicle* vehicle = mover->GetVehicle())
     {
-        mover->SetOrientation(movementInfo.pos.GetOrientation());
-        mover->UpdatePosition(movementInfo.pos);
+        if (VehicleSeatEntry const* seat = vehicle->GetSeatForPassenger(mover))
+        {
+            if (seat->m_flags & VEHICLE_SEAT_FLAG_ALLOW_TURNING)
+            {
+                if (movementInfo.pos.GetOrientation() != mover->GetOrientation())
+                {
+                    mover->SetOrientation(movementInfo.pos.GetOrientation());
+                    mover->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TURNING);
+                }
+            }
+        }
         return;
     }
 
-    // pussywizard: previously always mover->UpdatePosition(movementInfo.pos);
-    if (movementInfo.flags & MOVEMENTFLAG_ONTRANSPORT && mover->GetTransport())
-    {
-        float x, y, z, o;
-        movementInfo.transport.pos.GetPosition(x, y, z, o);
-        mover->GetTransport()->CalculatePassengerPosition(x, y, z, &o);
-        mover->UpdatePosition(x, y, z, o);
-    }
-    else
-        mover->UpdatePosition(movementInfo.pos);
-
-    // fall damage generation (ignore in flight case that can be triggered also at lags in moment teleportation to another map).
-    // Xinef: moved it here, previously StopMoving function called when player died relocated him to last saved coordinates (which were in air)
-    if (opcode == MSG_MOVE_FALL_LAND && plrMover && !plrMover->IsInFlight() && (!plrMover->GetTransport() || plrMover->GetTransport()->IsStaticTransport()))
-    {
-        plrMover->HandleFall(movementInfo);
-        plrMover->SetJumpingbyOpcode(false);
-    }
-    // Xinef: interrupt parachutes upon falling or landing in water
-    if (opcode == MSG_MOVE_FALL_LAND || opcode == MSG_MOVE_START_SWIM)
-    {
-        mover->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_LANDING); // Parachutes
-        if (plrMover)
-            plrMover->SetJumpingbyOpcode(false);
-    }
+    mover->UpdatePosition(movementInfo.pos);
 
     if (plrMover)                                            // nothing is charmed, or player charmed
     {
