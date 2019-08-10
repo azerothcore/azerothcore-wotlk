@@ -135,9 +135,13 @@ bool Player::CheckMovementInfo(MovementInfo const& movementInfo, bool jump)
         if (HasAuraType(SPELL_AURA_CONTROL_VEHICLE))
             return true;
 
+        bool transportflag = GetTransport() || (movementInfo.GetMovementFlags() & MOVEMENTFLAG_ONTRANSPORT) || HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
+
         if (sWorld->getBoolConfig(CONFIG_ANTICHEAT_SAFEMODE_ENABLED))
-            if (UnderACKmount())
+        {
+            if (UnderACKmount() || transportflag)
                 return true;
+        }
 
         if (IsSkipOnePacketForASH())
         {
@@ -165,7 +169,6 @@ bool Player::CheckMovementInfo(MovementInfo const& movementInfo, bool jump)
 
         float distance, movetime, speed, difftime, normaldistance, delay, delaysentrecieve, x, y;
         distance = npos.GetExactDist2d(this);
-        bool transportflag = GetTransport() || (movementInfo.GetMovementFlags() & MOVEMENTFLAG_ONTRANSPORT) || HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
 
         if (!jump && !CanFly() && !isSwimming() && !transportflag)
         {
