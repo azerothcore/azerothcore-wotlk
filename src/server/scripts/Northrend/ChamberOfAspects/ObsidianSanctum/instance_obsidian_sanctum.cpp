@@ -7,8 +7,6 @@
 #include "obsidian_sanctum.h"
 #include "Player.h"
 
-#define MAX_ENCOUNTER     1
-
 class instance_obsidian_sanctum : public InstanceMapScript
 {
 public:
@@ -44,9 +42,8 @@ public:
 
         bool IsEncounterInProgress() const
         {
-            for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
-                if (Encounters[i] == IN_PROGRESS)
-                    return true;
+            if (Encounters[BOSS_SARTHARION_EVENT] == IN_PROGRESS)
+                return true;
 
             return false;
         }
