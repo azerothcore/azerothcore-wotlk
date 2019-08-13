@@ -386,6 +386,8 @@ namespace MMAP
             printf("[Map %03i] We have %u tiles.                          \n", mapID, (unsigned int)tiles->size());
             for (std::set<uint32>::iterator it = tiles->begin(); it != tiles->end(); ++it)
             {
+                // percentageDone - increment tiles built
+                m_totalTilesBuilt++;
                 uint32 tileX, tileY;
 
                 // unpack tile coords
@@ -441,9 +443,6 @@ namespace MMAP
 
         // build navmesh tile
         buildMoveMapTile(mapID, tileX, tileY, meshData, bmin, bmax, navMesh);
-
-        // percentageDone - increment tiles built
-        m_totalTilesBuilt++;
     }
 
     /**************************************************************************/
