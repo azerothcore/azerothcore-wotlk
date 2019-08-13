@@ -3520,7 +3520,7 @@ enum PartyResult
 };
 
 #define MMAP_MAGIC 0x4d4d4150   // 'MMAP'
-#define MMAP_VERSION 9
+#define MMAP_VERSION 10
 
 struct MmapTileHeader
 {
