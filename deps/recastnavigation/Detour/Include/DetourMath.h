@@ -19,6 +19,6 @@ inline float dtMathCeilf(float x) { return ceilf(x); }
 inline float dtMathCosf(float x) { return cosf(x); }
 inline float dtMathSinf(float x) { return sinf(x); }
 inline float dtMathAtan2f(float y, float x) { return atan2f(y, x); }
-inline bool dtMathIsfinite(float x) { return std::isfinite(x); }
+inline bool dtMathIsfinite(float x) { return isfinite(x); }
 
 #endif
