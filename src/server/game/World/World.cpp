@@ -1322,7 +1322,7 @@ void World::LoadConfigSettings(bool reload)
     m_bool_configs[CONFIG_LFG_LOCATION_ALL] = sConfigMgr->GetBoolDefault("LFG.Location.All", false);
 
     // Allow afk players in sanctuary zones
-    m_bool_configs[CONFIG_AFK_PREVENT_LOGOUT_SANCTUARY] = sConfigMgr->GetBoolDefault("Misc.PreventAFKLogoutInSanctuary", false);
+    m_bool_configs[CONFIG_AFK_PREVENT_LOGOUT_SANCTUARY] = sConfigMgr->GetBoolDefault("PreventAFKLogoutInSanctuary", false);
 
     // call ScriptMgr if we're reloading the configuration
     sScriptMgr->OnAfterConfigLoad(reload);

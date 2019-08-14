@@ -1163,6 +1163,14 @@ RecruitAFriend.MaxDifference = 4
 InstantLogout = 1
 
 #
+#    PreventAFKLogoutInSanctuary 
+#        Description: Prevent players AFK in Sanctuary zones from being logged out
+#        Default:     0  - (Disabled)
+#                     1  - (Enabled)
+
+PreventAFKLogoutInSanctuary = 0
+
+#
 #    DisableWaterBreath
 #        Description: Required security level for water breathing.
 #        Default:     4  - (Disabled)
