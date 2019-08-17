@@ -43,7 +43,7 @@ jobs:
       script:
         - source ./apps/ci/ci-compile.sh
 
-    - stage: runs
+    - stage: run
       env: TRAVIS_BUILD_ID="1"
       before_install:
         - source ./apps/ci/ci-before_install.sh
