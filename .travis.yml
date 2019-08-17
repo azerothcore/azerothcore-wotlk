@@ -35,7 +35,7 @@ jobs:
           - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then git checkout $TRAVIS_BRANCH; fi
           - if [ "$TRAVIS_PULL_REQUEST" = "false" ] && [[ -n "$GITHUB_API_KEY" ]]; then git add -A . && git diff --cached --quiet || git commit -am "Import pending SQL update file..." -m "Referenced commit(s):$COMMIT_HASH" && git push https://$GITHUB_API_KEY@github.com/$TRAVIS_REPO_SLUG.git $TRAVIS_BRANCH; fi
           # sync staging with master
-          - if [ "$TRAVIS_PULL_REQUEST" = "false" ] && [ "$TRAVIS_BRANCH" = "master" ] && [[ -n "$GITHUB_API_KEY" ]]; then git fetch origin staging:staging && git checkout staging && git merge --no-edit master && git push https://$GITHUB_API_KEY@github.com/$TRAVIS_REPO_SLUG.git staging; git checkout master; fi
+          # - if [ "$TRAVIS_PULL_REQUEST" = "false" ] && [ "$TRAVIS_BRANCH" = "master" ] && [[ -n "$GITHUB_API_KEY" ]]; then git fetch origin staging:staging && git checkout staging && git merge --no-edit master && git push https://$GITHUB_API_KEY@github.com/$TRAVIS_REPO_SLUG.git staging; git checkout master; fi
           - source ./apps/ci/ci-before_install.sh
       install:
         - source ./apps/ci/ci-install.sh OFF
