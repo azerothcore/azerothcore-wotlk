@@ -185,7 +185,7 @@ extern int main(int argc, char** argv)
         return 1;
     }
 
-    sLog->outString("Authserver listening to port %d", rmport);
+    sLog->outString("Authserver listening to %s:%d", bind_ip.c_str(), rmport);
 
     // Initialize the signal handlers
     AuthServerSignalHandler SignalINT, SignalTERM;
