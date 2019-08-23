@@ -12,7 +12,6 @@
 #include "WorldPacket.h"
 #include "WorldSession.h"
 #include "DatabaseEnv.h"
-
 #include "CellImpl.h"
 #include "Chat.h"
 #include "ChannelMgr.h"
@@ -28,6 +27,7 @@
 #include "Util.h"
 #include "ScriptMgr.h"
 #include "AccountMgr.h"
+
 #ifdef ELUNA
 #include "LuaEngine.h"
 #endif
@@ -106,6 +106,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
         recvData.rfinish();
         return;
     }
+    
     if (langDesc->skill_id != 0 && !sender->HasSkill(langDesc->skill_id))
     {
         // also check SPELL_AURA_COMPREHEND_LANGUAGE (client offers option to speak in that language)
@@ -333,6 +334,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
         }
     }
 
+    sScriptMgr->OnBeforeSendChatMessage(_player, type, lang, msg);
 
     switch (type)
     {

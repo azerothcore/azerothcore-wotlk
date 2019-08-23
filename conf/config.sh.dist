@@ -152,17 +152,17 @@ DB_MYSQL_DUMP_EXEC="mysqldump"
 
 DB_AUTH_CONF="MYSQL_USER='acore'; \
                     MYSQL_PASS='acore'; \
-                    MYSQL_HOST='127.0.0.1';\
+                    MYSQL_HOST='localhost';\
                     "
 
 DB_CHARACTERS_CONF="MYSQL_USER='acore'; \
                     MYSQL_PASS='acore'; \
-                    MYSQL_HOST='127.0.0.1';\
+                    MYSQL_HOST='localhost';\
                     "
 
 DB_WORLD_CONF="MYSQL_USER='acore'; \
                     MYSQL_PASS='acore'; \
-                    MYSQL_HOST='127.0.0.1';\
+                    MYSQL_HOST='localhost';\
                     "
 
 DB_AUTH_NAME="acore_auth"

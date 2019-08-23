@@ -111,9 +111,6 @@
 #define snprintf _snprintf
 #define atoll _atoi64
 #define vsnprintf _vsnprintf
-#ifndef isfinite
-#define isfinite(X) _finite(X)
-#endif
 #define llabs _abs64
 
 #else
