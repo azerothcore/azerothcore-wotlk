@@ -1240,7 +1240,7 @@ void Pet::_LoadAuras(PreparedQueryResult result, uint32 timediff)
                 continue;
 
             // negative effects should continue counting down after logout
-            if (remaintime != -1 && (!spellInfo->IsPositive() || spellInfo->HasAttribute(SPELL_ATTR4_FADES_WHILE_LOGGED_OUT)))
+            if (remaintime != -1 && !spellInfo->IsPositive())
             {
                 if (remaintime/IN_MILLISECONDS <= int32(timediff))
                     continue;
