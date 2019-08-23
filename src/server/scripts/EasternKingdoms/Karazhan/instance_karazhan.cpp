@@ -1,9 +1,13 @@
 
 #include "ScriptMgr.h"
+#include "Creature.h"
+#include "GameObject.h"
 #include "InstanceScript.h"
 #include "karazhan.h"
 #include "SpellScript.h"
 #include "SpellAuraEffects.h"
+#include "Map.h"
+#include "Player.h"
 
 const Position OptionalSpawn[] =
 {
@@ -122,7 +126,7 @@ public:
                     HandleGameObject(m_uiStageDoorRightGUID, true);
                     if (GameObject* sideEntrance = instance->GetGameObject(m_uiSideEntranceDoor))
                         sideEntrance->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_LOCKED);
-                  
+                    instance->UpdateEncounterState(ENCOUNTER_CREDIT_KILL_CREATURE, 16812, nullptr);
                 }
                 break;
             case DATA_CHESS:
@@ -136,6 +140,11 @@ public:
             return true;
         }
 
+        void SetData64(uint32 type, uint64 data) override
+        {
+            if (type == DATA_IMAGE_OF_MEDIVH)
+                ImageGUID = data;
+        }
 
         void OnGameObjectCreate(GameObject* go) override
         {
@@ -193,8 +202,6 @@ public:
             case GO_DUST_COVERED_CHEST:
                 DustCoveredChest = go->GetGUID();
                 break;
-
-              
             }
 
             switch (OperaEvent)
@@ -253,8 +260,6 @@ public:
             }
 
             return 0;
-
-
         }
 
         uint64 GetData64(uint32 data) const override

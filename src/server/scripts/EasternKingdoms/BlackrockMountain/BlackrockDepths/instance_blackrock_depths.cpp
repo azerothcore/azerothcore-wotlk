@@ -51,7 +51,7 @@ enum GameObjects
     GO_GOLEM_ROOM_S         = 170574, // Magmus door Soutsh
     GO_THRONE_ROOM          = 170575, // Throne door
     GO_SPECTRAL_CHALICE     = 164869,
-    GO_CHEST_SEVEN          = 169243
+    GO_CHEST_SEVEN          = 169243,
 };
 
 class instance_blackrock_depths : public InstanceMapScript
@@ -155,13 +155,13 @@ public:
             case NPC_EMPEROR: EmperorGUID = creature->GetGUID(); break;
             case NPC_PHALANX: PhalanxGUID = creature->GetGUID(); break;
             case NPC_MOIRA: MoiraGUID = creature->GetGUID(); break;
-            case NPC_DOOMREL: TombBossGUIDs[0] = creature->GetGUID(); break;
-            case NPC_DOPEREL: TombBossGUIDs[1] = creature->GetGUID(); break;
-            case NPC_HATEREL: TombBossGUIDs[2] = creature->GetGUID(); break;
-            case NPC_VILEREL: TombBossGUIDs[3] = creature->GetGUID(); break;
-            case NPC_SEETHREL: TombBossGUIDs[4] = creature->GetGUID(); break;
-            case NPC_GLOOMREL: TombBossGUIDs[5] = creature->GetGUID(); break;
-            case NPC_ANGERREL: TombBossGUIDs[6] = creature->GetGUID(); break;
+            case NPC_ANGERREL:  TombBossGUIDs[0] = creature->GetGUID(); break;
+            case NPC_SEETHREL:  TombBossGUIDs[1] = creature->GetGUID(); break;
+            case NPC_DOPEREL:   TombBossGUIDs[2] = creature->GetGUID(); break;
+            case NPC_GLOOMREL:  TombBossGUIDs[3] = creature->GetGUID(); break;
+            case NPC_VILEREL:   TombBossGUIDs[4] = creature->GetGUID(); break;
+            case NPC_HATEREL:   TombBossGUIDs[5] = creature->GetGUID(); break;
+            case NPC_DOOMREL:   TombBossGUIDs[6] = creature->GetGUID(); break;
             case NPC_MAGMUS:
                 MagmusGUID = creature->GetGUID();
                 if (!creature->IsAlive())
@@ -212,13 +212,13 @@ public:
 
             switch (type)
             {
-            case DATA_EVENSTARTER:
-                TombEventStarterGUID = data;
-                if (!TombEventStarterGUID)
-                    TombOfSevenReset();//reset
-                else
-                    TombOfSevenStart();//start
-                break;
+                case DATA_EVENSTARTER:
+                    TombEventStarterGUID = data;
+                    if (!TombEventStarterGUID)
+                        TombOfSevenReset();//reset
+                    else
+                        TombOfSevenStart();//start
+                    break;
             }
         }
 
@@ -230,39 +230,39 @@ public:
 
             switch (type)
             {
-            case TYPE_RING_OF_LAW:
-                encounter[0] = data;
-                break;
-            case TYPE_VAULT:
-                encounter[1] = data;
-                break;
-            case TYPE_BAR:
-                if (data == SPECIAL)
-                    ++BarAleCount;
-                else
-                    encounter[2] = data;
-                break;
-            case TYPE_TOMB_OF_SEVEN:
-                encounter[3] = data;
-                break;
-            case TYPE_LYCEUM:
-                encounter[4] = data;
-                break;
-            case TYPE_IRON_HALL:
-                encounter[5] = data;
-                break;
-            case DATA_GHOSTKILL:
-                GhostKillCount += data;
-                break;
-            case DATA_OPEN_COFFER_DOORS:
-                OpenedCoofers += 1;
-                if (OpenedCoofers == 12)
-                {
-                    Position pos = {812.15f, -348.91f, -50.579f, 0.7f};
-                    if (TempSummon* summon = instance->SummonCreature(NPC_WATCHMAN_DOOMGRIP, pos))
-                        summon->SetTempSummonType(TEMPSUMMON_MANUAL_DESPAWN);
-                }
-                break;
+                case TYPE_RING_OF_LAW:
+                    encounter[0] = data;
+                    break;
+                case TYPE_VAULT:
+                    encounter[1] = data;
+                    break;
+                case TYPE_BAR:
+                    if (data == SPECIAL)
+                        ++BarAleCount;
+                    else
+                        encounter[2] = data;
+                    break;
+                case TYPE_TOMB_OF_SEVEN:
+                    encounter[3] = data;
+                    break;
+                case TYPE_LYCEUM:
+                    encounter[4] = data;
+                    break;
+                case TYPE_IRON_HALL:
+                    encounter[5] = data;
+                    break;
+                case DATA_GHOSTKILL:
+                    GhostKillCount += data;
+                    break;
+                case DATA_OPEN_COFFER_DOORS:
+                    OpenedCoofers += 1;
+                    if (OpenedCoofers == 12)
+                    {
+                        Position pos = {812.15f, -348.91f, -50.579f, 0.7f};
+                        if (TempSummon* summon = instance->SummonCreature(NPC_WATCHMAN_DOOMGRIP, pos))
+                            summon->SetTempSummonType(TEMPSUMMON_MANUAL_DESPAWN);
+                    }
+                    break;
             }
 
             if (data == DONE || GhostKillCount >= 7)
@@ -441,8 +441,8 @@ public:
                 if (TombTimer <= diff)
                 {
                     TombTimer = TIMER_TOMBOFTHESEVEN;
-                    ++TombEventCounter;
                     TombOfSevenEvent();
+                    ++TombEventCounter;
                     // Check Killed bosses
                     for (uint8 i = 0; i < 7; ++i)
                     {

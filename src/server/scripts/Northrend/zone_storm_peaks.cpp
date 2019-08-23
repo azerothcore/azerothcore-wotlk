@@ -122,7 +122,7 @@ public:
         uint32 hpTimer;
         bool charging;
 
-        void Reset() 
+        void Reset()
         {
             spellTimer = 0;
             hpTimer = 0;
@@ -244,12 +244,12 @@ public:
         {
             events.Reset();
             if (me->GetEntry() == NPC_TIME_LOST_PROTO_DRAKE)
-            {   
+            {
                 events.ScheduleEvent(SPELL_TIME_SHIFT, 10000);
                 events.ScheduleEvent(SPELL_TIME_LAPSE, 5000);
             }
             else
-            {   
+            {
                 events.ScheduleEvent(SPELL_FROST_BREATH, 8000);
                 events.ScheduleEvent(SPELL_FROST_CLEAVE, 5000);
             }
@@ -344,7 +344,7 @@ public:
             ScriptedAI::EnterEvadeMode();
         }
 
-        void Reset() 
+        void Reset()
         {
             me->SetRegeneratingHealth(true);
             me->SetSpeed(MOVE_RUN, 1.14f, true); // ZOMG!
@@ -470,7 +470,7 @@ public:
             if (setCharm)
             {
                 setCharm = false;
-                
+
                 if (Player* charmer = GetValidPlayer())
                 {
                     me->setFaction(16);
@@ -685,89 +685,6 @@ public:
 
 
 // Theirs
-/////////////////////
-///npc_injured_goblin
-/////////////////////
-
-enum InjuredGoblinMiner
-{
-    QUEST_BITTER_DEPARTURE     = 12832,
-    SAY_QUEST_ACCEPT           = 0,
-    SAY_END_WP_REACHED         = 1,
-    GOSSIP_ID                  = 9859,
-    GOSSIP_OPTION_ID           = 0
-};
-
-class npc_injured_goblin : public CreatureScript
-{
-public:
-    npc_injured_goblin() : CreatureScript("npc_injured_goblin") { }
-
-    struct npc_injured_goblinAI : public npc_escortAI
-    {
-        npc_injured_goblinAI(Creature* creature) : npc_escortAI(creature) { }
-
-        void WaypointReached(uint32 waypointId)
-        {
-            Player* player = GetPlayerForEscort();
-            if (!player)
-                return;
-
-            switch (waypointId)
-            {
-                case 26:
-                    Talk(SAY_END_WP_REACHED, player);
-                    break;
-                case 27:
-                    player->GroupEventHappens(QUEST_BITTER_DEPARTURE, me);
-                    break;
-            }
-        }
-
-        void EnterCombat(Unit* /*who*/) { }
-
-        void Reset() { }
-
-        void JustDied(Unit* /*killer*/)
-        {
-            Player* player = GetPlayerForEscort();
-            if (HasEscortState(STATE_ESCORT_ESCORTING) && player)
-                player->FailQuest(QUEST_BITTER_DEPARTURE);
-        }
-
-       void UpdateAI(uint32 uiDiff)
-        {
-            npc_escortAI::UpdateAI(uiDiff);
-            if (!UpdateVictim())
-                return;
-            DoMeleeAttackIfReady();
-        }
-
-        void sGossipSelect(Player* player, uint32 sender, uint32 action)
-        {
-            if (sender == GOSSIP_ID && action == GOSSIP_OPTION_ID)
-            {
-                player->CLOSE_GOSSIP_MENU();
-                me->setFaction(113);
-                npc_escortAI::Start(true, true, player->GetGUID());
-            }
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const
-    {
-        return new npc_injured_goblinAI(creature);
-    }
-
-    bool OnQuestAccept(Player* /*player*/, Creature* creature, Quest const* quest)
-    {
-        if (quest->GetQuestId() == QUEST_BITTER_DEPARTURE)
-            creature->AI()->Talk(SAY_QUEST_ACCEPT);
-
-        return false;
-    }
-};
-
 /*######
 ## npc_roxi_ramrocket
 ######*/
@@ -783,7 +700,7 @@ class npc_roxi_ramrocket : public CreatureScript
 public:
     npc_roxi_ramrocket() : CreatureScript("npc_roxi_ramrocket") { }
 
-    bool OnGossipHello(Player* player, Creature* creature)
+    bool OnGossipHello(Player* player, Creature* creature) override
     {
         //Quest Menu
         if (creature->IsQuestGiver())
@@ -791,20 +708,20 @@ public:
 
         //Trainer Menu
         if ( creature->IsTrainer() )
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_TRAINER, GOSSIP_TEXT_TRAIN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRAIN);
+            AddGossipItemFor(player, GOSSIP_ICON_TRAINER, GOSSIP_TEXT_TRAIN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRAIN);
 
         //Vendor Menu
         if ( creature->IsVendor() )
             if (player->HasSpell(SPELL_MECHANO_HOG) || player->HasSpell(SPELL_MEKGINEERS_CHOPPER))
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
+                AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
 
-        player->SEND_GOSSIP_MENU(player->GetGossipTextId(creature), creature->GetGUID());
+        SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
         return true;
     }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action)
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
     {
-        player->PlayerTalkClass->ClearMenus();
+        ClearGossipMenuFor(player);
         switch (action)
         {
         case GOSSIP_ACTION_TRAIN:
@@ -1132,7 +1049,6 @@ void AddSC_storm_peaks()
     new spell_q13007_iron_colossus();
 
     // Theirs
-    new npc_injured_goblin();
     new npc_roxi_ramrocket();
     new npc_brunnhildar_prisoner();
     new npc_freed_protodrake();

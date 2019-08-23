@@ -188,6 +188,12 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
         if (!talker)
             break;
 
+        if (!sCreatureTextMgr->TextExist(talker->GetEntry(), uint8(e.action.talk.textGroupID)))
+        {
+            sLog->outErrorDb("SmartScript::ProcessAction: SMART_ACTION_TALK: EntryOrGuid %d SourceType %u EventType %u TargetType %u using non-existent Text id %u for talker %u, ignored.", e.entryOrGuid, e.GetScriptType(), e.GetEventType(), e.GetTargetType(), e.action.talk.textGroupID,talker->GetEntry());
+            break;
+        }
+
         mTalkerEntry = talker->GetEntry();
         mLastTextID = e.action.talk.textGroupID;
         mTextTimer = e.action.talk.duration;
@@ -301,6 +307,131 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
                 sLog->outDebug(LOG_FILTER_DATABASE_AI, "SmartScript::ProcessAction:: SMART_ACTION_RANDOM_SOUND: target: %s (GuidLow: %u), sound: %u, onlyself: %u",
                     (*itr)->GetName().c_str(), (*itr)->GetGUIDLow(), sound, e.action.randomSound.onlySelf);
+#endif
+            }
+        }
+
+        delete targets;
+        break;
+    }
+    case SMART_ACTION_MUSIC:
+    {
+        ObjectList* targets = NULL;
+
+        if (e.action.music.type > 0)
+        {
+            if (me && me->FindMap())
+            {
+                Map::PlayerList const &players = me->GetMap()->GetPlayers();
+                targets = new ObjectList();
+
+                if (!players.isEmpty())
+                {
+                    for (Map::PlayerList::const_iterator i = players.begin(); i != players.end(); ++i)
+                        if (Player* player = i->GetSource())
+                        {
+                            if (player->GetZoneId() == me->GetZoneId())
+                            {
+                                if (e.action.music.type > 1)
+                                {
+                                    if (player->GetAreaId() == me->GetAreaId())
+                                        targets->push_back(player);
+                                }
+                                else
+                                    targets->push_back(player);
+                            }
+                        }
+                }
+            }
+        }
+        else
+            targets = GetTargets(e, unit);
+
+        if (targets)
+        {
+            for (ObjectList::const_iterator itr = targets->begin(); itr != targets->end(); ++itr)
+            {
+                if (IsUnit(*itr))
+                {
+                    (*itr)->SendPlayMusic(e.action.music.sound, e.action.music.onlySelf > 0);
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+                    sLog->outDebug(LOG_FILTER_DATABASE_AI, "SmartScript::ProcessAction:: SMART_ACTION_MUSIC: target: %s (GuidLow: %u), sound: %u, onlySelf: %u, type: %u",
+                        (*itr)->GetName().c_str(), (*itr)->GetGUIDLow(), e.action.music.sound, e.action.music.onlySelf, e.action.music.type);
+#endif
+                }
+            }
+
+            delete targets;
+        }
+        break;
+    }
+    case SMART_ACTION_RANDOM_MUSIC:
+    {
+        ObjectList* targets = NULL;
+
+        if (e.action.randomMusic.type > 0)
+        {
+            if (me && me->FindMap())
+            {
+                Map::PlayerList const &players = me->GetMap()->GetPlayers();
+                targets = new ObjectList();
+
+                if (!players.isEmpty())
+                {
+                    for (Map::PlayerList::const_iterator i = players.begin(); i != players.end(); ++i)
+                        if (Player* player = i->GetSource())
+                        {
+                            if (player->GetZoneId() == me->GetZoneId())
+                            {
+                                if (e.action.randomMusic.type > 1)
+                                {
+                                    if (player->GetAreaId() == me->GetAreaId())
+                                        targets->push_back(player);
+                                }
+                                else
+                                    targets->push_back(player);
+                            }
+                        }
+                }
+            }
+        }
+        else
+            targets = GetTargets(e, unit);
+
+        if (!targets)
+            break;
+
+        uint32 sounds[4];
+        sounds[0] = e.action.randomMusic.sound1;
+        sounds[1] = e.action.randomMusic.sound2;
+        sounds[2] = e.action.randomMusic.sound3;
+        sounds[3] = e.action.randomMusic.sound4;
+        uint32 temp[4];
+        uint32 count = 0;
+        for (uint8 i = 0; i < 4; i++)
+        {
+            if (sounds[i])
+            {
+                temp[count] = sounds[i];
+                ++count;
+            }
+        }
+
+        if (count == 0)
+        {
+            delete targets;
+            break;
+        }
+
+        for (ObjectList::const_iterator itr = targets->begin(); itr != targets->end(); ++itr)
+        {
+            if (IsUnit(*itr))
+            {
+                uint32 sound = temp[urand(0, count - 1)];
+                (*itr)->SendPlayMusic(sound, e.action.randomMusic.onlySelf > 0);
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+                sLog->outDebug(LOG_FILTER_DATABASE_AI, "SmartScript::ProcessAction:: SMART_ACTION_RANDOM_MUSIC: target: %s (GuidLow: %u), sound: %u, onlyself: %u, type: %u",
+                    (*itr)->GetName().c_str(), (*itr)->GetGUIDLow(), sound, e.action.randomMusic.onlySelf, e.action.randomMusic.type);
 #endif
             }
         }
@@ -1168,7 +1299,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
 
         for (ObjectList::const_iterator itr = targets->begin(); itr != targets->end(); ++itr)
             if (IsCreature(*itr))
-                (*itr)->ToCreature()->UpdateEntry(e.action.updateTemplate.creature, NULL, !e.action.updateTemplate.doNotChangeLevel);
+                (*itr)->ToCreature()->UpdateEntry(e.action.updateTemplate.creature, NULL, e.action.updateTemplate.updateLevel != 0);
 
         delete targets;
         break;
@@ -1763,9 +1894,14 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
 
             me->GetMotionMaster()->MovePoint(e.action.MoveToPos.pointId, dest.x, dest.y, dest.z, true, true, e.action.MoveToPos.controlled ? MOTION_SLOT_CONTROLLED : MOTION_SLOT_ACTIVE);
         }
-        else // Xinef: we can use dest.x, dest.y, dest.z to make offset :)
-            me->GetMotionMaster()->MovePoint(e.action.MoveToPos.pointId, target->GetPositionX() + e.target.x, target->GetPositionY() + e.target.y, target->GetPositionZ() + e.target.z, true, true, e.action.MoveToPos.controlled ? MOTION_SLOT_CONTROLLED : MOTION_SLOT_ACTIVE);
-
+        else // Xinef: we can use dest.x, dest.y, dest.z to make offset
+        {
+            float x, y, z;
+            target->GetPosition(x, y, z);
+            if (e.action.MoveToPos.ContactDistance > 0)
+                target->GetContactPoint(me, x, y, z, e.action.MoveToPos.ContactDistance);
+            me->GetMotionMaster()->MovePoint(e.action.MoveToPos.pointId, x + e.target.x, y + e.target.y, z + e.target.z, e.action.MoveToPos.controlled ? MOTION_SLOT_CONTROLLED : MOTION_SLOT_ACTIVE);
+        }
         break;
     }
     case SMART_ACTION_MOVE_TO_POS_TARGET:
@@ -2383,9 +2519,9 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 if (e.action.sendGossipMenu.gossipMenuId)
                     player->PrepareGossipMenu(GetBaseObject(), e.action.sendGossipMenu.gossipMenuId, true);
                 else
-                    player->PlayerTalkClass->ClearMenus();
+                    ClearGossipMenuFor(player);
 
-                player->SEND_GOSSIP_MENU(e.action.sendGossipMenu.gossipNpcTextId, GetBaseObject()->GetGUID());
+                SendGossipMenuFor(player, e.action.sendGossipMenu.gossipNpcTextId, GetBaseObject()->GetGUID());
             }
 
         delete targets;
@@ -3669,6 +3805,8 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
             if ((e.event.los.noHostile && !me->IsHostileTo(unit)) ||
                 (!e.event.los.noHostile && me->IsHostileTo(unit)))
             {
+                if (e.event.los.playerOnly && unit->GetTypeId() != TYPEID_PLAYER)
+                    return;
                 RecalcTimer(e, e.event.los.cooldownMin, e.event.los.cooldownMax);
                 ProcessAction(e, unit);
             }
@@ -3689,6 +3827,8 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
             if ((e.event.los.noHostile && !me->IsHostileTo(unit)) ||
                 (!e.event.los.noHostile && me->IsHostileTo(unit)))
             {
+                if (e.event.los.playerOnly && unit->GetTypeId() != TYPEID_PLAYER)
+                    return;
                 RecalcTimer(e, e.event.los.cooldownMin, e.event.los.cooldownMax);
                 ProcessAction(e, unit);
             }
@@ -4166,6 +4306,8 @@ void SmartScript::OnUpdate(uint32 const diff)
 
 void SmartScript::FillScript(SmartAIEventList e, WorldObject* obj, AreaTrigger const* at)
 {
+    (void)at; // ensure that the variable is referenced even if extra logs are disabled in order to pass compiler checks
+    
     if (e.empty())
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
@@ -4197,10 +4339,6 @@ void SmartScript::FillScript(SmartAIEventList e, WorldObject* obj, AreaTrigger c
         }
         mEvents.push_back((*i));//NOTE: 'world(0)' events still get processed in ANY instance mode
     }
-    if (mEvents.empty() && obj)
-        sLog->outErrorDb("SmartScript: Entry %u has events but no events added to list because of instance flags.", obj->GetEntry());
-    if (mEvents.empty() && at)
-        sLog->outErrorDb("SmartScript: AreaTrigger %u has events but no events added to list because of instance flags. NOTE: triggers can not handle any instance flags.", at->entry);
 }
 
 void SmartScript::GetScript()

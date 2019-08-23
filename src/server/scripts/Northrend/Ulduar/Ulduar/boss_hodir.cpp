@@ -415,7 +415,7 @@ public:
                         me->PlayDirectSound(SOUND_HODIR_FLASH_FREEZE, 0);
                         SmallIcicles(false);
                         events.RepeatEvent(55000 + urand(0,10000));
-                        events.ScheduleEvent(EVENT_SMALL_ICICLES_ENABLE, 12000);
+                        events.ScheduleEvent(EVENT_SMALL_ICICLES_ENABLE, Is25ManRaid() ? 12000 : 24000);
                         events.ScheduleEvent(EVENT_FROZEN_BLOWS, 15000);
                         events.RescheduleEvent(EVENT_FREEZE, 20000);
                     }

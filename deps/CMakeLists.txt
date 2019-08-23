@@ -1,4 +1,4 @@
-# Copyright (C) 
+# Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU AGPL3 v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 #
 # This file is free software; as a special exception the author gives
 # unlimited permission to copy and/or distribute it, with or without
@@ -16,34 +16,32 @@ else()
   add_definitions(-w)
 endif()
 
-if(CMAKE_SYSTEM_NAME MATCHES "Linux")
-  if(SERVERS AND NOT NOJEM)
-    add_subdirectory(jemalloc)  
-  endif()
-  if(TOOLS)
-    add_subdirectory(bzip2)
-  endif()
-  add_subdirectory(zlib)
-endif()
-
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
-  add_subdirectory(acelite)
   if(USE_MYSQL_SOURCES)
       add_subdirectory(mysqllite)
   endif()
-  if(TOOLS)
-    add_subdirectory(bzip2)
-  endif()
-  add_subdirectory(zlib)
 endif()
 
-add_subdirectory(g3dlite)
-add_subdirectory(recastnavigation)
+add_subdirectory(threads)
+add_subdirectory(acelite)
+
+if(SERVERS OR TOOLS)
+  add_subdirectory(zlib)
+  add_subdirectory(g3dlite)
+  add_subdirectory(recastnavigation)
+  add_subdirectory(SFMT)
+  add_subdirectory(utf8cpp)
+  add_subdirectory(openssl)
+endif()
 
 if(SERVERS)
+  add_subdirectory(mysql)
+  add_subdirectory(readline)
+  add_subdirectory(jemalloc)
   add_subdirectory(gsoap)
 endif()
 
 if(TOOLS)
+  add_subdirectory(bzip2)
   add_subdirectory(libmpq)
 endif()

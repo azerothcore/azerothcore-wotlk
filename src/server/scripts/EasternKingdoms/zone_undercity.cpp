@@ -43,7 +43,7 @@ enum Sylvanas
     SAY_SUNSORROW_WHISPER           = 0,
 
     SOUND_CREDIT                    = 10896,
-    
+
     NPC_HIGHBORNE_LAMENTER          = 21628,
     NPC_HIGHBORNE_BUNNY             = 21641,
     NPC_AMBASSADOR_SUNSORROW        = 16287,
@@ -125,7 +125,7 @@ public:
             if (type == GUID_EVENT_INVOKER)
             {
                 Talk(EMOTE_LAMENT);
-                DoPlaySoundToSet(me, SOUND_CREDIT);
+                DoPlayMusic(SOUND_CREDIT, true);
                 DoCast(me, SPELL_SYLVANAS_CAST, false);
                 playerGUID = guid;
                 LamentEvent = true;
@@ -310,15 +310,15 @@ public:
 
     bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
     {
-        player->PlayerTalkClass->ClearMenus();
+        ClearGossipMenuFor(player);
         if (action == GOSSIP_ACTION_INFO_DEF+1)
         {
-            player->CLOSE_GOSSIP_MENU();
+            CloseGossipMenuFor(player);
             creature->CastSpell(player, SPELL_MARK_OF_SHAME, false);
         }
         if (action == GOSSIP_ACTION_INFO_DEF+2)
         {
-            player->CLOSE_GOSSIP_MENU();
+            CloseGossipMenuFor(player);
             player->AreaExploredOrEventHappens(6628);
         }
         return true;
@@ -331,13 +331,13 @@ public:
 
         if (player->GetQuestStatus(6628) == QUEST_STATUS_INCOMPLETE && !player->HasAura(SPELL_MARK_OF_SHAME))
         {
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_HPF1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_HPF2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_HPF3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+2);
-            player->SEND_GOSSIP_MENU(5822, creature->GetGUID());
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HPF1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HPF2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HPF3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+2);
+            SendGossipMenuFor(player, 5822, creature->GetGUID());
         }
         else
-            player->SEND_GOSSIP_MENU(5821, creature->GetGUID());
+            SendGossipMenuFor(player, 5821, creature->GetGUID());
 
         return true;
     }
@@ -937,11 +937,13 @@ public:
 
     bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
     {
-        player->PlayerTalkClass->ClearMenus();
+        ClearGossipMenuFor(player);
+        
         switch (action)
         {
             case GOSSIP_ACTION_INFO_DEF + 1:
-                player->CLOSE_GOSSIP_MENU();
+                CloseGossipMenuFor(player);
+                
                 if (auto ai = CAST_AI(npc_varian_wrynn::npc_varian_wrynnAI, creature->AI()))
                 {
                     ai->Start(true, true, player->GetGUID());
@@ -952,8 +954,10 @@ public:
                     ai->SetDespawnAtEnd(false);
                     ai->SetDespawnAtFar(false);
                 }
+                
                 break;
         }
+
         return true;
     }
 
@@ -963,9 +967,9 @@ public:
             player->PrepareQuestMenu(creature->GetGUID());
 
         if (player->GetQuestStatus(QUEST_BATTLE_A) == QUEST_STATUS_INCOMPLETE)
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_WRYNN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_WRYNN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
 
-        player->SEND_GOSSIP_MENU(player->GetGossipTextId(creature), creature->GetGUID());
+        SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
 
         return true;
     }
@@ -977,6 +981,7 @@ public:
             memset(generatorGUID, 0, sizeof(generatorGUID));
             memset(allianceForcesGUID, 0, sizeof(allianceForcesGUID));
             memset(hordeForcesGUID, 0, sizeof(hordeForcesGUID));
+            allianceGuardsGUID.clear();
         }
 
         bool bStepping;
@@ -997,8 +1002,27 @@ public:
         uint64 generatorGUID[GENERATOR_MAXCOUNT];
         uint64 allianceForcesGUID[ALLIANCE_FORCE_MAXCOUNT];
         uint64 hordeForcesGUID[HORDE_FORCE_MAXCOUNT];
+        std::vector<uint64> allianceGuardsGUID;
 
         EventMap _events;
+
+        void EnterEvadeMode() override
+        {
+            me->DeleteThreatList();
+            me->CombatStop(true);
+            me->SetLootRecipient(NULL);
+
+            if (HasEscortState(STATE_ESCORT_ESCORTING))
+            {
+                AddEscortState(STATE_ESCORT_RETURNING);
+                ReturnToLastPoint();
+            }
+            else
+            {
+                me->GetMotionMaster()->MoveTargetedHome();
+                Reset();
+            }
+        }
 
         void Reset() override
         {
@@ -1065,6 +1089,12 @@ public:
                         temp->DespawnOrUnsummon();
                     }
                 }
+
+                for (std::vector<uint64>::const_iterator i = allianceGuardsGUID.begin(); i != allianceGuardsGUID.end(); ++i)
+                    if (Creature* temp = ObjectAccessor::GetCreature(*me, *i))
+                        temp->DespawnOrUnsummon();
+
+                allianceGuardsGUID.clear();
 
                 for (uint8 i = 0; i < HORDE_FORCE_MAXCOUNT; ++i)
                 {
@@ -1322,13 +1352,25 @@ public:
                     break;
                 case 7:
                     if (Unit* temp = me->SummonCreature(NPC_SW_SOLDIER, AllianceSpawn[8].x, AllianceSpawn[8].y, AllianceSpawn[8].z, 0, TEMPSUMMON_TIMED_DESPAWN, 90000))
+                    {
+                        allianceGuardsGUID.push_back(temp->GetGUID());
                         temp->GetMotionMaster()->MovePath(NPC_SW_SOLDIER * 10, false);
+                    }
                     if (Unit* temp = me->SummonCreature(NPC_SW_SOLDIER, AllianceSpawn[8].x, AllianceSpawn[8].y, AllianceSpawn[8].z, 0, TEMPSUMMON_TIMED_DESPAWN, 90000))
+                    {
+                        allianceGuardsGUID.push_back(temp->GetGUID());
                         temp->GetMotionMaster()->MovePath((NPC_SW_SOLDIER * 10) + 1, false);
+                    }
                     if (Unit* temp = me->SummonCreature(NPC_SW_SOLDIER, AllianceSpawn[8].x, AllianceSpawn[8].y, AllianceSpawn[8].z, 0, TEMPSUMMON_TIMED_DESPAWN, 90000))
+                    {
+                        allianceGuardsGUID.push_back(temp->GetGUID());
                         temp->GetMotionMaster()->MovePath((NPC_SW_SOLDIER * 10) + 2, false);
+                    }
                     if (Unit* temp = me->SummonCreature(NPC_SW_SOLDIER, AllianceSpawn[8].x, AllianceSpawn[8].y, AllianceSpawn[8].z, 0, TEMPSUMMON_TIMED_DESPAWN, 90000))
+                    {
+                        allianceGuardsGUID.push_back(temp->GetGUID());
                         temp->GetMotionMaster()->MovePath((NPC_SW_SOLDIER * 10) + 3, false);
+                    }
                     break;
                 case 8:
                     break;
@@ -1517,8 +1559,7 @@ public:
                             JumpToNextStep(10 * IN_MILLISECONDS);
                             break;
                         case 5:
-                            if (Player* player = GetPlayerForEscort())
-                                player->CastSpell(player, SPELL_WRYNN_BUFF);
+                            DoCast(me, SPELL_WRYNN_BUFF);
                             JumpToNextStep(3 * IN_MILLISECONDS);
                             break;
                         case 6:
@@ -2016,8 +2057,7 @@ public:
                         _events.ScheduleEvent(EVENT_AGGRO_JAINA, 2 * IN_MILLISECONDS);
                         break;
                     case EVENT_WRYNN_BUFF:
-                        if (Player* player = GetPlayerForEscort())
-                            player->CastSpell(player, SPELL_WRYNN_BUFF);
+                        DoCast(me, SPELL_WRYNN_BUFF);
                         _events.ScheduleEvent(EVENT_WRYNN_BUFF, 10 * IN_MILLISECONDS);
                         break;
                     default:
@@ -2214,44 +2254,6 @@ public:
     }
 };
 
-class spell_undercity_buffs : public SpellScriptLoader
-{
-public:
-    spell_undercity_buffs() : SpellScriptLoader("spell_undercity_buffs") { }
-
-    class spell_undercity_buffs_AuraScript : public AuraScript
-    {
-        PrepareAuraScript(spell_undercity_buffs_AuraScript);
-
-        // Add Update for Areacheck
-        void CalcPeriodic(AuraEffect const* /*effect*/, bool& isPeriodic, int32& amplitude)
-        {
-            isPeriodic = true;
-            amplitude = 5 * IN_MILLISECONDS;
-        }
-
-        void Update(AuraEffect* /*effect*/)
-        {
-            if (Player* owner = GetUnitOwner()->ToPlayer())
-            {
-                if (owner->GetZoneId() != ZONE_TIRISFAL && owner->GetZoneId() != ZONE_UNDERCITY)
-                    owner->RemoveAura(GetSpellInfo()->Id);
-            }
-        }
-
-        void Register()
-        {
-            DoEffectCalcPeriodic += AuraEffectCalcPeriodicFn(spell_undercity_buffs_AuraScript::CalcPeriodic, EFFECT_0, SPELL_AURA_MOD_DAMAGE_PERCENT_DONE);
-            OnEffectUpdatePeriodic += AuraEffectUpdatePeriodicFn(spell_undercity_buffs_AuraScript::Update, EFFECT_0, SPELL_AURA_MOD_DAMAGE_PERCENT_DONE);
-        }
-    };
-
-    AuraScript* GetAuraScript() const
-    {
-        return new spell_undercity_buffs_AuraScript();
-    }
-};
-
 /*######
 ## HORDE
 #######*/
@@ -2267,12 +2269,14 @@ public:
 
     bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
     {
-        player->PlayerTalkClass->ClearMenus();
+        ClearGossipMenuFor(player);
+        
         switch (action)
         {
             case GOSSIP_ACTION_INFO_DEF + 1:
             {
-                player->CLOSE_GOSSIP_MENU();
+                CloseGossipMenuFor(player);
+                
                 if (auto thrall_ai = CAST_AI(npc_thrall_bfu::npc_thrall_bfuAI, creature->AI()))
                 {
                     if (Creature* sylvannas = GetClosestCreatureWithEntry(creature, NPC_SYLVANAS, 50.0f))
@@ -2288,6 +2292,7 @@ public:
                 break;
             }
         }
+
         return true;
     }
 
@@ -2297,9 +2302,9 @@ public:
             player->PrepareQuestMenu(creature->GetGUID());
 
         if (player->GetQuestStatus(QUEST_BATTLE_H) == QUEST_STATUS_INCOMPLETE)
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_THRALL, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_THRALL, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
 
-        player->SEND_GOSSIP_MENU(player->GetGossipTextId(creature), creature->GetGUID());
+        SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
 
         return true;
     }
@@ -2321,6 +2326,7 @@ public:
         npc_thrall_bfuAI(Creature* creature) : npc_escortAI(creature)
         {
             memset(allianceForcesGUID, 0, sizeof(allianceForcesGUID));
+            hordeGuardsGUID.clear();
         }
 
         bool bStepping;
@@ -2336,13 +2342,34 @@ public:
         uint64 WrynnGUID;
         uint64 JainaGUID;
         uint64 SaurfangGUID;
+        std::vector<uint64> hordeGuardsGUID;
 
         EventMap _events;
+
+        void EnterEvadeMode() override
+        {
+            me->RemoveAura(SPELL_HEROIC_VANGUARD);
+            me->DeleteThreatList();
+            me->CombatStop(true);
+            me->SetLootRecipient(NULL);
+
+            if (HasEscortState(STATE_ESCORT_ESCORTING))
+            {
+                AddEscortState(STATE_ESCORT_RETURNING);
+                ReturnToLastPoint();
+            }
+            else
+            {
+                me->GetMotionMaster()->MoveTargetedHome();
+                Reset();
+            }
+        }
 
         void Reset() override
         {
             if (!HasEscortState(STATE_ESCORT_ESCORTING))
             {
+                me->SetStandState(UNIT_STAND_STATE_STAND);
                 me->Mount(MODEL_WHITE_WULF);
                 me->SetCorpseDelay(1);
                 me->SetRespawnTime(1);
@@ -2389,6 +2416,12 @@ public:
                     saurfang->DespawnOrUnsummon();
                     SaurfangGUID = 0;
                 }
+
+                for (std::vector<uint64>::const_iterator i = hordeGuardsGUID.begin(); i != hordeGuardsGUID.end(); ++i)
+                    if (Creature* temp = ObjectAccessor::GetCreature(*me, *i))
+                        temp->DespawnOrUnsummon();
+
+                hordeGuardsGUID.clear();
             }
         }
 
@@ -2527,7 +2560,7 @@ public:
                 sylvanas->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
                 sylvanas->SetReactState(REACT_AGGRESSIVE);
                 sylvanas->setFaction(FACTION_ESCORT_N_NEUTRAL_ACTIVE);
-                sylvanas->GetMotionMaster()->MoveFollow(me, 1, 0);
+                sylvanas->GetMotionMaster()->MoveFollow(me, 1, M_PI * 0.1f);
             }
         }
 
@@ -2604,15 +2637,28 @@ public:
                 case 6:
                     // COURTYARD_DONE Spawn
                     if (Unit* temp = me->SummonCreature(NPC_WARSONG_BATTLEGUARD, ThrallSpawn[29].x, ThrallSpawn[29].y, ThrallSpawn[29].z, ThrallSpawn[29].o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 300 * IN_MILLISECONDS))
+                    {
+                        hordeGuardsGUID.push_back(temp->GetGUID());
                         temp->GetMotionMaster()->MovePoint(0, ThrallSpawn[30].x, ThrallSpawn[30].y, ThrallSpawn[30].z);
+                    }
                     if (Unit* temp = me->SummonCreature(NPC_WARSONG_BATTLEGUARD, ThrallSpawn[31].x, ThrallSpawn[31].y, ThrallSpawn[31].z, ThrallSpawn[31].o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 300 * IN_MILLISECONDS))
+                    {
+                        hordeGuardsGUID.push_back(temp->GetGUID());
                         temp->GetMotionMaster()->MovePoint(0, ThrallSpawn[32].x, ThrallSpawn[32].y, ThrallSpawn[32].z);
+                    }
                     if (Unit* temp = me->SummonCreature(NPC_WARSONG_BATTLEGUARD, ThrallSpawn[33].x, ThrallSpawn[33].y, ThrallSpawn[33].z, ThrallSpawn[33].o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 300 * IN_MILLISECONDS))
+                    {
+                        hordeGuardsGUID.push_back(temp->GetGUID());
                         temp->GetMotionMaster()->MovePoint(0, ThrallSpawn[34].x, ThrallSpawn[34].y, ThrallSpawn[34].z);
+                    }
                     if (Unit* temp = me->SummonCreature(NPC_WARSONG_BATTLEGUARD, ThrallSpawn[35].x, ThrallSpawn[35].y, ThrallSpawn[35].z, ThrallSpawn[35].o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 300 * IN_MILLISECONDS))
+                    {
+                        hordeGuardsGUID.push_back(temp->GetGUID());
                         temp->GetMotionMaster()->MovePoint(0, ThrallSpawn[36].x, ThrallSpawn[36].y, ThrallSpawn[36].z);
+                    }
                     for (uint8 i = 0; i < 2; ++i)
-                        me->SummonCreature(NPC_WARSONG_BATTLEGUARD, ThrallSpawn[i + 44].x, ThrallSpawn[i + 44].y, ThrallSpawn[i + 44].z, ThrallSpawn[i + 44].o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 300 * IN_MILLISECONDS);
+                        if (Unit* temp = me->SummonCreature(NPC_WARSONG_BATTLEGUARD, ThrallSpawn[i + 44].x, ThrallSpawn[i + 44].y, ThrallSpawn[i + 44].z, ThrallSpawn[i + 44].o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 300 * IN_MILLISECONDS))
+                            hordeGuardsGUID.push_back(temp->GetGUID());
                     break;
                 case 7:
                     for (uint8 i = 0; i < 9; ++i)
@@ -2620,7 +2666,8 @@ public:
                     break;
                 case 8:
                     for (uint8 i = 0; i < 2; ++i)
-                        me->SummonCreature(NPC_WARSONG_BATTLEGUARD, ThrallSpawn[i + 57].x, ThrallSpawn[i + 57].y, ThrallSpawn[i + 57].z, ThrallSpawn[i + 57].o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 300 * IN_MILLISECONDS);
+                        if (Unit* temp = me->SummonCreature(NPC_WARSONG_BATTLEGUARD, ThrallSpawn[i + 57].x, ThrallSpawn[i + 57].y, ThrallSpawn[i + 57].z, ThrallSpawn[i + 57].o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 300 * IN_MILLISECONDS))
+                            hordeGuardsGUID.push_back(temp->GetGUID());
                     break;
                 case 9:
                     // Top of Undercity - Attacktrashpack
@@ -2753,6 +2800,7 @@ public:
                 case 18:
                     if (Creature* temp = me->SummonCreature(NPC_WARSONG_BATTLEGUARD, ThrallSpawn[69].x, ThrallSpawn[69].y, ThrallSpawn[69].z, ThrallSpawn[69].o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 240 * IN_MILLISECONDS))
                     {
+                        hordeGuardsGUID.push_back(temp->GetGUID());
                         temp->AI()->Talk(SAY_FOR_THE_HORDE);
                         temp->GetMotionMaster()->MovePath(NPC_WARSONG_BATTLEGUARD * 100, false);
                     }
@@ -2953,8 +3001,7 @@ public:
                             JumpToNextStep(6 * IN_MILLISECONDS);
                             break;
                         case 10:
-                            if (Player* player = GetPlayerForEscort())
-                                player->CastSpell(player, SPELL_THRALL_BUFF);
+                            DoCast(me, SPELL_THRALL_BUFF);
                             JumpToNextStep(10 * IN_MILLISECONDS);
                             break;
                             // Start Event
@@ -3654,7 +3701,10 @@ public:
                             break;
                         case 143:
                             if (Creature* sylvanas = ObjectAccessor::GetCreature(*me, sylvanasfollowGUID))
+                            {
+                                sylvanas->GetMotionMaster()->MovePoint(0, 1289.48f, 314.33f, -57.32f, true);
                                 sylvanas->CastSpell(sylvanas, SPELL_LEAP_TO_PLATFORM);
+                            }
                             JumpToNextStep(10 * IN_MILLISECONDS);
                             break;
                         case 144:
@@ -3662,6 +3712,7 @@ public:
                             {
                                 sylvanas->AI()->Talk(SYLVANAS_SAY_THRONE_1);
                                 me->SetFacingToObject(sylvanas);
+                                sylvanas->SetFacingToObject(me);
                                 me->HandleEmoteCommand(EMOTE_ONESHOT_SALUTE);
                             }
                             JumpToNextStep(3 * IN_MILLISECONDS);
@@ -3898,8 +3949,7 @@ public:
                         _events.ScheduleEvent(EVENT_AGGRO_SYLVANAS, 2 * IN_MILLISECONDS);
                         break;
                     case EVENT_THRALL_BUFF:
-                        if (Player* player = GetPlayerForEscort())
-                            player->CastSpell(player, SPELL_THRALL_BUFF);
+                        DoCast(me, SPELL_THRALL_BUFF);
                         _events.ScheduleEvent(EVENT_THRALL_BUFF, 10 * IN_MILLISECONDS);
                         break;
                     default:
@@ -3934,6 +3984,11 @@ public:
         }
 
         void InitializeAI() override
+        {
+            me->Mount(MODEL_SKELETON_MOUNT);
+        }
+
+        void JustRespawned() override
         {
             me->Mount(MODEL_SKELETON_MOUNT);
         }
@@ -4031,5 +4086,4 @@ void AddSC_undercity()
     new npc_lady_sylvanas_windrunner_bfu();
     new boss_blight_worm();
     new spell_blight_worm_ingest();
-    new spell_undercity_buffs();
 }

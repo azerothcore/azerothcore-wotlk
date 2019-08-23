@@ -17,6 +17,7 @@
 #include "SpellInfo.h"
 #include "SpellScript.h"
 #include "GossipDef.h"
+#include "ScriptedGossip.h"
 #include "CreatureAI.h"
 #include "Player.h"
 #include "WorldPacket.h"
@@ -765,7 +766,7 @@ bool ScriptMgr::OnQuestAccept(Player* player, Item* item, Quest const* quest)
 #endif
 
     GET_SCRIPT_RET(ItemScript, item->GetScriptId(), tmpscript, false);
-    player->PlayerTalkClass->ClearMenus();
+    ClearGossipMenuFor(player);
     return tmpscript->OnQuestAccept(player, item, quest);
 }
 
@@ -857,7 +858,7 @@ bool ScriptMgr::OnGossipHello(Player* player, Creature* creature)
         return true;
 #endif
     GET_SCRIPT_RET(CreatureScript, creature->GetScriptId(), tmpscript, false);
-    player->PlayerTalkClass->ClearMenus();
+    ClearGossipMenuFor(player);
     return tmpscript->OnGossipHello(player, creature);
 }
 
@@ -893,7 +894,7 @@ bool ScriptMgr::OnQuestAccept(Player* player, Creature* creature, Quest const* q
     ASSERT(quest);
 
     GET_SCRIPT_RET(CreatureScript, creature->GetScriptId(), tmpscript, false);
-    player->PlayerTalkClass->ClearMenus();
+    ClearGossipMenuFor(player);
     return tmpscript->OnQuestAccept(player, creature, quest);
 }
 
@@ -904,7 +905,7 @@ bool ScriptMgr::OnQuestSelect(Player* player, Creature* creature, Quest const* q
     ASSERT(quest);
 
     GET_SCRIPT_RET(CreatureScript, creature->GetScriptId(), tmpscript, false);
-    player->PlayerTalkClass->ClearMenus();
+    ClearGossipMenuFor(player);
     return tmpscript->OnQuestSelect(player, creature, quest);
 }
 
@@ -915,7 +916,7 @@ bool ScriptMgr::OnQuestComplete(Player* player, Creature* creature, Quest const*
     ASSERT(quest);
 
     GET_SCRIPT_RET(CreatureScript, creature->GetScriptId(), tmpscript, false);
-    player->PlayerTalkClass->ClearMenus();
+    ClearGossipMenuFor(player);
     return tmpscript->OnQuestComplete(player, creature, quest);
 }
 
@@ -927,12 +928,12 @@ bool ScriptMgr::OnQuestReward(Player* player, Creature* creature, Quest const* q
 #ifdef ELUNA
     if (sEluna->OnQuestReward(player, creature, quest, opt))
     {
-        player->PlayerTalkClass->ClearMenus();
+        ClearGossipMenuFor(player);
         return false;
     }
 #endif
     GET_SCRIPT_RET(CreatureScript, creature->GetScriptId(), tmpscript, false);
-    player->PlayerTalkClass->ClearMenus();
+    ClearGossipMenuFor(player);
     return tmpscript->OnQuestReward(player, creature, quest, opt);
 }
 
@@ -942,7 +943,7 @@ uint32 ScriptMgr::GetDialogStatus(Player* player, Creature* creature)
     ASSERT(creature);
 
     GET_SCRIPT_RET(CreatureScript, creature->GetScriptId(), tmpscript, DIALOG_STATUS_SCRIPTED_NO_STATUS);
-    player->PlayerTalkClass->ClearMenus();
+    ClearGossipMenuFor(player);
     return tmpscript->GetDialogStatus(player, creature);
 }
 
@@ -980,7 +981,7 @@ bool ScriptMgr::OnGossipHello(Player* player, GameObject* go)
         return true;
 #endif
     GET_SCRIPT_RET(GameObjectScript, go->GetScriptId(), tmpscript, false);
-    player->PlayerTalkClass->ClearMenus();
+    ClearGossipMenuFor(player);
     return tmpscript->OnGossipHello(player, go);
 }
 
@@ -1016,7 +1017,7 @@ bool ScriptMgr::OnQuestAccept(Player* player, GameObject* go, Quest const* quest
     ASSERT(quest);
 
     GET_SCRIPT_RET(GameObjectScript, go->GetScriptId(), tmpscript, false);
-    player->PlayerTalkClass->ClearMenus();
+    ClearGossipMenuFor(player);
     return tmpscript->OnQuestAccept(player, go, quest);
 }
 
@@ -1034,7 +1035,7 @@ bool ScriptMgr::OnQuestReward(Player* player, GameObject* go, Quest const* quest
         return false;
 #endif
     GET_SCRIPT_RET(GameObjectScript, go->GetScriptId(), tmpscript, false);
-    player->PlayerTalkClass->ClearMenus();
+    ClearGossipMenuFor(player);
     return tmpscript->OnQuestReward(player, go, quest, opt);
 }
 
@@ -1044,7 +1045,7 @@ uint32 ScriptMgr::GetDialogStatus(Player* player, GameObject* go)
     ASSERT(go);
 
     GET_SCRIPT_RET(GameObjectScript, go->GetScriptId(), tmpscript, DIALOG_STATUS_SCRIPTED_NO_STATUS);
-    player->PlayerTalkClass->ClearMenus();
+    ClearGossipMenuFor(player);
     return tmpscript->GetDialogStatus(player, go);
 }
 
@@ -1378,7 +1379,6 @@ bool ScriptMgr::OnCriteriaCheck(uint32 scriptId, Player* source, Unit* target, u
 }
 
 // Player
-
 void ScriptMgr::OnPlayerCompleteQuest(Player* player, Quest const* quest)
 {
     FOREACH_SCRIPT(PlayerScript)->OnPlayerCompleteQuest(player, quest);
@@ -1508,6 +1508,11 @@ void ScriptMgr::OnPlayerDuelEnd(Player* winner, Player* loser, DuelCompleteType 
 void ScriptMgr::OnPlayerChat(Player* player, uint32 type, uint32 lang, std::string& msg)
 {
     FOREACH_SCRIPT(PlayerScript)->OnChat(player, type, lang, msg);
+}
+
+void ScriptMgr::OnBeforeSendChatMessage(Player* player, uint32& type, uint32& lang, std::string& msg)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnBeforeSendChatMessage(player, type, lang, msg);
 }
 
 void ScriptMgr::OnPlayerChat(Player* player, uint32 type, uint32 lang, std::string& msg, Player* receiver)
@@ -1726,6 +1731,17 @@ void ScriptMgr::OnFirstLogin(Player* player)
     sEluna->OnFirstLogin(player);
 #endif
     FOREACH_SCRIPT(PlayerScript)->OnFirstLogin(player);
+}
+
+bool ScriptMgr::CanJoinInBattlegroundQueue(Player* player, uint64 BattlemasterGuid, BattlegroundTypeId BGTypeID, uint8 joinAsGroup, GroupJoinBattlegroundResult& err)
+{
+    bool ret = true;
+
+    FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
+        if (!itr->second->CanJoinInBattlegroundQueue(player, BattlemasterGuid, BGTypeID, joinAsGroup, err))
+            ret = false; // we change ret value only when scripts return false
+
+    return ret;
 }
 
 // Account
@@ -2002,7 +2018,6 @@ void ScriptMgr::OnAfterStoreOrEquipNewItem(Player* player, uint32 vendorslot, ui
     FOREACH_SCRIPT(PlayerScript)->OnAfterStoreOrEquipNewItem(player, vendorslot, item, count, bag, slot, pProto, pVendor, crItem, bStore);
 }
 
-
 void ScriptMgr::OnAfterUpdateMaxPower(Player* player, Powers& power, float& value)
 {
     FOREACH_SCRIPT(PlayerScript)->OnAfterUpdateMaxPower(player, power, value);
@@ -2052,6 +2067,60 @@ void ScriptMgr::OnBattlegroundUpdate(Battleground* bg, uint32 diff)
 void ScriptMgr::OnBattlegroundAddPlayer(Battleground* bg, Player* player)
 {
     FOREACH_SCRIPT(BGScript)->OnBattlegroundAddPlayer(bg, player);
+}
+
+void ScriptMgr::OnBattlegroundBeforeAddPlayer(Battleground* bg, Player* player)
+{
+    FOREACH_SCRIPT(BGScript)->OnBattlegroundBeforeAddPlayer(bg, player);
+}
+
+void ScriptMgr::OnBattlegroundRemovePlayerAtLeave(Battleground* bg, Player* player)
+{
+    FOREACH_SCRIPT(BGScript)->OnBattlegroundRemovePlayerAtLeave(bg, player);
+}
+
+void ScriptMgr::OnAddGroup(BattlegroundQueue* queue, GroupQueueInfo* ginfo, uint32& index, Player* leader, Group* grp, PvPDifficultyEntry const* bracketEntry, bool isPremade)
+{
+    FOREACH_SCRIPT(BGScript)->OnAddGroup(queue, ginfo, index, leader, grp, bracketEntry, isPremade);
+}
+
+bool ScriptMgr::CanFillPlayersToBG(BattlegroundQueue* queue, Battleground* bg, const int32 aliFree, const int32 hordeFree, BattlegroundBracketId bracket_id)
+{
+    bool ret = true;
+
+    FOR_SCRIPTS_RET(BGScript, itr, end, ret) // return true by default if not scripts
+        if (!itr->second->CanFillPlayersToBG(queue, bg, aliFree, hordeFree, bracket_id))
+            ret = false; // we change ret value only when scripts return false
+
+    return ret;
+}
+
+bool ScriptMgr::CanFillPlayersToBGWithSpecific(BattlegroundQueue* queue, Battleground* bg, const int32 aliFree, const int32 hordeFree,
+    BattlegroundBracketId thisBracketId, BattlegroundQueue* specificQueue, BattlegroundBracketId specificBracketId)
+{
+    bool ret = true;
+
+    FOR_SCRIPTS_RET(BGScript, itr, end, ret) // return true by default if not scripts
+        if (!itr->second->CanFillPlayersToBGWithSpecific(queue, bg, aliFree, hordeFree, thisBracketId, specificQueue, specificBracketId))
+            ret = false; // we change ret value only when scripts return false
+
+    return ret;
+}
+
+void ScriptMgr::OnCheckNormalMatch(BattlegroundQueue* queue, uint32& Coef, Battleground* bgTemplate, BattlegroundBracketId bracket_id, uint32& minPlayers, uint32& maxPlayers)
+{
+    FOREACH_SCRIPT(BGScript)->OnCheckNormalMatch(queue, Coef, bgTemplate, bracket_id, minPlayers, maxPlayers);
+}
+
+bool ScriptMgr::CanSendMessageQueue(BattlegroundQueue* queue, Player* leader, Battleground* bg, PvPDifficultyEntry const* bracketEntry)
+{
+    bool ret = true;
+
+    FOR_SCRIPTS_RET(BGScript, itr, end, ret) // return true by default if not scripts
+        if (!itr->second->CanSendMessageQueue(queue, leader, bg, bracketEntry))
+            ret = false; // we change ret value only when scripts return false
+
+    return ret;
 }
 
 // SpellSC

@@ -146,6 +146,8 @@ enum Events
     EVENT_SARTHARION_CALL_TENEBRON              = 30,
     EVENT_SARTHARION_CALL_SHADRON               = 31,
     EVENT_SARTHARION_CALL_VESPERON              = 32,
+
+    EVENT_SARTHARION_BOUNDARY                   = 33
 };
 
 const Position portalPos[4] = 
@@ -353,6 +355,7 @@ public:
             events.ScheduleEvent(EVENT_SARTHARION_LAVA_STRIKE, 5000);
             events.ScheduleEvent(EVENT_SARTHARION_HEALTH_CHECK, 10000);
             events.ScheduleEvent(EVENT_SARTHARION_BERSERK, 900000);
+            events.ScheduleEvent(EVENT_SARTHARION_BOUNDARY, 1000);
 
             StoreDragons();
             me->CallForHelp(500.0f);
@@ -422,6 +425,12 @@ public:
             // Special events which needs to be fired immidiately
             switch(events.GetEvent())
             {
+                case EVENT_SARTHARION_BOUNDARY:
+                    if (me->GetPositionX() < 3218.86f || me->GetPositionX() > 3275.69f || me->GetPositionY() < 484.68f || me->GetPositionY() > 572.4f) // https://github.com/TrinityCore/TrinityCore/blob/3.3.5/src/server/scripts/Northrend/ChamberOfAspects/ObsidianSanctum/instance_obsidian_sanctum.cpp#L31
+                        EnterEvadeMode();
+
+                    events.RepeatEvent(1000);
+                break;
                 case EVENT_SARTHARION_SUMMON_LAVA:
                     if (!urand(0,3))
                         Talk(SAY_SARTHARION_SPECIAL);
@@ -659,6 +668,10 @@ public:
 
             if (isSartharion || (pInstance && pInstance->GetData(BOSS_SARTHARION_EVENT) == DONE))
                 me->SetLootMode(0);
+
+            if (isSartharion)
+                if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO, 1, 500, true))
+                    me->AI()->AttackStart(target);
         }
 
         void JustDied(Unit* )
@@ -755,11 +768,6 @@ public:
                     for (uint8 i = 0; i < 6; ++i)
                     {
                         if ((cr = me->SummonCreature(NPC_TWILIGHT_EGG, EggsPos[isSartharion ? i+6 : i].GetPositionX(), EggsPos[isSartharion ? i+6 : i].GetPositionY(), EggsPos[isSartharion ? i+6 : i].GetPositionZ(), EggsPos[isSartharion ? i+6 : i].GetOrientation(), TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 60000)))
-                        {
-                            summons.Summon(cr);
-                            cr->SetPhaseMask(16, true);
-                        }
-                        if ((cr = me->SummonCreature(NPC_TWILIGHT_WHELP, EggsPos[isSartharion ? i+6 : i].GetPositionX(), EggsPos[isSartharion ? i+6 : i].GetPositionY(), EggsPos[isSartharion ? i+6 : i].GetPositionZ(), EggsPos[isSartharion ? i+6 : i].GetOrientation(), TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 60000)))
                         {
                             summons.Summon(cr);
                             cr->SetPhaseMask(16, true);
@@ -915,6 +923,10 @@ public:
 
             if (isSartharion || (pInstance && pInstance->GetData(BOSS_SARTHARION_EVENT) == DONE))
                 me->SetLootMode(0);
+
+            if (isSartharion)
+                if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO, 1, 500, true))
+                    me->AI()->AttackStart(target);
         }
 
         void JustDied(Unit* )
@@ -1145,6 +1157,10 @@ public:
 
             if (isSartharion || (pInstance && pInstance->GetData(BOSS_SARTHARION_EVENT) == DONE))
                 me->SetLootMode(0);
+
+            if (isSartharion)
+                if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO, 1, 500, true))
+                    me->AI()->AttackStart(target);
         }
 
         void JustDied(Unit* )
