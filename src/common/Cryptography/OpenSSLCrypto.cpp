@@ -38,7 +38,10 @@ void OpenSSLCrypto::threadsSetup()
     {
         cryptoLocks[i] = new ACE_Thread_Mutex();
     }
+    (void)&threadIdCallback;
     CRYPTO_THREADID_set_callback(threadIdCallback);
+
+    (void)&lockingCallback;
     CRYPTO_set_locking_callback(lockingCallback);
 }
 
