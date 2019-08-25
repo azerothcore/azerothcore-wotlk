@@ -224,7 +224,7 @@ void WorldSession::HandleSendMail(WorldPacket & recvData)
             return;
         }
 
-        if (COD && item->HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAG_WRAPPED))
+        if (COD && item->HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_WRAPPED))
         {
             player->SendMailResult(0, MAIL_SEND, MAIL_ERR_CANT_SEND_WRAPPED_COD);
             return;

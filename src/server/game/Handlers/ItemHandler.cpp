@@ -676,7 +676,7 @@ void WorldSession::HandleSellItemOpcode(WorldPacket & recvData)
         // prevent selling item for sellprice when the item is still refundable
         // this probably happens when right clicking a refundable item, the client sends both
         // CMSG_SELL_ITEM and CMSG_REFUND_ITEM (unverified)
-        if (pItem->HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAG_REFUNDABLE))
+        if (pItem->HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_REFUNDABLE))
             return; // Therefore, no feedback to client
 
         // special case at auto sell (sell all)
@@ -1355,7 +1355,7 @@ void WorldSession::HandleWrapItemOpcode(WorldPacket& recvData)
         case 21830: item->SetEntry(21831); break;
     }
     item->SetUInt64Value(ITEM_FIELD_GIFTCREATOR, _player->GetGUID());
-    item->SetUInt32Value(ITEM_FIELD_FLAGS, ITEM_FLAG_WRAPPED);
+    item->SetUInt32Value(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_WRAPPED);
     item->SetState(ITEM_CHANGED, _player);
 
     // after save it will be impossible to remove the item from the queue

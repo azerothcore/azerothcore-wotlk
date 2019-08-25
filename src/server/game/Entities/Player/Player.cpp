@@ -13018,7 +13018,7 @@ void Player::MoveItemToInventory(ItemPosCountVec const& dest, Item* pItem, bool 
         // in case trade we already have item in other player inventory
         pLastItem->SetState(in_characterInventoryDB ? ITEM_CHANGED : ITEM_NEW, this);
 
-        if (pLastItem->HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAG_BOP_TRADEABLE))
+        if (pLastItem->HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_BOP_TRADEABLE))
             AddTradeableItem(pLastItem);
     }
 }
@@ -13037,7 +13037,7 @@ void Player::DestroyItem(uint8 bag, uint8 slot, bool update)
             for (uint8 i = 0; i < MAX_BAG_SIZE; ++i)
                 DestroyItem(slot, i, update);
 
-        if (pItem->HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAG_WRAPPED))
+        if (pItem->HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_WRAPPED))
         {
             PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_GIFT);
 
@@ -18780,7 +18780,7 @@ Item* Player::_LoadItem(SQLTransaction& trans, uint32 zoneId, uint32 timeDiff, F
 #endif
                 remove = true;
             }
-            else if (item->HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAG_REFUNDABLE))
+            else if (item->HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_REFUNDABLE))
             {
                 if (item->GetPlayedTime() > (2 * HOUR))
                 {
@@ -18792,7 +18792,7 @@ Item* Player::_LoadItem(SQLTransaction& trans, uint32 zoneId, uint32 timeDiff, F
                     stmt->setUInt32(0, item->GetGUIDLow());
                     trans->Append(stmt);
 
-                    item->RemoveFlag(ITEM_FIELD_FLAGS, ITEM_FLAG_REFUNDABLE);
+                    item->RemoveFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_REFUNDABLE);
                 }
                 else
                 {
@@ -18813,11 +18813,11 @@ Item* Player::_LoadItem(SQLTransaction& trans, uint32 zoneId, uint32 timeDiff, F
                         sLog->outDebug(LOG_FILTER_PLAYER_LOADING, "Player::_LoadInventory: player (GUID: %u, name: '%s') has item (GUID: %u, entry: %u) with refundable flags, but without data in item_refund_instance. Removing flag.",
                             GetGUIDLow(), GetName().c_str(), item->GetGUIDLow(), item->GetEntry());
 #endif
-                        item->RemoveFlag(ITEM_FIELD_FLAGS, ITEM_FLAG_REFUNDABLE);
+                        item->RemoveFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_REFUNDABLE);
                     }
                 }
             }
-            else if (item->HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAG_BOP_TRADEABLE))
+            else if (item->HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_BOP_TRADEABLE))
             {
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_ITEM_BOP_TRADE);
                 stmt->setUInt32(0, item->GetGUIDLow());
@@ -18840,10 +18840,10 @@ Item* Player::_LoadItem(SQLTransaction& trans, uint32 zoneId, uint32 timeDiff, F
                 else
                 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                    sLog->outDebug(LOG_FILTER_PLAYER_LOADING, "Player::_LoadInventory: player (GUID: %u, name: '%s') has item (GUID: %u, entry: %u) with ITEM_FLAG_BOP_TRADEABLE flag, but without data in item_soulbound_trade_data. Removing flag.",
+                    sLog->outDebug(LOG_FILTER_PLAYER_LOADING, "Player::_LoadInventory: player (GUID: %u, name: '%s') has item (GUID: %u, entry: %u) with ITEM_FIELD_FLAG_BOP_TRADEABLE flag, but without data in item_soulbound_trade_data. Removing flag.",
                         GetGUIDLow(), GetName().c_str(), item->GetGUIDLow(), item->GetEntry());
 #endif
-                    item->RemoveFlag(ITEM_FIELD_FLAGS, ITEM_FLAG_BOP_TRADEABLE);
+                    item->RemoveFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_BOP_TRADEABLE);
                 }
             }
             else if (proto->HolidayId)
@@ -22006,7 +22006,7 @@ inline bool Player::_StoreOrEquipNewItem(uint32 vendorslot, uint32 item, uint8 c
 
         if (pProto->Flags & ITEM_FLAG_ITEM_PURCHASE_RECORD && crItem->ExtendedCost && pProto->GetMaxStackSize() == 1)
         {
-            it->SetFlag(ITEM_FIELD_FLAGS, ITEM_FLAG_REFUNDABLE);
+            it->SetFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_REFUNDABLE);
             it->SetRefundRecipient(GetGUIDLow());
             it->SetPaidMoney(price);
             it->SetPaidExtendedCost(crItem->ExtendedCost);
@@ -27116,7 +27116,7 @@ void Player::SendRefundInfo(Item* item)
     // This function call unsets ITEM_FLAGS_REFUNDABLE if played time is over 2 hours.
     item->UpdatePlayedTime(this);
 
-    if (!item->HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAG_REFUNDABLE))
+    if (!item->HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_REFUNDABLE))
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         sLog->outDebug(LOG_FILTER_PLAYER_ITEMS, "Item refund: item not refundable!");
@@ -27182,7 +27182,7 @@ bool Player::AddItem(uint32 itemId, uint32 count)
 
 void Player::RefundItem(Item* item)
 { 
-    if (!item->HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAG_REFUNDABLE))
+    if (!item->HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_REFUNDABLE))
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         sLog->outDebug(LOG_FILTER_PLAYER_ITEMS, "Item refund: item not refundable!");

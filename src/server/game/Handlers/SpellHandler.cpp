@@ -204,7 +204,7 @@ void WorldSession::HandleOpenItemOpcode(WorldPacket& recvPacket)
     }
 
     // Verify that the bag is an actual bag or wrapped item that can be used "normally"
-    if (!(proto->Flags & ITEM_FLAG_HAS_LOOT) && !item->HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAG_WRAPPED))
+    if (!(proto->Flags & ITEM_FLAG_HAS_LOOT) && !item->HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_WRAPPED))
     {
         pUser->SendEquipError(EQUIP_ERR_CANT_DO_RIGHT_NOW, item, NULL);
         sLog->outError("Possible hacking attempt: Player %s [guid: %u] tried to open item [guid: %u, entry: %u] which is not openable!",
@@ -233,7 +233,7 @@ void WorldSession::HandleOpenItemOpcode(WorldPacket& recvPacket)
         }
     }
 
-    if (item->HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAG_WRAPPED))// wrapped?
+    if (item->HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_WRAPPED))// wrapped?
     {
         PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHARACTER_GIFT_BY_ITEM);
 
@@ -257,7 +257,7 @@ void WorldSession::HandleOpenWrappedItemCallback(PreparedQueryResult result, uin
     if (!item)
         return;
 
-    if (item->GetGUIDLow() != itemLowGUID || !item->HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAG_WRAPPED)) // during getting result, gift was swapped with another item
+    if (item->GetGUIDLow() != itemLowGUID || !item->HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_WRAPPED)) // during getting result, gift was swapped with another item
         return;
 
 

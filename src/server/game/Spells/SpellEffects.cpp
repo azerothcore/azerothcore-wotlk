@@ -2167,7 +2167,7 @@ void Spell::EffectOpenLock(SpellEffIndex effIndex)
         SendLoot(guid, LOOT_SKINNING);
     else if (itemTarget)
     {
-        itemTarget->SetFlag(ITEM_FIELD_FLAGS, ITEM_FLAG_UNLOCKED);
+        itemTarget->SetFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_UNLOCKED);
         if (Player* itemOwner = itemTarget->GetOwner())
             itemTarget->SetState(ITEM_CHANGED, itemOwner);
     }

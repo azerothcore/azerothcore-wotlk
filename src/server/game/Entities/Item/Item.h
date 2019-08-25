@@ -209,8 +209,8 @@ class Item : public Object
         void SetOwnerGUID(uint64 guid) { SetUInt64Value(ITEM_FIELD_OWNER, guid); }
         Player* GetOwner() const;
 
-        void SetBinding(bool val) { ApplyModFlag(ITEM_FIELD_FLAGS, ITEM_FLAG_SOULBOUND, val); }
-        bool IsSoulBound() const { return HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAG_SOULBOUND); }
+        void SetBinding(bool val) { ApplyModFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_SOULBOUND, val); }
+        bool IsSoulBound() const { return HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_SOULBOUND); }
         bool IsBoundAccountWide() const { return (GetTemplate()->Flags & ITEM_FLAG_IS_BOUND_TO_ACCOUNT) != 0; }
         bool IsBindedNotWith(Player const* player) const;
         bool IsBoundByEnchant() const;
@@ -227,7 +227,7 @@ class Item : public Object
         Bag* ToBag() { if (IsBag()) return reinterpret_cast<Bag*>(this); else return NULL; }
         const Bag* ToBag() const { if (IsBag()) return reinterpret_cast<const Bag*>(this); else return NULL; }
 
-        bool IsLocked() const { return !HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAG_UNLOCKED); }
+        bool IsLocked() const { return !HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_UNLOCKED); }
         bool IsBag() const { return GetTemplate()->InventoryType == INVTYPE_BAG; }
         bool IsCurrencyToken() const { return GetTemplate()->IsCurrencyToken(); }
         bool IsNotEmptyBag() const;
