@@ -557,8 +557,8 @@ inline uint8 ItemSubClassToDurabilityMultiplierId(uint32 ItemClass, uint32 ItemS
     {
         case ITEM_CLASS_WEAPON: return ItemSubClass;
         case ITEM_CLASS_ARMOR:  return ItemSubClass + 21;
+        default:                return 0;
     }
-    return 0;
 }
 
 // GCC have alternative #pragma pack(N) syntax and old gcc version not support pack(push, N), also any gcc version not support it at some platform
@@ -730,8 +730,8 @@ struct ItemTemplate
         if (Delay == 0)
             return 0;
         float temp = 0;
-        for (uint8 i = 0; i < MAX_ITEM_PROTO_DAMAGES; ++i)
-            temp+=Damage[i].DamageMin + Damage[i].DamageMax;
+        for (auto i : Damage)
+            temp+=i.DamageMin + i.DamageMax;
         return temp*500/Delay;
     }
 
@@ -750,7 +750,7 @@ struct ItemTemplate
 
     float GetItemLevelIncludingQuality(uint8 pLevel) const
     {
-        float itemLevel = (float)ItemLevel;
+        auto itemLevel = (float)ItemLevel;
         switch (Quality)
         {
             case ITEM_QUALITY_POOR:
