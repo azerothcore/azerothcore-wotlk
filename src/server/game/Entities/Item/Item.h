@@ -10,7 +10,7 @@
 #include "Common.h"
 #include "Object.h"
 #include "LootMgr.h"
-#include "ItemPrototype.h"
+#include "ItemTemplate.h"
 #include "DatabaseEnv.h"
 
 class SpellInfo;
@@ -211,7 +211,7 @@ class Item : public Object
 
         void SetBinding(bool val) { ApplyModFlag(ITEM_FIELD_FLAGS, ITEM_FLAG_SOULBOUND, val); }
         bool IsSoulBound() const { return HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAG_SOULBOUND); }
-        bool IsBoundAccountWide() const { return (GetTemplate()->Flags & ITEM_PROTO_FLAG_BIND_TO_ACCOUNT) != 0; }
+        bool IsBoundAccountWide() const { return (GetTemplate()->Flags & ITEM_FLAG_IS_BOUND_TO_ACCOUNT) != 0; }
         bool IsBindedNotWith(Player const* player) const;
         bool IsBoundByEnchant() const;
         bool IsBoundByTempEnchant() const;
