@@ -424,12 +424,12 @@ std::wstring GetMainPartOfName(std::wstring wname, uint32 declension)
     static std::wstring const j_End    = { wchar_t(0x0439), wchar_t(0x0000) };
 
     static std::array<std::array<std::wstring const*, 7>, 6> const dropEnds = {{
-        {{ &a_End,  &o_End,    &ya_End,   &ie_End,  &soft_End, &j_End,    nullptr }},
-        {{ &a_End,  &ya_End,   &yeru_End, &i_End,   nullptr,   nullptr,   nullptr }},
-        {{ &ie_End, &u_End,    &yu_End,   &i_End,   nullptr,   nullptr,   nullptr }},
-        {{ &u_End,  &yu_End,   &o_End,    &ie_End,  &soft_End, &ya_End,   &a_End  }},
-        {{ &oj_End, &io_j_End, &ie_j_End, &o_m_End, &io_m_End, &ie_m_End, &yu_End }},
-        {{ &ie_End, &i_End,    nullptr,   nullptr,  nullptr,   nullptr,   nullptr }}
+        { &a_End,  &o_End,    &ya_End,   &ie_End,  &soft_End, &j_End,    nullptr },
+        { &a_End,  &ya_End,   &yeru_End, &i_End,   nullptr,   nullptr,   nullptr },
+        { &ie_End, &u_End,    &yu_End,   &i_End,   nullptr,   nullptr,   nullptr },
+        { &u_End,  &yu_End,   &o_End,    &ie_End,  &soft_End, &ya_End,   &a_End  },
+        { &oj_End, &io_j_End, &ie_j_End, &o_m_End, &io_m_End, &ie_m_End, &yu_End },
+        { &ie_End, &i_End,    nullptr,   nullptr,  nullptr,   nullptr,   nullptr }
     }};
 
     std::size_t const thisLen = wname.length();
