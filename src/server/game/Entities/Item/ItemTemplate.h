@@ -167,7 +167,7 @@ enum ItemFlags : uint32
     ITEM_FLAG_NO_PROGRESSIVE_LOOT               = 0x80000000
 };
 
-num ItemFlags2 : uint32
+enum ItemFlags2 : uint32
 {
         ITEM_FLAG2_FACTION_HORDE                            = 0x00000001,
         ITEM_FLAG2_FACTION_ALLIANCE                         = 0x00000002,
