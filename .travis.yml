@@ -1,6 +1,5 @@
 sudo: required
-dist: xenial # (16.04)
-# bionic (18.04) is not yet available in travis
+dist: bionic # (18.04)
 
 language: cpp
 
