@@ -15,6 +15,7 @@
 #include <utility>
 #include <set>
 #include <optional>
+#include <functional>
 
 #include "Util.h"
 
