@@ -33,9 +33,9 @@
 
 MapManager::MapManager()
 {
+    : _nextInstanceId(0), _scheduledScripts(0)
     i_timer[3].SetInterval(sWorld->getIntConfig(CONFIG_INTERVAL_MAPUPDATE));
     mapUpdateStep = 0;
-    _nextInstanceId = 0;
 }
 
 MapManager::~MapManager()

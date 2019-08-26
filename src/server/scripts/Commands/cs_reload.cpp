@@ -248,7 +248,7 @@ public:
 
     static bool HandleReloadAllScriptsCommand(ChatHandler* handler, const char* /*args*/)
     {
-        if (sScriptMgr->IsScriptScheduled())
+        if (sMapMgr->IsScriptScheduled())
         {
             handler->PSendSysMessage("DB scripts used currently, please attempt reload later.");
             handler->SetSentErrorMessage(true);
@@ -952,7 +952,7 @@ public:
 
     static bool HandleReloadEventScriptsCommand(ChatHandler* handler, const char* args)
     {
-        if (sScriptMgr->IsScriptScheduled())
+        if (sMapMgr->IsScriptScheduled())
         {
             handler->SendSysMessage("DB scripts used currently, please attempt reload later.");
             handler->SetSentErrorMessage(true);
@@ -972,7 +972,7 @@ public:
 
     static bool HandleReloadWpScriptsCommand(ChatHandler* handler, const char* args)
     {
-        if (sScriptMgr->IsScriptScheduled())
+        if (sMapMgr->IsScriptScheduled())
         {
             handler->SendSysMessage("DB scripts used currently, please attempt reload later.");
             handler->SetSentErrorMessage(true);
@@ -1005,7 +1005,7 @@ public:
 
     static bool HandleReloadSpellScriptsCommand(ChatHandler* handler, const char* args)
     {
-        if (sScriptMgr->IsScriptScheduled())
+        if (sMapMgr->IsScriptScheduled())
         {
             handler->SendSysMessage("DB scripts used currently, please attempt reload later.");
             handler->SetSentErrorMessage(true);

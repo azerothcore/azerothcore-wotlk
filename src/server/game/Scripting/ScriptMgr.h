@@ -1461,14 +1461,6 @@ class ScriptMgr
         void OnAfterInitializeLockedDungeons(Player* player);
         void OnAfterUpdateEncounterState(Map* map, EncounterCreditType type, uint32 creditEntry, Unit* source, Difficulty difficulty_fixed, DungeonEncounterList const* encounters, uint32 dungeonCompleted, bool updated);
 
-
-    public: /* Scheduled scripts */
-
-        uint32 IncreaseScheduledScriptsCount() { return ++_scheduledScripts; }
-        uint32 DecreaseScheduledScriptCount() { return --_scheduledScripts; }
-        uint32 DecreaseScheduledScriptCount(size_t count) { return _scheduledScripts -= count; }
-        bool IsScriptScheduled() const { return _scheduledScripts > 0; }
-
     public: /* UnitScript */
 
         void OnHeal(Unit* healer, Unit* reciever, uint32& gain);
@@ -1524,9 +1516,6 @@ class ScriptMgr
     private:
 
         uint32 _scriptCount;
-
-        //atomic op counter for active scripts amount
-        std::atomic<long> _scheduledScripts;
 };
 
 template<class TScript>
