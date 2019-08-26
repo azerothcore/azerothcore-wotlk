@@ -171,7 +171,7 @@ extern int main(int argc, char** argv)
     int32 rmport = sConfigMgr->GetIntDefault("RealmServerPort", 3724);
     if (rmport < 0 || rmport > 0xFFFF)
     {
-        sLog->outError("Specified port out of allowed range (1-65535)");
+        sLog->outError("The specified RealmServerPort (%d) is out of the allowed range (1-65535)", rmport);
         return 1;
     }
 
@@ -184,6 +184,8 @@ extern int main(int argc, char** argv)
         sLog->outError("Auth server can not bind to %s:%d", bind_ip.c_str(), rmport);
         return 1;
     }
+
+    sLog->outString("Authserver listening to %s:%d", bind_ip.c_str(), rmport);
 
     // Initialize the signal handlers
     AuthServerSignalHandler SignalINT, SignalTERM;
