@@ -8,6 +8,7 @@
 #define _EVENT_MAP_H_
 
 #include "Common.h"
+#include "Duration.h"
 
 class EventMap
 {
@@ -99,6 +100,20 @@ public:
             _phase &= uint8(~(1 << (phase - 1)));
     }
 
+
+    /**
+    * @name ScheduleEvent
+    * @brief Creates new event entry in map.
+    * @param eventId The id of the new event.
+    * @param time The time in milliseconds as std::chrono::duration until the event occurs.
+    * @param group The group which the event is associated to. Has to be between 1 and 8. 0 means it has no group.
+    * @param phase The phase in which the event can occur. Has to be between 1 and 8. 0 means it can occur in all phases.
+    */
+    void ScheduleEvent(uint32 eventId, Milliseconds const& time, uint32 group = 0, uint8 phase = 0)
+    {
+        ScheduleEvent(eventId, time.count(), group, phase);
+    }
+
     /**
     * @name ScheduleEvent
     * @brief Creates new event entry in map.
@@ -108,6 +123,19 @@ public:
     * @param phase The phase in which the event can occur. Has to be between 1 and 8. 0 means it can occur in all phases.
     */
     void ScheduleEvent(uint32 eventId, uint32 time, uint32 group = 0, uint8 phase = 0);
+
+    /**
+    * @name RescheduleEvent
+    * @brief Cancels the given event and reschedules it.
+    * @param eventId The id of the event.
+    * @param time The time in milliseconds as std::chrono::duration until the event occurs.
+    * @param group The group which the event is associated to. Has to be between 1 and 8. 0 means it has no group.
+    * @param phase The phase in which the event can occur. Has to be between 1 and 8. 0 means it can occur in all phases.
+    */
+    void RescheduleEvent(uint32 eventId, Milliseconds const& time, uint32 group = 0, uint8 phase = 0)
+    {
+        RescheduleEvent(eventId, time.count(), group, phase);
+    }
 
     /**
     * @name RescheduleEvent
@@ -126,11 +154,32 @@ public:
     /**
     * @name RepeatEvent
     * @brief Repeats the mostly recently executed event.
+    * @param time Time until in milliseconds as std::chrono::duration the event occurs.
+    */
+    void Repeat(Milliseconds const& time)
+    {
+        Repeat(time.count());
+    }
+
+    /**
+    * @name RepeatEvent
+    * @brief Repeats the mostly recently executed event.
     * @param time Time until the event occurs.
     */
     void Repeat(uint32 time)
     {
         _eventMap.insert(EventStore::value_type(_time + time, _lastEvent));
+    }
+
+    /**
+    * @name RepeatEvent
+    * @brief Repeats the mostly recently executed event.
+    * @param minTime Minimum time as std::chrono::duration until the event occurs.
+    * @param maxTime Maximum time as std::chrono::duration until the event occurs.
+    */
+    void Repeat(Milliseconds const& minTime, Milliseconds const& maxTime)
+    {
+        Repeat(minTime.count(), maxTime.count());
     }
 
     /**
@@ -154,11 +203,32 @@ public:
     /**
     * @name DelayEvents
     * @brief Delays all events in the map. If delay is greater than or equal internal timer, delay will be 0.
+    * @param delay Amount of delay in ms as std::chrono::duration.
+    */
+    void DelayEvents(Milliseconds const& delay)
+    {
+        DelayEvents(delay.count());
+    }
+
+    /**
+    * @name DelayEvents
+    * @brief Delays all events in the map. If delay is greater than or equal internal timer, delay will be 0.
     * @param delay Amount of delay.
     */
     void DelayEvents(uint32 delay)
     {
         _time = delay < _time ? _time - delay : 0;
+    }
+
+    /**
+    * @name DelayEvents
+    * @brief Delay all events of the same group.
+    * @param delay Amount of delay in ms as std::chrono::duration.
+    * @param group Group of the events.
+    */
+    void DelayEvents(Milliseconds const& delay, uint32 group)
+    {
+        DelayEvents(delay.count(), group);
     }
 
     /**
