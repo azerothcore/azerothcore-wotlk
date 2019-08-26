@@ -11,6 +11,7 @@
 #include "SharedDefines.h"
 #include "DBCEnums.h"
 #include "GameObject.h"
+#include "EventMap.h"
 
 class Creature;
 class GameObject;
