@@ -52,7 +52,7 @@ public:
 
     struct boss_anubrekhanAI : public BossAI
     {
-        boss_anubrekhanAI(Creature *c) : BossAI(c, BOSS_ANUB), summons(me)
+        explicit boss_anubrekhanAI(Creature *c) : BossAI(c, BOSS_ANUB), summons(me)
         {
             pInstance = c->GetInstanceScript();
             sayGreet = false;

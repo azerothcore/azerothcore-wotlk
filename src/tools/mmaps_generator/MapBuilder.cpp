@@ -4,18 +4,16 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "PathCommon.h"
 #include "MapBuilder.h"
-
 #include "MapTree.h"
 #include "ModelInstance.h"
+#include "PathCommon.h"
 
-#include "DetourNavMeshBuilder.h"
-#include "DetourNavMesh.h"
-#include "DetourCommon.h"
+#include <DetourCommon.h>
+#include <DetourNavMesh.h>
+#include <DetourNavMeshBuilder.h>
 
 #include "DisableMgr.h"
-#include <ace/OS_NS_unistd.h>
 
 namespace DisableMgr
 {
@@ -23,7 +21,7 @@ namespace DisableMgr
 }
 
 #define MMAP_MAGIC 0x4d4d4150   // 'MMAP'
-#define MMAP_VERSION 9
+#define MMAP_VERSION 10
 
 struct MmapTileHeader
 {
@@ -388,6 +386,8 @@ namespace MMAP
             printf("[Map %03i] We have %u tiles.                          \n", mapID, (unsigned int)tiles->size());
             for (std::set<uint32>::iterator it = tiles->begin(); it != tiles->end(); ++it)
             {
+                // percentageDone - increment tiles built
+                m_totalTilesBuilt++;
                 uint32 tileX, tileY;
 
                 // unpack tile coords
@@ -443,9 +443,6 @@ namespace MMAP
 
         // build navmesh tile
         buildMoveMapTile(mapID, tileX, tileY, meshData, bmin, bmax, navMesh);
-
-        // percentageDone - increment tiles built
-        m_totalTilesBuilt++;
     }
 
     /**************************************************************************/
