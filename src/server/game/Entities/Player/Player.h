@@ -50,10 +50,6 @@ typedef std::deque<Mail*> PlayerMails;
 #define PLAYER_MAX_DAILY_QUESTS     25
 #define PLAYER_EXPLORED_ZONES_SIZE  128
 
-#define GOSSIP_TOGGLE_INSTANT_FLIGHT "Toggle Instant Flight"
-#define MSG_INSTANT_FLIGHT_ON        "Instant Flight ON"
-#define MSG_INSTANT_FLIGHT_OFF       "Instant Flight OFF"
-
 // Note: SPELLMOD_* values is aura types in fact
 enum SpellModType
 {
