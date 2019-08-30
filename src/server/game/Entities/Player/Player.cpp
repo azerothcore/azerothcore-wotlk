@@ -8890,7 +8890,7 @@ void Player::_ApplyAllLevelScaleItemMods(bool apply)
             if (!proto)
                 continue;
 
-            _ApplyItemBonuses(proto, i, apply, true);
+            _ApplyItemMods(m_items[i], i, apply);
         }
     }
 }
