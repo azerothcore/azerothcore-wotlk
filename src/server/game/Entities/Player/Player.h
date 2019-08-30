@@ -50,6 +50,10 @@ typedef std::deque<Mail*> PlayerMails;
 #define PLAYER_MAX_DAILY_QUESTS     25
 #define PLAYER_EXPLORED_ZONES_SIZE  128
 
+#define GOSSIP_TOGGLE_INSTANT_FLIGHT "Toggle Instant Flight"
+#define MSG_INSTANT_FLIGHT_ON        "Instant Flight ON"
+#define MSG_INSTANT_FLIGHT_OFF       "Instant Flight OFF"
+
 // Note: SPELLMOD_* values is aura types in fact
 enum SpellModType
 {
@@ -909,6 +913,11 @@ enum PlayerCommandStates
     CHEAT_WATERWALK = 0x10
 };
 
+enum InstantFlightGossipAction
+{
+    GOSSIP_ACTION_TOGGLE_INSTANT_FLIGHT = 500
+};
+
 class PlayerTaxi
 {
     public:
@@ -1394,6 +1403,8 @@ class Player : public Unit, public GridObject<Player>
         uint32 GetGossipTextId(uint32 menuId, WorldObject* source);
         uint32 GetGossipTextId(WorldObject* source);
         static uint32 GetDefaultGossipMenuForSource(WorldObject* source);
+
+        void ToggleInstantFlight();
 
         /*********************************************************/
         /***                    QUEST SYSTEM                   ***/
@@ -2961,6 +2972,8 @@ class Player : public Unit, public GridObject<Player>
         // duel health and mana reset attributes
         uint32 healthBeforeDuel;
         uint32 manaBeforeDuel;
+
+        bool m_isInstantFlightOn;
 };
 
 void AddItemsSetItem(Player* player, Item* item);

@@ -1187,6 +1187,7 @@ AllFlightPaths = 0
 #                     of making them wait while flying.
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
+#                     2 - (Enabled, but the player can toggle instant flight off or on at each flight master)
 
 InstantFlightPaths = 0
 
