@@ -11,6 +11,7 @@
 #include "PassiveAI.h"
 #include "Player.h"
 #include "Vehicle.h"
+#include <random>
 
 enum ScriptTexts
 {
@@ -549,7 +550,7 @@ public:
                                     validPlayers.push_back(plr);
 
                 std::vector<Player*>::iterator begin=validPlayers.begin(), end=validPlayers.end();
-                std::random_shuffle(begin, end);
+                std::shuffle(begin, end, std::default_random_engine{});
 
                 for (uint8 i = 0; i < boneSpikeCount && i < validPlayers.size(); ++i)
                 {
