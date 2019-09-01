@@ -85,9 +85,9 @@ class spell_winter_wondervolt_trap : public SpellScriptLoader
 
                 uint32 spellId = 0;
                 if (target->getGender() == GENDER_MALE)
-                    spellId = RAND<uint32>(SPELL_WINTER_WONDERVOLT_RED_MAN, SPELL_WINTER_WONDERVOLT_GREEN_MAN);
+                    spellId = RAND(SPELL_WINTER_WONDERVOLT_RED_MAN, SPELL_WINTER_WONDERVOLT_GREEN_MAN);
                 else
-                    spellId = RAND<uint32>(SPELL_WINTER_WONDERVOLT_RED_WOMEN, SPELL_WINTER_WONDERVOLT_GREEN_WOMEN);
+                    spellId = RAND(SPELL_WINTER_WONDERVOLT_RED_WOMEN, SPELL_WINTER_WONDERVOLT_GREEN_WOMEN);
 
                 // cast
                 target->CastSpell(target, spellId, true);
