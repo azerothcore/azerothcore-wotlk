@@ -209,4 +209,14 @@ typedef std::vector<std::string> StringVector;
   ACE_Read_Guard< MUTEX > TRINITY_GUARD_OBJECT (LOCK); \
     if (TRINITY_GUARD_OBJECT.locked() == 0) ASSERT(false);
 
+namespace ACORE
+{
+    template<class ArgumentType, class ResultType>
+    struct unary_function
+    {
+        typedef ArgumentType argument_type;
+        typedef ResultType result_type;
+    };
+}
+
 #endif
