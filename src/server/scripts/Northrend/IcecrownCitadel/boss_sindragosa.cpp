@@ -227,7 +227,7 @@ class IceTombSummonEvent : public BasicEvent
         uint64 _sindragosaGUID;
 };
 
-struct LastPhaseIceTombTargetSelector : public std::unary_function<Unit*, bool>
+struct LastPhaseIceTombTargetSelector : public ACORE::unary_function<Unit*, bool>
 {
     public:
         LastPhaseIceTombTargetSelector(Creature* source) : _source(source) { }
@@ -240,6 +240,9 @@ struct LastPhaseIceTombTargetSelector : public std::unary_function<Unit*, bool>
                 return false;
 
             if (target->GetTypeId() != TYPEID_PLAYER)
+                return false;
+
+            if (target->HasAura(SPELL_FROST_IMBUED_BLADE))
                 return false;
 
             if (target->IsImmunedToDamageOrSchool(SPELL_SCHOOL_MASK_ALL) || target->HasAura(SPELL_ICE_TOMB_UNTARGETABLE) || target->HasAura(SPELL_ICE_TOMB_DAMAGE) || target->HasAura(SPELL_TANK_MARKER_AURA) || target->HasAuraType(SPELL_AURA_SPIRIT_OF_REDEMPTION))
@@ -1154,12 +1157,12 @@ class SindragosaIceTombCheck
     public:
         bool operator()(Unit* unit) const
         {
-            return unit->IsImmunedToDamageOrSchool(SPELL_SCHOOL_MASK_ALL);
+            return unit->HasAura(SPELL_FROST_IMBUED_BLADE) || unit->IsImmunedToDamageOrSchool(SPELL_SCHOOL_MASK_ALL);
         }
 
         bool operator()(WorldObject* object) const
         {
-            return object->ToUnit() && object->ToUnit()->IsImmunedToDamageOrSchool(SPELL_SCHOOL_MASK_ALL);
+            return object->ToUnit() && (object->ToUnit()->HasAura(SPELL_FROST_IMBUED_BLADE) || object->ToUnit()->IsImmunedToDamageOrSchool(SPELL_SCHOOL_MASK_ALL));
         }
 };
 

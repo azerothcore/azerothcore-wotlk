@@ -359,7 +359,7 @@ void SendPacketToPlayers(WorldPacket const* data, Unit* source)
 }
 
 
-struct NonTankLKTargetSelector : public std::unary_function<Unit*, bool>
+struct NonTankLKTargetSelector : public ACORE::unary_function<Unit*, bool>
 {
 public:
     NonTankLKTargetSelector(Creature* source, bool playerOnly = true, bool reqLOS = false, float maxDist = 0.0f, uint32 exclude1 = 0, uint32 exclude2 = 0) : _source(source), _playerOnly(playerOnly), _reqLOS(reqLOS), _maxDist(maxDist), _exclude1(exclude1), _exclude2(exclude2) { }
@@ -394,7 +394,7 @@ private:
 };
 
 
-struct DefileTargetSelector : public std::unary_function<Unit*, bool>
+struct DefileTargetSelector : public ACORE::unary_function<Unit*, bool>
 {
 public:
     DefileTargetSelector(Creature* source) : _source(source) { }
@@ -551,7 +551,7 @@ private:
     Creature& _owner;
 };
 
-class NecroticPlagueTargetCheck : public std::unary_function<Unit*, bool>
+class NecroticPlagueTargetCheck : public ACORE::unary_function<Unit*, bool>
 {
     public:
         NecroticPlagueTargetCheck(Unit const* obj, uint32 notAura1, uint32 notAura2) : _sourceObj(obj), _notAura1(notAura1), _notAura2(notAura2) {}
