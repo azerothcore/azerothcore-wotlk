@@ -24,6 +24,9 @@ else()
   message(STATUS "MSVC: Enabled SSE2 support")
 endif()
 
+message(STATUS "MSVC: Enabled С++17 support")
+set(CMAKE_CXX_STANDARD 17)
+
 # Set build-directive (used in core to tell which buildtype we used)
 add_definitions(-D_BUILD_DIRECTIVE=\\"$(ConfigurationName)\\")
 
