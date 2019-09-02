@@ -86,7 +86,7 @@ enum Misc
     EVENT_KILL_TALK                     = 100
 };
 
-struct HammerOfJusticeSelector : public std::unary_function<Unit*, bool>
+struct HammerOfJusticeSelector : public ACORE::unary_function<Unit*, bool>
 {
     Unit const* _me;
     HammerOfJusticeSelector(Unit* me) : _me(me) { }

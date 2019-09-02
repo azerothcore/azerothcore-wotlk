@@ -11,7 +11,7 @@
 #define MAX_BAG_SIZE 36                                     // 2.0.12
 
 #include "Item.h"
-#include "ItemPrototype.h"
+#include "ItemTemplate.h"
 
 class Bag : public Item
 {

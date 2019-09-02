@@ -9,6 +9,7 @@
 #include "icecrown_citadel.h"
 #include "SpellInfo.h"
 #include "Player.h"
+#include <random>
 
 enum ScriptTexts
 {
@@ -387,7 +388,7 @@ class boss_lady_deathwhisper : public CreatureScript
                                         }
 
                             std::vector<Player*>::iterator begin=validPlayers.begin(), end=validPlayers.end();
-                            std::random_shuffle(begin, end);
+                            std::shuffle(begin, end, std::default_random_engine{});
 
                             for (uint8 i = 0; i < RAID_MODE<uint8>(0, 1, 1, 3) && i < validPlayers.size(); i++)
                             {

@@ -188,7 +188,7 @@ private:
 };
 
 // xinef: malleable goo selector, check for target validity
-struct MalleableGooSelector : public std::unary_function<Unit*, bool>
+struct MalleableGooSelector : public ACORE::unary_function<Unit*, bool>
 {
     const Unit* me;
     MalleableGooSelector(Unit const* unit) : me(unit) {}

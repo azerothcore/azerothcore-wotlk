@@ -83,7 +83,7 @@ namespace XML
   private:
     bool initialized_;
     XERCES_CPP_NAMESPACE::DOMImplementation *impl_;
-    mutable std::auto_ptr<XERCES_CPP_NAMESPACE::XercesDOMParser> parser_;
+    mutable std::unique_ptr<XERCES_CPP_NAMESPACE::XercesDOMParser> parser_;
 
     Resolver *resolver_;
     bool release_resolver_;
