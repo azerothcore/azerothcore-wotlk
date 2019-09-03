@@ -401,7 +401,7 @@ template<class Check>
 void Trinity::UnitListSearcher<Check>::Visit(PlayerMapType &m)
 {
     for (PlayerMapType::iterator itr=m.begin(); itr != m.end(); ++itr)
-        if (itr->GetSource()->IsInPhase(_searcher))
+        if (itr->GetSource()->InSamePhase(_searcher))
             if (i_check(itr->GetSource()))
                 Insert(itr->GetSource());
 }
@@ -410,7 +410,7 @@ template<class Check>
 void Trinity::UnitListSearcher<Check>::Visit(CreatureMapType &m)
 {
     for (CreatureMapType::iterator itr=m.begin(); itr != m.end(); ++itr)
-        if (itr->GetSource()->IsInPhase(_searcher))
+        if (itr->GetSource()->InSamePhase(_searcher))
             if (i_check(itr->GetSource()))
                 Insert(itr->GetSource());
 }
