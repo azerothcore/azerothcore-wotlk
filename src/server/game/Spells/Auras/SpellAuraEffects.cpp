@@ -395,24 +395,26 @@ AuraEffect::~AuraEffect()
     delete m_channelData;
 }
 
-void AuraEffect::GetTargetList(std::list<Unit*> & targetList) const
+template <typename Container>
+void AuraEffect::GetTargetList(Container& targetContainer) const
 {
-    Aura::ApplicationMap const & targetMap = GetBase()->GetApplicationMap();
+    Aura::ApplicationMap const& targetMap = GetBase()->GetApplicationMap();
     // remove all targets which were not added to new list - they no longer deserve area aura
-    for (Aura::ApplicationMap::const_iterator appIter = targetMap.begin(); appIter != targetMap.end(); ++appIter)
+    for (auto appIter = targetMap.begin(); appIter != targetMap.end(); ++appIter)
     {
         if (appIter->second->HasEffect(GetEffIndex()))
-            targetList.push_back(appIter->second->GetTarget());
+            targetContainer.push_back(appIter->second->GetTarget());
     }
 }
 
-void AuraEffect::GetApplicationList(std::list<AuraApplication*> & applicationList) const
+template <typename Container>
+void AuraEffect::GetApplicationList(Container& applicationContainer) const
 {
-    Aura::ApplicationMap const & targetMap = GetBase()->GetApplicationMap();
-    for (Aura::ApplicationMap::const_iterator appIter = targetMap.begin(); appIter != targetMap.end(); ++appIter)
+    Aura::ApplicationMap const& targetMap = GetBase()->GetApplicationMap();
+    for (auto appIter = targetMap.begin(); appIter != targetMap.end(); ++appIter)
     {
         if (appIter->second->HasEffect(GetEffIndex()))
-            applicationList.push_back(appIter->second);
+            applicationContainer.push_back(appIter->second);
     }
 }
 
@@ -689,6 +691,7 @@ void AuraEffect::ChangeAmount(int32 newAmount, bool mark, bool onStackOrReapply)
         handleMask |= AURA_EFFECT_HANDLE_REAPPLY;
     if (!handleMask)
         return;
+
     std::vector<AuraApplication*> effectApplications;
     GetApplicationList(effectApplications);
     for (AuraApplication* aurApp : effectApplications)
@@ -696,6 +699,7 @@ void AuraEffect::ChangeAmount(int32 newAmount, bool mark, bool onStackOrReapply)
         aurApp->GetTarget()->_RegisterAuraEffect(this, false);
         HandleEffect(aurApp, handleMask, false);
     }
+
     if (handleMask & AURA_EFFECT_HANDLE_CHANGE_AMOUNT)
     {
         if (!mark)
@@ -884,12 +888,11 @@ void AuraEffect::Update(uint32 diff, Unit* caster)
             m_periodicTimer += m_amplitude;
             UpdatePeriodic(caster);
 
-            std::list<AuraApplication*> effectApplications;
+            std::vector<AuraApplication*> effectApplications;
             GetApplicationList(effectApplications);
             // tick on targets of effects
-            for (std::list<AuraApplication*>::const_iterator apptItr = effectApplications.begin(); apptItr != effectApplications.end(); ++apptItr)
-                if ((*apptItr)->HasEffect(GetEffIndex()))
-                    PeriodicTick(*apptItr, caster);
+            for (AuraApplication* aurApp : effectApplications)
+                PeriodicTick(aurApp, caster);
         }
     }
 }
@@ -6794,3 +6797,11 @@ void AuraEffect::HandleRaidProcFromChargeWithValueAuraProc(AuraApplication* aurA
 #endif
     target->CastCustomSpell(target, triggerSpellId, &value, NULL, NULL, true, NULL, this, GetCasterGUID());
 }
+
+template void AuraEffect::GetTargetList(std::list<Unit*>&) const;
+template void AuraEffect::GetTargetList(std::deque<Unit*>&) const;
+template void AuraEffect::GetTargetList(std::vector<Unit*>&) const;
+
+template void AuraEffect::GetApplicationList(std::list<AuraApplication*>&) const;
+template void AuraEffect::GetApplicationList(std::deque<AuraApplication*>&) const;
+template void AuraEffect::GetApplicationList(std::vector<AuraApplication*>&) const;
