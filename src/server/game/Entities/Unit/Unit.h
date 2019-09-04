@@ -2316,7 +2316,7 @@ class Unit : public WorldObject
         void CastPetAura(PetAura const* aura);
         bool IsPetAura(Aura const* aura);
 
-        uint32 GetModelForForm(ShapeshiftForm form) const;
+        uint32 GetModelForForm(ShapeshiftForm form, uint32 spellId) const;
         uint32 GetModelForTotem(PlayerTotemType totemType);
 
         // Redirect Threat
