@@ -35,7 +35,7 @@ else()
 
   target_link_libraries(bzip2
     PRIVATE
-      trinity-dependency-interface)
+      acore-dependency-interface)
 
   set_target_properties(bzip2
     PROPERTIES
