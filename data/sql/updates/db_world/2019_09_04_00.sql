@@ -1,3 +1,19 @@
+-- DB update 2019_09_03_01 -> 2019_09_04_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2019_09_03_01';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2019_09_03_01 2019_09_04_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1566600036032917597'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1566600036032917597');
 
 -- These quests should reward 30% more reputation for the Sons of Hodir (see patch notes 3.3.0)
@@ -169,3 +185,12 @@ VALUES
 (19208000,9,3,0,0,0,100,0,1500,1500,0,0,0,12,30302,3,10000,0,0,0,8,0,0,0,0,7389.53,-2731.87,871.723,0,'Hodir''s Helm - On Script - Summon ''Helm Sparkle Bunny'''),
 (19208000,9,4,0,0,0,100,0,1500,1500,0,0,0,12,30302,3,10000,0,0,0,8,0,0,0,0,7389.56,-2715.5,867.216,0,'Hodir''s Helm - On Script - Summon ''Helm Sparkle Bunny'''),
 (19208000,9,5,0,0,0,100,0,1500,1500,0,0,0,12,30302,3,10000,0,0,0,8,0,0,0,0,7377.39,-2726.03,868.973,0,'Hodir''s Helm - On Script - Summon ''Helm Sparkle Bunny''');
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
