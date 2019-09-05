@@ -933,6 +933,8 @@ Player::Player(WorldSession* session): Unit(true), m_mover(this)
         m_charmAISpells[i] = 0;
 
     m_applyResilience = true;
+
+    m_isInstantFlightOn = true;
 }
 
 Player::~Player()
@@ -2881,11 +2883,11 @@ Creature* Player::GetNPCIfCanInteractWith(uint64 guid, uint32 npcflagmask)
         return NULL;
 
     // Deathstate checks
-    if (!IsAlive() && !(creature->GetCreatureTemplate()->type_flags & CREATURE_TYPEFLAGS_GHOST))
+    if (!IsAlive() && !(creature->GetCreatureTemplate()->type_flags & CREATURE_TYPE_FLAG_GHOST_VISIBLE))
         return NULL;
 
     // alive or spirit healer
-    if (!creature->IsAlive() && !(creature->GetCreatureTemplate()->type_flags & CREATURE_TYPEFLAGS_DEAD_INTERACT))
+    if (!creature->IsAlive() && !(creature->GetCreatureTemplate()->type_flags & CREATURE_TYPE_FLAG_CAN_INTERACT_WHILE_DEAD))
         return NULL;
 
     // appropriate npc type
@@ -8890,7 +8892,7 @@ void Player::_ApplyAllLevelScaleItemMods(bool apply)
             if (!proto)
                 continue;
 
-            _ApplyItemBonuses(proto, i, apply, true);
+            _ApplyItemMods(m_items[i], i, apply);
         }
     }
 }
@@ -13018,7 +13020,7 @@ void Player::MoveItemToInventory(ItemPosCountVec const& dest, Item* pItem, bool 
         // in case trade we already have item in other player inventory
         pLastItem->SetState(in_characterInventoryDB ? ITEM_CHANGED : ITEM_NEW, this);
 
-        if (pLastItem->HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAG_BOP_TRADEABLE))
+        if (pLastItem->HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_BOP_TRADEABLE))
             AddTradeableItem(pLastItem);
     }
 }
@@ -13037,7 +13039,7 @@ void Player::DestroyItem(uint8 bag, uint8 slot, bool update)
             for (uint8 i = 0; i < MAX_BAG_SIZE; ++i)
                 DestroyItem(slot, i, update);
 
-        if (pItem->HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAG_WRAPPED))
+        if (pItem->HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_WRAPPED))
         {
             PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_GIFT);
 
@@ -13109,7 +13111,7 @@ void Player::DestroyItem(uint8 bag, uint8 slot, bool update)
             pBag->RemoveItem(slot, update);
 
         // Xinef: item is removed, remove loot from storage if any
-        if (proto->Flags & ITEM_PROTO_FLAG_OPENABLE)
+        if (proto->Flags & ITEM_FLAG_HAS_LOOT)
             sLootItemStorage->RemoveStoredLoot(pItem->GetGUIDLow());
 
         if (IsInWorld() && update)
@@ -14989,6 +14991,9 @@ void Player::PrepareGossipMenu(WorldObject* source, uint32 menuId /*= 0*/, bool 
             menu->GetGossipMenu().AddGossipMenuItemData(itr->second.OptionID, itr->second.ActionMenuID, itr->second.ActionPoiID);
         }
     }
+
+    if (sWorld->getIntConfig(CONFIG_INSTANT_TAXI) == 2 && npcflags & UNIT_NPC_FLAG_FLIGHTMASTER)
+        menu->GetGossipMenu().AddMenuItem(-1, GOSSIP_ICON_INTERACT_1, GetSession()->GetTrinityString(LANG_TOGGLE_INSTANT_FLIGHT), 0, GOSSIP_ACTION_TOGGLE_INSTANT_FLIGHT, "", 0, false); // instant flight toggle option
 }
 
 void Player::SendPreparedGossip(WorldObject* source)
@@ -15040,6 +15045,22 @@ void Player::OnGossipSelect(WorldObject* source, uint32 gossipListId, uint32 men
 
     uint32 gossipOptionId = item->OptionType;
     uint64 guid = source->GetGUID();
+
+    if (sWorld->getIntConfig(CONFIG_INSTANT_TAXI) == 2 && source->GetTypeId() == TYPEID_UNIT)
+    {
+        if (gossipOptionId == GOSSIP_ACTION_TOGGLE_INSTANT_FLIGHT && source->GetUInt32Value(UNIT_NPC_FLAGS) & UNIT_NPC_FLAG_FLIGHTMASTER)
+        {
+            ToggleInstantFlight();
+
+            if (m_isInstantFlightOn)
+                GetSession()->SendNotification(LANG_INSTANT_FLIGHT_ON);
+            else
+                GetSession()->SendNotification(LANG_INSTANT_FLIGHT_OFF);
+
+            PlayerTalkClass->SendCloseGossip();
+            return;
+        }
+    }
 
     if (source->GetTypeId() == TYPEID_GAMEOBJECT)
     {
@@ -15201,6 +15222,11 @@ uint32 Player::GetDefaultGossipMenuForSource(WorldObject* source)
     }
 
     return 0;
+}
+
+void Player::ToggleInstantFlight()
+{
+    m_isInstantFlightOn = !m_isInstantFlightOn;
 }
 
 /*********************************************************/
@@ -18772,7 +18798,7 @@ Item* Player::_LoadItem(SQLTransaction& trans, uint32 zoneId, uint32 timeDiff, F
                 remove = true;
             }
             // "Conjured items disappear if you are logged out for more than 15 minutes"
-            else if (timeDiff > 15 * MINUTE && proto->Flags & ITEM_PROTO_FLAG_CONJURED)
+            else if (timeDiff > 15 * MINUTE && proto->Flags & ITEM_FLAG_CONJURED)
             {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
                 sLog->outDebug(LOG_FILTER_PLAYER_LOADING, "Player::_LoadInventory: player (GUID: %u, name: '%s', diff: %u) has conjured item (GUID: %u, entry: %u) with expired lifetime (15 minutes). Deleting item.",
@@ -18780,7 +18806,7 @@ Item* Player::_LoadItem(SQLTransaction& trans, uint32 zoneId, uint32 timeDiff, F
 #endif
                 remove = true;
             }
-            else if (item->HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAG_REFUNDABLE))
+            else if (item->HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_REFUNDABLE))
             {
                 if (item->GetPlayedTime() > (2 * HOUR))
                 {
@@ -18792,7 +18818,7 @@ Item* Player::_LoadItem(SQLTransaction& trans, uint32 zoneId, uint32 timeDiff, F
                     stmt->setUInt32(0, item->GetGUIDLow());
                     trans->Append(stmt);
 
-                    item->RemoveFlag(ITEM_FIELD_FLAGS, ITEM_FLAG_REFUNDABLE);
+                    item->RemoveFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_REFUNDABLE);
                 }
                 else
                 {
@@ -18813,11 +18839,11 @@ Item* Player::_LoadItem(SQLTransaction& trans, uint32 zoneId, uint32 timeDiff, F
                         sLog->outDebug(LOG_FILTER_PLAYER_LOADING, "Player::_LoadInventory: player (GUID: %u, name: '%s') has item (GUID: %u, entry: %u) with refundable flags, but without data in item_refund_instance. Removing flag.",
                             GetGUIDLow(), GetName().c_str(), item->GetGUIDLow(), item->GetEntry());
 #endif
-                        item->RemoveFlag(ITEM_FIELD_FLAGS, ITEM_FLAG_REFUNDABLE);
+                        item->RemoveFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_REFUNDABLE);
                     }
                 }
             }
-            else if (item->HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAG_BOP_TRADEABLE))
+            else if (item->HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_BOP_TRADEABLE))
             {
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_ITEM_BOP_TRADE);
                 stmt->setUInt32(0, item->GetGUIDLow());
@@ -18840,10 +18866,10 @@ Item* Player::_LoadItem(SQLTransaction& trans, uint32 zoneId, uint32 timeDiff, F
                 else
                 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                    sLog->outDebug(LOG_FILTER_PLAYER_LOADING, "Player::_LoadInventory: player (GUID: %u, name: '%s') has item (GUID: %u, entry: %u) with ITEM_FLAG_BOP_TRADEABLE flag, but without data in item_soulbound_trade_data. Removing flag.",
+                    sLog->outDebug(LOG_FILTER_PLAYER_LOADING, "Player::_LoadInventory: player (GUID: %u, name: '%s') has item (GUID: %u, entry: %u) with ITEM_FIELD_FLAG_BOP_TRADEABLE flag, but without data in item_soulbound_trade_data. Removing flag.",
                         GetGUIDLow(), GetName().c_str(), item->GetGUIDLow(), item->GetEntry());
 #endif
-                    item->RemoveFlag(ITEM_FIELD_FLAGS, ITEM_FLAG_BOP_TRADEABLE);
+                    item->RemoveFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_BOP_TRADEABLE);
                 }
             }
             else if (proto->HolidayId)
@@ -19868,7 +19894,7 @@ void Player::_SaveInventory(SQLTransaction& trans)
         if (item->GetState() == ITEM_NEW)
         {
             // Xinef: item is removed, remove loot from storage if any
-            if (item->GetTemplate()->Flags & ITEM_PROTO_FLAG_OPENABLE)
+            if (item->GetTemplate()->Flags & ITEM_FLAG_HAS_LOOT)
                 sLootItemStorage->RemoveStoredLoot(item->GetGUIDLow());
             continue;
         }
@@ -19883,7 +19909,7 @@ void Player::_SaveInventory(SQLTransaction& trans)
         m_items[i]->FSetState(ITEM_NEW);
 
         // Xinef: item is removed, remove loot from storage if any
-        if (item->GetTemplate()->Flags & ITEM_PROTO_FLAG_OPENABLE)
+        if (item->GetTemplate()->Flags & ITEM_FLAG_HAS_LOOT)
             sLootItemStorage->RemoveStoredLoot(item->GetGUIDLow());
     }
 
@@ -21754,7 +21780,7 @@ bool Player::ActivateTaxiPathTo(std::vector<uint32> const& nodes, Creature* npc 
     //RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TALK);
 
     // Xinef: dont use instant flight paths if spellid is present (custom calls use spellid = 1)
-    if (sWorld->getBoolConfig(CONFIG_INSTANT_TAXI) && !spellid)
+    if ((sWorld->getIntConfig(CONFIG_INSTANT_TAXI) == 1 || (sWorld->getIntConfig(CONFIG_INSTANT_TAXI) == 2 && m_isInstantFlightOn)) && !spellid)
     {
         TaxiNodesEntry const* lastPathNode = sTaxiNodesStore.LookupEntry(nodes[nodes.size()-1]);
         m_taxi.ClearTaxiDestinations();
@@ -22004,9 +22030,9 @@ inline bool Player::_StoreOrEquipNewItem(uint32 vendorslot, uint32 item, uint8 c
         if (!bStore)
             AutoUnequipOffhandIfNeed();
 
-        if (pProto->Flags & ITEM_PROTO_FLAG_REFUNDABLE && crItem->ExtendedCost && pProto->GetMaxStackSize() == 1)
+        if (pProto->Flags & ITEM_FLAG_ITEM_PURCHASE_RECORD && crItem->ExtendedCost && pProto->GetMaxStackSize() == 1)
         {
-            it->SetFlag(ITEM_FIELD_FLAGS, ITEM_FLAG_REFUNDABLE);
+            it->SetFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_REFUNDABLE);
             it->SetRefundRecipient(GetGUIDLow());
             it->SetPaidMoney(price);
             it->SetPaidExtendedCost(crItem->ExtendedCost);
@@ -23328,7 +23354,7 @@ void Player::SendInstanceResetWarning(uint32 mapid, Difficulty difficulty, uint3
 
 void Player::ApplyEquipCooldown(Item* pItem)
 { 
-    if (pItem->HasFlag(ITEM_FIELD_FLAGS, ITEM_PROTO_FLAG_NO_EQUIP_COOLDOWN))
+    if (pItem->HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAG_NO_EQUIP_COOLDOWN))
         return;
 
     for (uint8 i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
@@ -25457,7 +25483,7 @@ InventoryResult Player::CanEquipUniqueItem(Item* pItem, uint8 eslot, uint32 limi
 InventoryResult Player::CanEquipUniqueItem(ItemTemplate const* itemProto, uint8 except_slot, uint32 limit_count) const
 { 
     // check unique-equipped on item
-    if (itemProto->Flags & ITEM_PROTO_FLAG_UNIQUE_EQUIPPED)
+    if (itemProto->Flags & ITEM_FLAG_UNIQUE_EQUIPPABLE)
     {
         // there is an equip limit on this item
         if (HasItemOrGemWithIdEquipped(itemProto->ItemId, 1, except_slot))
@@ -27116,7 +27142,7 @@ void Player::SendRefundInfo(Item* item)
     // This function call unsets ITEM_FLAGS_REFUNDABLE if played time is over 2 hours.
     item->UpdatePlayedTime(this);
 
-    if (!item->HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAG_REFUNDABLE))
+    if (!item->HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_REFUNDABLE))
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         sLog->outDebug(LOG_FILTER_PLAYER_ITEMS, "Item refund: item not refundable!");
@@ -27182,7 +27208,7 @@ bool Player::AddItem(uint32 itemId, uint32 count)
 
 void Player::RefundItem(Item* item)
 { 
-    if (!item->HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAG_REFUNDABLE))
+    if (!item->HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_REFUNDABLE))
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         sLog->outDebug(LOG_FILTER_PLAYER_ITEMS, "Item refund: item not refundable!");

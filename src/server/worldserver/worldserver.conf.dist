@@ -1195,6 +1195,7 @@ AllFlightPaths = 0
 #                     of making them wait while flying.
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
+#                     2 - (Enabled, but the player can toggle instant flight off or on at each flight master)
 
 InstantFlightPaths = 0
 
@@ -2635,6 +2636,17 @@ Battleground.StoreStatistics.Enable = 1
 #                     1 - (Enabled)
 
 Battleground.TrackDeserters.Enable = 1
+
+#
+#    Battleground.InvitationType
+#        Description: Set Battleground invitation type.
+#        Default:     0 - (Normal, Invite as much players to battlegrounds as queued,
+#                          Don't bother with balance)
+#                     1 - (Experimental, Don't allow to invite much more players
+#                          of one faction)
+#                     2 - (Experimental, Try to have even teams)
+
+Battleground.InvitationType = 0
 
 #
 ###################################################################################################
