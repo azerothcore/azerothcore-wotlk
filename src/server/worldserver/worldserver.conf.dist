@@ -1166,8 +1166,8 @@ InstantLogout = 1
 #    PreventAFKLogout
 #        Description: Prevent players AFK from being logged out
 #        Default:     0  - (Disabled)
-#                     1  - (Enabled, prevent players AFK in Sanctuary zones)
-#                     2  - (Enabled, prevent players AFK in all zones)
+#                     1  - (Enabled, prevent players AFK from being logged out in Sanctuary zones)
+#                     2  - (Enabled, prevent players AFK from being logged out in all zones)
 
 PreventAFKLogout = 0
 

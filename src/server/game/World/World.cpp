@@ -1323,7 +1323,7 @@ void World::LoadConfigSettings(bool reload)
     // Player can join LFG anywhere
     m_bool_configs[CONFIG_LFG_LOCATION_ALL] = sConfigMgr->GetBoolDefault("LFG.Location.All", false);
 
-    // Allow afk players
+    // Prevent players AFK from being logged out
     m_int_configs[CONFIG_AFK_PREVENT_LOGOUT] = sConfigMgr->GetIntDefault("PreventAFKLogout", 0);
 
     // call ScriptMgr if we're reloading the configuration
