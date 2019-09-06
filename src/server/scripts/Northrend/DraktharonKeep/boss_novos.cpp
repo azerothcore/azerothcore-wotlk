@@ -47,7 +47,7 @@ enum Misc
     EVENT_CAST_OFFENSIVE_SPELL              = 5,
     EVENT_KILL_TALK                         = 6,
     EVENT_CHECK_PHASE                       = 7,
-    EVENT_SPELL_SUMMON_MINIONS              = 8
+    EVENT_SPELL_SUMMON_MINIONS              = 8,
     
     ROOM_RIGHT  = 0,
     ROOM_LEFT   = 1,
