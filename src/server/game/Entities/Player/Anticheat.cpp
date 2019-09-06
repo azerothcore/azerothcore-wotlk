@@ -1,5 +1,6 @@
 #include "Player.h"
 #include "Language.h"
+#include "Vehicle.h"
 
 #define DEFAULT_PLAYER_BOUNDING_RADIUS      0.388999998569489f     // player size, also currently used (correctly?) for any non Unit world objects
 
@@ -129,10 +130,11 @@ bool Player::CheckMovementInfo(MovementInfo const& movementInfo, bool jump)
         if (ToUnit()->IsFalling() || IsInFlight())
             return true;
 
-        if (GetVehicle() || GetVehicleKit())
-            return true;
+        bool vehicle = false;
+        if (GetVehicleKit() && GetVehicleKit()->GetBase())
+            vehicle = true;
 
-        if (HasAuraType(SPELL_AURA_CONTROL_VEHICLE))
+        if (GetVehicle())
             return true;
 
         bool transportflag = GetTransport() || (movementInfo.GetMovementFlags() & MOVEMENTFLAG_ONTRANSPORT) || HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
@@ -194,11 +196,24 @@ bool Player::CheckMovementInfo(MovementInfo const& movementInfo, bool jump)
         latency = GetSession()->GetLatency();
         ping = std::max(uint32(60), latency);
 
-        speed = GetSpeed(MOVE_RUN);
+        if (!vehicle)
+            speed = GetSpeed(MOVE_RUN);
+        else
+            speed = GetVehicleKit()->GetBase()->GetSpeed(MOVE_RUN);
         if (isSwimming())
-            speed = GetSpeed(MOVE_SWIM);
-        if (IsFlying() || this->CanFly())
-            speed = GetSpeed(MOVE_FLIGHT);
+        {
+            if (!vehicle)
+                speed = GetSpeed(MOVE_SWIM);
+            else
+                speed = GetVehicleKit()->GetBase()->GetSpeed(MOVE_SWIM);
+        }
+        if (IsFlying() || CanFly())
+        {
+            if (!vehicle)
+                speed = GetSpeed(MOVE_FLIGHT);
+            else
+                speed = GetVehicleKit()->GetBase()->GetSpeed(MOVE_FLIGHT);
+        }
 
         delaysentrecieve = (ctime - oldstime) / 10000000000;
         delay = fabsf(movetime - stime) / 10000000000 + delaysentrecieve;
