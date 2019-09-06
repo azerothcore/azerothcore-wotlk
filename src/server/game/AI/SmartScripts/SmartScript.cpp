@@ -1299,7 +1299,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
 
         for (ObjectList::const_iterator itr = targets->begin(); itr != targets->end(); ++itr)
             if (IsCreature(*itr))
-                (*itr)->ToCreature()->UpdateEntry(e.action.updateTemplate.creature, NULL, !e.action.updateTemplate.doNotChangeLevel);
+                (*itr)->ToCreature()->UpdateEntry(e.action.updateTemplate.creature, NULL, e.action.updateTemplate.updateLevel != 0);
 
         delete targets;
         break;

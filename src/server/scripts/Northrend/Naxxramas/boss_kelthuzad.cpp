@@ -120,7 +120,7 @@ public:
 
     struct boss_kelthuzadAI : public BossAI
     {
-        boss_kelthuzadAI(Creature* c) : BossAI(c, BOSS_KELTHUZAD), summons(me)
+        explicit boss_kelthuzadAI(Creature* c) : BossAI(c, BOSS_KELTHUZAD), summons(me)
         {
             pInstance = me->GetInstanceScript();
             _justSpawned=true;
@@ -366,17 +366,17 @@ public:
                 {
                     std::vector<Unit*> unitList;
                     ThreatContainer::StorageType const& threatList = me->getThreatManager().getThreatList();
-                    for (ThreatContainer::StorageType::const_iterator itr = threatList.begin(); itr != threatList.end(); ++itr)
+                    for (auto itr : threatList)
                     {
-                        if ((*itr)->getTarget()->GetTypeId() == TYPEID_PLAYER
-                            && (*itr)->getTarget()->getPowerType() == POWER_MANA
-                            && (*itr)->getTarget()->GetPower(POWER_MANA))
-                            unitList.push_back((*itr)->getTarget());
+                        if (itr->getTarget()->GetTypeId() == TYPEID_PLAYER
+                            && itr->getTarget()->getPowerType() == POWER_MANA
+                            && itr->getTarget()->GetPower(POWER_MANA))
+                            unitList.push_back(itr->getTarget());
                     }
 
                     if (!unitList.empty())
                     {
-                        std::vector<Unit*>::iterator itr = unitList.begin();
+                        auto itr = unitList.begin();
                         advance(itr, urand(0, unitList.size()-1));
                         me->CastSpell(*itr, SPELL_DETONATE_MANA, false);
                         Talk(SAY_SPECIAL);
@@ -434,12 +434,10 @@ public:
 
     struct boss_kelthuzad_minionAI : public ScriptedAI
     {
-        boss_kelthuzad_minionAI(Creature* c) : ScriptedAI(c)
-        {
-        }
+        explicit boss_kelthuzad_minionAI(Creature* c) : ScriptedAI(c) { }
 
         EventMap events;
-        bool callHelp;
+        bool callHelp{};
 
         void Reset() override
         {
@@ -565,13 +563,13 @@ class spell_kelthuzad_frost_blast : public SpellScriptLoader
                     return;
 
                 std::list<WorldObject*> tmplist;
-                for (std::list<WorldObject*>::iterator itr = targets.begin(); itr != targets.end(); ++itr)
-                    if (!(*itr)->ToUnit()->HasAura(SPELL_FROST_BLAST))
-                        tmplist.push_back(*itr);
+                for (auto & target : targets)
+                    if (!target->ToUnit()->HasAura(SPELL_FROST_BLAST))
+                        tmplist.push_back(target);
 
                  targets.clear();
-                 for (std::list<WorldObject*>::iterator itr = tmplist.begin(); itr != tmplist.end(); ++itr)
-                     targets.push_back(*itr);
+                 for (auto & itr : tmplist)
+                     targets.push_back(itr);
             }
 
             void Register() override
@@ -597,9 +595,7 @@ class spell_kelthuzad_detonate_mana : public SpellScriptLoader
 
             bool Validate(SpellInfo const* /*spell*/) override
             {
-                if (!sSpellMgr->GetSpellInfo(SPELL_MANA_DETONATION_DAMAGE))
-                    return false;
-                return true;
+                return sSpellMgr->GetSpellInfo(SPELL_MANA_DETONATION_DAMAGE) != nullptr;
             }
 
             void HandleScript(AuraEffect const* aurEff)
@@ -607,7 +603,7 @@ class spell_kelthuzad_detonate_mana : public SpellScriptLoader
                 PreventDefaultAction();
 
                 Unit* target = GetTarget();
-                if (int32 mana = int32(target->GetMaxPower(POWER_MANA) / 10))
+                if (auto mana = int32(target->GetMaxPower(POWER_MANA) / 10))
                 {
                     mana = target->ModifyPower(POWER_MANA, -mana);
                     target->CastCustomSpell(SPELL_MANA_DETONATION_DAMAGE, SPELLVALUE_BASE_POINT0, -mana * 10, target, true, nullptr, aurEff);

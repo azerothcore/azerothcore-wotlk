@@ -63,7 +63,7 @@ public:
 
     struct boss_gluthAI : public BossAI
     {
-        boss_gluthAI(Creature *c) : BossAI(c, BOSS_GLUTH), summons(me)
+        explicit boss_gluthAI(Creature *c) : BossAI(c, BOSS_GLUTH), summons(me)
         {
             pInstance = me->GetInstanceScript();
         }
@@ -71,7 +71,6 @@ public:
         EventMap events;
         SummonList summons;
         InstanceScript* pInstance;
-        uint64 gazeTarget;
         
         void Reset() override
         {
@@ -79,7 +78,6 @@ public:
             me->ApplySpellImmune(SPELL_INFECTED_WOUND, IMMUNITY_ID, SPELL_INFECTED_WOUND, true);
             events.Reset();
             summons.DespawnAll();
-            gazeTarget = 0;
             me->SetReactState(REACT_AGGRESSIVE);
         }
 
@@ -140,9 +138,9 @@ public:
                 return false;
 
             Map::PlayerList const& pList = me->GetMap()->GetPlayers();
-            for(Map::PlayerList::const_iterator itr = pList.begin(); itr != pList.end(); ++itr)
+            for (const auto & itr : pList)
             {
-                Player* player = itr->GetSource();
+                Player* player = itr.GetSource();
                 if (!player || !player->IsAlive())
                     continue;
                 if (player->GetPositionZ() > 300.0f || me->GetExactDist(player) > 50.0f)

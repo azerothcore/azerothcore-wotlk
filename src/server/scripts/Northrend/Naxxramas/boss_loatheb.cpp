@@ -45,7 +45,7 @@ public:
 
     struct boss_loathebAI : public BossAI
     {
-        boss_loathebAI(Creature *c) : BossAI(c, BOSS_LOATHEB), summons(me)
+        explicit boss_loathebAI(Creature *c) : BossAI(c, BOSS_LOATHEB), summons(me)
         {
             pInstance = me->GetInstanceScript();
             me->SetHomePosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation());
@@ -103,8 +103,9 @@ public:
             events.ScheduleEvent(EVENT_SPELL_BERSERK, 720000);
         }
 
-        void JustDied(Unit* /*killer*/) override
+        void JustDied(Unit* killer) override
         {
+            BossAI::JustDied(killer);
             if (pInstance)
                 pInstance->SetData(BOSS_LOATHEB, DONE);
             summons.DespawnAll();
