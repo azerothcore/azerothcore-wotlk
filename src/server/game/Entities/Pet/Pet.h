@@ -179,11 +179,11 @@ class Pet : public Guardian
     private:
         void SaveToDB(uint32, uint8, uint32)                // override of Creature::SaveToDB     - must not be called
         {
-            ASSERT(false);
+            ABORT();
         }
         void DeleteFromDB()                                 // override of Creature::DeleteFromDB - must not be called
         {
-            ASSERT(false);
+            ABORT();
         }
 };
 #endif

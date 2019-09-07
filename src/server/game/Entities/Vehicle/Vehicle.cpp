@@ -390,7 +390,7 @@ bool Vehicle::AddPassenger(Unit* unit, int8 seatId)
         try
         {
         if (!_me->SetCharmedBy(unit, CHARM_TYPE_VEHICLE))
-            ASSERT(false);
+            ABORT();
         }
         catch (...)
         {

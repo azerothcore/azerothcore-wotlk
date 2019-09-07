@@ -265,7 +265,7 @@ void BattlegroundQueue::RemovePlayer(uint64 guid, bool sentToBg, uint32 playerQu
     QueuedPlayersMap::iterator itr = m_QueuedPlayers.find(guid);
     if (itr == m_QueuedPlayers.end())
     {
-        ASSERT(false);
+        ABORT();
         return;
     }
 
@@ -286,7 +286,7 @@ void BattlegroundQueue::RemovePlayer(uint64 guid, bool sentToBg, uint32 playerQu
     //player can't be in queue without group, but just in case
     if (group_itr == m_QueuedGroups[_bracketId][_groupType].end())
     {
-        ASSERT(false);
+        ABORT();
         return;
     }
 
