@@ -1280,6 +1280,9 @@ bool SpellInfo::IsAffectedBySpellMod(SpellModifier const* mod) const
 
 bool SpellInfo::CanPierceImmuneAura(SpellInfo const* aura) const
 {
+    if (!aura || aura->HasAttribute(SPELL_ATTR0_UNAFFECTED_BY_INVULNERABILITY))
+        return false;
+
     // these spells pierce all avalible spells (Resurrection Sickness for example)
     if (Attributes & SPELL_ATTR0_UNAFFECTED_BY_INVULNERABILITY)
         return true;
