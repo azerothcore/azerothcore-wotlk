@@ -321,7 +321,7 @@ class spell_hun_taming_the_beast : public SpellScriptLoader
             {
                 if (Unit* target = GetTarget())
                     if (Creature* creature = target->ToCreature())
-                        creature->DespawnOrUnsummon();
+                        creature->DespawnOrUnsummon(1);
             }
 
             void Register()
