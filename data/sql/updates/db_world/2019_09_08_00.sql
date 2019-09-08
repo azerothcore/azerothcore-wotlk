@@ -1,3 +1,19 @@
+-- DB update 2019_09_06_00 -> 2019_09_08_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2019_09_06_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2019_09_06_00 2019_09_08_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1565907440369912865'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1565907440369912865');
 
 -- "Small Proto-Drake Egg" not needed anymore, as those will be spawned via SAI
@@ -44,3 +60,12 @@ INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `positi
 VALUES
 (3046100,1,7081.55,-907.867,1067.18,'Veranus - WP1'),
 (3046101,1,7110.2,-916.508,1100.75,'Veranus - WP2');
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
