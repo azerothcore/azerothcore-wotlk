@@ -356,6 +356,13 @@ typedef std::map<uint32, SpellGroupStackFlags> SpellGroupStackMap;
 
 
 
+//for fix 1045 by @a4501150
+SpellInfo* _GetSpellInfo(uint32 spellId) { return spellId < GetSpellInfoStoreSize() ? mSpellInfoMap[spellId] : nullptr; }
+
+
+
+
+
 struct SpellThreatEntry
 {
     int32       flatMod;                                    // flat threat-value for this Spell  - default: 0
