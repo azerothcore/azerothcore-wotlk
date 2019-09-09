@@ -1163,6 +1163,15 @@ RecruitAFriend.MaxDifference = 4
 InstantLogout = 1
 
 #
+#    PreventAFKLogout
+#        Description: Prevent players AFK from being logged out
+#        Default:     0  - (Disabled)
+#                     1  - (Enabled, prevent players AFK from being logged out in Sanctuary zones)
+#                     2  - (Enabled, prevent players AFK from being logged out in all zones)
+
+PreventAFKLogout = 0
+
+#
 #    DisableWaterBreath
 #        Description: Required security level for water breathing.
 #        Default:     4  - (Disabled)
@@ -1438,7 +1447,7 @@ Motd = "Welcome to an AzerothCore server."
 #    PLEASE NOTE: another (hardcoded) text will appear below the MOTD:
 #
 #        "This server runs on AzerothCore www.azerothcore.org"
-#    
+#
 #    All the AzerothCore contributors, as well as its father projects (MaNGOS, TrinityCore, etc..),
 #    have worked for free to provide you this software. Please do not remove the credits.
 #
