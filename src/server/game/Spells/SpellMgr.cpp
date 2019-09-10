@@ -4340,6 +4340,10 @@ void SpellMgr::LoadDbcDataCorrections()
         case 50990: // Flame Breath (Catapult)
             spellInfo->EffectRadiusIndex[EFFECT_0] = 19; // 18yd
             break;
+        case 56103: // Jormungar Bite
+            spellInfo->EffectImplicitTargetA[EFFECT_0] = TARGET_UNIT_TARGET_ENEMY;
+            spellInfo->EffectImplicitTargetB[EFFECT_0] = 0;
+            break;
 
         /////////////////////////////////
         ///// Generic NPC Spells
