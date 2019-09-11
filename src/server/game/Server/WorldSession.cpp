@@ -269,7 +269,12 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
 
     while (m_Socket && !m_Socket->IsClosed() && !_recvQueue.empty() && _recvQueue.peek(true) != firstDelayedPacket && _recvQueue.next(packet, updater))
     {
-        if (packet->GetOpcode() < NUM_MSG_TYPES)
+        if (packet->GetOpcode() >= NUM_MSG_TYPES)
+        {
+            KickPlayer();
+            sLog->outError("WorldSession Packet filter: received non-existed opcode %s (0x%.4X)",LookupOpcodeName(packet->GetOpcode()), packet->GetOpcode());
+        }
+        else if (packet->GetOpcode() < NUM_MSG_TYPES)
         {
             OpcodeHandler &opHandle = opcodeTable[packet->GetOpcode()];
             try
