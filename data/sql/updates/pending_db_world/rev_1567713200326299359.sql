@@ -14,7 +14,7 @@ DELETE FROM `smart_scripts` WHERE `entryorguid` IN (-127591,-127590,-127589,-127
 
 DELETE FROM `creature_formations` WHERE `leaderGUID` IN (127590,27580,127449,127579);
 
-INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, `groupAI`) VALUES 
+INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, `groupAI`, `point_1`, `point_2`) VALUES
 (127590, 127590, 0, 0, 3, 0, 0),
 (127590, 127438, 0, 0, 3, 0, 0),
 (127590, 127617, 0, 0, 3, 0, 0),
