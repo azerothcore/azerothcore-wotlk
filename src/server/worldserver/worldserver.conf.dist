@@ -403,7 +403,8 @@ PersistentCharacterCleanFlags = 0
 #
 #    PreloadAllNonInstancedMapGrids
 #        Description: Preload all grids on all non-instanced maps. This will take a great amount
-#                     of additional RAM (ca. 9 GB) and causes the server to take longer to start.
+#                     of additional RAM (ca. 9 GB) and causes the server to take longer to start,
+#                     but can increase performance if used on a server with a high amount of players.
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 
