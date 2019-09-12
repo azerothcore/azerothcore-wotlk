@@ -271,11 +271,8 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
     {
         if (packet->GetOpcode() >= NUM_MSG_TYPES)
         {
-            //We need to make sure there's a player before we rule him out.
-            if (_player)
-            {
-                KickPlayer();
-            }
+            if (m_Socket)
+                m_Socket->CloseSocket("Bad client or cheater!!!");
             sLog->outError("WorldSession Packet filter: received non-existed opcode %s (0x%.4X)",LookupOpcodeName(packet->GetOpcode()), packet->GetOpcode());
         }
         else
