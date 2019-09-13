@@ -405,6 +405,8 @@ PersistentCharacterCleanFlags = 0
 #        Description: Preload all grids on all non-instanced maps. This will take a great amount
 #                     of additional RAM (ca. 9 GB) and causes the server to take longer to start,
 #                     but can increase performance if used on a server with a high amount of players.
+#                     It will also activate all creatures which are set active (e.g. the Fel Reavers
+#                     in Hellfire Peninsula) on server start.
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 
