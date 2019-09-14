@@ -12,7 +12,7 @@ DELETE FROM `smart_scripts` WHERE `entryorguid`= 26623  AND `id` IN (10,11);
 
 DELETE FROM `smart_scripts` WHERE `entryorguid` IN (-127591,-127590,-127589,-127582,-127580,-127579,-127578);
 
-DELETE FROM `creature_formations` WHERE `leaderGUID` IN (127590,27580,127449,127579);
+DELETE FROM `creature_formations` WHERE `leaderGUID` IN (127590,127580,127449,127579);
 
 INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, `groupAI`, `point_1`, `point_2`) VALUES
 (127590, 127590, 0, 0, 3, 0, 0),
