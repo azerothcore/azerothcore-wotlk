@@ -1,3 +1,19 @@
+-- DB update 2019_09_10_00 -> 2019_09_14_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2019_09_10_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2019_09_10_00 2019_09_14_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1567460303929588791'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1567460303929588791');
 
 -- Bath'rah the Windwatcher SAI
@@ -19,3 +35,12 @@ VALUES
 (617601,9,2,0,0,0,100,0,2500,2500,0,0,0,11,8606,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Bath''rah the Windwatcher - On Script - Cast ''Summon Cyclonian'''),
 (617601,9,3,0,0,0,100,0,0,0,0,0,0,1,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Bath''rah the Windwatcher - On Script - Say Line 1'),
 (617601,9,4,0,0,0,100,0,15000,15000,0,0,0,53,1,61760,0,0,0,2,1,0,0,0,0,0,0,0,0,'Bath''rah the Windwatcher - On Script - Start Waypoint');
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
