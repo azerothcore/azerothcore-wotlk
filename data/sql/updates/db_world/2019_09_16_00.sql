@@ -1,3 +1,19 @@
+-- DB update 2019_09_15_00 -> 2019_09_16_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2019_09_15_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2019_09_15_00 2019_09_16_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1567713200326299359'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1567713200326299359');
 
 UPDATE `creature_template` SET `flags_extra`= 0 WHERE `entry` IN (26638,31351);
@@ -30,3 +46,12 @@ INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, 
 (127579, 127578, 0, 0, 3, 0, 0),
 (127579, 127432, 0, 0, 3, 0, 0),
 (127579, 127433, 0, 0, 3, 0, 0);
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
