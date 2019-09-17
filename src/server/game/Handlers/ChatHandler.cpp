@@ -340,6 +340,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
     {
         case CHAT_MSG_SAY:
         case CHAT_MSG_EMOTE:
+        case CHAT_MSG_TEXT_EMOTE:
         case CHAT_MSG_YELL:
         {
             // Prevent cheating
@@ -355,7 +356,9 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recvData)
             if (type == CHAT_MSG_SAY)
                 sender->Say(msg, lang);
             else if (type == CHAT_MSG_EMOTE)
-                sender->TextEmote(msg);
+                sender->TextEmote(msg, EMOTE_TYPE_FACTION_ONLY);
+            else if (type == CHAT_MSG_TEXT_EMOTE)
+                sender->TextEmote(msg, EMOTE_TYPE_UNIVERSAL);
             else if (type == CHAT_MSG_YELL)
                 sender->Yell(msg, lang);
         } break;

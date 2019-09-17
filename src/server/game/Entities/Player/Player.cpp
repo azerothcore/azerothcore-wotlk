@@ -20939,14 +20939,38 @@ void Player::Yell(const std::string& text, const uint32 language)
 
 void Player::TextEmote(const std::string& text)
 {
+    TextEmote(text, EMOTE_TYPE_UNIVERSAL);
+}
+
+void Player::TextEmote(const std::string& text, uint32 type)
+{
     std::string _text(text);
     sScriptMgr->OnPlayerChat(this, CHAT_MSG_EMOTE, LANG_UNIVERSAL, _text);
 #ifdef ELUNA
     if (!sEluna->OnChat(this, CHAT_MSG_EMOTE, LANG_UNIVERSAL, _text))
         return;
 #endif
+
     WorldPacket data;
-    ChatHandler::BuildChatPacket(data, CHAT_MSG_EMOTE, LANG_UNIVERSAL, this, this, _text);
+
+    switch (type)
+    {
+        case EMOTE_TYPE_UNIVERSAL:
+            ChatHandler::BuildChatPacket(data, CHAT_MSG_EMOTE, LANG_UNIVERSAL, this, this, _text);
+            break;
+        case EMOTE_TYPE_FACTION_ONLY:
+        {
+            std::ostringstream textStream;
+            textStream << this->GetName().c_str() << " " << text.c_str();
+
+            if (this->GetTeamId() == TEAM_ALLIANCE)
+                ChatHandler::BuildChatPacket(data, CHAT_MSG_TEXT_EMOTE, LANG_COMMON, this, this, textStream.str());
+            else
+                ChatHandler::BuildChatPacket(data, CHAT_MSG_TEXT_EMOTE, LANG_ORCISH, this, this, textStream.str());
+            break;
+        }
+    }
+
     SendMessageToSetInRange(&data, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE), true, !sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_CHAT));
 }
 
