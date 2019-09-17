@@ -1,3 +1,19 @@
+-- DB update 2019_09_16_00 -> 2019_09_17_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2019_09_16_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2019_09_16_00 2019_09_17_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1567608091409034200'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1567608091409034200');
 
 -- Prevent casting "Twisting Blade" on self ("Xink's Shredder") or on the player
@@ -18,3 +34,12 @@ VALUES
 (27061,0,0,0,54,0,100,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Xink''s Shredder - On Just Summoned - Say Line 0'),
 (27061,0,1,2,28,0,100,0,0,0,0,0,0,1,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Xink''s Shredder - On Passenger Removed - Say Line 1'),
 (27061,0,2,0,61,0,100,0,0,0,0,0,0,41,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Xink''s Shredder - Linked - Force Despawn');
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
