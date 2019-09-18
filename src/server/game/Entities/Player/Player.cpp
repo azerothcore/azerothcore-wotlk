@@ -20959,7 +20959,7 @@ void Player::TextEmote(const std::string& text)
         if (!sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_EMOTE) && this->GetTeamId() != (*itr)->GetTeamId())
         {
             LocaleConstant loc_idx = (*itr)->GetSession()->GetSessionDbLocaleIndex();
-            std::string bct = ACORE::StringFormat(broadcastText->GetText(loc_idx), this->GetName());
+            std::string bct = ACORE::StringFormat(broadcastText->GetText(loc_idx, GENDER_FEMALE), this->GetName());
             ChatHandler::BuildChatPacket(data, CHAT_MSG_TEXT_EMOTE, LANG_UNIVERSAL, this, this, bct);
             (*itr)->SendDirectMessage(&data);
         }
