@@ -914,6 +914,11 @@ enum InstantFlightGossipAction
     GOSSIP_ACTION_TOGGLE_INSTANT_FLIGHT = 500
 };
 
+enum EmoteBroadcastTextID
+{
+    EMOTE_BROADCAST_TEXT_ID_STRANGE_GESTURES = 16259
+};
+
 class PlayerTaxi
 {
     public:
@@ -1221,7 +1226,6 @@ class Player : public Unit, public GridObject<Player>
         void Say(std::string const& text, const uint32 language);
         void Yell(std::string const& text, const uint32 language);
         void TextEmote(std::string const& text);
-        void TextEmote(std::string const& text, uint32 type);
         void Whisper(std::string const& text, const uint32 language, uint64 receiver);
 
         /*********************************************************/

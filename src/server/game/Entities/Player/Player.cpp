@@ -77,6 +77,7 @@
 #include "TicketMgr.h"
 #include "ScriptMgr.h"
 #include "GameGraveyard.h"
+#include "StringFormat.h"
 
 #ifdef ELUNA
 #include "LuaEngine.h"
@@ -20939,11 +20940,6 @@ void Player::Yell(const std::string& text, const uint32 language)
 
 void Player::TextEmote(const std::string& text)
 {
-    TextEmote(text, EMOTE_TYPE_UNIVERSAL);
-}
-
-void Player::TextEmote(const std::string& text, uint32 type)
-{
     std::string _text(text);
     sScriptMgr->OnPlayerChat(this, CHAT_MSG_EMOTE, LANG_UNIVERSAL, _text);
 #ifdef ELUNA
@@ -20952,26 +20948,27 @@ void Player::TextEmote(const std::string& text, uint32 type)
 #endif
 
     WorldPacket data;
+    BroadcastText const* broadcastText = sObjectMgr->GetBroadcastText(EMOTE_BROADCAST_TEXT_ID_STRANGE_GESTURES);
+    std::list<Player*> players;
+    Trinity::AnyPlayerInObjectRangeCheck checker(this, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE));
+    Trinity::PlayerListSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(this, players, checker);
+    this->VisitNearbyWorldObject(sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE), searcher);
 
-    switch (type)
+    for (std::list<Player*>::const_iterator itr = players.begin(); itr != players.end(); ++itr)
     {
-        case EMOTE_TYPE_UNIVERSAL:
-            ChatHandler::BuildChatPacket(data, CHAT_MSG_EMOTE, LANG_UNIVERSAL, this, this, _text);
-            break;
-        case EMOTE_TYPE_FACTION_ONLY:
+        if (!sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_EMOTE) && this->GetTeamId() != (*itr)->GetTeamId())
         {
-            std::ostringstream textStream;
-            textStream << this->GetName().c_str() << " " << text.c_str();
-
-            if (this->GetTeamId() == TEAM_ALLIANCE)
-                ChatHandler::BuildChatPacket(data, CHAT_MSG_TEXT_EMOTE, LANG_COMMON, this, this, textStream.str());
-            else
-                ChatHandler::BuildChatPacket(data, CHAT_MSG_TEXT_EMOTE, LANG_ORCISH, this, this, textStream.str());
-            break;
+            LocaleConstant loc_idx = (*itr)->GetSession()->GetSessionDbLocaleIndex();
+            std::string bct = ACORE::StringFormat(broadcastText->GetText(loc_idx), this->GetName());
+            ChatHandler::BuildChatPacket(data, CHAT_MSG_TEXT_EMOTE, LANG_UNIVERSAL, this, this, bct);
+            (*itr)->SendDirectMessage(&data);
+        }
+        else
+        {
+            ChatHandler::BuildChatPacket(data, CHAT_MSG_EMOTE, LANG_UNIVERSAL, this, this, _text);
+            (*itr)->SendDirectMessage(&data);
         }
     }
-
-    SendMessageToSetInRange(&data, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE), true, !sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_CHAT));
 }
 
 void Player::Whisper(const std::string& text, uint32 language, uint64 receiver)
