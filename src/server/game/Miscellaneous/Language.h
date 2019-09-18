@@ -1308,5 +1308,10 @@ enum TrinityStrings
     LANG_BAN_IP_YOUPERMBANNEDMESSAGE_WORLD   	    = 11018,
 
     LANG_MUTED_PLAYER                             = 30000, // Mute for player 2 hour
+
+    // Instant Flight
+    LANG_TOGGLE_INSTANT_FLIGHT                    = 30077,
+    LANG_INSTANT_FLIGHT_ON                        = 30078,
+    LANG_INSTANT_FLIGHT_OFF                       = 30079
 };
 #endif

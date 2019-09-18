@@ -307,6 +307,35 @@ class spell_hun_generic_scaling : public SpellScriptLoader
         }
 };
 
+// Taming the Beast quests (despawn creature after dismiss)
+class spell_hun_taming_the_beast : public SpellScriptLoader
+{
+    public:
+        spell_hun_taming_the_beast() : SpellScriptLoader("spell_hun_taming_the_beast") { }
+
+        class spell_hun_taming_the_beast_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_hun_taming_the_beast_AuraScript);
+
+            void HandleOnEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+            {
+                if (Unit* target = GetTarget())
+                    if (Creature* creature = target->ToCreature())
+                        creature->DespawnOrUnsummon();
+            }
+
+            void Register()
+            {
+                OnEffectRemove += AuraEffectRemoveFn(spell_hun_taming_the_beast_AuraScript::HandleOnEffectRemove, EFFECT_0, SPELL_AURA_MOD_CHARM, AURA_EFFECT_HANDLE_REAL);
+            }
+        };
+
+        AuraScript* GetAuraScript() const
+        {
+            return new spell_hun_taming_the_beast_AuraScript();
+        }
+};
+
 
 
 // Theirs
@@ -1200,6 +1229,7 @@ void AddSC_hunter_spell_scripts()
     new spell_hun_wyvern_sting();
     new spell_hun_animal_handler();
     new spell_hun_generic_scaling();
+    new spell_hun_taming_the_beast();
 
     // Theirs
     new spell_hun_aspect_of_the_beast();

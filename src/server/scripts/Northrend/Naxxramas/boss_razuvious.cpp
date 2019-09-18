@@ -57,7 +57,7 @@ public:
 
     struct boss_razuviousAI : public BossAI
     {
-        boss_razuviousAI(Creature *c) : BossAI(c, BOSS_RAZUVIOUS), summons(me)
+        explicit boss_razuviousAI(Creature *c) : BossAI(c, BOSS_RAZUVIOUS), summons(me)
         {
             pInstance = me->GetInstanceScript();
         }
@@ -175,9 +175,7 @@ public:
 
     struct boss_razuvious_minionAI : public ScriptedAI
     {
-        boss_razuvious_minionAI(Creature *c) : ScriptedAI(c)
-        {
-        }
+        explicit boss_razuvious_minionAI(Creature *c) : ScriptedAI(c) { }
 
         EventMap events;
 

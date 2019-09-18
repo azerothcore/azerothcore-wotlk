@@ -1027,6 +1027,13 @@ class instance_icecrown_citadel : public InstanceMapScript
                     if (theLichKing->IsAlive())
                         theLichKing->SetVisible(false);
             }
+            
+            void RemoveBackPack()
+            {
+                for (auto const& itr : instance->GetPlayers())
+                    if (Player* _player = itr.GetSource())
+                        _player->DestroyItemCount(ITEM_GOBLIN_ROCKET_PACK, _player->GetItemCount(ITEM_GOBLIN_ROCKET_PACK), true);
+            }
 
             bool SetBossState(uint32 type, EncounterState state)
             {
@@ -1742,6 +1749,8 @@ class instance_icecrown_citadel : public InstanceMapScript
                             {
                                 transport->setActive(false);
                                 transport->EnableMovement(false);
+                                //After movement is stopped remove the backpack
+                                RemoveBackPack();
                             }
                         if (Creature* captain = source->FindNearestCreature(TeamIdInInstance == TEAM_HORDE ? NPC_IGB_HIGH_OVERLORD_SAURFANG : NPC_IGB_MURADIN_BRONZEBEARD, 200.0f))
                             captain->AI()->DoAction(ACTION_EXIT_SHIP);
