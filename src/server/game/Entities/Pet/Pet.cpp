@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
@@ -104,7 +104,7 @@ SpellCastResult Pet::TryLoadFromDB(Player* owner, bool current /*= false*/, PetT
     stmt->setUInt8(1, uint8(current ? PET_SAVE_AS_CURRENT : PET_SAVE_NOT_IN_SLOT));
 
     PreparedQueryResult result = CharacterDatabase.AsyncQuery(stmt);
-    
+
     if (!result)
         return SPELL_FAILED_NO_PET;
 
@@ -145,7 +145,6 @@ SpellCastResult Pet::TryLoadFromDB(Player* owner, bool current /*= false*/, PetT
 
     return SPELL_CAST_OK;
 }
-
 
 bool Pet::LoadPetFromDB(Player* owner, uint8 asynchLoadType, uint32 petentry, uint32 petnumber, bool current, AsynchPetSummon* info)
 { 

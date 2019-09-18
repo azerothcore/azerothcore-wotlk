@@ -151,7 +151,7 @@ struct CreatureTemplate
 
     bool IsExotic() const
     {
-        return (type_flags & CREATURE_TYPEFLAGS_EXOTIC) != 0;
+        return (type_flags & CREATURE_TYPE_FLAG_EXOTIC_PET) != 0;
     }
     
     bool IsTameable(bool exotic) const

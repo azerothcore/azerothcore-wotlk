@@ -832,7 +832,7 @@ void WorldSession::HandleUnstablePetCallback(PreparedQueryResult result, uint32 
         CharacterDatabase.CommitTransaction(trans);
         _player->SetTemporaryUnsummonedPetNumber(0);
     }
-    
+
     if (!Pet::LoadPetFromDB(_player, PET_LOAD_HANDLE_UNSTABLE_CALLBACK, petEntry, petId))
     {
         SendStableResult(STABLE_ERR_STABLE);
@@ -922,7 +922,7 @@ void WorldSession::HandleStableSwapPet(WorldPacket & recvData)
             return;
         }
     }
-    
+
     // Find swapped pet slot in stable
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PET_SLOT_BY_ID);
 
