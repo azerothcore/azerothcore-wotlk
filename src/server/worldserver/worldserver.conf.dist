@@ -1644,6 +1644,14 @@ AllowTwoSide.Interaction.Calendar = 0
 AllowTwoSide.Interaction.Chat = 0
 
 #
+#    AllowTwoSide.Interaction.Emote
+#        Description: Allow emote messages between factions (e.g. "/e looks into the sky")
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+
+AllowTwoSide.Interaction.Emote = 0
+
+#
 #    AllowTwoSide.Interaction.Channel
 #        Description: Allow channel chat between factions.
 #        Default:     0 - (Disabled)
