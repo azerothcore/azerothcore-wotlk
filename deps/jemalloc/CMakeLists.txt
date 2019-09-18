@@ -85,6 +85,8 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux" AND SERVERS AND NOT NOJEM)
       -D_REENTRAN)
 
   target_link_libraries(jemalloc
+    PRIVATE
+      acore-dependency-interface
     PUBLIC
       threads
       ${CMAKE_DL_LIBS})
