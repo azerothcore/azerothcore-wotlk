@@ -20948,7 +20948,6 @@ void Player::TextEmote(const std::string& text)
 #endif
 
     WorldPacket data;
-    BroadcastText const* broadcastText = sObjectMgr->GetBroadcastText(EMOTE_BROADCAST_TEXT_ID_STRANGE_GESTURES);
     std::list<Player*> players;
     Trinity::AnyPlayerInObjectRangeCheck checker(this, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE));
     Trinity::PlayerListSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(this, players, checker);
@@ -20959,9 +20958,11 @@ void Player::TextEmote(const std::string& text)
         if (!sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_EMOTE) && this->GetTeamId() != (*itr)->GetTeamId())
         {
             LocaleConstant loc_idx = (*itr)->GetSession()->GetSessionDbLocaleIndex();
-            std::string bct = ACORE::StringFormat(broadcastText->GetText(loc_idx, GENDER_FEMALE), this->GetName());
-            ChatHandler::BuildChatPacket(data, CHAT_MSG_TEXT_EMOTE, LANG_UNIVERSAL, this, this, bct);
-            (*itr)->SendDirectMessage(&data);
+            if (BroadcastText const* bct = sObjectMgr->GetBroadcastText(EMOTE_BROADCAST_TEXT_ID_STRANGE_GESTURES))
+            {
+                ChatHandler::BuildChatPacket(data, CHAT_MSG_EMOTE, LANG_UNIVERSAL, this, this, bct->GetText(loc_idx, this->getGender()));
+                (*itr)->SendDirectMessage(&data);
+            }
         }
         else
         {

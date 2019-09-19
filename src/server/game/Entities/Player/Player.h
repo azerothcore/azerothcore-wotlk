@@ -916,7 +916,7 @@ enum InstantFlightGossipAction
 
 enum EmoteBroadcastTextID
 {
-    EMOTE_BROADCAST_TEXT_ID_STRANGE_GESTURES = 16259
+    EMOTE_BROADCAST_TEXT_ID_STRANGE_GESTURES = 91243
 };
 
 class PlayerTaxi
