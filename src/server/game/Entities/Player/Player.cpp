@@ -20952,21 +20952,21 @@ void Player::TextEmote(const std::string& text)
     Trinity::PlayerListSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(this, players, checker);
     this->VisitNearbyWorldObject(sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE), searcher);
 
-    for (std::list<Player*>::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+    for (auto const& itr : players)
     {
-        if (!sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_EMOTE) && this->GetTeamId() != (*itr)->GetTeamId())
+        if (!sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_EMOTE) && this->GetTeamId() != itr->GetTeamId())
         {
-            LocaleConstant loc_idx = (*itr)->GetSession()->GetSessionDbLocaleIndex();
+            LocaleConstant loc_idx = itr->GetSession()->GetSessionDbLocaleIndex();
             if (BroadcastText const* bct = sObjectMgr->GetBroadcastText(EMOTE_BROADCAST_TEXT_ID_STRANGE_GESTURES))
             {
                 ChatHandler::BuildChatPacket(data, CHAT_MSG_EMOTE, LANG_UNIVERSAL, this, this, bct->GetText(loc_idx, this->getGender()));
-                (*itr)->SendDirectMessage(&data);
+                itr->SendDirectMessage(&data);
             }
         }
         else
         {
             ChatHandler::BuildChatPacket(data, CHAT_MSG_EMOTE, LANG_UNIVERSAL, this, this, _text);
-            (*itr)->SendDirectMessage(&data);
+            itr->SendDirectMessage(&data);
         }
     }
 }
