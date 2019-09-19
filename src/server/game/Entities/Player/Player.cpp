@@ -77,7 +77,6 @@
 #include "TicketMgr.h"
 #include "ScriptMgr.h"
 #include "GameGraveyard.h"
-#include "StringFormat.h"
 
 #ifdef ELUNA
 #include "LuaEngine.h"
