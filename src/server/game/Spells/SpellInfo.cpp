@@ -1183,6 +1183,12 @@ bool SpellInfo::IsMultiSlotAura() const
     return IsPassive() || Id == 40075; // No other way to make 40075 have more than 1 copy of aura
 }
 
+bool SpellInfo::IsStackableOnOneSlotWithDifferentCasters() const
+{
+    /// TODO: Re-verify meaning of SPELL_ATTR3_STACK_FOR_DIFF_CASTERS and update conditions here
+    return StackAmount > 1 && !IsChanneled() && !HasAttribute(SPELL_ATTR3_STACK_FOR_DIFF_CASTERS);
+}
+
 bool SpellInfo::IsCooldownStartedOnEvent() const
 {
     return Attributes & SPELL_ATTR0_DISABLED_WHILE_ACTIVE || (CategoryEntry && CategoryEntry->Flags & SPELL_CATEGORY_FLAG_COOLDOWN_STARTS_ON_EVENT);
