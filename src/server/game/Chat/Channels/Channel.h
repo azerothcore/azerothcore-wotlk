@@ -150,6 +150,8 @@ class Channel
             if (state) flags |= MEMBER_FLAG_OWNER;
             else flags &= ~MEMBER_FLAG_OWNER;
         }
+        bool IsInvisible() const { return _invisible; }
+        void SetInvisible(bool on) { _invisible = on; }
         bool IsModerator() const { return flags & MEMBER_FLAG_MODERATOR; }
         void SetModerator(bool state)
         {
@@ -172,6 +174,8 @@ class Channel
             else
                 return false;
         }
+    private:
+        bool _invisible = false;
     };
 
     public:
@@ -197,6 +201,7 @@ class Channel
         void UnBan(uint64 guid);
         void Password(Player const* player, std::string const& pass);
         void SetMode(Player const* player, std::string const& p2n, bool mod, bool set);
+        void SetInvisible(Player const* player, bool on);
         void SetOwner(uint64 guid, bool exclaim = true);
         void SetOwner(Player const* player, std::string const& name);
         void SendWhoOwner(uint64 guid);
@@ -315,6 +320,7 @@ class Channel
         bool _announce;
         bool _ownership;
         bool _IsSaved;
+        bool _isOwnerInvisible;
         uint8 _flags;
         uint32 _channelId;
         uint32 _channelDBId;
