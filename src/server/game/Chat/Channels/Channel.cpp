@@ -23,7 +23,8 @@ Channel::Channel(std::string const& name, uint32 channelId, uint32 channelDBId, 
     _teamId(teamId),
     _ownerGUID(0),
     _name(name),
-    _password("")
+    _password(""),
+    _isOwnerInvisible(false)
 {
     // set special flags if built-in channel
     if (ChatChannelsEntry const* ch = sChatChannelsStore.LookupEntry(channelId)) // check whether it's a built-in channel
@@ -211,6 +212,8 @@ void Channel::JoinChannel(Player* player, std::string const& pass)
     SendToOne(&data, guid);
 
     JoinNotify(player);
+    
+    playersStore[guid].SetInvisible(!player->isGMVisible());
 
     // Custom channel handling
     if (!IsConstant())
@@ -226,8 +229,11 @@ void Channel::JoinChannel(Player* player, std::string const& pass)
         }
 
         // If the channel has no owner yet and ownership is allowed, set the new owner.
-        if (!_ownerGUID && _ownership)
+        if ((!_ownerGUID || _isOwnerInvisible) && !playersStore[guid].IsInvisible() && _ownership)
+        {
+            _isOwnerInvisible = playersStore[guid].IsInvisible();
             SetOwner(guid, false);
+        }
 
         if (_channelRights.flags & CHANNEL_RIGHT_CANT_SPEAK)
             playersStore[guid].SetMuted(true);
@@ -285,10 +291,15 @@ void Channel::LeaveChannel(Player* player, bool send)
                 for (Channel::PlayerContainer::const_iterator itr = playersStore.begin(); itr != playersStore.end(); ++itr)
                 {
                     newowner = itr->second.player;
+                    if (itr->second.IsInvisible())
+                        _isOwnerInvisible = true;
+                    else
+                        _isOwnerInvisible = false;
                     if (!itr->second.plrPtr->GetSession()->GetSecurity())
                         break;
                 }
                 SetOwner(newowner);
+                // if the new owner is invisible gm, set flag to automatically choose a new owner
             }
             else
                 SetOwner(0);
@@ -887,6 +898,19 @@ void Channel::Invite(Player const* player, std::string const& newname)
     WorldPacket data;
     MakePlayerInvited(&data, newp->GetName());
     SendToOne(&data, guid);
+}
+
+void Channel::SetInvisible(Player const* player, bool on)
+{
+    auto itr = playersStore.find(player->GetGUID());
+    if (itr == playersStore.end())
+        return;
+
+    itr->second.SetInvisible(on);
+
+    // we happen to be owner too, update flag
+    if (_ownerGUID == player->GetGUID())
+        _isOwnerInvisible = on;
 }
 
 void Channel::SetOwner(uint64 guid, bool exclaim)
