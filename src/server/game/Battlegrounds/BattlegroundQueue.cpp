@@ -1034,8 +1034,7 @@ void BattlegroundQueue::SendMessageQueue(Player* leader, Battleground* bg, PvPDi
         if (sWorld->GetGameTime() - BGSpamProtection[leader->GetGUID()].last_queue >= 30)
         {
             BGSpamProtection[leader->GetGUID()].last_queue = sWorld->GetGameTime();
-            sWorld->SendWorldText(LANG_BG_QUEUE_ANNOUNCE_WORLD, bgName, q_min_level, q_max_level,
-                qAlliance + qHorde, MaxPlayers);
+            sWorld->SendWorldText(LANG_BG_QUEUE_ANNOUNCE_WORLD, bgName, q_min_level, q_max_level, qAlliance + qHorde, MaxPlayers);
         }
     }
 }
