@@ -17,7 +17,7 @@ project(AzerothCore)
 cmake_minimum_required(VERSION 3.8)
 
 # CMake policies (can not be handled elsewhere)
-cmake_policy(SET CMP0005 NEW)
+cmake_policy(SET CMP0005 OLD)
 
 # add this options before PROJECT keyword
 set(CMAKE_DISABLE_SOURCE_CHANGES ON)
