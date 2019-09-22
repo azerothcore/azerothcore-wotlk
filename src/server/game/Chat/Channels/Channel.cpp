@@ -23,8 +23,8 @@ Channel::Channel(std::string const& name, uint32 channelId, uint32 channelDBId, 
     _teamId(teamId),
     _ownerGUID(0),
     _name(name),
-    _password(""),
-    _isOwnerInvisible(false)
+    _isOwnerInvisible(false),
+    _password("")
 {
     // set special flags if built-in channel
     if (ChatChannelsEntry const* ch = sChatChannelsStore.LookupEntry(channelId)) // check whether it's a built-in channel
