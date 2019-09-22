@@ -17,13 +17,13 @@ Channel::Channel(std::string const& name, uint32 channelId, uint32 channelDBId, 
     _announce(announce),
     _ownership(ownership),
     _IsSaved(false),
+    _isOwnerInvisible(false),
     _flags(0),
     _channelId(channelId),
     _channelDBId(channelDBId),
     _teamId(teamId),
     _ownerGUID(0),
     _name(name),
-    _isOwnerInvisible(false),
     _password("")
 {
     // set special flags if built-in channel
