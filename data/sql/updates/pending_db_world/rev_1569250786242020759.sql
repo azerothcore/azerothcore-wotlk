@@ -1,7 +1,7 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1569250786242020759');
 
-ALTER TABLE `creature_addon` ADD COLUMN `isLarge` TINYINT(3) UNSIGNED NOT NULL DEFAULT 0 AFTER `emote`;
-ALTER TABLE `creature_template_addon` ADD COLUMN `isLarge` TINYINT(3) UNSIGNED NOT NULL DEFAULT 0 AFTER `emote`;
+ALTER TABLE `creature_addon` ADD COLUMN `isLarge` TINYINT(1) UNSIGNED NOT NULL DEFAULT 0 AFTER `emote`;
+ALTER TABLE `creature_template_addon` ADD COLUMN `isLarge` TINYINT(1) UNSIGNED NOT NULL DEFAULT 0 AFTER `emote`;
 
 -- Doomwalker: Enable waypoint movement and set large
 UPDATE `creature_addon` SET `isLarge` = 1 WHERE `guid` = 84633;
