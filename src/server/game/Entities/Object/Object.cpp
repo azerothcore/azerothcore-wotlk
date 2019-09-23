@@ -1522,6 +1522,8 @@ float WorldObject::GetVisibilityRange() const
 { 
     if (isActiveObject() && !ToPlayer())
         return MAX_VISIBILITY_DISTANCE;
+    else if (IsVisibilityOverridden() && GetTypeId() == TYPEID_UNIT)
+        return MAX_VISIBILITY_DISTANCE;
     else if (GetTypeId() == TYPEID_GAMEOBJECT)
     {
         if (IsInWintergrasp())
@@ -1544,6 +1546,8 @@ float WorldObject::GetSightRange(const WorldObject* target) const
             if (target)
             {
                 if (target->isActiveObject() && !target->ToPlayer())
+                    return MAX_VISIBILITY_DISTANCE;
+                else if (target->IsVisibilityOverridden() && target->GetTypeId() == TYPEID_UNIT)
                     return MAX_VISIBILITY_DISTANCE;
                 else if (target->GetTypeId() == TYPEID_GAMEOBJECT)
                 {

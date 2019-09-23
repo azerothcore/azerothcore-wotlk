@@ -2208,6 +2208,10 @@ bool Creature::LoadCreaturesAddon(bool reload)
         SetByteValue(UNIT_FIELD_BYTES_2, 3, 0);
     }
 
+    // Check if Creature is Large
+    if (cainfo->isLarge)
+        SetVisibilityDistanceOverride(true);
+
     if (cainfo->emote != 0)
         SetUInt32Value(UNIT_NPC_EMOTESTATE, cainfo->emote);
 
