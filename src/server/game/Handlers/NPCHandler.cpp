@@ -593,7 +593,7 @@ void WorldSession::SendStablePetCallback(PreparedQueryResult result, uint64 guid
 
             data << uint32(fields[0].GetUInt32());        // id
             data << uint32(fields[1].GetUInt32());        // entry
-            data << uint32(fields[4].GetUInt32());        // level
+            data << uint32(fields[4].GetUInt16());        // level
             data << fields[8].GetString();                // petname 
             data << uint8(1);
             ++num;
