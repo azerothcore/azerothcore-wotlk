@@ -131,7 +131,7 @@ FOREACH(configFile ${MODULE_CONFIG_FILE_LIST})
     get_filename_component(file_name ${configFile} NAME_WE)
     set(CONFIG_LIST ${CONFIG_LIST}${file_name},)
 ENDFOREACH()
-add_definitions(-DCONFIG_FILE_LIST="\\"${CONFIG_LIST}\\"")
+add_definitions(-DCONFIG_FILE_LIST=$<1:"${CONFIG_LIST}">)
 # end handle config file
 
 CU_RUN_HOOK("AFTER_WORLDSERVER_CMAKE")
