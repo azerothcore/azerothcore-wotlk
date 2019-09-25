@@ -6,8 +6,6 @@
 
 #include "Errors.h"
 
-#include <ace/Stack_Trace.h>
-#include <ace/OS_NS_unistd.h>
 #include <thread>
 #include <cstdlib>
 
