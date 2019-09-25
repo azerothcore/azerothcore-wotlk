@@ -1118,30 +1118,50 @@ class spell_hun_tame_beast : public SpellScriptLoader
 
             SpellCastResult CheckCast()
             {
-                Unit* caster = GetCaster();
+               Unit* caster = GetCaster();
                 if (caster->GetTypeId() != TYPEID_PLAYER)
                     return SPELL_FAILED_DONT_REPORT;
 
+                Player* player = GetCaster()->ToPlayer();
+
                 if (!GetExplTargetUnit())
-                    return SPELL_FAILED_BAD_IMPLICIT_TARGETS;
+                {
+                    player->SendTameFailure(PET_TAME_INVALID_CREATURE);
+                    return SPELL_FAILED_DONT_REPORT;
+                }
 
                 if (Creature* target = GetExplTargetUnit()->ToCreature())
                 {
-                    if (target->getLevel() > caster->getLevel())
-                        return SPELL_FAILED_HIGHLEVEL;
+                    if (target->getLevel() > player->getLevel())
+                    {
+                        player->SendTameFailure(PET_TAME_TOO_HIGHLEVEL);
+                        return SPELL_FAILED_DONT_REPORT;
+                    }
+                    
+                    if (target->GetCreatureTemplate()->IsExotic() && !player->CanTameExoticPets())
+                    {
+                        player->SendTameFailure(PET_TAME_CANT_CONTROL_EXOTIC);
+                        return SPELL_FAILED_DONT_REPORT;
+                    }
 
-                    // use SMSG_PET_TAME_FAILURE?
-                    if (!target->GetCreatureTemplate()->IsTameable(caster->ToPlayer()->CanTameExoticPets()))
-                        return SPELL_FAILED_BAD_TARGETS;
+                    if (!target->GetCreatureTemplate()->IsTameable(player->CanTameExoticPets()))
+                    {
+                        player->SendTameFailure(PET_TAME_NOT_TAMEABLE);
+                        return SPELL_FAILED_DONT_REPORT;
+                    }
+                    
+                    if (caster->GetPetGUID() || player->GetTemporaryUnsummonedPetNumber() || player->IsPetDismissed() || player->GetCharmGUID())
+                    {
+                        player->SendTameFailure(PET_TAME_ANOTHER_SUMMON_ACTIVE);
+                        return SPELL_FAILED_DONT_REPORT;
+                    }
 
-                    if (caster->GetPetGUID())
-                        return SPELL_FAILED_ALREADY_HAVE_SUMMON;
-
-                    if (caster->GetCharmGUID())
-                        return SPELL_FAILED_ALREADY_HAVE_CHARM;
                 }
                 else
-                    return SPELL_FAILED_BAD_IMPLICIT_TARGETS;
+                {
+                    player->SendTameFailure(PET_TAME_INVALID_CREATURE);
+                    return SPELL_FAILED_DONT_REPORT;
+                }
 
                 return SPELL_CAST_OK;
             }

@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
@@ -95,6 +95,55 @@ void Pet::RemoveFromWorld()
         Unit::RemoveFromWorld();
         sObjectAccessor->RemoveObject(this);
     }
+}
+
+SpellCastResult Pet::TryLoadFromDB(Player* owner, bool current /*= false*/, PetType mandatoryPetType /*= MAX_PET_TYPE*/)
+{
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_PET_BY_ENTRY_AND_SLOT);
+    stmt->setUInt32(0, owner->GetGUIDLow());
+    stmt->setUInt8(1, uint8(current ? PET_SAVE_AS_CURRENT : PET_SAVE_NOT_IN_SLOT));
+
+    PreparedQueryResult result = CharacterDatabase.AsyncQuery(stmt);
+
+    if (!result)
+        return SPELL_FAILED_NO_PET;
+
+    Field* fields = result->Fetch();
+
+    uint32 petentry = fields[1].GetUInt32();
+    uint32 savedHealth = fields[10].GetUInt32();
+    uint32 summon_spell_id = fields[15].GetUInt32();
+    auto petType = PetType(fields[16].GetUInt8());
+
+    // update for case of current pet "slot = 0"
+    if (!petentry)
+        return SPELL_FAILED_NO_PET;
+
+    CreatureTemplate const* creatureInfo = sObjectMgr->GetCreatureTemplate(petentry);
+    if (!creatureInfo)
+    {
+        sLog->outError("Pet entry %u does not exist but used at pet load (owner: %s).", petentry, owner->GetName().c_str());
+        return SPELL_FAILED_NO_PET;
+    }
+
+    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(summon_spell_id);
+
+    bool isTemporarySummoned = spellInfo && spellInfo->GetDuration() > 0;
+
+    // check temporary summoned pets like mage water elemental
+    if (current && isTemporarySummoned)
+        return SPELL_FAILED_NO_PET;
+
+    if (!savedHealth)
+    {
+        owner->ToPlayer()->SendTameFailure(PET_TAME_DEAD);
+        return SPELL_FAILED_TARGETS_DEAD;
+    }
+
+    if (mandatoryPetType != MAX_PET_TYPE && petType != mandatoryPetType)
+        return SPELL_FAILED_BAD_TARGETS;
+
+    return SPELL_CAST_OK;
 }
 
 bool Pet::LoadPetFromDB(Player* owner, uint8 asynchLoadType, uint32 petentry, uint32 petnumber, bool current, AsynchPetSummon* info)
