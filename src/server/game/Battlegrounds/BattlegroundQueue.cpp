@@ -24,7 +24,7 @@ struct BGSpamProtectionS
     uint32 last_queue = 0; // CHAT DISABLED BY DEFAULT
 };
 
-std::unordered_map<uint32, BGSpamProtectionS> BGSpamProtection;
+std::unordered_map<uint64, BGSpamProtectionS> BGSpamProtection;
 
 /*********************************************************/
 /***            BATTLEGROUND QUEUE SYSTEM              ***/
