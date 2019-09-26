@@ -3890,7 +3890,7 @@ bool Player::_addSpell(uint32 spellId, uint8 addSpecMask, bool temporary)
                 {
                     sLog->outString("TRYING TO LEARN SPELL WITH EFFECT LEARN: %u, PLAYER: %u", spellId, GetGUIDLow());
                     return false;
-                    //ASSERT(false);
+                    //ABORT();
                 }
                 else if (const SpellInfo* learnSpell = sSpellMgr->GetSpellInfo(spellInfo->Effects[i].TriggerSpell))
                     _addSpell(learnSpell->Id, SPEC_MASK_ALL, true);
@@ -3943,7 +3943,7 @@ bool Player::_addSpell(uint32 spellId, uint8 addSpecMask, bool temporary)
         sLog->outString("TRYING TO LEARN SPELL WITH EFFECT LEARN 2: %u, PLAYER: %u", spellId, GetGUIDLow());
         m_spells.erase(spellInfo->Id); // mem leak, but should never happen
         return false;
-        //ASSERT(false);
+        //ABORT();
     }
     // pussywizard: cast passive spells (including all talents without SPELL_EFFECT_LEARN_SPELL) with additional checks
     else if (spellInfo->IsPassive() || (spellInfo->HasAttribute(SPELL_ATTR0_HIDDEN_CLIENTSIDE) && spellInfo->Stances))
@@ -20905,7 +20905,7 @@ void Player::StopCastingCharm()
         if (charm->GetCharmerGUID())
         {
             sLog->outCrash("Charmed unit has charmer guid " UI64FMTD, charm->GetCharmerGUID());
-            ASSERT(false);
+            ABORT();
         }
         else
             SetCharm(charm, false);
@@ -24521,7 +24521,7 @@ void Player::SetBattlegroundOrBattlefieldRaid(Group *group, int8 subgroup)
     if (GetGroup() && (GetGroup()->isBGGroup() || GetGroup()->isBFGroup()))
     {
         sLog->outMisc("Player::SetBattlegroundOrBattlefieldRaid - current group is %s group!", (GetGroup()->isBGGroup() ? "BG" : "BF"));
-        //ASSERT(false); // pussywizard: origanal group can never be bf/bg group
+        //ABORT(); // pussywizard: origanal group can never be bf/bg group
     }
 
     SetOriginalGroup(GetGroup(), GetSubGroup());

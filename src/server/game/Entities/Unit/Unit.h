@@ -1327,7 +1327,7 @@ class SafeUnitPointer
 {
 public:
     explicit SafeUnitPointer(Unit* defVal) :  ptr(defVal), defaultValue(defVal) {}
-    SafeUnitPointer(const SafeUnitPointer& /*p*/) { ASSERT(false); }
+    SafeUnitPointer(const SafeUnitPointer& /*p*/) { ABORT(); }
     void Initialize(Unit* defVal) { defaultValue = defVal; ptr = defVal; }
     ~SafeUnitPointer();
     void SetPointedTo(Unit* u);
