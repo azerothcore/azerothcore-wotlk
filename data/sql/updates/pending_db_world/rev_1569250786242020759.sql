@@ -3,7 +3,10 @@ INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1569250786242020759');
 ALTER TABLE `creature_addon` ADD COLUMN `isLarge` TINYINT(1) UNSIGNED NOT NULL DEFAULT 0 AFTER `emote`;
 ALTER TABLE `creature_template_addon` ADD COLUMN `isLarge` TINYINT(1) UNSIGNED NOT NULL DEFAULT 0 AFTER `emote`;
 
--- Setis
+-- Doomwalker: Enable waypoint movement
+UPDATE `creature` SET `MovementType` = 2 WHERE `guid` = 84633;
+
+-- Setis: Set large
 UPDATE `creature_addon` SET `isLarge` = 1 WHERE `guid` = 51838;
 
 -- Ported large creatures from the TC DB to the AC DB
