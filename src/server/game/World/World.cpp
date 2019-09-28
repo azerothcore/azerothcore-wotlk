@@ -1325,6 +1325,9 @@ void World::LoadConfigSettings(bool reload)
 
     // Prevent players AFK from being logged out
     m_int_configs[CONFIG_AFK_PREVENT_LOGOUT] = sConfigMgr->GetIntDefault("PreventAFKLogout", 0);
+    
+    //Delay Conflagrate
+    m_int_configs[CONFIG_DELAY_CONFLAGRATE] = sConfigMgr->GetIntDefault("DelayConflagrate", 700);
 
     // call ScriptMgr if we're reloading the configuration
     sScriptMgr->OnAfterConfigLoad(reload);

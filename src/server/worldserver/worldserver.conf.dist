@@ -3277,4 +3277,11 @@ Calculate.Gameoject.Zone.Area.Data = 0
 LFG.Location.All = 0
 
 #
+#     DelayConflagrate
+#        Description: Set time delay сonflagrate
+#        Default:     700 ms
+
+DelayConflagrate = 50
+
+#
 ###################################################################################################
