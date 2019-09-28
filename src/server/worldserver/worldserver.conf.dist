@@ -1163,6 +1163,15 @@ RecruitAFriend.MaxDifference = 4
 InstantLogout = 1
 
 #
+#    PreventAFKLogout
+#        Description: Prevent players AFK from being logged out
+#        Default:     0  - (Disabled)
+#                     1  - (Enabled, prevent players AFK from being logged out in Sanctuary zones)
+#                     2  - (Enabled, prevent players AFK from being logged out in all zones)
+
+PreventAFKLogout = 0
+
+#
 #    DisableWaterBreath
 #        Description: Required security level for water breathing.
 #        Default:     4  - (Disabled)
@@ -1187,6 +1196,7 @@ AllFlightPaths = 0
 #                     of making them wait while flying.
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
+#                     2 - (Enabled, but the player can toggle instant flight off or on at each flight master)
 
 InstantFlightPaths = 0
 
@@ -1437,7 +1447,7 @@ Motd = "Welcome to an AzerothCore server."
 #    PLEASE NOTE: another (hardcoded) text will appear below the MOTD:
 #
 #        "This server runs on AzerothCore www.azerothcore.org"
-#    
+#
 #    All the AzerothCore contributors, as well as its father projects (MaNGOS, TrinityCore, etc..),
 #    have worked for free to provide you this software. Please do not remove the credits.
 #
@@ -2627,6 +2637,17 @@ Battleground.StoreStatistics.Enable = 1
 #                     1 - (Enabled)
 
 Battleground.TrackDeserters.Enable = 1
+
+#
+#    Battleground.InvitationType
+#        Description: Set Battleground invitation type.
+#        Default:     0 - (Normal, Invite as much players to battlegrounds as queued,
+#                          Don't bother with balance)
+#                     1 - (Experimental, Don't allow to invite much more players
+#                          of one faction)
+#                     2 - (Experimental, Try to have even teams)
+
+Battleground.InvitationType = 0
 
 #
 ###################################################################################################

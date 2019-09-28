@@ -168,7 +168,6 @@ enum Spells
 
 enum MiscData
 {
-    ITEM_GOBLIN_ROCKET_PACK = 49278,
     MUSIC_ENCOUNTER         = 17289
 };
 

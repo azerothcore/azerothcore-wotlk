@@ -277,7 +277,7 @@ void WorldSession::HandleDestroyItemOpcode(WorldPacket & recvData)
         return;
     }
 
-    if (pItem->GetTemplate()->Flags & ITEM_PROTO_FLAG_INDESTRUCTIBLE)
+    if (pItem->GetTemplate()->Flags & ITEM_FLAG_NO_USER_DESTROY)
     {
         _player->SendEquipError(EQUIP_ERR_CANT_DROP_SOULBOUND, NULL, NULL);
         return;
@@ -676,7 +676,7 @@ void WorldSession::HandleSellItemOpcode(WorldPacket & recvData)
         // prevent selling item for sellprice when the item is still refundable
         // this probably happens when right clicking a refundable item, the client sends both
         // CMSG_SELL_ITEM and CMSG_REFUND_ITEM (unverified)
-        if (pItem->HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAG_REFUNDABLE))
+        if (pItem->HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_REFUNDABLE))
             return; // Therefore, no feedback to client
 
         // special case at auto sell (sell all)
@@ -940,7 +940,9 @@ void WorldSession::SendListInventory(uint64 vendorGuid)
                 ConditionList conditions = sConditionMgr->GetConditionsForNpcVendorEvent(vendor->GetEntry(), item->item);
                 if (!sConditionMgr->IsObjectMeetToConditions(_player, vendor, conditions))
                 {
-                    sLog->outError("SendListInventory: conditions not met for creature entry %u item %u", vendor->GetEntry(), item->item);
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+                    sLog->outDebug(LOG_FILTER_NETWORKIO, "SendListInventory: conditions not met for creature entry %u item %u", vendor->GetEntry(), item->item);
+#endif
                     continue;
                 }
 
@@ -1270,7 +1272,7 @@ void WorldSession::HandleWrapItemOpcode(WorldPacket& recvData)
         return;
     }
 
-    if (!(gift->GetTemplate()->Flags & ITEM_PROTO_FLAG_WRAPPER)) // cheating: non-wrapper wrapper
+    if (!(gift->GetTemplate()->Flags & ITEM_FLAG_IS_WRAPPER)) // cheating: non-wrapper wrapper
     {
         _player->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, gift, NULL);
         return;
@@ -1355,7 +1357,7 @@ void WorldSession::HandleWrapItemOpcode(WorldPacket& recvData)
         case 21830: item->SetEntry(21831); break;
     }
     item->SetUInt64Value(ITEM_FIELD_GIFTCREATOR, _player->GetGUID());
-    item->SetUInt32Value(ITEM_FIELD_FLAGS, ITEM_FLAG_WRAPPED);
+    item->SetUInt32Value(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_WRAPPED);
     item->SetState(ITEM_CHANGED, _player);
 
     // after save it will be impossible to remove the item from the queue
@@ -1455,7 +1457,7 @@ void WorldSession::HandleSocketOpcode(WorldPacket& recvData)
         ItemTemplate const* iGemProto = Gems[i]->GetTemplate();
 
         // unique item (for new and already placed bit removed enchantments
-        if (iGemProto->Flags & ITEM_PROTO_FLAG_UNIQUE_EQUIPPED)
+        if (iGemProto->Flags & ITEM_FLAG_UNIQUE_EQUIPPABLE)
         {
             for (int j = 0; j < MAX_GEM_SOCKETS; ++j)
             {

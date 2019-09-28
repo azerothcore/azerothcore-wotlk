@@ -4997,7 +4997,7 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
         // AT REMOVE
         else
         {
-            if ((GetSpellInfo()->IsQuestTame()) && caster && caster->IsAlive() && target->IsAlive())
+            if ((GetSpellInfo()->IsQuestTame()) && caster && caster->IsAlive() && target->IsAlive() && aurApp->GetRemoveMode() != AURA_REMOVE_BY_CANCEL)
             {
                 uint32 finalSpelId = 0;
                 switch (GetId())
