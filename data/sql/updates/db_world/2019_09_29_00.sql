@@ -1,3 +1,19 @@
+-- DB update 2019_09_28_00 -> 2019_09_29_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2019_09_28_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2019_09_28_00 2019_09_29_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1568124406441234663'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1568124406441234663');
 
 -- Set MovementType to 0 as Ruul is not using the default waypoint movement (table "waypoint_data") but SAI (table "waypoints")
@@ -162,3 +178,12 @@ VALUES
 (2131500,118,-3839.98,1071.58,118.499,''),
 (2131500,119,-3810.77,1074.14,125.56,''),
 (2131500,120,-3761.74,1081.67,125.316,'');
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
