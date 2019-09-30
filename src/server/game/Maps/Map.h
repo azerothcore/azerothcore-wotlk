@@ -319,6 +319,7 @@ class Map : public GridRefManager<NGridType>
         }
 
         void LoadGrid(float x, float y);
+        void LoadAllCells();
         bool UnloadGrid(NGridType& ngrid);
         virtual void UnloadAll();
 
