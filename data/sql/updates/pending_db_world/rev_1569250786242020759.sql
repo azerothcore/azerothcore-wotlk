@@ -9,6 +9,9 @@ UPDATE `creature` SET `MovementType` = 2 WHERE `guid` = 84633;
 -- Setis: Set large
 UPDATE `creature_addon` SET `isLarge` = 1 WHERE `guid` = 51838;
 
+-- Bone Giant: Set large
+UPDATE `creature_addon` SET `isLarge` = 1 WHERE `guid` IN (121147,122215,122216,122217,122218,122219);
+
 -- Ported large creatures from the TC DB to the AC DB
 DELETE FROM `creature_template_addon` WHERE `entry` IN
 (90, 229, 392, 1284, 1493, 1768, 1853, 2120, 2748, 2754, 3654, 3886, 3887, 3914, 3936, 3943, 
