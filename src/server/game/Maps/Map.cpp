@@ -469,6 +469,13 @@ void Map::LoadGrid(float x, float y)
     EnsureGridLoaded(Cell(x, y));
 }
 
+void Map::LoadAllCells()
+{
+    for (uint32 cellX = 0; cellX < TOTAL_NUMBER_OF_CELLS_PER_MAP; cellX++)
+        for (uint32 cellY = 0; cellY < TOTAL_NUMBER_OF_CELLS_PER_MAP; cellY++)
+            LoadGrid((cellX + 0.5f - CENTER_GRID_CELL_ID) * SIZE_OF_GRID_CELL, (cellY + 0.5f - CENTER_GRID_CELL_ID) * SIZE_OF_GRID_CELL);
+}
+
 bool Map::AddPlayerToMap(Player* player)
 { 
     CellCoord cellCoord = Trinity::ComputeCellCoord(player->GetPositionX(), player->GetPositionY());
@@ -2283,7 +2290,7 @@ inline void Map::setNGrid(NGridType *grid, uint32 x, uint32 y)
     if (x >= MAX_NUMBER_OF_GRIDS || y >= MAX_NUMBER_OF_GRIDS)
     {
         sLog->outError("map::setNGrid() Invalid grid coordinates found: %d, %d!", x, y);
-        ASSERT(false);
+        ABORT();
     }
     i_grids[x][y] = grid;
 }
@@ -2328,7 +2335,7 @@ void Map::AddObjectToSwitchList(WorldObject* obj, bool on)
     else if (itr->second != on)
         i_objectsToSwitch.erase(itr);
     else
-        ASSERT(false);
+        ABORT();
 }
 
 void Map::RemoveAllObjectsInRemoveList()
@@ -2539,7 +2546,7 @@ bool InstanceMap::CanEnter(Player* player, bool loginCheck)
     if (!loginCheck && player->GetMapRef().getTarget() == this)
     {
         sLog->outError("InstanceMap::CanEnter - player %s(%u) already in map %d, %d, %d!", player->GetName().c_str(), player->GetGUIDLow(), GetId(), GetInstanceId(), GetSpawnMode());
-        ASSERT(false);
+        ABORT();
         return false;
     }
 
@@ -2893,7 +2900,7 @@ bool BattlegroundMap::CanEnter(Player* player, bool loginCheck)
     if (!loginCheck && player->GetMapRef().getTarget() == this)
     {
         sLog->outError("BGMap::CanEnter - player %u is already in map!", player->GetGUIDLow());
-        ASSERT(false);
+        ABORT();
         return false;
     }
 

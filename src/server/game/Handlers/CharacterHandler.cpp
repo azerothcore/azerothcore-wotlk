@@ -1331,7 +1331,7 @@ void WorldSession::HandlePlayerLoginToCharInWorld(Player* pCurrChar)
 
 void WorldSession::HandlePlayerLoginToCharOutOfWorld(Player*  /*pCurrChar*/)
 {
-    ASSERT(false);
+    ABORT();
 }
 
 void WorldSession::HandleSetFactionAtWar(WorldPacket& recvData)

@@ -1036,7 +1036,7 @@ Item* Item::CreateItem(uint32 item, uint32 count, Player const* player)
             delete pItem;
     }
     else
-        ASSERT(false);
+        ABORT();
     return NULL;
 }
 

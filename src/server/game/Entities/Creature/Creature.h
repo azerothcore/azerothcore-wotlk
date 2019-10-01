@@ -149,6 +149,11 @@ struct CreatureTemplate
             return SKILL_SKINNING;                          // normal case
     }
 
+    bool IsExotic() const
+    {
+        return (type_flags & CREATURE_TYPE_FLAG_EXOTIC_PET) != 0;
+    }
+    
     bool IsTameable(bool exotic) const
     {
         if (type != CREATURE_TYPE_BEAST || family == 0 || (type_flags & CREATURE_TYPE_FLAG_TAMEABLE_PET) == 0)
