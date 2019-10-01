@@ -229,7 +229,7 @@ void Channel::JoinChannel(Player* player, std::string const& pass)
         }
 
         // If the channel has no owner yet and ownership is allowed, set the new owner.
-        if ((!_ownerGUID || _isOwnerInvisible) && !playersStore[guid].IsInvisible() && _ownership)
+        if ((!_ownerGUID || (_isOwnerInvisible && !playersStore[guid].IsInvisible() && sWorld->getBoolConfig(CONFIG_SILENTLY_GM_JOIN_TO_CHANNEL))) && _ownership)
         {
             _isOwnerInvisible = playersStore[guid].IsInvisible();
             SetOwner(guid, false);
