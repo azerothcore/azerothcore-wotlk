@@ -19,7 +19,12 @@
 #include "ScriptMgr.h"
 #include <unordered_map>
 
-std::unordered_map<uint64, uint32> BGSpamProtection;
+struct BGSpamProtectionS
+{
+    uint32 last_queue = 0; // CHAT DISABLED BY DEFAULT
+};
+
+std::unordered_map<uint64, BGSpamProtectionS> BGSpamProtection;
 
 /*********************************************************/
 /***            BATTLEGROUND QUEUE SYSTEM              ***/
@@ -1026,12 +1031,9 @@ void BattlegroundQueue::SendMessageQueue(Player* leader, Battleground* bg, PvPDi
     }
     else if (!bg->isArena()) // Show queue status to server (when joining battleground queue)
     {
-        if (sWorld->GetGameTime() - BGSpamProtection[leader->GetGUID()] < 0) // Unordered Map did not initialize with 0
-            BGSpamProtection[leader->GetGUID()] = 0; // Initialize with 0 so we won't have any problems
-
-        if (sWorld->GetGameTime() - BGSpamProtection[leader->GetGUID()] >= 30 || BGSpamProtection[leader->GetGUID()] == 0)
+        if (sWorld->GetGameTime() - BGSpamProtection[leader->GetGUID()].last_queue >= 30)
         {
-            BGSpamProtection[leader->GetGUID()] = sWorld->GetGameTime();
+            BGSpamProtection[leader->GetGUID()].last_queue = sWorld->GetGameTime();
             sWorld->SendWorldText(LANG_BG_QUEUE_ANNOUNCE_WORLD, bgName, q_min_level, q_max_level, qAlliance + qHorde, MaxPlayers);
         }
     }
