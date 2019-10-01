@@ -1029,7 +1029,7 @@ void BattlegroundQueue::SendMessageQueue(Player* leader, Battleground* bg, PvPDi
         if (sWorld->GetGameTime() - BGSpamProtection[leader->GetGUID()] < 0) // Unordered Map did not initialize with 0
             BGSpamProtection[leader->GetGUID()] = 0; // Initialize with 0 so we won't have any problems
 
-        if (sWorld->GetGameTime() - BGSpamProtection[leader->GetGUID()] >= 30)
+        if (sWorld->GetGameTime() - BGSpamProtection[leader->GetGUID()] >= 30 || BGSpamProtection[leader->GetGUID()] == 0)
         {
             BGSpamProtection[leader->GetGUID()] = sWorld->GetGameTime();
             sWorld->SendWorldText(LANG_BG_QUEUE_ANNOUNCE_WORLD, bgName, q_min_level, q_max_level, qAlliance + qHorde, MaxPlayers);
