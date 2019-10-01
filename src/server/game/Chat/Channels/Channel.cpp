@@ -17,7 +17,7 @@ Channel::Channel(std::string const& name, uint32 channelId, uint32 channelDBId, 
     _announce(announce),
     _ownership(ownership),
     _IsSaved(false),
-    _isOwnerInvisible(false),
+    _isOwnerGM(false),
     _flags(0),
     _channelId(channelId),
     _channelDBId(channelDBId),
@@ -213,7 +213,7 @@ void Channel::JoinChannel(Player* player, std::string const& pass)
 
     JoinNotify(player);
     
-    playersStore[guid].SetInvisible(!player->isGMVisible());
+    playersStore[guid].SetOwnerGM(AccountMgr::IsGMAccount(player->GetSession()->GetSecurity()));
 
     // Custom channel handling
     if (!IsConstant())
@@ -229,9 +229,11 @@ void Channel::JoinChannel(Player* player, std::string const& pass)
         }
 
         // If the channel has no owner yet and ownership is allowed, set the new owner.
-        if ((!_ownerGUID || (_isOwnerInvisible && !playersStore[guid].IsInvisible() && sWorld->getBoolConfig(CONFIG_SILENTLY_GM_JOIN_TO_CHANNEL))) && _ownership)
+        // If the channel owner is a GM and the config SilentGMJoinChannel is enabled, set the new owner
+        sLog->outDebug(LOG_FILTER_CHATSYS, "Is Owner GM (%s)", _isOwnerGM);
+        if ((!_ownerGUID || (_isOwnerGM && sWorld->getBoolConfig(CONFIG_SILENTLY_GM_JOIN_TO_CHANNEL))) && _ownership)
         {
-            _isOwnerInvisible = playersStore[guid].IsInvisible();
+            _isOwnerGM = playersStore[guid].IsOwnerGM();
             SetOwner(guid, false);
         }
 
@@ -291,10 +293,10 @@ void Channel::LeaveChannel(Player* player, bool send)
                 for (Channel::PlayerContainer::const_iterator itr = playersStore.begin(); itr != playersStore.end(); ++itr)
                 {
                     newowner = itr->second.player;
-                    if (itr->second.IsInvisible())
-                        _isOwnerInvisible = true;
+                    if (AccountMgr::IsGMAccount(itr->second.plrPtr->GetSession()->GetSecurity()))
+                        _isOwnerGM = true;
                     else
-                        _isOwnerInvisible = false;
+                        _isOwnerGM = false;
                     if (!itr->second.plrPtr->GetSession()->GetSecurity())
                         break;
                 }
@@ -900,17 +902,17 @@ void Channel::Invite(Player const* player, std::string const& newname)
     SendToOne(&data, guid);
 }
 
-void Channel::SetInvisible(Player const* player, bool on)
+void Channel::SetOwnerGM(Player const* player, bool on)
 {
     auto itr = playersStore.find(player->GetGUID());
     if (itr == playersStore.end())
         return;
 
-    itr->second.SetInvisible(on);
+    itr->second.SetOwnerGM(on);
 
     // we happen to be owner too, update flag
     if (_ownerGUID == player->GetGUID())
-        _isOwnerInvisible = on;
+        _isOwnerGM = on;
 }
 
 void Channel::SetOwner(uint64 guid, bool exclaim)
