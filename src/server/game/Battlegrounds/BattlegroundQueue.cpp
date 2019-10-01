@@ -1026,6 +1026,9 @@ void BattlegroundQueue::SendMessageQueue(Player* leader, Battleground* bg, PvPDi
     }
     else if (!bg->isArena()) // Show queue status to server (when joining battleground queue)
     {
+        if (sWorld->GetGameTime() - BGSpamProtection[leader->GetGUID()] < 0) // Unordered Map did not initialize with 0
+            BGSpamProtection[leader->GetGUID()] = 0; // Initialize with 0 so we won't have any problems
+
         if (sWorld->GetGameTime() - BGSpamProtection[leader->GetGUID()] >= 30)
         {
             BGSpamProtection[leader->GetGUID()] = sWorld->GetGameTime();
