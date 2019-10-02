@@ -230,7 +230,6 @@ void Channel::JoinChannel(Player* player, std::string const& pass)
 
         // If the channel has no owner yet and ownership is allowed, set the new owner.
         // If the channel owner is a GM and the config SilentGMJoinChannel is enabled, set the new owner
-        sLog->outDebug(LOG_FILTER_CHATSYS, "Is Owner GM (%s)", _isOwnerGM);
         if ((!_ownerGUID || (_isOwnerGM && sWorld->getBoolConfig(CONFIG_SILENTLY_GM_JOIN_TO_CHANNEL))) && _ownership)
         {
             _isOwnerGM = playersStore[guid].IsOwnerGM();
