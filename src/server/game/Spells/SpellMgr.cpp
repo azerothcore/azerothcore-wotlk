@@ -2624,7 +2624,7 @@ void SpellMgr::LoadSpellAreas()
     if (sWorld->getIntConfig(CONFIG_ICC_BUFF_HORDE) > 0)
     {
         sLog->outString(">> Using ICC buff Horde: %u", sWorld->getIntConfig(CONFIG_ICC_BUFF_HORDE));
-        SpellArea spellAreaICCBuffHorde    = { sWorld->getIntConfig(CONFIG_ICC_BUFF_HORDE),ICC_AREA,0,0,0,690,Gender(2),64,11,1 };
+        SpellArea spellAreaICCBuffHorde = { sWorld->getIntConfig(CONFIG_ICC_BUFF_HORDE),ICC_AREA,0,0,0,690,Gender(2),64,11,1 };
         SpellArea const* saICCBuffHorde = &mSpellAreaMap.insert(SpellAreaMap::value_type(sWorld->getIntConfig(CONFIG_ICC_BUFF_HORDE), spellAreaICCBuffHorde))->second;
         mSpellAreaForAreaMap.insert(SpellAreaForAreaMap::value_type(ICC_AREA, saICCBuffHorde));
         ++count;
