@@ -3281,4 +3281,15 @@ Calculate.Gameoject.Zone.Area.Data = 0
 LFG.Location.All = 0
 
 #
+#    ICC.Buff.Override
+#       Description: Override ICC buff which provides normally 30% increased total health, healing done, damage absorption, and damage.
+#                    If enabled "ICC.Buff.Horde" and "ICC.Buff.Alliance" accept the values 0, 5, 10, 15, 20, 25, 30.
+#       Default:     0 - (Disabled)
+#                    1 - (Enabled)
+
+ICC.Buff.Override = 0
+ICC.Buff.Horde    = 30
+ICC.Buff.Alliance = 30
+
+#
 ###################################################################################################

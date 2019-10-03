@@ -2461,9 +2461,88 @@ void SpellMgr::LoadSpellAreas()
         Field* fields = result->Fetch();
 
         uint32 spell = fields[0].GetUInt32();
+        uint32 area  = fields[1].GetUInt32();
+
+        if (sWorld->getBoolConfig(CONFIG_ICC_BUFF_OVERRIDE))
+        {
+            if (area == ICC_AREA)
+            {
+                uint32 oldSpell = spell;
+
+                switch (oldSpell)
+                {
+                    case ICC_BUFF_HORDE_5:
+                    case ICC_BUFF_HORDE_10:
+                    case ICC_BUFF_HORDE_15:
+                    case ICC_BUFF_HORDE_20:
+                    case ICC_BUFF_HORDE_25:
+                    case ICC_BUFF_HORDE_30:
+                        switch (sWorld->getIntConfig(CONFIG_ICC_BUFF_HORDE))
+                        {
+                            case 0:
+                                sLog->outString(">> ICC buff override: Removing aura %u", spell);
+                                continue; // no buff, ignore the spell_area entry
+                            case 5:
+                                spell = ICC_BUFF_HORDE_5;
+                                break;
+                            case 10:
+                                spell = ICC_BUFF_HORDE_10;
+                                break;
+                            case 15:
+                                spell = ICC_BUFF_HORDE_15;
+                                break;
+                            case 20:
+                                spell = ICC_BUFF_HORDE_20;
+                                break;
+                            case 25:
+                                spell = ICC_BUFF_HORDE_25;
+                                break;
+                            default:
+                                spell = ICC_BUFF_HORDE_30;
+                                break;
+                        }
+                        break;
+                    case ICC_BUFF_ALLIANCE_5:
+                    case ICC_BUFF_ALLIANCE_10:
+                    case ICC_BUFF_ALLIANCE_15:
+                    case ICC_BUFF_ALLIANCE_20:
+                    case ICC_BUFF_ALLIANCE_25:
+                    case ICC_BUFF_ALLIANCE_30:
+                        switch (sWorld->getIntConfig(CONFIG_ICC_BUFF_ALLIANCE))
+                        {
+                            case 0:
+                                sLog->outString(">> ICC buff override: Removing aura %u", spell);
+                                continue; // no buff, ignore the spell_area entry
+                            case 5:
+                                spell = ICC_BUFF_ALLIANCE_5;
+                                break;
+                            case 10:
+                                spell = ICC_BUFF_ALLIANCE_10;
+                                break;
+                            case 15:
+                                spell = ICC_BUFF_ALLIANCE_15;
+                                break;
+                            case 20:
+                                spell = ICC_BUFF_ALLIANCE_20;
+                                break;
+                            case 25:
+                                spell = ICC_BUFF_ALLIANCE_25;
+                                break;
+                            default:
+                                spell = ICC_BUFF_ALLIANCE_30;
+                                break;
+                        }
+                        break;
+                }
+
+                if (oldSpell != spell)
+                    sLog->outString(">> ICC buff override: Replacing aura %u with %u", oldSpell, spell);
+            }
+        }
+
         SpellArea spellArea;
         spellArea.spellId             = spell;
-        spellArea.areaId              = fields[1].GetUInt32();
+        spellArea.areaId              = area;
         spellArea.questStart          = fields[2].GetUInt32();
         spellArea.questStartStatus    = fields[3].GetUInt32();
         spellArea.questEndStatus      = fields[4].GetUInt32();

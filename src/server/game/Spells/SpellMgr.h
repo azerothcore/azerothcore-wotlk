@@ -491,6 +491,25 @@ class PetAura
 };
 typedef std::map<uint32, PetAura> SpellPetAuraMap;
 
+enum ICCBuffs
+{
+    ICC_BUFF_HORDE_5     = 73816,
+    ICC_BUFF_HORDE_10    = 73818,
+    ICC_BUFF_HORDE_15    = 73819,
+    ICC_BUFF_HORDE_20    = 73820,
+    ICC_BUFF_HORDE_25    = 73821,
+    ICC_BUFF_HORDE_30    = 73822,
+
+    ICC_BUFF_ALLIANCE_5  = 73762,
+    ICC_BUFF_ALLIANCE_10 = 73824,
+    ICC_BUFF_ALLIANCE_15 = 73825,
+    ICC_BUFF_ALLIANCE_20 = 73826,
+    ICC_BUFF_ALLIANCE_25 = 73827,
+    ICC_BUFF_ALLIANCE_30 = 73828,
+
+    ICC_AREA             = 4812
+};
+
 struct SpellArea
 {
     uint32 spellId;
