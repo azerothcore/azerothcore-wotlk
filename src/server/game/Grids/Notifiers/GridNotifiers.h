@@ -146,6 +146,16 @@ namespace Trinity
         void Visit(CorpseMapType &) {}
     };
 
+    struct LargeObjectUpdater
+    {
+        uint32 i_timeDiff;
+        explicit LargeObjectUpdater(const uint32 diff) : i_timeDiff(diff) {}
+        template<class T> void Visit(GridRefManager<T> &m);
+        void Visit(GameObjectMapType &) {}
+        void Visit(DynamicObjectMapType &) {}
+        void Visit(CorpseMapType &) {}
+    };
+
     // SEARCHERS & LIST SEARCHERS & WORKERS
 
     // WorldObject searchers & workers

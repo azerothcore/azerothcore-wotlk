@@ -325,6 +325,7 @@ struct CreatureAddon
     uint32 bytes1;
     uint32 bytes2;
     uint32 emote;
+    bool isLarge;
     std::vector<uint32> auras;
 };
 
