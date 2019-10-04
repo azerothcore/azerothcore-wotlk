@@ -493,7 +493,9 @@ typedef std::map<uint32, PetAura> SpellPetAuraMap;
 
 enum ICCBuff
 {
-    ICC_AREA             = 4812
+    ICC_AREA              = 4812,
+    ICC_RACEMASK_HORDE    =  690,
+    ICC_RACEMASK_ALLIANCE = 1101
 };
 
 struct SpellArea
