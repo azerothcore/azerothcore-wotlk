@@ -22049,6 +22049,7 @@ inline bool Player::_StoreOrEquipNewItem(uint32 vendorslot, uint32 item, uint8 c
         data << int32(crItem->maxcount > 0 ? new_count : 0xFFFFFFFF);
         data << uint32(count);
         GetSession()->SendPacket(&data);
+        it->SetItemRandomProperties(Item::GenerateItemRandomPropertyId(item));
         SendNewItem(it, pProto->BuyCount * count, true, false, false);
 
         if (!bStore)
