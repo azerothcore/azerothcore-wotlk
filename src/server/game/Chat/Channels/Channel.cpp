@@ -212,7 +212,7 @@ void Channel::JoinChannel(Player* player, std::string const& pass)
     SendToOne(&data, guid);
 
     JoinNotify(player);
-    
+
     playersStore[guid].SetOwnerGM(AccountMgr::IsGMAccount(player->GetSession()->GetSecurity()));
 
     // Custom channel handling
@@ -922,7 +922,7 @@ void Channel::SetOwner(uint64 guid, bool exclaim)
         pinfo.SetModerator(true);
         uint8 oldFlag = pinfo.flags;
         pinfo.SetOwner(true);
-        
+
         bool notify = true;
         Player* player = ObjectAccessor::FindPlayer(_ownerGUID);
 
@@ -933,7 +933,7 @@ void Channel::SetOwner(uint64 guid, bool exclaim)
         }
 
         WorldPacket data;
-        
+
         if (notify)
         {
             MakeModeChange(&data, _ownerGUID, oldFlag);
