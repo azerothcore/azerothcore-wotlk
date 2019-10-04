@@ -901,19 +901,6 @@ void Channel::Invite(Player const* player, std::string const& newname)
     SendToOne(&data, guid);
 }
 
-void Channel::SetOwnerGM(Player const* player, bool on)
-{
-    auto itr = playersStore.find(player->GetGUID());
-    if (itr == playersStore.end())
-        return;
-
-    itr->second.SetOwnerGM(on);
-
-    // we happen to be owner too, update flag
-    if (_ownerGUID == player->GetGUID())
-        _isOwnerGM = on;
-}
-
 void Channel::SetOwner(uint64 guid, bool exclaim)
 {
     if (_ownerGUID)
