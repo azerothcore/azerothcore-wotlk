@@ -3283,7 +3283,10 @@ LFG.Location.All = 0
 #
 #    ICC Buff
 #       Description: Specify ICC buff
-#       Default:     0     - (Buff Disabled)
+#       Default:     ICC.Buff.Horde    = 73822
+#                    ICC.Buff.Alliance = 73828
+#
+#                    Spell IDs for the auras:
 #                    73816 -  5% buff Horde
 #                    73818 - 10% buff Horde
 #                    73819 - 15% buff Horde
@@ -3297,8 +3300,8 @@ LFG.Location.All = 0
 #                    73827 - 25% buff Alliance
 #                    73828 - 30% buff Alliance
 
-ICC.Buff.Horde    = 0
-ICC.Buff.Alliance = 0
+ICC.Buff.Horde    = 73822
+ICC.Buff.Alliance = 73828
 
 #
 ###################################################################################################
