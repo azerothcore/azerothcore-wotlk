@@ -201,7 +201,6 @@ class Channel
         void UnBan(uint64 guid);
         void Password(Player const* player, std::string const& pass);
         void SetMode(Player const* player, std::string const& p2n, bool mod, bool set);
-        void SetOwnerGM(Player const* player, bool on);
         void SetOwner(uint64 guid, bool exclaim = true);
         void SetOwner(Player const* player, std::string const& name);
         void SendWhoOwner(uint64 guid);
