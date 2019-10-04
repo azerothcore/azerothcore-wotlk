@@ -325,6 +325,19 @@ void ObjectUpdater::Visit(GridRefManager<T> &m)
     }
 }
 
+template<class T>
+void LargeObjectUpdater::Visit(GridRefManager<T> &m)
+{
+    T* obj;
+    for (typename GridRefManager<T>::iterator iter = m.begin(); iter != m.end(); )
+    {
+        obj = iter->GetSource();
+        ++iter;
+        if (obj->IsInWorld() && obj->IsVisibilityOverridden())
+            obj->Update(i_timeDiff);
+    }
+}
+
 bool AnyDeadUnitObjectInRangeCheck::operator()(Player* u)
 {
     return !u->IsAlive() && !u->HasAuraType(SPELL_AURA_GHOST) && i_searchObj->IsWithinDistInMap(u, i_range);
@@ -358,3 +371,4 @@ bool AnyDeadUnitSpellTargetInRangeCheck::operator()(Creature* u)
 template void ObjectUpdater::Visit<Creature>(CreatureMapType&);
 template void ObjectUpdater::Visit<GameObject>(GameObjectMapType&);
 template void ObjectUpdater::Visit<DynamicObject>(DynamicObjectMapType&);
+template void LargeObjectUpdater::Visit<Creature>(CreatureMapType&);
