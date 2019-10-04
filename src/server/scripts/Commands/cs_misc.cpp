@@ -2743,6 +2743,7 @@ public:
         {
             if (Item* item = Item::CreateItem(itr->first, itr->second, handler->GetSession() ? handler->GetSession()->GetPlayer() : 0))
             {
+            	item->SetItemRandomProperties(Item::GenerateItemRandomPropertyId(itr->first));
                 item->SaveToDB(trans);                               // save for prevent lost at next mail load, if send fail then item will deleted
                 draft.AddItem(item);
             }
