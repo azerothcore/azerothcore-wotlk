@@ -935,14 +935,27 @@ void Channel::SetOwner(uint64 guid, bool exclaim)
         pinfo.SetModerator(true);
         uint8 oldFlag = pinfo.flags;
         pinfo.SetOwner(true);
+        
+        bool notify = true;
+        Player* player = ObjectAccessor::FindPlayer(_ownerGUID);
+
+        if (player)
+        {
+            uint32 sec = player->GetSession()->GetSecurity();
+            notify = !(AccountMgr::IsGMAccount(sec) && sWorld->getBoolConfig(CONFIG_SILENTLY_GM_JOIN_TO_CHANNEL));
+        }
 
         WorldPacket data;
-        MakeModeChange(&data, _ownerGUID, oldFlag);
-        SendToAll(&data);
+        
+        if (notify)
+        {
+            MakeModeChange(&data, _ownerGUID, oldFlag);
+            SendToAll(&data);
+        }
 
         FlagsNotify(pinfo.plrPtr);
 
-        if (exclaim)
+        if (exclaim && notify)
         {
             MakeOwnerChanged(&data, _ownerGUID);
             SendToAll(&data);
