@@ -1013,7 +1013,7 @@ void Item::SendTimeUpdate(Player* owner)
     owner->GetSession()->SendPacket(&data);
 }
 
-Item* Item::CreateItem(uint32 item, uint32 count, Player const* player, bool clone, uint32 clonePropId)
+Item* Item::CreateItem(uint32 item, uint32 count, Player const* player, bool clone, uint32 randomPropertyId)
 {
     if (count < 1)
         return NULL;                                        //don't create item at zero count
@@ -1031,9 +1031,10 @@ Item* Item::CreateItem(uint32 item, uint32 count, Player const* player, bool clo
         {
             pItem->SetCount(count);
             if (!clone)
-                pItem->SetItemRandomProperties(Item::GenerateItemRandomPropertyId(item));
-            else if (clone && clonePropId)
-                pItem->SetItemRandomProperties(clonePropId);
+                pItem->SetItemRandomProperties(randomPropertyId ? randomPropertyId : Item::GenerateItemRandomPropertyId(item));
+            else
+                if (randomPropertyId)
+                    pItem->SetItemRandomProperties(randomPropertyId);
             return pItem;
         }
         else

@@ -495,7 +495,7 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recvData)
     AllowedLooterSet looters = item.GetAllowedLooters();
 
     // not move item from loot to target inventory
-    Item* newitem = target->StoreNewItem(dest, item.itemid, true, looters);
+    Item* newitem = target->StoreNewItem(dest, item.itemid, true, item.randomPropertyId, looters);
     target->SendNewItem(newitem, uint32(item.count), false, false, true);
     target->UpdateLootAchievements(&item, loot);
 

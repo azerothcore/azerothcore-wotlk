@@ -1387,7 +1387,7 @@ void Group::CountTheRoll(Rolls::iterator rollI, Map* allowedMap)
                         roll->getLoot()->NotifyItemRemoved(roll->itemSlot);
                         roll->getLoot()->unlootedCount--;
                         AllowedLooterSet looters = item->GetAllowedLooters();
-                        player->StoreNewItem(dest, roll->itemid, true, looters);
+                        player->StoreNewItem(dest, roll->itemid, true, item->randomPropertyId, looters);
                         player->UpdateLootAchievements(item, roll->getLoot());
                     }
                     else
@@ -1455,7 +1455,7 @@ void Group::CountTheRoll(Rolls::iterator rollI, Map* allowedMap)
                             roll->getLoot()->NotifyItemRemoved(roll->itemSlot);
                             roll->getLoot()->unlootedCount--;
                             AllowedLooterSet looters = item->GetAllowedLooters();
-                            player->StoreNewItem(dest, roll->itemid, true, looters);
+                            player->StoreNewItem(dest, roll->itemid, true, item->randomPropertyId, looters);
                             player->UpdateLootAchievements(item, roll->getLoot());
                         }
                         else
