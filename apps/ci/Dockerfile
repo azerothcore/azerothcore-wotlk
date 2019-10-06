@@ -10,7 +10,7 @@ ADD conf/config.cmake.dist /azerothcore/conf/config.cmake.dist
 ADD src /azerothcore/src
 ADD modules /azerothcore/modules
 ADD CMakeLists.txt /azerothcore/CMakeLists.txt
-ADD /home/travis/.ccache /azerothcore/.ccache
+ADD .ccache /azerothcore/.ccache
 
 ENTRYPOINT  cd azerothcore/build && \
             # run cmake
