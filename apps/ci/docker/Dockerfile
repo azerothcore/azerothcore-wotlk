@@ -10,7 +10,7 @@ ADD conf/config.cmake.dist /azerothcore/conf/config.cmake.dist
 ADD src /azerothcore/src
 ADD modules /azerothcore/modules
 ADD CMakeLists.txt /azerothcore/CMakeLists.txt
-ADD var/build /azerothcore/build
+ADD build /azerothcore/build
 
 ENTRYPOINT  cd azerothcore/build && \
             # run cmake
