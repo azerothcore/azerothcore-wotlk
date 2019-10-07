@@ -1037,7 +1037,7 @@ std::unordered_map<int, bgRef> BattlegroundMgr::bgTypeToTemplate = {
 
 std::unordered_map<int, bgMapRef> BattlegroundMgr::getBgFromMap = {
     {
-        489,    // Warsong Gulch
+        BATTLEGROUND_WS,    // Warsong Gulch
         [](WorldPacket* data, Battleground::BattlegroundScoreMap::const_iterator itr2) {
             *data << uint32(0x00000002);            // count of next fields
             *data << uint32(((BattlegroundWGScore*)itr2->second)->FlagCaptures);        // flag captures
@@ -1045,14 +1045,14 @@ std::unordered_map<int, bgMapRef> BattlegroundMgr::getBgFromMap = {
         }
     },
     {
-        566,    // Eye of the Storm
+        BATTLEGROUND_EY,    // Eye of the Storm
         [](WorldPacket* data, Battleground::BattlegroundScoreMap::const_iterator itr2) {
             *data << uint32(0x00000001);            // count of next fields
             *data << uint32(((BattlegroundEYScore*)itr2->second)->FlagCaptures);        // flag captures
         }
     },
     {
-        529,    // Arathi Basin
+        BATTLEGROUND_AB,    // Arathi Basin
         [](WorldPacket* data, Battleground::BattlegroundScoreMap::const_iterator itr2) {
             *data << uint32(0x00000002);            // count of next fields
             *data << uint32(((BattlegroundABScore*)itr2->second)->BasesAssaulted);      // bases asssulted
@@ -1060,7 +1060,7 @@ std::unordered_map<int, bgMapRef> BattlegroundMgr::getBgFromMap = {
         }
     },
     {
-        30,     // Alterac Valley
+        BATTLEGROUND_AV,     // Alterac Valley
         [](WorldPacket* data, Battleground::BattlegroundScoreMap::const_iterator itr2) {
             *data << uint32(0x00000005);            // count of next fields
             *data << uint32(((BattlegroundAVScore*)itr2->second)->GraveyardsAssaulted); // GraveyardsAssaulted
@@ -1071,7 +1071,7 @@ std::unordered_map<int, bgMapRef> BattlegroundMgr::getBgFromMap = {
         }
     },
     {
-        607,    // Strand of the Ancients
+        BATTLEGROUND_SA,    // Strand of the Ancients
         [](WorldPacket* data, Battleground::BattlegroundScoreMap::const_iterator itr2) {
             *data << uint32(0x00000002);            // count of next fields
             *data << uint32(((BattlegroundSAScore*)itr2->second)->demolishers_destroyed);
@@ -1079,7 +1079,7 @@ std::unordered_map<int, bgMapRef> BattlegroundMgr::getBgFromMap = {
         }
     },
     {
-        628,    // Isle of Conquest
+        BATTLEGROUND_IC,    // Isle of Conquest
         [](WorldPacket* data, Battleground::BattlegroundScoreMap::const_iterator itr2) {
             *data << uint32(0x00000002);            // count of next fields
             *data << uint32(((BattlegroundICScore*)itr2->second)->BasesAssaulted);       // bases asssulted
